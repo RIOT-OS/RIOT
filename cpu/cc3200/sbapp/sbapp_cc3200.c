@@ -137,166 +137,167 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent) {
 	}
 
 	switch (pWlanEvent->Event) {
-	case SL_WLAN_CONNECT_EVENT: {
-		SET_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION);
+		case SL_WLAN_CONNECT_EVENT: {
+			SET_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION);
 
-		//
-		// Information about the connected AP (like name, MAC etc) will be
-		// available in 'slWlanConnectAsyncResponse_t'-Applications
-		// can use it if required
-		//
-		//  slWlanConnectAsyncResponse_t *pEventData = NULL;
-		// pEventData = &pWlanEvent->EventData.STAandP2PModeWlanConnected;
-		//
+			//
+			// Information about the connected AP (like name, MAC etc) will be
+			// available in 'slWlanConnectAsyncResponse_t'-Applications
+			// can use it if required
+			//
+			//  slWlanConnectAsyncResponse_t *pEventData = NULL;
+			// pEventData = &pWlanEvent->EventData.STAandP2PModeWlanConnected;
+			//
 
-		// Copy new connection SSID and BSSID to global parameters
-		memcpy(nwp.ssid,
-				pWlanEvent->EventData.STAandP2PModeWlanConnected.ssid_name,
-				pWlanEvent->EventData.STAandP2PModeWlanConnected.ssid_len);
-		memcpy(nwp.bssid,
-				pWlanEvent->EventData.STAandP2PModeWlanConnected.bssid,
-				SL_BSSID_LENGTH);
+			// Copy new connection SSID and BSSID to global parameters
+			memcpy(nwp.ssid,
+					pWlanEvent->EventData.STAandP2PModeWlanConnected.ssid_name,
+					pWlanEvent->EventData.STAandP2PModeWlanConnected.ssid_len);
+			memcpy(nwp.bssid,
+					pWlanEvent->EventData.STAandP2PModeWlanConnected.bssid,
+					SL_BSSID_LENGTH);
 
-		LOG_INFO("[WLAN EVENT] STA Connected to the AP: %s ,"
-				"BSSID: %x:%x:%x:%x:%x:%x\n\r", nwp.ssid, nwp.bssid[0],
-				nwp.bssid[1], nwp.bssid[2], nwp.bssid[3], nwp.bssid[4],
-				nwp.bssid[5]);
-	}
-		msg.type = WLAN_CONNECTED;
-
-		msg_send(&msg, sbapp.main_pid);
-
-		break;
-
-	case SL_WLAN_DISCONNECT_EVENT: {
-		slWlanConnectAsyncResponse_t* pEventData = NULL;
-
-		CLR_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION);
-		CLR_STATUS_BIT(nwp.status, STATUS_BIT_IP_ACQUIRED);
-
-		pEventData = &pWlanEvent->EventData.STAandP2PModeDisconnected;
-
-		// If the user has initiated 'Disconnect' request,
-		//'reason_code' is SL_USER_INITIATED_DISCONNECTION
-		//cppcheck-suppress duplicateBranch
-		if (SL_USER_INITIATED_DISCONNECTION == pEventData->reason_code) {
-			LOG_INFO("[WLAN EVENT]Device disconnected from the AP: %s,"
-					"BSSID: %x:%x:%x:%x:%x:%x on application's request \n\r",
-					nwp.ssid, nwp.bssid[0], nwp.bssid[1], nwp.bssid[2],
-					nwp.bssid[3], nwp.bssid[4], nwp.bssid[5]);
-		} else {
-			LOG_INFO("[WLAN ERROR]Device disconnected from the AP: %s,"
-					"BSSID: %x:%x:%x:%x:%x:%x on an ERROR..!! \n\r", nwp.ssid,
-					nwp.bssid[0], nwp.bssid[1], nwp.bssid[2], nwp.bssid[3],
-					nwp.bssid[4], nwp.bssid[5]);
+			LOG_INFO("[WLAN EVENT] STA Connected to the AP: %s ,"
+					"BSSID: %x:%x:%x:%x:%x:%x\n\r", nwp.ssid, nwp.bssid[0],
+					nwp.bssid[1], nwp.bssid[2], nwp.bssid[3], nwp.bssid[4],
+					nwp.bssid[5]);
 		}
-		memset(nwp.ssid, 0, sizeof(nwp.ssid));
-		memset(nwp.bssid, 0, sizeof(nwp.bssid));
-	}
-		break;
+			msg.type = WLAN_CONNECTED;
 
-	case SL_WLAN_STA_CONNECTED_EVENT: {
-		// when device is in AP mode and any client connects to device cc3xxx
-		SET_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION);
-		CLR_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION_FAILED);
+			msg_send(&msg, sbapp.main_pid);
 
-		//
-		// Information about the connected client (like SSID, MAC etc) will
-		// be available in 'slPeerInfoAsyncResponse_t' - Applications
-		// can use it if required
-		//
-		// slPeerInfoAsyncResponse_t *pEventData = NULL;
-		// pEventData = &pSlWlanEvent->EventData.APModeStaConnected;
-		//
+			break;
 
-	}
-		break;
+		case SL_WLAN_DISCONNECT_EVENT: {
+			slWlanConnectAsyncResponse_t* pEventData = NULL;
 
-	case SL_WLAN_STA_DISCONNECTED_EVENT: {
-		// when client disconnects from device (AP)
-		CLR_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION);
-		CLR_STATUS_BIT(nwp.status, STATUS_BIT_IP_LEASED);
+			CLR_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION);
+			CLR_STATUS_BIT(nwp.status, STATUS_BIT_IP_ACQUIRED);
 
-		//
-		// Information about the connected client (like SSID, MAC etc) will
-		// be available in 'slPeerInfoAsyncResponse_t' - Applications
-		// can use it if required
-		//
-		// slPeerInfoAsyncResponse_t *pEventData = NULL;
-		// pEventData = &pSlWlanEvent->EventData.APModestaDisconnected;
-		//
-	}
-		break;
+			pEventData = &pWlanEvent->EventData.STAandP2PModeDisconnected;
 
-	case SL_WLAN_SMART_CONFIG_COMPLETE_EVENT: {
-		SET_STATUS_BIT(nwp.status, STATUS_BIT_SMARTCONFIG_START);
+			// If the user has initiated 'Disconnect' request,
+			//'reason_code' is SL_USER_INITIATED_DISCONNECTION
+			//cppcheck-suppress duplicateBranch
+			if (SL_USER_INITIATED_DISCONNECTION == pEventData->reason_code) {
+				LOG_INFO(
+						"[WLAN EVENT]Device disconnected from the AP: %s,"
+								"BSSID: %x:%x:%x:%x:%x:%x on application's request \n\r",
+						nwp.ssid, nwp.bssid[0], nwp.bssid[1], nwp.bssid[2],
+						nwp.bssid[3], nwp.bssid[4], nwp.bssid[5]);
+			} else {
+				LOG_INFO("[WLAN ERROR]Device disconnected from the AP: %s,"
+						"BSSID: %x:%x:%x:%x:%x:%x on an ERROR..!! \n\r",
+						nwp.ssid, nwp.bssid[0], nwp.bssid[1], nwp.bssid[2],
+						nwp.bssid[3], nwp.bssid[4], nwp.bssid[5]);
+			}
+			memset(nwp.ssid, 0, sizeof(nwp.ssid));
+			memset(nwp.bssid, 0, sizeof(nwp.bssid));
+		}
+			break;
 
-		//
-		// Information about the SmartConfig details (like Status, SSID,
-		// Token etc) will be available in 'slSmartConfigStartAsyncResponse_t'
-		// - Applications can use it if required
-		//
-		//  slSmartConfigStartAsyncResponse_t *pEventData = NULL;
-		//  pEventData = &pSlWlanEvent->EventData.smartConfigStartResponse;
-		//
+		case SL_WLAN_STA_CONNECTED_EVENT: {
+			// when device is in AP mode and any client connects to device cc3xxx
+			SET_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION);
+			CLR_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION_FAILED);
 
-	}
-		break;
+			//
+			// Information about the connected client (like SSID, MAC etc) will
+			// be available in 'slPeerInfoAsyncResponse_t' - Applications
+			// can use it if required
+			//
+			// slPeerInfoAsyncResponse_t *pEventData = NULL;
+			// pEventData = &pSlWlanEvent->EventData.APModeStaConnected;
+			//
 
-	case SL_WLAN_SMART_CONFIG_STOP_EVENT: {
-		// SmartConfig operation finished
-		CLR_STATUS_BIT(nwp.status, STATUS_BIT_SMARTCONFIG_START);
+		}
+			break;
 
-		//
-		// Information about the SmartConfig details (like Status, padding
-		// etc) will be available in 'slSmartConfigStopAsyncResponse_t' -
-		// Applications can use it if required
-		//
-		// slSmartConfigStopAsyncResponse_t *pEventData = NULL;
-		// pEventData = &pSlWlanEvent->EventData.smartConfigStopResponse;
-		//
-	}
-		break;
+		case SL_WLAN_STA_DISCONNECTED_EVENT: {
+			// when client disconnects from device (AP)
+			CLR_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION);
+			CLR_STATUS_BIT(nwp.status, STATUS_BIT_IP_LEASED);
 
-	case SL_WLAN_P2P_DEV_FOUND_EVENT: {
-		SET_STATUS_BIT(nwp.status, STATUS_BIT_P2P_DEV_FOUND);
+			//
+			// Information about the connected client (like SSID, MAC etc) will
+			// be available in 'slPeerInfoAsyncResponse_t' - Applications
+			// can use it if required
+			//
+			// slPeerInfoAsyncResponse_t *pEventData = NULL;
+			// pEventData = &pSlWlanEvent->EventData.APModestaDisconnected;
+			//
+		}
+			break;
 
-		//
-		// Information about P2P config details (like Peer device name, own
-		// SSID etc) will be available in 'slPeerInfoAsyncResponse_t' -
-		// Applications can use it if required
-		//
-		// slPeerInfoAsyncResponse_t *pEventData = NULL;
-		// pEventData = &pSlWlanEvent->EventData.P2PModeDevFound;
-		//
-	}
-		break;
+		case SL_WLAN_SMART_CONFIG_COMPLETE_EVENT: {
+			SET_STATUS_BIT(nwp.status, STATUS_BIT_SMARTCONFIG_START);
 
-	case SL_WLAN_P2P_NEG_REQ_RECEIVED_EVENT: {
-		SET_STATUS_BIT(nwp.status, STATUS_BIT_P2P_REQ_RECEIVED);
+			//
+			// Information about the SmartConfig details (like Status, SSID,
+			// Token etc) will be available in 'slSmartConfigStartAsyncResponse_t'
+			// - Applications can use it if required
+			//
+			//  slSmartConfigStartAsyncResponse_t *pEventData = NULL;
+			//  pEventData = &pSlWlanEvent->EventData.smartConfigStartResponse;
+			//
 
-		//
-		// Information about P2P Negotiation req details (like Peer device
-		// name, own SSID etc) will be available in 'slPeerInfoAsyncResponse_t'
-		//  - Applications can use it if required
-		//
-		// slPeerInfoAsyncResponse_t *pEventData = NULL;
-		// pEventData = &pSlWlanEvent->EventData.P2PModeNegReqReceived;
-		//
-	}
-		break;
+		}
+			break;
 
-	case SL_WLAN_CONNECTION_FAILED_EVENT: {
-		// If device gets any connection failed event
-		SET_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION_FAILED);
-	}
-		break;
+		case SL_WLAN_SMART_CONFIG_STOP_EVENT: {
+			// SmartConfig operation finished
+			CLR_STATUS_BIT(nwp.status, STATUS_BIT_SMARTCONFIG_START);
 
-	default: {
-		LOG_WARNING("[WLAN EVENT] Unexpected event [0x%lx]\n\r",
-				pWlanEvent->Event);
-	}
-		break;
+			//
+			// Information about the SmartConfig details (like Status, padding
+			// etc) will be available in 'slSmartConfigStopAsyncResponse_t' -
+			// Applications can use it if required
+			//
+			// slSmartConfigStopAsyncResponse_t *pEventData = NULL;
+			// pEventData = &pSlWlanEvent->EventData.smartConfigStopResponse;
+			//
+		}
+			break;
+
+		case SL_WLAN_P2P_DEV_FOUND_EVENT: {
+			SET_STATUS_BIT(nwp.status, STATUS_BIT_P2P_DEV_FOUND);
+
+			//
+			// Information about P2P config details (like Peer device name, own
+			// SSID etc) will be available in 'slPeerInfoAsyncResponse_t' -
+			// Applications can use it if required
+			//
+			// slPeerInfoAsyncResponse_t *pEventData = NULL;
+			// pEventData = &pSlWlanEvent->EventData.P2PModeDevFound;
+			//
+		}
+			break;
+
+		case SL_WLAN_P2P_NEG_REQ_RECEIVED_EVENT: {
+			SET_STATUS_BIT(nwp.status, STATUS_BIT_P2P_REQ_RECEIVED);
+
+			//
+			// Information about P2P Negotiation req details (like Peer device
+			// name, own SSID etc) will be available in 'slPeerInfoAsyncResponse_t'
+			//  - Applications can use it if required
+			//
+			// slPeerInfoAsyncResponse_t *pEventData = NULL;
+			// pEventData = &pSlWlanEvent->EventData.P2PModeNegReqReceived;
+			//
+		}
+			break;
+
+		case SL_WLAN_CONNECTION_FAILED_EVENT: {
+			// If device gets any connection failed event
+			SET_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION_FAILED);
+		}
+			break;
+
+		default: {
+			LOG_WARNING("[WLAN EVENT] Unexpected event [0x%lx]\n\r",
+					pWlanEvent->Event);
+		}
+			break;
 	}
 }
 
@@ -317,66 +318,67 @@ void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *ev) {
 	}
 
 	switch (ev->Event) {
-	case SL_NETAPP_IPV4_IPACQUIRED_EVENT:
+		case SL_NETAPP_IPV4_IPACQUIRED_EVENT:
 
-		SET_STATUS_BIT(nwp.status, STATUS_BIT_IP_ACQUIRED);
+			SET_STATUS_BIT(nwp.status, STATUS_BIT_IP_ACQUIRED);
 
-		//Ip Acquired Event Data
-		pEventData = &ev->EventData.ipAcquiredV4;
-		nwp.ip = pEventData->ip;
+			//Ip Acquired Event Data
+			pEventData = &ev->EventData.ipAcquiredV4;
+			nwp.ip = pEventData->ip;
 
-		//Gateway IP address
-		nwp.gw_ip = pEventData->gateway;
+			//Gateway IP address
+			nwp.gw_ip = pEventData->gateway;
 
-		LOG_INFO("[NETAPP EVENT] IP Acquired: IP=%lu.%lu.%lu.%lu , "
-				"Gateway=%lu.%lu.%lu.%lu\n\r",
-				SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.ip, 3),
-				SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.ip, 2),
-				SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.ip, 1),
-				SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.ip, 0),
-				SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.gateway, 3),
-				SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.gateway, 2),
-				SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.gateway, 1),
-				SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.gateway, 0));
+			LOG_INFO("[NETAPP EVENT] IP Acquired: IP=%lu.%lu.%lu.%lu , "
+					"Gateway=%lu.%lu.%lu.%lu\n\r",
+					SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.ip, 3),
+					SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.ip, 2),
+					SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.ip, 1),
+					SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.ip, 0),
+					SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.gateway, 3),
+					SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.gateway, 2),
+					SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.gateway, 1),
+					SL_IPV4_BYTE(ev->EventData.ipAcquiredV4.gateway, 0));
 
-		msg.type = IP_ACQUIRED;
-		msg_send(&msg, sbapp.main_pid);
+			msg.type = IP_ACQUIRED;
+			msg_send(&msg, sbapp.main_pid);
 
-		break;
+			break;
 
-	case SL_NETAPP_IP_LEASED_EVENT: {
-		SET_STATUS_BIT(nwp.status, STATUS_BIT_IP_LEASED);
+		case SL_NETAPP_IP_LEASED_EVENT: {
+			SET_STATUS_BIT(nwp.status, STATUS_BIT_IP_LEASED);
 
-		//
-		// Information about the IP-Leased details(like IP-Leased,lease-time,
-		// mac etc) will be available in 'SlIpLeasedAsync_t' - Applications
-		// can use it if required
-		//
-		// SlIpLeasedAsync_t *pEventData = NULL;
-		// pEventData = &pNetAppEvent->EventData.ipLeased;
-		//
+			//
+			// Information about the IP-Leased details(like IP-Leased,lease-time,
+			// mac etc) will be available in 'SlIpLeasedAsync_t' - Applications
+			// can use it if required
+			//
+			// SlIpLeasedAsync_t *pEventData = NULL;
+			// pEventData = &pNetAppEvent->EventData.ipLeased;
+			//
 
-	}
-		break;
+		}
+			break;
 
-	case SL_NETAPP_IP_RELEASED_EVENT: {
-		CLR_STATUS_BIT(nwp.status, STATUS_BIT_IP_LEASED);
+		case SL_NETAPP_IP_RELEASED_EVENT: {
+			CLR_STATUS_BIT(nwp.status, STATUS_BIT_IP_LEASED);
 
-		//
-		// Information about the IP-Released details (like IP-address, mac
-		// etc) will be available in 'SlIpReleasedAsync_t' - Applications
-		// can use it if required
-		//
-		// SlIpReleasedAsync_t *pEventData = NULL;
-		// pEventData = &pNetAppEvent->EventData.ipReleased;
-		//
-	}
-		break;
+			//
+			// Information about the IP-Released details (like IP-address, mac
+			// etc) will be available in 'SlIpReleasedAsync_t' - Applications
+			// can use it if required
+			//
+			// SlIpReleasedAsync_t *pEventData = NULL;
+			// pEventData = &pNetAppEvent->EventData.ipReleased;
+			//
+		}
+			break;
 
-	default: {
-		LOG_WARNING("[NETAPP EVENT] unexpected event [0x%lx] \n", ev->Event);
-	}
-		break;
+		default: {
+			LOG_WARNING("[NETAPP EVENT] unexpected event [0x%lx] \n",
+					ev->Event);
+		}
+			break;
 	}
 }
 
@@ -575,11 +577,7 @@ long simplelink_to_default_state(void) {
  * @brief signals that smartconfig process is active
  */
 void smartconfig_still_active(void* arg) {
-	msg_t m = {
-			0,
-			SMARTCONFIG_ACTIVE,
-			{
-					0 } };
+	msg_t m = {0, SMARTCONFIG_ACTIVE, {0}};
 
 	msg_send(&m, sbapp.main_pid);
 }
@@ -588,11 +586,7 @@ void smartconfig_still_active(void* arg) {
  * @brief notify that time has come for another connection retry
  */
 void retry_connection(void* arg) {
-	msg_t m = {
-			0,
-			AUTO_CONNECTION_TIME_SLOT,
-			{
-					0 } };
+	msg_t m = {0, AUTO_CONNECTION_TIME_SLOT, {0}};
 
 	msg_send(&m, sbapp.main_pid);
 }
@@ -611,19 +605,23 @@ long wifi_connect(void) {
 
 int sbapp_init(void) {
 
+	msg_t m;
+	kernel_pid_t parent = thread_getpid();
+
 	/* check if thread is already running */
 	if (sbapp.main_pid == KERNEL_PID_UNDEF) {
 		/* start SBAPP thread */
 		sbapp.main_pid = thread_create(_stack, sizeof(_stack), SBAPP_PRIO,
-		THREAD_CREATE_STACKTEST, _event_loop, NULL, "sbapp");
+		THREAD_CREATE_STACKTEST, _event_loop, &parent, "sbapp");
 	}
+	msg_receive(&m);
+
 	return sbapp.main_pid;
 }
 
 uint32_t net_atoi(const char* name) {
 	uint32_t ip;
 	int sts;
-
 
 	// resolve HOST NAME/IP
 	sts = gethostbyname((signed char *) name, strlen(name), &ip, SL_AF_INET);
@@ -728,21 +726,21 @@ static void *_send_handler_task(void *arg) {
 	while (loop) {
 		msg_receive(&msg);
 		switch (msg.type) {
-		case SBAPI_MSG_TYPE_SND:
-			DEBUG("sbapp send: GNRC_SBAPI_MSG_TYPE_SND\n");
-			_send(conn, (gnrc_pktsnip_t *) msg.content.ptr);
-			break;
-		case SBAPI_MSG_TYPE_ERR:
-			DEBUG("sbapp send: SBAPI_MSG_TYPE_ERR\n");
-			loop = 0;
-			break;
-		case SBAPI_MSG_TYPE_SET:
-		case SBAPI_MSG_TYPE_GET:
-			msg_reply(&msg, &reply);
-			break;
-		default:
-			DEBUG("sbapp send: received unidentified message\n");
-			break;
+			case SBAPI_MSG_TYPE_SND:
+				DEBUG("sbapp send: GNRC_SBAPI_MSG_TYPE_SND\n");
+				_send(conn, (gnrc_pktsnip_t *) msg.content.ptr);
+				break;
+			case SBAPI_MSG_TYPE_ERR:
+				DEBUG("sbapp send: SBAPI_MSG_TYPE_ERR\n");
+				loop = 0;
+				break;
+			case SBAPI_MSG_TYPE_SET:
+			case SBAPI_MSG_TYPE_GET:
+				msg_reply(&msg, &reply);
+				break;
+			default:
+				DEBUG("sbapp send: received unidentified message\n");
+				break;
 
 		}
 	}
@@ -859,8 +857,7 @@ sbh_t sbapp_connect(uint8_t conn_type, uint32_t remote_ip, uint16_t remote_port,
 
 	// start the send task
 	conn->send_pid = thread_create(conn->send_stack, SBAPP_STACK_SIZE,
-			SBAPP_PRIO, THREAD_CREATE_STACKTEST, _send_handler_task, conn,
-			"sbapp");
+	SBAPP_PRIO, THREAD_CREATE_STACKTEST, _send_handler_task, conn, "sbapp");
 
 	// start the receive task
 	conn->recv_pid = thread_create(conn->recv_stack, SBAPP_STACK_SIZE,
@@ -898,7 +895,7 @@ int sbapp_send(sbh_t fd, void* data, size_t len) {
 }
 
 static void *_event_loop(void *arg) {
-	(void) arg;
+	kernel_pid_t parent_thr = *(kernel_pid_t *) arg;
 	msg_t msg, reply;
 	msg_t msg_queue[SBAPP_MSG_QUEUE_SIZE];
 	int counter = 0;
@@ -907,6 +904,7 @@ static void *_event_loop(void *arg) {
 	reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
 	reply.content.value = (uint32_t) -ENOTSUP;
 
+	//sbapp.main_pid = thread_getpid();
 	sbapp.sig_tim.callback = retry_connection;
 
 	/* initialize message queue */
@@ -927,61 +925,63 @@ static void *_event_loop(void *arg) {
 		msg_receive(&msg);
 		switch (msg.type) {
 
-		case SMARTCONFIG_ACTIVE:
-			if (!IS_IP_ACQUIRED(nwp.status)) {
-				xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(200));
-				LED_RED_TOGGLE;
-			} else {
-				LED_RED_OFF;
-				LED_GREEN_ON;
-			}
-
-			break;
-		case AUTO_CONNECTION_TIME_SLOT:
-			if (counter == MAX_CONN_COUNTER_VAL) {
-				counter = 0;
-				LOG_INFO("Use Smart Config App to configure the device.\n");
-				//Connect Using Smart Config
-				if (smartconfig_connect() < 0) {
-					PANIC(SMARTCONFIG_ERR);
+			case SMARTCONFIG_ACTIVE:
+				if (!IS_IP_ACQUIRED(nwp.status)) {
+					xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(200));
+					LED_RED_TOGGLE;
+				} else {
+					LED_RED_OFF;
+					LED_GREEN_ON;
 				}
 
-				sbapp.sig_tim.callback = smartconfig_still_active;
-				xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(200));
-				LED_RED_TOGGLE;
-				LED_YELLOW_OFF;
-			} else if (!IS_IP_ACQUIRED(nwp.status)) {
-				counter++;
-				xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(100));
-				LED_YELLOW_TOGGLE;
+				break;
+			case AUTO_CONNECTION_TIME_SLOT:
+				if (counter == MAX_CONN_COUNTER_VAL) {
+					counter = 0;
+					LOG_INFO("Use Smart Config App to configure the device.\n");
+					//Connect Using Smart Config
+					if (smartconfig_connect() < 0) {
+						PANIC(SMARTCONFIG_ERR);
+					}
+
+					sbapp.sig_tim.callback = smartconfig_still_active;
+					xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(200));
+					LED_RED_TOGGLE;
+					LED_YELLOW_OFF;
+				} else if (!IS_IP_ACQUIRED(nwp.status)) {
+					counter++;
+					xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(100));
+					LED_YELLOW_TOGGLE;
+				}
+
+				break;
+			case WLAN_CONNECTED: {
+				break;
 			}
+			case IP_ACQUIRED:
 
-			break;
-		case WLAN_CONNECTED: {
-			break;
-		}
-		case IP_ACQUIRED:
+				LOG_INFO("\nSTA mode, connect to the AP[%s] and type"
+						"IP address [%lu.%lu.%lu.%lu] in the browser \n",
+						nwp.ssid, SL_IPV4_BYTE(nwp.ip, 3),
+						SL_IPV4_BYTE(nwp.ip, 2), SL_IPV4_BYTE(nwp.ip, 1),
+						SL_IPV4_BYTE(nwp.ip, 0));
 
-			LOG_INFO("\nSTA mode, connect to the AP[%s] and type"
-					"IP address [%lu.%lu.%lu.%lu] in the browser \n", nwp.ssid,
-					SL_IPV4_BYTE(nwp.ip, 3), SL_IPV4_BYTE(nwp.ip, 2),
-					SL_IPV4_BYTE(nwp.ip, 1), SL_IPV4_BYTE(nwp.ip, 0));
+				LED_GREEN_ON;
+				LED_YELLOW_OFF;
+				msg.type = 0x1000;
+				msg_send(&msg, parent_thr);
+				break;
 
-			LED_GREEN_ON;
-			LED_YELLOW_OFF;
-
-			break;
-
-		case SBAPI_MSG_TYPE_SET:
-		case SBAPI_MSG_TYPE_GET:
-			msg_reply(&msg, &reply);
-			break;
-		case SBAPI_MSG_TYPE_HANDLER_EXIT:
-			free(msg.content.ptr);
-			break;
-		default:
-			DEBUG("sbapp: received unidentified message\n");
-			break;
+			case SBAPI_MSG_TYPE_SET:
+			case SBAPI_MSG_TYPE_GET:
+				msg_reply(&msg, &reply);
+				break;
+			case SBAPI_MSG_TYPE_HANDLER_EXIT:
+				free(msg.content.ptr);
+				break;
+			default:
+				DEBUG("sbapp: received unidentified message\n");
+				break;
 		}
 	}
 
