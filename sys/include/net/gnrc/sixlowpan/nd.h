@@ -220,15 +220,6 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6,
  */
 bool gnrc_sixlowpan_nd_opt_6ctx_handle(uint8_t icmpv6_type, sixlowpan_nd_opt_6ctx_t *ctx_opt);
 
-/**
- * @brief   Handles registration calls after node-wakeup.
- *
- * @see     <a href="https://tools.ietf.org/html/rfc6775#section-5.8.2">
- *              RFC 6776, section 5.8.2
- *          </a>
- */
-void gnrc_sixlowpan_nd_wakeup(void);
-
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
 /**
  * @brief   Handles authoritative border router option.

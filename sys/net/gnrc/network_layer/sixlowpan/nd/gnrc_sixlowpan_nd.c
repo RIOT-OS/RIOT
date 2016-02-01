@@ -391,17 +391,6 @@ bool gnrc_sixlowpan_nd_opt_6ctx_handle(uint8_t icmpv6_type, sixlowpan_nd_opt_6ct
     return true;
 }
 
-void gnrc_sixlowpan_nd_wakeup(void)
-{
-    gnrc_ipv6_nc_t *router = gnrc_ipv6_nc_get_next_router(NULL);
-    while (router) {
-        gnrc_sixlowpan_nd_uc_rtr_sol(router);
-        gnrc_ndp_internal_send_nbr_sol(router->iface, NULL, &router->ipv6_addr, &router->ipv6_addr);
-        gnrc_ndp_internal_reset_nbr_sol_timer(router, GNRC_NDP_RETRANS_TIMER,
-                                              GNRC_NDP_MSG_NBR_SOL_RETRANS, gnrc_ipv6_pid);
-    }
-}
-
 /* gnrc_sixlowpan_nd_opt_abr_handle etc. implemented in gnrc_sixlowpan_nd_router */
 
 /** @} */
