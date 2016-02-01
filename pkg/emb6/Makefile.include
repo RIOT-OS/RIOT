@@ -1,7 +1,9 @@
 PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/emb6
 EMB6_DIR := $(PKG_BUILDDIR)
+EMB6_CONTRIB := $(RIOTBASE)/pkg/emb6/contrib
 
-INCLUDES += -I$(EMB6_DIR)/target
+INCLUDES += -I$(PKG_BUILDDIR)/target
+INCLUDES += -I$(RIOTBASE)/pkg/emb6/include
 
 ifeq (,$(filter emb6_router,$(USEMODULE)))
   CFLAGS += -DEMB6_CONF_ROUTER=FALSE
@@ -14,6 +16,10 @@ endif
 ifneq (,$(filter emb6_common,$(USEMODULE)))
   DIRS += $(EMB6_DIR)/emb6
   INCLUDES += -I$(EMB6_DIR)/emb6
+endif
+
+ifneq (,$(filter emb6_contrib,$(USEMODULE)))
+  DIRS += $(EMB6_CONTRIB)
 endif
 
 ifneq (,$(filter emb6_ipv6,$(USEMODULE)))

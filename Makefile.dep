@@ -365,6 +365,7 @@ ifneq (,$(filter emb6,$(USEMODULE)))
   USEPKG += emb6
   USEMODULE += emb6_bsp
   USEMODULE += emb6_common
+  USEMODULE += emb6_contrib
   USEMODULE += emb6_ipv6
   USEMODULE += emb6_ipv6_multicast
   USEMODULE += emb6_llsec
