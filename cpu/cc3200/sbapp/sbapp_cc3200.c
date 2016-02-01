@@ -607,6 +607,7 @@ int sbapp_init(void) {
 
 	msg_t m;
 	kernel_pid_t parent = thread_getpid();
+	int sts;
 
 	/* check if thread is already running */
 	if (sbapp.main_pid == KERNEL_PID_UNDEF) {
@@ -614,8 +615,11 @@ int sbapp_init(void) {
 		sbapp.main_pid = thread_create(_stack, sizeof(_stack), SBAPP_PRIO,
 		THREAD_CREATE_STACKTEST, _event_loop, &parent, "sbapp");
 	}
-	msg_receive(&m);
-
+	sts = msg_receive(&m); // yield until ip connection is ready
+	if (sts == -1) {
+		DEBUG("unexpected error\n");
+	}
+	DEBUG("msg type: [%d]\n", m.type);
 	return sbapp.main_pid;
 }
 
@@ -767,9 +771,12 @@ static void *_receive_handler_task(void* arg) {
 	cd_t *cd = (cd_t *) arg;
 	int16_t size = 0;
 	gnrc_pktsnip_t *l4, *l3;
+	sockaddr_in from_addr;
+	socklen_t addr_size = sizeof(sockaddr_in);
 
 	do {
-		size = recv(cd->fd, recv_buffer, RECV_BUFF_SIZE, 0);
+		size = recvfrom(cd->fd, recv_buffer, RECV_BUFF_SIZE, 0,
+				(sockaddr*) &from_addr, &addr_size);
 		if (size <= 0) {
 			/**
 			 * error condition detected
@@ -785,13 +792,27 @@ static void *_receive_handler_task(void* arg) {
 		} else {
 			recv_buffer[size] = 0;
 
+			cd->addr = from_addr;
+
 			/* copy packet payload into pktbuf */
-			l3 = gnrc_pktbuf_add(NULL, cd, sizeof(cd_t*), GNRC_NETTYPE_SBAPP);
+			l3 = gnrc_pktbuf_add(NULL, cd, sizeof(cd_t), GNRC_NETTYPE_SBAPP);
 
 			l4 = gnrc_pktbuf_add(l3, recv_buffer, size + 1, GNRC_NETTYPE_UNDEF);
 
-			DEBUG("channel %d: recv: %s (len %d)\n",
-					cd->fd, (char *) l4->data, size);
+			DEBUG("channel %d: recv: %s (len %d) from %lu.%lu.%lu.%lu:%d\n",
+					cd->fd, (char *) l4->data, size,
+					SL_IPV4_BYTE(cd->addr.sin_addr.s_addr, 0),
+					SL_IPV4_BYTE(cd->addr.sin_addr.s_addr, 1),
+					SL_IPV4_BYTE(cd->addr.sin_addr.s_addr, 2),
+					SL_IPV4_BYTE(cd->addr.sin_addr.s_addr, 3),
+					ntohs(cd->addr.sin_port));
+#if 0
+					SL_IPV4_BYTE(from_addr.sin_addr.s_addr, 0),
+					SL_IPV4_BYTE(from_addr.sin_addr.s_addr, 1),
+					SL_IPV4_BYTE(from_addr.sin_addr.s_addr, 2),
+					SL_IPV4_BYTE(from_addr.sin_addr.s_addr, 3),
+					ntohs(from_addr.sin_port));
+#endif
 			msg.type = SBAPI_MSG_TYPE_RCV;
 			//msg.content.ptr = (char*)recv_buffer;
 			msg.content.ptr = (void*) l4;
@@ -816,9 +837,11 @@ static void *_receive_handler_task(void* arg) {
 sbh_t sbapp_connect(uint8_t conn_type, uint32_t remote_ip, uint16_t remote_port,
 		uint16_t local_port, kernel_pid_t pid) {
 
+#if 0
 	while (!IS_IP_ACQUIRED(nwp.status)) {
 		// wait for ip layer setup
 	}
+#endif
 
 	// create a connection descriptor
 	cd_t *conn = malloc(sizeof(cd_t));
@@ -904,7 +927,7 @@ static void *_event_loop(void *arg) {
 	reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
 	reply.content.value = (uint32_t) -ENOTSUP;
 
-	//sbapp.main_pid = thread_getpid();
+	sbapp.main_pid = thread_getpid();
 	sbapp.sig_tim.callback = retry_connection;
 
 	/* initialize message queue */
