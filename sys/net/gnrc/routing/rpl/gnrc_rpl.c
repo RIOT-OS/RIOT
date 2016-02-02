@@ -103,8 +103,8 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
     dodag->grounded = GNRC_RPL_GROUNDED;
     dodag->node_status = GNRC_RPL_ROOT_NODE;
     dodag->my_rank = GNRC_RPL_ROOT_RANK;
-    dodag->dodag_conf_requested = true;
-    dodag->prefix_info_requested = true;
+    dodag->req_opts |= GNRC_RPL_REQ_OPT_DODAG_CONF;
+    dodag->req_opts |= GNRC_RPL_REQ_OPT_PREFIX_INFO;
 
     trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL,
                   GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << dodag->dio_min),
