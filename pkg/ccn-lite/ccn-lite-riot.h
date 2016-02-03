@@ -176,7 +176,15 @@ int ccnl_send_interest(int suite, char *name, unsigned int *chunknum,
                        unsigned char *buf, size_t buf_len);
 
 /**
- * @brief Waits for incoming content chunk
+ * @brief Wait for incoming content chunk
+ *
+ * @pre The thread has to register for CCNL_CONT_CHUNK in @ref netreg first
+ *
+ * @post The thread should unregister from @ref netreg after this function returns
+ *
+ * @param[out] buf      Buffer to stores the received content
+ * @param[in]  buf_len  Size of @p buf
+ * @param[in]  timeout  Maximum to wait for the chunk, set to a default value if 0
  *
  * @return 0 if a content was received
  * @return -ETIMEDOUT if no chunk was received until timeout
