@@ -437,13 +437,13 @@ void i2c_poweroff(i2c_t dev)
     switch (dev) {
 #if I2C_0_EN
         case I2C_0:
-            while (I2C_0_DEV->SR2 & I2C_SR2_BUSY);
+            while (I2C_0_DEV->SR2 & I2C_SR2_BUSY) ;
             I2C_0_CLKDIS();
             break;
 #endif
 #if I2C_1_EN
         case I2C_1:
-            while (I2C_1_DEV->SR2 & I2C_SR2_BUSY);
+            while (I2C_1_DEV->SR2 & I2C_SR2_BUSY) ;
             I2C_1_CLKDIS();
             break;
 #endif
