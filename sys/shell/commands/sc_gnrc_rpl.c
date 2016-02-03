@@ -241,6 +241,22 @@ int _gnrc_rpl_operation(bool leaf, char *arg1)
     return 0;
 }
 
+int _gnrc_rpl_set_pio(char *inst_id, bool status)
+{
+    uint8_t instance_id = (uint8_t) atoi(inst_id);
+    gnrc_rpl_instance_t *inst;
+
+    if ((inst = gnrc_rpl_instance_get(instance_id)) == NULL) {
+        printf("error: could not find the instance (%d)\n", instance_id);
+        return 1;
+    }
+
+    gnrc_rpl_config_pio(&inst->dodag, status);
+
+    printf("success: %sactivated PIO transmissions\n", status ? "" : "de");
+    return 0;
+}
+
 int _gnrc_rpl(int argc, char **argv)
 {
     if ((argc < 2) || (strcmp(argv[1], "show") == 0)) {
@@ -283,6 +299,18 @@ int _gnrc_rpl(int argc, char **argv)
             return _gnrc_rpl_operation(false, argv[2]);
         }
     }
+    else if (strcmp(argv[1], "set") == 0) {
+        if (argc > 2) {
+            if (strcmp(argv[2], "pio") == 0) {
+                if ((argc == 5) && (strcmp(argv[3], "on") == 0)) {
+                    return _gnrc_rpl_set_pio(argv[4], true);
+                }
+                else if ((argc == 5) && (strcmp(argv[3], "off") == 0)) {
+                    return _gnrc_rpl_set_pio(argv[4], false);
+                }
+            }
+        }
+    }
 
     puts("* help\t\t\t\t- show usage");
     puts("* init <if_id>\t\t\t- initialize RPL on the given interface");
@@ -294,6 +322,7 @@ int _gnrc_rpl(int argc, char **argv)
     puts("* root <inst_id> <dodag_id>\t- add a dodag to a new or existing instance");
     puts("* router <instance_id>\t\t- operate as router in the instance");
     puts("* send dis\t\t\t- send a multicast DIS");
+    puts("* set pio <on/off> <instance_id>- (de-)activate PIO transmissions in DIOs");
     puts("* show\t\t\t\t- show instance and dodag tables");
     return 0;
 }
