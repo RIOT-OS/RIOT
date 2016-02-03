@@ -12,6 +12,26 @@
  * @defgroup    net_gnrc_rpl  RPL
  * @ingroup     net_gnrc
  * @brief       RPL implementation for GNRC
+ *
+ * Configuration
+ * =============
+ *
+ * USEMODULE
+ * ---------
+ *
+ * - RPL (Storing Mode)
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ *   USEMODULE += gnrc_rpl
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * CFLAGS
+ * ------
+ *
+ *  - Exclude Prefix Information Options from DIOs
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ *   CFLAGS += -DGNRC_RPL_WITHOUT_PIO
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
  * @{
  *
  * @file
