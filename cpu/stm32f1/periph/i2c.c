@@ -180,7 +180,6 @@ int i2c_read_byte(i2c_t dev, uint8_t address, char *data)
 
 int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
 {
-    unsigned int state;
     int i = 0;
     I2C_TypeDef *i2c;
 
@@ -194,99 +193,64 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
             return -1;
     }
 
+    DEBUG("Send Slave address and wait for ADDR == 1\n");
+    _start(i2c, address, I2C_FLAG_READ);
+
+    DEBUG("Clear ADDR\n");
+    _clear_addr(i2c);
+
     switch (length) {
         case 1:
-            DEBUG("Send Slave address and wait for ADDR == 1\n");
-            _start(i2c, address, I2C_FLAG_READ);
-
-            DEBUG("Set ACK = 0\n");
-            i2c->CR1 &= ~(I2C_CR1_ACK);
-
-            DEBUG("Clear ADDR and set STOP = 1\n");
-            state = disableIRQ();
-            _clear_addr(i2c);
-            i2c->CR1 |= (I2C_CR1_STOP);
-            restoreIRQ(state);
-
-            DEBUG("Wait for RXNE == 1\n");
-            while (!(i2c->SR1 & I2C_SR1_RXNE));
-
-            DEBUG("Read received data\n");
-            *data = (char)i2c->DR;
-            /* wait until STOP is cleared by hardware */
-            while (i2c->CR1 & I2C_CR1_STOP);
-            /* reset ACK to be able to receive new data */
-            i2c->CR1 |= (I2C_CR1_ACK);
             break;
+
         case 2:
-            DEBUG("Send Slave address and wait for ADDR == 1\n");
-            _start(i2c, address, I2C_FLAG_READ);
-            DEBUG("Set POS bit\n");
+            DEBUG("Set POS and ACK bit\n");
             i2c->CR1 |= (I2C_CR1_POS | I2C_CR1_ACK);
-            DEBUG("Crit block: Clear ADDR bit and clear ACK flag\n");
-            state = disableIRQ();
-            _clear_addr(i2c);
+            DEBUG("Crit block: clear ACK flag\n");
             i2c->CR1 &= ~(I2C_CR1_ACK);
-            restoreIRQ(state);
-
             DEBUG("Wait for transfer to be completed\n");
-            while (!(i2c->SR1 & I2C_SR1_BTF));
+            while (!(i2c->SR1 & I2C_SR1_BTF)) ;
 
-            DEBUG("Crit block: set STOP and read first byte\n");
-            state = disableIRQ();
-            i2c->CR1 |= (I2C_CR1_STOP);
-            data[0] = (char)i2c->DR;
-            restoreIRQ(state);
-
-            DEBUG("read second byte\n");
-            data[1] = (char)i2c->DR;
-
-            DEBUG("wait for STOP bit to be cleared again\n");
-            while (i2c->CR1 & I2C_CR1_STOP);
-
-            DEBUG("reset POS = 0 and ACK = 1\n");
-            i2c->CR1 &= ~(I2C_CR1_POS);
-            i2c->CR1 |= (I2C_CR1_ACK);
             break;
+
         default:
-            DEBUG("Send Slave address and wait for ADDR == 1\n");
-            _start(i2c, address, I2C_FLAG_READ);
-            _clear_addr(i2c);
             i2c->CR1 |= (I2C_CR1_ACK);
 
             while (i < (length - 3)) {
                 DEBUG("Wait until byte was received\n");
-                while (!(i2c->SR1 & I2C_SR1_RXNE));
+                while (!(i2c->SR1 & I2C_SR1_RXNE)) ;
                 DEBUG("Copy byte from DR\n");
                 data[i++] = (char)i2c->DR;
             }
 
             DEBUG("Reading the last 3 bytes, waiting for BTF flag\n");
-            while (!(i2c->SR1 & I2C_SR1_BTF));
+            while (!(i2c->SR1 & I2C_SR1_BTF)) ;
 
-            DEBUG("Disable ACK\n");
-            i2c->CR1 &= ~(I2C_CR1_ACK);
-
-            DEBUG("Crit block: set STOP and read N-2 byte\n");
-            state = disableIRQ();
+            DEBUG("Read N-3 byte\n");
             data[i++] = (char)i2c->DR;
-            i2c->CR1 |= (I2C_CR1_STOP);
-            restoreIRQ(state);
-
-            DEBUG("Read N-1 byte\n");
-            data[i++] = (char)i2c->DR;
-
-            while (!(i2c->SR1 & I2C_SR1_RXNE));
-            DEBUG("Read last byte\n");
-            data[i++] = (char)i2c->DR;
-
-            DEBUG("wait for STOP bit to be cleared again\n");
-            while (i2c->CR1 & I2C_CR1_STOP);
-
-            DEBUG("reset POS = 0 and ACK = 1\n");
-            i2c->CR1 &= ~(I2C_CR1_POS);
-            i2c->CR1 |= (I2C_CR1_ACK);
     }
+
+    DEBUG("Clear ACK\n");
+    i2c->CR1 &= ~(I2C_CR1_ACK);
+
+    DEBUG("Setting STOP=1\n");
+    i2c->CR1 |= (I2C_CR1_STOP);
+
+    while (i < length) {
+        DEBUG("Wait for RXNE == 1\n");
+        while (!(i2c->SR1 & I2C_SR1_RXNE)) ;
+
+        DEBUG("Read byte\n");
+        data[i++] = (char)i2c->DR;
+    }
+
+    DEBUG("wait for STOP bit to be cleared again\n");
+    while (i2c->CR1 & I2C_CR1_STOP) ;
+
+    DEBUG("reset POS = 0 and ACK = 1\n");
+    i2c->CR1 &= ~(I2C_CR1_POS);
+    i2c->CR1 |= (I2C_CR1_ACK);
+
     return length;
 }
 
