@@ -241,6 +241,7 @@ int _gnrc_rpl_operation(bool leaf, char *arg1)
     return 0;
 }
 
+#ifndef GNRC_RPL_WITHOUT_PIO
 int _gnrc_rpl_set_pio(char *inst_id, bool status)
 {
     uint8_t instance_id = (uint8_t) atoi(inst_id);
@@ -256,6 +257,7 @@ int _gnrc_rpl_set_pio(char *inst_id, bool status)
     printf("success: %sactivated PIO transmissions\n", status ? "" : "de");
     return 0;
 }
+#endif
 
 int _gnrc_rpl(int argc, char **argv)
 {
@@ -301,6 +303,7 @@ int _gnrc_rpl(int argc, char **argv)
     }
     else if (strcmp(argv[1], "set") == 0) {
         if (argc > 2) {
+#ifndef GNRC_RPL_WITHOUT_PIO
             if (strcmp(argv[2], "pio") == 0) {
                 if ((argc == 5) && (strcmp(argv[3], "on") == 0)) {
                     return _gnrc_rpl_set_pio(argv[4], true);
@@ -309,6 +312,7 @@ int _gnrc_rpl(int argc, char **argv)
                     return _gnrc_rpl_set_pio(argv[4], false);
                 }
             }
+#endif
         }
     }
 
@@ -322,7 +326,9 @@ int _gnrc_rpl(int argc, char **argv)
     puts("* root <inst_id> <dodag_id>\t- add a dodag to a new or existing instance");
     puts("* router <instance_id>\t\t- operate as router in the instance");
     puts("* send dis\t\t\t- send a multicast DIS");
+#ifndef GNRC_RPL_WITHOUT_PIO
     puts("* set pio <on/off> <instance_id>- (de-)activate PIO transmissions in DIOs");
+#endif
     puts("* show\t\t\t\t- show instance and dodag tables");
     return 0;
 }

@@ -483,6 +483,7 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6
  */
 uint8_t gnrc_rpl_gen_instance_id(bool local);
 
+#ifndef GNRC_RPL_WITHOUT_PIO
 /**
  * @brief (De-)Activate the transmission of Prefix Information Options within DIOs
  *        for a particular DODAG
@@ -495,6 +496,8 @@ static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
     dodag->req_opts = (dodag->req_opts & ~GNRC_RPL_REQ_OPT_PREFIX_INFO) |
                       (status << GNRC_RPL_REQ_OPT_PREFIX_INFO_SHIFT);
 }
+#endif
+
 #ifdef __cplusplus
 }
 #endif

@@ -116,6 +116,7 @@ gnrc_pktsnip_t *_dio_dodag_conf_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *dod
     return opt_snip;
 }
 
+#ifndef GNRC_RPL_WITHOUT_PIO
 gnrc_pktsnip_t *_dio_prefix_info_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *dodag)
 {
     gnrc_rpl_opt_prefix_info_t *prefix_info;
@@ -140,6 +141,7 @@ gnrc_pktsnip_t *_dio_prefix_info_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *do
     ipv6_addr_init_prefix(&prefix_info->prefix, &dodag->dodag_id, dodag->prefix_len);
     return opt_snip;
 }
+#endif
 
 void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
 {
@@ -152,11 +154,13 @@ void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
     gnrc_pktsnip_t *pkt = NULL, *tmp = NULL;
     gnrc_rpl_dio_t *dio;
 
+#ifndef GNRC_RPL_WITHOUT_PIO
     if (dodag->req_opts & GNRC_RPL_REQ_OPT_PREFIX_INFO) {
         if ((pkt = _dio_prefix_info_build(pkt, dodag)) == NULL) {
             return;
         }
     }
+#endif
 
     if (dodag->req_opts & GNRC_RPL_REQ_OPT_DODAG_CONF) {
         if ((pkt = _dio_dodag_conf_build(pkt, dodag)) == NULL) {
@@ -411,7 +415,9 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
             case (GNRC_RPL_OPT_PREFIX_INFO):
                 DEBUG("RPL: Prefix Information DIO option parsed\n");
                 *included_opts |= ((uint32_t) 1) << GNRC_RPL_OPT_PREFIX_INFO;
+#ifndef GNRC_RPL_WITHOUT_PIO
                 dodag->req_opts |= GNRC_RPL_REQ_OPT_PREFIX_INFO;
+#endif
                 gnrc_rpl_opt_prefix_info_t *pi = (gnrc_rpl_opt_prefix_info_t *) opt;
                 ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
                 if_id = gnrc_ipv6_netif_find_by_addr(NULL, &all_RPL_nodes);
