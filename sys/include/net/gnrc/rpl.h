@@ -482,6 +482,19 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6
  * @return  Global instance id, otherwise.
  */
 uint8_t gnrc_rpl_gen_instance_id(bool local);
+
+/**
+ * @brief (De-)Activate the transmission of Prefix Information Options within DIOs
+ *        for a particular DODAG
+ *
+ * @param[in] dodag             Pointer to the DODAG
+ * @param[in] status            true for activating PIOs and false for deactivating them
+ */
+static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
+{
+    dodag->req_opts = (dodag->req_opts & ~GNRC_RPL_REQ_OPT_PREFIX_INFO) |
+                      (status << GNRC_RPL_REQ_OPT_PREFIX_INFO_SHIFT);
+}
 #ifdef __cplusplus
 }
 #endif
