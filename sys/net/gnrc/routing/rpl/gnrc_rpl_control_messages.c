@@ -156,7 +156,6 @@ void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
         if ((pkt = _dio_prefix_info_build(pkt, dodag)) == NULL) {
             return;
         }
-        dodag->req_opts &= ~GNRC_RPL_REQ_OPT_PREFIX_INFO;
     }
 
     if (dodag->req_opts & GNRC_RPL_REQ_OPT_DODAG_CONF) {
@@ -263,7 +262,6 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, ipv6_addr_t *src, ipv6_addr_t *dst, 
         for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
             if (gnrc_rpl_instances[i].state != 0) {
                 gnrc_rpl_instances[i].dodag.req_opts |= GNRC_RPL_REQ_OPT_DODAG_CONF;
-                gnrc_rpl_instances[i].dodag.req_opts |= GNRC_RPL_REQ_OPT_PREFIX_INFO;
                 gnrc_rpl_send_DIO(&gnrc_rpl_instances[i], src);
             }
         }
