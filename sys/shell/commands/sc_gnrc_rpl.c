@@ -316,20 +316,20 @@ int _gnrc_rpl(int argc, char **argv)
         }
     }
 
-    puts("* help\t\t\t\t- show usage");
-    puts("* init <if_id>\t\t\t- initialize RPL on the given interface");
-    puts("* leaf <instance_id>\t\t- operate as leaf in the instance");
-    puts("* trickle reset <instance_id>\t- reset the trickle timer");
-    puts("* trickle start <instance_id>\t- start the trickle timer");
-    puts("* trickle stop <instance_id>\t- stop the trickle timer");
-    puts("* rm <instance_id>\t\t- delete the given instance and related dodag");
-    puts("* root <inst_id> <dodag_id>\t- add a dodag to a new or existing instance");
-    puts("* router <instance_id>\t\t- operate as router in the instance");
-    puts("* send dis\t\t\t- send a multicast DIS");
+    puts("* help\t\t\t\t\t- show usage");
+    puts("* init <if_id>\t\t\t\t- initialize RPL on the given interface");
+    puts("* leaf <instance_id>\t\t\t- operate as leaf in the instance");
+    puts("* trickle reset <instance_id>\t\t- reset the trickle timer");
+    puts("* trickle start <instance_id>\t\t- start the trickle timer");
+    puts("* trickle stop <instance_id>\t\t- stop the trickle timer");
+    puts("* rm <instance_id>\t\t\t- delete the given instance and related dodag");
+    puts("* root <inst_id> <dodag_id>\t\t- add a dodag to a new or existing instance");
+    puts("* router <instance_id>\t\t\t- operate as router in the instance");
+    puts("* send dis\t\t\t\t- send a multicast DIS");
 #ifndef GNRC_RPL_WITHOUT_PIO
-    puts("* set pio <on/off> <instance_id>- (de-)activate PIO transmissions in DIOs");
+    puts("* set pio <on/off> <instance_id>\t- (de-)activate PIO transmissions in DIOs");
 #endif
-    puts("* show\t\t\t\t- show instance and dodag tables");
+    puts("* show\t\t\t\t\t- show instance and dodag tables");
     return 0;
 }
 /**
