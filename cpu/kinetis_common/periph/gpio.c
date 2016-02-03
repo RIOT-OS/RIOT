@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
- * Copyright (C) 2014 Eistec AB
+ * Copyright (C) 2014-2016 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -24,6 +24,8 @@
  * @}
  */
 
+#include <stdint.h>
+#include <stddef.h>
 #include "cpu.h"
 #include "sched.h"
 #include "thread.h"
