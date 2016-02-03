@@ -204,6 +204,8 @@ int ccnl_wait_for_chunk(void *buf, size_t buf_len, uint64_t timeout);
 int ccnl_fib_add_entry(struct ccnl_relay_s *relay, struct ccnl_prefix_s *pfx,
                        struct ccnl_face_s *face);
 
+int ccnl_fib_rem_entry(struct ccnl_relay_s *relay, struct ccnl_prefix_s *pfx, struct ccnl_face_s *face);
+
 /**
  * @brief Prints the current CCN-Lite FIB
  *
