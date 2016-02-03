@@ -252,6 +252,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
             DEBUG("Send Slave address and wait for ADDR == 1\n");
             _start(i2c, address, I2C_FLAG_READ);
             _clear_addr(i2c);
+            i2c->CR1 |= (I2C_CR1_ACK);
 
             while (i < (length - 3)) {
                 DEBUG("Wait until byte was received\n");
