@@ -917,6 +917,17 @@ int sbapp_send(sbh_t fd, void* data, size_t len) {
 	return msg_send(&msg, handle->send_pid);
 }
 
+
+int sbapp_sendto(sbh_t fd, void* data, size_t len, sockaddr_in addr) {
+	int16_t sts;
+	cd_t* cd = (cd_t *)fd;
+
+	sts = sl_SendTo(cd->fd, data, len, 0, (sockaddr *) &cd->addr,
+			sizeof(sockaddr_in));
+
+	return sts;
+}
+
 static void *_event_loop(void *arg) {
 	kernel_pid_t parent_thr = *(kernel_pid_t *) arg;
 	msg_t msg, reply;

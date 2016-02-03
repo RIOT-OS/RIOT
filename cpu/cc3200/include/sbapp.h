@@ -26,6 +26,7 @@
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/netif/hdr.h"
+#include "socket.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -133,6 +134,21 @@ sbh_t sbapp_connect(uint8_t conn_type, uint32_t remote_ip, uint16_t port,
 int sbapp_send(sbh_t fd, void* data, size_t len);
 
 
+/**
+ *  @brief send a datagram packet to addr destination
+ *
+ *  @param[in] data  the payload
+ *  @param[in] len   the payload length
+ *  @param[in] addr  the destination address
+ *
+ *  @return the number of transmitted bytes or -1 if an error occurred
+ */
+int sbapp_sendto(sbh_t fd, void* data, size_t len, sockaddr_in addr);
+
+
+/**
+ *
+ */
 uint32_t net_atoi(const char* name);
 
 
