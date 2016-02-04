@@ -39,19 +39,12 @@
 #define MUTEX_TRYLOCK(id) mutex_trylock(&osi_mutexes[(int)id])
 #define MUTEX_UNLOCK(id) mutex_unlock(&osi_mutexes[(int)id])
 
-
-// network processor status and config handle
-nwp_t nwp = {
-        .role = ROLE_INVALID
-};
-
-
 static int synchronizer[MAX_SYNC_OBJS + 1];
 
 static mutex_t osi_mutexes[MAX_SYNC_OBJS];
 
 
-static char simplelink_started;
+//static char simplelink_started;
 
 
 #ifdef CC3200_MCU_ONLY
@@ -81,6 +74,13 @@ void init_sync_pool(void) {
 #define MUTEX_UNLOCK(id) mutex_unlock(id)
 
 #endif
+
+
+// network processor status and config handle
+nwp_t nwp = {
+        .role = ROLE_INVALID
+};
+
 
 #define OSI_MSG_TYPE 0xBEEF
 
@@ -541,7 +541,7 @@ void vSimpleLinkSpawnTask(void *pvParameters) {
     msg_t msg, msg_queue[QUEUE_SIZE_SLSPAWN];
     tSimpleLinkSpawnMsg* msg_ptr;
 
-    simplelink_started = 1;
+    //simplelink_started = 1;
 
     /* setup the message queue */
     msg_init_queue(msg_queue, QUEUE_SIZE_SLSPAWN);
