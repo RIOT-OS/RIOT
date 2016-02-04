@@ -922,7 +922,7 @@ int sbapp_sendto(sbh_t fd, void* data, size_t len, sockaddr_in addr) {
 	int16_t sts;
 	cd_t* cd = (cd_t *)fd;
 
-	sts = sl_SendTo(cd->fd, data, len, 0, (sockaddr *) &cd->addr,
+	sts = sl_SendTo(cd->fd, data, len, 0, (sockaddr *) &addr,
 			sizeof(sockaddr_in));
 
 	return sts;
