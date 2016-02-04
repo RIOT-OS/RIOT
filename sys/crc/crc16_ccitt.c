@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     sys_checksum_crc16_ccitt
+ * @ingroup     sys_crc_crc16_ccitt
  * @{
  *
  * @file
@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "checksum/crc16_ccitt.h"
+#include "crc/crc16_ccitt.h"
 
 static const uint16_t _crc16_lookuptable[256] = {
     0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
