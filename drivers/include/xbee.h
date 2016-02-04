@@ -27,6 +27,7 @@
 
 #include "kernel.h"
 #include "mutex.h"
+#include "xtimer.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
 #include "net/gnrc.h"
