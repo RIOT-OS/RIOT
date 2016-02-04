@@ -6,9 +6,9 @@
  * directory for more details.
  */
 
-#include "tests-checksum.h"
+#include "tests-crc.h"
 
-void tests_checksum(void)
+void tests_crc(void)
 {
-    TESTS_RUN(tests_checksum_crc16_ccitt_tests());
+    TESTS_RUN(tests_crc_crc16_ccitt_tests());
 }

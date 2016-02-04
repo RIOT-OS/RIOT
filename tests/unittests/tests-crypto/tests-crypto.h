@@ -32,13 +32,6 @@ extern "C" {
 void tests_crypto(void);
 
 /**
- * @brief   Generates tests for crypto/sha256.h
- *
- * @return  embUnit tests if successful, NULL if not.
- */
-Test *tests_crypto_sha256_tests(void);
-
-/**
  * @brief   Generates tests for crypto/chacha.h
  *
  * @return  embUnit tests if successful, NULL if not.

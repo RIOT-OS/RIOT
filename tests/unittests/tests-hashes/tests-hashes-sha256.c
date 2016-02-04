@@ -14,9 +14,9 @@
 
 #include "embUnit/embUnit.h"
 
-#include "crypto/sha256.h"
+#include "hashes/sha256.h"
 
-#include "tests-crypto.h"
+#include "tests-hashes.h"
 
 static int compare_str_vs_digest(const char *str,
                                  const unsigned char hash[SHA256_DIGEST_LENGTH])
@@ -47,7 +47,7 @@ static int calc_and_compare_hash(const char *str, const char *expected)
     return compare_str_vs_digest(expected, hash);
 }
 
-static void test_crypto_sha256_hash_sequence(void)
+static void test_hashes_sha256_hash_sequence(void)
 {
     TEST_ASSERT(calc_and_compare_hash("1234567890_1",
                                       "3eda9ffe5537a588f54d0b2a453e5fa932986d0bc0f9556924f5c2379b2c91b0"));
@@ -81,14 +81,14 @@ static void test_crypto_sha256_hash_sequence(void)
                                       "c19d3bf8588897076873f1a0a106ba840ca46bd1179d592953acecc4df59593c"));
 }
 
-Test *tests_crypto_sha256_tests(void)
+Test *tests_hashes_sha256_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_crypto_sha256_hash_sequence),
+        new_TestFixture(test_hashes_sha256_hash_sequence),
     };
 
-    EMB_UNIT_TESTCALLER(crypto_sha256_tests, NULL, NULL,
+    EMB_UNIT_TESTCALLER(hashes_sha256_tests, NULL, NULL,
                         fixtures);
 
-    return (Test *)&crypto_sha256_tests;
+    return (Test *)&hashes_sha256_tests;
 }

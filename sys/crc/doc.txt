@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_checksum Checksum
+ * @defgroup    sys_crc CRC Cyclic redundancy checks
  * @ingroup     sys
- * @brief       Checksum function libraries
+ * @brief       CRC hashing functions
  */
