@@ -44,12 +44,7 @@
 */
 #define gpio_enabled(dev) ( (enable_lut >> (dev)) & 1 )
 
-typedef struct {
-    gpio_cb_t cb;       /**< callback called from GPIO interrupt */
-    void *arg;          /**< argument passed to the callback */
-} gpio_state_t;
-
-static gpio_state_t gpio_config[GPIO_NUMOF];
+static gpio_isr_ctx_t gpio_config[GPIO_NUMOF];
 
 const uint32_t enable_lut = 0
 #if GPIO_0_EN
@@ -514,7 +509,7 @@ void gpio_write(gpio_t dev, int value)
 void isr_gpioa(void)
 {
     int mis, bit;
-    gpio_state_t* state;
+    gpio_isr_ctx_t* state;
 
     /* Latch and clear the interrupt status early on: */
     mis = GPIO_A->MIS;
@@ -539,7 +534,7 @@ void isr_gpioa(void)
 void isr_gpiob(void)
 {
     int mis, bit;
-    gpio_state_t* state;
+    gpio_isr_ctx_t* state;
 
     /* Latch and clear the interrupt status early on: */
     mis = GPIO_B->MIS;
@@ -564,7 +559,7 @@ void isr_gpiob(void)
 void isr_gpioc(void)
 {
     int mis, bit;
-    gpio_state_t* state;
+    gpio_isr_ctx_t* state;
 
     /* Latch and clear the interrupt status early on: */
     mis = GPIO_C->MIS;
@@ -589,7 +584,7 @@ void isr_gpioc(void)
 void isr_gpiod(void)
 {
     int mis, bit;
-    gpio_state_t* state;
+    gpio_isr_ctx_t* state;
 
     /* Latch and clear the interrupt status early on: */
     mis = GPIO_D->MIS;
