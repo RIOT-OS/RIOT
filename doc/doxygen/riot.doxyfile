@@ -829,7 +829,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/cortexm_common/include/core_cm*.h \
                          */cpu/stm32f*/include/stm32f* \
                          */drivers/nrf24l01p/include/nrf24l01p_settings.h \
-                         */cpu/nrf51/include/nrf51*.h \
+                         */cpu/nrf5*/include/nrf5*.h \
                          */cpu/lpc1768/include/LPC17xx.h \
                          */cpu/lpc11u34/include/LPC11Uxx.h \
                          */boards/*/include/periph_conf.h \
