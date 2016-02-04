@@ -58,7 +58,5 @@ set $pc = interrupt_vector[1]
 #*****************************************************************************
 
 break main
-b main.c:166
-b corda_response
 
 continue
