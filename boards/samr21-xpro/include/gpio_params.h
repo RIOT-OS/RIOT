@@ -39,6 +39,12 @@ static const  saul_gpio_params_t saul_gpio_params[] =
         .dir = GPIO_DIR_OUT,
         .pull = GPIO_NOPULL,
     },
+    {
+        .name = "Button(SW0)",
+        .pin = BUTTON_GPIO,
+        .dir = GPIO_DIR_IN,
+        .pull = GPIO_PULLUP,
+    },
 };
 
 #ifdef __cplusplus
