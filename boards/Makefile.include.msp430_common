@@ -17,5 +17,8 @@ export LINKFLAGS += $(CFLAGS_CPU) -lgcc
 # Import all toolchain settings
 include $(RIOTBOARD)/Makefile.include.gnu
 
+# as msp430 is 16bit only, cut the 32bit wide random number
+RANDOM := $(shell echo $(RANDOM) | cut -c -6)
+
 # export board specific includes to the global includes-listing
 export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
