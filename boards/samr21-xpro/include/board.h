@@ -78,6 +78,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @name SW0 (Button) pin definitions
+ * @{
+ */
+#define BUTTON_PORT         PORT->Group[0]
+#define BUTTON_PIN          (28)
+#define BUTTON_GPIO         GPIO_PIN(0, BUTTON_PIN)
+/** @} */
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);

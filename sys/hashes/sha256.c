@@ -28,7 +28,7 @@
  */
 
 /**
- * @ingroup     sys_crypto
+ * @ingroup     sys_hashes
  * @{
  *
  * @file
@@ -43,7 +43,7 @@
 
 #include <string.h>
 
-#include "crypto/sha256.h"
+#include "hashes/sha256.h"
 #include "board.h"
 
 #ifdef __BIG_ENDIAN__
