@@ -84,13 +84,6 @@ const char* sl_err_descr[] = {
 static uint8_t recv_buffer[RECV_BUFF_SIZE];
 
 /**
- * @brief send a packet
- *
- * @internal
- */
-static int16_t _send(cd_t *cd, gnrc_pktsnip_t *pkt);
-
-/**
  * @brief the sbapp thread function
  */
 static void *_event_loop(void *arg);
@@ -656,12 +649,6 @@ int16_t connect_to(cd_t *cd, uint32_t remote_ip, uint16_t remote_port,
 
 	cd->local_addr.sin_addr.s_addr = 0;
 
-#if 0
-	// resolve HOST NAME/IP
-	sts = sl_NetAppDnsGetHostByName((signed char *) server, strlen(server),
-			&server_ip, SL_AF_INET);
-#endif
-
 	// filling the TCP server socket address
 	cd->addr.sin_family = SL_AF_INET;
 	cd->addr.sin_port = sl_Htons(remote_port);
@@ -696,71 +683,6 @@ int16_t connect_to(cd_t *cd, uint32_t remote_ip, uint16_t remote_port,
 	return fd;
 }
 
-/**
- * @brief send a packet
- */
-static int16_t _send(cd_t* cd, gnrc_pktsnip_t *pkt) {
-	int16_t sts;
-
-	if (cd->conn_type == TCP) {
-		sts = sl_Send(cd->fd, pkt->data, pkt->size, 0);
-	} else {
-		sts = sl_SendTo(cd->fd, pkt->data, pkt->size, 0, (sockaddr *) &cd->addr,
-				sizeof(sockaddr_in));
-	}
-	return sts;
-}
-
-/**
- * @brief sender task
- */
-static void *_send_handler_task(void *arg) {
-	msg_t msg, reply;
-	msg_t msg_queue[SBAPP_MSG_QUEUE_SIZE];
-	cd_t *conn = (cd_t *) arg;
-	char loop = 1;
-
-	/* initialize message queue */
-	msg_init_queue(msg_queue, SBAPP_MSG_QUEUE_SIZE);
-
-	/* preset reply message */
-	reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
-	reply.content.value = (uint32_t) -ENOTSUP;
-
-	while (loop) {
-		msg_receive(&msg);
-		switch (msg.type) {
-			case SBAPI_MSG_TYPE_SND:
-				DEBUG("sbapp send: GNRC_SBAPI_MSG_TYPE_SND\n");
-				_send(conn, (gnrc_pktsnip_t *) msg.content.ptr);
-				break;
-			case SBAPI_MSG_TYPE_ERR:
-				DEBUG("sbapp send: SBAPI_MSG_TYPE_ERR\n");
-				loop = 0;
-				break;
-			case SBAPI_MSG_TYPE_SET:
-			case SBAPI_MSG_TYPE_GET:
-				msg_reply(&msg, &reply);
-				break;
-			default:
-				DEBUG("sbapp send: received unidentified message\n");
-				break;
-
-		}
-	}
-
-	reply.type = SBAPI_MSG_TYPE_HANDLER_EXIT;
-	reply.content.ptr = conn->send_stack;
-	conn->send_stack = NULL;
-	msg_send(&reply, sbapp.main_pid);
-
-	if (conn->recv_stack == NULL) {
-		close(conn->fd);
-		free(conn);
-	}
-
-	return NULL;
-}
 
 /**
  * receive data task
@@ -783,12 +705,6 @@ static void *_receive_handler_task(void* arg) {
 			 * when a connection is closed by peer recv return 0
 			 */
 			DEBUG("channel %d: error %d\n", cd->fd, size);
-			msg.type = SBAPI_MSG_TYPE_ERR;
-			msg.content.value = size;
-
-			// notify the twin thread
-			msg_send(&msg, cd->send_pid);
-
 		} else {
 			recv_buffer[size] = 0;
 
@@ -806,13 +722,6 @@ static void *_receive_handler_task(void* arg) {
 					SL_IPV4_BYTE(cd->addr.sin_addr.s_addr, 2),
 					SL_IPV4_BYTE(cd->addr.sin_addr.s_addr, 3),
 					ntohs(cd->addr.sin_port));
-#if 0
-					SL_IPV4_BYTE(from_addr.sin_addr.s_addr, 0),
-					SL_IPV4_BYTE(from_addr.sin_addr.s_addr, 1),
-					SL_IPV4_BYTE(from_addr.sin_addr.s_addr, 2),
-					SL_IPV4_BYTE(from_addr.sin_addr.s_addr, 3),
-					ntohs(from_addr.sin_port));
-#endif
 			msg.type = SBAPI_MSG_TYPE_RCV;
 			//msg.content.ptr = (char*)recv_buffer;
 			msg.content.ptr = (void*) l4;
@@ -822,26 +731,22 @@ static void *_receive_handler_task(void* arg) {
 	} while (size > 0);
 
 	msg.type = SBAPI_MSG_TYPE_HANDLER_EXIT;
-	msg.content.ptr = cd->recv_stack;
-	cd->recv_stack = NULL;
+	msg.content.ptr = (char *)cd;
 	msg_send(&msg, sbapp.main_pid);
 
+#if 0
 	if (cd->send_stack == NULL) {
 		close(cd->fd);
 		free(cd);
 	}
+#endif
 
 	return NULL;
 }
 
+
 sbh_t sbapp_connect(uint8_t conn_type, uint32_t remote_ip, uint16_t remote_port,
 		uint16_t local_port, kernel_pid_t pid) {
-
-#if 0
-	while (!IS_IP_ACQUIRED(nwp.status)) {
-		// wait for ip layer setup
-	}
-#endif
 
 	// create a connection descriptor
 	cd_t *conn = malloc(sizeof(cd_t));
@@ -858,29 +763,14 @@ sbh_t sbapp_connect(uint8_t conn_type, uint32_t remote_ip, uint16_t remote_port,
 	conn->pid = pid;
 
 #if ENABLE_DEBUG
-	conn->send_stack = malloc(SBAPP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF);
-#else
-	conn->send_stack = malloc(SBAPP_STACK_SIZE);
-#endif
-	if (conn->send_stack == NULL) {
-		free(conn);
-		return NULL;
-	}
-
-#if ENABLE_DEBUG
 	conn->recv_stack = malloc(SBAPP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF);
 #else
 	conn->recv_stack = malloc(SBAPP_STACK_SIZE);
 #endif
 	if (conn->recv_stack == NULL) {
 		free(conn);
-		free(conn->send_stack);
 		return NULL;
 	}
-
-	// start the send task
-	conn->send_pid = thread_create(conn->send_stack, SBAPP_STACK_SIZE,
-	SBAPP_PRIO, THREAD_CREATE_STACKTEST, _send_handler_task, conn, "sbapp");
 
 	// start the receive task
 	conn->recv_pid = thread_create(conn->recv_stack, SBAPP_STACK_SIZE,
@@ -894,28 +784,26 @@ void sbapp_close(sbh_t fd) {
 
 	close(handle->fd);
 	free(handle->recv_stack);
-	free(handle->send_stack);
 	free(handle);
 }
 
+
+/**
+ * @brief send a packet
+ */
 int sbapp_send(sbh_t fd, void* data, size_t len) {
-	msg_t msg;
-	cd_t *handle = (cd_t *) fd;
+    int16_t sts;
+    cd_t *cd = (cd_t *) fd;
 
-	// NULL if no memory available
-	gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, data, len, GNRC_NETTYPE_UNDEF);
-	if (pkt == NULL) {
-		return -1;
-	}
-
-	msg.type = SBAPI_MSG_TYPE_SND;
-	msg.content.ptr = (void*) pkt;
-
-	/*
-	 * return 1 on success, -1 on error
-	 */
-	return msg_send(&msg, handle->send_pid);
+    if (cd->conn_type == TCP) {
+        sts = sl_Send(cd->fd, data, len, 0);
+    } else {
+        sts = sl_SendTo(cd->fd, data, len, 0, (sockaddr *) &cd->addr,
+                sizeof(sockaddr_in));
+    }
+    return sts;
 }
+
 
 
 int sbapp_sendto(sbh_t fd, void* data, size_t len, sockaddr_in addr) {
@@ -1012,6 +900,10 @@ static void *_event_loop(void *arg) {
 				break;
 			case SBAPI_MSG_TYPE_HANDLER_EXIT:
 				free(msg.content.ptr);
+				sbapp_close(msg.content.ptr);
+
+				// TODO: send a message to upper layer
+
 				break;
 			default:
 				DEBUG("sbapp: received unidentified message\n");
