@@ -45,17 +45,9 @@ static const int8_t exti_config[2][32] = {
 };
 
 /**
- * @brief   Datatype to use for saving the interrupt contexts
- */
-typedef struct {
-    gpio_cb_t cb;       /**< callback to call on GPIO interrupt */
-    void *arg;          /**< argument passed to the callback */
-} gpio_exti_t;
-
-/**
  * @brief   Hold one interrupt context per interrupt line
  */
-static gpio_exti_t gpio_config[NUMOF_IRQS];
+static gpio_isr_ctx_t gpio_config[NUMOF_IRQS];
 
 static inline PortGroup *_port(gpio_t pin)
 {

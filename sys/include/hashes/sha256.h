@@ -29,7 +29,7 @@
 
 
 /**
- * @ingroup     sys_crypto
+ * @ingroup     sys_hashes
  * @{
  *
  * @file

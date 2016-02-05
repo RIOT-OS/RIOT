@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    sys_checksum_crc16_ccitt CRC16-CCITT
- * @ingroup     sys_checksum
+ * @defgroup    sys_crc_crc16_ccitt CRC16-CCITT
+ * @ingroup     sys_crc
  *
  * @brief       CRC16-CCITT checksum algorithm
  * @details     This implementation of CRC16 is based on the CCITT

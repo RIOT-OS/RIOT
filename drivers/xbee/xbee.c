@@ -462,16 +462,28 @@ int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
     _at_cmd(dev, "ATCN\r");
 
     /* load long address (we can not set it, its read only for Xbee devices) */
-    _get_addr_long(dev, dev->addr_long.uint8, 8);
+    if (_get_addr_long(dev, dev->addr_long.uint8, 8) < 0) {
+        DEBUG("xbee: Error getting address\n");
+        return -EIO;
+    }
     /* set default channel */
-    _set_addr(dev, &((dev->addr_long).uint8[6]), 2);
+    if (_set_addr(dev, &((dev->addr_long).uint8[6]), 2) < 0) {
+        DEBUG("xbee: Error setting short address\n");
+        return -EIO;
+    }
     tmp[1] = 0;
     tmp[0] = XBEE_DEFAULT_CHANNEL;
-    _set_channel(dev, tmp, 2);
+    if (_set_channel(dev, tmp, 2) < 0) {
+        DEBUG("xbee: Error setting channel\n");
+        return -EIO;
+    }
     /* set default PAN ID */
     tmp[1] = (uint8_t)(XBEE_DEFAULT_PANID >> 8);
     tmp[0] = (uint8_t)(XBEE_DEFAULT_PANID & 0xff);
-    _set_panid(dev, tmp, 2);
+    if (_set_panid(dev, tmp, 2) < 0) {
+        DEBUG("xbee: Error setting PAN ID\n");
+        return -EIO;
+    }
 
     DEBUG("xbee: Initialization successful\n");
     return 0;

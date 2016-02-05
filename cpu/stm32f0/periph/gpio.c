@@ -24,12 +24,7 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
-typedef struct {
-    gpio_cb_t cb;
-    void *arg;
-} gpio_state_t;
-
-static gpio_state_t gpio_config[GPIO_NUMOF];
+static gpio_isr_ctx_t gpio_config[GPIO_NUMOF];
 
 /* static port mappings */
 static GPIO_TypeDef *const gpio_port_map[GPIO_NUMOF] = {
