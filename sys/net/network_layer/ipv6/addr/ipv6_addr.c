@@ -14,10 +14,17 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "net/ipv6/addr.h"
+
+#ifdef MODULE_FMT
+#include "fmt.h"
+#else
+#include <stdio.h>
+#endif
 
 bool ipv6_addr_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
 {
@@ -120,6 +127,18 @@ int ipv6_addr_split(char *addr_str, char seperator, int _default)
     }
 
     return _default;
+}
+
+void ipv6_addr_print(const ipv6_addr_t *addr)
+{
+    assert(addr);
+    char addr_str[IPV6_ADDR_MAX_STR_LEN];
+    ipv6_addr_to_str(addr_str, addr, sizeof(addr_str));
+#ifdef MODULE_FMT
+    print_str(addr_str);
+#else
+    printf("%s", addr_str);
+#endif
 }
 
 /**

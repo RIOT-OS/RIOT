@@ -709,6 +709,13 @@ static inline int ipv6_addr_split_iface(char *addr_str)
     return ipv6_addr_split(addr_str, '%', -1);
 }
 
+/**
+ * @brief Print IPv6 address to stdout
+ *
+ * @param[in]   addr  Pointer to ipv6_addr_t to print
+ */
+void ipv6_addr_print(const ipv6_addr_t *addr);
+
 #ifdef __cplusplus
 }
 #endif
