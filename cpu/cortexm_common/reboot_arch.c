@@ -29,9 +29,8 @@
 #define SYSTEM_RESET  NVIC_SystemReset()
 #endif
 
-int reboot_arch(int mode)
+int reboot(void)
 {
-    printf("Going into reboot, mode %i\n", mode);
     /* wait a while to make sure the printf is finished */
     volatile int n = 100000;
     while(n--);
