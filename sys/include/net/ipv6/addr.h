@@ -669,6 +669,46 @@ char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len
  */
 ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr);
 
+/**
+ * @brief split IPv6 address string representation
+ *
+ * @note Will change @p seperator position in @p addr_str to '\0'
+ *
+ * @param[in,out]   addr_str    Address to split
+ * @param[in]       seperator   Seperator char to use
+ * @param[in]       _default    Default value
+ *
+ * @return      atoi(string after split)
+ * @return      @p _default if no string after @p seperator
+ */
+int ipv6_addr_split(char *addr_str, char seperator, int _default);
+
+/**
+ * @brief split IPv6 prefix string representation
+ *
+ * E.g., "2001:db8::1/64" returns "64", changes @p addr_str to "2001:db8::1"
+ *
+ * @param[in,out]   addr_str    Address to split
+ * @return          prefix length or 128 if none specified
+ */
+static inline int ipv6_addr_split_prefix(char *addr_str)
+{
+    return ipv6_addr_split(addr_str, '/', 128);
+}
+
+/**
+ * @brief split IPv6 address + interface specifier
+ *
+ * E.g., "fe80::1%5" returns "5", changes @p addr_str to "fe80::1"
+ *
+ * @param[in,out]   addr_str Address to split
+ * @return          interface number or -1 if none specified
+ */
+static inline int ipv6_addr_split_iface(char *addr_str)
+{
+    return ipv6_addr_split(addr_str, '%', -1);
+}
+
 #ifdef __cplusplus
 }
 #endif
