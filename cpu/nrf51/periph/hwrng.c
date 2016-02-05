@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
- * @ingroup     cpu_nrf51822
+ * @ingroup     cpu_nrf51
  * @{
  *
  * @file
@@ -20,20 +20,16 @@
  */
 
 #include "cpu.h"
-#include "periph_conf.h"
-#include "periph/random.h"
+#include "periph/hwrng.h"
 
-/* guard file in case no random device was specified */
-#if RANDOM_NUMOF
-
-void random_init(void)
+void hwrng_init(void)
 {
     /* The RNG is initiated every time when RNG read is called
      * This reduces power consumption when RNG is not needed
      */
 }
 
-int random_read(char *buf, unsigned int num)
+void hwrng_read(uint8_t *buf, unsigned int num)
 {
     unsigned int count = 0;
 
@@ -57,7 +53,7 @@ int random_read(char *buf, unsigned int num)
             __WFE();
         }
 
-        buf[count++] = (char)NRF_RNG->VALUE;
+        buf[count++] = (uint8_t)NRF_RNG->VALUE;
         /* NRF51 PAN #21 */
         NRF_RNG->EVENTS_VALRDY = 0;
         /* clear interrupt state */
@@ -66,18 +62,4 @@ int random_read(char *buf, unsigned int num)
 
     /* power off RNG */
     NRF_RNG->POWER = 0;
-
-    return count;
 }
-
-void random_poweron(void)
-{
-    /* RNG is powered on when needed */
-}
-
-void random_poweroff(void)
-{
-    /* RNG is powered off automaticly */
-}
-
-#endif /* RANDOM_NUMOF */
