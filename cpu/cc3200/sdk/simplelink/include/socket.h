@@ -355,6 +355,8 @@ extern "C" {
 #define INADDR_ANY                          SL_INADDR_ANY
 #define ERROR                               SL_SOC_ERROR
 #define INEXE                               SL_INEXE
+
+#if 0
 #define EBADF                               SL_EBADF
 #define ENSOCK                              SL_ENSOCK
 #define EAGAIN                              SL_EAGAIN
@@ -379,6 +381,7 @@ extern "C" {
 #define ENOTCONN                            SL_ENOTCONN
 #define ETIMEDOUT                           SL_ETIMEDOUT
 #define ECONNREFUSED                        SL_ECONNREFUSED
+#endif
 
 #define SOL_SOCKET                          SL_SOL_SOCKET
 #define IPPROTO_IP                          SL_IPPROTO_IP
