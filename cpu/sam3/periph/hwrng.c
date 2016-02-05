@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     cpu_sam3
  * @{
  *
  * @file
@@ -19,11 +19,7 @@
  */
 
 #include "cpu.h"
-#include "periph_conf.h"
-#include "periph/random.h"
-
-/* only compile this driver if enabled in the board's periph_conf.h */
-#if RANDOM_NUMOF
+#include "periph/hwrng.h"
 
 /**
  * @name KEY needs to be written to the config register when en|disabling
@@ -31,46 +27,34 @@
  */
 #define KEY             (0x524e4700)
 
-void random_init(void)
+void hwrng_init(void)
 {
-    random_poweron();
+    /* no need for initialization */
 }
 
-int random_read(char *buf, unsigned int num)
+void hwrng_read(uint8_t *buf, unsigned int num)
 {
-    /* cppcheck-suppress variableScope */
-    uint32_t tmp;
     unsigned count = 0;
+
+    /* enable clock signal for TRNG module */
+    PMC->PMC_PCER1 |= PMC_PCER1_PID41;
+    /* enable the generation of random numbers */
+    TRNG->TRNG_CR |= (KEY | TRNG_CR_ENABLE);
 
     while (count < num) {
         /* wait until new value is generated -> takes up to 84 cycles */
         while (!(TRNG->TRNG_ISR & TRNG_ISR_DATRDY));
         /* read 4 byte of random data */
-        tmp = TRNG->TRNG_ODATA;
+        uint32_t tmp = TRNG->TRNG_ODATA;
         /* extract copy bytes to result */
         for (int i = 0; i < 4 && count < num; i++) {
-            buf[count++] = (char)tmp;
+            buf[count++] = (uint8_t)tmp;
             tmp = tmp >> 8;
         }
     }
 
-    return count;
-}
-
-void random_poweron(void)
-{
-    /* enable clock signal for TRNG module */
-    PMC->PMC_PCER1 |= PMC_PCER1_PID41;
-    /* enable the generation of random numbers */
-    TRNG->TRNG_CR |= (KEY | TRNG_CR_ENABLE);
-}
-
-void random_poweroff(void)
-{
     /* disable the generation of random numbers */
     TRNG->TRNG_CR &= ~(KEY | TRNG_CR_ENABLE);
     /* disable clock signal for TRNG module */
     PMC->PMC_PCER1 &= ~(PMC_PCER1_PID41);
 }
-
-#endif /* RANDOM_NUMOF */
