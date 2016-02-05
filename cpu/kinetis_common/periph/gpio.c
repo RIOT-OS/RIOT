@@ -185,18 +185,7 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
     port->PCR[pin] = PORT_PCR_MUX(PIN_MUX_FUNCTION_ANALOG);
 
     /* set to push-pull configuration */
-    switch (pushpull) {
-        case GPIO_PULLUP:
-            port->PCR[pin] |= PORT_PCR_PE_MASK | PORT_PCR_PS_MASK; /* Pull enable, pull up */
-            break;
-
-        case GPIO_PULLDOWN:
-            port->PCR[pin] |= PORT_PCR_PE_MASK; /* Pull enable, !pull up */
-            break;
-
-        default:
-            break;
-    }
+    port->PCR[pin] |= pushpull;
 
     if (dir == GPIO_DIR_OUT) {
         BITBAND_REG32(gpio->PDDR, pin) = 1;    /* set pin to output mode */

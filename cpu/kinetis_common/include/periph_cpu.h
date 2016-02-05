@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 
+#include "cpu.h"
 #include "periph/dev_enums.h"
 
 #ifdef __cplusplus
@@ -53,7 +54,7 @@ typedef uint16_t gpio_t;
 /**
  * @brief   Define a CPU specific GPIO pin generator macro
  */
-#define GPIO_PIN(port, pin)          ((port << GPIO_PORT_SHIFT) | pin)
+#define GPIO_PIN(port, pin) ((port << GPIO_PORT_SHIFT) | (pin << GPIO_PIN_SHIFT))
 
 /**
  * @brief   Length of the CPU_ID in octets
@@ -66,9 +67,14 @@ typedef uint16_t gpio_t;
  */
 #define HAVE_GPIO_PP_T
 typedef enum {
-    GPIO_NOPULL = 4,        /**< do not use internal pull resistors */
-    GPIO_PULLUP = 9,        /**< enable internal pull-up resistor */
-    GPIO_PULLDOWN = 8       /**< enable internal pull-down resistor */
+    /** @brief Output: Actively driven in both directions, Input: Passive input */
+    GPIO_NOPULL = 0,
+    /** @brief Input: enable internal pull-up resistor, Output: undefined */
+    GPIO_PULLUP = (PORT_PCR_PE_MASK | PORT_PCR_PS_MASK),
+    /** @brief Input: enable internal pull-down resistor, Output: undefined */
+    GPIO_PULLDOWN = (PORT_PCR_PE_MASK),
+    /** @brief Output: Open drain, only actively driven low, Input: undefined */
+    GPIO_OPEN_DRAIN = (PORT_PCR_ODE_MASK),
 } gpio_pp_t;
 /** @} */
 
