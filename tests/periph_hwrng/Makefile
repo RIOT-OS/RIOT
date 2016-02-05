@@ -1,7 +1,7 @@
-export APPLICATION = periph_random
+export APPLICATION = periph_hwrng
 include ../Makefile.tests_common
 
-FEATURES_REQUIRED = periph_random
+FEATURES_REQUIRED = periph_hwrng
 
 USEMODULE += xtimer
 
