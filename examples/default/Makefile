@@ -28,6 +28,7 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 1
 
 # Modules to include:
+USEMODULE += xtimer
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
