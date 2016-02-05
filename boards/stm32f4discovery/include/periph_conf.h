@@ -214,13 +214,6 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name Random Number Generator configuration
- * @{
- */
-#define RANDOM_NUMOF        (1U)
-/** @} */
-
-/**
  * @name SPI configuration
  * @{
  */
