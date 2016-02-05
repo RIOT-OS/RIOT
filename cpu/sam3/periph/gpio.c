@@ -45,10 +45,7 @@
 /**
  * @brief Allocation of memory for 7 independent interrupt slots
  */
-static gpio_isr_ctx_t exti_ctx[CTX_NUMOF] = {
-    {NULL, NULL}, {NULL, NULL}, {NULL, NULL}, {NULL, NULL},
-    {NULL, NULL}, {NULL, NULL}, {NULL, NULL}
-};
+static gpio_isr_ctx_t exti_ctx[CTX_NUMOF] = {{0}};
 
 /**
  * @brief Allocation of 4 bit per pin to map a pin to an interrupt context
