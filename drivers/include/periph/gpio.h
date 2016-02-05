@@ -98,9 +98,14 @@ typedef enum {
  */
 #ifndef HAVE_GPIO_PP_T
 typedef enum {
-    GPIO_NOPULL = 0,        /**< do not use internal pull resistors */
-    GPIO_PULLUP = 1,        /**< enable internal pull-up resistor */
-    GPIO_PULLDOWN = 2       /**< enable internal pull-down resistor */
+    /** @brief Output: Actively driven in both directions, Input: Passive input */
+    GPIO_NOPULL = 0,
+    /** @brief Input: enable internal pull-up resistor, Output: undefined */
+    GPIO_PULLUP = 1,
+    /** @brief Input: enable internal pull-down resistor, Output: undefined */
+    GPIO_PULLDOWN = 2,
+    /** @brief Output: Open drain, only actively driven low, Input: undefined */
+    GPIO_OPEN_DRAIN = 3,
 } gpio_pp_t;
 #endif
 
