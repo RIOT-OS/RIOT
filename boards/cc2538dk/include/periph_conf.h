@@ -19,7 +19,7 @@
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
 
-#include "gptimer.h"
+#include "cpu.h"
 
 #ifdef __cplusplus
 extern "C" {

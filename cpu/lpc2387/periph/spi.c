@@ -114,7 +114,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     /* Clock Setup*/
     uint32_t pclksel;
     uint32_t cpsr;
-    lpc2387_pclk_scale(F_CPU / 1000, f_baud, &pclksel, &cpsr);
+    lpc2387_pclk_scale(CLOCK_CORECLOCK / 1000, f_baud, &pclksel, &cpsr);
     PCLKSEL1 &= ~(BIT10 | BIT11);   /* CCLK to PCLK divider*/
     PCLKSEL1 |= pclksel << 10;
     SSP0CPSR = cpsr;

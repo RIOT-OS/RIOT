@@ -108,6 +108,9 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
             tmp_addr->valid = 0xFFFF;
             gnrc_sixlowpan_nd_router_abr_t *abr = gnrc_sixlowpan_nd_router_abr_get();
+            mutex_unlock(&entry->mutex);
+            gnrc_ipv6_netif_set_rtr_adv(entry, true);
+            mutex_lock(&entry->mutex);
             if (gnrc_sixlowpan_nd_router_abr_add_prf(abr, entry, tmp_addr) < 0) {
                 DEBUG("ipv6_netif: error adding prefix to 6LoWPAN-ND management\n");
             }
@@ -870,7 +873,9 @@ void gnrc_ipv6_netif_init_by_dev(void)
             /* first interface wins */
             if (!abr_init) {
                 gnrc_sixlowpan_nd_router_abr_create(&addr, 0);
-                gnrc_ipv6_netif_set_rtr_adv(ipv6_if, true);
+                /* XXX should be set to true if there ever is an hard-coded
+                 * prefix set */
+                gnrc_ipv6_netif_set_rtr_adv(ipv6_if, false);
                 abr_init = true;
             }
 #endif

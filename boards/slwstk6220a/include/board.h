@@ -31,23 +31,9 @@ extern "C" {
 #endif
 
 /**
- * @brief   Define the nominal CPU core clock in this board
- */
-#define F_CPU               (CLOCK_CORECLOCK)
-
-/**
  * @brief   Assign the hardware timer
  */
 #define HW_TIMER            TIMER_DEV(0)
-
-/**
- * @brief   Define UART device and baudrate for STDIO
- * @{
- */
-#define STDIO               UART_DEV(0)
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
 
 /**
  * @brief   Connection to the on-board temperature/humidity sensor (Si7021)

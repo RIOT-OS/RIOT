@@ -44,6 +44,7 @@
 #ifndef PERIPH_UART_H
 #define PERIPH_UART_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "periph_cpu.h"

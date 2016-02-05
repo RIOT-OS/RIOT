@@ -243,6 +243,11 @@ static inline kernel_pid_t thread_getpid(void)
     return sched_active_pid;
 }
 
+/**
+ * @brief   Prints the message queue of the current thread.
+ */
+void thread_print_msg_queue(void);
+
 #ifdef DEVELHELP
 /**
  * @brief Returns the name of a process

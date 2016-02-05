@@ -40,7 +40,9 @@ int _random_init(int argc, char **argv)
         printf("PRNG initialized to current time: %d\n", initval);
 #else
         (void)initval;
-        printf("xtimer module not compiled in, can't initialize by time.\n");
+        puts("xtimer module not compiled in, can't initialize by time.\n"
+             "Please provide a seed.\n");
+        return 1;
 #endif
     }
     else {

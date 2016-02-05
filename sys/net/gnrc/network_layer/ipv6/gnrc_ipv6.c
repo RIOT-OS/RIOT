@@ -32,6 +32,7 @@
 #include "net/gnrc/ipv6/nc.h"
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/ipv6/whitelist.h"
+#include "net/gnrc/ipv6/blacklist.h"
 
 #include "net/gnrc/ipv6.h"
 
@@ -544,12 +545,7 @@ static inline kernel_pid_t _next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len
 #elif !defined(MODULE_GNRC_SIXLOWPAN_ND) && defined(MODULE_GNRC_IPV6_NC)
     (void)pkt;
     gnrc_ipv6_nc_t *nc = gnrc_ipv6_nc_get(iface, dst);
-    if ((nc == NULL) || !gnrc_ipv6_nc_is_reachable(nc)) {
-        return KERNEL_PID_UNDEF;
-    }
-    found_iface = nc->iface;
-    *l2addr_len = nc->l2_addr_len;
-    memcpy(l2addr, nc->l2_addr, nc->l2_addr_len);
+    found_iface = gnrc_ipv6_nc_get_l2_addr(l2addr, l2addr_len, nc);
 #elif !defined(MODULE_GNRC_SIXLOWPAN_ND)
     found_iface = KERNEL_PID_UNDEF;
     (void)l2addr;
@@ -740,6 +736,13 @@ static void _receive(gnrc_pktsnip_t *pkt)
             return;
         }
 #endif
+#ifdef MODULE_GNRC_IPV6_BLACKLIST
+        if (gnrc_ipv6_blacklisted(&((ipv6_hdr_t *)(pkt->data))->src)) {
+            DEBUG("ipv6: Source address blacklisted, dropping packet\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+#endif
         /* seize ipv6 as a temporary variable */
         ipv6 = gnrc_pktbuf_start_write(pkt);
 
@@ -763,6 +766,14 @@ static void _receive(gnrc_pktsnip_t *pkt)
     else if (!gnrc_ipv6_whitelisted(&((ipv6_hdr_t *)(ipv6->data))->src)) {
         /* if ipv6 header already marked*/
         DEBUG("ipv6: Source address not whitelisted, dropping packet\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
+#endif
+#ifdef MODULE_GNRC_IPV6_BLACKLIST
+    else if (gnrc_ipv6_blacklisted(&((ipv6_hdr_t *)(ipv6->data))->src)) {
+        /* if ipv6 header already marked*/
+        DEBUG("ipv6: Source address blacklisted, dropping packet\n");
         gnrc_pktbuf_release(pkt);
         return;
     }

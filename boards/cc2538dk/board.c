@@ -21,10 +21,6 @@
 #include "board.h"
 #include "cpu.h"
 
-#include "ioc.h"
-#include "lpm.h"
-#include "cc2538-gpio.h"
-
 static void led_init_helper(int gpio_num) {
     gpio_software_control(gpio_num);
     gpio_dir_output(gpio_num);

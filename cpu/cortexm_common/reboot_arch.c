@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 
-#include "arch/reboot_arch.h"
+#include "kernel.h"
 #include "cpu.h"
 
 #ifndef SYSTEM_RESET

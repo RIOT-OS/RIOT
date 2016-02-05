@@ -23,10 +23,6 @@ ifneq (,$(filter gnrc_conn_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
 endif
 
-ifneq (,$(filter schedstatistics,$(USEMODULE)))
-  USEMODULE += xtimer
-endif
-
 ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
   USEMODULE += gnrc_netif
 endif
@@ -201,6 +197,10 @@ ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
 endif
 
+ifneq (,$(filter gnrc_icmpv6_error,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6
+endif
+
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
   USEMODULE += inet_csum
   USEMODULE += gnrc_ipv6
@@ -220,6 +220,10 @@ ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
+  USEMODULE += ipv6_addr
+endif
+
+ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
   USEMODULE += ipv6_addr
 endif
 

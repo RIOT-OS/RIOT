@@ -22,11 +22,6 @@
 #include "thread.h"
 #include "periph/gpio.h"
 
-typedef struct {
-    gpio_cb_t cb;
-    void *arg;
-} gpio_state_t;
-
 /* Static IOCON registers definition */
 volatile uint32_t * const lpc_pin_registers[] = {
     /* PORT 0 (PIO0_0 -> PIO0_23) */
@@ -63,7 +58,7 @@ volatile uint32_t * const lpc_pin_registers[] = {
 
 static int8_t flex_int_mapping[GPIO_NUMOF];
 
-static gpio_state_t gpio_config[GPIO_NUMOF];
+static gpio_isr_ctx_t gpio_config[GPIO_NUMOF];
 static uint8_t gpio_int_id = 0;
 
 /* static port mappings */

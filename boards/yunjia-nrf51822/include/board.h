@@ -28,11 +28,6 @@ extern "C" {
 #endif
 
 /**
- * @name Define the nominal CPU core clock in this board
- */
-#define F_CPU               (16000000UL)
-
-/**
  * @brief   Xtimer configuration
  * @{
  */
@@ -41,15 +36,6 @@ extern "C" {
 #define XTIMER_MASK                 (0xff000000)
 #define XTIMER_SHIFT_ON_COMPARE     (2)
 #define XTIMER_BACKOFF              (40)
-/** @} */
-
-/**
- * @name Define the boards stdio
- * @{
- */
-#define STDIO               UART_DEV(0)
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
 /** @} */
 
 /**

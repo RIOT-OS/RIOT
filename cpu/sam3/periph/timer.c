@@ -117,7 +117,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
      * channel 2 toggles this line on each timer tick, the actual frequency driving ch0/1
      * is f_ch2 / 2 --> f_ch0/1 = (MCK / 2 / 2 / 1000000) * ticks_per_us.
      */
-    tim->TC_CHANNEL[2].TC_RC = ((F_CPU / 1000000) / 4) * ticks_per_us;
+    tim->TC_CHANNEL[2].TC_RC = ((CLOCK_CORECLOCK / 1000000) / 4) * ticks_per_us;
 
     /* start channel 2 */
     tim->TC_CHANNEL[2].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;

@@ -24,6 +24,13 @@ extern "C" {
 #endif
 
 /**
+ * @name        Clock configuration
+ * @{
+ */
+#define CLOCK_CORECLOCK     (16000000L)
+/** @} */
+
+/**
  * @name        Timer peripheral configuration
  * @brief       The ATmega2560 has 6 timers. Timer0 and Timer2 are 8 Bit Timers,
  *              Timer0 has special uses too and therefore we'll avoid using it.

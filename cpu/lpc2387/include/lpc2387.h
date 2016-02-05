@@ -21,7 +21,6 @@ extern "C" {
 
 #define F_CCO                   288000000
 #define CL_CPU_DIV              4                                   ///< CPU clock divider
-#define F_CPU                   (F_CCO / CL_CPU_DIV)                ///< CPU target speed in Hz
 #define F_RC_OSCILLATOR         4000000                             ///< Frequency of internal RC oscillator
 #define F_RTC_OSCILLATOR        32767                               ///< Frequency of RTC oscillator
 

@@ -199,7 +199,7 @@ static void _netif_list(kernel_pid_t dev)
     uint8_t u8;
     int res;
     netopt_state_t state;
-    netopt_enable_t enable;
+    netopt_enable_t enable = NETOPT_DISABLE;
     bool linebreak = false;
 
 #ifdef MODULE_GNRC_IPV6_NETIF
@@ -709,7 +709,7 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
     } type = _UNICAST;
     char *addr_str = argv[0];
     ipv6_addr_t addr;
-    uint8_t prefix_len;
+    uint8_t prefix_len, flags = 0;
 
     if (argc > 1) {
         if (strcmp(argv[0], "anycast") == 0) {
@@ -742,9 +742,15 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
         return 1;
     }
 
-    if (gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len, (type == _ANYCAST) ?
-                                 GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST :
-                                 GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST) == NULL) {
+    flags = GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_AUTO;
+    if (type == _ANYCAST) {
+        flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST;
+    }
+    else {
+        flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST;
+    }
+
+    if (gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len, flags) == NULL) {
         printf("error: unable to add IPv6 address\n");
         return 1;
     }

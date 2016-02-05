@@ -30,8 +30,6 @@
 extern "C" {
 #endif
 
-#define F_CPU 1000000
-
 void _native_LED_GREEN_OFF(void);
 #define LED_GREEN_OFF (_native_LED_GREEN_OFF())
 void _native_LED_GREEN_ON(void);

@@ -1,6 +1,7 @@
 PKG_NAME=oonf_api
 PKG_URL=http://olsr.org/git/oonf.git
 PKG_VERSION=v0.3.0
+PKG_DIR=$(CURDIR)/$(PKG_NAME)
 
 ifneq ($(RIOTBOARD),)
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
@@ -16,27 +17,31 @@ MODULE:=$(shell basename $(CURDIR))
 .PHONY: all clean patch reset
 
 all: patch
-	make -C $(CURDIR)/$(PKG_NAME)
-	make $(BINDIR)$(MODULE).a
+	"$(MAKE)" -C $(PKG_DIR)
+	"$(MAKE)" $(BINDIR)$(MODULE).a
 
-patch: $(CURDIR)/$(PKG_NAME)/Makefile
+patch: $(PKG_DIR)/Makefile
 
-$(CURDIR)/$(PKG_NAME)/Makefile: $(CURDIR)/$(PKG_NAME)
-	$(foreach patch,$(shell ls [0-9][0-9][0-9][0-9]*.patch),cd "$<" && git am "../$(patch)" || { git am --abort; exit 1; };)
+$(PKG_DIR)/Makefile: $(PKG_DIR)/.git/config
+	cd "$(PKG_DIR)" && git am --ignore-whitespace "$(CURDIR)"/*.patch
 
-$(CURDIR)/$(PKG_NAME):
-	test -d oonf_api || \
-	git clone $(PKG_URL) $@ && \
-		cd $@ && git reset --hard $(PKG_VERSION)
+$(PKG_DIR)/.git/config:
+	test -d "$(PKG_DIR)" || git clone "$(PKG_URL)" "$(PKG_DIR)"; \
+		cd "$(PKG_DIR)" && git checkout -f "$(PKG_VERSION)"
 
 clean::
-	# Reset package to checkout state.
-	cd $(CURDIR)/$(PKG_NAME) || true && \
+	@echo "Cleaning up oonf_api package..."
+	@cd "$(PKG_DIR)" 2> /dev/null > /dev/null && \
 		git clean -x -f && \
-		git reset --hard $(PKG_VERSION)
+		git am --abort && \
+		git reset --hard "$(PKG_VERSION)" && \
+		$(MAKE) patch || true
 
 distclean::
-	rm -rf $(CURDIR)/$(PKG_NAME)
+	rm -rf $(PKG_DIR)
 
 $(BINDIR)$(MODULE).a: $(BINDIR)oonf_*.a
 	mkdir -p $(BINDIR)$(MODULE); cd $(BINDIR)$(MODULE); for var in $?; do ar -x $$var; done; ar -r -c -s $(BINDIR)$(MODULE).a *.o
+
+Makefile.include:
+	@true

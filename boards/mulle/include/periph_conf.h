@@ -50,10 +50,6 @@ extern "C"
 #define CPU_INT_FAST_CLK_HZ             4000000u
 /** Default System clock value */
 #define DEFAULT_SYSTEM_CLOCK            (CPU_XTAL32k_CLK_HZ * 2929u)
-
-/** @todo Investigate the side effects of making F_CPU run-time variable */
-#define F_CPU DEFAULT_SYSTEM_CLOCK
-
 /** @} */
 
 /**

@@ -31,24 +31,10 @@ extern "C" {
 #endif
 
 /**
- * Define the nominal CPU core clock in this board
- */
-#define F_CPU               (CLOCK_CORECLOCK)
-
-/**
  * Assign the hardware timer
  */
 #define XTIMER              TIMER_1
 #define XTIMER_CHAN         (0)
-
-/**
- * @name Define UART device and baudrate for stdio
- * @{
- */
-#define STDIO               UART_DEV(0)
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
 
 /**
  * @name AT86RF233 configuration
@@ -89,6 +75,15 @@ extern "C" {
 #define LED_RED_ON          LED_ON
 #define LED_RED_OFF         LED_OFF
 #define LED_RED_TOGGLE      LED_TOGGLE
+/** @} */
+
+/**
+ * @name SW0 (Button) pin definitions
+ * @{
+ */
+#define BUTTON_PORT         PORT->Group[0]
+#define BUTTON_PIN          (28)
+#define BUTTON_GPIO         GPIO_PIN(0, BUTTON_PIN)
 /** @} */
 
 /**

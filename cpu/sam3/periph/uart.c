@@ -63,7 +63,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
                                              uart_config[uart].tx_pin);
 
     /* configure baud rate and set mode to 8N1 */
-    dev->UART_BRGR = (F_CPU / (16 * baudrate));
+    dev->UART_BRGR = (CLOCK_CORECLOCK / (16 * baudrate));
     dev->UART_MR = UART_MR_PAR_NO | US_MR_CHRL_8_BIT;
     dev->UART_CR = UART_CR_RXEN | UART_CR_TXEN | UART_CR_RSTSTA;
 

@@ -29,11 +29,6 @@ extern "C" {
 #endif
 
 /**
- * Define the nominal CPU core clock in this board
- */
-#define F_CPU               CLOCK_CORECLOCK
-
-/**
  * @name Configure connected CC1101 (radio) device
  * @{
  */
@@ -51,15 +46,6 @@ extern "C" {
 #define MPU9150_I2C         I2C_0
 #define MPU9150_HW_ADDR     (0x68)
 #define MPU9150_COMP_ADDR   (0x0E)
-/** @} */
-
-/**
- * @name Define UART device and baudrate for stdio
- * @{
- */
-#define STDIO               UART_DEV(0)
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
 /** @} */
 
 /**
