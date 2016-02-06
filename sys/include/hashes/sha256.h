@@ -52,6 +52,11 @@ extern "C" {
 #define SHA256_DIGEST_LENGTH 32
 
 /**
+ * @brief 512 Bit (64 Byte) internally used block size for sha256
+ */
+#define SHA256_INTERNAL_BLOCK_SIZE (64)
+
+/**
  * @brief Context for ciper operatins based on sha256
  */
 typedef struct {
@@ -99,6 +104,25 @@ void sha256_final(unsigned char digest[32], sha256_context_t *ctx);
  *           if md == NULL, one static buffer is used
  */
 unsigned char *sha256(const unsigned char *d, size_t n, unsigned char *md);
+
+/**
+ * @brief function to compute a hmac-sha256 from a given message
+ *
+ * @param[in] key key used in the hmac-sha256 computation
+ * @param[in] key_length the size in bytes of the key
+ * @param[in] message pointer to the message to generate the hmac-sha256
+ * @param[in] message_length the length of the message in bytes
+ * @param[out] result the computed hmac-sha256,
+ *             length MUST be SHA256_DIGEST_LENGTH
+ *             if result == NULL, a static buffer is used
+ * @returns pointer to the resulting digest.
+ *          if result == NULL the pointer points to the static buffer
+ */
+const unsigned char *hmac_sha256(const unsigned char *key,
+                                 size_t key_length,
+                                 const unsigned *message,
+                                 size_t message_length,
+                                 unsigned char *result);
 
 #ifdef __cplusplus
 }
