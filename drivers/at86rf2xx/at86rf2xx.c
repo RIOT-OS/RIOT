@@ -89,8 +89,8 @@ int at86rf2xx_init(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
 
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
-#if CPUID_ID_LEN
-    uint8_t cpuid[CPUID_ID_LEN];
+#if CPUID_LEN
+    uint8_t cpuid[CPUID_LEN];
     eui64_t addr_long;
 #endif
 
@@ -103,16 +103,16 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     dev->seq_nr = 0;
     dev->options = 0;
     /* set short and long address */
-#if CPUID_ID_LEN
+#if CPUID_LEN
     cpuid_get(cpuid);
 
-#if CPUID_ID_LEN < 8
-    /* in case CPUID_ID_LEN < 8, fill missing bytes with zeros */
-    for (int i = CPUID_ID_LEN; i < 8; i++) {
+#if CPUID_LEN < 8
+    /* in case CPUID_LEN < 8, fill missing bytes with zeros */
+    for (int i = CPUID_LEN; i < 8; i++) {
         cpuid[i] = 0;
     }
 #else
-    for (int i = 8; i < CPUID_ID_LEN; i++) {
+    for (int i = 8; i < CPUID_LEN; i++) {
         cpuid[i & 0x07] ^= cpuid[i];
     }
 #endif

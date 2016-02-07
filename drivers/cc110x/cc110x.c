@@ -87,11 +87,11 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
     cc110x_set_channel(dev, CC110X_DEFAULT_CHANNEL);
 
     /* set default node id */
-#ifdef CPUID_ID_LEN
-    if (CPUID_ID_LEN>0) {
-        char cpuid[CPUID_ID_LEN];
+#ifdef CPUID_LEN
+    if (CPUID_LEN>0) {
+        char cpuid[CPUID_LEN];
         cpuid_get(cpuid);
-        cc110x_set_address(dev, (uint8_t) cpuid[CPUID_ID_LEN-1]);
+        cc110x_set_address(dev, (uint8_t) cpuid[CPUID_LEN-1]);
     }
 #endif
 
