@@ -259,3 +259,62 @@ unsigned char *sha256(const unsigned char *d, size_t n, unsigned char *md)
 
     return md;
 }
+
+const unsigned char *hmac_sha256(const unsigned char *key,
+                                 size_t key_length,
+                                 const unsigned *message,
+                                 size_t message_length,
+                                 unsigned char *result)
+{
+    unsigned char k[SHA256_INTERNAL_BLOCK_SIZE];
+    memset((void *)k, 0x00, SHA256_INTERNAL_BLOCK_SIZE);
+
+    if (key_length > SHA256_INTERNAL_BLOCK_SIZE) {
+        sha256(key, key_length, k);
+    }
+    else {
+        memcpy((void*)k, key, key_length);
+    }
+
+    /*
+     * create the inner and outer keypads
+     * rising hamming distance enforcing i_* and o_* are distinct
+     * in at least one bit
+     */
+    unsigned char o_key_pad[SHA256_INTERNAL_BLOCK_SIZE];
+    unsigned char i_key_pad[SHA256_INTERNAL_BLOCK_SIZE];
+
+    for (size_t i = 0; i < SHA256_INTERNAL_BLOCK_SIZE; ++i) {
+        o_key_pad[i] = 0x5c^k[i];
+        i_key_pad[i] = 0x36^k[i];
+    }
+
+    /*
+     * Create the inner hash
+     * tmp = hash(i_key_pad CONCAT message)
+     */
+    sha256_context_t c;
+    unsigned char tmp[SHA256_DIGEST_LENGTH];
+
+    sha256_init(&c);
+    sha256_update(&c, i_key_pad, SHA256_INTERNAL_BLOCK_SIZE);
+    sha256_update(&c, message, message_length);
+    sha256_final(tmp, &c);
+
+    static unsigned char m[SHA256_DIGEST_LENGTH];
+
+    if (result == NULL) {
+        result = m;
+    }
+
+    /*
+     * Create the outer hash
+     * result = hash(o_key_pad CONCAT tmp)
+     */
+    sha256_init(&c);
+    sha256_update(&c, o_key_pad, SHA256_INTERNAL_BLOCK_SIZE);
+    sha256_update(&c, tmp, SHA256_DIGEST_LENGTH);
+    sha256_final(result, &c);
+
+    return result;
+}
