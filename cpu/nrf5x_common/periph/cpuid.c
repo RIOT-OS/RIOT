@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2015 Jan Wagner <mail@jwagner.eu>
- *               2016 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
+ *               2015 Jan Wagner <mail@jwagner.eu>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,13 +8,13 @@
  */
 
 /**
- * @ingroup     cpu_nrf52
+ * @ingroup     cpu_nrf5x_common
  * @{
  *
  * @file
  * @brief       CPUID interface implementation
  *
- * The NRF52832 provides a 64-bit unique identifier, that is unique for each
+ * The NRF52832 provides a 64-bit unique identifier that is unique for each
  * shipped unit.
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
