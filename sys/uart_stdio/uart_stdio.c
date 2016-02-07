@@ -33,6 +33,11 @@
 #include "board.h"
 #include "periph/uart.h"
 
+#ifdef USE_ETHOS_FOR_STDIO
+#include "ethos.h"
+extern ethos_t ethos;
+#endif
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -67,7 +72,11 @@ void uart_stdio_rx_cb(void *arg, char data)
 
 void uart_stdio_init(void)
 {
+#ifndef USE_ETHOS_FOR_STDIO
     uart_init(STDIO, STDIO_BAUDRATE, uart_stdio_rx_cb, NULL);
+#else
+    uart_init(ETHOS_UART, ETHOS_BAUDRATE, uart_stdio_rx_cb, NULL);
+#endif
 }
 
 int uart_stdio_read(char* buffer, int count)
@@ -81,6 +90,10 @@ int uart_stdio_read(char* buffer, int count)
 
 int uart_stdio_write(const char* buffer, int len)
 {
+#ifndef USE_ETHOS_FOR_STDIO
     uart_write(STDIO, (uint8_t *)buffer, (size_t)len);
+#else
+    ethos_send_frame(&ethos, (uint8_t*)buffer, len, ETHOS_FRAME_TYPE_TEXT);
+#endif
     return len;
 }
