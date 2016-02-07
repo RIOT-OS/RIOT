@@ -26,15 +26,20 @@ extern "C" {
 #endif
 
 /**
- * @brief   Use base register as defined by the CPU family
+ * @brief   Iron out some differences in register and IRQ channel naming between
+ *          the different nRFx family members
+ * @{
  */
 #if defined(CPU_FAM_NRF51)
 #define GPIO_BASE           (NRF_GPIO)
+#define UART_IRQN           (UART0_IRQn)
 #elif defined(CPU_FAM_NRF52)
 #define GPIO_BASE           (NRF_P0)
+#define UART_IRQN           (UARTE0_UART0_IRQn)
 #else
-#error "nrf5x_common/periph/gpio: no valid CPU_FAM defined"
+#error "nrf5x_common: no valid value for CPU_FAM_XX defined"
 #endif
+/** @} */
 
 /**
  * @brief   Length of the CPU_ID in octets
