@@ -19,11 +19,6 @@
  * @{
  */
 
-/**
- * Use RIOT specific configuration in CCN-Lite
- */
-#define CCNL_RIOT
-
 #include <unistd.h>
 #include "kernel_types.h"
 #include "arpa/inet.h"
