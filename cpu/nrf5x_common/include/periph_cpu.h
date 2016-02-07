@@ -26,6 +26,29 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Use base register as defined by the CPU family
+ */
+#if defined(CPU_FAM_NRF51)
+#define GPIO_BASE           (NRF_GPIO)
+#elif defined(CPU_FAM_NRF52)
+#define GPIO_BASE           (NRF_P0)
+#else
+#error "nrf5x_common/periph/gpio: no valid CPU_FAM defined"
+#endif
+
+/**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (8U)
+
+/**
+ * @brief   Override macro for defining GPIO pins
+ *
+ * The port definition is used (and zeroed) to suppress compiler warnings
+ */
+#define GPIO_PIN(x,y)       ((x & 0) | y)
+
+/**
  * @brief   Override GPIO pull register select values
  * @{
  */
@@ -48,18 +71,6 @@ typedef enum {
     GPIO_BOTH    = 3        /**< emit interrupt on both flanks */
 } gpio_flank_t;
 /** @} */
-
-/**
- * @brief   Override macro for defining GPIO pins
- *
- * The port definition is used (and zeroed) to suppress compiler warnings
- */
-#define GPIO_PIN(x,y)       ((x & 0) | y)
-
-/**
- * @brief   Length of the CPU_ID in octets
- */
-#define CPUID_LEN           (8U)
 
 #ifdef __cplusplus
 }
