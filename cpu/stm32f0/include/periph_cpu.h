@@ -26,6 +26,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (12U)
+
+/**
  * @brief declare needed generic SPI functions
  * @{
  */

@@ -55,13 +55,6 @@ extern "C" {
  */
 #define NATIVE_ETH_PROTO 0x1234
 
-/**
- * @brief   Length of CPU ID for @ref cpu_id_get() in @ref periph/cpuid.h
- */
-#ifndef CPUID_ID_LEN
-#define CPUID_ID_LEN                    (4)
-#endif
-
 #ifdef __cplusplus
 }
 #endif

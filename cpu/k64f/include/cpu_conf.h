@@ -47,16 +47,6 @@ extern "C"
 /** @} */
 
 /**
- * @brief Length for reading CPU_ID in octets
- */
-#define CPUID_ID_LEN                     (16)
-
-/**
- * @brief Pointer to CPU_ID
- */
-#define CPUID_ID_PTR                     ((void *)(&(SIM_UIDH)))
-
-/**
  * @name GPIO pin mux function numbers
  */
 /** @{ */

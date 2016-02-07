@@ -53,6 +53,11 @@ typedef uint32_t gpio_t;
 /** @} */
 
 /**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (12U)
+
+/**
  * @brief   Available ports on the STM32F4 family
  */
 enum {

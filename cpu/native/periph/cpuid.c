@@ -7,13 +7,15 @@
  */
 
 /**
- * @addtogroup  driver_periph
+ * @addtogroup  cpu_native
  * @{
  *
  * @file
  * @brief       Implementation
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
+ *
+ * @}
  */
 
 #include <string.h>
@@ -26,16 +28,12 @@
 
 void cpuid_get(void *id)
 {
-    /* Just in case _native_id is shorter than CPUID_ID_LEN: */
-    size_t len = CPUID_ID_LEN;
-    if (sizeof(_native_id) < CPUID_ID_LEN) {
+    /* Just in case _native_id is shorter than CPUID_LEN: */
+    size_t len = CPUID_LEN;
+    if (sizeof(_native_id) < CPUID_LEN) {
         memset(((char*)id) + sizeof(_native_id), 0xff,
-                CPUID_ID_LEN - sizeof(_native_id));
+                CPUID_LEN - sizeof(_native_id));
         len = sizeof(_native_id);
     }
     memcpy(id, &(_native_id), len);
 }
-
-/**
- * @}
- */

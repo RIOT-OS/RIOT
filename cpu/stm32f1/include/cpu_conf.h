@@ -43,11 +43,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Length for reading CPU_ID
- */
-#define CPUID_ID_LEN                    (12)
-
-/**
  * @brief Configure the CPU's clock system
  *
  * @param[in] source    source clock frequency

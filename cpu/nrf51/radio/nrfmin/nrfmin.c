@@ -510,7 +510,7 @@ static void _receive_data(void)
  */
 int nrfmin_init(gnrc_netdev_t *dev)
 {
-    uint8_t cpuid[CPUID_ID_LEN];
+    uint8_t cpuid[CPUID_LEN];
     uint8_t tmp;
     int i;
 
@@ -535,12 +535,12 @@ int nrfmin_init(gnrc_netdev_t *dev)
     /* get default address from CPU ID */
     cpuid_get(cpuid);
     tmp = 0;
-    for (i = 0; i < (CPUID_ID_LEN / 2); i++) {
+    for (i = 0; i < (CPUID_LEN / 2); i++) {
         tmp ^= cpuid[i];
     }
     _addr = ((uint16_t)tmp) << 8;
     tmp = 0;
-    for (; i < CPUID_ID_LEN; i++) {
+    for (; i < CPUID_LEN; i++) {
         tmp ^= cpuid[i];
     }
     _addr |= tmp;

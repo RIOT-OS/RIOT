@@ -34,11 +34,6 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (26U)
 /** @} */
 
-/**
- * @name Length in bytes for reading CPU_ID
- */
-#define CPUID_ID_LEN                    (8)
-
 #ifdef __cplusplus
 }
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,15 +7,18 @@
  */
 
 /**
- * @addtogroup  driver_periph
+ * @addtogroup  cpu_samd21
  * @{
  *
  * @file
  * @brief       Low-level CPUID driver implementation
  *
  * @author      Troels Hoffmeyer <troels.d.hoffmeyer@gmail.com>
+ *
+ * @}
  */
 
+#include <stdint.h>
 #include <string.h>
 
 #include "periph/cpuid.h"
@@ -32,5 +35,5 @@ void cpuid_get(void *id)
                                   SAMD21_CPUID_WORD1,
                                   SAMD21_CPUID_WORD2,
                                   SAMD21_CPUID_WORD3};
-    memcpy(id, (void*) source_address, CPUID_ID_LEN);
+    memcpy(id, (void*) source_address, CPUID_LEN);
 }
