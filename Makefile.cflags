@@ -56,7 +56,7 @@ else
   export LTO := 0
 endif
 ifeq ($(LTO),1)
-  $(info Building with Link-Time-Optimizations is currently an experimental feature. Expect broken binaries.)
+  $(warning Building with Link-Time-Optimizations is currently an experimental feature. Expect broken binaries.)
   LTOFLAGS = -flto
   CFLAGS += ${LTOFLAGS}
   LINKFLAGS += ${LTOFLAGS}
