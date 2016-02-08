@@ -74,7 +74,7 @@ static int _exti(gpio_t pin)
     return exti_config[port_num][_pin_pos(pin)];
 }
 
-int gpio_init_mux(gpio_t pin, gpio_mux_t mux)
+void gpio_init_mux(gpio_t pin, gpio_mux_t mux)
 {
     PortGroup* port = _port(pin);
     int pin_pos = _pin_pos(pin);
@@ -82,7 +82,6 @@ int gpio_init_mux(gpio_t pin, gpio_mux_t mux)
     port->PINCFG[pin_pos].reg |= PORT_PINCFG_PMUXEN;
     port->PMUX[pin_pos >> 1].reg &= ~(0xf << (4 * (pin_pos & 0x1)));
     port->PMUX[pin_pos >> 1].reg |=  (mux << (4 * (pin_pos & 0x1)));
-    return 0;
 }
 
 int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pushpull)
