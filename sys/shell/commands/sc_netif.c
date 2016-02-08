@@ -680,19 +680,10 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
 #ifdef MODULE_GNRC_IPV6_NETIF
 static uint8_t _get_prefix_len(char *addr)
 {
-    int prefix_len = SC_NETIF_IPV6_DEFAULT_PREFIX_LEN;
+    int prefix_len = ipv6_addr_split(addr, '/', SC_NETIF_IPV6_DEFAULT_PREFIX_LEN);
 
-    while ((*addr != '/') && (*addr != '\0')) {
-        addr++;
-    }
-
-    if (*addr == '/') {
-        *addr = '\0';
-        prefix_len = atoi(addr + 1);
-
-        if ((prefix_len < 1) || (prefix_len > IPV6_ADDR_BIT_LEN)) {
-            prefix_len = SC_NETIF_IPV6_DEFAULT_PREFIX_LEN;
-        }
+    if ((prefix_len < 1) || (prefix_len > IPV6_ADDR_BIT_LEN)) {
+        prefix_len = SC_NETIF_IPV6_DEFAULT_PREFIX_LEN;
     }
 
     return prefix_len;
