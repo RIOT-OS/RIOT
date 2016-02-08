@@ -19,26 +19,13 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
-#include "cpu.h"
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * @brief   Length of the CPU_ID in octets
- */
-#define CPUID_LEN           (12U)
-
-/**
- * @brief declare needed generic SPI functions
- * @{
- */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
-/** @} */
+/* to be filled */
 
 #ifdef __cplusplus
 }

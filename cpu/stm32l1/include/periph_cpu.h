@@ -21,7 +21,6 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
-#include "cpu.h"
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus
@@ -45,11 +44,6 @@ typedef uint32_t gpio_t;
  * @brief   Define a CPU specific GPIO pin generator macro
  */
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
-
-/**
- * @brief   Length of the CPU_ID in octets
- */
-#define CPUID_LEN           (12U)
 
 /**
  * @brief   Available ports on the STM32L1 family
