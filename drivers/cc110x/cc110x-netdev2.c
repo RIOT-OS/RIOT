@@ -191,7 +191,7 @@ static int _init(netdev2_t *dev)
     gpio_init_int(cc110x->params.gdo2, GPIO_NOPULL, GPIO_BOTH,
             &_netdev2_cc110x_isr, (void*)dev);
 
-    gpio_set(cc110x->params.gdo2);
+    //gpio_set(cc110x->params.gdo2);
     gpio_irq_disable(cc110x->params.gdo2);
 
     /* Switch to RX mode */
