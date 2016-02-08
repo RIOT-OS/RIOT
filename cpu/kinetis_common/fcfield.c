@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 /* fcfield table */
-__attribute__((weak, section(".fcfield")))
+__attribute__((weak, used, section(".fcfield")))
 const uint8_t flash_configuration_field[] = {
     0xff,    /* backdoor comparison key 3., offset: 0x0 */
     0xff,    /* backdoor comparison key 2., offset: 0x1 */
