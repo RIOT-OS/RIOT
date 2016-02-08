@@ -283,6 +283,11 @@ ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
 endif
 
 ifneq (,$(filter newlib,$(USEMODULE)))
+  # allow custom newlib syscalls implementations by adding
+  # newlib_syscalls_XXX to USEMODULE
+  ifeq (,$(filter newlib_syscalls_%,$(USEMODULE)))
+    USEMODULE += newlib_syscalls_default
+  endif
   USEMODULE += uart_stdio
 endif
 
