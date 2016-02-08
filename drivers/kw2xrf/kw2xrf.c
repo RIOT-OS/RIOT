@@ -392,8 +392,8 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     uint8_t reg = 0;
     uint8_t tmp[2];
     kw2xrf_gpio_int = int_pin;
-#if CPUID_ID_LEN
-    uint8_t cpuid[CPUID_ID_LEN];
+#if CPUID_LEN
+    uint8_t cpuid[CPUID_LEN];
     eui64_t addr_long;
 #endif
 
@@ -419,19 +419,19 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     dev->proto = KW2XRF_DEFAULT_PROTOCOL;
     dev->option = 0;
 
-#if CPUID_ID_LEN
+#if CPUID_LEN
     cpuid_get(cpuid);
 
-#if CPUID_ID_LEN < 8
+#if CPUID_LEN < 8
 
-    /* in case CPUID_ID_LEN < 8, fill missing bytes with zeros */
-    for (int i = CPUID_ID_LEN; i < 8; i++) {
+    /* in case CPUID_LEN < 8, fill missing bytes with zeros */
+    for (int i = CPUID_LEN; i < 8; i++) {
         cpuid[i] = 0;
     }
 
 #else
 
-    for (int i = 8; i < CPUID_ID_LEN; i++) {
+    for (int i = 8; i < CPUID_LEN; i++) {
         cpuid[i & 0x07] ^= cpuid[i];
     }
 

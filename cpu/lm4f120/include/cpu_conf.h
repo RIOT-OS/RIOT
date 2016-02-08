@@ -60,14 +60,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Length for reading CPU_ID
- * @{
- */
-#define CPUID_ID_LEN                    (12)
-#define CPUID_ADDR                      NVIC_CPUID
-/** @} */
-
-/**
  * @name cpu functions
  * @{
  */

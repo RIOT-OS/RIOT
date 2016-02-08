@@ -56,6 +56,11 @@ typedef enum {
  */
 #define GPIO_PIN(x,y)       ((x & 0) | y)
 
+/**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (8U)
+
 #ifdef __cplusplus
 }
 #endif

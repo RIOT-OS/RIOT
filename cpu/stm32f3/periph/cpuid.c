@@ -7,13 +7,15 @@
  */
 
 /**
- * @addtogroup  driver_periph
+ * @addtogroup  cpu_stm32f3
  * @{
  *
  * @file
  * @brief       Low-level CPUID driver implementation
  *
  * @author      James Hollister <jhollisterjr@gmail.com>
+ *
+ * @}
  */
 
 #include <string.h>
@@ -24,7 +26,5 @@
 
 void cpuid_get(void *id)
 {
-    memcpy(id, (void *)(STM32F3_CPUID_ADDR), CPUID_ID_LEN);
+    memcpy(id, (void *)(STM32F3_CPUID_ADDR), CPUID_LEN);
 }
-
-/** @} */

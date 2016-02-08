@@ -20,11 +20,11 @@
  */
 
 #include <string.h>
-#include "cpu_conf.h"
 
+#include "cpu.h"
 #include "periph/cpuid.h"
 
 void cpuid_get(void *id)
 {
-    memcpy(id, CPUID_ID_PTR, CPUID_ID_LEN);
+    memcpy(id, (void *)&(SIM_UIDH), CPUID_LEN);
 }

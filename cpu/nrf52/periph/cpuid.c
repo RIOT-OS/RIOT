@@ -26,9 +26,9 @@
 #include <string.h>
 
 #include "cpu.h"
-#include "cpu_conf.h"
+#include "periph/cpuid.h"
 
 void cpuid_get(void *id)
 {
-    memcpy(id, (void *)NRF_FICR->DEVICEID, CPUID_ID_LEN);
+    memcpy(id, (void *)NRF_FICR->DEVICEID, CPUID_LEN);
 }

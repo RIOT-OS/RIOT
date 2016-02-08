@@ -20,12 +20,11 @@
  * @}
  */
 
+#include <stdint.h>
 #include <string.h>
 
 #include "cpu.h"
 #include "periph/cpuid.h"
-
-#define BITS_PER_BYTE 8
 
 void cpuid_get(void *id)
 {
@@ -35,13 +34,12 @@ void cpuid_get(void *id)
      * The byte-order is big-endian but the word order is little endian.
      * Make some sense of it:
      */
-    dest[0] = IEEE_ADDR_MSWORD >> (3 * BITS_PER_BYTE);
-    dest[1] = IEEE_ADDR_MSWORD >> (2 * BITS_PER_BYTE);
-    dest[2] = IEEE_ADDR_MSWORD >> (1 * BITS_PER_BYTE);
-    dest[3] = IEEE_ADDR_MSWORD >> (0 * BITS_PER_BYTE);
-    dest[4] = IEEE_ADDR_LSWORD >> (3 * BITS_PER_BYTE);
-    dest[5] = IEEE_ADDR_LSWORD >> (2 * BITS_PER_BYTE);
-    dest[6] = IEEE_ADDR_LSWORD >> (1 * BITS_PER_BYTE);
-    dest[7] = IEEE_ADDR_LSWORD >> (0 * BITS_PER_BYTE);
+    dest[0] = IEEE_ADDR_MSWORD >> (3 * sizeof(uint8_t));
+    dest[1] = IEEE_ADDR_MSWORD >> (2 * sizeof(uint8_t));
+    dest[2] = IEEE_ADDR_MSWORD >> (1 * sizeof(uint8_t));
+    dest[3] = IEEE_ADDR_MSWORD >> (0 * sizeof(uint8_t));
+    dest[4] = IEEE_ADDR_LSWORD >> (3 * sizeof(uint8_t));
+    dest[5] = IEEE_ADDR_LSWORD >> (2 * sizeof(uint8_t));
+    dest[6] = IEEE_ADDR_LSWORD >> (1 * sizeof(uint8_t));
+    dest[7] = IEEE_ADDR_LSWORD >> (0 * sizeof(uint8_t));
 }
-/** @} */

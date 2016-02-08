@@ -19,6 +19,8 @@
 #ifndef PERIPH_CPU_H_
 #define PERIPH_CPU_H_
 
+#include <stdint.h>
+
 #include "periph/dev_enums.h"
 
 #ifdef __cplusplus
@@ -52,6 +54,11 @@ typedef uint16_t gpio_t;
  * @brief   Define a CPU specific GPIO pin generator macro
  */
 #define GPIO_PIN(port, pin)          ((port << GPIO_PORT_SHIFT) | pin)
+
+/**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (16U)
 
 /**
  * @brief   Override values for pull register configuration

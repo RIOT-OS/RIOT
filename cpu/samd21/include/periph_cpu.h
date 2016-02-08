@@ -45,6 +45,11 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(x, y)      (((gpio_t)(&PORT->Group[x])) | y)
 
 /**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (16U)
+
+/**
  * @brief   Available ports on the SAMD21
  */
 enum {

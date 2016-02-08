@@ -36,11 +36,6 @@ extern "C" {
 #define CPU_FLASH_BASE                  (0x00000000)
 /** @} */
 
-/**
- * @brief   CPU_ID length in octets
- */
-#define CPUID_ID_LEN                    (8)
-
 #ifdef __cplusplus
 }
 #endif

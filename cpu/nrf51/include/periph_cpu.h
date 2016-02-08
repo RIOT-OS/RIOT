@@ -26,6 +26,18 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Mandatory macro for defining GPIO pins
+ *
+ * The port definition is used (and zeroed) to suppress compiler warnings
+ */
+#define GPIO_PIN(x,y)       ((x & 0) | y)
+
+/**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (8U)
+
+/**
  * @brief   Override GPIO pull register select values
  * @{
  */
@@ -48,13 +60,6 @@ typedef enum {
     GPIO_BOTH    = 3        /**< emit interrupt on both flanks */
 } gpio_flank_t;
 /** @} */
-
-/**
- * @brief   Mandatory macro for defining GPIO pins
- *
- * The port definition is used (and zeroed) to suppress compiler warnings
- */
-#define GPIO_PIN(x,y)       ((x & 0) | y)
 
 #ifdef __cplusplus
 }
