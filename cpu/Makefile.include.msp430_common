@@ -3,12 +3,11 @@ export PREFIX ?= msp430-
 
 # define build specific options
 CFLAGS_CPU   = -mmcu=$(CPU_MODEL)
-CFLAGS_STYLE = -std=gnu99 -Wall -Wstrict-prototypes
 CFLAGS_LINK  =
 CFLAGS_DBG   = -gdwarf-2
 CFLAGS_OPT  ?= -Os
 # export compiler flags
-export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_STYLE) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
+export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 # export assmebly flags
 export ASFLAGS += $(CFLAGS_CPU) --defsym $(CPU_MODEL)=1 $(CFLAGS_DEBUG)
 # export linker flags
