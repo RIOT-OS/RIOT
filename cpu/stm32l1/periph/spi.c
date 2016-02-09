@@ -14,7 +14,7 @@
  * @brief       Low-level SPI driver implementation
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
- * @author      Hauke Petersen <mail@haukepetersen.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>

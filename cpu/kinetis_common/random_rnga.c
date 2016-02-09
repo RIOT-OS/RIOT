@@ -16,7 +16,7 @@
  * @brief       Low-level random number generator driver implementation.
  *
  * @author      Johann Fischer <j.fischer@phytec.de> (adaption for Freescale's RNGA)
- * @author      Hauke Petersen <mail@haukepetersen.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
