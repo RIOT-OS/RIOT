@@ -83,17 +83,17 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+extern void auto_init_snippets(void);
+
 void auto_init(void)
 {
+    auto_init_snippets();
+
 #ifdef MODULE_CONFIG
     DEBUG("Auto init loading config\n");
     config_load();
 #endif
 
-#ifdef MODULE_XTIMER
-    DEBUG("Auto init xtimer module.\n");
-    xtimer_init();
-#endif
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");
     rtc_init();

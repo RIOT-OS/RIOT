@@ -1,0 +1,7 @@
+# Makefile for auto-generated bin/$BOARD/snippets directory
+
+# this line concatenates all name.snipNN.ext files into name.ext
+SRC := $(shell sh -c 'for file in $$(ls *.snip* | sed -re "s/\.snip[0-9]{2}//" | sort -u); do echo $$file; \
+		cat $${file%.*}.snip* > $$file; done')
+
+include $(RIOTBASE)/Makefile.base
