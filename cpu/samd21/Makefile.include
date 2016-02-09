@@ -1,9 +1,5 @@
 export CPU_ARCH = cortex-m0plus
+export CPU_FAM  = samd21
 
-# this CPU implementation doesn't use CMSIS initialisation
-export CFLAGS += -DDONT_USE_CMSIS_INIT
-
-# use common periph functions
-USEMODULE += periph_common
-
+include $(RIOTCPU)/sam21_common/Makefile.include
 include $(RIOTCPU)/Makefile.include.cortexm_common
