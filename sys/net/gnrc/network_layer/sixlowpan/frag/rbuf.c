@@ -230,7 +230,7 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
 static void _rbuf_gc(void)
 {
     rbuf_t *oldest = NULL;
-    uint32_t now_sec = xtimer_now() / SEC_IN_USEC;
+    uint32_t now_usec = xtimer_now();
     unsigned int i;
 
     for (i = 0; i < RBUF_SIZE; i++) {
@@ -238,7 +238,7 @@ static void _rbuf_gc(void)
             return;
         }
         else if ((rbuf[i].pkt != NULL) &&
-                 ((now_sec - rbuf[i].arrival) > RBUF_TIMEOUT)) {
+                 ((now_usec - rbuf[i].arrival) > RBUF_TIMEOUT)) {
             DEBUG("6lo rfrag: entry (%s, ", gnrc_netif_addr_to_str(l2addr_str,
                     sizeof(l2addr_str), rbuf[i].src, rbuf[i].src_len));
             DEBUG("%s, %u, %u) timed out\n",
@@ -249,7 +249,7 @@ static void _rbuf_gc(void)
             gnrc_pktbuf_release(rbuf[i].pkt);
             _rbuf_rem(&(rbuf[i]));
         }
-        else if ((oldest == NULL) || (rbuf[i].arrival < oldest->arrival)) {
+        else if ((oldest == NULL) || ((oldest->arrival - rbuf[i].arrival) < (UINT32_MAX / 2))) {
             oldest = &(rbuf[i]);
         }
     }
@@ -266,7 +266,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
                          size_t size, uint16_t tag)
 {
     rbuf_t *res = NULL;
-    uint32_t now_sec = xtimer_now() / SEC_IN_USEC;
+    uint32_t now_usec = xtimer_now();
 
     for (unsigned int i = 0; i < RBUF_SIZE; i++) {
         /* check first if entry already available */
@@ -282,7 +282,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
                   gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
                                          rbuf[i].dst, rbuf[i].dst_len),
                   (unsigned)rbuf[i].pkt->size, rbuf[i].tag);
-            rbuf[i].arrival = now_sec;
+            rbuf[i].arrival = now_usec;
             return &(rbuf[i]);
         }
 
@@ -301,7 +301,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
         *((uint64_t *)res->pkt->data) = 0;  /* clean first few bytes for later
                                              * look-ups */
-        res->arrival = now_sec;
+        res->arrival = now_usec;
         memcpy(res->src, src, src_len);
         memcpy(res->dst, dst, dst_len);
         res->src_len = src_len;
