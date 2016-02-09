@@ -44,8 +44,8 @@ static char l2addr_str[3 * RBUF_L2ADDR_MAX_LEN];
 /* ------------------------------------
  * internal function definitions
  * ------------------------------------*/
-/* checks whether start and end are in given interval i */
-static inline bool _rbuf_int_in(rbuf_int_t *i, uint16_t start, uint16_t end);
+/* checks whether start and end overlaps, but not identical to, given interval i */
+static inline bool _rbuf_int_overlap_partially(rbuf_int_t *i, uint16_t start, uint16_t end);
 /* gets a free entry from interval buffer */
 static rbuf_int_t *_rbuf_int_get_free(void);
 /* remove entry from reassembly buffer */
@@ -66,6 +66,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     /* cppcheck is clearly wrong here */
     /* cppcheck-suppress variableScope */
     unsigned int data_offset = 0;
+    size_t original_size = frag_size;
     sixlowpan_frag_t *frag = pkt->data;
     rbuf_int_t *ptr;
     uint8_t *data = ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
@@ -118,11 +119,20 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         return;
     }
 
+    /* If the fragment overlaps another fragment and differs in either the size
+     * or the offset of the overlapped fragment, discards the datagram
+     * https://tools.ietf.org/html/rfc4944#section-5.3 */
     while (ptr != NULL) {
-        if (_rbuf_int_in(ptr, offset, offset + frag_size - 1)) {
-            DEBUG("6lo rfrag: overlapping or same intervals, discarding datagram\n");
+        if (_rbuf_int_overlap_partially(ptr, offset, offset + frag_size - 1)) {
+            DEBUG("6lo rfrag: overlapping intervals, discarding datagram\n");
             gnrc_pktbuf_release(entry->pkt);
             _rbuf_rem(entry);
+
+            /* "A fresh reassembly may be commenced with the most recently
+             * received link fragment"
+             * https://tools.ietf.org/html/rfc4944#section-5.3 */
+            rbuf_add(netif_hdr, pkt, original_size, offset);
+
             return;
         }
 
@@ -168,11 +178,11 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     }
 }
 
-static inline bool _rbuf_int_in(rbuf_int_t *i, uint16_t start, uint16_t end)
+static inline bool _rbuf_int_overlap_partially(rbuf_int_t *i, uint16_t start, uint16_t end)
 {
-    return (((i->start < start) && (start <= i->end)) ||
-            ((start < i->start) && (i->start <= end)) ||
-            ((i->start == start) && (i->end == end)));
+    /* start and ends are both inclusive, so using <= for both */
+    return ((i->start <= end) && (start <= i->end)) && /* overlaps */
+        ((start != i->start) || (end != i->end)); /* not identical */
 }
 
 static rbuf_int_t *_rbuf_int_get_free(void)
