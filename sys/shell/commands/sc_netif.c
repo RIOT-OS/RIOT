@@ -88,6 +88,7 @@ static void _set_usage(char *cmd_name)
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
          "       * \"power\" - TX power in dBm\n"
+         "       * \"retrans\" - max. number of retransmissions\n"
          "       * \"src_len\" - sets the source address length in byte\n"
          "       * \"state\" - set the device state\n");
 }
@@ -148,6 +149,10 @@ static void _print_netopt(netopt_t opt)
 
         case NETOPT_TX_POWER:
             printf("TX power [in dBm]");
+            break;
+
+        case NETOPT_RETRANS:
+            printf("max. retransmissions");
             break;
 
         case NETOPT_CSMA_RETRIES:
@@ -235,8 +240,10 @@ static void _netif_list(kernel_pid_t dev)
     res = gnrc_netapi_get(dev, NETOPT_NID, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
-        printf(" NID: 0x%" PRIx16 " ", u16);
+        printf(" NID: 0x%" PRIx16, u16);
     }
+
+    printf("\n          ");
 
     res = gnrc_netapi_get(dev, NETOPT_TX_POWER, 0, &i16, sizeof(i16));
 
@@ -249,6 +256,13 @@ static void _netif_list(kernel_pid_t dev)
     if (res >= 0) {
         printf(" State: ");
         _print_netopt_state(state);
+        printf(" ");
+    }
+
+    res = gnrc_netapi_get(dev, NETOPT_RETRANS, 0, &u8, sizeof(u8));
+
+    if (res >= 0) {
+        printf(" max. Retrans.: %u ", (unsigned)u8);
     }
 
     res = gnrc_netapi_get(dev, NETOPT_CSMA_RETRIES, 0, &u8, sizeof(u8));
@@ -586,6 +600,9 @@ static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
     }
     else if (strcmp("state", key) == 0) {
         return _netif_set_state(dev, value);
+    }
+    else if (strcmp("retrans", key) == 0) {
+        return _netif_set_u8(dev, NETOPT_RETRANS, value);
     }
     else if (strcmp("csma_retries", key) == 0) {
         return _netif_set_u8(dev, NETOPT_CSMA_RETRIES, value);
