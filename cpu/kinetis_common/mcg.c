@@ -153,7 +153,7 @@ static void kinetis_mcg_enable_osc(void)
         MCG->C2 = (uint8_t)(MCG_C2_RANGE0(0));
     }
 
-    OSC0->CR = (uint8_t)(OSC_CR_ERCLKEN_MASK | OSC_CR_EREFSTEN_MASK
+    OSC->CR = (uint8_t)(OSC_CR_ERCLKEN_MASK | OSC_CR_EREFSTEN_MASK
                          | (KINETIS_MCG_OSC_CLC & 0xf));
 
     /* Enable Oscillator */
