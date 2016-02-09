@@ -326,12 +326,12 @@ void gpio_irq_enable(gpio_t dev)
     mutex_lock(&int_config_lock);
     /* Search for the given pin in the port's interrupt configuration */
     LL_SEARCH_SCALAR(gpio_interrupts[_port_num(dev)], entry, pin, pin_number);
-    uint32_t irqc = entry->irqc;
     mutex_unlock(&int_config_lock);
     if (entry == NULL) {
         /* Pin has not been configured for interrupts */
         return;
     }
+    uint32_t irqc = entry->irqc;
     port->PCR[pin_number] &= ~(PORT_PCR_IRQC_MASK);
     port->PCR[pin_number] |= irqc;
 }
