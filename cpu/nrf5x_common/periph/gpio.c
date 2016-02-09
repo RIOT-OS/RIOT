@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2015 Jan Wagner <mail@jwagner.eu>
- *               2016 Freie Universität Berlin
+ *               2015-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,15 +8,17 @@
  */
 
 /**
- * @ingroup     cpu_nrf52
+ * @ingroup     cpu_nrf5x_common
  * @{
  *
  * @file
  * @brief       Low-level GPIO driver implementation
  *
- * NOTE: this GPIO driver implementation supports due to hardware limitations
- *       only one pin configured as external interrupt source at a time!
+ * @note        This GPIO driver implementation supports only one pin to be
+ *              defined as external interrupt.
  *
+ * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
+ * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Jan Wagner <mail@jwagner.eu>
  *
@@ -27,6 +29,7 @@
 #include "sched.h"
 #include "thread.h"
 #include "periph/gpio.h"
+#include "periph_cpu.h"
 #include "periph_conf.h"
 
 /**
@@ -38,11 +41,9 @@ static gpio_isr_ctx_t exti_chan;
 int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
 {
     /* configure pin direction, input buffer and pull resistor state */
-    NRF_P0->PIN_CNF[pin] = ((dir << GPIO_PIN_CNF_DIR_Pos) |
-                            (dir << GPIO_PIN_CNF_INPUT_Pos) |
-                            (pullup << GPIO_PIN_CNF_PULL_Pos));
-
-    printf("cfg[%i] 0x%08x\n", (int)pin, (unsigned)NRF_P0->PIN_CNF[pin]);
+    GPIO_BASE->PIN_CNF[pin] = ((dir << GPIO_PIN_CNF_DIR_Pos) |
+                               (dir << GPIO_PIN_CNF_INPUT_Pos) |
+                               (pullup << GPIO_PIN_CNF_PULL_Pos));
     return 0;
 }
 
@@ -81,35 +82,35 @@ void gpio_irq_disable(gpio_t pin)
 
 int gpio_read(gpio_t pin)
 {
-    if (NRF_P0->DIR & (1 << pin)) {
-        return (NRF_P0->OUT & (1 << pin)) ? 1 : 0;
+    if (GPIO_BASE->DIR & (1 << pin)) {
+        return (GPIO_BASE->OUT & (1 << pin)) ? 1 : 0;
     }
     else {
-        return (NRF_P0->IN & (1 << pin)) ? 1 : 0;
+        return (GPIO_BASE->IN & (1 << pin)) ? 1 : 0;
     }
 }
 
 void gpio_set(gpio_t pin)
 {
-    NRF_P0->OUTSET = (1 << pin);
+    GPIO_BASE->OUTSET = (1 << pin);
 }
 
 void gpio_clear(gpio_t pin)
 {
-    NRF_P0->OUTCLR = (1 << pin);
+    GPIO_BASE->OUTCLR = (1 << pin);
 }
 
 void gpio_toggle(gpio_t pin)
 {
-    NRF_P0->OUT ^= (1 << pin);
+    GPIO_BASE->OUT ^= (1 << pin);
 }
 
 void gpio_write(gpio_t pin, int value)
 {
     if (value) {
-        NRF_P0->OUTSET = (1 << pin);
+        GPIO_BASE->OUTSET = (1 << pin);
     } else {
-        NRF_P0->OUTCLR = (1 << pin);
+        GPIO_BASE->OUTCLR = (1 << pin);
     }
 }
 

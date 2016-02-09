@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2015 Jan Wagner <mail@jwagner.eu>
- *               2016 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
+ *               2015 Jan Wagner <mail@jwagner.eu>
+ *
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,12 +9,14 @@
  */
 
 /**
- * @ingroup     cpu_nrf52
+ * @ingroup     cpu_nrf5x_common
  * @{
  *
  * @file
  * @brief       Implementation of the peripheral UART interface
  *
+ * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
+ * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Jan Wagner <mail@jwagner.eu>
  *
@@ -23,14 +26,15 @@
 #include <stdint.h>
 
 #include "cpu.h"
-#include "thread.h"
 #include "sched.h"
-#include "periph_conf.h"
+#include "thread.h"
 #include "periph/uart.h"
-#include "board.h"
+#include "periph_cpu.h"
+#include "periph_conf.h"
+
 
 /**
- * @brief Allocate memory to store the callback functions.
+ * @brief Allocate memory for the interrupt context
  */
 static uart_isr_ctx_t uart_config;
 
@@ -44,19 +48,23 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     uart_config.rx_cb = rx_cb;
     uart_config.arg = arg;
 
+#ifdef CPU_FAM_NRF51
+   /* power on the UART device */
+    NRF_UART0->POWER = 1;
+#endif
     /* reset configuration registers */
     NRF_UART0->CONFIG = 0;
     /* configure RX/TX pin modes */
-    NRF_P0->DIRSET = (1 << UART_PIN_TX);
-    NRF_P0->DIRCLR = (1 << UART_PIN_RX);
+    GPIO_BASE->DIRSET = (1 << UART_PIN_TX);
+    GPIO_BASE->DIRCLR = (1 << UART_PIN_RX);
     /* configure UART pins to use */
     NRF_UART0->PSELTXD = UART_PIN_TX;
     NRF_UART0->PSELRXD = UART_PIN_RX;
     /* enable HW-flow control if defined */
 #if UART_HWFLOWCTRL
     /* set pin mode for RTS and CTS pins */
-    NRF_P0->DIRSET = (1 << UART_PIN_RTS);
-    NRF_P0->DIRCLR = (1 << UART_PIN_CTS);
+    GPIO_BASE->DIRSET = (1 << UART_PIN_RTS);
+    GPIO_BASE->DIRCLR = (1 << UART_PIN_CTS);
     /* configure RTS and CTS pins to use */
     NRF_UART0->PSELRTS = UART_PIN_RTS;
     NRF_UART0->PSELCTS = UART_PIN_CTS;
@@ -123,7 +131,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     NRF_UART0->TASKS_STARTTX = 1;
     NRF_UART0->TASKS_STARTRX = 1;
     /* enable global and receiving interrupt */
-    NVIC_EnableIRQ(UARTE0_UART0_IRQn);
+    NVIC_EnableIRQ(UART_IRQN);
     NRF_UART0->INTENSET = UART_INTENSET_RXDRDY_Msk;
     return 0;
 }
@@ -141,7 +149,6 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         }
     }
 }
-
 
 void uart_poweron(uart_t uart)
 {
