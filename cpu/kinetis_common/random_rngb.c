@@ -17,7 +17,7 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se> (adaption for Freescale's RNGB)
  * @author      Johann Fischer <j.fischer@phytec.de> (adaption for Freescale's RNGA)
- * @author      Hauke Petersen <mail@haukepetersen.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */

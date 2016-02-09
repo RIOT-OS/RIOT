@@ -13,7 +13,7 @@
  * @file
  * @brief       Low-level GPIO driver implementation
  *
- * @author      Hauke Petersen <mail@haukepetersen.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  *
  * @}
