@@ -118,7 +118,7 @@ endif
 include $(RIOTCPU)/cortexm_common/Makefile.include
 
 # Import all toolchain settings
-include $(RIOTBOARD)/Makefile.include.$(TOOLCHAIN)
+include $(RIOTCPU)/Makefile.include.$(TOOLCHAIN)
 
 # use the nano-specs of Newlib when available
 ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)

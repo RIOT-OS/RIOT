@@ -15,4 +15,4 @@ export ASFLAGS += $(CFLAGS_CPU) --defsym $(CPU_MODEL)=1 $(CFLAGS_DEBUG)
 export LINKFLAGS += $(CFLAGS_CPU) -lgcc
 
 # Import all toolchain settings
-include $(RIOTBOARD)/Makefile.include.gnu
+include $(RIOTCPU)/Makefile.include.gnu
