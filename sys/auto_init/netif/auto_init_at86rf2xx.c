@@ -22,6 +22,11 @@
 #include "board.h"
 #include "net/gnrc/netdev2.h"
 #include "net/gnrc/netdev2/ieee802154.h"
+#ifdef MODULE_GNRC_802154_BASIC_MAC
+#include "net/gnrc/ieee_802154_basic_mac.h"
+#else
+#include "net/gnrc/nomac.h"
+#endif
 #include "net/gnrc.h"
 
 #include "at86rf2xx.h"
@@ -63,6 +68,20 @@ void auto_init_at86rf2xx(void)
                               AT86RF2XX_MAC_PRIO,
                               "at86rf2xx",
                               &gnrc_adpt[i]);
+#ifdef MODULE_GNRC_802154_BASIC_MAC
+            /* start the 'gnrc_802154_basic_mac' module */
+            gnrc_802154_basic_mac_init(_at86rf2xx_stacks[i],
+                                       AT86RF2XX_MAC_STACKSIZE,
+                                       AT86RF2XX_MAC_PRIO,
+                                       "at86rfxx",
+                                       (gnrc_netdev_t *)&at86rf2xx_devs[i]);
+#else
+            gnrc_nomac_init(_at86rf2xx_stacks[i],
+                            AT86RF2XX_MAC_STACKSIZE,
+                            AT86RF2XX_MAC_PRIO,
+                            "at86rfxx",
+                            (gnrc_netdev_t *)&at86rf2xx_devs[i]);
+#endif
         }
     }
 }
