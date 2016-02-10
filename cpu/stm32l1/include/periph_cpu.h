@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015-2016 Freie Universität Berlin
  * Copyright (C) 2015 Hamburg University of Applied Sciences
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -18,10 +18,10 @@
  * @author          Katja Kirstein <katja.kirstein@haw-hamburg.de>
  */
 
-#ifndef PERIPH_CPU_H_
-#define PERIPH_CPU_H_
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
-#include "cpu.h"
+#include "periph_cpu_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,11 +44,6 @@ typedef uint32_t gpio_t;
  * @brief   Define a CPU specific GPIO pin generator macro
  */
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
-
-/**
- * @brief   Length of the CPU_ID in octets
- */
-#define CPUID_LEN           (12U)
 
 /**
  * @brief   Available ports on the STM32L1 family
@@ -104,18 +99,9 @@ typedef struct {
     uint8_t irqn;           /**< IRQ vector entry number */
 } timer_conf_t;
 
-/**
- * @brief declare needed generic SPI functions
- * @{
- */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CPU_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */

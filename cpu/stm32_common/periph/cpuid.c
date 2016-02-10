@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2014-2016 Freie Universität Berlin
  * Copyright (C) 2015 James Hollister
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -7,24 +8,27 @@
  */
 
 /**
- * @addtogroup  cpu_stm32f3
+ * @addtogroup  cpu_stm32_common
  * @{
  *
  * @file
- * @brief       Low-level CPUID driver implementation
+ * @brief       Implementation of the CPUID driver interface
  *
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      James Hollister <jhollisterjr@gmail.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
+#include <stdint.h>
 #include <string.h>
 
 #include "periph/cpuid.h"
 
-#define STM32F3_CPUID_ADDR (0x1ffff7ac)
+extern uint32_t *_cpuid_address;
 
 void cpuid_get(void *id)
 {
-    memcpy(id, (void *)(STM32F3_CPUID_ADDR), CPUID_LEN);
+    memcpy(id, _cpuid_address, CPUID_LEN);
 }
