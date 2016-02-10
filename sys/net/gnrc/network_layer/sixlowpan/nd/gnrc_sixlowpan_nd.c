@@ -127,7 +127,7 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
 #ifdef MODULE_GNRC_IPV6_EXT_RH
     ipv6_hdr_t *hdr;
     gnrc_pktsnip_t *ipv6;
-    LL_SEARCH_SCALAR(pkt, ipv6, type, GNRC_NETTYPE_IPV6);
+    ipv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
     assert(ipv6);
     hdr = ipv6->data;
     next_hop = ipv6_ext_rh_next_hop(hdr);

@@ -36,7 +36,7 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
                 if (pkt->size > max_len) {
                     return -ENOMEM;
                 }
-                LL_SEARCH_SCALAR(pkt, l3hdr, type, conn->l3_type);
+                l3hdr = gnrc_pktsnip_search_type(pkt, conn->l3_type);
                 if (l3hdr == NULL) {
                     msg_send_to_self(&msg); /* requeue invalid messages */
                     continue;
@@ -44,7 +44,7 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
 #if defined(MODULE_CONN_UDP) || defined(MODULE_CONN_TCP)
                 if ((conn->l4_type != GNRC_NETTYPE_UNDEF) && (port != NULL)) {
                     gnrc_pktsnip_t *l4hdr;
-                    LL_SEARCH_SCALAR(pkt, l4hdr, type, conn->l4_type);
+                    l4hdr = gnrc_pktsnip_search_type(pkt, conn->l4_type);
                     if (l4hdr == NULL) {
                         msg_send_to_self(&msg); /* requeue invalid messages */
                         continue;

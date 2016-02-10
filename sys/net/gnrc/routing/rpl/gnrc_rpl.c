@@ -119,7 +119,7 @@ static void _receive(gnrc_pktsnip_t *icmpv6)
     ipv6_hdr_t *ipv6_hdr = NULL;
     icmpv6_hdr_t *icmpv6_hdr = NULL;
 
-    LL_SEARCH_SCALAR(icmpv6, ipv6, type, GNRC_NETTYPE_IPV6);
+    ipv6 = gnrc_pktsnip_search_type(icmpv6, GNRC_NETTYPE_IPV6);
 
     assert(ipv6 != NULL);
 

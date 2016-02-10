@@ -86,8 +86,8 @@ int _handle_reply(gnrc_pktsnip_t *pkt, uint32_t time)
     icmpv6_echo_t *icmpv6_hdr;
     uint16_t seq;
 
-    LL_SEARCH_SCALAR(pkt, ipv6, type, GNRC_NETTYPE_IPV6);
-    LL_SEARCH_SCALAR(pkt, icmpv6, type, GNRC_NETTYPE_ICMPV6);
+    ipv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
+    icmpv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_ICMPV6);
 
     if ((ipv6 == NULL) || (icmpv6 == NULL)) {
         puts("error: IPv6 header or ICMPv6 header not found in reply");
