@@ -28,6 +28,3 @@ export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 export RESET_FLAGS = $(BINDIR)
 
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
-
-# export board specific includes to the global includes-listing
-export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

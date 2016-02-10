@@ -9,3 +9,5 @@ export FFLAGS = rf2500 "prog $(HEXFILE)"
 
 # include msp430 base makefile
 include $(RIOTBOARD)/Makefile.include.msp430_common
+
+INCLUDES += -I$(RIOTBOARD)/$(BOARD)/drivers/include

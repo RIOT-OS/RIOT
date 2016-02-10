@@ -21,6 +21,3 @@ export RESET_FLAGS = $(BINDIR)
 
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
-
-# export board specific includes to the global includes-listing
-export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

@@ -18,6 +18,3 @@ export DEBUGSERVER = st-util
 export OFLAGS = -O binary
 export FFLAGS = write bin/$(BOARD)/$(APPLICATION).hex 0x8000000
 export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(BINDIR)/$(APPLICATION).elf
-
-# export board specific includes to the global includes-listing
-export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

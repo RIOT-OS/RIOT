@@ -16,6 +16,3 @@ export LINKFLAGS += $(CFLAGS_CPU) -lgcc
 
 # Import all toolchain settings
 include $(RIOTBOARD)/Makefile.include.gnu
-
-# export board specific includes to the global includes-listing
-export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

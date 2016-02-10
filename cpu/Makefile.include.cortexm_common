@@ -108,9 +108,6 @@ export CFLAGS += -DARM_MATH_CM7
 endif
 endif
 
-# Include CPU specific includes:
-export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-
 # Explicitly tell the linker to link the startup code.
 #   Without this the interrupt vectors will not be linked correctly!
 ifeq ($(COMMON_STARTUP),)
