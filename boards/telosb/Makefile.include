@@ -12,6 +12,3 @@ include $(RIOTBOARD)/Makefile.include.serial
 export OFLAGS = -O ihex
 export FLASHER = $(RIOTBASE)/dist/tools/goodfet/goodfet.bsl
 export FFLAGS = --telosb -c $(PORT) -r -e -I -p $(HEXFILE)
-
-# include msp430 base makefile
-include $(RIOTBOARD)/Makefile.include.msp430_common
