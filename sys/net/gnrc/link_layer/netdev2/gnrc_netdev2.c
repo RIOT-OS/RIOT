@@ -75,6 +75,14 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event, void *data)
 
                     break;
                 }
+#ifdef MODULE_NETSTATS_L2
+            case NETDEV2_EVENT_TX_MEDIUM_BUSY:
+                dev->stats.tx_failed++;
+                break;
+            case NETDEV2_EVENT_TX_COMPLETE:
+                dev->stats.tx_success++;
+                break;
+#endif
             default:
                 DEBUG("gnrc_netdev2: warning: unhandled event %u.\n", event);
         }

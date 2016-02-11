@@ -240,6 +240,10 @@ static int _recv(netdev2_t *netdev2, char *buf, int len, void *info)
 
         _native_in_syscall--;
 
+#ifdef MODULE_NETSTATS_L2
+        netdev2->stats.rx_count++;
+        netdev2->stats.rx_bytes += nread;
+#endif
         return nread;
     }
     else if (nread == -1) {
@@ -262,7 +266,17 @@ static int _recv(netdev2_t *netdev2, char *buf, int len, void *info)
 static int _send(netdev2_t *netdev, const struct iovec *vector, int n)
 {
     netdev2_tap_t *dev = (netdev2_tap_t*)netdev;
-    return _native_writev(dev->tap_fd, vector, n);
+    int res = _native_writev(dev->tap_fd, vector, n);
+#ifdef MODULE_NETSTATS_L2
+    size_t bytes = 0;
+    for (int i = 0; i < n; i++) {
+        bytes += vector->iov_len;
+        vector++;
+    }
+    netdev->stats.tx_bytes += bytes;
+#endif
+    netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE, NULL);
+    return res;
 }
 
 void netdev2_tap_setup(netdev2_tap_t *dev, const netdev2_tap_params_t *params) {
@@ -367,6 +381,9 @@ static int _init(netdev2_t *netdev)
         err(EXIT_FAILURE, "gnrc_tabnet_init(): fcntl(F_SETFL)");
     }
 #endif /* not OSX */
+#ifdef MODULE_NETSTATS_L2
+    memset(&netdev->stats, 0, sizeof(netstats_t));
+#endif
     DEBUG("gnrc_tapnet: initialized.\n");
     return 0;
 }
