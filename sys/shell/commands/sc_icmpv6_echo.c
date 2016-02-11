@@ -271,6 +271,7 @@ int _icmpv6_ping(int argc, char **argv)
                 continue;
             }
 
+            gnrc_netif_hdr_init(((gnrc_netif_hdr_t *)pkt->data), 0, 0);
             ((gnrc_netif_hdr_t *)pkt->data)->if_pid = src_iface;
         }
 
