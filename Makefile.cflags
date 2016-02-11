@@ -55,6 +55,9 @@ CFLAGS += -fno-common
 # Enable all default warnings
 CFLAGS += -Wall
 
+# Use pipes between GCC stages
+CFLAGS += -pipe
+
 ifeq (,$(filter -DDEVELHELP,$(CFLAGS)))
   ifneq (1,$(FORCE_ASSERTS))
     CFLAGS += -DNDEBUG
