@@ -96,7 +96,7 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 
     /* Reset I2C */
     I2CSercom->CTRLA.reg = SERCOM_I2CS_CTRLA_SWRST;
-    while(I2CSercom->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK);
+    while(I2CSercom->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
 
     /* Turn on power manager for sercom */
     PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << (sercom_core - 20));
@@ -105,12 +105,12 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
                          GCLK_CLKCTRL_GEN_GCLK0 |
                          GCLK_CLKCTRL_ID(sercom_core));
-    while (GCLK->STATUS.bit.SYNCBUSY);
+    while (GCLK->STATUS.bit.SYNCBUSY) {}
 
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
                          GCLK_CLKCTRL_GEN_GCLK0 |
                          GCLK_CLKCTRL_ID(sercom_gclk_id_slow));
-    while (GCLK->STATUS.bit.SYNCBUSY);
+    while (GCLK->STATUS.bit.SYNCBUSY) {}
 
 
     /* Check if module is enabled. */
@@ -153,7 +153,7 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 
 
     /* I2C CONFIGURATION */
-    while(I2CSercom->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK);
+    while(I2CSercom->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
 
     /* Set sercom module to operate in I2C master mode. */
     I2CSercom->CTRLA.reg = SERCOM_I2CM_CTRLA_MODE_I2C_MASTER;
@@ -338,7 +338,7 @@ void i2c_poweron(i2c_t dev)
     switch (dev) {
 #if I2C_0_EN
         case I2C_0:
-            while(I2C_0_DEV.SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK);
+            while(I2C_0_DEV.SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
             I2C_0_DEV.CTRLA.bit.ENABLE = 1;
             break;
 #endif
@@ -352,7 +352,7 @@ void i2c_poweroff(i2c_t dev)
     switch (dev) {
 #if I2C_0_EN
         case I2C_0:
-            while(I2C_0_DEV.SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK);
+            while(I2C_0_DEV.SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
             I2C_0_DEV.CTRLA.reg |= SERCOM_I2CM_CTRLA_ENABLE;
             break;
 #endif
@@ -367,7 +367,7 @@ static int _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag)
 
     /* Wait for hardware module to sync */
     DEBUG("Wait for device to be ready\n");
-    while(dev->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK);
+    while(dev->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
 
     /* Set action to ACK. */
     dev->CTRLB.reg &= ~SERCOM_I2CM_CTRLB_ACKACT;
@@ -423,7 +423,7 @@ static inline int _write(SercomI2cm *dev, char *data, int length)
         }
 
         /* Wait for hardware module to sync */
-        while(dev->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK);
+        while(dev->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
 
         DEBUG("Written %i byte to data reg, now waiting for DR to be empty again\n", buffer_counter);
         dev->DATA.reg = data[buffer_counter++];
@@ -463,7 +463,7 @@ static inline int _read(SercomI2cm *dev, char *data, int length)
         }
 
         /* Wait for hardware module to sync */
-        while(dev->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK);
+        while(dev->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
         /* Save data to buffer. */
         data[count] = dev->DATA.reg;
 
@@ -486,7 +486,7 @@ static inline int _read(SercomI2cm *dev, char *data, int length)
 static inline void _stop(SercomI2cm *dev)
 {
     /* Wait for hardware module to sync */
-    while(dev->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK);
+    while(dev->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
     /* Stop command */
     dev->CTRLB.reg |= SERCOM_I2CM_CTRLB_CMD(3);
     DEBUG("Stop sent\n");
