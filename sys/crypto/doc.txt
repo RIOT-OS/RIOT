@@ -29,14 +29,19 @@
  * @code
  *  #include "crypto/ciphers.h"
  *
- *  ciphter_t cipher;
- *  uint8_t key[16] = {0}, plain_text[16] = {0}, cipher_text[16] = {0};
+ *  cipher_t cipher;
+ *  uint8_t key[AES_KEY_SIZE] = {0},
+ *          plain_text[AES_BLOCK_SIZE] = {0},
+ *          cipher_text[AES_BLOCK_SIZE] = {0};
  *
- *  if (cipher_init(&cipher, CIPHER_AES_128, key, key_len) < 0)
+ *  if (cipher_init(&cipher, CIPHER_AES_128, key, AES_KEY_SIZE) < 0)
  *      printf("Cipher init failed!\n");
  *
  *  if (cipher_encrypt(&cipher, plain_text, cipher_text) < 0)
- *      printf("Cipher encryption!\n");
+ *      printf("Cipher encryption failed!\n");
+ *  else
+ *      od_hex_dump(cipher_text, AES_BLOCK_SIZE, 0);
+ *
  * @endcode
  *
  * If you need to encrypt data of arbitrary size take a look at the different
