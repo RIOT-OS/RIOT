@@ -73,7 +73,7 @@ static bool _is_iface(kernel_pid_t dev)
     return false;
 }
 
-#ifdef MODULE_NETSTATS
+#ifdef MODULE_NETSTATS_L2
 static int _netif_stats(kernel_pid_t dev)
 {
     netstats_t *stats;
@@ -448,7 +448,7 @@ static void _netif_list(kernel_pid_t dev)
     }
 #endif
 
-#ifdef MODULE_NETSTATS
+#ifdef MODULE_NETSTATS_L2
     puts("");
     _netif_stats(dev);
 #endif
@@ -987,7 +987,7 @@ int _netif_config(int argc, char **argv)
 
                 return _netif_mtu((kernel_pid_t)dev, argv[3]);
             }
-#ifdef MODULE_NETSTATS
+#ifdef MODULE_NETSTATS_L2
             else if (strcmp(argv[2], "stats") == 0) {
                 return _netif_stats((kernel_pid_t)dev);
             }

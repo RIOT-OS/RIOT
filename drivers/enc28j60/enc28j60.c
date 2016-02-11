@@ -19,6 +19,7 @@
  */
 
 #include <errno.h>
+#include <string.h>
 
 #include "mutex.h"
 #include "xtimer.h"
@@ -226,6 +227,9 @@ static int nd_send(netdev2_t *netdev, const struct iovec *data, int count)
 
     mutex_lock(&dev->devlock);
 
+#ifdef MODULE_NETSTATS_L2
+    netdev->stats.tx_bytes += count;
+#endif
     /* set write pointer */
     cmd_w_addr(dev, ADDR_WRITE_PTR, BUF_TX_START);
     /* write control byte and the actual data into the buffer */
@@ -262,6 +266,10 @@ static int nd_recv(netdev2_t *netdev, char *buf, int max_len, void *info)
     size = (size_t)((head[3] << 8) | head[2]) - 4;  /* discard CRC */
 
     if (buf != NULL) {
+#ifdef MODULE_NETSTATS_L2
+        netdev->stats.rx_count++;
+        netdev2->stats.rx_bytes += size;
+#endif
         /* read packet content into the supplied buffer */
         if (size <= max_len) {
             cmd_rbm(dev, (uint8_t *)buf, size);
@@ -416,6 +424,9 @@ static void nd_isr(netdev2_t *netdev)
         }
         eir = cmd_rcr(dev, REG_EIR, -1);
     }
+#ifdef MODULE_NETSTATS_L2
+    memset(&netdev->stats, 0, sizeof(netstats_t));
+#endif
 }
 
 static int nd_get(netdev2_t *netdev, netopt_t opt, void *value, size_t max_len)
