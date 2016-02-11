@@ -44,6 +44,7 @@ void priority_queue_remove(priority_queue_t *root_, priority_queue_node_t *node)
 priority_queue_node_t *priority_queue_remove_head(priority_queue_t *root)
 {
     priority_queue_node_t *head = root->first;
+
     if (head) {
         root->first = head->next;
     }

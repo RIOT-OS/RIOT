@@ -27,7 +27,7 @@
 #include "arch/thread_arch.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -35,7 +35,7 @@
  */
 #define STATUS_NOT_FOUND (-1)
 
- /**
+/**
  * @def THREAD_STACKSIZE_DEFAULT
  * @brief A reasonable default stack size that will suffice most smaller tasks
  */
@@ -79,7 +79,7 @@
  * @def THREAD_PRIORITY_MIN
  * @brief Least priority a thread can have
  */
-#define THREAD_PRIORITY_MIN            (SCHED_PRIO_LEVELS-1)
+#define THREAD_PRIORITY_MIN            (SCHED_PRIO_LEVELS - 1)
 
 /**
  * @def THREAD_PRIORITY_IDLE
@@ -91,7 +91,7 @@
  * @def THREAD_PRIORITY_MAIN
  * @brief Priority of the main thread
  */
-#define THREAD_PRIORITY_MAIN           (THREAD_PRIORITY_MIN - (SCHED_PRIO_LEVELS/2))
+#define THREAD_PRIORITY_MAIN           (THREAD_PRIORITY_MIN - (SCHED_PRIO_LEVELS / 2))
 
 /**
  * @name Optional flags for controlling a threads initial state
@@ -112,10 +112,10 @@
  */
 #define THREAD_CREATE_WOUT_YIELD        (4)
 
- /**
-  * @brief Write markers into the thread's stack to measure stack usage (for
-  *        debugging)
-  */
+/**
+ * @brief Write markers into the thread's stack to measure stack usage (for
+ *        debugging)
+ */
 #define THREAD_CREATE_STACKTEST         (8)
 /** @} */
 
@@ -162,14 +162,14 @@
  * @return              -EINVAL, if @p priority is greater than or equal to
  *                      @ref SCHED_PRIO_LEVELS
  * @return              -EOVERFLOW, if there are too many threads running already
-*/
+ */
 kernel_pid_t thread_create(char *stack,
-                  int stacksize,
-                  char priority,
-                  int flags,
-                  thread_task_func_t task_func,
-                  void *arg,
-                  const char *name);
+                           int stacksize,
+                           char priority,
+                           int flags,
+                           thread_task_func_t task_func,
+                           void *arg,
+                           const char *name);
 
 /**
  * @brief       Retreive a thread control block by PID.

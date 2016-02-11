@@ -37,7 +37,7 @@ typedef struct atomic_int {
  *
  * @param[in] val  initial value for the atomic integer
  */
-#define ATOMIC_INIT(val) {(val)}
+#define ATOMIC_INIT(val) { (val) }
 
 /**
  * @brief Atomic Compare and Swap

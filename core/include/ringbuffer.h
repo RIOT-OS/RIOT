@@ -41,7 +41,7 @@ typedef struct ringbuffer {
  * @param[in]    BUF   Buffer to use for the ringbuffer. The size is deduced through `sizeof (BUF)`.
  * @returns      The static initializer.
  */
-#define RINGBUFFER_INIT(BUF) { (BUF), sizeof (BUF), 0, 0 }
+#define RINGBUFFER_INIT(BUF) { (BUF), sizeof(BUF), 0, 0 }
 
 /**
  * @brief        Initialize a ringbuffer.

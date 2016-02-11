@@ -56,7 +56,7 @@ clist_node_t *sched_runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;
 
 #ifdef MODULE_SCHEDSTATISTICS
-static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
+static void (*sched_cb)(uint32_t timestamp, uint32_t value) = NULL;
 schedstat sched_pidlist[KERNEL_PID_LAST + 1];
 #endif
 
@@ -160,7 +160,7 @@ void sched_switch(uint16_t other_prio)
     uint16_t current_prio = active_thread->priority;
     int on_runqueue = (active_thread->status >= STATUS_ON_RUNQUEUE);
 
-    DEBUG("sched_switch: active pid=%" PRIkernel_pid" prio=%" PRIu16 " on_runqueue=%i "
+    DEBUG("sched_switch: active pid=%" PRIkernel_pid " prio=%" PRIu16 " on_runqueue=%i "
           ", other_prio=%" PRIu16 "\n",
           active_thread->pid, current_prio, on_runqueue, other_prio);
 

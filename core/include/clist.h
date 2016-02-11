@@ -22,7 +22,7 @@
 #include "kernel_macros.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**

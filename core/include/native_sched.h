@@ -34,7 +34,7 @@ extern "C" {
  * Required to use some C++11 headers with g++ on the native board.
  */
 #define __CPU_SETSIZE 1024
-#define __NCPUBITS (8* sizeof(__cpu_mask))
+#define __NCPUBITS (8 * sizeof(__cpu_mask))
 typedef unsigned long int __cpu_mask;
 typedef struct {
     __cpu_mask __bits[__CPU_SETSIZE / __NCPUBITS];

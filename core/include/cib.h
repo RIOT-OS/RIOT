@@ -6,7 +6,7 @@
  * directory for more details.
  */
 
- /**
+/**
  * @addtogroup  core_util
  * @{
  *
@@ -37,7 +37,7 @@ typedef struct {
 /**
  * @brief   Initialize cib_t to a given size.
  */
-#define CIB_INIT(SIZE) { 0, 0, (SIZE) - 1 }
+#define CIB_INIT(SIZE) { 0, 0, (SIZE) -1 }
 
 /**
  * @brief Initialize cib_t to 0 and set size.
@@ -49,6 +49,7 @@ typedef struct {
 static inline void cib_init(cib_t *__restrict cib, unsigned int size)
 {
     cib_t c = CIB_INIT(size);
+
     *cib = c;
 }
 

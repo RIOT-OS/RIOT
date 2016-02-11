@@ -42,6 +42,7 @@ volatile tcb_t *thread_get(kernel_pid_t pid)
 int thread_getstatus(kernel_pid_t pid)
 {
     volatile tcb_t *t = thread_get(pid);
+
     return t ? (int) t->status : STATUS_NOT_FOUND;
 }
 
@@ -49,6 +50,7 @@ int thread_getstatus(kernel_pid_t pid)
 const char *thread_getname(kernel_pid_t pid)
 {
     volatile tcb_t *t = thread_get(pid);
+
     return t ? t->name : NULL;
 }
 #endif
@@ -94,6 +96,7 @@ void thread_yield(void)
 {
     unsigned old_state = disableIRQ();
     tcb_t *me = (tcb_t *)sched_active_thread;
+
     if (me->status >= STATUS_ON_RUNQUEUE) {
         clist_advance(&sched_runqueues[me->priority]);
     }

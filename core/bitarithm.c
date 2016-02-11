@@ -29,10 +29,10 @@ unsigned bitarithm_msb(unsigned v)
     register unsigned shift;
 
     r =     (v > 0xFFFF) << 4; v >>= r;
-    shift = (v > 0xFF  ) << 3; v >>= shift; r |= shift;
-    shift = (v > 0xF   ) << 2; v >>= shift; r |= shift;
-    shift = (v > 0x3   ) << 1; v >>= shift; r |= shift;
-                                            r |= (v >> 1);
+    shift = (v > 0xFF) << 3; v >>= shift; r |= shift;
+    shift = (v > 0xF) << 2; v >>= shift; r |= shift;
+    shift = (v > 0x3) << 1; v >>= shift; r |= shift;
+    r |= (v >> 1);
 #else
     r = 0;
     while (v >>= 1) { // unroll for more speed...
@@ -51,7 +51,8 @@ unsigned bitarithm_lsb(register unsigned v)
     while ((v & 0x01) == 0) {
         v >>= 1;
         r++;
-    };
+    }
+    ;
 
     return r;
 }

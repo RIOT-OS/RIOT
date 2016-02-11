@@ -20,15 +20,15 @@
 #define PANIC_ARCH_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
- /**
-  * @brief architecture dependent handling of an panic case
-  *
-  * This function gives the CPU the possibility to execute architecture
-  * dependent code in case of an severe error.
-  */
+/**
+ * @brief architecture dependent handling of an panic case
+ *
+ * This function gives the CPU the possibility to execute architecture
+ * dependent code in case of an severe error.
+ */
 void panic_arch(void);
 
 #ifdef __cplusplus

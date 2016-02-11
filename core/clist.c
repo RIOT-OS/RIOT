@@ -62,6 +62,7 @@ void clist_remove(clist_node_t **list, clist_node_t *node)
 void clist_print(clist_node_t *clist)
 {
     clist_node_t *start = clist, *node = start;
+
     if (!start) {
         return;
     }
