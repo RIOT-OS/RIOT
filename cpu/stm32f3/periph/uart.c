@@ -179,7 +179,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     }
 
     for (size_t i = 0; i < len; i++) {
-        while (!(dev->ISR & USART_ISR_TXE));
+        while (!(dev->ISR & USART_ISR_TXE)) {}
         dev->TDR = data[i];
     }
 }
