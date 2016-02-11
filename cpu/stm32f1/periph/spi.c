@@ -210,11 +210,11 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
             return -1;
     }
 
-    while (!(spi->SR & SPI_SR_TXE)) ;
+    while (!(spi->SR & SPI_SR_TXE)) {}
     spi->DR = out;
     transferred++;
 
-    while (!(spi->SR & SPI_SR_RXNE)) ;
+    while (!(spi->SR & SPI_SR_RXNE)) {}
     if (in != NULL) {
         *in = spi->DR;
         transferred++;
@@ -224,7 +224,7 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     }
 
     /* SPI busy */
-    while ((spi->SR & 0x80)) ;
+    while ((spi->SR & 0x80)) {}
 #if ENABLE_DEBUG
     if (in != NULL) {
         DEBUG("\nout: %x in: %x transferred: %x\n", out, *in, transferred);
