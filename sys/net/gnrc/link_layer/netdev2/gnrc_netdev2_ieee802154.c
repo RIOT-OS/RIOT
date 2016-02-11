@@ -55,12 +55,16 @@ static netdev2_retrans_queue_t *_alloc_pkt_node(gnrc_pktsnip_t *pkt)
 
 static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2);
 static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt);
+static int _set(gnrc_netdev2_t *netdev, netopt_t opt, void *val, size_t len);
+static int _get(gnrc_netdev2_t *netdev, netopt_t opt, void *val, size_t max_len);
 
 int gnrc_netdev2_ieee802154_init(gnrc_netdev2_t *gnrc_netdev2,
                                  netdev2_ieee802154_t *dev)
 {
     gnrc_netdev2->send = _send;
     gnrc_netdev2->recv = _recv;
+    gnrc_netdev2->set = _set;
+    gnrc_netdev2->get = _get;
     gnrc_netdev2->dev = (netdev2_t *)dev;
     gnrc_netdev2->retrans_head = NULL;
 
@@ -255,6 +259,55 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
     gnrc_pktbuf_hold(pkt, 1);
     /* release old data */
     gnrc_pktbuf_release(pkt);
+    return res;
+}
+
+static int _set(gnrc_netdev2_t *gnrc_netdev2, netopt_t opt, void *val, size_t len)
+{
+    int res = 0;
+    netdev2_ieee802154_t *dev = (netdev2_ieee802154_t *)gnrc_netdev2->dev;
+
+    if (dev == NULL) {
+        return -ENODEV;
+    }
+
+    if (opt == NETOPT_RETRANS) {
+        if (len > sizeof(uint8_t)) {
+            res = -EOVERFLOW;
+        }
+        else {
+            _netdev2_retrans = *((uint8_t *)val);
+            res = sizeof(uint8_t);
+        }
+    }
+    else {
+        res = dev->driver->set((netdev2_t *)dev, opt, val, len);
+    }
+
+    return res;
+}
+
+static int _get(gnrc_netdev2_t *gnrc_netdev2, netopt_t opt, void *val, size_t max_len)
+{
+    int res = 0;
+    netdev2_ieee802154_t *dev = (netdev2_ieee802154_t *)gnrc_netdev2->dev;
+
+    if (dev == NULL) {
+        return -ENODEV;
+    }
+    if (opt == NETOPT_RETRANS) {
+        if (max_len < sizeof(uint8_t)) {
+            res = -EOVERFLOW;
+        }
+        else {
+            *((uint8_t *)val) = _netdev2_retrans;
+            res = sizeof(uint8_t);
+        }
+    }
+    else {
+        res = dev->driver->get((netdev2_t *)dev, opt, val, max_len);
+    }
+
     return res;
 }
 

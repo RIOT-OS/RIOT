@@ -79,6 +79,34 @@ typedef struct gnrc_netdev2 {
     gnrc_pktsnip_t * (*recv)(struct gnrc_netdev2 *dev);
 
     /**
+     * @brief   Get an option value from a given network device
+     *
+     * @param[in]   dev     network device descriptor
+     * @param[in]   opt     option type
+     * @param[out]  value   pointer to store the option's value in
+     * @param[in]   max_len maximal amount of byte that fit into @p value
+     *
+     * @return              number of bytes written to @p value
+     * @return              <0 on error
+     */
+    int (*get)(struct gnrc_netdev2 *dev, netopt_t opt,
+               void *value, size_t max_len);
+
+    /**
+     * @brief   Set an option value for a given network device
+     *
+     * @param[in] dev       network device descriptor
+     * @param[in] opt       option type
+     * @param[in] value     value to set
+     * @param[in] value_len the length of @p value
+     *
+     * @return              number of bytes used from @p value
+     * @return              <0 on error
+     */
+    int (*set)(struct gnrc_netdev2 *dev, netopt_t opt,
+               void *value, size_t value_len);
+
+    /**
      * @brief netdev2 handle this adapter is working with
      */
     netdev2_t *dev;
