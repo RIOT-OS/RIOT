@@ -199,6 +199,14 @@ typedef enum {
      */
     NETOPT_CCA_THRESHOLD,
 
+    /**
+     * @brief get statistics about sent and received packets and data of the device or protocol
+     *
+     * Expects a pointer to a @ref netstats_t struct that will be pointed to
+     * the corresponding @ref netstats_t of the module.
+     */
+    NETOPT_STATS,
+
     /* add more options if needed */
 
     /**
