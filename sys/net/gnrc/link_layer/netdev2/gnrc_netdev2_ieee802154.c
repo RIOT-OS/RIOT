@@ -26,6 +26,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#ifdef MODULE_NETDEV_RETRANS
 #define _RETRANS_QUEUE_LEN  (16)
 #define _RETRANS_COUNT      (3)
 
@@ -52,6 +53,7 @@ static netdev2_retrans_queue_t *_alloc_pkt_node(gnrc_pktsnip_t *pkt)
 
     return NULL;
 }
+#endif
 
 static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2);
 static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt);
@@ -66,7 +68,9 @@ int gnrc_netdev2_ieee802154_init(gnrc_netdev2_t *gnrc_netdev2,
     gnrc_netdev2->set = _set;
     gnrc_netdev2->get = _get;
     gnrc_netdev2->dev = (netdev2_t *)dev;
+#ifdef MODULE_NETDEV_RETRANS
     gnrc_netdev2->retrans_head = NULL;
+#endif
 
     return 0;
 }
@@ -245,6 +249,7 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
     else {
         return -ENOBUFS;
     }
+#ifdef MODULE_NETDEV_RETRANS
     /* queue the packet for potential retransmissions */
     if (gnrc_netdev2->retrans_head->pkt != pkt) {
         netdev2_retrans_queue_t *pkt_node = _alloc_pkt_node(pkt);
@@ -257,6 +262,7 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
         }
     }
     gnrc_pktbuf_hold(pkt, 1);
+#endif
     /* release old data */
     gnrc_pktbuf_release(pkt);
     return res;
@@ -271,6 +277,7 @@ static int _set(gnrc_netdev2_t *gnrc_netdev2, netopt_t opt, void *val, size_t le
         return -ENODEV;
     }
 
+#ifdef MODULE_NETDEV_RETRANS
     if (opt == NETOPT_RETRANS) {
         if (len > sizeof(uint8_t)) {
             res = -EOVERFLOW;
@@ -281,8 +288,11 @@ static int _set(gnrc_netdev2_t *gnrc_netdev2, netopt_t opt, void *val, size_t le
         }
     }
     else {
+#endif
         res = dev->driver->set((netdev2_t *)dev, opt, val, len);
+#ifdef MODULE_NETDEV_RETRANS
     }
+#endif
 
     return res;
 }
@@ -295,6 +305,7 @@ static int _get(gnrc_netdev2_t *gnrc_netdev2, netopt_t opt, void *val, size_t ma
     if (dev == NULL) {
         return -ENODEV;
     }
+#ifdef MODULE_NETDEV_RETRANS
     if (opt == NETOPT_RETRANS) {
         if (max_len < sizeof(uint8_t)) {
             res = -EOVERFLOW;
@@ -305,8 +316,11 @@ static int _get(gnrc_netdev2_t *gnrc_netdev2, netopt_t opt, void *val, size_t ma
         }
     }
     else {
+#endif
         res = dev->driver->get((netdev2_t *)dev, opt, val, max_len);
+#ifdef MODULE_NETDEV_RETRANS
     }
+#endif
 
     return res;
 }

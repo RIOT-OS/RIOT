@@ -116,7 +116,12 @@ typedef struct gnrc_netdev2 {
      */
     kernel_pid_t pid;
 
+#ifdef MODULE_NETDEV_RETRANS
+    /**
+     * @brief head of queue for link-layer retransmissions
+     */
     netdev2_retrans_queue_t *retrans_head;
+#endif
 } gnrc_netdev2_t;
 
 /**

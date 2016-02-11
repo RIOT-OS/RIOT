@@ -75,6 +75,7 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
 
                     break;
                 }
+#ifdef MODULE_NETDEV_RETRANS
             case NETDEV2_EVENT_TX_MEDIUM_BUSY:
 #ifdef MODULE_NETSTATS_L2
                 dev->stats.tx_failed++;
@@ -114,6 +115,7 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
                     gnrc_pktqueue_remove_head((gnrc_pktqueue_t**)&(gnrc_netdev2->retrans_head));
                 }
                 break;
+#endif
             default:
                 DEBUG("gnrc_netdev2: warning: unhandled event %u.\n", event);
         }
