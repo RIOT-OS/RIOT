@@ -28,8 +28,8 @@
 #include "xtimer.h"
 #include "pir.h"
 
-char pir_handler_stack[THREAD_STACKSIZE_MAIN];
-pir_t dev;
+static char pir_handler_stack[THREAD_STACKSIZE_MAIN];
+static pir_t dev;
 
 void* pir_handler(void *arg)
 {
