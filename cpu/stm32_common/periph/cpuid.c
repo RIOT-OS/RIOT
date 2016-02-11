@@ -26,9 +26,9 @@
 
 #include "periph/cpuid.h"
 
-extern uint32_t *_cpuid_address;
+extern uint32_t _cpuid_address;
 
 void cpuid_get(void *id)
 {
-    memcpy(id, _cpuid_address, CPUID_LEN);
+    memcpy(id, &_cpuid_address, CPUID_LEN);
 }
