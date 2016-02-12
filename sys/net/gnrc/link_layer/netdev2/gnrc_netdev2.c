@@ -85,6 +85,7 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
                 DEBUG("gnrc_netdev2: no ACK received or medium busy: retrans count is = %u\n", (unsigned) gnrc_netdev2->retrans_head->cnt);
                 if (!gnrc_netdev2->retrans_head) {
                     DEBUG("\n!!! gnrc_netdev2: queue is empty while retransmitting, this shouldn't happen!\n\n");
+                    break;
                 }
                 else if (gnrc_netdev2->retrans_head->cnt-- <= 0) {
                     DEBUG("giving up sending, removing from buffer and queue: %p\n", gnrc_netdev2->retrans_head->pkt);
@@ -92,7 +93,8 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
                     gnrc_netdev2->retrans_head->pkt = NULL;
                     gnrc_pktqueue_remove_head((gnrc_pktqueue_t**)&(gnrc_netdev2->retrans_head));
                 }
-                else {
+                /* if there are still packets queued, send them now */
+                if (gnrc_netdev2->retrans_head) {
                     gnrc_netdev2->send(gnrc_netdev2, gnrc_netdev2->retrans_head->pkt);
                 }
             case NETDEV2_EVENT_TX_COMPLETE:
@@ -101,6 +103,7 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
 #endif
                 if (!gnrc_netdev2->retrans_head) {
                     DEBUG("\n!!! gnrc_netdev2: queue is empty while handling ACK, this shouldn't happen!\n\n");
+                    break;
                 }
                 else {
 #ifdef MODULE_NETSTATS
@@ -113,6 +116,10 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
                     gnrc_pktbuf_release(gnrc_netdev2->retrans_head->pkt);
                     gnrc_netdev2->retrans_head->pkt = NULL;
                     gnrc_pktqueue_remove_head((gnrc_pktqueue_t**)&(gnrc_netdev2->retrans_head));
+                }
+                /* if there are more packets queued, send them now */
+                if (gnrc_netdev2->retrans_head) {
+                    gnrc_netdev2->send(gnrc_netdev2, gnrc_netdev2->retrans_head->pkt);
                 }
                 break;
 #endif
