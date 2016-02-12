@@ -76,19 +76,23 @@ int mma8652_init(mma8652_t *dev, i2c_t i2c, uint8_t address, uint8_t dr, uint8_t
         return -3;
     }
 
+    if (mma8652_set_standby(dev) < 0) {
+        return -4;
+    }
+
     reg = MMA8652_XYZ_DATA_CFG_FS(range);
 
     i2c_acquire(dev->i2c);
     if (i2c_write_regs(dev->i2c, dev->addr, MMA8652_XYZ_DATA_CFG, &reg, 1) != 1) {
         i2c_release(dev->i2c);
-        return -4;
+        return -5;
     }
 
     reg = MMA8652_CTRL_REG1_DR(dr);
 
     if (i2c_write_regs(dev->i2c, dev->addr, MMA8652_CTRL_REG1, &reg, 1) != 1) {
         i2c_release(dev->i2c);
-        return -4;
+        return -5;
     }
     i2c_release(dev->i2c);
 

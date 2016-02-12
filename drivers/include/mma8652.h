@@ -90,7 +90,8 @@ int mma8652_test(mma8652_t *dev);
  * @return                  -1 if parameters are wrong
  * @return                  -2 if initialization of I2C bus failed
  * @return                  -3 if accelerometer test failed
- * @return                  -4 if accelerometer configuration failed
+ * @return                  -4 if setting to STANDBY mode failed
+ * @return                  -5 if accelerometer configuration failed
  */
 int mma8652_init(mma8652_t *dev, i2c_t i2c, uint8_t address, uint8_t dr, uint8_t range);
 
