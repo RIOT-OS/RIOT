@@ -16,6 +16,7 @@
  * @brief       Board specific definitions for the nucleo-f091 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Mohmmad Ayman <mohmmad.khzrag@gmail.com>
  */
 
 #ifndef BOARD_H_
@@ -46,8 +47,8 @@ extern "C" {
 #define LED_RED_OFF
 #define LED_RED_TOGGLE
 
-#define LED_GREEN_ON        (LED_GREEN_PORT->BSRRL = (1 << LED_GREEN_PIN))
-#define LED_GREEN_OFF       (LED_GREEN_PORT->BSRRH = (1 << LED_GREEN_PIN))
+#define LED_GREEN_ON        (LED_GREEN_PORT->BSRR = (1 << LED_GREEN_PIN))
+#define LED_GREEN_OFF       (LED_GREEN_PORT->BSRR = ((1 << LED_GREEN_PIN) << 16))
 #define LED_GREEN_TOGGLE    (LED_GREEN_PORT->ODR ^= (1 << LED_GREEN_PIN))
 
 #define LED_ORANGE_ON
