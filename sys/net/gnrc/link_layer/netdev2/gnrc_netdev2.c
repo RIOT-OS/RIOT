@@ -87,7 +87,7 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
                     DEBUG("\n!!! gnrc_netdev2: queue is empty while retransmitting, this shouldn't happen!\n\n");
                 }
                 else if (gnrc_netdev2->retrans_head->cnt-- <= 0) {
-                    DEBUG("packet sent, removing from buffer and queue: %p\n", gnrc_netdev2->retrans_head->pkt);
+                    DEBUG("giving up sending, removing from buffer and queue: %p\n", gnrc_netdev2->retrans_head->pkt);
                     gnrc_pktbuf_release(gnrc_netdev2->retrans_head->pkt);
                     gnrc_netdev2->retrans_head->pkt = NULL;
                     gnrc_pktqueue_remove_head((gnrc_pktqueue_t**)&(gnrc_netdev2->retrans_head));
