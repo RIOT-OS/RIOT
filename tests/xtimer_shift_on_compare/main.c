@@ -25,10 +25,10 @@
 #define ITERATIONS 128
 #define MAXSHIFT   8
 
-unsigned min[MAXSHIFT];
-unsigned max[MAXSHIFT];
-unsigned avg[MAXSHIFT];
-unsigned total[MAXSHIFT];
+static unsigned min[MAXSHIFT];
+static unsigned max[MAXSHIFT];
+static unsigned avg[MAXSHIFT];
+static unsigned total[MAXSHIFT];
 
 int main(void)
 {

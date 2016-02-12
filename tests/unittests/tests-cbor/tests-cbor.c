@@ -96,12 +96,12 @@ static void my_cbor_print(const cbor_stream_t *stream)
 #endif
 
 static unsigned char stream_data[1024];
-cbor_stream_t stream = {stream_data, sizeof(stream_data), 0};
+static cbor_stream_t stream = {stream_data, sizeof(stream_data), 0};
 
-cbor_stream_t empty_stream = {NULL, 0, 0}; /* stream that is not large enough */
+static cbor_stream_t empty_stream = {NULL, 0, 0}; /* stream that is not large enough */
 
-unsigned char invalid_stream_data[] = {0x40}; /* empty string encoded in CBOR */
-cbor_stream_t invalid_stream = {invalid_stream_data, sizeof(invalid_stream_data),
+static unsigned char invalid_stream_data[] = {0x40}; /* empty string encoded in CBOR */
+static cbor_stream_t invalid_stream = {invalid_stream_data, sizeof(invalid_stream_data),
                                 sizeof(invalid_stream_data)
                                };
 
