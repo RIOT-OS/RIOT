@@ -32,7 +32,7 @@ const cc110x_params_t cc110x_params[] = {
         .cs   = 24,
         .gdo0 = 27,  // todo: Not connected
         .gdo1 = SPI_0_PIN_MISO, // miso pin
-        .gdo2 = 28
+        .gdo2 = 20
     },
 };
 /** @} */
