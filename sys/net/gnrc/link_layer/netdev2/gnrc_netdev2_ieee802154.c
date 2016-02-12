@@ -250,11 +250,6 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
         return -ENOBUFS;
     }
 #ifdef MODULE_NETDEV_RETRANS
-    if ((!gnrc_netdev2->retrans_head) || (gnrc_netdev2->retrans_head->pkt == pkt)) {
-#endif
-        dev->driver->send((netdev2_t *)dev, vector, n);
-#ifdef MODULE_NETDEV_RETRANS
-    }
     /* queue the packet for potential retransmissions */
     if (gnrc_netdev2->retrans_head->pkt != pkt) {
         netdev2_retrans_queue_t *pkt_node = _alloc_pkt_node(pkt);
