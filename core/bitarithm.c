@@ -52,7 +52,6 @@ unsigned bitarithm_lsb(register unsigned v)
         v >>= 1;
         r++;
     }
-    ;
 
     return r;
 }
