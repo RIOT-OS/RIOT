@@ -32,11 +32,6 @@
 #include "debug.h"
 
 /**
- * @brief   The datasheet tells us, that ranging takes 70ms
- */
-#define RANGE_DELAY         (70000U)
-
-/**
  * @brief   Per default use normal speed on the I2C bus
  */
 #define BUS_SPEED           (I2C_SPEED_NORMAL)
@@ -90,18 +85,18 @@ int srf02_init(srf02_t *dev, i2c_t i2c, uint8_t addr)
     return 0;
 }
 
-uint16_t srf02_get_distance(srf02_t *dev, srf02_mode_t mode)
+void srf02_trigger(srf02_t *dev, srf02_mode_t mode)
 {
-    char res[2];
-
     /* trigger a new measurement by writing the mode to the CMD register */
     DEBUG("[srf02] trigger new reading\n");
     i2c_acquire(dev->i2c);
     i2c_write_reg(dev->i2c, dev->addr, REG_CMD, mode);
     i2c_release(dev->i2c);
+}
 
-    /* give the sensor the required time for sampling */
-    xtimer_usleep(RANGE_DELAY);
+uint16_t srf02_read(srf02_t *dev)
+{
+    char res[2];
 
     /* read the results */
     i2c_acquire(dev->i2c);
@@ -111,6 +106,16 @@ uint16_t srf02_get_distance(srf02_t *dev, srf02_mode_t mode)
 
     /* compile result - TODO: fix for different host byte order other than LE */
     return ((((uint16_t)res[0]) << 8) | (res[1] & 0xff));
+}
+
+uint16_t srf02_get_distance(srf02_t *dev, srf02_mode_t mode)
+{
+    /* trigger a new reading */
+    srf02_trigger(dev, mode);
+    /* give the sensor the required time for sampling */
+    xtimer_usleep(SRF02_RANGE_DELAY);
+    /* get the results */
+    return srf02_read(dev);
 }
 
 void srf02_set_addr(srf02_t *dev, uint8_t new_addr)
