@@ -108,6 +108,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 #ifdef MODULE_NETSTATS_L2
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_TX_END, true);
 #endif
+    at86rf2xx_set_max_retries(dev, 0);
     /* set default protocol */
 #ifdef MODULE_GNRC_SIXLOWPAN
     dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;

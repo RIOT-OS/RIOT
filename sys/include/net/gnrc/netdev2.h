@@ -24,6 +24,7 @@
  * The purpose of gnrc_netdev is to bring these two interfaces together.
  *
  * @author    Kaspar Schleiser <kaspar@schleiser.de>
+ * @author    Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #ifndef GNRC_NETDEV2_H
@@ -41,6 +42,15 @@ extern "C" {
  * @brief   Type for @ref msg_t if device fired an event
  */
 #define NETDEV2_MSG_TYPE_EVENT 0x1234
+
+/**
+ * @brief   Queue of packets for link-layer retransmissions
+ */
+typedef struct {
+    struct gnrc_pktqueue *next; /**< next node in queue */
+    gnrc_pktsnip_t *pkt;        /**< pointer to the packet */
+    uint8_t cnt;                /**< remaining number of max. retransmissions */
+} netdev2_retrans_queue_t;
 
 /**
  * @brief Structure holding GNRC netdev2 adapter state
@@ -77,6 +87,8 @@ typedef struct gnrc_netdev2 {
      * @brief PID of this adapter for netapi messages
      */
     kernel_pid_t pid;
+
+    netdev2_retrans_queue_t *retrans_head;
 } gnrc_netdev2_t;
 
 /**

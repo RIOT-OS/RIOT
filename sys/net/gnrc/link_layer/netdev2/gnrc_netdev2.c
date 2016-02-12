@@ -15,6 +15,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 
@@ -25,6 +26,7 @@
 
 #include "net/gnrc.h"
 #include "net/gnrc/nettype.h"
+#include "net/gnrc/pktqueue.h"
 #include "net/netdev2.h"
 
 #include "net/gnrc/netdev2.h"
@@ -73,14 +75,45 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
 
                     break;
                 }
-#ifdef MODULE_NETSTATS_L2
             case NETDEV2_EVENT_TX_MEDIUM_BUSY:
+#ifdef MODULE_NETSTATS_L2
                 dev->stats.tx_failed++;
-                break;
-            case NETDEV2_EVENT_TX_COMPLETE:
-                dev->stats.tx_success++;
-                break;
 #endif
+                break;
+            case NETDEV2_EVENT_TX_NOACK:
+                DEBUG("gnrc_netdev2: no ACK received or medium busy: retrans count is = %u\n", (unsigned) gnrc_netdev2->retrans_head->cnt);
+                if (!gnrc_netdev2->retrans_head) {
+                    DEBUG("\n!!! gnrc_netdev2: queue is empty while retransmitting, this shouldn't happen!\n\n");
+                }
+                else if (gnrc_netdev2->retrans_head->cnt-- <= 0) {
+                    DEBUG("packet sent, removing from buffer and queue: %p\n", gnrc_netdev2->retrans_head->pkt);
+                    gnrc_pktbuf_release(gnrc_netdev2->retrans_head->pkt);
+                    gnrc_netdev2->retrans_head->pkt = NULL;
+                    gnrc_pktqueue_remove_head((gnrc_pktqueue_t**)&(gnrc_netdev2->retrans_head));
+                }
+                else {
+                    gnrc_netdev2->send(gnrc_netdev2, gnrc_netdev2->retrans_head->pkt);
+                }
+            case NETDEV2_EVENT_TX_COMPLETE:
+#ifdef MODULE_NETSTATS_L2
+                dev->stats.tx_success++;
+#endif
+                if (!gnrc_netdev2->retrans_head) {
+                    DEBUG("\n!!! gnrc_netdev2: queue is empty while handling ACK, this shouldn't happen!\n\n");
+                }
+                else {
+#ifdef MODULE_NETSTATS
+                    if (!(((gnrc_netif_hdr_t*)gnrc_netdev2->retrans_head->pkt->data)->flags &
+                                (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST))) {
+                        dev->stats.acks_count++;
+                    }
+#endif
+                    DEBUG("packet sent, removing from buffer and queue: %p\n", gnrc_netdev2->retrans_head->pkt);
+                    gnrc_pktbuf_release(gnrc_netdev2->retrans_head->pkt);
+                    gnrc_netdev2->retrans_head->pkt = NULL;
+                    gnrc_pktqueue_remove_head((gnrc_pktqueue_t**)&(gnrc_netdev2->retrans_head));
+                }
+                break;
             default:
                 DEBUG("gnrc_netdev2: warning: unhandled event %u.\n", event);
         }
