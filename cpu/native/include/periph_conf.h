@@ -45,8 +45,9 @@
  * @name Timer peripheral configuration
  * @{
  */
-#define TIMER_NUMOF        (1U)
+#define TIMER_NUMOF        (2U)
 #define TIMER_0_EN         1
+#define TIMER_1_EN         1
 
 /**
  * @brief xtimer configuration

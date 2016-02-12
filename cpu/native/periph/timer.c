@@ -1,6 +1,7 @@
 /**
  * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *               2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2016 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,10 +12,11 @@
  * @{
  * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @file
  * @brief Native CPU periph/timer.h implementation
  *
- * Uses POSIX realtime clock and POSIX itimer to mimic hardware.
+ * Uses POSIX realtime clock and POSIX per-process timer to mimic hardware.
  *
  * This is based on native's hwtimer implementation by Ludwig Knüpfer.
  * I removed the multiplexing, as xtimer does the same. (kaspar)
@@ -37,6 +39,7 @@
 #include <string.h>
 #include <err.h>
 
+#include "assert.h"
 #include "cpu.h"
 #include "cpu_conf.h"
 #include "native_internal.h"
@@ -47,11 +50,13 @@
 
 #define NATIVE_TIMER_SPEED 1000000
 
-static unsigned long time_null;
+static unsigned long time_null[TIMER_NUMOF];
 
-static void (*_callback)(int);
+static void (*_callback[TIMER_NUMOF])(int);
 
-static struct itimerval itv;
+static struct sigevent evt[TIMER_NUMOF];
+static timer_t tid[TIMER_NUMOF];
+static struct itimerspec itv[TIMER_NUMOF];
 
 /**
  * returns ticks for give timespec
@@ -63,60 +68,77 @@ static unsigned long ts2ticks(struct timespec *tp)
 }
 
 /**
- * native timer signal handler
- *
- * set new system timer, call timer interrupt handler
+ * native timer signal handler for TIMER0
  */
-void native_isr_timer(void)
+void native_isr_timer0(void)
 {
     DEBUG("%s\n", __func__);
 
-    _callback(0);
+    _callback[0](0);
+}
+
+/**
+ * native timer signal handler for TIMER1
+ */
+void native_isr_timer1(void)
+{
+    DEBUG("%s\n", __func__);
+
+    _callback[1](1);
 }
 
 int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 {
-    (void)ticks_per_us;
+    (void) ticks_per_us;
+    assert(ticks_per_us != 1);
+
     DEBUG("%s\n", __func__);
     if (dev >= TIMER_NUMOF) {
         return -1;
     }
 
     /* initialize time delta */
-    time_null = 0;
-    time_null = timer_read(0);
+    time_null[dev] = 0;
+    time_null[dev] = timer_read(dev);
+
+    evt[dev].sigev_notify = SIGEV_SIGNAL;
+    evt[dev].sigev_signo = SIGRTMIN + dev;
+    evt[dev].sigev_value.sival_ptr = &tid[dev];
 
     timer_irq_disable(dev);
-    _callback = callback;
+    _callback[dev] = callback;
     timer_irq_enable(dev);
+
+    if (timer_create(CLOCK_REALTIME, &evt[dev], &tid[dev]) == -1) {
+        return -1;
+    }
 
     return 0;
 }
 
-static void do_timer_set(unsigned int offset)
+static void do_timer_set(tim_t dev, unsigned int offset)
 {
-    DEBUG("%s\n", __func__);
+    DEBUG("%s: %u\n", __func__, offset);
 
     if (offset && offset < NATIVE_TIMER_MIN_RES) {
         offset = NATIVE_TIMER_MIN_RES;
     }
 
-    memset(&itv, 0, sizeof(itv));
-    itv.it_value.tv_sec = (offset / 1000000);
-    itv.it_value.tv_usec = offset % 1000000;
+    memset(&itv[dev], 0, sizeof(itv[dev]));
+    itv[dev].it_value.tv_sec = (offset / 1000000);
+    itv[dev].it_value.tv_nsec = (offset % 1000000) * 1000;
 
-    DEBUG("timer_set(): setting %u.%06u\n", (unsigned)itv.it_value.tv_sec, (unsigned)itv.it_value.tv_usec);
+    DEBUG("timer_set(): setting %u.%06u\n", (unsigned)itv[dev].it_value.tv_sec, (unsigned)itv[dev].it_value.tv_nsec);
 
     _native_syscall_enter();
-    if (real_setitimer(ITIMER_REAL, &itv, NULL) == -1) {
-        err(EXIT_FAILURE, "timer_arm: setitimer");
+    if (real_timer_settime(tid[dev], 0, &itv[dev], NULL) == -1) {
+        err(EXIT_FAILURE, "timer_arm: timer_settime");
     }
     _native_syscall_leave();
 }
 
 int timer_set(tim_t dev, int channel, unsigned int offset)
 {
-    (void)dev;
     DEBUG("%s\n", __func__);
 
     if (channel != 0) {
@@ -127,7 +149,7 @@ int timer_set(tim_t dev, int channel, unsigned int offset)
         offset = NATIVE_TIMER_MIN_RES;
     }
 
-    do_timer_set(offset);
+    do_timer_set(dev, offset);
 
     return 1;
 }
@@ -140,21 +162,30 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_clear(tim_t dev, int channel)
 {
-    (void)dev;
     (void)channel;
 
-    do_timer_set(0);
+    do_timer_set(dev, 0);
 
     return 1;
 }
 
 void timer_irq_enable(tim_t dev)
 {
-    (void)dev;
     DEBUG("%s\n", __func__);
 
-    if (register_interrupt(SIGALRM, native_isr_timer) != 0) {
-        DEBUG("darn!\n\n");
+    switch (dev) {
+        case 0:
+            if (register_interrupt(SIGRTMIN + dev, native_isr_timer0) != 0) {
+                DEBUG("darn!\n\n");
+            }
+            break;
+        case 1:
+            if (register_interrupt(SIGRTMIN + dev, native_isr_timer1) != 0) {
+                DEBUG("darn!\n\n");
+            }
+            break;
+        default:
+            break;
     }
 
     return;
@@ -162,10 +193,9 @@ void timer_irq_enable(tim_t dev)
 
 void timer_irq_disable(tim_t dev)
 {
-    (void)dev;
     DEBUG("%s\n", __func__);
 
-    if (unregister_interrupt(SIGALRM) != 0) {
+    if (unregister_interrupt(SIGRTMIN + dev) != 0) {
         DEBUG("darn!\n\n");
     }
 
@@ -208,9 +238,10 @@ unsigned int timer_read(tim_t dev)
     if (real_clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
         err(EXIT_FAILURE, "timer_read: clock_gettime");
     }
+    DEBUG("timer_read: %lu\n", (ts2ticks(&t) - time_null[dev]));
 
 #endif
     _native_syscall_leave();
 
-    return ts2ticks(&t) - time_null;
+    return ts2ticks(&t) - time_null[dev];
 }
