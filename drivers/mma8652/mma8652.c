@@ -97,6 +97,7 @@ int mma8652_init(mma8652_t *dev, i2c_t i2c, uint8_t address, uint8_t dr, uint8_t
     i2c_release(dev->i2c);
 
     dev->initialized = true;
+    dev->scale = 1024 >> range;
 
     return 0;
 }
@@ -216,9 +217,9 @@ int mma8652_read(mma8652_t *dev, int16_t *x, int16_t *y, int16_t *z, uint8_t *st
     i2c_release(dev->i2c);
 
     *status = buf[0];
-    *x = (int16_t)(((int16_t)buf[1] << 8) | buf[2]) / 16;
-    *y = (int16_t)(((int16_t)buf[3] << 8) | buf[4]) / 16;
-    *z = (int16_t)(((int16_t)buf[5] << 8) | buf[6]) / 16;
+    *x = (int32_t)((int16_t)(((int16_t)buf[1] << 8) | buf[2]) >> 4) * 1000 / dev->scale;
+    *y = (int32_t)((int16_t)(((int16_t)buf[3] << 8) | buf[4]) >> 4) * 1000 / dev->scale;
+    *z = (int32_t)((int16_t)(((int16_t)buf[5] << 8) | buf[6]) >> 4) * 1000 / dev->scale;
 
     return 0;
 }
