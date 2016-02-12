@@ -36,10 +36,10 @@
 #include "irq.h"
 
 /* GCC documentation refers to the types as I1, I2, I4, I8, I16 */
-typedef uint8_t I1;
-typedef uint16_t I2;
-typedef uint32_t I4;
-typedef uint64_t I8;
+typedef uint8_t     I1;
+typedef uint16_t    I2;
+typedef uint32_t    I4;
+typedef uint64_t    I8;
 /* typedef __uint128_t I16; */ /* No 128 bit integer support yet */
 
 /**

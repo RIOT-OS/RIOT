@@ -34,7 +34,7 @@ unsigned bitarithm_msb(unsigned v)
     shift   = (v > 0x3) << 1; v >>= shift;  r |= shift;
                                             r |= (v >> 1);
 #else
-    r       = 0;
+    r = 0;
     while (v >>= 1) { // unroll for more speed...
         r++;
     }

@@ -71,7 +71,7 @@ int thread_wakeup(kernel_pid_t pid)
 {
     DEBUG("thread_wakeup: Trying to wakeup PID %" PRIkernel_pid "...\n", pid);
 
-    unsigned old_state  = disableIRQ();
+    unsigned old_state = disableIRQ();
 
     tcb_t *other_thread = (tcb_t *)sched_threads[pid];
     if (other_thread && other_thread->status == STATUS_SLEEPING) {
@@ -167,9 +167,9 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     }
 #endif
 
-    unsigned state      = disableIRQ();
+    unsigned state = disableIRQ();
 
-    kernel_pid_t pid    = KERNEL_PID_UNDEF;
+    kernel_pid_t pid = KERNEL_PID_UNDEF;
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; ++i) {
         if (sched_threads[i] == NULL) {
             pid = i;
@@ -184,10 +184,10 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
         return -EOVERFLOW;
     }
 
-    sched_threads[pid]  = cb;
+    sched_threads[pid] = cb;
 
-    cb->pid             = pid;
-    cb->sp              = thread_stack_init(function, arg, stack, stacksize);
+    cb->pid = pid;
+    cb->sp  = thread_stack_init(function, arg, stack, stacksize);
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
     cb->stack_start = stack;
@@ -198,15 +198,15 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     cb->name        = name;
 #endif
 
-    cb->priority            = priority;
-    cb->status              = 0;
+    cb->priority    = priority;
+    cb->status      = 0;
 
-    cb->rq_entry.next       = NULL;
-    cb->rq_entry.prev       = NULL;
+    cb->rq_entry.next   = NULL;
+    cb->rq_entry.prev   = NULL;
 
-    cb->wait_data           = NULL;
+    cb->wait_data = NULL;
 
-    cb->msg_waiters.first   = NULL;
+    cb->msg_waiters.first = NULL;
 
     cib_init(&(cb->msg_queue), 0);
     cb->msg_array = NULL;
