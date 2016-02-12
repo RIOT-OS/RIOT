@@ -28,13 +28,13 @@ unsigned bitarithm_msb(unsigned v)
 #if ARCH_32_BIT
     register unsigned shift;
 
-    r =     (v > 0xFFFF) << 4; v >>= r;
-    shift = (v > 0xFF) << 3; v >>= shift; r |= shift;
-    shift = (v > 0xF) << 2; v >>= shift; r |= shift;
-    shift = (v > 0x3) << 1; v >>= shift; r |= shift;
-    r |= (v >> 1);
+    r       = (v > 0xFFFF) << 4;            v >>= r;
+    shift   = (v > 0xFF) << 3; v >>= shift; r |= shift;
+    shift   = (v > 0xF) << 2; v >>= shift;  r |= shift;
+    shift   = (v > 0x3) << 1; v >>= shift;  r |= shift;
+                                            r |= (v >> 1);
 #else
-    r = 0;
+    r       = 0;
     while (v >>= 1) { // unroll for more speed...
         r++;
     }

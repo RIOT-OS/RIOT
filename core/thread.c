@@ -43,7 +43,7 @@ int thread_getstatus(kernel_pid_t pid)
 {
     volatile tcb_t *t = thread_get(pid);
 
-    return t ? (int) t->status : STATUS_NOT_FOUND;
+    return t ? (int)t->status : STATUS_NOT_FOUND;
 }
 
 #ifdef DEVELHELP
@@ -71,9 +71,9 @@ int thread_wakeup(kernel_pid_t pid)
 {
     DEBUG("thread_wakeup: Trying to wakeup PID %" PRIkernel_pid "...\n", pid);
 
-    unsigned old_state = disableIRQ();
+    unsigned old_state  = disableIRQ();
 
-    tcb_t *other_thread = (tcb_t *) sched_threads[pid];
+    tcb_t *other_thread = (tcb_t *)sched_threads[pid];
     if (other_thread && other_thread->status == STATUS_SLEEPING) {
         DEBUG("thread_wakeup: Thread is sleeping.\n");
 
@@ -94,8 +94,8 @@ int thread_wakeup(kernel_pid_t pid)
 
 void thread_yield(void)
 {
-    unsigned old_state = disableIRQ();
-    tcb_t *me = (tcb_t *)sched_active_thread;
+    unsigned    old_state   = disableIRQ();
+    tcb_t       *me         = (tcb_t *)sched_active_thread;
 
     if (me->status >= STATUS_ON_RUNQUEUE) {
         clist_advance(&sched_runqueues[me->priority]);
@@ -112,11 +112,11 @@ uintptr_t thread_measure_stack_free(char *stack)
 
     /* assume that the comparison fails before or after end of stack */
     /* assume that the stack grows "downwards" */
-    while (*stackp == (uintptr_t) stackp) {
+    while (*stackp == (uintptr_t)stackp) {
         stackp++;
     }
 
-    uintptr_t space_free = (uintptr_t) stackp - (uintptr_t) stack;
+    uintptr_t space_free = (uintptr_t)stackp - (uintptr_t)stack;
     return space_free;
 }
 #endif
@@ -130,15 +130,15 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 #ifdef DEVELHELP
     int total_stacksize = stacksize;
 #else
-    (void) name;
+    (void)name;
 #endif
 
     /* align the stack on a 16/32bit boundary */
-    uintptr_t misalignment = (uintptr_t) stack % ALIGN_OF(void *);
+    uintptr_t misalignment = (uintptr_t)stack % ALIGN_OF(void *);
     if (misalignment) {
-        misalignment = ALIGN_OF(void *) - misalignment;
-        stack += misalignment;
-        stacksize -= misalignment;
+        misalignment    = ALIGN_OF(void *) - misalignment;
+        stack           += misalignment;
+        stacksize       -= misalignment;
     }
 
     /* make room for the thread control block */
@@ -148,28 +148,28 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     stacksize -= stacksize % ALIGN_OF(tcb_t);
 
     /* allocate our thread control block at the top of our stackspace */
-    tcb_t *cb = (tcb_t *) (stack + stacksize);
+    tcb_t *cb = (tcb_t *)(stack + stacksize);
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
     if (flags & THREAD_CREATE_STACKTEST) {
         /* assign each int of the stack the value of it's address */
-        uintptr_t *stackmax = (uintptr_t *) (stack + stacksize);
-        uintptr_t *stackp = (uintptr_t *) stack;
+        uintptr_t   *stackmax   = (uintptr_t *)(stack + stacksize);
+        uintptr_t   *stackp     = (uintptr_t *)stack;
 
         while (stackp < stackmax) {
-            *stackp = (uintptr_t) stackp;
+            *stackp = (uintptr_t)stackp;
             stackp++;
         }
     }
     else {
         /* create stack guard */
-        *(uintptr_t *) stack = (uintptr_t) stack;
+        *(uintptr_t *)stack = (uintptr_t)stack;
     }
 #endif
 
-    unsigned state = disableIRQ();
+    unsigned state      = disableIRQ();
 
-    kernel_pid_t pid = KERNEL_PID_UNDEF;
+    kernel_pid_t pid    = KERNEL_PID_UNDEF;
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; ++i) {
         if (sched_threads[i] == NULL) {
             pid = i;
@@ -184,29 +184,29 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
         return -EOVERFLOW;
     }
 
-    sched_threads[pid] = cb;
+    sched_threads[pid]  = cb;
 
-    cb->pid = pid;
-    cb->sp = thread_stack_init(function, arg, stack, stacksize);
+    cb->pid             = pid;
+    cb->sp              = thread_stack_init(function, arg, stack, stacksize);
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
     cb->stack_start = stack;
 #endif
 
 #ifdef DEVELHELP
-    cb->stack_size = total_stacksize;
-    cb->name = name;
+    cb->stack_size  = total_stacksize;
+    cb->name        = name;
 #endif
 
-    cb->priority = priority;
-    cb->status = 0;
+    cb->priority            = priority;
+    cb->status              = 0;
 
-    cb->rq_entry.next = NULL;
-    cb->rq_entry.prev = NULL;
+    cb->rq_entry.next       = NULL;
+    cb->rq_entry.prev       = NULL;
 
-    cb->wait_data = NULL;
+    cb->wait_data           = NULL;
 
-    cb->msg_waiters.first = NULL;
+    cb->msg_waiters.first   = NULL;
 
     cib_init(&(cb->msg_queue), 0);
     cb->msg_array = NULL;

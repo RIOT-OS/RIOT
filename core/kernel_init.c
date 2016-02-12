@@ -47,7 +47,7 @@ volatile int lpm_prevent_sleep = 0;
 extern int main(void);
 static void *main_trampoline(void *arg)
 {
-    (void) arg;
+    (void)arg;
 
 #ifdef MODULE_AUTO_INIT
     auto_init();
@@ -66,7 +66,7 @@ static void *main_trampoline(void *arg)
 
 static void *idle_thread(void *arg)
 {
-    (void) arg;
+    (void)arg;
 
     while (1) {
         if (lpm_prevent_sleep) {
@@ -82,15 +82,15 @@ static void *idle_thread(void *arg)
     return NULL;
 }
 
-const char *main_name = "main";
-const char *idle_name = "idle";
+const char  *main_name  = "main";
+const char  *idle_name  = "idle";
 
 static char main_stack[THREAD_STACKSIZE_MAIN];
 static char idle_stack[THREAD_STACKSIZE_IDLE];
 
 void kernel_init(void)
 {
-    (void) disableIRQ();
+    (void)disableIRQ();
 
     thread_create(idle_stack, sizeof(idle_stack),
                   THREAD_PRIORITY_IDLE,

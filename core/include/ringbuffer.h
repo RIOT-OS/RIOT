@@ -51,10 +51,10 @@ typedef struct ringbuffer {
  */
 static inline void ringbuffer_init(ringbuffer_t *__restrict rb, char *buffer, unsigned bufsize)
 {
-    rb->buf = buffer;
-    rb->size = bufsize;
-    rb->start = 0;
-    rb->avail = 0;
+    rb->buf     = buffer;
+    rb->size    = bufsize;
+    rb->start   = 0;
+    rb->avail   = 0;
 }
 
 /**

@@ -55,8 +55,8 @@ typedef uint64_t I8;
     { \
         unsigned int mask = disableIRQ();     \
         (void)memmodel;                       \
-        I ## n tmp = *((I ## n *)ptr);             \
-        *((I ## n *)ptr) = prefixop(tmp op val); \
+        I ## n tmp          = *((I ## n *)ptr);             \
+        *((I ## n *)ptr)    = prefixop(tmp op val); \
         restoreIRQ(mask);                     \
         return tmp;                           \
     }

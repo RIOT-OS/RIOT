@@ -26,19 +26,19 @@
 void clist_add(clist_node_t **node, clist_node_t *new_node)
 {
     if (*node != NULL) {
-        new_node->next = (*node);
-        new_node->prev = (*node)->prev;
+        new_node->next      = (*node);
+        new_node->prev      = (*node)->prev;
         (*node)->prev->next = new_node;
-        (*node)->prev = new_node;
+        (*node)->prev       = new_node;
 
         if ((*node)->prev == *node) {
             (*node)->prev = new_node;
         }
     }
     else {
-        *node = new_node;
-        new_node->next = new_node;
-        new_node->prev = new_node;
+        *node           = new_node;
+        new_node->next  = new_node;
+        new_node->prev  = new_node;
     }
 }
 
@@ -46,8 +46,8 @@ void clist_add(clist_node_t **node, clist_node_t *new_node)
 void clist_remove(clist_node_t **list, clist_node_t *node)
 {
     if (node->next != node) {
-        node->prev->next = node->next;
-        node->next->prev = node->prev;
+        node->prev->next    = node->next;
+        node->next->prev    = node->prev;
 
         if (node == *list) {
             *list = node->next;

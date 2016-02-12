@@ -83,7 +83,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
     }
 #endif /* DEVELHELP */
 
-    tcb_t *target = (tcb_t *) sched_threads[target_pid];
+    tcb_t *target = (tcb_t *)sched_threads[target_pid];
 
     m->sender_pid = sched_active_pid;
 
@@ -123,15 +123,15 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
         DEBUG("msg_send: %" PRIkernel_pid ": send_blocked.\n",
               sched_active_thread->pid);
         priority_queue_node_t n;
-        n.priority = sched_active_thread->priority;
-        n.data = (unsigned int) sched_active_thread;
-        n.next = NULL;
+        n.priority  = sched_active_thread->priority;
+        n.data      = (unsigned int)sched_active_thread;
+        n.next      = NULL;
         DEBUG("msg_send: %" PRIkernel_pid ": Adding node to msg_waiters:\n",
               sched_active_thread->pid);
 
         priority_queue_add(&(target->msg_waiters), &n);
 
-        sched_active_thread->wait_data = (void *) m;
+        sched_active_thread->wait_data = (void *)m;
 
         int newstatus;
 
@@ -142,7 +142,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
             newstatus = STATUS_SEND_BLOCKED;
         }
 
-        sched_set_status((tcb_t *) sched_active_thread, newstatus);
+        sched_set_status((tcb_t *)sched_active_thread, newstatus);
 
         DEBUG("msg_send: %" PRIkernel_pid ": Back from send block.\n",
               sched_active_thread->pid);
@@ -155,7 +155,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
               PRIkernel_pid " to %" PRIkernel_pid ".\n",
               sched_active_thread->pid, thread_getpid(), target_pid);
         /* copy msg to target */
-        msg_t *target_message = (msg_t *) target->wait_data;
+        msg_t *target_message = (msg_t *)target->wait_data;
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
 
@@ -171,7 +171,7 @@ int msg_send_to_self(msg_t *m)
     unsigned state = disableIRQ();
 
     m->sender_pid = sched_active_pid;
-    int res = queue_msg((tcb_t *) sched_active_thread, m);
+    int res = queue_msg((tcb_t *)sched_active_thread, m);
 
     restoreIRQ(state);
     return res;
@@ -185,7 +185,7 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
     }
 #endif /* DEVELHELP */
 
-    tcb_t *target = (tcb_t *) sched_threads[target_pid];
+    tcb_t *target = (tcb_t *)sched_threads[target_pid];
 
     if (target == NULL) {
         DEBUG("msg_send_int(): target thread does not exist\n");
@@ -199,7 +199,7 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
 
 
         /* copy msg to target */
-        msg_t *target_message = (msg_t *) target->wait_data;
+        msg_t *target_message = (msg_t *)target->wait_data;
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
 
@@ -215,10 +215,10 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
 int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
 {
     assert(sched_active_pid != target_pid);
-    unsigned state = disableIRQ();
-    tcb_t *me = (tcb_t *) sched_threads[sched_active_pid];
+    unsigned    state   = disableIRQ();
+    tcb_t       *me     = (tcb_t *)sched_threads[sched_active_pid];
     sched_set_status(me, STATUS_REPLY_BLOCKED);
-    me->wait_data = (void *) reply;
+    me->wait_data = (void *)reply;
 
     /* msg_send blocks until reply received */
     return _msg_send(m, target_pid, true, state);
@@ -226,9 +226,9 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
 
 int msg_reply(msg_t *m, msg_t *reply)
 {
-    unsigned state = disableIRQ();
+    unsigned state  = disableIRQ();
 
-    tcb_t *target = (tcb_t *) sched_threads[m->sender_pid];
+    tcb_t *target   = (tcb_t *)sched_threads[m->sender_pid];
 
     if (!target) {
         DEBUG("msg_reply(): %" PRIkernel_pid ": Target \"%" PRIkernel_pid
@@ -247,7 +247,7 @@ int msg_reply(msg_t *m, msg_t *reply)
     DEBUG("msg_reply(): %" PRIkernel_pid ": Direct msg copy.\n",
           sched_active_thread->pid);
     /* copy msg to target */
-    msg_t *target_message = (msg_t *) target->wait_data;
+    msg_t *target_message = (msg_t *)target->wait_data;
     *target_message = *reply;
     sched_set_status(target, STATUS_PENDING);
     uint16_t target_prio = target->priority;
@@ -259,7 +259,7 @@ int msg_reply(msg_t *m, msg_t *reply)
 
 int msg_reply_int(msg_t *m, msg_t *reply)
 {
-    tcb_t *target = (tcb_t *) sched_threads[m->sender_pid];
+    tcb_t *target = (tcb_t *)sched_threads[m->sender_pid];
 
     if (target->status != STATUS_REPLY_BLOCKED) {
         DEBUG("msg_reply_int(): %" PRIkernel_pid ": Target \"%" PRIkernel_pid
@@ -267,10 +267,10 @@ int msg_reply_int(msg_t *m, msg_t *reply)
         return -1;
     }
 
-    msg_t *target_message = (msg_t *) target->wait_data;
-    *target_message = *reply;
+    msg_t *target_message = (msg_t *)target->wait_data;
+    *target_message                 = *reply;
     sched_set_status(target, STATUS_PENDING);
-    sched_context_switch_request = 1;
+    sched_context_switch_request    = 1;
     return 1;
 }
 
@@ -291,7 +291,7 @@ static int _msg_receive(msg_t *m, int block)
     DEBUG("_msg_receive: %" PRIkernel_pid ": _msg_receive.\n",
           sched_active_thread->pid);
 
-    tcb_t *me = (tcb_t *) sched_threads[sched_active_pid];
+    tcb_t *me       = (tcb_t *)sched_threads[sched_active_pid];
 
     int queue_index = -1;
 
@@ -311,7 +311,7 @@ static int _msg_receive(msg_t *m, int block)
         *m = me->msg_array[queue_index];
     }
     else {
-        me->wait_data = (void *) m;
+        me->wait_data = (void *)m;
     }
 
     priority_queue_node_t *node = priority_queue_remove_head(&(me->msg_waiters));
@@ -339,7 +339,7 @@ static int _msg_receive(msg_t *m, int block)
     else {
         DEBUG("_msg_receive: %" PRIkernel_pid ": _msg_receive(): Waking up waiting thread.\n",
               sched_active_thread->pid);
-        tcb_t *sender = (tcb_t *) node->data;
+        tcb_t *sender = (tcb_t *)node->data;
 
         if (queue_index >= 0) {
             /* We've already got a message from the queue. As there is a
@@ -349,15 +349,15 @@ static int _msg_receive(msg_t *m, int block)
         }
 
         /* copy msg */
-        msg_t *sender_msg = (msg_t *) sender->wait_data;
+        msg_t *sender_msg = (msg_t *)sender->wait_data;
         *m = *sender_msg;
 
         /* remove sender from queue */
         uint16_t sender_prio = THREAD_PRIORITY_IDLE;
         if (sender->status != STATUS_REPLY_BLOCKED) {
-            sender->wait_data = NULL;
+            sender->wait_data   = NULL;
             sched_set_status(sender, STATUS_PENDING);
-            sender_prio = sender->priority;
+            sender_prio         = sender->priority;
         }
 
         restoreIRQ(state);
@@ -375,7 +375,7 @@ int msg_avail(void)
     DEBUG("msg_available: %" PRIkernel_pid ": msg_available.\n",
           sched_active_thread->pid);
 
-    tcb_t *me = (tcb_t *) sched_active_thread;
+    tcb_t *me       = (tcb_t *)sched_active_thread;
 
     int queue_index = -1;
 
@@ -390,7 +390,7 @@ int msg_init_queue(msg_t *array, int num)
 {
     /* check if num is a power of two by comparing to its complement */
     if (num && (num & (num - 1)) == 0) {
-        tcb_t *me = (tcb_t *) sched_active_thread;
+        tcb_t *me = (tcb_t *)sched_active_thread;
         me->msg_array = array;
         cib_init(&(me->msg_queue), num);
         return 0;

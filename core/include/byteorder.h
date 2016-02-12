@@ -38,8 +38,8 @@ extern "C" {
  *                 between different byte orders at compile time.
  */
 typedef union __attribute__((packed)) {
-    uint16_t u16;       /**< 16 bit representation */
-    uint8_t u8[2];      /**< 8 bit representation */
+    uint16_t    u16;    /**< 16 bit representation */
+    uint8_t     u8[2];  /**< 8 bit representation */
 } le_uint16_t;
 
 /**
@@ -48,9 +48,9 @@ typedef union __attribute__((packed)) {
  *                 between different byte orders at compile time.
  */
 typedef union __attribute__((packed)) {
-    uint32_t u32;       /**< 32 bit representation */
-    uint8_t u8[4];      /**< 8 bit representation */
-    uint16_t u16[2];    /**< 16 bit representation */
+    uint32_t    u32;    /**< 32 bit representation */
+    uint8_t     u8[4];  /**< 8 bit representation */
+    uint16_t    u16[2]; /**< 16 bit representation */
     le_uint16_t l16[2]; /**< little endian 16 bit representation */
 } le_uint32_t;
 
@@ -60,10 +60,10 @@ typedef union __attribute__((packed)) {
  *                 between different byte orders at compile time.
  */
 typedef union __attribute__((packed)) {
-    uint64_t u64;       /**< 64 bit representation */
-    uint8_t u8[8];      /**< 8 bit representation */
-    uint16_t u16[4];    /**< 16 bit representation */
-    uint32_t u32[2];    /**< 32 bit representation */
+    uint64_t    u64;    /**< 64 bit representation */
+    uint8_t     u8[8];  /**< 8 bit representation */
+    uint16_t    u16[4]; /**< 16 bit representation */
+    uint32_t    u32[2]; /**< 32 bit representation */
     le_uint16_t l16[4]; /**< little endian 16 bit representation */
     le_uint32_t l32[2]; /**< little endian 32 bit representation */
 } le_uint64_t;
@@ -74,8 +74,8 @@ typedef union __attribute__((packed)) {
  *                 between different byte orders at compile time.
  */
 typedef union __attribute__((packed)) {
-    uint16_t u16;       /**< 16 bit representation */
-    uint8_t u8[2];      /**< 8 bit representation */
+    uint16_t    u16;    /**< 16 bit representation */
+    uint8_t     u8[2];  /**< 8 bit representation */
 } be_uint16_t;
 
 /**
@@ -84,9 +84,9 @@ typedef union __attribute__((packed)) {
  *                 between different byte orders at compile time.
  */
 typedef union __attribute__((packed)) {
-    uint32_t u32;       /**< 32 bit representation */
-    uint8_t u8[4];      /**< 8 bit representation */
-    uint16_t u16[2];    /**< 16 bit representation */
+    uint32_t    u32;    /**< 32 bit representation */
+    uint8_t     u8[4];  /**< 8 bit representation */
+    uint16_t    u16[2]; /**< 16 bit representation */
     be_uint16_t b16[2]; /**< big endian 16 bit representation */
 } be_uint32_t;
 
@@ -96,10 +96,10 @@ typedef union __attribute__((packed)) {
  *                 between different byte orders at compile time.
  */
 typedef union __attribute__((packed)) {
-    uint64_t u64;       /**< 64 bit representation */
-    uint8_t u8[8];      /**< 8 bit representation */
-    uint16_t u16[4];    /**< 16 bit representation */
-    uint32_t u32[2];    /**< 32 bit representation */
+    uint64_t    u64;    /**< 64 bit representation */
+    uint8_t     u8[8];  /**< 8 bit representation */
+    uint16_t    u16[4]; /**< 16 bit representation */
+    uint32_t    u32[2]; /**< 32 bit representation */
     be_uint16_t b16[4]; /**< big endian 16 bit representation */
     be_uint32_t b32[2]; /**< big endian 32 bit representation */
 } be_uint64_t;
@@ -287,10 +287,10 @@ static inline uint16_t byteorder_swaps(uint16_t v)
 #ifndef MODULE_MSP430_COMMON
     return __builtin_bswap16(v);
 #else
-    network_uint16_t result = { v };
-    uint8_t tmp = result.u8[0];
-    result.u8[0] = result.u8[1];
-    result.u8[1] = tmp;
+    network_uint16_t    result  = { v };
+    uint8_t             tmp     = result.u8[0];
+    result.u8[0]    = result.u8[1];
+    result.u8[1]    = tmp;
     return result.u16;
 #endif
 }

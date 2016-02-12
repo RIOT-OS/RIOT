@@ -47,8 +47,8 @@ void lifo_insert(int *array, int i)
     }
 #endif
 
-    array[index] = array[0];
-    array[0] = i;
+    array[index]    = array[0];
+    array[0]        = i;
 }
 
 int lifo_get(int *array)

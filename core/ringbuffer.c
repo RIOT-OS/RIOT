@@ -72,7 +72,7 @@ int ringbuffer_add_one(ringbuffer_t *restrict rb, char c)
     int result = -1;
 
     if (ringbuffer_full(rb)) {
-        result = (unsigned char) get_head(rb);
+        result = (unsigned char)get_head(rb);
     }
     add_tail(rb, c);
     return result;
@@ -81,7 +81,7 @@ int ringbuffer_add_one(ringbuffer_t *restrict rb, char c)
 int ringbuffer_get_one(ringbuffer_t *restrict rb)
 {
     if (!ringbuffer_empty(rb)) {
-        return (unsigned char) get_head(rb);
+        return (unsigned char)get_head(rb);
     }
     else {
         return -1;
@@ -117,12 +117,12 @@ unsigned ringbuffer_get(ringbuffer_t *restrict rb, char *buf, unsigned n)
 unsigned ringbuffer_remove(ringbuffer_t *restrict rb, unsigned n)
 {
     if (n > rb->avail) {
-        n = rb->avail;
-        rb->start = rb->avail = 0;
+        n           = rb->avail;
+        rb->start   = rb->avail = 0;
     }
     else {
-        rb->start -= n;
-        rb->avail -= n;
+        rb->start   -= n;
+        rb->avail   -= n;
 
         /* compensate underflow */
         if (rb->start > rb->size) {

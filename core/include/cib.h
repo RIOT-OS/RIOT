@@ -37,7 +37,7 @@ typedef struct {
 /**
  * @brief   Initialize cib_t to a given size.
  */
-#define CIB_INIT(SIZE) { 0, 0, (SIZE) -1 }
+#define CIB_INIT(SIZE) { 0, 0, (SIZE)-1 }
 
 /**
  * @brief Initialize cib_t to 0 and set size.
@@ -77,7 +77,7 @@ static inline int cib_get(cib_t *__restrict cib)
     unsigned int avail = cib_avail(cib);
 
     if (avail > 0) {
-        return (int) (cib->read_count++ & cib->mask);
+        return (int)(cib->read_count++ & cib->mask);
     }
 
     return -1;
@@ -95,8 +95,8 @@ static inline int cib_put(cib_t *__restrict cib)
     unsigned int avail = cib_avail(cib);
 
     /* We use a signed compare, because the mask is -1u for an empty CIB. */
-    if ((int) avail <= (int) cib->mask) {
-        return (int) (cib->write_count++ & cib->mask);
+    if ((int)avail <= (int)cib->mask) {
+        return (int)(cib->write_count++ & cib->mask);
     }
 
     return -1;
