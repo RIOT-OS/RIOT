@@ -8,5 +8,8 @@ export CFLAGS += -DDONT_USE_CMSIS_INIT
 # use common periph functions
 USEMODULE += periph_common
 
+# include sam21 common periph drivers
+USEMODULE += sam21_common_periph
+
 # export the common include directory
 export INCLUDES += -I$(RIOTCPU)/sam21_common/include
