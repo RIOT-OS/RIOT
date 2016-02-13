@@ -47,8 +47,8 @@ volatile int sched_num_threads = 0;
 
 volatile unsigned int sched_context_switch_request;
 
-volatile tcb_t  *sched_threads[KERNEL_PID_LAST + 1];
-volatile tcb_t  *sched_active_thread;
+volatile tcb_t *sched_threads[KERNEL_PID_LAST + 1];
+volatile tcb_t *sched_active_thread;
 
 volatile kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
 
@@ -183,7 +183,7 @@ NORETURN void sched_task_exit(void)
 {
     DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n", sched_active_thread->pid);
 
-    (void)disableIRQ();
+    disableIRQ();
     sched_threads[sched_active_pid] = NULL;
     sched_num_threads--;
 

@@ -82,15 +82,15 @@ static void *idle_thread(void *arg)
     return NULL;
 }
 
-const char  *main_name  = "main";
-const char  *idle_name  = "idle";
+const char *main_name = "main";
+const char *idle_name = "idle";
 
 static char main_stack[THREAD_STACKSIZE_MAIN];
 static char idle_stack[THREAD_STACKSIZE_IDLE];
 
 void kernel_init(void)
 {
-    (void)disableIRQ();
+    disableIRQ();
 
     thread_create(idle_stack, sizeof(idle_stack),
                   THREAD_PRIORITY_IDLE,

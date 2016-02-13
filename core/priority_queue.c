@@ -32,8 +32,8 @@ void priority_queue_remove(priority_queue_t *root_, priority_queue_node_t *node)
 
     while (root->next != NULL) {
         if (root->next == node) {
-            root->next  = node->next;
-            node->next  = NULL;
+            root->next = node->next;
+            node->next = NULL;
             return;
         }
 

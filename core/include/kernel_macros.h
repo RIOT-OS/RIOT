@@ -54,7 +54,7 @@ extern "C" {
                    }))
 #else
 #   define container_of(PTR, TYPE, MEMBER) \
-    ((TYPE *)((char *)(PTR)-offsetof(TYPE, MEMBER)))
+        ((TYPE *)((char *)(PTR) - offsetof(TYPE, MEMBER)))
 #endif
 
 #ifdef __cplusplus
