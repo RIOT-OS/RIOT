@@ -32,7 +32,7 @@
 /**
  * @brief   Allocate memory for one callback and argument per EXTI channel
  */
-static gpio_isr_ctx_t gpio_config[EXTI_NUMOF];
+static gpio_isr_ctx_t isr_ctx[EXTI_NUMOF];
 
 /**
  * @brief   Extract the port base address from the given pin identifier
@@ -91,8 +91,8 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     int port_num = _port_num(pin);
 
     /* set callback */
-    gpio_config[pin_num].cb = cb;
-    gpio_config[pin_num].arg = arg;
+    isr_ctx[pin_num].cb = cb;
+    isr_ctx[pin_num].arg = arg;
 
     /* enable clock of the SYSCFG module for EXTI configuration */
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGCOMPEN;
@@ -152,13 +152,11 @@ void gpio_irq_disable(gpio_t pin)
 
 int gpio_read(gpio_t pin)
 {
-    GPIO_TypeDef *port = _port(pin);
-    uint32_t pin_num = _pin_num(pin);
-
-    if (port->MODER & (1 << (pin_num * 2))) {   /* if configured as output */
-        return port->ODR & (1 << pin_num);      /* read output data reg */
-    } else {
-        return port->IDR & (1 << pin_num);      /* else read input data reg */
+    if (_port(pin)->MODER & (0x3 << (_pin_num(pin) * 2))) {
+        return _port(pin)->ODR & (1 << _pin_num(pin));
+    }
+    else {
+        return _port(pin)->IDR & (1 << _pin_num(pin));
     }
 }
 
@@ -169,24 +167,24 @@ void gpio_set(gpio_t pin)
 
 void gpio_clear(gpio_t pin)
 {
-    _port(pin)->BSRR = ((1 << _pin_num(pin)) << 16);
+    _port(pin)->BRR = (1 << _pin_num(pin));
 }
 
 void gpio_toggle(gpio_t pin)
 {
     if (gpio_read(pin)) {
-    _port(pin)->BSRR = ((1 << _pin_num(pin))<< 16);
+        _port(pin)->BRR = (1 << _pin_num(pin));
     } else {
-    _port(pin)->BSRR = (1 << _pin_num(pin));
+        _port(pin)->BSRR = (1 << _pin_num(pin));
     }
 }
 
 void gpio_write(gpio_t pin, int value)
 {
     if (value) {
-    _port(pin)->BSRR = (1 << _pin_num(pin));
+        _port(pin)->BSRR = (1 << _pin_num(pin));
     } else {
-    _port(pin)->BSRR = ((1 << _pin_num(pin)) << 16);
+        _port(pin)->BRR = (1 << _pin_num(pin));
     }
 }
 
@@ -195,7 +193,7 @@ void isr_exti(void)
     for (size_t i = 0; i < EXTI_NUMOF; i++) {
         if (EXTI->PR & (1 << i)) {
             EXTI->PR = (1 << i);        /* clear by writing a 1 */
-            gpio_config[i].cb(gpio_config[i].arg);
+            isr_ctx[i].cb(isr_ctx[i].arg);
         }
     }
     if (sched_context_switch_request) {
