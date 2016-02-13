@@ -1,15 +1,15 @@
-From 60ac2261d89d1a483bef4676c1e9b16fec8830d1 Mon Sep 17 00:00:00 2001
+From 2ab8fb085a02fec23ca817bd6de8848df160970b Mon Sep 17 00:00:00 2001
 From: Frank Holtz <frank-riot2015@holtznet.de>
 Date: Sat, 17 Jan 2015 18:41:14 +0100
 Subject: [PATCH 2/2] Include RIOT Hardware RNG interface
 
 ---
- uECC.c | 99 +++++++++++-------------------------------------------------------
- uECC.h | 28 +------------------
- 2 files changed, 17 insertions(+), 110 deletions(-)
+ uECC.c | 93 +++++++-----------------------------------------------------------
+ uECC.h | 28 +-------------------
+ 2 files changed, 11 insertions(+), 110 deletions(-)
 
 diff --git a/uECC.c b/uECC.c
-index aded242..5fe3389 100644
+index aded242..8b355a4 100644
 --- a/uECC.c
 +++ b/uECC.c
 @@ -322,85 +322,6 @@ static void vli_square(uECC_word_t *p_result, uECC_word_t *p_left);
@@ -98,86 +98,67 @@ index aded242..5fe3389 100644
  #ifdef __GNUC__ /* Only support GCC inline asm for now */
      #if (uECC_ASM && (uECC_PLATFORM == uECC_avr))
          #include "asm_avr.inc"
-@@ -1779,11 +1700,15 @@ int uECC_make_key(uint8_t p_publicKey[uECC_BYTES*2], uint8_t p_privateKey[uECC_B
-     uECC_word_t l_private[uECC_WORDS];
-     uECC_word_t l_tries = 0;
-     
-+    /* power on rng */
-+    random_poweron();
-+    
+@@ -1782,10 +1703,13 @@ int uECC_make_key(uint8_t p_publicKey[uECC_BYTES*2], uint8_t p_privateKey[uECC_B
      do
      {
      repeat:
 -        if(!g_rng((uint8_t *)l_private, sizeof(l_private)) || (l_tries++ >= MAX_TRIES))
-+        if(random_read((char *)l_private, sizeof(l_private))!=sizeof(l_private) || (l_tries++ >= MAX_TRIES))
++        if(l_tries++ >= MAX_TRIES)
          {
-+           random_poweroff();
              return 0;
          }
++
++        hwrng_read((uint8_t *)l_private, sizeof(l_private));
++
          if(vli_isZero(l_private))
-@@ -1805,6 +1730,7 @@ int uECC_make_key(uint8_t p_publicKey[uECC_BYTES*2], uint8_t p_privateKey[uECC_B
-     vli_nativeToBytes(p_privateKey, l_private);
-     vli_nativeToBytes(p_publicKey, l_public.x);
-     vli_nativeToBytes(p_publicKey + uECC_BYTES, l_public.y);
-+    random_poweroff();
-     return 1;
- }
- 
-@@ -1814,7 +1740,9 @@ int uECC_shared_secret(const uint8_t p_publicKey[uECC_BYTES*2], const uint8_t p_
+         {
+             goto repeat;
+@@ -1814,7 +1738,7 @@ int uECC_shared_secret(const uint8_t p_publicKey[uECC_BYTES*2], const uint8_t p_
      uECC_word_t l_private[uECC_WORDS];
      uECC_word_t l_random[uECC_WORDS];
      
 -    g_rng((uint8_t *)l_random, sizeof(l_random));
-+    random_poweron();
-+    random_read((char *)l_random, sizeof(l_random));
-+    random_poweroff();
++    hwrng_read((uint8_t *)l_random, sizeof(l_random));
      
      vli_bytesToNative(l_private, p_privateKey);
      vli_bytesToNative(l_public.x, p_publicKey);
-@@ -2152,11 +2080,14 @@ int uECC_sign(const uint8_t p_privateKey[uECC_BYTES], const uint8_t p_hash[uECC_
-     EccPoint p;
-     uECC_word_t l_tries = 0;
-     
-+    random_poweron();
-+    
+@@ -2155,11 +2079,13 @@ int uECC_sign(const uint8_t p_privateKey[uECC_BYTES], const uint8_t p_hash[uECC_
      do
      {
      repeat:
 -        if(!g_rng((uint8_t *)k, sizeof(k)) || (l_tries++ >= MAX_TRIES))
-+        if(random_read((char *)k, sizeof(k))!=sizeof(k) || (l_tries++ >= MAX_TRIES))
++        if(l_tries++ >= MAX_TRIES)
          {
-+            random_poweroff();
              return 0;
          }
          
-@@ -2203,8 +2134,9 @@ int uECC_sign(const uint8_t p_privateKey[uECC_BYTES], const uint8_t p_hash[uECC_
++        hwrng_read((uint8_t *)k, sizeof(k));
++
+         if(vli_isZero(k))
+         {
+             goto repeat;
+@@ -2203,10 +2129,11 @@ int uECC_sign(const uint8_t p_privateKey[uECC_BYTES], const uint8_t p_hash[uECC_
      l_tries = 0;
      do
      {
 -        if(!g_rng((uint8_t *)l_tmp, sizeof(l_tmp)) || (l_tries++ >= MAX_TRIES))
-+        if(random_read((char *)l_tmp, sizeof(l_tmp))!=sizeof(l_tmp) || (l_tries++ >= MAX_TRIES))
++        if(l_tries++ >= MAX_TRIES)
          {
-+            random_poweroff();
              return 0;
          }
++        hwrng_read((uint8_t *)l_tmp, sizeof(l_tmp));
      } while(vli_isZero(l_tmp));
-@@ -2234,6 +2166,7 @@ int uECC_sign(const uint8_t p_privateKey[uECC_BYTES], const uint8_t p_hash[uECC_
- #endif
-     vli_nativeToBytes(p_signature + uECC_BYTES, s);
      
-+    random_poweroff();
-     return 1;
- }
- 
+     /* Prevent side channel analysis of vli_modInv() to determine
 diff --git a/uECC.h b/uECC.h
-index 2c9927b..27a2e47 100644
+index 2c9927b..02e2f22 100644
 --- a/uECC.h
 +++ b/uECC.h
 @@ -4,6 +4,7 @@
  #define _MICRO_ECC_H_
  
  #include <stdint.h>
-+#include "periph/random.h"
++#include "periph/hwrng.h"
  
  /* Platform selection options.
  If uECC_PLATFORM is not defined, the code will try to guess it based on compiler macros.
@@ -216,5 +197,5 @@ index 2c9927b..27a2e47 100644
  Create a public/private key pair.
      
 -- 
-1.8.3.1
+2.7.1
 

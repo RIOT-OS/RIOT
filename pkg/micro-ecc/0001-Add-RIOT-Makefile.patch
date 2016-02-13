@@ -1,4 +1,4 @@
-From d6c1cb4244c72a8fa7d5a8550c8193700cd0de03 Mon Sep 17 00:00:00 2001
+From 146edb3bb6d23c8d3571bac0b12fd4d1ddc16639 Mon Sep 17 00:00:00 2001
 From: Frank Holtz <frank-riot2015@holtznet.de>
 Date: Sat, 27 Dec 2014 19:57:01 +0100
 Subject: [PATCH 1/2] Add RIOT Makefile
@@ -19,5 +19,4 @@ index 0000000..33c8152
 +
 +include $(RIOTBASE)/Makefile.base
 -- 
-1.8.3.1
-
+2.7.1
