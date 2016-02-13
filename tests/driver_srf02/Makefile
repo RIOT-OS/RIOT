@@ -5,6 +5,7 @@ FEATURES_REQUIRED = periph_i2c
 
 USEMODULE += xtimer
 USEMODULE += srf02
+USEMODULE += shell
 
 # set default device parameters in case they are undefined
 TEST_SRF02_I2C ?= I2C_0
