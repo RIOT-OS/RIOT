@@ -64,7 +64,7 @@ static NRF_TIMER_Type *const timer[] = {
 #endif
 };
 
-int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     if (dev >= TIMER_NUMOF) {
         return -1;
@@ -106,27 +106,31 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     timer[dev]->MODE = TIMER_MODE_MODE_Timer;        /* set the timer in Timer Mode. */
     timer[dev]->TASKS_CLEAR    = 1;                  /* clear the task first to be usable for later. */
 
-    switch (ticks_per_us) {
-        case 1:
-            timer[dev]->PRESCALER = 4;
-            break;
-
-        case 2:
-            timer[dev]->PRESCALER = 5;
-            break;
-
-        case 4:
-            timer[dev]->PRESCALER = 6;
-            break;
-
-        case 8:
+    switch (freq) {
+        case 125000ul:
             timer[dev]->PRESCALER = 7;
             break;
-
-        case 16:
-            timer[dev]->PRESCALER = 8;
+        case 250000ul:
+            timer[dev]->PRESCALER = 6;
             break;
-
+        case 500000ul:
+            timer[dev]->PRESCALER = 5;
+            break;
+        case 1000000ul:
+            timer[dev]->PRESCALER = 4;
+            break;
+        case 2000000ul:
+            timer[dev]->PRESCALER = 3;
+            break;
+        case 4000000ul:
+            timer[dev]->PRESCALER = 2;
+            break;
+        case 8000000ul:
+            timer[dev]->PRESCALER = 1;
+            break;
+        case 16000000ul:
+            timer[dev]->PRESCALER = 0;
+            break;
         default:
             return -1;
     }
