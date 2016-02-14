@@ -103,11 +103,7 @@ static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
             return 2;
         case NETOPT_PROTO:
             assert(value_len == sizeof(gnrc_nettype_t));
-#ifdef MODULE_GNRC_SIXLOWPAN
-            *((gnrc_nettype_t*)value) = GNRC_NETTYPE_SIXLOWPAN;
-#else
-            *((gnrc_nettype_t*)value) = GNRC_NETTYPE_UNDEF;
-#endif
+            *((gnrc_nettype_t *)value) = cc110x->proto;
             return sizeof(gnrc_nettype_t);
         case NETOPT_CHANNEL:
             assert(value_len > 1);
@@ -155,6 +151,15 @@ static int _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
                 return -EINVAL;
             }
             return 1;
+        case NETOPT_PROTO:
+            if (value_len != sizeof(gnrc_nettype_t)) {
+                return -EINVAL;
+            }
+            else {
+                cc110x->proto = (gnrc_nettype_t) value;
+                return sizeof(gnrc_nettype_t);
+            }
+            break;
         default:
             return -ENOTSUP;
     }
@@ -213,6 +218,15 @@ int netdev2_cc110x_setup(netdev2_cc110x_t *netdev2_cc110x, const cc110x_params_t
 {
     DEBUG("netdev2_cc110x_setup()\n");
     netdev2_cc110x->netdev.driver = &netdev2_cc110x_driver;
+
+    /* set default protocol */
+#ifdef MODULE_GNRC_NETIF
+# ifdef MODULE_GNRC_SIXLOWPAN
+    netdev2_cc110x->cc110x.proto = GNRC_NETTYPE_SIXLOWPAN;
+# else
+    netdev2_cc110x->cc110x.proto = GNRC_NETTYPE_UNDEF;
+# endif
+#endif
 
     return cc110x_setup(&netdev2_cc110x->cc110x, params);
 }
