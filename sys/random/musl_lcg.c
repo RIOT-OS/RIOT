@@ -33,12 +33,12 @@
 
 static uint64_t _seed;
 
-void genrand_init(uint32_t s)
+void random_init(uint32_t s)
 {
     _seed = s-1;
 }
 
-uint32_t genrand_uint32(void)
+uint32_t random_uint32(void)
 {
     _seed = 6364136223846793005ULL*_seed + 1;
     return _seed>>32;

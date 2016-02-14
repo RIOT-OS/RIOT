@@ -59,9 +59,9 @@ void ethos_setup(ethos_t *dev, uart_t uart, uint32_t baudrate, uint8_t *buf, siz
     tsrb_init(&dev->inbuf, (char*)buf, bufsize);
     mutex_init(&dev->out_mutex);
 
-    uint32_t a = genrand_uint32();
+    uint32_t a = random_uint32();
     memcpy(dev->mac_addr, (char*)&a, 4);
-    a = genrand_uint32();
+    a = random_uint32();
     memcpy(dev->mac_addr+4, (char*)&a, 2);
 
     dev->mac_addr[0] &= (0x2);      /* unset globally unique bit */

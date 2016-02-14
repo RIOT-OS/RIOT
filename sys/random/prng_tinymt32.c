@@ -25,12 +25,12 @@
 
 static tinymt32_t _random;
 
-void genrand_init(uint32_t seed)
+void random_init(uint32_t seed)
 {
     tinymt32_init(&_random, seed);
 }
 
-uint32_t genrand_uint32(void)
+uint32_t random_uint32(void)
 {
     return tinymt32_generate_uint32(&_random);
 }

@@ -52,7 +52,7 @@ hashfp_t hashes[BLOOM_HASHF] = {
 static void buf_fill(uint32_t *buf, int len)
 {
     for (int k = 0; k < len; k++) {
-        buf[k] = genrand_uint32();
+        buf[k] = random_uint32();
     }
 }
 
@@ -66,7 +66,7 @@ int main(void)
     printf("m: %" PRIu32 " k: %" PRIu32 "\n\n", (uint32_t) bloom.m,
            (uint32_t) bloom.k);
 
-    genrand_init(myseed);
+    random_init(myseed);
 
     unsigned long t1 = xtimer_now();
 

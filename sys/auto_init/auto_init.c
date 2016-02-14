@@ -95,7 +95,7 @@ void auto_init(void)
 #endif
 
 #ifdef MODULE_TINYMT32
-    genrand_init(0);
+    random_init(0);
 #endif
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
