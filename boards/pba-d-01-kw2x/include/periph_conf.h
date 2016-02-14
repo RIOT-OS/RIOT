@@ -96,11 +96,10 @@ extern "C"
 #define UART_0_IRQ_CHAN     UART2_RX_TX_IRQn
 #define UART_0_ISR          isr_uart2_rx_tx
 /* UART 0 pin configuration */
-#define UART_0_PORT_CLKEN() (SIM->SCGC5 |= (SIM_SCGC5_PORTD_MASK))
-#define UART_0_PORT         PORTD
-#define UART_0_RX_PIN       2
-#define UART_0_TX_PIN       3
-#define UART_0_AF           3
+#define UART_0_RX_GPIO      GPIO_PIN(PORT_D, 2)
+#define UART_0_RX_AF        GPIO_AF_3
+#define UART_0_TX_GPIO      GPIO_PIN(PORT_D, 3)
+#define UART_0_TX_AF        GPIO_AF_3
 
 /* UART 1 device configuration */
 #define UART_1_DEV          UART0
@@ -109,11 +108,10 @@ extern "C"
 #define UART_1_IRQ_CHAN     UART0_RX_TX_IRQn
 #define UART_1_ISR          isr_uart0_rx_tx
 /* UART 1 pin configuration */
-#define UART_1_PORT_CLKEN() (SIM->SCGC5 |= (SIM_SCGC5_PORTD_MASK))
-#define UART_1_PORT         PORTD
-#define UART_1_RX_PIN       6
-#define UART_1_TX_PIN       7
-#define UART_1_AF           3
+#define UART_1_RX_GPIO      GPIO_PIN(PORT_D, 6)
+#define UART_1_RX_AF        GPIO_AF_3
+#define UART_1_TX_GPIO      GPIO_PIN(PORT_D, 7)
+#define UART_1_TX_AF        GPIO_AF_3
 /** @} */
 
 /**

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
  * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2016 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -17,6 +18,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Johann Fischer <j.fischer@phytec.de>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */
@@ -98,24 +100,17 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 static int init_base(uart_t uart, uint32_t baudrate)
 {
     KINETIS_UART *dev;
-    PORT_Type *port;
     uint32_t clk;
     uint16_t ubd;
-    uint8_t tx_pin = 0;
-    uint8_t rx_pin = 0;
-    uint8_t af;
 
     switch (uart) {
 #if UART_0_EN
 
         case UART_0:
             dev = UART_0_DEV;
-            port = UART_0_PORT;
+            gpio_init_port(UART_0_TX_GPIO, UART_0_TX_AF);
+            gpio_init_port(UART_0_RX_GPIO, UART_0_RX_AF);
             clk = UART_0_CLK;
-            tx_pin = UART_0_TX_PIN;
-            rx_pin = UART_0_RX_PIN;
-            af = UART_0_AF;
-            UART_0_PORT_CLKEN();
             UART_0_CLKEN();
             break;
 #endif
@@ -123,12 +118,9 @@ static int init_base(uart_t uart, uint32_t baudrate)
 
         case UART_1:
             dev = UART_1_DEV;
-            port = UART_1_PORT;
+            gpio_init_port(UART_1_TX_GPIO, UART_1_TX_AF);
+            gpio_init_port(UART_1_RX_GPIO, UART_1_RX_AF);
             clk = UART_1_CLK;
-            tx_pin = UART_1_TX_PIN;
-            rx_pin = UART_1_RX_PIN;
-            af = UART_1_AF;
-            UART_1_PORT_CLKEN();
             UART_1_CLKEN();
             break;
 #endif
@@ -136,10 +128,6 @@ static int init_base(uart_t uart, uint32_t baudrate)
         default:
             return -1;
     }
-
-    /* configure RX and TX pins, set pin to use alternative function mode */
-    port->PCR[rx_pin] = PORT_PCR_MUX(af);
-    port->PCR[tx_pin] = PORT_PCR_MUX(af);
 
     /* disable transmitter and receiver */
     dev->C2 &= ~(UART_C2_TE_MASK | UART_C2_RE_MASK);

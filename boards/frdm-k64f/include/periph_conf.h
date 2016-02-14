@@ -92,11 +92,10 @@ extern "C"
 #define UART_0_IRQ_CHAN              UART0_RX_TX_IRQn
 #define UART_0_ISR                   isr_uart0_rx_tx
 /* UART 0 pin configuration */
-#define UART_0_PORT_CLKEN()          (SIM->SCGC5 |= (SIM_SCGC5_PORTB_MASK))
-#define UART_0_PORT                  PORTB
-#define UART_0_RX_PIN                16
-#define UART_0_TX_PIN                17
-#define UART_0_AF                    3
+#define UART_0_RX_GPIO               GPIO_PIN(PORT_B, 16)
+#define UART_0_RX_AF                 GPIO_AF_3
+#define UART_0_TX_GPIO               GPIO_PIN(PORT_B, 17)
+#define UART_0_TX_AF                 GPIO_AF_3
 /** @} */
 
 /**

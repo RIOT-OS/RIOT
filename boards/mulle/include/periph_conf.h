@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2015 Eistec AB
+ * Copyright (C) 2015-2016 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
  * details.
  */
-
 
 /**
  * @ingroup     board_mulle
@@ -84,7 +83,6 @@ extern "C"
 
 /** @} */
 
-
 /**
  * @name UART configuration
  * @{
@@ -105,15 +103,10 @@ extern "C"
 #define UART_0_IRQ_CHAN     UART1_RX_TX_IRQn
 #define UART_0_ISR          isr_uart1_status
 /* UART 0 pin configuration */
-#define UART_0_PORT_CLKEN() (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTC_SHIFT) = 1)
-#define UART_0_PORT         PORTC
-#define UART_0_TX_PIN       4
-#define UART_0_RX_PIN       3
-/* Function number in pin multiplex, see K60 Sub-Family Reference Manual,
- * section 10.3.1 K60 Signal Multiplexing and Pin Assignments */
-#define UART_0_AF           3
-#define UART_0_TX_PCR_MUX   3
-#define UART_0_RX_PCR_MUX   3
+#define UART_0_TX_GPIO      GPIO_PIN(PORT_C, 4)
+#define UART_0_TX_AF        GPIO_AF_3
+#define UART_0_RX_GPIO      GPIO_PIN(PORT_C, 3)
+#define UART_0_RX_AF        GPIO_AF_3
 
 /* UART 1 device configuration */
 #define UART_1_DEV          UART0
@@ -123,15 +116,10 @@ extern "C"
 #define UART_1_IRQ_CHAN     UART0_RX_TX_IRQn
 #define UART_1_ISR          isr_uart0_status
 /* UART 1 pin configuration */
-#define UART_1_PORT_CLKEN() (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTA_SHIFT) = 1)
-#define UART_1_PORT         PORTA
-#define UART_1_TX_PIN       14
-#define UART_1_RX_PIN       15
-/* Function number in pin multiplex, see K60 Sub-Family Reference Manual,
- * section 10.3.1 K60 Signal Multiplexing and Pin Assignments */
-#define UART_1_AF           3
-#define UART_1_TX_PCR_MUX   3
-#define UART_1_RX_PCR_MUX   3
+#define UART_1_TX_GPIO      GPIO_PIN(PORT_A, 14)
+#define UART_1_TX_AF        GPIO_AF_3
+#define UART_1_RX_GPIO      GPIO_PIN(PORT_A, 15)
+#define UART_1_RX_AF        GPIO_AF_3
 
 /** @} */
 
@@ -364,7 +352,6 @@ static const adc_conf_t adc_config[] = {
 
 /** @} */
 
-
 /**
  * @name I2C configuration
  * @{
@@ -414,7 +401,6 @@ static const adc_conf_t adc_config[] = {
  */
 #define GPIO_IRQ_PRIO       CPU_DEFAULT_IRQ_PRIO
 /** @} */
-
 
 /**
  * @name RTC configuration
