@@ -897,6 +897,14 @@ void gnrc_ipv6_netif_init_by_dev(void)
     }
 }
 
+#ifdef MODULE_NETSTATS_IPV6
+netstats_t *gnrc_ipv6_netif_get_stats(kernel_pid_t pid)
+{
+    gnrc_ipv6_netif_t *iface = gnrc_ipv6_netif_get(pid);
+    return &(iface->stats);
+}
+#endif
+
 /**
  * @}
  */
