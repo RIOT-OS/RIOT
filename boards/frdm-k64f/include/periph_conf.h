@@ -160,28 +160,22 @@ extern "C"
 #define PWM_0_CLK                    CLOCK_CORECLOCK
 #define PWM_0_CLKEN()                (SIM->SCGC6 |= (SIM_SCGC6_FTM0_MASK))
 #define PWM_0_CLKDIS()               (SIM->SCGC6 &= ~(SIM_SCGC6_FTM0_MASK))
-/* PWM 0 pin configuration */
-#define PWM_0_PORT_CLKEN()           (SIM->SCGC5 |= (SIM_SCGC5_PORTA_MASK | SIM_SCGC5_PORTC_MASK))
 /* Arduino Connector D3 */
-#define PWM_0_PORT_CH0               PORTA
-#define PWM_0_PIN_CH0                1
-#define PWM_0_FTMCHAN_CH0            6
-#define PWM_0_PIN_AF_CH0             3
+#define PWM_0_CH0_GPIO               GPIO_PIN(PORT_A, 1)
+#define PWM_0_CH0_FTMCHAN            6
+#define PWM_0_CH0_AF                 3
 /* Arduino Connector D5 */
-#define PWM_0_PORT_CH1               PORTA
-#define PWM_0_PIN_CH1                2
-#define PWM_0_FTMCHAN_CH1            7
-#define PWM_0_PIN_AF_CH1             3
+#define PWM_0_CH1_GPIO               GPIO_PIN(PORT_A, 2)
+#define PWM_0_CH1_FTMCHAN            7
+#define PWM_0_CH1_AF                 3
 /* Arduino Connector D6 */
-#define PWM_0_PORT_CH2               PORTC
-#define PWM_0_PIN_CH2                2
-#define PWM_0_FTMCHAN_CH2            1
-#define PWM_0_PIN_AF_CH2             4
+#define PWM_0_CH2_GPIO               GPIO_PIN(PORT_C, 2)
+#define PWM_0_CH2_FTMCHAN            1
+#define PWM_0_CH2_AF                 4
 /* Arduino Connector D7 */
-#define PWM_0_PORT_CH3               PORTC
-#define PWM_0_PIN_CH3                3
-#define PWM_0_FTMCHAN_CH3            2
-#define PWM_0_PIN_AF_CH3             4
+#define PWM_0_CH3_GPIO               GPIO_PIN(PORT_C, 3)
+#define PWM_0_CH3_FTMCHAN            2
+#define PWM_0_CH3_AF                 4
 /** @} */
 
 
