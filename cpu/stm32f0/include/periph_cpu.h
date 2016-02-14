@@ -42,14 +42,13 @@ typedef uint32_t gpio_t;
 /**
  * @brief   Define a CPU specific GPIO pin generator macro
  */
-#define GPIO_PIN(x, y)          ((GPIOA_BASE + (x << 10)) | y)
+#define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
 
 /**
  * @brief   Override flank configuration values
  * @{
  */
-#define HAVE_GPIO_FLANK_T\
-
+#define HAVE_GPIO_FLANK_T
 typedef enum {
     GPIO_RISING = 1,        /**< emit interrupt on rising flank */
     GPIO_FALLING = 2,       /**< emit interrupt on falling flank */
@@ -76,10 +75,6 @@ typedef enum {
     GPIO_AF1,               /**< use alternate function 1 */
     GPIO_AF2,               /**< use alternate function 2 */
     GPIO_AF3,               /**< use alternate function 3 */
-    GPIO_AF4,               /**< use alternate function 4 */
-    GPIO_AF5,               /**< use alternate function 5 */
-    GPIO_AF6,               /**< use alternate function 6 */
-    GPIO_AF7,               /**< use alternate function 7 */
 } gpio_af_t;
 
 /**
@@ -91,6 +86,13 @@ typedef enum {
  * @param[in] af        alternate function to use
  */
 void gpio_init_af(gpio_t pin, gpio_af_t af);
+
+/**
+ * @brief   Configure the given pin to be used as ADC input
+ *
+ * @param[in] pin       pin to configure
+ */
+void gpio_init_analog(gpio_t pin);
 
 #ifdef __cplusplus
 }
