@@ -120,7 +120,6 @@ static const uart_conf_t uart_config[] = {
  * @name PWM configuration
  * @{
  */
-#define PWM_NUMOF           (PWM_0_EN + PWM_1_EN)
 #define PWM_0_EN            1
 #define PWM_1_EN            1
 #define PWM_MAX_CHANNELS    2
@@ -129,7 +128,6 @@ static const uart_conf_t uart_config[] = {
 #define PWM_1_CHANNELS      PWM_MAX_CHANNELS
 
 /* PWM device configuration */
-#if PWM_NUMOF
 static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN
     {TCC1, {
@@ -146,7 +144,9 @@ static const pwm_conf_t pwm_config[] = {
     }},
 #endif
 };
-#endif
+
+/* number of devices that are actually defined */
+#define PWM_NUMOF           (2U)
 /** @} */
 
 /**

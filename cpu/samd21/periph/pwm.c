@@ -30,9 +30,6 @@
 #include "periph/pwm.h"
 
 
-/* ignore file in case no PWM devices are defined */
-#if PWM_NUMOF
-
 static inline int _num(pwm_t dev)
 {
     return ((int)(pwm_config[dev].dev) & 0xc00) >> 10;
@@ -90,23 +87,22 @@ static uint8_t get_prescaler(unsigned int target, int *scale)
     return target - 1;
 }
 
-int pwm_init(pwm_t dev, pwm_mode_t mode,
-             unsigned int frequency, unsigned int resolution)
+uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     uint8_t prescaler;
     int scale = 1;
-    int f_real;
+    uint32_t f_real;
 
     if (dev >= PWM_NUMOF) {
-        return -1;
+        return 0;
     }
 
     /* calculate the closest possible clock presacler */
-    prescaler = get_prescaler(CLOCK_CORECLOCK / (frequency * resolution), &scale);
+    prescaler = get_prescaler(CLOCK_CORECLOCK / (freq * res), &scale);
     if (prescaler == 0xff) {
-        return -2;
+        return 0;
     }
-    f_real = (CLOCK_CORECLOCK / (scale * resolution));
+    f_real = (CLOCK_CORECLOCK / (scale * res));
 
     /* configure the used pins */
     for (int i = 0; i < PWM_MAX_CHANNELS; i++) {
@@ -130,7 +126,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode,
             break;
         case PWM_CENTER:        /* currently not supported */
         default:
-            return -1;
+            return 0;
     }
     while (_tcc(dev)->SYNCBUSY.reg & TCC_SYNCBUSY_CTRLB);
 
@@ -141,7 +137,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode,
     _tcc(dev)->WAVE.reg = (TCC_WAVE_WAVEGEN_NPWM);
     while (_tcc(dev)->SYNCBUSY.reg & TCC_SYNCBUSY_WAVE);
     /* set the selected period */
-    _tcc(dev)->PER.reg = (resolution - 1);
+    _tcc(dev)->PER.reg = (res - 1);
     while (_tcc(dev)->SYNCBUSY.reg & TCC_SYNCBUSY_PER);
     /* start PWM operation */
     pwm_start(dev);
@@ -149,14 +145,18 @@ int pwm_init(pwm_t dev, pwm_mode_t mode,
     return f_real;
 }
 
-int pwm_set(pwm_t dev, int channel, unsigned int value)
+uint8_t pwm_channels(pwm_t dev)
+{
+    return sizeof(pwm_config[dev].chan) / sizeof(pwm_config[dev].chan[0]);
+}
+
+void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 {
     if (channel >= PWM_MAX_CHANNELS) {
-        return -1;
+        return;
     }
     _tcc(dev)->CC[_chan(dev, channel)].reg = value;
     while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CC0 << _chan(dev, channel)));
-    return 0;
 }
 
 void pwm_start(pwm_t dev)
@@ -193,5 +193,3 @@ void pwm_poweroff(pwm_t dev)
                          GCLK_CLKCTRL_ID(_clk_id(dev)));
     while (GCLK->STATUS.bit.SYNCBUSY);
 }
-
-#endif /* PWM_NUMOF */
