@@ -281,47 +281,47 @@ static inline uint64_t NTOHLL(uint64_t v);
  * @brief   Compile time byte-order swapping for short constants
  */
 #define CONST_HTONS(x)       ((uint16_t)                         \
-                             (((uint16_t)x >> 8) & 0x00FF)     | \
-                             (((uint16_t)x << 8) & 0xFF00))
+                             (((uint16_t)(x) >> 8) & 0x00FF)   | \
+                             (((uint16_t)(x) << 8) & 0xFF00))
 
 /**
  * @brief   Compile time byte-order swapping for integers constants
  */
-#define CONST_HTONL(x)       ((uint32_t)                            \
-                             (((uint32_t)x >> 24) & 0x000000FF)   | \
-                             (((uint32_t)x >> 8)  & 0x0000FF00)   | \
-                             (((uint32_t)x << 8)  & 0x00FF0000)   | \
-                             (((uint32_t)x << 24) & 0xFF000000))
+#define CONST_HTONL(x)       ((uint32_t)                              \
+                             (((uint32_t)(x) >> 24) & 0x000000FF)   | \
+                             (((uint32_t)(x) >> 8)  & 0x0000FF00)   | \
+                             (((uint32_t)(x) << 8)  & 0x00FF0000)   | \
+                             (((uint32_t)(x) << 24) & 0xFF000000))
 
 /**
  * @brief   Compile time byte-order swapping for long constants
  */
-#define CONST_HTONLL(x)      ((uint64_t)                                  \
-                             (((uint64_t)x >> 56) & 0x00000000000000FF) | \
-                             (((uint64_t)x >> 40) & 0x000000000000FF00) | \
-                             (((uint64_t)x >> 24) & 0x0000000000FF0000) | \
-                             (((uint64_t)x >> 8)  & 0x00000000FF000000) | \
-                             (((uint64_t)x << 8)  & 0x000000FF00000000) | \
-                             (((uint64_t)x << 24) & 0x0000FF0000000000) | \
-                             (((uint64_t)x << 40) & 0x00FF000000000000) | \
-                             (((uint64_t)x << 56) & 0xFF00000000000000))
+#define CONST_HTONLL(x)      ((uint64_t)                                    \
+                             (((uint64_t)(x) >> 56) & 0x00000000000000FF) | \
+                             (((uint64_t)(x) >> 40) & 0x000000000000FF00) | \
+                             (((uint64_t)(x) >> 24) & 0x0000000000FF0000) | \
+                             (((uint64_t)(x) >> 8)  & 0x00000000FF000000) | \
+                             (((uint64_t)(x) << 8)  & 0x000000FF00000000) | \
+                             (((uint64_t)(x) << 24) & 0x0000FF0000000000) | \
+                             (((uint64_t)(x) << 40) & 0x00FF000000000000) | \
+                             (((uint64_t)(x) << 56) & 0xFF00000000000000))
 
 #else
 
 /**
  * @brief   Compile time byte-order swapping for short constants
  */
-#define CONST_HTONS(x)       ((uint16_t)x)
+#define CONST_HTONS(x)       ((uint16_t)(x))
 
 /**
  * @brief   Compile time byte-order swapping for integers constants
  */
-#define CONST_HTONL(x)       ((uint32_t)x)
+#define CONST_HTONL(x)       ((uint32_t)(x))
 
 /**
  * @brief   Compile time byte-order swapping for integers constants
  */
-#define CONST_HTONLL(x)      ((uint64_t)x)
+#define CONST_HTONLL(x)      ((uint64_t)(x))
 
 #endif
 
