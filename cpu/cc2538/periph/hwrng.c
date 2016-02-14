@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Loci Controls Inc.
+ *               2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,27 +8,22 @@
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     cpu_cc2538
  * @{
  *
  * @file
- * @brief       Low-level random number generator driver implementation
+ * @brief       HWRNG peripheral driver interface implementation
  *
  * @author      Ian Martin <ian@locicontrols.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
-#include <stdint.h>
-
 #include "cpu.h"
-#include "periph_conf.h"
-#include "periph/random.h"
+#include "periph/hwrng.h"
 
-/* only compile this driver if enabled in the board's periph_conf.h */
-#if RANDOM_NUMOF
-
-void random_init(void)
+void hwrng_init(void)
 {
     uint16_t seed = 0;
     int i;
@@ -71,32 +67,18 @@ void random_init(void)
 
     /* Turn RF off: */
     RFCORE_SFR_RFST = ISRFOFF;
-
-    random_poweron();
 }
 
-int random_read(char *buf, unsigned int num)
+void hwrng_read(uint8_t *buf, unsigned int num)
 {
     unsigned count;
     for (count = 0; count < num; ) {
         /* Clock the RNG LSFR once: */
         SOC_ADC->cc2538_adc_adccon1.ADCCON1bits.RCTRL = 1;
 
-        /* Read up to 2 bytes of random data: */
+        /* Read up to 2 bytes of hwrng data: */
         buf[count++] = SOC_ADC_RNDL;
         if (count >= num) break;
         buf[count++] = SOC_ADC_RNDH;
     }
-
-    return count;
 }
-
-void random_poweron(void)
-{
-}
-
-void random_poweroff(void)
-{
-}
-
-#endif /* RANDOM_NUMOF */

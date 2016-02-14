@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Implementation of the random number generator interface
+ * @brief       Implementation of the hardware random number generator interface
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Jan Wagner <mail@jwagner.eu>
@@ -21,15 +21,14 @@
  */
 
 #include "cpu.h"
-#include "periph_conf.h"
-#include "periph/random.h"
+#include "periph/hwrng.h"
 
-void random_init(void)
+void hwrng_init(void)
 {
     /* nothing to do here */
 }
 
-int random_read(char *buf, unsigned int num)
+void hwrng_read(uint8_t *buf, unsigned int num)
 {
     unsigned int count = 0;
 
@@ -39,20 +38,8 @@ int random_read(char *buf, unsigned int num)
         while (NRF_RNG->EVENTS_VALRDY == 0);
 
         NRF_RNG->EVENTS_VALRDY = 0;
-        buf[count++] = (char)NRF_RNG->VALUE;
+        buf[count++] = (uint8_t)NRF_RNG->VALUE;
     }
 
     NRF_RNG->TASKS_STOP = 1;
-
-    return count;
-}
-
-void random_poweron(void)
-{
-    /* nothing to do here */
-}
-
-void random_poweroff(void)
-{
-    /* nothing to do here */
 }

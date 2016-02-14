@@ -209,13 +209,6 @@ static const pwm_conf_t pwm_config[] = {
 #define I2C_0_PINS          (PORT_PA16 | PORT_PA17)
 
 /**
- * @name Random Number Generator configuration
- * @{
- */
-#define RANDOM_NUMOF       (0U)
-/** @} */
-
-/**
  * @name RTC configuration
  * @{
  */

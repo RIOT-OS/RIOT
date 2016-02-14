@@ -22,19 +22,20 @@
 #include <string.h>
 
 #include "xtimer.h"
-#include "periph/random.h"
+#include "periph/hwrng.h"
 
 #define LIMIT       (20U)
 
 int main(void)
 {
-    char buf[LIMIT];
+    uint8_t buf[LIMIT];
 
-    puts("\nRandom number generator low-level driver test\n");
-    printf("This test will print from 1 to %i random bytes about every second\n\n", LIMIT);
+    puts("\nHWRNG peripheral driver test\n");
+    printf("This test will print from 1 to %i random bytes about every"
+           "second\n\n", LIMIT);
 
-    puts("Initializing Random Number Generator driver.\n");
-    random_init();
+    puts("Initializing the HWRNG driver.\n");
+    hwrng_init();
 
     while (1) {
         /* zero out buffer */
@@ -43,12 +44,7 @@ int main(void)
         /* create random numbers */
         for (unsigned i = 1; i <= LIMIT; i++) {
             printf("generating %u random byte(s)\n", i);
-            unsigned count = random_read(buf, i);
-
-            if (count != i) {
-                printf("Error generating random bytes, got %u instead of %u", count, i);
-                return 0;
-            }
+            hwrng_read(buf, i);
 
             printf("Got:");
             for (unsigned j = 0; j < i; j++) {

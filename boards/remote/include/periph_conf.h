@@ -99,13 +99,6 @@
 /** @} */
 
 /**
- * @name Random Number Generator configuration
- * @{
- */
-#define RANDOM_NUMOF        1
-/** @} */
-
-/**
  * @name GPIO configuration
  * @{
  */

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief       Low-level random number generator driver implementation.
+ * @brief       HWRNG interface implementation
  *
  * @author      Johann Fischer <j.fischer@phytec.de> (adaption for Freescale's RNGA)
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -22,20 +22,23 @@
  */
 
 #include "cpu.h"
-#include "periph/random.h"
+#include "periph/hwrng.h"
 #include "periph_conf.h"
 
-#if RANDOM_NUMOF
 #ifdef KINETIS_RNGA
 
-void random_init(void)
+void hwrng_init(void)
 {
-    random_poweron();
+    /* nothing to do here */
 }
 
-int random_read(char *buf, unsigned int num)
+void hwrng_read(uint8_t *buf, unsigned int num)
 {
     unsigned int count = 0;
+
+    /* power on and enable the device */
+    HWRNG_CLKEN();
+    KINETIS_RNGA->CR = RNG_CR_INTM_MASK | RNG_CR_HA_MASK | RNG_CR_GO_MASK;
 
     /* self-seeding */
     while (!(KINETIS_RNGA->SR & RNG_SR_OREG_LVL_MASK));
@@ -50,31 +53,14 @@ int random_read(char *buf, unsigned int num)
 
         /* copy data into result vector */
         for (int i = 0; i < 4 && count < num; i++) {
-            buf[count++] = (char)tmp;
+            buf[count++] = (uint8_t)tmp;
             tmp = tmp >> 8;
         }
     }
 
-    return (int)count;
-}
-
-void random_poweron(void)
-{
-    RANDOM_CLKEN();
-    KINETIS_RNGA->CR = RNG_CR_INTM_MASK | RNG_CR_HA_MASK | RNG_CR_GO_MASK;
-}
-
-void random_poweroff(void)
-{
+    /* power of the device */
     KINETIS_RNGA->CR = 0;
-    RANDOM_CLKDIS();
+    HWRNG_CLKDIS();
 }
-
-/*
-void isr_rng(void)
-{
-}
-*/
 
 #endif /* KINETIS_RNGA */
-#endif /* RANDOM_NUMOF */

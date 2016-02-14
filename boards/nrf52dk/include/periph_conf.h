@@ -74,13 +74,6 @@ extern "C" {
 #define UART_PIN_TX         6
 /** @} */
 
-/**
- * @name Random Number Generator configuration
- * @{
- */
-#define RANDOM_NUMOF        (1U)
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
