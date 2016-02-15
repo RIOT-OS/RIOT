@@ -1,7 +1,7 @@
 /*
+ * Copyright (C) 2016 Eistec AB
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
  * Copyright (C) 2014 Freie Universität Berlin
- * Copyright (C) 2016 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -23,8 +23,6 @@
  * @}
  */
 
-#include <math.h>
-
 #include "cpu.h"
 #include "thread.h"
 #include "sched.h"
@@ -32,9 +30,9 @@
 #include "periph/uart.h"
 
 #ifndef KINETIS_UART_ADVANCED
-/**
- * Attempts to determine the type of the UART,
- * using the BRFA field in the UART C4 register.
+/*
+ * Attempt to determine the type of the UART using the BRFA field in the UART
+ * C4 register.
  */
 #ifdef UART_C4_BRFA
 #define KINETIS_UART_ADVANCED    1
@@ -45,6 +43,11 @@
  * @brief Allocate memory to store the callback functions.
  */
 static uart_isr_ctx_t config[UART_NUMOF];
+
+/**
+ * @brief List of pointers to all UART device register groups
+ */
+static KINETIS_UART * const _uart_base_ptrs[] = UART_BASE_PTRS;
 
 static inline void kinetis_set_brfa(KINETIS_UART *dev, uint32_t baudrate, uint32_t clk)
 {
@@ -70,28 +73,28 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     config[uart].rx_cb = rx_cb;
     config[uart].arg = arg;
 
-    /* enable receive interrupt */
+    /* enable interrupt source */
     switch (uart) {
 #if UART_0_EN
-
-        case UART_0:
+        case UART_DEV(0):
             NVIC_SetPriority(UART_0_IRQ_CHAN, UART_IRQ_PRIO);
             NVIC_EnableIRQ(UART_0_IRQ_CHAN);
-            UART_0_DEV->C2 |= (1 << UART_C2_RIE_SHIFT);
             break;
 #endif
 #if UART_1_EN
-
-        case UART_1:
+        case UART_DEV(1):
             NVIC_SetPriority(UART_1_IRQ_CHAN, UART_IRQ_PRIO);
             NVIC_EnableIRQ(UART_1_IRQ_CHAN);
-            UART_1_DEV->C2 |= (1 << UART_C2_RIE_SHIFT);
             break;
 #endif
-
         default:
             return -2;
-            break;
+    }
+    KINETIS_UART *dev = _uart_base_ptrs[uart];
+
+    if (rx_cb != NULL) {
+        /* Enable receiver and receiver interrupt */
+        dev->C2 |= (UART_C2_RE_MASK | UART_C2_RIE_MASK);
     }
 
     return 0;
@@ -99,15 +102,12 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 static int init_base(uart_t uart, uint32_t baudrate)
 {
-    KINETIS_UART *dev;
     uint32_t clk;
     uint16_t ubd;
 
     switch (uart) {
 #if UART_0_EN
-
-        case UART_0:
-            dev = UART_0_DEV;
+        case UART_DEV(0):
             gpio_init_port(UART_0_TX_GPIO, UART_0_TX_AF);
             gpio_init_port(UART_0_RX_GPIO, UART_0_RX_AF);
             clk = UART_0_CLK;
@@ -115,22 +115,20 @@ static int init_base(uart_t uart, uint32_t baudrate)
             break;
 #endif
 #if UART_1_EN
-
-        case UART_1:
-            dev = UART_1_DEV;
+        case UART_DEV(1):
             gpio_init_port(UART_1_TX_GPIO, UART_1_TX_AF);
             gpio_init_port(UART_1_RX_GPIO, UART_1_RX_AF);
             clk = UART_1_CLK;
             UART_1_CLKEN();
             break;
 #endif
-
         default:
             return -1;
     }
+    KINETIS_UART *dev = _uart_base_ptrs[uart];
 
-    /* disable transmitter and receiver */
-    dev->C2 &= ~(UART_C2_TE_MASK | UART_C2_RE_MASK);
+    /* disable transmitter and receiver, and disable all interrupt sources */
+    dev->C2 = 0;
     /* set defaults, 8-bit mode, no parity */
     dev->C1 = 0;
 
@@ -143,6 +141,12 @@ static int init_base(uart_t uart, uint32_t baudrate)
     kinetis_set_brfa(dev, baudrate, clk);
 
 #if KINETIS_UART_ADVANCED
+    /* Clear overrun status flag and RDRF by reading S1 then reading D */
+    volatile uint8_t tmp = dev->S1;
+    (void) tmp;
+    tmp = dev->D;
+    (void) tmp;
+
     /* Enable FIFO buffers */
     dev->PFIFO |= UART_PFIFO_RXFE_MASK | UART_PFIFO_TXFE_MASK;
     /* Set level to trigger TDRE flag whenever there is space in the TXFIFO */
@@ -165,29 +169,14 @@ static int init_base(uart_t uart, uint32_t baudrate)
     dev->CFIFO = UART_CFIFO_RXFLUSH_MASK | UART_CFIFO_TXFLUSH_MASK;
 #endif
 
-    /* enable transmitter and receiver */
-    dev->C2 |= UART_C2_TE_MASK | UART_C2_RE_MASK;
+    /* enable transmitter */
+    dev->C2 |= UART_C2_TE_MASK;
     return 0;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    KINETIS_UART *dev;
-
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            dev = UART_0_DEV;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            dev = UART_1_DEV;
-            break;
-#endif
-        default:
-            return;
-    }
+    KINETIS_UART *dev = _uart_base_ptrs[uart];
 
     for (size_t i = 0; i < len; i++) {
         while (!(dev->S1 & UART_S1_TDRE_MASK));
@@ -198,13 +187,13 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
 {
     /*
-    * On Cortex-M0, it happens that S1 is read with LDR
-    * instruction instead of LDRB. This will read the data register
-    * at the same time and arrived byte will be lost. Maybe it's a GCC bug.
-    *
-    * Observed with: arm-none-eabi-gcc (4.8.3-8+..)
-    * It does not happen with: arm-none-eabi-gcc (4.8.3-9+11)
-    */
+     * On Cortex-M0, it happens that S1 is read with LDR
+     * instruction instead of LDRB. This will read the data register
+     * at the same time and arrived byte will be lost. Maybe it's a GCC bug.
+     *
+     * Observed with: arm-none-eabi-gcc (4.8.3-8+..)
+     * It does not happen with: arm-none-eabi-gcc (4.8.3-9+11)
+     */
 
     if (dev->S1 & UART_S1_RDRF_MASK) {
         /* RDRF flag will be cleared when dev-D was read */
@@ -220,6 +209,8 @@ static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
     if (dev->S1 & UART_S1_OR_MASK) {
         dev->S1 = UART_S1_OR_MASK;
     }
+#else
+    /* the advanced UART clears the OR flag above when D is read after reading S1 */
 #endif
 
     if (sched_context_switch_request) {
@@ -231,13 +222,13 @@ static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
 #if UART_0_EN
 void UART_0_ISR(void)
 {
-    irq_handler(UART_0, UART_0_DEV);
+    irq_handler(UART_DEV(0), UART_0_DEV);
 }
 #endif
 
 #if UART_1_EN
 void UART_1_ISR(void)
 {
-    irq_handler(UART_1, UART_1_DEV);
+    irq_handler(UART_DEV(1), UART_1_DEV);
 }
 #endif
