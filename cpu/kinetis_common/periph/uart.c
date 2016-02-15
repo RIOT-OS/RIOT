@@ -26,6 +26,7 @@
 #include "cpu.h"
 #include "thread.h"
 #include "sched.h"
+#include "mutex.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
 
@@ -43,6 +44,27 @@
  * @brief Allocate memory to store the callback functions.
  */
 static uart_isr_ctx_t config[UART_NUMOF];
+
+/**
+ * @brief Mutex for protecting uart_write
+ */
+static mutex_t _uart_write_mutex[UART_NUMOF] = {
+#if UART_NUMOF >= 1
+    MUTEX_INIT,
+#endif
+#if UART_NUMOF >= 2
+    MUTEX_INIT,
+#endif
+#if UART_NUMOF >= 3
+    MUTEX_INIT,
+#endif
+#if UART_NUMOF >= 4
+    MUTEX_INIT,
+#endif
+#if UART_NUMOF >= 5
+    MUTEX_INIT,
+#endif
+};
 
 /**
  * @brief List of pointers to all UART device register groups
@@ -220,9 +242,19 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     KINETIS_UART *dev = _uart_base_ptrs[uart];
 
-    for (size_t i = 0; i < len; i++) {
-        while (!(dev->S1 & UART_S1_TDRE_MASK));
-        dev->D = data[i];
+    if (inISR()) {
+        for (size_t i = 0; i < len; i++) {
+            while (!(dev->S1 & UART_S1_TDRE_MASK));
+            dev->D = data[i];
+        }
+    }
+    else {
+        mutex_lock(&_uart_write_mutex[uart]);
+        for (size_t i = 0; i < len; i++) {
+            while (!(dev->S1 & UART_S1_TDRE_MASK));
+            dev->D = data[i];
+        }
+        mutex_unlock(&_uart_write_mutex[uart]);
     }
 }
 
