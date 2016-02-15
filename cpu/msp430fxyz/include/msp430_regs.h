@@ -57,6 +57,7 @@ typedef struct {
     REG8    OD;         /**< output data */
     REG8    DIR;        /**< pin direction */
     REG8    SEL;        /**< alternative function select */
+    REG8	REN;		/**< eneble pullup/pulldonw resistor */
 } msp_port_t;
 
 /**
@@ -70,6 +71,7 @@ typedef struct {
     REG8    IES;        /**< interrupt edge select */
     REG8    IE;         /**< interrupt enable */
     REG8    SEL;        /**< alternative function select */
+    REG8	REN;		/**< eneble pullup/pulldonw resistor */
 } msp_port_isr_t;
 
 /**
