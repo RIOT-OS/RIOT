@@ -110,6 +110,31 @@ enum {
 };
 
 /**
+ * @brief   Override default ADC resolution values
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = (0xfe),             /**< not supported */
+    ADC_RES_8BIT  = ADC_CFG1_MODE(0),   /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = ADC_CFG1_MODE(2),   /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = ADC_CFG1_MODE(1),   /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = (0xff),             /**< ADC resolution: 14 bit */
+    ADC_RES_16BIT = ADC_CFG1_MODE(3)    /**< ADC resolution: 16 bit */
+} adc_res_t;
+/** @} */
+
+/**
+ * @brief   CPU specific ADC configuration
+ */
+typedef struct {
+    ADC_Type *dev;          /**< ADC device */
+    gpio_t pin;             /**< pin to use, set to GPIO_UNDEF for internal
+                             *   channels */
+    uint8_t chan;           /**< ADC channel */
+} adc_conf_t;
+
+/**
  * @brief   CPU internal function for initializing PORTs
  *
  * @param[in] pin       pin to initialize
