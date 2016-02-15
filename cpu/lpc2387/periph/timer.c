@@ -108,7 +108,7 @@ static inline void pwr_clk_and_isr(tim_t tim)
     }
 }
 
-int timer_init(tim_t tim, unsigned int us_per_tick, void (*callback)(int))
+int timer_init(tim_t tim, unsigned long freq, void (*callback)(int))
 {
     /* get the timers base register */
     lpc23xx_timer_t *dev = get_dev(tim);
@@ -126,7 +126,7 @@ int timer_init(tim_t tim, unsigned int us_per_tick, void (*callback)(int))
     dev->TCR = 0;
     dev->CTCR = 0;
     /* configure the prescaler */
-    dev->PR = (us_per_tick * ((CLOCK_PCLK / 1000000) - 1));
+    dev->PR = (CLOCK_PCLK / freq) - 1;
     /* enable timer */
     dev->TCR = 1;
     return 0;

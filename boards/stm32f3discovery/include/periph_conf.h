@@ -49,7 +49,7 @@ extern "C" {
 /* Timer 0 configuration */
 #define TIMER_0_DEV         TIM2
 #define TIMER_0_CHANNELS    4
-#define TIMER_0_PRESCALER   (71U)
+#define TIMER_0_FREQ        (CLOCK_CORECLOCK)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
 #define TIMER_0_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
 #define TIMER_0_ISR         isr_tim2

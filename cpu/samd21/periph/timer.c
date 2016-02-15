@@ -46,10 +46,10 @@ timer_conf_t config[TIMER_NUMOF];
 /**
  * @brief Setup the given timer
  */
-int timer_init(tim_t dev, unsigned int us_per_ticks, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     /* at the moment, the timer can only run at 1MHz */
-    if (us_per_ticks != 1) {
+    if (freq != 1000000ul) {
         return -1;
     }
 

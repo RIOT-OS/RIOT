@@ -35,14 +35,14 @@
 static void (*isr_cb)(int chan);
 
 
-int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     /* using fixed TIMER_BASE for now */
     if (dev != 0) {
         return -1;
     }
-    /* TODO: configure time-base depending on us_per_tick value */
-    if (us_per_tick != 1) {
+    /* TODO: configure time-base depending on freq value */
+    if (freq != 1000000ul) {
         return -1;
     }
 

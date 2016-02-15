@@ -44,7 +44,7 @@ timer_conf_t config[TIMER_NUMOF];
  * @brief Setup the given timer
  *
  */
-int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     cc2538_gptimer_t *gptimer;
     unsigned int gptimer_num;
@@ -93,7 +93,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     gptimer->cc2538_gptimer_tamr.TAMRbits.TACDIR = 1; /**< Count up */
 
     /* Set the prescale register for the desired frequency: */
-    gptimer->TAPR = RCOSC16M_FREQ / (ticks_per_us * USEC_PER_SEC) - 1;
+    gptimer->TAPR = (RCOSC16M_FREQ / freq) - 1;
 
     /* Enable interrupts for given timer: */
     timer_irq_enable(dev);

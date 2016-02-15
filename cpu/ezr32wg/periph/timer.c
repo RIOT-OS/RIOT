@@ -38,7 +38,7 @@
 static timer_isr_ctx_t isr_ctx[TIMER_NUMOF];
 
 
-int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     TIMER_TypeDef *pre, *tim;
 
@@ -63,7 +63,7 @@ int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
      * configure it up-counting, driven by the HFPER clock and we set the TOP
      * register depending on the specified timer speed value */
     pre->CTRL = 0;
-    pre->TOP = ((CLOCK_HFPERCLK / 1000000) - 1) * us_per_tick;
+    pre->TOP = ((CLOCK_HFPERCLK / freq) - 1);
     pre->CNT = 0;
     pre->IEN = 0;
 

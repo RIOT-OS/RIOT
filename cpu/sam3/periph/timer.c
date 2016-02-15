@@ -60,7 +60,7 @@ static timer_conf_t timer_config[TIMER_NUMOF];
  * For each timer, channel 0 is used to implement a prescaler. Channel 0 is
  * driven by the MCK / 2 (42MHz) (TIMER_CLOCK1).
  */
-int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     Tc *tim;
 
@@ -111,13 +111,13 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     tim->TC_CHANNEL[2].TC_CMR = TC_CMR_TCCLKS_TIMER_CLOCK1 | TC_CMR_WAVE
                               | TC_CMR_WAVSEL_UP_RC | TC_CMR_ACPC_TOGGLE;
 
-    /* configure the frequency of channel 2 to 1us * ticks_per_us
+    /* configure the frequency of channel 2 to freq * 4
      *
      * note: as channels 0 and 1 are only incremented on rising edges of TIOA2 line and
      * channel 2 toggles this line on each timer tick, the actual frequency driving ch0/1
-     * is f_ch2 / 2 --> f_ch0/1 = (MCK / 2 / 2 / 1000000) * ticks_per_us.
+     * is f_ch2 / 2 --> f_ch0/1 = (MCK / 2) / 2 / freq.
      */
-    tim->TC_CHANNEL[2].TC_RC = ((CLOCK_CORECLOCK / 1000000) / 4) * ticks_per_us;
+    tim->TC_CHANNEL[2].TC_RC = (CLOCK_CORECLOCK / 4) / freq;
 
     /* start channel 2 */
     tim->TC_CHANNEL[2].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
