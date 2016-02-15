@@ -29,6 +29,7 @@
 #include "mutex.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
+#include "dma.h"
 
 #ifndef KINETIS_UART_ADVANCED
 /*
@@ -67,6 +68,57 @@ static mutex_t _uart_write_mutex[UART_NUMOF] = {
 };
 
 /**
+ * @brief Mutex for signalling DMA transfers
+ */
+static mutex_t _uart_dma_mutex[UART_NUMOF];
+
+typedef struct {
+    int8_t channel;
+    uint8_t source;
+} uart_dma_config_t;
+
+/**
+ * @brief Mapping from UART device number to DMA channel and source
+ */
+static const uart_dma_config_t _uart_dma_config[UART_NUMOF] = {
+#if UART_NUMOF >= 1
+#if UART_0_EN && defined(UART_0_DMA_CHAN)
+    [UART_DEV(0)] = { .channel = UART_0_DMA_CHAN, .source = UART_0_DMA_SOURCE },
+#else
+    [UART_DEV(0)] = { .channel = -1, .source = 0 },
+#endif
+#endif
+#if UART_NUMOF >= 2
+#if UART_1_EN && defined(UART_1_DMA_CHAN)
+    [UART_DEV(1)] = { .channel = UART_1_DMA_CHAN, .source = UART_1_DMA_SOURCE },
+#else
+    [UART_DEV(1)] = { .channel = -1, .source = 0 },
+#endif
+#endif
+#if UART_NUMOF >= 3
+#if UART_2_EN && defined(UART_2_DMA_CHAN)
+    [UART_DEV(2)] = { .channel = UART_2_DMA_CHAN, .source = UART_2_DMA_SOURCE },
+#else
+    [UART_DEV(2)] = { .channel = -1, .source = 0 },
+#endif
+#endif
+#if UART_NUMOF >= 4
+#if UART_3_EN && defined(UART_3_DMA_CHAN)
+    [UART_DEV(3)] = { .channel = UART_3_DMA_CHAN, .source = UART_3_DMA_SOURCE },
+#else
+    [UART_DEV(3)] = { .channel = -1, .source = 0 },
+#endif
+#endif
+#if UART_NUMOF >= 5
+#if UART_4_EN && defined(UART_4_DMA_CHAN)
+    [UART_DEV(4)] = { .channel = UART_4_DMA_CHAN, .source = UART_4_DMA_SOURCE },
+#else
+    [UART_DEV(4)] = { .channel = -1, .source = 0 },
+#endif
+#endif
+};
+
+/**
  * @brief List of pointers to all UART device register groups
  */
 static KINETIS_UART * const _uart_base_ptrs[] = UART_BASE_PTRS;
@@ -90,6 +142,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     if (res < 0) {
         return res;
     }
+
+    /* initialize and lock DMA mutex */
+    mutex_init(&_uart_dma_mutex[uart]);
+    mutex_lock(&_uart_dma_mutex[uart]);
 
     /* remember callback addresses */
     config[uart].rx_cb = rx_cb;
@@ -131,6 +187,14 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
             return -2;
     }
     KINETIS_UART *dev = _uart_base_ptrs[uart];
+
+    if (_uart_dma_config[uart].channel >= 0) {
+        dma_init(_uart_dma_config[uart].channel, _uart_dma_config[uart].source);
+        /* Enable DMA for TX operation, use normal IRQ for RX */
+        dev->C5 = UART_C5_TDMAS_MASK;
+        /* let the TDRE flag trigger DMA requests */
+        dev->C2 |= (UART_C2_TIE_MASK);
+    }
 
     if (rx_cb != NULL) {
         /* Enable receiver and receiver interrupt */
@@ -242,21 +306,105 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     KINETIS_UART *dev = _uart_base_ptrs[uart];
 
-    if (inISR()) {
+    if (_uart_dma_config[uart].channel < 0) {
         for (size_t i = 0; i < len; i++) {
-            while (!(dev->S1 & UART_S1_TDRE_MASK));
+            while (!(dev->S1 & UART_S1_TDRE_MASK)) {}
             dev->D = data[i];
         }
     }
     else {
-        mutex_lock(&_uart_write_mutex[uart]);
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev->S1 & UART_S1_TDRE_MASK));
-            dev->D = data[i];
+        uint8_t channel = _uart_dma_config[uart].channel;
+        if (irq_is_in()) {
+            /* Put DMA on hold for the time being to avoid bus races */
+            BITBAND_REG8(dev->C2, UART_C2_TIE_SHIFT) = 0;
+            /* wait for any ongoing DMA transfer to complete */
+            while (DMA_DEV->TCD[channel].CSR & DMA_CSR_ACTIVE_MASK) {}
+
+            for (size_t i = 0; i < len; i++) {
+                while (!(dev->S1 & UART_S1_TDRE_MASK)) {}
+                dev->D = data[i];
+            }
+            /* Resume DMA transfers again */
+            BITBAND_REG8(dev->C2, UART_C2_TIE_SHIFT) = 1;
         }
-        mutex_unlock(&_uart_write_mutex[uart]);
+        else {
+            mutex_lock(&_uart_write_mutex[uart]);
+            /* Select source address */
+            DMA_DEV->TCD[channel].SADDR = (uint32_t)data;
+            /* Source step size */
+            DMA_DEV->TCD[channel].SOFF = DMA_SOFF_SOFF(sizeof(*data));
+            /* Destination address */
+            DMA_DEV->TCD[channel].DADDR = (uint32_t)(&dev->D);
+            /* Destination step size */
+            DMA_DEV->TCD[channel].DOFF = DMA_DOFF_DOFF(0);
+            /* Set source and destination width to 1 byte */
+            DMA_DEV->TCD[channel].ATTR = DMA_ATTR_DSIZE(DMA_ACCESS_SIZE_8BIT) | DMA_ATTR_SSIZE(DMA_ACCESS_SIZE_8BIT);
+            /* Set minor loop count */
+            DMA_DEV->TCD[channel].NBYTES_MLNO = DMA_NBYTES_MLNO_NBYTES(1);
+            /* Set major loop count */
+            /* Note: This breaks if len > 32767 */
+            DMA_DEV->TCD[channel].CITER_ELINKNO = DMA_CITER_ELINKNO_CITER(len);
+            DMA_DEV->TCD[channel].BITER_ELINKNO = DMA_BITER_ELINKNO_BITER(len);
+            /* Set control register */
+            /* Disable DMA requests after major loop finishes, interrupt on end of major loop */
+            DMA_DEV->TCD[channel].CSR = DMA_CSR_DREQ_MASK | DMA_CSR_INTMAJOR_MASK;
+            /* Enable requests on the chosen DMA channel */
+            dma_channel_enable(channel);
+            /* lock DMA mutex, DMA ISR will unlock it */
+            mutex_lock(&_uart_dma_mutex[uart]);
+
+            mutex_unlock(&_uart_write_mutex[uart]);
+        }
     }
 }
+
+static inline void dma_handler(uart_t uart)
+{
+    /* Clear DMA interrupt flag */
+    dma_clear_irq(_uart_dma_config[uart].channel);
+
+    /* Unlock the waiting mutex */
+    mutex_unlock(&_uart_dma_mutex[uart]);
+
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
+}
+
+#if UART_0_EN && defined(UART_0_DMA_CHAN)
+void UART_0_DMA_ISR(void)
+{
+    dma_handler(UART_DEV(0));
+}
+#endif
+
+#if UART_1_EN && defined(UART_1_DMA_CHAN)
+void UART_1_DMA_ISR(void)
+{
+    dma_handler(UART_DEV(1));
+}
+#endif
+
+#if UART_2_EN && defined(UART_2_DMA_CHAN)
+void UART_2_DMA_ISR(void)
+{
+    dma_handler(UART_DEV(2));
+}
+#endif
+
+#if UART_3_EN && defined(UART_3_DMA_CHAN)
+void UART_3_DMA_ISR(void)
+{
+    dma_handler(UART_DEV(3));
+}
+#endif
+
+#if UART_4_EN && defined(UART_4_DMA_CHAN)
+void UART_4_DMA_ISR(void)
+{
+    dma_handler(UART_DEV(4));
+}
+#endif
 
 static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
 {
