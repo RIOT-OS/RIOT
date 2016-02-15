@@ -8,6 +8,20 @@
  * directory for more details.
  */
 
+ /**
+ * @ingroup     unittests
+ * @{
+ *
+ * @file
+ * @brief       testcases for the sha256 implementation
+ *
+ * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * @author      Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
+ * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
+ *
+ * @}
+ */
+
 #include <limits.h>
 #include <string.h>
 #include <stdio.h>
