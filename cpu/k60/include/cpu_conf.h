@@ -97,6 +97,84 @@ extern "C"
 #define PORTE_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTE_SHIFT))
 /** @} */
 
+/** @brief DMA module clock gate */
+#define DMA_CLOCK_GATE (BITBAND_REG32(SIM->SCGC7, SIM_SCGC7_DMA_SHIFT))
+/** @brief DMA multiplexer clock gate */
+#define DMAMUX_CLOCK_GATE (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_DMAMUX_SHIFT))
+
+/** @brief DMA multiplexer source numbers */
+typedef enum {
+    DMA_SOURCE_DISABLED        =  0,
+    DMA_SOURCE_RESERVED1       =  1,
+    DMA_SOURCE_UART0_RX        =  2,
+    DMA_SOURCE_UART0_TX        =  3,
+    DMA_SOURCE_UART1_RX        =  4,
+    DMA_SOURCE_UART1_TX        =  5,
+    DMA_SOURCE_UART2_RX        =  6,
+    DMA_SOURCE_UART2_TX        =  7,
+    DMA_SOURCE_UART3_RX        =  8,
+    DMA_SOURCE_UART3_TX        =  9,
+    DMA_SOURCE_UART4_RX        = 10,
+    DMA_SOURCE_UART4_TX        = 11,
+    DMA_SOURCE_RESERVED12      = 12,
+    DMA_SOURCE_RESERVED13      = 13,
+    DMA_SOURCE_I2S0_RX         = 14,
+    DMA_SOURCE_I2S0_TX         = 15,
+    DMA_SOURCE_SPI0_RX         = 16,
+    DMA_SOURCE_SPI0_TX         = 17,
+    DMA_SOURCE_SPI1_RX         = 18,
+    DMA_SOURCE_SPI1_TX         = 19,
+    DMA_SOURCE_SPI2_RX         = 20,
+    DMA_SOURCE_SPI2_TX         = 21,
+    DMA_SOURCE_I2C0            = 22,
+    DMA_SOURCE_I2C1            = 23,
+    DMA_SOURCE_FTM0CH0         = 24,
+    DMA_SOURCE_FTM0CH1         = 25,
+    DMA_SOURCE_FTM0CH2         = 26,
+    DMA_SOURCE_FTM0CH3         = 27,
+    DMA_SOURCE_FTM0CH4         = 28,
+    DMA_SOURCE_FTM0CH5         = 29,
+    DMA_SOURCE_FTM0CH6         = 30,
+    DMA_SOURCE_FTM0CH7         = 31,
+    DMA_SOURCE_FTM1CH0         = 32,
+    DMA_SOURCE_FTM1CH1         = 33,
+    DMA_SOURCE_FTM2CH0         = 34,
+    DMA_SOURCE_FTM2CH1         = 35,
+    DMA_SOURCE_IEEE1588_TIMER0 = 36,
+    DMA_SOURCE_IEEE1588_TIMER1 = 37,
+    DMA_SOURCE_IEEE1588_TIMER2 = 38,
+    DMA_SOURCE_IEEE1588_TIMER3 = 39,
+    DMA_SOURCE_ADC0            = 40,
+    DMA_SOURCE_ADC1            = 41,
+    DMA_SOURCE_CMP0            = 42,
+    DMA_SOURCE_CMP1            = 43,
+    DMA_SOURCE_CMP2            = 44,
+    DMA_SOURCE_DAC0            = 45,
+    DMA_SOURCE_RESERVED46      = 46,
+    DMA_SOURCE_CMT             = 47,
+    DMA_SOURCE_PDB             = 48,
+    DMA_SOURCE_PORT_A          = 49,
+    DMA_SOURCE_PORT_B          = 50,
+    DMA_SOURCE_PORT_C          = 51,
+    DMA_SOURCE_PORT_D          = 52,
+    DMA_SOURCE_PORT_E          = 53,
+    DMA_SOURCE_DMAMUX_ALWAYS0  = 54,
+    DMA_SOURCE_DMAMUX_ALWAYS1  = 55,
+    DMA_SOURCE_DMAMUX_ALWAYS2  = 56,
+    DMA_SOURCE_DMAMUX_ALWAYS3  = 57,
+    DMA_SOURCE_DMAMUX_ALWAYS4  = 58,
+    DMA_SOURCE_DMAMUX_ALWAYS5  = 59,
+    DMA_SOURCE_DMAMUX_ALWAYS6  = 60,
+    DMA_SOURCE_DMAMUX_ALWAYS7  = 61,
+    DMA_SOURCE_DMAMUX_ALWAYS8  = 62,
+    DMA_SOURCE_DMAMUX_ALWAYS9  = 63,
+} dma_source_t;
+
+/**
+ * @brief Number of DMA channels available in hardware
+ */
+#define DMA_NUMOF 16
+
 /**
  * @name UART driver settings
  */

@@ -76,6 +76,22 @@ extern "C"
 #define PORTE_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTE_SHIFT))
 /** @} */
 
+/** @brief DMA module clock gate */
+#define DMA_CLOCK_GATE (BITBAND_REG32(SIM->SCGC7, SIM_SCGC7_DMA_SHIFT))
+/** @brief DMA multiplexer clock gate */
+#define DMAMUX_CLOCK_GATE (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_DMAMUX_SHIFT))
+
+/** @brief DMA multiplexer source numbers */
+/* TODO: Copy numbers from reference manual. */
+typedef enum {
+    DMA_SOURCE_DISABLED        =  0,
+} dma_source_t;
+
+/**
+ * @brief Number of DMA channels available in hardware
+ */
+#define DMA_NUMOF 16
+
 /**
  * @brief MCU specific Low Power Timer settings.
  */
