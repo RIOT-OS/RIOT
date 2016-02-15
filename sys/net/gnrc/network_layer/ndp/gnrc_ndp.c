@@ -275,7 +275,7 @@ void gnrc_ndp_nbr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 #endif
     }
 
-    LL_SEARCH_SCALAR(pkt, netif, type, GNRC_NETTYPE_NETIF);
+    netif = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
 
     if (netif != NULL) {
         netif_hdr = netif->data;

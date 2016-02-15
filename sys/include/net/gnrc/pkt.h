@@ -155,6 +155,18 @@ static inline size_t gnrc_pkt_count(const gnrc_pktsnip_t *pkt)
     return count;
 }
 
+/**
+ * @brief   Searches the packet for a packet snip of a specific type
+ *
+ * @param[in] pkt   list of packet snips
+ * @param[in] type  the type to search for
+ *
+ * @return  the packet snip in @p pkt with @ref gnrc_nettype_t @p type
+ * @return  NULL, if none of the snips in @p pkt is of @p type
+ */
+gnrc_pktsnip_t *gnrc_pktsnip_search_type(gnrc_pktsnip_t *pkt,
+                                         gnrc_nettype_t type);
+
 #ifdef __cplusplus
 }
 #endif
