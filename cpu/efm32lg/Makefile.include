@@ -1,0 +1,8 @@
+export CPU_ARCH = cortex-m3
+export CPU_FAM = efm32lg
+
+# include efm32_common
+include $(RIOTCPU)/efm32_common/Makefile.include
+
+# include cortexm_common
+include $(RIOTCPU)/Makefile.include.cortexm_common
