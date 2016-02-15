@@ -85,13 +85,11 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
     if (port == NULL) 
         return -1;
     /* set pin direction */
-    if(dir == GPIO_DIR_IN)
-        port->DIR &= ~(_pin(pin));
-    else
-        port->DIR |= _pin(pin);
+    port->DIR &= ~(_pin(pin));
+    port->DIR |= (dir & _pin(pin));
 
     /*Select Pullup/ pulldown resistor*/
-    if((pullup != GPIO_NOPULL) && (dir == GPIO_DIR_IN)){
+    if((pullup != GPIO_NOPULL) && (dir == GPIO_DIR_IN)) {
         port->REN |= _pin(pin);
         if(pullup == GPIO_PULLUP)
             port->OD = _pin(pin);
