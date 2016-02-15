@@ -87,6 +87,24 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
             NVIC_EnableIRQ(UART_1_IRQ_CHAN);
             break;
 #endif
+#if UART_2_EN
+        case UART_DEV(2):
+            NVIC_SetPriority(UART_2_IRQ_CHAN, UART_IRQ_PRIO);
+            NVIC_EnableIRQ(UART_2_IRQ_CHAN);
+            break;
+#endif
+#if UART_3_EN
+        case UART_DEV(3):
+            NVIC_SetPriority(UART_3_IRQ_CHAN, UART_IRQ_PRIO);
+            NVIC_EnableIRQ(UART_3_IRQ_CHAN);
+            break;
+#endif
+#if UART_4_EN
+        case UART_DEV(4):
+            NVIC_SetPriority(UART_4_IRQ_CHAN, UART_IRQ_PRIO);
+            NVIC_EnableIRQ(UART_4_IRQ_CHAN);
+            break;
+#endif
         default:
             return -2;
     }
@@ -120,6 +138,30 @@ static int init_base(uart_t uart, uint32_t baudrate)
             gpio_init_port(UART_1_RX_GPIO, UART_1_RX_AF);
             clk = UART_1_CLK;
             UART_1_CLKEN();
+            break;
+#endif
+#if UART_2_EN
+        case UART_DEV(2):
+            gpio_init_port(UART_2_TX_GPIO, UART_2_TX_AF);
+            gpio_init_port(UART_2_RX_GPIO, UART_2_RX_AF);
+            clk = UART_2_CLK;
+            UART_2_CLKEN();
+            break;
+#endif
+#if UART_3_EN
+        case UART_DEV(3):
+            gpio_init_port(UART_3_TX_GPIO, UART_3_TX_AF);
+            gpio_init_port(UART_3_RX_GPIO, UART_3_RX_AF);
+            clk = UART_3_CLK;
+            UART_3_CLKEN();
+            break;
+#endif
+#if UART_4_EN
+        case UART_DEV(4):
+            gpio_init_port(UART_4_TX_GPIO, UART_4_TX_AF);
+            gpio_init_port(UART_4_RX_GPIO, UART_4_RX_AF);
+            clk = UART_4_CLK;
+            UART_4_CLKEN();
             break;
 #endif
         default:
@@ -216,7 +258,6 @@ static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
     if (sched_context_switch_request) {
         thread_yield();
     }
-
 }
 
 #if UART_0_EN
@@ -230,5 +271,26 @@ void UART_0_ISR(void)
 void UART_1_ISR(void)
 {
     irq_handler(UART_DEV(1), UART_1_DEV);
+}
+#endif
+
+#if UART_2_EN
+void UART_2_ISR(void)
+{
+    irq_handler(UART_DEV(2), UART_2_DEV);
+}
+#endif
+
+#if UART_3_EN
+void UART_3_ISR(void)
+{
+    irq_handler(UART_DEV(3), UART_3_DEV);
+}
+#endif
+
+#if UART_4_EN
+void UART_4_ISR(void)
+{
+    irq_handler(UART_DEV(4), UART_4_DEV);
 }
 #endif
