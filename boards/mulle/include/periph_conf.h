@@ -120,6 +120,10 @@ extern "C"
 #define UART_1_CLK          (SystemSysClock)
 #define UART_1_IRQ_CHAN     UART1_RX_TX_IRQn
 #define UART_1_ISR          isr_uart1_status
+#define UART_1_DMA_CHAN     15
+#define UART_1_DMA_SOURCE   DMA_SOURCE_UART1_TX
+#define UART_1_DMA_IRQ      DMA15_IRQn
+#define UART_1_DMA_ISR      isr_dma15_complete
 /* UART 1 pin configuration */
 /* The chosen pins are normally connected to RX/TX on the USB to UART adapter on
  * the programmer board */
