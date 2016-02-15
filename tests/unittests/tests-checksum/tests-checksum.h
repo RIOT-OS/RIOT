@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Unittests for the ``crc`` module
+ * @brief       Unittests for the ``checksum`` module
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
@@ -28,14 +28,14 @@ extern "C" {
 /**
  * @brief   The entry point of this test suite.
  */
-void tests_crc(void);
+void tests_checksum(void);
 
 /**
- * @brief   Generates tests for crc/crc16_ccitt.h
+ * @brief   Generates tests for checksum/crc16_ccitt.h
  *
  * @return  embUnit tests if successful, NULL if not.
  */
-Test *tests_crc_crc16_ccitt_tests(void);
+Test *tests_checksum_crc16_ccitt_tests(void);
 
 #ifdef __cplusplus
 }

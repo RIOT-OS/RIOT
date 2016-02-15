@@ -10,9 +10,9 @@
 
 #include "embUnit/embUnit.h"
 
-#include "crc/crc16_ccitt.h"
+#include "checksum/crc16_ccitt.h"
 
-#include "tests-crc.h"
+#include "tests-checksum.h"
 
 static int calc_and_compare_crc_with_update(const unsigned char *buf,
         size_t len, size_t split, uint16_t expected)
@@ -32,7 +32,7 @@ static int calc_and_compare_crc(const unsigned char *buf, size_t len,
     return result == expected;
 }
 
-static void test_crc_crc16_ccitt_sequence(void)
+static void test_checksum_crc16_ccitt_sequence(void)
 {
     /* Reference values according to
      * http://srecord.sourceforge.net/crc16-ccitt.html */
@@ -85,13 +85,13 @@ static void test_crc_crc16_ccitt_sequence(void)
     }
 }
 
-Test *tests_crc_crc16_ccitt_tests(void)
+Test *tests_checksum_crc16_ccitt_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_crc_crc16_ccitt_sequence),
+        new_TestFixture(test_checksum_crc16_ccitt_sequence),
     };
 
-    EMB_UNIT_TESTCALLER(crc_crc16_ccitt_tests, NULL, NULL, fixtures);
+    EMB_UNIT_TESTCALLER(checksum_crc16_ccitt_tests, NULL, NULL, fixtures);
 
-    return (Test *)&crc_crc16_ccitt_tests;
+    return (Test *)&checksum_crc16_ccitt_tests;
 }
