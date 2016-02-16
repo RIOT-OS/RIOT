@@ -124,7 +124,7 @@ int main(void)
     puts("Make note of the PC clock when starting this test, let run for a while, "
         "compare the printed time against the expected time from the PC clock.");
     puts("The difference is the RIOT timer drift, this is likely caused by either: "
-        "Inaccurate hardware timer, or bugs in the software (xtimer or periph/timer).");
+        "an inaccurate hardware timer, or bugs in the software (xtimer or periph/timer).");
     printf("This test will run a periodic timer every %lu microseconds (%lu Hz), ",
         (unsigned long)TEST_INTERVAL, (unsigned long)TEST_HZ);
     puts("The current time will be printed once per second, along with the "
