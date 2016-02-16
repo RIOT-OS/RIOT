@@ -287,7 +287,7 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 /**
  * @brief xtimer backoff value
  *
- * All timers that are less than XTIMER_BACKOFF microseconds in the future will
+ * All timers that are less than XTIMER_BACKOFF ticks in the future will
  * just spin.
  *
  * This is supposed to be defined per-device in e.g., periph_conf.h.
