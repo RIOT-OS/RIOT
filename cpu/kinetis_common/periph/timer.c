@@ -71,8 +71,8 @@ typedef struct {
 /** Timer state memory */
 static timer_conf_t config[TIMER_NUMOF];
 
-/** Reference count from RTC for time LPTMR CNR = 0 */
-static uint32_t lptmr_reference = 0;
+/** Reference between current counter and total time */
+static uint32_t _timer_reference[TIMER_NUMOF];
 
 /* ********************** */
 /* PIT handling functions */
@@ -98,17 +98,20 @@ inline static void pit_set_prescaler(uint8_t ch, unsigned long freq)
 
 inline static void pit_set_counter(uint8_t ch, uint32_t timeout)
 {
+    uint8_t enabled = (TIMER_PIT_DEV->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK);
     TIMER_PIT_DEV->CHANNEL[ch].TCTRL = 0x0;
     TIMER_PIT_DEV->CHANNEL[ch].LDVAL = timeout;
-    TIMER_PIT_DEV->CHANNEL[ch].TCTRL = (PIT_TCTRL_TIE_MASK | PIT_TCTRL_CHN_MASK);
+    TIMER_PIT_DEV->CHANNEL[ch].TCTRL = (PIT_TCTRL_TIE_MASK | PIT_TCTRL_CHN_MASK | enabled);
 }
 
-inline static uint32_t pit_read(uint8_t ch)
+inline static uint32_t pit_read(tim_t dev, uint8_t ch)
 {
-    return (TIMER_PIT_DEV->CHANNEL[ch].LDVAL - TIMER_PIT_DEV->CHANNEL[ch].CVAL);
+    uint32_t ticks = TIMER_PIT_DEV->CHANNEL[ch].LDVAL - TIMER_PIT_DEV->CHANNEL[ch].CVAL;
+
+    return (ticks + _timer_reference[dev]);
 }
 
-#if TIMER_1_EN
+#if TIMER_1_EN || TIMER_2_EN
 static int pit_init(tim_t dev, unsigned long freq, void (*callback)(int)) {
     /* enable timer peripheral clock */
     TIMER_PIT_CLKEN();
@@ -119,12 +122,14 @@ static int pit_init(tim_t dev, unsigned long freq, void (*callback)(int)) {
         case TIMER_1:
             NVIC_SetPriority(TIMER_1_IRQ_CHAN, TIMER_IRQ_PRIO);
             pit_set_prescaler(TIMER_1_PRESCALER_CH, freq);
+            pit_set_counter(TIMER_1_COUNTER_CH, 0xffffffff);
             break;
 #endif
 #if TIMER_2_EN
         case TIMER_2:
             NVIC_SetPriority(TIMER_2_IRQ_CHAN, TIMER_IRQ_PRIO);
             pit_set_prescaler(TIMER_2_PRESCALER_CH, freq);
+            pit_set_counter(TIMER_2_COUNTER_CH, 0xffffffff);
             break;
 #endif
 
@@ -136,8 +141,13 @@ static int pit_init(tim_t dev, unsigned long freq, void (*callback)(int)) {
     /* set callback function */
     config[dev].cb = callback;
 
+    _timer_reference[dev] = 0;
+
     /* enable the timer's interrupt */
     timer_irq_enable(dev);
+
+    /* start the timer */
+    timer_start(dev);
 
     return 0;
 }
@@ -195,12 +205,16 @@ inline static uint32_t rtt_get_subtick(void)
 #endif
 
 inline static void lptmr_set(uint16_t timeout) {
+#if !TIMER_LPTMR_WITH_RTC
+    /* This is likely to lose a few ticks on each set, please use RTC if available */
+    _timer_reference[TIMER_0] = lptmr_read();
+#endif
     lptmr_stop();
     TIMER_LPTMR_DEV->CMR = LPTMR_CMR_COMPARE(timeout);
     /* Enable LPTMR compare interrupt source */
     BITBAND_REG32(TIMER_LPTMR_DEV->CSR, LPTMR_CSR_TIE_SHIFT) = 1;
 #if TIMER_LPTMR_WITH_RTC
-    lptmr_reference = rtt_get_subtick();
+    _timer_reference[TIMER_0] = rtt_get_subtick();
 #endif
     lptmr_start();
 }
@@ -222,7 +236,7 @@ inline static unsigned int lptmr_read(void) {
     }
 #endif
 
-    return (unsigned int)((ticks + lptmr_reference) & 0xffff);
+    return (unsigned int)((ticks + _timer_reference[TIMER_0]) & 0xffff);
 }
 
 /* Compute the prescaler setting, see reference manual for details */
@@ -261,15 +275,20 @@ inline static int lptmr_init(tim_t dev, unsigned long freq, void (*callback)(int
     TIMER_LPTMR_DEV->PSR = LPTMR_PSR_PBYP_MASK | LPTMR_PSR_PCS(2) |
             LPTMR_PSR_PRESCALE((uint32_t)prescale);
 
+    /* set callback function */
     config[dev].cb = callback;
+
+#if TIMER_LPTMR_WITH_RTC
+    _timer_reference[TIMER_0] = rtt_get_subtick();
+#else
+    _timer_reference[TIMER_0] = 0;
+#endif
 
     /* enable free running counter mode */
     LPTIMER_DEV->CSR = LPTMR_CSR_TFC_MASK;
 
     lptmr_irq_enable();
-#if TIMER_LPTMR_WITH_RTC
-    lptmr_reference = rtt_get_subtick();
-#endif
+
     lptmr_start();
     return 0;
 }
@@ -319,15 +338,15 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 #if TIMER_1_EN
 
         case TIMER_1:
+            _timer_reference[dev] = pit_read(dev, TIMER_1_COUNTER_CH);
             pit_set_counter(TIMER_1_COUNTER_CH, timeout);
-            pit_start(TIMER_1_COUNTER_CH);
             break;
 #endif
 #if TIMER_2_EN
 
         case TIMER_2:
+            _timer_reference[dev] = pit_read(dev, TIMER_2_COUNTER_CH);
             pit_set_counter(TIMER_2_COUNTER_CH, timeout);
-            pit_start(TIMER_2_COUNTER_CH);
             break;
 #endif
         default:
@@ -357,17 +376,15 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 #if TIMER_1_EN
 
         case TIMER_1:
-            now = pit_read(channel);
-            pit_set_counter(TIMER_1_COUNTER_CH, value - now);
-            pit_start(TIMER_1_COUNTER_CH);
+            _timer_reference[TIMER_1] = pit_read(dev, TIMER_1_COUNTER_CH);
+            pit_set_counter(TIMER_1_COUNTER_CH, value - _timer_reference[TIMER_1]);
             break;
 #endif
 #if TIMER_2_EN
 
         case TIMER_2:
-            now = pit_read(channel);
-            pit_set_counter(TIMER_2_COUNTER_CH, value - now);
-            pit_start(TIMER_2_COUNTER_CH);
+            _timer_reference[TIMER_2] = pit_read(dev, TIMER_2_COUNTER_CH);
+            pit_set_counter(TIMER_2_COUNTER_CH, value - _timer_reference[TIMER_2]);
             break;
 #endif
         default:
@@ -383,6 +400,8 @@ int timer_clear(tim_t dev, int channel)
     if (channel != 0) {
         return -1;
     }
+
+    _timer_reference[dev] = 0;
 
     timer_stop(dev);
 
@@ -400,12 +419,12 @@ unsigned int timer_read(tim_t dev)
 #if TIMER_1_EN
 
         case TIMER_1:
-            return pit_read(TIMER_1_COUNTER_CH);
+            return pit_read(dev, TIMER_1_COUNTER_CH);
 #endif
 #if TIMER_2_EN
 
         case TIMER_2:
-            return pit_read(TIMER_2_COUNTER_CH);
+            return pit_read(dev, TIMER_2_COUNTER_CH);
 #endif
         default:
             return 0;
@@ -520,10 +539,18 @@ void timer_irq_disable(tim_t dev)
     }
 }
 
-inline static void pit_irq_handler(tim_t dev, uint8_t ch)
+inline static void pit_irq_handler(tim_t dev, uint8_t ch, IRQn_Type irqn)
 {
-    /* Stop timer */
-    pit_stop(ch);
+    /* Advance reference time */
+    _timer_reference[dev] += TIMER_PIT_DEV->CHANNEL[ch].LDVAL;
+
+    /* Set a large temporary timeout */
+    pit_set_counter(ch, 0xffffffff);
+
+    /* Disable interrupt until a new timeout has been set */
+    BITBAND_REG32(TIMER_PIT_DEV->CHANNEL[ch].TCTRL, PIT_TCTRL_TIE_SHIFT) = 0;
+    NVIC_ClearPendingIRQ(irqn);
+
     /* Clear interrupt flag */
     TIMER_PIT_DEV->CHANNEL[ch].TFLG = PIT_TFLG_TIF_MASK;
 
@@ -545,6 +572,7 @@ void TIMER_LPTMR_ISR(void) {
 
     /* Clear interrupt flag */
     BITBAND_REG32(TIMER_LPTMR_DEV->CSR, LPTMR_CSR_TCF_SHIFT) = 1;
+    NVIC_ClearPendingIRQ(TIMER_LPTMR_IRQ_CHAN);
 
     if (config[dev].cb != NULL) {
         config[dev].cb(0);
@@ -559,14 +587,14 @@ void TIMER_LPTMR_ISR(void) {
 #if TIMER_1_EN
 void TIMER_1_ISR(void)
 {
-    pit_irq_handler(TIMER_1, TIMER_1_COUNTER_CH);
+    pit_irq_handler(TIMER_1, TIMER_1_COUNTER_CH, TIMER_1_IRQ_CHAN);
 }
 #endif
 
 #if TIMER_2_EN
 void TIMER_2_ISR(void)
 {
-    pit_irq_handler(TIMER_2, TIMER_2_COUNTER_CH);
+    pit_irq_handler(TIMER_2, TIMER_2_COUNTER_CH, TIMER_2_IRQ_CHAN);
 }
 #endif
 
