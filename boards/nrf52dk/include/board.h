@@ -45,15 +45,15 @@ extern "C" {
  * @brief   RIOT LED macros for backwards compatibility
  * @{
  */
-#define LED_RED_ON          (NRF_P0->OUTSET = LED1_PIN)
-#define LED_RED_OFF         (NRF_P0->OUTCLR = LED2_PIN)
-#define LED_RED_TOGGLE      (NRF_P0->OUT   ^= LED3_PIN)
-#define LED_GREEN_ON        (NRF_P0->OUTSET = LED1_PIN)
-#define LED_GREEN_OFF       (NRF_P0->OUTCLR = LED2_PIN)
-#define LED_GREEN_TOGGLE    (NRF_P0->OUT   ^= LED3_PIN)
-#define LED_ORANGE_ON       (NRF_P0->OUTSET = LED1_PIN)
-#define LED_ORANGE_OFF      (NRF_P0->OUTCLR = LED2_PIN)
-#define LED_ORANGE_TOGGLE   (NRF_P0->OUT   ^= LED3_PIN)
+#define LED_RED_ON          (NRF_P0->OUTSET = LED1_MASK)
+#define LED_RED_OFF         (NRF_P0->OUTCLR = LED1_MASK)
+#define LED_RED_TOGGLE      (NRF_P0->OUT   ^= LED1_MASK)
+#define LED_GREEN_ON        (NRF_P0->OUTSET = LED2_MASK)
+#define LED_GREEN_OFF       (NRF_P0->OUTCLR = LED2_MASK)
+#define LED_GREEN_TOGGLE    (NRF_P0->OUT   ^= LED2_MASK)
+#define LED_ORANGE_ON       (NRF_P0->OUTSET = LED3_MASK)
+#define LED_ORANGE_OFF      (NRF_P0->OUTCLR = LED3_MASK)
+#define LED_ORANGE_TOGGLE   (NRF_P0->OUT   ^= LED3_MASK)
 /** @} */
 
 /**
