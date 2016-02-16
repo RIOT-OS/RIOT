@@ -60,7 +60,7 @@ static inline int _is_set(xtimer_t *timer)
 void xtimer_init(void)
 {
     /* initialize low-level timer */
-    timer_init(XTIMER, (1000000ul >> XTIMER_SHIFT), _periph_timer_callback);
+    timer_init(XTIMER, XTIMER_HZ, _periph_timer_callback);
 
     /* register initial overflow tick */
     _lltimer_set(0xFFFFFFFF);
@@ -93,7 +93,7 @@ uint64_t xtimer_now64(void)
 
 void _xtimer_set_ticks(xtimer_t *timer, uint32_t offset)
 {
-    DEBUG("timer_set(): offset=%" PRIu32 " now=%" PRIu32 " (%" PRIu32 ")\n", offset, xtimer_now(), _xtimer_now());
+    DEBUG("timer_set(): offset=%" PRIu32 " now=%" PRIu32 " (%" PRIu32 ")\n", offset, xtimer_now(), _xtimer_now_ticks());
     if (!timer->callback) {
         DEBUG("timer_set(): timer has no callback.\n");
         return;
@@ -153,12 +153,6 @@ static inline void _lltimer_set(uint32_t target)
         return;
     }
     DEBUG("_lltimer_set(): setting %" PRIu32 "\n", _lltimer_mask(target));
-#ifdef XTIMER_SHIFT
-    target >>= XTIMER_SHIFT;
-    if (!target) {
-        target++;
-    }
-#endif
     timer_set_absolute(XTIMER, XTIMER_CHAN, _lltimer_mask(target));
 }
 
@@ -167,7 +161,7 @@ int _xtimer_set_absolute_ticks(xtimer_t *timer, uint32_t target)
     uint32_t now = _xtimer_now_ticks();
     int res = 0;
 
-    DEBUG("timer_set_absolute(): now=%" PRIu32 " target=%" PRIu32 "\n", now, target);
+    DEBUG("xtimer_set_absolute(): now=%" PRIu32 " target=%" PRIu32 "\n", now, target);
 
     timer->next = NULL;
     if ((target >= now) && ((target - XTIMER_BACKOFF) < now)) {
@@ -194,11 +188,11 @@ int _xtimer_set_absolute_ticks(xtimer_t *timer, uint32_t target)
             _add_timer_to_list(&overflow_list_head, timer);
         }
         else {
-            DEBUG("timer_set_absolute(): timer will expire in this timer period.\n");
+            DEBUG("xtimer_set_absolute(): timer will expire in this timer period.\n");
             _add_timer_to_list(&timer_list_head, timer);
 
             if (timer_list_head == timer) {
-                DEBUG("timer_set_absolute(): timer is new list head. updating lltimer.\n");
+                DEBUG("xtimer_set_absolute(): timer is new list head. updating lltimer.\n");
                 _lltimer_set(target - XTIMER_OVERHEAD);
             }
         }
@@ -296,7 +290,7 @@ static uint32_t _time_left(uint32_t target, uint32_t reference)
 
 static inline int _this_high_period(uint32_t target) {
 #if XTIMER_MASK
-    return (target & XTIMER_MASK_SHIFTED) == _high_cnt;
+    return (target & XTIMER_MASK) == _high_cnt;
 #else
     (void)target;
     return 1;
@@ -400,7 +394,7 @@ static void _next_period(void)
 {
 #if XTIMER_MASK
     /* advance <32bit mask register */
-    _high_cnt += ~XTIMER_MASK_SHIFTED + 1;
+    _high_cnt += ~XTIMER_MASK + 1;
     if (! _high_cnt) {
         /* high_cnt overflowed, so advance >32bit counter */
         _long_cnt++;

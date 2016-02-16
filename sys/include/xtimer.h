@@ -331,21 +331,6 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_ISR_BACKOFF 20
 #endif
 
-/*
- * @brief   xtimer prescaler value
- *
- * xtimer assumes it is running with an underlying 1MHz timer.
- * If the timer is slower by a power of two, XTIMER_SHIFT can be used to
- * adjust the difference.
- *
- * This will also initialize the underlying periph timer with
- * us_per_tick == (1<<XTIMER_SHIFT).
- *
- * For example, if the timer is running with 250khz, set XTIMER_SHIFT to 2.
- */
-#ifndef XTIMER_SHIFT
-#define XTIMER_SHIFT (0)
-#endif
 
 /**
  * @brief set xtimer default timer configuration
@@ -379,19 +364,6 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  * This is supposed to be defined per-device in e.g., periph_conf.h.
  */
 #define XTIMER_MASK (0)
-#endif
-#define XTIMER_MASK_SHIFTED (XTIMER_MASK << XTIMER_SHIFT)
-
-#ifndef XTIMER_USLEEP_UNTIL_OVERHEAD
-/**
- * @brief xtimer_usleep_until overhead value
- *
- * This value specifies the time a xtimer_usleep_until will be late
- * if uncorrected.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
- */
-#define XTIMER_USLEEP_UNTIL_OVERHEAD 10
 #endif
 
 #if XTIMER_MASK
@@ -458,6 +430,24 @@ inline static uint64_t _xtimer_ticks_to_us64(uint64_t ticks) {
     uint64_t us = (uint64_t)ticks * 15625ul;
     return (us >> 9); /* equivalent to (us / 512) */
 }
+#elif XTIMER_HZ == (250000ul)
+/* ATMega2560 uses 250 kHz timer ticks */
+
+inline static uint32_t _xtimer_us_to_ticks(uint32_t us) {
+    return (us >> 2); /* divide by four */
+}
+
+inline static uint64_t _xtimer_us_to_ticks64(uint64_t us) {
+    return (us >> 2); /* divide by four */
+}
+
+inline static uint32_t _xtimer_ticks_to_us(uint32_t ticks) {
+    return (us << 2); /* multiply by four */
+}
+
+inline static uint64_t _xtimer_ticks_to_us64(uint64_t ticks) {
+    return (us << 2); /* multiply by four */
+}
 #else
 #error Unknown hardware timer frequency (XTIMER_HZ), check periph_conf.h and/or add an implementation in xtimer.h
 #endif
@@ -497,11 +487,7 @@ static inline void xtimer_spin_until(uint32_t value);
  */
 inline static uint32_t _lltimer_now_ticks(void)
 {
-#if XTIMER_SHIFT
-    return ((uint32_t)timer_read(XTIMER)) << XTIMER_SHIFT;
-#else
     return timer_read(XTIMER);
-#endif
 }
 
 /**
@@ -526,7 +512,7 @@ inline static uint32_t _xtimer_now_ticks(void) {
  */
 static inline uint32_t _lltimer_mask(uint32_t val)
 {
-    return val & ~XTIMER_MASK_SHIFTED;
+    return val & ~XTIMER_MASK;
 }
 
 static inline uint32_t xtimer_now(void)
