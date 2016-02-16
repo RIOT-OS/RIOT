@@ -89,6 +89,7 @@ void *worker_thread(void *arg)
     (void) arg;
     unsigned int loop_counter = 0;
     uint32_t start = 0;
+    uint32_t last = 0;
 
     printf("Starting thread %" PRIkernel_pid "\n", thread_getpid());
 
@@ -98,6 +99,9 @@ void *worker_thread(void *arg)
         uint32_t now = xtimer_now();
         if (start == 0) {
             start = now;
+            last = start;
+            ++loop_counter;
+            continue;
         }
 
         uint32_t us, sec;
@@ -108,9 +112,12 @@ void *worker_thread(void *arg)
         hr = sec / 3600;
         if ((loop_counter % TEST_HZ) == 0) {
             uint32_t expected = start + loop_counter * TEST_INTERVAL;
-            int32_t diff = now - expected;
-            printf("now=%" PRIu32 ".%06" PRIu32 " (%u hours %u min), diff=%" PRId32 "\n",
-                sec, us, hr, min, diff);
+            int32_t drift = now - expected;
+            expected = last + TEST_HZ * TEST_INTERVAL;
+            int32_t jitter = now - expected;
+            printf("now=%" PRIu32 ".%06" PRIu32 " (%u hours %u min), drift=%" PRId32 ", jitter=%" PRId32 "\n",
+                sec, us, hr, min, drift, jitter);
+            last = now;
         }
         ++loop_counter;
     }
