@@ -652,35 +652,47 @@ void atk_gnrc_rpl_init(void);
 
 /**
  * @brief set the arbitrary rank that should be used by the attacker
- * 
+ *
  * @param[in] faked_rank the rank to override the real rank
  */
 void atk_gnrc_rpl_set_rank(uint16_t faked_rank);
 
 /**
  * @brief set if parents should be kept
- * 
+ *
  * @param[in] keep tells if parents should be kept
  */
 void atk_gnrc_rpl_rank_parents(bool keep);
 
 /**
  * @brief set if the DODAG should be kept
- * 
+ *
  * @param[in] keep tells if a DODAG remains after local repair
  */
 void atk_gnrc_rpl_dodag(bool keep);
 
 /**
  * @brief set if a rank attack should be performed
- * 
+ *
  * @param[in] attack tells if the attack should start
  */
 void atk_gnrc_rpl_rank_activate(bool attack);
 
 /**
+ * @brief increment the DODAG version number
+ *
+ * @param[in] instance_id the instance of the DODAG to increment the version
+ */
+void atk_gnrc_rpl_version_increment(uint8_t instance_id);
+
+/**
+ * @brief increment the DODAG version number of all instances
+ */
+void atk_gnrc_rpl_version_increment_all(void);
+
+/**
  * @brief initialize the atk_gnrc_rpl_opts options for the attacker
- * 
+ *
  * @param[out] opt writes the current atk options to the given struct
  */
 void atk_gnrc_rpl_get_options(atk_gnrc_rpl_opt_t* opt);

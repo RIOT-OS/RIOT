@@ -386,6 +386,26 @@ void atk_gnrc_rpl_rank_activate(bool attack)
     atk_gnrc_rpl_opts.rank_atk_activated = attack;
 }
 
+void atk_gnrc_rpl_version_increment(uint8_t instance_id)
+{
+    for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
+        if ((gnrc_rpl_instances[i].state != 0)
+             && (gnrc_rpl_instances[i].id == instance_id)) {
+                 gnrc_rpl_instances[i].dodag.version = GNRC_RPL_COUNTER_INCREMENT(gnrc_rpl_instances[i].dodag.version);
+                 return;
+        }
+    }
+}
+
+void atk_gnrc_rpl_version_increment_all(void)
+{
+    for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
+        if (gnrc_rpl_instances[i].state != 0) {
+            gnrc_rpl_instances[i].dodag.version = GNRC_RPL_COUNTER_INCREMENT(gnrc_rpl_instances[i].dodag.version);
+        }
+    }
+}
+
 void atk_gnrc_rpl_get_options(atk_gnrc_rpl_opt_t* opt)
 {
     *opt = atk_gnrc_rpl_opts;
