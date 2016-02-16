@@ -520,36 +520,6 @@ void timer_irq_disable(tim_t dev)
     }
 }
 
-void timer_reset(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-
-        case TIMER_0:
-            lptmr_stop();
-            lptmr_start();
-            break;
-#endif
-#if TIMER_1_EN
-
-        case TIMER_1:
-            pit_stop(TIMER_1_COUNTER_CH);
-            pit_start(TIMER_1_COUNTER_CH);
-            break;
-#endif
-#if TIMER_2_EN
-
-        case TIMER_2:
-            pit_stop(TIMER_2_COUNTER_CH);
-            pit_start(TIMER_2_COUNTER_CH);
-            break;
-#endif
-
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
 inline static void pit_irq_handler(tim_t dev, uint8_t ch)
 {
     /* Stop timer */
