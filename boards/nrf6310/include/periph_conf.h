@@ -22,6 +22,8 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,35 +45,14 @@ extern "C" {
  * @name Timer configuration
  * @{
  */
-#define TIMER_NUMOF         (1U)
-#define TIMER_0_EN          1
-#define TIMER_1_EN          0
-#define TIMER_2_EN          0
-#define TIMER_IRQ_PRIO      1
+static const timer_conf_t timer_config[] = {
+    /* dev, channels, width */
+    { NRF_TIMER0, 3, TIMER_BITMODE_BITMODE_24Bit, TIMER0_IRQn }
+};
 
-/* Timer 0 configuration */
-#define TIMER_0_DEV         NRF_TIMER0
-#define TIMER_0_CHANNELS    3
-#define TIMER_0_MAX_VALUE   (0xffffff)
-#define TIMER_0_BITMODE     TIMER_BITMODE_BITMODE_24Bit
 #define TIMER_0_ISR         isr_timer0
-#define TIMER_0_IRQ         TIMER0_IRQn
 
-/* Timer 1 configuration */
-#define TIMER_1_DEV         NRF_TIMER1
-#define TIMER_1_CHANNELS    3
-#define TIMER_1_MAX_VALUE   (0xffff)
-#define TIMER_1_BITMODE     TIMER_BITMODE_BITMODE_16Bit
-#define TIMER_1_ISR         isr_timer1
-#define TIMER_1_IRQ         TIMER1_IRQn
-
-/* Timer 2 configuration */
-#define TIMER_2_DEV         NRF_TIMER2
-#define TIMER_2_CHANNELS    3
-#define TIMER_2_MAX_VALUE   (0xffff)
-#define TIMER_2_BITMODE     TIMER_BITMODE_BITMODE_16Bit
-#define TIMER_2_ISR         isr_timer2
-#define TIMER_2_IRQ         TIMER2_IRQn
+#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**
