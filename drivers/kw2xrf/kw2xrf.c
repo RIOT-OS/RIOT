@@ -1192,6 +1192,10 @@ int kw2xrf_send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
     int index = 0;
     kw2xrf_t *dev = (kw2xrf_t *) netdev;
 
+    if ((dev->option & KW2XRF_OPT_PRELOADING) == NETOPT_DISABLE) {
+        kw2xrf_set_sequence(dev, XCVSEQ_TRANSMIT);
+    }
+
     if (pkt == NULL) {
         return -ENOMSG;
     }
