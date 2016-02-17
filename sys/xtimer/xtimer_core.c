@@ -44,7 +44,7 @@ static inline void _lltimer_set(uint32_t target);
 static uint32_t _time_left(uint32_t target, uint32_t reference);
 
 static void _timer_callback(void);
-static void _periph_timer_callback(int chan);
+static void _periph_timer_callback(void *arg, int chan);
 
 static inline int _this_high_period(uint32_t target);
 
@@ -56,7 +56,7 @@ static inline int _is_set(xtimer_t *timer)
 void xtimer_init(void)
 {
     /* initialize low-level timer */
-    timer_init(XTIMER, (1000000ul >> XTIMER_SHIFT), _periph_timer_callback);
+    timer_init(XTIMER, (1000000ul >> XTIMER_SHIFT), _periph_timer_callback, NULL);
 
     /* register initial overflow tick */
     _lltimer_set(0xFFFFFFFF);
@@ -131,8 +131,9 @@ void xtimer_set(xtimer_t *timer, uint32_t offset)
     }
 }
 
-static void _periph_timer_callback(int chan)
+static void _periph_timer_callback(void *arg, int chan)
 {
+    (void)arg;
     (void)chan;
     _timer_callback();
 }
