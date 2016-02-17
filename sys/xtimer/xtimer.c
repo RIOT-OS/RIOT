@@ -63,45 +63,65 @@ void _xtimer_sleep_ticks(uint32_t offset, uint32_t long_offset)
     mutex_lock(&mutex);
 }
 
-void xtimer_usleep_until(uint32_t *last_wakeup_us, uint32_t interval) {
+void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t interval) {
     xtimer_t timer;
     mutex_t mutex = MUTEX_INIT;
-    uint32_t last_wakeup = _xtimer_us_to_ticks(*last_wakeup_us);
-
     timer.callback = _callback_unlock_mutex;
     timer.arg = (void*) &mutex;
 
-    uint32_t target = last_wakeup + _xtimer_us_to_ticks(interval);
-    uint32_t now = _xtimer_now_ticks();
+    uint32_t last_wakeup_us = *last_wakeup;
+
+    uint32_t target_us = last_wakeup_us + interval;
+    uint32_t now_ticks = _xtimer_now_ticks();
+    uint32_t now_us = _xtimer_ticks_to_us(now_ticks);
     /* make sure we're not setting a value in the past */
-    if (now < last_wakeup) {
-        /* base timer overflowed */
-        if (!((target < last_wakeup) && (target > now))) {
+    if (now_us < last_wakeup_us) {
+        /* base timer overflowed between last_wakeup and now */
+        if (!((now_us < target_us) && (target_us < last_wakeup_us))) {
+            /* target time has already passed */
             goto out;
         }
     }
-    else if (! ((target < last_wakeup) || (target > now))) {
-        goto out;
+    else {
+        /* base timer did not overflow */
+        if (((last_wakeup_us < target_us) && (target_us < now_us))) {
+            /* target time has already passed */
+            goto out;
+        }
     }
 
-    /* For large offsets, set an absolute target time.
+    /*
+     * For large offsets, set an absolute target time.
      * As that might cause an underflow, for small offsets, spin.
+     *
+     * Note: last_wakeup must never specify a time in the future after
+     * xtimer_usleep_until returns.
+     * If this happens, last_wakeup may specify a time in the future when the
+     * next call to xtimer_usleep_until is made, which in turn will trigger the
+     * overflow logic above and make the next timer fire too early, causing
+     * last_wakeup to point even further into the future, leading to a chain
+     * reaction.
+     *
+     * To ensure that last_wakeup does not point to the future we compute the
+     * offset rounding up to nearest tick past the target.
+     *
+     * Observed on:
+     *  - mulle in tests/xtimer_drift with XTIMER_HZ set to 32768, and 31250
      */
-    uint32_t offset = target - now;
-
-    DEBUG("xuu, now: %9" PRIu32 ", tgt: %9" PRIu32 ", off: %9" PRIu32 "\n", now, target, offset);
-    if (offset > (XTIMER_BACKOFF * 2)) {
+    uint32_t offset_ticks = _xtimer_us_to_ticks_ceil(target_us - now_us);
+    DEBUG("xuu, now: %9" PRIu32 ", tgt: %9" PRIu32 ", off: %9" PRIu32 "\n", now_us, target_us, offset_ticks);
+    if (offset_ticks > XTIMER_BACKOFF) {
+        uint32_t target_ticks = now_ticks + offset_ticks;
         mutex_lock(&mutex);
-        DEBUG("xuu, abs: %" PRIu32 "\n", target);
-        _xtimer_set_absolute_ticks(&timer, target);
+        DEBUG("xuu, abs: %" PRIu32 "\n", target_ticks);
+        _xtimer_set_absolute_ticks(&timer, target_ticks);
         mutex_lock(&mutex);
     }
     else {
-        _xtimer_spin_ticks(offset);
+        _xtimer_spin_ticks(offset_ticks);
     }
-
 out:
-    *last_wakeup_us = _xtimer_ticks_to_us(target);
+    *last_wakeup = target_us;
 }
 
 static void _callback_msg(void* arg)

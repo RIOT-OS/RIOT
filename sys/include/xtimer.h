@@ -445,7 +445,7 @@ inline static uint64_t _xtimer_ticks_to_us64(uint64_t ticks) {
 #error (XTIMER_HZ << XTIMER_SHIFT) != 1000000ul
 #endif
 /* 1 MHz is a power-of-two multiple of XTIMER_HZ */
-/* e.g. ATMega2560 uses a 250 kHz timer */
+/* e.g. ATmega2560 uses a 250 kHz timer */
 inline static uint32_t _xtimer_us_to_ticks(uint32_t us) {
     return (us >> XTIMER_SHIFT); /* divide by power of two */
 }
@@ -515,6 +515,22 @@ inline static uint64_t _xtimer_ticks_to_us64(uint64_t ticks) {
 #error Unknown hardware timer frequency (XTIMER_HZ), check board.h and/or add an implementation in xtimer.h
 #endif
 #endif
+
+/**
+ * @brief Convert microseconds to underlying hardware timer ticks, rounding up
+ *
+ * Result will be rounded up to nearest integer tick equal to or longer than the
+ * given microsecond value
+ */
+inline static uint32_t _xtimer_us_to_ticks_ceil(uint32_t us)
+{
+#if XTIMER_HZ < SEC_IN_USEC
+    /* only timers slower than 1 MHz need rounding */
+    return _xtimer_us_to_ticks(us + (_xtimer_ticks_to_us(1) - 1));
+#else
+    return _xtimer_us_to_ticks(us);
+#endif
+}
 
 #if XTIMER_MASK
 extern volatile uint32_t _high_cnt;

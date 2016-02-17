@@ -165,6 +165,7 @@ int _xtimer_set_absolute_ticks(xtimer_t *timer, uint32_t target)
 
     timer->next = NULL;
     if ((target >= now) && ((target - XTIMER_BACKOFF) < now)) {
+        /* TODO: Handle corner case: now = 0, target = 1, XTIMER_BACKOFF = 2 (target < XTIMER_BACKOFF) */
         /* backoff */
         _xtimer_spin_until_ticks(target + XTIMER_BACKOFF);
         _shoot(timer);
