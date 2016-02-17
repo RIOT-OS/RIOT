@@ -30,21 +30,17 @@
 
 #define USEC_PER_SEC             1000000 /**< Conversion factor between seconds and microseconds */
 
-typedef struct {
-    void (*cb)(int);
-} timer_conf_t;
-
 /**
  * @brief Timer state memory
  */
-timer_conf_t config[TIMER_NUMOF];
+static timer_isr_ctx_t config[TIMER_NUMOF];
 
 
 /**
  * @brief Setup the given timer
  *
  */
-int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     cc2538_gptimer_t *gptimer;
     unsigned int gptimer_num;
@@ -80,7 +76,8 @@ int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
     gptimer_num = ((uintptr_t)gptimer - (uintptr_t)GPTIMER0) / 0x1000;
 
     /* Save the callback function: */
-    config[dev].cb = callback;
+    config[dev].cb = cb;
+    config[dev].arg = arg;
 
     /* Enable the clock for this timer: */
     SYS_CTRL_RCGCGPT |= (1 << gptimer_num);
@@ -380,90 +377,60 @@ void timer_irq_disable(tim_t dev)
     }
 }
 
-#if TIMER_0_EN
-void TIMER_0_ISR_1(void)
+static inline void irq_handler(int tim, int chan)
 {
-    if (config[0].cb != NULL) config[0].cb(0);
-
+    if (config[tim].cb != NULL) {
+        config[tim].cb(config[tim].arg, chan);
+    }
     if (sched_context_switch_request) {
         thread_yield();
     }
+}
 
+#if TIMER_0_EN
+void TIMER_0_ISR_1(void)
+{
+    irq_handler(0, 0);
 }
 
 void TIMER_0_ISR_2(void)
 {
-    if (config[0].cb != NULL) config[0].cb(1);
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
-
+    irq_handler(0, 1);
 }
 #endif /* TIMER_0_EN */
 
 #if TIMER_1_EN
 void TIMER_1_ISR_1(void)
 {
-    if (config[1].cb != NULL) config[1].cb(0);
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
-
+    irq_handler(1, 0);
 }
 
 void TIMER_1_ISR_2(void)
 {
-    if (config[1].cb != NULL) config[1].cb(1);
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
-
+    irq_handler(1, 1);
 }
 #endif /* TIMER_1_EN */
 
 #if TIMER_2_EN
 void TIMER_2_ISR_1(void)
 {
-    if (config[2].cb != NULL) config[2].cb(0);
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
-
+    irq_handler(2, 0);
 }
 
 void TIMER_2_ISR_2(void)
 {
-    if (config[2].cb != NULL) config[2].cb(1);
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
-
+    irq_handler(2, 1);
 }
 #endif /* TIMER_2_EN */
 
 #if TIMER_3_EN
 void TIMER_3_ISR_1(void)
 {
-    if (config[3].cb != NULL) config[3].cb(0);
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
-
+    irq_handler(3, 0);
 }
 
 void TIMER_3_ISR_2(void)
 {
-    if (config[3].cb != NULL) config[3].cb(1);
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
-
+    irq_handler(3, 1);
 }
 #endif /* TIMER_3_EN */

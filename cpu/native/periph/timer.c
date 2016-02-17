@@ -49,7 +49,8 @@
 
 static unsigned long time_null;
 
-static void (*_callback)(int);
+static timer_cb_t _callback;
+static void *_cb_arg;
 
 static struct itimerval itv;
 
@@ -71,10 +72,10 @@ void native_isr_timer(void)
 {
     DEBUG("%s\n", __func__);
 
-    _callback(0);
+    _callback(_cb_arg, 0);
 }
 
-int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     (void)freq;
     DEBUG("%s\n", __func__);
@@ -90,7 +91,8 @@ int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
     time_null = timer_read(0);
 
     timer_irq_disable(dev);
-    _callback = callback;
+    _callback = cb;
+    _cb_arg = arg;
     timer_irq_enable(dev);
 
     return 0;

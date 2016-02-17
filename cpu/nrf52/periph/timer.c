@@ -40,7 +40,8 @@
  * @brief struct for keeping track of a timer's state
  */
 typedef struct {
-    void (*cb)(int);
+    timer_cb_t cb;
+    void *arg;
     uint8_t flags;
 } timer_conf_t;
 
@@ -64,14 +65,15 @@ static NRF_TIMER_Type *const timer[] = {
 #endif
 };
 
-int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     if (dev >= TIMER_NUMOF) {
         return -1;
     }
 
     /* save callback */
-    timer_config[dev].cb = callback;
+    timer_config[dev].cb = cb;
+    timer_config[dev].arg = arg;
     /* power on timer */
     /* timer[dev]->POWER = 1; */
 
@@ -308,7 +310,7 @@ void TIMER_0_ISR(void)
             if (timer_config[TIMER_0].flags & (1 << i)) {
                 timer_config[TIMER_0].flags &= ~(1 << i);
                 TIMER_0_DEV->INTENCLR = (1 << (16 + i));
-                timer_config[TIMER_0].cb(i);
+                timer_config[TIMER_0].cb(timer_config[TIMER_0].arg, i);
             }
         }
     }
@@ -329,7 +331,7 @@ void TIMER_1_ISR(void)
             if (timer_config[TIMER_1].flags & (1 << i)) {
                 timer_config[TIMER_1].flags &= ~(1 << i);
                 TIMER_1_DEV->INTENCLR = (1 << (16 + i));
-                timer_config[TIMER_1].cb(i);
+                timer_config[TIMER_1].cb(timer_config[TIMER_1].arg, i);
             }
         }
     }
@@ -350,7 +352,7 @@ void TIMER_2_ISR(void)
             if (timer_config[TIMER_2].flags & (1 << i)) {
                 timer_config[TIMER_2].flags &= ~(1 << i);
                 TIMER_2_DEV->INTENCLR = (1 << (16 + i));
-                timer_config[TIMER_2].cb(i);
+                timer_config[TIMER_2].cb(timer_config[TIMER_2].arg, i);
             }
         }
     }
