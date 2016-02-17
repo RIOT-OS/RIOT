@@ -53,6 +53,8 @@
 #ifndef GPIO_H
 #define GPIO_H
 
+#include <limits.h>
+
 #include "periph_cpu.h"
 #include "periph_conf.h"
 /* TODO: remove once all platforms are ported to this interface */
@@ -73,14 +75,14 @@ extern "C" {
  * @brief   Define global value for GPIO not defined
  */
 #ifndef GPIO_UNDEF
-#define GPIO_UNDEF      (-1)
+#define GPIO_UNDEF          (UINT_MAX)
 #endif
 
 /**
  * @brief   Define the default GPIO type identifier
  */
 #ifndef HAVE_GPIO_T
-typedef int gpio_t;
+typedef unsigned int gpio_t;
 #endif
 
 /**
