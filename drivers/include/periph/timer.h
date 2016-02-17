@@ -56,12 +56,20 @@ typedef unsigned int tim_t;
 #endif
 
 /**
+ * @brief   Signature of event callback functions triggered from interrupts
+ *
+ * @param[in] arg       optional context for the callback
+ * @param[in] channel   timer channel that triggered the interrupt
+ */
+typedef void (*timer_cb_t)(void *arg, int channel);
+
+/**
  * @brief   Default interrupt context entry holding callback and argument
  * @{
  */
 #ifndef HAVE_TIMER_ISR_CTX_T
 typedef struct {
-    void (*cb)(int);        /**< callback executed from timer interrupt */
+    timer_cb_t cb;          /**< callback executed from timer interrupt */
     void *arg;              /**< optional argument given to that callback */
 } timer_isr_ctx_t;
 #endif
@@ -82,11 +90,12 @@ typedef struct {
  * @param[in] freq          requested number of ticks per second
  * @param[in] callback      this callback is called in interrupt context, the
  *                          emitting channel is passed as argument
+ * @param[in] arg           argument to the callback
  *
  * @return                  0 on success
  * @return                  -1 if speed not applicable or unknown device given
  */
-int timer_init(tim_t dev, unsigned long freq, void (*callback)(int));
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg);
 
 /**
  * @brief Set a given timer channel for the given timer device
