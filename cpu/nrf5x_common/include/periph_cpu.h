@@ -77,6 +77,16 @@ typedef enum {
 } gpio_flank_t;
 /** @} */
 
+/**
+ * @brief   Timer configuration options
+ */
+typedef struct {
+    NRF_TIMER_Type *dev;
+    uint8_t channels;
+    uint8_t bitmode;
+    uint8_t irqn;
+} timer_conf_t;
+
 #ifdef __cplusplus
 }
 #endif
