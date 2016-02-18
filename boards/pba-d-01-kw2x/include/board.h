@@ -72,6 +72,15 @@ extern "C"
 /** @} */
 
 /**
+ * @name Macro for button S1/S2.
+ * @{
+ */
+#define BUTTON_PORT         PORTD
+#define BUTTON_PIN          1
+#define BUTTON_GPIO         GPIO_PIN(PORT_D, BUTTON_PIN)
+/** @} */
+
+/**
 @name KW2XRF configuration
 @{
 */
