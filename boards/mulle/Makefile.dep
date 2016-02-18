@@ -13,3 +13,7 @@ FEATURES_REQUIRED += periph_rtt
 # The Mulle uses NVRAM to store persistent variables, such as boot count.
 USEMODULE += nvram_spi
 FEATURES_REQUIRED += periph_spi
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
