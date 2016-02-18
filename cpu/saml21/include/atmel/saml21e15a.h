@@ -44,8 +44,8 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
-#ifndef _SAML21E15A_
-#define _SAML21E15A_
+#ifndef SAML21E15A_H
+#define SAML21E15A_H
 
 /**
  * \ingroup SAML21_definitions

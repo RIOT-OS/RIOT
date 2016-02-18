@@ -15,8 +15,8 @@
  * @author          Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-#ifndef __CPU_CONF_H
-#define __CPU_CONF_H
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #include "atmel/saml21.h"
 
@@ -37,5 +37,5 @@ extern "C" {
 }
 #endif
 
-#endif /* __CPU_CONF_H */
+#endif /* CPU_CONF_H */
 /** @} */

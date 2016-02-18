@@ -25,8 +25,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef TELOSB_BOARD_H_
-#define TELOSB_BOARD_H_
+#ifndef TELOSB_BOARD_H
+#define TELOSB_BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,4 +81,4 @@ extern "C" {
 #include <stdint.h>
 
 /** @} */
-#endif /*  TELOSB_BOARD_H_ */
+#endif /*  TELOSB_BOARD_H */

@@ -35,8 +35,8 @@
    ---------------------------------------------------------------------------*/
 
 
-#ifndef __CORE_CMFUNC_H
-#define __CORE_CMFUNC_H
+#ifndef CORE_CMFUNC_H
+#define CORE_CMFUNC_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -675,4 +675,4 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_FPSCR(uint32_t fps
 }
 #endif
 
-#endif /* __CORE_CMFUNC_H */
+#endif /* CORE_CMFUNC_H */

@@ -735,6 +735,6 @@ __STATIC_INLINE uint32_t SysTick_Config(uint32_t ticks)
 }
 #endif
 
-#endif /* __CORE_CM0_H_DEPENDANT */
+#endif /* CORE_CM0_H_DEPENDANT */
 
 #endif /* __CMSIS_GENERIC */

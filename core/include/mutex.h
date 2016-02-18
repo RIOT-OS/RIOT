@@ -18,8 +18,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef MUTEX_H_
-#define MUTEX_H_
+#ifndef MUTEX_H
+#define MUTEX_H
 
 #include "priority_queue.h"
 #include "atomic.h"
@@ -101,5 +101,5 @@ void mutex_unlock_and_sleep(mutex_t *mutex);
 }
 #endif
 
-#endif /* MUTEX_H_ */
+#endif /* MUTEX_H */
 /** @} */

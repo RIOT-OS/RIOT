@@ -27,8 +27,8 @@
  * ----------------------------------------------------------------------------
  */
 
-#ifndef _SAM3X8E_
-#define _SAM3X8E_
+#ifndef SAM3X8E_H
+#define SAM3X8E_H
 
 /** \addtogroup cpu_sam3x8e_definitions SAM3X8E definitions
   This file defines all structures and symbols for SAM3X8E:
@@ -579,4 +579,4 @@ void WDT_Handler        ( void );
 
 /*@}*/
 
-#endif /* _SAM3X8E_ */
+#endif /* SAM3X8E_H */

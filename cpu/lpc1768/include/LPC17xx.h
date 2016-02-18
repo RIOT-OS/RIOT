@@ -23,8 +23,8 @@
  ******************************************************************************/
 
 
-#ifndef __LPC17xx_H__
-#define __LPC17xx_H__
+#ifndef LPC17xx_H
+#define LPC17xx_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -1044,4 +1044,4 @@ typedef struct
 }
 #endif
 
-#endif  // __LPC17xx_H__
+#endif  // LPC17xx_H

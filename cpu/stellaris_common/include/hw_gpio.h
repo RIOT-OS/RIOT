@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_GPIO_H__
-#define __HW_GPIO_H__
+#ifndef HW_GPIO_H
+#define HW_GPIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -197,4 +197,4 @@ extern "C" {
 }
 #endif
 
-#endif // __HW_GPIO_H__
+#endif // HW_GPIO_H

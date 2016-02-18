@@ -16,8 +16,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef ATTRIBUTES_H_
-#define ATTRIBUTES_H_
+#ifndef ATTRIBUTES_H
+#define ATTRIBUTES_H
 
 #include <stddef.h>
 
@@ -86,5 +86,5 @@
 }
 #endif
 
-#endif /* ATTRIBUTES_H_ */
+#endif /* ATTRIBUTES_H */
 /** @} */

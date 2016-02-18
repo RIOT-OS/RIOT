@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef MSB_BOARD_H_
-#define MSB_BOARD_H_
+#ifndef MSB_BOARD_H
+#define MSB_BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,4 +67,4 @@ extern "C" {
 #include "board-conf.h"
 
 /** @} */
-#endif /* MSB_BOARD_H_ */
+#endif /* MSB_BOARD_H */

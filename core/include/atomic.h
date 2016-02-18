@@ -18,8 +18,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef ATOMIC_H_
-#define ATOMIC_H_
+#ifndef ATOMIC_H
+#define ATOMIC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -146,5 +146,5 @@ static inline int atomic_set_to_zero(atomic_int_t *var)
 }
 #endif
 
-#endif /* ATOMIC_H_ */
+#endif /* ATOMIC_H */
 /** @} */

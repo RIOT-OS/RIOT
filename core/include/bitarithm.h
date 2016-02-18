@@ -17,8 +17,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef BITARITHM_H_
-#define BITARITHM_H_
+#ifndef BITARITHM_H
+#define BITARITHM_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -122,5 +122,5 @@ unsigned bitarithm_bits_set(unsigned v);
 }
 #endif
 
-#endif /* BITARITHM_H_ */
+#endif /* BITARITHM_H */
 /** @} */

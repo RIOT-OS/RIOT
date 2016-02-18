@@ -39,8 +39,8 @@
  #pragma system_include  /* treat file as system include file for MISRA check */
 #endif
 
-#ifndef __CORE_CMSIMD_H
-#define __CORE_CMSIMD_H
+#ifndef CORE_CMSIMD_H
+#define CORE_CMSIMD_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -694,4 +694,4 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __SMMLA (int32_t op1
 }
 #endif
 
-#endif /* __CORE_CMSIMD_H */
+#endif /* CORE_CMSIMD_H */

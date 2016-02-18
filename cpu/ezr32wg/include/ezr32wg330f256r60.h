@@ -31,8 +31,8 @@
  *
  *****************************************************************************/
 
-#ifndef __SILICON_LABS_EZR32WG330F256R60_H__
-#define __SILICON_LABS_EZR32WG330F256R60_H__
+#ifndef SILICON_LABS_EZR32WG330F256R60_H
+#define SILICON_LABS_EZR32WG330F256R60_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -492,4 +492,4 @@ typedef enum IRQn
 #ifdef __cplusplus
 }
 #endif
-#endif /* __SILICON_LABS_EZR32WG330F256R60_H__ */
+#endif /* SILICON_LABS_EZR32WG330F256R60_H */

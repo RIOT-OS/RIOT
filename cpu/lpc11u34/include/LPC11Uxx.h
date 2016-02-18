@@ -25,8 +25,8 @@
  *
  */
 
-#ifndef __LPC11UXX_H__
-#define __LPC11UXX_H__
+#ifndef LPC11UXX_H
+#define LPC11UXX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -662,5 +662,5 @@ typedef struct {
 #endif
 
 
-#endif  // __LPC11UXX_H__
+#endif  // LPC11UXX_H
 /** @} */

@@ -19,8 +19,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef KERNEL_H_
-#define KERNEL_H_
+#ifndef KERNEL_H
+#define KERNEL_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -68,5 +68,5 @@ extern config_t sysconfig;
 }
 #endif
 
-#endif /* KERNEL_H_ */
+#endif /* KERNEL_H */
 /** @} */

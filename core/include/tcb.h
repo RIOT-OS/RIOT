@@ -17,8 +17,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef TCB_H_
-#define TCB_H_
+#ifndef TCB_H
+#define TCB_H
 
 #include <stdint.h>
 #include "priority_queue.h"
@@ -87,5 +87,5 @@ typedef struct tcb_t {
 }
 #endif
 
-#endif /* TCB_H_ */
+#endif /* TCB_H */
 /** @} */

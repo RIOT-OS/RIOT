@@ -49,8 +49,8 @@
   * @{
   */
 
-#ifndef __STM32F334x8_H
-#define __STM32F334x8_H
+#ifndef STM32F334x8_H
+#define STM32F334x8_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -7590,7 +7590,7 @@ typedef struct
 }
 #endif /* __cplusplus */
 
-#endif /* __STM32F334x8_H */
+#endif /* STM32F334x8_H */
 
 /**
  * @}

@@ -41,8 +41,8 @@
  *
  */
 
-#ifndef _SAMR21G18A_
-#define _SAMR21G18A_
+#ifndef SAMR21G18A_H
+#define SAMR21G18A_H
 
 /**
  * \ingroup cpu_specific_SAMR21_definitions
