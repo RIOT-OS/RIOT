@@ -55,7 +55,10 @@ extern "C" {
 #define MSP430_HAS_DCOR             1
 #define MSP430_HAS_EXTERNAL_CRYSTAL 0
 
-/* LEDs ports MSB430 */
+/**
+ * @brief   LED definitions
+ * @{
+ */
 #define LEDS_PxDIR P5DIR
 #define LEDS_PxOUT P5OUT
 #define LEDS_CONF_RED       0x80
@@ -65,6 +68,10 @@ extern "C" {
 #define LED_RED_ON          LEDS_PxOUT &=~LEDS_CONF_RED
 #define LED_RED_OFF         LEDS_PxOUT |= LEDS_CONF_RED
 #define LED_RED_TOGGLE      LEDS_PxOUT ^= LEDS_CONF_RED
+#define LED_GREEN_ON        /* not present */
+#define LED_GREEN_OFF       /* not present */
+#define LED_GREEN_TOGGLE    /* not present */
+/** @} */
 
 #ifdef __cplusplus
 }
