@@ -120,6 +120,14 @@ void board_init(void);
 /** @} */
 
 /**
+ * @name Mulle Vchr, Vbat ADC lines
+ */
+/** @{ */
+#define MULLE_VBAT_ADC_LINE           ADC_LINE(6)
+#define MULLE_VCHR_ADC_LINE           ADC_LINE(7)
+/** @} */
+
+/**
  * @name K60 clock dividers
  */
 /** @{ */
