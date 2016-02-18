@@ -46,6 +46,7 @@ const char *saul_class_to_str(uint8_t class_id)
         case SAUL_SENSE_GYRO:   return "SENSE_GYRO";
         case SAUL_SENSE_COLOR:  return "SENSE_COLOR";
         case SAUL_SENSE_PRESS:  return "SENSE_PRESS";
+        case SAUL_SENSE_ANALOG: return "SENSE_ANALOG";
         case SAUL_CLASS_ANY:    return "CLASS_ANY";
         default:                return "CLASS_UNKNOWN";
     }
