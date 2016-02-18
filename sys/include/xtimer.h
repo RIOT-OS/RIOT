@@ -248,7 +248,7 @@ void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid);
  * @param[in] offset    time in microseconds from now specifying that timer's
  *                      callback's execution time
  */
-void xtimer_set(xtimer_t *timer, uint32_t offset);
+static inline void xtimer_set(xtimer_t *timer, uint32_t offset);
 
 /**
  * @brief remove a timer
@@ -600,7 +600,15 @@ static inline uint32_t xtimer_now(void)
     return _xtimer_ticks_to_us(_xtimer_now_ticks());
 }
 
-static inline void _xtimer_spin_until_ticks(uint32_t target) {
+void _xtimer_set_ticks(xtimer_t *timer, uint32_t offset);
+
+static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
+{
+    _xtimer_set_ticks(timer, _xtimer_us_to_ticks(offset));
+}
+
+static inline void _xtimer_spin_until_ticks(uint32_t target)
+{
 #if XTIMER_MASK
     target = _lltimer_mask(target);
 #endif
@@ -613,12 +621,14 @@ static inline void xtimer_spin_until(uint32_t target) {
     _xtimer_spin_until_ticks(target);
 }
 
-static inline void _xtimer_spin_ticks(uint32_t offset) {
+static inline void _xtimer_spin_ticks(uint32_t offset)
+{
     uint32_t start = _xtimer_now_ticks();
     while ((_xtimer_now_ticks() - start) < offset);
 }
 
-static inline void xtimer_spin(uint32_t offset) {
+static inline void xtimer_spin(uint32_t offset)
+{
     offset = _xtimer_us_to_ticks(offset);
     _xtimer_spin_ticks(offset);
 }
