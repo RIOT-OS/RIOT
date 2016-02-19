@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_bh1750fvi BH1750FVI Light Sensor
- * @ingroup     drivers_periph
+ * @ingroup     drivers_sensors
  * @brief       Driver for the Rohm BH1750FVI ambient light sensor
  *
  * @{
