@@ -57,7 +57,7 @@ typedef struct {
     REG8    OD;         /**< output data */
     REG8    DIR;        /**< pin direction */
     REG8    SEL;        /**< alternative function select */
-    REG8    REN;        /**< eneble pullup/pulldonw resistor */
+    REG8    REN;        /**< enable pullup/pulldown resistor */
 } msp_port_t;
 
 /**

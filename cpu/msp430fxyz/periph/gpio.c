@@ -82,7 +82,7 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
 {
     msp_port_t *port = _port(pin);
     /* check if port is valid */
-    if (port == NULL) 
+    if (port == NULL)
         return -1;
     /* set pin direction */
     port->DIR &= ~(_pin(pin));
