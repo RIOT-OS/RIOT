@@ -114,9 +114,9 @@ static int init_base(uart_t uart, uint32_t baudrate)
     }
 
     /* uart_configure RX and TX pins, set pin to use alternative function mode */
-    gpio_init(tx_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(tx_pin, GPIO_DIR_OUT, GPIO_PULLUP);
     gpio_init_af(tx_pin, af);
-    gpio_init(rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init(rx_pin, GPIO_DIR_IN, GPIO_PULLUP);
     gpio_init_af(rx_pin, af);
 
     /* uart_configure UART to mode 8N1 with given baudrate */
