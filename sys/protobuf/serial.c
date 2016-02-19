@@ -25,6 +25,9 @@
 
 #define MAX_BIN_SIZE 512
 
+#define RECORD_START (0x1E)
+#define RECORD_END   (0x17)
+
 #define IO_ERROR       -1
 #define IO_BUFF_OVFLOW -2
 
@@ -42,13 +45,21 @@ static void _putchar(int c) {
 
 #endif
 
+enum {
+    WAIT_START,
+    MSG_TYPE,
+    LEN,
+    BIN_BLOCK,
+    EXPECT_END
+};
+
 #if 1
 static proto_msg_t readbinary(uint8_t *buf, size_t *size)
 {
     uint8_t *line_buf_ptr = buf;
-    uint8_t start = 1;
+    uint8_t sts = WAIT_START;
     int8_t binlen = 0;
-    proto_msg_t message = M_PROTO_START;
+    proto_msg_t message = M_PROTO_ERROR;
     int c;
 
     while (1) {
@@ -60,9 +71,43 @@ static proto_msg_t readbinary(uint8_t *buf, size_t *size)
         if (c < 0) {
             return IO_ERROR;
         }
-        //_putchar(c);
 
-        if (start && c == 0x1E) {
+        if (c == RECORD_END) {
+            if (sts == EXPECT_END) {
+                return message + M_PROTO_START;
+            } else {
+                return M_PROTO_ERROR;
+            }
+        }
+
+        switch (sts) {
+            case WAIT_START:
+                if (c == RECORD_START) {
+                    sts = MSG_TYPE;
+                }
+                break;
+            case MSG_TYPE:
+                message = c;
+                sts = LEN;
+                break;
+            case LEN:
+                binlen = c;
+                sts = BIN_BLOCK;
+                break;
+            case BIN_BLOCK:
+                *line_buf_ptr++ = c;
+                if ((line_buf_ptr - buf) == binlen) {
+                    *size = binlen;
+                    sts = EXPECT_END;
+                    //return message + M_PROTO_START;
+                }
+
+                break;
+        }
+    }
+
+#if 0
+        if (start && c == RECORD_START) {
             // RS found, start of block
             start = 0;
 
@@ -81,41 +126,16 @@ static proto_msg_t readbinary(uint8_t *buf, size_t *size)
             *line_buf_ptr++ = c;
             if ((line_buf_ptr - buf) == binlen) {
                 *size = binlen;
-                return message;
+                return message + M_PROTO_START;
             }
         }
     }
+#endif
     return M_PROTO_START;
 }
 #endif
 
-#if 0
-static proto_msg_t readbinary(uint8_t *buf, size_t *size)
-{
-    uint8_t *line_buf_ptr = buf;
-    uint binlen = 4;
-    proto_msg_t message = M_PROTO_START;
 
-    while (1) {
-        if ((line_buf_ptr - buf) >= MAX_BIN_SIZE) {
-            return IO_BUFF_OVFLOW;
-        }
-
-        int c = getchar();
-        if (c < 0) {
-            return IO_ERROR;
-        }
-        //_putchar(c);
-
-        *line_buf_ptr++ = c;
-        if ((line_buf_ptr - buf) == binlen) {
-            *size = binlen;
-            return message;
-        }
-    }
-    return M_PROTO_START;
-}
-#endif
 
 
 void proto_shell_run(void)
@@ -126,7 +146,9 @@ void proto_shell_run(void)
     while (1) {
         ptype = readbinary(_buff, &len);
 
-        if (ptype != M_PROTO_START) {
+        if (ptype == M_PROTO_ERROR) {
+            printf("binary corrupted\n");
+        } else {
             submit(ptype, _buff, len);
         }
     }

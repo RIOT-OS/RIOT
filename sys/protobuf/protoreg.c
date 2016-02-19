@@ -24,7 +24,7 @@ typedef struct reg_t {
     kernel_pid_t pid;
 } reg_t;
 
-static reg_t reg[M_PROTO_END - M_PROTO_START];
+static reg_t reg[M_PROTO_ERROR - M_PROTO_START];
 
 void subscribe(kernel_pid_t pid, proto_msg_t command_id) {
     reg[command_id - M_PROTO_START].pid = pid;

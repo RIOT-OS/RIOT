@@ -29,7 +29,7 @@ typedef enum {
     M_PROTO_START  = 0x9000,
     M_MQTT_CONFIG,
     M_MQTT_COMMAND,
-    M_PROTO_END
+    M_PROTO_ERROR
 
 } proto_msg_t;
 

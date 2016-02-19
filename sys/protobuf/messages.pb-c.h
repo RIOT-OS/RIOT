@@ -4,7 +4,7 @@
 #ifndef PROTOBUF_C_messages_2eproto__INCLUDED
 #define PROTOBUF_C_messages_2eproto__INCLUDED
 
-#include <protobuf-c/protobuf-c.h>
+#include <protobuf-c.h>
 
 PROTOBUF_C__BEGIN_DECLS
 
