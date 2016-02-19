@@ -98,9 +98,9 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     NVIC_EnableIRQ(i2c_config[dev].er_irqn);
 
     /* configure pins */
-    gpio_init(i2c_config[dev].scl, GPIO_DIR_OUT, GPIO_PULLUP);
+    gpio_init(i2c_config[dev].scl, GPIO_DIR_OUT, GPIO_NOPULL_OD);
     gpio_init_af(i2c_config[dev].scl, i2c_config[dev].af);
-    gpio_init(i2c_config[dev].sda, GPIO_DIR_OUT, GPIO_PULLUP);
+    gpio_init(i2c_config[dev].sda, GPIO_DIR_OUT, GPIO_NOPULL_OD);
     gpio_init_af(i2c_config[dev].sda, i2c_config[dev].af);
 
     /* configure device */
