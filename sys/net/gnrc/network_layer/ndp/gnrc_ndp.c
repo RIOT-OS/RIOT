@@ -506,7 +506,7 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
     if (nc_entry == NULL) { /* not in default router list */
         /* create default router list entry */
         nc_entry = gnrc_ipv6_nc_add(iface, &ipv6->src, NULL, 0,
-                                    GNRC_IPV6_NC_IS_ROUTER);
+                                    GNRC_IPV6_NC_STATE_STALE | GNRC_IPV6_NC_IS_ROUTER);
         if (nc_entry == NULL) {
             DEBUG("ndp: error on default router list entry creation\n");
             return;
