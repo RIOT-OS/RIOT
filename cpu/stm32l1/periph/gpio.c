@@ -72,12 +72,14 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
     RCC->AHBENR |= (RCC_AHBENR_GPIOAEN << _port_num(pin));
     /* configure pull register */
     port->PUPDR &= ~(3 << (2 * pin_num));
-    port->PUPDR |= (pullup << (2 * pin_num));
+    port->PUPDR |= ((pullup & 0x03) << (2 * pin_num));
     /* set direction */
     if (dir == GPIO_DIR_OUT) {
         port->MODER &= ~(3 << (2 * pin_num));   /* set pin to output mode */
         port->MODER |= (1 << (2 * pin_num));
-        port->OTYPER &= ~(1 << pin_num);        /* set to push-pull */
+        /* set to push-pull or open-drain */
+        port->OTYPER &= ~(1 << pin_num);
+        port->OTYPER |= ((pullup >> 2) << pin_num);
         port->OSPEEDR |= (3 << (2 * pin_num));  /* set to high speed */
         port->ODR &= ~(1 << pin_num);           /* set pin to low signal */
     }
