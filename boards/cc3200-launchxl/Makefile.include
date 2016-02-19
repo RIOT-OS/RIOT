@@ -40,7 +40,9 @@ export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist $(ELFFILE)
 export RESET_FLAGS = $(BINDIR)
 
 export BTEST_FLAGS = $(CURDIR)/tests $(ELFFILE) $(TEST_SUITE)
-
+#protobuf setup
+export PROTOC_CMD ?= $(RIOTBOARD)/$(BOARD)/dist/protobuf.sh
+export PROTOC_ARGS = $(RIOTBASE)/sys/protobuf
 
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 

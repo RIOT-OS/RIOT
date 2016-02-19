@@ -607,12 +607,13 @@ int sbapp_init(void) {
 		/* start SBAPP thread */
 		sbapp.main_pid = thread_create(_stack, sizeof(_stack), SBAPP_PRIO,
 		THREAD_CREATE_STACKTEST, _event_loop, &parent, "sbapp");
+
+	    sts = msg_receive(&m); // yield until ip connection is ready
+	    if (sts == -1) {
+	        DEBUG("unexpected error\n");
+	    }
 	}
-	sts = msg_receive(&m); // yield until ip connection is ready
-	if (sts == -1) {
-		DEBUG("unexpected error\n");
-	}
-	DEBUG("msg type: [%d]\n", m.type);
+
 	return sbapp.main_pid;
 }
 
