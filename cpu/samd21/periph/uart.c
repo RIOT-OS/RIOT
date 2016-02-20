@@ -79,9 +79,9 @@ static int init_base(uart_t uart, uint32_t baudrate)
     /* enable sync and async clocks */
     uart_poweron(uart);
     /* configure pins */
-    gpio_init(uart_config[uart].rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init(uart_config[uart].rx_pin, GPIO_IN);
     gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
-    gpio_init(uart_config[uart].tx_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
     gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
     /* reset the UART device */
     dev->CTRLA.reg = SERCOM_USART_CTRLA_SWRST;
