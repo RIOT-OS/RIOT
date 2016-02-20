@@ -134,10 +134,10 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     while (!(GCLK->PCHCTRL[spi[dev].gclk_id].reg & GCLK_PCHCTRL_CHEN)) {}
 
     /* SCLK+MOSI = output */
-    gpio_init(spi[dev].sclk.pin, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(spi[dev].mosi.pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(spi[dev].sclk.pin, GPIO_OUT);
+    gpio_init(spi[dev].mosi.pin, GPIO_OUT);
     /* MISO = input */
-    gpio_init(spi[dev].miso.pin, GPIO_DIR_IN, GPIO_PULLUP);
+    gpio_init(spi[dev].miso.pin, GPIO_IN);
 
     /*
      * Set alternate funcion (PMUX) for our ports.
