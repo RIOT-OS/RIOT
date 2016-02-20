@@ -36,6 +36,19 @@ extern "C" {
 #define ETHERTYPE_ARP           (0x0806)    /**< Address resolution protocol */
 #define ETHERTYPE_NDN           (0x0801)    /**< Parc CCNX */
 #define ETHERTYPE_IPV6          (0x86dd)    /**< Internet protocol version 6 */
+
+/**
+ * @brief   6LoWPAN header encoding.
+ *
+ * @see     https://tools.ietf.org/html/draft-droms-6lo-ethertype-request-00
+ *
+ * `0x87dd` is free according to
+ * [IANA database](http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml)
+ *
+ * @warning EXPERIMENTAL!!1!
+ * @note    Use proper value when draft becomes RFC.
+ */
+#define ETHERTYPE_6LOENC        (0x87dd)
 #define ETHERTYPE_UNKNOWN       (0xffff)    /**< Reserved (no protocol specified) */
 
 #ifdef __cplusplus
