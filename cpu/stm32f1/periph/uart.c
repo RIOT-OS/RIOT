@@ -66,7 +66,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     isr_ctx[uart].arg   = arg;
 
     /* configure RX and TX pin */
-    gpio_init(uart_config[uart].rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init(uart_config[uart].rx_pin, GPIO_IN);
     gpio_init_af(uart_config[uart].tx_pin, GPIO_AF_OUT_PP);
 
     /* enable the clock */

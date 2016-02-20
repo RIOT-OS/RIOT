@@ -68,38 +68,32 @@ static inline int _pin_num(gpio_t pin)
 }
 
 
-int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
+int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     GPIO_TypeDef *port = _port(pin);
     int pin_num = _pin_num(pin);
 
+    /* open-drain output with pull-up is not supported */
+    if (mode == GPIO_OD_PU) {
+        return -1;
+    }
 
     /* enable the clock for the selected port */
     RCC->APB2ENR |= (RCC_APB2ENR_IOPAEN << _port_num(pin));
-    /* clear configuration */
+
+    /* set pin mode */
     port->CR[pin_num >> 3] &= ~(0xf << ((pin_num & 0x7) * 4));
-    /* set new configuration */
-    if (dir == GPIO_DIR_OUT) {
-        if (pullup != GPIO_NOPULL) {
-            return -1;
-        }
-        /* set to output, push-pull, 50MHz */
-        port->CR[pin_num >> 3] |= (0x3 << ((pin_num & 0x7) * 4));
-        /* clear pin */
-        port->BRR = (1 << pin_num);
-    }
-    else {
-        /* configure pin to input, pull register according to the value of
-         * the pullup parameter */
-        port->CR[pin_num >> 3] |= ((pullup & 0xc)  << ((pin_num & 0x7) * 4));
-        port->ODR &= ~(1 << pin_num);
-        port->ODR |=  ((pullup & 0x1) << pin_num);
+    port->CR[pin_num >> 3] |=  (mode << ((pin_num & 0x7) * 4));
+    /* set initial state of output register */
+    port->BRR = (1 << pin_num);
+    if (mode == GPIO_IN_PU) {
+        port->BSRR = (1 << pin_num);
     }
 
     return 0; /* all OK */
 }
 
-int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
     int pin_num = _pin_num(pin);
@@ -107,7 +101,7 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
     /* disable interrupts on the channel we want to edit (just in case) */
     EXTI->IMR &= ~(1 << pin_num);
     /* configure pin as input */
-    gpio_init(pin, GPIO_DIR_IN, pullup);
+    gpio_init(pin, mode);
     /* set callback */
     exti_ctx[pin_num].cb = cb;
     exti_ctx[pin_num].arg = arg;

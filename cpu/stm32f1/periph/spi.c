@@ -161,7 +161,7 @@ int spi_conf_pins(spi_t dev)
     /* configure pins for alternate function input (MISO) or output (MOSI, CLK) */
     gpio_init_af(clk, GPIO_AF_OUT_PP);
     gpio_init_af(mosi, GPIO_AF_OUT_PP);
-    gpio_init(miso, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init(miso, GPIO_IN);
     return 0;
 }
 
