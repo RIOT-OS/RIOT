@@ -101,7 +101,7 @@ static void encx24j600_isr(void *arg)
     gpio_irq_disable(dev->int_pin);
 
     /* call netdev2 hook */
-    dev->netdev.event_callback((netdev2_t*) dev, NETDEV2_EVENT_ISR, NULL);
+    dev->netdev.event_callback((netdev2_t*) dev, NETDEV2_EVENT_ISR, dev->isr_arg);
 }
 
 static void _isr(netdev2_t *netdev)
