@@ -44,6 +44,7 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
 
 /**
+<<<<<<< HEAD
  * @brief   All timers for the STM32F1 have 4 CC channels
  */
 #define TIMER_CHANNELS      (4U)
@@ -52,6 +53,33 @@ typedef uint32_t gpio_t;
  * @brief   All timers have a width of 16-bit
  */
 #define TIMER_MAXVAL        (0xffff)
+
+/**
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use 4 bit to determine the pin functions:
+ * - bit 2+3: in/out
+ * - bit 1: PU enable
+ * - bit 2: OD enable
+ */
+#define GPIO_MODE(mode, cnf)    (mode | (cnf << 2))
+
+/**
+ * @brief   Override GPIO mode options
+ *
+ * We use 4 bit to encode CNF and MODE.
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN    = GPIO_MODE(0, 1),   /**< input w/o pull R */
+    GPIO_IN_PD = GPIO_MODE(0, 2),   /**< input with pull-down */
+    GPIO_IN_PU = GPIO_MODE(0, 2),   /**< input with pull-up */
+    GPIO_OUT   = GPIO_MODE(3, 0),   /**< push-pull output */
+    GPIO_OD    = GPIO_MODE(3, 1),   /**< open-drain w/o pull R */
+    GPIO_OD_PU = (0xff)             /**< not supported by HW */
+} gpio_mode_t;
+/** @} */
 
 /**
  * @brief   Override values for pull register configuration
