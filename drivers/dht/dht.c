@@ -80,7 +80,7 @@ int dht_init(dht_t *dev, const dht_params_t *params)
 
     memcpy(dev, params, sizeof(dht_t));
 
-    if (gpio_init(dev->pin, GPIO_DIR_OUT, dev->pull) == -1) {
+    if (gpio_init(dev->pin, GPIO_OUT) == -1) {
         return -1;
     }
     gpio_set(dev->pin);
@@ -103,9 +103,9 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
     xtimer_usleep(40);
 
     /* sync on device */
-    gpio_init(dev->pin, GPIO_DIR_IN, dev->pull);
-    while (!gpio_read(dev->pin)) ;
-    while (gpio_read(dev->pin)) ;
+    gpio_init(dev, dev->in_mode);
+    while (!gpio_read(dev)) ;
+    while (gpio_read(dev)) ;
 
     /*
      * data is read in sequentially, highest bit first:
@@ -120,7 +120,7 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
 
     /* set pin high again - so we can trigger the next reading by pulling it low
      * again */
-    gpio_init(dev->pin, GPIO_DIR_OUT, dev->pull);
+    gpio_init(dev->pin, GPIO_OUT);
     gpio_set(dev->pin);
 
     /* validate the checksum */
