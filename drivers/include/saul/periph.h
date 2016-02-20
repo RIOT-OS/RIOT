@@ -31,8 +31,7 @@ extern "C" {
 typedef struct {
     const char *name;       /**< name of the device connected to this pin */
     gpio_t pin;             /**< GPIO pin to initialize and expose */
-    gpio_dir_t dir;         /**< use GPIO as input or output */
-    gpio_pp_t pull;         /**< define the pull-up/pull-down mode */
+    gpio_mode_t mode;       /**< pin mode to use */
 } saul_gpio_params_t;
 
 #ifdef __cplusplus
