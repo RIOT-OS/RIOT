@@ -7,90 +7,47 @@
 #endif
 
 #include "messages.pb-c.h"
-void   mqtt_message__init
-                     (MqttMessage         *message)
+void   rtest_response__init
+                     (RtestResponse         *message)
 {
-  static MqttMessage init_value = MQTT_MESSAGE__INIT;
+  static RtestResponse init_value = RTEST_RESPONSE__INIT;
   *message = init_value;
 }
-size_t mqtt_message__get_packed_size
-                     (const MqttMessage *message)
+size_t rtest_response__get_packed_size
+                     (const RtestResponse *message)
 {
-  assert(message->base.descriptor == &mqtt_message__descriptor);
+  assert(message->base.descriptor == &rtest_response__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t mqtt_message__pack
-                     (const MqttMessage *message,
+size_t rtest_response__pack
+                     (const RtestResponse *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &mqtt_message__descriptor);
+  assert(message->base.descriptor == &rtest_response__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t mqtt_message__pack_to_buffer
-                     (const MqttMessage *message,
+size_t rtest_response__pack_to_buffer
+                     (const RtestResponse *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &mqtt_message__descriptor);
+  assert(message->base.descriptor == &rtest_response__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-MqttMessage *
-       mqtt_message__unpack
+RtestResponse *
+       rtest_response__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (MqttMessage *)
-     protobuf_c_message_unpack (&mqtt_message__descriptor,
+  return (RtestResponse *)
+     protobuf_c_message_unpack (&rtest_response__descriptor,
                                 allocator, len, data);
 }
-void   mqtt_message__free_unpacked
-                     (MqttMessage *message,
+void   rtest_response__free_unpacked
+                     (RtestResponse *message,
                       ProtobufCAllocator *allocator)
 {
-  assert(message->base.descriptor == &mqtt_message__descriptor);
-  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
-}
-void   mqtt_config__init
-                     (MqttConfig         *message)
-{
-  static MqttConfig init_value = MQTT_CONFIG__INIT;
-  *message = init_value;
-}
-size_t mqtt_config__get_packed_size
-                     (const MqttConfig *message)
-{
-  assert(message->base.descriptor == &mqtt_config__descriptor);
-  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
-}
-size_t mqtt_config__pack
-                     (const MqttConfig *message,
-                      uint8_t       *out)
-{
-  assert(message->base.descriptor == &mqtt_config__descriptor);
-  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
-}
-size_t mqtt_config__pack_to_buffer
-                     (const MqttConfig *message,
-                      ProtobufCBuffer *buffer)
-{
-  assert(message->base.descriptor == &mqtt_config__descriptor);
-  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
-}
-MqttConfig *
-       mqtt_config__unpack
-                     (ProtobufCAllocator  *allocator,
-                      size_t               len,
-                      const uint8_t       *data)
-{
-  return (MqttConfig *)
-     protobuf_c_message_unpack (&mqtt_config__descriptor,
-                                allocator, len, data);
-}
-void   mqtt_config__free_unpacked
-                     (MqttConfig *message,
-                      ProtobufCAllocator *allocator)
-{
-  assert(message->base.descriptor == &mqtt_config__descriptor);
+  assert(message->base.descriptor == &rtest_response__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
 void   mqtt_command__init
@@ -136,106 +93,42 @@ void   mqtt_command__free_unpacked
   assert(message->base.descriptor == &mqtt_command__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-static const ProtobufCFieldDescriptor mqtt_message__field_descriptors[2] =
+static const ProtobufCFieldDescriptor rtest_response__field_descriptors[1] =
 {
   {
-    "payload",
+    "sval",
     1,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(MqttMessage, payload),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
-    "topic",
-    2,
-    PROTOBUF_C_LABEL_REQUIRED,
-    PROTOBUF_C_TYPE_STRING,
-    0,   /* quantifier_offset */
-    offsetof(MqttMessage, topic),
+    offsetof(RtestResponse, sval),
     NULL,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned mqtt_message__field_indices_by_name[] = {
-  0,   /* field[0] = payload */
-  1,   /* field[1] = topic */
+static const unsigned rtest_response__field_indices_by_name[] = {
+  0,   /* field[0] = sval */
 };
-static const ProtobufCIntRange mqtt_message__number_ranges[1 + 1] =
+static const ProtobufCIntRange rtest_response__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 2 }
+  { 0, 1 }
 };
-const ProtobufCMessageDescriptor mqtt_message__descriptor =
+const ProtobufCMessageDescriptor rtest_response__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "MqttMessage",
-  "MqttMessage",
-  "MqttMessage",
+  "rtest_response",
+  "RtestResponse",
+  "RtestResponse",
   "",
-  sizeof(MqttMessage),
-  2,
-  mqtt_message__field_descriptors,
-  mqtt_message__field_indices_by_name,
-  1,  mqtt_message__number_ranges,
-  (ProtobufCMessageInit) mqtt_message__init,
-  NULL,NULL,NULL    /* reserved[123] */
-};
-static const ProtobufCFieldDescriptor mqtt_config__field_descriptors[2] =
-{
-  {
-    "hostname",
-    1,
-    PROTOBUF_C_LABEL_REQUIRED,
-    PROTOBUF_C_TYPE_STRING,
-    0,   /* quantifier_offset */
-    offsetof(MqttConfig, hostname),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
-    "port",
-    2,
-    PROTOBUF_C_LABEL_REQUIRED,
-    PROTOBUF_C_TYPE_INT32,
-    0,   /* quantifier_offset */
-    offsetof(MqttConfig, port),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-};
-static const unsigned mqtt_config__field_indices_by_name[] = {
-  0,   /* field[0] = hostname */
-  1,   /* field[1] = port */
-};
-static const ProtobufCIntRange mqtt_config__number_ranges[1 + 1] =
-{
-  { 1, 0 },
-  { 0, 2 }
-};
-const ProtobufCMessageDescriptor mqtt_config__descriptor =
-{
-  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "MqttConfig",
-  "MqttConfig",
-  "MqttConfig",
-  "",
-  sizeof(MqttConfig),
-  2,
-  mqtt_config__field_descriptors,
-  mqtt_config__field_indices_by_name,
-  1,  mqtt_config__number_ranges,
-  (ProtobufCMessageInit) mqtt_config__init,
+  sizeof(RtestResponse),
+  1,
+  rtest_response__field_descriptors,
+  rtest_response__field_indices_by_name,
+  1,  rtest_response__number_ranges,
+  (ProtobufCMessageInit) rtest_response__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
 static const ProtobufCFieldDescriptor mqtt_command__field_descriptors[1] =

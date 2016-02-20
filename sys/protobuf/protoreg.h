@@ -24,6 +24,8 @@
 #include "kernel.h"
 #include "messages.pb-c.h"
 
+#define RECORD_START (0x1E)
+#define RECORD_END   (0x17)
 
 typedef enum {
     M_PROTO_START  = 0x9000,

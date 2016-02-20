@@ -25,9 +25,6 @@
 
 #define MAX_BIN_SIZE 512
 
-#define RECORD_START (0x1E)
-#define RECORD_END   (0x17)
-
 #define IO_ERROR       -1
 #define IO_BUFF_OVFLOW -2
 

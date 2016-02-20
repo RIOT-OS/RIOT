@@ -15,8 +15,7 @@ PROTOBUF_C__BEGIN_DECLS
 #endif
 
 
-typedef struct _MqttMessage MqttMessage;
-typedef struct _MqttConfig MqttConfig;
+typedef struct _RtestResponse RtestResponse;
 typedef struct _MqttCommand MqttCommand;
 
 
@@ -25,26 +24,14 @@ typedef struct _MqttCommand MqttCommand;
 
 /* --- messages --- */
 
-struct  _MqttMessage
+struct  _RtestResponse
 {
   ProtobufCMessage base;
-  char *payload;
-  char *topic;
+  char *sval;
 };
-#define MQTT_MESSAGE__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&mqtt_message__descriptor) \
-    , NULL, NULL }
-
-
-struct  _MqttConfig
-{
-  ProtobufCMessage base;
-  char *hostname;
-  int32_t port;
-};
-#define MQTT_CONFIG__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&mqtt_config__descriptor) \
-    , NULL, 0 }
+#define RTEST_RESPONSE__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&rtest_response__descriptor) \
+    , NULL }
 
 
 struct  _MqttCommand
@@ -57,43 +44,24 @@ struct  _MqttCommand
     , 0 }
 
 
-/* MqttMessage methods */
-void   mqtt_message__init
-                     (MqttMessage         *message);
-size_t mqtt_message__get_packed_size
-                     (const MqttMessage   *message);
-size_t mqtt_message__pack
-                     (const MqttMessage   *message,
+/* RtestResponse methods */
+void   rtest_response__init
+                     (RtestResponse         *message);
+size_t rtest_response__get_packed_size
+                     (const RtestResponse   *message);
+size_t rtest_response__pack
+                     (const RtestResponse   *message,
                       uint8_t             *out);
-size_t mqtt_message__pack_to_buffer
-                     (const MqttMessage   *message,
+size_t rtest_response__pack_to_buffer
+                     (const RtestResponse   *message,
                       ProtobufCBuffer     *buffer);
-MqttMessage *
-       mqtt_message__unpack
+RtestResponse *
+       rtest_response__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   mqtt_message__free_unpacked
-                     (MqttMessage *message,
-                      ProtobufCAllocator *allocator);
-/* MqttConfig methods */
-void   mqtt_config__init
-                     (MqttConfig         *message);
-size_t mqtt_config__get_packed_size
-                     (const MqttConfig   *message);
-size_t mqtt_config__pack
-                     (const MqttConfig   *message,
-                      uint8_t             *out);
-size_t mqtt_config__pack_to_buffer
-                     (const MqttConfig   *message,
-                      ProtobufCBuffer     *buffer);
-MqttConfig *
-       mqtt_config__unpack
-                     (ProtobufCAllocator  *allocator,
-                      size_t               len,
-                      const uint8_t       *data);
-void   mqtt_config__free_unpacked
-                     (MqttConfig *message,
+void   rtest_response__free_unpacked
+                     (RtestResponse *message,
                       ProtobufCAllocator *allocator);
 /* MqttCommand methods */
 void   mqtt_command__init
@@ -116,11 +84,8 @@ void   mqtt_command__free_unpacked
                       ProtobufCAllocator *allocator);
 /* --- per-message closures --- */
 
-typedef void (*MqttMessage_Closure)
-                 (const MqttMessage *message,
-                  void *closure_data);
-typedef void (*MqttConfig_Closure)
-                 (const MqttConfig *message,
+typedef void (*RtestResponse_Closure)
+                 (const RtestResponse *message,
                   void *closure_data);
 typedef void (*MqttCommand_Closure)
                  (const MqttCommand *message,
@@ -131,8 +96,7 @@ typedef void (*MqttCommand_Closure)
 
 /* --- descriptors --- */
 
-extern const ProtobufCMessageDescriptor mqtt_message__descriptor;
-extern const ProtobufCMessageDescriptor mqtt_config__descriptor;
+extern const ProtobufCMessageDescriptor rtest_response__descriptor;
 extern const ProtobufCMessageDescriptor mqtt_command__descriptor;
 
 PROTOBUF_C__END_DECLS
