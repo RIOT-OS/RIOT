@@ -107,7 +107,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     /* configure the used pins */
     for (int i = 0; i < PWM_MAX_CHANNELS; i++) {
         if (pwm_config[dev].chan[i].pin != GPIO_UNDEF) {
-            gpio_init(pwm_config[dev].chan[i].pin, GPIO_DIR_OUT, GPIO_NOPULL);
+            gpio_init(pwm_config[dev].chan[i].pin, GPIO_OUT);
             gpio_init_mux(pwm_config[dev].chan[i].pin, pwm_config[dev].chan[i].mux);
         }
     }
