@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2014 Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
  * Copyright (C) 2013 Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * Copyright (C) 2014 Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
+ * Copyright (C) 2016 Martin Landsmann <martin.landsmann@haw-hamburg.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,24 +19,108 @@
 
 #include "tests-hashes.h"
 
-static int compare_str_vs_digest(const char *str,
-                                 const unsigned char hash[SHA256_DIGEST_LENGTH])
-{
-    char ch[3] = { 0, 0, 0 };
-    size_t iter_hash = 0;
-    size_t str_length = strlen(str);
-    for (size_t i = 0; i < str_length; i += 2) {
-        ch[0] = str[i];
-        ch[1] = str[i + 1];
+/**
+ * @brief expected hash for test 01
+ * i.e. 3eda9ffe5537a588f54d0b2a453e5fa932986d0bc0f9556924f5c2379b2c91b0
+ *
+ * converted using:
+ * s=$(echo '<hash string>' | sed -e 's/../0x&, /g' | sed 's/, $//'); echo {$s}\;
+ *
+ * where <hash string> is the above sequence of characters 3e...b0
+ */
+static const unsigned char h01[] = {0x3e, 0xda, 0x9f, 0xfe, 0x55, 0x37, 0xa5, 0x88,
+                                    0xf5, 0x4d, 0x0b, 0x2a, 0x45, 0x3e, 0x5f, 0xa9,
+                                    0x32, 0x98, 0x6d, 0x0b, 0xc0, 0xf9, 0x55, 0x69,
+                                    0x24, 0xf5, 0xc2, 0x37, 0x9b, 0x2c, 0x91, 0xb0};
 
-        if (hash[iter_hash++] != strtol(ch, NULL, 16)) {
-            return 0;
-        }
-    }
-    return 1;
-}
+/**
+ * @brief expected hash for test 02
+ * i.e. a144d0b4d285260ebbbab6840baceaa09eab3e157443c9458de764b7262c8ace
+ */
+static const unsigned char h02[] = {0xa1, 0x44, 0xd0, 0xb4, 0xd2, 0x85, 0x26, 0x0e,
+                                    0xbb, 0xba, 0xb6, 0x84, 0x0b, 0xac, 0xea, 0xa0,
+                                    0x9e, 0xab, 0x3e, 0x15, 0x74, 0x43, 0xc9, 0x45,
+                                    0x8d, 0xe7, 0x64, 0xb7, 0x26, 0x2c, 0x8a, 0xce};
 
-static int calc_and_compare_hash(const char *str, const char *expected)
+/**
+ * @brief expected hash for test 03
+ * i.e. 9f839169d293276d1b799707d2171ac1fd5b78d0f3bc7693dbed831524dd2d77
+ */
+static const unsigned char h03[] = {0x9f, 0x83, 0x91, 0x69, 0xd2, 0x93, 0x27, 0x6d,
+                                    0x1b, 0x79, 0x97, 0x07, 0xd2, 0x17, 0x1a, 0xc1,
+                                    0xfd, 0x5b, 0x78, 0xd0, 0xf3, 0xbc, 0x76, 0x93,
+                                    0xdb, 0xed, 0x83, 0x15, 0x24, 0xdd, 0x2d, 0x77};
+
+/**
+ * @brief expected hash for test 04
+ * i.e. 6c5fe2a8e3de58a5e5ac061031a8e802ae1fb9e7197862ec1aedf236f0e23475
+ */
+static const unsigned char h04[] = {0x6c, 0x5f, 0xe2, 0xa8, 0xe3, 0xde, 0x58, 0xa5,
+                                    0xe5, 0xac, 0x06, 0x10, 0x31, 0xa8, 0xe8, 0x02,
+                                    0xae, 0x1f, 0xb9, 0xe7, 0x19, 0x78, 0x62, 0xec,
+                                    0x1a, 0xed, 0xf2, 0x36, 0xf0, 0xe2, 0x34, 0x75};
+
+/**
+ * @brief expected hash for test digits_letters
+ * i.e. 945ab9d52b069923680c2c067fa6092cbbd9234cf7a38628f3033b2d54d3d3bf
+ */
+static const unsigned char hdigits_letters[] =
+                                   {0x94, 0x5a, 0xb9, 0xd5, 0x2b, 0x06, 0x99, 0x23,
+                                    0x68, 0x0c, 0x2c, 0x06, 0x7f, 0xa6, 0x09, 0x2c,
+                                    0xbb, 0xd9, 0x23, 0x4c, 0xf7, 0xa3, 0x86, 0x28,
+                                    0xf3, 0x03, 0x3b, 0x2d, 0x54, 0xd3, 0xd3, 0xbf};
+
+/**
+ * @brief expected hash for test pangramm
+ * i.e. d32b568cd1b96d459e7291ebf4b25d007f275c9f13149beeb782fac0716613f8
+ */
+static const unsigned char hpangramm[] =
+                                   {0xd3, 0x2b, 0x56, 0x8c, 0xd1, 0xb9, 0x6d, 0x45,
+                                    0x9e, 0x72, 0x91, 0xeb, 0xf4, 0xb2, 0x5d, 0x00,
+                                    0x7f, 0x27, 0x5c, 0x9f, 0x13, 0x14, 0x9b, 0xee,
+                                    0xb7, 0x82, 0xfa, 0xc0, 0x71, 0x66, 0x13, 0xf8};
+
+/**
+ * @brief expected hash for test pangramm_no_more
+ * i.e. 78206a866dbb2bf017d8e34274aed01a8ce405b69d45db30bafa00f5eeed7d5e
+ */
+static const unsigned char hpangramm_no_more[] =
+                                   {0x78, 0x20, 0x6a, 0x86, 0x6d, 0xbb, 0x2b, 0xf0,
+                                    0x17, 0xd8, 0xe3, 0x42, 0x74, 0xae, 0xd0, 0x1a,
+                                    0x8c, 0xe4, 0x05, 0xb6, 0x9d, 0x45, 0xdb, 0x30,
+                                    0xba, 0xfa, 0x00, 0xf5, 0xee, 0xed, 0x7d, 0x5e};
+
+/**
+ * @brief expected hash for test empty
+ * i.e. e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+ */
+static const unsigned char hempty[] =
+                                   {0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14,
+                                    0x9a, 0xfb, 0xf4, 0xc8, 0x99, 0x6f, 0xb9, 0x24,
+                                    0x27, 0xae, 0x41, 0xe4, 0x64, 0x9b, 0x93, 0x4c,
+                                    0xa4, 0x95, 0x99, 0x1b, 0x78, 0x52, 0xb8, 0x55};
+
+/**
+ * @brief expected hash for test failing_compare
+ * i.e. c19d3bf8588897076873f1a0a106ba840ca46bd1179d592953acecc4df59593c
+ */
+static const unsigned char hfailing_compare[] =
+                                   {0xc1, 0x9d, 0x3b, 0xf8, 0x58, 0x88, 0x97, 0x07,
+                                    0x68, 0x73, 0xf1, 0xa0, 0xa1, 0x06, 0xba, 0x84,
+                                    0x0c, 0xa4, 0x6b, 0xd1, 0x17, 0x9d, 0x59, 0x29,
+                                    0x53, 0xac, 0xec, 0xc4, 0xdf, 0x59, 0x59, 0x3c};
+
+/**
+ * @brief expected hash for test long_sequence
+ * i.e. 06c84971e2831c48b8293144c762e3236a78217354896185b14a3a84f7cd8066
+ */
+static const unsigned char hlong_sequence[] =
+                                   {0x06, 0xc8, 0x49, 0x71, 0xe2, 0x83, 0x1c, 0x48,
+                                    0xb8, 0x29, 0x31, 0x44, 0xc7, 0x62, 0xe3, 0x23,
+                                    0x6a, 0x78, 0x21, 0x73, 0x54, 0x89, 0x61, 0x85,
+                                    0xb1, 0x4a, 0x3a, 0x84, 0xf7, 0xcd, 0x80, 0x66};
+
+static int calc_and_compare_hash(const char *str, const unsigned char *expected)
 {
     static unsigned char hash[SHA256_DIGEST_LENGTH];
     sha256_context_t sha256;
@@ -44,30 +129,65 @@ static int calc_and_compare_hash(const char *str, const char *expected)
     sha256_update(&sha256, str, strlen(str));
     sha256_final(hash, &sha256);
 
-    return compare_str_vs_digest(expected, hash);
+    return (memcmp(expected, hash, SHA256_DIGEST_LENGTH) == 0);
 }
 
-static void test_hashes_sha256_hash_sequence(void)
+static void test_hashes_sha256_hash_sequence_01(void)
 {
-    TEST_ASSERT(calc_and_compare_hash("1234567890_1",
-                                      "3eda9ffe5537a588f54d0b2a453e5fa932986d0bc0f9556924f5c2379b2c91b0"));
-    TEST_ASSERT(calc_and_compare_hash("1234567890_2",
-                                      "a144d0b4d285260ebbbab6840baceaa09eab3e157443c9458de764b7262c8ace"));
-    TEST_ASSERT(calc_and_compare_hash("1234567890_3",
-                                      "9f839169d293276d1b799707d2171ac1fd5b78d0f3bc7693dbed831524dd2d77"));
-    TEST_ASSERT(calc_and_compare_hash("1234567890_4",
-                                      "6c5fe2a8e3de58a5e5ac061031a8e802ae1fb9e7197862ec1aedf236f0e23475"));
+    TEST_ASSERT(calc_and_compare_hash("1234567890_1", h01));
+}
+
+static void test_hashes_sha256_hash_sequence_02(void)
+{
+    TEST_ASSERT(calc_and_compare_hash("1234567890_2", h02));
+}
+
+static void test_hashes_sha256_hash_sequence_03(void)
+{
+    TEST_ASSERT(calc_and_compare_hash("1234567890_3", h03));
+}
+
+static void test_hashes_sha256_hash_sequence_04(void)
+{
+    TEST_ASSERT(calc_and_compare_hash("1234567890_4", h04));
+}
+
+static void test_hashes_sha256_hash_sequence_digits_letters(void)
+{
     TEST_ASSERT(calc_and_compare_hash(
                     "0123456789abcde-0123456789abcde-0123456789abcde-0123456789abcde-",
-                    "945ab9d52b069923680c2c067fa6092cbbd9234cf7a38628f3033b2d54d3d3bf"));
+                    hdigits_letters));
+}
+
+static void test_hashes_sha256_hash_sequence_pangramm(void)
+{
     TEST_ASSERT(calc_and_compare_hash(
                     "Franz jagt im komplett verwahrlosten Taxi quer durch Bayern",
-                    "d32b568cd1b96d459e7291ebf4b25d007f275c9f13149beeb782fac0716613f8"));
+                    hpangramm));
+}
+
+static void test_hashes_sha256_hash_sequence_pangramm_no_more(void)
+{
+    /* exchanged `z` with `k` of the first word `Fran[z|k]` */
     TEST_ASSERT(calc_and_compare_hash(
                     "Frank jagt im komplett verwahrlosten Taxi quer durch Bayern",
-                    "78206a866dbb2bf017d8e34274aed01a8ce405b69d45db30bafa00f5eeed7d5e"));
-    TEST_ASSERT(calc_and_compare_hash("",
-                                      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"));
+                    hpangramm_no_more));
+}
+
+static void test_hashes_sha256_hash_sequence_empty(void)
+{
+    TEST_ASSERT(calc_and_compare_hash("", hempty));
+}
+
+static void test_hashes_sha256_hash_sequence_failing_compare(void)
+{
+    /* failing compare (sha256 switched last byte of expected hash from `3b` to `3c`) */
+    TEST_ASSERT(!calc_and_compare_hash("This test fails!",
+                    hfailing_compare));
+}
+
+static void test_hashes_sha256_hash_long_sequence(void)
+{
     TEST_ASSERT(calc_and_compare_hash(
                     "RIOT is an open-source microkernel-based operating system, designed"
                     " to match the requirements of Internet of Things (IoT) devices and"
@@ -75,112 +195,24 @@ static void test_hashes_sha256_hash_sequence(void)
                     " footprint (on the order of a few kilobytes), high energy efficiency"
                     ", real-time capabilities, communication stacks for both wireless and"
                     " wired networks, and support for a wide range of low-power hardware.",
-                    "06c84971e2831c48b8293144c762e3236a78217354896185b14a3a84f7cd8066"));
-    /* test failing sha256 by switching last byte of expected hash from 3b to 3c */
-    TEST_ASSERT(!calc_and_compare_hash("This test fails!",
-                                      "c19d3bf8588897076873f1a0a106ba840ca46bd1179d592953acecc4df59593c"));
-}
-
-
-static void test_hashes_hmac_sha256_hash_sequence(void)
-{
-    unsigned char key[64];
-    /* prepare an empty key */
-    memset((void*)key, 0x0, 64);
-    static unsigned char hmac[SHA256_DIGEST_LENGTH];
-
-    /* use an empty message */
-    const unsigned *m = NULL;
-    hmac_sha256(key, 64, m, 0, hmac);
-
-    TEST_ASSERT(compare_str_vs_digest(
-                 "b613679a0814d9ec772f95d778c35fc5ff1697c493715653c6c712144292c5ad", hmac));
-
-    /* use a real message */
-    const char str[] = "The quick brown fox jumps over the lazy dog";
-    key[0] = 'k';
-    key[1] = 'e';
-    key[2] = 'y';
-
-    hmac_sha256(key, 3, (unsigned*)str, strlen(str), hmac);
-    TEST_ASSERT(compare_str_vs_digest(
-                 "f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8", hmac));
-
-    /*
-        The followig testcases are taken from:
-        https://tools.ietf.org/html/rfc4868#section-2.7.1
-    */
-
-    /* Test Case PRF-1: */
-    const char strPRF1[] = "Hi There";
-    memset(key, 0x0b, 20);
-
-    hmac_sha256(key, 20, (unsigned*)strPRF1, strlen(strPRF1), hmac);
-    TEST_ASSERT(compare_str_vs_digest(
-                 "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7", hmac));
-
-    /* Test Case PRF-2: */
-    const char strPRF2[] = "what do ya want for nothing?";
-    /* clear the key (we used 20 bytes so we clear only 20) */
-    memset(key, 0x0, 20);
-    key[0] = 'J';
-    key[1] = 'e';
-    key[2] = 'f';
-    key[3] = 'e';
-
-    hmac_sha256(key, 4, (unsigned*)strPRF2, strlen(strPRF2), hmac);
-    TEST_ASSERT(compare_str_vs_digest(
-                 "5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843", hmac));
-
-    /* Test Case PRF-3: */
-    char strPRF3[50];
-    memset(strPRF3, 0xdd, 50);
-    memset(key, 0xaa, 20);
-
-    hmac_sha256(key, 20, (unsigned*)strPRF3, 50, hmac);
-    TEST_ASSERT(compare_str_vs_digest(
-                 "773ea91e36800e46854db8ebd09181a72959098b3ef8c122d9635514ced565fe", hmac));
-
-    /* Test Case PRF-4: */
-    char strPRF4[50];
-    memset(strPRF4, 0xcd, 50);
-    /* clear the key (we used 20 bytes so we clear only 20) */
-    memset(key, 0x0, 20);
-    /*
-    * set key to: 0102030405060708090a0b0c0d0e0f10111213141516171819
-    */
-    for (size_t i = 0; i < 25; ++i) {
-        key[i] = i+1;
-    }
-
-    hmac_sha256(key, 25, (unsigned*)strPRF4, 50, hmac);
-    TEST_ASSERT(compare_str_vs_digest(
-                 "82558a389a443c0ea4cc819899f2083a85f0faa3e578f8077a2e3ff46729665b", hmac));
-
-    /* Test Case PRF-5: */
-    const char strPRF5[] = "Test Using Larger Than Block-Size Key - Hash Key First";
-    unsigned char longKey[131];
-    memset(longKey, 0xaa, 131);
-
-    hmac_sha256(longKey, 131, (unsigned*)strPRF5, strlen(strPRF5), hmac);
-    TEST_ASSERT(compare_str_vs_digest(
-                 "60e431591ee0b67f0d8a26aacbf5b77f8e0bc6213728c5140546040f0ee37f54", hmac));
-
-    /* Test Case PRF-6: */
-    const char strPRF6[] = "This is a test using a larger than block-size key and a "
-                           "larger than block-size data. The key needs to be hashed "
-                           "before being used by the HMAC algorithm.";
-    /* the same key is used as above: 131 x 0xa */
-    hmac_sha256(longKey, 131, (unsigned*)strPRF6, strlen(strPRF6), hmac);
-    TEST_ASSERT(compare_str_vs_digest(
-                 "9b09ffa71b942fcb27635fbcd5b0e944bfdc63644f0713938a7f51535c3a35e2", hmac));
+                    hlong_sequence));
 }
 
 Test *tests_hashes_sha256_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_hashes_sha256_hash_sequence),
-        new_TestFixture(test_hashes_hmac_sha256_hash_sequence),
+        new_TestFixture(test_hashes_sha256_hash_sequence_01),
+        new_TestFixture(test_hashes_sha256_hash_sequence_02),
+        new_TestFixture(test_hashes_sha256_hash_sequence_03),
+        new_TestFixture(test_hashes_sha256_hash_sequence_04),
+
+        new_TestFixture(test_hashes_sha256_hash_sequence_digits_letters),
+        new_TestFixture(test_hashes_sha256_hash_sequence_pangramm),
+        new_TestFixture(test_hashes_sha256_hash_sequence_pangramm_no_more),
+        new_TestFixture(test_hashes_sha256_hash_sequence_empty),
+        new_TestFixture(test_hashes_sha256_hash_sequence_failing_compare),
+
+        new_TestFixture(test_hashes_sha256_hash_long_sequence),
     };
 
     EMB_UNIT_TESTCALLER(hashes_sha256_tests, NULL, NULL,
