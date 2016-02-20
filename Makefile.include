@@ -295,13 +295,6 @@ list-ttys:
 doc:
 	make -BC $(RIOTBASE) doc
 
-protobuf:
-	@echo "building protobuf interfaces"
-	$(AD)command -v $(PROTOC_CMD) >/dev/null 2>&1 || \
-		{ $(COLOR_ECHO) \
-		'${COLOR_RED} protobuf program $(PROTOC_CMD) not found. Aborting.${COLOR_RESET}'; \
-		exit 1; }
-	$(PROTOC_CMD) $(PROTOC_ARGS)
 
 btest:
 	$(AD)command -v $(DEBUGGER) >/dev/null 2>&1 || \
