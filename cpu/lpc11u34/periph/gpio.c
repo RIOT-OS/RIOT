@@ -261,7 +261,7 @@ static const uint8_t gpio_pin_map[GPIO_NUMOF] = {
 #endif
 };
 
-int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pullup)
+int gpio_init(gpio_t dev, gpio_mode_t mode)
 {
     uint8_t port;
     uint8_t pin;
@@ -279,26 +279,32 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pullup)
 
     /* Disable resistors */
     *lpc_pin_registers[pin + (port * 24)] &= ~(3 << 3);
-    /* Set resistors */
-    if (pullup == GPIO_PULLUP) {
-        *lpc_pin_registers[pin + (port * 24)] |= (2 << 3);
-    }
-    else if (pullup == GPIO_PULLDOWN) {
-        *lpc_pin_registers[pin + (port * 24)] |= (1 << 3);
-    }
 
-    /* Set direction */
-    if (dir == GPIO_DIR_OUT) {
-        LPC_GPIO->DIR[port] |= (1 << pin);           /* set pin to output mode */
-    }
-    else {
-        LPC_GPIO->DIR[port] &= ~(1 << pin);           /* set pin to output mode */
+    /* Set mode */
+    switch (mode) {
+        case GPIO_IN:
+            LPC_GPIO->DIR[port] &= ~(1 << pin);
+            break;
+        case GPIO_IN_PD:
+            LPC_GPIO->DIR[port] &= ~(1 << pin);
+            *lpc_pin_registers[pin + (port * 24)] |= (1 << 3);
+            break;
+        case GPIO_IN_PU:
+            LPC_GPIO->DIR[port] &= ~(1 << pin);
+            *lpc_pin_registers[pin + (port * 24)] |= (2 << 3);
+            break;
+        case GPIO_OUT:
+            LPC_GPIO->DIR[port] |= (1 << pin);
+            break;
+        default:
+            return -1;
     }
 
     return 0; /* all OK */
 }
 
-int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
+int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
+                  gpio_cb_t cb, void *arg)
 {
     int res;
     uint8_t pin;
@@ -318,7 +324,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     pin = gpio_pin_map[dev];
 
     /* configure pin as input */
-    res = gpio_init(dev, GPIO_DIR_IN, pullup);
+    res = gpio_init(dev, mode);
     if (res < 0) {
         return res;
     }
