@@ -152,7 +152,7 @@ int main(void)
     }
 
     puts("Set INT1 callback");
-    if (gpio_init_int(TEST_LIS3DH_INT1, GPIO_NOPULL, GPIO_RISING, test_int1, (void*)&int1_count) == 0) {
+    if (gpio_init_int(TEST_LIS3DH_INT1, GPIO_IN, GPIO_RISING, test_int1, (void*)&int1_count) == 0) {
         puts("[OK]");
     }
     else {
