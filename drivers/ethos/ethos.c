@@ -297,11 +297,12 @@ static int _recv(netdev2_t *netdev, char* buf, int len, void* info)
     ethos_t * dev = (ethos_t *) netdev;
 
     if (buf) {
-        if (len != dev->last_framesize) {
-            DEBUG("ethos _recv(): unmatched receive buffer size.");
+        if (len < dev->last_framesize) {
+            DEBUG("ethos _recv(): receive buffer too small.");
             return -1;
         }
 
+        len = dev->last_framesize;
         dev->last_framesize = 0;
 
         if ((tsrb_get(&dev->inbuf, buf, len) != len)) {
