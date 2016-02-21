@@ -274,29 +274,26 @@ static inline uint64_t NTOHLL(uint64_t v);
 
 
 /* **************************** IMPLEMENTATION ***************************** */
-
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-
 /**
- * @brief   Compile time byte-order swapping for short constants
+ * @brief   Compile time byte-order swapping for 16 bit constants
  */
-#define CONST_HTONS(x)       ((uint16_t)                         \
+#define CONST_BSWAP16(x)     ((uint16_t)                         \
                              (((uint16_t)(x) >> 8) & 0x00FF)   | \
                              (((uint16_t)(x) << 8) & 0xFF00))
 
 /**
- * @brief   Compile time byte-order swapping for integers constants
+ * @brief   Compile time byte-order swapping for 32 bit constants
  */
-#define CONST_HTONL(x)       ((uint32_t)                              \
+#define CONST_BSWAP32(x)     ((uint32_t)                              \
                              (((uint32_t)(x) >> 24) & 0x000000FF)   | \
                              (((uint32_t)(x) >> 8)  & 0x0000FF00)   | \
                              (((uint32_t)(x) << 8)  & 0x00FF0000)   | \
                              (((uint32_t)(x) << 24) & 0xFF000000))
 
 /**
- * @brief   Compile time byte-order swapping for long constants
+ * @brief   Compile time byte-order swapping for 64 bit constants
  */
-#define CONST_HTONLL(x)      ((uint64_t)                                    \
+#define CONST_BSWAP64(x)     ((uint64_t)                                    \
                              (((uint64_t)(x) >> 56) & 0x00000000000000FF) | \
                              (((uint64_t)(x) >> 40) & 0x000000000000FF00) | \
                              (((uint64_t)(x) >> 24) & 0x0000000000FF0000) | \
@@ -306,22 +303,115 @@ static inline uint64_t NTOHLL(uint64_t v);
                              (((uint64_t)(x) << 40) & 0x00FF000000000000) | \
                              (((uint64_t)(x) << 56) & 0xFF00000000000000))
 
+/**
+ * @brief          Constant from little endian to big endian, 16 bit.
+ */
+#define CONST_LTOBS(x)       CONST_BSWAP16(x)
+
+/**
+ * @brief          Constant from little endian to big endian, 32 bit.
+ */
+#define CONST_LTOBL(x)       CONST_BSWAP32(x)
+
+/**
+ * @brief          Constant from little endian to big endian, 64 bit.
+ */
+#define CONST_LTOBLL(x)      CONST_BSWAP64(x)
+
+/**
+ * @brief          Constant from bit endian to little endian, 16 bit.
+ */
+#define CONST_BTOLS(x)       CONST_BSWAP16(x)
+
+/**
+ * @brief          Constant from big endian to little endian, 32 bit.
+ */
+#define CONST_BTOLL(x)       CONST_BSWAP32(x)
+
+/**
+ * @brief          Constant from big endian to little endian, 64 bit.
+ */
+#define CONST_BTOLLL(x)      CONST_BSWAP64(x)
+
+#ifndef __BYTE_ORDER__
+#error "__BYTE_ORDER__ macro not defined by the compiler"
+#endif
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+
+/**
+ * @brief   Convert a constant from host byte order to network byte
+ *          order, 16 bit.
+ */
+#define CONST_HTONS(x)       CONST_BSWAP16(x)
+
+/**
+ * @brief   Convert a constant from host byte order to network byte
+ *          order, 32 bit.
+ */
+#define CONST_HTONL(x)       CONST_BSWAP32(x)
+
+/**
+ * @brief   Convert a constant from host byte order to network byte
+ *          order, 64 bit.
+ */
+#define CONST_HTONLL(x)      CONST_BSWAP64(x)
+
+/**
+ * @brief   Convert a constant from network byte order to host byte
+ *          order, 16 bit.
+ */
+#define CONST_NTOHS(x)       CONST_BSWAP16(x)
+
+/**
+ * @brief   Convert a constant from network byte order to host byte
+ *          order, 32 bit.
+ */
+#define CONST_NTOHL(x)       CONST_BSWAP32(x)
+
+/**
+ * @brief   Convert a constant from network byte order to host byte
+ *          order, 64 bit.
+ */
+#define CONST_NTOHLL(x)      CONST_BSWAP64(x)
+
 #else
 
 /**
- * @brief   Compile time byte-order swapping for short constants
+ * @brief   Convert a constant from host byte order to network byte
+ *          order, 16 bit.
  */
 #define CONST_HTONS(x)       ((uint16_t)(x))
 
 /**
- * @brief   Compile time byte-order swapping for integers constants
+ * @brief   Convert a constant from host byte order to network byte
+ *          order, 32 bit.
  */
 #define CONST_HTONL(x)       ((uint32_t)(x))
 
 /**
- * @brief   Compile time byte-order swapping for integers constants
+ * @brief   Convert a constant from host byte order to network byte
+ *          order, 64 bit.
  */
 #define CONST_HTONLL(x)      ((uint64_t)(x))
+
+/**
+ * @brief   Convert a constant from network byte order to host byte
+ *          order, 16 bit.
+ */
+#define CONST_NTOHS(x)       ((uint16_t)(x))
+
+/**
+ * @brief   Convert a constant from network byte order to host byte
+ *          order, 32 bit.
+ */
+#define CONST_NTOHL(x)       ((uint32_t)(x))
+
+/**
+ * @brief   Convert a constant from network byte order to host byte
+ *          order, 64 bit.
+ */
+#define CONST_NTOHLL(x)      ((uint64_t)(x))
 
 #endif
 
