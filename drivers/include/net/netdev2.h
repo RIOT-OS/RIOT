@@ -93,9 +93,8 @@ typedef struct netdev2 netdev2_t;
  * @brief   Event callback for signaling event to upper layers
  *
  * @param[in] type          type of the event
- * @param[in] arg           event argument
  */
-typedef void (*netdev2_event_cb_t)(netdev2_t *dev, netdev2_event_t event, void *arg);
+typedef void (*netdev2_event_cb_t)(netdev2_t *dev, netdev2_event_t event);
 
 /**
  * @brief Structure to hold driver state
