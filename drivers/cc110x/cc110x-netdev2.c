@@ -178,7 +178,7 @@ static void _netdev2_cc110x_rx_callback(void *arg)
     netdev2_t *netdev2 = (netdev2_t*) arg;
     cc110x_t *cc110x = &((netdev2_cc110x_t*) arg)->cc110x;
     gpio_irq_disable(cc110x->params.gdo2);
-    netdev2->event_callback(netdev2, NETDEV2_EVENT_RX_COMPLETE, netdev2->isr_arg);
+    netdev2->event_callback(netdev2, NETDEV2_EVENT_RX_COMPLETE, NULL);
 }
 
 static void _isr(netdev2_t *dev)
