@@ -215,7 +215,7 @@ static void mac_set(enc28j60_t *dev, uint8_t *mac)
 static void on_int(void *arg)
 {
     netdev2_t *netdev = (netdev2_t *)arg;
-    netdev->event_callback(arg, NETDEV2_EVENT_ISR, NULL);
+    netdev->event_callback(arg, NETDEV2_EVENT_ISR, netdev->isr_arg);
 }
 
 static int nd_send(netdev2_t *netdev, const struct iovec *data, int count)

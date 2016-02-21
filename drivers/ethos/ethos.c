@@ -110,7 +110,7 @@ static void _end_of_frame(ethos_t *dev)
         case ETHOS_FRAME_TYPE_DATA:
             if (dev->framesize) {
                 dev->last_framesize = dev->framesize;
-                dev->netdev.event_callback((netdev2_t*) dev, NETDEV2_EVENT_ISR, NULL);
+                dev->netdev.event_callback((netdev2_t*) dev, NETDEV2_EVENT_ISR, dev->netdev.isr_arg);
             }
             break;
         case ETHOS_FRAME_TYPE_HELLO:
