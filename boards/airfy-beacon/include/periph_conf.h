@@ -102,15 +102,12 @@
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF           (1U)
-#define SPI_0_EN            1
-#define SPI_IRQ_PRIO        1
+static const spi_conf_t spi_config[] = {
+    /* dev, sck, mosi, miso */
+    { NRF_SPI0, 15, 13, 14 }
+};
 
-/* SPI_0 device configuration */
-#define SPI_0_DEV           NRF_SPI0
-#define SPI_0_PIN_MOSI      13
-#define SPI_0_PIN_MISO      14
-#define SPI_0_PIN_SCK       15
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**

@@ -77,6 +77,32 @@ typedef enum {
 } gpio_flank_t;
 /** @} */
 
+
+#define HAVE_SPI_MODE_T
+typedef enum {
+    SPI_MODE_0 = 0,                 /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1 = SPI_CONFIG_CPHA_Msk,                 /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2 = SPI_CONFIG_CPOL_Msk,                 /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3 = (SPI_CONFIG_CPOL_Msk | SPI_CONFIG_CPHA_Msk)                  /**< CPOL=1, CPHA=1 */
+} spi_mode_t;
+
+#define HAVE_SPI_CLK_T
+typedef enum {
+    SPI_CLK_100KHZ = SPI_FREQUENCY_FREQUENCY_K125,  /**< 100KHz */
+    SPI_CLK_400KHZ = SPI_FREQUENCY_FREQUENCY_K500,  /**< 400KHz */
+    SPI_CLK_1MHZ   = SPI_FREQUENCY_FREQUENCY_M1,    /**< 1MHz */
+    SPI_CLK_5MHZ   = SPI_FREQUENCY_FREQUENCY_M4,    /**< 5MHz */
+    SPI_CLK_10MHZ  = SPI_FREQUENCY_FREQUENCY_M8     /**< 10MHz */
+} spi_clk_t;
+
+
+typedef struct {
+    NRF_SPI_Type *dev;
+    uint8_t csk;
+    uint8_t mosi;
+    uint8_t miso;
+} spi_conf_t;
+
 #ifdef __cplusplus
 }
 #endif

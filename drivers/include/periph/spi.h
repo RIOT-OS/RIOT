@@ -129,7 +129,6 @@ typedef enum {
  */
 int spi_init_pins(spi_t dev, spi_cs_t cs);
 
-
 /**
  * @brief Get mutually exclusive access to the given SPI bus
  *
