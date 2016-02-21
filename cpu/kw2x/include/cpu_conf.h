@@ -37,8 +37,6 @@
 #error "undefined CPU_MODEL"
 #endif
 
-#include "mcg.h"
-
 #ifdef __cplusplus
 extern "C"
 {
