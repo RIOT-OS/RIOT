@@ -303,36 +303,6 @@ static inline uint64_t NTOHLL(uint64_t v);
                              (((uint64_t)(x) << 40) & 0x00FF000000000000) | \
                              (((uint64_t)(x) << 56) & 0xFF00000000000000))
 
-/**
- * @brief          Constant from little endian to big endian, 16 bit.
- */
-#define CONST_LTOBS(x)       CONST_BSWAP16(x)
-
-/**
- * @brief          Constant from little endian to big endian, 32 bit.
- */
-#define CONST_LTOBL(x)       CONST_BSWAP32(x)
-
-/**
- * @brief          Constant from little endian to big endian, 64 bit.
- */
-#define CONST_LTOBLL(x)      CONST_BSWAP64(x)
-
-/**
- * @brief          Constant from bit endian to little endian, 16 bit.
- */
-#define CONST_BTOLS(x)       CONST_BSWAP16(x)
-
-/**
- * @brief          Constant from big endian to little endian, 32 bit.
- */
-#define CONST_BTOLL(x)       CONST_BSWAP32(x)
-
-/**
- * @brief          Constant from big endian to little endian, 64 bit.
- */
-#define CONST_BTOLLL(x)      CONST_BSWAP64(x)
-
 #ifndef __BYTE_ORDER__
 #error "__BYTE_ORDER__ macro not defined by the compiler"
 #endif
@@ -378,32 +348,32 @@ static inline uint64_t NTOHLL(uint64_t v);
 /**
  * @brief          Constant big endian, 16 bit.
  */
-#define CONST_TOBS(x)        CONST_BSWAP16(x)
+#define CONST_TOBES(x)       CONST_BSWAP16(x)
 
 /**
  * @brief          Constant to big endian, 32 bit.
  */
-#define CONST_TOBL(x)        CONST_BSWAP32(x)
+#define CONST_TOBEL(x)       CONST_BSWAP32(x)
 
 /**
  * @brief          Constant to big endian, 64 bit.
  */
-#define CONST_TOBLL(x)       CONST_BSWAP64(x)
+#define CONST_TOBELL(x)      CONST_BSWAP64(x)
 
 /**
  * @brief          Constant to little endian, 16 bit.
  */
-#define CONST_TOLS(x)        ((uint16_t)(x))
+#define CONST_TOLES(x)       ((uint16_t)(x))
 
 /**
  * @brief          Constant to little endian, 32 bit.
  */
-#define CONST_TOLL(x)        ((uint32_t)(x))
+#define CONST_TOLEL(x)       ((uint32_t)(x))
 
 /**
  * @brief          Constant to little endian, 64 bit.
  */
-#define CONST_TOLLL(x)       ((uint64_t)(x))
+#define CONST_TOLELL(x)      ((uint64_t)(x))
 
 #else
 
@@ -446,32 +416,32 @@ static inline uint64_t NTOHLL(uint64_t v);
 /**
  * @brief          Constant big endian, 16 bit.
  */
-#define CONST_TOBS(x)        ((uint16_t)(x))
+#define CONST_TOBES(x)       ((uint16_t)(x))
 
 /**
  * @brief          Constant to big endian, 32 bit.
  */
-#define CONST_TOBL(x)        ((uint32_t)(x))
+#define CONST_TOBEL(x)       ((uint32_t)(x))
 
 /**
  * @brief          Constant to big endian, 64 bit.
  */
-#define CONST_TOBLL(x)       ((uint64_t)(x))
+#define CONST_TOBELL(x)      ((uint64_t)(x))
 
 /**
  * @brief          Constant to little endian, 16 bit.
  */
-#define CONST_TOLS(x)        CONST_BSWAP16(x)
+#define CONST_TOLES(x)       CONST_BSWAP16(x)
 
 /**
  * @brief          Constant to little endian, 32 bit.
  */
-#define CONST_TOLL(x)        CONST_BSWAP32(x)
+#define CONST_TOLEL(x)       CONST_BSWAP32(x)
 
 /**
  * @brief          Constant to little endian, 64 bit.
  */
-#define CONST_TOLLL(x)       CONST_BSWAP64(x)
+#define CONST_TOLELL(x)      CONST_BSWAP64(x)
 
 #endif
 
