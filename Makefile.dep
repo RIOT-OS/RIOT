@@ -521,6 +521,7 @@ endif
 
 ifneq (,$(filter ethos,$(USEMODULE)))
     USEMODULE += netdev2_eth
+    USEMODULE += random
 endif
 
 ifneq (,$(filter random,$(USEMODULE)))
