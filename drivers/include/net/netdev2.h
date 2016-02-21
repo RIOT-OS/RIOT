@@ -101,11 +101,14 @@ typedef void (*netdev2_event_cb_t)(netdev2_t *dev, netdev2_event_t event);
  *
  * Supposed to be extended by driver implementations.
  * The extended structure should contain all variable driver state.
+ *
+ * Contains a field @p context which is not used by the drivers, but supposed to
+ * be used by upper layers to store reference information.
  */
 struct netdev2 {
     const struct netdev2_driver *driver;    /**< ptr to that driver's interface. */
     netdev2_event_cb_t event_callback;      /**< callback for device events */
-    void *isr_arg;                          /**< argument to pass on isr event */
+    void* context;                          /**< ptr to network stack context */
 #ifdef MODULE_NETSTATS_L2
     netstats_t stats;                       /**< transceiver's statistics */
 #endif
