@@ -111,7 +111,7 @@ static void _end_of_frame(ethos_t *dev)
         case ETHOS_FRAME_TYPE_DATA:
             if (dev->framesize) {
                 dev->last_framesize = dev->framesize;
-                dev->netdev.event_callback((netdev2_t*) dev, NETDEV2_EVENT_ISR, dev->netdev.isr_arg);
+                dev->netdev.event_callback((netdev2_t*) dev, NETDEV2_EVENT_ISR);
             }
             break;
         case ETHOS_FRAME_TYPE_HELLO:
@@ -177,7 +177,7 @@ static void ethos_isr(void *arg, uint8_t c)
 static void _isr(netdev2_t *netdev)
 {
     ethos_t *dev = (ethos_t *) netdev;
-    dev->netdev.event_callback((netdev2_t*) dev, NETDEV2_EVENT_RX_COMPLETE, NULL);
+    dev->netdev.event_callback((netdev2_t*) dev, NETDEV2_EVENT_RX_COMPLETE);
 }
 
 static int _init(netdev2_t *encdev)

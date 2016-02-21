@@ -98,7 +98,7 @@ static inline int _set_promiscous(netdev2_t *netdev, int value)
 static inline void _isr(netdev2_t *netdev)
 {
     if (netdev->event_callback) {
-        netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE, NULL);
+        netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
     }
 #if DEVELHELP
     else {
@@ -297,7 +297,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int n)
     netdev->stats.tx_bytes += bytes;
 #endif
     if (netdev->event_callback) {
-        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE, NULL);
+        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE);
     }
     return res;
 }
@@ -313,7 +313,7 @@ static void _tap_isr(int fd) {
     netdev2_t *netdev = (netdev2_t *)&netdev2_tap;
 
     if (netdev->event_callback) {
-        netdev->event_callback(netdev, NETDEV2_EVENT_ISR, netdev->isr_arg);
+        netdev->event_callback(netdev, NETDEV2_EVENT_ISR);
     }
     else {
         puts("netdev2_tap: _isr: no event callback.");

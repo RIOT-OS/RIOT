@@ -45,11 +45,9 @@ static void _pass_on_packet(gnrc_pktsnip_t *pkt);
  * @brief   Function called by the device driver on device events
  *
  * @param[in] event     type of event
- * @param[in] data      optional parameter
  */
-static void _event_cb(netdev2_t *dev, netdev2_event_t event, void *data)
+static void _event_cb(netdev2_t *dev, netdev2_event_t event)
 {
-    (void) data;
     gnrc_netdev2_t *gnrc_netdev2 = (gnrc_netdev2_t*) dev->isr_arg;
 
     if (event == NETDEV2_EVENT_ISR) {

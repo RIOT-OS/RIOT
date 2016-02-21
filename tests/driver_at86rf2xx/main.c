@@ -42,10 +42,8 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
-static void _event_cb(netdev2_t *dev, netdev2_event_t event, void *data)
+static void _event_cb(netdev2_t *dev, netdev2_event_t event)
 {
-    (void) data;
-
     if (event == NETDEV2_EVENT_ISR) {
         msg_t msg;
 

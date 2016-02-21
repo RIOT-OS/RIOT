@@ -218,6 +218,6 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev)
                         AT86RF2XX_TRX_STATE__TX_START);
     if (netdev->event_callback &&
         (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_START)) {
-        netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED, NULL);
+        netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED);
     }
 }

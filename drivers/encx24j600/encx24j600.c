@@ -96,13 +96,12 @@ void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params)
 static void encx24j600_isr(void *arg)
 {
     encx24j600_t *dev = (encx24j600_t *) arg;
-    netdev2_t *netdev = (netdev2_t *) arg;
 
     /* disable interrupt line */
     gpio_irq_disable(dev->int_pin);
 
     /* call netdev2 hook */
-    dev->netdev.event_callback((netdev2_t*) dev, NETDEV2_EVENT_ISR, netdev->isr_arg);
+    dev->netdev.event_callback((netdev2_t*) dev, NETDEV2_EVENT_ISR);
 }
 
 static void _isr(netdev2_t *netdev)
@@ -124,15 +123,14 @@ static void _isr(netdev2_t *netdev)
             NETDEV2_EVENT_LINK_DOWN :
             NETDEV2_EVENT_LINK_UP;
 
-        netdev->event_callback(netdev, event, NULL);
+        netdev->event_callback(netdev, event);
     }
 
     /* check & handle available packets */
     if (eir & ENC_PKTIF) {
         while (_packets_available(dev)) {
             unlock(dev);
-            netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE,
-                    NULL);
+            netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
             lock(dev);
         }
     }
