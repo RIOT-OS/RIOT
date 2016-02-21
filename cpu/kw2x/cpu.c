@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include "cpu.h"
+#include "mcg.h"
 #include "cpu_conf.h"
 
 #define FLASH_BASE          (0x00000000)
