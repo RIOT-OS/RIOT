@@ -106,8 +106,10 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     /* configure the used pins */
     for (int i = 0; i < PWM_MAX_CHANNELS; i++) {
-        gpio_init(pwm_config[dev].chan[i].pin, GPIO_DIR_OUT, GPIO_NOPULL);
-        gpio_init_mux(pwm_config[dev].chan[i].pin, pwm_config[dev].chan[i].mux);
+        if (pwm_config[dev].chan[i].pin != GPIO_UNDEF) {
+            gpio_init(pwm_config[dev].chan[i].pin, GPIO_DIR_OUT, GPIO_NOPULL);
+            gpio_init_mux(pwm_config[dev].chan[i].pin, pwm_config[dev].chan[i].mux);
+        }
     }
 
     /* power on the device */
@@ -152,7 +154,8 @@ uint8_t pwm_channels(pwm_t dev)
 
 void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 {
-    if (channel >= PWM_MAX_CHANNELS) {
+    if ((channel >= PWM_MAX_CHANNELS) ||
+        (pwm_config[dev].chan[channel].pin == GPIO_UNDEF)) {
         return;
     }
     _tcc(dev)->CC[_chan(dev, channel)].reg = value;
