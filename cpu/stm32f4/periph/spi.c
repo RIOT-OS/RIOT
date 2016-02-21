@@ -138,16 +138,15 @@ void spi_transfer_byte(spi_t bus, spi_cs_t cs, bool cont,
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         uint8_t *out, uint8_t *in, size_t len)
 {
-    uint8_t tmp;
-
-    dev(bus)->CR1 |= (SPI_CR1_SPE);     /* this pull the HW CS line low */
+    dev(bus)->CR1 |= (SPI_CR1_SPE);     /* this pulls the HW CS line low */
     if (cs != HWCS_LINE) {
         gpio_clear((gpio_t)cs);
     }
 
     for (size_t i = 0; i < len; i++) {
+        uint8_t tmp = (out) ? out[i] : 0;
         while (!(dev(bus)->SR & SPI_SR_TXE));
-        dev(bus)->DR = out[i];
+        dev(bus)->DR = tmp;
         while (!(dev(bus)->SR & SPI_SR_RXNE));
         tmp = dev(bus)->DR;
         if (in) {

@@ -90,6 +90,13 @@ static const uart_conf_t uart_config[] = {
 * @name SPI configuration
 * @{
 */
+static const spi_conf_t spi_config[] {
+    /* dev, clk, mosi, miso */
+    { SPI0, ID_SPI0, GPIO_PIN(PA, 25), GPIO_PIN(PA, 26), GPIO_PIN(PA, 27), GPIO_MUX_A }
+}
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+
 #define SPI_NUMOF           (1U)
 #define SPI_0_EN            1
 
