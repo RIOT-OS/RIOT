@@ -101,7 +101,7 @@ static inline int _set_promiscous(netdev2_t *netdev, int value)
 static inline void _isr(netdev2_t *netdev)
 {
     if (netdev->event_callback) {
-        netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE, (void*)NETDEV2_TYPE_ETHERNET);
+        netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE, netdev->isr_arg);
     }
 #if DEVELHELP
     else {
