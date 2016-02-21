@@ -199,8 +199,10 @@ void gpio_write(gpio_t pin, int value)
 
 void isr_exti(void)
 {
+    /* only generate interrupts against lines which have their IMR set */
+    uint32_t pending_isr = (EXTI->PR & EXTI->IMR);
     for (size_t i = 0; i < EXTI_NUMOF; i++) {
-        if (EXTI->PR & (1 << i)) {
+        if (pending_isr & (1 << i)) {
             EXTI->PR = (1 << i);        /* clear by writing a 1 */
             isr_ctx[i].cb(isr_ctx[i].arg);
         }
