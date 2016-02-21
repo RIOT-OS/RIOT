@@ -193,7 +193,7 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
             break;
 
         case XCVSEQ_RECEIVE:
-            dev->state = NETOPT_STATE_IDLE;
+            dev->state = NETOPT_STATE_RX;
             break;
 
         case XCVSEQ_TRANSMIT:
