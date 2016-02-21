@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
- * Copyright (C) 2015 Eistec AB
+ * Copyright (C) 2015-2016 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -30,61 +30,62 @@
 #include "cpu.h"
 #include "periph/pwm.h"
 #include "periph_conf.h"
+#include "port.h"
 
 /* FTM channel look up tables */
 #if PWM_0_EN
 static const uint8_t ftm0chan[] = {
 #if PWM_0_CHANNELS > 0
-    PWM_0_FTMCHAN_CH0,
+    PWM_0_CH0_FTMCHAN,
 #endif
 #if PWM_0_CHANNELS > 1
-    PWM_0_FTMCHAN_CH1,
+    PWM_0_CH1_FTMCHAN,
 #endif
 #if PWM_0_CHANNELS > 2
-    PWM_0_FTMCHAN_CH2,
+    PWM_0_CH2_FTMCHAN,
 #endif
 #if PWM_0_CHANNELS > 3
-    PWM_0_FTMCHAN_CH3,
+    PWM_0_CH3_FTMCHAN,
 #endif
 #if PWM_0_CHANNELS > 4
-    PWM_0_FTMCHAN_CH4,
+    PWM_0_CH4_FTMCHAN,
 #endif
 #if PWM_0_CHANNELS > 5
-    PWM_0_FTMCHAN_CH5,
+    PWM_0_CH5_FTMCHAN,
 #endif
 #if PWM_0_CHANNELS > 6
-    PWM_0_FTMCHAN_CH6,
+    PWM_0_CH6_FTMCHAN,
 #endif
 #if PWM_0_CHANNELS > 7
-    PWM_0_FTMCHAN_CH7,
+    PWM_0_CH7_FTMCHAN,
 #endif
 };
 #endif
 #if PWM_1_EN
 static const uint8_t ftm1chan[] = {
 #if PWM_1_CHANNELS > 0
-    PWM_1_FTMCHAN_CH0,
+    PWM_1_CH0_FTMCHAN,
 #endif
 #if PWM_1_CHANNELS > 1
-    PWM_1_FTMCHAN_CH1,
+    PWM_1_CH1_FTMCHAN,
 #endif
 #if PWM_1_CHANNELS > 2
-    PWM_1_FTMCHAN_CH2,
+    PWM_1_CH2_FTMCHAN,
 #endif
 #if PWM_1_CHANNELS > 3
-    PWM_1_FTMCHAN_CH3,
+    PWM_1_CH3_FTMCHAN,
 #endif
 #if PWM_1_CHANNELS > 4
-    PWM_1_FTMCHAN_CH4,
+    PWM_1_CH4_FTMCHAN,
 #endif
 #if PWM_1_CHANNELS > 5
-    PWM_1_FTMCHAN_CH5,
+    PWM_1_CH5_FTMCHAN,
 #endif
 #if PWM_1_CHANNELS > 6
-    PWM_1_FTMCHAN_CH6,
+    PWM_1_CH6_FTMCHAN,
 #endif
 #if PWM_1_CHANNELS > 7
-    PWM_1_FTMCHAN_CH7,
+    PWM_1_CH7_FTMCHAN,
 #endif
 };
 #endif
@@ -158,60 +159,58 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 #if PWM_0_EN
 
         case PWM_0:
-            PWM_0_PORT_CLKEN();
             #if PWM_0_CHANNELS > 0
-                PWM_0_PORT_CH0->PCR[PWM_0_PIN_CH0] = PORT_PCR_MUX(PWM_0_PIN_AF_CH0);
+                port_init(PWM_0_CH0_GPIO, GPIO_NOPULL, PWM_0_CH0_AF);
             #endif
             #if PWM_0_CHANNELS > 1
-                PWM_0_PORT_CH1->PCR[PWM_0_PIN_CH1] = PORT_PCR_MUX(PWM_0_PIN_AF_CH1);
+                port_init(PWM_0_CH1_GPIO, GPIO_NOPULL, PWM_0_CH1_AF);
             #endif
             #if PWM_0_CHANNELS > 2
-                PWM_0_PORT_CH2->PCR[PWM_0_PIN_CH2] = PORT_PCR_MUX(PWM_0_PIN_AF_CH2);
+                port_init(PWM_0_CH2_GPIO, GPIO_NOPULL, PWM_0_CH2_AF);
             #endif
             #if PWM_0_CHANNELS > 3
-                PWM_0_PORT_CH3->PCR[PWM_0_PIN_CH3] = PORT_PCR_MUX(PWM_0_PIN_AF_CH3);
+                port_init(PWM_0_CH3_GPIO, GPIO_NOPULL, PWM_0_CH3_AF);
             #endif
             #if PWM_0_CHANNELS > 4
-                PWM_0_PORT_CH4->PCR[PWM_0_PIN_CH4] = PORT_PCR_MUX(PWM_0_PIN_AF_CH4);
+                port_init(PWM_0_CH4_GPIO, GPIO_NOPULL, PWM_0_CH4_AF);
             #endif
             #if PWM_0_CHANNELS > 5
-                PWM_0_PORT_CH5->PCR[PWM_0_PIN_CH5] = PORT_PCR_MUX(PWM_0_PIN_AF_CH5);
+                port_init(PWM_0_CH5_GPIO, GPIO_NOPULL, PWM_0_CH5_AF);
             #endif
             #if PWM_0_CHANNELS > 6
-                PWM_0_PORT_CH6->PCR[PWM_0_PIN_CH6] = PORT_PCR_MUX(PWM_0_PIN_AF_CH6);
+                port_init(PWM_0_CH6_GPIO, GPIO_NOPULL, PWM_0_CH6_AF);
             #endif
             #if PWM_0_CHANNELS > 7
-                PWM_0_PORT_CH7->PCR[PWM_0_PIN_CH7] = PORT_PCR_MUX(PWM_0_PIN_AF_CH7);
+                port_init(PWM_0_CH7_GPIO, GPIO_NOPULL, PWM_0_CH7_AF);
             #endif
             break;
 #endif
 #if PWM_1_EN
 
         case PWM_1:
-            PWM_1_PORT_CLKEN();
             #if PWM_1_CHANNELS > 0
-                PWM_1_PORT_CH0->PCR[PWM_1_PIN_CH0] = PORT_PCR_MUX(PWM_1_PIN_AF_CH0);
+                port_init(PWM_1_CH0_GPIO, GPIO_NOPULL, PWM_1_CH0_AF);
             #endif
             #if PWM_1_CHANNELS > 1
-                PWM_1_PORT_CH1->PCR[PWM_1_PIN_CH1] = PORT_PCR_MUX(PWM_1_PIN_AF_CH1);
+                port_init(PWM_1_CH1_GPIO, GPIO_NOPULL, PWM_1_CH1_AF);
             #endif
             #if PWM_1_CHANNELS > 2
-                PWM_1_PORT_CH2->PCR[PWM_1_PIN_CH2] = PORT_PCR_MUX(PWM_1_PIN_AF_CH2);
+                port_init(PWM_1_CH2_GPIO, GPIO_NOPULL, PWM_1_CH2_AF);
             #endif
             #if PWM_1_CHANNELS > 3
-                PWM_1_PORT_CH3->PCR[PWM_1_PIN_CH3] = PORT_PCR_MUX(PWM_1_PIN_AF_CH3);
+                port_init(PWM_1_CH3_GPIO, GPIO_NOPULL, PWM_1_CH3_AF);
             #endif
             #if PWM_1_CHANNELS > 4
-                PWM_1_PORT_CH4->PCR[PWM_1_PIN_CH4] = PORT_PCR_MUX(PWM_1_PIN_AF_CH4);
+                port_init(PWM_1_CH4_GPIO, GPIO_NOPULL, PWM_1_CH4_AF);
             #endif
             #if PWM_1_CHANNELS > 5
-                PWM_1_PORT_CH5->PCR[PWM_1_PIN_CH5] = PORT_PCR_MUX(PWM_1_PIN_AF_CH5);
+                port_init(PWM_1_CH5_GPIO, GPIO_NOPULL, PWM_1_CH5_AF);
             #endif
             #if PWM_1_CHANNELS > 6
-                PWM_1_PORT_CH6->PCR[PWM_1_PIN_CH6] = PORT_PCR_MUX(PWM_1_PIN_AF_CH6);
+                port_init(PWM_1_CH6_GPIO, GPIO_NOPULL, PWM_1_CH6_AF);
             #endif
             #if PWM_1_CHANNELS > 7
-                PWM_1_PORT_CH7->PCR[PWM_1_PIN_CH7] = PORT_PCR_MUX(PWM_1_PIN_AF_CH7);
+                port_init(PWM_1_CH7_GPIO, GPIO_NOPULL, PWM_1_CH7_AF);
             #endif
             break;
 #endif

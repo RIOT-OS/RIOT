@@ -180,27 +180,22 @@ extern "C"
 #define PWM_0_CLKEN()       (SIM->SCGC6 |= (SIM_SCGC6_FTM0_MASK))
 #define PWM_0_CLKDIS()      (SIM->SCGC6 &= ~(SIM_SCGC6_FTM0_MASK))
 /* PWM 0 pin configuration */
-#define PWM_0_PORT_CLKEN()  (SIM->SCGC5 |= (SIM_SCGC5_PORTD_MASK | SIM_SCGC5_PORTA_MASK))
 
-#define PWM_0_PIN_CH0       4
-#define PWM_0_FTMCHAN_CH0   1
-#define PWM_0_PORT_CH0      PORTA
-#define PWM_0_PIN_AF_CH0    3
+#define PWM_0_CH0_GPIO      GPIO_PIN(PORT_A, 4)
+#define PWM_0_CH0_FTMCHAN   1
+#define PWM_0_CH0_AF        3
 
-#define PWM_0_PIN_CH1       4
-#define PWM_0_FTMCHAN_CH1   4
-#define PWM_0_PORT_CH1      PORTD
-#define PWM_0_PIN_AF_CH1    4
+#define PWM_0_CH1_GPIO      GPIO_PIN(PORT_D, 4)
+#define PWM_0_CH1_FTMCHAN   4
+#define PWM_0_CH1_AF        4
 
-#define PWM_0_PIN_CH2       6
-#define PWM_0_FTMCHAN_CH2   6
-#define PWM_0_PORT_CH2      PORTD
-#define PWM_0_PIN_AF_CH2    4
+#define PWM_0_CH2_GPIO      GPIO_PIN(PORT_D, 6)
+#define PWM_0_CH2_FTMCHAN   6
+#define PWM_0_CH2_AF        4
 
-#define PWM_0_PIN_CH3       1
-#define PWM_0_FTMCHAN_CH3   1
-#define PWM_0_PORT_CH3      PORTA
-#define PWM_0_PIN_AF_CH3    3
+#define PWM_0_CH3_GPIO      GPIO_PIN(PORT_A, 1)
+#define PWM_0_CH3_FTMCHAN   1
+#define PWM_0_CH3_AF        3
 /** @} */
 
 

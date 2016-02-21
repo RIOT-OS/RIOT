@@ -236,17 +236,13 @@ extern "C"
 #define PWM_0_CLKDIS()      (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT) = 0)
 
 /* PWM 0 pin configuration */
-#define PWM_0_PORT_CLKEN()  (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTC_SHIFT) = 1)
+#define PWM_0_CH0_GPIO      GPIO_PIN(PORT_C, 1)
+#define PWM_0_CH0_FTMCHAN   0
+#define PWM_0_CH0_AF        4
 
-#define PWM_0_PIN_CH0       1
-#define PWM_0_FTMCHAN_CH0   0
-#define PWM_0_PORT_CH0      PORTC
-#define PWM_0_PIN_AF_CH0    4
-
-#define PWM_0_PIN_CH1       2
-#define PWM_0_FTMCHAN_CH1   1
-#define PWM_0_PORT_CH1      PORTC
-#define PWM_0_PIN_AF_CH1    4
+#define PWM_0_CH1_GPIO      GPIO_PIN(PORT_C, 2)
+#define PWM_0_CH1_FTMCHAN   1
+#define PWM_0_CH1_AF        4
 
 /* PWM 1 device configuration */
 #define PWM_1_DEV           FTM1
@@ -256,20 +252,15 @@ extern "C"
 #define PWM_1_CLKDIS()      (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM1_SHIFT) = 0)
 
 /* PWM 1 pin configuration */
-#define PWM_1_PORT_CLKEN()  (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTA_SHIFT) = 1)
+#define PWM_1_CH0_GPIO      GPIO_PIN(PORT_A, 12)
+#define PWM_1_CH0_FTMCHAN   0
+#define PWM_1_CH0_AF        3
 
-#define PWM_1_PIN_CH0       12
-#define PWM_1_FTMCHAN_CH0   0
-#define PWM_1_PORT_CH0      PORTA
-#define PWM_1_PIN_AF_CH0    3
-
-#define PWM_1_PIN_CH1       13
-#define PWM_1_FTMCHAN_CH1   1
-#define PWM_1_PORT_CH1      PORTA
-#define PWM_1_PIN_AF_CH1    3
+#define PWM_1_CH1_GPIO      GPIO_PIN(PORT_A, 13)
+#define PWM_1_CH1_FTMCHAN   1
+#define PWM_1_CH1_AF        3
 
 /** @} */
-
 
 /**
  * @name SPI configuration
