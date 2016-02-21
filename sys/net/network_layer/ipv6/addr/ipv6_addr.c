@@ -26,6 +26,16 @@
 #include <stdio.h>
 #endif
 
+const ipv6_addr_t ipv6_addr_unspecified = IPV6_ADDR_UNSPECIFIED;
+const ipv6_addr_t ipv6_addr_loopback = IPV6_ADDR_LOOPBACK;
+const ipv6_addr_t ipv6_addr_link_local_prefix = IPV6_ADDR_LINK_LOCAL_PREFIX;
+const ipv6_addr_t ipv6_addr_solicited_node_prefix = IPV6_ADDR_SOLICITED_NODE_PREFIX;
+const ipv6_addr_t ipv6_addr_all_nodes_if_local = IPV6_ADDR_ALL_NODES_IF_LOCAL;
+const ipv6_addr_t ipv6_addr_all_nodes_link_local = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
+const ipv6_addr_t ipv6_addr_all_routers_if_local = IPV6_ADDR_ALL_ROUTERS_IF_LOCAL;
+const ipv6_addr_t ipv6_addr_all_routers_link_local = IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
+const ipv6_addr_t ipv6_addr_all_routers_site_local = IPV6_ADDR_ALL_ROUTERS_SITE_LOCAL;
+
 bool ipv6_addr_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
 {
     return (a->u64[0].u64 == b->u64[0].u64) &&

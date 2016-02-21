@@ -28,8 +28,10 @@
 #define IPV6_ADDR_H_
 
 #include <stdbool.h>
+#include <string.h>
 
 #include "byteorder.h"
+#include "net/ipv4/addr.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,6 +102,18 @@ typedef union {
                                                0x00, 0x00, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x01 }}
 /**
+ * @brief   Static initalizer for the link-local prefix (fe80::/64)
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.6">
+ *          RFC 4291, section 2.5.6
+ *      </a>
+ */
+#define IPV6_ADDR_LINK_LOCAL_PREFIX         {{ 0xfe, 0x80, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00 }}
+
+/**
  * @brief   Static initializer for the interface-local all nodes multicast IPv6
  *          address (ff01::1)
  *
@@ -166,6 +180,19 @@ typedef union {
                                                0x00, 0x00, 0x00, 0x02 }}
 
 /**
+ * @brief   Static initializer for the solicited node multicast prefix
+ *          (ff02:0:0:0:0:1:ff00::/104)
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
+ *          RFC 4291, section 2.7
+ *      </a>
+ */
+#define IPV6_ADDR_SOLICITED_NODE_PREFIX     {{ 0xff, 0x02, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x01, \
+                                               0xff, 0x00, 0x00, 0x00 }}
+
+/**
  * @name    Multicast address flags
  * @brief   Values for the flag field in multicast addresses.
  * @{
@@ -229,6 +256,58 @@ typedef union {
 /** @} */
 
 /**
+ * @brief In-memory constants of defined addresses and prefixes
+ * @{
+ */
+/**
+ * @see @ref IPV6_ADDR_UNSPECIFIED
+ */
+extern const ipv6_addr_t ipv6_addr_unspecified;
+
+/**
+ * @see @ref IPV6_ADDR_LOOPBACK
+ */
+extern const ipv6_addr_t ipv6_addr_loopback;
+
+/**
+ * @see @ref IPV6_ADDR_LINK_LOCAL_PREFIX
+ */
+extern const ipv6_addr_t ipv6_addr_link_local_prefix;
+
+/**
+ * @see @ref IPV6_ADDR_ALL_NODES_IF_LOCAL
+ */
+extern const ipv6_addr_t ipv6_addr_all_nodes_if_local;
+
+/**
+ * @see @ref IPV6_ADDR_ALL_NODES_LINK_LOCAL
+ */
+extern const ipv6_addr_t ipv6_addr_all_nodes_link_local;
+
+/**
+ * @see @ref IPV6_ADDR_ALL_ROUTERS_IF_LOCAL
+ */
+extern const ipv6_addr_t ipv6_addr_all_routers_if_local;
+
+/**
+ * @see @ref IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL
+ */
+extern const ipv6_addr_t ipv6_addr_all_routers_link_local;
+
+/**
+ * @see @ref IPV6_ADDR_ALL_ROUTERS_SITE_LOCAL
+ */
+extern const ipv6_addr_t ipv6_addr_all_routers_site_local;
+
+/**
+ * @see @ref IPV6_ADDR_SOLICITED_NODE_PREFIX
+ */
+extern const ipv6_addr_t ipv6_addr_solicited_node_prefix;
+/**
+ * @}
+ */
+
+/**
  * @brief   Checks if @p addr is unspecified (all zero).
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.2">
@@ -242,8 +321,7 @@ typedef union {
  */
 static inline bool ipv6_addr_is_unspecified(const ipv6_addr_t *addr)
 {
-    return (addr->u64[0].u64 == 0) &&
-           (addr->u64[1].u64 == 0);
+    return (memcmp(addr, &ipv6_addr_unspecified, sizeof(ipv6_addr_t)) == 0);
 }
 
 /**
@@ -260,8 +338,7 @@ static inline bool ipv6_addr_is_unspecified(const ipv6_addr_t *addr)
  */
 static inline bool ipv6_addr_is_loopback(const ipv6_addr_t *addr)
 {
-    return (addr->u64[0].u64 == 0) &&
-           (byteorder_ntohll(addr->u64[1]) == 1);
+    return (memcmp(addr, &ipv6_addr_loopback, sizeof(ipv6_addr_t)) == 0);
 }
 
 /**
@@ -278,8 +355,8 @@ static inline bool ipv6_addr_is_loopback(const ipv6_addr_t *addr)
  */
 static inline bool ipv6_addr_is_ipv4_compat(const ipv6_addr_t *addr)
 {
-    return (addr->u64[0].u64 == 0) &&
-           (addr->u32[2].u32 == 0);
+    return (memcmp(addr, &ipv6_addr_unspecified,
+                   sizeof(ipv6_addr_t) - sizeof(ipv4_addr_t)) == 0);
 }
 
 /**
@@ -296,8 +373,8 @@ static inline bool ipv6_addr_is_ipv4_compat(const ipv6_addr_t *addr)
  */
 static inline bool ipv6_addr_is_ipv4_mapped(const ipv6_addr_t *addr)
 {
-    return ((addr->u64[0].u64 == 0) &&
-            (addr->u16[4].u16 == 0) &&
+    return ((memcmp(addr, &ipv6_addr_unspecified,
+                    sizeof(ipv6_addr_t) - sizeof(ipv4_addr_t) - 2) == 0) &&
             (addr->u16[5].u16 == 0xffff));
 }
 
@@ -335,7 +412,7 @@ static inline bool ipv6_addr_is_multicast(const ipv6_addr_t *addr)
  */
 static inline bool ipv6_addr_is_link_local(const ipv6_addr_t *addr)
 {
-    return (byteorder_ntohll(addr->u64[0]) == 0xfe80000000000000) ||
+    return (memcmp(addr, &ipv6_addr_link_local_prefix, sizeof(addr->u64[0])) == 0) ||
            (ipv6_addr_is_multicast(addr) &&
             (addr->u8[1] & 0x0f) == IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
 }
@@ -400,15 +477,9 @@ static inline bool ipv6_addr_is_global(const ipv6_addr_t *addr)
         return ((addr->u8[1] & 0x0f) == IPV6_ADDR_MCAST_SCP_GLOBAL);
     }
     else {
-        /* for unicast check if: */
-        /* - not unspecific or loopback */
-        return (!((addr->u64[0].u64 == 0) &&
-                  ((byteorder_ntohll(addr->u64[1]) & (0xfffffffffffffffe)) == 0)) &&
-                /* - not link-local */
-                (byteorder_ntohll(addr->u64[0]) != 0xfe80000000000000) &&
-                /* - not site-local */
-                ((byteorder_ntohs(addr->u16[0]) & 0xffc0) !=
-                 IPV6_ADDR_SITE_LOCAL_PREFIX));
+        return !(ipv6_addr_is_link_local(addr) ||
+                 ipv6_addr_is_unspecified(addr) ||
+                 ipv6_addr_is_loopback(addr));
     }
 }
 
@@ -427,9 +498,8 @@ static inline bool ipv6_addr_is_global(const ipv6_addr_t *addr)
  */
 static inline bool ipv6_addr_is_solicited_node(const ipv6_addr_t *addr)
 {
-    return (byteorder_ntohll(addr->u64[0]) == 0xff02000000000000) &&
-           (byteorder_ntohl(addr->u32[2]) == 1) &&
-           (addr->u8[12] == 0xff);
+    return (memcmp(addr, &ipv6_addr_solicited_node_prefix,
+                   sizeof(ipv6_addr_t) - 3) == 0);
 }
 
 
@@ -488,8 +558,7 @@ void ipv6_addr_init_iid(ipv6_addr_t *out, const uint8_t *iid, uint8_t bits);
  */
 static inline void ipv6_addr_set_unspecified(ipv6_addr_t *addr)
 {
-    addr->u64[0].u64 = 0;
-    addr->u64[1].u64 = 0;
+    memset(addr, 0, sizeof(ipv6_addr_t));
 }
 
 /**
@@ -503,8 +572,8 @@ static inline void ipv6_addr_set_unspecified(ipv6_addr_t *addr)
  */
 static inline void ipv6_addr_set_loopback(ipv6_addr_t *addr)
 {
-    addr->u64[0].u64 = 0;
-    addr->u64[1] = byteorder_htonll(1);
+    memset(addr, 0, sizeof(ipv6_addr_t));
+    addr->u8[15] = 1;
 }
 
 /**
@@ -518,7 +587,7 @@ static inline void ipv6_addr_set_loopback(ipv6_addr_t *addr)
  */
 static inline void ipv6_addr_set_link_local_prefix(ipv6_addr_t *addr)
 {
-    addr->u64[0] = byteorder_htonll(0xfe80000000000000);
+    memcpy(addr, &ipv6_addr_link_local_prefix, sizeof(addr->u64[0]));
 }
 
 /**
@@ -550,14 +619,7 @@ static inline void ipv6_addr_set_iid(ipv6_addr_t *addr, uint64_t iid)
  */
 static inline void ipv6_addr_set_aiid(ipv6_addr_t *addr, uint8_t *iid)
 {
-    addr->u8[8]  = iid[0];
-    addr->u8[9]  = iid[1];
-    addr->u8[10] = iid[2];
-    addr->u8[11] = iid[3];
-    addr->u8[12] = iid[4];
-    addr->u8[13] = iid[5];
-    addr->u8[14] = iid[6];
-    addr->u8[15] = iid[7];
+    memcpy(&addr->u64[1], iid, sizeof(addr->u64[1]));
 }
 
 /**
@@ -591,9 +653,8 @@ static inline void ipv6_addr_set_multicast(ipv6_addr_t *addr, unsigned int flags
  */
 static inline void ipv6_addr_set_all_nodes_multicast(ipv6_addr_t *addr, unsigned int scope)
 {
-    addr->u64[0] = byteorder_htonll(0xff00000000000000);
+    memcpy(addr, &ipv6_addr_all_nodes_if_local, sizeof(ipv6_addr_t));
     addr->u8[1] = (uint8_t)scope;
-    addr->u64[1] = byteorder_htonll(1);
 }
 
 /**
@@ -609,9 +670,8 @@ static inline void ipv6_addr_set_all_nodes_multicast(ipv6_addr_t *addr, unsigned
  */
 static inline void ipv6_addr_set_all_routers_multicast(ipv6_addr_t *addr, unsigned int scope)
 {
-    addr->u64[0] = byteorder_htonll(0xff00000000000000);
+    memcpy(addr, &ipv6_addr_all_routers_if_local, sizeof(ipv6_addr_t));
     addr->u8[1] = (uint8_t)scope;
-    addr->u64[1] = byteorder_htonll(2);
 }
 
 /**
