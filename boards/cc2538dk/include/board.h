@@ -73,6 +73,17 @@ extern "C" {
 /** @} */
 
 /**
+ * @name xtimer configuration
+ * @{
+ */
+#define XTIMER              TIMER_0
+#define XTIMER_CHAN         0
+#define XTIMER_SHIFT        -4
+#define XTIMER_BACKOFF      50
+#define XTIMER_ISR_BACKOFF  40
+/** @} */
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
