@@ -87,7 +87,16 @@ static uint16_t _calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr,
             return 0;
     }
     /* return inverted results */
-    return ~csum;
+    if (csum == 0xFFFF) {
+        /* https://tools.ietf.org/html/rfc2460#section-8.1
+         * bullet 4
+         * "if that computation yields a result of zero, it must be changed
+         * to hex FFFF for placement in the UDP header."
+         */
+        return 0xFFFF;
+    } else {
+        return ~csum;
+    }
 }
 
 static void _receive(gnrc_pktsnip_t *pkt)
@@ -128,7 +137,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
     hdr = (udp_hdr_t *)udp->data;
 
     /* validate checksum */
-    if (_calc_csum(udp, ipv6, pkt)) {
+    if (_calc_csum(udp, ipv6, pkt) != 0xFFFF) {
         DEBUG("udp: received packet with invalid checksum, dropping it\n");
         gnrc_pktbuf_release(pkt);
         return;
