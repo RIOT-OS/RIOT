@@ -56,7 +56,7 @@ static inline int _is_set(xtimer_t *timer)
 void xtimer_init(void)
 {
     /* initialize low-level timer */
-    timer_init(XTIMER, (1000000ul >> XTIMER_SHIFT), _periph_timer_callback, NULL);
+    timer_init(XTIMER, XTIMER_RSHIFT(1000000ul), _periph_timer_callback, NULL);
 
     /* register initial overflow tick */
     _lltimer_set(0xFFFFFFFF);
@@ -150,7 +150,7 @@ static inline void _lltimer_set(uint32_t target)
     }
     DEBUG("_lltimer_set(): setting %" PRIu32 "\n", _lltimer_mask(target));
 #ifdef XTIMER_SHIFT
-    target >>= XTIMER_SHIFT;
+    target = XTIMER_RSHIFT(target);
     if (!target) {
         target++;
     }
