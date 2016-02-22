@@ -32,7 +32,7 @@
 static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
 {
     netdev2_t *dev = gnrc_netdev2->dev;
-    int bytes_expected = dev->driver->recv(dev, NULL, 0);
+    int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
     gnrc_pktsnip_t *pkt = NULL;
 
     if (bytes_expected) {
@@ -45,7 +45,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
             goto out;
         }
 
-        int nread = dev->driver->recv(dev, pkt->data, bytes_expected);
+        int nread = dev->driver->recv(dev, pkt->data, bytes_expected, NULL);
         if(nread <= 0) {
             DEBUG("_recv_ethernet_packet: read error.\n");
             goto safe_out;

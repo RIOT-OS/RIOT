@@ -71,7 +71,7 @@ static void _sigio_child(netdev2_tap_t *dev);
 /* netdev2 interface */
 static int _init(netdev2_t *netdev);
 static int _send(netdev2_t *netdev, const struct iovec *vector, int n);
-static int _recv(netdev2_t *netdev, char* buf, int n);
+static int _recv(netdev2_t *netdev, char* buf, int n, void *info);
 
 static inline void _get_mac_addr(netdev2_t *netdev, uint8_t *dst)
 {
@@ -187,9 +187,10 @@ static inline bool _is_addr_multicast(uint8_t *addr)
     return (addr[0] & 0x01);
 }
 
-static int _recv(netdev2_t *netdev2, char *buf, int len)
+static int _recv(netdev2_t *netdev2, char *buf, int len, void *info)
 {
     netdev2_tap_t *dev = (netdev2_tap_t*)netdev2;
+    (void)info;
 
     if (!buf) {
         /* no way of figuring out packet size without racey buffering,

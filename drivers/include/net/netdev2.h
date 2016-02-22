@@ -72,6 +72,16 @@ typedef enum {
 } netdev2_event_t;
 
 /**
+ * @brief   Received packet status information for most radios
+ *
+ * May be different for certain radios.
+ */
+struct netdev2_radio_rx_info {
+    uint8_t rssi;       /**< RSSI of a received packet */
+    uint8_t lqi;        /**< LQI of a received packet */
+};
+
+/**
  * @brief   Forward declaration for netdev2 struct
  */
 typedef struct netdev2 netdev2_t;
@@ -122,12 +132,15 @@ typedef struct netdev2_driver {
      * @param[in]   dev     network device descriptor
      * @param[out]  buf     buffer to write into or NULL
      * @param[in]   len     maximum nr. of bytes to read
+     * @param[out] info     status information for the received packet. Might
+     *                      be of different type for different netdev2 devices.
+     *                      May be NULL if not needed or applicable.
      *
      * @return <=0 on error
      * @return nr of bytes read if buf != NULL
      * @return packet size if buf == NULL
      */
-    int (*recv)(netdev2_t *dev, char* buf, int len);
+    int (*recv)(netdev2_t *dev, char *buf, int len, void *info);
 
     /**
      * @brief the driver's initialization function
