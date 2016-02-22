@@ -200,7 +200,6 @@ void gnrc_ipv6_netif_add(kernel_pid_t pid)
 
     /* Otherwise, fill the free entry */
 
-    ipv6_addr_t addr = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
     mutex_lock(&free_entry->mutex);
 
     DEBUG("ipv6 netif: Add IPv6 interface %" PRIkernel_pid " (i = %d)\n", pid,
@@ -210,7 +209,8 @@ void gnrc_ipv6_netif_add(kernel_pid_t pid)
     free_entry->cur_hl = GNRC_IPV6_NETIF_DEFAULT_HL;
     free_entry->flags = 0;
 
-    _add_addr_to_entry(free_entry, &addr, IPV6_ADDR_BIT_LEN, 0);
+    _add_addr_to_entry(free_entry, &ipv6_addr_all_nodes_link_local,
+                       IPV6_ADDR_BIT_LEN, 0);
 
     mutex_unlock(&free_entry->mutex);
 
