@@ -137,6 +137,15 @@ static void _receive(gnrc_pktsnip_t *pkt)
     hdr = (udp_hdr_t *)udp->data;
 
     /* validate checksum */
+    if (byteorder_ntohs(hdr->checksum) == 0) {
+        /* RFC 2460 Section 8.1
+         * "IPv6 receivers must discard UDP packets containing a zero checksum,
+         * and should log the error."
+         */
+        DEBUG("udp: received packet with zero checksum, dropping it\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
     if (_calc_csum(udp, ipv6, pkt) != 0xFFFF) {
         DEBUG("udp: received packet with invalid checksum, dropping it\n");
         gnrc_pktbuf_release(pkt);
