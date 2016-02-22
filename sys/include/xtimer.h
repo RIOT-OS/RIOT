@@ -342,8 +342,13 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_SHIFT (0)
 #endif
 
+#if (XTIMER_SHIFT < 0)
+#define XTIMER_RSHIFT(value) ( (value) << -XTIMER_SHIFT )
+#define XTIMER_LSHIFT(value) ( (value) >> -XTIMER_SHIFT )
+#else
 #define XTIMER_RSHIFT(value) ( (value) >> XTIMER_SHIFT )
 #define XTIMER_LSHIFT(value) ( (value) << XTIMER_SHIFT )
+#endif
 
 /**
  * @brief set xtimer default timer configuration
