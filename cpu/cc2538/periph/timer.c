@@ -28,12 +28,16 @@
 #include "periph/timer.h"
 #include "periph_conf.h"
 
-#define USEC_PER_SEC             1000000 /**< Conversion factor between seconds and microseconds */
+#define TIMER_A_IRQ_MASK 0x000000ff
+#define TIMER_B_IRQ_MASK 0x0000ff00
+
+#define NUM_CHANNELS     1
 
 /**
  * @brief Timer state memory
  */
 static timer_isr_ctx_t config[TIMER_NUMOF];
+static unsigned long config_freq[TIMER_NUMOF];
 
 
 /**
@@ -78,6 +82,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     /* Save the callback function: */
     config[dev].cb = cb;
     config[dev].arg = arg;
+    config_freq[dev] = freq;
 
     /* Enable the clock for this timer: */
     SYS_CTRL_RCGCGPT |= (1 << gptimer_num);
@@ -85,12 +90,10 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     /* Disable this timer before configuring it: */
     gptimer->cc2538_gptimer_ctl.CTL = 0;
 
-    gptimer->CFG  = GPTMCFG_16_BIT_TIMER;
+    gptimer->CFG  = GPTMCFG_32_BIT_TIMER;
     gptimer->cc2538_gptimer_tamr.TAMR = GPTIMER_PERIODIC_MODE;
     gptimer->cc2538_gptimer_tamr.TAMRbits.TACDIR = 1; /**< Count up */
-
-    /* Set the prescale register for the desired frequency: */
-    gptimer->TAPR = (RCOSC16M_FREQ / freq) - 1;
+    gptimer->cc2538_gptimer_tamr.TAMRbits.TAMIE  = 1; /**< Enable the Timer A Match Interrupt */
 
     /* Enable interrupts for given timer: */
     timer_irq_enable(dev);
@@ -103,12 +106,11 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
-    return timer_set_absolute(dev, channel, timer_read(dev) + timeout);
-}
-
-int timer_set_absolute(tim_t dev, int channel, unsigned int value)
-{
     cc2538_gptimer_t *gptimer;
+
+    if (channel >= NUM_CHANNELS) {
+        return -1;
+    }
 
     /* get timer base register address */
     switch (dev) {
@@ -138,18 +140,62 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     }
 
     /* set timeout value */
-    switch (channel) {
-        case 0:
-            gptimer->TAILR = value;
-            break;
+    gptimer->ICR           = TIMER_A_IRQ_MASK; /**< Clear any pending interrupt status */
 
-        case 1:
-            gptimer->TBILR = value;
-            break;
+    uint64_t scaled_value = timeout;
+    scaled_value *= RCOSC16M_FREQ;
+    scaled_value /= config_freq[dev];
+    gptimer->TAMATCHR = gptimer->TAV + scaled_value;
 
+    gptimer->cc2538_gptimer_imr.IMRbits.TAMIM = 1; /**< Enable the Timer A Match Interrupt */
+
+    return 1;
+}
+
+int timer_set_absolute(tim_t dev, int channel, unsigned int value)
+{
+    cc2538_gptimer_t *gptimer;
+
+    if (channel >= NUM_CHANNELS) {
+        return -1;
+    }
+
+    /* get timer base register address */
+    switch (dev) {
+#if TIMER_0_EN
+        case TIMER_0:
+            gptimer = TIMER_0_DEV;
+            break;
+#endif
+#if TIMER_1_EN
+        case TIMER_1:
+            gptimer = TIMER_1_DEV;
+            break;
+#endif
+#if TIMER_2_EN
+        case TIMER_2:
+            gptimer = TIMER_2_DEV;
+            break;
+#endif
+#if TIMER_3_EN
+        case TIMER_3:
+            gptimer = TIMER_3_DEV;
+            break;
+#endif
+        case TIMER_UNDEFINED:
         default:
             return -1;
     }
+
+    /* set timeout value */
+    gptimer->ICR           = TIMER_A_IRQ_MASK; /**< Clear any pending interrupt status */
+
+    uint64_t scaled_value = value;
+    scaled_value *= config_freq[dev];
+    scaled_value /= RCOSC16M_FREQ;
+    gptimer->TAMATCHR = (scaled_value > UINT32_MAX)? UINT32_MAX : scaled_value;
+
+    gptimer->cc2538_gptimer_imr.IMRbits.TAMIM = 1; /**< Enable the Timer A Match Interrupt */
 
     return 1;
 }
@@ -157,6 +203,10 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 int timer_clear(tim_t dev, int channel)
 {
     cc2538_gptimer_t *gptimer;
+
+    if (channel >= NUM_CHANNELS) {
+        return -1;
+    }
 
     /* get timer base register address */
     switch (dev) {
@@ -186,18 +236,7 @@ int timer_clear(tim_t dev, int channel)
             return -1;
     }
 
-    switch (channel) {
-        case 0:
-            gptimer->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            break;
-
-        case 1:
-            gptimer->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
-            break;
-
-        default:
-            return -1;
-    }
+    gptimer->cc2538_gptimer_imr.IMR = 0;
 
     return 1;
 }
@@ -211,19 +250,19 @@ unsigned int timer_read(tim_t dev)
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            return TIMER_0_DEV->TAR;
+            return (uint64_t)TIMER_0_DEV->TAV * config_freq[TIMER_0] / RCOSC16M_FREQ;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            return TIMER_1_DEV->TAR;
+            return (uint64_t)TIMER_1_DEV->TAV * config_freq[TIMER_1] / RCOSC16M_FREQ;
 #endif
 #if TIMER_2_EN
         case TIMER_2:
-            return TIMER_2_DEV->TAR;
+            return (uint64_t)TIMER_2_DEV->TAV * config_freq[TIMER_2] / RCOSC16M_FREQ;
 #endif
 #if TIMER_3_EN
         case TIMER_3:
-            return TIMER_3_DEV->TAR;
+            return (uint64_t)TIMER_3_DEV->TAV * config_freq[TIMER_3] / RCOSC16M_FREQ;
 #endif
 
         case TIMER_UNDEFINED:
@@ -241,25 +280,21 @@ void timer_stop(tim_t dev)
 #if TIMER_0_EN
         case TIMER_0:
             TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
             TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
             break;
 #endif
 #if TIMER_2_EN
         case TIMER_2:
             TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
             break;
 #endif
 #if TIMER_3_EN
         case TIMER_3:
             TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
             break;
 #endif
 
@@ -274,25 +309,21 @@ void timer_start(tim_t dev)
 #if TIMER_0_EN
         case TIMER_0:
             TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
-            TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 1;
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
             TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
-            TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 1;
             break;
 #endif
 #if TIMER_2_EN
         case TIMER_2:
             TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
-            TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 1;
             break;
 #endif
 #if TIMER_3_EN
         case TIMER_3:
             TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
-            TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 1;
             break;
 #endif
 
@@ -390,11 +421,13 @@ static inline void irq_handler(int tim, int chan)
 #if TIMER_0_EN
 void TIMER_0_ISR_1(void)
 {
+    TIMER_0_DEV->ICR = TIMER_A_IRQ_MASK;
     irq_handler(0, 0);
 }
 
 void TIMER_0_ISR_2(void)
 {
+    TIMER_0_DEV->ICR = TIMER_B_IRQ_MASK;
     irq_handler(0, 1);
 }
 #endif /* TIMER_0_EN */
@@ -402,11 +435,13 @@ void TIMER_0_ISR_2(void)
 #if TIMER_1_EN
 void TIMER_1_ISR_1(void)
 {
+    TIMER_1_DEV->ICR = TIMER_A_IRQ_MASK;
     irq_handler(1, 0);
 }
 
 void TIMER_1_ISR_2(void)
 {
+    TIMER_1_DEV->ICR = TIMER_B_IRQ_MASK;
     irq_handler(1, 1);
 }
 #endif /* TIMER_1_EN */
@@ -414,11 +449,13 @@ void TIMER_1_ISR_2(void)
 #if TIMER_2_EN
 void TIMER_2_ISR_1(void)
 {
+    TIMER_2_DEV->ICR = TIMER_A_IRQ_MASK;
     irq_handler(2, 0);
 }
 
 void TIMER_2_ISR_2(void)
 {
+    TIMER_2_DEV->ICR = TIMER_B_IRQ_MASK;
     irq_handler(2, 1);
 }
 #endif /* TIMER_2_EN */
@@ -426,11 +463,13 @@ void TIMER_2_ISR_2(void)
 #if TIMER_3_EN
 void TIMER_3_ISR_1(void)
 {
+    TIMER_3_DEV->ICR = TIMER_A_IRQ_MASK;
     irq_handler(3, 0);
 }
 
 void TIMER_3_ISR_2(void)
 {
+    TIMER_3_DEV->ICR = TIMER_B_IRQ_MASK;
     irq_handler(3, 1);
 }
 #endif /* TIMER_3_EN */

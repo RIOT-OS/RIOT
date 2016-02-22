@@ -43,7 +43,7 @@
 
 /* Timer 0 configuration */
 #define TIMER_0_DEV         GPTIMER0
-#define TIMER_0_CHANNELS    NUM_CHANNELS_PER_GPTIMER
+#define TIMER_0_CHANNELS    1
 #define TIMER_0_MAX_VALUE   0xffffffff
 #define TIMER_0_IRQn_1      GPTIMER_0A_IRQn
 #define TIMER_0_IRQn_2      GPTIMER_0B_IRQn
@@ -52,7 +52,7 @@
 
 /* Timer 1 configuration */
 #define TIMER_1_DEV         GPTIMER1
-#define TIMER_1_CHANNELS    NUM_CHANNELS_PER_GPTIMER
+#define TIMER_1_CHANNELS    1
 #define TIMER_1_MAX_VALUE   0xffffffff
 #define TIMER_1_IRQn_1      GPTIMER_1A_IRQn
 #define TIMER_1_IRQn_2      GPTIMER_1B_IRQn
@@ -61,7 +61,7 @@
 
 /* Timer 2 configuration */
 #define TIMER_2_DEV         GPTIMER2
-#define TIMER_2_CHANNELS    NUM_CHANNELS_PER_GPTIMER
+#define TIMER_2_CHANNELS    1
 #define TIMER_2_MAX_VALUE   0xffffffff
 #define TIMER_2_IRQn_1      GPTIMER_2A_IRQn
 #define TIMER_2_IRQn_2      GPTIMER_2B_IRQn
@@ -70,7 +70,7 @@
 
 /* Timer 3 configuration */
 #define TIMER_3_DEV         GPTIMER3
-#define TIMER_3_CHANNELS    NUM_CHANNELS_PER_GPTIMER
+#define TIMER_3_CHANNELS    1
 #define TIMER_3_MAX_VALUE   0xffffffff
 #define TIMER_3_IRQn_1      GPTIMER_3A_IRQn
 #define TIMER_3_IRQn_2      GPTIMER_3B_IRQn
