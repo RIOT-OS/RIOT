@@ -1008,7 +1008,7 @@ void _receive_data(kw2xrf_t *dev)
         return;
     }
 
-    /* If RAW-mode is selected direclty forward pkt, MAC does the rest */
+    /* If RAW-mode is selected directly forward pkt, MAC does the rest */
     if (dev->option & KW2XRF_OPT_RAWDUMP) {
         payload = gnrc_pktbuf_add(NULL, NULL, pkt_len, GNRC_NETTYPE_UNDEF);
 
@@ -1043,8 +1043,8 @@ void _receive_data(kw2xrf_t *dev)
     netif->if_pid = thread_getpid();
     netif->lqi = dev->buf[pkt_len];
     /* lqi and rssi are directly related to each other in the kw2x-device.
-     * The rssi-unit is dBm and in this case alwaysnegative, nevertheless
-     * a positive value is reported.
+     * The rssi-unit is dBm and in this case always negative, nevertheless a
+     * positive value is reported.
      */
     netif->rssi = -((netif->lqi) - 286.6) / 2.69333;
 
