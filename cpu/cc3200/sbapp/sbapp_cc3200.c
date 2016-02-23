@@ -22,6 +22,11 @@
 #include "debug.h"
 
 /**
+ * @brief msec timeout before hibernating network processor
+ */
+#define SL_STOP_TIME_WAIT (1000)
+
+/**
  * @brief the recv receive buffer
  */
 #define RECV_BUFF_SIZE                  (64)
@@ -94,10 +99,16 @@ static void *_event_loop(void *arg);
 typedef struct sbapp_t {
 	kernel_pid_t main_pid; /**< the main task (send pkts and control commands */
 	xtimer_t sig_tim; /**< a signaling timer for wifi events (smartconfig active, ...) */
+	uint32_t options; /**< various wifi options */
+	const char *ssid;
+	const char *password;
 } sbapp_t;
 
 sbapp_t sbapp = {
-		.main_pid = KERNEL_PID_UNDEF };
+		.main_pid = KERNEL_PID_UNDEF,
+		.ssid = NULL,
+		.password = NULL
+    };
 
 /**
  * @brief   memory segment for the NBAPP thread's stack
@@ -567,6 +578,14 @@ long simplelink_to_default_state(void) {
 }
 
 /**
+ *  @note char pointers are used assuming they are not freed by client meanwhile
+ */
+void sbapp_set_security(const char* ssid, const char* password) {
+    sbapp.ssid = ssid;
+    sbapp.password = password;
+}
+
+/**
  * @brief signals that smartconfig process is active
  */
 void smartconfig_still_active(void* arg) {
@@ -596,11 +615,13 @@ long wifi_connect(void) {
 	return nwp.role;
 }
 
-int sbapp_init(void) {
+int sbapp_init(uint32_t options) {
 
 	msg_t m;
 	kernel_pid_t parent = thread_getpid();
 	int sts;
+
+	sbapp.options = options;
 
 	/* check if thread is already running */
 	if (sbapp.main_pid == KERNEL_PID_UNDEF) {
@@ -608,13 +629,24 @@ int sbapp_init(void) {
 		sbapp.main_pid = thread_create(_stack, sizeof(_stack), SBAPP_PRIO,
 		THREAD_CREATE_STACKTEST, _event_loop, &parent, "sbapp");
 
-	    sts = msg_receive(&m); // yield until ip connection is ready
+		// yield until ip connection is ready or an error condition prevents
+		// a successful connection
+	    sts = msg_receive(&m);
 	    if (sts == -1) {
-	        DEBUG("unexpected error\n");
+	        DEBUG("unexpected error: %d\n", sts);
+	        return sts;
 	    }
 	}
 
 	return sbapp.main_pid;
+}
+
+int sbapp_stop(void) {
+    int sts;
+    sbapp.main_pid = KERNEL_PID_UNDEF;
+    sts = sl_Stop(SL_STOP_TIME_WAIT);
+    VDeleteSimpleLinkSpawnTask();
+    return sts;
 }
 
 uint32_t net_atoi(const char* name) {
@@ -837,11 +869,20 @@ static void *_event_loop(void *arg) {
 		PANIC(SIMPLELINK_START_ERR);
 	}
 
-	//simplelink_to_default_state();
+	simplelink_to_default_state();
 
 	xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(100));
 
-	wifi_connect();
+	//wifi_connect();
+	nwp.role = sl_Start(NULL, NULL, NULL);
+
+	if (sbapp.options & SBAPI_DELETE_PROFILES) {
+	    sl_WlanProfileDel(0xFF);
+	}
+
+	if (sbapp.ssid != NULL) {
+	    // add profile
+	}
 
 	/* dispatch SBAPI messages and manage simplelink events */
 	while (1) {

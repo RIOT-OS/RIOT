@@ -95,11 +95,40 @@ enum conn_type_t {
 #define SBAPI_SEND_FAILED 1
 
 
+/**
+ * @brief network driver settings
+ */
+#define SBAPI_SMARTCONFIG   (0x1)
+#define SBAPI_DEFAULT_RESET (0x2)
+
+// 2 bits flag, numbers of connections attempt before invoking smartconfig if
+// enabled
+#define SBAPI_RETRIES         (2 << 2)
+#define SBAPI_DELETE_PROFILES (0x10)
+
+#define SBAPI_DEFAULT_CFG   (SBAPI_RETRIES|SBAPI_SMARTCONFIG)
+
+
+/**
+ * @brief configuration key items
+ */
+#define SBAPI_SSID      (0x01)
+#define SBAPI_PWD       (0x02)
+
+
+/**
+ * @brief error types
+ */
+#define SBAPI_RIOT_KERNEL_PANIC (-1)
+#define SBAPI_CONNECTION_ERR    (-2)
+
+
 typedef void* sbh_t;
 
 /**
  * south bound app API methods
  */
+
 
 /**
  *  @brief initialize an ip connection with a 802.11 AP
@@ -107,7 +136,24 @@ typedef void* sbh_t;
  *  @return  PID of the UDP thread
  *  @return  negative value on error
  */
-int sbapp_init(void);
+int sbapp_init(uint32_t options);
+
+
+/**
+ * @brief close the connection with the network processor
+ */
+int sbapp_stop(void);
+
+
+/**
+ * @brief
+ */
+int sbapp_configure(int32_t options);
+
+/**
+ * @brief set wifi credentials
+ */
+void sbapp_set_security(const char* ssid, const char* password);
 
 /**
  * @brief connect to a TCP or UDP server
