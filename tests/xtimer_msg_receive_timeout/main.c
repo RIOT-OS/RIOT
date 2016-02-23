@@ -40,5 +40,6 @@ int main(void)
         }
         offset = (offset < 0) ? 1000 : -1000;
     }
+    xtimer_remove(&t);
     return 0;
 }
