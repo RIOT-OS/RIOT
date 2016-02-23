@@ -298,7 +298,7 @@ static int _msg_receive(msg_t *m, int block)
     }
 
     /* no message, fail */
-    if ((!block) && (queue_index == -1)) {
+    if ((!block) && ((!me->msg_waiters.first) && (queue_index == -1))) {
         restoreIRQ(state);
         return -1;
     }
