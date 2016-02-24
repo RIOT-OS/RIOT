@@ -96,6 +96,11 @@ enum conn_type_t {
 
 
 /**
+ * @brief security type (OPEN, WEP or WPA)
+ */
+#define SECURITY_TYPE SL_SEC_TYPE_WPA
+
+/**
  * @brief network driver settings
  */
 #define SBAPI_SMARTCONFIG   (0x1)

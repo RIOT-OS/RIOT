@@ -849,6 +849,20 @@ int sbapp_sendto(sbh_t fd, void* data, size_t len, sockaddr_in addr) {
 	return sts;
 }
 
+
+uint16_t static sbapp_add_profile(void) {
+    SlSecParams_t params;
+
+    params.Key = (signed char *)sbapp.password;
+    params.KeyLen = strlen(sbapp.password);
+
+    params.Type = SECURITY_TYPE;
+
+    return sl_WlanProfileAdd((signed char*) sbapp.ssid, strlen(sbapp.ssid), 0,
+                             &params, 0, 1, 0);
+}
+
+
 static void *_event_loop(void *arg) {
 	kernel_pid_t parent_thr = *(kernel_pid_t *) arg;
 	msg_t msg, reply;
@@ -881,7 +895,9 @@ static void *_event_loop(void *arg) {
 	}
 
 	if (sbapp.ssid != NULL) {
-	    // add profile
+	    if (sbapp_add_profile() < 0) {
+	        DEBUG("add profile failed, try to go ahead\n");
+	    }
 	}
 
 	/* dispatch SBAPI messages and manage simplelink events */
