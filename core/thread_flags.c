@@ -17,13 +17,6 @@ static thread_flags_t _thread_flags_clear_atomic(tcb_t *tcb, thread_flags_t mask
     return mask;
 }
 
-void thread_flags_set_atomic(tcb_t *tcb, thread_flags_t mask)
-{
-    unsigned state = disableIRQ();
-    tcb->flags |= mask;
-    restoreIRQ(state);
-}
-
 static void _thread_flags_wait(thread_flags_t mask, tcb_t *tcb, unsigned threadstate, unsigned irqstate)
 {
     DEBUG("_thread_flags_wait: me->flags=0x%08x me->mask=0x%08x. going blocked.\n",

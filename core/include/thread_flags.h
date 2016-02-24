@@ -126,15 +126,6 @@ thread_flags_t thread_flags_wait_all(thread_flags_t mask);
 thread_flags_t thread_flags_wait_one(thread_flags_t mask);
 
 /**
- * @brief Atomically set tcb->flags | mask, used internally
- *
- * (does not wake up thread)
- *
- * @internal
- */
-void thread_flags_set_atomic(tcb_t *tcb, thread_flags_t mask);
-
-/**
  * @brief Possibly wake up thread
  *
  * Has to be called with interrupts disabled.
