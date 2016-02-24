@@ -77,10 +77,10 @@ extern "C" {
  * @{
  */
 #define XTIMER              TIMER_0
-#define XTIMER_CHAN         0
-#define XTIMER_SHIFT        -4
-#define XTIMER_BACKOFF      50
-#define XTIMER_ISR_BACKOFF  40
+#define XTIMER_CHAN         (0)
+#define XTIMER_SHIFT        (-4)
+#define XTIMER_BACKOFF      (50)
+#define XTIMER_ISR_BACKOFF  (40)
 /** @} */
 
 /**
