@@ -35,6 +35,7 @@ int main(void)
     P(status);
     P(pid);
     P(priority);
+    P(flags);
     P(rq_entry);
     P(wait_data);
     P(msg_waiters);
