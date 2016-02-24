@@ -35,6 +35,9 @@ int main(void)
     P(status);
     P(priority);
     P(pid);
+#ifdef MODULE_CORE_THREAD_FLAGS
+    P(flags);
+#endif
     P(rq_entry);
     P(wait_data);
     P(msg_waiters);
