@@ -65,6 +65,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     case SPI_SPEED_1MHZ:
         f_baud = 1000000;
         break;
+    case SPI_SPEED_4MHZ:
+        return -1;
     case SPI_SPEED_5MHZ:
 #if CLOCK_CORECLOCK >= 5000000
         f_baud = 5000000;
@@ -79,6 +81,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 #else
         return -1;
 #endif
+    default:
+        return -1;
     }
     switch(conf)
     {
