@@ -73,8 +73,8 @@ static shell_command_handler_t find_handler(const shell_command_t *command_list,
 
 static void print_help(const shell_command_t *command_list)
 {
-    printf("%-20s %s\n", "Command", "Description");
-    puts("---------------------------------------");
+    printf("%-20s %s\r\n", "Command", "Description");
+    puts("---------------------------------------\r\n");
 
     const shell_command_t *command_lists[] = {
         command_list,
@@ -90,7 +90,7 @@ static void print_help(const shell_command_t *command_list)
         if ((entry = command_lists[i])) {
             /* iterating over commands in command_lists entry */
             while (entry->name != NULL) {
-                printf("%-20s %s\n", entry->name, entry->desc);
+                printf("%-20s %s\r\n", entry->name, entry->desc);
                 entry++;
             }
         }
@@ -210,7 +210,7 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
             print_help(command_list);
         }
         else {
-            printf("shell: command not found: %s\n", argv[0]);
+            printf("shell: command not found: %s\r\n", argv[0]);
         }
     }
 }
