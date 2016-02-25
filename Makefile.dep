@@ -3,6 +3,7 @@ include $(RIOTBASE)/drivers/Makefile.dep
 
 ifneq (,$(filter libcoap,$(USEPKG)))
     USEMODULE += posix_sockets
+    USEMODULE += gnrc_conn_udp
 endif
 
 ifneq (,$(filter nhdp,$(USEMODULE)))
