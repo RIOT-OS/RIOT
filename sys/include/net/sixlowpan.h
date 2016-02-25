@@ -20,7 +20,11 @@
 #ifndef SIXLOWPAN_H_
 #define SIXLOWPAN_H_
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
+
+#include "byteorder.h"
 
 #ifdef __cplusplus
 extern "C" {
