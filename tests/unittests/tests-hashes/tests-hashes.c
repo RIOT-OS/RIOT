@@ -26,4 +26,5 @@ void tests_hashes(void)
     TESTS_RUN(tests_hashes_sha1_tests());
     TESTS_RUN(tests_hashes_sha256_tests());
     TESTS_RUN(tests_hashes_sha256_hmac_tests());
+    TESTS_RUN(tests_hashes_sha256_chain_tests());
 }
