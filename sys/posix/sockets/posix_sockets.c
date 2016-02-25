@@ -31,6 +31,16 @@
 #include "sys/socket.h"
 #include "netinet/in.h"
 
+#ifdef  MODULE_CONN_IP
+#   include "net/conn/ip.h"
+#endif  /* MODULE_CONN_IP */
+#ifdef  MODULE_CONN_TCP
+#   include "net/conn/tcp.h"
+#endif  /* MODULE_CONN_TCP */
+#ifdef  MODULE_CONN_UDP
+#   include "net/conn/udp.h"
+#endif  /* MODULE_CONN_UDP */
+
 #define SOCKET_POOL_SIZE    (4)
 
 /**
