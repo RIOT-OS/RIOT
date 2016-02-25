@@ -17,6 +17,7 @@
 #include "nwp_conf.h"
 
 #include "log.h"
+#include "output_messages.h"
 
 #define ENABLE_DEBUG    (1)
 #include "debug.h"
@@ -45,10 +46,9 @@
  */
 #define MAX_CONN_COUNTER_VAL (MAX_CONN_WAIT_TIME/CONN_CHECK_TIME_SLOT)
 
-#define PANIC(ERR_ID)  puts(sl_err_descr[ERR_ID]); while(1) {}
-#define PANIC2(ERR_ID, ERR_VAL) printf("%s (%ld)", sl_err_descr[ERR_ID], ERR_VAL); while(1) {}
 
-#define STOP_IF_ERR(ERR_VAL, ERR_ID) if(ERR_VAL < 0) {PANIC2(ERR_ID, ERR_VAL)}
+// prefix used for morse code led messages
+#define NAMESPACE "SL"
 
 /**
  * simplelink driver errors
@@ -468,10 +468,10 @@ long simplelink_to_default_state(void) {
 	unsigned char ucConfigLen = 0;
 	unsigned char ucPower = 0;
 
-	long sts = -1;
+	int16_t sts = -1;
 
 	sts = sl_Start(0, 0, 0);
-	STOP_IF_ERR(sts, WLAN_START_ERR);
+	STOP_IF_ERR(NAMESPACE, sts, WLAN_START_ERR);
 
 	// If the device is not in station-mode, try configuring it in station-mode
 	if (ROLE_STA != sts) {
@@ -484,13 +484,13 @@ long simplelink_to_default_state(void) {
 
 		// Switch to STA role and restart
 		sts = sl_WlanSetMode(ROLE_STA);
-		STOP_IF_ERR(sts, WLAN_SETMODE_ERR)
+		STOP_IF_ERR(NAMESPACE, sts, WLAN_SETMODE_ERR);
 
 		sts = sl_Stop(0xFF);
-		STOP_IF_ERR(sts, WLAN_STOP_ERR)
+		STOP_IF_ERR(NAMESPACE, sts, WLAN_STOP_ERR);
 
 		sts = sl_Start(0, 0, 0);
-		STOP_IF_ERR(sts, WLAN_START_ERR);
+		STOP_IF_ERR(NAMESPACE, sts, WLAN_START_ERR);
 
 		// Check if the device is in station again
 		if (ROLE_STA != sts) {
@@ -504,7 +504,7 @@ long simplelink_to_default_state(void) {
 	ucConfigLen = sizeof(ver);
 	sts = sl_DevGet(SL_DEVICE_GENERAL_CONFIGURATION, &ucConfigOpt, &ucConfigLen,
 			(unsigned char *) (&ver));
-	STOP_IF_ERR(sts, GEN_ERROR);
+	STOP_IF_ERR(NAMESPACE, sts, GEN_ERROR);
 
 	LOG_INFO("Host Driver Version: %s\n\r", SL_DRIVER_VERSION);
 	LOG_INFO("Build Version %lu.%lu.%lu.%lu.31.%lu.%lu.%lu.%lu.%d.%d.%d.%d\n\r",
@@ -522,7 +522,7 @@ long simplelink_to_default_state(void) {
 	//      (Device's default connection policy)
 	sts = sl_WlanPolicySet(SL_POLICY_CONNECTION,
 			SL_CONNECTION_POLICY(1, 0, 0, 0, 1), NULL, 0);
-	STOP_IF_ERR(sts, WLAN_POLICYSET_ERR);
+	STOP_IF_ERR(NAMESPACE, sts, WLAN_POLICYSET_ERR);
 
 	// Remove all profiles
 	//lRetVal = sl_WlanProfileDel(0xFF);
@@ -543,36 +543,36 @@ long simplelink_to_default_state(void) {
 
 	// Enable DHCP client
 	sts = sl_NetCfgSet(SL_IPV4_STA_P2P_CL_DHCP_ENABLE, 1, 1, &ucVal);
-	STOP_IF_ERR(sts, NET_CFGSET_ERR);
+	STOP_IF_ERR(NAMESPACE, sts, NET_CFGSET_ERR);
 
 	// Disable scan
 	ucConfigOpt = SL_SCAN_POLICY(0);
 	sts = sl_WlanPolicySet(SL_POLICY_SCAN, ucConfigOpt, NULL, 0);
-	STOP_IF_ERR(sts, WLAN_POLICYSET_ERR);
+	STOP_IF_ERR(NAMESPACE, sts, WLAN_POLICYSET_ERR);
 
 	// Set Tx power level for station mode
 	// Number between 0-15, as dB offset from max power - 0 will set max power
 	ucPower = 0;
 	sts = sl_WlanSet(SL_WLAN_CFG_GENERAL_PARAM_ID,
 	WLAN_GENERAL_PARAM_OPT_STA_TX_POWER, 1, (unsigned char *) &ucPower);
-	STOP_IF_ERR(sts, WLAN_SET_ERR);
+	STOP_IF_ERR(NAMESPACE, sts, WLAN_SET_ERR);
 
 	// Set PM policy to normal
 	sts = sl_WlanPolicySet(SL_POLICY_PM, SL_NORMAL_POLICY, NULL, 0);
-	STOP_IF_ERR(sts, WLAN_POLICYSET_ERR);
+	STOP_IF_ERR(NAMESPACE, sts, WLAN_POLICYSET_ERR);
 
 	// Unregister mDNS services
 	sts = sl_NetAppMDNSUnRegisterService(0, 0);
-	STOP_IF_ERR(sts, NET_SERVICECFG_ERR);
+	STOP_IF_ERR(NAMESPACE, sts, NET_SERVICECFG_ERR);
 
 	// Remove  all 64 filters (8*8)
 	memset(RxFilterIdMask.FilterIdMask, 0xFF, 8);
 	sts = sl_WlanRxFilterSet(SL_REMOVE_RX_FILTER, (_u8 *) &RxFilterIdMask,
 			sizeof(_WlanRxFilterOperationCommandBuff_t));
-	STOP_IF_ERR(sts, WLAN_FILTERSET_ERR);
+	STOP_IF_ERR(NAMESPACE, sts, WLAN_FILTERSET_ERR);
 
 	sts = sl_Stop(SL_STOP_TIMEOUT);
-	STOP_IF_ERR(sts, WLAN_STOP_ERR);
+	STOP_IF_ERR(NAMESPACE, sts, WLAN_STOP_ERR);
 
 	return sts;
 }
@@ -880,7 +880,7 @@ static void *_event_loop(void *arg) {
 	msg_init_queue(msg_queue, SBAPP_MSG_QUEUE_SIZE);
 
 	if (VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY) < 0) {
-		PANIC(SIMPLELINK_START_ERR);
+		PANIC(NAMESPACE, SIMPLELINK_START_ERR);
 	}
 
 	simplelink_to_default_state();
@@ -921,7 +921,7 @@ static void *_event_loop(void *arg) {
 					LOG_INFO("Use Smart Config App to configure the device.\n");
 					//Connect Using Smart Config
 					if (smartconfig_connect() < 0) {
-						PANIC(SMARTCONFIG_ERR);
+						PANIC(NAMESPACE, SMARTCONFIG_ERR);
 					}
 
 					sbapp.sig_tim.callback = smartconfig_still_active;
