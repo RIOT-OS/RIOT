@@ -27,7 +27,7 @@ ifeq ($(PROGRAMMER),openocd)
   export FFLAGS  = -p "$(PORT)" -e -w -v $(HEXFILE)
 else ifeq ($(PROGRAMMER),cc3200prog)
 
-  export ENERGIA_ROOT?=/opt/energia-0101E0016/
+  export ENERGIA_ROOT?=/opt/energia-0101E0017/
   export UART_PORT?=29 # lanchpad default port seems to be COM29
 
   export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
