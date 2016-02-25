@@ -251,11 +251,8 @@ void xtimer_set(xtimer_t *timer, uint32_t offset);
  * @note this function runs in O(n) with n being the number of active timers
  *
  * @param[in] timer ptr to timer structure that will be removed
- *
- * @return  1 on success
- * @return  0 when timer was not active
  */
-int xtimer_remove(xtimer_t *timer);
+void xtimer_remove(xtimer_t *timer);
 
 /**
  * @brief receive a message blocking but with timeout
