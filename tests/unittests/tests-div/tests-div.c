@@ -15,7 +15,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-static uint32_t u32_test_values[] = {
+static const uint32_t u32_test_values[] = {
     0,
     1,
     10,
@@ -28,26 +28,57 @@ static uint32_t u32_test_values[] = {
     0xffffffff,
 };
 
-static uint64_t u64_test_values[] = {
-    16383999997ull,
+static const uint64_t u64_test_values[] = {
     11111111111ull,
     0xffffffffull+1,
+    16383999997ull,
+    16383999998ull,
+    16383999999ull,
+    16384000000ull,
+    1048575999807ull,
+    1048575999808ull,
+    1048575999809ull,
+    0xffffffffffffeeull,
+    0x777777777777777ull,
+    0x1111111111111111ull,
+    0xffffffffffffffffull,
+    0x8000000000000000ull,
 };
 
-#define N_U32_VALS (sizeof(u32_test_values)/sizeof(uint32_t))
-#define N_U64_VALS (sizeof(u64_test_values)/sizeof(uint64_t))
+/* These expected values for test_div_u64_by_15625div512
+ * were computed from the expression (u64_test_values * 512) / 15625 using 128
+ * bit integers. */
+static const uint64_t u64_15625_512_expected_values[] = {
+    364088888,
+    140737488,
+    536870911,
+    536870911,
+    536870911,
+    536870912,
+    34359738361,
+    34359738361,
+    34359738361,
+    2361183241434822,
+    17630168202713342,
+    40297527320487639,
+    604462909807314587,
+    302231454903657293,
+};
+
+#define N_U32_VALS (sizeof(u32_test_values)/sizeof(u32_test_values[0]))
+#define N_U64_VALS (sizeof(u64_test_values)/sizeof(u64_test_values[0]))
 
 static void test_div_u64_by_15625(void)
 {
     for (unsigned i = 0; i < N_U32_VALS; i++) {
-        DEBUG("Dividing %"PRIu32" by 15625...\n", u32_test_values[i]);
+        DEBUG("Dividing %12"PRIu32" by 15625...\n", u32_test_values[i]);
         TEST_ASSERT_EQUAL_INT(
-            u32_test_values[i] / 15625,
+            (uint64_t)u32_test_values[i] / 15625,
             div_u64_by_15625(u32_test_values[i]));
     }
 
     for (unsigned i = 0; i < N_U64_VALS; i++) {
-        DEBUG("Dividing %"PRIu64" by 15625...\n", u64_test_values[i]);
+        DEBUG("Dividing %12"PRIu64" by 15625...\n", u64_test_values[i]);
         TEST_ASSERT_EQUAL_INT(
             (uint64_t)u64_test_values[i] / 15625,
             div_u64_by_15625(u64_test_values[i]));
@@ -69,7 +100,7 @@ static void test_div_u64_by_1000000(void)
     for (unsigned i = 0; i < N_U32_VALS; i++) {
         DEBUG("Dividing %"PRIu32" by 1000000...\n", u32_test_values[i]);
         TEST_ASSERT_EQUAL_INT(
-            u32_test_values[i] / 1000000lu,
+            (uint64_t)u32_test_values[i] / 1000000lu,
             div_u64_by_1000000(u32_test_values[i]));
     }
 
@@ -93,7 +124,7 @@ static void test_div_u64_by_15625div512(void)
     for (unsigned i = 0; i < N_U64_VALS; i++) {
         DEBUG("Dividing %"PRIu64" by (15625/512)...\n", u64_test_values[i]);
         TEST_ASSERT_EQUAL_INT(
-            (uint64_t)u64_test_values[i] * 512lu / 15625,
+            u64_15625_512_expected_values[i],
             div_u64_by_15625div512(u64_test_values[i]));
     }
 }
