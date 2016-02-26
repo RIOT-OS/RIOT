@@ -179,7 +179,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     }
 
     unsigned state = disableIRQ();
-    if ( !_this_high_period(target) ) {
+    if ( (timer->long_target > _long_cnt) || !_this_high_period(target) ) {
         DEBUG("xtimer_set_absolute(): the timer doesn't fit into the low-level timer's mask.\n");
         _add_timer_to_long_list(&long_list_head, timer);
     }
