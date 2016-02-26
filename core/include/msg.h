@@ -375,6 +375,11 @@ int msg_avail(void);
  */
 int msg_init_queue(msg_t *array, int num);
 
+/**
+ * @brief   Prints the message queue of the current thread.
+ */
+void msg_queue_print(void);
+
 #ifdef __cplusplus
 }
 #endif

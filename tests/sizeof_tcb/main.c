@@ -39,10 +39,12 @@ int main(void)
     P(flags);
 #endif
     P(rq_entry);
+#ifdef MODULE_CORE_MSG
     P(wait_data);
     P(msg_waiters);
     P(msg_queue);
     P(msg_array);
+#endif
 #ifdef DEVELHELP
     P(name);
 #endif

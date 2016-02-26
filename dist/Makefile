@@ -36,6 +36,11 @@ QUIET ?= 1
 #USEMODULE += posix
 #USEMODULE += xtimer
 
+# If your application is very simple and doesn't use modules that use
+# messaging, it can be disabled to save some memory:
+
+#DISABLE_MODULE += core_msg
+
 #export INCLUDES += -Iapplication_include
 
 # Specify custom dependencies for your application here ...
