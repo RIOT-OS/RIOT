@@ -81,13 +81,22 @@ static int _ctx(gpio_t pin)
 int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
 {
     msp_port_t *port = _port(pin);
-    /* check if port is valid and pull resistor are valid */
-    if ((port == NULL) || (pullup != GPIO_NOPULL)) {
+    /* check if port is valid */
+    if (port == NULL)
         return -1;
-    }
     /* set pin direction */
     port->DIR &= ~(_pin(pin));
     port->DIR |= (dir & _pin(pin));
+
+    /*Select Pullup/ pulldown resistor*/
+    if((pullup != GPIO_NOPULL) && (dir == GPIO_DIR_IN)) {
+        port->REN |= _pin(pin);
+        if(pullup == GPIO_PULLUP)
+            port->OD = _pin(pin);
+        else
+            port->OD &= ~_pin(pin);
+    }
+
     /* reset output value */
     port->OD &= ~(_pin(pin));
     return 0;
@@ -98,15 +107,15 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
 {
     msp_port_isr_t *port = _isr_port(pin);
 
-    /* check if port, pull resistor and flank configuration are valid */
-    if ((port == NULL) || (pullup != GPIO_NOPULL) || (flank == GPIO_BOTH)) {
+    /* check if port and flank configuration are valid */
+    if ((port == NULL) || (flank == GPIO_BOTH)) {
         return -1;
     }
 
     /* disable any activated interrupt */
     port->IE &= ~(_pin(pin));
     /* configure as input */
-    gpio_init(pin, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init(pin, GPIO_DIR_IN, pullup);
     /* save ISR context */
     isr_ctx[_ctx(pin)].cb = cb;
     isr_ctx[_ctx(pin)].arg = arg;
