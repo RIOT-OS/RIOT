@@ -217,8 +217,8 @@ static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer)
 static void _add_timer_to_long_list(xtimer_t **list_head, xtimer_t *timer)
 {
     while (*list_head
-            && (*list_head)->long_target <= timer->long_target
-            && (*list_head)->target <= timer->target) {
+        && (((*list_head)->long_target < timer->long_target)
+        || (((*list_head)->long_target == timer->long_target) && ((*list_head)->target <= timer->target)))) {
         list_head = &((*list_head)->next);
     }
 
