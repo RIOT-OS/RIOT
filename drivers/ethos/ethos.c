@@ -291,8 +291,9 @@ static void _get_mac_addr(netdev2_t *encdev, uint8_t* buf)
     memcpy(buf, dev->mac_addr, 6);
 }
 
-static int _recv(netdev2_t *netdev, char* buf, int len)
+static int _recv(netdev2_t *netdev, char* buf, int len, void* info)
 {
+    (void) info;
     ethos_t * dev = (ethos_t *) netdev;
 
     if (buf) {
