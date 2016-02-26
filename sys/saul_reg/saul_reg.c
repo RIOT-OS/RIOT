@@ -25,14 +25,14 @@
 #include "saul_reg.h"
 
 /**
- * @brief   Keep the head of the device list
+ * @brief   Keep the head of the device list as global variable
  */
-static saul_reg_t *reg = NULL;
+saul_reg_t *saul_reg = NULL;
 
 
 int saul_reg_add(saul_reg_t *dev)
 {
-    saul_reg_t *tmp = reg;
+    saul_reg_t *tmp = saul_reg;
 
     if (dev == NULL) {
         return -ENODEV;
@@ -41,8 +41,8 @@ int saul_reg_add(saul_reg_t *dev)
     /* prepare new entry */
     dev->next = NULL;
     /* add to registry */
-    if (reg == NULL) {
-        reg = dev;
+    if (saul_reg == NULL) {
+        saul_reg = dev;
     }
     else {
         while (tmp->next != NULL) {
@@ -55,13 +55,13 @@ int saul_reg_add(saul_reg_t *dev)
 
 int saul_reg_rm(saul_reg_t *dev)
 {
-    saul_reg_t *tmp = reg;
+    saul_reg_t *tmp = saul_reg;
 
-    if (reg == NULL || dev == NULL) {
+    if (saul_reg == NULL || dev == NULL) {
         return -EINVAL;
     }
-    if (reg == dev) {
-        reg = dev->next;
+    if (saul_reg == dev) {
+        saul_reg = dev->next;
     }
     while (tmp->next && (tmp->next != dev)) {
         tmp = tmp->next;
@@ -75,14 +75,9 @@ int saul_reg_rm(saul_reg_t *dev)
     return 0;
 }
 
-saul_reg_t *saul_reg_get(void)
-{
-    return reg;
-}
-
 saul_reg_t *saul_reg_find_nth(int pos)
 {
-    saul_reg_t *tmp = reg;
+    saul_reg_t *tmp = saul_reg;
 
     for (int i = 0; (i < pos) && tmp; i++) {
         tmp = tmp->next;
@@ -92,7 +87,7 @@ saul_reg_t *saul_reg_find_nth(int pos)
 
 saul_reg_t *saul_reg_find_type(uint8_t type)
 {
-    saul_reg_t *tmp = reg;
+    saul_reg_t *tmp = saul_reg;
 
     while (tmp) {
         if (tmp->driver->type == type) {
@@ -105,7 +100,7 @@ saul_reg_t *saul_reg_find_type(uint8_t type)
 
 saul_reg_t *saul_reg_find_name(const char *name)
 {
-    saul_reg_t *tmp = reg;
+    saul_reg_t *tmp = saul_reg;
 
     while (tmp) {
         if (strcmp(tmp->name, name) == 0) {
