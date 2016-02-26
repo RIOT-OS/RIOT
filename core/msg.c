@@ -34,6 +34,8 @@
 #include "debug.h"
 #include "thread.h"
 
+#ifdef MODULE_CORE_MSG
+
 static int _msg_receive(msg_t *m, int block);
 static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned state);
 
@@ -389,3 +391,29 @@ int msg_init_queue(msg_t *array, int num)
 
     return -1;
 }
+
+void msg_queue_print(void)
+{
+    unsigned state = irq_disable();
+
+    thread_t *thread =(thread_t *)sched_active_thread;
+    cib_t *msg_queue = &thread->msg_queue;
+    msg_t *msg_array = thread->msg_array;
+    unsigned int i = msg_queue->read_count & msg_queue->mask;
+
+    printf("Message queue of thread %" PRIkernel_pid "\n", thread->pid);
+    printf("    size: %u (avail: %d)\n", msg_queue->mask + 1,
+           cib_avail((cib_t *)msg_queue));
+
+    for (; i != (msg_queue->write_count & msg_queue->mask);
+         i = (i + 1) & msg_queue->mask) {
+        msg_t *m = &msg_array[i];
+        printf("    * %u: sender: %" PRIkernel_pid ", type: 0x%04" PRIu16
+               ", content: %" PRIu32 " (%p)\n", i, m->sender_pid, m->type,
+               m->content.value, (void *)m->content.ptr);
+    }
+
+    irq_restore(state);
+}
+
+#endif /* MODULE_CORE_MSG */

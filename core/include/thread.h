@@ -85,11 +85,14 @@ struct _thread {
 
     clist_node_t rq_entry;          /**< run queue entry                */
 
-    void *wait_data;                /**< holding messages               */
+#if defined(MODULE_CORE_MSG) || defined(MODULE_CORE_THREAD_FLAGS)
+    void *wait_data;                /**< used by msg and thread flags   */
+#endif
+#if defined(MODULE_CORE_MSG)
     priority_queue_t msg_waiters;   /**< threads waiting on message     */
-
     cib_t msg_queue;                /**< message queue                  */
     msg_t *msg_array;               /**< memory holding messages        */
+#endif
 
 #if defined DEVELHELP || defined(SCHED_TEST_STACK)
     char *stack_start;              /**< thread's stack start address   */
@@ -320,11 +323,6 @@ static inline kernel_pid_t thread_getpid(void)
  * @return stack pointer
  */
 char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size);
-
-/**
- * @brief   Prints the message queue of the current thread.
- */
-void thread_print_msg_queue(void);
 
 /**
  * @brief Add thread to list, sorted by priority (internal)
