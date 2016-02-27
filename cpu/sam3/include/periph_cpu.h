@@ -61,6 +61,16 @@ typedef uint32_t gpio_t;
 #define CPUID_LEN           (16U)
 
 /**
+ * @brief   All SAM3 timers are 32-bit wide
+ */
+#define TIMER_MAX_VAL       (0xffffffff)
+
+/**
+ * @brief   We use 3 channels for each defined timer
+ */
+#define TIMER_CHANNELS      (3)
+
+/**
  * @brief Override values for pull register configuration
  * @{
  */
@@ -101,6 +111,14 @@ typedef enum {
     GPIO_MUX_A = 0,         /**< alternate function A */
     GPIO_MUX_B = 1,         /**< alternate function B */
 } gpio_mux_t;
+
+/**
+ * @brief   Timer configuration data
+ */
+typedef struct {
+    Tc *dev;                /**< timer device */
+    uint8_t id_ch0;         /**< ID of the timer's first channel */
+} timer_conf_t;
 
 /**
  * @brief   UART configuration data

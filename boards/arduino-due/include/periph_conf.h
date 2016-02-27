@@ -38,31 +38,16 @@ extern "C" {
  * @name Timer peripheral configuration
  * @{
  */
-#define TIMER_NUMOF         (3U)
-#define TIMER_0_EN          1
-#define TIMER_1_EN          1
-#define TIMER_2_EN          1
+static const timer_conf_t timer_config[] = {
+    /* dev, channel 0 ID */
+    { TC0, ID_TC0 },
+    { TC1, ID_TC3 },
+};
 
-/* Timer 0 configuration */
-#define TIMER_0_DEV         TC0
-#define TIMER_0_CHANNELS    6
-#define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_ISR1        isr_tc0
-#define TIMER_0_ISR2        isr_tc1
+#define TIMER_0_ISR         isr_tc0
+#define TIMER_1_ISR         isr_tc3
 
-/* Timer 1 configuration */
-#define TIMER_1_DEV         TC1
-#define TIMER_1_CHANNELS    6
-#define TIMER_1_MAX_VALUE   (0xffffffff)
-#define TIMER_1_ISR1        isr_tc3
-#define TIMER_1_ISR2        isr_tc4
-
-/* Timer 2 configuration */
-#define TIMER_2_DEV         TC2
-#define TIMER_2_CHANNELS    6
-#define TIMER_2_MAX_VALUE   (0xffffffff)
-#define TIMER_2_ISR1        isr_tc6
-#define TIMER_2_ISR2        isr_tc7
+#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**
