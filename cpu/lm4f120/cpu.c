@@ -19,8 +19,6 @@
 
 #include "cpu.h"
 #include "irq.h"
-#include "kernel.h"
-#include "kernel_internal.h"
 #include "sched.h"
 #include "thread.h"
 #include "arch/thread_arch.h"

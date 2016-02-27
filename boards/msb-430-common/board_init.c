@@ -25,7 +25,6 @@
 #include "board.h"
 #include "uart_stdio.h"
 #include "periph_conf.h"
-#include "kernel_internal.h"
 #include "msp430.h"
 #include "debug.h"
 

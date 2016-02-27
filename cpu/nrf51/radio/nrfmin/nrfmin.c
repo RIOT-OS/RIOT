@@ -22,7 +22,6 @@
 #include "mutex.h"
 #include "thread.h"
 #include "sched.h"
-#include "kernel.h"
 #include "periph_conf.h"
 #include "periph/cpuid.h"
 #include "nrfmin.h"

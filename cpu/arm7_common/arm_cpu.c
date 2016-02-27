@@ -18,9 +18,7 @@
 
 #include <stdio.h>
 #include "arm_cpu.h"
-#include "sched.h"
-#include "kernel.h"
-#include "kernel_internal.h"
+#include "thread.h"
 
 #define STACK_MARKER    (0x77777777)
 #define REGISTER_CNT    (12)

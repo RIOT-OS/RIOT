@@ -46,8 +46,6 @@
 
 #include <stdlib.h>
 
-#include "kernel_internal.h"
-#include "kernel.h"
 #include "irq.h"
 #include "sched.h"
 

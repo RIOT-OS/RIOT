@@ -22,9 +22,11 @@
 #ifndef THREAD_H
 #define THREAD_H
 
-#include "kernel.h"
+#include "cpu.h"
+#include "cpu_conf.h"
 #include "tcb.h"
 #include "arch/thread_arch.h"
+#include "sched.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -244,6 +246,18 @@ static inline kernel_pid_t thread_getpid(void)
 }
 
 /**
+ * @brief   Gets called upon thread creation to set CPU registers
+ *
+ * @param[in] task_func     First function to call within the thread
+ * @param[in] arg           Argument to supply to task_func
+ * @param[in] stack_start   Start address of the stack
+ * @param[in] stack_size    Stack size
+ *
+ * @return stack pointer
+ */
+char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size);
+
+/**
  * @brief   Prints the message queue of the current thread.
  */
 void thread_print_msg_queue(void);
@@ -269,7 +283,12 @@ const char *thread_getname(kernel_pid_t pid);
  * @return          the amount of unused space of the thread's stack
  */
 uintptr_t thread_measure_stack_free(char *stack);
-#endif
+#endif /* DEVELHELP */
+
+/**
+ * @brief   Prints human readable, ps-like thread information for debugging purposes
+ */
+void thread_print_stack(void);
 
 #ifdef __cplusplus
 }

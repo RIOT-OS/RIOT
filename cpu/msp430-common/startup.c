@@ -19,9 +19,9 @@
  * @}
  */
 
-#include "irq.h"
 #include <stdio.h>
-#include "kernel_internal.h"
+#include "kernel_init.h"
+#include "irq.h"
 
 extern void board_init(void);
 

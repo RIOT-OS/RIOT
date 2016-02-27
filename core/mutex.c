@@ -25,7 +25,6 @@
 #include "mutex.h"
 #include "tcb.h"
 #include "atomic.h"
-#include "kernel.h"
 #include "sched.h"
 #include "thread.h"
 #include "irq.h"

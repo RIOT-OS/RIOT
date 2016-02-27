@@ -20,7 +20,6 @@
 #ifndef __CRYPTO_MODES_CTR_H_
 #define __CRYPTO_MODES_CTR_H_
 
-#include "kernel.h"
 #include "crypto/ciphers.h"
 
 #ifdef __cplusplus

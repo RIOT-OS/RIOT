@@ -99,7 +99,6 @@
 #include "thread.h"
 #include "irq.h"
 #include "cpu.h"
-#include "kernel_internal.h"
 
 /**
  * @brief   Noticeable marker marking the beginning of a stack segment

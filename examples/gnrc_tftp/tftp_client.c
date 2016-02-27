@@ -22,7 +22,6 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "kernel.h"
 #include "net/gnrc/tftp.h"
 
 static const char *_tftp_default_host = "::1";

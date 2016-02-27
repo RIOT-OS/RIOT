@@ -25,7 +25,6 @@
 #include "byteorder.h"
 #include "thread.h"
 #include "msg.h"
-#include "kernel.h"
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc.h"
 #include "net/ipv6/addr.h"

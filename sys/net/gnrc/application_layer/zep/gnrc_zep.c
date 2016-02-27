@@ -21,7 +21,6 @@
 
 #include "ringbuffer.h"
 #include "hashes.h"
-#include "kernel.h"
 #include "msg.h"
 #include "net/ieee802154.h"
 #include "net/ipv6/addr.h"
