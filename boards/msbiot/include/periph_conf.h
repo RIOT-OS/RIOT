@@ -61,7 +61,7 @@ extern "C" {
 /* Timer 0 configuration */
 #define TIMER_0_DEV         TIM2
 #define TIMER_0_CHANNELS    4
-#define TIMER_0_PRESCALER   (83U)
+#define TIMER_0_FREQ        (84000000U)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
 #define TIMER_0_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
 #define TIMER_0_ISR         isr_tim2
@@ -70,7 +70,7 @@ extern "C" {
 /* Timer 1 configuration */
 #define TIMER_1_DEV         TIM5
 #define TIMER_1_CHANNELS    4
-#define TIMER_1_PRESCALER   (83U)
+#define TIMER_1_FREQ        (84000000U)
 #define TIMER_1_MAX_VALUE   (0xffffffff)
 #define TIMER_1_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM5EN)
 #define TIMER_1_ISR         isr_tim5
@@ -139,13 +139,6 @@ extern "C" {
 /* DAC 0 channel config */
 #define DAC_0_CH0_PIN        4
 #define DAC_0_CH1_PIN        5
-/** @} */
-
-/**
- * @name Random Number Generator configuration
- * @{
- */
-#define RANDOM_NUMOF        (1U)
 /** @} */
 
 /**

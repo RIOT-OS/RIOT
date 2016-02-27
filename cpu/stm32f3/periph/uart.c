@@ -190,6 +190,10 @@ static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
         char data = (char)dev->RDR;
         uart_config[uartnum].rx_cb(uart_config[uartnum].arg, data);
     }
+    else if (dev->ISR & USART_ISR_ORE) {
+        /* do nothing on overrun */
+        dev->ICR |= USART_ICR_ORECF;
+    }
     if (sched_context_switch_request) {
         thread_yield();
     }

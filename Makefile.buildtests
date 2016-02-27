@@ -59,6 +59,7 @@ buildtest:
 					RIOTNOLINK=$${RIOTNOLINK} \
 					RIOT_VERSION=$${RIOT_VERSION} \
 					WERROR=$${WERROR} \
+					LTO=$${LTO} \
 					$(MAKE) -j$(NPROC) 2>&1) ; \
 			if [ "$${?}" = "0" ]; then \
 				${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \

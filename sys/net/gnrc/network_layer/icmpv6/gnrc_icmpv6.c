@@ -59,13 +59,13 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
     icmpv6_hdr_t *hdr;
     gnrc_netreg_entry_t *sendto;
 
-    LL_SEARCH_SCALAR(pkt, icmpv6, type, GNRC_NETTYPE_ICMPV6);
+    icmpv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_ICMPV6);
 
     assert(icmpv6 != NULL);
 
     /* there can be extension headers between IPv6 and ICMPv6 header so we have
      * to search it */
-    LL_SEARCH_SCALAR(icmpv6, ipv6, type, GNRC_NETTYPE_IPV6);
+    ipv6 = gnrc_pktsnip_search_type(icmpv6, GNRC_NETTYPE_IPV6);
 
     assert(ipv6 != NULL);
 
@@ -121,7 +121,7 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
             break;
 
         default:
-            DEBUG("icmpv6: unknown type field %" PRIu8 "\n", hdr->type);
+            DEBUG("icmpv6: unknown type field %u\n", hdr->type);
             break;
     }
 
@@ -131,7 +131,7 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
     sendto = gnrc_netreg_lookup(GNRC_NETTYPE_ICMPV6, hdr->type);
 
     if (sendto == NULL) {
-        DEBUG("icmpv6: no receivers for ICMPv6 type %" PRIu8 "\n", hdr->type);
+        DEBUG("icmpv6: no receivers for ICMPv6 type %u\n", hdr->type);
         /* don't release: IPv6 does this */
         return;
     }
@@ -161,7 +161,7 @@ gnrc_pktsnip_t *gnrc_icmpv6_build(gnrc_pktsnip_t *next, uint8_t type, uint8_t co
         return NULL;
     }
 
-    DEBUG("icmpv6: Building ICMPv6 message with type=%" PRIu8 ", code=%" PRIu8 "\n",
+    DEBUG("icmpv6: Building ICMPv6 message with type=%u, code=%u\n",
           type, code);
     icmpv6 = (icmpv6_hdr_t *)pkt->data;
     icmpv6->type = type;

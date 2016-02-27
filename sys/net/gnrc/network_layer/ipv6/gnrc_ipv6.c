@@ -109,7 +109,7 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
     switch (nh) {
 #ifdef MODULE_GNRC_ICMPV6
         case PROTNUM_ICMPV6:
-            DEBUG("ipv6: handle ICMPv6 packet (nh = %" PRIu8 ")\n", nh);
+            DEBUG("ipv6: handle ICMPv6 packet (nh = %u)\n", nh);
             gnrc_icmpv6_demux(iface, pkt);
             break;
 #endif
@@ -121,7 +121,7 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
         case PROTNUM_IPV6_EXT_AH:
         case PROTNUM_IPV6_EXT_ESP:
         case PROTNUM_IPV6_EXT_MOB:
-            DEBUG("ipv6: handle extension header (nh = %" PRIu8 ")\n", nh);
+            DEBUG("ipv6: handle extension header (nh = %u)\n", nh);
             if (!gnrc_ipv6_ext_demux(iface, pkt, nh)) {
                 DEBUG("ipv6: unable to parse extension headers.\n");
                 gnrc_pktbuf_release(pkt);
@@ -129,7 +129,7 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
             }
 #endif
         case PROTNUM_IPV6:
-            DEBUG("ipv6: handle encapsulated IPv6 packet (nh = %" PRIu8 ")\n", nh);
+            DEBUG("ipv6: handle encapsulated IPv6 packet (nh = %u)\n", nh);
             _decapsulate(pkt);
             break;
         default:
@@ -137,7 +137,7 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
             break;
     }
 
-    DEBUG("ipv6: forward nh = %" PRIu8 " to other threads\n", nh);
+    DEBUG("ipv6: forward nh = %u to other threads\n", nh);
     receiver_num = gnrc_netreg_num(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL) +
                    gnrc_netreg_num(GNRC_NETTYPE_IPV6, nh);
 
@@ -344,8 +344,8 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, gnrc_pktsnip_t *ipv6,
     ipv6_hdr_t *hdr = ipv6->data;
 
     hdr->len = byteorder_htons(gnrc_pkt_len(payload));
-    DEBUG("ipv6: set payload length to %zu (network byteorder %04" PRIx16 ")\n",
-          gnrc_pkt_len(payload), hdr->len.u16);
+    DEBUG("ipv6: set payload length to %u (network byteorder %04" PRIx16 ")\n",
+          (unsigned) gnrc_pkt_len(payload), hdr->len.u16);
 
     /* check if e.g. extension header was not already marked */
     if (hdr->nh == PROTNUM_RESERVED) {
@@ -357,7 +357,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, gnrc_pktsnip_t *ipv6,
         }
     }
 
-    DEBUG("ipv6: set next header to %" PRIu8 "\n", hdr->nh);
+    DEBUG("ipv6: set next header to %u\n", hdr->nh);
 
     if (hdr->hl == 0) {
         if (iface == KERNEL_PID_UNDEF) {
@@ -710,7 +710,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
     assert(pkt != NULL);
 
-    LL_SEARCH_SCALAR(pkt, netif, type, GNRC_NETTYPE_NETIF);
+    netif = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
 
     if (netif != NULL) {
         iface = ((gnrc_netif_hdr_t *)netif->data)->if_pid;
@@ -790,7 +790,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
     DEBUG("ipv6: Received (src = %s, ",
           ipv6_addr_to_str(addr_str, &(hdr->src), sizeof(addr_str)));
-    DEBUG("dst = %s, next header = %" PRIu8 ", length = %" PRIu16 ")\n",
+    DEBUG("dst = %s, next header = %u, length = %" PRIu16 ")\n",
           ipv6_addr_to_str(addr_str, &(hdr->dst), sizeof(addr_str)),
           hdr->nh, byteorder_ntohs(hdr->len));
 
@@ -799,7 +799,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
 #ifdef MODULE_GNRC_IPV6_ROUTER    /* only routers redirect */
         /* redirect to next hop */
-        DEBUG("ipv6: decrement hop limit to %" PRIu8 "\n", (uint8_t) (hdr->hl - 1));
+        DEBUG("ipv6: decrement hop limit to %u\n", (uint8_t) (hdr->hl - 1));
 
         /* RFC 4291, section 2.5.6 states: "Routers must not forward any
          * packets with Link-Local source or destination addresses to other

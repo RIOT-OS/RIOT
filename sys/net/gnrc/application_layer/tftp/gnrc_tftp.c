@@ -598,10 +598,10 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
     gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)(m->content.ptr);
 
     gnrc_pktsnip_t *tmp;
-    LL_SEARCH_SCALAR(pkt, tmp, type, GNRC_NETTYPE_UDP);
+    tmp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UDP);
     udp_hdr_t *udp = (udp_hdr_t *)tmp->data;
 
-    LL_SEARCH_SCALAR(pkt, tmp, type, GNRC_NETTYPE_IPV6);
+    tmp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
     ipv6_hdr_t *ip = (ipv6_hdr_t *)tmp->data;
     uint8_t *data = (uint8_t *)pkt->data;
 

@@ -16,13 +16,9 @@ export ATMEGA_COMMON = $(RIOTCPU)/atmega_common/
 # define the linker script to use for this CPU
 #export LINKERSCRIPT = $(RIOTCPU)/$(CPU)/ldscripts/atmega2560.ld
 
-# include CPU specific includes
-export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-
 # explicitly tell the linker to link the syscalls and startup code.
 #   Without this the interrupt vectors will not be linked correctly!
 export UNDEF += $(BINDIR)cpu/startup.o
-
 
 # CPU depends on the atmega common module, so include it
 include $(ATMEGA_COMMON)Makefile.include

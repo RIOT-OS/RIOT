@@ -33,17 +33,9 @@
 #define EXTI_NUMOF      (16U)
 
 /**
- * @brief   Datastructure to hold an interrupt context
- */
-typedef struct {
-    gpio_cb_t cb;       /**< callback called from GPIO interrupt */
-    void *arg;          /**< argument passed to the callback */
-} gpio_state_t;
-
-/**
  * @brief   Hold one callback function pointer for each interrupt line
  */
-static gpio_state_t exti_chan[EXTI_NUMOF];
+static gpio_isr_ctx_t exti_chan[EXTI_NUMOF];
 
 /**
  * @brief   Extract the port base address from the given pin identifier
@@ -211,8 +203,10 @@ void gpio_write(gpio_t pin, int value)
 
 void isr_exti(void)
 {
+    /* only generate interrupts against lines which have their IMR set */
+    uint32_t pending_isr = (EXTI->PR & EXTI->IMR);
     for (int i = 0; i < EXTI_NUMOF; i++) {
-        if (EXTI->PR & (1 << i)) {
+        if (pending_isr & (1 << i)) {
             EXTI->PR |= (1 << i);               /* clear by writing a 1 */
             exti_chan[i].cb(exti_chan[i].arg);
         }

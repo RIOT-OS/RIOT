@@ -34,12 +34,7 @@
 
 static BITFIELD(_gpio_config_bitfield, GPIO_NUM_ISR);
 
-typedef struct {
-    gpio_cb_t cb;       /**< callback called from GPIO interrupt */
-    void *arg;          /**< argument passed to the callback */
-} gpio_state_t;
-
-static gpio_state_t _gpio_states[GPIO_NUM_ISR];
+static gpio_isr_ctx_t _gpio_states[GPIO_NUM_ISR];
 static BITFIELD(_gpio_rising, GPIO_NUM_ISR);
 static BITFIELD(_gpio_falling, GPIO_NUM_ISR);
 static uint8_t _gpio_isr_map[64]; /* only ports 0+2 can have ISRs */

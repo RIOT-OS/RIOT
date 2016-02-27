@@ -66,14 +66,14 @@ static inline unsigned int _llvalue_to_scaled_value(unsigned long long corrected
     return scaledv;
 }
 
-int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     if (dev >= TIMER_NUMOF){
         return -1;
     }
 
     config[dev].cb = callback;                          /* User Function */
-    config[dev].divisor = us_per_tick * ROM_SysCtlClockGet()/1000000;
+    config[dev].divisor = ROM_SysCtlClockGet() / freq;
 
     unsigned int sysctl_timer;
     unsigned int timer_base;

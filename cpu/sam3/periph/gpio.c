@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Hauke Petersen <mail@haukepetersen.de>
+ * Copyright (C) 2014 Hauke Petersen <devel@haukepetersen.de>
  *               2015 Hamburg University of Applied Sciences
  *               2015 Freie Universität Berlin
  *
@@ -43,20 +43,9 @@
 #define CTX_NUMOF           (7U)
 
 /**
- * @brief Context information needed for interrupts
- */
-typedef struct {
-    gpio_cb_t cb;       /**< callback called from GPIO interrupt */
-    void *arg;          /**< argument passed to the callback */
-} exti_ctx_t;
-
-/**
  * @brief Allocation of memory for 7 independent interrupt slots
  */
-static exti_ctx_t exti_ctx[CTX_NUMOF] = {
-    {NULL, NULL}, {NULL, NULL}, {NULL, NULL}, {NULL, NULL},
-    {NULL, NULL}, {NULL, NULL}, {NULL, NULL}
-};
+static gpio_isr_ctx_t exti_ctx[CTX_NUMOF] = {{0}};
 
 /**
  * @brief Allocation of 4 bit per pin to map a pin to an interrupt context

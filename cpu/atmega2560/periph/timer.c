@@ -46,10 +46,11 @@ timer_conf_t config[TIMER_NUMOF];
  * @brief Setup the given timer
  *
  */
-int timer_init(tim_t dev, unsigned int us_per_ticks, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
-    /* reject impossible us_per_ticks values */
-    if ((us_per_ticks != 4)) {
+    /* reject impossible freq values
+     * todo: Add support for 2 MHz and 16 MHz */
+    if ((freq != 250000ul)) {
         return -1;
     }
 
@@ -279,7 +280,7 @@ int timer_clear(tim_t dev, int channel)
 unsigned int timer_read(tim_t dev)
 {
     uint16_t a;
-    uint32_t b;
+    uint16_t b;
     /*
      * Disabling interrupts globally because read from 16 Bit register can
      * otherwise be messed up
@@ -317,6 +318,7 @@ unsigned int timer_read(tim_t dev)
 
         case TIMER_UNDEFINED:
         default:
+            (void)b;
             a = 0;
     }
 

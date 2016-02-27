@@ -21,7 +21,9 @@ $(PKG_DIR)/Makefile: $(PKG_DIR)/.git/config
 
 $(PKG_DIR)/.git/config:
 	test -d "$(PKG_DIR)" || git clone "$(PKG_URL)" "$(PKG_DIR)"; \
-		cd "$(PKG_DIR)" && git checkout -f "$(PKG_VERSION)"
+		cd "$(PKG_DIR)" && \
+		git remote set-url origin "$(PKG_URL)" && \
+		git fetch && git checkout -f "$(PKG_VERSION)"
 
 clean::
 	@echo "Cleaning up CCN-Lite package..."

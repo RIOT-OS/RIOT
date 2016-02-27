@@ -7,10 +7,10 @@
  */
 
 /**
- * @addtogroup  driver_periph
+ * @addtogroup  cpu_sam3
  * @{
  *
- * @file        cpuid.c
+ * @file
  * @brief       Low-level CPUID driver implementation
  *
  * @author      Dinh Nguyen <nqdinhddt@gmail.com>
@@ -18,9 +18,9 @@
  * @}
  */
 
+#include <stdint.h>
 #include <string.h>
 
-#include "cpu_conf.h"
 #include "periph/cpuid.h"
 
 #define EFC_FCMD_STUI    0x0E   /* Start unique ID */
@@ -67,5 +67,5 @@ void cpuid_get(void *id)
     /* Wait for FRDY bit rises. */
     while (0 == (EFC1->EEFC_FSR & EEFC_FSR_FRDY));
 
-    memcpy(id, (void*)cpuid, CPUID_ID_LEN);
+    memcpy(id, (void*)cpuid, CPUID_LEN);
 }

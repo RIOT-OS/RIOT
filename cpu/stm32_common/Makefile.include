@@ -1,0 +1,12 @@
+# export the CPU family so we can differentiate between them in the code
+FAM = $(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
+export CFLAGS += -DCPU_FAM_$(FAM)
+
+# include common periph module
+USEMODULE += periph_common
+
+# include stm32 common periph drivers
+USEMODULE += stm32_common_periph
+
+# export the common include directory
+export INCLUDES += -I$(RIOTCPU)/stm32_common/include

@@ -158,6 +158,11 @@ void auto_init(void)
     auto_init_enc28j60();
 #endif
 
+#ifdef MODULE_ETHOS
+    extern void auto_init_ethos(void);
+    auto_init_ethos();
+#endif
+
 #ifdef MODULE_GNRC_SLIP
     extern void auto_init_slip(void);
     auto_init_slip();

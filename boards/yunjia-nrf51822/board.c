@@ -24,7 +24,7 @@
 void board_init(void)
 {
     /* setup led(s) for debugging */
-    NRF_GPIO->PIN_CNF[LED_RED_PIN] = GPIO_PIN_CNF_DIR_Output;
+    NRF_GPIO->DIRSET = (LED_RED_MASK);
 
     /* initialize the CPU */
     cpu_init();

@@ -88,7 +88,7 @@ int servo_init(servo_t *dev, pwm_t pwm, int pwm_channel, unsigned int min, unsig
     return 0;
 }
 
-int servo_set(servo_t *dev, unsigned int pos)
+void servo_set(servo_t *dev, unsigned int pos)
 {
     unsigned int raw_value;
     if (pos > dev->max) {
@@ -103,5 +103,5 @@ int servo_set(servo_t *dev, unsigned int pos)
 
     DEBUG("servo_set: pos %d -> raw %d\n", pos, raw_value);
 
-    return pwm_set(dev->device, dev->channel, raw_value);
+    pwm_set(dev->device, dev->channel, raw_value);
 }

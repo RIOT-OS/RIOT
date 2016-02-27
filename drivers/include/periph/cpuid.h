@@ -23,21 +23,21 @@
 #ifndef PERIPH_CPUID_H_
 #define PERIPH_CPUID_H_
 
-#include "cpu_conf.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @def CPUID_ID_LEN
+ * @def CPUID_LEN
  *
  * @brief   The length in byte of the CPU's serial number.
  *
  * @note    Must be defined in the CPU's @ref cpu_conf.h
  */
+#if CPUID_LEN
 
-#if CPUID_ID_LEN
 /**
  * @brief   Gets the serial number of the CPU.
  *
@@ -45,7 +45,7 @@ extern "C" {
  *                  defined in the CPU's cpu_conf.h)
  */
 void cpuid_get(void *id);
-#endif /* CPUID_ID_LEN */
+#endif /* CPUID_LEN */
 
 #ifdef __cplusplus
 }

@@ -56,7 +56,7 @@ static inline int _is_set(xtimer_t *timer)
 void xtimer_init(void)
 {
     /* initialize low-level timer */
-    timer_init(XTIMER, (1 << XTIMER_SHIFT) /* us_per_tick */, _periph_timer_callback);
+    timer_init(XTIMER, (1000000ul >> XTIMER_SHIFT), _periph_timer_callback);
 
     /* register initial overflow tick */
     _lltimer_set(0xFFFFFFFF);
@@ -179,7 +179,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     }
 
     unsigned state = disableIRQ();
-    if ( !_this_high_period(target) ) {
+    if ( (timer->long_target > _long_cnt) || !_this_high_period(target) ) {
         DEBUG("xtimer_set_absolute(): the timer doesn't fit into the low-level timer's mask.\n");
         _add_timer_to_long_list(&long_list_head, timer);
     }
@@ -217,8 +217,8 @@ static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer)
 static void _add_timer_to_long_list(xtimer_t **list_head, xtimer_t *timer)
 {
     while (*list_head
-            && (*list_head)->long_target <= timer->long_target
-            && (*list_head)->target <= timer->target) {
+        && (((*list_head)->long_target < timer->long_target)
+        || (((*list_head)->long_target == timer->long_target) && ((*list_head)->target <= timer->target)))) {
         list_head = &((*list_head)->next);
     }
 

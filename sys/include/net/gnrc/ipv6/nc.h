@@ -88,7 +88,6 @@ extern "C" {
 #define GNRC_IPV6_NC_IS_ROUTER          (0x08)  /**< The neighbor is a router */
 
 #define GNRC_IPV6_NC_TYPE_MASK          (0x30)  /**< Mask for neighbor cache state */
-#define GNRC_IPV6_NC_TYPE_POS           (4)     /**< Shift of neighbor cache state */
 
 /**
  * @{
@@ -232,7 +231,7 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_get_next(gnrc_ipv6_nc_t *prev);
 gnrc_ipv6_nc_t *gnrc_ipv6_nc_get_next_router(gnrc_ipv6_nc_t *prev);
 
 /**
- * @brief   Returns the state of a neigbor cache entry.
+ * @brief   Returns the state of a neighbor cache entry.
  *
  * @param[in] entry A neighbor cache entry
  *
@@ -244,7 +243,7 @@ static inline uint8_t gnrc_ipv6_nc_get_state(const gnrc_ipv6_nc_t *entry)
 }
 
 /**
- * @brief   Returns the type of a neigbor cache entry.
+ * @brief   Returns the type of a neighbor cache entry.
  *
  * @param[in] entry A neighbor cache entry
  *

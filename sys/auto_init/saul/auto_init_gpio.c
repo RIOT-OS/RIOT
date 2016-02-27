@@ -62,7 +62,7 @@ void auto_init_gpio(void)
         saul_reg_entries[i].name = p->name;
         saul_reg_entries[i].driver = &gpio_saul_driver;
         /* initialize the GPIO pin */
-        gpio_init(p->pin, p->dir, GPIO_NOPULL);
+        gpio_init(p->pin, p->dir, p->pull);
         /* add to registry */
         saul_reg_add(&(saul_reg_entries[i]));
     }

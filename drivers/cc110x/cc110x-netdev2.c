@@ -47,11 +47,12 @@ static int _send(netdev2_t *dev, const struct iovec *vector, int count)
     return cc110x_send(&netdev2_cc110x->cc110x, cc110x_pkt);
 }
 
-static int _recv(netdev2_t *dev, char* buf, int len)
+static int _recv(netdev2_t *dev, char* buf, int len, void *info)
 {
     DEBUG("%s:%u\n", __func__, __LINE__);
 
     cc110x_t *cc110x = &((netdev2_cc110x_t*) dev)->cc110x;
+    netdev2_cc110x_rx_info_t *cc110x_info = info;
 
     cc110x_pkt_t *cc110x_pkt = &cc110x->pkt_buf.packet;
     if (cc110x_pkt->length > len) {
@@ -59,6 +60,8 @@ static int _recv(netdev2_t *dev, char* buf, int len)
     }
 
     memcpy(buf, (void*)cc110x_pkt, cc110x_pkt->length);
+    cc110x_info->rssi = cc110x->pkt_buf.rssi;
+    cc110x_info->lqi = cc110x->pkt_buf.lqi;
     return cc110x_pkt->length;
 }
 
@@ -69,12 +72,12 @@ static inline int _get_iid(netdev2_t *netdev, eui64_t *value, size_t max_len)
     }
 
     uint8_t *eui64 = (uint8_t*) value;
-#ifdef CPUID_ID_LEN
-    int n = (CPUID_ID_LEN < sizeof(eui64_t))
-        ? CPUID_ID_LEN
+#ifdef CPUID_LEN
+    int n = (CPUID_LEN < sizeof(eui64_t))
+        ? CPUID_LEN
         : sizeof(eui64_t);
 
-    char cpuid[CPUID_ID_LEN];
+    char cpuid[CPUID_LEN];
     cpuid_get(cpuid);
 
     memcpy(eui64 + 8 - n, cpuid, n);
@@ -103,11 +106,7 @@ static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
             return 2;
         case NETOPT_PROTO:
             assert(value_len == sizeof(gnrc_nettype_t));
-#ifdef MODULE_GNRC_SIXLOWPAN
-            *((gnrc_nettype_t*)value) = GNRC_NETTYPE_SIXLOWPAN;
-#else
-            *((gnrc_nettype_t*)value) = GNRC_NETTYPE_UNDEF;
-#endif
+            *((gnrc_nettype_t *)value) = cc110x->proto;
             return sizeof(gnrc_nettype_t);
         case NETOPT_CHANNEL:
             assert(value_len > 1);
@@ -155,6 +154,15 @@ static int _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
                 return -EINVAL;
             }
             return 1;
+        case NETOPT_PROTO:
+            if (value_len != sizeof(gnrc_nettype_t)) {
+                return -EINVAL;
+            }
+            else {
+                cc110x->proto = (gnrc_nettype_t) value;
+                return sizeof(gnrc_nettype_t);
+            }
+            break;
         default:
             return -ENOTSUP;
     }
@@ -173,7 +181,7 @@ static void _netdev2_cc110x_rx_callback(void *arg)
     netdev2_t *netdev2 = (netdev2_t*) arg;
     cc110x_t *cc110x = &((netdev2_cc110x_t*) arg)->cc110x;
     gpio_irq_disable(cc110x->params.gdo2);
-    netdev2->event_callback(netdev2, NETDEV2_EVENT_RX_COMPLETE, netdev2->isr_arg);
+    netdev2->event_callback(netdev2, NETDEV2_EVENT_RX_COMPLETE, NULL);
 }
 
 static void _isr(netdev2_t *dev)
@@ -213,6 +221,15 @@ int netdev2_cc110x_setup(netdev2_cc110x_t *netdev2_cc110x, const cc110x_params_t
 {
     DEBUG("netdev2_cc110x_setup()\n");
     netdev2_cc110x->netdev.driver = &netdev2_cc110x_driver;
+
+    /* set default protocol */
+#ifdef MODULE_GNRC_NETIF
+# ifdef MODULE_GNRC_SIXLOWPAN
+    netdev2_cc110x->cc110x.proto = GNRC_NETTYPE_SIXLOWPAN;
+# else
+    netdev2_cc110x->cc110x.proto = GNRC_NETTYPE_UNDEF;
+# endif
+#endif
 
     return cc110x_setup(&netdev2_cc110x->cc110x, params);
 }

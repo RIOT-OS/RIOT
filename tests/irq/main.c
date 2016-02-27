@@ -23,8 +23,8 @@
 #include "xtimer.h"
 #include "thread.h"
 
-char busy_stack[THREAD_STACKSIZE_MAIN];
-volatile int busy, i, k;
+static char busy_stack[THREAD_STACKSIZE_MAIN];
+static volatile int busy, i, k;
 
 void *busy_thread(void *arg)
 {

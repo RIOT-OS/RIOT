@@ -1,0 +1,15 @@
+# export the CPU family so we can differentiate between them in the code
+FAM = $(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
+export CFLAGS += -DCPU_FAM_$(FAM)
+
+# this CPU implementation doesn't use CMSIS initialization
+export CFLAGS += -DDONT_USE_CMSIS_INIT
+
+# use common periph functions
+USEMODULE += periph_common
+
+# include sam21 common periph drivers
+USEMODULE += sam21_common_periph
+
+# export the common include directory
+export INCLUDES += -I$(RIOTCPU)/sam21_common/include

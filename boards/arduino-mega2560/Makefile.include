@@ -1,4 +1,3 @@
-
 # define the cpu used by the arduino mega2560 board
 export CPU = atmega2560
 
@@ -44,12 +43,13 @@ ifeq ($(PROGRAMMER), stk500v2)
 endif
 
 # define build specific options
-export CPU_USAGE = -mmcu=atmega2560
-export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE)
-export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE)
-export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -static -lgcc -e reset_handler
+export CFLAGS_CPU   = -mmcu=atmega2560  $(CFLAGS_FPU)
+export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
+export CFLAGS_DBG   = -ggdb -g3
+export CFLAGS_OPT  ?= -Os
+
+export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
+export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
+export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -e reset_handler
 export OFLAGS += -j .text -j .data -O ihex
 export FFLAGS += -p m2560 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex
-
-# export board specific includes to the global includes-listing
-export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

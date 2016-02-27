@@ -56,6 +56,11 @@ typedef uint32_t gpio_t;
 /** @} */
 
 /**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (16U)
+
+/**
  * @brief Override values for pull register configuration
  * @{
  */

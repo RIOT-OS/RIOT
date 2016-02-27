@@ -48,7 +48,7 @@ timer_conf_t config[TIMER_NUMOF];
 /**
  * @brief Setup the given timer
  */
-int timer_init(tim_t dev, unsigned int us_per_ticks, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     /* configure GCLK0 to feed TC0 & TC1*/;
     GCLK->PCHCTRL[TC0_GCLK_ID].reg |= GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;

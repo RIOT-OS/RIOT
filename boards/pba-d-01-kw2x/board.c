@@ -41,14 +41,14 @@ static void leds_init(void)
     LED_G_PORT_CLKEN();
     LED_R_PORT_CLKEN();
     /* configure pins as gpio */
-    LED_B_PORT->PCR[LED_B_PIN] = PORT_PCR_MUX(1);
-    LED_G_PORT->PCR[LED_G_PIN] = PORT_PCR_MUX(1);
-    LED_R_PORT->PCR[LED_R_PIN] = PORT_PCR_MUX(1);
-    LED_B_GPIO->PDDR |= (1 << LED_B_PIN);
-    LED_G_GPIO->PDDR |= (1 << LED_G_PIN);
-    LED_R_GPIO->PDDR |= (1 << LED_R_PIN);
+    LED_B_PORT_BASE->PCR[LED_B_PIN] = PORT_PCR_MUX(1);
+    LED_G_PORT_BASE->PCR[LED_G_PIN] = PORT_PCR_MUX(1);
+    LED_R_PORT_BASE->PCR[LED_R_PIN] = PORT_PCR_MUX(1);
+    LED_B_GPIO_BASE->PDDR |= (1 << LED_B_PIN);
+    LED_G_GPIO_BASE->PDDR |= (1 << LED_G_PIN);
+    LED_R_GPIO_BASE->PDDR |= (1 << LED_R_PIN);
     /* turn all LEDs off */
-    LED_B_GPIO->PSOR |= (1 << LED_B_PIN);
-    LED_G_GPIO->PSOR |= (1 << LED_G_PIN);
-    LED_R_GPIO->PSOR |= (1 << LED_R_PIN);
+    LED_B_GPIO_BASE->PSOR |= (1 << LED_B_PIN);
+    LED_G_GPIO_BASE->PSOR |= (1 << LED_G_PIN);
+    LED_R_GPIO_BASE->PSOR |= (1 << LED_R_PIN);
 }

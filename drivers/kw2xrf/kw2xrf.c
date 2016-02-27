@@ -72,6 +72,7 @@ static const uint8_t pow_lt[44] = {
     28, 29, 30, 31
 };
 
+/* TODO: Implement this
 static const int level_lt[29] = {
     -35, -34, -32, -31,
     -29, -28, -26, -25,
@@ -82,6 +83,7 @@ static const int level_lt[29] = {
     1, 2, 4, 5,
     7
 };
+*/
 
 static gpio_t kw2xrf_gpio_int;
 
@@ -191,7 +193,7 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
             break;
 
         case XCVSEQ_RECEIVE:
-            dev->state = NETOPT_STATE_IDLE;
+            dev->state = NETOPT_STATE_RX;
             break;
 
         case XCVSEQ_TRANSMIT:
@@ -392,8 +394,8 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     uint8_t reg = 0;
     uint8_t tmp[2];
     kw2xrf_gpio_int = int_pin;
-#if CPUID_ID_LEN
-    uint8_t cpuid[CPUID_ID_LEN];
+#if CPUID_LEN
+    uint8_t cpuid[CPUID_LEN];
     eui64_t addr_long;
 #endif
 
@@ -419,19 +421,19 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     dev->proto = KW2XRF_DEFAULT_PROTOCOL;
     dev->option = 0;
 
-#if CPUID_ID_LEN
+#if CPUID_LEN
     cpuid_get(cpuid);
 
-#if CPUID_ID_LEN < 8
+#if CPUID_LEN < 8
 
-    /* in case CPUID_ID_LEN < 8, fill missing bytes with zeros */
-    for (int i = CPUID_ID_LEN; i < 8; i++) {
+    /* in case CPUID_LEN < 8, fill missing bytes with zeros */
+    for (int i = CPUID_LEN; i < 8; i++) {
         cpuid[i] = 0;
     }
 
 #else
 
-    for (int i = 8; i < CPUID_ID_LEN; i++) {
+    for (int i = 8; i < CPUID_LEN; i++) {
         cpuid[i & 0x07] ^= cpuid[i];
     }
 
@@ -1006,7 +1008,7 @@ void _receive_data(kw2xrf_t *dev)
         return;
     }
 
-    /* If RAW-mode is selected direclty forward pkt, MAC does the rest */
+    /* If RAW-mode is selected directly forward pkt, MAC does the rest */
     if (dev->option & KW2XRF_OPT_RAWDUMP) {
         payload = gnrc_pktbuf_add(NULL, NULL, pkt_len, GNRC_NETTYPE_UNDEF);
 
@@ -1041,8 +1043,8 @@ void _receive_data(kw2xrf_t *dev)
     netif->if_pid = thread_getpid();
     netif->lqi = dev->buf[pkt_len];
     /* lqi and rssi are directly related to each other in the kw2x-device.
-     * The rssi-unit is dBm and in this case alwaysnegative, nevertheless
-     * a positive value is reported.
+     * The rssi-unit is dBm and in this case always negative, nevertheless a
+     * positive value is reported.
      */
     netif->rssi = -((netif->lqi) - 286.6) / 2.69333;
 
@@ -1189,6 +1191,10 @@ int kw2xrf_send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
 {
     int index = 0;
     kw2xrf_t *dev = (kw2xrf_t *) netdev;
+
+    if ((dev->option & KW2XRF_OPT_PRELOADING) == NETOPT_DISABLE) {
+        kw2xrf_set_sequence(dev, XCVSEQ_TRANSMIT);
+    }
 
     if (pkt == NULL) {
         return -ENOMSG;

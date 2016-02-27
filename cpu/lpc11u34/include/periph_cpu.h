@@ -34,6 +34,11 @@ extern "C" {
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
 
+/**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (16U)
+
 #ifdef __cplusplus
 }
 #endif

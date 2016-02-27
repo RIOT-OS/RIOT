@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,15 +7,18 @@
  */
 
 /**
- * @addtogroup  driver_periph
+ * @addtogroup  cpu_ezr32wg
  * @{
  *
  * @file
  * @brief       Low-level CPUID driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ *
+ * @}
  */
 
+#include <stdint.h>
 #include <string.h>
 
 #include "periph/cpuid.h"

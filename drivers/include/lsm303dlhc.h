@@ -101,11 +101,13 @@ typedef struct {
  * @brief Device descriptor for LSM303DLHC sensors
  */
 typedef struct {
-    i2c_t i2c;              /**< I2C device                  */
-    uint8_t acc_address;    /**< accelerometer's I2C address */
-    uint8_t mag_address;    /**< magnetometer's I2C address  */
-    gpio_t  acc_pin;        /**< accelerometer's data ready pin */
-    gpio_t  mag_pin;        /**< magnetometer's data ready pin  */
+    i2c_t i2c;                          /**< I2C device                  */
+    uint8_t acc_address;                /**< accelerometer's I2C address */
+    uint8_t mag_address;                /**< magnetometer's I2C address  */
+    gpio_t  acc_pin;                    /**< accelerometer's data ready pin */
+    gpio_t  mag_pin;                    /**< magnetometer's data ready pin  */
+    lsm303dlhc_acc_scale_t acc_scale;   /**< accelerometer scale factor */
+    lsm303dlhc_mag_gain_t mag_gain;     /**< magnetometer gain */
 } lsm303dlhc_t;
 
 /**
@@ -159,7 +161,7 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, i2c_t i2c, gpio_t acc_pin, gpio_t mag_pin
  *                          +- 2g   |  1*10^-3
  *                          +- 4g   |  2*10^-3
  *                          +- 8g   |  4*10^-3
- *                          +-16g   | 12*10^-3
+ *                          +-16g   |  8*10^-3
  *
  * @param[in]  dev      device descriptor of an LSM303DLHC device
  * @param[out] data     the measured accelerometer data

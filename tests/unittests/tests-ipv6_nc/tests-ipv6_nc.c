@@ -345,6 +345,18 @@ static void test_ipv6_nc_is_reachable__reachable(void)
     TEST_ASSERT(gnrc_ipv6_nc_is_reachable(entry));
 }
 
+static void test_ipv6_nc_is_reachable__unmanaged(void)
+{
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    gnrc_ipv6_nc_t *entry = NULL;
+
+    test_ipv6_nc_add__success(); /* adds DEFAULT_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF */
+
+    TEST_ASSERT_NOT_NULL((entry = gnrc_ipv6_nc_get(DEFAULT_TEST_NETIF, &addr)));
+    entry->flags = (GNRC_IPV6_NC_STATE_UNMANAGED << GNRC_IPV6_NC_STATE_POS);
+    TEST_ASSERT(gnrc_ipv6_nc_is_reachable(entry));
+}
+
 static void test_ipv6_nc_still_reachable__incomplete(void)
 {
     ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
@@ -449,6 +461,7 @@ Test *tests_ipv6_nc_tests(void)
         new_TestFixture(test_ipv6_nc_get_next_router__second_entry),
         new_TestFixture(test_ipv6_nc_is_reachable__incomplete),
         new_TestFixture(test_ipv6_nc_is_reachable__reachable),
+        new_TestFixture(test_ipv6_nc_is_reachable__unmanaged),
         new_TestFixture(test_ipv6_nc_still_reachable__incomplete),
         new_TestFixture(test_ipv6_nc_still_reachable__success),
         new_TestFixture(test_ipv6_nc_get_l2_addr__NULL_entry),

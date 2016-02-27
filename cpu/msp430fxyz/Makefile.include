@@ -1,5 +1,3 @@
-INCLUDES += -I$(RIOTCPU)/msp430fxyz/include/
-
 include $(RIOTCPU)/msp430-common/Makefile.include
 
 export USEMODULE += periph periph_common uart_stdio

@@ -107,7 +107,7 @@ BRIEF_MEMBER_DESC      = YES
 # brief descriptions will be completely suppressed.
 # The default value is: YES.
 
-REPEAT_BRIEF           = YES
+REPEAT_BRIEF           = NO
 
 # This tag implements a quasi-intelligent brief description abbreviator that is
 # used to form the text in various listings. Each string in this list, if found
@@ -672,7 +672,7 @@ FILE_VERSION_FILTER    =
 # DoxygenLayout.xml, doxygen will parse it automatically even if the LAYOUT_FILE
 # tag is left empty.
 
-LAYOUT_FILE            =
+LAYOUT_FILE            = RIOTDoxygenLayout.xml
 
 # The CITE_BIB_FILES tag can be used to specify one or more bib files containing
 # the reference definitions. This must be a list of .bib files. The .bib
@@ -829,7 +829,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/cortexm_common/include/core_cm*.h \
                          */cpu/stm32f*/include/stm32f* \
                          */drivers/nrf24l01p/include/nrf24l01p_settings.h \
-                         */cpu/nrf51/include/nrf51*.h \
+                         */cpu/nrf5*/include/nrf5*.h \
                          */cpu/lpc1768/include/LPC17xx.h \
                          */cpu/lpc11u34/include/LPC11Uxx.h \
                          */boards/*/include/periph_conf.h \
@@ -1997,7 +1997,7 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = DOXYGEN \
                          __attribute__(x)= \
                          ADC_NUMOF \
-                         CPUID_ID_LEN \
+                         CPUID_LEN \
                          DAC_NUMOF \
                          GPIO_NUMOF \
                          I2C_NUMOF \

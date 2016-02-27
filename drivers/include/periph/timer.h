@@ -79,14 +79,14 @@ typedef struct {
  * enabled.
  *
  * @param[in] dev           the timer to initialize
- * @param[in] us_per_tick   number of us passed for one timer tick
+ * @param[in] freq          requested number of ticks per second
  * @param[in] callback      this callback is called in interrupt context, the
  *                          emitting channel is passed as argument
  *
  * @return                  0 on success
  * @return                  -1 if speed not applicable or unknown device given
  */
-int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int));
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int));
 
 /**
  * @brief Set a given timer channel for the given timer device

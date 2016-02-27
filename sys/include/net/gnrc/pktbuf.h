@@ -202,15 +202,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len);
  *
  * @return  The new reference to @p pkt.
  */
-static inline gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt,
-                                                      gnrc_pktsnip_t *snip)
-{
-    LL_DELETE(pkt, snip);
-    snip->next = NULL;
-    gnrc_pktbuf_release(snip);
-
-    return pkt;
-}
+gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *snip);
 
 #ifdef DEVELHELP
 /**

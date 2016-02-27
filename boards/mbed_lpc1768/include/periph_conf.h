@@ -34,7 +34,7 @@ extern "C" {
 /* Timer 0 configuration */
 #define TIMER_0_DEV         LPC_TIM0
 #define TIMER_0_CHANNELS    4
-#define TIMER_0_PRESCALER   (95U)
+#define TIMER_0_FREQ        (96000000ul)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
 #define TIMER_0_CLKEN()     (LPC_SC->PCONP |= (1 << 1))
 #define TIMER_0_CLKDIS()    (LPC_SC->PCONP &= ~(1 << 1))

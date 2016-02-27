@@ -53,6 +53,8 @@
 #ifndef GPIO_H
 #define GPIO_H
 
+#include <limits.h>
+
 #include "periph_cpu.h"
 #include "periph_conf.h"
 /* TODO: remove once all platforms are ported to this interface */
@@ -73,14 +75,14 @@ extern "C" {
  * @brief   Define global value for GPIO not defined
  */
 #ifndef GPIO_UNDEF
-#define GPIO_UNDEF      (-1)
+#define GPIO_UNDEF          (UINT_MAX)
 #endif
 
 /**
  * @brief   Define the default GPIO type identifier
  */
 #ifndef HAVE_GPIO_T
-typedef int gpio_t;
+typedef unsigned int gpio_t;
 #endif
 
 /**
@@ -121,6 +123,18 @@ typedef enum {
  * @param[in] arg       optional context for the callback
  */
 typedef void (*gpio_cb_t)(void *arg);
+
+/**
+ * @brief   Default interrupt context for GPIO pins
+ * @{
+ */
+#ifndef HAVE_GPIO_ISR_CTX_T
+typedef struct {
+    gpio_cb_t cb;           /**< interrupt callback */
+    void *arg;              /**< optional argument */
+} gpio_isr_ctx_t;
+#endif
+/** @} */
 
 /**
  * @brief   Initialize the given pin as general purpose input or output

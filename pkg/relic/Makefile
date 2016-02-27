@@ -1,5 +1,5 @@
 RELIC_URL=http://github.com/relic-toolkit/relic.git
-RELIC_BRANCH=master
+RELIC_BRANCH=cdcfaeef101d18c3231c3b46359c519dd72682e8
 
 PKG_NAME=relic
 PKG_URL=$(RELIC_URL)

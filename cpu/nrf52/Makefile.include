@@ -1,0 +1,5 @@
+export CPU_ARCH = cortex-m4f
+export CPU_FAM  = nrf52
+
+include $(RIOTCPU)/nrf5x_common/Makefile.include
+include $(RIOTCPU)/Makefile.include.cortexm_common

@@ -106,13 +106,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name Random Number Generator configuration
- * @{
- */
-#define RANDOM_NUMOF        (1U)
-/** @} */
-
-/**
  * @name Radio device configuration
  *
  * The radio is not guarded by a NUMOF define, as the radio is selected by its
