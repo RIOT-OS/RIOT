@@ -123,8 +123,7 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
         case PROTNUM_IPV6_EXT_MOB:
             DEBUG("ipv6: handle extension header (nh = %u)\n", nh);
             if (!gnrc_ipv6_ext_demux(iface, pkt, nh)) {
-                DEBUG("ipv6: unable to parse extension headers.\n");
-                gnrc_pktbuf_release(pkt);
+                DEBUG("ipv6: stop packet processing.\n");
                 return;
             }
 #endif

@@ -15,48 +15,24 @@
 #include <stdbool.h>
 
 #include "net/protnum.h"
+#include "net/ipv6/ext.h"
 #include "net/ipv6/ext/rh.h"
 #include "net/gnrc/rpl/srh.h"
 
-ipv6_addr_t *ipv6_ext_rh_next_hop(ipv6_hdr_t *ipv6)
+int ipv6_ext_rh_process(ipv6_hdr_t *hdr, ipv6_ext_rh_t *ext)
 {
-    ipv6_ext_rh_t *ext = (ipv6_ext_rh_t *)(ipv6 + 1);
-    bool c = true;
+    (void) hdr;
 
-    while (c) {
-        switch (ext->type) {
-            case PROTNUM_IPV6_EXT_HOPOPT:
-            case PROTNUM_IPV6_EXT_DST:
-            case PROTNUM_IPV6_EXT_FRAG:
-            case PROTNUM_IPV6_EXT_AH:
-            case PROTNUM_IPV6_EXT_ESP:
-            case PROTNUM_IPV6_EXT_MOB:
-                ext = (ipv6_ext_rh_t *)ipv6_ext_get_next((ipv6_ext_t *)ext);
-                break;
-
-            case PROTNUM_IPV6_EXT_RH:
-                c = false;
-                break;
-
-            default:
-                c = false;
-                break;
-        }
-    }
-
-    if (ipv6->nh == PROTNUM_IPV6_EXT_RH) {
-        switch (ext->type) {
+    switch (ext->type) {
 #ifdef MODULE_GNRC_RPL_SRH
-            case GNRC_RPL_SRH_TYPE:
-                return gnrc_rpl_srh_next_hop((gnrc_rpl_srh_t *)ext);
+        case GNRC_RPL_SRH_TYPE:
+            return gnrc_rpl_srh_process(hdr, (gnrc_rpl_srh_t *)ext);
 #endif
 
-            default:
-                break;
-        }
+        default:
+            break;
     }
-
-    return NULL;
+    return EXT_RH_CODE_ERROR;
 }
 
 /** @} */
