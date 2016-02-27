@@ -49,6 +49,7 @@ def is_tracked(application_folder):
         return True
 
 def get_results_and_output_from(fd):
+    read_more_output = True
     results_prefix = 'Building for '
     output_prefix = 'Building application '
     prev_results = False
