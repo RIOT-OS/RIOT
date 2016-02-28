@@ -55,8 +55,8 @@ int main(void)
                 else {
                 }
 
-                a = _lltimer_now() | _high_cnt;
-                b = _lltimer_now() | _high_cnt;
+                a = _lltimer_now_ticks() | _high_cnt;
+                b = _lltimer_now_ticks() | _high_cnt;
             } while ((a>>shift) != (b>>shift));
 
             min[shift] = i < min[shift] ? i : min[shift];

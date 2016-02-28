@@ -34,6 +34,23 @@
 #define DISABLE_WDOG    1
 
 /**
+ * @brief   xtimer configuration
+ * @{
+ */
+/* Make sure xtimer uses the LPTMR periph/timer device */
+#define XTIMER                      (TIMER_0)
+#define XTIMER_CHAN                 (0)
+/* LPTMR is 16 bits wide */
+#define XTIMER_MASK                 (0xffff0000ul)
+#define XTIMER_SHIFT_ON_COMPARE     (0)
+#define XTIMER_BACKOFF              (4)
+#define XTIMER_ISR_BACKOFF          (4)
+#define XTIMER_OVERHEAD             (3)
+#define XTIMER_HZ                   (32768ul)
+#define XTIMER_SHIFT                (0)
+/** @} */
+
+/**
  * @name LEDs configuration
  * @{
  */

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2015-2016 Eistec AB
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -23,7 +24,10 @@
  * @{
  * @file
  * @brief   xtimer interface definitions
+ *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ *
  */
 #ifndef XTIMER_H
 #define XTIMER_H
@@ -35,6 +39,7 @@
 
 #include "board.h"
 #include "periph_conf.h"
+#include "div.h"
 
 /**
  * @brief internal define to allow using variables instead of defines
@@ -243,7 +248,7 @@ void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid);
  * @param[in] offset    time in microseconds from now specifying that timer's
  *                      callback's execution time
  */
-void xtimer_set(xtimer_t *timer, uint32_t offset);
+static inline void xtimer_set(xtimer_t *timer, uint32_t offset);
 
 /**
  * @brief remove a timer
@@ -282,7 +287,7 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 /**
  * @brief xtimer backoff value
  *
- * All timers that are less than XTIMER_BACKOFF microseconds in the future will
+ * All timers that are less than XTIMER_BACKOFF ticks in the future will
  * just spin.
  *
  * This is supposed to be defined per-device in e.g., periph_conf.h.
@@ -326,21 +331,6 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_ISR_BACKOFF 20
 #endif
 
-/*
- * @brief   xtimer prescaler value
- *
- * xtimer assumes it is running with an underlying 1MHz timer.
- * If the timer is slower by a power of two, XTIMER_SHIFT can be used to
- * adjust the difference.
- *
- * This will also initialize the underlying periph timer with
- * us_per_tick == (1<<XTIMER_SHIFT).
- *
- * For example, if the timer is running with 250khz, set XTIMER_SHIFT to 2.
- */
-#ifndef XTIMER_SHIFT
-#define XTIMER_SHIFT (0)
-#endif
 
 /**
  * @brief set xtimer default timer configuration
@@ -375,59 +365,6 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  */
 #define XTIMER_MASK (0)
 #endif
-#define XTIMER_MASK_SHIFTED (XTIMER_MASK << XTIMER_SHIFT)
-
-#ifndef XTIMER_USLEEP_UNTIL_OVERHEAD
-/**
- * @brief xtimer_usleep_until overhead value
- *
- * This value specifies the time a xtimer_usleep_until will be late
- * if uncorrected.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
- */
-#define XTIMER_USLEEP_UNTIL_OVERHEAD 10
-#endif
-
-#if XTIMER_MASK
-extern volatile uint32_t _high_cnt;
-#endif
-
-/**
- * @brief IPC message type for xtimer msg callback
- */
-#define MSG_XTIMER 12345
-
-/**
- * @brief returns the (masked) low-level timer counter value.
- */
-static inline uint32_t _lltimer_now(void)
-{
-#if XTIMER_SHIFT
-    return ((uint32_t)timer_read(XTIMER)) << XTIMER_SHIFT;
-#else
-    return timer_read(XTIMER);
-#endif
-}
-
-/**
- * @brief drop bits of a value that don't fit into the low-level timer.
- */
-static inline uint32_t _lltimer_mask(uint32_t val)
-{
-    return val & ~XTIMER_MASK_SHIFTED;
-}
-
-/**
- * @{
- * @brief xtimer internal stuff
- * @internal
- */
-int _xtimer_set_absolute(xtimer_t *timer, uint32_t target);
-void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
-void _xtimer_sleep(uint32_t offset, uint32_t long_offset);
-static inline void xtimer_spin_until(uint32_t value);
-/** @} */
 
 #if XTIMER_MASK
 #ifndef XTIMER_SHIFT_ON_COMPARE
@@ -436,11 +373,11 @@ static inline void xtimer_spin_until(uint32_t value);
  *
  * (only relevant when XTIMER_MASK != 0, e.g., timers < 32bit.)
  *
- * When combining _lltimer_now() and _high_cnt, we have to get the same value in
- * order to work around a race between overflowing _lltimer_now() and OR'ing the
- * resulting values.
- * But some platforms are too slow to get the same timer
- * value twice, so we use this define to ignore some of the bits.
+ * When combining _lltimer_now_ticks() and _high_cnt, we have to get the same
+ * value in order to work around a race between overflowing _xtimer_now() and
+ * OR'ing the resulting values.
+ * But some platforms are too slow to get the same timer value twice, so we use
+ * this define to ignore some of the bits.
  *
  * Use tests/xtimer_shift_on_compare to find the correct value for your MCU.
  */
@@ -448,48 +385,286 @@ static inline void xtimer_spin_until(uint32_t value);
 #endif
 #endif
 
-#ifndef XTIMER_MIN_SPIN
+#ifndef XTIMER_HZ
 /**
- * @brief Minimal value xtimer_spin() can spin
+ * @brief Tick rate of the underlying hardware timer.
+ *
+ * This value is used to convert between hardware ticks and microseconds.
+ *
+ * This is supposed to be defined per-device in e.g., periph_conf.h.
  */
-#define XTIMER_MIN_SPIN (1<<XTIMER_SHIFT)
+#define XTIMER_HZ (1000000ul)
 #endif
 
-static inline uint32_t xtimer_now(void)
+#ifndef XTIMER_SHIFT
+/**
+ * @brief XTIMER_SHIFT is used when the timer frequency is a direct power-of-two
+ * multiple/division of 1000000
+ *
+ * Choose XTIMER_SHIFT so that
+ *
+ * XTIMER_HZ == 1000000 << XTIMER_SHIFT (if XTIMER_HZ > 1000000)
+ *
+ *  or
+ *
+ * XTIMER_HZ << XTIMER_SHIFT == 1000000 (if XTIMER_HZ < 1000000)
+ */
+
+#define XTIMER_SHIFT (0)
+#endif
+
+/* Some optimizations for common timer frequencies */
+#if (XTIMER_SHIFT != 0)
+#if (XTIMER_HZ % 15625 != 0)
+#error XTIMER_HZ must be a multiple of 15625 (5^6) when using XTIMER_SHIFT
+#endif
+#if (XTIMER_HZ > 1000000ul)
+#if (XTIMER_HZ != (1000000ul << XTIMER_SHIFT))
+#error XTIMER_HZ != (1000000ul << XTIMER_SHIFT)
+#endif
+/* XTIMER_HZ is a power-of-two multiple of 1 MHz */
+/* e.g. cc2538 uses a 16 MHz timer */
+inline static uint32_t _xtimer_us_to_ticks(uint32_t us) {
+    return (us << XTIMER_SHIFT); /* multiply by power of two */
+}
+
+inline static uint64_t _xtimer_us_to_ticks64(uint64_t us) {
+    return (us << XTIMER_SHIFT); /* multiply by power of two */
+}
+
+inline static uint32_t _xtimer_ticks_to_us(uint32_t ticks) {
+    return (ticks >> XTIMER_SHIFT); /* divide by power of two */
+}
+
+inline static uint64_t _xtimer_ticks_to_us64(uint64_t ticks) {
+    return (ticks >> XTIMER_SHIFT); /* divide by power of two */
+}
+
+#else /* !(XTIMER_HZ > 1000000ul) */
+#if ((XTIMER_HZ << XTIMER_SHIFT) != 1000000ul)
+#error (XTIMER_HZ << XTIMER_SHIFT) != 1000000ul
+#endif
+/* 1 MHz is a power-of-two multiple of XTIMER_HZ */
+/* e.g. ATmega2560 uses a 250 kHz timer */
+inline static uint32_t _xtimer_us_to_ticks(uint32_t us) {
+    return (us >> XTIMER_SHIFT); /* divide by power of two */
+}
+
+inline static uint64_t _xtimer_us_to_ticks64(uint64_t us) {
+    return (us >> XTIMER_SHIFT); /* divide by power of two */
+}
+
+inline static uint32_t _xtimer_ticks_to_us(uint32_t ticks) {
+    return (ticks << XTIMER_SHIFT); /* multiply by power of two */
+}
+
+inline static uint64_t _xtimer_ticks_to_us64(uint64_t ticks) {
+    return (ticks << XTIMER_SHIFT); /* multiply by power of two */
+}
+#endif /* defined(XTIMER_SHIFT) && (XTIMER_SHIFT != 0) */
+#elif XTIMER_HZ == (1000000ul)
+/* This is the most straightforward as the xtimer API is based around
+ * microseconds for representing time values. */
+inline static uint32_t _xtimer_us_to_ticks(uint32_t ticks) {
+    return ticks; /* no-op */
+}
+
+inline static uint32_t _xtimer_ticks_to_us(uint32_t ticks) {
+    return ticks; /* no-op */
+}
+
+inline static uint64_t _xtimer_us_to_ticks64(uint64_t us) {
+    return us; /* no-op */
+}
+
+inline static uint64_t _xtimer_ticks_to_us64(uint64_t us) {
+    return us; /* no-op */
+}
+
+#elif XTIMER_HZ == (32768ul)
+/* This is a common frequency for RTC crystals. We use the fact that the
+ * greatest common divisor between 32768 and 1000000 is 64, so instead of
+ * multiplying by the fraction (32768 / 1000000), we will instead use
+ * (512 / 15625), which reduces the truncation caused by the integer widths */
+inline static uint32_t _xtimer_us_to_ticks(uint32_t us) {
+    return div_u32_by_15625div512(us);
+}
+
+inline static uint64_t _xtimer_us_to_ticks64(uint64_t us) {
+    return div_u64_by_15625div512(us);
+}
+
+inline static uint32_t _xtimer_ticks_to_us(uint32_t ticks) {
+    /* return (usec * 15625) / 512; */
+    /* Using 64 bit multiplication to avoid truncating the top 9 bits */
+    uint64_t us = (uint64_t)ticks * 15625ul;
+    return (us >> 9); /* equivalent to (us / 512) */
+}
+
+inline static uint64_t _xtimer_ticks_to_us64(uint64_t ticks) {
+    /* return (usec * 15625) / 512; */
+    uint64_t us = (uint64_t)ticks * 15625ul;
+    return (us >> 9); /* equivalent to (us / 512) */
+}
+
+#else
+/* No matching implementation found, try to give meaningful error messages */
+#if ((XTIMER_HZ % 15625) == 0)
+#error Unknown hardware timer frequency (XTIMER_HZ), missing XTIMER_SHIFT in board.h? See xtimer.h documentation for more info
+#else
+#error Unknown hardware timer frequency (XTIMER_HZ), check board.h and/or add an implementation in xtimer.h
+#endif
+#endif
+
+/**
+ * @brief Convert microseconds to underlying hardware timer ticks, rounding up
+ *
+ * Result will be rounded up to nearest integer tick equal to or longer than the
+ * given microsecond value
+ */
+inline static uint32_t _xtimer_us_to_ticks_ceil(uint32_t us)
 {
+#if XTIMER_HZ < SEC_IN_USEC
+    /* only timers slower than 1 MHz need rounding */
+    return _xtimer_us_to_ticks(us + (_xtimer_ticks_to_us(1) - 1));
+#else
+    return _xtimer_us_to_ticks(us);
+#endif
+}
+
+/**
+ * @brief Long term counter
+ *
+ * This variable contains the upper 32 bits of the "now" tick count
+ */
+extern volatile uint32_t _long_cnt;
+#if XTIMER_MASK
+/**
+ * @brief High order bits of short term counter.
+ *
+ * This is only used when underlying hardware timer is less than 32 bits wide.
+ */
+extern volatile uint32_t _high_cnt;
+#endif
+
+/**
+ * @brief IPC message type for xtimer msg callback
+ */
+#define MSG_XTIMER 12345
+
+#if (XTIMER_BACKOFF < XTIMER_OVERHEAD)
+#warning XTIMER_BACKOFF < XTIMER_OVERHEAD will cause timer underruns on short timeouts.
+#endif
+
+#if (XTIMER_ISR_BACKOFF < XTIMER_OVERHEAD)
+#warning XTIMER_ISR_BACKOFF < XTIMER_OVERHEAD will cause timer underruns on short timeouts.
+#endif
+
+/**
+ * @{
+ * @brief xtimer internal stuff
+ * @internal
+ */
+inline static uint32_t _xtimer_now_ticks(void);
+
+int _xtimer_set_absolute_ticks(xtimer_t *timer, uint32_t target);
+void _xtimer_set_ticks64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
+void _xtimer_sleep_ticks(uint32_t offset, uint32_t long_offset);
+static inline void xtimer_spin_until(uint32_t value);
+/** @} */
+
+/**
+ * @brief returns the (masked) low-level timer counter value.
+ */
+inline static uint32_t _lltimer_now_ticks(void)
+{
+    return timer_read(XTIMER);
+}
+
+/**
+ * @brief returns the full 32 bit xtimer current time, i.e. including _high_cnt
+ * in <32-bit timers.
+ */
+inline static uint32_t _xtimer_now_ticks(void) {
 #if XTIMER_MASK
     uint32_t a, b;
     do {
-        a = _lltimer_now() | _high_cnt;
-        b = _lltimer_now() | _high_cnt;
+        a = _lltimer_now_ticks() | _high_cnt;
+        b = _lltimer_now_ticks() | _high_cnt;
     } while ((a >> XTIMER_SHIFT_ON_COMPARE) != (b >> XTIMER_SHIFT_ON_COMPARE));
     return b;
 #else
-    return _lltimer_now();
+    return _lltimer_now_ticks();
 #endif
 }
 
-static inline void xtimer_spin_until(uint32_t target) {
+/**
+ * @brief Get both the short term and the long term ticks.
+ *
+ * This function will handle overflows to ensure that the short term and the
+ * long term ticks are synchronized before returning.
+ *
+ * @param[out] short_term  pointer to short term tick variable
+ * @param[out] long_term   pointer to long term tick variable
+ */
+void _xtimer_now_ticks64(uint32_t *short_term, uint32_t *long_term);
+
+/**
+ * @brief drop bits of a value that don't fit into the low-level timer.
+ */
+static inline uint32_t _lltimer_mask(uint32_t val)
+{
+    return val & ~XTIMER_MASK;
+}
+
+static inline uint32_t xtimer_now(void)
+{
+    return (uint32_t)xtimer_now64();
+}
+
+void _xtimer_set_ticks(xtimer_t *timer, uint32_t offset);
+
+static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
+{
+    _xtimer_set_ticks(timer, _xtimer_us_to_ticks(offset));
+}
+
+static inline void _xtimer_spin_until_ticks(uint32_t target)
+{
 #if XTIMER_MASK
     target = _lltimer_mask(target);
 #endif
-    while (_lltimer_now() > target);
-    while (_lltimer_now() < target);
+    while (_xtimer_now_ticks() > target);
+    while (_xtimer_now_ticks() < target);
 }
 
-static inline void xtimer_spin(uint32_t offset) {
-    uint32_t start = _lltimer_now();
-    while ((_lltimer_now() - start) < offset);
+static inline void xtimer_spin_until(uint32_t target) {
+    target = _xtimer_us_to_ticks(target);
+    _xtimer_spin_until_ticks(target);
 }
 
-static inline void xtimer_usleep(uint32_t microseconds)
+static inline void _xtimer_spin_ticks(uint32_t offset)
 {
-    _xtimer_sleep(microseconds, 0);
+    uint32_t start = _xtimer_now_ticks();
+    while ((_xtimer_now_ticks() - start) < offset);
 }
 
-static inline void xtimer_usleep64(uint64_t microseconds)
+static inline void xtimer_spin(uint32_t offset)
 {
-    _xtimer_sleep((uint32_t) microseconds, (uint32_t) (microseconds >> 32));
+    offset = _xtimer_us_to_ticks(offset);
+    _xtimer_spin_ticks(offset);
+}
+
+static inline void xtimer_usleep(uint32_t offset)
+{
+    offset = _xtimer_us_to_ticks(offset);
+    _xtimer_sleep_ticks(offset, 0);
+}
+
+static inline void xtimer_usleep64(uint64_t offset)
+{
+    offset = _xtimer_us_to_ticks64(offset);
+    _xtimer_sleep_ticks((uint32_t) offset, (uint32_t) (offset >> 32));
 }
 
 static inline void xtimer_sleep(uint32_t seconds)
@@ -499,7 +674,7 @@ static inline void xtimer_sleep(uint32_t seconds)
 
 static inline void xtimer_nanosleep(uint32_t nanoseconds)
 {
-    _xtimer_sleep(nanoseconds / USEC_IN_NS, 0);
+    xtimer_usleep(nanoseconds / 1000);
 }
 
 #ifdef __cplusplus
