@@ -44,7 +44,7 @@ class mutex {
  public:
   using native_handle_type = mutex_t*;
 
-  inline constexpr mutex() noexcept : m_mtx{0, PRIORITY_QUEUE_INIT} {}
+  inline constexpr mutex() noexcept : m_mtx{0} {}
   ~mutex();
 
   void lock();
