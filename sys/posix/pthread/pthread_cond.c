@@ -92,7 +92,7 @@ int pthread_cond_destroy(struct pthread_cond_t *cond)
     return 0;
 }
 
-int pthread_cond_wait(struct pthread_cond_t *cond, struct mutex_t *mutex)
+int pthread_cond_wait(struct pthread_cond_t *cond, mutex_t *mutex)
 {
     priority_queue_node_t n;
     n.priority = sched_active_thread->priority;
@@ -118,7 +118,7 @@ int pthread_cond_wait(struct pthread_cond_t *cond, struct mutex_t *mutex)
     return 0;
 }
 
-int pthread_cond_timedwait(struct pthread_cond_t *cond, struct mutex_t *mutex, const struct timespec *abstime)
+int pthread_cond_timedwait(struct pthread_cond_t *cond, mutex_t *mutex, const struct timespec *abstime)
 {
     timex_t now, then, reltime;
 
