@@ -29,7 +29,7 @@ static_tests_groups = ["static-tests"]
 known_mcu_groups = arm_mcu_groups + msp_mcu_groups + x86_mcu_groups + \
     avr8_mcu_groups + static_tests_groups
 
-common_pkgs = ["pcregrep", "libpcre3", "python3", "python3-pexpect"]
+common_pkgs = ["pcregrep", "libpcre3", "python3", "python-pexpect"]
 
 # testing the relic pkg and its RIOT specific unit test requires cmake
 common_pkgs = common_pkgs + ["cmake"]
