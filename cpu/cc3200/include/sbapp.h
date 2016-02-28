@@ -38,6 +38,11 @@ enum conn_type_t {
 	UDP
 };
 
+typedef enum {
+    WLAN_SETTING,
+    SBAPI_STATUS,
+} sbapp_opt_t;
+
 /**
  * @brief   Default message queue size for the NBAPP thread
  */
@@ -84,6 +89,17 @@ enum conn_type_t {
  * @brief detected an error condition on the network channel (currently a tcp socket)
  */
 #define SBAPI_MSG_TYPE_ERR             (0x0306)
+
+/**
+ * @brief   Data structure to be send for setting (@ref SBAPI_MSG_TYPE_SET)
+ *          and getting (@ref SBAPI_MSG_TYPE_GET) options
+ */
+typedef struct {
+    sbapp_opt_t opt;               /**< the option to get/set */
+    uint16_t context;           /**< (optional) context for that option */
+    void *data;                 /**< data to set or buffer to read into */
+    uint16_t data_len;          /**< size of the data / the buffer */
+} sbapi_opt_t;
 
 
 /**
@@ -159,6 +175,15 @@ int sbapp_configure(int32_t options);
  * @brief set wifi credentials
  */
 void sbapp_set_security(const char* ssid, const char* password);
+
+
+/**
+ * @brief add a wifi profile
+ */
+int16_t sbapp_add_profile(const char* ssid, const char* pwd);
+
+
+int8_t sbapp_is_connected(uint16_t msec);
 
 /**
  * @brief connect to a TCP or UDP server

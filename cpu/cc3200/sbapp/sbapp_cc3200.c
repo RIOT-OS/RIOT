@@ -63,6 +63,7 @@ enum error_types {
 	WLAN_FILTERSET_ERR,
 	WLAN_POLICYSET_ERR,
 	WLAN_SET_ERR,
+	WLAN_CONNECTION_FAILED,
 	NET_CFGSET_ERR,
 	NET_SERVICECFG_ERR,
 	SMARTCONFIG_ERR,
@@ -76,6 +77,7 @@ const char* sl_err_descr[] = {
 		[SIMPLELINK_START_ERR ] = "failed to start sl task",
 		[WLAN_START_ERR ] = "failed to initialize sl device",
 		[WLAN_STOP_ERR ] = "failed to stop sl device",
+		[WLAN_CONNECTION_FAILED] = "wifi connection failed",
 		[WLAN_SETMODE_ERR ] = "failed to set wlan mode",
 		[WLAN_FILTERSET_ERR ] = "unable to set wlan filter",
 		[WLAN_POLICYSET_ERR ] = "wlan set policy failed",
@@ -617,9 +619,8 @@ long wifi_connect(void) {
 
 int sbapp_init(uint32_t options) {
 
-	msg_t m;
+	msg_t reply;
 	kernel_pid_t parent = thread_getpid();
-	int sts;
 
 	sbapp.options = options;
 
@@ -631,10 +632,9 @@ int sbapp_init(uint32_t options) {
 
 		// yield until ip connection is ready or an error condition prevents
 		// a successful connection
-	    sts = msg_receive(&m);
-	    if (sts == -1) {
-	        DEBUG("unexpected error: %d\n", sts);
-	        return sts;
+	    msg_receive(&reply);
+	    if ((int)reply.content.value < 0) {
+	        return (int)reply.content.value;
 	    }
 	}
 
@@ -849,8 +849,31 @@ int sbapp_sendto(sbh_t fd, void* data, size_t len, sockaddr_in addr) {
 	return sts;
 }
 
+int8_t sbapp_is_connected(uint16_t msec) {
+    uint32_t t1 = xtimer_now();
+    int32_t delta = 0;
 
-uint16_t static sbapp_add_profile(void) {
+    while (delta <= MSEC_TO_TICKS(msec) && !IS_IP_ACQUIRED(nwp.status) ) {
+        xtimer_usleep(MSEC_TO_TICKS(100));
+        delta = xtimer_now() - t1;
+
+    }
+    return IS_IP_ACQUIRED(nwp.status);
+}
+
+int16_t sbapp_add_profile(const char* ssid, const char* pwd) {
+    SlSecParams_t params;
+
+    params.Key = (signed char *)pwd;
+    params.KeyLen = strlen(pwd);
+    params.Type = SECURITY_TYPE;
+
+    return sl_WlanProfileAdd((signed char*) ssid, strlen(ssid), 0,
+                             &params, 0, 1, 0);
+
+}
+
+uint16_t static _sbapp_add_profile(void) {
     SlSecParams_t params;
 
     params.Key = (signed char *)sbapp.password;
@@ -862,6 +885,16 @@ uint16_t static sbapp_add_profile(void) {
                              &params, 0, 1, 0);
 }
 
+static void sbapi_eval_msg(sbapi_opt_t *cmd) {
+    switch (cmd->opt) {
+        case SBAPI_STATUS:
+            //nwp.role = sl_Start(0,0,0);
+            break;
+        default:
+            // TODO: do nothing at the moment
+            DEBUG("unexpected sbapi option/command\n");
+    }
+}
 
 static void *_event_loop(void *arg) {
 	kernel_pid_t parent_thr = *(kernel_pid_t *) arg;
@@ -883,11 +916,11 @@ static void *_event_loop(void *arg) {
 		PANIC(NAMESPACE, SIMPLELINK_START_ERR);
 	}
 
-	simplelink_to_default_state();
+	//simplelink_to_default_state();
 
 	xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(100));
 
-	//wifi_connect();
+	// start the simplelink device channel
 	nwp.role = sl_Start(NULL, NULL, NULL);
 
 	if (sbapp.options & SBAPI_DELETE_PROFILES) {
@@ -895,7 +928,7 @@ static void *_event_loop(void *arg) {
 	}
 
 	if (sbapp.ssid != NULL) {
-	    if (sbapp_add_profile() < 0) {
+	    if (_sbapp_add_profile() < 0) {
 	        DEBUG("add profile failed, try to go ahead\n");
 	    }
 	}
@@ -918,16 +951,24 @@ static void *_event_loop(void *arg) {
 			case AUTO_CONNECTION_TIME_SLOT:
 				if (counter == MAX_CONN_COUNTER_VAL) {
 					counter = 0;
-					LOG_INFO("Use Smart Config App to configure the device.\n");
-					//Connect Using Smart Config
-					if (smartconfig_connect() < 0) {
-						PANIC(NAMESPACE, SMARTCONFIG_ERR);
+					if (sbapp.options & SBAPI_SMARTCONFIG) {
+					    LOG_INFO("Use Smart Config App to configure the device.\n");
+					    //Connect Using Smart Config
+					    if (smartconfig_connect() < 0) {
+					        PANIC(NAMESPACE, SMARTCONFIG_ERR);
+					    }
+					    sbapp.sig_tim.callback = smartconfig_still_active;
+					    xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(200));
+					    LED_RED_TOGGLE;
+					    LED_YELLOW_OFF;
+					} else {
+					    // PANIC(NAMESPACE, WLAN_CONNECTION_FAILED);
+					    // TODO: send a FAILURE message
+					    SIGNAL(NAMESPACE, WLAN_CONNECTION_FAILED);
+		                msg.type = 0x1000;
+		                msg.content.value = SBAPI_CONNECTION_ERR;
+		                msg_send(&msg, parent_thr);
 					}
-
-					sbapp.sig_tim.callback = smartconfig_still_active;
-					xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(200));
-					LED_RED_TOGGLE;
-					LED_YELLOW_OFF;
 				} else if (!IS_IP_ACQUIRED(nwp.status)) {
 					counter++;
 					xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(100));
@@ -952,7 +993,10 @@ static void *_event_loop(void *arg) {
 				msg_send(&msg, parent_thr);
 				break;
 
-			case SBAPI_MSG_TYPE_SET:
+			case SBAPI_MSG_TYPE_SET: {
+			    sbapi_eval_msg((sbapi_opt_t *)msg.content.ptr);
+			    break;
+			}
 			case SBAPI_MSG_TYPE_GET:
 				msg_reply(&msg, &reply);
 				break;
