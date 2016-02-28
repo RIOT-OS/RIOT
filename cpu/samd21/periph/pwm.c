@@ -93,7 +93,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     int scale = 1;
     uint32_t f_real;
 
-    if (dev >= PWM_NUMOF) {
+    if ((unsigned int)dev >= PWM_NUMOF) {
         return 0;
     }
 
