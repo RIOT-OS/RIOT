@@ -72,8 +72,11 @@ void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t interval) {
     uint32_t last_wakeup_us = *last_wakeup;
 
     uint32_t target_us = last_wakeup_us + interval;
-    uint32_t now_ticks = _xtimer_now_ticks();
-    uint32_t now_us = _xtimer_ticks_to_us(now_ticks);
+    uint32_t now_short = 0;
+    uint32_t now_long = 0;
+    _xtimer_now_ticks64(&now_short, &now_long);
+    uint64_t now_ticks = ((uint64_t)now_long << 32) | now_short;
+    uint32_t now_us = _xtimer_ticks_to_us64(now_ticks);
     /* make sure we're not setting a value in the past */
     if (now_us < last_wakeup_us) {
         /* base timer overflowed between last_wakeup and now */

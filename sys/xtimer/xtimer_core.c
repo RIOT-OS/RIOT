@@ -32,7 +32,7 @@
 
 static volatile int _in_handler = 0;
 
-static volatile uint32_t _long_cnt = 0;
+volatile uint32_t _long_cnt = 0;
 #if XTIMER_MASK
 volatile uint32_t _high_cnt = 0;
 #endif
@@ -66,7 +66,7 @@ void xtimer_init(void)
     _lltimer_set(0xFFFFFFFF);
 }
 
-inline static void _xtimer_now_ticks64(uint32_t *short_term, uint32_t *long_term)
+void _xtimer_now_ticks64(uint32_t *short_term, uint32_t *long_term)
 {
     uint32_t before, after, long_value;
 

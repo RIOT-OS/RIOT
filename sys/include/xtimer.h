@@ -532,7 +532,18 @@ inline static uint32_t _xtimer_us_to_ticks_ceil(uint32_t us)
 #endif
 }
 
+/**
+ * @brief Long term counter
+ *
+ * This variable contains the upper 32 bits of the "now" tick count
+ */
+extern volatile uint32_t _long_cnt;
 #if XTIMER_MASK
+/**
+ * @brief High order bits of short term counter.
+ *
+ * This is only used when underlying hardware timer is less than 32 bits wide.
+ */
 extern volatile uint32_t _high_cnt;
 #endif
 
@@ -588,6 +599,17 @@ inline static uint32_t _xtimer_now_ticks(void) {
 }
 
 /**
+ * @brief Get both the short term and the long term ticks.
+ *
+ * This function will handle overflows to ensure that the short term and the
+ * long term ticks are synchronized before returning.
+ *
+ * @param[out] short_term  pointer to short term tick variable
+ * @param[out] long_term   pointer to long term tick variable
+ */
+void _xtimer_now_ticks64(uint32_t *short_term, uint32_t *long_term);
+
+/**
  * @brief drop bits of a value that don't fit into the low-level timer.
  */
 static inline uint32_t _lltimer_mask(uint32_t val)
@@ -597,7 +619,7 @@ static inline uint32_t _lltimer_mask(uint32_t val)
 
 static inline uint32_t xtimer_now(void)
 {
-    return _xtimer_ticks_to_us(_xtimer_now_ticks());
+    return (uint32_t)xtimer_now64();
 }
 
 void _xtimer_set_ticks(xtimer_t *timer, uint32_t offset);
