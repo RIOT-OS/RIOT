@@ -1,6 +1,3 @@
-ifeq (,$(filter prng_%,$(USEMODULE)))
-    USEMODULE += prng_mersenne
-endif
 ifneq (,$(filter prng_mersenne,$(USEMODULE)))
     SRC += mersenne.c
 endif
@@ -9,6 +6,10 @@ ifneq (,$(filter prng_minstd,$(USEMODULE)))
 endif
 ifneq (,$(filter prng_musl_lcg,$(USEMODULE)))
     SRC += musl_lcg.c
+endif
+ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
+    SRC += prng_tinymt32.c
+    DIRS += tinymt32
 endif
 
 include $(RIOTBASE)/Makefile.base

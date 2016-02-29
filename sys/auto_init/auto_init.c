@@ -80,6 +80,10 @@
 #include "net/fib.h"
 #endif
 
+#ifdef MODULE_TINYMT32
+#include "random.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -90,6 +94,9 @@ void auto_init(void)
     config_load();
 #endif
 
+#ifdef MODULE_TINYMT32
+    genrand_init(0);
+#endif
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();

@@ -430,3 +430,14 @@ endif
 ifneq (,$(filter ethos,$(USEMODULE)))
     USEMODULE += netdev2_eth
 endif
+
+ifneq (,$(filter random,$(USEMODULE)))
+    # select default prng
+    ifeq (,$(filter prng_%,$(USEMODULE)))
+        USEMODULE += prng_tinymt32
+    endif
+
+    ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
+        USEMODULE += tinymt32
+    endif
+endif
