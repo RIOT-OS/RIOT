@@ -30,6 +30,16 @@
 #include "periph/gpio.h"
 
 /**
+ * @brief   Get the OCR reg value from the gpio_mode_t value
+ */
+#define MODE_PCR_MASK       (0x23)
+
+/**
+ * @brief   This bit in the mode is set to 1 for output configuration
+ */
+#define MODE_OUT            (0x80)
+
+/**
  * @brief   Shifting a gpio_t value by this number of bit we can extract the
  *          port number from the GPIO base address
  */
@@ -161,24 +171,29 @@ static void ctx_clear(int port, int pin)
     write_map(port, pin, ctx);
 }
 
-int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
+int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     /* set pin to analog mode while configuring it */
     gpio_init_port(pin, GPIO_AF_ANALOG);
+
     /* set pin direction */
-    gpio(pin)->PDDR &= ~(1 << pin_num(pin));
-    gpio(pin)->PDDR |=  (dir << pin_num(pin));
-    if (dir == GPIO_DIR_OUT) {
+    if (mode & MODE_OUT) {
+        gpio(pin)->PDDR |=  (1 << pin_num(pin));
         gpio(pin)->PCOR = (1 << pin_num(pin));
     }
+    else {
+        gpio(pin)->PDDR &= ~(1 << pin_num(pin));
+    }
+
     /* enable GPIO function */
-    port(pin)->PCR[pin_num(pin)] = (GPIO_AF_GPIO | pullup);
+    port(pin)->PCR[pin_num(pin)] = (GPIO_AF_GPIO | (mode & MODE_PCR_MASK));
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                  gpio_cb_t cb, void *arg)
 {
-    if (gpio_init(pin, GPIO_DIR_IN, pullup) < 0) {
+    if (gpio_init(pin, mode) < 0) {
         return -1;
     }
 
