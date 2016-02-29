@@ -60,9 +60,9 @@ void board_init(void)
     int status;
 
     /* initialize the boards LEDs */
-    gpio_init(LED0_PIN, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(LED1_PIN, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(LED2_PIN, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(LED0_PIN, GPIO_OUT);
+    gpio_init(LED1_PIN, GPIO_OUT);
+    gpio_init(LED2_PIN, GPIO_OUT);
 
     /* Initialize power control pins */
     power_pins_init();
@@ -124,9 +124,9 @@ void board_init(void)
 
 static inline void power_pins_init(void)
 {
-    gpio_init(MULLE_POWER_AVDD, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(MULLE_POWER_VPERIPH, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(MULLE_POWER_VSEC, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(MULLE_POWER_AVDD, GPIO_OUT);
+    gpio_init(MULLE_POWER_VPERIPH, GPIO_OUT);
+    gpio_init(MULLE_POWER_VSEC, GPIO_OUT);
     gpio_clear(MULLE_POWER_AVDD);
     gpio_clear(MULLE_POWER_VPERIPH);
     gpio_clear(MULLE_POWER_VSEC);
