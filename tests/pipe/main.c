@@ -29,7 +29,6 @@
 #include <inttypes.h>
 
 #include "thread.h"
-#include "kernel.h"
 #include "pipe.h"
 #include "pipe.h"
 

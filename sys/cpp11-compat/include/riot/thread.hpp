@@ -26,7 +26,6 @@
 
 #include "time.h"
 #include "thread.h"
-#include "kernel_internal.h"
 
 #include <tuple>
 #include <atomic>

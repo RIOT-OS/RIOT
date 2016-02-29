@@ -18,8 +18,12 @@
 #include <stdint.h>
 #include <unistd.h>
 
+#ifdef __WITH_AVRLIBC__
+#include <stdio.h>  /* for fwrite() */
+#else
 /* work around broken sys/posix/unistd.h */
 ssize_t write(int fildes, const void *buf, size_t nbyte);
+#endif
 
 #include "fmt.h"
 

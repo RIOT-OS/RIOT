@@ -19,8 +19,10 @@
 #ifndef TESTS_CRYPTO_H_
 #define TESTS_CRYPTO_H_
 
+#include <stddef.h>
+#include <stdint.h>
+
 #include "embUnit.h"
-#include "kernel.h"
 
 #ifdef __cplusplus
 extern "C" {

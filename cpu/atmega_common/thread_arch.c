@@ -25,7 +25,6 @@
 #include "sched.h"
 #include "irq.h"
 #include "cpu.h"
-#include "kernel_internal.h"
 
 /*
  * local function declarations  (prefixed with __)

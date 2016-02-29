@@ -23,11 +23,12 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "cpu.h"
+#include "kernel_init.h"
 #include "board.h"
 #include "panic.h"
-#include "kernel_internal.h"
 #include "vectors_cortexm.h"
 
 /**

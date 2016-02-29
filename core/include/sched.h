@@ -81,6 +81,7 @@
 #define SCHEDULER_H
 
 #include <stddef.h>
+#include "attributes.h"
 #include "bitarithm.h"
 #include "tcb.h"
 #include "attributes.h"
@@ -164,6 +165,11 @@ extern volatile kernel_pid_t sched_active_pid;
  */
 extern clist_node_t *sched_runqueues[SCHED_PRIO_LEVELS];
 
+/**
+ * @brief  Removes thread from scheduler and set status to #STATUS_STOPPED
+ */
+NORETURN void sched_task_exit(void);
+
 #ifdef MODULE_SCHEDSTATISTICS
 /**
  *  Scheduler statistics
@@ -186,8 +192,7 @@ extern schedstat sched_pidlist[KERNEL_PID_LAST + 1];
  *  @param[in] callback The callback functions the will be called
  */
 void sched_register_cb(void (*callback)(uint32_t, uint32_t));
-
-#endif
+#endif /* MODULE_SCHEDSTATISTICS */
 
 #ifdef __cplusplus
 }

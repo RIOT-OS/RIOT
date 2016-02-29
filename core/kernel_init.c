@@ -21,13 +21,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <errno.h>
-#include "tcb.h"
-#include "kernel.h"
-#include "kernel_internal.h"
+#include "kernel_init.h"
 #include "sched.h"
-#include "cpu.h"
-#include "lpm.h"
 #include "thread.h"
+#include "lpm.h"
 #include "irq.h"
 #include "log.h"
 

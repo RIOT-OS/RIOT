@@ -10,7 +10,6 @@
 #include "cpu.h"
 #include "irq.h"
 #include "board.h"
-#include "kernel_internal.h"
 #include "msp430.h"
 #include "debug.h"
 #include "uart_stdio.h"

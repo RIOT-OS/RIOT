@@ -25,7 +25,6 @@
 
 #include <stdint.h>
 
-#include "kernel.h"
 #include "mutex.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"

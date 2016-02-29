@@ -23,7 +23,6 @@
 #include <stddef.h>
 #include <inttypes.h>
 #include <assert.h>
-#include "kernel.h"
 #include "sched.h"
 #include "msg.h"
 #include "priority_queue.h"
