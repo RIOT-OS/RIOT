@@ -64,6 +64,7 @@ extern "C" {
  * @brief xtimer configuration values
  * @{
  */
+#define XTIMER_HZ                   (250000ul)
 #define XTIMER_SHIFT                (2)
 #define XTIMER_SHIFT_ON_COMPARE     (8)
 #define XTIMER_BACKOFF              (40)

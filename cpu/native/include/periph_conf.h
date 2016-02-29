@@ -53,7 +53,6 @@
  * @{
  */
 #define XTIMER_OVERHEAD 14
-#define XTIMER_USLEEP_UNTIL_OVERHEAD 1
 
 /* timer_set_absolute() has a high margin for possible underflow if set with
  * value not far in the future. To prevent this, we set high backoff values
