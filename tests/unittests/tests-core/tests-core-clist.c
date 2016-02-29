@@ -16,7 +16,8 @@
 
 #define TEST_CLIST_LEN    (8)
 
-static clist_node_t tests_clist_buf[TEST_CLIST_LEN];
+static list_node_t tests_clist_buf[TEST_CLIST_LEN];
+static list_node_t test_clist;
 
 static void set_up(void)
 {
@@ -25,64 +26,70 @@ static void set_up(void)
 
 static void test_clist_add_one(void)
 {
-    clist_node_t *list = NULL, *elem = &(tests_clist_buf[0]);
+    list_node_t *elem = &(tests_clist_buf[0]);
+    list_node_t *list = &test_clist;
+    list->next = NULL;
 
-    clist_add(&list, elem);
+    clist_insert(list, elem);
 
-    TEST_ASSERT_NOT_NULL(list);
-    TEST_ASSERT(list->next == list);
+    TEST_ASSERT_NOT_NULL(list->next);
+    TEST_ASSERT(list->next->next == list->next);
 }
 
 static void test_clist_add_two(void)
 {
-    clist_node_t *list = &(tests_clist_buf[0]), *elem = &(tests_clist_buf[1]);
+    list_node_t *list = &test_clist;
+    list->next = NULL;
+
+    list_node_t *elem = &(tests_clist_buf[1]);
 
     test_clist_add_one();
 
-    clist_add(&list, elem);
+    clist_insert(list, elem);
 
-    TEST_ASSERT_NOT_NULL(list);
+    TEST_ASSERT_NOT_NULL(list->next);
     TEST_ASSERT(list->next == elem);
-    TEST_ASSERT(list->next->next == list);
+    TEST_ASSERT(list->next->next->next == list->next);
 }
 
-static void test_clist_remove_one(void)
+static void test_clist_remove_head(void)
 {
-    clist_node_t *list = &(tests_clist_buf[0]), *elem = &(tests_clist_buf[1]);
+    list_node_t *list = &test_clist;
 
     test_clist_add_two();
 
-    clist_remove(&list, elem);
+    clist_remove_head(list);
 
-    TEST_ASSERT_NOT_NULL(list);
-    TEST_ASSERT(list->next == list);
+    TEST_ASSERT_NOT_NULL(list->next);
+    TEST_ASSERT(list->next->next == &tests_clist_buf[1]);
 }
 
 static void test_clist_remove_two(void)
 {
-    clist_node_t *list = &(tests_clist_buf[0]), *elem = &(tests_clist_buf[1]);
+    list_node_t *list = &test_clist;
 
     test_clist_add_two();
 
-    clist_remove(&list, elem);
-    clist_remove(&list, list);
+    clist_remove_head(list);
+    clist_remove_head(list);
 
-    TEST_ASSERT_NULL(list);
+    TEST_ASSERT_NULL(list->next);
 }
 
 static void test_clist_advance(void)
 {
-    clist_node_t *list = &(tests_clist_buf[0]);
+    list_node_t *list = &test_clist;
+    list->next = NULL;
 
     test_clist_add_two();
 
-    clist_advance(&list);
+    clist_advance(list);
 
-    TEST_ASSERT(list == &(tests_clist_buf[1]));
+    TEST_ASSERT(list->next->next == &tests_clist_buf[1]);
 
-    clist_advance(&list);
+    clist_advance(list);
 
-    TEST_ASSERT(list == &(tests_clist_buf[0]));
+    TEST_ASSERT(list->next->next == &tests_clist_buf[0]);
 }
 
 Test *tests_core_clist_tests(void)
@@ -90,7 +97,7 @@ Test *tests_core_clist_tests(void)
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_clist_add_one),
         new_TestFixture(test_clist_add_two),
-        new_TestFixture(test_clist_remove_one),
+        new_TestFixture(test_clist_remove_head),
         new_TestFixture(test_clist_remove_two),
         new_TestFixture(test_clist_advance),
     };
