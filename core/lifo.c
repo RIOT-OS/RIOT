@@ -47,8 +47,8 @@ void lifo_insert(int *array, int i)
     }
 #endif
 
-    array[index] = array[0];
-    array[0] = i;
+    array[index]    = array[0];
+    array[0]        = i;
 }
 
 int lifo_get(int *array)
@@ -63,7 +63,7 @@ int lifo_get(int *array)
 #ifdef DEVELHELP
     /* make sure a double insert does not result in an infinite
      * resource of values */
-    array[head+1] = -1;
+    array[head + 1] = -1;
 #endif
 
     DEBUG("lifo_get: returning %i\n", head);

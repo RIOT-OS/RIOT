@@ -47,7 +47,7 @@ volatile int lpm_prevent_sleep = 0;
 extern int main(void);
 static void *main_trampoline(void *arg)
 {
-    (void) arg;
+    (void)arg;
 
 #ifdef MODULE_AUTO_INIT
     auto_init();
@@ -66,7 +66,7 @@ static void *main_trampoline(void *arg)
 
 static void *idle_thread(void *arg)
 {
-    (void) arg;
+    (void)arg;
 
     while (1) {
         if (lpm_prevent_sleep) {
@@ -90,17 +90,17 @@ static char idle_stack[THREAD_STACKSIZE_IDLE];
 
 void kernel_init(void)
 {
-    (void) disableIRQ();
+    disableIRQ();
 
     thread_create(idle_stack, sizeof(idle_stack),
-            THREAD_PRIORITY_IDLE,
-            THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
-            idle_thread, NULL, idle_name);
+                  THREAD_PRIORITY_IDLE,
+                  THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                  idle_thread, NULL, idle_name);
 
     thread_create(main_stack, sizeof(main_stack),
-            THREAD_PRIORITY_MAIN,
-            THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
-            main_trampoline, NULL, main_name);
+                  THREAD_PRIORITY_MAIN,
+                  THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                  main_trampoline, NULL, main_name);
 
     cpu_switch_context_exit();
 }

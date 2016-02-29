@@ -39,7 +39,7 @@ extern "C" {
  */
 typedef union __attribute__((packed)) {
     uint16_t    u16;    /**< 16 bit representation */
-    uint8_t      u8[2]; /**< 8 bit representation */
+    uint8_t     u8[2];  /**< 8 bit representation */
 } le_uint16_t;
 
 /**
@@ -49,7 +49,7 @@ typedef union __attribute__((packed)) {
  */
 typedef union __attribute__((packed)) {
     uint32_t    u32;    /**< 32 bit representation */
-    uint8_t      u8[4]; /**< 8 bit representation */
+    uint8_t     u8[4];  /**< 8 bit representation */
     uint16_t    u16[2]; /**< 16 bit representation */
     le_uint16_t l16[2]; /**< little endian 16 bit representation */
 } le_uint32_t;
@@ -61,7 +61,7 @@ typedef union __attribute__((packed)) {
  */
 typedef union __attribute__((packed)) {
     uint64_t    u64;    /**< 64 bit representation */
-    uint8_t      u8[8]; /**< 8 bit representation */
+    uint8_t     u8[8];  /**< 8 bit representation */
     uint16_t    u16[4]; /**< 16 bit representation */
     uint32_t    u32[2]; /**< 32 bit representation */
     le_uint16_t l16[4]; /**< little endian 16 bit representation */
@@ -75,7 +75,7 @@ typedef union __attribute__((packed)) {
  */
 typedef union __attribute__((packed)) {
     uint16_t    u16;    /**< 16 bit representation */
-    uint8_t      u8[2]; /**< 8 bit representation */
+    uint8_t     u8[2];  /**< 8 bit representation */
 } be_uint16_t;
 
 /**
@@ -85,7 +85,7 @@ typedef union __attribute__((packed)) {
  */
 typedef union __attribute__((packed)) {
     uint32_t    u32;    /**< 32 bit representation */
-    uint8_t      u8[4]; /**< 8 bit representation */
+    uint8_t     u8[4];  /**< 8 bit representation */
     uint16_t    u16[2]; /**< 16 bit representation */
     be_uint16_t b16[2]; /**< big endian 16 bit representation */
 } be_uint32_t;
@@ -97,7 +97,7 @@ typedef union __attribute__((packed)) {
  */
 typedef union __attribute__((packed)) {
     uint64_t    u64;    /**< 64 bit representation */
-    uint8_t      u8[8]; /**< 8 bit representation */
+    uint8_t     u8[8];  /**< 8 bit representation */
     uint16_t    u16[4]; /**< 16 bit representation */
     uint32_t    u32[2]; /**< 32 bit representation */
     be_uint16_t b16[4]; /**< big endian 16 bit representation */
@@ -278,7 +278,7 @@ static inline uint64_t NTOHLL(uint64_t v);
 #ifdef HAVE_NO_BUILTIN_BSWAP16
 static inline unsigned short __builtin_bswap16(unsigned short a)
 {
-    return (a<<8)|(a>>8);
+    return (a << 8) | (a >> 8);
 }
 #endif
 
@@ -288,7 +288,7 @@ static inline uint16_t byteorder_swaps(uint16_t v)
     return __builtin_bswap16(v);
 #else
     network_uint16_t result = { v };
-    uint8_t tmp = result.u8[0];
+    uint8_t          tmp    = result.u8[0];
     result.u8[0] = result.u8[1];
     result.u8[1] = tmp;
     return result.u16;
@@ -308,36 +308,42 @@ static inline uint64_t byteorder_swapll(uint64_t v)
 static inline be_uint16_t byteorder_ltobs(le_uint16_t v)
 {
     be_uint16_t result = { byteorder_swaps(v.u16) };
+
     return result;
 }
 
 static inline be_uint32_t byteorder_ltobl(le_uint32_t v)
 {
     be_uint32_t result = { byteorder_swapl(v.u32) };
+
     return result;
 }
 
 static inline be_uint64_t byteorder_ltobll(le_uint64_t v)
 {
     be_uint64_t result = { byteorder_swapll(v.u64) };
+
     return result;
 }
 
 static inline le_uint16_t byteorder_btols(be_uint16_t v)
 {
     le_uint16_t result = { byteorder_swaps(v.u16) };
+
     return result;
 }
 
 static inline le_uint32_t byteorder_btoll(be_uint32_t v)
 {
     le_uint32_t result = { byteorder_swapl(v.u32) };
+
     return result;
 }
 
 static inline le_uint64_t byteorder_btolll(be_uint64_t v)
 {
     le_uint64_t result = { byteorder_swapll(v.u64) };
+
     return result;
 }
 
@@ -345,7 +351,7 @@ static inline le_uint64_t byteorder_btolll(be_uint64_t v)
  * @brief Swaps the byteorder according to the endianess
  */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#   define _byteorder_swap(V, T) (byteorder_swap##T((V)))
+#   define _byteorder_swap(V, T) (byteorder_swap ## T((V)))
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #   define _byteorder_swap(V, T) (V)
 #else
@@ -355,18 +361,21 @@ static inline le_uint64_t byteorder_btolll(be_uint64_t v)
 static inline network_uint16_t byteorder_htons(uint16_t v)
 {
     network_uint16_t result = { _byteorder_swap(v, s) };
+
     return result;
 }
 
 static inline network_uint32_t byteorder_htonl(uint32_t v)
 {
     network_uint32_t result = { _byteorder_swap(v, l) };
+
     return result;
 }
 
 static inline network_uint64_t byteorder_htonll(uint64_t v)
 {
     network_uint64_t result = { _byteorder_swap(v, ll) };
+
     return result;
 }
 
@@ -403,18 +412,21 @@ static inline uint64_t HTONLL(uint64_t v)
 static inline uint16_t NTOHS(uint16_t v)
 {
     network_uint16_t input = { v };
+
     return byteorder_ntohs(input);
 }
 
 static inline uint32_t NTOHL(uint32_t v)
 {
     network_uint32_t input = { v };
+
     return byteorder_ntohl(input);
 }
 
 static inline uint64_t NTOHLL(uint64_t v)
 {
     network_uint64_t input = { v };
+
     return byteorder_ntohll(input);
 }
 

@@ -44,7 +44,7 @@ extern const char assert_crash_message[];
  */
 
 #ifdef NDEBUG
-#define assert(ignore)((void) 0)
+#define assert(ignore)((void)0)
 #else
 #define assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, assert_crash_message))
 #endif

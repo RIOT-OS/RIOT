@@ -36,7 +36,7 @@
 #       ifdef _POSIX_SSIZE_MAX
 #           define SSIZE_MAX _POSIX_SSIZE_MAX
 #       else
-#           define SSIZE_MAX ((ssize_t) (SIZE_MAX / 2))
+#           define SSIZE_MAX ((ssize_t)(SIZE_MAX / 2))
 #       endif
 #   endif
 
@@ -46,7 +46,7 @@
 #endif
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**

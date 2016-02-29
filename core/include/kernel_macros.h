@@ -40,21 +40,21 @@ extern "C" {
  */
 #if __STDC_VERSION__ >= 201112L
 #   define container_of(PTR, TYPE, MEMBER) \
-        (_Generic((PTR), \
-            const __typeof__ (((TYPE *) 0)->MEMBER) *: \
-                ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER))), \
-            __typeof__ (((TYPE *) 0)->MEMBER) *: \
-                ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER))) \
-        ))
+    (_Generic((PTR), \
+              const __typeof__(((TYPE *)0)->MEMBER) * : \
+              ((TYPE *)((char *)(PTR)-offsetof(TYPE, MEMBER))), \
+              __typeof__(((TYPE *)0)->MEMBER) * : \
+              ((TYPE *)((char *)(PTR)-offsetof(TYPE, MEMBER))) \
+              ))
 #elif defined __GNUC__
 #   define container_of(PTR, TYPE, MEMBER) \
-        (__extension__ ({ \
-            __extension__ const __typeof__ (((TYPE *) 0)->MEMBER) *__m____ = (PTR); \
-            ((TYPE *) ((char *) __m____ - offsetof(TYPE, MEMBER))); \
-        }))
+    (__extension__({ \
+                       __extension__ const __typeof__(((TYPE *)0)->MEMBER) *__m____ = (PTR); \
+                       ((TYPE *)((char *)__m____ - offsetof(TYPE, MEMBER))); \
+                   }))
 #else
 #   define container_of(PTR, TYPE, MEMBER) \
-        ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER)))
+        ((TYPE *)((char *)(PTR) - offsetof(TYPE, MEMBER)))
 #endif
 
 #ifdef __cplusplus

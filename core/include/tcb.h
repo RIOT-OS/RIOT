@@ -27,7 +27,7 @@
 #include "msg.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -50,7 +50,7 @@
  * @brief These have to be on a run queue.
  * @{*/
 #define STATUS_ON_RUNQUEUE      STATUS_RUNNING  /**< to check if on run queue:
-                                                 `st >= STATUS_ON_RUNQUEUE`             */
+                                                   `st >= STATUS_ON_RUNQUEUE`             */
 #define STATUS_RUNNING          6               /**< currently running                  */
 #define STATUS_PENDING          7               /**< waiting to be scheduled to run     */
 /** @} */
@@ -60,19 +60,19 @@
  * @brief @c tcb_t holds thread's context data.
  */
 typedef struct tcb_t {
-    char *sp;                   /**< thread's stack pointer         */
-    uint16_t status;            /**< thread's status                */
+    char *sp;                       /**< thread's stack pointer         */
+    uint16_t status;                /**< thread's status                */
 
-    kernel_pid_t pid;           /**< thread's process id            */
-    uint16_t priority;          /**< thread's priority              */
+    kernel_pid_t pid;               /**< thread's process id            */
+    uint16_t priority;              /**< thread's priority              */
 
-    clist_node_t rq_entry;      /**< run queue entry                */
+    clist_node_t rq_entry;          /**< run queue entry                */
 
-    void *wait_data;            /**< holding messages               */
+    void *wait_data;                /**< holding messages               */
     priority_queue_t msg_waiters;   /**< threads waiting on message     */
 
-    cib_t msg_queue;            /**< message queue                  */
-    msg_t *msg_array;           /**< memory holding messages        */
+    cib_t msg_queue;                /**< message queue                  */
+    msg_t *msg_array;               /**< memory holding messages        */
 
 #if defined DEVELHELP || defined(SCHED_TEST_STACK)
     char *stack_start;          /**< thread's stack start address   */

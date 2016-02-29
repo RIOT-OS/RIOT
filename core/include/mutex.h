@@ -25,7 +25,7 @@
 #include "atomic.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -62,6 +62,7 @@ typedef struct mutex_t {
 static inline void mutex_init(mutex_t *mutex)
 {
     mutex_t empty_mutex = MUTEX_INIT;
+
     *mutex = empty_mutex;
 }
 
