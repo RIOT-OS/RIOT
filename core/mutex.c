@@ -89,7 +89,7 @@ void mutex_unlock(mutex_t *mutex)
         return;
     }
 
-    list_node_t *next = (list_node_t*) list_remove_head(&mutex->queue);
+    list_node_t *next = list_remove_head(&mutex->queue);
 
     thread_t *process = container_of((clist_node_t*)next, thread_t, rq_entry);
 

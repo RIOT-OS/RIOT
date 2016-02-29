@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,6 +14,14 @@
  * @file
  * @brief       Circular linked list
  *
+ * This file contains a circularly linked list implementation.
+ *
+ * clist_insert(), clist_remove_head() and clist_advance() take constant time.
+ *
+ * Each list is represented as a "clist_node_t". It's only member, the "next"
+ * pointer, points to the last entry in the list, whose "next" pointer points to
+ * the first entry.
+ *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
@@ -20,51 +29,67 @@
 #define CLIST_H
 
 #include "kernel_defines.h"
+#include "list.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
 /**
- * @def         clist_get_container(NODE, TYPE, MEMBER)
- * @brief       Returns the container of the circular list
- * @details     For a struct `TYPE` with a member `MEMBER`, which is a `clist_node_t`,
- *              given a pointer `NODE` to `TYPE::MEMBER` this function returns a pointer
- *              to the instance of `TYPE`.
- * @details     E.g. for `struct my_struct_t { ...; clist_node_t n; ... } my_struct;`,
- *              `&my_struct == clist_get_container(&my_struct.n, struct my_struct_t, n)`.
- * @param[in]   NODE     pointer to a member
- * @param[in]   TYPE     a type name (a struct or union), container of NODE
- * @param[in]   MEMBER   name of the member of TYPE which NODE points to
- * @return      Pointer to the container of NODE.
- */
-#define clist_get_container(NODE, TYPE, MEMBER) container_of(NODE, TYPE, MEMBER)
-
-/**
- * @brief Structure representing a node in the clist.
- */
-typedef struct clist_node_t {
-    struct clist_node_t *next;  /**< pointer to next node         */
-    struct clist_node_t *prev;  /**< pointer to the previous node */
-} clist_node_t;
-
-/**
- * @brief Inserts *new_node* after *node* into list
+ * @brief List node structure
  *
- * @param[in,out]   node        Node after which *new_node* gets inserted
- * @param[in,out]   new_node    Node which gets inserted after *node*.
+ * Used as is as reference to a list.
+ *
+ * clist stores a pointer to the last element of a list.  That way, both
+ * appending to end of list and removing head can be done in constant time.
+ *
+ * Actual list objects should have a @c clist_node_t as member and then use
+ * the container_of() macro in list operations.
+ * See @ref thread_add_to_list() as example.
+ */
+typedef list_node_t clist_node_t;
+
+/**
+ * @brief inserts *new_node* into *list*
+ *
+ * @param[in,out]   list        Ptr to clist
+ * @param[in,out]   new_node    Node which gets inserted.
  *                              Must not be NULL.
  */
-void clist_add(clist_node_t **node, clist_node_t *new_node);
+static inline void clist_insert(clist_node_t *list, clist_node_t *new_node)
+{
+    if (list->next) {
+        new_node->next = list->next->next;
+        list->next->next = new_node;
+    }
+    else {
+        new_node->next = new_node;
+    }
+    list->next = new_node;
+}
 
 /**
- * @brief Removes *node* from list
+ * @brief Removes and returns first element from list
  *
- * @param[in,out]   list        Pointer to the *list* to remove *node* from.
- * @param[in]       node        Node to remove from *list*
- *                              Must not be NULL.
+ * @param[in,out]   list        Pointer to the *list* to remove first element
+ *                              from.
  */
-void clist_remove(clist_node_t **list, clist_node_t *node);
+static inline clist_node_t *clist_remove_head(clist_node_t *list)
+{
+    if (list->next) {
+        clist_node_t *first = list->next->next;
+        if (list->next == first) {
+            list->next = NULL;
+        }
+        else {
+            list->next->next = first->next;
+        }
+        return first;
+    }
+    else {
+        return NULL;
+    }
+}
 
 /**
  * @brief Advances the circle list.
@@ -75,9 +100,11 @@ void clist_remove(clist_node_t **list, clist_node_t *node);
  *
  * @param[in,out]   list        The list to work upon.
  */
-static inline void clist_advance(clist_node_t **list)
+static inline void clist_advance(clist_node_t *list)
 {
-    *list = (*list)->next;
+    if (list->next) {
+        list->next = list->next->next;
+    }
 }
 
 #if ENABLE_DEBUG

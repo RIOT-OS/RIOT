@@ -224,7 +224,6 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     cb->status = 0;
 
     cb->rq_entry.next = NULL;
-    cb->rq_entry.prev = NULL;
 
     cb->wait_data = NULL;
 
