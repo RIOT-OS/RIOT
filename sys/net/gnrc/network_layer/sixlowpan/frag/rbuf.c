@@ -29,8 +29,17 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+/* estimated fragment payload size to determinate RBUF_INT_SIZE, default to
+ * MAC payload size - fragment header. */
+#ifndef GNRC_SIXLOWPAN_FRAG_SIZE
+/* assuming 64-bit source/destination address, source PAN ID omitted */
+#define GNRC_SIXLOWPAN_FRAG_SIZE (104 - 5)
+#endif
+
 #ifndef RBUF_INT_SIZE
-#define RBUF_INT_SIZE   (GNRC_IPV6_NETIF_DEFAULT_MTU * RBUF_SIZE / 127)
+/* same as ((int) ceil((double) N / D)) */
+#define DIV_CEIL(N, D) (((N) + (D) - 1) / (D))
+#define RBUF_INT_SIZE (DIV_CEIL(GNRC_IPV6_NETIF_DEFAULT_MTU, GNRC_SIXLOWPAN_FRAG_SIZE) * RBUF_SIZE)
 #endif
 
 static rbuf_int_t rbuf_int[RBUF_INT_SIZE];
