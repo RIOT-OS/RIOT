@@ -33,8 +33,8 @@ int main(void)
 
     P(sp);
     P(status);
-    P(pid);
     P(priority);
+    P(pid);
     P(rq_entry);
     P(wait_data);
     P(msg_waiters);
