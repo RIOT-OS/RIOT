@@ -58,6 +58,12 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
+ * @name Real time counter configuration
+ * @{
+ */
+#define RTC_NUMOF           (1U)
+
+/**
  * @brief UART configuration
  */
 #define UART_NUMOF          (1U)
