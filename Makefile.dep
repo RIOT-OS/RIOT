@@ -310,6 +310,10 @@ ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter mbox,$(USEMODULE)))
+  USEMODULE += sema
+endif
+
 ifneq (,$(filter sema,$(USEMODULE)))
   USEMODULE += xtimer
 endif
