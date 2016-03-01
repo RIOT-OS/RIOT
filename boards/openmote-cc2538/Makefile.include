@@ -6,17 +6,11 @@ export CPU_MODEL = cc2538sf53
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbserial-* | head -n 1)
 
-#
-export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
-export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
-export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
-
-export OFLAGS = -O binary
-export HEXFILE = $(ELFFILE:.elf=.bin)
-export FFLAGS = $(BINDIR) $(HEXFILE)
-export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
-export RESET_FLAGS = $(BINDIR)
+# setup JLink for flashing
+export JLINK_DEVICE := cc2538sf53
+export JLINK_FLASH_ADDR := 200000
+export JLINK_IF := JTAG
+include $(RIOTBOARD)/Makefile.include.jlink
 
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
