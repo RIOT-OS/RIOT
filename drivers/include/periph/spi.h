@@ -55,9 +55,11 @@ typedef enum {
 } spi_t;
 
 /**
- * @brief The SPI mode is defined by the four possible combinations of clock polarity and
- *        clock phase.
+ * @brief The SPI mode is defined by the four possible combinations of clock
+ *        polarity and clock phase.
+ * @{
  */
+#ifndef HAVE_SPI_CONF_T
 typedef enum {
     /**
      * The first data bit is sampled by the receiver on the first SCK edge. The
@@ -84,13 +86,17 @@ typedef enum {
      */
     SPI_CONF_SECOND_FALLING = 3
 } spi_conf_t;
+#endif
+/** @} */
 
 /**
  * @brief Define a set of pre-defined SPI clock speeds.
  *
  * The actual speed of the bus can vary to some extend, as the combination of CPU clock and
  * available prescale values on certain platforms may not make the exact values possible.
+ * @{
  */
+#ifndef HAVE_SPI_SPEED_T
 typedef enum {
     SPI_SPEED_100KHZ = 0,       /**< drive the SPI bus with 100KHz */
     SPI_SPEED_400KHZ,           /**< drive the SPI bus with 400KHz */
@@ -98,6 +104,8 @@ typedef enum {
     SPI_SPEED_5MHZ,             /**< drive the SPI bus with 5MHz */
     SPI_SPEED_10MHZ             /**< drive the SPI bus with 10MHz */
 } spi_speed_t;
+#endif
+/** @} */
 
 /**
  * @brief Initialize the given SPI device to work in master mode
