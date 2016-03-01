@@ -48,31 +48,12 @@ static uint8_t byte2bcd(uint8_t value);
 
 /**
  * @brief Initializes the RTC to use LSE (external 32.768 kHz oscillator) as a
- * clocl source. Verify that your board has this oscillator. If other clock
+ * clock source. Verify that your board has this oscillator. If other clock
  * source is used, then also the prescaler constants should be changed.
  */
 void rtc_init(void)
 {
-    /* Enable write access to RTC registers */
-    RCC->APB1ENR |= RCC_APB1ENR_PWREN;
-    PWR->CR |= PWR_CR_DBP;
-
-    /* Reset RTC domain */
-    RCC->CSR |= RCC_CSR_RTCRST;
-    RCC->CSR &= ~(RCC_CSR_RTCRST);
-
-    /* Enable the LSE clock (external 32.768 kHz oscillator) */
-    RCC->CSR &= ~(RCC_CSR_LSEON);
-    RCC->CSR &= ~(RCC_CSR_LSEBYP);
-    RCC->CSR |= RCC_CSR_LSEON;
-    while ( (RCC->CSR & RCC_CSR_LSERDY) == 0 );
-
-    /* Switch RTC to LSE clock source */
-    RCC->CSR &= ~(RCC_CSR_RTCSEL);
-    RCC->CSR |= RCC_CSR_RTCSEL_LSE;
-
-    /* Enable the RTC */
-    RCC->CSR |= RCC_CSR_RTCEN;
+    rtc_poweron();
 
     /* Unlock RTC write protection */
     RTC->WPR = RTC_WRITE_PROTECTION_KEY1;
@@ -211,7 +192,26 @@ void rtc_clear_alarm(void)
 
 void rtc_poweron(void)
 {
-    /* RTC on STM32L1 is online even on sleep modes. No need to power on. */
+    /* Enable write access to RTC registers */
+    RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+    PWR->CR |= PWR_CR_DBP;
+
+    /* Reset RTC domain */
+    RCC->CSR |= RCC_CSR_RTCRST;
+    RCC->CSR &= ~(RCC_CSR_RTCRST);
+
+    /* Enable the LSE clock (external 32.768 kHz oscillator) */
+    RCC->CSR &= ~(RCC_CSR_LSEON);
+    RCC->CSR &= ~(RCC_CSR_LSEBYP);
+    RCC->CSR |= RCC_CSR_LSEON;
+    while ( (RCC->CSR & RCC_CSR_LSERDY) == 0 );
+
+    /* Switch RTC to LSE clock source */
+    RCC->CSR &= ~(RCC_CSR_RTCSEL);
+    RCC->CSR |= RCC_CSR_RTCSEL_LSE;
+
+    /* Enable the RTC */
+    RCC->CSR |= RCC_CSR_RTCEN;
 }
 
 void rtc_poweroff(void)
