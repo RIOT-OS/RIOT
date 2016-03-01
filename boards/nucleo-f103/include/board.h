@@ -36,6 +36,13 @@ extern "C" {
 #define STDIO               UART_DEV(1)
 
 /**
+ * @name xtimer configuration
+ */
+#define XTIMER_MASK         (0xffff0000)
+#define XTIMER_BACKOFF      5
+/** @} */
+
+/**
  * @name LED pin definitions
  * @{
  */
@@ -64,17 +71,6 @@ extern "C" {
  * @{
  */
 #define BUTTON_USER_GPIO    GPIO_PIN(PORT_C, 13)
-/** @} */
-
-/**
- * @name xtimer configuration
- * @{
- */
-#define XTIMER              TIMER_0
-#define XTIMER_CHAN         0
-#define XTIMER_SHIFT        0
-#define XTIMER_MASK         0 /* llt 32-bit since combined */
-#define XTIMER_BACKOFF      5
 /** @} */
 
 /**
