@@ -1,6 +1,6 @@
 PKG_NAME=ccn-lite
-PKG_URL=https://github.com/cn-uofbasel/ccn-lite/
-PKG_VERSION=57be9b1985dc501b26f861b24448b54db37f73f1
+PKG_URL=https://github.com/OlegHahm/ccn-lite/
+PKG_VERSION=39b1406c11de9de364220909488eebabe7e81613
 PKG_DIR=$(CURDIR)/$(PKG_NAME)
 
 ifneq ($(RIOTBOARD),)

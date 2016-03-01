@@ -364,7 +364,7 @@ int _tftp_init_ctxt(ipv6_addr_t *addr, const char *file_name,
 
     /* generate a random source UDP source port */
     do {
-        ctxt->src_port = (genrand_uint32() & 0xff) + GNRC_TFTP_DEFAULT_SRC_PORT;
+        ctxt->src_port = (random_uint32() & 0xff) + GNRC_TFTP_DEFAULT_SRC_PORT;
     } while (gnrc_netreg_num(GNRC_NETTYPE_UDP, ctxt->src_port));
 
     return TS_FINISHED;

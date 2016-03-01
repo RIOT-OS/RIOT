@@ -55,7 +55,7 @@ int rand_minstd(void)
     return _seed;
 }
 
-uint32_t genrand_uint32(void)
+uint32_t random_uint32(void)
 {
     /* minstd as implemented returns only values from 1 to 2147483647,
      * so run it two times to get 32bits */
@@ -64,7 +64,7 @@ uint32_t genrand_uint32(void)
     return  (((uint32_t)A) << 16) | B;
 }
 
-void genrand_init(uint32_t val)
+void random_init(uint32_t val)
 {
     if (!val) {
         val = 1;

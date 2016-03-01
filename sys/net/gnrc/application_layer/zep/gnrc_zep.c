@@ -153,7 +153,7 @@ kernel_pid_t gnrc_zep_init(gnrc_zep_t *dev, uint16_t src_port, ipv6_addr_t *dst,
     dev->proto = GNRC_NETTYPE_UNDEF;
 #endif
 
-    dev->seq = genrand_uint32();
+    dev->seq = random_uint32();
     dev->src_port = src_port;
     dev->dst.u64[0] = dst->u64[0];
     dev->dst.u64[1] = dst->u64[1];

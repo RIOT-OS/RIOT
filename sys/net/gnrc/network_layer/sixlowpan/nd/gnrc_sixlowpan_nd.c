@@ -37,7 +37,7 @@ static inline void _rtr_sol_reschedule(gnrc_ipv6_netif_t *iface, uint32_t sec_de
 
 static inline uint32_t _binary_exp_backoff(uint32_t base_sec, unsigned int exp)
 {
-    return genrand_uint32_range(0, (1 << exp)) * base_sec;
+    return random_uint32_range(0, (1 << exp)) * base_sec;
 }
 
 static inline void _revert_iid(uint8_t *iid)

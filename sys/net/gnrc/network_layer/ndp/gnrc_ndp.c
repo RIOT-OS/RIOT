@@ -432,7 +432,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                 ms = GNRC_SIXLOWPAN_ND_MAX_RTR_ADV_DELAY;
             }
 #endif
-            delay = genrand_uint32_range(0, ms);
+            delay = random_uint32_range(0, ms);
             xtimer_remove(&if_entry->rtr_adv_timer);
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
             /* in case of a 6LBR we have to check if the interface is actually
@@ -471,7 +471,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 
 static inline void _set_reach_time(gnrc_ipv6_netif_t *if_entry, uint32_t mean)
 {
-    uint32_t reach_time = genrand_uint32_range(GNRC_NDP_MIN_RAND, GNRC_NDP_MAX_RAND);
+    uint32_t reach_time = random_uint32_range(GNRC_NDP_MIN_RAND, GNRC_NDP_MAX_RAND);
 
     if_entry->reach_time_base = mean;
     /* to avoid floating point number computation and have higher value entropy, the

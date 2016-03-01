@@ -198,7 +198,7 @@ static int _implicit_bind(socket_t *s, void *addr)
     int res;
 
     /* TODO: ensure that this port hasn't been used yet */
-    s->src_port = (uint16_t)genrand_uint32_range(1LU << 10U, 1LU << 16U);
+    s->src_port = (uint16_t)random_uint32_range(1LU << 10U, 1LU << 16U);
 
     /* find the best matching source address */
     if ((best_match = conn_find_best_source(addr)) == NULL) {
