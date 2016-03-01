@@ -53,7 +53,6 @@ static uint8_t byte2bcd(uint8_t value);
  */
 void rtc_init(void)
 {
-
     /* Enable write access to RTC registers */
     RCC->APB1ENR |= RCC_APB1ENR_PWREN;
     PWR->CR |= PWR_CR_DBP;
@@ -98,7 +97,6 @@ void rtc_init(void)
 
     /* Enable RTC write protection */
     RTC->WPR = 0xff;
-
 }
 
 int rtc_set_time(struct tm *time)
@@ -233,7 +231,6 @@ void rtc_poweroff(void)
 
 void isr_rtc_alarm(void)
 {
-
     if ((RTC->ISR & RTC_ISR_ALRAF) && (rtc_callback.cb != NULL)) {
         rtc_callback.cb(rtc_callback.arg);
         RTC->ISR &= ~RTC_ISR_ALRAF;
