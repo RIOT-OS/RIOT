@@ -144,6 +144,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 
     uint64_t scaled_value = timeout;
     scaled_value *= RCOSC16M_FREQ;
+    scaled_value += config_freq[dev] / 2;
     scaled_value /= config_freq[dev];
     gptimer->TAMATCHR = gptimer->TAV + scaled_value;
 
@@ -192,6 +193,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
     uint64_t scaled_value = value;
     scaled_value *= config_freq[dev];
+    scaled_value += RCOSC16M_FREQ / 2;
     scaled_value /= RCOSC16M_FREQ;
     gptimer->TAMATCHR = (scaled_value > UINT32_MAX)? UINT32_MAX : scaled_value;
 
