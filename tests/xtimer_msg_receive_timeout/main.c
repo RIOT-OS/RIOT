@@ -45,7 +45,7 @@ int main(void)
             printf("Message received: %" PRIu16 "\n", m.type);
         }
         offset = (offset < 0) ? 1000 : -1000;
+        xtimer_remove(&t);
     }
-    xtimer_remove(&t);
     return 0;
 }
