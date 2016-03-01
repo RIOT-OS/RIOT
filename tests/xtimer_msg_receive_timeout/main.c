@@ -13,6 +13,12 @@
  * @file
  * @brief       test application for xtimer_msg_receive_timeout()
  *
+ *              This test will start sequentially start 10 xtimers to send a
+ *              IPC msg, alternating with an interval of 900ms and 1100ms
+ *              respectively. Everytime a timer was set, it will wait for a
+ *              message for at most 1000ms. This should succeed and fail in an
+ *              alternating manner.
+ *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  *
  * @}
