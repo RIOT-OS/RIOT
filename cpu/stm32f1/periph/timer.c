@@ -36,16 +36,12 @@
 
 static inline void irq_handler(tim_t timer, TIM_TypeDef *dev0, TIM_TypeDef *dev1);
 
-typedef struct {
-    void (*cb)(int);
-} timer_conf_t;
-
 /**
  * Timer state memory
  */
-static timer_conf_t config[TIMER_NUMOF];
+static timer_isr_ctx_t config[TIMER_NUMOF];
 
-int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     TIM_TypeDef *timer0;
     TIM_TypeDef *timer1;
@@ -84,7 +80,8 @@ int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
     }
 
     /* set callback function */
-    config[dev].cb = callback;
+    config[dev].cb = cb;
+    config[dev].arg = arg;
 
     /* set timer to run in counter mode */
     timer0->CR1 = (TIM_CR1_ARPE | TIM_CR1_URS);
@@ -363,7 +360,7 @@ static inline void irq_handler(tim_t timer, TIM_TypeDef *dev0, TIM_TypeDef *dev1
         /* if higher 16bit also match */
         if (dev1->CNT >= dev1->CCR1) {
             dev0->DIER &= ~TIM_DIER_CC1IE;
-            config[timer].cb(0);
+            config[timer].cb(config[timer].arg, 0);
         }
         DEBUG("channel 1 CCR: %08x\n", ((dev1->CCR1<<16) | (0xffff & dev0->CCR1)));
     }
@@ -373,7 +370,7 @@ static inline void irq_handler(tim_t timer, TIM_TypeDef *dev0, TIM_TypeDef *dev1
         /* if higher 16bit also match */
         if (dev1->CNT >= dev1->CCR2) {
             dev0->DIER &= ~TIM_DIER_CC2IE;
-            config[timer].cb(1);
+            config[timer].cb(config[timer].arg, 1);
         }
         DEBUG("channel 2 CCR: %08x\n", ((dev1->CCR2<<16) | (0xffff & dev0->CCR2)));
     }
@@ -383,7 +380,7 @@ static inline void irq_handler(tim_t timer, TIM_TypeDef *dev0, TIM_TypeDef *dev1
         /* if higher 16bit also match */
         if (dev1->CNT >= dev1->CCR3) {
             dev0->DIER &= ~TIM_DIER_CC3IE;
-            config[timer].cb(2);
+            config[timer].cb(config[timer].arg, 2);
         }
         DEBUG("channel 3 CCR: %08x\n", ((dev1->CCR3<<16) | (0xffff & dev0->CCR3)));
     }
@@ -393,7 +390,7 @@ static inline void irq_handler(tim_t timer, TIM_TypeDef *dev0, TIM_TypeDef *dev1
         /* if higher 16bit also match */
         if (dev1->CNT >= dev1->CCR4) {
             dev0->DIER &= ~TIM_DIER_CC4IE;
-            config[timer].cb(3);
+            config[timer].cb(config[timer].arg, 3);
         }
         DEBUG("channel 4 CCR: %08x\n", ((dev1->CCR4<<16) | (0xffff & dev0->CCR4)));
     }

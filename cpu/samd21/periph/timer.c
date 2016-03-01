@@ -32,21 +32,16 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-
-typedef struct {
-    void (*cb)(int);
-} timer_conf_t;
-
 /**
  * @brief Timer state memory
  */
-timer_conf_t config[TIMER_NUMOF];
+static timer_isr_ctx_t config[TIMER_NUMOF];
 
 
 /**
  * @brief Setup the given timer
  */
-int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* at the moment, the timer can only run at 1MHz */
     if (freq != 1000000ul) {
@@ -123,7 +118,8 @@ int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
     }
 
     /* save callback */
-    config[dev].cb = callback;
+    config[dev].cb = cb;
+    config[dev].arg = arg;
 
     /* enable interrupts for given timer */
     timer_irq_enable(dev);
@@ -339,14 +335,14 @@ void TIMER_0_ISR(void)
         if(config[TIMER_0].cb) {
             TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
-            config[TIMER_0].cb(0);
+            config[TIMER_0].cb(config[TIMER_0].arg, 0);
         }
     }
     else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
         if(config[TIMER_0].cb) {
             TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
-            config[TIMER_0].cb(1);
+            config[TIMER_0].cb(config[TIMER_0].arg, 1);
         }
     }
 
@@ -364,14 +360,14 @@ void TIMER_1_ISR(void)
         if (config[TIMER_1].cb) {
             TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
-            config[TIMER_1].cb(0);
+            config[TIMER_1].cb(config[TIMER_1].arg, 0);
         }
     }
     else if (TIMER_1_DEV.INTFLAG.bit.MC1 && TIMER_1_DEV.INTENSET.bit.MC1) {
         if(config[TIMER_1].cb) {
             TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
-            config[TIMER_1].cb(1);
+            config[TIMER_1].cb(config[TIMER_1].arg, 1);
         }
 
     }

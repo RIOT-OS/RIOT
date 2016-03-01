@@ -35,16 +35,11 @@
 
 #if TIMER_NUMOF
 
-/** Type for timer state */
-typedef struct {
-    void (*cb)(int);
-} timer_conf_t;
-
 /* Virtual count up timer */
 static uint32_t cu_timer[TIMER_NUMOF];
 
 /** Timer state memory */
-static timer_conf_t config[TIMER_NUMOF];
+static timer_isr_ctx_t config[TIMER_NUMOF];
 
 inline static void pit_timer_start(uint8_t ch)
 {
@@ -84,7 +79,7 @@ inline static void pit_timer_set_max(uint8_t ch)
     pit_timer_start(ch);
 }
 
-int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* enable timer peripheral clock */
     TIMER_CLKEN();
@@ -116,7 +111,8 @@ int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
     }
 
     /* set callback function */
-    config[dev].cb = callback;
+    config[dev].cb = cb;
+    config[dev].arg = arg;
     cu_timer[dev] = 0;
 
     /* enable the timer's interrupt */
@@ -317,7 +313,7 @@ inline static void pit_timer_irq_handler(tim_t dev, uint8_t ch)
     pit_timer_set_max(ch);
 
     if (config[dev].cb != NULL) {
-        config[dev].cb(dev);
+        config[dev].cb(config[dev].arg, dev);
     }
 
     TIMER_BASE->CHANNEL[ch].TFLG = PIT_TFLG_TIF_MASK;

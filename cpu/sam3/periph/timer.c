@@ -76,7 +76,7 @@ static inline Tc *dev(tim_t tim)
  * For each timer, channel 1 is used to implement a prescaler. Channel 1 is
  * driven by the MCK / 2 (42MHz) (TIMER_CLOCK1).
  */
-int timer_init(tim_t tim, unsigned long freq, void (*callback)(int))
+int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* check if device is valid */
     if (tim >= TIMER_NUMOF) {
@@ -87,7 +87,8 @@ int timer_init(tim_t tim, unsigned long freq, void (*callback)(int))
     clk_en(tim);
 
     /* save callback */
-    isr_ctx[tim].cb = callback;
+    isr_ctx[tim].cb = cb;
+    isr_ctx[tim].arg = arg;
 
     /* configure the timer block by connecting TIOA1 to XC0 */
     dev(tim)->TC_BMR = TC_BMR_TC0XC0S_TIOA1;
@@ -182,7 +183,7 @@ static inline void isr_handler(tim_t tim)
     for (int i = 0; i < TIMER_CHANNELS; i++) {
         if (status & (TC_SR_CPAS << i)) {
             dev(tim)->TC_CHANNEL[0].TC_IDR = (TC_IDR_CPAS << i);
-            isr_ctx[tim].cb(i);
+            isr_ctx[tim].cb(isr_ctx[tim].arg, i);
         }
     }
 
