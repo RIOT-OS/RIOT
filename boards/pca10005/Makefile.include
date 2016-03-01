@@ -6,18 +6,10 @@ export CPU_MODEL = nrf51x22xxaa
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
 
-# define flash and debugging environment
-export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
-export DEBUGSERVER = JLinkGDBServer -device nrf51822 -if SWD
-export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
-
-export OFLAGS = -O binary
-export HEXFILE = $(ELFFILE:.elf=.bin)
-export TERMFLAGS += -p "$(PORT)"
-export FFLAGS = $(BINDIR) $(HEXFILE)
-export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
-export RESET_FLAGS = $(BINDIR)
+# setup JLink for flashing
+export JLINK_DEVICE := nrf51822
+export JLINK_PRE_FLASH := w4 4001e504 1
+include $(RIOTBOARD)/Makefile.include.jlink
 
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
