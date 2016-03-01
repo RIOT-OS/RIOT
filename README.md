@@ -35,21 +35,22 @@ RIOT OS is an operating system for Internet of Things (IoT) devices. It is based
 Its features comprise
 * a preemptive, tickless scheduler with priorities
 * flexible memory management
-* high resolution timers
-* virtual, long-term timers
+* high resolution, long-term timers
+* support for AVR, MSP430, ARM7, and ARM Cortex-M on over 50 boards
 * the native port allows to run RIOT as-is on Linux, BSD, and MacOS. Multiple instances of RIOT running on a single machine can also be interconnected via a simple virtual Ethernet bridge
-* Wiselib support (C++ algorithm library, including routing, clustering, timesync, localization, security and more algorithms)
 * IPv6
+* 6LoWPAN (RFC4944, RFC6282, and RFC6775)
 * UDP
-* 6LoWPAN
-* NHDP
+* RPL (storing mode)
+* CoAP
+* CCN-Lite
 
 ## GETTING STARTED
 * You want to start the RIOT? Just follow our [Getting started documentation](https://github.com/RIOT-OS/RIOT/wiki/Introduction)
 * The RIOT API itself can be built from the code using doxygen. The latest version is uploaded daily to http://riot-os.org/api.
 
 ### USING THE NATIVE PORT WITH NETWORKING
-If you compile RIOT for the native cpu and include the nativenet module, you can specify a network interface like this: `PORT=tap0 make term`
+If you compile RIOT for the native cpu and include the gnrc_netif_default module, you can specify a network interface like this: `PORT=tap0 make term`
 
 #### SETTING UP A TAP NETWORK
 There is a shellscript in `RIOT/dist/tools/tapsetup` called `tapsetup` which you can use to create a network of tap interfaces.
