@@ -23,6 +23,7 @@
 
 #include "irq.h"
 #include "sched.h"
+#include "thread.h"
 #include "timex.h"
 #include "xtimer.h"
 #include "priority_queue.h"
