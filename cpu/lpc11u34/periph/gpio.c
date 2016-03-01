@@ -19,7 +19,7 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
+#include "thread.h"
 #include "periph/gpio.h"
 
 /* Static IOCON registers definition */
