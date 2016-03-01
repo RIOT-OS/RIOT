@@ -21,7 +21,6 @@
 #include <stdio.h>
 
 #include "board.h"
-#include "system_sam3xa.h"
 
 
 void led_init(void);
@@ -29,9 +28,6 @@ void led_init(void);
 
 void board_init(void)
 {
-    /* initialize core clocks via STM-lib given function */
-    SystemInit();
-
     /* initialize the CPU */
     cpu_init();
 
