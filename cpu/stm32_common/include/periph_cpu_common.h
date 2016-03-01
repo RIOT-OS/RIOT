@@ -39,6 +39,14 @@ extern "C" {
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
 
+/**
+ * @brief   Available peripheral buses
+ */
+enum {
+    APB1,
+    APB2
+};
+
 #ifdef __cplusplus
 }
 #endif
