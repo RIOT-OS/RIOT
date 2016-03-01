@@ -27,6 +27,7 @@ then
     if [ "$BUILDTEST_MCU_GROUP" == "static-tests" ]
     then
         RESULT=0
+        RECALL="$1"
 
         if git diff master HEAD -- .travis.yml &> /dev/null; then
             # check if .travis.yml was changed in the current PR and skip if so
@@ -40,6 +41,15 @@ then
                 echo "    git push -f origin $(git rev-parse --abbrev-ref HEAD)" >&2
                 echo "==============================================================" >&2
                 return 1
+            fi
+        fi
+
+        if [ "$RECALL" != "recall" ]; then
+            if git diff master HEAD -- "$0" &> /dev/null; then
+                git rebase master || git rebase --abort
+
+                "$0" "recall"
+                exit $?
             fi
         fi
 
