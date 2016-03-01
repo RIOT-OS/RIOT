@@ -46,7 +46,7 @@ void hwrng_read(uint8_t *buf, unsigned int num)
     for(uint8_t i = 0; i<4;++i) {
       //bit 5 and 6 of the AT86RF2XX_REG__PHY_RSSI register contain the RND_VALUE
       uint8_t regVal = at86rf2xx_reg_read (&dev, AT86RF2XX_REG__PHY_RSSI)
-	& 0x60; 
+	& AT86RF2XX_PHY_RSSI_MASK__RND_VALUE; 
       //shift the two random bits first to the right and then to the correct position of the return byte
       regVal = regVal >> 5;
       regVal = regVal << 2*i;
