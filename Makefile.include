@@ -192,6 +192,7 @@ endif
 # the binaries to link
 BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
+BASELIBS += $(APPDEPS)
 
 .PHONY: all clean flash term doc debug debug-server reset objdump help info-modules
 .PHONY: ..in-docker-container
