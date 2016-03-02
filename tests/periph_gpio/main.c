@@ -121,6 +121,9 @@ static int init_int(int argc, char **argv)
     if (argc >= 5) {
         pr = atoi(argv[4]);
         switch (pr) {
+            case 0:
+                mode = GPIO_IN;
+                break;
             case 1:
                 mode = GPIO_IN_PU;
                 break;
