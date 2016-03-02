@@ -60,11 +60,9 @@ extern "C" {
 /** @} */
 
 /**
- * @name Buttons
- * @{
+ * @brief   User button
  */
-#define BUTTON_USER_GPIO    GPIO_PIN(PORT_C, 13)
-/** @} */
+#define BTN_B1_PIN          GPIO_PIN(PORT_C, 13)
 
 /**
  * @name xtimer configuration
