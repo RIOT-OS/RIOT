@@ -27,10 +27,9 @@ static void _send_rtr_adv(gnrc_ipv6_netif_t *iface, ipv6_addr_t *dst);
 
 void gnrc_ndp_router_set_router(gnrc_ipv6_netif_t *iface, bool enable)
 {
-    ipv6_addr_t all_routers = IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
     if (enable && !(iface->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER)) {
-        gnrc_ipv6_netif_add_addr(iface->pid, &all_routers, 128,
-                                 GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST);
+        gnrc_ipv6_netif_add_addr(iface->pid, &ipv6_addr_all_routers_link_local,
+                                 128, GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST);
         mutex_lock(&iface->mutex);
         iface->flags |= GNRC_IPV6_NETIF_FLAGS_ROUTER;
         iface->max_adv_int = GNRC_IPV6_NETIF_DEFAULT_MAX_ADV_INT;
@@ -40,7 +39,7 @@ void gnrc_ndp_router_set_router(gnrc_ipv6_netif_t *iface, bool enable)
         gnrc_ndp_router_set_rtr_adv(iface, enable);
     }
     else if (!enable && (iface->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER)) {
-        gnrc_ipv6_netif_remove_addr(iface->pid, &all_routers);
+        gnrc_ipv6_netif_remove_addr(iface->pid, (ipv6_addr_t *)&ipv6_addr_all_routers_link_local);
         gnrc_ndp_router_set_rtr_adv(iface, enable);
     }
 }
