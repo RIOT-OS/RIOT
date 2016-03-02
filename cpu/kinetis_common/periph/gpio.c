@@ -32,7 +32,7 @@
 /**
  * @brief   Get the OCR reg value from the gpio_mode_t value
  */
-#define MODE_PCR_MASK       (0x23)
+#define MODE_PCR_MASK       (PORT_PCR_ODE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK)
 
 /**
  * @brief   This bit in the mode is set to 1 for output configuration
