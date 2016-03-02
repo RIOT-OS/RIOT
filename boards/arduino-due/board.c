@@ -29,9 +29,6 @@ void led_init(void);
 
 void board_init(void)
 {
-    /* initialize core clocks via CMSIS function provided by Atmel */
-    SystemInit();
-
     /* initialize the CPU */
     cpu_init();
 
