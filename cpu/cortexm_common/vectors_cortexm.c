@@ -141,6 +141,8 @@ static inline int _stack_size_left(uint32_t required)
     return ((int)((uint32_t)sp - (uint32_t)&_sstack) - required);
 }
 
+void hard_fault_handler(uint32_t* sp, uint32_t corrupted, uint32_t exc_return, uint32_t* r4_to_r11_stack);
+
 /* Trampoline function to save stack pointer before calling hard fault handler */
 __attribute__((naked)) void hard_fault_default(void)
 {
@@ -181,7 +183,7 @@ __attribute__((naked)) void hard_fault_default(void)
         "push {r4-r11}                      \n" /* save r4..r11 to the stack  */
 #endif
         "mov r3, sp                         \n" /* r4_to_r11_stack parameter  */
-        "b hard_fault_handler               \n" /* hard_fault_handler(r0)     */
+        "bl hard_fault_handler              \n" /* hard_fault_handler(r0)     */
           :
           : [sram]   "r" (&_sram + HARDFAULT_HANDLER_REQUIRED_STACK_SPACE),
             [eram]   "r" (&_eram),
