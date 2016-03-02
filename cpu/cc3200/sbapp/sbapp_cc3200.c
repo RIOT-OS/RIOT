@@ -916,7 +916,7 @@ static void *_event_loop(void *arg) {
 		PANIC(NAMESPACE, SIMPLELINK_START_ERR);
 	}
 
-	//simplelink_to_default_state();
+	simplelink_to_default_state();
 
 	xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(100));
 
