@@ -37,9 +37,10 @@ extern "C" {
  */
 #ifdef TIME_TICKS_UNIT
  #define XTIMER_BACKOFF 2000
+ #define XTIMER_OVERHEAD 320
 #else
  #define XTIMER_BACKOFF  25
- #define XTIMER_OVERHEAD 200000
+ #define XTIMER_OVERHEAD 4
 #endif
 
 
