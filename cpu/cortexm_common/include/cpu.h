@@ -102,6 +102,18 @@ static inline void cpu_print_last_instruction(void)
     printf("%p\n", (void*) lr_ptr);
 }
 
+/**
+ * @brief   Put the CPU into the 'wait for event' sleep mode
+ *
+ * This function is meant to be used for short periods of time, where it is not
+ * feasible to switch to the idle thread and back.
+ */
+static inline void cpu_sleep_until_event(void)
+{
+    __SEV();
+    __WFE();
+}
+
 #ifdef __cplusplus
 }
 #endif
