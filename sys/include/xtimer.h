@@ -342,6 +342,14 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_SHIFT (0)
 #endif
 
+#if (XTIMER_SHIFT < 0)
+#define XTIMER_USEC_TO_TICKS(value) ( (value) << -XTIMER_SHIFT )
+#define XTIMER_TICKS_TO_USEC(value) ( (value) >> -XTIMER_SHIFT )
+#else
+#define XTIMER_USEC_TO_TICKS(value) ( (value) >> XTIMER_SHIFT )
+#define XTIMER_TICKS_TO_USEC(value) ( (value) << XTIMER_SHIFT )
+#endif
+
 /**
  * @brief set xtimer default timer configuration
  * @{
@@ -375,7 +383,7 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  */
 #define XTIMER_MASK (0)
 #endif
-#define XTIMER_MASK_SHIFTED (XTIMER_MASK << XTIMER_SHIFT)
+#define XTIMER_MASK_SHIFTED XTIMER_TICKS_TO_USEC(XTIMER_MASK)
 
 #ifndef XTIMER_USLEEP_UNTIL_OVERHEAD
 /**
@@ -404,7 +412,7 @@ extern volatile uint32_t _high_cnt;
 static inline uint32_t _lltimer_now(void)
 {
 #if XTIMER_SHIFT
-    return ((uint32_t)timer_read(XTIMER)) << XTIMER_SHIFT;
+    return XTIMER_TICKS_TO_USEC((uint32_t)timer_read(XTIMER));
 #else
     return timer_read(XTIMER);
 #endif
@@ -452,7 +460,7 @@ static inline void xtimer_spin_until(uint32_t value);
 /**
  * @brief Minimal value xtimer_spin() can spin
  */
-#define XTIMER_MIN_SPIN (1<<XTIMER_SHIFT)
+#define XTIMER_MIN_SPIN XTIMER_TICKS_TO_USEC(1)
 #endif
 
 static inline uint32_t xtimer_now(void)
