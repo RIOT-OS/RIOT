@@ -23,7 +23,7 @@
 #include "irq.h"
 
 /* WARNING! enabling this will have side effects and can lead to timer underflows. */
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static volatile int _in_handler = 0;
@@ -113,13 +113,13 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
 
 void xtimer_set(xtimer_t *timer, uint32_t offset)
 {
-    DEBUG("timer_set(): offset=%" PRIu32 " now=%" PRIu32 " (%" PRIu32 ")\n", offset, xtimer_now(), _lltimer_now());
+    //DEBUG("timer_set(): offset=%" PRIu32 " now=%" PRIu32 " (%" PRIu32 ")\n", offset, xtimer_now(), _lltimer_now());
     if (!timer->callback) {
         DEBUG("timer_set(): timer has no callback.\n");
         return;
     }
 
-    xtimer_remove(timer);
+    //xtimer_remove(timer);
 
     if (offset < XTIMER_BACKOFF) {
         xtimer_spin(offset);
@@ -172,7 +172,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
         return 0;
     }
 
-    timer->target = target;
+    timer->target = target - XTIMER_OVERHEAD;
     timer->long_target = _long_cnt;
     if (target < now) {
         timer->long_target++;
