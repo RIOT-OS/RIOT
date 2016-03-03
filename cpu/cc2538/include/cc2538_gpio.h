@@ -122,6 +122,8 @@ enum {
 */
 #define gpio_dir_input(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DIR &= ~GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
 
+#define cc2538_gpio_read(gpio_num) ( (GPIO_NUM_TO_DEV(gpio_num)->DATA >> GPIO_BIT_NUM(gpio_num)) & 1 )
+
 /**
  * @brief Set a specific GPIO output pin high
  *
