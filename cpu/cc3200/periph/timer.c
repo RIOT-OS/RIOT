@@ -36,6 +36,8 @@
 
 #define MAX_TIMERS TIMER_UNDEFINED
 
+#define TICKS_IN_USEC 80
+
 typedef struct {
     void (*cb)(int);
 } timer_conf_t;
@@ -174,30 +176,29 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 }
 
 int set_absolute(tim_t dev, int channel, unsigned long long value) {
-
     switch (dev) {
-    case TIMER_0:
-        MAP_TimerMatchSet(TIMERA0_BASE, TIMER_A, value);
-        // enable the match timer
-        HWREG(TIMERA0_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
-        break;
-    case TIMER_1:
-        MAP_TimerMatchSet(TIMERA1_BASE, TIMER_A, value);
-        // enable the match timer
-        HWREG(TIMERA1_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
-        break;
-    case TIMER_2:
-        MAP_TimerMatchSet(TIMERA2_BASE, TIMER_A, value);
-        // enable the match timer
-        HWREG(TIMERA2_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
-        break;
-    case TIMER_3:
-        MAP_TimerMatchSet(TIMERA3_BASE, TIMER_A, value);
-        // enable the match timer
-        HWREG(TIMERA3_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
-        break;
-    default:
-        break;
+        case TIMER_0:
+            MAP_TimerMatchSet(TIMERA0_BASE, TIMER_A, value);
+            // enable the match timer
+            HWREG(TIMERA0_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
+            break;
+        case TIMER_1:
+            MAP_TimerMatchSet(TIMERA1_BASE, TIMER_A, value);
+            // enable the match timer
+            HWREG(TIMERA1_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
+            break;
+        case TIMER_2:
+            MAP_TimerMatchSet(TIMERA2_BASE, TIMER_A, value);
+            // enable the match timer
+            HWREG(TIMERA2_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
+            break;
+        case TIMER_3:
+            MAP_TimerMatchSet(TIMERA3_BASE, TIMER_A, value);
+            // enable the match timer
+            HWREG(TIMERA3_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
+            break;
+        default:
+            break;
     }
 
     return 0;
@@ -206,27 +207,34 @@ int set_absolute(tim_t dev, int channel, unsigned long long value) {
 
 int timer_set(tim_t dev, int channel, unsigned int timeout) {
 
+#ifndef TIME_TICKS_UNIT
+    timeout *= 80;
+#endif
+
     switch (dev) {
-    case TIMER_0:
-        return timer_set_absolute(dev, channel,
-        HWREG(TIMERA0_BASE + TIMER_O_TAR) + timeout);
-    case TIMER_1:
-        return timer_set_absolute(dev, channel,
-        HWREG(TIMERA1_BASE + TIMER_O_TAR) + timeout);
-    case TIMER_2:
-        return set_absolute(dev, channel,
-        HWREG(TIMERA2_BASE + TIMER_O_TAR) + timeout);
-    case TIMER_3:
-        return set_absolute(dev, channel,
-        HWREG(TIMERA3_BASE + TIMER_O_TAR) + timeout);
-    default:
-        break;
+        case TIMER_0:
+            return set_absolute(dev, channel,
+                                HWREG(TIMERA0_BASE + TIMER_O_TAR) + timeout);
+        case TIMER_1:
+            return set_absolute(dev, channel,
+                                HWREG(TIMERA1_BASE + TIMER_O_TAR) + timeout);
+        case TIMER_2:
+            return set_absolute(dev, channel,
+                                HWREG(TIMERA2_BASE + TIMER_O_TAR) + timeout);
+        case TIMER_3:
+            return set_absolute(dev, channel,
+                                HWREG(TIMERA3_BASE + TIMER_O_TAR) + timeout);
+        default:
+            break;
     }
 
     return 0;
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
+#ifndef TIME_TICKS_UNIT
+    value *= 80;
+#endif
     return set_absolute(dev, channel, value);
 }
 
@@ -258,6 +266,7 @@ int timer_clear(tim_t dev, int channel) {
     return 0;
 }
 
+#ifdef TIME_TICKS_UNIT
 unsigned int timer_read(tim_t dev) {
     switch (dev) {
     case TIMER_0:
@@ -276,6 +285,26 @@ unsigned int timer_read(tim_t dev) {
         return 0;
     }
 }
+#else
+unsigned int timer_read(tim_t dev) {
+    switch (dev) {
+    case TIMER_0:
+        return TimerValueGet(TIMERA0_BASE, TIMER_A)/TICKS_IN_USEC;
+        break;
+    case TIMER_1:
+        return TimerValueGet(TIMERA1_BASE, TIMER_A)/TICKS_IN_USEC;
+        break;
+    case TIMER_2:
+        return TimerValueGet(TIMERA2_BASE, TIMER_A)/TICKS_IN_USEC;
+        break;
+    case TIMER_3:
+        return TimerValueGet(TIMERA3_BASE, TIMER_A)/TICKS_IN_USEC;
+        break;
+    default:
+        return 0;
+    }
+}
+#endif
 
 void timer_start(tim_t dev) {
     switch (dev) {

@@ -23,7 +23,7 @@
 #include "irq.h"
 
 /* WARNING! enabling this will have side effects and can lead to timer underflows. */
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
 
 static volatile int _in_handler = 0;

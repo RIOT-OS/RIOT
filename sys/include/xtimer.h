@@ -310,8 +310,10 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  *
  * This is supposed to be defined per-device in e.g., periph_conf.h.
  */
+#if 0
 #ifndef XTIMER_OVERHEAD
 #define XTIMER_OVERHEAD 20
+#endif
 #endif
 
 #ifndef XTIMER_ISR_BACKOFF
