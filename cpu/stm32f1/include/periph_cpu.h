@@ -44,6 +44,16 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
 
 /**
+ * @brief   All timers for the STM32F1 have 4 CC channels
+ */
+#define TIMER_CHANNELS      (4U)
+
+/**
+ * @brief   All timers have a width of 16-bit
+ */
+#define TIMER_MAXVAL        (0xffff)
+
+/**
  * @brief   Override values for pull register configuration
  * @{
  */
@@ -90,6 +100,16 @@ typedef enum {
     GPIO_AF_OUT_PP = 0xb,   /**< alternate function output - push-pull */
     GPIO_AF_OUT_OD = 0xf,   /**< alternate function output - open-drain */
 } gpio_af_out_t;
+
+/**
+ * @brief   Timer configuration
+ */
+typedef struct {
+    TIM_TypeDef *dev;       /**< timer device */
+    uint8_t bus;            /**< APBx bus the timer is clock from */
+    uint8_t rcc_bit;        /**< corresponding bit in the RCC register */
+    uint8_t irqn;           /**< global IRQ channel */
+} timer_conf_t;
 
 /**
  * @brief   Configure the alternate function for the given pin
