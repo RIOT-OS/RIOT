@@ -345,6 +345,7 @@ OsiReturnVal_e osi_LockObjCreate(OsiLockObj_t* pLockObj) {
 
 }
 
+#if 0
 /*!
  \brief 	This function creates a Task.
 
@@ -409,6 +410,7 @@ void osi_TaskDelete(OsiTaskHandle* pTaskHandle) {
     free(tcb->msg_array);
     free(tcb->stack_start);
 }
+#endif
 
 /*!
  \brief 	This function deletes a locking object.
