@@ -39,7 +39,7 @@
 #define TICKS_IN_USEC 80
 
 typedef struct {
-    void (*cb)(int);
+    void (*cb)(void*, int);
 } timer_conf_t;
 
 timer_conf_t config[MAX_TIMERS];
@@ -47,7 +47,7 @@ timer_conf_t config[MAX_TIMERS];
 
 void irq_timer0_handler(void) {
     timer_clear(TIMER_0, 0);
-    config[TIMER_0].cb(0); // timer has one hw channel
+    config[TIMER_0].cb(0,0); // timer has one hw channel
     if (sched_context_switch_request) {
         thread_yield();
     }
@@ -55,7 +55,7 @@ void irq_timer0_handler(void) {
 
 void irq_timer1_handler(void) {
     timer_clear(TIMER_1, 0);
-    config[TIMER_1].cb(0); // timer has one hw channel
+    config[TIMER_1].cb(0,0); // timer has one hw channel
     if (sched_context_switch_request) {
         thread_yield();
     }
@@ -63,7 +63,7 @@ void irq_timer1_handler(void) {
 
 void irq_timer2_handler(void) {
     timer_clear(TIMER_2, 0);
-    config[TIMER_2].cb(0); // timer has one hw channel
+    config[TIMER_2].cb(0,0); // timer has one hw channel
     if (sched_context_switch_request) {
         thread_yield();
     }
@@ -71,14 +71,14 @@ void irq_timer2_handler(void) {
 
 void irq_timer3_handler(void) {
     timer_clear(TIMER_3, 0);
-    config[TIMER_3].cb(0); // timer has one hw channel
+    config[TIMER_3].cb(0,0); // timer has one hw channel
     if (sched_context_switch_request) {
         thread_yield();
     }
 }
 
 
-int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg) {
 
     switch (dev) {
     case TIMER_0:
@@ -94,7 +94,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
         // register the handler
         MAP_TimerIntRegister(TIMERA0_BASE, TIMER_A, irq_timer0_handler);
 
-        config[TIMER_0].cb = callback;
+        config[TIMER_0].cb = cb;
 
         MAP_IntPrioritySet(INT_TIMERA0A, INT_PRIORITY_LVL_2);
 
@@ -116,7 +116,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
         // register the handler
         MAP_TimerIntRegister(TIMERA1_BASE, TIMER_A, irq_timer1_handler);
 
-        config[TIMER_1].cb = callback;
+        config[TIMER_1].cb = cb;
 
         MAP_IntPrioritySet(INT_TIMERA1A, INT_PRIORITY_LVL_2);
 
@@ -138,7 +138,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
         // register the handler
         MAP_TimerIntRegister(TIMERA2_BASE, TIMER_A, irq_timer2_handler);
 
-        config[TIMER_2].cb = callback;
+        config[TIMER_2].cb = cb;
 
         MAP_IntPrioritySet(INT_TIMERA2A, INT_PRIORITY_LVL_2);
 
@@ -160,7 +160,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
         // register the handler
         MAP_TimerIntRegister(TIMERA3_BASE, TIMER_A, irq_timer3_handler);
 
-        config[TIMER_3].cb = callback;
+        config[TIMER_3].cb = cb;
 
         MAP_IntPrioritySet(INT_TIMERA3A, INT_PRIORITY_LVL_2);
 
