@@ -51,10 +51,6 @@ static mutex_t locks[] =  {
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
-
     spi_poweron(dev);
 
     /* disable the device -> nRF51822 reference 3.0 26.1.1 and 27.1*/
@@ -132,10 +128,6 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
 
 int spi_conf_pins(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
-
     switch (dev) {
 #if SPI_0_EN
         case SPI_0:
@@ -159,13 +151,15 @@ int spi_conf_pins(spi_t dev)
             spi[dev]->PSELSCK = SPI_1_PIN_SCK;
             break;
 #endif
+        default:
+            return -1;
     }
     return 0;
 }
 
 int spi_acquire(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
     mutex_lock(&locks[dev]);
@@ -174,7 +168,7 @@ int spi_acquire(spi_t dev)
 
 int spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
     mutex_unlock(&locks[dev]);
@@ -188,7 +182,7 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
 
@@ -227,14 +221,14 @@ void spi_transmission_begin(spi_t dev, char reset_val)
 
 void spi_poweron(spi_t dev)
 {
-    if (dev < SPI_NUMOF) {
+    if ((unsigned int)dev < SPI_NUMOF) {
         spi[dev]->POWER = 1;
     }
 }
 
 void spi_poweroff(spi_t dev)
 {
-    if (dev < SPI_NUMOF) {
+    if ((unsigned int)dev < SPI_NUMOF) {
         spi[dev]->POWER = 0;
     }
 }

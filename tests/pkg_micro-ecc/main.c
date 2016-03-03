@@ -37,7 +37,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "uECC.h"
-#include "periph/random.h"
+#include "periph/hwrng.h"
 
 #define TESTROUNDS  16
 
@@ -61,9 +61,7 @@ int main(void)
     uint8_t l_sig[uECC_BYTES * 2];
 
     /* initialize hardware random number generator */
-    random_init();
-    /* power off RNG to save energy */
-    random_poweroff();
+    hwrng_init();
 
     printf("Testing %d random private key pairs and signature\n", TESTROUNDS);
 

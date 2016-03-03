@@ -84,7 +84,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
     pkt = payload;  /* reset pkt from temporary variable */
 
-    LL_SEARCH_SCALAR(pkt, payload, type, GNRC_NETTYPE_SIXLOWPAN);
+    payload = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_SIXLOWPAN);
 
     if ((payload == NULL) || (payload->size < 1)) {
         DEBUG("6lo: Received packet has no 6LoWPAN payload\n");

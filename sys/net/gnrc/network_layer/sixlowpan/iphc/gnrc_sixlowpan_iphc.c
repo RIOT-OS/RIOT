@@ -82,8 +82,7 @@
 #define NHC_UDP_S_INLINE            (0x01)
 #define NHC_UDP_D_INLINE            (0x02)
 #define NHC_UDP_SD_ELIDED           (0x03)
-#define NHC_UDP_C_MASK              (0xF4)
-#define NHC_UDP_C_ELIDED            (0x03)
+#define NHC_UDP_C_ELIDED            (0x04)
 
 #define NHC_UDP_4BIT_PORT           (0xF0B0)
 #define NHC_UDP_4BIT_MASK           (0xFFF0)
@@ -171,7 +170,7 @@ inline static size_t iphc_nhc_udp_decode(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t **d
             break;
     }
 
-    if ((udp_nhc & NHC_UDP_C_MASK) == NHC_UDP_C_ELIDED) {
+    if ((udp_nhc & NHC_UDP_C_ELIDED) != 0) {
         DEBUG("6lo iphc nhc: unsupported elided checksum\n");
         gnrc_pktbuf_release(udp);
         return 0;

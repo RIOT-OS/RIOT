@@ -71,14 +71,6 @@ extern "C"
 /** @} */
 
 /**
- * @name Length and address for reading CPU_ID (named UID in Freescale documents)
- * @{
- */
-#define CPUID_ID_LEN                    (16)
-#define CPUID_ID_PTR                    ((void *)(&(SIM->UIDH)))
-/** @} */
-
-/**
  * @name GPIO pin mux function numbers
  */
 /** @{ */

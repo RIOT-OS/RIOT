@@ -36,7 +36,6 @@
 #include <ifaddrs.h>
 #include <sys/stat.h>
 
-#include "kernel.h"
 #include "cpu.h"
 #include "irq.h"
 #include "xtimer.h"

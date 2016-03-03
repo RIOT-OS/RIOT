@@ -114,6 +114,3 @@ include $(RIOTBOARD)/Makefile.include.serial
 
 # include board dependencies
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
-
-# include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortexm_common

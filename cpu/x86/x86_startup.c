@@ -38,10 +38,11 @@
 #include "x86_uart.h"
 
 #include <cpu.h>
-#include <kernel_internal.h>
 #include <tlsf-malloc.h>
 
 #include <stdio.h>
+
+#include "kernel_init.h"
 
 /* Must be <= 0x1000 because otherwise x86_map_physical_pages() might get a page out of this pool.
  * Because static memory has the PT_G flag, flushing the TLB would cause a stale PT

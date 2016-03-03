@@ -280,10 +280,9 @@ extern "C"
  * @name Random Number Generator configuration
  * @{
  */
-#define RANDOM_NUMOF                 (1U)
-#define KINETIS_RNGA                 RNG
-#define RANDOM_CLKEN()               (SIM->SCGC6 |= (1 << 9))
-#define RANDOM_CLKDIS()              (SIM->SCGC6 &= ~(1 << 9))
+#define KINETIS_RNGA                RNG
+#define HWRNG_CLKEN()               (SIM->SCGC6 |= (1 << 9))
+#define HWRNG_CLKDIS()              (SIM->SCGC6 &= ~(1 << 9))
 /** @} */
 
 #ifdef __cplusplus

@@ -103,8 +103,10 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
     dodag->grounded = GNRC_RPL_GROUNDED;
     dodag->node_status = GNRC_RPL_ROOT_NODE;
     dodag->my_rank = GNRC_RPL_ROOT_RANK;
-    dodag->dodag_conf_requested = true;
-    dodag->prefix_info_requested = true;
+    dodag->req_opts |= GNRC_RPL_REQ_OPT_DODAG_CONF;
+#ifndef GNRC_RPL_WITHOUT_PIO
+    dodag->req_opts |= GNRC_RPL_REQ_OPT_PREFIX_INFO;
+#endif
 
     trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL,
                   GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << dodag->dio_min),
@@ -119,7 +121,7 @@ static void _receive(gnrc_pktsnip_t *icmpv6)
     ipv6_hdr_t *ipv6_hdr = NULL;
     icmpv6_hdr_t *icmpv6_hdr = NULL;
 
-    LL_SEARCH_SCALAR(icmpv6, ipv6, type, GNRC_NETTYPE_IPV6);
+    ipv6 = gnrc_pktsnip_search_type(icmpv6, GNRC_NETTYPE_IPV6);
 
     assert(ipv6 != NULL);
 

@@ -1,4 +1,4 @@
-UNDEF := $(BINDIR)newlib/syscalls.o $(UNDEF)
+UNDEF := $(BINDIR)newlib_syscalls_default/syscalls.o $(UNDEF)
 
 # Search for Newlib include directories
 

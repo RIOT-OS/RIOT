@@ -28,6 +28,3 @@ export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 export RESET_FLAGS = $(BINDIR)
 
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
-
-# include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortexm_common

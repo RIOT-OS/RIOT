@@ -24,9 +24,6 @@ export DEBUGSERVER_FLAGS = $(MSPDEBUGFLAGS) gdb
 export DEBUGGER = $(PREFIX)gdb
 export DEBUGGER_FLAGS = --tui --ex="target remote localhost:2000" --ex "monitor reset halt" --ex load -ex "monitor reset halt"  $(ELFFILE)
 
-# include msp430 base makefile
-include $(RIOTBOARD)/Makefile.include.msp430_common
-
 # export msb-430-common includes
 export INCLUDES += -I$(RIOTBOARD)/msb-430-common/include
 export INCLUDES += -I$(RIOTBOARD)/msb-430-common/drivers/include

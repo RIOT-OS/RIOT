@@ -25,7 +25,12 @@
 extern "C" {
 #endif
 
-/* nothing defined here so far... */
+/**
+ * @brief   Length of the CPU_ID in octets
+ */
+#ifndef CPUID_LEN
+#define CPUID_LEN           (4U)
+#endif
 
 #ifdef __cplusplus
 }

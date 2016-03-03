@@ -44,7 +44,7 @@ static inline void _lltimer_set(uint32_t target);
 static uint32_t _time_left(uint32_t target, uint32_t reference);
 
 static void _timer_callback(void);
-static void _periph_timer_callback(int chan);
+static void _periph_timer_callback(void *arg, int chan);
 
 static inline int _this_high_period(uint32_t target);
 
@@ -56,7 +56,7 @@ static inline int _is_set(xtimer_t *timer)
 void xtimer_init(void)
 {
     /* initialize low-level timer */
-    timer_init(XTIMER, (1 << XTIMER_SHIFT) /* us_per_tick */, _periph_timer_callback);
+    timer_init(XTIMER, XTIMER_USEC_TO_TICKS(1000000ul), _periph_timer_callback, NULL);
 
     /* register initial overflow tick */
     _lltimer_set(0xFFFFFFFF);
@@ -131,8 +131,9 @@ void xtimer_set(xtimer_t *timer, uint32_t offset)
     }
 }
 
-static void _periph_timer_callback(int chan)
+static void _periph_timer_callback(void *arg, int chan)
 {
+    (void)arg;
     (void)chan;
     _timer_callback();
 }
@@ -149,7 +150,7 @@ static inline void _lltimer_set(uint32_t target)
     }
     DEBUG("_lltimer_set(): setting %" PRIu32 "\n", _lltimer_mask(target));
 #ifdef XTIMER_SHIFT
-    target >>= XTIMER_SHIFT;
+    target = XTIMER_USEC_TO_TICKS(target);
     if (!target) {
         target++;
     }
@@ -179,7 +180,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     }
 
     unsigned state = disableIRQ();
-    if ( !_this_high_period(target) ) {
+    if ( (timer->long_target > _long_cnt) || !_this_high_period(target) ) {
         DEBUG("xtimer_set_absolute(): the timer doesn't fit into the low-level timer's mask.\n");
         _add_timer_to_long_list(&long_list_head, timer);
     }
@@ -217,8 +218,8 @@ static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer)
 static void _add_timer_to_long_list(xtimer_t **list_head, xtimer_t *timer)
 {
     while (*list_head
-            && (*list_head)->long_target <= timer->long_target
-            && (*list_head)->target <= timer->target) {
+        && (((*list_head)->long_target < timer->long_target)
+        || (((*list_head)->long_target == timer->long_target) && ((*list_head)->target <= timer->target)))) {
         list_head = &((*list_head)->next);
     }
 

@@ -27,6 +27,31 @@ then
     if [ "$BUILDTEST_MCU_GROUP" == "static-tests" ]
     then
         RESULT=0
+        RECALL="$1"
+
+        if git diff master HEAD -- .travis.yml &> /dev/null; then
+            # check if .travis.yml was changed in the current PR and skip if so
+            if ! git diff --name-only $(git merge-base HEAD master)..HEAD -- \
+                .travis.yml &> 1; then
+                echo "==============================================================" >&2
+                echo -e "\033[1;31m.travis.yml differs in upstream.\033[0m"
+                echo -e "\033[1;31mPlease rebase your PR to current upstream or expect errors!!!!\033[0m" >&2
+                echo "    git fetch https://github.com/RIOT-OS/RIOT master" >&2
+                echo "    git rebase FETCH_HEAD" >&2
+                echo "    git push -f origin $(git rev-parse --abbrev-ref HEAD)" >&2
+                echo "==============================================================" >&2
+                return 1
+            fi
+        fi
+
+        if [ "$RECALL" != "recall" ]; then
+            if git diff master HEAD -- "$0" &> /dev/null; then
+                git rebase master || git rebase --abort
+
+                "$0" "recall"
+                exit $?
+            fi
+        fi
 
         git rebase master || git rebase --abort
         RESULT=$(set_result $? $RESULT)

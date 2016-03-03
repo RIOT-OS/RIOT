@@ -1,3 +1,1 @@
-export INCLUDES += -I$(RIOTBOARD)/pttu/include
-
 include $(RIOTBOARD)/msba2-common/Makefile.include

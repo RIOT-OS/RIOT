@@ -174,9 +174,7 @@ int unregister_interrupt(int sig);
 }
 #endif
 
-#include "kernel_internal.h"
 #include "sched.h"
-
 
 /** @} */
 #endif /* _NATIVE_INTERNAL_H */

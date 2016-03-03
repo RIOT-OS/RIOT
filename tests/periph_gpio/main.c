@@ -220,9 +220,9 @@ static int toggle(int argc, char **argv)
 }
 
 static const shell_command_t shell_commands[] = {
-    { "init_in", "initialize pin as output", init_in },
-    { "init_out", "initialize pin as input", init_out },
-    { "init_int", "initialize pin as EXTI", init_int },
+    { "init_in", "initialize pin as input", init_in },
+    { "init_out", "initialize pin as output", init_out },
+    { "init_int", "initialize pin as input with interrupt", init_int },
     { "read", "read pin status", read },
     { "set", "set pin to HIGH", set },
     { "clear", "set pin to LOW", clear },

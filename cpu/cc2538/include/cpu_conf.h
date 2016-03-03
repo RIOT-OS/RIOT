@@ -41,13 +41,6 @@ extern "C" {
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
-/**
- * @brief   length of CPU ID for @ref cpuid_get() in @ref periph/cpuid.h
- */
-#ifndef CPUID_ID_LEN
-#define CPUID_ID_LEN                    8
-#endif
-
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

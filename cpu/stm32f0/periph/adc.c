@@ -53,6 +53,8 @@ int adc_init(adc_t dev, adc_precision_t precision)
                                   (3 << ADC_0_CH4_PIN) | (3 << ADC_0_CH5_PIN));
             break;
 #endif
+        default:
+            return -1;
     }
 
     /* reset control registers */
@@ -79,7 +81,6 @@ int adc_init(adc_t dev, adc_precision_t precision)
         case ADC_RES_16BIT:
             adc_poweroff(dev);
             return -1;
-            break;
     }
 
     /* configure sampling time to 41.5 cycles */
@@ -123,6 +124,8 @@ int adc_sample(adc_t dev, int channel)
             }
             break;
 #endif
+        default:
+            return -1;
     }
 
     /* start single conversion */

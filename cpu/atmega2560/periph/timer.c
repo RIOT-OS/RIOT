@@ -33,23 +33,20 @@
 
 #define IRQ_DISABLED 0x00
 
-typedef struct {
-    void (*cb)(int);
-} timer_conf_t;
-
 /**
  * @brief Timer state memory
  */
-timer_conf_t config[TIMER_NUMOF];
+static timer_isr_ctx_t config[TIMER_NUMOF];
 
 /**
  * @brief Setup the given timer
  *
  */
-int timer_init(tim_t dev, unsigned int us_per_ticks, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
-    /* reject impossible us_per_ticks values */
-    if ((us_per_ticks != 4)) {
+    /* reject impossible freq values
+     * todo: Add support for 2 MHz and 16 MHz */
+    if ((freq != 250000ul)) {
         return -1;
     }
 
@@ -84,7 +81,8 @@ int timer_init(tim_t dev, unsigned int us_per_ticks, void (*callback)(int))
     }
 
     /* save callback */
-    config[dev].cb = callback;
+    config[dev].cb = cb;
+    config[dev].arg = arg;
 
     return 0;
 }
@@ -279,7 +277,7 @@ int timer_clear(tim_t dev, int channel)
 unsigned int timer_read(tim_t dev)
 {
     uint16_t a;
-    uint32_t b;
+    uint16_t b;
     /*
      * Disabling interrupts globally because read from 16 Bit register can
      * otherwise be messed up
@@ -317,6 +315,7 @@ unsigned int timer_read(tim_t dev)
 
         case TIMER_UNDEFINED:
         default:
+            (void)b;
             a = 0;
     }
 
@@ -420,7 +419,7 @@ static inline void _isr(int timer, int chan)
     __enter_isr();
     timer_clear(timer, chan);
 
-    config[timer].cb(chan);
+    config[timer].cb(config[timer].arg, chan);
 
     if (sched_context_switch_request) {
         thread_yield();

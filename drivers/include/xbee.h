@@ -25,7 +25,6 @@
 
 #include <stdint.h>
 
-#include "kernel.h"
 #include "mutex.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
@@ -68,7 +67,9 @@ extern "C" {
 /**
  * @brief   Default channel used after initialization
  */
+#ifndef XBEE_DEFAULT_CHANNEL
 #define XBEE_DEFAULT_CHANNEL        (26U)
+#endif
 
 /**
  * @name    Address flags

@@ -31,38 +31,36 @@ extern "C" {
  * @name Clock configuration
  * @{
  */
-#define CLOCK_CORECLOCK     (84000000U)
+/* targeted system core clock */
+#define CLOCK_CORECLOCK     (84000000UL)
+/* external oscillator clock */
+#define CLOCK_EXT_OSC       (12000000UL)
+/* define PLL configuration
+ *
+ * The values must fulfill this equation:
+ * CORECLOCK = (EXT_OCS / PLL_DIV) * (PLL_MUL + 1)
+ */
+#define CLOCK_PLL_MUL       (83)
+#define CLOCK_PLL_DIV       (12)
+
+/* number of wait states before flash read and write operations */
+#define CLOCK_FWS           (4)         /* 4 is save for 84MHz */
 /** @} */
 
 /**
  * @name Timer peripheral configuration
  * @{
  */
-#define TIMER_NUMOF         (3U)
-#define TIMER_0_EN          1
-#define TIMER_1_EN          1
-#define TIMER_2_EN          1
+static const timer_conf_t timer_config[] = {
+    /* dev, channel 0 ID */
+    { TC0, ID_TC0 },
+    { TC1, ID_TC3 },
+};
 
-/* Timer 0 configuration */
-#define TIMER_0_DEV         TC0
-#define TIMER_0_CHANNELS    6
-#define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_ISR1        isr_tc0
-#define TIMER_0_ISR2        isr_tc1
+#define TIMER_0_ISR         isr_tc0
+#define TIMER_1_ISR         isr_tc3
 
-/* Timer 1 configuration */
-#define TIMER_1_DEV         TC1
-#define TIMER_1_CHANNELS    6
-#define TIMER_1_MAX_VALUE   (0xffffffff)
-#define TIMER_1_ISR1        isr_tc3
-#define TIMER_1_ISR2        isr_tc4
-
-/* Timer 2 configuration */
-#define TIMER_2_DEV         TC2
-#define TIMER_2_CHANNELS    6
-#define TIMER_2_MAX_VALUE   (0xffffffff)
-#define TIMER_2_ISR1        isr_tc6
-#define TIMER_2_ISR2        isr_tc7
+#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**
@@ -84,13 +82,6 @@ static const uart_conf_t uart_config[] = {
 #define UART_3_ISR          isr_usart3
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
-/** @} */
-
-/**
- * @name Random Number Generator configuration
- * @{
- */
-#define RANDOM_NUMOF        (1U)
 /** @} */
 
 /**

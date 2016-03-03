@@ -34,7 +34,7 @@ extern "C" {
 /**
  * @brief   Default I2C address of SRF02 sensors
  */
-#define SRF02_DEFAULT_ADDR                  112
+#define SRF02_DEFAULT_ADDR                  (0xe0)
 
 /**
  * @brief   Device descriptor for SRF02 sensors
@@ -84,6 +84,14 @@ int srf02_init(srf02_t *dev, i2c_t i2c, uint8_t addr);
  *
  */
 uint16_t srf02_get_distance(srf02_t *dev, srf02_mode_t mode);
+
+/**
+ * @brief   Program the given device with a new bus address
+ *
+ * @param[in] dev           device to program
+ * @param[in] new_addr      new address to program the given device to
+ */
+void srf02_set_addr(srf02_t *dev, uint8_t new_addr);
 
 #ifdef __cplusplus
 }

@@ -57,7 +57,7 @@
 #endif
 
 
-#define SCALE       LIS3DH_SCALE_4G
+#define SCALE       4
 #define ODR         LIS3DH_ODR_100Hz
 #define SLEEP       (100 * 1000U)
 #define SPI_CONF    (SPI_CONF_SECOND_FALLING)
@@ -89,8 +89,7 @@ int main(void)
     }
 
     puts("Initializing LIS3DH sensor... ");
-    if (lis3dh_init(&dev, TEST_LIS3DH_SPI, TEST_LIS3DH_CS,
-                      TEST_LIS3DH_INT1, TEST_LIS3DH_INT2, SCALE) == 0) {
+    if (lis3dh_init(&dev, TEST_LIS3DH_SPI, TEST_LIS3DH_CS, SCALE) == 0) {
         puts("[OK]");
     }
     else {
@@ -153,7 +152,7 @@ int main(void)
     }
 
     puts("Set INT1 callback");
-    if (gpio_init_int(dev.int1, GPIO_NOPULL, GPIO_RISING, test_int1, (void*)&int1_count) == 0) {
+    if (gpio_init_int(TEST_LIS3DH_INT1, GPIO_NOPULL, GPIO_RISING, test_int1, (void*)&int1_count) == 0) {
         puts("[OK]");
     }
     else {
@@ -181,7 +180,7 @@ int main(void)
                 puts("[Failed]\n");
                 return 1;
             }
-            int1 = gpio_read(dev.int1);
+            int1 = gpio_read(TEST_LIS3DH_INT1);
             printf("X: %6d Y: %6d Z: %6d Temp: %6d, INT1: %08x\n",
                    acc_data.acc_x, acc_data.acc_y, acc_data.acc_z, temperature, int1);
             --fifo_level;

@@ -134,10 +134,6 @@ int srf08_get_distances(srf08_t *dev, uint16_t *range_array, int num_echos, srf0
             return -3;
         }
 
-        if (range_bytes == 0) {
-            break;
-        }
-
         else {
             uint16_t distance = (range_bytes[0] << 8) | range_bytes[1];
             range_array[(register_location - 2) / 2] = distance;

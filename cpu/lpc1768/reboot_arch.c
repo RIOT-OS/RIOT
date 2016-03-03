@@ -23,7 +23,6 @@
 
 #include <stdio.h>
 
-#include "kernel.h"
 #include "cpu.h"
 
 void reboot(void)

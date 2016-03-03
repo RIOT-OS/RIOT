@@ -31,7 +31,6 @@
 #include "cpu.h"
 #include "lpm.h"
 #include "VIC.h"
-#include "kernel.h"
 #include "ssp0-board.h"
 #include "smb380-board.h"
 #include "xtimer.h"

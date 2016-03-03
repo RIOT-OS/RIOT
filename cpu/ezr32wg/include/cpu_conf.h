@@ -40,11 +40,6 @@ extern "C" {
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
-/**
- * @brief   CPUID_ID_LEN length of cpuid in bytes
- */
-#define CPUID_ID_LEN                    (8U)    /* 64-bit unique ID */
-
 #ifdef __cplusplus
 }
 #endif

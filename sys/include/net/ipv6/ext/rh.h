@@ -23,11 +23,23 @@
 #include <stdint.h>
 
 #include "net/ipv6/addr.h"
+#include "net/ipv6/ext.h"
 #include "net/ipv6/hdr.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name Return codes for routing header processing
+ * @{
+ */
+#define EXT_RH_CODE_ERROR       (-1)
+#define EXT_RH_CODE_FORWARD     (0)
+#define EXT_RH_CODE_OK          (1)
+/**
+ * @}
+ */
 
 /**
  * @brief   IPv6 routing extension header.
@@ -46,14 +58,16 @@ typedef struct __attribute__((packed)) {
 } ipv6_ext_rh_t;
 
 /**
- * @brief   Extract next hop from the routing header of an IPv6 packet.
+ * @brief   Process the routing header of an IPv6 packet.
  *
- * @param[in] ipv6      An IPv6 packet.
+ * @param[in, out] ipv6     An IPv6 packet.
+ * @param[in] ext           A routing header of @ipv6.
  *
- * @return  next hop on success, on success
- * @return  NULL, if not found.
+ * @return  EXT_RH_CODE_ERROR
+ * @return  EXT_RH_CODE_FORWARD
+ * @return  EXT_RH_CODE_OK
  */
-ipv6_addr_t *ipv6_ext_rh_next_hop(ipv6_hdr_t *ipv6);
+int ipv6_ext_rh_process(ipv6_hdr_t *ipv6, ipv6_ext_rh_t *ext);
 
 #ifdef __cplusplus
 }

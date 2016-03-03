@@ -67,7 +67,7 @@ int main(void)
 
     while (1) {
         mma8652_read(&dev, &x, &y, &z, &status);
-        printf("Acceleration, raw: X: %d Y: %d Z: %d S: %2x\n", x, y, z, status);
+        printf("Acceleration, in mg: X: %d Y: %d Z: %d S: %2x\n", x, y, z, status);
         xtimer_usleep(SLEEP);
     }
 

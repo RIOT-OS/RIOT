@@ -32,36 +32,6 @@
  */
 static uart_isr_ctx_t config[UART_NUMOF];
 
-/**
- * The list of UART peripherals.
- */
-static const unsigned long g_ulUARTPeriph[3] =
-{
-    SYSCTL_PERIPH_UART0,
-    SYSCTL_PERIPH_UART1,
-    SYSCTL_PERIPH_UART2
-};
-
-/**
- * The list of all possible base address of the console UART
- */
-static const unsigned long g_ulUARTBase[3] =
-{
-    UART0_BASE,
-    UART1_BASE,
-    UART2_BASE
-};
-
-/**
- * The list of possible interrupts for the console UART.
- */
-static const unsigned long g_ulUARTInt[3] =
-{
-    INT_UART0,
-    INT_UART1,
-    INT_UART2
-};
-
 static int init_base(uart_t uart, uint32_t baudrate);
 
 /**

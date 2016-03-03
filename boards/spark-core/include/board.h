@@ -36,6 +36,11 @@
 #define LOCATION_VTABLE     (0x08005000)
 
 /**
+ * @name Tell the xtimer that we use a 16-bit peripheral timer
+ */
+#define XTIMER_MASK         (0xffff0000)
+
+/**
  * @name LED pin definitions
  * @{
  */
