@@ -146,6 +146,9 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     /* round down the stacksize to a multiple of thread_t alignments (usually 16/32bit) */
     stacksize -= stacksize % ALIGN_OF(thread_t);
 
+    if (stacksize < 0) {
+        DEBUG("thread_create: stacksize is too small!\n");
+    }
     /* allocate our thread control block at the top of our stackspace */
     thread_t *cb = (thread_t *) (stack + stacksize);
 
