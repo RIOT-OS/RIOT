@@ -69,8 +69,12 @@ int thread_wakeup(kernel_pid_t pid)
 
     unsigned old_state = disableIRQ();
 
-    thread_t *other_thread = (thread_t *) sched_threads[pid];
-    if (other_thread && other_thread->status == STATUS_SLEEPING) {
+    thread_t *other_thread = (thread_t *) thread_get(pid);
+
+    if (!other_thread) {
+        DEBUG("thread_wakeup: Thread does not exist!\n");
+    }
+    else if (other_thread->status == STATUS_SLEEPING) {
         DEBUG("thread_wakeup: Thread is sleeping.\n");
 
         sched_set_status(other_thread, STATUS_RUNNING);
@@ -82,10 +86,10 @@ int thread_wakeup(kernel_pid_t pid)
     }
     else {
         DEBUG("thread_wakeup: Thread is not sleeping!\n");
-
-        restoreIRQ(old_state);
-        return STATUS_NOT_FOUND;
     }
+
+    restoreIRQ(old_state);
+    return STATUS_NOT_FOUND;
 }
 
 void thread_yield(void)
