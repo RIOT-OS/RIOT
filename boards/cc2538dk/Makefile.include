@@ -3,7 +3,7 @@ export CPU        = cc2538
 export CPU_MODEL ?= cc2538nf53
 
 # setup serial terminal
-export PORT      ?= /dev/ttyUSB1
+PORT_LINUX ?= $(firstword $(wildcard /dev/serial/by-id/*XDS100v3*if01* /dev/ttyUSB1))
 include $(RIOTBOARD)/Makefile.include.serial
 
 # debugger config
