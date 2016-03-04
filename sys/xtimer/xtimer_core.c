@@ -119,7 +119,7 @@ void xtimer_set(xtimer_t *timer, uint32_t offset)
         return;
     }
 
-    //xtimer_remove(timer);
+    xtimer_remove(timer);
 
     if (offset < XTIMER_BACKOFF) {
         xtimer_spin(offset);
@@ -174,6 +174,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     }
 
     timer->target = target - XTIMER_OVERHEAD;
+    //timer->target = target;
     timer->long_target = _long_cnt;
     if (target < now) {
         timer->long_target++;
@@ -205,8 +206,8 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     return res;
 }
 
-static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer)
-{
+static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer) {
+
     while (*list_head && (*list_head)->target <= timer->target) {
         list_head = &((*list_head)->next);
     }
