@@ -55,6 +55,7 @@ buildtest:
 	        RIOTBASE=$${RIOTBASE} \
 	        RIOTBOARD=$${RIOTBOARD} \
 	        RIOTCPU=$${RIOTCPU} \
+	        RIOTPKG=$${RIOTPKG} \
 	        BINDIRBASE=$${BINDIRBASE} \
 	        RIOTNOLINK=$${RIOTNOLINK} \
 	        RIOT_VERSION=$${RIOT_VERSION} \
@@ -90,6 +91,7 @@ buildtest:
 	    RIOTBASE=$${RIOTBASE} \
 	    RIOTBOARD=$${RIOTBOARD} \
 	    RIOTCPU=$${RIOTCPU} \
+	    RIOTPKG=$${RIOTPKG} \
 	    BINDIRBASE=$${BINDIRBASE} \
 	    RIOTNOLINK=$${RIOTNOLINK} \
 	    RIOT_VERSION=$${RIOT_VERSION} \
@@ -127,6 +129,7 @@ info-buildsizes:
 	    RIOTBASE=$${RIOTBASE} \
 	    RIOTBOARD=$${RIOTBOARD} \
 	    RIOTCPU=$${RIOTCPU} \
+	    RIOTPKG=$${RIOTPKG} \
 	    BINDIRBASE=$${BINDIRBASE} \
 	    $(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${BOARD}"; \
 	done;
@@ -143,6 +146,7 @@ info-buildsizes-diff:
 	      RIOTBASE=$${RIOTBASE} \
 	      RIOTBOARD=$${RIOTBOARD} \
 	      RIOTCPU=$${RIOTCPU} \
+	      RIOTPKG=$${RIOTPKG} \
 	      BINDIRBASE=$${BINDIRBASE} \
 	      $(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4; \
 	  done | \
@@ -176,6 +180,7 @@ info-build:
 	@echo 'RIOTBASE:  $(RIOTBASE)'
 	@echo 'RIOTBOARD: $(RIOTBOARD)'
 	@echo 'RIOTCPU:   $(RIOTCPU)'
+	@echo 'RIOTPKG:   $(RIOTPKG)'
 	@echo ''
 	@echo 'DEFAULT_MODULE: $(sort $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE)))'
 	@echo 'DISABLE_MODULE: $(sort $(DISABLE_MODULE))'
@@ -296,5 +301,5 @@ info-files:
 	    echo "$$CPPSRC" | xargs dirname -- | sort | uniq | xargs -I{} find {} -name "Makefile*"; \
 	    echo "$$CPPSRC" | xargs $(CXX) $(CXXFLAGS) $(INCLUDES) -MM 2> /dev/null | grep -o "[^ ]\+\.h"; \
 	  fi; \
-	  $(foreach pkg,$(USEPKG),find $(RIOTBASE)/pkg/$(pkg) -type f;) \
+	  $(foreach pkg,$(USEPKG),find $(RIOTPKG)/$(pkg) -type f;) \
 	) | sort | uniq | sed 's#$(RIOTBASE)/##'

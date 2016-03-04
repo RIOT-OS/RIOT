@@ -15,6 +15,8 @@ RIOTCPU := $(abspath $(RIOTCPU))
 RIOTBOARD ?= $(RIOTBASE)/boards
 RIOTBOARD := $(abspath $(RIOTBOARD))
 
+RIOTPKG ?= $(RIOTBASE)/pkg
+
 RIOTPROJECT ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 RIOTPROJECT := $(abspath $(RIOTPROJECT))
 
@@ -247,33 +249,33 @@ INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    all $(BASELIBS) $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include): clean
+    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include): clean
 endif
 
 # include Makefile.includes for packages in $(USEPKG)
-$(RIOTBASE)/pkg/%/Makefile.include::
-	$(AD)"$(MAKE)" -C $(RIOTBASE)/pkg/$* Makefile.include
+$(RIOTPKG)/%/Makefile.include::
+	$(AD)"$(MAKE)" -C $(RIOTPKG)/$* Makefile.include
 
-.PHONY: $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include)
--include $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include)
+.PHONY: $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
+-include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 
 .PHONY: $(USEPKG:%=${BINDIR}%.a)
 $(USEPKG:%=${BINDIR}%.a):
 	@mkdir -p ${BINDIR}
-	"$(MAKE)" -C $(RIOTBASE)/pkg/$(patsubst ${BINDIR}%.a,%,$@)
+	"$(MAKE)" -C $(RIOTPKG)/$(patsubst ${BINDIR}%.a,%,$@)
 
 clean:
-	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i clean ; done
+	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i clean ; done
 	-@rm -rf $(BINDIR)
 	-@rm -rf $(SCANBUILD_OUTPUTDIR)
 
 # Remove intermediates, but keep the .elf, .hex and .map etc.
 clean-intermediates:
-	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i clean ; done
+	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i clean ; done
 	-@rm -rf $(BINDIR)/*.a $(BINDIR)/*/
 
 distclean:
-	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i distclean ; done
+	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
 flash: all
