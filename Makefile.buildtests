@@ -50,7 +50,7 @@ buildtest:
 	        PATH=$${PATH} \
 	        BOARD=$${BOARD} \
 	        CCACHE=$${CCACHE} \
-	        CCACHE_DIR=$${CCACHE_DIR} \
+	        $${CCACHE_DIR:+CCACHE_DIR=$${CCACHE_DIR}} \
 	        CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
 	        RIOTBASE=$${RIOTBASE} \
 	        RIOTBOARD=$${RIOTBOARD} \
@@ -85,7 +85,7 @@ buildtest:
 	    PATH=$${PATH} \
 	    BOARD=$${BOARD} \
 	    CCACHE=$${CCACHE} \
-	    CCACHE_DIR=$${CCACHE_DIR} \
+	    $${CCACHE_DIR:+CCACHE_DIR=$${CCACHE_DIR}} \
 	    CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
 	    RIOTBASE=$${RIOTBASE} \
 	    RIOTBOARD=$${RIOTBOARD} \
