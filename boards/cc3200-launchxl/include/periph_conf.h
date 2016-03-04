@@ -32,15 +32,12 @@ extern "C" {
 
 #define CLOCK_CORECLOCK     (80000000U)      /* desired core clock frequency */
 
-/*
- * 25 usec in cc3200 ticks
- */
 #ifdef TIME_TICKS_UNIT
- #define XTIMER_BACKOFF 2000
- #define XTIMER_OVERHEAD 320
+ #define XTIMER_BACKOFF  720
+ #define XTIMER_OVERHEAD 400
 #else
- #define XTIMER_BACKOFF  25
- #define XTIMER_OVERHEAD 4
+ #define XTIMER_BACKOFF  9
+ #define XTIMER_OVERHEAD 5
 #endif
 
 
