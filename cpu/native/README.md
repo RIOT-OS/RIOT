@@ -18,20 +18,18 @@ All this does is run your application under Valgrind.
 Now Valgrind will print some information whenever it detects an
 invalid memory access.
 
-In order to debug the program when this occurs you can pass the
---db-attach parameter to Valgrind. E.g:
+In order to debug the program when this occurs you can use the targets
+debug-valgrind-server and debug-valgrind. Therefore, you need to open two
+terminals and run:
 
-    valgrind --db-attach=yes ./bin/native/default.elf tap0
+    make debug-valgrind-server
 
-Now, you will be asked whether you would like to attach the running
-process to gdb whenever a problem occurs.
+in the first one and run:
 
-In order for this to work under Linux 3.4 or newer, you might need to
-disable the ptrace access restrictions:
-As root call:
+    make debug-valgrind
 
-    echo 0 > /proc/sys/kernel/yama/ptrace_scope
-
+in the seconde one. This starts per default gdb attached to valgrinds gdb
+server (vgdb).
 
 Network Support
 ===============
