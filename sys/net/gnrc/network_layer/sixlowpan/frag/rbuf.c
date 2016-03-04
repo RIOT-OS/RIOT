@@ -248,16 +248,13 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
 
 static void _rbuf_gc(void)
 {
-    rbuf_t *oldest = NULL;
     uint32_t now_usec = xtimer_now();
     unsigned int i;
 
     for (i = 0; i < RBUF_SIZE; i++) {
-        if (rbuf[i].pkt == NULL) { /* leave GC early if there is still room */
-            return;
-        }
-        else if ((rbuf[i].pkt != NULL) &&
-                 ((now_usec - rbuf[i].arrival) > RBUF_TIMEOUT)) {
+        /* since pkt occupies pktbuf, aggressivly collect garbage */
+        if ((rbuf[i].pkt != NULL) &&
+              ((now_usec - rbuf[i].arrival) > RBUF_TIMEOUT)) {
             DEBUG("6lo rfrag: entry (%s, ", gnrc_netif_addr_to_str(l2addr_str,
                     sizeof(l2addr_str), rbuf[i].src, rbuf[i].src_len));
             DEBUG("%s, %u, %u) timed out\n",
@@ -268,15 +265,6 @@ static void _rbuf_gc(void)
             gnrc_pktbuf_release(rbuf[i].pkt);
             _rbuf_rem(&(rbuf[i]));
         }
-        else if ((oldest == NULL) || ((oldest->arrival - rbuf[i].arrival) < (UINT32_MAX / 2))) {
-            oldest = &(rbuf[i]);
-        }
-    }
-
-    if ((i >= RBUF_SIZE) && (oldest != NULL) && (oldest->pkt != NULL)) {
-        DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
-        gnrc_pktbuf_release(oldest->pkt);
-        _rbuf_rem(oldest);
     }
 }
 
@@ -284,7 +272,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
                          const void *dst, size_t dst_len,
                          size_t size, uint16_t tag)
 {
-    rbuf_t *res = NULL;
+    rbuf_t *res = NULL, *oldest = NULL;
     uint32_t now_usec = xtimer_now();
 
     for (unsigned int i = 0; i < RBUF_SIZE; i++) {
@@ -309,33 +297,49 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
         if ((res == NULL) && (rbuf[i].pkt == NULL)) {
             res = &(rbuf[i]);
         }
-    }
 
-    if (res != NULL) { /* entry not in buffer but found empty spot */
-        res->pkt = gnrc_pktbuf_add(NULL, NULL, size, GNRC_NETTYPE_SIXLOWPAN);
-        if (res->pkt == NULL) {
-            DEBUG("6lo rfrag: can not allocate reassembly buffer space.\n");
-            return NULL;
+        /* remember oldest slot */
+        /* note that xtimer_now will overflow in ~1.2 hours */
+        if ((oldest == NULL) || (oldest->arrival - rbuf[i].arrival < UINT32_MAX / 2)) {
+            oldest = &(rbuf[i]);
         }
-
-        *((uint64_t *)res->pkt->data) = 0;  /* clean first few bytes for later
-                                             * look-ups */
-        res->arrival = now_usec;
-        memcpy(res->src, src, src_len);
-        memcpy(res->dst, dst, dst_len);
-        res->src_len = src_len;
-        res->dst_len = dst_len;
-        res->tag = tag;
-        res->cur_size = 0;
-
-        DEBUG("6lo rfrag: entry %p (%s, ", (void *)res,
-              gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->src,
-                                     res->src_len));
-        DEBUG("%s, %u, %u) created\n",
-              gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->dst,
-                                     res->dst_len), (unsigned)res->pkt->size,
-              res->tag);
     }
+
+    /* entry not in buffer and no empty spot found */
+    if (res == NULL) {
+        assert(oldest != NULL);
+        assert(oldest->pkt != NULL); /* if oldest->pkt == NULL, res must not be NULL */
+        DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
+        gnrc_pktbuf_release(oldest->pkt);
+        _rbuf_rem(oldest);
+        res = oldest;
+    }
+
+    /* now we have an empty spot */
+
+    res->pkt = gnrc_pktbuf_add(NULL, NULL, size, GNRC_NETTYPE_SIXLOWPAN);
+    if (res->pkt == NULL) {
+        DEBUG("6lo rfrag: can not allocate reassembly buffer space.\n");
+        return NULL;
+    }
+
+    *((uint64_t *)res->pkt->data) = 0;  /* clean first few bytes for later
+                                         * look-ups */
+    res->arrival = now_usec;
+    memcpy(res->src, src, src_len);
+    memcpy(res->dst, dst, dst_len);
+    res->src_len = src_len;
+    res->dst_len = dst_len;
+    res->tag = tag;
+    res->cur_size = 0;
+
+    DEBUG("6lo rfrag: entry %p (%s, ", (void *)res,
+          gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->src,
+                                 res->src_len));
+    DEBUG("%s, %u, %u) created\n",
+          gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->dst,
+                                 res->dst_len), (unsigned)res->pkt->size,
+          res->tag);
 
     return res;
 }
