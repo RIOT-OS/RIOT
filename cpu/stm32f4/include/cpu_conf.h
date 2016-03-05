@@ -21,6 +21,8 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #if defined(CPU_MODEL_STM32F401RE)
 #include "stm32f401xe.h"
 #elif defined(CPU_MODEL_STM32F407VG)

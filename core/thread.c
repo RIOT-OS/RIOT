@@ -29,7 +29,7 @@
 #include "bitarithm.h"
 #include "sched.h"
 
-volatile tcb_t *thread_get(kernel_pid_t pid)
+volatile thread_t *thread_get(kernel_pid_t pid)
 {
     if (pid_is_valid(pid)) {
         return sched_threads[pid];
@@ -39,14 +39,14 @@ volatile tcb_t *thread_get(kernel_pid_t pid)
 
 int thread_getstatus(kernel_pid_t pid)
 {
-    volatile tcb_t *t = thread_get(pid);
+    volatile thread_t *t = thread_get(pid);
     return t ? (int) t->status : STATUS_NOT_FOUND;
 }
 
 #ifdef DEVELHELP
 const char *thread_getname(kernel_pid_t pid)
 {
-    volatile tcb_t *t = thread_get(pid);
+    volatile thread_t *t = thread_get(pid);
     return t ? t->name : NULL;
 }
 #endif
@@ -58,7 +58,7 @@ void thread_sleep(void)
     }
 
     unsigned state = disableIRQ();
-    sched_set_status((tcb_t *)sched_active_thread, STATUS_SLEEPING);
+    sched_set_status((thread_t *)sched_active_thread, STATUS_SLEEPING);
     restoreIRQ(state);
     thread_yield_higher();
 }
@@ -69,7 +69,7 @@ int thread_wakeup(kernel_pid_t pid)
 
     unsigned old_state = disableIRQ();
 
-    tcb_t *other_thread = (tcb_t *) sched_threads[pid];
+    thread_t *other_thread = (thread_t *) sched_threads[pid];
     if (other_thread && other_thread->status == STATUS_SLEEPING) {
         DEBUG("thread_wakeup: Thread is sleeping.\n");
 
@@ -91,7 +91,7 @@ int thread_wakeup(kernel_pid_t pid)
 void thread_yield(void)
 {
     unsigned old_state = disableIRQ();
-    tcb_t *me = (tcb_t *)sched_active_thread;
+    thread_t *me = (thread_t *)sched_active_thread;
     if (me->status >= STATUS_ON_RUNQUEUE) {
         clist_advance(&sched_runqueues[me->priority]);
     }
@@ -137,13 +137,13 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     }
 
     /* make room for the thread control block */
-    stacksize -= sizeof(tcb_t);
+    stacksize -= sizeof(thread_t);
 
-    /* round down the stacksize to a multiple of tcb_t alignments (usually 16/32bit) */
-    stacksize -= stacksize % ALIGN_OF(tcb_t);
+    /* round down the stacksize to a multiple of thread_t alignments (usually 16/32bit) */
+    stacksize -= stacksize % ALIGN_OF(thread_t);
 
     /* allocate our thread control block at the top of our stackspace */
-    tcb_t *cb = (tcb_t *) (stack + stacksize);
+    thread_t *cb = (thread_t *) (stack + stacksize);
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
     if (flags & THREAD_CREATE_STACKTEST) {

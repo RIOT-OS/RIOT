@@ -25,6 +25,8 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #ifdef CPU_MODEL_KW21D256
 #include "MKW22D5.h"
 #elif CPU_MODEL_KW21D512

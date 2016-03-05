@@ -32,6 +32,7 @@
 
 #include "cpu.h"
 #include "board.h"
+#include "sched.h"
 #include "thread.h"
 #include "reboot.h"
 #include "irq.h"

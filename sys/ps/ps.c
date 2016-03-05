@@ -19,7 +19,7 @@
 
 #include "thread.h"
 #include "sched.h"
-#include "tcb.h"
+#include "thread.h"
 #include "kernel_types.h"
 
 #ifdef MODULE_SCHEDSTATISTICS
@@ -66,7 +66,7 @@ void ps(void)
            "state");
 
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
-        tcb_t *p = (tcb_t *)sched_threads[i];
+        thread_t *p = (thread_t *)sched_threads[i];
 
         if (p != NULL) {
             int state = p->status;                                                 /* copy state */

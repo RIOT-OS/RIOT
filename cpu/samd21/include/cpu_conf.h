@@ -18,6 +18,8 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #include "samd21.h"
 
 #ifdef __cplusplus
