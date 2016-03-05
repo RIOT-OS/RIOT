@@ -62,7 +62,7 @@ buildtest:
 	        WERROR=$${WERROR} \
 	        LTO=$${LTO} \
 	        TOOLCHAIN=$${TOOLCHAIN} \
-	        $(MAKE) -j$(NPROC) 2>&1) ; \
+	        $(MAKE) -j$(NPROC) -B 2>&1) ; \
 	    if [ "$${?}" = "0" ]; then \
 	      ${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
 	      if [ -n "$${BUILDTEST_VERBOSE}" ]; then \
