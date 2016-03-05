@@ -358,6 +358,10 @@ auto_init_mpu9150();
     extern void auto_init_adcxx1c(void);
     auto_init_adcxx1c();
 #endif
+#ifdef MODULE_MMA7660
+    extern void auto_init_mma7660(void);
+    auto_init_mma7660();
+#endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 
