@@ -29,7 +29,7 @@ def run(testfunc, timeout=5, echo=True):
         return 1
     finally:
         print("")
-        child.kill(signal.SIGKILL)
+        os.killpg(os.getpgid(child.pid), signal.SIGKILL)
         child.close()
 
     return 0
