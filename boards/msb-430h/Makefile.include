@@ -1,1 +1,2 @@
+USEMODULE += msb-430-common
 include $(RIOTBOARD)/msb-430-common/Makefile.include
