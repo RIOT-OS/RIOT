@@ -9,6 +9,10 @@ ifneq (,$(filter at30tse75x,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter at30ts74,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter at86rf2%,$(USEMODULE)))
   USEMODULE += at86rf2xx
   USEMODULE += xtimer
