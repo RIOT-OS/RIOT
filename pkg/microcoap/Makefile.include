@@ -1,1 +1,1 @@
-INCLUDES += -I$(RIOTBASE)/pkg/microcoap/microcoap
+INCLUDES += -I$(RIOTPKG)/microcoap/microcoap

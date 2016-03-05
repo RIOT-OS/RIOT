@@ -1,1 +1,1 @@
-INCLUDES += -I$(RIOTBASE)/pkg/tlsf/tlsf
+INCLUDES += -I$(RIOTPKG)/tlsf/tlsf

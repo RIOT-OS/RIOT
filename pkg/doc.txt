@@ -11,7 +11,7 @@
  *
  * ~~~~~~~~ {.mk}
  * USEPKG += <pkg_name>
- * INCLUDE += $(RIOTBASE)/pkg/<pkg_name>/...
+ * INCLUDE += $(RIOTPKG)/<pkg_name>/...
  * ~~~~~~~~
  *
  * Porting an external library

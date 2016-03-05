@@ -1,1 +1,1 @@
-INCLUDES += -I $(RIOTBASE)/pkg/oonf_api/oonf_api/src-api
+INCLUDES += -I$(RIOTPKG)/oonf_api/oonf_api/src-api
