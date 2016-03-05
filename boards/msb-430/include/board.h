@@ -13,7 +13,10 @@
  *
  * <h2>Compontents</h2>
  * \li MSP430
- * \li CC1100
+ * \li CC1020
+ * \li SHT11
+ * \li MMA7260Q
+ * \li LED
  *
  * @{
  *
