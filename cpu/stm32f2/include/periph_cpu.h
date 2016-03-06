@@ -197,10 +197,10 @@ static inline void dma_isr_enable(int stream)
         NVIC_EnableIRQ(DMA1_Stream7_IRQn);
     }
     else if (stream < 14) {
-        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + stream));
+        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + (stream - 7)));
     }
     else if (stream < 17) {
-        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + stream));
+        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream - 13)));
     }
 }
 
