@@ -90,7 +90,6 @@ term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
 term-gprof: export TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELF)
 all-valgrind: export CFLAGS += -DHAVE_VALGRIND_H -g
 all-valgrind: export NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
-all-debug: export CFLAGS += -g
 all-cachegrind: export CFLAGS += -g
 all-gprof: export CFLAGS += -pg
 all-gprof: export LINKFLAGS += -pg
@@ -123,8 +122,6 @@ endif
 endif
 
 all: # do not override first target
-
-all-debug: all
 
 all-gprof: all
 
