@@ -68,8 +68,8 @@ extern "C" {
 #define D1_ON               (LED_PORT->BSRRL = D1_PIN)
 #define D1_OFF              (LED_PORT->BSRRH = D1_PIN)
 #define D1_TOGGLE           (LED_PORT->ODR ^= D1_PIN)
-#define D2_ON               (LED_PORT->BSRRL = D2_PIN)
-#define D2_OFF              (LED_PORT->BSRRH = D2_PIN)
+#define D2_ON               (LED_PORT->BSRRH = D2_PIN)
+#define D2_OFF              (LED_PORT->BSRRL = D2_PIN)
 #define D2_TOGGLE           (LED_PORT->ODR ^= D2_PIN)
 
 /* for compatability to other boards */

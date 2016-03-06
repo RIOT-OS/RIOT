@@ -29,14 +29,12 @@ extern "C" {
  * @name Clock system configuration
  * @{
  */
-#define CLOCK_HSE                   (25000000U)         /* external oscillator */
+#define CLOCK_HSE                   (26000000U)         /* external oscillator */
 #define CLOCK_CORECLOCK             (120000000U)        /* desired core clock frequency */
 
 /* the actual PLL values are automatically generated */
 #define CLOCK_PLL_DIV               (CLOCK_HSE / 1000000)
 #define CLOCK_PLL_MUL               ((CLOCK_CORECLOCK / 1000000) * 2)
-#define CLOCK_PLL_SYSCLK_DIV        (2U)
-#define CLOCK_PLL_USB_SDO_RNG_DIV   (CLOCK_PLL_MUL / 48)
 #define CLOCK_AHB_DIV               RCC_CFGR_HPRE_DIV1
 #define CLOCK_APB2_DIV              RCC_CFGR_PPRE2_DIV2
 #define CLOCK_APB1_DIV              RCC_CFGR_PPRE1_DIV4
@@ -44,8 +42,8 @@ extern "C" {
 
 /* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
 #define CLOCK_AHB                   (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB2                  (CLOCK_CORECLOCK / 2)
 #define CLOCK_APB1                  (CLOCK_CORECLOCK / 4)
+#define CLOCK_APB2                  (CLOCK_CORECLOCK / 2)
 /** @} */
 
 /**
@@ -84,19 +82,19 @@ static const uart_conf_t uart_config[] = {
     /* device, RCC mask, RX pin, TX pin, pin AF, IRQ channel, DMA stream, DMA  */
     {
         USART1,                     /* device base register */
-        RCC_APB1ENR_USART1EN,       /* RCC mask */
-        GPIO_PIN(PORT_B,6),         /* RX pin */
-        GPIO_PIN(PORT_B,7),         /* TX pin */
+        RCC_APB2ENR_USART1EN,       /* RCC mask */
+        GPIO_PIN(PORT_A,10),        /* RX pin */
+        GPIO_PIN(PORT_A,9),         /* TX pin */
         GPIO_AF7,                   /* pin AF */
         USART1_IRQn,                /* IRQ channel */
-        6,                          /* DMA stream */
+        15,                         /* DMA stream */
         4                           /* DMA channel */
     },
 };
 
 /* assign ISR vector names */
 #define UART_0_ISR          isr_usart1
-#define UART_0_DMA_ISR      isr_dma1_stream6
+#define UART_0_DMA_ISR      isr_dma2_stream7
 
 /* deduct number of defined UART interfaces */
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))

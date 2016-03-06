@@ -56,58 +56,6 @@
 #ifdef __cplusplus
  extern "C" {
 #endif /* __cplusplus */
-  
-/** @addtogroup Library_configuration_section
-  * @{
-  */
-  
-/* Uncomment the line below according to the target STM32 device used in your
-   application 
-  */
-
-#if !defined (STM32F2XX) 
-  #define STM32F2XX
-#endif
-
-/*  Tip: To avoid modifying this file each time you need to switch between these
-        devices, you can define the device in your toolchain compiler preprocessor.
-  */
-
-#if !defined (STM32F2XX)
- #error "Please select first the target STM32F2XX device used in your application (in stm32f2xx.h file)"
-#endif
-
-#if !defined  (USE_STDPERIPH_DRIVER)
-/**
- * @brief Comment the line below if you will not use the peripherals drivers.
-   In this case, these drivers will not be included and the application code will 
-   be based on direct access to peripherals registers 
-   */
-  /*#define USE_STDPERIPH_DRIVER*/
-#endif /* USE_STDPERIPH_DRIVER */
-
-/**
- * @brief In the following line adjust the value of External High Speed oscillator (HSE)
-   used in your application 
-   
-   Tip: To avoid modifying this file each time you need to use different HSE, you
-        can define the HSE value in your toolchain compiler preprocessor.
-  */           
-#if !defined  (HSE_VALUE) 
-  #define HSE_VALUE    ((uint32_t)25000000) /*!< Value of the External oscillator in Hz */
-#endif /* HSE_VALUE */
-
-/**
- * @brief In the following line adjust the External High Speed oscillator (HSE) Startup 
-   Timeout value 
-   */
-#if !defined  (HSE_STARTUP_TIMEOUT) 
-  #define HSE_STARTUP_TIMEOUT    ((uint16_t)0x0500)   /*!< Time out for HSE start up */
-#endif /* HSE_STARTUP_TIMEOUT */
-
-#if !defined  (HSI_VALUE)   
-  #define HSI_VALUE    ((uint32_t)16000000) /*!< Value of the Internal oscillator in Hz*/
-#endif /* HSI_VALUE */
 
 /**
  * @brief STM32F2XX Standard Peripherals Library version number V1.1.3
