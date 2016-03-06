@@ -15,7 +15,6 @@
  * @file
  * @brief           Implementation specific CPU configuration options
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  * @author          Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl
  */
 

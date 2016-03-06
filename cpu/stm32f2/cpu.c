@@ -78,9 +78,8 @@ static void clk_init(void)
     /* PCLK1 = HCLK */
     RCC->CFGR |= (uint32_t)CLOCK_APB1_DIV;
     /*  PLL configuration: PLLCLK = SOURCE_CLOCK / SOURCE_CLOCK_DIV * SOURCE_CLOCK_MUL */
-    RCC->CFGR &= ~((uint32_t)(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ));
-    RCC->CFGR |= (uint32_t)(RCC_PLL_SOURCE | CLOCK_PLL_DIV | (CLOCK_PLL_MUL << 6)
-                 | (((CLOCK_PLL_SYSCLK_DIV >> 1) -1) << 16) | (CLOCK_PLL_USB_SDO_RNG_DIV << 24));
+    RCC->PLLCFGR &= ~((uint32_t)(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ));
+    RCC->PLLCFGR |= (uint32_t)(RCC_PLL_SOURCE | CLOCK_PLL_DIV | (CLOCK_PLL_MUL << 6));
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
     /* Wait till PLL is ready */

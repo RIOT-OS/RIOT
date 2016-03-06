@@ -13,7 +13,6 @@
  * @file
  * @brief       Low-level DAC driver implementation
  *
- * @author      Simon Brummer<simon.brummer@haw-hamburg.de>
  * @author      Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
  *
  * @}

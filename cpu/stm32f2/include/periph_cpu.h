@@ -13,7 +13,6 @@
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  * @author          Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
  */
 
@@ -122,7 +121,7 @@ void gpio_init_af(gpio_t pin, gpio_af_t af);
  */
 static inline void dma_poweron(int stream)
 {
-    if (stream < 8) {
+    if (stream <= 8) {
         RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
     } else {
         RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
@@ -140,7 +139,7 @@ static inline void dma_poweron(int stream)
  */
 static inline DMA_TypeDef *dma_base(int stream)
 {
-    return (stream < 8) ? DMA1 : DMA2;
+    return (stream <= 8) ? DMA1 : DMA2;
 }
 
 /**
@@ -197,11 +196,11 @@ static inline void dma_isr_enable(int stream)
     else if (stream == 8) {
         NVIC_EnableIRQ(DMA1_Stream7_IRQn);
     }
-    else if (stream < 14) {
-        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + stream));
+    else if (stream < 13) {
+        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + (stream - 7)));
     }
-    else if (stream < 17) {
-        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + stream));
+    else if (stream < 16) {
+        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream - 13)));
     }
 }
 
