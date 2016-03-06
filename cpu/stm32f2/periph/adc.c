@@ -13,7 +13,6 @@
  * @file
  * @brief       Low-level ADC driver implementation
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
  *
  * @}
