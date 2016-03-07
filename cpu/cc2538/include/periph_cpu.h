@@ -19,6 +19,8 @@
 #ifndef PERIPH_CPU_H_
 #define PERIPH_CPU_H_
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
