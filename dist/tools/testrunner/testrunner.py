@@ -10,7 +10,7 @@
 import os, signal, sys, subprocess
 from pexpect import spawnu, TIMEOUT, EOF
 
-def run(testfunc, timeout=5, echo=True):
+def run(testfunc, timeout=10, echo=True):
     env = os.environ.copy()
     child = spawnu("make term", env=env, timeout=timeout)
     if echo:
