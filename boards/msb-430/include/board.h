@@ -11,14 +11,22 @@
  * @ingroup     boards
  * @brief       Support for the ScatterWeb MSB-430 board
  *
- * <h2>Compontents</h2>
+ * @details
+ * See
+ * http://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/Z_Finished_Projects/ScatterWeb/modules/mod_MSB-430.html
+ * for circuit diagram etc.
+ *
+ * <h2>Components</h2>
  * \li MSP430
- * \li CC1100
+ * \li CC1020
+ * \li SHT11
+ * \li MMA7260Q
+ * \li LED
  *
  * @{
  *
  * @file
- * @brief       Central defnitions for the ScatterWeb MSB-430 board
+ * @brief       Central definitions for the ScatterWeb MSB-430 board
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  */
