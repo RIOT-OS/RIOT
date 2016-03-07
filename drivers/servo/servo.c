@@ -99,8 +99,7 @@ void servo_set(servo_t *dev, unsigned int pos)
     }
 
     /* rescale value to match PWM peripheral configuration */
-    raw_value = (pos * dev->scale_nom) / dev->scale_den;
-
+    raw_value = ((unsigned long long)((pos * dev->scale_nom) / dev->scale_den) * SERVO_RESOLUTION * SERVO_FREQUENCY)/SEC_IN_USEC;
     DEBUG("servo_set: pos %d -> raw %d\n", pos, raw_value);
 
     pwm_set(dev->device, dev->channel, raw_value);
