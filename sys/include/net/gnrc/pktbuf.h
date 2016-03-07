@@ -215,6 +215,56 @@ gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *sni
  */
 gnrc_pktsnip_t *gnrc_pktbuf_replace_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *old, gnrc_pktsnip_t *add);
 
+/**
+ * @brief Duplicates pktsnip chain upto (including) a snip with the given type
+ *        as a continuous snip.
+ *
+ *          Example:
+ *              Input:
+ *                                                                  buffer
+ *              +---------------------------+                      +------+
+ *              | size = 8                  | data       +-------->|      |
+ *              | type = NETTYPE_IPV6_EXT   |------------+         +------+
+ *              +---------------------------+                      .      .
+ *                    | next                                       .      .
+ *                    v                                            .      .
+ *              +---------------------------+                      +------+
+ *              | size = 40                 | data    +----------->|      |
+ *              | type = NETTYPE_IPV6       |---------+            +------+
+ *              +---------------------------+                      .      .
+ *                    | next                                       .      .
+ *                    v
+ *              +---------------------------+                      +------+
+ *              | size = 14                 | data +-------------->|      |
+ *              | type = NETTYPE_NETIF      |------+               +------+
+ *              +---------------------------+                      .      .
+ *
+ *
+ *              Output:
+ *                                                                  buffer
+ *              +---------------------------+                      +------+
+ *              | size = 48                 | data       +-------->|      |
+ *              | type = NETTYPE_IPV6       |------------+         |      |
+ *              +---------------------------+                      |      |
+ *                    |                                            +------+
+ *                    |                                            .      .
+ *                    | next                                       .      .
+ *                    v
+ *              +---------------------------+                      +------+
+ *              | size = 14                 | data +-------------->|      |
+ *              | type = NETTYPE_NETIF      |------+               +------+
+ *              +---------------------------+                      .      .
+ *
+ *        The original snip is keeped as is except `users` decremented.
+ *
+ * @param[in,out] pkt   The snip to duplicate.
+ * @param[in]     type  The type of snip to stop duplication.
+ *
+ * @return The duplicated snip, if succeeded.
+ * @return NULL, if no space is left in the packet buffer.
+ */
+gnrc_pktsnip_t *gnrc_pktbuf_duplicate_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type);
+
 #ifdef DEVELHELP
 /**
  * @brief   Prints some statistics about the packet buffer to stdout.

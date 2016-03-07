@@ -25,114 +25,6 @@
 
 #ifdef MODULE_GNRC_RPL_SRH
 
-static size_t _cumulate_size_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type)
-{
-    size_t sum = 0;
-
-    for (; pkt != NULL; pkt = pkt->next) {
-        sum += pkt->size;
-
-        if (pkt->type == type) {
-            break;
-        }
-    }
-
-    return sum;
-}
-
-/**
- * @brief duplicates pktsnip chain upto (including) a snip with the given type
- *        as a continuous snip.
- *
- *          Example:
- *              Input:
- *                                                                  buffer
- *              +---------------------------+                      +------+
- *              | size = 8                  | data       +-------->|      |
- *              | type = NETTYPE_IPV6_EXT   |------------+         +------+
- *              +---------------------------+                      .      .
- *                    | next                                       .      .
- *                    v                                            .      .
- *              +---------------------------+                      +------+
- *              | size = 40                 | data    +----------->|      |
- *              | type = NETTYPE_IPV6       |---------+            +------+
- *              +---------------------------+                      .      .
- *                    | next                                       .      .
- *                    v
- *              +---------------------------+                      +------+
- *              | size = 14                 | data +-------------->|      |
- *              | type = NETTYPE_NETIF      |------+               +------+
- *              +---------------------------+                      .      .
- *
- *
- *              Output:
- *                                                                  buffer
- *              +---------------------------+                      +------+
- *              | size = 48                 | data       +-------->|      |
- *              | type = NETTYPE_IPV6       |------------+         |      |
- *              +---------------------------+                      |      |
- *                    |                                            +------+
- *                    |                                            .      .
- *                    | next                                       .      .
- *                    v
- *              +---------------------------+                      +------+
- *              | size = 14                 | data +-------------->|      |
- *              | type = NETTYPE_NETIF      |------+               +------+
- *              +---------------------------+                      .      .
- *
- *        The original snip is keeped as is except `users` decremented.
- *
- * @param[in,out] pkt   The snip to duplicate.
- * @param[in]     type  The type of snip to stop duplication.
- *
- * @return The duplicated snip, if succeeded.
- * @return NULL, if no space is left in the packet buffer.
- */
-static gnrc_pktsnip_t *_duplicate_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type)
-{
-    bool is_shared = pkt->users > 1;
-    size_t size = _cumulate_size_upto(pkt, type);
-
-    DEBUG("ipv6_ext: duplicating %d octets\n", (int) size);
-
-    gnrc_pktsnip_t *tmp;
-    gnrc_pktsnip_t *target = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
-    gnrc_pktsnip_t *next = (target == NULL) ? NULL : target->next;
-    gnrc_pktsnip_t *new = gnrc_pktbuf_add(next, NULL, size, type);
-
-    if (new == NULL) {
-        return NULL;
-    }
-
-    /* copy payloads */
-    for (tmp = pkt; tmp != NULL; tmp = tmp->next) {
-        uint8_t *dest = ((uint8_t *)new->data) + (size - tmp->size);
-
-        memcpy(dest, tmp->data, tmp->size);
-
-        size -= tmp->size;
-
-        if (tmp->type == type) {
-            break;
-        }
-    }
-
-    /* decrements reference counters */
-
-    if (target != NULL) {
-        target->next = NULL;
-    }
-
-    gnrc_pktbuf_release(pkt);
-
-    if (is_shared && (target != NULL)) {
-        target->next = next;
-    }
-
-    return new;
-}
-
-
 enum gnrc_ipv6_ext_demux_status {
     GNRC_IPV6_EXT_OK,
     GNRC_IPV6_EXT_FORWARDED,
@@ -155,10 +47,10 @@ static enum gnrc_ipv6_ext_demux_status _handle_rh(gnrc_pktsnip_t *current, gnrc_
        the head. `ipv6_ext_rh_process` modifies the IPv6 header as well as
        the extension header */
 
-    current_offset = _cumulate_size_upto(current->next, GNRC_NETTYPE_IPV6);
+    current_offset = gnrc_pkt_len_upto(current->next, GNRC_NETTYPE_IPV6);
 
     if (pkt->users != 1) {
-        if ((ipv6 = _duplicate_upto(pkt, GNRC_NETTYPE_IPV6)) == NULL) {
+        if ((ipv6 = gnrc_pktbuf_duplicate_upto(pkt, GNRC_NETTYPE_IPV6)) == NULL) {
             DEBUG("ipv6: could not get a copy of pkt\n");
             gnrc_pktbuf_release(pkt);
             return GNRC_IPV6_EXT_ERROR;
