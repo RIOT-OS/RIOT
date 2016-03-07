@@ -19,8 +19,6 @@
 #ifndef PERIPH_CPU_H_
 #define PERIPH_CPU_H_
 
-#include "periph/dev_enums.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,9 +28,29 @@ extern "C" {
  */
 #define CPUID_LEN           (8U)
 
+/**
+ * @brief   Define a custom type for GPIO pins
+ * @{
+ */
+#define HAVE_GPIO_T
+typedef uint32_t gpio_t;
+/** @} */
+
+/**
+ * @brief   Definition of a fitting UNDEF value
+ */
+#define GPIO_UNDEF          (0xffffffff)
+
+typedef struct {
+    gpio_t scl_pin;         /**< pin used for SCL */
+    gpio_t sda_pin;         /**< pin used for SDA */
+} i2c_conf_t;
+
 #ifdef __cplusplus
 }
 #endif
+
+#include "periph/dev_enums.h"
 
 #endif /* PERIPH_CPU_H_ */
 /** @} */
