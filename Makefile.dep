@@ -31,6 +31,9 @@ endif
 ifneq (,$(filter netdev2_tap,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += netdev2_eth
+  ifneq (,$(filter gnrc_%,$(USEMODULE)))
+    USEMODULE += gnrc_netdev2
+  endif
 endif
 
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
