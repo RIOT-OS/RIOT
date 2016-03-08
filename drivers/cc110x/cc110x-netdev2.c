@@ -84,6 +84,8 @@ static inline int _get_iid(netdev2_t *netdev, eui64_t *value, size_t max_len)
     cpuid_get(cpuid);
 
     memcpy(eui64 + 8 - n, cpuid, n);
+    eui64[sizeof(eui64_t) - 2] = 0;
+    eui64[sizeof(eui64_t) - 1] = cpuid[CPUID_LEN-1];
 
 #else
     for (int i = 0; i < 8; i++) {
