@@ -69,6 +69,18 @@ typedef enum {
 /** @} */
 
 /**
+ * @brief Override pullup selection values
+ * @{
+ */
+#define HAVE_GPIO_PP_T
+typedef enum {
+    GPIO_NOPULL = 0x00,
+    GPIO_PULLUP = 0xff,
+    GPIO_PULLDOWN = 0xff
+} gpio_pp_t;
+/** @} */
+
+/**
  * @brief   Available ports on MSP430 platforms
  */
 enum {
