@@ -206,6 +206,13 @@ int bind(int socket, const struct sockaddr *address,
  *                          on the address family of the socket.
  * @param[in] address_len   Specifies the length of the sockaddr structure
  *                          pointed to by the address argument.
+ * @post The socket will be implicitely bound to an addressed, if it is not already bound.
+ *       According to
+ *       http://pubs.opengroup.org/onlinepubs/009695399/functions/connect.html
+ *       for a "socket [that] has not already been bound to a local address,
+ *       connect() shall bind it to an address which, unless the socket's
+ *       address family is AF_UNIX, is an unused local address."
+ *
  * @return  Upon successful completion, connect() shall return 0; otherwise,
  *          -1 shall be returned and errno set to indicate the error.
  */
@@ -397,6 +404,17 @@ ssize_t send(int socket, const void *buffer, size_t length, int flags);
  *                          address depend on the address family of the socket.
  * @param[in] address_len   Specifies the length of the sockaddr structure pointed
  *                          to by the @p address argument.
+ *
+ * @post    The socket will implicitely be bound to the unspecified address and
+ *          a random port, in case it is not already bound. Rationale: A client
+ *          should not require to explicitly call bind() to receive packets,
+ *          but is expected to receive replies sent to the ephemeral port that
+ *          was selected as a source port by the UDP implementation.
+ *
+ * @todo    For @ref net_gnrc any @ref recvfrom call that is called to receive
+ *          an expected response to this send command, must be called from the
+ *          same thread. This is undesired behavior and will be fixed in
+ *          upcoming versions of RIOT.
  *
  * @return  Upon successful completion, send() shall return the number of bytes
  *          sent. Otherwise, -1 shall be returned and errno set to indicate the
