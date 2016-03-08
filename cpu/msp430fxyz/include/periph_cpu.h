@@ -74,9 +74,9 @@ typedef enum {
  */
 #define HAVE_GPIO_PP_T
 typedef enum {
-    GPIO_NOPULL = 0x00,
-    GPIO_PULLUP = 0xff,
-    GPIO_PULLDOWN = 0xff
+    GPIO_NOPULL = 0x00,         /**< no pullup resistor */
+    GPIO_PULLUP = 0xff,         /**< use pullup resistor */
+    GPIO_PULLDOWN = 0xff        /**< use pulldown resistor */
 } gpio_pp_t;
 /** @} */
 
