@@ -81,15 +81,46 @@ static int _ctx(gpio_t pin)
 int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
 {
     msp_port_t *port = _port(pin);
-    /* check if port is valid and pull resistor are valid */
-    if ((port == NULL) || (pullup != GPIO_NOPULL)) {
+    /* check if port is valid */
+    if (port == NULL)
         return -1;
-    }
+
     /* set pin direction */
     port->DIR &= ~(_pin(pin));
     port->DIR |= (dir & _pin(pin));
-    /* reset output value */
-    port->OD &= ~(_pin(pin));
+
+    /* select pullup/pulldown resistor */
+    if(pullup != GPIO_NOPULL) {
+        if(port == PORT_1) {
+            P1REN &=  ~(_pin(pin));
+            P1REN |= _pin(pin);
+        }
+        else if(port == PORT_2) {
+            P2REN &= ~(_pin(pin));
+            P2REN |= _pin(pin);
+        }
+        else if(port == PORT_3) {
+            P3REN &= ~(_pin(pin));
+            P3REN |= _pin(pin);
+        }
+        else if(port == PORT_4) {
+            P4REN &= ~(_pin(pin));
+            P4REN |= _pin(pin);
+        }
+        else if(port == PORT_5) {
+            P5REN &= ~(_pin(pin));
+            P5REN |= _pin(pin);
+        }
+        else if(port == PORT_6) {
+            P6REN &= ~(_pin(pin));
+            P6REN |= _pin(pin);
+        }
+
+        if(pullup == GPIO_PULLUP)
+            port->OD |= _pin(pin);
+        else
+            port->OD &= ~(_pin(pin));
+    }
     return 0;
 }
 
