@@ -90,38 +90,40 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
     port->DIR &= ~(_pin(pin));
     port->DIR |= (dir & _pin(pin));
 
-    /* select pullup/pulldown resistor */
-    if(pullup != GPIO_NOPULL) {
-        if(port == PORT_1) {
-            P1REN &=  ~(_pin(pin));
-            P1REN |= _pin(pin);
-        }
-        else if(port == PORT_2) {
-            P2REN &= ~(_pin(pin));
-            P2REN |= _pin(pin);
-        }
-        else if(port == PORT_3) {
-            P3REN &= ~(_pin(pin));
-            P3REN |= _pin(pin);
-        }
-        else if(port == PORT_4) {
-            P4REN &= ~(_pin(pin));
-            P4REN |= _pin(pin);
-        }
-        else if(port == PORT_5) {
-            P5REN &= ~(_pin(pin));
-            P5REN |= _pin(pin);
-        }
-        else if(port == PORT_6) {
-            P6REN &= ~(_pin(pin));
-            P6REN |= _pin(pin);
-        }
-
-        if(pullup == GPIO_PULLUP)
-            port->OD |= _pin(pin);
-        else
-            port->OD &= ~(_pin(pin));
+    /* set pullup/pulldown resistor */
+    if(port == PORT_1) {
+        P1REN &= ~(_pin(pin));
+        P1REN |= (pullup & _pin(pin));
     }
+    else if(port == PORT_2) {
+        P2REN &= ~(_pin(pin));
+        P2REN |= (pullup & _pin(pin));
+    }
+    else if(port == PORT_3) {
+        P3REN &= ~(_pin(pin));
+        P3REN |= (pullup & _pin(pin));
+    }
+    else if(port == PORT_4) {
+        P4REN &= ~(_pin(pin));
+        P4REN |= (pullup & _pin(pin));
+    }
+    else if(port == PORT_5) {
+        P5REN &= ~(_pin(pin));
+        P5REN |= (pullup & _pin(pin));
+    }
+    else if(port == PORT_6) {
+        P6REN &= ~(_pin(pin));
+        P6REN |= (pullup & _pin(pin));
+    }
+
+    /* Set output direction */
+    if(pullup == GPIO_PULLUP)
+        /* if pullup selected then output must be high*/
+        port->OD |= _pin(pin);
+        /* for other cases the output is low*/
+    else
+        port->OD &= ~(_pin(pin));
+
     return 0;
 }
 
