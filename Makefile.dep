@@ -364,10 +364,6 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   FEATURES_REQUIRED += cpp
 endif
 
-ifneq (,$(filter gnrc_netdev_eth,$(USEMODULE)))
-  USEMODULE += gnrc_pktbuf
-endif
-
 ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netapi
   USEMODULE += gnrc_netreg
