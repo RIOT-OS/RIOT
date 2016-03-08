@@ -1,4 +1,4 @@
-MODULE = board
+MODULE = wsn430-common
 
 DIRS = drivers
 
