@@ -106,7 +106,7 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
     else {
         if (!ipv6_addr_is_link_local(addr)) {
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
-            tmp_addr->valid = 0xFFFF;
+            tmp_addr->valid = UINT32_MAX;
             gnrc_sixlowpan_nd_router_abr_t *abr = gnrc_sixlowpan_nd_router_abr_get();
             mutex_unlock(&entry->mutex);
             gnrc_ipv6_netif_set_rtr_adv(entry, true);
