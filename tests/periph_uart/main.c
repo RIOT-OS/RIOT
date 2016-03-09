@@ -35,8 +35,8 @@
 #define PRINTER_PRIO        (THREAD_PRIORITY_MAIN - 1)
 #define PRINTER_TYPE        (0xabcd)
 
-#ifndef STDIO
-#define STDIO               (UART_UNDEF)
+#ifndef UART_STDIO_DEV
+#define UART_STDIO_DEV      (UART_UNDEF)
 #endif
 
 typedef struct {
@@ -52,7 +52,7 @@ static char printer_stack[THREAD_STACKSIZE_MAIN];
 static int parse_dev(char *arg)
 {
     int dev = atoi(arg);
-    if (dev == STDIO) {
+    if (dev == UART_STDIO_DEV) {
         printf("Error: The selected UART_DEV(%i) is used for the shell!\n", dev);
         return -2;
     }
@@ -176,7 +176,7 @@ int main(void)
 
     puts("UART INFO:");
     printf("Available devices:               %i\n", UART_NUMOF);
-    printf("UART used for STDIO (the shell): UART_DEV(%i)\n\n", STDIO);
+    printf("UART used for STDIO (the shell): UART_DEV(%i)\n\n", UART_STDIO_DEV);
 
     /* initialize ringbuffers */
     for (int i = 0; i < UART_NUMOF; i++) {

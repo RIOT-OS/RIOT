@@ -20,8 +20,32 @@
 #ifndef UART_STDIO_H
 #define UART_STDIO_H
 
+/* Boards may override the default STDIO UART device */
+#include "board.h"
+
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifndef UART_STDIO_DEV
+/**
+ * @brief UART device to use for STDIO
+ */
+#define UART_STDIO_DEV           UART_DEV(0)
+#endif
+
+#ifndef UART_STDIO_BAUDRATE
+/**
+ * @brief Baudrate for STDIO
+ */
+#define UART_STDIO_BAUDRATE      (115200)
+#endif
+
+#ifndef UART_STDIO_RX_BUFSIZE
+/**
+ * @brief Buffer size for STDIO
+ */
+#define UART_STDIO_RX_BUFSIZE    (64)
 #endif
 
 /**

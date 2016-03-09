@@ -31,14 +31,14 @@
 extern "C" {
 #endif
 
-/* if using ethos + stdio, use STDIO values unless overridden */
+/* if using ethos + stdio, use UART_STDIO values unless overridden */
 #ifdef USE_ETHOS_FOR_STDIO
-#include "board.h"
+#include "uart_stdio.h"
 #ifndef ETHOS_UART
-#define ETHOS_UART  STDIO
+#define ETHOS_UART     UART_STDIO_DEV
 #endif
 #ifndef ETHOS_BAUDRATE
-#define ETHOS_BAUDRATE STDIO_BAUDRATE
+#define ETHOS_BAUDRATE UART_STDIO_BAUDRATE
 #endif
 #endif
 

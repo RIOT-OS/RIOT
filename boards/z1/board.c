@@ -215,7 +215,7 @@ void board_init(void)
     /* initializes DCO */
     msp430_init_dco();
 
-    /* initialize STDIO */
+    /* initialize STDIO over UART */
     uart_stdio_init();
 
     /* enable interrupts */
