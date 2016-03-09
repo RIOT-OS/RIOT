@@ -94,7 +94,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     msp_usart_t *dev = UART_BASE;
 
     for (size_t i = 0; i < len; i++) {
-        while (!(dev->TCTL & USART_TCTL_TXEPT));
+        while (!(dev->TCTL & USART_TCTL_TXEPT)) {}
         dev->TXBUF = data[i];
     }
 }
@@ -182,7 +182,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     (void)uart;
 
     for (size_t i = 0; i < len; i++) {
-        while (!(UART_IF & UART_IE_TX_BIT));
+        while (!(UART_IF & UART_IE_TX_BIT)) {}
         UART_BASE->ATXBUF = data[i];
     }
 }

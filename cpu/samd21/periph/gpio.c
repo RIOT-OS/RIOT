@@ -140,7 +140,7 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
     GCLK->CLKCTRL.reg = (EIC_GCLK_ID |
                          GCLK_CLKCTRL_CLKEN |
                          GCLK_CLKCTRL_GEN_GCLK0);
-    while (GCLK->STATUS.bit.SYNCBUSY);
+    while (GCLK->STATUS.bit.SYNCBUSY) {}
     /* configure the active flank */
     EIC->CONFIG[exti >> 3].reg &= ~(0xf << ((exti & 0x7) * 4));
     EIC->CONFIG[exti >> 3].reg |=  (flank << ((exti & 0x7) * 4));
@@ -152,7 +152,7 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
     EIC->INTENSET.reg = (1 << exti);
     /* enable the EIC module*/
     EIC->CTRL.reg = EIC_CTRL_ENABLE;
-    while (EIC->STATUS.reg & EIC_STATUS_SYNCBUSY);
+    while (EIC->STATUS.reg & EIC_STATUS_SYNCBUSY) {}
     return 0;
 }
 

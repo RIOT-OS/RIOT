@@ -72,7 +72,7 @@ static void clock_init(void)
     RCC->CR |= RCC_CR_HSEON;
 
     /* wait for HSE to be ready */
-    while (!(RCC->CR & RCC_CR_HSERDY));
+    while (!(RCC->CR & RCC_CR_HSERDY)) {}
 
     /* setup the peripheral bus prescalers */
 
@@ -92,7 +92,7 @@ static void clock_init(void)
     /* enable PLL again */
     RCC->CR |= RCC_CR_PLLON;
     /* wait until PLL is stable */
-    while(!(RCC->CR & RCC_CR_PLLRDY));
+    while(!(RCC->CR & RCC_CR_PLLRDY)) {}
 
     /* configure flash latency */
 
@@ -106,5 +106,5 @@ static void clock_init(void)
     RCC->CFGR |= RCC_CFGR_SW_PLL;
 
     /* wait for sysclock to be stable */
-    while (!(RCC->CFGR & RCC_CFGR_SWS_PLL));
+    while (!(RCC->CFGR & RCC_CFGR_SWS_PLL)) {}
 }

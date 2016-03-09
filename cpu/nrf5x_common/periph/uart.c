@@ -143,7 +143,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
             /* write data into transmit register */
             NRF_UART0->TXD = data[i];
             /* wait for any transmission to be done */
-            while (NRF_UART0->EVENTS_TXDRDY == 0);
+            while (NRF_UART0->EVENTS_TXDRDY == 0) {}
             /* reset ready flag */
             NRF_UART0->EVENTS_TXDRDY = 0;
         }
