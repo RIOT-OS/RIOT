@@ -10,6 +10,7 @@ env:
         - NPROC_MAX=8
     matrix:
         - BUILDTEST_MCU_GROUP=static-tests
+        - BUILDTEST_MCU_GROUP=cortex_m4_3
         - BUILDTEST_MCU_GROUP=cortex_m4_2
         - BUILDTEST_MCU_GROUP=cortex_m4_1
         - BUILDTEST_MCU_GROUP=cortex_m0_2
