@@ -55,9 +55,6 @@ endif
 ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
     DIRS += netapi
 endif
-ifneq (,$(filter gnrc_netdev_eth,$(USEMODULE)))
-    DIRS += link_layer/netdev_eth
-endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
     DIRS += netif
 endif
