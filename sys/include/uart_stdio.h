@@ -52,7 +52,7 @@ extern "C" {
 /**
  * @brief initialize the module
  */
-void uart_stdio_init(void);
+int uart_stdio_init(void);
 
 /**
  * @brief read @p len bytes from stdio uart into @p buffer

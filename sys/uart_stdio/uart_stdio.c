@@ -34,6 +34,10 @@
 #include "board.h"
 #include "periph/uart.h"
 
+#ifdef MODULE_PREINIT
+#include "init.h"
+#endif
+
 #ifdef USE_ETHOS_FOR_STDIO
 #include "ethos.h"
 extern ethos_t ethos;
@@ -59,13 +63,14 @@ void uart_stdio_rx_cb(void *arg, uint8_t data)
     mutex_unlock(&_rx_mutex);
 }
 
-void uart_stdio_init(void)
+int uart_stdio_init(void)
 {
 #ifndef USE_ETHOS_FOR_STDIO
     uart_init(UART_STDIO_DEV, UART_STDIO_BAUDRATE, uart_stdio_rx_cb, NULL);
 #else
     uart_init(ETHOS_UART, ETHOS_BAUDRATE, uart_stdio_rx_cb, NULL);
 #endif
+    return 0;
 }
 
 int uart_stdio_read(char* buffer, int count)
@@ -86,3 +91,7 @@ int uart_stdio_write(const char* buffer, int len)
 #endif
     return len;
 }
+
+#ifdef MODULE_PREINIT
+postcore_init(uart_stdio_init);
+#endif
