@@ -66,6 +66,11 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   User button
+ */
+#define BTN_B1_PIN          GPIO_PIN(PORT_C, 13)
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
