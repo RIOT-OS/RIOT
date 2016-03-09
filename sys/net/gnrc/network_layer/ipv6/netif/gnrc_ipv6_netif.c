@@ -549,7 +549,7 @@ kernel_pid_t gnrc_ipv6_netif_find_by_prefix(ipv6_addr_t **out, const ipv6_addr_t
  *      runtime of this function
  */
 static int _create_candidate_set(gnrc_ipv6_netif_t *iface, const ipv6_addr_t *dst,
-                                 uint8_t *candidate_set)
+                                 uint8_t *candidate_set, bool link_local_only)
 {
     int res = -1;
 
@@ -571,6 +571,11 @@ static int _create_candidate_set(gnrc_ipv6_netif_t *iface, const ipv6_addr_t *ds
          */
         if (ipv6_addr_is_multicast(&(iter->addr)) ||
             ipv6_addr_is_unspecified(&(iter->addr))) {
+            continue;
+        }
+
+        /* Check if we only want link local addresses */
+        if (link_local_only && !ipv6_addr_is_link_local(&(iter->addr))) {
             continue;
         }
 
@@ -760,7 +765,7 @@ static ipv6_addr_t *_source_address_selection(gnrc_ipv6_netif_t *iface, const ip
     return res;
 }
 
-ipv6_addr_t *gnrc_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ipv6_addr_t *dst)
+ipv6_addr_t *gnrc_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ipv6_addr_t *dst, bool ll_only)
 {
     gnrc_ipv6_netif_t *iface = gnrc_ipv6_netif_get(pid);
     ipv6_addr_t *best_src = NULL;
@@ -768,7 +773,7 @@ ipv6_addr_t *gnrc_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ipv6_add
     BITFIELD(candidate_set, GNRC_IPV6_NETIF_ADDR_NUMOF);
     memset(candidate_set, 0, sizeof(candidate_set));
 
-    int first_candidate = _create_candidate_set(iface, dst, candidate_set);
+    int first_candidate = _create_candidate_set(iface, dst, candidate_set, ll_only);
     if (first_candidate >= 0) {
         best_src = _source_address_selection(iface, dst, candidate_set);
         if (best_src == NULL) {
