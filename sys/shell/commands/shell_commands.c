@@ -176,7 +176,7 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_GNRC_NETIF
     {"ifconfig", "Configure network interfaces", _netif_config},
-    {"txtsnd", "send raw data", _netif_send },
+    {"txtsnd", "Sends a custom string as is over the link layer", _netif_send },
 #endif
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
