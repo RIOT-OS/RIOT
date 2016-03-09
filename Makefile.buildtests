@@ -45,11 +45,12 @@ buildtest:
 	  [ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
 	  for NTH_TRY in 1 2 3; do \
 	    ${COLOR_ECHO} -n ".. "; \
+	    if [ "$$NTH_TRY" != "3" ]; then export _CCACHE=$$CCACHE; else export _CCACHE=""; fi ; \
 	    LOG=$$(env -i \
 	        HOME=$${HOME} \
 	        PATH=$${PATH} \
 	        BOARD=$${BOARD} \
-	        CCACHE=$${CCACHE} \
+	        CCACHE=$${_CCACHE} \
 	        $${CCACHE_DIR:+CCACHE_DIR=$${CCACHE_DIR}} \
 	        CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
 	        RIOTBASE=$${RIOTBASE} \
