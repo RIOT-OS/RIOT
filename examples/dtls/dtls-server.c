@@ -250,6 +250,6 @@ int dtls_server_cmd(int argc, char **argv)
     (void) argc;
     (void) argv;
     thread_create(server_stack, sizeof(server_stack), THREAD_PRIORITY_MAIN - 1,
-                  CREATE_STACKTEST, _server_trampoline, NULL, "DTLS server");
+                  THREAD_CREATE_STACKTEST, _server_trampoline, NULL, "DTLS server");
     return 0;
 }

@@ -270,7 +270,7 @@ int dtls_client_cmd(int argc, char **argv)
     }
 
     thread_create(client_reader, sizeof(client_reader), THREAD_PRIORITY_MAIN - 1,
-                  CREATE_STACKTEST, _client_trampoline, argv[1], "DTLS client");
+                  THREAD_CREATE_STACKTEST, _client_trampoline, argv[1], "DTLS client");
 
 
     return 0;
