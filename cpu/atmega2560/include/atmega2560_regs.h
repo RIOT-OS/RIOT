@@ -70,7 +70,7 @@ typedef struct {
 #define MEGA_UART0_BASE         ((uint16_t *)(&UCSR0A))
 #define MEGA_UART1_BASE         ((uint16_t *)(&UCSR1A))
 #define MEGA_UART2_BASE         ((uint16_t *)(&UCSR2A))
-#define MEGA_UART3_BASE         ((uint16_t *)(&UCSR2A))
+#define MEGA_UART3_BASE         ((uint16_t *)(&UCSR3A))
 /** @} */
 
 /**
