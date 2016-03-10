@@ -257,9 +257,26 @@ extern "C" {
 /**
  * @brief SPI configuration
  */
-#define SPI_NUMOF           (0U)                                                    /* TODO */
-#define SPI_0_EN            0
+#define SPI_NUMOF           (1U)
+#define SPI_0_EN            1
 #define SPI_1_EN            0
+
+/* SPI 0 Registers */
+#define SPI_0_CR 			SPCR
+#define SPI_0_DR 			SPDR
+#define SPI_0_SR 			SPSR
+#define SPI_0_DDR 			DDRB
+#define SPI_0_MOSI 			PB2
+#define SPI_0_MISO 			PB3
+#define SPI_0_SCK 			PB1
+#define SPI_0_MSTR 			MSTR
+#define SPI_0_SPE 			SPE
+#define SPI_0_SPR0 			SPR0
+#define SPI_0_SPR1 			SPR1
+#define SPI_0_SPI2X			SPI2X
+#define SPI_0_CPOL			CPOL
+#define SPI_0_CPHA			CPHA
+#define SPI_0_SPIF			SPIF
 
 /**
  * @brief I2C configuration
