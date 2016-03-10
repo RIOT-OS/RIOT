@@ -116,13 +116,15 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
         P6REN |= (pullup & _pin(pin));
     }
 
-    /* Set output direction */
-    if(pullup == GPIO_PULLUP)
-        /* if pullup selected then output must be high*/
+    /* set output direction */
+    if(pullup == GPIO_PULLUP) {
+        /* if pullup selected then output must be high */
         port->OD |= _pin(pin);
-        /* for other cases the output is low*/
-    else
+    }
+        /* for other cases the output is low */
+    else {
         port->OD &= ~(_pin(pin));
+    }
 
     return 0;
 }
