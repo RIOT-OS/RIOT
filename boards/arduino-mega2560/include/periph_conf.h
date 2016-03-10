@@ -256,10 +256,21 @@ extern "C" {
 
 /**
  * @brief SPI configuration
+ *
+ * The atmega2560 has only one hardware SPI with fixed pin configuration, so all
+ * we can do here, is to enable or disable it...
+ *
+ * The fixed pins used, are:
+ * MOSI - PB2 (Arduino pin 51)
+ * MISO - PB3 (Arduino pin 50)
+ * SCK  - PB1 (Arduino pin 52)
+ * SS   - PB0 (Arduino pin 53) -> this pin is configured as output, but not used
+ *
+ * @{
  */
-#define SPI_NUMOF           (0U)                                                    /* TODO */
-#define SPI_0_EN            0
-#define SPI_1_EN            0
+#define SPI_NUMOF           1           /* set to 0 to disable SPI */
+#define SPI_0_EN            1           /* remove once SPI rework is done */
+/** @} */
 
 /**
  * @brief I2C configuration
