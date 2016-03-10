@@ -28,20 +28,21 @@
  * @}
  */
 
+#include <stdint.h>
+#include <stdio.h>
+
+#include "kernel_defines.h"
+#include "cpu.h"
+#include "sched.h"
+#include "thread.h"
+#include "ucontext.h"
+
 #include "x86_interrupts.h"
 #include "x86_memory.h"
 #include "x86_ports.h"
 #include "x86_registers.h"
 #include "x86_threading.h"
 
-#include <attributes.h>
-#include <cpu.h>
-#include <sched.h>
-#include <thread.h>
-#include <ucontext.h>
-
-#include <stdint.h>
-#include <stdio.h>
 
 #define ASM_FUN_ATTRIBUTES \
     __attribute__((noinline)) \
