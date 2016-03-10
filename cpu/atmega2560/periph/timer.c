@@ -19,9 +19,6 @@
  * @}
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-
 #include <avr/interrupt.h>
 
 #include "board.h"
@@ -31,449 +28,231 @@
 #include "periph/timer.h"
 #include "periph_conf.h"
 
-#define IRQ_DISABLED 0x00
+/**
+ * @brief   All timers have three channels
+ */
+#define CHANNELS                (3)
 
 /**
- * @brief Timer state memory
+ * @brief   We have 5 possible prescaler values
  */
-static timer_isr_ctx_t config[TIMER_NUMOF];
+#define PRESCALE_NUMOF          (5U)
+
+/**
+ * @brief   Possible prescaler values, encoded as 2 ^ val
+ */
+static const uint8_t prescalers[] = { 0, 3, 6, 8, 10 };
+
+/**
+ * @brief   Timer state context
+ */
+typedef struct {
+    mega_timer_t *dev;          /**< timer device */
+    volatile uint8_t *mask;     /**< address of interrupt mask register */
+    volatile uint8_t *flag;     /**< address of interrupt flag register */
+    timer_cb_t cb;              /**< interrupt callback */
+    void *arg;                  /**< interrupt callback argument */
+    uint8_t mode;               /**< remember the configured mode */
+    uint8_t isrs;               /**< remember the interrupt state */
+} ctx_t;
+
+/**
+ * @brief   Allocate memory for saving the device states
+ * @{
+ */
+#if TIMER_NUMOF
+static ctx_t ctx[] = {
+#ifdef TIMER_0
+    { TIMER_0, TIMER_0_MASK, TIMER_0_FLAG, NULL, NULL, 0, 0 },
+#endif
+#ifdef TIMER_1
+    { TIMER_1, TIMER_1_MASK, TIMER_1_FLAG, NULL, NULL, 0, 0 },
+#endif
+#ifdef TIMER_2
+    { TIMER_2, TIMER_2_MASK, TIMER_2_FLAG, NULL, NULL, 0, 0 },
+#endif
+#ifdef TIMER_3
+    { TIMER_3, TIMER_3_MASK, TIMER_3_FLAG, NULL, NULL, 0, 0 },
+#endif
+};
+#else
+/* fallback if no timer is configured */
+static ctx_t *ctx[] = {{ NULL }};
+#endif
+/** @} */
 
 /**
  * @brief Setup the given timer
- *
  */
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
-    /* reject impossible freq values
-     * todo: Add support for 2 MHz and 16 MHz */
-    if ((freq != 250000ul)) {
+    uint8_t pre = 0;
+
+    /* make sure given device is valid */
+    if (tim >= TIMER_NUMOF) {
         return -1;
     }
 
-
-    /* select the timer and enable the timer specific peripheral clocks */
-    switch (dev) {
-#if TIMER_0_EN
-
-        case TIMER_0:
-            TIMER0_COUNTER   = 0;
-            TIMER0_CONTROL_B |= TIMER0_FREQ_250KHZ;
+    /* figure out if freq is applicable */
+    for (; pre < PRESCALE_NUMOF; pre++) {
+        if ((CLOCK_CORECLOCK >> prescalers[pre]) == freq) {
             break;
-#endif
-#if TIMER_1_EN
-
-        case TIMER_1:
-            TIMER1_COUNTER   = 0;
-            TIMER1_CONTROL_B |= TIMER1_FREQ_250KHZ;
-            break;
-#endif
-#if TIMER_2_EN
-
-        case TIMER_2:
-            TIMER2_COUNTER   = 0;
-            TIMER2_CONTROL_B |= TIMER2_FREQ_250KHZ;
-            break;
-#endif
-
-        case TIMER_UNDEFINED:
-        default:
-            return -1;
+        }
+    }
+    if (pre == PRESCALE_NUMOF) {
+        return -1;
     }
 
-    /* save callback */
-    config[dev].cb = cb;
-    config[dev].arg = arg;
+    /* stop and reset timer */
+    ctx[tim].dev->CRA = 0;
+    ctx[tim].dev->CRB = 0;
+    ctx[tim].dev->CRC = 0;
+    ctx[tim].dev->CNT = 0;
+
+    /* save interrupt context and timer mode */
+    ctx[tim].cb   = cb;
+    ctx[tim].arg  = arg;
+    ctx[tim].mode = (pre + 1);
+
+    /* enable timer with calculated prescaler */
+    ctx[tim].dev->CRB = (pre + 1);
 
     return 0;
 }
 
-int timer_set(tim_t dev, int channel, unsigned int timeout)
+int timer_set(tim_t tim, int channel, unsigned int timeout)
 {
-    return timer_set_absolute(dev, channel, timer_read(dev) + timeout);
+    return timer_set_absolute(tim, channel, timer_read(tim) + timeout);
 }
 
-int timer_set_absolute(tim_t dev, int channel, unsigned int value)
+int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    unsigned state = irq_disable();
-
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            switch (channel) {
-                case 0:
-                    TIMER0_COMP_A = (uint16_t) value;
-                    TIMER0_IRQ_FLAG_REG &= ~(1 << TIMER0_COMP_A_FLAG);
-                    TIMER0_IRQ_MASK_REG |= (1 << TIMER0_COMP_A_EN);
-                    break;
-
-                case 1:
-                    TIMER0_COMP_B = (uint16_t) value;
-                    TIMER0_IRQ_FLAG_REG &= ~(1 << TIMER0_COMP_B_FLAG);
-                    TIMER0_IRQ_MASK_REG |= (1 << TIMER0_COMP_B_EN);
-                    break;
-
-                case 2:
-                    TIMER0_COMP_C = (uint16_t) value;
-                    TIMER0_IRQ_FLAG_REG &= ~(1 << TIMER0_COMP_C_FLAG);
-                    TIMER0_IRQ_MASK_REG |= (1 << TIMER0_COMP_C_EN);
-                    break;
-
-                default:
-                    irq_restore(state);
-                    return -1;
-            }
-
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            switch (channel) {
-                case 0:
-                    TIMER1_COMP_A = (uint16_t) value;
-                    TIMER1_IRQ_FLAG_REG &= ~(1 << TIMER1_COMP_A_FLAG);
-                    TIMER1_IRQ_MASK_REG |= (1 << TIMER1_COMP_A_EN);
-                    break;
-
-                case 1:
-                    TIMER1_COMP_B = (uint16_t) value;
-                    TIMER1_IRQ_FLAG_REG &= ~(1 << TIMER1_COMP_B_FLAG);
-                    TIMER1_IRQ_MASK_REG |= (1 << TIMER1_COMP_B_EN);
-                    break;
-
-                case 2:
-                    TIMER1_COMP_C = (uint16_t) value;
-                    TIMER1_IRQ_FLAG_REG &= ~(1 << TIMER1_COMP_C_FLAG);
-                    TIMER1_IRQ_MASK_REG |= (1 << TIMER1_COMP_C_EN);
-                    break;
-
-                default:
-                    irq_restore(state);
-                    return -1;
-            }
-
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            switch (channel) {
-                case 0:
-                    TIMER2_COMP_A = (uint16_t) value;
-                    TIMER2_IRQ_FLAG_REG &= ~(1 << TIMER2_COMP_A_FLAG);
-                    TIMER2_IRQ_MASK_REG |= (1 << TIMER2_COMP_A_EN);
-                    break;
-
-                case 1:
-                    TIMER2_COMP_B = (uint16_t) value;
-                    TIMER2_IRQ_FLAG_REG &= ~(1 << TIMER2_COMP_B_FLAG);
-                    TIMER2_IRQ_MASK_REG |= (1 << TIMER2_COMP_B_EN);
-                    break;
-
-                case 2:
-                    TIMER2_COMP_C = (uint16_t) value;
-                    TIMER2_IRQ_FLAG_REG &= ~(1 << TIMER2_COMP_C_FLAG);
-                    TIMER2_IRQ_MASK_REG |= (1 << TIMER2_COMP_C_EN);
-                    break;
-
-                default:
-                    irq_restore(state);
-                    return -1;
-            }
-
-            break;
-#endif
-
-        case TIMER_UNDEFINED:
-        default:
-            irq_restore(state);
-            return -1;
+    if (channel >= CHANNELS) {
+        return -1;
     }
 
-    /* enable interrupts for given timer */
-    timer_irq_enable(dev);
-    irq_restore(state);
+    ctx[tim].dev->OCR[channel] = (uint16_t)value;
+    *ctx[tim].flag &= ~(1 << (channel + OCF1A));
+    *ctx[tim].mask |=  (1 << (channel + OCIE1A));
 
-    return 1;
+    return 0;
 }
 
-int timer_clear(tim_t dev, int channel)
+int timer_clear(tim_t tim, int channel)
 {
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            switch (channel) {
-                case 0:
-                    TIMER0_IRQ_FLAG_REG &= ~(1 << TIMER0_COMP_A_FLAG);
-                    break;
-
-                case 1:
-                    TIMER0_IRQ_FLAG_REG &= ~(1 << TIMER0_COMP_B_FLAG);
-                    break;
-
-                case 2:
-                    TIMER0_IRQ_FLAG_REG &= ~(1 << TIMER0_COMP_C_FLAG);
-                    break;
-
-                default:
-                    return -1;
-            }
-
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            switch (channel) {
-                case 0:
-                    TIMER1_IRQ_FLAG_REG &= ~(1 << TIMER1_COMP_A_FLAG);
-                    break;
-
-                case 1:
-                    TIMER1_IRQ_FLAG_REG &= ~(1 << TIMER1_COMP_B_FLAG);
-                    break;
-
-                case 2:
-                    TIMER1_IRQ_FLAG_REG &= ~(1 << TIMER1_COMP_C_FLAG);
-                    break;
-
-                default:
-                    return -1;
-                    break;
-            }
-
-            break;
-#endif
-#if TIMER_2_EN
-
-        case TIMER_2:
-            switch (channel) {
-                case 0:
-                    TIMER2_IRQ_FLAG_REG &= ~(1 << TIMER2_COMP_A_FLAG);
-                    break;
-
-                case 1:
-                    TIMER2_IRQ_FLAG_REG &= ~(1 << TIMER2_COMP_B_FLAG);
-                    break;
-
-                case 2:
-                    TIMER2_IRQ_FLAG_REG &= ~(1 << TIMER2_COMP_C_FLAG);
-                    break;
-
-                default:
-                    return -1;
-                    break;
-            }
-
-            break;
-#endif
-
-        case TIMER_UNDEFINED:
-        default:
-            return -1;
+    if (channel >= CHANNELS) {
+        return -1;
     }
 
-    timer_irq_disable(dev);
-    return 1;
+    *ctx[tim].mask &= ~(1 << (channel + OCIE1A));
+
+    return 0;
 }
 
-unsigned int timer_read(tim_t dev)
+unsigned int timer_read(tim_t tim)
 {
-    uint16_t a;
-    uint16_t b;
-    /*
-     * Disabling interrupts globally because read from 16 Bit register can
-     * otherwise be messed up
-     */
-    unsigned state = irq_disable();
-
-    switch (dev) {
-#if TIMER_0_EN
-
-        case TIMER_0:
-            do {
-                a = TIMER0_COUNTER;
-                b = TIMER0_COUNTER;
-            } while (a != b);
-            break;
-#endif
-#if TIMER_1_EN
-
-        case TIMER_1:
-            do {
-                a = TIMER1_COUNTER;
-                b = TIMER1_COUNTER;
-            } while (a != b);
-            break;
-#endif
-#if TIMER_2_EN
-
-        case TIMER_2:
-            do {
-                a = TIMER2_COUNTER;
-                b = TIMER2_COUNTER;
-            } while (a != b);
-            break;
-#endif
-
-        case TIMER_UNDEFINED:
-        default:
-            (void)b;
-            a = 0;
-    }
-
-    irq_restore(state);
-    return a;
+    return (unsigned int)ctx[tim].dev->CNT;
 }
 
-void timer_stop(tim_t dev)
+void timer_stop(tim_t tim)
 {
-    switch (dev) {
-#if TIMER_0_EN
-
-        case TIMER_0:
-            TIMER0_CONTROL_B = TIMER0_FREQ_DISABLE;
-            break;
-#endif
-#if TIMER_1_EN
-
-        case TIMER_1:
-            TIMER1_CONTROL_B = TIMER1_FREQ_DISABLE;
-            break;
-#endif
-#if TIMER_2_EN
-
-        case TIMER_2:
-            TIMER2_CONTROL_B = TIMER2_FREQ_DISABLE;
-            break;
-#endif
-
-        case TIMER_UNDEFINED:
-            break;
-    }
+    ctx[tim].dev->CRB = 0;
 }
 
-void timer_start(tim_t dev)
+void timer_start(tim_t tim)
 {
-    switch (dev) {
-#if TIMER_0_EN
-
-        case TIMER_0:
-            TIMER0_CONTROL_B |= TIMER0_FREQ_250KHZ;
-            break;
-#endif
-#if TIMER_1_EN
-
-        case TIMER_1:
-            TIMER1_CONTROL_B |= TIMER1_FREQ_250KHZ;
-            break;
-#endif
-#if TIMER_2_EN
-
-        case TIMER_2:
-            TIMER1_CONTROL_B |= TIMER1_FREQ_250KHZ;
-            break;
-#endif
-
-        case TIMER_UNDEFINED:
-            break;
-    }
+    ctx[tim].dev->CRB = ctx[tim].mode;
 }
 
-void timer_irq_enable(tim_t dev)
+void timer_irq_enable(tim_t tim)
 {
-    (void) dev;
-#ifdef DEVELHELP
-    printf("timer_irq_enable not implemented\n");
-#endif
+    *ctx[tim].mask = ctx[tim].isrs;
 }
 
-void timer_irq_disable(tim_t dev)
+void timer_irq_disable(tim_t tim)
 {
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            TIMER0_IRQ_MASK_REG &= ~(1 << TIMER0_COMP_A_EN);
-            TIMER0_IRQ_MASK_REG &= ~(1 << TIMER0_COMP_B_EN);
-            TIMER0_IRQ_MASK_REG &= ~(1 << TIMER0_COMP_C_EN);
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            TIMER1_IRQ_MASK_REG &= ~(1 << TIMER1_COMP_A_EN);
-            TIMER1_IRQ_MASK_REG &= ~(1 << TIMER1_COMP_B_EN);
-            TIMER1_IRQ_MASK_REG &= ~(1 << TIMER1_COMP_C_EN);
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            TIMER2_IRQ_MASK_REG &= ~(1 << TIMER2_COMP_A_EN);
-            TIMER2_IRQ_MASK_REG &= ~(1 << TIMER2_COMP_B_EN);
-            TIMER2_IRQ_MASK_REG &= ~(1 << TIMER2_COMP_C_EN);
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
+    ctx[tim].isrs = *(ctx[tim].mask);
+    *ctx[tim].mask = 0;
 }
 
-static inline void _isr(int timer, int chan)
+static inline void _isr(int num, int chan)
 {
     __enter_isr();
-    timer_clear(timer, chan);
 
-    config[timer].cb(config[timer].arg, chan);
+    *ctx[num].mask &= ~(1 << (chan + OCIE1A));
+    ctx[num].cb(ctx[num].arg, chan);
 
     if (sched_context_switch_request) {
         thread_yield();
     }
+
     __exit_isr();
 }
 
-#if TIMER_0_EN
-ISR(TIMER0_COMPA_ISR, ISR_BLOCK)
+#ifdef TIMER_0
+ISR(TIMER_0_ISRA, ISR_BLOCK)
 {
     _isr(0, 0);
 }
 
-ISR(TIMER0_COMPB_ISR, ISR_BLOCK)
+ISR(TIMER_0_ISRB, ISR_BLOCK)
 {
     _isr(0, 1);
 }
 
-ISR(TIMER0_COMPC_ISR, ISR_BLOCK)
+ISR(TIMER_0_ISRC, ISR_BLOCK)
 {
     _isr(0, 2);
 }
-#endif /* TIMER_0_EN */
+#endif /* TIMER_0 */
 
-#if TIMER_1_EN
-ISR(TIMER1_COMPA_ISR, ISR_BLOCK)
+#ifdef TIMER_1
+ISR(TIMER_1_ISRA, ISR_BLOCK)
 {
     _isr(1, 0);
 }
 
-ISR(TIMER1_COMPB_ISR, ISR_BLOCK)
+ISR(TIMER_1_ISRB, ISR_BLOCK)
 {
     _isr(1, 1);
 }
 
-ISR(TIMER1_COMPC_ISR, ISR_BLOCK)
+ISR(TIMER_1_ISRC, ISR_BLOCK)
 {
     _isr(1, 2);
 }
-#endif /* TIMER_1_EN */
+#endif /* TIMER_1 */
 
-#if TIMER_2_EN
-ISR(TIMER2_COMPA_ISR, ISR_BLOCK)
+#ifdef TIMER_2
+ISR(TIMER_2_ISRA, ISR_BLOCK)
 {
     _isr(2, 0);
 }
 
-ISR(TIMER2_COMPB_ISR, ISR_BLOCK)
+ISR(TIMER_2_ISRB, ISR_BLOCK)
 {
     _isr(2, 1);
 }
 
-ISR(TIMER2_COMPC_ISR, ISR_BLOCK)
+ISR(TIMER_2_ISRC, ISR_BLOCK)
 {
     _isr(2, 2);
 }
-#endif /* TIMER_2_EN */
+#endif /* TIMER_2 */
+
+#ifdef TIMER_3
+ISR(TIMER_3_ISRA, ISR_BLOCK)
+{
+    _isr(2, 0);
+}
+
+ISR(TIMER_3_ISRB, ISR_BLOCK)
+{
+    _isr(2, 1);
+}
+
+ISR(TIMER_3_ISRC, ISR_BLOCK)
+{
+    _isr(2, 2);
+}
+#endif /* TIMER_3 */
