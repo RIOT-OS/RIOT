@@ -19,216 +19,115 @@
  * @}
  */
 
-#include "board.h"
 #include "cpu.h"
-#include "thread.h"
 #include "sched.h"
+#include "thread.h"
 
 #include "periph/uart.h"
-#include "periph_conf.h"
 
 /**
- * @brief Allocate memory to store the callback functions.
+ * @brief   Configured device map
+ * @{
  */
-static uart_isr_ctx_t config[UART_NUMOF];
+#if UART_NUMOF
+static mega_uart_t *dev[] = {
+#ifdef UART_0
+    UART_0,
+#endif
+#ifdef UART_1
+    UART_1,
+#endif
+#ifdef UART_2
+    UART_2,
+#endif
+#ifdef UART_3
+    UART_3
+#endif
+};
+#else
+/* fallback if no UART is defined */
+static const mega_uart_t *dev[] = { NULL };
+#endif
 
-static int init_base(uart_t uart, uint32_t baudrate);
+/**
+ * @brief   Allocate memory to store the callback functions.
+ */
+static uart_isr_ctx_t isr_ctx[UART_NUMOF];
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
-    /* initialize basic functionality */
-    int res = init_base(uart, baudrate);
-
-    if (res != 0) {
-        return res;
+    /* make sure the given device is valid */
+    if (uart >= UART_NUMOF) {
+        return -1;
     }
 
-    /* register callbacks */
-    config[uart].rx_cb = rx_cb;
-    config[uart].arg = arg;
+    /* register interrupt context */
+    isr_ctx[uart].rx_cb = rx_cb;
+    isr_ctx[uart].arg   = arg;
 
-    /* configure interrupts and enable RX interrupt */
-    switch (uart) {
-#if UART_0_EN
+    /* disable and reset UART */
+    dev[uart]->CSRB = 0;
+    dev[uart]->CSRA = 0;
 
-        case UART_0:
-            UART0_RX_IRQ_EN;
-            break;
-#endif /* UART_0_EN */
-#if UART_1_EN
-
-        case UART_1:
-            UART1_RX_IRQ_EN;
-            break;
-#endif /* UART_1_EN */
-#if UART_2_EN
-
-        case UART_2:
-            UART2_RX_IRQ_EN;
-            break;
-#endif /* UART_2_EN */
-#if UART_3_EN
-
-        case UART_3:
-            UART3_RX_IRQ_EN;
-            break;
-#endif /* UART_3_EN */
-    }
-
-    return 0;
-}
-
-static int init_base(uart_t uart, uint32_t baudrate)
-{
-    uint16_t clock_divider = CLOCK_CORECLOCK / (16 * baudrate);
-
-    switch (uart) {
-#if UART_0_EN
-
-        case UART_0:
-            /* enable RX and TX */
-            UART0_RX_TX_EN;
-            /* use 8 Bit characters */
-            UART0_SET_8BIT_SIZE;
-
-            /* set clock divider */
-            UART0_BAUD_RATE_L = clock_divider;
-            UART0_BAUD_RATE_H = (clock_divider >> 8);
-            break;
-#endif /* UART_0 */
-#if UART_1_EN
-
-        case UART_1:
-            /* enable RX and TX */
-            UART1_RX_TX_EN;
-            /* use 8 Bit characters */
-            UART1_SET_8BIT_SIZE;
-
-            /* set clock divider */
-            UART1_BAUD_RATE_L = clock_divider;
-            UART1_BAUD_RATE_H = (clock_divider >> 8);
-            break;
-#endif /* UART_1 */
-#if UART_2_EN
-
-        case UART_2:
-            /* enable RX and TX */
-            UART2_RX_TX_EN;
-            /* use 8 Bit characters */
-            UART2_SET_8BIT_SIZE;
-
-            /* set clock divider */
-            UART2_BAUD_RATE_L = clock_divider;
-            UART2_BAUD_RATE_H = (clock_divider >> 8);
-            break;
-#endif /* UART_2 */
-#if UART_3_EN
-
-        case UART_3:
-            /* enable RX and TX */
-            UART3_RX_TX_EN;
-            /* use 8 Bit characters */
-            UART3_SET_8BIT_SIZE;
-
-            /* set clock divider */
-            UART3_BAUD_RATE_L = clock_divider;
-            UART3_BAUD_RATE_H = (clock_divider >> 8);
-            break;
-#endif /* UART_3 */
-        default:
-            (void)clock_divider;    /* this makes cppcheck happy */
-    }
+    /* configure UART to 8N1 mode */
+    dev[uart]->CSRC = (1 << UCSZ00) | (1 << UCSZ01);
+    /* set clock divider */
+    dev[uart]->BRR = CLOCK_CORECLOCK / (16 * baudrate);
+    /* enable RX and TX and the RX interrupt */
+    dev[uart]->CSRB = ((1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0));
 
     return 0;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            for (unsigned i = 0; i < len; i++) {
-                while (!UART0_DTREG_EMPTY);
-                UART0_DATA_REGISTER = data[i];
-            }
-            break;
-#endif /* UART_0_EN */
-#if UART_1_EN
-        case UART_1:
-            for (unsigned i = 0; i < len; i++) {
-                while (!UART1_DTREG_EMPTY);
-                UART1_DATA_REGISTER = data[i];
-            }
-            break;
-#endif /* UART_1_EN */
-#if UART_2_EN
-        case UART_2:
-            for (unsigned i = 0; i < len; i++) {
-                while (!UART2_DTREG_EMPTY);
-                UART2_DATA_REGISTER = data[i];
-            }
-            break;
-#endif /* UART_2_EN */
-#if UART_3_EN
-        case UART_3:
-            for (unsigned i = 0; i < len; i++) {
-                while (!UART3_DTREG_EMPTY);
-                UART3_DATA_REGISTER = data[i];
-            }
-            break;
-#endif /* UART_3_EN */
+    for (size_t i = 0; i < len; i++) {
+        while (!(dev[uart]->CSRA & (1 << UDRE0)));
+        dev[uart]->DR = data[i];
     }
 }
 
-
-#if UART_0_EN
-ISR(USART0_RX_vect, ISR_BLOCK)
+static inline void isr_handler(int num)
 {
-    __enter_isr();
-    config[UART_0].rx_cb(config[UART_0].arg, UART0_DATA_REGISTER);
+    isr_ctx[num].rx_cb(isr_ctx[num].arg, dev[num]->DR);
 
     if (sched_context_switch_request) {
         thread_yield();
     }
-    __exit_isr();
 }
-#endif /* UART_0_EN */
 
-#if UART_1_EN
-ISR(USART1_RX_vect, ISR_BLOCK)
+#ifdef UART_0_ISR
+ISR(UART_0_ISR, ISR_BLOCK)
 {
     __enter_isr();
-    config[UART_1].rx_cb(config[UART_1].arg, UART1_DATA_REGISTER);
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    isr_handler(0);
     __exit_isr();
 }
-#endif /* UART_1_EN */
+#endif /* UART_0_ISR */
 
-#if UART_2_EN
-ISR(USART2_RX_vect, ISR_BLOCK)
+#if UART_1_ISR
+ISR(UART_1_ISR, ISR_BLOCK)
 {
     __enter_isr();
-    config[UART_2].rx_cb(config[UART_2].arg, UART2_DATA_REGISTER);
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    isr_handler(1);
     __exit_isr();
 }
-#endif /* UART_2_EN */
+#endif /* UART_1_ISR */
 
-#if UART_3_EN
-ISR(USART3_RX_vect, ISR_BLOCK)
+#if UART_2_ISR
+ISR(UART_2_ISR, ISR_BLOCK)
 {
     __enter_isr();
-    config[UART_3].rx_cb(config[UART_3].arg, UART3_DATA_REGISTER);
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    isr_handler(2);
     __exit_isr();
 }
-#endif /* UART_3_EN */
+#endif /* UART_2_ISR */
+
+#if UART_3_ISR
+ISR(UART_3_ISR, ISR_BLOCK)
+{
+    __enter_isr();
+    isr_handler(3);
+    __exit_isr();
+}
+#endif /* UART_3_ISR */
