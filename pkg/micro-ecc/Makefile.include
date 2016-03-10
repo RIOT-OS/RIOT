@@ -1,1 +1,1 @@
-INCLUDES += -I$(RIOTPKG)/micro-ecc/micro-ecc
+INCLUDES += -I$(BINDIR)/pkg/micro-ecc
