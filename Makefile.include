@@ -448,3 +448,6 @@ ifneq (,$(filter iotlab-m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
     include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
   endif
 endif
+
+# Include desvirt Makefile
+include $(RIOTBASE)/dist/tools/desvirt/Makefile.desvirt
