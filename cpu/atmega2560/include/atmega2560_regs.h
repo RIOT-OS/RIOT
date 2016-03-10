@@ -47,6 +47,18 @@ typedef struct {
 } mega_timer_t;
 
 /**
+ * @brief   UART register map
+ */
+typedef struct {
+    REG8    CSRA;               /**< control and status register A */
+    REG8    CSRB;               /**< control and status register B */
+    REG8    CSRC;               /**< control and status register C */
+    REG8    reserved;           /**< reserved */
+    REG16   BRR;                /**< baud rate register */
+    REG8    DR;                 /**< data register */
+} mega_uart_t;
+
+/**
  * @brief    Base register address definitions
  * @{
  */
@@ -54,6 +66,11 @@ typedef struct {
 #define MEGA_TIMER3_BASE        (uint16_t *)(&TCCR3A)
 #define MEGA_TIMER4_BASE        (uint16_t *)(&TCCR4A)
 #define MEGA_TIMER5_BASE        (uint16_t *)(&TCCR5A)
+
+#define MEGA_UART0_BASE         ((uint16_t *)(&UCSR0A))
+#define MEGA_UART1_BASE         ((uint16_t *)(&UCSR1A))
+#define MEGA_UART2_BASE         ((uint16_t *)(&UCSR2A))
+#define MEGA_UART3_BASE         ((uint16_t *)(&UCSR2A))
 /** @} */
 
 /**
@@ -64,6 +81,11 @@ typedef struct {
 #define MEGA_TIMER3             ((mega_timer_t *)MEGA_TIMER3_BASE)
 #define MEGA_TIMER4             ((mega_timer_t *)MEGA_TIMER4_BASE)
 #define MEGA_TIMER5             ((mega_timer_t *)MEGA_TIMER5_BASE)
+
+#define MEGA_UART0              ((mega_uart_t *)MEGA_UART0_BASE)
+#define MEGA_UART1              ((mega_uart_t *)MEGA_UART1_BASE)
+#define MEGA_UART2              ((mega_uart_t *)MEGA_UART2_BASE)
+#define MEGA_UART3              ((mega_uart_t *)MEGA_UART3_BASE)
 /** @} */
 
 #ifdef __cplusplus
