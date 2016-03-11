@@ -34,12 +34,22 @@ extern "C" {
  */
 #define LED0_PIN            GPIO_PIN(PORT_A, 5)
 
-#define LED_MASK            GPIOA
 #define LED0_MASK           (1 << 5)
 
-#define LED0_ON             (GPIOA->BRR  = ~LED0_MASK)
-#define LED0_OFF            (GPIOA->OSRR =  LED0_MASK)
-#define LED0_TOGGLE         (GPIOA->ODR ^=  LED0_MASK)
+#if defined(CPU_FAM_STM32F4)
+#define LED_CREG            BSRRH
+#else
+#define LED_CREG            BRR
+#endif
+#if defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L1)
+#define LED_SREG            BSRRL
+#else
+#define LED_SREG            BSRR
+#endif
+
+#define LED0_ON             (GPIOA->LED_SREG = LED0_MASK)
+#define LED0_OFF            (GPIOA->LED_CREG = LED0_MASK)
+#define LED0_TOGGLE         (GPIOA->ODR     ^= LED0_MASK)
 /** @} */
 
 /**
