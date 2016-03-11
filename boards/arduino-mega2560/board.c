@@ -43,26 +43,11 @@ void board_init(void)
     /* initialize the CPU */
     cpu_init();
 
-    /* initialize the boards LEDs */
-    led_init();
+    /* initialize the board LED (connected to pin PB7) */
+    DDRB |= (1 << DDB7);
+    PORTB &= ~(1 << 7);
 
     enableIRQ();
-}
-
-
-/**
- * @brief Initialize the boards on-board LED (Amber LED "L")
- *
- * The LED initialization is hard-coded in this function. As the LED is soldered
- * onto the board it is fixed to its CPU pins.
- *
- * The LED is connected to the following pin:
- * - LED: PB27
- */
-void led_init(void)
-{
-    LED_ENABLE_PORT;
-    LED_ON;
 }
 
 /**
