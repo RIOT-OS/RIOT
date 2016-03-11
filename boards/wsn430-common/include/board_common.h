@@ -44,6 +44,32 @@ extern "C" {
 #define XTIMER_BACKOFF              (40)
 /** @} */
 
+/**
+ * @brief   LED pin definitions and handlers
+ * @{
+ */
+#define LED0_PIN                    GPIO_PIN(4, 4)
+#define LED1_PIN                    GPIO_PIN(4, 5)
+#define LED2_PIN                    GPIO_PIN(4, 6)
+
+#define LED_DIR_REG                 P5DIR
+#define LED0_MASK                   (1 << 4)
+#define LED1_MASK                   (1 << 5)
+#define LED2_MASK                   (1 << 6)
+
+#define LED0_ON                     (LED_DIR_REG &=~LED0_MASK)
+#define LED0_OFF                    (LED_DIR_REG |= LED0_MASK)
+#define LED0_TOGGLE                 (LED_DIR_REG ^= LED0_MASK)
+
+#define LED1_ON                     (LED_DIR_REG &=~LED1_MASK)
+#define LED1_OFF                    (LED_DIR_REG |= LED1_MASK)
+#define LED1_TOGGLE                 (LED_DIR_REG ^= LED1_MASK)
+
+#define LED2_ON                     (LED_DIR_REG &=~LED2_MASK)
+#define LED2_OFF                    (LED_DIR_REG |= LED2_MASK)
+#define LED2_TOGGLE                 (LED_DIR_REG ^= LED2_MASK)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
