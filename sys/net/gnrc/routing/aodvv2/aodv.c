@@ -21,7 +21,7 @@
 #include "aodv.h"
 #include "aodvv2/aodvv2.h"
 #include "aodv_debug.h"
-#include "ng_fib.h"
+#include "net/fib.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -138,7 +138,7 @@ void *fib_signal_handler_thread(void *arg)
     ipv6_addr_t dest;
     struct netaddr na_dest;
 
-    int err = fib_register_rp(&aodvv2_prefix.u8[0], aodvv2_address_type_size);
+    int err = fib_register_rp(&gnrc_ipv6_fib_table, &aodvv2_prefix.u8[0], aodvv2_address_type_size);
     if ( err != 0) {
         DEBUG("ERROR: cannot register at fib, error code:\n");
         exit(1);
@@ -148,7 +148,7 @@ void *fib_signal_handler_thread(void *arg)
         msg_t msg;
         msg_receive(&msg);
 
-        if (msg.type == FIB_MSG_RP_SIGNAL) {
+        if (msg.type == FIB_MSG_RP_SIGNAL_UNREACHABLE_DESTINATION) {
             rp_address_msg_t* rp_msg = (rp_address_msg_t*)msg.content.ptr;
             if (rp_msg->address_size == sizeof(ipv6_addr_t)) {
                 /* We currently only support IPv6*/

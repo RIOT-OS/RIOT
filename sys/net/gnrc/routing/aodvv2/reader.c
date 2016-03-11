@@ -17,13 +17,9 @@
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>
  */
 
-#ifdef RIOT
-#include "net_help.h"
-#endif
-
 #include "reader.h"
 #include "aodv_debug.h"
-#include "ng_fib.h"
+#include "net/fib.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -350,8 +346,9 @@ static enum rfc5444_result _cb_rreq_end_callback(
         routingtable_add_entry(tmp_rt_entry);
 
         /* add entry to FIB */
-        fib_add_entry(aodvv2_if_id, tmp_rt_entry->addr._addr, sizeof(ipv6_addr_t), 0,
-                      tmp_rt_entry->nextHopAddr._addr, sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
+        fib_add_entry(&gnrc_ipv6_fib_table, aodvv2_if_id, tmp_rt_entry->addr._addr,
+                      sizeof(ipv6_addr_t), 0, tmp_rt_entry->nextHopAddr._addr,
+                      sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
 
         free(tmp_rt_entry);
     }
@@ -366,8 +363,8 @@ static enum rfc5444_result _cb_rreq_end_callback(
         routingtable_fill_routing_entry_t_rreq(&packet_data, rt_entry);
 
         /* update the FIB */
-        fib_update_entry(rt_entry->addr._addr, sizeof(ipv6_addr_t), rt_entry->nextHopAddr._addr,
-                         sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
+        fib_update_entry(&gnrc_ipv6_fib_table, rt_entry->addr._addr, sizeof(ipv6_addr_t),
+                         rt_entry->nextHopAddr._addr, sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
     }
 
     /*
@@ -561,8 +558,9 @@ static enum rfc5444_result _cb_rrep_end_callback(
         routingtable_add_entry(tmp_rt_entry);
 
         /* add entry to FIB */
-        fib_add_entry(aodvv2_if_id, tmp_rt_entry->addr._addr, sizeof(ipv6_addr_t), 0,
-                      tmp_rt_entry->nextHopAddr._addr, sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
+        fib_add_entry(&gnrc_ipv6_fib_table, aodvv2_if_id, tmp_rt_entry->addr._addr,
+                      sizeof(ipv6_addr_t), 0, tmp_rt_entry->nextHopAddr._addr,
+                      sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
 
         free(tmp_rt_entry);
     }
@@ -577,8 +575,8 @@ static enum rfc5444_result _cb_rrep_end_callback(
         routingtable_fill_routing_entry_t_rrep(&packet_data, rt_entry);
 
         /* update the FIB */
-        fib_update_entry(rt_entry->addr._addr, sizeof(ipv6_addr_t), rt_entry->nextHopAddr._addr,
-                         sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
+        fib_update_entry(&gnrc_ipv6_fib_table, rt_entry->addr._addr, sizeof(ipv6_addr_t),
+                         rt_entry->nextHopAddr._addr, sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
     }
 
     /* If HandlingRtr is RREQ_Gen then the RREP satisfies RREQ_Gen's
@@ -668,7 +666,7 @@ static enum rfc5444_result _cb_rerr_blocktlv_addresstlvs_okay(struct rfc5444_rea
         }
 
         /* remove entry from FIB */
-        fib_remove_entry(packet_data.origNode.addr._addr, sizeof(ipv6_addr_t));
+        fib_remove_entry(&gnrc_ipv6_fib_table, packet_data.origNode.addr._addr, sizeof(ipv6_addr_t));
     }
 
     return RFC5444_OKAY;
