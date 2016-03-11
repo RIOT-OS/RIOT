@@ -142,6 +142,7 @@ typedef struct {
 
 /**
  * @brief   I2C configuration options
+ * @{
  */
 typedef struct {
     I2C_TypeDef *dev;       /**< I2C device */
@@ -157,6 +158,7 @@ typedef struct {
 
 /**
  * @brief   Structure for SPI configuration data
+ * @{
  */
 typedef struct {
     SPI_TypeDef *dev;       /**< SPI device base register address */
@@ -167,6 +169,7 @@ typedef struct {
     uint8_t abpbus;         /**< APB bus, 0 := APB1, 1:= APB2 */
     uint32_t rccmask;         /**< bit in the RCC peripheral enable register */
 } spi_conf_t;
+/** @} */
 
 /**
  * @brief   Configure the alternate function for the given pin
