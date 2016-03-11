@@ -197,7 +197,7 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #endif
 #ifdef MODULE_GNRC_RPL
-    {"rpl", "rpl configuration tool [help|init|rm|root|show]", _gnrc_rpl },
+    {"rpl", "rpl configuration tool ('rpl help' for more information)", _gnrc_rpl },
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
