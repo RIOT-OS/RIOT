@@ -83,6 +83,15 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
+ * @brief   ADC configuration
+ *
+ * The configuration consists simply of a list of channels that should be used
+ * @{
+ */
+#define ADC_NUMOF          (0)
+/** @} */
+
+/**
  * @name Radio device configuration
  *
  * The radio is not guarded by a NUMOF define, as the radio is selected by its
