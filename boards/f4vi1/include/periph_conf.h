@@ -104,6 +104,13 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
+/**
+ * @brief   ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (0)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
