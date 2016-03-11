@@ -1,12 +1,13 @@
 Expected result
 ===============
-The 'red' and the 'green' LEDs of the board should light up alternating with a
-500ms interval. If your board has only one LED (probably defined as LED_RED),
-you will see only this LED blink at 1Hz. If your board has no on-board LED, you
-will see nothing.
+This test will blink all available on-board LEDs, one after each other in an
+endless loop. Each LED will light up once long, and twice short, where the long
+interval is roughly 4 times as long as the short interval. The length of the
+interval is not specified and differs for each platform.
 
 Background
 ==========
-All boards in RIOT define at least two macros for accessing two selected
-on-board LEDs directly. These are called LED_RED and LED_GREEN, independent if
-the actual color of those LED is red or green.
+Running this test shows if all the direct access macros for all on-board LEDs
+are working correctly (xx_ON, xx_OFF, xx_TOGGLE). This test is intentionally not
+using any timers, so it can also be used early on in the porting process, where
+timers might not yet be available.
