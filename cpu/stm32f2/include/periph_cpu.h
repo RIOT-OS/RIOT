@@ -44,12 +44,28 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
 
 /**
- * @brief declare needed generic SPI functions
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use 5 bit to encode the mode:
+ * - bit 0+1: pin mode (input / output)
+ * - bit 2+3: pull resistor configuration
+ * - bit   4: output type (0: push-pull, 1: open-drain)
+ */
+#define GPIO_MODE(io, pr, ot)   ((io << 0) | (pr << 2) | (ot << 4))
+
+/**
+ * @brief   Override GPIO mode options
  * @{
  */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN    = GPIO_MODE(0, 0, 0),    /**< input w/o pull R */
+    GPIO_IN_PD = GPIO_MODE(0, 2, 0),    /**< input with pull-down */
+    GPIO_IN_PU = GPIO_MODE(0, 1, 0),    /**< input with pull-up */
+    GPIO_OUT   = GPIO_MODE(1, 0, 0),    /**< push-pull output */
+    GPIO_OD    = GPIO_MODE(1, 0, 1),    /**< open-drain w/o pull R */
+    GPIO_OD_PU = GPIO_MODE(1, 1, 1)     /**< open-drain with pull-up */
+} gpio_mode_t;
 /** @} */
 
 /**
@@ -121,7 +137,7 @@ void gpio_init_af(gpio_t pin, gpio_af_t af);
  */
 static inline void dma_poweron(int stream)
 {
-    if (stream <= 8) {
+    if (stream < 8) {
         RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
     } else {
         RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
@@ -139,7 +155,7 @@ static inline void dma_poweron(int stream)
  */
 static inline DMA_TypeDef *dma_base(int stream)
 {
-    return (stream <= 8) ? DMA1 : DMA2;
+    return (stream < 8) ? DMA1 : DMA2;
 }
 
 /**

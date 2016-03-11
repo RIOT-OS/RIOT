@@ -17,6 +17,7 @@
  * @}
  */
 
+#include <stdint.h>
 #include "cpu.h"
 #include "periph_conf.h"
 
@@ -30,63 +31,84 @@
 # define RCC_PLL_SOURCE         RCC_PLLCFGR_PLLSRC_HSE
 #endif
 
-static void clk_init(void);
+static void cpu_clock_init(void);
 
+/**
+ * @brief Initialize the CPU, set IRQ priorities
+ */
 void cpu_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();
-    /* initialize system clocks */
-    clk_init();
+    /* initialize the clock system */
+    cpu_clock_init();
 }
 
 /**
- * @brief Configure the clock system of the stm32f2
+ * @brief Configure the controllers clock system
  *
+ * The clock initialization make the following assumptions:
+ * - the external HSE clock from an external oscillator is used as base clock
+ * - the internal PLL circuit is used for clock refinement
+ *
+ * Use the following formulas to calculate the needed values:
+ *
+ * SYSCLK = ((HSE_VALUE / CLOCK_PLL_M) * CLOCK_PLL_N) / CLOCK_PLL_P
+ * USB, SDIO and RNG Clock =  ((HSE_VALUE / CLOCK_PLL_M) * CLOCK_PLL_N) / CLOCK_PLL_Q
+ *
+ * The actual used values are specified in the board's `periph_conf.h` file.
+ *
+ * NOTE: currently there is not timeout for initialization of PLL and other locks
+ *       -> when wrong values are chosen, the initialization could stall
  */
-static void clk_init(void)
+static void cpu_clock_init(void)
 {
-    /* Reset the RCC clock configuration to the default reset state(for debug purpose) */
-    /* Set HSION bit */
-    RCC->CR |= 0x00000001U;
-    /* Reset SW, HPRE, PPRE1, PPRE2, ADCPRE and MCO bits */
-    RCC->CFGR = 0x00000000U;
-    /* Reset HSEON, CSSON and PLLON bits */
-    RCC->CR &= 0xFEF6FFFFU;
-    /* Reset PLLCFGR register */
-    RCC->PLLCFGR = 0x24003010U;
-    /* Reset HSEBYP bit */
-    RCC->CR &= 0xFFFBFFFFU;
-    /* Disable all interrupts and clear pending bits  */
-    RCC->CIR = 0x00000000U;
+    /* configure the HSE clock */
 
-    /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration */
+    /* enable the HSI clock */
+    RCC->CR |= RCC_CR_HSION;
+
+    /* reset clock configuration register */
+    RCC->CFGR = 0;
+
+    /* disable HSE, CSS and PLL */
+    RCC->CR &= ~(RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON);
+
+    /* disable all clock interrupts */
+    RCC->CIR = 0;
+
     /* Enable the high speed clock source */
     RCC->CR |= RCC_CR_SOURCE;
-    /* Wait till hish speed clock source is ready,
-     * NOTE: the MCU will stay here forever if no HSE clock is connected */
+
+    /* Wait till hish speed clock source is ready */
     while ((RCC->CR & RCC_CR_SOURCE_RDY) == 0);
+
     /* Configure Flash prefetch, Instruction cache, Data cache and wait state */
     FLASH->ACR = FLASH_ACR_PRFTEN | FLASH_ACR_ICEN | FLASH_ACR_DCEN;
     /* Flash 2 wait state */
     FLASH->ACR &= ~((uint32_t)FLASH_ACR_LATENCY);
     FLASH->ACR |= (uint32_t)CLOCK_FLASH_LATENCY;
+
     /* HCLK = SYSCLK */
     RCC->CFGR |= (uint32_t)CLOCK_AHB_DIV;
     /* PCLK2 = HCLK */
     RCC->CFGR |= (uint32_t)CLOCK_APB2_DIV;
     /* PCLK1 = HCLK */
     RCC->CFGR |= (uint32_t)CLOCK_APB1_DIV;
+
     /*  PLL configuration: PLLCLK = SOURCE_CLOCK / SOURCE_CLOCK_DIV * SOURCE_CLOCK_MUL */
     RCC->PLLCFGR &= ~((uint32_t)(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ));
     RCC->PLLCFGR |= (uint32_t)(RCC_PLL_SOURCE | CLOCK_PLL_DIV | (CLOCK_PLL_MUL << 6));
+
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
     /* Wait till PLL is ready */
     while ((RCC->CR & RCC_CR_PLLRDY) == 0);
+
     /* Select PLL as system clock source */
     RCC->CFGR &= ~((uint32_t)(RCC_CFGR_SW));
     RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
+
     /* Wait till PLL is used as system clock source */
     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
 }

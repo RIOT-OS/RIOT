@@ -42,7 +42,8 @@ static inline USART_TypeDef *_dev(uart_t uart)
 /**
  * @brief   Transmission locks
  */
-static mutex_t tx_sync[UART_NUMOF];
+static mutex_t _tx_dma_sync[UART_NUMOF];
+static mutex_t _tx_lock[UART_NUMOF];
 
 /**
  * @brief   Find out which peripheral bus the UART device is connected to
@@ -64,7 +65,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     uint8_t fraction;
 
     /* check if given UART device does exist */
-    if (uart < 0 || uart >= UART_NUMOF) {
+    if ((unsigned int)uart >= UART_NUMOF) {
         return -1;
     }
 
@@ -73,13 +74,14 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* remember callback addresses and argument */
     uart_ctx[uart].rx_cb = rx_cb;
     uart_ctx[uart].arg = arg;
-    /* init tx lock */
-    mutex_init(&tx_sync[uart]);
-    mutex_lock(&tx_sync[uart]);
+    /* init TX lock and DMA synchronization mutex */
+    mutex_init(&_tx_lock[uart]);
+    mutex_init(&_tx_dma_sync[uart]);
+    mutex_lock(&_tx_dma_sync[uart]);
 
     /* configure pins */
-    gpio_init(uart_config[uart].rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
-    gpio_init(uart_config[uart].tx_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(uart_config[uart].rx_pin, GPIO_IN);
+    gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
     gpio_init_af(uart_config[uart].rx_pin, uart_config[uart].af);
     gpio_init_af(uart_config[uart].tx_pin, uart_config[uart].af);
     /* enable UART clock */
@@ -123,18 +125,20 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         /* send data by active waiting on the TXE flag */
         USART_TypeDef *dev = _dev(uart);
         for (int i = 0; i < len; i++) {
-            while (!(dev->SR & USART_SR_TXE));
+            while (!(dev->SR & USART_SR_TXE)) {}
             dev->DR = data[i];
         }
     }
     else {
+        mutex_lock(&_tx_lock[uart]);
         DMA_Stream_TypeDef *stream = dma_stream(uart_config[uart].dma_stream);
         /* configure and start DMA transfer */
         stream->M0AR = (uint32_t)data;
         stream->NDTR = (uint16_t)len;
         stream->CR |= DMA_SxCR_EN;
         /* wait for transfer to complete */
-        mutex_lock(&tx_sync[uart]);
+        mutex_lock(&_tx_dma_sync[uart]);
+        mutex_unlock(&_tx_lock[uart]);
     }
 }
 
@@ -173,7 +177,7 @@ static inline void dma_handler(int uart, int stream)
 {
     /* clear DMA done flag */
     dma_base(stream)->IFCR[dma_hl(stream)] = dma_ifc(stream);
-    mutex_unlock(&tx_sync[uart]);
+    mutex_unlock(&_tx_dma_sync[uart]);
     if (sched_context_switch_request) {
         thread_yield();
     }

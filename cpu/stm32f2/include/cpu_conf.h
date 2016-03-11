@@ -21,6 +21,8 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #include "stm32f2xx.h"
 
 #ifdef __cplusplus
@@ -35,11 +37,6 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (81U)
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
-
-/**
- * @brief Length for reading CPU_ID
- */
-#define CPUID_ID_LEN                    (12)
 
 /**
  * @brief Configure the CPU's clock system
