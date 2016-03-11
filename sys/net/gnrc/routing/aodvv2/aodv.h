@@ -23,9 +23,8 @@
 #include "kernel.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc/ipv6.h"
-#include "net/gnrc.h" // note to self: anstatt ng_netbase (TODO delete me)
+#include "net/gnrc.h"
 #include "net/gnrc/ipv6/netif.h"
-//#include "net/ng_udp.h"
 #include "net/gnrc/pkt.h"
 #include "net/eui64.h"
 

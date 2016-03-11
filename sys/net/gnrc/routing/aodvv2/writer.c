@@ -17,10 +17,6 @@
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>
  */
 
-#ifdef RIOT
-#include "net_help.h"
-#endif
-
 #include "writer.h"
 
 #include "aodv_debug.h"

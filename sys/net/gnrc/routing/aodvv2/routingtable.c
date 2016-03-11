@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <inttypes.h>
 
+#include "vtimer.h"
+
 #include "routingtable.h"
 #include "aodv_debug.h"
 
