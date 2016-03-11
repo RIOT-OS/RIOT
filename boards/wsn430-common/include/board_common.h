@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2013 Milan Babel <babel@inf.fu-berlin.de>
+ *               2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,23 +16,37 @@
  * @file
  * @brief       Common definitions for WSN430 based boards
  *
- * @author      unknown
+ * @author      Milan Babel <babel@inf.fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ *
  */
 
-#ifndef BOARD_CONF_H_
-#define BOARD_CONF_H_
-
-#include <stdint.h>
+#ifndef BOARD_COMMON_H_
+#define BOARD_COMMON_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @brief   Address of the info memory
+ */
 #define INFOMEM     (0x1000)
+
+/**
+ * @brief   Xtimer configuration
+ * @{
+ */
+#define XTIMER                      (0)
+#define XTIMER_CHAN                 (0)
+#define XTIMER_MASK                 (0xffff0000)
+#define XTIMER_SHIFT_ON_COMPARE     (4)
+#define XTIMER_BACKOFF              (40)
+/** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
+#endif /* BOARD_COMMON_H_ */
 /** @} */
-#endif /* BOARD-CONF_H */

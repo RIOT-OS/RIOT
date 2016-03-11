@@ -28,7 +28,7 @@
 #ifndef WSN_BOARD_H_
 #define WSN_BOARD_H_
 
-#include "board-conf.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,17 +38,6 @@ extern "C" {
 #ifndef __MSP430F1611__
 #define __MSP430F1611__
 #endif
-
-/**
- * @brief   Xtimer configuration
- * @{
- */
-#define XTIMER                      (0)
-#define XTIMER_CHAN                 (0)
-#define XTIMER_MASK                 (0xffff0000)
-#define XTIMER_SHIFT_ON_COMPARE     (4)
-#define XTIMER_BACKOFF              (40)
-/** @} */
 
 /* MSB430 core */
 #define MSP430_INITIAL_CPU_SPEED    800000uL
