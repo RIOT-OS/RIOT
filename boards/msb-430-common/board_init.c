@@ -203,6 +203,6 @@ void board_init(void)
 
     msp430_set_cpu_speed(CLOCK_CORECLOCK);
 
-    /* finally initialize the STDIO */
+    /* finally initialize STDIO over UART */
     uart_stdio_init();
 }

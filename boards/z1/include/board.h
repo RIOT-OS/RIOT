@@ -54,9 +54,9 @@ extern "C" {
  * @brief   Standard input/output device configuration
  * @{
  */
-#define STDIO                       (0)
-#define STDIO_BAUDRATE              (115200U)
-#define STDIO_RX_BUFSIZE            (64U)
+#define UART_STDIO_DEV              (UART_DEV(0))
+#define UART_STDIO_BAUDRATE         (115200U)
+#define UART_STDIO_RX_BUFSIZE       (64U)
 /** @} */
 
 /*  MSP430 core */

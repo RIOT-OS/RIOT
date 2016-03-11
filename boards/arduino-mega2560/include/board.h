@@ -32,7 +32,7 @@ extern "C" {
 * @brief As the CPU is too slow to handle 115200 baud, we set the default
 *        baudrate to 9600 for this board
 */
-#define STDIO_BAUDRATE      (9600U)
+#define UART_STDIO_BAUDRATE (9600U)
 
 /**
  * @name LED pin definitions
