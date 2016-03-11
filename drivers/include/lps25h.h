@@ -60,7 +60,7 @@ typedef enum {
  * @param[out]  dev     device descriptor of the sensor
  * @param[in]   i2c     I2C bus the sensor is connected to
  * @param[in]   address the sensor's address on the I2C bus
- * @param[in]   rate    internal sampling rate of the sensor
+ * @param[in]   odr    internal sampling rate of the sensor
  *
  * @return               0 on success
  * @return              -1 on error
