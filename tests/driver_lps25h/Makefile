@@ -16,7 +16,7 @@ ifneq (,$(TEST_LPS25H_ADDR))
   CFLAGS += -DTEST_LPS25H_ADDR=$(TEST_LPS25H_ADDR)
 else
   # set random default
-  CFLAGS += -DTEST_LPS25H_ADDR=94
+  CFLAGS += -DTEST_LPS25H_ADDR=92
 endif
 
 include $(RIOTBASE)/Makefile.include
