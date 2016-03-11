@@ -44,7 +44,5 @@ extern "C" {
 }
 #endif
 
-#include "board-conf.h"
-
 /** @} */
 #endif /* MSB_BOARD_H_ */
