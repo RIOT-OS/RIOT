@@ -1,9 +1,5 @@
 /*
-<<<<<<< HEAD
- * Copyright (C) 2014-2015 Freie Universität Berlin
-=======
  * Copyright (C) 2014-2016 Freie Universität Berlin
->>>>>>> haukepetersen/opt_periph_adc
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more

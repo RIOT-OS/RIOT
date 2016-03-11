@@ -26,6 +26,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Available number of ADC devices
+ */
+#define ADC_DEVS            (2U)
+
+/**
  * @brief   Overwrite the default gpio_t type definition
  * @{
  */
@@ -66,6 +71,20 @@ typedef enum {
     GPIO_OD    = GPIO_MODE(1, 0, 1),    /**< open-drain w/o pull R */
     GPIO_OD_PU = GPIO_MODE(1, 1, 1)     /**< open-drain with pull-up */
 } gpio_mode_t;
+/** @} */
+
+/**
+ * @brief   Override I2C speed options
+ * @{
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW = 0,      /**< low speed mode:    ~10kbit/s */
+    I2C_SPEED_NORMAL,       /**< normal mode:       ~100kbit/s */
+    I2C_SPEED_FAST,         /**< fast mode:         ~400kbit/sj */
+    I2C_SPEED_FAST_PLUS,    /**< fast plus mode:    ~1Mbit/s */
+    I2C_SPEED_HIGH,         /**< high speed mode:   ~3.4Mbit/s */
+} i2c_speed_t;
 /** @} */
 
 /**
@@ -121,6 +140,70 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   I2C configuration options
+ * @{
+ */
+typedef struct {
+    I2C_TypeDef *dev;       /**< I2C device */
+    gpio_t scl_pin;         /**< clock pin */
+    gpio_t sda_pin;         /**< data pin */
+    uint8_t scl_af;         /**< SCL pin alternate function */
+    uint8_t sda_af;         /**< SDA pin alternate function */
+    i2c_speed_t speed;      /**< I2C bus speed */
+    uint8_t rcc_bit;        /**< bit in the rcc register */
+    uint8_t irqn;           /**< IRQ channel */
+} i2c_conf_t;
+/** @} */
+
+/**
+ * @brief   Structure for SPI configuration data
+ * @{
+ */
+typedef struct {
+    SPI_TypeDef *dev;       /**< SPI device base register address */
+    gpio_t mosi_pin;        /**< MOSI pin */
+    gpio_t miso_pin;        /**< MISO pin */
+    gpio_t sclk_pin;        /**< SCLK pin */
+    gpio_af_t af;           /**< pin alternate function */
+    uint8_t abpbus;         /**< APB bus, 0 := APB1, 1:= APB2 */
+    uint32_t rccmask;         /**< bit in the RCC peripheral enable register */
+} spi_conf_t;
+/** @} */
+
+/**
+ * @brief   Override the ADC resolution configuration
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0x00000000,  /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = 0x01000000,  /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = 0x02000000,  /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = 0x03000000,  /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 1,           /**< ADC resolution: 14 bit (not supported) */
+    ADC_RES_16BIT = 2            /**< ADC resolution: 16 bit (not supported)*/
+} adc_res_t;
+/** @} */
+
+/**
+ * @brief   ADC channel configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the channel */
+    uint8_t dev;            /**< ADCx - 1 device used for the channel */
+    uint8_t chan;           /**< CPU ADC channel connected to the pin */
+    uint8_t rcc;            /**< bit in the RCC APB2 enable register */
+} adc_conf_t;
+
+/**
+ * @brief   DAC line configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the line */
+    uint8_t chan;           /**< DAC device used for this line */
+} dac_conf_t;
+
+/**
  * @brief   Configure the alternate function for the given pin
  *
  * @note    This is meant for internal use in STM32F4 peripheral drivers only
@@ -129,6 +212,13 @@ typedef struct {
  * @param[in] af        alternate function to use
  */
 void gpio_init_af(gpio_t pin, gpio_af_t af);
+
+/**
+ * @brief   Configure the given pin to be used as ADC input
+ *
+ * @param[in] pin       pin to configure
+ */
+void gpio_init_analog(gpio_t pin);
 
 /**
  * @brief   Power on the DMA device the given stream belongs to
