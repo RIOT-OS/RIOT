@@ -211,7 +211,7 @@ void isr_exti(void)
 {
     for (unsigned i = 0; i < GPIO_ISR_CHAN_NUMOF; i++) {
         if (EXTI->PR & (1 << i)) {
-            EXTI->PR |= (1 << i);               /* clear by writing a 1 */
+            EXTI->PR = (1 << i);               /* clear by writing a 1 */
             exti_chan[i].cb(exti_chan[i].arg);
         }
     }
