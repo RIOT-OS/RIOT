@@ -18,35 +18,15 @@
  * @}
  */
 
+#include "cpu.h"
 #include "board.h"
-
-static void leds_init(void);
-extern void SystemInit(void);
 
 void board_init(void)
 {
+    /* initialize and turn off the boards LEDs */
+    LED_PORT->DIR[1] = (LED0_MASK | LED1_MASK | LED2_MASK);
+    LED_PORT->SET[1] = (LED0_MASK | LED1_MASK | LED2_MASK);
+
     /* initialize the CPU */
     cpu_init();
-    /* initialize the boards LEDs */
-    leds_init();
-}
-
-/**
- * @brief Initialize the boards on-board LEDs (LED1 to LED4)
- *
- * The LED initialization is hard-coded in this function. As the LEDs are soldered
- * onto the board they are fixed to their CPU pins.
- *
- * The LEDs are connected to the following pins:
- * - LED1: P1.13
- * - LED2: P1.14
- * - LED3: P1.15
- */
-static void leds_init(void)
-{
-    /* configure LED pins as output */
-    LED_PORT->DIR[1] = (LED1_PIN | LED2_PIN | LED3_PIN);
-
-    /* clear all LEDs */
-    LED_PORT->SET[1] = (LED1_PIN | LED2_PIN | LED3_PIN);
 }
