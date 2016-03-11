@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 
-#include "net/ng_ipv6.h"
+#include "net/gnrc/ipv6.h"
 #include "common/netaddr.h"
 
 #include "aodvv2/types.h"
@@ -96,17 +96,17 @@ bool rreqtable_is_redundant(struct aodvv2_packet_data *packet_data);
 
 /**
  * Convert an IP stored as an ipv6_addr_t to a netaddr
- * @param src       ng_ipv6_addr_t to convert
+ * @param src       ipv6_addr_t to convert
  * @param dst       (empty) netaddr to convert into
  */
-void ipv6_addr_t_to_netaddr(ng_ipv6_addr_t *src, struct netaddr *dst);
+void ipv6_addr_t_to_netaddr(ipv6_addr_t *src, struct netaddr *dst);
 
 /**
  * Convert an IP stored as a netaddr to an ipv6_addr_t
  * @param src       (empty) netaddr to convert into
- * @param dst       ng_ipv6_addr_t to convert
+ * @param dst       ipv6_addr_t to convert
  */
-void netaddr_to_ipv6_addr_t(struct netaddr *src, ng_ipv6_addr_t *dst);
+void netaddr_to_ipv6_addr_t(struct netaddr *src, ipv6_addr_t *dst);
 
 #ifdef  __cplusplus
 }
