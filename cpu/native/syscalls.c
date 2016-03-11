@@ -402,7 +402,7 @@ int getpid(void)
     return -1;
 }
 
-#ifdef MODULE_VTIMER
+#ifdef MODULE_XTIMER
 int _gettimeofday(struct timeval *tp, void *restrict tzp)
 {
     (void) tzp;
