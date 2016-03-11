@@ -456,7 +456,7 @@ static void process_temp_tables(void)
     nib_entry_t *nib_elt;
     timex_t now;
 
-    vtimer_now(&now);
+    xtimer_now_timex(&now);
     iib_update_lt_status(&now);
 
     nib_elt = nib_process_hello();

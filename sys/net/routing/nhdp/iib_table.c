@@ -20,7 +20,7 @@
 
 #include "mutex.h"
 #include "timex.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "utlist.h"
 #include "kernel_types.h"
 
@@ -118,7 +118,7 @@ iib_link_set_entry_t *iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt
     }
 
     if (base_elt) {
-        vtimer_now(&now);
+        xtimer_now_timex(&now);
 
         /* Create a new link tuple for the neighbor that originated the hello */
         ls_entry = update_link_set(base_elt, nb_elt, &now, validity_time, is_sym_nb, is_lost);
@@ -143,7 +143,7 @@ void iib_fill_wr_addresses(kernel_pid_t if_pid, struct rfc5444_writer *wr)
 
     mutex_lock(&mtx_iib_access);
 
-    vtimer_now(&now);
+    xtimer_now_timex(&now);
 
     /* Before adding addresses first update the status of all link tuples */
     iib_update_lt_status(&now);
@@ -251,7 +251,7 @@ void iib_process_metric_msg(iib_link_set_entry_t *ls_entry, uint64_t int_time)
     ls_entry->hello_interval = rfc5444_timetlv_encode(int_time);
     if (ls_entry->last_seq_no == 0) {
         timex_t now, i_time;
-        vtimer_now(&now);
+        xtimer_now_timex(&now);
         i_time = timex_from_uint64(int_time * MS_IN_USEC * DAT_HELLO_TIMEOUT_FACTOR);
         ls_entry->dat_received[0]++;
         ls_entry->dat_total[0]++;
@@ -297,7 +297,7 @@ void iib_process_metric_pckt(iib_link_set_entry_t *ls_entry, uint32_t metric_out
 
     if (ls_entry->hello_interval != 0) {
         timex_t now, i_time;
-        vtimer_now(&now);
+        xtimer_now_timex(&now);
         i_time = timex_from_uint64(rfc5444_timetlv_decode(ls_entry->hello_interval)
                 * MS_IN_USEC * DAT_HELLO_TIMEOUT_FACTOR);
         ls_entry->dat_time = timex_add(now, i_time);
