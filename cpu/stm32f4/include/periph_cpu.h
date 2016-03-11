@@ -69,6 +69,20 @@ typedef enum {
 /** @} */
 
 /**
+ * @brief   Override I2C speed options
+ * @{
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW = 0,      /**< low speed mode:    ~10kbit/s */
+    I2C_SPEED_NORMAL,       /**< normal mode:       ~100kbit/s */
+    I2C_SPEED_FAST,         /**< fast mode:         ~400kbit/sj */
+    I2C_SPEED_FAST_PLUS,    /**< fast plus mode:    ~1Mbit/s */
+    I2C_SPEED_HIGH,         /**< high speed mode:   ~3.4Mbit/s */
+} i2c_speed_t;
+/** @} */
+
+/**
  * @brief   Available ports on the STM32F4 family
  */
 enum {
@@ -118,6 +132,21 @@ typedef struct {
     uint8_t dma_stream;     /**< DMA stream used for TX */
     uint8_t dma_chan;       /**< DMA channel used for TX */
 } uart_conf_t;
+/** @} */
+
+/**
+ * @brief   I2C configuration options
+ */
+typedef struct {
+    I2C_TypeDef *dev;       /**< I2C device */
+    gpio_t scl_pin;         /**< clock pin */
+    gpio_t sda_pin;         /**< data pin */
+    uint8_t scl_af;         /**< SCL pin alternate function */
+    uint8_t sda_af;         /**< SDA pin alternate function */
+    i2c_speed_t speed;      /**< I2C bus speed */
+    uint8_t rcc_bit;        /**< bit in the rcc register */
+    uint8_t irqn;           /**< IRQ channel */
+} i2c_conf_t;
 /** @} */
 
 /**
