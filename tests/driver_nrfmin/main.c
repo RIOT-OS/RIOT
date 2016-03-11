@@ -41,7 +41,7 @@ int main(void)
     gnrc_nomac_init(nomac_stack, sizeof(nomac_stack), 5, "nomac", &dev);
 
     /* initialize packet dumper */
-    netobj.pid = gnrc_pktdump_getpid();
+    netobj.pid = gnrc_pktdump_pid;
     netobj.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &netobj);
 

@@ -99,7 +99,7 @@ int adc_sample(adc_t dev, int channel)
     NRF_ADC->TASKS_START = 1;
 
     /* wait for conversion to be complete */
-    while (((NRF_ADC->BUSY & ADC_BUSY_BUSY_Msk) >> ADC_BUSY_BUSY_Pos) == ADC_BUSY_BUSY_Busy);
+    while (((NRF_ADC->BUSY & ADC_BUSY_BUSY_Msk) >> ADC_BUSY_BUSY_Pos) == ADC_BUSY_BUSY_Busy) {}
     NRF_ADC->EVENTS_END = 1;
 
     /* return result */

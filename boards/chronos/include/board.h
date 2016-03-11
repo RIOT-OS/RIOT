@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-// for correct inclusion of <msp430.h>
+/* for correct inclusion of <msp430.h> */
 #ifndef __CC430F6137__
 #define __CC430F6137__
 #endif
@@ -42,11 +42,28 @@ extern "C" {
 #define XTIMER_SHIFT_ON_COMPARE     (4)
 /** @} */
 
+/**
+ * @brief   MSP430 core configuration
+ * @{
+ */
 #define MSP430_INITIAL_CPU_SPEED    7372800uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
 #define F_RC_OSCILLATOR             32768
 #define MSP430_HAS_DCOR             1
 #define MSP430_HAS_EXTERNAL_CRYSTAL 1
+/** @} */
+
+/**
+ * @brief   LED defines for compatibility
+ * @{
+ */
+#define LED_RED_ON                  /* not present */
+#define LED_RED_OFF                 /* not present */
+#define LED_RED_TOGGLE              /* not present */
+#define LED_GREEN_ON                /* not present */
+#define LED_GREEN_OFF               /* not present */
+#define LED_GREEN_TOGGLE            /* not present */
+/** @} */
 
 #ifdef __cplusplus
 }

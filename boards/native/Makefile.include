@@ -8,6 +8,8 @@ export NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 export CPU = native
 export ELF = $(BINDIR)$(APPLICATION).elf
 
+USEMODULE += native-drivers
+
 # toolchain:
 export PREFIX =
 export CC ?= $(PREFIX)gcc

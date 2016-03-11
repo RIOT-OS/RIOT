@@ -56,6 +56,11 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief User button pin
+ */
+#define SW0_PIN             GPIO_PIN(PA, 2)
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);

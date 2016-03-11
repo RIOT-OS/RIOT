@@ -35,7 +35,7 @@ int main(void)
     puts("SLIP test");
 
     /* initialize and register pktdump */
-    dump.pid = gnrc_pktdump_getpid();
+    dump.pid = gnrc_pktdump_pid;
     dump.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
 
     if (dump.pid <= KERNEL_PID_UNDEF) {

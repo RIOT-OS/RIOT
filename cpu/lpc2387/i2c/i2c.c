@@ -164,8 +164,7 @@ bool i2c_stop(uint8_t i2c_interface)
             I20CONCLR = I2CONCLR_SIC; /* Clear SI flag */
 
             /*--- Wait for STOP detected ---*/
-            while (I20CONSET & I2CONSET_STO)
-                ;
+            while (I20CONSET & I2CONSET_STO) {}
 
             break;
 
@@ -175,8 +174,7 @@ bool i2c_stop(uint8_t i2c_interface)
             I21CONCLR = I2CONCLR_SIC; /* Clear SI flag */
 
             /*--- Wait for STOP detected ---*/
-            while (I21CONSET & I2CONSET_STO)
-                ;
+            while (I21CONSET & I2CONSET_STO) {}
 
             break;
 
@@ -185,8 +183,7 @@ bool i2c_stop(uint8_t i2c_interface)
             I22CONCLR = I2CONCLR_SIC; /* Clear SI flag */
 
             /*--- Wait for STOP detected ---*/
-            while (I22CONSET & I2CONSET_STO)
-                ;
+            while (I22CONSET & I2CONSET_STO) {}
     }
 
     //  puts("...i2c_stop ended\n");

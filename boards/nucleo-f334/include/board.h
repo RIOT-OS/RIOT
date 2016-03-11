@@ -56,6 +56,11 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   User button
+ */
+#define BTN_B1_PIN          GPIO_PIN(PORT_C, 13)
+
+/**
  * @name xtimer tuning values
  * @{
  */

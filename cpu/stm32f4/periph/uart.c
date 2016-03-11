@@ -125,7 +125,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         /* send data by active waiting on the TXE flag */
         USART_TypeDef *dev = _dev(uart);
         for (int i = 0; i < len; i++) {
-            while (!(dev->SR & USART_SR_TXE));
+            while (!(dev->SR & USART_SR_TXE)) {}
             dev->DR = data[i];
         }
     }

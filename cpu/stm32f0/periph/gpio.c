@@ -102,7 +102,7 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 
     /* enable global pin interrupt */
     if (pin_num < 2) {
-        NVIC_EnableIRQ(EXTI2_3_IRQn + pin_num);
+        NVIC_EnableIRQ(EXTI0_1_IRQn);
     }
     else if (pin_num < 4) {
         NVIC_EnableIRQ(EXTI2_3_IRQn);

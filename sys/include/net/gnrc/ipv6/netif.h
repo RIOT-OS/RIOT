@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "kernel_macros.h"
+#include "kernel_defines.h"
 #include "kernel_types.h"
 #include "mutex.h"
 #include "net/ipv6.h"

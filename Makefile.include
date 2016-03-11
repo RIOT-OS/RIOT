@@ -133,6 +133,9 @@ ifeq (,$(UNZIP_HERE))
   endif
 endif
 
+ifeq (, ${APPLICATION})
+    $(error An application name must be specified as APPLICATION.)
+endif
 ifneq (0,$(shell test -d $(RIOTBOARD)/$(BOARD); echo $$?))
     $(error The specified board $(BOARD) does not exist.)
 endif
@@ -449,3 +452,6 @@ ifneq (,$(filter iotlab-m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
     include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
   endif
 endif
+
+# Include desvirt Makefile
+include $(RIOTBASE)/dist/tools/desvirt/Makefile.desvirt

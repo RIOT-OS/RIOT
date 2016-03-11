@@ -17,7 +17,7 @@
 #ifndef __SYS__POSIX__PTHREAD_THREADING__H
 #define __SYS__POSIX__PTHREAD_THREADING__H
 
-#include "attributes.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {

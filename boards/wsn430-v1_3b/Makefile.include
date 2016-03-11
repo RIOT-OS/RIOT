@@ -1,1 +1,2 @@
+USEMODULE += wsn430-common
 include $(RIOTBOARD)/wsn430-common/Makefile.include

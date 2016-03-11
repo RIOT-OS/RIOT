@@ -57,7 +57,8 @@ git clone git://github.com/RIOT-OS/RIOT.git # assumption: git is pre-installed
 git checkout <LATEST_RELEASE>
 cd RIOT
 ./dist/tools/tapsetup/tapsetup              # create virtual Ethernet
-                                            # interfaces to connect to RIOT
+                                            # interfaces to connect multiple
+                                            # RIOT instances
 cd examples/default/
 make all
 make term

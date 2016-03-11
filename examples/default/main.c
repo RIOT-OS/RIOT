@@ -55,7 +55,7 @@ int main(void)
 #ifdef MODULE_NETIF
     gnrc_netreg_entry_t dump;
 
-    dump.pid = gnrc_pktdump_getpid();
+    dump.pid = gnrc_pktdump_pid;
     dump.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 #endif

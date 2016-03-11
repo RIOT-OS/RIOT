@@ -28,7 +28,7 @@
  * @}
  */
 
-#include "attributes.h"
+#include "kernel_defines.h"
 #include "cpu.h"
 #include "sched.h"
 #include "x86_uart.h"

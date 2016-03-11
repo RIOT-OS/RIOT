@@ -67,7 +67,7 @@ if $FULL_CHECK; then
     parallel -k exec_build_func {} "$@"  ::: static-tests avr8 msp430 x86 arm7 \
                                              cortex_m0_2 cortex_m0_1 \
                                              cortex_m3_1 cortex_m3_2 \
-                                             cortex_m4_1 cortex_m4_2 \
+                                             cortex_m4_1 cortex_m4_2 cortex_m4_3 \
     |& tee -a "$MYTMPDIR/output.log"
 else
     echo "PR not ready for CI build. Only static-tests will be executed!"

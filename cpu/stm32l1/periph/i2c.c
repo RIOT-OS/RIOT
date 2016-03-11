@@ -171,13 +171,13 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
 
             DEBUG("Wait for RXNE == 1\n");
 
-            while (!(i2c->SR1 & I2C_SR1_RXNE));
+            while (!(i2c->SR1 & I2C_SR1_RXNE)) {}
 
             DEBUG("Read received data\n");
             *data = (char)i2c->DR;
 
             /* wait until STOP is cleared by hardware */
-            while (i2c->CR1 & I2C_CR1_STOP);
+            while (i2c->CR1 & I2C_CR1_STOP) {}
 
             /* reset ACK to be able to receive new data */
             i2c->CR1 |= (I2C_CR1_ACK);
@@ -196,7 +196,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
 
             DEBUG("Wait for transfer to be completed\n");
 
-            while (!(i2c->SR1 & I2C_SR1_BTF));
+            while (!(i2c->SR1 & I2C_SR1_BTF)) {}
 
             DEBUG("Crit block: set STOP and read first byte\n");
             state = disableIRQ();
@@ -209,7 +209,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
 
             DEBUG("wait for STOP bit to be cleared again\n");
 
-            while (i2c->CR1 & I2C_CR1_STOP);
+            while (i2c->CR1 & I2C_CR1_STOP) {}
 
             DEBUG("reset POS = 0 and ACK = 1\n");
             i2c->CR1 &= ~(I2C_CR1_POS);
@@ -224,7 +224,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
             while (i < (length - 3)) {
                 DEBUG("Wait until byte was received\n");
 
-                while (!(i2c->SR1 & I2C_SR1_RXNE));
+                while (!(i2c->SR1 & I2C_SR1_RXNE)) {}
 
                 DEBUG("Copy byte from DR\n");
                 data[i++] = (char)i2c->DR;
@@ -232,7 +232,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
 
             DEBUG("Reading the last 3 bytes, waiting for BTF flag\n");
 
-            while (!(i2c->SR1 & I2C_SR1_BTF));
+            while (!(i2c->SR1 & I2C_SR1_BTF)) {}
 
             DEBUG("Disable ACK\n");
             i2c->CR1 &= ~(I2C_CR1_ACK);
@@ -246,7 +246,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
             DEBUG("Read N-1 byte\n");
             data[i++] = (char)i2c->DR;
 
-            while (!(i2c->SR1 & I2C_SR1_RXNE));
+            while (!(i2c->SR1 & I2C_SR1_RXNE)) {}
 
             DEBUG("Read last byte\n");
 
@@ -254,7 +254,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
 
             DEBUG("wait for STOP bit to be cleared again\n");
 
-            while (i2c->CR1 & I2C_CR1_STOP);
+            while (i2c->CR1 & I2C_CR1_STOP) {}
 
             DEBUG("reset POS = 0 and ACK = 1\n");
             i2c->CR1 &= ~(I2C_CR1_POS);
@@ -350,7 +350,7 @@ void i2c_poweron(i2c_t dev)
 void i2c_poweroff(i2c_t dev)
 {
     if ((unsigned int)dev < I2C_NUMOF) {
-        while (i2c_config[dev].dev->SR2 & I2C_SR2_BUSY);
+        while (i2c_config[dev].dev->SR2 & I2C_SR2_BUSY) {}
         RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN << dev);
     }
 }
@@ -360,14 +360,14 @@ static void _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag)
     /* wait for device to be ready */
     DEBUG("Wait for device to be ready\n");
 
-    while (i2c->SR2 & I2C_SR2_BUSY);
+    while (i2c->SR2 & I2C_SR2_BUSY) {}
 
     /* generate start condition */
     DEBUG("Generate start condition\n");
     i2c->CR1 |= I2C_CR1_START;
     DEBUG("Wait for SB flag to be set\n");
 
-    while (!(i2c->SR1 & I2C_SR1_SB));
+    while (!(i2c->SR1 & I2C_SR1_SB)) {}
 
     /* send address and read/write flag */
     DEBUG("Send address\n");
@@ -375,7 +375,7 @@ static void _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag)
     /* clear ADDR flag by reading first SR1 and then SR2 */
     DEBUG("Wait for ADDR flag to be set\n");
 
-    while (!(i2c->SR1 & I2C_SR1_ADDR));
+    while (!(i2c->SR1 & I2C_SR1_ADDR)) {}
 }
 
 static inline void _clear_addr(I2C_TypeDef *i2c)
@@ -395,7 +395,7 @@ static inline void _write(I2C_TypeDef *i2c, char *data, int length)
         DEBUG("Written %i byte to data reg, now waiting for DR to be empty again\n", i);
 
         /* wait for transfer to finish */
-        while (!(i2c->SR1 & I2C_SR1_TXE));
+        while (!(i2c->SR1 & I2C_SR1_TXE)) {}
 
         DEBUG("DR is now empty again\n");
     }
@@ -406,7 +406,7 @@ static inline void _stop(I2C_TypeDef *i2c)
     /* make sure last byte was send */
     DEBUG("Wait if last byte hasn't been sent\n");
 
-    while (!(i2c->SR1 & I2C_SR1_BTF));
+    while (!(i2c->SR1 & I2C_SR1_BTF)) {}
 
     /* send STOP condition */
     i2c->CR1 |= I2C_CR1_STOP;
@@ -439,7 +439,7 @@ void I2C_0_ERR_ISR(void)
     if (state & I2C_SR1_SMBALERT) {
         DEBUG("SMBALERT\n");
     }
-    while (1);
+    while (1) {}
 }
 #endif /* I2C_0_EN */
 
@@ -470,7 +470,7 @@ void I2C_1_ERR_ISR(void)
     if (state & I2C_SR1_SMBALERT) {
         DEBUG("SMBALERT\n");
     }
-    while (1);
+    while (1) {}
 }
 #endif /* I2C_1_EN */
 

@@ -51,6 +51,10 @@ typedef struct conn_udp conn_udp_t;
  * @param[in] family    The family of @p addr (see @ref net_af).
  * @param[in] port      The local UDP port for @p conn.
  *
+ * @todo    With @ref net_gnrc @ref conn_udp_recvfrom needs to be called from the
+ *          same thread as for this function. This is undesired behavior and
+ *          will be fixed in upcoming versions of RIOT.
+ *
  * @return  0 on success.
  * @return  any other negative number in case of an error. For portability implementations should
  *          draw inspiration of the errno values from the POSIX' bind() function specification.
@@ -92,6 +96,10 @@ int conn_udp_getlocaladdr(conn_udp_t *conn, void *addr, uint16_t *port);
  * @param[out] port     NULL pointer or the sender's UDP port.
  *
  * @note    Function may block.
+ *
+ * @todo    With @ref net_gnrc this function needs to be called from the same
+ *          thread as @ref conn_udp_create. This is undesired behavior and will
+ *          be fixed in upcoming versions of RIOT.
  *
  * @return  The number of bytes received on success.
  * @return  0, if no received data is available, but everything is in order.

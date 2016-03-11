@@ -18,12 +18,12 @@ OS = $(shell uname)
 ifeq ($(OS),Linux)
   PORT ?= /dev/ttyACM0
   FLASHER = avrdude
-#else ifeq ($(OS),Darwin)
-#  PORT ?=
-#  FLASHER =
+else ifeq ($(OS),Darwin)
+  PORT ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+  FLASHER = avrdude
 else
   $(info CAUTION: No flash tool for your host system found!)
-  # TODO: fix for building under windows/MacOS
+  # TODO: fix for building under windows
 endif
 export FLASHER
 export PORT

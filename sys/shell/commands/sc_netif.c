@@ -840,7 +840,7 @@ int _netif_send(int argc, char **argv)
     uint8_t flags = 0x00;
 
     if (argc < 4) {
-        printf("usage: %s <if> [<addr>|bcast] <data>\n", argv[0]);
+        printf("usage: %s <if> [<L2 addr>|bcast] <data>\n", argv[0]);
         return 1;
     }
 

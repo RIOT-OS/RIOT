@@ -131,7 +131,7 @@ int adc_sample(adc_t dev, int channel)
     /* start single conversion */
     adc->CR |= ADC_CR_ADSTART;
     /* wait until conversion is complete */
-    while (!(adc->ISR & ADC_ISR_EOC));
+    while (!(adc->ISR & ADC_ISR_EOC)) {}
     /* read and return result */
     return (int)adc->DR;
 }

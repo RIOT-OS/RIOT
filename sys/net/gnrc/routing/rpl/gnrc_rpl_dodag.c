@@ -193,8 +193,9 @@ bool gnrc_rpl_parent_add_by_addr(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *addr,
 bool gnrc_rpl_parent_remove(gnrc_rpl_parent_t *parent)
 {
     if (parent == parent->dodag->parents) {
-        ipv6_addr_t def = IPV6_ADDR_UNSPECIFIED;
-        fib_remove_entry(&gnrc_ipv6_fib_table, def.u8, sizeof(ipv6_addr_t));
+        fib_remove_entry(&gnrc_ipv6_fib_table,
+                         (uint8_t *) ipv6_addr_unspecified.u8,
+                         sizeof(ipv6_addr_t));
     }
     LL_DELETE(parent->dodag->parents, parent);
     memset(parent, 0, sizeof(gnrc_rpl_parent_t));
@@ -209,8 +210,9 @@ void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
 
     if (dodag->parents) {
         gnrc_rpl_dodag_remove_all_parents(dodag);
-        ipv6_addr_t def = IPV6_ADDR_UNSPECIFIED;
-        fib_remove_entry(&gnrc_ipv6_fib_table, def.u8, sizeof(ipv6_addr_t));
+        fib_remove_entry(&gnrc_ipv6_fib_table,
+                         (uint8_t *) ipv6_addr_unspecified.u8,
+                         sizeof(ipv6_addr_t));
     }
 
     if (dodag->my_rank != GNRC_RPL_INFINITE_RANK) {
@@ -224,7 +226,6 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
 {
     uint16_t old_rank = dodag->my_rank;
     uint32_t now = xtimer_now();
-    ipv6_addr_t def = IPV6_ADDR_UNSPECIFIED;
 
     /* update Parent lifetime */
     if (parent != NULL) {
@@ -233,9 +234,14 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
             ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
             kernel_pid_t if_id;
             if ((if_id = gnrc_ipv6_netif_find_by_addr(NULL, &all_RPL_nodes)) != KERNEL_PID_UNDEF) {
-                fib_add_entry(&gnrc_ipv6_fib_table, if_id, def.u8, sizeof(ipv6_addr_t),
+                fib_add_entry(&gnrc_ipv6_fib_table,
+                              if_id,
+                              (uint8_t *) ipv6_addr_unspecified.u8,
+                              sizeof(ipv6_addr_t),
                               (FIB_FLAG_NET_PREFIX | 0x0),
-                              parent->addr.u8, sizeof(ipv6_addr_t), FIB_FLAG_RPL_ROUTE,
+                              parent->addr.u8,
+                              sizeof(ipv6_addr_t),
+                              FIB_FLAG_RPL_ROUTE,
                               (dodag->default_lifetime * dodag->lifetime_unit) * SEC_IN_MS);
             }
         }
@@ -260,7 +266,6 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
  */
 static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *dodag)
 {
-    ipv6_addr_t def = IPV6_ADDR_UNSPECIFIED;
     gnrc_rpl_parent_t *old_best = dodag->parents;
     gnrc_rpl_parent_t *new_best = old_best;
     uint16_t old_rank = dodag->my_rank;
@@ -285,7 +290,9 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
             gnrc_rpl_send_DAO(dodag->instance, &old_best->addr, 0);
             gnrc_rpl_delay_dao(dodag);
         }
-        fib_remove_entry(&gnrc_ipv6_fib_table, def.u8, sizeof(ipv6_addr_t));
+        fib_remove_entry(&gnrc_ipv6_fib_table,
+                         (uint8_t *) ipv6_addr_unspecified.u8,
+                         sizeof(ipv6_addr_t));
         ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
 
         kernel_pid_t if_id = gnrc_ipv6_netif_find_by_addr(NULL, &all_RPL_nodes);
@@ -295,10 +302,15 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
             return NULL;
         }
 
-        fib_add_entry(&gnrc_ipv6_fib_table, if_id, def.u8, sizeof(ipv6_addr_t),
-                      (FIB_FLAG_NET_PREFIX | 0x0), dodag->parents->addr.u8, sizeof(ipv6_addr_t),
-                      FIB_FLAG_RPL_ROUTE, (dodag->default_lifetime * dodag->lifetime_unit)
-                      * SEC_IN_MS);
+        fib_add_entry(&gnrc_ipv6_fib_table,
+                      if_id,
+                      (uint8_t *) ipv6_addr_unspecified.u8,
+                      sizeof(ipv6_addr_t),
+                      (FIB_FLAG_NET_PREFIX | 0x0),
+                      dodag->parents->addr.u8,
+                      sizeof(ipv6_addr_t),
+                      FIB_FLAG_RPL_ROUTE,
+                      (dodag->default_lifetime * dodag->lifetime_unit) * SEC_IN_MS);
     }
 
     dodag->my_rank = dodag->instance->of->calc_rank(dodag->parents, 0);
