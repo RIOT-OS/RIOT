@@ -53,18 +53,6 @@ extern "C" {
 #define MSP430_HAS_EXTERNAL_CRYSTAL 1
 /** @} */
 
-/**
- * @brief   LED defines for compatibility
- * @{
- */
-#define LED_RED_ON                  /* not present */
-#define LED_RED_OFF                 /* not present */
-#define LED_RED_TOGGLE              /* not present */
-#define LED_GREEN_ON                /* not present */
-#define LED_GREEN_OFF               /* not present */
-#define LED_GREEN_TOGGLE            /* not present */
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
