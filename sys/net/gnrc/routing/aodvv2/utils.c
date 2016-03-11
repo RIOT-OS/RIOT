@@ -228,14 +228,14 @@ static void _reset_entry_if_stale(uint8_t i)
     }
 }
 
-void ipv6_addr_t_to_netaddr(ng_ipv6_addr_t *src, struct netaddr *dst)
+void ipv6_addr_t_to_netaddr(ipv6_addr_t *src, struct netaddr *dst)
 {
     dst->_type = AF_INET6;
     dst->_prefix_len = AODVV2_RIOT_PREFIXLEN;
     memcpy(dst->_addr, &src->u8[0], sizeof(dst->_addr));
 }
 
-void netaddr_to_ipv6_addr_t(struct netaddr *src, ng_ipv6_addr_t *dst)
+void netaddr_to_ipv6_addr_t(struct netaddr *src, ipv6_addr_t *dst)
 {
     memcpy(&dst->u8[0], src->_addr, sizeof(uint8_t) * NETADDR_MAX_LENGTH);
 }

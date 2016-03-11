@@ -327,15 +327,15 @@ static enum rfc5444_result _cb_rreq_end_callback(
 
         /* TODO: proper bidirectionality detection as described in the draft now (v10 or higher)
 
-        ng_ipv6_addr_t sender_tmp;
+        ipv6_addr_t sender_tmp;
         netaddr_to_ipv6_addr_t(&packet_data.sender, &sender_tmp);
 
-        ng_ipv6_addr_t nxt_hop;
-        size_t nxt_hop_size = sizeof(ng_ipv6_addr_t);
+        ipv6_addr_t nxt_hop;
+        size_t nxt_hop_size = sizeof(ipv6_addr_t);
         uint32_t next_hop_flags = 0;
         if(fib_get_next_hop(&aodvv2_if_id,
                             &nxt_hop.u8[0], &nxt_hop_size, &next_hop_flags,
-                            &sender_tmp.u8[0], sizeof(ng_ipv6_addr_t), 0) != 0) {
+                            &sender_tmp.u8[0], sizeof(ipv6_addr_t), 0) != 0) {
             DEBUG("OH NOES! No bidirectional link to sender. Dropping packet.\n");
             return RFC5444_DROP_PACKET;
         }
@@ -350,8 +350,8 @@ static enum rfc5444_result _cb_rreq_end_callback(
         routingtable_add_entry(tmp_rt_entry);
 
         /* add entry to FIB */
-        fib_add_entry(aodvv2_if_id, tmp_rt_entry->addr._addr, sizeof(ng_ipv6_addr_t), 0,
-                      tmp_rt_entry->nextHopAddr._addr, sizeof(ng_ipv6_addr_t), 0, aodvv2_validity_t);
+        fib_add_entry(aodvv2_if_id, tmp_rt_entry->addr._addr, sizeof(ipv6_addr_t), 0,
+                      tmp_rt_entry->nextHopAddr._addr, sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
 
         free(tmp_rt_entry);
     }
@@ -366,8 +366,8 @@ static enum rfc5444_result _cb_rreq_end_callback(
         routingtable_fill_routing_entry_t_rreq(&packet_data, rt_entry);
 
         /* update the FIB */
-        fib_update_entry(rt_entry->addr._addr, sizeof(ng_ipv6_addr_t), rt_entry->nextHopAddr._addr,
-                         sizeof(ng_ipv6_addr_t), 0, aodvv2_validity_t);
+        fib_update_entry(rt_entry->addr._addr, sizeof(ipv6_addr_t), rt_entry->nextHopAddr._addr,
+                         sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
     }
 
     /*
@@ -538,15 +538,15 @@ static enum rfc5444_result _cb_rrep_end_callback(
 
         /* TODO: proper bidirectionality detection as described in the draft now (v10 or higher)
 
-        ng_ipv6_addr_t sender_tmp;
+        ipv6_addr_t sender_tmp;
         netaddr_to_ipv6_addr_t(&packet_data.sender, &sender_tmp);
 
-        ng_ipv6_addr_t nxt_hop;
-        size_t nxt_hop_size = sizeof(ng_ipv6_addr_t);
+        ipv6_addr_t nxt_hop;
+        size_t nxt_hop_size = sizeof(ipv6_addr_t);
         uint32_t next_hop_flags = 0;
         if(fib_get_next_hop(&aodvv2_if_id,
                             &nxt_hop.u8[0], &nxt_hop_size, &next_hop_flags,
-                            &sender_tmp.u8[0], sizeof(ng_ipv6_addr_t), 0) != 0) {
+                            &sender_tmp.u8[0], sizeof(ipv6_addr_t), 0) != 0) {
             DEBUG("OH NOES! No bidirectional link to sender. Dropping packet.\n");
             return RFC5444_DROP_PACKET;
         }
@@ -561,8 +561,8 @@ static enum rfc5444_result _cb_rrep_end_callback(
         routingtable_add_entry(tmp_rt_entry);
 
         /* add entry to FIB */
-        fib_add_entry(aodvv2_if_id, tmp_rt_entry->addr._addr, sizeof(ng_ipv6_addr_t), 0,
-                      tmp_rt_entry->nextHopAddr._addr, sizeof(ng_ipv6_addr_t), 0, aodvv2_validity_t);
+        fib_add_entry(aodvv2_if_id, tmp_rt_entry->addr._addr, sizeof(ipv6_addr_t), 0,
+                      tmp_rt_entry->nextHopAddr._addr, sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
 
         free(tmp_rt_entry);
     }
@@ -577,8 +577,8 @@ static enum rfc5444_result _cb_rrep_end_callback(
         routingtable_fill_routing_entry_t_rrep(&packet_data, rt_entry);
 
         /* update the FIB */
-        fib_update_entry(rt_entry->addr._addr, sizeof(ng_ipv6_addr_t), rt_entry->nextHopAddr._addr,
-                         sizeof(ng_ipv6_addr_t), 0, aodvv2_validity_t);
+        fib_update_entry(rt_entry->addr._addr, sizeof(ipv6_addr_t), rt_entry->nextHopAddr._addr,
+                         sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
     }
 
     /* If HandlingRtr is RREQ_Gen then the RREP satisfies RREQ_Gen's

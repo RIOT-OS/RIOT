@@ -57,8 +57,8 @@ static char aodv_fib_stack_buf[THREAD_STACKSIZE_MAIN];
 static aodvv2_metric_t _metric_type;
 static int sender_thread;
 static struct autobuf _hexbuf;
-static ng_ipv6_addr_t _v6_addr_mcast, _v6_addr_loopback;
-static ng_ipv6_addr_t _v6_addr_local;
+static ipv6_addr_t _v6_addr_mcast, _v6_addr_loopback;
+static ipv6_addr_t _v6_addr_local;
 static struct netaddr na_local; /* the same as _v6_addr_local, but to save us
                                  * constant calls to ipv6_addr_t_to_netaddr()... */
 static struct writer_target *wt;
@@ -66,7 +66,7 @@ static mutex_t rreq_mutex;
 static mutex_t rrep_mutex;
 static mutex_t rerr_mutex;
 
-static ng_ipv6_addr_t aodvv2_prefix = AODVV2_PREFIX;
+static ipv6_addr_t aodvv2_prefix = AODVV2_PREFIX;
 static int aodvv2_prefix_len;
 static int aodvv2_address_type_size;
 
@@ -87,7 +87,7 @@ void aodv_init(kernel_pid_t interface)
     }
     aodvv2_if_id = interface;
 
-    aodvv2_address_type_size = sizeof(ng_ipv6_addr_t);
+    aodvv2_address_type_size = sizeof(ipv6_addr_t);
     aodvv2_prefix_len = 64;
 
     mutex_init(&rreq_mutex);
@@ -112,13 +112,13 @@ void aodv_init(kernel_pid_t interface)
 
     /* start listening & enable sending */
     thread_create(aodv_rcv_stack_buf, sizeof(aodv_rcv_stack_buf), THREAD_PRIORITY_MAIN,
-                  CREATE_STACKTEST, _aodv_receiver_thread, NULL, "_aodv_receiver_thread");
+                  THREAD_CREATE_STACKTEST, _aodv_receiver_thread, NULL, "_aodv_receiver_thread");
     AODV_DEBUG("listening on port %d\n", MANET_PORT);
     sender_thread = thread_create(aodv_snd_stack_buf, sizeof(aodv_snd_stack_buf),
-                                  THREAD_PRIORITY_MAIN, CREATE_STACKTEST, _aodv_sender_thread,
+                                  THREAD_PRIORITY_MAIN, THREAD_CREATE_STACKTEST, _aodv_sender_thread,
                                   NULL, "_aodv_sender_thread");
     thread_create(aodv_fib_stack_buf, sizeof(aodv_fib_stack_buf),
-                                  THREAD_PRIORITY_MAIN, CREATE_STACKTEST, fib_signal_handler_thread,
+                                  THREAD_PRIORITY_MAIN, THREAD_CREATE_STACKTEST, fib_signal_handler_thread,
                                   NULL, "fib_signal_handler_thread");
 }
 
@@ -135,7 +135,7 @@ void aodv_set_metric_type(aodvv2_metric_t metric_type)
 void *fib_signal_handler_thread(void *arg)
 {
     (void) arg;
-    ng_ipv6_addr_t dest;
+    ipv6_addr_t dest;
     struct netaddr na_dest;
 
     int err = fib_register_rp(&aodvv2_prefix.u8[0], aodvv2_address_type_size);
@@ -150,7 +150,7 @@ void *fib_signal_handler_thread(void *arg)
 
         if (msg.type == FIB_MSG_RP_SIGNAL) {
             rp_address_msg_t* rp_msg = (rp_address_msg_t*)msg.content.ptr;
-            if (rp_msg->address_size == sizeof(ng_ipv6_addr_t)) {
+            if (rp_msg->address_size == sizeof(ipv6_addr_t)) {
                 /* We currently only support IPv6*/
                 memcpy(&dest, rp_msg->address, rp_msg->address_size);
                 /* Reply to the FIB so that it can stop blocking */
@@ -179,7 +179,7 @@ void *fib_signal_handler_thread(void *arg)
                 };
 
                 AODV_DEBUG("\tstarting route discovery towards %s... \n",
-                      ng_ipv6_addr_to_str(addr_str, &dest, NG_IPV6_ADDR_MAX_STR_LEN));
+                      ipv6_addr_to_str(addr_str, &dest, IPV6_ADDR_MAX_STR_LEN));
                 aodv_send_rreq(&rreq_data);
             }
             else {
@@ -283,12 +283,12 @@ static void _init_addresses(void)
     eui64_t iid;
 
     /* init multicast address: set to to a link-local all nodes multicast address */
-    ng_ipv6_addr_set_all_nodes_multicast(&_v6_addr_mcast, NG_IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
+    ipv6_addr_set_all_nodes_multicast(&_v6_addr_mcast, IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
     DEBUG("my multicast address is: %s\n",
-        ng_ipv6_addr_to_str(addr_str, &_v6_addr_mcast, NG_IPV6_ADDR_MAX_STR_LEN));
+        ipv6_addr_to_str(addr_str, &_v6_addr_mcast, IPV6_ADDR_MAX_STR_LEN));
 
     /* get id (of type eui46_t) of the interface we're sending on */
-    int err_code = ng_netapi_get(aodvv2_if_id, NETCONF_OPT_IPV6_IID, 0, &iid,
+    int err_code = gnrc_netapi_get(aodvv2_if_id, NETOPT_IPV6_IID, 0, &iid,
                        sizeof(eui64_t));
     if (err_code < 0) {
         DEBUG("Error: failed to get iid, error code: %d\n", err_code);
@@ -296,14 +296,14 @@ static void _init_addresses(void)
     }
 
     /* Set addr according to our interface id */
-    ng_ipv6_addr_set_aiid(&_v6_addr_local, &iid.uint8[0]);
+    ipv6_addr_set_aiid(&_v6_addr_local, &iid.uint8[0]);
     /* Set (global!) prefix */
-    ng_ipv6_addr_init_prefix(&_v6_addr_local, &aodvv2_prefix, aodvv2_prefix_len);
+    ipv6_addr_init_prefix(&_v6_addr_local, &aodvv2_prefix, aodvv2_prefix_len);
     /* Add our homemade address to our interface (aodvv2_if_id) */
-    ng_ipv6_netif_add_addr(aodvv2_if_id, &_v6_addr_local, aodvv2_prefix_len, 0);
+    gnrc_ipv6_netif_add_addr(aodvv2_if_id, &_v6_addr_local, aodvv2_prefix_len, 0);
 
     DEBUG("my src address is:       %s\n",
-        ng_ipv6_addr_to_str(addr_str, &_v6_addr_local, NG_IPV6_ADDR_MAX_STR_LEN));
+        ipv6_addr_to_str(addr_str, &_v6_addr_local, IPV6_ADDR_MAX_STR_LEN));
 
     /* store src & multicast address as netaddr as well for easy interaction
      * with oonf based stuff */
@@ -311,7 +311,7 @@ static void _init_addresses(void)
     ipv6_addr_t_to_netaddr(&_v6_addr_mcast, &na_mcast);
 
     /* TODO: do I need this?*/
-    ng_ipv6_addr_set_loopback(&_v6_addr_loopback);
+    ipv6_addr_set_loopback(&_v6_addr_loopback);
 }
 
 /* Build RREQs, RREPs and RERRs from the information contained in the thread's
@@ -355,9 +355,9 @@ static void *_aodv_receiver_thread(void *arg)
 {
     (void) arg;
 
-    ng_netreg_entry_t server = {
+    gnrc_netreg_entry_t server = {
         .next = NULL,
-        .demux_ctx = NG_NETREG_DEMUX_CTX_ALL,
+        .demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL,
         .pid = KERNEL_PID_UNDEF };
 
     AODV_DEBUG("%s()\n", __func__);
@@ -369,24 +369,24 @@ static void *_aodv_receiver_thread(void *arg)
 
     msg_init_queue(msg_q, RCV_MSG_Q_SIZE);
     reply.content.value = (uint32_t)(-ENOTSUP);
-    reply.type = NG_NETAPI_MSG_TYPE_ACK;
+    reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
 
     /* start server (which means registering AODVv2 receiver for the chosen port) */
     server.pid = sched_active_pid; /* sched_active_pid is our pid, since we are currently act */
     server.demux_ctx = (uint32_t) MANET_PORT;
-    ng_netreg_register(NG_NETTYPE_UDP, &server);
+    gnrc_netreg_register(GNRC_NETTYPE_UDP, &server);
 
     while (1) {
         msg_receive(&msg);
         switch (msg.type) {
-            case NG_NETAPI_MSG_TYPE_RCV:
+            case GNRC_NETAPI_MSG_TYPE_RCV:
                 AODV_DEBUG("received data:\n");
-                ng_pktsnip_t *pkt = ((ng_pktsnip_t *)msg.content.ptr);
+                gnrc_pktsnip_t *pkt = ((gnrc_pktsnip_t *)msg.content.ptr);
                 if (pkt->size <= UDP_BUFFER_SIZE) {
                     memcpy(buf_rcv, pkt->data, pkt->size);
 
-                    if(pkt->next->next->type == NG_NETTYPE_IPV6) {
-                        ipv6_addr_t_to_netaddr(&(((ng_ipv6_hdr_t*)(pkt->next->next->data))->src), &_sender);
+                    if(pkt->next->next->type == GNRC_NETTYPE_IPV6) {
+                        ipv6_addr_t_to_netaddr(&(((ipv6_hdr_t*)(pkt->next->next->data))->src), &_sender);
                     }
 
                     if (netaddr_cmp(&_sender, &na_local) == 0) {
@@ -396,12 +396,12 @@ static void *_aodv_receiver_thread(void *arg)
                         aodv_packet_reader_handle_packet((void *) buf_rcv, pkt->size, &_sender);
                     }
                 }
-                ng_pktbuf_release(pkt);
+                gnrc_pktbuf_release(pkt);
                 break;
-            case NG_NETAPI_MSG_TYPE_SND:
+            case GNRC_NETAPI_MSG_TYPE_SND:
                 break;
-            case NG_NETAPI_MSG_TYPE_GET:
-            case NG_NETAPI_MSG_TYPE_SET:
+            case GNRC_NETAPI_MSG_TYPE_GET:
+            case GNRC_NETAPI_MSG_TYPE_SET:
                 msg_reply(&msg, &reply);
                 break;
             default:
@@ -416,34 +416,35 @@ static void *_aodv_receiver_thread(void *arg)
 /**
     The code o this function was borrowed from:
     examples/ng_networking/udp.c:34 - :90
+    TODO: merge into write callback
 */
-static void send(ng_ipv6_addr_t addr, uint16_t port, void *data, size_t data_length)
+static void _aodv_send(ipv6_addr_t addr, uint16_t port, void *data, size_t data_length)
 {
-    ng_pktsnip_t *payload, *pkt_with_udp, *pkt_with_ip;
+    gnrc_pktsnip_t *payload, *pkt_with_udp, *pkt_with_ip;
 
     /* allocate payload */
-    payload = ng_pktbuf_add(NULL, data, data_length, NG_NETTYPE_UNDEF);
+    payload = gnrc_pktbuf_add(NULL, data, data_length, GNRC_NETTYPE_UNDEF);
     if (payload == NULL) {
         DEBUG("Error: unable to copy data to packet buffer\n");
         return;
     }
     /* allocate UDP header, set payload, set source port := destination port */
-    pkt_with_udp = ng_udp_hdr_build(payload, (uint8_t*)&port, 2, (uint8_t*)&port, 2);
+    pkt_with_udp = gnrc_udp_hdr_build(payload, (uint8_t*)&port, 2, (uint8_t*)&port, 2);
     if (pkt_with_udp == NULL) {
         DEBUG("Error: unable to allocate UDP header\n");
-        ng_pktbuf_release(payload);
+        gnrc_pktbuf_release(payload);
         return;
     }
     /* allocate IPv6 header, set pkt_with_udp as payload */
-    pkt_with_ip = ng_ipv6_hdr_build(pkt_with_udp, (uint8_t*)&_v6_addr_local, aodvv2_address_type_size,
+    pkt_with_ip = gnrc_ipv6_hdr_build(pkt_with_udp, (uint8_t*)&_v6_addr_local, aodvv2_address_type_size,
                                     (uint8_t *)&addr, sizeof(addr));
     if (pkt_with_ip == NULL) {
         DEBUG("Error: unable to allocate IPv6 header\n");
-        ng_pktbuf_release(pkt_with_udp);
+        gnrc_pktbuf_release(pkt_with_udp);
         return;
     }
     /* all headers are set, send packet */
-    if(!ng_netapi_dispatch_send(NG_NETTYPE_UDP, NG_NETREG_DEMUX_CTX_ALL, pkt_with_ip)) {
+    if(!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, pkt_with_ip)) {
         DEBUG("Error sending packet\n");
     }
 }
@@ -457,7 +458,7 @@ static void _write_packet(struct rfc5444_writer *wr __attribute__ ((unused)),
                           void *buffer, size_t length)
 {
     AODV_DEBUG("%s()\n", __func__);
-    ng_ipv6_addr_t addr_send;
+    ipv6_addr_t addr_send;
 
     /* generate hexdump and human readable representation of packet
      * and print to console */
@@ -480,11 +481,11 @@ static void _write_packet(struct rfc5444_writer *wr __attribute__ ((unused)),
         DEBUG("originating RREQ with SeqNum %d towards %s via %s; updating RREQ table...\n",
             wt->packet_data.origNode.seqnum,
             netaddr_to_string(&nbuf, &wt->packet_data.targNode.addr),
-            ng_ipv6_addr_to_str(addr_str, &addr_send, IPV6_MAX_ADDR_STR_LEN));
+            ipv6_addr_to_str(addr_str, &addr_send, IPV6_MAX_ADDR_STR_LEN));
         rreqtable_is_redundant(&wt->packet_data);
     }
 
-    send(addr_send, (uint16_t) MANET_PORT, buffer, length);
+    _aodv_send(addr_send, (uint16_t) MANET_PORT, buffer, length);
 }
 
 /* Print the json representation of a sent packet to stdout for debugging */

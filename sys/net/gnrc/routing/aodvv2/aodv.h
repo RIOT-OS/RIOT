@@ -21,12 +21,12 @@
 #define AODV_H_
 
 #include "kernel.h"
-#include "udp.h"
-#include "net/ng_ipv6.h"
-#include "net/ng_netbase.h"
-#include "net/ng_netif.h"
-#include "net/ng_udp.h"
-#include "net/ng_pkt.h"
+#include "net/gnrc/udp.h"
+#include "net/gnrc/ipv6.h"
+#include "net/gnrc.h" // note to self: anstatt ng_netbase (TODO delete me)
+#include "net/gnrc/ipv6/netif.h"
+//#include "net/ng_udp.h"
+#include "net/gnrc/pkt.h"
 #include "net/eui64.h"
 
 #include "aodvv2/types.h"
