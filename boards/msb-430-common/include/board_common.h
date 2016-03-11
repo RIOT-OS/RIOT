@@ -22,6 +22,8 @@
 #ifndef BOARD_COMMON_H_
 #define BOARD_COMMON_H_
 
+#include "cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,23 +45,18 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   LED definitions
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LEDS_PxDIR                  (P5DIR)
-#define LEDS_PxOUT                  (P5OUT)
-#define LEDS_CONF_RED               (0x80)
-#define LEDS_CONF_GREEN             (0x00)
-#define LEDS_CONF_YELLOW            (0x00)
+#define LED0_PIN                    GPIO_PIN(4, 7)
 
-#define LED_RED_ON                  (LEDS_PxOUT &=~LEDS_CONF_RED)
-#define LED_RED_OFF                 (LEDS_PxOUT |= LEDS_CONF_RED)
-#define LED_RED_TOGGLE              (LEDS_PxOUT ^= LEDS_CONF_RED)
-#define LED_GREEN_ON                /* not present */
-#define LED_GREEN_OFF               /* not present */
-#define LED_GREEN_TOGGLE            /* not present */
+#define LED_OUT_REG                 (P5OUT)
+#define LED0_MASK                   (1 << 7)
+
+#define LED0_ON                     (LED_OUT_REG &= ~LED0_MASK)
+#define LED0_OFF                    (LED_OUT_REG |=  LED0_MASK)
+#define LED0_TOGGLE                 (LED_OUT_REG ^=  LED0_MASK)
 /** @} */
-
 
 #ifdef __cplusplus
 }
