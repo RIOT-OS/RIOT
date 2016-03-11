@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the STM32F215RG
+ * @brief           Memory definitions for the STM32F205RG
  *
  * @author          Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
  *
@@ -20,8 +20,9 @@
 
 MEMORY
 {
-    rom (rx)        : ORIGIN = 0x08000000, LENGTH = 512K
+    rom (rx)        : ORIGIN = 0x08000000, LENGTH = 1024K
     ram (xrw)       : ORIGIN = 0x20000000, LENGTH = 128K
+    cpuid (r)       : ORIGIN = 0x1fff7a10, LENGTH = 12
 }
 
 INCLUDE cortexm_base.ld
