@@ -23,7 +23,6 @@
 #include <stddef.h>
 #include <inttypes.h>
 #include <assert.h>
-#include "kernel.h"
 #include "sched.h"
 #include "msg.h"
 #include "priority_queue.h"
@@ -298,7 +297,7 @@ static int _msg_receive(msg_t *m, int block)
     }
 
     /* no message, fail */
-    if ((!block) && (queue_index == -1)) {
+    if ((!block) && ((!me->msg_waiters.first) && (queue_index == -1))) {
         restoreIRQ(state);
         return -1;
     }

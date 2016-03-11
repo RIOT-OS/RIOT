@@ -64,6 +64,7 @@ typedef struct {
     i2c_t i2c;              /**< I2C device, the accelerometer is connected to */
     uint8_t addr;           /**< the accelerometer's slave address on the I2C bus */
     bool initialized;       /**< accelerometer status, true if accelerometer is initialized */
+    int16_t scale;          /**< each count corresponds to (1/scale) g */
 } mma8652_t;
 
 /**
@@ -90,7 +91,8 @@ int mma8652_test(mma8652_t *dev);
  * @return                  -1 if parameters are wrong
  * @return                  -2 if initialization of I2C bus failed
  * @return                  -3 if accelerometer test failed
- * @return                  -4 if accelerometer configuration failed
+ * @return                  -4 if setting to STANDBY mode failed
+ * @return                  -5 if accelerometer configuration failed
  */
 int mma8652_init(mma8652_t *dev, i2c_t i2c, uint8_t address, uint8_t dr, uint8_t range);
 
@@ -151,15 +153,15 @@ int mma8652_is_ready(mma8652_t *dev);
 
 /**
  * @brief Read accelerometer's data.
- * Acceleration can be calculated as:<br>
- *     \f$ a = \frac{value}{1024} \cdot g \f$ if full scale is set to 2g<br>
- *     \f$ a = \frac{value}{512} \cdot g \f$ if full scale is set to 4g<br>
- *     \f$ a = \frac{value}{256} \cdot g \f$ if full scale is set to 8g<br>
+ * Acceleration will be calculated as:<br>
+ *     \f$ a = \frac{value \cdot 1000}{1024} \cdot mg \f$ if full scale is set to 2g<br>
+ *     \f$ a = \frac{value \cdot 1000}{512} \cdot mg \f$ if full scale is set to 4g<br>
+ *     \f$ a = \frac{value \cdot 1000}{256} \cdot mg \f$ if full scale is set to 8g<br>
  *
  * @param[in]  dev          device descriptor of accelerometer
- * @param[out] x            x-axis value
- * @param[out] y            y-axis value
- * @param[out] z            z-axis value
+ * @param[out] x            x-axis value in mg
+ * @param[out] y            y-axis value in mg
+ * @param[out] z            z-axis value in mg
  * @param[out] status       accelerometer status register
  *
  * @return                  0 on success

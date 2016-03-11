@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Hauke Petersen <mail@haukepetersen.de>
+ * Copyright (C) 2014 Hauke Petersen <devel@haukepetersen.de>
  *               2015 Hamburg University of Applied Sciences
  *               2015 Freie Universität Berlin
  *

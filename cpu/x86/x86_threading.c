@@ -34,7 +34,6 @@
 #include "x86_threading.h"
 #include "cpu.h"
 #include "irq.h"
-#include "kernel_internal.h"
 #include "ucontext.h"
 #include "sched.h"
 #include "stdbool.h"

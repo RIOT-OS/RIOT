@@ -40,9 +40,7 @@ WEAK_DEFAULT void isr_pvd(void);
 WEAK_DEFAULT void isr_rtc(void);
 WEAK_DEFAULT void isr_flash(void);
 WEAK_DEFAULT void isr_rcc(void);
-WEAK_DEFAULT void isr_exti0_1(void);
-WEAK_DEFAULT void isr_exti2_3(void);
-WEAK_DEFAULT void isr_exti4_15(void);
+WEAK_DEFAULT void isr_exti(void);
 WEAK_DEFAULT void isr_ts(void);
 WEAK_DEFAULT void isr_dma1_ch1(void);
 WEAK_DEFAULT void isr_dma1_ch2_3(void);
@@ -95,9 +93,9 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_rtc,                /* real time clock */
     (void*) isr_flash,              /* flash memory controller */
     (void*) isr_rcc,                /* reset and clock control */
-    (void*) isr_exti0_1,            /* external interrupt lines 0 and 1 */
-    (void*) isr_exti2_3,            /* external interrupt lines 2 and 3 */
-    (void*) isr_exti4_15,           /* external interrupt lines 4 to 15 */
+    (void*) isr_exti,               /* external interrupt lines 0 and 1 */
+    (void*) isr_exti,               /* external interrupt lines 2 and 3 */
+    (void*) isr_exti,               /* external interrupt lines 4 to 15 */
     (void*) isr_ts,                 /* touch sensing input*/
     (void*) isr_dma1_ch1,           /* direct memory access controller 1, channel 1*/
     (void*) isr_dma1_ch2_3,         /* direct memory access controller 1, channel 2 and 3*/

@@ -11,7 +11,6 @@
 #include "sbapp.h"
 #include "sbapp_priv.h"
 
-#include "kernel.h"
 #include "xtimer.h"
 #include "net/gnrc.h"
 #include "nwp_conf.h"

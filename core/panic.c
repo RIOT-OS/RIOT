@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include "assert.h"
+#include "attributes.h"
 #include "cpu.h"
 #include "irq.h"
 #include "lpm.h"

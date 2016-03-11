@@ -43,7 +43,7 @@ static inline TIM_TypeDef *_tim(tim_t dev)
     return timer_config[dev].dev;
 }
 
-int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     TIM_TypeDef *tim;
 
@@ -55,7 +55,8 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     /* get base register */
     tim = _tim(dev);
     /* save callback */
-    isr_ctx[dev].cb = callback;
+    isr_ctx[dev].cb = cb;
+    isr_ctx[dev].cb = arg;
     /* enable peripheral clock */
     RCC->APB1ENR |= (1 << timer_config[dev].rcc);
     /* reset timer and configure to up-counting mode */
@@ -64,7 +65,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     tim->SR = 0;
     /* configure reload and pre-scaler values */
     tim->ARR = 0xffffffff;
-    tim->PSC = (((CLOCK_CORECLOCK / 1000000) * ticks_per_us) - 1);
+    tim->PSC = (CLOCK_CORECLOCK / freq) - 1;
     /* trigger update event to make pre-scaler value effective */
     tim->EGR = TIM_EGR_UG;
     /* enable interrupts and start the timer */
@@ -139,7 +140,7 @@ static inline void irq_handler(tim_t num, TIM_TypeDef *tim)
         if ((tim->SR & bit) && (tim->DIER & bit)) {
             tim->SR &= ~(bit);
             tim->DIER &= ~(bit);
-            isr_ctx[num].cb(i);
+            isr_ctx[num].cb(isr_ctx[num].arg, i);
         }
     }
     if (sched_context_switch_request) {

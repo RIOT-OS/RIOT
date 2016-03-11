@@ -39,6 +39,11 @@ typedef uint32_t tim_t;
 /** @} */
 
 /**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (8U)
+
+/**
  * @brief   Define timer configuration values
  *
  * @note    The two timers must be adjacent to each other (e.g. TIMER0 and

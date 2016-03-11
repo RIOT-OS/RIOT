@@ -37,7 +37,7 @@ static inline void _rtr_sol_reschedule(gnrc_ipv6_netif_t *iface, uint32_t sec_de
 
 static inline uint32_t _binary_exp_backoff(uint32_t base_sec, unsigned int exp)
 {
-    return genrand_uint32_range(0, (1 << exp)) * base_sec;
+    return random_uint32_range(0, (1 << exp)) * base_sec;
 }
 
 static inline void _revert_iid(uint8_t *iid)
@@ -124,14 +124,6 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
     ipv6_addr_t *next_hop = NULL;
     gnrc_ipv6_nc_t *nc_entry = NULL;
 
-#ifdef MODULE_GNRC_IPV6_EXT_RH
-    ipv6_hdr_t *hdr;
-    gnrc_pktsnip_t *ipv6;
-    LL_SEARCH_SCALAR(pkt, ipv6, type, GNRC_NETTYPE_IPV6);
-    assert(ipv6);
-    hdr = ipv6->data;
-    next_hop = ipv6_ext_rh_next_hop(hdr);
-#endif
 #ifdef MODULE_FIB
     kernel_pid_t fib_iface;
     ipv6_addr_t next_hop_actual;    /* FIB copies address into this variable */

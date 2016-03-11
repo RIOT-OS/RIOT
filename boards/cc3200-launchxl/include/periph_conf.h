@@ -25,17 +25,21 @@ extern "C" {
 
 /**
  * @name Timer peripheral configuration
- * @{
+ *
  */
 
 #include "cc3200.h"
 
 #define CLOCK_CORECLOCK     (80000000U)      /* desired core clock frequency */
 
-/*
- * about 30 usec in cc3200 ticks
- */
-#define XTIMER_BACKOFF 2000
+#ifdef TIME_TICKS_UNIT
+ #define XTIMER_BACKOFF  720
+ #define XTIMER_OVERHEAD 400
+#else
+ #define XTIMER_BACKOFF  9
+ #define XTIMER_OVERHEAD 5
+#endif
+
 
 // CC3200 has 4 timer blocks
 #define TIMER_0_EN 1

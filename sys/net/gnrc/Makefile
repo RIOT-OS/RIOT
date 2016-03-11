@@ -73,6 +73,9 @@ endif
 ifneq (,$(filter gnrc_nomac,$(USEMODULE)))
     DIRS += link_layer/nomac
 endif
+ifneq (,$(filter gnrc_pkt,$(USEMODULE)))
+    DIRS += pkt
+endif
 ifneq (,$(filter gnrc_pktbuf_static,$(USEMODULE)))
     DIRS += pktbuf_static
 endif

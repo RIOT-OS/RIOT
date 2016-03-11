@@ -108,7 +108,7 @@ static inline void pwr_clk_and_isr(tim_t tim)
     }
 }
 
-int timer_init(tim_t tim, unsigned int us_per_tick, void (*callback)(int))
+int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* get the timers base register */
     lpc23xx_timer_t *dev = get_dev(tim);
@@ -119,14 +119,15 @@ int timer_init(tim_t tim, unsigned int us_per_tick, void (*callback)(int))
     }
 
     /* save the callback */
-    isr_ctx[tim].cb = callback;
+    isr_ctx[tim].cb = cb;
+    isr_ctx[tim].arg = arg;
     /* enable power, config periph clock and install ISR vector */
     pwr_clk_and_isr(tim);
     /* reset timer configuration (sets the timer to timer mode) */
     dev->TCR = 0;
     dev->CTCR = 0;
     /* configure the prescaler */
-    dev->PR = (us_per_tick * ((CLOCK_PCLK / 1000000) - 1));
+    dev->PR = (CLOCK_PCLK / freq) - 1;
     /* enable timer */
     dev->TCR = 1;
     return 0;
@@ -192,7 +193,7 @@ static inline void isr_handler(lpc23xx_timer_t *dev, int tim_num)
         if (dev->IR & (1 << i)) {
             dev->IR |= (1 << i);
             dev->MCR &= ~(1 << (i * 3));
-            isr_ctx[tim_num].cb(i);
+            isr_ctx[tim_num].cb(isr_ctx[tim_num].arg, i);
         }
     }
     /* we must not forget to acknowledge the handling of the interrupt */

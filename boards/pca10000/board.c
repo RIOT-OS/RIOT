@@ -25,8 +25,8 @@
 void board_init(void)
 {
     /* initialize the boards LEDs: set pins to output and turn LEDs off */
-    NRF_GPIO->DIRSET = (LED_RED_PIN | LED_GREEN_PIN | LED_BLUE_PIN);
-    NRF_GPIO->OUTSET = (LED_RED_PIN | LED_GREEN_PIN | LED_BLUE_PIN);
+    NRF_GPIO->DIRSET = (LED_RED_MASK | LED_GREEN_MASK | LED_BLUE_MASK);
+    NRF_GPIO->OUTSET = (LED_RED_MASK | LED_GREEN_MASK | LED_BLUE_MASK);
     /* trigger the CPU initialization code */
     cpu_init();
 }

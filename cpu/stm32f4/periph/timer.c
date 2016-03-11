@@ -30,16 +30,11 @@
 /** Unified IRQ handler for all timers */
 static inline void irq_handler(tim_t timer, TIM_TypeDef *dev);
 
-/** Type for timer state */
-typedef struct {
-    void (*cb)(int);
-} timer_conf_t;
-
 /** Timer state memory */
-timer_conf_t config[TIMER_NUMOF];
+static timer_isr_ctx_t config[TIMER_NUMOF];
 
 
-int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     TIM_TypeDef *timer;
 
@@ -52,7 +47,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
             NVIC_SetPriority(TIMER_0_IRQ_CHAN, TIMER_IRQ_PRIO);
             /* select timer */
             timer = TIMER_0_DEV;
-            timer->PSC = TIMER_0_PRESCALER * ticks_per_us;
+            timer->PSC = (TIMER_0_FREQ / freq) - 1;
             break;
 #endif
 #if TIMER_1_EN
@@ -63,7 +58,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
             NVIC_SetPriority(TIMER_1_IRQ_CHAN, TIMER_IRQ_PRIO);
             /* select timer */
             timer = TIMER_1_DEV;
-            timer->PSC = TIMER_1_PRESCALER * ticks_per_us;
+            timer->PSC = (TIMER_1_FREQ / freq) - 1;
             break;
 #endif
         case TIMER_UNDEFINED:
@@ -72,7 +67,8 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     }
 
     /* set callback function */
-    config[dev].cb = callback;
+    config[dev].cb = cb;
+    config[dev].arg = arg;
 
     /* set timer to run in counter mode */
     timer->CR1 = 0;
@@ -290,22 +286,22 @@ static inline void irq_handler(tim_t timer, TIM_TypeDef *dev)
     if (dev->SR & TIM_SR_CC1IF) {
         dev->DIER &= ~TIM_DIER_CC1IE;
         dev->SR &= ~TIM_SR_CC1IF;
-        config[timer].cb(0);
+        config[timer].cb(config[timer].arg, 0);
     }
     else if (dev->SR & TIM_SR_CC2IF) {
         dev->DIER &= ~TIM_DIER_CC2IE;
         dev->SR &= ~TIM_SR_CC2IF;
-        config[timer].cb(1);
+        config[timer].cb(config[timer].arg, 1);
     }
     else if (dev->SR & TIM_SR_CC3IF) {
         dev->DIER &= ~TIM_DIER_CC3IE;
         dev->SR &= ~TIM_SR_CC3IF;
-        config[timer].cb(2);
+        config[timer].cb(config[timer].arg, 2);
     }
     else if (dev->SR & TIM_SR_CC4IF) {
         dev->DIER &= ~TIM_DIER_CC4IE;
         dev->SR &= ~TIM_SR_CC4IF;
-        config[timer].cb(3);
+        config[timer].cb(config[timer].arg, 3);
     }
     if (sched_context_switch_request) {
         thread_yield();

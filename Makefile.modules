@@ -4,6 +4,8 @@ include $(RIOTBASE)/Makefile.defaultmodules
 USEMODULE := $(filter-out $(filter-out $(FEATURES_PROVIDED), $(FEATURES_OPTIONAL)), $(sort $(USEMODULE)))
 
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
 ED = $(patsubst %,-DMODULE_%,$(subst -,_,$(USEMODULE) $(USEPKG)))
 ED += $(patsubst %,-DFEATURE_%,$(subst -,_,$(filter $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))))
 EXTDEFINES = $(shell echo $(sort $(ED))|tr 'a-z' 'A-Z')

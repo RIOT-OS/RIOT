@@ -364,7 +364,7 @@ int _tftp_init_ctxt(ipv6_addr_t *addr, const char *file_name,
 
     /* generate a random source UDP source port */
     do {
-        ctxt->src_port = (genrand_uint32() & 0xff) + GNRC_TFTP_DEFAULT_SRC_PORT;
+        ctxt->src_port = (random_uint32() & 0xff) + GNRC_TFTP_DEFAULT_SRC_PORT;
     } while (gnrc_netreg_num(GNRC_NETTYPE_UDP, ctxt->src_port));
 
     return TS_FINISHED;
@@ -598,10 +598,10 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
     gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)(m->content.ptr);
 
     gnrc_pktsnip_t *tmp;
-    LL_SEARCH_SCALAR(pkt, tmp, type, GNRC_NETTYPE_UDP);
+    tmp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UDP);
     udp_hdr_t *udp = (udp_hdr_t *)tmp->data;
 
-    LL_SEARCH_SCALAR(pkt, tmp, type, GNRC_NETTYPE_IPV6);
+    tmp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
     ipv6_hdr_t *ip = (ipv6_hdr_t *)tmp->data;
     uint8_t *data = (uint8_t *)pkt->data;
 

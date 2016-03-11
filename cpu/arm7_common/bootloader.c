@@ -26,7 +26,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "kernel.h"
 #include "thread.h"
 
 void FIQ_Routine(void)   __attribute__((interrupt("FIQ")));

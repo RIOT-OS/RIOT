@@ -43,4 +43,4 @@ export BTEST_FLAGS = $(CURDIR)/tests $(ELFFILE) $(TEST_SUITE)
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
 # include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortexm_common
+#include $(RIOTBOARD)/Makefile.include.cortexm_common

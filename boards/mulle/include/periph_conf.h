@@ -505,9 +505,8 @@ extern "C"
  * @name Random Number Generator configuration
  * @{
  */
-#define RANDOM_NUMOF            (1U)
-#define RANDOM_CLKEN()          (BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT) = 1)
-#define RANDOM_CLKDIS()         (BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT) = 0)
+#define HWRNG_CLKEN()       (BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT) = 1)
+#define HWRNG_CLKDIS()      (BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT) = 0)
 /** @} */
 
 #ifdef __cplusplus

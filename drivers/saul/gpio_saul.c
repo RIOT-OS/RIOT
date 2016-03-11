@@ -6,7 +6,7 @@
  * directory for more details.
  */
 
-/*
+/**
  * @ingroup     drivers_saul
  * @{
  *

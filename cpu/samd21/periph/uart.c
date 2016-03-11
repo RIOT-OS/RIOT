@@ -68,7 +68,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     uint32_t baud;
     SercomUsart *dev;
 
-    if (uart < 0 || uart >= UART_NUMOF) {
+    if ((unsigned int)uart >= UART_NUMOF) {
         return -1;
     }
 

@@ -157,7 +157,7 @@ WEAK_DEFAULT void isr_software(void);
 /**
  * @brief Interrupt vector definition
  */
-__attribute__((section(".vector_table")))
+__attribute__((used, section(".vector_table")))
 const void *interrupt_vector[] = {
     /* Stack pointer */
     (void *)(&_estack),             /* pointer to the top of the empty stack */

@@ -346,7 +346,6 @@ OsiReturnVal_e osi_LockObjCreate(OsiLockObj_t* pLockObj) {
 }
 
 #if 0
-
 /*!
  \brief 	This function creates a Task.
 

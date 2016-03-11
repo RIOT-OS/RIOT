@@ -22,7 +22,7 @@
 #ifndef GNRC_PKTDUMP_H_
 #define GNRC_PKTDUMP_H_
 
-#include "kernel.h"
+#include "kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

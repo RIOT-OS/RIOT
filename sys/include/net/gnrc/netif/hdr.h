@@ -24,7 +24,6 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "kernel.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/pktbuf.h"
 

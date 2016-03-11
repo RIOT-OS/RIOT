@@ -39,22 +39,16 @@
 /** @} */
 
 /**
- * @brief Struct holding the configuration data for a UART device
- */
-typedef struct {
-    void (*cb)(int);            /**< timeout callback */
-} timer_conf_t;
-
-/**
  * @brief UART device configurations
  */
-static timer_conf_t config[TIMER_NUMOF];
+static timer_isr_ctx_t config[TIMER_NUMOF];
 
-int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     if (dev == TIMER_0) {
         /* save callback */
-        config[TIMER_0].cb = callback;
+        config[TIMER_0].cb = cb;
+        config[TIMER_0].arg = arg;
         /* enable power for timer */
         TIMER_0_CLKEN();
         /* let timer run with full frequency */
@@ -62,7 +56,7 @@ int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
         /* set to timer mode */
         TIMER_0_DEV->CTCR = 0;
         /* configure prescaler */
-        TIMER_0_DEV->PR = (us_per_tick * TIMER_0_PRESCALER);
+        TIMER_0_DEV->PR = (TIMER_0_FREQ / freq) - 1;
         /* configure and enable timer interrupts */
         NVIC_SetPriority(TIMER_0_IRQ, TIMER_IRQ_PRIO);
         NVIC_EnableIRQ(TIMER_0_IRQ);
@@ -158,22 +152,22 @@ void TIMER_0_ISR(void)
     if (TIMER_0_DEV->IR & MR0_FLAG) {
         TIMER_0_DEV->IR |= (MR0_FLAG);
         TIMER_0_DEV->MCR &= ~(1 << 0);
-        config[TIMER_0].cb(0);
+        config[TIMER_0].cb(config[TIMER_0].arg, 0);
     }
     if (TIMER_0_DEV->IR & MR1_FLAG) {
         TIMER_0_DEV->IR |= (MR1_FLAG);
         TIMER_0_DEV->MCR &= ~(1 << 3);
-        config[TIMER_0].cb(1);
+        config[TIMER_0].cb(config[TIMER_0].arg, 1);
     }
     if (TIMER_0_DEV->IR & MR2_FLAG) {
         TIMER_0_DEV->IR |= (MR2_FLAG);
         TIMER_0_DEV->MCR &= ~(1 << 6);
-        config[TIMER_0].cb(2);
+        config[TIMER_0].cb(config[TIMER_0].arg, 2);
     }
     if (TIMER_0_DEV->IR & MR3_FLAG) {
         TIMER_0_DEV->IR |= (MR3_FLAG);
         TIMER_0_DEV->MCR &= ~(1 << 9);
-        config[TIMER_0].cb(3);
+        config[TIMER_0].cb(config[TIMER_0].arg, 3);
     }
     if (sched_context_switch_request) {
         thread_yield();

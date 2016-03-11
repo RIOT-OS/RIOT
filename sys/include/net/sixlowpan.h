@@ -20,7 +20,11 @@
 #ifndef SIXLOWPAN_H_
 #define SIXLOWPAN_H_
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
+
+#include "byteorder.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,7 +71,7 @@ extern "C" {
  */
 static inline bool sixlowpan_nalp(uint8_t disp)
 {
-    return (disp & 0x3f);
+    return ((disp & 0xc0) == 0);
 }
 /** @} */
 

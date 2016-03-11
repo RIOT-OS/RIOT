@@ -20,7 +20,6 @@
 #include <stdint.h>
 #include <errno.h>
 
-#include "kernel.h"
 #include "byteorder.h"
 #include "msg.h"
 #include "thread.h"
@@ -105,7 +104,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
     }
     pkt = udp;
 
-    LL_SEARCH_SCALAR(pkt, ipv6, type, GNRC_NETTYPE_IPV6);
+    ipv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
 
     assert(ipv6 != NULL);
 

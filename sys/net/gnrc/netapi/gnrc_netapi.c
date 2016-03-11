@@ -18,7 +18,6 @@
  * @}
  */
 
-#include "kernel.h"
 #include "msg.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/pktbuf.h"

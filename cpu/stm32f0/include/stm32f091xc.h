@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f091xc.h
   * @author  MCD Application Team
-  * @version V2.2.0
-  * @date    05-December-2014
+  * @version V2.2.2
+  * @date    26-June-2015
   * @brief   CMSIS STM32F091xC devices Peripheral Access Layer Header File.
   *
   *          This file contains:
@@ -14,7 +14,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -59,7 +59,6 @@
 /** @addtogroup Configuration_section_for_CMSIS
   * @{
   */
-
 /**
  * @brief Configuration of the Cortex-M0 Processor and Core Peripherals
  */
@@ -452,6 +451,7 @@ typedef struct
 /**
   * @brief Reset and Clock Control
   */
+
 typedef struct
 {
   __IO uint32_t CR;         /*!< RCC clock control register,                                  Address offset: 0x00 */
@@ -473,7 +473,6 @@ typedef struct
 /**
   * @brief Real-Time Clock
   */
-
 typedef struct
 {
   __IO uint32_t TR;         /*!< RTC time register,                                        Address offset: 0x00 */
@@ -609,6 +608,7 @@ typedef struct
   */
 
 #define FLASH_BASE            ((uint32_t)0x08000000) /*!< FLASH base address in the alias region */
+#define FLASH_BANK1_END       ((uint32_t)0x0803FFFF) /*!< FLASH END address of bank1 */
 #define SRAM_BASE             ((uint32_t)0x20000000) /*!< SRAM base address in the alias region */
 #define PERIPH_BASE           ((uint32_t)0x40000000) /*!< Peripheral base address in the alias region */
 
@@ -636,6 +636,7 @@ typedef struct
 #define CRS_BASE              (APBPERIPH_BASE + 0x00006C00)
 #define PWR_BASE              (APBPERIPH_BASE + 0x00007000)
 #define DAC_BASE              (APBPERIPH_BASE + 0x00007400)
+
 #define CEC_BASE              (APBPERIPH_BASE + 0x00007800)
 
 #define SYSCFG_BASE           (APBPERIPH_BASE + 0x00010000)
@@ -753,7 +754,6 @@ typedef struct
 #define GPIOD               ((GPIO_TypeDef *) GPIOD_BASE)
 #define GPIOE               ((GPIO_TypeDef *) GPIOE_BASE)
 #define GPIOF               ((GPIO_TypeDef *) GPIOF_BASE)
-
 /**
   * @}
   */
@@ -1129,9 +1129,10 @@ typedef struct
 /*!<CAN filter registers */
 /*******************  Bit definition for CAN_FMR register  ********************/
 #define  CAN_FMR_FINIT                       ((uint32_t)0x00000001)        /*!<Filter Init Mode */
+#define  CAN_FMR_CAN2SB                      ((uint32_t)0x00003F00)        /*!<CAN2 start bank */
 
 /*******************  Bit definition for CAN_FM1R register  *******************/
-#define  CAN_FM1R_FBM                        ((uint32_t)0x00003FFF)        /*!<Filter Mode */
+#define  CAN_FM1R_FBM                        ((uint32_t)0x0FFFFFFF)        /*!<Filter Mode */
 #define  CAN_FM1R_FBM0                       ((uint32_t)0x00000001)        /*!<Filter Init Mode bit 0 */
 #define  CAN_FM1R_FBM1                       ((uint32_t)0x00000002)        /*!<Filter Init Mode bit 1 */
 #define  CAN_FM1R_FBM2                       ((uint32_t)0x00000004)        /*!<Filter Init Mode bit 2 */
@@ -1146,9 +1147,23 @@ typedef struct
 #define  CAN_FM1R_FBM11                      ((uint32_t)0x00000800)        /*!<Filter Init Mode bit 11 */
 #define  CAN_FM1R_FBM12                      ((uint32_t)0x00001000)        /*!<Filter Init Mode bit 12 */
 #define  CAN_FM1R_FBM13                      ((uint32_t)0x00002000)        /*!<Filter Init Mode bit 13 */
+#define  CAN_FM1R_FBM14                      ((uint32_t)0x00004000)        /*!<Filter Init Mode bit 14 */
+#define  CAN_FM1R_FBM15                      ((uint32_t)0x00008000)        /*!<Filter Init Mode bit 15 */
+#define  CAN_FM1R_FBM16                      ((uint32_t)0x00010000)        /*!<Filter Init Mode bit 16 */
+#define  CAN_FM1R_FBM17                      ((uint32_t)0x00020000)        /*!<Filter Init Mode bit 17 */
+#define  CAN_FM1R_FBM18                      ((uint32_t)0x00040000)        /*!<Filter Init Mode bit 18 */
+#define  CAN_FM1R_FBM19                      ((uint32_t)0x00080000)        /*!<Filter Init Mode bit 19 */
+#define  CAN_FM1R_FBM20                      ((uint32_t)0x00100000)        /*!<Filter Init Mode bit 20 */
+#define  CAN_FM1R_FBM21                      ((uint32_t)0x00200000)        /*!<Filter Init Mode bit 21 */
+#define  CAN_FM1R_FBM22                      ((uint32_t)0x00400000)        /*!<Filter Init Mode bit 22 */
+#define  CAN_FM1R_FBM23                      ((uint32_t)0x00800000)        /*!<Filter Init Mode bit 23 */
+#define  CAN_FM1R_FBM24                      ((uint32_t)0x01000000)        /*!<Filter Init Mode bit 24 */
+#define  CAN_FM1R_FBM25                      ((uint32_t)0x02000000)        /*!<Filter Init Mode bit 25 */
+#define  CAN_FM1R_FBM26                      ((uint32_t)0x04000000)        /*!<Filter Init Mode bit 26 */
+#define  CAN_FM1R_FBM27                      ((uint32_t)0x08000000)        /*!<Filter Init Mode bit 27 */
 
 /*******************  Bit definition for CAN_FS1R register  *******************/
-#define  CAN_FS1R_FSC                        ((uint32_t)0x00003FFF)        /*!<Filter Scale Configuration */
+#define  CAN_FS1R_FSC                        ((uint32_t)0x0FFFFFFF)        /*!<Filter Scale Configuration */
 #define  CAN_FS1R_FSC0                       ((uint32_t)0x00000001)        /*!<Filter Scale Configuration bit 0 */
 #define  CAN_FS1R_FSC1                       ((uint32_t)0x00000002)        /*!<Filter Scale Configuration bit 1 */
 #define  CAN_FS1R_FSC2                       ((uint32_t)0x00000004)        /*!<Filter Scale Configuration bit 2 */
@@ -1163,40 +1178,82 @@ typedef struct
 #define  CAN_FS1R_FSC11                      ((uint32_t)0x00000800)        /*!<Filter Scale Configuration bit 11 */
 #define  CAN_FS1R_FSC12                      ((uint32_t)0x00001000)        /*!<Filter Scale Configuration bit 12 */
 #define  CAN_FS1R_FSC13                      ((uint32_t)0x00002000)        /*!<Filter Scale Configuration bit 13 */
+#define  CAN_FS1R_FSC14                      ((uint32_t)0x00004000)        /*!<Filter Scale Configuration bit 14 */
+#define  CAN_FS1R_FSC15                      ((uint32_t)0x00008000)        /*!<Filter Scale Configuration bit 15 */
+#define  CAN_FS1R_FSC16                      ((uint32_t)0x00010000)        /*!<Filter Scale Configuration bit 16 */
+#define  CAN_FS1R_FSC17                      ((uint32_t)0x00020000)        /*!<Filter Scale Configuration bit 17 */
+#define  CAN_FS1R_FSC18                      ((uint32_t)0x00040000)        /*!<Filter Scale Configuration bit 18 */
+#define  CAN_FS1R_FSC19                      ((uint32_t)0x00080000)        /*!<Filter Scale Configuration bit 19 */
+#define  CAN_FS1R_FSC20                      ((uint32_t)0x00100000)        /*!<Filter Scale Configuration bit 20 */
+#define  CAN_FS1R_FSC21                      ((uint32_t)0x00200000)        /*!<Filter Scale Configuration bit 21 */
+#define  CAN_FS1R_FSC22                      ((uint32_t)0x00400000)        /*!<Filter Scale Configuration bit 22 */
+#define  CAN_FS1R_FSC23                      ((uint32_t)0x00800000)        /*!<Filter Scale Configuration bit 23 */
+#define  CAN_FS1R_FSC24                      ((uint32_t)0x01000000)        /*!<Filter Scale Configuration bit 24 */
+#define  CAN_FS1R_FSC25                      ((uint32_t)0x02000000)        /*!<Filter Scale Configuration bit 25 */
+#define  CAN_FS1R_FSC26                      ((uint32_t)0x04000000)        /*!<Filter Scale Configuration bit 26 */
+#define  CAN_FS1R_FSC27                      ((uint32_t)0x08000000)        /*!<Filter Scale Configuration bit 27 */
 
 /******************  Bit definition for CAN_FFA1R register  *******************/
-#define  CAN_FFA1R_FFA                       ((uint32_t)0x00003FFF)        /*!<Filter FIFO Assignment */
-#define  CAN_FFA1R_FFA0                      ((uint32_t)0x00000001)        /*!<Filter FIFO Assignment for Filter 0 */
-#define  CAN_FFA1R_FFA1                      ((uint32_t)0x00000002)        /*!<Filter FIFO Assignment for Filter 1 */
-#define  CAN_FFA1R_FFA2                      ((uint32_t)0x00000004)        /*!<Filter FIFO Assignment for Filter 2 */
-#define  CAN_FFA1R_FFA3                      ((uint32_t)0x00000008)        /*!<Filter FIFO Assignment for Filter 3 */
-#define  CAN_FFA1R_FFA4                      ((uint32_t)0x00000010)        /*!<Filter FIFO Assignment for Filter 4 */
-#define  CAN_FFA1R_FFA5                      ((uint32_t)0x00000020)        /*!<Filter FIFO Assignment for Filter 5 */
-#define  CAN_FFA1R_FFA6                      ((uint32_t)0x00000040)        /*!<Filter FIFO Assignment for Filter 6 */
-#define  CAN_FFA1R_FFA7                      ((uint32_t)0x00000080)        /*!<Filter FIFO Assignment for Filter 7 */
-#define  CAN_FFA1R_FFA8                      ((uint32_t)0x00000100)        /*!<Filter FIFO Assignment for Filter 8 */
-#define  CAN_FFA1R_FFA9                      ((uint32_t)0x00000200)        /*!<Filter FIFO Assignment for Filter 9 */
-#define  CAN_FFA1R_FFA10                     ((uint32_t)0x00000400)        /*!<Filter FIFO Assignment for Filter 10 */
-#define  CAN_FFA1R_FFA11                     ((uint32_t)0x00000800)        /*!<Filter FIFO Assignment for Filter 11 */
-#define  CAN_FFA1R_FFA12                     ((uint32_t)0x00001000)        /*!<Filter FIFO Assignment for Filter 12 */
-#define  CAN_FFA1R_FFA13                     ((uint32_t)0x00002000)        /*!<Filter FIFO Assignment for Filter 13 */
+#define  CAN_FFA1R_FFA                        ((uint32_t)0x0FFFFFFF)        /*!<Filter FIFO Assignment */
+#define  CAN_FFA1R_FFA0                       ((uint32_t)0x00000001)        /*!<Filter FIFO Assignment bit 0 */
+#define  CAN_FFA1R_FFA1                       ((uint32_t)0x00000002)        /*!<Filter FIFO Assignment bit 1 */
+#define  CAN_FFA1R_FFA2                       ((uint32_t)0x00000004)        /*!<Filter FIFO Assignment bit 2 */
+#define  CAN_FFA1R_FFA3                       ((uint32_t)0x00000008)        /*!<Filter FIFO Assignment bit 3 */
+#define  CAN_FFA1R_FFA4                       ((uint32_t)0x00000010)        /*!<Filter FIFO Assignment bit 4 */
+#define  CAN_FFA1R_FFA5                       ((uint32_t)0x00000020)        /*!<Filter FIFO Assignment bit 5 */
+#define  CAN_FFA1R_FFA6                       ((uint32_t)0x00000040)        /*!<Filter FIFO Assignment bit 6 */
+#define  CAN_FFA1R_FFA7                       ((uint32_t)0x00000080)        /*!<Filter FIFO Assignment bit 7 */
+#define  CAN_FFA1R_FFA8                       ((uint32_t)0x00000100)        /*!<Filter FIFO Assignment bit 8 */
+#define  CAN_FFA1R_FFA9                       ((uint32_t)0x00000200)        /*!<Filter FIFO Assignment bit 9 */
+#define  CAN_FFA1R_FFA10                      ((uint32_t)0x00000400)        /*!<Filter FIFO Assignment bit 10 */
+#define  CAN_FFA1R_FFA11                      ((uint32_t)0x00000800)        /*!<Filter FIFO Assignment bit 11 */
+#define  CAN_FFA1R_FFA12                      ((uint32_t)0x00001000)        /*!<Filter FIFO Assignment bit 12 */
+#define  CAN_FFA1R_FFA13                      ((uint32_t)0x00002000)        /*!<Filter FIFO Assignment bit 13 */
+#define  CAN_FFA1R_FFA14                      ((uint32_t)0x00004000)        /*!<Filter FIFO Assignment bit 14 */
+#define  CAN_FFA1R_FFA15                      ((uint32_t)0x00008000)        /*!<Filter FIFO Assignment bit 15 */
+#define  CAN_FFA1R_FFA16                      ((uint32_t)0x00010000)        /*!<Filter FIFO Assignment bit 16 */
+#define  CAN_FFA1R_FFA17                      ((uint32_t)0x00020000)        /*!<Filter FIFO Assignment bit 17 */
+#define  CAN_FFA1R_FFA18                      ((uint32_t)0x00040000)        /*!<Filter FIFO Assignment bit 18 */
+#define  CAN_FFA1R_FFA19                      ((uint32_t)0x00080000)        /*!<Filter FIFO Assignment bit 19 */
+#define  CAN_FFA1R_FFA20                      ((uint32_t)0x00100000)        /*!<Filter FIFO Assignment bit 20 */
+#define  CAN_FFA1R_FFA21                      ((uint32_t)0x00200000)        /*!<Filter FIFO Assignment bit 21 */
+#define  CAN_FFA1R_FFA22                      ((uint32_t)0x00400000)        /*!<Filter FIFO Assignment bit 22 */
+#define  CAN_FFA1R_FFA23                      ((uint32_t)0x00800000)        /*!<Filter FIFO Assignment bit 23 */
+#define  CAN_FFA1R_FFA24                      ((uint32_t)0x01000000)        /*!<Filter FIFO Assignment bit 24 */
+#define  CAN_FFA1R_FFA25                      ((uint32_t)0x02000000)        /*!<Filter FIFO Assignment bit 25 */
+#define  CAN_FFA1R_FFA26                      ((uint32_t)0x04000000)        /*!<Filter FIFO Assignment bit 26 */
+#define  CAN_FFA1R_FFA27                      ((uint32_t)0x08000000)        /*!<Filter FIFO Assignment bit 27 */
 
 /*******************  Bit definition for CAN_FA1R register  *******************/
-#define  CAN_FA1R_FACT                       ((uint32_t)0x00003FFF)        /*!<Filter Active */
-#define  CAN_FA1R_FACT0                      ((uint32_t)0x00000001)        /*!<Filter 0 Active */
-#define  CAN_FA1R_FACT1                      ((uint32_t)0x00000002)        /*!<Filter 1 Active */
-#define  CAN_FA1R_FACT2                      ((uint32_t)0x00000004)        /*!<Filter 2 Active */
-#define  CAN_FA1R_FACT3                      ((uint32_t)0x00000008)        /*!<Filter 3 Active */
-#define  CAN_FA1R_FACT4                      ((uint32_t)0x00000010)        /*!<Filter 4 Active */
-#define  CAN_FA1R_FACT5                      ((uint32_t)0x00000020)        /*!<Filter 5 Active */
-#define  CAN_FA1R_FACT6                      ((uint32_t)0x00000040)        /*!<Filter 6 Active */
-#define  CAN_FA1R_FACT7                      ((uint32_t)0x00000080)        /*!<Filter 7 Active */
-#define  CAN_FA1R_FACT8                      ((uint32_t)0x00000100)        /*!<Filter 8 Active */
-#define  CAN_FA1R_FACT9                      ((uint32_t)0x00000200)        /*!<Filter 9 Active */
-#define  CAN_FA1R_FACT10                     ((uint32_t)0x00000400)        /*!<Filter 10 Active */
-#define  CAN_FA1R_FACT11                     ((uint32_t)0x00000800)        /*!<Filter 11 Active */
-#define  CAN_FA1R_FACT12                     ((uint32_t)0x00001000)        /*!<Filter 12 Active */
-#define  CAN_FA1R_FACT13                     ((uint32_t)0x00002000)        /*!<Filter 13 Active */
+#define  CAN_FA1R_FACT                        ((uint32_t)0x0FFFFFFF)        /*!<Filter Active */
+#define  CAN_FA1R_FACT0                       ((uint32_t)0x00000001)        /*!<Filter Active bit 0 */
+#define  CAN_FA1R_FACT1                       ((uint32_t)0x00000002)        /*!<Filter Active bit 1 */
+#define  CAN_FA1R_FACT2                       ((uint32_t)0x00000004)        /*!<Filter Active bit 2 */
+#define  CAN_FA1R_FACT3                       ((uint32_t)0x00000008)        /*!<Filter Active bit 3 */
+#define  CAN_FA1R_FACT4                       ((uint32_t)0x00000010)        /*!<Filter Active bit 4 */
+#define  CAN_FA1R_FACT5                       ((uint32_t)0x00000020)        /*!<Filter Active bit 5 */
+#define  CAN_FA1R_FACT6                       ((uint32_t)0x00000040)        /*!<Filter Active bit 6 */
+#define  CAN_FA1R_FACT7                       ((uint32_t)0x00000080)        /*!<Filter Active bit 7 */
+#define  CAN_FA1R_FACT8                       ((uint32_t)0x00000100)        /*!<Filter Active bit 8 */
+#define  CAN_FA1R_FACT9                       ((uint32_t)0x00000200)        /*!<Filter Active bit 9 */
+#define  CAN_FA1R_FACT10                      ((uint32_t)0x00000400)        /*!<Filter Active bit 10 */
+#define  CAN_FA1R_FACT11                      ((uint32_t)0x00000800)        /*!<Filter Active bit 11 */
+#define  CAN_FA1R_FACT12                      ((uint32_t)0x00001000)        /*!<Filter Active bit 12 */
+#define  CAN_FA1R_FACT13                      ((uint32_t)0x00002000)        /*!<Filter Active bit 13 */
+#define  CAN_FA1R_FACT14                      ((uint32_t)0x00004000)        /*!<Filter Active bit 14 */
+#define  CAN_FA1R_FACT15                      ((uint32_t)0x00008000)        /*!<Filter Active bit 15 */
+#define  CAN_FA1R_FACT16                      ((uint32_t)0x00010000)        /*!<Filter Active bit 16 */
+#define  CAN_FA1R_FACT17                      ((uint32_t)0x00020000)        /*!<Filter Active bit 17 */
+#define  CAN_FA1R_FACT18                      ((uint32_t)0x00040000)        /*!<Filter Active bit 18 */
+#define  CAN_FA1R_FACT19                      ((uint32_t)0x00080000)        /*!<Filter Active bit 19 */
+#define  CAN_FA1R_FACT20                      ((uint32_t)0x00100000)        /*!<Filter Active bit 20 */
+#define  CAN_FA1R_FACT21                      ((uint32_t)0x00200000)        /*!<Filter Active bit 21 */
+#define  CAN_FA1R_FACT22                      ((uint32_t)0x00400000)        /*!<Filter Active bit 22 */
+#define  CAN_FA1R_FACT23                      ((uint32_t)0x00800000)        /*!<Filter Active bit 23 */
+#define  CAN_FA1R_FACT24                      ((uint32_t)0x01000000)        /*!<Filter Active bit 24 */
+#define  CAN_FA1R_FACT25                      ((uint32_t)0x02000000)        /*!<Filter Active bit 25 */
+#define  CAN_FA1R_FACT26                      ((uint32_t)0x04000000)        /*!<Filter Active bit 26 */
+#define  CAN_FA1R_FACT27                      ((uint32_t)0x08000000)        /*!<Filter Active bit 27 */
 
 /*******************  Bit definition for CAN_F0R1 register  *******************/
 #define  CAN_F0R1_FB0                        ((uint32_t)0x00000001)        /*!<Filter bit 0 */
@@ -2208,7 +2265,6 @@ typedef struct
 #define  CEC_IER_TXERRIE                     ((uint32_t)0x00000800)       /*!< CEC Tx-Error IT Enable                 */
 #define  CEC_IER_TXACKEIE                    ((uint32_t)0x00001000)       /*!< CEC Tx Missing Acknowledge IT Enable   */
 
-
 /******************************************************************************/
 /*                                                                            */
 /*                      Analog Comparators (COMP)                             */
@@ -2256,24 +2312,24 @@ typedef struct
 #define COMP_CSR_COMP2OUT              ((uint32_t)0x40000000) /*!< COMP2 output level */
 #define COMP_CSR_COMP2LOCK             ((uint32_t)0x80000000) /*!< COMP2 lock */
 /* COMPx bits definition */
-#define COMP_CSR_COMPxEN               ((uint16_t)0x0001) /*!< COMPx enable */
-#define COMP_CSR_COMPxMODE             ((uint16_t)0x000C) /*!< COMPx power mode */
-#define COMP_CSR_COMPxMODE_0           ((uint16_t)0x0004) /*!< COMPx power mode bit 0 */
-#define COMP_CSR_COMPxMODE_1           ((uint16_t)0x0008) /*!< COMPx power mode bit 1 */
-#define COMP_CSR_COMPxINSEL            ((uint16_t)0x0070) /*!< COMPx inverting input select */
-#define COMP_CSR_COMPxINSEL_0          ((uint16_t)0x0010) /*!< COMPx inverting input select bit 0 */
-#define COMP_CSR_COMPxINSEL_1          ((uint16_t)0x0020) /*!< COMPx inverting input select bit 1 */
-#define COMP_CSR_COMPxINSEL_2          ((uint16_t)0x0040) /*!< COMPx inverting input select bit 2 */
-#define COMP_CSR_COMPxOUTSEL           ((uint16_t)0x0700) /*!< COMPx output select */
-#define COMP_CSR_COMPxOUTSEL_0         ((uint16_t)0x0100) /*!< COMPx output select bit 0 */
-#define COMP_CSR_COMPxOUTSEL_1         ((uint16_t)0x0200) /*!< COMPx output select bit 1 */
-#define COMP_CSR_COMPxOUTSEL_2         ((uint16_t)0x0400) /*!< COMPx output select bit 2 */
-#define COMP_CSR_COMPxPOL              ((uint16_t)0x0800) /*!< COMPx output polarity */
-#define COMP_CSR_COMPxHYST             ((uint16_t)0x3000) /*!< COMPx hysteresis */
-#define COMP_CSR_COMPxHYST_0           ((uint16_t)0x1000) /*!< COMPx hysteresis bit 0 */
-#define COMP_CSR_COMPxHYST_1           ((uint16_t)0x2000) /*!< COMPx hysteresis bit 1 */
-#define COMP_CSR_COMPxOUT              ((uint16_t)0x4000) /*!< COMPx output level */
-#define COMP_CSR_COMPxLOCK             ((uint16_t)0x8000) /*!< COMPx lock */
+#define COMP_CSR_COMPxEN               ((uint32_t)0x00000001) /*!< COMPx enable */
+#define COMP_CSR_COMPxMODE             ((uint32_t)0x0000000C) /*!< COMPx power mode */
+#define COMP_CSR_COMPxMODE_0           ((uint32_t)0x00000004) /*!< COMPx power mode bit 0 */
+#define COMP_CSR_COMPxMODE_1           ((uint32_t)0x00000008) /*!< COMPx power mode bit 1 */
+#define COMP_CSR_COMPxINSEL            ((uint32_t)0x00000070) /*!< COMPx inverting input select */
+#define COMP_CSR_COMPxINSEL_0          ((uint32_t)0x00000010) /*!< COMPx inverting input select bit 0 */
+#define COMP_CSR_COMPxINSEL_1          ((uint32_t)0x00000020) /*!< COMPx inverting input select bit 1 */
+#define COMP_CSR_COMPxINSEL_2          ((uint32_t)0x00000040) /*!< COMPx inverting input select bit 2 */
+#define COMP_CSR_COMPxOUTSEL           ((uint32_t)0x00000700) /*!< COMPx output select */
+#define COMP_CSR_COMPxOUTSEL_0         ((uint32_t)0x00000100) /*!< COMPx output select bit 0 */
+#define COMP_CSR_COMPxOUTSEL_1         ((uint32_t)0x00000200) /*!< COMPx output select bit 1 */
+#define COMP_CSR_COMPxOUTSEL_2         ((uint32_t)0x00000400) /*!< COMPx output select bit 2 */
+#define COMP_CSR_COMPxPOL              ((uint32_t)0x00000800) /*!< COMPx output polarity */
+#define COMP_CSR_COMPxHYST             ((uint32_t)0x00003000) /*!< COMPx hysteresis */
+#define COMP_CSR_COMPxHYST_0           ((uint32_t)0x00001000) /*!< COMPx hysteresis bit 0 */
+#define COMP_CSR_COMPxHYST_1           ((uint32_t)0x00002000) /*!< COMPx hysteresis bit 1 */
+#define COMP_CSR_COMPxOUT              ((uint32_t)0x00004000) /*!< COMPx output level */
+#define COMP_CSR_COMPxLOCK             ((uint32_t)0x00008000) /*!< COMPx lock */
 
 /******************************************************************************/
 /*                                                                            */
@@ -2769,15 +2825,19 @@ typedef struct
 #define  EXTI_IMR_MR15                       ((uint32_t)0x00008000)        /*!< Interrupt Mask on line 15 */
 #define  EXTI_IMR_MR16                       ((uint32_t)0x00010000)        /*!< Interrupt Mask on line 16 */
 #define  EXTI_IMR_MR17                       ((uint32_t)0x00020000)        /*!< Interrupt Mask on line 17 */
+#define  EXTI_IMR_MR18                       ((uint32_t)0x00040000)        /*!< Interrupt Mask on line 18 */
 #define  EXTI_IMR_MR19                       ((uint32_t)0x00080000)        /*!< Interrupt Mask on line 19 */
 #define  EXTI_IMR_MR20                       ((uint32_t)0x00100000)        /*!< Interrupt Mask on line 20 */
 #define  EXTI_IMR_MR21                       ((uint32_t)0x00200000)        /*!< Interrupt Mask on line 21 */
 #define  EXTI_IMR_MR22                       ((uint32_t)0x00400000)        /*!< Interrupt Mask on line 22 */
 #define  EXTI_IMR_MR23                       ((uint32_t)0x00800000)        /*!< Interrupt Mask on line 23 */
+#define  EXTI_IMR_MR24                       ((uint32_t)0x01000000)        /*!< Interrupt Mask on line 24 - reserved */
 #define  EXTI_IMR_MR25                       ((uint32_t)0x02000000)        /*!< Interrupt Mask on line 25 */
 #define  EXTI_IMR_MR26                       ((uint32_t)0x04000000)        /*!< Interrupt Mask on line 26 */
 #define  EXTI_IMR_MR27                       ((uint32_t)0x08000000)        /*!< Interrupt Mask on line 27 */
-#define  EXTI_IMR_MR28                       ((uint32_t)0x10000000)        /*!< Interrupt Mask on line 28 */
+#define  EXTI_IMR_MR28                       ((uint32_t)0x10000000)        /*!< Interrupt Mask on line 28 - reserved */
+#define  EXTI_IMR_MR29                       ((uint32_t)0x20000000)        /*!< Interrupt Mask on line 29 - reserved */
+#define  EXTI_IMR_MR30                       ((uint32_t)0x40000000)        /*!< Interrupt Mask on line 30 - reserved */
 #define  EXTI_IMR_MR31                       ((uint32_t)0x80000000)        /*!< Interrupt Mask on line 31 */
 
 /******************  Bit definition for EXTI_EMR register  ********************/
@@ -2799,15 +2859,19 @@ typedef struct
 #define  EXTI_EMR_MR15                       ((uint32_t)0x00008000)        /*!< Event Mask on line 15 */
 #define  EXTI_EMR_MR16                       ((uint32_t)0x00010000)        /*!< Event Mask on line 16 */
 #define  EXTI_EMR_MR17                       ((uint32_t)0x00020000)        /*!< Event Mask on line 17 */
+#define  EXTI_EMR_MR18                       ((uint32_t)0x00040000)        /*!< Event Mask on line 18 */
 #define  EXTI_EMR_MR19                       ((uint32_t)0x00080000)        /*!< Event Mask on line 19 */
 #define  EXTI_EMR_MR20                       ((uint32_t)0x00100000)        /*!< Event Mask on line 20 */
 #define  EXTI_EMR_MR21                       ((uint32_t)0x00200000)        /*!< Event Mask on line 21 */
 #define  EXTI_EMR_MR22                       ((uint32_t)0x00400000)        /*!< Event Mask on line 22 */
 #define  EXTI_EMR_MR23                       ((uint32_t)0x00800000)        /*!< Event Mask on line 23 */
+#define  EXTI_EMR_MR24                       ((uint32_t)0x01000000)        /*!< Event Mask on line 24 - reserved */
 #define  EXTI_EMR_MR25                       ((uint32_t)0x02000000)        /*!< Event Mask on line 25 */
 #define  EXTI_EMR_MR26                       ((uint32_t)0x04000000)        /*!< Event Mask on line 26 */
 #define  EXTI_EMR_MR27                       ((uint32_t)0x08000000)        /*!< Event Mask on line 27 */
-#define  EXTI_EMR_MR28                       ((uint32_t)0x10000000)        /*!< Event Mask on line 28 */
+#define  EXTI_EMR_MR28                       ((uint32_t)0x10000000)        /*!< Event Mask on line 28 - reserved */
+#define  EXTI_EMR_MR29                       ((uint32_t)0x20000000)        /*!< Event Mask on line 29 - reserved */
+#define  EXTI_EMR_MR30                       ((uint32_t)0x40000000)        /*!< Event Mask on line 30 - reserved */
 #define  EXTI_EMR_MR31                       ((uint32_t)0x80000000)        /*!< Event Mask on line 31 */
 
 /*******************  Bit definition for EXTI_RTSR register  ******************/
@@ -2925,8 +2989,8 @@ typedef struct
 #define  FLASH_OPTKEYR_OPTKEYR               ((uint32_t)0xFFFFFFFF)        /*!< Option Byte Key */
 
 /******************  FLASH Keys  **********************************************/
-#define FLASH_FKEY1                          ((uint32_t)0x45670123)        /*!< Flash program erase key1 */
-#define FLASH_FKEY2                          ((uint32_t)0xCDEF89AB)        /*!< Flash program erase key2: used with FLASH_PEKEY1
+#define FLASH_KEY1                           ((uint32_t)0x45670123)        /*!< Flash program erase key1 */
+#define FLASH_KEY2                           ((uint32_t)0xCDEF89AB)        /*!< Flash program erase key2: used with FLASH_PEKEY1
                                                                                 to unlock the write access to the FPEC. */
 
 #define FLASH_OPTKEY1                        ((uint32_t)0x45670123)        /*!< Flash option key1 */
@@ -2961,12 +3025,15 @@ typedef struct
 #define  FLASH_OBR_RDPRT1                    ((uint32_t)0x00000002)        /*!< Read protection Level 1 */
 #define  FLASH_OBR_RDPRT2                    ((uint32_t)0x00000004)        /*!< Read protection Level 2 */
 
-#define  FLASH_OBR_USER                      ((uint32_t)0x00003700)        /*!< User Option Bytes */
+#define  FLASH_OBR_USER                      ((uint32_t)0x0000FF00)        /*!< User Option Bytes */
 #define  FLASH_OBR_IWDG_SW                   ((uint32_t)0x00000100)        /*!< IWDG SW */
 #define  FLASH_OBR_nRST_STOP                 ((uint32_t)0x00000200)        /*!< nRST_STOP */
 #define  FLASH_OBR_nRST_STDBY                ((uint32_t)0x00000400)        /*!< nRST_STDBY */
+#define  FLASH_OBR_nBOOT0                    ((uint32_t)0x00001000)        /*!< nBOOT0 */
 #define  FLASH_OBR_nBOOT1                    ((uint32_t)0x00001000)        /*!< nBOOT1 */
 #define  FLASH_OBR_VDDA_MONITOR              ((uint32_t)0x00002000)        /*!< VDDA power supply supervisor */
+#define  FLASH_OBR_RAM_PARITY_CHECK          ((uint32_t)0x00004000)        /*!< RAM parity check */
+#define  FLASH_OBR_BOOT_SEL                  ((uint32_t)0x00008000)        /*!< BOOT selection */
 
 /* Old BOOT1 bit definition, maintained for legacy purpose */
 #define FLASH_OBR_BOOT1                      FLASH_OBR_nBOOT1
@@ -4001,6 +4068,7 @@ typedef struct
 #define RTC_CR_SUB1H                         ((uint32_t)0x00020000)
 #define RTC_CR_ADD1H                         ((uint32_t)0x00010000)
 #define RTC_CR_TSIE                          ((uint32_t)0x00008000)
+#define RTC_CR_WUTIE                         ((uint32_t)0x00004000)
 #define RTC_CR_ALRAIE                        ((uint32_t)0x00001000)
 #define RTC_CR_TSE                           ((uint32_t)0x00000800)
 #define RTC_CR_WUTE                          ((uint32_t)0x00000400)
@@ -4319,182 +4387,182 @@ typedef struct
 #define SYSCFG_CFGR1_I2C_FMP_PA10           ((uint32_t)0x00800000) /*!< Enable Fast Mode Plus on PA10 */
 
 /*****************  Bit definition for SYSCFG_EXTICR1 register  **************/
-#define SYSCFG_EXTICR1_EXTI0            ((uint16_t)0x000F) /*!< EXTI 0 configuration */
-#define SYSCFG_EXTICR1_EXTI1            ((uint16_t)0x00F0) /*!< EXTI 1 configuration */
-#define SYSCFG_EXTICR1_EXTI2            ((uint16_t)0x0F00) /*!< EXTI 2 configuration */
-#define SYSCFG_EXTICR1_EXTI3            ((uint16_t)0xF000) /*!< EXTI 3 configuration */
+#define SYSCFG_EXTICR1_EXTI0                 ((uint32_t)0x0000000F) /*!< EXTI 0 configuration */
+#define SYSCFG_EXTICR1_EXTI1                 ((uint32_t)0x000000F0) /*!< EXTI 1 configuration */
+#define SYSCFG_EXTICR1_EXTI2                 ((uint32_t)0x00000F00) /*!< EXTI 2 configuration */
+#define SYSCFG_EXTICR1_EXTI3                 ((uint32_t)0x0000F000) /*!< EXTI 3 configuration */
 
 /**
   * @brief  EXTI0 configuration
   */
-#define SYSCFG_EXTICR1_EXTI0_PA         ((uint16_t)0x0000) /*!< PA[0] pin */
-#define SYSCFG_EXTICR1_EXTI0_PB         ((uint16_t)0x0001) /*!< PB[0] pin */
-#define SYSCFG_EXTICR1_EXTI0_PC         ((uint16_t)0x0002) /*!< PC[0] pin */
-#define SYSCFG_EXTICR1_EXTI0_PD         ((uint16_t)0x0003) /*!< PD[0] pin */
-#define SYSCFG_EXTICR1_EXTI0_PE         ((uint16_t)0x0004) /*!< PE[0] pin */
-#define SYSCFG_EXTICR1_EXTI0_PF         ((uint16_t)0x0005) /*!< PF[0] pin */
+#define SYSCFG_EXTICR1_EXTI0_PA              ((uint32_t)0x00000000) /*!< PA[0] pin */
+#define SYSCFG_EXTICR1_EXTI0_PB              ((uint32_t)0x00000001) /*!< PB[0] pin */
+#define SYSCFG_EXTICR1_EXTI0_PC              ((uint32_t)0x00000002) /*!< PC[0] pin */
+#define SYSCFG_EXTICR1_EXTI0_PD              ((uint32_t)0x00000003) /*!< PD[0] pin */
+#define SYSCFG_EXTICR1_EXTI0_PE              ((uint32_t)0x00000004) /*!< PE[0] pin */
+#define SYSCFG_EXTICR1_EXTI0_PF              ((uint32_t)0x00000005) /*!< PF[0] pin */
 
 /**
   * @brief  EXTI1 configuration
   */
-#define SYSCFG_EXTICR1_EXTI1_PA         ((uint16_t)0x0000) /*!< PA[1] pin */
-#define SYSCFG_EXTICR1_EXTI1_PB         ((uint16_t)0x0010) /*!< PB[1] pin */
-#define SYSCFG_EXTICR1_EXTI1_PC         ((uint16_t)0x0020) /*!< PC[1] pin */
-#define SYSCFG_EXTICR1_EXTI1_PD         ((uint16_t)0x0030) /*!< PD[1] pin */
-#define SYSCFG_EXTICR1_EXTI1_PE         ((uint16_t)0x0040) /*!< PE[1] pin */
-#define SYSCFG_EXTICR1_EXTI1_PF         ((uint16_t)0x0050) /*!< PF[1] pin */
+#define SYSCFG_EXTICR1_EXTI1_PA              ((uint32_t)0x00000000) /*!< PA[1] pin */
+#define SYSCFG_EXTICR1_EXTI1_PB              ((uint32_t)0x00000010) /*!< PB[1] pin */
+#define SYSCFG_EXTICR1_EXTI1_PC              ((uint32_t)0x00000020) /*!< PC[1] pin */
+#define SYSCFG_EXTICR1_EXTI1_PD              ((uint32_t)0x00000030) /*!< PD[1] pin */
+#define SYSCFG_EXTICR1_EXTI1_PE              ((uint32_t)0x00000040) /*!< PE[1] pin */
+#define SYSCFG_EXTICR1_EXTI1_PF              ((uint32_t)0x00000050) /*!< PF[1] pin */
 
 /**
   * @brief  EXTI2 configuration
   */
-#define SYSCFG_EXTICR1_EXTI2_PA         ((uint16_t)0x0000) /*!< PA[2] pin */
-#define SYSCFG_EXTICR1_EXTI2_PB         ((uint16_t)0x0100) /*!< PB[2] pin */
-#define SYSCFG_EXTICR1_EXTI2_PC         ((uint16_t)0x0200) /*!< PC[2] pin */
-#define SYSCFG_EXTICR1_EXTI2_PD         ((uint16_t)0x0300) /*!< PD[2] pin */
-#define SYSCFG_EXTICR1_EXTI2_PE         ((uint16_t)0x0400) /*!< PE[2] pin */
-#define SYSCFG_EXTICR1_EXTI2_PF         ((uint16_t)0x0500) /*!< PF[2] pin */
+#define SYSCFG_EXTICR1_EXTI2_PA              ((uint32_t)0x00000000) /*!< PA[2] pin */
+#define SYSCFG_EXTICR1_EXTI2_PB              ((uint32_t)0x00000100) /*!< PB[2] pin */
+#define SYSCFG_EXTICR1_EXTI2_PC              ((uint32_t)0x00000200) /*!< PC[2] pin */
+#define SYSCFG_EXTICR1_EXTI2_PD              ((uint32_t)0x00000300) /*!< PD[2] pin */
+#define SYSCFG_EXTICR1_EXTI2_PE              ((uint32_t)0x00000400) /*!< PE[2] pin */
+#define SYSCFG_EXTICR1_EXTI2_PF              ((uint32_t)0x00000500) /*!< PF[2] pin */
 
 /**
   * @brief  EXTI3 configuration
   */
-#define SYSCFG_EXTICR1_EXTI3_PA         ((uint16_t)0x0000) /*!< PA[3] pin */
-#define SYSCFG_EXTICR1_EXTI3_PB         ((uint16_t)0x1000) /*!< PB[3] pin */
-#define SYSCFG_EXTICR1_EXTI3_PC         ((uint16_t)0x2000) /*!< PC[3] pin */
-#define SYSCFG_EXTICR1_EXTI3_PD         ((uint16_t)0x3000) /*!< PD[3] pin */
-#define SYSCFG_EXTICR1_EXTI3_PE         ((uint16_t)0x4000) /*!< PE[3] pin */
-#define SYSCFG_EXTICR1_EXTI3_PF         ((uint16_t)0x5000) /*!< PF[3] pin */
+#define SYSCFG_EXTICR1_EXTI3_PA              ((uint32_t)0x00000000) /*!< PA[3] pin */
+#define SYSCFG_EXTICR1_EXTI3_PB              ((uint32_t)0x00001000) /*!< PB[3] pin */
+#define SYSCFG_EXTICR1_EXTI3_PC              ((uint32_t)0x00002000) /*!< PC[3] pin */
+#define SYSCFG_EXTICR1_EXTI3_PD              ((uint32_t)0x00003000) /*!< PD[3] pin */
+#define SYSCFG_EXTICR1_EXTI3_PE              ((uint32_t)0x00004000) /*!< PE[3] pin */
+#define SYSCFG_EXTICR1_EXTI3_PF              ((uint32_t)0x00005000) /*!< PF[3] pin */
 
 /*****************  Bit definition for SYSCFG_EXTICR2 register  **************/
-#define SYSCFG_EXTICR2_EXTI4            ((uint16_t)0x000F) /*!< EXTI 4 configuration */
-#define SYSCFG_EXTICR2_EXTI5            ((uint16_t)0x00F0) /*!< EXTI 5 configuration */
-#define SYSCFG_EXTICR2_EXTI6            ((uint16_t)0x0F00) /*!< EXTI 6 configuration */
-#define SYSCFG_EXTICR2_EXTI7            ((uint16_t)0xF000) /*!< EXTI 7 configuration */
+#define SYSCFG_EXTICR2_EXTI4                 ((uint32_t)0x0000000F) /*!< EXTI 4 configuration */
+#define SYSCFG_EXTICR2_EXTI5                 ((uint32_t)0x000000F0) /*!< EXTI 5 configuration */
+#define SYSCFG_EXTICR2_EXTI6                 ((uint32_t)0x00000F00) /*!< EXTI 6 configuration */
+#define SYSCFG_EXTICR2_EXTI7                 ((uint32_t)0x0000F000) /*!< EXTI 7 configuration */
 
 /**
   * @brief  EXTI4 configuration
   */
-#define SYSCFG_EXTICR2_EXTI4_PA         ((uint16_t)0x0000) /*!< PA[4] pin */
-#define SYSCFG_EXTICR2_EXTI4_PB         ((uint16_t)0x0001) /*!< PB[4] pin */
-#define SYSCFG_EXTICR2_EXTI4_PC         ((uint16_t)0x0002) /*!< PC[4] pin */
-#define SYSCFG_EXTICR2_EXTI4_PD         ((uint16_t)0x0003) /*!< PD[4] pin */
-#define SYSCFG_EXTICR2_EXTI4_PE         ((uint16_t)0x0004) /*!< PE[4] pin */
-#define SYSCFG_EXTICR2_EXTI4_PF         ((uint16_t)0x0005) /*!< PF[4] pin */
+#define SYSCFG_EXTICR2_EXTI4_PA              ((uint32_t)0x00000000) /*!< PA[4] pin */
+#define SYSCFG_EXTICR2_EXTI4_PB              ((uint32_t)0x00000001) /*!< PB[4] pin */
+#define SYSCFG_EXTICR2_EXTI4_PC              ((uint32_t)0x00000002) /*!< PC[4] pin */
+#define SYSCFG_EXTICR2_EXTI4_PD              ((uint32_t)0x00000003) /*!< PD[4] pin */
+#define SYSCFG_EXTICR2_EXTI4_PE              ((uint32_t)0x00000004) /*!< PE[4] pin */
+#define SYSCFG_EXTICR2_EXTI4_PF              ((uint32_t)0x00000005) /*!< PF[4] pin */
 
 /**
   * @brief  EXTI5 configuration
   */
-#define SYSCFG_EXTICR2_EXTI5_PA         ((uint16_t)0x0000) /*!< PA[5] pin */
-#define SYSCFG_EXTICR2_EXTI5_PB         ((uint16_t)0x0010) /*!< PB[5] pin */
-#define SYSCFG_EXTICR2_EXTI5_PC         ((uint16_t)0x0020) /*!< PC[5] pin */
-#define SYSCFG_EXTICR2_EXTI5_PD         ((uint16_t)0x0030) /*!< PD[5] pin */
-#define SYSCFG_EXTICR2_EXTI5_PE         ((uint16_t)0x0040) /*!< PE[5] pin */
-#define SYSCFG_EXTICR2_EXTI5_PF         ((uint16_t)0x0050) /*!< PF[5] pin */
+#define SYSCFG_EXTICR2_EXTI5_PA              ((uint32_t)0x00000000) /*!< PA[5] pin */
+#define SYSCFG_EXTICR2_EXTI5_PB              ((uint32_t)0x00000010) /*!< PB[5] pin */
+#define SYSCFG_EXTICR2_EXTI5_PC              ((uint32_t)0x00000020) /*!< PC[5] pin */
+#define SYSCFG_EXTICR2_EXTI5_PD              ((uint32_t)0x00000030) /*!< PD[5] pin */
+#define SYSCFG_EXTICR2_EXTI5_PE              ((uint32_t)0x00000040) /*!< PE[5] pin */
+#define SYSCFG_EXTICR2_EXTI5_PF              ((uint32_t)0x00000050) /*!< PF[5] pin */
 
 /**
   * @brief  EXTI6 configuration
   */
-#define SYSCFG_EXTICR2_EXTI6_PA         ((uint16_t)0x0000) /*!< PA[6] pin */
-#define SYSCFG_EXTICR2_EXTI6_PB         ((uint16_t)0x0100) /*!< PB[6] pin */
-#define SYSCFG_EXTICR2_EXTI6_PC         ((uint16_t)0x0200) /*!< PC[6] pin */
-#define SYSCFG_EXTICR2_EXTI6_PD         ((uint16_t)0x0300) /*!< PD[6] pin */
-#define SYSCFG_EXTICR2_EXTI6_PE         ((uint16_t)0x0400) /*!< PE[6] pin */
-#define SYSCFG_EXTICR2_EXTI6_PF         ((uint16_t)0x0500) /*!< PF[6] pin */
+#define SYSCFG_EXTICR2_EXTI6_PA              ((uint32_t)0x00000000) /*!< PA[6] pin */
+#define SYSCFG_EXTICR2_EXTI6_PB              ((uint32_t)0x00000100) /*!< PB[6] pin */
+#define SYSCFG_EXTICR2_EXTI6_PC              ((uint32_t)0x00000200) /*!< PC[6] pin */
+#define SYSCFG_EXTICR2_EXTI6_PD              ((uint32_t)0x00000300) /*!< PD[6] pin */
+#define SYSCFG_EXTICR2_EXTI6_PE              ((uint32_t)0x00000400) /*!< PE[6] pin */
+#define SYSCFG_EXTICR2_EXTI6_PF              ((uint32_t)0x00000500) /*!< PF[6] pin */
 
 /**
   * @brief  EXTI7 configuration
   */
-#define SYSCFG_EXTICR2_EXTI7_PA         ((uint16_t)0x0000) /*!< PA[7] pin */
-#define SYSCFG_EXTICR2_EXTI7_PB         ((uint16_t)0x1000) /*!< PB[7] pin */
-#define SYSCFG_EXTICR2_EXTI7_PC         ((uint16_t)0x2000) /*!< PC[7] pin */
-#define SYSCFG_EXTICR2_EXTI7_PD         ((uint16_t)0x3000) /*!< PD[7] pin */
-#define SYSCFG_EXTICR2_EXTI7_PE         ((uint16_t)0x4000) /*!< PE[7] pin */
-#define SYSCFG_EXTICR2_EXTI7_PF         ((uint16_t)0x5000) /*!< PF[7] pin */
+#define SYSCFG_EXTICR2_EXTI7_PA              ((uint32_t)0x00000000) /*!< PA[7] pin */
+#define SYSCFG_EXTICR2_EXTI7_PB              ((uint32_t)0x00001000) /*!< PB[7] pin */
+#define SYSCFG_EXTICR2_EXTI7_PC              ((uint32_t)0x00002000) /*!< PC[7] pin */
+#define SYSCFG_EXTICR2_EXTI7_PD              ((uint32_t)0x00003000) /*!< PD[7] pin */
+#define SYSCFG_EXTICR2_EXTI7_PE              ((uint32_t)0x00004000) /*!< PE[7] pin */
+#define SYSCFG_EXTICR2_EXTI7_PF              ((uint32_t)0x00005000) /*!< PF[7] pin */
 
 /*****************  Bit definition for SYSCFG_EXTICR3 register  **************/
-#define SYSCFG_EXTICR3_EXTI8            ((uint16_t)0x000F) /*!< EXTI 8 configuration */
-#define SYSCFG_EXTICR3_EXTI9            ((uint16_t)0x00F0) /*!< EXTI 9 configuration */
-#define SYSCFG_EXTICR3_EXTI10           ((uint16_t)0x0F00) /*!< EXTI 10 configuration */
-#define SYSCFG_EXTICR3_EXTI11           ((uint16_t)0xF000) /*!< EXTI 11 configuration */
+#define SYSCFG_EXTICR3_EXTI8                 ((uint32_t)0x0000000F) /*!< EXTI 8 configuration */
+#define SYSCFG_EXTICR3_EXTI9                 ((uint32_t)0x000000F0) /*!< EXTI 9 configuration */
+#define SYSCFG_EXTICR3_EXTI10                ((uint32_t)0x00000F00) /*!< EXTI 10 configuration */
+#define SYSCFG_EXTICR3_EXTI11                ((uint32_t)0x0000F000) /*!< EXTI 11 configuration */
 
 /**
   * @brief  EXTI8 configuration
   */
-#define SYSCFG_EXTICR3_EXTI8_PA         ((uint16_t)0x0000) /*!< PA[8] pin */
-#define SYSCFG_EXTICR3_EXTI8_PB         ((uint16_t)0x0001) /*!< PB[8] pin */
-#define SYSCFG_EXTICR3_EXTI8_PC         ((uint16_t)0x0002) /*!< PC[8] pin */
-#define SYSCFG_EXTICR3_EXTI8_PD         ((uint16_t)0x0003) /*!< PD[8] pin */
-#define SYSCFG_EXTICR3_EXTI8_PE         ((uint16_t)0x0004) /*!< PE[8] pin */
+#define SYSCFG_EXTICR3_EXTI8_PA              ((uint32_t)0x00000000) /*!< PA[8] pin */
+#define SYSCFG_EXTICR3_EXTI8_PB              ((uint32_t)0x00000001) /*!< PB[8] pin */
+#define SYSCFG_EXTICR3_EXTI8_PC              ((uint32_t)0x00000002) /*!< PC[8] pin */
+#define SYSCFG_EXTICR3_EXTI8_PD              ((uint32_t)0x00000003) /*!< PD[8] pin */
+#define SYSCFG_EXTICR3_EXTI8_PE              ((uint32_t)0x00000004) /*!< PE[8] pin */
 
 /**
   * @brief  EXTI9 configuration
   */
-#define SYSCFG_EXTICR3_EXTI9_PA         ((uint16_t)0x0000) /*!< PA[9] pin */
-#define SYSCFG_EXTICR3_EXTI9_PB         ((uint16_t)0x0010) /*!< PB[9] pin */
-#define SYSCFG_EXTICR3_EXTI9_PC         ((uint16_t)0x0020) /*!< PC[9] pin */
-#define SYSCFG_EXTICR3_EXTI9_PD         ((uint16_t)0x0030) /*!< PD[9] pin */
-#define SYSCFG_EXTICR3_EXTI9_PE         ((uint16_t)0x0040) /*!< PE[9] pin */
-#define SYSCFG_EXTICR3_EXTI9_PF         ((uint16_t)0x0050) /*!< PF[9] pin */
+#define SYSCFG_EXTICR3_EXTI9_PA              ((uint32_t)0x00000000) /*!< PA[9] pin */
+#define SYSCFG_EXTICR3_EXTI9_PB              ((uint32_t)0x00000010) /*!< PB[9] pin */
+#define SYSCFG_EXTICR3_EXTI9_PC              ((uint32_t)0x00000020) /*!< PC[9] pin */
+#define SYSCFG_EXTICR3_EXTI9_PD              ((uint32_t)0x00000030) /*!< PD[9] pin */
+#define SYSCFG_EXTICR3_EXTI9_PE              ((uint32_t)0x00000040) /*!< PE[9] pin */
+#define SYSCFG_EXTICR3_EXTI9_PF              ((uint32_t)0x00000050) /*!< PF[9] pin */
 
 /**
   * @brief  EXTI10 configuration
   */
-#define SYSCFG_EXTICR3_EXTI10_PA        ((uint16_t)0x0000) /*!< PA[10] pin */
-#define SYSCFG_EXTICR3_EXTI10_PB        ((uint16_t)0x0100) /*!< PB[10] pin */
-#define SYSCFG_EXTICR3_EXTI10_PC        ((uint16_t)0x0200) /*!< PC[10] pin */
-#define SYSCFG_EXTICR3_EXTI10_PD        ((uint16_t)0x0300) /*!< PE[10] pin */
-#define SYSCFG_EXTICR3_EXTI10_PE        ((uint16_t)0x0400) /*!< PD[10] pin */
-#define SYSCFG_EXTICR3_EXTI10_PF        ((uint16_t)0x0500) /*!< PF[10] pin */
+#define SYSCFG_EXTICR3_EXTI10_PA             ((uint32_t)0x00000000) /*!< PA[10] pin */
+#define SYSCFG_EXTICR3_EXTI10_PB             ((uint32_t)0x00000100) /*!< PB[10] pin */
+#define SYSCFG_EXTICR3_EXTI10_PC             ((uint32_t)0x00000200) /*!< PC[10] pin */
+#define SYSCFG_EXTICR3_EXTI10_PD             ((uint32_t)0x00000300) /*!< PE[10] pin */
+#define SYSCFG_EXTICR3_EXTI10_PE             ((uint32_t)0x00000400) /*!< PD[10] pin */
+#define SYSCFG_EXTICR3_EXTI10_PF             ((uint32_t)0x00000500) /*!< PF[10] pin */
 
 /**
   * @brief  EXTI11 configuration
   */
-#define SYSCFG_EXTICR3_EXTI11_PA        ((uint16_t)0x0000) /*!< PA[11] pin */
-#define SYSCFG_EXTICR3_EXTI11_PB        ((uint16_t)0x1000) /*!< PB[11] pin */
-#define SYSCFG_EXTICR3_EXTI11_PC        ((uint16_t)0x2000) /*!< PC[11] pin */
-#define SYSCFG_EXTICR3_EXTI11_PD        ((uint16_t)0x3000) /*!< PD[11] pin */
-#define SYSCFG_EXTICR3_EXTI11_PE        ((uint16_t)0x4000) /*!< PE[11] pin */
+#define SYSCFG_EXTICR3_EXTI11_PA             ((uint32_t)0x00000000) /*!< PA[11] pin */
+#define SYSCFG_EXTICR3_EXTI11_PB             ((uint32_t)0x00001000) /*!< PB[11] pin */
+#define SYSCFG_EXTICR3_EXTI11_PC             ((uint32_t)0x00002000) /*!< PC[11] pin */
+#define SYSCFG_EXTICR3_EXTI11_PD             ((uint32_t)0x00003000) /*!< PD[11] pin */
+#define SYSCFG_EXTICR3_EXTI11_PE             ((uint32_t)0x00004000) /*!< PE[11] pin */
 
 /*****************  Bit definition for SYSCFG_EXTICR4 register  **************/
-#define SYSCFG_EXTICR4_EXTI12           ((uint16_t)0x000F) /*!< EXTI 12 configuration */
-#define SYSCFG_EXTICR4_EXTI13           ((uint16_t)0x00F0) /*!< EXTI 13 configuration */
-#define SYSCFG_EXTICR4_EXTI14           ((uint16_t)0x0F00) /*!< EXTI 14 configuration */
-#define SYSCFG_EXTICR4_EXTI15           ((uint16_t)0xF000) /*!< EXTI 15 configuration */
+#define SYSCFG_EXTICR4_EXTI12                ((uint32_t)0x0000000F) /*!< EXTI 12 configuration */
+#define SYSCFG_EXTICR4_EXTI13                ((uint32_t)0x000000F0) /*!< EXTI 13 configuration */
+#define SYSCFG_EXTICR4_EXTI14                ((uint32_t)0x00000F00) /*!< EXTI 14 configuration */
+#define SYSCFG_EXTICR4_EXTI15                ((uint32_t)0x0000F000) /*!< EXTI 15 configuration */
 
 /**
   * @brief  EXTI12 configuration
   */
-#define SYSCFG_EXTICR4_EXTI12_PA        ((uint16_t)0x0000) /*!< PA[12] pin */
-#define SYSCFG_EXTICR4_EXTI12_PB        ((uint16_t)0x0001) /*!< PB[12] pin */
-#define SYSCFG_EXTICR4_EXTI12_PC        ((uint16_t)0x0002) /*!< PC[12] pin */
-#define SYSCFG_EXTICR4_EXTI12_PD        ((uint16_t)0x0003) /*!< PD[12] pin */
-#define SYSCFG_EXTICR4_EXTI12_PE        ((uint16_t)0x0004) /*!< PE[12] pin */
+#define SYSCFG_EXTICR4_EXTI12_PA             ((uint32_t)0x00000000) /*!< PA[12] pin */
+#define SYSCFG_EXTICR4_EXTI12_PB             ((uint32_t)0x00000001) /*!< PB[12] pin */
+#define SYSCFG_EXTICR4_EXTI12_PC             ((uint32_t)0x00000002) /*!< PC[12] pin */
+#define SYSCFG_EXTICR4_EXTI12_PD             ((uint32_t)0x00000003) /*!< PD[12] pin */
+#define SYSCFG_EXTICR4_EXTI12_PE             ((uint32_t)0x00000004) /*!< PE[12] pin */
 
 /**
   * @brief  EXTI13 configuration
   */
-#define SYSCFG_EXTICR4_EXTI13_PA        ((uint16_t)0x0000) /*!< PA[13] pin */
-#define SYSCFG_EXTICR4_EXTI13_PB        ((uint16_t)0x0010) /*!< PB[13] pin */
-#define SYSCFG_EXTICR4_EXTI13_PC        ((uint16_t)0x0020) /*!< PC[13] pin */
-#define SYSCFG_EXTICR4_EXTI13_PD        ((uint16_t)0x0030) /*!< PD[13] pin */
-#define SYSCFG_EXTICR4_EXTI13_PE        ((uint16_t)0x0040) /*!< PE[13] pin */
+#define SYSCFG_EXTICR4_EXTI13_PA             ((uint32_t)0x00000000) /*!< PA[13] pin */
+#define SYSCFG_EXTICR4_EXTI13_PB             ((uint32_t)0x00000010) /*!< PB[13] pin */
+#define SYSCFG_EXTICR4_EXTI13_PC             ((uint32_t)0x00000020) /*!< PC[13] pin */
+#define SYSCFG_EXTICR4_EXTI13_PD             ((uint32_t)0x00000030) /*!< PD[13] pin */
+#define SYSCFG_EXTICR4_EXTI13_PE             ((uint32_t)0x00000040) /*!< PE[13] pin */
 
 /**
   * @brief  EXTI14 configuration
   */
-#define SYSCFG_EXTICR4_EXTI14_PA        ((uint16_t)0x0000) /*!< PA[14] pin */
-#define SYSCFG_EXTICR4_EXTI14_PB        ((uint16_t)0x0100) /*!< PB[14] pin */
-#define SYSCFG_EXTICR4_EXTI14_PC        ((uint16_t)0x0200) /*!< PC[14] pin */
-#define SYSCFG_EXTICR4_EXTI14_PD        ((uint16_t)0x0300) /*!< PD[14] pin */
-#define SYSCFG_EXTICR4_EXTI14_PE        ((uint16_t)0x0400) /*!< PE[14] pin */
+#define SYSCFG_EXTICR4_EXTI14_PA             ((uint32_t)0x00000000) /*!< PA[14] pin */
+#define SYSCFG_EXTICR4_EXTI14_PB             ((uint32_t)0x00000100) /*!< PB[14] pin */
+#define SYSCFG_EXTICR4_EXTI14_PC             ((uint32_t)0x00000200) /*!< PC[14] pin */
+#define SYSCFG_EXTICR4_EXTI14_PD             ((uint32_t)0x00000300) /*!< PD[14] pin */
+#define SYSCFG_EXTICR4_EXTI14_PE             ((uint32_t)0x00000400) /*!< PE[14] pin */
 
 /**
   * @brief  EXTI15 configuration
   */
-#define SYSCFG_EXTICR4_EXTI15_PA        ((uint16_t)0x0000) /*!< PA[15] pin */
-#define SYSCFG_EXTICR4_EXTI15_PB        ((uint16_t)0x1000) /*!< PB[15] pin */
-#define SYSCFG_EXTICR4_EXTI15_PC        ((uint16_t)0x2000) /*!< PC[15] pin */
-#define SYSCFG_EXTICR4_EXTI15_PD        ((uint16_t)0x3000) /*!< PD[15] pin */
-#define SYSCFG_EXTICR4_EXTI15_PE        ((uint16_t)0x4000) /*!< PE[15] pin */
+#define SYSCFG_EXTICR4_EXTI15_PA             ((uint32_t)0x00000000) /*!< PA[15] pin */
+#define SYSCFG_EXTICR4_EXTI15_PB             ((uint32_t)0x00001000) /*!< PB[15] pin */
+#define SYSCFG_EXTICR4_EXTI15_PC             ((uint32_t)0x00002000) /*!< PC[15] pin */
+#define SYSCFG_EXTICR4_EXTI15_PD             ((uint32_t)0x00003000) /*!< PD[15] pin */
+#define SYSCFG_EXTICR4_EXTI15_PE             ((uint32_t)0x00004000) /*!< PE[15] pin */
 
 /*****************  Bit definition for SYSCFG_CFGR2 register  ****************/
 #define SYSCFG_CFGR2_LOCKUP_LOCK               ((uint32_t)0x00000001) /*!< Enables and locks the LOCKUP (Hardfault) output of CortexM0 with Break Input of TIMER1 */
@@ -5659,6 +5727,7 @@ typedef struct
 /**
   * @}
   */
+
 
 /******************************************************************************/
 /*  For a painless codes migration between the STM32F3xx device product       */

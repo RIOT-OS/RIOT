@@ -42,7 +42,7 @@ extern "C" {
 /* Timer 0 configuration */
 #define TIMER_0_DEV         LPC_CT32B1
 #define TIMER_0_CHANNELS    4
-#define TIMER_0_PRESCALER   (48U)
+#define TIMER_0_FREQ        (48000000ul)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
 #define TIMER_0_CLKEN()     (LPC_SYSCON->SYSAHBCLKCTRL |= (1 << 10))
 #define TIMER_0_CLKDIS()    (LPC_SYSCON->SYSAHBCLKCTRL &= ~(1 << 10))

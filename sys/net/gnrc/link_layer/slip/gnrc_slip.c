@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "kernel.h"
 #include "kernel_types.h"
 #include "msg.h"
 #include "net/gnrc.h"

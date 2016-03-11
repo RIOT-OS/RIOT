@@ -26,7 +26,6 @@
 
 #include "lpc23xx.h"
 #include "VIC.h"
-#include "kernel.h"
 #include "periph/uart.h"
 
 /* for now, we only support one UART device... */

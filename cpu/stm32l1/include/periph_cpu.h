@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015-2016 Freie Universität Berlin
  * Copyright (C) 2015 Hamburg University of Applied Sciences
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -18,10 +18,10 @@
  * @author          Katja Kirstein <katja.kirstein@haw-hamburg.de>
  */
 
-#ifndef PERIPH_CPU_H_
-#define PERIPH_CPU_H_
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
-#include "cpu.h"
+#include "periph_cpu_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,17 +100,20 @@ typedef struct {
 } timer_conf_t;
 
 /**
- * @brief declare needed generic SPI functions
- * @{
+ * @brief   I2C configuration data structure
  */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
-/** @} */
+typedef struct {
+    I2C_TypeDef *dev;       /**< i2c device */
+    gpio_t scl;             /**< scl pin number */
+    gpio_t sda;             /**< sda pin number */
+    gpio_af_t af;           /**< I2C alternate function value */
+    uint8_t er_irqn;        /**< error IRQ */
+    uint8_t ev_irqn;        /**< event IRQ */
+} i2c_conf_t;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CPU_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */

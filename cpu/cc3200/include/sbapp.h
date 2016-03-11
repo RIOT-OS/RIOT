@@ -21,7 +21,6 @@
 #ifndef SYS_INCLUDE_NET_SBAPP_H_
 #define SYS_INCLUDE_NET_SBAPP_H_
 
-#include "kernel.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netreg.h"

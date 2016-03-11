@@ -22,7 +22,6 @@
 
 #include <stdio.h>
 
-#include "kernel.h"
 #include "cpu.h"
 
 #ifndef SYSTEM_RESET

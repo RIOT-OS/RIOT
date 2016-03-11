@@ -14,10 +14,27 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "net/ipv6/addr.h"
+
+#ifdef MODULE_FMT
+#include "fmt.h"
+#else
+#include <stdio.h>
+#endif
+
+const ipv6_addr_t ipv6_addr_unspecified = IPV6_ADDR_UNSPECIFIED;
+const ipv6_addr_t ipv6_addr_loopback = IPV6_ADDR_LOOPBACK;
+const ipv6_addr_t ipv6_addr_link_local_prefix = IPV6_ADDR_LINK_LOCAL_PREFIX;
+const ipv6_addr_t ipv6_addr_solicited_node_prefix = IPV6_ADDR_SOLICITED_NODE_PREFIX;
+const ipv6_addr_t ipv6_addr_all_nodes_if_local = IPV6_ADDR_ALL_NODES_IF_LOCAL;
+const ipv6_addr_t ipv6_addr_all_nodes_link_local = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
+const ipv6_addr_t ipv6_addr_all_routers_if_local = IPV6_ADDR_ALL_ROUTERS_IF_LOCAL;
+const ipv6_addr_t ipv6_addr_all_routers_link_local = IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
+const ipv6_addr_t ipv6_addr_all_routers_site_local = IPV6_ADDR_ALL_ROUTERS_SITE_LOCAL;
 
 bool ipv6_addr_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
 {
@@ -104,6 +121,34 @@ void ipv6_addr_init_iid(ipv6_addr_t *out, const uint8_t *iid, uint8_t bits)
     }
 
     memcpy(&(out->u8[pos]), iid, bytes);
+}
+
+int ipv6_addr_split(char *addr_str, char seperator, int _default)
+{
+    char *sep = addr_str;
+    while(*++sep) {
+        if (*sep == seperator) {
+            *sep++ = '\0';
+            if (*sep) {
+                _default = atoi(sep);
+            }
+            break;
+        }
+    }
+
+    return _default;
+}
+
+void ipv6_addr_print(const ipv6_addr_t *addr)
+{
+    assert(addr);
+    char addr_str[IPV6_ADDR_MAX_STR_LEN];
+    ipv6_addr_to_str(addr_str, addr, sizeof(addr_str));
+#ifdef MODULE_FMT
+    print_str(addr_str);
+#else
+    printf("%s", addr_str);
+#endif
 }
 
 /**

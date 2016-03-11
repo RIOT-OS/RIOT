@@ -22,7 +22,7 @@
 #ifndef PANIC_H
 #define PANIC_H
 
-#include "kernel.h"
+#include "attributes.h"
 
 #ifdef __cplusplus
  extern "C" {
