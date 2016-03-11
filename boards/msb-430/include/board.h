@@ -34,7 +34,7 @@
 #ifndef MSB_BOARD_H_
 #define MSB_BOARD_H_
 
-#include "board-conf.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,41 +45,12 @@ extern "C" {
 #define __MSP430F1612__
 #endif
 
-/**
- * @brief   Xtimer configuration
- * @{
- */
-#define XTIMER                      (0)
-#define XTIMER_CHAN                 (0)
-#define XTIMER_MASK                 (0xffff0000)
-#define XTIMER_SHIFT_ON_COMPARE     (4)
-#define XTIMER_BACKOFF              (40)
-/** @} */
-
 /* MSB430 core */
 #define MSP430_INITIAL_CPU_SPEED    2457600uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
 #define F_RC_OSCILLATOR             32768
 #define MSP430_HAS_DCOR             1
 #define MSP430_HAS_EXTERNAL_CRYSTAL 0
-
-/**
- * @brief   LED definitions
- * @{
- */
-#define LEDS_PxDIR                  (P5DIR)
-#define LEDS_PxOUT                  (P5OUT)
-#define LEDS_CONF_RED               (0x80)
-#define LEDS_CONF_GREEN             (0x00)
-#define LEDS_CONF_YELLOW            (0x00)
-
-#define LED_RED_ON                  (LEDS_PxOUT &=~LEDS_CONF_RED)
-#define LED_RED_OFF                 (LEDS_PxOUT |= LEDS_CONF_RED)
-#define LED_RED_TOGGLE              (LEDS_PxOUT ^= LEDS_CONF_RED)
-#define LED_GREEN_ON                /* not present */
-#define LED_GREEN_OFF               /* not present */
-#define LED_GREEN_TOGGLE            /* not present */
-/** @} */
 
 #ifdef __cplusplus
 }
