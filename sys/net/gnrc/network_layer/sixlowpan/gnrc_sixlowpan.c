@@ -129,12 +129,13 @@ static void _receive(gnrc_pktsnip_t *pkt)
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
     else if (sixlowpan_iphc_is(dispatch)) {
-        size_t dispatch_size;
+        size_t dispatch_size, nh_len;
         gnrc_pktsnip_t *sixlowpan, *tmp;
         gnrc_pktsnip_t *dec_hdr = gnrc_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
                                                   GNRC_NETTYPE_IPV6);
         if ((dec_hdr == NULL) ||
-            (dispatch_size = gnrc_sixlowpan_iphc_decode(&dec_hdr, pkt, 0, 0)) == 0) {
+            (dispatch_size = gnrc_sixlowpan_iphc_decode(&dec_hdr, pkt, 0, 0,
+                                                        &nh_len)) == 0) {
             DEBUG("6lo: error on IPHC decoding\n");
             if (dec_hdr != NULL) {
                 gnrc_pktbuf_release(dec_hdr);

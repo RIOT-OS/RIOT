@@ -101,9 +101,9 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         }
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
         else if (sixlowpan_iphc_is(data)) {
-            size_t iphc_len;
+            size_t iphc_len, nh_len = 0;
             iphc_len = gnrc_sixlowpan_iphc_decode(&entry->pkt, pkt, entry->pkt->size,
-                                                  sizeof(sixlowpan_frag_t));
+                                                  sizeof(sixlowpan_frag_t), &nh_len);
             if (iphc_len == 0) {
                 DEBUG("6lo rfrag: could not decode IPHC dispatch\n");
                 gnrc_pktbuf_release(entry->pkt);
@@ -112,8 +112,10 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             }
             data += iphc_len;       /* take remaining data as data */
             frag_size -= iphc_len;  /* and reduce frag size by IPHC dispatch length */
-            frag_size += sizeof(ipv6_hdr_t);    /* but add IPv6 header length */
-            data_offset += sizeof(ipv6_hdr_t);  /* start copying after IPv6 header */
+            /* but add IPv6 header + next header lengths */
+            frag_size += sizeof(ipv6_hdr_t) + nh_len;
+            /* start copying after IPv6 header and next headers */
+            data_offset += sizeof(ipv6_hdr_t) + nh_len;
         }
 #endif
     }
