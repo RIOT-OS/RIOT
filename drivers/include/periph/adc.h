@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -9,7 +9,29 @@
 /**
  * @defgroup    drivers_periph_adc ADC
  * @ingroup     drivers_periph
- * @brief       Low-level ADC peripheral driver
+ * @brief       Low-level ADC peripheral driver interface
+ *
+ * This is a very simple ADC interface to allow platform independent access to
+ * a MCU's ADC unit(s). This interface is intentionally designed as simple as
+ * possible, to allow for very easy implementation and maximal portability.
+ *
+ * As of now, the interface does not allow for any advanced ADC concepts (e.g.
+ * continuous mode, scan sequences, injections). It is to be determined, if
+ * these features will ever be integrated in this interface, or if it does make
+ * more sense to create a second, advanced ADC interface for this.
+ *
+ * The ADC driver interface is build around the concept of ADC lines. An ADC
+ * line in this context is a tuple consisting out of a hardware ADC device (an
+ * ADC functional unit on the MCU) and an ADC channel connected to pin.
+ *
+ * If a MCU has more than one hardware ADC unit, the ADC lines can be mapped in
+ * a way, that it is possible to sample multiple lines in parallel, given that
+ * the ADC implementation allows for interruption of the program flow while
+ * waiting for the result of a conversion (e.g. through putting the calling
+ * thread to sleep while waiting for the conversion results).
+ *
+ * @todo        Extend interface for continuous mode?
+ *
  * @{
  *
  * @file
@@ -21,121 +43,96 @@
 #ifndef ADC_H
 #define ADC_H
 
+#include <stdint.h>
+
+#include "periph_cpu.h"
 #include "periph_conf.h"
+/* TODO: remove once all platforms are ported to this interface */
+#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* guard file in case no ADC device is defined */
-#if ADC_NUMOF
-
 /**
- * @brief Definition available ADC devices
- *
- * Each ADC device is based on a hardware ADC which can have one or more
- * multiplexed channels.
+ * @brief   Make sure the number of available ADC lines is defined
+ * @{
  */
-typedef enum {
-#if ADC_0_EN
-    ADC_0 = 0,              /**< ADC device 0 */
+#ifndef ADC_NUMOF
+#error "ADC_NUMOF undefined"
 #endif
-#if ADC_1_EN
-    ADC_1,                  /**< ADC device 1 */
-#endif
-#if ADC_2_EN
-    ADC_2,                  /**< ADC device 2 */
-#endif
-#if ADC_3_EN
-    ADC_3,                  /**< ADC device 3 */
-#endif
-} adc_t;
+/** @} */
 
 /**
- * @brief Possible ADC precision settings
+ * @brief   Define default ADC type identifier
+ * @{
  */
-typedef enum {
-    ADC_RES_6BIT = 0,       /**< ADC precision: 6 bit */
-    ADC_RES_8BIT,           /**< ADC precision: 8 bit */
-    ADC_RES_10BIT,          /**< ADC precision: 10 bit */
-    ADC_RES_12BIT,          /**< ADC precision: 12 bit */
-    ADC_RES_14BIT,          /**< ADC precision: 14 bit */
-    ADC_RES_16BIT,          /**< ADC precision: 16 bit */
-} adc_precision_t;
+#ifndef HAVE_ADC_T
+typedef unsigned int adc_t;
+#endif
+/** @} */
 
 /**
- * @brief Initialization of a given ADC device
+ * @brief   Default ADC undefined value
+ * @{
+ */
+#ifndef ADC_UNDEF
+#define ADC_UNDEF           (0xffff)
+#endif
+/** @} */
+
+/**
+ * @brief   Default ADC line access macro
+ * @{
+ */
+#ifndef ADC_LINE
+#define ADC_LINE(x)          (x)
+#endif
+/** @} */
+
+/**
+ * @brief   Possible ADC resolution settings
+ * @{
+ */
+#ifndef HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT = 0,       /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT,           /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT,          /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT,          /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT,          /**< ADC resolution: 14 bit */
+    ADC_RES_16BIT,          /**< ADC resolution: 16 bit */
+} adc_res_t;
+#endif
+/** @} */
+
+/**
+ * @brief   Initialize the given ADC line
  *
- * The ADC will be initialized in synchronous, blocking mode, so no callbacks for finished
- * conversions are required as conversions are presumed to be very fast (somewhere in the
- * range of some us).
+ * The ADC line is initialized in synchronous, blocking mode.
  *
- * @param[in] dev           the device to initialize
- * @param[in] precision     the precision to use for conversion
+ * @param[in] line          line to initialize
  *
  * @return                  0 on success
- * @return                  -1 on precision not available
+ * @return                  -1 on invalid ADC line
  */
-int adc_init(adc_t dev, adc_precision_t precision);
+int adc_init(adc_t line);
 
 /**
- * @brief Start a new conversion by using the given channel.
+ * @brief   Sample a value from the given ADC line
  *
- * If a conversion on any channel on the given ADC core is in progress, it is aborted.
+ * This function blocks until the conversion has finished. Please note, that if
+ * more than one line share the same ADC device, and if these lines are sampled
+ * at the same time (e.g. from different threads), the one called secondly waits
+ * for the first to finish before its conversion starts.
  *
- * @param[in] dev           the ADC device to use for the conversion
- * @param[in] channel       the channel to convert from
+ * @param[in] line          line to sample
+ * @param[in] resolution    resolution to use for conversion
  *
- * @return                  the converted value
- * @return                  -1 on invalid channel
+ * @return                  the sampled value on success
+ * @return                  -1 if resolution is not applicable
  */
-int adc_sample(adc_t dev, int channel);
-
-/**
- * @brief Enable the power for the given ADC device
- *
- * @param[in] dev           the ADC device to power up
- */
-void adc_poweron(adc_t dev);
-
-/**
- * @brief Disable the power for the given ADC device
- *
- * @param[in] dev           the ADC device to power down
- */
-void adc_poweroff(adc_t dev);
-
-/**
- * @brief Helper function to map a converted value to the given integer range.
- *
- * This function is useful for converting sampled ADC values into their physical representation.
- *
- * The min value is asserted to be smaller than the max value.
- *
- * @param[in] dev           the ADC device to read the precision value from (as input interval)
- * @param[in] value         the value to map
- * @param[in] min           the lower bound of the target interval
- * @param[in] max           the upper bound of the target interval
- *
- * @return                  the mapped value
- */
-int adc_map(adc_t dev, int value, int min, int max);
-
-/**
- * @brief Helper function to map a converted value to the given float range
- *
- * @see adc_map
- *
- * @param[in] dev           the ADC device to read the precision value from (as input interval)
- * @param[in] value         the value to map
- * @param[in] min           the lower bound of the target interval
- * @param[in] max           the upper bound of the target interval
- *
- * @return                  the mapped value
- */
-float adc_mapf(adc_t dev, int value, float min, float max);
-
-#endif /* ADC_NUMOF */
+int adc_sample(adc_t line, adc_res_t res);
 
 #ifdef __cplusplus
 }

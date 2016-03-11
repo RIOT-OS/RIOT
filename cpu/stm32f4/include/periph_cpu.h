@@ -49,7 +49,6 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
 
 /**
-<<<<<<< HEAD
  * @brief   Generate GPIO mode bitfields
  *
  * We use 5 bit to encode the mode:
@@ -172,6 +171,39 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   Override the ADC resolution configuration
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0x00000000,  /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = 0x01000000,  /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = 0x02000000,  /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = 0x03000000,  /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 1,           /**< ADC resolution: 14 bit (not supported) */
+    ADC_RES_16BIT = 2            /**< ADC resolution: 16 bit (not supported)*/
+} adc_res_t;
+/** @} */
+
+/**
+ * @brief   ADC channel configuration data
+ */
+typedef struct {
+    ADC_TypeDef *dev;       /**< ADC device used for the channel */
+    gpio_t pin;             /**< pin connected to the channel */
+    uint8_t chan;           /**< CPU ADC channel connected to the pin */
+    uint8_t rcc;            /**< bit in the RCC APB2 enable register */
+} adc_conf_t;
+
+/**
+ * @brief   DAC line configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the line */
+    uint8_t chan;           /**< DAC device used for this line */
+} dac_conf_t;
+
+/**
  * @brief   Configure the alternate function for the given pin
  *
  * @note    This is meant for internal use in STM32F4 peripheral drivers only
@@ -180,6 +212,13 @@ typedef struct {
  * @param[in] af        alternate function to use
  */
 void gpio_init_af(gpio_t pin, gpio_af_t af);
+
+/**
+ * @brief   Configure the given pin to be used as ADC input
+ *
+ * @param[in] pin       pin to configure
+ */
+void gpio_init_analog(gpio_t pin);
 
 /**
  * @brief   Power on the DMA device the given stream belongs to
