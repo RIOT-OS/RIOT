@@ -54,15 +54,33 @@ extern "C" {
 #define GPIO_PIN(x,y)       ((x & 0) | y)
 
 /**
- * @brief   Override GPIO pull register select values
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use 4 bit to encode the pin mode:
+ * - bit   0: output enable
+ * - bit   1: input connect
+ * - bit 2+3: pull resistor configuration
+ */
+#define GPIO_MODE(oe, ic, pr)   (oe | (ic << 1) | (pr << 2))
+
+/**
+ * @brief   Override GPIO modes
+ *
+ * We use 4 bit to encode the pin mode:
+ * - bit   0: output enable
+ * - bit   1: input connect
+ * - bit 2+3: pull resistor configuration
  * @{
  */
-#define HAVE_GPIO_PP_T
+#define HAVE_GPIO_MODE_T
 typedef enum {
-    GPIO_NOPULL = 0,        /**< do not use internal pull resistors */
-    GPIO_PULLUP = 3,        /**< enable internal pull-up resistor */
-    GPIO_PULLDOWN = 1       /**< enable internal pull-down resistor */
-} gpio_pp_t;
+    GPIO_IN    = GPIO_MODE(0, 0, 0),    /**< IN */
+    GPIO_IN_PD = GPIO_MODE(0, 0, 1),    /**< IN with pull-down */
+    GPIO_IN_PU = GPIO_MODE(0, 0, 3),    /**< IN with pull-up */
+    GPIO_OUT   = GPIO_MODE(1, 1, 0),    /**< OUT (push-pull) */
+    GPIO_OD    = (0xff),                /**< not supported by HW */
+    GPIO_OD_PU = (0xfe)                 /**< not supported by HW */
+} gpio_mode_t;
 /** @} */
 
 /**

@@ -41,6 +41,21 @@ typedef uint32_t gpio_t;
 /** @} */
 
 /**
+ * @brief   Override GPIO modes
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN    = (GPIO_DIR_MODE_IN | (GPIO_PIN_TYPE_STD << 4)),     /**< IN */
+    GPIO_IN_PD = (GPIO_DIR_MODE_IN | (GPIO_PIN_TYPE_STD_WPD << 4)), /**< IN with pull-down */
+    GPIO_IN_PU = (GPIO_DIR_MODE_IN | (GPIO_PIN_TYPE_STD_WPU << 4)), /**< IN with pull-up */
+    GPIO_OUT   = (GPIO_DIR_MODE_OUT | (GPIO_PIN_TYPE_STD << 4)),    /**< OUT (push-pull) */
+    GPIO_OD    = (GPIO_DIR_MODE_OUT | (GPIO_PIN_TYPE_OD << 4)),     /**< OD */
+    GPIO_OD_PU = (GPIO_DIR_MODE_OUT | (GPIO_PIN_TYPE_OD_WPU << 4)), /**< OD with pull-up */
+} gpio_mode_t;
+/** @} */
+
+/**
  * @brief   Override values for pull register configuration
  * @{
  */

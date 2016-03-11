@@ -167,8 +167,8 @@ static void _pin_config(gpio_t scl, gpio_t sda)
 {
     /* toggle pins to reset analog filter -> see datasheet */
     /* set as output */
-    gpio_init(scl, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(sda, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(scl, GPIO_OUT);
+    gpio_init(sda, GPIO_OUT);
     /* run through toggling sequence */
     gpio_set(scl);
     gpio_set(sda);

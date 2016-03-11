@@ -144,16 +144,16 @@ void board_init(void)
 static inline void leds_init(void)
 {
     /* The pin configuration can be found in board.h and periph_conf.h */
-    gpio_init(LED_RED_GPIO, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(LED_YELLOW_GPIO, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(LED_GREEN_GPIO, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(LED_RED_GPIO, GPIO_OUT);
+    gpio_init(LED_YELLOW_GPIO, GPIO_OUT);
+    gpio_init(LED_GREEN_GPIO, GPIO_OUT);
 }
 
 static inline void power_pins_init(void)
 {
-    gpio_init(MULLE_POWER_AVDD, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(MULLE_POWER_VPERIPH, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(MULLE_POWER_VSEC, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(MULLE_POWER_AVDD, GPIO_OUT);
+    gpio_init(MULLE_POWER_VPERIPH, GPIO_OUT);
+    gpio_init(MULLE_POWER_VSEC, GPIO_OUT);
     gpio_clear(MULLE_POWER_AVDD);
     gpio_clear(MULLE_POWER_VPERIPH);
     gpio_clear(MULLE_POWER_VSEC);

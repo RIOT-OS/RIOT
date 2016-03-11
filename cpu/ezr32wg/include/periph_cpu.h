@@ -89,26 +89,18 @@ enum {
 };
 
 /**
- * @brief   Override direction values
+ * @brief   Override GPIO modes
  * @{
  */
-#define HAVE_GPIO_DIR_T
+#define HAVE_GPIO_MODE_T
 typedef enum {
-    GPIO_DIR_IN = 0,        /**< configure pin as input */
-    GPIO_DIR_OUT = 4,       /**< configure pin as output */
-} gpio_dir_t;
-/** @} */
-
-/**
- * @brief   Override pull register configuration values
- * @{
- */
-#define HAVE_GPIO_PP_T
-typedef enum {
-    GPIO_NOPULL = 1,        /**< do not use internal pull resistors */
-    GPIO_PULLUP = 6,        /**< enable internal pull-up resistor */
-    GPIO_PULLDOWN = 2       /**< enable internal pull-down resistor */
-} gpio_pp_t;
+    GPIO_IN    = _GPIO_P_MODEL_MODE0_INPUT,         /**< IN */
+    GPIO_IN_PD = _GPIO_P_MODEL_MODE0_INPUTPULL,     /**< IN with pull-down */
+    GPIO_IN_PU = _GPIO_P_MODEL_MODE0_INPUTPULL,     /**< IN with pull-up */
+    GPIO_OUT   = _GPIO_P_MODEL_MODE0_PUSHPULL,      /**< OUT (push-pull) */
+    GPIO_OD    = _GPIO_P_MODEL_MODE0_WIREDAND,      /**< OD */
+    GPIO_OD_PU = _GPIO_P_MODEL_MODE0_WIREDANDPULLUP /**< OD with pull-up */
+} gpio_mode_t;
 /** @} */
 
 /**

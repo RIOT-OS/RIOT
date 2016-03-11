@@ -184,7 +184,7 @@ int cmd_init_master(int argc, char **argv)
                 spi_dev, res);
         return 1;
     }
-    res = gpio_init(spi_cs, GPIO_DIR_OUT, GPIO_PULLUP);
+    res = gpio_init(spi_cs, GPIO_OUT);
     if (res < 0){
         printf("gpio_init: error initializing GPIO_%ld as CS line (code %i)\n",
                 (long)spi_cs, res);
@@ -212,7 +212,7 @@ int cmd_init_slave(int argc, char **argv)
                 spi_dev, res);
         return 1;
     }
-    res = gpio_init_int(spi_cs, GPIO_NOPULL, GPIO_FALLING, slave_on_cs, 0);
+    res = gpio_init_int(spi_cs, GPIO_IN, GPIO_FALLING, slave_on_cs, 0);
     if (res < 0){
         printf("gpio_init_int: error initializing GPIO_%ld as CS line (code %i)\n",
                 (long)spi_cs, res);

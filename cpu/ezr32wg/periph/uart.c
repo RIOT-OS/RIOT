@@ -67,8 +67,8 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
      * the division afterwards... */
     uart->CLKDIV = (((CLOCK_HFPERCLK << 5) / (16 * baudrate) - 32) << 3);
     /* configure the pins */
-    gpio_init(uart_config[dev].rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
-    gpio_init(uart_config[dev].tx_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(uart_config[dev].rx_pin, GPIO_IN);
+    gpio_init(uart_config[dev].tx_pin, GPIO_OUT);
     uart->ROUTE = ((uart_config[dev].loc << _USART_ROUTE_LOCATION_SHIFT) |
                    USART_ROUTE_RXPEN | USART_ROUTE_TXPEN);
     /* enable RX interrupt */
