@@ -118,6 +118,16 @@ static const timer_conf_t timer_config[] = {
 #define SPI_1_PIN_MOSI      18
 /** @} */
 
+/**
+ * @brief   ADC configuration
+ *
+ * The configuration consists simply of a list of channels that should be used
+ * @{
+ */
+#define ADC_NUMOF          (0)
+/** @} */
+
+
 #ifdef __cplusplus
 }
 #endif
