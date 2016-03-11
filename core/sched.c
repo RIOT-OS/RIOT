@@ -22,8 +22,6 @@
 #include <stdint.h>
 
 #include "sched.h"
-#include "kernel.h"
-#include "kernel_internal.h"
 #include "clist.h"
 #include "bitarithm.h"
 #include "irq.h"
@@ -47,8 +45,8 @@ volatile int sched_num_threads = 0;
 
 volatile unsigned int sched_context_switch_request;
 
-volatile tcb_t *sched_threads[KERNEL_PID_LAST + 1];
-volatile tcb_t *sched_active_thread;
+volatile thread_t *sched_threads[KERNEL_PID_LAST + 1];
+volatile thread_t *sched_active_thread;
 
 volatile kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
 
@@ -64,13 +62,13 @@ int sched_run(void)
 {
     sched_context_switch_request = 0;
 
-    tcb_t *active_thread = (tcb_t *)sched_active_thread;
+    thread_t *active_thread = (thread_t *)sched_active_thread;
 
     /* The bitmask in runqueue_bitcache is never empty,
      * since the threading should not be started before at least the idle thread was started.
      */
     int nextrq = bitarithm_lsb(runqueue_bitcache);
-    tcb_t *next_thread = clist_get_container(sched_runqueues[nextrq], tcb_t, rq_entry);
+    thread_t *next_thread = clist_get_container(sched_runqueues[nextrq], thread_t, rq_entry);
 
     DEBUG("sched_run: active thread: %" PRIkernel_pid ", next thread: %" PRIkernel_pid "\n",
           (active_thread == NULL) ? KERNEL_PID_UNDEF : active_thread->pid,
@@ -115,7 +113,7 @@ int sched_run(void)
 
     next_thread->status = STATUS_RUNNING;
     sched_active_pid = next_thread->pid;
-    sched_active_thread = (volatile tcb_t *) next_thread;
+    sched_active_thread = (volatile thread_t *) next_thread;
 
     DEBUG("sched_run: done, changed sched_active_thread.\n");
 
@@ -129,7 +127,7 @@ void sched_register_cb(void (*callback)(uint32_t, uint32_t))
 }
 #endif
 
-void sched_set_status(tcb_t *process, unsigned int status)
+void sched_set_status(thread_t *process, unsigned int status)
 {
     if (status >= STATUS_ON_RUNQUEUE) {
         if (!(process->status >= STATUS_ON_RUNQUEUE)) {
@@ -156,7 +154,7 @@ void sched_set_status(tcb_t *process, unsigned int status)
 
 void sched_switch(uint16_t other_prio)
 {
-    tcb_t *active_thread = (tcb_t *) sched_active_thread;
+    thread_t *active_thread = (thread_t *) sched_active_thread;
     uint16_t current_prio = active_thread->priority;
     int on_runqueue = (active_thread->status >= STATUS_ON_RUNQUEUE);
 
@@ -187,7 +185,7 @@ NORETURN void sched_task_exit(void)
     sched_threads[sched_active_pid] = NULL;
     sched_num_threads--;
 
-    sched_set_status((tcb_t *)sched_active_thread, STATUS_STOPPED);
+    sched_set_status((thread_t *)sched_active_thread, STATUS_STOPPED);
 
     sched_active_thread = NULL;
     cpu_switch_context_exit();

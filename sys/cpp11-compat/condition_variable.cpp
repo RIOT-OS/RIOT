@@ -23,6 +23,7 @@
 
 #include "irq.h"
 #include "sched.h"
+#include "thread.h"
 #include "timex.h"
 #include "xtimer.h"
 #include "priority_queue.h"
@@ -40,7 +41,7 @@ void condition_variable::notify_one() noexcept {
   priority_queue_node_t* head = priority_queue_remove_head(&m_queue);
   int other_prio = -1;
   if (head != NULL) {
-    tcb_t* other_thread = (tcb_t*)sched_threads[head->data];
+    thread_t* other_thread = (thread_t*)sched_threads[head->data];
     if (other_thread) {
       other_prio = other_thread->priority;
       sched_set_status(other_thread, STATUS_PENDING);
@@ -61,7 +62,7 @@ void condition_variable::notify_all() noexcept {
     if (head == NULL) {
       break;
     }
-    tcb_t* other_thread = (tcb_t*)sched_threads[head->data];
+    thread_t* other_thread = (thread_t*)sched_threads[head->data];
     if (other_thread) {
       auto max_prio
         = [](int a, int b) { return (a < 0) ? b : ((a < b) ? a : b); };

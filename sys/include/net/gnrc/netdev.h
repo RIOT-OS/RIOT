@@ -27,7 +27,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "kernel.h"
 #include "net/gnrc/pkt.h"
 #include "net/netopt.h"
 

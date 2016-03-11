@@ -18,6 +18,9 @@
 * @}
 */
 
+#include <stddef.h>
+#include <stdint.h>
+
 #include "crypto/modes/ecb.h"
 
 int cipher_encrypt_ecb(cipher_t* cipher, uint8_t* input,

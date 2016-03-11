@@ -38,7 +38,7 @@ extern "C" {
  *          IANA, ICMPv6 "type" Numbers
  *      </a>
  */
-#define ICMPV6_DEST_UNR     (1)     /**< Destination unreachable message */
+#define ICMPV6_DST_UNR      (1)     /**< Destination unreachable message */
 #define ICMPV6_PKT_TOO_BIG  (2)     /**< Packet Too Big message */
 #define ICMPV6_TIME_EXC     (3)     /**< Time Exceeded message */
 #define ICMPV6_PARAM_PROB   (4)     /**< Parameter Problem message */

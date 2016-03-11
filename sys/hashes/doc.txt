@@ -1,0 +1,38 @@
+/*
+ * Copyright (C) 2016 INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup    sys_hashes Hashes
+ * @ingroup     sys
+ *
+ * @brief       RIOT provides a collection of hash algorithms.
+ *
+ * RIOT supports the following hash functions:
+ *
+ * @section Checksums
+ *
+ * * Fletcher-16
+ * * Fletcher-32
+ *
+ * @section Non-cryptographic hash functions
+ *
+ * * Bernstein hash djb2i (http://www.cse.yorku.ca/~oz/hash.html)
+ * * sdbm (http://www.cse.yorku.ca/~oz/hash.html)
+ * * Kernighan and Ritchie
+ * * Shift, And, Xor
+ * * Donald E. Knuth
+ * * Fowler–Noll–Vo hash function
+ * * Rotating Hash
+ * * One at a time Hash
+ *
+ * @section Unkeyed cryptographic hash functions
+ *
+ * * MD5
+ * * SHA-256
+ *
+ */

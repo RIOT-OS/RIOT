@@ -33,7 +33,7 @@ static char receiver_stack[THREAD_STACKSIZE_DEFAULT];
 
 typedef struct {
     void (*run)(void);
-    tcb_t *main_thread;
+    thread_t *main_thread;
     mutex_t mutexes[2];
 } test_ubjson_receiver_data_t;
 
@@ -80,7 +80,7 @@ void test_ubjson_test(void (*sender_fun)(void), void (*receiver_fun)(void))
 {
     test_ubjson_receiver_data_t data = {
         .run = receiver_fun,
-        .main_thread = (tcb_t *) sched_active_thread,
+        .main_thread = (thread_t *) sched_active_thread,
         .mutexes = { MUTEX_INIT, MUTEX_INIT },
     };
     mutex_lock(&data.mutexes[0]);

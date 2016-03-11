@@ -21,6 +21,8 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #if (CPU_MODEL == ezr32wg330f256r60)
 #include "ezr32wg330f256r60.h"
 #else
@@ -39,11 +41,6 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (FPUEH_IRQn + 1)
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
-
-/**
- * @brief   CPUID_ID_LEN length of cpuid in bytes
- */
-#define CPUID_ID_LEN                    (8U)    /* 64-bit unique ID */
 
 #ifdef __cplusplus
 }

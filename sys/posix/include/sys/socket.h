@@ -94,7 +94,7 @@ extern "C" {
 #define SO_TYPE         (15)    /**< Socket type. */
 /** @} */
 
-typedef unsigned int sa_family_t;   /**< address family type */
+typedef unsigned short sa_family_t;   /**< address family type */
 
 /**
  * @brief   Used to define the socket address.

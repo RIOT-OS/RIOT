@@ -38,7 +38,7 @@
 static timer_isr_ctx_t isr_ctx[TIMER_NUMOF];
 
 
-int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     TIMER_TypeDef *pre, *tim;
 
@@ -48,7 +48,8 @@ int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
     }
 
     /* save callback */
-    isr_ctx[dev].cb = callback;
+    isr_ctx[dev].cb = cb;
+    isr_ctx[dev].arg = arg;
 
     /* get timers */
     pre = timer_config[dev].prescaler;
@@ -63,7 +64,7 @@ int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
      * configure it up-counting, driven by the HFPER clock and we set the TOP
      * register depending on the specified timer speed value */
     pre->CTRL = 0;
-    pre->TOP = ((CLOCK_HFPERCLK / 1000000) - 1) * us_per_tick;
+    pre->TOP = ((CLOCK_HFPERCLK / freq) - 1);
     pre->CNT = 0;
     pre->IEN = 0;
 
@@ -152,7 +153,7 @@ void TIMER_0_ISR(void)
         if (tim->IF & (TIMER_IF_CC0 << i)) {
             tim->CC[i].CTRL = _TIMER_CC_CTRL_MODE_OFF;
             tim->IFC = (TIMER_IFC_CC0 << i);
-            isr_ctx[0].cb(i);
+            isr_ctx[0].cb(isr_ctx[0].arg, i);
         }
     }
     if (sched_context_switch_request) {

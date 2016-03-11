@@ -33,10 +33,7 @@ USEMODULE += xtimer
 USEMODULE += random
 USEMODULE += prng_minstd
 
-
-ifneq (,$(filter-out native,$(BOARD)))
-	USEPKG += tlsf
-endif
+USEPKG += tlsf
 
 USEPKG += ccn-lite
 USEMODULE += ccn-lite-utils

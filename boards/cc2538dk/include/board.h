@@ -28,20 +28,6 @@ extern "C" {
 #endif
 
 /**
- * Define the nominal CPU core clock in this board
- */
-#define F_CPU               XOSC32M_FREQ
-
-/**
- * @name Define UART device and baudrate for stdio
- * @{
- */
-#define STDIO               UART_0
-#define STDIO_BAUDRATE      115200
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
-
-/**
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
@@ -84,6 +70,17 @@ extern "C" {
 #define CCA_BACKDOOR_ENABLE       1
 #define CCA_BACKDOOR_PORT_A_PIN   3 /**< Select button */
 #define CCA_BACKDOOR_ACTIVE_LEVEL 0 /**< Active low */
+/** @} */
+
+/**
+ * @name xtimer configuration
+ * @{
+ */
+#define XTIMER              TIMER_0
+#define XTIMER_CHAN         (0)
+#define XTIMER_SHIFT        (-4)
+#define XTIMER_BACKOFF      (50)
+#define XTIMER_ISR_BACKOFF  (40)
 /** @} */
 
 /**

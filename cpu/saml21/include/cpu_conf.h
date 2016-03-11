@@ -18,6 +18,8 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #include "atmel/saml21.h"
 
 #ifdef __cplusplus
@@ -32,11 +34,6 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   PERIPH_COUNT_IRQn
 #define CPU_FLASH_BASE                  FLASH_ADDR
 /** @} */
-
-/**
- * @brief CPUID_ID_LEN length of cpuid in bytes
- */
-#define CPUID_ID_LEN (16) /* 128 bits long, 16 bytes long */
 
 #ifdef __cplusplus
 }

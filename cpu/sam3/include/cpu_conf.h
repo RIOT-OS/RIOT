@@ -21,6 +21,7 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
 #include "sam3x8e.h"
 
 #ifdef __cplusplus

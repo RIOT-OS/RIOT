@@ -51,15 +51,6 @@ void init_clks2(void);
 void bl_init_clks(void);
 
 /**
- * @name Define UART device and baudrate for stdio
- * @{
- */
-#define STDIO               UART_0
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
-
-/**
  * @name dummy-defines for LEDs
  * @{
  */

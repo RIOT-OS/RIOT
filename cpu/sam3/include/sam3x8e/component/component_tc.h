@@ -49,9 +49,7 @@ typedef struct {
   RwReg      TC_SMMR;       /**< \brief (TcChannel Offset: 0x8) Stepper Motor Mode Register */
   RoReg      Reserved1[1];
   RwReg      TC_CV;         /**< \brief (TcChannel Offset: 0x10) Counter Value */
-  RwReg      TC_RA;         /**< \brief (TcChannel Offset: 0x14) Register A */
-  RwReg      TC_RB;         /**< \brief (TcChannel Offset: 0x18) Register B */
-  RwReg      TC_RC;         /**< \brief (TcChannel Offset: 0x1C) Register C */
+  RwReg      TC_R[3];       /**< \brief (TcChannel Offset: 0x14) Register A-C */
   RwReg      TC_SR;         /**< \brief (TcChannel Offset: 0x20) Status Register */
   RwReg      TC_IER;        /**< \brief (TcChannel Offset: 0x24) Interrupt Enable Register */
   RwReg      TC_IDR;        /**< \brief (TcChannel Offset: 0x28) Interrupt Disable Register */

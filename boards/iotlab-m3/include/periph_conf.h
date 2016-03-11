@@ -20,6 +20,8 @@
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,7 +34,7 @@ extern "C" {
 #define CLOCK_CORECLOCK     (72000000U)             /* targeted core clock frequency */
 /* configuration of PLL prescaler and multiply values */
 /* CORECLOCK := HSE / PLL_HSE_DIV * PLL_HSE_MUL */
-#define CLOCK_PLL_HSE_DIV   RCC_CFGR_PLLXTPRE_HSE_Div2
+#define CLOCK_PLL_HSE_DIV   RCC_CFGR_PLLXTPRE_HSE_DIV2
 #define CLOCK_PLL_HSE_MUL   RCC_CFGR_PLLMULL9
 /* configuration of peripheral bus clock prescalers */
 #define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1      /* AHB clock -> 72MHz */
@@ -46,37 +48,16 @@ extern "C" {
  * @brief Timer configuration
  * @{
  */
-#define TIMER_NUMOF         (2U)
-#define TIMER_0_EN          1
-#define TIMER_1_EN          1
+static const timer_conf_t timer_config[] = {
+    /* device, APB bus, rcc_bit */
+    { TIM2, APB1, RCC_APB1ENR_TIM2EN, TIM2_IRQn },
+    { TIM3, APB1, RCC_APB1ENR_TIM3EN, TIM3_IRQn }
+};
 
-/* Timer 0 configuration */
-#define TIMER_0_DEV_0       TIM2
-#define TIMER_0_DEV_1       TIM3
-#define TIMER_0_CHANNELS    4
-#define TIMER_0_PRESCALER   (72U)
-#define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_CLKEN()     (RCC->APB1ENR |= (RCC_APB1ENR_TIM2EN | RCC_APB1ENR_TIM3EN))
-#define TIMER_0_ISR_0       isr_tim2
-#define TIMER_0_ISR_1       isr_tim3
-#define TIMER_0_IRQ_CHAN_0  TIM2_IRQn
-#define TIMER_0_IRQ_CHAN_1  TIM3_IRQn
-#define TIMER_0_IRQ_PRIO    1
-#define TIMER_0_TRIG_SEL    TIM_SMCR_TS_0
+#define TIMER_0_ISR         isr_tim2
+#define TIMER_1_ISR         isr_tim3
 
-/* Timer 1 configuration */
-#define TIMER_1_DEV_0       TIM4
-#define TIMER_1_DEV_1       TIM5
-#define TIMER_1_CHANNELS    4
-#define TIMER_1_PRESCALER   (72U)
-#define TIMER_1_MAX_VALUE   (0xffffffff)
-#define TIMER_1_CLKEN()     (RCC->APB1ENR |= (RCC_APB1ENR_TIM4EN | RCC_APB1ENR_TIM5EN))
-#define TIMER_1_ISR_0       isr_tim4
-#define TIMER_1_ISR_1       isr_tim5
-#define TIMER_1_IRQ_CHAN_0  TIM4_IRQn
-#define TIMER_1_IRQ_CHAN_1  TIM5_IRQn
-#define TIMER_1_IRQ_PRIO    1
-#define TIMER_1_TRIG_SEL    TIM_SMCR_TS_1
+#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**

@@ -29,11 +29,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Define the nominal CPU core clock in this board
- */
-#define F_CPU               (16000000UL)
-
-/**
  * @brief   Xtimer configuration
  * @{
  */
@@ -45,37 +40,30 @@ extern "C" {
 /** @} */
 
 /**
- * @name    Define the boards stdio
- * @{
- */
-#define STDIO               UART_DEV(0)
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
-
-/**
  * @name    LED pin definitions
  * @{
  */
-#define ONBOARD_LED         1
-#define LED_RED_PIN         (1 << 21)
-#define LED_GREEN_PIN       (1 << 22)
-#define LED_BLUE_PIN        (1 << 23)
+#define LED_RED_PIN         (GPIO_PIN(0, 21))
+#define LED_GREEN_PIN       (GPIO_PIN(0, 22))
+#define LED_BLUE_PIN        (GPIO_PIN(0, 23))
+#define LED_RED_MASK        (1 << 21)
+#define LED_GREEN_MASK      (1 << 22)
+#define LED_BLUE_MASK       (1 << 23)
 /** @} */
 
 /**
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED_RED_ON          (NRF_GPIO->OUTCLR = LED_RED_PIN)
-#define LED_RED_OFF         (NRF_GPIO->OUTSET = LED_RED_PIN)
-#define LED_RED_TOGGLE      (NRF_GPIO->OUT ^= LED_RED_PIN)
-#define LED_GREEN_ON        (NRF_GPIO->OUTCLR = LED_GREEN_PIN)
-#define LED_GREEN_OFF       (NRF_GPIO->OUTSET = LED_GREEN_PIN)
-#define LED_GREEN_TOGGLE    (NRF_GPIO->OUT ^= LED_GREEN_PIN)
-#define LED_BLUE_ON         (NRF_GPIO->OUTCLR = LED_BLUE_PIN)
-#define LED_BLUE_OFF        (NRF_GPIO->OUTSET = LED_BLUE_PIN)
-#define LED_BLUE_TOGGLE     (NRF_GPIO->OUT ^= LED_BLUE_PIN)
+#define LED_RED_ON          (NRF_GPIO->OUTCLR = LED_RED_MASK)
+#define LED_RED_OFF         (NRF_GPIO->OUTSET = LED_RED_MASK)
+#define LED_RED_TOGGLE      (NRF_GPIO->OUT   ^= LED_RED_MASK)
+#define LED_GREEN_ON        (NRF_GPIO->OUTCLR = LED_GREEN_MASK)
+#define LED_GREEN_OFF       (NRF_GPIO->OUTSET = LED_GREEN_MASK)
+#define LED_GREEN_TOGGLE    (NRF_GPIO->OUT   ^= LED_GREEN_MASK)
+#define LED_BLUE_ON         (NRF_GPIO->OUTCLR = LED_BLUE_MASK)
+#define LED_BLUE_OFF        (NRF_GPIO->OUTSET = LED_BLUE_MASK)
+#define LED_BLUE_TOGGLE     (NRF_GPIO->OUT   ^= LED_BLUE_MASK)
 /** @} */
 
 /**

@@ -38,10 +38,11 @@
 #include "x86_uart.h"
 
 #include <cpu.h>
-#include <kernel_internal.h>
 #include <tlsf-malloc.h>
 
 #include <stdio.h>
+
+#include "kernel_init.h"
 
 /* Must be <= 0x1000 because otherwise x86_map_physical_pages() might get a page out of this pool.
  * Because static memory has the PT_G flag, flushing the TLB would cause a stale PT
@@ -51,7 +52,7 @@ static char early_malloc_pool[0x1000] __attribute__((aligned(4)));
 
 void x86_startup(void)
 {
-    tlsf_add_pool(early_malloc_pool, sizeof early_malloc_pool);
+    tlsf_create_with_pool(early_malloc_pool, sizeof early_malloc_pool);
 
     x86_early_init_uart();
     x86_init_threading();

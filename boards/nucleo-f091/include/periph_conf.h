@@ -45,7 +45,7 @@ extern "C" {
 /* Timer 0 configuration */
 #define TIMER_0_DEV         TIM2
 #define TIMER_0_CHANNELS    4
-#define TIMER_0_PRESCALER   (47U)
+#define TIMER_0_FREQ        (CLOCK_CORECLOCK)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
 #define TIMER_0_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
 #define TIMER_0_IRQ_CHAN    TIM2_IRQn
@@ -86,74 +86,6 @@ extern "C" {
 #define UART_1_RX_PIN       7
 #define UART_1_TX_PIN       6
 #define UART_1_AF           0
-/** @} */
-
-/**
- * @name GPIO configuration
- * @{
- */
-#define GPIO_0_EN           1
-#define GPIO_1_EN           1
-#define GPIO_2_EN           1
-#define GPIO_3_EN           1
-#define GPIO_4_EN           1
-#define GPIO_5_EN           1
-#define GPIO_IRQ_PRIO       1
-
-/* IRQ config */
-#define GPIO_IRQ_0          -1                      /* not configured */
-#define GPIO_IRQ_1          -1                      /* not configured */
-#define GPIO_IRQ_2          -1                      /* not configured */
-#define GPIO_IRQ_3          -1                      /* not configured */
-#define GPIO_IRQ_4          -1                      /* not configured */
-#define GPIO_IRQ_5          -1                      /* not configured */
-#define GPIO_IRQ_6          -1                      /* not configured */
-#define GPIO_IRQ_7          -1                      /* not configured */
-#define GPIO_IRQ_8          -1                      /* not configured */
-#define GPIO_IRQ_9          -1                      /* not configured */
-#define GPIO_IRQ_10         GPIO_0
-#define GPIO_IRQ_11         GPIO_1
-#define GPIO_IRQ_12         GPIO_2
-#define GPIO_IRQ_13         GPIO_3
-#define GPIO_IRQ_14         GPIO_4
-#define GPIO_IRQ_15         GPIO_5
-
-/* GPIO channel 0 config */
-#define GPIO_0_PORT         GPIOC
-#define GPIO_0_PIN          10
-#define GPIO_0_CLK          19
-#define GPIO_0_EXTI_CFG()   (SYSCFG->EXTICR[2] |= SYSCFG_EXTICR3_EXTI10_PC)
-#define GPIO_0_IRQ          EXTI4_15_IRQn
-/* GPIO channel 1 config */
-#define GPIO_1_PORT         GPIOC
-#define GPIO_1_PIN          11
-#define GPIO_1_CLK          19
-#define GPIO_1_EXTI_CFG()   (SYSCFG->EXTICR[2] |= SYSCFG_EXTICR3_EXTI11_PC)
-#define GPIO_1_IRQ          EXTI4_15_IRQn
-/* GPIO channel 2 config */
-#define GPIO_2_PORT         GPIOC
-#define GPIO_2_PIN          12
-#define GPIO_2_CLK          19
-#define GPIO_2_EXTI_CFG()   (SYSCFG->EXTICR[3] |= SYSCFG_EXTICR4_EXTI12_PC)
-#define GPIO_2_IRQ          EXTI4_15_IRQn
-/* GPIO channel 3 config */
-#define GPIO_3_PORT         GPIOC
-#define GPIO_3_PIN          13                   /* Used for user button 1 */
-#define GPIO_3_CLK          19
-#define GPIO_3_EXTI_CFG()   (SYSCFG->EXTICR[3] |= SYSCFG_EXTICR4_EXTI13_PC)
-#define GPIO_3_IRQ          EXTI4_15_IRQn
-/* GPIO channel 4 config */
-#define GPIO_4_PORT         GPIOC
-#define GPIO_4_PIN          14
-#define GPIO_4_CLK          19
-#define GPIO_4_EXTI_CFG()   (SYSCFG->EXTICR[3] |= SYSCFG_EXTICR4_EXTI14_PC)
-#define GPIO_4_IRQ          EXTI4_15_IRQn
-/* GPIO channel 5 config */
-#define GPIO_5_PORT         GPIOC
-#define GPIO_5_PIN          15
-#define GPIO_5_CLK          19
-#define GPIO_5_EXTI_CFG()   (SYSCFG->EXTICR[3] |= SYSCFG_EXTICR4_EXTI15_PC)
-#define GPIO_5_IRQ          EXTI4_15_IRQn
 /** @} */
 
 /**

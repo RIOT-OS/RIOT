@@ -1,6 +1,5 @@
 export CPU_ARCH = cortex-m3
+export CPU_FAM  = stm32l1
 
-# use common periph functions
-USEMODULE += periph_common
-
+include $(RIOTCPU)/stm32_common/Makefile.include
 include $(RIOTCPU)/Makefile.include.cortexm_common

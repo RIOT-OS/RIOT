@@ -64,6 +64,11 @@ void lpm_end_awake(void);
  */
 enum lpm_mode lpm_get(void);
 
+/**
+ * @name LPM-internal variable
+ */
+extern volatile int lpm_prevent_sleep;
+
 #ifdef __cplusplus
 }
 #endif

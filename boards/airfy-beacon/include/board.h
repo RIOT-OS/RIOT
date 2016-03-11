@@ -28,11 +28,6 @@
 #endif
 
 /**
- * @name Define the nominal CPU core clock in this board
- */
-#define F_CPU               (16000000UL)
-
-/**
  * @brief   Xtimer configuration
  * @{
  */
@@ -44,24 +39,21 @@
 /** @} */
 
 /**
- * @name Define the boards stdio
- * @{
- */
-#define STDIO               UART_DEV(0)
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
-
-/**
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED_RED_PIN         16
+#define LED_RED_PIN         (GPIO_PIN(0, 16))
+#define LED_RED_MASK        (1 << 16)
 
-#define LED_RED_ON          (NRF_GPIO->OUTSET = (1 << LED_RED_PIN))
-#define LED_RED_OFF         (NRF_GPIO->OUTCLR = (1 << LED_RED_PIN))
-#define LED_RED_TOGGLE      (NRF_GPIO->OUT ^= (1 << LED_RED_PIN))
-
+#define LED_RED_ON          (NRF_GPIO->OUTSET = LED_RED_MASK)
+#define LED_RED_OFF         (NRF_GPIO->OUTCLR = LED_RED_MASK)
+#define LED_RED_TOGGLE      (NRF_GPIO->OUT   ^= LED_RED_MASK)
+#define LED_GREEN_ON        /* not available */
+#define LED_GREEN_OFF       /* not available */
+#define LED_GREEN_TOGGLE    /* not available */
+#define LED_BLUE_ON         /* not available */
+#define LED_BLUE_OFF        /* not available */
+#define LED_BLUE_TOGGLE     /* not available */
 /* @} */
 
 /**

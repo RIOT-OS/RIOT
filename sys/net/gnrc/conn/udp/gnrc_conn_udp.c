@@ -10,6 +10,8 @@
  * @{
  *
  * @file
+ * @brief       GNRC implementation of the udp interface defined by net/gnrc/udp.h
+ *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 

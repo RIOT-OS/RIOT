@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_hashes Hashes
+ * @ingroup     sys_hashes Hashes
  * @ingroup     sys
  * @brief       Hash function library
  * @{
@@ -17,7 +17,6 @@
  *
  * @author      Jason Linehan <patientulysses@gmail.com>
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
- * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef HASHES_H_
@@ -31,7 +30,7 @@ extern "C" {
 #endif
 
 /**
- * @brief djb2_hash
+ * @brief djb2
  *
  * HISTORY
  * This algorithm (k=33) was first reported by Dan Bernstein many years
@@ -50,7 +49,7 @@ extern "C" {
 uint32_t djb2_hash(const uint8_t *buf, size_t len);
 
 /**
- * @brief sdbm_hash
+ * @brief sdbm
  *
  * HISTORY
  * This algorithm was created for sdbm (a public-domain reimplementation
@@ -75,7 +74,7 @@ uint32_t djb2_hash(const uint8_t *buf, size_t len);
 uint32_t sdbm_hash(const uint8_t *buf, size_t len);
 
 /**
- * @brief lose lose
+ * @brief Kernighan and Ritchie
  *
  * HISTORY
  * This hash function appeared in K&R (1st ed) but at least the reader
@@ -100,9 +99,7 @@ uint32_t sdbm_hash(const uint8_t *buf, size_t len);
 uint32_t kr_hash(const uint8_t *buf, size_t len);
 
 /**
- * @brief sax_hash
- *
- * Shift, Add, XOR
+ * @brief Shift, Add, XOR
  *
  * @param buf input buffer to hash
  * @param len length of buffer
@@ -111,7 +108,7 @@ uint32_t kr_hash(const uint8_t *buf, size_t len);
 uint32_t sax_hash(const uint8_t *buf, size_t len);
 
 /**
- * @brief dek_hash
+ * @brief Donald E. Knuth
  *
  * HISTORY
  * Proposed by Donald E. Knuth in The Art Of Computer Programming Vol. 3,
@@ -124,7 +121,7 @@ uint32_t sax_hash(const uint8_t *buf, size_t len);
 uint32_t dek_hash(const uint8_t *buf, size_t len);
 
 /**
- * @brief fnv_hash
+ * @brief Fowler–Noll–Vo
  *
  * NOTE
  * For a more fully featured and modern version of this hash, see fnv32.c
@@ -137,7 +134,7 @@ uint32_t fnv_hash(const uint8_t *buf, size_t len);
 
 
 /**
- * @brief rotating_hash
+ * @brief Rotating
  *
  * found on
  * http://burtleburtle.net/bob/hash/doobs.html
@@ -149,7 +146,7 @@ uint32_t fnv_hash(const uint8_t *buf, size_t len);
 uint32_t rotating_hash(const uint8_t *buf, size_t len);
 
 /**
- * @brief one_at_a_time_hash
+ * @brief One at a time
  *
  * found on
  * http://burtleburtle.net/bob/hash/doobs.html
@@ -159,36 +156,6 @@ uint32_t rotating_hash(const uint8_t *buf, size_t len);
  * @return 32 bit sized hash
  */
 uint32_t one_at_a_time_hash(const uint8_t *buf, size_t len);
-
-/**
- * @brief Fletcher's 16 bit checksum
- *
- * found on
- * http://en.wikipedia.org/w/index.php?title=Fletcher%27s_checksum&oldid=661273016#Optimizations
- *
- * @note the returned sum is never 0
- *
- * @param buf input buffer to hash
- * @param bytes length of buffer, in bytes
- * @return 16 bit sized hash in the interval [1..65535]
- */
-uint16_t fletcher16(const uint8_t *buf, size_t bytes);
-
-/**
- * @brief Fletcher's 32 bit checksum
- *
- * found on
- * http://en.wikipedia.org/w/index.php?title=Fletcher%27s_checksum&oldid=661273016#Optimizations
- *
- * @note the returned sum is never 0
- * @note pay attention to alignment issues since this operates on an input
- *       buffer containing 16 bit words, not bytes.
- *
- * @param buf input buffer to hash
- * @param words length of buffer, in 16 bit words
- * @return 32 bit sized hash in the interval [1..2^32]
- */
-uint32_t fletcher32(const uint16_t *buf, size_t words);
 
 #ifdef __cplusplus
 }

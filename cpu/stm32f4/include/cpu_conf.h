@@ -21,6 +21,8 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #if defined(CPU_MODEL_STM32F401RE)
 #include "stm32f401xe.h"
 #elif defined(CPU_MODEL_STM32F407VG)
@@ -41,11 +43,6 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (82U)
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
-
-/**
- * @brief Length for reading CPU_ID
- */
-#define CPUID_ID_LEN                    (12)
 
 #ifdef __cplusplus
 }

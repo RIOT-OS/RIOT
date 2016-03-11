@@ -19,6 +19,7 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
 #include "nrf51.h"
 #include "nrf51_bitfields.h"
 
@@ -33,11 +34,6 @@ extern "C" {
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
 #define CPU_IRQ_NUMOF                   (26U)
 /** @} */
-
-/**
- * @name Length in bytes for reading CPU_ID
- */
-#define CPUID_ID_LEN                    (8)
 
 #ifdef __cplusplus
 }

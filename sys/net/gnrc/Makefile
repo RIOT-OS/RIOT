@@ -13,6 +13,9 @@ endif
 ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
     DIRS += network_layer/icmpv6/echo
 endif
+ifneq (,$(filter gnrc_icmpv6_error,$(USEMODULE)))
+    DIRS += network_layer/icmpv6/error
+endif
 ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
     DIRS += network_layer/ipv6
 endif
@@ -30,6 +33,9 @@ ifneq (,$(filter gnrc_ipv6_netif,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
     DIRS += network_layer/ipv6/whitelist
+endif
+ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
+    DIRS += network_layer/ipv6/blacklist
 endif
 ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
     DIRS += network_layer/ndp
@@ -66,6 +72,9 @@ ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_nomac,$(USEMODULE)))
     DIRS += link_layer/nomac
+endif
+ifneq (,$(filter gnrc_pkt,$(USEMODULE)))
+    DIRS += pkt
 endif
 ifneq (,$(filter gnrc_pktbuf_static,$(USEMODULE)))
     DIRS += pktbuf_static

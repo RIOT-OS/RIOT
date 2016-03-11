@@ -1,0 +1,16 @@
+# define the cpu used by the OpenMote-cc2538 board
+export CPU = cc2538
+export CPU_MODEL = cc2538sf53
+
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbserial-* | head -n 1)
+
+# setup JLink for flashing
+export JLINK_DEVICE := cc2538sf53
+export JLINK_FLASH_ADDR := 200000
+export JLINK_IF := JTAG
+include $(RIOTBOARD)/Makefile.include.jlink
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial

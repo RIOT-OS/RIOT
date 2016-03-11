@@ -19,14 +19,15 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
 #include "cc2538.h"
-#include "cc2538-gpio.h"
-#include "cc2538-uart.h"
-#include "gptimer.h"
-#include "ioc.h"
-#include "soc-adc.h"
-#include "rfcore.h"
-#include "sys-ctrl.h"
+#include "cc2538_gpio.h"
+#include "cc2538_uart.h"
+#include "cc2538_gptimer.h"
+#include "cc2538_ioc.h"
+#include "cc2538_soc_adc.h"
+#include "cc2538_rfcore.h"
+#include "cc2538_sys_ctrl.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,13 +41,6 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   PERIPH_COUNT_IRQn
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
-
-/**
- * @brief   length of CPU ID for @ref cpuid_get() in @ref periph/cpuid.h
- */
-#ifndef CPUID_ID_LEN
-#define CPUID_ID_LEN                    8
-#endif
 
 #ifdef __cplusplus
 } /* end extern "C" */

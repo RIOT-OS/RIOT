@@ -19,7 +19,6 @@
 
 #include <time.h>
 
-#include "kernel.h"
 #include "mutex.h"
 
 #ifdef __cplusplus

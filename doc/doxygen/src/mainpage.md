@@ -35,7 +35,7 @@ RIOT is developed by an open community that anyone is welcome to join:
    RIOT (or to just stay in the loop). A searchable archive of this list is
    available at the
    [RIOT user Gmane newsgroup](http://news.gmane.org/gmane.os.riot.user)
- - [Subscribe]((http://lists.riot-os.org/mailman/listinfo/devel) to
+ - [Subscribe](http://lists.riot-os.org/mailman/listinfo/devel) to
    devel@riot-os.org to follow and discuss kernel and network stack
    developement, or hardware support. A searchable archive of this list is
    available at the
@@ -204,6 +204,8 @@ starting point for anyone who is new to RIOT.
 For more information best browse that directory and have a look at the
 `README.md` files that ship with each example.
 
+To create your own application — here or anywhere else — see @ref creating-an-application
+
 tests
 -----
 Many features/modules in RIOT come with their own test application, which are
@@ -226,11 +228,13 @@ debugging, reseting (e.g. support for [OpenOCD](http://openocd.org/),
 integration to open testbeds such as the [IoT-LAB](https://www.iot-lab.info/).
 Furthermore you can find here scripts to do all kind of code and style checks.
 
-<!--
 Further information                                      {#further-information}
 ===================
-*TBD*
+ - @ref getting-started
+ - @ref creating-an-application
+ - @ref creating-modules
 
+<!--
 Idea for this section: just name each of RIOT's main features/concepts and link
 to an appropriate page with further information:
     - Create an application

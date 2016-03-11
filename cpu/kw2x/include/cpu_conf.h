@@ -25,6 +25,8 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #ifdef CPU_MODEL_KW21D256
 #include "MKW22D5.h"
 #elif CPU_MODEL_KW21D512
@@ -50,16 +52,6 @@ extern "C"
 #define CPU_IRQ_NUMOF                   (65U)
 #define CPU_FLASH_BASE                  (0x00000000)
 /** @} */
-
-/**
- * @brief Length for reading CPU_ID in octets
- */
-#define CPUID_ID_LEN                     (16)
-
-/**
- * @brief Pointer to CPU_ID
- */
-#define CPUID_ID_PTR                     ((void *)(&(SIM_UIDH)))
 
 /**
  * @name GPIO pin mux function numbers

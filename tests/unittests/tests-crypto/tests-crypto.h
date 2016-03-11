@@ -19,8 +19,10 @@
 #ifndef TESTS_CRYPTO_H_
 #define TESTS_CRYPTO_H_
 
+#include <stddef.h>
+#include <stdint.h>
+
 #include "embUnit.h"
-#include "kernel.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,13 +32,6 @@ extern "C" {
  * @brief   The entry point of this test suite.
  */
 void tests_crypto(void);
-
-/**
- * @brief   Generates tests for crypto/sha256.h
- *
- * @return  embUnit tests if successful, NULL if not.
- */
-Test *tests_crypto_sha256_tests(void);
 
 /**
  * @brief   Generates tests for crypto/chacha.h

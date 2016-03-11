@@ -34,7 +34,6 @@
 #include "x86_threading.h"
 #include "cpu.h"
 #include "irq.h"
-#include "kernel_internal.h"
 #include "ucontext.h"
 #include "sched.h"
 #include "stdbool.h"
@@ -142,7 +141,7 @@ void isr_cpu_switch_context_exit(void)
 
 void cpu_switch_context_exit(void)
 {
-    dINT();
+    disableIRQ();
 
     if (!x86_in_isr) {
         x86_in_isr = true;
@@ -206,7 +205,7 @@ static void fpu_used_interrupt(uint8_t intr_num, struct x86_pushad *orig_ctx, un
 
 static void x86_thread_exit(void)
 {
-    dINT();
+    disableIRQ();
     if (fpu_owner == sched_active_pid) {
         fpu_owner = KERNEL_PID_UNDEF;
     }

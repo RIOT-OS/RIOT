@@ -81,15 +81,21 @@
 #define SCHEDULER_H
 
 #include <stddef.h>
+#include "attributes.h"
 #include "bitarithm.h"
-#include "tcb.h"
 #include "attributes.h"
 #include "kernel_types.h"
 #include "native_sched.h"
+#include "clist.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
+
+/**
+ * @brief forward declaration for thread_t, defined in thread.h
+ */
+typedef struct _thread thread_t;
 
 /**
  * @def SCHED_PRIO_LEVELS
@@ -112,7 +118,7 @@ int sched_run(void);
  *                          targeted process
  * @param[in]   status      The new status of this thread
  */
-void sched_set_status(tcb_t *process, unsigned int status);
+void sched_set_status(thread_t *process, unsigned int status);
 
 /**
  * @brief       Yield if approriate.
@@ -142,12 +148,12 @@ extern volatile unsigned int sched_context_switch_request;
 /**
  *  Thread table
  */
-extern volatile tcb_t *sched_threads[KERNEL_PID_LAST + 1];
+extern volatile thread_t *sched_threads[KERNEL_PID_LAST + 1];
 
 /**
  *  Currently active thread
  */
-extern volatile tcb_t *sched_active_thread;
+extern volatile thread_t *sched_active_thread;
 
 /**
  *  Number of running (non-terminated) threads
@@ -163,6 +169,11 @@ extern volatile kernel_pid_t sched_active_pid;
  * List of runqueues per priority level
  */
 extern clist_node_t *sched_runqueues[SCHED_PRIO_LEVELS];
+
+/**
+ * @brief  Removes thread from scheduler and set status to #STATUS_STOPPED
+ */
+NORETURN void sched_task_exit(void);
 
 #ifdef MODULE_SCHEDSTATISTICS
 /**
@@ -186,8 +197,7 @@ extern schedstat sched_pidlist[KERNEL_PID_LAST + 1];
  *  @param[in] callback The callback functions the will be called
  */
 void sched_register_cb(void (*callback)(uint32_t, uint32_t));
-
-#endif
+#endif /* MODULE_SCHEDSTATISTICS */
 
 #ifdef __cplusplus
 }

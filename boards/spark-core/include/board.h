@@ -31,23 +31,14 @@
 #endif
 
 /**
- * @name Define the nominal CPU core clock in this board
- */
-#define F_CPU               CLOCK_CORECLOCK
-
-/**
  * @name Define the location of the RIOT image in flash
  */
 #define LOCATION_VTABLE     (0x08005000)
 
 /**
- * @name Define the UART to be used as stdio and its baudrate
- * @{
+ * @name Tell the xtimer that we use a 16-bit peripheral timer
  */
-#define STDIO               UART_0
-#define STDIO_BAUDRATE      (115200)
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
+#define XTIMER_MASK         (0xffff0000)
 
 /**
  * @name LED pin definitions

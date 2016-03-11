@@ -22,6 +22,8 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #ifdef CPU_MODEL_STM32F303VC
 #include "stm32f303xc.h"
 #endif
@@ -44,11 +46,6 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (82U)
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
-
-/**
- * @brief Length for reading CPU_ID
- */
-#define CPUID_ID_LEN                    (12)
 
 
 #ifdef __cplusplus

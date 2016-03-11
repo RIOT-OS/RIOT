@@ -32,11 +32,11 @@ extern "C" {
 /**
  * @brief   Decompresses a received 6LoWPAN IPHC frame.
  *
- * @pre (ipv6 != NULL) && (ipv6->size >= sizeof(gnrc_ipv6_hdr_t))
+ * @pre (dec_hdr != NULL) && (*dec_hdr != NULL) && ((*dec_hdr)->size >= sizeof(gnrc_ipv6_hdr_t))
  *
- * @param[out] ipv6         A pre-allocated IPv6 header. Will not be inserted into
- *                          @p pkt
- * @param[in,out] pkt       A received 6LoWPAN IPHC frame. IPHC dispatch will not
+ * @param[out] dec_hdr      A pre-allocated IPv6 header. Will not be inserted into
+ *                          @p pkt. May change due to next headers being added in NHC.
+ * @param[in] pkt           A received 6LoWPAN IPHC frame. IPHC dispatch will not
  *                          be marked.
  * @param[in] datagram_size Size of the full uncompressed IPv6 datagram. May be 0, if @p pkt
  *                          contains the full (unfragmented) IPv6 datagram.
@@ -45,8 +45,8 @@ extern "C" {
  * @return  length of the HC dispatches + inline values on success.
  * @return  0 on error.
  */
-size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *pkt, size_t datagram_size,
-                                  size_t offset);
+size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
+                                  size_t datagram_size, size_t offset);
 
 /**
  * @brief   Compresses a 6LoWPAN for IPHC.

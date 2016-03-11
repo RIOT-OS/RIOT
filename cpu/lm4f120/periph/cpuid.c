@@ -7,22 +7,23 @@
  */
 
 /**
- * @addtogroup      driver_periph
- * @ingroup         cpu_lm4f120
+ * @addtogroup      cpu_lm4f120
  * @{
  *
- * @file            cpuid.c
+ * @file
  * @brief           Low-level CPUID driver implementation
  *
  * @author          Rakendra Thapa <rakendrathapa@gmail.com>
+ *
+ * @}
  */
 
 #include <string.h>
-#include "cpu_conf.h"
+
+#include "cpu.h"
 #include "periph/cpuid.h"
 
 void cpuid_get(void *id)
 {
-    memcpy(id, (void *)(CPUID_ADDR), CPUID_ID_LEN);
+    memcpy(id, (void *)(NVIC_CPUID), CPUID_LEN);
 }
-/** @} */

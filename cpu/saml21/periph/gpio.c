@@ -51,12 +51,7 @@ static const int8_t exti_config[2][32] = {
       0,  1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1, -1, -1, 14, 15},
 };
 
-typedef struct {
-    gpio_cb_t cb;       /**< callback called from GPIO interrupt */
-    void *arg;          /**< argument passed to the callback */
-} gpio_state_t;
-
-static gpio_state_t gpio_config[NUMOF_IRQS];
+static gpio_isr_ctx_t gpio_config[NUMOF_IRQS];
 
 
 static inline PortGroup *_port(gpio_t pin)

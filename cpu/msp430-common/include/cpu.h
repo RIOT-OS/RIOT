@@ -27,6 +27,7 @@
 #include "board.h"
 
 #include "sched.h"
+#include "thread.h"
 #include "msp430_types.h"
 #include "cpu_conf.h"
 
@@ -43,14 +44,6 @@ extern "C" {
  * @brief   Macro for defining interrupt service routines
  */
 #define ISR(a,b)        void __attribute__((naked, interrupt (a))) b(void)
-
-/**
- * @brief   Deprecated interrupt control functions for backward compatibility
- * @{
- */
-#define eINT            enableIRQ
-#define dINT            disableIRQ
-/** @} */
 
 /**
  * @brief Globally disable IRQs

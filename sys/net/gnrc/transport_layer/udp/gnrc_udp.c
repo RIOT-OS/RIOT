@@ -20,7 +20,6 @@
 #include <stdint.h>
 #include <errno.h>
 
-#include "kernel.h"
 #include "byteorder.h"
 #include "msg.h"
 #include "thread.h"
@@ -105,14 +104,14 @@ static void _receive(gnrc_pktsnip_t *pkt)
     }
     pkt = udp;
 
-    LL_SEARCH_SCALAR(pkt, ipv6, type, GNRC_NETTYPE_IPV6);
+    ipv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
 
     assert(ipv6 != NULL);
 
-    if ((ipv6->next != NULL) && (ipv6->next->type == GNRC_NETTYPE_UDP) &&
-        (ipv6->next->size == sizeof(udp_hdr_t))) {
+    if ((pkt->next != NULL) && (pkt->next->type == GNRC_NETTYPE_UDP) &&
+        (pkt->next->size == sizeof(udp_hdr_t))) {
         /* UDP header was already marked. Take it. */
-        udp = ipv6->next;
+        udp = pkt->next;
     }
     else {
         udp = gnrc_pktbuf_mark(pkt, sizeof(udp_hdr_t), GNRC_NETTYPE_UDP);

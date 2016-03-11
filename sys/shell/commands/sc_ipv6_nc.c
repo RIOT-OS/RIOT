@@ -179,7 +179,7 @@ static int _ipv6_nc_add(int argc, char **argv)
     }
 
     if ((l2_addr_str != NULL) && (l2_addr_len = gnrc_netif_addr_from_str(l2_addr, sizeof(l2_addr),
-                                                                         argv[1])) == 0) {
+                                                                         l2_addr_str)) == 0) {
         puts("error: unable to parse link-layer address.");
         return 1;
     }

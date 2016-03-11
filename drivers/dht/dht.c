@@ -1,6 +1,7 @@
 /*
  * Copyright 2015 Ludwig Knüpfer
- * Copyright 2015 Christian Mehlis
+ *           2015 Christian Mehlis
+ *           2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,131 +18,72 @@
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
 #include <stdint.h>
+#include <string.h>
 
+#include "log.h"
 #include "xtimer.h"
 #include "timex.h"
 #include "periph/gpio.h"
 
 #include "dht.h"
+#include "dht_params.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/***********************************************************************
- * internal API declaration
- **********************************************************************/
+#define PULSE_WIDTH_THRESHOLD       (40U)
 
-static void dht_read_data(gpio_t dev, uint32_t *data, uint8_t *checksum);
-static int dht_test_checksum(uint32_t data, uint8_t checksum);
-void dht_parse_11(dht_data_t *data, float *outhum, float *outtemp);
-void dht_parse_22(dht_data_t *data, float *outhum, float *outtemp);
+/**
+ * @brief   Allocation of memory for device descriptors
+ */
+dht_t dht_devs[DHT_NUMOF];
 
-/***********************************************************************
- * internal API implementation
- **********************************************************************/
-
-void dht_parse_11(dht_data_t *data, float *outhum, float *outtemp)
+static uint16_t read(gpio_t pin, int bits)
 {
-    *outhum = data->humidity >> 8;
-    *outtemp = data->temperature >> 8;
-}
+    uint32_t start, end;
+    uint16_t res = 0;
 
-void dht_parse_22(dht_data_t *data, float *outhum, float *outtemp)
-{
-    *outhum = data->humidity / 10;
-
-    /* the highest bit indicates a negative value */
-    if (data->temperature & 0x8000) {
-        *outtemp = (data->temperature & 0x7FFF) / -10;
-    }
-    else {
-        *outtemp = data->temperature / 10;
-    }
-}
-
-static int dht_test_checksum(uint32_t data, uint8_t checksum)
-{
-    uint8_t sum;
-    sum  = (data >>  0) & 0x000000FF;
-    sum += (data >>  8) & 0x000000FF;
-    sum += (data >> 16) & 0x000000FF;
-    sum += (data >> 24) & 0x000000FF;
-
-    return ((checksum == sum) && (checksum != 0));
-}
-
-static void dht_read_data(gpio_t dev, uint32_t *data, uint8_t *checksum)
-{
-    /* send init signal to device */
-    gpio_clear(dev);
-    xtimer_usleep(20 * MS_IN_USEC);
-    gpio_set(dev);
-    xtimer_usleep(40);
-
-    /* sync on device */
-    gpio_init(dev, GPIO_DIR_IN, GPIO_PULLUP);
-    while (!gpio_read(dev)) ;
-    while (gpio_read(dev)) ;
-
-    /*
-     * data is read in sequentially, highest bit first:
-     *  40 .. 24  23   ..   8  7  ..  0
-     * [humidity][temperature][checksum]
-     */
-
-    /* read all the bits */
-    uint64_t les_bits = 0x00000000000000;
-    for (int c = 0; c < 40; c++) {
-        les_bits <<= 1; /* this is a nop in the first iteration, but
-                           we must not shift the last bit */
-        /* wait for start of bit */
-        while (!gpio_read(dev)) ;
-        unsigned long start = xtimer_now();
-        /* wait for end of bit */
-        while (gpio_read(dev)) ;
-        /* calculate bit length (long 1, short 0) */
-        unsigned long stop = xtimer_now();
-        /* compensate for overflow if needed */
-        if (stop < start) {
-            stop = UINT32_MAX - stop;
-            start = 0;
-        }
-        if ((stop - start) > 40) {
-            /* read 1, set bit */
-            les_bits |= 0x0000000000000001;
-        }
-        else {
-            /* read 0, don't set bit */
+    for (int i = 0; i < bits; i++) {
+        res <<= 1;
+        /* measure the length between the next rising and falling flanks (the
+         * time the pin is high - smoke up :-) */
+        while (!gpio_read(pin));
+        start = xtimer_now();
+        while (gpio_read(pin));
+        end = xtimer_now();
+        /* if the high phase was more than 40us, we got a 1 */
+        if ((end - start) > PULSE_WIDTH_THRESHOLD) {
+            res |= 0x0001;
         }
     }
-
-    *checksum = les_bits & 0x00000000000000FF;
-    *data = (les_bits >> 8) & 0x00000000FFFFFFFF;
-
-    gpio_init(dev, GPIO_DIR_OUT, GPIO_PULLUP);
-    gpio_set(dev);
+    return res;
 }
 
-/***********************************************************************
- * public API implementation
- **********************************************************************/
+void dht_auto_init(void)
+{
+    for (unsigned i = 0; i < DHT_NUMOF; i++) {
+        if (dht_init(&dht_devs[i], &dht_params[i]) < 0) {
+            LOG_ERROR("Unable to initialize DHT sensor #%i\n", i);
+        }
+    }
+}
 
-int dht_init(dht_t *dev, dht_type_t type, gpio_t gpio)
+int dht_init(dht_t *dev, const dht_params_t *params)
 {
     DEBUG("dht_init\n");
 
-    dev->gpio = gpio;
-    dev->type = type;
+    memcpy(dev, params, sizeof(dht_t));
 
-    if (gpio_init(gpio, GPIO_DIR_OUT, GPIO_PULLUP) == -1) {
+    if (gpio_init(dev->pin, GPIO_DIR_OUT, dev->pull) == -1) {
         return -1;
     }
-    gpio_set(gpio);
+    gpio_set(dev->pin);
 
     xtimer_usleep(2000 * MS_IN_USEC);
 
@@ -149,51 +91,64 @@ int dht_init(dht_t *dev, dht_type_t type, gpio_t gpio)
     return 0;
 }
 
-
-int dht_read_raw(dht_t *dev, dht_data_t *outdata)
+int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
 {
-    uint32_t data;
-    uint8_t checksum;
+    uint8_t csum, sum;
+    uint16_t raw_hum, raw_temp;
 
-    /* read raw data */
-    dht_read_data(dev->gpio, &data, &checksum);
+    /* send init signal to device */
+    gpio_clear(dev->pin);
+    xtimer_usleep(20 * MS_IN_USEC);
+    gpio_set(dev->pin);
+    xtimer_usleep(40);
 
-    /* check checksum */
-    int ret = dht_test_checksum(data, checksum);
-    if (!ret) {
-        DEBUG("checksum fail\n");
-    }
+    /* sync on device */
+    gpio_init(dev->pin, GPIO_DIR_IN, dev->pull);
+    while (!gpio_read(dev->pin)) ;
+    while (gpio_read(dev->pin)) ;
 
-    outdata->humidity = data >> 16;
-    outdata->temperature = data & 0x0000FFFF;
+    /*
+     * data is read in sequentially, highest bit first:
+     *  40 .. 24  23   ..   8  7  ..  0
+     * [humidity][temperature][checksum]
+     */
 
-    return (ret - 1); /* take that logic! */
-}
+    /* read the humidity, temperature, and checksum bits */
+    raw_hum = read(dev->pin, 16);
+    raw_temp = read(dev->pin, 16);
+    csum = (uint8_t)read(dev->pin, 8);
 
-void dht_parse(dht_t *dev, dht_data_t *data, float *outrelhum, float *outtemp)
-{
-    switch (dev->type) {
-        case (DHT11):
-            dht_parse_11(data, outrelhum, outtemp);
-            break;
+    /* set pin high again - so we can trigger the next reading by pulling it low
+     * again */
+    gpio_init(dev->pin, GPIO_DIR_OUT, dev->pull);
+    gpio_set(dev->pin);
 
-        case DHT22:
-            dht_parse_22(data, outrelhum, outtemp);
-            break;
-
-        default:
-            DEBUG("unknown DHT type\n");
-    }
-}
-
-int dht_read(dht_t *dev, float *outrelhum, float *outtemp)
-{
-    /* read data, fail on error */
-    dht_data_t data;
-    if (dht_read_raw(dev, &data) == -1) {
+    /* validate the checksum */
+    sum = (raw_temp >> 8) + (raw_temp & 0xff) + (raw_hum >> 8) + (raw_hum & 0xff);
+    if ((sum != csum) || (csum == 0)) {
+        DEBUG("error: checksum invalid\n");
         return -1;
     }
 
-    dht_parse(dev, &data, outrelhum, outtemp);
+    /* parse the RAW values */
+    DEBUG("RAW values: temp: %7i hum: %7i\n", (int)raw_temp, (int)raw_hum);
+    switch (dev->type) {
+        case DHT11:
+            *temp = (int16_t)((raw_temp >> 8) * 10);
+            *hum = (int16_t)((raw_hum >> 8) * 10);
+            break;
+        case DHT22:
+            *hum = (int16_t)raw_hum;
+            /* if the high-bit is set, the value is negative */
+            if (raw_temp & 0x8000) {
+                *temp = (int16_t)((raw_temp & ~0x8000) * -1);
+            }
+            else {
+                *temp = (int16_t)raw_temp;
+            }
+        default:
+            return -2;
+    }
+
     return 0;
 }

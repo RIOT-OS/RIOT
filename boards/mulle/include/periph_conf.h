@@ -50,10 +50,6 @@ extern "C"
 #define CPU_INT_FAST_CLK_HZ             4000000u
 /** Default System clock value */
 #define DEFAULT_SYSTEM_CLOCK            (CPU_XTAL32k_CLK_HZ * 2929u)
-
-/** @todo Investigate the side effects of making F_CPU run-time variable */
-#define F_CPU DEFAULT_SYSTEM_CLOCK
-
 /** @} */
 
 /**
@@ -509,9 +505,8 @@ extern "C"
  * @name Random Number Generator configuration
  * @{
  */
-#define RANDOM_NUMOF            (1U)
-#define RANDOM_CLKEN()          (BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT) = 1)
-#define RANDOM_CLKDIS()         (BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT) = 0)
+#define HWRNG_CLKEN()       (BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT) = 1)
+#define HWRNG_CLKDIS()      (BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT) = 0)
 /** @} */
 
 #ifdef __cplusplus

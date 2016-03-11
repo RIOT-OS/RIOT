@@ -46,8 +46,8 @@ extern "C" {
  * @param[in] pkt   A packet.
  * @param[in] nh    A protocol number (see @ref net_protnum).
  *
- * @return  true, on success.
- * @return  false, on failure.
+ * @return  true, on success - continue packet processing.
+ * @return  false, on failure - stop packet processing.
  */
 bool gnrc_ipv6_ext_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                          uint8_t nh);

@@ -80,6 +80,10 @@
 #include "net/fib.h"
 #endif
 
+#ifdef MODULE_TINYMT32
+#include "random.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -90,6 +94,9 @@ void auto_init(void)
     config_load();
 #endif
 
+#ifdef MODULE_TINYMT32
+    random_init(0);
+#endif
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
@@ -138,6 +145,11 @@ void auto_init(void)
     DEBUG("Auto init UDP module.\n");
     gnrc_udp_init();
 #endif
+#ifdef MODULE_DHT
+    DEBUG("Auto init DHT devices.\n");
+    extern void dht_auto_init(void);
+    dht_auto_init();
+#endif
 
 
 /* initialize network devices */
@@ -156,6 +168,11 @@ void auto_init(void)
 #ifdef MODULE_ENC28J60
     extern void auto_init_enc28j60(void);
     auto_init_enc28j60();
+#endif
+
+#ifdef MODULE_ETHOS
+    extern void auto_init_ethos(void);
+    auto_init_ethos();
 #endif
 
 #ifdef MODULE_GNRC_SLIP
@@ -212,6 +229,10 @@ void auto_init(void)
 #ifdef MODULE_L3G4200D
     extern void auto_init_l3g4200d(void);
     auto_init_l3g4200d();
+#endif
+#ifdef MODULE_LIS3DH
+    extern void auto_init_lis3dh(void);
+    auto_init_lis3dh();
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */

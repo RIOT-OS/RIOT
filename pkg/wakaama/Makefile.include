@@ -1,1 +1,1 @@
-INCLUDES += -I$(RIOTBASE)/pkg/wakaama/wakaama
+INCLUDES += -I$(RIOTPKG)/wakaama/wakaama

@@ -30,14 +30,12 @@ static int lis3dh_read_regs(const lis3dh_t *dev, const lis3dh_reg_t reg, const u
                             uint8_t *buf);
 
 
-int lis3dh_init(lis3dh_t *dev, spi_t spi, gpio_t cs_pin, gpio_t int1_pin, gpio_t int2_pin, uint8_t scale)
+int lis3dh_init(lis3dh_t *dev, spi_t spi, gpio_t cs_pin, uint8_t scale)
 {
     uint8_t in;
 
     dev->spi = spi;
     dev->cs = cs_pin;
-    dev->int1 = int1_pin;
-    dev->int2 = int2_pin;
     dev->scale = 0;
 
     /* CS */
@@ -72,10 +70,6 @@ int lis3dh_init(lis3dh_t *dev, spi_t spi, gpio_t cs_pin, gpio_t int1_pin, gpio_t
 
     /* Configure scale */
     lis3dh_set_scale(dev, scale);
-
-    /* Initialize the interrupt pins */
-    gpio_init(dev->int1, GPIO_DIR_IN, GPIO_NOPULL);
-    gpio_init(dev->int2, GPIO_DIR_IN, GPIO_NOPULL);
 
     return 0;
 }
@@ -172,27 +166,32 @@ int lis3dh_set_odr(lis3dh_t *dev, const uint8_t odr)
 
 int lis3dh_set_scale(lis3dh_t *dev, const uint8_t scale)
 {
+    uint8_t scale_reg;
     /* Sensor full range is -32768 -- +32767 (measurements are left adjusted) */
     /*  => Scale factor is scale/32768 */
     switch (scale)
     {
-        case LIS3DH_SCALE_2G:
+        case 2:
             dev->scale = 2000;
+            scale_reg = LIS3DH_CTRL_REG4_SCALE_2G;
             break;
-        case LIS3DH_SCALE_4G:
+        case 4:
             dev->scale = 4000;
+            scale_reg = LIS3DH_CTRL_REG4_SCALE_4G;
             break;
-        case LIS3DH_SCALE_8G:
+        case 8:
             dev->scale = 8000;
+            scale_reg = LIS3DH_CTRL_REG4_SCALE_8G;
             break;
-        case LIS3DH_SCALE_16G:
+        case 16:
             dev->scale = 16000;
+            scale_reg = LIS3DH_CTRL_REG4_SCALE_16G;
             break;
         default:
             return -1;
     }
     return lis3dh_write_bits(dev, LIS3DH_REG_CTRL_REG4, LIS3DH_CTRL_REG4_FS_MASK,
-                             scale);
+                             scale_reg);
 }
 
 int lis3dh_set_int1(lis3dh_t *dev, const uint8_t mode)

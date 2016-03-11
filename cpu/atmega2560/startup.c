@@ -24,8 +24,6 @@
 
 /* For Catchall-Loop */
 #include "board.h"
-#include <util/delay.h>
-#include <stdio.h>
 
 
 /**

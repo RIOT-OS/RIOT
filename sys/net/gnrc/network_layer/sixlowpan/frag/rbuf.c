@@ -29,8 +29,17 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+/* estimated fragment payload size to determinate RBUF_INT_SIZE, default to
+ * MAC payload size - fragment header. */
+#ifndef GNRC_SIXLOWPAN_FRAG_SIZE
+/* assuming 64-bit source/destination address, source PAN ID omitted */
+#define GNRC_SIXLOWPAN_FRAG_SIZE (104 - 5)
+#endif
+
 #ifndef RBUF_INT_SIZE
-#define RBUF_INT_SIZE   (GNRC_IPV6_NETIF_DEFAULT_MTU * RBUF_SIZE / 127)
+/* same as ((int) ceil((double) N / D)) */
+#define DIV_CEIL(N, D) (((N) + (D) - 1) / (D))
+#define RBUF_INT_SIZE (DIV_CEIL(GNRC_IPV6_NETIF_DEFAULT_MTU, GNRC_SIXLOWPAN_FRAG_SIZE) * RBUF_SIZE)
 #endif
 
 static rbuf_int_t rbuf_int[RBUF_INT_SIZE];
@@ -44,8 +53,8 @@ static char l2addr_str[3 * RBUF_L2ADDR_MAX_LEN];
 /* ------------------------------------
  * internal function definitions
  * ------------------------------------*/
-/* checks whether start and end are in given interval i */
-static inline bool _rbuf_int_in(rbuf_int_t *i, uint16_t start, uint16_t end);
+/* checks whether start and end overlaps, but not identical to, given interval i */
+static inline bool _rbuf_int_overlap_partially(rbuf_int_t *i, uint16_t start, uint16_t end);
 /* gets a free entry from interval buffer */
 static rbuf_int_t *_rbuf_int_get_free(void);
 /* remove entry from reassembly buffer */
@@ -66,6 +75,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     /* cppcheck is clearly wrong here */
     /* cppcheck-suppress variableScope */
     unsigned int data_offset = 0;
+    size_t original_size = frag_size;
     sixlowpan_frag_t *frag = pkt->data;
     rbuf_int_t *ptr;
     uint8_t *data = ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
@@ -92,7 +102,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
         else if (sixlowpan_iphc_is(data)) {
             size_t iphc_len;
-            iphc_len = gnrc_sixlowpan_iphc_decode(entry->pkt, pkt, entry->pkt->size,
+            iphc_len = gnrc_sixlowpan_iphc_decode(&entry->pkt, pkt, entry->pkt->size,
                                                   sizeof(sixlowpan_frag_t));
             if (iphc_len == 0) {
                 DEBUG("6lo rfrag: could not decode IPHC dispatch\n");
@@ -118,11 +128,20 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         return;
     }
 
+    /* If the fragment overlaps another fragment and differs in either the size
+     * or the offset of the overlapped fragment, discards the datagram
+     * https://tools.ietf.org/html/rfc4944#section-5.3 */
     while (ptr != NULL) {
-        if (_rbuf_int_in(ptr, offset, offset + frag_size - 1)) {
-            DEBUG("6lo rfrag: overlapping or same intervals, discarding datagram\n");
+        if (_rbuf_int_overlap_partially(ptr, offset, offset + frag_size - 1)) {
+            DEBUG("6lo rfrag: overlapping intervals, discarding datagram\n");
             gnrc_pktbuf_release(entry->pkt);
             _rbuf_rem(entry);
+
+            /* "A fresh reassembly may be commenced with the most recently
+             * received link fragment"
+             * https://tools.ietf.org/html/rfc4944#section-5.3 */
+            rbuf_add(netif_hdr, pkt, original_size, offset);
+
             return;
         }
 
@@ -168,11 +187,11 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     }
 }
 
-static inline bool _rbuf_int_in(rbuf_int_t *i, uint16_t start, uint16_t end)
+static inline bool _rbuf_int_overlap_partially(rbuf_int_t *i, uint16_t start, uint16_t end)
 {
-    return (((i->start < start) && (start <= i->end)) ||
-            ((start < i->start) && (i->start <= end)) ||
-            ((i->start == start) && (i->end == end)));
+    /* start and ends are both inclusive, so using <= for both */
+    return ((i->start <= end) && (start <= i->end)) && /* overlaps */
+        ((start != i->start) || (end != i->end)); /* not identical */
 }
 
 static rbuf_int_t *_rbuf_int_get_free(void)
@@ -229,16 +248,13 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
 
 static void _rbuf_gc(void)
 {
-    rbuf_t *oldest = NULL;
-    uint32_t now_sec = xtimer_now() / SEC_IN_USEC;
+    uint32_t now_usec = xtimer_now();
     unsigned int i;
 
     for (i = 0; i < RBUF_SIZE; i++) {
-        if (rbuf[i].pkt == NULL) { /* leave GC early if there is still room */
-            return;
-        }
-        else if ((rbuf[i].pkt != NULL) &&
-                 ((now_sec - rbuf[i].arrival) > RBUF_TIMEOUT)) {
+        /* since pkt occupies pktbuf, aggressivly collect garbage */
+        if ((rbuf[i].pkt != NULL) &&
+              ((now_usec - rbuf[i].arrival) > RBUF_TIMEOUT)) {
             DEBUG("6lo rfrag: entry (%s, ", gnrc_netif_addr_to_str(l2addr_str,
                     sizeof(l2addr_str), rbuf[i].src, rbuf[i].src_len));
             DEBUG("%s, %u, %u) timed out\n",
@@ -249,15 +265,6 @@ static void _rbuf_gc(void)
             gnrc_pktbuf_release(rbuf[i].pkt);
             _rbuf_rem(&(rbuf[i]));
         }
-        else if ((oldest == NULL) || (rbuf[i].arrival < oldest->arrival)) {
-            oldest = &(rbuf[i]);
-        }
-    }
-
-    if ((i >= RBUF_SIZE) && (oldest != NULL) && (oldest->pkt != NULL)) {
-        DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
-        gnrc_pktbuf_release(oldest->pkt);
-        _rbuf_rem(oldest);
     }
 }
 
@@ -265,8 +272,8 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
                          const void *dst, size_t dst_len,
                          size_t size, uint16_t tag)
 {
-    rbuf_t *res = NULL;
-    uint32_t now_sec = xtimer_now() / SEC_IN_USEC;
+    rbuf_t *res = NULL, *oldest = NULL;
+    uint32_t now_usec = xtimer_now();
 
     for (unsigned int i = 0; i < RBUF_SIZE; i++) {
         /* check first if entry already available */
@@ -282,7 +289,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
                   gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
                                          rbuf[i].dst, rbuf[i].dst_len),
                   (unsigned)rbuf[i].pkt->size, rbuf[i].tag);
-            rbuf[i].arrival = now_sec;
+            rbuf[i].arrival = now_usec;
             return &(rbuf[i]);
         }
 
@@ -290,33 +297,49 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
         if ((res == NULL) && (rbuf[i].pkt == NULL)) {
             res = &(rbuf[i]);
         }
-    }
 
-    if (res != NULL) { /* entry not in buffer but found empty spot */
-        res->pkt = gnrc_pktbuf_add(NULL, NULL, size, GNRC_NETTYPE_SIXLOWPAN);
-        if (res->pkt == NULL) {
-            DEBUG("6lo rfrag: can not allocate reassembly buffer space.\n");
-            return NULL;
+        /* remember oldest slot */
+        /* note that xtimer_now will overflow in ~1.2 hours */
+        if ((oldest == NULL) || (oldest->arrival - rbuf[i].arrival < UINT32_MAX / 2)) {
+            oldest = &(rbuf[i]);
         }
-
-        *((uint64_t *)res->pkt->data) = 0;  /* clean first few bytes for later
-                                             * look-ups */
-        res->arrival = now_sec;
-        memcpy(res->src, src, src_len);
-        memcpy(res->dst, dst, dst_len);
-        res->src_len = src_len;
-        res->dst_len = dst_len;
-        res->tag = tag;
-        res->cur_size = 0;
-
-        DEBUG("6lo rfrag: entry %p (%s, ", (void *)res,
-              gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->src,
-                                     res->src_len));
-        DEBUG("%s, %u, %u) created\n",
-              gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->dst,
-                                     res->dst_len), (unsigned)res->pkt->size,
-              res->tag);
     }
+
+    /* entry not in buffer and no empty spot found */
+    if (res == NULL) {
+        assert(oldest != NULL);
+        assert(oldest->pkt != NULL); /* if oldest->pkt == NULL, res must not be NULL */
+        DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
+        gnrc_pktbuf_release(oldest->pkt);
+        _rbuf_rem(oldest);
+        res = oldest;
+    }
+
+    /* now we have an empty spot */
+
+    res->pkt = gnrc_pktbuf_add(NULL, NULL, size, GNRC_NETTYPE_SIXLOWPAN);
+    if (res->pkt == NULL) {
+        DEBUG("6lo rfrag: can not allocate reassembly buffer space.\n");
+        return NULL;
+    }
+
+    *((uint64_t *)res->pkt->data) = 0;  /* clean first few bytes for later
+                                         * look-ups */
+    res->arrival = now_usec;
+    memcpy(res->src, src, src_len);
+    memcpy(res->dst, dst, dst_len);
+    res->src_len = src_len;
+    res->dst_len = dst_len;
+    res->tag = tag;
+    res->cur_size = 0;
+
+    DEBUG("6lo rfrag: entry %p (%s, ", (void *)res,
+          gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->src,
+                                 res->src_len));
+    DEBUG("%s, %u, %u) created\n",
+          gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->dst,
+                                 res->dst_len), (unsigned)res->pkt->size,
+          res->tag);
 
     return res;
 }

@@ -108,6 +108,9 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
             tmp_addr->valid = 0xFFFF;
             gnrc_sixlowpan_nd_router_abr_t *abr = gnrc_sixlowpan_nd_router_abr_get();
+            mutex_unlock(&entry->mutex);
+            gnrc_ipv6_netif_set_rtr_adv(entry, true);
+            mutex_lock(&entry->mutex);
             if (gnrc_sixlowpan_nd_router_abr_add_prf(abr, entry, tmp_addr) < 0) {
                 DEBUG("ipv6_netif: error adding prefix to 6LoWPAN-ND management\n");
             }
@@ -197,7 +200,6 @@ void gnrc_ipv6_netif_add(kernel_pid_t pid)
 
     /* Otherwise, fill the free entry */
 
-    ipv6_addr_t addr = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
     mutex_lock(&free_entry->mutex);
 
     DEBUG("ipv6 netif: Add IPv6 interface %" PRIkernel_pid " (i = %d)\n", pid,
@@ -207,7 +209,8 @@ void gnrc_ipv6_netif_add(kernel_pid_t pid)
     free_entry->cur_hl = GNRC_IPV6_NETIF_DEFAULT_HL;
     free_entry->flags = 0;
 
-    _add_addr_to_entry(free_entry, &addr, IPV6_ADDR_BIT_LEN, 0);
+    _add_addr_to_entry(free_entry, &ipv6_addr_all_nodes_link_local,
+                       IPV6_ADDR_BIT_LEN, 0);
 
     mutex_unlock(&free_entry->mutex);
 
@@ -502,10 +505,7 @@ kernel_pid_t gnrc_ipv6_netif_find_by_prefix(ipv6_addr_t **out, const ipv6_addr_t
         match = _find_by_prefix_unsafe(&tmp_res, ipv6_ifs + i, prefix, NULL);
 
         if (match > best_match) {
-            if (out != NULL) {
-                *out = tmp_res;
-            }
-
+            *out = tmp_res;
             res = ipv6_ifs[i].pid;
             best_match = match;
         }
@@ -745,7 +745,7 @@ static ipv6_addr_t *_source_address_selection(gnrc_ipv6_netif_t *iface, const ip
     }
 
     /* reset candidate set to mark winners */
-    memset(candidate_set, 0, (GNRC_IPV6_NETIF_ADDR_NUMOF / 8) + 1);
+    memset(candidate_set, 0, (GNRC_IPV6_NETIF_ADDR_NUMOF + 7) / 8);
     /* check if we have a clear winner */
     /* collect candidates with maximum points */
     for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {
@@ -873,7 +873,9 @@ void gnrc_ipv6_netif_init_by_dev(void)
             /* first interface wins */
             if (!abr_init) {
                 gnrc_sixlowpan_nd_router_abr_create(&addr, 0);
-                gnrc_ipv6_netif_set_rtr_adv(ipv6_if, true);
+                /* XXX should be set to true if there ever is an hard-coded
+                 * prefix set */
+                gnrc_ipv6_netif_set_rtr_adv(ipv6_if, false);
                 abr_init = true;
             }
 #endif

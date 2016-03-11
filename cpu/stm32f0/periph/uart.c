@@ -122,16 +122,16 @@ int init_base(uart_t uart, uint32_t baudrate)
         port->AFR[0] |= af << (rx_pin * 4);
     }
     else {
-        port->AFR[1] &= ~(0xf << ((rx_pin - 16) * 4));
-        port->AFR[1] |= af << ((rx_pin - 16) * 4);
+        port->AFR[1] &= ~(0xf << ((rx_pin - 8) * 4));
+        port->AFR[1] |= af << ((rx_pin - 8) * 4);
     }
     if (tx_pin < 8) {
         port->AFR[0] &= ~(0xf << (tx_pin * 4));
         port->AFR[0] |= af << (tx_pin * 4);
     }
     else {
-        port->AFR[1] &= ~(0xf << ((tx_pin - 16) * 4));
-        port->AFR[1] |= af << ((tx_pin - 16) * 4);
+        port->AFR[1] &= ~(0xf << ((tx_pin - 8) * 4));
+        port->AFR[1] |= af << ((tx_pin - 8) * 4);
     }
 
     /* configure UART to mode 8N1 with given baudrate */

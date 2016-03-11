@@ -28,7 +28,9 @@ extern "C" {
 
 #define INITIAL_ADDRESS_WIDTH       5
 #define NRF24L01P_MAX_DATA_LENGTH   32
+#ifndef INITIAL_RF_CHANNEL
 #define INITIAL_RF_CHANNEL          5
+#endif
 #define INITIAL_RX_POWER_0dB        0
 
 #define DELAY_CS_TOGGLE_TICKS       2
@@ -86,6 +88,14 @@ extern "C" {
 #define REG_FIFO_STATUS         0x17
 #define REG_DYNPD               0x1c
 #define REG_FEATURE             0x1d
+
+/* Bits in EN_AA register */
+#define ENAA_P0      0x01
+#define ENAA_P1      0x02
+#define ENAA_P2      0x04
+#define ENAA_P3      0x08
+#define ENAA_P4      0x10
+#define ENAA_P5      0x20
 
 /* Bits in CONFIG register */
 #define MASK_RX_DR   0x40

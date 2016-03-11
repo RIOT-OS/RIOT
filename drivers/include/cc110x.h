@@ -27,6 +27,7 @@ extern "C" {
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "cc110x-internal.h"
+#include "net/gnrc/nettype.h"
 
 /**
  * @brief Struct for holding cc110x IO parameters
@@ -60,6 +61,9 @@ struct cc110x {
     cc110x_pkt_buf_t pkt_buf;                   /**< RX/TX buffer */
     void (*isr_cb)(cc110x_t *dev, void* arg);   /**< isr callback */
     void *isr_cb_arg;                           /**< isr callback argument */
+#ifdef MODULE_GNRC_NETIF
+    gnrc_nettype_t proto;                       /**< protocol the radio expects */
+#endif
 };
 
 /**

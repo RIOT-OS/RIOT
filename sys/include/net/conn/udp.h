@@ -105,9 +105,9 @@ int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len, void *addr, 
 /**
  * @brief   Sends a UDP message
  *
- * @param[in] data      Pointer where the received data should be stored.
- * @param[in] len       Maximum space available at @p data.
- * @param[in] src       The source address. May be NULL for all any interface address.
+ * @param[in] data      Pointer to the data to send.
+ * @param[in] len       Length of the @p data to send.
+ * @param[in] src       The source address. May be NULL for any interface address.
  * @param[in] src_len   Length of @p src. May be 0 if @p src is NULL
  * @param[in] dst       The receiver's network address.
  * @param[in] dst_len   Length of @p dst.
@@ -117,7 +117,7 @@ int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len, void *addr, 
  *
  * @note    Function may block.
  *
- * @return  The number of bytes send on success.
+ * @return  The number of bytes sent on success.
  * @return  any other negative number in case of an error. For portability, implementations should
  *          draw inspiration of the errno values from the POSIX' send(), sendfrom(), or sendmsg()
  *          function specification.

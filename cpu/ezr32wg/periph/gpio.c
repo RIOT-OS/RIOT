@@ -31,19 +31,10 @@
  * @brief   Number of external interrupt lines
  */
 #define NUMOF_IRQS                  (16U)
-
-/**
- * @brief   Datatype to use for saving the interrupt contexts
- */
-typedef struct {
-    gpio_cb_t cb;       /**< callback to call on GPIO interrupt */
-    void *arg;          /**< argument passed to the callback */
-} gpio_exti_t;
-
 /**
  * @brief   Hold one interrupt context per interrupt line
  */
-static gpio_exti_t isr_ctx[NUMOF_IRQS];
+static gpio_isr_ctx_t isr_ctx[NUMOF_IRQS];
 
 static inline int _port_num(gpio_t pin)
 {

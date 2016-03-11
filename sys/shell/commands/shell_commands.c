@@ -102,6 +102,10 @@ extern int _ipv6_nc_routers(int argc, char **argv);
 extern int _whitelist(int argc, char **argv);
 #endif
 
+#ifdef MODULE_GNRC_IPV6_BLACKLIST
+extern int _blacklist(int argc, char **argv);
+#endif
+
 #ifdef MODULE_GNRC_ZEP
 #ifdef MODULE_IPV6_ADDR
 extern int _zep_init(int argc, char **argv);
@@ -183,6 +187,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_GNRC_IPV6_WHITELIST
     {"whitelist", "whitelists an address for receival ('whitelist [add|del|help]')", _whitelist },
+#endif
+#ifdef MODULE_GNRC_IPV6_BLACKLIST
+    {"blacklist", "blacklists an address for receival ('blacklist [add|del|help]')", _blacklist },
 #endif
 #ifdef MODULE_GNRC_ZEP
 #ifdef MODULE_IPV6_ADDR

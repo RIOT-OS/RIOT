@@ -13,7 +13,7 @@
  * @file
  * @brief       Low-level GPIO driver implementation
  *
- * @author      Hauke Petersen <mail@haukepetersen.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *
  * @}
@@ -35,15 +35,10 @@
  */
 #define GPIO_ISR_CHAN_NUMOF             (16U)
 
-typedef struct {
-    gpio_cb_t cb;       /**< callback called from GPIO interrupt */
-    void *arg;          /**< argument passed to the callback */
-} exti_ctx_t;
-
 /**
  * @brief   Allocate memory for one callback and argument per EXTI channel
  */
-static exti_ctx_t exti_ctx[GPIO_ISR_CHAN_NUMOF];
+static gpio_isr_ctx_t exti_ctx[GPIO_ISR_CHAN_NUMOF];
 
 /**
  * @brief   Extract the pin's port base address from the given pin identifier
@@ -212,8 +207,10 @@ void gpio_write(gpio_t pin, int value)
 
 void isr_exti(void)
 {
+    /* only generate interrupts against lines which have their IMR set */
+    uint32_t pending_isr = (EXTI->PR & EXTI->IMR);
     for (unsigned i = 0; i < GPIO_ISR_CHAN_NUMOF; i++) {
-        if (EXTI->PR & (1 << i)) {
+        if (pending_isr & (1 << i)) {
             EXTI->PR = (1 << i);        /* clear by writing a 1 */
             exti_ctx[i].cb(exti_ctx[i].arg);
         }

@@ -34,8 +34,8 @@ typedef unsigned (*ringbuffer_op_t)(ringbuffer_t *restrict rb, char *buf, unsign
 static ssize_t pipe_rw(ringbuffer_t *rb,
                        void *buf,
                        size_t n,
-                       tcb_t **other_op_blocked,
-                       tcb_t **this_op_blocked,
+                       thread_t **other_op_blocked,
+                       thread_t **this_op_blocked,
                        ringbuffer_op_t ringbuffer_op)
 {
     if (n == 0) {
@@ -48,7 +48,7 @@ static ssize_t pipe_rw(ringbuffer_t *rb,
         unsigned count = ringbuffer_op(rb, buf, n);
 
         if (count > 0) {
-            tcb_t *other_thread = *other_op_blocked;
+            thread_t *other_thread = *other_op_blocked;
             int other_prio = -1;
             if (other_thread) {
                 *other_op_blocked = NULL;
@@ -69,9 +69,9 @@ static ssize_t pipe_rw(ringbuffer_t *rb,
             return 0;
         }
         else {
-            *this_op_blocked = (tcb_t *) sched_active_thread;
+            *this_op_blocked = (thread_t *) sched_active_thread;
 
-            sched_set_status((tcb_t *) sched_active_thread, STATUS_SLEEPING);
+            sched_set_status((thread_t *) sched_active_thread, STATUS_SLEEPING);
             restoreIRQ(old_state);
             thread_yield_higher();
         }

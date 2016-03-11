@@ -30,6 +30,7 @@
 #define TESTS_UBJSON_H_
 
 #include "embUnit.h"
+#include "kernel_macros.h"
 
 #include "ubjson.h"
 

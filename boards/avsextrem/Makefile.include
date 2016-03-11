@@ -1,2 +1,3 @@
-export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
+USEMODULE += msba2-common
+
 include $(RIOTBOARD)/msba2-common/Makefile.include

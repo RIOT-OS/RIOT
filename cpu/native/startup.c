@@ -30,7 +30,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "kernel_internal.h"
+#include "kernel_init.h"
 #include "cpu.h"
 
 #include "board_internal.h"

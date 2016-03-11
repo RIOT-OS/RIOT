@@ -25,7 +25,6 @@
 #include "sched.h"
 #include "irq.h"
 #include "cpu.h"
-#include "kernel_internal.h"
 
 /*
  * local function declarations  (prefixed with __)
@@ -39,7 +38,7 @@ static void __enter_thread_mode(void);
  * @brief Since AVR doesn't support direct manipulation of the program counter we
  * model a stack like it would be left by __context_save().
  * The resulting layout in memory is the following:
- * ---------------tcb_t (not created by thread_arch_stack_init) ----------
+ * ---------------thread_t (not created by thread_arch_stack_init) ----------
  * local variables (a temporary value and the stackpointer)
  * -----------------------------------------------------------------------
  * a marker (AFFE) - for debugging purposes (helps finding the stack

@@ -82,8 +82,7 @@
 #define NHC_UDP_S_INLINE            (0x01)
 #define NHC_UDP_D_INLINE            (0x02)
 #define NHC_UDP_SD_ELIDED           (0x03)
-#define NHC_UDP_C_MASK              (0xF4)
-#define NHC_UDP_C_ELIDED            (0x03)
+#define NHC_UDP_C_ELIDED            (0x04)
 
 #define NHC_UDP_4BIT_PORT           (0xF0B0)
 #define NHC_UDP_4BIT_MASK           (0xFFF0)
@@ -111,16 +110,23 @@ static inline bool _context_overlaps_iid(gnrc_sixlowpan_ctx_t *ctx,
              (iid->uint8[(ctx->prefix_len / 8) - 8] & byte_mask[ctx->prefix_len % 8])));
 }
 
-#ifdef MODULE_GNRC_UDP
-inline static size_t iphc_nhc_udp_decode(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *ipv6, size_t offset)
+#ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
+inline static size_t iphc_nhc_udp_decode(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t **dec_hdr,
+                                         size_t offset)
 {
     uint8_t *payload = pkt->data;
-    uint8_t udp_nhc = payload[offset++];
+    gnrc_pktsnip_t *ipv6 = *dec_hdr;
     ipv6_hdr_t *ipv6_hdr = ipv6->data;
+#ifdef MODULE_GNRC_UDP
+    const gnrc_nettype_t snip_type = GNRC_NETTYPE_UDP;
+#else
+    const gnrc_nettype_t snip_type = GNRC_NETTYPE_UNDEF;
+#endif
+    gnrc_pktsnip_t *udp = gnrc_pktbuf_add(NULL, NULL, sizeof(udp_hdr_t),
+                                          snip_type);
+    uint8_t udp_nhc = payload[offset++];
     uint8_t tmp;
 
-    gnrc_pktsnip_t *udp = gnrc_pktbuf_add(NULL, NULL, sizeof(udp_hdr_t),
-                                          GNRC_NETTYPE_UDP);
     if (udp == NULL) {
         DEBUG("6lo: error on IPHC NHC UDP decoding\n");
         return 0;
@@ -164,7 +170,7 @@ inline static size_t iphc_nhc_udp_decode(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *ip
             break;
     }
 
-    if ((udp_nhc & NHC_UDP_C_MASK) == NHC_UDP_C_ELIDED) {
+    if ((udp_nhc & NHC_UDP_C_ELIDED) != 0) {
         DEBUG("6lo iphc nhc: unsupported elided checksum\n");
         gnrc_pktbuf_release(udp);
         return 0;
@@ -178,21 +184,25 @@ inline static size_t iphc_nhc_udp_decode(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *ip
     ipv6_hdr->nh = PROTNUM_UDP;
     ipv6_hdr->len = udp_hdr->length;
 
-    ipv6->next = udp;
+    udp->next = ipv6;
+    *dec_hdr = udp;
 
     return offset;
 }
 #endif
 
-size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *pkt, size_t datagram_size,
-                                  size_t offset)
+size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
+                                  size_t datagram_size, size_t offset)
 {
+    gnrc_pktsnip_t *ipv6;
     gnrc_netif_hdr_t *netif_hdr = pkt->next->data;
     ipv6_hdr_t *ipv6_hdr;
     uint8_t *iphc_hdr = pkt->data;
     size_t payload_offset = SIXLOWPAN_IPHC_HDR_LEN;
     gnrc_sixlowpan_ctx_t *ctx = NULL;
 
+    assert(dec_hdr != NULL);
+    ipv6 = *dec_hdr;
     assert(ipv6 != NULL);
     assert(ipv6->size >= sizeof(ipv6_hdr_t));
 
@@ -470,11 +480,9 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *pkt, siz
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
     if (iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_NH) {
         switch (iphc_hdr[payload_offset] & NHC_ID_MASK) {
-#ifdef MODULE_GNRC_UDP
             case NHC_UDP_ID:
-                payload_offset = iphc_nhc_udp_decode(pkt, ipv6, payload_offset);
+                payload_offset = iphc_nhc_udp_decode(pkt, dec_hdr, payload_offset);
                 break;
-#endif
 
             default:
                 break;
@@ -485,7 +493,7 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *pkt, siz
     return payload_offset;
 }
 
-#ifdef MODULE_GNRC_UDP
+#ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
 inline static size_t iphc_nhc_udp_encode(gnrc_pktsnip_t *udp, ipv6_hdr_t *ipv6_hdr)
 {
     udp_hdr_t *udp_hdr = udp->data;
@@ -620,7 +628,7 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
 
     /* compress next header */
     switch (ipv6_hdr->nh) {
-#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) && defined(MODULE_GNRC_UDP)
+#ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
         case PROTNUM_UDP:
             iphc_nhc_udp_encode(pkt->next->next, ipv6_hdr);
             iphc_hdr[IPHC1_IDX] |= SIXLOWPAN_IPHC1_NH;

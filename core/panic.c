@@ -25,11 +25,13 @@
 #include <stdio.h>
 
 #include "assert.h"
+#include "attributes.h"
 #include "cpu.h"
 #include "irq.h"
 #include "lpm.h"
 #include "panic.h"
 #include "arch/panic_arch.h"
+#include "reboot.h"
 
 #if defined(DEVELHELP) && defined(MODULE_PS)
 #include "ps.h"
@@ -72,7 +74,7 @@ NORETURN void core_panic(core_panic_t crash_code, const char *message)
     panic_arch();
 #ifndef DEVELHELP
     /* DEVELHELP not set => reboot system */
-    (void) reboot(RB_AUTOBOOT);
+    reboot();
 #endif
 
     /* tell the compiler that we won't return from this function

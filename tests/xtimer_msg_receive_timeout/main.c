@@ -13,6 +13,12 @@
  * @file
  * @brief       test application for xtimer_msg_receive_timeout()
  *
+ *              This test will start sequentially start 10 xtimers to send a
+ *              IPC msg, alternating with an interval of 900ms and 1100ms
+ *              respectively. Everytime a timer was set, it will wait for a
+ *              message for at most 1000ms. This should succeed and fail in an
+ *              alternating manner.
+ *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  *
  * @}
@@ -23,6 +29,8 @@
 #include "xtimer.h"
 #include "timex.h"
 
+#define TEST_PERIOD (100000LU)
+
 int main(void)
 {
     msg_t m, tmsg;
@@ -31,14 +39,15 @@ int main(void)
     tmsg.type = 44;
 
     for (int i = 0; i < 10; i++) {
-        xtimer_set_msg(&t, SEC_IN_USEC + offset, &tmsg, sched_active_pid);
-        if (xtimer_msg_receive_timeout(&m, SEC_IN_USEC) < 0) {
+        xtimer_set_msg(&t, TEST_PERIOD + offset, &tmsg, sched_active_pid);
+        if (xtimer_msg_receive_timeout(&m, TEST_PERIOD) < 0) {
             puts("Timeout!");
         }
         else {
             printf("Message received: %" PRIu16 "\n", m.type);
         }
         offset = (offset < 0) ? 1000 : -1000;
+        xtimer_remove(&t);
     }
     return 0;
 }

@@ -21,6 +21,7 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include "cpu_conf_common.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -57,14 +58,6 @@ extern "C" {
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
 #define CPU_IRQ_NUMOF                   (48U)
 #define CPU_FLASH_BASE                  FLASH_BASE
-/** @} */
-
-/**
- * @brief Length for reading CPU_ID
- * @{
- */
-#define CPUID_ID_LEN                    (12)
-#define CPUID_ADDR                      NVIC_CPUID
 /** @} */
 
 /**

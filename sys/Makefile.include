@@ -61,7 +61,7 @@ ifneq (,$(filter log_%,$(USEMODULE)))
     include $(RIOTBASE)/sys/log/Makefile.include
 endif
 
-ifneq (,$(filter newlib,$(USEMODULE)))
+ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
     include $(RIOTBASE)/sys/newlib/Makefile.include
 endif
 

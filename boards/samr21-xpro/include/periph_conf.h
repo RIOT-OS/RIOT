@@ -120,33 +120,35 @@ static const uart_conf_t uart_config[] = {
  * @name PWM configuration
  * @{
  */
-#define PWM_NUMOF           (PWM_0_EN + PWM_1_EN)
 #define PWM_0_EN            1
 #define PWM_1_EN            1
-#define PWM_MAX_CHANNELS    2
+#define PWM_MAX_CHANNELS    3
 /* for compatibility with test application */
 #define PWM_0_CHANNELS      PWM_MAX_CHANNELS
 #define PWM_1_CHANNELS      PWM_MAX_CHANNELS
 
 /* PWM device configuration */
-#if PWM_NUMOF
 static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN
     {TCC1, {
         /* GPIO pin, MUX value, TCC channel */
-        {GPIO_PIN(PA, 6), GPIO_MUX_E, 0},
-        {GPIO_PIN(PA, 7), GPIO_MUX_E, 1}
+        { GPIO_PIN(PA, 6), GPIO_MUX_E, 0 },
+        { GPIO_PIN(PA, 7), GPIO_MUX_E, 1 },
+        { GPIO_UNDEF, (gpio_mux_t)0, 2 }
     }},
 #endif
 #if PWM_1_EN
     {TCC0, {
         /* GPIO pin, MUX value, TCC channel */
-        {GPIO_PIN(PA, 18), GPIO_MUX_F, 2},
-        {GPIO_PIN(PA, 19), GPIO_MUX_F, 3}
-    }},
+        { GPIO_PIN(PA, 16), GPIO_MUX_F, 0 },
+        { GPIO_PIN(PA, 18), GPIO_MUX_F, 2 },
+        { GPIO_PIN(PA, 19), GPIO_MUX_F, 3 }
+    }}
 #endif
 };
-#endif
+
+/* number of devices that are actually defined */
+#define PWM_NUMOF           (2U)
 /** @} */
 
 /**
@@ -207,13 +209,6 @@ static const pwm_conf_t pwm_config[] = {
 #define I2C_SDA             PIN_PA16
 #define I2C_SCL             PIN_PA17
 #define I2C_0_PINS          (PORT_PA16 | PORT_PA17)
-
-/**
- * @name Random Number Generator configuration
- * @{
- */
-#define RANDOM_NUMOF       (0U)
-/** @} */
 
 /**
  * @name RTC configuration

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,20 +15,17 @@
  * @brief       Implementation of the kernels reboot interface
  *
  * @author      Paul RATHGEB <paul.rathgeb@skynet.be>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
 
-#include <stdio.h>
-
-#include "arch/reboot_arch.h"
+#include "reboot.h"
 #include "cpu.h"
+#include "log.h"
 
-int reboot_arch(int mode)
+void reboot(void)
 {
-    printf("Going into reboot, mode %i\n", mode);
-
+    LOG_INFO("RIOT rebooting...\n");
     NVIC_SystemReset();
-
-    return 0;
 }

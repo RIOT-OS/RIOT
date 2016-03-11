@@ -18,9 +18,7 @@
 
 #include <stdio.h>
 #include "arm_cpu.h"
-#include "sched.h"
-#include "kernel.h"
-#include "kernel_internal.h"
+#include "thread.h"
 
 #define STACK_MARKER    (0x77777777)
 #define REGISTER_CNT    (12)
@@ -90,13 +88,9 @@ void thread_print_stack(void)
     printf("STACK (%d)= %X \n", i, *s);
 }
 
-int reboot_arch(int mode)
+void reboot(void)
 {
-    (void) mode;
-
     while (1) {
         arm_reset();
     }
-
-    return -1;
 }

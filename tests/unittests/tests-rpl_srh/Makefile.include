@@ -1,0 +1,3 @@
+USEMODULE += gnrc_ipv6
+USEMODULE += ipv6_addr
+USEMODULE += gnrc_rpl_srh

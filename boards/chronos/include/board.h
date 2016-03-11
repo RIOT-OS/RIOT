@@ -42,18 +42,6 @@ extern "C" {
 #define XTIMER_SHIFT_ON_COMPARE     (4)
 /** @} */
 
-/**
- * @brief   Standard input/output device configuration
- *
- * This defines are for compatibility with the CPU implementation but they are
- * not used for this board (as it has no UART interface accessible...)
- * @{
- */
-#define STDIO                       (0)
-#define STDIO_BAUDRATE              (115200U)
-#define STDIO_RX_BUFSIZE            (64U)
-/** @} */
-
 #define MSP430_INITIAL_CPU_SPEED    7372800uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
 #define F_RC_OSCILLATOR             32768

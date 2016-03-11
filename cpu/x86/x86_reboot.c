@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014  René Kijewski  <rene.kijewski@fu-berlin.de>
+ * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2014  René Kijewski  <rene.kijewski@fu-berlin.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,6 +25,7 @@
  * @brief       Configurable reboot handler for x86.
  *
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
@@ -84,22 +86,16 @@ void NORETURN x86_kbc_reboot(void)
 static x86_reboot_t reboot_fun;
 static bool reboot_twice;
 
-int reboot_arch(int mode)
+void reboot(void)
 {
-    switch (mode) {
-        case RB_AUTOBOOT:
-            asm volatile ("cli");
-            if (!reboot_twice) {
-                reboot_twice = true;
-                if (reboot_fun) {
-                    reboot_fun();
-                }
-            }
-            x86_kbc_reboot();
-
-        default:
-            return -1;
+    asm volatile ("cli");
+    if (!reboot_twice) {
+        reboot_twice = true;
+        if (reboot_fun) {
+            reboot_fun();
+        }
     }
+    x86_kbc_reboot();
 }
 
 void x86_set_reboot_fun(x86_reboot_t fun)

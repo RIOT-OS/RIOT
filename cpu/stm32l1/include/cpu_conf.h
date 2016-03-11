@@ -21,6 +21,8 @@
 #ifndef CPUCONF_H_
 #define CPUCONF_H_
 
+#include "cpu_conf_common.h"
+
 #include "stm32l1xx.h"
 
 #ifdef __cplusplus
@@ -35,11 +37,6 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (57U)
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
-
-/**
- * @name Length for reading CPU_ID
- */
-#define CPUID_ID_LEN                      (12)
 
 #ifdef __cplusplus
 }

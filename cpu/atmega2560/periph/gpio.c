@@ -34,12 +34,7 @@
 #define GPIO_OFFSET_PIN_PIN     (0x03)
 #define GPIO_EXT_INT_NUMOF      (8U)
 
-typedef struct {
-    gpio_cb_t cb;
-    void *arg;
-} gpio_state_t;
-
-static gpio_state_t config[GPIO_EXT_INT_NUMOF];
+static gpio_isr_ctx_t config[GPIO_EXT_INT_NUMOF];
 
 /**
  * @brief     Extract the pin number of the given pin

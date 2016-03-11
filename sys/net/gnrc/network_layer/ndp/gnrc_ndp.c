@@ -275,7 +275,7 @@ void gnrc_ndp_nbr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 #endif
     }
 
-    LL_SEARCH_SCALAR(pkt, netif, type, GNRC_NETTYPE_NETIF);
+    netif = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
 
     if (netif != NULL) {
         netif_hdr = netif->data;
@@ -397,12 +397,15 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 
             switch (opt->type) {
                 case NDP_OPT_SL2A:
-                    if ((l2src_len = gnrc_ndp_internal_sl2a_opt_handle(pkt, ipv6, rtr_sol->type, opt,
-                                                                       l2src)) < 0) {
+                    l2src_len = gnrc_ndp_internal_sl2a_opt_handle(pkt, ipv6,
+                                                                  rtr_sol->type,
+                                                                  opt, l2src);
+                    if (l2src_len < 0) {
                         /* -ENOTSUP can not happen */
                         /* invalid source link-layer address option */
                         return;
                     }
+                    _stale_nc(iface, &ipv6->src, l2src, l2src_len);
                     break;
 
                 default:
@@ -419,7 +422,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
             }
 #endif
         }
-        _stale_nc(iface, &ipv6->src, l2src, l2src_len);
+
         /* send delayed */
         if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_RTR_ADV) {
             uint32_t delay;
@@ -429,7 +432,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                 ms = GNRC_SIXLOWPAN_ND_MAX_RTR_ADV_DELAY;
             }
 #endif
-            delay = genrand_uint32_range(0, ms);
+            delay = random_uint32_range(0, ms);
             xtimer_remove(&if_entry->rtr_adv_timer);
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
             /* in case of a 6LBR we have to check if the interface is actually
@@ -468,7 +471,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 
 static inline void _set_reach_time(gnrc_ipv6_netif_t *if_entry, uint32_t mean)
 {
-    uint32_t reach_time = genrand_uint32_range(GNRC_NDP_MIN_RAND, GNRC_NDP_MAX_RAND);
+    uint32_t reach_time = random_uint32_range(GNRC_NDP_MIN_RAND, GNRC_NDP_MAX_RAND);
 
     if_entry->reach_time_base = mean;
     /* to avoid floating point number computation and have higher value entropy, the
@@ -503,7 +506,7 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
     if (nc_entry == NULL) { /* not in default router list */
         /* create default router list entry */
         nc_entry = gnrc_ipv6_nc_add(iface, &ipv6->src, NULL, 0,
-                                    GNRC_IPV6_NC_IS_ROUTER);
+                                    GNRC_IPV6_NC_STATE_STALE | GNRC_IPV6_NC_IS_ROUTER);
         if (nc_entry == NULL) {
             DEBUG("ndp: error on default router list entry creation\n");
             return;

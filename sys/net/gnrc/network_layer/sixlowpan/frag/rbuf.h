@@ -30,9 +30,9 @@
 extern "C" {
 #endif
 
-#define RBUF_L2ADDR_MAX_LEN (8U)    /**< maximum length for link-layer addresses */
-#define RBUF_SIZE           (4U)    /**< size of the reassembly buffer */
-#define RBUF_TIMEOUT        (3U)    /**< timeout for reassembly in seconds */
+#define RBUF_L2ADDR_MAX_LEN (8U)               /**< maximum length for link-layer addresses */
+#define RBUF_SIZE           (4U)               /**< size of the reassembly buffer */
+#define RBUF_TIMEOUT        (3U * SEC_IN_USEC) /**< timeout for reassembly in microseconds */
 
 /**
  * @brief   Fragment intervals to identify limits of fragments.
@@ -73,8 +73,8 @@ typedef struct rbuf_int {
 typedef struct {
     rbuf_int_t *ints;                   /**< intervals of the fragment */
     gnrc_pktsnip_t *pkt;                /**< the reassembled packet in packet buffer */
-    uint32_t arrival;                   /**< time in seconds of arrival of last
-                                         *   received fragment */
+    uint32_t arrival;                   /**< time in microseconds of arrival of
+                                         *   last received fragment */
     uint8_t src[RBUF_L2ADDR_MAX_LEN];   /**< source address */
     uint8_t dst[RBUF_L2ADDR_MAX_LEN];   /**< destination address */
     uint8_t src_len;                    /**< length of source address */

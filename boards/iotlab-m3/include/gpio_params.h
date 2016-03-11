@@ -35,16 +35,19 @@ static const  saul_gpio_params_t saul_gpio_params[] =
         .name = "LED(red)",
         .pin = LED_RED_GPIO,
         .dir = GPIO_DIR_OUT,
+        .pull = GPIO_NOPULL,
     },
     {
         .name = "LED(green)",
         .pin = LED_GREEN_GPIO,
         .dir = GPIO_DIR_OUT,
+        .pull = GPIO_NOPULL,
     },
     {
         .name = "LED(orange)",
         .pin = LED_ORANGE_GPIO,
         .dir = GPIO_DIR_OUT,
+        .pull = GPIO_NOPULL,
     },
 };
 

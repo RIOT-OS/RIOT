@@ -41,6 +41,8 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, i2c_t i2c, gpio_t acc_pin, gpio_t mag_pin
     dev->mag_address = mag_address;
     dev->acc_pin     = acc_pin;
     dev->mag_pin     = mag_pin;
+    dev->acc_scale   = acc_scale;
+    dev->mag_gain    = mag_gain;
 
     /* Acquire exclusive access to the bus. */
     i2c_acquire(dev->i2c);

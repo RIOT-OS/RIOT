@@ -58,7 +58,7 @@ static volatile unsigned counter;
 
 static void do_sleep(int factor)
 {
-    uint32_t timeout_us = (genrand_uint32() % 100000) * factor;
+    uint32_t timeout_us = (random_uint32() % 100000) * factor;
     /* PRINTF("sleep for % 8i µs.", timeout_us); */
     xtimer_usleep(timeout_us);
 }
