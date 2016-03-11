@@ -40,7 +40,7 @@ int main(void)
     int pres;
 
     printf("LPS25H pressure sensor test application\n");
-    printf("Initializing LPS25H sensor at I2C_%i .. ", TEST_LPS25H_I2C);
+    printf("Initializing LPS25H sensor at I2C_%i ... ", TEST_LPS25H_I2C);
     if (lps25h_init(&dev, TEST_LPS25H_I2C, TEST_LPS25H_ADDR, ODR) == 0) {
         printf("[ OK ]\n");
     }

@@ -27,10 +27,8 @@
 #include "lps25h.h"
 #include "include/lps25h-internal.h"
 
-/**
- * @brief default I2C bus speed for this sensor
- */
-#define BUS_SPEED           I2C_SPEED_FAST
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
 /**
  * @brief pressure divider for norming pressure output
@@ -52,13 +50,13 @@ int lps25h_init(lps25h_t *dev, i2c_t i2c, uint8_t address, lps25h_odr_t odr)
 
     i2c_acquire(dev->i2c);
 
-    if (i2c_init_master(dev->i2c, BUS_SPEED) < 0) {
+    if (i2c_init_master(dev->i2c, I2C_SPEED_FAST) < 0) {
         i2c_release(dev->i2c);
         return -1;
     }
 
     i2c_read_reg(dev->i2c, dev->address, LPS25H_REG_WHO_AM_I, &tmp);
-    if (tmp & LPS25H_CHIP_ID) {
+    if (tmp & !LPS25H_CHIP_ID) {
         i2c_release(dev->i2c);
         return -1;
     }
@@ -71,6 +69,7 @@ int lps25h_init(lps25h_t *dev, i2c_t i2c, uint8_t address, lps25h_odr_t odr)
         i2c_release(dev->i2c);
         return -1;
     }
+
     i2c_release(dev->i2c);
 
     return 0;
@@ -79,8 +78,8 @@ int lps25h_init(lps25h_t *dev, i2c_t i2c, uint8_t address, lps25h_odr_t odr)
 int lps25h_read_temp(lps25h_t *dev)
 {
     char tmp[2] = {0, 0};
-    int16_t val = 0;
-    float res = TEMP_BASE;
+    int val = 0;
+    float res;
 
     i2c_acquire(dev->i2c);
     i2c_read_regs(dev->i2c, dev->address, LPS25H_REG_TEMP_OUT_L, &tmp[0], 2);
@@ -88,7 +87,9 @@ int lps25h_read_temp(lps25h_t *dev)
 
     val = (tmp[1] << 8) | tmp[0];
 
-    res += ((float)val) / TEMP_DIVIDER;
+    DEBUG("LPS25H: raw temperature: %i\n", val);
+
+    res = TEMP_BASE + ((float)val / TEMP_DIVIDER);
 
     return (int)res;
 }
@@ -96,13 +97,16 @@ int lps25h_read_temp(lps25h_t *dev)
 int lps25h_read_pres(lps25h_t *dev)
 {
     char tmp[3] = {0, 0, 0};
-    int32_t val = 0;
+    int val = 0;
     float res;
 
     i2c_acquire(dev->i2c);
     i2c_read_regs(dev->i2c, dev->address, LPS25H_REG_PRESS_POUT_XL, &tmp[0], 3);
     i2c_release(dev->i2c);
+
     val = (tmp[2] << 16) | (tmp[1] << 8) | tmp[0];
+
+    DEBUG("LPS25H: raw pressure: %i\n", val);
 
     res = ((float)val) / PRES_DIVIDER;
 
