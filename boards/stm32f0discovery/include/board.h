@@ -28,32 +28,23 @@ extern "C" {
 #endif
 
 /**
- * @name LED pin definitions
- * @{
- */
-#define LED_PORT            GPIOC
-#define LD3_PIN             (1 << 9)
-#define LD4_PIN             (1 << 8)
-/** @} */
-
-/**
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LD3_ON              (LED_PORT->BSRR = LD3_PIN)
-#define LD3_OFF             (LED_PORT->BSRR = (LD3_PIN << 16))
-#define LD3_TOGGLE          (LED_PORT->ODR ^= LD3_PIN)
-#define LD4_ON              (LED_PORT->BSRR = LD4_PIN)
-#define LD4_OFF             (LED_PORT->BSRR = (LD4_PIN << 16))
-#define LD4_TOGGLE          (LED_PORT->ODR ^= LD4_PIN)
+#define LED0_PIN            GPIO_PIN(PORT_C, 9)
+#define LED1_PIN            GPIO_PIN(PORT_C, 8)
 
-/* for compatibility to other boards */
-#define LED_GREEN_ON        LD3_ON
-#define LED_GREEN_OFF       LD3_OFF
-#define LED_GREEN_TOGGLE    LD3_TOGGLE
-#define LED_RED_ON          LD4_ON
-#define LED_RED_OFF         LD4_OFF
-#define LED_RED_TOGGLE      LD4_TOGGLE
+#define LED_PORT            GPIOC
+#define LED0_MASK           (1 << 9)
+#define LED1_MASK           (1 << 8)
+
+#define LED0_ON             (LED_PORT->BSRR = LED0_MASK)
+#define LED0_OFF            (LED_PORT->BRR  = LED0_MASK)
+#define LED0_TOGGLE         (LED_PORT->ODR ^= LED0_MASK)
+
+#define LED1_ON             (LED_PORT->BSRR = LED1_MASK)
+#define LED1_OFF            (LED_PORT->BRR  = LED1_MASK)
+#define LED1_TOGGLE         (LED_PORT->ODR ^= LED1_MASK)
 /** @} */
 
 /**
