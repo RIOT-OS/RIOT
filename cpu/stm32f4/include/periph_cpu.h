@@ -26,9 +26,13 @@ extern "C" {
 #endif
 
 /**
- * @brief   Length of the CPU_ID in octets
+ * @brief   Available number of ADC devices
  */
-#define CPUID_LEN           (12U)
+#if defined(CPU_MODEL_STM32F401RE)
+#define ADC_DEVS            (1U)
+#elif defined(CPU_MODEL_STM32F407VG) || defined(CPU_MODEL_STM32F415RG)
+#define ADC_DEVS            (3U)
+#endif
 
 /**
  * @brief   Overwrite the default gpio_t type definition
@@ -189,8 +193,8 @@ typedef enum {
  * @brief   ADC channel configuration data
  */
 typedef struct {
-    ADC_TypeDef *dev;       /**< ADC device used for the channel */
     gpio_t pin;             /**< pin connected to the channel */
+    uint8_t dev;            /**< ADCx - 1 device used for the channel */
     uint8_t chan;           /**< CPU ADC channel connected to the pin */
     uint8_t rcc;            /**< bit in the RCC APB2 enable register */
 } adc_conf_t;

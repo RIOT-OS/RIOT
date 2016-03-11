@@ -20,7 +20,7 @@
  * these features will ever be integrated in this interface, or if it does make
  * more sense to create a second, advanced ADC interface for this.
  *
- * The ADC driver interface is build around the concept of ADC lines. An ADC
+ * The ADC driver interface is built around the concept of ADC lines. An ADC
  * line in this context is a tuple consisting out of a hardware ADC device (an
  * ADC functional unit on the MCU) and an ADC channel connected to pin.
  *
@@ -40,10 +40,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef ADC_H
-#define ADC_H
-
-#include <stdint.h>
+#ifndef PERIPH_ADC_H
+#define PERIPH_ADC_H
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -138,5 +136,5 @@ int adc_sample(adc_t line, adc_res_t res);
 }
 #endif
 
-#endif /* ADC_H */
+#endif /* PERIPH_ADC_H */
 /** @} */

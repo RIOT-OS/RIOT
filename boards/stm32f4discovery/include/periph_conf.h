@@ -120,11 +120,11 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 static const adc_conf_t adc_config[] = {
-    /* device, pin, channel, RCC bit */
-    {ADC1, GPIO_PIN(PORT_A, 1), 1, 8},
-    {ADC1, GPIO_PIN(PORT_A, 4), 4, 8},
-    {ADC2, GPIO_PIN(PORT_C, 1), 11, 9},
-    {ADC2, GPIO_PIN(PORT_C, 2), 12, 9}
+    /* pin, device (ADCx), channel */
+    {GPIO_PIN(PORT_A, 1), 0, 1},
+    {GPIO_PIN(PORT_A, 4), 0, 4},
+    {GPIO_PIN(PORT_C, 1), 1, 11},
+    {GPIO_PIN(PORT_C, 2), 1, 12}
 };
 
 /* deduct the number of available ADC channels from the configuration above */
@@ -222,7 +222,7 @@ static const i2c_conf_t i2c_config[] = {
     {
         I2C1,
         GPIO_PIN(PORT_B, 6),
-        GPIO_PIN(PORT_B, 7)},
+        GPIO_PIN(PORT_B, 7),
         4,
         4,
         I2C_SPEED_NORMAL,

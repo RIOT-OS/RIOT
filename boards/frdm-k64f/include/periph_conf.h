@@ -20,7 +20,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "cpu_conf.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -45,6 +45,7 @@ extern "C"
 #define KINETIS_MCG_PLL_FREQ         60000000
 
 #define CLOCK_CORECLOCK              KINETIS_MCG_PLL_FREQ
+#define CLOCK_BUSCLOCK               (CLOCK_CORECLOCK / 2)
 /** @} */
 
 
@@ -102,47 +103,17 @@ extern "C"
  * @name ADC configuration
  * @{
  */
-#define ADC_NUMOF                    (1U)
-#define ADC_0_EN                     1
-#define ADC_MAX_CHANNELS             6
+static const adc_conf_t adc_config[] = {
+    /* dev, pin, channel */
+    { ADC0, GPIO_PIN(PORT_B, 10), 14 },
+    { ADC0, GPIO_PIN(PORT_B, 11), 15 },
+    { ADC0, GPIO_PIN(PORT_C, 11), 7 },
+    { ADC0, GPIO_PIN(PORT_C, 10), 6 },
+    { ADC0, GPIO_PIN(PORT_C, 8), 4 },
+    { ADC0, GPIO_PIN(PORT_C, 9), 5 },
+};
 
-/* ADC 0 configuration */
-#define ADC_0_DEV                    ADC1
-#define ADC_0_MODULE_CLOCK           CLOCK_CORECLOCK
-#define ADC_0_CHANNELS               6
-#define ADC_0_CLKEN()                (SIM->SCGC3 |= (SIM_SCGC3_ADC1_MASK))
-#define ADC_0_CLKDIS()               (SIM->SCGC3 &= ~(SIM_SCGC3_ADC1_MASK))
-#define ADC_0_PORT_CLKEN()           (SIM->SCGC5 |= (SIM_SCGC5_PORTB_MASK | SIM_SCGC5_PORTC_MASK))
-/* ADC 0 channel 0 pin config */
-#define ADC_0_CH0_PORT               PORTB
-#define ADC_0_CH0_PIN                10
-#define ADC_0_CH0_PIN_AF             0
-#define ADC_0_CH0                    14
-/* ADC 0 channel 1 pin config */
-#define ADC_0_CH1_PORT               PORTB
-#define ADC_0_CH1_PIN                11
-#define ADC_0_CH1_PIN_AF             0
-#define ADC_0_CH1                    15
-/* ADC 0 channel 2 pin config */
-#define ADC_0_CH2_PORT               PORTC
-#define ADC_0_CH2_PIN                11
-#define ADC_0_CH2_PIN_AF             0
-#define ADC_0_CH2                    7
-/* ADC 0 channel 3 pin config */
-#define ADC_0_CH3_PORT               PORTC
-#define ADC_0_CH3_PIN                10
-#define ADC_0_CH3_PIN_AF             0
-#define ADC_0_CH3                    6
-/* ADC 0 channel 4 pin config */
-#define ADC_0_CH4_PORT               PORTC
-#define ADC_0_CH4_PIN                8
-#define ADC_0_CH4_PIN_AF             0
-#define ADC_0_CH4                    4
-/* ADC 0 channel 5 pin config */
-#define ADC_0_CH5_PORT               PORTC
-#define ADC_0_CH5_PIN                9
-#define ADC_0_CH5_PIN_AF             0
-#define ADC_0_CH5                    5
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 /**

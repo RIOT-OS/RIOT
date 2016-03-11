@@ -102,23 +102,14 @@ extern "C" {
  * @name ADC configuration
  * @{
  */
-#define ADC_NUMOF           (1U)
-#define ADC_0_EN            1
-#define ADC_MAX_CHANNELS    2
+static const adc_conf_t adc_config[] = {
+    /* pin, device (ADCx), channel */
+    {GPIO_PIN(PORT_B, 0), 0, 8},
+    {GPIO_PIN(PORT_B, 1), 0, 9}
+};
 
-/* ADC 0 configuration */
-#define ADC_0_DEV           ADC1
-#define ADC_0_CHANNELS      2
-#define ADC_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_ADC1EN)
-#define ADC_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_ADC1EN))
-#define ADC_0_PORT          GPIOB
-#define ADC_0_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
-/* ADC 0 channel 0 pin config */
-#define ADC_0_CH0           8
-#define ADC_0_CH0_PIN       0
-/* ADC 0 channel 1 pin config */
-#define ADC_0_CH1           9
-#define ADC_0_CH1_PIN       1
+/* deduct the number of available ADC channels from the configuration above */
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 /**

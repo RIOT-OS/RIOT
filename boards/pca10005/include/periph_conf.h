@@ -105,16 +105,9 @@ static const timer_conf_t timer_config[] = {
  * @name ADC configuration
  * @{
  */
-#define ADC_NUMOF           (1U)
-#define ADC_0_EN            1
-#define ADC_MAX_CHANNELS    4
+static const uint8_t adc_config[] = {0, 1, 2, 3};
 
-/* ADC 0 device configuration */
-#define ADC_0_CHANNELS      4
-#define ADC_0_CH0           ADC_CONFIG_PSEL_AnalogInput0
-#define ADC_0_CH1           ADC_CONFIG_PSEL_AnalogInput1
-#define ADC_0_CH2           ADC_CONFIG_PSEL_AnalogInput2
-#define ADC_0_CH3           ADC_CONFIG_PSEL_AnalogInput3
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 /**
