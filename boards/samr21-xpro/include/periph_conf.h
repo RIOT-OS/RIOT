@@ -17,6 +17,7 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author      Mark Solters <msolters@driblet.io>
  */
 
 #ifndef PERIPH_CONF_H_
@@ -230,6 +231,149 @@ static const pwm_conf_t pwm_config[] = {
 #define RTT_MAX_VALUE       (0xffffffff)
 #define RTT_FREQUENCY       (32768U)    /* in Hz. For changes see `rtt.c` */
 #define RTT_RUNSTDBY        (1)         /* Keep RTT running in sleep states */
+/** @} */
+
+/** @} */
+
+/**
+ * @ ADC Configuration
+ * @{
+ */
+
+#define ADC_NUMOF                          (1U)
+#define ADC_0_EN                           1
+#define ADC_MAX_CHANNELS                   8
+
+/* ADC 0 device configuration */
+#define ADC_0_DEV                          ADC
+#define ADC_0_PORT                         (PORT->Group[0])
+#define ADC_0_IRQ                          ADC_IRQn
+#define ADC_0_CHANNELS                     6 // ignore PA04 & PA05 due to EDBG UART conflict
+
+typedef struct {
+  PortGroup *port;
+  uint8_t pin;
+  uint8_t muxpos;                 /* see datasheet sec 30.8.8 */
+} adc_channel_t;
+
+/* ADC 0 Default values */
+#define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
+#define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV4
+#define ADC_0_WINDOW_MODE                  ADC_WINCTRL_WINMODE_DISABLE
+#define ADC_0_WINDOW_LOWER                 0
+#define ADC_0_WINDOW_HIGHER                0
+
+#define ADC_0_CORRECTION_EN                0 /* disabled */
+#define ADC_0_GAIN_CORRECTION              ADC_GAINCORR_RESETVALUE
+#define ADC_0_OFFSET_CORRECTION            ADC_OFFSETCORR_RESETVALUE
+#define ADC_0_SAMPLE_LENGTH                0
+#define ADC_0_PIN_SCAN_OFFSET_START        0 /* disabled */
+#define ADC_0_PIN_SCAN_INPUT_TO_SCAN       0 /* disabled */
+#define ADC_0_LEFT_ADJUST                  0 /* disabled */
+#define ADC_0_DIFFERENTIAL_MODE            0 /* disabled */
+#define ADC_0_FREE_RUNNING                 0 /* disabled */
+#define ADC_0_EVENT_ACTION                 0 /* disabled */
+#define ADC_0_RUN_IN_STANDBY               0 /* disabled */
+
+/* ADC 0 Module Status flags */
+#define ADC_0_STATUS_RESULT_READY          (1UL << 0)
+#define ADC_0_STATUS_WINDOW                (1UL << 1)
+#define ADC_0_STATUS_OVERRUN               (1UL << 2)
+
+#if ADC_0_CHANNELS
+/*  An array listing all possible positive input
+ *  ADC channels for the SAMR21-XPRO.
+ *
+ *  Note: Enabling PA04/PA05 will cause EDBG serial communication
+ *  to freeze, so they are disabled by default!
+ */
+static const adc_channel_t adc_channels[] = {
+    /* port, pin, muxpos */
+    //{&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN4, 0x4},      // PA04
+    //{&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN5, 0x5},      // PA05
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN6, 0x6},      // PA06
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN7, 0x7},      // PA07
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN16, 0x10},    // PA08
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN17, 0x11},    // PA09
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN10, 0xA},     // PB02
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN11, 0xB},     // PB03
+};
+
+/*  In differential mode, we can only pick one positive
+ *  and one negative input.  These are the default values.
+ */
+#define ADC_0_POS_INPUT                    ADC_INPUTCTRL_MUXPOS_PIN6
+#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_IOGND
+#endif
+
+/* ADC 0 Gain Factor */
+#define ADC_0_GAIN_FACTOR_1X               ADC_INPUTCTRL_GAIN_1X
+#define ADC_0_GAIN_FACTOR_2X               ADC_INPUTCTRL_GAIN_2X
+#define ADC_0_GAIN_FACTOR_4X               ADC_INPUTCTRL_GAIN_4X
+#define ADC_0_GAIN_FACTOR_8X               ADC_INPUTCTRL_GAIN_8X
+#define ADC_0_GAIN_FACTOR_16X              ADC_INPUTCTRL_GAIN_16X
+/* Use this to define the value used */
+#define ADC_0_GAIN_FACTOR_DEFAULT          ADC_0_GAIN_FACTOR_1X
+
+/* ADC 0 Resolutions */
+#define ADC_0_RES_8BIT                     ADC_CTRLB_RESSEL_8BIT
+#define ADC_0_RES_10BIT                    ADC_CTRLB_RESSEL_10BIT
+#define ADC_0_RES_12BIT                    ADC_CTRLB_RESSEL_12BIT
+#define ADC_0_RES_16BIT                    ADC_CTRLB_RESSEL_16BIT
+
+/* ADC 0 Voltage reference
+ *
+ * Note: ADC_0_REF_EXT_B is PA04 on the SAMR21-xpro.
+ *       PA04 is also hardwired to the USB EDBG serial.
+ *       If you use ADC_0_REF_EXT_B while also using
+ *       EDBG serial, the serial connection will freeze.
+ */
+#define ADC_0_REF_INT_1V                   ADC_REFCTRL_REFSEL_INT1V
+#define ADC_0_REF_EXT_B                    ADC_REFCTRL_REFSEL_AREFB
+#define ADC_0_REF_COM_EN                   0
+/* Use this to define the value used */
+#define ADC_0_REF_DEFAULT                  ADC_0_REF_INT_1V
+
+/* ADC 0 ACCUMULATE */
+#define ADC_0_ACCUM_DISABLE                ADC_AVGCTRL_SAMPLENUM_1
+#define ADC_0_ACCUM_2                      ADC_AVGCTRL_SAMPLENUM_2
+#define ADC_0_ACCUM_4                      ADC_AVGCTRL_SAMPLENUM_4
+#define ADC_0_ACCUM_8                      ADC_AVGCTRL_SAMPLENUM_8
+#define ADC_0_ACCUM_16                     ADC_AVGCTRL_SAMPLENUM_16
+#define ADC_0_ACCUM_32                     ADC_AVGCTRL_SAMPLENUM_32
+#define ADC_0_ACCUM_64                     ADC_AVGCTRL_SAMPLENUM_64
+#define ADC_0_ACCUM_128                    ADC_AVGCTRL_SAMPLENUM_128
+#define ADC_0_ACCUM_256                    ADC_AVGCTRL_SAMPLENUM_256
+#define ADC_0_ACCUM_512                    ADC_AVGCTRL_SAMPLENUM_512
+#define ADC_0_ACCUM_1024                   ADC_AVGCTRL_SAMPLENUM_1024
+/* Use this to define the value used */
+#define ADC_0_ACCUM_DEFAULT                ADC_0_ACCUM_DISABLE
+
+/* ADC 0 DIVIDE RESULT */
+#define ADC_0_DIV_RES_DISABLE              0
+#define ADC_0_DIV_RES_2                    1
+#define ADC_0_DIV_RES_4                    2
+#define ADC_0_DIV_RES_8                    3
+#define ADC_0_DIV_RES_16                   4
+#define ADC_0_DIV_RES_32                   5
+#define ADC_0_DIV_RES_64                   6
+#define ADC_0_DIV_RES_128                  7
+/* Use this to define the value used */
+#define ADC_0_DIV_RES_DEFAULT             ADC_0_DIV_RES_DISABLE
+
+/*  Declare ADC Configuration object */
+#define ADC_CONF_TYPE_DEFINED 1
+typedef struct {
+  uint32_t precision;
+  uint32_t prescaler;
+  uint32_t gain;
+  uint32_t accumulate;
+  uint8_t  divide;
+  int vref;
+  int differential_mode;
+  int run_in_standby;
+} adc_conf_t;
+
 /** @} */
 
 #ifdef __cplusplus
