@@ -121,14 +121,19 @@ typedef struct {
  */
 #define SBAPI_SMARTCONFIG   (0x1)
 #define SBAPI_DEFAULT_RESET (0x2)
+#define SBAPI_AUTOSTART     (0x3)
 
 // 2 bits flag, numbers of connections attempt before invoking smartconfig if
 // enabled
 #define SBAPI_RETRIES         (2 << 2)
 #define SBAPI_DELETE_PROFILES (0x10)
 
-#define SBAPI_DEFAULT_CFG   (SBAPI_RETRIES|SBAPI_SMARTCONFIG)
+#define SBAPI_DEFAULT_CFG   (SBAPI_RETRIES|SBAPI_SMARTCONFIG|SBAPI_AUTOSTART)
 
+/**
+ * @brief msec timeout before hibernating network processor
+ */
+#define SL_STOP_TIME_WAIT (2000)
 
 /**
  * @brief configuration key items

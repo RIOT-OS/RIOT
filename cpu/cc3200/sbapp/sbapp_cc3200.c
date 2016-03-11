@@ -22,10 +22,6 @@
 #define ENABLE_DEBUG    (1)
 #include "debug.h"
 
-/**
- * @brief msec timeout before hibernating network processor
- */
-#define SL_STOP_TIME_WAIT (1000)
 
 /**
  * @brief the recv receive buffer
@@ -620,12 +616,21 @@ long wifi_connect(void) {
 int sbapp_init(uint32_t options) {
 
 	msg_t reply;
+	msg_t timeout_msg;
 	kernel_pid_t parent = thread_getpid();
+	xtimer_t guard_timer;
+
+	timeout_msg.type = 0x1;
+	timeout_msg.content.value = -2;
 
 	sbapp.options = options;
 
 	/* check if thread is already running */
 	if (sbapp.main_pid == KERNEL_PID_UNDEF) {
+
+	    // protection timer
+	    xtimer_set_msg(&guard_timer, MSEC_TO_TICKS(20000), &timeout_msg, parent);
+
 		/* start SBAPP thread */
 		sbapp.main_pid = thread_create(_stack, sizeof(_stack), SBAPP_PRIO,
 		THREAD_CREATE_STACKTEST, _event_loop, &parent, "sbapp");
@@ -633,6 +638,8 @@ int sbapp_init(uint32_t options) {
 		// yield until ip connection is ready or an error condition prevents
 		// a successful connection
 	    msg_receive(&reply);
+
+	    xtimer_remove(&guard_timer);
 	    if ((int)reply.content.value < 0) {
 	        return (int)reply.content.value;
 	    }
@@ -901,6 +908,7 @@ static void *_event_loop(void *arg) {
 	msg_t msg, reply;
 	msg_t msg_queue[SBAPP_MSG_QUEUE_SIZE];
 	int counter = 0;
+	int16_t sts;
 
 	/* preset reply message */
 	reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
@@ -916,12 +924,22 @@ static void *_event_loop(void *arg) {
 		PANIC(NAMESPACE, SIMPLELINK_START_ERR);
 	}
 
-	simplelink_to_default_state();
+	//simplelink_to_default_state();
 
 	xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(100));
 
 	// start the simplelink device channel
 	nwp.role = sl_Start(NULL, NULL, NULL);
+
+	if(sbapp.options & SBAPI_AUTOSTART) {
+	    // Set connection policy to Auto
+	    sts = sl_WlanPolicySet(SL_POLICY_CONNECTION,
+	            SL_CONNECTION_POLICY(1, 0, 0, 0, 1), NULL, 0);
+	} else {
+        sts = sl_WlanPolicySet(SL_POLICY_CONNECTION,
+                SL_CONNECTION_POLICY(0, 0, 0, 0, 0), NULL, 0);
+	}
+    STOP_IF_ERR(NAMESPACE, sts, WLAN_POLICYSET_ERR);
 
 	if (sbapp.options & SBAPI_DELETE_PROFILES) {
 	    sl_WlanProfileDel(0xFF);
