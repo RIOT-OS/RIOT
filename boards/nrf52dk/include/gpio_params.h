@@ -34,25 +34,25 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 {
     {
         .name = "LED 1",
-        .pin = LED1_PIN,
+        .pin = LED0_PIN,
         .dir = GPIO_DIR_OUT,
         .pull = GPIO_NOPULL
     },
     {
         .name = "LED 2",
-        .pin = LED2_PIN,
+        .pin = LED1_PIN,
         .dir = GPIO_DIR_OUT,
         .pull = GPIO_NOPULL
     },
     {
         .name = "LED 3",
-        .pin = LED3_PIN,
+        .pin = LED2_PIN,
         .dir = GPIO_DIR_OUT,
         .pull = GPIO_NOPULL
     },
     {
         .name = "LED 4",
-        .pin = LED4_PIN,
+        .pin = LED3_PIN,
         .dir = GPIO_DIR_OUT,
         .pull = GPIO_NOPULL
     },
