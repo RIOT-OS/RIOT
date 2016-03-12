@@ -98,7 +98,7 @@ static void cpu_clock_init(void)
 
     /*  PLL configuration: PLLCLK = SOURCE_CLOCK / SOURCE_CLOCK_DIV * SOURCE_CLOCK_MUL */
     RCC->PLLCFGR &= ~((uint32_t)(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ));
-    RCC->PLLCFGR |= (uint32_t)(RCC_PLL_SOURCE | CLOCK_PLL_DIV | (CLOCK_PLL_MUL << 6));
+    RCC->PLLCFGR |= (uint32_t)(RCC_PLL_SOURCE | CLOCK_PLL_DIV | (CLOCK_PLL_MUL << 6) | (CLOCK_PLL_Q_DIV << 24));
 
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;

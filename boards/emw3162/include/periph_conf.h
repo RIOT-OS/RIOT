@@ -35,6 +35,7 @@ extern "C" {
 /* the actual PLL values are automatically generated */
 #define CLOCK_PLL_DIV               (CLOCK_HSE / 1000000)
 #define CLOCK_PLL_MUL               ((CLOCK_CORECLOCK / 1000000) * 2)
+#define CLOCK_PLL_Q_DIV             ((CLOCK_CORECLOCK * 2) / 48000000)
 #define CLOCK_AHB_DIV               RCC_CFGR_HPRE_DIV1
 #define CLOCK_APB2_DIV              RCC_CFGR_PPRE2_DIV2
 #define CLOCK_APB1_DIV              RCC_CFGR_PPRE1_DIV4

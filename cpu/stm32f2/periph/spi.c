@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Hamburg University of Applied Sciences
+ * Copyright (C) 2016 Engineering-Spirit
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -16,6 +16,7 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
  *
  * @}
  */
