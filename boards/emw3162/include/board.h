@@ -29,11 +29,6 @@ extern "C" {
 #endif
 
 /**
- * Define the nominal CPU core clock in this board
- */
-#define F_CPU               CLOCK_CORECLOCK
-
-/**
  * @name xtimer configuration
  * @{
  */
@@ -44,21 +39,15 @@ extern "C" {
 /** @} */
 
 /**
- * @name Define UART device and baudrate for stdio
- * @{
- */
-#define STDIO               UART_DEV(0)
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
-
-/**
  * @name LED pin definitions
  * @{
  */
 #define LED_PORT            GPIOB
 #define D1_PIN              (1 << 0)
 #define D2_PIN              (1 << 1)
+
+#define LED_RED_GPIO        GPIO_PIN(GPIOB, 0)
+#define LED_GREEN_GPIO      GPIO_PIN(GPIOB, 1)
 /** @} */
 
 /**

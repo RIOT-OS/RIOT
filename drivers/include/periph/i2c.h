@@ -129,7 +129,7 @@ enum {
      * not respond with an ACK. This means that either the address was wrong or
      * that the slave is not connected correctly.
      */
-    I2C_ERR_ADDR = -1
+    I2C_ERR_ADDR = -1,
     /**
      * @brief   Data error
      *

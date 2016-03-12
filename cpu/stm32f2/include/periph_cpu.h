@@ -19,7 +19,7 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
-#include "cpu.h"
+#include "periph_cpu_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,6 +47,19 @@ typedef uint32_t gpio_t;
  * @brief   Define a CPU specific GPIO pin generator macro
  */
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
+
+/**
+ * @brief   Override HWSC macro
+ */
+#define SPI_HWCS(x)         (x)
+
+/**
+ * @brief   Peripheral buses
+ */
+enum {
+    BUS_APB1    = 1,
+    BUS_APB2    = 0
+};
 
 /**
  * @brief   Generate GPIO mode bitfields

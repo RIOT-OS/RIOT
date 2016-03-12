@@ -124,31 +124,36 @@ typedef enum {
 /**
  * @brief   Initialize pins used by the given SPI device
  *
- * @param[in] dev       initialize pins for this SPI device
+ * @param[in] bus       initialize pins for this SPI bus
  * @param[in] cs        also initialize this chip select pin
  */
-int spi_init_pins(spi_t dev, spi_cs_t cs);
+int spi_init_pins(spi_t bus, spi_cs_t cs);
 
 /**
  * @brief Get mutually exclusive access to the given SPI bus
  *
  * In case the SPI device is busy, this function will block until the bus is free again.
  *
- * @param[in] dev       SPI device to access
+ * @param[in] bus       SPI bus to access
+ * @param[in] mode      SPI mode to be used
+ * @param[in] clk       Clock speed to use
+ * @param[in] cs        Chip select line to be used
  */
-int spi_acquire(spi_t dev, spi_mode_t mode, spi_clk_t clk, spi_cs_t cs);
+int spi_acquire(spi_t bus, spi_mode_t mode, spi_clk_t clk, spi_cs_t cs);
 
 /**
  * @brief Release the given SPI device to be used by others
  *
- * @param[in] dev       SPI device to release
+ * @param[in] bus       SPI bus to release
  */
-void spi_release(spi_t dev);
+void spi_release(spi_t bus);
 
 /**
  * @brief Transfer one byte on the given SPI bus
  *
- * @param[in] dev       SPI device to use
+ * @param[in] bus       SPI bus to use
+ * @param[in] cs        Chip select line to use
+ * @param[in] cont      True if the chip select must remain asserted at function return
  * @param[in] out       Byte to send out, set NULL if only receiving
  * @param[out] in       Byte to read, set NULL if only sending
  */
@@ -158,7 +163,9 @@ void spi_transfer_byte(spi_t bus, spi_cs_t cs, bool cont,
 /**
  * @brief Transfer a number bytes on the given SPI bus
  *
- * @param[in] dev       SPI device to use
+ * @param[in] bus       SPI bus to use
+ * @param[in] cs        Chip select line to use
+ * @param[in] cont      True if the chip select must remain asserted at function return
  * @param[in] out       Array of bytes to send, set NULL if only receiving
  * @param[out] in       Buffer to receive bytes to, set NULL if only sending
  * @param[in] length    Number of bytes to transfer
@@ -173,7 +180,8 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
  * many SPI devices use a register based addressing scheme, this function is a convenient short-
  * cut for interfacing with such devices.
  *
- * @param[in] dev       SPI device to use
+ * @param[in] bus       SPI bus to use
+ * @param[in] cs        Chip select line to use
  * @param[in] reg       Register address to transfer data to/from
  * @param[in] out       Byte to send, set NULL if only receiving data
  * @param[out] in       Byte to read, set NULL if only sending
@@ -191,7 +199,8 @@ void spi_transfer_reg(spi_t bus, spi_cs_t cs,
  * many SPI devices use a register based addressing scheme, this function is a convenient short-
  * cut for interfacing with such devices.
  *
- * @param[in] dev       SPI device to use
+ * @param[in] bus       SPI bus to use
+ * @param[in] cs        Chip select line to use
  * @param[in] reg       Register address to transfer data to/from
  * @param[in] out       Byte array to send data from, set NULL if only receiving
  * @param[out] in       Byte buffer to read into, set NULL if only sending

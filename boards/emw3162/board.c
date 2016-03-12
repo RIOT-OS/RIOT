@@ -19,7 +19,6 @@
  */
 
 #include "board.h"
-#include "cpu.h"
 
 static void leds_init(void);
 

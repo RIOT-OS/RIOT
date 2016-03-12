@@ -53,6 +53,19 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
 
 /**
+ * @brief   Override HWSC macro
+ */
+#define SPI_HWCS(x)         (x)
+
+/**
+ * @brief   Peripheral buses
+ */
+enum {
+    BUS_APB1    = 1,
+    BUS_APB2    = 0
+};
+
+/**
  * @brief   Generate GPIO mode bitfields
  *
  * We use 5 bit to encode the mode:
