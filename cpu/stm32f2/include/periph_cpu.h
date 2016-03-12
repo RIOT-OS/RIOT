@@ -21,8 +21,6 @@
 
 #include "periph_cpu_common.h"
 
-#include <math.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif

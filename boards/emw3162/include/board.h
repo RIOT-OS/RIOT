@@ -42,32 +42,8 @@ extern "C" {
  * @name LED pin definitions
  * @{
  */
-#define LED_PORT            GPIOB
-#define D1_PIN              (1 << 0)
-#define D2_PIN              (1 << 1)
-
-#define LED_RED_GPIO        GPIO_PIN(GPIOB, 0)
-#define LED_GREEN_GPIO      GPIO_PIN(GPIOB, 1)
-/** @} */
-
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define D1_ON               (LED_PORT->BSRRL = D1_PIN)
-#define D1_OFF              (LED_PORT->BSRRH = D1_PIN)
-#define D1_TOGGLE           (LED_PORT->ODR ^= D1_PIN)
-#define D2_ON               (LED_PORT->BSRRH = D2_PIN)
-#define D2_OFF              (LED_PORT->BSRRL = D2_PIN)
-#define D2_TOGGLE           (LED_PORT->ODR ^= D2_PIN)
-
-/* for compatability to other boards */
-#define LED_GREEN_ON        D1_ON
-#define LED_GREEN_OFF       D1_OFF
-#define LED_GREEN_TOGGLE    D1_TOGGLE
-#define LED_RED_ON          D2_ON
-#define LED_RED_OFF         D2_OFF
-#define LED_RED_TOGGLE      D2_TOGGLE
+#define LED_GREEN_GPIO      GPIO_PIN(PORT_B, 0)
+#define LED_RED_GPIO        GPIO_PIN(PORT_B, 1)
 /** @} */
 
 /**

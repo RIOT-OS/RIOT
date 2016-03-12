@@ -44,7 +44,6 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
 
 /**
-<<<<<<< HEAD
  * @brief   All timers for the STM32F1 have 4 CC channels
  */
 #define TIMER_CHANNELS      (4U)

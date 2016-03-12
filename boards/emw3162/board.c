@@ -43,6 +43,7 @@ void board_init(void)
  */
 static void leds_init(void)
 {
+#if 0
     /* enable clock for port GPIOD */
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
 
@@ -58,4 +59,5 @@ static void leds_init(void)
 
     /* turn all LEDs off */
     LED_PORT->BSRRH = 0x00000003;
+#endif
 }
