@@ -62,7 +62,6 @@ void spi_transfer_reg(spi_t bus, spi_cs_t cs,
 #ifdef PERIPH_SPI_NEEDS_TRANSFER_REGS
 void spi_transfer_regs(spi_t bus, spi_cs_t cs,
                        uint8_t reg, uint8_t *out, uint8_t *in, size_t len)
-//int spi_transfer_regs(spi_t bus, spi_cs_t cs, uint8_t reg, uint8_t *out, uint8_t *in, size_t len)
 {
     uint8_t tmp;
     spi_transfer_byte(bus, cs, true, reg, &tmp);
