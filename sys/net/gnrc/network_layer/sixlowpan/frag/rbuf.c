@@ -319,7 +319,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
     /* now we have an empty spot */
 
-    res->pkt = gnrc_pktbuf_add(NULL, NULL, size, GNRC_NETTYPE_SIXLOWPAN);
+    res->pkt = gnrc_pktbuf_add(NULL, NULL, size, GNRC_NETTYPE_IPV6);
     if (res->pkt == NULL) {
         DEBUG("6lo rfrag: can not allocate reassembly buffer space.\n");
         return NULL;
