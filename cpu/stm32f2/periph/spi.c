@@ -32,6 +32,8 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
+#define MIN(a, b)           ((a) > (b) ? (b) : (a))
+
 /**
  * @brief   The STM32F2 only has one hardware chip select line
  */
@@ -114,9 +116,9 @@ int spi_acquire(spi_t bus, spi_mode_t mode, spi_clk_t clk, spi_cs_t cs)
     /* enable SPI device clock */
     clk_en(bus);
     /* enable device */
-    dev(bus)->CR1 = (((clk + spi_config[bus].abpbus) << 3) | mode | SPI_CR1_MSTR);
+    dev(bus)->CR1 = ((MIN((clk + spi_config[bus].abpbus), 0x7) << 3) | mode | SPI_CR1_MSTR);
     if (cs != HWCS_LINE) {
-        dev(bus)->CR1 |= SPI_CR1_SSM | SPI_CR1_SSI;
+        dev(bus)->CR1 |= (SPI_CR1_SSM | SPI_CR1_SSI);
     }
     return 0;
 }

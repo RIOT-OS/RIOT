@@ -21,6 +21,8 @@
 
 #include "periph_cpu_common.h"
 
+#include <math.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -57,8 +59,8 @@ typedef uint32_t gpio_t;
  * @brief   Peripheral buses
  */
 enum {
-    BUS_APB1    = 1,
-    BUS_APB2    = 0
+    BUS_APB1    = 0,
+    BUS_APB2    = 1
 };
 
 /**
@@ -94,7 +96,7 @@ typedef enum {
 typedef enum {
     I2C_SPEED_LOW = 0,      /**< low speed mode:    ~10kbit/s */
     I2C_SPEED_NORMAL,       /**< normal mode:       ~100kbit/s */
-    I2C_SPEED_FAST,         /**< fast mode:         ~400kbit/sj */
+    I2C_SPEED_FAST,         /**< fast mode:         ~400kbit/s */
     I2C_SPEED_FAST_PLUS,    /**< fast plus mode:    ~1Mbit/s */
     I2C_SPEED_HIGH,         /**< high speed mode:   ~3.4Mbit/s */
 } i2c_speed_t;
@@ -168,6 +170,29 @@ typedef struct {
 } i2c_conf_t;
 /** @} */
 
+#define HAVE_SPI_MODE_T
+typedef enum {
+    SPI_MODE_0      = 0,    /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1,             /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2,             /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3,             /**< CPOL=1, CPHA=1 */
+} spi_mode_t;
+
+/**
+ * @brief   Define the SPI CLK devider values for APB1
+ *          (assume APB1 clock speed is 30MHz and APB2clk = APB1clk * 2)
+ *
+ * @note    calculate with: value = (int)((sqrt(CLOCK_APB1 / (spi_clk)) / 2) - 1)
+ */
+#define HAVE_SPI_CLK_T
+typedef enum {
+    SPI_CLK_100KHZ  = 0x7,  /**< 117 KHz */
+    SPI_CLK_400KHZ  = 0x5,  /**< 468 KHz */
+    SPI_CLK_1MHZ    = 0x4,  /**< 937 KHz */
+    SPI_CLK_5MHZ    = 0x2,  /**< 3.75 MHz */
+    SPI_CLK_10MHZ   = 0x1,  /**< 7.5 MHz */
+} spi_clk_t;
+
 /**
  * @brief   Structure for SPI configuration data
  * @{
@@ -179,7 +204,7 @@ typedef struct {
     gpio_t sclk_pin;        /**< SCLK pin */
     gpio_af_t af;           /**< pin alternate function */
     uint8_t abpbus;         /**< APB bus, 0 := APB1, 1:= APB2 */
-    uint32_t rccmask;         /**< bit in the RCC peripheral enable register */
+    uint32_t rccmask;       /**< bit in the RCC peripheral enable register */
 } spi_conf_t;
 /** @} */
 

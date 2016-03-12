@@ -188,7 +188,7 @@ static const spi_conf_t spi_config[] = {
         GPIO_PIN(PORT_A, 6),
         GPIO_PIN(PORT_A, 5),
         5,
-        1,
+        BUS_APB2,
         RCC_APB2ENR_SPI1EN
     },
     {
@@ -197,7 +197,7 @@ static const spi_conf_t spi_config[] = {
         GPIO_PIN(PORT_B, 14),
         GPIO_PIN(PORT_B, 13),
         5,
-        0,
+        BUS_APB1,
         RCC_APB1ENR_SPI2EN
     }
 };
