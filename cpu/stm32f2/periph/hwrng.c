@@ -55,4 +55,4 @@ void hwrng_read(uint8_t *buf, unsigned int num)
     RCC->AHB2ENR &= ~RCC_AHB2ENR_RNGEN;
 }
 
-#endif /* CPUID_LEN */
+#endif /* RNG */

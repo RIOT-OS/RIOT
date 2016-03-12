@@ -229,7 +229,7 @@ void rtc_poweroff(void)
     RCC->BDCR &= ~(RCC_BDCR_LSEON);
 }
 
-void isr_rtc(void)
+void isr_rtc_alarm(void)
 {
 
     if ((RTC->ISR & RTC_ISR_ALRAF) && (rtc_callback.cb != NULL)) {
