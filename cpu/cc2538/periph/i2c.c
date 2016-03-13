@@ -84,7 +84,10 @@ static uint32_t speed_hz;
 static uint32_t scl_delay;
 
 #define bus_quiet()            ( cc2538_gpio_read(I2C_0_SCL_PIN) && cc2538_gpio_read(I2C_0_SDA_PIN) )
-#define WARN_IF(cond) if (cond) DEBUG("%s at %s:%u\n", #cond, RIOT_FILE_NOPATH, __LINE__)
+#define WARN_IF(cond) \
+        if (cond) { \
+            DEBUG("%s at %s:%u\n", #cond, RIOT_FILE_NOPATH, __LINE__); \
+        }
 
 void cc2538_i2c_init_master(uint32_t speed_hz);
 
