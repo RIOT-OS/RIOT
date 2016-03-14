@@ -266,15 +266,6 @@ extern "C" {
 #define PWM_1_CH2_AF        0x81
 /* @} */
 
-/**
- * @brief ADC configuration
- * @{
- */
-#define ADC_NUMOF           (1U)
-#define ADC_0_EN            1
-#define ADC_MAX_CHANNELS    8
-/* @} */
-
 #ifdef __cplusplus
 }
 #endif

@@ -19,6 +19,8 @@
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -89,38 +91,22 @@ extern "C" {
 /** @} */
 
 /**
- * @name ADC configuration
+ * @brief   ADC configuration
+ *
+ * We need to configure the following values:
+ * [ pin, channel ]
  * @{
  */
-#define ADC_NUMOF           (1U)
-#define ADC_0_EN            1
-#define ADC_MAX_CHANNELS    6
+#define ADC_CONFIG {            \
+    { GPIO_PIN(PORT_C, 0), 10 },\
+    { GPIO_PIN(PORT_C, 1), 11 },\
+    { GPIO_PIN(PORT_C, 2), 12 },\
+    { GPIO_PIN(PORT_C, 3), 13 },\
+    { GPIO_PIN(PORT_C, 4), 14 },\
+    { GPIO_PIN(PORT_C, 5), 15 } \
+}
 
-/* ADC 0 configuration */
-#define ADC_0_DEV           ADC1
-#define ADC_0_CHANNELS      6
-#define ADC_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_ADCEN)
-#define ADC_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_ADCEN))
-#define ADC_0_PORT          GPIOC
-#define ADC_0_PORT_CLKEN()  (RCC->AHBENR |= RCC_AHBENR_GPIOCEN)
-/* ADC 0 channel 0 pin config */
-#define ADC_0_CH0           10
-#define ADC_0_CH0_PIN       0
-/* ADC 0 channel 1 pin config */
-#define ADC_0_CH1           11
-#define ADC_0_CH1_PIN       1
-/* ADC 0 channel 2 pin config */
-#define ADC_0_CH2           12
-#define ADC_0_CH2_PIN       2
-/* ADC 0 channel 3 pin config */
-#define ADC_0_CH3           13
-#define ADC_0_CH3_PIN       3
-/* ADC 0 channel 4 pin config */
-#define ADC_0_CH4           14
-#define ADC_0_CH4_PIN       4
-/* ADC 0 channel 5 pin config */
-#define ADC_0_CH5           15
-#define ADC_0_CH5_PIN       5
+#define ADC_NUMOF           (6)
 /** @} */
 
 /**

@@ -32,6 +32,7 @@
 #endif
 
 #define RES             DAC_RES_10BIT
+#define ADC_RES         ADC_RES_10BIT
 #define DELAY           (1000 * 1000U)
 #define MAX_VALUE_STEPS 1000
 
@@ -60,9 +61,9 @@ int main(void)
             return 1;
         }
 
-#if ADC_NUMOF > 0
-        printf("Initializing ADC_0 @ %i bit resolution", (6 + (2* RES)));
-        if (adc_init(0, RES) == 0) {
+#ifdef ADC_NUMOF
+        printf("Initializing ADC_LINE(0)");
+        if (adc_init(ADC_LINE(0)) == 0) {
             puts("    ...[ok]");
         }
         else {
@@ -82,9 +83,9 @@ int main(void)
                     printf("%i: Something went wrong writing DAC\n", status_dac_write);
                     return -1;
                 }
-#if ADC_NUMOF > 0
+#ifdef ADC_NUMOF
                 /* Read values from ADC */
-                int sample = adc_sample(ADC_0, 0);
+                int sample = adc_sample(ADC_LINE(0), ADC_RES);
                 if (sample < 0) {
                     printf("%i: Something went wrong sampling ADC\n", sample);
                     return -1;

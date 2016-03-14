@@ -52,7 +52,6 @@ typedef enum {
 } gpio_pp_t;
 /** @} */
 
-
 /**
  * @brief   Override values for pin direction configuration
  * @{
@@ -87,6 +86,19 @@ enum {
   PORT_E = 4,       /**< port E */
   PORT_F = 5,       /**< port F */
 };
+
+/**
+ * @brief   Override resolution options
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0xa00,            /**< not supported by hardware */
+    ADC_RES_8BIT  = 0xb00,            /**< not supported by hardware */
+    ADC_RES_10BIT = ADC_RES_10BIT_S,  /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = ADC_RES_12BIT_S,  /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 0xc00,            /**< not supported by hardware */
+    ADC_RES_16BIT = 0xd00,            /**< not supported by hardware */
+} adc_res_t;
 
 #ifdef __cplusplus
 }

@@ -161,6 +161,12 @@ static const uart_conf_t uart_config[] = {
 #define I2C_0_SDA_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
 /** @} */
 
+/**
+ * @brief   ADC configuration
+ * @{
+ */
+#define ADC_NUMOF          (0)
+/** @} */
 
 #ifdef __cplusplus
 }

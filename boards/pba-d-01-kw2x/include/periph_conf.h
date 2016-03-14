@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
@@ -22,7 +22,7 @@
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
 
-#include "cpu_conf.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -47,6 +47,7 @@ extern "C"
 #define KINETIS_MCG_PLL_FREQ              48000000
 
 #define CLOCK_CORECLOCK                   KINETIS_MCG_PLL_FREQ
+#define CLOCK_BUSCLOCK                    CLOCK_CORECLOCK
 /** @} */
 
 
@@ -115,54 +116,22 @@ extern "C"
 #define UART_1_AF           3
 /** @} */
 
-
 /**
  * @name ADC configuration
  * @{
  */
-#define ADC_NUMOF           (1U)
-#define ADC_0_EN            1
-#define ADC_MAX_CHANNELS    6
+static const adc_conf_t adc_config[] = {
+    /* dev, pin, channel */
+    { ADC0, GPIO_PIN(PORT_E, 2), 1 },
+    { ADC0, GPIO_PIN(PORT_E, 3), 1 },
+    { ADC0, GPIO_PIN(PORT_D, 7), 22 },
+    { ADC0, GPIO_PIN(PORT_D, 5), 6 },
+    { ADC0, GPIO_PIN(PORT_E, 0), 10 },
+    { ADC0, GPIO_PIN(PORT_E, 1), 11 },
+};
 
-/* ADC 0 configuration */
-#define ADC_0_DEV           ADC0
-#define ADC_0_MODULE_CLOCK  CLOCK_CORECLOCK
-#define ADC_0_CHANNELS      6
-#define ADC_0_CLKEN()       (SIM->SCGC6 |= (SIM_SCGC6_ADC0_MASK))
-#define ADC_0_CLKDIS()      (SIM->SCGC6 &= ~(SIM_SCGC6_ADC0_MASK))
-#define ADC_0_PORT_CLKEN()  (SIM->SCGC5 |= (SIM_SCGC5_PORTD_MASK | SIM_SCGC5_PORTE_MASK))
-/* ADC 0 channel 0 pin config */
-#define ADC_0_CH0           1
-#define ADC_0_CH0_PIN       2
-#define ADC_0_CH0_PIN_AF    0
-#define ADC_0_CH0_PORT      PORTE
-/* ADC 0 channel 1 pin config */
-#define ADC_0_CH1           1 /* PTE3 uses the same ADC_CH as PTE2, in single channel mode only one of them can be selected */
-#define ADC_0_CH1_PIN       3
-#define ADC_0_CH1_PIN_AF    0
-#define ADC_0_CH1_PORT      PORTE
-/* ADC 0 channel 2 pin config */
-#define ADC_0_CH2           22
-#define ADC_0_CH2_PIN       7
-#define ADC_0_CH2_PIN_AF    0
-#define ADC_0_CH2_PORT      PORTD
-/* ADC 0 channel 3 pin config */
-#define ADC_0_CH3           6
-#define ADC_0_CH3_PIN       5
-#define ADC_0_CH3_PIN_AF    0
-#define ADC_0_CH3_PORT      PORTD
-/* ADC 0 channel 4 pin config */
-#define ADC_0_CH4           10
-#define ADC_0_CH4_PIN       0
-#define ADC_0_CH4_PIN_AF    0
-#define ADC_0_CH4_PORT      PORTE
-/* ADC 0 channel 5 pin config */
-#define ADC_0_CH5           11
-#define ADC_0_CH5_PIN       1
-#define ADC_0_CH5_PIN_AF    0
-#define ADC_0_CH5_PORT      PORTE
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
-
 
 /**
  * @name PWM configuration
