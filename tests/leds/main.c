@@ -33,7 +33,7 @@
 void dumb_delay(uint32_t delay)
 {
     for (uint32_t i = 0; i < delay; i++) {
-        asm("nop");
+        __asm__("nop");
     }
 }
 

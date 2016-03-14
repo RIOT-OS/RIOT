@@ -214,7 +214,7 @@ void NORETURN __enter_thread_mode(void)
 {
     irq_enable();
     __context_restore();
-    asm volatile("ret");
+    __asm__ volatile("ret");
 
     UNREACHABLE();
 }
@@ -229,13 +229,13 @@ void thread_arch_yield(void)
     irq_enable();
 
     __context_restore();
-    asm volatile("ret");
+    __asm__ volatile("ret");
 }
 
 
 __attribute__((always_inline)) static inline void __context_save(void)
 {
-    asm volatile(
+    __asm__ volatile(
         "push r0                             \n\t"
         "in   r0, __SREG__                   \n\t"
         "cli                                 \n\t"
@@ -291,7 +291,7 @@ __attribute__((always_inline)) static inline void __context_save(void)
 
 __attribute__((always_inline)) static inline void __context_restore(void)
 {
-    asm volatile(
+    __asm__ volatile(
         "lds  r26, sched_active_thread       \n\t"
         "lds  r27, sched_active_thread + 1   \n\t"
         "ld   r28, x+                        \n\t"

@@ -174,7 +174,7 @@ interrupt(PORT1_VECTOR) __attribute__((naked)) port1_isr(void)
         }
         else {
             /* TODO: check for long duration irq */
-            asm volatile(" nop ");
+            __asm__ volatile(" nop ");
         }
     }
     else {
@@ -221,7 +221,7 @@ interrupt(PORT2_VECTOR) __attribute__((naked)) port2_isr(void)
         else {
             c2++;
             /* TODO: check for long duration irq */
-            asm volatile(" nop ");
+            __asm__ volatile(" nop ");
         }
     }
     else {
