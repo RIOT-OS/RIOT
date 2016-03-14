@@ -59,8 +59,6 @@
 
 #include "periph_conf.h"
 #include "periph_cpu.h"
-/* TODO: remove once all platforms are ported to this interface */
-#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -119,25 +117,34 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   I2C error codes
+ * @brief   I2C transfer results
  */
 enum {
-    I2C_OK       = 0,       /**< everything went fine */
     /**
-     * @brief   Address error
-     *
-     * After the address + the read/write bit were send, the addressed slave did
-     * not respond with an ACK. This means that either the address was wrong or
-     * that the slave is not connected correctly.
+     * @brief   All bytes were transferred successfully
      */
-    I2C_ERR_ADDR = -1
+    I2C_ACK       = 0,
     /**
-     * @brief   Data error
+     * @brief   NACK when transferring the address byte
      *
-     * An error occurred while transferring the data from/to the slave. Possible
-     * reasons are overrun errors, NACKs when writing to the slave, or similar.
+     * After the address + the read/write bit were send, we got an NACK as
+     * response. This means most probably, that there is no slave with the used
+     * address on the bus, or the slave did just not respond for some reason.
      */
-    I2C_ERR_DATA = -2       /**< data error */
+    I2C_ADDR_NACK = -1
+    /**
+     * @brief   NACK while writing data bytes
+     *
+     * The slave responded to a data byte written to it with a NACK.
+     */
+    I2C_NACK_DATA = -2       /**< data error */
+     /**
+      * @brief   Internal error
+      *
+      * This status code is returned, on any other internal error that might
+      * have occurred.
+      */
+    I2C_ERR = -3;
 };
 
 /**
@@ -146,7 +153,7 @@ enum {
  * The given I2C device will be initialized with the parameters as specified in
  * the boards periph_conf.h, using the pins and the speed value given there.
  *
- * @param[in] dev           the device to initialize
+ * @param[in] dev       the device to initialize
  *
  * @return                  0 on successful initialization
  * @return                  -1 on undefined device given
@@ -159,18 +166,16 @@ int i2c_init(i2c_t dev);
  * In case the I2C device is busy, this function will block until the bus is
  * free again.
  *
- * @param[in] dev       I2C device to access
+ * @param[in] dev           I2C device to access
  *
- * @return              0 on success
- * @return              -1 on invalid device
- * @return              -2 on unsupported speed value
+ * @return                  0 on success
  */
 int i2c_acquire(i2c_t dev);
 
 /**
  * @brief   Release the given I2C device to be used by others
  *
- * @param[in] dev       I2C device to release
+ * @param[in] dev           I2C device to release
  */
 void i2c_release(i2c_t dev);
 
@@ -182,9 +187,9 @@ void i2c_release(i2c_t dev);
  * @param[out] data         array holding the received bytes
  * @param[in]  length       the number of bytes to read into `data`
  *
- * @return                  I2C_OK on successful transfer of @p len byte
- * @return                  I2C_ERR_ADDR on address error
- * @return                  I2C_ERR_DATA on data error
+ * @return                  I2C_ACK on successful transfer of @p len byte
+ * @return                  I2C_ADDR_NACK if response to address byte was NACK
+ * @return                  I2C_ERR for any other error
  */
 int i2c_read(i2c_t dev, uint8_t addr, uint8_t *data, size_t len);
 
@@ -197,10 +202,10 @@ int i2c_read(i2c_t dev, uint8_t addr, uint8_t *data, size_t len);
  * @param[out] data         array holding the received bytes
  * @param[in]  len          number of bytes to read into `data
  *
- * @return                  I2C_OK on successful transfer of @p len byte
+ * @return                  I2C_ACK on successful transfer of @p len byte
  *                          to @p reg
- * @return                  I2C_ERR_ADDR on address error
- * @return                  I2C_ERR_DATA on data error
+ * @return                  I2C_ADDR_NACK if response to address byte was NACK
+ * @return                  I2C_ERR for any other error
  */
 int i2c_read_reg(i2c_t dev, uint8_t addr, uint8_t reg,
                  uint8_t *data, size_t len);
@@ -212,9 +217,10 @@ int i2c_read_reg(i2c_t dev, uint8_t addr, uint8_t reg,
  * @param[in] addr          7-bit device address (right-aligned)
  * @param[in] data          byte to write to the device
  *
- * @return                  I2C_OK on successful transfer of @p data
- * @return                  I2C_ERR_ADDR on address error
- * @return                  I2C_ERR_DATA on data error
+ * @return                  I2C_ACK on successful transfer of @p data
+ * @return                  I2C_ADDR_NACK if response to address byte was NACK
+ * @return                  I2C_NACK_DATA if response to any data byte was NACK
+ * @return                  I2C_ERR for any other error
  */
 int i2c_write_byte(i2c_t dev, uint8_t addr, uint8_t data);
 
@@ -226,9 +232,10 @@ int i2c_write_byte(i2c_t dev, uint8_t addr, uint8_t data);
  * @param[in] data          array with bytes to write to the target device
  * @param[in] len           number of bytes to write to the target device
  *
- * @return                  I2C_OK on successful transfer of @p len byte
- * @return                  I2C_ERR_ADDR on address error
- * @return                  I2C_ERR_DATA on data error
+ * @return                  I2C_ACK on successful transfer of @p len byte
+ * @return                  I2C_ADDR_NACK if response to address byte was NACK
+ * @return                  I2C_NACK_DATA if response to any data byte was NACK
+ * @return                  I2C_ERR for any other error
  */
 int i2c_write_bytes(i2c_t dev, uint8_t addr, uint8_t *data, size_t len);
 
@@ -240,9 +247,10 @@ int i2c_write_bytes(i2c_t dev, uint8_t addr, uint8_t *data, size_t len);
  * @param[in] reg           the register address on the targeted I2C device
  * @param[in] data          byte to write to the device
  *
- * @return                  I2C_OK on successful transfer of @p data to @p reg
- * @return                  I2C_ERR_ADDR on address error
- * @return                  I2C_ERR_DATA on data error
+ * @return                  I2C_ACK on successful transfer of @p data to @p reg
+ * @return                  I2C_ADDR_NACK if response to address byte was NACK
+ * @return                  I2C_NACK_DATA if response to any data byte was NACK
+ * @return                  I2C_ERR for any other error
  */
 int i2c_write_reg(i2c_t dev, uint8_t addr, uint8_t reg, uint8_t data);
 
@@ -256,10 +264,11 @@ int i2c_write_reg(i2c_t dev, uint8_t addr, uint8_t reg, uint8_t data);
  * @param[in] data          array with bytes to write to the target device
  * @param[in] len           number of bytes to write to the target device
  *
- * @return                  I2C_OK on successful transfer of @p len byte
+ * @return                  I2C_ACK on successful transfer of @p len byte
  *                          to @p reg
- * @return                  I2C_ERR_ADDR on address error
- * @return                  I2C_ERR_DATA on data error
+ * @return                  I2C_ADDR_NACK if response to address byte was NACK
+ * @return                  I2C_NACK_DATA if response to any data byte was NACK
+ * @return                  I2C_ERR for any other error
  */
 int i2c_write_regs(i2c_t dev, uint8_t addr, uint8_t reg,
                    uint8_t *data, size_t len);
