@@ -119,18 +119,14 @@ int adc_sample(adc_t line, adc_res_t res)
     /* lock and power on the ADC device  */
     prep(line);
 
-    /* wait for any ongoing conversions to finish */
-    while (dev(line)->SR & ADC_SR_STRT) {}
     /* set resolution and conversion channel */
-    dev(line)->CR1 &= ~(ADC_CR1_RES);
-    dev(line)->CR1 |= res;
+    dev(line)->CR1 = res;
     dev(line)->SQR3 = adc_config[line].chan;
     /* start conversion and wait for results */
     dev(line)->CR2 |= ADC_CR2_SWSTART;
     while (!(dev(line)->SR & ADC_SR_EOC)) {}
     /* finally read sample and reset the STRT bit in the status register */
     sample = (int)dev(line)->DR;
-    dev(line)->SR &= ~ADC_SR_STRT;
 
     /* power off and unlock device again */
     done(line);
