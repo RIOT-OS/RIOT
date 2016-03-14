@@ -382,18 +382,6 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #endif
 #define XTIMER_MASK_SHIFTED XTIMER_TICKS_TO_USEC(XTIMER_MASK)
 
-#ifndef XTIMER_USLEEP_UNTIL_OVERHEAD
-/**
- * @brief xtimer_usleep_until overhead value
- *
- * This value specifies the time a xtimer_usleep_until will be late
- * if uncorrected.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
- */
-#define XTIMER_USLEEP_UNTIL_OVERHEAD 10
-#endif
-
 #if XTIMER_MASK
 extern volatile uint32_t _high_cnt;
 #endif
