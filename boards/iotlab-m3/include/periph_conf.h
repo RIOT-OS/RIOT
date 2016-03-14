@@ -45,6 +45,18 @@ extern "C" {
 /** @} */
 
 /**
+ * @name ADC configuration
+ * @{
+ */
+#define ADC_CONFIG          {       \
+    { GPIO_PIN(PORT_A,3), 0, 3  },  \
+    { GPIO_UNDEF        , 0, 16 },  \
+    { GPIO_UNDEF        , 0, 17 } }
+
+#define ADC_NUMOF           (3)
+/** @} */
+
+/**
  * @brief Timer configuration
  * @{
  */
