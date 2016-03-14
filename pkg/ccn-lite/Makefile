@@ -3,10 +3,6 @@ PKG_URL=https://github.com/OlegHahm/ccn-lite/
 PKG_VERSION=39b1406c11de9de364220909488eebabe7e81613
 PKG_DIR=$(CURDIR)/$(PKG_NAME)
 
-ifneq ($(RIOTBOARD),)
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
-endif
-
 .PHONY: all clean distclean
 
 export RIOT_CFLAGS = ${CFLAGS} ${INCLUDES}

@@ -6,10 +6,6 @@ PKG_URL=$(RELIC_URL)
 PKG_VERSION=$(RELIC_BRANCH)
 PKG_DIR=$(CURDIR)/$(PKG_NAME)
 
-ifneq ($(RIOTBOARD),)
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
-endif
-
 ifneq ($(RIOTBASE),)
 INCLUDES += -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/sys/net/include \
 			-I$(RIOTBASE)/sys/posix/include -I$(RIOTBASE)/sys/posix/pnet/include
