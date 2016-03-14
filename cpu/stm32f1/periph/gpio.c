@@ -150,6 +150,16 @@ void gpio_init_af(gpio_t pin, gpio_af_out_t af)
     port->CR[pin_num >> 3] |=  (af << ((pin_num & 0x7) * 4));
 }
 
+void gpio_init_analog(gpio_t pin)
+{
+    /* enable the GPIO port RCC */
+    RCC->APB2ENR |= (RCC_APB2ENR_IOPAEN << _port_num(pin));
+
+    /* map the pin as analog input */
+    int pin_num = _pin_num(pin);
+    _port(pin)->CR[pin_num >= 8] &= ~(0xfl << (4 * (pin_num - ((pin_num >= 8) * 8))));
+}
+
 void gpio_irq_enable(gpio_t pin)
 {
     EXTI->IMR |= (1 << _pin_num(pin));

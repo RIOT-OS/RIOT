@@ -26,6 +26,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Available number of ADC devices
+ */
+#define ADC_DEVS            (2U)
+
+/**
  * @brief   Overwrite the default gpio_t type definition
  * @{
  */
@@ -102,6 +107,15 @@ typedef enum {
 } gpio_af_out_t;
 
 /**
+ * @brief   ADC channel configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the channel */
+    uint8_t dev;            /**< ADCx - 1 device used for the channel */
+    uint8_t chan;           /**< CPU ADC channel connected to the pin */
+} adc_conf_t;
+
+/**
  * @brief   Timer configuration
  */
 typedef struct {
@@ -120,6 +134,13 @@ typedef struct {
  * @param[in] af        alternate function to use
  */
 void gpio_init_af(gpio_t pin, gpio_af_out_t af);
+
+/**
+ * @brief   Configure the given pin to be used as ADC input
+ *
+ * @param[in] pin       pin to configure
+ */
+void gpio_init_analog(gpio_t pin);
 
 #ifdef __cplusplus
 }
