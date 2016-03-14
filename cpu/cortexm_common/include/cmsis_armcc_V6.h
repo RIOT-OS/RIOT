@@ -466,8 +466,9 @@ __attribute__((always_inline)) __STATIC_INLINE void __set_BASEPRI_MAX(uint32_t v
 #if  (__ARM_FEATURE_CMSE == 3U)
 /**
   \brief   Set Base Priority with condition (non_secure)
-  \details Assigns the given value to the non-secure Base Priority register when in secure state only if BASEPRI masking is disabled,
-	       or the new value increases the BASEPRI priority level.
+  \details Assigns the given value to the non-secure Base Priority register when
+           in secure state only if BASEPRI masking is disabled, or the new value
+           increases the BASEPRI priority level.
   \param [in]    basePri  Base Priority value to set
  */
 __attribute__((always_inline)) __STATIC_INLINE void __TZ_set_BASEPRI_MAX_NS(uint32_t value)
