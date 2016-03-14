@@ -1,3 +1,3 @@
 MODULE = board
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTBASE)/Makefile.periph
