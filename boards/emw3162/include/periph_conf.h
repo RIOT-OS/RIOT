@@ -107,7 +107,7 @@ static const uart_conf_t uart_config[] = {
  */
 #define ADC_CONFIG      {   \
     {GPIO_UNDEF, 0, 16},    \
-    {GPIO_UNDEF, 0, 17}
+    {GPIO_UNDEF, 0, 17} }
 
 #define ADC_NUMOF           (2)
 /** @} */

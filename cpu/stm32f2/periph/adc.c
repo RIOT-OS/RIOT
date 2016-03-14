@@ -91,6 +91,9 @@ int adc_init(adc_t line)
     }
     ADC->CCR = ((clk_div / 2) - 1) << 16;
 
+    /* enable the ADC module */
+    dev(line)->CR2 = ADC_CR2_ADON;
+
     /* check if this channel is an internal ADC channel, if so
      * enable the internal temperature and Vref */
     if (adc_config[line].chan == 16 || adc_config[line].chan == 17) {
