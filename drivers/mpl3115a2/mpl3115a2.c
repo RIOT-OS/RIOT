@@ -197,7 +197,9 @@ int mpl3115a2_read_pressure(mpl3115a2_t *dev, uint32_t *pres, uint8_t *status)
     }
     i2c_release(dev->i2c);
 
-    *status = buf[0];
+    if (status != NULL) {
+        *status = buf[0];
+    }
 
     *pres = ((uint32_t)buf[1] << 16) | ((uint32_t)buf[2] << 8) | buf[3];
     *pres = *pres / 64;

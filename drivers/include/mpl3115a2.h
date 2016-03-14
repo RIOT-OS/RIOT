@@ -67,6 +67,15 @@ typedef struct {
 } mpl3115a2_t;
 
 /**
+ * @brief Data structure holding the full set of configuration parameters
+ */
+typedef struct {
+    i2c_t i2c;                  /**< I2C bus the device is connected to */
+    uint8_t addr;               /**< address on that bus */
+    uint8_t ratio;              /**< measurement ratio to use */
+} mpl3115a2_params_t;
+
+/**
  * @brief MPL3115A2 sensor test.
  * This function looks for Device ID of the MPL3115A2 sensor.
  *
