@@ -30,4 +30,11 @@ NEWLIB_INCLUDES ?= \
         $(foreach pat, $(NEWLIB_INCLUDE_PATTERNS), $(wildcard $(pat))), \
         -isystem $(dir))
 
-export INCLUDES += $(NEWLIB_INCLUDES)
+# If nothing was found we will try to fall back to searching for a cross-gcc in
+# the current PATH and use a relative path for the includes
+ifeq (,$(NEWLIB_INCLUDES))
+  NEWLIB_INCLUDES := $(addprefix -isystem ,$(wildcard $(dir $(shell which $(PREFIX)gcc))../$(TARGET_TRIPLE)/include))
+endif
+
+# Newlib includes should go before GCC includes.
+export INCLUDES := $(NEWLIB_INCLUDES) $(INCLUDES)

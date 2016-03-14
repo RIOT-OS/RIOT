@@ -44,6 +44,12 @@ extern "C" {
 /** @} */
 
 /**
+ * @name ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (0)
+/** @} */
+/**
  * @brief Timer configuration
  * @{
  */

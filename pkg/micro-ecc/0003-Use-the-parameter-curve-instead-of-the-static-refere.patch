@@ -1,0 +1,26 @@
+From bea5d775b9a6c0587002fdc70d98f3db6900c8ea Mon Sep 17 00:00:00 2001
+From: Mathias Tausig <mathias.tausig@fh-campuswien.ac.at>
+Date: Mon, 7 Mar 2016 16:28:40 +0100
+Subject: [PATCH 3/3] Use the parameter curve instead of the static reference
+ so curve_secp224r1 (to prevent a compiler warning)
+
+---
+ curve-specific.inc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/curve-specific.inc b/curve-specific.inc
+index 81f725f..137855e 100644
+--- a/curve-specific.inc
++++ b/curve-specific.inc
+@@ -563,7 +563,7 @@ static void mod_sqrt_secp224r1(uECC_word_t *a, uECC_Curve curve) {
+         }
+     }
+     uECC_vli_modInv(f1, e0, curve_secp224r1.p, num_words_secp224r1); /* f1 <-- 1 / e0 */
+-    uECC_vli_modMult_fast(a, d0, f1, &curve_secp224r1);              /* a  <-- d0 / e0 */
++    uECC_vli_modMult_fast(a, d0, f1, curve);              /* a  <-- d0 / e0 */
+ }
+ #endif /* uECC_SUPPORT_COMPRESSED_POINT */
+ 
+-- 
+2.5.0
+

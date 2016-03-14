@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Freie Universität Berlin
+ * Copyright (C) 2016 Engineering-Spirit
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -7,13 +7,14 @@
  */
 
 /**
- * @ingroup     cpu_stm32f4
+ * @ingroup     cpu_stm32f1
  * @{
  *
  * @file
  * @brief       Low-level ADC driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  *
  * @}
  */
@@ -26,7 +27,7 @@
 /**
  * @brief   Maximum allowed ADC clock speed
  */
-#define MAX_ADC_SPEED           (12000000U)
+#define MAX_ADC_SPEED           (14000000U)
 
 /**
  * @brief   Load the ADC configuration
@@ -82,16 +83,46 @@ int adc_init(adc_t line)
 
     /* configure the pin */
     gpio_init_analog(adc_config[line].pin);
-    /* set sequence length to 1 conversion and enable the ADC device */
-    dev(line)->SQR1 = 0;
-    dev(line)->CR2 = ADC_CR2_ADON;
     /* set clock prescaler to get the maximal possible ADC clock value */
     for (clk_div = 2; clk_div < 8; clk_div += 2) {
         if ((CLOCK_CORECLOCK / clk_div) <= MAX_ADC_SPEED) {
             break;
         }
     }
-    ADC->CCR = ((clk_div / 2) - 1) << 16;
+    RCC->CFGR &= ~(RCC_CFGR_ADCPRE);
+    RCC->CFGR |= ((clk_div / 2) - 1) << 14;
+
+    /* enable the ADC module */
+    dev(line)->CR2 |= ADC_CR2_ADON;
+
+    /* resets the selected ADC calibration registers */
+    dev(line)->CR2 |= ADC_CR2_RSTCAL;
+    /* check the status of RSTCAL bit */
+    while (dev(line)->CR2 & ADC_CR2_RSTCAL) {}
+
+    /* enable the selected ADC calibration process */
+    dev(line)->CR2 |= ADC_CR2_CAL;
+    /* wait for the calibration to have finished */
+    while (dev(line)->CR2 & ADC_CR2_CAL) {}
+
+    /* set all channels to maximum (239.5) cycles for best accuracy */
+    dev(line)->SMPR1 |= 0x00ffffff;
+    dev(line)->SMPR2 |= 0x3fffffff;
+    /* we want to sample one channel */
+    dev(line)->SQR1 = ADC_SQR1_L_0;
+    /* start sampling from software */
+    dev(line)->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL;
+
+    /* check if this channel is an internal ADC channel, if so
+     * enable the internal temperature and Vref */
+    if (adc_config[line].chan == 16 || adc_config[line].chan == 17) {
+        /* check if the internal channels are configured to use ADC1 */
+        if (dev(line) != ADC1) {
+            return -3;
+        }
+
+        dev(line)->CR2 |= ADC_CR2_TSVREFE;
+    }
 
     /* free the device again */
     done(line);
@@ -102,9 +133,14 @@ int adc_sample(adc_t line, adc_res_t res)
 {
     int sample;
 
-    /* check if resolution is applicable */
-    if (res < 0xff) {
+    /* check if the linenel is valid */
+    if (line >= ADC_NUMOF) {
         return -1;
+    }
+
+    /* check if resolution is applicable */
+    if (res != ADC_RES_12BIT) {
+        return -2;
     }
 
     /* lock and power on the ADC device  */
@@ -112,8 +148,7 @@ int adc_sample(adc_t line, adc_res_t res)
 
     /* wait for any ongoing conversions to finish */
     while (dev(line)->SR & ADC_SR_STRT) {}
-    /* set resolution and conversion channel */
-    dev(line)->CR1 = res;
+    /* set conversion channel */
     dev(line)->SQR3 = adc_config[line].chan;
     /* start conversion and wait for results */
     dev(line)->CR2 |= ADC_CR2_SWSTART;

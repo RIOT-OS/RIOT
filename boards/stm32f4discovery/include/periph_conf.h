@@ -116,19 +116,20 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name ADC configuration
+ * @brief   ADC configuration
+ *
+ * We need to define the following fields:
+ * PIN, device (ADCx), channel
  * @{
  */
-static const adc_conf_t adc_config[] = {
-    /* pin, device (ADCx), channel */
-    {GPIO_PIN(PORT_A, 1), 0, 1},
-    {GPIO_PIN(PORT_A, 4), 0, 4},
-    {GPIO_PIN(PORT_C, 1), 1, 11},
-    {GPIO_PIN(PORT_C, 2), 1, 12}
-};
+#define ADC_CONFIG {              \
+    {GPIO_PIN(PORT_A, 1), 0, 1},  \
+    {GPIO_PIN(PORT_A, 4), 0, 4},  \
+    {GPIO_PIN(PORT_C, 1), 1, 11}, \
+    {GPIO_PIN(PORT_C, 2), 1, 12}  \
+}
 
-/* deduct the number of available ADC channels from the configuration above */
-#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
+#define ADC_NUMOF           (4)
 /** @} */
 
 /**

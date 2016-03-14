@@ -4,7 +4,7 @@ export CPU_MODEL = nrf51x22xxaa
 
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
 # setup JLink for flashing
 export JLINK_DEVICE := nrf51822

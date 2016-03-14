@@ -102,6 +102,29 @@ typedef enum {
     I2C_SPEED_FAST_PLUS,    /**< fast plus mode:    ~1Mbit/s */
     I2C_SPEED_HIGH,         /**< high speed mode:   ~3.4Mbit/s */
 } i2c_speed_t;
+
+/**
+ * @brief declare needed generic SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
+/**
+ * @brief   Override the ADC resolution configuration
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0x03000000,  /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = 0x02000000,  /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = 0x01000000,  /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = 0x00000000,  /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 1,           /**< ADC resolution: 14 bit (not supported) */
+    ADC_RES_16BIT = 2            /**< ADC resolution: 16 bit (not supported)*/
+} adc_res_t;
 /** @} */
 
 /**
@@ -185,21 +208,6 @@ typedef struct {
     uint8_t abpbus;         /**< APB bus, 0 := APB1, 1:= APB2 */
     uint32_t rccmask;         /**< bit in the RCC peripheral enable register */
 } spi_conf_t;
-/** @} */
-
-/**
- * @brief   Override the ADC resolution configuration
- * @{
- */
-#define HAVE_ADC_RES_T
-typedef enum {
-    ADC_RES_6BIT  = 0x00000000,  /**< ADC resolution: 6 bit */
-    ADC_RES_8BIT  = 0x01000000,  /**< ADC resolution: 8 bit */
-    ADC_RES_10BIT = 0x02000000,  /**< ADC resolution: 10 bit */
-    ADC_RES_12BIT = 0x03000000,  /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT = 1,           /**< ADC resolution: 14 bit (not supported) */
-    ADC_RES_16BIT = 2            /**< ADC resolution: 16 bit (not supported)*/
-} adc_res_t;
 /** @} */
 
 /**
@@ -316,14 +324,14 @@ static inline void dma_isr_enable(int stream)
     if (stream < 7) {
         NVIC_EnableIRQ((IRQn_Type)((int)DMA1_Stream0_IRQn + stream));
     }
-    else if (stream == 8) {
+    else if (stream == 7) {
         NVIC_EnableIRQ(DMA1_Stream7_IRQn);
     }
-    else if (stream < 14) {
-        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + stream));
+    else if (stream < 13) {
+        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + (stream - 8)));
     }
-    else if (stream < 17) {
-        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + stream));
+    else if (stream < 16) {
+        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream - 13)));
     }
 }
 

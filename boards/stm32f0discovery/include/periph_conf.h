@@ -91,20 +91,22 @@ extern "C" {
 /** @} */
 
 /**
- * @name ADC configuration
+ * @brief   ADC configuration
+ *
+ * We need to configure the following values:
+ * [ pin, channel ]
  * @{
  */
-static const adc_conf_t adc_config[] = {
-    /* pin, channel */
-    { GPIO_PIN(PORT_C, 0), 10 },
-    { GPIO_PIN(PORT_C, 1), 11 },
-    { GPIO_PIN(PORT_C, 2), 12 },
-    { GPIO_PIN(PORT_C, 3), 13 },
-    { GPIO_PIN(PORT_C, 4), 14 },
-    { GPIO_PIN(PORT_C, 5), 15 }
-};
+#define ADC_CONFIG {            \
+    { GPIO_PIN(PORT_C, 0), 10 },\
+    { GPIO_PIN(PORT_C, 1), 11 },\
+    { GPIO_PIN(PORT_C, 2), 12 },\
+    { GPIO_PIN(PORT_C, 3), 13 },\
+    { GPIO_PIN(PORT_C, 4), 14 },\
+    { GPIO_PIN(PORT_C, 5), 15 } \
+}
 
-#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
+#define ADC_NUMOF           (6)
 /** @} */
 
 /**

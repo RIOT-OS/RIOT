@@ -100,12 +100,13 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @name ADC configuration
+ * @brief   ADC configuration
+ *
+ * The configuration consists simply of a list of channels that should be used
  * @{
  */
-static const uint8_t adc_config[] = {4, 5, 6, 7};
-
-#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
+#define ADC_CONFIG          {4, 5, 6, 7}
+#define ADC_NUMOF           (4)
 /** @} */
 
 /**

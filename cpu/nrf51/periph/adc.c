@@ -26,6 +26,16 @@
 #include "periph_conf.h"
 
 /**
+ * @brief   Load the ADC configuration
+ * @{
+ */
+#ifdef ADC_CONFIG
+static const uint8_t adc_config[] = ADC_CONFIG;
+#else
+static const uint8_t adc_config[] = {};
+#endif
+
+/**
  * @brief   Lock to prevent concurrency issues when used from different threads
  */
 static mutex_t lock;
