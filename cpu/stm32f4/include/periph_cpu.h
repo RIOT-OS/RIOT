@@ -135,7 +135,6 @@ typedef struct {
     gpio_t pin;             /**< pin connected to the channel */
     uint8_t dev;            /**< ADCx - 1 device used for the channel */
     uint8_t chan;           /**< CPU ADC channel connected to the pin */
-    uint8_t rcc;            /**< bit in the RCC APB2 enable register */
 } adc_conf_t;
 
 /**
