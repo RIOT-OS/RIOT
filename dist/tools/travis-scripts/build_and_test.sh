@@ -77,5 +77,6 @@ then
         #   resolved:
         #   - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
     fi
-    ./dist/tools/compile_test/compile_test.py $TRAVIS_BRANCH
+    BASE_BRANCH="${TRAVIS_BRANCH:-${CI_BASE_BRANCH}}"
+    ./dist/tools/compile_test/compile_test.py $BASE_BRANCH
 fi
