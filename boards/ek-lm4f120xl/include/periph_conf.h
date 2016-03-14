@@ -93,12 +93,11 @@ extern "C" {
 /** @} */
 
 /**
- * @name ADC configuration
+ * @brief   ADC configuration
  * @{
  */
-#define ADC_NUMOF 1
-#define ADC_0_EN 1
-#define ADC_MAX_CHANNELS    12
+#define ADC_NUMOF           (12)
+/** @} */
 
 #ifdef __cplusplus
 }
