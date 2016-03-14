@@ -13,6 +13,7 @@
  * @file
  * @brief       Low-level ADC driver implementation
  *
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
  *
  * @}
@@ -27,6 +28,16 @@
  * @brief   Maximum allowed ADC clock speed
  */
 #define MAX_ADC_SPEED           (12000000U)
+
+/**
+ * @brief   Load the ADC configuration
+ * @{
+ */
+#ifdef ADC_CONFIG
+static const adc_conf_t adc_config[] = ADC_CONFIG;
+#else
+static const adc_conf_t adc_config[] = {};
+#endif
 
 /**
  * @brief   Allocate locks for all three available ADC devices
@@ -72,9 +83,6 @@ int adc_init(adc_t line)
 
     /* configure the pin */
     gpio_init_analog(adc_config[line].pin);
-    /* set sequence length to 1 conversion and enable the ADC device */
-    dev(line)->SQR1 = 0;
-    dev(line)->CR2 = ADC_CR2_ADON;
     /* set clock prescaler to get the maximal possible ADC clock value */
     for (clk_div = 2; clk_div < 8; clk_div += 2) {
         if ((CLOCK_CORECLOCK / clk_div) <= MAX_ADC_SPEED) {
@@ -82,6 +90,17 @@ int adc_init(adc_t line)
         }
     }
     ADC->CCR = ((clk_div / 2) - 1) << 16;
+
+    /* check if this channel is an internal ADC channel, if so
+     * enable the internal temperature and Vref */
+    if (adc_config[line].chan == 16 || adc_config[line].chan == 17) {
+        /* check if the internal channels are configured to use ADC1 */
+        if (dev(line) != ADC1) {
+            return -3;
+        }
+
+        ADC->CCR |= ADC_CCR_TSVREFE;
+    }
 
     /* free the device again */
     done(line);
@@ -103,7 +122,8 @@ int adc_sample(adc_t line, adc_res_t res)
     /* wait for any ongoing conversions to finish */
     while (dev(line)->SR & ADC_SR_STRT) {}
     /* set resolution and conversion channel */
-    dev(line)->CR1 = res;
+    dev(line)->CR1 &= ~(ADC_CR1_RES);
+    dev(line)->CR1 |= res;
     dev(line)->SQR3 = adc_config[line].chan;
     /* start conversion and wait for results */
     dev(line)->CR2 |= ADC_CR2_SWSTART;
