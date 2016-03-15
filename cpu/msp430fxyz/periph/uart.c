@@ -204,7 +204,7 @@ ISR(UART_RX_ISR, isr_uart_0_rx)
     __enter_isr();
 
     uint8_t stat = UART_BASE->ASTAT;
-    char data = (char)UART_BASE->ARXBUF;
+    uint8_t data = (uint8_t)UART_BASE->ARXBUF;
 
     if (stat & (USCI_ASTAT_FE | USCI_ASTAT_OE | USCI_ASTAT_PE | USCI_ASTAT_BRK)) {
         /* some error which we do not handle, just do a pseudo read to reset the

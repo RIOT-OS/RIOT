@@ -84,7 +84,7 @@ void UART0_IRQHandler(void)
         case UIIR_CTI_INT:              /* Character Timeout Indicator */
         case UIIR_RDA_INT:              /* Receive Data Available */
                 do {
-                    char c = (char)U0RBR;
+                    uint8_t c = (uint8_t)U0RBR;
                     _rx_cb(_cb_arg, c);
                 } while (U0LSR & ULSR_RDR);
             break;

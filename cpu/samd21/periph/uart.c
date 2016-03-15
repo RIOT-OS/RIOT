@@ -135,7 +135,7 @@ static inline void irq_handler(int dev)
 
     if (uart->INTFLAG.reg & SERCOM_USART_INTFLAG_RXC) {
         /* interrupt flag is cleared by reading the data register */
-        uart_ctx[dev].rx_cb(uart_ctx[dev].arg, (char)(uart->DATA.reg));
+        uart_ctx[dev].rx_cb(uart_ctx[dev].arg, (uint8_t)(uart->DATA.reg));
     }
     else if (uart->INTFLAG.reg & SERCOM_USART_INTFLAG_ERROR) {
         /* clear error flag */
