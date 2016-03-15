@@ -81,7 +81,7 @@ int uart_stdio_write(const char* buffer, int len);
  * @param[in]   arg     (unused)
  * @param[in]   data    character that has been received
  */
-void uart_stdio_rx_cb(void *arg, char data);
+void uart_stdio_rx_cb(void *arg, uint8_t data);
 
 #ifdef __cplusplus
 }

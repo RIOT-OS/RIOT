@@ -135,11 +135,8 @@ void isr_uart0(void)
     {
         while(ROM_UARTCharsAvail(UART0_BASE))
         {
-            char cChar;
-            long lChar;
-            lChar = ROM_UARTCharGetNonBlocking(UART0_BASE);
-            cChar = (unsigned char)(lChar & 0xFF);
-            config[UART_0].rx_cb(config[UART_0].arg, cChar);
+            long lchar = ROM_UARTCharGetNonBlocking(UART0_BASE);
+            config[UART_0].rx_cb(config[UART_0].arg, (uint8_t)lchar);
         }
     }
     if (sched_context_switch_request) {

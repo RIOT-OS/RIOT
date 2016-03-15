@@ -136,7 +136,7 @@ static inline void irq_handler(uint8_t uartnum, SercomUsart *dev)
 {
     if (dev->INTFLAG.bit.RXC) {
         /* cleared by reading DATA regiser */
-        char data = (char)dev->DATA.reg;
+        uint8_t data = (uint8_t)dev->DATA.reg;
         uart_config[uartnum].rx_cb(uart_config[uartnum].arg, data);
     }
     else if (dev->INTFLAG.bit.ERROR) {

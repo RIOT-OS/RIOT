@@ -99,7 +99,7 @@ static inline void isr_handler(int num)
     Uart *dev = uart_config[num].dev;
 
     if (dev->UART_SR & UART_SR_RXRDY) {
-        ctx[num].rx_cb(ctx[num].arg, (char)dev->UART_RHR);
+        ctx[num].rx_cb(ctx[num].arg, (uint8_t)dev->UART_RHR);
     }
     if (sched_context_switch_request) {
         thread_yield();
