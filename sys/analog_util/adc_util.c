@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     sys_adc_util
+ * @ingroup     sys_analog_util
  * @{
  *
  * @file
@@ -18,7 +18,7 @@
  * @}
  */
 
-#include "adc_util.h"
+#include "analog_util.h"
 
 /* keep a max value to ADC resolution mapping for quick access in the ROM */
 static const int val_max[] = {
@@ -28,7 +28,7 @@ static const int val_max[] = {
     [ADC_RES_12BIT] =   0x0fff,
     [ADC_RES_14BIT] =   0x3fff,
     [ADC_RES_16BIT] =   0xffff
-}
+};
 
 int adc_util_map(int sample, adc_res_t res, int min, int max)
 {
