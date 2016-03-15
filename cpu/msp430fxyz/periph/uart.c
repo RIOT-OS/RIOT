@@ -124,7 +124,7 @@ ISR(UART_RX_ISR, isr_uart_0_rx)
     __exit_isr();
 }
 
-/* we use alternative UART code in case the board used the USIC module for UART
+/* we use alternative UART code in case the board used the USCI module for UART
  * in case of the (older) USART module */
 #else
 
@@ -171,7 +171,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     UART_RX_PORT->SEL |= UART_RX_PIN;
     UART_TX_PORT->SEL |= UART_TX_PIN;
     UART_RX_PORT->DIR &= ~(UART_RX_PIN);
-    UART_TX_PORT->DIR &= ~(UART_TX_PIN);
+    UART_TX_PORT->DIR |= UART_TX_PIN;
     /* releasing the software reset bit starts the UART */
     dev->ACTL1 &= ~(USCI_ACTL1_SWRST);
     return 0;
