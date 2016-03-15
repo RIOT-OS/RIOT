@@ -206,7 +206,7 @@ int _gnrc_rpl_dodag_show(void)
                "TR(I=[%d,%d], k=%d, c=%d, TC=%" PRIu32 "s, TI=%" PRIu32 "s)]\n",
                ipv6_addr_to_str(addr_str, &dodag->dodag_id, sizeof(addr_str)),
                dodag->my_rank, (dodag->node_status == GNRC_RPL_LEAF_NODE ? "Leaf" : "Router"),
-               ((dodag->req_opts & GNRC_RPL_REQ_OPT_PREFIX_INFO) ? "on" : "off"),
+               ((dodag->dio_opts & GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO) ? "on" : "off"),
                (int) cleanup, (1 << dodag->dio_min), dodag->dio_interval_doubl, dodag->trickle.k,
                dodag->trickle.c, (uint32_t) (tc & 0xFFFFFFFF), (uint32_t) (ti & 0xFFFFFFFF));
 
