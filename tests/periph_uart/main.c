@@ -63,7 +63,7 @@ static int parse_dev(char *arg)
     return dev;
 }
 
-static void rx_cb(void *arg, char data)
+static void rx_cb(void *arg, uint8_t data)
 {
     int dev = (int)arg;
 
