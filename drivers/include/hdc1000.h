@@ -61,6 +61,14 @@ typedef struct {
 } hdc1000_t;
 
 /**
+ * @brief Data structure holding the full set of configuration parameters
+ */
+typedef struct {
+    i2c_t i2c;              /**< I2C bus the device is connected to */
+    uint8_t addr;           /**< address on that bus */
+} hdc1000_params_t;
+
+/**
  * @brief HDC1000 sensor test.
  * This function looks for Manufacturer ID of the HDC1000 sensor.
  *
