@@ -137,7 +137,7 @@ enum {
      *
      * The slave responded to a data byte written to it with a NACK.
      */
-    I2C_NACK_DATA = -2       /**< data error */
+    I2C_DATA_NACK = -2       /**< data error */
      /**
       * @brief   Internal error
       *
@@ -219,7 +219,7 @@ int i2c_read_reg(i2c_t dev, uint8_t addr, uint8_t reg,
  *
  * @return                  I2C_ACK on successful transfer of @p data
  * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_NACK_DATA if response to any data byte was NACK
+ * @return                  I2C_DATA_NACK if response to any data byte was NACK
  * @return                  I2C_ERR for any other error
  */
 int i2c_write_byte(i2c_t dev, uint8_t addr, uint8_t data);
@@ -234,7 +234,7 @@ int i2c_write_byte(i2c_t dev, uint8_t addr, uint8_t data);
  *
  * @return                  I2C_ACK on successful transfer of @p len byte
  * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_NACK_DATA if response to any data byte was NACK
+ * @return                  I2C_DATA_NACK if response to any data byte was NACK
  * @return                  I2C_ERR for any other error
  */
 int i2c_write_bytes(i2c_t dev, uint8_t addr, uint8_t *data, size_t len);
@@ -249,7 +249,7 @@ int i2c_write_bytes(i2c_t dev, uint8_t addr, uint8_t *data, size_t len);
  *
  * @return                  I2C_ACK on successful transfer of @p data to @p reg
  * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_NACK_DATA if response to any data byte was NACK
+ * @return                  I2C_DATA_NACK if response to any data byte was NACK
  * @return                  I2C_ERR for any other error
  */
 int i2c_write_reg(i2c_t dev, uint8_t addr, uint8_t reg, uint8_t data);
@@ -267,7 +267,7 @@ int i2c_write_reg(i2c_t dev, uint8_t addr, uint8_t reg, uint8_t data);
  * @return                  I2C_ACK on successful transfer of @p len byte
  *                          to @p reg
  * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_NACK_DATA if response to any data byte was NACK
+ * @return                  I2C_DATA_NACK if response to any data byte was NACK
  * @return                  I2C_ERR for any other error
  */
 int i2c_write_regs(i2c_t dev, uint8_t addr, uint8_t reg,
