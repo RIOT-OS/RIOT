@@ -487,7 +487,6 @@ static inline void _write(I2C_TypeDef *dev, char *data, int length, char *err)
         while (!(dev->SR1 & I2C_SR1_TXE) && !(*err)) {}
         DEBUG("DR is now empty again\n");
     }
-
 }
 
 static inline void _stop(I2C_TypeDef *dev, char *err)

@@ -209,24 +209,23 @@ static const spi_conf_t spi_config[] = {
  * @name I2C configuration
  * @{
  */
-static const i2c_conf_t i2c_config[] = {
-    /* device, SDA pin, SCL pin, SDA AF, SCL AF, bus speed, rcc_bit, irqn */
-    {
-        I2C1,
-        GPIO_PIN(PORT_B, 6),
-        GPIO_PIN(PORT_B, 7),
-        4,
-        4,
-        I2C_SPEED_NORMAL,
-        0,
-        I2C1_EV_IRQn,
-    }
-};
+#define I2C_NUMOF           (1U)
+#define I2C_0_EN            1
+#define I2C_IRQ_PRIO        1
+#define I2C_APBCLK          (CLOCK_APB1)
 
+/* I2C 0 device configuration */
+#define I2C_0_DEV           I2C1
+#define I2C_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_I2C1EN)
+#define I2C_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN))
+#define I2C_0_EVT_IRQ       I2C1_EV_IRQn
 #define I2C_0_EVT_ISR       isr_i2c1_ev
+#define I2C_0_ERR_IRQ       I2C1_ER_IRQn
 #define I2C_0_ERR_ISR       isr_i2c1_er
-
-#define I2C_NUMOF           (1)
+/* I2C 0 pin configuration */
+#define I2C_0_SCL_PIN       GPIO_PIN(PORT_B, 6) /* remapped */
+#define I2C_0_SDA_PIN       GPIO_PIN(PORT_B, 7) /* remapped */
+#define I2C_0_REMAP         4
 /** @} */
 
 /**

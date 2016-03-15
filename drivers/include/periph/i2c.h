@@ -150,7 +150,7 @@ enum {
  * @return                  0 on successful initialization
  * @return                  -1 on undefined device given
  */
-int i2c_init(i2c_t dev);
+int i2c_init_master(i2c_t dev, i2c_speed_t speed);
 
 /**
  * @brief   Get mutually exclusive access to the given I2C bus

@@ -60,6 +60,7 @@ int main(void)
 
 #if MODULE_M24LRXXX
     m24lrxxx_t dev;
+    i2c_init_master(0, I2C_SPEED_NORMAL);
     m24lrxxx_init(&dev, m24lrxxx_params[0].bus, m24lrxxx_params[0].speed, m24lrxxx_params[0].address);
 #endif
 
