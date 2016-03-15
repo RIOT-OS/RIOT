@@ -63,3 +63,6 @@ endif
 ifneq (,$(filter bmp180,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/bmp180/include
 endif
+ifneq (,$(filter hdc1000,$(USEMODULE)))
+    export UNDEF += $(BINDIR)hdc1000/hdc1000_saul.o
+endif
