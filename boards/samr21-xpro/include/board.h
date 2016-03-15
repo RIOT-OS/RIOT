@@ -31,10 +31,12 @@ extern "C" {
 #endif
 
 /**
- * Assign the hardware timer
+ * @brief   xtimer configuration
+ * @{
  */
 #define XTIMER              TIMER_1
 #define XTIMER_CHAN         (0)
+/** @} */
 
 /**
  * @name AT86RF233 configuration

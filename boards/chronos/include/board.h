@@ -27,7 +27,9 @@
 extern "C" {
 #endif
 
-/* for correct inclusion of <msp430.h> */
+/**
+ * @brief   Define the CPU model for the <msp430.h>
+ */
 #ifndef __CC430F6137__
 #define __CC430F6137__
 #endif

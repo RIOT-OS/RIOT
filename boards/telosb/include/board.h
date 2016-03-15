@@ -34,7 +34,9 @@
 extern "C" {
 #endif
 
-/*  for correct inclusion of <msp430.h> */
+/**
+ * @brief   Define the CPU model for the <msp430.h>
+ */
 #ifndef __MSP430F1611__
 #define __MSP430F1611__
 #endif
@@ -50,12 +52,18 @@ extern "C" {
 #define XTIMER_BACKOFF              (40)
 /** @} */
 
-/* TelosB core */
+/**
+ * @brief   CPU core configuration
+ *
+ * @todo    Move this to the periph_conf.h
+ * @{
+ */
 #define MSP430_INITIAL_CPU_SPEED    2457600uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
 #define F_RC_OSCILLATOR             32768
 #define MSP430_HAS_DCOR             0
 #define MSP430_HAS_EXTERNAL_CRYSTAL 1
+/** @} */
 
 /**
  * @brief   LED pin definitions and handlers
@@ -86,8 +94,6 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#include <stdint.h>
 
 /** @} */
 #endif /*  TELOSB_BOARD_H_ */

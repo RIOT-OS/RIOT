@@ -28,17 +28,25 @@
 extern "C" {
 #endif
 
-/* for correct inclusion of <msp430.h> */
+/**
+ * @brief   Define the CPU model for the <msp430.h>
+ */
 #ifndef __MSP430F1612__
 #define __MSP430F1612__
 #endif
 
-//MSB430 core
+/**
+ * @brief   CPU core configuration
+ *
+ * @todo    Move this to the periph_conf.h
+ * @{
+ */
 #define MSP430_INITIAL_CPU_SPEED    7372800uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
 #define F_RC_OSCILLATOR             32768
 #define MSP430_HAS_DCOR             1
 #define MSP430_HAS_EXTERNAL_CRYSTAL 1
+/** @} */
 
 #ifdef __cplusplus
 }

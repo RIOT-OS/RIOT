@@ -37,6 +37,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Define the CPU model for the <msp430.h>
+ */
 #ifndef __MSP430F2617__
 #define __MSP430F2617__
 #endif
@@ -61,7 +64,12 @@ extern "C" {
 #define UART_STDIO_RX_BUFSIZE       (64U)
 /** @} */
 
-/*  MSP430 core */
+/**
+ * @brief   CPU core configuration
+ *
+ * @todo    Move this to the periph_conf.h
+ * @{
+ */
 #define MSP430_INITIAL_CPU_SPEED    8000000uL
 #ifndef F_CPU
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
@@ -69,6 +77,7 @@ extern "C" {
 #define F_RC_OSCILLATOR             32768
 #define MSP430_HAS_DCOR             0
 #define MSP430_HAS_EXTERNAL_CRYSTAL 1
+/** @} */
 
 /**
  * @brief   LED pin definitions and handlers
@@ -97,12 +106,16 @@ extern "C" {
 /** @} */
 
 
-/*  User-button port */
+/**
+ * @brief   User button configuration
+ * @{
+ */
 #define USER_BTN_PxIN      P2IN
 #define USER_BTN_MASK      0x20
 
 #define USER_BTN_PRESSED   ((USER_BTN_PxIN & USER_BTN_MASK) == 0)
 #define USER_BTN_RELEASED  ((USER_BTN_PxIN & USER_BTN_MASK) != 0)
+/** @} */
 
 #ifdef __cplusplus
 }
