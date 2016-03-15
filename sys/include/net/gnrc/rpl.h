@@ -528,8 +528,8 @@ uint8_t gnrc_rpl_gen_instance_id(bool local);
  */
 static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
 {
-    dodag->req_opts = (dodag->req_opts & ~GNRC_RPL_REQ_OPT_PREFIX_INFO) |
-                      (status << GNRC_RPL_REQ_OPT_PREFIX_INFO_SHIFT);
+    dodag->dio_opts = (dodag->dio_opts & ~GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO) |
+                      (status << GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO_SHIFT);
 }
 #endif
 

@@ -155,18 +155,18 @@ void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
     gnrc_rpl_dio_t *dio;
 
 #ifndef GNRC_RPL_WITHOUT_PIO
-    if (dodag->req_opts & GNRC_RPL_REQ_OPT_PREFIX_INFO) {
+    if (dodag->dio_opts & GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO) {
         if ((pkt = _dio_prefix_info_build(pkt, dodag)) == NULL) {
             return;
         }
     }
 #endif
 
-    if (dodag->req_opts & GNRC_RPL_REQ_OPT_DODAG_CONF) {
+    if (dodag->dio_opts & GNRC_RPL_REQ_DIO_OPT_DODAG_CONF) {
         if ((pkt = _dio_dodag_conf_build(pkt, dodag)) == NULL) {
             return;
         }
-        dodag->req_opts &= ~GNRC_RPL_REQ_OPT_DODAG_CONF;
+        dodag->dio_opts &= ~GNRC_RPL_REQ_DIO_OPT_DODAG_CONF;
     }
 
     if ((tmp = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_rpl_dio_t), GNRC_NETTYPE_UNDEF)) == NULL) {
@@ -265,7 +265,7 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, ipv6_addr_t *src, ipv6_addr_t *dst, 
     else {
         for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
             if (gnrc_rpl_instances[i].state != 0) {
-                gnrc_rpl_instances[i].dodag.req_opts |= GNRC_RPL_REQ_OPT_DODAG_CONF;
+                gnrc_rpl_instances[i].dodag.dio_opts |= GNRC_RPL_REQ_DIO_OPT_DODAG_CONF;
                 gnrc_rpl_send_DIO(&gnrc_rpl_instances[i], src);
             }
         }
@@ -390,7 +390,7 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
             case (GNRC_RPL_OPT_DODAG_CONF):
                 DEBUG("RPL: DODAG CONF DIO option parsed\n");
                 *included_opts |= ((uint32_t) 1) << GNRC_RPL_OPT_DODAG_CONF;
-                dodag->req_opts |= GNRC_RPL_REQ_OPT_DODAG_CONF;
+                dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_DODAG_CONF;
                 gnrc_rpl_opt_dodag_conf_t *dc = (gnrc_rpl_opt_dodag_conf_t *) opt;
                 gnrc_rpl_of_t *of = gnrc_rpl_get_of_for_ocp(byteorder_ntohs(dc->ocp));
                 if (of != NULL) {
@@ -416,7 +416,7 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                 DEBUG("RPL: Prefix Information DIO option parsed\n");
                 *included_opts |= ((uint32_t) 1) << GNRC_RPL_OPT_PREFIX_INFO;
 #ifndef GNRC_RPL_WITHOUT_PIO
-                dodag->req_opts |= GNRC_RPL_REQ_OPT_PREFIX_INFO;
+                dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO;
 #endif
                 gnrc_rpl_opt_prefix_info_t *pi = (gnrc_rpl_opt_prefix_info_t *) opt;
                 ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
