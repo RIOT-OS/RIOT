@@ -19,6 +19,7 @@
  */
 
 #include "board.h"
+#include "periph/gpio.h"
 
 static void leds_init(void);
 
@@ -43,21 +44,6 @@ void board_init(void)
  */
 static void leds_init(void)
 {
-#if 0
-    /* enable clock for port GPIOD */
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
-
-    /* configure pins as general outputs */
-    LED_PORT->MODER &= ~(0x0000000f);
-    LED_PORT->MODER |= 0x00000005;
-    /* set output speed high-speed */
-    LED_PORT->OSPEEDR |= 0x0000000f;
-    /* set output type to push-pull */
-    LED_PORT->OTYPER &= ~(0xf000);
-    /* disable pull resistors */
-    LED_PORT->PUPDR &= ~(0xff000000);
-
-    /* turn all LEDs off */
-    LED_PORT->BSRRH = 0x00000003;
-#endif
+    gpio_init(LED_GREEN_GPIO, LED_GREEN_MODE);
+    gpio_init(LED_RED_GPIO, LED_RED_MODE);
 }

@@ -44,13 +44,16 @@ extern "C" {
  */
 #define LED_GREEN_GPIO      GPIO_PIN(PORT_B, 0)
 #define LED_RED_GPIO        GPIO_PIN(PORT_B, 1)
+
+#define LED_GREEN_MODE      GPIO_MODE(0, 0, 0)
+#define LED_RED_MODE        GPIO_MODE(0, 0, 1)
 /** @} */
 
 /**
  * @name SHT11 definitions
  * @{
  */
-#define SHT11_I2C           I2C_0
+#define SHT11_I2C           0
 /** @} */
 
 /**

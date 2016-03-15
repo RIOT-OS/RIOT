@@ -24,8 +24,6 @@
 
 #include <stdint.h>
 
-#if 0
-
 #include "cpu.h"
 #include "irq.h"
 #include "mutex.h"
@@ -34,6 +32,9 @@
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
+
+/* guard file in case no I2C device is defined */
+#if I2C_NUMOF
 
 /* static function definitions */
 static void _i2c_init(I2C_TypeDef *i2c, int ccr);
@@ -572,4 +573,4 @@ void I2C_0_ERR_ISR(void)
 }
 #endif /* I2C_0_EN */
 
-#endif
+#endif /* I2C_NUMOF */

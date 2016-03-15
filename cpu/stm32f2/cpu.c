@@ -81,7 +81,7 @@ static void cpu_clock_init(void)
     RCC->CR |= RCC_CR_SOURCE;
 
     /* Wait till hish speed clock source is ready */
-    while ((RCC->CR & RCC_CR_SOURCE_RDY) == 0);
+    while ((RCC->CR & RCC_CR_SOURCE_RDY) == 0) {}
 
     /* Configure Flash prefetch, Instruction cache, Data cache and wait state */
     FLASH->ACR = FLASH_ACR_PRFTEN | FLASH_ACR_ICEN | FLASH_ACR_DCEN;
@@ -103,12 +103,12 @@ static void cpu_clock_init(void)
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
     /* Wait till PLL is ready */
-    while ((RCC->CR & RCC_CR_PLLRDY) == 0);
+    while ((RCC->CR & RCC_CR_PLLRDY) == 0) {}
 
     /* Select PLL as system clock source */
     RCC->CFGR &= ~((uint32_t)(RCC_CFGR_SW));
     RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
 
     /* Wait till PLL is used as system clock source */
-    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
+    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
 }

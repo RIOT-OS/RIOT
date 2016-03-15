@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @name Clock system configuration
+ * @brief Clock system configuration
  * @{
  */
 #define CLOCK_HSE                   (26000000U)         /* external oscillator */
@@ -48,7 +48,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name Timer configuration
+ * @brief Timer configuration
  * @{
  */
 #define TIMER_NUMOF         (2U)
@@ -76,7 +76,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name UART configuration
+ * @brief UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -102,7 +102,10 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name ADC configuration
+ * @brief   ADC configuration
+ *
+ * We need to define the following fields:
+ * PIN, device (ADCx), channel
  * @{
  */
 #define ADC_CONFIG      {   \
@@ -113,21 +116,22 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name DAC configuration
+ * @brief   DAC configuration
+ *
+ * We need to define the following fields:
+ * PIN, DAC channel
  * @{
  */
-static const dac_conf_t dac_config[] = {
-    /* pin, channel */
-    {GPIO_PIN(PORT_A, 4), 0},
-    {GPIO_PIN(PORT_A, 5), 1}
-};
+#define DAC_CONFIG {          \
+    {GPIO_PIN(PORT_A, 4), 0}, \
+    {GPIO_PIN(PORT_A, 5), 1}  \
+}
 
-/* deduct the number of DAC lines from this configuration */
-#define DAC_NUMOF           (sizeof(dac_config) / sizeof(dac_config[0]))
+#define DAC_NUMOF           (2)
 /** @} */
 
 /**
- * @name PWM configuration
+ * @brief PWM configuration
  * @{
  */
 #define PWM_NUMOF           (2U)
@@ -174,7 +178,7 @@ static const dac_conf_t dac_config[] = {
 /** @} */
 
 /**
- * @name SPI configuration
+ * @brief SPI configuration
  * @{
  */
 static const spi_conf_t spi_config[] = {
@@ -222,7 +226,7 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_0_EVT_ISR       isr_i2c1_ev
 #define I2C_0_ERR_ISR       isr_i2c1_er
 
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF           (1)
 /** @} */
 
 /**

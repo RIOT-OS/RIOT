@@ -22,12 +22,26 @@
 #include "periph/dac.h"
 #include "periph_conf.h"
 
+/* only compile this, if the CPU has a DAC */
+#ifdef DAC
+
+/**
+ * @brief   Get the DAC configuration from the board (if configured)
+ * @{
+ */
+#ifdef DAC_CONFIG
+static const dac_conf_t dac_config[] = DAC_CONFIG;
+#else
+static const dac_conf_t dac_config[] = {};
+#endif
+/** @} */
 
 int8_t dac_init(dac_t line)
 {
     if (line >= DAC_NUMOF) {
         return -1;
     }
+
 
     /* configure pin */
     gpio_init_analog(dac_config[line].pin);
@@ -59,3 +73,5 @@ void dac_poweroff(dac_t line)
 {
     DAC->CR &= ~(1 << (16 * dac_config[line].chan));
 }
+
+#endif /* DAC */
