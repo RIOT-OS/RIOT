@@ -44,6 +44,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   DAC configuration
+ * @{
+ */
+#define DAC_NUMOF           (0)
+/** @} */
+
+/**
  * @brief Timer configuration
  * @{
  */

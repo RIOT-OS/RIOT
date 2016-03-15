@@ -39,6 +39,17 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   DAC configuration
+ * @{
+ */
+#define DAC_CONFIG {                \
+    { GPIO_PIN(PORT_A, 4), 0, 0 },  \
+}
+
+#define DAC_NUMOF           (1)
+/** @} */
+
+/**
  * @brief Timer configuration
  * @{
  */

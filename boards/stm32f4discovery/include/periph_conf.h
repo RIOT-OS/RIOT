@@ -140,9 +140,9 @@ static const uart_conf_t uart_config[] = {
  * PIN, DAC channel
  * @{
  */
-#define DAC_CONFIG {          \
-    {GPIO_PIN(PORT_A, 4), 0}, \
-    {GPIO_PIN(PORT_A, 5), 1}  \
+#define DAC_CONFIG {            \
+    { GPIO_PIN(PORT_A, 4), 0 }, \
+    { GPIO_PIN(PORT_A, 5), 1 }, \
 }
 
 #define DAC_NUMOF           (2)

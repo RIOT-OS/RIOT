@@ -81,6 +81,13 @@ void periph_clk_en(uint8_t bus, uint32_t mask);
  */
 void periph_clk_dis(uint8_t bus, uint32_t mask);
 
+/**
+ * @brief   Configure the given pin to be used as ADC input
+ *
+ * @param[in] pin       pin to configure
+ */
+void gpio_init_analog(gpio_t pin);
+
 #ifdef __cplusplus
 }
 #endif
