@@ -91,8 +91,6 @@ term-valgrind: export VALGRIND_FLAGS ?= \
 debug-valgrind-server: export VALGRIND_FLAGS ?= --vgdb=yes --vgdb-error=0 -v \
 	--leak-check=full --track-origins=yes --fullpath-after=${RIOTBASE} \
 	--read-var-info=yes
-debug-valgrind: export VALGRIND_PID ?= $(shell pgrep -n memcheck-x86-li -u ${USER} | cut -d" " -f1)
-debug-valgrind: export DEBUGGER_FLAGS := -ex "target remote | vgdb --pid=${VALGRIND_PID}" $(DEBUGGER_FLAGS)
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
 term-gprof: export TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELF)
 all-valgrind: export CFLAGS += -DHAVE_VALGRIND_H -g
@@ -148,7 +146,8 @@ debug-valgrind-server:
 	$(VALGRIND) $(VALGRIND_FLAGS) $(ELF) $(PORT)
 
 debug-valgrind:
-	@echo $(VALGRIND_PID)
+	$(eval VALGRIND_PID ?= $(shell pgrep -n memcheck-x86-li -u ${USER} | cut -d" " -f1))
+	$(eval DEBUGGER_FLAGS := -ex "target remote | vgdb --pid=${VALGRIND_PID}" $(DEBUGGER_FLAGS))
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
 term-cachegrind:
