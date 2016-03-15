@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief    MMA852 configuration
+ * @brief    MMA8652 parameter configuration
  */
 static const  mma8652_params_t mma8652_params[] =
 {
@@ -36,7 +36,7 @@ static const  mma8652_params_t mma8652_params[] =
         .i2c = MMA8652_I2C,
         .addr = MMA8652_ADDR,
         .rate = MMA8652_DATARATE_DEFAULT,
-        .scale = MMA8652_FS_RANGE_DEFAULT,
+        .scale = MMA8652_FS_RANGE_DEFAULT
     },
 };
 
