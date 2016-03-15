@@ -80,8 +80,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     mutex_lock(&_tx_dma_sync[uart]);
 
     /* configure pins */
-    gpio_init(uart_config[uart].rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
-    gpio_init(uart_config[uart].tx_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(uart_config[uart].rx_pin, GPIO_IN);
+    gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
     gpio_init_af(uart_config[uart].rx_pin, uart_config[uart].af);
     gpio_init_af(uart_config[uart].tx_pin, uart_config[uart].af);
     /* enable UART clock */

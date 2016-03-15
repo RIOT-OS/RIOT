@@ -43,6 +43,8 @@
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
+/* TODO: remove once all platforms are ported to this interface */
+#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {

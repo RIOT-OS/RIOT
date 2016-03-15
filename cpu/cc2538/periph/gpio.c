@@ -343,13 +343,7 @@ static const uint8_t reverse_pin_lut[] = {
 #endif
 };
 
-static const uint32_t ioc_mask_lut[] = {
-    [GPIO_NOPULL  ] = IOC_OVERRIDE_DIS,
-    [GPIO_PULLUP  ] = IOC_OVERRIDE_PUE,
-    [GPIO_PULLDOWN] = IOC_OVERRIDE_PDE,
-};
-
-int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
+int gpio_init(gpio_t dev, gpio_mode_t mode)
 {
     int pin;
 
@@ -360,28 +354,42 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
     pin = pin_lut[dev];
     gpio_software_control(pin);
 
-    if (dir == GPIO_DIR_OUT) {
-        gpio_dir_output(pin);
-        /* configure the pin's pull resistor state */
-        IOC_PXX_OVER[pin] = IOC_OVERRIDE_OE | ioc_mask_lut[pushpull];
-    }
-    else {
-        gpio_dir_input(pin);
-        /* configure the pin's pull resistor state */
-        IOC_PXX_OVER[pin] = ioc_mask_lut[pushpull];
+    switch (mode) {
+        case GPIO_IN:
+            gpio_dir_input(pin);
+            /* configure the pin's pull resistor state */
+            IOC_PXX_OVER[pin] = (IOC_OVERRIDE_DIS);
+            break;
+        case GPIO_IN_PD:
+            gpio_dir_input(pin);
+            /* configure the pin's pull resistor state */
+            IOC_PXX_OVER[pin] = (IOC_OVERRIDE_PDE);
+            break;
+        case GPIO_IN_PU:
+            gpio_dir_input(pin);
+            /* configure the pin's pull resistor state */
+            IOC_PXX_OVER[pin] = (IOC_OVERRIDE_PUE);
+        case GPIO_OUT:
+            gpio_dir_output(pin);
+            /* configure the pin's pull resistor state */
+            IOC_PXX_OVER[pin] = (IOC_OVERRIDE_OE | IOC_OVERRIDE_DIS);
+            break;
+        default:
+            return -1;
     }
 
     return 0;
 }
 
-int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
+int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
+                  gpio_cb_t cb, void *arg)
 {
     int res, pin, irq_num;
     uint32_t mask;
     cc2538_gpio_t* instance;
 
     /* Note: gpio_init() also checks if the gpio is enabled. */
-    res = gpio_init(dev, GPIO_DIR_IN, pullup);
+    res = gpio_init(dev, mode);
     if (res < 0) {
         return res;
     }

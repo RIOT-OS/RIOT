@@ -56,43 +56,38 @@ static inline int _pin_mask(gpio_t pin)
     return (1 << _pin_pos(pin));
 }
 
-int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pushpull)
+int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     GPIO_P_TypeDef *port = _port(pin);
     uint32_t pin_pos = _pin_pos(pin);
-    uint32_t mode;
 
     /* enable power for the GPIO module */
     CMU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_GPIO;
 
-    /* if configured as output, no pull resistors are supported */
-    if ((dir == GPIO_DIR_OUT) && (pushpull != GPIO_NOPULL)) {
-        return -1;
-    }
-
-    /* configure the pin mode:
-     * case output: no pull resistors available, use default drive strength
-     *  case input: use input without filter, set pull-up, pull-down or no-pull
-     *              as given */
-    mode = (dir | (pushpull & 0x3));
+    /* configure the mode */
     port->MODE[pin_pos >> 3] &= ~(0xf << ((pin_pos & 0x7) * 4));
     port->MODE[pin_pos >> 3] |= (mode << ((pin_pos & 0x7) * 4));
-    port->CTRL = GPIO_P_CTRL_DRIVEMODE_DEFAULT;
-    port->DOUT |= (((pushpull >> 2) & 0x1) << pin_pos);
+    /* reset output register */
+    port->DOUTCLR = (1 << pin_pos);
+    /* if input with pull-up, set the data out register */
+    if (mode == GPIO_IN_PU) {
+        port->DOUTSET = (1 << pin_pos);
+    }
+
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                     gpio_cb_t cb, void *arg)
 {
     uint32_t pin_pos = _pin_pos(pin);
 
     /* configure as input */
-    gpio_init(pin, GPIO_DIR_IN, pullup);
+    gpio_init(pin, mode);
 
     /* just in case, disable interrupt for this channel */
     GPIO->IEN &= ~(1 << pin_pos);
-    // /* save callback */
+    /* save callback */
     isr_ctx[pin_pos].cb = cb;
     isr_ctx[pin_pos].arg = arg;
     /* configure interrupt */

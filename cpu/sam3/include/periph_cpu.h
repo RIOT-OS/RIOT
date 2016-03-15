@@ -71,15 +71,28 @@ typedef uint32_t gpio_t;
 #define TIMER_CHANNELS      (3)
 
 /**
- * @brief Override values for pull register configuration
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use 3 bit to determine the pin functions:
+ * - bit 0: in/out
+ * - bit 1: PU enable
+ * - bit 2: OD enable
+ */
+#define GPIO_MODE(io, pu, od)   (io | (pu << 1) | (od << 2))
+
+/**
+ * @brief   Override GPIO modes
  * @{
  */
-#define HAVE_GPIO_PP_T
+#define HAVE_GPIO_MODE_T
 typedef enum {
-    GPIO_NOPULL = 4,        /**< do not use internal pull resistors */
-    GPIO_PULLUP = 9,        /**< enable internal pull-up resistor */
-    GPIO_PULLDOWN = 8       /**< enable internal pull-down resistor */
-} gpio_pp_t;
+    GPIO_IN    = GPIO_MODE(0, 0, 0),    /**< IN */
+    GPIO_IN_PD = 0xf,                   /**< not supported by HW */
+    GPIO_IN_PU = GPIO_MODE(0, 1, 0),    /**< IN with pull-up */
+    GPIO_OUT   = GPIO_MODE(1, 0, 0),    /**< OUT (push-pull) */
+    GPIO_OD    = GPIO_MODE(1, 0, 1),    /**< OD */
+    GPIO_OD_PU = GPIO_MODE(1, 1, 1),    /**< OD with pull-up */
+} gpio_mode_t;
 /** @} */
 
 /**
@@ -112,6 +125,23 @@ typedef enum {
     GPIO_MUX_B = 1,         /**< alternate function B */
 } gpio_mux_t;
 
+#ifndef HAVE_SPI_MODE_T
+typedef enum {
+    SPI_MODE_0 = (SPI_CSR_NCPHA),                   /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1 = (0),                               /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2 = (SPI_CSR_CPOL | SPI_CSR_NCPHA),    /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3 = (SPI_CSR_CPOL)                     /**< CPOL=1, CPHA=1 */
+} spi_mode_t;
+
+#ifndef HAVE_SPI_CLK_T
+typedef enum {
+    SPI_CLK_100KHZ = (CLOCK_CORECLOCK / 100000),    /**< 100KHz */
+    SPI_CLK_400KHZ = (CLOCK_CORECLOCK / 400000),    /**< 400KHz */
+    SPI_CLK_1MHZ   = (CLOCK_CORECLOCK / 1000000),   /**< 1MHz */
+    SPI_CLK_5MHZ   = (CLOCK_CORECLOCK / 5000000),   /**< 5MHz */
+    SPI_CLK_10MHZ  = (CLOCK_CORECLOCK / 10000000)   /**< 10MHz */
+} spi_clk_t;
+
 /**
  * @brief   Timer configuration data
  */
@@ -133,6 +163,22 @@ typedef struct {
     uint8_t pmc_id;         /**< bit in the PMC register of the device*/
     uint8_t irqn;           /**< interrupt number of the device */
 } uart_conf_t;
+
+/**
+ * @brief   SPI configuration data
+ */
+typedef struct {
+    Spi *dev;
+    uint8_t id;
+    gpio_t clk;
+    gpio_t mosi;
+    gpio_t miso;
+    gpio_mux_t mux;
+} spi_conf_t;
+
+
+
+void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
 
 #ifdef __cplusplus
 }

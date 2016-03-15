@@ -53,6 +53,57 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
 
 /**
+ * @brief   Override HWSC macro
+ */
+#define SPI_HWCS(x)         (x)
+
+/**
+ * @brief   Peripheral buses
+ */
+enum {
+    BUS_APB1    = 1,
+    BUS_APB2    = 0
+};
+
+/**
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use 5 bit to encode the mode:
+ * - bit 0+1: pin mode (input / output)
+ * - bit 2+3: pull resistor configuration
+ * - bit   4: output type (0: push-pull, 1: open-drain)
+ */
+#define GPIO_MODE(io, pr, ot)   ((io << 0) | (pr << 2) | (ot << 4))
+
+/**
+ * @brief   Override GPIO mode options
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN    = GPIO_MODE(0, 0, 0),    /**< input w/o pull R */
+    GPIO_IN_PD = GPIO_MODE(0, 2, 0),    /**< input with pull-down */
+    GPIO_IN_PU = GPIO_MODE(0, 1, 0),    /**< input with pull-up */
+    GPIO_OUT   = GPIO_MODE(1, 0, 0),    /**< push-pull output */
+    GPIO_OD    = GPIO_MODE(1, 0, 1),    /**< open-drain w/o pull R */
+    GPIO_OD_PU = GPIO_MODE(1, 1, 1)     /**< open-drain with pull-up */
+} gpio_mode_t;
+/** @} */
+
+/**
+ * @brief   Override I2C speed options
+ * @{
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW = 0,      /**< low speed mode:    ~10kbit/s */
+    I2C_SPEED_NORMAL,       /**< normal mode:       ~100kbit/s */
+    I2C_SPEED_FAST,         /**< fast mode:         ~400kbit/sj */
+    I2C_SPEED_FAST_PLUS,    /**< fast plus mode:    ~1Mbit/s */
+    I2C_SPEED_HIGH,         /**< high speed mode:   ~3.4Mbit/s */
+} i2c_speed_t;
+
+/**
  * @brief declare needed generic SPI functions
  * @{
  */
@@ -126,6 +177,37 @@ typedef struct {
     uint8_t dma_stream;     /**< DMA stream used for TX */
     uint8_t dma_chan;       /**< DMA channel used for TX */
 } uart_conf_t;
+/** @} */
+
+/**
+ * @brief   I2C configuration options
+ * @{
+ */
+typedef struct {
+    I2C_TypeDef *dev;       /**< I2C device */
+    gpio_t scl_pin;         /**< clock pin */
+    gpio_t sda_pin;         /**< data pin */
+    uint8_t scl_af;         /**< SCL pin alternate function */
+    uint8_t sda_af;         /**< SDA pin alternate function */
+    i2c_speed_t speed;      /**< I2C bus speed */
+    uint8_t rcc_bit;        /**< bit in the rcc register */
+    uint8_t irqn;           /**< IRQ channel */
+} i2c_conf_t;
+/** @} */
+
+/**
+ * @brief   Structure for SPI configuration data
+ * @{
+ */
+typedef struct {
+    SPI_TypeDef *dev;       /**< SPI device base register address */
+    gpio_t mosi_pin;        /**< MOSI pin */
+    gpio_t miso_pin;        /**< MISO pin */
+    gpio_t sclk_pin;        /**< SCLK pin */
+    gpio_af_t af;           /**< pin alternate function */
+    uint8_t abpbus;         /**< APB bus, 0 := APB1, 1:= APB2 */
+    uint32_t rccmask;         /**< bit in the RCC peripheral enable register */
+} spi_conf_t;
 /** @} */
 
 /**

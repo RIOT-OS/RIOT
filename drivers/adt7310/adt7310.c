@@ -153,7 +153,7 @@ int adt7310_init(adt7310_t *dev, spi_t spi, gpio_t cs)
     dev->high_res = false;
 
     /* CS */
-    gpio_init(dev->cs, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(dev->cs, GPIO_OUT);
     gpio_set(dev->cs);
 
 #if ENABLE_DEBUG

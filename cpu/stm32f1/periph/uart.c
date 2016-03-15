@@ -107,7 +107,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     }
     /* configure RX and TX pin */
     gpio_init_af(tx_pin, GPIO_AF_OUT_PP);
-    gpio_init(rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init(rx_pin, GPIO_IN);
 
     /* configure UART to mode 8N1 with given baudrate */
     bus_freq /= baudrate;

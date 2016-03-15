@@ -44,7 +44,7 @@ void cc110x_cs(cc110x_t *dev)
     volatile int retry_count = 0;
     /* Switch MISO/GDO1 to GPIO input mode */
 #ifndef GPIO_READS_SPI_PINS
-    gpio_init(dev->params.gdo1, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init(dev->params.gdo1, GPIO_IN);
 #endif
     /* CS to low */
     gpio_clear(dev->params.cs);

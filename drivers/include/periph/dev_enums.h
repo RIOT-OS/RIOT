@@ -217,6 +217,46 @@ enum {
     PWM_UNDEFINED       /**< Deprecated symbol, use PWM_UNDEF instead */
 };
 
+/**
+ * @brief   Legacy definition of ADC devices
+ * @deprecated
+ */
+enum {
+#if ADC_0_EN
+    ADC_0 = 0,              /**< ADC device 0 */
+#endif
+#if ADC_1_EN
+    ADC_1,                  /**< ADC device 1 */
+#endif
+#if ADC_2_EN
+    ADC_2,                  /**< ADC device 2 */
+#endif
+#if ADC_3_EN
+    ADC_3,                  /**< ADC device 3 */
+#endif
+    ADC_UNDEFINED           /**< Deprecated symbol, use ADC_UNDEF instead */
+};
+
+/**
+ * @brief   Legacy definition of DAC devices
+ * @deprecated
+ */
+enum {
+#if DAC_0_EN
+    DAC_0 = 0,              /**< DAC device 0 */
+#endif
+#if DAC_1_EN
+    DAC_1 = 1,              /**< DAC device 1 */
+#endif
+#if DAC_2_EN
+    DAC_2 = 2,              /**< DAC device 2 */
+#endif
+#if DAC_3_EN
+    DAC_3 = 3,              /**< DAC device 3 */
+#endif
+    DAC_UNDEFINED           /**< Deprecated symbol, use DAC_UNDEF instead */
+};
+
 #ifdef __cplusplus
 }
 #endif

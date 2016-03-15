@@ -1,0 +1,17 @@
+# define the cpu used by the stm32f4-discovery board
+export CPU = stm32f2
+export CPU_MODEL = stm32f205rg
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# setup JLink for flashing
+export JLINK_DEVICE := stm32f205rg
+include $(RIOTBOARD)/Makefile.include.jlink
+
+# include board dependencies
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep

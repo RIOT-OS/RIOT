@@ -1,0 +1,8 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += ng_sht11
+  USEMODULE += m24lrxxx
+endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif

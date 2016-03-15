@@ -24,68 +24,47 @@
 #include "periph/spi.h"
 #include "periph_cpu.h"
 
-#if SPI_NUMOF
-
 #ifdef PERIPH_SPI_NEEDS_TRANSFER_BYTES
-int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
+void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
+                        uint8_t *out, uint8_t *in, size_t len)
 {
-    int trans_ret;
-    unsigned trans_bytes = 0;
-    char in_temp;
-
-    for (trans_bytes = 0; trans_bytes < length; trans_bytes++) {
-        if (out != NULL) {
-            trans_ret = spi_transfer_byte(dev, out[trans_bytes], &in_temp);
-        }
-        else {
-            trans_ret = spi_transfer_byte(dev, 0, &in_temp);
-        }
-        if (trans_ret < 0) {
-            return -1;
-        }
-        if (in != NULL) {
-            in[trans_bytes] = in_temp;
+    if (out && in) {
+        while (len--) {
+            spi_transfer_byte(bus, cs, (cont || len > 0), *out++, in++);
         }
     }
-
-    return trans_bytes;
+    else if (out) {
+        uint8_t tmp;
+        while (len--) {
+            spi_transfer_byte(bus, cs, (cont || len > 0), *out++, &tmp);
+        }
+    }
+    else if (in) {
+        while (len--) {
+            spi_transfer_byte(bus, cs, (cont || len > 0), 0, in++);
+        }
+    }
 }
 #endif
 
 #ifdef PERIPH_SPI_NEEDS_TRANSFER_REG
-int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
+void spi_transfer_reg(spi_t bus, spi_cs_t cs,
+                      uint8_t reg, uint8_t out, uint8_t *in)
 {
-    int trans_ret;
-
-    trans_ret = spi_transfer_byte(dev, reg, in);
-    if (trans_ret < 0) {
-        return -1;
-    }
-    trans_ret = spi_transfer_byte(dev, out, in);
-    if (trans_ret < 0) {
-        return -1;
-    }
-
-    return 1;
+    uint8_t tmp;
+    spi_transfer_byte(bus, cs, true, reg, &tmp);
+    spi_transfer_byte(bus, cs, false, out, &tmp);
+    if (in)
+        *in = tmp;
 }
 #endif
 
 #ifdef PERIPH_SPI_NEEDS_TRANSFER_REGS
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length)
+void spi_transfer_regs(spi_t bus, spi_cs_t cs,
+                       uint8_t reg, uint8_t *out, uint8_t *in, size_t len)
 {
-    int trans_ret;
-
-    trans_ret = spi_transfer_byte(dev, reg, in);
-    if (trans_ret < 0) {
-        return -1;
-    }
-    trans_ret = spi_transfer_bytes(dev, out, in, length);
-    if (trans_ret < 0) {
-        return -1;
-    }
-
-    return trans_ret;
+    uint8_t tmp;
+    spi_transfer_byte(bus, cs, true, reg, &tmp);
+    spi_transfer_bytes(bus, cs, false, out, in, len);
 }
 #endif
-
-#endif /* SPI_NUMOF */

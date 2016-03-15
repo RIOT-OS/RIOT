@@ -44,6 +44,7 @@ int8_t dac_init(dac_t line)
         return -1;
     }
 
+
     /* configure pin */
     gpio_init_analog(dac_config[line].pin);
     /* enable the DAC's clock */
