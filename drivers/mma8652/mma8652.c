@@ -216,7 +216,9 @@ int mma8652_read(mma8652_t *dev, int16_t *x, int16_t *y, int16_t *z, uint8_t *st
     }
     i2c_release(dev->i2c);
 
-    *status = buf[0];
+    if (status != NULL) {
+        *status = buf[0];
+    }
     *x = (int32_t)((int16_t)(((int16_t)buf[1] << 8) | buf[2]) >> 4) * 1000 / dev->scale;
     *y = (int32_t)((int16_t)(((int16_t)buf[3] << 8) | buf[4]) >> 4) * 1000 / dev->scale;
     *z = (int32_t)((int16_t)(((int16_t)buf[5] << 8) | buf[6]) >> 4) * 1000 / dev->scale;
