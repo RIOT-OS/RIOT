@@ -41,7 +41,7 @@ static inline const pwm_conf_chan_t* chan(pwm_t dev, int ch)
 
 static inline volatile uint16_t* ccr(pwm_t dev, int ch)
 {
-    return (&(tim(dev)->CCR1)) + (chan(dev, ch)->chan << 1);
+    return (volatile uint16_t *)&(tim(dev)->CCR[chan(dev, ch)->chan]);
 }
 
 static inline volatile uint32_t* apb(pwm_t dev)
@@ -88,9 +88,11 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
          */
         /* timer 12 to 14 and timer 9 to 15 must be re-mapped on MAPR2 register of AFIO */
         volatile uint32_t *MAPR = &(AFIO->MAPR);
+#if defined(TIM15)
         if ((conf->dev > TIM12 && conf->dev < TIM14) || (conf->dev > TIM15 && conf->dev < TIM11)) {
             MAPR = &(AFIO->MAPR2);
         }
+#endif
 
         /* clear re-mapping of the peripheral and set the new re-mapping */
         // TODO add support for not reset ? *MAPR &= ~(PWM_0_AFIO_MAPR_BITMASK << PWM_0_AFIO_MAPR_OFFSET);
