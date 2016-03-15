@@ -47,6 +47,20 @@ extern "C" {
 /** @} */
 
 /**
+ * @name SHT11 definitions
+ * @{
+ */
+#define SHT11_I2C           I2C_0
+/** @} */
+
+/**
+ * @name M24LR04E definitions
+ * @{
+ */
+#define M24LRXXX_I2C        0
+/** @} */
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);

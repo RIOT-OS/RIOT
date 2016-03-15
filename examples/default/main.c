@@ -42,6 +42,12 @@
 #include "net/gnrc.h"
 #endif
 
+#ifdef MODULE_M24LRXXX
+#include "periph/i2c.h"
+#include "m24lrxxx.h"
+#include "m24lrxx_params.h"
+#endif
+
 int main(void)
 {
 #ifdef MODULE_LTC4150
@@ -51,6 +57,12 @@ int main(void)
 #ifdef FEATURE_PERIPH_RTC
     rtc_init();
 #endif
+
+#if MODULE_M24LRXXX
+    m24lrxxx_t dev;
+    m24lrxxx_init(&dev, m24lrxxx_params[0].bus, m24lrxxx_params[0].speed, m24lrxxx_params[0].address);
+#endif
+
 
 #ifdef MODULE_NETIF
     gnrc_netreg_entry_t dump;
