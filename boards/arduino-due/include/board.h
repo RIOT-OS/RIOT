@@ -32,26 +32,11 @@ extern "C" {
  * @name LED pin definitions
  * @{
  */
-#define LED_PORT            PIOB
-#define LED_BIT             PIO_PB27
-#define LED_PIN             GPIO_PIN(PB, 27)
-/** @} */
+#define LED0_PIN            GPIO_PIN(PB, 27)
 
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_ON              (LED_PORT->PIO_SODR = LED_BIT)
-#define LED_OFF             (LED_PORT->PIO_CODR = LED_BIT)
-#define LED_TOGGLE          (LED_PORT->PIO_ODSR ^= LED_BIT)
-
-/* for compatability to other boards */
-#define LED_GREEN_ON        LED_ON
-#define LED_GREEN_OFF       LED_OFF
-#define LED_GREEN_TOGGLE    LED_TOGGLE
-#define LED_RED_ON          /* not available */
-#define LED_RED_OFF         /* not available */
-#define LED_RED_TOGGLE      /* not available */
+#define LED0_ON             (PIOB->PIO_SODR  = PIO_PB27)
+#define LED0_OFF            (PIOB->PIO_CODR  = PIO_PB27)
+#define LED0_TOGGLE         (PIOB->PIO_ODSR ^= PIO_PB27)
 /** @} */
 
 /**

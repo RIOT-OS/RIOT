@@ -50,18 +50,6 @@ void init_clks2(void);
  */
 void bl_init_clks(void);
 
-/**
- * @name dummy-defines for LEDs
- * @{
- */
-#define LED_GREEN_ON        /* not available */
-#define LED_GREEN_OFF       /* not available */
-#define LED_GREEN_TOGGLE    /* not available */
-#define LED_RED_ON          /* not available */
-#define LED_RED_OFF         /* not available */
-#define LED_RED_TOGGLE      /* not available */
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif

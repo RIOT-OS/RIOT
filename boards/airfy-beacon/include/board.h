@@ -39,24 +39,6 @@
 /** @} */
 
 /**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_RED_PIN         (GPIO_PIN(0, 16))
-#define LED_RED_MASK        (1 << 16)
-
-#define LED_RED_ON          (NRF_GPIO->OUTSET = LED_RED_MASK)
-#define LED_RED_OFF         (NRF_GPIO->OUTCLR = LED_RED_MASK)
-#define LED_RED_TOGGLE      (NRF_GPIO->OUT   ^= LED_RED_MASK)
-#define LED_GREEN_ON        /* not available */
-#define LED_GREEN_OFF       /* not available */
-#define LED_GREEN_TOGGLE    /* not available */
-#define LED_BLUE_ON         /* not available */
-#define LED_BLUE_OFF        /* not available */
-#define LED_BLUE_TOGGLE     /* not available */
-/* @} */
-
-/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
