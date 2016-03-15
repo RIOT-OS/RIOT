@@ -136,6 +136,32 @@ ifneq (0,$(shell test -d $(RIOTBOARD)/$(BOARD); echo $$?))
     $(error The specified board $(BOARD) does not exist.)
 endif
 
+# Use TOOLCHAIN environment variable to select the toolchain to use.
+# Default: gnu
+TOOLCHAIN ?= gnu
+
+# TOOLCHAIN = clang is an alias for TOOLCHAIN = llvm
+ifeq (clang,$(TOOLCHAIN))
+# use override so that we can redefine a variable set on the command line (as
+# opposed to one set in the environment)
+override TOOLCHAIN := llvm
+endif
+# TOOLCHAIN = gcc is an alias for TOOLCHAIN = gnu
+ifeq (gcc,$(TOOLCHAIN))
+# use override so that we can redefine a variable set on the command line (as
+# opposed to one set in the environment)
+override TOOLCHAIN := gnu
+endif
+
+ifeq (,$(TOOLCHAIN))
+override TOOLCHAIN := gnu
+endif
+
+export TOOLCHAIN
+
+# Import all toolchain settings
+include $(RIOTCPU)/Makefile.include.$(TOOLCHAIN)
+
 # mandatory includes!
 include $(RIOTBASE)/Makefile.modules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
