@@ -165,7 +165,7 @@ void uart_poweroff(uart_t uart)
 static inline void irq_handler(int uart, USART_TypeDef *dev)
 {
     if (dev->SR & USART_SR_RXNE) {
-        char data = (char)dev->DR;
+        uint8_t data = (uint8_t)dev->DR;
         uart_ctx[uart].rx_cb(uart_ctx[uart].arg, data);
     }
     if (sched_context_switch_request) {

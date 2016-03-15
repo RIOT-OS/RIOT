@@ -1,6 +1,6 @@
 PKG_NAME=cmsis-dsp
 PKG_URL=https://github.com/gebart/CMSIS-DSP.git
-PKG_VERSION=v1.4.5-riot1
+PKG_VERSION=v1.4.5a-riot1
 PKG_DIR=$(CURDIR)/$(PKG_NAME)
 
 ifneq ($(RIOTBASE),)

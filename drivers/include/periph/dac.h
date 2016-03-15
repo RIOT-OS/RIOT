@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 Simon Brummer
- *               2015 Freie Universität Berlin
+ *               2015-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -39,6 +39,7 @@
 #define PERIPH_DAC_H
 
 #include <stdint.h>
+#include <limits.h>
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -72,7 +73,7 @@ typedef unsigned int dac_t;
  * @{
  */
 #ifndef DAC_UNDEF
-#define DAC_UNDEF           (0xffff)
+#define DAC_UNDEF           (UINT_MAX)
 #endif
 /** @} */
 

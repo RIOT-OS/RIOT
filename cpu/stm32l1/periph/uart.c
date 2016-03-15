@@ -166,7 +166,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
 {
     if (dev->SR & USART_SR_RXNE) {
-        char data = (char)dev->DR;
+        uint8_t data = (uint8_t)dev->DR;
         uart_config[uartnum].rx_cb(uart_config[uartnum].arg, data);
     }
     if (sched_context_switch_request) {

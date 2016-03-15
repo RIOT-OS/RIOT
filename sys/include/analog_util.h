@@ -84,7 +84,7 @@ uint16_t dac_util_map(int value, int min, int max);
  *
  * @return                 the mapped value
  */
-uint16_t dac_mapf(float value, float min, float max);
+uint16_t dac_util_mapf(float value, float min, float max);
 
 #ifdef __cplusplus
 }

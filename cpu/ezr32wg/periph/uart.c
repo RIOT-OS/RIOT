@@ -101,7 +101,7 @@ void uart_poweroff(uart_t dev)
 static inline void rx_irq(int dev)
 {
     if (_uart(dev)->IF & USART_IF_RXDATAV) {
-        char data = (char)_uart(dev)->RXDATA;
+        uint8_t data = (uint8_t)_uart(dev)->RXDATA;
         isr_ctx[dev].rx_cb(isr_ctx[dev].arg, data);
     }
     if (sched_context_switch_request) {

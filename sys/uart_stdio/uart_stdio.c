@@ -52,10 +52,10 @@ static tsrb_t _rx_buf = TSRB_INIT(_rx_buf_mem);
 /**
  * @brief Receive a new character from the UART and put it into the receive buffer
  */
-void uart_stdio_rx_cb(void *arg, char data)
+void uart_stdio_rx_cb(void *arg, uint8_t data)
 {
     (void)arg;
-    tsrb_add_one(&_rx_buf, data);
+    tsrb_add_one(&_rx_buf, (uint8_t)data);
     mutex_unlock(&_rx_mutex);
 }
 

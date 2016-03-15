@@ -133,17 +133,18 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name DAC configuration
+ * @brief   DAC configuration
+ *
+ * We need to define the following fields:
+ * PIN, DAC channel
  * @{
  */
-static const dac_conf_t dac_config[] = {
-    /* pin, channel */
-    {GPIO_PIN(PORT_A, 4), 0},
-    {GPIO_PIN(PORT_A, 5), 1}
-};
+#define DAC_CONFIG {          \
+    {GPIO_PIN(PORT_A, 4), 0}, \
+    {GPIO_PIN(PORT_A, 5), 1}  \
+}
 
-/* deduct the number of DAC lines from this configuration */
-#define DAC_NUMOF           (sizeof(dac_config) / sizeof(dac_config[0]))
+#define DAC_NUMOF           (2)
 /** @} */
 
 /**
