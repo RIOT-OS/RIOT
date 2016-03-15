@@ -46,6 +46,13 @@
 #define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_2
 /** @} */
 
+ /**
+  * @brief   DAC configuration
+  * @{
+  */
+ #define DAC_NUMOF           (0)
+ /** @} */
+
 /**
  * @name ADC configuration
  * @{

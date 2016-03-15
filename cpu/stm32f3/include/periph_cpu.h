@@ -85,6 +85,15 @@ typedef enum {
     GPIO_AF15               /**< use alternate function 14 */
 } gpio_af_t;
 
+/**
+ * @brief   DAC line configuration support
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the line */
+    uint8_t dac;            /**< The DAC to use, 0 or 1 */
+    uint8_t chan;           /**< DAC device used for this line */
+} dac_conf_t;
+
 #ifdef __cplusplus
 }
 #endif

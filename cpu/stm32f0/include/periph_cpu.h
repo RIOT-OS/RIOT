@@ -20,7 +20,6 @@
 #define PERIPH_CPU_H
 
 #include "periph_cpu_common.h"
-#include "cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -108,6 +107,14 @@ typedef struct {
 } adc_conf_t;
 
 /**
+ * @brief   DAC line configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the line */
+    uint8_t chan;           /**< DAC device used for this line */
+} dac_conf_t;
+
+/**
  * @brief   Configure the alternate function for the given pin
  *
  * @note    This is meant for internal use in STM32F4 peripheral drivers only
@@ -116,13 +123,6 @@ typedef struct {
  * @param[in] af        alternate function to use
  */
 void gpio_init_af(gpio_t pin, gpio_af_t af);
-
-/**
- * @brief   Configure the given pin to be used as ADC input
- *
- * @param[in] pin       pin to configure
- */
-void gpio_init_analog(gpio_t pin);
 
 #ifdef __cplusplus
 }
