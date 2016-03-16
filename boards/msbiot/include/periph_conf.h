@@ -129,40 +129,42 @@ extern "C" {
 /** @} */
 
 /**
- * @name UART configuration
+ * @brief   UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
-    /* device, RCC mask, RX pin, TX pin, pin AF, IRQ channel, DMA stream, DMA  */
     {
-        USART2,                     /* device base register */
-        RCC_APB1ENR_USART2EN,       /* RCC mask */
-        GPIO_PIN(PORT_A,3),         /* RX pin */
-        GPIO_PIN(PORT_A,2),         /* TX pin */
-        GPIO_AF7,                   /* pin AF */
-        USART2_IRQn,                /* IRQ channel */
-        6,                          /* DMA stream */
-        4                           /* DMA channel */
+        .dev        = USART2,
+        .rcc_mask   = RCC_APB1ENR_USART2EN,
+        .rx_pin     = GPIO_PIN(PORT_A,3),
+        .tx_pin     = GPIO_PIN(PORT_A,2),
+        .af         = GPIO_AF7,
+        .bus        = APB1,
+        .irqn       = USART2_IRQn,
+        .dma_stream = 6,
+        .dma_chan   = 4
     },
     {
-        USART1,                     /* device base register */
-        RCC_APB2ENR_USART1EN,       /* RCC mask */
-        GPIO_PIN(PORT_A,10),        /* RX pin */
-        GPIO_PIN(PORT_A,9),         /* TX pin */
-        GPIO_AF7,                   /* pin AF */
-        USART1_IRQn,                /* IRQ channel */
-        15,                         /* DMA stream */
-        4                           /* DMA channel */
+        .dev        = USART1,
+        .rcc_mask   = RCC_APB2ENR_USART1EN,
+        .rx_pin     = GPIO_PIN(PORT_A,10),
+        .tx_pin     = GPIO_PIN(PORT_A,9),
+        .af         = GPIO_AF7,
+        .bus        = APB2,
+        .irqn       = USART1_IRQn,
+        .dma_stream = 15,
+        .dma_chan   = 4
     },
     {
-        USART3,                     /* device base register */
-        RCC_APB1ENR_USART3EN,       /* RCC mask */
-        GPIO_PIN(PORT_D,9),         /* RX pin */
-        GPIO_PIN(PORT_D,8),         /* TX pin */
-        GPIO_AF7,                   /* pin AF */
-        USART3_IRQn,                /* IRQ channel */
-        3,                          /* DMA stream */
-        4                           /* DMA channel */
+        .dev        = USART3,
+        .rcc_mask   = RCC_APB1ENR_USART3EN,
+        .rx_pin     = GPIO_PIN(PORT_D,9),
+        .tx_pin     = GPIO_PIN(PORT_D,8),
+        .af         = GPIO_AF7,
+        .bus        = APB1,
+        .irqn       = USART3_IRQn,
+        .dma_stream = 3,
+        .dma_chan   = 4
     },
 };
 

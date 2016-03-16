@@ -83,16 +83,16 @@ extern "C" {
  * @{
  */
 static const uart_conf_t uart_config[] = {
-    /* device, RCC mask, RX pin, TX pin, pin AF, IRQ channel, DMA stream, DMA  */
     {
-        USART6,                     /* device base register */
-        RCC_APB2ENR_USART6EN,       /* RCC mask */
-        GPIO_PIN(PORT_C,7),         /* RX pin */
-        GPIO_PIN(PORT_C,6),         /* TX pin */
-        GPIO_AF8,                   /* pin AF */
-        USART6_IRQn,                /* IRQ channel */
-        14,                         /* DMA stream */
-        5                           /* DMA channel */
+        .dev        = USART6,
+        .rcc_mask   = RCC_APB2ENR_USART6EN,
+        .rx_pin     = GPIO_PIN(PORT_C,7),
+        .tx_pin     = GPIO_PIN(PORT_C,6),
+        .af         = GPIO_AF8,
+        .bus        = APB2,
+        .irqn       = USART6_IRQn,
+        .dma_stream = 14,
+        .dma_chan   = 5
     },
 };
 
