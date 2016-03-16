@@ -81,6 +81,21 @@ typedef enum {
 } gpio_af_t;
 
 /**
+ * @brief   Override values for pull register configuration
+ * @{
+ */
+#define HAVE_GPIO_PP_T
+typedef enum {
+    GPIO_NOPULL = 0,        /**< do not use internal pull resistors */
+    GPIO_PULLUP = 1,        /**< enable internal pull-up resistor */
+    GPIO_PULLDOWN = 2,      /**< enable internal pull-down resistor */
+    GPIO_NOPULL_OD = 4,     /**< do not use internal pull resistors (open drain) */
+    GPIO_PULLUP_OD = 5,     /**< enable internal pull-up resistor (open drain) */
+    GPIO_PULLDOWN_OD = 6    /**< enable internal pull-down resistor (open drain) */
+} gpio_pp_t;
+/** @} */
+
+/**
  * @brief   Configure the alternate function for the given pin
  *
  * @note    This is meant for internal use in STM32L1 peripheral drivers only
