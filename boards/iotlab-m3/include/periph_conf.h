@@ -57,13 +57,22 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Timer configuration
+ * @brief   Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
-    /* device, APB bus, rcc_bit */
-    { TIM2, APB1, RCC_APB1ENR_TIM2EN, TIM2_IRQn },
-    { TIM3, APB1, RCC_APB1ENR_TIM3EN, TIM3_IRQn }
+    {
+        .dev     = TIM2,
+        .rcc_bit = RCC_APB1ENR_TIM2EN,
+        .bus     = APB1,
+        .irqn    = TIM2_IRQn
+    },
+    {
+        .dev     = TIM3,
+        .rcc_bit = RCC_APB1ENR_TIM3EN,
+        .bus     = APB1,
+        .irqn    = TIM3_IRQn
+    }
 };
 
 #define TIMER_0_ISR         isr_tim2
