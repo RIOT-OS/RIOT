@@ -63,4 +63,10 @@ ifneq (,$(filter arduino,$(USEMODULE)))
     include $(RIOTBASE)/sys/arduino/Makefile.include
 endif
 
+ifneq (,$(filter printf_float,$(USEMODULE)))
+    ifeq (1,$(USE_NANO_SPECS))
+        export LINKFLAGS += -u _printf_float
+    endif
+endif
+
 INCLUDES += -I$(RIOTBASE)/sys/libc/include
