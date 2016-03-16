@@ -122,6 +122,7 @@ typedef struct {
     gpio_t rx_pin;          /**< RX pin */
     gpio_t tx_pin;          /**< TX pin */
     gpio_af_t af;           /**< alternate pin function to use */
+    uint8_t bus;            /**< APB bus */
     uint8_t irqn;           /**< IRQ channel */
     uint8_t dma_stream;     /**< DMA stream used for TX */
     uint8_t dma_chan;       /**< DMA channel used for TX */
