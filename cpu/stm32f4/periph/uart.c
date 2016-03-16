@@ -45,17 +45,6 @@ static inline USART_TypeDef *_dev(uart_t uart)
 static mutex_t _tx_dma_sync[UART_NUMOF];
 static mutex_t _tx_lock[UART_NUMOF];
 
-/**
- * @brief   Find out which peripheral bus the UART device is connected to
- *
- * @return  1: APB1
- * @return  2: APB2
- */
-static inline int _bus(uart_t uart)
-{
-    return (uart_config[uart].rcc_mask < RCC_APB1ENR_USART2EN) ? 2 : 1;
-}
-
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     USART_TypeDef *dev;
@@ -88,7 +77,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     uart_poweron(uart);
 
     /* calculate and set baudrate */
-    if (_bus(uart) == 1) {
+    if (uart_config[uart].bus == APB1) {
         divider = CLOCK_APB1 / (16 * baudrate);
     }
     else {
@@ -144,22 +133,12 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
 void uart_poweron(uart_t uart)
 {
-    if (_bus(uart) == 1) {
-        RCC->APB1ENR |= uart_config[uart].rcc_mask;
-    }
-    else {
-        RCC->APB2ENR |= uart_config[uart].rcc_mask;
-    }
+    periph_clk_en(uart_config[uart].bus, uart_config[uart].rcc_mask);
 }
 
 void uart_poweroff(uart_t uart)
 {
-    if (_bus(uart) == 1) {
-        RCC->APB1ENR &= ~(uart_config[uart].rcc_mask);
-    }
-    else {
-        RCC->APB2ENR &= ~(uart_config[uart].rcc_mask);
-    }
+    periph_clk_dis(uart_config[uart].bus, uart_config[uart].rcc_mask);
 }
 
 static inline void irq_handler(int uart, USART_TypeDef *dev)
