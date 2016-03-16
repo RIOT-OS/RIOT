@@ -76,7 +76,6 @@ static inline void cpu_print_last_instruction(void)
  */
 static inline void cpu_sleep_until_event(void)
 {
-    __SEV();
     __WFE();
 }
 
