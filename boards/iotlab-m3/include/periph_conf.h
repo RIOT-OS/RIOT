@@ -62,16 +62,16 @@ extern "C" {
  */
 static const timer_conf_t timer_config[] = {
     {
-        .dev     = TIM2,
-        .rcc_bit = RCC_APB1ENR_TIM2EN,
-        .bus     = APB1,
-        .irqn    = TIM2_IRQn
+        .dev      = TIM2,
+        .rcc_mask = RCC_APB1ENR_TIM2EN,
+        .bus      = APB1,
+        .irqn     = TIM2_IRQn
     },
     {
-        .dev     = TIM3,
-        .rcc_bit = RCC_APB1ENR_TIM3EN,
-        .bus     = APB1,
-        .irqn    = TIM3_IRQn
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .bus      = APB1,
+        .irqn     = TIM3_IRQn
     }
 };
 
