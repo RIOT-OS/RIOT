@@ -37,19 +37,6 @@ static inline TIM_TypeDef *dev(tim_t tim)
     return timer_config[tim].dev;
 }
 
-/**
- * @brief   Enable the peripheral clock for the given timer
- */
-static void clk_en(tim_t tim)
-{
-    if (timer_config[tim].bus == APB1) {
-        RCC->APB1ENR |= timer_config[tim].rcc_bit;
-    }
-    else {
-        RCC->APB2ENR |= timer_config[tim].rcc_bit;
-    }
-}
-
 int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* check if device is valid */
@@ -62,7 +49,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     isr_ctx[tim].arg = arg;
 
     /* enable the peripheral clock */
-    clk_en(tim);
+    periph_clk_en(timer_config[tim].bus, timer_config[tim].rcc_mask);
 
     /* configure the timer as upcounter in continuous mode */
     dev(tim)->CR1  = 0;
@@ -145,7 +132,6 @@ static inline void irq_handler(tim_t tim)
             isr_ctx[tim].cb(isr_ctx[tim].arg, i);
         }
     }
-
     if (sched_context_switch_request) {
         thread_yield();
     }

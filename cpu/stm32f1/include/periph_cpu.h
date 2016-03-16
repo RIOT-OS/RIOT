@@ -120,7 +120,7 @@ typedef struct {
  */
 typedef struct {
     TIM_TypeDef *dev;       /**< timer device */
-    uint32_t rcc_bit;       /**< corresponding bit in the RCC register */
+    uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
     uint8_t bus;            /**< APBx bus the timer is clock from */
     uint8_t irqn;           /**< global IRQ channel */
 } timer_conf_t;
