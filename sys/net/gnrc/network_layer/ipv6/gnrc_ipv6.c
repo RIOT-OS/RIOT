@@ -372,7 +372,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, gnrc_pktsnip_t *ipv6,
             ipv6_addr_set_loopback(&hdr->src);
         }
         else {
-            ipv6_addr_t *src = gnrc_ipv6_netif_find_best_src_addr(iface, &hdr->dst);
+            ipv6_addr_t *src = gnrc_ipv6_netif_find_best_src_addr(iface, &hdr->dst, false);
 
             if (src != NULL) {
                 DEBUG("ipv6: set packet source to %s\n",
