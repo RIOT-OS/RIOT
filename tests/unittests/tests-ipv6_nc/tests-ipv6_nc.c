@@ -54,6 +54,13 @@ static void set_up(void)
     gnrc_ipv6_netif_add(DEFAULT_TEST_NETIF);
 }
 
+static void tear_down(void)
+{
+    /* remove all ncache entries, this is necesaary in case
+     * the last test initializes timers. */
+    gnrc_ipv6_nc_init();
+}
+
 static void test_ipv6_nc_add__address_registered(void)
 {
     ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
@@ -469,7 +476,7 @@ Test *tests_ipv6_nc_tests(void)
         new_TestFixture(test_ipv6_nc_get_l2_addr__reachable),
     };
 
-    EMB_UNIT_TESTCALLER(ipv6_nc_tests, set_up, NULL, fixtures);
+    EMB_UNIT_TESTCALLER(ipv6_nc_tests, set_up, tear_down, fixtures);
 
     return (Test *)&ipv6_nc_tests;
 }
