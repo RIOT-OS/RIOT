@@ -175,6 +175,10 @@ void gnrc_ipv6_nc_remove(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
         xtimer_remove(&entry->rtr_adv_timer);
 #endif
 
+        xtimer_remove(&entry->rtr_timeout);
+        xtimer_remove(&entry->nbr_sol_timer);
+        xtimer_remove(&entry->nbr_adv_timer);
+
         ipv6_addr_set_unspecified(&(entry->ipv6_addr));
         entry->iface = KERNEL_PID_UNDEF;
         entry->flags = 0;
