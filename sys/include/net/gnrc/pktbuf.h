@@ -204,6 +204,17 @@ gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len);
  */
 gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *snip);
 
+/**
+ * @brief   Replace a snip from a packet and the packet buffer by another snip.
+ *
+ * @param[in] pkt   A packet
+ * @param[in] old   snip currently in the packet
+ * @param[in] add   snip which will replace old
+ *
+ * @return  The new reference to @p pkt
+ */
+gnrc_pktsnip_t *gnrc_pktbuf_replace_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *old, gnrc_pktsnip_t *add);
+
 #ifdef DEVELHELP
 /**
  * @brief   Prints some statistics about the packet buffer to stdout.
