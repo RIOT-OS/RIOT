@@ -126,6 +126,18 @@ typedef struct {
 } timer_conf_t;
 
 /**
+ * @brief   UART configuration options
+ */
+typedef struct {
+    USART_TypeDef *dev;     /**< UART device */
+    gpio_t rx_pin;          /**< TX pin */
+    gpio_t tx_pin;          /**< RX pin */
+    uint32_t rcc_pin;       /**< bit in the RCC register */
+    uint8_t bus;            /**< peripheral bus */
+    uint8_t irqn;           /**< interrupt number */
+} uart_conf_t;
+
+/**
  * @brief   Configure the alternate function for the given pin
  *
  * @note    This is meant for internal use in STM32F1 peripheral drivers only
