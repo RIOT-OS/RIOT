@@ -97,6 +97,9 @@ typedef enum {
 #ifdef TEST_SUITES
     GNRC_NETTYPE_TEST,
 #endif
+    /**
+     * @}
+     */
 
     GNRC_NETTYPE_NUMOF,         /**< maximum number of available protocols */
 } gnrc_nettype_t;
