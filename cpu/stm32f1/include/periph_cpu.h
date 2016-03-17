@@ -154,16 +154,20 @@ typedef struct {
 } timer_conf_t;
 
 /**
- * @brief   UART configuration options
+ * @brief   Structure for UART configuration data
+ * @{
  */
 typedef struct {
-    USART_TypeDef *dev;     /**< UART device */
-    gpio_t rx_pin;          /**< TX pin */
-    gpio_t tx_pin;          /**< RX pin */
-    uint32_t rcc_pin;       /**< bit in the RCC register */
-    uint8_t bus;            /**< peripheral bus */
-    uint8_t irqn;           /**< interrupt number */
+    USART_TypeDef *dev;     /**< UART device base register address */
+    gpio_t rx_pin;          /**< RX pin */
+    gpio_t tx_pin;          /**< TX pin */
+    uint32_t rcc_mask;      /**< bit in clock enable register */
+    uint32_t afio_remap;    /**< AFIO pin remapping */
+    uint8_t bus;            /**< APB bus */
+    uint8_t irqn;           /**< IRQ channel */
+    uint8_t dma_chan;       /**< DMA channel used for TX */
 } uart_conf_t;
+/** @} */
 
 /**
  * @brief   Configure the alternate function for the given pin
