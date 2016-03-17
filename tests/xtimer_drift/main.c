@@ -87,7 +87,7 @@ void *slacker_thread(void *arg)
 void *worker_thread(void *arg)
 {
     (void) arg;
-    unsigned int loop_counter = 0;
+    uint32_t loop_counter = 0;
     uint32_t start = 0;
     uint32_t last = 0;
 
@@ -105,9 +105,9 @@ void *worker_thread(void *arg)
         }
 
         uint32_t us, sec;
-        unsigned int min, hr;
-        us = now % 1000000;
-        sec = now / 1000000;
+        uint32_t min, hr;
+        us = now % SEC_IN_USEC;
+        sec = now / SEC_IN_USEC;
         min = (sec / 60) % 60;
         hr = sec / 3600;
         if ((loop_counter % TEST_HZ) == 0) {
@@ -115,8 +115,9 @@ void *worker_thread(void *arg)
             int32_t drift = now - expected;
             expected = last + TEST_HZ * TEST_INTERVAL;
             int32_t jitter = now - expected;
-            printf("now=%" PRIu32 ".%06" PRIu32 " (%u hours %u min), drift=%" PRId32 " us, jitter=%" PRId32 " us\n",
-                sec, us, hr, min, drift, jitter);
+            printf("now=%" PRIu32 ".%06" PRIu32 " (%" PRIu32 " hours %" PRIu32 " min), ",
+                sec, us, hr, min);
+            printf("drift=%" PRId32 " us, jitter=%" PRId32 " us\n", drift, jitter);
             last = now;
         }
         ++loop_counter;
