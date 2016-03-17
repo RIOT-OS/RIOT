@@ -191,7 +191,6 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
     }
     /* prepare packet for sending */
     vec_snip = gnrc_pktbuf_get_iovec(pkt, &n);
-    res = -ENOBUFS;
     if (vec_snip != NULL) {
         struct iovec *vector;
 
@@ -200,6 +199,9 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
         vector[0].iov_base = mhr;
         vector[0].iov_len = (size_t)res;
         res = netdev->driver->send(netdev, vector, n);
+    }
+    else {
+        return -ENOBUFS;
     }
     /* release old data */
     gnrc_pktbuf_release(pkt);
