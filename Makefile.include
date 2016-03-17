@@ -50,6 +50,8 @@ include $(RIOTBASE)/Makefile.docker
 # Static code analysis tools provided by LLVM
 include $(RIOTBASE)/Makefile.scan-build
 
+export RIOTBUILD_CONFIG_HEADER_C = $(BINDIR)riotbuild/riotbuild.h
+
 COLOR_GREEN  :=
 COLOR_RED    :=
 COLOR_PURPLE :=
@@ -226,12 +228,6 @@ ifeq ($(origin RIOT_VERSION), undefined)
   endif
 endif
 
-ifneq (,$(RIOT_VERSION_OVERRIDE))
-export CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION_OVERRIDE)\"
-else
-export CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
-endif
-
 # the binaries to link
 BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
@@ -255,7 +251,7 @@ ifeq ($(BUILD_IN_DOCKER),1)
 all: ..in-docker-container
 else
 ## make script for your application. Build RIOT-base here!
-all: ..compiler-check ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
+all: ..compiler-check ..build-message $(RIOTBUILD_CONFIG_HEADER_C) $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
 	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTBASE)/Makefile.application
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
@@ -286,7 +282,7 @@ include $(RIOTBASE)/drivers/Makefile.include
 
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include): clean
+    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(RIOTBUILD_CONFIG_HEADER_C): clean
 endif
 
 # include Makefile.includes for packages in $(USEPKG)
@@ -301,7 +297,7 @@ USEMODULE_INCLUDES_ = $(shell echo $(USEMODULE_INCLUDES) | tr ' ' '\n' | awk '!a
 INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 
 .PHONY: $(USEPKG:%=${BINDIR}%.a)
-$(USEPKG:%=${BINDIR}%.a):
+$(USEPKG:%=${BINDIR}%.a): $(RIOTBUILD_CONFIG_HEADER_C)
 	@mkdir -p ${BINDIR}
 	"$(MAKE)" -C $(RIOTPKG)/$(patsubst ${BINDIR}%.a,%,$@)
 
@@ -380,7 +376,7 @@ eclipsesym: $(CURDIR)/eclipsesym.xml
 eclipsesym.xml: $(CURDIR)/eclipsesym.xml
 
 $(CURDIR)/eclipsesym.xml:
-	$(AD)printf "%s\n" $(CC) $(CFLAGS) $(INCLUDES) | \
+	$(AD)printf "%s\n" $(CC) $(CFLAGS_WITH_MACROS) $(INCLUDES) | \
 		$(RIOTBASE)/dist/tools/eclipsesym/cmdline2xml.sh > $@
 
 # Extra make goals for testing and comparing changes.
@@ -495,3 +491,22 @@ include $(RIOTBASE)/dist/tools/desvirt/Makefile.desvirt
 
 # include bindist target
 include $(RIOTBASE)/Makefile.bindist
+
+# Build a header file with all common macro definitions and undefinitions
+# make it phony to force re-run of the script every time even if the file exists
+# The script will only touch the file if anything has changed since last time.
+.PHONY: $(RIOTBUILD_CONFIG_HEADER_C)
+$(RIOTBUILD_CONFIG_HEADER_C):
+	@mkdir -p '$(dir $@)'
+	$(AD)'$(RIOTBASE)/dist/tools/genconfigheader/genconfigheader.sh' '$@' $(CFLAGS_WITH_MACROS)
+
+CFLAGS_WITH_MACROS := $(CFLAGS)
+CFLAGS := $(patsubst -D%,,$(CFLAGS))
+CFLAGS := $(patsubst -U%,,$(CFLAGS))
+CFLAGS += -include '$(RIOTBUILD_CONFIG_HEADER_C)'
+
+ifneq (,$(RIOT_VERSION_OVERRIDE))
+export CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION_OVERRIDE)\"
+else
+export CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
+endif
