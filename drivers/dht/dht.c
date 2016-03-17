@@ -103,9 +103,9 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
     xtimer_usleep(40);
 
     /* sync on device */
-    gpio_init(dev, dev->in_mode);
-    while (!gpio_read(dev)) ;
-    while (gpio_read(dev)) ;
+    gpio_init(dev->pin, dev->in_mode);
+    while (!gpio_read(dev->pin)) ;
+    while (gpio_read(dev->pin)) ;
 
     /*
      * data is read in sequentially, highest bit first:
