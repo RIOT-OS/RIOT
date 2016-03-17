@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2016 Hochschule für Angewandte Wissenschaften Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -18,12 +18,7 @@
  * @file
  * @brief       Interface definition for MRF24J40 based drivers
  *
- * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
- * @author      Daniel Krebs <github@daniel-krebs.net>
- * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
- * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Bernhard Nägele <bernhard@naegele-privat.de>
  */
 
 #ifndef MRF24J40_H_

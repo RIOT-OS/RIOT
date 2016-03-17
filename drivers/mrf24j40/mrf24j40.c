@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
- * Copyright (C) 2015 Freie UniversitÃ¤t Berlin
+ * Copyright (C) 2016 Hochschule für Angewandte Wissenschaften Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,11 +13,7 @@
  * @file
  * @brief       Implementation of public functions for MRF24J40 drivers
  *
- * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
- * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
- * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Bernhard Nägele <bernhard@naegele-privat.de>
  *
  * @}
  */

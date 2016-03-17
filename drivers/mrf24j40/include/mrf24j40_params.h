@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *               2015 Hauke Petersen <hauke.petersen@fu-berlin.de>
+  * Copyright (C) 2016 Hochschule für Angewandte Wissenschaften Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,8 +13,7 @@
  * @file
  * @brief       Default configuration for the MRF24J40 driver
  *
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Bernhard Nägele <bernhard@naegele-privat.de>
  */
 
 #ifndef MRF24J40_PARAMS_H

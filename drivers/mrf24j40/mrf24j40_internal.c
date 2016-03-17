@@ -63,6 +63,7 @@ uint8_t mrf24j40_reg_read_long(const mrf24j40_t *dev, const uint16_t addr)
 	gpio_clear(dev->cs_pin);
 	spi_transfer_byte(dev->spi, reg1, 0);
 	spi_transfer_byte(dev->spi, reg2, &value);
+	spi_transfer_byte(dev->spi, 0, &value);
 	gpio_set(dev->cs_pin);
 	spi_release(dev->spi);
 	
