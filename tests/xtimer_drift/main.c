@@ -115,7 +115,7 @@ void *worker_thread(void *arg)
             int32_t drift = now - expected;
             expected = last + TEST_HZ * TEST_INTERVAL;
             int32_t jitter = now - expected;
-            printf("now=%" PRIu32 ".%06" PRIu32 " (%u hours %u min), drift=%" PRId32 ", jitter=%" PRId32 "\n",
+            printf("now=%" PRIu32 ".%06" PRIu32 " (%u hours %u min), drift=%" PRId32 " us, jitter=%" PRId32 " us\n",
                 sec, us, hr, min, drift, jitter);
             last = now;
         }
@@ -136,6 +136,9 @@ int main(void)
         (unsigned long)TEST_INTERVAL, (unsigned long)TEST_HZ);
     puts("The current time will be printed once per second, along with the "
          "difference between the actual and expected xtimer_now value.");
+    puts("The first output variable, 'drift', represents the total offset since "
+         "start between xtimer_now and the expected time.");
+    puts("The second output variable, 'jitter', represents the difference in drift from the last printout.");
     puts("Two other threads are also running only to cause extra interrupts and context switches.");
     puts(" <====== PC clock if running in pyterm.");
     puts("");
