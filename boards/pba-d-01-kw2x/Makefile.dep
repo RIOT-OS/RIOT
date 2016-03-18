@@ -8,4 +8,5 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += mpl3115a2
   USEMODULE += mma8652
   USEMODULE += hdc1000
+  USEMODULE += mag3110
 endif
