@@ -87,6 +87,15 @@ typedef struct {
 } mag3110_t;
 
 /**
+ * @brief Data structure holding the full set of configuration parameters
+ */
+typedef struct {
+    i2c_t i2c;                  /**< I2C bus the device is connected to */
+    uint8_t addr;               /**< address on that bus */
+    uint8_t ratio;              /**< measurement ratio to use */
+} mag3110_params_t;
+
+/**
  * @brief MAG3110 magnetometer test.
  * This function looks for Device ID of the MAG3110 magnetometer.
  *

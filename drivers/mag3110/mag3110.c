@@ -198,7 +198,9 @@ int mag3110_read(mag3110_t *dev, int16_t *x, int16_t *y, int16_t *z, uint8_t *st
     }
     i2c_release(dev->i2c);
 
-    *status = buf[0];
+    if (status != NULL) {
+        *status = buf[0];
+    }
     *x = ((int16_t)buf[1] << 8) | buf[2];
     *y = ((int16_t)buf[3] << 8) | buf[4];
     *z = ((int16_t)buf[5] << 8) | buf[6];
