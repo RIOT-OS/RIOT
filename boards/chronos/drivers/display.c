@@ -50,6 +50,7 @@
  */
 
 #include <string.h>
+#include <stdint.h>
 #include <cc430f6137.h>
 
 #include "display.h"

@@ -21,6 +21,8 @@
  *
  */
 
+#if !(MODULE_NEWLIB)
+
 #include <stdio.h>
 
 static void _dummy(int c)
@@ -45,3 +47,5 @@ ssize_t write(int fildes, const void *buf, size_t nbyte)
 {
     return -1;
 }
+
+#endif

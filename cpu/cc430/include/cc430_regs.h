@@ -103,8 +103,12 @@ typedef struct {
  * @brief   Base register address definitions
  * @{
  */
+#ifndef TIMER_A0_BASE
 #define TIMER_A0_BASE           ((uint16_t)0x0340)
+#endif
+#ifndef TIMER_A1_BASE
 #define TIMER_A1_BASE           ((uint16_t)0x0380)
+#endif
 /** @} */
 
 /**
