@@ -111,11 +111,9 @@ void UART_0_ISR(void)
 {
     uint_fast16_t mis;
 
-    /* Store the current MIS and clear all flags early, except the RTM flag.
-     * This will clear itself when we read out the entire FIFO contents */
+    /* Latch the Masked Interrupt Status and clear any active flags */
     mis = UART_0_DEV->cc2538_uart_mis.MIS;
-
-    UART_0_DEV->ICR = 0x0000FFBF;
+    UART_0_DEV->ICR = mis;
 
     while (UART_0_DEV->cc2538_uart_fr.FRbits.RXFE == 0) {
         uart_config[0].rx_cb(uart_config[0].arg, UART_0_DEV->DR);
@@ -137,11 +135,9 @@ void UART_1_ISR(void)
 {
     uint_fast16_t mis;
 
-    /* Store the current MIS and clear all flags early, except the RTM flag.
-     * This will clear itself when we read out the entire FIFO contents */
-    mis = UART_1_DEV->MIS;
-
-    UART_1_DEV->ICR = 0x0000FFBF;
+    /* Latch the Masked Interrupt Status and clear any active flags */
+    mis = UART_1_DEV->cc2538_uart_mis.MIS;
+    UART_1_DEV->ICR = mis;
 
     while (UART_1_DEV->FRbits.RXFE == 0) {
         uart_config[1].rx_cb(uart_config[1].arg, UART_1_DEV->DR);
@@ -296,8 +292,8 @@ static int init_base(uart_t uart, uint32_t baudrate)
     u->cc2538_uart_im.IMbits.FEIM = 1; /**< UART framing error interrupt mask */
 
     /* Set FIFO interrupt levels: */
-    u->cc2538_uart_ifls.IFLSbits.RXIFLSEL = FIFO_LEVEL_1_8TH;
-    u->cc2538_uart_ifls.IFLSbits.TXIFLSEL = FIFO_LEVEL_4_8TH;
+    u->cc2538_uart_ifls.IFLSbits.RXIFLSEL = FIFO_LEVEL_4_8TH; /**< MCU default */
+    u->cc2538_uart_ifls.IFLSbits.TXIFLSEL = FIFO_LEVEL_4_8TH; /**< MCU default */
 
     u->cc2538_uart_ctl.CTLbits.RXE = 1;
     u->cc2538_uart_ctl.CTLbits.TXE = 1;

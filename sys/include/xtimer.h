@@ -251,11 +251,8 @@ void xtimer_set(xtimer_t *timer, uint32_t offset);
  * @note this function runs in O(n) with n being the number of active timers
  *
  * @param[in] timer ptr to timer structure that will be removed
- *
- * @return  1 on success
- * @return  0 when timer was not active
  */
-int xtimer_remove(xtimer_t *timer);
+void xtimer_remove(xtimer_t *timer);
 
 /**
  * @brief receive a message blocking but with timeout
@@ -384,18 +381,6 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_MASK (0)
 #endif
 #define XTIMER_MASK_SHIFTED XTIMER_TICKS_TO_USEC(XTIMER_MASK)
-
-#ifndef XTIMER_USLEEP_UNTIL_OVERHEAD
-/**
- * @brief xtimer_usleep_until overhead value
- *
- * This value specifies the time a xtimer_usleep_until will be late
- * if uncorrected.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
- */
-#define XTIMER_USLEEP_UNTIL_OVERHEAD 10
-#endif
 
 #if XTIMER_MASK
 extern volatile uint32_t _high_cnt;

@@ -202,9 +202,9 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 {
     (void)dev;
     char tmp;
-    while (!(SPI_IF & SPI_IE_TX_BIT));
+    while (!(SPI_IF & SPI_IE_TX_BIT)) {}
     SPI_DEV->TXBUF = (uint8_t)out;
-    while (!(SPI_IF & SPI_IE_RX_BIT));
+    while (!(SPI_IF & SPI_IE_RX_BIT)) {}
     tmp = (char)SPI_DEV->RXBUF;
     if (in) {
         *in = tmp;

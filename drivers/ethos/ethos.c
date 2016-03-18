@@ -40,7 +40,7 @@
 #include "debug.h"
 
 static void _get_mac_addr(netdev2_t *dev, uint8_t* buf);
-static void ethos_isr(void *arg, char c);
+static void ethos_isr(void *arg, uint8_t c);
 const static netdev2_driver_t netdev2_driver_ethos;
 
 static const uint8_t _esc_esc[] = {ETHOS_ESC_CHAR, (ETHOS_ESC_CHAR ^ 0x20)};
@@ -126,7 +126,7 @@ static void _end_of_frame(ethos_t *dev)
     _reset_state(dev);
 }
 
-static void ethos_isr(void *arg, char c)
+static void ethos_isr(void *arg, uint8_t c)
 {
     ethos_t *dev = (ethos_t *) arg;
 

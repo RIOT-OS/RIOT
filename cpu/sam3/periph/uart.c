@@ -79,7 +79,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     Uart *dev = uart_config[uart].dev;
 
     for (size_t i = 0; i < len; i++) {
-        while (!(dev->UART_SR & UART_SR_TXRDY));
+        while (!(dev->UART_SR & UART_SR_TXRDY)) {}
         dev->UART_THR = data[i];
     }
 }
@@ -99,7 +99,7 @@ static inline void isr_handler(int num)
     Uart *dev = uart_config[num].dev;
 
     if (dev->UART_SR & UART_SR_RXRDY) {
-        ctx[num].rx_cb(ctx[num].arg, (char)dev->UART_RHR);
+        ctx[num].rx_cb(ctx[num].arg, (uint8_t)dev->UART_RHR);
     }
     if (sched_context_switch_request) {
         thread_yield();

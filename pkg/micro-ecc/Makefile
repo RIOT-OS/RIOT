@@ -1,6 +1,8 @@
 PKG_NAME=micro-ecc
 PKG_URL=https://github.com/kmackay/micro-ecc.git
-PKG_VERSION=f3d46f0fb77b42535168a17b4b51802beb124a32
+PKG_VERSION=b6c0cdbe7d20af48b0c2a909a66ff00b093d1542
+PKG_DIR=$(CURDIR)
+PKG_BUILDDIR=$(BINDIR)/pkg/$(PKG_NAME)
 
 ifneq ($(RIOTBOARD),)
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
@@ -16,28 +18,26 @@ MODULE:=$(shell basename $(CURDIR))
 .PHONY: all clean patch reset
 
 all: patch
-	make -C $(CURDIR)/$(PKG_NAME)
+	make -C $(PKG_BUILDDIR)
 	make $(BINDIR)$(MODULE).a
 
-patch: $(CURDIR)/$(PKG_NAME)/Makefile
+patch: $(PKG_BUILDDIR)/Makefile
 
-$(CURDIR)/$(PKG_NAME)/Makefile: $(CURDIR)/$(PKG_NAME)
-	$(foreach patch,$(shell ls [0-9][0-9][0-9][0-9]*.patch),cd "$<" && git am "../$(patch)" || { git am --abort; exit 1; };)
-	touch $(CURDIR)/$(PKG_NAME)/Makefile
+$(PKG_BUILDDIR)/Makefile: $(PKG_BUILDDIR)
+	cd $(PKG_BUILDDIR) && \
+	    for patch in $(PKG_DIR)/[0-9][0-9][0-9][0-9]*.patch; do git am "$${patch}" || { git am --abort; exit 1; }; done
+	touch $(PKG_BUILDDIR)/Makefile
 
-$(CURDIR)/$(PKG_NAME):
-	test -d $(PKG_NAME) || \
+$(PKG_BUILDDIR):
+	mkdir -p $(BINDIR)/pkg && \
 	git clone $(PKG_URL) $@ && \
 		cd $@ && git reset --hard $(PKG_VERSION)
 
 clean::
-	# Reset package to checkout state.
-	cd $(CURDIR)/$(PKG_NAME) || true && \
-		git clean -x -f && \
-		git reset --hard $(PKG_VERSION)
+	rm -Rf $(PKG_BUILDDIR)
 
 distclean::
-	rm -rf $(CURDIR)/$(PKG_NAME)
+	rm -rf $(PKG_BUILDDIR)
 
 #$(BINDIR)$(MODULE).a: $(BINDIR)micro-ecc_*.a
 #	mkdir -p $(BINDIR)$(MODULE); cd $(BINDIR)$(MODULE); for var in $?; do ar -x $$var; done; ar -r -c -s $(BINDIR)$(MODULE).a *.o

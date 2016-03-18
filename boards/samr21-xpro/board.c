@@ -20,17 +20,14 @@
  * @}
  */
 
-#include <stdio.h>
-
 #include "board.h"
-#include "cpu.h"
+#include "periph/gpio.h"
 
 void board_init(void)
 {
+    /* initialize the on-board LED */
+    gpio_init(LED0_PIN, GPIO_OUT);
+
     /* initialize the CPU */
     cpu_init();
-    /* initialize the boards LED at pin PA19 */
-    LED_PORT.DIRSET.reg = (1 << LED_PIN);
-    LED_PORT.OUTSET.reg = (1 << LED_PIN);
-    LED_PORT.PINCFG[LED_PIN].bit.PULLEN = false;
 }

@@ -1,4 +1,4 @@
-MODULE = board
+MODULE = msb-430-common
 
 DIRS = drivers
 

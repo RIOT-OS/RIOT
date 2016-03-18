@@ -38,18 +38,18 @@ buildtest:
 	@ \
 	BUILDTESTOK=true; \
 	APP_RETRY=0; \
-	rm -rf "$$BINDIRBASE"; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
 	  RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_MEMORY) | grep $${BOARD} 2>&1 >/dev/null && echo 1); \
 	  ${COLOR_ECHO} -n "Building for $${BOARD} "; \
 	  [ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
 	  for NTH_TRY in 1 2 3; do \
 	    ${COLOR_ECHO} -n ".. "; \
+	    if [ "$$NTH_TRY" != "3" ]; then export _CCACHE=$$CCACHE; else export _CCACHE=""; fi ; \
 	    LOG=$$(env -i \
 	        HOME=$${HOME} \
 	        PATH=$${PATH} \
 	        BOARD=$${BOARD} \
-	        CCACHE=$${CCACHE} \
+	        CCACHE=$${_CCACHE} \
 	        $${CCACHE_DIR:+CCACHE_DIR=$${CCACHE_DIR}} \
 	        CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
 	        RIOTBASE=$${RIOTBASE} \
@@ -62,7 +62,7 @@ buildtest:
 	        WERROR=$${WERROR} \
 	        LTO=$${LTO} \
 	        TOOLCHAIN=$${TOOLCHAIN} \
-	        $(MAKE) -j$(NPROC) -B 2>&1) ; \
+	        $(MAKE) -j$(NPROC) clean all 2>&1) ; \
 	    if [ "$${?}" = "0" ]; then \
 	      ${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
 	      if [ -n "$${BUILDTEST_VERBOSE}" ]; then \

@@ -8,8 +8,12 @@ endif
 
 ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE += conn_udp
-  USEMODULE += vtimer
+  USEMODULE += xtimer
   USEMODULE += oonf_rfc5444
+endif
+
+ifneq (,$(filter netdev2_ieee802154,$(USEMODULE)))
+  USEMODULE += ieee802154
 endif
 
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pktbuf,$(USEMODULE))))
@@ -31,6 +35,9 @@ endif
 ifneq (,$(filter netdev2_tap,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += netdev2_eth
+  ifneq (,$(filter gnrc_%,$(USEMODULE)))
+    USEMODULE += gnrc_netdev2
+  endif
 endif
 
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
@@ -362,10 +369,6 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += timex
   FEATURES_REQUIRED += cpp
-endif
-
-ifneq (,$(filter gnrc_netdev_eth,$(USEMODULE)))
-  USEMODULE += gnrc_pktbuf
 endif
 
 ifneq (,$(filter gnrc,$(USEMODULE)))

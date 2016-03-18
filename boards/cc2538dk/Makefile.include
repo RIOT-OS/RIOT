@@ -4,6 +4,7 @@ export CPU_MODEL ?= cc2538nf53
 
 # setup serial terminal
 PORT_LINUX ?= $(firstword $(wildcard /dev/serial/by-id/*XDS100v3*if01* /dev/ttyUSB1))
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 include $(RIOTBOARD)/Makefile.include.serial
 
 # debugger config

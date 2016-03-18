@@ -151,7 +151,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     USART_TypeDef *dev = uart_port[uart];
 
     for (size_t i = 0; i < len; i++) {
-        while (!(dev->ISR & USART_ISR_TXE));
+        while (!(dev->ISR & USART_ISR_TXE)) {}
         dev->TDR = data[i];
     }
 }
@@ -191,7 +191,7 @@ void uart_poweroff(uart_t uart)
 static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
 {
     if (dev->ISR & USART_ISR_RXNE) {
-        char data = (char)dev->RDR;
+        uint8_t data = (uint8_t)dev->RDR;
         uart_config[uartnum].rx_cb(uart_config[uartnum].arg, data);
     }
     else if (dev->ISR & USART_ISR_ORE) {

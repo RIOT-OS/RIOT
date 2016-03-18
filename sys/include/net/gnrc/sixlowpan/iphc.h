@@ -46,7 +46,8 @@ extern "C" {
  * @return  0 on error.
  */
 size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
-                                  size_t datagram_size, size_t offset);
+                                  size_t datagram_size, size_t offset,
+                                  size_t *nh_len);
 
 /**
  * @brief   Compresses a 6LoWPAN for IPHC.

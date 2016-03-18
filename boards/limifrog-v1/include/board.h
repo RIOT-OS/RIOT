@@ -31,27 +31,17 @@ extern "C" {
 #endif
 
 /**
- * @name LED pin definitions
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_RED_PORT        (GPIOC)
-#define LED_RED_PIN         (3)
-#define LED_RED_GPIO        GPIO_PIN(PORT_C,3)
-/** @} */
+#define LED0_PIN            GPIO_PIN(PORT_C, 3)
 
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_GREEN_ON
-#define LED_GREEN_OFF
-#define LED_GREEN_TOGGLE
-#define LED_ORANGE_ON
-#define LED_ORANGE_OFF
-#define LED_ORANGE_TOGGLE
-#define LED_RED_ON          (LED_RED_PORT->BSRRL = (1 << LED_RED_PIN))
-#define LED_RED_OFF         (LED_RED_PORT->BSRRH = (1 << LED_RED_PIN))
-#define LED_RED_TOGGLE      (LED_RED_PORT->ODR ^= (1 << LED_RED_PIN))
+#define LED0_PORT           (GPIOC)
+#define LED0_MASK           (1 << 3)
+
+#define LED0_ON             (LED0_PORT->BSRRL = LED0_MASK)
+#define LED0_OFF            (LED0_PORT->BSRRH = LED0_MASK)
+#define LED0_TOGGLE         (LED0_PORT->ODR  ^= LED0_MASK)
  /** @} */
 
 /**

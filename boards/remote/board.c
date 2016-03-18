@@ -23,47 +23,18 @@
 #include "board.h"
 #include "cpu.h"
 
-static inline void leds_init(void);
 static inline void rf_switch_init(void);
 
 void board_init(void)
 {
     /* initialize the boards LEDs */
-    leds_init();
+    gpio_init(LED0_PIN, GPIO_OUT);
+    gpio_init(LED1_PIN, GPIO_OUT);
+    gpio_init(LED2_PIN, GPIO_OUT);
     /* initialize the CPU */
     cpu_init();
     /* initialize the 2.4GHz RF switch */
     rf_switch_init();
-}
-
-/**
- * @brief Initialize the boards on-board LEDs (LD3 and LD4)
- *
- * The LED initialization is hard-coded in this function. As the LED (RGB) are
- * soldered onto the board they are fixed to their CPU pins.
- *
- * The LEDs are connected to the following pins:
- * - LED1: PD2 (red)
- * - LED2: PC3 (blue)
- * - LED3: PD5 (green)
- */
-static inline void leds_init(void)
-{
-    /* set pins to be controlled by software */
-    LED_PORT_C->AFSEL &= ~(1 << LED_BLUE_PIN);
-    LED_PORT_D->AFSEL &= ~((1 << LED_RED_PIN) | (1 << LED_GREEN_PIN));
-
-    /* configure pins as output */
-    LED_PORT_C->DIR |= (1 << LED_BLUE_PIN);
-    LED_PORT_D->DIR |= ((1 << LED_RED_PIN) | (1 << LED_GREEN_PIN));
-
-    /* configure io-mux for used pins */
-    IOC->PC_OVER[LED_BLUE_PIN] = IOC_OVERRIDE_OE;
-    IOC->PD_OVER[LED_GREEN_PIN] = IOC_OVERRIDE_OE;
-    IOC->PD_OVER[LED_RED_PIN] = IOC_OVERRIDE_OE;
-
-    /* Shoot rainbows */
-    LED_RAINBOW();
 }
 
 /**

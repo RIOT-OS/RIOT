@@ -27,7 +27,9 @@
 extern "C" {
 #endif
 
-/* for correct inclusion of <msp430.h> */
+/**
+ * @brief   Define the CPU model for the <msp430.h>
+ */
 #ifndef __CC430F6137__
 #define __CC430F6137__
 #endif
@@ -51,18 +53,6 @@ extern "C" {
 #define F_RC_OSCILLATOR             32768
 #define MSP430_HAS_DCOR             1
 #define MSP430_HAS_EXTERNAL_CRYSTAL 1
-/** @} */
-
-/**
- * @brief   LED defines for compatibility
- * @{
- */
-#define LED_RED_ON                  /* not present */
-#define LED_RED_OFF                 /* not present */
-#define LED_RED_TOGGLE              /* not present */
-#define LED_GREEN_ON                /* not present */
-#define LED_GREEN_OFF               /* not present */
-#define LED_GREEN_TOGGLE            /* not present */
 /** @} */
 
 #ifdef __cplusplus

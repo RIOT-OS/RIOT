@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
  * Copyright (C) 2015 Eistec AB
  *
@@ -25,18 +25,68 @@
 #include <stdio.h>
 
 #include "cpu.h"
+#include "mutex.h"
 #include "periph/adc.h"
-#include "periph_conf.h"
 
-/* guard in case that no ADC device is defined */
-#if ADC_NUMOF
+/**
+ * @brief   Maximum clock speed
+ *
+ * The ADC clock speed must be configured to be >2MHz and <12MHz in order for
+ * the ADC to work. For ADC calibration to work as intended, the ADC clock speed
+ * must further no be >4MHz, so we target a ADC clock speed > 2 and <4MHz.
+ */
+#define ADC_MAX_CLK         (4000000U)
 
-typedef struct {
-    int max_value;
-    int bits;
-} adc_config_t;
+static mutex_t locks[] = {
+    MUTEX_INIT,
+#ifdef ADC1
+    MUTEX_INIT,
+#endif
+};
 
-adc_config_t adc_config[ADC_NUMOF];
+static inline ADC_Type *dev(adc_t line)
+{
+    return adc_config[line].dev;
+}
+
+static inline int dev_num(adc_t line)
+{
+    if (dev(line) == ADC0) {
+        return 0;
+    }
+#ifdef ADC1
+    else if (dev(line) == ADC1) {
+        return 1;
+    }
+#endif
+    return -1;
+}
+
+static inline void prep(adc_t line)
+{
+    if (dev(line) == ADC0) {
+        BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_ADC0_SHIFT) = 1;
+    }
+#ifdef ADC1
+    else {
+        BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_ADC1_SHIFT) = 1;
+    }
+#endif
+    mutex_lock(&locks[dev_num(line)]);
+}
+
+static inline void done(adc_t line)
+{
+    if (dev(line) == ADC0) {
+        BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_ADC0_SHIFT) = 0;
+    }
+#ifdef ADC1
+    else {
+        BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_ADC1_SHIFT) = 0;
+    }
+#endif
+    mutex_unlock(&locks[dev_num(line)]);
+}
 
 /**
  * @brief Perform ADC calibration routine.
@@ -44,34 +94,31 @@ adc_config_t adc_config[ADC_NUMOF];
  * This is a recipe taken straight from the Kinetis K60 reference manual. It has
  * been tested on MK60DN512VLL10.
  *
- * @param[in]  ADC_ptr     Pointer to ADC device to operate on.
+ * @param[in]  dev          Pointer to ADC device to operate on.
  *
  * @return 0 on success
  * @return <0 on errors
  */
-int kinetis_adc_calibrate(ADC_Type *ADC_ptr)
+int kinetis_adc_calibrate(ADC_Type *dev)
 {
     uint16_t cal;
 
-    ADC_ptr->SC3 |= ADC_SC3_CAL_MASK;
+    dev->SC3 |= ADC_SC3_CAL_MASK;
 
-    while (ADC_ptr->SC3 & ADC_SC3_CAL_MASK); /* wait for calibration to finish */
+    while (dev->SC3 & ADC_SC3_CAL_MASK) {} /* wait for calibration to finish */
 
-    while (!(ADC_ptr->SC1[0] & ADC_SC1_COCO_MASK));
+    while (!(dev->SC1[0] & ADC_SC1_COCO_MASK)) {}
 
-    if (ADC_ptr->SC3 & ADC_SC3_CALF_MASK) {
+    if (dev->SC3 & ADC_SC3_CALF_MASK) {
         /* calibration failed for some reason, possibly SC2[ADTRG] is 1 ? */
         return -1;
     }
 
-    /*
-     * Following the steps in the reference manual:
-     */
+    /* From the reference manual */
     /* 1. Initialize or clear a 16-bit variable in RAM. */
-    /* 2. Add the plus-side calibration results CLP0, CLP1, CLP2, CLP3, CLP4, and
-     * CLPS to the variable. */
-    cal = ADC_ptr->CLP0 + ADC_ptr->CLP1 + ADC_ptr->CLP2 + ADC_ptr->CLP3 +
-          ADC_ptr->CLP4 + ADC_ptr->CLPS;
+    /* 2. Add the plus-side calibration results CLP0, CLP1, CLP2, CLP3, CLP4,
+     * and CLPS to the variable. */
+    cal = dev->CLP0 + dev->CLP1 + dev->CLP2 + dev->CLP3 + dev->CLP4 + dev->CLPS;
     /* 3. Divide the variable by two. */
     cal /= 2;
     /* 4. Set the MSB of the variable. */
@@ -82,345 +129,88 @@ int kinetis_adc_calibrate(ADC_Type *ADC_ptr)
      * We ignore the above optimization suggestion, we most likely only perform
      * this calibration on startup and it will only save nanoseconds. */
     /* 6. Store the value in the plus-side gain calibration register PG. */
-    ADC_ptr->PG = cal;
-
+    dev->PG = cal;
     /* 7. Repeat the procedure for the minus-side gain calibration value. */
-    cal = ADC_ptr->CLM0 + ADC_ptr->CLM1 + ADC_ptr->CLM2 + ADC_ptr->CLM3 +
-          ADC_ptr->CLM4 + ADC_ptr->CLMS;
+    cal = dev->CLM0 + dev->CLM1 + dev->CLM2 + dev->CLM3 + dev->CLM4 + dev->CLMS;
     cal /= 2;
     cal |= (1 << 15);
-    ADC_ptr->MG = cal;
+    dev->MG = cal;
 
     return 0;
 }
 
-
-int adc_init(adc_t dev, adc_precision_t precision)
+int adc_init(adc_t line)
 {
-    ADC_Type *adc = 0;
-    PORT_Type *port[ADC_MAX_CHANNELS];
-    uint8_t pins[ADC_MAX_CHANNELS];
-    uint8_t af[ADC_MAX_CHANNELS];
-    int channels = 0;
-    uint32_t mode = 0;
-    uint32_t div = 0;
-    int i = 0;
-    uint32_t clock = 0;
-
-    adc_poweron(dev);
-
-    switch (dev) {
-#if ADC_0_EN
-
-        case ADC_0:
-            adc = ADC_0_DEV;
-            port[0] = ADC_0_CH0_PORT;
-            port[1] = ADC_0_CH1_PORT;
-            port[2] = ADC_0_CH2_PORT;
-            port[3] = ADC_0_CH3_PORT;
-            port[4] = ADC_0_CH4_PORT;
-            port[5] = ADC_0_CH5_PORT;
-            pins[0] = ADC_0_CH0_PIN;
-            pins[1] = ADC_0_CH1_PIN;
-            pins[2] = ADC_0_CH2_PIN;
-            pins[3] = ADC_0_CH3_PIN;
-            pins[4] = ADC_0_CH4_PIN;
-            pins[5] = ADC_0_CH5_PIN;
-            af[0] = ADC_0_CH0_PIN_AF;
-            af[1] = ADC_0_CH1_PIN_AF;
-            af[2] = ADC_0_CH2_PIN_AF;
-            af[3] = ADC_0_CH3_PIN_AF;
-            af[4] = ADC_0_CH4_PIN_AF;
-            af[5] = ADC_0_CH5_PIN_AF;
-            channels = ADC_0_CHANNELS;
-            clock = ADC_0_MODULE_CLOCK;
-            ADC_0_PORT_CLKEN();
-            break;
-#endif
-#if ADC_1_EN
-
-        case ADC_1:
-            adc = ADC_1_DEV;
-            port[0] = ADC_1_CH0_PORT;
-            port[1] = ADC_1_CH1_PORT;
-            port[2] = ADC_1_CH2_PORT;
-            port[3] = ADC_1_CH3_PORT;
-            port[4] = ADC_1_CH4_PORT;
-            port[5] = ADC_1_CH5_PORT;
-            pins[0] = ADC_1_CH0_PIN;
-            pins[1] = ADC_1_CH1_PIN;
-            pins[2] = ADC_1_CH2_PIN;
-            pins[3] = ADC_1_CH3_PIN;
-            pins[4] = ADC_1_CH4_PIN;
-            pins[5] = ADC_1_CH5_PIN;
-            af[0] = ADC_1_CH0_PIN_AF;
-            af[1] = ADC_1_CH1_PIN_AF;
-            af[2] = ADC_1_CH2_PIN_AF;
-            af[3] = ADC_1_CH3_PIN_AF;
-            af[4] = ADC_1_CH4_PIN_AF;
-            af[5] = ADC_1_CH5_PIN_AF;
-            channels = ADC_1_CHANNELS;
-            clock = ADC_1_MODULE_CLOCK;
-            ADC_1_PORT_CLKEN();
-            break;
-#endif
-
-        default:
-            return -1;
-    }
-
-    if (channels > ADC_MAX_CHANNELS) {
+    /* make sure the given line is valid */
+    if (line >= ADC_NUMOF) {
         return -1;
     }
 
-    /* set precision, these numbers are valid for the K60 */
-    switch (precision) {
-        case ADC_RES_6BIT:
-            /* Not supported by hardware, use 8 bit mode. */
-            mode = ADC_CFG1_MODE(0);
-            adc_config[dev].bits = 8;
-            break;
+    /* prepare the device: lock and power on */
+    prep(line);
 
-        case ADC_RES_8BIT:
-            mode = ADC_CFG1_MODE(0);
-            adc_config[dev].bits = 8;
-            break;
-
-        case ADC_RES_10BIT:
-            mode = ADC_CFG1_MODE(2);
-            adc_config[dev].bits = 10;
-            break;
-
-        case ADC_RES_12BIT:
-            mode = ADC_CFG1_MODE(1);
-            adc_config[dev].bits = 12;
-            break;
-
-        case ADC_RES_14BIT:
-            /* Not supported by hardware, use 16 bit mode. */
-            mode = ADC_CFG1_MODE(3);
-            adc_config[dev].bits = 16;
-            break;
-
-        case ADC_RES_16BIT:
-            mode = ADC_CFG1_MODE(3);
-            adc_config[dev].bits = 16;
-            break;
-    }
-
-    adc_config[dev].max_value = (1 << adc_config[dev].bits) - 1;
-
-    for (i = 0; i < channels; i++) {
-        /* Check whether we need to set the pin mux for this channel. */
-        if (port[i] != NULL) {
-            port[i]->PCR[pins[i]] = PORT_PCR_MUX(af[i]);
-        }
+    /* configure the connected pin mux */
+    if (adc_config[line].pin != GPIO_UNDEF) {
+        gpio_init_port(adc_config[line].pin, GPIO_AF_ANALOG);
     }
 
     /* The ADC requires at least 2 MHz module clock for full accuracy, and less
      * than 12 MHz */
     /* For the calibration it is important that the ADC clock is <= 4 MHz */
-    if (clock > 4000000 * 8) {
-        /* Need to divide by 16, we set the clock input to BusClock/2 and
-         * divide clock by 8 (the maximum divider) */
-        div = ADC_CFG1_ADIV(3) | ADC_CFG1_ADICLK(1);
-    }
-    else if (clock > 4000000 * 4) {
-        /* divide clock by 8 */
-        div = ADC_CFG1_ADIV(3);
-    }
-    else if (clock > 4000000 * 2) {
-        /* divide clock by 4 */
-        div = ADC_CFG1_ADIV(2);
-    }
-    else if (clock > 4000000 * 1) {
-        /* divide clock by 2 */
-        div = ADC_CFG1_ADIV(1);
+    uint32_t adiv;
+    int i = 4;
+    if (CLOCK_BUSCLOCK > (ADC_MAX_CLK * 8)) {
+        adiv = ADC_CFG1_ADIV(3) | ADC_CFG1_ADICLK(1);
     }
     else {
-        /* no clock divider */
-        div = ADC_CFG1_ADIV(0);
+        while ((i > 0) && (CLOCK_BUSCLOCK < (ADC_MAX_CLK * i))) {
+            i--;
+        }
+        adiv = ADC_CFG1_ADIV(i - 1);
     }
 
     /* set configuration register 1: clocking and precision */
     /* Set long sample time */
-    adc->CFG1 = ADC_CFG1_ADLSMP_MASK | mode | div;
-
+    dev(line)->CFG1 = ADC_CFG1_ADLSMP_MASK | adiv;
     /* select ADxxb channels, longest sample time (20 extra ADC cycles) */
-    adc->CFG2 = ADC_CFG2_MUXSEL_MASK | ADC_CFG2_ADLSTS(0);
-
+    dev(line)->CFG2 = ADC_CFG2_MUXSEL_MASK | ADC_CFG2_ADLSTS(0);
     /* select software trigger, external ref pins */
-    adc->SC2 = ADC_SC2_REFSEL(0);
-
+    dev(line)->SC2 = ADC_SC2_REFSEL(0);
     /* select hardware average over 32 samples */
-    adc->SC3 = ADC_SC3_AVGE_MASK | ADC_SC3_AVGS(3);
-
+    dev(line)->SC3 = ADC_SC3_AVGE_MASK | ADC_SC3_AVGS(3);
     /* set an (arbitrary) input channel, single-ended mode */
-    adc->SC1[0] = ADC_SC1_ADCH(ADC_0_CH0);
-    adc->SC1[1] = ADC_SC1_ADCH(ADC_0_CH0);
+    dev(line)->SC1[0] = ADC_SC1_ADCH(0);
 
     /* perform calibration routine */
-    if (kinetis_adc_calibrate(adc) != 0) {
+    int res = kinetis_adc_calibrate(dev(line));
+    done(line);
+    return res;
+}
+
+int adc_sample(adc_t line, adc_res_t res)
+{
+    int sample;
+
+    /* check if resolution is applicable */
+    if (res > 0xf0) {
         return -1;
     }
 
-    return 0;
-}
+    /* lock and power on the device */
+    prep(line);
 
-int adc_sample(adc_t dev, int channel)
-{
-    ADC_Type *adc = 0;
-
-    switch (dev) {
-#if ADC_0_EN
-
-        case ADC_0:
-            adc = ADC_0_DEV;
-
-            /* start single conversion on corresponding channel */
-            switch (channel) {
-                case 0:
-                    adc->SC1[0] = ADC_SC1_ADCH(ADC_0_CH0);
-                    break;
-
-                case 1:
-                    adc->SC1[0] = ADC_SC1_ADCH(ADC_0_CH1);
-                    break;
-
-                case 2:
-                    adc->SC1[0] = ADC_SC1_ADCH(ADC_0_CH2);
-                    break;
-
-                case 3:
-                    adc->SC1[0] = ADC_SC1_ADCH(ADC_0_CH3);
-                    break;
-
-                case 4:
-                    adc->SC1[0] = ADC_SC1_ADCH(ADC_0_CH4);
-                    break;
-
-                case 5:
-                    adc->SC1[0] = ADC_SC1_ADCH(ADC_0_CH5);
-                    break;
-
-                default:
-                    return -1;
-            }
-
-            break;
-#endif
-#if ADC_1_EN
-
-        case ADC_1:
-            adc = ADC_1_DEV;
-
-            /* start single conversion on corresponding channel */
-            switch (channel) {
-                case 0:
-                    adc->SC1[0] = ADC_SC1_ADCH(ADC_1_CH0);
-                    break;
-
-                case 1:
-                    adc->SC1[0] = ADC_SC1_ADCH(ADC_1_CH1);
-                    break;
-
-                case 2:
-                    adc->SC1[0] = ADC_SC1_ADCH(ADC_1_CH2);
-                    break;
-
-                case 3:
-                    adc->SC1[0] = ADC_SC1_ADCH(ADC_1_CH3);
-                    break;
-
-                case 4:
-                    adc->SC1[0] = ADC_SC1_ADCH(ADC_1_CH4);
-                    break;
-
-                case 5:
-                    adc->SC1[0] = ADC_SC1_ADCH(ADC_1_CH5);
-                    break;
-
-                default:
-                    return -1;
-            }
-
-            break;
-#endif
-    }
-
+    /* set resolution */
+    dev(line)->CFG1 &= ~(ADC_CFG1_MODE_MASK);
+    dev(line)->CFG1 |=  (res);
+    /* select the channel that is sampled */
+    dev(line)->SC1[0] = adc_config[line].chan;
     /* wait until conversion is complete */
-    /* TODO: Use interrupts and yield the thread */
-    while (!(adc->SC1[0] & ADC_SC1_COCO_MASK));
-
+    while (!(dev(line)->SC1[0] & ADC_SC1_COCO_MASK)) {}
     /* read and return result */
-    return (int)adc->R[0];
+    sample = (int)dev(line)->R[0];
+
+    /* power off and unlock the device */
+    done(line);
+
+    return sample;
 }
-
-void adc_poweron(adc_t dev)
-{
-    switch (dev) {
-#if ADC_0_EN
-
-        case ADC_0:
-            ADC_0_CLKEN();
-            break;
-#endif
-#if ADC_1_EN
-
-        case ADC_1:
-            ADC_1_CLKEN();
-            break;
-#endif
-    }
-}
-
-void adc_poweroff(adc_t dev)
-{
-    switch (dev) {
-#if ADC_0_EN
-
-        case ADC_0:
-            ADC_0_CLKDIS();
-            break;
-#endif
-#if ADC_1_EN
-
-        case ADC_1:
-            ADC_1_CLKDIS();
-            break;
-#endif
-    }
-}
-
-int adc_map(adc_t dev, int value, int min, int max)
-{
-    int scale = max - min;
-
-    /* NB: There is additional room for the multiplication result if using the
-     * actual precision setting of the ADC as the limit in this if statement: */
-    if (scale < (1 << 16)) {
-        /* The ADCs on these CPUs are limited to 16 bits, the result of
-         * value x scale will be 31 bits long or less. We use the upper part
-         * of a 32 bit word when scaling */
-        int32_t tmp = value * scale;
-        /* Divide by ADC range to get the scaled result */
-        return (tmp / (1 << adc_config[dev].bits));
-    }
-    else {
-        /* Target scale is too large to use int32_t as an in between result */
-        int64_t tmp = scale;
-        /* Make sure the compiler does not generate code which will truncate the
-         * result. */
-        tmp *= value;
-        /* Divide by ADC range to get the scaled result */
-        tmp /= (1 << adc_config[dev].bits);
-        return tmp;
-    }
-}
-
-float adc_mapf(adc_t dev, int value, float min, float max)
-{
-    return ((max - min) / ((float)adc_config[dev].max_value)) * value;
-}
-
-#endif /* ADC_NUMOF */

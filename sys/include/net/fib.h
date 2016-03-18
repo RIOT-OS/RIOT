@@ -44,7 +44,8 @@ typedef struct rp_address_msg_t {
 } rp_address_msg_t;
 
 /**
- * @brief message type for RP notification: unreachable destination
+ * @brief message type for RP notification: no route to destination available,
+ *        start route discovery if appropriate
  */
 #define FIB_MSG_RP_SIGNAL_UNREACHABLE_DESTINATION (0x99)
 
@@ -54,7 +55,7 @@ typedef struct rp_address_msg_t {
 #define FIB_MSG_RP_SIGNAL_DESTINATION_USED (0x98)
 
 /**
- * @brief message type for RP notification: sr created
+ * @brief message type for RP notification: source route created
  */
 #define FIB_MSG_RP_SIGNAL_SOURCE_ROUTE_CREATED (0x97)
 

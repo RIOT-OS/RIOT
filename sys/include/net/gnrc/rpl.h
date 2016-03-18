@@ -32,6 +32,13 @@
  *   CFLAGS += -DGNRC_RPL_WITHOUT_PIO
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
+ *  - Modify trickle parameters
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS=20
+ *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_INTERVAL_MIN=3
+ *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT=10
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
  * @{
  *
  * @file
@@ -211,9 +218,17 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
  *      </a>
  * @{
  */
+#ifndef GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS
 #define GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS (20)
+#endif
+
+#ifndef GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN
 #define GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN (3)
+#endif
+
+#ifndef GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT
 #define GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT (10)
+#endif
 /** @} */
 
 /**
@@ -513,8 +528,8 @@ uint8_t gnrc_rpl_gen_instance_id(bool local);
  */
 static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
 {
-    dodag->req_opts = (dodag->req_opts & ~GNRC_RPL_REQ_OPT_PREFIX_INFO) |
-                      (status << GNRC_RPL_REQ_OPT_PREFIX_INFO_SHIFT);
+    dodag->dio_opts = (dodag->dio_opts & ~GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO) |
+                      (status << GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO_SHIFT);
 }
 #endif
 

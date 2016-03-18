@@ -19,7 +19,7 @@
 #ifndef THREAD_ARCH_H
 #define THREAD_ARCH_H
 
-#include "attributes.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
  extern "C" {

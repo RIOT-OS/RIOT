@@ -54,7 +54,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 #if CLOCK_USE_PLL
     /* configure GCLK1 (configured to 1MHz) to feed TC3, TC4 and TC5 */;
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | (TC3_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
-    while (GCLK->STATUS.bit.SYNCBUSY);
+    while (GCLK->STATUS.bit.SYNCBUSY) {}
     /* TC4 and TC5 share the same channel */
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
 #else
@@ -63,7 +63,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     /* TC4 and TC5 share the same channel */
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
 #endif
-    while (GCLK->STATUS.bit.SYNCBUSY);
+    while (GCLK->STATUS.bit.SYNCBUSY) {}
 
     switch (dev) {
 #if TIMER_0_EN
@@ -74,7 +74,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
         PM->APBCMASK.reg |= PM_APBCMASK_TC3;
         /* reset timer */
         TIMER_0_DEV.CTRLA.bit.SWRST = 1;
-        while (TIMER_0_DEV.CTRLA.bit.SWRST);
+        while (TIMER_0_DEV.CTRLA.bit.SWRST) {}
         /* choosing 16 bit mode */
         TIMER_0_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT16_Val;
 #if CLOCK_USE_PLL
@@ -97,7 +97,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
         /* reset timer */
         TIMER_1_DEV.CTRLA.bit.SWRST = 1;
 
-        while (TIMER_1_DEV.CTRLA.bit.SWRST);
+        while (TIMER_1_DEV.CTRLA.bit.SWRST) {}
 
 
         TIMER_1_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT32_Val;
@@ -237,17 +237,15 @@ unsigned int timer_read(tim_t dev)
     case TIMER_0:
         /* request syncronisation */
         TIMER_0_DEV.READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(0x10);
-        while (TIMER_0_DEV.STATUS.bit.SYNCBUSY);
+        while (TIMER_0_DEV.STATUS.bit.SYNCBUSY) {}
         return TIMER_0_DEV.COUNT.reg;
-        break;
 #endif
 #if TIMER_1_EN
     case TIMER_1:
         /* request syncronisation */
         TIMER_1_DEV.READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(0x10);
-        while (TIMER_1_DEV.STATUS.bit.SYNCBUSY);
+        while (TIMER_1_DEV.STATUS.bit.SYNCBUSY) {}
         return TIMER_1_DEV.COUNT.reg;
-        break;
 #endif
     default:
         return 0;

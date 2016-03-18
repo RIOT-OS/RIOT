@@ -20,6 +20,7 @@
 #define PERIPH_CONF_H_
 
 #include "cpu.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -103,6 +104,29 @@ extern "C" {
 /* UART 1 pin configuration */
 #define UART_1_RTS_PIN      GPIO_PD3
 #define UART_1_CTS_PIN      GPIO_PB0
+/** @} */
+
+/**
+ * @name I2C configuration
+ * @{
+ */
+#define I2C_NUMOF               1
+#define I2C_0_EN                1
+#define I2C_IRQ_PRIO            1
+
+/* I2C 0 device configuration */
+#define I2C_0_DEV               0
+#define I2C_0_IRQ               I2C_IRQn
+#define I2C_0_IRQ_HANDLER       isr_i2c
+#define I2C_0_SCL_PIN           GPIO_PA2 /* SPI_SCK on the SmartRF06 baseboard */
+#define I2C_0_SDA_PIN           GPIO_PA4 /* SPI_MOSI on the SmartRF06 baseboard */
+
+static const i2c_conf_t i2c_config[I2C_NUMOF] = {
+    {
+        .scl_pin = GPIO_PA2, /* SPI_SCK on the SmartRF06 baseboard */
+        .sda_pin = GPIO_PA4, /* SPI_MOSI on the SmartRF06 baseboard */
+    },
+};
 /** @} */
 
 /**

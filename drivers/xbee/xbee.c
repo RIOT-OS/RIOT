@@ -136,9 +136,8 @@ static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
 /*
  * Interrupt callbacks
  */
-static void _rx_cb(void *arg, char _c)
+static void _rx_cb(void *arg, uint8_t c)
 {
-    unsigned char c = _c;
     xbee_t *dev = (xbee_t *)arg;
     msg_t msg;
 
@@ -154,7 +153,7 @@ static void _rx_cb(void *arg, char _c)
             dev->int_state = XBEE_INT_STATE_SIZE2;
             break;
         case XBEE_INT_STATE_SIZE2:
-            dev->int_size += (uint8_t)c;
+            dev->int_size += c;
             dev->int_state = XBEE_INT_STATE_TYPE;
             break;
         case XBEE_INT_STATE_TYPE:
@@ -165,7 +164,7 @@ static void _rx_cb(void *arg, char _c)
                     return;
                 }
                 dev->rx_limit = dev->int_size + 1;
-                dev->rx_buf[dev->rx_count++] = (uint8_t)c;
+                dev->rx_buf[dev->rx_count++] = c;
                 dev->int_state = XBEE_INT_STATE_RX;
             }
             else if (c == API_ID_AT_RESP) {
@@ -177,7 +176,7 @@ static void _rx_cb(void *arg, char _c)
             }
             break;
         case XBEE_INT_STATE_RESP:
-            dev->resp_buf[dev->resp_count++] = (uint8_t)c;
+            dev->resp_buf[dev->resp_count++] = c;
             if (dev->resp_count == dev->resp_limit) {
                 /* here we ignore the checksum to prevent deadlocks */
                 mutex_unlock(&(dev->resp_lock));
@@ -185,7 +184,7 @@ static void _rx_cb(void *arg, char _c)
             }
             break;
         case XBEE_INT_STATE_RX:
-            dev->rx_buf[dev->rx_count++] = (uint8_t)c;
+            dev->rx_buf[dev->rx_count++] = c;
             if (dev->rx_count == dev->rx_limit) {
                 /* packet is complete */
                 msg.type = GNRC_NETDEV_MSG_TYPE_EVENT;
@@ -429,14 +428,14 @@ int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
         return -ENXIO;
     }
     if (reset_pin != GPIO_UNDEF) {
-        if (gpio_init(reset_pin, GPIO_DIR_OUT, GPIO_NOPULL) < 0) {
+        if (gpio_init(reset_pin, GPIO_OUT) < 0) {
             DEBUG("xbee: Error initializing RESET pin\n");
             return -ENXIO;
         }
         gpio_set(reset_pin);
     }
     if (sleep_pin != GPIO_UNDEF) {
-        if (gpio_init(sleep_pin, GPIO_DIR_OUT, GPIO_NOPULL) < 0) {
+        if (gpio_init(sleep_pin, GPIO_OUT) < 0) {
             DEBUG("xbee: Error initializing SLEEP pin\n");
             return -ENXIO;
         }

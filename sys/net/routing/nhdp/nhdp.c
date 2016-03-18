@@ -42,6 +42,8 @@
 #error "nhdp needs a conn_udp implementation to work"
 #endif
 
+#define HELLO_TIMER (12345)
+
 char nhdp_stack[NHDP_STACK_SIZE];
 char nhdp_rcv_stack[NHDP_STACK_SIZE];
 
@@ -54,8 +56,9 @@ static mutex_t send_rcv_mutex = MUTEX_INIT;
 static conn_udp_t conn;
 
 #if (NHDP_METRIC_NEEDS_TIMER)
-static vtimer_t metric_timer;
+static xtimer_t metric_timer;
 static timex_t metric_interval;
+static msg_t metric_msg;
 #endif
 
 /* Internal function prototypes */
@@ -100,7 +103,10 @@ kernel_pid_t nhdp_start(void)
         /* Configure periodic timer message to refresh metric values */
         if (nhdp_pid != KERNEL_PID_UNDEF) {
             metric_interval = timex_from_uint64(DAT_REFRESH_INTERVAL * SEC_IN_USEC);
-            vtimer_set_msg(&metric_timer, metric_interval, nhdp_pid, NHDP_METRIC_TIMER, NULL);
+            metric_msg.type = NHDP_METRIC_TIMER;
+            metric_msg.content.ptr = NULL;
+            xtimer_set_msg64(&metric_timer, timex_uint64(metric_interval),
+                             metric_msg, nhdp_pid);
         }
 #endif
     }
@@ -196,7 +202,7 @@ int nhdp_register_if(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
                                  THREAD_CREATE_STACKTEST, _nhdp_receiver, NULL, "nhdp_rcv_thread");
 
     /* Start sending periodic HELLO */
-    signal_msg.type = MSG_TIMER;
+    signal_msg.type = HELLO_TIMER;
     signal_msg.content.ptr = (char *) if_entry;
     /* TODO: msg_send or msg_try_send? */
     msg_try_send(&signal_msg, nhdp_pid);
@@ -247,7 +253,7 @@ static void *_nhdp_runner(void *arg)
         msg_receive(&msg_rcvd);
 
         switch (msg_rcvd.type) {
-            case MSG_TIMER:
+            case HELLO_TIMER:
                 mutex_lock(&send_rcv_mutex);
                 if_entry = (nhdp_if_entry_t *) msg_rcvd.content.ptr;
 
@@ -256,8 +262,9 @@ static void *_nhdp_runner(void *arg)
                 /* TODO: Add jitter */
 
                 /* Schedule next sending */
-                vtimer_set_msg(&if_entry->if_timer, if_entry->hello_interval,
-                               thread_getpid(), MSG_TIMER, (void *) if_entry);
+                xtimer_set_msg64(&if_entry->if_timer,
+                                 timex_uint64(if_entry->hello_interval),
+                                 &msg_rcvd, thread_getpid());
                 mutex_unlock(&send_rcv_mutex);
                 break;
 
@@ -268,8 +275,10 @@ static void *_nhdp_runner(void *arg)
                 iib_process_metric_refresh();
 
                 /* Schedule next sending */
-                vtimer_set_msg(&metric_timer, metric_interval,
-                               thread_getpid(), NHDP_METRIC_TIMER, NULL);
+                metric_msg.type = NHDP_METRIC_TIMER;
+                metric_msg.content.ptr = NULL;
+                xtimer_set_msg64(&metric_timer, timex_uint64(metric_interval),
+                                 metric_msg, thread_getpid());
                 mutex_unlock(&send_rcv_mutex);
                 break;
 #endif

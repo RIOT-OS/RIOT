@@ -129,9 +129,38 @@ ifeq (,$(UNZIP_HERE))
   endif
 endif
 
+ifeq (, ${APPLICATION})
+    $(error An application name must be specified as APPLICATION.)
+endif
 ifneq (0,$(shell test -d $(RIOTBOARD)/$(BOARD); echo $$?))
     $(error The specified board $(BOARD) does not exist.)
 endif
+
+# Use TOOLCHAIN environment variable to select the toolchain to use.
+# Default: gnu
+TOOLCHAIN ?= gnu
+
+# TOOLCHAIN = clang is an alias for TOOLCHAIN = llvm
+ifeq (clang,$(TOOLCHAIN))
+# use override so that we can redefine a variable set on the command line (as
+# opposed to one set in the environment)
+override TOOLCHAIN := llvm
+endif
+# TOOLCHAIN = gcc is an alias for TOOLCHAIN = gnu
+ifeq (gcc,$(TOOLCHAIN))
+# use override so that we can redefine a variable set on the command line (as
+# opposed to one set in the environment)
+override TOOLCHAIN := gnu
+endif
+
+ifeq (,$(TOOLCHAIN))
+override TOOLCHAIN := gnu
+endif
+
+export TOOLCHAIN
+
+# Import all toolchain settings
+include $(RIOTCPU)/Makefile.include.$(TOOLCHAIN)
 
 # mandatory includes!
 include $(RIOTBASE)/Makefile.modules
@@ -445,3 +474,6 @@ ifneq (,$(filter iotlab-m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
     include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
   endif
 endif
+
+# Include desvirt Makefile
+include $(RIOTBASE)/dist/tools/desvirt/Makefile.desvirt

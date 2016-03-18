@@ -32,13 +32,14 @@ extern "C" {
 #include "trickle.h"
 
 /**
- * @name Bit positions and shifts for gnrc_rpl_dodag_t::req_opts
+ * @anchor GNRC_RPL_REQ_DIO_OPTS
+ * @name DIO Options for gnrc_rpl_dodag_t::dio_opts
  * @{
  */
-#define GNRC_RPL_REQ_OPT_DODAG_CONF_SHIFT       (0)
-#define GNRC_RPL_REQ_OPT_DODAG_CONF             (1 << GNRC_RPL_REQ_OPT_DODAG_CONF_SHIFT)
-#define GNRC_RPL_REQ_OPT_PREFIX_INFO_SHIFT      (1)
-#define GNRC_RPL_REQ_OPT_PREFIX_INFO            (1 << GNRC_RPL_REQ_OPT_PREFIX_INFO_SHIFT)
+#define GNRC_RPL_REQ_DIO_OPT_DODAG_CONF_SHIFT       (0)
+#define GNRC_RPL_REQ_DIO_OPT_DODAG_CONF             (1 << GNRC_RPL_REQ_DIO_OPT_DODAG_CONF_SHIFT)
+#define GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO_SHIFT      (1)
+#define GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO            (1 << GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO_SHIFT)
 /** @} */
 
 /**
@@ -230,7 +231,8 @@ struct gnrc_rpl_dodag {
     uint8_t dao_seq;                /**< dao sequence number */
     uint8_t dao_counter;            /**< amount of retried DAOs */
     bool dao_ack_received;          /**< flag to check for DAO-ACK */
-    uint8_t req_opts;               /**< flags that represent option requests */
+    uint8_t dio_opts;               /**< options in the next DIO
+                                         (see @ref GNRC_RPL_REQ_DIO_OPTS "DIO Options") */
     uint8_t dao_time;               /**< time to schedule a DAO in seconds */
     trickle_t trickle;              /**< trickle representation */
 };

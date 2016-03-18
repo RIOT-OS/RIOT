@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "kernel_macros.h"
+#include "kernel_defines.h"
 #include "kernel_types.h"
 #include "mutex.h"
 #include "net/ipv6.h"
@@ -509,9 +509,10 @@ ipv6_addr_t *gnrc_ipv6_netif_match_prefix(kernel_pid_t pid, const ipv6_addr_t *p
  * @brief   Searches for the best address on an interface usable as a
  *          source address for a given destination address.
  *
- * @param[in] pid   The PID to the interface.
- * @param[in] dest  The destination address you want to find a destination
- *                  address for.
+ * @param[in] pid     The PID to the interface.
+ * @param[in] dest    The destination address you want to find a destination
+ *                    address for.
+ * @param[in] ll_only If only link local addresses qualify
  *
  * @todo Rule 4 from RFC 6724 is currently not implemented. Has to updated as
  *       soon as gnrc supports Mobile IP.
@@ -526,7 +527,7 @@ ipv6_addr_t *gnrc_ipv6_netif_match_prefix(kernel_pid_t pid, const ipv6_addr_t *p
  * @return  NULL, if no matching address can be found on the interface.
  * @return  NULL, if @p pid is no interface.
  */
-ipv6_addr_t *gnrc_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ipv6_addr_t *dest);
+ipv6_addr_t *gnrc_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ipv6_addr_t *dest, bool ll_only);
 
 /**
  * @brief   Get interface specific meta-information on an address

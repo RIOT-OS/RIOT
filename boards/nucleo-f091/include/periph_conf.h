@@ -19,6 +19,8 @@
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -98,6 +100,13 @@ extern "C" {
  * See Nucleo User Manual UM1724 section 5.6.2.
  */
 #define RTC_NUMOF           (1U)
+/** @} */
+
+/**
+ * @brief   ADC configuration
+ * @{
+ */
+#define ADC_NUMOF          (0)
 /** @} */
 
 #ifdef __cplusplus

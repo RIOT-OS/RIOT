@@ -19,10 +19,7 @@
  */
 
 #include "board.h"
-#include "cpu.h"
 #include "periph/gpio.h"
-
-static void leds_init(void);
 
 void board_init(void)
 {
@@ -30,23 +27,5 @@ void board_init(void)
     cpu_init();
 
     /* initialize the boards LEDs */
-    leds_init();
-
-    /* pin remapping: in order to use the MCU peripherals with the Arduino
-    * compatible connectors. Some peripherals need to be remapped here. */
-    RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-    AFIO->MAPR |= AFIO_MAPR_I2C1_REMAP;
-}
-
-/**
- * @brief Initialize the boards on-board LEDs
- *
- * The green LED is connected to pin PA5
- */
-static void leds_init(void)
-{
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
-    GPIOA->CR[0] &= ~(0x0f << 20);
-    GPIOA->CR[0] |= (0x03 << 20);
-    GPIOA->BRR = (1 << 5);
+    gpio_init(LED0_PIN, GPIO_OUT);
 }

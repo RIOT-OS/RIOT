@@ -34,14 +34,18 @@ server (vgdb).
 Network Support
 ===============
 
-If you compile RIOT for the native cpu and include the `native_net`
+If you compile RIOT for the native cpu and include the `netdev2_tap`
 module, you need to specify a network interface like this:
 
     make term PORT=tap0
 
+**Please note:** in case you're using RIOT's default network stack, the GNRC
+stack, you may also use `gnrc_netif_default` module and also add
+`auto_init_gnrc_netif` in order to automatically initialize the interface.
 
-Setting Up A Tap Network
-========================
+
+Setting Up A Virtual Network
+============================
 
 There is a shellscript in RIOT/dist/tools/tapsetup called `tapsetup` which you
 can use to create a network of tap interfaces.
@@ -60,6 +64,13 @@ To delete the bridge and all tap interfaces:
 
 For OSX you **have** to run this after killing your RIOT instance and rerun
 `../../dist/tools/tapsetup [-c [<count>]]` before restarting.
+
+**Please note:** If you want to communicate between RIOT and your host
+operating system, you must not use the `tapsetup` script, but create and
+activate the tap interface manually. On Linux you can do so, by calling
+
+    sudo ip tuntap add tap0 mode tap user ${USER}
+    sudo ip link set tap0 up
 
 
 Daemonization

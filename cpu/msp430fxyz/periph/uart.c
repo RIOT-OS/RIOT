@@ -94,7 +94,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     msp_usart_t *dev = UART_BASE;
 
     for (size_t i = 0; i < len; i++) {
-        while (!(dev->TCTL & USART_TCTL_TXEPT));
+        while (!(dev->TCTL & USART_TCTL_TXEPT)) {}
         dev->TXBUF = data[i];
     }
 }
@@ -124,7 +124,7 @@ ISR(UART_RX_ISR, isr_uart_0_rx)
     __exit_isr();
 }
 
-/* we use alternative UART code in case the board used the USIC module for UART
+/* we use alternative UART code in case the board used the USCI module for UART
  * in case of the (older) USART module */
 #else
 
@@ -171,7 +171,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     UART_RX_PORT->SEL |= UART_RX_PIN;
     UART_TX_PORT->SEL |= UART_TX_PIN;
     UART_RX_PORT->DIR &= ~(UART_RX_PIN);
-    UART_TX_PORT->DIR &= ~(UART_TX_PIN);
+    UART_TX_PORT->DIR |= UART_TX_PIN;
     /* releasing the software reset bit starts the UART */
     dev->ACTL1 &= ~(USCI_ACTL1_SWRST);
     return 0;
@@ -182,7 +182,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     (void)uart;
 
     for (size_t i = 0; i < len; i++) {
-        while (!(UART_IF & UART_IE_TX_BIT));
+        while (!(UART_IF & UART_IE_TX_BIT)) {}
         UART_BASE->ATXBUF = data[i];
     }
 }
@@ -204,7 +204,7 @@ ISR(UART_RX_ISR, isr_uart_0_rx)
     __enter_isr();
 
     uint8_t stat = UART_BASE->ASTAT;
-    char data = (char)UART_BASE->ARXBUF;
+    uint8_t data = (uint8_t)UART_BASE->ARXBUF;
 
     if (stat & (USCI_ASTAT_FE | USCI_ASTAT_OE | USCI_ASTAT_PE | USCI_ASTAT_BRK)) {
         /* some error which we do not handle, just do a pseudo read to reset the

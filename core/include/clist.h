@@ -19,7 +19,7 @@
 #ifndef CLIST_H
 #define CLIST_H
 
-#include "kernel_macros.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
  extern "C" {

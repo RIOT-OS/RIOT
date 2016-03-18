@@ -1,0 +1,57 @@
+TOOL_NAME=desvirt
+TOOL_URL=https://github.com/des-testbed/desvirt.git
+TOOL_VERSION=master
+TOOL_DIR=$(RIOTBASE)/dist/tools/$(TOOL_NAME)/$(TOOL_NAME)
+
+.PHONY: desvirt-check desvirt-check-topo-file desvirt-check-topo-args desvirt-clean \
+        desvirt-distclean desvirt-define desvirt-undefine desvirt-start desvirt-stop desvirt-list
+
+desvirt-check:
+
+    ifeq ($(wildcard $(TOOL_DIR)),)
+	    git clone $(TOOL_URL) $(TOOL_DIR)
+	    cd $(TOOL_DIR) && git reset --hard $(TOOL_VERSION)
+    endif
+
+desvirt-check-topo-file: desvirt-check
+
+    ifndef TOPO
+	    $(error TOPO is not set)
+    endif
+
+desvirt-check-topo-args: desvirt-check
+
+    ifndef TOPO_TYPE
+	    $(error TOPO_TYPE is not set)
+    endif
+    ifndef TOPO_SIZE
+	    $(error TOPO_SIZE is not set)
+    endif
+
+desvirt-define: desvirt-check-topo-file
+	cd $(TOOL_DIR) && ./vnet -d $(TOOL_DIR)/.desvirt/$(TOPO_FLE) -n $(basename $(TOPO))
+
+desvirt-undefine: desvirt-check-topo-file
+	cd $(TOOL_DIR) && ./vnet -u $(TOOL_DIR)/.desvirt/$(TOPO_FLE) -n $(basename $(TOPO))
+
+desvirt-start: desvirt-check-topo-file
+	cd $(TOOL_DIR) && ./vnet -s -n $(basename $(TOPO))
+
+desvirt-stop: desvirt-check-topo-file
+	cd $(TOOL_DIR) && ./vnet -q -n $(basename $(TOPO))
+
+desvirt-topology: desvirt-check-topo-args all
+	cd $(TOOL_DIR) && \
+	./topology_creator -e $(ELFFILE) -n riot_native -r ieee802154 -s$(TOPO_SIZE) -t$(TOPO_TYPE) -f $(TOPO_TYPE)$(TOPO_SIZE)
+
+desvirt-list: desvirt-check
+	cd $(TOOL_DIR) && ./vnet -l
+
+desvirt-clean::
+
+    ifneq ($(wildcard $(TOOL_DIR)),"")
+	    cd $(TOOL_DIR) && git clean -x -f && git reset --hard $(TOOL_VERSION)
+    endif
+
+desvirt-distclean::
+	rm -rf $(TOOL_DIR)

@@ -14,7 +14,6 @@ PSEUDOMODULES += gnrc_sixlowpan_router
 PSEUDOMODULES += gnrc_sixlowpan_router_default
 PSEUDOMODULES += gnrc_sixlowpan_iphc_nhc
 PSEUDOMODULES += gnrc_pktbuf
-PSEUDOMODULES += ieee802154
 PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
 PSEUDOMODULES += newlib

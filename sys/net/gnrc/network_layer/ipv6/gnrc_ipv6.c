@@ -372,7 +372,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, gnrc_pktsnip_t *ipv6,
             ipv6_addr_set_loopback(&hdr->src);
         }
         else {
-            ipv6_addr_t *src = gnrc_ipv6_netif_find_best_src_addr(iface, &hdr->dst);
+            ipv6_addr_t *src = gnrc_ipv6_netif_find_best_src_addr(iface, &hdr->dst, false);
 
             if (src != NULL) {
                 DEBUG("ipv6: set packet source to %s\n",
@@ -823,8 +823,15 @@ static void _receive(gnrc_pktsnip_t *pkt)
                 gnrc_pktbuf_release(pkt);
                 return;
             }
-            gnrc_pktbuf_remove_snip(pkt, ipv6->next);   /* remove L2 headers around IPV6 */
-            while (ptr != NULL) {                       /* reverse packet order */
+
+            /* remove L2 headers around IPV6 */
+            netif = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
+            if (netif != NULL) {
+                gnrc_pktbuf_remove_snip(pkt, netif);
+            }
+
+            /* reverse packet snip list order */
+            while (ptr != NULL) {
                 gnrc_pktsnip_t *next;
                 ptr = gnrc_pktbuf_start_write(ptr);     /* duplicate if not already done */
                 if (ptr == NULL) {

@@ -11,18 +11,50 @@
  * @{
  *
  * @file
- * @brief       Compiler attributes/pragmas configuration
+ * @brief       Common macros and compiler attributes/pragmas configuration
  *
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef ATTRIBUTES_H_
-#define ATTRIBUTES_H_
+#ifndef KERNEL_DEFINES_H_
+#define KERNEL_DEFINES_H_
 
 #include <stddef.h>
 
 #ifdef __cplusplus
  extern "C" {
+#endif
+
+/**
+ * @def         container_of(PTR, TYPE, MEMBER)
+ * @brief       Returns the container of a pointer to a member.
+ * @details     For a struct `TYPE` with a member `MEMBER`,
+ *              given a pointer `PTR` to `TYPE::MEMBER` this function returns a pointer
+ *              to the instance of `TYPE`.
+ * @details     E.g. for `struct my_struct_t { ...; something_t n; ... } my_struct;`,
+ *              `&my_struct == container_of(&my_struct.n, struct my_struct_t, n)`.
+ * @param[in]   PTR      pointer to a member
+ * @param[in]   TYPE     a type name (a struct or union), container of PTR
+ * @param[in]   MEMBER   name of the member of TYPE which PTR points to
+ * @return      Pointer to the container of PTR.
+ */
+#if __STDC_VERSION__ >= 201112L
+#   define container_of(PTR, TYPE, MEMBER) \
+        (_Generic((PTR), \
+            const __typeof__ (((TYPE *) 0)->MEMBER) *: \
+                ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER))), \
+            __typeof__ (((TYPE *) 0)->MEMBER) *: \
+                ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER))) \
+        ))
+#elif defined __GNUC__
+#   define container_of(PTR, TYPE, MEMBER) \
+        (__extension__ ({ \
+            __extension__ const __typeof__ (((TYPE *) 0)->MEMBER) *__m____ = (PTR); \
+            ((TYPE *) ((char *) __m____ - offsetof(TYPE, MEMBER))); \
+        }))
+#else
+#   define container_of(PTR, TYPE, MEMBER) \
+        ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER)))
 #endif
 
 /**
@@ -86,5 +118,5 @@
 }
 #endif
 
-#endif /* ATTRIBUTES_H_ */
+#endif /* KERNEL_DEFINES_H_ */
 /** @} */

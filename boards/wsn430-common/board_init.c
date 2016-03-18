@@ -107,10 +107,8 @@ void board_init(void)
     msp430_cpu_init();
     msb_ports_init();
 
-    LED_RED_ON;
-
     msp430_set_cpu_speed(MCLK_8MHZ_SCLK_8MHZ);
 
-    /* initialize the STDIO */
+    /* initialize STDIO over UART */
     uart_stdio_init();
 }

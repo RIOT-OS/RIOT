@@ -33,26 +33,46 @@ extern "C" {
 #define CLOCK_CORECLOCK     (72000000U)             /* desired core clock frequency */
 
 /* the actual PLL values are automatically generated */
-#define CLOCK_PLL_HSE_DIV   RCC_CFGR_PLLXTPRE_HSE  /* not divided */
-#define CLOCK_PLL_HSE_MUL   RCC_CFGR_PLLMULL9
+#define CLOCK_PLL_DIV       RCC_CFGR_PLLXTPRE_HSE  /* not divided */
+#define CLOCK_PLL_MUL       RCC_CFGR_PLLMULL9
 
 /* AHB, APB1, APB2 dividers */
 #define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
 #define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1
 #define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV2    /* max 36 MHz (!) */
 
+/* resulting bus clocks */
+#define CLOCK_APB1          (CLOCK_CORECLOCK / 2)
+#define CLOCK_APB2          (CLOCK_CORECLOCK)
+
 /* Flash latency */
 #define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_2    /* for >= 72 MHz */
 /** @} */
 
 /**
- * @brief Timer configuration
+ * @name ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (0)
+/** @} */
+
+/**
+ * @brief   Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
-    /* device, APB bus, rcc_bit */
-    { TIM2, APB1, RCC_APB1ENR_TIM2EN, TIM2_IRQn },
-    { TIM3, APB1, RCC_APB1ENR_TIM3EN, TIM3_IRQn }
+    {
+        .dev      = TIM2,
+        .rcc_mask = RCC_APB1ENR_TIM2EN,
+        .bus      = APB1,
+        .irqn     = TIM2_IRQn
+    },
+    {
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .bus      = APB1,
+        .irqn     = TIM3_IRQn
+    }
 };
 
 #define TIMER_0_ISR         isr_tim2
@@ -65,41 +85,38 @@ static const timer_conf_t timer_config[] = {
  * @brief UART configuration
  * @{
  */
-#define UART_NUMOF          (3U)
-#define UART_0_EN           0
-#define UART_1_EN           1
-#define UART_2_EN           0
-#define UART_IRQ_PRIO       1
+static const uart_conf_t uart_config[] = {
+    {
+        .dev     = USART2,
+        .rx_pin  = GPIO_PIN(PORT_A, 3),
+        .tx_pin  = GPIO_PIN(PORT_A, 2),
+        .rcc_pin = RCC_APB1ENR_USART2EN,
+        .bus     = APB1,
+        .irqn    = USART2_IRQn
+    },
+    {
+        .dev     = USART1,
+        .rx_pin  = GPIO_PIN(PORT_A, 10),
+        .tx_pin  = GPIO_PIN(PORT_A, 9),
+        .rcc_pin = RCC_APB2ENR_USART1EN,
+        .bus     = APB2,
+        .irqn    = USART1_IRQn
+    },
+    {
+        .dev     = USART3,
+        .rx_pin  = GPIO_PIN(PORT_B, 11),
+        .tx_pin  = GPIO_PIN(PORT_B, 10),
+        .rcc_pin = RCC_APB1ENR_USART3EN,
+        .bus     = APB1,
+        .irqn    = USART3_IRQn
+    }
+};
 
-/* UART 0 device configuration */
-#define UART_0_DEV          USART1
-#define UART_0_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_USART1EN)
-#define UART_0_IRQ          USART1_IRQn
-#define UART_0_ISR          isr_usart1
-#define UART_0_BUS_FREQ     CLOCK_CORECLOCK
-/* UART 0 pin configuration */
-#define UART_0_RX_PIN       GPIO_PIN(PORT_A, 10)
-#define UART_0_TX_PIN       GPIO_PIN(PORT_A, 9)
-
-/* UART 1 device configuration */
-#define UART_1_DEV          USART2
-#define UART_1_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART2EN)
-#define UART_1_IRQ          USART2_IRQn
-#define UART_1_ISR          isr_usart2
-#define UART_1_BUS_FREQ     CLOCK_CORECLOCK / 2
-/* UART 1 pin configuration */
-#define UART_1_RX_PIN       GPIO_PIN(PORT_A, 3)
-#define UART_1_TX_PIN       GPIO_PIN(PORT_A, 2)
-
-/* UART 2 device configuration */
-#define UART_2_DEV          USART3
-#define UART_2_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART3EN)
-#define UART_2_IRQ          USART3_IRQn
+#define UART_0_ISR          isr_usart2
+#define UART_1_ISR          isr_usart1
 #define UART_2_ISR          isr_usart3
-#define UART_2_BUS_FREQ     CLOCK_CORECLOCK / 2
-/* UART 2 pin configuration */
-#define UART_2_RX_PIN       GPIO_PIN(PORT_B, 11)
-#define UART_2_TX_PIN       GPIO_PIN(PORT_B, 10)
+
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**

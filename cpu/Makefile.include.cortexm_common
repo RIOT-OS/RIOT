@@ -1,29 +1,6 @@
 # Target triple for the build. Use arm-none-eabi if you are unsure.
 export TARGET_TRIPLE ?= arm-none-eabi
 
-# Use TOOLCHAIN environment variable to select the toolchain to use.
-# Default: gnu
-TOOLCHAIN ?= gnu
-
-# TOOLCHAIN = clang is an alias for TOOLCHAIN = llvm
-ifeq (clang,$(TOOLCHAIN))
-# use override so that we can redefine a variable set on the command line (as
-# opposed to one set in the environment)
-override TOOLCHAIN := llvm
-endif
-# TOOLCHAIN = gcc is an alias for TOOLCHAIN = gnu
-ifeq (gcc,$(TOOLCHAIN))
-# use override so that we can redefine a variable set on the command line (as
-# opposed to one set in the environment)
-override TOOLCHAIN := gnu
-endif
-
-ifeq (,$(TOOLCHAIN))
-override TOOLCHAIN := gnu
-endif
-
-export TOOLCHAIN
-
 # default toolchain prefix, defaults to target triple followed by a dash, you
 # will most likely not need to touch this.
 export PREFIX ?= $(if $(TARGET_TRIPLE),$(TARGET_TRIPLE)-)
@@ -115,9 +92,6 @@ endif
 
 # CPU depends on the cortex-m common module, so include it:
 include $(RIOTCPU)/cortexm_common/Makefile.include
-
-# Import all toolchain settings
-include $(RIOTCPU)/Makefile.include.$(TOOLCHAIN)
 
 # use the nano-specs of Newlib when available
 ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)

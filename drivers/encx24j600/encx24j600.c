@@ -250,9 +250,9 @@ static int _init(netdev2_t *encdev)
     DEBUG("encx24j600: starting initialization...\n");
 
     /* setup IO */
-    gpio_init(dev->cs, GPIO_DIR_OUT, GPIO_PULLUP);
+    gpio_init(dev->cs, GPIO_OUT);
     gpio_set(dev->cs);
-    gpio_init_int(dev->int_pin, GPIO_PULLUP, GPIO_FALLING, encx24j600_isr, (void*)dev);
+    gpio_init_int(dev->int_pin, GPIO_IN_PU, GPIO_FALLING, encx24j600_isr, (void*)dev);
 
     if (spi_init_master(dev->spi, SPI_CONF_FIRST_RISING, ENCX24J600_SPI_SPEED) < 0) {
         return -1;

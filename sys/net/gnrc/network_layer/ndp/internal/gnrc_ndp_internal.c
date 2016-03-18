@@ -246,7 +246,7 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
 
     /* check if there is a fitting source address to target */
     if (src == NULL) {
-        src = gnrc_ipv6_netif_find_best_src_addr(iface, tgt);
+        src = gnrc_ipv6_netif_find_best_src_addr(iface, tgt, false);
     }
     if (src != NULL) {
         l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
@@ -315,7 +315,7 @@ void gnrc_ndp_internal_send_rtr_sol(kernel_pid_t iface, ipv6_addr_t *dst)
         dst = (ipv6_addr_t *)&ipv6_addr_all_routers_link_local;
     }
     /* check if there is a fitting source address to target */
-    if ((src = gnrc_ipv6_netif_find_best_src_addr(iface, dst)) != NULL) {
+    if ((src = gnrc_ipv6_netif_find_best_src_addr(iface, dst, false)) != NULL) {
         uint8_t l2src[8];
         size_t l2src_len;
         l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
@@ -522,8 +522,9 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
     }
     if (src == NULL) {
         mutex_unlock(&ipv6_iface->mutex);
-        /* get address from source selection algorithm */
-        src = gnrc_ipv6_netif_find_best_src_addr(iface, dst);
+        /* get address from source selection algorithm.
+         * Only link local addresses may be used (RFC 4861 section 4.1) */
+        src = gnrc_ipv6_netif_find_best_src_addr(iface, dst, true);
         mutex_lock(&ipv6_iface->mutex);
     }
     /* add SL2A for source address */
