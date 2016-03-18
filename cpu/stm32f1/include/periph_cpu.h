@@ -62,11 +62,12 @@ typedef uint32_t gpio_t;
  * @brief   Generate GPIO mode bitfields
  *
  * We use 4 bit to determine the pin functions:
+ * - bit 4: ODR value
  * - bit 2+3: in/out
  * - bit 1: PU enable
  * - bit 2: OD enable
  */
-#define GPIO_MODE(mode, cnf)    (mode | (cnf << 2))
+#define GPIO_MODE(mode, cnf, odr)       (mode | (cnf << 2) | (odr << 4))
 
 /**
  * @brief   Override GPIO mode options
@@ -76,12 +77,12 @@ typedef uint32_t gpio_t;
  */
 #define HAVE_GPIO_MODE_T
 typedef enum {
-    GPIO_IN    = GPIO_MODE(0, 1),   /**< input w/o pull R */
-    GPIO_IN_PD = GPIO_MODE(0, 2),   /**< input with pull-down */
-    GPIO_IN_PU = GPIO_MODE(0, 2),   /**< input with pull-up */
-    GPIO_OUT   = GPIO_MODE(3, 0),   /**< push-pull output */
-    GPIO_OD    = GPIO_MODE(3, 1),   /**< open-drain w/o pull R */
-    GPIO_OD_PU = (0xff)             /**< not supported by HW */
+    GPIO_IN    = GPIO_MODE(0, 1, 0),    /**< input w/o pull R */
+    GPIO_IN_PD = GPIO_MODE(0, 2, 0),    /**< input with pull-down */
+    GPIO_IN_PU = GPIO_MODE(0, 2, 1),    /**< input with pull-up */
+    GPIO_OUT   = GPIO_MODE(3, 0, 0),    /**< push-pull output */
+    GPIO_OD    = GPIO_MODE(3, 1, 0),    /**< open-drain w/o pull R */
+    GPIO_OD_PU = (0xff)                 /**< not supported by HW */
 } gpio_mode_t;
 /** @} */
 
