@@ -35,22 +35,13 @@
 #include "debug.h"
 
 
-static void _irq_handler(void *arg)
+void at86rf2xx_setup(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
+                     gpio_t cs_pin, gpio_t int_pin, gpio_t sleep_pin,
+                     gpio_t reset_pin)
 {
-    msg_t msg;
-    at86rf2xx_t *dev = (at86rf2xx_t *) arg;
+    netdev2_t *netdev = (netdev2_t *)dev;
 
-    /* tell driver thread about the interrupt */
-    msg.type = GNRC_NETDEV_MSG_TYPE_EVENT;
-    msg_send(&msg, dev->mac_pid);
-}
-
-int at86rf2xx_init(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
-                   gpio_t cs_pin, gpio_t int_pin,
-                   gpio_t sleep_pin, gpio_t reset_pin)
-{
-    dev->driver = &at86rf2xx_driver;
-
+    netdev->driver = &at86rf2xx_driver;
     /* initialize device descriptor */
     dev->spi = spi;
     dev->cs_pin = cs_pin;
@@ -59,32 +50,8 @@ int at86rf2xx_init(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
     dev->reset_pin = reset_pin;
     dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
     dev->state = AT86RF2XX_STATE_SLEEP;
-
     /* initialise SPI */
     spi_init_master(dev->spi, SPI_CONF_FIRST_RISING, spi_speed);
-    /* initialise GPIOs */
-    gpio_init(dev->cs_pin, GPIO_OUT);
-    gpio_set(dev->cs_pin);
-    gpio_init(dev->sleep_pin, GPIO_OUT);
-    gpio_clear(dev->sleep_pin);
-    gpio_init(dev->reset_pin, GPIO_OUT);
-    gpio_set(dev->reset_pin);
-    gpio_init_int(dev->int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
-
-    /* make sure device is not sleeping, so we can query part number */
-    at86rf2xx_assert_awake(dev);
-
-    /* test if the SPI is set up correctly and the device is responding */
-    if (at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM) !=
-        AT86RF2XX_PARTNUM) {
-        DEBUG("[at86rf2xx] error: unable to read correct part number\n");
-        return -1;
-    }
-
-    /* reset device to default values and put it into RX state */
-    at86rf2xx_reset(dev);
-
-    return 0;
 }
 
 void at86rf2xx_reset(at86rf2xx_t *dev)
@@ -100,8 +67,8 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_reset_state_machine(dev);
 
     /* reset options and sequence number */
-    dev->seq_nr = 0;
-    dev->options = 0;
+    dev->netdev.seq = 0;
+    dev->netdev.flags = 0;
     /* set short and long address */
 #if CPUID_LEN
     cpuid_get(cpuid);
@@ -134,15 +101,16 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* set default TX power */
     at86rf2xx_set_txpower(dev, AT86RF2XX_DEFAULT_TXPOWER);
     /* set default options */
+    at86rf2xx_set_option(dev, NETDEV2_IEEE802154_PAN_COMP, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_START, false);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_END, true);
     /* set default protocol */
 #ifdef MODULE_GNRC_SIXLOWPAN
-    dev->proto = GNRC_NETTYPE_SIXLOWPAN;
-#else
-    dev->proto = GNRC_NETTYPE_UNDEF;
+    dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
+#elif MODULE_GNRC
+    dev->netdev.proto = GNRC_NETTYPE_UNDEF;
 #endif
     /* enable safe mode (protect RX FIFO until reading data starts) */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
@@ -219,39 +187,42 @@ void at86rf2xx_tx_prepare(at86rf2xx_t *dev)
     /* make sure ongoing transmissions are finished */
     do {
         state = at86rf2xx_get_status(dev);
-    }
-    while (state == AT86RF2XX_STATE_BUSY_RX_AACK ||
-           state == AT86RF2XX_STATE_BUSY_TX_ARET);
+    } while (state == AT86RF2XX_STATE_BUSY_RX_AACK ||
+             state == AT86RF2XX_STATE_BUSY_TX_ARET);
     if (state != AT86RF2XX_STATE_TX_ARET_ON) {
         dev->idle_state = state;
     }
     at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
-    dev->frame_len = IEEE802154_FCS_LEN;
+    dev->tx_frame_len = IEEE802154_FCS_LEN;
 }
 
 size_t at86rf2xx_tx_load(at86rf2xx_t *dev, uint8_t *data,
                          size_t len, size_t offset)
 {
-    dev->frame_len += (uint8_t)len;
+    dev->tx_frame_len += (uint8_t)len;
     at86rf2xx_sram_write(dev, offset + 1, data, len);
     return offset + len;
 }
 
 void at86rf2xx_tx_exec(at86rf2xx_t *dev)
 {
+    netdev2_t *netdev = (netdev2_t *)dev;
+
     /* write frame length field in FIFO */
-    at86rf2xx_sram_write(dev, 0, &(dev->frame_len), 1);
+    at86rf2xx_sram_write(dev, 0, &(dev->tx_frame_len), 1);
     /* trigger sending of pre-loaded frame */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE,
                         AT86RF2XX_TRX_STATE__TX_START);
-    if (dev->event_cb && (dev->options & AT86RF2XX_OPT_TELL_TX_START)) {
-        dev->event_cb(NETDEV_EVENT_TX_STARTED, NULL);
+    if (netdev->event_callback &&
+        (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_START)) {
+        netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED, NULL);
     }
 }
 
 size_t at86rf2xx_rx_len(at86rf2xx_t *dev)
 {
     uint8_t phr;
+
     at86rf2xx_fb_read(dev, &phr, 1);
 
     /* ignore MSB (refer p.80) and substract length of FCS field */
