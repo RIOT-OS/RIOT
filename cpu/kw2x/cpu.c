@@ -24,20 +24,11 @@
 #include "mcg.h"
 #include "cpu_conf.h"
 
+#ifdef MODULE_PREINIT
+#include "init.h"
+#endif
+
 #define FLASH_BASE          (0x00000000)
-
-static void cpu_clock_init(void);
-
-/**
- * @brief Initialize the CPU, set IRQ priorities
- */
-void cpu_init(void)
-{
-    /* initialize the Cortex-M core */
-    cortexm_init();
-    /* initialize the clock system */
-    cpu_clock_init();
-}
 
 static inline void modem_clock_init(void)
 {
@@ -80,3 +71,23 @@ static void cpu_clock_init(void)
     modem_clock_init();
     kinetis_mcg_set_mode(KINETIS_MCG_PEE);
 }
+
+/**
+ * @brief Initialize the CPU, set IRQ priorities
+ */
+void cpu_init(void)
+{
+    /* initialize the Cortex-M core */
+    cortexm_init();
+    /* initialize the clock system */
+    cpu_clock_init();
+}
+
+#ifdef MODULE_PREINIT
+int kw2x_cpu_init(void)
+{
+    cpu_init();
+    return 0;
+}
+core_init(kw2x_cpu_init);
+#endif
