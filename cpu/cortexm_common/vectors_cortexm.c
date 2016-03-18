@@ -96,13 +96,14 @@ void reset_handler_default(void)
 
     post_startup();
 
+#ifndef MODULE_PREINIT
     /* initialize the board (which also initiates CPU initialization) */
     board_init();
-
 #if MODULE_NEWLIB
     /* initialize std-c library (this must be done after board_init) */
     extern void __libc_init_array(void);
     __libc_init_array();
+#endif
 #endif
 
     /* startup the kernel */
