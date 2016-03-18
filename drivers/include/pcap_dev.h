@@ -191,6 +191,43 @@ void pcap_dev_setup(pcap_dev_t *dev, const pcap_dev_sd_t *sd, void *sd_state,
                     const pcap_dev_opt_fn_t getters[],
                     const pcap_dev_opt_fn_t setters[]);
 
+#ifndef PCAP_DEV_DEFAULT_IEEE802154_ADDR_SHORT
+#define PCAP_DEV_DEFAULT_IEEE802154_ADDR_SHORT  (0x0230)
+#endif
+
+#ifndef PCAP_DEV_DEFAULT_IEEE802154_ADDR_LONG
+#define PCAP_DEV_DEFAULT_IEEE802154_ADDR_LONG   \
+            { 0xf2, 0xe2, 0xa5, 0x34, 0x51, 0x15, 0xbf, 0xee }
+#endif
+
+#ifndef PCAP_DEV_DEFAULT_IEEE802154_NET_MODE
+#define PCAP_DEV_DEFAULT_IEEE802154_NET_MODE    (PCAP_NET_IEEE802154_NOFCS)
+#endif
+
+#ifndef PCAP_DEV_DEFAULT_NID
+#define PCAP_DEV_DEFAULT_NID            (0x0023)
+#endif
+
+#ifndef PCAP_DEV_DEFAULT_CHANNEL
+#define PCAP_DEV_DEFAULT_CHANNEL        (26U)
+#endif
+
+/**
+ * @brief   Setup @ref drivers_pcap_dev as IEEE 802.15.4 device.
+ *
+ * @param[in] dev               A new @ref drivers_pcap_dev.
+ * @param[in] sd                sink/drain for @p dev.
+ * @param[in] sd_state          state of sink/drain for @p dev.
+ * @param[in] drain_delay       Time in microseconds to wait for reading the first
+ *                              frame from drain.
+ * @param[in] drain_buf         Buffer to temporarily store received frames.
+ *                              Should be at least of length 141.
+ * @param[in] drain_buf_size    Size of @p drain_buf.
+ */
+void pcap_dev_setup_ieee802154(pcap_dev_t *dev, const pcap_dev_sd_t *sd,
+                               void *sd_state, uint32_t drain_delay,
+                               uint8_t *drain_buf, uint16_t drain_buf_size);
+
 #ifdef __cplusplus
 }
 #endif
