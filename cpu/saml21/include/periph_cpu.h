@@ -33,6 +33,31 @@ enum {
     PB = 1,                 /**< port B */
 };
 
+/**
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use 3 bit to determine the pin functions:
+ * - bit 0: PU or PU
+ * - bit 1: input enable
+ * - bit 2: pull enable
+ */
+#define GPIO_MODE(pr, ie, pe)   (pr | (ie << 1) | (pe << 2))
+
+/**
+ * @brief   Override GPIO modes
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN    = GPIO_MODE(0, 1, 0),    /**< IN */
+    GPIO_IN_PD = GPIO_MODE(0, 1, 1),    /**< IN with pull-down */
+    GPIO_IN_PU = GPIO_MODE(1, 1, 1),    /**< IN with pull-up */
+    GPIO_OUT   = GPIO_MODE(0, 0, 0),    /**< OUT (push-pull) */
+    GPIO_OD    = 0xfe,                  /**< not supported by HW */
+    GPIO_OD_PU = 0xff                   /**< not supported by HW */
+} gpio_mode_t;
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

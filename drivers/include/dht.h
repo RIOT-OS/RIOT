@@ -59,8 +59,8 @@ typedef enum {
 typedef struct {
     gpio_t pin;             /**< GPIO pin of the device's data pin */
     dht_type_t type;        /**< type of the DHT device */
-    gpio_pp_t pull;         /**< internal pull resistor configuration, set to
-                             *   GPIO_NOPULL when using an external pull-up */
+    gpio_mode_t in_mode;    /**< input pin configuration, with or without pull
+                             *   resistor */
 } dht_t;
 
 /**

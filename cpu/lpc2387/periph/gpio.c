@@ -62,11 +62,14 @@ static int _isr_map_entry(gpio_t pin) {
     return _pin;
 }
 
-int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
+int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    (void) dir;
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
+
+    if (mode != GPIO_OUT) {
+        return -1;
+    }
 
     FIO_PORT_t *_port = &FIO_PORTS[port];
 
@@ -75,9 +78,6 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
 
     /* set direction */
     _port->DIR = ~0;
-
-    /* set pullup/pulldown **/
-    PINMODE[pin>>4] |= pullup << (_pin*2);
 
     gpio_init_mux(pin, 0);
 
@@ -92,9 +92,11 @@ int gpio_init_mux(unsigned pin, unsigned mux)
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                     gpio_cb_t cb, void *arg)
 {
+    (void)mode;
+
     DEBUG("gpio_init_int(): pin %u\n", pin);
     int isr_map_entry;
 
@@ -125,7 +127,6 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
     _gpio_states[_state_index].arg = arg;
 
     extern void GPIO_IRQHandler(void);
-    gpio_init(pin, GPIO_DIR_IN, pullup);
 
     if (flank & GPIO_FALLING) {
         bf_set(_gpio_falling, _state_index);
