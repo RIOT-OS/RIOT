@@ -1,0 +1,5 @@
+ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
+  USEMODULE += gnrc_nomac
+  USEMODULE += cc2538rf
+endif
+
