@@ -17,6 +17,15 @@ ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE += oonf_rfc5444
 endif
 
+ifneq (,$(filter pcap_dev_%,$(USEMODULE)))
+  USEMODULE += pcap_dev
+endif
+
+ifneq (,$(filter pcap_dev,$(USEMODULE)))
+  USEMODULE += timex
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += netdev_default
