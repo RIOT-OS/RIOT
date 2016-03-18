@@ -38,6 +38,7 @@ ifneq (,$(filter mma8652,$(USEMODULE)))
 endif
 ifneq (,$(filter mag3110,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mag3110/include
+    export UNDEF += $(BINDIR)mag3110/mag3110_saul.o
 endif
 ifneq (,$(filter mpu9150,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mpu9150/include
