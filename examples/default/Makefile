@@ -37,7 +37,7 @@ USEMODULE += saul_reg
 USEMODULE += saul_default
 USEMODULE += auto_init_saul
 
-BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 mulle native nrf51dongle \
+BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 iotlab-a8-m3 mulle native nrf51dongle \
 	nrf6310 pba-d-01-kw2x pca10000 pca10005 saml21-xpro samr21-xpro spark-core \
 	yunjia-nrf51822
 
