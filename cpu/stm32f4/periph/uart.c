@@ -26,6 +26,8 @@
 #include "periph/uart.h"
 #include "periph/gpio.h"
 
+#include <string.h>
+
 /**
  * @brief   Allocate memory to store the callback functions
  */
@@ -119,10 +121,12 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         }
     }
     else {
+        uint8_t tmp_buf[len];
+        memcpy(tmp_buf, data, len);
         mutex_lock(&_tx_lock[uart]);
         DMA_Stream_TypeDef *stream = dma_stream(uart_config[uart].dma_stream);
         /* configure and start DMA transfer */
-        stream->M0AR = (uint32_t)data;
+        stream->M0AR = (uint32_t)tmp_buf;
         stream->NDTR = (uint16_t)len;
         stream->CR |= DMA_SxCR_EN;
         /* wait for transfer to complete */
