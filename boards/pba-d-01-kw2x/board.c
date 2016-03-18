@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
- * Copyright (C) 2014 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2016 PHYTEC Messtechnik GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -23,7 +23,11 @@
 #include "board.h"
 #include "periph/gpio.h"
 
-void board_init(void)
+#ifdef MODULE_PREINIT
+#include "init.h"
+#endif
+
+static void leds_init(void)
 {
     /* initialize the on-board LEDs */
     gpio_init(LED0_PIN, GPIO_OUT);
@@ -32,7 +36,23 @@ void board_init(void)
     gpio_set(LED1_PIN);
     gpio_init(LED2_PIN, GPIO_OUT);
     gpio_set(LED2_PIN);
+}
 
+#ifdef MODULE_PREINIT
+int pba_board_init(void)
+{
+    leds_init();
+    return 0;
+}
+
+deck_init(pba_board_init);
+
+#else
+
+void board_init(void)
+{
+    leds_init();
     /* initialize the CPU core */
     cpu_init();
 }
+#endif

@@ -27,6 +27,8 @@ export OPENOCD_PRE_VERIFY_CMDS += \
 export OPENOCD_EXTRA_INIT
 export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/kinetis_common/dist/check-fcfield-elf.sh
 
+export UNDEF += $(BINDIR)board/board.o
+
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 
 # Add board selector (USB serial) to OpenOCD options if specified.
