@@ -20,6 +20,10 @@
 
 #include "auto_init.h"
 
+#ifdef MODULE_PREINIT
+#include "init.h"
+#endif
+
 #ifdef MODULE_CONFIG
 #include "config.h"
 #endif
@@ -95,43 +99,40 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-void auto_init(void)
+static int _init_peripheral(void)
+{
+#ifdef MODULE_RTC
+    DEBUG("Auto init rtc module.\n");
+    rtc_init();
+#endif
+#ifdef MODULE_GPIOINT
+    DEBUG("Auto init gpioint module.\n");
+    gpioint_init();
+#endif
+#ifdef MODULE_MCI
+    DEBUG("Auto init mci module.\n");
+    mci_initialize();
+#endif
+    return 0;
+}
+
+static int _init_subsys(void)
+{
+    return 0;
+}
+
+static int _init_system(void)
 {
 #ifdef MODULE_CONFIG
     DEBUG("Auto init loading config\n");
     config_load();
 #endif
-
 #ifdef MODULE_TINYMT32
     random_init(0);
 #endif
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
-#endif
-#ifdef MODULE_RTC
-    DEBUG("Auto init rtc module.\n");
-    rtc_init();
-#endif
-#ifdef MODULE_BMP180
-    DEBUG("Auto init BMP180 module.\n");
-    bmp180_auto_init();
-#endif
-#ifdef MODULE_SHT11
-    DEBUG("Auto init SHT11 module.\n");
-    sht11_init();
-#endif
-#ifdef MODULE_GPIOINT
-    DEBUG("Auto init gpioint module.\n");
-    gpioint_init();
-#endif
-#ifdef MODULE_LTC4150
-    DEBUG("Auto init ltc4150 module.\n");
-    ltc4150_init();
-#endif
-#ifdef MODULE_MCI
-    DEBUG("Auto init mci module.\n");
-    mci_initialize();
 #endif
 #ifdef MODULE_PROFILING
     extern void profiling_init(void);
@@ -157,16 +158,23 @@ void auto_init(void)
     DEBUG("Auto init UDP module.\n");
     gnrc_udp_init();
 #endif
-#ifdef MODULE_DHT
-    DEBUG("Auto init DHT devices.\n");
-    extern void dht_auto_init(void);
-    dht_auto_init();
-#endif
 #ifdef MODULE_LWIP
     DEBUG("Bootstraping lwIP.\n");
     lwip_bootstrap();
 #endif
+#ifdef MODULE_AUTO_INIT_GNRC_RPL
 
+#ifdef MODULE_GNRC_RPL
+    extern void auto_init_gnrc_rpl(void);
+    auto_init_gnrc_rpl();
+#endif
+
+#endif /* MODULE_AUTO_INIT_GNRC_RPL */
+    return 0;
+}
+
+static int _init_net_device(void)
+{
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
 
@@ -218,7 +226,31 @@ void auto_init(void)
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
 #ifdef MODULE_GNRC_IPV6_NETIF
+    /* TODO: should be inside _init_subsys? */
     gnrc_ipv6_netif_init_by_dev();
+#endif
+
+    return 0;
+}
+
+static int _init_device(void)
+{
+#ifdef MODULE_LTC4150
+    DEBUG("Auto init ltc4150 module.\n");
+    ltc4150_init();
+#endif
+#ifdef MODULE_SHT11
+    DEBUG("Auto init SHT11 module.\n");
+    sht11_init();
+#endif
+#ifdef MODULE_DHT
+    DEBUG("Auto init DHT devices.\n");
+    extern void dht_auto_init(void);
+    dht_auto_init();
+#ifdef MODULE_BMP180
+    DEBUG("Auto init BMP180 module.\n");
+    bmp180_auto_init();
+#endif
 #endif
 
 #ifdef MODULE_GNRC_UHCPC
@@ -264,13 +296,23 @@ void auto_init(void)
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
-
-#ifdef MODULE_AUTO_INIT_GNRC_RPL
-
-#ifdef MODULE_GNRC_RPL
-    extern void auto_init_gnrc_rpl(void);
-    auto_init_gnrc_rpl();
-#endif
-
-#endif /* MODULE_AUTO_INIT_GNRC_RPL */
+    return 0;
 }
+
+#ifdef MODULE_PREINIT
+void auto_init(void){}
+peripheral_init(_init_peripheral);
+subsys_init(_init_subsys);
+system_init(_init_system);
+device_init(_init_net_device);
+device_init(_init_device);
+#else
+void auto_init(void)
+{
+    _init_peripheral();
+    _init_subsys();
+    _init_system();
+    _init_net_device();
+    _init_device();
+}
+#endif
