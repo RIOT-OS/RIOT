@@ -78,6 +78,7 @@ void _native_init_syscalls(void);
  */
 extern ssize_t (*real_read)(int fd, void *buf, size_t count);
 extern ssize_t (*real_write)(int fd, const void *buf, size_t count);
+extern off_t (*real_lseek)(int fd, off_t offset, int whence);
 extern size_t (*real_fread)(void *ptr, size_t size, size_t nmemb, FILE *stream);
 extern void (*real_clearerr)(FILE *stream);
 extern __attribute__((noreturn)) void (*real_exit)(int status);

@@ -50,6 +50,7 @@
 
 ssize_t (*real_read)(int fd, void *buf, size_t count);
 ssize_t (*real_write)(int fd, const void *buf, size_t count);
+off_t (*real_lseek)(int fd, off_t offset, int whence);
 size_t (*real_fread)(void *ptr, size_t size, size_t nmemb, FILE *stream);
 void (*real_clearerr)(FILE *stream);
 __attribute__((noreturn)) void (*real_exit)(int status);
@@ -421,6 +422,7 @@ void _native_init_syscalls(void)
 {
     *(void **)(&real_read) = dlsym(RTLD_NEXT, "read");
     *(void **)(&real_write) = dlsym(RTLD_NEXT, "write");
+    *(void **)(&real_lseek) = dlsym(RTLD_NEXT, "lseek");
     *(void **)(&real_malloc) = dlsym(RTLD_NEXT, "malloc");
     *(void **)(&real_calloc) = dlsym(RTLD_NEXT, "calloc");
     *(void **)(&real_realloc) = dlsym(RTLD_NEXT, "realloc");
