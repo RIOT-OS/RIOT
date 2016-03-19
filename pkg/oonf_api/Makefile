@@ -1,5 +1,5 @@
 PKG_NAME=oonf_api
-PKG_URL=http://olsr.org/git/oonf.git
+PKG_URL=https://github.com/OLSR/OONF.git
 PKG_VERSION=v0.3.0
 PKG_DIR=$(CURDIR)/$(PKG_NAME)
 
