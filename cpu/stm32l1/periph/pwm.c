@@ -268,12 +268,12 @@ void pwm_poweron(pwm_t dev)
     switch (dev) {
 #if PWM_0_EN
         case PWM_0:
-            PWM_0_CLKEN();
+            periph_clk_en(PWM_0_BUS, PWM_0_RCC_MASK);
             break;
 #endif
 #if PWM_1_EN
         case PWM_1:
-            PWM_1_CLKEN();
+            periph_clk_en(PWM_1_BUS, PWM_1_RCC_MASK);
             break;
 #endif
     }
@@ -284,12 +284,12 @@ void pwm_poweroff(pwm_t dev)
     switch (dev) {
 #if PWM_0_EN
         case PWM_0:
-            PWM_0_CLKDIS();
+            periph_clk_dis(PWM_0_BUS, PWM_0_RCC_MASK);
             break;
 #endif
 #if PWM_1_EN
         case PWM_1:
-            PWM_1_CLKDIS();
+            periph_clk_dis(PWM_1_BUS, PWM_1_RCC_MASK);
             break;
 #endif
     }
