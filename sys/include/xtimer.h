@@ -323,7 +323,8 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_ISR_BACKOFF 20
 #endif
 
-/*
+#ifndef XTIMER_SHIFT
+/**
  * @brief   xtimer prescaler value
  *
  * xtimer assumes it is running with an underlying 1MHz timer.
@@ -335,7 +336,6 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  *
  * For example, if the timer is running with 250khz, set XTIMER_SHIFT to 2.
  */
-#ifndef XTIMER_SHIFT
 #define XTIMER_SHIFT (0)
 #endif
 
