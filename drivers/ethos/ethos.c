@@ -222,7 +222,7 @@ void ethos_send_frame(ethos_t *dev, const uint8_t *data, size_t len, unsigned fr
 {
     uint8_t frame_delim = ETHOS_FRAME_DELIMITER;
 
-    if (!inISR()) {
+    if (!irq_is_in()) {
         mutex_lock(&dev->out_mutex);
     }
     else {
@@ -248,7 +248,7 @@ void ethos_send_frame(ethos_t *dev, const uint8_t *data, size_t len, unsigned fr
     /* end of frame */
     uart_write(dev->uart, &frame_delim, 1);
 
-    if (!inISR()) {
+    if (!irq_is_in()) {
         mutex_unlock(&dev->out_mutex);
     }
 }

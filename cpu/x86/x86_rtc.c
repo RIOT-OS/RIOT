@@ -161,7 +161,7 @@ bool x86_rtc_read(x86_rtc_data_t *dest)
         return false;
     }
 
-    unsigned old_status = disableIRQ();
+    unsigned old_status = irq_disable();
 
     while (is_update_in_progress()) {
         asm volatile ("pause");
@@ -193,7 +193,7 @@ bool x86_rtc_read(x86_rtc_data_t *dest)
         dest->hour = ((dest->hour & 0x7F) + 12) % 24;
     }
 
-    restoreIRQ(old_status);
+    irq_restore(old_status);
     return true;
 }
 
@@ -203,7 +203,7 @@ bool x86_rtc_set_alarm(const x86_rtc_data_t *when, uint32_t msg_content, kernel_
         return false;
     }
 
-    unsigned old_status = disableIRQ();
+    unsigned old_status = irq_disable();
     bool result;
     if (target_pid == KERNEL_PID_UNDEF) {
         result = true;
@@ -233,7 +233,7 @@ bool x86_rtc_set_alarm(const x86_rtc_data_t *when, uint32_t msg_content, kernel_
         }
     }
     rtc_irq_handler(0);
-    restoreIRQ(old_status);
+    irq_restore(old_status);
     return result;
 }
 
@@ -243,7 +243,7 @@ bool x86_rtc_set_periodic(uint8_t hz, uint32_t msg_content, kernel_pid_t target_
         return false;
     }
 
-    unsigned old_status = disableIRQ();
+    unsigned old_status = irq_disable();
     bool result;
     if (target_pid == KERNEL_PID_UNDEF || hz == RTC_REG_A_HZ_OFF) {
         result = true;
@@ -265,7 +265,7 @@ bool x86_rtc_set_periodic(uint8_t hz, uint32_t msg_content, kernel_pid_t target_
         }
     }
     rtc_irq_handler(0);
-    restoreIRQ(old_status);
+    irq_restore(old_status);
     return result;
 }
 
@@ -275,7 +275,7 @@ bool x86_rtc_set_update(uint32_t msg_content, kernel_pid_t target_pid, bool allo
         return false;
     }
 
-    unsigned old_status = disableIRQ();
+    unsigned old_status = irq_disable();
     bool result;
     if (target_pid == KERNEL_PID_UNDEF) {
         result = true;
@@ -293,6 +293,6 @@ bool x86_rtc_set_update(uint32_t msg_content, kernel_pid_t target_pid, bool allo
         }
     }
     rtc_irq_handler(0);
-    restoreIRQ(old_status);
+    irq_restore(old_status);
     return result;
 }

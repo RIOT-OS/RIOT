@@ -103,10 +103,10 @@ static void msb_ports_init(void)
 
 void msp430_set_cpu_speed(uint32_t speed)
 {
-    disableIRQ();
+    irq_disable();
     __msp430_cpu_speed = speed;
     msp430_init_dco();
-    enableIRQ();
+    irq_enable();
 }
 
 /*---------------------------------------------------------------------------*/

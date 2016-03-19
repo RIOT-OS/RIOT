@@ -43,7 +43,7 @@ static ssize_t pipe_rw(ringbuffer_t *rb,
     }
 
     while (1) {
-        unsigned old_state = disableIRQ();
+        unsigned old_state = irq_disable();
 
         unsigned count = ringbuffer_op(rb, buf, n);
 
@@ -56,7 +56,7 @@ static ssize_t pipe_rw(ringbuffer_t *rb,
                 sched_set_status(other_thread, STATUS_PENDING);
             }
 
-            restoreIRQ(old_state);
+            irq_restore(old_state);
 
             if (other_prio >= 0) {
                 sched_switch(other_prio);
@@ -64,15 +64,15 @@ static ssize_t pipe_rw(ringbuffer_t *rb,
 
             return count;
         }
-        else if (*this_op_blocked || inISR()) {
-            restoreIRQ(old_state);
+        else if (*this_op_blocked || irq_is_in()) {
+            irq_restore(old_state);
             return 0;
         }
         else {
             *this_op_blocked = (thread_t *) sched_active_thread;
 
             sched_set_status((thread_t *) sched_active_thread, STATUS_SLEEPING);
-            restoreIRQ(old_state);
+            irq_restore(old_state);
             thread_yield_higher();
         }
     }

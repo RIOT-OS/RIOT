@@ -94,7 +94,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    unsigned state = disableIRQ();
+    unsigned state = irq_disable();
 
     switch (dev) {
 #if TIMER_0_EN
@@ -119,7 +119,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
                     break;
 
                 default:
-                    restoreIRQ(state);
+                    irq_restore(state);
                     return -1;
             }
 
@@ -147,7 +147,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
                     break;
 
                 default:
-                    restoreIRQ(state);
+                    irq_restore(state);
                     return -1;
             }
 
@@ -175,7 +175,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
                     break;
 
                 default:
-                    restoreIRQ(state);
+                    irq_restore(state);
                     return -1;
             }
 
@@ -184,13 +184,13 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
         case TIMER_UNDEFINED:
         default:
-            restoreIRQ(state);
+            irq_restore(state);
             return -1;
     }
 
     /* enable interrupts for given timer */
     timer_irq_enable(dev);
-    restoreIRQ(state);
+    irq_restore(state);
 
     return 1;
 }
@@ -282,7 +282,7 @@ unsigned int timer_read(tim_t dev)
      * Disabling interrupts globally because read from 16 Bit register can
      * otherwise be messed up
      */
-    unsigned state = disableIRQ();
+    unsigned state = irq_disable();
 
     switch (dev) {
 #if TIMER_0_EN
@@ -319,7 +319,7 @@ unsigned int timer_read(tim_t dev)
             a = 0;
     }
 
-    restoreIRQ(state);
+    irq_restore(state);
     return a;
 }
 

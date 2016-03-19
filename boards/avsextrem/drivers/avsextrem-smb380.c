@@ -566,7 +566,7 @@ int16_t SMB380_getTemperature(void)
 {
     int16_t t = 0;
 
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_TEMP, 0, SMB380_READ_REGISTER);
 
@@ -574,7 +574,7 @@ int16_t SMB380_getTemperature(void)
     t = (SMB380_ssp_read() & 0xFF);
     t = (t >> 1) + SMB380_TEMP_OFFSET;
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 
     return t;
 }
@@ -588,7 +588,7 @@ void SMB380_getAcceleration(unsigned char axis, int16_t *pAbs, int16_t *pMg)
         settings.range = SMB380_getRange();
     }
 
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
 
     switch (axis) {
@@ -610,7 +610,7 @@ void SMB380_getAcceleration(unsigned char axis, int16_t *pAbs, int16_t *pMg)
     ur = (SMB380_ssp_read() & SMB380_ACC_MSB_MASK) << 2;
     ur |= (SMB380_ssp_read() & SMB380_ACC_LSB_MASK) >> 6;
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 
     if (pAbs != NULL) {
         if (ur & BIT9) {  //ur<0
@@ -635,18 +635,18 @@ void SMB380_getAcceleration(unsigned char axis, int16_t *pAbs, int16_t *pMg)
 unsigned char SMB380_getChipID(void)
 {
     unsigned char ur = 0;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CHIP_ID, 0, 0);
     ur = (unsigned char)(SMB380_ssp_read() & SMB380_CHIP_ID_MASK);
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
     return ur;
 }
 
 void SMB380_setWakeUpPause(unsigned char duration)
 {
     unsigned char utemp;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL4, 0, SMB380_READ_REGISTER);
     utemp = SMB380_ssp_read();
@@ -655,19 +655,19 @@ void SMB380_setWakeUpPause(unsigned char duration)
     SMB380_ssp_write(SMB380_CONTROL4, utemp, SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 unsigned char SMB380_getWakeUpPause(void)
 {
     unsigned char up;
 
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL4, 0, SMB380_READ_REGISTER);
     up = (unsigned char)SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
     up &= SMB380_CONTROL4_WAKEUP_PAUSE_MASK;
     up = up >> 1;
 
@@ -683,7 +683,7 @@ void SMB380_setBandWidth(unsigned char bandWidth)
             (bandWidth == SMB380_BAND_WIDTH_375HZ) ||
             (bandWidth == SMB380_BAND_WIDTH_50HZ) ||
             (bandWidth == SMB380_BAND_WIDTH_750HZ)) {
-        unsigned long cpsr = disableIRQ();
+        unsigned long cpsr = irq_disable();
         SMB380_Prepare();
         SMB380_ssp_write(SMB380_CONTROL3, 0, SMB380_READ_REGISTER);
         unsigned char utemp = SMB380_ssp_read();
@@ -692,14 +692,14 @@ void SMB380_setBandWidth(unsigned char bandWidth)
         SMB380_ssp_write(SMB380_CONTROL3, utemp, SMB380_WRITE_REGISTER);
         SMB380_ssp_read();
         SMB380_Unprepare();
-        restoreIRQ(cpsr);
+        irq_restore(cpsr);
     }
 }
 
 void SMB380_setRange(unsigned char range)
 {
     if (range != 0x3) {
-        unsigned long cpsr = disableIRQ();
+        unsigned long cpsr = irq_disable();
         SMB380_Prepare();
         SMB380_ssp_write(SMB380_CONTROL3, 0, SMB380_READ_REGISTER);
         unsigned char utemp = (unsigned char)SMB380_ssp_read();
@@ -708,7 +708,7 @@ void SMB380_setRange(unsigned char range)
         SMB380_ssp_write(SMB380_CONTROL3, utemp, SMB380_WRITE_REGISTER);
         SMB380_ssp_read();
         SMB380_Unprepare();
-        restoreIRQ(cpsr);
+        irq_restore(cpsr);
         settings.countRange = 0;
     }
 
@@ -717,12 +717,12 @@ void SMB380_setRange(unsigned char range)
 unsigned char SMB380_getRange(void)
 {
     unsigned char ur;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL3, 0, SMB380_READ_REGISTER);
     ur = (SMB380_ssp_read() & SMB380_CONTROL3_RANGE_MASK) >> 3;
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 
     switch (ur) {
         case SMB380_RANGE_2G:
@@ -742,12 +742,12 @@ unsigned char SMB380_getRange(void)
 unsigned char SMB380_getBandWidth(void)
 {
     unsigned char uBand;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL3, 0, SMB380_READ_REGISTER);
     uBand = SMB380_ssp_read() & SMB380_CONTROL3_BANDWITH_MASK;
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
     return uBand;
 }
 
@@ -785,34 +785,34 @@ int16_t SMB380_getBandWidthAbs(void)
 
 void SMB380_softReset(void)
 {
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL1, SMB380_CONTROL1_SOFT_RESET_MASK,
                      SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 void SMB380_setCustomerReg(unsigned char data)
 {
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CUST1, data, SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 unsigned char SMB380_getCustomerReg(void)
 {
     unsigned uReg = 0;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CUST1, 0, SMB380_READ_REGISTER);
     uReg = (unsigned char)SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
     return uReg;
 }
 
@@ -820,7 +820,7 @@ unsigned char SMB380_getCustomerReg(void)
 void SMB380_Selftest_1(void)
 {
     unsigned char uReg = 0;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_LG_THRES, 6, SMB380_WRITE_REGISTER);
     //SSP0Init();
@@ -837,7 +837,7 @@ void SMB380_Selftest_1(void)
     //  SSP0Init();
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 void SMB380_ShowMemory(void)
@@ -846,12 +846,12 @@ void SMB380_ShowMemory(void)
     printf("SMB380 Speicher\n\r");
 
     for (unsigned char regAd = 0x16; regAd > 0; regAd--) {
-        unsigned long cpsr = disableIRQ();
+        unsigned long cpsr = irq_disable();
         SMB380_Prepare();
         SMB380_ssp_write(regAd - 1, 0, SMB380_READ_REGISTER);
         uint16_t uReg = SMB380_ssp_read();
         SMB380_Unprepare();
-        restoreIRQ(cpsr);
+        irq_restore(cpsr);
         printf("Register: = %X: 0x%X = ", regAd - 1, uReg);
 
         for (int pos = 0; pos < 16; pos++) { //uReg != 0)
@@ -874,20 +874,20 @@ void SMB380_ShowMemory(void)
 
 void SMB380_setUpperLimit(void)
 {
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_HG_THRES, 128, SMB380_WRITE_REGISTER); //1g
     SMB380_ssp_read();
     SMB380_ssp_write(SMB380_HG_DUR, 0, SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 void SMB380_enableUpperLimit(void)
 {
     unsigned short uReg;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL2, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
@@ -895,13 +895,13 @@ void SMB380_enableUpperLimit(void)
                      SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 void SMB380_disableUpperLimit(void)
 {
     unsigned short uReg;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL2, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
@@ -909,13 +909,13 @@ void SMB380_disableUpperLimit(void)
                      SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 void SMB380_enableLowerLimit(void)
 {
     unsigned short uReg;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL2, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
@@ -923,13 +923,13 @@ void SMB380_enableLowerLimit(void)
                      SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 void SMB380_disableLowerLimit(void)
 {
     unsigned short uReg;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL2, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
@@ -937,7 +937,7 @@ void SMB380_disableLowerLimit(void)
                      SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 /* @param gvaluefloat - value is in mg
@@ -960,7 +960,7 @@ uint8_t SMB380_setAnyMotionLimit(uint16_t mg, uint16_t gvalueint)
         return 0;
     }
 
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     /* 0,3g = 300 / 15,6mg = 19 */
     SMB380_ssp_write(SMB380_ANY_MOTION_THRES, threshold, SMB380_WRITE_REGISTER);
@@ -969,14 +969,14 @@ uint8_t SMB380_setAnyMotionLimit(uint16_t mg, uint16_t gvalueint)
     SMB380_ssp_write(SMB380_ANY_MOTION_DUR_HYST, 0, SMB380_READ_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
     return 1;
 }
 
 void SMB380_enableAnyMotionLimit(void)
 {
     unsigned short uReg;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL4, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
@@ -989,13 +989,13 @@ void SMB380_enableAnyMotionLimit(void)
                      SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 void SMB380_disableAnyMotionLimit(void)
 {
     unsigned short uReg;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL2, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
@@ -1010,13 +1010,13 @@ void SMB380_disableAnyMotionLimit(void)
                      SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 void SMB380_enableNewDataInt(void)
 {
     unsigned short uReg;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     /*
      * prevent deep sleep, reason: 400 µs wake-up time is to long for 3kHz
      * interrupts
@@ -1032,13 +1032,13 @@ void SMB380_enableNewDataInt(void)
     // measuring temperature dependent internal sample rate of SMB380
     tickStart = xtimer_now();
     tickCurrentSamples = 0;
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 void SMB380_disableNewDataInt(void)
 {
     unsigned short uReg;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL4, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
@@ -1051,13 +1051,13 @@ void SMB380_disableNewDataInt(void)
      * interrupts
      */
     CLRBIT(lpm_prevent_sleep, LPM_PREVENT_SLEEP_ACCSENSOR);
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 void SMB380_resetInterruptFlags(void)
 {
     unsigned short uReg;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL1, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
@@ -1065,13 +1065,13 @@ void SMB380_resetInterruptFlags(void)
                      SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 void SMB380_enableEEPROM(void)
 {
     unsigned short uReg;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL1, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
@@ -1079,13 +1079,13 @@ void SMB380_enableEEPROM(void)
                      SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 void SMB380_disableEEPROM(void)
 {
     unsigned short uReg;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL1, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
@@ -1093,7 +1093,7 @@ void SMB380_disableEEPROM(void)
                      SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 }
 
 /*
@@ -1107,7 +1107,7 @@ unsigned char SMB380_readOffset(uint16_t *offset)
     }
 
     unsigned short uReg;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
 
     SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_X, 0, SMB380_READ_REGISTER);
@@ -1136,7 +1136,7 @@ unsigned char SMB380_readOffset(uint16_t *offset)
     printf("Offset Z: %u \r\n", uReg);
 
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 
     return true;
 }
@@ -1144,7 +1144,7 @@ unsigned char SMB380_readOffset(uint16_t *offset)
 unsigned char SMB380_readOffsetTemp(uint16_t *offset)
 {
     unsigned short uReg;
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
 
     SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_T, 0, SMB380_READ_REGISTER);
@@ -1157,7 +1157,7 @@ unsigned char SMB380_readOffsetTemp(uint16_t *offset)
     printf("Offset T: %u ", uReg);
 
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 
     return true;
 }
@@ -1178,7 +1178,7 @@ void SMB380_writeOffset(uint16_t *offset, uint8_t EEPROM)
         }
 
         unsigned short uReg;
-        unsigned long cpsr = disableIRQ();
+        unsigned long cpsr = irq_disable();
         SMB380_Prepare();
 
         //x-Axis
@@ -1229,7 +1229,7 @@ void SMB380_writeOffset(uint16_t *offset, uint8_t EEPROM)
         xtimer_usleep(50000);
 
         SMB380_Unprepare();
-        restoreIRQ(cpsr);
+        irq_restore(cpsr);
 
     }
 }
@@ -1247,7 +1247,7 @@ void SMB380_writeOffsetTemp(uint16_t *offset, uint8_t EEPROM)
         }
 
         unsigned short uReg;
-        unsigned long cpsr = disableIRQ();
+        unsigned long cpsr = irq_disable();
         SMB380_Prepare();
 
         //T-Axis
@@ -1267,7 +1267,7 @@ void SMB380_writeOffsetTemp(uint16_t *offset, uint8_t EEPROM)
         xtimer_usleep(50000);
 
         SMB380_Unprepare();
-        restoreIRQ(cpsr);
+        irq_restore(cpsr);
     }
 }
 
@@ -1277,7 +1277,7 @@ unsigned char SMB380_readGain(uint16_t *gain)
         return false;
     }
 
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
 
     //x-gain
@@ -1291,7 +1291,7 @@ unsigned char SMB380_readGain(uint16_t *gain)
     gain[2] = (SMB380_ssp_read() & SMB380_OFFSET_GAIN_MASK);
 
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 
     return true;
 }
@@ -1302,7 +1302,7 @@ unsigned char SMB380_readGainTemp(uint16_t *gain)
         return false;
     }
 
-    unsigned long cpsr = disableIRQ();
+    unsigned long cpsr = irq_disable();
     SMB380_Prepare();
 
     //T-gain
@@ -1310,7 +1310,7 @@ unsigned char SMB380_readGainTemp(uint16_t *gain)
     gain[0] = (SMB380_ssp_read() & SMB380_OFFSET_GAIN_MASK);
 
     SMB380_Unprepare();
-    restoreIRQ(cpsr);
+    irq_restore(cpsr);
 
     return true;
 }

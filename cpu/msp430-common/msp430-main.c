@@ -110,10 +110,10 @@ static char *cur_break = (char *) &_end;
 
 void msp430_cpu_init(void)
 {
-    disableIRQ();
+    irq_disable();
     init_ports();
     //  lpm_init();
-    enableIRQ();
+    irq_enable();
 
     if ((uintptr_t)cur_break & 1) { /* Workaround for msp430-ld bug!*/
         cur_break++;

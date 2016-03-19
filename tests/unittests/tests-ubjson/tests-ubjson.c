@@ -71,7 +71,7 @@ static void *test_ubjson_receiver_trampoline(void *arg)
     mutex_unlock(&data->mutexes[0]);
     mutex_lock(&data->mutexes[1]);
 
-    disableIRQ();
+    irq_disable();
     sched_set_status(data->main_thread, STATUS_PENDING);
     return NULL;
 }

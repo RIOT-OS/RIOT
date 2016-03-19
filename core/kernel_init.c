@@ -87,7 +87,7 @@ static char idle_stack[THREAD_STACKSIZE_IDLE];
 
 void kernel_init(void)
 {
-    (void) disableIRQ();
+    (void) irq_disable();
 
     thread_create(idle_stack, sizeof(idle_stack),
             THREAD_PRIORITY_IDLE,

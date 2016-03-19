@@ -132,7 +132,7 @@ static void pic_register_handler(void)
 
 void x86_pic_set_enabled_irqs(uint16_t mask)
 {
-    unsigned old_status = disableIRQ();
+    unsigned old_status = irq_disable();
 
     mask |= PIC_MASK_SLAVE;
     mask &= ~PIC_MASK_FPU;
@@ -140,12 +140,12 @@ void x86_pic_set_enabled_irqs(uint16_t mask)
     io_wait();
     outb(PIC_SLAVE + PIC_IMR, ~(uint8_t) (mask >> 8));
 
-    restoreIRQ(old_status);
+    irq_restore(old_status);
 }
 
 void x86_pic_enable_irq(unsigned num)
 {
-    unsigned old_status = disableIRQ();
+    unsigned old_status = irq_disable();
 
     uint16_t port;
     if (num < 8) {
@@ -158,12 +158,12 @@ void x86_pic_enable_irq(unsigned num)
     uint8_t cur = inb(port + PIC_IMR);
     outb(port + PIC_IMR, cur & ~(1 << num));
 
-    restoreIRQ(old_status);
+    irq_restore(old_status);
 }
 
 void x86_pic_disable_irq(unsigned num)
 {
-    unsigned old_status = disableIRQ();
+    unsigned old_status = irq_disable();
 
     uint16_t port;
     if (num < 8) {
@@ -176,7 +176,7 @@ void x86_pic_disable_irq(unsigned num)
     uint8_t cur = inb(port + PIC_IMR);
     outb(port + PIC_IMR, cur | (1 << num));
 
-    restoreIRQ(old_status);
+    irq_restore(old_status);
 }
 
 void x86_init_pic(void)

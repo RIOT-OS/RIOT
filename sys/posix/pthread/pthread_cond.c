@@ -100,18 +100,18 @@ int pthread_cond_wait(struct pthread_cond_t *cond, struct mutex_t *mutex)
     n.next = NULL;
 
     /* the signaling thread may not hold the mutex, the queue is not thread safe */
-    unsigned old_state = disableIRQ();
+    unsigned old_state = irq_disable();
     priority_queue_add(&(cond->queue), &n);
-    restoreIRQ(old_state);
+    irq_restore(old_state);
 
     mutex_unlock_and_sleep(mutex);
 
     if (n.data != -1u) {
         /* on signaling n.data is set to -1u */
         /* if it isn't set, then the wakeup is either spurious or a timer wakeup */
-        old_state = disableIRQ();
+        old_state = irq_disable();
         priority_queue_remove(&(cond->queue), &n);
-        restoreIRQ(old_state);
+        irq_restore(old_state);
     }
 
     mutex_lock(mutex);
@@ -137,7 +137,7 @@ int pthread_cond_timedwait(struct pthread_cond_t *cond, struct mutex_t *mutex, c
 
 int pthread_cond_signal(struct pthread_cond_t *cond)
 {
-    unsigned old_state = disableIRQ();
+    unsigned old_state = irq_disable();
 
     priority_queue_node_t *head = priority_queue_remove_head(&(cond->queue));
     int other_prio = -1;
@@ -150,7 +150,7 @@ int pthread_cond_signal(struct pthread_cond_t *cond)
         head->data = -1u;
     }
 
-    restoreIRQ(old_state);
+    irq_restore(old_state);
 
     if (other_prio >= 0) {
         sched_switch(other_prio);
@@ -166,7 +166,7 @@ static int max_prio(int a, int b)
 
 int pthread_cond_broadcast(struct pthread_cond_t *cond)
 {
-    unsigned old_state = disableIRQ();
+    unsigned old_state = irq_disable();
 
     int other_prio = -1;
 
@@ -184,7 +184,7 @@ int pthread_cond_broadcast(struct pthread_cond_t *cond)
         head->data = -1u;
     }
 
-    restoreIRQ(old_state);
+    irq_restore(old_state);
 
     if (other_prio >= 0) {
         sched_switch(other_prio);

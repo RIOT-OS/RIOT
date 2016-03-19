@@ -153,11 +153,11 @@ int SerialPort::read(void)
 {
     int res = -1;
 
-    disableIRQ();
+    irq_disable();
     if (rx_buf.avail > 0) {
         res = ringbuffer_get_one(&rx_buf);
     }
-    enableIRQ();
+    irq_enable();
 
     return res;
 }

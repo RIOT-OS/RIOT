@@ -18,7 +18,7 @@ static inline unsigned __get_cpsr(void)
     return retval;
 }
 
-int inISR(void)
+int irq_is_in(void)
 {
     int retval;
     asm volatile(" mrs  %0, cpsr" : "=r"(retval) : /* no inputs */);
@@ -30,7 +30,7 @@ static inline void __set_cpsr(unsigned val)
     asm volatile(" msr  cpsr, %0" : /* no outputs */ : "r"(val));
 }
 
-unsigned disableIRQ(void)
+unsigned irq_disable(void)
 {
     unsigned _cpsr;
 
@@ -39,7 +39,7 @@ unsigned disableIRQ(void)
     return _cpsr;
 }
 
-unsigned restoreIRQ(unsigned oldCPSR)
+unsigned irq_restore(unsigned oldCPSR)
 {
     unsigned _cpsr;
 
@@ -56,7 +56,7 @@ unsigned IRQenabled(void)
     return (_cpsr & IRQ_MASK);
 }
 
-unsigned enableIRQ(void)
+unsigned irq_enable(void)
 {
     unsigned _cpsr;
 

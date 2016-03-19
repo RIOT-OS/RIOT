@@ -76,7 +76,7 @@ void pipe_init(pipe_t *pipe, ringbuffer_t *rb, void (*free)(void *));
  * @details      Only one thread may access the pipe readingly at once.
  *               If the pipe is empty, then the current thread is send sleeping.
  *               It gets woken up once there is data ready in the pipe.
- *               In an ISR (inISR()) 0 will returned if the pipe is empty.
+ *               In an ISR (irq_is_in()) 0 will returned if the pipe is empty.
  * @param[in]    pipe   Pipe to read from.
  * @param[out]   buf    Buffer to write into
  * @param        n      Size of buffer.
@@ -90,7 +90,7 @@ ssize_t pipe_read(pipe_t *pipe, void *buf, size_t n);
  * @details      Only one thread may access the pipe writingly at once.
  *               If the pipe is full, then the current thread is send sleeping.
  *               It gets woken up once there is room again in the pipe.
- *               In an ISR (inISR()) 0 will returned if the pipe is full.
+ *               In an ISR (irq_is_in()) 0 will returned if the pipe is full.
  * @param[in]    pipe   Pipe to write to.
  * @param[out]   buf    Buffer to read from.
  * @param        n      Size of buffer.

@@ -70,7 +70,7 @@ static inline void __attribute__((always_inline)) __enable_irq(void)
 /**
  * @brief   The current ISR state (inside or not)
  */
-extern volatile int __inISR;
+extern volatile int __irq_is_in;
 
 /**
  * @brief   Memory used as stack for the interrupt context
@@ -127,7 +127,7 @@ static inline void __attribute__((always_inline)) __enter_isr(void)
 {
     __save_context();
     __asm__("mov.w %0,r1" : : "i"(__isr_stack + MSP430_ISR_STACK_SIZE));
-    __inISR = 1;
+    __irq_is_in = 1;
 }
 
 /**
@@ -135,7 +135,7 @@ static inline void __attribute__((always_inline)) __enter_isr(void)
  */
 static inline void __attribute__((always_inline)) __exit_isr(void)
 {
-    __inISR = 0;
+    __irq_is_in = 0;
 
     if (sched_context_switch_request) {
         sched_run();

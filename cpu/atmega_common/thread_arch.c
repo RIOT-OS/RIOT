@@ -212,7 +212,7 @@ void thread_arch_start_threading(void)
 void NORETURN __enter_thread_mode(void) __attribute__((naked));
 void NORETURN __enter_thread_mode(void)
 {
-    enableIRQ();
+    irq_enable();
     __context_restore();
     asm volatile("ret");
 
@@ -224,9 +224,9 @@ void thread_arch_yield(void)
 {
     __context_save();
 
-    /* disableIRQ(); */ /* gets already disabled during __context_save() */
+    /* irq_disable(); */ /* gets already disabled during __context_save() */
     sched_run();
-    enableIRQ();
+    irq_enable();
 
     __context_restore();
     asm volatile("ret");

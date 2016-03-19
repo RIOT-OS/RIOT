@@ -31,15 +31,15 @@
 
 int atomic_cas(atomic_int_t *var, int old, int now)
 {
-    unsigned int mask = disableIRQ();
+    unsigned int mask = irq_disable();
 
     if (ATOMIC_VALUE(*var) != old) {
-        restoreIRQ(mask);
+        irq_restore(mask);
         return 0;
     }
 
     ATOMIC_VALUE(*var) = now;
-    restoreIRQ(mask);
+    irq_restore(mask);
     return 1;
 }
 

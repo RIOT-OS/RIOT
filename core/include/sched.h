@@ -125,7 +125,7 @@ void sched_set_status(thread_t *process, unsigned int status);
  * @details     Either yield if other_prio is higher than the current priority,
  *              or if the current thread is not on the runqueue.
  *
- *              Depending on whether the current execution is in an ISR (inISR()),
+ *              Depending on whether the current execution is in an ISR (irq_is_in()),
  *              thread_yield_higher() is called or @ref sched_context_switch_request is set,
  *              respectively.
  *

@@ -175,7 +175,7 @@ static void _gpio_configure(gpio_t pin, unsigned rising, unsigned falling)
     /* configure irq */
     unsigned int bit = 0x1 << _pin;
 
-    unsigned state = disableIRQ();
+    unsigned state = irq_disable();
 
     *en_clr |= bit;                                         /* clear interrupt */
 
@@ -193,7 +193,7 @@ static void _gpio_configure(gpio_t pin, unsigned rising, unsigned falling)
         *en_r &= ~bit;                                      /* disable rising edge */
     }
 
-    restoreIRQ(state);
+    irq_restore(state);
 }
 
 void gpio_irq_enable(gpio_t pin)

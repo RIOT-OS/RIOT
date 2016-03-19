@@ -95,7 +95,7 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
         xtimer_set(timer, (uint32_t) offset);
     }
     else {
-        int state = disableIRQ();
+        int state = irq_disable();
         if (_is_set(timer)) {
             _remove(timer);
         }
@@ -108,7 +108,7 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
         }
 
         _add_timer_to_long_list(&long_list_head, timer);
-        restoreIRQ(state);
+        irq_restore(state);
         DEBUG("xtimer_set64(): added longterm timer (long_target=%" PRIu32 " target=%" PRIu32 ")\n",
                 timer->long_target, timer->target);
     }
@@ -176,7 +176,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
         return 0;
     }
 
-    unsigned state = disableIRQ();
+    unsigned state = irq_disable();
     if (_is_set(timer)) {
         _remove(timer);
     }
@@ -207,7 +207,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
         }
     }
 
-    restoreIRQ(state);
+    irq_restore(state);
 
     return res;
 }
@@ -272,11 +272,11 @@ static void _remove(xtimer_t *timer)
 
 void xtimer_remove(xtimer_t *timer)
 {
-    int state = disableIRQ();
+    int state = irq_disable();
     if (_is_set(timer)) {
         _remove(timer);
     }
-    restoreIRQ(state);
+    irq_restore(state);
 }
 
 static uint32_t _time_left(uint32_t target, uint32_t reference)

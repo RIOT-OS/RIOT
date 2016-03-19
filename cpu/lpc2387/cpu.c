@@ -87,7 +87,7 @@ bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority)
 
 __attribute__((naked,noreturn)) void arm_reset(void)
 {
-    disableIRQ();
+    irq_disable();
     WDTC = 0x0FFFF;
     WDMOD = 0x03;
     WDFEED= 0xAA;
