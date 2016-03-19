@@ -142,12 +142,23 @@ extern "C"
  */
 static const adc_conf_t adc_config[] = {
     /* dev, pin, channel */
-    { ADC0, GPIO_UNDEF, 26 },       /* internal: temperature sensor */
-    { ADC0, GPIO_UNDEF, 27 },       /* internal: band gap */
-    { ADC0, GPIO_UNDEF, 29 },       /* internal: V_REFSH */
-    { ADC0, GPIO_UNDEF, 30 },       /* internal: V_REFSL */
-    { ADC1, GPIO_UNDEF,  0 },       /* connected to  Mulle Vbat/2 on PGA1_DP */
-    { ADC1, GPIO_UNDEF, 19 },       /* connected to Mulle Vchr/2 on PGA1_DM  */
+    [ 0] = { ADC1, GPIO_UNDEF, 26 },       /* internal: temperature sensor */
+    [ 1] = { ADC1, GPIO_UNDEF, 27 },       /* internal: band gap */
+    [ 2] = { ADC1, GPIO_UNDEF, 29 },       /* internal: V_REFSH */
+    [ 3] = { ADC1, GPIO_UNDEF, 30 },       /* internal: V_REFSL */
+    [ 4] = { ADC1, GPIO_UNDEF, 23 },       /* internal: DAC0 module output level */
+    [ 5] = { ADC1, GPIO_UNDEF, 18 },       /* internal: VREF module output level */
+    [ 6] = { ADC1, GPIO_UNDEF,  0 },       /* on board connection to Mulle Vbat/2 on PGA1_DP pin */
+    [ 7] = { ADC1, GPIO_UNDEF, 19 },       /* on board connection to Mulle Vchr/2 on PGA1_DM pin */
+    [ 8] = { ADC0, GPIO_UNDEF,  0 },       /* expansion port PGA0_DP pin */
+    [ 9] = { ADC0, GPIO_UNDEF, 19 },       /* expansion port PGA0_DM pin */
+    [10] = { ADC0, GPIO_PIN(PORT_A, 17), 17 }, /* expansion port PTA17 */
+    [11] = { ADC1, GPIO_PIN(PORT_B,  0),  8 }, /* expansion port PTB0  */
+    [12] = { ADC0, GPIO_PIN(PORT_C,  0), 14 }, /* expansion port PTC0  */
+    [13] = { ADC1, GPIO_PIN(PORT_C,  8),  4 }, /* expansion port PTC8  */
+    [14] = { ADC1, GPIO_PIN(PORT_C,  9),  5 }, /* expansion port PTC9  */
+    [15] = { ADC1, GPIO_PIN(PORT_C, 10),  6 }, /* expansion port PTC10 */
+    [16] = { ADC1, GPIO_PIN(PORT_C, 11),  7 }, /* expansion port PTC11 */
 };
 
 #define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
