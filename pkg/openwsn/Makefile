@@ -3,10 +3,6 @@ PKG_URL=https://github.com/openwsn-berkeley/openwsn-fw.git
 PKG_VERSION=ff25e5d0ae5d344ed793a724d60532fb917bf1f8
 PKG_DIR=$(CURDIR)/$(PKG_NAME)
 
-ifneq ($(RIOTBOARD),)
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
-endif
-
 .PHONY: all clean patch reset
 
 all: patch
