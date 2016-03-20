@@ -16,12 +16,7 @@ $(PKG_DIR)/Makefile: $(PKG_DIR)/.git/config
 	@
 
 $(PKG_DIR)/.git/config:
-	test -d "$(PKG_DIR)" || git clone "$(PKG_URL)" "$(PKG_DIR)"; \
-		cd "$(PKG_DIR)" && git checkout -f "$(PKG_VERSION)"
-
-$(CURDIR)/$(PKG_NAME) $(PKG_NAME):
-	# Get PKG_VERSION of package from PKG_URL
-	git clone '$(PKG_URL)' '$(PKG_NAME)' && cd '$(PKG_NAME)' && git reset --hard '$(PKG_VERSION)'
+	test -d "$(PKG_DIR)" || $(GITCACHE) clone "$(PKG_URL)" "$(PKG_VERSION)" "$(PKG_DIR)"
 
 clean::
 	@echo "Cleaning up $(PKG_NAME) package..."
