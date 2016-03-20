@@ -71,17 +71,14 @@ int gnrc_udp_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr);
  *
  * @param[in] payload       Payload contained in the UDP packet
  * @param[in] src           Source port in host byte order
- * @param[in] src_len       Length of @p src, must be 2
  * @param[in] dst           Destination port in host byte order
- * @param[in] dst_len       Length of @p dst, must be 2
  *
  * @return  pointer to the newly created (and allocated) header
  * @return  NULL on `src == NULL`, `dst == NULL`, `src_len != 2`, `dst_len != 2`
  *          or on allocation error
  */
-gnrc_pktsnip_t *gnrc_udp_hdr_build(gnrc_pktsnip_t *payload,
-                                   uint8_t *src, size_t src_len,
-                                   uint8_t *dst, size_t dst_len);
+gnrc_pktsnip_t *gnrc_udp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src,
+                                   uint16_t dst);
 
 /**
  * @brief   Initialize and start UDP

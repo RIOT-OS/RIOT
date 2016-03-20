@@ -230,8 +230,7 @@ static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
 
     zep = new_pkt->data;
 
-    hdr = gnrc_udp_hdr_build(new_pkt, (uint8_t *)(&(dev->src_port)), sizeof(uint16_t),
-                             (uint8_t *)(&(dev->dst_port)), sizeof(uint16_t));
+    hdr = gnrc_udp_hdr_build(new_pkt, dev->src_port, dev->dst_port);
 
     if (hdr == NULL) {
         DEBUG("zep: could not allocate UDP header in pktbuf\n");

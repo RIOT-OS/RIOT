@@ -148,12 +148,20 @@ gnrc_pktsnip_t *gnrc_netreg_hdr_build(gnrc_nettype_t type, gnrc_pktsnip_t *paylo
 #ifdef MODULE_GNRC_TCP
 
         case GNRC_NETTYPE_TCP:
-            return gnrc_tcp_hdr_build(payload, src, src_len, dst, dst_len);
+            {
+            uint16_t src_port = *((uint16_t *)src);
+            uint16_t dst_port = *((uint16_t *)dst);
+            return gnrc_tcp_hdr_build(payload, src_port, dst_port);
+            }
 #endif
 #ifdef MODULE_GNRC_UDP
 
         case GNRC_NETTYPE_UDP:
-            return gnrc_udp_hdr_build(payload, src, src_len, dst, dst_len);
+            {
+            uint16_t src_port = *((uint16_t *)src);
+            uint16_t dst_port = *((uint16_t *)dst);
+            return gnrc_udp_hdr_build(payload, src_port, dst_port);
+            }
 #endif
 
         default:
