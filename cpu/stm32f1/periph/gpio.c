@@ -36,6 +36,12 @@
 #define GPIO_ISR_CHAN_NUMOF             (16U)
 
 /**
+ * @brief   Extract information from mode parameter
+ */
+#define MODE_MASK                       (0x0f)
+#define ODR_POS                         (4U)
+
+/**
  * @brief   Allocate memory for one callback and argument per EXTI channel
  */
 static gpio_isr_ctx_t exti_ctx[GPIO_ISR_CHAN_NUMOF];
@@ -83,12 +89,10 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
     /* set pin mode */
     port->CR[pin_num >> 3] &= ~(0xf << ((pin_num & 0x7) * 4));
-    port->CR[pin_num >> 3] |=  (mode << ((pin_num & 0x7) * 4));
+    port->CR[pin_num >> 3] |=  ((mode & MODE_MASK) << ((pin_num & 0x7) * 4));
     /* set initial state of output register */
     port->BRR = (1 << pin_num);
-    if (mode == GPIO_IN_PU) {
-        port->BSRR = (1 << pin_num);
-    }
+    port->BSRR = ((mode >> ODR_POS) << pin_num);
 
     return 0; /* all OK */
 }
