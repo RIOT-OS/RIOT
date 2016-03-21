@@ -159,6 +159,10 @@ endif
 
 export TOOLCHAIN
 
+# default toolchain prefix, defaults to target triple followed by a dash, you
+# will most likely not need to touch this.
+export PREFIX ?= $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
+
 # Import all toolchain settings
 include $(RIOTCPU)/Makefile.include.$(TOOLCHAIN)
 
