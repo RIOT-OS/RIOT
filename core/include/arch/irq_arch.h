@@ -47,12 +47,18 @@
 /**
  * @brief Globally enable maskable interrupt sources
  *
+ * @note  This function must behave exactly the same if called from an ISR or
+ *        not.
+ *
  * @return              the IRQ state after enabling interrupts
  */
 unsigned int irq_arch_enable(void);
 
 /**
  * @brief Globally disable all maskable interrupt sources
+ *
+ * @note  This function must behave exactly the same if called from an ISR or
+ *        not.
  *
  * @return              the IRQ state before disabling interrupts
  */
@@ -61,6 +67,9 @@ unsigned int irq_arch_disable(void);
 
 /**
  * @brief Restore a previously recorded IRQ state
+ *
+ * @note  This function must behave exactly the same if called from an ISR or
+ *        not.
  *
  * @param[in] state     the state to set the IRQ flags to
  */
