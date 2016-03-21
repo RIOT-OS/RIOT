@@ -32,8 +32,8 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define HDR_NETTYPE (GNRC_NETTYPE_UNDEF)
 #endif
 
-gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload, ipv6_addr_t *src,
-                                    ipv6_addr_t *dst)
+gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload, const ipv6_addr_t *src,
+                                    const ipv6_addr_t *dst)
 {
     gnrc_pktsnip_t *ipv6;
     ipv6_hdr_t *hdr;
