@@ -143,7 +143,7 @@ gnrc_pktsnip_t *gnrc_netreg_hdr_build(gnrc_nettype_t type, gnrc_pktsnip_t *paylo
 #ifdef MODULE_GNRC_IPV6
 
         case GNRC_NETTYPE_IPV6:
-            return gnrc_ipv6_hdr_build(payload, src, src_len, dst, dst_len);
+            return gnrc_ipv6_hdr_build(payload, src, dst);
 #endif
 #ifdef MODULE_GNRC_TCP
 

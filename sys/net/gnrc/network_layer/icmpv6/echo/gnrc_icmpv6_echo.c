@@ -84,13 +84,11 @@ void gnrc_icmpv6_echo_req_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6_hdr,
     }
 
     if (ipv6_addr_is_multicast(&ipv6_hdr->dst)) {
-        hdr = gnrc_ipv6_hdr_build(pkt, NULL, 0, (uint8_t *)&ipv6_hdr->src,
-                                  sizeof(ipv6_addr_t));
+        hdr = gnrc_ipv6_hdr_build(pkt, NULL, (uint8_t *)&ipv6_hdr->src);
     }
     else {
         hdr = gnrc_ipv6_hdr_build(pkt, (uint8_t *)&ipv6_hdr->dst,
-                                  sizeof(ipv6_addr_t), (uint8_t *)&ipv6_hdr->src,
-                                  sizeof(ipv6_addr_t));
+                                  (uint8_t *)&ipv6_hdr->src);
     }
 
     if (hdr == NULL) {

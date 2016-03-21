@@ -971,7 +971,7 @@ tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len)
     }
 
     /* allocate IPv6 header */
-    ip = gnrc_ipv6_hdr_build(udp, NULL, 0, ctxt->peer.u8, sizeof(ipv6_addr_t));
+    ip = gnrc_ipv6_hdr_build(udp, NULL, ctxt->peer.u8);
     if (ip == NULL) {
         DEBUG("tftp: error unable to allocate IPv6 header");
         gnrc_pktbuf_release(udp);

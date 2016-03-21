@@ -65,7 +65,7 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
             return;
         }
         /* allocate IPv6 header */
-        ip = gnrc_ipv6_hdr_build(udp, NULL, 0, (uint8_t *)&addr, sizeof(addr));
+        ip = gnrc_ipv6_hdr_build(udp, NULL, (uint8_t *)&addr);
         if (ip == NULL) {
             puts("Error: unable to allocate IPv6 header");
             gnrc_pktbuf_release(udp);

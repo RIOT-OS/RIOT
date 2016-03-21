@@ -241,8 +241,7 @@ static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
 
     new_pkt = hdr;
 
-    hdr = gnrc_ipv6_hdr_build(new_pkt, NULL, 0, (uint8_t *) &(dev->dst),
-                              sizeof(ipv6_addr_t));
+    hdr = gnrc_ipv6_hdr_build(new_pkt, NULL, (uint8_t *) &(dev->dst));
 
     if (hdr == NULL) {
         DEBUG("zep: could not allocate IPv6 header in pktbuf\n");
