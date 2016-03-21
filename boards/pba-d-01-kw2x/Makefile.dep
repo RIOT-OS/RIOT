@@ -10,4 +10,5 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += hdc1000
   USEMODULE += mag3110
   USEMODULE += tcs37727
+  USEMODULE += tmp006
 endif
