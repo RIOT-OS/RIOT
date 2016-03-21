@@ -43,8 +43,8 @@ extern "C" {
  * @return  The an IPv6 header in packet buffer on success.
  * @return  NULL on error.
  */
-gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload, uint8_t *src,
-                                    uint8_t *dst);
+gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload, ipv6_addr_t *src,
+                                    ipv6_addr_t *dst);
 
 #ifdef __cplusplus
 }

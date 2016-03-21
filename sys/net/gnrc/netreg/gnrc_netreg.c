@@ -146,7 +146,7 @@ gnrc_pktsnip_t *gnrc_netreg_hdr_build(gnrc_nettype_t type, gnrc_pktsnip_t *paylo
         case GNRC_NETTYPE_IPV6:
             assert(src_len == sizeof(ipv6_addr_t));
             assert(dst_len == sizeof(ipv6_addr_t));
-            return gnrc_ipv6_hdr_build(payload, src, dst);
+            return gnrc_ipv6_hdr_build(payload, (ipv6_addr_t*) src, (ipv6_addr_t*) dst);
 #endif
 #ifdef MODULE_GNRC_TCP
 

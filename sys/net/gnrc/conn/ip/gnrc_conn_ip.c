@@ -99,7 +99,7 @@ int conn_ip_sendto(const void *data, size_t len, const void *src, size_t src_len
                 return -EINVAL;
             }
             /* addr will only be copied */
-            hdr = gnrc_ipv6_hdr_build(pkt, (uint8_t *)src, (uint8_t *)dst);
+            hdr = gnrc_ipv6_hdr_build(pkt, src, dst);
             if (hdr == NULL) {
                 gnrc_pktbuf_release(pkt);
                 return -ENOMEM;

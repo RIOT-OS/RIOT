@@ -254,7 +254,7 @@ int _icmpv6_ping(int argc, char **argv)
 
         _set_payload(pkt->data, payload_len);
 
-        pkt = gnrc_ipv6_hdr_build(pkt, NULL, addr.u8);
+        pkt = gnrc_ipv6_hdr_build(pkt, NULL, &addr);
 
         if (pkt == NULL) {
             puts("error: packet buffer full");

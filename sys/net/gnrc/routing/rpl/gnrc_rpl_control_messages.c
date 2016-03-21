@@ -77,7 +77,7 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ip
         dst = (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes;
     }
 
-    hdr = gnrc_ipv6_hdr_build(pkt, (uint8_t *)src, (uint8_t *)dst);
+    hdr = gnrc_ipv6_hdr_build(pkt, src, dst);
 
     if (hdr == NULL) {
         DEBUG("RPL: Send - no space left in packet buffer\n");
