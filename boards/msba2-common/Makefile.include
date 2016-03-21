@@ -1,19 +1,6 @@
 ## the cpu to build for
 export CPU = lpc2387
 
-# Target triple for the build. Use arm-none-eabi if you are unsure.
-export TARGET_ARCH ?= arm-none-eabi
-
-# toolchain config
-export PREFIX = $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
-
-export CC = $(PREFIX)gcc
-export CXX = $(PREFIX)g++
-export AR = $(PREFIX)ar
-export AS = $(PREFIX)as
-export LINK = $(PREFIX)gcc
-export SIZE = $(PREFIX)size
-export OBJCOPY = $(PREFIX)objcopy
 FLASHER = lpc2k_pgm
 TERMPROG ?= $(RIOTBASE)/dist/tools/pyterm/pyterm
 
