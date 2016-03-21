@@ -122,6 +122,15 @@ typedef struct {
 } tmp006_t;
 
 /**
+ * @brief Data structure holding the full set of configuration parameters
+ */
+typedef struct {
+    i2c_t i2c;              /**< I2C bus the device is connected to */
+    uint8_t addr;           /**< address on that bus */
+    uint8_t ratio;          /**< measurement ratio to use */
+} tmp006_params_t;
+
+/**
  * @brief TMP006 sensor test.
  * This function looks for Device ID of the TMP006 sensor.
  *
