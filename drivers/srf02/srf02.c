@@ -73,6 +73,7 @@ int srf02_init(srf02_t *dev, i2c_t i2c, uint8_t addr)
     /* try to read the software revision (read the CMD reg) from the device */
     i2c_read_reg(i2c, dev->addr, REG_CMD, &rev);
     if (rev == 0 || rev == 255) {
+        i2c_release(dev->i2c);
         DEBUG("[srf02] error reading the devices software revision\n");
         return -1;
     } else {
