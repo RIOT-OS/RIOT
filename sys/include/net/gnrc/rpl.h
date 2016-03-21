@@ -27,7 +27,7 @@
  * CFLAGS
  * ------
  *
- *  - Exclude Prefix Information Options from DIOs
+ * - Exclude Prefix Information Options from DIOs
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  *   CFLAGS += -DGNRC_RPL_WITHOUT_PIO
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -37,6 +37,16 @@
  *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS=20
  *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_INTERVAL_MIN=3
  *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT=10
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * - Make reception of DODAG_CONF optional when joining a DODAG.
+ *   This will use the default trickle parameters until a
+ *   DODAG_CONF is received from the parent. The DODAG_CONF is
+ *   requested once from the parent while joining the DODAG.
+ *   The standard behaviour is to request a DODAG_CONF and join
+ *   only a DODAG once a DODAG_CONF is received.
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ *   CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @{
