@@ -26,7 +26,7 @@ $(PKG_BUILDDIR)/Makefile: $(PKG_BUILDDIR)
 
 $(PKG_BUILDDIR):
 	mkdir -p $(BINDIR)/pkg && \
-	git clone $(PKG_URL) $@ && \
+	git clone $(GIT_REFERENCE) $(PKG_URL) $@ && \
 		cd $@ && git reset --hard $(PKG_VERSION)
 
 clean::

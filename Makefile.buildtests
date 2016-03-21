@@ -51,6 +51,7 @@ buildtest:
 	        BOARD=$${BOARD} \
 	        CCACHE=$${_CCACHE} \
 	        $${CCACHE_DIR:+CCACHE_DIR=$${CCACHE_DIR}} \
+	        $${GIT_REFERENCE:+GIT_REFERENCE="$${GIT_REFERENCE}"} \
 	        CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
 	        RIOTBASE=$${RIOTBASE} \
 	        RIOTBOARD=$${RIOTBOARD} \
