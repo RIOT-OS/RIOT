@@ -65,6 +65,15 @@ typedef struct {
 } tcs37727_t;
 
 /**
+ * @brief Data structure holding the full set of configuration parameters
+ */
+typedef struct {
+    i2c_t i2c;              /**< I2C bus the device is connected to */
+    uint8_t addr;           /**< address on that bus */
+    int atime;              /**< RGBC integration time */
+} tcs37727_params_t;
+
+/**
  * @brief Initialise the TCS37727 sensor driver.
  * Settings: Gain 4x, Proximity Detection off
  *
