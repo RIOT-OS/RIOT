@@ -54,6 +54,7 @@ ifneq (,$(filter encx24j600,$(USEMODULE)))
 endif
 ifneq (,$(filter tcs37727,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/tcs37727/include
+    export UNDEF += $(BINDIR)tcs37727/tcs37727_saul.o
 endif
 ifneq (,$(filter enc28j60,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/enc28j60/include
