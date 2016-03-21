@@ -92,14 +92,6 @@ typedef struct {
 
 static gpio_state_t gpio_config[NUM_OF_PORT][NUM_OF_PINS];
 
-static inline uint16_t _port_addr(gpio_t pin)
-{
-    const uint8_t port_num = _port_num(pin);
-    const uint32_t port_addr = _port_base[port_num];
-
-    return port_addr;
-}
-
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     const uint8_t port_num = _port_num(pin);
