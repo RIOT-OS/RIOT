@@ -68,3 +68,6 @@ endif
 ifneq (,$(filter hdc1000,$(USEMODULE)))
     export UNDEF += $(BINDIR)hdc1000/hdc1000_saul.o
 endif
+ifneq (,$(filter tmp006,$(USEMODULE)))
+    export UNDEF += $(BINDIR)tmp006/tmp006_saul.o
+endif
