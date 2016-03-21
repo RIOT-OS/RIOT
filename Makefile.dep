@@ -290,6 +290,10 @@ ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   USEMODULE += od
 endif
 
+ifneq (,$(filter newlib_nano,$(USEMODULE)))
+  USEMODULE += newlib
+endif
+
 ifneq (,$(filter newlib,$(USEMODULE)))
   # allow custom newlib syscalls implementations by adding
   # newlib_syscalls_XXX to USEMODULE
