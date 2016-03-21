@@ -15,9 +15,7 @@ $(PKG_DIR)/Makefile: $(PKG_TEMP_DIR)/.git/config
 	echo 'include $$(RIOTBASE)/Makefile.base' > $(PKG_DIR)/Makefile
 
 $(PKG_TEMP_DIR)/.git/config:
-	test -d "$(PKG_TEMP_DIR)" || git clone "$(PKG_URL)" "$(PKG_TEMP_DIR)"; \
-		cd "$(PKG_TEMP_DIR)" && git checkout -f "$(PKG_VERSION)"; \
-		cd "$(PKG_TEMP_DIR)" && git am --ignore-whitespace "$(CURDIR)"/*.patch; \
+	test -d "$(PKG_TEMP_DIR)" || $(GITCACHE) clone "$(PKG_URL)" "$(PKG_VERSION)" "$(PKG_TEMP_DIR)" ; \
 		mkdir -p "$(PKG_DIR)" ; \
 		cp $(PKG_TEMP_DIR)/core/*.c $(PKG_TEMP_DIR)/core/*.h $(PKG_DIR); \
 		cp $(PKG_TEMP_DIR)/core/er-coap-13/*.c $(PKG_TEMP_DIR)/core/er-coap-13/*.h $(PKG_DIR); \
