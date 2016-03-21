@@ -136,49 +136,4 @@ int gnrc_netreg_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr)
     }
 }
 
-gnrc_pktsnip_t *gnrc_netreg_hdr_build(gnrc_nettype_t type, gnrc_pktsnip_t *payload,
-                                      uint8_t *src, uint8_t src_len,
-                                      uint8_t *dst, uint8_t dst_len)
-{
-    switch (type) {
-#ifdef MODULE_GNRC_IPV6
-
-        case GNRC_NETTYPE_IPV6:
-            assert(src_len == sizeof(ipv6_addr_t));
-            assert(dst_len == sizeof(ipv6_addr_t));
-            return gnrc_ipv6_hdr_build(payload, (ipv6_addr_t*) src, (ipv6_addr_t*) dst);
-#endif
-#ifdef MODULE_GNRC_TCP
-
-        case GNRC_NETTYPE_TCP:
-            {
-            assert(src_len == sizeof(uint16_t));
-            assert(dst_len == sizeof(uint16_t));
-            uint16_t src_port = *((uint16_t *)src);
-            uint16_t dst_port = *((uint16_t *)dst);
-            return gnrc_tcp_hdr_build(payload, src_port, dst_port);
-            }
-#endif
-#ifdef MODULE_GNRC_UDP
-
-        case GNRC_NETTYPE_UDP:
-            {
-            assert(src_len == sizeof(uint16_t));
-            assert(dst_len == sizeof(uint16_t));
-            uint16_t src_port = *((uint16_t *)src);
-            uint16_t dst_port = *((uint16_t *)dst);
-            return gnrc_udp_hdr_build(payload, src_port, dst_port);
-            }
-#endif
-
-        default:
-            (void)payload;
-            (void)src;
-            (void)src_len;
-            (void)dst;
-            (void)dst_len;
-            return NULL;
-    }
-}
-
 /** @} */
