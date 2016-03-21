@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include "assert.h"
 #include "clist.h"
 #include "utlist.h"
 #include "net/gnrc/netreg.h"
@@ -143,12 +144,16 @@ gnrc_pktsnip_t *gnrc_netreg_hdr_build(gnrc_nettype_t type, gnrc_pktsnip_t *paylo
 #ifdef MODULE_GNRC_IPV6
 
         case GNRC_NETTYPE_IPV6:
+            assert(src_len == sizeof(ipv6_addr_t));
+            assert(dst_len == sizeof(ipv6_addr_t));
             return gnrc_ipv6_hdr_build(payload, src, dst);
 #endif
 #ifdef MODULE_GNRC_TCP
 
         case GNRC_NETTYPE_TCP:
             {
+            assert(src_len == sizeof(uint16_t));
+            assert(dst_len == sizeof(uint16_t));
             uint16_t src_port = *((uint16_t *)src);
             uint16_t dst_port = *((uint16_t *)dst);
             return gnrc_tcp_hdr_build(payload, src_port, dst_port);
@@ -158,6 +163,8 @@ gnrc_pktsnip_t *gnrc_netreg_hdr_build(gnrc_nettype_t type, gnrc_pktsnip_t *paylo
 
         case GNRC_NETTYPE_UDP:
             {
+            assert(src_len == sizeof(uint16_t));
+            assert(dst_len == sizeof(uint16_t));
             uint16_t src_port = *((uint16_t *)src);
             uint16_t dst_port = *((uint16_t *)dst);
             return gnrc_udp_hdr_build(payload, src_port, dst_port);
