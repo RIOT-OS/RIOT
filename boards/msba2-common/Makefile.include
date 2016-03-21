@@ -29,10 +29,7 @@ export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nos
 export LINKFLAGS += -Wl,--gc-sections
 
 # use the nano-specs of Newlib when available
-ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
-export CFLAGS += -specs=nano.specs
-export LINKFLAGS += -specs=nano.specs -lc -lnosys
-endif
+USEMODULE += newlib_nano
 
 ifeq ($(PORT),)
 	export PORT = /dev/ttyUSB0

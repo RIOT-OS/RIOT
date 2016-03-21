@@ -1,5 +1,18 @@
 UNDEF := $(BINDIR)newlib_syscalls_default/syscalls.o $(UNDEF)
 
+ifneq (,$(filter newlib_nano,$(USEMODULE)))
+  # Test if nano.specs is available
+  ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+    USE_NEWLIB_NANO = 1
+  endif
+endif
+
+ifeq (1,$(USE_NEWLIB_NANO))
+  export LINKFLAGS += -specs=nano.specs
+endif
+
+export LINKFLAGS += -lc -lnosys
+
 # Search for Newlib include directories
 
 # Since Clang is not installed as a separate instance for each crossdev target
@@ -25,15 +38,21 @@ NEWLIB_INCLUDE_PATTERNS ?= \
 # the patterns above. We use the -isystem gcc/clang argument to add the include
 # directories as system include directories, which means they will not be
 # searched until after all the project specific include directories (-I/path)
-NEWLIB_INCLUDES ?= \
-    $(foreach dir, \
-        $(foreach pat, $(NEWLIB_INCLUDE_PATTERNS), $(wildcard $(pat))), \
-        -isystem $(dir))
+NEWLIB_INCLUDE_DIR ?= $(firstword $(wildcard $(NEWLIB_INCLUDE_PATTERNS)))
 
 # If nothing was found we will try to fall back to searching for a cross-gcc in
 # the current PATH and use a relative path for the includes
-ifeq (,$(NEWLIB_INCLUDES))
-  NEWLIB_INCLUDES := $(addprefix -isystem ,$(wildcard $(dir $(shell which $(PREFIX)gcc))../$(TARGET_ARCH)/include))
+ifeq (,$(NEWLIB_INCLUDE_DIR))
+  NEWLIB_INCLUDE_DIR := $(abspath $(wildcard $(dir $(shell which $(PREFIX)gcc))../$(TARGET_ARCH)/include))
+endif
+
+NEWLIB_INCLUDES := -isystem $(NEWLIB_INCLUDE_DIR)
+
+ifeq (1,$(USE_NEWLIB_NANO))
+  NEWLIB_NANO_INCLUDE_DIR ?= $(NEWLIB_INCLUDE_DIR)/nano
+  # newlib-nano overrides newlib.h and its include dir should therefore go before
+  # the regular newlib include dir.
+  NEWLIB_INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(NEWLIB_INCLUDES)
 endif
 
 # Newlib includes should go before GCC includes.
