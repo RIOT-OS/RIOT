@@ -69,6 +69,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "net/gnrc.h"
+#include "net/gnrc/ipv6.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/rpl/structs.h"
@@ -93,7 +94,7 @@ extern "C" {
  * @brief   Default priority for the RPL thread
  */
 #ifndef GNRC_RPL_PRIO
-#define GNRC_RPL_PRIO           (THREAD_PRIORITY_MAIN - 4)
+#define GNRC_RPL_PRIO           (GNRC_IPV6_PRIO + 1)
 #endif
 
 /**
