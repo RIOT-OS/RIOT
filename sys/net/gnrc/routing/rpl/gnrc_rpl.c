@@ -84,7 +84,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
 
     gnrc_rpl_dodag_t *dodag = NULL;
     gnrc_rpl_instance_t *inst = gnrc_rpl_root_instance_init(instance_id, dodag_id,
-                                                         GNRC_RPL_DEFAULT_MOP);
+                                                            GNRC_RPL_DEFAULT_MOP);
 
     if (!inst) {
         return NULL;

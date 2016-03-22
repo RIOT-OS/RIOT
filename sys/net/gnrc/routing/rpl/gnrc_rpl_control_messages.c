@@ -140,13 +140,13 @@ gnrc_pktsnip_t *_dio_prefix_info_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *do
     prefix_info->length = GNRC_RPL_OPT_PREFIX_INFO_LEN;
     /* auto-address configuration */
     prefix_info->LAR_flags = GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT;
-    prefix_info->valid_lifetime = dodag->addr_valid;
-    prefix_info->pref_lifetime = dodag->addr_preferred;
-    prefix_info->prefix_len = dodag->prefix_len;
+    prefix_info->valid_lifetime = dodag->netif_addr->valid;
+    prefix_info->pref_lifetime = dodag->netif_addr->preferred;
+    prefix_info->prefix_len = dodag->netif_addr->prefix_len;
     prefix_info->reserved = 0;
 
     memset(&prefix_info->prefix, 0, sizeof(prefix_info->prefix));
-    ipv6_addr_init_prefix(&prefix_info->prefix, &dodag->dodag_id, dodag->prefix_len);
+    ipv6_addr_init_prefix(&prefix_info->prefix, &dodag->dodag_id, dodag->netif_addr->prefix_len);
     return opt_snip;
 }
 #endif
@@ -375,6 +375,7 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
     eui64_t iid;
     *included_opts = 0;
+    ipv6_addr_t *me;
 
     if (!_gnrc_rpl_check_options_validity(msg_type, inst, opt, len)) {
         return false;
@@ -432,7 +433,10 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                     break;
                 }
                 ipv6_addr_set_aiid(&pi->prefix, iid.uint8);
-                gnrc_ipv6_netif_add_addr(dodag->iface, &pi->prefix, pi->prefix_len, 0);
+                me = gnrc_ipv6_netif_add_addr(dodag->iface, &pi->prefix, pi->prefix_len, 0);
+                if (me) {
+                    dodag->netif_addr = gnrc_ipv6_netif_addr_get(me);
+                }
 
                 break;
 
@@ -542,12 +546,12 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
             assert(iface != KERNEL_PID_UNDEF);
         }
 
-        gnrc_rpl_dodag_init(inst, &dio->dodag_id, iface);
+        gnrc_rpl_dodag_init(inst, &dio->dodag_id, iface, NULL);
 
         dodag = &inst->dodag;
 
         DEBUG("RPL: Joined DODAG (%s).\n",
-                ipv6_addr_to_str(addr_str, &dio->dodag_id, sizeof(addr_str)));
+               ipv6_addr_to_str(addr_str, &dio->dodag_id, sizeof(addr_str)));
 
         gnrc_rpl_parent_t *parent = NULL;
 
@@ -581,6 +585,25 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
             DEBUG("RPL: DIO without DODAG_CONF option - use default trickle parameters\n");
             gnrc_rpl_send_DIS(NULL, src);
 #endif
+        }
+
+        /* if there was no netif_addr created manually or by a PIO, then leave this DODAG */
+        if (!dodag->netif_addr) {
+            ipv6_addr_t *configured_addr;
+
+            if (!(configured_addr = gnrc_ipv6_netif_match_prefix(dodag->iface, &dodag->dodag_id))) {
+                DEBUG("RPL: no IPv6 address configured to match the given dodag id: %s\n",
+                      ipv6_addr_to_str(addr_str, dodag_id, sizeof(addr_str)));
+                gnrc_rpl_instance_remove(inst);
+                return;
+            }
+
+            if (!(dodag->netif_addr = gnrc_ipv6_netif_addr_get(configured_addr))) {
+                DEBUG("RPL: no netif address found for %s\n",
+                       ipv6_addr_to_str(addr_str, configured_addr, sizeof(addr_str)));
+                gnrc_rpl_instance_remove(inst);
+                return;
+            }
         }
 
         gnrc_rpl_delay_dao(dodag);
