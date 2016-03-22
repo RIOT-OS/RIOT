@@ -70,6 +70,13 @@ DOCKER_ENVIRONMENT_CMDLINE := $(foreach varname,$(DOCKER_ENV_VARS), \
   -e '$(varname)=$(subst ','\'',$($(varname)))', \
   ))
 DOCKER_ENVIRONMENT_CMDLINE := $(strip $(DOCKER_ENVIRONMENT_CMDLINE))
+# The variables set on the command line will also be passed on the command line
+# in Docker
+DOCKER_OVERRIDE_CMDLINE := $(foreach varname,$(DOCKER_ENV_VARS), \
+    $(if $(filter command,$(origin $(varname))), \
+    '$(varname)=$($(varname))', \
+    ))
+DOCKER_OVERRIDE_CMDLINE := $(strip $(DOCKER_OVERRIDE_CMDLINE))
 
 # This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
 # We do not push the regular $(MAKECMDGOALS) to the container's make command in
@@ -93,4 +100,4 @@ DOCKER_ENVIRONMENT_CMDLINE := $(strip $(DOCKER_ENVIRONMENT_CMDLINE))
 	    -e 'RIOTPROJECT=$(DOCKER_BUILD_ROOT)/riotproject' \
 	    $(DOCKER_ENVIRONMENT_CMDLINE) \
 	    -w '$(DOCKER_BUILD_ROOT)/riotproject/$(BUILDRELPATH)' \
-	    '$(DOCKER_IMAGE)' make $(DOCKER_MAKECMDGOALS)
+	    '$(DOCKER_IMAGE)' make $(DOCKER_MAKECMDGOALS) $(DOCKER_OVERRIDE_CMDLINE)
