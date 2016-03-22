@@ -21,6 +21,10 @@
 #include <errno.h>
 #include <stdio.h>
 
+#ifdef USE_NEWLIB_THREAD_SAFE
+#include <string.h>
+#endif
+
 #include "assert.h"
 #include "thread.h"
 #include "irq.h"
@@ -230,6 +234,11 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     cb->msg_waiters.next = NULL;
     cib_init(&(cb->msg_queue), 0);
     cb->msg_array = NULL;
+#endif
+
+#ifdef USE_NEWLIB_THREAD_SAFE
+    /* initialize the reent context */
+    _REENT_INIT_PTR(&(cb->newlib_reent));
 #endif
 
     sched_num_threads++;

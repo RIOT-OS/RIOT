@@ -1,6 +1,10 @@
 # pull dependencies from drivers
 include $(RIOTBASE)/drivers/Makefile.dep
 
+ifneq (,$(filter newlib_thread_safe,$(USEMODULE)))
+  USEMODULE += newlib_nano
+endif
+
 ifneq (,$(filter libcoap,$(USEPKG)))
     USEMODULE += posix_sockets
     USEMODULE += gnrc_conn_udp

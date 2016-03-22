@@ -115,6 +115,10 @@ int sched_run(void)
     sched_active_pid = next_thread->pid;
     sched_active_thread = (volatile thread_t *) next_thread;
 
+#ifdef USE_NEWLIB_THREAD_SAFE
+    _impure_ptr = &(next_thread->newlib_reent);
+#endif
+
     DEBUG("sched_run: done, changed sched_active_thread.\n");
 
     return 1;

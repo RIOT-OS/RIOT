@@ -1,0 +1,22 @@
+# define the compile test file
+define __has_reent_small_test
+#include <sys/reent.h>\n
+#ifndef _REENT_SMALL\n
+#error wasting 1KB\n
+#endif
+endef
+
+# compile the tests
+__has_reent := $(shell echo "\#include <sys/reent.h>\n" | $(CC) -E $(CFLAGS) $(INCLUDES) - 2> /dev/null > /dev/null; echo $$?)
+__has_reent_small := $(shell echo "$(__has_reent_small_test)" | $(CC) -E $(CFLAGS) $(INCLUDES) - 2> /dev/null > /dev/null; echo $$?)
+
+# check if we use REENT_SMALL
+ifeq (0, $(__has_reent))
+  ifeq (0, $(__has_reent_small))
+    export USE_NEWLIB_THREAD_SAFE := 1
+  else
+    $(shell $(COLOR_ECHO) "\n$(COLOR_YELLOW)_REENT_SMALL not defined, thread-safe newlib disabled!\n$(COLOR_RESET)" 1>&2)
+  endif
+else
+  $(shell $(COLOR_ECHO) "\n$(COLOR_YELLOW)MODULE_NEWLIB_THREAD_SAFE defined but <sys/reent.h> not found in toolchain path, thread-safe newlib is disabled!\n\n$(COLOR_RESET)\n" 1>&2)
+endif
