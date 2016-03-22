@@ -101,16 +101,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Flag signaling a write operation on the bus
- */
-#define I2C_FLAG_WRITE      0
-
-/**
- * @brief   Flag signaling a read operation on the bus
- */
-#define I2C_FLAG_READ       1
-
-/**
  * @brief   Default I2C device access macro
  * @{
  */
@@ -158,8 +148,10 @@ typedef enum {
  */
 #ifndef HAVE_I2C_FLAGS_T
 enum {
-    I2C_ADDR10 = 0x01,      /**< use 10-bit device addressing */
-    I2C_NOSTOP = 0x02       /**< do not issue a STOP condition after transfer */
+    I2C_WRITE  = 0x00,      /**< write data to the device */
+    I2C_READ   = 0x01,      /**< read data from the device */
+    I2C_ADDR10 = 0x02,      /**< use 10-bit device addressing */
+    I2C_NOSTOP = 0x04       /**< do not issue a STOP condition after transfer */
 };
 #endif
 /** @} */
@@ -232,35 +224,20 @@ int i2c_acquire(i2c_t dev);
 void i2c_release(i2c_t dev);
 
 /**
- * @brief   Read data from an I2C device with the given address
+ * @brief   Read or write data from/to the given I2C device
  *
  * @param[in]  dev          I2C peripheral device
  * @param[in]  addr         7-bit or 10-bit device address (right-aligned)
  * @param[out] data         array holding the received bytes
  * @param[in]  len          the number of bytes to read into @p data
- * @param[in]  flags        optional flags (see I2C_ADDR10 and I2C_NOSTOP)
+ * @param[in]  flags        flags to specify read/write, no stop or addr width
  *
  * @return                  I2C_ACK on successful transfer of @p len byte
  * @return                  I2C_ADDR_NACK if response to address byte was NACK
  * @return                  I2C_ERR for any other error
  */
-int i2c_read(i2c_t dev, uint16_t addr, uint8_t *data, size_t len, uint8_t flags);
-
-/**
- * @brief   Write multiple bytes to an I2C device with the given address
- *
- * @param[in] dev           I2C peripheral device
- * @param[in] addr          7-bit or 10-bit device address (right-aligned)
- * @param[in] data          array with bytes to write to the target device
- * @param[in] len           number of bytes to write to the target device
- * @param[in] flags         optional flags (see I2C_ADDR10 and I2C_NOSTOP)
- *
- * @return                  I2C_ACK on successful transfer of @p len byte
- * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_DATA_NACK if response to any data byte was NACK
- * @return                  I2C_ERR for any other error
- */
-int i2c_write(i2c_t dev, uint16_t addr, uint8_t *data, size_t len, uint8_t flags);
+int i2c_transfer(i2c_t dev, uint16_t addr,
+                 uint8_t *data, size_t len, uint8_t flags);
 
 /**
  * @brief   Convenience function for writing a single byte to the bus
@@ -278,6 +255,10 @@ int i2c_write(i2c_t dev, uint16_t addr, uint8_t *data, size_t len, uint8_t flags
  * @return                  I2C_ERR for any other error
  */
 int i2c_write_byte(i2c_t dev, uint16_t addr, uint8_t data, uint8_t flags);
+
+
+/* TODO: re-add read/write reg convenience functions */
+
 
 #ifdef __cplusplus
 }
