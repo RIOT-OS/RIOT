@@ -39,7 +39,6 @@ static void _rpl_trickle_send_dio(void *args)
 {
     gnrc_rpl_instance_t *inst = (gnrc_rpl_instance_t *) args;
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
-    ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
 
     /* a leaf node does not send DIOs periodically */
     if (dodag->node_status == GNRC_RPL_LEAF_NODE) {
@@ -47,7 +46,7 @@ static void _rpl_trickle_send_dio(void *args)
         return;
     }
 
-    gnrc_rpl_send_DIO(inst, &all_RPL_nodes);
+    gnrc_rpl_send_DIO(inst, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes);
     DEBUG("trickle callback: Instance (%d) | DODAG: (%s)\n", inst->id,
           ipv6_addr_to_str(addr_str,&dodag->dodag_id, sizeof(addr_str)));
 }
@@ -231,14 +230,13 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
     if (parent != NULL) {
         parent->lifetime = (now / SEC_IN_USEC) + ((dodag->default_lifetime * dodag->lifetime_unit));
         if (parent == dodag->parents) {
-            ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
             kernel_pid_t if_id;
-            if ((if_id = gnrc_ipv6_netif_find_by_addr(NULL, &all_RPL_nodes)) != KERNEL_PID_UNDEF) {
+            if ((if_id = gnrc_ipv6_netif_find_by_addr(NULL, &ipv6_addr_all_rpl_nodes)) != KERNEL_PID_UNDEF) {
                 fib_add_entry(&gnrc_ipv6_fib_table,
                               if_id,
                               (uint8_t *) ipv6_addr_unspecified.u8,
                               sizeof(ipv6_addr_t),
-                              (FIB_FLAG_NET_PREFIX | 0x0),
+                              FIB_FLAG_NET_PREFIX,
                               parent->addr.u8,
                               sizeof(ipv6_addr_t),
                               FIB_FLAG_RPL_ROUTE,
@@ -269,13 +267,14 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
     gnrc_rpl_parent_t *old_best = dodag->parents;
     gnrc_rpl_parent_t *new_best = old_best;
     uint16_t old_rank = dodag->my_rank;
-    gnrc_rpl_parent_t *elt = NULL, *tmp = NULL;
+    gnrc_rpl_parent_t *elt, *tmp;
+    kernel_pid_t if_id;
 
     if (dodag->parents == NULL) {
         return NULL;
     }
 
-    LL_FOREACH_SAFE(dodag->parents, elt, tmp) {
+    LL_FOREACH(dodag->parents, elt) {
         new_best = dodag->instance->of->which_parent(new_best, elt);
     }
 
@@ -290,12 +289,8 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
             gnrc_rpl_send_DAO(dodag->instance, &old_best->addr, 0);
             gnrc_rpl_delay_dao(dodag);
         }
-        fib_remove_entry(&gnrc_ipv6_fib_table,
-                         (uint8_t *) ipv6_addr_unspecified.u8,
-                         sizeof(ipv6_addr_t));
-        ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
 
-        kernel_pid_t if_id = gnrc_ipv6_netif_find_by_addr(NULL, &all_RPL_nodes);
+        if_id = gnrc_ipv6_netif_find_by_addr(NULL, &ipv6_addr_all_rpl_nodes);
 
         if (if_id == KERNEL_PID_UNDEF) {
             DEBUG("RPL: no interface found for the parent address\n");
@@ -306,7 +301,7 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
                       if_id,
                       (uint8_t *) ipv6_addr_unspecified.u8,
                       sizeof(ipv6_addr_t),
-                      (FIB_FLAG_NET_PREFIX | 0x0),
+                      FIB_FLAG_NET_PREFIX,
                       dodag->parents->addr.u8,
                       sizeof(ipv6_addr_t),
                       FIB_FLAG_RPL_ROUTE,
@@ -318,7 +313,6 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
         trickle_reset_timer(&dodag->trickle);
     }
 
-    elt = NULL; tmp = NULL;
     LL_FOREACH_SAFE(dodag->parents, elt, tmp) {
         if (DAGRANK(dodag->my_rank, dodag->instance->min_hop_rank_inc)
             <= DAGRANK(elt->rank, dodag->instance->min_hop_rank_inc)) {
@@ -355,8 +349,8 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
     }
 
     if ((netif_addr = gnrc_ipv6_netif_addr_get(configured_addr)) == NULL) {
-        DEBUG("RPL: no netif address found for %s\n", ipv6_addr_to_str(addr_str, configured_addr,
-                sizeof(addr_str)));
+        DEBUG("RPL: no netif address found for %s\n",
+              ipv6_addr_to_str(addr_str, configured_addr, sizeof(addr_str)));
         return NULL;
     }
 

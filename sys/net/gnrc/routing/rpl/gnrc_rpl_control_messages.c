@@ -51,8 +51,8 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6
 {
     (void) dodag_id;
     gnrc_pktsnip_t *hdr;
-    ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR, ll_addr;
-    kernel_pid_t iface = gnrc_ipv6_netif_find_by_addr(NULL, &all_RPL_nodes);
+    ipv6_addr_t ll_addr;
+    kernel_pid_t iface = gnrc_ipv6_netif_find_by_addr(NULL, &ipv6_addr_all_rpl_nodes);
     if (iface == KERNEL_PID_UNDEF) {
         DEBUG("RPL: no suitable interface found for this destination address\n");
         gnrc_pktbuf_release(pkt);
@@ -71,11 +71,11 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6
     }
 
     if (dst == NULL) {
-        dst = &all_RPL_nodes;
+        dst = (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes;
     }
 
     hdr = gnrc_ipv6_hdr_build(pkt, (uint8_t *)src, sizeof(ipv6_addr_t), (uint8_t *)dst,
-                            sizeof(ipv6_addr_t));
+                              sizeof(ipv6_addr_t));
 
     if (hdr == NULL) {
         DEBUG("RPL: Send - no space left in packet buffer\n");
@@ -151,7 +151,7 @@ void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
     }
 
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
-    gnrc_pktsnip_t *pkt = NULL, *tmp = NULL;
+    gnrc_pktsnip_t *pkt = NULL, *tmp;
     gnrc_rpl_dio_t *dio;
 
 #ifndef GNRC_RPL_WITHOUT_PIO
@@ -419,8 +419,7 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                 dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO;
 #endif
                 gnrc_rpl_opt_prefix_info_t *pi = (gnrc_rpl_opt_prefix_info_t *) opt;
-                ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
-                if_id = gnrc_ipv6_netif_find_by_addr(NULL, &all_RPL_nodes);
+                if_id = gnrc_ipv6_netif_find_by_addr(NULL, &ipv6_addr_all_rpl_nodes);
                 /* check for the auto address-configuration flag */
                 if ((gnrc_netapi_get(if_id, NETOPT_IPV6_IID, 0, &iid, sizeof(eui64_t)) < 0) &&
                         !(pi->LAR_flags & GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT)) {
@@ -469,8 +468,8 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                 *included_opts |= ((uint32_t) 1) << GNRC_RPL_OPT_TRANSIT;
                 gnrc_rpl_opt_transit_t *transit = (gnrc_rpl_opt_transit_t *) opt;
                 if (first_target == NULL) {
-                    DEBUG("RPL: Encountered a RPL TRANSIT DAO option without \
-a preceding RPL TARGET DAO option\n");
+                    DEBUG("RPL: Encountered a RPL TRANSIT DAO option without "
+                          "a preceding RPL TARGET DAO option\n");
                     break;
                 }
 
@@ -560,7 +559,7 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len)
 
         uint32_t included_opts = 0;
         if(!_parse_options(GNRC_RPL_ICMPV6_CODE_DIO, inst, (gnrc_rpl_opt_t *)(dio + 1), len,
-                           NULL, &included_opts)) {
+                           src, &included_opts)) {
             DEBUG("RPL: Error encountered during DIO option parsing - remove DODAG\n");
             gnrc_rpl_instance_remove(inst);
             return;
@@ -670,7 +669,7 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len)
         dodag->prf = dio->g_mop_prf & GNRC_RPL_PRF_MASK;
         uint32_t included_opts = 0;
         if(!_parse_options(GNRC_RPL_ICMPV6_CODE_DIO, inst, (gnrc_rpl_opt_t *)(dio + 1), len,
-                           NULL, &included_opts)) {
+                           src, &included_opts)) {
             DEBUG("RPL: Error encountered during DIO option parsing - remove DODAG\n");
             gnrc_rpl_instance_remove(inst);
             return;
