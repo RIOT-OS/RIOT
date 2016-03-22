@@ -6,6 +6,8 @@ export CPU_MODEL = samr21x18a
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
+export UNDEF += $(BINDIR)board/board.o
+
 # setup the boards dependencies
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 

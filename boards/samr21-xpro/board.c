@@ -23,6 +23,12 @@
 #include "board.h"
 #include "periph/gpio.h"
 
+#ifdef MODULE_PREINIT
+#include "init.h"
+#endif
+
+
+#ifndef MODULE_PREINIT
 void board_init(void)
 {
     /* initialize the on-board LED */
@@ -31,3 +37,13 @@ void board_init(void)
     /* initialize the CPU */
     cpu_init();
 }
+#else
+int xpro_board_init(void)
+{
+    /* initialize the on-board LED */
+    gpio_init(LED0_PIN, GPIO_OUT);
+    return 0;
+}
+
+deck_init(xpro_board_init);
+#endif
