@@ -1,36 +1,39 @@
 PKG_NAME=		# name of the package
 PKG_URL=		# source url of the package e.g. a git repository
 PKG_VERSION=	# version of the package to use e.g. a git commit/ref
+PKG_DIR=$(CURDIR)
+PKG_BUILDDIR=$(BINDIR)/pkg/$(PKG_NAME)
 
 ifneq ($(RIOTBOARD),)
 include $(RIOTBOARD)/Makefile.base
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
 endif
 
+MODULE:=$(shell basename $(CURDIR))
+
 .PHONY: all clean patch distclean
 
 all: patch
-	$(MAKE) -C $(CURDIR)/$(PKG_NAME)
+	$(MAKE) -C $(PKG_BUILDDIR)
 
-patch: $(CURDIR)/$(PKG_NAME)/Makefile
-	# Dependancy might be changed accordingly though we think the Makefile
+patch: $(PKG_BUILDDIR)/Makefile
+	# Dependency might be changed accordingly though we think the Makefile
 	# will be the first thing you want to change
 	#
 	# Here might not happen anything besides dependancy checks
 
-$(CURDIR)/$(PKG_NAME)/Makefile: $(CURDIR)/$(PKG_NAME)
-	# Here you apply your patch.
-	$(foreach patch,$(shell ls [0-9][0-9][0-9][0-9]*.patch),cd "$<" && git am "$(patch)" || { git am --abort; exit 1; };)
+$(PKG_BUILDDIR)/Makefile: $(PKG_BUILDDIR)
+	cd $(PKG_BUILDDIR) && \
+	    for patch in $(PKG_DIR)/[0-9][0-9][0-9][0-9]*.patch; do git am "$${patch}" || { git am --abort; exit 1; }; done
+	touch $(PKG_BUILDDIR)/Makefile
 
-$(PKG_NAME):
-	# Get PKG_VERSION of package from PKG_URL
-	git clone $(PKG_URL) $(PKG_NAME) && cd $(PKG_NAME) && git reset --hard $(PKG_VERSION)
+$(PKG_BUILDDIR):
+	mkdir -p $(BINDIR)/pkg && \
+	git clone $(PKG_URL) $@ && \
+		cd $@ && git reset --hard $(PKG_VERSION)
 
 clean::
-	# Reset package to checkout state.
-	cd $(CURDIR)/$(PKG_NAME) || true && \
-		git clean -x -f && \
-		git reset --hard $(PKG_VERSION)
+	rm -Rf $(PKG_BUILDDIR)
 
 distclean::
-	rm -rf $(CURDIR)/$(PKG_NAME)
+	rm -rf $(PKG_BUILDDIR)

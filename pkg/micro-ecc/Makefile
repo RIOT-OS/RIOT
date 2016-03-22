@@ -11,11 +11,11 @@ endif
 
 MODULE:=$(shell basename $(CURDIR))
 
-.PHONY: all clean patch reset
+.PHONY: all clean patch distclean
 
 all: patch
-	make -C $(PKG_BUILDDIR)
-	make $(BINDIR)$(MODULE).a
+	$(MAKE) -C $(PKG_BUILDDIR)
+	$(MAKE) $(BINDIR)$(MODULE).a
 
 patch: $(PKG_BUILDDIR)/Makefile
 
