@@ -451,6 +451,21 @@ void fib_remove_entry(fib_table_t *table, uint8_t *dst, size_t dst_size)
     mutex_unlock(&(table->mtx_access));
 }
 
+void fib_flush(fib_table_t *table, kernel_pid_t interface)
+{
+    mutex_lock(&(table->mtx_access));
+    DEBUG("[fib_flush]\n");
+
+    for (size_t i = 0; i < table->size; ++i) {
+        if ((interface == KERNEL_PID_UNDEF) ||
+            (interface == table->data.entries[i].iface_id)) {
+            fib_remove(&table->data.entries[i]);
+        }
+    }
+
+    mutex_unlock(&(table->mtx_access));
+}
+
 int fib_get_next_hop(fib_table_t *table, kernel_pid_t *iface_id,
                      uint8_t *next_hop, size_t *next_hop_size,
                      uint32_t *next_hop_flags, uint8_t *dst, size_t dst_size,
