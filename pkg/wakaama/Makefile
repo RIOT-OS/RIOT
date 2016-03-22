@@ -1,36 +1,18 @@
 PKG_NAME=wakaama
 PKG_URL=git://github.com/eclipse/wakaama.git
 PKG_VERSION=69a32cfae39f66fe4eec4cc8d1cd48ced7ad447c
-PKG_DIR=$(CURDIR)/$(PKG_NAME)
-PKG_TEMP_DIR=$(CURDIR)/temp
 
-.PHONY: all clean patch
+.PHONY: all
 
 all: patch
-	"$(MAKE)" -C $(PKG_DIR)
+	"$(MAKE)" -C $(PKG_BUILDDIR)/riotbuild
 
-patch: $(PKG_DIR)/Makefile
+patch: download
+	mkdir -p "$(PKG_BUILDDIR)/riotbuild"
+	cp $(PKG_BUILDDIR)/core/*.c $(PKG_BUILDDIR)/core/*.h $(PKG_BUILDDIR)/riotbuild
+	cp $(PKG_BUILDDIR)/core/er-coap-13/*.c $(PKG_TEMP_DIR)/core/er-coap-13/*.h $(PKG_BUILDDIR)/riotbuild
 
-$(PKG_DIR)/Makefile: $(PKG_TEMP_DIR)/.git/config
-	echo 'include $$(RIOTBASE)/Makefile.base' > $(PKG_DIR)/Makefile
+	echo 'MODULE:=wakaama' > $(PKG_BUILDDIR)/riotbuild/Makefile
+	echo 'include $$(RIOTBASE)/Makefile.base' >> $(PKG_BUILDDIR)/riotbuild/Makefile
 
-$(PKG_TEMP_DIR)/.git/config:
-	test -d "$(PKG_TEMP_DIR)" || $(GITCACHE) clone "$(PKG_URL)" "$(PKG_VERSION)" "$(PKG_TEMP_DIR)" ; \
-		mkdir -p "$(PKG_DIR)" ; \
-		cp $(PKG_TEMP_DIR)/core/*.c $(PKG_TEMP_DIR)/core/*.h $(PKG_DIR); \
-		cp $(PKG_TEMP_DIR)/core/er-coap-13/*.c $(PKG_TEMP_DIR)/core/er-coap-13/*.h $(PKG_DIR); \
-		rm -Rf "$(PKG_TEMP_DIR)"
-clean::
-	@echo "Cleaning up $(PKG_NAME) package..."
-	@cd "$(PKG_DIR)" 2> /dev/null > /dev/null && \
-		git clean -x -f && \
-		git am --abort && \
-		git reset --hard "$(PKG_VERSION)" && \
-		$(MAKE) patch || true
-
-
-distclean::
-	rm -rf "$(PKG_DIR)"
-
-Makefile.include:
-	@true
+include $(RIOTBASE)/pkg/pkg.mk
