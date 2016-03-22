@@ -88,16 +88,21 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
+ * @brief   Calculate the I2C speed value
+ */
+#define I2C_SPEED(mode)         ((mode << 15) | (CLOCK_APB1 / (2 << (2 * mode) * 10000))
+
+/**
  * @brief   Override I2C speed options
  * @{
  */
 #define HAVE_I2C_SPEED_T
 typedef enum {
-    I2C_SPEED_LOW = 0,      /**< low speed mode:    ~10kbit/s */
-    I2C_SPEED_NORMAL,       /**< normal mode:       ~100kbit/s */
-    I2C_SPEED_FAST,         /**< fast mode:         ~400kbit/sj */
-    I2C_SPEED_FAST_PLUS,    /**< fast plus mode:    ~1Mbit/s */
-    I2C_SPEED_HIGH,         /**< high speed mode:   ~3.4Mbit/s */
+    I2C_SPEED_LOW       = -1,   /**< low speed mode:    ~10kbit/s */
+    I2C_SPEED_NORMAL    =  0,   /**< normal mode:       ~100kbit/s */
+    I2C_SPEED_FAST      =  1,   /**< fast mode:         ~400kbit/sj */
+    I2C_SPEED_FAST_PLUS = -1,   /**< fast plus mode:    ~1Mbit/s */
+    I2C_SPEED_HIGH      = -1,   /**< high speed mode:   ~3.4Mbit/s */
 } i2c_speed_t;
 /** @} */
 
@@ -173,8 +178,9 @@ typedef struct {
     gpio_t sda_pin;         /**< data pin */
     uint8_t scl_af;         /**< SCL pin alternate function */
     uint8_t sda_af;         /**< SDA pin alternate function */
+    gpio_mode_t pin_mode;   /**< OD with or without pull resistor */
     i2c_speed_t speed;      /**< I2C bus speed */
-    uint8_t rcc_bit;        /**< bit in the rcc register */
+    uint8_t rcc_mask;       /**< bit mask for the RCC register */
     uint8_t irqn;           /**< IRQ channel */
 } i2c_conf_t;
 

@@ -241,20 +241,19 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name I2C configuration
+ * @brief   I2C configuration
  * @{
  */
 static const i2c_conf_t i2c_config[] = {
-    /* device, SDA pin, SCL pin, SDA AF, SCL AF, bus speed, rcc_bit, irqn */
     {
-        I2C1,
-        GPIO_PIN(PORT_B, 6),
-        GPIO_PIN(PORT_B, 7)},
-        4,
-        4,
-        I2C_SPEED_NORMAL,
-        RCC_APB1ENR_I2C1EN,
-        isr_i2c1_ev,
+        .dev      = I2C1,
+        .scl_pin  = GPIO_PIN(PORT_B, 6),
+        .sda_pin  = GPIO_PIN(PORT_B, 7),
+        .scl_af   = 4,
+        .sda_af   = 4,
+        .speed    = I2C_SPEED(I2C_SPEED_NORMAL),
+        .rcc_mask = RCC_APB1ENR_I2C1EN,
+        .irqn     = I2C1_EV_IRQn,
     }
 };
 
