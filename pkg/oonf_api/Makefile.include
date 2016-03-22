@@ -1,1 +1,1 @@
-INCLUDES += -I$(RIOTPKG)/oonf_api/oonf_api/src-api
+INCLUDES += -I$(BINDIR)/pkg/oonf_api/src-api
