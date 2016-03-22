@@ -28,7 +28,7 @@ CFLAGS += -DSLIP_BAUDRATE=$(SLIP_BAUDRATE)
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += gnrc_netif_default
+USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Include SLIP package for IP over Serial communication
 USEMODULE += gnrc_slip

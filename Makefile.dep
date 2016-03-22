@@ -12,8 +12,33 @@ ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE += oonf_rfc5444
 endif
 
+ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+  USEMODULE += gnrc_netif
+  USEMODULE += netdev_default
+endif
+
+ifneq (,$(filter cc110x,$(USEMODULE)))
+  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+    USEMODULE += gnrc_cc110x
+	# XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
+	# as all drivers are ported to netdev2
+	USEMODULE += gnrc_netdev2
+  endif
+endif
+
+ifneq (,$(filter kw2xrf,$(USEMODULE)))
+  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+    USEMODULE += gnrc_nomac
+  endif
+endif
+
 ifneq (,$(filter at86rf2%,$(USEMODULE)))
   USEMODULE += netdev2_ieee802154
+  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+	# XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
+	# as all drivers are ported to netdev2
+    USEMODULE += gnrc_netdev2
+  endif
 endif
 
 ifneq (,$(filter netdev2_ieee802154,$(USEMODULE)))
@@ -30,10 +55,6 @@ endif
 
 ifneq (,$(filter gnrc_conn_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
-endif
-
-ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
-  USEMODULE += gnrc_netif
 endif
 
 ifneq (,$(filter netdev2_tap,$(USEMODULE)))
