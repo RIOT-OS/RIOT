@@ -110,7 +110,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     /* in case we are inside an ISR, we need to send blocking */
-    if (inISR()) {
+    if (irq_is_in()) {
         /* send data by active waiting on the TXE flag */
         USART_TypeDef *dev = _dev(uart);
         for (int i = 0; i < len; i++) {

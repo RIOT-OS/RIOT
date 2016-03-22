@@ -466,7 +466,7 @@ void i2c_interface0_master_handler(void) //__irq
     state_value = I20STAT;
 
     //IENABLE;          /* handles nested interrupt */
-    //enableIRQ();
+    //irq_enable();
     switch (state_value) {
         case 0x08: /* A Start condition is issued. */
             //puts("A Start condition is issued\n");
@@ -589,7 +589,7 @@ void i2c_interface0_master_handler(void) //__irq
     }
 
     //IDISABLE;
-    //disableIRQ();
+    //irq_disable();
     //puts("leave I2C handler function\n");
     VICVectAddr = 0; /* Acknowledge Interrupt */
 }
@@ -608,7 +608,7 @@ void i2c_interface1_master_handler(void) //__irq
     state_value = I21STAT;
 
     //IENABLE;    /* handles nested interrupt */
-    //enableIRQ();
+    //irq_enable();
     switch (state_value) {
         case 0x08: /* A Start condition is issued. */
             //puts("A Start condition is issued\n");
@@ -732,7 +732,7 @@ void i2c_interface1_master_handler(void) //__irq
     }
 
     //IDISABLE;
-    //disableIRQ();
+    //irq_disable();
     //puts("leave I2C handler function\n");
     VICVectAddr = 0; /* Acknowledge Interrupt */
 }
@@ -751,7 +751,7 @@ void i2c_interface2_master_handler(void) //__irq
     state_value = I22STAT;
 
     //IENABLE;  /* handles nested interrupt */
-    //enableIRQ();
+    //irq_enable();
     switch (state_value) {
         case 0x08: /* A Start condition is issued. */
             //puts("A Start condition is issued\n");
@@ -875,7 +875,7 @@ void i2c_interface2_master_handler(void) //__irq
     }
 
     //IDISABLE;
-    //disableIRQ();
+    //irq_disable();
     //puts("leave I2C handler function\n");
     VICVectAddr = 0; /* Acknowledge Interrupt */
 }

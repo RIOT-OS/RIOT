@@ -47,7 +47,7 @@ void board_init(void)
     DDRB |= (1 << DDB7);
     PORTB &= ~(1 << 7);
 
-    enableIRQ();
+    irq_enable();
 }
 
 /**

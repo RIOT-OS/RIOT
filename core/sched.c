@@ -163,7 +163,7 @@ void sched_switch(uint16_t other_prio)
           active_thread->pid, current_prio, on_runqueue, other_prio);
 
     if (!on_runqueue || (current_prio > other_prio)) {
-        if (inISR()) {
+        if (irq_is_in()) {
             DEBUG("sched_switch: setting sched_context_switch_request.\n");
             sched_context_switch_request = 1;
         }
@@ -181,7 +181,7 @@ NORETURN void sched_task_exit(void)
 {
     DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n", sched_active_thread->pid);
 
-    (void) disableIRQ();
+    (void) irq_disable();
     sched_threads[sched_active_pid] = NULL;
     sched_num_threads--;
 

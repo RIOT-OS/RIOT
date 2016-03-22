@@ -69,7 +69,7 @@ NORETURN void core_panic(core_panic_t crash_code, const char *message)
 #endif
     }
     /* disable watchdog and all possible sources of interrupts */
-    disableIRQ();
+    irq_disable();
     panic_arch();
 #ifndef DEVELHELP
     /* DEVELHELP not set => reboot system */
