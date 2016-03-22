@@ -278,10 +278,6 @@ export USEMODULE_INCLUDES =
 include $(RIOTBASE)/sys/Makefile.include
 include $(RIOTBASE)/drivers/Makefile.include
 
-USEMODULE_INCLUDES_ = $(shell echo $(USEMODULE_INCLUDES) | tr ' ' '\n' | awk '!a[$$0]++' | tr '\n' ' ')
-
-INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
-
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
     all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include): clean
@@ -293,6 +289,10 @@ $(RIOTPKG)/%/Makefile.include::
 
 .PHONY: $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
+
+USEMODULE_INCLUDES_ = $(shell echo $(USEMODULE_INCLUDES) | tr ' ' '\n' | awk '!a[$$0]++' | tr '\n' ' ')
+
+INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 
 .PHONY: $(USEPKG:%=${BINDIR}%.a)
 $(USEPKG:%=${BINDIR}%.a):
