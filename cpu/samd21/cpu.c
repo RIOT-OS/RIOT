@@ -21,6 +21,10 @@
 #include "cpu.h"
 #include "periph_conf.h"
 
+#ifdef MODULE_PREINIT
+#include "init.h"
+#endif
+
 /**
  * @brief   Configure clock sources and the cpu frequency
  */
@@ -100,3 +104,12 @@ void cpu_init(void)
     /* Initialise clock sources and generic clocks */
     clk_init();
 }
+
+#ifdef MODULE_PREINIT
+int samd21_cpu_init(void)
+{
+    cpu_init();
+    return 0;
+}
+core_init(samd21_cpu_init);
+#endif
