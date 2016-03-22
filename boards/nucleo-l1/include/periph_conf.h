@@ -213,6 +213,46 @@ static const timer_conf_t timer_config[] = {
 #define GPIO_15_IRQ         EXTI15_10_IRQn
 
 /**
+ * @name PWM configuration
+ * @{
+ */
+#define PWM_NUMOF           (2U)
+#define PWM_0_EN            1
+#define PWM_1_EN            1 
+#define PWM_MAX_CHANNELS    4
+
+/* PWM 0 device configuration */
+#define PWM_0_DEV           TIM3
+#define PWM_0_CHANNELS      4
+#define PWM_0_CLK           (32000000U)
+#define PWM_0_BUS           APB1ENR
+#define PWM_0_RCC_MASK      RCC_APB1ENR_TIM3EN     
+/* PWM 0 pin configuration */
+#define PWM_0_PORT          GPIOB
+#define PWM_0_PORT_CLKEN()  (RCC->AHBENR |= RCC_AHBENR_GPIOBEN)
+#define PWM_0_PIN_CH0       4
+#define PWM_0_PIN_CH1       5
+#define PWM_0_PIN_CH2       0
+#define PWM_0_PIN_CH3       1 
+#define PWM_0_PIN_AF        2
+
+/* PWM 1 device configuration */ 
+#define PWM_1_DEV           TIM4
+#define PWM_1_CHANNELS      4
+#define PWM_1_CLK           (32000000U)
+#define PWM_1_BUS           APB1ENR
+#define PWM_1_RCC_MASK      RCC_APB1ENR_TIM4EN     
+/* PWM 1 pin configuration */
+#define PWM_1_PORT          GPIOB
+#define PWM_1_PORT_CLKEN()  (RCC->AHBENR |= RCC_AHBENR_GPIOBEN)
+#define PWM_1_PIN_CH0       6
+#define PWM_1_PIN_CH1       7 
+#define PWM_1_PIN_CH2       8
+#define PWM_1_PIN_CH3       9 
+#define PWM_1_PIN_AF        2
+/** @} */
+
+/**
  * @brief SPI configuration
  * @{
  */
