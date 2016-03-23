@@ -21,7 +21,7 @@ __native_sig_leave_tramp:
     call _swapcontext
     addl $8, %esp
 
-    call _enableIRQ /* TODO this call ? */
+    call _irq_enable
 
     movl $0x0, __native_in_isr
     popal
