@@ -188,7 +188,9 @@ static uint_fast8_t i2c_ctrl_blocking(uint_fast8_t flags)
 
     if (I2CM_STAT & BUSY) {
         /* If the controller is still busy, it probably will be forever */
+#ifdef MODULE_XTIMER
         DEBUG("Master is still BUSY after %u usec. Resetting.\n", xtimer_timeout);
+#endif
         cc2538_i2c_init_master(speed_hz);
     }
 
@@ -536,7 +538,8 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
     }
 
         if (n < length) {
-            DEBUG("%s(%u, %p, %u): %u/%u bytes delivered.\n", __FUNCTION__, address, data, length, n, length);
+            DEBUG("%s(%u, %p, %u): %u/%u bytes delivered.\n",
+                  __FUNCTION__, address, (void *)data, length, n, length);
         }
 
     return n;
@@ -617,7 +620,7 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
                 dev,
                 address,
                 reg,
-                data,
+                (void *)data,
                 length,
                 n,
                 length
