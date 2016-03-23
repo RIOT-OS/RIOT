@@ -192,12 +192,30 @@ bool gnrc_rpl_parent_add_by_addr(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *addr,
 
 bool gnrc_rpl_parent_remove(gnrc_rpl_parent_t *parent)
 {
-    if (parent == parent->dodag->parents) {
+    assert(parent != NULL);
+
+    gnrc_rpl_dodag_t *dodag = parent->dodag;
+
+    if (parent == dodag->parents) {
         fib_remove_entry(&gnrc_ipv6_fib_table,
                          (uint8_t *) ipv6_addr_unspecified.u8,
                          sizeof(ipv6_addr_t));
+
+        /* set the default route to the next parent for now */
+        if (parent->next) {
+            uint32_t now = xtimer_now() / SEC_IN_USEC;
+            fib_add_entry(&gnrc_ipv6_fib_table,
+                          dodag->iface,
+                          (uint8_t *) ipv6_addr_unspecified.u8,
+                          sizeof(ipv6_addr_t),
+                          FIB_FLAG_NET_PREFIX,
+                          parent->next->addr.u8,
+                          sizeof(ipv6_addr_t),
+                          FIB_FLAG_RPL_ROUTE,
+                          (parent->next->lifetime - now) * SEC_IN_MS);
+        }
     }
-    LL_DELETE(parent->dodag->parents, parent);
+    LL_DELETE(dodag->parents, parent);
     memset(parent, 0, sizeof(gnrc_rpl_parent_t));
     return true;
 }
