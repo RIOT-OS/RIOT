@@ -119,7 +119,8 @@ def is_updated(application_folder, subprocess_env):
             return True
 
         if '.travis.yml' in diff_files or \
-           any('dist/' in s for s in diff_files):
+           any('dist/' in s for s in diff_files) or \
+           any('pkg/' in s for s in diff_files):
             return True
 
         boards_changes = set()
