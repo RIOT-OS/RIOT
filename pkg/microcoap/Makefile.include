@@ -1,1 +1,1 @@
-INCLUDES += -I$(RIOTPKG)/microcoap/microcoap
+INCLUDES += -I$(BINDIR)/pkg/microcoap
