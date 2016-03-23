@@ -51,6 +51,7 @@ buildtest:
 	        BOARD=$${BOARD} \
 	        CCACHE=$${_CCACHE} \
 	        $${CCACHE_DIR:+CCACHE_DIR=$${CCACHE_DIR}} \
+	        $${GIT_CACHE_DIR:+GIT_CACHE_DIR=$${GIT_CACHE_DIR}} \
 	        CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
 	        RIOTBASE=$${RIOTBASE} \
 	        RIOTBOARD=$${RIOTBOARD} \
@@ -88,6 +89,7 @@ buildtest:
 	    CCACHE=$${CCACHE} \
 	    $${CCACHE_DIR:+CCACHE_DIR=$${CCACHE_DIR}} \
 	    CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
+	    $${GIT_CACHE_DIR:+GIT_CACHE_DIR=$${GIT_CACHE_DIR}} \
 	    RIOTBASE=$${RIOTBASE} \
 	    RIOTBOARD=$${RIOTBOARD} \
 	    RIOTCPU=$${RIOTCPU} \
