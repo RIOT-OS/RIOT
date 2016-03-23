@@ -455,37 +455,42 @@ void gnrc_rpl_send_DAO_ACK(gnrc_rpl_instance_t *instance, ipv6_addr_t *destinati
  * @brief   Parse a DIS.
  *
  * @param[in] dis       Pointer to the DIS message.
+ * @param[in] iface     Interface PID of the incoming DIS.
  * @param[in] src       Pointer to the source address of the IPv6 packet.
  * @param[in] dst       Pointer to the destination address of the IPv6 packet.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, ipv6_addr_t *src, ipv6_addr_t *dst, uint16_t len);
+void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src,
+                       ipv6_addr_t *dst, uint16_t len);
 
 /**
  * @brief   Parse a DIO.
  *
  * @param[in] dio       Pointer to the DIO message.
+ * @param[in] iface     Interface PID of the incoming DIO.
  * @param[in] src       Pointer to the source address of the IPv6 packet.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len);
+void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src, uint16_t len);
 
 /**
  * @brief   Parse a DAO.
  *
  * @param[in] dao       Pointer to the DAO message.
+ * @param[in] iface     Interface PID of the incoming DIO.
  * @param[in] src       Pointer to the source address of the IPv6 packet.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, ipv6_addr_t *src, uint16_t len);
+void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src, uint16_t len);
 
 /**
  * @brief   Parse a DAO-ACK.
  *
  * @param[in] dao_ack   Pointer to the DAO-ACK message.
+ * @param[in] iface     Interface PID of the incoming DIO.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, uint16_t len);
+void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, uint16_t len);
 
 /**
  * @brief   Delay the DAO sending interval
@@ -518,11 +523,13 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
  * @brief Send a control message
  *
  * @param[in] pkt               gnrc_pktnsip_t to send
+ * @param[in] iface             Interface PID to send this pkt to
  * @param[in] src               Source address of the packet
  * @param[in] dst               Destination address of the packet
  * @param[in] dodag_id          Id of the DODAG
  */
-void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *dodag_id);
+void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
+                   ipv6_addr_t *dodag_id);
 
 /**
  * @brief Generate a local or global instance id

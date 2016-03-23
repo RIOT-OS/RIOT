@@ -224,6 +224,7 @@ struct gnrc_rpl_dodag {
     uint8_t dio_redun;              /**< trickle k parameter */
     uint8_t default_lifetime;       /**< lifetime of routes (lifetime * unit) */
     uint16_t lifetime_unit;         /**< unit in seconds of the lifetime */
+    kernel_pid_t iface;             /**< interface PID this DODAG operates on */
     uint8_t version;                /**< version of this DODAG */
     uint8_t grounded;               /**< grounded flag */
     uint16_t my_rank;               /**< rank/position in the DODAG */

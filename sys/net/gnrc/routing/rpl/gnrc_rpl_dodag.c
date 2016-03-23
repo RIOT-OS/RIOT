@@ -113,7 +113,7 @@ gnrc_rpl_instance_t *gnrc_rpl_instance_get(uint8_t instance_id)
     return NULL;
 }
 
-bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id)
+bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, kernel_pid_t iface)
 {
     gnrc_rpl_dodag_t *dodag = NULL;
 
@@ -142,6 +142,7 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id)
     dodag->dao_ack_received = false;
     dodag->dao_counter = 0;
     dodag->instance = instance;
+    dodag->iface = iface;
 
     return true;
 }
@@ -230,18 +231,15 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
     if (parent != NULL) {
         parent->lifetime = (now / SEC_IN_USEC) + ((dodag->default_lifetime * dodag->lifetime_unit));
         if (parent == dodag->parents) {
-            kernel_pid_t if_id;
-            if ((if_id = gnrc_ipv6_netif_find_by_addr(NULL, &ipv6_addr_all_rpl_nodes)) != KERNEL_PID_UNDEF) {
-                fib_add_entry(&gnrc_ipv6_fib_table,
-                              if_id,
-                              (uint8_t *) ipv6_addr_unspecified.u8,
-                              sizeof(ipv6_addr_t),
-                              FIB_FLAG_NET_PREFIX,
-                              parent->addr.u8,
-                              sizeof(ipv6_addr_t),
-                              FIB_FLAG_RPL_ROUTE,
-                              (dodag->default_lifetime * dodag->lifetime_unit) * SEC_IN_MS);
-            }
+            fib_add_entry(&gnrc_ipv6_fib_table,
+                          dodag->iface,
+                          (uint8_t *) ipv6_addr_unspecified.u8,
+                          sizeof(ipv6_addr_t),
+                          FIB_FLAG_NET_PREFIX,
+                          parent->addr.u8,
+                          sizeof(ipv6_addr_t),
+                          FIB_FLAG_RPL_ROUTE,
+                          (dodag->default_lifetime * dodag->lifetime_unit) * SEC_IN_MS);
         }
     }
 
@@ -268,7 +266,6 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
     gnrc_rpl_parent_t *new_best = old_best;
     uint16_t old_rank = dodag->my_rank;
     gnrc_rpl_parent_t *elt, *tmp;
-    kernel_pid_t if_id;
 
     if (dodag->parents == NULL) {
         return NULL;
@@ -290,15 +287,8 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
             gnrc_rpl_delay_dao(dodag);
         }
 
-        if_id = gnrc_ipv6_netif_find_by_addr(NULL, &ipv6_addr_all_rpl_nodes);
-
-        if (if_id == KERNEL_PID_UNDEF) {
-            DEBUG("RPL: no interface found for the parent address\n");
-            return NULL;
-        }
-
         fib_add_entry(&gnrc_ipv6_fib_table,
-                      if_id,
+                      dodag->iface,
                       (uint8_t *) ipv6_addr_unspecified.u8,
                       sizeof(ipv6_addr_t),
                       FIB_FLAG_NET_PREFIX,
@@ -335,6 +325,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
     gnrc_ipv6_netif_addr_t *netif_addr = NULL;
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
+    kernel_pid_t iface;
 
     if (!(ipv6_addr_is_global(dodag_id) || ipv6_addr_is_unique_local_unicast(dodag_id))) {
         DEBUG("RPL: dodag id (%s) must be a global or unique local IPv6 address\n",
@@ -342,7 +333,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
         return NULL;
     }
 
-    if (gnrc_ipv6_netif_find_by_addr(&configured_addr, dodag_id) == KERNEL_PID_UNDEF) {
+    if ((iface = gnrc_ipv6_netif_find_by_addr(&configured_addr, dodag_id)) == KERNEL_PID_UNDEF) {
         DEBUG("RPL: no IPv6 address configured to match the given dodag id: %s\n",
               ipv6_addr_to_str(addr_str, dodag_id, sizeof(addr_str)));
         return NULL;
@@ -369,7 +360,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
         return NULL;
     }
 
-    if (!gnrc_rpl_dodag_init(inst, dodag_id)) {
+    if (!gnrc_rpl_dodag_init(inst, dodag_id, iface)) {
         DEBUG("RPL: could not initialize DODAG");
         return NULL;
     }

@@ -117,13 +117,21 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
 
 static void _receive(gnrc_pktsnip_t *icmpv6)
 {
-    gnrc_pktsnip_t *ipv6 = NULL;
-    ipv6_hdr_t *ipv6_hdr = NULL;
-    icmpv6_hdr_t *icmpv6_hdr = NULL;
+    gnrc_pktsnip_t *ipv6, *netif;
+    ipv6_hdr_t *ipv6_hdr;
+    icmpv6_hdr_t *icmpv6_hdr;
+    kernel_pid_t iface = KERNEL_PID_UNDEF;
+
+    assert(icmpv6 != NULL);
 
     ipv6 = gnrc_pktsnip_search_type(icmpv6, GNRC_NETTYPE_IPV6);
+    netif = gnrc_pktsnip_search_type(icmpv6, GNRC_NETTYPE_NETIF);
 
     assert(ipv6 != NULL);
+
+    if (netif) {
+        iface = ((gnrc_netif_hdr_t *)netif->data)->if_pid;
+    }
 
     ipv6_hdr = (ipv6_hdr_t *)ipv6->data;
 
@@ -131,23 +139,23 @@ static void _receive(gnrc_pktsnip_t *icmpv6)
     switch (icmpv6_hdr->code) {
         case GNRC_RPL_ICMPV6_CODE_DIS:
             DEBUG("RPL: DIS received\n");
-            gnrc_rpl_recv_DIS((gnrc_rpl_dis_t *)(icmpv6_hdr + 1), &ipv6_hdr->src, &ipv6_hdr->dst,
-                    byteorder_ntohs(ipv6_hdr->len));
+            gnrc_rpl_recv_DIS((gnrc_rpl_dis_t *)(icmpv6_hdr + 1), iface, &ipv6_hdr->src,
+                              &ipv6_hdr->dst, byteorder_ntohs(ipv6_hdr->len));
             break;
         case GNRC_RPL_ICMPV6_CODE_DIO:
             DEBUG("RPL: DIO received\n");
-            gnrc_rpl_recv_DIO((gnrc_rpl_dio_t *)(icmpv6_hdr + 1), &ipv6_hdr->src,
-                    byteorder_ntohs(ipv6_hdr->len));
+            gnrc_rpl_recv_DIO((gnrc_rpl_dio_t *)(icmpv6_hdr + 1), iface, &ipv6_hdr->src,
+                              byteorder_ntohs(ipv6_hdr->len));
             break;
         case GNRC_RPL_ICMPV6_CODE_DAO:
             DEBUG("RPL: DAO received\n");
-            gnrc_rpl_recv_DAO((gnrc_rpl_dao_t *)(icmpv6_hdr + 1), &ipv6_hdr->src,
-                    byteorder_ntohs(ipv6_hdr->len));
+            gnrc_rpl_recv_DAO((gnrc_rpl_dao_t *)(icmpv6_hdr + 1), iface, &ipv6_hdr->src,
+                              byteorder_ntohs(ipv6_hdr->len));
             break;
         case GNRC_RPL_ICMPV6_CODE_DAO_ACK:
             DEBUG("RPL: DAO-ACK received\n");
-            gnrc_rpl_recv_DAO_ACK((gnrc_rpl_dao_ack_t *)(icmpv6_hdr + 1),
-                    byteorder_ntohs(ipv6_hdr->len));
+            gnrc_rpl_recv_DAO_ACK((gnrc_rpl_dao_ack_t *)(icmpv6_hdr + 1), iface,
+                                  byteorder_ntohs(ipv6_hdr->len));
             break;
         default:
             DEBUG("RPL: Unknown ICMPV6 code received\n");
