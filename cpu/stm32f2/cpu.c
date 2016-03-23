@@ -77,9 +77,20 @@ static void clk_init(void)
     RCC->CFGR |= (uint32_t)CLOCK_APB2_DIV;
     /* PCLK1 = HCLK */
     RCC->CFGR |= (uint32_t)CLOCK_APB1_DIV;
-    /*  PLL configuration: PLLCLK = SOURCE_CLOCK / SOURCE_CLOCK_DIV * SOURCE_CLOCK_MUL */
+
+    /* reset PLL config register */
     RCC->PLLCFGR &= ~((uint32_t)(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ));
-    RCC->PLLCFGR |= (uint32_t)(RCC_PLL_SOURCE | CLOCK_PLL_DIV | (CLOCK_PLL_MUL << 6));
+    /* set HSE as source for the PLL */
+    RCC->PLLCFGR |= RCC_PLL_SOURCE;
+    /* set division factor for main PLL input clock */
+    RCC->PLLCFGR |= (CLOCK_PLL_M & 0x3F);
+    /* set main PLL multiplication factor for VCO */
+    RCC->PLLCFGR |= (CLOCK_PLL_N & 0x1FF) << 6;
+    /* set main PLL division factor for main system clock */
+    RCC->PLLCFGR |= (((CLOCK_PLL_P & 0x03) >> 1) - 1) << 16;
+    /* set main PLL division factor for USB OTG FS, SDIO and RNG clocks */
+    RCC->PLLCFGR |= (CLOCK_PLL_Q & 0x0F) << 24;
+
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
     /* Wait till PLL is ready */

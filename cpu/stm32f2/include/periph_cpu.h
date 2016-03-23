@@ -19,37 +19,35 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
-#include "cpu.h"
+#include "periph_cpu_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   Overwrite the default gpio_t type definition
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use 5 bit to encode the mode:
+ * - bit 0+1: pin mode (input / output)
+ * - bit 2+3: pull resistor configuration
+ * - bit   4: output type (0: push-pull, 1: open-drain)
+ */
+#define GPIO_MODE(io, pr, ot)   ((io << 0) | (pr << 2) | (ot << 4))
+
+/**
+ * @brief   Override GPIO mode options
  * @{
  */
-#define HAVE_GPIO_T
-typedef uint32_t gpio_t;
-/** @} */
-
-/**
- * @brief   Definition of a fitting UNDEF value
- */
-#define GPIO_UNDEF          (0xffffffff)
-
-/**
- * @brief   Define a CPU specific GPIO pin generator macro
- */
-#define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
-
-/**
- * @brief declare needed generic SPI functions
- * @{
- */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN    = GPIO_MODE(0, 0, 0),    /**< input w/o pull R */
+    GPIO_IN_PD = GPIO_MODE(0, 2, 0),    /**< input with pull-down */
+    GPIO_IN_PU = GPIO_MODE(0, 1, 0),    /**< input with pull-up */
+    GPIO_OUT   = GPIO_MODE(1, 0, 0),    /**< push-pull output */
+    GPIO_OD    = GPIO_MODE(1, 0, 1),    /**< open-drain w/o pull R */
+    GPIO_OD_PU = GPIO_MODE(1, 1, 1)     /**< open-drain with pull-up */
+} gpio_mode_t;
 /** @} */
 
 /**
@@ -105,9 +103,26 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   ADC channel configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the channel */
+    uint8_t dev;            /**< ADCx - 1 device used for the channel */
+    uint8_t chan;           /**< CPU ADC channel connected to the pin */
+} adc_conf_t;
+
+/**
+ * @brief   DAC line configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the line */
+    uint8_t chan;           /**< DAC device used for this line */
+} dac_conf_t;
+
+/**
  * @brief   Configure the alternate function for the given pin
  *
- * @note    This is meant for internal use in STM32F4 peripheral drivers only
+ * @note    This is meant for internal use in STM32F2 peripheral drivers only
  *
  * @param[in] pin       pin to configure
  * @param[in] af        alternate function to use

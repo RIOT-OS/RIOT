@@ -35,7 +35,7 @@ void dummy_handler(void) {
 WEAK_DEFAULT void isr_svc(void);
 WEAK_DEFAULT void isr_pendsv(void);
 WEAK_DEFAULT void isr_systick(void);
-/* STM32F4 specific interrupt vectors */
+/* STM32F2 specific interrupt vectors */
 WEAK_DEFAULT void isr_wwdg(void);
 WEAK_DEFAULT void isr_pvd(void);
 WEAK_DEFAULT void isr_tamp_stamp(void);
@@ -116,7 +116,7 @@ WEAK_DEFAULT void isr_hash_rng(void);
 ISR_VECTORS const void *interrupt_vector[] = {
     /* Exception stack pointer */
     (void*) (&_estack),             /* pointer to the top of the stack */
-    /* Cortex-M4 handlers */
+    /* Cortex-M3 handlers */
     (void*) reset_handler_default,  /* entry point of the program */
     (void*) nmi_default,            /* non maskable interrupt handler */
     (void*) hard_fault_default,     /* hard fault exception */

@@ -19,22 +19,25 @@
  */
 
 #include "cpu.h"
-#include "periph/random.h"
+#include "periph/hwrng.h"
 #include "periph_conf.h"
 
 /* ignore file in case no RNG device is defined */
-#if RANDOM_NUMOF
+#ifdef RNG
 
-void random_init(void)
+void hwrng_init(void)
 {
-    random_poweron();
+
 }
 
-int random_read(char *buf, unsigned int num)
+void hwrng_read(uint8_t *buf, unsigned int num)
 {
     /* cppcheck-suppress variableScope */
     uint32_t tmp;
     unsigned int count = 0;
+
+    RCC->AHB2ENR |= RCC_AHB2ENR_RNGEN;
+    RNG->CR = RNG_CR_RNGEN;
 
     while (count < num) {
         /* wait for random data to be ready to read */
@@ -48,17 +51,6 @@ int random_read(char *buf, unsigned int num)
         }
     }
 
-    return (int)count;
-}
-
-void random_poweron(void)
-{
-    RCC->AHB2ENR |= RCC_AHB2ENR_RNGEN;
-    RNG->CR = RNG_CR_RNGEN;
-}
-
-void random_poweroff(void)
-{
     RNG->CR = 0;
     RCC->AHB2ENR &= ~RCC_AHB2ENR_RNGEN;
 }

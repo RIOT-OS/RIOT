@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the STM32F215RG
+ * @brief           Memory definitions for the STM32F217ZG
  *
  * @author          Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
  * @author          Vincent Dupont <vincent@otakeys.com>

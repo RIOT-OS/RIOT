@@ -78,8 +78,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     mutex_lock(&tx_sync[uart]);
 
     /* configure pins */
-    gpio_init(uart_config[uart].rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
-    gpio_init(uart_config[uart].tx_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(uart_config[uart].rx_pin, GPIO_IN);
+    gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
     gpio_init_af(uart_config[uart].rx_pin, uart_config[uart].af);
     gpio_init_af(uart_config[uart].tx_pin, uart_config[uart].af);
     /* enable UART clock */
@@ -119,7 +119,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     /* in case we are inside an ISR, we need to send blocking */
-    if (inISR()) {
+    if (irq_is_in()) {
         /* send data by active waiting on the TXE flag */
         USART_TypeDef *dev = _dev(uart);
         for (int i = 0; i < len; i++) {
@@ -172,7 +172,12 @@ static inline void irq_handler(int uart, USART_TypeDef *dev)
 static inline void dma_handler(int uart, int stream)
 {
     /* clear DMA done flag */
-    dma_base(stream)->IFCR[dma_hl(stream)] = dma_ifc(stream);
+    if (stream < 4) {
+        dma_base(stream)->LIFCR = dma_ifc(stream);
+    }
+    else {
+        dma_base(stream)->HIFCR = dma_ifc(stream);
+    }
     mutex_unlock(&tx_sync[uart]);
     if (sched_context_switch_request) {
         thread_yield();

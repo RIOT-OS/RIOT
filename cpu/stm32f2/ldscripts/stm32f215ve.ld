@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the STM32F215RG
+ * @brief           Memory definitions for the STM32F215VG
  *
  * @author          Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
  * @author          Vincent Dupont <vincent@otakeys.com>
@@ -22,7 +22,7 @@
 
 MEMORY
 {
-    rom (rx)        : ORIGIN = 0x08000000, LENGTH = 1024K
+    rom (rx)        : ORIGIN = 0x08000000, LENGTH = 512K
     ram (xrw)       : ORIGIN = 0x20000000, LENGTH = 128K
     cpuid (r)       : ORIGIN = 0x1fff7a10, LENGTH = 12
 }

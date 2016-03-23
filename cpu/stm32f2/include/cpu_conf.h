@@ -21,7 +21,17 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
-#include "stm32f2xx.h"
+#include "cpu_conf_common.h"
+
+#if defined(CPU_MODEL_STM32F205RG)
+#include "stm32f205xx.h"
+#elif defined(CPU_MODEL_STM32F207ZG)
+#include "stm32f207xx.h"
+#elif defined(CPU_MODEL_STM32F215RG) || defined(CPU_MODEL_STM32F215VG) || defined(CPU_MODEL_STM32F215VE)
+#include "stm32f215xx.h"
+#elif defined(CPU_MODEL_STM32F217ZG)
+#include "stm32f217xx.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,20 +45,6 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (81U)
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
-
-/**
- * @brief Length for reading CPU_ID
- */
-#define CPUID_ID_LEN                    (12)
-
-/**
- * @brief Configure the CPU's clock system
- *
- * @param[in] source    source clock frequency
- * @param[in] target    target clock frequency
- * @param[in] prescale  prescaler to use
- */
-void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale);
 
 #ifdef __cplusplus
 }
