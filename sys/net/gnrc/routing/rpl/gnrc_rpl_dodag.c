@@ -113,21 +113,16 @@ gnrc_rpl_instance_t *gnrc_rpl_instance_get(uint8_t instance_id)
     return NULL;
 }
 
-bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, kernel_pid_t iface)
+bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, kernel_pid_t iface,
+                         gnrc_ipv6_netif_addr_t *netif_addr)
 {
-    gnrc_rpl_dodag_t *dodag = NULL;
+    /* TODO: check if netif_addr belongs to iface */
 
-    if ((instance == NULL) || instance->state == 0) {
-        DEBUG("Instance is NULL or unused\n");
-        return false;
-    }
+    assert(instance && (instance->state > 0));
 
-    dodag = &instance->dodag;
+    gnrc_rpl_dodag_t *dodag = &instance->dodag;
 
     dodag->dodag_id = *dodag_id;
-    dodag->prefix_len = GNRC_RPL_DEFAULT_PREFIX_LEN;
-    dodag->addr_preferred = GNRC_RPL_DEFAULT_PREFIX_LIFETIME;
-    dodag->addr_valid = GNRC_RPL_DEFAULT_PREFIX_LIFETIME;
     dodag->my_rank = GNRC_RPL_INFINITE_RANK;
     dodag->trickle.callback.func = &_rpl_trickle_send_dio;
     dodag->trickle.callback.args = instance;
@@ -143,6 +138,7 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, k
     dodag->dao_counter = 0;
     dodag->instance = instance;
     dodag->iface = iface;
+    dodag->netif_addr = netif_addr;
 
     return true;
 }
@@ -373,15 +369,13 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
         return NULL;
     }
 
-    if (!gnrc_rpl_dodag_init(inst, dodag_id, iface)) {
+    if (!gnrc_rpl_dodag_init(inst, dodag_id, iface, netif_addr)) {
         DEBUG("RPL: could not initialize DODAG");
+        gnrc_rpl_instance_remove(inst);
         return NULL;
     }
 
     dodag = &inst->dodag;
-    dodag->prefix_len = netif_addr->prefix_len;
-    dodag->addr_preferred = netif_addr->preferred;
-    dodag->addr_valid = netif_addr->valid;
     dodag->instance = inst;
 
     return inst;
