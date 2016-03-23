@@ -185,11 +185,13 @@ int _gnrc_rpl_dodag_show(void)
         if (gnrc_rpl_instances[i].state == 0) {
             continue;
         }
-        printf("instance [%d | mop: %d | ocp: %d | mhri: %d | mri %d]\n", gnrc_rpl_instances[i].id,
-                gnrc_rpl_instances[i].mop, gnrc_rpl_instances[i].of->ocp,
-                gnrc_rpl_instances[i].min_hop_rank_inc, gnrc_rpl_instances[i].max_rank_inc);
 
         dodag = &gnrc_rpl_instances[i].dodag;
+
+        printf("instance [%d | Iface: %" PRIkernel_pid " | mop: %d | ocp: %d | mhri: %d | mri %d]\n",
+                gnrc_rpl_instances[i].id, dodag->iface,
+                gnrc_rpl_instances[i].mop, gnrc_rpl_instances[i].of->ocp,
+                gnrc_rpl_instances[i].min_hop_rank_inc, gnrc_rpl_instances[i].max_rank_inc);
 
         tc = (((uint64_t) dodag->trickle.msg_callback_timer.long_target << 32)
                 | dodag->trickle.msg_callback_timer.target) - xnow;
