@@ -100,7 +100,7 @@ void ps(void)
 #endif
                    sname, queued, p->priority
 #ifdef DEVELHELP
-                   , p->stack_size, stacksz, p->stack_start
+                   , p->stack_size, stacksz, (void *)p->stack_start
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
                    , runtime_ticks, switches
