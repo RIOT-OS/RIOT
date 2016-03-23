@@ -271,18 +271,12 @@ int gnrc_udp_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr)
     return 0;
 }
 
-gnrc_pktsnip_t *gnrc_udp_hdr_build(gnrc_pktsnip_t *payload,
-                                   uint8_t *src, size_t src_len,
-                                   uint8_t *dst, size_t dst_len)
+gnrc_pktsnip_t *gnrc_udp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src,
+                                   uint16_t dst)
 {
     gnrc_pktsnip_t *res;
     udp_hdr_t *hdr;
 
-    /* check parameters */
-    if (src == NULL || dst == NULL ||
-        src_len != sizeof(uint16_t) || dst_len != sizeof(uint16_t)) {
-        return NULL;
-    }
     /* allocate header */
     res = gnrc_pktbuf_add(payload, NULL, sizeof(udp_hdr_t), GNRC_NETTYPE_UDP);
     if (res == NULL) {
@@ -290,8 +284,8 @@ gnrc_pktsnip_t *gnrc_udp_hdr_build(gnrc_pktsnip_t *payload,
     }
     /* initialize header */
     hdr = (udp_hdr_t *)res->data;
-    hdr->src_port = byteorder_htons(*((uint16_t *)src));
-    hdr->dst_port = byteorder_htons(*((uint16_t *)dst));
+    hdr->src_port = byteorder_htons(src);
+    hdr->dst_port = byteorder_htons(dst);
     hdr->checksum = byteorder_htons(0);
     return res;
 }

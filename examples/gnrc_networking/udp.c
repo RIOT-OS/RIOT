@@ -34,8 +34,7 @@ static gnrc_netreg_entry_t server = { NULL, GNRC_NETREG_DEMUX_CTX_ALL, KERNEL_PI
 static void send(char *addr_str, char *port_str, char *data, unsigned int num,
                  unsigned int delay)
 {
-    uint8_t port[2];
-    uint16_t tmp;
+    uint16_t port;
     ipv6_addr_t addr;
 
     /* parse destination address */
@@ -44,13 +43,11 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
         return;
     }
     /* parse port */
-    tmp = (uint16_t)atoi(port_str);
-    if (tmp == 0) {
+    port = (uint16_t)atoi(port_str);
+    if (port == 0) {
         puts("Error: unable to parse destination port");
         return;
     }
-    port[0] = (uint8_t)tmp;
-    port[1] = tmp >> 8;
 
     for (unsigned int i = 0; i < num; i++) {
         gnrc_pktsnip_t *payload, *udp, *ip;
@@ -61,14 +58,14 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
             return;
         }
         /* allocate UDP header, set source port := destination port */
-        udp = gnrc_udp_hdr_build(payload, port, 2, port, 2);
+        udp = gnrc_udp_hdr_build(payload, port, port);
         if (udp == NULL) {
             puts("Error: unable to allocate UDP header");
             gnrc_pktbuf_release(payload);
             return;
         }
         /* allocate IPv6 header */
-        ip = gnrc_ipv6_hdr_build(udp, NULL, 0, (uint8_t *)&addr, sizeof(addr));
+        ip = gnrc_ipv6_hdr_build(udp, NULL, &addr);
         if (ip == NULL) {
             puts("Error: unable to allocate IPv6 header");
             gnrc_pktbuf_release(udp);
@@ -81,7 +78,7 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
             return;
         }
         printf("Success: send %u byte to [%s]:%u\n", (unsigned)payload->size,
-               addr_str, tmp);
+               addr_str, port);
         xtimer_usleep(delay);
     }
 }
