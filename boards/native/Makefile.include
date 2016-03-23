@@ -33,7 +33,7 @@ endif
 endif
 
 export DEBUGGER = gdb
-export TERMPROG = $(ELF)
+export TERMPROG ?= $(ELF)
 export FLASHER = true
 export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate

@@ -71,7 +71,7 @@ then
 
     if [ "$BUILDTEST_MCU_GROUP" == "x86" ]
     then
-        make -C ./tests/unittests all test BOARD=native || exit
+        make -C ./tests/unittests all-debug test BOARD=native TERMPROG='gdb -batch -ex r -ex bt $(ELF)' || exit
         # TODO:
         #   Reenable once https://github.com/RIOT-OS/RIOT/issues/2300 is
         #   resolved:
