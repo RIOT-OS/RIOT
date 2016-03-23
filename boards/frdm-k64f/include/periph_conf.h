@@ -117,9 +117,17 @@ static const adc_conf_t adc_config[] = {
 /** @} */
 
 /**
-* @name PWM configuration
-* @{
-*/
+ * @name DAC configuration
+ * @{
+ */
+#define DAC_CONFIG {}
+#define DAC_NUMOF  0
+/** @} */
+
+/**
+ * @name PWM configuration
+ * @{
+ */
 #define PWM_NUMOF                    (1U)
 #define PWM_0_EN                     1
 #define PWM_MAX_CHANNELS             8

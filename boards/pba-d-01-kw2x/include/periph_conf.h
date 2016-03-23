@@ -134,6 +134,14 @@ static const adc_conf_t adc_config[] = {
 /** @} */
 
 /**
+ * @name DAC configuration
+ * @{
+ */
+#define DAC_CONFIG {}
+#define DAC_NUMOF  0
+/** @} */
+
+/**
  * @name PWM configuration
  * @{
  */

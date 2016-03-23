@@ -149,6 +149,16 @@ typedef struct {
 } adc_conf_t;
 
 /**
+ * @brief   CPU specific DAC configuration
+ */
+typedef struct {
+    /** DAC device base pointer */
+    DAC_Type *dev;
+    /** Pointer to module clock gate bit in bitband region, use BITBAND_REGADDR() */
+    uint32_t volatile *clk_gate;
+} dac_conf_t;
+
+/**
  * @brief   CPU internal function for initializing PORTs
  *
  * @param[in] pin       pin to initialize
