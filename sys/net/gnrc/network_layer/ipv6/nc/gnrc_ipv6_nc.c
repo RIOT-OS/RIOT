@@ -45,7 +45,7 @@ static void _nc_remove(kernel_pid_t iface, gnrc_ipv6_nc_t *entry)
     }
 
     DEBUG("ipv6_nc: Remove %s for interface %" PRIkernel_pid "\n",
-          ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
+          ipv6_addr_to_str(addr_str, &(entry->ipv6_addr), sizeof(addr_str)),
           iface);
 
 #ifdef MODULE_GNRC_NDP_NODE
