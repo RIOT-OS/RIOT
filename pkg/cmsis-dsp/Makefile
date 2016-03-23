@@ -8,7 +8,7 @@ endif
 
 .PHONY: all
 
-all: download
+all: git-download
 	$(MAKE) -C $(PKG_BUILDDIR)
 
 include $(RIOTBASE)/pkg/pkg.mk

@@ -9,7 +9,7 @@ endif
 
 .PHONY: all
 
-all: download
+all: git-download
 	make -C $(PKG_BUILDDIR)
 
 include $(RIOTBASE)/pkg/pkg.mk
