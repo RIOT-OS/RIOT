@@ -223,7 +223,6 @@ void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
 
 void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
 {
-    uint16_t old_rank = dodag->my_rank;
     uint32_t now = xtimer_now();
 
     /* update Parent lifetime */
@@ -247,10 +246,6 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
 
     if (_gnrc_rpl_find_preferred_parent(dodag) == NULL) {
         gnrc_rpl_local_repair(dodag);
-    }
-
-    if (dodag->parents && (old_rank != dodag->my_rank)) {
-        trickle_reset_timer(&dodag->trickle);
     }
 }
 
