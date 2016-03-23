@@ -369,10 +369,11 @@ int gpio_init(gpio_t dev, gpio_mode_t mode)
             gpio_dir_input(pin);
             /* configure the pin's pull resistor state */
             IOC_PXX_OVER[pin] = (IOC_OVERRIDE_PUE);
+            break;
         case GPIO_OUT:
             gpio_dir_output(pin);
             /* configure the pin's pull resistor state */
-            IOC_PXX_OVER[pin] = (IOC_OVERRIDE_OE | IOC_OVERRIDE_DIS);
+            IOC_PXX_OVER[pin] = (IOC_OVERRIDE_OE);
             break;
         default:
             return -1;
