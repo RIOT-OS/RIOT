@@ -10,9 +10,9 @@
 @ Fast Block Copy (declared in diskio.h)
 @-----------------------------------------------------------@
 
-.global Copy_un2al
+.global copy_un2al
 .arm
-Copy_un2al:
+copy_un2al:
     STMFD   SP!, {R4-R8}
     ANDS    IP, R1, #3
     BEQ lb_align
@@ -46,9 +46,9 @@ lb_align:
     BX  LR
 
 
-.global Copy_al2un
+.global copy_al2un
 .arm
-Copy_al2un:
+copy_al2un:
     STMFD   SP!, {R4-R8}
     ANDS    IP, R0, #3
     BEQ sb_align
