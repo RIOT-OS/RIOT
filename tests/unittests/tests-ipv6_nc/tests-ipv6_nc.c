@@ -59,6 +59,7 @@ static void tear_down(void)
     /* remove all ncache entries, this is necesaary in case
      * the last test initializes timers. */
     gnrc_ipv6_nc_init();
+    gnrc_ipv6_netif_init();
 }
 
 static void test_ipv6_nc_add__address_registered(void)
