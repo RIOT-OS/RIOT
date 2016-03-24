@@ -63,6 +63,9 @@ typedef enum {
 #ifdef MODULE_GNRC_IPV6
     GNRC_NETTYPE_IPV6,          /**< Protocol is IPv6 */
 #endif
+#ifdef MODULE_GNRC_IPV6_EXT
+    GNRC_NETTYPE_IPV6_EXT,      /**< Protocol is IPv6 extension header */
+#endif
 #ifdef MODULE_GNRC_ICMPV6
     GNRC_NETTYPE_ICMPV6,        /**< Protocol is ICMPv6 */
 #endif
@@ -187,6 +190,16 @@ static inline gnrc_nettype_t gnrc_nettype_from_protnum(uint8_t num)
 #ifdef MODULE_GNRC_UDP
         case PROTNUM_UDP:
             return GNRC_NETTYPE_UDP;
+#endif
+#ifdef MODULE_GNRC_IPV6_EXT
+        case PROTNUM_IPV6_EXT_HOPOPT:
+        case PROTNUM_IPV6_EXT_DST:
+        case PROTNUM_IPV6_EXT_RH:
+        case PROTNUM_IPV6_EXT_FRAG:
+        case PROTNUM_IPV6_EXT_AH:
+        case PROTNUM_IPV6_EXT_ESP:
+        case PROTNUM_IPV6_EXT_MOB:
+            return GNRC_NETTYPE_IPV6_EXT;
 #endif
         default:
             return GNRC_NETTYPE_UNDEF;

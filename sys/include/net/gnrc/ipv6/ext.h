@@ -40,16 +40,26 @@ extern "C" {
 /**
  * @brief   Demultiplex extension headers according to @p nh.
  *
+ * About `current` and `pkt`:
+ *
+ *                     current     pkt
+ *                     |           |
+ *                     v           v
+ * IPv6 <- IPv6_EXT <- IPv6_EXT <- UNDEF
+ *
+ * This situation may happen when the packet has a source routing extension
+ * header (RFC 6554), and the packet is forwarded from an interface to another.
+ *
  * @internal
  *
- * @param[in] iface The receiving interface.
- * @param[in] pkt   A packet.
- * @param[in] nh    A protocol number (see @ref net_protnum).
- *
- * @return  true, on success - continue packet processing.
- * @return  false, on failure - stop packet processing.
+ * @param[in] iface     The receiving interface.
+ * @param[in] current   A snip to process.
+ * @param[in] pkt       A packet.
+ * @param[in] nh        A protocol number (see @ref net_protnum) of the current snip.
  */
-bool gnrc_ipv6_ext_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
+void gnrc_ipv6_ext_demux(kernel_pid_t iface,
+                         gnrc_pktsnip_t *current,
+                         gnrc_pktsnip_t *pkt,
                          uint8_t nh);
 
 /**
