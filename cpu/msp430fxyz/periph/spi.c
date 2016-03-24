@@ -70,20 +70,26 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     switch (speed) {
         case SPI_SPEED_100KHZ:
             br /= 100000;
+            break;
         case SPI_SPEED_400KHZ:
             br /= 400000;
+            break;
         case SPI_SPEED_1MHZ:
             br /= 1000000;
+            break;
         case SPI_SPEED_5MHZ:
             br /= 5000000;
-            if (br < 2) {       /* make sure the is not smaller then 2 */
-                br = 2;
-            }
             break;
         default:
             /* other clock speeds are not supported */
             return -1;
     }
+
+    /* make sure the is not smaller then 2 */
+    if (br < 2) {
+        br = 2;
+    }
+
     SPI_DEV->BR0 = (uint8_t)br;
     SPI_DEV->BR1 = (uint8_t)(br >> 8);
     SPI_DEV->MCTL = 0;
@@ -136,20 +142,26 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     switch (speed) {
         case SPI_SPEED_100KHZ:
             br /= 100000;
+            break;
         case SPI_SPEED_400KHZ:
             br /= 400000;
+            break;
         case SPI_SPEED_1MHZ:
             br /= 1000000;
+            break;
         case SPI_SPEED_5MHZ:
             br /= 5000000;
-            if (br < 2) {       /* make sure the is not smaller then 2 */
-                br = 2;
-            }
             break;
         default:
             /* other clock speeds are not supported */
             return -1;
     }
+
+    /* make sure the is not smaller then 2 */
+    if (br < 2) {
+        br = 2;
+    }
+
     SPI_DEV->BR0 = (uint8_t)br;
     SPI_DEV->BR1 = (uint8_t)(br >> 8);
     /* release from software reset */
