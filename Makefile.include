@@ -204,6 +204,15 @@ ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
 endif
 
+# set some settings useful for continuous integration builds
+ifeq ($(RIOT_CI_BUILD),1)
+    RIOT_VERSION_OVERRIDE:=buildtest
+    ifneq ($(filter $(BOARD_INSUFFICIENT_MEMORY), $(BOARD)),)
+        $(info CI-build: skipping link step)
+        RIOTNOLINK:=1
+    endif
+endif
+
 # if you want to publish the board into the sources as an uppercase #define
 BOARDDEF := $(shell echo $(BOARD) | tr 'a-z' 'A-Z' | tr '-' '_')
 CPUDEF := $(shell echo $(CPU) | tr 'a-z' 'A-Z' | tr '-' '_')
