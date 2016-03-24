@@ -597,6 +597,14 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
                                                  (sixlowpan_nd_opt_abr_t *)opt);
                 break;
 #endif
+#ifdef MODULE_GNRC_DNS
+            case NDP_OPT_RDNSS:
+                if (gnrc_ndp_internal_rdnss_opt_handle(iface, rtr_adv->type, (ndp_opt_rdnss_t *)opt) <= 0) {
+                    /* invalid RDNSS option */
+                    return;
+                }
+                break;
+#endif
         }
 
         opt_offset += (opt->len * 8);

@@ -121,6 +121,9 @@ extern int _gnrc_rpl(int argc, char **argv);
 extern int _gnrc_6ctx(int argc, char **argv);
 #endif
 #endif
+#ifdef MODULE_GNRC_DNS
+extern int _gnrc_dns_handler(int argc, char **argv);
+#endif
 
 #ifdef MODULE_CCN_LITE_UTILS
 extern int _ccnl_open(int argc, char **argv);
@@ -207,6 +210,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_SAUL_REG
     {"saul", "interact with sensors and actuators using SAUL", _saul },
+#endif
+#ifdef MODULE_GNRC_DNS
+    {"dns", "dns configuration tool [show|add|del|resolve]", _gnrc_dns_handler },
 #endif
 #ifdef MODULE_CCN_LITE_UTILS
     { "ccnl_open", "opens an interface or socket", _ccnl_open},
