@@ -6,6 +6,11 @@ ifneq (,$(filter libcoap,$(USEPKG)))
     USEMODULE += gnrc_conn_udp
 endif
 
+ifneq (,$(filter ccn-lite,$(USEPKG)))
+    export CFLAGS += -DCCNL_RIOT
+endif
+
+
 ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE += conn_udp
   USEMODULE += xtimer
