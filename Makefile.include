@@ -250,7 +250,7 @@ all: ..in-docker-container
 else
 ## make script for your application. Build RIOT-base here!
 all: ..compiler-check ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
-	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
+	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTBASE)/Makefile.application
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
 	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
