@@ -4,7 +4,7 @@ PKG_VERSION=ff25e5d0ae5d344ed793a724d60532fb917bf1f8
 
 .PHONY: all
 
-all: download
+all: git-download
 	"$(MAKE)" -C $(PKG_DIR)
 
 include $(RIOTBASE)/pkg/pkg.mk

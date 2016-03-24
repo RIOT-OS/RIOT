@@ -4,15 +4,17 @@
 PKG_DIR?=$(CURDIR)
 PKG_BUILDDIR?=$(BINDIR)/pkg/$(PKG_NAME)
 
-download: $(PKG_BUILDDIR)/.downloaded
+.PHONY: git-download
 
-$(PKG_BUILDDIR)/.downloaded:
+git-download: $(PKG_BUILDDIR)/.git-downloaded
+
+$(PKG_BUILDDIR)/.git-downloaded:
 	mkdir -p $(PKG_BUILDDIR)
 	$(GITCACHE) clone "$(PKG_URL)" "$(PKG_VERSION)" "$(PKG_BUILDDIR)"
 	if test -d "$(PKG_DIR)"/patches; then \
 		git -C "$(PKG_BUILDDIR)" am --ignore-whitespace "$(PKG_DIR)"/patches/*.patch; \
-		fi
-	touch $(PKG_BUILDDIR)/.downloaded
+	fi
+	touch $@
 
 clean::
 	@echo "Cleaning package $(PKG_NAME)..."

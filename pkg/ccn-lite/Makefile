@@ -6,7 +6,7 @@ PKG_VERSION=39b1406c11de9de364220909488eebabe7e81613
 
 export RIOT_CFLAGS = ${CFLAGS} ${INCLUDES}
 
-all: download
+all: git-download
 	"$(MAKE)" -BC $(PKG_BUILDDIR)/src lib-ccn-lite.a
 	"$(MAKE)" -BC $(PKG_BUILDDIR)/src lib-ccn-lite-utils.a
 	cp $(PKG_BUILDDIR)/src/lib-ccn-lite.a ${BINDIR}/ccn-lite.a
