@@ -173,7 +173,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     /* Clear previous configuration for GC_TX_OFFS */
     rf_ctrl0 &= ~AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS;
 
-    if (dev->chan != 0) {
+    if (dev->netdev.chan != 0) {
         /* Set sub mode bit on 915 MHz as recommended by the data sheet */
         trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE;
     }
@@ -199,7 +199,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     phy_cc_cca &= ~(AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
 
     /* Update the channel register */
-    phy_cc_cca |= (dev->chan & AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
+    phy_cc_cca |= (dev->netdev.chan & AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_CC_CCA, phy_cc_cca);
 
 #ifdef MODULE_AT86RF212B
