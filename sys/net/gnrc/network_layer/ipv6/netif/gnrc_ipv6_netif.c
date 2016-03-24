@@ -167,14 +167,34 @@ static void _reset_addr_from_entry(gnrc_ipv6_netif_t *entry)
     memset(entry->addrs, 0, sizeof(entry->addrs));
 }
 
+static void _ipv6_netif_remove(gnrc_ipv6_netif_t *entry)
+{
+    if (entry == NULL) {
+        return;
+    }
+
+#ifdef MODULE_GNRC_NDP
+    gnrc_ndp_netif_remove(entry);
+#endif
+
+    mutex_lock(&entry->mutex);
+    xtimer_remove(&entry->rtr_sol_timer);
+#ifdef MODULE_GNRC_NDP_ROUTER
+    xtimer_remove(&entry->rtr_adv_timer);
+#endif
+    _reset_addr_from_entry(entry);
+    DEBUG("ipv6 netif: Remove IPv6 interface %" PRIkernel_pid "\n", entry->pid);
+    entry->pid = KERNEL_PID_UNDEF;
+    entry->flags = 0;
+
+    mutex_unlock(&entry->mutex);
+}
+
 void gnrc_ipv6_netif_init(void)
 {
     for (int i = 0; i < GNRC_NETIF_NUMOF; i++) {
         mutex_init(&(ipv6_ifs[i].mutex));
-        mutex_lock(&(ipv6_ifs[i].mutex));
-        _reset_addr_from_entry(&ipv6_ifs[i]);
-        ipv6_ifs[i].pid = KERNEL_PID_UNDEF;
-        mutex_unlock(&(ipv6_ifs[i].mutex));
+        _ipv6_netif_remove(&ipv6_ifs[i]);
     }
 }
 
@@ -228,26 +248,7 @@ void gnrc_ipv6_netif_add(kernel_pid_t pid)
 void gnrc_ipv6_netif_remove(kernel_pid_t pid)
 {
     gnrc_ipv6_netif_t *entry = gnrc_ipv6_netif_get(pid);
-
-    if (entry == NULL) {
-        return;
-    }
-
-#ifdef MODULE_GNRC_NDP
-    gnrc_ndp_netif_remove(entry);
-#endif
-
-    mutex_lock(&entry->mutex);
-    xtimer_remove(&entry->rtr_sol_timer);
-#ifdef MODULE_GNRC_NDP_ROUTER
-    xtimer_remove(&entry->rtr_adv_timer);
-#endif
-    _reset_addr_from_entry(entry);
-    DEBUG("ipv6 netif: Remove IPv6 interface %" PRIkernel_pid "\n", pid);
-    entry->pid = KERNEL_PID_UNDEF;
-    entry->flags = 0;
-
-    mutex_unlock(&entry->mutex);
+    _ipv6_netif_remove(entry);
 }
 
 gnrc_ipv6_netif_t *gnrc_ipv6_netif_get(kernel_pid_t pid)
