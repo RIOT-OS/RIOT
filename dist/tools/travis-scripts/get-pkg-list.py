@@ -37,7 +37,7 @@ common_pkgs = common_pkgs + ["cmake"]
 arm_pkgs = ["gcc-arm-none-eabi"]
 msp_pkgs = ["gcc-msp430"]
 x86_pkgs = ["qemu-system-x86", "g++-multilib", "gcc-multilib",
-            "build-essential","python-pip"]
+            "build-essential","python-pip", "gdb"]
 avr8_pkgs = ["gcc-avr", "binutils-avr", "avr-libc"]
 static_tests_pkgs = ["doxygen", "cppcheck"]
 all_mcu_pkgs = arm_pkgs + msp_pkgs + \
