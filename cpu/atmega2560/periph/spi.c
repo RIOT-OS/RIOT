@@ -60,8 +60,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     PRR0 &= ~(1 << PRSPI);
 
     /* configure as master, with given mode and clock */
-    SPSR = (speed >> S2X_SHIFT);
-    SPCR = ((1 << SPE) | (1 << MSTR) | conf | (speed & SPEED_MASK));
+    SPSR = (~speed >> S2X_SHIFT);
+    SPCR = ((1 << SPE) | (1 << MSTR) | conf | (~speed & SPEED_MASK));
 
     /* clear interrupt flag */
     (void)SPSR;
