@@ -34,7 +34,7 @@ static void *ctx_isr_arg;
 static int init_base(uart_t uart, uint32_t baudrate);
 
 /* per default, we use the legacy MSP430 USART module for UART functionality */
-#ifndef UART_USE_USIC
+#ifndef UART_USE_USCI
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {

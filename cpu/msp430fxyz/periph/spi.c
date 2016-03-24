@@ -34,7 +34,7 @@
 static mutex_t spi_lock = MUTEX_INIT;
 
 /* per default, we use the legacy MSP430 USART module for UART functionality */
-#ifndef SPI_USE_USIC
+#ifndef SPI_USE_USCI
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
@@ -100,9 +100,9 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     return 0;
 }
 
-/* we use alternative SPI code in case the board used the USIC module for SPI
+/* we use alternative SPI code in case the board used the USCI module for SPI
  * instead of the (older) USART module */
-#else   /* SPI_USE_USIC */
+#else   /* SPI_USE_USCI */
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
@@ -169,7 +169,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     return 0;
 }
 
-#endif  /* UART_USE_USIC */
+#endif  /* SPI_USE_USCI */
 
 int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
 {
