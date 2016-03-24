@@ -1,5 +1,5 @@
-ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
-	USEMODULE += cc110x gnrc_netdev2 gnrc_cc110x
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+	USEMODULE += cc110x
 endif
 
 USEMODULE += msba2-common
