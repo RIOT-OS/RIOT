@@ -53,7 +53,7 @@ extern "C" {
 #define UART_NUMOF          (1U)
 #define UART_0_EN           (1U)
 
-#define UART_USE_USIC
+#define UART_USE_USCI
 #define UART_BASE           (USCI_0)
 #define UART_IE             (SFR->IE2)
 #define UART_IF             (SFR->IFG2)
@@ -75,7 +75,7 @@ extern "C" {
 #define SPI_0_EN            (1U)
 
 /* SPI configuration */
-#define SPI_USE_USIC
+#define SPI_USE_USCI
 #define SPI_DEV             (USCI_0_B_SPI)
 #define SPI_IE              (SFR->IE2)
 #define SPI_IF              (SFR->IFG2)
