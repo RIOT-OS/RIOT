@@ -74,7 +74,7 @@ static bool _is_iface(kernel_pid_t dev)
 }
 
 #ifdef MODULE_NETSTATS_L2
-static int _netif_stats(kernel_pid_t dev)
+static int _netif_stats(kernel_pid_t dev, bool reset)
 {
     netstats_t *stats;
     int res = -ENOTSUP;
@@ -153,7 +153,7 @@ static void _del_usage(char *cmd_name)
 
 static void _stats_usage(char *cmd_name)
 {
-    printf("usage: %s <if_id> stats\n", cmd_name);
+    printf("usage: %s <if_id> stats [reset]\n", cmd_name);
 }
 
 static void _print_netopt(netopt_t opt)
@@ -450,7 +450,7 @@ static void _netif_list(kernel_pid_t dev)
 
 #ifdef MODULE_NETSTATS_L2
     puts("");
-    _netif_stats(dev);
+    _netif_stats(dev, false);
 #endif
     puts("");
 }
@@ -989,7 +989,11 @@ int _netif_config(int argc, char **argv)
             }
 #ifdef MODULE_NETSTATS_L2
             else if (strcmp(argv[2], "stats") == 0) {
-                return _netif_stats((kernel_pid_t)dev);
+                bool reset = false;
+                if ((argc > 3) && (strncmp(argv[3], "reset", 5) == 0)) {
+                    reset = true;
+                }
+                return _netif_stats((kernel_pid_t)dev, reset);
             }
 #endif
 #ifdef MODULE_GNRC_IPV6_NETIF
