@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 
-#include "netdev2.h"
+#include "net/netdev2.h"
 #include "net/netopt.h"
 
 #ifdef __cplusplus

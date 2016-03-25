@@ -28,7 +28,7 @@
 #include "tsrb.h"
 
 #include "net/netdev2.h"
-#include "net/netdev2_eth.h"
+#include "net/netdev2/eth.h"
 #include "net/eui64.h"
 #include "net/ethernet.h"
 
