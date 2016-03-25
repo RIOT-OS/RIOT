@@ -30,7 +30,6 @@
 #include "mutex.h"
 #include "net/ipv6.h"
 #include "net/ipv6/addr.h"
-#include "vtimer.h"
 #include "xtimer.h"
 
 #ifdef __cplusplus

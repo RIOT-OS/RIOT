@@ -8,7 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := stm32f0discovery
 
 USEMODULE += posix
 USEMODULE += pthread
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 CFLAGS += -DNATIVE_AUTO_EXIT
 

@@ -12,7 +12,7 @@
  *
  * @file
  * @brief  C++11 chrono drop in replacement that adds the function now based on
- *         vtimer/timex
+ *         xtimer/timex
  * @see    <a href="http://en.cppreference.com/w/cpp/thread/thread">
  *           std::thread, defined in header <thread>
  *         </a>
