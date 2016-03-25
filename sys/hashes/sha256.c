@@ -64,11 +64,23 @@
  */
 static void be32enc_vect(void *dst_, const void *src_, size_t len)
 {
-    uint32_t *dst = dst_;
-    const uint32_t *src = src_;
-
-    for (size_t i = 0; i < len / 4; i++) {
-        dst[i] = __builtin_bswap32(src[i]);
+    if ((uintptr_t)dst_ % sizeof(uint32_t) == 0 &&
+        (uintptr_t)src_ % sizeof(uint32_t) == 0) {
+        uint32_t *dst = dst_;
+        const uint32_t *src = src_;
+        for (size_t i = 0; i < len / 4; i++) {
+            dst[i] = __builtin_bswap32(src[i]);
+        }
+    }
+    else {
+        uint8_t *dst = dst_;
+        const uint8_t *src = src_;
+        for (size_t i = 0; i < len; i += 4) {
+            dst[i] = src[i + 3];
+            dst[i + 1] = src[i + 2];
+            dst[i + 2] = src[i + 1];
+            dst[i + 3] = src[i];
+        }
     }
 }
 
