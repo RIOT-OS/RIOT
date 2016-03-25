@@ -42,7 +42,7 @@ typedef struct fib_entry_t {
     /** interface ID */
     kernel_pid_t iface_id;
     /** Lifetime of this entry (an absolute time-point is stored by the FIB) */
-    uint64_t lifetime;
+    uint32_t lifetime;
     /** Unique identifier for the type of the global address */
     uint32_t global_flags;
     /** Pointer to the shared generic address */
@@ -70,7 +70,7 @@ typedef struct fib_sr_t {
     /** interface ID */
     kernel_pid_t sr_iface_id;
     /** Lifetime of this entry (an absolute time-point is stored by the FIB) */
-    uint64_t sr_lifetime;
+    uint32_t sr_lifetime;
     /** Flags for this source route */
     uint32_t sr_flags;
     /** Pointer to the first hop on the source route */

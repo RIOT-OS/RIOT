@@ -55,13 +55,13 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define FIB_ADDR_PRINT_LENS         FIB_ADDR_PRINT_LENS2(FIB_ADDR_PRINT_LEN)
 
 /**
- * @brief convert an offset given in ms to abolute time in time in us
- * @param[in]  ms       the milliseconds to be converted
+ * @brief convert an offset given in cs to abolute time in cs
+ * @param[in]  cs       the centiseconds to be converted
  * @param[out] target   the converted point in time
  */
-static void fib_lifetime_to_absolute(uint32_t ms, uint64_t *target)
+static void fib_lifetime_to_absolute(uint32_t cs, uint32_t *target)
 {
-    *target = xtimer_now64() + (ms * 1000);
+    *target = (uint32_t) (xtimer_now64() / CS_IN_USEC + cs);
 }
 
 /**
@@ -80,7 +80,7 @@ static void fib_lifetime_to_absolute(uint32_t ms, uint64_t *target)
  */
 static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
                           fib_entry_t **entry_arr, size_t *entry_arr_size) {
-    uint64_t now = xtimer_now64();
+    uint32_t now = (uint32_t) (xtimer_now64() / CS_IN_USEC);
 
     size_t count = 0;
     size_t prefix_size = 0;
@@ -178,7 +178,7 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
  * @param[in] next_hop       the next hop address to be updated
  * @param[in] next_hop_size  the next hop address size
  * @param[in] next_hop_flags the next-hop address flags
- * @param[in] lifetime       the lifetime in ms
+ * @param[in] lifetime       the lifetime in centiseconds
  *
  * @return 0 if the entry has been updated
  *         -ENOMEM if the entry cannot be updated due to insufficient RAM
@@ -218,7 +218,7 @@ static int fib_upd_entry(fib_entry_t *entry, uint8_t *next_hop,
  * @param[in] next_hop       the next hop address
  * @param[in] next_hop_size  the next hop address size
  * @param[in] next_hop_flags the next-hop address flags
- * @param[in] lifetime       the lifetime in ms
+ * @param[in] lifetime       the lifetime in centiseconds
  *
  * @return 0 on success
  *         -ENOMEM if no new entry can be created
@@ -686,9 +686,9 @@ int fib_sr_create(fib_table_t *table, fib_sr_t **fib_sr, kernel_pid_t sr_iface_i
 */
 static int fib_sr_check_lifetime(fib_sr_t *fib_sr)
 {
-    uint64_t tm = fib_sr->sr_lifetime - xtimer_now64();
+    uint32_t tm = (uint32_t) (fib_sr->sr_lifetime - xtimer_now64() / CS_IN_USEC);
     /* check if the lifetime expired */
-    if ((int64_t)tm < 0) {
+    if ((int32_t)tm < 0) {
         /* remove this sr if its lifetime expired */
         fib_sr->sr_lifetime = 0;
 
@@ -1513,7 +1513,7 @@ static void fib_print_address(universal_address_container_t *entry)
 void fib_print_routes(fib_table_t *table)
 {
     mutex_lock(&(table->mtx_access));
-    uint64_t now = xtimer_now64();
+    uint32_t now = xtimer_now() / CS_IN_USEC;
 
     if (table->table_type == FIB_TABLE_TYPE_SH) {
         printf("%-" FIB_ADDR_PRINT_LENS "s %-10s   %-" FIB_ADDR_PRINT_LENS "s %-10s %-16s"
@@ -1533,15 +1533,15 @@ void fib_print_routes(fib_table_t *table)
                 printf(" 0x%08"PRIx32" ", table->data.entries[i].next_hop_flags);
                 if (table->data.entries[i].lifetime != FIB_LIFETIME_NO_EXPIRE) {
 
-                    uint64_t tm = table->data.entries[i].lifetime - now;
+                    uint32_t tm = table->data.entries[i].lifetime - now;
 
                     /* we must interpret the values as signed */
-                    if ((int64_t)tm < 0 ) {
+                    if ((int32_t)tm < 0 ) {
                         printf("%-16s ", "EXPIRED");
                     }
                     else {
-                        printf("%"PRIu32".%05"PRIu32, (uint32_t)(tm / 1000000),
-                               (uint32_t)(tm % 1000000));
+                        printf("%"PRIu32".%05"PRIu32, (uint32_t)(tm / SEC_IN_CS),
+                               (uint32_t)(tm % SEC_IN_CS));
                     }
                 }
                 else {
@@ -1563,10 +1563,10 @@ void fib_print_routes(fib_table_t *table)
 
                 if (table->data.source_routes->headers[i].sr_lifetime != FIB_LIFETIME_NO_EXPIRE) {
 
-                    uint64_t tm = table->data.source_routes->headers[i].sr_lifetime - now;
+                    uint32_t tm = table->data.source_routes->headers[i].sr_lifetime - now;
 
                     /* we must interpret the values as signed */
-                    if ((int64_t)tm < 0 ) {
+                    if ((int32_t)tm < 0 ) {
                         printf("%-16s ", "EXPIRED");
                     }
                     else {
@@ -1586,7 +1586,7 @@ void fib_print_routes(fib_table_t *table)
 }
 
 #if FIB_DEVEL_HELPER
-int fib_devel_get_lifetime(fib_table_t *table, uint64_t *lifetime, uint8_t *dst,
+int fib_devel_get_lifetime(fib_table_t *table, uint32_t *lifetime, uint8_t *dst,
                            size_t dst_size)
 {
     if (table->table_type == FIB_TABLE_TYPE_SH) {
