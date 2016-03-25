@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015, 2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the SAMR21G18A
+ * @brief           Memory definitions for the SAMR21E18A and SAMR21G18A
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
