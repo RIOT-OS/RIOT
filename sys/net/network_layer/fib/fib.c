@@ -1513,11 +1513,11 @@ static void fib_print_address(universal_address_container_t *entry)
 void fib_print_routes(fib_table_t *table)
 {
     mutex_lock(&(table->mtx_access));
-    uint32_t now = xtimer_now() / CS_IN_USEC;
+    uint32_t now = (uint32_t) (xtimer_now64() / CS_IN_USEC);
 
     if (table->table_type == FIB_TABLE_TYPE_SH) {
-        printf("%-" FIB_ADDR_PRINT_LENS "s %-10s   %-" FIB_ADDR_PRINT_LENS "s %-10s %-16s"
-                " Interface\n" , "Destination", "Flags", "Next Hop", "Flags", "Expires");
+        printf("%-" FIB_ADDR_PRINT_LENS "s %-10s   %-" FIB_ADDR_PRINT_LENS "s %-10s %-10s"
+                " Expires\n" , "Destination", "Flags", "Next Hop", "Flags", "Interface");
 
         for (size_t i = 0; i < table->size; ++i) {
             if (table->data.entries[i].lifetime != 0) {
@@ -1531,35 +1531,38 @@ void fib_print_routes(fib_table_t *table)
 
                 fib_print_address(table->data.entries[i].next_hop);
                 printf(" 0x%08"PRIx32" ", table->data.entries[i].next_hop_flags);
+
+                printf("%-10d ", (int)table->data.entries[i].iface_id);
+
                 if (table->data.entries[i].lifetime != FIB_LIFETIME_NO_EXPIRE) {
 
                     uint32_t tm = table->data.entries[i].lifetime - now;
 
                     /* we must interpret the values as signed */
                     if ((int32_t)tm < 0 ) {
-                        printf("%-16s ", "EXPIRED");
+                        printf("%s\n", "EXPIRED");
                     }
                     else {
-                        printf("%"PRIu32".%05"PRIu32, (uint32_t)(tm / SEC_IN_CS),
-                               (uint32_t)(tm % SEC_IN_CS));
+                        printf("%" PRIu32 ".%02d\n", (uint32_t)(tm / SEC_IN_CS),
+                                                     (uint8_t)(tm % SEC_IN_CS));
                     }
                 }
                 else {
-                    printf("%-16s ", "NEVER");
+                    printf("%s\n", "NEVER");
                 }
-
-                printf("%d\n", (int)table->data.entries[i].iface_id);
             }
         }
     }
     else if (table->table_type == FIB_TABLE_TYPE_SR) {
-        printf("%-" FIB_ADDR_PRINT_LENS "s %-" FIB_ADDR_PRINT_LENS "s %-6s %-16s Interface\n"
-               , "SR Destination", "SR First Hop", "SR Flags", "Expires");
+        printf("%-" FIB_ADDR_PRINT_LENS "s %-" FIB_ADDR_PRINT_LENS "s %-6s %-10s Expires\n"
+               , "SR Destination", "SR First Hop", "SR Flags", "Interface");
         for (size_t i = 0; i < table->size; ++i) {
             if (table->data.source_routes->headers[i].sr_lifetime != 0) {
                 fib_print_address(table->data.source_routes->headers[i].sr_dest->address);
                 fib_print_address(table->data.source_routes->headers[i].sr_path->address);
                 printf(" 0x%04"PRIx32" ", table->data.source_routes->headers[i].sr_flags);
+
+                printf("%-10d ", (int)table->data.source_routes->headers[i].sr_iface_id);
 
                 if (table->data.source_routes->headers[i].sr_lifetime != FIB_LIFETIME_NO_EXPIRE) {
 
@@ -1567,18 +1570,16 @@ void fib_print_routes(fib_table_t *table)
 
                     /* we must interpret the values as signed */
                     if ((int32_t)tm < 0 ) {
-                        printf("%-16s ", "EXPIRED");
+                        printf("%s\n", "EXPIRED");
                     }
                     else {
-                        printf("%"PRIu32".%05"PRIu32, (uint32_t)(tm / 1000000),
-                               (uint32_t)(tm % 1000000));
+                        printf("%"PRIu32".%02d\n", (uint32_t)(tm / SEC_IN_CS),
+                                                   (uint8_t)(tm % SEC_IN_CS));
                     }
                 }
                 else {
-                    printf("%-16s ", "NEVER");
+                    printf("%s\n", "NEVER");
                 }
-
-                printf("%d\n", (int)table->data.source_routes->headers[i].sr_iface_id);
             }
         }
     }
