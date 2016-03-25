@@ -208,7 +208,7 @@ bool gnrc_rpl_parent_remove(gnrc_rpl_parent_t *parent)
                           parent->next->addr.u8,
                           sizeof(ipv6_addr_t),
                           FIB_FLAG_RPL_ROUTE,
-                          (parent->next->lifetime - now) * SEC_IN_MS);
+                          (parent->next->lifetime - now) * SEC_IN_CS);
         }
     }
     LL_DELETE(dodag->parents, parent);
@@ -252,7 +252,7 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
                           parent->addr.u8,
                           sizeof(ipv6_addr_t),
                           FIB_FLAG_RPL_ROUTE,
-                          (dodag->default_lifetime * dodag->lifetime_unit) * SEC_IN_MS);
+                          dodag->default_lifetime * dodag->lifetime_unit * SEC_IN_CS);
         }
     }
 
@@ -304,7 +304,7 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
                       dodag->parents->addr.u8,
                       sizeof(ipv6_addr_t),
                       FIB_FLAG_RPL_ROUTE,
-                      (dodag->default_lifetime * dodag->lifetime_unit) * SEC_IN_MS);
+                      dodag->default_lifetime * dodag->lifetime_unit * SEC_IN_CS);
     }
 
     dodag->my_rank = dodag->instance->of->calc_rank(dodag->parents, 0);
