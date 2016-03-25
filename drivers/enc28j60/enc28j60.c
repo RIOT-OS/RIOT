@@ -24,7 +24,7 @@
 #include "xtimer.h"
 #include "assert.h"
 #include "net/ethernet.h"
-#include "net/netdev2_eth.h"
+#include "net/netdev2/eth.h"
 
 #include "enc28j60.h"
 #include "enc28j60_regs.h"
