@@ -70,7 +70,7 @@ static int _recv(netdev2_t *dev, char* buf, int len, void *info)
 
 static inline int _get_iid(netdev2_t *netdev, eui64_t *value, size_t max_len)
 {
-    cc110x_t *cc110x = &((netdev2_cc110x_t*) dev)->cc110x;
+    cc110x_t *cc110x = &((netdev2_cc110x_t*) netdev)->cc110x;
     uint8_t *eui64 = (uint8_t*) value;
 
     if (max_len < sizeof(eui64_t)) {
