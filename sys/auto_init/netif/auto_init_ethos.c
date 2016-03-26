@@ -54,12 +54,16 @@ void auto_init_ethos(void)
     ethos_setup(&ethos, ETHOS_UART,
             ETHOS_BAUDRATE, _inbuf, sizeof(_inbuf));
 
+#ifdef MODULE_GNRC
     /* initialize netdev2<->gnrc adapter state */
     gnrc_netdev2_eth_init(&_gnrc_ethos, (netdev2_t*)&ethos);
 
     /* start gnrc netdev2 thread */
     gnrc_netdev2_init(_netdev2_eth_stack, MAC_STACKSIZE,
             MAC_PRIO, "gnrc_ethos", &_gnrc_ethos);
+#else
+    netdev->driver->init((netdev2_t *)&ethos[i]);
+#endif
 }
 
 #else

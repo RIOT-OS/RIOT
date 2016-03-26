@@ -56,10 +56,14 @@ void auto_init_xbee(void)
             DEBUG("Error initializing XBee radio device!");
         }
         else {
+#ifdef MODULE_GNRC
             gnrc_nomac_init(_nomac_stacks[i],
                             XBEE_MAC_STACKSIZE, XBEE_MAC_PRIO, "xbee",
                             (gnrc_netdev_t *)&xbee_devs[i]);
         }
+#else
+        netdev->driver->init((netdev2_t *)&xbee_devs[i]);
+#endif
     }
 }
 

@@ -46,12 +46,16 @@ void auto_init_encx24j600(void)
     /* setup netdev2 device */
     encx24j600_setup(&encx24j600, ENCX24J600_SPI, ENCX24J600_CS, ENCX24J600_INT);
 
+#ifdef MODULE_GNRC
     /* initialize netdev2<->gnrc adapter state */
     gnrc_netdev2_eth_init(&_gnrc_encx24j600, (netdev2_t*)&encx24j600);
 
     /* start gnrc netdev2 thread */
     gnrc_netdev2_init(_netdev2_eth_stack, MAC_STACKSIZE,
             MAC_PRIO, "gnrc_encx24j600", &_gnrc_encx24j600);
+#else
+    netdev->driver->init((netdev2_t *)&encx24j600[i]);
+#endif
 }
 
 #else
