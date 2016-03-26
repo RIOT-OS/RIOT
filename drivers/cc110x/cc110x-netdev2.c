@@ -70,30 +70,18 @@ static int _recv(netdev2_t *dev, char* buf, int len, void *info)
 
 static inline int _get_iid(netdev2_t *netdev, eui64_t *value, size_t max_len)
 {
+    cc110x_t *cc110x = &((netdev2_cc110x_t*) dev)->cc110x;
+    uint8_t *eui64 = (uint8_t*) value;
+
     if (max_len < sizeof(eui64_t)) {
         return -EOVERFLOW;
     }
 
-    uint8_t *eui64 = (uint8_t*) value;
-#ifdef CPUID_LEN
-    int n = (CPUID_LEN < sizeof(eui64_t))
-        ? CPUID_LEN
-        : sizeof(eui64_t);
-
-    char cpuid[CPUID_LEN];
-    cpuid_get(cpuid);
-
-    memcpy(eui64 + 8 - n, cpuid, n);
-
-#else
-    for (int i = 0; i < 8; i++) {
-        eui64[i] = i;
-    }
-#endif
-
-    /* make sure we mark the address as non-multicast and not globally unique */
-    eui64[0] &= ~(0x01);
-    eui64[0] |= 0x02;
+    /* make address compatible to https://tools.ietf.org/html/rfc6282#section-3.2.2*/
+    memset(eui64, 0, sizeof(eui64_t));
+    eui64[3] = 0xff;
+    eui64[4] = 0xfe;
+    eui64[7] = cc110x->radio_address;
 
     return sizeof(eui64_t);
 }
