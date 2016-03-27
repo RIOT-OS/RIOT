@@ -72,6 +72,9 @@ void auto_init_enc28j60(void)
         netdev->driver->init((netdev2_t *)&dev[i]);
 #endif
     }
+#ifdef MODULE_NETDEV_DEFAULT
+    netdev_default = (netdev2_t *)&dev[0];
+#endif
 }
 
 #else

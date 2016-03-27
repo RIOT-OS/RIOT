@@ -64,6 +64,9 @@ void auto_init_ethos(void)
 #else
     netdev->driver->init((netdev2_t *)&ethos[i]);
 #endif
+#ifdef MODULE_NETDEV_DEFAULT
+    netdev_default = (netdev2_t *)&ethos;
+#endif
 }
 
 #else

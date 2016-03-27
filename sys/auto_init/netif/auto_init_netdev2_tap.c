@@ -46,6 +46,10 @@ void auto_init_netdev2_tap(void)
 
     gnrc_netdev2_init(_netdev2_eth_stack, TAP_MAC_STACKSIZE,
             TAP_MAC_PRIO, "gnrc_netdev2_tap", &_gnrc_netdev2_tap);
+
+#ifdef MODULE_NETDEV_DEFAULT
+    netdev_default = (netdev2_t *)&netdev2_tap;
+#endif
 }
 
 #else

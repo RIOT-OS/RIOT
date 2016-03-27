@@ -56,6 +56,9 @@ void auto_init_encx24j600(void)
 #else
     netdev->driver->init((netdev2_t *)&encx24j600[i]);
 #endif
+#ifdef MODULE_NETDEV_DEFAULT
+    netdev_default = (netdev2_t *)&encx24j600[0];
+#endif
 }
 
 #else

@@ -66,6 +66,9 @@ void auto_init_cc110x(void)
 #endif
         }
     }
+#ifdef MODULE_NETDEV_DEFAULT
+    netdev_default = (netdev2_t *)&cc110x_devs[0];
+#endif
 }
 #else
 typedef int dont_be_pedantic;

@@ -69,6 +69,9 @@ void auto_init_at86rf2xx(void)
         netdev->driver->init((netdev2_t *)&at86rf2xx_devs[i]);
 #endif
     }
+#ifdef MODULE_NETDEV_DEFAULT
+    netdev_default = (netdev2_t *)&at86rf2xx_devs[0];
+#endif
 }
 #else
 typedef int dont_be_pedantic;

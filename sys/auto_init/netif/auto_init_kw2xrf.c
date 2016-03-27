@@ -68,6 +68,9 @@ void auto_init_kw2xrf(void)
 #endif
         }
     }
+#ifdef MODULE_NETDEV_DEFAULT
+    netdev_default = (netdev2_t *)&kw2xrf_devs[0];
+#endif
 }
 #else
 typedef int dont_be_pedantic;
