@@ -69,7 +69,8 @@ void auto_init_enc28j60(void)
         gnrc_netdev2_init(stack[i], MAC_STACKSIZE, MAC_PRIO,
                           "gnrc_enc28j60", &gnrc_adpt[i]);
 #else
-        netdev->driver->init((netdev2_t *)&dev[i]);
+        netdev2_t *netdev = (netdev2_t *)&dev[i];
+        netdev->driver->init(netdev);
 #endif
     }
 #ifdef MODULE_NETDEV_DEFAULT

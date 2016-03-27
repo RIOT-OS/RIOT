@@ -66,7 +66,8 @@ void auto_init_at86rf2xx(void)
                               &gnrc_adpt[i]);
         }
 #else
-        netdev->driver->init((netdev2_t *)&at86rf2xx_devs[i]);
+        netdev2_t *netdev = (netdev2_t *)&at86rf2xx_devs[i];
+        netdev->driver->init(netdev);
 #endif
     }
 #ifdef MODULE_NETDEV_DEFAULT

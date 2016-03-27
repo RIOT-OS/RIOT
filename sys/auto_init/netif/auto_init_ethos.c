@@ -62,7 +62,8 @@ void auto_init_ethos(void)
     gnrc_netdev2_init(_netdev2_eth_stack, MAC_STACKSIZE,
             MAC_PRIO, "gnrc_ethos", &_gnrc_ethos);
 #else
-    netdev->driver->init((netdev2_t *)&ethos[i]);
+    netdev2_t *netdev = (netdev2_t *)&ethos;
+    netdev->driver->init(netdev);
 #endif
 #ifdef MODULE_NETDEV_DEFAULT
     netdev_default = (netdev2_t *)&ethos;

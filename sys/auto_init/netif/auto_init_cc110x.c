@@ -62,7 +62,8 @@ void auto_init_cc110x(void)
                 DEBUG("Error starting gnrc_cc110x thread for CC110X!");
             }
 #else
-            netdev->driver->init((netdev2_t *)&cc110x_devs[i]);
+            netdev2_t *netdev = (netdev2_t *)&cc110x_devs[i];
+            netdev->driver->init(netdev);
 #endif
         }
     }

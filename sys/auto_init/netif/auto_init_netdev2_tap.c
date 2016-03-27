@@ -42,10 +42,16 @@ static gnrc_netdev2_t _gnrc_netdev2_tap;
 
 void auto_init_netdev2_tap(void)
 {
+#ifdef MODULE_GNRC
     gnrc_netdev2_eth_init(&_gnrc_netdev2_tap, (netdev2_t*)&netdev2_tap);
 
     gnrc_netdev2_init(_netdev2_eth_stack, TAP_MAC_STACKSIZE,
             TAP_MAC_PRIO, "gnrc_netdev2_tap", &_gnrc_netdev2_tap);
+
+#else
+    netdev2_t *netdev = (netdev2_t *)&netdev2_tap[i];
+    netdev->driver->init((netdev2_t *)&netdev2_tap[i]);
+#endif
 
 #ifdef MODULE_NETDEV_DEFAULT
     netdev_default = (netdev2_t *)&netdev2_tap;
