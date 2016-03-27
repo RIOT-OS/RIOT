@@ -48,13 +48,6 @@
 #include "periph/rtc.h"
 #endif
 
-#ifdef MODULE_AUTO_INIT_NETDEV
-#   ifdef MODULE_NETDEV_DEFAULT
-#       include "net/netdev2.h"
-        netdev2_t *netdev_default = NULL;
-#   endif
-#endif
-
 #ifdef MODULE_GNRC_SIXLOWPAN
 #include "net/gnrc/sixlowpan.h"
 #endif
