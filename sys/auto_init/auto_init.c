@@ -76,6 +76,10 @@
 #include "net/gnrc/udp.h"
 #endif
 
+#ifdef MODULE_GNRC_DNS
+#include "net/gnrc/dns.h"
+#endif
+
 #ifdef MODULE_FIB
 #include "net/fib.h"
 #endif
@@ -150,7 +154,10 @@ void auto_init(void)
     extern void dht_auto_init(void);
     dht_auto_init();
 #endif
-
+#ifdef MODULE_GNRC_DNS
+    DEBUG("Auto init DNS module.\n");
+    gnrc_dns_init();
+#endif
 
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF

@@ -16,6 +16,7 @@
 
 #include "net/eui64.h"
 #include "net/gnrc/ipv6.h"
+#include "net/gnrc/dns.h"
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/sixlowpan/nd.h"
@@ -731,6 +732,53 @@ bool gnrc_ndp_internal_mtu_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
     if_entry->mtu = byteorder_ntohl(mtu_opt->mtu);
     mutex_unlock(&if_entry->mutex);
     return true;
+}
+
+int gnrc_ndp_internal_rdnss_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
+                                       ndp_opt_rdnss_t *rdnss_opt)
+{
+#ifdef MODULE_GNRC_DNS
+
+    uint8_t items;
+    uint32_t lifetime;
+    gnrc_ipv6_netif_t *if_entry = gnrc_ipv6_netif_get(iface);
+
+    /* TODO due to more network interface more DNS servers
+     *      could be added
+     */
+    (void) if_entry;
+
+    /* test if the length is valid should be: (len - 1) % 2 == 0 */
+    if (!(rdnss_opt->len & 0x01)) {
+        DEBUG("ndp: Invalid RDNSS option length\n");
+        return -EINVAL;
+    }
+
+    /* test if this came from an Router Advertisement */
+    if (icmpv6_type != ICMPV6_RTR_ADV) {
+        DEBUG("ndp: RDNSS option only valid with Router Advertisement\n");
+        return -EINVAL;
+    }
+
+    /* get the available DNS servers from the option */
+    items = (rdnss_opt->len - 1) >> 1;
+    lifetime = byteorder_ntohl(rdnss_opt->lifetime);
+
+    /* TODO maybe validate the lifetime of the DNS against the router maximum router advertisement */
+
+    /* update the DNS entries */
+    return gnrc_dns_update_entries(lifetime, items, rdnss_opt->dns_servers);
+
+#else
+    (void) iface;
+    (void) icmpv6_type;
+    (void) rdnss_opt;
+
+    DEBUG("ndp: Received RDNS option, but feature disabled.\n");
+
+    return 0;
+
+#endif
 }
 
 bool gnrc_ndp_internal_pi_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,

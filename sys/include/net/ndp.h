@@ -69,6 +69,7 @@ extern "C" {
 #define NDP_OPT_PI                  (3)     /**< prefix information option */
 #define NDP_OPT_RH                  (4)     /**< redirected option */
 #define NDP_OPT_MTU                 (5)     /**< MTU option */
+#define NDP_OPT_RDNSS               (25)    /**< RDNSS option */
 #define NDP_OPT_AR                  (33)    /**< address registration option */
 #define NDP_OPT_6CTX                (34)    /**< 6LoWPAN context option */
 #define NDP_OPT_ABR                 (35)    /**< authoritative border router option */
@@ -244,6 +245,21 @@ typedef struct __attribute__((packed)) {
     network_uint32_t mtu;   /**< MTU */
 } ndp_opt_mtu_t;
 
+/**
+ * @brief   RDNSS option format
+ * @extends ndp_opt_t
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc6106#section-5.1">
+ *          RFC 6106, section 5.1
+ *      </a>
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t type;                   /**< option type */
+    uint8_t len;                    /**< length in units of 8 octets */
+    uint16_t reserved;              /**< reserved field */
+    network_uint32_t lifetime;      /**< lifetime the servers may be used */
+    ipv6_addr_t dns_servers[];      /**< DNS servers (array length calculated by (len - 1) / 2 */
+} ndp_opt_rdnss_t;
 
 #ifdef __cplusplus
 }

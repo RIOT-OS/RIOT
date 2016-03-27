@@ -69,6 +69,9 @@ endif
 ifneq (,$(filter ccn-lite-utils,$(USEMODULE)))
   SRC += sc_ccnl.c
 endif
+ifneq (,$(filter gnrc_dns,$(USEMODULE)))
+    SRC += sc_gnrc_dns.c
+endif
 
 # TODO
 # Conditional building not possible at the moment due to

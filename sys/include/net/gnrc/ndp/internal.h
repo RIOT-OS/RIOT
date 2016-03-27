@@ -175,6 +175,22 @@ bool gnrc_ndp_internal_mtu_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
                                       ndp_opt_mtu_t *mtu_opt);
 
 /**
+ * @brief   Handles a RDNSS option.
+ *
+ * @internal
+ *
+ * @param[in] iface         Interface the MTU option was received on.
+ * @param[in] icmpv6_type   ICMPv6 type of the message carrying the option.
+ * @param[in] rndss_opt     A RDNSS option.
+ *
+ * @return  number of DNS servers added to the DNS cache
+ * @return  -EINVAL, the RDNSS option was not valid
+ * @return  -ENOTSUP, if node should silently ignore the option.
+ */
+int gnrc_ndp_internal_rdnss_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
+                                       ndp_opt_rdnss_t *rdnss_opt);
+
+/**
  * @brief   Handles a PI option.
  *
  * @internal
