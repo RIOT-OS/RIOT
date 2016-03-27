@@ -1,5 +1,7 @@
 ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += at86rf212b
+  CFLAGS += -DNETDEV_DEFAULT_AT86RF2XX
+  CFLAGS += -DNETDEV_DEFAULT_PARAM_SET=0
 endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
