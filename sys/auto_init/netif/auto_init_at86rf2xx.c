@@ -71,7 +71,7 @@ void auto_init_at86rf2xx(void)
 #endif
     }
 #ifdef MODULE_NETDEV_DEFAULT
-    netdev_default = (netdev2_t *)&at86rf2xx_devs[0];
+    netdev_default = (netdev2_t *)&at86rf2xx_devs[NETDEV_DEFAULT_PARAM_SET];
 #endif
 }
 #else

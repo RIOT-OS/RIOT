@@ -68,7 +68,7 @@ void auto_init_cc110x(void)
         }
     }
 #ifdef MODULE_NETDEV_DEFAULT
-    netdev_default = (netdev2_t *)&cc110x_devs[0];
+    netdev_default = (netdev2_t *)&cc110x_devs[NETDEV_DEFAULT_PARAM_SET];
 #endif
 }
 #else

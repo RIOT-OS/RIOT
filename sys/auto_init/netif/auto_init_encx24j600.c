@@ -54,11 +54,11 @@ void auto_init_encx24j600(void)
     gnrc_netdev2_init(_netdev2_eth_stack, MAC_STACKSIZE,
             MAC_PRIO, "gnrc_encx24j600", &_gnrc_encx24j600);
 #else
-    netdev2_t *netdev = (netdev2_t *)&encx24j600[i];
+    netdev2_t *netdev = (netdev2_t *)&encx24j600;
     netdev->driver->init(netdev);
 #endif
 #ifdef MODULE_NETDEV_DEFAULT
-    netdev_default = (netdev2_t *)&encx24j600[0];
+    netdev_default = (netdev2_t *)&encx24j600;
 #endif
 }
 

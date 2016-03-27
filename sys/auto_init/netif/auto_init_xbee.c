@@ -67,7 +67,7 @@ void auto_init_xbee(void)
 #endif
     }
 #ifdef MODULE_NETDEV_DEFAULT
-    netdev_default = (netdev2_t *)&xbee_devs[0];
+    netdev_default = (netdev2_t *)&xbee_devs[NETDEV_DEFAULT_PARAM_SET];
 #endif
 }
 

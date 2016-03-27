@@ -74,7 +74,7 @@ void auto_init_enc28j60(void)
 #endif
     }
 #ifdef MODULE_NETDEV_DEFAULT
-    netdev_default = (netdev2_t *)&dev[0];
+    netdev_default = (netdev2_t *)&dev[NETDEV_DEFAULT_PARAM_SET];
 #endif
 }
 
