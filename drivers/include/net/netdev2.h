@@ -97,9 +97,7 @@ typedef struct netdev2 netdev2_t;
 extern netdev2_t *netdev_default;
 #endif
 
-#ifdef NETDEV_DEFAULT_AT86RF231
 void netdev_default_setup(void *dev);
-#endif
 
 /**
  * @brief   Event callback for signaling event to upper layers
