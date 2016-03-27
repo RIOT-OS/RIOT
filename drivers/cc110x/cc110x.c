@@ -105,6 +105,16 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
     return 0;
 }
 
+#ifdef NETDEV_DEFAULT_CC110X
+cc110x_t _dev;
+netdev2_t *netdev_default = (netdev2_t*) &_dev;
+
+void netdev_default_setup(void *dev)
+{
+    cc110x_setup((cc110x_t*) dev, (cc110x_params_t*) &cc110x_params[NETDEV_DEFAULT_PARAM_SET]);
+}
+#endif
+
 uint8_t cc110x_set_address(cc110x_t *dev, uint8_t address)
 {
     DEBUG("%s:%s:%u setting address %u\n", RIOT_FILE_RELATIVE, __func__,

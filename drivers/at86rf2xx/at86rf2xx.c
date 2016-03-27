@@ -30,6 +30,7 @@
 #include "at86rf2xx_registers.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_netdev.h"
+#include "at86rf2xx_params.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -47,6 +48,16 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     /* initialise SPI */
     spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING, params->spi_speed);
 }
+
+#ifdef NETDEV_DEFAULT_AT86RF2XX
+at86rf2xx_t _dev;
+netdev2_t *netdev_default = (netdev2_t*) &_dev;
+
+void netdev_default_setup(void *dev)
+{
+    at86rf2xx_setup((at86rf2xx_t*) dev, (at86rf2xx_params_t*) &at86rf2xx_params[NETDEV_DEFAULT_PARAM_SET]);
+}
+#endif
 
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
