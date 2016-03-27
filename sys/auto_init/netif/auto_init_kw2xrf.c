@@ -59,18 +59,11 @@ void auto_init_kw2xrf(void)
             DEBUG("Error initializing KW2xrf radio device!");
         }
         else {
-#ifdef MODULE_GNRC
             gnrc_nomac_init(_nomac_stacks[i],
                             KW2XRF_MAC_STACKSIZE, KW2XRF_MAC_PRIO,
                             "kw2xrf", (gnrc_netdev_t *)&kw2xrf_devs[i]);
-#else
-            netdev->driver->init((netdev2_t *)&kw2xrf_devs[i]);
-#endif
         }
     }
-#ifdef MODULE_NETDEV_DEFAULT
-    netdev_default = (netdev2_t *)&kw2xrf_devs[0];
-#endif
 }
 #else
 typedef int dont_be_pedantic;
