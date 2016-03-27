@@ -88,7 +88,7 @@ struct netdev2_radio_rx_info {
  */
 typedef struct netdev2 netdev2_t;
 
-#ifdef MODULE_AUTO_INIT_GNRC_NETIF
+#ifdef MODULE_AUTO_INIT_NETDEV
 #   ifdef MODULE_NETDEV_DEFAULT
 /**
  * @brief   Pointer to the default network device of the board

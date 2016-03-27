@@ -185,7 +185,7 @@
  *
  * - To auto-initialize these network devices as GNRC network interfaces
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   USEMODULE += auto_init_gnrc_netif
+ *   USEMODULE += auto_init_netdev
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - You may choose to build either as an IPv6 Node

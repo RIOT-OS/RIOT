@@ -1,6 +1,6 @@
 DIRS += $(AUTO_INIT_MODULES)
 
-ifneq (,$(filter auto_init_gnrc_netif,$(USEMODULE)))
+ifneq (,$(filter auto_init_netdev,$(USEMODULE)))
 DIRS += netif
 endif
 

@@ -48,7 +48,7 @@ ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
   # use the default network interface for the board
   USEMODULE += gnrc_netdev_default
   # automatically initialize the network interface
-  USEMODULE += auto_init_gnrc_netif
+  USEMODULE += auto_init_netdev
   # the application dumps received packets to stdout
   USEMODULE += gnrc_pktdump
 

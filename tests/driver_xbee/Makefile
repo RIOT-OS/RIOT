@@ -7,7 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := stm32f0discovery weio
 
 USEMODULE += xbee
 USEMODULE += gnrc_netif
-USEMODULE += auto_init_gnrc_netif
+USEMODULE += auto_init_netdev
 USEMODULE += gnrc_nomac
 USEMODULE += gnrc_pktdump
 USEMODULE += shell
