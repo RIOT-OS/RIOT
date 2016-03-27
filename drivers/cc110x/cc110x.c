@@ -106,8 +106,12 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
 }
 
 #ifdef NETDEV_DEFAULT_CC110X
-cc110x_t _dev;
-netdev2_t *netdev_default = (netdev2_t*) &_dev;
+netdev2_t *netdev_default;
+
+#   ifndef MODULE_AUTO_INIT_NETDEV
+    cc110x_t _dev;
+    netdev_default = (netdev2_t*) &_dev;
+#   endif
 
 void netdev_default_setup(void *dev)
 {

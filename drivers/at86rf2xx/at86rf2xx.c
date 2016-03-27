@@ -50,8 +50,12 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
 }
 
 #ifdef NETDEV_DEFAULT_AT86RF2XX
-at86rf2xx_t _dev;
-netdev2_t *netdev_default = (netdev2_t*) &_dev;
+netdev2_t *netdev_default;
+
+#   ifndef MODULE_AUTO_INIT_NETDEV
+    at86rf2xx_t _dev;
+    netdev_default = (netdev2_t*) &_dev;
+#endif
 
 void netdev_default_setup(void *dev)
 {
