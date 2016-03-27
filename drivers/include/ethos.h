@@ -81,6 +81,16 @@ typedef struct {
 } ethos_t;
 
 /**
+ * @brief   Struct containing the needed configuration
+ */
+typedef struct {
+    uart_t uart;            /**< UART device to use */
+    uint32_t baudrate;      /**< baudrate to UART device */
+    uint8_t buf;            /**< buffer for incoming packets */
+    size_t bufsize;         /**< size of ethos_params_t::buf */
+} ethos_params_t;
+
+/**
  * @brief Setup an ethos based device state.
  *
  * The supplied buffer *must* have a power-of-two size, and it *must* be large
@@ -90,12 +100,9 @@ typedef struct {
  * E.g., if 1536b ethernet frames are expected, 2048 is probably a good size for @p buf.
  *
  * @param[out]  dev         handle of the device to initialize
- * @param[in]   uart        UART device to use
- * @param[in]   baudrate    baudrate for UART device
- * @param[in]   buf         buffer for incoming packets
- * @param[in]   bufsize     size of @p buf
+ * @param[in]   params      parameters for device initialization
  */
-void ethos_setup(ethos_t *dev, uart_t uart, uint32_t baudrate, uint8_t *buf, size_t bufsize);
+void ethos_setup(ethos_t *dev, const ethos_params_t *params);
 
 /**
  * @brief send frame over serial port using ethos' framing

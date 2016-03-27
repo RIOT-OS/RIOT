@@ -82,12 +82,12 @@ static inline void unlock(encx24j600_t *dev) {
     mutex_unlock(&dev->mutex);
 }
 
-void encx24j600_setup(encx24j600_t *dev, spi_t spi, gpio_t cs, gpio_t int_pin)
+void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params)
 {
     dev->netdev.driver = &netdev2_driver_encx24j600;
-    dev->spi = spi;
-    dev->cs = cs;
-    dev->int_pin = int_pin;
+    dev->spi = params->spi;
+    dev->cs = params->cs;
+    dev->int_pin = params->int_pin;
     dev->rx_next_ptr = RX_BUFFER_START;
 
     mutex_init(&dev->mutex);

@@ -96,8 +96,7 @@ int main(void)
         netdev2_t *dev = (netdev2_t *)(&devs[i]);
 
         printf("Initializing AT86RF2xx radio at SPI_%d\n", p->spi);
-        at86rf2xx_setup(&devs[i], p->spi, p->spi_speed, p->cs_pin,
-                        p->int_pin, p->sleep_pin, p->reset_pin);
+        at86rf2xx_setup(&devs[i], (at86rf2xx_params_t*) p);
         dev->event_callback = _event_cb;
         dev->driver->init(dev);
     }

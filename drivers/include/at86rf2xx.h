@@ -133,32 +133,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Device descriptor for AT86RF2XX radio devices
- *
- * @extends netdev2_ieee802154_t
- */
-typedef struct {
-    netdev2_ieee802154_t netdev;            /**< netdev2 parent struct */
-    /**
-     * @brief   device specific fields
-     * @{
-     */
-    spi_t spi;                              /**< used SPI device */
-    gpio_t cs_pin;                          /**< chip select pin */
-    gpio_t sleep_pin;                       /**< sleep pin */
-    gpio_t reset_pin;                       /**< reset pin */
-    gpio_t int_pin;                         /**< external interrupt pin */
-    uint8_t state;                          /**< current state of the radio */
-    uint8_t tx_frame_len;                   /**< length of the current TX frame */
-#ifdef MODULE_AT86RF212B
-    /* Only AT86RF212B supports multiple pages (PHY modes) */
-    uint8_t page;                       /**< currently used channel page */
-#endif
-    uint8_t idle_state;                 /**< state to return to after sending */
-    /** @} */
-} at86rf2xx_t;
-
-/**
  * @brief struct holding all params needed for device initialization
  */
 typedef struct at86rf2xx_params {
@@ -171,19 +145,34 @@ typedef struct at86rf2xx_params {
 } at86rf2xx_params_t;
 
 /**
+ * @brief   Device descriptor for AT86RF2XX radio devices
+ *
+ * @extends netdev2_ieee802154_t
+ */
+typedef struct {
+    netdev2_ieee802154_t netdev;            /**< netdev2 parent struct */
+    /**
+     * @brief   device specific fields
+     * @{
+     */
+    at86rf2xx_params_t params;              /**< parameters for initialization */
+    uint8_t state;                          /**< current state of the radio */
+    uint8_t tx_frame_len;                   /**< length of the current TX frame */
+#ifdef MODULE_AT86RF212B
+    /* Only AT86RF212B supports multiple pages (PHY modes) */
+    uint8_t page;                       /**< currently used channel page */
+#endif
+    uint8_t idle_state;                 /**< state to return to after sending */
+    /** @} */
+} at86rf2xx_t;
+
+/**
  * @brief   Setup an AT86RF2xx based device state
  *
  * @param[out] dev          device descriptor
- * @param[in] spi           SPI bus the device is connected to
- * @param[in] spi_speed     SPI speed to use
- * @param[in] cs_pin        GPIO pin connected to chip select
- * @param[in] int_pin       GPIO pin connected to the interrupt pin
- * @param[in] sleep_pin     GPIO pin connected to the sleep pin
- * @param[in] reset_pin     GPIO pin connected to the reset pin
+ * @param[in]  params       parameters for device initialization
  */
-void at86rf2xx_setup(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
-                     gpio_t cs_pin, gpio_t int_pin, gpio_t sleep_pin,
-                     gpio_t reset_pin);
+void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params);
 
 /**
  * @brief   Trigger a hardware reset and configure radio with default values

@@ -455,7 +455,7 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
         /* Discard all IRQ flags, framebuffer is lost anyway */
         at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
         /* Go to SLEEP mode from TRX_OFF */
-        gpio_set(dev->sleep_pin);
+        gpio_set(dev->params.sleep_pin);
         dev->state = state;
     } else {
         _set_state(dev, state);

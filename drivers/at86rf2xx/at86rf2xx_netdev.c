@@ -69,13 +69,13 @@ static int _init(netdev2_t *netdev)
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
 
     /* initialise GPIOs */
-    gpio_init(dev->cs_pin, GPIO_OUT);
-    gpio_set(dev->cs_pin);
-    gpio_init(dev->sleep_pin, GPIO_OUT);
-    gpio_clear(dev->sleep_pin);
-    gpio_init(dev->reset_pin, GPIO_OUT);
-    gpio_set(dev->reset_pin);
-    gpio_init_int(dev->int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
+    gpio_init(dev->params.cs_pin, GPIO_OUT);
+    gpio_set(dev->params.cs_pin);
+    gpio_init(dev->params.sleep_pin, GPIO_OUT);
+    gpio_clear(dev->params.sleep_pin);
+    gpio_init(dev->params.reset_pin, GPIO_OUT);
+    gpio_set(dev->params.reset_pin);
+    gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
 
     /* make sure device is not sleeping, so we can query part number */
     at86rf2xx_assert_awake(dev);
