@@ -59,7 +59,6 @@ extern "C" {
                                      .sleep_pin = GPIO_PIN(PORT_A, 2), \
                                      .reset_pin = GPIO_PIN(PORT_C, 1)}
 
-
 /**
  * @name Define the interface for the connected flash memory
  * @{
