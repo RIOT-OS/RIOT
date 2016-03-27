@@ -90,25 +90,32 @@ static const timer_conf_t timer_config[] = {
  */
 static const uart_conf_t uart_config[] = {
     {
-        .dev     = USART1,
-        .rx_pin  = GPIO_PIN(PORT_A, 10),
-        .tx_pin  = GPIO_PIN(PORT_A, 9),
-        .rcc_pin = RCC_APB2ENR_USART1EN,
-        .bus     = APB2,
-        .irqn    = USART1_IRQn
+        .dev        = USART1,
+        .rx_pin     = GPIO_PIN(PORT_A, 10),
+        .tx_pin     = GPIO_PIN(PORT_A, 9),
+        .rcc_mask   = RCC_APB2ENR_USART1EN,
+        .afio_remap = 0,
+        .dma_chan   = 3,
+        .bus        = APB2,
+        .irqn       = USART1_IRQn
     },
     {
-        .dev     = USART2,
-        .rx_pin  = GPIO_PIN(PORT_A, 3),
-        .tx_pin  = GPIO_PIN(PORT_A, 2),
-        .rcc_pin = RCC_APB1ENR_USART2EN,
-        .bus     = APB1,
-        .irqn    = USART2_IRQn
+        .dev        = USART2,
+        .rx_pin     = GPIO_PIN(PORT_A, 3),
+        .tx_pin     = GPIO_PIN(PORT_A, 2),
+        .rcc_mask   = RCC_APB1ENR_USART2EN,
+        .afio_remap = 0,
+        .dma_chan   = 6,
+        .bus        = APB1,
+        .irqn       = USART2_IRQn
     }
 };
 
 #define UART_0_ISR          isr_usart1
+#define UART_0_DMA_ISR      isr_dma1_ch4
+
 #define UART_1_ISR          isr_usart2
+#define UART_1_DMA_ISR      isr_dma1_ch7
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */

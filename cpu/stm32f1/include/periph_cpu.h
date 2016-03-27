@@ -14,6 +14,7 @@
  * @brief           CPU specific definitions for internal peripheral handling
  *
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
  */
 
 #ifndef PERIPH_CPU_H
@@ -154,16 +155,20 @@ typedef struct {
 } timer_conf_t;
 
 /**
- * @brief   UART configuration options
+ * @brief   Structure for UART configuration data
+ * @{
  */
 typedef struct {
-    USART_TypeDef *dev;     /**< UART device */
-    gpio_t rx_pin;          /**< TX pin */
-    gpio_t tx_pin;          /**< RX pin */
-    uint32_t rcc_pin;       /**< bit in the RCC register */
-    uint8_t bus;            /**< peripheral bus */
-    uint8_t irqn;           /**< interrupt number */
+    USART_TypeDef *dev;     /**< UART device base register address */
+    gpio_t rx_pin;          /**< RX pin */
+    gpio_t tx_pin;          /**< TX pin */
+    uint32_t rcc_mask;      /**< bit in clock enable register */
+    uint32_t afio_remap;    /**< AFIO pin remapping */
+    uint8_t bus;            /**< APB bus */
+    uint8_t irqn;           /**< IRQ channel */
+    uint8_t dma_chan;       /**< DMA channel used for TX */
 } uart_conf_t;
+/** @} */
 
 /**
  * @brief   Configure the alternate function for the given pin
@@ -181,6 +186,119 @@ void gpio_init_af(gpio_t pin, gpio_af_out_t af);
  * @param[in] pin       pin to configure
  */
 void gpio_init_analog(gpio_t pin);
+
+/**
+ * @brief   Power on the DMA device the given stream belongs to
+ *
+ * @param[in] channel   logical DMA channel
+ */
+static inline void dma_poweron(int channel)
+{
+#if defined(DMA2)
+    if (channel < 7) {
+        RCC->AHBENR |= RCC_AHBENR_DMA1EN;
+    } else {
+        RCC->AHBENR |= RCC_AHBENR_DMA2EN;
+    }
+#else
+    (void) channel;
+
+    RCC->AHBENR |= RCC_AHBENR_DMA1EN;
+#endif
+}
+
+/**
+ * @brief   Get DMA base register
+ *
+ * For simplifying DMA channel handling, we map the DMA channels transparently to
+ * one integer number, such that DMA1 channel1 equals 0, DMA2 channel1 equals 7,
+ * DMA2 channel7 equals 14 and so on.
+ *
+ * @param[in] stream    logical DMA channel
+ */
+static inline DMA_TypeDef *dma_base(int channel)
+{
+#if defined(DMA2)
+    return (channel < 7) ? DMA1 : DMA2;
+#else
+    return DMA1;
+#endif
+}
+
+/**
+ * @brief   Get the DMA stream base address
+ *
+ * @param[in] channel   logical DMA stream
+ *
+ * @return  base address for the selected DMA channel
+ */
+static inline DMA_Channel_TypeDef *dma_channel(int channel)
+{
+    /**
+     * DMA Channel register map is calculated with:
+     *      Address offset: 0x08 + 0d20 × (channel number – 1)
+     *
+     * STM32's Channel 1 is our Channel 0 so no - 1 needed
+     */
+    uint32_t base = (uint32_t)dma_base(channel);
+    if (channel >= 7) {
+        channel -= 7;
+    }
+    return (DMA_Channel_TypeDef *)(base + (0x08 + (0x14 * channel)));
+}
+
+/**
+ * @brief   Get the transfer complete flag position for the corresponding channel
+ *
+ * @param[in] channel   logical DMA channel
+ */
+static inline uint32_t dma_tcif(int channel)
+{
+    /**
+     * DMA_ISR & DMA_IFCR have per channel 4 interrupt bits
+     * | b3      | b2     | b1       | b0     |
+     * |--------------------------------------|
+     * | TEIFx   | HTIFx  | TCIFx    | GIFx   |
+     * | Error   | Half   | Complete | Global |
+     *
+     * `2 << (channel * 4)` marks the TCIFx bit
+     */
+
+    if (channel >= 7) {
+        channel -= 7;
+    }
+
+    return (0x2 << (channel << 2));
+}
+
+static inline void dma_isr_enable(int channel)
+{
+    /**
+     * | ch   | IRQn                | ISR   |
+     * -------------------------------------|
+     * | 0    | DMA1_Channel1_IRQn  | 11    |
+     * | 1    | DMA1_Channel2_IRQn  | 12    |
+     * | 2    | DMA1_Channel3_IRQn  | 13    |
+     * | 3    | DMA1_Channel4_IRQn  | 14    |
+     * | 4    | DMA1_Channel5_IRQn  | 15    |
+     * | 5    | DMA1_Channel6_IRQn  | 16    |
+     * | 6    | DMA1_Channel7_IRQn  | 17    |
+     * | 7    | DMA2_Channel1_IRQn  | 56    |
+     * | 8    | DMA2_Channel2_IRQn  | 57    |
+     * | 9    | DMA2_Channel3_IRQn  | 58    |
+     * | 10-11| DMA2_Channel4_5_IRQn| 59    |
+     */
+
+    if (channel < 7) {
+        NVIC_EnableIRQ((IRQn_Type)((int)DMA1_Channel1_IRQn + channel));
+    }
+    else if (channel < 11) {
+        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Channel1_IRQn + (channel - 7)));
+    }
+    else if (channel == 11) {
+        NVIC_EnableIRQ(DMA2_Channel4_5_IRQn);
+    }
+}
 
 #ifdef __cplusplus
 }
