@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief   Auto initialization for nx_at86rf2xx network interfaces
+ * @brief   Auto initialization for at86rf2xx network interfaces
  *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
