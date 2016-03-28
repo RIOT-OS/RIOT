@@ -142,6 +142,18 @@ typedef struct {
 } xbee_t;
 
 /**
+ * @brief   auto_init struct holding Xbee device initalization params
+ */
+typedef struct xbee_params {
+    uart_t uart;            /**< UART interfaced the device is connected to */
+    uint32_t baudrate;      /**< baudrate to use */
+    gpio_t sleep_pin;       /**< GPIO pin that is connected to the SLEEP pin
+                                 set to GPIO_UNDEF if not used */
+    gpio_t reset_pin;      /**< GPIO pin that is connected to the STATUS pin
+                                 set to GPIO_UNDEF if not used */
+} xbee_params_t;
+
+/**
  * @brief   Reference to the XBee driver interface
  */
 extern const gnrc_netdev_driver_t xbee_driver;
@@ -150,31 +162,13 @@ extern const gnrc_netdev_driver_t xbee_driver;
  * @brief   Initialize the given Xbee device
  *
  * @param[out] dev          Xbee device to initialize
- * @param[in]  uart         UART interfaced the device is connected to
- * @param[in]  baudrate     baudrate to use
- * @param[in]  sleep_pin    GPIO pin that is connected to the SLEEP pin, set to
- *                          GPIO_UNDEF if not used
- * @param[in]  status_pin   GPIO pin that is connected to the STATUS pin, set to
- *                          GPIO_UNDEF if not used
+ * @param[in]  params       parameters for device initialization
  *
  * @return                  0 on success
  * @return                  -ENODEV on invalid device descriptor
  * @return                  -ENXIO on invalid UART or GPIO pins
  */
-int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
-              gpio_t sleep_pin, gpio_t status_pin);
-
-/**
- * @brief   auto_init struct holding Xbee device initalization params
- */
-typedef struct xbee_params {
-    uart_t uart;            /**< UART interfaced the device is connected to */
-    uint32_t baudrate;      /**< baudrate to use */
-    gpio_t sleep_pin;       /**< GPIO pin that is connected to the SLEEP pin
-                                 set to GPIO_UNDEF if not used */
-    gpio_t status_pin;      /**< GPIO pin that is connected to the STATUS pin
-                                 set to GPIO_UNDEF if not used */
-} xbee_params_t;
+int xbee_init(xbee_t *dev, const xbee_params_t *params);
 
 #ifdef __cplusplus
 }

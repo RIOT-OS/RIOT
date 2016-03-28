@@ -35,23 +35,17 @@
 #include "debug.h"
 
 
-void at86rf2xx_setup(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
-                     gpio_t cs_pin, gpio_t int_pin, gpio_t sleep_pin,
-                     gpio_t reset_pin)
+void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
 {
     netdev2_t *netdev = (netdev2_t *)dev;
 
     netdev->driver = &at86rf2xx_driver;
     /* initialize device descriptor */
-    dev->spi = spi;
-    dev->cs_pin = cs_pin;
-    dev->int_pin = int_pin;
-    dev->sleep_pin = sleep_pin;
-    dev->reset_pin = reset_pin;
+    memcpy(&dev->params, params, sizeof(at86rf2xx_params_t));
     dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
     dev->state = AT86RF2XX_STATE_SLEEP;
     /* initialise SPI */
-    spi_init_master(dev->spi, SPI_CONF_FIRST_RISING, spi_speed);
+    spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING, params->spi_speed);
 }
 
 void at86rf2xx_reset(at86rf2xx_t *dev)

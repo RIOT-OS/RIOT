@@ -395,8 +395,7 @@ static int _set_proto(xbee_t *dev, uint8_t *val, size_t len)
 /*
  * Driver's "public" functions
  */
-int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
-              gpio_t reset_pin, gpio_t sleep_pin)
+int xbee_init(xbee_t *dev, const xbee_params_t *params)
 {
     uint8_t tmp[2];
 
@@ -404,15 +403,15 @@ int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
     if (dev == NULL) {
         return -ENODEV;
     }
-    if (uart >= UART_NUMOF) {
+    if (params->uart >= UART_NUMOF) {
         return -ENXIO;
     }
     /* set device driver */
     dev->driver = &xbee_driver;
     /* set peripherals to use */
-    dev->uart = uart;
-    dev->reset_pin = reset_pin;
-    dev->sleep_pin = sleep_pin;
+    dev->uart = params->uart;
+    dev->reset_pin = params->reset_pin;
+    dev->sleep_pin = params->sleep_pin;
     /* set default options */
     dev->addr_flags = 0;
     dev->proto = XBEE_DEFAULT_PROTOCOL;
@@ -423,29 +422,29 @@ int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
     dev->resp_limit = 1;    /* needs to be greater then 0 initially */
     dev->rx_count = 0;
     /* initialize UART and GPIO pins */
-    if (uart_init(uart, baudrate, _rx_cb, dev) < 0) {
+    if (uart_init(params->uart, params->baudrate, _rx_cb, dev) < 0) {
         DEBUG("xbee: Error initializing UART\n");
         return -ENXIO;
     }
-    if (reset_pin != GPIO_UNDEF) {
-        if (gpio_init(reset_pin, GPIO_OUT) < 0) {
+    if (params->reset_pin != GPIO_UNDEF) {
+        if (gpio_init(params->reset_pin, GPIO_OUT) < 0) {
             DEBUG("xbee: Error initializing RESET pin\n");
             return -ENXIO;
         }
-        gpio_set(reset_pin);
+        gpio_set(params->reset_pin);
     }
-    if (sleep_pin != GPIO_UNDEF) {
-        if (gpio_init(sleep_pin, GPIO_OUT) < 0) {
+    if (params->sleep_pin != GPIO_UNDEF) {
+        if (gpio_init(params->sleep_pin, GPIO_OUT) < 0) {
             DEBUG("xbee: Error initializing SLEEP pin\n");
             return -ENXIO;
         }
-        gpio_clear(sleep_pin);
+        gpio_clear(params->sleep_pin);
     }
     /* if reset pin is connected, do a hardware reset */
-    if (reset_pin != GPIO_UNDEF) {
-        gpio_clear(reset_pin);
+    if (params->reset_pin != GPIO_UNDEF) {
+        gpio_clear(params->reset_pin);
         xtimer_usleep(RESET_DELAY);
-        gpio_set(reset_pin);
+        gpio_set(params->reset_pin);
     }
     /* put the XBee device into command mode */
     xtimer_usleep(ENTER_CMD_MODE_DELAY);

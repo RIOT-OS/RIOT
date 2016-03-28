@@ -47,16 +47,16 @@ static const uint8_t _esc_esc[] = {ETHOS_ESC_CHAR, (ETHOS_ESC_CHAR ^ 0x20)};
 static const uint8_t _esc_delim[] = {ETHOS_ESC_CHAR, (ETHOS_FRAME_DELIMITER ^ 0x20)};
 
 
-void ethos_setup(ethos_t *dev, uart_t uart, uint32_t baudrate, uint8_t *buf, size_t bufsize)
+void ethos_setup(ethos_t *dev, const ethos_params_t *params)
 {
     dev->netdev.driver = &netdev2_driver_ethos;
-    dev->uart = uart;
+    dev->uart = params->uart;
     dev->state = WAIT_FRAMESTART;
     dev->framesize = 0;
     dev->frametype = 0;
     dev->last_framesize = 0;
 
-    tsrb_init(&dev->inbuf, (char*)buf, bufsize);
+    tsrb_init(&dev->inbuf, (char*)params->buf, params->bufsize);
     mutex_init(&dev->out_mutex);
 
     uint32_t a = random_uint32();
@@ -67,7 +67,7 @@ void ethos_setup(ethos_t *dev, uart_t uart, uint32_t baudrate, uint8_t *buf, siz
     dev->mac_addr[0] &= (0x2);      /* unset globally unique bit */
     dev->mac_addr[0] &= ~(0x1);     /* set unicast bit*/
 
-    uart_init(uart, baudrate, ethos_isr, (void*)dev);
+    uart_init(params->uart, params->baudrate, ethos_isr, (void*)dev);
 
     uint8_t frame_delim = ETHOS_FRAME_DELIMITER;
     uart_write(dev->uart, &frame_delim, 1);
