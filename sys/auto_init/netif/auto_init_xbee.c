@@ -54,7 +54,7 @@ void auto_init_xbee(void)
                 p->uart,
                 p->baudrate,
                 p->sleep_pin,
-                p->status_pin);
+                p->reset_pin);
 
         if (res < 0) {
             DEBUG("Error initializing XBee radio device!");

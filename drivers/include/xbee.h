@@ -154,7 +154,7 @@ extern const gnrc_netdev_driver_t xbee_driver;
  * @param[in]  baudrate     baudrate to use
  * @param[in]  sleep_pin    GPIO pin that is connected to the SLEEP pin, set to
  *                          GPIO_UNDEF if not used
- * @param[in]  status_pin   GPIO pin that is connected to the STATUS pin, set to
+ * @param[in]  reset_pin    GPIO pin that is connected to the STATUS pin, set to
  *                          GPIO_UNDEF if not used
  *
  * @return                  0 on success
@@ -162,7 +162,7 @@ extern const gnrc_netdev_driver_t xbee_driver;
  * @return                  -ENXIO on invalid UART or GPIO pins
  */
 int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
-              gpio_t sleep_pin, gpio_t status_pin);
+              gpio_t sleep_pin, gpio_t reset_pin);
 
 /**
  * @brief   auto_init struct holding Xbee device initalization params
@@ -172,7 +172,7 @@ typedef struct xbee_params {
     uint32_t baudrate;      /**< baudrate to use */
     gpio_t sleep_pin;       /**< GPIO pin that is connected to the SLEEP pin
                                  set to GPIO_UNDEF if not used */
-    gpio_t status_pin;      /**< GPIO pin that is connected to the STATUS pin
+    gpio_t reset_pin;       /**< GPIO pin that is connected to the STATUS pin
                                  set to GPIO_UNDEF if not used */
 } xbee_params_t;
 
