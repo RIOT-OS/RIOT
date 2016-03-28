@@ -125,6 +125,34 @@ static const i2c_conf_t i2c_config[I2C_NUMOF] = {
 /** @} */
 
 /**
+ * @name SPI configuration
+ * @{
+ */
+#define SPI_NUMOF           2
+#define SPI_0_EN            1
+#define SPI_1_EN            1
+
+#ifdef HAVE_PERIPH_SPI_CONF_T
+static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
+    {
+        .dev      = SSI0,
+        .mosi_pin = GPIO_PD0,
+        .miso_pin = GPIO_PC4,
+        .sck_pin  = GPIO_PD1,
+        .cs_pin   = GPIO_PD3,
+    },
+    {
+        .dev      = SSI1,
+        .mosi_pin = GPIO_PC7,
+        .miso_pin = GPIO_PA4,
+        .sck_pin  = GPIO_PB5,
+    },
+};
+#endif
+
+/** @} */
+
+/**
  * @name GPIO configuration
  * @{
  */

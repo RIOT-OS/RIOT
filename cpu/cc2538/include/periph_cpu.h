@@ -21,6 +21,8 @@
 
 #include <stdint.h>
 
+#include "cc2538_ssi.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,10 +45,30 @@ typedef uint32_t gpio_t;
  */
 #define GPIO_UNDEF          (0xffffffff)
 
+/**
+ * @brief declare needed generic SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
 typedef struct {
     gpio_t scl_pin;         /**< pin used for SCL */
     gpio_t sda_pin;         /**< pin used for SDA */
 } i2c_conf_t;
+
+/**
+ * @brief   SPI configuration data structure
+ */
+#define HAVE_PERIPH_SPI_CONF_T
+typedef struct {
+    cc2538_ssi_t *dev;      /**< SSI device */
+    gpio_t mosi_pin;        /**< pin used for MOSI */
+    gpio_t miso_pin;        /**< pin used for MISO */
+    gpio_t sck_pin;         /**< pin used for SCK */
+    gpio_t cs_pin;          /**< pin used for CS */
+} periph_spi_conf_t;
 
 #ifdef __cplusplus
 }
