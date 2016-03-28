@@ -1,4 +1,4 @@
 ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
     USEMODULE += netdev2_tap
-	CFLAGS += -DNETDEV_DEFAULT_TAP
+    CFLAGS += -DNETDEV_DEFAULT_TAP
 endif
