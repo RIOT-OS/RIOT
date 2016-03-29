@@ -35,24 +35,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Overwrite the default gpio_t type definition
- * @{
- */
-#define HAVE_GPIO_T
-typedef uint32_t gpio_t;
-/** @} */
-
-/**
- * @brief   Definition of a fitting UNDEF value
- */
-#define GPIO_UNDEF          (0xffffffff)
-
-/**
- * @brief   Define a CPU specific GPIO pin generator macro
- */
-#define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
-
-/**
  * @brief declare needed generic SPI functions
  * @{
  */
@@ -180,13 +162,6 @@ typedef struct {
  * @param[in] af        alternate function to use
  */
 void gpio_init_af(gpio_t pin, gpio_af_t af);
-
-/**
- * @brief   Configure the given pin to be used as ADC input
- *
- * @param[in] pin       pin to configure
- */
-void gpio_init_analog(gpio_t pin);
 
 /**
  * @brief   Power on the DMA device the given stream belongs to

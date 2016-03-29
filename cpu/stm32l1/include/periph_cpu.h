@@ -28,24 +28,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Overwrite the default gpio_t type definition
- * @{
- */
-#define HAVE_GPIO_T
-typedef uint32_t gpio_t;
-/** @} */
-
-/**
- * @brief   Definition of a fitting UNDEF value
- */
-#define GPIO_UNDEF          (0xffffffff)
-
-/**
- * @brief   Define a CPU specific GPIO pin generator macro
- */
-#define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
-
-/**
  * @brief   Generate GPIO mode bitfields
  *
  * We use 5 bit to encode the mode:
@@ -104,6 +86,14 @@ typedef enum {
     GPIO_AF13,              /**< use alternate function 13 */
     GPIO_AF14               /**< use alternate function 14 */
 } gpio_af_t;
+
+/**
+ * @brief   DAC line configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the line */
+    uint8_t chan;           /**< DAC device used for this line */
+} dac_conf_t;
 
 /**
  * @brief   Configure the alternate function for the given pin

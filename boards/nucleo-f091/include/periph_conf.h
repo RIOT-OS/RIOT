@@ -109,6 +109,13 @@ extern "C" {
 #define ADC_NUMOF          (0)
 /** @} */
 
+/**
+ * @brief   DAC configuration
+ * @{
+ */
+#define DAC_NUMOF           (0)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
