@@ -20,12 +20,12 @@
 
 void thread_print_msg_queue(void)
 {
-    volatile tcb_t *tcb = sched_active_thread;
-    volatile cib_t *msg_queue = &tcb->msg_queue;
-    msg_t *msg_array = tcb->msg_array;
+    volatile thread_t *thread = sched_active_thread;
+    volatile cib_t *msg_queue = &thread->msg_queue;
+    msg_t *msg_array = thread->msg_array;
     unsigned int i = msg_queue->read_count & msg_queue->mask;
 
-    printf("Message queue of thread %" PRIkernel_pid "\n", tcb->pid);
+    printf("Message queue of thread %" PRIkernel_pid "\n", thread->pid);
     printf("    size: %u (avail: %d)\n", msg_queue->mask + 1,
            cib_avail((cib_t *)msg_queue));
 

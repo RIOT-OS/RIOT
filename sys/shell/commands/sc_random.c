@@ -50,7 +50,7 @@ int _random_init(int argc, char **argv)
         printf("PRNG initialized given value: %d\n", initval);
     }
 
-    genrand_init(initval);
+    random_init(initval);
 
     return 0;
 }
@@ -60,7 +60,7 @@ int _random_get(int argc, char **argv)
     (void) argc;
     (void) argv;
 
-    printf("%" PRIu32 "\n", genrand_uint32());
+    printf("%" PRIu32 "\n", random_uint32());
 
     return 0;
 }

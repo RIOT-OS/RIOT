@@ -172,10 +172,10 @@ int spi_release(spi_t dev)
 int spi_transfer_byte(spi_t dev, char out, char *in)
 {
     (void) dev;
-    while (!SPI_TX_EMPTY);
+    while (!SPI_TX_EMPTY) {}
     SSP0DR = out;
-    while (SPI_BUSY);
-    while (!SPI_RX_AVAIL);
+    while (SPI_BUSY) {}
+    while (!SPI_RX_AVAIL) {}
 
     char tmp = (char)SSP0DR;
 

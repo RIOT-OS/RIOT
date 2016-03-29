@@ -44,7 +44,8 @@ typedef struct rp_address_msg_t {
 } rp_address_msg_t;
 
 /**
- * @brief message type for RP notification: unreachable destination
+ * @brief message type for RP notification: no route to destination available,
+ *        start route discovery if appropriate
  */
 #define FIB_MSG_RP_SIGNAL_UNREACHABLE_DESTINATION (0x99)
 
@@ -54,7 +55,7 @@ typedef struct rp_address_msg_t {
 #define FIB_MSG_RP_SIGNAL_DESTINATION_USED (0x98)
 
 /**
- * @brief message type for RP notification: sr created
+ * @brief message type for RP notification: source route created
  */
 #define FIB_MSG_RP_SIGNAL_SOURCE_ROUTE_CREATED (0x97)
 
@@ -158,6 +159,17 @@ int fib_update_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
  * @param[in] dst_size      the destination address size
  */
 void fib_remove_entry(fib_table_t *table, uint8_t *dst, size_t dst_size);
+
+/**
+ * @brief removes all entries from the corresponding FIB table and interface combination
+ *
+ * @note if interface is KERNEL_PID_UNDEF, then all entries regardless of the interface
+ *       will be removed.
+ *
+ * @param[in] table         the fib table to flush
+ * @param[in] interface     entries associated with this interface will be removed
+ */
+void fib_flush(fib_table_t *table, kernel_pid_t interface);
 
 /**
  * @brief provides a next hop for a given destination

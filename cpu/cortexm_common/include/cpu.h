@@ -40,40 +40,6 @@ extern "C" {
 #endif
 
 /**
- * @brief    Configuration of default stack sizes
- *
- * As all members of the Cortex-M family behave identical in terms of stack
- * usage, we define the default stack size values here centrally for all CPU
- * implementations.
- *
- * If needed, you can overwrite these values the the `cpu_conf.h` file of the
- * specific CPU implementation.
- *
- * @todo Adjust values for Cortex-M4F with FPU?
- * @todo Configure second set if no newlib nano.specs are available?
- * @{
- */
-#ifndef THREAD_EXTRA_STACKSIZE_PRINTF
-#define THREAD_EXTRA_STACKSIZE_PRINTF   (512)
-#endif
-#ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT        (1024)
-#endif
-#ifndef THREAD_STACKSIZE_IDLE
-#define THREAD_STACKSIZE_IDLE           (256)
-#endif
-/** @} */
-
-/**
- * @brief   Stack size used for the exception (ISR) stack
- * @{
- */
-#ifndef ISR_STACKSIZE
-#define ISR_STACKSIZE                   (512U)
-#endif
-/** @} */
-
-/**
  * @brief   Some members of the Cortex-M family have architecture specific
  *          atomic operations in atomic_arch.c
  */
@@ -100,6 +66,17 @@ static inline void cpu_print_last_instruction(void)
     register uint32_t *lr_ptr;
     __asm__ __volatile__("mov %0, lr" : "=r"(lr_ptr));
     printf("%p\n", (void*) lr_ptr);
+}
+
+/**
+ * @brief   Put the CPU into the 'wait for event' sleep mode
+ *
+ * This function is meant to be used for short periods of time, where it is not
+ * feasible to switch to the idle thread and back.
+ */
+static inline void cpu_sleep_until_event(void)
+{
+    __WFE();
 }
 
 #ifdef __cplusplus

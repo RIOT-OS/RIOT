@@ -24,13 +24,13 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #ifdef CPU_MODEL_MK64FN1M0VLL12
 #include "MK64F12.h"
 #else
 #error "undefined CPU_MODEL"
 #endif
-
-#include "mcg.h"
 
 #ifdef __cplusplus
 extern "C"

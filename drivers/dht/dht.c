@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup     driver_dht
+ * @ingroup     drivers_dht
  * @{
  *
  * @file
@@ -71,6 +71,12 @@ void dht_auto_init(void)
         if (dht_init(&dht_devs[i], &dht_params[i]) < 0) {
             LOG_ERROR("Unable to initialize DHT sensor #%i\n", i);
         }
+#ifdef MODULE_SAUL_REG
+        for (int j = 0; j < 2; j++) {
+            dht_saul_reg[i][j].dev = &dht_devs[i];
+            saul_reg_add(&dht_saul_reg[i][j]);
+        }
+#endif
     }
 }
 
@@ -80,7 +86,7 @@ int dht_init(dht_t *dev, const dht_params_t *params)
 
     memcpy(dev, params, sizeof(dht_t));
 
-    if (gpio_init(dev->pin, GPIO_DIR_OUT, dev->pull) == -1) {
+    if (gpio_init(dev->pin, GPIO_OUT) == -1) {
         return -1;
     }
     gpio_set(dev->pin);
@@ -103,7 +109,7 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
     xtimer_usleep(40);
 
     /* sync on device */
-    gpio_init(dev->pin, GPIO_DIR_IN, dev->pull);
+    gpio_init(dev->pin, dev->in_mode);
     while (!gpio_read(dev->pin)) ;
     while (gpio_read(dev->pin)) ;
 
@@ -120,7 +126,7 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
 
     /* set pin high again - so we can trigger the next reading by pulling it low
      * again */
-    gpio_init(dev->pin, GPIO_DIR_OUT, dev->pull);
+    gpio_init(dev->pin, GPIO_OUT);
     gpio_set(dev->pin);
 
     /* validate the checksum */

@@ -95,7 +95,7 @@ void auto_init(void)
 #endif
 
 #ifdef MODULE_TINYMT32
-    genrand_init(0);
+    random_init(0);
 #endif
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
@@ -229,6 +229,14 @@ void auto_init(void)
 #ifdef MODULE_L3G4200D
     extern void auto_init_l3g4200d(void);
     auto_init_l3g4200d();
+#endif
+#ifdef MODULE_LIS3DH
+    extern void auto_init_lis3dh(void);
+    auto_init_lis3dh();
+#endif
+#ifdef MODULE_MMA8652
+    extern void auto_init_mma8652(void);
+    auto_init_mma8652();
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */

@@ -1,4 +1,4 @@
-SRC = saul_str.c
+SRC = saul.c saul_str.c
 
 ifneq (,$(filter saul_gpio,$(USEMODULE)))
   SRC += gpio_saul.c

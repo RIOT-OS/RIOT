@@ -25,12 +25,14 @@
 #include <stdio.h>
 
 #include "assert.h"
+#include "kernel_defines.h"
 #include "cpu.h"
 #include "irq.h"
 #include "lpm.h"
 #include "panic.h"
 #include "arch/panic_arch.h"
 #include "reboot.h"
+#include "log.h"
 
 #if defined(DEVELHELP) && defined(MODULE_PS)
 #include "ps.h"
@@ -54,22 +56,20 @@ NORETURN void core_panic(core_panic_t crash_code, const char *message)
             cpu_print_last_instruction();
         }
 #endif
-        puts("*** RIOT kernel panic:");
-        puts(message);
-        puts("");
+        LOG_ERROR("*** RIOT kernel panic:\n%s\n\n", message);
 #ifdef DEVELHELP
 #ifdef MODULE_PS
         ps();
-        puts("");
+        LOG_ERROR("\n");
 #endif
 
-        puts("*** halted.\n");
+        LOG_ERROR("*** halted.\n\n");
 #else
-        puts("*** rebooting...\n\n");
+        LOG_ERROR("*** rebooting...\n\n");
 #endif
     }
     /* disable watchdog and all possible sources of interrupts */
-    disableIRQ();
+    irq_disable();
     panic_arch();
 #ifndef DEVELHELP
     /* DEVELHELP not set => reboot system */

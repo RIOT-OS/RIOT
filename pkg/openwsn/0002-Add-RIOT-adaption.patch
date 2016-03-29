@@ -112,8 +112,8 @@ index 0000000..85f2eb1
 +
 +#define INTERRUPT_DECLARATION(); //no declaration
 +
-+#define DISABLE_INTERRUPTS()    disableIRQ();
-+#define ENABLE_INTERRUPTS()     enableIRQ();
++#define DISABLE_INTERRUPTS()    irq_disable();
++#define ENABLE_INTERRUPTS()     irq_enable();
 +
 +//===== timer
 +

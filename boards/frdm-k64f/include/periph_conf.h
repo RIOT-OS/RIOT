@@ -20,7 +20,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "cpu_conf.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -45,6 +45,7 @@ extern "C"
 #define KINETIS_MCG_PLL_FREQ         60000000
 
 #define CLOCK_CORECLOCK              KINETIS_MCG_PLL_FREQ
+#define CLOCK_BUSCLOCK               (CLOCK_CORECLOCK / 2)
 /** @} */
 
 
@@ -102,47 +103,17 @@ extern "C"
  * @name ADC configuration
  * @{
  */
-#define ADC_NUMOF                    (1U)
-#define ADC_0_EN                     1
-#define ADC_MAX_CHANNELS             6
+static const adc_conf_t adc_config[] = {
+    /* dev, pin, channel */
+    { ADC0, GPIO_PIN(PORT_B, 10), 14 },
+    { ADC0, GPIO_PIN(PORT_B, 11), 15 },
+    { ADC0, GPIO_PIN(PORT_C, 11), 7 },
+    { ADC0, GPIO_PIN(PORT_C, 10), 6 },
+    { ADC0, GPIO_PIN(PORT_C, 8), 4 },
+    { ADC0, GPIO_PIN(PORT_C, 9), 5 },
+};
 
-/* ADC 0 configuration */
-#define ADC_0_DEV                    ADC1
-#define ADC_0_MODULE_CLOCK           CLOCK_CORECLOCK
-#define ADC_0_CHANNELS               6
-#define ADC_0_CLKEN()                (SIM->SCGC3 |= (SIM_SCGC3_ADC1_MASK))
-#define ADC_0_CLKDIS()               (SIM->SCGC3 &= ~(SIM_SCGC3_ADC1_MASK))
-#define ADC_0_PORT_CLKEN()           (SIM->SCGC5 |= (SIM_SCGC5_PORTB_MASK | SIM_SCGC5_PORTC_MASK))
-/* ADC 0 channel 0 pin config */
-#define ADC_0_CH0_PORT               PORTB
-#define ADC_0_CH0_PIN                10
-#define ADC_0_CH0_PIN_AF             0
-#define ADC_0_CH0                    14
-/* ADC 0 channel 1 pin config */
-#define ADC_0_CH1_PORT               PORTB
-#define ADC_0_CH1_PIN                11
-#define ADC_0_CH1_PIN_AF             0
-#define ADC_0_CH1                    15
-/* ADC 0 channel 2 pin config */
-#define ADC_0_CH2_PORT               PORTC
-#define ADC_0_CH2_PIN                11
-#define ADC_0_CH2_PIN_AF             0
-#define ADC_0_CH2                    7
-/* ADC 0 channel 3 pin config */
-#define ADC_0_CH3_PORT               PORTC
-#define ADC_0_CH3_PIN                10
-#define ADC_0_CH3_PIN_AF             0
-#define ADC_0_CH3                    6
-/* ADC 0 channel 4 pin config */
-#define ADC_0_CH4_PORT               PORTC
-#define ADC_0_CH4_PIN                8
-#define ADC_0_CH4_PIN_AF             0
-#define ADC_0_CH4                    4
-/* ADC 0 channel 5 pin config */
-#define ADC_0_CH5_PORT               PORTC
-#define ADC_0_CH5_PIN                9
-#define ADC_0_CH5_PIN_AF             0
-#define ADC_0_CH5                    5
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 /**
@@ -160,28 +131,22 @@ extern "C"
 #define PWM_0_CLK                    CLOCK_CORECLOCK
 #define PWM_0_CLKEN()                (SIM->SCGC6 |= (SIM_SCGC6_FTM0_MASK))
 #define PWM_0_CLKDIS()               (SIM->SCGC6 &= ~(SIM_SCGC6_FTM0_MASK))
-/* PWM 0 pin configuration */
-#define PWM_0_PORT_CLKEN()           (SIM->SCGC5 |= (SIM_SCGC5_PORTA_MASK | SIM_SCGC5_PORTC_MASK))
 /* Arduino Connector D3 */
-#define PWM_0_PORT_CH0               PORTA
-#define PWM_0_PIN_CH0                1
-#define PWM_0_FTMCHAN_CH0            6
-#define PWM_0_PIN_AF_CH0             3
+#define PWM_0_CH0_GPIO               GPIO_PIN(PORT_A, 1)
+#define PWM_0_CH0_FTMCHAN            6
+#define PWM_0_CH0_AF                 3
 /* Arduino Connector D5 */
-#define PWM_0_PORT_CH1               PORTA
-#define PWM_0_PIN_CH1                2
-#define PWM_0_FTMCHAN_CH1            7
-#define PWM_0_PIN_AF_CH1             3
+#define PWM_0_CH1_GPIO               GPIO_PIN(PORT_A, 2)
+#define PWM_0_CH1_FTMCHAN            7
+#define PWM_0_CH1_AF                 3
 /* Arduino Connector D6 */
-#define PWM_0_PORT_CH2               PORTC
-#define PWM_0_PIN_CH2                2
-#define PWM_0_FTMCHAN_CH2            1
-#define PWM_0_PIN_AF_CH2             4
+#define PWM_0_CH2_GPIO               GPIO_PIN(PORT_C, 2)
+#define PWM_0_CH2_FTMCHAN            1
+#define PWM_0_CH2_AF                 4
 /* Arduino Connector D7 */
-#define PWM_0_PORT_CH3               PORTC
-#define PWM_0_PIN_CH3                3
-#define PWM_0_FTMCHAN_CH3            2
-#define PWM_0_PIN_AF_CH3             4
+#define PWM_0_CH3_GPIO               GPIO_PIN(PORT_C, 3)
+#define PWM_0_CH3_FTMCHAN            2
+#define PWM_0_CH3_AF                 4
 /** @} */
 
 

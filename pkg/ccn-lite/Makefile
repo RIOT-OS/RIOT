@@ -1,11 +1,7 @@
 PKG_NAME=ccn-lite
-PKG_URL=https://github.com/cn-uofbasel/ccn-lite/
-PKG_VERSION=57be9b1985dc501b26f861b24448b54db37f73f1
+PKG_URL=https://github.com/OlegHahm/ccn-lite/
+PKG_VERSION=39b1406c11de9de364220909488eebabe7e81613
 PKG_DIR=$(CURDIR)/$(PKG_NAME)
-
-ifneq ($(RIOTBOARD),)
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
-endif
 
 .PHONY: all clean distclean
 
@@ -20,10 +16,7 @@ all: $(PKG_DIR)/Makefile
 $(PKG_DIR)/Makefile: $(PKG_DIR)/.git/config
 
 $(PKG_DIR)/.git/config:
-	test -d "$(PKG_DIR)" || git clone "$(PKG_URL)" "$(PKG_DIR)"; \
-		cd "$(PKG_DIR)" && \
-		git remote set-url origin "$(PKG_URL)" && \
-		git fetch && git checkout -f "$(PKG_VERSION)"
+	test -d "$(PKG_DIR)" || $(GITCACHE) clone "$(PKG_URL)" "$(PKG_VERSION)" "$(PKG_DIR)"
 
 clean::
 	@echo "Cleaning up CCN-Lite package..."

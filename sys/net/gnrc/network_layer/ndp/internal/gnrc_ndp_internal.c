@@ -209,7 +209,7 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
     if (gnrc_ipv6_netif_addr_is_non_unicast(tgt)) {
         /* avoid collision for anycast addresses
          * (see https://tools.ietf.org/html/rfc4861#section-7.2.7) */
-        uint32_t delay = genrand_uint32_range(0, GNRC_NDP_MAX_AC_TGT_DELAY * SEC_IN_USEC);
+        uint32_t delay = random_uint32_range(0, GNRC_NDP_MAX_AC_TGT_DELAY * SEC_IN_USEC);
         gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, dst);
         DEBUG("ndp internal: delay neighbor advertisement for %" PRIu32 " sec.",
               (delay / SEC_IN_USEC));
@@ -246,7 +246,7 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
 
     /* check if there is a fitting source address to target */
     if (src == NULL) {
-        src = gnrc_ipv6_netif_find_best_src_addr(iface, tgt);
+        src = gnrc_ipv6_netif_find_best_src_addr(iface, tgt, false);
     }
     if (src != NULL) {
         l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
@@ -307,14 +307,15 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
 void gnrc_ndp_internal_send_rtr_sol(kernel_pid_t iface, ipv6_addr_t *dst)
 {
     gnrc_pktsnip_t *hdr, *pkt = NULL;
-    ipv6_addr_t *src = NULL, all_routers = IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
+    ipv6_addr_t *src = NULL;
     DEBUG("ndp internal: send router solicitation (iface: %" PRIkernel_pid ", dst: ff02::2)\n",
           iface);
     if (dst == NULL) {
-        dst = &all_routers;
+        /* isn't changed afterwards so discarding const should be alright */
+        dst = (ipv6_addr_t *)&ipv6_addr_all_routers_link_local;
     }
     /* check if there is a fitting source address to target */
-    if ((src = gnrc_ipv6_netif_find_best_src_addr(iface, dst)) != NULL) {
+    if ((src = gnrc_ipv6_netif_find_best_src_addr(iface, dst, false)) != NULL) {
         uint8_t l2src[8];
         size_t l2src_len;
         l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
@@ -422,14 +423,14 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
                                     bool fin)
 {
     gnrc_pktsnip_t *hdr = NULL, *pkt = NULL;
-    ipv6_addr_t all_nodes = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
     gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(iface);
     uint32_t reach_time = 0, retrans_timer = 0;
     uint16_t adv_ltime = 0;
     uint8_t cur_hl = 0;
 
     if (dst == NULL) {
-        dst = &all_nodes;
+        /* isn't changed afterwards so discarding const should be fine */
+        dst = (ipv6_addr_t *)&ipv6_addr_all_nodes_link_local;
     }
     DEBUG("ndp internal: send router advertisement (iface: %" PRIkernel_pid ", dst: %s%s\n",
           iface, ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)), fin ? ", final" : "");
@@ -521,8 +522,9 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
     }
     if (src == NULL) {
         mutex_unlock(&ipv6_iface->mutex);
-        /* get address from source selection algorithm */
-        src = gnrc_ipv6_netif_find_best_src_addr(iface, dst);
+        /* get address from source selection algorithm.
+         * Only link local addresses may be used (RFC 4861 section 4.1) */
+        src = gnrc_ipv6_netif_find_best_src_addr(iface, dst, true);
         mutex_lock(&ipv6_iface->mutex);
     }
     /* add SL2A for source address */

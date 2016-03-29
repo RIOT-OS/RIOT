@@ -36,23 +36,19 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-typedef struct {
-    void (*cb)(int);
-} timer_conf_t;
-
 /**
  * @brief Timer state memory
  */
-timer_conf_t config[TIMER_NUMOF];
+static timer_isr_ctx_t config[TIMER_NUMOF];
 
 /**
  * @brief Setup the given timer
  */
-int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* configure GCLK0 to feed TC0 & TC1*/;
     GCLK->PCHCTRL[TC0_GCLK_ID].reg |= GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;
-    while (!(GCLK->PCHCTRL[TC0_GCLK_ID].reg & GCLK_PCHCTRL_CHEN));
+    while (!(GCLK->PCHCTRL[TC0_GCLK_ID].reg & GCLK_PCHCTRL_CHEN)) {}
 
     /* select the timer and enable the timer specific peripheral clocks */
     switch (dev) {
@@ -64,7 +60,7 @@ int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
         MCLK->APBCMASK.reg |= MCLK_APBCMASK_TC0;
         /* reset timer */
         TIMER_0_DEV.CTRLA.bit.SWRST = 1;
-        while (TIMER_0_DEV.SYNCBUSY.bit.SWRST);
+        while (TIMER_0_DEV.SYNCBUSY.bit.SWRST) {}
         /* choosing 32 bit mode */
         TIMER_0_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT32_Val;
         /* sourced by 4MHz with Presc 4 results in 1MHz*/
@@ -79,7 +75,8 @@ int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
     }
 
     /* save callback */
-    config[dev].cb = callback;
+    config[dev].cb = cb;
+    config[dev].arg = arg;
 
     /* enable interrupts for given timer */
     timer_irq_enable(dev);
@@ -162,9 +159,8 @@ unsigned int timer_read(tim_t dev)
     case TIMER_0:
         /* request syncronisation */
         TIMER_0_DEV.CTRLBSET.bit.CMD = TC_CTRLBSET_CMD_READSYNC_Val;
-        while (TIMER_0_DEV.SYNCBUSY.bit.STATUS);
+        while (TIMER_0_DEV.SYNCBUSY.bit.STATUS) {}
         return TIMER_0_DEV.COUNT.reg;
-        break;
 #endif
     default:
         return 0;
@@ -232,14 +228,14 @@ void TIMER_0_ISR(void)
         if(config[TIMER_0].cb) {
             TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
-            config[TIMER_0].cb(0);
+            config[TIMER_0].cb(config[TIMER_0].arg, 0);
         }
     }
     else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
         if(config[TIMER_0].cb) {
             TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
-            config[TIMER_0].cb(1);
+            config[TIMER_0].cb(config[TIMER_0].arg, 1);
         }
     }
 

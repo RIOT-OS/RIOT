@@ -20,7 +20,8 @@
 #ifndef __CRYPTO_MODES_HELPER_H_
 #define __CRYPTO_MODES_HELPER_H_
 
-#include "kernel.h"
+#include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {

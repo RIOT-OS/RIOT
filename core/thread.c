@@ -22,16 +22,14 @@
 #include <stdio.h>
 
 #include "thread.h"
-#include "kernel.h"
 #include "irq.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
-#include "kernel_internal.h"
 #include "bitarithm.h"
 #include "sched.h"
 
-volatile tcb_t *thread_get(kernel_pid_t pid)
+volatile thread_t *thread_get(kernel_pid_t pid)
 {
     if (pid_is_valid(pid)) {
         return sched_threads[pid];
@@ -41,27 +39,27 @@ volatile tcb_t *thread_get(kernel_pid_t pid)
 
 int thread_getstatus(kernel_pid_t pid)
 {
-    volatile tcb_t *t = thread_get(pid);
+    volatile thread_t *t = thread_get(pid);
     return t ? (int) t->status : STATUS_NOT_FOUND;
 }
 
 #ifdef DEVELHELP
 const char *thread_getname(kernel_pid_t pid)
 {
-    volatile tcb_t *t = thread_get(pid);
+    volatile thread_t *t = thread_get(pid);
     return t ? t->name : NULL;
 }
 #endif
 
 void thread_sleep(void)
 {
-    if (inISR()) {
+    if (irq_is_in()) {
         return;
     }
 
-    unsigned state = disableIRQ();
-    sched_set_status((tcb_t *)sched_active_thread, STATUS_SLEEPING);
-    restoreIRQ(state);
+    unsigned state = irq_disable();
+    sched_set_status((thread_t *)sched_active_thread, STATUS_SLEEPING);
+    irq_restore(state);
     thread_yield_higher();
 }
 
@@ -69,35 +67,39 @@ int thread_wakeup(kernel_pid_t pid)
 {
     DEBUG("thread_wakeup: Trying to wakeup PID %" PRIkernel_pid "...\n", pid);
 
-    unsigned old_state = disableIRQ();
+    unsigned old_state = irq_disable();
 
-    tcb_t *other_thread = (tcb_t *) sched_threads[pid];
-    if (other_thread && other_thread->status == STATUS_SLEEPING) {
+    thread_t *other_thread = (thread_t *) thread_get(pid);
+
+    if (!other_thread) {
+        DEBUG("thread_wakeup: Thread does not exist!\n");
+    }
+    else if (other_thread->status == STATUS_SLEEPING) {
         DEBUG("thread_wakeup: Thread is sleeping.\n");
 
         sched_set_status(other_thread, STATUS_RUNNING);
 
-        restoreIRQ(old_state);
+        irq_restore(old_state);
         sched_switch(other_thread->priority);
 
         return 1;
     }
     else {
         DEBUG("thread_wakeup: Thread is not sleeping!\n");
-
-        restoreIRQ(old_state);
-        return STATUS_NOT_FOUND;
     }
+
+    irq_restore(old_state);
+    return STATUS_NOT_FOUND;
 }
 
 void thread_yield(void)
 {
-    unsigned old_state = disableIRQ();
-    tcb_t *me = (tcb_t *)sched_active_thread;
+    unsigned old_state = irq_disable();
+    thread_t *me = (thread_t *)sched_active_thread;
     if (me->status >= STATUS_ON_RUNQUEUE) {
         clist_advance(&sched_runqueues[me->priority]);
     }
-    restoreIRQ(old_state);
+    irq_restore(old_state);
 
     thread_yield_higher();
 }
@@ -139,13 +141,16 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     }
 
     /* make room for the thread control block */
-    stacksize -= sizeof(tcb_t);
+    stacksize -= sizeof(thread_t);
 
-    /* round down the stacksize to a multiple of tcb_t alignments (usually 16/32bit) */
-    stacksize -= stacksize % ALIGN_OF(tcb_t);
+    /* round down the stacksize to a multiple of thread_t alignments (usually 16/32bit) */
+    stacksize -= stacksize % ALIGN_OF(thread_t);
 
+    if (stacksize < 0) {
+        DEBUG("thread_create: stacksize is too small!\n");
+    }
     /* allocate our thread control block at the top of our stackspace */
-    tcb_t *cb = (tcb_t *) (stack + stacksize);
+    thread_t *cb = (thread_t *) (stack + stacksize);
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
     if (flags & THREAD_CREATE_STACKTEST) {
@@ -164,7 +169,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     }
 #endif
 
-    unsigned state = disableIRQ();
+    unsigned state = irq_disable();
 
     kernel_pid_t pid = KERNEL_PID_UNDEF;
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; ++i) {
@@ -176,7 +181,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     if (pid == KERNEL_PID_UNDEF) {
         DEBUG("thread_create(): too many threads!\n");
 
-        restoreIRQ(state);
+        irq_restore(state);
 
         return -EOVERFLOW;
     }
@@ -219,13 +224,13 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
         sched_set_status(cb, STATUS_PENDING);
 
         if (!(flags & THREAD_CREATE_WOUT_YIELD)) {
-            restoreIRQ(state);
+            irq_restore(state);
             sched_switch(priority);
             return pid;
         }
     }
 
-    restoreIRQ(state);
+    irq_restore(state);
 
     return pid;
 }

@@ -28,7 +28,7 @@ int bf_get_unset(uint8_t field[], int size)
     int nbytes = (size + 7) / 8;
     int i = 0;
 
-    unsigned state = disableIRQ();
+    unsigned state = irq_disable();
 
     /* skip full bytes */
     for (int j = 0; (j < nbytes) && (field[j] == 255); j++) {
@@ -43,6 +43,6 @@ int bf_get_unset(uint8_t field[], int size)
         }
     }
 
-    restoreIRQ(state);
+    irq_restore(state);
     return(result);
 }

@@ -37,10 +37,15 @@ extern "C" {
  * @name Set the default baudrate to 500K for this board
  * @{
  */
-#ifndef STDIO_BAUDRATE
-#   define STDIO_BAUDRATE   (500000U)
+#ifndef UART_STDIO_BAUDRATE
+#   define UART_STDIO_BAUDRATE (500000U)
 #endif
 /** @} */
+
+/**
+ * @name Tell the xtimer that we use a 16-bit peripheral timer
+ */
+#define XTIMER_MASK         (0xffff0000)
 
 /**
  * @name Define the interface to the AT86RF231 radio
@@ -103,35 +108,28 @@ extern "C" {
 /** @} */
 
 /**
- * @name LED pin definitions
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_RED_PORT        (GPIOD)
-#define LED_RED_PIN         (2)
-#define LED_RED_GPIO        GPIO_PIN(PORT_D,2)
-#define LED_GREEN_PORT      (GPIOB)
-#define LED_GREEN_PIN       (5)
-#define LED_GREEN_GPIO      GPIO_PIN(PORT_B,5)
-#define LED_ORANGE_PORT     (GPIOC)
-#define LED_ORANGE_PIN      (10)
-#define LED_ORANGE_GPIO     GPIO_PIN(PORT_C,10)
-/** @} */
+#define LED0_PIN            GPIO_PIN(PORT_D, 2)
+#define LED1_PIN            GPIO_PIN(PORT_B, 5)
+#define LED2_PIN            GPIO_PIN(PORT_C, 10)
 
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_RED_ON          (LED_RED_PORT->ODR &= ~(1<<LED_RED_PIN))
-#define LED_RED_OFF         (LED_RED_PORT->ODR |= (1<<LED_RED_PIN))
-#define LED_RED_TOGGLE      (LED_RED_PORT->ODR ^= (1<<LED_RED_PIN))
+#define LED0_MASK           (1 << 2)
+#define LED1_MASK           (1 << 5)
+#define LED2_MASK           (1 << 10)
 
-#define LED_GREEN_ON        (LED_GREEN_PORT->ODR &= ~(1<<LED_GREEN_PIN))
-#define LED_GREEN_OFF       (LED_GREEN_PORT->ODR |= (1<<LED_GREEN_PIN))
-#define LED_GREEN_TOGGLE    (LED_GREEN_PORT->ODR ^= (1<<LED_GREEN_PIN))
+#define LED0_ON             (GPIOD->ODR &= ~LED0_MASK)
+#define LED0_OFF            (GPIOD->ODR |=  LED0_MASK)
+#define LED0_TOGGLE         (GPIOD->ODR ^=  LED0_MASK)
 
-#define LED_ORANGE_ON       (LED_ORANGE_PORT->ODR &= ~(1<<LED_ORANGE_PIN))
-#define LED_ORANGE_OFF      (LED_ORANGE_PORT->ODR |= (1<<LED_ORANGE_PIN))
-#define LED_ORANGE_TOGGLE   (LED_ORANGE_PORT->ODR ^= (1<<LED_ORANGE_PIN))
+#define LED1_ON             (GPIOB->ODR &= ~LED1_MASK)
+#define LED1_OFF            (GPIOB->ODR |=  LED1_MASK)
+#define LED1_TOGGLE         (GPIOB->ODR ^=  LED1_MASK)
+
+#define LED2_ON             (GPIOC->ODR &= ~LED2_MASK)
+#define LED2_OFF            (GPIOC->ODR |=  LED2_MASK)
+#define LED2_TOGGLE         (GPIOC->ODR ^=  LED2_MASK)
 /** @} */
 
 /**

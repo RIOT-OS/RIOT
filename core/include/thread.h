@@ -22,18 +22,72 @@
 #ifndef THREAD_H
 #define THREAD_H
 
-#include "kernel.h"
-#include "tcb.h"
+#include "priority_queue.h"
+#include "clist.h"
+#include "cib.h"
+#include "msg.h"
 #include "arch/thread_arch.h"
+#include "cpu_conf.h"
+#include "sched.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
 /**
- * @brief Describes an illegal thread status
+ * @brief Thread status list
+ * @{
  */
-#define STATUS_NOT_FOUND (-1)
+#define STATUS_NOT_FOUND        (-1)            /**< Describes an illegal thread status */
+
+/**
+ * @brief Blocked states.
+ * @{
+ */
+#define STATUS_STOPPED          0               /**< has terminated                     */
+#define STATUS_SLEEPING         1               /**< sleeping                           */
+#define STATUS_MUTEX_BLOCKED    2               /**< waiting for a locked mutex         */
+#define STATUS_RECEIVE_BLOCKED  3               /**< waiting for a message              */
+#define STATUS_SEND_BLOCKED     4               /**< waiting for message to be delivered*/
+#define STATUS_REPLY_BLOCKED    5               /**< waiting for a message response     */
+/** @} */
+
+/**
+ * @brief These have to be on a run queue.
+ * @{*/
+#define STATUS_ON_RUNQUEUE      STATUS_RUNNING  /**< to check if on run queue:
+                                                 `st >= STATUS_ON_RUNQUEUE`             */
+#define STATUS_RUNNING          6               /**< currently running                  */
+#define STATUS_PENDING          7               /**< waiting to be scheduled to run     */
+/** @} */
+/** @} */
+
+/**
+ * @brief @c thread_t holds thread's context data.
+ */
+struct _thread {
+    char *sp;                       /**< thread's stack pointer         */
+    uint8_t status;                /**< thread's status                */
+    uint8_t priority;              /**< thread's priority              */
+
+    kernel_pid_t pid;               /**< thread's process id            */
+
+    clist_node_t rq_entry;          /**< run queue entry                */
+
+    void *wait_data;                /**< holding messages               */
+    priority_queue_t msg_waiters;   /**< threads waiting on message     */
+
+    cib_t msg_queue;                /**< message queue                  */
+    msg_t *msg_array;               /**< memory holding messages        */
+
+#if defined DEVELHELP || defined(SCHED_TEST_STACK)
+    char *stack_start;              /**< thread's stack start address   */
+#endif
+#ifdef DEVELHELP
+    const char *name;               /**< thread's name                  */
+    int stack_size;                 /**< thread's stack size            */
+#endif
+};
 
  /**
  * @def THREAD_STACKSIZE_DEFAULT
@@ -72,7 +126,7 @@
  * @brief Minimum stack size
  */
 #ifndef THREAD_STACKSIZE_MINIMUM
-#define THREAD_STACKSIZE_MINIMUM  (sizeof(tcb_t))
+#define THREAD_STACKSIZE_MINIMUM  (sizeof(thread_t))
 #endif
 
 /**
@@ -126,8 +180,8 @@
  * 1. the new thread's stack is initialized depending on the platform
  * 2. the new thread is added to the scheduler to be run
  *
- * As RIOT is using a fixed priority scheduling algorithm, threads
- * are scheduled base on their priority. The priority is fixed for every thread
+ * As RIOT is using a fixed priority scheduling algorithm, threads are
+ * scheduled based on their priority. The priority is fixed for every thread
  * and specified during the threads creation by the *priority* parameter.
  *
  * A low value for *priority* number means the thread having a high priority
@@ -140,15 +194,16 @@
  * In addition to the priority, the *flags* argument can be used to alter the
  * newly created threads behavior after creation. The following flags are available:
  *  - THREAD_CREATE_SLEEPING    the newly created thread will be put to sleeping
- *                              state and must be waken up manually
+ *                              state and must be woken up manually
  *  - THREAD_CREATE_WOUT_YIELD  the newly created thread will not run
  *                              immediately after creation
  *  - THREAD_CREATE_STACKTEST   write markers into the thread's stack to measure
  *                              the stack's memory usage (for debugging and
  *                              profiling purposes)
  *
- * @note Currently we support creating threads from within an ISR, however it is considered
- *       to be a bad programming practice and we strongly discourage it.
+ * @note Currently we support creating threads from within an ISR, however it
+ *       is considered to be a bad programming practice and we strongly discourage
+ *       it.
  *
  * @param[out] stack    start address of the preallocated stack memory
  * @param[in] stacksize the size of the thread's stack in bytes
@@ -178,7 +233,7 @@ kernel_pid_t thread_create(char *stack,
  * @param[in]   pid   Thread to retreive.
  * @return      `NULL` if the PID is invalid or there is no such thread.
  */
-volatile tcb_t *thread_get(kernel_pid_t pid);
+volatile thread_t *thread_get(kernel_pid_t pid);
 
 /**
  * @brief Returns the status of a process
@@ -232,7 +287,6 @@ void thread_yield_higher(void);
  */
 int thread_wakeup(kernel_pid_t pid);
 
-
 /**
  * @brief Returns the process ID of the currently running thread
  *
@@ -240,8 +294,21 @@ int thread_wakeup(kernel_pid_t pid);
  */
 static inline kernel_pid_t thread_getpid(void)
 {
+    extern volatile kernel_pid_t sched_active_pid;
     return sched_active_pid;
 }
+
+/**
+ * @brief   Gets called upon thread creation to set CPU registers
+ *
+ * @param[in] task_func     First function to call within the thread
+ * @param[in] arg           Argument to supply to task_func
+ * @param[in] stack_start   Start address of the stack
+ * @param[in] stack_size    Stack size
+ *
+ * @return stack pointer
+ */
+char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size);
 
 /**
  * @brief   Prints the message queue of the current thread.
@@ -269,7 +336,12 @@ const char *thread_getname(kernel_pid_t pid);
  * @return          the amount of unused space of the thread's stack
  */
 uintptr_t thread_measure_stack_free(char *stack);
-#endif
+#endif /* DEVELHELP */
+
+/**
+ * @brief   Prints human readable, ps-like thread information for debugging purposes
+ */
+void thread_print_stack(void);
 
 #ifdef __cplusplus
 }

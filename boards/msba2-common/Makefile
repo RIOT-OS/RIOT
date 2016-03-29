@@ -1,4 +1,4 @@
-MODULE = board
+MODULE = msba2-common
 
 DIRS = drivers
 

@@ -90,7 +90,7 @@ class SerCmd(cmd.Cmd):
             confdir (str):      configuration directory
             conffile (str):     configuration file name
             host (str):         local host name
-            run_name (str):     identifier for log filer subdirectory
+            run_name (str):     identifier for log files subdirectory
 
         """
 
@@ -114,7 +114,7 @@ class SerCmd(cmd.Cmd):
             self.run_name = defaultrunname
 
         if not self.log_dir_name:
-            self.log_dir_name = self.hostname
+            self.log_dir_name = self.host
 
         if not os.path.exists(self.configdir):
             os.makedirs(self.configdir)
@@ -138,7 +138,7 @@ class SerCmd(cmd.Cmd):
 
         # create Logging object
         my_millis = "%.4f" % (time.time())
-        date_str = '%s.%s' % (time.strftime('%Y%m%d-%H:%M:%S'), my_millis[-4:])
+        date_str = '%s.%s' % (time.strftime('%Y%m%d-%H.%M.%S'), my_millis[-4:])
         self.startup = date_str
         # create formatter
         formatter = logging.Formatter(self.fmt_str)
@@ -712,9 +712,8 @@ if __name__ == "__main__":
     parser.add_argument("-rn", "--run-name",
                         help="Run name, used for logfile")
     parser.add_argument("-ln", "--log-dir-name",
-                        help="Log directory name (default is hostname e.g. "
-                        "%s/<hostname>)" % defaultdir,
-                        default=defaultdir)
+                        help="Log directory name (default is hostname + "
+                        "run-name e.g. %s/<hostname>/<run-name>)" % defaultdir)
     parser.add_argument("-nl", "--newline",
                         help="Specify the newline character(s) as a combination "
                         "of CR and LF. Examples: -nl=LF, -nl=CRLF. "

@@ -140,6 +140,11 @@ typedef struct {
 } saul_driver_t;
 
 /**
+ * @brief   Default not supported function
+ */
+int saul_notsup(void *dev, phydat_t *dat);
+
+/**
  * @brief   Helper function converts a class ID to a string
  *
  * @param[in] class_id      device class ID

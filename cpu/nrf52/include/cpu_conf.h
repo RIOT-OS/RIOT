@@ -20,6 +20,7 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include "cpu_conf_common.h"
 #include "nrf52.h"
 #include "nrf52_bitfields.h"
 

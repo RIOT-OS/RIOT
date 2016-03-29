@@ -27,9 +27,26 @@
  * CFLAGS
  * ------
  *
- *  - Exclude Prefix Information Options from DIOs
+ * - Exclude Prefix Information Options from DIOs
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  *   CFLAGS += -DGNRC_RPL_WITHOUT_PIO
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ *  - Modify trickle parameters
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS=20
+ *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_INTERVAL_MIN=3
+ *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT=10
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * - Make reception of DODAG_CONF optional when joining a DODAG.
+ *   This will use the default trickle parameters until a
+ *   DODAG_CONF is received from the parent. The DODAG_CONF is
+ *   requested once from the parent while joining the DODAG.
+ *   The standard behaviour is to request a DODAG_CONF and join
+ *   only a DODAG once a DODAG_CONF is received.
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ *   CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @{
@@ -52,6 +69,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "net/gnrc.h"
+#include "net/gnrc/ipv6.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/rpl/structs.h"
@@ -76,7 +94,7 @@ extern "C" {
  * @brief   Default priority for the RPL thread
  */
 #ifndef GNRC_RPL_PRIO
-#define GNRC_RPL_PRIO           (THREAD_PRIORITY_MAIN - 4)
+#define GNRC_RPL_PRIO           (GNRC_IPV6_PRIO + 1)
 #endif
 
 /**
@@ -211,9 +229,17 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
  *      </a>
  * @{
  */
+#ifndef GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS
 #define GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS (20)
+#endif
+
+#ifndef GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN
 #define GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN (3)
+#endif
+
+#ifndef GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT
 #define GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT (10)
+#endif
 /** @} */
 
 /**
@@ -359,6 +385,11 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
  * @brief PID of the RPL thread.
  */
 extern kernel_pid_t gnrc_rpl_pid;
+
+/**
+ * @brief @see @ref GNRC_RPL_ALL_NODES_ADDR
+ */
+extern const ipv6_addr_t ipv6_addr_all_rpl_nodes;
 
 /**
  * @brief Initialization of the RPL thread.
@@ -513,8 +544,8 @@ uint8_t gnrc_rpl_gen_instance_id(bool local);
  */
 static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
 {
-    dodag->req_opts = (dodag->req_opts & ~GNRC_RPL_REQ_OPT_PREFIX_INFO) |
-                      (status << GNRC_RPL_REQ_OPT_PREFIX_INFO_SHIFT);
+    dodag->dio_opts = (dodag->dio_opts & ~GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO) |
+                      (status << GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO_SHIFT);
 }
 #endif
 

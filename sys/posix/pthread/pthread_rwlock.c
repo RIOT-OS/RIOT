@@ -122,7 +122,7 @@ static int pthread_rwlock_lock(pthread_rwlock_t *rwlock,
         /* queue for the lock */
         __pthread_rwlock_waiter_node_t waiting_node = {
             .is_writer = is_writer,
-            .thread = (tcb_t *) sched_active_thread,
+            .thread = (thread_t *) sched_active_thread,
             .qnode = {
                 .next = NULL,
                 .data = (uintptr_t) &waiting_node,

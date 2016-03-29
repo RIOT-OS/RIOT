@@ -20,7 +20,6 @@
 
 #include <errno.h>
 
-#include "kernel.h"
 #include "msg.h"
 #include "thread.h"
 

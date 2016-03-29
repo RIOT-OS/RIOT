@@ -318,7 +318,7 @@ struct x86_known_pci_device;
  * @param[in]   d   Device that (might) need attention.
  *
  * Because PCI is multiplexer, there might not be an IRQ for this device.
- * This callback is called out of the interrupt handler (inISR() == true).
+ * This callback is called out of the interrupt handler (irq_is_in() == true).
  * Lengthy operations should be handled in a dedicated thread; use msg_send_int().
  * You must no enable interrupt inside the handler.
  */

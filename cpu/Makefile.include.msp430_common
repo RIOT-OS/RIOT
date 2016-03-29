@@ -1,5 +1,5 @@
-# default toolchain prefix
-export PREFIX ?= msp430-
+# Target architecture for the build. Use msp430 if you are unsure.
+export TARGET_ARCH ?= msp430
 
 # define build specific options
 CFLAGS_CPU   = -mmcu=$(CPU_MODEL)

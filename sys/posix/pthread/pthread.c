@@ -26,7 +26,6 @@
 
 #include "cpu_conf.h"
 #include "irq.h"
-#include "kernel_internal.h"
 #include "msg.h"
 #include "mutex.h"
 #include "priority_queue.h"
@@ -207,7 +206,7 @@ void pthread_exit(void *retval)
             }
         }
 
-        disableIRQ();
+        irq_disable();
         if (self->stack) {
             msg_t m;
             m.content.ptr = self->stack;

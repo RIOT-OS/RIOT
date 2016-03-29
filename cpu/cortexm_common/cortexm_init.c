@@ -46,7 +46,10 @@ void cortexm_init(void)
     /* set SVC interrupt to same priority as the rest */
     NVIC_SetPriority(SVCall_IRQn, CPU_DEFAULT_IRQ_PRIO);
     /* initialize all vendor specific interrupts with the same value */
-    for (IRQn_Type i = 0; i < (int) CPU_IRQ_NUMOF; i++) {
-        NVIC_SetPriority(i, CPU_DEFAULT_IRQ_PRIO);
+    for (int i = 0; i < CPU_IRQ_NUMOF; i++) {
+        NVIC_SetPriority((IRQn_Type) i, CPU_DEFAULT_IRQ_PRIO);
     }
+
+    /* enable wake up on events for __WFE CPU sleep */
+    SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
 }

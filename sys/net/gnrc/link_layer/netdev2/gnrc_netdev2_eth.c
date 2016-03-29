@@ -136,6 +136,7 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
     ethernet_hdr_t hdr;
     gnrc_netif_hdr_t *netif_hdr;
     gnrc_pktsnip_t *payload;
+    int res;
 
     netdev2_t *dev = gnrc_netdev2->dev;
 
@@ -194,15 +195,20 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
           hdr.dst[3], hdr.dst[4], hdr.dst[5]);
 
     size_t n;
-    pkt = gnrc_pktbuf_get_iovec(pkt, &n);
-    struct iovec *vector = (struct iovec *)pkt->data;
-    vector[0].iov_base = (char*)&hdr;
-    vector[0].iov_len = sizeof(ethernet_hdr_t);
-    dev->driver->send(dev, vector, n);
+    payload = gnrc_pktbuf_get_iovec(pkt, &n);   /* use payload as temporary
+                                                 * variable */
+    res = -ENOBUFS;
+    if (payload != NULL) {
+        pkt = payload;      /* reassign for later release; vec_snip is prepended to pkt */
+        struct iovec *vector = (struct iovec *)pkt->data;
+        vector[0].iov_base = (char*)&hdr;
+        vector[0].iov_len = sizeof(ethernet_hdr_t);
+        res = dev->driver->send(dev, vector, n);
+    }
 
     gnrc_pktbuf_release(pkt);
 
-    return 0;
+    return res;
 }
 
 int gnrc_netdev2_eth_init(gnrc_netdev2_t *gnrc_netdev2, netdev2_t *dev)

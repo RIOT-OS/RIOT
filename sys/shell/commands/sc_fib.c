@@ -49,6 +49,11 @@ static unsigned char tmp_ipv6_nxt[IN6ADDRSZ]; /**< buffer for ipv6 address conve
 static void _fib_usage(int info)
 {
     switch (info) {
+        case 0: {
+            puts("\nsee <fibroute [add|del]> for more information\n"
+                 "<fibroute flush [interface]> removes all entries [associated with interface]\n");
+            break;
+        }
         case 1: {
             puts("\nbrief: adds a new entry to the FIB.\nusage: "
                  INFO1_TXT "\n" INFO3_TXT);
@@ -131,21 +136,37 @@ int _fib_route_handler(int argc, char **argv)
         else if ((strcmp("del", argv[1]) == 0)) {
             _fib_usage(3);
         }
+        else if ((strcmp("flush", argv[1]) == 0)) {
+            fib_flush(&gnrc_ipv6_fib_table, KERNEL_PID_UNDEF);
+            puts("successfully flushed all entries");
+        }
         else {
-            puts("\nunrecognized parameter1.\nPlease enter fibroute [add|del] for more information.");
+            _fib_usage(0);
         }
 
         return 1;
     }
 
-    if (argc > 2 && !((strcmp("add", argv[1]) == 0) || (strcmp("del", argv[1]) == 0))) {
+    if (argc > 2 && !((strcmp("add", argv[1]) == 0) ||
+                      (strcmp("del", argv[1]) == 0) ||
+                      (strcmp("flush", argv[1]) == 0))) {
         puts("\nunrecognized parameter2.\nPlease enter fibroute [add|del] for more information.");
         return 1;
     }
 
     /* e.g. fibroute del <destination> */
     if (argc == 3) {
-        if (inet_pton(AF_INET6, argv[2], tmp_ipv6_dst)) {
+        if ((strcmp("flush", argv[1]) == 0)) {
+            kernel_pid_t iface = atoi(argv[2]);
+            if (gnrc_netif_exist(iface)) {
+                fib_flush(&gnrc_ipv6_fib_table, iface);
+                printf("successfully flushed all entries for interface %" PRIu16"\n", iface);
+            }
+            else {
+                printf("interface %" PRIu16" does not exist\n", iface);
+            }
+        }
+        else if (inet_pton(AF_INET6, argv[2], tmp_ipv6_dst)) {
             fib_remove_entry(&gnrc_ipv6_fib_table, tmp_ipv6_dst, IN6ADDRSZ);
         }
         else if (inet_pton(AF_INET, argv[2], tmp_ipv4_dst)) {

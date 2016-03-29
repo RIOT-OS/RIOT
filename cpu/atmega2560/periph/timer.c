@@ -33,20 +33,16 @@
 
 #define IRQ_DISABLED 0x00
 
-typedef struct {
-    void (*cb)(int);
-} timer_conf_t;
-
 /**
  * @brief Timer state memory
  */
-timer_conf_t config[TIMER_NUMOF];
+static timer_isr_ctx_t config[TIMER_NUMOF];
 
 /**
  * @brief Setup the given timer
  *
  */
-int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* reject impossible freq values
      * todo: Add support for 2 MHz and 16 MHz */
@@ -85,7 +81,8 @@ int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
     }
 
     /* save callback */
-    config[dev].cb = callback;
+    config[dev].cb = cb;
+    config[dev].arg = arg;
 
     return 0;
 }
@@ -97,7 +94,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    unsigned state = disableIRQ();
+    unsigned state = irq_disable();
 
     switch (dev) {
 #if TIMER_0_EN
@@ -122,7 +119,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
                     break;
 
                 default:
-                    restoreIRQ(state);
+                    irq_restore(state);
                     return -1;
             }
 
@@ -150,7 +147,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
                     break;
 
                 default:
-                    restoreIRQ(state);
+                    irq_restore(state);
                     return -1;
             }
 
@@ -178,7 +175,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
                     break;
 
                 default:
-                    restoreIRQ(state);
+                    irq_restore(state);
                     return -1;
             }
 
@@ -187,13 +184,13 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
         case TIMER_UNDEFINED:
         default:
-            restoreIRQ(state);
+            irq_restore(state);
             return -1;
     }
 
     /* enable interrupts for given timer */
     timer_irq_enable(dev);
-    restoreIRQ(state);
+    irq_restore(state);
 
     return 1;
 }
@@ -285,7 +282,7 @@ unsigned int timer_read(tim_t dev)
      * Disabling interrupts globally because read from 16 Bit register can
      * otherwise be messed up
      */
-    unsigned state = disableIRQ();
+    unsigned state = irq_disable();
 
     switch (dev) {
 #if TIMER_0_EN
@@ -322,7 +319,7 @@ unsigned int timer_read(tim_t dev)
             a = 0;
     }
 
-    restoreIRQ(state);
+    irq_restore(state);
     return a;
 }
 
@@ -422,7 +419,7 @@ static inline void _isr(int timer, int chan)
     __enter_isr();
     timer_clear(timer, chan);
 
-    config[timer].cb(chan);
+    config[timer].cb(config[timer].arg, chan);
 
     if (sched_context_switch_request) {
         thread_yield();

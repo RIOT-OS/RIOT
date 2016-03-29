@@ -27,7 +27,7 @@
 
 static bool qemu_shutdown(void)
 {
-    unsigned old_state = disableIRQ();
+    unsigned old_state = irq_disable();
 
     DEBUG("SHUTTING DOWN.\n");
 
@@ -35,7 +35,7 @@ static bool qemu_shutdown(void)
     /* Works for qemu and bochs. */
     outw(0xB004, 0x2000);
 
-    restoreIRQ(old_state);
+    irq_restore(old_state);
     return false;
 }
 

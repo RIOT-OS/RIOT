@@ -75,14 +75,14 @@ uint8_t flashrom_write(uint8_t *dst, const uint8_t *src, size_t size)
     }
 
     /*  write flash */
-    unsigned intstate = disableIRQ();
+    unsigned intstate = irq_disable();
     err = copy_ram_to_flash((uint32_t) dst, (uint32_t) src, 256);
-    restoreIRQ(intstate);
+    irq_restore(intstate);
 
     if (err) {
         DEBUG("ERROR: COPY_RAM_TO_FLASH: %u\n", err);
         /* set interrupts back and return */
-        restoreIRQ(intstate);
+        irq_restore(intstate);
         return 0;
     }
     /* check result */
@@ -120,16 +120,16 @@ uint8_t flashrom_erase(uint8_t *addr)
         return 0;
     }
 
-    intstate = disableIRQ();
+    intstate = irq_disable();
 
     /* erase sector */
     if (erase_sectors(sec, sec)) {
         DEBUG("-- ERROR: ERASE SECTOR --\n");
-        restoreIRQ(intstate);
+        irq_restore(intstate);
         return 0;
     }
 
-    restoreIRQ(intstate);
+    irq_restore(intstate);
 
     /* check again */
     if (blank_check_sector(sec, sec)) {

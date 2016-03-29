@@ -40,7 +40,7 @@
 #include "debug.h"
 
 static void _get_mac_addr(netdev2_t *dev, uint8_t* buf);
-static void ethos_isr(void *arg, char c);
+static void ethos_isr(void *arg, uint8_t c);
 const static netdev2_driver_t netdev2_driver_ethos;
 
 static const uint8_t _esc_esc[] = {ETHOS_ESC_CHAR, (ETHOS_ESC_CHAR ^ 0x20)};
@@ -59,9 +59,9 @@ void ethos_setup(ethos_t *dev, uart_t uart, uint32_t baudrate, uint8_t *buf, siz
     tsrb_init(&dev->inbuf, (char*)buf, bufsize);
     mutex_init(&dev->out_mutex);
 
-    uint32_t a = genrand_uint32();
+    uint32_t a = random_uint32();
     memcpy(dev->mac_addr, (char*)&a, 4);
-    a = genrand_uint32();
+    a = random_uint32();
     memcpy(dev->mac_addr+4, (char*)&a, 2);
 
     dev->mac_addr[0] &= (0x2);      /* unset globally unique bit */
@@ -126,7 +126,7 @@ static void _end_of_frame(ethos_t *dev)
     _reset_state(dev);
 }
 
-static void ethos_isr(void *arg, char c)
+static void ethos_isr(void *arg, uint8_t c)
 {
     ethos_t *dev = (ethos_t *) arg;
 
@@ -222,7 +222,7 @@ void ethos_send_frame(ethos_t *dev, const uint8_t *data, size_t len, unsigned fr
 {
     uint8_t frame_delim = ETHOS_FRAME_DELIMITER;
 
-    if (!inISR()) {
+    if (!irq_is_in()) {
         mutex_lock(&dev->out_mutex);
     }
     else {
@@ -248,7 +248,7 @@ void ethos_send_frame(ethos_t *dev, const uint8_t *data, size_t len, unsigned fr
     /* end of frame */
     uart_write(dev->uart, &frame_delim, 1);
 
-    if (!inISR()) {
+    if (!irq_is_in()) {
         mutex_unlock(&dev->out_mutex);
     }
 }

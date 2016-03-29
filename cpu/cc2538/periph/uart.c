@@ -30,8 +30,6 @@
 #undef BIT
 #define BIT(n) ( 1 << (n) )
 
-#define UART_WORD_LENGTH        8
-
 enum {
     FIFO_LEVEL_1_8TH = 0,
     FIFO_LEVEL_2_8TH = 1,
@@ -39,6 +37,17 @@ enum {
     FIFO_LEVEL_6_8TH = 3,
     FIFO_LEVEL_7_8TH = 4,
 };
+
+/* Valid word lengths for the LCRHbits.WLEN bit field: */
+enum {
+    WLEN_5_BITS = 0,
+    WLEN_6_BITS = 1,
+    WLEN_7_BITS = 2,
+    WLEN_8_BITS = 3,
+};
+
+/* Bit field definitions for the UART Line Control Register: */
+#define FEN   BIT( 4) /**< Enable FIFOs */
 
 /* Bit masks for the UART Masked Interrupt Status (MIS) Register: */
 #define OEMIS BIT(10) /**< UART overrun error masked status */
@@ -87,10 +96,10 @@ static void reset(cc2538_uart_t *u)
     u->cc2538_uart_dr.ECR = 0xFF;
 
     /* Flush FIFOs by clearing LCHR.FEN */
-    u->cc2538_uart_lcrh.LCRHbits.FEN = 0;
+    u->cc2538_uart_lcrh.LCRH &= ~FEN;
 
     /* Restore LCHR configuration */
-    u->cc2538_uart_lcrh.LCRHbits.FEN = 1;
+    u->cc2538_uart_lcrh.LCRH |= FEN;
 
     /* UART Enable */
     u->cc2538_uart_ctl.CTLbits.UARTEN = 1;
@@ -102,11 +111,9 @@ void UART_0_ISR(void)
 {
     uint_fast16_t mis;
 
-    /* Store the current MIS and clear all flags early, except the RTM flag.
-     * This will clear itself when we read out the entire FIFO contents */
+    /* Latch the Masked Interrupt Status and clear any active flags */
     mis = UART_0_DEV->cc2538_uart_mis.MIS;
-
-    UART_0_DEV->ICR = 0x0000FFBF;
+    UART_0_DEV->ICR = mis;
 
     while (UART_0_DEV->cc2538_uart_fr.FRbits.RXFE == 0) {
         uart_config[0].rx_cb(uart_config[0].arg, UART_0_DEV->DR);
@@ -128,11 +135,9 @@ void UART_1_ISR(void)
 {
     uint_fast16_t mis;
 
-    /* Store the current MIS and clear all flags early, except the RTM flag.
-     * This will clear itself when we read out the entire FIFO contents */
-    mis = UART_1_DEV->MIS;
-
-    UART_1_DEV->ICR = 0x0000FFBF;
+    /* Latch the Masked Interrupt Status and clear any active flags */
+    mis = UART_1_DEV->cc2538_uart_mis.MIS;
+    UART_1_DEV->ICR = mis;
 
     while (UART_1_DEV->FRbits.RXFE == 0) {
         uart_config[1].rx_cb(uart_config[1].arg, UART_1_DEV->DR);
@@ -287,8 +292,8 @@ static int init_base(uart_t uart, uint32_t baudrate)
     u->cc2538_uart_im.IMbits.FEIM = 1; /**< UART framing error interrupt mask */
 
     /* Set FIFO interrupt levels: */
-    u->cc2538_uart_ifls.IFLSbits.RXIFLSEL = FIFO_LEVEL_1_8TH;
-    u->cc2538_uart_ifls.IFLSbits.TXIFLSEL = FIFO_LEVEL_4_8TH;
+    u->cc2538_uart_ifls.IFLSbits.RXIFLSEL = FIFO_LEVEL_4_8TH; /**< MCU default */
+    u->cc2538_uart_ifls.IFLSbits.TXIFLSEL = FIFO_LEVEL_4_8TH; /**< MCU default */
 
     u->cc2538_uart_ctl.CTLbits.RXE = 1;
     u->cc2538_uart_ctl.CTLbits.TXE = 1;
@@ -303,10 +308,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     u->FBRD = divisor & DIVFRAC_MASK;
 
     /* Configure line control for 8-bit, no parity, 1 stop bit and enable  */
-    u->cc2538_uart_lcrh.LCRH = 0;
-    u->cc2538_uart_lcrh.LCRHbits.WLEN = UART_WORD_LENGTH - 5;
-    u->cc2538_uart_lcrh.LCRHbits.FEN  = 1;                    /**< Enable FIFOs */
-    u->cc2538_uart_lcrh.LCRHbits.PEN  = 0;                    /**< No parity */
+    u->cc2538_uart_lcrh.LCRH = (WLEN_8_BITS << 5) | FEN;
 
     /* UART Enable */
     u->cc2538_uart_ctl.CTLbits.UARTEN = 1;

@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+#include "msp430_types.h"
+
 #define STDIN_FILENO    0   ///< stdin file descriptor
 #define STDOUT_FILENO   1   ///< stdout file descriptor
 #define STDERR_FILENO   2   ///< stderr file descriptor

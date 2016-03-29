@@ -78,71 +78,41 @@ static int _ctx(gpio_t pin)
     return (_port(pin) == PORT_1) ? i : (i + 8);
 }
 
-int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
+int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     msp_port_t *port = _port(pin);
-    /* check if port is valid */
-    if (port == NULL) {
+
+    /* check if port is valid and mode applicable */
+    if ((port == NULL) || ((mode != GPIO_IN) && (mode != GPIO_OUT))) {
         return -1;
     }
 
-    /* set pin direction */
+    /* reset pin and output value */
     port->DIR &= ~(_pin(pin));
-    port->DIR |= (dir & _pin(pin));
-
-    /* set pullup/pulldown resistor */
-    if(port == PORT_1) {
-        P1REN &= ~(_pin(pin));
-        P1REN |= (pullup & _pin(pin));
-    }
-    else if(port == PORT_2) {
-        P2REN &= ~(_pin(pin));
-        P2REN |= (pullup & _pin(pin));
-    }
-    else if(port == PORT_3) {
-        P3REN &= ~(_pin(pin));
-        P3REN |= (pullup & _pin(pin));
-    }
-    else if(port == PORT_4) {
-        P4REN &= ~(_pin(pin));
-        P4REN |= (pullup & _pin(pin));
-    }
-    else if(port == PORT_5) {
-        P5REN &= ~(_pin(pin));
-        P5REN |= (pullup & _pin(pin));
-    }
-    else if(port == PORT_6) {
-        P6REN &= ~(_pin(pin));
-        P6REN |= (pullup & _pin(pin));
-    }
-
-    /* set output direction */
-    if(pullup == GPIO_PULLUP) {
-        /* if pullup selected then output must be high */
-        port->OD |= _pin(pin);
-    }
-        /* for other cases the output is low */
-    else {
-        port->OD &= ~(_pin(pin));
+    port->OD &= ~(_pin(pin));
+    if (mode == GPIO_OUT) {
+        port->DIR |= _pin(pin);
     }
 
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                     gpio_cb_t cb, void *arg)
 {
     msp_port_isr_t *port = _isr_port(pin);
 
     /* check if port, pull resistor and flank configuration are valid */
-    if ((port == NULL) || (pullup != GPIO_NOPULL) || (flank == GPIO_BOTH)) {
+    if ((port == NULL) || (flank == GPIO_BOTH)) {
         return -1;
     }
 
     /* disable any activated interrupt */
     port->IE &= ~(_pin(pin));
     /* configure as input */
-    gpio_init(pin, GPIO_DIR_IN, GPIO_NOPULL);
+    if (gpio_init(pin, mode) < 0) {
+        return -1;
+    }
     /* save ISR context */
     isr_ctx[_ctx(pin)].cb = cb;
     isr_ctx[_ctx(pin)].arg = arg;

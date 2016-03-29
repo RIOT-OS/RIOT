@@ -24,8 +24,9 @@
 void board_init(void)
 {
     /* initialize the boards LEDs */
-    NRF_P0->DIRSET = (LED1_MASK | LED2_MASK | LED3_MASK | LED4_MASK);
-    NRF_P0->OUTSET = (LED1_MASK | LED2_MASK | LED3_MASK | LED4_MASK);
+    NRF_P0->DIRSET = (LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK);
+    NRF_P0->OUTSET = (LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK);
+    NRF_P0->OUTSET = (LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK);
 
     /* initialize the CPU */
     cpu_init();

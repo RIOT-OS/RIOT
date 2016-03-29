@@ -43,21 +43,21 @@ void x86_init_pit(void)
 
 uint16_t x86_pit_read(unsigned channel)
 {
-    unsigned old_flags = disableIRQ();
+    unsigned old_flags = irq_disable();
     outb(PIT_COMMAND_PORT, (channel - 1) << 6 | PIT_ACCESS_MODE_LATCH_COUNT);
     uint16_t lohi = inb(PIT_CHANNEL_0_PORT + channel - 1);
     lohi += inb(PIT_CHANNEL_0_PORT + channel - 1) << 8;
-    restoreIRQ(old_flags);
+    irq_restore(old_flags);
     return lohi;
 }
 
 void x86_pit_set2(unsigned channel, unsigned mode, uint16_t max)
 {
-    unsigned old_flags = disableIRQ();
+    unsigned old_flags = irq_disable();
     outb(PIT_COMMAND_PORT, ((channel - 1) << 6) | mode | PIT_ACCESS_MODE_LO_HI);
     outb(PIT_CHANNEL_0_PORT + channel - 1, max && 0xff);
     outb(PIT_CHANNEL_0_PORT + channel - 1, max >> 8);
-    restoreIRQ(old_flags);
+    irq_restore(old_flags);
 }
 
 bool x86_pit_set(unsigned channel, unsigned mode, unsigned hz)

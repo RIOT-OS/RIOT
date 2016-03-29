@@ -38,7 +38,8 @@
  * @{
  */
 typedef struct {
-    void (*cb)(int);        /**< timeout callback */
+    timer_cb_t cb;          /**< timeout callback */
+    void *arg;              /**< argument to the callback */
     unsigned int divisor;   /**< software clock divisor */
 } timer_conf_t;
 
@@ -66,13 +67,14 @@ static inline unsigned int _llvalue_to_scaled_value(unsigned long long corrected
     return scaledv;
 }
 
-int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     if (dev >= TIMER_NUMOF){
         return -1;
     }
 
-    config[dev].cb = callback;                          /* User Function */
+    config[dev].cb = cb;
+    config[dev].arg = arg;
     config[dev].divisor = ROM_SysCtlClockGet() / freq;
 
     unsigned int sysctl_timer;
@@ -368,7 +370,7 @@ void isr_wtimer0a(void)
 {
     /* Clears both IT */
     ROM_TimerIntClear(WTIMER0_BASE, TIMER_TIMA_TIMEOUT | TIMER_TIMA_MATCH);
-    config[TIMER_0].cb(0);
+    config[TIMER_0].cb(config[TIMER_0].arg, 0);
     if (sched_context_switch_request){
         thread_yield();
     }
@@ -380,7 +382,7 @@ void isr_wtimer1a(void)
 {
     ROM_TimerIntClear(WTIMER1_BASE, TIMER_TIMA_TIMEOUT | TIMER_TIMA_MATCH);
 
-    config[TIMER_1].cb(0);
+    config[TIMER_1].cb(config[TIMER_0].arg, 0);
     if (sched_context_switch_request){
         thread_yield();
     }

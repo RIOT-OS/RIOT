@@ -288,11 +288,11 @@ static int nd_init(netdev2_t *netdev)
     mutex_lock(&dev->devlock);
 
     /* setup the low-level interfaces */
-    gpio_init(dev->reset_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(dev->reset_pin, GPIO_OUT);
     gpio_clear(dev->reset_pin);     /* this puts the device into reset state */
-    gpio_init(dev->cs_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(dev->cs_pin, GPIO_OUT);
     gpio_set(dev->cs_pin);
-    gpio_init_int(dev->int_pin, GPIO_NOPULL, GPIO_FALLING, on_int, (void *)dev);
+    gpio_init_int(dev->int_pin, GPIO_IN, GPIO_FALLING, on_int, (void *)dev);
     res = spi_init_master(dev->spi, SPI_CONF_FIRST_RISING, SPI_SPEED);
     if (res < 0) {
         DEBUG("[enc28j60] init: error initializing SPI bus [%i]\n", res);

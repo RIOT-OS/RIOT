@@ -387,16 +387,14 @@ typedef enum {
 /** @} */
 
 /**
- * @name Scale parameters
- *
- * Use these names when calling lis3dh_set_scale()
+ * @name Scale register values symbolic names
  */
 /** @{ */
-#define LIS3DH_SCALE_2G  (0) /**< Scale: +/- 2G */
-#define LIS3DH_SCALE_4G  (LIS3DH_CTRL_REG4_FS0_MASK) /**< Scale: +/- 4G */
-#define LIS3DH_SCALE_8G  (LIS3DH_CTRL_REG4_FS1_MASK) /**< Scale: +/- 8G */
+#define LIS3DH_CTRL_REG4_SCALE_2G  (0) /**< Scale: +/- 2G */
+#define LIS3DH_CTRL_REG4_SCALE_4G  (LIS3DH_CTRL_REG4_FS0_MASK) /**< Scale: +/- 4G */
+#define LIS3DH_CTRL_REG4_SCALE_8G  (LIS3DH_CTRL_REG4_FS1_MASK) /**< Scale: +/- 8G */
 /** Scale: +/- 16G */
-#define LIS3DH_SCALE_16G (LIS3DH_CTRL_REG4_FS1_MASK | LIS3DH_CTRL_REG4_FS0_MASK)
+#define LIS3DH_CTRL_REG4_SCALE_16G (LIS3DH_CTRL_REG4_FS1_MASK | LIS3DH_CTRL_REG4_FS0_MASK)
 /** @} */
 
 /**
@@ -686,6 +684,13 @@ typedef struct {
     gpio_t cs;              /**< Chip select pin */
     gpio_t int1;            /**< INT1 pin */
     gpio_t int2;            /**< INT2 (DRDY) pin */
+    uint8_t scale;          /**< Default sensor scale: 2, 4, 8, or 16 (G) */
+    uint8_t odr;            /**< Default sensor ODR setting: LIS3DH_ODR_xxxHz */
+} lis3dh_params_t;
+
+typedef struct {
+    spi_t spi;              /**< SPI device the sensor is connected to */
+    gpio_t cs;              /**< Chip select pin */
     int16_t scale;          /**< Current scale setting of the sensor */
 } lis3dh_t;
 
@@ -697,8 +702,7 @@ typedef struct __attribute__((packed))
     int16_t acc_x;          /**< Acceleration in the X direction in milli-G */
     int16_t acc_y;          /**< Acceleration in the Y direction in milli-G */
     int16_t acc_z;          /**< Acceleration in the Z direction in milli-G */
-}
-lis3dh_data_t;
+} lis3dh_data_t;
 
 
 /**
@@ -707,14 +711,12 @@ lis3dh_data_t;
  * @param[in]  dev          Device descriptor of sensor to initialize
  * @param[in]  spi          SPI bus the accelerometer is connected to
  * @param[in]  cs_pin       GPIO connected to the chip select pin of the accelerometer
- * @param[in]  int1_pin     GPIO connected to the INT1 pin of the accelerometer
- * @param[in]  int2_pin     GPIO connected to the INT2 pin of the accelerometer
  * @param[in]  scale        Initial scale setting of the sensor
  *
  * @return                  0 on success
  * @return                  -1 on error
  */
-int lis3dh_init(lis3dh_t *dev, spi_t spi, gpio_t cs_pin, gpio_t int1_pin, gpio_t int2_pin, uint8_t scale);
+int lis3dh_init(lis3dh_t *dev, spi_t spi, gpio_t cs_pin, uint8_t scale);
 
 /**
  * @brief Read 3D acceleration data from the accelerometer
@@ -819,7 +821,7 @@ int lis3dh_set_odr(lis3dh_t *dev, const uint8_t odr);
 /**
  * @brief Set the full scale range of the sensor.
  *
- * Valid values for scale is 2, 4, 8, 16 and represents the full range of the
+ * Valid values for scale are 2, 4, 8, 16 and represents the full range of the
  * sensor.
  *
  * @param[in]  dev          Device descriptor of sensor

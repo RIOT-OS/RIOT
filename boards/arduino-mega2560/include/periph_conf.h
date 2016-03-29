@@ -24,24 +24,25 @@ extern "C" {
 #endif
 
 /**
- * @name        Clock configuration
+ * @brief   Clock configuration
  * @{
  */
 #define CLOCK_CORECLOCK     (16000000L)
 /** @} */
 
 /**
- * @name        Timer peripheral configuration
- * @brief       The ATmega2560 has 6 timers. Timer0 and Timer2 are 8 Bit Timers,
- *              Timer0 has special uses too and therefore we'll avoid using it.
- *              Timer5 has special uses with certain Arduino Shields, too.
- *              Therefore we'll also avoid using Timer5.
- *              This results in the following mapping to use the left over 16 Bit
- *              timers:
+ * @brief   Timer peripheral configuration
  *
- *              Timer1 -> TIMER_0
- *              Timer3 -> TIMER_1
- *              Timer4 -> TIMER_2
+ * The ATmega2560 has 6 timers. Timer0 and Timer2 are 8 Bit Timers,
+ * Timer0 has special uses too and therefore we'll avoid using it.
+ * Timer5 has special uses with certain Arduino Shields, too.
+ * Therefore we'll also avoid using Timer5.
+ * This results in the following mapping to use the left over 16 Bit
+ * timers:
+ *
+ * Timer1 -> TIMER_0
+ * Timer3 -> TIMER_1
+ * Timer4 -> TIMER_2
  *
  * @{
  */
@@ -133,9 +134,10 @@ extern "C" {
 #define TIMER2_COMPA_ISR    TIMER4_COMPA_vect
 #define TIMER2_COMPB_ISR    TIMER4_COMPB_vect
 #define TIMER2_COMPC_ISR    TIMER4_COMPC_vect
+/** @} */
 
 /**
- * @name UART configuration
+ * @brief   UART configuration
  * @{
  */
 #define UART_NUMOF          (4U)
@@ -239,34 +241,25 @@ extern "C" {
 #define UART3_SET_8BIT_SIZE UART3_CTRL_STAT_C |= UART3_8BIT_SIZE
 #define UART3_RECEIVED_DATA (UART3_CTRL_STAT_A & (1 << UART3_RX_COMPLETE))
 #define UART3_DTREG_EMPTY   (UART3_CTRL_STAT_A & (1 << UART3_DATA_EMPTY))
-
-/**
- * @brief ADC configuration
- */
-#define ADC_NUMOF           (0U)
-#define ADC_0_EN            0
-#define ADC_1_EN            0
-
-/**
- * @brief PWM configuration
- */
-#define PWM_NUMOF           (0U)
-#define PWM_0_EN            0
-#define PWM_1_EN            0
+/** @} */
 
 /**
  * @brief SPI configuration
+ *
+ * The atmega2560 has only one hardware SPI with fixed pin configuration, so all
+ * we can do here, is to enable or disable it...
+ *
+ * The fixed pins used, are:
+ * MOSI - PB2 (Arduino pin 51)
+ * MISO - PB3 (Arduino pin 50)
+ * SCK  - PB1 (Arduino pin 52)
+ * SS   - PB0 (Arduino pin 53) -> this pin is configured as output, but not used
+ *
+ * @{
  */
-#define SPI_NUMOF           (0U)                                                    /* TODO */
-#define SPI_0_EN            0
-#define SPI_1_EN            0
-
-/**
- * @brief I2C configuration
- */
-#define I2C_NUMOF           (0U)                                                    /* TODO */
-#define I2C_0_EN            0
-#define I2C_0_EN            0
+#define SPI_NUMOF           1           /* set to 0 to disable SPI */
+#define SPI_0_EN            1           /* remove once SPI rework is done */
+/** @} */
 
 #ifdef __cplusplus
 }

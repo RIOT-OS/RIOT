@@ -49,6 +49,11 @@ typedef struct {
 } saul_reg_info_t;
 
 /**
+ * @brief   Export the SAUL registry as global variable
+ */
+extern saul_reg_t *saul_reg;
+
+/**
  * @brief   Register a device with the SAUL registry
  *
  * @note    Make sure the registry entry the @p dev pointer is pointing to
@@ -71,14 +76,6 @@ int saul_reg_add(saul_reg_t *dev);
  * @return      -ENODEV if device was not found in the registry
  */
 int saul_reg_rm(saul_reg_t *dev);
-
-/**
- * @brief   Get the first device from the list of registered devices
- *
- * @return      pointer to the first device in the list
- * @return      NULL if list is empty
- */
-saul_reg_t *saul_reg_get(void);
 
 /**
  * @brief   Find a device by it's position in the registry

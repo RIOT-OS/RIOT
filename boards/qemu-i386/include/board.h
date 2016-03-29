@@ -25,12 +25,13 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Serial port configuration
+ * @{
+ */
 #define UART_PORT (COM1_PORT) /* IO port to use for UART */
 #define UART_IRQ (COM1_IRQ)   /* IRQ line to use for UART */
-
-#define LED_RED_ON          /* not available */
-#define LED_RED_OFF         /* not available */
-#define LED_RED_TOGGLE      /* not available */
+/** @} */
 
 #ifdef __cplusplus
 }

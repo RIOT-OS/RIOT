@@ -299,17 +299,13 @@ void lm75A_start_sensor_sampling(void (*handler)(void))
      * Normal main() thread activity.
      */
     while (true) {
-        //Toggle the green LED;
-        LED_RED_TOGGLE;
         printf("amb_temp = %3.3f\n", lm75A_get_ambient_temperature());
 
         if (my_alarm && (handler != NULL)) {
-            LED_GREEN_ON;
             handler();
             my_alarm = false;
         }
         xtimer_usleep(100000);
-        LED_RED_TOGGLE;
         xtimer_usleep(100000);
     }
 }

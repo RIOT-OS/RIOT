@@ -1,11 +1,7 @@
 PKG_NAME=oonf_api
-PKG_URL=http://olsr.org/git/oonf.git
+PKG_URL=https://github.com/OLSR/OONF.git
 PKG_VERSION=v0.3.0
 PKG_DIR=$(CURDIR)/$(PKG_NAME)
-
-ifneq ($(RIOTBOARD),)
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
-endif
 
 ifneq ($(RIOTBASE),)
 INCLUDES += -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/sys/net/include \
@@ -26,8 +22,7 @@ $(PKG_DIR)/Makefile: $(PKG_DIR)/.git/config
 	cd "$(PKG_DIR)" && git am --ignore-whitespace "$(CURDIR)"/*.patch
 
 $(PKG_DIR)/.git/config:
-	test -d "$(PKG_DIR)" || git clone "$(PKG_URL)" "$(PKG_DIR)"; \
-		cd "$(PKG_DIR)" && git checkout -f "$(PKG_VERSION)"
+	test -d "$(PKG_DIR)" || $(GITCACHE) clone "$(PKG_URL)" "$(PKG_VERSION)" "$(PKG_DIR)"
 
 clean::
 	@echo "Cleaning up oonf_api package..."

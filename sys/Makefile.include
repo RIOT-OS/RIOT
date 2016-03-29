@@ -1,8 +1,4 @@
-ifneq (,$(filter net_help,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-endif
 ifneq (,$(filter nhdp,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/routing/nhdp
 endif
 
@@ -12,11 +8,9 @@ endif
 
 ifneq (,$(filter fib,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include   # remove as soon as deleted
 endif
 ifneq (,$(filter posix,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
@@ -67,6 +61,12 @@ endif
 
 ifneq (,$(filter arduino,$(USEMODULE)))
     include $(RIOTBASE)/sys/arduino/Makefile.include
+endif
+
+ifneq (,$(filter printf_float,$(USEMODULE)))
+    ifeq (1,$(USE_NANO_SPECS))
+        export LINKFLAGS += -u _printf_float
+    endif
 endif
 
 INCLUDES += -I$(RIOTBASE)/sys/libc/include

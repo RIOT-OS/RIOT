@@ -36,32 +36,40 @@
 #define LOCATION_VTABLE     (0x08005000)
 
 /**
- * @name LED pin definitions
- * @{
+ * @name Tell the xtimer that we use a 16-bit peripheral timer
  */
-#define LED_PORT            (GPIOA)
-#define LED_RED_PIN         (9)
-#define LED_GREEN_PIN       (10)
-#define LED_BLUE_PIN        (8)
-#define LED_WHITE_PIN       (13)
-/** @} */
+#define XTIMER_MASK         (0xffff0000)
 
 /**
- * @name Macros for controlling the on-board LEDs.
+ * @brief   Macros for controlling the on-board LEDs
  * @{
  */
-#define LED_RED_ON          (LED_PORT->BRR = (1<<LED_RED_PIN))
-#define LED_RED_OFF         (LED_PORT->BSRR = (1<<LED_RED_PIN))
-#define LED_RED_TOGGLE      (LED_PORT->ODR ^= (1<<LED_RED_PIN))
-#define LED_GREEN_ON        (LED_PORT->BRR = (1<<LED_GREEN_PIN))
-#define LED_GREEN_OFF       (LED_PORT->BSRR = (1<<LED_GREEN_PIN))
-#define LED_GREEN_TOGGLE    (LED_PORT->ODR ^= (1<<LED_GREEN_PIN))
-#define LED_BLUE_ON         (LED_PORT->BRR = (1<<LED_BLUE_PIN))
-#define LED_BLUE_OFF        (LED_PORT->BSRR = (1<<LED_BLUE_PIN))
-#define LED_BLUE_TOGGLE     (LED_PORT->ODR ^= (1<<LED_BLUE_PIN))
-#define LED_WHITE_ON        (LED_PORT->BRR = (1<<LED_WHITE_PIN))
-#define LED_WHITE_OFF       (LED_PORT->BSRR = (1<<LED_WHITE_PIN))
-#define LED_WHITE_TOGGLE    (LED_PORT->ODR ^= (1<<LED_WHITE_PIN))
+#define LED0_PIN            GPIO_PIN(PORT_A, 9)
+#define LED1_PIN            GPIO_PIN(PORT_A, 10)
+#define LED2_PIN            GPIO_PIN(PORT_A, 8)
+#define LED3_PIN            GPIO_PIN(PORT_A, 13)
+
+#define LED_PORT            (GPIOA)
+#define LED0_MASK           (1 << 9)
+#define LED1_MASK           (1 << 10)
+#define LED2_MASK           (1 << 8)
+#define LED3_MASK           (1 << 13)
+
+#define LED0_ON             (LED_PORT->BRR  = LED0_MASK)
+#define LED0_OFF            (LED_PORT->BSRR = LED0_MASK)
+#define LED0_TOGGLE         (LED_PORT->ODR ^= LED0_MASK)
+
+#define LED1_ON             (LED_PORT->BRR  = LED1_MASK)
+#define LED1_OFF            (LED_PORT->BSRR = LED1_MASK)
+#define LED1_TOGGLE         (LED_PORT->ODR ^= LED1_MASK)
+
+#define LED2_ON             (LED_PORT->BRR  = LED2_MASK)
+#define LED2_OFF            (LED_PORT->BSRR = LED2_MASK)
+#define LED2_TOGGLE         (LED_PORT->ODR ^= LED2_MASK)
+
+#define LED3_ON             (LED_PORT->BRR  = LED3_MASK)
+#define LED3_OFF            (LED_PORT->BSRR = LED3_MASK)
+#define LED3_TOGGLE         (LED_PORT->ODR ^= LED3_MASK)
 /** @} */
 
 /**

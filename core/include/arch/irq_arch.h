@@ -37,10 +37,10 @@
  * @{
  */
 #ifdef COREIF_NG
-#define enableIRQ       irq_arch_enable
-#define disableIRQ      irq_arch_disable
-#define restoreIRQ      irq_arch_restore
-#define inISR           irq_arch_in
+#define irq_enable      irq_arch_enable
+#define irq_disable     irq_arch_disable
+#define irq_restore     irq_arch_restore
+#define irq_is_in       irq_arch_in
 #endif
 /** @} */
 
