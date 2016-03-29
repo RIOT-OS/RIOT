@@ -211,14 +211,16 @@ static inline void isr_handler(msp_port_isr_t *port, int ctx)
     }
 }
 
-ISR(PORT1_VECTOR, isr_port1)
+void __attribute__((naked, optimize("omit-frame-pointer"), no_instrument_function,
+                    interrupt (PORT1_VECTOR))) isr_port1(void)
 {
     __enter_isr();
     isr_handler((msp_port_isr_t *)PORT_1, 0);
     __exit_isr();
 }
 
-ISR(PORT2_VECTOR, isr_port2)
+void __attribute__((naked, optimize("omit-frame-pointer"), no_instrument_function,
+                    interrupt (PORT2_VECTOR))) isr_port2(void)
 {
     __enter_isr();
     isr_handler((msp_port_isr_t *)PORT_2, 8);

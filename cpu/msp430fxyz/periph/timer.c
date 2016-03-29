@@ -125,7 +125,8 @@ void timer_irq_disable(tim_t dev)
     /* TODO: not supported, yet */
 }
 
-ISR(TIMER_ISR_CC0, isr_timer_a_cc0)
+void __attribute__((naked, optimize("omit-frame-pointer"), no_instrument_function,
+                    interrupt (TIMER_ISR_CC0))) isr_timer_a_cc0(void)
 {
     __enter_isr();
 
@@ -135,7 +136,8 @@ ISR(TIMER_ISR_CC0, isr_timer_a_cc0)
     __exit_isr();
 }
 
-ISR(TIMER_ISR_CCX, isr_timer_a_ccx)
+void __attribute__((optimize("omit-frame-pointer"), no_instrument_function,
+                    interrupt (TIMER_ISR_CCX))) isr_timer_a_ccx(void)
 {
     __enter_isr();
 
