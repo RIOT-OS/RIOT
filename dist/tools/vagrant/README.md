@@ -3,7 +3,7 @@
 
 ## About
 This repository includes a [Vagrantfile](https://github.com/RIOT-OS/RIOT/blob/master/Vagrantfile)
-to create and control a Linux virtual machine based on an Ubuntu Trusty (64-bit) image that contains
+to create and control a Linux virtual machine based on an Ubuntu Wily (64-bit) image that contains
 all necessary toolchains and dependencies to build and flash compatible devices with RIOT-OS.
 The advantage of using this VM is to have a reproducable, portable and even disposable environment
 that can be used to develop for RIOT-OS with decreased setup times and without the requirement of
