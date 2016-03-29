@@ -24,9 +24,11 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "log.h"
 #include "xtimer.h"
-#include "srf02.h"
 #include "periph/i2c.h"
+#include "srf02.h"
+#include "srf02_params.h"
 
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
@@ -56,11 +58,30 @@
 #define CMD_ADDR_SEQ3       (0xa5)
 /** @} */
 
+/**
+ * @brief   Allocate memory for device descriptors
+ */
+srf02_t srf02_devs[SRF02_NUMOF];
 
-int srf02_init(srf02_t *dev, i2c_t i2c, uint8_t addr)
+
+void srf02_auto_init(void)
 {
-    dev->i2c = i2c;
-    dev->addr = (addr >> 1);    /* internally we right align the 7-bit addr */
+    for (int i = 0; i < SRF02_NUMOF; i++) {
+        if (srf02_init(&srf02_devs[i], &srf02_params[i]) < 0) {
+            LOG_ERROR("initialization of SRF02 device #%i failed", i);
+            return;
+        }
+#ifdef MODULE_SAUL_REG
+        srf02_saul_reg[i].dev = srf02_devs[i];
+        saul_reg_add(&srf02_saul_reg[i]);
+#endif
+    }
+}
+
+int srf02_init(srf02_t *dev, const srf02_params_t *params)
+{
+    dev->i2c  = params->i2c;
+    dev->addr = (params->addr >> 1);
     char rev;
 
     /* Acquire exclusive access to the bus. */
@@ -68,13 +89,15 @@ int srf02_init(srf02_t *dev, i2c_t i2c, uint8_t addr)
     /* initialize i2c interface */
     if (i2c_init_master(dev->i2c, BUS_SPEED) < 0) {
         DEBUG("[srf02] error initializing I2C bus\n");
+        i2c_release(dev->i2c);
         return -1;
     }
     /* try to read the software revision (read the CMD reg) from the device */
-    i2c_read_reg(i2c, dev->addr, REG_CMD, &rev);
+    i2c_read_reg(dev->i2c, dev->addr, REG_CMD, &rev);
     if (rev == 0 || rev == 255) {
         i2c_release(dev->i2c);
         DEBUG("[srf02] error reading the devices software revision\n");
+        i2c_release(dev->i2c);
         return -1;
     } else {
         DEBUG("[srf02] software revision: 0x%02x\n", rev);

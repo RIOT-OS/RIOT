@@ -74,6 +74,7 @@ endif
 
 ifneq (,$(filter srf02,$(USEMODULE)))
   USEMODULE += xtimer
+  FEATURES_REQUIRED = periph_i2c
 endif
 
 ifneq (,$(filter srf08,$(USEMODULE)))

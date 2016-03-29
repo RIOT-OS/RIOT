@@ -62,6 +62,35 @@ typedef enum {
 } srf02_mode_t;
 
 /**
+ * @brief   Device descriptor for SRF02 sensors
+ */
+typedef struct {
+    i2c_t i2c;              /**< I2C device the sensor is connected to */
+    uint8_t addr;           /**< I2C bus address of the sensor */
+} srf02_t;
+
+/**
+ * @brief   Configuration parameters for SRF02 devices
+ */
+typedef struct {
+    i2c_t i2c;              /**< I2C bus the device is connected to */
+    uint8_t addr;           /**< address on that bus */
+} srf02_params_t;
+
+/**
+ * @brief   SAUL driver interface
+ */
+#ifdef MODULE_SAUL
+extern const sauL_driver_t srf02_saul_driver;
+#endif
+
+/**
+ * @brief   Auto initialize all configured SRF02 devices using the
+ *          srf02_params.h file
+ */
+void srf02_auto_init(void);
+
+/**
  * @brief   Initialize the SRF02 ultrasonic sensor
  *
  * @param[in] dev           device descriptor of an SRF02 sensor
@@ -71,7 +100,7 @@ typedef enum {
  * @return                  0 on successful initialization
  * @return                  -1 on error
  */
-int srf02_init(srf02_t *dev, i2c_t i2c, uint8_t addr);
+int srf02_init(srf02_t *dev, const srf02_params_t *params);
 
 /**
  * @brief   Trigger a new measurement

@@ -150,7 +150,11 @@ void auto_init(void)
     extern void dht_auto_init(void);
     dht_auto_init();
 #endif
-
+#ifdef MODULE_SRF02
+    extern void srf02_auto_init(void);
+    DEBUG("Auto init SRF02 driver.\n");
+    srf02_auto_init();
+#endif
 
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
