@@ -157,3 +157,21 @@ void mrf24j40_reset_state_machine(mrf24j40_t *dev)
 
     mrf24j40_force_reset(dev);
 }
+
+int16_t mrf24j40_get_txpower(mrf24j40_t *dev)
+{
+
+}
+
+void at86rf2xx_set_txpower(at86rf2xx_t *dev, int16_t txpower)
+{
+    uint8_t txpower_reg_value;
+    if(txpower >= 1)
+    {
+        txpower += 1;
+    }
+    txpower_reg_value = (txpower<<3);
+    mrf24j40_reg_write_long(dev,MRF24J40_REG_RFCON3, txpower_reg_value);
+    // todo : txpower > 6
+    
+}

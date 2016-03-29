@@ -57,4 +57,4 @@ uint8_t mrf24j40_reg_read_long(const mrf24j40_t *dev, const uint16_t addr);
  * @param[in] value value to write to the given register
  */
  
-void mrf24j40_reg_write_short_long(const mrf24j40_t *dev, const uint16_t addr, const uint8_t value);
+void mrf24j40_reg_write_long(const mrf24j40_t *dev, const uint16_t addr, const uint8_t value);
