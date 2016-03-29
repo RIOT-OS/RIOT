@@ -462,8 +462,7 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                 fib_add_entry(&gnrc_ipv6_fib_table, dodag->iface, target->target.u8,
                               sizeof(ipv6_addr_t), fib_dst_flags, src->u8,
                               sizeof(ipv6_addr_t), FIB_FLAG_RPL_ROUTE,
-                              (dodag->default_lifetime * dodag->lifetime_unit) *
-                              SEC_IN_MS);
+                              dodag->default_lifetime * dodag->lifetime_unit * SEC_IN_CS);
                 break;
 
             case (GNRC_RPL_OPT_TRANSIT):
@@ -487,8 +486,7 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                                      sizeof(ipv6_addr_t),
                                      ((transit->e_flags & GNRC_RPL_OPT_TRANSIT_E_FLAG) ?
                                       0x0 : FIB_FLAG_RPL_ROUTE),
-                                     (transit->path_lifetime *
-                                      dodag->lifetime_unit * SEC_IN_MS));
+                                     transit->path_lifetime * dodag->lifetime_unit * SEC_IN_CS);
                     first_target = (gnrc_rpl_opt_target_t *) (((uint8_t *) (first_target)) +
                                    sizeof(gnrc_rpl_opt_t) + first_target->length);
                 }

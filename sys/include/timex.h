@@ -39,6 +39,16 @@ extern "C" {
 #define SEC_IN_MS   (1000U)
 
 /**
+ * @brief The number of centiseconds per second
+ */
+#define SEC_IN_CS   (100U)
+
+/**
+ * @brief The number of microseconds per centisecond
+ */
+#define CS_IN_USEC  (10000U)
+
+/**
  * @brief The number of microseconds per millisecond
  */
 #define MS_IN_USEC  (1000U)

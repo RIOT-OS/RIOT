@@ -70,7 +70,7 @@ typedef struct fib_destination_set_entry_t {
 /**
  * @brief indicator of a lifetime that does not expire (2^64 - 1)
  */
-#define FIB_LIFETIME_NO_EXPIRE (0xFFFFFFFFffffffff)
+#define FIB_LIFETIME_NO_EXPIRE (0xFFFFFFFF)
 
 /**
  * @brief flag to identify if a route was set by RPL
@@ -121,7 +121,7 @@ int fib_register_rp(fib_table_t *table, uint8_t *prefix, size_t prefix_addr_type
  * @param[in] next_hop       the next hop address to be updated
  * @param[in] next_hop_size  the next hop address size
  * @param[in] next_hop_flags the next-hop address flags
- * @param[in] lifetime       the lifetime in ms to be updates
+ * @param[in] lifetime       the lifetime in centiseconds to be updates
  *
  * @return 0 on success
  *         -ENOMEM if the entry cannot be created due to insufficient RAM
@@ -141,7 +141,7 @@ int fib_add_entry(fib_table_t *table, kernel_pid_t iface_id, uint8_t *dst,
  * @param[in] next_hop       the next hop address to be updated
  * @param[in] next_hop_size  the next hop address size
  * @param[in] next_hop_flags the next-hop address flags
- * @param[in] lifetime       the lifetime in ms to be updates
+ * @param[in] lifetime       the lifetime in centiseconds to be updates
  *
  * @return 0 on success
  *         -ENOMEM if the entry cannot be updated due to insufficient RAM
@@ -498,7 +498,7 @@ void fib_print_sr(fib_table_t *table, fib_sr_t *sr);
  * @return 0             on success: entry for dst found and lifetime copied
  *         -EHOSTUNREACH if no fitting entry is available
  */
-int fib_devel_get_lifetime(fib_table_t *table, uint64_t *lifetime, uint8_t *dst,
+int fib_devel_get_lifetime(fib_table_t *table, uint32_t *lifetime, uint8_t *dst,
                            size_t dst_size);
 
 #endif
