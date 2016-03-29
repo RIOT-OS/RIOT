@@ -40,18 +40,18 @@ extern "C" {
  * @brief Device descriptor for LPS25H sensors
  */
 typedef struct {
-    i2c_t   i2c;                    /**< I2C device the sensor is connected to */
-    uint8_t address;                /**< I2C bus address of the sensor */
+    i2c_t   i2c;               /**< I2C device the sensor is connected to */
+    uint8_t addr;              /**< I2C bus address of the sensor */
 } lps25h_t;
 
 /**
  * @brief Possible sampling rates for LPS25H sensors
  */
 typedef enum {
-    LPS25H_ODR_1HZ   = 0x10,      /**< sample with 1Hz */
-    LPS25H_ODR_7HZ   = 0x20,      /**< sample with 7Hz */
-    LPS25H_ODR_12HZ5 = 0x30,      /**< sample with 12.5Hz */
-    LPS25H_ODR_25HZ  = 0x40       /**< sample with 25Hz */
+    LPS25H_ODR_1HZ   = 0x10,   /**< sample with 1Hz */
+    LPS25H_ODR_7HZ   = 0x20,   /**< sample with 7Hz */
+    LPS25H_ODR_12HZ5 = 0x30,   /**< sample with 12.5Hz */
+    LPS25H_ODR_25HZ  = 0x40    /**< sample with 25Hz */
 } lps25h_odr_t;
 
 /**
@@ -89,21 +89,15 @@ int lps25h_read_pres(lps25h_t *dev);
  * @brief Enable the given sensor
  *
  * @param[in] dev       device descriptor of sensor to enable
- *
- * @return               0 on success
- * @return              -1 on error
  */
-int lps25h_enable(lps25h_t *dev);
+ void lps25h_enable(lps25h_t *dev);
 
 /**
  * @brief Disable the given sensor
  *
  * @param[in] dev       device descriptor of sensor enable
- *
- * @return               0 on success
- * @return              -1 on success
  */
-int lps25h_disable(lps25h_t *dev);
+void lps25h_disable(lps25h_t *dev);
 
 #ifdef __cplusplus
 }
