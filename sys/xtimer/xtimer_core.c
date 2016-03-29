@@ -40,11 +40,12 @@ static xtimer_t *long_list_head = NULL;
 static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer);
 static void _add_timer_to_long_list(xtimer_t **list_head, xtimer_t *timer);
 static void _shoot(xtimer_t *timer);
+static void _remove(xtimer_t *timer);
 static inline void _lltimer_set(uint32_t target);
 static uint32_t _time_left(uint32_t target, uint32_t reference);
 
 static void _timer_callback(void);
-static void _periph_timer_callback(int chan);
+static void _periph_timer_callback(void *arg, int chan);
 
 static inline int _this_high_period(uint32_t target);
 
@@ -56,7 +57,7 @@ static inline int _is_set(xtimer_t *timer)
 void xtimer_init(void)
 {
     /* initialize low-level timer */
-    timer_init(XTIMER, (1000000ul >> XTIMER_SHIFT), _periph_timer_callback);
+    timer_init(XTIMER, XTIMER_USEC_TO_TICKS(1000000ul), _periph_timer_callback, NULL);
 
     /* register initial overflow tick */
     _lltimer_set(0xFFFFFFFF);
@@ -94,7 +95,10 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
         xtimer_set(timer, (uint32_t) offset);
     }
     else {
-        xtimer_remove(timer);
+        int state = irq_disable();
+        if (_is_set(timer)) {
+            _remove(timer);
+        }
 
         _xtimer_now64(&timer->target, &timer->long_target);
         timer->target += offset;
@@ -103,9 +107,8 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
             timer->long_target++;
         }
 
-        int state = disableIRQ();
         _add_timer_to_long_list(&long_list_head, timer);
-        restoreIRQ(state);
+        irq_restore(state);
         DEBUG("xtimer_set64(): added longterm timer (long_target=%" PRIu32 " target=%" PRIu32 ")\n",
                 timer->long_target, timer->target);
     }
@@ -131,8 +134,9 @@ void xtimer_set(xtimer_t *timer, uint32_t offset)
     }
 }
 
-static void _periph_timer_callback(int chan)
+static void _periph_timer_callback(void *arg, int chan)
 {
+    (void)arg;
     (void)chan;
     _timer_callback();
 }
@@ -149,7 +153,7 @@ static inline void _lltimer_set(uint32_t target)
     }
     DEBUG("_lltimer_set(): setting %" PRIu32 "\n", _lltimer_mask(target));
 #ifdef XTIMER_SHIFT
-    target >>= XTIMER_SHIFT;
+    target = XTIMER_USEC_TO_TICKS(target);
     if (!target) {
         target++;
     }
@@ -172,13 +176,17 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
         return 0;
     }
 
+    unsigned state = irq_disable();
+    if (_is_set(timer)) {
+        _remove(timer);
+    }
+
     timer->target = target;
     timer->long_target = _long_cnt;
     if (target < now) {
         timer->long_target++;
     }
 
-    unsigned state = disableIRQ();
     if ( (timer->long_target > _long_cnt) || !_this_high_period(target) ) {
         DEBUG("xtimer_set_absolute(): the timer doesn't fit into the low-level timer's mask.\n");
         _add_timer_to_long_list(&long_list_head, timer);
@@ -199,7 +207,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
         }
     }
 
-    restoreIRQ(state);
+    irq_restore(state);
 
     return res;
 }
@@ -239,14 +247,8 @@ static int _remove_timer_from_list(xtimer_t **list_head, xtimer_t *timer)
     return 0;
 }
 
-int xtimer_remove(xtimer_t *timer)
+static void _remove(xtimer_t *timer)
 {
-    if (!_is_set(timer)) {
-        return 0;
-    }
-
-    unsigned state = disableIRQ();
-    int res = 0;
     if (timer_list_head == timer) {
         uint32_t next;
         timer_list_head = timer->next;
@@ -260,17 +262,21 @@ int xtimer_remove(xtimer_t *timer)
         _lltimer_set(next);
     }
     else {
-        res = _remove_timer_from_list(&timer_list_head, timer) ||
-            _remove_timer_from_list(&overflow_list_head, timer) ||
-            _remove_timer_from_list(&long_list_head, timer);
+        if (!_remove_timer_from_list(&timer_list_head, timer)) {
+            if (!_remove_timer_from_list(&overflow_list_head, timer)) {
+                _remove_timer_from_list(&long_list_head, timer);
+            }
+        }
     }
+}
 
-    timer->target = 0;
-    timer->long_target = 0;
-
-    restoreIRQ(state);
-
-    return res;
+void xtimer_remove(xtimer_t *timer)
+{
+    int state = irq_disable();
+    if (_is_set(timer)) {
+        _remove(timer);
+    }
+    irq_restore(state);
 }
 
 static uint32_t _time_left(uint32_t target, uint32_t reference)

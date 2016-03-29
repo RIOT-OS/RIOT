@@ -67,7 +67,8 @@ void clist_print(clist_node_t *clist)
     }
 
     do {
-        printf("list entry: %p: prev=%p next=%p\n", clist, clist->prev, clist->next);
+        printf("list entry: %p: prev=%p next=%p\n",
+               (void *)clist, (void *)clist->prev, (void *)clist->next);
         clist = clist->next;
 
         if (clist == start) {

@@ -328,7 +328,7 @@ static int fib_signal_rp(fib_table_t *table, uint16_t type, uint8_t *dat,
     for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
         if (table->notify_rp[i] != KERNEL_PID_UNDEF) {
             DEBUG("[fib_signal_rp] send msg@: %p to pid[%d]: %d\n", \
-                  msg.content.ptr, (int)i, (int)(table->notify_rp[i]));
+                  (void *)msg.content.ptr, (int)i, (int)(table->notify_rp[i]));
 
             /* do only signal a RP if its registered prefix matches */
             if (type != FIB_MSG_RP_SIGNAL_SOURCE_ROUTE_CREATED) {
@@ -446,6 +446,21 @@ void fib_remove_entry(fib_table_t *table, uint8_t *dst, size_t dst_size)
          * this should never happen
          */
         DEBUG("[fib_update_entry] ambigious entries detected!!!\n");
+    }
+
+    mutex_unlock(&(table->mtx_access));
+}
+
+void fib_flush(fib_table_t *table, kernel_pid_t interface)
+{
+    mutex_lock(&(table->mtx_access));
+    DEBUG("[fib_flush]\n");
+
+    for (size_t i = 0; i < table->size; ++i) {
+        if ((interface == KERNEL_PID_UNDEF) ||
+            (interface == table->data.entries[i].iface_id)) {
+            fib_remove(&table->data.entries[i]);
+        }
     }
 
     mutex_unlock(&(table->mtx_access));

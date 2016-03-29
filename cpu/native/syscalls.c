@@ -36,7 +36,6 @@
 #include <ifaddrs.h>
 #include <sys/stat.h>
 
-#include "kernel.h"
 #include "cpu.h"
 #include "irq.h"
 #include "xtimer.h"
@@ -121,7 +120,7 @@ void _native_syscall_leave(void)
        )
     {
         _native_in_isr = 1;
-        unsigned int mask = disableIRQ();
+        unsigned int mask = irq_disable();
         _native_cur_ctx = (ucontext_t *)sched_active_thread->sp;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
@@ -130,7 +129,7 @@ void _native_syscall_leave(void)
         if (swapcontext(_native_cur_ctx, &native_isr_context) == -1) {
             err(EXIT_FAILURE, "_native_syscall_leave: swapcontext");
         }
-        restoreIRQ(mask);
+        irq_restore(mask);
     }
 }
 
@@ -403,7 +402,7 @@ int getpid(void)
     return -1;
 }
 
-#ifdef MODULE_VTIMER
+#ifdef MODULE_XTIMER
 int _gettimeofday(struct timeval *tp, void *restrict tzp)
 {
     (void) tzp;

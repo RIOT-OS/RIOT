@@ -34,7 +34,7 @@ static inline void _reschedule_rtr_sol(gnrc_ipv6_netif_t *iface, uint32_t delay)
 
 void gnrc_ndp_host_init(gnrc_ipv6_netif_t *iface)
 {
-    uint32_t interval = genrand_uint32_range(0, GNRC_NDP_MAX_RTR_SOL_DELAY * SEC_IN_USEC);
+    uint32_t interval = random_uint32_range(0, GNRC_NDP_MAX_RTR_SOL_DELAY * SEC_IN_USEC);
     mutex_lock(&iface->mutex);
     iface->rtr_sol_count = GNRC_NDP_MAX_RTR_SOL_NUMOF;
     DEBUG("ndp host: delayed initial router solicitation by %" PRIu32 " usec.\n", interval);

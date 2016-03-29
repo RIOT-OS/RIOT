@@ -24,6 +24,7 @@
  */
 
 #include <stdio.h>
+#include "uart_stdio.h"
 
 #include "tsrb.h"
 #include "thread.h"
@@ -41,39 +42,27 @@ extern ethos_t ethos;
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifndef STDIO
-#define STDIO               UART_DEV(0)
-#endif
-
-#ifndef STDIO_BAUDRATE
-#define STDIO_BAUDRATE      (115200)
-#endif
-
-#ifndef STDIO_RX_BUFSIZE
-#define STDIO_RX_BUFSIZE    (64)
-#endif
-
 /**
  * @brief use mutex for waiting on incoming UART chars
  */
 static mutex_t _rx_mutex = MUTEX_INIT;
-static char _rx_buf_mem[STDIO_RX_BUFSIZE];
+static char _rx_buf_mem[UART_STDIO_RX_BUFSIZE];
 static tsrb_t _rx_buf = TSRB_INIT(_rx_buf_mem);
 
 /**
  * @brief Receive a new character from the UART and put it into the receive buffer
  */
-void uart_stdio_rx_cb(void *arg, char data)
+void uart_stdio_rx_cb(void *arg, uint8_t data)
 {
     (void)arg;
-    tsrb_add_one(&_rx_buf, data);
+    tsrb_add_one(&_rx_buf, (uint8_t)data);
     mutex_unlock(&_rx_mutex);
 }
 
 void uart_stdio_init(void)
 {
 #ifndef USE_ETHOS_FOR_STDIO
-    uart_init(STDIO, STDIO_BAUDRATE, uart_stdio_rx_cb, NULL);
+    uart_init(UART_STDIO_DEV, UART_STDIO_BAUDRATE, uart_stdio_rx_cb, NULL);
 #else
     uart_init(ETHOS_UART, ETHOS_BAUDRATE, uart_stdio_rx_cb, NULL);
 #endif
@@ -91,7 +80,7 @@ int uart_stdio_read(char* buffer, int count)
 int uart_stdio_write(const char* buffer, int len)
 {
 #ifndef USE_ETHOS_FOR_STDIO
-    uart_write(STDIO, (uint8_t *)buffer, (size_t)len);
+    uart_write(UART_STDIO_DEV, (uint8_t *)buffer, (size_t)len);
 #else
     ethos_send_frame(&ethos, (uint8_t*)buffer, len, ETHOS_FRAME_TYPE_TEXT);
 #endif

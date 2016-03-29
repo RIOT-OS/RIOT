@@ -26,7 +26,6 @@
 
 #include "cpu_conf.h"
 #include "irq.h"
-#include "kernel_internal.h"
 #include "msg.h"
 #include "mutex.h"
 #include "priority_queue.h"
@@ -109,7 +108,7 @@ static void *pthread_reaper(void *arg)
     while (1) {
         msg_t m;
         msg_receive(&m);
-        DEBUG("pthread_reaper(): free(%p)\n", m.content.ptr);
+        DEBUG("pthread_reaper(): free(%p)\n", (void *)m.content.ptr);
         free(m.content.ptr);
     }
 
@@ -207,7 +206,7 @@ void pthread_exit(void *retval)
             }
         }
 
-        disableIRQ();
+        irq_disable();
         if (self->stack) {
             msg_t m;
             m.content.ptr = self->stack;

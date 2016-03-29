@@ -40,6 +40,7 @@ extern "C" {
 #endif
 
 /**
+<<<<<<< HEAD
  * @brief Interrupt stack canary value
  *
  * @note 0xe7fe is the ARM Thumb machine code equivalent of asm("bl #-2\n") or
@@ -82,6 +83,8 @@ extern "C" {
 /** @} */
 
 /**
+=======
+>>>>>>> 6504671a33d6607dddf3b5bd645098bbcdf362d5
  * @brief   Some members of the Cortex-M family have architecture specific
  *          atomic operations in atomic_arch.c
  */
@@ -108,6 +111,17 @@ static inline void cpu_print_last_instruction(void)
     register uint32_t *lr_ptr;
     __asm__ __volatile__("mov %0, lr" : "=r"(lr_ptr));
     printf("%p\n", (void*) lr_ptr);
+}
+
+/**
+ * @brief   Put the CPU into the 'wait for event' sleep mode
+ *
+ * This function is meant to be used for short periods of time, where it is not
+ * feasible to switch to the idle thread and back.
+ */
+static inline void cpu_sleep_until_event(void)
+{
+    __WFE();
 }
 
 #ifdef __cplusplus

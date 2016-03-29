@@ -100,7 +100,6 @@
 #include "thread.h"
 #include "irq.h"
 #include "cpu.h"
-#include "kernel_internal.h"
 
 extern uint32_t _estack;
 extern uint32_t _sstack;

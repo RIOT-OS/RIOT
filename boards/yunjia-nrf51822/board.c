@@ -23,9 +23,6 @@
 
 void board_init(void)
 {
-    /* setup led(s) for debugging */
-    NRF_GPIO->DIRSET = (LED_RED_MASK);
-
     /* initialize the CPU */
     cpu_init();
 }

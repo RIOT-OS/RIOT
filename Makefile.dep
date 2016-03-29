@@ -6,10 +6,48 @@ ifneq (,$(filter libcoap,$(USEPKG)))
     USEMODULE += gnrc_conn_udp
 endif
 
+ifneq (,$(filter ccn-lite,$(USEPKG)))
+    export CFLAGS += -DCCNL_RIOT
+endif
+
+
 ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE += conn_udp
-  USEMODULE += vtimer
+  USEMODULE += xtimer
   USEMODULE += oonf_rfc5444
+endif
+
+ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+  USEMODULE += gnrc_netif
+  USEMODULE += netdev_default
+endif
+
+ifneq (,$(filter cc110x,$(USEMODULE)))
+  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+    USEMODULE += gnrc_cc110x
+	# XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
+	# as all drivers are ported to netdev2
+	USEMODULE += gnrc_netdev2
+  endif
+endif
+
+ifneq (,$(filter kw2xrf,$(USEMODULE)))
+  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+    USEMODULE += gnrc_nomac
+  endif
+endif
+
+ifneq (,$(filter at86rf2%,$(USEMODULE)))
+  USEMODULE += netdev2_ieee802154
+  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+	# XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
+	# as all drivers are ported to netdev2
+    USEMODULE += gnrc_netdev2
+  endif
+endif
+
+ifneq (,$(filter netdev2_ieee802154,$(USEMODULE)))
+  USEMODULE += ieee802154
 endif
 
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pktbuf,$(USEMODULE))))
@@ -24,13 +62,12 @@ ifneq (,$(filter gnrc_conn_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
 endif
 
-ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
-  USEMODULE += gnrc_netif
-endif
-
 ifneq (,$(filter netdev2_tap,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += netdev2_eth
+  ifneq (,$(filter gnrc_%,$(USEMODULE)))
+    USEMODULE += gnrc_netdev2
+  endif
 endif
 
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
@@ -38,12 +75,16 @@ ifneq (,$(filter gnrc_zep,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += gnrc_udp
   USEMODULE += random
-  USEMODULE += vtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
   USEMODULE += gnrc_udp
   USEMODULE += xtimer
+endif
+
+ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
+  USEMODULE += gnrc_rpl
 endif
 
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
@@ -216,7 +257,6 @@ ifneq (,$(filter ipv6_ext_rh,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
-  USEMODULE += ipv6_ext
   USEMODULE += gnrc_ipv6
 endif
 
@@ -283,6 +323,10 @@ ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   USEMODULE += od
 endif
 
+ifneq (,$(filter newlib_nano,$(USEMODULE)))
+  USEMODULE += newlib
+endif
+
 ifneq (,$(filter newlib,$(USEMODULE)))
   # allow custom newlib syscalls implementations by adding
   # newlib_syscalls_XXX to USEMODULE
@@ -314,10 +358,6 @@ ifneq (,$(filter sema,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter vtimer,$(USEMODULE)))
-  USEMODULE += xtimer
-  USEMODULE += timex
-endif
 
 ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
   USEPKG += libfixmath
@@ -364,10 +404,6 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   FEATURES_REQUIRED += cpp
 endif
 
-ifneq (,$(filter gnrc_netdev_eth,$(USEMODULE)))
-  USEMODULE += gnrc_pktbuf
-endif
-
 ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netapi
   USEMODULE += gnrc_netreg
@@ -393,7 +429,6 @@ endif
 
 ifneq (,$(filter pthread,$(USEMODULE)))
     USEMODULE += xtimer
-    USEMODULE += vtimer
     USEMODULE += timex
 endif
 
@@ -429,4 +464,15 @@ endif
 
 ifneq (,$(filter ethos,$(USEMODULE)))
     USEMODULE += netdev2_eth
+endif
+
+ifneq (,$(filter random,$(USEMODULE)))
+    # select default prng
+    ifeq (,$(filter prng_%,$(USEMODULE)))
+        USEMODULE += prng_tinymt32
+    endif
+
+    ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
+        USEMODULE += tinymt32
+    endif
 endif

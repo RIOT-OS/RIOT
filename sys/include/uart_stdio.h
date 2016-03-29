@@ -20,8 +20,32 @@
 #ifndef UART_STDIO_H
 #define UART_STDIO_H
 
+/* Boards may override the default STDIO UART device */
+#include "board.h"
+
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifndef UART_STDIO_DEV
+/**
+ * @brief UART device to use for STDIO
+ */
+#define UART_STDIO_DEV           UART_DEV(0)
+#endif
+
+#ifndef UART_STDIO_BAUDRATE
+/**
+ * @brief Baudrate for STDIO
+ */
+#define UART_STDIO_BAUDRATE      (115200)
+#endif
+
+#ifndef UART_STDIO_RX_BUFSIZE
+/**
+ * @brief Buffer size for STDIO
+ */
+#define UART_STDIO_RX_BUFSIZE    (64)
 #endif
 
 /**
@@ -57,7 +81,7 @@ int uart_stdio_write(const char* buffer, int len);
  * @param[in]   arg     (unused)
  * @param[in]   data    character that has been received
  */
-void uart_stdio_rx_cb(void *arg, char data);
+void uart_stdio_rx_cb(void *arg, uint8_t data);
 
 #ifdef __cplusplus
 }

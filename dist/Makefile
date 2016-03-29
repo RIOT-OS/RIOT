@@ -34,7 +34,7 @@ QUIET ?= 1
 
 #USEMODULE += shell
 #USEMODULE += posix
-#USEMODULE += vtimer
+#USEMODULE += xtimer
 
 #export INCLUDES += -Iapplication_include
 

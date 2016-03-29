@@ -19,6 +19,9 @@ endif
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
     DIRS += oneway-malloc
 endif
+ifneq (,$(filter ieee802154,$(USEMODULE)))
+    DIRS += net/link_layer/ieee802154
+endif
 ifneq (,$(filter ipv4_addr,$(USEMODULE)))
     DIRS += net/network_layer/ipv4/addr
 endif
@@ -58,8 +61,8 @@ endif
 ifneq (,$(filter log_%,$(USEMODULE)))
     DIRS += log
 endif
-ifneq (,$(filter vtimer,$(USEMODULE)))
-    DIRS += compat/vtimer
+ifneq (,$(filter xtimer,$(USEMODULE)))
+    DIRS += xtimer
 endif
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
     DIRS += cpp11-compat

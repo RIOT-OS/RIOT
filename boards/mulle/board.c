@@ -38,15 +38,6 @@ static nvram_spi_params_t nvram_spi_params = {
         .address_count = MULLE_NVRAM_SPI_ADDRESS_COUNT,
 };
 
-/**
- * @brief Initialize the boards on-board LEDs
- *
- * The LEDs are initialized here in order to be able to use them in the early
- * boot for diagnostics.
- *
- */
-static inline void leds_init(void);
-
 /** @brief Initialize the GPIO pins controlling the power switches. */
 static inline void power_pins_init(void);
 
@@ -67,8 +58,11 @@ static int mulle_nvram_init(void);
 void board_init(void)
 {
     int status;
-    /* initialize the boards LEDs, this is done first for debugging purposes */
-    leds_init();
+
+    /* initialize the boards LEDs */
+    gpio_init(LED0_PIN, GPIO_OUT);
+    gpio_init(LED1_PIN, GPIO_OUT);
+    gpio_init(LED2_PIN, GPIO_OUT);
 
     /* Initialize power control pins */
     power_pins_init();
@@ -84,8 +78,6 @@ void board_init(void)
 
     /* Turn on AVDD for reading voltages */
     gpio_set(MULLE_POWER_AVDD);
-
-    LED_RED_ON;
 
     /* Initialize RTC oscillator as early as possible since we are using it as a
      * base clock for the FLL.
@@ -119,8 +111,6 @@ void board_init(void)
     /* initialize the CPU */
     cpu_init();
 
-    LED_YELLOW_ON;
-
     /* NVRAM requires xtimer for timing */
     xtimer_init();
 
@@ -130,30 +120,13 @@ void board_init(void)
         /* Increment boot counter */
         increase_boot_count();
     }
-
-    LED_GREEN_ON;
-}
-
-/**
- * @brief Initialize the boards on-board LEDs
- *
- * The LEDs are initialized here in order to be able to use them in the early
- * boot for diagnostics.
- *
- */
-static inline void leds_init(void)
-{
-    /* The pin configuration can be found in board.h and periph_conf.h */
-    gpio_init(LED_RED_GPIO, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(LED_YELLOW_GPIO, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(LED_GREEN_GPIO, GPIO_DIR_OUT, GPIO_NOPULL);
 }
 
 static inline void power_pins_init(void)
 {
-    gpio_init(MULLE_POWER_AVDD, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(MULLE_POWER_VPERIPH, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(MULLE_POWER_VSEC, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(MULLE_POWER_AVDD, GPIO_OUT);
+    gpio_init(MULLE_POWER_VPERIPH, GPIO_OUT);
+    gpio_init(MULLE_POWER_VSEC, GPIO_OUT);
     gpio_clear(MULLE_POWER_AVDD);
     gpio_clear(MULLE_POWER_VPERIPH);
     gpio_clear(MULLE_POWER_VSEC);

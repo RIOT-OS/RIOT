@@ -29,7 +29,7 @@
 #ifndef CPU_X86_CPU_H_
 #define CPU_X86_CPU_H_
 
-#include "attributes.h"
+#include "kernel_defines.h"
 #include "irq.h"
 #include "ucontext.h"
 #include "cpu_conf.h"

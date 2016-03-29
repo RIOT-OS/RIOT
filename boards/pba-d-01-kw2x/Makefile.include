@@ -29,6 +29,18 @@ export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/kinetis_common/dist/check-fcfield-elf
 
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 
+# Add board selector (USB serial) to OpenOCD options if specified.
+# Use /dist/tools/usb-serial/list-ttys.sh to find out serial number.
+#   Usage: SERIAL="0200..." BOARD="pba-d-01-kw2x" make flash
+ifneq (,$(SERIAL))
+    export OPENOCD_EXTRA_INIT += "-c cmsis_dap_serial $(SERIAL)"
+    SERIAL_TTY = $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL))
+    ifeq (,$(SERIAL_TTY))
+        $(error Did not find a device with serial $(SERIAL))
+    endif
+    PORT_LINUX := $(SERIAL_TTY)
+endif
+
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
 

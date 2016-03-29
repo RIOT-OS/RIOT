@@ -21,6 +21,8 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #ifdef CPU_MODEL_STM32F051R8
 #include "stm32f051x8.h"
 #endif

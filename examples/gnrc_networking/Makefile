@@ -14,7 +14,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos msb-430 msb-430h nrf51dongle \
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += gnrc_netif_default
+USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
 USEMODULE += gnrc_ipv6_router_default
@@ -34,6 +34,10 @@ USEMODULE += ps
 # which is not needed in a production environment but helps in the
 # development process:
 CFLAGS += -DDEVELHELP
+
+# Comment this out to join RPL DODAGs even if DIOs do not contain
+# DODAG Configuration Options (see the doc for more info)
+# CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

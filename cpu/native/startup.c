@@ -30,7 +30,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "kernel_internal.h"
+#include "kernel_init.h"
 #include "cpu.h"
 
 #include "board_internal.h"
@@ -313,7 +313,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     native_cpu_init();
     native_interrupt_init();
 #ifdef MODULE_NETDEV2_TAP
-    netdev2_tap_setup(&netdev2_tap, argv[1]);
+    netdev2_tap_params_t p;
+    p.tap_name = &(argv[1]);
+    netdev2_tap_setup(&netdev2_tap, &p);
 #endif
 
     board_init();

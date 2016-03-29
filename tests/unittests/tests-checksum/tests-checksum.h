@@ -19,7 +19,6 @@
 #define TESTS_CHECKSUM_H
 
 #include "embUnit.h"
-#include "kernel.h"
 
 #ifdef __cplusplus
 extern "C" {

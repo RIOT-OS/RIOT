@@ -21,10 +21,7 @@
 #ifndef BOARD_H_
 #define BOARD_H_
 
-#include <stdint.h>
-
-#include "cpu.h"
-#include "periph_conf.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,54 +30,14 @@ extern "C" {
 /**
  * @brief Use the 2nd UART for STDIO on this board
  */
-#define STDIO               UART_DEV(1)
-
-/**
- * @name LED pin definitions
- * @{
- */
-#define LED_GREEN_GPIO      GPIO_PIN(PORT_A, 5)
-/** @} */
-
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_RED_ON
-#define LED_RED_OFF
-#define LED_RED_TOGGLE
-
-#define LED_GREEN_ON        (GPIOA->BSRR = (1 << 5))
-#define LED_GREEN_OFF       (GPIOA->BRR = (1 << 5))
-#define LED_GREEN_TOGGLE    (GPIOA->ODR ^= (1 << 5))
-
-#define LED_ORANGE_ON
-#define LED_ORANGE_OFF
-#define LED_ORANGE_TOGGLE
-/** @} */
-
-/**
- * @name Buttons
- * @{
- */
-#define BUTTON_USER_GPIO    GPIO_PIN(PORT_C, 13)
-/** @} */
+#define UART_STDIO_DEV      UART_DEV(1)
 
 /**
  * @name xtimer configuration
- * @{
  */
-#define XTIMER              TIMER_0
-#define XTIMER_CHAN         0
-#define XTIMER_SHIFT        0
-#define XTIMER_MASK         0 /* llt 32-bit since combined */
+#define XTIMER_MASK         (0xffff0000)
 #define XTIMER_BACKOFF      5
 /** @} */
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

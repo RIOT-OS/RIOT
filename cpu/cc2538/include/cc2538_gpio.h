@@ -122,6 +122,8 @@ enum {
 */
 #define gpio_dir_input(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DIR &= ~GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
 
+#define cc2538_gpio_read(gpio_num) ( (GPIO_NUM_TO_DEV(gpio_num)->DATA >> GPIO_BIT_NUM(gpio_num)) & 1 )
+
 /**
  * @brief Set a specific GPIO output pin high
  *
@@ -280,6 +282,19 @@ typedef struct {
  */
 #define IOC    ((cc2538_ioc_t *)0x400d4000)     /**< IOC instance */
 /** @} */
+
+/**
+ * @brief     Initialize a GPIO port.
+ * @details   Initializes the port to a default state, disables interrupts and
+ *            clears any pending interrupts.
+ * @param[in] gpio_port A pointer to the port's instance, e.g. "GPIO_A".
+ */
+void cc2538_gpio_port_init(cc2538_gpio_t* gpio_port);
+
+/**
+ * @brief     Initialize all four GPIO ports.
+ */
+void cc2538_gpio_init(void);
 
 #ifdef __cplusplus
 } /* end extern "C" */

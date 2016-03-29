@@ -21,6 +21,8 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #include "LPC17xx.h"
 
 #ifdef __cplusplus
@@ -35,6 +37,13 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (35U)
 #define CPU_FLASH_BASE                  LPC_FLASH_BASE
 /** @} */
+
+/**
+ * @brief   CPU ID configuration
+ * @{
+ */
+#define CPUID_LEN                       (16U)
+/* @} */
 
 #ifdef __cplusplus
 }

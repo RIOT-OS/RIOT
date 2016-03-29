@@ -180,7 +180,7 @@
  *
  * - To include the default network device(s) on your board:
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   USEMODULE += gnrc_netif_default
+ *   USEMODULE += gnrc_netdev_default
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - To auto-initialize these network devices as GNRC network interfaces

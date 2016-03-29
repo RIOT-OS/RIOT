@@ -131,13 +131,13 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         GCLK_PCHCTRL_CHEN |
         GCLK_PCHCTRL_GEN_GCLK0;
 
-    while (!(GCLK->PCHCTRL[spi[dev].gclk_id].reg & GCLK_PCHCTRL_CHEN));
+    while (!(GCLK->PCHCTRL[spi[dev].gclk_id].reg & GCLK_PCHCTRL_CHEN)) {}
 
     /* SCLK+MOSI = output */
-    gpio_init(spi[dev].sclk.pin, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(spi[dev].mosi.pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(spi[dev].sclk.pin, GPIO_OUT);
+    gpio_init(spi[dev].mosi.pin, GPIO_OUT);
     /* MISO = input */
-    gpio_init(spi[dev].miso.pin, GPIO_DIR_IN, GPIO_PULLUP);
+    gpio_init(spi[dev].miso.pin, GPIO_IN);
 
     /*
      * Set alternate funcion (PMUX) for our ports.
@@ -152,7 +152,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 
     /* Disable spi to write config */
     spi_dev->CTRLA.bit.ENABLE = 0;
-    while (spi_dev->SYNCBUSY.reg);
+    while (spi_dev->SYNCBUSY.reg) {}
 
     /* setup baud */
     spi_dev->BAUD.bit.BAUD = (uint8_t) (((uint32_t) GCLK_REF) / (2 * f_baud) - 1); /* Syncronous mode*/
@@ -163,9 +163,9 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
                           |  (cpha << SERCOM_SPI_CTRLA_CPHA_Pos)
                           |  (cpol << SERCOM_SPI_CTRLA_CPOL_Pos);
 
-    while (spi_dev->SYNCBUSY.reg);
+    while (spi_dev->SYNCBUSY.reg) {}
     spi_dev->CTRLB.reg = (SERCOM_SPI_CTRLB_CHSIZE(0) | SERCOM_SPI_CTRLB_RXEN);
-    while(spi_dev->SYNCBUSY.reg);
+    while(spi_dev->SYNCBUSY.reg) {}
     spi_poweron(dev);
     return 0;
 }
@@ -183,7 +183,7 @@ void spi_transmission_begin(spi_t dev, char reset_val)
 
 int spi_acquire(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
     mutex_lock(&locks[dev]);
@@ -192,7 +192,7 @@ int spi_acquire(spi_t dev)
 
 int spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
     mutex_unlock(&locks[dev]);
@@ -203,12 +203,12 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 {
     SercomSpi* spi_dev = spi[dev].dev;
 
-    while (!spi_dev->INTFLAG.bit.DRE); /* while data register is not empty*/
+    while (!spi_dev->INTFLAG.bit.DRE) {} /* while data register is not empty */
     spi_dev->DATA.bit.DATA = out;
 
     if (in)
     {
-        while (!spi_dev->INTFLAG.bit.RXC); /* while receive is not complete*/
+        while (!spi_dev->INTFLAG.bit.RXC) {} /* while receive is not complete */
         *in = spi_dev->DATA.bit.DATA;
     }
     else
@@ -223,14 +223,14 @@ void spi_poweron(spi_t dev)
 {
     SercomSpi* spi_dev = spi[dev].dev;
     spi_dev->CTRLA.reg |= SERCOM_SPI_CTRLA_ENABLE;
-    while(spi_dev->SYNCBUSY.bit.ENABLE);
+    while(spi_dev->SYNCBUSY.bit.ENABLE) {}
 }
 
 void spi_poweroff(spi_t dev)
 {
     SercomSpi* spi_dev = spi[dev].dev;
     spi_dev->CTRLA.bit.ENABLE = 0;
-    while(spi_dev->SYNCBUSY.bit.ENABLE);
+    while(spi_dev->SYNCBUSY.bit.ENABLE) {}
 }
 
 #endif /* SPI_0_EN || SPI_1_EN */

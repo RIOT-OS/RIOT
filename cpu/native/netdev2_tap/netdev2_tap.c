@@ -50,7 +50,7 @@
 
 #include "net/eui64.h"
 #include "net/netdev2.h"
-#include "net/netdev2_eth.h"
+#include "net/netdev2/eth.h"
 #include "net/ethernet.h"
 #include "net/ethernet/hdr.h"
 #include "netdev2_tap.h"
@@ -265,9 +265,9 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int n)
     return _native_writev(dev->tap_fd, vector, n);
 }
 
-void netdev2_tap_setup(netdev2_tap_t *dev, const char *name) {
+void netdev2_tap_setup(netdev2_tap_t *dev, const netdev2_tap_params_t *params) {
     dev->netdev.driver = &netdev2_driver_tap;
-    strncpy(dev->tap_name, name, IFNAMSIZ);
+    strncpy(dev->tap_name, *(params->tap_name), IFNAMSIZ);
 }
 
 static void _tap_isr(void) {

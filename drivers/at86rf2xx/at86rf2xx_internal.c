@@ -32,26 +32,26 @@ void at86rf2xx_reg_write(const at86rf2xx_t *dev,
                          const uint8_t addr,
                          const uint8_t value)
 {
-    spi_acquire(dev->spi);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi,
+    spi_acquire(dev->params.spi);
+    gpio_clear(dev->params.cs_pin);
+    spi_transfer_reg(dev->params.spi,
                      AT86RF2XX_ACCESS_REG | AT86RF2XX_ACCESS_WRITE | addr,
                      value, 0);
-    gpio_set(dev->cs_pin);
-    spi_release(dev->spi);
+    gpio_set(dev->params.cs_pin);
+    spi_release(dev->params.spi);
 }
 
 uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr)
 {
     char value;
 
-    spi_acquire(dev->spi);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi,
+    spi_acquire(dev->params.spi);
+    gpio_clear(dev->params.cs_pin);
+    spi_transfer_reg(dev->params.spi,
                      AT86RF2XX_ACCESS_REG | AT86RF2XX_ACCESS_READ | addr,
                      0, &value);
-    gpio_set(dev->cs_pin);
-    spi_release(dev->spi);
+    gpio_set(dev->params.cs_pin);
+    spi_release(dev->params.spi);
 
     return (uint8_t)value;
 }
@@ -61,14 +61,14 @@ void at86rf2xx_sram_read(const at86rf2xx_t *dev,
                          uint8_t *data,
                          const size_t len)
 {
-    spi_acquire(dev->spi);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi,
+    spi_acquire(dev->params.spi);
+    gpio_clear(dev->params.cs_pin);
+    spi_transfer_reg(dev->params.spi,
                      AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_READ,
                      (char)offset, NULL);
-    spi_transfer_bytes(dev->spi, NULL, (char *)data, len);
-    gpio_set(dev->cs_pin);
-    spi_release(dev->spi);
+    spi_transfer_bytes(dev->params.spi, NULL, (char *)data, len);
+    gpio_set(dev->params.cs_pin);
+    spi_release(dev->params.spi);
 }
 
 void at86rf2xx_sram_write(const at86rf2xx_t *dev,
@@ -76,21 +76,21 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev,
                           const uint8_t *data,
                           const size_t len)
 {
-    spi_acquire(dev->spi);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi,
+    spi_acquire(dev->params.spi);
+    gpio_clear(dev->params.cs_pin);
+    spi_transfer_reg(dev->params.spi,
                      AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_WRITE,
                      (char)offset, NULL);
-    spi_transfer_bytes(dev->spi, (char *)data, NULL, len);
-    gpio_set(dev->cs_pin);
-    spi_release(dev->spi);
+    spi_transfer_bytes(dev->params.spi, (char *)data, NULL, len);
+    gpio_set(dev->params.cs_pin);
+    spi_release(dev->params.spi);
 }
 
 void at86rf2xx_fb_start(const at86rf2xx_t *dev)
 {
-    spi_acquire(dev->spi);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_byte(dev->spi,
+    spi_acquire(dev->params.spi);
+    gpio_clear(dev->params.cs_pin);
+    spi_transfer_byte(dev->params.spi,
                       AT86RF2XX_ACCESS_FB | AT86RF2XX_ACCESS_READ,
                       NULL);
 }
@@ -99,13 +99,13 @@ void at86rf2xx_fb_read(const at86rf2xx_t *dev,
                        uint8_t *data,
                        const size_t len)
 {
-    spi_transfer_bytes(dev->spi, NULL, (char *)data, len);
+    spi_transfer_bytes(dev->params.spi, NULL, (char *)data, len);
 }
 
 void at86rf2xx_fb_stop(const at86rf2xx_t *dev)
 {
-    gpio_set(dev->cs_pin);
-    spi_release(dev->spi);
+    gpio_set(dev->params.cs_pin);
+    spi_release(dev->params.spi);
 }
 
 uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
@@ -123,7 +123,7 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev)
     if(at86rf2xx_get_status(dev) == AT86RF2XX_STATE_SLEEP) {
 
         /* wake up and wait for transition to TRX_OFF */
-        gpio_clear(dev->sleep_pin);
+        gpio_clear(dev->params.sleep_pin);
         xtimer_usleep(AT86RF2XX_WAKEUP_DELAY);
 
         /* update state */
@@ -138,9 +138,9 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
     at86rf2xx_assert_awake(dev);
 
     /* trigger hardware reset */
-    gpio_clear(dev->reset_pin);
+    gpio_clear(dev->params.reset_pin);
     xtimer_usleep(AT86RF2XX_RESET_PULSE_WIDTH);
-    gpio_set(dev->reset_pin);
+    gpio_set(dev->params.reset_pin);
     xtimer_usleep(AT86RF2XX_RESET_DELAY);
 }
 
@@ -173,7 +173,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     /* Clear previous configuration for GC_TX_OFFS */
     rf_ctrl0 &= ~AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS;
 
-    if (dev->chan != 0) {
+    if (dev->netdev.chan != 0) {
         /* Set sub mode bit on 915 MHz as recommended by the data sheet */
         trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE;
     }
@@ -199,7 +199,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     phy_cc_cca &= ~(AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
 
     /* Update the channel register */
-    phy_cc_cca |= (dev->chan & AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
+    phy_cc_cca |= (dev->netdev.chan & AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_CC_CCA, phy_cc_cca);
 
 #ifdef MODULE_AT86RF212B

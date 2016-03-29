@@ -1,3 +1,5 @@
+# Target architecture for the build. Use avr if you are unsure.
+export TARGET_ARCH ?= avr
 
 # include module specific includes
 export INCLUDES += -I$(RIOTCPU)/atmega_common/include -isystem$(RIOTCPU)/atmega_common/avr-libc-extra

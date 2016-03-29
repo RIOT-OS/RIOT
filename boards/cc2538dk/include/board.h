@@ -28,34 +28,34 @@ extern "C" {
 #endif
 
 /**
- * @name Macros for controlling the on-board LEDs.
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_RED_GPIO        GPIO_PC0 /**< Red LED GPIO pin */
-#define LED_YELLOW_GPIO     GPIO_PC1 /**< Yellow LED GPIO pin */
-#define LED_GREEN_GPIO      GPIO_PC2 /**< Green LED GPIO pin */
-#define LED_ORANGE_GPIO     GPIO_PC3 /**< Orange LED GPIO pin */
+#define LED0_PIN            GPIO_PIN(2, 0)
+#define LED1_PIN            GPIO_PIN(2, 1)
+#define LED2_PIN            GPIO_PIN(2, 2)
+#define LED3_PIN            GPIO_PIN(2, 3)
 
-#define LED_RED_ON          cc2538_gpio_set(LED_GREEN_GPIO)
-#define LED_RED_OFF         cc2538_gpio_clear(LED_GREEN_GPIO)
-#define LED_RED_TOGGLE      cc2538_gpio_toggle(LED_GREEN_GPIO)
+#define LED0_GPIO           GPIO_PC0        /**< red LED */
+#define LED1_GPIO           GPIO_PC1        /**< yellow LED */
+#define LED2_GPIO           GPIO_PC2        /**< green LED */
+#define LED3_GPIO           GPIO_PC3        /**< orange LED */
 
-#define LED_YELLOW_ON       cc2538_gpio_set(LED_YELLOW_GPIO)
-#define LED_YELLOW_OFF      cc2538_gpio_clear(LED_YELLOW_GPIO)
-#define LED_YELLOW_TOGGLE   cc2538_gpio_toggle(LED_YELLOW_GPIO)
+#define LED0_ON             cc2538_gpio_set(LED0_GPIO)
+#define LED0_OFF            cc2538_gpio_clear(LED0_GPIO)
+#define LED0_TOGGLE         cc2538_gpio_toggle(LED0_GPIO)
 
-#define LED_GREEN_ON        cc2538_gpio_set(LED_GREEN_GPIO)
-#define LED_GREEN_OFF       cc2538_gpio_clear(LED_GREEN_GPIO)
-#define LED_GREEN_TOGGLE    cc2538_gpio_toggle(LED_GREEN_GPIO)
+#define LED1_ON             cc2538_gpio_set(LED1_GPIO)
+#define LED1_OFF            cc2538_gpio_clear(LED1_GPIO)
+#define LED1_TOGGLE         cc2538_gpio_toggle(LED1_GPIO)
 
-#define LED_ORANGE_ON       cc2538_gpio_set(LED_ORANGE_GPIO)
-#define LED_ORANGE_OFF      cc2538_gpio_clear(LED_ORANGE_GPIO)
-#define LED_ORANGE_TOGGLE   cc2538_gpio_toggle(LED_ORANGE_GPIO)
+#define LED2_ON             cc2538_gpio_set(LED2_GPIO)
+#define LED2_OFF            cc2538_gpio_clear(LED2_GPIO)
+#define LED2_TOGGLE         cc2538_gpio_toggle(LED2_GPIO)
 
-/* Default to red if the color is not specified: */
-#define LED_ON              LED_RED_ON
-#define LED_OFF             LED_RED_OFF
-#define LED_TOGGLE          LED_RED_TOGGLE
+#define LED3_ON             cc2538_gpio_set(LED3_GPIO)
+#define LED3_OFF            cc2538_gpio_clear(LED3_GPIO)
+#define LED3_TOGGLE         cc2538_gpio_toggle(LED3_GPIO)
 /** @} */
 
 /**
@@ -70,6 +70,17 @@ extern "C" {
 #define CCA_BACKDOOR_ENABLE       1
 #define CCA_BACKDOOR_PORT_A_PIN   3 /**< Select button */
 #define CCA_BACKDOOR_ACTIVE_LEVEL 0 /**< Active low */
+/** @} */
+
+/**
+ * @name xtimer configuration
+ * @{
+ */
+#define XTIMER              TIMER_0
+#define XTIMER_CHAN         (0)
+#define XTIMER_SHIFT        (-4)
+#define XTIMER_BACKOFF      (50)
+#define XTIMER_ISR_BACKOFF  (40)
 /** @} */
 
 /**

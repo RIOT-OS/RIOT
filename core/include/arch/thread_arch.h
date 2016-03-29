@@ -20,13 +20,12 @@
 #ifndef THREAD_ARCH_H
 #define THREAD_ARCH_H
 
-#include "attributes.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-#include "kernel_internal.h"
 /**
  * @name Define the mapping between the architecture independent interfaces
  *       and the kernel internal interfaces
@@ -43,6 +42,10 @@
 #endif
 /** @} */
 
+/**
+ * @brief Prototype for a thread entry function
+ */
+typedef void *(*thread_task_func_t)(void *arg);
 
 /**
  * @brief Initialize a thread's stack

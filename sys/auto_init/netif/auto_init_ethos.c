@@ -51,8 +51,12 @@ void auto_init_ethos(void)
     DEBUG("auto_init_ethos(): initializing device...\n");
 
     /* setup netdev2 device */
-    ethos_setup(&ethos, ETHOS_UART,
-            ETHOS_BAUDRATE, _inbuf, sizeof(_inbuf));
+    ethos_params_t p;
+    p.uart      = ETHOS_UART;
+    p.baudrate  = ETHOS_BAUDRATE;
+    p.buffer    = _inbuf;
+    b.bufsize   = sizeof(_inbuf);
+    ethos_setup(&ethos, &p);
 
     /* initialize netdev2<->gnrc adapter state */
     gnrc_netdev2_eth_init(&_gnrc_ethos, (netdev2_t*)&ethos);

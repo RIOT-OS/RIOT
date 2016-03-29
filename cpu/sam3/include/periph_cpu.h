@@ -61,15 +61,38 @@ typedef uint32_t gpio_t;
 #define CPUID_LEN           (16U)
 
 /**
- * @brief Override values for pull register configuration
+ * @brief   All SAM3 timers are 32-bit wide
+ */
+#define TIMER_MAX_VAL       (0xffffffff)
+
+/**
+ * @brief   We use 3 channels for each defined timer
+ */
+#define TIMER_CHANNELS      (3)
+
+/**
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use 3 bit to determine the pin functions:
+ * - bit 0: in/out
+ * - bit 1: PU enable
+ * - bit 2: OD enable
+ */
+#define GPIO_MODE(io, pu, od)   (io | (pu << 1) | (od << 2))
+
+/**
+ * @brief   Override GPIO modes
  * @{
  */
-#define HAVE_GPIO_PP_T
+#define HAVE_GPIO_MODE_T
 typedef enum {
-    GPIO_NOPULL = 4,        /**< do not use internal pull resistors */
-    GPIO_PULLUP = 9,        /**< enable internal pull-up resistor */
-    GPIO_PULLDOWN = 8       /**< enable internal pull-down resistor */
-} gpio_pp_t;
+    GPIO_IN    = GPIO_MODE(0, 0, 0),    /**< IN */
+    GPIO_IN_PD = 0xf,                   /**< not supported by HW */
+    GPIO_IN_PU = GPIO_MODE(0, 1, 0),    /**< IN with pull-up */
+    GPIO_OUT   = GPIO_MODE(1, 0, 0),    /**< OUT (push-pull) */
+    GPIO_OD    = GPIO_MODE(1, 0, 1),    /**< OD */
+    GPIO_OD_PU = GPIO_MODE(1, 1, 1),    /**< OD with pull-up */
+} gpio_mode_t;
 /** @} */
 
 /**
@@ -101,6 +124,14 @@ typedef enum {
     GPIO_MUX_A = 0,         /**< alternate function A */
     GPIO_MUX_B = 1,         /**< alternate function B */
 } gpio_mux_t;
+
+/**
+ * @brief   Timer configuration data
+ */
+typedef struct {
+    Tc *dev;                /**< timer device */
+    uint8_t id_ch0;         /**< ID of the timer's first channel */
+} timer_conf_t;
 
 /**
  * @brief   UART configuration data

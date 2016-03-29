@@ -27,10 +27,10 @@ extern "C" {
 
 #include "serialport.hpp"
 
-void rx_cb(void *arg, char c)
+void rx_cb(void *arg, uint8_t c)
 {
     ringbuffer_t *buf = (ringbuffer_t *)arg;
-    ringbuffer_add_one(buf, c);
+    ringbuffer_add_one(buf, (char)c);
 }
 
 SerialPort::SerialPort(uart_t dev)
@@ -153,11 +153,11 @@ int SerialPort::read(void)
 {
     int res = -1;
 
-    disableIRQ();
+    irq_disable();
     if (rx_buf.avail > 0) {
         res = ringbuffer_get_one(&rx_buf);
     }
-    enableIRQ();
+    irq_enable();
 
     return res;
 }

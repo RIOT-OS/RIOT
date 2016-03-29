@@ -717,6 +717,7 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
     } type = _UNICAST;
     char *addr_str = argv[0];
     ipv6_addr_t addr;
+    ipv6_addr_t *ifaddr;
     uint8_t prefix_len, flags = 0;
 
     if (argc > 1) {
@@ -758,10 +759,15 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
         flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST;
     }
 
-    if (gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len, flags) == NULL) {
+    if ((ifaddr = gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len, flags)) == NULL) {
         printf("error: unable to add IPv6 address\n");
         return 1;
     }
+
+    /* Address shall be valid infinitely */
+    gnrc_ipv6_netif_addr_get(ifaddr)->valid = UINT32_MAX;
+    /* Address shall be preferred infinitely */
+    gnrc_ipv6_netif_addr_get(ifaddr)->preferred = UINT32_MAX;
 
     printf("success: added %s/%d to interface %" PRIkernel_pid "\n", addr_str,
            prefix_len, dev);
@@ -835,12 +841,12 @@ int _netif_send(int argc, char **argv)
     kernel_pid_t dev;
     uint8_t addr[MAX_ADDR_LEN];
     size_t addr_len;
-    gnrc_pktsnip_t *pkt;
+    gnrc_pktsnip_t *pkt, *hdr;
     gnrc_netif_hdr_t *nethdr;
     uint8_t flags = 0x00;
 
     if (argc < 4) {
-        printf("usage: %s <if> [<addr>|bcast] <data>\n", argv[0]);
+        printf("usage: %s <if> [<L2 addr>|bcast] <data>\n", argv[0]);
         return 1;
     }
 
@@ -867,15 +873,22 @@ int _netif_send(int argc, char **argv)
 
     /* put packet together */
     pkt = gnrc_pktbuf_add(NULL, argv[3], strlen(argv[3]), GNRC_NETTYPE_UNDEF);
-    pkt = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_netif_hdr_t) + addr_len,
-                          GNRC_NETTYPE_NETIF);
-    nethdr = (gnrc_netif_hdr_t *)pkt->data;
-    gnrc_netif_hdr_init(nethdr, 0, addr_len);
-    gnrc_netif_hdr_set_dst_addr(nethdr, addr, addr_len);
+    if (pkt == NULL) {
+        puts("error: packet buffer full");
+        return 1;
+    }
+    hdr = gnrc_netif_hdr_build(NULL, 0, addr, addr_len);
+    if (hdr == NULL) {
+        puts("error: packet buffer full");
+        gnrc_pktbuf_release(pkt);
+        return 1;
+    }
+    LL_PREPEND(pkt, hdr);
+    nethdr = (gnrc_netif_hdr_t *)hdr->data;
     nethdr->flags = flags;
     /* and send it */
     if (gnrc_netapi_send(dev, pkt) < 1) {
-        puts("error: unable to send\n");
+        puts("error: unable to send");
         gnrc_pktbuf_release(pkt);
         return 1;
     }

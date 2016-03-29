@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "kernel.h"
 #include "kernel_types.h"
 #include "msg.h"
 #include "net/gnrc.h"
@@ -51,9 +50,9 @@
 #define _SLIP_DEV(arg)    ((gnrc_slip_dev_t *)arg)
 
 /* UART callbacks */
-static void _slip_rx_cb(void *arg, char data)
+static void _slip_rx_cb(void *arg, uint8_t data)
 {
-    if (data == _SLIP_END) {
+    if (data == (uint8_t)_SLIP_END) {
         msg_t msg;
 
         msg.type = _SLIP_MSG_TYPE;
@@ -67,14 +66,14 @@ static void _slip_rx_cb(void *arg, char data)
         _SLIP_DEV(arg)->in_esc = 0;
 
         switch (data) {
-            case (_SLIP_END_ESC):
+            case ((uint8_t)_SLIP_END_ESC):
                 if (ringbuffer_add_one(&_SLIP_DEV(arg)->in_buf, _SLIP_END) < 0) {
                     _SLIP_DEV(arg)->in_bytes++;
                 }
 
                 break;
 
-            case (_SLIP_ESC_ESC):
+            case ((uint8_t)_SLIP_ESC_ESC):
                 if (ringbuffer_add_one(&_SLIP_DEV(arg)->in_buf, _SLIP_ESC) < 0) {
                     _SLIP_DEV(arg)->in_bytes++;
                 }
@@ -85,7 +84,7 @@ static void _slip_rx_cb(void *arg, char data)
                 break;
         }
     }
-    else if (data == _SLIP_ESC) {
+    else if (data == (uint8_t)_SLIP_ESC) {
         _SLIP_DEV(arg)->in_esc = 1;
     }
     else {

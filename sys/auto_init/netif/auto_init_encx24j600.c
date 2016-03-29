@@ -44,7 +44,11 @@ void auto_init_encx24j600(void)
 {
     DEBUG("auto_init_encx24j600(): initializing device...\n");
     /* setup netdev2 device */
-    encx24j600_setup(&encx24j600, ENCX24J600_SPI, ENCX24J600_CS, ENCX24J600_INT);
+    encx24j600_params_t p;
+    p.spi       = ENCX24J600_SPI;
+    p.cs_pin    = ENCX24J600_CS;
+    p.int_pin   = ENCX24J600_INT;
+    encx24j600_setup(&encx24j600, &p);
 
     /* initialize netdev2<->gnrc adapter state */
     gnrc_netdev2_eth_init(&_gnrc_encx24j600, (netdev2_t*)&encx24j600);

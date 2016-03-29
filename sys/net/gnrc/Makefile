@@ -55,9 +55,6 @@ endif
 ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
     DIRS += netapi
 endif
-ifneq (,$(filter gnrc_netdev_eth,$(USEMODULE)))
-    DIRS += link_layer/netdev_eth
-endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
     DIRS += netif
 endif
@@ -87,6 +84,9 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_rpl_srh,$(USEMODULE)))
     DIRS += routing/rpl/srh
+endif
+ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
+    DIRS += routing/rpl/p2p
 endif
 ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
     DIRS += network_layer/sixlowpan

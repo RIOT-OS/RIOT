@@ -20,6 +20,8 @@
 #ifndef MULLE_PERIPH_CONF_H_
 #define MULLE_PERIPH_CONF_H_
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -50,6 +52,9 @@ extern "C"
 #define CPU_INT_FAST_CLK_HZ             4000000u
 /** Default System clock value */
 #define DEFAULT_SYSTEM_CLOCK            (CPU_XTAL32k_CLK_HZ * 2929u)
+
+/* bus clock for the peripherals */
+#define CLOCK_BUSCLOCK                  (DEFAULT_SYSTEM_CLOCK / 2)
 /** @} */
 
 /**
@@ -130,93 +135,45 @@ extern "C"
 
 /** @} */
 
-
 /**
  * @name ADC configuration
  * @{
  */
-#define ADC_NUMOF           (2U)
-#define ADC_0_EN            1
-#define ADC_1_EN            1
-#define ADC_MAX_CHANNELS    6
+static const adc_conf_t adc_config[] = {
+    /* dev, pin, channel */
+    [ 0] = { ADC1, GPIO_UNDEF, 26 },       /* internal: temperature sensor */
+    [ 1] = { ADC1, GPIO_UNDEF, 27 },       /* internal: band gap */
+    [ 2] = { ADC1, GPIO_UNDEF, 29 },       /* internal: V_REFSH */
+    [ 3] = { ADC1, GPIO_UNDEF, 30 },       /* internal: V_REFSL */
+    [ 4] = { ADC1, GPIO_UNDEF, 23 },       /* internal: DAC0 module output level */
+    [ 5] = { ADC1, GPIO_UNDEF, 18 },       /* internal: VREF module output level */
+    [ 6] = { ADC1, GPIO_UNDEF,  0 },       /* on board connection to Mulle Vbat/2 on PGA1_DP pin */
+    [ 7] = { ADC1, GPIO_UNDEF, 19 },       /* on board connection to Mulle Vchr/2 on PGA1_DM pin */
+    [ 8] = { ADC0, GPIO_UNDEF,  0 },       /* expansion port PGA0_DP pin */
+    [ 9] = { ADC0, GPIO_UNDEF, 19 },       /* expansion port PGA0_DM pin */
+    [10] = { ADC0, GPIO_PIN(PORT_A, 17), 17 }, /* expansion port PTA17 */
+    [11] = { ADC1, GPIO_PIN(PORT_B,  0),  8 }, /* expansion port PTB0  */
+    [12] = { ADC0, GPIO_PIN(PORT_C,  0), 14 }, /* expansion port PTC0  */
+    [13] = { ADC1, GPIO_PIN(PORT_C,  8),  4 }, /* expansion port PTC8  */
+    [14] = { ADC1, GPIO_PIN(PORT_C,  9),  5 }, /* expansion port PTC9  */
+    [15] = { ADC1, GPIO_PIN(PORT_C, 10),  6 }, /* expansion port PTC10 */
+    [16] = { ADC1, GPIO_PIN(PORT_C, 11),  7 }, /* expansion port PTC11 */
+};
 
-/* ADC 0 configuration */
-#define ADC_0_DEV           ADC0
-#define ADC_0_CHANNELS      4
-#define ADC_0_CLKEN()       (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_ADC0_SHIFT) = 1)
-#define ADC_0_CLKDIS()      (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_ADC0_SHIFT) = 0)
-#define ADC_0_PORT_CLKEN()  /* no PORT pins configured */
-#define ADC_0_MODULE_CLOCK  SystemBusClock
-/* ADC 0 channel 0 pin config */
-#define ADC_0_CH0           26 /* Temp sensor channel */
-#define ADC_0_CH0_PORT      0 /* this channel is not part of the pin mux on this CPU */
-#define ADC_0_CH0_PIN       0
-#define ADC_0_CH0_PIN_AF    0
-/* ADC 0 channel 1 pin config */
-#define ADC_0_CH1           27 /* Band gap channel */
-#define ADC_0_CH1_PORT      0 /* this channel is not part of the pin mux on this CPU */
-#define ADC_0_CH1_PIN       0
-#define ADC_0_CH1_PIN_AF    0
-/* ADC 0 channel 2 pin config */
-#define ADC_0_CH2           29 /* V_REFSH */
-#define ADC_0_CH2_PORT      0 /* this channel is not part of the pin mux on this CPU */
-#define ADC_0_CH2_PIN       0
-#define ADC_0_CH2_PIN_AF    0
-/* ADC 0 channel 3 pin config */
-#define ADC_0_CH3           30 /* V_REFSL */
-#define ADC_0_CH3_PORT      0 /* this channel is not part of the pin mux on this CPU */
-#define ADC_0_CH3_PIN       0
-#define ADC_0_CH3_PIN_AF    0
-/* ADC 0 channel 4 pin config */
-#define ADC_0_CH4           4
-#define ADC_0_CH4_PORT      0
-#define ADC_0_CH4_PIN       0
-#define ADC_0_CH4_PIN_AF    0
-/* ADC 0 channel 5 pin config */
-#define ADC_0_CH5           5
-#define ADC_0_CH5_PORT      0
-#define ADC_0_CH5_PIN       0
-#define ADC_0_CH5_PIN_AF    0
-
-/* ADC 1 configuration */
-#define ADC_1_DEV           ADC1
-#define ADC_1_CHANNELS      2
-#define ADC_1_CLKEN()       (BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_ADC1_SHIFT) = 1)
-#define ADC_1_CLKDIS()      (BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_ADC1_SHIFT) = 0)
-#define ADC_1_PORT_CLKEN()  /* no PORT pins configured */
-#define ADC_1_MODULE_CLOCK  SystemBusClock
-/* ADC 1 channel 0 pin config */
-#define ADC_1_CH0           0 /* DADP0, connected externally to Mulle Vbat/2 on PGA1_DP */
-#define ADC_1_CH0_PORT      0 /* this channel is not part of the pin mux on this CPU */
-#define ADC_1_CH0_PIN       0
-#define ADC_1_CH0_PIN_AF    0
-/* ADC 1 channel 1 pin config */
-#define ADC_1_CH1           19 /* AD19, connected externally to Mulle Vchr/2 on PGA1_DM */
-#define ADC_1_CH1_PORT      0  /* this channel is not part of the pin mux on this CPU */
-#define ADC_1_CH1_PIN       0
-#define ADC_1_CH1_PIN_AF    0
-/* ADC 1 channel 2 pin config */
-#define ADC_1_CH2           12
-#define ADC_1_CH2_PIN       0
-#define ADC_1_CH2_PIN_AF    0
-#define ADC_1_CH2_PORT      0
-/* ADC 1 channel 3 pin config */
-#define ADC_1_CH3           13
-#define ADC_1_CH3_PIN       0
-#define ADC_1_CH3_PIN_AF    0
-#define ADC_1_CH3_PORT      0
-/* ADC 1 channel 4 pin config */
-#define ADC_1_CH4           14
-#define ADC_1_CH4_PIN       0
-#define ADC_1_CH4_PIN_AF    0
-#define ADC_1_CH4_PORT      0
-/* ADC 1 channel 5 pin config */
-#define ADC_1_CH5           15
-#define ADC_1_CH5_PIN       0
-#define ADC_1_CH5_PIN_AF    0
-#define ADC_1_CH5_PORT      0
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
+/**
+ * @name DAC configuration
+ * @{
+ */
+
+#define DAC_CONFIG { \
+    { DAC0, (uint32_t volatile *)BITBAND_REGADDR(SIM->SCGC2, SIM_SCGC2_DAC0_SHIFT) }, \
+  }
+#define DAC_NUMOF 1
+
+/** @} */
 
 /**
  * @name PWM configuration
@@ -236,17 +193,13 @@ extern "C"
 #define PWM_0_CLKDIS()      (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT) = 0)
 
 /* PWM 0 pin configuration */
-#define PWM_0_PORT_CLKEN()  (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTC_SHIFT) = 1)
+#define PWM_0_CH0_GPIO      GPIO_PIN(PORT_C, 1)
+#define PWM_0_CH0_FTMCHAN   0
+#define PWM_0_CH0_AF        4
 
-#define PWM_0_PIN_CH0       1
-#define PWM_0_FTMCHAN_CH0   0
-#define PWM_0_PORT_CH0      PORTC
-#define PWM_0_PIN_AF_CH0    4
-
-#define PWM_0_PIN_CH1       2
-#define PWM_0_FTMCHAN_CH1   1
-#define PWM_0_PORT_CH1      PORTC
-#define PWM_0_PIN_AF_CH1    4
+#define PWM_0_CH1_GPIO      GPIO_PIN(PORT_C, 2)
+#define PWM_0_CH1_FTMCHAN   1
+#define PWM_0_CH1_AF        4
 
 /* PWM 1 device configuration */
 #define PWM_1_DEV           FTM1
@@ -256,20 +209,15 @@ extern "C"
 #define PWM_1_CLKDIS()      (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM1_SHIFT) = 0)
 
 /* PWM 1 pin configuration */
-#define PWM_1_PORT_CLKEN()  (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTA_SHIFT) = 1)
+#define PWM_1_CH0_GPIO      GPIO_PIN(PORT_A, 12)
+#define PWM_1_CH0_FTMCHAN   0
+#define PWM_1_CH0_AF        3
 
-#define PWM_1_PIN_CH0       12
-#define PWM_1_FTMCHAN_CH0   0
-#define PWM_1_PORT_CH0      PORTA
-#define PWM_1_PIN_AF_CH0    3
-
-#define PWM_1_PIN_CH1       13
-#define PWM_1_FTMCHAN_CH1   1
-#define PWM_1_PORT_CH1      PORTA
-#define PWM_1_PIN_AF_CH1    3
+#define PWM_1_CH1_GPIO      GPIO_PIN(PORT_A, 13)
+#define PWM_1_CH1_FTMCHAN   1
+#define PWM_1_CH1_AF        3
 
 /** @} */
-
 
 /**
  * @name SPI configuration

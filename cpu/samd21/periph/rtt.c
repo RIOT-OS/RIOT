@@ -72,7 +72,7 @@ void rtt_init(void)
 
     /* Setup clock GCLK2 with divider 1 */
     GCLK->GENDIV.reg = GCLK_GENDIV_ID(2) | GCLK_GENDIV_DIV(1);
-    while (GCLK->STATUS.bit.SYNCBUSY);
+    while (GCLK->STATUS.bit.SYNCBUSY) {}
 
     /* Enable GCLK2 with XOSC32K as source. Use divider without modification
      * and keep running in standby. */
@@ -82,24 +82,24 @@ void rtt_init(void)
                         GCLK_GENCTRL_RUNSTDBY |
 #endif
                         GCLK_GENCTRL_SRC_XOSC32K;
-    while (GCLK->STATUS.bit.SYNCBUSY);
+    while (GCLK->STATUS.bit.SYNCBUSY) {}
 
     /* Connect GCLK2 to RTC */
     GCLK->CLKCTRL.reg = GCLK_CLKCTRL_GEN_GCLK2 |
                         GCLK_CLKCTRL_CLKEN |
                         GCLK_CLKCTRL_ID(RTC_GCLK_ID);
-    while (GCLK->STATUS.bit.SYNCBUSY);
+    while (GCLK->STATUS.bit.SYNCBUSY) {}
 
     /* Disable RTC */
     rtt_poweroff();
 
     /* Reset RTC */
     rtcMode0->CTRL.bit.SWRST = 1;
-    while (rtcMode0->STATUS.bit.SYNCBUSY || rtcMode0->CTRL.bit.SWRST);
+    while (rtcMode0->STATUS.bit.SYNCBUSY || rtcMode0->CTRL.bit.SWRST) {}
 
     /* Configure as 32bit counter with no prescaler and no clear on match compare */
     rtcMode0->CTRL.reg = RTC_MODE0_CTRL_MODE_COUNT32 | RTC_MODE0_CTRL_PRESCALER_DIV1;
-    while (rtcMode0->STATUS.bit.SYNCBUSY);
+    while (rtcMode0->STATUS.bit.SYNCBUSY) {}
 
     /* Setup interrupt */
     NVIC_EnableIRQ(RTT_IRQ);
@@ -132,7 +132,7 @@ void rtt_clear_overflow_cb(void)
 uint32_t rtt_get_counter(void)
 {
     RtcMode0 *rtcMode0 = &(RTT_DEV);
-    while (rtcMode0->STATUS.bit.SYNCBUSY);
+    while (rtcMode0->STATUS.bit.SYNCBUSY) {}
     return rtcMode0->COUNT.reg;
 }
 
@@ -140,7 +140,7 @@ void rtt_set_counter(uint32_t counter)
 {
     RtcMode0 *rtcMode0 = &(RTT_DEV);
     rtcMode0->COUNT.reg = counter;
-    while (rtcMode0->STATUS.bit.SYNCBUSY);
+    while (rtcMode0->STATUS.bit.SYNCBUSY) {}
 }
 
 void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
@@ -150,7 +150,7 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
 
     RtcMode0 *rtcMode0 = &(RTT_DEV);
     rtcMode0->COMP[0].reg = alarm;
-    while (rtcMode0->STATUS.bit.SYNCBUSY);
+    while (rtcMode0->STATUS.bit.SYNCBUSY) {}
 
     /* Enable Compare Interrupt and clear flag */
     rtcMode0->INTFLAG.bit.CMP0 = 1;
@@ -177,14 +177,14 @@ void rtt_poweron(void)
 {
     RtcMode0 *rtcMode0 = &(RTT_DEV);
     rtcMode0->CTRL.bit.ENABLE = 1;
-    while (rtcMode0->STATUS.bit.SYNCBUSY);
+    while (rtcMode0->STATUS.bit.SYNCBUSY) {}
 }
 
 void rtt_poweroff(void)
 {
     RtcMode0 *rtcMode0 = &(RTT_DEV);
     rtcMode0->CTRL.bit.ENABLE = 0;
-    while (rtcMode0->STATUS.bit.SYNCBUSY);
+    while (rtcMode0->STATUS.bit.SYNCBUSY) {}
 }
 
 void RTT_ISR(void)

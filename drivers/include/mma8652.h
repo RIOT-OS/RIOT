@@ -68,6 +68,16 @@ typedef struct {
 } mma8652_t;
 
 /**
+ * @brief Data structure holding all the information needed for initialization
+ */
+typedef struct {
+    i2c_t i2c;              /**< I2C bus used */
+    uint8_t addr;           /**< accelerometer's I2C address */
+    uint8_t rate;           /**< accelerometer's sampling rate */
+    uint8_t scale;          /**< accelerometer's scale factor */
+} mma8652_params_t;
+
+/**
  * @brief MMA8652 accelerometer test.
  * This function looks for Device ID of the MMA8652 accelerometer.
  *

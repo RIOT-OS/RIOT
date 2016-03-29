@@ -56,8 +56,8 @@ ifeq ($(PROGRAMMER_VERSION),)
       endif
     endif
   endif
-  # Default to version 0.60 programmer for now.
-  PROGRAMMER_VERSION ?= 0.60
+  # Default to version 0.70 programmer
+  PROGRAMMER_VERSION ?= 0.70
 endif
 
 export OPENOCD_CONFIG = $(RIOTBOARD)/$(BOARD)/dist/openocd/mulle-programmer-$(PROGRAMMER_VERSION).conf
@@ -82,7 +82,7 @@ ifeq ($(PORT),)
       PORT := $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh)
   endif
   else ifeq ($(OS),Darwin)
-    PORT := $(shell ls -1 /dev/tty.usbserial* | head -n 1)
+    PORT := $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
   endif
 endif
 ifeq ($(PORT),)

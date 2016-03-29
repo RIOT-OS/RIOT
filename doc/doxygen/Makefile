@@ -1,3 +1,10 @@
+RIOTBASE=$(shell git rev-parse --show-toplevel)
+# Generate list of quoted absolute include paths. Evaluated in riot.doxyfile.
+export STRIP_FROM_INC_PATH_LIST=$(shell \
+    git ls-tree -dr --full-tree --name-only HEAD |\
+    grep '/include$$' |\
+    sed 's/.*/\"$(subst /,\/,${RIOTBASE})\/\0\"/')
+
 .PHONY: doc
 doc: html
 

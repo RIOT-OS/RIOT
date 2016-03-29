@@ -48,7 +48,7 @@ int main(void)
     if (TEST_PIN_EN != GPIO_UNDEF) {
         printf("Toggling enable pin...");
 
-        if (gpio_init(TEST_PIN_EN, GPIO_DIR_OUT, GPIO_NOPULL) == 0) {
+        if (gpio_init(TEST_PIN_EN, GPIO_OUT) == 0) {
             puts("[OK]\n");
         }
         else {

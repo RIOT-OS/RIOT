@@ -21,10 +21,7 @@
 #ifndef BOARD_H_
 #define BOARD_H_
 
-#include <stdint.h>
-
-#include "cpu.h"
-#include "periph_conf.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,40 +37,9 @@ extern "C" {
 #define XTIMER_BACKOFF      (3)
 /** @} */
 
-/**
- * @name LED pin definitions
- * @{
- */
-#define LED_GREEN_PORT      (GPIOA)
-#define LED_GREEN_PIN       (5)
-/** @} */
-
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_RED_ON
-#define LED_RED_OFF
-#define LED_RED_TOGGLE
-
-#define LED_GREEN_ON        (LED_GREEN_PORT->ODR &= ~(1<<LED_GREEN_PIN))
-#define LED_GREEN_OFF       (LED_GREEN_PORT->ODR |= (1<<LED_GREEN_PIN))
-#define LED_GREEN_TOGGLE    (LED_GREEN_PORT->ODR ^= (1<<LED_GREEN_PIN))
-
-#define LED_ORANGE_ON
-#define LED_ORANGE_OFF
-#define LED_ORANGE_TOGGLE
-/** @} */
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* BOARD_H_ */
-/** @} */
 /** @} */
