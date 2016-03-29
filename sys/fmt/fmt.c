@@ -1,15 +1,20 @@
-/**
+/*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup sys_fmt
+ */
+
+/**
+ * @ingroup     sys_fmt
  * @{
+ *
  * @file
- * @brief String formatting library implementation
- * @author Kaspar Schleiser <kaspar@schleiser.de>
+ * @brief       String formatting library implementation
+ *
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ *
  * @}
  */
 
@@ -32,6 +37,17 @@ static const char _hex_chars[16] = "0123456789ABCDEF";
 static inline int _is_digit(char c)
 {
     return (c >= '0' && c <= '9');
+}
+
+static inline unsigned pwr(unsigned val, unsigned exp)
+{
+    unsigned res = 1;
+
+    for (unsigned i = 0; i < exp; i++) {
+        res *= val;
+    }
+
+    return res;
 }
 
 size_t fmt_byte_hex(char *out, uint8_t byte)
@@ -120,6 +136,56 @@ size_t fmt_s32_dec(char *out, int32_t val)
         val *= -1;
     }
     return fmt_u32_dec(out, val) + negative;
+}
+
+size_t fmt_s16_dec(char *out, int16_t val)
+{
+    return fmt_s32_dec(out, val);
+}
+
+size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits)
+{
+    int16_t absolute, divider;
+    size_t pos = 0;
+    size_t div_len, len;
+    unsigned e;
+    char tmp[4];
+
+    if (fp_digits > 4) {
+        return 0;
+    }
+    if (fp_digits == 0) {
+        return fmt_s16_dec(out, val);
+    }
+    if (val < 0) {
+        if (out) {
+            out[pos++] = '-';
+        }
+        val *= -1;
+    }
+
+    e = pwr(10, fp_digits);
+    absolute = (val / (int)e);
+    divider = val - (absolute * e);
+
+    pos += fmt_s16_dec(&out[pos], absolute);
+
+    if (!out) {
+        return pos + 1 + fp_digits;     /* abs len + decimal point + divider */
+    }
+
+    out[pos++] = '.';
+    len = pos + fp_digits;
+    div_len = fmt_s16_dec(tmp, divider);
+
+    while (pos < (len - div_len)) {
+        out[pos++] = '0';
+    }
+    for (size_t i = 0; i < div_len; i++) {
+        out[pos++] = tmp[i];
+    }
+
+    return pos;
 }
 
 uint32_t scn_u32_dec(const char *str, size_t n)
