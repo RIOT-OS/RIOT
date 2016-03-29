@@ -110,7 +110,8 @@ uint16_t adc12_single_conversion(uint16_t ref, uint16_t sht, uint16_t channel)
  * @param       none
  * @return      none
  *************************************************************************************************/
-interrupt(ADC12_VECTOR) __attribute__((naked)) adc_isr(void)
+interrupt(ADC12_VECTOR) __attribute__((naked, optimize("omit-frame-pointer"),
+                                       no_instrument_function)) adc_isr(void)
 {
     __enter_isr();
 

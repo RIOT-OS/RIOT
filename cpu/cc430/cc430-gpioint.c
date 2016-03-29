@@ -143,7 +143,7 @@ bool gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
     return 1;
 }
 
-interrupt(PORT1_VECTOR) __attribute__((naked)) port1_isr(void)
+interrupt(PORT1_VECTOR) port1_isr(void)
 {
     uint8_t int_enable, ifg_num, p1ifg;
     uint16_t p1iv;
@@ -188,7 +188,7 @@ interrupt(PORT1_VECTOR) __attribute__((naked)) port1_isr(void)
     __exit_isr();
 }
 
-interrupt(PORT2_VECTOR) __attribute__((naked)) port2_isr(void)
+interrupt(PORT2_VECTOR) port2_isr(void)
 {
     uint8_t int_enable, ifg_num, p2ifg;
     uint16_t p2iv;

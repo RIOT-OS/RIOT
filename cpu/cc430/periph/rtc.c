@@ -182,7 +182,8 @@ void rtc_clear_alarm(void)
     RTCCTL0 &= ~RTCAIE;
 }
 
-interrupt(RTC_VECTOR) __attribute__((naked)) rtc_isr(void)
+interrupt(RTC_VECTOR) __attribute__((naked, optimize("omit-frame-pointer"),
+                                     no_instrument_function)) rtc_isr(void)
 {
     __enter_isr();
 
