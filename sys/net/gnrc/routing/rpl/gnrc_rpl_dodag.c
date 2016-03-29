@@ -24,6 +24,10 @@
 #include "utlist.h"
 
 #include "net/gnrc/rpl.h"
+#ifdef MODULE_GNRC_RPL_P2P
+#include "net/gnrc/rpl/p2p.h"
+#include "net/gnrc/rpl/p2p_dodag.h"
+#endif
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -45,6 +49,16 @@ static void _rpl_trickle_send_dio(void *args)
         trickle_stop(&dodag->trickle);
         return;
     }
+
+#ifdef MODULE_GNRC_RPL_P2P
+    if (dodag->instance->mop == GNRC_RPL_P2P_MOP) {
+        gnrc_rpl_p2p_ext_t *p2p_ext = gnrc_rpl_p2p_ext_get(dodag);
+        if (p2p_ext && (p2p_ext->for_me || ((p2p_ext->lifetime_sec <= 0) || p2p_ext->stop))) {
+            trickle_stop(&dodag->trickle);
+            return;
+        }
+    }
+#endif
 
     gnrc_rpl_send_DIO(inst, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes);
     DEBUG("trickle callback: Instance (%d) | DODAG: (%s)\n", inst->id,
@@ -97,6 +111,9 @@ bool gnrc_rpl_instance_remove_by_id(uint8_t instance_id)
 bool gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst)
 {
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
+#ifdef MODULE_GNRC_RPL_P2P
+    gnrc_rpl_p2p_ext_remove(dodag);
+#endif
     gnrc_rpl_dodag_remove_all_parents(dodag);
     trickle_stop(&dodag->trickle);
     memset(inst, 0, sizeof(gnrc_rpl_instance_t));
@@ -140,6 +157,14 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, k
     dodag->iface = iface;
     dodag->netif_addr = netif_addr;
 
+#ifdef MODULE_GNRC_RPL_P2P
+    if ((instance->mop == GNRC_RPL_P2P_MOP) && (gnrc_rpl_p2p_ext_new(dodag) == NULL)) {
+        DEBUG("RPL: could not allocate new P2P-RPL DODAG extension. Remove DODAG\n");
+        gnrc_rpl_instance_remove(instance);
+        return false;
+    }
+#endif
+
     return true;
 }
 
@@ -149,6 +174,7 @@ void gnrc_rpl_dodag_remove_all_parents(gnrc_rpl_dodag_t *dodag)
     LL_FOREACH_SAFE(dodag->parents, elt, tmp) {
         gnrc_rpl_parent_remove(elt);
     }
+    dodag->my_rank = GNRC_RPL_INFINITE_RANK;
 }
 
 bool gnrc_rpl_parent_add_by_addr(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *addr,
@@ -243,6 +269,9 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
     /* update Parent lifetime */
     if (parent != NULL) {
         parent->lifetime = (now / SEC_IN_USEC) + ((dodag->default_lifetime * dodag->lifetime_unit));
+#ifdef MODULE_GNRC_RPL_P2P
+        if (dodag->instance->mop != GNRC_RPL_P2P_MOP) {
+#endif
         if (parent == dodag->parents) {
             fib_add_entry(&gnrc_ipv6_fib_table,
                           dodag->iface,
@@ -254,6 +283,9 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
                           FIB_FLAG_RPL_ROUTE,
                           (dodag->default_lifetime * dodag->lifetime_unit) * SEC_IN_MS);
         }
+#ifdef MODULE_GNRC_RPL_P2P
+        }
+#endif
     }
 
     if (_gnrc_rpl_find_preferred_parent(dodag) == NULL) {
@@ -291,11 +323,16 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
     if (new_best != old_best) {
         LL_DELETE(dodag->parents, new_best);
         LL_PREPEND(dodag->parents, new_best);
-        if (dodag->instance->mop != GNRC_RPL_MOP_NO_DOWNWARD_ROUTES) {
+        /* no-path DAOs only for the storing mode */
+        if ((dodag->instance->mop == GNRC_RPL_MOP_STORING_MODE_NO_MC) ||
+            (dodag->instance->mop == GNRC_RPL_MOP_STORING_MODE_MC)) {
             gnrc_rpl_send_DAO(dodag->instance, &old_best->addr, 0);
             gnrc_rpl_delay_dao(dodag);
         }
 
+#ifdef MODULE_GNRC_RPL_P2P
+    if (dodag->instance->mop != GNRC_RPL_P2P_MOP) {
+#endif
         fib_add_entry(&gnrc_ipv6_fib_table,
                       dodag->iface,
                       (uint8_t *) ipv6_addr_unspecified.u8,
@@ -305,6 +342,10 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
                       sizeof(ipv6_addr_t),
                       FIB_FLAG_RPL_ROUTE,
                       (dodag->default_lifetime * dodag->lifetime_unit) * SEC_IN_MS);
+#ifdef MODULE_GNRC_RPL_P2P
+    }
+#endif
+
     }
 
     dodag->my_rank = dodag->instance->of->calc_rank(dodag->parents, 0);
