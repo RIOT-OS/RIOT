@@ -32,11 +32,13 @@
 #elif CLOCK_HSI
 #define CLOCK_CR_SOURCE            RCC_CR_HSION
 #define CLOCK_CR_SOURCE_RDY        RCC_CR_HSIRDY
-#define CLOCK_PLL_SOURCE           (0)
+#define CLOCK_PLL_SOURCE           0
+#define CLOCK_DISABLE_HSI          0
 #elif CLOCK_HSE
 #define CLOCK_CR_SOURCE            RCC_CR_HSEON
 #define CLOCK_CR_SOURCE_RDY        RCC_CR_HSERDY
 #define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC
+#define CLOCK_DISABLE_HSI          1
 #else
 #error "Please provide CLOCK_HSI or CLOCK_HSE in boards/NAME/includes/perhip_cpu.h"
 #endif
@@ -99,4 +101,9 @@ static void clk_init(void)
     RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
     /* Wait till PLL is used as system clock source */
     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
+
+#if CLOCK_DISABLE_HSI
+    RCC->CR &= ~(RCC_CR_HSION);
+    while ((RCC->CR & RCC_CR_HSIRDY) != 0) {}
+#endif
 }
