@@ -188,9 +188,7 @@ static uint_fast8_t i2c_ctrl_blocking(uint_fast8_t flags)
 
     if (I2CM_STAT & BUSY) {
         /* If the controller is still busy, it probably will be forever */
-#ifdef MODULE_XTIMER
         DEBUG("Master is still BUSY after %u usec. Resetting.\n", xtimer_timeout);
-#endif
         cc2538_i2c_init_master(speed_hz);
     }
 
