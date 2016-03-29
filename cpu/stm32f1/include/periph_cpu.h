@@ -124,6 +124,25 @@ enum {
 };
 
 /**
+ * @brief   PWM channel configuration data structure
+ */
+typedef struct {
+    gpio_t pin;                 /**< GPIO pin */
+    uint8_t chan;               /**< timer channel to use */
+} pwm_conf_chan_t;
+
+/**
+ * @brief   PWM device configuration data structure
+ */
+typedef struct {
+    TIM_TypeDef *dev;           /**< timer device to use */
+    uint32_t remap;             /**< timer remapping to use */
+    uint8_t apb;                /**< the RCC clock line to use */
+    uint8_t rcc;                /**< RCC bit to enable the timer */
+    pwm_conf_chan_t chan[4];    /**< channel configuration */
+} pwm_conf_t;
+
+/**
  * @brief   Define alternate function modes
  *
  * On this CPU, only the output pins have alternate function modes. The input
@@ -164,6 +183,14 @@ typedef struct {
     uint8_t bus;            /**< peripheral bus */
     uint8_t irqn;           /**< interrupt number */
 } uart_conf_t;
+
+/**
+ *  * @brief   DAC line configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the line */
+    uint8_t chan;           /**< DAC device used for this line */
+} dac_conf_t;
 
 /**
  * @brief   Configure the alternate function for the given pin

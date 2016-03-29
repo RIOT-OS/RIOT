@@ -1767,6 +1767,10 @@ typedef struct
 
 #define AFIO_MAPR_TIM4_REMAP                 ((uint32_t)0x00001000)        /*!< TIM4_REMAP bit (TIM4 remapping) */
 
+/*!< TIM4_REMAP configuration */
+#define AFIO_MAPR_TIM4_REMAP_NOREMAP         ((uint32_t)0x00000000)        /*!< No remap (CH1/PB6, CH2/PB7, CH3/PB8, CH4/PB9) */
+#define AFIO_MAPR_TIM4_REMAP_FULLREMAP       ((uint32_t)0x00001000)        /*!< Full remap (CH1/PD12, CH2/PD13, CH3/PD14, CH4/PD15) */
+
 #define AFIO_MAPR_CAN_REMAP                  ((uint32_t)0x00006000)        /*!< CAN_REMAP[1:0] bits (CAN Alternate function remapping) */
 #define AFIO_MAPR_CAN_REMAP_0                ((uint32_t)0x00002000)        /*!< Bit 0 */
 #define AFIO_MAPR_CAN_REMAP_1                ((uint32_t)0x00004000)        /*!< Bit 1 */
