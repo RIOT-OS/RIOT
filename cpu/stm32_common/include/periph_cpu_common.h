@@ -48,6 +48,24 @@ enum {
 };
 
 /**
+ * @brief   Overwrite the default gpio_t type definition
+ * @{
+ */
+#define HAVE_GPIO_T
+typedef uint32_t gpio_t;
+/** @} */
+
+/**
+ * @brief   Definition of a fitting UNDEF value
+ */
+#define GPIO_UNDEF          (0xffffffff)
+
+/**
+ * @brief   Define a CPU specific GPIO pin generator macro
+ */
+#define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
+
+/**
  * @brief   Enable the given peripheral clock
  *
  * @param[in] bus       bus the peripheral is connected to
