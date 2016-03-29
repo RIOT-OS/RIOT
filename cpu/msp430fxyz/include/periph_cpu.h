@@ -46,6 +46,21 @@ typedef uint16_t gpio_t;
 #define GPIO_PIN(x, y)      ((gpio_t)(((x & 0xff) << 8) | (1 << (y & 0xff))))
 
 /**
+ * @brief   Override pin selection modes
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN     = 0x00,         /**< pin as input without pull resistor */
+    GPIO_IN_PD  = 0xff,         /**< pin as input with pullup resistor */
+    GPIO_IN_PU  = 0xff,         /**< pin as input with pulldown resistor */
+    GPIO_OUT    = 0x00,         /**< pin as output without pull resistor */
+    GPIO_OD     = 0x00,         /**< not supported */
+    GPIO_OD_PU  = 0xff          /**< pin as open-drain with pull up resistor */
+}gpio_mode_t;
+/** @} */
+
+/**
  * @brief   Override flank selection values
  * @{
  */
@@ -55,18 +70,6 @@ typedef enum {
     GPIO_RISING  = 0x00,        /**< emit interrupt on rising flank */
     GPIO_BOTH    = 0xab         /**< not supported -> random value*/
 } gpio_flank_t;
-/** @} */
-
-/**
- * @brief Override pullup selection values
- * @{
- */
-#define HAVE_GPIO_PP_T
-typedef enum {
-    GPIO_NOPULL = 0x00,         /**< no pullup resistor */
-    GPIO_PULLUP = 0xff,         /**< use pullup resistor */
-    GPIO_PULLDOWN = 0xff        /**< use pulldown resistor */
-} gpio_pp_t;
 /** @} */
 
 /**

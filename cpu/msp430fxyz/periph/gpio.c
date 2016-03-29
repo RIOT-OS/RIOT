@@ -83,7 +83,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     msp_port_t *port = _port(pin);
 
     /* check if port is valid and mode applicable */
-    if ((port == NULL) || ((mode != GPIO_IN) && (mode != GPIO_OUT))) {
+    if ((port == NULL) || (mode == GPIO_OD)) {
         return -1;
     }
 
@@ -92,6 +92,36 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     port->OD &= ~(_pin(pin));
     if (mode == GPIO_OUT) {
         port->DIR |= _pin(pin);
+    }
+
+    /* set pull up/down resitors */
+    if (port == PORT_1) {
+        P1REN &= ~(_pin(pin));
+        P1REN |= _pin(pin);
+    }
+    else if (port == PORT_2) {
+        P2REN &= ~(_pin(pin));
+        P2REN |= _pin(pin);
+    }
+    else if (port == PORT_3) {
+        P3REN &= ~(_pin(pin));
+        P3REN |= _pin(pin);
+    }
+    else if (port == PORT_4) {
+        P4REN &= ~(_pin(pin));
+        P4REN |= _pin(pin);
+    }
+    else if (port == PORT_5) {
+        P5REN &= ~(_pin(pin));
+        P5REN |= _pin(pin);
+    }
+    else if (port == PORT_6) {
+        P6REN &= ~(_pin(pin));
+        P6REN |= _pin(pin);
+    }
+
+    if ((mode == GPIO_OD_PU) || (mode == GPIO_IN_PU)) {
+        port->OD |= _pin(pin);
     }
 
     return 0;
