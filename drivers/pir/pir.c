@@ -58,7 +58,7 @@ int pir_register_thread(pir_t *dev)
         }
     }
     else {
-        DEBUG("pir_register_thread: activating interrupt for %p..\n", dev);
+        DEBUG("pir_register_thread: activating interrupt for %p..\n", (void *)dev);
         if (pir_activate_int(dev) != 0) {
             DEBUG("\tfailed\n");
             return -1;

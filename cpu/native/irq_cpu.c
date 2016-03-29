@@ -452,7 +452,8 @@ void native_interrupt_init(void)
     DEBUG("native_interrupt_init\n");
 
     VALGRIND_STACK_REGISTER(__isr_stack, __isr_stack + sizeof(__isr_stack));
-    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", __isr_stack, (void*)((int)__isr_stack + sizeof(__isr_stack)));
+    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
+                   (void *)__isr_stack, (void*)((int)__isr_stack + sizeof(__isr_stack)));
 
     native_interrupts_enabled = 1;
     _native_sigpend = 0;

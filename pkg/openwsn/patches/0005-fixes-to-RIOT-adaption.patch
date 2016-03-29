@@ -2318,7 +2318,7 @@ index 367513c..a5589ff 100644
     taskList_item_t** taskListWalker;
     INTERRUPT_DECLARATION();
     
-+   DEBUG("owsn scheduler: push back task %p.\n", cb);
++   DEBUG("owsn scheduler: push back task %p.\n", (void *)cb);
     DISABLE_INTERRUPTS();
     
     // find an empty task container
