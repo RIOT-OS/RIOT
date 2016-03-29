@@ -30,6 +30,7 @@
 #include "cpu_conf.h"
 #include "sched.h"
 #include "list.h"
+#include "clist.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -68,8 +69,8 @@
  */
 struct _thread {
     char *sp;                       /**< thread's stack pointer         */
-    uint8_t status;                /**< thread's status                */
-    uint8_t priority;              /**< thread's priority              */
+    uint8_t status;                 /**< thread's status                */
+    uint8_t priority;               /**< thread's priority              */
 
     kernel_pid_t pid;               /**< thread's process id            */
 
