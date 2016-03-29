@@ -92,7 +92,7 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
         char cpuid[CPUID_LEN];
         cpuid_get(cpuid);
         for (int i = 1; i < CPUID_LEN; i++) {
-            cpuid[0] ^= cpuid[i]
+            cpuid[0] ^= cpuid[i];
         }
         cc110x_set_address(dev, (uint8_t) cpuid[0]);
     }
