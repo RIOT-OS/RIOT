@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -29,102 +30,101 @@
 #include "thread.h"
 #include "irq.h"
 #include "thread.h"
+#include "list.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-static void mutex_wait(struct mutex_t *mutex);
+#define MUTEX_LOCKED ((void*)-1)
 
-int mutex_trylock(struct mutex_t *mutex)
-{
-    DEBUG("%s: trylocking to get mutex. val: %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
-    return atomic_set_to_one(&mutex->val);
-}
-
-void mutex_lock(struct mutex_t *mutex)
-{
-    DEBUG("%s: trying to get mutex. val: %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
-
-    if (atomic_set_to_one(&mutex->val) == 0) {
-        /* mutex was locked. */
-        mutex_wait(mutex);
-    }
-}
-
-static void mutex_wait(struct mutex_t *mutex)
+int _mutex_lock(mutex_t *mutex, int blocking)
 {
     unsigned irqstate = irq_disable();
-    DEBUG("%s: Mutex in use. %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
+    DEBUG("%s: Mutex in use.\n", sched_active_thread->name);
 
-    if (atomic_set_to_one(&mutex->val)) {
-        /* somebody released the mutex. return. */
-        DEBUG("%s: mutex_wait early out. %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
+    if (mutex->queue.next == NULL) {
+        /* mutex is unlocked. */
+        mutex->queue.next = MUTEX_LOCKED;
+        DEBUG("%s: mutex_wait early out.\n", sched_active_thread->name);
         irq_restore(irqstate);
-        return;
+        return 1;
     }
-
-    sched_set_status((thread_t*) sched_active_thread, STATUS_MUTEX_BLOCKED);
-
-    priority_queue_node_t n;
-    n.priority = (unsigned int) sched_active_thread->priority;
-    n.data = (unsigned int) sched_active_thread;
-    n.next = NULL;
-
-    DEBUG("%s: Adding node to mutex queue: prio: %" PRIu32 "\n", sched_active_thread->name, n.priority);
-
-    priority_queue_add(&(mutex->queue), &n);
-
-    irq_restore(irqstate);
-
-    thread_yield_higher();
-
-    /* we were woken up by scheduler. waker removed us from queue. we have the mutex now. */
+    else if (blocking) {
+        thread_t *me = (thread_t*) sched_active_thread;
+        DEBUG("%s: Adding node to mutex queue: prio: %" PRIu32 "\n", me->name, (uint32_t)me->priority);
+        sched_set_status(me, STATUS_MUTEX_BLOCKED);
+        if (mutex->queue.next == MUTEX_LOCKED) {
+            mutex->queue.next = (list_node_t*)&me->rq_entry;
+            mutex->queue.next->next = NULL;
+        }
+        else {
+            thread_add_to_list(&mutex->queue, me);
+        }
+        irq_restore(irqstate);
+        thread_yield_higher();
+        /* we were woken up by scheduler. waker removed us from queue. we have the mutex now. */
+        return 1;
+    }
+    else {
+        irq_restore(irqstate);
+        return 0;
+    }
 }
 
-void mutex_unlock(struct mutex_t *mutex)
+void mutex_unlock(mutex_t *mutex)
 {
     unsigned irqstate = irq_disable();
-    DEBUG("mutex_unlock(): val: %u pid: %" PRIkernel_pid "\n", ATOMIC_VALUE(mutex->val), sched_active_pid);
+    DEBUG("mutex_unlock(): queue.next: 0x%08x pid: %" PRIkernel_pid "\n", (unsigned)mutex->queue.next, sched_active_pid);
 
-    if (ATOMIC_VALUE(mutex->val) == 0) {
+    if (mutex->queue.next == NULL) {
         /* the mutex was not locked */
         irq_restore(irqstate);
         return;
     }
 
-    priority_queue_node_t *next = priority_queue_remove_head(&(mutex->queue));
-    if (!next) {
+    if (mutex->queue.next == MUTEX_LOCKED) {
+        mutex->queue.next = NULL;
         /* the mutex was locked and no thread was waiting for it */
-        ATOMIC_VALUE(mutex->val) = 0;
         irq_restore(irqstate);
         return;
     }
 
-    thread_t *process = (thread_t *) next->data;
+    list_node_t *next = (list_node_t*) list_remove_head(&mutex->queue);
+
+    thread_t *process = container_of((clist_node_t*)next, thread_t, rq_entry);
+
     DEBUG("mutex_unlock: waking up waiting thread %" PRIkernel_pid "\n", process->pid);
     sched_set_status(process, STATUS_PENDING);
+
+    if (!mutex->queue.next) {
+        mutex->queue.next = MUTEX_LOCKED;
+    }
 
     uint16_t process_priority = process->priority;
     irq_restore(irqstate);
     sched_switch(process_priority);
 }
 
-void mutex_unlock_and_sleep(struct mutex_t *mutex)
+void mutex_unlock_and_sleep(mutex_t *mutex)
 {
-    DEBUG("%s: unlocking mutex. val: %u pid: %" PRIkernel_pid ", and taking a nap\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val), sched_active_pid);
+    DEBUG("%s: unlocking mutex. queue.next: 0x%08x pid: %" PRIkernel_pid ", and taking a nap\n", sched_active_thread->name, (unsigned)mutex->queue.next, sched_active_pid);
     unsigned irqstate = irq_disable();
 
-    if (ATOMIC_VALUE(mutex->val) != 0) {
-        priority_queue_node_t *next = priority_queue_remove_head(&(mutex->queue));
-        if (next) {
-            thread_t *process = (thread_t *) next->data;
-            DEBUG("%s: waking up waiter.\n", process->name);
-            sched_set_status(process, STATUS_PENDING);
+    if (mutex->queue.next) {
+        if (mutex->queue.next == MUTEX_LOCKED) {
+            mutex->queue.next = NULL;
         }
         else {
-            ATOMIC_VALUE(mutex->val) = 0; /* This is safe, interrupts are disabled */
+            list_node_t *next = list_remove_head(&mutex->queue);
+            thread_t *process = container_of((clist_node_t*)next, thread_t, rq_entry);
+            DEBUG("%s: waking up waiter.\n", process->name);
+            sched_set_status(process, STATUS_PENDING);
+            if (!mutex->queue.next) {
+                mutex->queue.next = MUTEX_LOCKED;
+            }
         }
     }
+
     DEBUG("%s: going to sleep.\n", sched_active_thread->name);
     sched_set_status((thread_t*) sched_active_thread, STATUS_SLEEPING);
     irq_restore(irqstate);

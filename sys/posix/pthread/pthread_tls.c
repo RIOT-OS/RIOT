@@ -36,7 +36,7 @@ struct __pthread_tls_key {
 /**
  * @brief   Used while manipulating the TLS of a pthread.
  */
-static struct mutex_t tls_mutex;
+static mutex_t tls_mutex;
 
 /**
  * @brief        Find a thread-specific datum.

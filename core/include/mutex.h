@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013, 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2013, 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -21,7 +22,9 @@
 #ifndef MUTEX_H_
 #define MUTEX_H_
 
-#include "priority_queue.h"
+#include <stddef.h>
+
+#include "list.h"
 #include "atomic.h"
 
 #ifdef __cplusplus
@@ -31,27 +34,20 @@
 /**
  * @brief Mutex structure. Must never be modified by the user.
  */
-typedef struct mutex_t {
-    /* fields are managed by mutex functions, don't touch */
-    /**
-     * @brief   The value of the mutex; 0 if unlocked, 1 if locked. **Must
-     *          never be changed by the user.**
-     * @internal
-     */
-    atomic_int_t val;
+typedef struct {
     /**
      * @brief   The process waiting queue of the mutex. **Must never be changed
      *          by the user.**
      * @internal
      */
-    priority_queue_t queue;
+    list_node_t queue;
 } mutex_t;
 
 /**
  * @brief Static initializer for mutex_t.
  * @details This initializer is preferable to mutex_init().
  */
-#define MUTEX_INIT { ATOMIC_INIT(0), PRIORITY_QUEUE_INIT }
+#define MUTEX_INIT { { NULL } }
 
 /**
  * @brief Initializes a mutex object.
@@ -61,9 +57,23 @@ typedef struct mutex_t {
  */
 static inline void mutex_init(mutex_t *mutex)
 {
-    mutex_t empty_mutex = MUTEX_INIT;
-    *mutex = empty_mutex;
+    mutex->queue.next = NULL;
 }
+
+/**
+ * @brief Lock a mutex, blocking or non-blocking.
+ *
+ * @details For commit purposes you should probably use mutex_trylock() and
+ *          mutex_lock() instead.
+ *
+ * @param[in] mutex         Mutex object to lock. Has to be initialized first.
+ *                          Must not be NULL.
+ * @param[in] blocking      if true, block until mutex is available.
+ *
+ * @return 1 if mutex was unlocked, now it is locked.
+ * @return 0 if the mutex was locked.
+ */
+int _mutex_lock(mutex_t *mutex, int blocking);
 
 /**
  * @brief Tries to get a mutex, non-blocking.
@@ -74,14 +84,20 @@ static inline void mutex_init(mutex_t *mutex)
  * @return 1 if mutex was unlocked, now it is locked.
  * @return 0 if the mutex was locked.
  */
-int mutex_trylock(mutex_t *mutex);
+static inline int mutex_trylock(mutex_t *mutex)
+{
+    return _mutex_lock(mutex, 0);
+}
 
 /**
  * @brief Locks a mutex, blocking.
  *
  * @param[in] mutex Mutex object to lock. Has to be initialized first. Must not be NULL.
  */
-void mutex_lock(mutex_t *mutex);
+static inline void mutex_lock(mutex_t *mutex)
+{
+    _mutex_lock(mutex, 1);
+}
 
 /**
  * @brief Unlocks the mutex.
