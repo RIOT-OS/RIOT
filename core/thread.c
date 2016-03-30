@@ -225,12 +225,12 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     cb->rq_entry.next = NULL;
 
+#ifdef MODULE_CORE_MSG
     cb->wait_data = NULL;
-
     cb->msg_waiters.first = NULL;
-
     cib_init(&(cb->msg_queue), 0);
     cb->msg_array = NULL;
+#endif
 
     sched_num_threads++;
 
