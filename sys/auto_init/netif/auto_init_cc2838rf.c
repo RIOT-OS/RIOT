@@ -17,7 +17,7 @@
  * @author  Anon Mall <anon.mall@dai-labor.de>
  */
 
-#ifdef BOARD_OPENMOTE
+#ifdef CPU_CC2538
 
 #include "board.h"
 #include "net/gnrc/nomac.h"
@@ -44,6 +44,7 @@ void auto_init_cc2538rf(void)
 {
     DEBUG("auto init cc2538rf: doing auto init\n");
 
+
     cc2538rf_init(&cc2538rf_dev);
 
      gnrc_nomac_init(_nomac_stacks,
@@ -52,6 +53,6 @@ void auto_init_cc2538rf(void)
 }
 #else
 typedef int dont_be_pedantic;
-#endif /* MODULE_CC2538RF */
+#endif /* CPU_2358 */
 
 /** @} */
