@@ -729,9 +729,14 @@ static inline bool _pkt_not_for_me(kernel_pid_t *iface, ipv6_hdr_t *hdr)
     if (ipv6_addr_is_loopback(&hdr->dst)) {
         return false;
     }
-    else if (*iface == KERNEL_PID_UNDEF) {
-        *iface = gnrc_ipv6_netif_find_by_addr(NULL, &hdr->dst);
-        return (*iface == KERNEL_PID_UNDEF);
+    else if ((!ipv6_addr_is_link_local(&hdr->dst)) ||
+             (*iface == KERNEL_PID_UNDEF)) {
+        kernel_pid_t if_pid = gnrc_ipv6_netif_find_by_addr(NULL, &hdr->dst);
+        if (*iface == KERNEL_PID_UNDEF) {
+            *iface = if_pid;    /* Use original interface for reply if
+                                 * existent */
+        }
+        return (if_pid == KERNEL_PID_UNDEF);
     }
     else {
         return (gnrc_ipv6_netif_find_addr(*iface, &hdr->dst) == NULL);
