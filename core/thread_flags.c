@@ -79,8 +79,10 @@ thread_flags_t thread_flags_wait_one(thread_flags_t mask)
 {
     _thread_flags_wait_any(mask);
     thread_t *me = (thread_t*) sched_active_thread;
-    unsigned tmp = me->flags & mask;
-    return _thread_flags_clear_atomic(me, thread_flags_clear(1 << bitarithm_lsb(tmp)));
+    thread_flags_t tmp = me->flags & mask;
+    /* clear all but least significant bit */
+    tmp &= (~tmp + 1);
+    return _thread_flags_clear_atomic(me, tmp);
 }
 
 thread_flags_t thread_flags_wait_all(thread_flags_t mask)
