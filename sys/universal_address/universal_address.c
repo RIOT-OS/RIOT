@@ -215,13 +215,13 @@ int universal_address_compare(universal_address_container_t *entry,
     if (test_all_zeros) {
         *addr_size_in_bits = 0;
         mutex_unlock(&mtx_access);
-        return 2;
-    } 
+        return UNIVERSAL_ADDRESS_IS_ALL_ZERO_ADDRESS;
+    }
 
     /* if we have no distinct bytes the addresses are equal */
     if (idx == -1) {
         mutex_unlock(&mtx_access);
-        return 0;
+        return UNIVERSAL_ADDRESS_EQUAL;
     }
 
     /* count equal bits */
@@ -235,7 +235,7 @@ int universal_address_compare(universal_address_container_t *entry,
 
     /* get the total number of matching bits */
     *addr_size_in_bits = (idx << 3) + j;
-    ret = 1;
+    ret = UNIVERSAL_ADDRESS_MATCHING_PREFIX;
 
     mutex_unlock(&mtx_access);
     return ret;
@@ -254,31 +254,31 @@ int universal_address_compare_prefix(universal_address_container_t *entry,
 
     /* Get the index of the first trailing `0` */
     int i = 0;
-    for( i = entry->address_size-1; i >= 0; --i) {
-        if( prefix[i] != 0 ) {
+    for (i = entry->address_size-1; i >= 0; --i) {
+        if (prefix[i] != 0) {
             break;
         }
     }
 
-    if( memcmp(entry->address, prefix, i) == 0 ) {
+    if (memcmp(entry->address, prefix, i) == 0) {
         /* if the bytes-1 equals we check the bits of the lowest byte */
         uint8_t bitmask = 0x00;
         /* get a bitmask for the trailing 0b */
-        for( uint8_t j = 0; j < 8; ++j ) {
-            if ( (prefix[i] >> j) & 0x01 ) {
+        for (uint8_t j = 0; j < 8; ++j) {
+            if ((prefix[i] >> j) & 0x01) {
                 bitmask = 0xff << j;
                 break;
             }
         }
 
-        if( (entry->address[i] & bitmask) == (prefix[i] & bitmask) ) {
+        if ((entry->address[i] & bitmask) == (prefix[i] & bitmask)) {
             ret = entry->address[i] != prefix[i];
-            if( ret == 0 ) {
+            if (ret == UNIVERSAL_ADDRESS_EQUAL) {
                 /* check if the remaining bits from entry are significant */
                 i++;
-                for(; i < entry->address_size; ++i) {
-                    if( entry->address[i] != 0 ) {
-                        ret = 1;
+                for ( ; i < entry->address_size; ++i) {
+                    if (entry->address[i] != 0) {
+                        ret = UNIVERSAL_ADDRESS_MATCHING_PREFIX;
                         break;
                     }
                 }
