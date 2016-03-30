@@ -41,6 +41,15 @@ static void *_thread(void *arg)
     flags = thread_flags_wait_all(0x2 | 0x4);
     printf("thread(): received flags: 0x%04x\n", (unsigned)flags & 0xFFFF);
 
+
+    printf("thread(): waiting for any flag, one by one\n");
+    flags = thread_flags_wait_one(0xFFFF);
+    printf("thread(): received flags: 0x%04x\n", (unsigned)flags & 0xFFFF);
+
+    printf("thread(): waiting for any flag, one by one\n");
+    flags = thread_flags_wait_one(0xFFFF);
+    printf("thread(): received flags: 0x%04x\n", (unsigned)flags & 0xFFFF);
+
     return NULL;
 }
 
@@ -66,6 +75,7 @@ int main(void)
     _set(thread, 0x1);
     _set(thread, 0x64);
     _set(thread, 0x1);
+    _set(thread, 0x8);
     _set(thread, 0x2);
     _set(thread, 0x4);
 
