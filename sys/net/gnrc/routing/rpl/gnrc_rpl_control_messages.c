@@ -621,7 +621,7 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
 
             if (!(configured_addr = gnrc_ipv6_netif_match_prefix(dodag->iface, &dodag->dodag_id))) {
                 DEBUG("RPL: no IPv6 address configured to match the given dodag id: %s\n",
-                      ipv6_addr_to_str(addr_str, dodag_id, sizeof(addr_str)));
+                      ipv6_addr_to_str(addr_str, &(dodag->dodag_id), sizeof(addr_str)));
                 gnrc_rpl_instance_remove(inst);
                 return;
             }
