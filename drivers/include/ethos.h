@@ -86,7 +86,7 @@ typedef struct {
 typedef struct {
     uart_t uart;            /**< UART device to use */
     uint32_t baudrate;      /**< baudrate to UART device */
-    uint8_t buf;            /**< buffer for incoming packets */
+    uint8_t *buf;           /**< buffer for incoming packets */
     size_t bufsize;         /**< size of ethos_params_t::buf */
 } ethos_params_t;
 
