@@ -403,6 +403,31 @@ static size_t decode_bytes(const cbor_stream_t *s, size_t offset, char *out, siz
     return (bytes_start + bytes_length);
 }
 
+/* A zero copy version of decode_bytes.
+   Will not null termiante input, but tell you the size of what you read.
+   Great for reading byte strings which could contain nulls inside
+*/
+static size_t decode_bytes_no_copy(const cbor_stream_t *s, size_t offset, unsigned char **out, size_t *length)
+{
+    CBOR_ENSURE_SIZE_READ(s, offset + 1);
+
+    if ((CBOR_TYPE(s, offset) != CBOR_BYTES && CBOR_TYPE(s, offset) != CBOR_TEXT) || !out) {
+        return 0;
+    }
+
+    uint64_t bytes_length;
+    size_t bytes_start = decode_int(s, offset, &bytes_length);
+
+    if (!bytes_start) {
+        return 0;
+    }
+
+    CBOR_ENSURE_SIZE_READ(s, offset + bytes_start + bytes_length);
+    *out = &(s->data[offset + bytes_start]);
+    *length = bytes_length;
+    return (bytes_start + bytes_length);
+}
+
 size_t cbor_deserialize_int(const cbor_stream_t *stream, size_t offset, int *val)
 {
     CBOR_ENSURE_SIZE_READ(stream, offset + 1);
@@ -594,14 +619,21 @@ size_t cbor_deserialize_byte_string(const cbor_stream_t *stream, size_t offset, 
     return decode_bytes(stream, offset, val, length);
 }
 
+size_t cbor_deserialize_byte_string_no_copy(const cbor_stream_t *stream, size_t offset, unsigned char **val,
+                                    size_t *length)
+{
+    CBOR_ENSURE_SIZE_READ(stream, offset + 1);
+
+    if (CBOR_TYPE(stream, offset) != CBOR_BYTES) {
+        return 0;
+    }
+
+    return decode_bytes_no_copy(stream, offset, val, length);
+}
+
 size_t cbor_serialize_byte_string(cbor_stream_t *stream, const char *val)
 {
     return encode_bytes(CBOR_BYTES, stream, val, strlen(val));
-}
-
-size_t cbor_serialize_byte_stringl(cbor_stream_t *stream, const char *val, size_t length)
-{
-    return encode_bytes(CBOR_BYTES, stream, val, length);
 }
 
 size_t cbor_deserialize_unicode_string(const cbor_stream_t *stream, size_t offset, char *val,
@@ -614,6 +646,18 @@ size_t cbor_deserialize_unicode_string(const cbor_stream_t *stream, size_t offse
     }
 
     return decode_bytes(stream, offset, val, length);
+}
+
+size_t cbor_deserialize_unicode_string_no_copy(const cbor_stream_t *stream, size_t offset, unsigned char **val,
+                                    size_t *length)
+{
+    CBOR_ENSURE_SIZE_READ(stream, offset + 1);
+
+    if (CBOR_TYPE(stream, offset) != CBOR_TEXT) {
+        return 0;
+    }
+
+    return decode_bytes_no_copy(stream, offset, val, length);
 }
 
 size_t cbor_serialize_unicode_string(cbor_stream_t *stream, const char *val)
