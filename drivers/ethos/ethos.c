@@ -26,6 +26,7 @@
 #include "ethos.h"
 #include "periph/uart.h"
 #include "tsrb.h"
+#include "irq.h"
 
 #include "net/netdev2.h"
 #include "net/netdev2/eth.h"
