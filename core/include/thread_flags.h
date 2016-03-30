@@ -124,7 +124,7 @@ thread_flags_t thread_flags_wait_all(thread_flags_t mask);
  * @brief Wait for any flags in mask to become set (blocking), one at a time
  *
  * This function is like thread_flags_wait_any(), but will only clear and return
- * one flag at a time, most significant set bit first.
+ * one flag at a time, least significant set bit first.
  *
  * @param[in]   mask    mask of flags to wait for
  *
