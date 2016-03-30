@@ -78,9 +78,14 @@ typedef struct fib_destination_set_entry_t {
 #define FIB_FLAG_RPL_ROUTE (1UL << 0)
 
 /**
- * @brief flag to identify if the FIB-Entry is a net prefix (MSB == 1)
+ * @brief flag used as shift for the net prefix length in bits
  */
-#define FIB_FLAG_NET_PREFIX (1UL<<31)
+#define FIB_FLAG_NET_PREFIX_SHIFT (24)
+
+/**
+ * @brief flag used as mask for the net prefix length in bits
+ */
+#define FIB_FLAG_NET_PREFIX_MASK (0xffUL << FIB_FLAG_NET_PREFIX_SHIFT)
 
 /**
  * @brief initializes all FIB entries with 0

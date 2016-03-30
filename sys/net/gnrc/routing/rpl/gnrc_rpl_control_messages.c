@@ -475,7 +475,7 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                 uint32_t fib_dst_flags = 0;
 
                 if (target->prefix_length < IPV6_ADDR_BIT_LEN) {
-                    fib_dst_flags |= FIB_FLAG_NET_PREFIX;
+                    fib_dst_flags = ((uint32_t)(target->prefix_length) << FIB_FLAG_NET_PREFIX_SHIFT);
                 }
 
                 DEBUG("RPL: adding fib entry %s/%d 0x%x\n",
@@ -856,16 +856,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
             }
             addr = (ipv6_addr_t *) fentry->global->address;
             if (ipv6_addr_is_global(addr)) {
-                size_t prefix_length;
-
-                if (fentry->global_flags & FIB_FLAG_NET_PREFIX) {
-                    universal_address_compare(fentry->global,
-                                              fentry->global->address,
-                                              &prefix_length);
-                }
-                else {
-                    prefix_length = IPV6_ADDR_BIT_LEN;
-                }
+                size_t prefix_length = (fentry->global_flags >> FIB_FLAG_NET_PREFIX_SHIFT);
 
                 DEBUG("RPL: Send DAO - building target %s/%d\n",
                       ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
