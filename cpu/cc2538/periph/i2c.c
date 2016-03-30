@@ -27,7 +27,10 @@
 #include "periph/i2c.h"
 #include "sched.h"
 #include "thread.h"
+#ifdef MODULE_XTIMER
 #include "xtimer.h"
+#endif
+#include "timex.h" /* for SEC_IN_USEC */
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -188,7 +191,9 @@ static uint_fast8_t i2c_ctrl_blocking(uint_fast8_t flags)
 
     if (I2CM_STAT & BUSY) {
         /* If the controller is still busy, it probably will be forever */
+#ifdef MODULE_XTIMER
         DEBUG("Master is still BUSY after %u usec. Resetting.\n", xtimer_timeout);
+#endif
         cc2538_i2c_init_master(speed_hz);
     }
 
