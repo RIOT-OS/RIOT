@@ -42,6 +42,17 @@ extern "C" {
 #define UNIVERSAL_ADDRESS_SIZE (IPV6_ADDR_BIT_LEN >> 3)
 #endif
 
+/** @brief return value indicating the compared addresses are equal */
+#define UNIVERSAL_ADDRESS_EQUAL (0)
+
+/** @brief return value indicating the compared addresses match up to a certain prefix */
+#define UNIVERSAL_ADDRESS_MATCHING_PREFIX (1)
+
+/** @brief return value indicating all address bits of the entry are `0`.
+ *         Its considered as default route address that matches any other prefix.
+ */
+#define UNIVERSAL_ADDRESS_IS_ALL_ZERO_ADDRESS (2)
+
 /**
  * @brief The container descriptor used to identify a universal address entry
  */
@@ -69,7 +80,7 @@ void universal_address_reset(void);
  * @param[in] addr_size  the number of bytes required for the address entry
  *
  * @return pointer to the universal_address_container_t containing the address on success
- *         NULL if the address could not be inserted
+ * @return NULL if the address could not be inserted
  */
 universal_address_container_t *universal_address_add(uint8_t *addr, size_t addr_size);
 
@@ -90,7 +101,7 @@ void universal_address_rem(universal_address_container_t *entry);
  *                           this value is overwritten with the actual size required
  *
  * @return addr if the address is copied to the addr destination
- *         NULL if the size is unsufficient for copy
+ * @return NULL if the size is unsufficient for copy
  */
 uint8_t* universal_address_get_address(universal_address_container_t *entry,
                                        uint8_t *addr, size_t *addr_size);
@@ -107,9 +118,12 @@ uint8_t* universal_address_get_address(universal_address_container_t *entry,
  *                                    with the number of matching bits till the
  *                                    first of trailing `0`s
  *
- * @return 0 if the entries are equal
- *         1 if the entry match to a certain prefix (trailing '0's in *entry)
- *         -ENOENT if the given adresses do not match
+ * @return UNIVERSAL_ADDRESS_EQUAL if the entries are equal
+ * @return UNIVERSAL_ADDRESS_MATCHING_PREFIX if the entry matches to a certain prefix
+ *                                           (trailing '0's in @p entry)
+ * @return UNIVERSAL_ADDRESS_IS_ALL_ZERO_ADDRESS if the entry address is all `0`s
+ *                                               and considered as default route
+ * @return -ENOENT if the given adresses do not match
  */
 int universal_address_compare(universal_address_container_t *entry,
                               uint8_t *addr, size_t *addr_size_in_bits);
@@ -128,9 +142,10 @@ int universal_address_compare(universal_address_container_t *entry,
 *                                e.g. for an ipv6_addr_t it would be sizeof(ipv6_addr_t)
 *                                regardless if the stored prefix is < ::/128
 *
-* @return 0 if the entries are equal
-*         1 if the entry match to a certain prefix (trailing '0's in *prefix)
-*         -ENOENT if the given adresses do not match
+* @return UNIVERSAL_ADDRESS_EQUAL if the entries are equal
+* @return UNIVERSAL_ADDRESS_MATCHING_PREFIX if the entry matches to a certain prefix
+*                                           (trailing '0's in @p prefix)
+* @return -ENOENT if the given adresses do not match
 */
 int universal_address_compare_prefix(universal_address_container_t *entry,
                             uint8_t *prefix, size_t prefix_size_in_bits);
