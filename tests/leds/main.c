@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "board.h"
+#include "led.h"
 #include "periph_conf.h"
 
 #ifdef CLOCK_CORECLOCK
@@ -86,7 +86,6 @@ int main(void)
 
 
     while (1) {
-#ifdef LED0_ON
         LED0_ON;
         dumb_delay(DELAY_LONG);
         LED0_OFF;
@@ -99,8 +98,7 @@ int main(void)
         dumb_delay(DELAY_SHORT);
         LED0_TOGGLE;
         dumb_delay(DELAY_LONG);
-#endif
-#ifdef LED1_ON
+
         LED1_ON;
         dumb_delay(DELAY_LONG);
         LED1_OFF;
@@ -113,8 +111,7 @@ int main(void)
         dumb_delay(DELAY_SHORT);
         LED1_TOGGLE;
         dumb_delay(DELAY_LONG);
-#endif
-#ifdef LED2_ON
+
         LED2_ON;
         dumb_delay(DELAY_LONG);
         LED2_OFF;
@@ -127,8 +124,7 @@ int main(void)
         dumb_delay(DELAY_SHORT);
         LED2_TOGGLE;
         dumb_delay(DELAY_LONG);
-#endif
-#ifdef LED3_ON
+
         LED3_ON;
         dumb_delay(DELAY_LONG);
         LED3_OFF;
@@ -141,8 +137,7 @@ int main(void)
         dumb_delay(DELAY_SHORT);
         LED3_TOGGLE;
         dumb_delay(DELAY_LONG);
-#endif
-#ifdef LED4_ON
+
         LED4_ON;
         dumb_delay(DELAY_LONG);
         LED4_OFF;
@@ -155,8 +150,7 @@ int main(void)
         dumb_delay(DELAY_SHORT);
         LED4_TOGGLE;
         dumb_delay(DELAY_LONG);
-#endif
-#ifdef LED5_ON
+
         LED5_ON;
         dumb_delay(DELAY_LONG);
         LED5_OFF;
@@ -169,8 +163,7 @@ int main(void)
         dumb_delay(DELAY_SHORT);
         LED5_TOGGLE;
         dumb_delay(DELAY_LONG);
-#endif
-#ifdef LED6_ON
+
         LED6_ON;
         dumb_delay(DELAY_LONG);
         LED6_OFF;
@@ -183,8 +176,7 @@ int main(void)
         dumb_delay(DELAY_SHORT);
         LED6_TOGGLE;
         dumb_delay(DELAY_LONG);
-#endif
-#ifdef LED7_ON
+
         LED7_ON;
         dumb_delay(DELAY_LONG);
         LED7_OFF;
@@ -197,7 +189,6 @@ int main(void)
         dumb_delay(DELAY_SHORT);
         LED7_TOGGLE;
         dumb_delay(DELAY_LONG);
-#endif
     }
 
     return 0;
