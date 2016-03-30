@@ -203,6 +203,15 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
         struct iovec *vector = (struct iovec *)pkt->data;
         vector[0].iov_base = (char*)&hdr;
         vector[0].iov_len = sizeof(ethernet_hdr_t);
+#ifdef MODULE_NETSTATS_L2
+        if ((netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_BROADCAST) ||
+            (netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
+            gnrc_netdev2->dev->stats.tx_mcast_count++;
+        }
+        else {
+            gnrc_netdev2->dev->stats.tx_unicast_count++;
+        }
+#endif
         res = dev->driver->send(dev, vector, n);
     }
 

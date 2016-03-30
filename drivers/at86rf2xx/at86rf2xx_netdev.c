@@ -21,6 +21,7 @@
  * @}
  */
 
+#include <string.h>
 #include <assert.h>
 #include <errno.h>
 
@@ -87,6 +88,9 @@ static int _init(netdev2_t *netdev)
         return -1;
     }
 
+#ifdef MODULE_NETSTATS_L2
+    memset(&netdev->stats, 0, sizeof(netstats_t));
+#endif
     /* reset device to default values and put it into RX state */
     at86rf2xx_reset(dev);
 
@@ -109,6 +113,9 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
                    (unsigned)len + 2);
             return -EOVERFLOW;
         }
+#ifdef MODULE_NETSTATS_L2
+        netdev->stats.tx_bytes += len;
+#endif
         len = at86rf2xx_tx_load(dev, ptr->iov_base, ptr->iov_len, len);
     }
 
@@ -141,6 +148,10 @@ static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
         at86rf2xx_fb_stop(dev);
         return pkt_len;
     }
+#ifdef MODULE_NETSTATS_L2
+    netdev->stats.rx_count++;
+    netdev->stats.rx_bytes += pkt_len;
+#endif
     /* not enough space in buf */
     if (pkt_len > len) {
         at86rf2xx_fb_stop(dev);

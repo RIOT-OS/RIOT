@@ -148,6 +148,16 @@ int netdev2_ieee802154_get(netdev2_ieee802154_t *dev, netopt_t opt, void *value,
         case NETOPT_IPV6_IID:
             res = _get_iid(dev, value, max_len);
             break;
+#ifdef MODULE_NETSTATS_L2
+        case NETOPT_STATS:
+            if (max_len < sizeof(uintptr_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
+            *((netstats_t**)value) = &dev->netdev.stats;
+            res = sizeof(uintptr_t);
+            break;
+#endif
         default:
             break;
     }
