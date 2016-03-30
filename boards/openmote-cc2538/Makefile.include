@@ -22,7 +22,5 @@ else
   export FFLAGS  = -p "$(PORT)" -e -w -v -b 460800 $(HEXFILE)
 endif
 
-
-
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
