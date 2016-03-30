@@ -111,6 +111,9 @@ ifneq (,$(filter ieee802154,$(USEMODULE)))
   ifneq (,$(filter gnrc_ipv6_router_default, $(USEMODULE)))
     USEMODULE += gnrc_sixlowpan_router_default
   endif
+  ifneq (,$(filter lwip%, $(USEMODULE)))
+    USEMODULE += lwip_sixlowpan
+  endif
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_default,$(USEMODULE)))
@@ -352,6 +355,60 @@ endif
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   USEMODULE += sema
   USEMODULE += xtimer
+endif
+
+ifneq (,$(filter lwip_sixlowpan,$(USEMODULE)))
+  USEMODULE += lwip_ipv6_autoconfig
+endif
+
+ifneq (,$(filter lwip_ipv6_autoconfig,$(USEMODULE)))
+  USEMODULE += lwip_ipv6
+endif
+
+ifneq (,$(filter lwip_ipv6,$(USEMODULE)))
+  USEMODULE += random
+endif
+
+ifneq (,$(filter lwip_udplite,$(USEMODULE)))
+  USEMODULE += lwip_udp
+endif
+
+ifneq (,$(filter lwip_conn_%,$(USEMODULE)))
+  USEMODULE += lwip_conn
+endif
+
+ifneq (,$(filter lwip_conn_ip,$(USEMODULE)))
+  USEMODULE += lwip_raw
+endif
+
+ifneq (,$(filter lwip_conn_udp,$(USEMODULE)))
+  USEMODULE += lwip_udp
+endif
+
+ifneq (,$(filter lwip_%,$(USEMODULE)))
+  USEMODULE += lwip
+endif
+
+ifneq (,$(filter lwip,$(USEMODULE)))
+  USEPKG += lwip
+  USEMODULE += lwip_api
+  USEMODULE += lwip_contrib
+  USEMODULE += lwip_core
+  USEMODULE += lwip_netif
+  ifeq (,$(filter lwip_ipv4 lwip_ipv6,$(USEMODULE)))
+    USEMODULE += lwip_ipv4
+  endif
+  ifeq (,$(filter lwip_tcp lwip_udp lwip_udplite,$(USEMODULE)))
+    USEMODULE += lwip_raw
+  endif
+endif
+
+ifneq (,$(filter lwip_ppp,$(USEMODULE)))
+  USEMODULE += lwip_polarssl
+endif
+
+ifneq (,$(filter lwip_contrib,$(USEMODULE)))
+  USEMODULE += sema
 endif
 
 ifneq (,$(filter sema,$(USEMODULE)))

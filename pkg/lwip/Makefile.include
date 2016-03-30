@@ -1,0 +1,18 @@
+INCLUDES += -I$(RIOTBASE)/pkg/lwip/include \
+            -I$(BINDIRBASE)/pkg/$(BOARD)/lwip/src/include
+
+ifneq (,$(filter lwip_conn,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib/conn
+endif
+ifneq (,$(filter lwip_conn_ip,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib/conn/ip
+endif
+ifneq (,$(filter lwip_conn_udp,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib/conn/udp
+endif
+ifneq (,$(filter lwip_contrib,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib
+endif
+ifneq (,$(filter lwip_netdev2,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib/netdev2
+endif
