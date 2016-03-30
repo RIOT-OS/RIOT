@@ -54,8 +54,8 @@ void auto_init_ethos(void)
     ethos_params_t p;
     p.uart      = ETHOS_UART;
     p.baudrate  = ETHOS_BAUDRATE;
-    p.buffer    = _inbuf;
-    b.bufsize   = sizeof(_inbuf);
+    p.buf       = _inbuf;
+    p.bufsize   = sizeof(_inbuf);
     ethos_setup(&ethos, &p);
 
     /* initialize netdev2<->gnrc adapter state */
