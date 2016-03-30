@@ -439,6 +439,10 @@ size_t cbor_deserialize_int(const cbor_stream_t *stream, size_t offset, int *val
     uint64_t buf;
     size_t read_bytes = decode_int(stream, offset, &buf);
 
+    if (!read_bytes) {
+        return 0;
+    }
+
     if (CBOR_TYPE(stream, offset) == CBOR_UINT) {
         *val = buf; /* resolve as CBOR_UINT */
     }
