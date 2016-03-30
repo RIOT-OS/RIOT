@@ -21,17 +21,16 @@ ifeq (,$(SLIP_BAUDRATE))
   SLIP_BAUDRATE=115200
 endif
 
+#
 GNRC_NETIF_NUMOF := 2
-INCLUDES += -I$(CURDIR)
-CFLAGS += -DSLIP_UART=$(SLIP_UART)
-CFLAGS += -DSLIP_BAUDRATE=$(SLIP_BAUDRATE)
+USEMODULE += ethos gnrc_netdev2
+CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=115200 -DUSE_ETHOS_FOR_STDIO
+FEATURES_REQUIRED += periph_uart
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
-# Include SLIP package for IP over Serial communication
-USEMODULE += gnrc_slip
 # Specify the mandatory networking modules for 6LoWPAN border router
 USEMODULE += gnrc_sixlowpan_border_router_default
 # Add forwarding table
@@ -42,6 +41,9 @@ USEMODULE += gnrc_icmpv6_echo
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
+
+# include UHCP client
+USEMODULE += gnrc_uhcpc
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
