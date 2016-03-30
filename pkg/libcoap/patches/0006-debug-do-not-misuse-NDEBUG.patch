@@ -1,0 +1,263 @@
+From ca876797dbe6ba05f75a451e8724495a0770fe86 Mon Sep 17 00:00:00 2001
+From: Oleg Hahm <oleg@hobbykeller.org>
+Date: Thu, 23 Jul 2015 10:20:38 +0200
+Subject: [PATCH 6/9] debug: do not misuse NDEBUG
+
+---
+ coap_list.c       |  2 +-
+ debug.c           |  4 ++--
+ debug.h           |  3 +++
+ encode.c          |  2 +-
+ examples/client.c |  4 ++--
+ net.c             | 12 ++++++------
+ pdu.c             |  2 +-
+ resource.c        |  2 +-
+ str.c             |  2 +-
+ subscribe.c       | 14 +++++++-------
+ 10 files changed, 25 insertions(+), 22 deletions(-)
+
+diff --git a/coap_list.c b/coap_list.c
+index e93003c..95da094 100644
+--- a/coap_list.c
++++ b/coap_list.c
+@@ -74,7 +74,7 @@ coap_list_t *
+ coap_new_listnode(void *data, void (*delete_func)(void *) ) {
+   coap_list_t *node = coap_malloc( sizeof(coap_list_t) );
+   if ( ! node ) {
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+     coap_log(LOG_CRIT, "coap_new_listnode: malloc\n");
+ #endif
+     return NULL;
+diff --git a/debug.c b/debug.c
+index adff3c2..e043225 100644
+--- a/debug.c
++++ b/debug.c
+@@ -86,7 +86,7 @@ print_timestamp(char *s, size_t len, coap_tick_t t) {
+
+ #endif /* HAVE_TIME_H */
+
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+
+ #ifndef HAVE_STRNLEN
+ /**
+@@ -326,7 +326,7 @@ coap_show_pdu(const coap_pdu_t *pdu) {
+ }
+ #endif /* WITH_CONTIKI */
+
+-#endif /* NDEBUG */
++#endif /* DEBUG_ENABLED */
+
+ #ifndef WITH_CONTIKI
+ void
+diff --git a/debug.h b/debug.h
+index d18558f..edf4b86 100644
+--- a/debug.h
++++ b/debug.h
+@@ -54,7 +54,10 @@ void coap_log_impl(coap_log_t level, const char *format, ...);
+ #endif
+
+ #ifndef NDEBUG
++#define DEBUG_ENABLED
++#endif
+
++#ifdef DEBUG_ENABLED
+ /* A set of convenience macros for common log levels. */
+ #define info(...) coap_log(LOG_INFO, __VA_ARGS__)
+ #define warn(...) coap_log(LOG_WARNING, __VA_ARGS__)
+diff --git a/encode.c b/encode.c
+index b034b6b..cdd9a20 100644
+--- a/encode.c
++++ b/encode.c
+@@ -6,7 +6,7 @@
+  * README for terms of use.
+  */
+
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+ #  include <stdio.h>
+ #endif
+
+diff --git a/examples/client.c b/examples/client.c
+index bd75deb..7872c35 100644
+--- a/examples/client.c
++++ b/examples/client.c
+@@ -282,7 +282,7 @@ message_handler(struct coap_context_t  *ctx,
+   unsigned char *databuf;
+   coap_tid_t tid;
+
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+   if (LOG_DEBUG <= coap_get_log_level()) {
+     debug("** process incoming %d.%02d response:\n",
+     (received->hdr->code >> 5), received->hdr->code & 0x1F);
+@@ -1075,7 +1075,7 @@ main(int argc, char **argv) {
+   if (! (pdu = coap_new_request(ctx, method, optlist)))
+     return -1;
+
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+   if (LOG_DEBUG <= coap_get_log_level()) {
+     debug("sending CoAP request:\n");
+     coap_show_pdu(pdu);
+diff --git a/net.c b/net.c
+index 7338802..9372570 100644
+--- a/net.c
++++ b/net.c
+@@ -243,7 +243,7 @@ coap_new_node() {
+   node = coap_malloc_node();
+
+   if ( ! node ) {
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+     coap_log(LOG_WARNING, "coap_new_node: malloc\n");
+ #endif
+     return NULL;
+@@ -327,7 +327,7 @@ coap_new_context(
+
+ #ifndef WITH_CONTIKI
+   if ( !c ) {
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+     coap_log(LOG_EMERG, "coap_init: malloc:\n");
+ #endif
+     return NULL;
+@@ -362,20 +362,20 @@ coap_new_context(
+ #ifdef WITH_POSIX
+   c->sockfd = socket(listen_addr->addr.sa.sa_family, SOCK_DGRAM, 0);
+   if ( c->sockfd < 0 ) {
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+     coap_log(LOG_EMERG, "coap_new_context: socket\n");
+ #endif /* WITH_POSIX */
+     goto onerror;
+   }
+
+   if ( setsockopt( c->sockfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse) ) < 0 ) {
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+     coap_log(LOG_WARNING, "setsockopt SO_REUSEADDR\n");
+ #endif
+   }
+
+   if (bind(c->sockfd, &listen_addr->addr.sa, listen_addr->size) < 0) {
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+     coap_log(LOG_EMERG, "coap_new_context: bind\n");
+ #endif
+     goto onerror;
+@@ -923,7 +923,7 @@ if (!coap_pdu_parse((unsigned char *)buf, bytes_read, node->pdu)) {
+   coap_transaction_id(&node->remote, node->pdu, &node->id);
+   coap_insert_node(&ctx->recvqueue, node);
+
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+   if (LOG_DEBUG <= coap_get_log_level()) {
+ #ifndef INET6_ADDRSTRLEN
+ #define INET6_ADDRSTRLEN 40
+diff --git a/pdu.c b/pdu.c
+index 04ef9c6..05d8537 100644
+--- a/pdu.c
++++ b/pdu.c
+@@ -132,7 +132,7 @@ coap_new_pdu() {
+   pdu = coap_pdu_init(0, 0, uip_ntohs(COAP_INVALID_TID), COAP_MAX_PDU_SIZE);
+ #endif /* WITH_CONTIKI */
+
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+   if (!pdu)
+     coap_log(LOG_CRIT, "coap_new_pdu: cannot allocate memory for new PDU\n");
+ #endif
+diff --git a/resource.c b/resource.c
+index 1d9cf34..101ea4d 100644
+--- a/resource.c
++++ b/resource.c
+@@ -821,4 +821,4 @@ coap_remove_failed_observers(coap_context_t *context,
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+   if (LOG_DEBUG <= coap_get_log_level()) {
+ #ifndef INET6_ADDRSTRLEN
+ #define INET6_ADDRSTRLEN 40
+diff --git a/str.c b/str.c
+index 0956789..f997ced 100644
+--- a/str.c
++++ b/str.c
+@@ -17,7 +17,7 @@
+ str *coap_new_string(size_t size) {
+   str *s = coap_malloc(sizeof(str) + size + 1);
+   if ( !s ) {
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+     coap_log(LOG_CRIT, "coap_new_string: malloc\n");
+ #endif
+     return NULL;
+diff --git a/subscribe.c b/subscribe.c
+index d683419..37d4e20 100644
+--- a/subscribe.c
++++ b/subscribe.c
+@@ -43,7 +43,7 @@ notify(coap_context_t *context, coap_resource_t *res,
+   int ls, finished=0;
+   unsigned char ct, d;
+   unsigned int length;
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+   char addr[INET6_ADDRSTRLEN];
+ #endif
+
+@@ -90,7 +90,7 @@ notify(coap_context_t *context, coap_resource_t *res,
+     /* TODO: add mediatype */
+   }
+
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+   if ( inet_ntop(sub->subscriber.addr.sa.sa_family,
+     &sub->subscriber.addr, addr, sizeof(addr)) ) {
+     debug("*** notify for %s to [%s]\n", res->uri->path.s, addr);
+@@ -100,7 +100,7 @@ notify(coap_context_t *context, coap_resource_t *res,
+       &sub->subscriber.addr.sa,
+       sub->subscriber.size, pdu)
+       == COAP_INVALID_TID) {
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+     debug("coap_check_resource_list: error sending notification\n");
+ #endif
+     coap_delete_pdu(pdu);
+@@ -164,7 +164,7 @@ coap_get_resource_from_key(coap_context_t *ctx, coap_key_t key) {
+
+ coap_resource_t *
+ coap_get_resource(coap_context_t *ctx, coap_uri_t *uri) {
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+   int i;
+   printf("search resource %ux", coap_uri_hash(uri));
+   for (i=0; i < uri->path.length; ++i) {
+@@ -180,7 +180,7 @@ void
+ coap_check_subscriptions(coap_context_t *context) {
+   time_t now;
+   coap_list_t *node;
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+   char addr[INET6_ADDRSTRLEN];
+ #endif
+
+@@ -191,7 +191,7 @@ coap_check_subscriptions(coap_context_t *context) {
+
+   node = context->subscriptions;
+   while ( node && COAP_SUBSCRIPTION(node)->expires < now ) {
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+     if (inet_ntop(COAP_SUBSCRIPTION(node)->subscriber.addr.sa.sa_family,
+      &COAP_SUBSCRIPTION(node)->subscriber.addr,
+      addr, sizeof(addr))) {
+@@ -236,7 +236,7 @@ coap_delete_resource(coap_context_t *context, coap_key_t key) {
+   for (prev = NULL, node = context->resources; node;
+        prev = node, node = node->next) {
+     if (coap_uri_hash(COAP_RESOURCE(node)->uri) == key) {
+-#ifndef NDEBUG
++#ifdef DEBUG_ENABLED
+       debug("removed key %lu (%s)\n",key,COAP_RESOURCE(node)->uri->path.s);
+ #endif
+       if (!prev)
+--
+2.5.0

@@ -1,0 +1,44 @@
+From 8395cf4c5753569ed964794ab98ba2fcb8af250b Mon Sep 17 00:00:00 2001
+From: Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
+Date: Wed, 29 Oct 2014 11:37:05 +0100
+Subject: [PATCH 07/10] Use RIOT's container_of implementation
+
+---
+ src-api/common/container_of.h | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/src-api/common/container_of.h b/src-api/common/container_of.h
+index fcb38fe..b49d836 100644
+--- a/src-api/common/container_of.h
++++ b/src-api/common/container_of.h
+@@ -59,10 +59,24 @@
+  * @return pointer to surrounding struct
+  */
+ #ifndef container_of
+-#define container_of(ptr, type, member) ({ \
+-    const typeof(((type *)0)->member ) *__tempptr = (ptr); \
+-    (type *)((char *)__tempptr - offsetof(type,member)); \
+-  })
++#if __STDC_VERSION__ >= 201112L
++#   define container_of(PTR, TYPE, MEMBER) \
++        (_Generic((PTR), \
++            const __typeof__ (((TYPE *) 0)->MEMBER) *: \
++                ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER))), \
++            __typeof__ (((TYPE *) 0)->MEMBER) *: \
++                ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER))) \
++        ))
++#elif defined __GNUC__
++#   define container_of(PTR, TYPE, MEMBER) \
++        (__extension__ ({ \
++            __extension__ const __typeof__ (((TYPE *) 0)->MEMBER) *__m____ = (PTR); \
++            ((TYPE *) ((char *) __m____ - offsetof(TYPE, MEMBER))); \
++        }))
++#else
++#   define container_of(PTR, TYPE, MEMBER) \
++        ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER)))
++#endif
+ #endif
+
+ /**
+--
+1.9.1

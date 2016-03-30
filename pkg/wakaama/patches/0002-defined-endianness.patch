@@ -1,0 +1,28 @@
+From 1d2282a5bf10f8e0bed285da028dd42354b5851d Mon Sep 17 00:00:00 2001
+From: Darredevil <alex.darredevil@gmail.com>
+Date: Thu, 13 Aug 2015 15:18:50 +0100
+Subject: [PATCH 2/6] defined endianness
+
+---
+ core/tlv.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/core/tlv.c b/core/tlv.c
+index 0586f3d..08c66f1 100644
+--- a/core/tlv.c
++++ b/core/tlv.c
+@@ -24,6 +24,12 @@
+ #include <inttypes.h>
+ #include <float.h>
+
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++#define LWM2M_LITTLE_ENDIAN
++#else
++#define LWM2M_BIG_ENDIAN
++#endif
++
+ #ifndef LWM2M_BIG_ENDIAN
+ #ifndef LWM2M_LITTLE_ENDIAN
+ #error Please define LWM2M_BIG_ENDIAN or LWM2M_LITTLE_ENDIAN
+--
+1.9.1

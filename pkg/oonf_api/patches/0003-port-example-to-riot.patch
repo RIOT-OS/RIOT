@@ -1,0 +1,46 @@
+From 1eb568357ba8e0679ad8d9a4cc3be0ad54cfc955 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benpicco@zedat.fu-berlin.de>
+Date: Tue, 1 Oct 2013 17:39:03 +0200
+Subject: [PATCH 03/10] port example to riot
+
+---
+ examples/rfc5444_reader_writer/Makefile | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+ create mode 100644 examples/rfc5444_reader_writer/Makefile
+
+diff --git a/examples/rfc5444_reader_writer/Makefile b/examples/rfc5444_reader_writer/Makefile
+new file mode 100644
+index 0000000..9d5653d
+--- /dev/null
++++ b/examples/rfc5444_reader_writer/Makefile
+@@ -0,0 +1,28 @@
++####
++#### Sample Makefile for building apps with the RIOT OS
++####
++#### The Sample Filesystem Layout is:
++#### /this makefile
++#### ../../RIOT
++####
++
++# name of your project
++export APPLICATION := $(shell basename $(CURDIR))
++
++# for easy switching of boards
++export BOARD ?= native
++
++# this has to be the absolute path of the RIOT-base dir
++export RIOTBASE =$(CURDIR)/../../../../..
++
++export CFLAGS = -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
++
++## Modules to include.
++
++USEMODULE += oonf_rfc5444
++
++INCLUDES += -I$(CURDIR)/..
++
++QUIET ?= 1
++
++include $(RIOTBASE)/Makefile.include
+--
+1.9.1

@@ -1,0 +1,33 @@
+From ed834183706e55f505d52299c434ef948d7fe22f Mon Sep 17 00:00:00 2001
+From: Darredevil <alex.darredevil@gmail.com>
+Date: Tue, 18 Aug 2015 11:43:15 +0100
+Subject: [PATCH 1/4] fixed warnings in bootstrap.c
+
+---
+ core/bootstrap.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/core/bootstrap.c b/core/bootstrap.c
+index 2bd6d82..282bc11 100644
+--- a/core/bootstrap.c
++++ b/core/bootstrap.c
+@@ -97,6 +97,8 @@ void handle_bootstrap_response(lwm2m_context_t * context,
+         coap_packet_t * message,
+         void * fromSessionH)
+ {
++    (void)fromSessionH;
++
+     if (COAP_204_CHANGED == message->code)
+     {
+         context->bsState = BOOTSTRAP_PENDING;
+@@ -221,6 +223,8 @@ void update_bootstrap_state(lwm2m_context_t * context,
+ coap_status_t handle_bootstrap_finish(lwm2m_context_t * context,
+                                       void * fromSessionH)
+ {
++    (void)fromSessionH;
++
+     if (context->bsState == BOOTSTRAP_PENDING)
+     {
+         context->bsState = BOOTSTRAP_FINISHED;
+--
+1.9.1

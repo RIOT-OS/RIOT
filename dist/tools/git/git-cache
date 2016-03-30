@@ -1,0 +1,121 @@
+#!/bin/sh
+
+git_cache() {
+    git -C "${GIT_CACHE_DIR}" $*
+}
+
+init() {
+    set -ex
+    test -d "${GIT_CACHE_DIR}/.git" || {
+        mkdir -p "${GIT_CACHE_DIR}"
+
+        git_cache init --bare
+        git_cache config core.compression 1
+    }
+    set +ex
+}
+
+add() {
+    set -ex
+    git_cache remote add $1 $2
+    set +ex
+}
+
+update() {
+    set -ex
+    local REMOTE=${1:---all}
+    git_cache fetch $REMOTE
+    set +ex
+}
+
+list() {
+    local REMOTES="$(git_cache remote show)"
+    for remote in $REMOTES; do
+        echo "${remote}: $(git_cache remote get-url $remote)"
+    done
+}
+
+drop() {
+    set -ex
+    local REMOTE=${1}
+    [ -z "$REMOTE" ] && {
+        echo "usage: git cache drop <name>"
+        exit 1
+    }
+    git_cache remote remove $REMOTE
+    set +ex
+}
+
+_check_commit() {
+    git_cache cat-file -e ${1}^{commit}
+}
+
+clone() {
+    set -ex
+    local REMOTE="${1}"
+    local SHA1="${2}"
+    local REMOTE_NAME="$(basename $REMOTE)"
+    local TARGET_PATH="${3:-${REMOTE_NAME}}"
+
+    if _check_commit $2 2>&1; then
+        git init "${TARGET_PATH}"
+        git_cache tag commit$SHA1 $SHA1 || true # ignore possibly already existing tag
+        git -C "${TARGET_PATH}" fetch --depth=1 "${GIT_CACHE_DIR}" refs/tags/commit$SHA1
+        git -C "${TARGET_PATH}" checkout FETCH_HEAD
+    else
+        git clone "${REMOTE}" "${TARGET_PATH}"
+        git -C "${TARGET_PATH}" checkout $SHA1
+    fi
+    set +ex
+}
+
+usage() {
+    echo "git cache uses a bare git repository containing all objects from multiple"
+    echo "upstream git repositories."
+    echo ""
+    echo "usage:"
+    echo ""
+    echo "    git cache init                initialize git cache"
+    echo "    git cache add <name> <url>    add repository <url> with name <name>"
+    echo "    git cache list                list cached repositories"
+    echo "    git cache drop <name>         drop repo from cache"
+    echo "    git cache update [<name>]     fetch repo named <name> (or all)"
+    echo "    git cache clone <url> <SHA1>  clone repository <url> from cache"
+    echo "    git cache show-path           print's the path that can be used as "
+    echo "                                  '--reference' parameter"
+    echo ""
+    echo "To retrieve objects from cache (will use remote repository if needed):"
+    echo '    git clone --reference $(git cache show-path) <repo>'
+}
+
+ACTION=$1
+shift
+
+export GIT_CACHE_DIR=${GIT_CACHE_DIR:-${HOME}/.gitcache}
+
+case $ACTION in
+    init)
+        init $*
+        ;;
+    add)
+        add $*
+        ;;
+    update)
+        update $*
+        ;;
+    list)
+        list $*
+        ;;
+    drop)
+        drop $*
+        ;;
+    show-path)
+        echo ${GIT_CACHE_DIR}
+        ;;
+    clone)
+        clone $*
+        ;;
+    *)
+        usage
+        ;;
+esac

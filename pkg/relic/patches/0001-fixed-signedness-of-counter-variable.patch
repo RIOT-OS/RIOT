@@ -1,0 +1,26 @@
+From 96f92673ac7b719f745958738e6652491bff2c3b Mon Sep 17 00:00:00 2001
+From: Oleg Hahm <oleg@hobbykeller.org>
+Date: Sat, 28 Nov 2015 16:01:18 +0100
+Subject: fixed signedness of counter variable
+
+---
+ src/cp/relic_cp_bdpe.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/cp/relic_cp_bdpe.c b/src/cp/relic_cp_bdpe.c
+index c63621c..0a253a5 100644
+--- a/src/cp/relic_cp_bdpe.c
++++ b/src/cp/relic_cp_bdpe.c
+@@ -160,7 +160,8 @@ int cp_bdpe_enc(uint8_t *out, int *out_len, dig_t in, bdpe_t pub) {
+ 
+ int cp_bdpe_dec(dig_t *out, uint8_t *in, int in_len, bdpe_t prv) {
+ 	bn_t m, t, z;
+-	int i, size, result = STS_OK;
++	unsigned i;
++	int size, result = STS_OK;
+ 
+ 	size = bn_size_bin(prv->n);
+ 
+-- 
+2.6.2
+

@@ -1,0 +1,318 @@
+From 8976fda8df092ce24e1c6bbf718f94cb98009231 Mon Sep 17 00:00:00 2001
+From: Martine Lenders <mail@martine-lenders.eu>
+Date: Sun, 1 Feb 2015 16:35:56 +0100
+Subject: [PATCH 1/2] Remove unneeded *.c files
+
+---
+ endpoints.c   | 113 ----------------------------------------------------------
+ main-posix.c  |  71 ------------------------------------
+ microcoap.ino |  99 --------------------------------------------------
+ 3 files changed, 283 deletions(-)
+ delete mode 100644 endpoints.c
+ delete mode 100644 main-posix.c
+ delete mode 100644 microcoap.ino
+
+diff --git a/endpoints.c b/endpoints.c
+deleted file mode 100644
+index ccc961b..0000000
+--- a/endpoints.c
++++ /dev/null
+@@ -1,113 +0,0 @@
+-#include <stdbool.h>
+-#include <string.h>
+-#include "coap.h"
+-
+-static char light = '0';
+-
+-const uint16_t rsplen = 1500;
+-static char rsp[1500] = "";
+-void build_rsp(void);
+-
+-#ifdef ARDUINO
+-#include "Arduino.h"
+-static int led = 6;
+-void endpoint_setup(void)
+-{                
+-    pinMode(led, OUTPUT);     
+-    build_rsp();
+-}
+-#else
+-#include <stdio.h>
+-void endpoint_setup(void)
+-{
+-    build_rsp();
+-}
+-#endif
+-
+-static const coap_endpoint_path_t path_well_known_core = {2, {".well-known", "core"}};
+-static int handle_get_well_known_core(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
+-{
+-    return coap_make_response(scratch, outpkt, (const uint8_t *)rsp, strlen(rsp), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_APPLICATION_LINKFORMAT);
+-}
+-
+-static const coap_endpoint_path_t path_light = {1, {"light"}};
+-static int handle_get_light(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
+-{
+-    return coap_make_response(scratch, outpkt, (const uint8_t *)&light, 1, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
+-}
+-
+-static int handle_put_light(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
+-{
+-    if (inpkt->payload.len == 0)
+-        return coap_make_response(scratch, outpkt, NULL, 0, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_BAD_REQUEST, COAP_CONTENTTYPE_TEXT_PLAIN);
+-    if (inpkt->payload.p[0] == '1')
+-    {
+-        light = '1';
+-#ifdef ARDUINO
+-        digitalWrite(led, HIGH);
+-#else
+-        printf("ON\n");
+-#endif
+-        return coap_make_response(scratch, outpkt, (const uint8_t *)&light, 1, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CHANGED, COAP_CONTENTTYPE_TEXT_PLAIN);
+-    }
+-    else
+-    {
+-        light = '0';
+-#ifdef ARDUINO
+-        digitalWrite(led, LOW);
+-#else
+-        printf("OFF\n");
+-#endif
+-        return coap_make_response(scratch, outpkt, (const uint8_t *)&light, 1, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CHANGED, COAP_CONTENTTYPE_TEXT_PLAIN);
+-    }
+-}
+-
+-const coap_endpoint_t endpoints[] =
+-{
+-    {COAP_METHOD_GET, handle_get_well_known_core, &path_well_known_core, "ct=40"},
+-    {COAP_METHOD_GET, handle_get_light, &path_light, "ct=0"},
+-    {COAP_METHOD_PUT, handle_put_light, &path_light, NULL},
+-    {(coap_method_t)0, NULL, NULL, NULL}
+-};
+-
+-void build_rsp(void)
+-{
+-    uint16_t len = rsplen;
+-    const coap_endpoint_t *ep = endpoints;
+-    int i;
+-
+-    len--; // Null-terminated string
+-
+-    while(NULL != ep->handler)
+-    {
+-        if (NULL == ep->core_attr) {
+-            ep++;
+-            continue;
+-        }
+-
+-        if (0 < strlen(rsp)) {
+-            strncat(rsp, ",", len);
+-            len--;
+-        }
+-
+-        strncat(rsp, "<", len);
+-        len--;
+-
+-        for (i = 0; i < ep->path->count; i++) {
+-            strncat(rsp, "/", len);
+-            len--;
+-
+-            strncat(rsp, ep->path->elems[i], len);
+-            len -= strlen(ep->path->elems[i]);
+-        }
+-
+-        strncat(rsp, ">;", len);
+-        len -= 2;
+-
+-        strncat(rsp, ep->core_attr, len);
+-        len -= strlen(ep->core_attr);
+-
+-        ep++;
+-    }
+-}
+-
+diff --git a/main-posix.c b/main-posix.c
+deleted file mode 100644
+index dd73cf9..0000000
+--- a/main-posix.c
++++ /dev/null
+@@ -1,71 +0,0 @@
+-#include <sys/socket.h>
+-#include <netinet/in.h>
+-#include <stdio.h>
+-#include <stdbool.h>
+-#include <strings.h>
+-
+-#include "coap.h"
+-
+-#define PORT 5683
+-
+-int main(int argc, char **argv)
+-{
+-    int fd;
+-    struct sockaddr_in servaddr, cliaddr;
+-    uint8_t buf[4096];
+-    uint8_t scratch_raw[4096];
+-    coap_rw_buffer_t scratch_buf = {scratch_raw, sizeof(scratch_raw)};
+-
+-    fd = socket(AF_INET,SOCK_DGRAM,0);
+-
+-    bzero(&servaddr,sizeof(servaddr));
+-    servaddr.sin_family = AF_INET;
+-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+-    servaddr.sin_port = htons(PORT);
+-    bind(fd,(struct sockaddr *)&servaddr, sizeof(servaddr));
+-
+-    endpoint_setup();
+-
+-    while(1)
+-    {
+-        int n, rc;
+-        socklen_t len = sizeof(cliaddr);
+-        coap_packet_t pkt;
+-
+-        n = recvfrom(fd, buf, sizeof(buf), 0, (struct sockaddr *)&cliaddr, &len);
+-#ifdef DEBUG
+-        printf("Received: ");
+-        coap_dump(buf, n, true);
+-        printf("\n");
+-#endif
+-
+-        if (0 != (rc = coap_parse(&pkt, buf, n)))
+-            printf("Bad packet rc=%d\n", rc);
+-        else
+-        {
+-            size_t rsplen = sizeof(buf);
+-            coap_packet_t rsppkt;
+-#ifdef DEBUG
+-            coap_dumpPacket(&pkt);
+-#endif
+-            coap_handle_req(&scratch_buf, &pkt, &rsppkt);
+-
+-            if (0 != (rc = coap_build(buf, &rsplen, &rsppkt)))
+-                printf("coap_build failed rc=%d\n", rc);
+-            else
+-            {
+-#ifdef DEBUG
+-                printf("Sending: ");
+-                coap_dump(buf, rsplen, true);
+-                printf("\n");
+-#endif
+-#ifdef DEBUG
+-                coap_dumpPacket(&rsppkt);
+-#endif
+-
+-                sendto(fd, buf, rsplen, 0, (struct sockaddr *)&cliaddr, sizeof(cliaddr));
+-            }
+-        }
+-    }
+-}
+-
+diff --git a/microcoap.ino b/microcoap.ino
+deleted file mode 100644
+index 148b6ce..0000000
+--- a/microcoap.ino
++++ /dev/null
+@@ -1,99 +0,0 @@
+-/*
+-* WARNING - UDP_TX_PACKET_MAX_SIZE is hardcoded by Arduino to 24 bytes
+-* This limits the size of possible outbound UDP packets
+-*/
+-
+-#include <SPI.h>
+-#include <Ethernet.h>
+-#include <stdint.h>
+-#include <EthernetUdp.h>
+-#include "coap.h"
+-
+-#define PORT 5683
+-static uint8_t mac[] = {0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02};
+-
+-EthernetClient client;
+-EthernetUDP udp;
+-uint8_t packetbuf[256];
+-static uint8_t scratch_raw[32];
+-static coap_rw_buffer_t scratch_buf = {scratch_raw, sizeof(scratch_raw)};
+-
+-void setup()
+-{
+-    int i;
+-    Serial.begin(9600);
+-    while (!Serial) 
+-    {
+-        ; // wait for serial port to connect. Needed for Leonardo only
+-    }
+-
+-    // start the Ethernet connection:
+-    if (Ethernet.begin(mac) == 0)
+-    {
+-        Serial.println("Failed to configure Ethernet using DHCP");
+-        while(1);
+-    }
+-    Serial.print("My IP address: ");
+-    for (i=0;i<4;i++)
+-    {
+-        Serial.print(Ethernet.localIP()[i], DEC);
+-        Serial.print("."); 
+-    }
+-    Serial.println();
+-    udp.begin(PORT);
+-
+-    coap_setup();
+-    endpoint_setup();
+-}
+-
+-void udp_send(const uint8_t *buf, int buflen)
+-{
+-    udp.beginPacket(udp.remoteIP(), udp.remotePort());
+-    while(buflen--)
+-        udp.write(*buf++);
+-    udp.endPacket();
+-}
+-
+-void loop()
+-{
+-    int sz;
+-    int rc;
+-    coap_packet_t pkt;
+-    int i;
+-    
+-    if ((sz = udp.parsePacket()) > 0)
+-    {
+-        udp.read(packetbuf, sizeof(packetbuf));
+-
+-        for (i=0;i<sz;i++)
+-        {
+-            Serial.print(packetbuf[i], HEX);
+-            Serial.print(" ");
+-        }
+-        Serial.println("");
+-
+-        if (0 != (rc = coap_parse(&pkt, packetbuf, sz)))
+-        {
+-            Serial.print("Bad packet rc=");
+-            Serial.println(rc, DEC);
+-        }
+-        else
+-        {
+-            size_t rsplen = sizeof(packetbuf);
+-            coap_packet_t rsppkt;
+-            coap_handle_req(&scratch_buf, &pkt, &rsppkt);
+-
+-            memset(packetbuf, 0, UDP_TX_PACKET_MAX_SIZE);
+-            if (0 != (rc = coap_build(packetbuf, &rsplen, &rsppkt)))
+-            {
+-                Serial.print("coap_build failed rc=");
+-                Serial.println(rc, DEC);
+-            }
+-            else
+-            {
+-                udp_send(packetbuf, rsplen);
+-            }
+-        }
+-    }
+-}
+-
+-- 
+1.9.1
+

@@ -1,0 +1,24 @@
+From eef1038b2f96c6e83fad3a2b7beaa0439190d8a6 Mon Sep 17 00:00:00 2001
+From: Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
+Date: Wed, 29 Oct 2014 12:13:27 +0100
+Subject: [PATCH 10/10] Change index of array from 0 to 1
+
+---
+ src-api/common/template.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src-api/common/template.h b/src-api/common/template.h
+index d98fe77..7ca75a8 100644
+--- a/src-api/common/template.h
++++ b/src-api/common/template.h
+@@ -64,7 +64,7 @@ struct abuf_template_storage_entry {
+
+ struct abuf_template_storage {
+   size_t count;
+-  struct abuf_template_storage_entry indices[0];
++  struct abuf_template_storage_entry indices[1];
+ };
+
+ EXPORT struct abuf_template_storage *abuf_template_init (
+--
+1.9.1

@@ -1,0 +1,41 @@
+From d2cb5acad29db4c98af1a965a9c0d0ce67729984 Mon Sep 17 00:00:00 2001
+From: Mathias Tausig <mathias.tausig@fh-campuswien.ac.at>
+Date: Mon, 7 Mar 2016 17:20:49 +0100
+Subject: [PATCH 2/3] Include RIOT Hardware RNG interface
+
+---
+ uECC.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/uECC.c b/uECC.c
+index f65fe37..662d899 100644
+--- a/uECC.c
++++ b/uECC.c
+@@ -2,6 +2,7 @@
+ 
+ #include "uECC.h"
+ #include "uECC_vli.h"
++#include "periph/hwrng.h"
+ 
+ #ifndef uECC_RNG_MAX_TRIES
+     #define uECC_RNG_MAX_TRIES 64
+@@ -170,10 +171,15 @@ static cmpresult_t uECC_vli_cmp_unsafe(const uECC_word_t *left,
+     #include "asm_avr.inc"
+ #endif
+ 
++int riot_hwrng(uint8_t *dest, unsigned size) {
++  hwrng_read(dest, size);
++  return 1;
++}
++
+ #if default_RNG_defined
+ static uECC_RNG_Function g_rng_function = &default_RNG;
+ #else
+-static uECC_RNG_Function g_rng_function = 0;
++static uECC_RNG_Function g_rng_function = &riot_hwrng;
+ #endif
+ 
+ void uECC_set_rng(uECC_RNG_Function rng_function) {
+-- 
+2.5.0
+

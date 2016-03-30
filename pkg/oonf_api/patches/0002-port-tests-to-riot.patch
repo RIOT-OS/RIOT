@@ -1,0 +1,174 @@
+From ccb37ece1a21325bbc1f3efba7d3f0ec0d6b26ac Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benpicco@zedat.fu-berlin.de>
+Date: Tue, 23 Jul 2013 21:08:31 +0200
+Subject: [PATCH 02/10] port tests to riot
+
+---
+ tests/common/.Makefile.template     | 37 +++++++++++++++++++++++++++++++++++++
+ tests/common/bin/.gitignore         |  0
+ tests/common/generate_makefiles.sh  |  8 ++++++++
+ tests/common/test_common_avl.c      | 10 +++++-----
+ tests/cunit/Makefile                |  3 +++
+ tests/rfc5444/.Makefile.template    | 30 ++++++++++++++++++++++++++++++
+ tests/rfc5444/bin/.gitignore        |  0
+ tests/rfc5444/generate_makefiles.sh |  8 ++++++++
+ 8 files changed, 91 insertions(+), 5 deletions(-)
+ create mode 100644 tests/common/.Makefile.template
+ create mode 100644 tests/common/bin/.gitignore
+ create mode 100755 tests/common/generate_makefiles.sh
+ create mode 100644 tests/cunit/Makefile
+ create mode 100644 tests/rfc5444/.Makefile.template
+ create mode 100644 tests/rfc5444/bin/.gitignore
+ create mode 100755 tests/rfc5444/generate_makefiles.sh
+
+diff --git a/tests/common/.Makefile.template b/tests/common/.Makefile.template
+new file mode 100644
+index 0000000..afbaf0f
+--- /dev/null
++++ b/tests/common/.Makefile.template
+@@ -0,0 +1,37 @@
++####
++#### Sample Makefile for building apps with the RIOT OS
++####
++#### The Sample Filesystem Layout is:
++#### /this makefile
++#### ../../RIOT
++#### ../../boards   for board definitions (if you have one or more)
++####
++
++# name of your project
++export APPLICATION = %TESTNAME%
++
++# for easy switching of boards
++export BOARD ?= native
++
++# this has to be the absolute path of the RIOT-base dir
++export RIOTBASE =$(CURDIR)/../../../../../..
++
++export CFLAGS = -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
++
++## Modules to include.
++
++USEMODULE += oonf_cunit
++ifneq (,$(findstring regex,$(APPLICATION)))
++	USEMODULE += oonf_regex
++endif
++USEMODULE += oonf_common
++
++ifneq (,$(findstring daemonize,$(APPLICATION)))
++	error daemonize is not supported on RIOT
++endif
++
++export INCLUDES += -I$(CURDIR)/../..
++
++QUIET ?= 1
++
++include $(RIOTBASE)/Makefile.include
+diff --git a/tests/common/bin/.gitignore b/tests/common/bin/.gitignore
+new file mode 100644
+index 0000000..e69de29
+diff --git a/tests/common/generate_makefiles.sh b/tests/common/generate_makefiles.sh
+new file mode 100755
+index 0000000..8bf9faa
+--- /dev/null
++++ b/tests/common/generate_makefiles.sh
+@@ -0,0 +1,8 @@
++#!/bin/bash
++
++for file in *.c; do
++	test=$(basename $file .c)
++	mkdir -p $test
++	sed s/%TESTNAME%/$test/ .Makefile.template > $test/Makefile
++	cp $test\.c $test
++done
+diff --git a/tests/common/test_common_avl.c b/tests/common/test_common_avl.c
+index b5ee8c0..e4e5b26 100644
+--- a/tests/common/test_common_avl.c
++++ b/tests/common/test_common_avl.c
+@@ -816,17 +816,17 @@ static void random_delete(uint32_t *array, int count) {
+
+ /* insert/remove 1000's random numbers into tree and check if everything is okay */
+ static void test_random_insert(void) {
+-  uint32_t array[1000];
++  uint32_t array[100];
+   struct tree_element *e, *ptr;
+
+   srand(0);
+   START_TEST();
+   avl_init(&head, avl_comp_uint32, true);
+
+-  random_insert(array, 1000);
+-  random_delete(array, 500);
+-  random_insert(array, 400);
+-  random_delete(array, 600);
++  random_insert(array, 100);
++  random_delete(array, 50);
++  random_insert(array, 40);
++  random_delete(array, 60);
+
+   avl_remove_all_elements(&head, e, node, ptr) {
+     free(e);
+diff --git a/tests/cunit/Makefile b/tests/cunit/Makefile
+new file mode 100644
+index 0000000..5e0046d
+--- /dev/null
++++ b/tests/cunit/Makefile
+@@ -0,0 +1,3 @@
++MODULE:=oonf_$(shell basename $(CURDIR))
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/tests/rfc5444/.Makefile.template b/tests/rfc5444/.Makefile.template
+new file mode 100644
+index 0000000..e472545
+--- /dev/null
++++ b/tests/rfc5444/.Makefile.template
+@@ -0,0 +1,30 @@
++####
++#### Sample Makefile for building apps with the RIOT OS
++####
++#### The Sample Filesystem Layout is:
++#### /this makefile
++#### ../../RIOT
++#### ../../boards   for board definitions (if you have one or more)
++####
++
++# name of your project
++export APPLICATION = %TESTNAME%
++
++# for easy switching of boards
++export BOARD ?= native
++
++# this has to be the absolute path of the RIOT-base dir
++export RIOTBASE =$(CURDIR)/../../../../../..
++
++export CFLAGS = -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
++
++## Modules to include.
++USEMODULE += oonf_cunit
++USEMODULE += oonf_common
++USEMODULE += oonf_rfc5444
++
++export INCLUDES += -I$(CURDIR)/../..
++
++QUIET ?= 1
++
++include $(RIOTBASE)/Makefile.include
+diff --git a/tests/rfc5444/bin/.gitignore b/tests/rfc5444/bin/.gitignore
+new file mode 100644
+index 0000000..e69de29
+diff --git a/tests/rfc5444/generate_makefiles.sh b/tests/rfc5444/generate_makefiles.sh
+new file mode 100755
+index 0000000..8bf9faa
+--- /dev/null
++++ b/tests/rfc5444/generate_makefiles.sh
+@@ -0,0 +1,8 @@
++#!/bin/bash
++
++for file in *.c; do
++	test=$(basename $file .c)
++	mkdir -p $test
++	sed s/%TESTNAME%/$test/ .Makefile.template > $test/Makefile
++	cp $test\.c $test
++done
+--
+1.9.1
