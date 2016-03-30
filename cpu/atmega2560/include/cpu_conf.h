@@ -19,6 +19,7 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "atmega2560_regs.h"
 
 #ifdef __cplusplus
 extern "C" {
