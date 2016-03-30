@@ -28,6 +28,7 @@
 
 #define UDP_BUFFER_SIZE     (128) /** with respect to IEEE 802.15.4's MTU */
 #define RCV_MSG_Q_SIZE      (32)  /* TODO: check if smaller values work, too */
+#define FIB_MSG_Q_SIZE      (16)  /* TODO: check if smaller values work, too */
 #define AODVV2_PREFIX {{ 0xbe, 0xe2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }}
 
 static void _init_addresses(void);
@@ -134,15 +135,21 @@ void aodv_set_metric_type(aodvv2_metric_t metric_type)
  */
 void *fib_signal_handler_thread(void *arg)
 {
+    // TODO: warum wird der erst gestartet wenn ifconfig aufgerufen wird?
     (void) arg;
+    msg_t fib_msgq[FIB_MSG_Q_SIZE];
     ipv6_addr_t dest;
     struct netaddr na_dest;
+
+    msg_init_queue(fib_msgq, FIB_MSG_Q_SIZE);
 
     int err = fib_register_rp(&gnrc_ipv6_fib_table, &aodvv2_prefix.u8[0], aodvv2_address_type_size);
     if ( err != 0) {
         DEBUG("ERROR: cannot register at fib, error code:\n");
         exit(1);
     }
+
+    printf("my pid is: %d\n", sched_active_pid);
 
     while (true) {
         msg_t msg;
@@ -320,8 +327,8 @@ static void *_aodv_sender_thread(void *arg)
 {
     (void) arg;
 
-    msg_t msgq[RCV_MSG_Q_SIZE];
-    msg_init_queue(msgq, RCV_MSG_Q_SIZE);
+    msg_t snd_msgq[RCV_MSG_Q_SIZE];
+    msg_init_queue(snd_msgq, RCV_MSG_Q_SIZE);
 
     while (true) {
         msg_t msg;
@@ -365,9 +372,9 @@ static void *_aodv_receiver_thread(void *arg)
     struct netaddr _sender;
 
     msg_t msg, reply;
-    msg_t msg_q[RCV_MSG_Q_SIZE];
+    msg_t rcv_msgq[RCV_MSG_Q_SIZE];
 
-    msg_init_queue(msg_q, RCV_MSG_Q_SIZE);
+    msg_init_queue(rcv_msgq, RCV_MSG_Q_SIZE);
     reply.content.value = (uint32_t)(-ENOTSUP);
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
 
