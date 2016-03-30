@@ -141,7 +141,11 @@ void *fib_signal_handler_thread(void *arg)
     ipv6_addr_t dest;
     struct netaddr na_dest;
 
-    msg_init_queue(fib_msgq, FIB_MSG_Q_SIZE);
+    if (msg_init_queue(fib_msgq, FIB_MSG_Q_SIZE) !=0)
+    {
+        printf("ERROR: Couldn't init message queue for fib_signal_handler_thread\n");
+        exit(1);
+    }
 
     int err = fib_register_rp(&gnrc_ipv6_fib_table, &aodvv2_prefix.u8[0], aodvv2_address_type_size);
     if ( err != 0) {
@@ -149,19 +153,20 @@ void *fib_signal_handler_thread(void *arg)
         exit(1);
     }
 
-    printf("my pid is: %d\n", sched_active_pid);
+    printf("\nmy pid is: %d\n", sched_active_pid);
 
     while (true) {
-        msg_t msg;
-        msg_receive(&msg);
+        msg_t fib_msg;
+        msg_receive(&fib_msg);
+        printf("received msg: %p\n", fib_msg.content.ptr);
 
-        if (msg.type == FIB_MSG_RP_SIGNAL_UNREACHABLE_DESTINATION) {
-            rp_address_msg_t* rp_msg = (rp_address_msg_t*)msg.content.ptr;
+        if (fib_msg.type == FIB_MSG_RP_SIGNAL_UNREACHABLE_DESTINATION) {
+            rp_address_msg_t* rp_msg = (rp_address_msg_t*)fib_msg.content.ptr;
             if (rp_msg->address_size == sizeof(ipv6_addr_t)) {
                 /* We currently only support IPv6*/
                 memcpy(&dest, rp_msg->address, rp_msg->address_size);
                 /* Reply to the FIB so that it can stop blocking */
-                msg_reply(&msg, &msg);
+                msg_reply(&fib_msg, &fib_msg);
 
                 /* perform/initiate a rreq for dst here*/
                 ipv6_addr_t_to_netaddr(&dest, &na_dest);
@@ -191,7 +196,7 @@ void *fib_signal_handler_thread(void *arg)
             }
             else {
                 /* Reply to the FIB so that it can stop blocking */
-                msg_reply(&msg, &msg);
+                msg_reply(&fib_msg, &fib_msg);
             }
         }
     }
