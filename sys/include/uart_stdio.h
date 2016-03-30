@@ -21,6 +21,7 @@
 #define UART_STDIO_H
 
 /* Boards may override the default STDIO UART device */
+#include <stdint.h>
 #include "board.h"
 
 #ifdef __cplusplus
