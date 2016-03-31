@@ -42,6 +42,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Override default baudrate for STDIO
+ * @{
+ */
+#ifndef UART_STDIO_BAUDRATE
+#define UART_STDIO_BAUDRATE         (9600)
+#endif
+/** @} */
+
+/**
  * @brief   Xtimer configuration
  * @{
  */

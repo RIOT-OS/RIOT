@@ -6,6 +6,7 @@ export CPU_MODEL = msp430f1611
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial-MXV*)))
 # setup serial terminal
+export BAUD ?= 9600
 include $(RIOTBOARD)/Makefile.include.serial
 
 # flash tool configuration
