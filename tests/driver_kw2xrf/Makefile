@@ -5,7 +5,7 @@ FEATURES_REQUIRED = periph_spi periph_gpio
 
 BOARD_INSUFFICIENT_MEMORY := stm32f0discovery nucleo-f334 weio
 
-USEMODULE += auto_init_gnrc_netif
+USEMODULE += auto_init_netdev
 USEMODULE += gnrc_netif
 USEMODULE += gnrc_nomac
 USEMODULE += gnrc_pktdump

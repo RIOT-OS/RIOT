@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup auto_init_gnrc_netif
+ * @ingroup auto_init_netdev
  * @{
  *
  * @file
@@ -50,12 +50,20 @@ void auto_init_encx24j600(void)
     p.int_pin   = ENCX24J600_INT;
     encx24j600_setup(&encx24j600, &p);
 
+#ifdef MODULE_GNRC
     /* initialize netdev2<->gnrc adapter state */
     gnrc_netdev2_eth_init(&_gnrc_encx24j600, (netdev2_t*)&encx24j600);
 
     /* start gnrc netdev2 thread */
     gnrc_netdev2_init(_netdev2_eth_stack, MAC_STACKSIZE,
             MAC_PRIO, "gnrc_encx24j600", &_gnrc_encx24j600);
+#else
+    netdev2_t *netdev = (netdev2_t *)&encx24j600;
+    netdev->driver->init(netdev);
+#endif
+#ifdef MODULE_NETDEV_DEFAULT
+    netdev_default = (netdev2_t *)&encx24j600;
+#endif
 }
 
 #else

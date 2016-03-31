@@ -8,7 +8,7 @@
  */
 
 /*
- * @ingroup auto_init_gnrc_netif
+ * @ingroup auto_init_netdev
  * @{
  *
  * @file
@@ -51,6 +51,7 @@ void auto_init_at86rf2xx(void)
 
         DEBUG("Initializing AT86RF2xx radio at SPI_%i\n", p->spi);
         at86rf2xx_setup(&at86rf2xx_devs[i], (at86rf2xx_params_t*) p);
+#ifdef MODULE_GNRC
         res = gnrc_netdev2_ieee802154_init(&gnrc_adpt[i],
                                            (netdev2_ieee802154_t *)&at86rf2xx_devs[i]);
 
@@ -64,7 +65,14 @@ void auto_init_at86rf2xx(void)
                               "at86rf2xx",
                               &gnrc_adpt[i]);
         }
+#else
+        netdev2_t *netdev = (netdev2_t *)&at86rf2xx_devs[i];
+        netdev->driver->init(netdev);
+#endif
     }
+#ifdef MODULE_NETDEV_DEFAULT
+    netdev_default = (netdev2_t *)&at86rf2xx_devs[NETDEV_DEFAULT_PARAM_SET];
+#endif
 }
 #else
 typedef int dont_be_pedantic;

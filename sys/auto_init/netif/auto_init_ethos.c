@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup auto_init_gnrc_netif
+ * @ingroup auto_init_netdev
  * @{
  *
  * @file
@@ -58,12 +58,20 @@ void auto_init_ethos(void)
     p.bufsize   = sizeof(_inbuf);
     ethos_setup(&ethos, &p);
 
+#ifdef MODULE_GNRC
     /* initialize netdev2<->gnrc adapter state */
     gnrc_netdev2_eth_init(&_gnrc_ethos, (netdev2_t*)&ethos);
 
     /* start gnrc netdev2 thread */
     gnrc_netdev2_init(_netdev2_eth_stack, MAC_STACKSIZE,
             MAC_PRIO, "gnrc_ethos", &_gnrc_ethos);
+#else
+    netdev2_t *netdev = (netdev2_t *)&ethos;
+    netdev->driver->init(netdev);
+#endif
+#ifdef MODULE_NETDEV_DEFAULT
+    netdev_default = (netdev2_t *)&ethos;
+#endif
 }
 
 #else

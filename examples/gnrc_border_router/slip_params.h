@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief   slip parameters example, used by auto_init_gnrc_netif
+ * @brief   slip parameters example, used by auto_init_netdev
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */

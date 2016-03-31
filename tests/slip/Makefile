@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h nucleo-f334 stm32f0discovery weio
 
-USEMODULE += auto_init_gnrc_netif
+USEMODULE += auto_init_netdev
 USEMODULE += gnrc
 USEMODULE += gnrc_pktdump
 USEMODULE += gnrc_slip

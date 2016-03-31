@@ -54,14 +54,22 @@ void auto_init_cc110x(void)
             DEBUG("Error initializing CC110X radio device!");
         }
         else {
+#ifdef MODULE_GNRC
             gnrc_netdev2_cc110x_init(&_gnrc_netdev2_devs[i], &cc110x_devs[i]);
             res = gnrc_netdev2_init(_stacks[i], CC110X_MAC_STACKSIZE,
                     CC110X_MAC_PRIO, "cc110x", &_gnrc_netdev2_devs[i]);
             if (res < 0) {
                 DEBUG("Error starting gnrc_cc110x thread for CC110X!");
             }
+#else
+            netdev2_t *netdev = (netdev2_t *)&cc110x_devs[i];
+            netdev->driver->init(netdev);
+#endif
         }
     }
+#ifdef MODULE_NETDEV_DEFAULT
+    netdev_default = (netdev2_t *)&cc110x_devs[NETDEV_DEFAULT_PARAM_SET];
+#endif
 }
 #else
 typedef int dont_be_pedantic;

@@ -7,7 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := msb-430h nucleo-f334 stm32f0discovery weio z1
 
 USEMODULE += gnrc_netdev2
 USEMODULE += gnrc_netdev_default
-USEMODULE += auto_init_gnrc_netif
+USEMODULE += auto_init_netdev
 USEMODULE += enc28j60
 USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_icmpv6_echo

@@ -9,7 +9,7 @@
  */
 
 /*
- * @ingroup auto_init_gnrc_netif
+ * @ingroup auto_init_netdev
  * @{
  *
  * @file

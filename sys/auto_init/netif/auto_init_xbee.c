@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup auto_init_gnrc_netif
+ * @ingroup auto_init_netdev
  * @{
  *
  * @file
@@ -56,11 +56,19 @@ void auto_init_xbee(void)
             DEBUG("Error initializing XBee radio device!");
         }
         else {
+#ifdef MODULE_GNRC
             gnrc_nomac_init(_nomac_stacks[i],
                             XBEE_MAC_STACKSIZE, XBEE_MAC_PRIO, "xbee",
                             (gnrc_netdev_t *)&xbee_devs[i]);
         }
+#else
+        netdev2_t *netdev = (netdev2_t *)&xbee_devs[i];
+        netdev->driver->init(netdev);
+#endif
     }
+#ifdef MODULE_NETDEV_DEFAULT
+    netdev_default = (netdev2_t *)&xbee_devs[NETDEV_DEFAULT_PARAM_SET];
+#endif
 }
 
 #else

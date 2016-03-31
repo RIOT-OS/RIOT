@@ -41,7 +41,7 @@ module, you need to specify a network interface like this:
 
 **Please note:** in case you're using RIOT's default network stack, the GNRC
 stack, you may also use `gnrc_netdev_default` module and also add
-`auto_init_gnrc_netif` in order to automatically initialize the interface.
+`auto_init_netdev` in order to automatically initialize the interface.
 
 
 Setting Up A Virtual Network

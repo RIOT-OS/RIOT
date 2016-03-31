@@ -7,7 +7,7 @@ BOARD_WHITELIST = native
 
 USEMODULE += gnrc_zep
 USEMODULE += gnrc_netdev_default
-USEMODULE += auto_init_gnrc_netif
+USEMODULE += auto_init_netdev
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_nomac
 USEMODULE += gnrc_pktdump

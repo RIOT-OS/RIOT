@@ -284,6 +284,14 @@ void netdev2_tap_setup(netdev2_tap_t *dev, const netdev2_tap_params_t *params) {
     strncpy(dev->tap_name, *(params->tap_name), IFNAMSIZ);
 }
 
+#ifdef NETDEV_DEFAULT_TAP
+void netdev_default_setup(void *dev)
+{
+    (void) dev;
+    /* setup is called anyway, nothing to do here */
+}
+#endif
+
 static void _tap_isr(void) {
     netdev2_t *netdev = (netdev2_t *)&netdev2_tap;
 

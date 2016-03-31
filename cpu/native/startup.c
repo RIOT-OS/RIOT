@@ -49,6 +49,9 @@ const char *_native_unix_socket_path = NULL;
 #ifdef MODULE_NETDEV2_TAP
 #include "netdev2_tap.h"
 extern netdev2_tap_t netdev2_tap;
+#   ifdef NETDEV_DEFAULT_TAP
+        netdev2_t *netdev_default;
+#   endif
 #endif
 
 /**
@@ -316,6 +319,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     netdev2_tap_params_t p;
     p.tap_name = &(argv[1]);
     netdev2_tap_setup(&netdev2_tap, &p);
+#   ifdef NETDEV_DEFAULT_TAP
+        netdev_default = (netdev2_t*) &netdev2_tap;
+#   endif
 #endif
 
     board_init();

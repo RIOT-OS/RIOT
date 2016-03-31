@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup     auto_init_gnrc_netif
+ * @ingroup     auto_init_netdev
  * @{
  *
  * @file
@@ -62,12 +62,20 @@ void auto_init_enc28j60(void)
         DEBUG("auto_init_enc28j60(): initializing device [%i]...\n", i);
         /* setup netdev2 device */
         enc28j60_setup(&dev[i], &enc28j60_params[i]);
+#ifdef MODULE_GNRC
         /* initialize netdev2 <-> gnrc adapter state */
         gnrc_netdev2_eth_init(&gnrc_adpt[i], (netdev2_t *)&dev[i]);
         /* start gnrc netdev2 thread */
         gnrc_netdev2_init(stack[i], MAC_STACKSIZE, MAC_PRIO,
                           "gnrc_enc28j60", &gnrc_adpt[i]);
+#else
+        netdev2_t *netdev = (netdev2_t *)&dev[i];
+        netdev->driver->init(netdev);
+#endif
     }
+#ifdef MODULE_NETDEV_DEFAULT
+    netdev_default = (netdev2_t *)&dev[NETDEV_DEFAULT_PARAM_SET];
+#endif
 }
 
 #else

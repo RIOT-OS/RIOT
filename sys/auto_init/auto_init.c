@@ -160,7 +160,7 @@ void auto_init(void)
 #endif
 
 /* initialize network devices */
-#ifdef MODULE_AUTO_INIT_GNRC_NETIF
+#ifdef MODULE_AUTO_INIT_NETDEV
 
 #ifdef MODULE_AT86RF2XX
     extern void auto_init_at86rf2xx(void);
@@ -207,7 +207,7 @@ void auto_init(void)
     auto_init_netdev2_tap();
 #endif
 
-#endif /* MODULE_AUTO_INIT_GNRC_NETIF */
+#endif /* MODULE_AUTO_INIT_NETDEV */
 
 #ifdef MODULE_GNRC_IPV6_NETIF
     gnrc_ipv6_netif_init_by_dev();
