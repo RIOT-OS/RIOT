@@ -4,26 +4,43 @@
 all:
 
 # set undefined variables
-RIOTBASE ?= $(shell dirname "$(lastword $(MAKEFILE_LIST))")
-RIOTBASE := $(abspath $(RIOTBASE))
-
+RIOTBASE       ?= $(shell dirname "$(lastword $(MAKEFILE_LIST))")
 CCACHE_BASEDIR ?= $(RIOTBASE)
-CCACHE_BASEDIR := $(abspath $(CCACHE_BASEDIR))
+RIOTCPU        ?= $(RIOTBASE)/cpu
+RIOTBOARD      ?= $(RIOTBASE)/boards
+RIOTPKG        ?= $(RIOTBASE)/pkg
+RIOTPROJECT    ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
+GITCACHE       ?= $(RIOTBASE)/dist/tools/git/git-cache
+APPDIR         ?= $(CURDIR)
+BINDIRBASE     ?= $(APPDIR)/bin
+BINDIR         ?= $(BINDIRBASE)/$(BOARD)
 
-RIOTCPU ?= $(RIOTBASE)/cpu
-RIOTCPU := $(abspath $(RIOTCPU))
+__DIRECTORY_VARIABLES := RIOTBASE CCACHE_BASEDIR RIOTCPU RIOTBOARD RIOTPKG GITCACHE RIOTPROJECT APPDIR BINDIRBASE BINDIR
 
-RIOTBOARD ?= $(RIOTBASE)/boards
-RIOTBOARD := $(abspath $(RIOTBOARD))
+# Make all paths absolute.
+override RIOTBASE       := $(abspath $(RIOTBASE))
+override CCACHE_BASEDIR := $(abspath $(CCACHE_BASEDIR))
+override RIOTCPU        := $(abspath $(RIOTCPU))
+override RIOTBOARD      := $(abspath $(RIOTBOARD))
+override RIOTPKG        := $(abspath $(RIOTPKG))
+override RIOTPROJECT    := $(abspath $(RIOTPROJECT))
+override GITCACHE       := $(abspath $(GITCACHE))
+override APPDIR         := $(abspath $(APPDIR))/
+override BINDIRBASE     := $(abspath $(BINDIRBASE))
+override BINDIR         := $(abspath $(BINDIR))/
 
-RIOTPKG ?= $(RIOTBASE)/pkg
-RIOTPKG := $(abspath $(RIOTPKG))
+# Ensure that all directories are set and don't contain spaces.
+ifneq (, $(filter-out 1, $(foreach v,${__DIRECTORY_VARIABLES},$(words ${${v}}))))
+  $(info Aborting compilation for your safety.)
+  $(info Related variables = ${__DIRECTORY_VARIABLES})
+  $(error Make sure no path override is empty or contains spaces!)
+endif
 
-RIOTPROJECT ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
-RIOTPROJECT := $(abspath $(RIOTPROJECT))
+# Use absolute paths in recusive "make" even if overriden on command line.
+MAKEOVERRIDES += $(foreach v,${__DIRECTORY_VARIABLES},${v}=${${v}})
 
-GITCACHE ?= $(RIOTBASE)/dist/tools/git/git-cache
-GITCACHE := $(abspath $(GITCACHE))
+# Path to the current directory relative to the git root
+BUILDRELPATH ?= $(shell git rev-parse --show-prefix)
 
 # Include Docker settings near the top because we need to build the environment
 # command line before some of the variable origins are overwritten below when
@@ -32,18 +49,6 @@ include $(RIOTBASE)/Makefile.docker
 
 # Static code analysis tools provided by LLVM
 include $(RIOTBASE)/Makefile.scan-build
-
-# Path to the current directory relative to the git root
-BUILDRELPATH ?= $(shell git rev-parse --show-prefix)
-
-APPDIR ?= $(CURDIR)
-APPDIR := $(abspath $(APPDIR))/
-
-BINDIRBASE ?= $(APPDIR)/bin
-BINDIRBASE := $(abspath $(BINDIRBASE))
-
-BINDIR ?= $(BINDIRBASE)/$(BOARD)
-BINDIR := $(abspath $(BINDIR))/
 
 COLOR_GREEN  :=
 COLOR_RED    :=
