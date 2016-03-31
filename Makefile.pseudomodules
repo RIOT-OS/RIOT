@@ -4,6 +4,7 @@ PSEUDOMODULES += conn_tcp
 PSEUDOMODULES += conn_udp
 PSEUDOMODULES += core_msg
 PSEUDOMODULES += core_thread_flags
+PSEUDOMODULES += emb6_router
 PSEUDOMODULES += gnrc_netdev_default
 PSEUDOMODULES += gnrc_ipv6_default
 PSEUDOMODULES += gnrc_ipv6_router
