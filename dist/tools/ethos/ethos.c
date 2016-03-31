@@ -30,7 +30,7 @@
 
 static void usage(void)
 {
-    fprintf(stderr, "usage: eth_over_serial <tap> <serial>\n");
+    fprintf(stderr, "usage: ethos <tap> <serial>\n");
 }
 
 int set_serial_attribs (int fd, int speed, int parity)
