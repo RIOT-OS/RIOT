@@ -37,6 +37,8 @@ int main(void)
     xtimer_t t;
     int64_t offset = -1000;
     tmsg.type = 44;
+    t.target = 0;
+    t.long_target = 0;
 
     for (int i = 0; i < 10; i++) {
         xtimer_set_msg(&t, TEST_PERIOD + offset, &tmsg, sched_active_pid);
