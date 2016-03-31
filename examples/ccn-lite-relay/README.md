@@ -48,7 +48,7 @@ An example usage of this application could be setup like this:
 1. Open a terminal window, navigate to the RIOT directory, and enter
    `dist/tools/tapsetup/tapsetup -c`.
 2. Open a second terminal window and navigate to this directory in both of
-   windows.
+   linux.
 3. Call `make -B clean all term` in the first terminal and `PORT=tap1 make
    term` in the second one.
 4. Enter `ccnl_open 3` in both terminals.

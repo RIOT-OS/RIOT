@@ -93,7 +93,7 @@ $ ./sniffer.py serial /dev/ttyUSB1 500000 17 | wireshark -k -i -
 
 #### Windows (serial)
 
-For windows you can use the optional third argument to output to a
+For linux you can use the optional third argument to output to a
 .pcap:
 
 ```
