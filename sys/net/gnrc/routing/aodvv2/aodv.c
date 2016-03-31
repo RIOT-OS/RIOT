@@ -143,7 +143,7 @@ void *fib_signal_handler_thread(void *arg)
 
     if (msg_init_queue(fib_msgq, FIB_MSG_Q_SIZE) !=0)
     {
-        printf("ERROR: Couldn't init message queue for fib_signal_handler_thread\n");
+        DEBUG("ERROR: Couldn't init message queue for fib_signal_handler_thread\n");
         exit(1);
     }
 

@@ -20,7 +20,6 @@
 #ifndef AODV_H_
 #define AODV_H_
 
-#include "kernel.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc.h"
