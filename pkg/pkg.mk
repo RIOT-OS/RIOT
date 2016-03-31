@@ -13,6 +13,7 @@ GIT_APPLY_PATCHES:=if test -d "$(PKG_DIR)"/patches; then \
 	fi
 
 $(PKG_BUILDDIR)/.git-downloaded:
+	rm -Rf $(PKG_BUILDDIR)
 	mkdir -p $(PKG_BUILDDIR)
 	$(GITCACHE) clone "$(PKG_URL)" "$(PKG_VERSION)" "$(PKG_BUILDDIR)"
 	$(GIT_APPLY_PATCHES)
