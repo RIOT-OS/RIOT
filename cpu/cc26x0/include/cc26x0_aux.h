@@ -136,6 +136,14 @@ typedef struct {
  * @brief   AUX_WUC register values
  * @{
  */
+#define MODCLKEN0_SMPH_EN           0x00000001  /* enable clock for AUX_SMPH */
+#define MODCLKEN0_AIODIO0_EN        0x00000002  /* enable clock for AUX_AIODIO0 */
+#define MODCLKEN0_AIODIO1_EN        0x00000004  /* enable clock for AUX_AIODIO1 */
+#define MODCLKEN0_TIMER_EN          0x00000008  /* enable clock for AUX_TIMER */
+#define MODCLKEN0_ANAIF_EN          0x00000010  /* enable clock for AUX_ANAIF */
+#define MODCLKEN0_TDC_EN            0x00000020  /* enable clock for AUX_TDC */
+#define MODCLKEN0_AUX_DDI0_OSC_EN   0x00000040  /* enable clock for AUX_DDI0_OSC */
+#define MODCLKEN0_AUX_ADI4_EN       0x00000080  /* enable clock for AUX_ADI4 */
 /** @} */
 
 /** @ingroup cpu_specific_peripheral_memory_map
