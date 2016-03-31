@@ -1,0 +1,15 @@
+## the cpu to build for
+export CPU = stm32f0
+export CPU_MODEL = stm32f072rb
+
+#define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbmodem* | head -n 1)
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# this board uses openocd
+include $(RIOTBOARD)/Makefile.include.openocd
+
+include $(RIOTBOARD)/nucleo-common/Makefile.include
