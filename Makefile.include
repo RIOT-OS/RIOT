@@ -265,7 +265,7 @@ endif # BUILD_IN_DOCKER
 ..compiler-check:
 	@command -v $(CC) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
-		'${COLOR_RED} Compiler $(CC) is required but not found in PATH.  Aborting.${COLOR_RESET}'; \
+		'${COLOR_RED}Compiler $(CC) is required but not found in PATH.  Aborting.${COLOR_RESET}'; \
 		exit 1; }
 
 ..build-message:
@@ -319,14 +319,14 @@ distclean:
 flash: all
 	@command -v $(FLASHER) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
-		'${COLOR_RED} Flash program $(FLASHER) not found. Aborting.${COLOR_RESET}'; \
+		'${COLOR_RED}Flash program $(FLASHER) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(FLASHER) $(FFLAGS)
 
 term: $(filter flash, $(MAKECMDGOALS))
 	@command -v $(TERMPROG) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
-		'${COLOR_RED} Terminal program $(TERMPROG) not found. Aborting.${COLOR_RESET}'; \
+		'${COLOR_RED}Terminal program $(TERMPROG) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(TERMPROG) $(TERMFLAGS)
 
@@ -339,21 +339,21 @@ doc:
 debug:
 	@command -v $(DEBUGGER) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
-		'${COLOR_RED} Debug program $(DEBUGGER) not found. Aborting.${COLOR_RESET}'; \
+		'${COLOR_RED}Debug program $(DEBUGGER) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
 debug-server:
 	@command -v $(DEBUGSERVER) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
-		'${COLOR_RED} Debug server program $(DEBUGSERVER) not found. Aborting.${COLOR_RESET}'; \
+		'${COLOR_RED}Debug server program $(DEBUGSERVER) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
 
 reset:
 	@command -v $(RESET) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
-		'${COLOR_RED} Reset program $(RESET) not found. Aborting.${COLOR_RESET}'; \
+		'${COLOR_RED}Reset program $(RESET) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(RESET) $(RESET_FLAGS)
 
@@ -363,7 +363,7 @@ OBJDUMPFLAGS ?= -S -D -h
 objdump:
 	@command -v $(OBJDUMP) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
-		'${COLOR_RED} Objdump program $(OBJDUMP) not found. Aborting.${COLOR_RESET}'; \
+		'${COLOR_RED}Objdump program $(OBJDUMP) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(OBJDUMP) $(OBJDUMPFLAGS) $(ELFFILE) | less
 
