@@ -132,8 +132,8 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
 
             int ret_comp = universal_address_compare(table->data.entries[i].global, dst, &match_size);
             /* If we found an exact match */
-            if ((ret_comp == UNIVERSAL_ADDRESS_EQUAL) 
-                || (is_all_zeros_addr && (match_size == 0) && (ret_comp == UNIVERSAL_ADDRESS_IS_ALL_ZERO_ADDRESS))) {
+            if ((ret_comp == UNIVERSAL_ADDRESS_EQUAL)
+                || (is_all_zeros_addr && (ret_comp == UNIVERSAL_ADDRESS_IS_ALL_ZERO_ADDRESS))) {
                 entry_arr[0] = &(table->data.entries[i]);
                 *entry_arr_size = 1;
                 /* we will not find a better one so we return */
