@@ -85,6 +85,16 @@ static inline gnrc_pktqueue_t *gnrc_pktqueue_remove_head(gnrc_pktqueue_t **queue
     return gnrc_pktqueue_remove(queue, *queue);
 }
 
+/**
+ * @brief flush the packet queue
+ *
+ * @param[in]  queue    the queue, may not be NULL
+ */
+static inline void gnrc_pktqueue_flush(gnrc_pktqueue_t **queue)
+{
+    while(gnrc_pktqueue_remove_head(queue));
+}
+
 #ifdef __cplusplus
 }
 #endif
