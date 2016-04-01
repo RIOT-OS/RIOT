@@ -34,79 +34,79 @@
 
 int __attribute__((optimize("omit-frame-pointer"), no_instrument_function)) getcontext(ucontext_t *ucp)
 {
-    asm volatile ("pushf\n" :: "a"(ucp));
-    asm volatile ("pop 4*2(%eax)\n");
+    __asm__ volatile ("pushf\n" :: "a"(ucp));
+    __asm__ volatile ("pop 4*2(%eax)\n");
 
-    asm volatile ("mov %eax, 4*3(%eax)\n");
-    asm volatile ("mov %ecx, 4*4(%eax)\n");
-    asm volatile ("mov %edx, 4*5(%eax)\n");
-    asm volatile ("mov %ebx, 4*6(%eax)\n");
- /* asm volatile ("mov %esp, 4*7(%eax)\n"); omitted */
-    asm volatile ("mov %ebp, 4*8(%eax)\n");
-    asm volatile ("mov %esi, 4*9(%eax)\n");
-    asm volatile ("mov %edi, 4*10(%eax)\n");
+    __asm__ volatile ("mov %eax, 4*3(%eax)\n");
+    __asm__ volatile ("mov %ecx, 4*4(%eax)\n");
+    __asm__ volatile ("mov %edx, 4*5(%eax)\n");
+    __asm__ volatile ("mov %ebx, 4*6(%eax)\n");
+ /* __asm__ volatile ("mov %esp, 4*7(%eax)\n"); omitted */
+    __asm__ volatile ("mov %ebp, 4*8(%eax)\n");
+    __asm__ volatile ("mov %esi, 4*9(%eax)\n");
+    __asm__ volatile ("mov %edi, 4*10(%eax)\n");
 
-    asm volatile ("lea 4(%esp), %edx\n");
-    asm volatile ("mov %edx, 4*0(%eax)\n");
-    asm volatile ("xor %edx, %edx\n");
-    asm volatile ("mov %edx, 4*1(%eax)\n");
+    __asm__ volatile ("lea 4(%esp), %edx\n");
+    __asm__ volatile ("mov %edx, 4*0(%eax)\n");
+    __asm__ volatile ("xor %edx, %edx\n");
+    __asm__ volatile ("mov %edx, 4*1(%eax)\n");
 
-    asm volatile ("mov (%esp), %edx\n");
-    asm volatile ("mov %edx, 4*11(%eax)\n");
+    __asm__ volatile ("mov (%esp), %edx\n");
+    __asm__ volatile ("mov %edx, 4*11(%eax)\n");
 
     return 0;
 }
 
 int __attribute__((optimize("omit-frame-pointer"), no_instrument_function)) setcontext(const ucontext_t *ucp)
 {
-    asm volatile ("1:\n" :: "a"(ucp));
+    __asm__ volatile ("1:\n" :: "a"(ucp));
 
- /* asm volatile ("mov 4*3(%eax), %eax\n");, omitted */
-    asm volatile ("mov 4*4(%eax), %ecx\n");
- /* asm volatile ("mov 4*5(%eax), %edx\n");, omitted */
-    asm volatile ("mov 4*6(%eax), %ebx\n");
- /* asm volatile ("mov 4*7(%eax), %esp\n");, omitted */
-    asm volatile ("mov 4*8(%eax), %ebp\n");
-    asm volatile ("mov 4*9(%eax), %esi\n");
-    asm volatile ("mov 4*10(%eax), %edi\n");
+ /* __asm__ volatile ("mov 4*3(%eax), %eax\n");, omitted */
+    __asm__ volatile ("mov 4*4(%eax), %ecx\n");
+ /* __asm__ volatile ("mov 4*5(%eax), %edx\n");, omitted */
+    __asm__ volatile ("mov 4*6(%eax), %ebx\n");
+ /* __asm__ volatile ("mov 4*7(%eax), %esp\n");, omitted */
+    __asm__ volatile ("mov 4*8(%eax), %ebp\n");
+    __asm__ volatile ("mov 4*9(%eax), %esi\n");
+    __asm__ volatile ("mov 4*10(%eax), %edi\n");
 
-    asm volatile ("mov 4*0(%eax), %esp\n");
-    asm volatile ("add 4*1(%eax), %esp\n");
+    __asm__ volatile ("mov 4*0(%eax), %esp\n");
+    __asm__ volatile ("add 4*1(%eax), %esp\n");
 
-    asm volatile ("mov 4*11(%eax), %edx\n");
-    asm volatile ("mov %eax, %ebx\n");
+    __asm__ volatile ("mov 4*11(%eax), %edx\n");
+    __asm__ volatile ("mov %eax, %ebx\n");
 
-    asm volatile ("push 4*2(%eax)\n");
-    asm volatile ("popf\n");
+    __asm__ volatile ("push 4*2(%eax)\n");
+    __asm__ volatile ("popf\n");
 
-    asm volatile ("call *%edx\n");
+    __asm__ volatile ("call *%edx\n");
 
-    asm volatile ("mov 4*12(%ebx), %eax\n");
-    asm volatile ("jmp 1b\n");
+    __asm__ volatile ("mov 4*12(%ebx), %eax\n");
+    __asm__ volatile ("jmp 1b\n");
     __builtin_unreachable();
 }
 
 static void __attribute__((optimize("omit-frame-pointer"), noreturn, no_instrument_function)) makecontext_entrypoint(void)
 {
     /* ebx = ucp, ecx = argc, ebp = arg[0], esi = arg[1], edi = arg[2] */
-    asm volatile ("mov 4*3(%ebx), %eax\n"); /* eax = func */
+    __asm__ volatile ("mov 4*3(%ebx), %eax\n"); /* eax = func */
 
-    asm volatile ("jecxz 0f\n");
-    asm volatile ("cmpb $1, %cl; je 1f\n");
-    asm volatile ("cmpb $2, %cl; je 2f\n");
-    asm volatile ("cmpb $3, %cl; je 3f\n");
-    asm volatile ("cmpb $4, %cl; je 4f\n");
+    __asm__ volatile ("jecxz 0f\n");
+    __asm__ volatile ("cmpb $1, %cl; je 1f\n");
+    __asm__ volatile ("cmpb $2, %cl; je 2f\n");
+    __asm__ volatile ("cmpb $3, %cl; je 3f\n");
+    __asm__ volatile ("cmpb $4, %cl; je 4f\n");
 
-    asm volatile ("   mov 4*7(%ebx), %edx; push %edx\n");
-    asm volatile ("4: mov 4*5(%ebx), %edx; push %edx\n");
-    asm volatile ("3: push %edi\n");
-    asm volatile ("2: push %esi\n");
-    asm volatile ("1: push %ebp\n");
-    asm volatile ("0: call *%eax\n"); /* call func(...), preserves ebx */
+    __asm__ volatile ("   mov 4*7(%ebx), %edx; push %edx\n");
+    __asm__ volatile ("4: mov 4*5(%ebx), %edx; push %edx\n");
+    __asm__ volatile ("3: push %edi\n");
+    __asm__ volatile ("2: push %esi\n");
+    __asm__ volatile ("1: push %ebp\n");
+    __asm__ volatile ("0: call *%eax\n"); /* call func(...), preserves ebx */
 
-    asm volatile ("mov 4*12(%ebx), %eax\n");
-    asm volatile ("push %eax\n");
-    asm volatile ("call setcontext\n");
+    __asm__ volatile ("mov 4*12(%ebx), %eax\n");
+    __asm__ volatile ("push %eax\n");
+    __asm__ volatile ("call setcontext\n");
     __builtin_unreachable();
 }
 

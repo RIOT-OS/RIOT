@@ -49,12 +49,12 @@ void init8_ovr(void) __attribute__((naked)) __attribute__((section(".init8")));
 
 void init7_ovr(void)
 {
-    asm("call reset_handler");
+    __asm__("call reset_handler");
 }
 
 void init8_ovr(void)
 {
-    asm("jmp exit");
+    __asm__("jmp exit");
 }
 /**
  * @brief This function is the entry point after a system reset

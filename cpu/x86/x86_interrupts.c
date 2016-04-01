@@ -158,7 +158,7 @@ static void continue_after_intr(void)
 {
     ucontext_t *ctx = (ucontext_t *) sched_active_thread->sp;
     x86_interrupted_ctx = ctx->uc_context.registers;
-    asm volatile (
+    __asm__ volatile (
         "push %0\n"      /* flags */
         "push $0x0008\n" /* cs */
         "push %1\n"      /* ip */
@@ -204,7 +204,7 @@ void x86_int_handler(void)
     ctx->uc_context.registers = x86_interrupted_ctx;
     ctx->uc_stack.ss_sp = x86_interrupt_handler_stack;
     ctx->uc_stack.ss_size = sizeof x86_interrupt_handler_stack;
-    asm volatile ("pushf; pop %0" : "=g"(ctx->uc_context.flags));
+    __asm__ volatile ("pushf; pop %0" : "=g"(ctx->uc_context.flags));
     ctx->uc_context.ip = (void *) (uintptr_t) &continue_after_intr;
     ctx->__intr.ip = sp[0];
     ctx->__intr.flags = sp[2];
@@ -215,56 +215,56 @@ void x86_int_handler(void)
 
 void ASM_FUN_ATTRIBUTES NORETURN x86_int_entry(void)
 {
-    asm volatile ("mov %eax, (4*0 + x86_interrupted_ctx)");
-    asm volatile ("mov %ecx, (4*1 + x86_interrupted_ctx)");
-    asm volatile ("mov %edx, (4*2 + x86_interrupted_ctx)");
-    asm volatile ("mov %ebx, (4*3 + x86_interrupted_ctx)");
-    asm volatile ("mov %ebp, (4*5 + x86_interrupted_ctx)");
-    asm volatile ("mov %esi, (4*6 + x86_interrupted_ctx)");
-    asm volatile ("mov %edi, (4*7 + x86_interrupted_ctx)");
+    __asm__ volatile ("mov %eax, (4*0 + x86_interrupted_ctx)");
+    __asm__ volatile ("mov %ecx, (4*1 + x86_interrupted_ctx)");
+    __asm__ volatile ("mov %edx, (4*2 + x86_interrupted_ctx)");
+    __asm__ volatile ("mov %ebx, (4*3 + x86_interrupted_ctx)");
+    __asm__ volatile ("mov %ebp, (4*5 + x86_interrupted_ctx)");
+    __asm__ volatile ("mov %esi, (4*6 + x86_interrupted_ctx)");
+    __asm__ volatile ("mov %edi, (4*7 + x86_interrupted_ctx)");
 
-    asm volatile ("jnc 1f");
-    asm volatile ("  mov (%esp), %eax");
-    asm volatile ("  add $4, %esp");
-    asm volatile ("  jmp 2f");
-    asm volatile ("1:");
-    asm volatile ("  xor %eax, %eax");
-    asm volatile ("2:");
-    asm volatile ("  mov %eax, x86_current_interrupt_error_code");
+    __asm__ volatile ("jnc 1f");
+    __asm__ volatile ("  mov (%esp), %eax");
+    __asm__ volatile ("  add $4, %esp");
+    __asm__ volatile ("  jmp 2f");
+    __asm__ volatile ("1:");
+    __asm__ volatile ("  xor %eax, %eax");
+    __asm__ volatile ("2:");
+    __asm__ volatile ("  mov %eax, x86_current_interrupt_error_code");
 
-    asm volatile ("mov %esp, (4*4 + x86_interrupted_ctx)");
-    asm volatile ("mov %0, %%esp" :: "g"(&x86_interrupt_handler_stack[sizeof x86_interrupt_handler_stack]));
-    asm volatile ("call x86_int_handler");
-    asm volatile ("jmp x86_int_exit");
+    __asm__ volatile ("mov %esp, (4*4 + x86_interrupted_ctx)");
+    __asm__ volatile ("mov %0, %%esp" :: "g"(&x86_interrupt_handler_stack[sizeof x86_interrupt_handler_stack]));
+    __asm__ volatile ("call x86_int_handler");
+    __asm__ volatile ("jmp x86_int_exit");
     __builtin_unreachable();
 }
 
 void ASM_FUN_ATTRIBUTES NORETURN x86_int_exit(void)
 {
-    asm volatile ("mov (4*0 + x86_interrupted_ctx), %eax");
-    asm volatile ("mov (4*1 + x86_interrupted_ctx), %ecx");
-    asm volatile ("mov (4*2 + x86_interrupted_ctx), %edx");
-    asm volatile ("mov (4*3 + x86_interrupted_ctx), %ebx");
-    asm volatile ("mov (4*5 + x86_interrupted_ctx), %ebp");
-    asm volatile ("mov (4*6 + x86_interrupted_ctx), %esi");
-    asm volatile ("mov (4*7 + x86_interrupted_ctx), %edi");
-    asm volatile ("mov (4*4 + x86_interrupted_ctx), %esp");
+    __asm__ volatile ("mov (4*0 + x86_interrupted_ctx), %eax");
+    __asm__ volatile ("mov (4*1 + x86_interrupted_ctx), %ecx");
+    __asm__ volatile ("mov (4*2 + x86_interrupted_ctx), %edx");
+    __asm__ volatile ("mov (4*3 + x86_interrupted_ctx), %ebx");
+    __asm__ volatile ("mov (4*5 + x86_interrupted_ctx), %ebp");
+    __asm__ volatile ("mov (4*6 + x86_interrupted_ctx), %esi");
+    __asm__ volatile ("mov (4*7 + x86_interrupted_ctx), %edi");
+    __asm__ volatile ("mov (4*4 + x86_interrupted_ctx), %esp");
 
-    asm volatile ("iret");
+    __asm__ volatile ("iret");
     __builtin_unreachable();
 }
 
 #define DECLARE_INT(NUM, HAS_ERROR_CODE, MNEMONIC) \
     static void ASM_FUN_ATTRIBUTES NORETURN x86_int_entry_##NUM##h(void) \
     { \
-        asm volatile ("movb %0, x86_current_interrupt" :: "n"(0x##NUM)); \
+        __asm__ volatile ("movb %0, x86_current_interrupt" :: "n"(0x##NUM)); \
         if ((HAS_ERROR_CODE)) { \
-            asm volatile ("stc"); \
+            __asm__ volatile ("stc"); \
         } \
         else { \
-            asm volatile ("clc"); \
+            __asm__ volatile ("clc"); \
         }\
-        asm volatile ("jmp x86_int_entry"); \
+        __asm__ volatile ("jmp x86_int_entry"); \
         __builtin_unreachable(); \
     }
 DECLARE_INT(00, 0, "#DE")
@@ -342,7 +342,7 @@ static void test_int_bp(void)
     unsigned long si;
     unsigned long di;
     unsigned long eflags_before, eflags_after;
-    asm volatile (
+    __asm__ volatile (
         "mov %8, %%esi\n"
         "mov %9, %%edi\n"
         "pushf; pop %6\n"
@@ -416,7 +416,7 @@ static void load_interrupt_descriptor_table(void)
     SET_IDT_DESC(2e, 0, "PIC ATA1", 0)
     SET_IDT_DESC(2f, 0, "PIC ATA2", 0)
 
-    asm volatile ("lidt %0" :: "m"(idtr));
+    __asm__ volatile ("lidt %0" :: "m"(idtr));
 }
 
 void x86_init_interrupts(void)
