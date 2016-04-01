@@ -46,6 +46,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <limits.h>
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -79,7 +80,7 @@ typedef unsigned int uart_t;
  * @{
  */
 #ifndef UART_UNDEF
-#define UART_UNDEF          (-1)
+#define UART_UNDEF          (UINT_MAX)
 #endif
 /** @} */
 
