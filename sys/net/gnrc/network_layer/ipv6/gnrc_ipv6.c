@@ -208,6 +208,17 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *current, gnrc_pktsnip_t
     gnrc_pktbuf_release(pkt);
 }
 
+ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt)
+{
+    ipv6_hdr_t *hdr = NULL;
+    gnrc_pktsnip_t *tmp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
+    if ((tmp) && ipv6_hdr_is(tmp->data)) {
+        hdr = ((ipv6_hdr_t*) tmp->data);
+    }
+
+    return hdr;
+}
+
 /* internal functions */
 static void *_event_loop(void *args)
 {
