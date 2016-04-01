@@ -43,6 +43,8 @@
 #ifndef PERIPH_ADC_H
 #define PERIPH_ADC_H
 
+#include <limits.h>
+
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
@@ -73,7 +75,7 @@ typedef unsigned int adc_t;
  * @{
  */
 #ifndef ADC_UNDEF
-#define ADC_UNDEF           (0xffff)
+#define ADC_UNDEF           (UINT_MAX)
 #endif
 /** @} */
 
