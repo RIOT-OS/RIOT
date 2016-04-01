@@ -102,7 +102,7 @@ void board_init(void)
      * (If the clock is not stable all UART output is garbled until it has
      * stabilized) */
     for (int i = 0; i < 100000; ++i) {
-        asm volatile("nop\n");
+        __asm__ volatile("nop\n");
     }
 
     /* Update SystemCoreClock global var */

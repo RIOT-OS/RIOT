@@ -67,7 +67,7 @@ void msp430_init_dco(void)
     BCSCTL1 |= DIVA1 + DIVA0;             /* ACLK = LFXT1CLK/8 */
 
     for (i = 0xFFFF; i > 0; i--) {        /* Delay for XTAL to settle */
-        asm("nop");
+        __asm__("nop");
     }
 
     CCTL2 = CCIS0 + CM0 + CAP;            /* Define CCR2, CAP, ACLK */

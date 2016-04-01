@@ -59,8 +59,8 @@ extern "C" {
 static inline void __attribute__((always_inline, noreturn)) x86_hlt(void)
 {
     while (1) {
-        asm volatile ("cli");
-        asm volatile ("hlt");
+        __asm__ volatile ("cli");
+        __asm__ volatile ("hlt");
     }
 }
 

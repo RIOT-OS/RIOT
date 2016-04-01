@@ -164,7 +164,7 @@ bool x86_rtc_read(x86_rtc_data_t *dest)
     unsigned old_status = irq_disable();
 
     while (is_update_in_progress()) {
-        asm volatile ("pause");
+        __asm__ volatile ("pause");
     }
 
     uint8_t b = x86_cmos_read(RTC_REG_B);

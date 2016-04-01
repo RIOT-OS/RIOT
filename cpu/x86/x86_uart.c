@@ -72,7 +72,7 @@ ssize_t x86_uart_write(const char *buf, size_t len)
     size_t written = 0;
     while (written < len) {
         while (!is_output_empty()) {
-            asm volatile ("pause");
+            __asm__ volatile ("pause");
         }
         outb(UART_PORT + THR, buf[written]);
         ++written;
@@ -89,7 +89,7 @@ ssize_t x86_uart_read(char *buf, size_t len)
     size_t read = 0;
     while (read < len) {
         while (!is_input_empty()) {
-            asm volatile ("pause");
+            __asm__ volatile ("pause");
         }
         buf[read] = inb(UART_PORT + RBR);
         ++read;
