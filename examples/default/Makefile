@@ -58,7 +58,7 @@ ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
 endif
 
 FEATURES_OPTIONAL += config
-FEATURES_OPTIONAL += periph_rtc
+#FEATURES_OPTIONAL += periph_rtc
 
 ifneq (,$(filter msb-430,$(BOARD)))
   USEMODULE += sht11
