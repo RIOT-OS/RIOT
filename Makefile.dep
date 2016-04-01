@@ -504,16 +504,17 @@ ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
   USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
 endif
 
-ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
-  USEMODULE += netopt
-endif
-
 ifneq (,$(filter netstats_%, $(USEMODULE)))
   USEMODULE += netstats
 endif
 
 ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
   USEMODULE += xtimer
+  USEMODULE += gnrc_netdev2
+endif
+
+ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
+  USEMODULE += netopt
 endif
 
 ifneq (,$(filter pthread,$(USEMODULE)))

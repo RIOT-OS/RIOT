@@ -109,17 +109,17 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         if(_packet_is_broadcast(lwmac->tx.packet)) {
             /* Set CSMA retries as configured and enable */
             uint8_t csma_retries = LWMAC_BROADCAST_CSMA_RETRIES;
-            lwmac->netdev->driver->set(lwmac->netdev, NETOPT_CSMA_RETRIES,
+			lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_CSMA_RETRIES,
                                         &csma_retries, sizeof(csma_retries));
             netopt_enable_t csma_enable = NETOPT_ENABLE;
-            lwmac->netdev->driver->set(lwmac->netdev, NETOPT_CSMA, &csma_enable, sizeof(csma_enable));
+			lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_CSMA, &csma_enable, sizeof(csma_enable));
 
             GOTO_TX_STATE(TX_STATE_SEND_BROADCAST, true);
         } else {
             /* Don't attempt to send a WR if channel is busy to get timings
              * right, will be changed for sending DATA packet */
             netopt_enable_t csma_disable = NETOPT_DISABLE;
-            lwmac->netdev->driver->set(lwmac->netdev, NETOPT_CSMA, &csma_disable, sizeof(csma_disable));
+			lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_CSMA, &csma_disable, sizeof(csma_disable));
 
             GOTO_TX_STATE(TX_STATE_SEND_WR, true);
         }
@@ -149,7 +149,7 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
 
             /* No Auto-ACK for broadcast packets */
             netopt_enable_t autoack = NETOPT_DISABLE;
-            lwmac->netdev->driver->set(lwmac->netdev, NETOPT_AUTOACK, &autoack, sizeof(autoack));
+			lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_AUTOACK, &autoack, sizeof(autoack));
 
             first = true;
         }
@@ -159,7 +159,7 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
             /* Don't let the packet be released yet, we want to send it again */
             gnrc_pktbuf_hold(pkt, 1);
 
-            lwmac->netdev->driver->send_data(lwmac->netdev, pkt);
+			lwmac->netdev->send(lwmac->netdev, pkt);
             _set_netdev_state(lwmac, NETOPT_STATE_TX);
 
             lwmac_set_timeout(lwmac, TIMEOUT_NEXT_BROADCAST, LWMAC_TIME_BETWEEN_BROADCAST_US);
@@ -210,11 +210,11 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
 
         /* Disable Auto ACK */
         netopt_enable_t autoack = NETOPT_DISABLE;
-        lwmac->netdev->driver->set(lwmac->netdev, NETOPT_AUTOACK, &autoack, sizeof(autoack));
+		lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_AUTOACK, &autoack, sizeof(autoack));
 
         /* Prepare WR, this will discard any frame in the transceiver that has
          * possibly arrived in the meantime but we don't care at this point. */
-        lwmac->netdev->driver->send_data(lwmac->netdev, pkt);
+		lwmac->netdev->send(lwmac->netdev, pkt);
 
         /* First WR, try to catch wakeup phase */
         if(lwmac->tx.wr_sent == 0) {
@@ -395,22 +395,22 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
 
         /* Enable Auto ACK again */
         netopt_enable_t autoack = NETOPT_ENABLE;
-        lwmac->netdev->driver->set(lwmac->netdev, NETOPT_AUTOACK, &autoack, sizeof(autoack));
+		lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_AUTOACK, &autoack, sizeof(autoack));
 
         /* It's okay to retry sending DATA. Timing doesn't matter anymore and
          * destination is waiting for a certain amount of time. */
         uint8_t csma_retries = LWMAC_DATA_CSMA_RETRIES;
-        lwmac->netdev->driver->set(lwmac->netdev, NETOPT_CSMA_RETRIES, &csma_retries, sizeof(csma_retries));
+		lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_CSMA_RETRIES, &csma_retries, sizeof(csma_retries));
 
         netopt_enable_t csma_enable = NETOPT_ENABLE;
-        lwmac->netdev->driver->set(lwmac->netdev, NETOPT_CSMA, &csma_enable, sizeof(csma_enable));
+		lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_CSMA, &csma_enable, sizeof(csma_enable));
 
         /* Insert lwMAC header above NETIF header */
         lwmac_hdr_t hdr = {FRAMETYPE_DATA};
         pkt->next = gnrc_pktbuf_add(pkt->next, &hdr, sizeof(hdr), GNRC_NETTYPE_LWMAC);
 
         /* Send data */
-        lwmac->netdev->driver->send_data(lwmac->netdev, pkt);
+		lwmac->netdev->send(lwmac->netdev, pkt);
         _set_netdev_state(lwmac, NETOPT_STATE_TX);
 
         /* Packet has been released by netdev, so drop pointer */

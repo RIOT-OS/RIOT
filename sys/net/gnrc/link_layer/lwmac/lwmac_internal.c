@@ -376,7 +376,7 @@ int _parse_packet(gnrc_pktsnip_t* pkt, lwmac_packet_info_t* info)
 // TODO: Don't use global variables
 void _set_netdev_state(lwmac_t* lwmac, netopt_state_t devstate)
 {
-    lwmac->netdev->driver->set(lwmac->netdev,
+	lwmac->netdev2_driver->set(lwmac->netdev->dev,
                                NETOPT_STATE,
                                &devstate,
                                sizeof(devstate));
@@ -387,7 +387,7 @@ void _set_netdev_state(lwmac_t* lwmac, netopt_state_t devstate)
 netopt_state_t _get_netdev_state(lwmac_t* lwmac)
 {
     netopt_state_t state;
-    if (0 < lwmac->netdev->driver->get(lwmac->netdev,
+	if (0 < lwmac->netdev2_driver->get(lwmac->netdev->dev,
                                        NETOPT_STATE,
                                        &state,
                                        sizeof(state))) {

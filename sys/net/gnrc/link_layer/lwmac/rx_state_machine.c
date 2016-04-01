@@ -58,7 +58,7 @@ void lwmac_rx_start(lwmac_t* lwmac)
 
     /* Don't attempt to send a WA if channel is busy to get timings right */
     netopt_enable_t csma_disable = NETOPT_DISABLE;
-    lwmac->netdev->driver->set(lwmac->netdev, NETOPT_CSMA, &csma_disable, sizeof(csma_disable));
+	lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_CSMA, &csma_disable, sizeof(csma_disable));
 
     lwmac->rx.state = RX_STATE_INIT;
 }
@@ -191,7 +191,7 @@ static bool _lwmac_rx_update(lwmac_t* lwmac)
 
         /* Disable Auto ACK */
         netopt_enable_t autoack = NETOPT_DISABLE;
-        lwmac->netdev->driver->set(lwmac->netdev, NETOPT_AUTOACK, &autoack, sizeof(autoack));
+		lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_AUTOACK, &autoack, sizeof(autoack));
 
         /* We might have taken too long to answer the WR so we're receiving the
          * next one already. Don't send WA yet and go back to WR reception.
@@ -207,12 +207,12 @@ static bool _lwmac_rx_update(lwmac_t* lwmac)
 //        }
 
         /* Send WA */
-        lwmac->netdev->driver->send_data(lwmac->netdev, pkt);
+		lwmac->netdev->send(lwmac->netdev, pkt);
         _set_netdev_state(lwmac, NETOPT_STATE_TX);
 
         /* Enable Auto ACK again for data reception */
         autoack = NETOPT_ENABLE;
-        lwmac->netdev->driver->set(lwmac->netdev, NETOPT_AUTOACK, &autoack, sizeof(autoack));
+		lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_AUTOACK, &autoack, sizeof(autoack));
 
         GOTO_RX_STATE(RX_STATE_WAIT_WA_SENT, false);
     }

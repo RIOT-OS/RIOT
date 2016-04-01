@@ -23,7 +23,7 @@
 #define GNRC_LWMAC_H
 
 #include <kernel_types.h>
-#include <net/gnrc/netdev.h>
+#include <net/gnrc/netdev2.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -168,7 +168,7 @@ extern "C" {
  * @return                  -ENODEV if *dev* is invalid
  */
 kernel_pid_t gnrc_lwmac_init(char *stack, int stacksize, char priority,
-                           const char *name, gnrc_netdev_t *dev);
+						   const char *name, gnrc_netdev2_t *dev);
 
 #ifdef __cplusplus
 }

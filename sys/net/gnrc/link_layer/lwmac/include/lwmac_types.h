@@ -25,6 +25,8 @@
 #include <stdbool.h>
 #include <kernel_types.h>
 #include <xtimer.h>
+#include <net/netdev2.h>
+#include <net/gnrc/netdev2.h>
 #include <net/gnrc.h>
 #include <net/gnrc/lwmac/lwmac.h>
 #include <net/gnrc/lwmac/hdr.h>
@@ -172,7 +174,8 @@ typedef struct lwmac {
     /* PID of lwMAC thread */
     kernel_pid_t pid;
     /* NETDEV device used by lwMAC */
-    gnrc_netdev_t* netdev;
+	gnrc_netdev2_t* netdev;
+	const netdev2_driver_t* netdev2_driver;
     /* Internal state of MAC layer */
     lwmac_state_t state;
     /* Track if a transmission might have corrupted a received packet */
@@ -197,6 +200,7 @@ typedef struct lwmac {
 #define LWMAC_INIT { \
 /* pid */                   KERNEL_PID_UNDEF,  \
 /* netdev */                NULL, \
+/* netdev2_driver */		NULL, \
 /* state */                 UNDEF, \
 /* rx_in_progress */        false, \
 /* l2_addr */               LWMAC_L2_ADDR_INIT, \

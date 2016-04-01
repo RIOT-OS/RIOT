@@ -29,6 +29,8 @@
 #include <timex.h>
 #include <periph/rtt.h>
 #include <net/gnrc.h>
+#include <net/netdev2.h>
+#include <net/gnrc/netdev2.h>
 #include <net/gnrc/lwmac/lwmac.h>
 #include <net/gnrc/lwmac/packet_queue.h>
 
@@ -425,73 +427,90 @@ void rtt_handler(uint32_t event)
  * @param[in] data          optional parameter
  */
 // TODO: Don't use global variables
-static void _event_cb(gnrc_netdev_event_t event, void *data)
+//static void _event_cb(gnrc_netdev_event_t event, void *data)
+static void _event_cb(netdev2_t* dev, netdev2_event_t event, void *data)
 {
-    switch(event)
-    {
-    case NETDEV_EVENT_RX_STARTED:
-        LOG_DEBUG("NETDEV_EVENT_RX_STARTED\n");
-        lwmac.rx_started = true;
-        break;
-    case NETDEV_EVENT_RX_COMPLETE:
-    {
-        LOG_DEBUG("NETDEV_EVENT_RX_COMPLETE\n");
+	(void) data;
+	gnrc_netdev2_t *gnrc_netdev2 = (gnrc_netdev2_t*) dev->isr_arg;
 
-        gnrc_pktsnip_t* pkt = (gnrc_pktsnip_t *) data;
+	if (event == NETDEV2_EVENT_ISR) {
+		msg_t msg;
 
-        /* Prevent packet corruption when a packet is sent before the previous
-         * received packet has been downloaded. This happens e.g. when a timeout
-         * expires that causes the tx state machine to send a packet. When a
-         * packet arrives after the timeout, the notification is queued but the
-         * tx state machine continues to send and then destroys the received
-         * packet in the frame buffer. After completion, the queued notification
-         * will be handled a corrupted packet will be downloaded. Therefore
-         * keep track that RX_STARTED is followed by RX_COMPLETE.
-         *
-         * TODO: transceivers might have 2 frame buffers, so make this optional
-         */
-        if(!lwmac.rx_started) {
-            LOG_WARNING("Maybe sending kicked in and frame buffer is now corrupted\n");
-            gnrc_pktbuf_release(pkt);
-            lwmac.rx_started = false;
-            break;
-        }
+		msg.type = NETDEV2_MSG_TYPE_EVENT;
+		msg.content.ptr = (void*) gnrc_netdev2;
 
-        lwmac.rx_started = false;
+		if (msg_send(&msg, gnrc_netdev2->pid) <= 0) {
+			puts("gnrc_netdev2: possibly lost interrupt.");
+		}
+	} else {
 
-        if(!packet_queue_push(&lwmac.rx.queue, pkt, 0))
-        {
-            LOG_ERROR("Can't push RX packet @ %p, memory full?\n", pkt);
-            gnrc_pktbuf_release(pkt);
-            break;
-        }
-        lwmac_schedule_update();
-        break;
-    }
-    case NETDEV_EVENT_TX_STARTED:
-        lwmac.tx_feedback = TX_FEEDBACK_UNDEF;
-        lwmac.rx_started = false;
-//        lwmac_schedule_update();
-        break;
-    case NETDEV_EVENT_TX_COMPLETE:
-        lwmac.tx_feedback = TX_FEEDBACK_SUCCESS;
-        lwmac.rx_started = false;
-        lwmac_schedule_update();
-        break;
-    case NETDEV_EVENT_TX_NOACK:
-        lwmac.tx_feedback = TX_FEEDBACK_NOACK;
-        lwmac.rx_started = false;
-        lwmac_schedule_update();
-        break;
-    case NETDEV_EVENT_TX_MEDIUM_BUSY:
-        lwmac.tx_feedback = TX_FEEDBACK_BUSY;
-        lwmac.rx_started = false;
-        lwmac_schedule_update();
-        break;
+		DEBUG("gnrc_netdev2: event triggered -> %i\n", event);
+		switch(event)
+		{
+		case NETDEV2_EVENT_RX_STARTED:
+			LOG_DEBUG("NETDEV_EVENT_RX_STARTED\n");
+			lwmac.rx_started = true;
+			break;
+		case NETDEV2_EVENT_RX_COMPLETE:
+		{
+			LOG_DEBUG("NETDEV_EVENT_RX_COMPLETE\n");
 
-    default:
-        LOG_WARNING("Unhandled netdev event: %u\n", event);
-    }
+			gnrc_pktsnip_t *pkt = gnrc_netdev2->recv(gnrc_netdev2);
+
+			/* Prevent packet corruption when a packet is sent before the previous
+			 * received packet has been downloaded. This happens e.g. when a timeout
+			 * expires that causes the tx state machine to send a packet. When a
+			 * packet arrives after the timeout, the notification is queued but the
+			 * tx state machine continues to send and then destroys the received
+			 * packet in the frame buffer. After completion, the queued notification
+			 * will be handled a corrupted packet will be downloaded. Therefore
+			 * keep track that RX_STARTED is followed by RX_COMPLETE.
+			 *
+			 * TODO: transceivers might have 2 frame buffers, so make this optional
+			 */
+			if(!lwmac.rx_started) {
+				LOG_WARNING("Maybe sending kicked in and frame buffer is now corrupted\n");
+				gnrc_pktbuf_release(pkt);
+				lwmac.rx_started = false;
+				break;
+			}
+
+			lwmac.rx_started = false;
+
+			if(!packet_queue_push(&lwmac.rx.queue, pkt, 0))
+			{
+				LOG_ERROR("Can't push RX packet @ %p, memory full?\n", pkt);
+				gnrc_pktbuf_release(pkt);
+				break;
+			}
+			lwmac_schedule_update();
+			break;
+		}
+		case NETDEV2_EVENT_TX_STARTED:
+			lwmac.tx_feedback = TX_FEEDBACK_UNDEF;
+			lwmac.rx_started = false;
+	//        lwmac_schedule_update();
+			break;
+		case NETDEV2_EVENT_TX_COMPLETE:
+			lwmac.tx_feedback = TX_FEEDBACK_SUCCESS;
+			lwmac.rx_started = false;
+			lwmac_schedule_update();
+			break;
+		case NETDEV2_EVENT_TX_NOACK:
+			lwmac.tx_feedback = TX_FEEDBACK_NOACK;
+			lwmac.rx_started = false;
+			lwmac_schedule_update();
+			break;
+		case NETDEV2_EVENT_TX_MEDIUM_BUSY:
+			lwmac.tx_feedback = TX_FEEDBACK_BUSY;
+			lwmac.rx_started = false;
+			lwmac_schedule_update();
+			break;
+
+		default:
+			LOG_WARNING("Unhandled netdev event: %u\n", event);
+		}
+	}
 }
 
 /**
@@ -504,7 +523,12 @@ static void _event_cb(gnrc_netdev_event_t event, void *data)
 // TODO: Don't use global variables
 static void *_lwmac_thread(void *args)
 {
-    gnrc_netdev_t* dev = lwmac.netdev = (gnrc_netdev_t *)args;
+	gnrc_netdev2_t* gnrc_netdev2 = lwmac.netdev = (gnrc_netdev2_t *)args;
+	netdev2_t* dev = gnrc_netdev2->dev;
+	lwmac.netdev2_driver = dev->driver;
+
+	gnrc_netdev2->pid = thread_getpid();
+
     gnrc_netapi_opt_t* opt;
     int res;
     msg_t msg, reply, msg_queue[LWMAC_IPC_MSG_QUEUE_SIZE];
@@ -519,11 +543,16 @@ static void *_lwmac_thread(void *args)
 
     /* setup the MAC layers message queue */
     msg_init_queue(msg_queue, LWMAC_IPC_MSG_QUEUE_SIZE);
-    /* save the PID to the device descriptor and register the device */
-    dev->mac_pid = lwmac.pid;
-    gnrc_netif_add(lwmac.pid);
-    /* register the event callback with the device driver */
-    dev->driver->add_event_callback(dev, _event_cb);
+
+	/* initialize low-level driver */
+	dev->driver->init(dev);
+
+	/* register the device to the network stack*/
+	gnrc_netif_add(thread_getpid());
+
+	/* register the event callback with the device driver */
+	dev->event_callback = _event_cb;
+	dev->isr_arg = (void*) gnrc_netdev2;
 
     /* Enable RX- and TX-started interrupts  */
     netopt_enable_t enable = NETOPT_ENABLE;
@@ -589,10 +618,10 @@ static void *_lwmac_thread(void *args)
         }
 
         /* Transceiver raised an interrupt */
-        case GNRC_NETDEV_MSG_TYPE_EVENT:
+		case NETDEV2_MSG_TYPE_EVENT:
             LOG_DEBUG("GNRC_NETDEV_MSG_TYPE_EVENT received\n");
             /* Forward event back to driver */
-            dev->driver->isr_event(dev, msg.content.value);
+			dev->driver->isr(dev);
             break;
 
         /* TX: Queue for sending */
@@ -687,12 +716,12 @@ static void *_lwmac_thread(void *args)
 }
 
 kernel_pid_t gnrc_lwmac_init(char *stack, int stacksize, char priority,
-                        const char *name, gnrc_netdev_t *dev)
+						const char *name, gnrc_netdev2_t *dev)
 {
     kernel_pid_t res;
 
     /* check if given netdev device is defined and the driver is set */
-    if (dev == NULL || dev->driver == NULL) {
+	if (dev == NULL || dev->dev == NULL) {
         LOG_ERROR("No netdev supplied or driver not set\n");
         return -ENODEV;
     }
