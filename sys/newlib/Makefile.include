@@ -28,11 +28,12 @@ export LINKFLAGS += -lc -lnosys
 # Ubuntu seem to put a copy of the newlib headers in the same place as
 # Gentoo crossdev, but we prefer to look at /etc/alternatives first.
 # On OSX, newlib includes are possibly located in
-# /usr/local/opt/arm-none-eabi*/arm-none-eabi/include
+# /usr/local/opt/arm-none-eabi*/arm-none-eabi/include or /usr/local/opt/gcc-arm/arm-none-eabi/include
 NEWLIB_INCLUDE_PATTERNS ?= \
   /etc/alternatives/gcc-$(TARGET_ARCH)-include \
   /usr/$(TARGET_ARCH)/include \
   /usr/local/opt/$(TARGET_ARCH)*/$(TARGET_ARCH)/include \
+  /usr/local/opt/gcc-*/$(TARGET_ARCH)/include \
   #
 # Use the wildcard Makefile function to search for existing directories matching
 # the patterns above. We use the -isystem gcc/clang argument to add the include
