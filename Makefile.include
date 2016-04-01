@@ -263,7 +263,7 @@ endif
 endif # BUILD_IN_DOCKER
 
 ..compiler-check:
-	$(AD)command -v $(CC) >/dev/null 2>&1 || \
+	@command -v $(CC) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
 		'${COLOR_RED} Compiler $(CC) is required but not found in PATH.  Aborting.${COLOR_RESET}'; \
 		exit 1; }
@@ -317,14 +317,14 @@ distclean:
 	-@rm -rf $(BINDIRBASE)
 
 flash: all
-	$(AD)command -v $(FLASHER) >/dev/null 2>&1 || \
+	@command -v $(FLASHER) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
 		'${COLOR_RED} Flash program $(FLASHER) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(FLASHER) $(FFLAGS)
 
 term: $(filter flash, $(MAKECMDGOALS))
-	$(AD)command -v $(TERMPROG) >/dev/null 2>&1 || \
+	@command -v $(TERMPROG) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
 		'${COLOR_RED} Terminal program $(TERMPROG) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
@@ -337,21 +337,21 @@ doc:
 	make -BC $(RIOTBASE) doc
 
 debug:
-	$(AD)command -v $(DEBUGGER) >/dev/null 2>&1 || \
+	@command -v $(DEBUGGER) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
 		'${COLOR_RED} Debug program $(DEBUGGER) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
 debug-server:
-	$(AD)command -v $(DEBUGSERVER) >/dev/null 2>&1 || \
+	@command -v $(DEBUGSERVER) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
 		'${COLOR_RED} Debug server program $(DEBUGSERVER) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
 
 reset:
-	$(AD)command -v $(RESET) >/dev/null 2>&1 || \
+	@command -v $(RESET) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
 		'${COLOR_RED} Reset program $(RESET) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
@@ -361,7 +361,7 @@ reset:
 OBJDUMPFLAGS ?= -S -D -h
 
 objdump:
-	$(AD)command -v $(OBJDUMP) >/dev/null 2>&1 || \
+	@command -v $(OBJDUMP) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
 		'${COLOR_RED} Objdump program $(OBJDUMP) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
