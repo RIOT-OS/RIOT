@@ -97,7 +97,7 @@ static uint8_t _cksum(uint8_t *buf, size_t size)
 
 static void _at_cmd(xbee_t *dev, const char *cmd)
 {
-    DEBUG("xbee: AT_CMD: %s", cmd);
+    DEBUG("xbee: AT_CMD: %s\n", cmd);
 
     uart_write(dev->uart, (uint8_t *)cmd, strlen(cmd));
 }
