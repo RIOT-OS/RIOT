@@ -108,15 +108,6 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     return (char *) p;
 }
 
-/**
- * This function calculates the ISR_usage
- */
-int thread_arch_isr_stack_usage(void)
-{
-    /* TODO */
-    return -1;
-}
-
 void isr_cpu_switch_context_exit(void)
 {
     ucontext_t *ctx;

@@ -4,9 +4,9 @@ linux_checkid() {
     udevinfo -a -n ${1} | grep -q "ATTRS{product}==\"${2}\""
 }
 
-linux_flash_fm() {
+windows_flash_fm() {
     echo "Checking FTDI device on COM${1}"
-    PORTINFO=`${BASEDIR}/../../../tools/linux/ftdiinfo/bin/Debug/ftdiinfo.exe /l COM${1}`
+    PORTINFO=`${BASEDIR}/../../../tools/windows/ftdiinfo/bin/Debug/ftdiinfo.exe /l COM${1}`
     PORTCHECK=`echo ${PORTINFO} | awk '{ print $1 }'`
     BOARDCHECK=`echo ${PORTINFO} | awk '{ print $3 }'`
     SERIAL=`echo ${PORTINFO} | awk '{ print $2 }'`
@@ -24,7 +24,7 @@ linux_flash_fm() {
     cmd /C start "FlashMagic ${HEXFILE} to ${BOARDCHECK} on COM${1}" fm.exe "COM(${1}, 230400) DEVICE(LPC2387, 16.000000) HARDWARE(BOOTEXEC, 50, 100) HIGHSPEED(0, 230400) ERASEUSED(${HEXFILE}, PROTECTISP) HEXFILE(${HEXFILE}, NOCHECKSUMS, NOFILL, PROTECTISP) RESET"
 }
 
-linux_flash_openocd() {
+windows_flash_openocd() {
     echo "Flashing ${HEXFILE} through JTAG"
     # Using OpenOcd on Windows
     #cmd /C start "OpenOCD ${HEXFILE} to ${BOARDCHECK}"
@@ -85,9 +85,9 @@ fi
 for PORT in $PORTS; do
     if [ "x${WINDOWS}x" != "xx" ]; then
         if [ "${PORT}" = "openocd" ]; then
-            linux_flash_openocd
+            windows_flash_openocd
         else
-            linux_flash_fm ${PORT}
+            windows_flash_fm ${PORT}
         fi
     else
         if [ "${PORT}" = "openocd" ]; then

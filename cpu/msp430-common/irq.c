@@ -24,7 +24,7 @@
 
 volatile int __irq_is_in = 0;
 
-char __isr_stack[ISR_STACKSIZE];
+char __isr_stack[MSP430_ISR_STACK_SIZE];
 
 unsigned int irq_disable(void)
 {

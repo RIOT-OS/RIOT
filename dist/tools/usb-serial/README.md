@@ -59,7 +59,7 @@ solution):
         endif
     endif
 
-    # TODO: add support for linux as host platform
+    # TODO: add support for windows as host platform
     ifeq ($(PORT),)
       $(info CAUTION: No terminal port for your host system found!)
     endif

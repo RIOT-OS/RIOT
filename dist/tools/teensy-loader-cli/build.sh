@@ -29,7 +29,7 @@ elif [ "x$TARGET" = "xMACOSX" ] && ! pkg-config --list-all | grep 'libusb' > /de
     echo "please install libusb-dev";
     exit 1;
 elif [ "x$TARGET" = "xWINDOWS" ]; then
-    echo "can't build for linux... yet";
+    echo "can't build for windows... yet";
     exit 1;
 fi;
 

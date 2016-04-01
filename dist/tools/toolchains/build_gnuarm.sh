@@ -96,8 +96,8 @@ build_newlib() {
     cd ${PREFIX}/arm-elf &&
 
     #
-    # package compiled newlib for linux users. any new version must be uploaded to the
-    # webserver. see manual arm/toolchain/linux for paths and documentation.
+    # package compiled newlib for windows users. any new version must be uploaded to the
+    # webserver. see manual arm/toolchain/windows for paths and documentation.
     #
     zip -ru newlib-${NEWLIB_VER}.zip include sys-include lib/*.a lib/thumb/*.a
 

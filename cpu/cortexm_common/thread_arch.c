@@ -233,15 +233,6 @@ char *thread_arch_stack_init(thread_task_func_t task_func,
     return (char*) stk;
 }
 
-/* This function returns the number of bytes used on the ISR stack */
-int thread_arch_isr_stack_usage(void)
-{
-    uint32_t  *ptr = &_sstack;
-    while (*(ptr++) == STACK_CANARY_WORD) {
-    }
-    return ISR_STACKSIZE - (ptr - &_sstack) * sizeof(*ptr);
-}
-
 void thread_arch_stack_print(void)
 {
     int count = 0;

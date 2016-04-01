@@ -14,7 +14,7 @@ else ifeq ($(OS),Darwin)
   FLASHER = avrdude
 else
   $(info CAUTION: No flash tool for your host system found!)
-  # TODO: fix for building under linux
+  # TODO: fix for building under windows
 endif
 export FLASHER
 export PORT

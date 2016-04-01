@@ -89,15 +89,6 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     return (char *) stackptr;
 }
 
-/**
- * This function calculates the ISR_usage
- */
-int thread_arch_isr_stack_usage(void)
-{
-    /* TODO */
-    return -1;
-}
-
 /******************************************************************************/
 
 /* System reboot */

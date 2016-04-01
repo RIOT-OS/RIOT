@@ -12,7 +12,7 @@ else ifeq ($(OS),Darwin)
   FLASHER = $(RIOTBOARD)/$(BOARD)/dist/bossac_udoo_osx
 else
   $(info CAUTION: No flash tool for your host system found!)
-  # TODO: add support for linux as host platform
+  # TODO: add support for windows as host platform
 endif
 export FLASHER
 export PORT

@@ -167,13 +167,6 @@ char *thread_arch_stack_init(thread_task_func_t task_func, void *arg,
     return (char *) stk;
 }
 
-/* This function calculates the ISR_usage */
-int thread_arch_isr_stack_usage(void)
-{
-    /* TODO */
-    return -1;
-}
-
 /**
  * @brief thread_arch_stack_print prints the stack to stdout.
  * It depends on getting the correct values for stack_start, stack_size and sp

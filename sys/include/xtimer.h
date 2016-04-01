@@ -180,9 +180,13 @@ void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t usecs);
  * The mesage struct specified by msg parameter will not be copied, e.g., it
  * needs to point to valid memory until the message has been delivered.
  *
+<<<<<<< HEAD
  * @param[in] timer         timer struct to work with.
  *                          Its xtimer_t::target and xtimer_t::long_target
  *                          fields need to be initialized with 0 on first use.
+=======
+ * @param[in] timer         timer struct to work with
+>>>>>>> origin/newmaster
  * @param[in] offset        microseconds from now
  * @param[in] msg           ptr to msg that will be sent
  * @param[in] target_pid    pid the message will be sent to
@@ -198,9 +202,13 @@ void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t t
  * The mesage struct specified by msg parameter will not be copied, e.g., it
  * needs to point to valid memory until the message has been delivered.
  *
+<<<<<<< HEAD
  * @param[in] timer         timer struct to work with.
  *                          Its xtimer_t::target and xtimer_t::long_target
  *                          fields need to be initialized with 0 on first use.
+=======
+ * @param[in] timer         timer struct to work with
+>>>>>>> origin/newmaster
  * @param[in] offset        microseconds from now
  * @param[in] msg           ptr to msg that will be sent
  * @param[in] target_pid    pid the message will be sent to
@@ -213,9 +221,13 @@ void xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t
  * This function sets a timer that will wake up a thread when the timer has
  * expired.
  *
+<<<<<<< HEAD
  * @param[in] timer         timer struct to work with.
  *                          Its xtimer_t::target and xtimer_t::long_target
  *                          fields need to be initialized with 0 on first use
+=======
+ * @param[in] timer         timer struct to work with
+>>>>>>> origin/newmaster
  * @param[in] offset        microseconds from now
  * @param[in] pid           pid of the thread that will be woken up
  */
@@ -227,9 +239,13 @@ void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid);
  * This function sets a timer that will wake up a thread when the timer has
  * expired.
  *
+<<<<<<< HEAD
  * @param[in] timer         timer struct to work with.
  *                          Its xtimer_t::target and xtimer_t::long_target
  *                          fields need to be initialized with 0 on first use
+=======
+ * @param[in] timer         timer struct to work with
+>>>>>>> origin/newmaster
  * @param[in] offset        microseconds from now
  * @param[in] pid           pid of the thread that will be woken up
  */
@@ -247,9 +263,13 @@ void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid);
  * context (unless offset < XTIMER_BACKOFF). DON'T USE THIS FUNCTION unless you
  * know *exactly* what that means.
  *
+<<<<<<< HEAD
  * @param[in] timer     the timer structure to use.
  *                      Its xtimer_t::target and xtimer_t::long_target
  *                      fields need to be initialized with 0 on first use
+=======
+ * @param[in] timer     the timer structure to use
+>>>>>>> origin/newmaster
  * @param[in] offset    time in microseconds from now specifying that timer's
  *                      callback's execution time
  */
