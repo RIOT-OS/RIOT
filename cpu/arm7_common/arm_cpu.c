@@ -25,14 +25,7 @@
 
 void thread_yield_higher(void)
 {
-    __asm__("svc 0\n");
-}
-
-/* This function calculates the ISR_usage */
-int thread_arch_isr_stack_usage(void)
-{
-/* TODO */
-    return -1;
+    asm("svc 0\n");
 }
 
 /*----------------------------------------------------------------------------
@@ -76,10 +69,16 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     return (char *)stk;
 }
 
+int thread_arch_isr_stack_usage(void)
+{
+    /* TODO */
+    return -1;
+}
+
 void thread_print_stack(void)
 {
     register void *stack = 0;
-    __asm__("mov %0, sp" : "=r"(stack));
+    asm("mov %0, sp" : "=r"(stack));
 
     register unsigned int *s = (unsigned int *)stack;
     printf("task: %X SP: %X\n", (unsigned int) sched_active_thread, (unsigned int) stack);

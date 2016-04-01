@@ -88,7 +88,6 @@
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
- * @author      Mohmmad Ayman <mohmmadayman@aucegypt.edu>
  *
  * @}
  */
@@ -100,9 +99,6 @@
 #include "thread.h"
 #include "irq.h"
 #include "cpu.h"
-
-extern uint32_t _estack;
-extern uint32_t _sstack;
 
 /**
  * @brief   Noticeable marker marking the beginning of a stack segment
@@ -243,7 +239,7 @@ int thread_arch_isr_stack_usage(void)
     uint32_t  *ptr = &_sstack;
     while (*(ptr++) == STACK_CANARY_WORD) {
     }
-    return ISR_STACKSIZE - (ptr - &_sstack);
+    return ISR_STACKSIZE - (ptr - &_sstack) * sizeof(*ptr);
 }
 
 void thread_arch_stack_print(void)
@@ -266,7 +262,7 @@ void thread_arch_stack_print(void)
 
 __attribute__((naked)) void NORETURN thread_arch_start_threading(void)
 {
-    __asm__ volatile (
+    __ASM volatile (
     "bl     irq_arch_enable               \n" /* enable IRQs to make the SVC
                                            * interrupt is reachable */
     "svc    #1                            \n" /* trigger the SVC interrupt */
@@ -284,7 +280,7 @@ void thread_arch_yield(void)
 
 __attribute__((naked)) void arch_context_switch(void)
 {
-    __asm__ volatile (
+    __ASM volatile (
     /* PendSV handler entry point */
     ".global isr_pendsv               \n"
     ".thumb_func                      \n"

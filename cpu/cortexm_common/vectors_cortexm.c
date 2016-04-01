@@ -32,14 +32,6 @@
 #include "vectors_cortexm.h"
 
 /**
- * @brief Interrupt stack canary value
- *
- * @note 0xe7fe is the ARM Thumb machine code equivalent of __asm__("bl #-2\n") or
- * 'while (1);', i.e. an infinite loop.
- */
-#define STACK_CANARY_WORD 0xE7FEE7FEu
-
-/**
  * @brief   Memory markers, defined in the linker script
  * @{
  */
@@ -86,7 +78,7 @@ void reset_handler_default(void)
     uint32_t *top;
     /* Fill stack space with canary values up until the current stack pointer */
     /* Read current stack pointer from CPU register */
-    __asm__ volatile ("mov %[top], sp" : [top] "=r" (top) : : );
+    asm volatile ("mov %[top], sp" : [top] "=r" (top) : : );
     dst = &_sstack;
     while (dst < top) {
         *(dst++) = STACK_CANARY_WORD;
@@ -137,7 +129,7 @@ void nmi_default(void)
 static inline int _stack_size_left(uint32_t required)
 {
     uint32_t* sp;
-    __asm__ volatile ("mov %[sp], sp" : [sp] "=r" (sp) : : );
+    asm volatile ("mov %[sp], sp" : [sp] "=r" (sp) : : );
     return ((int)((uint32_t)sp - (uint32_t)&_sstack) - required);
 }
 
@@ -147,7 +139,7 @@ void hard_fault_handler(uint32_t* sp, uint32_t corrupted, uint32_t exc_return, u
 __attribute__((naked)) void hard_fault_default(void)
 {
     /* Get stack pointer where exception stack frame lies */
-    __asm__ volatile
+    __ASM volatile
     (
         /* Check that msp is valid first because we want to stack all the
          * r4-r11 registers so that we can use r0, r1, r2, r3 for other things. */
@@ -275,7 +267,7 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
         if(stack_left < 0) {
             printf("\nISR stack overflowed by at least %d bytes.\n", (-1 * stack_left));
         }
-        __asm__ volatile (
+        __ASM volatile (
             "mov r0, %[sp]\n"
             "ldr r2, [r0, #8]\n"
             "ldr r3, [r0, #12]\n"

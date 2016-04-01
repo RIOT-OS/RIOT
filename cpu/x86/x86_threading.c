@@ -70,17 +70,17 @@ unsigned irq_disable(void)
 unsigned irq_enable(void)
 {
     unsigned long eflags;
-    __asm__ volatile ("pushf; pop %0; sti" : "=g"(eflags));
+    asm volatile ("pushf; pop %0; sti" : "=g"(eflags));
     return (eflags & X86_IF) != 0;
 }
 
 void irq_restore(unsigned state)
 {
     if (state) {
-        __asm__ volatile ("sti");
+        asm volatile ("sti");
     }
     else {
-        __asm__ volatile ("cli");
+        asm volatile ("cli");
     }
 }
 
@@ -184,7 +184,7 @@ static void fpu_used_interrupt(uint8_t intr_num, struct x86_pushad *orig_ctx, un
     (void) orig_ctx;
     (void) error_code;
 
-    __asm__ volatile ("clts"); /* clear task switch flag */
+    asm volatile ("clts"); /* clear task switch flag */
 
     if (fpu_owner == sched_active_pid) {
         return;
@@ -192,13 +192,13 @@ static void fpu_used_interrupt(uint8_t intr_num, struct x86_pushad *orig_ctx, un
 
     if (fpu_owner != KERNEL_PID_UNDEF) {
         ucontext_t *ctx_owner = (ucontext_t *) sched_threads[fpu_owner]->sp;
-        __asm__ volatile ("fxsave (%0)" :: "r"(&fpu_data));
+        asm volatile ("fxsave (%0)" :: "r"(&fpu_data));
         ctx_owner->__fxsave = fpu_data;
     }
 
     ucontext_t *ctx_active = (ucontext_t *) sched_active_thread->sp;
     fpu_data = ctx_active->__fxsave;
-    __asm__ volatile ("fxrstor (%0)" :: "r"(&fpu_data));
+    asm volatile ("fxrstor (%0)" :: "r"(&fpu_data));
 
     fpu_owner = sched_active_pid;
 }
@@ -220,7 +220,7 @@ void x86_init_threading(void)
     makecontext(&end_context, x86_thread_exit, 0);
 
     x86_interrupt_handler_set(X86_INT_NM, fpu_used_interrupt);
-    __asm__ volatile ("fxsave (%0)" :: "r"(&initial_fpu_state));
+    asm volatile ("fxsave (%0)" :: "r"(&initial_fpu_state));
 
     DEBUG("Threading initialized\n");
 }
