@@ -40,6 +40,15 @@ extern "C" {
  #define XTIMER_OVERHEAD 5
 #endif
 
+#define XTIMER_SHIFT 1
+#define XTIMER_USEC_TO_TICKS_FACTOR 80
+
+#define XTIMER_USEC_TO_TICKS(value) ( value*XTIMER_USEC_TO_TICKS_FACTOR )
+#define XTIMER_TICKS_TO_USEC(value) ( value/XTIMER_USEC_TO_TICKS_FACTOR )
+
+
+#define TIME_TICKS_UNIT 1
+
 
 // CC3200 has 4 timer blocks
 #define TIMER_0_EN 1

@@ -36,7 +36,11 @@
 
 #define MAX_TIMERS TIMER_UNDEFINED
 
-#define TICKS_IN_USEC 80
+#ifndef TIME_TICKS_UNIT
+ #define TICKS_IN_USEC 80
+#else
+ #define TICKS_IN_USEC 1
+#endif
 
 typedef struct {
     void (*cb)(void*, int);

@@ -355,8 +355,13 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_USEC_TO_TICKS(value) ( (value) << -XTIMER_SHIFT )
 #define XTIMER_TICKS_TO_USEC(value) ( (value) >> -XTIMER_SHIFT )
 #else
+#ifndef XTIMER_USEC_TO_TICKS
 #define XTIMER_USEC_TO_TICKS(value) ( (value) >> XTIMER_SHIFT )
 #define XTIMER_TICKS_TO_USEC(value) ( (value) << XTIMER_SHIFT )
+#endif
+//#define XTIMER_USEC_TO_TICKS(value) ( value*XTIMER_USEC_TO_TICKS_FACTOR )
+//#define XTIMER_TICKS_TO_USEC(value) ( value/XTIMER_USEC_TO_TICKS_FACTOR )
+
 #endif
 
 /**

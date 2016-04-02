@@ -25,7 +25,7 @@
 #include "board.h"
 #include "xtimer.h"
 
-#ifdef UTEST
+#ifndef UTEST
 #define MORSE_LED_ON   LED_RED_ON
 #define MORSE_LED_OFF  LED_RED_OFF
 #else
@@ -39,9 +39,10 @@ void mock_gpio_clear(gpio_t dev);
 //Define the LED Pin
 #define PIN_OUT        9
 //Define unit length in ms
-#define UNIT_LENGTH    250 //250
+#define UNIT_LENGTH    100 //250
 
 #define delay(MILLISEC) xtimer_usleep(MILLISEC*1000)
+//#define delay(MILLISEC) xtimer_usleep(MILLISEC*80000)
 
 //Build a struct with the morse code mapping
 static const struct {const char letter, *code;} MorseMap[] =
