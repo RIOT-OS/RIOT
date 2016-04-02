@@ -21,7 +21,7 @@
 #ifndef INCLUDE_OUTPUT_MESSAGES_H_
 #define INCLUDE_OUTPUT_MESSAGES_H_
 
-#ifdef NDEBUG
+#ifdef DEVELHELP
 
  #define PANIC(NS, ERR_ID)  puts(sl_err_descr[ERR_ID]); while(1) {}
  #define PANIC2(NS, ERR_ID, ERR_VAL) printf("%s (%d)\n", sl_err_descr[ERR_ID], ERR_VAL); while(1) {}
