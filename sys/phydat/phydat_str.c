@@ -32,10 +32,27 @@ void phydat_dump(phydat_t *data, uint8_t dim)
     }
     printf("Data:");
     for (uint8_t i = 0; i < dim; i++) {
-        char tmp[PHYDAT_SCALE_STR_MAXLEN];
-        phydat_scale_to_str(data->scale, tmp);
-        printf("\t[%i] %i%s%s\n", (int)i, (int)data->val[i], tmp,
-               phydat_unit_to_str(data->unit));
+        char scale_str = phydat_scale_to_str(data->scale);
+
+        printf("\t[%i] ", (int)i);
+
+        if (scale_str) {
+            printf("%i%c", (int)data->val[i], scale_str);
+        }
+        else if (data->scale == 0) {
+            printf("%i", (int)data->val[i]);
+        }
+        else if ((data->scale > -5) && (data->scale < 0)) {
+            char num[8];
+            size_t len = fmt_s16_dfp(num, data->val[i], data->scale * -1);
+            num[len] = '\0';
+            printf("%s", num);
+        }
+        else {
+            printf("%iE%i", (int)data->val[i], (int)data->scale);
+        }
+
+        printf("%s\n", phydat_unit_to_str(data->unit));
     }
 }
 
@@ -55,27 +72,24 @@ const char *phydat_unit_to_str(uint8_t unit)
         case UNIT_BAR:      return "Bar";
         case UNIT_PA:       return "Pa";
         case UNIT_CD:       return "cd";
+        case UNIT_PERCENT:  return "%";
         default:            return "";
     }
 }
 
-void phydat_scale_to_str(int8_t scale, char *str)
+char phydat_scale_to_str(int8_t scale)
 {
     switch (scale) {
-        case 0:     *str = '\0'; return;
-        case -3:    *str = 'm'; break;
-        case -6:    *str = 'u'; break;
-        case -9:    *str = 'n'; break;
-        case -12:   *str = 'p'; break;
-        case -15:   *str = 'f'; break;
-        case 3:     *str = 'k'; break;
-        case 6:     *str = 'M'; break;
-        case 9:     *str = 'G'; break;
-        case 12:    *str = 'T'; break;
-        case 15:    *str = 'P'; break;
-        default:
-            *str++ = 'E';
-            str += fmt_s32_dec(str, scale) -1;
+        case -3:    return 'm';
+        case -6:    return 'u';
+        case -9:    return 'n';
+        case -12:   return 'p';
+        case -15:   return 'f';
+        case 3:     return 'k';
+        case 6:     return 'M';
+        case 9:     return 'G';
+        case 12:    return 'T';
+        case 15:    return 'P';
+        default:    return '\0';
     }
-    *++str = '\0';
 }

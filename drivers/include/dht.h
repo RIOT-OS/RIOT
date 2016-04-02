@@ -30,6 +30,7 @@
 
 #include <stdint.h>
 
+#include "saul.h"
 #include "periph/gpio.h"
 
 #ifdef __cplusplus
@@ -59,14 +60,22 @@ typedef enum {
 typedef struct {
     gpio_t pin;             /**< GPIO pin of the device's data pin */
     dht_type_t type;        /**< type of the DHT device */
-    gpio_pp_t pull;         /**< internal pull resistor configuration, set to
-                             *   GPIO_NOPULL when using an external pull-up */
+    gpio_mode_t in_mode;    /**< input pin configuration, with or without pull
+                             *   resistor */
 } dht_t;
 
 /**
  * @brief configuration parameters for DHT devices
  */
 typedef dht_t dht_params_t;
+
+/**
+ * @brief export SAUL endpoints
+ * @{
+ */
+extern const saul_driver_t dht_temp_saul_driver;
+extern const saul_driver_t dht_hum_saul_driver;
+/** @} */
 
 /**
  * @brief auto-initialize all configured DHT devices

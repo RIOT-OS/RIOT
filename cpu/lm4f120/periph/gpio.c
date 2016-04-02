@@ -30,6 +30,16 @@
 #include "debug.h"
 
 /**
+ * @brief   Mask out the pin type from the gpio_mode_t value
+ */
+#define TYPE(mode)          (mode >> 4)
+
+/**
+ * @brief   Mask out the pin mode from the gpio_mode_t value
+ */
+#define MODE(mode)          (mode & 0x0f)
+
+/**
  * @brief     Extract the pin number of the given pin
  */
 static inline uint8_t _pin_num(gpio_t pin)
@@ -82,15 +92,7 @@ typedef struct {
 
 static gpio_state_t gpio_config[NUM_OF_PORT][NUM_OF_PINS];
 
-static inline uint16_t _port_addr(gpio_t pin)
-{
-    const uint8_t port_num = _port_num(pin);
-    const uint32_t port_addr = _port_base[port_num];
-
-    return port_addr;
-}
-
-int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
+int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
@@ -109,8 +111,8 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
     HWREG(port_addr+GPIO_LOCK_R_OFF) = 0;
 
     ROM_GPIOPadConfigSet(port_addr, pin_bit,
-                         GPIO_STRENGTH_2MA, pullup);
-    ROM_GPIODirModeSet(port_addr, pin_bit, dir);
+                         GPIO_STRENGTH_2MA, TYPE(mode));
+    ROM_GPIODirModeSet(port_addr, pin_bit, MODE(mode));
 
     return 0;
 }
@@ -156,7 +158,7 @@ void isr_gpio_portf(void){
     _isr_gpio(5);
 }
 
-int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
     const uint8_t port_num = _port_num(pin);
@@ -176,7 +178,7 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
 
     ROM_GPIODirModeSet(port_addr, 1<<pin_num, GPIO_DIR_MODE_IN);
     ROM_GPIOPadConfigSet(port_addr, 1<<pin_num,
-                         GPIO_STRENGTH_2MA, pullup);
+                         GPIO_STRENGTH_2MA, TYPE(mode));
 
     ROM_IntMasterDisable();
 

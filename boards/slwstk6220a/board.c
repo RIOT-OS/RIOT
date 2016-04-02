@@ -26,11 +26,11 @@ void board_init(void)
 {
     /* enable access to the evaluation board controller chip. Without this, the
      * board controller does not forward the UART output to the USB port */
-    gpio_init(BC_PIN, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(BC_PIN, GPIO_OUT);
     gpio_set(BC_PIN);
     /* initialize the boards LEDs */
-    gpio_init(LED0_PIN, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(LED1_PIN, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(LED0_PIN, GPIO_OUT);
+    gpio_init(LED1_PIN, GPIO_OUT);
     /* initialize the CPU */
     cpu_init();
 }

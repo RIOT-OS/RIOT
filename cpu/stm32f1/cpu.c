@@ -18,12 +18,28 @@
  * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  *
  * @}
  */
 
 #include "cpu.h"
 #include "periph_conf.h"
+
+/* Check the source to be used for the PLL */
+#if defined(CLOCK_HSI) && defined(CLOCK_HSE)
+#error "Only provide one of two CLOCK_HSI/CLOCK_HSE"
+#elif CLOCK_HSI
+#define CLOCK_CR_SOURCE            RCC_CR_HSION
+#define CLOCK_CR_SOURCE_RDY        RCC_CR_HSIRDY
+#define CLOCK_PLL_SOURCE           (0)
+#elif CLOCK_HSE
+#define CLOCK_CR_SOURCE            RCC_CR_HSEON
+#define CLOCK_CR_SOURCE_RDY        RCC_CR_HSERDY
+#define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC
+#else
+#error "Please provide CLOCK_HSI or CLOCK_HSE in boards/NAME/includes/perhip_cpu.h"
+#endif
 
 static void clk_init(void);
 
@@ -37,7 +53,6 @@ void cpu_init(void)
 
 /**
  * @brief Configure the clock system of the stm32f1
- *
  */
 static void clk_init(void)
 {
@@ -56,14 +71,14 @@ static void clk_init(void)
     RCC->CIR = (uint32_t)0x009F0000;
 
     /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration */
-    /* Enable HSE */
-    RCC->CR |= ((uint32_t)RCC_CR_HSEON);
-    /* Wait till HSE is ready,
-     * NOTE: the MCU will stay here forever if no HSE clock is connected */
-    while ((RCC->CR & RCC_CR_HSERDY) == 0);
+    /* Enable high speed clock source */
+    RCC->CR |= ((uint32_t)CLOCK_CR_SOURCE);
+    /* Wait till the high speed clock source is ready
+     * NOTE: the MCU will stay here forever if you use an external clock source and it's not connected */
+    while ((RCC->CR & CLOCK_CR_SOURCE_RDY) == 0) {}
     /* Enable Prefetch Buffer */
     FLASH->ACR |= FLASH_ACR_PRFTBE;
-    /* Flash 2 wait state */
+    /* Set the flash wait state */
     FLASH->ACR &= ~((uint32_t)FLASH_ACR_LATENCY);
     FLASH->ACR |= (uint32_t)CLOCK_FLASH_LATENCY;
     /* HCLK = SYSCLK */
@@ -72,16 +87,16 @@ static void clk_init(void)
     RCC->CFGR |= (uint32_t)CLOCK_APB2_DIV;
     /* PCLK1 = HCLK */
     RCC->CFGR |= (uint32_t)CLOCK_APB1_DIV;
-    /*  PLL configuration: PLLCLK = HSE / HSE_DIV * HSE_MUL */
+    /*  PLL configuration: PLLCLK = CLOCK_SOURCE / PLL_DIV * PLL_MUL */
     RCC->CFGR &= ~((uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC | CLOCK_PLL_HSE_DIV | CLOCK_PLL_HSE_MUL);
+    RCC->CFGR |= (uint32_t)(CLOCK_PLL_SOURCE | CLOCK_PLL_DIV | CLOCK_PLL_MUL);
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
     /* Wait till PLL is ready */
-    while ((RCC->CR & RCC_CR_PLLRDY) == 0);
+    while ((RCC->CR & RCC_CR_PLLRDY) == 0) {}
     /* Select PLL as system clock source */
     RCC->CFGR &= ~((uint32_t)(RCC_CFGR_SW));
     RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
     /* Wait till PLL is used as system clock source */
-    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
+    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
 }

@@ -27,9 +27,26 @@
  * CFLAGS
  * ------
  *
- *  - Exclude Prefix Information Options from DIOs
+ * - Exclude Prefix Information Options from DIOs
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  *   CFLAGS += -DGNRC_RPL_WITHOUT_PIO
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ *  - Modify trickle parameters
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS=20
+ *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_INTERVAL_MIN=3
+ *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT=10
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * - Make reception of DODAG_CONF optional when joining a DODAG.
+ *   This will use the default trickle parameters until a
+ *   DODAG_CONF is received from the parent. The DODAG_CONF is
+ *   requested once from the parent while joining the DODAG.
+ *   The standard behaviour is to request a DODAG_CONF and join
+ *   only a DODAG once a DODAG_CONF is received.
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ *   CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @{
@@ -52,13 +69,14 @@
 #include <string.h>
 #include <stdint.h>
 #include "net/gnrc.h"
+#include "net/gnrc/ipv6.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/rpl/structs.h"
 #include "net/gnrc/rpl/dodag.h"
 #include "net/gnrc/rpl/of_manager.h"
 #include "net/fib.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "trickle.h"
 
 #ifdef __cplusplus
@@ -76,7 +94,7 @@ extern "C" {
  * @brief   Default priority for the RPL thread
  */
 #ifndef GNRC_RPL_PRIO
-#define GNRC_RPL_PRIO           (THREAD_PRIORITY_MAIN - 4)
+#define GNRC_RPL_PRIO           (GNRC_IPV6_PRIO + 1)
 #endif
 
 /**
@@ -211,9 +229,17 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
  *      </a>
  * @{
  */
+#ifndef GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS
 #define GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS (20)
+#endif
+
+#ifndef GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN
 #define GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN (3)
+#endif
+
+#ifndef GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT
 #define GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT (10)
+#endif
 /** @} */
 
 /**
@@ -361,6 +387,11 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 extern kernel_pid_t gnrc_rpl_pid;
 
 /**
+ * @brief @see @ref GNRC_RPL_ALL_NODES_ADDR
+ */
+extern const ipv6_addr_t ipv6_addr_all_rpl_nodes;
+
+/**
  * @brief Initialization of the RPL thread.
  *
  * @param[in] if_pid            PID of the interface
@@ -424,37 +455,42 @@ void gnrc_rpl_send_DAO_ACK(gnrc_rpl_instance_t *instance, ipv6_addr_t *destinati
  * @brief   Parse a DIS.
  *
  * @param[in] dis       Pointer to the DIS message.
+ * @param[in] iface     Interface PID of the incoming DIS.
  * @param[in] src       Pointer to the source address of the IPv6 packet.
  * @param[in] dst       Pointer to the destination address of the IPv6 packet.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, ipv6_addr_t *src, ipv6_addr_t *dst, uint16_t len);
+void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src,
+                       ipv6_addr_t *dst, uint16_t len);
 
 /**
  * @brief   Parse a DIO.
  *
  * @param[in] dio       Pointer to the DIO message.
+ * @param[in] iface     Interface PID of the incoming DIO.
  * @param[in] src       Pointer to the source address of the IPv6 packet.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len);
+void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src, uint16_t len);
 
 /**
  * @brief   Parse a DAO.
  *
  * @param[in] dao       Pointer to the DAO message.
+ * @param[in] iface     Interface PID of the incoming DIO.
  * @param[in] src       Pointer to the source address of the IPv6 packet.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, ipv6_addr_t *src, uint16_t len);
+void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src, uint16_t len);
 
 /**
  * @brief   Parse a DAO-ACK.
  *
  * @param[in] dao_ack   Pointer to the DAO-ACK message.
+ * @param[in] iface     Interface PID of the incoming DIO.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, uint16_t len);
+void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, uint16_t len);
 
 /**
  * @brief   Delay the DAO sending interval
@@ -487,11 +523,13 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
  * @brief Send a control message
  *
  * @param[in] pkt               gnrc_pktnsip_t to send
+ * @param[in] iface             Interface PID to send this pkt to
  * @param[in] src               Source address of the packet
  * @param[in] dst               Destination address of the packet
  * @param[in] dodag_id          Id of the DODAG
  */
-void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *dodag_id);
+void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
+                   ipv6_addr_t *dodag_id);
 
 /**
  * @brief Generate a local or global instance id
@@ -513,8 +551,8 @@ uint8_t gnrc_rpl_gen_instance_id(bool local);
  */
 static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
 {
-    dodag->req_opts = (dodag->req_opts & ~GNRC_RPL_REQ_OPT_PREFIX_INFO) |
-                      (status << GNRC_RPL_REQ_OPT_PREFIX_INFO_SHIFT);
+    dodag->dio_opts = (dodag->dio_opts & ~GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO) |
+                      (status << GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO_SHIFT);
 }
 #endif
 

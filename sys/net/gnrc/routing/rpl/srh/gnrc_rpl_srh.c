@@ -41,7 +41,7 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
     uint8_t *addr_vec = (uint8_t *) (rh + 1);
     bool found = false;
 
-    DEBUG("RPL SRH: %" PRIu8 " addresses in the routing header\n", n);
+    DEBUG("RPL SRH: %u addresses in the routing header\n", (unsigned) n);
 
     if (rh->seg_left > n) {
         DEBUG("RPL SRH: number of segments left > number of addresses - discard\n");
@@ -70,7 +70,6 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
         if (k == n - 1) {
             tmp_pref_elided = GNRC_RPL_SRH_COMPRE(rh->compr);
             tmp_addr_len = sizeof(ipv6_addr_t) - tmp_pref_elided;
-            tmp = ipv6->dst;
         }
         memcpy(&tmp.u8[tmp_pref_elided], &addr_vec[k * compri_addr_len], tmp_addr_len);
         if (gnrc_ipv6_netif_find_by_addr(NULL, &tmp) != KERNEL_PID_UNDEF) {

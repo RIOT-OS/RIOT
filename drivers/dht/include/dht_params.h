@@ -20,6 +20,8 @@
 #define DHT_PARAMS_H
 
 #include "board.h"
+#include "dht.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,12 +38,12 @@ extern "C" {
 #define DHT_PARAM_TYPE              (DHT11)
 #endif
 #ifndef DHT_PARAM_PULL
-#define DHT_PARAM_PULL              (GPIO_PULLUP)
+#define DHT_PARAM_PULL              (GPIO_IN_PU)
 #endif
 
-#define DHT_PARAMS_DEFAULT          {.pin = DHT_PARAM_PIN, \
-                                     .type = DHT_PARAM_TYPE, \
-                                     .pull = DHT_PARAM_PULL}
+#define DHT_PARAMS_DEFAULT          {.pin     = DHT_PARAM_PIN, \
+                                     .type    = DHT_PARAM_TYPE, \
+                                     .in_mode = DHT_PARAM_PULL}
 /**@}*/
 
 /**
@@ -60,6 +62,25 @@ static const dht_params_t dht_params[] =
  * @brief   Get the number of configured DHT devices
  */
 #define DHT_NUMOF       (sizeof(dht_params) / sizeof(dht_params[0]))
+
+#ifdef MODULE_SAUL_REG
+/**
+ * @brief   Allocate and configure entries to the SAUL registry
+ */
+saul_reg_t dht_saul_reg[][2] =
+{
+    {
+        {
+            .name = "dht-temp",
+            .driver = &dht_temp_saul_driver
+        },
+        {
+            .name = "dht-hum",
+            .driver = &dht_hum_saul_driver
+        }
+    }
+};
+#endif
 
 #ifdef __cplusplus
 }

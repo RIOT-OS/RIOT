@@ -25,19 +25,18 @@ extern "C" {
 
 #include "arduino.hpp"
 
-static inline gpio_dir_t _dir(int mode)
-{
-    return (mode == OUTPUT) ? GPIO_DIR_OUT : GPIO_DIR_IN;
-}
-
-static inline gpio_pp_t _pr(int mode)
-{
-    return (mode == INPUT_PULLUP) ? GPIO_PULLUP : GPIO_NOPULL;
-}
-
 void pinMode(int pin, int mode)
 {
-    gpio_init(arduino_pinmap[pin], _dir(mode), _pr(mode));
+    gpio_mode_t m = GPIO_OUT;
+
+    if (mode == INPUT) {
+        m = GPIO_IN;
+    }
+    else if (mode == INPUT_PULLUP) {
+        m = GPIO_IN_PU;
+    }
+
+    gpio_init(arduino_pinmap[pin], m);
 }
 
 void digitalWrite(int pin, int state)

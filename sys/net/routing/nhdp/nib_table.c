@@ -20,7 +20,7 @@
 
 #include "timex.h"
 #include "mutex.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "utlist.h"
 
 #include "rfc5444/rfc5444_iana.h"
@@ -57,7 +57,7 @@ nib_entry_t *nib_process_hello(void)
 
     mutex_lock(&mtx_nib_access);
 
-    vtimer_now(&now);
+    xtimer_now_timex(&now);
 
     LL_FOREACH_SAFE(nib_entry_head, nib_elt, nib_tmp) {
         nhdp_addr_entry_t *list_elt;
@@ -113,7 +113,7 @@ void nib_fill_wr_addresses(struct rfc5444_writer *wr)
 
     mutex_lock(&mtx_nib_access);
 
-    vtimer_now(&now);
+    xtimer_now_timex(&now);
 
     /* Add addresses of symmetric neighbors to HELLO msg */
     LL_FOREACH(nib_entry_head, nib_elt) {

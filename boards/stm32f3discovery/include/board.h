@@ -28,56 +28,65 @@ extern "C" {
 #endif
 
 /**
- * @name LED pin definitions
- * @{
- */
-#define LED_PORT            GPIOE
-#define LD3_PIN             (1 << 9)
-#define LD4_PIN             (1 << 8)
-#define LD5_PIN             (1 << 10)
-#define LD6_PIN             (1 << 15)
-#define LD7_PIN             (1 << 11)
-#define LD8_PIN             (1 << 14)
-#define LD9_PIN             (1 << 12)
-#define LD10_PIN            (1 << 13)
-/** @} */
-
-/**
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LD3_ON              (LED_PORT->BSRRL = LD3_PIN)
-#define LD3_OFF             (LED_PORT->BSRRH = LD3_PIN)
-#define LD3_TOGGLE          (LED_PORT->ODR ^= LD3_PIN)
-#define LD4_ON              (LED_PORT->BSRRL = LD4_PIN)
-#define LD4_OFF             (LED_PORT->BSRRH = LD4_PIN)
-#define LD4_TOGGLE          (LED_PORT->ODR ^= LD4_PIN)
-#define LD5_ON              (LED_PORT->BSRRL = LD5_PIN)
-#define LD5_OFF             (LED_PORT->BSRRH = LD5_PIN)
-#define LD5_TOGGLE          (LED_PORT->ODR ^= LD5_PIN)
-#define LD6_ON              (LED_PORT->BSRRL = LD6_PIN)
-#define LD6_OFF             (LED_PORT->BSRRH = LD6_PIN)
-#define LD6_TOGGLE          (LED_PORT->ODR ^= LD6_PIN)
-#define LD7_ON              (LED_PORT->BSRRL = LD7_PIN)
-#define LD7_OFF             (LED_PORT->BSRRH = LD7_PIN)
-#define LD7_TOGGLE          (LED_PORT->ODR ^= LD7_PIN)
-#define LD8_ON              (LED_PORT->BSRRL = LD8_PIN)
-#define LD8_OFF             (LED_PORT->BSRRH = LD8_PIN)
-#define LD8_TOGGLE          (LED_PORT->ODR ^= LD8_PIN)
-#define LD9_ON              (LED_PORT->BSRRL = LD9_PIN)
-#define LD9_OFF             (LED_PORT->BSRRH = LD9_PIN)
-#define LD9_TOGGLE          (LED_PORT->ODR ^= LD9_PIN)
-#define LD10_ON             (LED_PORT->BSRRL = LD10_PIN)
-#define LD10_OFF            (LED_PORT->BSRRH = LD10_PIN)
-#define LD10_TOGGLE         (LED_PORT->ODR ^= LD10_PIN)
-/* for compatability to other boards */
-#define LED_GREEN_ON        LD4_ON
-#define LED_GREEN_OFF       LD4_OFF
-#define LED_GREEN_TOGGLE    LD4_TOGGLE
-#define LED_RED_ON          LD5_ON
-#define LED_RED_OFF         LD5_OFF
-#define LED_RED_TOGGLE      LD5_TOGGLE
+#define LED0_PIN            GPIO_PIN(PORT_E, 9)
+#define LED1_PIN            GPIO_PIN(PORT_E, 8)
+#define LED2_PIN            GPIO_PIN(PORT_E, 10)
+#define LED3_PIN            GPIO_PIN(PORT_E, 15)
+#define LED4_PIN            GPIO_PIN(PORT_E, 11)
+#define LED5_PIN            GPIO_PIN(PORT_E, 14)
+#define LED6_PIN            GPIO_PIN(PORT_E, 12)
+#define LED7_PIN            GPIO_PIN(PORT_E, 13)
+
+#define LED_PORT            GPIOE
+#define LED0_MASK           (1 << 9)
+#define LED1_MASK           (1 << 8)
+#define LED2_MASK           (1 << 10)
+#define LED3_MASK           (1 << 15)
+#define LED4_MASK           (1 << 11)
+#define LED5_MASK           (1 << 14)
+#define LED6_MASK           (1 << 12)
+#define LED7_MASK           (1 << 13)
+
+#define LED0_ON             (LED_PORT->BSRRL = LED0_MASK)
+#define LED0_OFF            (LED_PORT->BSRRH = LED0_MASK)
+#define LED0_TOGGLE         (LED_PORT->ODR  ^= LED0_MASK)
+
+#define LED1_ON             (LED_PORT->BSRRL = LED1_MASK)
+#define LED1_OFF            (LED_PORT->BSRRH = LED1_MASK)
+#define LED1_TOGGLE         (LED_PORT->ODR  ^= LED1_MASK)
+
+#define LED2_ON             (LED_PORT->BSRRL = LED2_MASK)
+#define LED2_OFF            (LED_PORT->BSRRH = LED2_MASK)
+#define LED2_TOGGLE         (LED_PORT->ODR  ^= LED2_MASK)
+
+#define LED3_ON             (LED_PORT->BSRRL = LED3_MASK)
+#define LED3_OFF            (LED_PORT->BSRRH = LED3_MASK)
+#define LED3_TOGGLE         (LED_PORT->ODR  ^= LED3_MASK)
+
+#define LED4_ON             (LED_PORT->BSRRL = LED4_MASK)
+#define LED4_OFF            (LED_PORT->BSRRH = LED4_MASK)
+#define LED4_TOGGLE         (LED_PORT->ODR  ^= LED4_MASK)
+
+#define LED5_ON             (LED_PORT->BSRRL = LED5_MASK)
+#define LED5_OFF            (LED_PORT->BSRRH = LED5_MASK)
+#define LED5_TOGGLE         (LED_PORT->ODR  ^= LED5_MASK)
+
+#define LED6_ON             (LED_PORT->BSRRL = LED6_MASK)
+#define LED6_OFF            (LED_PORT->BSRRH = LED6_MASK)
+#define LED6_TOGGLE         (LED_PORT->ODR  ^= LED6_MASK)
+
+#define LED7_ON             (LED_PORT->BSRRL = LED7_MASK)
+#define LED7_OFF            (LED_PORT->BSRRH = LED7_MASK)
+#define LED7_TOGGLE         (LED_PORT->ODR  ^= LED7_MASK)
 /** @} */
+
+/**
+ * @brief User button
+ */
+#define BTN_B1_PIN          GPIO_PIN(PORT_A, 0)
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

@@ -87,8 +87,9 @@ void *slacker_thread(void *arg)
 void *worker_thread(void *arg)
 {
     (void) arg;
-    unsigned int loop_counter = 0;
+    uint32_t loop_counter = 0;
     uint32_t start = 0;
+    uint32_t last = 0;
 
     printf("Starting thread %" PRIkernel_pid "\n", thread_getpid());
 
@@ -98,19 +99,26 @@ void *worker_thread(void *arg)
         uint32_t now = xtimer_now();
         if (start == 0) {
             start = now;
+            last = start;
+            ++loop_counter;
+            continue;
         }
 
         uint32_t us, sec;
-        unsigned int min, hr;
-        us = now % 1000000;
-        sec = now / 1000000;
+        uint32_t min, hr;
+        us = now % SEC_IN_USEC;
+        sec = now / SEC_IN_USEC;
         min = (sec / 60) % 60;
         hr = sec / 3600;
         if ((loop_counter % TEST_HZ) == 0) {
             uint32_t expected = start + loop_counter * TEST_INTERVAL;
-            int32_t diff = now - expected;
-            printf("now=%" PRIu32 ".%06" PRIu32 " (%u hours %u min), diff=%" PRId32 "\n",
-                sec, us, hr, min, diff);
+            int32_t drift = now - expected;
+            expected = last + TEST_HZ * TEST_INTERVAL;
+            int32_t jitter = now - expected;
+            printf("now=%" PRIu32 ".%06" PRIu32 " (%" PRIu32 " hours %" PRIu32 " min), ",
+                sec, us, hr, min);
+            printf("drift=%" PRId32 " us, jitter=%" PRId32 " us\n", drift, jitter);
+            last = now;
         }
         ++loop_counter;
     }
@@ -124,11 +132,14 @@ int main(void)
     puts("Make note of the PC clock when starting this test, let run for a while, "
         "compare the printed time against the expected time from the PC clock.");
     puts("The difference is the RIOT timer drift, this is likely caused by either: "
-        "Inaccurate hardware timer, or bugs in the software (xtimer or periph/timer).");
+        "an inaccurate hardware timer, or bugs in the software (xtimer or periph/timer).");
     printf("This test will run a periodic timer every %lu microseconds (%lu Hz), ",
         (unsigned long)TEST_INTERVAL, (unsigned long)TEST_HZ);
     puts("The current time will be printed once per second, along with the "
          "difference between the actual and expected xtimer_now value.");
+    puts("The first output variable, 'drift', represents the total offset since "
+         "start between xtimer_now and the expected time.");
+    puts("The second output variable, 'jitter', represents the difference in drift from the last printout.");
     puts("Two other threads are also running only to cause extra interrupts and context switches.");
     puts(" <====== PC clock if running in pyterm.");
     puts("");

@@ -20,47 +20,26 @@
  */
 
 #include "board.h"
-#include "cpu.h"
-
-static void leds_init(void);
+#include "periph/gpio.h"
 
 void board_init(void)
 {
+    /* initialize the boards LEDs */
+    gpio_init(LED0_PIN, GPIO_OUT);
+    gpio_init(LED1_PIN, GPIO_OUT);
+    gpio_init(LED2_PIN, GPIO_OUT);
+    gpio_init(LED3_PIN, GPIO_OUT);
+    gpio_set(LED0_PIN);
+    gpio_set(LED1_PIN);
+    gpio_set(LED2_PIN);
+    gpio_set(LED3_PIN);
+
     /* initialize the CPU */
     cpu_init();
-    /* initialize the boards LEDs */
-    leds_init();
     /* disable systick interrupt, set by the spark bootloader */
     SysTick->CTRL = 0;
     /* signal to spark bootloader: do not enable IWDG! set Stop Mode Flag! */
     BKP->DR9 = 0xAFFF;
     /* configure the RIOT vector table location to internal flash + spark bootloader offset */
     SCB->VTOR = LOCATION_VTABLE;
-}
-
-/**
- * @brief Initialize the boards on-board LEDs
- *
- * The LEDs initialization is hard-coded in this function. As the LED is soldered
- * onto the board it is fixed to its CPU pins.
- *
- */
-static void leds_init(void)
-{
-    /* enable clock for port A */
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
-
-    /* reset pins */
-    LED_PORT->CR[1] &= ~(0xf << (4*(LED_RED_PIN - 8)) |
-                       0xf << (4*(LED_GREEN_PIN - 8)) |
-                       0xf << (4*(LED_BLUE_PIN - 8)) |
-                       0xf << (4*(LED_WHITE_PIN - 8)));
-
-    /* set pins to out */
-    LED_PORT->CR[1] |= (0x3 << (4*(LED_RED_PIN - 8)) |
-                      0x3 << (4*(LED_GREEN_PIN - 8)) |
-                      0x3 << (4*(LED_BLUE_PIN - 8)) |
-                      0x3 << (4*(LED_WHITE_PIN - 8)));
-
-    LED_PORT->BSRR = (1 << LED_RED_PIN) | (1 << LED_GREEN_PIN) | (1 << LED_BLUE_PIN) | (1 << LED_WHITE_PIN);
 }

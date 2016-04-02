@@ -3,12 +3,9 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_spi periph_gpio
 
-BOARD_INSUFFICIENT_MEMORY := nucleo-f334 stm32f0discovery weio
+DISABLE_MODULE += auto_init
 
-USEMODULE += auto_init_gnrc_netif
-USEMODULE += gnrc_netif
-USEMODULE += gnrc_nomac
-USEMODULE += gnrc_pktdump
+USEMODULE += od
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps

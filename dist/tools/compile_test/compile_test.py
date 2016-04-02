@@ -77,81 +77,6 @@ def get_results_and_output_from(fd):
         elif read_more_output:
             output.write(line)
 
-def _get_common_user(common):
-    return [f for f in check_output(r'grep -l "{}" cpu/*/Makefile* boards/*/Makefile*'.format(common),
-            shell=True).split() if 'common' not in f]
-
-def _get_boards_from_files(files):
-    boards = set()
-    if any('boards/' in s for s in files):
-        for f in files:
-            if 'boards/' not in f:
-                continue
-            board = re.sub(r'^boards/([^/]+)/.*$', r'\1', f)
-
-            if 'common' in board:
-                boards |= _get_boards_from_files(_get_common_user(board))
-            else:
-                boards |= { board }
-
-    return boards
-
-def _get_cpus_from_files(files):
-    cpus = set()
-
-    if any('cpu/' in s for s in files):
-        for f in files:
-            if 'cpu/' not in f:
-                continue
-
-            cpu = re.sub(r'^cpu/([^/]+)/.*', r'\1', f)
-
-            if 'common' in cpu:
-                cpus |= _get_cpus_from_files(_get_common_user(cpu))
-            else:
-                cpus |= { cpu }
-
-    return cpus
-
-def is_updated(application_folder, subprocess_env):
-    try:
-        if base_branch == '':
-            return True
-
-        if '.travis.yml' in diff_files or \
-           any('dist/' in s for s in diff_files):
-            return True
-
-        boards_changes = set()
-
-        boards_changes |= _get_boards_from_files(diff_files)
-
-        for cpu in _get_cpus_from_files(diff_files):
-            board_files = check_output(r'grep -l "^\(export \)*CPU[ :?=]\+{}" boards/*/Makefile.include'.format(cpu),
-                                       shell=True).split()
-            boards_changes |= _get_boards_from_files(board_files)
-
-        if len(boards_changes) > 0:
-            app_files = set()
-
-            for board in boards_changes:
-                env = { 'BOARD': board }
-                env.update(subprocess_env)
-                tmp = check_output(('make', 'info-files'), stderr=null,
-                                         cwd=application_folder, env=env)
-                app_files |= set(tmp.split())
-
-                if (len(diff_files & app_files) > 0):
-                    return True
-        else:
-            app_files = check_output(('make', 'info-files'), stderr=null,
-                                     cwd=application_folder, env=subprocess_env)
-            app_files = set(app_files.split())
-
-        return (len(diff_files & app_files) > 0)
-    except CalledProcessError as e:
-        return True
-
 def build_all():
     riotbase = environ.get('RIOTBASE') or abspath(join(dirname(abspath(__file__)), '../' * 3))
     for folder in ('examples', 'tests'):
@@ -169,10 +94,6 @@ def build_all():
             stdout.write('\tBuilding application: {} ({}/{}) '.format(colorize_str(application, Termcolor.blue), nth, len(applications)))
             stdout.flush()
             try:
-                if not is_updated(join(riotbase, folder, application), subprocess_env):
-                    print(colorize_str('(skipped)', Termcolor.yellow))
-                    skipped.append(application)
-                    continue
                 subprocess = Popen(('make', 'buildtest'),
                                    bufsize=1, stdin=null, stdout=PIPE, stderr=null,
                                    cwd=join(riotbase, folder, application),
@@ -242,7 +163,6 @@ def print_num_of_errors_and_warnings():
 if __name__ == '__main__':
     success = []
     failed = []
-    skipped = []
     exceptions = []
     warnings = []
     errors = []
@@ -260,8 +180,9 @@ if __name__ == '__main__':
     print_output_for(warnings, 'Warnings', Termcolor.yellow)
     print_output_for(errors, 'Errors', Termcolor.red)
 
-    outputListDescription = [(Termcolor.yellow, skipped, 'skipped'), (Termcolor.green, success, 'success'),
-                             (Termcolor.red, failed, 'failed'), (Termcolor.blue, exceptions, 'exceptions')]
+    outputListDescription = [(Termcolor.green, success, 'success'),
+                             (Termcolor.red, failed, 'failed'),
+                             (Termcolor.blue, exceptions, 'exceptions')]
     print_outcome(outputListDescription)
 
     print_num_of_errors_and_warnings()

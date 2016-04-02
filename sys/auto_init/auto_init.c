@@ -76,6 +76,10 @@
 #include "net/gnrc/udp.h"
 #endif
 
+#ifdef MODULE_LWIP
+#include "lwip.h"
+#endif
+
 #ifdef MODULE_FIB
 #include "net/fib.h"
 #endif
@@ -119,7 +123,7 @@ void auto_init(void)
 #endif
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");
-    MCI_initialize();
+    mci_initialize();
 #endif
 #ifdef MODULE_PROFILING
     extern void profiling_init(void);
@@ -150,7 +154,10 @@ void auto_init(void)
     extern void dht_auto_init(void);
     dht_auto_init();
 #endif
-
+#ifdef MODULE_LWIP
+    DEBUG("Bootstraping lwIP.\n");
+    lwip_bootstrap();
+#endif
 
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
@@ -233,6 +240,10 @@ void auto_init(void)
 #ifdef MODULE_LIS3DH
     extern void auto_init_lis3dh(void);
     auto_init_lis3dh();
+#endif
+#ifdef MODULE_MMA8652
+    extern void auto_init_mma8652(void);
+    auto_init_mma8652();
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */

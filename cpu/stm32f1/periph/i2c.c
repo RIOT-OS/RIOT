@@ -167,8 +167,8 @@ static void _pin_config(gpio_t scl, gpio_t sda)
 {
     /* toggle pins to reset analog filter -> see datasheet */
     /* set as output */
-    gpio_init(scl, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(sda, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(scl, GPIO_OUT);
+    gpio_init(sda, GPIO_OUT);
     /* run through toggling sequence */
     gpio_set(scl);
     gpio_set(sda);
@@ -244,7 +244,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
             DEBUG("Crit block: clear ACK flag\n");
             i2c->CR1 &= ~(I2C_CR1_ACK);
             DEBUG("Wait for transfer to be completed\n");
-            while (!(i2c->SR1 & I2C_SR1_BTF)) ;
+            while (!(i2c->SR1 & I2C_SR1_BTF)) {}
 
             break;
 
@@ -253,13 +253,13 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
 
             while (i < (length - 3)) {
                 DEBUG("Wait until byte was received\n");
-                while (!(i2c->SR1 & I2C_SR1_RXNE)) ;
+                while (!(i2c->SR1 & I2C_SR1_RXNE)) {}
                 DEBUG("Copy byte from DR\n");
                 data[i++] = (char)i2c->DR;
             }
 
             DEBUG("Reading the last 3 bytes, waiting for BTF flag\n");
-            while (!(i2c->SR1 & I2C_SR1_BTF)) ;
+            while (!(i2c->SR1 & I2C_SR1_BTF)) {}
 
             DEBUG("Read N-3 byte\n");
             data[i++] = (char)i2c->DR;
@@ -273,14 +273,14 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
 
     while (i < length) {
         DEBUG("Wait for RXNE == 1\n");
-        while (!(i2c->SR1 & I2C_SR1_RXNE)) ;
+        while (!(i2c->SR1 & I2C_SR1_RXNE)) {}
 
         DEBUG("Read byte\n");
         data[i++] = (char)i2c->DR;
     }
 
     DEBUG("wait for STOP bit to be cleared again\n");
-    while (i2c->CR1 & I2C_CR1_STOP) ;
+    while (i2c->CR1 & I2C_CR1_STOP) {}
 
     DEBUG("reset POS = 0 and ACK = 1\n");
     i2c->CR1 &= ~(I2C_CR1_POS);
@@ -437,13 +437,13 @@ void i2c_poweroff(i2c_t dev)
     switch (dev) {
 #if I2C_0_EN
         case I2C_0:
-            while (I2C_0_DEV->SR2 & I2C_SR2_BUSY) ;
+            while (I2C_0_DEV->SR2 & I2C_SR2_BUSY) {}
             I2C_0_CLKDIS();
             break;
 #endif
 #if I2C_1_EN
         case I2C_1:
-            while (I2C_1_DEV->SR2 & I2C_SR2_BUSY) ;
+            while (I2C_1_DEV->SR2 & I2C_SR2_BUSY) {}
             I2C_1_CLKDIS();
             break;
 #endif
@@ -456,18 +456,18 @@ static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, char *err
     *err = 0x00;
     /* wait for device to be ready */
     DEBUG("Wait for device to be ready\n");
-    while (dev->SR2 & I2C_SR2_BUSY) ;
+    while (dev->SR2 & I2C_SR2_BUSY) {}
     /* generate start condition */
     DEBUG("Generate start condition\n");
     dev->CR1 |= I2C_CR1_START;
     DEBUG("Wait for SB flag to be set\n");
-    while (!(dev->SR1 & I2C_SR1_SB)) ;
+    while (!(dev->SR1 & I2C_SR1_SB)) {}
     /* send address and read/write flag */
     DEBUG("Send address\n");
     dev->DR = (address << 1) | rw_flag;
     /* clear ADDR flag by reading first SR1 and then SR2 */
     DEBUG("Wait for ADDR flag to be set\n");
-    while (!(dev->SR1 & I2C_SR1_ADDR) && !(*err)) ;
+    while (!(dev->SR1 & I2C_SR1_ADDR) && !(*err)) {}
 }
 
 static inline void _clear_addr(I2C_TypeDef *dev)
@@ -484,7 +484,7 @@ static inline void _write(I2C_TypeDef *dev, char *data, int length, char *err)
         dev->DR = (uint8_t)data[i];
         DEBUG("Written %i byte to data reg, now waiting for DR to be empty again\n", i);
         /* wait for transfer to finish */
-        while (!(dev->SR1 & I2C_SR1_TXE) && !(*err)) ;
+        while (!(dev->SR1 & I2C_SR1_TXE) && !(*err)) {}
         DEBUG("DR is now empty again\n");
     }
 
@@ -493,11 +493,11 @@ static inline void _write(I2C_TypeDef *dev, char *data, int length, char *err)
 static inline void _stop(I2C_TypeDef *dev, char *err)
 {
     /* make sure last byte was send */
-    while (!(dev->SR1 & I2C_SR1_BTF) && !(*err)) ;
+    while (!(dev->SR1 & I2C_SR1_BTF) && !(*err)) {}
     /* send STOP condition */
     dev->CR1 |= I2C_CR1_STOP;
     /* wait until transmission is complete */
-    while (dev->SR2 & I2C_SR2_BUSY) ;
+    while (dev->SR2 & I2C_SR2_BUSY) {}
 }
 
 static inline void i2c_irq_handler(i2c_t i2c_dev, I2C_TypeDef *dev)

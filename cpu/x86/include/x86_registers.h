@@ -74,7 +74,7 @@ extern "C" {
 static inline uint32_t X86_CR_ATTR cr0_read(void)
 {
     uint32_t result;
-    asm volatile ("mov %%cr0, %%eax" : "=a"(result));
+    __asm__ volatile ("mov %%cr0, %%eax" : "=a"(result));
     return result;
 }
 
@@ -87,7 +87,7 @@ static inline uint32_t X86_CR_ATTR cr0_read(void)
  */
 static inline void X86_CR_ATTR cr0_write(uint32_t value)
 {
-    asm volatile ("mov %%eax, %%cr0" :: "a"(value));
+    __asm__ volatile ("mov %%eax, %%cr0" :: "a"(value));
 }
 
 /**
@@ -99,7 +99,7 @@ static inline void X86_CR_ATTR cr0_write(uint32_t value)
 static inline uint32_t X86_CR_ATTR cr2_read(void)
 {
     uint32_t result;
-    asm volatile ("mov %%cr2, %%eax" : "=a"(result));
+    __asm__ volatile ("mov %%cr2, %%eax" : "=a"(result));
     return result;
 }
 
@@ -111,7 +111,7 @@ static inline uint32_t X86_CR_ATTR cr2_read(void)
 static inline uint32_t X86_CR_ATTR cr3_read(void)
 {
     uint32_t result;
-    asm volatile ("mov %%cr3, %%eax" : "=a"(result));
+    __asm__ volatile ("mov %%cr3, %%eax" : "=a"(result));
     return result;
 }
 
@@ -122,7 +122,7 @@ static inline uint32_t X86_CR_ATTR cr3_read(void)
  */
 static inline void X86_CR_ATTR cr3_write(uint32_t value)
 {
-    asm volatile ("mov %%eax, %%cr3" :: "a"(value));
+    __asm__ volatile ("mov %%eax, %%cr3" :: "a"(value));
 }
 
 /**
@@ -131,7 +131,7 @@ static inline void X86_CR_ATTR cr3_write(uint32_t value)
 static inline uint32_t X86_CR_ATTR cr4_read(void)
 {
     uint32_t result;
-    asm volatile ("mov %%cr4, %%eax" : "=a"(result));
+    __asm__ volatile ("mov %%cr4, %%eax" : "=a"(result));
     return result;
 }
 
@@ -144,7 +144,7 @@ static inline uint32_t X86_CR_ATTR cr4_read(void)
  */
 static inline void X86_CR_ATTR cr4_write(uint32_t value)
 {
-    asm volatile ("mov %%eax, %%cr4" :: "a"(value));
+    __asm__ volatile ("mov %%eax, %%cr4" :: "a"(value));
 }
 
 #define EFER_SCE   (1u <<  0)
@@ -163,7 +163,7 @@ static inline void X86_CR_ATTR cr4_write(uint32_t value)
 static inline uint64_t X86_CR_ATTR msr_read(uint32_t msr)
 {
     uint32_t eax, edx;
-    asm volatile (
+    __asm__ volatile (
         "rdmsr"
         : "=a"(eax), "=d"(edx)
         : "c"(msr)
@@ -180,7 +180,7 @@ static inline uint64_t X86_CR_ATTR msr_read(uint32_t msr)
  */
 static inline void X86_CR_ATTR msr_set(uint32_t msr, uint64_t value)
 {
-    asm volatile (
+    __asm__ volatile (
         "wrmsr"
         :: "a"((uint32_t) value), "d"((uint32_t) (value >> 32)), "c"(msr)
     );
@@ -250,7 +250,7 @@ static inline void X86_CR_ATTR msr_set(uint32_t msr, uint64_t value)
 static inline uint64_t X86_CR_ATTR cpuid_caps(void)
 {
     uint32_t edx, ecx;
-    asm volatile ("cpuid" : "=d"(edx), "=c"(ecx) : "a"(1) : "ebx");
+    __asm__ volatile ("cpuid" : "=d"(edx), "=c"(ecx) : "a"(1) : "ebx");
     return ((uint64_t) ecx << 32) | edx;
 }
 

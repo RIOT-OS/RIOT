@@ -143,7 +143,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
             /* write data into transmit register */
             NRF_UART0->TXD = data[i];
             /* wait for any transmission to be done */
-            while (NRF_UART0->EVENTS_TXDRDY == 0);
+            while (NRF_UART0->EVENTS_TXDRDY == 0) {}
             /* reset ready flag */
             NRF_UART0->EVENTS_TXDRDY = 0;
         }
@@ -167,7 +167,7 @@ void isr_uart0(void)
 {
     if (NRF_UART0->EVENTS_RXDRDY == 1) {
         NRF_UART0->EVENTS_RXDRDY = 0;
-        char byte = (char)(NRF_UART0->RXD & 0xff);
+        uint8_t byte = (uint8_t)(NRF_UART0->RXD & 0xff);
         uart_config.rx_cb(uart_config.arg, byte);
     }
     if (sched_context_switch_request) {

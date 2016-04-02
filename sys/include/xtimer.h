@@ -180,7 +180,9 @@ void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t usecs);
  * The mesage struct specified by msg parameter will not be copied, e.g., it
  * needs to point to valid memory until the message has been delivered.
  *
- * @param[in] timer         timer struct to work with
+ * @param[in] timer         timer struct to work with.
+ *                          Its xtimer_t::target and xtimer_t::long_target
+ *                          fields need to be initialized with 0 on first use.
  * @param[in] offset        microseconds from now
  * @param[in] msg           ptr to msg that will be sent
  * @param[in] target_pid    pid the message will be sent to
@@ -196,7 +198,9 @@ void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t t
  * The mesage struct specified by msg parameter will not be copied, e.g., it
  * needs to point to valid memory until the message has been delivered.
  *
- * @param[in] timer         timer struct to work with
+ * @param[in] timer         timer struct to work with.
+ *                          Its xtimer_t::target and xtimer_t::long_target
+ *                          fields need to be initialized with 0 on first use.
  * @param[in] offset        microseconds from now
  * @param[in] msg           ptr to msg that will be sent
  * @param[in] target_pid    pid the message will be sent to
@@ -209,7 +213,9 @@ void xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t
  * This function sets a timer that will wake up a thread when the timer has
  * expired.
  *
- * @param[in] timer         timer struct to work with
+ * @param[in] timer         timer struct to work with.
+ *                          Its xtimer_t::target and xtimer_t::long_target
+ *                          fields need to be initialized with 0 on first use
  * @param[in] offset        microseconds from now
  * @param[in] pid           pid of the thread that will be woken up
  */
@@ -221,7 +227,9 @@ void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid);
  * This function sets a timer that will wake up a thread when the timer has
  * expired.
  *
- * @param[in] timer         timer struct to work with
+ * @param[in] timer         timer struct to work with.
+ *                          Its xtimer_t::target and xtimer_t::long_target
+ *                          fields need to be initialized with 0 on first use
  * @param[in] offset        microseconds from now
  * @param[in] pid           pid of the thread that will be woken up
  */
@@ -239,7 +247,9 @@ void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid);
  * context (unless offset < XTIMER_BACKOFF). DON'T USE THIS FUNCTION unless you
  * know *exactly* what that means.
  *
- * @param[in] timer     the timer structure to use
+ * @param[in] timer     the timer structure to use.
+ *                      Its xtimer_t::target and xtimer_t::long_target
+ *                      fields need to be initialized with 0 on first use
  * @param[in] offset    time in microseconds from now specifying that timer's
  *                      callback's execution time
  */
@@ -251,11 +261,8 @@ void xtimer_set(xtimer_t *timer, uint32_t offset);
  * @note this function runs in O(n) with n being the number of active timers
  *
  * @param[in] timer ptr to timer structure that will be removed
- *
- * @return  1 on success
- * @return  0 when timer was not active
  */
-int xtimer_remove(xtimer_t *timer);
+void xtimer_remove(xtimer_t *timer);
 
 /**
  * @brief receive a message blocking but with timeout
@@ -328,7 +335,8 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_ISR_BACKOFF 20
 #endif
 
-/*
+#ifndef XTIMER_SHIFT
+/**
  * @brief   xtimer prescaler value
  *
  * xtimer assumes it is running with an underlying 1MHz timer.
@@ -340,7 +348,6 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  *
  * For example, if the timer is running with 250khz, set XTIMER_SHIFT to 2.
  */
-#ifndef XTIMER_SHIFT
 #define XTIMER_SHIFT (0)
 #endif
 
@@ -386,18 +393,6 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_MASK (0)
 #endif
 #define XTIMER_MASK_SHIFTED XTIMER_TICKS_TO_USEC(XTIMER_MASK)
-
-#ifndef XTIMER_USLEEP_UNTIL_OVERHEAD
-/**
- * @brief xtimer_usleep_until overhead value
- *
- * This value specifies the time a xtimer_usleep_until will be late
- * if uncorrected.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
- */
-#define XTIMER_USLEEP_UNTIL_OVERHEAD 10
-#endif
 
 #if XTIMER_MASK
 extern volatile uint32_t _high_cnt;
@@ -489,7 +484,12 @@ static inline void xtimer_spin_until(uint32_t target) {
 
 static inline void xtimer_spin(uint32_t offset) {
     uint32_t start = _lltimer_now();
+#if XTIMER_MASK
+    offset = _lltimer_mask(offset);
+    while (_lltimer_mask(_lltimer_now() - start) < offset);
+#else
     while ((_lltimer_now() - start) < offset);
+#endif
 }
 
 static inline void xtimer_usleep(uint32_t microseconds)

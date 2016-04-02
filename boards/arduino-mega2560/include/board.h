@@ -32,32 +32,19 @@ extern "C" {
 * @brief As the CPU is too slow to handle 115200 baud, we set the default
 *        baudrate to 9600 for this board
 */
-#define STDIO_BAUDRATE      (9600U)
+#define UART_STDIO_BAUDRATE (9600U)
 
 /**
- * @name LED pin definitions
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_PORT            PORTB
-#define LED_PIN             (1 << 7)
-/** @} */
+#define LED0_PIN            GPIO_PIN(1, 7)
 
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_ENABLE_PORT     DDRB |= (1 << DDB7)
-#define LED_ON              LED_PORT |= LED_PIN
-#define LED_OFF             LED_PORT &= ~LED_PIN
-#define LED_TOGGLE          LED_PORT ^= LED_PIN;
+#define LED0_MASK           (1 << DDB7)
 
-/* for compatability to other boards */
-#define LED_GREEN_ON        LED_ON
-#define LED_GREEN_OFF       LED_OFF
-#define LED_GREEN_TOGGLE    LED_TOGGLE
-#define LED_RED_ON          /* not available */
-#define LED_RED_OFF         /* not available */
-#define LED_RED_TOGGLE      /* not available */
+#define LED0_ON             (PORTB |=  LED0_MASK)
+#define LED0_OFF            (PORTB &= ~LED0_MASK)
+#define LED0_TOGGLE         (PORTB ^=  LED0_MASK)
 /** @} */
 
 /**

@@ -27,28 +27,6 @@
 #include "board.h"
 #include "cpu.h"
 
-void loop_delay(void)
-{
-    volatile uint16_t i, j;
-
-    for (i = 1; i < 30; i++) {
-        for (j = 1; j != 0; j++) {
-            asm volatile(" nop ");
-        }
-    }
-}
-
-void bl_blink(void)
-{
-    LED_RED_ON;
-    LED_GREEN_ON;
-
-    loop_delay();
-
-    LED_RED_OFF;
-    LED_GREEN_OFF;
-}
-
 void bl_init_ports(void)
 {
     gpio_init_ports();
@@ -58,13 +36,11 @@ void bl_init_ports(void)
     PINSEL0 &= ~(BIT5 + BIT7);
 
     /* LEDS */
-    FIO3DIR |= LED_RED_PIN;
-    FIO3DIR |= LED_GREEN_PIN;
-    LED_RED_OFF;
-    LED_GREEN_OFF;
+    FIO3DIR |= LED0_MASK;
+    FIO3DIR |= LED1_MASK;
 
-    /* short blinking of both of the LEDs on startup */
-    bl_blink();
+    LED0_OFF;
+    LED0_OFF;
 }
 
 void init_clks1(void)

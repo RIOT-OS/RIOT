@@ -161,7 +161,7 @@ int spi_conf_pins(spi_t dev)
     /* configure pins for alternate function input (MISO) or output (MOSI, CLK) */
     gpio_init_af(clk, GPIO_AF_OUT_PP);
     gpio_init_af(mosi, GPIO_AF_OUT_PP);
-    gpio_init(miso, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init(miso, GPIO_IN);
     return 0;
 }
 
@@ -210,11 +210,11 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
             return -1;
     }
 
-    while (!(spi->SR & SPI_SR_TXE)) ;
+    while (!(spi->SR & SPI_SR_TXE)) {}
     spi->DR = out;
     transferred++;
 
-    while (!(spi->SR & SPI_SR_RXNE)) ;
+    while (!(spi->SR & SPI_SR_RXNE)) {}
     if (in != NULL) {
         *in = spi->DR;
         transferred++;
@@ -224,7 +224,7 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     }
 
     /* SPI busy */
-    while ((spi->SR & 0x80)) ;
+    while ((spi->SR & 0x80)) {}
 #if ENABLE_DEBUG
     if (in != NULL) {
         DEBUG("\nout: %x in: %x transferred: %x\n", out, *in, transferred);

@@ -50,7 +50,7 @@ static const struct idtr_t EMPTY_IDT = {
 
 void x86_load_empty_idt(void)
 {
-    asm volatile ("lidt %0" :: "m"(EMPTY_IDT));
+    __asm__ volatile ("lidt %0" :: "m"(EMPTY_IDT));
 }
 
 static bool fail_violently;
@@ -62,7 +62,7 @@ void NORETURN x86_kbc_reboot(void)
 
     while (1) {
         if (fail_violently) {
-            asm volatile ("int3"); /* Cause a tripple fault. Won't return. */
+            __asm__ volatile ("int3"); /* Cause a tripple fault. Won't return. */
         }
         fail_violently = true;
 
@@ -79,7 +79,7 @@ void NORETURN x86_kbc_reboot(void)
             }
         }
 
-        asm volatile ("int3"); /* Cause a tripple fault. Won't return. */
+        __asm__ volatile ("int3"); /* Cause a tripple fault. Won't return. */
     }
 }
 
@@ -88,7 +88,7 @@ static bool reboot_twice;
 
 void reboot(void)
 {
-    asm volatile ("cli");
+    __asm__ volatile ("cli");
     if (!reboot_twice) {
         reboot_twice = true;
         if (reboot_fun) {

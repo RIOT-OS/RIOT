@@ -51,6 +51,32 @@ typedef uint16_t gpio_t;
 #define CPUID_LEN           (16U)
 
 /**
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use the following bits to encode the pin mode:
+ * - bit 0: 0 for pull-down or 1 for pull-up
+ * - bit 1: pull register enable (as configured in bit 0)
+ * - bit 5: OD enable
+ * - bit 7: output or input mode
+ */
+#define GPIO_MODE(pu, pe, od, out)   (pu | (pe << 1) | (od << 5) | (out << 7))
+
+/**
+ * @brief   Override GPIO modes
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN    = GPIO_MODE(0, 0, 0, 0),     /**< IN */
+    GPIO_IN_PD = GPIO_MODE(0, 1, 0, 0),     /**< IN with pull-down */
+    GPIO_IN_PU = GPIO_MODE(1, 1, 0, 0),     /**< IN with pull-up */
+    GPIO_OUT   = GPIO_MODE(0, 0, 0, 1),     /**< OUT (push-pull) */
+    GPIO_OD    = GPIO_MODE(1, 0, 1, 1),     /**< OD */
+    GPIO_OD_PU = GPIO_MODE(1, 1, 1, 1),     /**< OD with pull-up */
+} gpio_mode_t;
+/** @} */
+
+/**
  * @brief   Define a condensed set of PORT PCR values
  *
  * To combine values just aggregate them using a logical OR.
@@ -68,18 +94,6 @@ enum {
     GPIO_PCR_PD    = (PORT_PCR_PE_MASK),    /**< enable pull-down */
     GPIO_PCR_PU    = (PORT_PCR_PE_MASK | PORT_PCR_PS_MASK)  /**< enable PU */
 };
-
-/**
- * @brief   Override values for pull register configuration
- * @{
- */
-#define HAVE_GPIO_PP_T
-typedef enum {
-    GPIO_NOPULL   = 0x0,            /**< do not use internal pull resistors */
-    GPIO_PULLUP   = GPIO_PCR_PU,    /**< enable internal pull-up resistor */
-    GPIO_PULLDOWN = GPIO_PCR_PD     /**< enable internal pull-down resistor */
-} gpio_pp_t;
-/** @} */
 
 /**
  * @brief   Override flank configuration values
@@ -108,6 +122,41 @@ enum {
     PORT_G = 6,             /**< port G */
     GPIO_PORTS_NUMOF        /**< overall number of available ports */
 };
+
+/**
+ * @brief   Override default ADC resolution values
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = (0xfe),             /**< not supported */
+    ADC_RES_8BIT  = ADC_CFG1_MODE(0),   /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = ADC_CFG1_MODE(2),   /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = ADC_CFG1_MODE(1),   /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = (0xff),             /**< ADC resolution: 14 bit */
+    ADC_RES_16BIT = ADC_CFG1_MODE(3)    /**< ADC resolution: 16 bit */
+} adc_res_t;
+/** @} */
+
+/**
+ * @brief   CPU specific ADC configuration
+ */
+typedef struct {
+    ADC_Type *dev;          /**< ADC device */
+    gpio_t pin;             /**< pin to use, set to GPIO_UNDEF for internal
+                             *   channels */
+    uint8_t chan;           /**< ADC channel */
+} adc_conf_t;
+
+/**
+ * @brief   CPU specific DAC configuration
+ */
+typedef struct {
+    /** DAC device base pointer */
+    DAC_Type *dev;
+    /** Pointer to module clock gate bit in bitband region, use BITBAND_REGADDR() */
+    uint32_t volatile *clk_gate;
+} dac_conf_t;
 
 /**
  * @brief   CPU internal function for initializing PORTs

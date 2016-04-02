@@ -19,34 +19,17 @@
  */
 
 #include "board.h"
-#include "cpu.h"
+#include "periph/gpio.h"
 
-static void leds_init(void);
 
 void board_init(void)
 {
     /* initialize the CPU */
     cpu_init();
 
-    /* initialize the boards LEDs */
-    leds_init();
-}
-
-/**
- * @brief Initialize the boards on-board LEDs
- *
- * The LEDs initialization is hard-coded in this function. As the LED is soldered
- * onto the board it is fixed to its CPU pins.
- *
- * The LEDs are connected to the following pin:
- * - Green:     PB12
- * - Red:       PB10
- */
-static void leds_init(void)
-{
-    /* green pin */
-    RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
-    LED_GREEN_PORT->CR[0] = (0x3 << ((LED_GREEN_PIN-8)*4));
-    /* red pin */;
-    LED_RED_PORT->CR[0] = (0x3 << ((LED_RED_PIN-8)*4));
+    /* initialize the boards LEDs and turn them off */
+    gpio_init(LED0_PIN, GPIO_OUT);
+    gpio_init(LED1_PIN, GPIO_OUT);
+    gpio_set(LED0_PIN);
+    gpio_set(LED1_PIN);
 }

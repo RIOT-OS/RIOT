@@ -132,8 +132,7 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
 
             int ret_comp = universal_address_compare(table->data.entries[i].global, dst, &match_size);
             /* If we found an exact match */
-            if (ret_comp == 0 || (is_all_zeros_addr && match_size == 0)) {
-                DEBUG("[fib_find_entry] found an exact match");
+            if ((ret_comp == 0) || (is_all_zeros_addr && (match_size == 0) && (ret_comp == 2))) {
                 entry_arr[0] = &(table->data.entries[i]);
                 *entry_arr_size = 1;
                 /* we will not find a better one so we return */
@@ -141,14 +140,31 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
             }
             else {
                 /* we try to find the most fitting prefix */
-                if ((ret_comp == 1)
-                    && (table->data.entries[i].global_flags & FIB_FLAG_NET_PREFIX)) {
-                    if ((prefix_size == 0) || (match_size > prefix_size)) {
+                if (ret_comp == 1) {
+                    if (table->data.entries[i].global_flags & FIB_FLAG_NET_PREFIX_MASK) {
+                        /* we shift the most upper flag byte back to get the number of prefix bits */
+                        size_t global_prefix_len = (table->data.entries[i].global_flags
+                                                    & FIB_FLAG_NET_PREFIX_MASK) >> FIB_FLAG_NET_PREFIX_SHIFT;
+
+                        if ((match_size >= global_prefix_len) &&
+                            ((prefix_size == 0) || (match_size > prefix_size))) {
+                            entry_arr[0] = &(table->data.entries[i]);
+                            /* we could find a better one so we move on */
+                            ret = 0;
+
+                            prefix_size = match_size;
+                            count = 1;
+                        }
+                    }
+                 }
+                 else if (ret_comp == 2) {
+                    /* we found the default gateway entry, e.g. ::/0 for IPv6
+                     * and we keep it only if there is no better one
+                     */
+                    if (prefix_size == 0) {
                         entry_arr[0] = &(table->data.entries[i]);
                         /* we could find a better one so we move on */
                         ret = 0;
-
-                        prefix_size = match_size;
                         count = 1;
                     }
                 }
@@ -328,7 +344,7 @@ static int fib_signal_rp(fib_table_t *table, uint16_t type, uint8_t *dat,
     for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
         if (table->notify_rp[i] != KERNEL_PID_UNDEF) {
             DEBUG("[fib_signal_rp] send msg@: %p to pid[%d]: %d\n", \
-                  msg.content.ptr, (int)i, (int)(table->notify_rp[i]));
+                  (void *)msg.content.ptr, (int)i, (int)(table->notify_rp[i]));
 
             /* do only signal a RP if its registered prefix matches */
             if (type != FIB_MSG_RP_SIGNAL_SOURCE_ROUTE_CREATED) {
@@ -446,6 +462,21 @@ void fib_remove_entry(fib_table_t *table, uint8_t *dst, size_t dst_size)
          * this should never happen
          */
         DEBUG("[fib_update_entry] ambigious entries detected!!!\n");
+    }
+
+    mutex_unlock(&(table->mtx_access));
+}
+
+void fib_flush(fib_table_t *table, kernel_pid_t interface)
+{
+    mutex_lock(&(table->mtx_access));
+    DEBUG("[fib_flush]\n");
+
+    for (size_t i = 0; i < table->size; ++i) {
+        if ((interface == KERNEL_PID_UNDEF) ||
+            (interface == table->data.entries[i].iface_id)) {
+            fib_remove(&table->data.entries[i]);
+        }
     }
 
     mutex_unlock(&(table->mtx_access));
@@ -1501,17 +1532,19 @@ void fib_print_routes(fib_table_t *table)
     uint64_t now = xtimer_now64();
 
     if (table->table_type == FIB_TABLE_TYPE_SH) {
-        printf("%-" FIB_ADDR_PRINT_LENS "s %-10s   %-" FIB_ADDR_PRINT_LENS "s %-10s %-16s"
+        printf("%-" FIB_ADDR_PRINT_LENS "s %-17s %-" FIB_ADDR_PRINT_LENS "s %-10s %-16s"
                 " Interface\n" , "Destination", "Flags", "Next Hop", "Flags", "Expires");
 
         for (size_t i = 0; i < table->size; ++i) {
             if (table->data.entries[i].lifetime != 0) {
                 fib_print_address(table->data.entries[i].global);
                 printf(" 0x%08"PRIx32" ", table->data.entries[i].global_flags);
-                if(table->data.entries[i].global_flags & FIB_FLAG_NET_PREFIX) {
-                    printf("N ");
+                if(table->data.entries[i].global_flags & FIB_FLAG_NET_PREFIX_MASK) {
+                    uint32_t prefix = (table->data.entries[i].global_flags
+                                       & FIB_FLAG_NET_PREFIX_MASK);
+                    printf("N /%-3d ", (int)(prefix >> FIB_FLAG_NET_PREFIX_SHIFT));
                 } else {
-                    printf("H ");
+                    printf("H      ");
                 }
 
                 fib_print_address(table->data.entries[i].next_hop);

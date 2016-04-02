@@ -139,7 +139,7 @@ void x86_interrupt_handler_set(unsigned num, x86_intr_handler_t handler);
 static inline unsigned long __attribute__((always_inline)) x86_pushf_cli(void)
 {
     unsigned long result;
-    asm volatile("pushf; cli; pop %0" : "=g"(result));
+    __asm__ volatile("pushf; cli; pop %0" : "=g"(result));
     return result;
 }
 
@@ -148,7 +148,7 @@ static inline unsigned long __attribute__((always_inline)) x86_pushf_cli(void)
  */
 static inline void __attribute__((always_inline)) x86_restore_flags(unsigned long stored_value)
 {
-    asm volatile("push %0; popf" :: "g"(stored_value));
+    __asm__ volatile("push %0; popf" :: "g"(stored_value));
 }
 
 /**

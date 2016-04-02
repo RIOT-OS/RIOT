@@ -18,6 +18,6 @@ export DBG         = $(GDBPREFIX)gdb
 #export STRIP      = $(LLVMPREFIX)strip
 
 # Tell clang to cross compile
-export CFLAGS     += -target $(TARGET_TRIPLE)
-export CXXFLAGS   += -target $(TARGET_TRIPLE)
-export LINKFLAGS  += -target $(TARGET_TRIPLE)
+export CFLAGS     += -target $(TARGET_ARCH)
+export CXXFLAGS   += -target $(TARGET_ARCH)
+export LINKFLAGS  += -target $(TARGET_ARCH)

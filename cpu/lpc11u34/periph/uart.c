@@ -133,7 +133,7 @@ void uart_poweroff(uart_t uart)
 void UART_0_ISR(void)
 {
     if (UART_0_DEV->LSR & (1 << 0)) {       /* is RDR flag set? */
-        char data = (char)UART_0_DEV->RBR;
+        uint8_t data = (uint8_t)UART_0_DEV->RBR;
         config[UART_0].rx_cb(config[UART_0].arg, data);
     }
     if (sched_context_switch_request) {

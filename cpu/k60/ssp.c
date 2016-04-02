@@ -46,7 +46,7 @@ void __attribute__((section(".preinit_array")))(*preinit__stack_chk_guard_setup[
  */
 void __attribute__((noreturn)) __stack_chk_fail(void)
 {
-    asm volatile ("bkpt #1");
+    __asm__ volatile ("bkpt #1");
 
     while (1);
 }

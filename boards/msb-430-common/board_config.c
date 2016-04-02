@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 #include <string.h>
-#include "board-conf.h"
+#include "board.h"
 #include "config.h"
 #include "flashrom.h"
 

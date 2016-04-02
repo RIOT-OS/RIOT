@@ -46,17 +46,6 @@ typedef uint16_t gpio_t;
 #define GPIO_PIN(x, y)      ((gpio_t)(((x & 0xff) << 8) | (1 << (y & 0xff))))
 
 /**
- * @brief   Override direction values
- * @{
- */
-#define HAVE_GPIO_DIR_T
-typedef enum {
-    GPIO_DIR_IN =  0x00,    /**< configure pin as input */
-    GPIO_DIR_OUT = 0xff,    /**< configure pin as output */
-} gpio_dir_t;
-/** @} */
-
-/**
  * @brief   Override flank selection values
  * @{
  */

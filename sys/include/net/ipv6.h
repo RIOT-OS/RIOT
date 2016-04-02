@@ -24,9 +24,9 @@
 #ifndef IPV6_H_
 #define IPV6_H_
 
-#include "ipv6/addr.h"
-#include "ipv6/ext.h"
-#include "ipv6/hdr.h"
+#include "net/ipv6/addr.h"
+#include "net/ipv6/ext.h"
+#include "net/ipv6/hdr.h"
 
 #ifdef __cplusplus
 extern "C" {

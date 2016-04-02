@@ -29,7 +29,7 @@
 #define CPU__X86__REBOOT__H__
 
 #include <stdbool.h>
-#include "attributes.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {

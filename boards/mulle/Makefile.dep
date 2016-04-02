@@ -1,6 +1,5 @@
-ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += at86rf212b
-  USEMODULE += gnrc_nomac
 endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
@@ -13,3 +12,7 @@ FEATURES_REQUIRED += periph_rtt
 # The Mulle uses NVRAM to store persistent variables, such as boot count.
 USEMODULE += nvram_spi
 FEATURES_REQUIRED += periph_spi
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif

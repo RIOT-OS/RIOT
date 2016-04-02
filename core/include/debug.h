@@ -68,7 +68,6 @@ extern "C" {
  * @{
  */
 #if ENABLE_DEBUG
-#include "tcb.h"
 
 /**
  * @def DEBUG_FUNC

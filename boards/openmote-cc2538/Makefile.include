@@ -4,13 +4,23 @@ export CPU_MODEL = cc2538sf53
 
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbserial-* | head -n 1)
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 
-# setup JLink for flashing
-export JLINK_DEVICE := cc2538sf53
-export JLINK_FLASH_ADDR := 200000
-export JLINK_IF := JTAG
-include $(RIOTBOARD)/Makefile.include.jlink
+# Set default flash tool
+export PROGRAMMER ?= cc2538-bsl
+
+ifeq ($(PROGRAMMER),jlink)
+  # setup JLink for flashing
+  export JLINK_DEVICE := cc2538sf53
+  export JLINK_FLASH_ADDR := 200000
+  export JLINK_IF := JTAG
+  include $(RIOTBOARD)/Makefile.include.jlink
+else
+  export OFLAGS = -O binary
+  export HEXFILE = $(ELFFILE:.elf=.bin)
+  export FLASHER = python $(RIOTBASE)/dist/tools/cc2538-bsl/cc2538-bsl.py
+  export FFLAGS  = -p "$(PORT)" -e -w -v -b 460800 $(HEXFILE)
+endif
 
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial

@@ -26,22 +26,9 @@ extern "C" {
 #endif
 
 /**
- * @brief   Overwrite the default gpio_t type definition
- * @{
+ * @brief   Available number of ADC devices
  */
-#define HAVE_GPIO_T
-typedef uint32_t gpio_t;
-/** @} */
-
-/**
- * @brief   Definition of a fitting UNDEF value
- */
-#define GPIO_UNDEF          (0xffffffff)
-
-/**
- * @brief   Define a CPU specific GPIO pin generator macro
- */
-#define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
+#define ADC_DEVS            (2U)
 
 /**
  * @brief   All timers for the STM32F1 have 4 CC channels
@@ -52,6 +39,34 @@ typedef uint32_t gpio_t;
  * @brief   All timers have a width of 16-bit
  */
 #define TIMER_MAXVAL        (0xffff)
+
+/**
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use 4 bit to determine the pin functions:
+ * - bit 4: ODR value
+ * - bit 2+3: in/out
+ * - bit 1: PU enable
+ * - bit 2: OD enable
+ */
+#define GPIO_MODE(mode, cnf, odr)       (mode | (cnf << 2) | (odr << 4))
+
+/**
+ * @brief   Override GPIO mode options
+ *
+ * We use 4 bit to encode CNF and MODE.
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN    = GPIO_MODE(0, 1, 0),    /**< input w/o pull R */
+    GPIO_IN_PD = GPIO_MODE(0, 2, 0),    /**< input with pull-down */
+    GPIO_IN_PU = GPIO_MODE(0, 2, 1),    /**< input with pull-up */
+    GPIO_OUT   = GPIO_MODE(3, 0, 0),    /**< push-pull output */
+    GPIO_OD    = GPIO_MODE(3, 1, 0),    /**< open-drain w/o pull R */
+    GPIO_OD_PU = (0xff)                 /**< not supported by HW */
+} gpio_mode_t;
+/** @} */
 
 /**
  * @brief   Override values for pull register configuration
@@ -102,14 +117,43 @@ typedef enum {
 } gpio_af_out_t;
 
 /**
+ * @brief   ADC channel configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the channel */
+    uint8_t dev;            /**< ADCx - 1 device used for the channel */
+    uint8_t chan;           /**< CPU ADC channel connected to the pin */
+} adc_conf_t;
+
+/**
  * @brief   Timer configuration
  */
 typedef struct {
     TIM_TypeDef *dev;       /**< timer device */
+    uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
     uint8_t bus;            /**< APBx bus the timer is clock from */
-    uint8_t rcc_bit;        /**< corresponding bit in the RCC register */
     uint8_t irqn;           /**< global IRQ channel */
 } timer_conf_t;
+
+/**
+ * @brief   UART configuration options
+ */
+typedef struct {
+    USART_TypeDef *dev;     /**< UART device */
+    gpio_t rx_pin;          /**< TX pin */
+    gpio_t tx_pin;          /**< RX pin */
+    uint32_t rcc_pin;       /**< bit in the RCC register */
+    uint8_t bus;            /**< peripheral bus */
+    uint8_t irqn;           /**< interrupt number */
+} uart_conf_t;
+
+/**
+ * @brief   DAC line configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the line */
+    uint8_t chan;           /**< DAC device used for this line */
+} dac_conf_t;
 
 /**
  * @brief   Configure the alternate function for the given pin

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Simon Brummer
+ *               2015-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -9,144 +10,116 @@
 /**
  * @defgroup    drivers_periph_dac DAC
  * @ingroup     drivers_periph
- * @brief       Low-level DAC peripheral driver
+ * @brief       DAC peripheral driver interface
+ *
+ * Similar to the ADC driver interface (@ref drivers_periph_adc), the DAC
+ * interface uses the concept of lines, corresponds to a tuple of a DAC device
+ * and a DAC output channel.
+ *
+ * The DAC interface expects data to be served as a 16-bit unsigned integer,
+ * independent of the actual resolution of the hardware device. It is up to the
+ * DAC driver, to scale the given value to the maximal width that can be
+ * handled. The device driver should, on the other hand, implement the DAC in a
+ * way, that it will use the bit width, that comes closest to 16-bit.
+ *
+ * This kind of 'auto-scaling' is quite sufficient for this interface, as
+ * standard DAC peripherals use a fixed conversion resolution internally anyway,
+ * so that any particular bit-width configuration on this driver level would not
+ * have much effect...
  *
  * @{
  * @file
- * @brief       Low-level DAC peripheral driver interface definitions
+ * @brief       DAC peripheral driver interface definition
  *
  * @author      Simon Brummer <simon.brummer@haw-hamburg.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef DAC_H
-#define DAC_H
+#ifndef PERIPH_DAC_H
+#define PERIPH_DAC_H
 
 #include <stdint.h>
+#include <limits.h>
+
+#include "periph_cpu.h"
 #include "periph_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* guard file in case no DAC device is defined */
-#if DAC_NUMOF
-
 /**
- * @brief Definition avialable DAC devices
- *
- * Each DAC device is based on a hardware DAC which can have one or more
- * independet channels.
+ * @brief   Make sure the number of available DAC lines is defined
+ * @{
  */
-typedef enum {
-#if DAC_0_EN
-    DAC_0 = 0,             /**< DAC device 0 */
+#ifndef DAC_NUMOF
+#define "DAC_NUMOF undefined"
 #endif
-#if DAC_1_EN
-    DAC_1 = 1,             /**< DAC device 1 */
-#endif
-#if DAC_2_EN
-    DAC_2 = 2,             /**< DAC device 2 */
-#endif
-#if DAC_3_EN
-    DAC_3 = 3,             /**< DAC device 3 */
-#endif
-} dac_t;
+/** @} */
 
 /**
- * @brief Possilbe DAC precision settings
+ * @brief   Define default DAC type identifier
+ * @{
  */
-typedef enum {
-    DAC_RES_6BIT = 0,      /**< DAC precision: 6 bit */
-    DAC_RES_8BIT,          /**< DAC precision: 8 bit */
-    DAC_RES_10BIT,         /**< DAC precision: 10 bit */
-    DAC_RES_12BIT,         /**< DAC precision: 12 bit */
-    DAC_RES_14BIT,         /**< DAC precision: 14 bit */
-    DAC_RES_16BIT,         /**< DAC precision: 16 bit */
-} dac_precision_t;
+#ifndef HAVE_DAC_T
+typedef unsigned int dac_t;
+#endif
+/** @} */
 
 /**
- * @brief Initialization of a given DAC device
+ * @brief   Default DAC undefined value
+ * @{
+ */
+#ifndef DAC_UNDEF
+#define DAC_UNDEF           (UINT_MAX)
+#endif
+/** @} */
+
+/**
+ * @brief   Default DAC access macro
+ * @{
+ */
+#ifndef DAC_LINE
+#define DAC_LINE(x)         (x)
+#endif
+/** @} */
+
+/**
+ * @brief   Initialize the given DAC line
  *
- * The DAC will be initialized with all possilble channels active.
- * On each channel will be initialized with a Zero on it.
- *
- * @param[in] dev          the device to initialize
- * @param[in] precision    the precision to use for conversion
+ * @param[in] line         DAC line to initialize
  *
  * @return                 0 on success
- * @return                 -1 on unknown DAC Device
- * @return                 -2 on precision not available
+ * @return                 -1 on invalid DAC line
  */
-int8_t dac_init(dac_t dev, dac_precision_t precision);
+int8_t dac_init(dac_t line);
 
 /**
  * @brief Write a value onto DAC Device on a given Channel.
  *
- * @param[in] dev          the DAC device to use
- * @param[in] channel      the channel used for Digital/Analoge conversion
- * @param[in] value        the value to write onto DAC.
- *
- * @return                 0 on success
- * @return                 -1 on unknown DAC Device
- * @return                 -2 on invalid channel
- * @return                 -3 if value is out of range.
+ * @param[in] line         DAC line to set
+ * @param[in] value        value to set @p line to
  */
-int8_t dac_write(dac_t dev, uint8_t channel, uint16_t value);
+void dac_set(dac_t line, uint16_t value);
 
 /**
- * @brief Enable power for the given DAC Device
+ * @brief   Enable the given DAC line
  *
- * @param[in] dev          the DAC device to power up.
- *
- * @return                 0 on success
- * @return                 -1 on unknown DAC Device
+ * @param[in] line          DAC line to power on
  */
-int8_t dac_poweron(dac_t dev);
+void dac_poweron(dac_t line);
 
 /**
- * @brief Disable power for the given DAC Device
+ * @brief   Disable the given DAC line
  *
- * @param[in] dev          the DAC device to power down
- *
- * @return                 0 on success
- * @return                 -1 on unknown DAC Device
+ * @param[in] line          DAC line to power off
  */
-int8_t dac_poweroff(dac_t dev);
+void dac_poweroff(dac_t line);
 
-/**
- * @brief Helper function to map a given integer range to a valid DAC value.
- *
- * This function is useful for converting ranges of values to a valid DAC output value.
- *
- * The min value is assumed to be smaller than max value and value is assumed
- * to be between min and max.
- *
- * @param[in] dev          the DAC Device to read precision value from
- * @param[in] value        the value to map onto min and max
- * @param[in] min          the lower bound of the target interval
- * @param[in] max          the upper bound of the target interval
- *
- * @return                 the mapped value, in valid DAC range
- */
-uint16_t dac_map(dac_t dev, int value, int min, int max);
 
-/**
- * @brief Helper function to map a given float value range to a valid DAC value.
- *
- * @see dac_map
- *
- * @param[in] dev          the DAC Device to read precision value from
- * @param[in] value        the value to map onto min and max
- * @param[in] min          the lower bound of the target interval
- * @param[in] max          the upper bound of the target interval
- *
- * @return                 the mapped value, in valid DAC range
- */
-uint16_t dac_mapf(dac_t dev, float value, float min, float max);
-
-#endif/* DAC_NUMOF */
 #ifdef __cplusplus
 }
 #endif
-#endif /* DAC_H */
+
+#endif /* PERIPH_DAC_H */
 /** @} */

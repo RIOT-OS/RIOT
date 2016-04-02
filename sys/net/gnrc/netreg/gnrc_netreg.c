@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include "assert.h"
 #include "clist.h"
 #include "utlist.h"
 #include "net/gnrc/netreg.h"
@@ -132,37 +133,6 @@ int gnrc_netreg_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr)
 #endif
         default:
             return -ENOENT;
-    }
-}
-
-gnrc_pktsnip_t *gnrc_netreg_hdr_build(gnrc_nettype_t type, gnrc_pktsnip_t *payload,
-                                      uint8_t *src, uint8_t src_len,
-                                      uint8_t *dst, uint8_t dst_len)
-{
-    switch (type) {
-#ifdef MODULE_GNRC_IPV6
-
-        case GNRC_NETTYPE_IPV6:
-            return gnrc_ipv6_hdr_build(payload, src, src_len, dst, dst_len);
-#endif
-#ifdef MODULE_GNRC_TCP
-
-        case GNRC_NETTYPE_TCP:
-            return gnrc_tcp_hdr_build(payload, src, src_len, dst, dst_len);
-#endif
-#ifdef MODULE_GNRC_UDP
-
-        case GNRC_NETTYPE_UDP:
-            return gnrc_udp_hdr_build(payload, src, src_len, dst, dst_len);
-#endif
-
-        default:
-            (void)payload;
-            (void)src;
-            (void)src_len;
-            (void)dst;
-            (void)dst_len;
-            return NULL;
     }
 }
 

@@ -261,6 +261,12 @@ static inline int _i2c_receive(I2C_Type *dev, uint8_t *data, int length)
             dev->C1 |= I2C_C1_TXAK_MASK;
         }
 
+        if (length == 0) {
+            /* Stop immediately because the receiving of the next byte will be
+             * initiated by reading the data register (dev->D). */
+            dev->C1 &= ~I2C_C1_MST_MASK;
+        }
+
         data[n] = (char)dev->D;
         n++;
     }

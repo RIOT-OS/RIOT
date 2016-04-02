@@ -181,7 +181,7 @@ void gnrc_ndp_nbr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
             /* see https://tools.ietf.org/html/rfc6775#section-6.5.2 */
             eui64_t iid;
             ieee802154_get_iid(&iid, ar_opt->eui64.uint8, sizeof(eui64_t));
-            ipv6_addr_set_iid(&nbr_adv_dst, iid.uint64.u64);
+            ipv6_addr_set_aiid(&nbr_adv_dst, iid.uint8);
             ipv6_addr_set_link_local_prefix(&nbr_adv_dst);
         }
     }
@@ -381,6 +381,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
     gnrc_ipv6_netif_t *if_entry = gnrc_ipv6_netif_get(iface);
 
     if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) {
+        gnrc_ipv6_nc_t *nc_entry;
         int sicmpv6_size = (int)icmpv6_size, l2src_len = 0;
         uint8_t l2src[GNRC_IPV6_NC_L2_ADDR_MAX];
         uint16_t opt_offset = 0;
@@ -458,11 +459,17 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                 /* or unicast, if source is known */
                 /* XXX: can't just use GNRC_NETAPI_MSG_TYPE_SND, since the next retransmission
                  * must also be set. */
-                gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
+                nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
                 xtimer_set_msg(&nc_entry->rtr_adv_timer, delay, &nc_entry->rtr_adv_msg,
                                gnrc_ipv6_pid);
             }
 #endif
+        }
+        nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
+        if (nc_entry != NULL) {
+            /* unset isRouter flag
+             * (https://tools.ietf.org/html/rfc4861#section-6.2.6) */
+            nc_entry->flags &= ~GNRC_IPV6_NC_IS_ROUTER;
         }
     }
     /* otherwise ignore silently */

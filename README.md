@@ -50,7 +50,7 @@ Its features comprise
 * The RIOT API itself can be built from the code using doxygen. The latest version is uploaded daily to http://riot-os.org/api.
 
 ### USING THE NATIVE PORT WITH NETWORKING
-If you compile RIOT for the native cpu and include the gnrc_netif_default module, you can specify a network interface like this: `PORT=tap0 make term`
+If you compile RIOT for the native cpu and include the `netdev2_tap` module, you can specify a network interface like this: `PORT=tap0 make term`
 
 #### SETTING UP A TAP NETWORK
 There is a shellscript in `RIOT/dist/tools/tapsetup` called `tapsetup` which you can use to create a network of tap interfaces.

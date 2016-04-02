@@ -19,6 +19,7 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
 #include "nrf51.h"
 #include "nrf51_bitfields.h"
 

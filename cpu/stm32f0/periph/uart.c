@@ -122,16 +122,16 @@ int init_base(uart_t uart, uint32_t baudrate)
         port->AFR[0] |= af << (rx_pin * 4);
     }
     else {
-        port->AFR[1] &= ~(0xf << ((rx_pin - 16) * 4));
-        port->AFR[1] |= af << ((rx_pin - 16) * 4);
+        port->AFR[1] &= ~(0xf << ((rx_pin - 8) * 4));
+        port->AFR[1] |= af << ((rx_pin - 8) * 4);
     }
     if (tx_pin < 8) {
         port->AFR[0] &= ~(0xf << (tx_pin * 4));
         port->AFR[0] |= af << (tx_pin * 4);
     }
     else {
-        port->AFR[1] &= ~(0xf << ((tx_pin - 16) * 4));
-        port->AFR[1] |= af << ((tx_pin - 16) * 4);
+        port->AFR[1] &= ~(0xf << ((tx_pin - 8) * 4));
+        port->AFR[1] |= af << ((tx_pin - 8) * 4);
     }
 
     /* configure UART to mode 8N1 with given baudrate */
@@ -151,7 +151,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     USART_TypeDef *dev = uart_port[uart];
 
     for (size_t i = 0; i < len; i++) {
-        while (!(dev->ISR & USART_ISR_TXE));
+        while (!(dev->ISR & USART_ISR_TXE)) {}
         dev->TDR = data[i];
     }
 }
@@ -191,7 +191,7 @@ void uart_poweroff(uart_t uart)
 static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
 {
     if (dev->ISR & USART_ISR_RXNE) {
-        char data = (char)dev->RDR;
+        uint8_t data = (uint8_t)dev->RDR;
         uart_config[uartnum].rx_cb(uart_config[uartnum].arg, data);
     }
     else if (dev->ISR & USART_ISR_ORE) {

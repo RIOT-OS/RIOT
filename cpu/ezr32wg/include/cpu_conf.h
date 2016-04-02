@@ -21,6 +21,8 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #if (CPU_MODEL == ezr32wg330f256r60)
 #include "ezr32wg330f256r60.h"
 #else

@@ -43,6 +43,15 @@
 #define CTX_NUMOF           (7U)
 
 /**
+ * @brief Bit positions in the GPIO mode value
+ * @{
+ */
+#define MODE_BIT_IO         (0x1)
+#define MODE_BIT_PUE        (0x2)
+#define MODE_BIT_ODE        (0x4)
+/** @} */
+
+/**
  * @brief Allocation of memory for 7 independent interrupt slots
  */
 static gpio_isr_ctx_t exti_ctx[CTX_NUMOF] = {{0}};
@@ -137,14 +146,14 @@ static void _ctx_clear(int port, int pin)
     }
 }
 
-int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pushpull)
+int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     Pio *port = _port(pin);
     int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
 
-    /* make sure port is valid */
-    if (!_port_valid(port)) {
+    /* make sure port is valid and no pull-down is selected*/
+    if (!_port_valid(port) || (mode == GPIO_IN_PD)) {
         return -1;
     }
 
@@ -157,31 +166,33 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pushpull)
 
      /* give the PIO module the power over the corresponding pin */
     port->PIO_PER = (1 << pin_num);
-    /* configure the pin's pull resistor state */
-    switch (pushpull) {
-        case GPIO_PULLDOWN:
-            return -1;
-        case GPIO_PULLUP:
-            port->PIO_PUER = (1 << pin_num);
-            break;
-        case GPIO_NOPULL:
-            port->PIO_PUDR = (1 << pin_num);
-            break;
-    }
-    if (dir == GPIO_DIR_OUT) {
-        /* configure pin as output */
+
+    /* configure pin direction (in/out) */
+    if (mode & MODE_BIT_IO) {
         port->PIO_OER = (1 << pin_num);
-        port->PIO_CODR = (1 << pin_num);
     }
     else {
-        /* configure pin as input */
         port->PIO_ODR = (1 << pin_num);
+    }
+    /* set pull-up */
+    if (mode & MODE_BIT_PUE) {
+        port->PIO_PUER = (1 << pin_num);
+    }
+    else {
+        port->PIO_PUDR = (1 << pin_num);
+    }
+    /* set multi-driver (open-drain) mode */
+    if (mode & MODE_BIT_ODE) {
+        port->PIO_MDER = (1 << pin_num);
+    }
+    else {
+        port->PIO_MDDR = (1 << pin_num);
     }
 
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_pp_t pushpull, gpio_flank_t flank,
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
     Pio *port = _port(pin);
@@ -194,7 +205,7 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pushpull, gpio_flank_t flank,
     }
 
     /* configure pin as input */
-    gpio_init(pin, GPIO_DIR_IN, pushpull);
+    gpio_init(pin, mode);
 
     /* try go grab a free spot in the context array */
     int ctx_num = _get_free_ctx();

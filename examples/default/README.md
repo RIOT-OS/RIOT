@@ -53,7 +53,7 @@ Running the `help` command on an iotlab-m3:
 2015-09-16 16:57:17,742 - INFO # lsm303dlhc_init      Initializes the lsm303dlhc sensor driver.
 2015-09-16 16:57:17,744 - INFO # lsm303dlhc_read      Prints data from the lsm303dlhc sensor.
 2015-09-16 16:57:17,746 - INFO # ifconfig             Configure network interfaces
-2015-09-16 16:57:17,747 - INFO # txtsnd               send raw data
+2015-09-16 16:57:17,747 - INFO # txtsnd               Sends a custom string as is over the link layer
 ```
 
 Running the `ps` command on an iotlab-m3:

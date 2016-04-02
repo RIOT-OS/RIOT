@@ -1,20 +1,16 @@
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
-# vim:fenc=utf-8
-#
-# Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+#!/usr/bin/env python3
+
+# Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+import os
 import sys
-import pexpect
 
-def init():
-    term = pexpect.spawn("make term", timeout=1.1)
-    term.logfile = sys.stdout
-    return term
+sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+import testrunner
 
 def test1(term):
     term.expect_exact("######################### TEST1:")
@@ -91,10 +87,12 @@ def test4(term):
     term.expect_exact("first: timed out")
     term.expect(r"first: waited 1\d{6} usec")
 
+def testfunc(child):
+    test1(child)
+    test2(child)
+    test3(child)
+    test4(child)
+    child.expect("######################### DONE")
+
 if __name__ == "__main__":
-    TERM = init()
-    test1(TERM)
-    test2(TERM)
-    test3(TERM)
-    test4(TERM)
-    TERM.expect("######################### DONE")
+    sys.exit(testrunner.run(testfunc))

@@ -15,6 +15,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #include <stdbool.h>
@@ -25,6 +26,7 @@
 #include <inttypes.h>
 
 #include "thread.h"
+#include "net/netstats.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/netif.h"
@@ -70,6 +72,35 @@ static bool _is_iface(kernel_pid_t dev)
 
     return false;
 }
+
+#ifdef MODULE_NETSTATS_L2
+static int _netif_stats(kernel_pid_t dev, bool reset)
+{
+    netstats_t *stats;
+    int res = -ENOTSUP;
+    res = gnrc_netapi_get(dev, NETOPT_STATS, 0, &stats, sizeof(&stats));
+    if (res < 0) {
+        puts("           Protocol or device doesn't provide statistics.");
+    }
+    else if (reset) {
+        memset(stats, 0, sizeof(netstats_t));
+        puts("Reset statistics!");
+    }
+    else {
+        printf("           RX packets %u  bytes %u\n"
+               "           TX packets %u (Multicast: %u)  bytes %u\n"
+               "           TX succeeded %u errors %u\n",
+               (unsigned) stats->rx_count,
+               (unsigned) stats->rx_bytes,
+               (unsigned) (stats->tx_unicast_count + stats->tx_mcast_count),
+               (unsigned) stats->tx_mcast_count,
+               (unsigned) stats->tx_bytes,
+               (unsigned) stats->tx_success,
+               (unsigned) stats->tx_failed);
+    }
+    return res;
+}
+#endif
 
 static void _set_usage(char *cmd_name)
 {
@@ -118,6 +149,11 @@ static void _del_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> del <ipv6_addr>\n",
            cmd_name);
+}
+
+static void _stats_usage(char *cmd_name)
+{
+    printf("usage: %s <if_id> stats [reset]\n", cmd_name);
 }
 
 static void _print_netopt(netopt_t opt)
@@ -412,6 +448,10 @@ static void _netif_list(kernel_pid_t dev)
     }
 #endif
 
+#ifdef MODULE_NETSTATS_L2
+    puts("");
+    _netif_stats(dev, false);
+#endif
     puts("");
 }
 
@@ -717,6 +757,7 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
     } type = _UNICAST;
     char *addr_str = argv[0];
     ipv6_addr_t addr;
+    ipv6_addr_t *ifaddr;
     uint8_t prefix_len, flags = 0;
 
     if (argc > 1) {
@@ -758,10 +799,15 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
         flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST;
     }
 
-    if (gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len, flags) == NULL) {
+    if ((ifaddr = gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len, flags)) == NULL) {
         printf("error: unable to add IPv6 address\n");
         return 1;
     }
+
+    /* Address shall be valid infinitely */
+    gnrc_ipv6_netif_addr_get(ifaddr)->valid = UINT32_MAX;
+    /* Address shall be preferred infinitely */
+    gnrc_ipv6_netif_addr_get(ifaddr)->preferred = UINT32_MAX;
 
     printf("success: added %s/%d to interface %" PRIkernel_pid "\n", addr_str,
            prefix_len, dev);
@@ -828,7 +874,6 @@ static int _netif_mtu(kernel_pid_t dev, char *mtu_str)
 #endif
 }
 
-
 /* shell commands */
 int _netif_send(int argc, char **argv)
 {
@@ -840,7 +885,7 @@ int _netif_send(int argc, char **argv)
     uint8_t flags = 0x00;
 
     if (argc < 4) {
-        printf("usage: %s <if> [<addr>|bcast] <data>\n", argv[0]);
+        printf("usage: %s <if> [<L2 addr>|bcast] <data>\n", argv[0]);
         return 1;
     }
 
@@ -942,6 +987,15 @@ int _netif_config(int argc, char **argv)
 
                 return _netif_mtu((kernel_pid_t)dev, argv[3]);
             }
+#ifdef MODULE_NETSTATS_L2
+            else if (strcmp(argv[2], "stats") == 0) {
+                bool reset = false;
+                if ((argc > 3) && (strncmp(argv[3], "reset", 5) == 0)) {
+                    reset = true;
+                }
+                return _netif_stats((kernel_pid_t)dev, reset);
+            }
+#endif
 #ifdef MODULE_GNRC_IPV6_NETIF
             else if (strcmp(argv[2], "hl") == 0) {
                 if (argc < 4) {
@@ -982,5 +1036,6 @@ int _netif_config(int argc, char **argv)
     _flag_usage(argv[0]);
     _add_usage(argv[0]);
     _del_usage(argv[0]);
+    _stats_usage(argv[0]);
     return 1;
 }

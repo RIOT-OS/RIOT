@@ -6,7 +6,7 @@ FEATURES_REQUIRED = periph_spi periph_gpio
 BOARD_INSUFFICIENT_MEMORY := msb-430h nucleo-f334 stm32f0discovery weio z1
 
 USEMODULE += gnrc_netdev2
-USEMODULE += gnrc_netif_default
+USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += enc28j60
 USEMODULE += gnrc_ipv6_router_default

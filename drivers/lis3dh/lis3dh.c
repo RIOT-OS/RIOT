@@ -39,7 +39,7 @@ int lis3dh_init(lis3dh_t *dev, spi_t spi, gpio_t cs_pin, uint8_t scale)
     dev->scale = 0;
 
     /* CS */
-    gpio_init(dev->cs, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(dev->cs, GPIO_OUT);
     gpio_set(dev->cs);
 
     if (lis3dh_read_regs(dev, LIS3DH_REG_WHO_AM_I, 1, &in) < 0) {
