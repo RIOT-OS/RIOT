@@ -218,7 +218,7 @@ const uint8_t digital_pin_to_bit_mask[] = {
 		BV(3) /*  40 - GPIO_11 */
 };
 
-int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull) {
+int gpio_init(gpio_t dev, gpio_mode_t mode) {
 	uint8_t bit = digitalPinToBitMask(dev);
 	uint8_t port = digitalPinToPort(dev);
 
@@ -230,20 +230,23 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull) {
 
 	MAP_PinTypeGPIO(pinNum, PIN_MODE_0, false);
 
-	if (dir == GPIO_DIR_OUT) {
+	if (mode == GPIO_OUT) {
 		MAP_GPIODirModeSet(portBase, bit, GPIO_DIR_MODE_OUT);
 	} else {
 		MAP_GPIODirModeSet(portBase, bit, GPIO_DIR_MODE_IN);
 	}
 
-	switch (pushpull) {
-	case GPIO_NOPULL:
+	switch (mode) {
+	case GPIO_IN:
+	case GPIO_OUT:
+	case GPIO_OD:
 		MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD);
 		break;
-	case GPIO_PULLUP:
+	case GPIO_OD_PU:
+	case GPIO_IN_PU:
 		MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD_PU);
 		break;
-	case GPIO_PULLDOWN:
+	case GPIO_IN_PD:
 		MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD_PD);
 		break;
 	}
@@ -295,7 +298,7 @@ void GPIOA3IntHandler(void) {
 	GPIOXIntHandler(GPIOA3_BASE, cbFuncsA3, cbArgA3);
 }
 
-int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank,
+int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
 		gpio_cb_t cb, void *arg) {
 	uint32_t cc3200Mode, res, i;
 
@@ -304,7 +307,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank,
 	uint32_t portBase = (uint32_t) portBASERegister(port);
 
 	/* Note: gpio_init() also checks if the gpio is enabled. */
-	res = gpio_init(dev, GPIO_DIR_IN, pullup);
+	res = gpio_init(dev, mode);
 	if (res < 0) {
 		return res;
 	}

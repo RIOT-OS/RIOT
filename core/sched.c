@@ -63,10 +63,8 @@ uint8_t _tcb_name_offset = offsetof(tcb_t, name);
 #endif
 #endif
 
-clist_node_t *sched_runqueues[SCHED_PRIO_LEVELS];
+clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
 
-
-clist_node_t *sched_runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;
 
 #ifdef MODULE_SCHEDSTATISTICS

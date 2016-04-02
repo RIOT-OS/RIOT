@@ -108,7 +108,7 @@ static void vSimpleLinkSpawnTask(void *pvParameters);
 int init_queue(kernel_pid_t tid, msg_t *array, int num) {
     /* check if num is a power of two by comparing to its complement */
     if (num && (num & (num - 1)) == 0) {
-        tcb_t *me = (tcb_t*) thread_get(tid);
+        thread_t *me = (thread_t*) thread_get(tid);
         me->msg_array = array;
         cib_init(&(me->msg_queue), num);
         return 0;

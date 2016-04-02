@@ -27,6 +27,33 @@
 extern "C" {
 #endif
 
+/**
+ * @brief    Configuration of default stack sizes
+ *
+ * @{
+ */
+#ifndef THREAD_EXTRA_STACKSIZE_PRINTF
+#define THREAD_EXTRA_STACKSIZE_PRINTF   (512)
+#endif
+#ifndef THREAD_STACKSIZE_DEFAULT
+#define THREAD_STACKSIZE_DEFAULT        (1024)
+#endif
+#ifndef THREAD_STACKSIZE_IDLE
+#define THREAD_STACKSIZE_IDLE           (256)
+#endif
+/** @} */
+
+/**
+ * @brief   Stack size used for the exception (ISR) stack
+ * @{
+ */
+#ifndef ISR_STACKSIZE
+#define ISR_STACKSIZE                   (512U)
+#endif
+/** @} */
+
+
+
 #define CPU_DEFAULT_IRQ_PRIO    (1U) /**< The default priority is 1 for every
  	 	 	 	 	 	 	 	 	 	 interrupt, 0 is the highest possible
  	 	 	 	 	 	 	 	 	 	 priority. */
