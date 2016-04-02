@@ -140,8 +140,8 @@ static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
     /* get the size of the received packet */
     at86rf2xx_fb_read(dev, &phr, 1);
 
-    /* Ignore FCS for packet length */
-    pkt_len = phr - 2;
+    /* ignore MSB (refer p.80) and substract length of FCS field */
+    pkt_len = (phr & 0x7f) - 2;
 
     /* just return length when buf == NULL */
     if (buf == NULL) {
