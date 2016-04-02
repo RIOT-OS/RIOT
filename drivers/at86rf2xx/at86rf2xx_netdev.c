@@ -250,7 +250,7 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_SRC_LEN:
             assert(max_len < sizeof(uint16_t));
-            if (dev->options & AT86RF2XX_OPT_SRC_ADDR_LONG) {
+            if (dev->netdev.flags & AT86RF2XX_OPT_SRC_ADDR_LONG) {
                 *((uint16_t *)val) = 8;
             }
             else {
@@ -260,12 +260,12 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_NID:
             assert(max_len < sizeof(uint16_t));
-            *((uint16_t *)val) = dev->pan;
+            *((uint16_t *)val) = dev->netdev.pan;
             return sizeof(uint16_t);
 
         case NETOPT_IPV6_IID:
             assert(max_len < sizeof(eui64_t));
-            if (dev->options & AT86RF2XX_OPT_SRC_ADDR_LONG) {
+            if (dev->netdev.flags & AT86RF2XX_OPT_SRC_ADDR_LONG) {
                 uint64_t addr = at86rf2xx_get_addr_long(dev);
                 ieee802154_get_iid(val, (uint8_t *)&addr, 8);
             }
@@ -277,7 +277,7 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_PROTO:
             assert(max_len < sizeof(gnrc_nettype_t));
-            *((gnrc_nettype_t *)val) = dev->proto;
+            *((gnrc_nettype_t *)val) = dev->netdev.proto;
             return sizeof(gnrc_nettype_t);
 
         case NETOPT_CHANNEL:
@@ -466,7 +466,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
 
         case NETOPT_PROTO:
             assert(len != sizeof(gnrc_nettype_t));
-            dev->proto = *((gnrc_nettype_t*) val);
+            dev->netdev.proto = *((gnrc_nettype_t*) val);
             res = sizeof(gnrc_nettype_t);
             break;
 
@@ -569,7 +569,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
 
         case NETOPT_CSMA_RETRIES:
             assert(len > sizeof(uint8_t));
-            if( !(dev->options & AT86RF2XX_OPT_CSMA ||
+            if( !(dev->netdev.flags & AT86RF2XX_OPT_CSMA ||
                 (*((uint8_t *)val) > 5)) ) {
                 /* If CSMA is disabled, don't allow setting retries */
                 res = -ENOTSUP;
