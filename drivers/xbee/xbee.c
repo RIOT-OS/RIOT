@@ -216,8 +216,8 @@ static int _get_addr_short(xbee_t *dev, uint8_t *val, size_t len)
     cmd[1] = 'Y';
     _api_at_cmd(dev, cmd, 2, &resp);
     if (resp.status == 0) {
-        memcpy(val, resp.data, 2);
-        return 2;
+        memcpy(val, resp.data, IEEE802154_SHORT_ADDRESS_LEN);
+        return IEEE802154_SHORT_ADDRESS_LEN;
     }
     return -ECANCELED;
 }
@@ -227,7 +227,7 @@ static int _get_addr_long(xbee_t *dev, uint8_t *val, size_t len)
     uint8_t cmd[2];
     resp_t resp;
 
-    if (len < 8) {
+    if (len < IEEE802154_LONG_ADDRESS_LEN) {
         return -EOVERFLOW;
     }
 
@@ -246,7 +246,7 @@ static int _get_addr_long(xbee_t *dev, uint8_t *val, size_t len)
     _api_at_cmd(dev, cmd, 2, &resp);
     if (resp.status == 0) {
         memcpy(val + 4, resp.data, 4);
-        return 8;
+        return IEEE802154_LONG_ADDRESS_LEN;
     }
     return -ECANCELED;
 }
@@ -286,10 +286,10 @@ static int _set_addr_len(xbee_t *dev, uint16_t *val, size_t len)
     }
 
     switch (*val) {
-        case 8:
+        case IEEE802154_LONG_ADDRESS_LEN:
             dev->addr_flags |= XBEE_ADDR_FLAGS_LONG;
             break;
-        case 2:
+        case IEEE802154_SHORT_ADDRESS_LEN:
             dev->addr_flags &= ~XBEE_ADDR_FLAGS_LONG;
             break;
         default:
@@ -460,15 +460,15 @@ int xbee_init(xbee_t *dev, const xbee_params_t *params)
     _at_cmd(dev, "ATCN\r");
 
     /* load long address (we can not set it, its read only for Xbee devices) */
-    if (_get_addr_long(dev, dev->addr_long.uint8, 8) < 0) {
+    if (_get_addr_long(dev, dev->addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN) < 0) {
         DEBUG("xbee: Error getting address\n");
         return -EIO;
     }
-    /* set default channel */
-    if (_set_addr(dev, &((dev->addr_long).uint8[6]), 2) < 0) {
+    if (_set_addr(dev, &((dev->addr_long).uint8[6]), IEEE802154_SHORT_ADDRESS_LEN) < 0) {
         DEBUG("xbee: Error setting short address\n");
         return -EIO;
     }
+    /* set default channel */
     tmp[1] = 0;
     tmp[0] = XBEE_DEFAULT_CHANNEL;
     if (_set_channel(dev, tmp, 2) < 0) {
@@ -520,7 +520,8 @@ static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
     }
     /* get netif header check address length and flags */
     hdr = (gnrc_netif_hdr_t *)pkt->data;
-    if (!((hdr->dst_l2addr_len == 2) || (hdr->dst_l2addr_len == 8) ||
+    if (!((hdr->dst_l2addr_len == IEEE802154_SHORT_ADDRESS_LEN) ||
+          (hdr->dst_l2addr_len == IEEE802154_LONG_ADDRESS_LEN) ||
           _is_broadcast(hdr))) {
         gnrc_pktbuf_release(pkt);
         return -ENOMSG;
@@ -539,18 +540,18 @@ static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
         dev->tx_buf[4] = 0xff;
         dev->tx_buf[5] = 0xff;
     }
-    if (hdr->dst_l2addr_len == 2) {
+    if (hdr->dst_l2addr_len == IEEE802154_SHORT_ADDRESS_LEN) {
         dev->tx_buf[1] = (uint8_t)((size + 5) >> 8);
         dev->tx_buf[2] = (uint8_t)(size + 5);
         dev->tx_buf[3] = API_ID_TX_SHORT_ADDR;
-        memcpy(dev->tx_buf + 5, gnrc_netif_hdr_get_dst_addr(hdr), 2);
+        memcpy(dev->tx_buf + 5, gnrc_netif_hdr_get_dst_addr(hdr), IEEE802154_SHORT_ADDRESS_LEN);
         pos = 7;
     }
     else {
         dev->tx_buf[1] = (uint8_t)((size + 11) >> 8);
         dev->tx_buf[2] = (uint8_t)(size + 11);
         dev->tx_buf[3] = API_ID_TX_LONG_ADDR;
-        memcpy(dev->tx_buf + 5, gnrc_netif_hdr_get_dst_addr(hdr), 8);
+        memcpy(dev->tx_buf + 5, gnrc_netif_hdr_get_dst_addr(hdr), IEEE802154_LONG_ADDRESS_LEN);
         pos = 13;
     }
     /* set options */
@@ -614,10 +615,10 @@ static int _get(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t max_len
                 return -EOVERFLOW;
             }
             if (dev->addr_flags & XBEE_ADDR_FLAGS_LONG) {
-                *((uint16_t *)value) = 8;
+                *((uint16_t *)value) = IEEE802154_LONG_ADDRESS_LEN;
             }
             else {
-                *((uint16_t *)value) = 2;
+                *((uint16_t *)value) = IEEE802154_SHORT_ADDRESS_LEN;
             }
             return sizeof(uint16_t);
         case NETOPT_IPV6_IID:
@@ -625,10 +626,10 @@ static int _get(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t max_len
                 return -EOVERFLOW;
             }
             if (dev->addr_flags & XBEE_ADDR_FLAGS_LONG) {
-                ieee802154_get_iid(value, (uint8_t *)&dev->addr_long, 8);
+                ieee802154_get_iid(value, (uint8_t *)&dev->addr_long, IEEE802154_LONG_ADDRESS_LEN);
             }
             else {
-                ieee802154_get_iid(value, (uint8_t *)&dev->addr_short, 2);
+                ieee802154_get_iid(value, (uint8_t *)&dev->addr_short, IEEE802154_SHORT_ADDRESS_LEN);
             }
 
             return sizeof(eui64_t);
@@ -695,10 +696,10 @@ static void _isr_event(gnrc_netdev_t *netdev, uint32_t event_type)
 
     /* read address length */
     if (dev->rx_buf[0] == API_ID_RX_SHORT_ADDR) {
-        addr_len = 2;
+        addr_len = IEEE802154_SHORT_ADDRESS_LEN;
     }
     else {
-        addr_len = 8;
+        addr_len = IEEE802154_LONG_ADDRESS_LEN;
     }
 
     /* check checksum for correctness */
@@ -728,10 +729,10 @@ static void _isr_event(gnrc_netdev_t *netdev, uint32_t event_type)
     hdr->lqi = 0;
     gnrc_netif_hdr_set_src_addr(hdr, &(dev->rx_buf[1]), addr_len);
     if (addr_len == 2) {
-        gnrc_netif_hdr_set_dst_addr(hdr, dev->addr_short, 2);
+        gnrc_netif_hdr_set_dst_addr(hdr, dev->addr_short, IEEE802154_SHORT_ADDRESS_LEN);
     }
     else {
-        gnrc_netif_hdr_set_dst_addr(hdr, dev->addr_long.uint8, 8);
+        gnrc_netif_hdr_set_dst_addr(hdr, dev->addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
     }
     pos = 3 + addr_len;
     /* allocate and copy payload */
