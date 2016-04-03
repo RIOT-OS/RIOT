@@ -55,6 +55,11 @@ extern "C" {
  */
 #define NATIVE_ETH_PROTO 0x1234
 
+#if (defined(GNRC_PKTBUF_SIZE)) && (GNRC_PKTBUF_SIZE < 2048)
+#   undef  GNRC_PKTBUF_SIZE
+#   define GNRC_PKTBUF_SIZE     (2048)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
