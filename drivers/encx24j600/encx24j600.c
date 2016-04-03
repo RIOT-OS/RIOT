@@ -32,7 +32,7 @@
 #include "net/netdev2/eth.h"
 #include "net/eui64.h"
 #include "net/ethernet.h"
-//#include "net/ethernet/hdr.h"
+#include "net/netstats.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -298,12 +298,19 @@ static int _init(netdev2_t *encdev)
 
     unlock(dev);
 
+#ifdef MODULE_NETSTATS_L2
+    memset(&netdev->stats, 0, sizeof(netstats_t));
+#endif
     return 0;
 }
 
 static int _send(netdev2_t *netdev, const struct iovec *vector, int count) {
     encx24j600_t * dev = (encx24j600_t *) netdev;
     lock(dev);
+
+#ifdef MODULE_NETSTATS_L2
+    netdev->stats.tx_bytes += count;
+#endif
 
     /* wait until previous packet has been sent */
     while ((reg_get(dev, ECON1) & TXRTS));
@@ -367,6 +374,10 @@ static int _recv(netdev2_t *netdev, char* buf, int len, void *info)
     size_t payload_len = hdr.frame_len - 4;
 
     if (buf) {
+#ifdef MODULE_NETSTATS_L2
+        netdev->stats.rx_count++;
+        netdev2->stats.rx_bytes += len;
+#endif
         /* read packet (without 4 bytes checksum) */
         sram_op(dev, RRXDATA, 0xFFFF, buf, payload_len);
 

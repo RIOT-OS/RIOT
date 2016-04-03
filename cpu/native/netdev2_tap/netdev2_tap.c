@@ -296,7 +296,9 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int n)
     }
     netdev->stats.tx_bytes += bytes;
 #endif
-    netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE, NULL);
+    if (netdev->event_callback) {
+        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE, NULL);
+    }
     return res;
 }
 
