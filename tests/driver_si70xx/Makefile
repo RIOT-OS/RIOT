@@ -9,8 +9,8 @@ USEMODULE += xtimer
 
 # set default device parameters in case they are undefined
 TEST_I2C ?= 0
-TEST_I2C_ADDR ?= 128
-TEST_PIN_EN ?= 57
+TEST_I2C_ADDR ?= 0x80
+TEST_PIN_EN ?= GPIO_PIN\(0,0\)
 
 # export parameters
 CFLAGS += -DTEST_I2C=$(TEST_I2C)
