@@ -230,6 +230,7 @@ static int nd_send(netdev2_t *netdev, const struct iovec *data, int count)
 #ifdef MODULE_NETSTATS_L2
     netdev->stats.tx_bytes += count;
 #endif
+
     /* set write pointer */
     cmd_w_addr(dev, ADDR_WRITE_PTR, BUF_TX_START);
     /* write control byte and the actual data into the buffer */
@@ -380,6 +381,9 @@ static int nd_init(netdev2_t *netdev)
     /* allow receiving bytes from now on */
     cmd_bfs(dev, REG_ECON1, -1, ECON1_RXEN);
 
+#ifdef MODULE_NETSTATS_L2
+    memset(&netdev->stats, 0, sizeof(netstats_t));
+#endif
     mutex_unlock(&dev->devlock);
     return 0;
 }
@@ -424,9 +428,6 @@ static void nd_isr(netdev2_t *netdev)
         }
         eir = cmd_rcr(dev, REG_EIR, -1);
     }
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
 }
 
 static int nd_get(netdev2_t *netdev, netopt_t opt, void *value, size_t max_len)
