@@ -318,7 +318,7 @@ static int _recv(netdev2_t *netdev, char* buf, int len, void* info)
     }
 }
 
-int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
+static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
 {
     int res = 0;
 
