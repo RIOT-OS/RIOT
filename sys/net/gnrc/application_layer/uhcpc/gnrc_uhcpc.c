@@ -65,13 +65,17 @@ static ipv6_addr_t _prefix;
 
 void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, uint8_t *src, uhcp_iface_t iface)
 {
+    (void)prefix_len;
+    (void)lifetime;
+    (void)src;
+
     eui64_t iid;
     if (!gnrc_wireless_interface) {
         LOG_WARNING("uhcpc: uhcp_handle_prefix(): received prefix, but don't know any wireless interface\n");
         return;
     }
 
-    if (iface != gnrc_border_interface) {
+    if ((kernel_pid_t)iface != gnrc_border_interface) {
         LOG_WARNING("uhcpc: uhcp_handle_prefix(): received prefix from unexpected interface\n");
         return;
     }
@@ -116,6 +120,8 @@ static msg_t _uhcp_msg_queue[4];
 
 static void* uhcp_client_thread(void *arg)
 {
+    (void)arg;
+
     msg_init_queue(_uhcp_msg_queue, sizeof(_uhcp_msg_queue)/sizeof(msg_t));
     uhcp_client(gnrc_border_interface);
     return NULL;
