@@ -72,9 +72,9 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 #if CPUID_LEN
     cpuid_get(cpuid);
 
-#if CPUID_LEN < 8
+#if CPUID_LEN < IEEE802154_LONG_ADDRESS_LEN
     /* in case CPUID_LEN < 8, fill missing bytes with zeros */
-    for (int i = CPUID_LEN; i < 8; i++) {
+    for (int i = CPUID_LEN; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
         cpuid[i] = 0;
     }
 #else
@@ -86,7 +86,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     cpuid[0] &= ~(0x01);
     cpuid[0] |= 0x02;
     /* copy and set long address */
-    memcpy(&addr_long, cpuid, 8);
+    memcpy(&addr_long, cpuid, IEEE802154_LONG_ADDRESS_LEN);
     at86rf2xx_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
     at86rf2xx_set_addr_short(dev, NTOHS(addr_long.uint16[0].u16));
 #else
