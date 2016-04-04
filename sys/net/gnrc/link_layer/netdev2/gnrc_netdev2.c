@@ -106,12 +106,6 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
                     break;
                 }
                 else {
-#ifdef MODULE_NETSTATS
-                    if (!(((gnrc_netif_hdr_t*)gnrc_netdev2->retrans_head->pkt->data)->flags &
-                                (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST))) {
-                        dev->stats.acks_count++;
-                    }
-#endif
                     DEBUG("packet sent, removing from buffer and queue: %p\n", gnrc_netdev2->retrans_head->pkt);
                     gnrc_pktbuf_release(gnrc_netdev2->retrans_head->pkt);
                     gnrc_netdev2->retrans_head->pkt = NULL;
