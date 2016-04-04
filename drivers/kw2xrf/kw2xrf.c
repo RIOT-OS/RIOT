@@ -395,7 +395,12 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     uint8_t tmp[2];
     kw2xrf_gpio_int = int_pin;
 #if CPUID_LEN
+/* make sure that the buffer is always big enough to store a 64bit value */
+#   if CPUID_LEN < IEEE802154_LONG_ADDRESS_LEN
+    uint8_t cpuid[IEEE802154_LONG_ADDRESS_LEN];
+#   else
     uint8_t cpuid[CPUID_LEN];
+#endif
     eui64_t addr_long;
 #endif
 

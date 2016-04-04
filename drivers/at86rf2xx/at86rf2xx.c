@@ -51,7 +51,12 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
 #if CPUID_LEN
+/* make sure that the buffer is always big enough to store a 64bit value */
+#   if CPUID_LEN < IEEE802154_LONG_ADDRESS_LEN
+    uint8_t cpuid[IEEE802154_LONG_ADDRESS_LEN];
+#   else
     uint8_t cpuid[CPUID_LEN];
+#endif
     eui64_t addr_long;
 #endif
 
