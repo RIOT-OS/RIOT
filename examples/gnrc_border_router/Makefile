@@ -12,20 +12,14 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon msb-430 msb-430h pca10000 pca10005 \
                              spark-core stm32f0discovery telosb \
                              weio wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1 nucleo-f072
 
-ifeq (,$(SLIP_UART))
-  # set default (last available UART)
-  SLIP_UART="UART_DEV(UART_NUMOF-1)"
-endif
-ifeq (,$(SLIP_BAUDRATE))
-  # set default
-  SLIP_BAUDRATE=115200
-endif
-
-#
+# use ethos (ethernet over serial) for network communication and stdio over
+# UART, but not on native, as native has a tap interface towards the host.
+ifeq (,$(filter native,$(BOARD)))
 GNRC_NETIF_NUMOF := 2
 USEMODULE += ethos gnrc_netdev2
 CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=115200 -DUSE_ETHOS_FOR_STDIO
 FEATURES_REQUIRED += periph_uart
+endif
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
