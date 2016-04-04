@@ -42,7 +42,7 @@
 
 static void _get_mac_addr(netdev2_t *dev, uint8_t* buf);
 static void ethos_isr(void *arg, uint8_t c);
-const static netdev2_driver_t netdev2_driver_ethos;
+static const netdev2_driver_t netdev2_driver_ethos;
 
 static const uint8_t _esc_esc[] = {ETHOS_ESC_CHAR, (ETHOS_ESC_CHAR ^ 0x20)};
 static const uint8_t _esc_delim[] = {ETHOS_ESC_CHAR, (ETHOS_FRAME_DELIMITER ^ 0x20)};
@@ -341,7 +341,7 @@ int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
 }
 
 /* netdev2 interface */
-const static netdev2_driver_t netdev2_driver_ethos = {
+static const netdev2_driver_t netdev2_driver_ethos = {
     .send = _send,
     .recv = _recv,
     .init = _init,
