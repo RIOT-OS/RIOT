@@ -50,6 +50,7 @@ endif
 ifneq (,$(filter ethos,$(USEMODULE)))
     USEMODULE += netdev2_eth
     USEMODULE += random
+    USEMODULE += tsrb
 endif
 
 ifneq (,$(filter hih6130,$(USEMODULE)))
