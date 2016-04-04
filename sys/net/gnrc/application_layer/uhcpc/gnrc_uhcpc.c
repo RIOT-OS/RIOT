@@ -49,7 +49,7 @@ static void set_interface_roles(void)
                     0x00, addr.u8, 16, 0,
                     (uint32_t)FIB_LIFETIME_NO_EXPIRE);
         }
-        else if ((!gnrc_wireless_interface) && (dev_type == NETDEV2_TYPE_UNKNOWN)) {
+        else if ((!gnrc_wireless_interface) && (dev_type != NETDEV2_TYPE_ETHERNET)) {
             gnrc_wireless_interface = dev;
         }
 
