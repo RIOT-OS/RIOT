@@ -70,16 +70,17 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     dev->netdev.flags = 0;
     /* set short and long address */
 #if CPUID_LEN
+    /* in case CPUID_LEN < 8, fill missing bytes with zeros */
+    memset(cpuid, 0, CPUID_LEN);
+
     cpuid_get(cpuid);
 
-#if CPUID_LEN < IEEE802154_LONG_ADDRESS_LEN
-    /* in case CPUID_LEN < 8, fill missing bytes with zeros */
-    memset(&(cpuid[CPUID_LEN]), 0, (IEEE802154_LONG_ADDRESS_LEN - CPUID_LEN));
-#else
-    for (int i = 8; i < CPUID_LEN; i++) {
+#if CPUID_LEN > IEEE802154_LONG_ADDRESS_LEN
+    for (int i = IEEE802154_LONG_ADDRESS_LEN; i < CPUID_LEN; i++) {
         cpuid[i & 0x07] ^= cpuid[i];
     }
 #endif
+
     /* make sure we mark the address as non-multicast and not globally unique */
     cpuid[0] &= ~(0x01);
     cpuid[0] |= 0x02;
