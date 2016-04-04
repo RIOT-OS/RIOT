@@ -131,6 +131,12 @@ void auto_init_gnrc_uhcpc(void)
 {
     set_interface_roles();
 
+    /* only start client if more than one interface is given */
+    if (! (gnrc_border_interface && gnrc_wireless_interface)) {
+        LOG_WARNING("uhcpc: only one interface found, skipping setup.\n");
+        return;
+    }
+
     /* initiate uhcp client */
     thread_create(_uhcp_client_stack, sizeof(_uhcp_client_stack),
             THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
