@@ -435,9 +435,7 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
 #if CPUID_LEN < IEEE802154_LONG_ADDRESS_LEN
 
     /* in case CPUID_LEN < 8, fill missing bytes with zeros */
-    for (int i = CPUID_LEN; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
-        cpuid[i] = 0;
-    }
+    memset(&(cpuid[CPUID_LEN]), 0, (IEEE802154_LONG_ADDRESS_LEN - CPUID_LEN));
 
 #else
 

@@ -74,9 +74,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 
 #if CPUID_LEN < IEEE802154_LONG_ADDRESS_LEN
     /* in case CPUID_LEN < 8, fill missing bytes with zeros */
-    for (int i = CPUID_LEN; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
-        cpuid[i] = 0;
-    }
+    memset(&(cpuid[CPUID_LEN]), 0, (IEEE802154_LONG_ADDRESS_LEN - CPUID_LEN));
 #else
     for (int i = 8; i < CPUID_LEN; i++) {
         cpuid[i & 0x07] ^= cpuid[i];
