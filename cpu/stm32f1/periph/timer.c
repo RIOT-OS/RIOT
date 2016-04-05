@@ -56,7 +56,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     dev(tim)->CR2  = 0;
     dev(tim)->ARR  = TIMER_MAXVAL;
     /* set prescaler */
-    dev(tim)->PSC = ((CLOCK_CORECLOCK / freq) - 1);
+    dev(tim)->PSC = ((((timer_config[tim].bus == APB1) ? CLOCK_APB1_TIMERS : CLOCK_APB2_TIMERS) / freq) - 1);
     /* generate an update event to apply our configuration */
     dev(tim)->EGR = TIM_EGR_UG;
 
