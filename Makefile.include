@@ -7,7 +7,8 @@ all:
 RIOTBASE ?= $(shell dirname "$(lastword $(MAKEFILE_LIST))")
 RIOTBASE := $(abspath $(RIOTBASE))
 
-CCACHE_BASEDIR := $(RIOTBASE)
+CCACHE_BASEDIR ?= $(RIOTBASE)
+CCACHE_BASEDIR := $(abspath $(CCACHE_BASEDIR))
 
 RIOTCPU ?= $(RIOTBASE)/cpu
 RIOTCPU := $(abspath $(RIOTCPU))
@@ -16,11 +17,13 @@ RIOTBOARD ?= $(RIOTBASE)/boards
 RIOTBOARD := $(abspath $(RIOTBOARD))
 
 RIOTPKG ?= $(RIOTBASE)/pkg
+RIOTPKG := $(abspath $(RIOTPKG))
 
 RIOTPROJECT ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 RIOTPROJECT := $(abspath $(RIOTPROJECT))
 
-GITCACHE:=$(RIOTBASE)/dist/tools/git/git-cache
+GITCACHE ?= $(RIOTBASE)/dist/tools/git/git-cache
+GITCACHE := $(abspath $(GITCACHE))
 
 # Include Docker settings near the top because we need to build the environment
 # command line before some of the variable origins are overwritten below when
