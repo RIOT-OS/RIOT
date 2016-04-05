@@ -9,6 +9,7 @@
 # JLINK:            JLink command name, default: "JLinkExe"
 # JLINK_SERVER:     JLink GCB server command name, default: "JLinkGDBDerver"
 # JLINK_DEVICE:     Device identifier used by JLink
+# JLINK_SERIAL:     Device serial used by JLink
 # JLINK_IF:         Interface used by JLink, default: "SWD"
 # JLINK_SPEED:      Interface clock speed to use (in kHz), default "2000"
 # JLINK_FLASH_ADDR: Starting address of the target's flash memory, default: "0"
@@ -63,7 +64,6 @@ _FLASH_ADDR=0
 # a couple of tests for certain configuration options
 #
 test_config() {
-
     if [ -z "${HEXFILE}" ]; then
         echo "no hexfile"
     else
@@ -122,11 +122,19 @@ test_tui() {
     fi
 }
 
+test_serial() {
+    if [ -n "${JLINK_SERIAL}" ]; then
+        JLINK_SERIAL_SERVER="-select usb='${JLINK_SERIAL}'"
+        JLINK_SERIAL="-SelectEmuBySN '${JLINK_SERIAL}'"
+    fi
+}
+
 #
 # now comes the actual actions
 #
 do_flash() {
     test_config
+    test_serial
     test_hexfile
     # clear any existing contents in burn file
     /bin/echo -n "" > ${BINDIR}/burn.seg
@@ -140,7 +148,8 @@ do_flash() {
     fi
     cat ${RIOTBASE}/dist/tools/jlink/reset.seg >> ${BINDIR}/burn.seg
     # flash device
-    sh -c "${JLINK} -device '${JLINK_DEVICE}' \
+    sh -c "${JLINK} ${JLINK_SERIAL} \
+                    -device '${JLINK_DEVICE}' \
                     -speed '${JLINK_SPEED}' \
                     -if '${JLINK_IF}' \
                     -commandfile '${BINDIR}/burn.seg'"
@@ -148,11 +157,13 @@ do_flash() {
 
 do_debug() {
     test_config
+    test_serial
     test_elffile
     test_ports
     test_tui
     # start the JLink GDB server
-    sh -c "${JLINK_SERVER} -device '${JLINK_DEVICE}' \
+    sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
+                           -device '${JLINK_DEVICE}' \
                            -speed '${JLINK_SPEED}' \
                            -if '${JLINK_IF}' \
                            -port '${GDB_PORT}' \
@@ -168,8 +179,10 @@ do_debug() {
 do_debugserver() {
     test_ports
     test_config
+    test_serial
     # start the JLink GDB server
-    sh -c "${JLINK_SERVER} -device '${JLINK_DEVICE}' \
+    sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
+                           -device '${JLINK_DEVICE}' \
                            -speed '${JLINK_SPEED}' \
                            -if '${JLINK_IF}' \
                            -port '${GDB_PORT}' \
@@ -178,8 +191,10 @@ do_debugserver() {
 
 do_reset() {
     test_config
+    test_serial
     # reset the board
-    sh -c "${JLINK} -device '${JLINK_DEVICE}' \
+    sh -c "${JLINK} ${JLINK_SERIAL} \
+                    -device '${JLINK_DEVICE}' \
                     -speed '${JLINK_SPEED}' \
                     -if '${JLINK_IF}' \
                     -commandfile '${RIOTBASE}/dist/tools/jlink/reset.seg'"
