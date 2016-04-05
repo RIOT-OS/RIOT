@@ -39,8 +39,8 @@ endif
 # Use absolute paths in recusive "make" even if overriden on command line.
 MAKEOVERRIDES += $(foreach v,${__DIRECTORY_VARIABLES},${v}=${${v}})
 
-# Path to the current directory relative to the git root
-BUILDRELPATH ?= $(shell git rev-parse --show-prefix)
+# Path to the current directory relative to RIOTPROJECT
+BUILDRELPATH ?= ${PWD:${RIOTPROJECT}/%=%}/
 
 # Include Docker settings near the top because we need to build the environment
 # command line before some of the variable origins are overwritten below when
