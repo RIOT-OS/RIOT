@@ -19,6 +19,7 @@ cleanup() {
     remove_tap
     ip a d fd00:dead:beef::1/128 dev lo
     kill $UHCPD_PID
+    trap "" INT QUIT TERM EXIT
 }
 
 start_uhcpd() {
@@ -36,6 +37,6 @@ UHCPD=../uhcpd/bin/uhcpd
     exit 1
 }
 
-trap "cleanup" EXIT
+trap "cleanup" INT QUIT TERM EXIT
 
 create_tap && start_uhcpd && ./ethos $TAP $PORT
