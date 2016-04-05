@@ -33,7 +33,7 @@ extern "C" {
 #define CLOCK_CORECLOCK     (72000000U)             /* desired core clock frequency */
 
 /* the actual PLL values are automatically generated */
-#define CLOCK_PLL_DIV       (0)
+#define CLOCK_PLL_DIV       (1)
 #define CLOCK_PLL_MUL       (9)
 
 /* AHB, APB1, APB2 dividers */
