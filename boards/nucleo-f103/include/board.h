@@ -35,8 +35,9 @@ extern "C" {
 /**
  * @name xtimer configuration
  */
-#define XTIMER_MASK         (0xffff0000)
-#define XTIMER_BACKOFF      5
+#define XTIMER_MASK                 (0xffff0000)
+#define XTIMER_BACKOFF              5
+#define XTIMER_SHIFT_ON_COMPARE     (1)
 /** @} */
 
 #ifdef __cplusplus
