@@ -129,3 +129,25 @@ static int _recv(netdev2_t *netdev, char *buf, int len)
         return -ENOBUFS;
     }
 }
+
+netopt_state_t _get_state(mrf24j40_t *dev)
+{
+    switch (mrf24j40_get_status(dev)) {
+        case MRF24J40_RFSTATE_SLEEP:
+            return NETOPT_STATE_SLEEP;
+        case MRF24J40_RFSTATE_RX:
+            return NETOPT_STATE_RX;
+        case MRF24J40_RFSTATE_TX:
+            return NETOPT_STATE_TX;
+        case MRF24J40_RFSTATE_CALVCO:
+            return NETOPT_STATE_CALVCO;
+        case MRF24J40_RFSTATE_CALFIL:
+            return NETOPT_STATE_CALFIL;
+        case MRF24J40_RFSTATE_RESET:
+            return NETOPT_STATE_RESET;
+        case MRF24J40_RFSTATE_RTSEL1:
+            return NETOPT_STATE_RTSEL1;
+        case MRF24J40_RFSTATE_RTSEL2:
+            return NETOPT_STATE_RTSEL2;
+    }
+}
