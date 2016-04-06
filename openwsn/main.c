@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "shell.h"
 #include "posix_io.h"
 #include "03oos_openwsn.h"
