@@ -235,3 +235,4 @@ typedef struct multiboot_mod_list multiboot_module_t;
 #endif
 
 #endif  /** ! MULTIBOOT_H_ */
+/** @} */
