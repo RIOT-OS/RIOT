@@ -52,4 +52,12 @@ void cortexm_init(void)
 
     /* enable wake up on events for __WFE CPU sleep */
     SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
+
+    /* for Cortex-M3 r1p0 and up the STKALIGN option was added, but not automatically
+     * enabled until revision r2p0. For 64bit function arguments to work properly this
+     * needs to be enabled.
+     */
+#ifdef SCB_CCR_STKALIGN_Msk
+    SCB->CCR |= SCB_CCR_STKALIGN_Msk;
+#endif
 }
