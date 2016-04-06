@@ -10,7 +10,6 @@ ifneq (,$(filter ccn-lite,$(USEPKG)))
     export CFLAGS += -DCCNL_RIOT
 endif
 
-
 ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE += conn_udp
   USEMODULE += xtimer
@@ -20,30 +19,6 @@ endif
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += netdev_default
-endif
-
-ifneq (,$(filter cc110x,$(USEMODULE)))
-  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-    USEMODULE += gnrc_cc110x
-	# XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
-	# as all drivers are ported to netdev2
-	USEMODULE += gnrc_netdev2
-  endif
-endif
-
-ifneq (,$(filter kw2xrf,$(USEMODULE)))
-  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-    USEMODULE += gnrc_nomac
-  endif
-endif
-
-ifneq (,$(filter at86rf2%,$(USEMODULE)))
-  USEMODULE += netdev2_ieee802154
-  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-	# XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
-	# as all drivers are ported to netdev2
-    USEMODULE += gnrc_netdev2
-  endif
 endif
 
 ifneq (,$(filter netdev2_ieee802154,$(USEMODULE)))
@@ -559,11 +534,6 @@ endif
 
 ifneq (,$(filter phydat,$(USEMODULE)))
   USEMODULE += fmt
-endif
-
-ifneq (,$(filter ethos,$(USEMODULE)))
-    USEMODULE += netdev2_eth
-    USEMODULE += random
 endif
 
 ifneq (,$(filter random,$(USEMODULE)))
