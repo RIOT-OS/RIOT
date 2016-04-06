@@ -18,7 +18,7 @@ CFLAGS += -DDEVELHELP
 export QUIET ?= 1
 
 USEMODULE += ps
-USEMODULE += vtimer
+USEMODULE += xtimer
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += posix
