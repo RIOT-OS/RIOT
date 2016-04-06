@@ -86,7 +86,7 @@ void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params)
 {
     dev->netdev.driver = &netdev2_driver_encx24j600;
     dev->spi = params->spi;
-    dev->cs = params->cs;
+    dev->cs = params->cs_pin;
     dev->int_pin = params->int_pin;
     dev->rx_next_ptr = RX_BUFFER_START;
 
@@ -96,12 +96,13 @@ void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params)
 static void encx24j600_isr(void *arg)
 {
     encx24j600_t *dev = (encx24j600_t *) arg;
+    netdev2_t *netdev = (netdev2_t *) arg;
 
     /* disable interrupt line */
     gpio_irq_disable(dev->int_pin);
 
     /* call netdev2 hook */
-    dev->netdev.event_callback((netdev2_t*) dev, NETDEV2_EVENT_ISR, dev->isr_arg);
+    dev->netdev.event_callback((netdev2_t*) dev, NETDEV2_EVENT_ISR, netdev->isr_arg);
 }
 
 static void _isr(netdev2_t *netdev)
