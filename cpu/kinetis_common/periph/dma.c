@@ -41,6 +41,10 @@ int dma_init(const uint8_t channel, const dma_source_t source)
     }
 
     DMA_CLOCK_GATE = 1;
+
+    /* Set Halt on Error, enable minor loop linking, pause transfers during debug */
+    DMA_DEV->CR = DMA_CR_HOE_MASK | DMA_CR_EMLM_MASK | DMA_CR_EDBG_MASK;
+
     DMAMUX_CLOCK_GATE = 1;
 
     /* Disable the channel completely */
