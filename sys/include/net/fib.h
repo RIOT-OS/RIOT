@@ -37,7 +37,7 @@ extern "C" {
 /**
  * @brief Routing Protocol (RP) message content to request/reply notification
  */
-typedef struct rp_address_msg_t {
+typedef struct {
     uint8_t *address;      /**< The pointer to the address */
     uint8_t address_size;  /**< The address size */
     uint32_t address_flags; /**< The flags for the given address */
@@ -62,7 +62,7 @@ typedef struct rp_address_msg_t {
 /**
  * @brief entry used to collect available destinations
  */
-typedef struct fib_destination_set_entry_t {
+typedef struct {
     uint8_t dest[UNIVERSAL_ADDRESS_SIZE]; /**< The destination address */
     size_t dest_size;    /**< The destination address size */
 } fib_destination_set_entry_t;

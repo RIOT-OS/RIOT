@@ -138,7 +138,7 @@ extern "C" {
  * @sa cbor_clear
  * @sa cbor_destroy
  */
-typedef struct cbor_stream_t {
+typedef struct {
     /** Array containing CBOR encoded data */
     unsigned char *data;
     /** Size of the array */
