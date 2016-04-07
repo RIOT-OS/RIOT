@@ -33,7 +33,7 @@ extern "C" {
 /**
  * @brief   Possible L_STATUS values of a link tuple
  */
-typedef enum iib_link_tuple_status_t {
+typedef enum {
     IIB_LT_STATUS_PENDING,
     IIB_LT_STATUS_LOST,
     IIB_LT_STATUS_HEARD,
@@ -44,7 +44,7 @@ typedef enum iib_link_tuple_status_t {
 /**
  * @brief   Link Set entry (link tuple)
  */
-typedef struct iib_link_set_entry_t {
+typedef struct iib_link_set_entry {
     nhdp_addr_entry_t *address_list_head;       /**< Pointer to head of this tuple's addresses */
     timex_t heard_time;                         /**< Time at which entry leaves heard status */
     timex_t sym_time;                           /**< Time at which entry leaves symmetry status */
@@ -52,7 +52,7 @@ typedef struct iib_link_set_entry_t {
     uint8_t lost;                               /**< Flag whether link is lost */
     timex_t exp_time;                           /**< Time at which entry expires */
     nib_entry_t *nb_elt;                        /**< Pointer to corresponding nb tuple */
-    enum iib_link_tuple_status_t last_status;   /**< Last processed status of link tuple */
+    iib_link_tuple_status_t last_status;        /**< Last processed status of link tuple */
     uint32_t metric_in;                         /**< Metric value for incoming link */
     uint32_t metric_out;                        /**< Metric value for outgoing link */
 #if (NHDP_METRIC == NHDP_LMT_DAT)
@@ -64,29 +64,29 @@ typedef struct iib_link_set_entry_t {
     uint32_t rx_bitrate;                        /**< Incoming Bitrate for this link in Bit/s */
     uint16_t last_seq_no;                       /**< The last received packet sequence number */
 #endif
-    struct iib_link_set_entry_t *next;          /**< Pointer to next list entry */
+    struct iib_link_set_entry *next;            /**< Pointer to next list entry */
 } iib_link_set_entry_t;
 
 /**
  * @brief   2-Hop Set entry (2-Hop tuple)
  */
-typedef struct iib_two_hop_set_entry_t {
-    struct iib_link_set_entry_t *ls_elt;        /**< Pointer to corresponding link tuple */
+typedef struct iib_two_hop_set_entry {
+    iib_link_set_entry_t *ls_elt;               /**< Pointer to corresponding link tuple */
     nhdp_addr_t *th_nb_addr;                    /**< Address of symmetric 2-hop neighbor */
     timex_t exp_time;                           /**< Time at which entry expires */
     uint32_t metric_in;                         /**< Metric value for incoming link */
     uint32_t metric_out;                        /**< Metric value for outgoing link */
-    struct iib_two_hop_set_entry_t *next;       /**< Pointer to next list entry */
+    struct iib_two_hop_set_entry *next;         /**< Pointer to next list entry */
 } iib_two_hop_set_entry_t;
 
 /**
  * @brief   Link set for a registered interface
  */
-typedef struct iib_base_entry_t {
+typedef struct iib_base_entry {
     kernel_pid_t if_pid;                                /**< PID of the interface */
-    struct iib_link_set_entry_t *link_set_head;         /**< Pointer to this if's link tuples */
-    struct iib_two_hop_set_entry_t *two_hop_set_head;   /**< Pointer to this if's 2-hop tuples */
-    struct iib_base_entry_t *next;                      /**< Pointer to next list entry */
+    iib_link_set_entry_t *link_set_head;                /**< Pointer to this if's link tuples */
+    iib_two_hop_set_entry_t *two_hop_set_head;          /**< Pointer to this if's 2-hop tuples */
+    struct iib_base_entry *next;                        /**< Pointer to next list entry */
 } iib_base_entry_t;
 
 /**

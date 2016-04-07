@@ -88,7 +88,7 @@ extern "C" {
 /**
  * @brief   MANET interface representation
  */
-typedef struct nhdp_if_entry_t {
+typedef struct {
     kernel_pid_t if_pid;                        /**< PID of the interface's handling thread */
     xtimer_t if_timer;                          /**< xtimer used for the periodic signaling */
     timex_t hello_interval;                     /**< Interval time for periodic HELLOs */

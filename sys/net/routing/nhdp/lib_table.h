@@ -32,10 +32,10 @@ extern "C" {
 /**
  * @brief   Local Interface Set entry (local interface tuple)
  */
-typedef struct lib_entry_t {
+typedef struct lib_entry {
     kernel_pid_t if_pid;                    /**< PID of the interface's handling thread */
     nhdp_addr_entry_t *if_addr_list_head;   /**< Pointer to head of this interface's addr list */
-    struct lib_entry_t *next;               /**< Pointer to next list entry */
+    struct lib_entry *next;                 /**< Pointer to next list entry */
 } lib_entry_t;
 
 /**
