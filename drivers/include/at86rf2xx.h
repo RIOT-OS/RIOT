@@ -163,6 +163,9 @@ typedef struct {
     uint8_t page;                       /**< currently used channel page */
 #endif
     uint8_t idle_state;                 /**< state to return to after sending */
+    uint8_t pending_tx;                 /**< keep track of pending TX calls
+                                             this is required to know when to
+                                             return to @ref at86rf2xx_t::idle_state */
     /** @} */
 } at86rf2xx_t;
 
