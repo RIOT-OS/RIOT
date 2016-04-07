@@ -340,9 +340,10 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
             /* Set source and destination width to 1 byte */
             DMA_DEV->TCD[channel].ATTR = DMA_ATTR_DSIZE(DMA_ACCESS_SIZE_8BIT) | DMA_ATTR_SSIZE(DMA_ACCESS_SIZE_8BIT);
             /* Set minor loop count */
-            DMA_DEV->TCD[channel].NBYTES_MLNO = DMA_NBYTES_MLNO_NBYTES(1);
+            DMA_DEV->TCD[channel].NBYTES_MLOFFNO = DMA_NBYTES_MLOFFNO_NBYTES(1);
             /* Set major loop count */
-            /* Note: This breaks if len > 32767 */
+            /* The DMA engine can only handle up to 2**15 major loop iterations */
+            assert(len <= (DMA_CITER_ELINKNO_CITER_MASK >> DMA_CITER_ELINKNO_CITER_SHIFT));
             DMA_DEV->TCD[channel].CITER_ELINKNO = DMA_CITER_ELINKNO_CITER(len);
             DMA_DEV->TCD[channel].BITER_ELINKNO = DMA_BITER_ELINKNO_BITER(len);
             /* Set control register */
