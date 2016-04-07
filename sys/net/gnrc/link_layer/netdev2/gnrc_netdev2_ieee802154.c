@@ -118,10 +118,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
             uint8_t *tmp_src;
             tmp_src = gnrc_netif_hdr_get_src_addr(hdr);
 
-            uint8_t my_long_addr[IEEE802154_LONG_ADDRESS_LEN];
-            netdev2_ieee802154_get(state, NETOPT_ADDRESS_LONG, my_long_addr, sizeof(my_long_addr));
-
-            if (memcmp(my_long_addr, tmp_src, IEEE802154_LONG_ADDRESS_LEN) == 0) {
+            if (memcmp(state->long_addr, tmp_src, IEEE802154_LONG_ADDRESS_LEN) == 0) {
                 DEBUG("_recv_ieee802154: received packet from myself\n");
                 gnrc_pktbuf_release(pkt);
                 return NULL;
