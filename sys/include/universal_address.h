@@ -56,7 +56,7 @@ extern "C" {
 /**
  * @brief The container descriptor used to identify a universal address entry
  */
-typedef struct universal_address_container_t {
+typedef struct {
     uint8_t use_count;                       /**< The number of entries link here */
     uint8_t address_size;                    /**< Size in bytes of the used generic address */
     uint8_t address[UNIVERSAL_ADDRESS_SIZE]; /**< The generic address data */
