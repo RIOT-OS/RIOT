@@ -25,16 +25,8 @@
 #include "board.h"
 #include "xtimer.h"
 
-#ifndef UTEST
 #define MORSE_LED_ON   LED_RED_ON
 #define MORSE_LED_OFF  LED_RED_OFF
-#else
-
-void mock_gpio_clear(gpio_t dev);
-
-#define MORSE_LED_ON   LED_RED_ON
-#define MORSE_LED_OFF  mock_gpio_clear(LED_RED)
-#endif
 
 //Define the LED Pin
 #define PIN_OUT        9
