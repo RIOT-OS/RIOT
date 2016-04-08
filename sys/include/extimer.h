@@ -89,10 +89,11 @@ uint64_t extimer_get_absolute(uint64_t offset);
  *
  * Event fires immediately if its time is in the past.
  *
+ * @pre timer != NULL
  * @pre extimer_event_t::next of event needs to be NULL.
  * @pre pid != KERNEL_PID_UNDEF
  *
- * @param[in] timer A timer.
+ * @param[in] timer A timer. Must not be NULL.
  * @param[in] event An event. extimer_event_t::next must be NULL.
  * @param[in] pid   PID of the event handler thread.
  */
@@ -101,8 +102,11 @@ void extimer_add(extimer_t *timer, extimer_event_t *event, kernel_pid_t pid);
 /**
  * @brief   Removes an existing event from a timer
  *
- * @param[in] timer A timer.
- * @param[in] event An event.
+ * @pre timer != NULL
+ * @pre event != NULL
+ *
+ * @param[in] timer A timer. Must not be NULL.
+ * @param[in] event An event. Must not be NULL.
  *
  * @return  The removed event.
  * @return  NULL, if event list of @p timer was empty.
