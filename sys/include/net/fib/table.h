@@ -93,12 +93,12 @@ typedef struct {
 } fib_sr_meta_t;
 
 /**
-* @breif FIB table type for single hop entries
+* @brief FIB table type for single hop entries
 */
 #define FIB_TABLE_TYPE_SH (1)
 
 /**
-* @breif FIB table type for source routes
+* @brief FIB table type for source routes
 */
 #define FIB_TABLE_TYPE_SR (FIB_TABLE_TYPE_SH + 1)
 
