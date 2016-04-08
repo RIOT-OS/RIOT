@@ -44,6 +44,7 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     memcpy(&dev->params, params, sizeof(at86rf2xx_params_t));
     dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
     dev->state = AT86RF2XX_STATE_SLEEP;
+    dev->pending_tx = 0;
     /* initialise SPI */
     spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING, params->spi_speed);
 }
@@ -185,6 +186,7 @@ void at86rf2xx_tx_prepare(at86rf2xx_t *dev)
 {
     uint8_t state;
 
+    dev->pending_tx++;
     /* make sure ongoing transmissions are finished */
     do {
         state = at86rf2xx_get_status(dev);
