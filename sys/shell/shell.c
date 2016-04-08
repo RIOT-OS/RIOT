@@ -234,8 +234,10 @@ static int readline(char *buf, size_t size)
         /* DOS newlines are handled like hitting enter twice, but empty lines are ignored. */
         if (c == '\r' || c == '\n') {
             *line_buf_ptr = '\0';
+#ifndef SHELL_NO_ECHO
             _putchar('\r');
             _putchar('\n');
+#endif
 
             /* return 1 if line is empty, 0 otherwise */
             return line_buf_ptr == buf;
@@ -249,21 +251,27 @@ static int readline(char *buf, size_t size)
 
             *--line_buf_ptr = '\0';
             /* white-tape the character */
+#ifndef SHELL_NO_ECHO
             _putchar('\b');
             _putchar(' ');
             _putchar('\b');
+#endif
         }
         else {
             *line_buf_ptr++ = c;
+#ifndef SHELL_NO_ECHO
             _putchar(c);
+#endif
         }
     }
 }
 
 static inline void print_prompt(void)
 {
+#ifndef SHELL_NO_PROMPT
     _putchar('>');
     _putchar(' ');
+#endif
 
 #ifdef MODULE_NEWLIB
     fflush(stdout);
