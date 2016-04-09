@@ -112,14 +112,14 @@ void aodv_init(kernel_pid_t interface)
     aodv_packet_writer_init(_write_packet);
 
     /* start listening & enable sending */
-    thread_create(aodv_rcv_stack_buf, sizeof(aodv_rcv_stack_buf), THREAD_PRIORITY_MAIN,
+    thread_create(aodv_rcv_stack_buf, sizeof(aodv_rcv_stack_buf), THREAD_PRIORITY_MAIN - 1,
                   THREAD_CREATE_STACKTEST, _aodv_receiver_thread, NULL, "_aodv_receiver_thread");
     AODV_DEBUG("listening on port %d\n", MANET_PORT);
     sender_thread = thread_create(aodv_snd_stack_buf, sizeof(aodv_snd_stack_buf),
-                                  THREAD_PRIORITY_MAIN, THREAD_CREATE_STACKTEST, _aodv_sender_thread,
+                                  THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST, _aodv_sender_thread,
                                   NULL, "_aodv_sender_thread");
     thread_create(aodv_fib_stack_buf, sizeof(aodv_fib_stack_buf),
-                                  THREAD_PRIORITY_MAIN, THREAD_CREATE_STACKTEST, fib_signal_handler_thread,
+                                  THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST, fib_signal_handler_thread,
                                   NULL, "fib_signal_handler_thread");
 }
 
