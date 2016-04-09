@@ -22,7 +22,6 @@
 #ifndef THREAD_H
 #define THREAD_H
 
-#include "priority_queue.h"
 #include "clist.h"
 #include "cib.h"
 #include "msg.h"
@@ -89,7 +88,7 @@ struct _thread {
     void *wait_data;                /**< used by msg and thread flags   */
 #endif
 #if defined(MODULE_CORE_MSG)
-    priority_queue_t msg_waiters;   /**< threads waiting on message     */
+    list_node_t msg_waiters;        /**< threads waiting on message     */
     cib_t msg_queue;                /**< message queue                  */
     msg_t *msg_array;               /**< memory holding messages        */
 #endif
