@@ -30,9 +30,7 @@
 #include "sched.h"
 #include "clist.h"
 
-#ifdef MODULE_CORE_THREAD_FLAGS
 #include "thread_flags.h"
-#endif
 
 #ifdef __cplusplus
  extern "C" {
@@ -78,9 +76,7 @@ struct _thread {
 
     kernel_pid_t pid;               /**< thread's process id            */
 
-#ifdef MODULE_CORE_THREAD_FLAGS
     thread_flags_t flags;           /**< currently set flags            */
-#endif
 
     clist_node_t rq_entry;          /**< run queue entry                */
 
