@@ -158,7 +158,8 @@ static struct rfc5444_reader_tlvblock_consumer_entry _rerr_address_consumer_entr
 };
 
 /**
- * This block callback is called for every address
+ * Check if the header is valid. This block callback is called for every
+ * message tlv block of a RREQ Message.
  *
  * @param cont
  * @return
@@ -181,7 +182,8 @@ static enum rfc5444_result _cb_rreq_blocktlv_messagetlvs_okay(struct rfc5444_rea
 }
 
 /**
- * This block callback is called for every address of a RREQ Message.
+ * Check if all address TLVs are valid. This block callback is called for every
+ * address of a RREQ Message.
  *
  * @param cont
  * @return
@@ -467,7 +469,7 @@ static enum rfc5444_result _cb_rrep_blocktlv_addresstlvs_okay(struct rfc5444_rea
 }
 
 /**
- * This callback is called every time the _rreq_consumer finishes reading a
+ * This callback is called every time the _rrep_consumer finishes reading a
  * packet.
  * @param cont
  * @param dropped indicates wehther the packet has been dropped previously by
