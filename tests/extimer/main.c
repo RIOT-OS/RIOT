@@ -21,8 +21,9 @@
 #include "sched.h"
 #include "xtimer.h"
 
-#define EVENT_TEST  (0x5555)
-#define EVENT_NUM   (8)
+#define TIME_MULTIPLIER (1000)
+#define EVENT_TEST      (0x5555)
+#define EVENT_NUM       (8)
 
 msg_t msg_queue[EVENT_NUM];
 extimer_event_t events[EVENT_NUM];
@@ -43,7 +44,7 @@ static void test_extimer_add(void)
 
     for (i = 0; i < EVENT_NUM; i++) {
         events[i].msg.type = EVENT_TEST;
-        events[i].time = extimer_get_absolute(1000 * i);
+        events[i].time = extimer_get_absolute(TIME_MULTIPLIER * i);
         if (i == 0) {
             start = xtimer_now();
         }
@@ -54,7 +55,8 @@ static void test_extimer_add(void)
         }
     }
     i = 0;
-    while (xtimer_msg_receive_timeout(&msg, (EVENT_NUM + 1) * 1000) >= 0) {
+    while (xtimer_msg_receive_timeout(&msg,
+                                      (EVENT_NUM + 1) * TIME_MULTIPLIER) >= 0) {
         if ((msg.type == EVENT_TEST)) {
             printf("event %i received after %u us\n", i++,
                    (unsigned)(xtimer_now() - start));
@@ -71,14 +73,15 @@ static void test_extimer_del(void)
 
     for (i = 0; i < EVENT_NUM; i++) {
         events[i].msg.type = EVENT_TEST;
-        events[i].time = extimer_get_absolute(1000 * i);
+        events[i].time = extimer_get_absolute(TIME_MULTIPLIER * i);
         if (i == 0) {
             start = xtimer_now();
         }
         extimer_add(&timer, &events[i], sched_active_pid);
     }
     i = 0;
-    while (xtimer_msg_receive_timeout(&msg, (EVENT_NUM + 1) * 1000) >= 0) {
+    while (xtimer_msg_receive_timeout(&msg,
+                                      (EVENT_NUM + 1) * TIME_MULTIPLIER) >= 0) {
         if (msg.type == EVENT_TEST) {
             printf("event %i received after %u us\n", i++,
                    (unsigned)(xtimer_now() - start));
@@ -98,14 +101,15 @@ static void test_extimer_add_reverse(void)
 
     for (i = (EVENT_NUM - 1); i >= 0; i--) {
         events[i].msg.type = EVENT_TEST;
-        events[i].time = extimer_get_absolute(1000 * i);
+        events[i].time = extimer_get_absolute(TIME_MULTIPLIER * i);
         if (i == 0) {
             start = xtimer_now();
         }
         extimer_add(&timer, &events[i], sched_active_pid);
     }
     i = 0;
-    while (xtimer_msg_receive_timeout(&msg, (EVENT_NUM + 1) * 1000) >= 0) {
+    while (xtimer_msg_receive_timeout(&msg,
+                                      (EVENT_NUM + 1) * TIME_MULTIPLIER) >= 0) {
         if ((msg.type == EVENT_TEST)) {
             printf("event %i received after %u us\n", i++,
                    (unsigned)(xtimer_now() - start));

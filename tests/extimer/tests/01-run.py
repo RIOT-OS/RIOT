@@ -13,12 +13,14 @@ sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
 EVENT_NUM = 8
+TIME_MULTIPLIER = 1000
 
 def check_time(child, i):
     child.expect(r"event %d received after (\d+) us" % i)
     time = int(child.match.groups(1)[0])
 
-    assert((time > (1000 * i) - 250) and (time < (1000 * i) + 200))
+    assert((time > (TIME_MULTIPLIER * i) - 250) and \
+           (time < (TIME_MULTIPLIER * i) + 200))
 
 def testfunc(child):
     child.expect_exact("Test extimer_add()")
