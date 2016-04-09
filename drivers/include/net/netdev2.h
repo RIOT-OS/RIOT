@@ -133,7 +133,7 @@ typedef struct netdev2_driver {
     /**
      * @brief Get a received frame
      *
-     * Supposed to be called from netdev2_event_handler().
+     * Supposed to be called from @ref netdev2_t::event_callback().
      *
      * If buf == NULL and len == 0, returns the packet size without dropping it.
      * If buf == NULL and len > 0, drops the packet and returns the packet size.
@@ -164,7 +164,7 @@ typedef struct netdev2_driver {
      * This function will be called from a network stack's loop when being notified
      * by netdev2_isr.
      *
-     * It is supposed to call netdev2_event_handler for each occuring event.
+     * It is supposed to call @ref netdev2_t::event_callback() for each occuring event.
      *
      * See receive packet flow description for details.
      *
