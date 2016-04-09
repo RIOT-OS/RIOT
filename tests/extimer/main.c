@@ -37,7 +37,8 @@ static void reset(void)
 static void test_extimer_add(void)
 {
     msg_t msg;
-    uint32_t start;
+    uint32_t start = 0; /* will be overwritten but is here to silence pedantic
+                         * compilers */
     int i;
 
     for (i = 0; i < EVENT_NUM; i++) {
@@ -64,7 +65,8 @@ static void test_extimer_add(void)
 static void test_extimer_del(void)
 {
     msg_t msg;
-    uint32_t start;
+    uint32_t start = 0; /* will be overwritten but is here to silence pedantic
+                         * compilers */
     int i;
 
     for (i = 0; i < EVENT_NUM; i++) {
@@ -90,7 +92,8 @@ static void test_extimer_del(void)
 static void test_extimer_add_reverse(void)
 {
     msg_t msg;
-    uint32_t start;
+    uint32_t start = 0; /* will be overwritten but is here to silence pedantic
+                         * compilers */
     int i;
 
     for (i = (EVENT_NUM - 1); i >= 0; i--) {

@@ -18,7 +18,7 @@ def check_time(child, i):
     child.expect(r"event %d received after (\d+) us" % i)
     time = int(child.match.groups(1)[0])
 
-    assert((time > (1000 * i) - 150) and (time < (1000 * i) + 150))
+    assert((time > (1000 * i) - 250) and (time < (1000 * i) + 200))
 
 def testfunc(child):
     child.expect_exact("Test extimer_add()")
