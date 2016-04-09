@@ -153,12 +153,9 @@ void *fib_signal_handler_thread(void *arg)
         exit(1);
     }
 
-    printf("\nmy pid is: %d\n", sched_active_pid);
-
     while (true) {
         msg_t fib_msg;
         msg_receive(&fib_msg);
-        printf("received msg: %p\n", fib_msg.content.ptr);
 
         if (fib_msg.type == FIB_MSG_RP_SIGNAL_UNREACHABLE_DESTINATION) {
             rp_address_msg_t* rp_msg = (rp_address_msg_t*)fib_msg.content.ptr;
