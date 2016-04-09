@@ -168,7 +168,7 @@ typedef enum {
      * If the interface is wireless this function will return -ENOTSUP, a
      * positive value otherwise.
      *
-     * @note Setting this option will always return -EONOTSUP.
+     * @note Setting this option will always return -ENOTSUP.
      */
     NETOPT_IS_WIRED,
 
