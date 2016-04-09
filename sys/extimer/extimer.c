@@ -28,19 +28,20 @@ static void _callback(void *arg);
 
 uint64_t extimer_get_absolute(uint64_t offset)
 {
-    uint64_t now = xtimer_now64();
+    const uint64_t now = xtimer_now64();
+    const uint64_t res = now + offset;
 
     DEBUG("%s(offset=%" PRIu64 ")\n", DEBUG_FUNC, offset);
 
     DEBUG("%s():%d: entering\n", DEBUG_FUNC, __LINE__);
-    if ((now + offset) < now) { /* handle integer overflow */
+    if (res < now) { /* handle integer overflow */
         DEBUG("%s():%d: integer overflow, returning UINT64_MAX\n", DEBUG_FUNC,
               __LINE__);
         return UINT64_MAX;
     }
     DEBUG("%s():%d: returning %" PRIu64 "\n", DEBUG_FUNC, __LINE__,
-          now + offset);
-    return now + offset;
+          res);
+    return res;
 }
 
 void extimer_add(extimer_t *timer, extimer_event_t *event, kernel_pid_t pid)
