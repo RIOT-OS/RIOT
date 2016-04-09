@@ -36,7 +36,7 @@ static uint32_t si70xx_measure(si70xx_t *dev, uint8_t command)
     i2c_release(dev->i2c_dev);
 
     /* reconstruct raw result */
-    return (result[0] << 8) + (result[1] & 0xfc);
+    return ((uint32_t)result[0] << 8) + (result[1] & 0xfc);
 }
 
 int si70xx_test(si70xx_t *dev)
