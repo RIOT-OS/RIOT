@@ -20,7 +20,7 @@
 
 void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr)
 {
-    char addr_str[GNRC_NETIF_HDR_L2ADDR_MAX_LEN * 3];
+    char addr_str[GNRC_NETIF_HDR_L2ADDR_PRINT_LEN];
 
     printf("if_pid: %" PRIkernel_pid "  ", hdr->if_pid);
     printf("rssi: %" PRIu8 "  ", hdr->rssi);

@@ -89,7 +89,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
             gnrc_pktsnip_t *ieee802154_hdr, *netif_hdr;
             gnrc_netif_hdr_t *hdr;
 #if ENABLE_DEBUG
-            char src_str[GNRC_NETIF_HDR_L2ADDR_MAX_LEN];
+            char src_str[GNRC_NETIF_HDR_L2ADDR_PRINT_LEN];
 #endif
             size_t mhr_len = ieee802154_get_frame_hdr_len(pkt->data);
 
