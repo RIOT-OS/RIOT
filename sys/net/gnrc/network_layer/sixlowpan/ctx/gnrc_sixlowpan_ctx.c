@@ -61,7 +61,8 @@ gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_lookup_addr(const ipv6_addr_t *addr)
 
 #if ENABLE_DEBUG
     if (res != NULL) {
-        DEBUG("6lo ctx: found context (%u, %s/%" PRIu8 ") ", res->id,
+        DEBUG("6lo ctx: found context (%u, %s/%" PRIu8 ") ",
+              (res->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK),
               ipv6_addr_to_str(ipv6str, &res->prefix, sizeof(ipv6str)),
               res->prefix_len);
         DEBUG("for address %s\n", ipv6_addr_to_str(ipv6str, addr, sizeof(ipv6str)));
