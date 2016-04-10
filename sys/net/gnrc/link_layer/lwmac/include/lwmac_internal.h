@@ -227,10 +227,10 @@ static inline bool gnrc_lwmac_get_quit_rx(gnrc_netif_t *netif)
 static inline void gnrc_lwmac_set_dutycycle_active(gnrc_netif_t *netif, bool active)
 {
     if (active) {
-        netif->mac.lwmac.lwmac_info |= GNRC_LWMAC_DUTYCYCLE_ACTIVE;
+        netif->mac.prot.lwmac.lwmac_info |= GNRC_LWMAC_DUTYCYCLE_ACTIVE;
     }
     else {
-        netif->mac.lwmac.lwmac_info &= ~GNRC_LWMAC_DUTYCYCLE_ACTIVE;
+        netif->mac.prot.lwmac.lwmac_info &= ~GNRC_LWMAC_DUTYCYCLE_ACTIVE;
     }
 }
 
@@ -244,7 +244,7 @@ static inline void gnrc_lwmac_set_dutycycle_active(gnrc_netif_t *netif, bool act
  */
 static inline bool gnrc_lwmac_get_dutycycle_active(gnrc_netif_t *netif)
 {
-    return (netif->mac.lwmac.lwmac_info & GNRC_LWMAC_DUTYCYCLE_ACTIVE);
+    return (netif->mac.prot.lwmac.lwmac_info & GNRC_LWMAC_DUTYCYCLE_ACTIVE);
 }
 
 /**
@@ -257,10 +257,10 @@ static inline bool gnrc_lwmac_get_dutycycle_active(gnrc_netif_t *netif)
 static inline void gnrc_lwmac_set_reschedule(gnrc_netif_t *netif, bool reschedule)
 {
     if (reschedule) {
-        netif->mac.lwmac.lwmac_info |= GNRC_LWMAC_NEEDS_RESCHEDULE;
+        netif->mac.prot.lwmac.lwmac_info |= GNRC_LWMAC_NEEDS_RESCHEDULE;
     }
     else {
-        netif->mac.lwmac.lwmac_info &= ~GNRC_LWMAC_NEEDS_RESCHEDULE;
+        netif->mac.prot.lwmac.lwmac_info &= ~GNRC_LWMAC_NEEDS_RESCHEDULE;
     }
 }
 
@@ -274,7 +274,7 @@ static inline void gnrc_lwmac_set_reschedule(gnrc_netif_t *netif, bool reschedul
  */
 static inline bool gnrc_lwmac_get_reschedule(gnrc_netif_t *netif)
 {
-    return (netif->mac.lwmac.lwmac_info & GNRC_LWMAC_NEEDS_RESCHEDULE);
+    return (netif->mac.prot.lwmac.lwmac_info & GNRC_LWMAC_NEEDS_RESCHEDULE);
 }
 
 /**

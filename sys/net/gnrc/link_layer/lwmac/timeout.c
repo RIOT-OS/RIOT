@@ -62,19 +62,19 @@ inline bool gnrc_lwmac_timeout_is_running(gnrc_netif_t *netif,
                                           gnrc_lwmac_timeout_type_t type)
 {
     assert(netif);
-    return (_lwmac_find_timeout(&netif->mac.lwmac, type) >= 0);
+    return (_lwmac_find_timeout(&netif->mac.prot.lwmac, type) >= 0);
 }
 
 bool gnrc_lwmac_timeout_is_expired(gnrc_netif_t *netif, gnrc_lwmac_timeout_type_t type)
 {
     assert(netif);
 
-    int index = _lwmac_find_timeout(&netif->mac.lwmac, type);
+    int index = _lwmac_find_timeout(&netif->mac.prot.lwmac, type);
     if (index >= 0) {
-        if (netif->mac.lwmac.timeouts[index].expired) {
-            _lwmac_clear_timeout(&netif->mac.lwmac.timeouts[index]);
+        if (netif->mac.prot.lwmac.timeouts[index].expired) {
+            _lwmac_clear_timeout(&netif->mac.prot.lwmac.timeouts[index]);
         }
-        return netif->mac.lwmac.timeouts[index].expired;
+        return netif->mac.prot.lwmac.timeouts[index].expired;
     }
     return false;
 }
@@ -89,9 +89,9 @@ gnrc_lwmac_timeout_t *_lwmac_acquire_timeout(gnrc_netif_t *netif,
     }
 
     for (unsigned i = 0; i < GNRC_LWMAC_TIMEOUT_COUNT; i++) {
-        if (netif->mac.lwmac.timeouts[i].type == GNRC_LWMAC_TIMEOUT_DISABLED) {
-            netif->mac.lwmac.timeouts[i].type = type;
-            return &netif->mac.lwmac.timeouts[i];
+        if (netif->mac.prot.lwmac.timeouts[i].type == GNRC_LWMAC_TIMEOUT_DISABLED) {
+            netif->mac.prot.lwmac.timeouts[i].type = type;
+            return &netif->mac.prot.lwmac.timeouts[i];
         }
     }
     return NULL;
@@ -108,9 +108,9 @@ void gnrc_lwmac_clear_timeout(gnrc_netif_t *netif, gnrc_lwmac_timeout_type_t typ
 {
     assert(netif);
 
-    int index = _lwmac_find_timeout(&netif->mac.lwmac, type);
+    int index = _lwmac_find_timeout(&netif->mac.prot.lwmac, type);
     if (index >= 0) {
-        _lwmac_clear_timeout(&netif->mac.lwmac.timeouts[index]);
+        _lwmac_clear_timeout(&netif->mac.prot.lwmac.timeouts[index]);
     }
 }
 
@@ -141,8 +141,8 @@ void gnrc_lwmac_reset_timeouts(gnrc_netif_t *netif)
     assert(netif);
 
     for (unsigned i = 0; i < GNRC_LWMAC_TIMEOUT_COUNT; i++) {
-        if (netif->mac.lwmac.timeouts[i].type != GNRC_LWMAC_TIMEOUT_DISABLED) {
-            _lwmac_clear_timeout(&netif->mac.lwmac.timeouts[i]);
+        if (netif->mac.prot.lwmac.timeouts[i].type != GNRC_LWMAC_TIMEOUT_DISABLED) {
+            _lwmac_clear_timeout(&netif->mac.prot.lwmac.timeouts[i]);
         }
     }
 }

@@ -45,6 +45,27 @@ extern "C" {
  */
 #define GNRC_NETIF_MAC_INFO_CSMA_ENABLED       (0x0100U)
 
+#if defined(MODULE_GNRC_LWMAC) || defined(MODULE_GNRC_GOMACH)
+/**
+ * @brief Data type to hold MAC protocols
+ */
+typedef union {
+#ifdef MODULE_GNRC_LWMAC
+    /**
+     * @brief LWMAC specific structure object for storing LWMAC internal states.
+     */
+    gnrc_lwmac_t lwmac;
+#endif
+
+#ifdef MODULE_GNRC_GOMACH
+    /**
+     * @brief GoMacH specific structure object for storing GoMacH internal states.
+     */
+    gnrc_gomach_t gomach;
+#endif
+} gnrc_mac_prot_t;
+#endif
+
 /**
  * @brief   @ref net_gnrc_mac component of @ref gnrc_netif_mac_t
  */
@@ -80,11 +101,8 @@ typedef struct {
     gnrc_mac_tx_t tx;
 #endif  /* ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (GNRC_MAC_NEIGHBOR_COUNT == 0)) || DOXYGEN */
 
-#ifdef MODULE_GNRC_LWMAC
-    /**
-     * @brief LWMAC specific structure object for storing LWMAC internal states.
-     */
-    gnrc_lwmac_t lwmac;
+#if defined(MODULE_GNRC_LWMAC) || defined(MODULE_GNRC_GOMACH)
+    gnrc_mac_prot_t prot;
 #endif
 } gnrc_netif_mac_t;
 

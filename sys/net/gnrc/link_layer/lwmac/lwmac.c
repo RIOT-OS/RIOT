@@ -245,7 +245,7 @@ inline void lwmac_schedule_update(gnrc_netif_t *netif)
 
 void lwmac_set_state(gnrc_netif_t *netif, gnrc_lwmac_state_t newstate)
 {
-    gnrc_lwmac_state_t oldstate = netif->mac.lwmac.state;
+    gnrc_lwmac_state_t oldstate = netif->mac.prot.lwmac.state;
 
     if (newstate == oldstate) {
         return;
@@ -257,7 +257,7 @@ void lwmac_set_state(gnrc_netif_t *netif, gnrc_lwmac_state_t newstate)
     }
 
     /* Already change state, but might be reverted to oldstate when needed */
-    netif->mac.lwmac.state = newstate;
+    netif->mac.prot.lwmac.state = newstate;
 
     /* Actions when leaving old state */
     switch (oldstate) {
@@ -269,8 +269,8 @@ void lwmac_set_state(gnrc_netif_t *netif, gnrc_lwmac_state_t newstate)
             /* Output duty-cycle ratio */
             uint64_t duty;
             duty = (uint64_t) rtt_get_counter();
-            duty = ((uint64_t) netif->mac.lwmac.awake_duration_sum_ticks) * 100 /
-                   (duty - (uint64_t)netif->mac.lwmac.system_start_time_ticks);
+            duty = ((uint64_t) netif->mac.prot.lwmac.awake_duration_sum_ticks) * 100 /
+                   (duty - (uint64_t)netif->mac.prot.lwmac.system_start_time_ticks);
             printf("[LWMAC]: achieved duty-cycle: %lu %% \n", (uint32_t)duty);
 #endif
             break;
@@ -305,8 +305,8 @@ void lwmac_set_state(gnrc_netif_t *netif, gnrc_lwmac_state_t newstate)
                                             RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US -
                                                             (3 * GNRC_LWMAC_WAKEUP_DURATION_US / 2)));
                 LOG_WARNING("WARNING: [LWMAC] phase backoffed: %lu us\n", RTT_TICKS_TO_US(alarm));
-                netif->mac.lwmac.last_wakeup = netif->mac.lwmac.last_wakeup + alarm;
-                alarm = _next_inphase_event(netif->mac.lwmac.last_wakeup,
+                netif->mac.prot.lwmac.last_wakeup = netif->mac.prot.lwmac.last_wakeup + alarm;
+                alarm = _next_inphase_event(netif->mac.prot.lwmac.last_wakeup,
                                             RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US));
                 rtt_set_alarm(alarm, rtt_cb, (void *) GNRC_LWMAC_EVENT_RTT_WAKEUP_PENDING);
             }
@@ -441,12 +441,12 @@ static void _rx_management_failed(gnrc_netif_t *netif)
     /* Here we check if we are close to the end of the cycle. If yes,
      * go to sleep. Firstly, get the relative phase. */
     uint32_t phase = rtt_get_counter();
-    if (phase < netif->mac.lwmac.last_wakeup) {
-        phase = (RTT_US_TO_TICKS(GNRC_LWMAC_PHASE_MAX) - netif->mac.lwmac.last_wakeup) +
+    if (phase < netif->mac.prot.lwmac.last_wakeup) {
+        phase = (RTT_US_TO_TICKS(GNRC_LWMAC_PHASE_MAX) - netif->mac.prot.lwmac.last_wakeup) +
                 phase;
     }
     else {
-        phase = phase - netif->mac.lwmac.last_wakeup;
+        phase = phase - netif->mac.prot.lwmac.last_wakeup;
     }
     /* If the relative phase is beyond 4/5 cycle time, go to sleep. */
     if (phase > (4 * RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US) / 5)) {
@@ -472,12 +472,12 @@ static void _rx_management_success(gnrc_netif_t *netif)
     /* Here we check if we are close to the end of the cycle. If yes,
      * go to sleep. Firstly, get the relative phase. */
     uint32_t phase = rtt_get_counter();
-    if (phase < netif->mac.lwmac.last_wakeup) {
-        phase = (RTT_US_TO_TICKS(GNRC_LWMAC_PHASE_MAX) - netif->mac.lwmac.last_wakeup) +
+    if (phase < netif->mac.prot.lwmac.last_wakeup) {
+        phase = (RTT_US_TO_TICKS(GNRC_LWMAC_PHASE_MAX) - netif->mac.prot.lwmac.last_wakeup) +
                 phase;
     }
     else {
-        phase = phase - netif->mac.lwmac.last_wakeup;
+        phase = phase - netif->mac.prot.lwmac.last_wakeup;
     }
     /* If the relative phase is beyond 4/5 cycle time, go to sleep. */
     if (phase > (4 * RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US) / 5)) {
@@ -619,7 +619,7 @@ static void _lwmac_update_listening(gnrc_netif_t *netif)
         /* Dispatch first as there still may be broadcast packets. */
         gnrc_mac_dispatch(&netif->mac.rx);
 
-        netif->mac.lwmac.state = GNRC_LWMAC_SLEEPING;
+        netif->mac.prot.lwmac.state = GNRC_LWMAC_SLEEPING;
         /* Enable duty cycling again */
         rtt_handler(GNRC_LWMAC_EVENT_RTT_RESUME, netif);
 
@@ -648,7 +648,7 @@ static bool lwmac_update(gnrc_netif_t *netif)
 {
     gnrc_lwmac_set_reschedule(netif, false);
 
-    switch (netif->mac.lwmac.state) {
+    switch (netif->mac.prot.lwmac.state) {
         case GNRC_LWMAC_SLEEPING: {
             /* Quit scheduling transmission if 'quit-tx' flag is found set, thus
              * to avoid potential collisions with ongoing transmissions of other
@@ -673,7 +673,7 @@ static bool lwmac_update(gnrc_netif_t *netif)
             break;
         }
         default:
-            LOG_DEBUG("[LWMAC] No actions in state %u\n", netif->mac.lwmac.state);
+            LOG_DEBUG("[LWMAC] No actions in state %u\n", netif->mac.prot.lwmac.state);
     }
 
     return gnrc_lwmac_get_reschedule(netif);
@@ -699,8 +699,8 @@ void rtt_handler(uint32_t event, gnrc_netif_t *netif)
     switch (event & 0xffff) {
         case GNRC_LWMAC_EVENT_RTT_WAKEUP_PENDING: {
             /* A new cycle starts, set sleep timing and initialize related MAC-info flags. */
-            netif->mac.lwmac.last_wakeup = rtt_get_alarm();
-            alarm = _next_inphase_event(netif->mac.lwmac.last_wakeup,
+            netif->mac.prot.lwmac.last_wakeup = rtt_get_alarm();
+            alarm = _next_inphase_event(netif->mac.prot.lwmac.last_wakeup,
                                         RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_DURATION_US));
             rtt_set_alarm(alarm, rtt_cb, (void *) GNRC_LWMAC_EVENT_RTT_SLEEP_PENDING);
             gnrc_lwmac_set_quit_tx(netif, false);
@@ -712,7 +712,7 @@ void rtt_handler(uint32_t event, gnrc_netif_t *netif)
         }
         case GNRC_LWMAC_EVENT_RTT_SLEEP_PENDING: {
             /* Set next wake-up timing. */
-            alarm = _next_inphase_event(netif->mac.lwmac.last_wakeup,
+            alarm = _next_inphase_event(netif->mac.prot.lwmac.last_wakeup,
                                         RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US));
             rtt_set_alarm(alarm, rtt_cb, (void *) GNRC_LWMAC_EVENT_RTT_WAKEUP_PENDING);
             lwmac_set_state(netif, GNRC_LWMAC_SLEEPING);
@@ -730,14 +730,14 @@ void rtt_handler(uint32_t event, gnrc_netif_t *netif)
         case GNRC_LWMAC_EVENT_RTT_PAUSE: {
             rtt_clear_alarm();
             LOG_DEBUG("[LWMAC] RTT: Stop duty cycling, now in state %u\n",
-                      netif->mac.lwmac.state);
+                      netif->mac.prot.lwmac.state);
             gnrc_lwmac_set_dutycycle_active(netif, false);
             break;
         }
         case GNRC_LWMAC_EVENT_RTT_RESUME: {
             LOG_DEBUG("[LWMAC] RTT: Resume duty cycling\n");
             rtt_clear_alarm();
-            alarm = _next_inphase_event(netif->mac.lwmac.last_wakeup,
+            alarm = _next_inphase_event(netif->mac.prot.lwmac.last_wakeup,
                                         RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US));
             rtt_set_alarm(alarm, rtt_cb, (void *) GNRC_LWMAC_EVENT_RTT_WAKEUP_PENDING);
             gnrc_lwmac_set_dutycycle_active(netif, true);
@@ -934,9 +934,9 @@ static void _lwmac_init(gnrc_netif_t *netif)
 
 #if (GNRC_LWMAC_ENABLE_DUTYCYLE_RECORD == 1)
     /* Start duty cycle recording */
-    netif->mac.lwmac.system_start_time_ticks = rtt_get_counter();
-    netif->mac.lwmac.last_radio_on_time_ticks = netif->mac.lwmac.system_start_time_ticks;
-    netif->mac.lwmac.awake_duration_sum_ticks = 0;
-    netif->mac.lwmac.lwmac_info |= GNRC_LWMAC_RADIO_IS_ON;
+    netif->mac.prot.lwmac.system_start_time_ticks = rtt_get_counter();
+    netif->mac.prot.lwmac.last_radio_on_time_ticks = netif->mac.prot.lwmac.system_start_time_ticks;
+    netif->mac.prot.lwmac.awake_duration_sum_ticks = 0;
+    netif->mac.prot.lwmac.lwmac_info |= GNRC_LWMAC_RADIO_IS_ON;
 #endif
 }

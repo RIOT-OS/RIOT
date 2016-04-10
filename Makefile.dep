@@ -24,6 +24,14 @@ ifneq (,$(filter gnrc_mac,$(USEMODULE)))
   USEMODULE += csma_sender
 endif
 
+ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
+  USEMODULE += gnrc_netif
+  USEMODULE += random
+  USEMODULE += xtimer
+  USEMODULE += gnrc_mac
+  FEATURES_REQUIRED += periph_rtt
+endif
+
 ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += xtimer
