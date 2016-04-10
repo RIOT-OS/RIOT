@@ -36,6 +36,7 @@ extern "C" {
  *          in bytes.
  */
 #define GNRC_NETIF_HDR_L2ADDR_MAX_LEN   (8)
+#define GNRC_NETIF_HDR_L2ADDR_PRINT_LEN (GNRC_NETIF_HDR_L2ADDR_MAX_LEN * 3)
 
 /**
  * @{
