@@ -204,6 +204,17 @@ struct _thread {
  * The lowest possible priority is *THREAD_PRIORITY_IDLE - 1*. The value is depending
  * on the platforms architecture, e.g. 30 in 32-bit systems, 14 in 16-bit systems.
  *
+ * @note Assigning the same priority to two or more threads is usually not a
+ *       good idea. A thread in RIOT may run until it yields (@ref
+ *       thread_yield) or another thread with higher priority is runnable (@ref
+ *       STATUS_ON_RUNQUEUE) again. Having multiple threads with the same
+ *       priority may make it difficult to determine when which of them gets
+ *       scheduled and how much CPU time they will get. In most applications,
+ *       the number of threads in application is significantly smaller than the
+ *       number of available priorities, so assigning distinct priorities per
+ *       thread should not be a problem. Only assign the same priority to
+ *       multiple threads if you know what you are doing!
+ *
  *
  * In addition to the priority, the *flags* argument can be used to alter the
  * newly created threads behavior after creation. The following flags are available:
