@@ -109,8 +109,8 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
     for (int i = 0; i < count; i++, ptr++) {
         /* current packet data + FCS too long */
         if ((len + ptr->iov_len + 2) > AT86RF2XX_MAX_PKT_LENGTH) {
-            printf("[at86rf2xx] error: packet too large (%u byte) to be send\n",
-                   (unsigned)len + 2);
+            DEBUG("[at86rf2xx] error: packet too large (%u byte) to be send\n",
+                  (unsigned)len + 2);
             return -EOVERFLOW;
         }
 #ifdef MODULE_NETSTATS_L2
@@ -626,11 +626,9 @@ static void _isr(netdev2_t *netdev)
                  state == AT86RF2XX_STATE_BUSY_TX_ARET) {
             /* check for more pending TX calls and return to idle state if
              * there are none */
-            if (dev->pending_tx == 0) {
+            assert(dev->pending_tx != 0);
+            if ((--dev->pending_tx) == 0) {
                 at86rf2xx_set_state(dev, dev->idle_state);
-            }
-            else {
-                dev->pending_tx--;
             }
 
             DEBUG("[at86rf2xx] EVT - TX_END\n");
