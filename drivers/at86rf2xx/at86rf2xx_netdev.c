@@ -109,8 +109,8 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
     for (int i = 0; i < count; i++, ptr++) {
         /* current packet data + FCS too long */
         if ((len + ptr->iov_len + 2) > AT86RF2XX_MAX_PKT_LENGTH) {
-            printf("[at86rf2xx] error: packet too large (%u byte) to be send\n",
-                   (unsigned)len + 2);
+            DEBUG("[at86rf2xx] error: packet too large (%u byte) to be send\n",
+                  (unsigned)len + 2);
             return -EOVERFLOW;
         }
 #ifdef MODULE_NETSTATS_L2
