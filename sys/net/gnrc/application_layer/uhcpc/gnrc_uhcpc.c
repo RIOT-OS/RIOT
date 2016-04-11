@@ -27,15 +27,11 @@ static void set_interface_roles(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t numof = gnrc_netif_get(ifs);
-    uint16_t dev_type;
 
     for (size_t i = 0; i < numof && i < GNRC_NETIF_NUMOF; i++) {
         kernel_pid_t dev = ifs[i];
-        int res = gnrc_netapi_get(dev, NETOPT_DEVICE_TYPE, 0, &dev_type, sizeof(dev_type));
-        if (res <= 0) {
-            dev_type = NETDEV2_TYPE_UNKNOWN;
-        }
-        if ((!gnrc_border_interface) && (dev_type == NETDEV2_TYPE_ETHERNET)) {
+        int is_wired = gnrc_netapi_get(dev, NETOPT_IS_WIRED, 0, NULL, 0);
+        if ((!gnrc_border_interface) && (is_wired == 1)) {
             ipv6_addr_t addr, defroute;
             gnrc_border_interface = dev;
 
@@ -49,7 +45,7 @@ static void set_interface_roles(void)
                     0x00, addr.u8, 16, 0,
                     (uint32_t)FIB_LIFETIME_NO_EXPIRE);
         }
-        else if ((!gnrc_wireless_interface) && (dev_type != NETDEV2_TYPE_ETHERNET)) {
+        else if ((!gnrc_wireless_interface) && (is_wired != 1)) {
             gnrc_wireless_interface = dev;
         }
 
@@ -58,7 +54,7 @@ static void set_interface_roles(void)
         }
     }
 
-    LOG_INFO("uhcpc: Using %u as border interface and %u as wireless interface.\n", gnrc_border_interface, gnrc_wireless_interface);
+    LOG_INFO("gnrc_uhcpc: Using %u as border interface and %u as wireless interface.\n", gnrc_border_interface, gnrc_wireless_interface);
 }
 
 static ipv6_addr_t _prefix;
@@ -71,12 +67,12 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
 
     eui64_t iid;
     if (!gnrc_wireless_interface) {
-        LOG_WARNING("uhcpc: uhcp_handle_prefix(): received prefix, but don't know any wireless interface\n");
+        LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): received prefix, but don't know any wireless interface\n");
         return;
     }
 
     if ((kernel_pid_t)iface != gnrc_border_interface) {
-        LOG_WARNING("uhcpc: uhcp_handle_prefix(): received prefix from unexpected interface\n");
+        LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): received prefix from unexpected interface\n");
         return;
     }
 
@@ -85,12 +81,12 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
         ipv6_addr_set_aiid((ipv6_addr_t*)prefix, iid.uint8);
     }
     else {
-        LOG_WARNING("uhcpc: uhcp_handle_prefix(): cannot get IID of wireless interface\n");
+        LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): cannot get IID of wireless interface\n");
         return;
     }
 
     if (ipv6_addr_equal(&_prefix, (ipv6_addr_t*)prefix)) {
-        LOG_WARNING("uhcpc: uhcp_handle_prefix(): got same prefix again\n");
+        LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): got same prefix again\n");
         return;
     }
 
@@ -99,13 +95,13 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
                              GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_AUTO);
 
     gnrc_ipv6_netif_remove_addr(gnrc_wireless_interface, &_prefix);
-    print_str("uhcpc: uhcp_handle_prefix(): configured new prefix ");
+    print_str("gnrc_uhcpc: uhcp_handle_prefix(): configured new prefix ");
     ipv6_addr_print((ipv6_addr_t*)prefix);
     puts("/64");
 
     if (!ipv6_addr_is_unspecified(&_prefix)) {
         gnrc_ipv6_netif_remove_addr(gnrc_wireless_interface, &_prefix);
-        print_str("uhcpc: uhcp_handle_prefix(): removed old prefix ");
+        print_str("gnrc_uhcpc: uhcp_handle_prefix(): removed old prefix ");
         ipv6_addr_print(&_prefix);
         puts("/64");
     }
@@ -133,7 +129,7 @@ void auto_init_gnrc_uhcpc(void)
 
     /* only start client if more than one interface is given */
     if (! (gnrc_border_interface && gnrc_wireless_interface)) {
-        LOG_WARNING("uhcpc: only one interface found, skipping setup.\n");
+        LOG_WARNING("gnrc_uhcpc: only one interface found, skipping setup.\n");
         return;
     }
 
