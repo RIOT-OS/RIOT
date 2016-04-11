@@ -37,6 +37,7 @@ static const char *_netopt_strmap[] = {
     [NETOPT_PRELOADING]      = "NETOPT_PRELOADING",
     [NETOPT_PROMISCUOUSMODE] = "NETOPT_PROMISCUOUSMODE",
     [NETOPT_AUTOACK]         = "NETOPT_AUTOACK",
+    [NETOPT_ACK_REQ]         = "NETOPT_ACK_REQ",
     [NETOPT_RETRANS]         = "NETOPT_RETRANS",
     [NETOPT_PROTO]           = "NETOPT_PROTO",
     [NETOPT_STATE]           = "NETOPT_STATE",
