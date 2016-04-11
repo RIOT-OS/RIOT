@@ -376,17 +376,11 @@ int msg_avail(void)
     return queue_index;
 }
 
-int msg_init_queue(msg_t *array, int num)
+void msg_init_queue(msg_t *array, int num)
 {
-    /* check if num is a power of two by comparing to its complement */
-    if (num && (num & (num - 1)) == 0) {
-        thread_t *me = (thread_t*) sched_active_thread;
-        me->msg_array = array;
-        cib_init(&(me->msg_queue), num);
-        return 0;
-    }
-
-    return -1;
+    thread_t *me = (thread_t*) sched_active_thread;
+    me->msg_array = array;
+    cib_init(&(me->msg_queue), num);
 }
 
 void msg_queue_print(void)
