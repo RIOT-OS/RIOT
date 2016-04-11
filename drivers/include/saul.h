@@ -76,7 +76,7 @@ enum {
     SAUL_ACT_MOTOR      = 0x44,     /**< actuator: motor */
     SAUL_ACT_SWITCH     = 0x45,     /**< actuator: simple on/off switch */
     SAUL_ACT_DIMMER     = 0x46,     /**< actuator: dimmable switch */
-    SAUL_SENSE_ANY      = 0x80,     /**< any sensor - wildcart */
+    SAUL_SENSE_ANY      = 0x80,     /**< any sensor - wildcard */
     SAUL_SENSE_BTN      = 0x81,     /**< sensor: simple button */
     SAUL_SENSE_TEMP     = 0x82,     /**< sensor: temperature */
     SAUL_SENSE_HUM      = 0x83,     /**< sensor: humidity */

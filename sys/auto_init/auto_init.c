@@ -221,6 +221,10 @@ void auto_init(void)
     extern void auto_init_gpio(void);
     auto_init_gpio();
 #endif
+#ifdef MODULE_SAUL_ADC
+    extern void auto_init_adc(void);
+    auto_init_adc();
+#endif
 #ifdef MODULE_LSM303DLHC
     extern void auto_init_lsm303dlhc(void);
     auto_init_lsm303dlhc();
