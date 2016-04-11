@@ -37,7 +37,7 @@ extern "C" {
 /**
  * @brief Routing Protocol (RP) message content to request/reply notification
  */
-typedef struct rp_address_msg_t {
+typedef struct {
     uint8_t *address;      /**< The pointer to the address */
     uint8_t address_size;  /**< The address size */
     uint32_t address_flags; /**< The flags for the given address */
@@ -62,7 +62,7 @@ typedef struct rp_address_msg_t {
 /**
  * @brief entry used to collect available destinations
  */
-typedef struct fib_destination_set_entry_t {
+typedef struct {
     uint8_t dest[UNIVERSAL_ADDRESS_SIZE]; /**< The destination address */
     size_t dest_size;    /**< The destination address size */
 } fib_destination_set_entry_t;
@@ -294,6 +294,7 @@ int fib_sr_set(fib_table_t *table, fib_sr_t *fib_sr, kernel_pid_t *sr_iface_id,
 /**
 * @brief deletes the sr
 *
+* @param[in] table the fib instance to access
 * @param[in, out] fib_sr pointer to the source route to be deleted
 *
 * @return 0 on success
@@ -432,7 +433,7 @@ int fib_sr_entry_get_address(fib_table_t *table, fib_sr_t *fib_sr, fib_sr_entry_
 * @param[out] sr_iface_id pointer to the store the iface_id for this route
 * @param[in, out] sr_flags pointer to store the flags of this route
 * @param[out] addr_list pointer to the location for storing the source route addresses
-* @param[in, out] addr_list_elements the number of elements available in addr_list
+* @param[in, out] addr_list_size the number of elements available in addr_list
 * @param[in, out] element_size the provided size for one element in addr_list
 * @param[in] reverse indicator if the hops should be stored in reverse order
 * @param[in, out] fib_sr pointer for cosecutive receiving matching source routes.

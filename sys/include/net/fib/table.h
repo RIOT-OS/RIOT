@@ -38,7 +38,7 @@ extern "C" {
 /**
  * @brief Container descriptor for a FIB entry
  */
-typedef struct fib_entry_t {
+typedef struct {
     /** interface ID */
     kernel_pid_t iface_id;
     /** Lifetime of this entry (an absolute time-point is stored by the FIB) */
@@ -46,27 +46,27 @@ typedef struct fib_entry_t {
     /** Unique identifier for the type of the global address */
     uint32_t global_flags;
     /** Pointer to the shared generic address */
-    struct universal_address_container_t *global;
+    universal_address_container_t *global;
     /** Unique identifier for the type of the next hop address */
     uint32_t next_hop_flags;
     /** Pointer to the shared generic address */
-    struct universal_address_container_t *next_hop;
+    universal_address_container_t *next_hop;
 } fib_entry_t;
 
 /**
 * @brief Container descriptor for a FIB source route entry
 */
-typedef struct fib_sr_entry_t {
+typedef struct fib_sr_entry {
     /** Pointer to the shared generic address */
-    struct universal_address_container_t *address;
+    universal_address_container_t *address;
     /** Pointer to the next shared generic address on the source route */
-    struct fib_sr_entry_t *next;
+    struct fib_sr_entry *next;
 } fib_sr_entry_t;
 
 /**
 * @brief Container descriptor for a FIB source route
 */
-typedef struct fib_sr_t {
+typedef struct {
     /** interface ID */
     kernel_pid_t sr_iface_id;
     /** Lifetime of this entry (an absolute time-point is stored by the FIB) */
@@ -74,16 +74,16 @@ typedef struct fib_sr_t {
     /** Flags for this source route */
     uint32_t sr_flags;
     /** Pointer to the first hop on the source route */
-    struct fib_sr_entry_t *sr_path;
+    fib_sr_entry_t *sr_path;
     /** Pointer to the destination of the source route */
-    struct fib_sr_entry_t *sr_dest;
+    fib_sr_entry_t *sr_dest;
 } fib_sr_t;
 
 /**
 * @brief Container for one FIB source route table,
 *        combining source routes and an entry pool
 */
-typedef struct fib_sr_meta_t {
+typedef struct {
     /** pointer to source route header array */
     fib_sr_t *headers;
     /** pointer to entry pool array holding all hop entries for this table */
@@ -93,12 +93,12 @@ typedef struct fib_sr_meta_t {
 } fib_sr_meta_t;
 
 /**
-* @breif FIB table type for single hop entries
+* @brief FIB table type for single hop entries
 */
 #define FIB_TABLE_TYPE_SH (1)
 
 /**
-* @breif FIB table type for source routes
+* @brief FIB table type for source routes
 */
 #define FIB_TABLE_TYPE_SR (FIB_TABLE_TYPE_SH + 1)
 

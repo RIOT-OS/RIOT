@@ -181,7 +181,7 @@ extern "C" {
  * the corresponding fields are never read by the kernel.
  *
  */
-typedef struct msg {
+typedef struct {
     kernel_pid_t sender_pid;    /**< PID of sending thread. Will be filled in
                                      by msg_send. */
     uint16_t type;              /**< Type field. */
