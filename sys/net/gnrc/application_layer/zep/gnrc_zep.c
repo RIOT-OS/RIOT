@@ -561,9 +561,7 @@ void *_event_loop(void *args)
                                    KERNEL_PID_UNDEF
                                  };
 
-    if (msg_init_queue(msg_q, GNRC_ZEP_MSG_QUEUE_SIZE)) {
-        return NULL;
-    }
+    msg_init_queue(msg_q, GNRC_ZEP_MSG_QUEUE_SIZE);
 
     my_reg.pid = thread_getpid();
 
