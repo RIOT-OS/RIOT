@@ -9,6 +9,7 @@ USEMODULE += ps
 # include specific driver makefiles in order to test compilation
 # in order to make the test application work, comment all but one
 include Makefile.enc28j60
+include Makefile.encx24j600
 include Makefile.kw2xrf
 include Makefile.xbee
 
@@ -20,5 +21,8 @@ endif
 
 # make sure local parameter headers can be found
 CFLAGS += -I$(CURDIR)
+
+# lower pktbuf size
+CFLAGS += -DGNRC_PKTBUF_SIZE=2048
 
 include $(RIOTBASE)/Makefile.include
