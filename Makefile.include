@@ -4,7 +4,7 @@
 all:
 
 # set undefined variables
-RIOTBASE       ?= $(shell dirname "$(lastword $(MAKEFILE_LIST))")
+RIOTBASE       ?= $(dir $(lastword $(MAKEFILE_LIST)))
 CCACHE_BASEDIR ?= $(RIOTBASE)
 RIOTCPU        ?= $(RIOTBASE)/cpu
 RIOTBOARD      ?= $(RIOTBASE)/boards
