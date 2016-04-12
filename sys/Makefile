@@ -78,6 +78,14 @@ ifneq (,$(filter hamming256,$(USEMODULE)))
     DIRS += ecc/hamming256
 endif
 
+ifneq (,$(filter uhcpc,$(USEMODULE)))
+    DIRS += net/application_layer/uhcp
+endif
+
+ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
+    DIRS += net/gnrc/application_layer/uhcpc
+endif
+
 ifneq (,$(filter netopt,$(USEMODULE)))
     DIRS += net/crosslayer/netopt
 endif

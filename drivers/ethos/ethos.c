@@ -26,6 +26,7 @@
 #include "ethos.h"
 #include "periph/uart.h"
 #include "tsrb.h"
+#include "irq.h"
 
 #include "net/netdev2.h"
 #include "net/netdev2/eth.h"
@@ -41,7 +42,7 @@
 
 static void _get_mac_addr(netdev2_t *dev, uint8_t* buf);
 static void ethos_isr(void *arg, uint8_t c);
-const static netdev2_driver_t netdev2_driver_ethos;
+static const netdev2_driver_t netdev2_driver_ethos;
 
 static const uint8_t _esc_esc[] = {ETHOS_ESC_CHAR, (ETHOS_ESC_CHAR ^ 0x20)};
 static const uint8_t _esc_delim[] = {ETHOS_ESC_CHAR, (ETHOS_FRAME_DELIMITER ^ 0x20)};
@@ -297,12 +298,12 @@ static int _recv(netdev2_t *netdev, char* buf, int len, void* info)
     ethos_t * dev = (ethos_t *) netdev;
 
     if (buf) {
-        if (len < dev->last_framesize) {
+        if (len < (int)dev->last_framesize) {
             DEBUG("ethos _recv(): receive buffer too small.");
             return -1;
         }
 
-        len = dev->last_framesize;
+        len = (int)dev->last_framesize;
         dev->last_framesize = 0;
 
         if ((tsrb_get(&dev->inbuf, buf, len) != len)) {
@@ -317,7 +318,7 @@ static int _recv(netdev2_t *netdev, char* buf, int len, void* info)
     }
 }
 
-int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
+static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
 {
     int res = 0;
 
@@ -340,7 +341,7 @@ int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
 }
 
 /* netdev2 interface */
-const static netdev2_driver_t netdev2_driver_ethos = {
+static const netdev2_driver_t netdev2_driver_ethos = {
     .send = _send,
     .recv = _recv,
     .init = _init,
