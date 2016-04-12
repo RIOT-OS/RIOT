@@ -40,18 +40,11 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 #define GNRC_RPL_GROUNDED_SHIFT             (7)
 #define GNRC_RPL_MOP_SHIFT                  (3)
-#define GNRC_RPL_OPT_DODAG_CONF_LEN         (14)
-#define GNRC_RPL_OPT_PREFIX_INFO_LEN        (30)
-#define GNRC_RPL_OPT_TARGET_LEN             (18)
 #define GNRC_RPL_OPT_TRANSIT_E_FLAG_SHIFT   (7)
 #define GNRC_RPL_OPT_TRANSIT_E_FLAG         (1 << GNRC_RPL_OPT_TRANSIT_E_FLAG_SHIFT)
-#define GNRC_RPL_OPT_TRANSIT_INFO_LEN       (4)
 #define GNRC_RPL_SHIFTED_MOP_MASK           (0x7)
 #define GNRC_RPL_PRF_MASK                   (0x7)
 #define GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT    (1 << 6)
-#define GNRC_RPL_DAO_D_BIT                  (1 << 6)
-#define GNRC_RPL_DAO_K_BIT                  (1 << 7)
-#define GNRC_RPL_DAO_ACK_D_BIT              (1 << 7)
 
 void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
                    ipv6_addr_t *dodag_id)
