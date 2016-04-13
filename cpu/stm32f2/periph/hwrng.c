@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2016 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +15,7 @@
  * @brief       Low-level random number generator driver implementation
  *
  * @author      Hauke Petersen <mail@haukepetersen.de>
+ * @author      Aurelien Gonce <aurelien.gonce@altran.fr>
  *
  * @}
  */
@@ -27,8 +29,12 @@
 
 void hwrng_init(void)
 {
-
+    /* enable RNG reset state */
+    RCC->AHB2ENR |= RCC_AHB2ENR_RNGEN;
+    /* release RNG from reset state */
+    RCC->AHB2ENR &= ~RCC_AHB2ENR_RNGEN;
 }
+
 
 void hwrng_read(uint8_t *buf, unsigned int num)
 {
@@ -36,8 +42,10 @@ void hwrng_read(uint8_t *buf, unsigned int num)
     uint32_t tmp;
     unsigned int count = 0;
 
+    /* enable RNG reset state */
     RCC->AHB2ENR |= RCC_AHB2ENR_RNGEN;
-    RNG->CR = RNG_CR_RNGEN;
+    /* enable the RNG */
+    RNG->CR |= RNG_CR_RNGEN;
 
     while (count < num) {
         /* wait for random data to be ready to read */
@@ -46,12 +54,14 @@ void hwrng_read(uint8_t *buf, unsigned int num)
         tmp = RNG->DR;
         /* copy data into result vector */
         for (int i = 0; i < 4 && count < num; i++) {
-            buf[count++] = (char)tmp;
+            buf[count++] = (uint8_t)tmp;
             tmp = tmp >> 8;
         }
     }
 
-    RNG->CR = 0;
+    /* disable the RNG */
+    RNG->CR &= ~RNG_CR_RNGEN;
+    /* release RNG from reset state */
     RCC->AHB2ENR &= ~RCC_AHB2ENR_RNGEN;
 }
 
