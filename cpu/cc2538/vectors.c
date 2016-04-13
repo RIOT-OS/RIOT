@@ -54,6 +54,7 @@ WEAK_DEFAULT void isr_timer2_chan0(void);
 WEAK_DEFAULT void isr_timer2_chan1(void);
 WEAK_DEFAULT void isr_comp(void);
 WEAK_DEFAULT void isr_rfcoretx(void);
+WEAK_DEFAULT void isr_rfcoretx_alternate(void);
 WEAK_DEFAULT void isr_rfcoreerr(void);
 WEAK_DEFAULT void isr_icepick(void);
 WEAK_DEFAULT void isr_flash(void);
@@ -117,8 +118,8 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_timer2_chan0,       /* 39 Timer 2 subtimer A */
     (void*) isr_timer2_chan1,       /* 40 Timer 2 subtimer B */
     (void*) isr_comp,               /* 41 Analog Comparator 0 */
-    (void*) isr_rfcoretx,           /* 42 RFCore Rx/Tx */
-    (void*) isr_rfcoreerr,          /* 43 RFCore Error */
+    (void*) isr_rfcoretx_alternate, /* 42 RFCore Rx/Tx ALTERNATE */
+    (void*) isr_rfcoreerr,          /* 43 RFCore Error ALTERNATE */
     (void*) isr_icepick,            /* 44 IcePick */
     (void*) isr_flash,              /* 45 FLASH Control */
     (void*) isr_aes,                /* 46 AES */
@@ -139,6 +140,101 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) (0UL),                  /* 61 Reserved */
     (void*) isr_dma,                /* 62 uDMA */
     (void*) isr_dmaerr,             /* 63 uDMA Error */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /* 70 Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /* 80 Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /* 90 Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /* 100 Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /* 110 Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /* 120 Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /* 130 Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /*  Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 140 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 150 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) (0UL),                  /* 57 Reserved */
+    (void*) isr_rfcoretx,           /* 157 RFCore Rx/Tx ALTERNATE */
+    (void*) isr_rfcoreerr,          /* 158 RFCore Error ALTERNATE */
 };
 
 #if UPDATE_CCA

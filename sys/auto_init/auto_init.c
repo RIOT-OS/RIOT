@@ -192,6 +192,17 @@ void auto_init(void)
     auto_init_cc110x();
 #endif
 
+#ifdef CPU_CC2538
+    extern void auto_init_cc2538rf(void);
+    auto_init_cc2538rf();
+#endif
+/*
+#ifdef MODULE_CC2538RF
+    extern void auto_init_cc2538rf(void);
+    auto_init_cc2538rf();
+#endif
+*/
+
 #ifdef MODULE_XBEE
     extern void auto_init_xbee(void);
     auto_init_xbee();

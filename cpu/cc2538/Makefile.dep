@@ -1,0 +1,3 @@
+ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
+  USEMODULE += gnrc_nomac
+endif

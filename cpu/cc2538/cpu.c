@@ -44,6 +44,7 @@ void cpu_init(void)
     /* initialize the Cortex-M core */
     cortexm_init();
     /* Enable the CC2538's more compact alternate interrupt mapping */
+    //Does not work for now
     SYS_CTRL->I_MAP = 1;
     /* initialize the clock system */
     cpu_clock_init();
