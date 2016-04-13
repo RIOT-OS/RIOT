@@ -863,7 +863,7 @@ void gnrc_ipv6_netif_init_by_dev(void)
              * gnrc_ipv6_netif_add() */
         }
 
-        if (gnrc_netapi_get(ifs[i], NETOPT_IS_WIRED, 0, &tmp, sizeof(int)) > 0) {
+        if (gnrc_netapi_get(ifs[i], NETOPT_IS_WIRED, 0, NULL, 0) > 0) {
             ipv6_if->flags |= GNRC_IPV6_NETIF_FLAGS_IS_WIRED;
         }
         else {
