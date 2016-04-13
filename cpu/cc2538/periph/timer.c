@@ -33,6 +33,8 @@
 
 #define NUM_CHANNELS     1
 
+#define XTIMER_LL_SHIFT  4
+
 /**
  * @brief Timer state memory
  */
@@ -191,6 +193,14 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     /* set timeout value */
     gptimer->ICR           = TIMER_A_IRQ_MASK; /**< Clear any pending interrupt status */
 
+#ifdef MODULE_XTIMER
+    if (dev == XTIMER) {
+        gptimer->TAMATCHR = value << XTIMER_LL_SHIFT;
+        gptimer->cc2538_gptimer_imr.IMRbits.TAMIM = 1; /**< Enable the Timer A Match Interrupt */
+        return 1;
+    }
+#endif
+
     uint64_t scaled_value = value;
     scaled_value *= config_freq[dev];
     scaled_value += RCOSC16M_FREQ / 2;
@@ -249,28 +259,43 @@ int timer_clear(tim_t dev, int channel)
  */
 unsigned int timer_read(tim_t dev)
 {
+    cc2538_gptimer_t *gptimer;
+
+    /* get timer base register address */
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            return (uint64_t)TIMER_0_DEV->TAV * config_freq[TIMER_0] / RCOSC16M_FREQ;
+            gptimer = TIMER_0_DEV;
+            break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            return (uint64_t)TIMER_1_DEV->TAV * config_freq[TIMER_1] / RCOSC16M_FREQ;
+            gptimer = TIMER_1_DEV;
+            break;
 #endif
 #if TIMER_2_EN
         case TIMER_2:
-            return (uint64_t)TIMER_2_DEV->TAV * config_freq[TIMER_2] / RCOSC16M_FREQ;
+            gptimer = TIMER_2_DEV;
+            break;
 #endif
 #if TIMER_3_EN
         case TIMER_3:
-            return (uint64_t)TIMER_3_DEV->TAV * config_freq[TIMER_3] / RCOSC16M_FREQ;
+            gptimer = TIMER_3_DEV;
+            break;
 #endif
 
         case TIMER_UNDEFINED:
         default:
             return 0;
     }
+
+#ifdef MODULE_XTIMER
+    if (dev == XTIMER) {
+        return gptimer->TAV >> XTIMER_LL_SHIFT;
+    }
+#endif
+
+    return (uint64_t)gptimer->TAV * config_freq[dev] / RCOSC16M_FREQ;
 }
 
 /*
