@@ -19,7 +19,7 @@ endif
 
 ifneq (,$(filter bh1750fvi,$(USEMODULE)))
   USEMODULE += xtimer
-  FEATURES_REQUIRED = periph_i2c
+  FEATURES_REQUIRED += periph_i2c
 endif
 
 ifneq (,$(filter cc110x,$(USEMODULE)))
@@ -34,7 +34,7 @@ endif
 
 ifneq (,$(filter dht,$(USEMODULE)))
     USEMODULE += xtimer
-    FEATURES_REQUIRED = periph_gpio
+    FEATURES_REQUIRED += periph_gpio
 endif
 
 ifneq (,$(filter enc28j60,$(USEMODULE)))
