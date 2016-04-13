@@ -36,7 +36,7 @@ static uint32_t si70xx_measure(si70xx_t *dev, uint8_t command)
     i2c_release(dev->i2c_dev);
 
     /* reconstruct raw result */
-    return (result[0] << 8) + (result[1] & 0xfc);
+    return ((uint32_t)result[0] << 8) + (result[1] & 0xfc);
 }
 
 int si70xx_test(si70xx_t *dev)
@@ -149,9 +149,9 @@ uint64_t si70xx_get_serial(si70xx_t *dev)
     i2c_release(dev->i2c_dev);
 
     /* calculate the ID */
-    uint32_t id_first = (in_first[0] << 24) + (in_first[2] << 16) +
+    uint32_t id_first = ((uint32_t)in_first[0] << 24) + ((uint32_t)in_first[2] << 16) +
                         (in_first[4] << 8) + (in_first[6] << 0);
-    uint32_t id_second = (in_second[0] << 24) + (in_second[2] << 16) +
+    uint32_t id_second = ((uint32_t)in_second[0] << 24) + ((uint32_t)in_second[2] << 16) +
                          (in_second[4] << 8) + (in_second[6] << 0);
 
     return (((uint64_t) id_first) << 32) + id_second;
