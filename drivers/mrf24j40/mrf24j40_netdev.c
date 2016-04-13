@@ -151,3 +151,24 @@ netopt_state_t _get_state(mrf24j40_t *dev)
             return NETOPT_STATE_RTSEL2;
     }
 }
+
+static int _set_state(mrf24j40_t *dev, netopt_state_t state)
+{
+    switch (state) {
+        case NETOPT_STATE_SLEEP:
+            mrf24j40_set_state(dev, MRF24J40_RFSTATE_SLEEP);
+            break;
+        case NETOPT_STATE_RX:
+            mrf24j40_set_state(dev, MRF24J40_RFSTATE_RX);
+            break;
+        case NETOPT_STATE_TX:
+            mrf24j40_set_state(dev, MRF24J40_RFSTATE_TX);
+            break;
+        case NETOPT_STATE_RESET:
+            mrf24j40_reset(dev);
+            break;
+        default:
+            return -ENOTSUP;
+    }
+    return sizeof(netopt_state_t);
+}
