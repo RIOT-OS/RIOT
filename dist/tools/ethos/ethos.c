@@ -227,17 +227,17 @@ static void _write_escaped(int fd, char* buf, ssize_t n)
             case LINE_FRAME_DELIMITER:
                 out[0] = LINE_ESC_CHAR;
                 out[1] = (LINE_FRAME_DELIMITER ^ 0x20);
-                write(fd, out, 2);
+                (void) write(fd, out, 2);
                 escaped++;
                 break;
             case LINE_ESC_CHAR:
                 out[0] = LINE_ESC_CHAR;
                 out[1] = (LINE_ESC_CHAR ^ 0x20);
-                write(fd, out, 2);
+                (void) write(fd, out, 2);
                 escaped++;
                 break;
             default:
-                write(fd, &c, 1);
+                (void) write(fd, &c, 1);
         }
     }
 }
@@ -246,16 +246,16 @@ static void _send_hello(int serial_fd, serial_t *serial, unsigned type)
 {
     char delim = LINE_FRAME_DELIMITER;
     char head[] = { LINE_FRAME_DELIMITER, LINE_ESC_CHAR, (type ^ 0x20) };
-    write(serial_fd, head, sizeof(head));
-    write(serial_fd, serial->local_l2_addr, 6);
-    write(serial_fd, &delim, 1);
+    (void) write(serial_fd, head, sizeof(head));
+    (void) write(serial_fd, serial->local_l2_addr, 6);
+    (void) write(serial_fd, &delim, 1);
 }
 
 static void _clear_neighbor_cache(const char *ifname)
 {
     char tmp[20 + IFNAMSIZ];
     snprintf(tmp, sizeof(tmp), "ip neigh flush dev %s", ifname);
-    system(tmp);
+    (void) system(tmp);
 }
 
 int main(int argc, char *argv[])
@@ -317,10 +317,10 @@ int main(int argc, char *argv[])
                     if (res) {
                         switch (serial.frametype) {
                             case LINE_FRAME_TYPE_DATA:
-                                write(tap_fd, serial.frame, serial.framebytes);
+                                (void) write(tap_fd, serial.frame, serial.framebytes);
                                 break;
                             case LINE_FRAME_TYPE_TEXT:
-                                write(STDOUT_FILENO, serial.frame, serial.framebytes);
+                                (void) write(STDOUT_FILENO, serial.frame, serial.framebytes);
                                 break;
                             case LINE_FRAME_TYPE_HELLO:
                             case LINE_FRAME_TYPE_HELLO_REPLY:
@@ -353,9 +353,9 @@ int main(int argc, char *argv[])
                 continue;
             }
             char delim = LINE_FRAME_DELIMITER;
-            write(serial_fd, &delim, 1);
+            (void) write(serial_fd, &delim, 1);
             _write_escaped(serial_fd, inbuf, res);
-            write(serial_fd, &delim, 1);
+            (void) write(serial_fd, &delim, 1);
         }
 
         if (FD_ISSET(STDIN_FILENO, &readfds)) {
@@ -368,9 +368,9 @@ int main(int argc, char *argv[])
             if (res) {
                 char delim = LINE_FRAME_DELIMITER;
                 char head[] = { LINE_FRAME_DELIMITER, LINE_ESC_CHAR, (LINE_FRAME_TYPE_TEXT ^ 0x20) };
-                write(serial_fd, head, sizeof(head));
+                (void) write(serial_fd, head, sizeof(head));
                 _write_escaped(serial_fd, inbuf, res);
-                write(serial_fd, &delim, 1);
+                (void) write(serial_fd, &delim, 1);
             }
         }
     }
