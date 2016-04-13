@@ -163,7 +163,7 @@ int16_t mrf24j40_get_txpower(mrf24j40_t *dev)
 
 }
 
-void at86rf2xx_set_txpower(at86rf2xx_t *dev, int16_t txpower)
+void mrf24j40_set_txpower(mrf24j40_t *dev, int16_t txpower)
 {
     uint8_t txpower_reg_value;
     if(txpower >= 1)
@@ -175,3 +175,11 @@ void at86rf2xx_set_txpower(at86rf2xx_t *dev, int16_t txpower)
     // todo : txpower > 6
     
 }
+
+void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
+{
+    
+}
+
+
+

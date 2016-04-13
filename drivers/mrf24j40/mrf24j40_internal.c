@@ -36,9 +36,7 @@ uint8_t mrf24j40_reg_read_short(const mrf24j40_t *dev, const uint8_t addr)
 	return (uint8_t)value;
 }
 
-/**
- *bei spi müsste ne uint16_t addr eingeführt werden sonst müll
- */
+
 void mrf24j40_reg_write_long(const mrf24j40_t *dev, const uint16_t addr, const uint8_t value)
 {
 	uint8_t reg1,reg2;
