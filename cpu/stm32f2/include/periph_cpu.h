@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Engineering-Spirit
+ * Copyright (C) 2016 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief           CPU specific definitions for internal peripheral handling
  *
  * @author          Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
+ * @author          Aurelien Gonce <aurelien.gonce@altran.fr>
  */
 
 #ifndef PERIPH_CPU_H
@@ -51,6 +53,15 @@ typedef enum {
 /** @} */
 
 /**
+ * @brief   Available peripheral buses
+ */
+enum {
+    AHB1,           /**< AHB1 bus */
+    AHB2,           /**< AHB2 bus */
+    AHB3            /**< AHB3 bus */
+};
+
+/**
  * @brief   Available ports on the STM32F2 family
  */
 enum {
@@ -85,6 +96,38 @@ typedef enum {
     GPIO_AF13,              /**< use alternate function 13 */
     GPIO_AF14               /**< use alternate function 14 */
 } gpio_af_t;
+
+/**
+ * @name    PWM configuration
+ * @{
+ */
+typedef struct {
+    uint8_t tim;            /**< timer used */
+    GPIO_TypeDef *port;     /**< pwm device */
+    uint8_t bus;            /**< AHBx bus */
+    uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
+    uint8_t CH0;            /**< channel 0 */
+    uint8_t CH1;            /**< channel 1 */
+    uint8_t CH2;            /**< channel 2 */
+    uint8_t CH3;            /**< channel 3 */
+    uint8_t AF;             /**< alternate function */
+} pwm_conf_t;
+
+
+/**
+ * @brief   Timer configuration
+ * @{
+ */
+typedef struct {
+    TIM_TypeDef *dev;       /**< timer device */
+    uint8_t channels;       /**< number of channel */
+    uint32_t freq;          /**< frequency */
+    uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
+    uint8_t bus;            /**< APBx bus the timer is clock from */
+    uint8_t irqn;           /**< global IRQ channel */
+    uint8_t priority;       /**< priority */
+} timer_conf_t;
+/** @} */
 
 /**
  * @brief   Structure for UART configuration data
@@ -197,13 +240,13 @@ static inline int dma_hl(int stream)
 static inline uint32_t dma_ifc(int stream)
 {
     switch (stream & 0x3) {
-        case 0:
+        case 0: /* 0 and 4 */
             return (1 << 5);
-        case 1:
+        case 1: /* 1 and 5 */
             return (1 << 11);
-        case 2:
+        case 2: /* 2 and 6 */
             return (1 << 21);
-        case 3:
+        case 3: /* 3 and 7 */
             return (1 << 27);
         default:
             return 0;

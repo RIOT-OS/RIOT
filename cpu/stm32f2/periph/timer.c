@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2016  OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -7,13 +8,14 @@
  */
 
 /**
- * @ingroup     cpu_stm32f4
+ * @ingroup     cpu_stm32f2
  * @{
  *
  * @file
  * @brief       Low-level timer driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Aurelien Gonce <aurelien.gonce@altran.fr>
  *
  * @}
  */
@@ -33,49 +35,40 @@ static inline void irq_handler(tim_t timer, TIM_TypeDef *dev);
 /** Timer state memory */
 static timer_isr_ctx_t config[TIMER_NUMOF];
 
+/**
+ * @brief   Get the timer device
+ */
+static inline TIM_TypeDef *get_dev(tim_t tim)
+{
+    return timer_config[tim].dev;
+}
 
 int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
-    TIM_TypeDef *timer;
-
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            /* enable timer peripheral clock */
-            TIMER_0_CLKEN();
-            /* set timer's IRQ priority */
-            NVIC_SetPriority(TIMER_0_IRQ_CHAN, TIMER_IRQ_PRIO);
-            /* select timer */
-            timer = TIMER_0_DEV;
-            timer->PSC = (TIMER_0_FREQ / freq) - 1;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            /* enable timer peripheral clock */
-            TIMER_1_CLKEN();
-            /* set timer's IRQ priority */
-            NVIC_SetPriority(TIMER_1_IRQ_CHAN, TIMER_IRQ_PRIO);
-            /* select timer */
-            timer = TIMER_1_DEV;
-            timer->PSC = (TIMER_1_FREQ / freq) - 1;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-        default:
-            return -1;
+    /* check if device is valid */
+    if (dev >= TIMER_NUMOF) {
+        return -1;
     }
+
+    /* enable timer peripheral clock */
+    periph_clk_en(timer_config[dev].bus, timer_config[dev].rcc_mask);
+
+    /* set timer's IRQ priority */
+    NVIC_SetPriority(timer_config[dev].irqn, timer_config[dev].priority);
+
+    /* set prescaler */
+    get_dev(dev)->PSC = (timer_config[dev].freq / freq) - 1;
 
     /* set callback function */
     config[dev].cb = cb;
     config[dev].arg = arg;
 
     /* set timer to run in counter mode */
-    timer->CR1 = 0;
-    timer->CR2 = 0;
+    get_dev(dev)->CR1 = 0;
+    get_dev(dev)->CR2 = 0;
 
     /* set auto-reload and prescaler values and load new values */
-    timer->EGR |= TIM_EGR_UG;
+    get_dev(dev)->EGR |= TIM_EGR_UG;
 
     /* enable the timer's interrupt */
     timer_irq_enable(dev);
@@ -89,49 +82,35 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
     int now = timer_read(dev);
-    return timer_set_absolute(dev, channel, now + timeout - 1);
+    return timer_set_absolute(dev, channel, now + timeout);
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    TIM_TypeDef *timer;
-
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            timer = TIMER_0_DEV;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            timer = TIMER_1_DEV;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-        default:
-            return -1;
+    if (channel >= timer_config[dev].channels || dev >= TIMER_NUMOF) {
+        return -1;
     }
 
     switch (channel) {
         case 0:
-            timer->CCR1 = value;
-            timer->SR &= ~TIM_SR_CC1IF;
-            timer->DIER |= TIM_DIER_CC1IE;
+            get_dev(dev)->CCR1 = value;
+            get_dev(dev)->SR &= ~TIM_SR_CC1IF;
+            get_dev(dev)->DIER |= TIM_DIER_CC1IE;
             break;
         case 1:
-            timer->CCR2 = value;
-            timer->SR &= ~TIM_SR_CC2IF;
-            timer->DIER |= TIM_DIER_CC2IE;
+            get_dev(dev)->CCR2 = value;
+            get_dev(dev)->SR &= ~TIM_SR_CC2IF;
+            get_dev(dev)->DIER |= TIM_DIER_CC2IE;
             break;
         case 2:
-            timer->CCR3 = value;
-            timer->SR &= ~TIM_SR_CC3IF;
-            timer->DIER |= TIM_DIER_CC3IE;
+            get_dev(dev)->CCR3 = value;
+            get_dev(dev)->SR &= ~TIM_SR_CC3IF;
+            get_dev(dev)->DIER |= TIM_DIER_CC3IE;
             break;
         case 3:
-            timer->CCR4 = value;
-            timer->SR &= ~TIM_SR_CC4IF;
-            timer->DIER |= TIM_DIER_CC4IE;
+            get_dev(dev)->CCR4 = value;
+            get_dev(dev)->SR &= ~TIM_SR_CC4IF;
+            get_dev(dev)->DIER |= TIM_DIER_CC4IE;
             break;
         default:
             return -1;
@@ -142,143 +121,58 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_clear(tim_t dev, int channel)
 {
-    TIM_TypeDef *timer;
-
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            timer = TIMER_0_DEV;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            timer = TIMER_1_DEV;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-        default:
-            return -1;
+    if (channel >= timer_config[dev].channels || dev >= TIMER_NUMOF) {
+        return -1;
     }
 
-    switch (channel) {
-        case 0:
-            timer->DIER &= ~TIM_DIER_CC1IE;
-            break;
-        case 1:
-            timer->DIER &= ~TIM_DIER_CC2IE;
-            break;
-        case 2:
-            timer->DIER &= ~TIM_DIER_CC3IE;
-            break;
-        case 3:
-            timer->DIER &= ~TIM_DIER_CC4IE;
-            break;
-        default:
-            return -1;
-    }
+    get_dev(dev)->DIER &= ~(TIM_DIER_CC1IE << channel);
 
     return 0;
 }
 
 unsigned int timer_read(tim_t dev)
 {
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            return TIMER_0_DEV->CNT;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            return TIMER_1_DEV->CNT;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-        default:
-            return 0;
-    }
+    return (unsigned int)get_dev(dev)->CNT;
 }
 
 void timer_start(tim_t dev)
 {
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            TIMER_0_DEV->CR1 |= TIM_CR1_CEN;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            TIMER_1_DEV->CR1 |= TIM_CR1_CEN;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
+    get_dev(dev)->CR1 |= TIM_CR1_CEN;
 }
 
 void timer_stop(tim_t dev)
 {
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            TIMER_0_DEV->CR1 &= ~TIM_CR1_CEN;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            TIMER_1_DEV->CR1 &= ~TIM_CR1_CEN;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
+    get_dev(dev)->CR1 &= ~TIM_CR1_CEN;
 }
 
 void timer_irq_enable(tim_t dev)
 {
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            NVIC_EnableIRQ(TIMER_0_IRQ_CHAN);
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            NVIC_EnableIRQ(TIMER_1_IRQ_CHAN);
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
+    NVIC_EnableIRQ(timer_config[dev].irqn);
 }
 
 void timer_irq_disable(tim_t dev)
 {
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            NVIC_DisableIRQ(TIMER_0_IRQ_CHAN);
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            NVIC_DisableIRQ(TIMER_1_IRQ_CHAN);
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
+    NVIC_DisableIRQ(timer_config[dev].irqn);
 }
 
 void TIMER_0_ISR(void)
 {
-    irq_handler(TIMER_0, TIMER_0_DEV);
+    irq_handler(TIMER_0, get_dev(TIMER_0));
 }
 
 void TIMER_1_ISR(void)
 {
-    irq_handler(TIMER_1, TIMER_1_DEV);
+    irq_handler(TIMER_1, get_dev(TIMER_1));
+}
+
+void TIMER_2_ISR(void)
+{
+    irq_handler(TIMER_2, get_dev(TIMER_2));
+}
+
+void TIMER_3_ISR(void)
+{
+    irq_handler(TIMER_3, get_dev(TIMER_3));
 }
 
 static inline void irq_handler(tim_t timer, TIM_TypeDef *dev)
