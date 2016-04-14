@@ -116,6 +116,19 @@ extern "C" {
 #define USER_BTN_RELEASED  ((USER_BTN_PxIN & USER_BTN_MASK) != 0)
 /** @} */
 
+/**
+ * @brief   Definition of the interface to the CC2420 radio
+ */
+#define CC2420_PARAMS_BOARD         {.spi        = SPI_0, \
+                                     .spi_clk    = SPI_SPEED_1MHZ, \
+                                     .pin_cs     = GPIO_PIN(P3, 0), \
+                                     .pin_fifo   = GPIO_PIN(P1, 3), \
+                                     .pin_fifop  = GPIO_PIN(P1, 2), \
+                                     .pin_cca    = GPIO_PIN(P1, 4), \
+                                     .pin_sfd    = GPIO_PIN(P4, 1), \
+                                     .pin_vrefen = GPIO_PIN(P4, 5), \
+                                     .pin_reset  = GPIO_PIN(P4, 6)}
+
 #ifdef __cplusplus
 }
 #endif
