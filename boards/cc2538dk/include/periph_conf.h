@@ -96,14 +96,14 @@ extern "C" {
 /* UART 0 pin configuration */
 #define UART_0_TX_PIN       GPIO_PA1
 #define UART_0_RX_PIN       GPIO_PA0
+#define UART_0_RTS_PIN      GPIO_PD3
+#define UART_0_CTS_PIN      GPIO_PB0
 
 /* UART 1 device configuration */
 #define UART_1_DEV          UART1
 #define UART_1_IRQ          UART1_IRQn
 #define UART_1_ISR          isr_uart1
 /* UART 1 pin configuration */
-#define UART_1_RTS_PIN      GPIO_PD3
-#define UART_1_CTS_PIN      GPIO_PB0
 /** @} */
 
 /**
