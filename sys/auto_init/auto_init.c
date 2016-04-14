@@ -107,7 +107,7 @@ void auto_init(void)
     cpuid_get(cpuid);
     uint32_t seed = cpuid[0];
     for (unsigned int i = 1; i < CPUID_LEN; ++i) {
-        seed ^= cpuid[i];
+        seed += cpuid[i];
     }
     random_init(seed);
 #else
