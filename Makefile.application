@@ -3,8 +3,10 @@ MODULE = $(APPLICATION)
 DIRS += $(RIOTCPU)/$(CPU) $(RIOTBOARD)/$(BOARD)
 DIRS += $(RIOTBASE)/core $(RIOTBASE)/drivers $(RIOTBASE)/sys
 
+TOOLS_DIR ?= $(RIOTBASE)/../tools
+
 prepare-mock: $(BINDIR)$(MODULE).a
 	@echo "preparing to mock $(BINDIR)$(MODULE).a ..."
-	python $(RIOTBASE)/../tools/prepare_to_mock.py $(CURDIR) $(BOARD)
+	python3 $(TOOLS_DIR)/prepare_to_mock.py $(CURDIR) $(BOARD)
 
 include $(RIOTBASE)/Makefile.base
