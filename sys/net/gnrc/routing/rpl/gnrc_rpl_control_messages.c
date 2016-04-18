@@ -58,7 +58,6 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ip
 {
     (void)dodag_id;
     gnrc_pktsnip_t *hdr;
-    ipv6_addr_t ll_addr;
     if (iface == KERNEL_PID_UNDEF) {
         if ((iface = gnrc_ipv6_netif_find_by_addr(NULL, &ipv6_addr_all_rpl_nodes))
             == KERNEL_PID_UNDEF) {
@@ -69,8 +68,7 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ip
     }
 
     if (src == NULL) {
-        ipv6_addr_set_link_local_prefix(&ll_addr);
-        src = gnrc_ipv6_netif_match_prefix(iface, &ll_addr);
+        src = gnrc_ipv6_netif_match_prefix(iface, &ipv6_addr_link_local_prefix);
 
         if (src == NULL) {
             DEBUG("RPL: no suitable src address found\n");
@@ -478,7 +476,7 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                     fib_dst_flags = ((uint32_t)(target->prefix_length) << FIB_FLAG_NET_PREFIX_SHIFT);
                 }
 
-                DEBUG("RPL: adding fib entry %s/%d 0x%x\n",
+                DEBUG("RPL: adding fib entry %s/%d 0x%" PRIx32 "\n",
                       ipv6_addr_to_str(addr_str, &(target->target), sizeof(addr_str)),
                       target->prefix_length,
                       fib_dst_flags);
