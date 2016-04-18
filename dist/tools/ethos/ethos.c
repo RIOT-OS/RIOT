@@ -28,9 +28,11 @@
 
 #define TRACE(x)
 
+#define BAUDRATE_DEFAULT B115200
+
 static void usage(void)
 {
-    fprintf(stderr, "usage: ethos <tap> <serial>\n");
+    fprintf(stderr, "usage: ethos <tap> <serial> [baudrate]\n");
 }
 
 static void checked_write(int handle, void *buffer, int nbyte)
@@ -270,12 +272,22 @@ static void _clear_neighbor_cache(const char *ifname)
 int main(int argc, char *argv[])
 {
     char inbuf[MTU];
+    int speed = BAUDRATE_DEFAULT;
 
     serial_t serial = {0};
 
     if (argc < 3) {
         usage();
         return 1;
+    }
+
+    if (argc >= 4) {
+        speed = atoi(argv[3]);
+        /* baudrates smaller 9600 don't make sense */
+        if (speed < 9600) {
+            fprintf(stderr, "Invalid baudrate specified: %s\n", argv[3]);
+            return 1;
+        }
     }
 
     char ifname[IFNAMSIZ];
@@ -293,7 +305,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    set_serial_attribs(serial_fd, B115200, 0);
+    set_serial_attribs(serial_fd, speed, 0);
     set_blocking(serial_fd, 1);
 
     fd_set readfds;
