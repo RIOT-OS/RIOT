@@ -61,10 +61,10 @@ enum {
 #define DIVFRAC_MASK          ( (1 << DIVFRAC_NUM_BITS) - 1 )
 
 /** @brief Indicates if there are bytes available in the UART0 receive FIFO */
-#define uart0_rx_avail() ( UART0->FRbits.RXFE == 0 )
+#define uart0_rx_avail() ( UART0->cc2538_uart_fr.FRbits.RXFE == 0 )
 
 /** @brief Indicates if there are bytes available in the UART1 receive FIFO */
-#define uart1_rx_avail() ( UART1->FRbits.RXFE == 0 )
+#define uart1_rx_avail() ( UART1->cc2538_uart_fr.FRbits.RXFE == 0 )
 
 /** @brief Read one byte from the UART0 receive FIFO */
 #define uart0_read()     ( UART0->DR )
@@ -139,7 +139,7 @@ void UART_1_ISR(void)
     mis = UART_1_DEV->cc2538_uart_mis.MIS;
     UART_1_DEV->ICR = mis;
 
-    while (UART_1_DEV->FRbits.RXFE == 0) {
+    while (UART_1_DEV->cc2538_uart_fr.FRbits.RXFE == 0) {
         uart_config[1].rx_cb(uart_config[1].arg, UART_1_DEV->DR);
     }
 
