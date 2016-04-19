@@ -34,51 +34,43 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 {
     {
         .name = "LED 1",
-        .pin = LED1_PIN,
-        .dir = GPIO_DIR_OUT,
-        .pull = GPIO_NOPULL
+        .pin = LED0_PIN,
+        .mode = GPIO_OUT
     },
     {
         .name = "LED 2",
-        .pin = LED2_PIN,
-        .dir = GPIO_DIR_OUT,
-        .pull = GPIO_NOPULL
+        .pin = LED1_PIN,
+        .mode = GPIO_OUT
     },
     {
         .name = "LED 3",
-        .pin = LED3_PIN,
-        .dir = GPIO_DIR_OUT,
-        .pull = GPIO_NOPULL
+        .pin = LED2_PIN,
+        .mode = GPIO_OUT
     },
     {
         .name = "LED 4",
-        .pin = LED4_PIN,
-        .dir = GPIO_DIR_OUT,
-        .pull = GPIO_NOPULL
+        .pin = LED3_PIN,
+        .mode = GPIO_OUT
     },
     {
         .name = "Button 1",
         .pin = BUTTON1_PIN,
-        .dir = GPIO_DIR_IN,
-        .pull = GPIO_PULLUP
+        .mode = GPIO_IN_PU
     },
     {
         .name = "Button 2",
         .pin = BUTTON2_PIN,
-        .dir = GPIO_DIR_IN,
-        .pull = GPIO_PULLUP
+        .mode = GPIO_IN_PU
     },
     {
         .name = "Button 3",
         .pin = BUTTON3_PIN,
-        .dir = GPIO_DIR_IN,
-        .pull = GPIO_PULLUP
+        .mode = GPIO_IN_PU
     },
     {
         .name = "Button 4",
         .pin = BUTTON4_PIN,
-        .dir = GPIO_DIR_IN,
-        .pull = GPIO_PULLUP
+        .mode = GPIO_IN_PU
     }
 };
 

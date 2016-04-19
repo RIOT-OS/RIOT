@@ -173,7 +173,7 @@ ISRV(PORT1_VECTOR, port1_isr)
         }
         else {
             /* TODO: check for long duration irq */
-            asm volatile(" nop ");
+            __asm__ volatile(" nop ");
         }
     }
     else {
@@ -220,7 +220,7 @@ ISRV(PORT2_VECTOR, port2_isr)
         else {
             c2++;
             /* TODO: check for long duration irq */
-            asm volatile(" nop ");
+            __asm__ volatile(" nop ");
         }
     }
     else {

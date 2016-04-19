@@ -50,11 +50,7 @@ void auto_init_xbee(void)
     for (size_t i = 0; i < XBEE_NUM; i++) {
         const xbee_params_t *p = &xbee_params[i];
         DEBUG("Initializing XBee radio at UART_%i\n", p->uart);
-        int res = xbee_init(&xbee_devs[i],
-                p->uart,
-                p->baudrate,
-                p->sleep_pin,
-                p->status_pin);
+        int res = xbee_init(&xbee_devs[i], (xbee_params_t*) p);
 
         if (res < 0) {
             DEBUG("Error initializing XBee radio device!");

@@ -73,6 +73,34 @@ static void test_rgb2hex__success(void)
     TEST_ASSERT_EQUAL_INT(0x000AB13C, hex);
 }
 
+static void test_rgb_invert__success(void)
+{
+    const color_rgb_t col = {.r = 100, .g = 128, .b =   0};
+    const color_rgb_t res = {.r = 155, .g = 127, .b = 255};
+    color_rgb_t tmp;
+
+    color_rgb_invert(&col, &tmp);
+
+    TEST_ASSERT_EQUAL_INT(res.r, tmp.r);
+    TEST_ASSERT_EQUAL_INT(res.g, tmp.g);
+    TEST_ASSERT_EQUAL_INT(res.b, tmp.b);
+}
+
+
+static void test_rgb_complementary__success(void)
+{
+    /* See example: https://helpx.adobe.com/illustrator/using/adjusting-colors.html */
+    const color_rgb_t col = {.r = 102, .g = 153, .b =  51};
+    const color_rgb_t res = {.r = 102, .g =  51, .b = 153};
+    color_rgb_t tmp;
+
+    color_rgb_complementary(&col, &tmp);
+
+    TEST_ASSERT_EQUAL_INT(res.r, tmp.r);
+    TEST_ASSERT_EQUAL_INT(res.g, tmp.g);
+    TEST_ASSERT_EQUAL_INT(res.b, tmp.b);
+}
+
 Test *tests_color_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -81,6 +109,8 @@ Test *tests_color_tests(void)
         new_TestFixture(test_hex2rgb__success),
         new_TestFixture(test_rgb2hex__success),
         new_TestFixture(test_rgb2str__success),
+        new_TestFixture(test_rgb_invert__success),
+        new_TestFixture(test_rgb_complementary__success),
     };
 
     EMB_UNIT_TESTCALLER(color_tests, NULL, NULL, fixtures);

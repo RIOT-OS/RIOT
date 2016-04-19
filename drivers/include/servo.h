@@ -51,10 +51,12 @@ typedef struct {
  * differ slightly from servo to servo, so the min and max values are
  * parameterized in the init function.
  *
- * The servo is initialized with fixed PWM values:
+ * The servo is initialized with default PWM values:
  * - frequency: 100Hz (10ms interval)
  * - resolution: 10000 (1000 steps per ms)
  *
+ * These default values can be changed by setting SERVO_RESOLUTION and
+ * SERVO_FREQUENCY macros.
  * Caution: When initializing a servo, the PWM device will be reconfigured to
  * new frequency/resolution values. It is however fine to use multiple servos
  * with the same PWM device, just on different channels.
@@ -62,8 +64,8 @@ typedef struct {
  * @param[out] dev          struct describing the servo
  * @param[in] pwm           the PWM device the servo is connected to
  * @param[in] pwm_channel   the PWM channel the servo is connected to
- * @param[in] min           minimum pulse width in us
- * @param[in] max           maximum pulse width in us
+ * @param[in] min           minimum pulse width (in the resolution range)
+ * @param[in] max           maximum pulse width (in the resolution range)
  *
  * @return                  0 on success
  * @return                  <0 on error
@@ -73,15 +75,16 @@ int servo_init(servo_t *dev, pwm_t pwm, int pwm_channel, unsigned int min, unsig
 /**
  * @brief Set the servo motor to a specified position
  *
- * The position of the servo is specified in the pulse width that controls the
- * servo. A value of 1500 means a pulse width of 1.5 ms, which is the center
- * position on most servos.
+ * The position of the servo is specified in the pulse width that
+ * controls the servo. With default configurations, a value of 1500
+ * means a pulse width of 1.5 ms, which is the center position on
+ * most servos.
  *
  * In case pos is larger/smaller then the max/min values, pos will be set to
  * these values.
  *
  * @param[in] dev           the servo to set
- * @param[in] pos           the position to set the servo in us
+ * @param[in] pos           the position to set the servo (in the resolution range)
  */
 void servo_set(servo_t *dev, unsigned int pos);
 

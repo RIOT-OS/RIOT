@@ -43,7 +43,7 @@ void hwrng_read(uint8_t *buf, unsigned int num)
 
     while (count < num) {
         /* wait until new value is generated -> takes up to 84 cycles */
-        while (!(TRNG->TRNG_ISR & TRNG_ISR_DATRDY));
+        while (!(TRNG->TRNG_ISR & TRNG_ISR_DATRDY)) {}
         /* read 4 byte of random data */
         uint32_t tmp = TRNG->TRNG_ODATA;
         /* extract copy bytes to result */

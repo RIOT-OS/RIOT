@@ -27,7 +27,7 @@ static xbee_params_t xbee_params[] = {
     { .uart = XBEE_UART,
       .baudrate = 9600U,
       .sleep_pin = GPIO_UNDEF,
-      .status_pin = GPIO_UNDEF
+      .reset_pin = GPIO_UNDEF
     },
 };
 

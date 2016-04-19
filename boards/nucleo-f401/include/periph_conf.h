@@ -77,20 +77,20 @@ extern "C" {
 /** @} */
 
 /**
- * @name UART configuration
+ * @brief   UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
-    /* device, RCC mask, RX pin, TX pin, pin AF, IRQ channel, DMA stream, DMA  */
     {
-        USART2,                     /* device base register */
-        RCC_APB1ENR_USART2EN,       /* RCC mask */
-        GPIO_PIN(PORT_A,3),         /* RX pin */
-        GPIO_PIN(PORT_A,2),         /* TX pin */
-        GPIO_AF7,                   /* pin AF */
-        USART2_IRQn,                /* IRQ channel */
-        6,                          /* DMA stream */
-        4                           /* DMA channel */
+        .dev        = USART2,
+        .rcc_mask   = RCC_APB1ENR_USART2EN,
+        .rx_pin     = GPIO_PIN(PORT_A,3),
+        .tx_pin     = GPIO_PIN(PORT_A,2),
+        .af         = GPIO_AF7,
+        .bus        = APB1,
+        .irqn       = USART2_IRQn,
+        .dma_stream = 6,
+        .dma_chan   = 4
     }
 };
 
@@ -132,6 +132,48 @@ static const uart_conf_t uart_config[] = {
 #define SPI_0_MOSI_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
 /** @} */
 
+
+/**
+ * @name I2C configuration
+ * @{
+ */
+#define I2C_NUMOF           (1U)
+#define I2C_0_EN            1
+#define I2C_IRQ_PRIO        1
+#define I2C_APBCLK          (42000000U)
+
+/* I2C 0 device configuration */
+#define I2C_0_DEV           I2C1
+#define I2C_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_I2C1EN)
+#define I2C_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN))
+#define I2C_0_EVT_IRQ       I2C1_EV_IRQn
+#define I2C_0_EVT_ISR       isr_i2c1_ev
+#define I2C_0_ERR_IRQ       I2C1_ER_IRQn
+#define I2C_0_ERR_ISR       isr_i2c1_er
+/* I2C 0 pin configuration */
+#define I2C_0_SCL_PORT      GPIOB
+#define I2C_0_SCL_PIN       8
+#define I2C_0_SCL_AF        4
+#define I2C_0_SCL_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define I2C_0_SDA_PORT      GPIOB
+#define I2C_0_SDA_PIN       9
+#define I2C_0_SDA_AF        4
+#define I2C_0_SDA_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+/** @} */
+
+/**
+ * @brief   ADC configuration
+ * @{
+ */
+#define ADC_NUMOF          (0)
+/** @} */
+
+/**
+ * @brief   DAC configuration
+ * @{
+ */
+#define DAC_NUMOF           (0)
+/** @} */
 
 #ifdef __cplusplus
 }

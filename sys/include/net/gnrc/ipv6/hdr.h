@@ -37,19 +37,14 @@ extern "C" {
  * @param[in] payload   Payload for the packet.
  * @param[in] src       Source address for the header. Can be NULL if not
  *                      known or required.
- * @param[in] src_len   Length of @p src. Can be 0 if not known or required or
- *                      must be `sizeof(ipv6_addr_t)`.
  * @param[in] dst       Destination address for the header. Can be NULL if not
  *                      known or required.
- * @param[in] dst_len   Length of @p dst. Can be 0 if not known or required or
- *                      must be `sizeof(ipv6_addr_t)`.
  *
  * @return  The an IPv6 header in packet buffer on success.
  * @return  NULL on error.
  */
-gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload,
-                                    uint8_t *src, uint8_t src_len,
-                                    uint8_t *dst, uint8_t dst_len);
+gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload, const ipv6_addr_t *src,
+                                    const ipv6_addr_t *dst);
 
 #ifdef __cplusplus
 }

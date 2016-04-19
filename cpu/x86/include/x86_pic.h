@@ -121,7 +121,7 @@ void x86_init_pic(void);
  * @brief   Callback handler if there was an interrupt on this IRQ line.
  * @param   irq_num   IRQ line in question.
  *
- * This callback is called out of the interrupt handler (inISR() == true).
+ * This callback is called out of the interrupt handler (irq_is_in() == true).
  * Lengthy operations should be handled in a dedicated thread; use msg_send_int().
  * You must no enable interrupt inside the handler.
  */

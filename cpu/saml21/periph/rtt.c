@@ -40,7 +40,7 @@ void rtt_init(void)
 
     /* reset */
     RTC->MODE0.CTRLA.bit.SWRST = 1;
-    while(RTC->MODE0.CTRLA.bit.SWRST);
+    while(RTC->MODE0.CTRLA.bit.SWRST) {}
 
     /* set 32bit counting mode */
     RTC->MODE0.CTRLA.bit.MODE = 0;
@@ -50,7 +50,7 @@ void rtt_init(void)
 
     /* enable */
     RTC->MODE0.CTRLA.bit.ENABLE = 1;
-    while(RTC->MODE0.SYNCBUSY.bit.ENABLE);
+    while(RTC->MODE0.SYNCBUSY.bit.ENABLE) {}
 
     /* initially clear flag */
     RTC->MODE0.INTFLAG.bit.CMP0 = 1;
@@ -84,7 +84,7 @@ void rtt_clear_overflow_cb(void)
 uint32_t rtt_get_counter(void)
 {
     DEBUG("%s:%d\n", __func__, __LINE__);
-    while (RTC->MODE0.SYNCBUSY.bit.COUNT);
+    while (RTC->MODE0.SYNCBUSY.bit.COUNT) {}
     return RTC->MODE0.COUNT.reg;
 }
 
@@ -96,7 +96,7 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     rtt_clear_alarm();
 
     /* set COM register */
-    while (RTC->MODE0.SYNCBUSY.bit.COMP0);
+    while (RTC->MODE0.SYNCBUSY.bit.COMP0) {}
     RTC->MODE0.COMP[0].reg = alarm;
 
     /* setup callback */

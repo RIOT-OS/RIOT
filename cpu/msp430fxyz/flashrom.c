@@ -83,7 +83,7 @@ static uint8_t prepare(void)
 
     /* disable all interrupts to protect CPU
      during programming from system crash */
-    istate = disableIRQ();
+    istate = irq_disable();
 
     /* disable all NMI-Interrupt sources */
     ie1 = IE1;
@@ -98,7 +98,7 @@ void finish(uint8_t istate)
     /* Enable interrupts. */
     IE1 = ie1;
     IE2 = ie2;
-    restoreIRQ(istate);
+    irq_restore(istate);
 }
 
 static inline void busy_wait(void)

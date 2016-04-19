@@ -35,6 +35,7 @@
 
 #include "board_internal.h"
 #include "native_internal.h"
+#include "tty_uart.h"
 
 int _native_null_in_pipe[2];
 int _native_null_out_file;
@@ -200,7 +201,7 @@ void usage_exit(void)
     real_printf(" <tap interface>");
 #endif
 
-    real_printf(" [-i <id>] [-d] [-e|-E] [-o]\n");
+    real_printf(" [-i <id>] [-d] [-e|-E] [-o] [-c <tty device>]\n");
 
     real_printf(" help: %s -h\n", _progname);
 
@@ -216,7 +217,8 @@ void usage_exit(void)
 -E          do not redirect stderr (i.e. leave sterr unchanged despite\n\
             daemon/socket io)\n\
 -o          redirect stdout to file (/tmp/riot.stdout.PID) when not attached\n\
-            to socket\n");
+            to socket\n\
+-c          specify TTY device for UART\n");
 
     real_printf("\n\
 The order of command line arguments matters.\n");
@@ -239,6 +241,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     char *stderrtype = "stdio";
     char *stdouttype = "stdio";
     char *stdiotype = "stdio";
+    int uart = 0;
 
 #if defined(MODULE_NETDEV2_TAP)
     if (
@@ -297,6 +300,16 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
         else if (strcmp("-o", arg) == 0) {
             stdouttype = "file";
         }
+        else if (strcmp("-c", arg) == 0) {
+            if (argp + 1 < argc) {
+                argp++;
+            }
+            else {
+                usage_exit();
+            }
+
+            tty_uart_setup(uart++, argv[argp]);
+        }
         else {
             usage_exit();
         }
@@ -313,7 +326,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     native_cpu_init();
     native_interrupt_init();
 #ifdef MODULE_NETDEV2_TAP
-    netdev2_tap_setup(&netdev2_tap, argv[1]);
+    netdev2_tap_params_t p;
+    p.tap_name = &(argv[1]);
+    netdev2_tap_setup(&netdev2_tap, &p);
 #endif
 
     board_init();

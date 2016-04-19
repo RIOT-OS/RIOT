@@ -75,7 +75,7 @@ void spi_poweroff(spi_t dev)
     switch (dev) {
 #if SPI_0_EN
         case SPI_0:
-            while (!(SPI_0_DEV->SPI_SR & SPI_SR_SPIENS)); /* not busy anymore */
+            while (!(SPI_0_DEV->SPI_SR & SPI_SR_SPIENS)) {} /* not busy anymore */
             SPI_0_CLKDIS();
             NVIC_DisableIRQ(SPI_0_IRQ);
             break;
@@ -324,11 +324,11 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
             return -1;
     }
 
-    while (!(spi_port->SPI_SR & SPI_SR_TDRE));
+    while (!(spi_port->SPI_SR & SPI_SR_TDRE)) {}
 
     spi_port->SPI_TDR = SPI_TDR_TD(out);
 
-    while (!(spi_port->SPI_SR & SPI_SR_RDRF));
+    while (!(spi_port->SPI_SR & SPI_SR_RDRF)) {}
 
     *in = spi_port->SPI_RDR & SPI_RDR_RD_Msk;
 

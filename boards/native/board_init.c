@@ -24,7 +24,7 @@
  */
 void board_init(void)
 {
-    LED_GREEN_OFF;
-    LED_RED_ON;
+    LED0_OFF;
+    LED1_ON;
     puts("RIOT native board initialized.");
 }

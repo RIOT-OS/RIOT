@@ -29,16 +29,20 @@
 #include "xtimer.h"
 #include "timex.h"
 
+#define TEST_PERIOD (100000LU)
+
 int main(void)
 {
     msg_t m, tmsg;
     xtimer_t t;
     int64_t offset = -1000;
     tmsg.type = 44;
+    t.target = 0;
+    t.long_target = 0;
 
     for (int i = 0; i < 10; i++) {
-        xtimer_set_msg(&t, SEC_IN_USEC + offset, &tmsg, sched_active_pid);
-        if (xtimer_msg_receive_timeout(&m, SEC_IN_USEC) < 0) {
+        xtimer_set_msg(&t, TEST_PERIOD + offset, &tmsg, sched_active_pid);
+        if (xtimer_msg_receive_timeout(&m, TEST_PERIOD) < 0) {
             puts("Timeout!");
         }
         else {

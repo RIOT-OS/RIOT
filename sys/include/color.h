@@ -17,6 +17,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Cenk Gündoğan <mail@cgundogan.de>
+ * @author      Simon Brummer <brummer.simon@googlemail.com>
  */
 
 #ifndef __COLOR_H
@@ -103,6 +104,34 @@ void color_str2rgb(const char *str, color_rgb_t *color);
  * @param[out] str      Output color encoded as string of the form 'RRGGBB'
  */
 void color_rgb2str(const color_rgb_t *rgb, char *str);
+
+/**
+ * @brief Invert a given rgb color
+ *
+ * @pre                 ((rgb != NULL) && (inv_rgb != NULL))
+ *
+ * @param[in] rgb       Input rgb color, that should be converted. Must be NOT NULL
+ * @param[out] inv_rgb  Output rgb color, result of the conversion. Must be NOT NULL
+ */
+static inline void color_rgb_invert(const color_rgb_t *rgb, color_rgb_t *inv_rgb)
+{
+    inv_rgb->r = rgb->r ^ 0xFF;
+    inv_rgb->g = rgb->g ^ 0xFF;
+    inv_rgb->b = rgb->b ^ 0xFF;
+}
+
+/**
+ * @brief Calculate the complementary color of a given rgb color.
+ *
+ * @note                Complementary color calculation according to adobe illustator calculations.
+ *                      See https://helpx.adobe.com/illustrator/using/adjusting-colors.html
+ *
+ * @pre                 ((rgb != NULL) && (comp_rgb != NULL))
+ *
+ * @param[in] rgb       Input rgb color. Must be NOT NULL
+ * @param[out] comp_rgb Output rgb color, result of the complementary color calculation. Must be NOT NULL
+ */
+void color_rgb_complementary(const color_rgb_t *rgb, color_rgb_t *comp_rgb);
 
 #ifdef __cplusplus
 }

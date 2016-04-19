@@ -1,4 +1,7 @@
-ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += kw2xrf
-  USEMODULE += gnrc_nomac
+endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += mma8652
 endif

@@ -95,19 +95,13 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @name ADC configuration
+ * @brief   ADC configuration
+ *
+ * The configuration consists simply of a list of channels that should be used
  * @{
  */
-#define ADC_NUMOF           (1U)
-#define ADC_0_EN            1
-#define ADC_MAX_CHANNELS    4
-
-/* ADC 0 device configuration */
-#define ADC_0_CHANNELS      4
-#define ADC_0_CH0           ADC_CONFIG_PSEL_AnalogInput3
-#define ADC_0_CH1           ADC_CONFIG_PSEL_AnalogInput4
-#define ADC_0_CH2           ADC_CONFIG_PSEL_AnalogInput5
-#define ADC_0_CH3           ADC_CONFIG_PSEL_AnalogInput6
+#define ADC_CONFIG          {3, 4, 5, 6}
+#define ADC_NUMOF           (4)
 /** @} */
 
 /**

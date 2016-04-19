@@ -30,18 +30,24 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   LED handlers
+ * @{
+ */
 void _native_LED_GREEN_OFF(void);
-#define LED_GREEN_OFF (_native_LED_GREEN_OFF())
 void _native_LED_GREEN_ON(void);
-#define LED_GREEN_ON (_native_LED_GREEN_ON())
 void _native_LED_GREEN_TOGGLE(void);
-#define LED_GREEN_TOGGLE (_native_LED_GREEN_TOGGLE())
 void _native_LED_RED_OFF(void);
-#define LED_RED_OFF (_native_LED_RED_OFF())
 void _native_LED_RED_ON(void);
-#define LED_RED_ON (_native_LED_RED_ON())
 void _native_LED_RED_TOGGLE(void);
-#define LED_RED_TOGGLE (_native_LED_RED_TOGGLE())
+
+#define LED0_ON             (_native_LED_RED_ON())
+#define LED0_OFF            (_native_LED_RED_OFF())
+#define LED0_TOGGLE         (_native_LED_RED_TOGGLE())
+#define LED1_ON             (_native_LED_GREEN_ON())
+#define LED1_OFF            (_native_LED_GREEN_OFF())
+#define LED1_TOGGLE         (_native_LED_GREEN_TOGGLE())
+/** @} */
 
 #ifdef __cplusplus
 }

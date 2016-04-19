@@ -41,6 +41,21 @@ typedef uint32_t gpio_t;
 /** @} */
 
 /**
+ * @brief   Override GPIO modes
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN    = (GPIO_DIR_MODE_IN | (GPIO_PIN_TYPE_STD << 4)),     /**< IN */
+    GPIO_IN_PD = (GPIO_DIR_MODE_IN | (GPIO_PIN_TYPE_STD_WPD << 4)), /**< IN with pull-down */
+    GPIO_IN_PU = (GPIO_DIR_MODE_IN | (GPIO_PIN_TYPE_STD_WPU << 4)), /**< IN with pull-up */
+    GPIO_OUT   = (GPIO_DIR_MODE_OUT | (GPIO_PIN_TYPE_STD << 4)),    /**< OUT (push-pull) */
+    GPIO_OD    = (GPIO_DIR_MODE_OUT | (GPIO_PIN_TYPE_OD << 4)),     /**< OD */
+    GPIO_OD_PU = (GPIO_DIR_MODE_OUT | (GPIO_PIN_TYPE_OD_WPU << 4)), /**< OD with pull-up */
+} gpio_mode_t;
+/** @} */
+
+/**
  * @brief   Override values for pull register configuration
  * @{
  */
@@ -51,7 +66,6 @@ typedef enum {
   GPIO_PULLDOWN = GPIO_PIN_TYPE_STD_WPD	    /**< enable internal pull-down resistor */
 } gpio_pp_t;
 /** @} */
-
 
 /**
  * @brief   Override values for pin direction configuration
@@ -87,6 +101,19 @@ enum {
   PORT_E = 4,       /**< port E */
   PORT_F = 5,       /**< port F */
 };
+
+/**
+ * @brief   Override resolution options
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0xa00,            /**< not supported by hardware */
+    ADC_RES_8BIT  = 0xb00,            /**< not supported by hardware */
+    ADC_RES_10BIT = ADC_RES_10BIT_S,  /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = ADC_RES_12BIT_S,  /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 0xc00,            /**< not supported by hardware */
+    ADC_RES_16BIT = 0xd00,            /**< not supported by hardware */
+} adc_res_t;
 
 #ifdef __cplusplus
 }

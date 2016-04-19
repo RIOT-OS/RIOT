@@ -71,7 +71,7 @@ typedef struct pthread_thread {
 } pthread_thread_t;
 
 static pthread_thread_t *volatile pthread_sched_threads[MAXTHREADS];
-static struct mutex_t pthread_mutex;
+static mutex_t pthread_mutex;
 
 static volatile kernel_pid_t pthread_reaper_pid = KERNEL_PID_UNDEF;
 
@@ -108,7 +108,7 @@ static void *pthread_reaper(void *arg)
     while (1) {
         msg_t m;
         msg_receive(&m);
-        DEBUG("pthread_reaper(): free(%p)\n", m.content.ptr);
+        DEBUG("pthread_reaper(): free(%p)\n", (void *)m.content.ptr);
         free(m.content.ptr);
     }
 
@@ -206,7 +206,7 @@ void pthread_exit(void *retval)
             }
         }
 
-        disableIRQ();
+        irq_disable();
         if (self->stack) {
             msg_t m;
             m.content.ptr = self->stack;

@@ -18,32 +18,34 @@ All this does is run your application under Valgrind.
 Now Valgrind will print some information whenever it detects an
 invalid memory access.
 
-In order to debug the program when this occurs you can pass the
---db-attach parameter to Valgrind. E.g:
+In order to debug the program when this occurs you can use the targets
+debug-valgrind-server and debug-valgrind. Therefore, you need to open two
+terminals and run:
 
-    valgrind --db-attach=yes ./bin/native/default.elf tap0
+    make debug-valgrind-server
 
-Now, you will be asked whether you would like to attach the running
-process to gdb whenever a problem occurs.
+in the first one and run:
 
-In order for this to work under Linux 3.4 or newer, you might need to
-disable the ptrace access restrictions:
-As root call:
+    make debug-valgrind
 
-    echo 0 > /proc/sys/kernel/yama/ptrace_scope
-
+in the seconde one. This starts per default gdb attached to valgrinds gdb
+server (vgdb).
 
 Network Support
 ===============
 
-If you compile RIOT for the native cpu and include the `native_net`
+If you compile RIOT for the native cpu and include the `netdev2_tap`
 module, you need to specify a network interface like this:
 
     make term PORT=tap0
 
+**Please note:** in case you're using RIOT's default network stack, the GNRC
+stack, you may also use `gnrc_netdev_default` module and also add
+`auto_init_gnrc_netif` in order to automatically initialize the interface.
 
-Setting Up A Tap Network
-========================
+
+Setting Up A Virtual Network
+============================
 
 There is a shellscript in RIOT/dist/tools/tapsetup called `tapsetup` which you
 can use to create a network of tap interfaces.
@@ -62,6 +64,13 @@ To delete the bridge and all tap interfaces:
 
 For OSX you **have** to run this after killing your RIOT instance and rerun
 `../../dist/tools/tapsetup [-c [<count>]]` before restarting.
+
+**Please note:** If you want to communicate between RIOT and your host
+operating system, you must not use the `tapsetup` script, but create and
+activate the tap interface manually. On Linux you can do so, by calling
+
+    sudo ip tuntap add tap0 mode tap user ${USER}
+    sudo ip link set tap0 up
 
 
 Daemonization

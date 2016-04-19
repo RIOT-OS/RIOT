@@ -86,7 +86,10 @@ extern "C" {
  * @name RTC configuration
  * @{
  */
-#define RTC_NUMOF           (0)
+#define RTC_NUMOF           (1)
+#define EXTERNAL_OSC32_SOURCE                    1
+#define INTERNAL_OSC32_SOURCE                    0
+#define ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE      0
 /** @} */
 
 /**

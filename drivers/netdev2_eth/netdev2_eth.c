@@ -79,6 +79,15 @@ int netdev2_eth_get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
             {
                 return _get_iid(dev, value, max_len);
             }
+#ifdef MODULE_NETSTATS_L2
+        case NETOPT_STATS:
+            {
+                assert(max_len >= sizeof(uintptr_t));
+                *((netstats_t**)value) = &dev->stats;
+                res = sizeof(uintptr_t);
+                break;
+            }
+#endif
         default:
             {
                 res = -ENOTSUP;

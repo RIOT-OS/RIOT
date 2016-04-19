@@ -1,0 +1,71 @@
+PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/emb6
+EMB6_DIR := $(PKG_BUILDDIR)
+EMB6_CONTRIB := $(RIOTBASE)/pkg/emb6/contrib
+
+INCLUDES += -I$(PKG_BUILDDIR)/target
+INCLUDES += -I$(RIOTBASE)/pkg/emb6/include
+
+ifeq (,$(filter emb6_router,$(USEMODULE)))
+  CFLAGS += -DEMB6_CONF_ROUTER=FALSE
+endif
+
+ifneq (,$(filter emb6_bsp,$(USEMODULE)))
+  DIRS += $(EMB6_DIR)/target/bsp
+endif
+
+ifneq (,$(filter emb6_common,$(USEMODULE)))
+  DIRS += $(EMB6_DIR)/emb6
+  INCLUDES += -I$(EMB6_DIR)/emb6
+endif
+
+ifneq (,$(filter emb6_contrib,$(USEMODULE)))
+  DIRS += $(EMB6_CONTRIB)
+endif
+
+ifneq (,$(filter emb6_conn_udp,$(USEMODULE)))
+  DIRS += $(EMB6_CONTRIB)/conn/udp
+endif
+
+ifneq (,$(filter emb6_ipv6,$(USEMODULE)))
+  DIRS += $(EMB6_DIR)/emb6/src/net/ipv6
+  INCLUDES += -I$(EMB6_DIR)/emb6/inc/net/ipv6
+endif
+
+ifneq (,$(filter emb6_ipv6_multicast,$(USEMODULE)))
+  DIRS += $(EMB6_DIR)/emb6/src/net/ipv6/multicast
+  INCLUDES += -I$(EMB6_DIR)/emb6/inc/net/ipv6/multicast
+endif
+
+ifneq (,$(filter emb6_llsec,$(USEMODULE)))
+  DIRS += $(EMB6_DIR)/emb6/src/mac/llsec
+  INCLUDES += -I$(EMB6_DIR)/emb6/inc/mac/llsec
+endif
+
+ifneq (,$(filter emb6_mac,$(USEMODULE)))
+  DIRS += $(EMB6_DIR)/emb6/src/mac
+  INCLUDES += -I$(EMB6_DIR)/emb6/inc/mac
+endif
+
+ifneq (,$(filter emb6_netdev2,$(USEMODULE)))
+  DIRS += $(EMB6_CONTRIB)/netdev2
+endif
+
+ifneq (,$(filter emb6_rpl,$(USEMODULE)))
+  DIRS += $(EMB6_DIR)/emb6/src/net/rpl
+  INCLUDES += -I$(EMB6_DIR)/emb6/inc/net/rpl
+endif
+
+ifneq (,$(filter emb6_sicslowpan,$(USEMODULE)))
+  DIRS += $(EMB6_DIR)/emb6/src/net/sicslowpan
+  INCLUDES += -I$(EMB6_DIR)/emb6/inc/net/sicslowpan
+endif
+
+ifneq (,$(filter emb6_sock,$(USEMODULE)))
+  DIRS += $(EMB6_DIR)/emb6/src/tport
+  INCLUDES += -I$(EMB6_DIR)/emb6/inc/tport
+endif
+
+ifneq (,$(filter emb6_utils,$(USEMODULE)))
+  DIRS += $(EMB6_DIR)/utils/src
+  INCLUDES += -I$(EMB6_DIR)/utils/inc
+endif

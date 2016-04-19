@@ -27,7 +27,7 @@
 #endif /* !defined(FORBIDDEN_ADDRESS) */
 #ifndef INVALID_INSTRUCTION
 /* Random garbage may crash the program as well. */
-#define INVALID_INSTRUCTION asm volatile (".short 0xdead, 0xbeef, 0xcafe, 0xbabe\n")
+#define INVALID_INSTRUCTION __asm__ volatile (".short 0xdead, 0xbeef, 0xcafe, 0xbabe\n")
 #endif /* !defined(INVALID_INSTRUCTION) */
 
 #define PRINT_MACRO(a) PRINT_MACRO2(a)

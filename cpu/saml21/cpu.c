@@ -24,7 +24,7 @@
 
 static void _gclk_setup(int gclk, uint32_t reg)
 {
-    while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_GENCTRL(gclk));
+    while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_GENCTRL(gclk)) {}
     GCLK->GENCTRL[gclk].reg = reg;
 }
 
@@ -57,8 +57,8 @@ void cpu_init(void)
 
     /* Software reset the GCLK module to ensure it is re-initialized correctly */
     GCLK->CTRLA.reg = GCLK_CTRLA_SWRST;
-    while (GCLK->CTRLA.reg & GCLK_CTRLA_SWRST);
-    while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_SWRST);
+    while (GCLK->CTRLA.reg & GCLK_CTRLA_SWRST) {}
+    while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_SWRST) {}
 
     /* set OSC16M to 16MHz */
     OSCCTRL->OSC16MCTRL.bit.FSEL = 3;

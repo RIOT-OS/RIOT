@@ -53,11 +53,11 @@ typedef uint64_t I8;
 #define TEMPLATE_ATOMIC_FETCH_OP_N(opname, op, n, prefixop) \
     I##n __atomic_fetch_##opname##_##n (volatile void *ptr, I##n val, int memmodel) \
     { \
-        unsigned int mask = disableIRQ();     \
+        unsigned int mask = irq_disable();    \
         (void)memmodel;                       \
         I##n tmp = *((I##n*)ptr);             \
         *((I##n*)ptr) = prefixop(tmp op val); \
-        restoreIRQ(mask);                     \
+        irq_restore(mask);                    \
         return tmp;                           \
     }
 

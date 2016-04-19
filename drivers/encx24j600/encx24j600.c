@@ -29,7 +29,7 @@
 #include "xtimer.h"
 
 #include "net/netdev2.h"
-#include "net/netdev2_eth.h"
+#include "net/netdev2/eth.h"
 #include "net/eui64.h"
 #include "net/ethernet.h"
 //#include "net/ethernet/hdr.h"
@@ -82,12 +82,12 @@ static inline void unlock(encx24j600_t *dev) {
     mutex_unlock(&dev->mutex);
 }
 
-void encx24j600_setup(encx24j600_t *dev, spi_t spi, gpio_t cs, gpio_t int_pin)
+void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params)
 {
     dev->netdev.driver = &netdev2_driver_encx24j600;
-    dev->spi = spi;
-    dev->cs = cs;
-    dev->int_pin = int_pin;
+    dev->spi = params->spi;
+    dev->cs = params->cs;
+    dev->int_pin = params->int_pin;
     dev->rx_next_ptr = RX_BUFFER_START;
 
     mutex_init(&dev->mutex);
@@ -250,9 +250,9 @@ static int _init(netdev2_t *encdev)
     DEBUG("encx24j600: starting initialization...\n");
 
     /* setup IO */
-    gpio_init(dev->cs, GPIO_DIR_OUT, GPIO_PULLUP);
+    gpio_init(dev->cs, GPIO_OUT);
     gpio_set(dev->cs);
-    gpio_init_int(dev->int_pin, GPIO_PULLUP, GPIO_FALLING, encx24j600_isr, (void*)dev);
+    gpio_init_int(dev->int_pin, GPIO_IN_PU, GPIO_FALLING, encx24j600_isr, (void*)dev);
 
     if (spi_init_master(dev->spi, SPI_CONF_FIRST_RISING, ENCX24J600_SPI_SPEED) < 0) {
         return -1;

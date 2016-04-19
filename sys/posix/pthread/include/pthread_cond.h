@@ -19,6 +19,7 @@
 
 #include <time.h>
 #include "mutex.h"
+#include "priority_queue.h"
 
 #if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
 #   include "msp430_types.h"
@@ -120,7 +121,7 @@ int pthread_cond_destroy(struct pthread_cond_t *cond);
  * @param[in, out] mutex pre-allocated mutex variable structure.
  * @return returns 0 on success, an errorcode otherwise.
  */
-int pthread_cond_wait(struct pthread_cond_t *cond, struct mutex_t *mutex);
+int pthread_cond_wait(struct pthread_cond_t *cond, mutex_t *mutex);
 
 /**
  * @brief blocks the calling thread until the specified condition cond is signalled
@@ -129,7 +130,7 @@ int pthread_cond_wait(struct pthread_cond_t *cond, struct mutex_t *mutex);
  * @param[in] abstime pre-allocated timeout.
  * @return returns 0 on success, an errorcode otherwise.
  */
-int pthread_cond_timedwait(struct pthread_cond_t *cond, struct mutex_t *mutex, const struct timespec *abstime);
+int pthread_cond_timedwait(struct pthread_cond_t *cond, mutex_t *mutex, const struct timespec *abstime);
 
 /**
  * @brief unblock at least one of the threads that are blocked on the specified condition variable cond

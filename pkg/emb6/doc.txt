@@ -1,0 +1,9 @@
+/**
+ * @defgroup pkg_emb6 emb6 network stack
+ * @ingroup pkg
+ * @brief   emb6 network stack
+ * @see     https://github.com/hso-esk/emb6/raw/develop/doc/pdf/emb6.pdf
+ *
+ * emb6 is a fork of Contiki's uIP network stack without its usage of
+ * proto-threads. It uses periodic event polling instead.
+ */

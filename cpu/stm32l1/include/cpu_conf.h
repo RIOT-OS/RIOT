@@ -21,6 +21,8 @@
 #ifndef CPUCONF_H_
 #define CPUCONF_H_
 
+#include "cpu_conf_common.h"
+
 #include "stm32l1xx.h"
 
 #ifdef __cplusplus

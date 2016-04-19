@@ -8,3 +8,5 @@ export FLASHER = mspdebug
 export FFLAGS = rf2500 "prog $(HEXFILE)"
 
 INCLUDES += -I$(RIOTBOARD)/$(BOARD)/drivers/include
+
+USEMODULE += chronos-drivers

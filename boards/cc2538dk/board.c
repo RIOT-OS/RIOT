@@ -30,17 +30,6 @@ static void led_init_helper(int gpio_num) {
 }
 
 /**
- * @brief Initialize the SmartRF06's on-board LEDs
- */
-void led_init(void)
-{
-    led_init_helper(LED_RED_GPIO);
-    led_init_helper(LED_GREEN_GPIO);
-    led_init_helper(LED_YELLOW_GPIO);
-    led_init_helper(LED_ORANGE_GPIO);
-}
-
-/**
  * @brief Initialize the SmartRF06 board
  */
 void board_init(void)
@@ -49,7 +38,10 @@ void board_init(void)
     cpu_init();
 
     /* initialize the boards LEDs */
-    led_init();
+    led_init_helper(LED0_GPIO);
+    led_init_helper(LED1_GPIO);
+    led_init_helper(LED2_GPIO);
+    led_init_helper(LED3_GPIO);
 }
 
 /** @} */

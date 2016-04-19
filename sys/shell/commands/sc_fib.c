@@ -33,7 +33,7 @@
 
 #define INFO1_TXT "fibroute add <destination> via <next hop> [dev <device>]"
 #define INFO2_TXT " [lifetime <lifetime>]"
-#define INFO3_TXT "       <destination> - the destination address\n" \
+#define INFO3_TXT "       <destination> - the destination address with optional prefix size, e.g. /116\n" \
                   "       <next hop>    - the address of the next-hop towards the <destination>\n" \
                   "       <device>      - the device id of the Interface to use." \
                   " Optional if only one interface is available.\n"
@@ -49,6 +49,11 @@ static unsigned char tmp_ipv6_nxt[IN6ADDRSZ]; /**< buffer for ipv6 address conve
 static void _fib_usage(int info)
 {
     switch (info) {
+        case 0: {
+            puts("\nsee <fibroute [add|del]> for more information\n"
+                 "<fibroute flush [interface]> removes all entries [associated with interface]\n");
+            break;
+        }
         case 1: {
             puts("\nbrief: adds a new entry to the FIB.\nusage: "
                  INFO1_TXT "\n" INFO3_TXT);
@@ -74,15 +79,33 @@ static void _fib_usage(int info)
 
 static void _fib_add(const char *dest, const char *next, kernel_pid_t pid, uint32_t lifetime)
 {
-    unsigned char *dst = (unsigned char *)dest;
-    size_t dst_size = (strlen(dest));
+    uint32_t prefix = 0;
+    /* Get the prefix length */
+    size_t i = 0;
+    for (i = strlen(dest); i > 0; --i) {
+        if (dest[i] == '/') {
+           prefix = atoi(&dest[i+1]);
+           break;
+        }
+        if (dest[i] == ':' || dest[i] == '.') {
+           i = strlen(dest);
+           break;
+        }
+    }
+
+    size_t dst_size = (i+1);
+    unsigned char dst_arr[dst_size];
+    memset(dst_arr, 0, dst_size);
+    memcpy(dst_arr, dest, i);
+    unsigned char *dst = &dst_arr[0];
     uint32_t dst_flags = 0;
+
     unsigned char *nxt = (unsigned char *)next;
     size_t nxt_size = (strlen(next));
     uint32_t nxt_flags = 0;
 
     /* determine destination address */
-    if (inet_pton(AF_INET6, dest, tmp_ipv6_dst)) {
+    if (inet_pton(AF_INET6, (char*)dst, tmp_ipv6_dst)) {
         dst = tmp_ipv6_dst;
         dst_size = IN6ADDRSZ;
     }
@@ -101,16 +124,7 @@ static void _fib_add(const char *dest, const char *next, kernel_pid_t pid, uint3
         nxt_size = INADDRSZ;
     }
 
-    /* Set the prefix flag for a network */
-    dst_flags |= FIB_FLAG_NET_PREFIX;
-    for (size_t i = 0; i < dst_size; ++i) {
-        if (dst[i] != 0) {
-            /* and clear the bit if its not the default route */
-            dst_flags = (dst_flags & ~FIB_FLAG_NET_PREFIX);
-            break;
-        }
-    }
-
+    dst_flags |= (prefix << FIB_FLAG_NET_PREFIX_SHIFT);
     fib_add_entry(&gnrc_ipv6_fib_table, pid, dst, dst_size, dst_flags, nxt,
                   nxt_size, nxt_flags, lifetime);
 }
@@ -131,21 +145,37 @@ int _fib_route_handler(int argc, char **argv)
         else if ((strcmp("del", argv[1]) == 0)) {
             _fib_usage(3);
         }
+        else if ((strcmp("flush", argv[1]) == 0)) {
+            fib_flush(&gnrc_ipv6_fib_table, KERNEL_PID_UNDEF);
+            puts("successfully flushed all entries");
+        }
         else {
-            puts("\nunrecognized parameter1.\nPlease enter fibroute [add|del] for more information.");
+            _fib_usage(0);
         }
 
         return 1;
     }
 
-    if (argc > 2 && !((strcmp("add", argv[1]) == 0) || (strcmp("del", argv[1]) == 0))) {
+    if (argc > 2 && !((strcmp("add", argv[1]) == 0) ||
+                      (strcmp("del", argv[1]) == 0) ||
+                      (strcmp("flush", argv[1]) == 0))) {
         puts("\nunrecognized parameter2.\nPlease enter fibroute [add|del] for more information.");
         return 1;
     }
 
     /* e.g. fibroute del <destination> */
     if (argc == 3) {
-        if (inet_pton(AF_INET6, argv[2], tmp_ipv6_dst)) {
+        if ((strcmp("flush", argv[1]) == 0)) {
+            kernel_pid_t iface = atoi(argv[2]);
+            if (gnrc_netif_exist(iface)) {
+                fib_flush(&gnrc_ipv6_fib_table, iface);
+                printf("successfully flushed all entries for interface %" PRIu16"\n", iface);
+            }
+            else {
+                printf("interface %" PRIu16" does not exist\n", iface);
+            }
+        }
+        else if (inet_pton(AF_INET6, argv[2], tmp_ipv6_dst)) {
             fib_remove_entry(&gnrc_ipv6_fib_table, tmp_ipv6_dst, IN6ADDRSZ);
         }
         else if (inet_pton(AF_INET, argv[2], tmp_ipv4_dst)) {

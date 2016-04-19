@@ -3,6 +3,8 @@ FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_gpio
 
 # Various other features (if any)
 FEATURES_PROVIDED += config

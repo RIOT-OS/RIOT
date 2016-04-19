@@ -33,7 +33,8 @@
 //Define unit length in ms
 #define UNIT_LENGTH    100 //250
 
-#define delay(MILLISEC) xtimer_usleep(MSEC_TO_TICKS(MILLISEC))
+#define delay(MILLISEC) xtimer_usleep(MILLISEC*1000)
+//#define delay(MILLISEC) xtimer_usleep(MILLISEC*80000)
 
 //Build a struct with the morse code mapping
 static const struct {const char letter, *code;} MorseMap[] =

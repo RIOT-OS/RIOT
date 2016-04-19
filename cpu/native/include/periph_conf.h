@@ -53,7 +53,6 @@
  * @{
  */
 #define XTIMER_OVERHEAD 14
-#define XTIMER_USLEEP_UNTIL_OVERHEAD 1
 
 /* timer_set_absolute() has a high margin for possible underflow if set with
  * value not far in the future. To prevent this, we set high backoff values
@@ -62,6 +61,15 @@
 #define XTIMER_BACKOFF      200
 #define XTIMER_ISR_BACKOFF  200
 
+/** @} */
+
+/**
+ * @brief UART configuration
+ * @{
+ */
+#ifndef UART_NUMOF
+#define UART_NUMOF (1U)
+#endif
 /** @} */
 
 #ifdef __cplusplus

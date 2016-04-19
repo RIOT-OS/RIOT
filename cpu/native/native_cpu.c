@@ -80,7 +80,8 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     ucontext_t *p;
 
     VALGRIND_STACK_REGISTER(stack_start, (char *) stack_start + stacksize);
-    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", stack_start, (void*)((int)stack_start + stacksize));
+    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
+                   stack_start, (void*)((int)stack_start + stacksize));
 
     DEBUG("thread_stack_init\n");
 
@@ -140,7 +141,7 @@ void cpu_switch_context_exit(void)
 #endif
 
     if (_native_in_isr == 0) {
-        disableIRQ();
+        irq_disable();
         _native_in_isr = 1;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
@@ -177,7 +178,7 @@ void thread_yield_higher(void)
     ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
     if (_native_in_isr == 0) {
         _native_in_isr = 1;
-        disableIRQ();
+        irq_disable();
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
         native_isr_context.uc_stack.ss_flags = 0;
@@ -185,7 +186,7 @@ void thread_yield_higher(void)
         if (swapcontext(ctx, &native_isr_context) == -1) {
             err(EXIT_FAILURE, "thread_yield_higher: swapcontext");
         }
-        enableIRQ();
+        irq_enable();
     }
     else {
         isr_thread_yield();
@@ -203,7 +204,8 @@ void native_cpu_init(void)
     end_context.uc_stack.ss_flags = 0;
     makecontext(&end_context, sched_task_exit, 0);
     VALGRIND_STACK_REGISTER(__end_stack, __end_stack + sizeof(__end_stack));
-    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", __end_stack, (void*)((int)__end_stack + sizeof(__end_stack)));
+    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
+                   (void*)__end_stack, (void*)((int)__end_stack + sizeof(__end_stack)));
 
     DEBUG("RIOT native cpu initialized.\n");
 }

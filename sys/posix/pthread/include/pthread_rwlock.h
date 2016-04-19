@@ -18,7 +18,7 @@
 #define __SYS__POSIX__PTHREAD_RWLOCK__H
 
 #include "priority_queue.h"
-#include "tcb.h"
+#include "thread.h"
 
 #include <errno.h>
 #include <stdbool.h>
@@ -59,12 +59,11 @@ typedef struct pthread_rwlock
 /**
  * @brief     Internal structure that stores one waiting thread.
  */
-typedef struct __pthread_rwlock_waiter_node
-{
-    bool is_writer; /**< `false`: reader; `true`: writer */
-    tcb_t *thread; /**< waiting thread */
-    priority_queue_node_t qnode; /**< Node to store in `pthread_rwlock_t::queue`. */
-    bool continue_; /**< This is not a spurious wakeup. */
+typedef struct __pthread_rwlock_waiter_node {
+    bool is_writer;                 /**< `false`: reader; `true`: writer */
+    thread_t *thread;               /**< waiting thread */
+    priority_queue_node_t qnode;    /**< Node to store in `pthread_rwlock_t::queue`. */
+    bool continue_;                 /**< This is not a spurious wakeup. */
 } __pthread_rwlock_waiter_node_t;
 
 /**

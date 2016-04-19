@@ -22,6 +22,8 @@
  * @}
  */
 
+#include <unistd.h>
+#include <reent.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,6 +34,7 @@
 
 #include "cpu.h"
 #include "board.h"
+#include "sched.h"
 #include "thread.h"
 #include "reboot.h"
 #include "irq.h"
@@ -94,7 +97,7 @@ void _exit(int n)
  */
 void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
 {
-    unsigned int state = disableIRQ();
+    unsigned int state = irq_disable();
     void *res = heap_top;
 
     if ((heap_top + incr > &_eheap) || (heap_top + incr < &_sheap)) {
@@ -105,7 +108,7 @@ void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
         heap_top += incr;
     }
 
-    restoreIRQ(state);
+    irq_restore(state);
     return res;
 }
 
@@ -157,9 +160,10 @@ int _kill_r(struct _reent *r, pid_t pid, int sig)
  *
  * @return      TODO
  */
-int _open_r(struct _reent *r, const char *name, int mode)
+int _open_r(struct _reent *r, const char *name, int flags, int mode)
 {
     (void) name;
+    (void) flags;
     (void) mode;
     r->_errno = ENODEV;                     /* not implemented yet */
     return -1;
@@ -271,7 +275,7 @@ int _fstat_r(struct _reent *r, int fd, struct stat *st)
  *
  * @return      TODO
  */
-int _stat_r(struct _reent *r, char *name, struct stat *st)
+int _stat_r(struct _reent *r, const char *name, struct stat *st)
 {
     (void) name;
     (void) st;
@@ -306,7 +310,7 @@ int _isatty_r(struct _reent *r, int fd)
  *
  * @return      TODO
  */
-int _unlink_r(struct _reent *r, char *path)
+int _unlink_r(struct _reent *r, const char *path)
 {
     (void) path;
     r->_errno = ENODEV;                     /* not implemented yet */

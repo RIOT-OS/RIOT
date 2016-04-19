@@ -36,9 +36,10 @@
  * @brief Initialize on-board LEDs
  */
 void led_init(void) {
-    gpio_init(LED_RED, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(LED_GREEN, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(LED_YELLOW, GPIO_DIR_OUT, GPIO_NOPULL);
+
+    gpio_init(LED_RED, GPIO_OUT);
+    gpio_init(LED_GREEN, GPIO_OUT);
+    gpio_init(LED_YELLOW, GPIO_OUT);
 
     gpio_clear(LED_RED);
     gpio_clear(LED_GREEN);

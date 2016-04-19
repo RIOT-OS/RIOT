@@ -21,6 +21,8 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #include "LPC11Uxx.h"
 
 #ifdef __cplusplus

@@ -96,8 +96,7 @@ int conn_udp_sendto(const void *data, size_t len, const void *src, size_t src_le
     gnrc_pktsnip_t *pkt, *hdr = NULL;
 
     pkt = gnrc_pktbuf_add(NULL, (void *)data, len, GNRC_NETTYPE_UNDEF); /* data will only be copied */
-    hdr = gnrc_udp_hdr_build(pkt, (uint8_t *)&sport, sizeof(uint16_t), (uint8_t *)&dport,
-                             sizeof(uint16_t));
+    hdr = gnrc_udp_hdr_build(pkt, sport, dport);
     if (hdr == NULL) {
         gnrc_pktbuf_release(pkt);
         return -ENOMEM;
@@ -112,7 +111,7 @@ int conn_udp_sendto(const void *data, size_t len, const void *src, size_t src_le
                 return -EINVAL;
             }
             /* addr will only be copied */
-            hdr = gnrc_ipv6_hdr_build(pkt, (uint8_t *)src, src_len, (uint8_t *)dst, dst_len);
+            hdr = gnrc_ipv6_hdr_build(pkt, src, dst);
             if (hdr == NULL) {
                 gnrc_pktbuf_release(pkt);
                 return -ENOMEM;

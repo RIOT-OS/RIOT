@@ -1,6 +1,5 @@
-ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
+ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
   USEMODULE += at86rf233
-  USEMODULE += gnrc_nomac
 endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))

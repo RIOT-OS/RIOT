@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include "msg.h"
+#include "xtimer.h"
 
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
@@ -34,6 +35,9 @@ int main(void)
 
     /* microcoap_server uses conn which uses gnrc which needs a msg queue */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
+
+    puts("Waiting for address autoconfiguration...");
+    xtimer_sleep(3);
 
     /* print network addresses */
     puts("Configured network interfaces:");

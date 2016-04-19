@@ -40,7 +40,7 @@ void hwrng_read(uint8_t *buf, unsigned int num)
     /* get random data */
     while (count < num) {
         /* wait for random data to be ready to read */
-        while (!(RNG->SR & RNG_SR_DRDY));
+        while (!(RNG->SR & RNG_SR_DRDY)) {}
         /* read next 4 bytes */
         uint32_t tmp = RNG->DR;
         /* copy data into result vector */

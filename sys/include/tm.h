@@ -21,7 +21,7 @@
 #include <sys/time.h>
 #include <stdint.h>
 
-#include "attributes.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {

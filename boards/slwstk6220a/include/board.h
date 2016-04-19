@@ -58,34 +58,19 @@ extern "C" {
 /** @} */
 
 /**
- * @brief    LED pin definitions
+ * @brief   LED pin definitions
  * @{
  */
-#define LED0_PIN            GPIO_PIN(PF,6)
-#define LED1_PIN            GPIO_PIN(PF,7)
-/** @} */
+#define LED0_PIN            GPIO_PIN(PF, 6)
+#define LED1_PIN            GPIO_PIN(PF, 7)
 
-/**
- * @brief   Macros for controlling the on-board LEDs.
- * @{
- */
 #define LED0_ON             gpio_set(LED0_PIN)
 #define LED0_OFF            gpio_clear(LED0_PIN)
 #define LED0_TOGGLE         gpio_toggle(LED0_PIN)
+
 #define LED1_ON             gpio_set(LED1_PIN)
 #define LED1_OFF            gpio_clear(LED1_PIN)
 #define LED1_TOGGLE         gpio_toggle(LED1_PIN)
-
-/* for compatability to other boards */
-#define LED_GREEN_ON        LED1_ON
-#define LED_GREEN_OFF       LED1_OFF
-#define LED_GREEN_TOGGLE    LED1_TOGGLE
-#define LED_ORANGE_ON       /* not available */
-#define LED_ORANGE_OFF      /* not available */
-#define LED_ORANGE_TOGGLE   /* not available */
-#define LED_RED_ON          LED0_ON
-#define LED_RED_OFF         LED0_OFF
-#define LED_RED_TOGGLE      LED0_TOGGLE
 /** @} */
 
 /**
