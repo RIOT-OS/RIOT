@@ -47,6 +47,11 @@
 #define RESET_DELAY                 (10U * 1000U)
 
 /**
+ * @brief   Timeout for receiving AT command response
+ */
+#define RESP_TIMEOUT_USEC           (SEC_IN_USEC)
+
+/**
  * @brief   Start delimiter in API frame mode
  */
 #define API_START_DELIMITER         (0x7e)
@@ -102,6 +107,17 @@ static void _at_cmd(xbee_t *dev, const char *cmd)
     uart_write(dev->uart, (uint8_t *)cmd, strlen(cmd));
 }
 
+static void isr_resp_timeout(void *arg)
+{
+    xbee_t *dev = (xbee_t *)arg;
+
+    if (mutex_trylock(&(dev->resp_lock)) == 0) {
+        dev->int_state = XBEE_INT_STATE_IDLE;
+    }
+
+    mutex_unlock(&(dev->resp_lock));
+}
+
 static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
 {
     DEBUG("xbee: AT_CMD: %s\n", cmd);
@@ -122,9 +138,29 @@ static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
     /* start send data */
     uart_write(dev->uart, dev->tx_buf, size + 6);
 
+    uint64_t sent_time = xtimer_now64();
+
+    xtimer_t resp_timer;
+
+    resp_timer.callback = isr_resp_timeout;
+    resp_timer.arg = dev;
+
+    xtimer_set(&resp_timer, RESP_TIMEOUT_USEC);
+
     /* wait for results */
-    while (dev->resp_limit != dev->resp_count) {
+    while ((dev->resp_limit != dev->resp_count) &&
+           (xtimer_now64() - sent_time < RESP_TIMEOUT_USEC)) {
         mutex_lock(&(dev->resp_lock));
+    }
+
+    xtimer_remove(&resp_timer);
+
+    if (dev->resp_limit != dev->resp_count) {
+        DEBUG("xbee: response timeout\n");
+        resp->status = 255;
+        mutex_unlock(&(dev->tx_lock));
+
+        return;
     }
 
     /* populate response data structure */
