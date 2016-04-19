@@ -82,36 +82,50 @@ extern "C"
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
-#define UART_0_EN           1
+#define UART_NUMOF          (3U)
+#define UART_0_EN           0
 #define UART_1_EN           0
-#define UART_IRQ_PRIO       1
+#define UART_2_EN           1
+#define UART_IRQ_PRIO       CPU_DEFAULT_IRQ_PRIO
 #define UART_CLK            (48e6)
+#define UART_STDIO_DEV      UART_DEV(2)
+#define KINETIS_UART        UART_Type
 
 /* UART 0 device configuration */
-#define KINETIS_UART        UART_Type
-#define UART_0_DEV          UART2
-#define UART_0_CLKEN()      (SIM->SCGC4 |= (SIM_SCGC4_UART2_MASK))
+#define UART_0_DEV          UART0
+#define UART_0_CLKEN()      (SIM->SCGC4 |= (SIM_SCGC4_UART0_MASK))
 #define UART_0_CLK          UART_CLK
-#define UART_0_IRQ_CHAN     UART2_RX_TX_IRQn
-#define UART_0_ISR          isr_uart2_rx_tx
+#define UART_0_IRQ_CHAN     UART0_RX_TX_IRQn
+#define UART_0_ISR          isr_uart0_rx_tx
 /* UART 0 pin configuration */
-#define UART_0_RX_GPIO      GPIO_PIN(PORT_D, 2)
+#define UART_0_RX_GPIO      GPIO_PIN(PORT_D, 6)
 #define UART_0_RX_AF        GPIO_AF_3
-#define UART_0_TX_GPIO      GPIO_PIN(PORT_D, 3)
+#define UART_0_TX_GPIO      GPIO_PIN(PORT_D, 7)
 #define UART_0_TX_AF        GPIO_AF_3
 
 /* UART 1 device configuration */
-#define UART_1_DEV          UART0
-#define UART_1_CLKEN()      (SIM->SCGC4 |= (SIM_SCGC4_UART0_MASK))
+#define UART_1_DEV          UART1
+#define UART_1_CLKEN()      (SIM->SCGC4 |= (SIM_SCGC4_UART1_MASK))
 #define UART_1_CLK          UART_CLK
-#define UART_1_IRQ_CHAN     UART0_RX_TX_IRQn
-#define UART_1_ISR          isr_uart0_rx_tx
+#define UART_1_IRQ_CHAN     UART1_RX_TX_IRQn
+#define UART_1_ISR          isr_uart1_rx_tx
 /* UART 1 pin configuration */
-#define UART_1_RX_GPIO      GPIO_PIN(PORT_D, 6)
+#define UART_1_RX_GPIO      GPIO_PIN(PORT_E, 1)
 #define UART_1_RX_AF        GPIO_AF_3
-#define UART_1_TX_GPIO      GPIO_PIN(PORT_D, 7)
+#define UART_1_TX_GPIO      GPIO_PIN(PORT_E, 0)
 #define UART_1_TX_AF        GPIO_AF_3
+
+/* UART 2 device configuration */
+#define UART_2_DEV          UART2
+#define UART_2_CLKEN()      (SIM->SCGC4 |= (SIM_SCGC4_UART2_MASK))
+#define UART_2_CLK          UART_CLK
+#define UART_2_IRQ_CHAN     UART2_RX_TX_IRQn
+#define UART_2_ISR          isr_uart2_rx_tx
+/* UART 2 pin configuration */
+#define UART_2_RX_GPIO      GPIO_PIN(PORT_D, 2)
+#define UART_2_RX_AF        GPIO_AF_3
+#define UART_2_TX_GPIO      GPIO_PIN(PORT_D, 3)
+#define UART_2_TX_AF        GPIO_AF_3
 /** @} */
 
 /**
