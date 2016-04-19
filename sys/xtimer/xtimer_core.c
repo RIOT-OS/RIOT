@@ -90,48 +90,60 @@ uint64_t xtimer_now64(void)
 void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
 {
     DEBUG(" _xtimer_set64() offset=%" PRIu32 " long_offset=%" PRIu32 "\n", offset, long_offset);
-    if (!long_offset) {
-        /* timer fits into the short timer */
-        xtimer_set(timer, (uint32_t) offset);
-    }
-    else {
-        int state = irq_disable();
-        if (_is_set(timer)) {
-            _remove(timer);
-        }
 
-        _xtimer_now64(&timer->target, &timer->long_target);
-        timer->target += offset;
-        timer->long_target += long_offset;
-        if (timer->target < offset) {
-            timer->long_target++;
-        }
-
-        _add_timer_to_long_list(&long_list_head, timer);
-        irq_restore(state);
-        DEBUG("xtimer_set64(): added longterm timer (long_target=%" PRIu32 " target=%" PRIu32 ")\n",
-                timer->long_target, timer->target);
-    }
-}
-
-void xtimer_set(xtimer_t *timer, uint32_t offset)
-{
-    DEBUG("timer_set(): offset=%" PRIu32 " now=%" PRIu32 " (%" PRIu32 ")\n", offset, xtimer_now(), _lltimer_now());
     if (!timer->callback) {
-        DEBUG("timer_set(): timer has no callback.\n");
+        DEBUG("_xtimer_set64(): timer has no callback.\n");
         return;
     }
 
     xtimer_remove(timer);
 
-    if (offset < XTIMER_BACKOFF) {
+    if (!long_offset && offset < XTIMER_BACKOFF) {
         xtimer_spin(offset);
         _shoot(timer);
     }
-    else {
-        uint32_t target = xtimer_now() + offset;
-        _xtimer_set_absolute(timer, target);
+
+    unsigned state = irq_disable();
+
+    //  Take timer snapshot.
+    uint32_t now_short_term, now_long_term;
+    _xtimer_now64 (&now_short_term, &now_long_term);
+
+    //  Calculate absolute target.
+    timer->target = now_short_term + offset;
+    timer->long_target = now_long_term + long_offset;
+    if (timer->target < offset)
+    {
+        timer->long_target++;
     }
+
+    if ( (timer->long_target != _long_cnt) || !_this_high_period(timer->target) ) {
+        DEBUG("_xtimer_set64(): the timer doesn't fit into the low-level timer's mask.\n");
+        _add_timer_to_long_list(&long_list_head, timer);
+    }
+    else {
+        if (_lltimer_mask(now_short_term) >= timer->target) {
+            DEBUG("_xtimer_set64(): the timer will expire in the next timer period\n");
+            _add_timer_to_list(&overflow_list_head, timer);
+        }
+        else {
+            DEBUG("_xtimer_set64(): timer will expire in this timer period.\n");
+            _add_timer_to_list(&timer_list_head, timer);
+
+            if (timer_list_head == timer) {
+                DEBUG("_xtimer_set64(): timer is new list head. updating lltimer.\n");
+                _lltimer_set(timer->target - XTIMER_OVERHEAD);
+            }
+        }
+    }
+
+    irq_restore(state);
+}
+
+void xtimer_set(xtimer_t *timer, uint32_t offset)
+{
+    DEBUG("timer_set(): offset=%" PRIu32 " now=%" PRIu32 " (%" PRIu32 ")\n", offset, xtimer_now(), _lltimer_now());
+    _xtimer_set64(timer, offset, 0);
 }
 
 static void _periph_timer_callback(void *arg, int chan)
@@ -159,57 +171,6 @@ static inline void _lltimer_set(uint32_t target)
     }
 #endif
     timer_set_absolute(XTIMER, XTIMER_CHAN, _lltimer_mask(target));
-}
-
-int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
-{
-    uint32_t now = xtimer_now();
-    int res = 0;
-
-    DEBUG("timer_set_absolute(): now=%" PRIu32 " target=%" PRIu32 "\n", now, target);
-
-    timer->next = NULL;
-    if ((target >= now) && ((target - XTIMER_BACKOFF) < now)) {
-        /* backoff */
-        xtimer_spin_until(target + XTIMER_BACKOFF);
-        _shoot(timer);
-        return 0;
-    }
-
-    unsigned state = irq_disable();
-    if (_is_set(timer)) {
-        _remove(timer);
-    }
-
-    timer->target = target;
-    timer->long_target = _long_cnt;
-    if (target < now) {
-        timer->long_target++;
-    }
-
-    if ( (timer->long_target > _long_cnt) || !_this_high_period(target) ) {
-        DEBUG("xtimer_set_absolute(): the timer doesn't fit into the low-level timer's mask.\n");
-        _add_timer_to_long_list(&long_list_head, timer);
-    }
-    else {
-        if (_lltimer_mask(now) >= target) {
-            DEBUG("xtimer_set_absolute(): the timer will expire in the next timer period\n");
-            _add_timer_to_list(&overflow_list_head, timer);
-        }
-        else {
-            DEBUG("timer_set_absolute(): timer will expire in this timer period.\n");
-            _add_timer_to_list(&timer_list_head, timer);
-
-            if (timer_list_head == timer) {
-                DEBUG("timer_set_absolute(): timer is new list head. updating lltimer.\n");
-                _lltimer_set(target - XTIMER_OVERHEAD);
-            }
-        }
-    }
-
-    irq_restore(state);
-
-    return res;
 }
 
 static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer)

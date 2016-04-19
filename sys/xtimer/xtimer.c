@@ -46,60 +46,22 @@ void _xtimer_sleep(uint32_t offset, uint32_t long_offset)
 
     timer.callback = _callback_unlock_mutex;
     timer.arg = (void*) &mutex;
-    timer.target = timer.long_target = 0;
 
     mutex_lock(&mutex);
     _xtimer_set64(&timer, offset, long_offset);
     mutex_lock(&mutex);
 }
 
-void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t interval) {
-    xtimer_t timer;
-    mutex_t mutex = MUTEX_INIT;
+void xtimer_usleep_until(uint64_t *last_wakeup, uint32_t interval)
+{
+    //  Calculate absolute target time.
+    uint64_t target = *last_wakeup + interval;
+    //  Calculate compensated offset.
+    uint64_t now = xtimer_now64();
+    uint64_t offset = target - now;
 
-    timer.callback = _callback_unlock_mutex;
-    timer.arg = (void*) &mutex;
+    _xtimer_sleep(offset, offset >> 32);
 
-    uint32_t target = *last_wakeup + interval;
-
-    uint32_t now = xtimer_now();
-    /* make sure we're not setting a value in the past */
-    if (now < *last_wakeup) {
-        /* base timer overflowed */
-        if (!((target < *last_wakeup) && (target > now))) {
-            goto out;
-        }
-    }
-    else if (! ((target < *last_wakeup) || (target > now))) {
-        goto out;
-    }
-
-    /* For large offsets, set an absolute target time, as
-     * it is more exact.
-     *
-     * As that might cause an underflow, for small offsets,
-     * use a relative offset, as that can never underflow.
-     *
-     * For very small offsets, spin.
-     */
-    uint32_t offset = target - now;
-
-    if (offset > (XTIMER_BACKOFF * 2)) {
-        mutex_lock(&mutex);
-        if (offset >> 9) { /* >= 512 */
-            offset = target;
-        }
-        else {
-            offset += xtimer_now();
-        }
-        _xtimer_set_absolute(&timer, offset);
-        mutex_lock(&mutex);
-    }
-    else {
-        xtimer_spin(offset);
-    }
-
-out:
     *last_wakeup = target;
 }
 
