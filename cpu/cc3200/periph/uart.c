@@ -209,7 +209,6 @@ void uart_tx_end(uart_t uart) {
 
 }
 
-//int uart_write(uart_t uart, char data) {
 void uart_write(uart_t uart, const uint8_t *data, size_t len) {
     unsigned long u;
 
@@ -259,16 +258,15 @@ int uart_read_blocking(uart_t uart, char *data) {
     return 1;
 }
 
-//*****************************************************************************
-//
-//! Get the Command string from UART
-//!
-//! \param  pucBuffer is the command store to which command will be populated
-//! \param  ucBufLen is the length of buffer store available
-//!
-//! \return Length of the bytes received. -1 if buffer length exceeded.
-//!
-//*****************************************************************************
+/**
+ * @brief Get the Command string from UART
+ *
+ * @param  pucBuffer is the command store to which command will be populated
+ * @param  ucBufLen is the length of buffer store available
+ *
+ * @return Length of the bytes received. -1 if buffer length exceeded.
+ *
+ **/
 int uart_read_line(uart_t uart, char *pcBuffer, unsigned int uiBufLen) {
     char cChar;
     int iLen = 0;
@@ -344,7 +342,6 @@ int uart_read_line(uart_t uart, char *pcBuffer, unsigned int uiBufLen) {
 
     *(pcBuffer + iLen) = '\0';
 
-    //Report("\n\r");
     MAP_UARTCharPut(CONSOLE, '\n');
     MAP_UARTCharPut(CONSOLE, '\r');
 
