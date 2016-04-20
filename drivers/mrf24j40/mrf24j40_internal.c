@@ -77,3 +77,19 @@ uint8_t mrf24j40_get_status(const mrf24j40_t *dev)
     return mrf24j40_reg_read(dev, MRF24J40_REG_RFSTATE)
                 & MRF24J40_RFSTATE_MASK_RFSTATE;
 }
+
+void mrf24j40_sram_read(const at86rf2xx_t *dev,
+                         uint8_t *data,
+                         const size_t len)
+{
+	for(uint16_t i = 0; i < len; i++)
+    	data[i] = mrf24j40_reg_read_long(dev->spi, i)
+}
+
+void mrf24j40_sram_write(const at86rf2xx_t *dev,
+                          const uint8_t *data,
+                          const size_t len)
+{
+    for(uint16_t i = 0; i < len; i++)
+    	mrf24j40_reg_write_long(dev->spi, i, data[i])
+}
