@@ -167,7 +167,7 @@ void mrf24j40_reset(mrf24j40_t *dev)
 #endif
 
 
-    /* set default options */								/* Bis hierher gekommen 28.Feb. */
+    /* set default options */								
     mrf24j40_set_option(dev, MRF24J40_OPT_AUTOACK, true);
     mrf24j40_set_option(dev, MRF24J40_OPT_CSMA, true);
     mrf24j40_set_option(dev, MRF24J40_OPT_TELL_RX_START, false);
