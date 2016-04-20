@@ -28,7 +28,6 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 1
 
 # Modules to include:
-USEMODULE += xtimer
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
@@ -39,8 +38,8 @@ USEMODULE += saul_default
 USEMODULE += auto_init_saul
 
 BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 mulle native nrf51dongle \
-	nrf6310 pba-d-01-kw2x pca10000 pca10001 pca10005 saml21-xpro samr21-xpro spark-core \
-	yunjia-nrf51822 cc3200-launchxl
+	nrf6310 pba-d-01-kw2x pca10000 pca10005 saml21-xpro samr21-xpro spark-core \
+	yunjia-nrf51822
 
 ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
   # Use modules for networking
