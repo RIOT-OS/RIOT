@@ -349,6 +349,7 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_SHIFT (0)
 #endif
 
+#ifndef XTIMER_USEC_TO_TICKS
 #if (XTIMER_SHIFT < 0)
 #define XTIMER_USEC_TO_TICKS(value) ( (value) << -XTIMER_SHIFT )
 #define XTIMER_TICKS_TO_USEC(value) ( (value) >> -XTIMER_SHIFT )
@@ -356,6 +357,8 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_USEC_TO_TICKS(value) ( (value) >> XTIMER_SHIFT )
 #define XTIMER_TICKS_TO_USEC(value) ( (value) << XTIMER_SHIFT )
 #endif
+#endif
+
 
 /**
  * @brief set xtimer default timer configuration
