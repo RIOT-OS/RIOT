@@ -215,7 +215,7 @@ int spi_release(spi_t dev)
 
 static char ssi_flush_input(cc2538_ssi_t *ssi)
 {
-    char tmp;
+    char tmp = 0;
 
     while (ssi->SRbits.RNE) {
         tmp = ssi->DR;
