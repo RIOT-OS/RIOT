@@ -189,46 +189,7 @@ int16_t sbapp_add_profile(const char* ssid, const char* pwd);
 
 int8_t sbapp_is_connected(uint16_t msec);
 
-/**
- * @brief connect to a TCP or UDP server
- *
- * @param[in] conn_type  TCP or UDP
- * @param[in] server the hostname or ip address of the server
- * @param[in] port remote port
- * @param[in] local_port  local port, if zero a random port is assigned
- *
- * @return the connection handle
- */
-sbh_t sbapp_connect(uint8_t conn_type, uint32_t remote_ip, uint16_t port,
-		uint16_t local_port, kernel_pid_t pid);
 
-
-/**
- *  @brief send data
- *
- *  @param[in] fd the connection handle
- *              (or think it is a file descriptor if you prefer)
- *
- *  @return 1 on success -1 on error
- */
-int sbapp_send(sbh_t fd, void* data, size_t len);
-
-
-/**
- *  @brief send a datagram packet to addr destination
- *
- *  @param[in] data  the payload
- *  @param[in] len   the payload length
- *  @param[in] addr  the destination address
- *
- *  @return the number of transmitted bytes or -1 if an error occurred
- */
-int sbapp_sendto(sbh_t fd, void* data, size_t len, sockaddr_in addr);
-
-
-/**
- *
- */
 uint32_t net_atoi(const char* name);
 
 

@@ -16,10 +16,25 @@
 #include "nwp_conf.h"
 
 #include "log.h"
-#include "output_messages.h"
 
 #define ENABLE_DEBUG    (1)
 #include "debug.h"
+
+#ifdef DEVELHELP
+
+ #define PANIC(NS, ERR_ID)  puts(sl_err_descr[ERR_ID]); while(1) {}
+ #define PANIC2(NS, ERR_ID, ERR_VAL) printf("%s (%d)\n", sl_err_descr[ERR_ID], ERR_VAL); while(1) {}
+ #define SIGNAL(NS, ERR_ID)  puts(sl_err_descr[ERR_ID])
+
+#else
+
+ #define PANIC(NS, ERR_ID)           while(1) {}
+ #define PANIC2(NS, ERR_ID, ERR_VAL) while(1) {}
+ #define SIGNAL(NS, ERR_ID)
+
+#endif
+
+#define STOP_IF_ERR(NS, ERR_VAL, ERR_ID) if(ERR_VAL < 0) {PANIC2(NS, ERR_ID, ERR_VAL);}
 
 
 /**
@@ -83,8 +98,6 @@ const char* sl_err_descr[] = {
 		[SOCKET_OPEN_FAIL ] = "socket open failed",
 		[SOCKET_CONNECT_FAIL ] = "socket connect failed" };
 
-static uint8_t recv_buffer[RECV_BUFF_SIZE];
-
 /**
  * @brief the sbapp thread function
  */
@@ -141,16 +154,6 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent) {
 		case SL_WLAN_CONNECT_EVENT: {
 			SET_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION);
 
-			//
-			// Information about the connected AP (like name, MAC etc) will be
-			// available in 'slWlanConnectAsyncResponse_t'-Applications
-			// can use it if required
-			//
-			//  slWlanConnectAsyncResponse_t *pEventData = NULL;
-			// pEventData = &pWlanEvent->EventData.STAandP2PModeWlanConnected;
-			//
-
-			// Copy new connection SSID and BSSID to global parameters
 			memcpy(nwp.ssid,
 					pWlanEvent->EventData.STAandP2PModeWlanConnected.ssid_name,
 					pWlanEvent->EventData.STAandP2PModeWlanConnected.ssid_len);
@@ -177,9 +180,6 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent) {
 
 			pEventData = &pWlanEvent->EventData.STAandP2PModeDisconnected;
 
-			// If the user has initiated 'Disconnect' request,
-			//'reason_code' is SL_USER_INITIATED_DISCONNECTION
-			//cppcheck-suppress duplicateBranch
 			if (SL_USER_INITIATED_DISCONNECTION == pEventData->reason_code) {
 				LOG_INFO(
 						"[WLAN EVENT]Device disconnected from the AP: %s,"
@@ -201,16 +201,6 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent) {
 			// when device is in AP mode and any client connects to device cc3xxx
 			SET_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION);
 			CLR_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION_FAILED);
-
-			//
-			// Information about the connected client (like SSID, MAC etc) will
-			// be available in 'slPeerInfoAsyncResponse_t' - Applications
-			// can use it if required
-			//
-			// slPeerInfoAsyncResponse_t *pEventData = NULL;
-			// pEventData = &pSlWlanEvent->EventData.APModeStaConnected;
-			//
-
 		}
 			break;
 
@@ -218,73 +208,27 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent) {
 			// when client disconnects from device (AP)
 			CLR_STATUS_BIT(nwp.status, STATUS_BIT_CONNECTION);
 			CLR_STATUS_BIT(nwp.status, STATUS_BIT_IP_LEASED);
-
-			//
-			// Information about the connected client (like SSID, MAC etc) will
-			// be available in 'slPeerInfoAsyncResponse_t' - Applications
-			// can use it if required
-			//
-			// slPeerInfoAsyncResponse_t *pEventData = NULL;
-			// pEventData = &pSlWlanEvent->EventData.APModestaDisconnected;
-			//
 		}
 			break;
 
 		case SL_WLAN_SMART_CONFIG_COMPLETE_EVENT: {
 			SET_STATUS_BIT(nwp.status, STATUS_BIT_SMARTCONFIG_START);
-
-			//
-			// Information about the SmartConfig details (like Status, SSID,
-			// Token etc) will be available in 'slSmartConfigStartAsyncResponse_t'
-			// - Applications can use it if required
-			//
-			//  slSmartConfigStartAsyncResponse_t *pEventData = NULL;
-			//  pEventData = &pSlWlanEvent->EventData.smartConfigStartResponse;
-			//
-
 		}
 			break;
 
 		case SL_WLAN_SMART_CONFIG_STOP_EVENT: {
 			// SmartConfig operation finished
 			CLR_STATUS_BIT(nwp.status, STATUS_BIT_SMARTCONFIG_START);
-
-			//
-			// Information about the SmartConfig details (like Status, padding
-			// etc) will be available in 'slSmartConfigStopAsyncResponse_t' -
-			// Applications can use it if required
-			//
-			// slSmartConfigStopAsyncResponse_t *pEventData = NULL;
-			// pEventData = &pSlWlanEvent->EventData.smartConfigStopResponse;
-			//
 		}
 			break;
 
 		case SL_WLAN_P2P_DEV_FOUND_EVENT: {
 			SET_STATUS_BIT(nwp.status, STATUS_BIT_P2P_DEV_FOUND);
-
-			//
-			// Information about P2P config details (like Peer device name, own
-			// SSID etc) will be available in 'slPeerInfoAsyncResponse_t' -
-			// Applications can use it if required
-			//
-			// slPeerInfoAsyncResponse_t *pEventData = NULL;
-			// pEventData = &pSlWlanEvent->EventData.P2PModeDevFound;
-			//
 		}
 			break;
 
 		case SL_WLAN_P2P_NEG_REQ_RECEIVED_EVENT: {
 			SET_STATUS_BIT(nwp.status, STATUS_BIT_P2P_REQ_RECEIVED);
-
-			//
-			// Information about P2P Negotiation req details (like Peer device
-			// name, own SSID etc) will be available in 'slPeerInfoAsyncResponse_t'
-			//  - Applications can use it if required
-			//
-			// slPeerInfoAsyncResponse_t *pEventData = NULL;
-			// pEventData = &pSlWlanEvent->EventData.P2PModeNegReqReceived;
-			//
 		}
 			break;
 
@@ -348,30 +292,11 @@ void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *ev) {
 
 		case SL_NETAPP_IP_LEASED_EVENT: {
 			SET_STATUS_BIT(nwp.status, STATUS_BIT_IP_LEASED);
-
-			//
-			// Information about the IP-Leased details(like IP-Leased,lease-time,
-			// mac etc) will be available in 'SlIpLeasedAsync_t' - Applications
-			// can use it if required
-			//
-			// SlIpLeasedAsync_t *pEventData = NULL;
-			// pEventData = &pNetAppEvent->EventData.ipLeased;
-			//
-
 		}
 			break;
 
 		case SL_NETAPP_IP_RELEASED_EVENT: {
 			CLR_STATUS_BIT(nwp.status, STATUS_BIT_IP_LEASED);
-
-			//
-			// Information about the IP-Released details (like IP-address, mac
-			// etc) will be available in 'SlIpReleasedAsync_t' - Applications
-			// can use it if required
-			//
-			// SlIpReleasedAsync_t *pEventData = NULL;
-			// pEventData = &pNetAppEvent->EventData.ipReleased;
-			//
 		}
 			break;
 
@@ -521,10 +446,6 @@ long simplelink_to_default_state(void) {
 			SL_CONNECTION_POLICY(1, 0, 0, 0, 1), NULL, 0);
 	STOP_IF_ERR(NAMESPACE, sts, WLAN_POLICYSET_ERR);
 
-	// Remove all profiles
-	//lRetVal = sl_WlanProfileDel(0xFF);
-	//ASSERT_ON_ERROR(lRetVal);
-
 	//
 	// Device in station-mode. Disconnect previous connection if any
 	// The function returns 0 if 'Disconnected done', negative number if already
@@ -667,192 +588,6 @@ uint32_t net_atoi(const char* name) {
 	DEBUG("%s ipv4 int value: %lu\n", name, ip);
 	return ip;
 
-}
-
-int16_t connect_to(cd_t *cd, uint32_t remote_ip, uint16_t remote_port,
-		uint16_t local_port) {
-	//SlSockAddrIn_t addr;
-	int iAddrSize;
-	int16_t fd; // socket file descriptor
-	int sts;
-	//unsigned long server_ip;
-
-	//SlSockAddrIn_t  local_addr;
-
-	cd->local_addr.sin_family = SL_AF_INET;
-	if (local_port) {
-		cd->local_addr.sin_port = sl_Htons(local_port);
-	} else {
-		cd->local_addr.sin_port = 0;
-	}
-
-	cd->local_addr.sin_addr.s_addr = 0;
-
-	// filling the TCP server socket address
-	cd->addr.sin_family = SL_AF_INET;
-	cd->addr.sin_port = sl_Htons(remote_port);
-	cd->addr.sin_addr.s_addr = sl_Htonl(remote_ip);
-
-	// creating a TCP or UDP socket
-	fd = sl_Socket(SL_AF_INET, cd->conn_type, 0);
-	if (fd < 0) {
-		DEBUG("%ld:%d %s (reason %d)", remote_ip, remote_port,
-				sl_err_descr[SOCKET_OPEN_FAIL], fd);
-		return fd;
-	}
-
-	sts = sl_Bind(fd, (SlSockAddr_t *) &cd->local_addr, sizeof(SlSockAddrIn_t));
-	if (sts < 0) {
-		DEBUG("%lu:%d bind failed (reason %d)\n", remote_ip, remote_port, fd);
-		sl_Close(fd);
-	}
-
-	if (cd->conn_type == TCP) {
-		iAddrSize = sizeof(sockaddr_in);
-
-		// connect to the TCP socket to the TCP server address
-		sts = sl_Connect(fd, (SlSockAddr_t *) &cd->addr, iAddrSize);
-		if (sts < 0) {
-			sl_Close(fd);
-			fd = sts;
-			DEBUG("%lu:%d %s (reason %d)\n", remote_ip, remote_port,
-					sl_err_descr[SOCKET_CONNECT_FAIL], fd);
-		}
-	}
-	return fd;
-}
-
-
-/**
- * receive data task
- */
-static void *_receive_handler_task(void* arg) {
-
-	msg_t msg;   //, msg_queue[8];
-	cd_t *cd = (cd_t *) arg;
-	int16_t size = 0;
-	gnrc_pktsnip_t *l4, *l3;
-	sockaddr_in from_addr;
-	socklen_t addr_size = sizeof(sockaddr_in);
-
-	do {
-		size = recvfrom(cd->fd, recv_buffer, RECV_BUFF_SIZE, 0,
-				(sockaddr*) &from_addr, &addr_size);
-		if (size <= 0) {
-			/**
-			 * error condition detected
-			 * when a connection is closed by peer recv return 0
-			 */
-			DEBUG("channel %d: error %d\n", cd->fd, size);
-		} else {
-			recv_buffer[size] = 0;
-
-			cd->addr = from_addr;
-
-			/* copy packet payload into pktbuf */
-			l3 = gnrc_pktbuf_add(NULL, cd, sizeof(cd_t), GNRC_NETTYPE_SBAPP);
-
-			l4 = gnrc_pktbuf_add(l3, recv_buffer, size + 1, GNRC_NETTYPE_UNDEF);
-
-			DEBUG("channel %d: recv: %s (len %d) from %lu.%lu.%lu.%lu:%d\n",
-					cd->fd, (char *) l4->data, size,
-					SL_IPV4_BYTE(cd->addr.sin_addr.s_addr, 0),
-					SL_IPV4_BYTE(cd->addr.sin_addr.s_addr, 1),
-					SL_IPV4_BYTE(cd->addr.sin_addr.s_addr, 2),
-					SL_IPV4_BYTE(cd->addr.sin_addr.s_addr, 3),
-					ntohs(cd->addr.sin_port));
-			msg.type = SBAPI_MSG_TYPE_RCV;
-			//msg.content.ptr = (char*)recv_buffer;
-			msg.content.ptr = (void*) l4;
-		}
-		msg_send(&msg, cd->pid);
-
-	} while (size > 0);
-
-	msg.type = SBAPI_MSG_TYPE_HANDLER_EXIT;
-	msg.content.ptr = (char *)cd;
-	msg_send(&msg, sbapp.main_pid);
-
-#if 0
-	if (cd->send_stack == NULL) {
-		close(cd->fd);
-		free(cd);
-	}
-#endif
-
-	return NULL;
-}
-
-
-sbh_t sbapp_connect(uint8_t conn_type, uint32_t remote_ip, uint16_t remote_port,
-		uint16_t local_port, kernel_pid_t pid) {
-
-	// create a connection descriptor
-	cd_t *conn = malloc(sizeof(cd_t));
-	if (conn == NULL) {
-		return NULL;
-	}
-	conn->conn_type = conn_type;
-
-	conn->fd = connect_to(conn, remote_ip, remote_port, local_port);
-	if (conn->fd < 0) {
-		return NULL;
-	}
-
-	conn->pid = pid;
-
-#if ENABLE_DEBUG
-	conn->recv_stack = malloc(SBAPP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF);
-#else
-	conn->recv_stack = malloc(SBAPP_STACK_SIZE);
-#endif
-	if (conn->recv_stack == NULL) {
-		free(conn);
-		return NULL;
-	}
-
-	// start the receive task
-	conn->recv_pid = thread_create(conn->recv_stack, SBAPP_STACK_SIZE,
-	SBAPP_PRIO, THREAD_CREATE_STACKTEST, _receive_handler_task, conn, "sbapp");
-
-	return conn;
-}
-
-void sbapp_close(sbh_t fd) {
-	cd_t *handle = (cd_t *) fd;
-
-	close(handle->fd);
-	free(handle->recv_stack);
-	free(handle);
-}
-
-
-/**
- * @brief send a packet
- */
-int sbapp_send(sbh_t fd, void* data, size_t len) {
-    int16_t sts;
-    cd_t *cd = (cd_t *) fd;
-
-    if (cd->conn_type == TCP) {
-        sts = sl_Send(cd->fd, data, len, 0);
-    } else {
-        sts = sl_SendTo(cd->fd, data, len, 0, (sockaddr *) &cd->addr,
-                sizeof(sockaddr_in));
-    }
-    return sts;
-}
-
-
-
-int sbapp_sendto(sbh_t fd, void* data, size_t len, sockaddr_in addr) {
-	int16_t sts;
-	cd_t* cd = (cd_t *)fd;
-
-	sts = sl_SendTo(cd->fd, data, len, 0, (sockaddr *) &addr,
-			sizeof(sockaddr_in));
-
-	return sts;
 }
 
 int8_t sbapp_is_connected(uint16_t msec) {
@@ -1016,13 +751,6 @@ static void *_event_loop(void *arg) {
 			}
 			case SBAPI_MSG_TYPE_GET:
 				msg_reply(&msg, &reply);
-				break;
-			case SBAPI_MSG_TYPE_HANDLER_EXIT:
-				free(msg.content.ptr);
-				sbapp_close(msg.content.ptr);
-
-				// TODO: send a message to upper layer
-
 				break;
 			default:
 				DEBUG("sbapp: received unidentified message\n");
