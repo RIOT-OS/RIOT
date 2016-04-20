@@ -36,6 +36,16 @@ extern "C" {
 #define CPU_FLASH_BASE                  FLASH_ADDR
 /** @} */
 
+/**
+ * @brief   Flash page configuration
+ * @{
+ */
+/* a flashpage in RIOT is mapped to a flash row on the SAM0s */
+#define FLASHPAGE_SIZE      (256U)
+/* one SAM0 row contains 4 SAM0 pages -> 4x the amount of RIOT flashpages */
+#define FLASHPAGE_NUMOF     (FLASH_NB_OF_PAGES / 4)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
