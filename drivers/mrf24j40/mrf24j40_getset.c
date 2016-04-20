@@ -98,18 +98,35 @@ void mrf24j40_set_pan(mrf24j40_t *dev, uint16_t pan)
 
 
 
-void mrf24j40_set_csma_backoff_exp(mrf24j40_t *dev, uint8_t min, uint8_t max)
+void mrf24j40_set_csma_retries(mrf24j40_t *dev, uint8_t retries)
 {
-    max = (max > 5) ? 5 : max;
-    min = (min > max) ? max : min;
-    DEBUG("[at86rf2xx] opt: Set min BE=%u, max BE=%u\n", min, max);
-
-	uint8_t tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXMCR);
-    tmp &= ~(MRF24J40_REG_TXMCR_CSMA_BACKOFF_MASK);
-    tmp |= (min << 3) | (max);
+    uint8_t tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXMCR);
+    tmp &= ~(MRF24J40_MAX_CSMA_RETRIES);
+    tmp |= retries;
     mrf24j40_reg_write_short(dev, MRF24J40_REG_TXMCR, tmp);
 }
+uint8_t mrf24j40_get_csma_retries(mrf24j40_t *dev)
+{
+    uint8_t retries = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXMCR);
+    retries &= ~(MRF24J40_MAX_CSMA_RETRIES);
+    
+    return retries;
+}
 
+void mrf24j40_set_csma_backoff_exp(mrf24j40_t *dev, uint8_t exponent)
+{
+    uint8_t tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXMCR);
+    tmp &= ~(MRF24J40_CSMA_BACKOFF_EXPONENT);
+    tmp |= (exponent << 3);
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_TXMCR, value);
+}
+uint8_t mrf24j40_get_csma_backoff_exp(mrf24j40_t *dev)
+{
+    uint8_t exponent = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXMCR);
+    exponent &= ~(MRF24J40_CSMA_BACKOFF_EXPONENT);
+    
+    return (exponent >> 3);
+}
 
 static inline void _set_state(mrf24j40_t *dev, uint8_t state)
 {
@@ -178,7 +195,64 @@ void mrf24j40_set_txpower(mrf24j40_t *dev, int16_t txpower)
 
 void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
 {
-    
+    uint8_t tmp;
+
+    DEBUG("set option %i to %i\n", option, state);
+
+    /* set option field */
+    if (state) {
+        dev->netdev.flags |= option;
+        /* trigger option specific actions */
+        switch (option) {
+            case MRF24J40_OPT_CSMA:
+
+                /* Initialize CSMA seed with hardware address */
+               
+                at86rf2xx_set_csma_max_retries(dev, 5);
+                at86rf2xx_set_csma_backoff_exp(dev, 3);
+                break;
+            case AT86RF2XX_OPT_PROMISCUOUS:
+                mrf24j40_reg_write_short(dev->spi,MRF24J40_REG_RXMCR,1)
+                break;
+            case AT86RF2XX_OPT_ERROR:
+                mrf24j40_reg_write_short(dev->spi,MRF24J40_REG_RXMCR,2)
+                break;
+            case AT86RF2XX_OPT_TELL_RX_START:
+                
+                tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_INTCON);
+                tmp |= MRF24J40_INTCON_MASK__RX_START;
+                mrf24j40_reg_read_write(dev, MRF24J40_REG_INTCON, tmp);
+                break;
+            default:
+                /* do nothing */
+                break;
+        }
+    }
+    else {
+        dev->netdev.flags &= ~(option);
+        /* trigger option specific actions */
+        switch (option) {
+            case MRF24J40_OPT_CSMA:
+                /* setting backoff exponent to 0 means CSMA disabled */
+                mrf24j40_set_csma_backoff_exp(dev, 0);
+                break;
+            case AT86RF2XX_OPT_PROMISCUOUS:
+                mrf24j40_reg_write_short(dev->spi,MRF24J40_REG_RXMCR,0)
+                break;
+            case AT86RF2XX_OPT_ERROR:
+                mrf24j40_reg_write_short(dev->spi,MRF24J40_REG_RXMCR,0)
+                break;
+            case AT86RF2XX_OPT_TELL_RX_START:
+                DEBUG("[at86rf2xx] opt: disabling SFD IRQ\n");
+                tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_INTCON);
+                tmp &= ~MRF24J40_INTCON_MASK__RX_START;
+                mrf24j40_reg_read_write(dev, MRF24J40_REG_INTCON, tmp);
+                break;
+            default:
+                /* do nothing */
+                break;
+        }
+    }
 }
 
 
