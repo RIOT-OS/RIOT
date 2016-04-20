@@ -102,12 +102,15 @@ struct _thread {
 #endif
 };
 
- /**
+/**
  * @def THREAD_STACKSIZE_DEFAULT
  * @brief A reasonable default stack size that will suffice most smaller tasks
  */
 #ifndef THREAD_STACKSIZE_DEFAULT
 #error THREAD_STACKSIZE_DEFAULT must be defined per CPU
+#endif
+#ifdef DOXYGEN
+#define THREAD_STACKSIZE_DEFAULT
 #endif
 
 /**
@@ -117,6 +120,9 @@ struct _thread {
 #ifndef THREAD_STACKSIZE_IDLE
 #error THREAD_STACKSIZE_IDLE must be defined per CPU
 #endif
+#ifdef DOXYGEN
+#define THREAD_STACKSIZE_IDLE
+#endif
 
 /**
  * @def THREAD_EXTRA_STACKSIZE_PRINTF
@@ -125,6 +131,9 @@ struct _thread {
  */
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF
 #error THREAD_EXTRA_STACKSIZE_PRINTF must be defined per CPU
+#endif
+#ifdef DOXYGEN
+#define THREAD_EXTRA_STACKSIZE_PRINTF
 #endif
 
 /**
