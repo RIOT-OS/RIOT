@@ -181,7 +181,7 @@ extern "C" {
  * the corresponding fields are never read by the kernel.
  *
  */
-typedef struct msg {
+typedef struct {
     kernel_pid_t sender_pid;    /**< PID of sending thread. Will be filled in
                                      by msg_send. */
     uint16_t type;              /**< Type field. */
@@ -369,11 +369,8 @@ int msg_avail(void);
  *                  not be NULL.
  * @param[in] num   Number of ``msg_t`` structures in array.
  *                  **MUST BE POWER OF TWO!**
- *
- * @return 0, if successful
- * @return -1, on error
  */
-int msg_init_queue(msg_t *array, int num);
+void msg_init_queue(msg_t *array, int num);
 
 /**
  * @brief   Prints the message queue of the current thread.

@@ -10,6 +10,10 @@
 /**
  * @defgroup    net_gnrc_netdev   Network device driver interface
  * @ingroup     net_gnrc
+ * @deprecated  Use @ref drivers_netdev_netdev2 "netdev2" instead for new
+ *              devices. This module only allows for interaction with
+ *              @ref net_gnrc "GNRC", while @ref drivers_netdev_netdev2
+ *              "netdev2" is independent from the stack.
  * @brief       Common network device interface
  * @{
  *

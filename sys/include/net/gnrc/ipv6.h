@@ -14,10 +14,7 @@
  * The IPv6 control thread understands messages of type
  *
  *  * @ref GNRC_NETAPI_MSG_TYPE_RCV, and
- *  * @ref GNRC_NETAPI_MSG_TYPE_SND.
- *
- * If the message is of type @ref GNRC_NETAPI_MSG_TYPE_RCV the provided @ref
- * gnrc_pktsnip_t must contain a snip of type @ref GNRC_NETTYPE_NETIF.
+ *  * @ref GNRC_NETAPI_MSG_TYPE_SND,
  *
  * @{
  *

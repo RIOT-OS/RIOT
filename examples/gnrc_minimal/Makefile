@@ -21,15 +21,7 @@ USEMODULE += gnrc_icmpv6_echo
 # Use minimal standard PRNG
 USEMODULE += prng_minstd
 
-CFLAGS += -DGNRC_IPV6_NETIF_ADDR_NUMOF=4
-# Reduce sizes for GNRC's packet buffer and neighbor cache
-# (for native we need a bigger buffer, because the tap driver temporarily
-# allocates ~1500 bytes)
-ifneq (,$(filter native,$(BOARD)))
-    CFLAGS += -DGNRC_PKTBUF_SIZE=2048 -DGNRC_IPV6_NC_SIZE=1
-else
-    CFLAGS += -DGNRC_PKTBUF_SIZE=512 -DGNRC_IPV6_NC_SIZE=0
-endif
+CFLAGS += -DGNRC_PKTBUF_SIZE=512 -DGNRC_IPV6_NETIF_ADDR_NUMOF=4 -DGNRC_IPV6_NC_SIZE=1
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

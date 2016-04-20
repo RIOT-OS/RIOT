@@ -213,6 +213,11 @@ void auto_init(void)
     gnrc_ipv6_netif_init_by_dev();
 #endif
 
+#ifdef MODULE_GNRC_UHCPC
+    extern void auto_init_gnrc_uhcpc(void);
+    auto_init_gnrc_uhcpc();
+#endif
+
 /* initialize sensors and actuators */
 #ifdef MODULE_AUTO_INIT_SAUL
     DEBUG("auto_init SAUL\n");
@@ -220,6 +225,10 @@ void auto_init(void)
 #ifdef MODULE_SAUL_GPIO
     extern void auto_init_gpio(void);
     auto_init_gpio();
+#endif
+#ifdef MODULE_SAUL_ADC
+    extern void auto_init_adc(void);
+    auto_init_adc();
 #endif
 #ifdef MODULE_LSM303DLHC
     extern void auto_init_lsm303dlhc(void);

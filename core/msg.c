@@ -25,7 +25,7 @@
 #include <assert.h>
 #include "sched.h"
 #include "msg.h"
-#include "priority_queue.h"
+#include "list.h"
 #include "thread.h"
 #include "irq.h"
 #include "cib.h"
@@ -93,10 +93,12 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
         return -1;
     }
 
+    thread_t *me = (thread_t *) sched_active_thread;
+
     DEBUG("msg_send() %s:%i: Sending from %" PRIkernel_pid " to %" PRIkernel_pid
           ". block=%i src->state=%i target->state=%i\n", RIOT_FILE_RELATIVE,
           __LINE__, sched_active_pid, target_pid,
-          block, sched_active_thread->status, target->status);
+          block, me->status, target->status);
 
     if (target->status != STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send() %s:%i: Target %" PRIkernel_pid " is not RECEIVE_BLOCKED.\n",
@@ -107,7 +109,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
                   " has a msg_queue. Queueing message.\n", RIOT_FILE_RELATIVE,
                   __LINE__, target_pid);
             irq_restore(state);
-            if (sched_active_thread->status == STATUS_REPLY_BLOCKED) {
+            if (me->status == STATUS_REPLY_BLOCKED) {
                 thread_yield_higher();
             }
             return 1;
@@ -115,45 +117,39 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
 
         if (!block) {
             DEBUG("msg_send: %" PRIkernel_pid ": Receiver not waiting, block=%u\n",
-                  sched_active_thread->pid, block);
+                  me->pid, block);
             irq_restore(state);
             return 0;
         }
 
-        DEBUG("msg_send: %" PRIkernel_pid ": send_blocked.\n",
-              sched_active_thread->pid);
-        priority_queue_node_t n;
-        n.priority = sched_active_thread->priority;
-        n.data = (unsigned int) sched_active_thread;
-        n.next = NULL;
-        DEBUG("msg_send: %" PRIkernel_pid ": Adding node to msg_waiters:\n",
-              sched_active_thread->pid);
+        DEBUG("msg_send: %" PRIkernel_pid ": going send blocked.\n",
+              me->pid);
 
-        priority_queue_add(&(target->msg_waiters), &n);
-
-        sched_active_thread->wait_data = (void*) m;
+        me->wait_data = (void*) m;
 
         int newstatus;
 
-        if (sched_active_thread->status == STATUS_REPLY_BLOCKED) {
+        if (me->status == STATUS_REPLY_BLOCKED) {
             newstatus = STATUS_REPLY_BLOCKED;
         }
         else {
             newstatus = STATUS_SEND_BLOCKED;
         }
 
-        sched_set_status((thread_t*) sched_active_thread, newstatus);
+        sched_set_status((thread_t*) me, newstatus);
 
-        DEBUG("msg_send: %" PRIkernel_pid ": Back from send block.\n",
-              sched_active_thread->pid);
+        thread_add_to_list(&(target->msg_waiters), me);
 
         irq_restore(state);
         thread_yield_higher();
+
+        DEBUG("msg_send: %" PRIkernel_pid ": Back from send block.\n",
+              me->pid);
     }
     else {
         DEBUG("msg_send: %" PRIkernel_pid ": Direct msg copy from %"
               PRIkernel_pid " to %" PRIkernel_pid ".\n",
-              sched_active_thread->pid, thread_getpid(), target_pid);
+              me->pid, thread_getpid(), target_pid);
         /* copy msg to target */
         msg_t *target_message = (msg_t*) target->wait_data;
         *target_message = *m;
@@ -293,7 +289,7 @@ static int _msg_receive(msg_t *m, int block)
     }
 
     /* no message, fail */
-    if ((!block) && ((!me->msg_waiters.first) && (queue_index == -1))) {
+    if ((!block) && ((!me->msg_waiters.next) && (queue_index == -1))) {
         irq_restore(state);
         return -1;
     }
@@ -307,9 +303,9 @@ static int _msg_receive(msg_t *m, int block)
         me->wait_data = (void *) m;
     }
 
-    priority_queue_node_t *node = priority_queue_remove_head(&(me->msg_waiters));
+    list_node_t *next = list_remove_head(&me->msg_waiters);
 
-    if (node == NULL) {
+    if (next == NULL) {
         DEBUG("_msg_receive: %" PRIkernel_pid ": _msg_receive(): No thread in waiting list.\n",
               sched_active_thread->pid);
 
@@ -332,7 +328,8 @@ static int _msg_receive(msg_t *m, int block)
     else {
         DEBUG("_msg_receive: %" PRIkernel_pid ": _msg_receive(): Waking up waiting thread.\n",
               sched_active_thread->pid);
-        thread_t *sender = (thread_t*) node->data;
+
+        thread_t *sender = container_of((clist_node_t*)next, thread_t, rq_entry);
 
         if (queue_index >= 0) {
             /* We've already got a message from the queue. As there is a
@@ -379,17 +376,11 @@ int msg_avail(void)
     return queue_index;
 }
 
-int msg_init_queue(msg_t *array, int num)
+void msg_init_queue(msg_t *array, int num)
 {
-    /* check if num is a power of two by comparing to its complement */
-    if (num && (num & (num - 1)) == 0) {
-        thread_t *me = (thread_t*) sched_active_thread;
-        me->msg_array = array;
-        cib_init(&(me->msg_queue), num);
-        return 0;
-    }
-
-    return -1;
+    thread_t *me = (thread_t*) sched_active_thread;
+    me->msg_array = array;
+    cib_init(&(me->msg_queue), num);
 }
 
 void msg_queue_print(void)

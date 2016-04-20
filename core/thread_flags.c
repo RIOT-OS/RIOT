@@ -19,7 +19,6 @@
  */
 
 
-#include "bitarithm.h"
 #include "thread_flags.h"
 #include "irq.h"
 #include "thread.h"

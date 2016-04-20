@@ -58,7 +58,7 @@ int saul_reg_rm(saul_reg_t *dev)
     saul_reg_t *tmp = saul_reg;
 
     if (saul_reg == NULL || dev == NULL) {
-        return -EINVAL;
+        return -ENODEV;
     }
     if (saul_reg == dev) {
         saul_reg = dev->next;

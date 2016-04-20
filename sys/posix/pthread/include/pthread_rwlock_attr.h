@@ -27,7 +27,7 @@ extern "C" {
  * @brief     Attributes for a new reader/writer lock.
  * @details   The options set in this struct will be ignored by pthread_rwlock_init().
  */
-typedef struct pthread_rwlockattr
+typedef struct
 {
     /**
      * @brief     Whether to share lock with child processes.

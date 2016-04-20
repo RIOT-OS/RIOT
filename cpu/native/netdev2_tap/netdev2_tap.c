@@ -107,7 +107,7 @@ static inline void _isr(netdev2_t *netdev)
 #endif
 }
 
-int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
+static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
 {
     if (dev != (netdev2_t *)&netdev2_tap) {
         return -ENODEV;
@@ -137,7 +137,7 @@ int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
     return res;
 }
 
-int _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
+static int _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
 {
     (void)value_len;
 
@@ -296,7 +296,9 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int n)
     }
     netdev->stats.tx_bytes += bytes;
 #endif
-    netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE, NULL);
+    if (netdev->event_callback) {
+        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE, NULL);
+    }
     return res;
 }
 

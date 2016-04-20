@@ -36,6 +36,20 @@ void tests_checksum(void);
  */
 Test *tests_checksum_crc16_ccitt_tests(void);
 
+/**
+ * @brief   Generates tests for checksum/fletcher16.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_checksum_fletcher16_tests(void);
+
+/**
+ * @brief   Generates tests for checksum/fletcher32.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_checksum_fletcher32_tests(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -186,7 +186,7 @@ int _open_r(struct _reent *r, const char *name, int flags, int mode)
  *
  * @return      TODO
  */
-int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
+_ssize_t _read_r(struct _reent *r, int fd, void *buffer, size_t count)
 {
     (void)r;
     (void)fd;
@@ -208,7 +208,7 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
  *
  * @return      TODO
  */
-int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
+_ssize_t _write_r(struct _reent *r, int fd, const void *data, size_t count)
 {
     (void) r;
     (void) fd;
