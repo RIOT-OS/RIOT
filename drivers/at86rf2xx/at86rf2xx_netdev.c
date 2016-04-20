@@ -383,7 +383,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
     uint8_t old_state = at86rf2xx_get_status(dev);
-    int res = 0;
+    int res = -ENOTSUP;
 
     if (dev == NULL) {
         return -ENODEV;
@@ -433,7 +433,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
                 uint8_t chan = ((uint8_t *)val)[0];
                 if (chan < AT86RF2XX_MIN_CHANNEL ||
                     chan > AT86RF2XX_MAX_CHANNEL) {
-                    res = -ENOTSUP;
+                    res = -EINVAL;
                     break;
                 }
                 at86rf2xx_set_chan(dev, chan);
@@ -449,7 +449,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
                 uint8_t page = ((uint8_t *)val)[0];
 #ifdef MODULE_AT86RF212B
                 if ((page != 0) && (page != 2)) {
-                    res = -ENOTSUP;
+                    res = -EINVAL;
                 }
                 else {
                     at86rf2xx_set_page(dev, page);
@@ -458,7 +458,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
 #else
                 /* rf23x only supports page 0, no need to configure anything in the driver. */
                 if (page != 0) {
-                    res = -ENOTSUP;
+                    res = -EINVAL;
                 }
                 else {
                     res = sizeof(uint16_t);
@@ -549,11 +549,8 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
                 (*((uint8_t *)val) > 5)) {
                 res = -EOVERFLOW;
             }
-            else if (!(dev->netdev.flags & AT86RF2XX_OPT_CSMA)) {
-                /* If CSMA is disabled, don't allow setting retries */
-                res = -ENOTSUP;
-            }
-            else {
+            else if (dev->netdev.flags & AT86RF2XX_OPT_CSMA) {
+                /* only set if CSMA is enabled */
                 at86rf2xx_set_csma_max_retries(dev, *((uint8_t *)val));
                 res = sizeof(uint8_t);
             }
@@ -570,7 +567,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             break;
 
         default:
-            res = -ENOTSUP;
+            break;
     }
 
     /* go back to sleep if were sleeping and state hasn't been changed */
