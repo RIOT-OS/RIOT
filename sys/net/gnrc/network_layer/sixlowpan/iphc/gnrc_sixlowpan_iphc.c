@@ -566,7 +566,7 @@ inline static size_t iphc_nhc_udp_encode(gnrc_pktsnip_t *udp, ipv6_hdr_t *ipv6_h
     if (udp->type == GNRC_NETTYPE_IPV6) {
         /* forwarded ipv6 packet */
         size_t diff = sizeof(udp_hdr_t) - nhc_len;
-        for (int i = nhc_len; i < (udp->size - diff); i++) {
+        for (size_t i = nhc_len; i < (udp->size - diff); i++) {
             udp_data[i] = udp_data[i + diff];
         }
         /* NOTE: gnrc_pktbuf_realloc_data overflow if (udp->size - diff) < 4 */
