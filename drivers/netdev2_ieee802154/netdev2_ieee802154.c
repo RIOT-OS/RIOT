@@ -154,7 +154,7 @@ int netdev2_ieee802154_get(netdev2_ieee802154_t *dev, netopt_t opt, void *value,
                 res = -EOVERFLOW;
                 break;
             }
-            *((netstats_t**)value) = &dev->netdev.stats;
+            *((netstats_t **)value) = &dev->netdev.stats;
             res = sizeof(uintptr_t);
             break;
 #endif
@@ -170,6 +170,21 @@ int netdev2_ieee802154_set(netdev2_ieee802154_t *dev, netopt_t opt, void *value,
     int res = -ENOTSUP;
 
     switch (opt) {
+        case NETOPT_CHANNEL:
+        {
+            if (len > sizeof(uint16_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
+            uint16_t chan = *((uint16_t *)value);
+            /* real validity needs to be checked by device, since sub-GHz and
+             * 2.4 GHz band radios have different legal values. Here we only
+             * check that it fits in an 8-bit variabl*/
+            assert(chan <= UINT8_MAX);
+            dev->chan = chan;
+            res = sizeof(uint16_t);
+            break;
+        }
         case NETOPT_ADDRESS:
             if (len > sizeof(dev->short_addr)) {
                 res = -EOVERFLOW;
@@ -208,14 +223,13 @@ int netdev2_ieee802154_set(netdev2_ieee802154_t *dev, netopt_t opt, void *value,
             res = sizeof(uint16_t);
             break;
         case NETOPT_NID:
-            if (len > sizeof(dev->pan)) {
+            if (len > sizeof(uint16_t)) {
                 res = -EOVERFLOW;
                 break;
             }
             dev->pan = *((uint16_t *)value);
             res = sizeof(dev->pan);
             break;
-        /* channel can be very device specific */
         case NETOPT_AUTOACK:
             if ((*(bool *)value)) {
                 dev->flags |= NETDEV2_IEEE802154_ACK_REQ;
