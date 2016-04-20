@@ -15,6 +15,7 @@
  */
 
 #include <string.h>
+#include <legacymsp430.h>
 #include "irq.h"
 #include "cpu.h"
 #include "cc430-rtc.h"
@@ -181,7 +182,7 @@ void rtc_clear_alarm(void)
     RTCCTL0 &= ~RTCAIE;
 }
 
-ISRV(RTC_VECTOR, rtc_isr)
+interrupt(RTC_VECTOR) __attribute__((naked)) rtc_isr(void)
 {
     __enter_isr();
 

@@ -50,21 +50,7 @@ volatile thread_t *sched_active_thread;
 
 volatile kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
 
-#ifdef THREADS_INSTRUMENTED
-/* Needed by OpenOCD to read sched_threads */
-__attribute__((used)) __attribute__((section (".openocd")))
-uint8_t max_threads = sizeof(sched_threads) / sizeof(tcb_t*);
-
-#ifdef DEVELHELP
-/* OpenOCD can't determine struct offsets and additionally this member is only
- * available if compiled with DEVELHELP */
-__attribute__((used)) __attribute__((section (".openocd")))
-uint8_t _tcb_name_offset = offsetof(tcb_t, name);
-#endif
-#endif
-
 clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
-
 static uint32_t runqueue_bitcache = 0;
 
 #ifdef MODULE_SCHEDSTATISTICS

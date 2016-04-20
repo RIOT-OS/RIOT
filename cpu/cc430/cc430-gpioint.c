@@ -15,6 +15,7 @@
  */
 
 #include <stdlib.h>
+#include <legacymsp430.h>
 #include "gpioint.h"
 #include "bitarithm.h"
 #include "cpu.h"
@@ -142,7 +143,7 @@ bool gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
     return 1;
 }
 
-ISRV(PORT1_VECTOR, port1_isr)
+interrupt(PORT1_VECTOR) __attribute__((naked)) port1_isr(void)
 {
     uint8_t int_enable, ifg_num, p1ifg;
     uint16_t p1iv;
@@ -187,7 +188,7 @@ ISRV(PORT1_VECTOR, port1_isr)
     __exit_isr();
 }
 
-ISRV(PORT2_VECTOR, port2_isr)
+interrupt(PORT2_VECTOR) __attribute__((naked)) port2_isr(void)
 {
     uint8_t int_enable, ifg_num, p2ifg;
     uint16_t p2iv;
