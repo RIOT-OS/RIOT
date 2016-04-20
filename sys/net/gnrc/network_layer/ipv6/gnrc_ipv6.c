@@ -769,8 +769,9 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
     netif = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
 
-    assert(netif);
-    iface = ((gnrc_netif_hdr_t *)netif->data)->if_pid;
+    if (netif != NULL) {
+        iface = ((gnrc_netif_hdr_t *)netif->data)->if_pid;
+    }
 
     first_ext = pkt;
 
