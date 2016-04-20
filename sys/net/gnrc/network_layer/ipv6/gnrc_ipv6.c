@@ -255,11 +255,13 @@ static void *_event_loop(void *args)
                 ((gnrc_ipv6_nc_t *)msg.content.ptr)->flags &= ~GNRC_IPV6_NC_IS_ROUTER;
                 break;
 
-            case GNRC_NDP_MSG_ADDR_TIMEOUT:
-                DEBUG("ipv6: Router advertisement timer event received\n");
-                gnrc_ipv6_netif_remove_addr(KERNEL_PID_UNDEF,
-                                            (ipv6_addr_t *)msg.content.ptr);
-                break;
+            /* XXX reactivate when https://github.com/RIOT-OS/RIOT/issues/5122 is
+             * solved properly */
+            /* case GNRC_NDP_MSG_ADDR_TIMEOUT: */
+            /*     DEBUG("ipv6: Router advertisement timer event received\n"); */
+            /*     gnrc_ipv6_netif_remove_addr(KERNEL_PID_UNDEF, */
+            /*                                 (ipv6_addr_t *)msg.content.ptr); */
+            /*     break; */
 
             case GNRC_NDP_MSG_NBR_SOL_RETRANS:
                 DEBUG("ipv6: Neigbor solicitation retransmission timer event received\n");
@@ -310,10 +312,12 @@ static void *_event_loop(void *args)
                 gnrc_sixlowpan_nd_router_abr_remove(
                         (gnrc_sixlowpan_nd_router_abr_t *)msg.content.ptr);
                 break;
-            case GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT:
-                DEBUG("ipv6: address registration timeout received\n");
-                gnrc_sixlowpan_nd_router_gc_nc((gnrc_ipv6_nc_t *)msg.content.ptr);
-                break;
+            /* XXX reactivate when https://github.com/RIOT-OS/RIOT/issues/5122 is
+             * solved properly */
+            /* case GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT: */
+            /*     DEBUG("ipv6: address registration timeout received\n"); */
+            /*     gnrc_sixlowpan_nd_router_gc_nc((gnrc_ipv6_nc_t *)msg.content.ptr); */
+            /*     break; */
             case GNRC_NDP_MSG_RTR_ADV_SIXLOWPAN_DELAY:
                 DEBUG("ipv6: Delayed router advertisement event received\n");
                 gnrc_ipv6_nc_t *nc_entry = (gnrc_ipv6_nc_t *)msg.content.ptr;
