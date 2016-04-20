@@ -31,8 +31,22 @@ extern "C" {
  * @brief   ARM Cortex-M specific CPU configuration
  * @{
  */
-#define CPU_DEFAULT_IRQ_PRIO            (1U)
-#define CPU_IRQ_NUMOF                   (26U)
+#define CPU_DEFAULT_IRQ_PRIO    (1U)
+#define CPU_IRQ_NUMOF           (26U)
+#define CPU_FLASH_BASE          (0x00000000)
+/** @} */
+
+/**
+ * @brief   Flash page configuration
+ * @{
+ */
+#define FLASHPAGE_SIZE          (1024U)
+
+#if defined(CPU_MODEL_NRF51X22XXAA)
+#define FLASHPAGE_NUMOF         (256U)
+#elif defined(CPU_MODEL_NRF51X22XXAB)
+#define FLASHPAGE_NUMOF         (128U)
+#endif
 /** @} */
 
 #ifdef __cplusplus

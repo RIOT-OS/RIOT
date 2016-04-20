@@ -38,6 +38,17 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Flash page configuration
+ * @{
+ */
+#define FLASHPAGE_SIZE                  (4096U)
+
+#if defined(CPU_MODEL_NRF52XXAA)
+#define FLASHPAGE_NUMOF                 (128U)
+#endif
+/** @} */
+
+/**
  * @brief   SoftDevice settings
  * @{
  */
