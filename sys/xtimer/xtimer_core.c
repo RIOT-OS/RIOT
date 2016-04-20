@@ -116,7 +116,7 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
 
 void xtimer_set(xtimer_t *timer, uint32_t offset)
 {
-    //DEBUG("timer_set(): offset=%" PRIu32 " now=%" PRIu32 " (%" PRIu32 ")\n", offset, xtimer_now(), _lltimer_now());
+    DEBUG("timer_set(): offset=%" PRIu32 " now=%" PRIu32 " (%" PRIu32 ")\n", offset, xtimer_now(), _lltimer_now());
     if (!timer->callback) {
         DEBUG("timer_set(): timer has no callback.\n");
         return;
@@ -180,12 +180,8 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     if (_is_set(timer)) {
         _remove(timer);
     }
-#ifdef XTIMER_SHIFT
-    timer->target = (target - XTIMER_OVERHEAD)%(0xffffffff/XTIMER_USEC_TO_TICKS_FACTOR);
-#else
-    timer->target = target - XTIMER_OVERHEAD;
-    //timer->target = target;
-#endif
+
+    timer->target = target;
     timer->long_target = _long_cnt;
     if (target < now) {
         timer->long_target++;
@@ -216,8 +212,8 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     return res;
 }
 
-static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer) {
-
+static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer)
+{
     while (*list_head && (*list_head)->target <= timer->target) {
         list_head = &((*list_head)->next);
     }
