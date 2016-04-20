@@ -104,20 +104,6 @@ typedef enum {
      * @}
      */
 
-    /**
-     * @{
-     * @name API for cc3200 simplelink network driver
-     */
-
-#ifdef MODULE_SBAPP
-    GNRC_NETTYPE_SBAPP,
-#endif
-
-    /**
-     * @}
-     */
-
-
     GNRC_NETTYPE_NUMOF,         /**< maximum number of available protocols */
 } gnrc_nettype_t;
 
