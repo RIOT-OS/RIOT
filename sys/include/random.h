@@ -10,11 +10,17 @@
 /**
  * @defgroup    sys_random Random
  * @ingroup     sys
- * @brief       Random number generator
+ * @brief       Pseudo Random Number Generator (PRNG)
  * @{
  *
  * @file
- * @brief       Mersenne Twister - a very fast random number generator
+ * @brief       Common interface to the software PRNG
+ *
+ * Various implementations of a PRNG are available:
+ *  - Tiny Mersenne Twister (default)
+ *  - Mersenne Twister
+ *  - Simple Park-Miller PRNG
+ *  - Musl C PRNG
  */
 
 #ifndef RANDOM_H
@@ -31,7 +37,7 @@ extern "C" {
 #endif
 
 /**
- * @brief initializes mt[N] with a seed
+ * @brief initializes PRNG with a seed
  *
  * @param s seed for the PRNG
  */
