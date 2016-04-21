@@ -24,14 +24,18 @@
 
 /* TODO derive an interface when there is enough to derive from */
 void rfc_prepare(void);
-void rfc_setup_ble(void);
+bool rfc_setup_ble(void);
 void rfc_beacon(void);
 
 int main(void)
 {
     puts("Hello World!");
     rfc_prepare();
-    rfc_setup_ble();
+
+    if (!rfc_setup_ble()) {
+        fprintf(stderr, "rfc_setup_ble failed\n");
+        return 1;
+    }
 
     uint32_t cnt;
     while (1) {
