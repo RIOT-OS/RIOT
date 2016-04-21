@@ -42,20 +42,6 @@ void isr_rfc_cpe1(void)
     RFC_DBELL->RFCPEIFG = ~flags;
 }
 
-/* TODO that's shit design */
-static void run_command_ptr(radio_op_command_t *rop)
-{
-    printf("RFC_DBELL->CMDSTA before %lx\n", RFC_DBELL->CMDSTA);
-    RFC_DBELL->CMDR = (uintptr_t) rop;
-    printf("CMDR %lx\n", RFC_DBELL->CMDR);
-    while (!(RFC_DBELL->CMDSTA & 0xFF)) ;
-    printf("RFC_DBELL->CMDSTA %lx\n", RFC_DBELL->CMDSTA);
-    do {
-        //printf("rop->op.status %x\n", rop->op.status);
-    } while (rop->status < R_OP_STATUS_SKIPPED);
-    printf("rop->op.status %x\n", rop->status);
-}
-
 void rfc_irq_enable(void)
 {
     NVIC_EnableIRQ(RF_CMD_ACK_IRQN);
@@ -72,13 +58,40 @@ void rfc_irq_disable(void)
     NVIC_DisableIRQ(RF_HW_IRQN);
 }
 
+uint32_t rfc_send_cmd(void *ropCmd)
+{
+    RFC_DBELL->CMDR = (uint32_t) ropCmd;
+
+    /* wait for cmd ack (rop cmd was submitted successfully) */
+    while (RFC_DBELL->RFACKIFG << 31);
+    while (!RFC_DBELL->CMDSTA);
+
+    return RFC_DBELL->CMDSTA;
+}
+
+uint16_t rfc_wait_cmd_done(void *ropCmd)
+{
+    radio_op_command_t *command = (radio_op_command_t *) ropCmd;
+    uint32_t timeout_cnt = 0;
+    /* wait for cmd execution. condition on rop status doesn't work by itself (too fast?). */
+    do {
+        if (++timeout_cnt > 500000)
+        {
+            command->status = R_OP_STATUS_DONE_TIMEOUT;
+            break;
+        }
+    } while (command->status < R_OP_STATUS_SKIPPED);
+
+    return command->status;
+}
+
 void rfc_setup_ble(void)
 {
     uint8_t buf[sizeof(radio_setup_t) + 3];
     radio_setup_t *rs = (radio_setup_t *)((uintptr_t)(buf + 3) & (0xFFFFFFFC));
     memset(rs, 0, sizeof(rs));
 
-    run_command_ptr(&rs->op);
+    rfc_send_cmd(&rs->op);
 }
 
 void rfc_beacon(void)
@@ -98,7 +111,7 @@ void rfc_beacon(void)
         printf("%.2x", ((uint8_t *) rop)[i]);
     printf("\n");
 
-    run_command_ptr(&rop->op);
+    rfc_send_cmd(&rop->op);
 }
 
 void rfc_prepare(void)
