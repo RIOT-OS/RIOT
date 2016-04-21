@@ -9,7 +9,6 @@
  *
  */
 #include "sbapp.h"
-#include "sbapp_priv.h"
 
 #include "xtimer.h"
 #include "net/gnrc.h"
