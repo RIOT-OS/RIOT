@@ -1037,7 +1037,8 @@ typedef union {
 
 #if defined(sl_HttpServerCallback) || defined(EXT_LIB_REGISTERED_HTTP_SERVER_EVENTS)
 const _SlCmdCtrl_t _SlNetAppSendTokenValueCmdCtrl = {
-SL_OPCODE_NETAPP_HTTPSENDTOKENVALUE, sizeof(sl_NetAppHttpServerSendToken_t),
+        SL_OPCODE_NETAPP_HTTPSENDTOKENVALUE,
+        sizeof(sl_NetAppHttpServerSendToken_t),
         sizeof(_BasicResponse_t) };
 
 _u16 _sl_NetAppSendTokenValue(slHttpServerData_t * Token_value) {

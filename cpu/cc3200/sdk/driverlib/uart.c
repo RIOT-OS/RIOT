@@ -58,7 +58,12 @@
 //
 //*****************************************************************************
 static const unsigned long g_ppulUARTIntMap[][2] = {
-        { UARTA0_BASE, INT_UARTA0 }, { UARTA1_BASE, INT_UARTA1 }, };
+        {
+                UARTA0_BASE,
+                INT_UARTA0 },
+        {
+                UARTA1_BASE,
+                INT_UARTA1 }, };
 
 //*****************************************************************************
 //

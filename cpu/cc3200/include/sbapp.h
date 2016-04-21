@@ -31,15 +31,12 @@
 extern "C" {
 #endif
 
-
 enum conn_type_t {
-	TCP = 1,
-	UDP
+    TCP = 1, UDP
 };
 
 typedef enum {
-    WLAN_SETTING,
-    SBAPI_STATUS,
+    WLAN_SETTING, SBAPI_STATUS,
 } sbapp_opt_t;
 
 /**
@@ -62,7 +59,6 @@ typedef enum {
 #ifndef SBAPP_STACK_SIZE
 #define SBAPP_STACK_SIZE     (THREAD_STACKSIZE_DEFAULT)
 #endif
-
 
 /**
  * @brief @ref core_msg type for passing a @ref net_gnrc_pkt from sbapp up the app
@@ -94,21 +90,18 @@ typedef enum {
  *          and getting (@ref SBAPI_MSG_TYPE_GET) options
  */
 typedef struct {
-    sbapp_opt_t opt;               /**< the option to get/set */
-    uint16_t context;           /**< (optional) context for that option */
-    void *data;                 /**< data to set or buffer to read into */
-    uint16_t data_len;          /**< size of the data / the buffer */
+    sbapp_opt_t opt; /**< the option to get/set */
+    uint16_t context; /**< (optional) context for that option */
+    void *data; /**< data to set or buffer to read into */
+    uint16_t data_len; /**< size of the data / the buffer */
 } sbapi_opt_t;
-
 
 /**
  * @brief the connection handler exited because of an error
  */
 #define SBAPI_MSG_TYPE_HANDLER_EXIT    (0x307)
 
-
 #define SBAPI_SEND_FAILED 1
-
 
 /**
  * @brief security type (OPEN, WEP or WPA)
@@ -140,20 +133,17 @@ typedef struct {
 #define SBAPI_SSID      (0x01)
 #define SBAPI_PWD       (0x02)
 
-
 /**
  * @brief error types
  */
 #define SBAPI_RIOT_KERNEL_PANIC (-1)
 #define SBAPI_CONNECTION_ERR    (-2)
 
-
 typedef void* sbh_t;
 
 /**
  * south bound app API methods
  */
-
 
 /**
  *  @brief initialize an ip connection with a 802.11 AP
@@ -163,12 +153,10 @@ typedef void* sbh_t;
  */
 int sbapp_init(uint32_t options);
 
-
 /**
  * @brief close the connection with the network processor
  */
 int sbapp_stop(void);
-
 
 /**
  * @brief
@@ -180,23 +168,18 @@ int sbapp_configure(int32_t options);
  */
 void sbapp_set_security(const char* ssid, const char* password);
 
-
 /**
  * @brief add a wifi profile
  */
 int16_t sbapp_add_profile(const char* ssid, const char* pwd);
 
-
 int8_t sbapp_is_connected(uint16_t msec);
 
-
 uint32_t net_atoi(const char* name);
-
 
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /* SYS_INCLUDE_NET_SBAPP_H_ */
 /** @} */

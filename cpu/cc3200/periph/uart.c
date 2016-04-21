@@ -160,8 +160,9 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate) {
         //
         MAP_PinTypeUART(PIN_57, PIN_MODE_3);
 
-        MAP_UARTConfigSetExpClk(UARTA0_BASE, MAP_PRCMPeripheralClockGet(PRCM_UARTA0),
-                baudrate, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+        MAP_UARTConfigSetExpClk(UARTA0_BASE,
+        MAP_PRCMPeripheralClockGet(PRCM_UARTA0), baudrate,
+                (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                 UART_CONFIG_PAR_NONE));
 
         reset(UARTA0_BASE);
@@ -228,8 +229,9 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len) {
         return;
     }
 
-    for(size_t i=0; i<len; i++) {
-    	MAP_UARTCharPut(u, data[i]);;
+    for (size_t i = 0; i < len; i++) {
+        MAP_UARTCharPut(u, data[i]);
+        ;
     }
 
 }

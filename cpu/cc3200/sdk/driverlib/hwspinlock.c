@@ -56,7 +56,7 @@
 // Global semaphore register list
 //*****************************************************************************
 static const uint32_t HwSpinLock_RegLst[] = {
-COMMON_REG_BASE + COMMON_REG_O_SPI_Properties_Register };
+        COMMON_REG_BASE + COMMON_REG_O_SPI_Properties_Register };
 
 //*****************************************************************************
 //

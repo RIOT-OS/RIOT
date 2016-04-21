@@ -55,7 +55,6 @@ extern "C" {
  */
 #define PUSH2 11
 
-
 /*
  * debug pin
  *
@@ -75,7 +74,6 @@ extern "C" {
  * xtimer fixed channel value
  */
 #define XTIMER_CHAN (0)
-
 
 #if TIMER_0_MAX_VALUE == 0xffffff
 #define XTIMER_MASK 0xff000000

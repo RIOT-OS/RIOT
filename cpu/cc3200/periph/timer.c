@@ -42,10 +42,9 @@ typedef struct {
 
 timer_conf_t config[MAX_TIMERS];
 
-
 void irq_timer0_handler(void) {
     timer_clear(TIMER_0, 0);
-    config[TIMER_0].cb(0,0); // timer has one hw channel
+    config[TIMER_0].cb(0, 0); // timer has one hw channel
     if (sched_context_switch_request) {
         thread_yield();
     }
@@ -53,7 +52,7 @@ void irq_timer0_handler(void) {
 
 void irq_timer1_handler(void) {
     timer_clear(TIMER_1, 0);
-    config[TIMER_1].cb(0,0); // timer has one hw channel
+    config[TIMER_1].cb(0, 0); // timer has one hw channel
     if (sched_context_switch_request) {
         thread_yield();
     }
@@ -61,7 +60,7 @@ void irq_timer1_handler(void) {
 
 void irq_timer2_handler(void) {
     timer_clear(TIMER_2, 0);
-    config[TIMER_2].cb(0,0); // timer has one hw channel
+    config[TIMER_2].cb(0, 0); // timer has one hw channel
     if (sched_context_switch_request) {
         thread_yield();
     }
@@ -69,12 +68,11 @@ void irq_timer2_handler(void) {
 
 void irq_timer3_handler(void) {
     timer_clear(TIMER_3, 0);
-    config[TIMER_3].cb(0,0); // timer has one hw channel
+    config[TIMER_3].cb(0, 0); // timer has one hw channel
     if (sched_context_switch_request) {
         thread_yield();
     }
 }
-
 
 int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg) {
 
@@ -175,28 +173,28 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg) {
 
 int set_absolute(tim_t dev, int channel, unsigned long long value) {
     switch (dev) {
-        case TIMER_0:
-            MAP_TimerMatchSet(TIMERA0_BASE, TIMER_A, value);
-            // enable the match timer
-            HWREG(TIMERA0_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
-            break;
-        case TIMER_1:
-            MAP_TimerMatchSet(TIMERA1_BASE, TIMER_A, value);
-            // enable the match timer
-            HWREG(TIMERA1_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
-            break;
-        case TIMER_2:
-            MAP_TimerMatchSet(TIMERA2_BASE, TIMER_A, value);
-            // enable the match timer
-            HWREG(TIMERA2_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
-            break;
-        case TIMER_3:
-            MAP_TimerMatchSet(TIMERA3_BASE, TIMER_A, value);
-            // enable the match timer
-            HWREG(TIMERA3_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
-            break;
-        default:
-            break;
+    case TIMER_0:
+        MAP_TimerMatchSet(TIMERA0_BASE, TIMER_A, value);
+        // enable the match timer
+        HWREG(TIMERA0_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
+        break;
+    case TIMER_1:
+        MAP_TimerMatchSet(TIMERA1_BASE, TIMER_A, value);
+        // enable the match timer
+        HWREG(TIMERA1_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
+        break;
+    case TIMER_2:
+        MAP_TimerMatchSet(TIMERA2_BASE, TIMER_A, value);
+        // enable the match timer
+        HWREG(TIMERA2_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
+        break;
+    case TIMER_3:
+        MAP_TimerMatchSet(TIMERA3_BASE, TIMER_A, value);
+        // enable the match timer
+        HWREG(TIMERA3_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH;
+        break;
+    default:
+        break;
     }
 
     return 0;
@@ -206,20 +204,20 @@ int set_absolute(tim_t dev, int channel, unsigned long long value) {
 int timer_set(tim_t dev, int channel, unsigned int timeout) {
 
     switch (dev) {
-        case TIMER_0:
-            return set_absolute(dev, channel,
-                                HWREG(TIMERA0_BASE + TIMER_O_TAR) + timeout);
-        case TIMER_1:
-            return set_absolute(dev, channel,
-                                HWREG(TIMERA1_BASE + TIMER_O_TAR) + timeout);
-        case TIMER_2:
-            return set_absolute(dev, channel,
-                                HWREG(TIMERA2_BASE + TIMER_O_TAR) + timeout);
-        case TIMER_3:
-            return set_absolute(dev, channel,
-                                HWREG(TIMERA3_BASE + TIMER_O_TAR) + timeout);
-        default:
-            break;
+    case TIMER_0:
+        return set_absolute(dev, channel,
+        HWREG(TIMERA0_BASE + TIMER_O_TAR) + timeout);
+    case TIMER_1:
+        return set_absolute(dev, channel,
+        HWREG(TIMERA1_BASE + TIMER_O_TAR) + timeout);
+    case TIMER_2:
+        return set_absolute(dev, channel,
+        HWREG(TIMERA2_BASE + TIMER_O_TAR) + timeout);
+    case TIMER_3:
+        return set_absolute(dev, channel,
+        HWREG(TIMERA3_BASE + TIMER_O_TAR) + timeout);
+    default:
+        break;
     }
 
     return 0;

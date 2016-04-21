@@ -68,22 +68,22 @@
 //
 //*****************************************************************************
 static const unsigned long g_pulFMPPERegs[] = {
-FLASH_FMPPE0,
-FLASH_FMPPE1,
-FLASH_FMPPE2,
-FLASH_FMPPE3,
-FLASH_FMPPE4,
-FLASH_FMPPE5,
-FLASH_FMPPE6,
-FLASH_FMPPE7,
-FLASH_FMPPE8,
-FLASH_FMPPE9,
-FLASH_FMPPE10,
-FLASH_FMPPE11,
-FLASH_FMPPE12,
-FLASH_FMPPE13,
-FLASH_FMPPE14,
-FLASH_FMPPE15
+        FLASH_FMPPE0,
+        FLASH_FMPPE1,
+        FLASH_FMPPE2,
+        FLASH_FMPPE3,
+        FLASH_FMPPE4,
+        FLASH_FMPPE5,
+        FLASH_FMPPE6,
+        FLASH_FMPPE7,
+        FLASH_FMPPE8,
+        FLASH_FMPPE9,
+        FLASH_FMPPE10,
+        FLASH_FMPPE11,
+        FLASH_FMPPE12,
+        FLASH_FMPPE13,
+        FLASH_FMPPE14,
+        FLASH_FMPPE15
 
 };
 
@@ -94,22 +94,22 @@ FLASH_FMPPE15
 //
 //*****************************************************************************
 static const unsigned long g_pulFMPRERegs[] = {
-FLASH_FMPRE0,
-FLASH_FMPRE1,
-FLASH_FMPRE2,
-FLASH_FMPRE3,
-FLASH_FMPRE4,
-FLASH_FMPRE5,
-FLASH_FMPRE6,
-FLASH_FMPRE7,
-FLASH_FMPRE8,
-FLASH_FMPRE9,
-FLASH_FMPRE10,
-FLASH_FMPRE11,
-FLASH_FMPRE12,
-FLASH_FMPRE13,
-FLASH_FMPRE14,
-FLASH_FMPRE15, };
+        FLASH_FMPRE0,
+        FLASH_FMPRE1,
+        FLASH_FMPRE2,
+        FLASH_FMPRE3,
+        FLASH_FMPRE4,
+        FLASH_FMPRE5,
+        FLASH_FMPRE6,
+        FLASH_FMPRE7,
+        FLASH_FMPRE8,
+        FLASH_FMPRE9,
+        FLASH_FMPRE10,
+        FLASH_FMPRE11,
+        FLASH_FMPRE12,
+        FLASH_FMPRE13,
+        FLASH_FMPRE14,
+        FLASH_FMPRE15, };
 
 //*****************************************************************************
 //

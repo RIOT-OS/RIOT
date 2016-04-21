@@ -252,7 +252,7 @@ void DmaSpiSwIntHandler(void) {
     MAP_SPICSDisable(LSPI_BASE);
 
 #if defined(SL_PLATFORM_MULTI_THREADED)
-    osi_MsgQWrite(&DMAMsgQ,g_cDummy,OSI_NO_WAIT);
+    osi_MsgQWrite(&DMAMsgQ, g_cDummy, OSI_NO_WAIT);
 #else
     g_cDummy = 0x1;
 #endif
@@ -413,10 +413,11 @@ Fd_t spi_Open(char *ifName, unsigned long flags) {
 
         MAP_SPIFIFOLevelSet(ulBase, 1, 1);
 #if defined(SL_PLATFORM_MULTI_THREADED)
-        osi_InterruptRegister(INT_LSPI, (P_OSI_INTR_ENTRY)DmaSpiSwIntHandler,INT_PRIORITY_LVL_1);
-        MAP_SPIIntEnable(ulBase,SPI_INT_EOW);
+        osi_InterruptRegister(INT_LSPI, (P_OSI_INTR_ENTRY) DmaSpiSwIntHandler,
+        INT_PRIORITY_LVL_1);
+        MAP_SPIIntEnable(ulBase, SPI_INT_EOW);
 
-        osi_MsgQCreate(&DMAMsgQ,"DMAQueue",sizeof(int),1);
+        osi_MsgQCreate(&DMAMsgQ, "DMAQueue", sizeof(int), 1);
 
 #else
 
@@ -512,10 +513,10 @@ int spi_Read(Fd_t fd, unsigned char *pBuff, int len) {
                 SetupDMAReceive(&pBuff[read_size], len);
                 MAP_SPICSEnable(LSPI_BASE);
 #if defined(SL_PLATFORM_MULTI_THREADED)
-                osi_MsgQRead(&DMAMsgQ,temp,OSI_WAIT_FOREVER);
+                osi_MsgQRead(&DMAMsgQ, temp, OSI_WAIT_FOREVER);
 #else
                 while (g_cDummy != 0x1)
-                    ;
+                ;
                 g_cDummy = 0x0;
 #endif
                 read_size += len;
@@ -525,10 +526,10 @@ int spi_Read(Fd_t fd, unsigned char *pBuff, int len) {
                 MAX_DMA_RECV_TRANSACTION_SIZE);
                 MAP_SPICSEnable(LSPI_BASE);
 #if defined(SL_PLATFORM_MULTI_THREADED)
-                osi_MsgQRead(&DMAMsgQ,temp,OSI_WAIT_FOREVER);
+                osi_MsgQRead(&DMAMsgQ, temp, OSI_WAIT_FOREVER);
 #else
                 while (g_cDummy != 0x1)
-                    ;
+                ;
                 g_cDummy = 0x0;
 #endif
                 read_size += MAX_DMA_RECV_TRANSACTION_SIZE;
@@ -578,10 +579,10 @@ int spi_Write(Fd_t fd, unsigned char *pBuff, int len) {
         MAP_SPICSEnable(LSPI_BASE);
 
 #if defined(SL_PLATFORM_MULTI_THREADED)
-        osi_MsgQRead(&DMAMsgQ,temp,OSI_WAIT_FOREVER);
+        osi_MsgQRead(&DMAMsgQ, temp, OSI_WAIT_FOREVER);
 #else
         while (g_cDummy != 0x1)
-            ;
+        ;
         g_cDummy = 0x0;
 #endif
         write_size += len;
@@ -624,7 +625,8 @@ int NwpRegisterInterruptHandler(P_EVENT_HANDLER InterruptHdl, void* pValue) {
     } else {
 #ifdef SL_PLATFORM_MULTI_THREADED
         MAP_IntPendClear(INT_NWPIC);
-        osi_InterruptRegister(INT_NWPIC, (P_OSI_INTR_ENTRY)InterruptHdl,INT_PRIORITY_LVL_1);
+        osi_InterruptRegister(INT_NWPIC, (P_OSI_INTR_ENTRY) InterruptHdl,
+        INT_PRIORITY_LVL_1);
 #else
         MAP_IntRegister(INT_NWPIC, InterruptHdl);
         MAP_IntPrioritySet(INT_NWPIC, INT_PRIORITY_LVL_1);

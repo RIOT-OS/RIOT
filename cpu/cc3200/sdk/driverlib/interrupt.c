@@ -58,9 +58,14 @@
 //
 //*****************************************************************************
 static const unsigned long g_pulPriority[] = {
-NVIC_APINT_PRIGROUP_0_8, NVIC_APINT_PRIGROUP_1_7, NVIC_APINT_PRIGROUP_2_6,
-NVIC_APINT_PRIGROUP_3_5, NVIC_APINT_PRIGROUP_4_4, NVIC_APINT_PRIGROUP_5_3,
-NVIC_APINT_PRIGROUP_6_2, NVIC_APINT_PRIGROUP_7_1 };
+        NVIC_APINT_PRIGROUP_0_8,
+        NVIC_APINT_PRIGROUP_1_7,
+        NVIC_APINT_PRIGROUP_2_6,
+        NVIC_APINT_PRIGROUP_3_5,
+        NVIC_APINT_PRIGROUP_4_4,
+        NVIC_APINT_PRIGROUP_5_3,
+        NVIC_APINT_PRIGROUP_6_2,
+        NVIC_APINT_PRIGROUP_7_1 };
 
 //*****************************************************************************
 //
@@ -68,16 +73,60 @@ NVIC_APINT_PRIGROUP_6_2, NVIC_APINT_PRIGROUP_7_1 };
 // the priority encoding for that interrupt.
 //
 //*****************************************************************************
-static const unsigned long g_pulRegs[] = { 0, NVIC_SYS_PRI1, NVIC_SYS_PRI2,
-NVIC_SYS_PRI3, NVIC_PRI0, NVIC_PRI1,
-NVIC_PRI2, NVIC_PRI3, NVIC_PRI4, NVIC_PRI5, NVIC_PRI6, NVIC_PRI7,
-NVIC_PRI8, NVIC_PRI9, NVIC_PRI10, NVIC_PRI11, NVIC_PRI12, NVIC_PRI13,
-NVIC_PRI14, NVIC_PRI15, NVIC_PRI16, NVIC_PRI17, NVIC_PRI18, NVIC_PRI19,
-NVIC_PRI20, NVIC_PRI21, NVIC_PRI22, NVIC_PRI23, NVIC_PRI24, NVIC_PRI25,
-NVIC_PRI26, NVIC_PRI27, NVIC_PRI28, NVIC_PRI29, NVIC_PRI30, NVIC_PRI31,
-NVIC_PRI32, NVIC_PRI33, NVIC_PRI34, NVIC_PRI35, NVIC_PRI36, NVIC_PRI37,
-NVIC_PRI38, NVIC_PRI39, NVIC_PRI40, NVIC_PRI41, NVIC_PRI42, NVIC_PRI43,
-NVIC_PRI44, NVIC_PRI45, NVIC_PRI46, NVIC_PRI47, NVIC_PRI48
+static const unsigned long g_pulRegs[] = {
+        0,
+        NVIC_SYS_PRI1,
+        NVIC_SYS_PRI2,
+        NVIC_SYS_PRI3,
+        NVIC_PRI0,
+        NVIC_PRI1,
+        NVIC_PRI2,
+        NVIC_PRI3,
+        NVIC_PRI4,
+        NVIC_PRI5,
+        NVIC_PRI6,
+        NVIC_PRI7,
+        NVIC_PRI8,
+        NVIC_PRI9,
+        NVIC_PRI10,
+        NVIC_PRI11,
+        NVIC_PRI12,
+        NVIC_PRI13,
+        NVIC_PRI14,
+        NVIC_PRI15,
+        NVIC_PRI16,
+        NVIC_PRI17,
+        NVIC_PRI18,
+        NVIC_PRI19,
+        NVIC_PRI20,
+        NVIC_PRI21,
+        NVIC_PRI22,
+        NVIC_PRI23,
+        NVIC_PRI24,
+        NVIC_PRI25,
+        NVIC_PRI26,
+        NVIC_PRI27,
+        NVIC_PRI28,
+        NVIC_PRI29,
+        NVIC_PRI30,
+        NVIC_PRI31,
+        NVIC_PRI32,
+        NVIC_PRI33,
+        NVIC_PRI34,
+        NVIC_PRI35,
+        NVIC_PRI36,
+        NVIC_PRI37,
+        NVIC_PRI38,
+        NVIC_PRI39,
+        NVIC_PRI40,
+        NVIC_PRI41,
+        NVIC_PRI42,
+        NVIC_PRI43,
+        NVIC_PRI44,
+        NVIC_PRI45,
+        NVIC_PRI46,
+        NVIC_PRI47,
+        NVIC_PRI48
 
 };
 
@@ -89,7 +138,12 @@ NVIC_PRI44, NVIC_PRI45, NVIC_PRI46, NVIC_PRI47, NVIC_PRI48
 //
 //*****************************************************************************
 static const unsigned long g_pulEnRegs[] = {
-NVIC_EN0, NVIC_EN1, NVIC_EN2, NVIC_EN3, NVIC_EN4, NVIC_EN5 };
+        NVIC_EN0,
+        NVIC_EN1,
+        NVIC_EN2,
+        NVIC_EN3,
+        NVIC_EN4,
+        NVIC_EN5 };
 
 //*****************************************************************************
 //
@@ -99,7 +153,12 @@ NVIC_EN0, NVIC_EN1, NVIC_EN2, NVIC_EN3, NVIC_EN4, NVIC_EN5 };
 //
 //*****************************************************************************
 static const unsigned long g_pulDisRegs[] = {
-NVIC_DIS0, NVIC_DIS1, NVIC_DIS2, NVIC_DIS3, NVIC_DIS4, NVIC_DIS5 };
+        NVIC_DIS0,
+        NVIC_DIS1,
+        NVIC_DIS2,
+        NVIC_DIS3,
+        NVIC_DIS4,
+        NVIC_DIS5 };
 
 //*****************************************************************************
 //
@@ -108,7 +167,12 @@ NVIC_DIS0, NVIC_DIS1, NVIC_DIS2, NVIC_DIS3, NVIC_DIS4, NVIC_DIS5 };
 //
 //*****************************************************************************
 static const unsigned long g_pulPendRegs[] = {
-NVIC_PEND0, NVIC_PEND1, NVIC_PEND2, NVIC_PEND3, NVIC_PEND4, NVIC_PEND5 };
+        NVIC_PEND0,
+        NVIC_PEND1,
+        NVIC_PEND2,
+        NVIC_PEND3,
+        NVIC_PEND4,
+        NVIC_PEND5 };
 
 //*****************************************************************************
 //
@@ -118,8 +182,12 @@ NVIC_PEND0, NVIC_PEND1, NVIC_PEND2, NVIC_PEND3, NVIC_PEND4, NVIC_PEND5 };
 //
 //*****************************************************************************
 static const unsigned long g_pulUnpendRegs[] = {
-NVIC_UNPEND0, NVIC_UNPEND1, NVIC_UNPEND2, NVIC_UNPEND3, NVIC_UNPEND4,
-NVIC_UNPEND5 };
+        NVIC_UNPEND0,
+        NVIC_UNPEND1,
+        NVIC_UNPEND2,
+        NVIC_UNPEND3,
+        NVIC_UNPEND4,
+        NVIC_UNPEND5 };
 
 //*****************************************************************************
 //

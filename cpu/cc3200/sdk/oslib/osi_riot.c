@@ -43,9 +43,7 @@ static int synchronizer[MAX_SYNC_OBJS + 1];
 
 static mutex_t osi_mutexes[MAX_SYNC_OBJS];
 
-
 //static char simplelink_started;
-
 
 #ifdef CC3200_MCU_ONLY
 void SimpleLinkWlanEventHandler(SlWlanEvent_t* pSlWlanEvent) {};
@@ -58,11 +56,10 @@ void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
         SlHttpServerResponse_t *pSlHttpServerResponse) {};
 #endif
 
-
 void init_sync_pool(void) {
     lifo_init(synchronizer, MAX_SYNC_OBJS);
 
-    for(int i=0; i<MAX_SYNC_OBJS; i++) {
+    for (int i = 0; i < MAX_SYNC_OBJS; i++) {
         lifo_insert(synchronizer, i);
         mutex_init(&osi_mutexes[i]);
     }
@@ -75,12 +72,9 @@ void init_sync_pool(void) {
 
 #endif
 
-
 // network processor status and config handle
 nwp_t nwp = {
-        .role = ROLE_INVALID
-};
-
+        .role = ROLE_INVALID };
 
 #define OSI_MSG_TYPE 0xBEEF
 
@@ -100,7 +94,6 @@ typedef struct osi_task_list {
 static kernel_pid_t sl_spawn_id;
 
 static char *simplelink_stack;
-
 
 //Local function definition
 static void vSimpleLinkSpawnTask(void *pvParameters);
@@ -179,7 +172,7 @@ OsiReturnVal_e osi_SyncObjCreate(OsiSyncObj_t* pSyncObj) {
     mutex_init(mutex);
     *pSyncObj = mutex;
 #else
-    *pSyncObj = (OsiSyncObj_t)lifo_get(synchronizer);
+    *pSyncObj = (OsiSyncObj_t) lifo_get(synchronizer);
 #endif
     return OSI_OK;
 }
@@ -203,8 +196,8 @@ OsiReturnVal_e osi_SyncObjDelete(OsiSyncObj_t* pSyncObj) {
 #ifdef MALLOC_SL_OBJECTS
     free(*pSyncObj);
 #else
-    mutex_init(&osi_mutexes[(int)*pSyncObj]);
-    lifo_insert(synchronizer, (int)*pSyncObj);
+    mutex_init(&osi_mutexes[(int) *pSyncObj]);
+    lifo_insert(synchronizer, (int) *pSyncObj);
 #endif
     return OSI_OK;
 }
@@ -339,7 +332,7 @@ OsiReturnVal_e osi_LockObjCreate(OsiLockObj_t* pLockObj) {
     mutex_init(mutex);
     *pLockObj = mutex;
 #else
-    *pLockObj = (OsiSyncObj_t)lifo_get(synchronizer);
+    *pLockObj = (OsiSyncObj_t) lifo_get(synchronizer);
 #endif
     return OSI_OK;
 
@@ -429,8 +422,8 @@ OsiReturnVal_e osi_LockObjDelete(OsiLockObj_t* pLockObj) {
 #ifdef MALLOC_SL_OBJECTS
     free(*pLockObj);
 #else
-    mutex_init(&osi_mutexes[(int)*pLockObj]);
-    lifo_insert(synchronizer, (int)*pLockObj);
+    mutex_init(&osi_mutexes[(int) *pLockObj]);
+    lifo_insert(synchronizer, (int) *pLockObj);
 #endif
     return OSI_OK;
 }
@@ -577,15 +570,15 @@ OsiReturnVal_e VStartSimpleLinkSpawnTask(unsigned long uxPriority) {
 
     simplelink_stack = malloc(THREAD_STACKSIZE_SLSPAWN);
 
-    sl_spawn_id = thread_create(simplelink_stack, THREAD_STACKSIZE_SLSPAWN, uxPriority,
-    		THREAD_CREATE_STACKTEST, (thread_task_func_t) vSimpleLinkSpawnTask, NULL,
-            (const char*) "SLSPAWN");
+    sl_spawn_id = thread_create(simplelink_stack, THREAD_STACKSIZE_SLSPAWN,
+            uxPriority,
+            THREAD_CREATE_STACKTEST, (thread_task_func_t) vSimpleLinkSpawnTask,
+            NULL, (const char*) "SLSPAWN");
 
     DEBUG("spawn tid: %d\n", sl_spawn_id);
 
     return OSI_OK;
 }
-
 
 /*!
  \brief 	This is the API to delete SL spawn task and delete the SL queue
@@ -596,11 +589,9 @@ OsiReturnVal_e VStartSimpleLinkSpawnTask(unsigned long uxPriority) {
  \note
  \warning
  */
-void VDeleteSimpleLinkSpawnTask( void )
-{
+void VDeleteSimpleLinkSpawnTask(void) {
     free(simplelink_stack);
 }
-
 
 /*!
  \brief 	This function is used to create the MsgQ
@@ -690,14 +681,13 @@ OsiReturnVal_e osi_MsgQRead(OsiMsgQ_t* pMsgQ, void* pMsg, OsiTime_t Timeout) {
  \return - void
  \note
  \warning
-*/
+ */
 void osi_Sleep(unsigned int MilliSecs) {
     xtimer_usleep(MilliSecs * 80000);
 }
 
-
 void cc3200_reset(void) {
-    if (nwp.status & (1<<STATUS_BIT_CONNECTION)) {
+    if (nwp.status & (1 << STATUS_BIT_CONNECTION)) {
         sl_Stop(SL_STOP_TIMEOUT);
         MAP_PRCMHibernateIntervalSet(330);
         MAP_PRCMHibernateWakeupSourceEnable(PRCM_HIB_SLOW_CLK_CTR);

@@ -71,7 +71,12 @@ _u16 _sl_Strlen(const _u8 *buffer) {
 _u32 _sl_GetCreateFsMode(_u32 maxSizeInBytes, _u32 accessFlags) {
     _u32 granIdx = 0;
     _u32 granNum = 0;
-    _u32 granTable[_FS_MAX_MODE_SIZE_GRAN] = { 256, 1024, 4096, 16384, 65536 };
+    _u32 granTable[_FS_MAX_MODE_SIZE_GRAN] = {
+            256,
+            1024,
+            4096,
+            16384,
+            65536 };
     for (granIdx = _FS_MODE_SIZE_GRAN_256B; granIdx < _FS_MAX_MODE_SIZE_GRAN;
             granIdx++) {
         if (granTable[granIdx] * 255 >= maxSizeInBytes)
@@ -160,7 +165,8 @@ const _SlCmdCtrl_t _SlFsCloseCmdCtrl =
 
 _i16 sl_FsClose(const _i32 FileHdl, const _u8* pCeritificateFileName,
         const _u8* pSignature, const _u32 SignatureLen) {
-    _SlFsCloseMsg_u Msg = { 0 };
+    _SlFsCloseMsg_u Msg = {
+            0 };
     _SlCmdExt_t ExtCtrl;
 
     Msg.Cmd.FileHandle = FileHdl;

@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief           
+ * @brief
  *
  * @author          Attilio Dona'
  */
@@ -27,15 +27,14 @@
  * @brief describe a communication endpoint
  */
 typedef struct cd_t {
-	kernel_pid_t recv_pid;
-	int16_t fd;
-	kernel_pid_t pid;
-	char *recv_stack;
-	uint8_t conn_type; //< SOCK_STREAM (1) or SOCK_DGRAM (2)
-	sockaddr_in addr;
-	sockaddr_in local_addr;
+    kernel_pid_t recv_pid;
+    int16_t fd;
+    kernel_pid_t pid;
+    char *recv_stack;
+    uint8_t conn_type; //< SOCK_STREAM (1) or SOCK_DGRAM (2)
+    sockaddr_in addr;
+    sockaddr_in local_addr;
 } cd_t;
-
 
 #endif /* RIOT_CPU_CC3200_INCLUDE_SBAPP_PRIV_H_ */
 /** @} */

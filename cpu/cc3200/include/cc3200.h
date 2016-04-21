@@ -45,7 +45,6 @@ extern const uint8_t digital_pin_to_bit_mask[];
 #define digitalPinToBitMask(P)    ( digital_pin_to_bit_mask[P] )
 #define portBASERegister(P)       ((volatile uint32_t *) port_to_base[P])
 
-
 #define __CM4_REV                 0x0001  /*! Core revision r0p1              */
 #define __MPU_PRESENT             1       /*! CC3200 does not provides an MPU */
 #define __NVIC_PRIO_BITS          3       /*! CC3200 uses 3 Bits              */
@@ -129,7 +128,6 @@ typedef enum {
  * reset the chip
  */
 void cc3200_reset(void);
-
 
 #endif /* CPU_INCLUDE_CC3200_H_ */
 /** @} */

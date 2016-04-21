@@ -28,7 +28,15 @@
 
 #include "device.h"
 
-static char _cpuid[8] = {0xBE, 0xEF, 0x12, 0x34, 0x56, 0x78, 0x90, 0xAB};
+static char _cpuid[8] = {
+        0xBE,
+        0xEF,
+        0x12,
+        0x34,
+        0x56,
+        0x78,
+        0x90,
+        0xAB };
 
 void cpuid_get(void *id) {
     unsigned char macAddressVal[SL_MAC_ADDR_LEN];
@@ -45,7 +53,7 @@ void cpuid_get(void *id) {
         addr_ptr[4] = 0xFE;
         memcpy(addr_ptr + 5, macAddressVal + 3, 3); // NIC
     } else {
-        for(int i=0; i<CPUID_ID_LEN; i++) {
+        for (int i = 0; i < CPUID_ID_LEN; i++) {
             addr_ptr[i] = _cpuid[i];
         }
     }

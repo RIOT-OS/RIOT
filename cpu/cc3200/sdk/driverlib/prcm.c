@@ -223,27 +223,69 @@ static void RTCU32SecRegWrite(unsigned long u32Msec) {
 //*****************************************************************************
 static const PRCM_PeriphRegs_t PRCM_PeriphRegsList[] = {
 
-{ APPS_RCM_O_CAMERA_CLK_GATING, APPS_RCM_O_CAMERA_SOFT_RESET }, {
-APPS_RCM_O_MCASP_CLK_GATING, APPS_RCM_O_MCASP_SOFT_RESET }, {
-APPS_RCM_O_MMCHS_CLK_GATING, APPS_RCM_O_MMCHS_SOFT_RESET }, {
-APPS_RCM_O_MCSPI_A1_CLK_GATING, APPS_RCM_O_MCSPI_A1_SOFT_RESET }, {
-APPS_RCM_O_MCSPI_A2_CLK_GATING, APPS_RCM_O_MCSPI_A2_SOFT_RESET }, {
-APPS_RCM_O_UDMA_A_CLK_GATING, APPS_RCM_O_UDMA_A_SOFT_RESET }, {
-APPS_RCM_O_GPIO_A_CLK_GATING, APPS_RCM_O_GPIO_A_SOFT_RESET }, {
-APPS_RCM_O_GPIO_B_CLK_GATING, APPS_RCM_O_GPIO_B_SOFT_RESET }, {
-APPS_RCM_O_GPIO_C_CLK_GATING, APPS_RCM_O_GPIO_C_SOFT_RESET }, {
-APPS_RCM_O_GPIO_D_CLK_GATING, APPS_RCM_O_GPIO_D_SOFT_RESET }, {
-APPS_RCM_O_GPIO_E_CLK_GATING, APPS_RCM_O_GPIO_E_SOFT_RESET }, {
-APPS_RCM_O_WDOG_A_CLK_GATING, APPS_RCM_O_WDOG_A_SOFT_RESET }, {
-APPS_RCM_O_UART_A0_CLK_GATING, APPS_RCM_O_UART_A0_SOFT_RESET }, {
-APPS_RCM_O_UART_A1_CLK_GATING, APPS_RCM_O_UART_A1_SOFT_RESET }, {
-APPS_RCM_O_GPT_A0_CLK_GATING, APPS_RCM_O_GPT_A0_SOFT_RESET }, {
-APPS_RCM_O_GPT_A1_CLK_GATING, APPS_RCM_O_GPT_A1_SOFT_RESET }, {
-APPS_RCM_O_GPT_A2_CLK_GATING, APPS_RCM_O_GPT_A2_SOFT_RESET }, {
-APPS_RCM_O_GPT_A3_CLK_GATING, APPS_RCM_O_GPT_A3_SOFT_RESET }, {
-APPS_RCM_O_CRYPTO_CLK_GATING, APPS_RCM_O_CRYPTO_SOFT_RESET }, {
-APPS_RCM_O_MCSPI_S0_CLK_GATING, APPS_RCM_O_MCSPI_S0_SOFT_RESET }, {
-APPS_RCM_O_I2C_CLK_GATING, APPS_RCM_O_I2C_SOFT_RESET }
+        {
+                APPS_RCM_O_CAMERA_CLK_GATING,
+                APPS_RCM_O_CAMERA_SOFT_RESET },
+        {
+                APPS_RCM_O_MCASP_CLK_GATING,
+                APPS_RCM_O_MCASP_SOFT_RESET },
+        {
+                APPS_RCM_O_MMCHS_CLK_GATING,
+                APPS_RCM_O_MMCHS_SOFT_RESET },
+        {
+                APPS_RCM_O_MCSPI_A1_CLK_GATING,
+                APPS_RCM_O_MCSPI_A1_SOFT_RESET },
+        {
+                APPS_RCM_O_MCSPI_A2_CLK_GATING,
+                APPS_RCM_O_MCSPI_A2_SOFT_RESET },
+        {
+                APPS_RCM_O_UDMA_A_CLK_GATING,
+                APPS_RCM_O_UDMA_A_SOFT_RESET },
+        {
+                APPS_RCM_O_GPIO_A_CLK_GATING,
+                APPS_RCM_O_GPIO_A_SOFT_RESET },
+        {
+                APPS_RCM_O_GPIO_B_CLK_GATING,
+                APPS_RCM_O_GPIO_B_SOFT_RESET },
+        {
+                APPS_RCM_O_GPIO_C_CLK_GATING,
+                APPS_RCM_O_GPIO_C_SOFT_RESET },
+        {
+                APPS_RCM_O_GPIO_D_CLK_GATING,
+                APPS_RCM_O_GPIO_D_SOFT_RESET },
+        {
+                APPS_RCM_O_GPIO_E_CLK_GATING,
+                APPS_RCM_O_GPIO_E_SOFT_RESET },
+        {
+                APPS_RCM_O_WDOG_A_CLK_GATING,
+                APPS_RCM_O_WDOG_A_SOFT_RESET },
+        {
+                APPS_RCM_O_UART_A0_CLK_GATING,
+                APPS_RCM_O_UART_A0_SOFT_RESET },
+        {
+                APPS_RCM_O_UART_A1_CLK_GATING,
+                APPS_RCM_O_UART_A1_SOFT_RESET },
+        {
+                APPS_RCM_O_GPT_A0_CLK_GATING,
+                APPS_RCM_O_GPT_A0_SOFT_RESET },
+        {
+                APPS_RCM_O_GPT_A1_CLK_GATING,
+                APPS_RCM_O_GPT_A1_SOFT_RESET },
+        {
+                APPS_RCM_O_GPT_A2_CLK_GATING,
+                APPS_RCM_O_GPT_A2_SOFT_RESET },
+        {
+                APPS_RCM_O_GPT_A3_CLK_GATING,
+                APPS_RCM_O_GPT_A3_SOFT_RESET },
+        {
+                APPS_RCM_O_CRYPTO_CLK_GATING,
+                APPS_RCM_O_CRYPTO_SOFT_RESET },
+        {
+                APPS_RCM_O_MCSPI_S0_CLK_GATING,
+                APPS_RCM_O_MCSPI_S0_SOFT_RESET },
+        {
+                APPS_RCM_O_I2C_CLK_GATING,
+                APPS_RCM_O_I2C_SOFT_RESET }
 
 };
 

@@ -60,7 +60,10 @@
 // A mapping of I2C base address to interrupt number.
 //
 //*****************************************************************************
-static const uint32_t g_ppui32I2CIntMap[][2] = { { I2CA0_BASE, INT_I2CA0 }, };
+static const uint32_t g_ppui32I2CIntMap[][2] = {
+        {
+                I2CA0_BASE,
+                INT_I2CA0 }, };
 
 static const int_fast8_t g_i8I2CIntMapRows = sizeof(g_ppui32I2CIntMap)
         / sizeof(g_ppui32I2CIntMap[0]);

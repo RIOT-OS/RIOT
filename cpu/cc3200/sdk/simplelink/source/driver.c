@@ -387,26 +387,41 @@ _u8 _SlDrvProtectAsyncRespSetting(_u8 *pAsyncRsp, _u8 ActionID, _u8 SocketID) {
 /*****************************************************************************/
 /* Variables                                                                 */
 /*****************************************************************************/
-const _SlSyncPattern_t g_H2NSyncPattern = H2N_SYNC_PATTERN;
-const _SlSyncPattern_t g_H2NCnysPattern = H2N_CNYS_PATTERN;
+const _SlSyncPattern_t g_H2NSyncPattern = H2N_SYNC_PATTERN
+;
+const _SlSyncPattern_t g_H2NCnysPattern = H2N_CNYS_PATTERN
+;
 _volatile _u8 RxIrqCnt;
 
 #ifndef SL_TINY_EXT
-const _SlActionLookup_t _SlActionLookupTable[] = { { ACCEPT_ID,
-SL_OPCODE_SOCKET_ACCEPTASYNCRESPONSE,
-        (_SlSpawnEntryFunc_t) _sl_HandleAsync_Accept }, { CONNECT_ID,
-SL_OPCODE_SOCKET_CONNECTASYNCRESPONSE,
-        (_SlSpawnEntryFunc_t) _sl_HandleAsync_Connect }, { SELECT_ID,
-SL_OPCODE_SOCKET_SELECTASYNCRESPONSE,
-        (_SlSpawnEntryFunc_t) _sl_HandleAsync_Select }, { GETHOSYBYNAME_ID,
-SL_OPCODE_NETAPP_DNSGETHOSTBYNAMEASYNCRESPONSE,
-        (_SlSpawnEntryFunc_t) _sl_HandleAsync_DnsGetHostByName }, {
-        GETHOSYBYSERVICE_ID, SL_OPCODE_NETAPP_MDNSGETHOSTBYSERVICEASYNCRESPONSE,
-        (_SlSpawnEntryFunc_t) _sl_HandleAsync_DnsGetHostByService }, { PING_ID,
-SL_OPCODE_NETAPP_PINGREPORTREQUESTRESPONSE,
-        (_SlSpawnEntryFunc_t) _sl_HandleAsync_PingResponse },
-        { START_STOP_ID,
-        SL_OPCODE_DEVICE_STOP_ASYNC_RESPONSE,
+const _SlActionLookup_t _SlActionLookupTable[] = {
+        {
+                ACCEPT_ID,
+                SL_OPCODE_SOCKET_ACCEPTASYNCRESPONSE,
+                (_SlSpawnEntryFunc_t) _sl_HandleAsync_Accept },
+        {
+                CONNECT_ID,
+                SL_OPCODE_SOCKET_CONNECTASYNCRESPONSE,
+                (_SlSpawnEntryFunc_t) _sl_HandleAsync_Connect },
+        {
+                SELECT_ID,
+                SL_OPCODE_SOCKET_SELECTASYNCRESPONSE,
+                (_SlSpawnEntryFunc_t) _sl_HandleAsync_Select },
+        {
+                GETHOSYBYNAME_ID,
+                SL_OPCODE_NETAPP_DNSGETHOSTBYNAMEASYNCRESPONSE,
+                (_SlSpawnEntryFunc_t) _sl_HandleAsync_DnsGetHostByName },
+        {
+                GETHOSYBYSERVICE_ID,
+                SL_OPCODE_NETAPP_MDNSGETHOSTBYSERVICEASYNCRESPONSE,
+                (_SlSpawnEntryFunc_t) _sl_HandleAsync_DnsGetHostByService },
+        {
+                PING_ID,
+                SL_OPCODE_NETAPP_PINGREPORTREQUESTRESPONSE,
+                (_SlSpawnEntryFunc_t) _sl_HandleAsync_PingResponse },
+        {
+                START_STOP_ID,
+                SL_OPCODE_DEVICE_STOP_ASYNC_RESPONSE,
                 (_SlSpawnEntryFunc_t) _sl_HandleAsync_Stop } };
 #else
 const _SlActionLookup_t _SlActionLookupTable[] =
@@ -423,33 +438,52 @@ typedef struct {
 } OpcodeKeyVal_t;
 
 /* The table translates opcode to user's event type */
-const OpcodeKeyVal_t OpcodeTranslateTable[] = { {
-        SL_OPCODE_WLAN_SMART_CONFIG_START_ASYNC_RESPONSE,
-        SL_WLAN_SMART_CONFIG_COMPLETE_EVENT }, {
-SL_OPCODE_WLAN_SMART_CONFIG_STOP_ASYNC_RESPONSE,
-SL_WLAN_SMART_CONFIG_STOP_EVENT }, {
-SL_OPCODE_WLAN_STA_CONNECTED, SL_WLAN_STA_CONNECTED_EVENT }, {
-        SL_OPCODE_WLAN_STA_DISCONNECTED,
-        SL_WLAN_STA_DISCONNECTED_EVENT }, {
-SL_OPCODE_WLAN_P2P_DEV_FOUND,
-SL_WLAN_P2P_DEV_FOUND_EVENT }, {
-SL_OPCODE_WLAN_P2P_NEG_REQ_RECEIVED,
-SL_WLAN_P2P_NEG_REQ_RECEIVED_EVENT }, {
-SL_OPCODE_WLAN_CONNECTION_FAILED,
-SL_WLAN_CONNECTION_FAILED_EVENT }, {
-SL_OPCODE_WLAN_WLANASYNCCONNECTEDRESPONSE,
-SL_WLAN_CONNECT_EVENT }, {
-SL_OPCODE_WLAN_WLANASYNCDISCONNECTEDRESPONSE,
-SL_WLAN_DISCONNECT_EVENT }, {
-SL_OPCODE_NETAPP_IPACQUIRED,
-SL_NETAPP_IPV4_IPACQUIRED_EVENT }, {
-SL_OPCODE_NETAPP_IPACQUIRED_V6,
-SL_NETAPP_IPV6_IPACQUIRED_EVENT }, {
-SL_OPCODE_NETAPP_IP_LEASED, SL_NETAPP_IP_LEASED_EVENT }, {
-        SL_OPCODE_NETAPP_IP_RELEASED, SL_NETAPP_IP_RELEASED_EVENT }, {
-SL_OPCODE_SOCKET_TXFAILEDASYNCRESPONSE,
-SL_SOCKET_TX_FAILED_EVENT }, { SL_OPCODE_SOCKET_SOCKETASYNCEVENT,
-        SL_SOCKET_ASYNC_EVENT } };
+const OpcodeKeyVal_t OpcodeTranslateTable[] = {
+        {
+                SL_OPCODE_WLAN_SMART_CONFIG_START_ASYNC_RESPONSE,
+                SL_WLAN_SMART_CONFIG_COMPLETE_EVENT },
+        {
+                SL_OPCODE_WLAN_SMART_CONFIG_STOP_ASYNC_RESPONSE,
+                SL_WLAN_SMART_CONFIG_STOP_EVENT },
+        {
+                SL_OPCODE_WLAN_STA_CONNECTED,
+                SL_WLAN_STA_CONNECTED_EVENT },
+        {
+                SL_OPCODE_WLAN_STA_DISCONNECTED,
+                SL_WLAN_STA_DISCONNECTED_EVENT },
+        {
+                SL_OPCODE_WLAN_P2P_DEV_FOUND,
+                SL_WLAN_P2P_DEV_FOUND_EVENT },
+        {
+                SL_OPCODE_WLAN_P2P_NEG_REQ_RECEIVED,
+                SL_WLAN_P2P_NEG_REQ_RECEIVED_EVENT },
+        {
+                SL_OPCODE_WLAN_CONNECTION_FAILED,
+                SL_WLAN_CONNECTION_FAILED_EVENT },
+        {
+                SL_OPCODE_WLAN_WLANASYNCCONNECTEDRESPONSE,
+                SL_WLAN_CONNECT_EVENT },
+        {
+                SL_OPCODE_WLAN_WLANASYNCDISCONNECTEDRESPONSE,
+                SL_WLAN_DISCONNECT_EVENT },
+        {
+                SL_OPCODE_NETAPP_IPACQUIRED,
+                SL_NETAPP_IPV4_IPACQUIRED_EVENT },
+        {
+                SL_OPCODE_NETAPP_IPACQUIRED_V6,
+                SL_NETAPP_IPV6_IPACQUIRED_EVENT },
+        {
+                SL_OPCODE_NETAPP_IP_LEASED,
+                SL_NETAPP_IP_LEASED_EVENT },
+        {
+                SL_OPCODE_NETAPP_IP_RELEASED,
+                SL_NETAPP_IP_RELEASED_EVENT },
+        {
+                SL_OPCODE_SOCKET_TXFAILEDASYNCRESPONSE,
+                SL_SOCKET_TX_FAILED_EVENT },
+        {
+                SL_OPCODE_SOCKET_SOCKETASYNCEVENT,
+                SL_SOCKET_ASYNC_EVENT } };
 
 _SlDriverCb_t* g_pCB = NULL;
 P_SL_DEV_PING_CALLBACK pPingCallBackFunc = NULL;
@@ -1423,7 +1457,8 @@ typedef union {
 
 #ifndef SL_TINY_EXT
 _i16 _SlDrvBasicCmd(_SlOpcode_t Opcode) {
-    _SlBasicCmdMsg_u Msg = { 0 };
+    _SlBasicCmdMsg_u Msg = {
+            0 };
     _SlCmdCtrl_t CmdCtrl;
 
     CmdCtrl.Opcode = Opcode;

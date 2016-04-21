@@ -47,7 +47,12 @@
 /*****************************************************************************/
 
 const _i8 StartResponseLUT[8] = {
-ROLE_UNKNOWN_ERR, ROLE_STA, ROLE_STA_ERR, ROLE_AP, ROLE_AP_ERR, ROLE_P2P,
+        ROLE_UNKNOWN_ERR,
+        ROLE_STA,
+        ROLE_STA_ERR,
+        ROLE_AP,
+        ROLE_AP_ERR,
+        ROLE_P2P,
         ROLE_P2P_ERR,
         ROLE_UNKNOWN_ERR };
 
@@ -94,7 +99,7 @@ _i16 sl_Start(const void* pIfHdl, _i8* pDevName,
     }
 
     ObjIdx = _SlDrvProtectAsyncRespSetting((_u8 *) &AsyncRsp, START_STOP_ID,
-    SL_MAX_SOCKETS);
+            SL_MAX_SOCKETS);
 
     if (MAX_CONCURRENT_ACTIONS == ObjIdx) {
         return SL_POOL_IS_EMPTY;
@@ -181,7 +186,8 @@ typedef union {
 } _SlStopMsg_u;
 
 const _SlCmdCtrl_t _SlStopCmdCtrl = {
-SL_OPCODE_DEVICE_STOP_COMMAND, sizeof(_DevStopCommand_t),
+        SL_OPCODE_DEVICE_STOP_COMMAND,
+        sizeof(_DevStopCommand_t),
         sizeof(_BasicResponse_t) };
 
 #if _SL_INCLUDE_FUNC(sl_Stop)

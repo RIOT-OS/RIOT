@@ -86,12 +86,12 @@ ISR_VECTORS const void *interrupt_vector[] = {
         0,                     // Reserved
         0,                     // Reserved
         0,                     // Reserved
-        isr_svc,               /* system call interrupt, in RIOT used for
-                                * switching into thread context on boot */
+        isr_svc, /* system call interrupt, in RIOT used for
+         * switching into thread context on boot */
         debug_mon_default,     // Debug monitor handler
         0,                     // Reserved
-        isr_pendsv,            /* pendSV interrupt, in RIOT the actual
-                                * context switching is happening here */
+        isr_pendsv, /* pendSV interrupt, in RIOT the actual
+         * context switching is happening here */
         isr_systick,           // SysTick interrupt, not used in RIOT
         isr_gpio_porta0,       // GPIO Port A0
         isr_gpio_porta1,       // GPIO Port A1
@@ -102,7 +102,11 @@ ISR_VECTORS const void *interrupt_vector[] = {
         isr_uart1,             // UART1 Rx and Tx
         0,                     // Reserved
         isr_i2c0,              // I2C0 Master and Slave
-        0, 0, 0, 0, 0,         // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,         // Reserved
         isr_adc0_seq0,         // ADC Channel 0
         isr_adc0_seq1,         // ADC Channel 1
         isr_adc0_seq2,         // ADC Channel 2
@@ -114,48 +118,220 @@ ISR_VECTORS const void *interrupt_vector[] = {
         isr_timer1b,           // Timer 1 subtimer B
         isr_timer2a,           // Timer 2 subtimer A
         isr_timer2b,           // Timer 2 subtimer B
-        0, 0, 0, 0,            // Reserved
+        0,
+        0,
+        0,
+        0,            // Reserved
         isr_flashctl,          // Flash
-        0, 0, 0, 0, 0,         // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,         // Reserved
         isr_timer3a,           // Timer 3 subtimer A
         isr_timer3b,           // Timer 3 subtimer B
-        0, 0, 0, 0, 0, 0, 0, 0, 0,  // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,  // Reserved
         isr_udma_sw,           // uDMA Software Transfer
         isr_udma_error,        // uDMA Error
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,  // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,  // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,  // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,  // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,  // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,  // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,  // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,  // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,  // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,  // Reserved
         isr_sha,               // SHA
-        0, 0,                  // Reserved
+        0,
+        0,                  // Reserved
         isr_aes,               // AES
         0,                     // Reserved
         isr_des,               // DES
-        0, 0, 0, 0, 0,         // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,         // Reserved
         isr_sdhost,            // SDHost
         0,                     // Reserved
         isr_i2s,               // I2S
         0,                     // Reserved
         isr_camera,            // Camera
-        0, 0, 0, 0, 0, 0, 0,   // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,   // Reserved
         isr_nwp,               // NWP to APPS Interrupt
         isr_prcm,              // Power, Reset and Clock module
-        0, 0,                  // Reserved
+        0,
+        0,                  // Reserved
         isr_shared_spi,        // Shared SPI
         isr_generic_spi,       // Generic SPI
         isr_link_spi,          // Link SPI
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // Reserved
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // Reserved
-        0, 0                            // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,   // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,   // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,   // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,   // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,   // Reserved
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,   // Reserved
+        0,
+        0                            // Reserved
         };
 

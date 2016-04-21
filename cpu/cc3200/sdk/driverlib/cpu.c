@@ -47,8 +47,7 @@
 //*****************************************************************************
 #if defined(gcc)
 unsigned long __attribute__((naked))
-CPUcpsid(void)
-{
+CPUcpsid(void) {
     unsigned long ulRet;
 
     //
@@ -67,7 +66,7 @@ CPUcpsid(void)
     // that this does not result in any code being produced because of the
     // naked attribute).
     //
-    return(ulRet);
+    return (ulRet);
 }
 #endif
 #if defined(ewarm)
@@ -123,8 +122,7 @@ CPUcpsid(void)
 //*****************************************************************************
 #if defined(gcc)
 unsigned long __attribute__((naked))
-CPUprimask(void)
-{
+CPUprimask(void) {
     unsigned long ulRet;
 
     //
@@ -140,7 +138,7 @@ CPUprimask(void)
     // that this does not result in any code being produced because of the
     // naked attribute).
     //
-    return(ulRet);
+    return (ulRet);
 }
 #endif
 #if defined(ewarm)
@@ -190,8 +188,7 @@ CPUprimask(void)
 //*****************************************************************************
 #if defined(gcc)
 unsigned long __attribute__((naked))
-CPUcpsie(void)
-{
+CPUcpsie(void) {
     unsigned long ulRet;
 
     //
@@ -210,7 +207,7 @@ CPUcpsie(void)
     // that this does not result in any code being produced because of the
     // naked attribute).
     //
-    return(ulRet);
+    return (ulRet);
 }
 #endif
 #if defined(ewarm)
@@ -265,8 +262,7 @@ CPUcpsie(void)
 //*****************************************************************************
 #if defined(gcc)
 void __attribute__((naked))
-CPUwfi(void)
-{
+CPUwfi(void) {
     //
     // Wait for the next interrupt.
     //
@@ -308,8 +304,7 @@ CPUwfi(void)
 //*****************************************************************************
 #if defined(gcc)
 void __attribute__((naked))
-CPUbasepriSet(unsigned long ulNewBasepri)
-{
+CPUbasepriSet(unsigned long ulNewBasepri) {
 
     //
     // Set the BASEPRI register
@@ -352,8 +347,7 @@ CPUbasepriSet(unsigned long ulNewBasepri)
 //*****************************************************************************
 #if defined(gcc)
 unsigned long __attribute__((naked))
-CPUbasepriGet(void)
-{
+CPUbasepriGet(void) {
     unsigned long ulRet;
 
     //
@@ -369,7 +363,7 @@ CPUbasepriGet(void)
     // that this does not result in any code being produced because of the
     // naked attribute).
     //
-    return(ulRet);
+    return (ulRet);
 }
 #endif
 #if defined(ewarm)

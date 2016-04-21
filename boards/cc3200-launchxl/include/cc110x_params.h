@@ -33,14 +33,13 @@ extern "C" {
  * @{
  */
 const cc110x_params_t cc110x_params[] = {
-    {
-        .spi  = SPI_0,          //<! spi module instance
-        .cs   = SPI_0_PIN_CS,   //<! chip select
-        .gdo0 = GDO0_PIN,       //<! GDO0 pin
-        .gdo1 = SPI_0_PIN_MISO, //<! GDO1 pin is shared with MISO
-        .gdo2 = GDO2_PIN        //<! GDO2 pin
-    },
-};
+        {
+                .spi = SPI_0,          //<! spi module instance
+                .cs = SPI_0_PIN_CS,   //<! chip select
+                .gdo0 = GDO0_PIN,       //<! GDO0 pin
+                .gdo1 = SPI_0_PIN_MISO, //<! GDO1 pin is shared with MISO
+                .gdo2 = GDO2_PIN        //<! GDO2 pin
+        }, };
 /** @} */
 
 #ifdef __cplusplus

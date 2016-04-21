@@ -613,7 +613,11 @@ void AESDataRead(uint32_t ui32Base, uint8_t *pui8Dest, uint8_t ui8Length) {
 //*****************************************************************************
 bool AESDataWriteNonBlocking(uint32_t ui32Base, uint8_t *pui8Src,
         uint8_t ui8Length) {
-    volatile uint32_t pui32Src[4] = { 0, 0, 0, 0 };
+    volatile uint32_t pui32Src[4] = {
+            0,
+            0,
+            0,
+            0 };
     uint8_t ui8BytCnt;
     uint8_t *pui8SrcTemp;
 
@@ -670,7 +674,11 @@ bool AESDataWriteNonBlocking(uint32_t ui32Base, uint8_t *pui8Src,
 //*****************************************************************************
 
 void AESDataWrite(uint32_t ui32Base, uint8_t *pui8Src, uint8_t ui8Length) {
-    volatile uint32_t pui32Src[4] = { 0, 0, 0, 0 };
+    volatile uint32_t pui32Src[4] = {
+            0,
+            0,
+            0,
+            0 };
     uint8_t ui8BytCnt;
     uint8_t *pui8SrcTemp;
     //

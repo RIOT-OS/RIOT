@@ -27,11 +27,11 @@
 extern "C" {
 #endif
 
-/**
- * @brief    Configuration of default stack sizes
- *
- * @{
- */
+    /**
+     * @brief    Configuration of default stack sizes
+     *
+     * @{
+     */
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF
 #define THREAD_EXTRA_STACKSIZE_PRINTF   (512)
 #endif
@@ -41,18 +41,16 @@ extern "C" {
 #ifndef THREAD_STACKSIZE_IDLE
 #define THREAD_STACKSIZE_IDLE           (256)
 #endif
-/** @} */
+    /** @} */
 
-/**
- * @brief   Stack size used for the exception (ISR) stack
- * @{
- */
+    /**
+     * @brief   Stack size used for the exception (ISR) stack
+     * @{
+     */
 #ifndef ISR_STACKSIZE
 #define ISR_STACKSIZE                   (512U)
 #endif
-/** @} */
-
-
+    /** @} */
 
 #define CPU_DEFAULT_IRQ_PRIO    (1U) /**< The default priority is 1 for every
  	 	 	 	 	 	 	 	 	 	 interrupt, 0 is the highest possible
@@ -61,23 +59,21 @@ extern "C" {
  	 	 	 	 	 	 	 	 	 	 	 	 	   sources*/
 #define CPU_FLASH_BASE          START_OF_RAM /**< code is booted into RAM */
 
-/**
- * @brief   length of CPU ID for @ref cpuid_get() in @ref periph/cpuid.h
- */
+    /**
+     * @brief   length of CPU ID for @ref cpuid_get() in @ref periph/cpuid.h
+     */
 #ifndef CPUID_ID_LEN
 #define CPUID_ID_LEN                    8
 #endif
 
-
-/**
- * Define the nominal CPU core clock
- */
+    /**
+     * Define the nominal CPU core clock
+     */
 #define F_CPU               80000000
 
 #define SEC_TO_TICKS(sec)   80000000*sec /**< Convert seconds to  clock ticks */
 #define MSEC_TO_TICKS(msec) 80000*msec /**< Convert millisecs to  clock ticks */
 #define USEC_TO_TICKS(usec) 80*usec /**< Convert microseconds to  clock ticks */
-
 
 #ifdef __cplusplus
 } /* end extern "C" */

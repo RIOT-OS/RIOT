@@ -31,7 +31,6 @@
 
 #include "periph/gpio.h"
 
-
 /**
  * @brief Initialize on-board LEDs
  */
@@ -47,7 +46,6 @@ void led_init(void) {
 }
 
 extern const void *interrupt_vector[];
-
 
 /**
  * @brief Initialize the board

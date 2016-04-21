@@ -61,22 +61,23 @@ _u16 _sl_TruncatePayloadByProtocol(const _i16 pSd, const _u16 length);
 /*  three families. */
 #define SL_SOCKET_PAYLOAD_BASE (1350)
 
-const _u8 _SlPayloadByProtocolLUT[16] = { (1472 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_UDP_IPV4 */
-(1460 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_TCP_IPV4 */
-(1452 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_UDP_IPV6 */
-(1440 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_TCP_IPV6 */
-(1386 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_TCP_IPV4_SECURE */
-(1386 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_UDP_IPV4_SECURE */
-(1396 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_UDP_IPV6_SECURE */
-(1396 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_TCP_IPV6_SECURE */
-(1476 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_RAW_TRANCEIVER */
-(1514 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_RAW_PACKET */
-(1480 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_RAW_IP4 */
-(1480 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_RAW_IP6 */
-(1440 - SL_SOCKET_PAYLOAD_BASE), /* Default */
-(1440 - SL_SOCKET_PAYLOAD_BASE), /* Default */
-(1440 - SL_SOCKET_PAYLOAD_BASE), /* Default */
-(1440 - SL_SOCKET_PAYLOAD_BASE) /* Default */
+const _u8 _SlPayloadByProtocolLUT[16] = {
+        (1472 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_UDP_IPV4 */
+        (1460 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_TCP_IPV4 */
+        (1452 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_UDP_IPV6 */
+        (1440 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_TCP_IPV6 */
+        (1386 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_TCP_IPV4_SECURE */
+        (1386 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_UDP_IPV4_SECURE */
+        (1396 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_UDP_IPV6_SECURE */
+        (1396 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_TCP_IPV6_SECURE */
+        (1476 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_RAW_TRANCEIVER */
+        (1514 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_RAW_PACKET */
+        (1480 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_RAW_IP4 */
+        (1480 - SL_SOCKET_PAYLOAD_BASE), /* SL_SOCKET_PAYLOAD_TYPE_RAW_IP6 */
+        (1440 - SL_SOCKET_PAYLOAD_BASE), /* Default */
+        (1440 - SL_SOCKET_PAYLOAD_BASE), /* Default */
+        (1440 - SL_SOCKET_PAYLOAD_BASE), /* Default */
+        (1440 - SL_SOCKET_PAYLOAD_BASE) /* Default */
 };
 
 /* ******************************************************************************/
@@ -354,7 +355,8 @@ typedef union {
 } _SlRecvfromMsg_u;
 
 const _SlCmdCtrl_t _SlRecvfomCmdCtrl = {
-SL_OPCODE_SOCKET_RECVFROM, sizeof(_sendRecvCommand_t),
+        SL_OPCODE_SOCKET_RECVFROM,
+        sizeof(_sendRecvCommand_t),
         sizeof(_SocketAddrResponse_u) };
 
 #if _SL_INCLUDE_FUNC(sl_RecvFrom)
@@ -535,7 +537,9 @@ typedef union {
 } _SlSendMsg_u;
 
 const _SlCmdCtrl_t _SlSendCmdCtrl = {
-SL_OPCODE_SOCKET_SEND, sizeof(_sendRecvCommand_t), 0 };
+        SL_OPCODE_SOCKET_SEND,
+        sizeof(_sendRecvCommand_t),
+        0 };
 
 #if _SL_INCLUDE_FUNC(sl_Send)
 _i16 sl_Send(_i16 sd, const void *pBuf, _i16 Len, _i16 flags)
@@ -854,7 +858,8 @@ typedef union {
 } _SlSetSockOptMsg_u;
 
 const _SlCmdCtrl_t _SlSetSockOptCmdCtrl = {
-SL_OPCODE_SOCKET_SETSOCKOPT, sizeof(_setSockOptCommand_t),
+        SL_OPCODE_SOCKET_SETSOCKOPT,
+        sizeof(_setSockOptCommand_t),
         sizeof(_SocketResponse_t) };
 
 #if _SL_INCLUDE_FUNC(sl_SetSockOpt)
