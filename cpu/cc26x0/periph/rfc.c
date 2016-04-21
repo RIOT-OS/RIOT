@@ -69,14 +69,12 @@ uint32_t rfc_send_cmd(void *ropCmd)
     return RFC_DBELL->CMDSTA;
 }
 
-uint16_t rfc_wait_cmd_done(void *ropCmd)
+uint16_t rfc_wait_cmd_done(radio_op_command_t *command)
 {
-    radio_op_command_t *command = (radio_op_command_t *) ropCmd;
     uint32_t timeout_cnt = 0;
     /* wait for cmd execution. condition on rop status doesn't work by itself (too fast?). */
     do {
-        if (++timeout_cnt > 500000)
-        {
+        if (++timeout_cnt > 500000) {
             command->status = R_OP_STATUS_DONE_TIMEOUT;
             break;
         }
