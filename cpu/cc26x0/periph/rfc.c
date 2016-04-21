@@ -177,6 +177,8 @@ void rfc_prepare(void)
     RFC_PWR->PWMCLKEN |= 0x7FF;
     printf("RFC_PWR->PWMCLKEN %lx\n", RFC_PWR->PWMCLKEN);
 
+    PRCM->RFCMODESEL = 5; /* CC2650 requires MODE5 - no doc available on RFCMODESEL*/
+
     /* RFC IRQ */
     rfc_irq_enable();
 
