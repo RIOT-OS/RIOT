@@ -200,7 +200,8 @@ struct _thread {
  *
  * Creating a new thread is done in two steps:
  * 1. the new thread's stack is initialized depending on the platform
- * 2. the new thread is added to the scheduler to be run
+ * 2. the new thread is added to the scheduler and the scheduler is run (if not
+ *    indicated otherwise)
  *
  * As RIOT is using a fixed priority scheduling algorithm, threads are
  * scheduled based on their priority. The priority is fixed for every thread
