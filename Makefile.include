@@ -392,7 +392,7 @@ include $(RIOTBASE)/Makefile.buildtests
 # Export variables used throughout the whole make system:
 include $(RIOTBASE)/Makefile.vars
 
-# Warn if the selected board and drivers don't provide all needed featues:
+# Warn if the selected board and drivers don't provide all needed features:
 ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   EXPECT_ERRORS :=
   EXPECT_CONFLICT :=
