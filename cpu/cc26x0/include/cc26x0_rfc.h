@@ -14,6 +14,7 @@
  * @brief           CC26x0 RFC register definitions
  *
  * @author          Leon George <leon@georgemail.eu>
+ * @author          Florent-Valéry Coen <florent.coen@gmail.com>
  */
 
 #ifndef CC26x0_RFC_H
@@ -142,19 +143,6 @@ typedef struct {
 #define CMDR_CMDID_IEEE_ABORT_FG  0x2401
 #define CMDR_CMDID_IEEE_STOP_FG   0x2402
 #define CMDR_CMDID_IEEE_CCA_REQ   0x2403
-/* ble */
-#define CMDR_CMDID_BLE_SLAVE      0x1801
-#define CMDR_CMDID_BLE_MASTER     0x1802
-#define CMDR_CMDID_BLE_ADV        0x1803
-#define CMDR_CMDID_BLE_ADV_DIR    0x1804
-#define CMDR_CMDID_BLE_ADV_NC     0x1805
-#define CMDR_CMDID_BLE_ADV_SCAN   0x1806
-#define CMDR_CMDID_BLE_SCANNER    0x1807
-#define CMDR_CMDID_BLE_INITIATOR  0x1808
-#define CMDR_CMDID_BLE_GENERIC_RX 0x1809
-#define CMDR_CMDID_BLE_TX_TEST    0x180A
-/* ble immediate */
-#define CMDR_CMDID_BLE_ADV_PAYLOAD    0x180A0000
 /**@}*/
 
 #define CMDSTA_RESULT_mask    0xFF
@@ -369,16 +357,6 @@ typedef struct {
 #define R_OP_STATUS_DONE_TIMEOUT        0x0403
 #define R_OP_STATUS_DONE_STOPPED        0x0404
 #define R_OP_STATUS_DONE_ABORT          0x0405
-/* ble */
-#define R_OP_STATUS_BLE_DONE_OK         0x1400
-#define R_OP_STATUS_BLE_DONE_RXTIMEOUT  0x1401
-#define R_OP_STATUS_BLE_DONE_NOSYNC     0x1402
-#define R_OP_STATUS_BLE_DONE_RXERR      0x1403
-#define R_OP_STATUS_BLE_DONE_CONNECT    0x1404
-#define R_OP_STATUS_BLE_DONE_MAXNACK    0x1405
-#define R_OP_STATUS_BLE_DONE_ENDED      0x1406
-#define R_OP_STATUS_BLE_DONE_ABORT      0x1407
-#define R_OP_STATUS_BLE_DONE_STOPPED    0x1408
 
 #define R_OP_STATUS_ERROR_PAST_START    0x0800
 #define R_OP_STATUS_ERROR_START_TRIG    0x0801
@@ -392,14 +370,6 @@ typedef struct {
 #define R_OP_STATUS_ERROR_TXUNF         0x080a
 #define R_OP_STATUS_ERROR_RXOVF         0x080b
 #define R_OP_STATUS_ERROR_NO_RX         0x080c
-/* ble */
-#define R_OP_STATUS_BLE_ERROR_PAR           0x1800
-#define R_OP_STATUS_BLE_ERROR_RXBUF         0x1801
-#define R_OP_STATUS_BLE_ERROR_NO_SETUP      0x1802
-#define R_OP_STATUS_BLE_ERROR_NO_FS         0x1803
-#define R_OP_STATUS_BLE_ERROR_SYNTH_PROG    0x1804
-#define R_OP_STATUS_BLE_ERROR_RXOVF         0x1805
-#define R_OP_STATUS_BLE_ERROR_TXUNF         0x1806
 
 #define R_OP_STARTTRIG_TYPE_mask            0xF
 #define R_OP_STARTTRIG_TYPE_TRIG_NOW        0x0
@@ -519,21 +489,7 @@ typedef struct {
 
 
 
-typedef struct {
-    radio_op_command_t op;
-    uint8_t channel;
-    uint8_t whitening;
-    uint32_t pParams;
-    uint32_t pOutput;
-} ble_rop_cmd_t;
-
-typedef struct {
-    uint16_t commandNo;
-    uint8_t payloadType;
-    uint8_t newLen;
-    uintptr_t pNewData;
-    uintptr_t pParams;// TODO type this properly once type is known (damn datashiet)
-} ble_update_adv_payload_t;
+#include "cc26x0_rfc_ble.h"
 
 #ifdef __cplusplus
 }
