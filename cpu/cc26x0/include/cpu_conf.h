@@ -32,6 +32,7 @@
 #include "cc26x0_i2c.h"
 #include "cc26x0_ioc.h"
 #include "cc26x0_prcm.h"
+#include "cc26x0_rfc.h"
 #include "cc26x0_uart.h"
 #include "cc26x0_vims.h"
 #include "cc26x0_wdt.h"
