@@ -334,4 +334,3 @@ ISR_VECTORS const void *interrupt_vector[] = {
         0,
         0                            // Reserved
         };
-

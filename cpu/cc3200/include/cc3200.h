@@ -131,4 +131,3 @@ void cc3200_reset(void);
 
 #endif /* CPU_INCLUDE_CC3200_H_ */
 /** @} */
-

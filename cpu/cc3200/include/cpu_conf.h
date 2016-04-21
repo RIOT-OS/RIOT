@@ -53,10 +53,10 @@ extern "C" {
     /** @} */
 
 #define CPU_DEFAULT_IRQ_PRIO    (1U) /**< The default priority is 1 for every
- 	 	 	 	 	 	 	 	 	 	 interrupt, 0 is the highest possible
- 	 	 	 	 	 	 	 	 	 	 priority. */
+                                          interrupt, 0 is the highest possible
+                                          priority. */
 #define CPU_IRQ_NUMOF           PERIPH_COUNT_IRQn /**< number of interrupt
- 	 	 	 	 	 	 	 	 	 	 	 	 	   sources*/
+                                                       sources*/
 #define CPU_FLASH_BASE          START_OF_RAM /**< code is booted into RAM */
 
     /**

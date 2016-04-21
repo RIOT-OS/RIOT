@@ -764,4 +764,3 @@ static void *_event_loop(void *arg) {
     return NULL;
 
 }
-
