@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2016 Leon George, Florent-Valéry Coen
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup         cpu_cc26x0_rfc_definitions
  * @{
@@ -17,7 +25,7 @@
 extern "C" {
 #endif
 
-/** @addtogroup cpu_specific_peripheral_memory_map
+/** @ingroup cpu_specific_peripheral_memory_map
  * @{
  */
 #define RFC_RAT_BASE           (0x40043000)
@@ -42,7 +50,7 @@ typedef struct {
 
 
 
-/** @addtogroup cpu_specific_peripheral_memory_map
+/** @ingroup cpu_specific_peripheral_memory_map
  * @{
  */
 #define RFC_DBELL_BASE           (0x40041000)
@@ -295,7 +303,7 @@ typedef struct {
 
 
 
-/** @addtogroup cpu_specific_peripheral_memory_map
+/** @ingroup cpu_specific_peripheral_memory_map
  * @{
  */
 #define RFC_PWR_BASE           (0x40040000)
