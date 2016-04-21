@@ -5,8 +5,6 @@
 
 #include "cc26x0_rfc.h"
 
-#include "periph_rfc.h"
-
 #define BLE_ADV_STR "this is not a riot\n"
 
 void isr_rfc_cmd_ack(void)
