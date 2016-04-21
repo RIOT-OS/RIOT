@@ -84,8 +84,9 @@ void rfc_prepare(void)
     PRCM->CLKLOADCTL = CLKLOADCTL_LOAD;
     while (!(PRCM->CLKLOADCTL & CLKLOADCTL_LOADDONE)) ;
 
-    PRCM->PDCTL0RFC = 1;
-    PRCM->PDCTL1RFC = 1;
+    /* RFC POWER DOMAIN */
+    PRCM->PDCTL0 |= PDCTL0_RFC_ON;
+    PRCM->PDCTL1 |= PDCTL1_RFC_ON;
     while (!(PRCM->PDSTAT0 & PDSTAT0_RFC_ON)) ;
     while (!(PRCM->PDSTAT1 & PDSTAT1_RFC_ON)) ;
 
