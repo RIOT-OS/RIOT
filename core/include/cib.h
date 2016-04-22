@@ -15,11 +15,13 @@
  * @details     This structure provides an organizational interface
  *              and combined with an memory array forms a circular buffer.
  *
- * @author      unknown, propably Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      unknown, probably Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #ifndef CIB_H
 #define CIB_H
+
+#include "assert.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,14 +42,18 @@ typedef struct {
 #define CIB_INIT(SIZE) { 0, 0, (SIZE) - 1 }
 
 /**
- * @brief Initialize cib_t to 0 and set size.
+ * @brief Initialize @p cib to 0 and set buffer size to @p size.
  *
  * @param[out] cib      Buffer to initialize.
  *                      Must not be NULL.
  * @param[in]  size     Size of the buffer, must not exceed MAXINT/2.
+ *                      Should be equal to 0 or power of 2.
  */
 static inline void cib_init(cib_t *__restrict cib, unsigned int size)
 {
+    /* check if size is a power of 2 by comparing it to its complement */
+    assert(!(size & (size - 1)));
+
     cib_t c = CIB_INIT(size);
     *cib = c;
 }
@@ -57,7 +63,7 @@ static inline void cib_init(cib_t *__restrict cib, unsigned int size)
  *
  * @param[in] cib       the cib_t to check.
  *                      Must not be NULL.
- * @return How often cib_get() can be called before the CIB is empty.
+ * @return How often cib_get() can be called before @p cib is empty.
  */
 static inline unsigned int cib_avail(cib_t *__restrict cib)
 {

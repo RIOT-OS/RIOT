@@ -46,9 +46,9 @@ static char _nomac_stacks[KW2XRF_MAC_STACKSIZE][KW2XRF_NUM];
 void auto_init_kw2xrf(void)
 {
     for (int i = 0; i < KW2XRF_NUM; i++) {
-        DEBUG("Initializing KW2xrf radio at SPI_%i\n", i);
         const kw2xrf_params_t *p = &kw2xrf_params[i];
 
+        DEBUG("Initializing KW2xrf radio at SPI_%i\n", p->spi);
         int res = kw2xrf_init(&kw2xrf_devs[i],
                 p->spi,
                 p->spi_speed,

@@ -32,19 +32,11 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define HDR_NETTYPE (GNRC_NETTYPE_UNDEF)
 #endif
 
-gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload,
-                                    uint8_t *src, uint8_t src_len,
-                                    uint8_t *dst, uint8_t dst_len)
+gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload, const ipv6_addr_t *src,
+                                    const ipv6_addr_t *dst)
 {
     gnrc_pktsnip_t *ipv6;
     ipv6_hdr_t *hdr;
-
-    if (((src_len != 0) && (src_len != sizeof(ipv6_addr_t))) ||
-        ((dst_len != 0) && (dst_len != sizeof(ipv6_addr_t)))) {
-        DEBUG("ipv6_hdr: Address length was not 0 or %zu byte.\n",
-              sizeof(ipv6_addr_t));
-        return NULL;
-    }
 
     ipv6 = gnrc_pktbuf_add(payload, NULL, sizeof(ipv6_hdr_t), HDR_NETTYPE);
 
@@ -55,28 +47,26 @@ gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload,
 
     hdr = (ipv6_hdr_t *)ipv6->data;
 
-    if ((src != NULL) && (src_len != 0)) {
+    if (src != NULL) {
 #ifdef MODULE_IPV6_ADDR
         DEBUG("ipv6_hdr: set packet source to %s\n",
               ipv6_addr_to_str(addr_str, (ipv6_addr_t *)src,
                                sizeof(addr_str)));
 #endif
-        memcpy(&hdr->src, src, src_len);
+        memcpy(&hdr->src, src, sizeof(ipv6_addr_t));
     }
     else {
         DEBUG("ipv6_hdr: set packet source to ::\n");
         ipv6_addr_set_unspecified(&hdr->src);
     }
 
-    memset(&hdr->dst + dst_len, 0, sizeof(ipv6_addr_t) - dst_len);
-
-    if ((dst != NULL) && (dst_len != 0)) {
+    if (dst != NULL) {
 #ifdef MODULE_IPV6_ADDR
         DEBUG("ipv6_hdr: set packet destination to %s\n",
               ipv6_addr_to_str(addr_str, (ipv6_addr_t *)dst,
                                sizeof(addr_str)));
 #endif
-        memcpy(&hdr->dst, dst, dst_len);
+        memcpy(&hdr->dst, dst, sizeof(ipv6_addr_t));
     }
     else {
         DEBUG("ipv6_hdr: set packet destination to ::1\n");

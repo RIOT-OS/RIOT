@@ -24,7 +24,6 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "kernel.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/pktbuf.h"
 
@@ -37,6 +36,7 @@ extern "C" {
  *          in bytes.
  */
 #define GNRC_NETIF_HDR_L2ADDR_MAX_LEN   (8)
+#define GNRC_NETIF_HDR_L2ADDR_PRINT_LEN (GNRC_NETIF_HDR_L2ADDR_MAX_LEN * 3)
 
 /**
  * @{

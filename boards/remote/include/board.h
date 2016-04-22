@@ -31,75 +31,30 @@
 #endif
 
 /**
- * @name LED pin definitions
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_PORT_C          GPIO_C
-#define LED_PORT_D          GPIO_D
-#define LED_RED_PIN         (2)
-#define LED_GREEN_PIN       (5)
-#define LED_BLUE_PIN        (3)
+#define LED0_PIN            GPIO_PIN(3, 2)
+#define LED1_PIN            GPIO_PIN(3, 5)
+#define LED2_PIN            GPIO_PIN(2, 3)
+
+#define LED0_MASK           (1 << 2)
+#define LED1_MASK           (1 << 5)
+#define LED2_MASK           (1 << 3)
+
+#define LED0_ON             (GPIO_D->DATA &= ~LED0_MASK)
+#define LED0_OFF            (GPIO_D->DATA |=  LED0_MASK)
+#define LED0_TOGGLE         (GPIO_D->DATA ^=  LED0_MASK)
+
+#define LED1_ON             (GPIO_D->DATA &= ~LED1_MASK)
+#define LED1_OFF            (GPIO_D->DATA |=  LED1_MASK)
+#define LED1_TOGGLE         (GPIO_D->DATA ^=  LED1_MASK)
+
+#define LED2_ON             (GPIO_C->DATA &= ~LED2_MASK)
+#define LED2_OFF            (GPIO_C->DATA |=  LED2_MASK)
+#define LED2_TOGGLE         (GPIO_C->DATA ^=  LED2_MASK)
 /** @} */
-/**
- * @name Macros for controlling the on-board LEDs
- * @{
- */
-#define LED_RED_ON         (LED_PORT_D->DATA &= ~(1 << LED_RED_PIN))
-#define LED_RED_OFF        (LED_PORT_D->DATA |= (1 << LED_RED_PIN))
-#define LED_RED_TOGGLE     (LED_PORT_D->DATA ^= (1 << LED_RED_PIN))
-#define LED_GREEN_ON       (LED_PORT_D->DATA &= ~(1 << LED_GREEN_PIN))
-#define LED_GREEN_OFF      (LED_PORT_D->DATA |= (1 << LED_GREEN_PIN))
-#define LED_GREEN_TOGGLE   (LED_PORT_D->DATA ^= (1 << LED_GREEN_PIN))
-#define LED_BLUE_ON        (LED_PORT_C->DATA &= ~(1 << LED_BLUE_PIN))
-#define LED_BLUE_OFF       (LED_PORT_C->DATA |= (1 << LED_BLUE_PIN))
-#define LED_BLUE_TOGGLE    (LED_PORT_C->DATA ^= (1 << LED_BLUE_PIN))
-#define LED_ALL_OFF        LED_GREEN_OFF; \
-                           LED_RED_OFF;   \
-                           LED_BLUE_OFF
-/* Output is color white */
-#define LED_ALL_ON         LED_BLUE_ON;   \
-                           LED_RED_ON;    \
-                           LED_GREEN_ON
-#define LED_YELLOW_ON      LED_BLUE_OFF;  \
-                           LED_GREEN_ON;  \
-                           LED_RED_ON
-#define LED_YELLOW_OFF     LED_GREEN_OFF; \
-                           LED_RED_OFF
-#define LED_YELLOW_TOGGLE  LED_GREEN_TOGGLE; \
-                           LED_RED_TOGGLE
-#define LED_PURPLE_ON      LED_GREEN_OFF;    \
-                           LED_BLUE_ON;      \
-                           LED_RED_ON
-#define LED_PURPLE_OFF     LED_BLUE_OFF;     \
-                           LED_RED_OFF
-#define LED_PURPLE_TOGGLE  LED_BLUE_TOGGLE;  \
-                           LED_RED_TOGGLE
-/* Take LED_COLOR as argument, i.e LED_RED */
-#define LED_FADE(led)                         \
-  volatile int i;                             \
-  int k, j;                                   \
-  LED_FADE_EXPAND(led)
-#define LED_FADE_EXPAND(led)                  \
-  for(k = 0; k < 800; ++k) {                  \
-    j = k > 400 ? 800 - k : k;                \
-    led##_ON;                                 \
-    for(i = 0; i < j; ++i) {                  \
-      asm("nop");                             \
-    }                                         \
-    led##_OFF;                                \
-    for(i = 0; i < 400 - j; ++i) {            \
-      asm("nop");                             \
-    }                                         \
-  }
-#define LED_RAINBOW()                         \
-  volatile int i;                             \
-  int k,j;                                    \
-  LED_FADE_EXPAND(LED_YELLOW);                \
-  LED_FADE_EXPAND(LED_RED);                   \
-  LED_FADE_EXPAND(LED_PURPLE);                \
-  LED_FADE_EXPAND(LED_BLUE);                  \
-  LED_FADE_EXPAND(LED_GREEN);                 \
-/** @} */
+
 /**
  * @name Flash Customer Configuration Area (CCA) parameters
  * @{
@@ -121,6 +76,18 @@
 #define RF_SWITCH_INTERNAL  (RF_SWITCH_PORT->DATA &= ~(1 << RF_SWITCH_PIN))
 #define RF_SWITCH_TOGGLE    (RF_SWITCH_PORT->DATA ^= (1 << RF_SWITCH_PIN))
 /** @} */
+
+/**
+ * @name xtimer configuration
+ * @{
+ */
+#define XTIMER              TIMER_0
+#define XTIMER_CHAN         (0)
+#define XTIMER_SHIFT        (-4)
+#define XTIMER_BACKOFF      (50)
+#define XTIMER_ISR_BACKOFF  (40)
+/** @} */
+
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */

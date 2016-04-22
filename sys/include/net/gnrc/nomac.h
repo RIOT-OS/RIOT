@@ -22,7 +22,6 @@
 #ifndef GNRC_NOMAC_H_
 #define GNRC_NOMAC_H_
 
-#include "kernel.h"
 #include "net/gnrc/netdev.h"
 
 #ifdef __cplusplus

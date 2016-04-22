@@ -26,9 +26,10 @@
 #include "ethos.h"
 #include "periph/uart.h"
 #include "tsrb.h"
+#include "irq.h"
 
 #include "net/netdev2.h"
-#include "net/netdev2_eth.h"
+#include "net/netdev2/eth.h"
 #include "net/eui64.h"
 #include "net/ethernet.h"
 
@@ -40,34 +41,34 @@
 #include "debug.h"
 
 static void _get_mac_addr(netdev2_t *dev, uint8_t* buf);
-static void ethos_isr(void *arg, char c);
-const static netdev2_driver_t netdev2_driver_ethos;
+static void ethos_isr(void *arg, uint8_t c);
+static const netdev2_driver_t netdev2_driver_ethos;
 
 static const uint8_t _esc_esc[] = {ETHOS_ESC_CHAR, (ETHOS_ESC_CHAR ^ 0x20)};
 static const uint8_t _esc_delim[] = {ETHOS_ESC_CHAR, (ETHOS_FRAME_DELIMITER ^ 0x20)};
 
 
-void ethos_setup(ethos_t *dev, uart_t uart, uint32_t baudrate, uint8_t *buf, size_t bufsize)
+void ethos_setup(ethos_t *dev, const ethos_params_t *params)
 {
     dev->netdev.driver = &netdev2_driver_ethos;
-    dev->uart = uart;
+    dev->uart = params->uart;
     dev->state = WAIT_FRAMESTART;
     dev->framesize = 0;
     dev->frametype = 0;
     dev->last_framesize = 0;
 
-    tsrb_init(&dev->inbuf, (char*)buf, bufsize);
+    tsrb_init(&dev->inbuf, (char*)params->buf, params->bufsize);
     mutex_init(&dev->out_mutex);
 
-    uint32_t a = genrand_uint32();
+    uint32_t a = random_uint32();
     memcpy(dev->mac_addr, (char*)&a, 4);
-    a = genrand_uint32();
+    a = random_uint32();
     memcpy(dev->mac_addr+4, (char*)&a, 2);
 
     dev->mac_addr[0] &= (0x2);      /* unset globally unique bit */
     dev->mac_addr[0] &= ~(0x1);     /* set unicast bit*/
 
-    uart_init(uart, baudrate, ethos_isr, (void*)dev);
+    uart_init(params->uart, params->baudrate, ethos_isr, (void*)dev);
 
     uint8_t frame_delim = ETHOS_FRAME_DELIMITER;
     uart_write(dev->uart, &frame_delim, 1);
@@ -126,7 +127,7 @@ static void _end_of_frame(ethos_t *dev)
     _reset_state(dev);
 }
 
-static void ethos_isr(void *arg, char c)
+static void ethos_isr(void *arg, uint8_t c)
 {
     ethos_t *dev = (ethos_t *) arg;
 
@@ -222,7 +223,7 @@ void ethos_send_frame(ethos_t *dev, const uint8_t *data, size_t len, unsigned fr
 {
     uint8_t frame_delim = ETHOS_FRAME_DELIMITER;
 
-    if (!inISR()) {
+    if (!irq_is_in()) {
         mutex_lock(&dev->out_mutex);
     }
     else {
@@ -248,7 +249,7 @@ void ethos_send_frame(ethos_t *dev, const uint8_t *data, size_t len, unsigned fr
     /* end of frame */
     uart_write(dev->uart, &frame_delim, 1);
 
-    if (!inISR()) {
+    if (!irq_is_in()) {
         mutex_unlock(&dev->out_mutex);
     }
 }
@@ -291,16 +292,18 @@ static void _get_mac_addr(netdev2_t *encdev, uint8_t* buf)
     memcpy(buf, dev->mac_addr, 6);
 }
 
-static int _recv(netdev2_t *netdev, char* buf, int len)
+static int _recv(netdev2_t *netdev, char* buf, int len, void* info)
 {
+    (void) info;
     ethos_t * dev = (ethos_t *) netdev;
 
     if (buf) {
-        if (len != dev->last_framesize) {
-            DEBUG("ethos _recv(): unmatched receive buffer size.");
+        if (len < (int)dev->last_framesize) {
+            DEBUG("ethos _recv(): receive buffer too small.");
             return -1;
         }
 
+        len = (int)dev->last_framesize;
         dev->last_framesize = 0;
 
         if ((tsrb_get(&dev->inbuf, buf, len) != len)) {
@@ -315,7 +318,7 @@ static int _recv(netdev2_t *netdev, char* buf, int len)
     }
 }
 
-int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
+static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
 {
     int res = 0;
 
@@ -338,7 +341,7 @@ int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
 }
 
 /* netdev2 interface */
-const static netdev2_driver_t netdev2_driver_ethos = {
+static const netdev2_driver_t netdev2_driver_ethos = {
     .send = _send,
     .recv = _recv,
     .init = _init,

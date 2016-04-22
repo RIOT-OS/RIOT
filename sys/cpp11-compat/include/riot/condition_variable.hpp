@@ -26,6 +26,7 @@
 
 #include "sched.h"
 #include "xtimer.h"
+#include "priority_queue.h"
 
 #include "riot/mutex.hpp"
 #include "riot/chrono.hpp"

@@ -161,7 +161,7 @@ STRIP_FROM_PATH        =
 # specify the list of include paths that are normally passed to the compiler
 # using the -I flag.
 
-STRIP_FROM_INC_PATH    =
+STRIP_FROM_INC_PATH    = $(STRIP_FROM_INC_PATH_LIST) # Exported from Makefile.
 
 # If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter (but
 # less readable) file names. This can be useful is your file systems doesn't
@@ -842,6 +842,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/ezr32wg/include/ezr* \
                          */pkg/*/*/* \
                          */pkg/tlsf/patch.txt \
+                         */sys/random/tinymt32/* \
 
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names

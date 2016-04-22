@@ -42,6 +42,11 @@
 #define NUMOF_IRQS                  (16U)
 
 /**
+ * @brief   Mask to get PINCFG reg value from mode value
+ */
+#define MODE_PINCFG_MASK            (0x06)
+
+/**
  * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
  */
 static const int8_t exti_config[2][32] = {
@@ -89,42 +94,38 @@ void gpio_init_mux(gpio_t pin, gpio_mux_t mux)
     port->PMUX[pin_pos >> 1].reg |=  (mux << (4 * (pin_pos & 0x1)));
 }
 
-int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pushpull)
+int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     PortGroup* port = _port(pin);
     int pin_pos = _pin_pos(pin);
     int pin_mask = _pin_mask(pin);
 
-    /* configure the pin's pull resistor and reset all other configuration */
-    switch (pushpull) {
-        case GPIO_PULLDOWN:
-            port->OUTCLR.reg = pin_mask;
-            port->PINCFG[pin_pos].reg = PORT_PINCFG_PULLEN;
-            break;
-        case GPIO_PULLUP:
-            port->OUTSET.reg = pin_mask;
-            port->PINCFG[pin_pos].reg = PORT_PINCFG_PULLEN;
-            break;
-        case GPIO_NOPULL:
-            port->PINCFG[pin_pos].reg = 0;
-            break;
+    /* make sure pin mode is applicable */
+    if (mode > 0x7) {
+        return -1;
     }
-    /* set pin_pos direction */
-    if (dir == GPIO_DIR_OUT) {
-        if (pushpull == GPIO_PULLDOWN) {
-            return -1;
-        }
-        port->DIRSET.reg = pin_mask;            /* configure as output */
-        port->OUTCLR.reg = pin_mask;            /* set pin LOW on init */
+
+    /* set pin direction */
+    if (mode & 0x2) {
+        port->DIRCLR.reg = pin_mask;
     }
     else {
-        port->DIRCLR.reg = pin_mask;            /* configure as input */
-        port->PINCFG[pin_pos].reg |= PORT_PINCFG_INEN;
+        port->DIRSET.reg = pin_mask;
     }
+
+    /* configure the pin cfg and clear output register */
+    port->PINCFG[pin_pos].reg = (mode & MODE_PINCFG_MASK);
+    port->OUTCLR.reg = pin_mask;
+
+    /* and set pull-up/pull-down if applicable */
+    if (mode == 0x7) {
+        port->OUTSET.reg = pin_mask;
+    }
+
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
     int exti = _exti(pin);
@@ -138,7 +139,7 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
     gpio_config[exti].cb = cb;
     gpio_config[exti].arg = arg;
     /* configure pin as input and set MUX to peripheral function A */
-    gpio_init(pin, GPIO_DIR_IN, pullup);
+    gpio_init(pin, mode);
     gpio_init_mux(pin, GPIO_MUX_A);
     /* enable clocks for the EIC module */
     MCLK->APBAMASK.reg |= MCLK_APBAMASK_EIC;
@@ -153,7 +154,7 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
     EIC->INTENSET.reg = (1 << exti);
     /* enable the EIC module*/
     EIC->CTRLA.reg = EIC_CTRLA_ENABLE;
-    while (EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE);
+    while (EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE) {}
     return 0;
 }
 

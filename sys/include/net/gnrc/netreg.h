@@ -149,25 +149,6 @@ gnrc_netreg_entry_t *gnrc_netreg_getnext(gnrc_netreg_entry_t *entry);
 
 int gnrc_netreg_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr);
 
-/**
- * @brief   Builds a header for sending and adds it to the packet buffer.
- *
- * @param[in] type      Type of the header.
- * @param[in] payload   Payload for the packet.
- * @param[in] src       Source address for the header. Can be NULL if not
- *                      known or required.
- * @param[in] src_len   Length of @p src. Can be 0 if not known or required.
- * @param[in] dst       Destination address for the header. Can be NULL if not
- *                      known or required.
- * @param[in] dst_len   Length of @p dst. Can be 0 if not known or required.
- *
- * @return  The header for the protocol on success.
- * @return  NULL on error.
- */
-gnrc_pktsnip_t *gnrc_netreg_hdr_build(gnrc_nettype_t type, gnrc_pktsnip_t *payload,
-                                      uint8_t *src, uint8_t src_len,
-                                      uint8_t *dst, uint8_t dst_len);
-
 #ifdef __cplusplus
 }
 #endif

@@ -48,9 +48,11 @@
 
 #include "native_internal.h"
 
+#include "async_read.h"
+
 #include "net/eui64.h"
 #include "net/netdev2.h"
-#include "net/netdev2_eth.h"
+#include "net/netdev2/eth.h"
 #include "net/ethernet.h"
 #include "net/ethernet/hdr.h"
 #include "netdev2_tap.h"
@@ -62,11 +64,6 @@
 
 /* support one tap interface for now */
 netdev2_tap_t netdev2_tap;
-
-#ifdef __MACH__
-pid_t _sigio_child_pid;
-static void _sigio_child(netdev2_tap_t *dev);
-#endif
 
 /* netdev2 interface */
 static int _init(netdev2_t *netdev);
@@ -110,7 +107,7 @@ static inline void _isr(netdev2_t *netdev)
 #endif
 }
 
-int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
+static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
 {
     if (dev != (netdev2_t *)&netdev2_tap) {
         return -ENODEV;
@@ -140,7 +137,7 @@ int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
     return res;
 }
 
-int _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
+static int _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
 {
     (void)value_len;
 
@@ -187,12 +184,58 @@ static inline bool _is_addr_multicast(uint8_t *addr)
     return (addr[0] & 0x01);
 }
 
+static void _continue_reading(netdev2_tap_t *dev)
+{
+    /* work around lost signals */
+    fd_set rfds;
+    struct timeval t;
+    memset(&t, 0, sizeof(t));
+    FD_ZERO(&rfds);
+    FD_SET(dev->tap_fd, &rfds);
+
+    _native_in_syscall++; /* no switching here */
+
+    if (real_select(dev->tap_fd + 1, &rfds, NULL, NULL, &t) == 1) {
+        int sig = SIGIO;
+        extern int _sig_pipefd[2];
+        extern ssize_t (*real_write)(int fd, const void * buf, size_t count);
+        real_write(_sig_pipefd[1], &sig, sizeof(int));
+        _native_sigpend++;
+        DEBUG("netdev2_tap: sigpend++\n");
+    }
+    else {
+        DEBUG("netdev2_tap: native_async_read_continue\n");
+        native_async_read_continue(dev->tap_fd);
+    }
+
+    _native_in_syscall--;
+}
+
 static int _recv(netdev2_t *netdev2, char *buf, int len, void *info)
 {
     netdev2_tap_t *dev = (netdev2_tap_t*)netdev2;
     (void)info;
 
     if (!buf) {
+        if (len > 0) {
+            /* no memory available in pktbuf, discarding the frame */
+            DEBUG("netdev2_tap: discarding the frame\n");
+
+            /* repeating `real_read` for small size on tap device results in
+             * freeze for some reason. Using a large buffer for now. */
+            /*
+            uint8_t buf[4];
+            while (real_read(dev->tap_fd, buf, sizeof(buf)) > 0) {
+            }
+            */
+
+            static uint8_t buf[ETHERNET_FRAME_LEN];
+
+            real_read(dev->tap_fd, buf, sizeof(buf));
+
+            _continue_reading(dev);
+        }
+
         /* no way of figuring out packet size without racey buffering,
          * so we return the maximum possible size */
         return ETHERNET_FRAME_LEN;
@@ -210,36 +253,18 @@ static int _recv(netdev2_t *netdev2, char *buf, int len, void *info)
                   "That's not me => Dropped\n",
                   hdr->dst[0], hdr->dst[1], hdr->dst[2],
                   hdr->dst[3], hdr->dst[4], hdr->dst[5]);
-#ifdef __MACH__
-            kill(_sigio_child_pid, SIGCONT);
-#endif
+
+            native_async_read_continue(dev->tap_fd);
+
             return 0;
         }
-        /* work around lost signals */
-        fd_set rfds;
-        struct timeval t;
-        memset(&t, 0, sizeof(t));
-        FD_ZERO(&rfds);
-        FD_SET(dev->tap_fd, &rfds);
 
-        _native_in_syscall++; /* no switching here */
+        _continue_reading(dev);
 
-        if (real_select(dev->tap_fd + 1, &rfds, NULL, NULL, &t) == 1) {
-            int sig = SIGIO;
-            extern int _sig_pipefd[2];
-            extern ssize_t (*real_write)(int fd, const void * buf, size_t count);
-            real_write(_sig_pipefd[1], &sig, sizeof(int));
-            _native_sigpend++;
-            DEBUG("netdev2_tap: sigpend++\n");
-        }
-        else {
-#ifdef __MACH__
-        kill(_sigio_child_pid, SIGCONT);
+#ifdef MODULE_NETSTATS_L2
+        netdev2->stats.rx_count++;
+        netdev2->stats.rx_bytes += nread;
 #endif
-        }
-
-        _native_in_syscall--;
-
         return nread;
     }
     else if (nread == -1) {
@@ -262,15 +287,29 @@ static int _recv(netdev2_t *netdev2, char *buf, int len, void *info)
 static int _send(netdev2_t *netdev, const struct iovec *vector, int n)
 {
     netdev2_tap_t *dev = (netdev2_tap_t*)netdev;
-    return _native_writev(dev->tap_fd, vector, n);
+    int res = _native_writev(dev->tap_fd, vector, n);
+#ifdef MODULE_NETSTATS_L2
+    size_t bytes = 0;
+    for (int i = 0; i < n; i++) {
+        bytes += vector->iov_len;
+        vector++;
+    }
+    netdev->stats.tx_bytes += bytes;
+#endif
+    if (netdev->event_callback) {
+        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE, NULL);
+    }
+    return res;
 }
 
-void netdev2_tap_setup(netdev2_tap_t *dev, const char *name) {
+void netdev2_tap_setup(netdev2_tap_t *dev, const netdev2_tap_params_t *params) {
     dev->netdev.driver = &netdev2_driver_tap;
-    strncpy(dev->tap_name, name, IFNAMSIZ);
+    strncpy(dev->tap_name, *(params->tap_name), IFNAMSIZ);
 }
 
-static void _tap_isr(void) {
+static void _tap_isr(int fd) {
+    (void) fd;
+
     netdev2_t *netdev = (netdev2_t *)&netdev2_tap;
 
     if (netdev->event_callback) {
@@ -306,7 +345,7 @@ static int _init(netdev2_t *netdev)
     /* initialize device descriptor */
     dev->promiscous = 0;
     /* implicitly create the tap interface */
-    if ((dev->tap_fd = real_open(clonedev , O_RDWR)) == -1) {
+    if ((dev->tap_fd = real_open(clonedev, O_RDWR | O_NONBLOCK)) == -1) {
         err(EXIT_FAILURE, "open(%s)", clonedev);
     }
 #if (defined(__MACH__) || defined(__FreeBSD__)) /* OSX/FreeBSD */
@@ -351,22 +390,14 @@ static int _init(netdev2_t *netdev)
     DEBUG("gnrc_tapnet_init(): dev->addr = %02x:%02x:%02x:%02x:%02x:%02x\n",
             dev->addr[0], dev->addr[1], dev->addr[2],
             dev->addr[3], dev->addr[4], dev->addr[5]);
+
     /* configure signal handler for fds */
-    register_interrupt(SIGIO, _tap_isr);
-#ifdef __MACH__
-    /* tuntap signalled IO is not working in OSX,
-     * * check http://sourceforge.net/p/tuntaposx/bugs/17/ */
-    _sigio_child(dev);
-#else
-    /* configure fds to send signals on io */
-    if (fcntl(dev->tap_fd, F_SETOWN, _native_pid) == -1) {
-        err(EXIT_FAILURE, "gnrc_tapnet_init(): fcntl(F_SETOWN)");
-    }
-    /* set file access mode to non-blocking */
-    if (fcntl(dev->tap_fd, F_SETFL, O_NONBLOCK | O_ASYNC) == -1) {
-        err(EXIT_FAILURE, "gnrc_tabnet_init(): fcntl(F_SETFL)");
-    }
-#endif /* not OSX */
+    native_async_read_setup();
+    native_async_read_add_handler(dev->tap_fd, _tap_isr);
+
+#ifdef MODULE_NETSTATS_L2
+    memset(&netdev->stats, 0, sizeof(netstats_t));
+#endif
     DEBUG("gnrc_tapnet: initialized.\n");
     return 0;
 }
@@ -379,40 +410,8 @@ void netdev2_tap_cleanup(netdev2_tap_t *dev)
     }
 
     /* cleanup signal handling */
-    unregister_interrupt(SIGIO);
-#ifdef __MACH__
-    kill(_sigio_child_pid, SIGKILL);
-#endif
+    native_async_read_cleanup();
 
     /* close the tap device */
     real_close(dev->tap_fd);
 }
-
-#ifdef __MACH__
-static void _sigio_child(netdev2_tap_t *dev)
-{
-    pid_t parent = _native_pid;
-    if ((_sigio_child_pid = real_fork()) == -1) {
-        err(EXIT_FAILURE, "sigio_child: fork");
-    }
-    if (_sigio_child_pid > 0) {
-        /* return in parent process */
-        return;
-    }
-    /* watch tap interface and signal parent process if data is
-     * available */
-    fd_set rfds;
-    while (1) {
-        FD_ZERO(&rfds);
-        FD_SET(dev->tap_fd, &rfds);
-        if (real_select(dev->tap_fd + 1, &rfds, NULL, NULL, NULL) == 1) {
-            kill(parent, SIGIO);
-        }
-        else {
-            kill(parent, SIGKILL);
-            err(EXIT_FAILURE, "osx_sigio_child: select");
-        }
-        pause();
-    }
-}
-#endif

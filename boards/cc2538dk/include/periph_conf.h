@@ -20,6 +20,7 @@
 #define PERIPH_CONF_H_
 
 #include "cpu.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +40,7 @@ extern "C" {
 
 /* Timer 0 configuration */
 #define TIMER_0_DEV         GPTIMER0
-#define TIMER_0_CHANNELS    NUM_CHANNELS_PER_GPTIMER
+#define TIMER_0_CHANNELS    1
 #define TIMER_0_MAX_VALUE   0xffffffff
 #define TIMER_0_IRQn_1      GPTIMER_0A_IRQn
 #define TIMER_0_IRQn_2      GPTIMER_0B_IRQn
@@ -48,7 +49,7 @@ extern "C" {
 
 /* Timer 1 configuration */
 #define TIMER_1_DEV         GPTIMER1
-#define TIMER_1_CHANNELS    NUM_CHANNELS_PER_GPTIMER
+#define TIMER_1_CHANNELS    1
 #define TIMER_1_MAX_VALUE   0xffffffff
 #define TIMER_1_IRQn_1      GPTIMER_1A_IRQn
 #define TIMER_1_IRQn_2      GPTIMER_1B_IRQn
@@ -57,7 +58,7 @@ extern "C" {
 
 /* Timer 2 configuration */
 #define TIMER_2_DEV         GPTIMER2
-#define TIMER_2_CHANNELS    NUM_CHANNELS_PER_GPTIMER
+#define TIMER_2_CHANNELS    1
 #define TIMER_2_MAX_VALUE   0xffffffff
 #define TIMER_2_IRQn_1      GPTIMER_2A_IRQn
 #define TIMER_2_IRQn_2      GPTIMER_2B_IRQn
@@ -66,7 +67,7 @@ extern "C" {
 
 /* Timer 3 configuration */
 #define TIMER_3_DEV         GPTIMER3
-#define TIMER_3_CHANNELS    NUM_CHANNELS_PER_GPTIMER
+#define TIMER_3_CHANNELS    1
 #define TIMER_3_MAX_VALUE   0xffffffff
 #define TIMER_3_IRQn_1      GPTIMER_3A_IRQn
 #define TIMER_3_IRQn_2      GPTIMER_3B_IRQn
@@ -95,14 +96,58 @@ extern "C" {
 /* UART 0 pin configuration */
 #define UART_0_TX_PIN       GPIO_PA1
 #define UART_0_RX_PIN       GPIO_PA0
+#define UART_0_RTS_PIN      GPIO_PD3
+#define UART_0_CTS_PIN      GPIO_PB0
 
 /* UART 1 device configuration */
 #define UART_1_DEV          UART1
 #define UART_1_IRQ          UART1_IRQn
 #define UART_1_ISR          isr_uart1
 /* UART 1 pin configuration */
-#define UART_1_RTS_PIN      GPIO_PD3
-#define UART_1_CTS_PIN      GPIO_PB0
+/** @} */
+
+/**
+ * @name I2C configuration
+ * @{
+ */
+#define I2C_NUMOF               1
+#define I2C_0_EN                1
+#define I2C_IRQ_PRIO            1
+
+/* I2C 0 device configuration */
+#define I2C_0_DEV               0
+#define I2C_0_IRQ               I2C_IRQn
+#define I2C_0_IRQ_HANDLER       isr_i2c
+#define I2C_0_SCL_PIN           GPIO_PA2 /* SPI_SCK on the SmartRF06 baseboard */
+#define I2C_0_SDA_PIN           GPIO_PA4 /* SPI_MOSI on the SmartRF06 baseboard */
+
+static const i2c_conf_t i2c_config[I2C_NUMOF] = {
+    {
+        .scl_pin = GPIO_PA2, /* SPI_SCK on the SmartRF06 baseboard */
+        .sda_pin = GPIO_PA4, /* SPI_MOSI on the SmartRF06 baseboard */
+    },
+};
+/** @} */
+
+/**
+ * @name SPI configuration
+ * @{
+ */
+#define SPI_NUMOF           1
+#define SPI_0_EN            1
+
+#ifdef HAVE_PERIPH_SPI_CONF_T
+static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
+    {
+        .dev      = SSI0,
+        .mosi_pin = GPIO_PA4,
+        .miso_pin = GPIO_PA5,
+        .sck_pin  = GPIO_PA2,
+        .cs_pin   = GPIO_PD0,
+    },
+};
+#endif
+
 /** @} */
 
 /**

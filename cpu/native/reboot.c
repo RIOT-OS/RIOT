@@ -20,6 +20,7 @@
 
 #include "native_internal.h"
 #include "netdev2_tap.h"
+#include "tty_uart.h"
 
 void reboot(void)
 {
@@ -28,6 +29,8 @@ void reboot(void)
 #ifdef MODULE_NETDEV2_TAP
     netdev2_tap_cleanup(&netdev2_tap);
 #endif
+
+    uart_cleanup();
 
     if (real_execve(_native_argv[0], _native_argv, NULL) == -1) {
         err(EXIT_FAILURE, "reboot: execve");

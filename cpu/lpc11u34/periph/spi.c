@@ -93,7 +93,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     spi->CR1 |= (1 << 1);
 
     /* Wait while the BUSY flag is set */
-    while(spi->SR & (1 << 4));
+    while(spi->SR & (1 << 4)) {}
     /* Clear the RX FIFO */
     while(spi->SR & (1 << 2)) {
         spi->DR;
@@ -139,7 +139,7 @@ int spi_conf_pins(spi_t dev)
 
 int spi_acquire(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
     mutex_lock(&locks[dev]);
@@ -148,7 +148,7 @@ int spi_acquire(spi_t dev)
 
 int spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
     mutex_unlock(&locks[dev]);
@@ -176,11 +176,11 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     }
 
     /* Wait while the BUSY flag is set */
-    while(spi->SR & (1 << 4));
+    while(spi->SR & (1 << 4)) {}
     /* Put byte in the TX Fifo */
     *((volatile uint8_t *)(&spi->DR)) = (uint8_t)out;
     /* Wait until the current byte is transfered */
-    while(!(spi->SR & (1 << 2)) );
+    while(!(spi->SR & (1 << 2)) ) {}
     /* Read the returned byte */
     tmp = *((volatile uint8_t *)(&spi->DR));
     /* 'return' response byte if wished for */

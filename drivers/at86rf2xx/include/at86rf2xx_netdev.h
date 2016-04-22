@@ -19,7 +19,7 @@
 #ifndef AT86RF2XX_NETDEV_H_
 #define AT86RF2XX_NETDEV_H_
 
-#include "net/gnrc/netdev.h"
+#include "net/netdev2.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,7 +28,7 @@ extern "C" {
 /**
  * @brief   Reference to the netdev device driver struct
  */
-extern const gnrc_netdev_driver_t at86rf2xx_driver;
+extern const netdev2_driver_t at86rf2xx_driver;
 
 #ifdef __cplusplus
 }

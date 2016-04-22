@@ -1,0 +1,1 @@
+INCLUDES += -I$(BINDIRBASE)/pkg/$(BOARD)/jsmn

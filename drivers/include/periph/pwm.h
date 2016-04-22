@@ -22,6 +22,7 @@
 #define PERIPH_PWM_H
 
 #include <stdint.h>
+#include <limits.h>
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -53,7 +54,7 @@ extern "C" {
  * @{
  */
 #ifndef PWM_UNDEF
-#define PWM_UNDEF           (-1)
+#define PWM_UNDEF           (UINT_MAX)
 #endif
 /** @} */
 

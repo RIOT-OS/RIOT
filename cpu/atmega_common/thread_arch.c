@@ -25,7 +25,6 @@
 #include "sched.h"
 #include "irq.h"
 #include "cpu.h"
-#include "kernel_internal.h"
 
 /*
  * local function declarations  (prefixed with __)
@@ -39,7 +38,7 @@ static void __enter_thread_mode(void);
  * @brief Since AVR doesn't support direct manipulation of the program counter we
  * model a stack like it would be left by __context_save().
  * The resulting layout in memory is the following:
- * ---------------tcb_t (not created by thread_arch_stack_init) ----------
+ * ---------------thread_t (not created by thread_arch_stack_init) ----------
  * local variables (a temporary value and the stackpointer)
  * -----------------------------------------------------------------------
  * a marker (AFFE) - for debugging purposes (helps finding the stack
@@ -213,9 +212,9 @@ void thread_arch_start_threading(void)
 void NORETURN __enter_thread_mode(void) __attribute__((naked));
 void NORETURN __enter_thread_mode(void)
 {
-    enableIRQ();
+    irq_enable();
     __context_restore();
-    asm volatile("ret");
+    __asm__ volatile("ret");
 
     UNREACHABLE();
 }
@@ -225,18 +224,18 @@ void thread_arch_yield(void)
 {
     __context_save();
 
-    /* disableIRQ(); */ /* gets already disabled during __context_save() */
+    /* irq_disable(); */ /* gets already disabled during __context_save() */
     sched_run();
-    enableIRQ();
+    irq_enable();
 
     __context_restore();
-    asm volatile("ret");
+    __asm__ volatile("ret");
 }
 
 
 __attribute__((always_inline)) static inline void __context_save(void)
 {
-    asm volatile(
+    __asm__ volatile(
         "push r0                             \n\t"
         "in   r0, __SREG__                   \n\t"
         "cli                                 \n\t"
@@ -292,7 +291,7 @@ __attribute__((always_inline)) static inline void __context_save(void)
 
 __attribute__((always_inline)) static inline void __context_restore(void)
 {
-    asm volatile(
+    __asm__ volatile(
         "lds  r26, sched_active_thread       \n\t"
         "lds  r27, sched_active_thread + 1   \n\t"
         "ld   r28, x+                        \n\t"

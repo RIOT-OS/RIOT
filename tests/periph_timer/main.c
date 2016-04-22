@@ -39,8 +39,9 @@ static volatile int fired;
 static volatile uint32_t sw_count;
 static volatile uint32_t timeouts[MAX_CHANNELS];
 
-static void cb(int chan)
+static void cb(void *arg, int chan)
 {
+    (void)arg;
     timeouts[chan] = sw_count;
     fired++;
 }
@@ -57,7 +58,7 @@ static int test_timer(unsigned num)
     }
 
     /* initialize and halt timer */
-    if (timer_init(TIMER_DEV(num), TIM_SPEED, cb) < 0) {
+    if (timer_init(TIMER_DEV(num), TIM_SPEED, cb, NULL) < 0) {
         printf("TIMER_%u: ERROR on initialization - skipping\n\n", num);
         return 0;
     }

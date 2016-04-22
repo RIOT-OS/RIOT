@@ -55,6 +55,7 @@
 #define I2C_H
 
 #include <stdint.h>
+#include <limits.h>
 
 #include "periph_cpu.h"
 /**
@@ -91,7 +92,7 @@ extern "C" {
  * @{
  */
 #ifndef I2C_UNDEF
-#define I2C_UNDEF           (-1)
+#define I2C_UNDEF           (UINT_MAX)
 #endif
 /** @} */
 

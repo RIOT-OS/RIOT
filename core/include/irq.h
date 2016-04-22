@@ -33,22 +33,22 @@
  *
  * @return  Previous value of status register. The return value should not
  *          interpreted as a boolean value. The actual value is only
- *          significant for restoreIRQ().
+ *          significant for irq_restore().
  *
- * @see     restoreIRQ
+ * @see     irq_restore
  */
-unsigned disableIRQ(void);
+unsigned irq_disable(void);
 
 /**
  * @brief   This function clears the IRQ disable bit in the status register
  *
  * @return  Previous value of status register. The return value should not
  *          interpreted as a boolean value. The actual value is only
- *          significant for restoreIRQ().
+ *          significant for irq_restore().
  *
- * @see     restoreIRQ
+ * @see     irq_restore
  */
-unsigned enableIRQ(void);
+unsigned irq_enable(void);
 
 /**
  * @brief   This function restores the IRQ disable bit in the status register
@@ -56,16 +56,16 @@ unsigned enableIRQ(void);
  *
  * @param[in] state   state to restore
  *
- * @see     enableIRQ
- * @see     disableIRQ
+ * @see     irq_enable
+ * @see     irq_disable
  */
-void restoreIRQ(unsigned state);
+void irq_restore(unsigned state);
 
 /**
  * @brief   Check whether called from interrupt service routine
  * @return  true, if in interrupt service routine, false if not
  */
-int inISR(void);
+int irq_is_in(void);
 
 #ifdef __cplusplus
 }

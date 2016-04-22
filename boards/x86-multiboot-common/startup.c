@@ -62,12 +62,12 @@ const multiboot_header_t multiboot_header = {
 
 void __attribute__((noreturn, optimize("Os", "omit-frame-pointer"), no_instrument_function)) _start(void)
 {
-    asm volatile ("xor %ebp, %ebp");
-    asm volatile ("push %ebp");
-    asm volatile ("push %ebx");
-    asm volatile ("push %eax");
-    asm volatile ("push %ebp");
-    asm volatile ("jmp *%0" :: "r"(&startup));
+    __asm__ volatile ("xor %ebp, %ebp");
+    __asm__ volatile ("push %ebp");
+    __asm__ volatile ("push %ebx");
+    __asm__ volatile ("push %eax");
+    __asm__ volatile ("push %ebp");
+    __asm__ volatile ("jmp *%0" :: "r"(&startup));
     __builtin_unreachable();
 }
 
@@ -112,7 +112,7 @@ static void have_a_break(void)
 {
     volatile bool cnt = false;
     while (!cnt) {
-        asm volatile ("pause");
+        __asm__ volatile ("pause");
     }
 }
 

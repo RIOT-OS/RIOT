@@ -35,32 +35,6 @@
         } \
     }
 
-static void test_gnrc_ipv6_hdr_build__wrong_src_len(void)
-{
-    ipv6_addr_t src = DEFAULT_TEST_SRC;
-    ipv6_addr_t dst = DEFAULT_TEST_DST;
-
-    gnrc_pktbuf_init();
-    TEST_ASSERT_NULL(gnrc_ipv6_hdr_build(NULL, (uint8_t *)&src,
-                                         sizeof(ipv6_addr_t) + TEST_UINT8,
-                                         (uint8_t *)&dst,
-                                         sizeof(ipv6_addr_t)));
-    TEST_ASSERT(gnrc_pktbuf_is_empty());
-}
-
-static void test_gnrc_ipv6_hdr_build__wrong_dst_len(void)
-{
-    ipv6_addr_t src = DEFAULT_TEST_SRC;
-    ipv6_addr_t dst = DEFAULT_TEST_DST;
-
-    gnrc_pktbuf_init();
-    TEST_ASSERT_NULL(gnrc_ipv6_hdr_build(NULL, (uint8_t *)&src,
-                                         sizeof(ipv6_addr_t),
-                                         (uint8_t *)&dst,
-                                         sizeof(ipv6_addr_t) + TEST_UINT8));
-    TEST_ASSERT(gnrc_pktbuf_is_empty());
-}
-
 static void test_gnrc_ipv6_hdr_build__src_NULL(void)
 {
     ipv6_addr_t dst = DEFAULT_TEST_DST;
@@ -68,8 +42,7 @@ static void test_gnrc_ipv6_hdr_build__src_NULL(void)
     ipv6_hdr_t *hdr;
 
     gnrc_pktbuf_init();
-    TEST_ASSERT_NOT_NULL((pkt = gnrc_ipv6_hdr_build(NULL, NULL, 0, (uint8_t *)&dst,
-                                sizeof(ipv6_addr_t))));
+    TEST_ASSERT_NOT_NULL(pkt = gnrc_ipv6_hdr_build(NULL, NULL, &dst));
     hdr = pkt->data;
     TEST_ASSERT_NOT_NULL(hdr);
     TEST_ASSERT(ipv6_hdr_is(hdr));
@@ -88,9 +61,7 @@ static void test_gnrc_ipv6_hdr_build__dst_NULL(void)
     ipv6_hdr_t *hdr;
 
     gnrc_pktbuf_init();
-    TEST_ASSERT_NOT_NULL((pkt = gnrc_ipv6_hdr_build(NULL, (uint8_t *)&src,
-                                sizeof(ipv6_addr_t),
-                                NULL, 0)));
+    TEST_ASSERT_NOT_NULL(pkt = gnrc_ipv6_hdr_build(NULL, &src, NULL));
     hdr = pkt->data;
     TEST_ASSERT_NOT_NULL(hdr);
     TEST_ASSERT(ipv6_hdr_is(hdr));
@@ -110,10 +81,7 @@ static void test_gnrc_ipv6_hdr_build__complete(void)
     ipv6_hdr_t *hdr;
 
     gnrc_pktbuf_init();
-    TEST_ASSERT_NOT_NULL((pkt = gnrc_ipv6_hdr_build(NULL, (uint8_t *)&src,
-                                sizeof(ipv6_addr_t),
-                                (uint8_t *)&dst,
-                                sizeof(ipv6_addr_t))));
+    TEST_ASSERT_NOT_NULL(pkt = gnrc_ipv6_hdr_build(NULL, &src, &dst));
     hdr = pkt->data;
     TEST_ASSERT_NOT_NULL(hdr);
     TEST_ASSERT(ipv6_hdr_is(hdr));
@@ -129,8 +97,6 @@ static void test_gnrc_ipv6_hdr_build__complete(void)
 Test *tests_gnrc_ipv6_hdr_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_gnrc_ipv6_hdr_build__wrong_src_len),
-        new_TestFixture(test_gnrc_ipv6_hdr_build__wrong_dst_len),
         new_TestFixture(test_gnrc_ipv6_hdr_build__src_NULL),
         new_TestFixture(test_gnrc_ipv6_hdr_build__dst_NULL),
         new_TestFixture(test_gnrc_ipv6_hdr_build__complete),

@@ -93,7 +93,7 @@ void cc430_cpu_init(void)
     // Disable write-access to port mapping registers:
     PMAPPWD = 0;
     // Re-enable all interrupts
-    enableIRQ();
+    irq_enable();
 
 }
 

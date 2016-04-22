@@ -48,7 +48,7 @@ int main(void)
     if (TEST_PIN_EN != GPIO_UNDEF) {
         printf("Toggling enable pin...");
 
-        if (gpio_init(TEST_PIN_EN, GPIO_DIR_OUT, GPIO_NOPULL) == 0) {
+        if (gpio_init(TEST_PIN_EN, GPIO_OUT) == 0) {
             puts("[OK]\n");
         }
         else {
@@ -103,8 +103,8 @@ int main(void)
         both = !both;
 
         /* display results */
-        printf("relative humidity: %d.%d\n", humidity / 100, humidity % 100);
-        printf("temperature: %d.%d C\n", temperature / 100, temperature % 100);
+        printf("relative humidity: %d.%02d\n", humidity / 100, humidity % 100);
+        printf("temperature: %d.%02d C\n", temperature / 100, temperature % 100);
 
         /* sleep between measurements */
         xtimer_usleep(1000 * MS_IN_USEC);

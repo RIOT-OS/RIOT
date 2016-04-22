@@ -19,6 +19,7 @@
 
 #include <time.h>
 #include "mutex.h"
+#include "priority_queue.h"
 
 #if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
 #   include "msp430_types.h"
@@ -35,7 +36,7 @@ extern "C" {
 /**
  * @note condition attributes are currently NOT USED in RIOT condition variables
  */
-typedef struct pthread_condattr_t {
+typedef struct {
     /** dumdidum */
     int __dummy;
 } pthread_condattr_t;
@@ -45,7 +46,7 @@ typedef struct pthread_condattr_t {
  *
  * @warning fields are managed by cv functions, don't touch
  */
-typedef struct pthread_cond_t {
+typedef struct {
     priority_queue_t queue; /**< Threads currently waiting to be signaled. */
 } pthread_cond_t;
 
@@ -54,14 +55,14 @@ typedef struct pthread_cond_t {
  * @param[in, out] attr pre-allocated condition attribute variable structure.
  * @return returns 0 on success, an errorcode otherwise.
  */
-int pthread_cond_condattr_init(struct pthread_condattr_t *attr);
+int pthread_cond_condattr_init(pthread_condattr_t *attr);
 
 /**
  * @brief Uninitializes a condition attribute variable object
  * @param[in, out] attr pre-allocated condition attribute variable structure.
  * @return returns 0 on success, an errorcode otherwise.
  */
-int pthread_cond_condattr_destroy(struct pthread_condattr_t *attr);
+int pthread_cond_condattr_destroy(pthread_condattr_t *attr);
 
 /**
  * @brief Get the process-shared attribute in an initialised attributes object referenced by attr
@@ -105,14 +106,14 @@ int pthread_condattr_setclock(pthread_condattr_t *attr, clockid_t clock_id);
  * @param[in] attr pre-allocated condition attribute variable structure.
  * @return returns 0 on success, an errorcode otherwise.
  */
-int pthread_cond_init(struct pthread_cond_t *cond, struct pthread_condattr_t *attr);
+int pthread_cond_init(pthread_cond_t *cond, pthread_condattr_t *attr);
 
 /**
  * @brief Destroy the condition variable cond
  * @param[in, out] cond pre-allocated condition variable structure.
  * @return returns 0 on success, an errorcode otherwise.
  */
-int pthread_cond_destroy(struct pthread_cond_t *cond);
+int pthread_cond_destroy(pthread_cond_t *cond);
 
 /**
  * @brief blocks the calling thread until the specified condition cond is signalled
@@ -120,7 +121,7 @@ int pthread_cond_destroy(struct pthread_cond_t *cond);
  * @param[in, out] mutex pre-allocated mutex variable structure.
  * @return returns 0 on success, an errorcode otherwise.
  */
-int pthread_cond_wait(struct pthread_cond_t *cond, struct mutex_t *mutex);
+int pthread_cond_wait(pthread_cond_t *cond, mutex_t *mutex);
 
 /**
  * @brief blocks the calling thread until the specified condition cond is signalled
@@ -129,21 +130,21 @@ int pthread_cond_wait(struct pthread_cond_t *cond, struct mutex_t *mutex);
  * @param[in] abstime pre-allocated timeout.
  * @return returns 0 on success, an errorcode otherwise.
  */
-int pthread_cond_timedwait(struct pthread_cond_t *cond, struct mutex_t *mutex, const struct timespec *abstime);
+int pthread_cond_timedwait(pthread_cond_t *cond, mutex_t *mutex, const struct timespec *abstime);
 
 /**
  * @brief unblock at least one of the threads that are blocked on the specified condition variable cond
  * @param[in, out] cond pre-allocated condition variable structure.
  * @return returns 0 on success, an errorcode otherwise.
  */
-int pthread_cond_signal(struct pthread_cond_t *cond);
+int pthread_cond_signal(pthread_cond_t *cond);
 
 /**
  * @brief unblock all threads that are currently blocked on the specified condition variable cond
  * @param[in, out] cond pre-allocated condition variable structure.
  * @return returns 0 on success, an errorcode otherwise.
  */
-int pthread_cond_broadcast(struct pthread_cond_t *cond);
+int pthread_cond_broadcast(pthread_cond_t *cond);
 
 #ifdef __cplusplus
 }

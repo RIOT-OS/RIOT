@@ -33,40 +33,32 @@ extern "C" {
 #endif
 
 /**
- * @name LED pin definitions
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_PORT            LPC_GPIO1
-#define LED1_PIN            BIT18
-#define LED2_PIN            BIT20
-#define LED3_PIN            BIT21
-#define LED4_PIN            BIT23
-/** @} */
+#define LED0_PIN            GPIO_PIN(1, 18)
+#define LED1_PIN            GPIO_PIN(1, 20)
+#define LED2_PIN            GPIO_PIN(1, 21)
+#define LED3_PIN            GPIO_PIN(1, 23)
 
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED1_ON              (LED_PORT->FIOSET = LED1_PIN)
-#define LED1_OFF             (LED_PORT->FIOCLR = LED1_PIN)
-#define LED1_TOGGLE          (LED_PORT->FIOPIN ^= LED1_PIN)
-#define LED2_ON              (LED_PORT->FIOSET = LED2_PIN)
-#define LED2_OFF             (LED_PORT->FIOCLR = LED2_PIN)
-#define LED2_TOGGLE          (LED_PORT->FIOPIN ^= LED2_PIN)
-#define LED3_ON              (LED_PORT->FIOSET = LED3_PIN)
-#define LED3_OFF             (LED_PORT->FIOCLR = LED3_PIN)
-#define LED3_TOGGLE          (LED_PORT->FIOPIN ^= LED3_PIN)
-#define LED4_ON              (LED_PORT->FIOSET = LED4_PIN)
-#define LED4_OFF             (LED_PORT->FIOCLR = LED4_PIN)
-#define LED4_TOGGLE          (LED_PORT->FIOPIN ^= LED4_PIN)
+#define LED_PORT            (LPC_GPIO1)
+#define LED0_MASK           (BIT18)
+#define LED1_MASK           (BIT20)
+#define LED2_MASK           (BIT21)
+#define LED3_MASK           (BIT23)
 
-/* for compatibility to other boards */
-#define LED_GREEN_ON        LED1_ON
-#define LED_GREEN_OFF       LED1_OFF
-#define LED_GREEN_TOGGLE    LED1_TOGGLE
-#define LED_RED_ON          LED4_ON
-#define LED_RED_OFF         LED4_OFF
-#define LED_RED_TOGGLE      LED4_TOGGLE
+#define LED0_ON             (LED_PORT->FIOSET  = LED0_MASK)
+#define LED0_OFF            (LED_PORT->FIOCLR  = LED0_MASK)
+#define LED0_TOGGLE         (LED_PORT->FIOPIN ^= LED0_MASK)
+#define LED1_ON             (LED_PORT->FIOSET  = LED1_MASK)
+#define LED1_OFF            (LED_PORT->FIOCLR  = LED1_MASK)
+#define LED1_TOGGLE         (LED_PORT->FIOPIN ^= LED1_MASK)
+#define LED2_ON             (LED_PORT->FIOSET  = LED2_MASK)
+#define LED2_OFF            (LED_PORT->FIOCLR  = LED2_MASK)
+#define LED2_TOGGLE         (LED_PORT->FIOPIN ^= LED2_MASK)
+#define LED3_ON             (LED_PORT->FIOSET  = LED3_MASK)
+#define LED3_OFF            (LED_PORT->FIOCLR  = LED3_MASK)
+#define LED3_TOGGLE         (LED_PORT->FIOPIN ^= LED3_MASK)
 /** @} */
 
 /**

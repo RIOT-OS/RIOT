@@ -108,7 +108,9 @@ int _handle_reply(gnrc_pktsnip_t *pkt, uint32_t time)
                ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
                byteorder_ntohs(icmpv6_hdr->id), seq, (unsigned)ipv6_hdr->hl,
                time / MS_IN_USEC, time % MS_IN_USEC);
+#ifdef MODULE_GNRC_IPV6_NC
         gnrc_ipv6_nc_still_reachable(&ipv6_hdr->src);
+#endif
     }
     else {
         puts("error: unexpected parameters");
@@ -254,8 +256,7 @@ int _icmpv6_ping(int argc, char **argv)
 
         _set_payload(pkt->data, payload_len);
 
-        pkt = gnrc_netreg_hdr_build(GNRC_NETTYPE_IPV6, pkt, NULL, 0, addr.u8,
-                                    sizeof(ipv6_addr_t));
+        pkt = gnrc_ipv6_hdr_build(pkt, NULL, &addr);
 
         if (pkt == NULL) {
             puts("error: packet buffer full");

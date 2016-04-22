@@ -23,17 +23,18 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "cpu.h"
+#include "kernel_init.h"
 #include "board.h"
 #include "panic.h"
-#include "kernel_internal.h"
 #include "vectors_cortexm.h"
 
 /**
  * @brief Interrupt stack canary value
  *
- * @note 0xe7fe is the ARM Thumb machine code equivalent of asm("bl #-2\n") or
+ * @note 0xe7fe is the ARM Thumb machine code equivalent of __asm__("bl #-2\n") or
  * 'while (1);', i.e. an infinite loop.
  */
 #define STACK_CANARY_WORD 0xE7FEE7FEu
@@ -85,7 +86,7 @@ void reset_handler_default(void)
     uint32_t *top;
     /* Fill stack space with canary values up until the current stack pointer */
     /* Read current stack pointer from CPU register */
-    asm volatile ("mov %[top], sp" : [top] "=r" (top) : : );
+    __asm__ volatile ("mov %[top], sp" : [top] "=r" (top) : : );
     dst = &_sstack;
     while (dst < top) {
         *(dst++) = STACK_CANARY_WORD;
@@ -136,15 +137,17 @@ void nmi_default(void)
 static inline int _stack_size_left(uint32_t required)
 {
     uint32_t* sp;
-    asm volatile ("mov %[sp], sp" : [sp] "=r" (sp) : : );
+    __asm__ volatile ("mov %[sp], sp" : [sp] "=r" (sp) : : );
     return ((int)((uint32_t)sp - (uint32_t)&_sstack) - required);
 }
+
+void hard_fault_handler(uint32_t* sp, uint32_t corrupted, uint32_t exc_return, uint32_t* r4_to_r11_stack);
 
 /* Trampoline function to save stack pointer before calling hard fault handler */
 __attribute__((naked)) void hard_fault_default(void)
 {
     /* Get stack pointer where exception stack frame lies */
-    __ASM volatile
+    __asm__ volatile
     (
         /* Check that msp is valid first because we want to stack all the
          * r4-r11 registers so that we can use r0, r1, r2, r3 for other things. */
@@ -153,12 +156,12 @@ __attribute__((naked)) void hard_fault_default(void)
         "bhi fix_msp                        \n" /*   goto fix_msp }           */
         "cmp r0, %[sram]                    \n" /* if(msp <= &_sram) {        */
         "bls fix_msp                        \n" /*   goto fix_msp }           */
-        "mov r1, #0                         \n" /* else { corrupted = false   */
+        "movs r1, #0                        \n" /* else { corrupted = false   */
         "b   test_sp                        \n" /*   goto test_sp     }       */
         " fix_msp:                          \n" /*                            */
         "mov r1, %[estack]                  \n" /*     r1 = _estack           */
         "mov sp, r1                         \n" /*     sp = r1                */
-        "mov r1, #1                         \n" /*     corrupted = true       */
+        "movs r1, #1                        \n" /*     corrupted = true       */
         " test_sp:                          \n" /*                            */
         "movs r0, #4                        \n" /* r0 = 0x4                   */
         "mov r2, lr                         \n" /* r2 = lr                    */
@@ -180,7 +183,7 @@ __attribute__((naked)) void hard_fault_default(void)
         "push {r4-r11}                      \n" /* save r4..r11 to the stack  */
 #endif
         "mov r3, sp                         \n" /* r4_to_r11_stack parameter  */
-        "b hard_fault_handler               \n" /* hard_fault_handler(r0)     */
+        "bl hard_fault_handler              \n" /* hard_fault_handler(r0)     */
           :
           : [sram]   "r" (&_sram + HARDFAULT_HANDLER_REQUIRED_STACK_SPACE),
             [eram]   "r" (&_eram),
@@ -272,7 +275,7 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
         if(stack_left < 0) {
             printf("\nISR stack overflowed by at least %d bytes.\n", (-1 * stack_left));
         }
-        __ASM volatile (
+        __asm__ volatile (
             "mov r0, %[sp]\n"
             "ldr r2, [r0, #8]\n"
             "ldr r3, [r0, #12]\n"

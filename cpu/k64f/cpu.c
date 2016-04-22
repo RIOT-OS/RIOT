@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include "cpu.h"
+#include "mcg.h"
 #include "cpu_conf.h"
 
 #define SIM_CLKDIV1_60MHZ      (SIM_CLKDIV1_OUTDIV1(0) | \

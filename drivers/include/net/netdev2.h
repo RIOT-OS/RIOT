@@ -46,13 +46,14 @@ extern "C" {
 #include <stdint.h>
 #include <sys/uio.h>
 
+#include "net/netstats.h"
 #include "net/netopt.h"
 
 enum {
     NETDEV2_TYPE_UNKNOWN,
     NETDEV2_TYPE_RAW,
     NETDEV2_TYPE_ETHERNET,
-    NETDEV2_TYPE_802154,
+    NETDEV2_TYPE_IEEE802154,
     NETDEV2_TYPE_CC110X,
 };
 
@@ -61,13 +62,15 @@ enum {
  *          upper layer
  */
 typedef enum {
-    NETDEV2_EVENT_ISR,           /**< driver needs it's ISR handled */
-    NETDEV2_EVENT_RX_STARTED,    /**< started to receive a packet */
-    NETDEV2_EVENT_RX_COMPLETE,   /**< finished receiving a packet */
-    NETDEV2_EVENT_TX_STARTED,    /**< started to transfer a packet */
-    NETDEV2_EVENT_TX_COMPLETE,   /**< finished transferring packet */
-    NETDEV2_EVENT_LINK_UP,       /**< link established */
-    NETDEV2_EVENT_LINK_DOWN,     /**< link gone */
+    NETDEV2_EVENT_ISR,              /**< driver needs it's ISR handled */
+    NETDEV2_EVENT_RX_STARTED,       /**< started to receive a packet */
+    NETDEV2_EVENT_RX_COMPLETE,      /**< finished receiving a packet */
+    NETDEV2_EVENT_TX_STARTED,       /**< started to transfer a packet */
+    NETDEV2_EVENT_TX_COMPLETE,      /**< finished transferring packet */
+    NETDEV2_EVENT_TX_NOACK,         /**< ACK requested but not received */
+    NETDEV2_EVENT_TX_MEDIUM_BUSY,   /**< couldn't transfer packet */
+    NETDEV2_EVENT_LINK_UP,          /**< link established */
+    NETDEV2_EVENT_LINK_DOWN,        /**< link gone */
     /* expand this list if needed */
 } netdev2_event_t;
 
@@ -92,7 +95,7 @@ typedef struct netdev2 netdev2_t;
  * @param[in] type          type of the event
  * @param[in] arg           event argument
  */
-typedef void (*netdev2_event_cb_t)(netdev2_t *dev, netdev2_event_t event, void* arg);
+typedef void (*netdev2_event_cb_t)(netdev2_t *dev, netdev2_event_t event, void *arg);
 
 /**
  * @brief Structure to hold driver state
@@ -103,7 +106,10 @@ typedef void (*netdev2_event_cb_t)(netdev2_t *dev, netdev2_event_t event, void* 
 struct netdev2 {
     const struct netdev2_driver *driver;    /**< ptr to that driver's interface. */
     netdev2_event_cb_t event_callback;      /**< callback for device events */
-    void* isr_arg;                          /**< argument to pass on isr event */
+    void *isr_arg;                          /**< argument to pass on isr event */
+#ifdef MODULE_NETSTATS_L2
+    netstats_t stats;                       /**< transceiver's statistics */
+#endif
 };
 
 /**
@@ -127,7 +133,10 @@ typedef struct netdev2_driver {
     /**
      * @brief Get a received frame
      *
-     * Supposed to be called from netdev2_event_handler().
+     * Supposed to be called from @ref netdev2_t::event_callback().
+     *
+     * If buf == NULL and len == 0, returns the packet size without dropping it.
+     * If buf == NULL and len > 0, drops the packet and returns the packet size.
      *
      * @param[in]   dev     network device descriptor
      * @param[out]  buf     buffer to write into or NULL
@@ -155,7 +164,7 @@ typedef struct netdev2_driver {
      * This function will be called from a network stack's loop when being notified
      * by netdev2_isr.
      *
-     * It is supposed to call netdev2_event_handler for each occuring event.
+     * It is supposed to call @ref netdev2_t::event_callback() for each occuring event.
      *
      * See receive packet flow description for details.
      *

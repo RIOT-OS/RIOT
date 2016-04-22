@@ -34,6 +34,11 @@ extern "C" {
 #endif
 
 /**
+ * @name Tell the xtimer that we use a 16-bit peripheral timer
+ */
+#define XTIMER_MASK         (0xffff0000)
+
+/**
  * @name Define the interface to the AT86RF231 radio
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
@@ -76,32 +81,22 @@ extern "C" {
 /** @} */
 
 /**
- * @name LED pin definitions
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_RED_PORT        (GPIOB)
-#define LED_RED_PIN         (10)
-#define LED_RED_GPIO        GPIO_PIN(PORT_B,10)
-#define LED_GREEN_PORT      (GPIOB)
-#define LED_GREEN_PIN       (12)
-#define LED_GREEN_GPIO      GPIO_PIN(PORT_B,12)
-/** @} */
+#define LED0_PIN            GPIO_PIN(PORT_B, 10)
+#define LED1_PIN            GPIO_PIN(PORT_B, 12)
 
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_RED_ON          (LED_RED_PORT->ODR &= ~(1<<LED_RED_PIN))
-#define LED_RED_OFF         (LED_RED_PORT->ODR |= (1<<LED_RED_PIN))
-#define LED_RED_TOGGLE      (LED_RED_PORT->ODR ^= (1<<LED_RED_PIN))
+#define LED0_MASK           (1 << 10)
+#define LED1_MASK           (1 << 12)
 
-#define LED_GREEN_ON        (LED_GREEN_PORT->ODR &= ~(1<<LED_GREEN_PIN))
-#define LED_GREEN_OFF       (LED_GREEN_PORT->ODR |= (1<<LED_GREEN_PIN))
-#define LED_GREEN_TOGGLE    (LED_GREEN_PORT->ODR ^= (1<<LED_GREEN_PIN))
+#define LED0_ON             (GPIOB->ODR &= ~LED0_MASK)
+#define LED0_OFF            (GPIOB->ODR |=  LED0_MASK)
+#define LED0_TOGGLE         (GPIOB->ODR ^=  LED0_MASK)
 
-#define LED_ORANGE_ON
-#define LED_ORANGE_OFF
-#define LED_ORANGE_TOGGLE
+#define LED1_ON             (GPIOB->ODR &= ~LED1_MASK)
+#define LED1_OFF            (GPIOB->ODR |=  LED1_MASK)
+#define LED1_TOGGLE         (GPIOB->ODR ^=  LED1_MASK)
 /** @} */
 
 /**

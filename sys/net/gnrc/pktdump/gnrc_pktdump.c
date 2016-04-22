@@ -25,7 +25,6 @@
 #include "byteorder.h"
 #include "thread.h"
 #include "msg.h"
-#include "kernel.h"
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc.h"
 #include "net/ipv6/addr.h"
@@ -37,7 +36,7 @@
 /**
  * @brief   PID of the pktdump thread
  */
-static kernel_pid_t _pid = KERNEL_PID_UNDEF;
+kernel_pid_t gnrc_pktdump_pid = KERNEL_PID_UNDEF;
 
 /**
  * @brief   Stack for the pktdump thread
@@ -155,17 +154,12 @@ static void *_eventloop(void *arg)
     return NULL;
 }
 
-kernel_pid_t gnrc_pktdump_getpid(void)
-{
-    return _pid;
-}
-
 kernel_pid_t gnrc_pktdump_init(void)
 {
-    if (_pid == KERNEL_PID_UNDEF) {
-        _pid = thread_create(_stack, sizeof(_stack), GNRC_PKTDUMP_PRIO,
+    if (gnrc_pktdump_pid == KERNEL_PID_UNDEF) {
+        gnrc_pktdump_pid = thread_create(_stack, sizeof(_stack), GNRC_PKTDUMP_PRIO,
                              THREAD_CREATE_STACKTEST,
                              _eventloop, NULL, "pktdump");
     }
-    return _pid;
+    return gnrc_pktdump_pid;
 }

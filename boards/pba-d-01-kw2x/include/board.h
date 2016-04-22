@@ -31,47 +31,28 @@ extern "C"
 #endif
 
 /**
- * @name LED pin definitions
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_R_PORT_CLKEN()    (SIM->SCGC5 |= (SIM_SCGC5_PORTD_MASK)) /**< Clock Enable for PORTD*/
-#define LED_G_PORT_CLKEN()    (SIM->SCGC5 |= (SIM_SCGC5_PORTD_MASK)) /**< Clock Enable for PORTD*/
-#define LED_B_PORT_CLKEN()    (SIM->SCGC5 |= (SIM_SCGC5_PORTA_MASK)) /**< Clock Enable for PORTA*/
-#define LED_R_PORT_BASE       PORTD /**< PORT base for the Red LED */
-#define LED_G_PORT_BASE       PORTD /**< PORT base for the Green LED */
-#define LED_B_PORT_BASE       PORTA /**< PORT base for the Blue LED */
-#define LED_R_GPIO_BASE       GPIOD /**< GPIO base for Red LED */
-#define LED_G_GPIO_BASE       GPIOD /**< GPIO base for Green LED */
-#define LED_B_GPIO_BASE       GPIOA /**< GPIO base for Blue LED */
-#define LED_R_PIN             6     /**< Red LED connected to PINx*/
-#define LED_G_PIN             4     /**< Green LED connected to PINx*/
-#define LED_B_PIN             4     /**< Blue LED connected to PINx*/
-#define LED_R_GPIO            GPIO_PIN(PORT_D, LED_R_PIN) /**< GPIO-Device for Red LED */
-#define LED_G_GPIO            GPIO_PIN(PORT_D, LED_G_PIN) /**< GPIO-Device for Green LED */
-#define LED_B_GPIO            GPIO_PIN(PORT_A, LED_B_PIN) /**< GPIO-Device for Blue LED */
-/** @} */
+#define LED2_PIN            GPIO_PIN(PORT_D, 6)
+#define LED1_PIN            GPIO_PIN(PORT_D, 4)
+#define LED0_PIN            GPIO_PIN(PORT_A, 4)
 
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_B_ON            (LED_B_GPIO_BASE->PCOR = (1 << LED_B_PIN))
-#define LED_B_OFF           (LED_B_GPIO_BASE->PSOR = (1 << LED_B_PIN))
-#define LED_B_TOGGLE        (LED_B_GPIO_BASE->PTOR = (1 << LED_B_PIN))
-#define LED_G_ON            (LED_G_GPIO_BASE->PCOR = (1 << LED_G_PIN))
-#define LED_G_OFF           (LED_G_GPIO_BASE->PSOR = (1 << LED_G_PIN))
-#define LED_G_TOGGLE        (LED_G_GPIO_BASE->PTOR = (1 << LED_G_PIN))
-#define LED_R_ON            (LED_R_GPIO_BASE->PCOR = (1 << LED_R_PIN))
-#define LED_R_OFF           (LED_R_GPIO_BASE->PSOR = (1 << LED_R_PIN))
-#define LED_R_TOGGLE        (LED_R_GPIO_BASE->PTOR = (1 << LED_R_PIN))
+#define LED0_MASK           (1 << 6)
+#define LED1_MASK           (1 << 4)
+#define LED2_MASK           (1 << 4)
 
-/* for compatability to other boards */
-#define LED_GREEN_ON        LED_G_ON
-#define LED_GREEN_OFF       LED_G_OFF
-#define LED_GREEN_TOGGLE    LED_G_TOGGLE
-#define LED_RED_ON          LED_R_ON
-#define LED_RED_OFF         LED_R_OFF
-#define LED_RED_TOGGLE      LED_R_TOGGLE
+#define LED0_ON            (GPIOD->PCOR = LED0_MASK)
+#define LED0_OFF           (GPIOD->PSOR = LED0_MASK)
+#define LED0_TOGGLE        (GPIOD->PTOR = LED0_MASK)
+
+#define LED1_ON            (GPIOD->PCOR = LED1_MASK)
+#define LED1_OFF           (GPIOD->PSOR = LED1_MASK)
+#define LED1_TOGGLE        (GPIOD->PTOR = LED1_MASK)
+
+#define LED2_ON            (GPIOA->PCOR = LED2_MASK)
+#define LED2_OFF           (GPIOA->PSOR = LED2_MASK)
+#define LED2_TOGGLE        (GPIOA->PTOR = LED2_MASK)
 /** @} */
 
 /**

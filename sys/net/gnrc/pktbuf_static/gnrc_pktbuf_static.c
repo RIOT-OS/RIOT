@@ -217,9 +217,8 @@ void gnrc_pktbuf_hold(gnrc_pktsnip_t *pkt, unsigned int num)
     mutex_unlock(&_mutex);
 }
 
-void gnrc_pktbuf_release_error(gnrc_pktsnip_t *pkt, uint32_t err)
+static void _release_error_locked(gnrc_pktsnip_t *pkt, uint32_t err)
 {
-    mutex_lock(&_mutex);
     while (pkt) {
         gnrc_pktsnip_t *tmp;
         assert(_pktbuf_contains(pkt));
@@ -236,6 +235,12 @@ void gnrc_pktbuf_release_error(gnrc_pktsnip_t *pkt, uint32_t err)
         gnrc_neterr_report(pkt, err);
         pkt = tmp;
     }
+}
+
+void gnrc_pktbuf_release_error(gnrc_pktsnip_t *pkt, uint32_t err)
+{
+    mutex_lock(&_mutex);
+    _release_error_locked(pkt, err);
     mutex_unlock(&_mutex);
 }
 
@@ -501,6 +506,79 @@ gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *sni
     gnrc_pktbuf_release(snip);
 
     return pkt;
+}
+
+gnrc_pktsnip_t *gnrc_pktbuf_replace_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *old, gnrc_pktsnip_t *add)
+{
+    /* If add is a list we need to preserve its tail */
+    if (add->next != NULL) {
+        gnrc_pktsnip_t *tail = add->next;
+        gnrc_pktsnip_t *back;
+        LL_SEARCH_SCALAR(tail, back, next, NULL); /* find the last snip in add */
+        /* Replace old */
+        LL_REPLACE_ELEM(pkt, old, add);
+        /* and wire in the tail between */
+        back->next = add->next;
+        add->next = tail;
+    }
+    else {
+        /* add is a single element, has no tail, simply replace */
+        LL_REPLACE_ELEM(pkt, old, add);
+    }
+    old->next = NULL;
+    gnrc_pktbuf_release(old);
+
+    return pkt;
+}
+
+gnrc_pktsnip_t *gnrc_pktbuf_duplicate_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type)
+{
+    mutex_lock(&_mutex);
+
+    bool is_shared = pkt->users > 1;
+    size_t size = gnrc_pkt_len_upto(pkt, type);
+
+    DEBUG("ipv6_ext: duplicating %d octets\n", (int) size);
+
+    gnrc_pktsnip_t *tmp;
+    gnrc_pktsnip_t *target = gnrc_pktsnip_search_type(pkt, type);
+    gnrc_pktsnip_t *next = (target == NULL) ? NULL : target->next;
+    gnrc_pktsnip_t *new = _create_snip(next, NULL, size, type);
+
+    if (new == NULL) {
+        mutex_unlock(&_mutex);
+
+        return NULL;
+    }
+
+    /* copy payloads */
+    for (tmp = pkt; tmp != NULL; tmp = tmp->next) {
+        uint8_t *dest = ((uint8_t *)new->data) + (size - tmp->size);
+
+        memcpy(dest, tmp->data, tmp->size);
+
+        size -= tmp->size;
+
+        if (tmp->type == type) {
+            break;
+        }
+    }
+
+    /* decrements reference counters */
+
+    if (target != NULL) {
+        target->next = NULL;
+    }
+
+    _release_error_locked(pkt, GNRC_NETERR_SUCCESS);
+
+    if (is_shared && (target != NULL)) {
+        target->next = next;
+    }
+
+    mutex_unlock(&_mutex);
+
+    return new;
 }
 
 /** @} */

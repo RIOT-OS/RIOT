@@ -99,7 +99,6 @@
 #include "thread.h"
 #include "irq.h"
 #include "cpu.h"
-#include "kernel_internal.h"
 
 /**
  * @brief   Noticeable marker marking the beginning of a stack segment
@@ -254,7 +253,7 @@ void thread_arch_stack_print(void)
 
 __attribute__((naked)) void NORETURN thread_arch_start_threading(void)
 {
-    __ASM volatile (
+    __asm__ volatile (
     "bl     irq_arch_enable               \n" /* enable IRQs to make the SVC
                                            * interrupt is reachable */
     "svc    #1                            \n" /* trigger the SVC interrupt */
@@ -272,7 +271,7 @@ void thread_arch_yield(void)
 
 __attribute__((naked)) void arch_context_switch(void)
 {
-    __ASM volatile (
+    __asm__ volatile (
     /* PendSV handler entry point */
     ".global isr_pendsv               \n"
     ".thumb_func                      \n"

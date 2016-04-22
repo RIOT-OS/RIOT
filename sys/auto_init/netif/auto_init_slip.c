@@ -47,7 +47,7 @@ static char _slip_stacks[SLIP_STACKSIZE][SLIP_NUM];
 
 void auto_init_slip(void)
 {
-    for (int i = 0; i < SLIP_NUM; i++) {
+    for (unsigned int i = 0; i < SLIP_NUM; i++) {
         const gnrc_slip_params_t *p = &gnrc_slip_params[i];
         DEBUG("Initializing SLIP radio at UART_%d\n", p->uart);
         kernel_pid_t res = gnrc_slip_init(&slip_devs[i], p->uart, p->baudrate,

@@ -34,35 +34,29 @@
 #define DISABLE_WDOG    1
 
 /**
- * @name LEDs configuration
+ * @brief   LED pin definitions and handlers
  * @{
  */
+#define LED_PORT            PTC
+#define LED0_BIT            (15)
+#define LED1_BIT            (14)
+#define LED2_BIT            (13)
 
-#define LED_RED_PORT        PTC
-#define LED_RED_PIN         15
-#define LED_RED_GPIO        GPIO_PIN(PORT_C, LED_RED_PIN)
-#define LED_YELLOW_PORT     PTC
-#define LED_YELLOW_PIN      14
-#define LED_YELLOW_GPIO     GPIO_PIN(PORT_C, LED_YELLOW_PIN)
-#define LED_GREEN_PORT      PTC
-#define LED_GREEN_PIN       13
-#define LED_GREEN_GPIO      GPIO_PIN(PORT_C, LED_GREEN_PIN)
+#define LED0_PIN            GPIO_PIN(PORT_C, LED0_BIT)
+#define LED1_PIN            GPIO_PIN(PORT_C, LED1_BIT)
+#define LED2_PIN            GPIO_PIN(PORT_C, LED2_BIT)
 
-/** @} */
+#define LED0_ON             (BITBAND_REG32(LED_PORT->PSOR, LED0_BIT) = 1)
+#define LED0_OFF            (BITBAND_REG32(LED_PORT->PCOR, LED0_BIT) = 1)
+#define LED0_TOGGLE         (BITBAND_REG32(LED_PORT->PTOR, LED0_BIT) = 1)
 
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_RED_ON          (BITBAND_REG32(LED_RED_PORT->PSOR, LED_RED_PIN) = 1)
-#define LED_RED_OFF         (BITBAND_REG32(LED_RED_PORT->PCOR, LED_RED_PIN) = 1)
-#define LED_RED_TOGGLE      (BITBAND_REG32(LED_RED_PORT->PTOR, LED_RED_PIN) = 1)
-#define LED_YELLOW_ON       (BITBAND_REG32(LED_YELLOW_PORT->PSOR, LED_YELLOW_PIN) = 1)
-#define LED_YELLOW_OFF      (BITBAND_REG32(LED_YELLOW_PORT->PCOR, LED_YELLOW_PIN) = 1)
-#define LED_YELLOW_TOGGLE   (BITBAND_REG32(LED_YELLOW_PORT->PTOR, LED_YELLOW_PIN) = 1)
-#define LED_GREEN_ON        (BITBAND_REG32(LED_GREEN_PORT->PSOR, LED_GREEN_PIN) = 1)
-#define LED_GREEN_OFF       (BITBAND_REG32(LED_GREEN_PORT->PCOR, LED_GREEN_PIN) = 1)
-#define LED_GREEN_TOGGLE    (BITBAND_REG32(LED_GREEN_PORT->PTOR, LED_GREEN_PIN) = 1)
+#define LED1_ON             (BITBAND_REG32(LED_PORT->PSOR, LED1_BIT) = 1)
+#define LED1_OFF            (BITBAND_REG32(LED_PORT->PCOR, LED1_BIT) = 1)
+#define LED1_TOGGLE         (BITBAND_REG32(LED_PORT->PTOR, LED1_BIT) = 1)
+
+#define LED2_ON             (BITBAND_REG32(LED_PORT->PSOR, LED2_BIT) = 1)
+#define LED2_OFF            (BITBAND_REG32(LED_PORT->PCOR, LED2_BIT) = 1)
+#define LED2_TOGGLE         (BITBAND_REG32(LED_PORT->PTOR, LED2_BIT) = 1)
 /** @} */
 
 #ifdef __cplusplus
@@ -123,6 +117,14 @@ void board_init(void);
 #define MULLE_NVRAM_SPI_CS            GPIO_PIN(PORT_D, 6) /**< FRAM CS pin */
 #define MULLE_NVRAM_CAPACITY          512     /**< FRAM size, in bytes */
 #define MULLE_NVRAM_SPI_ADDRESS_COUNT 1       /**< FRAM addressing size, in bytes */
+/** @} */
+
+/**
+ * @name Mulle Vchr, Vbat ADC lines
+ */
+/** @{ */
+#define MULLE_VBAT_ADC_LINE           ADC_LINE(6)
+#define MULLE_VCHR_ADC_LINE           ADC_LINE(7)
 /** @} */
 
 /**

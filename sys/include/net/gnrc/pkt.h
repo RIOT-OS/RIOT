@@ -137,6 +137,31 @@ static inline size_t gnrc_pkt_len(gnrc_pktsnip_t *pkt)
 }
 
 /**
+ * @brief Calculates length of a packet in byte upto (including) a snip with the given type.
+ *
+ * @param[in] pkt  list of packet snips.
+ * @param[in] type type of snip to stop calculation.
+ *
+ * @return  length of the list of headers.
+ */
+static inline size_t gnrc_pkt_len_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type)
+{
+    size_t len = 0;
+
+    while (pkt) {
+        len += pkt->size;
+
+        if (pkt->type == type) {
+            break;
+        }
+
+        pkt = pkt->next;
+    }
+
+    return len;
+}
+
+/**
  * @brief Count the numbers of snips in the given packet
  *
  * @param[in] pkt   first snip in the packet

@@ -53,7 +53,7 @@ void cpuid_get(void *id)
     EFC1->EEFC_FCR = EEFC_FCR_FKEY(EFC_KEY) | EFC_FCMD_STUI;
 
     /* Wait for FRDY bit falls */
-    while (EFC1->EEFC_FSR & EEFC_FSR_FRDY);
+    while (EFC1->EEFC_FSR & EEFC_FSR_FRDY) {}
 
     /* Read UID */
     cpuid[0] = *(uint32_t *)IFLASH1_ADDR;
@@ -65,7 +65,7 @@ void cpuid_get(void *id)
     EFC1->EEFC_FCR = EEFC_FCR_FKEY(EFC_KEY) | EFC_FCMD_SPUI ;
 
     /* Wait for FRDY bit rises. */
-    while (0 == (EFC1->EEFC_FSR & EEFC_FSR_FRDY));
+    while (0 == (EFC1->EEFC_FSR & EEFC_FSR_FRDY)) {}
 
     memcpy(id, (void*)cpuid, CPUID_LEN);
 }

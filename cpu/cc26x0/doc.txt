@@ -1,0 +1,15 @@
+/**
+ * @defgroup        cpu_cc26x0 Texas Instruments CC26x0
+ * @ingroup         cpu
+ * @brief           Texas Instruments CC26x0 Cortex-M3 MCU specific code
+ */
+
+/**
+ * @defgroup        cpu_specific_peripheral_memory_map
+ * @ingroup         cpu
+ */
+
+/**
+ * @defgroup        cpu_cc26x0_definitions Texas Instruments CC26x0 definitions
+ * @ingroup         cpu_cc26x0
+ */

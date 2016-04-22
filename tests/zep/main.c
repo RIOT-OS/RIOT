@@ -35,7 +35,7 @@ int main(void)
     puts("ZEP module test");
 
     /* initialize and register pktdump */
-    dump.pid = gnrc_pktdump_getpid();
+    dump.pid = gnrc_pktdump_pid;
 
     if (dump.pid <= KERNEL_PID_UNDEF) {
         puts("Error starting pktdump thread");

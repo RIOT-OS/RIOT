@@ -41,7 +41,7 @@ int pir_init(pir_t *dev, gpio_t gpio)
 {
     dev->gpio_dev = gpio;
     dev->msg_thread_pid = KERNEL_PID_UNDEF;
-    return gpio_init(dev->gpio_dev, GPIO_DIR_IN, GPIO_NOPULL);
+    return gpio_init(dev->gpio_dev, GPIO_IN);
 }
 
 pir_event_t pir_get_status(pir_t *dev)
@@ -58,7 +58,7 @@ int pir_register_thread(pir_t *dev)
         }
     }
     else {
-        DEBUG("pir_register_thread: activating interrupt for %p..\n", dev);
+        DEBUG("pir_register_thread: activating interrupt for %p..\n", (void *)dev);
         if (pir_activate_int(dev) != 0) {
             DEBUG("\tfailed\n");
             return -1;
@@ -106,5 +106,5 @@ static void pir_callback(void *arg)
 
 static int pir_activate_int(pir_t *dev)
 {
-    return gpio_init_int(dev->gpio_dev, GPIO_NOPULL, GPIO_BOTH, pir_callback, dev);
+    return gpio_init_int(dev->gpio_dev, GPIO_IN, GPIO_BOTH, pir_callback, dev);
 }

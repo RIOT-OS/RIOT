@@ -8,6 +8,8 @@ export NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 export CPU = native
 export ELF = $(BINDIR)$(APPLICATION).elf
 
+USEMODULE += native-drivers
+
 # toolchain:
 export PREFIX =
 export CC ?= $(PREFIX)gcc
@@ -31,7 +33,7 @@ endif
 endif
 
 export DEBUGGER = gdb
-export TERMPROG = $(ELF)
+export TERMPROG ?= $(ELF)
 export FLASHER = true
 export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
@@ -86,6 +88,9 @@ term-valgrind: export VALGRIND_FLAGS ?= \
 	--track-origins=yes \
 	--fullpath-after=$(RIOTBASE)/ \
 	--read-var-info=yes
+debug-valgrind-server: export VALGRIND_FLAGS ?= --vgdb=yes --vgdb-error=0 -v \
+	--leak-check=full --track-origins=yes --fullpath-after=${RIOTBASE} \
+	--read-var-info=yes
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
 term-gprof: export TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELF)
 all-valgrind: export CFLAGS += -DHAVE_VALGRIND_H -g
@@ -135,10 +140,15 @@ all-valgrind: all
 all-cachegrind: all
 
 term-valgrind:
-# use this if you want to attach gdb from valgrind:
-#	echo 0 > /proc/sys/kernel/yama/ptrace_scope
-#	VALGRIND_FLAGS += --db-attach=yes
 	$(VALGRIND) $(VALGRIND_FLAGS) $(ELF) $(PORT)
+
+debug-valgrind-server:
+	$(VALGRIND) $(VALGRIND_FLAGS) $(ELF) $(PORT)
+
+debug-valgrind:
+	$(eval VALGRIND_PID ?= $(shell pgrep -n memcheck-x86-li -u ${USER} | cut -d" " -f1))
+	$(eval DEBUGGER_FLAGS := -ex "target remote | vgdb --pid=${VALGRIND_PID}" $(DEBUGGER_FLAGS))
+	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
 term-cachegrind:
 	$(VALGRIND) $(CACHEGRIND_FLAGS) $(ELF) $(PORT)

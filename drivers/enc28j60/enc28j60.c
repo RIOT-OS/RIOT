@@ -19,12 +19,13 @@
  */
 
 #include <errno.h>
+#include <string.h>
 
 #include "mutex.h"
 #include "xtimer.h"
 #include "assert.h"
 #include "net/ethernet.h"
-#include "net/netdev2_eth.h"
+#include "net/netdev2/eth.h"
 
 #include "enc28j60.h"
 #include "enc28j60_regs.h"
@@ -226,6 +227,10 @@ static int nd_send(netdev2_t *netdev, const struct iovec *data, int count)
 
     mutex_lock(&dev->devlock);
 
+#ifdef MODULE_NETSTATS_L2
+    netdev->stats.tx_bytes += count;
+#endif
+
     /* set write pointer */
     cmd_w_addr(dev, ADDR_WRITE_PTR, BUF_TX_START);
     /* write control byte and the actual data into the buffer */
@@ -262,6 +267,10 @@ static int nd_recv(netdev2_t *netdev, char *buf, int max_len, void *info)
     size = (size_t)((head[3] << 8) | head[2]) - 4;  /* discard CRC */
 
     if (buf != NULL) {
+#ifdef MODULE_NETSTATS_L2
+        netdev->stats.rx_count++;
+        netdev2->stats.rx_bytes += size;
+#endif
         /* read packet content into the supplied buffer */
         if (size <= max_len) {
             cmd_rbm(dev, (uint8_t *)buf, size);
@@ -288,11 +297,11 @@ static int nd_init(netdev2_t *netdev)
     mutex_lock(&dev->devlock);
 
     /* setup the low-level interfaces */
-    gpio_init(dev->reset_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(dev->reset_pin, GPIO_OUT);
     gpio_clear(dev->reset_pin);     /* this puts the device into reset state */
-    gpio_init(dev->cs_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(dev->cs_pin, GPIO_OUT);
     gpio_set(dev->cs_pin);
-    gpio_init_int(dev->int_pin, GPIO_NOPULL, GPIO_FALLING, on_int, (void *)dev);
+    gpio_init_int(dev->int_pin, GPIO_IN, GPIO_FALLING, on_int, (void *)dev);
     res = spi_init_master(dev->spi, SPI_CONF_FIRST_RISING, SPI_SPEED);
     if (res < 0) {
         DEBUG("[enc28j60] init: error initializing SPI bus [%i]\n", res);
@@ -372,6 +381,9 @@ static int nd_init(netdev2_t *netdev)
     /* allow receiving bytes from now on */
     cmd_bfs(dev, REG_ECON1, -1, ECON1_RXEN);
 
+#ifdef MODULE_NETSTATS_L2
+    memset(&netdev->stats, 0, sizeof(netstats_t));
+#endif
     mutex_unlock(&dev->devlock);
     return 0;
 }

@@ -138,25 +138,25 @@ void native_print_signals(void)
 /**
  * block signals
  */
-unsigned disableIRQ(void)
+unsigned irq_disable(void)
 {
     unsigned int prev_state;
 
     _native_syscall_enter();
-    DEBUG("disableIRQ()\n");
+    DEBUG("irq_disable()\n");
 
     if (_native_in_isr == 1) {
-        DEBUG("disableIRQ + _native_in_isr\n");
+        DEBUG("irq_disable + _native_in_isr\n");
     }
 
     if (sigprocmask(SIG_SETMASK, &_native_sig_set_dint, NULL) == -1) {
-        err(EXIT_FAILURE, "disableIRQ: sigprocmask");
+        err(EXIT_FAILURE, "irq_disable: sigprocmask");
     }
 
     prev_state = native_interrupts_enabled;
     native_interrupts_enabled = 0;
 
-    DEBUG("disableIRQ(): return\n");
+    DEBUG("irq_disable(): return\n");
     _native_syscall_leave();
 
     return prev_state;
@@ -165,20 +165,20 @@ unsigned disableIRQ(void)
 /**
  * unblock signals
  */
-unsigned enableIRQ(void)
+unsigned irq_enable(void)
 {
     unsigned int prev_state;
 
     if (_native_in_isr == 1) {
 #ifdef DEVELHELP
-        real_write(STDERR_FILENO, "enableIRQ + _native_in_isr\n", 27);
+        real_write(STDERR_FILENO, "irq_enable + _native_in_isr\n", 27);
 #else
-        DEBUG("enableIRQ + _native_in_isr\n");
+        DEBUG("irq_enable + _native_in_isr\n");
 #endif
     }
 
     _native_syscall_enter();
-    DEBUG("enableIRQ()\n");
+    DEBUG("irq_enable()\n");
 
     /* Mark the IRQ as enabled first since sigprocmask could call the handler
      * before returning to userspace.
@@ -188,33 +188,33 @@ unsigned enableIRQ(void)
     native_interrupts_enabled = 1;
 
     if (sigprocmask(SIG_SETMASK, &_native_sig_set, NULL) == -1) {
-        err(EXIT_FAILURE, "enableIRQ: sigprocmask");
+        err(EXIT_FAILURE, "irq_enable: sigprocmask");
     }
 
     _native_syscall_leave();
 
-    DEBUG("enableIRQ(): return\n");
+    DEBUG("irq_enable(): return\n");
 
     return prev_state;
 }
 
-void restoreIRQ(unsigned state)
+void irq_restore(unsigned state)
 {
-    DEBUG("restoreIRQ()\n");
+    DEBUG("irq_restore()\n");
 
     if (state == 1) {
-        enableIRQ();
+        irq_enable();
     }
     else {
-        disableIRQ();
+        irq_disable();
     }
 
     return;
 }
 
-int inISR(void)
+int irq_is_in(void)
 {
-    DEBUG("inISR: %i\n", _native_in_isr);
+    DEBUG("irq_is_in: %i\n", _native_in_isr);
     return _native_in_isr;
 }
 
@@ -297,7 +297,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     }
 
     /* XXX: Workaround safety check - whenever this happens it really
-     * indicates a bug in disableIRQ */
+     * indicates a bug in irq_disable */
     if (native_interrupts_enabled == 0) {
         //printf("interrupts are off, but I caught a signal.\n");
         return;
@@ -356,7 +356,7 @@ void set_signal_handler(int sig, bool add)
     struct sigaction sa;
     int ret;
 
-    /* update the signal mask so enableIRQ()/disableIRQ() will be aware */
+    /* update the signal mask so irq_enable()/irq_disable() will be aware */
     if (add) {
         _native_syscall_enter();
         ret = sigdelset(&_native_sig_set, sig);
@@ -404,12 +404,12 @@ int register_interrupt(int sig, _native_callback_t handler)
 {
     DEBUG("register_interrupt\n");
 
-    unsigned state = disableIRQ();
+    unsigned state = irq_disable();
 
     native_irq_handlers[sig] = handler;
     set_signal_handler(sig, true);
 
-    restoreIRQ(state);
+    irq_restore(state);
 
     return 0;
 }
@@ -421,12 +421,12 @@ int unregister_interrupt(int sig)
 {
     DEBUG("unregister_interrupt\n");
 
-    unsigned state = disableIRQ();
+    unsigned state = irq_disable();
 
     set_signal_handler(sig, false);
     native_irq_handlers[sig] = NULL;
 
-    restoreIRQ(state);
+    irq_restore(state);
 
     return 0;
 }
@@ -452,7 +452,8 @@ void native_interrupt_init(void)
     DEBUG("native_interrupt_init\n");
 
     VALGRIND_STACK_REGISTER(__isr_stack, __isr_stack + sizeof(__isr_stack));
-    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", __isr_stack, (void*)((int)__isr_stack + sizeof(__isr_stack)));
+    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
+                   (void *)__isr_stack, (void*)((int)__isr_stack + sizeof(__isr_stack)));
 
     native_interrupts_enabled = 1;
     _native_sigpend = 0;

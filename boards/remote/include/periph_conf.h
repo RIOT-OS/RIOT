@@ -21,6 +21,9 @@
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
 
+#include "cc2538_gpio.h"
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -46,7 +49,7 @@
 
 /* Timer 0 configuration */
 #define TIMER_0_DEV         GPTIMER0
-#define TIMER_0_CHANNELS    NUM_CHANNELS_PER_GPTIMER
+#define TIMER_0_CHANNELS    1
 #define TIMER_0_MAX_VALUE   0xffffffff
 #define TIMER_0_IRQn_1      GPTIMER_0A_IRQn
 #define TIMER_0_IRQn_2      GPTIMER_0B_IRQn
@@ -55,7 +58,7 @@
 
 /* Timer 1 configuration */
 #define TIMER_1_DEV         GPTIMER1
-#define TIMER_1_CHANNELS    NUM_CHANNELS_PER_GPTIMER
+#define TIMER_1_CHANNELS    1
 #define TIMER_1_MAX_VALUE   0xffffffff
 #define TIMER_1_IRQn_1      GPTIMER_1A_IRQn
 #define TIMER_1_IRQn_2      GPTIMER_1B_IRQn
@@ -64,7 +67,7 @@
 
 /* Timer 2 configuration */
 #define TIMER_2_DEV         GPTIMER2
-#define TIMER_2_CHANNELS    NUM_CHANNELS_PER_GPTIMER
+#define TIMER_2_CHANNELS    1
 #define TIMER_2_MAX_VALUE   0xffffffff
 #define TIMER_2_IRQn_1      GPTIMER_2A_IRQn
 #define TIMER_2_IRQn_2      GPTIMER_2B_IRQn
@@ -73,7 +76,7 @@
 
 /* Timer 3 configuration */
 #define TIMER_3_DEV         GPTIMER3
-#define TIMER_3_CHANNELS    NUM_CHANNELS_PER_GPTIMER
+#define TIMER_3_CHANNELS    1
 #define TIMER_3_MAX_VALUE   0xffffffff
 #define TIMER_3_IRQn_1      GPTIMER_3A_IRQn
 #define TIMER_3_IRQn_2      GPTIMER_3B_IRQn
@@ -96,6 +99,57 @@
 /* UART 0 pin configuration */
 #define UART_0_TX_PIN       GPIO_PA1
 #define UART_0_RX_PIN       GPIO_PA0
+/** @} */
+
+/**
+ * @name I2C configuration
+ * @{
+ */
+#define I2C_NUMOF               1
+#define I2C_0_EN                1
+#define I2C_IRQ_PRIO            1
+
+/* I2C 0 device configuration */
+#define I2C_0_DEV               0
+#define I2C_0_IRQ               I2C_IRQn
+#define I2C_0_IRQ_HANDLER       isr_i2c
+#define I2C_0_SCL_PIN           GPIO_PB1
+#define I2C_0_SDA_PIN           GPIO_PB0
+
+static const i2c_conf_t i2c_config[I2C_NUMOF] = {
+    {
+        .scl_pin = GPIO_PC3,
+        .sda_pin = GPIO_PC2,
+    },
+};
+/** @} */
+
+/**
+ * @name SPI configuration
+ * @{
+ */
+#define SPI_NUMOF           2
+#define SPI_0_EN            1
+#define SPI_1_EN            1
+
+#ifdef HAVE_PERIPH_SPI_CONF_T
+static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
+    {
+        .dev      = SSI0,
+        .mosi_pin = GPIO_PD0,
+        .miso_pin = GPIO_PC4,
+        .sck_pin  = GPIO_PD1,
+        .cs_pin   = GPIO_PD3,
+    },
+    {
+        .dev      = SSI1,
+        .mosi_pin = GPIO_PC7,
+        .miso_pin = GPIO_PA4,
+        .sck_pin  = GPIO_PB5,
+    },
+};
+#endif
+
 /** @} */
 
 /**
