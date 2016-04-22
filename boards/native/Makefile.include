@@ -83,7 +83,7 @@ endif
 export TERMFLAGS := $(PORT) $(TERMFLAGS)
 
 export ASFLAGS =
-export DEBUGGER_FLAGS = --args $(ELF) $(TERMFLAGS)
+export DEBUGGER_FLAGS = -q --args $(ELF) $(TERMFLAGS)
 term-valgrind: export VALGRIND_FLAGS ?= \
 	--track-origins=yes \
 	--fullpath-after=$(RIOTBASE)/ \
