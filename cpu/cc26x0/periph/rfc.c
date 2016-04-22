@@ -69,8 +69,8 @@ void rfc_beacon(void)
     uint8_t buf[sizeof(ble_rop_cmd_t) + 3];
     ble_rop_cmd_t *rop = (ble_rop_cmd_t *)((uintptr_t)(buf + 3) & (0xFFFFFFFC));
 
-    //rop->op.commandNo = RFC_DBELL_CMDR_CMDID_BLE_ADV_SCAN;
-    rop->op.commandNo = RFC_DBELL_CMDR_CMDID_PING;
+    //rop->op.commandNo = CMDR_CMDID_BLE_ADV_SCAN;
+    rop->op.commandNo = CMDR_CMDID_PING;
     rop->op.status = 0;
     rop->op.pNextOp = 0;
     rop->op.startTrigger = 0;
