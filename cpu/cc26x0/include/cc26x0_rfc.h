@@ -83,6 +83,10 @@ typedef struct {
 #define CMDR_OPTPAR_mask          0xFF00
 #define CMDR_CMDID_pos            16
 #define CMDR_CMDID_mask           0xFFFF0000
+/**
+ * @addtogroup cc2x0_rop_command_ids
+ * @{
+ */
 /* radio operation */
 #define CMDR_CMDID_NOP            0x0801
 #define CMDR_CMDID_SETUP          0x0802
@@ -151,6 +155,7 @@ typedef struct {
 #define CMDR_CMDID_BLE_TX_TEST    0x180A
 /* ble immediate */
 #define CMDR_CMDID_BLE_ADV_PAYLOAD    0x180A0000
+/**@}*/
 
 #define CMDSTA_RESULT_mask    0xFF
 #define CMDSTA_RET_VAL_pos    8 /* MSB first */
@@ -349,6 +354,10 @@ typedef struct {
     uint8_t condition; /* W */
 } radio_op_command_t;
 
+/**
+ * @addtogroup cc26x0_rop_status_codes
+ * @{
+ */
 #define R_OP_STATUS_IDLE                0x0000
 #define R_OP_STATUS_PENDING             0x0001
 #define R_OP_STATUS_ACTIVE              0x0002
@@ -425,6 +434,7 @@ typedef struct {
 #define R_OP_CONDITION_RULE_SKIP_ON_TRUE    0x05
 #define R_OP_CONDITION_NSKIP_pos            4
 #define R_OP_CONDITION_NSKIP_mask           0xF0
+/**@}*/
 
 
 typedef struct {
