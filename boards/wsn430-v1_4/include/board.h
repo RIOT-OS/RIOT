@@ -25,8 +25,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef WSN_BOARD_H_
-#define WSN_BOARD_H_
+#ifndef WSN_BOARD_H
+#define WSN_BOARD_H
 
 #include "board_common.h"
 
@@ -37,8 +37,8 @@ extern "C" {
 /**
  * @brief   Define the CPU model for the <msp430.h>
  */
-#ifndef __MSP430F1611__
-#define __MSP430F1611__
+#ifndef   MSP430F1611
+#define   MSP430F1611
 #endif
 
 /**
@@ -61,4 +61,4 @@ extern "C" {
 #include <msp430x16x.h>
 
 /** @} */
-#endif /*  WSN_BOARD_H_ */
+#endif /*  WSN_BOARD_H  */
