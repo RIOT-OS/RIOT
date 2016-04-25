@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef MSB_BOARD_H_
-#define MSB_BOARD_H_
+#ifndef MSB_BOARD_H
+#define MSB_BOARD_H
 
 #include "board_common.h"
 
@@ -31,8 +31,8 @@ extern "C" {
 /**
  * @brief   Define the CPU model for the <msp430.h>
  */
-#ifndef __MSP430F1612__
-#define __MSP430F1612__
+#ifndef   MSP430F1612
+#define   MSP430F1612
 #endif
 
 /**
@@ -53,4 +53,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* MSB_BOARD_H_ */
+#endif /* MSB_BOARD_H  */

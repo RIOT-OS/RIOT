@@ -18,8 +18,8 @@
  * @author      unknwon
  */
 
-#ifndef CHRONOS_BOARD_H_
-#define CHRONOS_BOARD_H_
+#ifndef CHRONOS_BOARD_H
+#define CHRONOS_BOARD_H
 
 #include <stdint.h>
 
@@ -30,8 +30,8 @@ extern "C" {
 /**
  * @brief   Define the CPU model for the <msp430.h>
  */
-#ifndef __CC430F6137__
-#define __CC430F6137__
+#ifndef   CC430F6137
+#define   CC430F6137
 #endif
 
 /**
@@ -58,5 +58,5 @@ extern "C" {
 }
 #endif
 
-#endif /* _CHRONOS_BOARD_H_ */
+#endif /*  CHRONOS_BOARD_H  */
 /** @} */
