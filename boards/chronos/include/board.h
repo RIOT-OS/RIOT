@@ -30,8 +30,8 @@ extern "C" {
 /**
  * @brief   Define the CPU model for the <msp430.h>
  */
-#ifndef   CC430F6137
-#define   CC430F6137
+#ifndef CC430F6137
+#define CC430F6137
 #endif
 
 /**
@@ -58,5 +58,5 @@ extern "C" {
 }
 #endif
 
-#endif /*  CHRONOS_BOARD_H  */
+#endif /* CHRONOS_BOARD_H */
 /** @} */

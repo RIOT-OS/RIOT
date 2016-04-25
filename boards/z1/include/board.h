@@ -40,8 +40,8 @@ extern "C" {
 /**
  * @brief   Define the CPU model for the <msp430.h>
  */
-#ifndef   MSP430F2617
-#define   MSP430F2617
+#ifndef MSP430F2617
+#define MSP430F2617
 #endif
 
 /**
@@ -121,4 +121,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /*  Z1_BOARD_H */
+#endif /* Z1_BOARD_H */
