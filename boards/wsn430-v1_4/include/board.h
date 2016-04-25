@@ -37,8 +37,8 @@ extern "C" {
 /**
  * @brief   Define the CPU model for the <msp430.h>
  */
-#ifndef   MSP430F1611
-#define   MSP430F1611
+#ifndef MSP430F1611
+#define MSP430F1611
 #endif
 
 /**
@@ -61,4 +61,4 @@ extern "C" {
 #include <msp430x16x.h>
 
 /** @} */
-#endif /*  WSN_BOARD_H  */
+#endif /* WSN_BOARD_H */
