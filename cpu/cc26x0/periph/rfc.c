@@ -125,6 +125,28 @@ void rfc_ble_beacon(void)
     rfc_send_cmd(&rop.ropCmd);
 }
 
+bool rfc_ping_test(void)
+{
+    direct_command_t pingCommand;
+    pingCommand.commandID = CMDR_CMDID_PING;
+    RFC_DBELL->CMDR = (uint32_t) (&pingCommand);
+    while (!RFC_DBELL->CMDSTA); /* wait for cmd execution */
+    return RFC_DBELL->CMDSTA == CMDSTA_RESULT_DONE;
+}
+
+bool rfc_nop_test(void)
+{
+    nop_cmd_t nopCommand;
+    memset(&nopCommand, 0, sizeof(nopCommand));
+    nopCommand.ropCmd.commandNo = CMDR_CMDID_NOP;
+    nopCommand.ropCmd.status = R_OP_STATUS_IDLE;
+    nopCommand.ropCmd.condition.rule = 1; /* never run next cmd. need to implement definition */
+    rfc_send_cmd(&nopCommand);
+
+    uint16_t status = rfc_wait_cmd_done(&nopCommand.ropCmd);
+    return status == R_OP_STATUS_DONE_OK;
+}
+
 void rfc_prepare(void)
 {
     /* RFC POWER DOMAIN CLOCK GATE */

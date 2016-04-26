@@ -24,6 +24,8 @@
 
 /* TODO derive an interface when there is enough to derive from */
 void rfc_prepare(void);
+bool rfc_ping_test(void);
+bool rfc_nop_test(void);
 bool rfc_setup_ble(void);
 void rfc_ble_beacon(void);
 
@@ -31,6 +33,16 @@ int main(void)
 {
     puts("Hello World!");
     rfc_prepare();
+
+    if (!rfc_ping_test()) {
+        fprintf(stderr, "rfc_ping_test failed\n");
+        return 1;
+    }
+
+    if (!rfc_nop_test()) {
+        fprintf(stderr, "rfc_nop_test failed\n");
+        return 1;
+    }
 
     if (!rfc_setup_ble()) {
         fprintf(stderr, "rfc_setup_ble failed\n");
