@@ -55,6 +55,22 @@ static void run_command_ptr(radio_op_command_t *rop)
     printf("rop->op.status %x\n", rop->status);
 }
 
+void rfc_irq_enable(void)
+{
+    NVIC_EnableIRQ(RF_CMD_ACK_IRQN);
+    NVIC_EnableIRQ(RF_CPE0_IRQN);
+    NVIC_EnableIRQ(RF_CPE1_IRQN);
+    NVIC_EnableIRQ(RF_HW_IRQN);
+}
+
+void rfc_irq_disable(void)
+{
+    NVIC_DisableIRQ(RF_CMD_ACK_IRQN);
+    NVIC_EnableIRQ(RF_CPE0_IRQN);
+    NVIC_EnableIRQ(RF_CPE1_IRQN);
+    NVIC_EnableIRQ(RF_HW_IRQN);
+}
+
 void rfc_setup_ble(void)
 {
     uint8_t buf[sizeof(radio_setup_t) + 3];
@@ -102,9 +118,8 @@ void rfc_prepare(void)
     RFC_PWR->PWMCLKEN |= 0x7FF;
     printf("RFC_PWR->PWMCLKEN %lx\n", RFC_PWR->PWMCLKEN);
 
-    printf("IEN %lx\n", RFC_DBELL->RFCPEIEN);
-
-    printf("rfc-prep\n");
+    /* RFC IRQ */
+    rfc_irq_enable();
 
     rfc_setup_ble();
 
