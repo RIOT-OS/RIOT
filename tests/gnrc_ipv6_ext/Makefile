@@ -21,9 +21,10 @@ USEMODULE += gnrc_ipv6_router_default
 # IPv6 extension headers
 USEMODULE += gnrc_ipv6_ext
 USEMODULE += gnrc_rpl_srh
+USEMODULE += gnrc_sixlowpan_iphc_nhc
+# UDP
+USEMODULE += gnrc_udp
 # Add also the shell, some shell commands
-USEMODULE += shell
-USEMODULE += shell_commands
 USEMODULE += ps
 
 # Comment this out to disable code in RIOT that does safety checking
