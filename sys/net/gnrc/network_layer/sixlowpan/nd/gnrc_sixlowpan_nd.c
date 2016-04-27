@@ -12,6 +12,7 @@
  * @file
  */
 
+#include "assert.h"
 #include "net/eui64.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/ndp.h"

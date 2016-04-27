@@ -26,6 +26,11 @@ extern "C" {
 #endif
 
 /**
+ * Static initializer for @ref pthread_mutex_t struct
+ */
+#define PTHREAD_MUTEX_INITIALIZER  MUTEX_INIT
+
+/**
  * @brief           Pthread mutexes are quite the same as RIOT mutexes.
  * @details         Recursive locking is not supported.
  *                  A thread can unlock a mutex even if it does not hold it.

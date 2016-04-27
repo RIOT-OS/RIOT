@@ -19,6 +19,7 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
+#include "assert.h"
 #include "byteorder.h"
 #include "kernel_types.h"
 #include "net/ipv6/hdr.h"

@@ -18,6 +18,7 @@
 
 #include <stdbool.h>
 
+#include "assert.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/ipv6/hdr.h"
