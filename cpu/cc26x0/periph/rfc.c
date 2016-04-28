@@ -7,6 +7,7 @@
  */
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "cc26x0_prcm.h"
 
@@ -16,28 +17,29 @@
 
 void isr_rfc_cmd_ack(void)
 {
-    printf("cmd_ack %lx\n", RFC_DBELL->RFACKIFG);
+    /*ROP ack = op submitted, DIR or IMM ack = op executed*/
+    printf("Command acknowledged. CMDSTA: 0x%" PRIu32 " \n", RFC_DBELL->CMDSTA);
     RFC_DBELL->RFACKIFG = 0;
 }
 
 void isr_rfc_hw(void)
 {
     uint32_t flags = RFC_DBELL->RFHWIFG;
-    printf("hw %lx\n", flags);
+    printf("hw 0x%" PRIx32 "\n", flags);
     RFC_DBELL->RFHWIFG = ~flags;
 }
 
 void isr_rfc_cpe0(void)
 {
     uint32_t flags = RFC_DBELL->RFCPEIFG & (~RFC_DBELL->RFCPEISL);
-    printf("cpe0 %lx\n", flags);
+    printf("cpe0 0x%" PRIx32 "\n", flags);
     RFC_DBELL->RFCPEIFG = ~flags;
 }
 
 void isr_rfc_cpe1(void)
 {
     uint32_t flags = RFC_DBELL->RFCPEIFG & RFC_DBELL->RFCPEISL;
-    printf("cpe1 %lx\n", flags);
+    printf("cpe1 0x%" PRIx32 "\n", flags);
     RFC_DBELL->RFCPEIFG = ~flags;
 }
 
