@@ -626,10 +626,10 @@ static void _isr(netdev2_t *netdev)
             assert(dev->pending_tx != 0);
             if ((--dev->pending_tx) == 0) {
                 at86rf2xx_set_state(dev, dev->idle_state);
+                DEBUG("[at86rf2xx] return to state 0x%x\n", dev->idle_state);
             }
 
             DEBUG("[at86rf2xx] EVT - TX_END\n");
-            DEBUG("[at86rf2xx] return to state 0x%x\n", dev->idle_state);
 
             if (netdev->event_callback && (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END)) {
                 switch (trac_status) {
