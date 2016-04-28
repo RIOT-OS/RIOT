@@ -74,6 +74,12 @@ extern "C" {
 #define LWIP_IPV6_AUTOCONFIG    (0)
 #endif /* MODULE_LWIP_IPV6_AUTOCONFIG */
 
+#ifdef MODULE_LWIP_IPV6_MLD
+#define LWIP_IPV6_MLD           (1)
+#else  /* MODULE_LWIP_IPV6 */
+#define LWIP_IPV6_MLD           (0)
+#endif /* MODULE_LWIP_IPV6 */
+
 #ifdef MODULE_LWIP_IPV6
 #define LWIP_IPV6               (1)
 #else  /* MODULE_LWIP_IPV6 */

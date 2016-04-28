@@ -365,7 +365,7 @@ ifneq (,$(filter lwip_sixlowpan,$(USEMODULE)))
   USEMODULE += lwip_ipv6_autoconfig
 endif
 
-ifneq (,$(filter lwip_ipv6_autoconfig,$(USEMODULE)))
+ifneq (,$(filter lwip_ipv6_autoconfig lwip_ipv6_mld,$(USEMODULE)))
   USEMODULE += lwip_ipv6
 endif
 

@@ -25,6 +25,7 @@ PSEUDOMODULES += lwip_dhcp
 PSEUDOMODULES += lwip_ethernet
 PSEUDOMODULES += lwip_igmp
 PSEUDOMODULES += lwip_ipv6_autoconfig
+PSEUDOMODULES += lwip_ipv6_mld
 PSEUDOMODULES += lwip_raw
 PSEUDOMODULES += lwip_sixlowpan
 PSEUDOMODULES += lwip_stats
