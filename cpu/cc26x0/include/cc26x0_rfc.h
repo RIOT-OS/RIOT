@@ -286,7 +286,6 @@ typedef struct {
 #define RFC_PWR_BASE           (0x40040000)
 /** @} */
 
-
 typedef struct {
     reg32_t PWMCLKEN;
 } cc26x0_rfc_pwr_regs_t;
@@ -306,11 +305,13 @@ typedef struct {
 #define PWMCLKEN_RFCTRC     0x00000400
 
 
-
-
-
-
-
+/* direct command type*/
+typedef struct {
+    uint16_t commandID;
+    uint8_t optParam;
+    unsigned int optParamExt: 6;
+    unsigned int commandType: 2; /*must be 01 for direct command*/
+} direct_command_t;
 
 
 /*
@@ -318,14 +319,27 @@ typedef struct {
  * W: system CPU writes a value, the radio CPU reads it and does not modify it
  * R/W: system CPU writes an initial value, the radio CPU may modify it
  */
-typedef struct {
+typedef struct _radio_op_command _radio_op_command_t;
+struct __attribute__ ((packed)) _radio_op_command {
     uint16_t commandNo; /* W */
     uint16_t status; /* R/W */
-    uint32_t pNextOp; /* W */
+    _radio_op_command_t *pNextOp; /* W */
     uint32_t startTime; /* W */
-    uint8_t startTrigger; /* missing from datashiet... */
-    uint8_t condition; /* W */
-} radio_op_command_t;
+    struct {
+        uint8_t triggerType:4;
+        uint8_t bEnaCmd:1;
+        uint8_t triggerNo:2;
+        uint8_t pastTrig:1;
+    } startTrigger;       /* missing from datashiet... */
+    struct {
+        uint8_t rule:4;
+        uint8_t nSkip:4;
+    } condition; /* W */
+};
+
+typedef struct __attribute__ ((aligned(4))) {
+    _radio_op_command_t op;
+} radio_op_command_t; /* rop require 32-bit word alignement, i.e. the 2 LSB of cmd addr are 0 */
 
 /**
  * @addtogroup cc26x0_rop_status_codes
@@ -392,18 +406,28 @@ typedef struct {
 /**@}*/
 
 
-typedef struct {
-    radio_op_command_t op;
-    uint8_t mode;
+typedef struct __attribute__ ((aligned(4))) {
+    _radio_op_command_t op;
+    uint8_t mode; /* W */
     /*
      * supported values: 0 (equivalent to 2), 2, 5, 6, 10, 12, 15, and 30
      * 0 or 2 only supported for devices that support 2.4-GHz operation
      */
-    uint8_t loDivider;
-    uint16_t config;
-    uint16_t txPower;
-    uint32_t pRegOverride;
-} radio_setup_t;
+    uint8_t IoDivider; /* W */
+    struct {
+        uint16_t frontEndMode:3;
+        uint16_t biasMode:1;
+        uint16_t :6;
+        uint16_t bNoFsPowerUp:1;
+    } config; /* W */
+    struct {
+        uint16_t IB:6;
+        uint16_t GC:2;
+        uint16_t boost:1;
+        uint16_t tempCoeff:7;
+    } txPower; /* W */
+    uint32_t *pRegOverride; /* W */
+} radio_setup_cmd_t;
 
 #define RADIO_SETUP_MODE_BLE                0x0
 #define RADIO_SETUP_MODE_IEEE8021504        0x1

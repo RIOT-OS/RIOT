@@ -68,8 +68,8 @@ extern "C" {
 /**@}*/
 
 
-typedef struct {
-    radio_op_command_t op;
+typedef struct __attribute__ ((aligned(4))) {
+    _radio_op_command_t op;
     uint8_t channel;
     uint8_t whitening;
     uint32_t pParams;

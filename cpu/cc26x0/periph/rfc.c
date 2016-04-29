@@ -77,41 +77,31 @@ uint16_t rfc_wait_cmd_done(void *ropCmd)
     do {
         if (++timeout_cnt > 500000)
         {
-            command->status = R_OP_STATUS_DONE_TIMEOUT;
+            command->op.status = R_OP_STATUS_DONE_TIMEOUT;
             break;
         }
-    } while (command->status < R_OP_STATUS_SKIPPED);
+    } while (command->op.status < R_OP_STATUS_SKIPPED);
 
-    return command->status;
+    return command->op.status;
 }
 
 void rfc_setup_ble(void)
 {
-    uint8_t buf[sizeof(radio_setup_t) + 3];
-    radio_setup_t *rs = (radio_setup_t *)((uintptr_t)(buf + 3) & (0xFFFFFFFC));
-    memset(rs, 0, sizeof(rs));
+    radio_setup_cmd_t rs;
+    memset(&rs, 0, sizeof(rs));
 
-    rfc_send_cmd(&rs->op);
+    rfc_send_cmd(&rs.op);
 }
 
 void rfc_beacon(void)
 {
-    uint8_t buf[sizeof(ble_rop_cmd_t) + 3];
-    ble_rop_cmd_t *rop = (ble_rop_cmd_t *)((uintptr_t)(buf + 3) & (0xFFFFFFFC));
+    ble_rop_cmd_t rop;
+    memset(&rop, 0, sizeof(rop));
 
     //rop->op.commandNo = CMDR_CMDID_BLE_ADV_SCAN;
-    rop->op.commandNo = CMDR_CMDID_PING;
-    rop->op.status = 0;
-    rop->op.pNextOp = 0;
-    rop->op.startTrigger = 0;
-    rop->op.condition = 0;
+    rop.op.commandNo = CMDR_CMDID_PING;
 
-    printf("cmdno %x\n", rop->op.commandNo);
-    for (int i = 0; i < sizeof(*rop); i++)
-        printf("%.2x", ((uint8_t *) rop)[i]);
-    printf("\n");
-
-    rfc_send_cmd(&rop->op);
+    rfc_send_cmd(&rop.op);
 }
 
 void rfc_prepare(void)
