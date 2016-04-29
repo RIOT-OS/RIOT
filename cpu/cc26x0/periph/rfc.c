@@ -10,7 +10,6 @@
 #include <inttypes.h>
 
 #include "cc26x0_prcm.h"
-
 #include "cc26x0_rfc.h"
 
 #define BLE_ADV_STR "this is not a riot\n"
@@ -115,6 +114,7 @@ void rfc_beacon(void)
 
 void rfc_prepare(void)
 {
+    /* RFC POWER DOMAIN CLOCK GATE */
     PRCM->RFCCLKG = 1;
 
     PRCM->CLKLOADCTL = CLKLOADCTL_LOAD;
@@ -126,6 +126,7 @@ void rfc_prepare(void)
     while (!(PRCM->PDSTAT0 & PDSTAT0_RFC_ON)) ;
     while (!(PRCM->PDSTAT1 & PDSTAT1_RFC_ON)) ;
 
+    /* RFC CLOCK */
     //RFC_PWR->PWMCLKEN |= RFC_PWR_PWMCLKEN_CPE;
     //RFC_PWR->PWMCLKEN |= RFC_PWR_PWMCLKEN_CPERAM;
     RFC_PWR->PWMCLKEN |= 0x7FF;
