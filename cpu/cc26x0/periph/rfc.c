@@ -77,12 +77,12 @@ uint16_t rfc_wait_cmd_done(void *ropCmd)
     do {
         if (++timeout_cnt > 500000)
         {
-            command->op.status = R_OP_STATUS_DONE_TIMEOUT;
+            command->status = R_OP_STATUS_DONE_TIMEOUT;
             break;
         }
-    } while (command->op.status < R_OP_STATUS_SKIPPED);
+    } while (command->status < R_OP_STATUS_SKIPPED);
 
-    return command->op.status;
+    return command->status;
 }
 
 void rfc_setup_ble(void)
@@ -90,7 +90,7 @@ void rfc_setup_ble(void)
     radio_setup_cmd_t rs;
     memset(&rs, 0, sizeof(rs));
 
-    rfc_send_cmd(&rs.op);
+    rfc_send_cmd(&rs.ropCmd);
 }
 
 void rfc_beacon(void)
@@ -99,9 +99,9 @@ void rfc_beacon(void)
     memset(&rop, 0, sizeof(rop));
 
     //rop->op.commandNo = CMDR_CMDID_BLE_ADV_SCAN;
-    rop.op.commandNo = CMDR_CMDID_PING;
+    rop.ropCmd.commandNo = CMDR_CMDID_PING;
 
-    rfc_send_cmd(&rop.op);
+    rfc_send_cmd(&rop.ropCmd);
 }
 
 void rfc_prepare(void)

@@ -319,11 +319,12 @@ typedef struct {
  * W: system CPU writes a value, the radio CPU reads it and does not modify it
  * R/W: system CPU writes an initial value, the radio CPU may modify it
  */
-typedef struct _radio_op_command _radio_op_command_t;
-struct __attribute__ ((packed)) _radio_op_command {
+
+typedef struct radio_op_command_s radio_op_command_t;
+struct __attribute__ ((packed)) radio_op_command_s {
     uint16_t commandNo; /* W */
     uint16_t status; /* R/W */
-    _radio_op_command_t *pNextOp; /* W */
+    radio_op_command_t *pNextOp; /* W */
     uint32_t startTime; /* W */
     struct {
         uint8_t triggerType:4;
@@ -335,11 +336,7 @@ struct __attribute__ ((packed)) _radio_op_command {
         uint8_t rule:4;
         uint8_t nSkip:4;
     } condition; /* W */
-};
-
-typedef struct __attribute__ ((aligned(4))) {
-    _radio_op_command_t op;
-} radio_op_command_t; /* rop require 32-bit word alignement, i.e. the 2 LSB of cmd addr are 0 */
+}; /* rop require 32-bit word alignement, i.e. the 2 LSB of cmd addr are 0 */
 
 /**
  * @addtogroup cc26x0_rop_status_codes
@@ -407,7 +404,12 @@ typedef struct __attribute__ ((aligned(4))) {
 
 
 typedef struct __attribute__ ((aligned(4))) {
-    _radio_op_command_t op;
+    radio_op_command_t ropCmd;
+} nop_cmd_t;
+
+
+typedef struct __attribute__ ((aligned(4))) {
+    radio_op_command_t ropCmd;
     uint8_t mode; /* W */
     /*
      * supported values: 0 (equivalent to 2), 2, 5, 6, 10, 12, 15, and 30
