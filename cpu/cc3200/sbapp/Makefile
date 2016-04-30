@@ -1,2 +1,0 @@
-include $(RIOTBASE)/Makefile.base
-
