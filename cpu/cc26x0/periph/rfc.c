@@ -71,6 +71,17 @@ void rfc_irq_disable(void)
     NVIC_DisableIRQ(RF_HW_IRQN);
 }
 
+void rfc_ping_test(void)
+{
+    uint8_t buf[sizeof(radio_setup_t) + 3];
+    radio_setup_t *rs = (radio_setup_t *)((uintptr_t)(buf + 3) & (0xFFFFFFFC));
+    memset(rs, 0, sizeof(rs));
+
+    rop->op.commandNo = CMDR_CMDID_PING;
+
+    run_command_ptr(&rs->op);
+}
+
 void rfc_setup_ble(void)
 {
     uint8_t buf[sizeof(radio_setup_t) + 3];
