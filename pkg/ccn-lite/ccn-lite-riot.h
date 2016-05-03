@@ -137,6 +137,16 @@ extern "C" {
 #define CCNL_PREFIX_BUFSIZE     (50)
 
 /**
+ * Message type for signalling a timeout while waiting for a content chunk
+ */
+#define CCNL_MSG_TIMEOUT        (0x1701)
+
+/**
+ * Message type for advancing the ageing timer
+ */
+#define CCNL_MSG_AGEING         (0x1702)
+
+/**
  * Struct holding CCN-Lite's central relay information
  */
 extern struct ccnl_relay_s ccnl_relay;
