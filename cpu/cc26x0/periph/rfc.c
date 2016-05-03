@@ -51,7 +51,7 @@ static void run_command_ptr(radio_op_command_t *rop)
     printf("RFC_DBELL->CMDSTA %lx\n", RFC_DBELL->CMDSTA);
     do {
         //printf("rop->op.status %x\n", rop->op.status);
-    } while (rop->status < 4);
+    } while (rop->status < R_OP_STATUS_SKIPPED);
     printf("rop->op.status %x\n", rop->status);
 }
 
