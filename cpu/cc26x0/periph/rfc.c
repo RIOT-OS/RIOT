@@ -22,23 +22,23 @@ void isr_rfc_cmd_ack(void)
 
 void isr_rfc_hw(void)
 {
-    uint32_t asdf = RFC_DBELL->RFHWIFG;
-    printf("hw %lx\n", asdf);
-    RFC_DBELL->RFHWIFG = ~asdf;
+    uint32_t flags = RFC_DBELL->RFHWIFG;
+    printf("hw %lx\n", flags);
+    RFC_DBELL->RFHWIFG = ~flags;
 }
 
 void isr_rfc_cpe0(void)
 {
-    uint32_t asdf = RFC_DBELL->RFCPEIFG;
-    printf("cpe0 %lx\n", asdf);
-    RFC_DBELL->RFCPEIFG = ~asdf;
+    uint32_t flags = RFC_DBELL->RFCPEIFG & (~RFC_DBELL->RFCPEISL);
+    printf("cpe0 %lx\n", flags);
+    RFC_DBELL->RFCPEIFG = ~flags;
 }
 
 void isr_rfc_cpe1(void)
 {
-    uint32_t asdf = RFC_DBELL->RFCPEIFG;
-    printf("cpe1 %lx\n", asdf);
-    RFC_DBELL->RFCPEIFG = ~asdf;
+    uint32_t flags = RFC_DBELL->RFCPEIFG & RFC_DBELL->RFCPEISL;
+    printf("cpe1 %lx\n", flags);
+    RFC_DBELL->RFCPEIFG = ~flags;
 }
 
 /* TODO that's shit design */
