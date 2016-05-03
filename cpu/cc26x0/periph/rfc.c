@@ -66,9 +66,9 @@ void rfc_irq_enable(void)
 void rfc_irq_disable(void)
 {
     NVIC_DisableIRQ(RF_CMD_ACK_IRQN);
-    NVIC_EnableIRQ(RF_CPE0_IRQN);
-    NVIC_EnableIRQ(RF_CPE1_IRQN);
-    NVIC_EnableIRQ(RF_HW_IRQN);
+    NVIC_DisableIRQ(RF_CPE0_IRQN);
+    NVIC_DisableIRQ(RF_CPE1_IRQN);
+    NVIC_DisableIRQ(RF_HW_IRQN);
 }
 
 void rfc_setup_ble(void)
