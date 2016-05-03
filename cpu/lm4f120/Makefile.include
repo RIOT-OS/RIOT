@@ -1,4 +1,8 @@
 export CPU_ARCH = cortex-m4f
 
 include $(RIOTMAKE)/arch/cortexm.inc.mk
+
+# use common periph functions
+USEMODULE += periph_common
+
 include $(RIOTCPU)/stellaris_common/Makefile.include
