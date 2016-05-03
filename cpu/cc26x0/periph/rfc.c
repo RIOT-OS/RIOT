@@ -131,12 +131,4 @@ void rfc_prepare(void)
 
     /* RFC IRQ */
     rfc_irq_enable();
-
-    rfc_setup_ble();
-
-        rfc_beacon();
-        rfc_beacon();
-
-    //while (true) {
-    //}
 }
