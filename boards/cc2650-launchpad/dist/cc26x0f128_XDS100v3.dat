@@ -1,0 +1,68 @@
+# config version=3.5
+$ sepk
+  pod_drvr=libjioserdesusbv3.so
+  pod_port=0
+$ /
+$ product
+  title="Texas Instruments XDS100v3 USB"
+  alias=TI_XDS100v3_USB
+  name=FTDI_FT2232
+$ /
+$ ftdi_ft2232
+  usb_vid=0x0403
+  usb_pid=0xa6d1
+  gpio_l0="TRSTn,Active_Low"
+  gpio_l1="EMU_Pin_Enable,Active_Low"
+  gpio_l2="EMU_Pin_0,Active_Low"
+  gpio_l3="Adaptive_Clock,Active_High"
+  gpio_h0="SRSTn,Active_High"
+  gpio_h1="Clock_Fail_Detect,Active_High"
+  gpio_h2="Power_Loss_Detect,Active_Low"
+  gpio_h3="Power_Loss_Reset,Active_High"
+  gpio_h4="EMU_Pin_1,Active_Low"
+  gpio_h5="Cable_Disconnect,Active_High"
+  gpio_h6="Dot7_Bypass,Active_Low"
+  gpio_h7="Alternate_Io,Active_Low"
+  apio_l0=Unused
+  apio_l1="Jtag_Isolate,Active_High"
+  apio_l2="Clock_Fail_Enable,Active_High"
+  apio_l3=Unused
+  apio_h0=Unused
+  apio_h1="Status_0,Active_High"
+  apio_h2="Status_2,Active_High"
+  apio_h3=Unused
+  apio_h4="Jtag_Loopback,Active_High"
+  apio_h5="Status_1,Active_High"
+  apio_h6=Unused
+  apio_h7=Unused
+$ /
+$ uscif
+  tdoedge=FALL
+  jtagboot_mode=disable
+  jtagboot_value=hiz
+  powerboot_mode=disable
+  powerboot_value=hiz
+  jtag_isolate=disable
+$ /
+$ dot7
+  dts_usage=enable
+  dts_type=xds100v3
+  ts_pin_width=all_four
+$ /
+$ uscif
+  tclk_program=adaptive
+  tclk_frequency=3.0
+$ /
+$ dot7
+  dts_program=emulator
+  dts_frequency=16.7MHz
+  ts_format=jscan0
+$ /
+@ icepick_c family=icepick_c irbits=6 drbits=1 subpaths=1
+  & subpath_0 address=16 default=no custom=yes force=yes pseudo=no
+    @ cs_dap_0 family=cs_dap irbits=4 drbits=1 subpaths=1 identify=0x4BA00477
+      & subpath_1 type=debug address=0 default=no custom=yes force=yes pseudo=no
+        @ cortex_m3_0 family=cortex_mxx irbits=0 drbits=0 identify=0x02000000 traceid=0x0
+      & /
+  & /
+# /
