@@ -223,12 +223,14 @@ int _ccnl_interest(int argc, char **argv)
         _ne.pid = sched_active_pid;
         gnrc_netreg_register(GNRC_NETTYPE_CCN_CHUNK, &_ne);
 
-        ccnl_send_interest(CCNL_SUITE_NDNTLV, argv[1], NULL, _int_buf, BUF_SIZE);
+        struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL, 0);
+        ccnl_send_interest(prefix, _int_buf, BUF_SIZE);
         if (ccnl_wait_for_chunk(_cont_buf, BUF_SIZE, 0) > 0) {
             gnrc_netreg_unregister(GNRC_NETTYPE_CCN_CHUNK, &_ne);
             printf("Content received: %s\n", _cont_buf);
             return 0;
         }
+        ccnl_free(prefix);
         gnrc_netreg_unregister(GNRC_NETTYPE_CCN_CHUNK, &_ne);
     }
     printf("Timeout! No content received in response to the Interest for %s.\n", argv[1]);
