@@ -34,6 +34,7 @@ brackets):
  * IOTLAB_EXP_NAME (RIOT_EXP)
  * IOTLAB_PHY_NODES
  * IOTLAB_EXCLUDE_NODES
+ * IOTLAB_LOGGING
 
 ### Format of a Resource ID
 Both variables `IOTLAB_PHY_NODES` and `IOTLAB_EXCLUDE_NODES` use the resource id
@@ -63,6 +64,8 @@ Note that the usage of `IOTLAB_PHY_NODES` ignores `IOTLAB_NODES`. It will also f
 binary of the current application to all registered nodes. The name of the
 experiment is set to "RIOT_EXP" or "RIOT_EXP_$(IOTLAB_EXP_NAME)"
 if `IOTLAB_EXP_NAME` is defined.
+If `IOTLAB_LOGGING` is set to `1`, then the output of all nodes will be logged on the server
+into a file called "RIOT_LOG-<EXPNAME>-<EXPID>".
 
 #### iotlab-flash
 
@@ -83,3 +86,6 @@ then you must specify the site with `IOTLAB_SITE`.
 
 Uses ssh to login the user on the IoT-LAB server of the specified site and
 start the `serial_aggregator` to communication with all registered nodes.
+If `IOTLAB_LOGGING` is set to `1`, then closing the connection with `CTRL+C/D` will also quit
+the logging process. Detach from the server-side tmux process with `CTRL+A-D`
+(or as defined in your server-side `.tmux.conf` file)
