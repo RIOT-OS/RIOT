@@ -26,6 +26,10 @@
 #include "xtimer.h"
 #endif
 
+#ifdef MODULE_TLSF
+#include "tlsf.h"
+#endif
+
 /* list of states copied from tcb.h */
 const char *state_names[] = {
     [STATUS_RUNNING] = "running",
@@ -112,5 +116,9 @@ void ps(void)
 #ifdef DEVELHELP
     printf("\t%5s %-21s|%13s%6s %5i (%5i)\n", "|", "SUM", "|", "|",
            overall_stacksz, overall_used);
+#   ifdef MODULE_TLSF
+    puts("\nHeap usage:");
+    tlsf_walk_pool(NULL);
+#   endif
 #endif
 }
