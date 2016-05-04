@@ -43,7 +43,7 @@ extern "C" {
  * On some platforms, the random number generator needs some global
  * initialization before it can be used. This should happen in this function
  * if it would impose too much overhead to do this everytime the hwrng_read
- * function is called. The device should however be put into power of mode
+ * function is called. The device should however be put into power-off mode
  * after initialization and will be powered on and of when hwrng_read is called.
  */
 void hwrng_init(void);
