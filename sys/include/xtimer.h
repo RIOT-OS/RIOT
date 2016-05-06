@@ -357,26 +357,38 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_TICKS_TO_USEC(value) ( (value) << XTIMER_SHIFT )
 #endif
 
-/**
- * @brief set xtimer default timer configuration
- * @{
+/*
+ * Default xtimer configuration
  */
 #ifndef XTIMER
-#define XTIMER (0)
+/**
+ * @brief Underlying hardware timer device to assign to xtimer
+ */
+#define XTIMER TIMER_DEV(0)
+/**
+ * @brief Underlying hardware timer channel to assign to xtimer
+ */
 #define XTIMER_CHAN (0)
 
-#if TIMER_0_MAX_VALUE == 0xffffff
-#define XTIMER_MASK 0xff000000
-#elif TIMER_0_MAX_VALUE == 0xffff
-#define XTIMER_MASK 0xffff0000
+#if (TIMER_0_MAX_VALUE) == 0xfffffful
+#define XTIMER_WIDTH (24)
+#elif (TIMER_0_MAX_VALUE) == 0xffff
+#define XTIMER_WIDTH (16)
 #endif
 
 #endif
+
+#ifndef XTIMER_WIDTH
 /**
- * @}
+ * @brief xtimer timer width
+ *
+ * This value specifies the width (in bits) of the hardware timer used by xtimer.
+ * Default is 32.
  */
+#define XTIMER_WIDTH (32)
+#endif
 
-#ifndef XTIMER_MASK
+#if XTIMER_WIDTH != 32
 /**
  * @brief xtimer timer mask
  *
@@ -384,12 +396,13 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  * counts to, e.g., 0xffffffff & ~TIMER_MAXVALUE.
  *
  * For a 16bit timer, the mask would be 0xFFFF0000, for a 24bit timer, the mask
- * would be 0xFF000000. Don't set this for 32bit timers.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
+ * would be 0xFF000000.
  */
+#define XTIMER_MASK ((0xffffffff >> XTIMER_WIDTH) << XTIMER_WIDTH)
+#else
 #define XTIMER_MASK (0)
 #endif
+
 #define XTIMER_MASK_SHIFTED XTIMER_TICKS_TO_USEC(XTIMER_MASK)
 
 #if XTIMER_MASK

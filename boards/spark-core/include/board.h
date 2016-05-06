@@ -38,7 +38,7 @@
 /**
  * @name Tell the xtimer that we use a 16-bit peripheral timer
  */
-#define XTIMER_MASK         (0xffff0000)
+#define XTIMER_WIDTH        (16)
 
 /**
  * @brief   Macros for controlling the on-board LEDs

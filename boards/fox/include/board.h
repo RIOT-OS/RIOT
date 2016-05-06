@@ -36,7 +36,7 @@ extern "C" {
 /**
  * @name Tell the xtimer that we use a 16-bit peripheral timer
  */
-#define XTIMER_MASK         (0xffff0000)
+#define XTIMER_WIDTH        (16)
 
 /**
  * @name Define the interface to the AT86RF231 radio
