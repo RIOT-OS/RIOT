@@ -161,7 +161,7 @@ static inline void xtimer_spin(uint32_t microseconds);
  * @param[in] last_wakeup   base time stamp for the wakeup
  * @param[in] period        time in microseconds that will be added to last_wakeup
  */
-void xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period);
+void xtimer_periodic_wakeup(uint64_t *last_wakeup, uint32_t period);
 
 /**
  * @brief Set a timer that sends a message
@@ -407,7 +407,7 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #if XTIMER_WIDTH != 32
 #define XTIMER_MASK ((0xffffffff >> XTIMER_WIDTH) << XTIMER_WIDTH)
 #else
-#define XTIMER_MASK (0)
+#define XTIMER_MASK (0U)
 #endif
 
 #define XTIMER_MASK_SHIFTED XTIMER_TICKS_TO_USEC(XTIMER_MASK)
