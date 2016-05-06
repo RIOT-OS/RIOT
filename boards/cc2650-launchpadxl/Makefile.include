@@ -1,5 +1,6 @@
 export CPU       = cc26x0
 export CPU_MODEL = cc26x0f128
+export DEBUGGER  = XDS110
 
 # set default port depending on operating system
 PORT_LINUX  ?= /dev/ttyACM0
@@ -11,4 +12,4 @@ include $(RIOTBOARD)/Makefile.include.serial
 # configure the flash tool
 export UNIFLASH_PATH ?= "UNIFLASH_PATH unconfigured"
 export FLASHER = $(UNIFLASH_PATH)/uniflash.sh
-export FFLAGS  = -ccxml $(RIOTBOARD)/$(BOARD)/dist/cc26x0stk.ccxml -program $(ELFFILE)
+export FFLAGS  = -ccxml $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(DEBUGGER).ccxml -program $(ELFFILE)
