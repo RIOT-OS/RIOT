@@ -1,0 +1,43 @@
+APPLICATION = pkg_u8glib
+include ../Makefile.tests_common
+
+USEMODULE += xtimer
+
+USEPKG += u8glib
+
+# set default device parameters in case they are undefined
+TEST_U8GLIB_OUTPUT    ?= 1
+TEST_U8GLIB_DISPLAY   ?= u8g_dev_ssd1306_128x64_hw_spi
+
+TEST_U8GLIB_I2C       ?= 0
+TEST_U8GLIB_SPI       ?= 0
+
+TEST_U8GLIB_ADDR      ?= 0x78
+
+TEST_U8GLIB_PIN_CSN   ?= GPIO_PIN\(0,0\)
+TEST_U8GLIB_PIN_A0    ?= GPIO_PIN\(0,0\)
+TEST_U8GLIB_PIN_RESET ?= GPIO_PIN\(0,0\)
+
+# features depends on output type
+ifeq ($(TEST_U8GLIB_OUTPUT),2)
+FEATURES_REQUIRED += periph_i2c periph_gpio
+endif
+
+ifeq ($(TEST_U8GLIB_OUTPUT),3)
+FEATURES_REQUIRED += periph_spi periph_gpio
+endif
+
+# export parameters
+CFLAGS += -DTEST_U8GLIB_OUTPUT=$(TEST_U8GLIB_OUTPUT)
+CFLAGS += -DTEST_U8GLIB_DISPLAY=$(TEST_U8GLIB_DISPLAY)
+
+CFLAGS += -DTEST_U8GLIB_I2C=$(TEST_U8GLIB_I2C)
+CFLAGS += -DTEST_U8GLIB_SPI=$(TEST_U8GLIB_SPI)
+
+CFLAGS += -DTEST_U8GLIB_ADDR=$(TEST_U8GLIB_ADDR)
+
+CFLAGS += -DTEST_U8GLIB_PIN_CSN=$(TEST_U8GLIB_PIN_CSN)
+CFLAGS += -DTEST_U8GLIB_PIN_A0=$(TEST_U8GLIB_PIN_A0)
+CFLAGS += -DTEST_U8GLIB_PIN_RESET=$(TEST_U8GLIB_PIN_RESET)
+
+include $(RIOTBASE)/Makefile.include
