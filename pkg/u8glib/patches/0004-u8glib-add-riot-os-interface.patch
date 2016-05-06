@@ -1,0 +1,645 @@
+From 831cd1168546fb63afdf01f57a727b52f6470eb2 Mon Sep 17 00:00:00 2001
+From: Bas Stottelaar <basstottelaar@gmail.com>
+Date: Fri, 6 May 2016 01:10:28 +0200
+Subject: [PATCH 4/4] u8glib: add riot-os interface.
+
+---
+ csrc/u8g.h                   | 145 ++++++++++++++++++++++++++-----------------
+ csrc/u8g_com_riotos_hw_spi.c |  75 ++++++++++++++++++++++
+ csrc/u8g_com_riotos_i2c.c    |  67 ++++++++++++++++++++
+ csrc/u8g_delay_riotos.c      |  16 +++++
+ csrc/u8g_dev_riotos_stdout.c |  82 ++++++++++++++++++++++++
+ 5 files changed, 328 insertions(+), 57 deletions(-)
+ create mode 100644 csrc/u8g_com_riotos_hw_spi.c
+ create mode 100644 csrc/u8g_com_riotos_i2c.c
+ create mode 100644 csrc/u8g_delay_riotos.c
+ create mode 100644 csrc/u8g_dev_riotos_stdout.c
+
+diff --git a/csrc/u8g.h b/csrc/u8g.h
+index fc92e51..6a76bfa 100644
+--- a/csrc/u8g.h
++++ b/csrc/u8g.h
+@@ -1,36 +1,36 @@
+ /*
+ 
+   u8g.h
+-  
++
+   Universal 8bit Graphics Library
+-  
++
+   Copyright (c) 2011, olikraus@gmail.com
+   All rights reserved.
+ 
+-  Redistribution and use in source and binary forms, with or without modification, 
++  Redistribution and use in source and binary forms, with or without modification,
+   are permitted provided that the following conditions are met:
+ 
+-  * Redistributions of source code must retain the above copyright notice, this list 
++  * Redistributions of source code must retain the above copyright notice, this list
+     of conditions and the following disclaimer.
+-    
+-  * Redistributions in binary form must reproduce the above copyright notice, this 
+-    list of conditions and the following disclaimer in the documentation and/or other 
++
++  * Redistributions in binary form must reproduce the above copyright notice, this
++    list of conditions and the following disclaimer in the documentation and/or other
+     materials provided with the distribution.
+ 
+-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+-  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+-  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+-  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+-  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+-  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+-  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+-  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+-  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+-  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+-  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+-  
++  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
++  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
++  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
++  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
++  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
++  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++
+ */
+ 
+ #ifndef _U8G_H
+@@ -56,10 +56,10 @@ typedef signed short int16_t;
+ 
+ #if defined(__AVR__)
+ #include <avr/pgmspace.h>
+-#endif 
++#endif
+ 
+-/* 
+-  use the com interface directly on any systems which are not AVR or ARDUINO 
++/*
++  use the com interface directly on any systems which are not AVR or ARDUINO
+ */
+ #if defined(__AVR__) || defined(ARDUINO) || defined(__MSP430__)
+ #define U8G_WITH_PINLIST
+@@ -70,7 +70,7 @@ typedef signed short int16_t;
+ extern "C" {
+ #endif
+ 
+-  
++
+ /*===============================================================*/
+ #ifdef __GNUC__
+ #  define U8G_NOINLINE __attribute__((noinline))
+@@ -133,7 +133,7 @@ typedef uint8_t u8g_fntpgm_uint8_t;
+ #  define U8G_PROGMEM PROGMEM
+ typedef uint8_t u8g_pgm_uint8_t;
+ typedef uint8_t u8g_fntpgm_uint8_t;
+-#  define u8g_pgm_read(adr) (*(const u8g_pgm_uint8_t *)(adr)) 
++#  define u8g_pgm_read(adr) (*(const u8g_pgm_uint8_t *)(adr))
+ #  define U8G_PSTR(s) ((u8g_pgm_uint8_t *)(s))
+ #endif
+ 
+@@ -142,10 +142,10 @@ typedef uint8_t u8g_fntpgm_uint8_t;
+ #  define PROGMEM
+ typedef uint8_t u8g_pgm_uint8_t;
+ typedef uint8_t u8g_fntpgm_uint8_t;
+-#  define u8g_pgm_read(adr) (*(const u8g_pgm_uint8_t *)(adr)) 
++#  define u8g_pgm_read(adr) (*(const u8g_pgm_uint8_t *)(adr))
+ #  define U8G_PSTR(s) ((u8g_pgm_uint8_t *)(s))
+ #endif
+-  
++
+ /*===============================================================*/
+ /* interrupt safe code */
+ #if defined(U8G_INTERRUPT_SAFE)
+@@ -167,8 +167,8 @@ extern uint8_t global_SREG_backup;	/* u8g_state.c */
+ #  define U8G_ATOMIC_START()
+ #  define U8G_ATOMIC_END()
+ #endif /* U8G_INTERRUPT_SAFE */
+-  
+-  
++
++
+ /*===============================================================*/
+ /* forward */
+ typedef struct _u8g_t u8g_t;
+@@ -193,7 +193,7 @@ typedef int8_t u8g_int_t;
+ #ifdef OBSOLETE
+ struct _u8g_box_t
+ {
+-  u8g_uint_t x0, y0, x1, y1;  
++  u8g_uint_t x0, y0, x1, y1;
+ };
+ typedef struct _u8g_box_t u8g_box_t;
+ #endif /* OBSOLETE */
+@@ -606,6 +606,37 @@ struct _u8g_dev_arg_irgb_t
+ /* arg: u8g_box_t *, fill structure with current page properties */
+ #define U8G_DEV_MSG_GET_PAGE_BOX 23
+ 
++/* riot-os specific */
++#include "periph/gpio.h"
++#include "periph/i2c.h"
++#include "periph/spi.h"
++
++#if I2C_NUMOF
++typedef struct {
++    i2c_t i2c_dev;
++    uint8_t address;
++    uint8_t mode;
++    gpio_t reset_pin;
++    u8g_t *u8g;
++} u8g_i2c_t;
++
++int u8g_init_i2c(u8g_i2c_t *dev, i2c_t i2c_dev, uint8_t address, gpio_t reset_pin, u8g_t *u8g, u8g_dev_t *display);
++#endif
++
++#if SPI_NUMOF
++typedef struct {
++    spi_t spi_dev;
++    gpio_t csn_pin;
++    gpio_t a0_pin;
++    gpio_t reset_pin;
++    u8g_t *u8g;
++} u8g_spi_t;
++
++int u8g_init_spi(u8g_spi_t *dev, spi_t spi_dev, gpio_t csn_pin, gpio_t a0_pin, gpio_t reset_pin, u8g_t *u8g, u8g_dev_t *display);
++#endif
++
++int u8g_init_stdout(u8g_t *u8g);
++
+ /*
+ #define U8G_DEV_MSG_PRIMITIVE_START             30
+ #define U8G_DEV_MSG_PRIMITIVE_END               31
+@@ -687,7 +718,7 @@ uint8_t u8g_com_arduino_st7920_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_va
+ uint8_t u8g_com_arduino_parallel_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);           /* u8g_com_arduino_parallel.c */
+ uint8_t u8g_com_arduino_fast_parallel_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);      /* u8g_com_arduino_fast_parallel.c */
+ uint8_t u8g_com_arduino_port_d_wr_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);       /* u8g_com_arduino_port_d_wr.c */
+-uint8_t u8g_com_arduino_no_en_parallel_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);	/* u8g_com_arduino_no_en_parallel.c */		
++uint8_t u8g_com_arduino_no_en_parallel_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);	/* u8g_com_arduino_no_en_parallel.c */
+ uint8_t u8g_com_arduino_ssd_i2c_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);		/* u8g_com_arduino_ssd_i2c.c */
+ uint8_t u8g_com_arduino_uc_i2c_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);
+ uint8_t u8g_com_arduino_t6963_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);			/* u8g_com_arduino_t6963.c */
+@@ -712,7 +743,7 @@ uint8_t u8g_com_linux_ssd_i2c_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void
+ uint8_t u8g_com_psoc5_ssd_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);   /* u8g_com_psoc5_ssd_hw_spi.c */
+ uint8_t u8g_com_psoc5_ssd_hw_parallel_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);   /* u8g_com_psoc5_ssd_hw_parallel.c */
+ 
+-/* 
++/*
+   Translation of system specific com drives to generic com names
+   At the moment, the following generic com drives are available
+   U8G_COM_HW_SPI
+@@ -722,8 +753,8 @@ uint8_t u8g_com_psoc5_ssd_hw_parallel_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_va
+   U8G_COM_FAST_PARALLEL
+   U8G_COM_SSD_I2C
+   U8G_COM_UC_I2C
+-  
+-defined(__18CXX) || defined(__PIC32MX)  
++
++defined(__18CXX) || defined(__PIC32MX)
+ 
+ */
+ 
+@@ -1118,7 +1149,7 @@ typedef void (*u8g_state_cb)(uint8_t msg);
+ 
+ /* read/write pin, must be the last pin in the list, this means U8G_PIN_LIST_LEN =  U8G_PI_RW + 1*/
+ #define U8G_PI_WR 13
+-#define U8G_PI_RW 13 
++#define U8G_PI_RW 13
+ 
+ #define U8G_PIN_LIST_LEN 14
+ 
+@@ -1134,8 +1165,8 @@ struct _u8g_t
+ {
+   u8g_uint_t width;
+   u8g_uint_t height;
+-  
+-  
++
++
+   u8g_dev_t *dev;               /* first device in the device chain */
+   const u8g_pgm_uint8_t *font;             /* regular font for all text procedures */
+   const u8g_pgm_uint8_t *cursor_font;  /* special font for cursor procedures */
+@@ -1145,31 +1176,32 @@ struct _u8g_t
+   u8g_uint_t cursor_x;
+   u8g_uint_t cursor_y;
+   u8g_draw_cursor_fn cursor_fn;
+-  
++
+   int8_t glyph_dx;
+   int8_t glyph_x;
+   int8_t glyph_y;
+   uint8_t glyph_width;
+   uint8_t glyph_height;
+-  
++
+   u8g_font_calc_vref_fnptr font_calc_vref;
+   uint8_t font_height_mode;
+   int8_t font_ref_ascent;
+   int8_t font_ref_descent;
+   uint8_t font_line_spacing_factor;     /* line_spacing = factor * (ascent - descent) / 64 */
+   uint8_t line_spacing;
+-  
++
+   u8g_dev_arg_pixel_t arg_pixel;
+   /* uint8_t color_index; */
+ 
+ #ifdef U8G_WITH_PINLIST
+   uint8_t pin_list[U8G_PIN_LIST_LEN];
+ #endif
+-  
++
+   u8g_state_cb state_cb;
+-  
++
+   u8g_box_t current_page;		/* current box of the visible page */
+ 
++  void *riot_dev;  /* riot-os device (i2c, spi or stdout) */
+ };
+ 
+ #define u8g_GetFontAscent(u8g) ((u8g)->font_ref_ascent)
+@@ -1199,9 +1231,9 @@ uint8_t u8g_InitSPI(u8g_t *u8g, u8g_dev_t *dev, uint8_t sck, uint8_t mosi, uint8
+ uint8_t u8g_InitHWSPI(u8g_t *u8g, u8g_dev_t *dev, uint8_t cs, uint8_t a0, uint8_t reset);
+ uint8_t u8g_InitI2C(u8g_t *u8g, u8g_dev_t *dev, uint8_t options);	/* use U8G_I2C_OPT_NONE as options */
+ uint8_t u8g_Init8BitFixedPort(u8g_t *u8g, u8g_dev_t *dev, uint8_t en, uint8_t cs, uint8_t di, uint8_t rw, uint8_t reset);
+-uint8_t u8g_Init8Bit(u8g_t *u8g, u8g_dev_t *dev, uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7, 
++uint8_t u8g_Init8Bit(u8g_t *u8g, u8g_dev_t *dev, uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7,
+   uint8_t en, uint8_t cs1, uint8_t cs2, uint8_t di, uint8_t rw, uint8_t reset);
+-uint8_t u8g_InitRW8Bit(u8g_t *u8g, u8g_dev_t *dev, uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7, 
++uint8_t u8g_InitRW8Bit(u8g_t *u8g, u8g_dev_t *dev, uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7,
+   uint8_t cs, uint8_t a0, uint8_t wr, uint8_t rd, uint8_t reset);
+ #endif
+ 
+@@ -1237,7 +1269,7 @@ void u8g_SetDefaultMidColor(u8g_t *u8g);
+ #define u8g_GetMode(u8g) ((u8g)->mode)
+ /*
+   U8G_MODE_GET_BITS_PER_PIXEL(u8g_GetMode(u8g))
+-  U8G_MODE_IS_COLOR(u8g_GetMode(u8g)) 
++  U8G_MODE_IS_COLOR(u8g_GetMode(u8g))
+ */
+ 
+ /* u8g_state.c */
+@@ -1355,7 +1387,7 @@ u8g_uint_t u8g_DrawAAStr(u8g_t *u8g, u8g_uint_t x, u8g_uint_t y, const char *s);
+ 
+ /* u8g_rect.c */
+ 
+-void u8g_draw_box(u8g_t *u8g, u8g_uint_t x, u8g_uint_t y, u8g_uint_t w, u8g_uint_t h) U8G_NOINLINE; 
++void u8g_draw_box(u8g_t *u8g, u8g_uint_t x, u8g_uint_t y, u8g_uint_t w, u8g_uint_t h) U8G_NOINLINE;
+ 
+ void u8g_DrawHLine(u8g_t *u8g, u8g_uint_t x, u8g_uint_t y, u8g_uint_t w) U8G_NOINLINE;
+ void u8g_DrawVLine(u8g_t *u8g, u8g_uint_t x, u8g_uint_t y, u8g_uint_t w) U8G_NOINLINE;
+@@ -1442,7 +1474,7 @@ struct pg_edge_struct
+   pg_word_t height;
+   pg_word_t current_x_offset;
+   pg_word_t error_offset;
+-  
++
+   /* --- line loop --- */
+   pg_word_t current_y;
+   pg_word_t max_y;
+@@ -1637,8 +1669,8 @@ extern const u8g_fntpgm_uint8_t u8g_font_cu12_67_75[] U8G_FONT_SECTION("u8g_font
+ extern const u8g_fntpgm_uint8_t u8g_font_cu12_78_79[] U8G_FONT_SECTION("u8g_font_cu12_78_79");
+ extern const u8g_fntpgm_uint8_t u8g_font_cu12[] U8G_FONT_SECTION("u8g_font_cu12");
+ 
+-/* 
+-  Free-Universal Bold 
++/*
++  Free-Universal Bold
+   r: Reduced char set (codes 32 - 128)
+   n: Numbers (codes 42 - 57)
+   no char: Full set (codes 32 - 255)
+@@ -1666,7 +1698,7 @@ extern const u8g_fntpgm_uint8_t u8g_font_fub35n[] U8G_FONT_SECTION("u8g_font_fub
+ extern const u8g_fntpgm_uint8_t u8g_font_fub42n[] U8G_FONT_SECTION("u8g_font_fub42n");
+ extern const u8g_fntpgm_uint8_t u8g_font_fub49n[] U8G_FONT_SECTION("u8g_font_fub49n");
+ 
+-/* 
++/*
+   Free-Universal Regular
+   r: Reduced char set (codes 32 - 128)
+   n: Numbers (codes 42 - 57)
+@@ -1695,7 +1727,7 @@ extern const u8g_fntpgm_uint8_t u8g_font_fur35n[] U8G_FONT_SECTION("u8g_font_fur
+ extern const u8g_fntpgm_uint8_t u8g_font_fur42n[] U8G_FONT_SECTION("u8g_font_fur42n");
+ extern const u8g_fntpgm_uint8_t u8g_font_fur49n[] U8G_FONT_SECTION("u8g_font_fur49n");
+ 
+-/* 
++/*
+   Gentium Bold
+   r: Reduced char set (codes 32 - 128)
+   n: Numbers (codes 42 - 57)
+@@ -1726,7 +1758,7 @@ extern const u8g_fntpgm_uint8_t u8g_font_gdb20n[] U8G_FONT_SECTION("u8g_font_gdb
+ extern const u8g_fntpgm_uint8_t u8g_font_gdb25n[] U8G_FONT_SECTION("u8g_font_gdb25n");
+ extern const u8g_fntpgm_uint8_t u8g_font_gdb30n[] U8G_FONT_SECTION("u8g_font_gdb30n");
+ 
+-/* 
++/*
+   Gentium Regular
+   r: Reduced char set (codes 32 - 128)
+   n: Numbers (codes 42 - 57)
+@@ -1763,7 +1795,7 @@ extern const u8g_fntpgm_uint8_t u8g_font_gdr20n[] U8G_FONT_SECTION("u8g_font_gdr
+ extern const u8g_fntpgm_uint8_t u8g_font_gdr25n[] U8G_FONT_SECTION("u8g_font_gdr25n");
+ extern const u8g_fntpgm_uint8_t u8g_font_gdr30n[] U8G_FONT_SECTION("u8g_font_gdr30n");
+ 
+-/* 
++/*
+   Old-Standard Bold
+   r: Reduced char set (codes 32 - 128)
+   n: Numbers (codes 42 - 57)
+@@ -1788,7 +1820,7 @@ extern const u8g_fntpgm_uint8_t u8g_font_osb26n[] U8G_FONT_SECTION("u8g_font_osb
+ extern const u8g_fntpgm_uint8_t u8g_font_osb29n[] U8G_FONT_SECTION("u8g_font_osb29n");
+ extern const u8g_fntpgm_uint8_t u8g_font_osb35n[] U8G_FONT_SECTION("u8g_font_osb35n");
+ 
+-/* 
++/*
+   Old-Standard Regular
+   r: Reduced char set (codes 32 - 128)
+   n: Numbers (codes 42 - 57)
+@@ -1835,7 +1867,7 @@ extern const u8g_fntpgm_uint8_t u8g_font_unifont_12_13[] U8G_FONT_SECTION("u8g_f
+ 
+ /* 04b fonts */
+ 
+-extern const u8g_fntpgm_uint8_t u8g_font_04b_03b[] U8G_FONT_SECTION("u8g_font_04b_03b"); 
++extern const u8g_fntpgm_uint8_t u8g_font_04b_03b[] U8G_FONT_SECTION("u8g_font_04b_03b");
+ extern const u8g_fntpgm_uint8_t u8g_font_04b_03bn[] U8G_FONT_SECTION("u8g_font_04b_03bn");
+ extern const u8g_fntpgm_uint8_t u8g_font_04b_03br[] U8G_FONT_SECTION("u8g_font_04b_03br");
+ extern const u8g_fntpgm_uint8_t u8g_font_04b_03[] U8G_FONT_SECTION("u8g_font_04b_03");
+@@ -2061,4 +2093,3 @@ extern const u8g_fntpgm_uint8_t u8g_font_profont29r[] U8G_FONT_SECTION("u8g_font
+ #endif
+ 
+ #endif /* _U8G_H */
+-
+diff --git a/csrc/u8g_com_riotos_hw_spi.c b/csrc/u8g_com_riotos_hw_spi.c
+new file mode 100644
+index 0000000..208cc51
+--- /dev/null
++++ b/csrc/u8g_com_riotos_hw_spi.c
+@@ -0,0 +1,75 @@
++#include "u8g.h"
++
++#if SPI_NUMOF
++
++static uint8_t u8g_com_riotos_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr)
++{
++    u8g_spi_t *dev = (u8g_spi_t *) u8g->riot_dev;
++
++    spi_acquire(dev->spi_dev);
++
++    switch (msg) {
++    case U8G_COM_MSG_STOP:
++        spi_poweroff(dev->spi_dev);
++        break;
++    case U8G_COM_MSG_INIT:
++        if (dev->csn_pin != GPIO_UNDEF) {
++            gpio_init(dev->csn_pin, GPIO_OUT);
++        }
++        if (dev->a0_pin != GPIO_UNDEF) {
++            gpio_init(dev->a0_pin, GPIO_OUT);
++        }
++        if (dev->reset_pin != GPIO_UNDEF) {
++            gpio_init(dev->reset_pin, GPIO_OUT);
++        }
++
++        spi_init_master(dev->spi_dev, SPI_CONF_SECOND_FALLING, SPI_SPEED_5MHZ);
++
++        break;
++    case U8G_COM_MSG_ADDRESS:
++        if (dev->a0_pin != GPIO_UNDEF) {
++            gpio_write(dev->a0_pin, arg_val);
++        }
++        break;
++    case U8G_COM_MSG_CHIP_SELECT:
++        if (dev->csn_pin != GPIO_UNDEF) {
++            gpio_write(dev->csn_pin, arg_val);
++        }
++        break;
++    case U8G_COM_MSG_RESET:
++        if (dev->reset_pin != GPIO_UNDEF) {
++            gpio_write(dev->reset_pin, arg_val);
++        }
++        break;
++    case U8G_COM_MSG_WRITE_BYTE:
++        spi_transfer_byte(dev->spi_dev, (char) arg_val, NULL);
++        break;
++    case U8G_COM_MSG_WRITE_SEQ:
++    case U8G_COM_MSG_WRITE_SEQ_P:
++        spi_transfer_bytes(dev->spi_dev, (char *) arg_ptr, NULL, arg_val);
++        break;
++    }
++
++    spi_release(dev->spi_dev);
++
++    return 1;
++}
++
++int u8g_init_spi(u8g_spi_t *dev, spi_t spi_dev, gpio_t csn_pin, gpio_t a0_pin, gpio_t reset_pin, u8g_t *u8g, u8g_dev_t *display)
++{
++    /* store reference to u8g_spi_t device to access it in method above */
++    u8g->riot_dev = dev;
++
++    dev->spi_dev = spi_dev;
++    dev->reset_pin = reset_pin;
++    dev->csn_pin = csn_pin;
++    dev->a0_pin = a0_pin;
++    dev->u8g = u8g;
++
++    /* initialize display */
++    u8g_InitComFn(u8g, display, &u8g_com_riotos_hw_spi_fn);
++
++    return 0;
++}
++
++#endif /* SPI_NUMOF */
+diff --git a/csrc/u8g_com_riotos_i2c.c b/csrc/u8g_com_riotos_i2c.c
+new file mode 100644
+index 0000000..6fdb56c
+--- /dev/null
++++ b/csrc/u8g_com_riotos_i2c.c
+@@ -0,0 +1,67 @@
++#include "u8g.h"
++
++#if I2C_NUMOF
++
++static uint8_t u8g_com_riotos_i2c_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr)
++{
++    u8g_i2c_t *dev = (u8g_i2c_t *) u8g->riot_dev;
++
++    i2c_acquire(dev->i2c_dev);
++
++    switch (msg) {
++    case U8G_COM_MSG_STOP:
++        i2c_poweroff(dev->i2c_dev);
++        break;
++    case U8G_COM_MSG_INIT:
++        if (dev->reset_pin != GPIO_UNDEF) {
++            gpio_init(dev->reset_pin, GPIO_OUT);
++        }
++
++        i2c_init_master(dev->i2c_dev, I2C_SPEED_NORMAL);
++        break;
++    case U8G_COM_MSG_ADDRESS:
++        if (arg_val == 0) {
++            dev->mode = 0x00;
++        } else {
++            dev->mode = 0x40;
++        }
++
++        break;
++    case U8G_COM_MSG_RESET:
++        if (dev->reset_pin != GPIO_UNDEF) {
++            gpio_write(dev->reset_pin, arg_val);
++        }
++
++        break;
++    case U8G_COM_MSG_WRITE_BYTE:
++        i2c_write_reg(dev->i2c_dev, dev->address, dev->mode, arg_val);
++        break;
++    case U8G_COM_MSG_WRITE_SEQ:
++    case U8G_COM_MSG_WRITE_SEQ_P:
++        i2c_write_regs(dev->i2c_dev, dev->address,
++                       dev->mode, (char *) arg_ptr, arg_val);
++        break;
++    }
++
++    i2c_release(dev->i2c_dev);
++
++    return 1;
++}
++
++int u8g_init_i2c(u8g_i2c_t *dev, i2c_t i2c_dev, uint8_t address, gpio_t reset_pin, u8g_t *u8g, u8g_dev_t *display)
++{
++    /* store reference to u8g_i2c_t device to access it in method above */
++    u8g->riot_dev = dev;
++
++    dev->i2c_dev = i2c_dev;
++    dev->address = address;
++    dev->reset_pin = reset_pin;
++    dev->u8g = u8g;
++
++    /* initialize display */
++    u8g_InitComFn(dev->u8g, display, &u8g_com_riotos_i2c_fn);
++
++    return 0;
++}
++
++#endif /* I2C_NUMOF */
+diff --git a/csrc/u8g_delay_riotos.c b/csrc/u8g_delay_riotos.c
+new file mode 100644
+index 0000000..0a393f3
+--- /dev/null
++++ b/csrc/u8g_delay_riotos.c
+@@ -0,0 +1,16 @@
++#include "xtimer.h"
++
++void u8g_Delay(uint16_t val)
++{
++    xtimer_usleep((uint32_t)val*(uint32_t)1000);
++}
++
++void u8g_MicroDelay(void)
++{
++    xtimer_usleep(1);
++}
++
++void u8g_10MicroDelay(void)
++{
++    xtimer_usleep(10);
++}
+diff --git a/csrc/u8g_dev_riotos_stdout.c b/csrc/u8g_dev_riotos_stdout.c
+new file mode 100644
+index 0000000..ff4b514
+--- /dev/null
++++ b/csrc/u8g_dev_riotos_stdout.c
+@@ -0,0 +1,82 @@
++#include <stdio.h>
++
++#include "u8g.h"
++
++/* display width */
++#ifndef U8G_STDOUT_WIDTH
++#define U8G_STDOUT_WIDTH 96
++#endif
++
++/* display height */
++#ifndef U8G_STDOUT_HEIGHT
++#define U8G_STDOUT_HEIGHT 32
++#endif
++
++/* height of a single page */
++#ifndef U8G_STDOUT_PAGE_HEIGHT
++#define U8G_STDOUT_PAGE_HEIGHT 8
++#endif
++
++/* use blocks to represent pixels, otherwise normal characters */
++#ifdef U8G_STDOUT_ANSI
++#define U8G_STDOUT_BLACK "\033[40m "
++#define U8G_STDOUT_WHITE "\033[47m "
++#define U8G_STDOUT_RESET "\033[0m"
++#else
++#define U8G_STDOUT_BLACK "#"
++#define U8G_STDOUT_WHITE "."
++#undef U8G_STDOUT_RESET
++#endif
++
++static uint8_t u8g_dev_riotos_stdout_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t msg, void *arg)
++{
++    switch(msg) {
++        case U8G_DEV_MSG_PAGE_FIRST:
++        {
++            /* move cursor up */
++            printf("\033[%dA", U8G_STDOUT_HEIGHT);
++
++            break;
++        }
++        case U8G_DEV_MSG_PAGE_NEXT:
++        {
++            u8g_pb_t *pb = (u8g_pb_t *)(dev->dev_mem);
++            uint8_t i, j;
++            uint8_t page_height;
++
++            page_height = pb->p.page_y1;
++            page_height -= pb->p.page_y0;
++            page_height++;
++
++            for (j = 0; j < page_height; j++) {
++                for (i = 0; i < U8G_STDOUT_WIDTH; i++) {
++                    if ((((uint8_t *)(pb->buf))[i] & (1 << j)) != 0) {
++                        printf("%s", U8G_STDOUT_BLACK);
++                    } else {
++                        printf("%s", U8G_STDOUT_WHITE);
++                    }
++                }
++
++                printf("%s", "\n");
++#ifdef U8G_STDOUT_RESET
++                printf("%s", U8G_STDOUT_RESET);
++#endif
++            }
++
++            break;
++        }
++    }
++
++    return u8g_dev_pb8v1_base_fn(u8g, dev, msg, arg);
++}
++
++/* create definition for stdout display */
++U8G_PB_DEV(u8g_dev_riotos_stdout, U8G_STDOUT_WIDTH, U8G_STDOUT_HEIGHT, U8G_STDOUT_PAGE_HEIGHT, u8g_dev_riotos_stdout_fn, NULL);
++
++int u8g_init_stdout(u8g_t *u8g)
++{
++    /* initialize display */
++    u8g_Init(u8g, &u8g_dev_riotos_stdout);
++
++    return 0;
++}
+-- 
+2.8.1
+

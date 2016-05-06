@@ -1,0 +1,55 @@
+From 3638fe6edbd420e7e76bc84bc051aace36160cb5 Mon Sep 17 00:00:00 2001
+From: Bas Stottelaar <basstottelaar@gmail.com>
+Date: Tue, 22 Dec 2015 19:32:17 +0100
+Subject: [PATCH 2/4] u8glib: fix compiler errors.
+
+---
+ csrc/u8g_clip.c                     | 2 +-
+ csrc/u8g_dev_ssd1325_nhd27oled_bw.c | 3 +++
+ csrc/u8g_dev_ssd1325_nhd27oled_gr.c | 3 +++
+ 3 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/csrc/u8g_clip.c b/csrc/u8g_clip.c
+index 5f12097..39c66a2 100644
+--- a/csrc/u8g_clip.c
++++ b/csrc/u8g_clip.c
+@@ -95,7 +95,7 @@ static uint8_t u8g_is_intersection_boolean(u8g_uint_t a0, u8g_uint_t a1, u8g_uin
+ #define U8G_IS_INTERSECTION_MACRO(a0,a1,v0,v1) ((uint8_t)( (v0) <= (a1) ) ? ( ( (v1) >= (a0) ) ? ( 1 ) : ( (v0) > (v1) ) ) : ( ( (v1) >= (a0) ) ? ( (v0) > (v1) ) : ( 0 ) ))
+ 
+ //static uint8_t u8g_is_intersection_decision_tree(u8g_uint_t a0, u8g_uint_t a1, u8g_uint_t v0, u8g_uint_t v1) U8G_ALWAYS_INLINE;
+-static uint8_t U8G_ALWAYS_INLINE u8g_is_intersection_decision_tree(u8g_uint_t a0, u8g_uint_t a1, u8g_uint_t v0, u8g_uint_t v1) 
++static U8G_ALWAYS_INLINE uint8_t u8g_is_intersection_decision_tree(u8g_uint_t a0, u8g_uint_t a1, u8g_uint_t v0, u8g_uint_t v1)
+ {
+   /* surprisingly the macro leads to larger code */
+   /* return U8G_IS_INTERSECTION_MACRO(a0,a1,v0,v1); */
+diff --git a/csrc/u8g_dev_ssd1325_nhd27oled_bw.c b/csrc/u8g_dev_ssd1325_nhd27oled_bw.c
+index d889539..93a01c9 100644
+--- a/csrc/u8g_dev_ssd1325_nhd27oled_bw.c
++++ b/csrc/u8g_dev_ssd1325_nhd27oled_bw.c
+@@ -41,6 +41,9 @@
+ 
+ */
+ 
++/* prevent empty translation unit errors */
++typedef int dummy_type_t;
++
+ #ifdef OBSOLETE_CODE
+ 
+ #include "u8g.h"
+diff --git a/csrc/u8g_dev_ssd1325_nhd27oled_gr.c b/csrc/u8g_dev_ssd1325_nhd27oled_gr.c
+index 6ab4813..0070d09 100644
+--- a/csrc/u8g_dev_ssd1325_nhd27oled_gr.c
++++ b/csrc/u8g_dev_ssd1325_nhd27oled_gr.c
+@@ -41,6 +41,9 @@
+ 
+ */
+ 
++/* prevent empty translation unit errors */
++typedef int dummy_type_t;
++
+ #ifdef OBSOLETE_CODE
+ 
+ #include "u8g.h"
+-- 
+2.8.1
+
