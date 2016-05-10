@@ -39,7 +39,7 @@ int main(void)
     for (int i = 0; i < NUMOF; i++) {
         uint32_t now = xtimer_now();
         printf("Testing interval %" PRIu32 "... (now=%" PRIu32 ")\n", interval, now);
-        uint32_t last_wakeup = xtimer_now();
+        uint64_t last_wakeup = xtimer_now();
         uint32_t before = last_wakeup;
         xtimer_periodic_wakeup(&last_wakeup, interval);
         now = xtimer_now();

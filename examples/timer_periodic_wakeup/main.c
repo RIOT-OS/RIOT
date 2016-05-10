@@ -27,7 +27,7 @@
 
 int main(void)
 {
-    uint32_t last_wakeup = xtimer_now();
+    uint64_t last_wakeup = xtimer_now();
 
     while(1) {
         xtimer_periodic_wakeup(&last_wakeup, INTERVAL);

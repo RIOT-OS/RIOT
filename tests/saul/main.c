@@ -32,7 +32,7 @@
 int main(void)
 {
     phydat_t res;
-    uint32_t last = xtimer_now();
+    uint64_t last = xtimer_now();
 
     puts("SAUL test application");
 

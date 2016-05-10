@@ -31,7 +31,7 @@
 
 int main(void)
 {
-    uint32_t last = xtimer_now();
+    uint64_t last = xtimer_now();
     int sample = 0;
 
     puts("\nRIOT ADC peripheral driver test\n");

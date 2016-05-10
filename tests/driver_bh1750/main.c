@@ -29,7 +29,7 @@
 int main(void)
 {
     bh1750fvi_t dev;
-    uint32_t last = xtimer_now();
+    uint64_t last = xtimer_now();
 
     puts("BH1750FVI ambient light sensor test\n");
 

@@ -190,7 +190,7 @@ int main(void)
                    NULL,
                    "worker");
 
-    uint32_t last_wakeup = xtimer_now();
+    uint64_t last_wakeup = xtimer_now();
     while (1) {
         xtimer_periodic_wakeup(&last_wakeup, TEST_INTERVAL);
         msg_try_send(&m, pid3);

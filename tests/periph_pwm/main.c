@@ -42,7 +42,7 @@ int main(void)
 {
     int state = 0;
     int step = STEP;
-    uint32_t last_wakeup = xtimer_now();
+    uint64_t last_wakeup = xtimer_now();
 
     puts("\nRIOT PWM test");
     puts("Connect an LED or scope to PWM pins to see something\n");

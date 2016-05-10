@@ -96,7 +96,7 @@ void *mid_sleep(void *arg)
 void *ticker(void *arg)
 {
     (void)arg;
-    uint32_t base = xtimer_now();
+    uint64_t base = xtimer_now();
 
     while (1) {
         ++short_ticks;
