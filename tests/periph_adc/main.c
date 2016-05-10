@@ -25,7 +25,7 @@
 
 
 #define RES             ADC_RES_10BIT
-#define DELAY           (100 * 1000U)
+#define DELAY           (100LU * 1000U)
 
 
 int main(void)
