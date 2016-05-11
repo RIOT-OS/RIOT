@@ -57,7 +57,7 @@ void auto_init_mma8652(void)
 
         DEBUG("[auto_init_saul] initializing mma8652 acc sensor\n");
 
-        if (mma8652_init(&mma8652_devs[i], p->i2c, p->addr, p->rate, p->scale) < 0) {
+        if (mma8652_init(&mma8652_devs[i], p->i2c, p->addr, p->rate, p->scale, p->type) < 0) {
             DEBUG("[auto_init_saul] error during initialization\n");
             return;
         }
