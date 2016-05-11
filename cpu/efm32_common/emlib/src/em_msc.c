@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_msc.c
  * @brief Flash controller (MSC) Peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -42,6 +42,16 @@
 
 /** @cond DO_NOT_INCLUDE_WITH_DOXYGEN */
 
+#if defined(__ICCARM__)
+/* Suppress warnings originating from use of EFM_ASSERT() with IAR:
+   EFM_ASSERT() is implemented as a local ramfunc */
+#pragma diag_suppress=Ta022
+#endif
+
+#if defined(EM_MSC_RUN_FROM_FLASH) && defined(_EFM32_GECKO_FAMILY)
+#error "Running Flash write/erase operations from Flash is not supported on EFM32G."
+#endif
+
 #if defined( MSC_WRITECTRL_WDOUBLE )
 #define WORDS_PER_DATA_PHASE (FLASH_SIZE < (512 * 1024) ? 1 : 2)
 #else
@@ -53,30 +63,144 @@ typedef enum {
   mscWriteFast,
 } MSC_WriteStrategy_Typedef;
 
-MSC_FUNC_PREFIX static MSC_Status_TypeDef
+MSC_RAMFUNC_DECLARATOR MSC_Status_TypeDef
   MSC_WriteWordI(uint32_t *address,
                  void const *data,
                  uint32_t numBytes,
-                 MSC_WriteStrategy_Typedef writeStrategy) MSC_FUNC_POSTFIX;
+                 MSC_WriteStrategy_Typedef writeStrategy);
 
-MSC_FUNC_PREFIX __STATIC_INLINE MSC_Status_TypeDef
+MSC_RAMFUNC_DECLARATOR MSC_Status_TypeDef
   MSC_LoadWriteData(uint32_t* data,
                     uint32_t numWords,
-                    MSC_WriteStrategy_Typedef writeStrategy) MSC_FUNC_POSTFIX;
+                    MSC_WriteStrategy_Typedef writeStrategy);
 
-MSC_FUNC_PREFIX __STATIC_INLINE MSC_Status_TypeDef
-  MSC_LoadVerifyAddress(uint32_t* address) MSC_FUNC_POSTFIX;
+MSC_RAMFUNC_DECLARATOR MSC_Status_TypeDef
+  MSC_LoadVerifyAddress(uint32_t* address);
+
+#if !defined(EM_MSC_RUN_FROM_FLASH)
+
+MSC_RAMFUNC_DECLARATOR void mscRfAssertEFM(const char *file, int line);
+
+/***************************************************************************//**
+ * @brief
+ *   Local ramfunc assertEFM.
+ *
+ *   A local ramfunc version of assertEFM is needed because certain MSC functions
+ *   are allocated to RAM. The Flash may get erased and code normally located in
+ *   Flash must therefore have a RAM copy.
+ *
+ *   This function is invoked through EFM_ASSERT() macro usage only, it should
+ *   not be used explicitly.
+ *
+ * @param[in] file
+ *   Name of source file where assertion failed.
+ *
+ * @param[in] line
+ *   Line number in source file where assertion failed.
+ ******************************************************************************/
+MSC_RAMFUNC_DEFINITION_BEGIN
+void mscRfAssertEFM(const char *file, int line)
+{
+  (void)file;  /* Unused parameter */
+  (void)line;  /* Unused parameter */
+
+  while (true)
+  {
+  }
+}
+MSC_RAMFUNC_DEFINITION_END
+
+/* Undef the define from em_assert.h and redirect to local ramfunc version. */
+#undef  EFM_ASSERT
+#if defined(DEBUG_EFM) || defined(DEBUG_EFM_USER)
+#define EFM_ASSERT(expr)    ((expr) ? ((void)0) : mscRfAssertEFM(__FILE__, __LINE__))
+#else
+#define EFM_ASSERT(expr)    ((void)(expr))
+#endif /* defined(DEBUG_EFM) || defined(DEBUG_EFM_USER) */
+
+#endif /* !EM_MSC_RUN_FROM_FLASH */
+
+/***************************************************************************//**
+ * @brief
+ *   Local ramfunc disable interrupts.
+ *
+ * @return
+ *   The resulting interrupt disable nesting level.
+ *
+ ******************************************************************************/
+MSC_RAMFUNC_DECLARATOR uint32_t mscRfIntDisable(void);
+
+MSC_RAMFUNC_DEFINITION_BEGIN
+uint32_t mscRfIntDisable(void)
+{
+#if defined(EM_MSC_RUN_FROM_FLASH)
+  return INT_Disable();
+#else
+  __disable_irq();
+  if (INT_LockCnt < UINT32_MAX)
+  {
+    INT_LockCnt++;
+  }
+
+  return INT_LockCnt;
+#endif
+}
+MSC_RAMFUNC_DEFINITION_END
+
+/***************************************************************************//**
+ * @brief
+ *   Local ramfunc enable interrupts.
+ *
+ * @return
+ *   The resulting interrupt disable nesting level.
+ *
+ * @details
+ *   Decrement interrupt lock level counter and enable interrupts if counter
+ *   reached zero.
+ *
+ ******************************************************************************/
+MSC_RAMFUNC_DECLARATOR uint32_t mscRfIntEnable(void);
+
+MSC_RAMFUNC_DEFINITION_BEGIN
+uint32_t mscRfIntEnable(void)
+{
+#if defined(EM_MSC_RUN_FROM_FLASH)
+  return INT_Enable();
+#else
+  uint32_t retVal;
+
+  if (INT_LockCnt > 0)
+  {
+    INT_LockCnt--;
+    retVal = INT_LockCnt;
+    if (retVal == 0)
+    {
+      __enable_irq();
+    }
+    return retVal;
+  }
+  else
+  {
+    return 0;
+  }
+#endif
+}
+MSC_RAMFUNC_DEFINITION_END
 
 /** @endcond */
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup MSC
  * @brief Flash controller (MSC) Peripheral API
+ * @details
+ *  This module contains functions to control the MSC peripheral of Silicon
+ *  Labs 32-bit MCUs and SoCs. The user can perform Flash memory read and write
+ *  operations through the Memory System Controller.
  * @{
  ******************************************************************************/
 
@@ -119,7 +243,9 @@ void MSC_Init(void)
   /* Configure MSC->TIMEBASE according to selected frequency */
   freq = CMU_ClockFreqGet(cmuClock_AUX);
 
-  if (freq > 7000000)
+  /* Timebase 5us is used for the 1/1.2MHz band only. Note that the 1MHz band
+     is tuned to 1.2MHz on newer revisions.  */
+  if (freq > 1200000)
   {
     /* Calculate number of clock cycles for 1us as base period */
     freq   = (freq * 11) / 10;
@@ -234,19 +360,8 @@ void MSC_ExecConfigSet(MSC_ExecConfig_TypeDef *execConfig)
  *   mscReturnLocked - Operation tried to erase a locked area of the flash.
  * @endverbatim
  ******************************************************************************/
-#if !defined(EM_MSC_RUN_FROM_FLASH)
-#if defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code="ram_code"
-#elif defined(__ICCARM__)
-/* Suppress warnings originating from use of EFM_ASSERT():              */
-/* "Call to a non __ramfunc function from within a __ramfunc function"  */
-/* "Possible rom access from within a __ramfunc function"               */
-#pragma diag_suppress=Ta022
-#pragma diag_suppress=Ta023
-__ramfunc
-#endif
-#endif /* !EM_MSC_RUN_FROM_FLASH */
-__STATIC_INLINE MSC_Status_TypeDef MSC_LoadVerifyAddress(uint32_t* address)
+MSC_RAMFUNC_DEFINITION_BEGIN
+MSC_Status_TypeDef MSC_LoadVerifyAddress(uint32_t* address)
 {
   uint32_t status;
   uint32_t timeOut;
@@ -279,12 +394,7 @@ __STATIC_INLINE MSC_Status_TypeDef MSC_LoadVerifyAddress(uint32_t* address)
   }
   return mscReturnOk;
 }
-#if defined(__ICCARM__)
-#pragma diag_default=Ta022
-#pragma diag_default=Ta023
-#elif defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code
-#endif /* __CC_ARM */
+MSC_RAMFUNC_DEFINITION_END
 
 
 /***************************************************************************//**
@@ -307,22 +417,10 @@ __STATIC_INLINE MSC_Status_TypeDef MSC_LoadVerifyAddress(uint32_t* address)
  *                      to complete.
  * @endverbatim
  ******************************************************************************/
-#if !defined(EM_MSC_RUN_FROM_FLASH)
-#if defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code="ram_code"
-#elif defined(__ICCARM__)
-/* Suppress warnings originating from use of EFM_ASSERT():              */
-/* "Call to a non __ramfunc function from within a __ramfunc function"  */
-/* "Possible rom access from within a __ramfunc function"               */
-#pragma diag_suppress=Ta022
-#pragma diag_suppress=Ta023
-__ramfunc
-#endif
-#endif /* !EM_MSC_RUN_FROM_FLASH */
-__STATIC_INLINE MSC_Status_TypeDef
-  MSC_LoadWriteData(uint32_t* data,
-                    uint32_t numWords,
-                    MSC_WriteStrategy_Typedef writeStrategy)
+MSC_RAMFUNC_DEFINITION_BEGIN
+MSC_Status_TypeDef MSC_LoadWriteData(uint32_t* data,
+                                     uint32_t numWords,
+                                     MSC_WriteStrategy_Typedef writeStrategy)
 {
   uint32_t timeOut;
   uint32_t wordIndex;
@@ -388,7 +486,7 @@ __STATIC_INLINE MSC_Status_TypeDef
     if (writeStrategy == mscWriteIntSafe)
     {
       /* Requires a system core clock at 1MHz or higher */
-      EFM_ASSERT(SystemCoreClockGet() >= 1000000);
+      EFM_ASSERT(SystemCoreClock >= 1000000);
       wordIndex = 0;
       while(wordIndex < numWords)
       {
@@ -426,13 +524,13 @@ __STATIC_INLINE MSC_Status_TypeDef
     {
 #if defined( _EFM32_GECKO_FAMILY )
       /* Gecko does not have auto-increment of ADDR. */
-      EFM_ASSERT(0);
+      EFM_ASSERT(false);
 #else
-      /* Requires a system core clock at 14MHz or higher */
-      EFM_ASSERT(SystemCoreClockGet() >= 14000000);
+      /* Requires a system core clock at 14MHz or higher. */
+      EFM_ASSERT(SystemCoreClock >= 14000000);
 
       wordIndex = 0;
-      INT_Disable();
+      mscRfIntDisable();
       while(wordIndex < numWords)
       {
         /* Wait for the MSC to be ready for the next word. */
@@ -464,7 +562,7 @@ __STATIC_INLINE MSC_Status_TypeDef
         data++;
         wordIndex++;
       }
-      INT_Enable();
+      mscRfIntEnable();
 
       /* Wait for the transaction to finish. */
       timeOut = MSC_PROGRAM_TIMEOUT;
@@ -488,12 +586,7 @@ __STATIC_INLINE MSC_Status_TypeDef
 
   return retval;
 }
-#if defined(__ICCARM__)
-#pragma diag_default=Ta022
-#pragma diag_default=Ta023
-#elif defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code
-#endif /* __CC_ARM */
+MSC_RAMFUNC_DEFINITION_END
 
 
 /***************************************************************************//**
@@ -510,21 +603,11 @@ __STATIC_INLINE MSC_Status_TypeDef
  * @return
  *   Returns the status of the data load operation
  ******************************************************************************/
-#if !defined(EM_MSC_RUN_FROM_FLASH)
-#if defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code="ram_code"
-#elif defined(__ICCARM__)
-/* Suppress warnings originating from use of EFM_ASSERT():              */
-/* "Call to a non __ramfunc function from within a __ramfunc function"  */
-/* "Possible rom access from within a __ramfunc function"               */
-#pragma diag_suppress=Ta022
-#pragma diag_suppress=Ta023
-#endif
-#endif /* !EM_MSC_RUN_FROM_FLASH */
-static MSC_Status_TypeDef MSC_WriteWordI(uint32_t *address,
-                                         void const *data,
-                                         uint32_t numBytes,
-                                         MSC_WriteStrategy_Typedef writeStrategy)
+MSC_RAMFUNC_DEFINITION_BEGIN
+MSC_Status_TypeDef MSC_WriteWordI(uint32_t *address,
+                                  void const *data,
+                                  uint32_t numBytes,
+                                  MSC_WriteStrategy_Typedef writeStrategy)
 {
   uint32_t wordCount;
   uint32_t numWords;
@@ -588,12 +671,7 @@ static MSC_Status_TypeDef MSC_WriteWordI(uint32_t *address,
 
   return retval;
 }
-#if defined(__ICCARM__)
-#pragma diag_default=Ta022
-#pragma diag_default=Ta023
-#elif defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code
-#endif /* __CC_ARM */
+MSC_RAMFUNC_DEFINITION_END
 
 /** @endcond */
 
@@ -623,17 +701,7 @@ static MSC_Status_TypeDef MSC_WriteWordI(uint32_t *address,
  *       to complete.
  * @endverbatim
  ******************************************************************************/
-#if !defined(EM_MSC_RUN_FROM_FLASH)
-#if defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code="ram_code"
-#elif defined(__ICCARM__)
-/* Suppress warnings originating from use of EFM_ASSERT():              */
-/* "Call to a non __ramfunc function from within a __ramfunc function"  */
-/* "Possible rom access from within a __ramfunc function"               */
-#pragma diag_suppress=Ta022
-#pragma diag_suppress=Ta023
-#endif
-#endif /* !EM_MSC_RUN_FROM_FLASH */
+MSC_RAMFUNC_DEFINITION_BEGIN
 MSC_Status_TypeDef MSC_ErasePage(uint32_t *startAddress)
 {
   uint32_t timeOut = MSC_PROGRAM_TIMEOUT;
@@ -680,12 +748,7 @@ MSC_Status_TypeDef MSC_ErasePage(uint32_t *startAddress)
   MSC->WRITECTRL &= ~MSC_WRITECTRL_WREN;
   return mscReturnOk;
 }
-#if defined(__ICCARM__)
-#pragma diag_default=Ta022
-#pragma diag_default=Ta023
-#elif defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code
-#endif /* __CC_ARM */
+MSC_RAMFUNC_DEFINITION_END
 
 
 /***************************************************************************//**
@@ -705,7 +768,7 @@ MSC_Status_TypeDef MSC_ErasePage(uint32_t *startAddress)
  *   must define a section called "ram_code" and place this manually in your
  *   project's scatter file.
  *
- *   This function requires a ystem core clock at 1MHz or higher.
+ *   This function requires a system core clock at 1MHz or higher.
  *
  * @param[in] address
  *   Pointer to the flash word to write to. Must be aligned to words.
@@ -724,29 +787,14 @@ MSC_Status_TypeDef MSC_ErasePage(uint32_t *startAddress)
  *       the next word into the DWORD register.
  * @endverbatim
  ******************************************************************************/
-#if !defined(EM_MSC_RUN_FROM_FLASH)
-#if defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code="ram_code"
-#elif defined(__ICCARM__)
-/* Suppress warnings originating from use of EFM_ASSERT():              */
-/* "Call to a non __ramfunc function from within a __ramfunc function"  */
-/* "Possible rom access from within a __ramfunc function"               */
-#pragma diag_suppress=Ta022
-#pragma diag_suppress=Ta023
-#endif
-#endif /* !EM_MSC_RUN_FROM_FLASH */
+MSC_RAMFUNC_DEFINITION_BEGIN
 MSC_Status_TypeDef MSC_WriteWord(uint32_t *address,
-                                  void const *data,
-                                  uint32_t numBytes)
+                                 void const *data,
+                                 uint32_t numBytes)
 {
   return MSC_WriteWordI(address, data, numBytes, mscWriteIntSafe);
 }
-#if defined(__ICCARM__)
-#pragma diag_default=Ta022
-#pragma diag_default=Ta023
-#elif defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code
-#endif /* __CC_ARM */
+MSC_RAMFUNC_DEFINITION_END
 
 
 #if !defined( _EFM32_GECKO_FAMILY )
@@ -783,29 +831,15 @@ MSC_Status_TypeDef MSC_WriteWord(uint32_t *address,
  *       the next word into the DWORD register.
  * @endverbatim
  ******************************************************************************/
-#if !defined(EM_MSC_RUN_FROM_FLASH)
-#if defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code="ram_code"
-#elif defined(__ICCARM__)
-/* Suppress warnings originating from use of EFM_ASSERT():              */
-/* "Call to a non __ramfunc function from within a __ramfunc function"  */
-/* "Possible rom access from within a __ramfunc function"               */
-#pragma diag_suppress=Ta022
-#pragma diag_suppress=Ta023
-#endif
-#endif /* !EM_MSC_RUN_FROM_FLASH */
+MSC_RAMFUNC_DEFINITION_BEGIN
 MSC_Status_TypeDef MSC_WriteWordFast(uint32_t *address,
-                                  void const *data,
-                                  uint32_t numBytes)
+                                     void const *data,
+                                     uint32_t numBytes)
 {
   return MSC_WriteWordI(address, data, numBytes, mscWriteFast);
 }
-#if defined(__ICCARM__)
-#pragma diag_default=Ta022
-#pragma diag_default=Ta023
-#elif defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code
-#endif /* __CC_ARM */
+MSC_RAMFUNC_DEFINITION_END
+
 #endif
 
 
@@ -813,17 +847,14 @@ MSC_Status_TypeDef MSC_WriteWordFast(uint32_t *address,
 /***************************************************************************//**
  * @brief
  *   Erase entire flash in one operation
+ *
  * @note
  *   This command will erase the entire contents of the device.
  *   Use with care, both a debug session and all contents of the flash will be
  *   lost. The lock bit, MLW will prevent this operation from executing and
  *   might prevent successful mass erase.
  ******************************************************************************/
-#if !defined(EM_MSC_RUN_FROM_FLASH)
-#if defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code="ram_code"
-#endif /* __CC_ARM */
-#endif /* !EM_MSC_RUN_FROM_FLASH */
+MSC_RAMFUNC_DEFINITION_BEGIN
 MSC_Status_TypeDef MSC_MassErase(void)
 {
   /* Enable writing to the MSC */
@@ -852,11 +883,10 @@ MSC_Status_TypeDef MSC_MassErase(void)
   /* This will only successfully return if calling function is also in SRAM */
   return mscReturnOk;
 }
-#if defined(__CC_ARM)  /* MDK-ARM compiler */
-#pragma arm section code
-#endif /* __CC_ARM */
+MSC_RAMFUNC_DEFINITION_END
+
 #endif
 
 /** @} (end addtogroup MSC) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* defined(MSC_COUNT) && (MSC_COUNT > 0) */

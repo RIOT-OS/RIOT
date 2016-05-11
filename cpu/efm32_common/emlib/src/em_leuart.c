@@ -2,10 +2,10 @@
  * @file em_leuart.c
  * @brief Low Energy Universal Asynchronous Receiver/Transmitter (LEUART)
  *   Peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -38,7 +38,7 @@
 #include "em_assert.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -46,6 +46,11 @@
  * @addtogroup LEUART
  * @brief Low Energy Universal Asynchronous Receiver/Transmitter (LEUART)
  *        Peripheral API
+ * @details
+ *  This module contains functions to control the LEUART peripheral of Silicon
+ *  Labs 32-bit MCUs and SoCs. The LEUART provides full UART communication using
+ *  a low frequency 32.768 kHz clock, and has special features for communication
+ *  without CPU intervention.
  * @{
  ******************************************************************************/
 
@@ -701,5 +706,5 @@ void LEUART_RxDmaInEM2Enable(LEUART_TypeDef *leuart, bool enable)
 
 
 /** @} (end addtogroup LEUART) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* defined(LEUART_COUNT) && (LEUART_COUNT > 0) */

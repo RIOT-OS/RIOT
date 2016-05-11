@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_chip.h
  * @brief Chip Initialization API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,30 +30,38 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_CHIP_H__
-#define __SILICON_LABS_EM_CHIP_H__
+#ifndef EM_CHIP_H
+#define EM_CHIP_H
 
 #include "em_device.h"
 #include "em_system.h"
+#include "em_gpio.h"
+#include "em_bus.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup CHIP
  * @brief Chip Initialization API
+ * @details
+ *  API to initialize chip for errata workarounds.
  * @{
  ******************************************************************************/
 
 /**************************************************************************//**
  * @brief
- *   Chip initialization routine for revision errata workarounds
+ *   Chip initialization routine for revision errata workarounds. This function
+ *   must be called immediately in main().
+ *
+ * @note
+ *   This function must be called immediately in main().
  *
  * This init function will configure the device to a state where it is
  * as similar as later revisions as possible, to improve software compatibility
@@ -181,13 +189,64 @@ __STATIC_INLINE void CHIP_Init(void)
     *(volatile uint32_t*)(0x400C80E4) &= ~(1 << 24);
   }
 #endif
+
+#if defined(_EFM32_PEARL_FAMILY)     \
+    || defined(_EFM32_JADE_FAMILY)   \
+    || defined(_EFR32_BLUE_FAMILY)   \
+    || defined(_EFR32_MIGHTY_FAMILY) \
+    || defined(_EFR32_FLEX_FAMILY)   \
+    || defined(_EFR32_ZAPPY_FAMILY)
+
+  /****************************
+  * Fixes for errata GPIO_E201 (slewrate) and
+  * HFXO high temperature oscillator startup robustness fix */
+
+  uint32_t port;
+  uint32_t clkEn;
+  uint8_t prodRev;
+  const uint32_t setVal   = (0x5 << _GPIO_P_CTRL_SLEWRATEALT_SHIFT)
+                             | (0x5 << _GPIO_P_CTRL_SLEWRATE_SHIFT);
+  const uint32_t resetVal = _GPIO_P_CTRL_RESETVALUE
+                            & ~(_GPIO_P_CTRL_SLEWRATE_MASK
+                                | _GPIO_P_CTRL_SLEWRATEALT_MASK);
+
+  prodRev = SYSTEM_GetProdRev();
+
+  /* This errata is fixed in hardware from PRODREV 0x8F. */
+  if (prodRev < 0x8F)
+  {
+    /* Fixes for errata GPIO_E201 (slewrate) */
+
+    /* Save HFBUSCLK enable state and enable GPIO clock. */
+    clkEn = CMU->HFBUSCLKEN0;
+    CMU->HFBUSCLKEN0 = clkEn | CMU_HFBUSCLKEN0_GPIO;
+
+    /* Update slewrate */
+    for(port = 0; port <= GPIO_PORT_MAX; port++)
+    {
+      GPIO->P[port].CTRL = setVal | resetVal;
+    }
+
+    /* Restore HFBUSCLK enable state. */
+    CMU->HFBUSCLKEN0 = clkEn;
+  }
+
+  /* This errata is fixed in hardware from PRODREV 0x90. */
+  if (prodRev < 0x90)
+  {
+    /* HFXO high temperature oscillator startup robustness fix */
+    CMU->HFXOSTARTUPCTRL =
+          (CMU->HFXOSTARTUPCTRL & ~_CMU_HFXOSTARTUPCTRL_IBTRIMXOCORE_MASK)
+          | (0x20 << _CMU_HFXOSTARTUPCTRL_IBTRIMXOCORE_SHIFT);
+  }
+#endif
 }
 
 /** @} (end addtogroup CHIP) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __SILICON_LABS_EM_CHIP_H__ */
+#endif /* EM_CHIP_H */

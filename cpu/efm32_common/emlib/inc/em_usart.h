@@ -2,10 +2,10 @@
  * @file em_usart.h
  * @brief Universal synchronous/asynchronous receiver/transmitter (USART/UART)
  *   peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -32,8 +32,8 @@
  ******************************************************************************/
 
 
-#ifndef __SILICON_LABS_EM_USART_H__
-#define __SILICON_LABS_EM_USART_H__
+#ifndef EM_USART_H
+#define EM_USART_H
 
 #include "em_device.h"
 #if defined(USART_COUNT) && (USART_COUNT > 0)
@@ -45,13 +45,12 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup USART
- * @brief Universal Synchronous/Asynchronous Receiver/Transmitter (USART) peripheral API
  * @{
  ******************************************************************************/
 
@@ -412,11 +411,11 @@ typedef struct
 #endif
 #if defined(_USART_TIMING_CSHOLD_MASK)
   /** Auto CS enabling */
-  bool autoCsEnable;
+  bool                    autoCsEnable;
   /** Auto CS hold time in baud cycles */
-  uint8_t autoCsHold;
+  uint8_t                 autoCsHold;
   /** Auto CS setup time in baud cycles */
-  uint8_t autoCsSetup;
+  uint8_t                 autoCsSetup;
 #endif
 } USART_InitSync_TypeDef;
 
@@ -493,6 +492,52 @@ typedef struct
 
 
 /** Default config for IrDA mode init structure. */
+#if defined(_USART_TIMING_CSHOLD_MASK) && defined(USART_CTRL_MVDIS)
+#define USART_INITIRDA_DEFAULT                                                              \
+{                                                                                           \
+  {                                                                                         \
+    usartEnable,     /* Enable RX/TX when init completed. */                                \
+    0,               /* Use current configured reference clock for configuring baudrate. */ \
+    115200,          /* 115200 bits/s. */                                                   \
+    usartOVS16,      /* 16x oversampling. */                                                \
+    usartDatabits8,  /* 8 databits. */                                                      \
+    usartEvenParity, /* Even parity. */                                                     \
+    usartStopbits1,  /* 1 stopbit. */                                                       \
+    false,           /* Do not disable majority vote. */                                    \
+    false,           /* Not USART PRS input mode. */                                        \
+    usartPrsRxCh0,   /* PRS channel 0. */                                                   \
+    false,           /* Auto CS functionality enable/disable switch */                      \
+    0,               /* Auto CS Hold cycles */                                              \
+    0                /* Auto CS Setup cycles */                                             \
+  },                                                                                        \
+  false,             /* Rx invert disabled. */                                              \
+  false,             /* Filtering disabled. */                                              \
+  usartIrDAPwTHREE,  /* Pulse width is set to ONE. */                                       \
+  false,             /* Routing to PRS is disabled. */                                      \
+  usartIrDAPrsCh0    /* PRS channel 0. */                                                   \
+}
+#elif defined(USART_INPUT_RXPRS) && defined(USART_CTRL_MVDIS)
+#define USART_INITIRDA_DEFAULT                                                              \
+{                                                                                           \
+  {                                                                                         \
+    usartEnable,     /* Enable RX/TX when init completed. */                                \
+    0,               /* Use current configured reference clock for configuring baudrate. */ \
+    115200,          /* 115200 bits/s. */                                                   \
+    usartOVS16,      /* 16x oversampling. */                                                \
+    usartDatabits8,  /* 8 databits. */                                                      \
+    usartEvenParity, /* Even parity. */                                                     \
+    usartStopbits1,  /* 1 stopbit. */                                                       \
+    false,           /* Do not disable majority vote. */                                    \
+    false,           /* Not USART PRS input mode. */                                        \
+    usartPrsRxCh0    /* PRS channel 0. */                                                   \
+  },                                                                                        \
+  false,             /* Rx invert disabled. */                                              \
+  false,             /* Filtering disabled. */                                              \
+  usartIrDAPwTHREE,  /* Pulse width is set to ONE. */                                       \
+  false,             /* Routing to PRS is disabled. */                                      \
+  usartIrDAPrsCh0    /* PRS channel 0. */                                                   \
+}
+#else
 #define USART_INITIRDA_DEFAULT                                                              \
 {                                                                                           \
   {                                                                                         \
@@ -510,7 +555,7 @@ typedef struct
   false,             /* Routing to PRS is disabled. */                                      \
   usartIrDAPrsCh0    /* PRS channel 0. */                                                   \
 }
-
+#endif
 
 #if defined(_USART_I2SCTRL_MASK)
 /** I2S mode init structure. Inherited from synchronous mode init structure */
@@ -539,6 +584,31 @@ typedef struct
 
 
 /** Default config for I2S mode init structure. */
+#if defined(_USART_TIMING_CSHOLD_MASK)
+#define USART_INITI2S_DEFAULT                                                                  \
+{                                                                                              \
+  {                                                                                            \
+    usartEnableTx,      /* Enable TX when init completed. */                                   \
+    0,                  /* Use current configured reference clock for configuring baudrate. */ \
+    1000000,            /* Baudrate 1M bits/s. */                                              \
+    usartDatabits16,    /* 16 databits. */                                                     \
+    true,               /* Operate as I2S master. */                                           \
+    true,               /* Most significant bit first. */                                      \
+    usartClockMode0,    /* Clock idle low, sample on rising edge. */                           \
+    false,              /* Don't enable USARTRx via PRS. */                                    \
+    usartPrsRxCh0,      /* PRS channel selection (dummy). */                                   \
+    false,              /* Disable AUTOTX mode. */                                             \
+    false,              /* No AUTOCS mode */                                                   \
+    0,                  /* Auto CS Hold cycles */                                              \
+    0                   /* Auto CS Setup cycles */                                             \
+  },                                                                                           \
+  usartI2sFormatW16D16, /* 16-bit word, 16-bit data */                                         \
+  true,                 /* Delay on I2S data. */                                               \
+  false,                /* No DMA split. */                                                    \
+  usartI2sJustifyLeft,  /* Data is left-justified within the frame */                          \
+  false                 /* Stereo mode. */                                                     \
+}
+#else
 #define USART_INITI2S_DEFAULT                                                                  \
 {                                                                                              \
   {                                                                                            \
@@ -559,6 +629,7 @@ typedef struct
   usartI2sJustifyLeft,  /* Data is left-justified within the frame */                          \
   false                 /* Stereo mode. */                                                     \
 }
+#endif
 #endif
 
 /*******************************************************************************
@@ -581,15 +652,53 @@ void USART_Enable(USART_TypeDef *usart, USART_Enable_TypeDef enable);
 
 void USART_InitAsync(USART_TypeDef *usart, const USART_InitAsync_TypeDef *init);
 void USART_InitSync(USART_TypeDef *usart, const USART_InitSync_TypeDef *init);
-#if defined(USART0) || ((USART_COUNT == 1) && defined(USART1))
-void USART_InitIrDA(const USART_InitIrDA_TypeDef *init);
-#endif
+void USARTn_InitIrDA(USART_TypeDef *usart, const USART_InitIrDA_TypeDef *init);
 
 #if defined(_USART_I2SCTRL_MASK)
 void USART_InitI2s(USART_TypeDef *usart, USART_InitI2s_TypeDef *init);
 #endif
 void USART_InitPrsTrigger(USART_TypeDef *usart, const USART_PrsTriggerInit_TypeDef *init);
 
+#if defined(DEFAULT_IRDA_USART) || defined(USART0) || ((USART_COUNT == 1) && defined(USART1))
+/***************************************************************************//**
+ * @brief
+ *   Init DEFAULT_IRDA_USART for asynchronous IrDA mode.
+ *
+ * @details
+ *   This function will configure basic settings in order to operate in
+ *   asynchronous IrDA mode.
+ *
+ *   Special control setup not covered by this function must be done after
+ *   using this function by direct modification of the CTRL and IRCTRL
+ *   registers.
+ *
+ *   Notice that pins used by the USART/UART module must be properly configured
+ *   by the user explicitly, in order for the USART/UART to work as intended.
+ *   (When configuring pins, one should remember to consider the sequence of
+ *   configuration, in order to avoid unintended pulses/glitches on output
+ *   pins.)
+ *
+ * @param[in] init
+ *   Pointer to initialization structure used to configure async IrDA setup.
+ *
+ * @deprecated
+ *   Deprecated function. New code should use USARTn_InitIrDA().
+ *   This function uses DEFAULT_IRDA_USART, which unless otherwise specified, is
+ *   USART0 on most devices, and USART1 on devices that don't have a USART0.
+ *
+ ******************************************************************************/
+__STATIC_INLINE void USART_InitIrDA(const USART_InitIrDA_TypeDef *init)
+{
+#if defined(DEFAULT_IRDA_USART)
+  USART_TypeDef *usart = DEFAULT_IRDA_USART;
+#elif (USART_COUNT == 1) && defined(USART1)
+  USART_TypeDef *usart = USART1;
+#else
+  USART_TypeDef *usart = USART0;
+#endif
+  USARTn_InitIrDA(usart, init);
+}
+#endif
 
 /***************************************************************************//**
  * @brief
@@ -889,11 +998,11 @@ void USART_TxExt(USART_TypeDef *usart, uint16_t data);
 
 
 /** @} (end addtogroup USART) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* defined(USART_COUNT) && (USART_COUNT > 0) */
-#endif /* __SILICON_LABS_EM_USART_H__ */
+#endif /* EM_USART_H */

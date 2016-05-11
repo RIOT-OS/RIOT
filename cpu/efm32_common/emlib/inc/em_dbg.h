@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_dbg.h
  * @brief Debug (DBG) API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -31,8 +31,8 @@
  ******************************************************************************/
 
 
-#ifndef __SILICON_LABS_EM_DBG_H__
-#define __SILICON_LABS_EM_DBG_H__
+#ifndef EM_DBG_H
+#define EM_DBG_H
 
 #include <stdbool.h>
 #include "em_device.h"
@@ -44,7 +44,7 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -82,7 +82,7 @@ void DBG_SWOEnable(unsigned int location);
 #endif
 
 /** @} (end addtogroup DBG) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
@@ -90,4 +90,4 @@ void DBG_SWOEnable(unsigned int location);
 
 #endif /* defined( CoreDebug_DHCSR_C_DEBUGEN_Msk ) */
 
-#endif /* __SILICON_LABS_EM_DBG_H__ */
+#endif /* EM_DBG_H */

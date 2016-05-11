@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_letimer.c
  * @brief Low Energy Timer (LETIMER) Peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -36,13 +36,17 @@
 #include "em_assert.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup LETIMER
  * @brief Low Energy Timer (LETIMER) Peripheral API
+ * @details
+ *  This module contains functions to control the LETIMER peripheral of Silicon
+ *  Labs 32-bit MCUs and SoCs. The LETIMER is a down-counter that can keep track
+ *  of time and output configurable waveforms.
  * @{
  ******************************************************************************/
 
@@ -540,5 +544,5 @@ void LETIMER_Reset(LETIMER_TypeDef *letimer)
 
 
 /** @} (end addtogroup LETIMER) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* defined(LETIMER_COUNT) && (LETIMER_COUNT > 0) */

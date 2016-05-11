@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_timer.h
  * @brief Timer/counter (TIMER) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_TIMER_H__
-#define __SILICON_LABS_EM_TIMER_H__
+#ifndef EM_TIMER_H
+#define EM_TIMER_H
 
 #include "em_device.h"
 #if defined(TIMER_COUNT) && (TIMER_COUNT > 0)
@@ -44,7 +44,7 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -109,7 +109,7 @@ typedef enum
   /** Prescaled HFPER clock. */
   timerClkSelHFPerClk = _TIMER_CTRL_CLKSEL_PRESCHFPERCLK,
 
-  /** Prescaled HFPER clock. */
+  /** Compare/Capture Channel 1 Input. */
   timerClkSelCC1      = _TIMER_CTRL_CLKSEL_CC1,
 
   /**
@@ -921,11 +921,11 @@ __STATIC_INLINE void TIMER_Unlock(TIMER_TypeDef *timer)
 
 
 /** @} (end addtogroup TIMER) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* defined(TIMER_COUNT) && (TIMER_COUNT > 0) */
-#endif /* __SILICON_LABS_EM_TIMER_H__ */
+#endif /* EM_TIMER_H */

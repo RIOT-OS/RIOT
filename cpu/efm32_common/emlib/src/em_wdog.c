@@ -2,10 +2,10 @@
  * @file em_wdog.c
  * @brief Watchdog (WDOG) peripheral API
  *   devices.
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -34,23 +34,20 @@
 #include "em_wdog.h"
 #if defined(WDOG_COUNT) && (WDOG_COUNT > 0)
 
-#if defined(WDOG0)
-#define WDOG WDOG0
-#if (WDOG_COUNT > 1)
-#warning "Multiple watchdogs not supported"
-#endif
-#endif
-
 #include "em_bus.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup WDOG
  * @brief Watchdog (WDOG) Peripheral API
+ * @details
+ *  This module contains functions to control the WDOG peripheral of Silicon
+ *  Labs 32-bit MCUs and SoCs. The WDOG resets the system in case of a fault
+ *  condition.
  * @{
  ******************************************************************************/
 
@@ -68,20 +65,29 @@
  *   before a previous update to the same register has completed, this function
  *   will stall until the previous synchronization has completed.
  *
+ * @param[in] wdog
+ *   Pointer to WDOG peripheral register block.
+ *
  * @param[in] enable
  *   true to enable watchdog, false to disable. Watchdog cannot be disabled if
  *   watchdog has been locked.
  ******************************************************************************/
-void WDOG_Enable(bool enable)
+void WDOGn_Enable(WDOG_TypeDef *wdog, bool enable)
 {
+  /* SYNCBUSY may stall when locked. */
+  if (wdog->CTRL & WDOG_CTRL_LOCK)
+  {
+    return;
+  }
+
   if (!enable)
   {
     /* Wait for any pending previous write operation to have been completed in */
     /* low frequency domain */
-    while (WDOG->SYNCBUSY & WDOG_SYNCBUSY_CTRL)
+    while (wdog->SYNCBUSY & WDOG_SYNCBUSY_CTRL)
       ;
   }
-  BUS_RegBitWrite(&(WDOG->CTRL), _WDOG_CTRL_EN_SHIFT, enable);
+  BUS_RegBitWrite(&wdog->CTRL, _WDOG_CTRL_EN_SHIFT, enable);
 }
 
 
@@ -93,11 +99,14 @@ void WDOG_Enable(bool enable)
  *   When the watchdog is activated, it must be fed (ie clearing the counter)
  *   before it reaches the defined timeout period. Otherwise, the watchdog
  *   will generate a reset.
+  *
+ * @param[in] wdog
+ *   Pointer to WDOG peripheral register block.
  ******************************************************************************/
-void WDOG_Feed(void)
+void WDOGn_Feed(WDOG_TypeDef *wdog)
 {
   /* The watchdog should not be fed while it is disabled */
-  if ( !(WDOG->CTRL & WDOG_CTRL_EN) )
+  if (!(wdog->CTRL & WDOG_CTRL_EN))
   {
     return;
   }
@@ -106,16 +115,16 @@ void WDOG_Feed(void)
   /* is no point in waiting for it to complete before clearing over again. */
   /* This avoids stalling the core in the typical use case where some idle loop */
   /* keeps clearing the watchdog. */
-  if (WDOG->SYNCBUSY & WDOG_SYNCBUSY_CMD)
+  if (wdog->SYNCBUSY & WDOG_SYNCBUSY_CMD)
   {
     return;
   }
   /* Before writing to the WDOG_CMD register we also need to make sure that
    * any previous write to WDOG_CTRL is complete. */
-  while ( WDOG->SYNCBUSY & WDOG_SYNCBUSY_CTRL )
+  while ( wdog->SYNCBUSY & WDOG_SYNCBUSY_CTRL )
     ;
 
-  WDOG->CMD = WDOG_CMD_CLEAR;
+  wdog->CMD = WDOG_CMD_CLEAR;
 }
 
 
@@ -130,11 +139,14 @@ void WDOG_Feed(void)
  *   before a previous update to the same register has completed, this function
  *   will stall until the previous synchronization has completed.
  *
+ * @param[in] wdog
+ *   Pointer to WDOG peripheral register block.
+ *
  * @param[in] init
  *   Structure holding watchdog configuration. A default setting
  *   #WDOG_INIT_DEFAULT is available for init.
  ******************************************************************************/
-void WDOG_Init(const WDOG_Init_TypeDef *init)
+void WDOGn_Init(WDOG_TypeDef *wdog, const WDOG_Init_TypeDef *init)
 {
   uint32_t setting;
 
@@ -166,34 +178,35 @@ void WDOG_Init(const WDOG_Init_TypeDef *init)
   {
     setting |= WDOG_CTRL_EM4BLOCK;
   }
-
   if (init->swoscBlock)
   {
     setting |= WDOG_CTRL_SWOSCBLOCK;
   }
-
+  if (init->lock)
+  {
+    setting |= WDOG_CTRL_LOCK;
+  }
+#if defined( _WDOG_CTRL_WDOGRSTDIS_MASK )
+  if (init->resetDisable)
+  {
+    setting |= WDOG_CTRL_WDOGRSTDIS;
+  }
+#endif
   setting |= ((uint32_t)(init->clkSel)   << _WDOG_CTRL_CLKSEL_SHIFT)
+#if defined( _WDOG_CTRL_WARNSEL_MASK )
+             | ((uint32_t)(init->warnSel) << _WDOG_CTRL_WARNSEL_SHIFT)
+#endif
+#if defined( _WDOG_CTRL_WINSEL_MASK )
+             | ((uint32_t)(init->winSel) << _WDOG_CTRL_WINSEL_SHIFT)
+#endif
              | ((uint32_t)(init->perSel) << _WDOG_CTRL_PERSEL_SHIFT);
 
   /* Wait for any pending previous write operation to have been completed in */
   /* low frequency domain */
-  while (WDOG->SYNCBUSY & WDOG_SYNCBUSY_CTRL)
+  while (wdog->SYNCBUSY & WDOG_SYNCBUSY_CTRL)
     ;
 
-  WDOG->CTRL = setting;
-
-  /* Optional register locking */
-  if (init->lock)
-  {
-    if (init->enable)
-    {
-      WDOG_Lock();
-    }
-    else
-    {
-      BUS_RegBitWrite(&(WDOG->CTRL), _WDOG_CTRL_LOCK_SHIFT, 1);
-    }
-  }
+  wdog->CTRL = setting;
 }
 
 
@@ -214,19 +227,22 @@ void WDOG_Init(const WDOG_Init_TypeDef *init)
  *   synchronization into the low frequency domain. If this register is modified
  *   before a previous update to the same register has completed, this function
  *   will stall until the previous synchronization has completed.
+ *
+ * @param[in] wdog
+ *   Pointer to WDOG peripheral register block.
  ******************************************************************************/
-void WDOG_Lock(void)
+void WDOGn_Lock(WDOG_TypeDef *wdog)
 {
   /* Wait for any pending previous write operation to have been completed in */
   /* low frequency domain */
-  while (WDOG->SYNCBUSY & WDOG_SYNCBUSY_CTRL)
+  while (wdog->SYNCBUSY & WDOG_SYNCBUSY_CTRL)
     ;
 
   /* Disable writing to the control register */
-  BUS_RegBitWrite(&(WDOG->CTRL), _WDOG_CTRL_LOCK_SHIFT, 1);
+  BUS_RegBitWrite(&wdog->CTRL, _WDOG_CTRL_LOCK_SHIFT, 1);
 }
 
 
 /** @} (end addtogroup WDOG) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* defined(WDOG_COUNT) && (WDOG_COUNT > 0) */

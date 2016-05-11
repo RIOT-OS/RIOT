@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_acmp.h
  * @brief Analog Comparator (ACMP) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_ACMP_H__
-#define __SILICON_LABS_EM_ACMP_H__
+#ifndef EM_ACMP_H
+#define EM_ACMP_H
 
 #include "em_device.h"
 #if defined(ACMP_COUNT) && (ACMP_COUNT > 0)
@@ -44,7 +44,7 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -923,11 +923,11 @@ __STATIC_INLINE void ACMP_IntSet(ACMP_TypeDef *acmp, uint32_t flags)
 }
 
 /** @} (end addtogroup ACMP) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* defined(ACMP_COUNT) && (ACMP_COUNT > 0) */
-#endif /* __SILICON_LABS_EM_ACMP_H__ */
+#endif /* EM_ACMP_H */

@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_emu.c
  * @brief Energy Management Unit (EMU) Peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -37,16 +37,21 @@
 
 #include "em_cmu.h"
 #include "em_system.h"
+#include "em_common.h"
 #include "em_assert.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup EMU
  * @brief Energy Management Unit (EMU) Peripheral API
+ * @details
+ *  This module contains functions to control the EMU peripheral of Silicon
+ *  Labs 32-bit MCUs and SoCs. The EMU handles the different low energy modes
+ *  in Silicon Labs microcontrollers.
  * @{
  ******************************************************************************/
 
@@ -132,7 +137,7 @@ static uint16_t cmuHfclkStatus;
 #endif
 #if defined( _EMU_DCDCCTRL_MASK )
 static uint16_t dcdcMaxCurrent_mA;
-static uint16_t dcdcOutput_mVout;
+static EMU_DcdcLnReverseCurrentControl_TypeDef dcdcReverseCurrentControl;
 #endif
 
 /** @endcond */
@@ -279,7 +284,7 @@ static void emuRestore(void)
 
 #if defined( ERRATA_FIX_EMU_E107_EN )
 /* Get enable conditions for errata EMU_E107 fix. */
-static __INLINE bool getErrataFixEmuE107En(void)
+__STATIC_INLINE bool getErrataFixEmuE107En(void)
 {
   /* SYSTEM_ChipRevisionGet could have been used here, but we would like a
    * faster implementation in this case.
@@ -316,10 +321,10 @@ static __INLINE bool getErrataFixEmuE107En(void)
 
 #if defined( _EMU_DCDCCTRL_MASK )
 /* LP prepare / LN restore P/NFET count */
-static void maxCurrentUpdate(void);
+static void currentLimitersUpdate(void);
 #define DCDC_LP_PFET_CNT        7
-#define DCDC_LP_NFET_CNT        15
-void dcdcFetCntSet(bool lpModeSet)
+#define DCDC_LP_NFET_CNT        7
+static void dcdcFetCntSet(bool lpModeSet)
 {
   uint32_t tmp;
   static uint32_t emuDcdcMiscCtrlReg;
@@ -332,22 +337,22 @@ void dcdcFetCntSet(bool lpModeSet)
     tmp |= (DCDC_LP_PFET_CNT << _EMU_DCDCMISCCTRL_PFETCNT_SHIFT)
             | (DCDC_LP_NFET_CNT << _EMU_DCDCMISCCTRL_NFETCNT_SHIFT);
     EMU->DCDCMISCCTRL = tmp;
-    maxCurrentUpdate();
+    currentLimitersUpdate();
   }
   else
   {
     EMU->DCDCMISCCTRL = emuDcdcMiscCtrlReg;
-    maxCurrentUpdate();
+    currentLimitersUpdate();
   }
 }
 
-void dcdcHsFixLnBlock(void)
+static void dcdcHsFixLnBlock(void)
 {
 #define EMU_DCDCSTATUS  (* (volatile uint32_t *)(EMU_BASE + 0x7C))
   if (errataFixDcdcHsState == errataFixDcdcHsTrimSet)
   {
     /* Wait for LNRUNNING */
-    if ((EMU->DCDCCTRL & ~_EMU_DCDCCTRL_DCDCMODE_MASK) == EMU_DCDCCTRL_DCDCMODE_LOWNOISE)
+    if ((EMU->DCDCCTRL & _EMU_DCDCCTRL_DCDCMODE_MASK) == EMU_DCDCCTRL_DCDCMODE_LOWNOISE)
     {
       while (!(EMU_DCDCSTATUS & (0x1 << 16)));
     }
@@ -991,11 +996,15 @@ static bool ConstCalibrationLoad(void)
 
 /***************************************************************************//**
  * @brief
- *   Set recommended and validated current optimization settings
+ *   Set recommended and validated current optimization and timing settings
  *
  ******************************************************************************/
-void ValidatedConfigSet(void)
+static void ValidatedConfigSet(void)
 {
+/* Disable LP mode hysterysis in the state machine control */
+#define EMU_DCDCMISCCTRL_LPCMPHYSDIS (0x1UL << 1)
+/* Comparator threshold on the high side */
+#define EMU_DCDCMISCCTRL_LPCMPHYSHI  (0x1UL << 2)
 #define EMU_DCDCSMCTRL  (* (volatile uint32_t *)(EMU_BASE + 0x44))
 
   uint32_t dcdcTiming;
@@ -1007,16 +1016,16 @@ void ValidatedConfigSet(void)
 
   /* Set low-noise RCO for EFM32 and EFR32 */
 #if defined( _EFR_DEVICE )
-  /* 7MHz is recommended for all EFR32 parts with DCDC */
-  EMU->DCDCLNFREQCTRL = (EMU->DCDCLNFREQCTRL & ~_EMU_DCDCLNFREQCTRL_RCOBAND_MASK)
-                          | (EMU_DcdcLnRcoBand_7MHz << _EMU_DCDCLNFREQCTRL_RCOBAND_SHIFT);
+  /* 7MHz is recommended for EFR32 */
+  EMU_DCDCLnRcoBandSet(EMU_DcdcLnRcoBand_7MHz);
 #else
-  /* 3MHz is recommended for all EFM32 parts with DCDC */
-  EMU->DCDCLNFREQCTRL = (EMU->DCDCLNFREQCTRL & ~_EMU_DCDCLNFREQCTRL_RCOBAND_MASK)
-                          | (EMU_DcdcLnRcoBand_3MHz << _EMU_DCDCLNFREQCTRL_RCOBAND_SHIFT);
+  /* 3MHz is recommended for EFM32 */
+  EMU_DCDCLnRcoBandSet(EMU_DcdcLnRcoBand_3MHz);
 #endif
 
   EMU->DCDCTIMING &= ~_EMU_DCDCTIMING_DUTYSCALE_MASK;
+  EMU->DCDCMISCCTRL |= EMU_DCDCMISCCTRL_LPCMPHYSDIS
+                       | EMU_DCDCMISCCTRL_LPCMPHYSHI;
 
   family = SYSTEM_GetFamily();
   SYSTEM_ChipRevisionGet(&rev);
@@ -1047,44 +1056,97 @@ void ValidatedConfigSet(void)
 
 /***************************************************************************//**
  * @brief
- *   Calculate and update EMU->DCDCMISCCTRL for maximum DCDC current based
- *   on the slice configuration and user set maximum.
+ *   Compute current limiters:
+ *     LNCLIMILIMSEL: LN current limiter threshold
+ *     LPCLIMILIMSEL: LP current limiter threshold
+ *     DCDCZDETCTRL:  zero detector limiter threshold
  ******************************************************************************/
-static void maxCurrentUpdate(void)
+static void currentLimitersUpdate(void)
 {
-  uint32_t lncLimImSel;
-  uint32_t lpcLimImSel;
+  uint32_t lncLimSel;
+  uint32_t zdetLimSel;
   uint32_t pFetCnt;
+  uint16_t maxReverseCurrent_mA;
 
+    /* 80mA as recommended peak in Application Note AN0948.
+       The peak current is the average current plus 50% of the current ripple.
+       Hence, a 14mA average current is recommended in LP mode. Since LP PFETCNT is also
+       a constant, we get lpcLimImSel = 1. The following calculation is provided
+       for documentation only. */
+  const uint32_t lpcLim = (((14 + 40) + ((14 + 40) / 2))
+                           / (5 * (DCDC_LP_PFET_CNT + 1)))
+                          - 1;
+  const uint32_t lpcLimSel = lpcLim << _EMU_DCDCMISCCTRL_LPCLIMILIMSEL_SHIFT;
+
+  /* Get enabled PFETs */
   pFetCnt = (EMU->DCDCMISCCTRL & _EMU_DCDCMISCCTRL_PFETCNT_MASK)
              >> _EMU_DCDCMISCCTRL_PFETCNT_SHIFT;
 
-  /* Equation from Reference Manual section 11.5.20, in the register
-     field description for LNCLIMILIMSEL and LPCLIMILIMSEL. */
-  lncLimImSel = (dcdcMaxCurrent_mA / (5 * (pFetCnt + 1))) - 1;
-  /* 80mA as recommended in Application Note AN0948 */
-  lpcLimImSel = (80 / (5 * (pFetCnt + 1))) - 1;
+  /* Compute LN current limiter threshold from nominal user input current and
+     LN PFETCNT as described in the register description for
+     EMU_DCDCMISCCTRL_LNCLIMILIMSEL. */
+  lncLimSel = (((dcdcMaxCurrent_mA + 40) + ((dcdcMaxCurrent_mA + 40) / 2))
+               / (5 * (pFetCnt + 1)))
+              - 1;
 
-  lncLimImSel <<= _EMU_DCDCMISCCTRL_LNCLIMILIMSEL_SHIFT;
-  lpcLimImSel <<= _EMU_DCDCMISCCTRL_LPCLIMILIMSEL_SHIFT;
+  /* Saturate the register field value */
+  lncLimSel = SL_MIN(lncLimSel,
+                     _EMU_DCDCMISCCTRL_LNCLIMILIMSEL_MASK
+                      >> _EMU_DCDCMISCCTRL_LNCLIMILIMSEL_SHIFT);
+
+  lncLimSel <<= _EMU_DCDCMISCCTRL_LNCLIMILIMSEL_SHIFT;
+
+  /* Check for overflow */
+  EFM_ASSERT((lncLimSel & ~_EMU_DCDCMISCCTRL_LNCLIMILIMSEL_MASK) == 0x0);
+  EFM_ASSERT((lpcLimSel & ~_EMU_DCDCMISCCTRL_LPCLIMILIMSEL_MASK) == 0x0);
+
   EMU->DCDCMISCCTRL = (EMU->DCDCMISCCTRL & ~(_EMU_DCDCMISCCTRL_LNCLIMILIMSEL_MASK
                                              | _EMU_DCDCMISCCTRL_LPCLIMILIMSEL_MASK))
-                       | (lncLimImSel | lpcLimImSel);
+                       | (lncLimSel | lpcLimSel);
+
+
+  /* Compute reverse current limit threshold for the zero detector from user input
+     maximum reverse current and LN PFETCNT as described in the register description
+     for EMU_DCDCZDETCTRL_ZDETILIMSEL. */
+  if (dcdcReverseCurrentControl >= 0)
+  {
+    /* If dcdcReverseCurrentControl < 0, then EMU_DCDCZDETCTRL_ZDETILIMSEL is "don't care" */
+    maxReverseCurrent_mA = (uint16_t)dcdcReverseCurrentControl;
+
+    zdetLimSel = ( ((maxReverseCurrent_mA + 40) + ((maxReverseCurrent_mA + 40) / 2))
+                    / ((2 * (pFetCnt + 1)) + ((pFetCnt + 1) / 2)) );
+    /* Saturate the register field value */
+    zdetLimSel = SL_MIN(zdetLimSel,
+                        _EMU_DCDCZDETCTRL_ZDETILIMSEL_MASK
+                         >> _EMU_DCDCZDETCTRL_ZDETILIMSEL_SHIFT);
+
+    zdetLimSel <<= _EMU_DCDCZDETCTRL_ZDETILIMSEL_SHIFT;
+
+    /* Check for overflow */
+    EFM_ASSERT((zdetLimSel & ~_EMU_DCDCZDETCTRL_ZDETILIMSEL_MASK) == 0x0);
+
+    EMU->DCDCZDETCTRL = (EMU->DCDCZDETCTRL & ~_EMU_DCDCZDETCTRL_ZDETILIMSEL_MASK)
+                         | zdetLimSel;
+  }
 }
 
 
 /***************************************************************************//**
  * @brief
- *   Set static variable that holds the user set maximum current. Update
- *   DCDC configuration.
+ *   Set static variables that hold the user set maximum peak current
+ *   and reverse current. Update limiters.
  *
- * @param[in] mAmaxCurrent
- *   Maximum allowed current drawn by the DCDC from VREGVDD in mA.
+ * @param[in] maxCurrent_mA
+ *   Set the maximum peak current that the DCDC can draw from the power source.
+ * @param[in] reverseCurrentControl
+ *   Reverse current control as defined by
+ *   @ref EMU_DcdcLnReverseCurrentControl_TypeDef. Positive values have unit mA.
  ******************************************************************************/
-static void maxCurrentSet(uint32_t mAmaxCurrent)
+static void userCurrentLimitsSet(uint32_t maxCurrent_mA,
+                                 EMU_DcdcLnReverseCurrentControl_TypeDef reverseCurrentControl)
 {
-  dcdcMaxCurrent_mA = mAmaxCurrent;
-  maxCurrentUpdate();
+  dcdcMaxCurrent_mA = maxCurrent_mA;
+  dcdcReverseCurrentControl = reverseCurrentControl;
 }
 
 
@@ -1192,8 +1254,9 @@ void EMU_DCDCModeSet(EMU_DcdcMode_TypeDef dcdcMode)
  *   Configure DCDC regulator
  *
  * @note
- *   Use the function EMU_DCDCPowerDown() to if the power circuit is configured
- *   for NODCDC as decribed in Section 11.3.4.3 in the Reference Manual.
+ * If the power circuit is configured for NODCDC as described in Section
+ * 11.3.4.3 of the Reference Manual, do not call this function. Instead call
+ * EMU_DCDCPowerOff().
  *
  * @param[in] dcdcInit
  *   DCDC initialization structure
@@ -1226,6 +1289,7 @@ bool EMU_DCDCInit(EMU_DCDCInit_TypeDef *dcdcInit)
   /* Check current parameters */
   EFM_ASSERT(dcdcInit->maxCurrent_mA <= 200);
   EFM_ASSERT(dcdcInit->em01LoadCurrent_mA <= dcdcInit->maxCurrent_mA);
+  EFM_ASSERT(dcdcInit->reverseCurrentControl <= 200);
 
   /* DCDC low-noise supports max 200mA */
   if (dcdcInit->dcdcMode == emuDcdcMode_LowNoise)
@@ -1233,46 +1297,70 @@ bool EMU_DCDCInit(EMU_DCDCInit_TypeDef *dcdcInit)
     EFM_ASSERT(dcdcInit->em01LoadCurrent_mA <= 200);
   }
 
-  /* EM2, 3 and 4 current above 100uA is not supported */
-  EFM_ASSERT(dcdcInit->em234LoadCurrent_uA <= 100);
+  /* EM2/3/4 current above 1mA is not supported */
+  EFM_ASSERT(dcdcInit->em234LoadCurrent_uA <= 1000);
 
-  /* Decode LP comparator bias for EM0/1 and EM2/3 */
-  lpCmpBiasSel  = EMU_DCDCMISCCTRL_LPCMPBIAS_BIAS1;
+  /* Decode LP comparator bias for EM2/3/4 */
   if (dcdcInit->em234LoadCurrent_uA <= 10)
   {
     lpCmpBiasSel  = EMU_DCDCMISCCTRL_LPCMPBIAS_BIAS0;
   }
+  else if (dcdcInit->em234LoadCurrent_uA <= 100)
+  {
+    lpCmpBiasSel  = EMU_DCDCMISCCTRL_LPCMPBIAS_BIAS1;
+  }
+  else
+  {
+    lpCmpBiasSel  = EMU_DCDCMISCCTRL_LPCMPBIAS_BIAS2;
+  }
 
-  /* Set DCDC low-power mode comparator bias selection */
+  /* ==== THESE NEXT STEPS ARE STRONGLY ORDER DEPENDENT ==== */
+
+  /* 1. Set DCDC low-power mode comparator bias selection and forced CCM
+        => Updates DCDCMISCCTRL_LNFORCECCM */
   EMU->DCDCMISCCTRL = (EMU->DCDCMISCCTRL & ~(_EMU_DCDCMISCCTRL_LPCMPBIAS_MASK
                                              | _EMU_DCDCMISCCTRL_LNFORCECCM_MASK))
                        | ((uint32_t)lpCmpBiasSel
-                          | (uint32_t)dcdcInit->lnTransientMode);
+                          | (dcdcInit->reverseCurrentControl >= 0 ?
+                             EMU_DCDCMISCCTRL_LNFORCECCM : 0));
 
-  /* Set recommended and validated current optimization settings */
+  /* 2. Set recommended and validated current optimization settings
+        => Updates DCDCLNFREQCTRL_RCOBAND */
   ValidatedConfigSet();
 
-  /* Set the maximum current that the DCDC can draw from the power source */
-  maxCurrentSet(dcdcInit->maxCurrent_mA);
+  /* 3. Updated static current limits user data.
+        Limiters are updated in EMU_DCDCOptimizeSlice() */
+  userCurrentLimitsSet(dcdcInit->maxCurrent_mA,
+                       dcdcInit->reverseCurrentControl);
 
-  /* Optimize LN slice based on given load current estimate */
+  /* 4. Optimize LN slice based on given user input load current
+        <= Depends on DCDCMISCCTRL_LNFORCECCM and DCDCLNFREQCTRL_RCOBAND
+        <= Depends on dcdcInit->maxCurrent_mA and dcdcInit->reverseCurrentControl
+        => Updates DCDCMISCCTRL_P/NFETCNT
+        => Updates DCDCMISCCTRL_LNCLIMILIMSEL and DCDCMISCCTRL_LPCLIMILIMSEL
+        => Updates DCDCZDETCTRL_ZDETILIMSEL */
   EMU_DCDCOptimizeSlice(dcdcInit->em01LoadCurrent_mA);
 
+  /* ======================================================= */
+
   /* Set DCDC output voltage */
-  dcdcOutput_mVout = dcdcInit->mVout;
-  if (!EMU_DCDCOutputVoltageSet(dcdcOutput_mVout, true, true))
+  if (!EMU_DCDCOutputVoltageSet(dcdcInit->mVout, true, true))
   {
     EFM_ASSERT(false);
     /* Return when assertions are disabled */
     return false;
   }
 
-  /* Set EM0 DCDC operating mode. Output voltage set in EMU_DCDCOutputVoltageSet()
-     above takes effect if mode is changed from bypass here. */
-  EMU_DCDCModeSet(dcdcInit->dcdcMode);
+  /* Select analog peripheral power supply. This must be done before
+     DCDC mode is set. */
+  BUS_RegBitWrite(&EMU->PWRCTRL,
+                  _EMU_PWRCTRL_ANASW_SHIFT,
+                  dcdcInit->anaPeripheralPower ? 1 : 0);
 
-  /* Select analog peripheral power supply */
-  BUS_RegBitWrite(&EMU->PWRCTRL, _EMU_PWRCTRL_ANASW_SHIFT, dcdcInit->anaPeripheralPower ? 1 : 0);
+  /* Set EM0 DCDC operating mode. Output voltage set in
+     EMU_DCDCOutputVoltageSet() above takes effect if mode
+     is changed from bypass here. */
+  EMU_DCDCModeSet(dcdcInit->dcdcMode);
 
   return true;
 }
@@ -1338,6 +1426,8 @@ bool EMU_DCDCOutputVoltageSet(uint32_t mV,
 
     /* Set attenuation to use */
     attSet = (mV > 1800);
+    /* Always set mVlow different from mVhigh to avoid division by zero   */
+    /* further down.                                                      */
     if (attSet)
     {
       mVlow = 1800;
@@ -1461,7 +1551,7 @@ bool EMU_DCDCOutputVoltageSet(uint32_t mV,
 
 
     /* Check for valid 2-point trim values */
-    if ((vrefLow == 0xFF) && (vrefHigh == 0xFF))
+    if (mVlow >= mVhigh)
     {
       EFM_ASSERT(false);
       /* Return when assertions are disabled */
@@ -1493,10 +1583,10 @@ bool EMU_DCDCOutputVoltageSet(uint32_t mV,
  *   Optimize DCDC slice count based on the estimated average load current
  *   in EM0
  *
- * @param[in] mAEm0LoadCurrent
+ * @param[in] em0LoadCurrent_mA
  *   Estimated average EM0 load current in mA.
  ******************************************************************************/
-void EMU_DCDCOptimizeSlice(uint32_t mAEm0LoadCurrent)
+void EMU_DCDCOptimizeSlice(uint32_t em0LoadCurrent_mA)
 {
   uint32_t sliceCount = 0;
   uint32_t rcoBand = (EMU->DCDCLNFREQCTRL & _EMU_DCDCLNFREQCTRL_RCOBAND_MASK)
@@ -1505,11 +1595,11 @@ void EMU_DCDCOptimizeSlice(uint32_t mAEm0LoadCurrent)
   /* Set recommended slice count */
   if ((EMU->DCDCMISCCTRL & _EMU_DCDCMISCCTRL_LNFORCECCM_MASK) && (rcoBand >= EMU_DcdcLnRcoBand_5MHz))
   {
-    if (mAEm0LoadCurrent < 20)
+    if (em0LoadCurrent_mA < 20)
     {
       sliceCount = 4;
     }
-    else if ((mAEm0LoadCurrent >= 20) && (mAEm0LoadCurrent < 40))
+    else if ((em0LoadCurrent_mA >= 20) && (em0LoadCurrent_mA < 40))
     {
       sliceCount = 8;
     }
@@ -1520,11 +1610,11 @@ void EMU_DCDCOptimizeSlice(uint32_t mAEm0LoadCurrent)
   }
   else if ((!(EMU->DCDCMISCCTRL & _EMU_DCDCMISCCTRL_LNFORCECCM_MASK)) && (rcoBand <= EMU_DcdcLnRcoBand_4MHz))
   {
-    if (mAEm0LoadCurrent < 10)
+    if (em0LoadCurrent_mA < 10)
     {
       sliceCount = 4;
     }
-    else if ((mAEm0LoadCurrent >= 10) && (mAEm0LoadCurrent < 20))
+    else if ((em0LoadCurrent_mA >= 10) && (em0LoadCurrent_mA < 20))
     {
       sliceCount = 8;
     }
@@ -1535,7 +1625,7 @@ void EMU_DCDCOptimizeSlice(uint32_t mAEm0LoadCurrent)
   }
   else if ((EMU->DCDCMISCCTRL & _EMU_DCDCMISCCTRL_LNFORCECCM_MASK) && (rcoBand <= EMU_DcdcLnRcoBand_4MHz))
   {
-    if (mAEm0LoadCurrent < 40)
+    if (em0LoadCurrent_mA < 40)
     {
       sliceCount = 8;
     }
@@ -1551,7 +1641,7 @@ void EMU_DCDCOptimizeSlice(uint32_t mAEm0LoadCurrent)
     EFM_ASSERT(false);
   }
 
-  /* The selected silices are PSLICESEL + 1 */
+  /* The selected slices are PSLICESEL + 1 */
   sliceCount--;
 
   /* Apply slice count to both N and P slice */
@@ -1561,8 +1651,8 @@ void EMU_DCDCOptimizeSlice(uint32_t mAEm0LoadCurrent)
                                              | _EMU_DCDCMISCCTRL_NFETCNT_MASK))
                       | sliceCount;
 
-  /* Update current limit configuration as it depends on the slice configuration. */
-  maxCurrentUpdate();
+  /* Update current limiters */
+  currentLimitersUpdate();
 }
 
 /***************************************************************************//**
@@ -1574,6 +1664,12 @@ void EMU_DCDCOptimizeSlice(uint32_t mAEm0LoadCurrent)
  ******************************************************************************/
 void EMU_DCDCLnRcoBandSet(EMU_DcdcLnRcoBand_TypeDef band)
 {
+  uint32_t forcedCcm;
+  forcedCcm = BUS_RegBitRead(&EMU->DCDCMISCCTRL, _EMU_DCDCMISCCTRL_LNFORCECCM_SHIFT);
+
+  /* DCM mode supports up to 4MHz LN RCO. */
+  EFM_ASSERT((!forcedCcm && band <= EMU_DcdcLnRcoBand_4MHz) || forcedCcm);
+
   EMU->DCDCLNFREQCTRL = (EMU->DCDCLNFREQCTRL & ~_EMU_DCDCLNFREQCTRL_RCOBAND_MASK)
                          | (band << _EMU_DCDCLNFREQCTRL_RCOBAND_SHIFT);
 }
@@ -1593,18 +1689,20 @@ void EMU_DCDCLnRcoBandSet(EMU_DcdcLnRcoBand_TypeDef band)
  ******************************************************************************/
 bool EMU_DCDCPowerOff(void)
 {
+  bool dcdcModeSet;
+
   /* Set power configuration to hard bypass */
   EMU->PWRCFG = 0xF;
-  if ((EMU->PWRCFG & _EMU_PWRCFG_PWRCFG_MASK) != 0xF)
-  {
-    EFM_ASSERT(false);
-    /* Return when assertions are disabled */
-    return false;
-  }
 
-  /* Set DCDC to OFF and disable LP in EM2/3/4 */
+  /* Set DCDC to OFF and disable LP in EM2/3/4. Verify that the required
+     mode could be set. */
+  while(EMU->DCDCSYNC & EMU_DCDCSYNC_DCDCCTRLBUSY);
   EMU->DCDCCTRL = EMU_DCDCCTRL_DCDCMODE_OFF;
-  return true;
+
+  dcdcModeSet = (EMU->PWRCFG == 0xF) && (EMU->DCDCCTRL == EMU_DCDCCTRL_DCDCMODE_OFF);
+  EFM_ASSERT(dcdcModeSet);
+
+  return dcdcModeSet;
 }
 #endif
 
@@ -1801,5 +1899,5 @@ bool EMU_VmonChannelStatusGet(EMU_VmonChannel_TypeDef channel)
 #endif /* EMU_STATUS_VMONRDY */
 
 /** @} (end addtogroup EMU) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* __EM_EMU_H */

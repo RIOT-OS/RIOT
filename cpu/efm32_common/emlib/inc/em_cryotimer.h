@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_cryotimer.h
  * @brief Ultra Low Energy Timer/Counter (CRYOTIMER) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef EM_CRYOTIMER_H__
-#define EM_CRYOTIMER_H__
+#ifndef EM_CRYOTIMER_H
+#define EM_CRYOTIMER_H
 
 #include <stdbool.h>
 #include "em_device.h"
@@ -44,7 +44,7 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -94,7 +94,7 @@ typedef enum
 } CRYOTIMER_Presc_TypeDef;
 
 /** Low frequency oscillator selection. */
-typedef enum 
+typedef enum
 {
   cryotimerOscLFRCO   = _CRYOTIMER_CTRL_OSCSEL_LFRCO,  /**< Select Low Frequency RC Oscillator. */
   cryotimerOscLFXO    = _CRYOTIMER_CTRL_OSCSEL_LFXO,   /**< Select Low Frequency Crystal Oscillator. */
@@ -199,7 +199,7 @@ __STATIC_INLINE void CRYOTIMER_IntClear(uint32_t flags)
 /***************************************************************************//**
  * @brief
  *   Get the CRYOTIMER interrupt flag.
- * 
+ *
  * @note
  *   The event bits are not cleared by the use of this function.
  *
@@ -277,12 +277,12 @@ __STATIC_INLINE void CRYOTIMER_IntSet(uint32_t flags)
  *   Set the CRYOTIMER period select
  *
  * @note
- *   Sets the duration between the Interrupts/Wakeup events based on 
+ *   Sets the duration between the Interrupts/Wakeup events based on
  *   the pre-scaled clock.
  *
  * @param[in] period
- *   2^period is the number of clock cycles before a wakeup event or 
- *   interrupt is triggered. The CRYOTIMER_Periodsel_TypeDef enum can 
+ *   2^period is the number of clock cycles before a wakeup event or
+ *   interrupt is triggered. The CRYOTIMER_Periodsel_TypeDef enum can
  *   be used a convenience type when calling this function.
  ******************************************************************************/
 __STATIC_INLINE void CRYOTIMER_PeriodSet(uint32_t period)
@@ -295,7 +295,7 @@ __STATIC_INLINE void CRYOTIMER_PeriodSet(uint32_t period)
  *   Get the CRYOTIMER period select value
  *
  * @note
- *   Gets the duration between the Interrupts/Wakeup events in the 
+ *   Gets the duration between the Interrupts/Wakeup events in the
  *   CRYOTIMER.
  *
  * @return
@@ -351,7 +351,7 @@ void CRYOTIMER_Init(const CRYOTIMER_Init_TypeDef *init);
 #endif
 
 /** @} (end addtogroup CRYOTIMER) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #endif /* defined(CRYOTIMER_PRESENT) && (CRYOTIMER_COUNT == 1) */
-#endif /* EM_CRYOTIMER_H__ */
+#endif /* EM_CRYOTIMER_H */

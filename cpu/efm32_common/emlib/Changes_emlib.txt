@@ -1,4 +1,51 @@
 ================ Revision history ============================================
+4.3.0:
+ - em_cmu: Removed unused fields from CMU_HFXOInit_TypeDef. The removed fields
+   are regIshStartup and timeoutWarmSteady.
+ - em_rtc.h: Added RTC_CounterSet function for modifying the RTC Counter.
+ - em_burtc.c: Fixed bug when doing low frequency domain synchronization.
+ - em_gpio.c: Deprecated GPIO_IntConfig(), use new function GPIO_ExtIntConfig()
+   instead.
+ - Removed deprecated file em_part.h.
+ - em_dma.c: Replaced infinite loop on bus errors in default irq handler with
+   an assert.
+ - em_gpio.c: Use direct register write instead of BUS API in GPIO_PinModeSet
+   to prevent glitches.
+ - Fixed incorrect handling of CMU_CTRL_WSHFLE and CMU_HFPRESC_HFCLKLEPRESC in
+   em_cmu.c for EFM32 Pearl and Jade Gecko.
+ - Type enumerations cmuClock_HFLE and cmuSelect_HFCLKLE can now be used for
+   all families to select or reference the divided down HF clock for LE peripherals.
+ - Code size optimization in em_cmu.c.
+ - Added GPCRC support.
+ - Added support for WARNSEL, WINSEL and WDOGRSTDIS to em_wdog. Added interrupt
+   functions. Added support for multiple WDOG instances. Deprecated functions
+   WDOG_Enable(), WDOG_Feed(), WDOG_Init() and WDOG_Lock().
+ - GPIO_EM4GetPinWakeupCause() now returns the content of the EM4WU field from
+   the GPIO_IF register for platform 2 devices.
+ - Added function GPIO_SlewrateSet() to set slewrate for GPIO ports.
+ - Added fix for GPIO_E201 in CHIP_Init().
+ - Added function CMU_HFRCOBandGet() and CMU_HFRCOBandSet() for platform 2.
+   Functions with the same names are present for platform 1, but the parameter
+   and return types are different. Platform 1 and 2 also do not support the same
+   HFRCO/AUXHFRCO frequencies.
+ - Added HFLE wait-state control to CMU_HFRCOBandSet(). This is a bug on
+   EFM32 Wonder Gecko only as HFLE DIV4 is required at 24MHz, in between the 28HMz
+   and 21MHz HFRCO bands.
+ - Fixed reset-cause XMASKs for platform 2, gen 1 parts. Improved
+   documentation in em_rmu.c.
+ - Added support for configuring IrDA on USART1 for EFM32 Happy Gecko. The
+   function USART_InitIrDA() is deprecated, and replaced by USARTn_InitIrDA().
+ - Added module em_ramfunc. Fixed issue with calls from em_msc RAM code to Flash.
+ - Updated current limiter threshold equations for LNCLIMILIMSEL, LPCLIMILIMSEL
+   and DCDCZDETCTRL.
+ - Member type EMU_DcdcLnTransientMode_TypeDef in EMU_DCDCInit_TypeDef changed to
+   EMU_DcdcLnReverseCurrentControl_TypeDef to enable support for reverse current
+   limiter.
+ - EM2/3 current consumption optimization: Default value
+   emuDcdcAnaPeripheralPower_AVDD in EMU_DCDCINIT_DEFAULT for EFR32
+   changed to emuDcdcAnaPeripheralPower_DCDC.
+ - EM2/3 current consumption optimization: DCDC_LP_NFET_CNT updated to 7.
+
 4.2.1:
  - Added errata fix for an issue that may cause BOD resets in EM2 when using
    DCDC-to-DVDD mode. The fix is implemented in EMU_DCDCInit().
@@ -18,11 +65,11 @@
    retention in EM4H/S.
  - Fixed bug in ADC_InitScan() which caused a overwrite of single conversion
    mode calibration values.
- - Added support for CRYPTO module on Pearl and Jade Geckos (em_crypto.c/h)
+ - Added support for CRYPTO module on EFM32 Pearl and Jade Gecko (em_crypto.c/h).
 
 4.1.1:
  - EMU_DCDCInit() updated with new parameters for EM2 and 3. Current consumption
-   with DCDC at expected levels for EFR32 and EFM32PG revA1, A2 and B0.
+   with DCDC at expected levels for EFR32 and EFM32 Pearl and Jade Gecko.
  - EMU_DCDCInit_TypeDef updated with more parameters. EMU_DcdcLpcmpBiasMode_TypeDef
    is removed.
  - More assertions added to EMU_DCDCInit().
@@ -34,9 +81,10 @@
  - Added support for VMON.
 
 4.1.0:
+ - New signature for RMU_ResetControl() function.
  - The typedef EMU_EM23Init_TypeDef which is a parameter to EMU_EM23Init()
    has got a new definition.
- - Initial support _SILICON_LABS_32B_PLATFORM_2 devices added
+ - Initial support _SILICON_LABS_32B_PLATFORM_2 devices added.
 
 4.0.0:
  - Use ARM CMSIS version 4.2.0.
@@ -50,7 +98,7 @@
  - Fixed I2C_FREQ_STANDARD_MAX macros.
  - Fixed bug in MSC_WriteWord which called internal functions that were linked
    to flash for armgcc. All subsequent calls of MSC_WriteWord should now be
-   linked to RAM for all supported compilers. The internals of MSC_WriteWord
+   linked to RAM for all supported compilers. The internals of MSC_WriteWord()
    will check the global variable SystemCoreClock in order to make sure the
    frequency is high enough for flash operations. If the core clock frequency
    is changed, software is responsible for calling MSC_Init or

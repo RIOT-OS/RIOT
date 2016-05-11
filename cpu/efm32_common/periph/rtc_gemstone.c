@@ -30,6 +30,7 @@
 #include "em_cmu.h"
 #include "em_rtcc.h"
 #include "em_rtcc_utils.h"
+#include "em_common_utils.h"
 
 /* guard file in case no RTC device is defined */
 #if RTC_NUMOF
@@ -52,19 +53,19 @@ void rtc_init(void)
     CMU_ClockEnable(cmuClock_RTCC, true);
 
     /* reset and initialize peripheral */
-    RTCC_Init_TypeDef init = RTCC_INIT_DEFAULT;
-
-    init.enable = false;
-    init.presc = rtccCntPresc_32768;
-    init.cntMode = rtccCntModeCalendar;
+    EFM32_CREATE_INIT(init, RTCC_Init_TypeDef, RTCC_INIT_DEFAULT,
+        .conf.enable = false,
+        .conf.presc = rtccCntPresc_32768,
+        .conf.cntMode = rtccCntModeCalendar
+    );
 
     RTCC_Reset();
-    RTCC_Init(&init);
+    RTCC_Init(&init.conf);
 
     /* initialize alarm channel */
-    RTCC_CCChConf_TypeDef channelInit = RTCC_CH_INIT_COMPARE_DEFAULT;
+    RTCC_CCChConf_TypeDef init_channel = RTCC_CH_INIT_COMPARE_DEFAULT;
 
-    RTCC_ChannelInit(0, &channelInit);
+    RTCC_ChannelInit(0, &init_channel);
 
     /* enable interrupt */
     NVIC_ClearPendingIRQ(RTCC_IRQn);

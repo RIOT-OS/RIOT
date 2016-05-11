@@ -24,36 +24,11 @@
 
 #include "em_cmu.h"
 #include "em_timer.h"
+#include "em_timer_utils.h"
+#include "em_common_utils.h"
 
 /* guard file in case no PWM device is defined */
 #if PWM_NUMOF
-
-static const uint32_t channel_to_route[] = {
-#ifdef _SILICON_LABS_32B_PLATFORM_1
-    TIMER_ROUTE_CC0PEN,
-    TIMER_ROUTE_CC1PEN,
-    TIMER_ROUTE_CC2PEN
-#else
-    TIMER_ROUTEPEN_CC0PEN,
-    TIMER_ROUTEPEN_CC1PEN,
-    TIMER_ROUTEPEN_CC2PEN,
-    TIMER_ROUTEPEN_CC3PEN
-#endif
-};
-
-static const TIMER_Prescale_TypeDef prescalers[] = {
-    timerPrescale1,
-    timerPrescale2,
-    timerPrescale4,
-    timerPrescale8,
-    timerPrescale16,
-    timerPrescale32,
-    timerPrescale64,
-    timerPrescale128,
-    timerPrescale256,
-    timerPrescale512,
-    timerPrescale1024,
-};
 
 uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
@@ -67,65 +42,52 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     CMU_ClockEnable(pwm_config[dev].cmu, true);
 
     /* calculate the prescaler by determining the best prescaler */
-    uint32_t actual_freq = CMU_ClockFreqGet(pwm_config[dev].cmu);
-    TIMER_Prescale_TypeDef prescaler = timerPrescale1;
+    uint32_t freq_timer = CMU_ClockFreqGet(pwm_config[dev].cmu);
+    TIMER_Prescale_TypeDef prescaler = TIMER_PrescalerCalc(freq * res,
+                                                           freq_timer);
 
-    for (int i = 0; i < 11; i++) {
-        if ((actual_freq / (1 << i)) < (freq * res)) {
-            /* if first prescaler doesn't work, then no pwm frequency works */
-            if (i == 0) {
-                return -2;
-            }
-            else {
-                prescaler = prescalers[i - 1];
-                actual_freq = actual_freq / (1 << (i - 1));
-                break;
-            }
-        }
+    if (prescaler > timerPrescale1024) {
+        return -2;
     }
 
     /* reset and initialize peripheral */
-    TIMER_Init_TypeDef init = TIMER_INIT_DEFAULT;
-
-    init.enable = false;
-    init.prescale = prescaler;
+    EFM32_CREATE_INIT(init, TIMER_Init_TypeDef, TIMER_INIT_DEFAULT,
+        .conf.enable = false,
+        .conf.prescale = prescaler
+    );
 
     TIMER_Reset(pwm_config[dev].dev);
-    TIMER_Init(pwm_config[dev].dev, &init);
-
-    /* configure the period */
+    TIMER_Init(pwm_config[dev].dev, &init.conf);
     TIMER_TopSet(pwm_config[dev].dev, res);
 
-    /* initialize all channels */
-    TIMER_InitCC_TypeDef init_cc = TIMER_INITCC_DEFAULT;
-
-    init_cc.mode = timerCCModePWM;
+    /* initialize channels */
+    EFM32_CREATE_INIT(init_channel, TIMER_InitCC_TypeDef, TIMER_INITCC_DEFAULT,
+        .conf.mode = timerCCModePWM
+    );
 
     for (int i = 0; i < pwm_config[dev].channels; i++) {
-        uint8_t index = pwm_config[dev].channel_offset + i;
+        pwm_chan_conf_t channel = pwm_config[dev].channel[i];
 
         /* configure the pin */
-        gpio_init(pwm_channel_config[index].pin, GPIO_DIR_OUT, GPIO_NOPULL);
+        gpio_init(channel.pin, GPIO_OUT);
 
         /* configure pin function */
 #ifdef _SILICON_LABS_32B_PLATFORM_1
-        pwm_config[dev].dev->ROUTE |= (channel_to_route[pwm_channel_config[index].index] | pwm_channel_config[index].loc);
+        pwm_config[dev].dev->ROUTE |= (channel.loc |
+                                       TIMER_Channel2Route(channel.index));
 #else
-        pwm_config[dev].dev->ROUTEPEN |= channel_to_route[pwm_channel_config[index].index];
-        pwm_config[dev].dev->ROUTELOC0 |= pwm_channel_config[index].loc;
+        pwm_config[dev].dev->ROUTELOC0 |= channel.loc;
+        pwm_config[dev].dev->ROUTEPEN |= TIMER_Channel2Route(channel.index);
 #endif
 
         /* setup channel */
-        TIMER_InitCC(pwm_config[dev].dev,
-                     pwm_channel_config[index].index, &init_cc);
-        TIMER_CompareBufSet(pwm_config[dev].dev,
-                            pwm_channel_config[index].index, 0);
+        TIMER_InitCC(pwm_config[dev].dev, channel.index, &init_channel.conf);
     }
 
     /* enable peripheral */
     TIMER_Enable(pwm_config[dev].dev, true);
 
-    return actual_freq / res;
+    return freq_timer / TIMER_Prescaler2Div(prescaler) / res;
 }
 
 uint8_t pwm_channels(pwm_t dev)
@@ -135,10 +97,9 @@ uint8_t pwm_channels(pwm_t dev)
 
 void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 {
-    uint8_t index = pwm_config[dev].channel_offset + channel;
-
-    TIMER_CompareBufSet(
-        pwm_config[dev].dev, pwm_channel_config[index].index, value);
+    TIMER_CompareBufSet(pwm_config[dev].dev,
+                        pwm_config[dev].channel[channel].index,
+                        value);
 }
 
 void pwm_start(pwm_t dev)

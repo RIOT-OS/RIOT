@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_system.h
  * @brief System API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_SYSTEM_H__
-#define __SILICON_LABS_EM_SYSTEM_H__
+#ifndef EM_SYSTEM_H
+#define EM_SYSTEM_H
 
 #include <stdbool.h>
 #include "em_device.h"
@@ -41,7 +41,7 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -112,14 +112,14 @@ typedef enum
 #if defined(_DEVINFO_PART_DEVICE_FAMILY_EFR32BG1V)
   systemPartFamilyBlue1V   = _DEVINFO_PART_DEVICE_FAMILY_EFR32BG1V,       /**< EFR32 Blue Gecko Gen1 Value Device Family */
 #endif
-#if defined(_DEVINFO_PART_DEVICE_FAMILY_EFR32SG1P)
-  systemPartFamilySnappy1P = _DEVINFO_PART_DEVICE_FAMILY_EFR32SG1P,       /**< EFR32 Snappy Gecko Gen1 Premium Device Family */
+#if defined(_DEVINFO_PART_DEVICE_FAMILY_EFR32ZG1P)
+  systemPartFamilyZappy1P = _DEVINFO_PART_DEVICE_FAMILY_EFR32ZG1P,        /**< EFR32 Zappy Gecko Gen1 Premium Device Family */
 #endif
-#if defined(_DEVINFO_PART_DEVICE_FAMILY_EFR32SG1B)
-  systemPartFamilySnappy1B = _DEVINFO_PART_DEVICE_FAMILY_EFR32SG1B,       /**< EFR32 Snappy Gecko Gen1 Basic Device Family */
+#if defined(_DEVINFO_PART_DEVICE_FAMILY_EFR32ZG1B)
+  systemPartFamilyZappy1B = _DEVINFO_PART_DEVICE_FAMILY_EFR32ZG1B,        /**< EFR32 Zappy Gecko Gen1 Basic Device Family */
 #endif
-#if defined(_DEVINFO_PART_DEVICE_FAMILY_EFR32SG1V)
-  systemPartFamilySnappy1V = _DEVINFO_PART_DEVICE_FAMILY_EFR32SG1V,       /**< EFR32 Snappy Gecko Gen1 Value Device Family */
+#if defined(_DEVINFO_PART_DEVICE_FAMILY_EFR32ZG1V)
+  systemPartFamilyZappy1V = _DEVINFO_PART_DEVICE_FAMILY_EFR32ZG1V,        /**< EFR32 Zappy Gecko Gen1 Value Device Family */
 #endif
 #if defined(_DEVINFO_PART_DEVICE_FAMILY_EFR32FG1P)
   systemPartFamilyFlex1P   = _DEVINFO_PART_DEVICE_FAMILY_EFR32FG1P,       /**< EFR32 Flex Gecko Gen1 Premium Device Family */
@@ -130,7 +130,7 @@ typedef enum
 #if defined(_DEVINFO_PART_DEVICE_FAMILY_EFR32FG1V)
   systemPartFamilyFlex1V   = _DEVINFO_PART_DEVICE_FAMILY_EFR32FG1V,       /**< EFR32 Flex Gecko Gen1 Value Device Family */
 #endif
-/* Legacy family #defines */
+/* Deprecated family #defines */
 #if defined(_DEVINFO_PART_DEVICE_FAMILY_G)
   systemPartFamilyGecko   = _DEVINFO_PART_DEVICE_FAMILY_G,   /**< Gecko Device Family */
 #endif
@@ -205,14 +205,15 @@ __STATIC_INLINE void SYSTEM_FpuAccessModeSet(SYSTEM_FpuAccess_TypeDef accessMode
 
 /***************************************************************************//**
  * @brief
- *   Get the unique number for this part.
+ *   Get the unique number for this device.
  *
  * @return
- *   Unique number for this part.
+ *   Unique number for this device.
  ******************************************************************************/
 __STATIC_INLINE uint64_t SYSTEM_GetUnique(void)
 {
-  return (uint64_t)((uint64_t)DEVINFO->UNIQUEH << 32) | (uint64_t)DEVINFO->UNIQUEL;
+  uint32_t tmp = DEVINFO->UNIQUEL;
+  return (uint64_t)((uint64_t)DEVINFO->UNIQUEH << 32) | tmp;
 }
 
 /***************************************************************************//**
@@ -383,10 +384,10 @@ __STATIC_INLINE uint8_t SYSTEM_GetCalibrationTemperature(void)
 }
 
 /** @} (end addtogroup SYSTEM) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __SILICON_LABS_EM_SYSTEM_H__ */
+#endif /* EM_SYSTEM_H */

@@ -32,11 +32,12 @@
 #include "em_device.h"
 #include "em_cmu.h"
 #include "em_usart.h"
+#include "em_common_utils.h"
 
 /* guard file in case no SPI device is defined */
 #if SPI_NUMOF
 
-static mutex_t spi_lock[I2C_NUMOF] = {
+static mutex_t spi_lock[SPI_NUMOF] = {
 #if SPI_0_EN
     [SPI_0] = MUTEX_INIT,
 #endif
@@ -44,59 +45,6 @@ static mutex_t spi_lock[I2C_NUMOF] = {
     [SPI_1] = MUTEX_INIT,
 #endif
 };
-
-/**
- * @brief Convert speeds to integers
- */
-static uint32_t speed_to_baud(spi_speed_t speed)
-{
-    uint32_t baud = 1000000;
-
-    switch (speed) {
-        case SPI_SPEED_100KHZ:
-            baud = 100000;
-            break;
-        case SPI_SPEED_400KHZ:
-            baud = 400000;
-            break;
-        case SPI_SPEED_1MHZ:
-            baud = 1000000;
-            break;
-        case SPI_SPEED_5MHZ:
-            baud = 5000000;
-            break;
-        case SPI_SPEED_10MHZ:
-            baud = 10000000;
-            break;
-    }
-
-    return baud;
-}
-
-/**
- * @brief Convert to normal modes
- */
-static uint32_t conf_to_cpol(spi_conf_t conf)
-{
-    uint32_t cpol = usartClockMode0;
-
-    switch (conf) {
-        case SPI_CONF_FIRST_RISING:
-            cpol = usartClockMode0;
-            break;
-        case SPI_CONF_SECOND_RISING:
-            cpol = usartClockMode1;
-            break;
-        case SPI_CONF_FIRST_FALLING:
-            cpol = usartClockMode2;
-            break;
-        case SPI_CONF_SECOND_FALLING:
-            cpol = usartClockMode3;
-            break;
-    }
-
-    return cpol;
-}
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
@@ -109,42 +57,48 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     CMU_ClockEnable(cmuClock_HFPER, true);
     CMU_ClockEnable(spi_config[dev].cmu, true);
 
+    /* initialize and enable peripheral */
+    EFM32_CREATE_INIT(init, USART_InitSync_TypeDef, USART_INITSYNC_DEFAULT,
+        .conf.baudrate = (uint32_t) speed,
+        .conf.clockMode = (USART_ClockMode_TypeDef) conf,
+        .conf.msbf = true
+    );
+
+    USART_InitSync(spi_config[dev].dev, &init.conf);
+
     /* configure the pins */
     spi_conf_pins(dev);
-
-    /* initialize and enable peripheral */
-    USART_InitSync_TypeDef init = USART_INITSYNC_DEFAULT;
-
-    init.baudrate = speed_to_baud(speed);
-    init.clockMode = conf_to_cpol(conf);
-    init.msbf = true;
-
-    USART_InitSync(spi_config[dev].dev, &init);
 
     return 0;
 }
 
 int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
 {
+    /* not (yet) supported */
     return -1;
 }
 
 int spi_conf_pins(spi_t dev)
 {
     /* configure the pins */
-    gpio_init(spi_config[dev].clk_pin, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(spi_config[dev].mosi_pin, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(spi_config[dev].miso_pin, GPIO_DIR_IN, GPIO_PULLDOWN);
+    gpio_init(spi_config[dev].clk_pin, GPIO_OUT);
+    gpio_init(spi_config[dev].mosi_pin, GPIO_OUT);
+    gpio_init(spi_config[dev].miso_pin, GPIO_IN_PD);
+
+    gpio_set(spi_config[dev].clk_pin);
+    gpio_set(spi_config[dev].mosi_pin);
 
     /* configure pin functions */
 #ifdef _SILICON_LABS_32B_PLATFORM_1
     spi_config[dev].dev->ROUTE = (spi_config[dev].loc |
-                                  USART_ROUTE_RXPEN | USART_ROUTE_TXPEN |
+                                  USART_ROUTE_RXPEN |
+                                  USART_ROUTE_TXPEN |
                                   USART_ROUTE_CLKPEN);
 #else
-    spi_config[dev].dev->ROUTEPEN =
-        USART_ROUTEPEN_RXPEN | USART_ROUTEPEN_TXPEN | USART_ROUTEPEN_CLKPEN;
     spi_config[dev].dev->ROUTELOC0 = spi_config[dev].loc;
+    spi_config[dev].dev->ROUTEPEN = (USART_ROUTEPEN_RXPEN |
+                                     USART_ROUTEPEN_TXPEN |
+                                     USART_ROUTEPEN_CLKPEN);
 #endif
 
     return 0;

@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_burtc.h
  * @brief Backup Real Time Counter (BURTC) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_BURTC_H__
-#define __SILICON_LABS_EM_BURTC_H__
+#ifndef EM_BURTC_H
+#define EM_BURTC_H
 
 #include "em_device.h"
 #if defined(BURTC_PRESENT)
@@ -45,7 +45,7 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -409,11 +409,11 @@ uint32_t BURTC_ClockFreqGet(void);
 
 
 /** @} (end addtogroup BURTC) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* BURTC_PRESENT */
-#endif /* __SILICON_LABS_EM_BURTC_H__ */
+#endif /* EM_BURTC_H */

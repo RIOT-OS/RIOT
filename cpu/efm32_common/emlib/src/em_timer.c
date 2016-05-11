@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_timer.c
  * @brief Timer/counter (TIMER) Peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -36,7 +36,7 @@
 #include "em_assert.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -227,8 +227,9 @@ void TIMER_Reset(TIMER_TypeDef *timer)
   timer->CTRL = _TIMER_CTRL_RESETVALUE;
   timer->IEN  = _TIMER_IEN_RESETVALUE;
   timer->IFC  = _TIMER_IFC_MASK;
-  timer->TOP  = _TIMER_TOP_RESETVALUE;
   timer->TOPB = _TIMER_TOPB_RESETVALUE;
+  /* Write TOP after TOPB to invalidate TOPB (clear TIMER_STATUS_TOPBV) */
+  timer->TOP  = _TIMER_TOP_RESETVALUE;
   timer->CNT  = _TIMER_CNT_RESETVALUE;
   /* Do not reset route register, setting should be done independently */
   /* (Note: ROUTE register may be locked by DTLOCK register.) */
@@ -256,5 +257,5 @@ void TIMER_Reset(TIMER_TypeDef *timer)
 
 
 /** @} (end addtogroup TIMER) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* defined(TIMER_COUNT) && (TIMER_COUNT > 0) */

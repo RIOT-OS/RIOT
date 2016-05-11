@@ -53,7 +53,7 @@ static inline uint32_t _pin_mask(gpio_t pin)
     return (1 << _pin_num(pin));
 }
 
-int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pushpull)
+int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     /* check for valid pin */
     if (pin == GPIO_UNDEF) {
@@ -65,48 +65,18 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pushpull)
     CMU_ClockEnable(cmuClock_GPIO, true);
 
     /* configure pin */
-    if (dir == GPIO_DIR_OUT && pushpull == GPIO_NOPULL) {
+    GPIO_PinModeSet(_port_num(pin), _pin_num(pin), mode >> 1, mode & 0x1);
 #ifdef _SILICON_LABS_32B_PLATFORM_1
-        GPIO_DriveModeSet(_port_num(pin), gpioDriveModeStandard);
+    GPIO_DriveModeSet(_port_num(pin), gpioDriveModeStandard);
 #endif
-        GPIO_PinModeSet(_port_num(pin), _pin_num(pin), gpioModePushPull, 0);
-    }
-    else if (dir == GPIO_DIR_IN) {
-        if (pushpull == GPIO_NOPULL) {
-            GPIO_PinModeSet(_port_num(pin), _pin_num(pin), gpioModeInput, 0);
-        }
-        else if (pushpull == GPIO_PULLUP) {
-            GPIO_PinModeSet(_port_num(pin), _pin_num(pin), gpioModeInputPull, 1);
-        }
-        else if (pushpull == GPIO_PULLDOWN) {
-            GPIO_PinModeSet(_port_num(pin), _pin_num(pin), gpioModeInputPull, 0);
-        }
-        else {
-            return -1;
-        }
-    }
-    else if (dir == GPIO_DIR_BI) {
-        if (pushpull == GPIO_NOPULL) {
-            GPIO_PinModeSet(_port_num(pin), _pin_num(pin), gpioModeWiredAnd, 1);
-        }
-        else if (pushpull == GPIO_PULLUP) {
-            GPIO_PinModeSet(_port_num(pin), _pin_num(pin), gpioModeWiredAndPullUp, 1);
-        }
-        else {
-            return -1;
-        }
-    }
-    else {
-        return -1;
-    }
 
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
-    int result = gpio_init(pin, GPIO_DIR_IN, GPIO_NOPULL);
+    int result = gpio_init(pin, mode);
 
     if (result != 0) {
         return result;
@@ -119,11 +89,9 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
     isr_ctx[_pin_num(pin)].cb = cb;
     isr_ctx[_pin_num(pin)].arg = arg;
 
-    /* configure interrupt */
-    GPIO_IntConfig(_port_num(pin), _pin_num(pin), flank & GPIO_RISING, flank & GPIO_FALLING, true);
-
     /* enable interrupts */
-    GPIO_IntEnable(_pin_num(pin));
+    GPIO_IntConfig(_port_num(pin), _pin_num(pin),
+                   flank & GPIO_RISING, flank & GPIO_FALLING, true);
 
     NVIC_ClearPendingIRQ(GPIO_EVEN_IRQn);
     NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);

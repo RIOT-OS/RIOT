@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file em_opamp.c
  * @brief Operational Amplifier (OPAMP) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  ******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -37,7 +37,7 @@
 #include "em_assert.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -424,6 +424,6 @@ void OPAMP_Enable(DAC_TypeDef *dac, OPAMP_TypeDef opa, const OPAMP_Init_TypeDef 
 }
 
 /** @} (end addtogroup OPAMP) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #endif /* defined( OPAMP_PRESENT ) && ( OPAMP_COUNT == 1 ) */

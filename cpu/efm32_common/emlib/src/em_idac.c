@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_idac.c
  * @brief Current Digital to Analog Converter (IDAC) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -37,13 +37,18 @@
 #include "em_bus.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup IDAC
  * @brief Current Digital to Analog Conversion (IDAC) Peripheral API
+ * @details
+ *  This module contains functions to control the IDAC peripheral of Silicon
+ *  Labs 32-bit MCUs and SoCs. The IDAC can sink or source a configurable
+ *  constant current, to bias internal circuits, or together with the @ref ADC
+ *  measure capacitance by injecting a controlled current into a component.
  * @{
  ******************************************************************************/
 
@@ -62,11 +67,7 @@
  *   Initialize IDAC.
  *
  * @details
- *   Initializes IDAC according to the initialization structure parameter, and
- *   sets the default calibration value stored in the DEVINFO structure.
- *
- * @note
- *   This function will disable the IDAC prior to configuration.
+ *   Configure the IDAC according to initialization structure parameters.
  *
  * @param[in] idac
  *   Pointer to IDAC peripheral register block.
@@ -90,7 +91,11 @@ void IDAC_Init(IDAC_TypeDef *idac, const IDAC_Init_TypeDef *init)
   }
   if (init->prsEnable)
   {
+#if defined(_IDAC_CTRL_OUTENPRS_MASK)
     tmp |= IDAC_CTRL_OUTENPRS;
+#else
+    tmp |= IDAC_CTRL_APORTOUTENPRS;
+#endif
   }
   if (init->sinkEnable)
   {
@@ -113,13 +118,8 @@ void IDAC_Init(IDAC_TypeDef *idac, const IDAC_Init_TypeDef *init)
  ******************************************************************************/
 void IDAC_Enable(IDAC_TypeDef *idac, bool enable)
 {
-  volatile uint32_t *reg;
-
   EFM_ASSERT(IDAC_REF_VALID(idac));
-
-  reg = &(idac->CTRL);
-
-  BUS_RegBitWrite(reg, _IDAC_CTRL_EN_SHIFT, enable);
+  BUS_RegBitWrite(&idac->CTRL, _IDAC_CTRL_EN_SHIFT, enable);
 }
 
 
@@ -171,13 +171,8 @@ void IDAC_Reset(IDAC_TypeDef *idac)
  ******************************************************************************/
 void IDAC_MinimalOutputTransitionMode(IDAC_TypeDef *idac, bool enable)
 {
-  volatile uint32_t *reg;
-
   EFM_ASSERT(IDAC_REF_VALID(idac));
-
-  reg = &(idac->CTRL);
-
-  BUS_RegBitWrite(reg, _IDAC_CTRL_MINOUTTRANS_SHIFT, enable);
+  BUS_RegBitWrite(&idac->CTRL, _IDAC_CTRL_MINOUTTRANS_SHIFT, enable);
 }
 
 
@@ -188,7 +183,7 @@ void IDAC_MinimalOutputTransitionMode(IDAC_TypeDef *idac, bool enable)
  * @details
  *   This function sets the current range of the IDAC output. The function
  *   also updates the IDAC calibration register (IDAC_CAL) with the default
- *   calibration value (from DEVINFO, factory setting) corresponding to the
+ *   calibration value from DEVINFO (factory calibration) corresponding to the
  *   specified range.
  *
  * @param[in] idac
@@ -239,15 +234,9 @@ void IDAC_RangeSet(IDAC_TypeDef *idac, const IDAC_Range_TypeDef range)
 
   /* Load calibration data depending on selected range and sink/source mode */
   /* TUNING (calibration) field in CURPROG register. */
-  if (idac == IDAC0)
-  {
-    diCal0 = DEVINFO->IDAC0CAL0;
-    diCal1 = DEVINFO->IDAC0CAL1;
-  }
-  else
-  {
-    EFM_ASSERT(false);
-  }
+  EFM_ASSERT(idac == IDAC0);
+  diCal0 = DEVINFO->IDAC0CAL0;
+  diCal1 = DEVINFO->IDAC0CAL1;
 
   tmp = idac->CURPROG & ~(_IDAC_CURPROG_TUNING_MASK
                           | _IDAC_CURPROG_RANGESEL_MASK);
@@ -356,17 +345,16 @@ void IDAC_StepSet(IDAC_TypeDef *idac, const uint32_t step)
  ******************************************************************************/
 void IDAC_OutEnable(IDAC_TypeDef *idac, bool enable)
 {
-  volatile uint32_t *reg;
-
   EFM_ASSERT(IDAC_REF_VALID(idac));
-
-  reg = &(idac->CTRL);
-
-  BUS_RegBitWrite(reg, _IDAC_CTRL_OUTEN_SHIFT, enable);
+#if defined(_IDAC_CTRL_OUTEN_MASK)
+  BUS_RegBitWrite(&idac->CTRL, _IDAC_CTRL_OUTEN_SHIFT, enable);
+#else
+  BUS_RegBitWrite(&idac->CTRL, _IDAC_CTRL_APORTOUTEN_SHIFT, enable);
+#endif
 }
 
 
 /** @} (end addtogroup IDAC) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #endif /* defined(IDAC_COUNT) && (IDAC_COUNT > 0) */

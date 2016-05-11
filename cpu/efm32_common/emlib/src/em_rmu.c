@@ -2,10 +2,10 @@
  * @file em_rmu.c
  * @brief Reset Management Unit (RMU) peripheral module peripheral API
  *
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -39,13 +39,18 @@
 #include "em_bus.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup RMU
  * @brief Reset Management Unit (RMU) Peripheral API
+ * @details
+ *  This module contains functions to control the RMU peripheral of Silicon
+ *  Labs 32-bit MCUs and SoCs. The RMU ensures correct reset operation. It is
+ *  responsible for connecting the different reset sources to the reset lines of
+ *  the MCU or SoC.
  * @{
  ******************************************************************************/
 
@@ -55,65 +60,72 @@
 
 /** @cond DO_NOT_INCLUDE_WITH_DOXYGEN */
 
-/* Reset cause "don't care" definitions.
-   1's mark the bits that must be zero, zeros are "don't cares". */
+/* Reset cause zero and "don't care" bit definitions (XMASKs).
+   A XMASK 1 bit marks a bit that must be zero in RMU_RSTCAUSE. A 0 in XMASK
+   is a "don't care" bit in RMU_RSTCAUSE if also 0 in resetCauseMask
+   in @ref RMU_ResetCauseMasks_Typedef. */
+
+/* EFM32G */
 #if (_RMU_RSTCAUSE_MASK == 0x0000007FUL)
-#define RMU_RSTCAUSE_PORST_XMASK         (0x00000000) /**0b0000000000000000  < Power On Reset */
-#define RMU_RSTCAUSE_BODUNREGRST_XMASK   (0x00000081) /**0b0000000010000001  < Brown Out Detector Unregulated Domain Reset */
-#define RMU_RSTCAUSE_BODREGRST_XMASK     (0x00000091) /**0b0000000010010001  < Brown Out Detector Regulated Domain Reset */
-#define RMU_RSTCAUSE_EXTRST_XMASK        (0x00000001) /**0b0000000000000001  < External Pin Reset */
-#define RMU_RSTCAUSE_WDOGRST_XMASK       (0x00000003) /**0b0000000000000011  < Watchdog Reset */
-#define RMU_RSTCAUSE_LOCKUPRST_XMASK     (0x0000EFDF) /**0b1110111111011111  < LOCKUP Reset */
-#define RMU_RSTCAUSE_SYSREQRST_XMASK     (0x0000EF9F) /**0b1110111110011111  < System Request Reset */
-#define NUM_RSTCAUSES                             (7)
+#define RMU_RSTCAUSE_PORST_XMASK         0x00000000UL /** 0000000000000000  < Power On Reset */
+#define RMU_RSTCAUSE_BODUNREGRST_XMASK   0x00000081UL /** 0000000010000001  < Brown Out Detector Unregulated Domain Reset */
+#define RMU_RSTCAUSE_BODREGRST_XMASK     0x00000091UL /** 0000000010010001  < Brown Out Detector Regulated Domain Reset */
+#define RMU_RSTCAUSE_EXTRST_XMASK        0x00000001UL /** 0000000000000001  < External Pin Reset */
+#define RMU_RSTCAUSE_WDOGRST_XMASK       0x00000003UL /** 0000000000000011  < Watchdog Reset */
+#define RMU_RSTCAUSE_LOCKUPRST_XMASK     0x0000EFDFUL /** 1110111111011111  < LOCKUP Reset */
+#define RMU_RSTCAUSE_SYSREQRST_XMASK     0x0000EF9FUL /** 1110111110011111  < System Request Reset */
+#define NUM_RSTCAUSES                               7
 
+/* EFM32TG, EFM32HG, EZR32HG, EFM32ZG */
 #elif (_RMU_RSTCAUSE_MASK == 0x000007FFUL)
-#define RMU_RSTCAUSE_PORST_XMASK         (0x00000000) /**0b0000000000000000  < Power On Reset */
-#define RMU_RSTCAUSE_BODUNREGRST_XMASK   (0x00000081) /**0b0000000010000001  < Brown Out Detector Unregulated Domain Reset */
-#define RMU_RSTCAUSE_BODREGRST_XMASK     (0x00000091) /**0b0000000010010001  < Brown Out Detector Regulated Domain Reset */
-#define RMU_RSTCAUSE_EXTRST_XMASK        (0x00000001) /**0b0000000000000001  < External Pin Reset */
-#define RMU_RSTCAUSE_WDOGRST_XMASK       (0x00000003) /**0b0000000000000011  < Watchdog Reset */
-#define RMU_RSTCAUSE_LOCKUPRST_XMASK     (0x0000EFDF) /**0b1110111111011111  < LOCKUP Reset */
-#define RMU_RSTCAUSE_SYSREQRST_XMASK     (0x0000EF9F) /**0b1110111110011111  < System Request Reset */
-#define RMU_RSTCAUSE_EM4RST_XMASK        (0x00000719) /**0b0000011100011001  < EM4 Reset */
-#define RMU_RSTCAUSE_EM4WURST_XMASK      (0x00000619) /**0b0000011000011001  < EM4 Wake-up Reset */
-#define RMU_RSTCAUSE_BODAVDD0_XMASK      (0x0000041F) /**0b0000010000011111  < AVDD0 Bod Reset. */
-#define RMU_RSTCAUSE_BODAVDD1_XMASK      (0x0000021F) /**0b0000001000011111  < AVDD1 Bod Reset. */
-#define NUM_RSTCAUSES                            (11)
+#define RMU_RSTCAUSE_PORST_XMASK         0x00000000UL /** 0000000000000000  < Power On Reset */
+#define RMU_RSTCAUSE_BODUNREGRST_XMASK   0x00000081UL /** 0000000010000001  < Brown Out Detector Unregulated Domain Reset */
+#define RMU_RSTCAUSE_BODREGRST_XMASK     0x00000091UL /** 0000000010010001  < Brown Out Detector Regulated Domain Reset */
+#define RMU_RSTCAUSE_EXTRST_XMASK        0x00000001UL /** 0000000000000001  < External Pin Reset */
+#define RMU_RSTCAUSE_WDOGRST_XMASK       0x00000003UL /** 0000000000000011  < Watchdog Reset */
+#define RMU_RSTCAUSE_LOCKUPRST_XMASK     0x0000EFDFUL /** 1110111111011111  < LOCKUP Reset */
+#define RMU_RSTCAUSE_SYSREQRST_XMASK     0x0000EF9FUL /** 1110111110011111  < System Request Reset */
+#define RMU_RSTCAUSE_EM4RST_XMASK        0x00000719UL /** 0000011100011001  < EM4 Reset */
+#define RMU_RSTCAUSE_EM4WURST_XMASK      0x00000619UL /** 0000011000011001  < EM4 Wake-up Reset */
+#define RMU_RSTCAUSE_BODAVDD0_XMASK      0x0000041FUL /** 0000010000011111  < AVDD0 Bod Reset. */
+#define RMU_RSTCAUSE_BODAVDD1_XMASK      0x0000021FUL /** 0000001000011111  < AVDD1 Bod Reset. */
+#define NUM_RSTCAUSES                              11
 
+/* EFM32GG, EFM32LG, EZR32LG, EFM32WG, EZR32WG */
 #elif (_RMU_RSTCAUSE_MASK == 0x0000FFFFUL)
-#define RMU_RSTCAUSE_PORST_XMASK         (0x00000000) /**0b0000000000000000  < Power On Reset */
-#define RMU_RSTCAUSE_BODUNREGRST_XMASK   (0x00000081) /**0b0000000010000001  < Brown Out Detector Unregulated Domain Reset */
-#define RMU_RSTCAUSE_BODREGRST_XMASK     (0x00000091) /**0b0000000010010001  < Brown Out Detector Regulated Domain Reset */
-#define RMU_RSTCAUSE_EXTRST_XMASK        (0x00000001) /**0b0000000000000001  < External Pin Reset */
-#define RMU_RSTCAUSE_WDOGRST_XMASK       (0x00000003) /**0b0000000000000011  < Watchdog Reset */
-#define RMU_RSTCAUSE_LOCKUPRST_XMASK     (0x0000EFDF) /**0b1110111111011111  < LOCKUP Reset */
-#define RMU_RSTCAUSE_SYSREQRST_XMASK     (0x0000EF9F) /**0b1110111110011111  < System Request Reset */
-#define RMU_RSTCAUSE_EM4RST_XMASK        (0x00000719) /**0b0000011100011001  < EM4 Reset */
-#define RMU_RSTCAUSE_EM4WURST_XMASK      (0x00000619) /**0b0000011000011001  < EM4 Wake-up Reset */
-#define RMU_RSTCAUSE_BODAVDD0_XMASK      (0x0000041F) /**0b0000010000011111  < AVDD0 Bod Reset */
-#define RMU_RSTCAUSE_BODAVDD1_XMASK      (0x0000021F) /**0b0000001000011111  < AVDD1 Bod Reset */
-#define RMU_RSTCAUSE_BUBODVDDDREG_XMASK  (0x00000001) /**0b0000000000000001  < Backup Brown Out Detector, VDD_DREG */
-#define RMU_RSTCAUSE_BUBODBUVIN_XMASK    (0x00000001) /**0b0000000000000001  < Backup Brown Out Detector, BU_VIN */
-#define RMU_RSTCAUSE_BUBODUNREG_XMASK    (0x00000001) /**0b0000000000000001  < Backup Brown Out Detector Unregulated Domain */
-#define RMU_RSTCAUSE_BUBODREG_XMASK      (0x00000001) /**0b0000000000000001  < Backup Brown Out Detector Regulated Domain */
-#define RMU_RSTCAUSE_BUMODERST_XMASK     (0x00000001) /**0b0000000000000001  < Backup mode reset */
-#define NUM_RSTCAUSES                            (16)
+#define RMU_RSTCAUSE_PORST_XMASK         0x00000000UL /** 0000000000000000  < Power On Reset */
+#define RMU_RSTCAUSE_BODUNREGRST_XMASK   0x00000081UL /** 0000000010000001  < Brown Out Detector Unregulated Domain Reset */
+#define RMU_RSTCAUSE_BODREGRST_XMASK     0x00000091UL /** 0000000010010001  < Brown Out Detector Regulated Domain Reset */
+#define RMU_RSTCAUSE_EXTRST_XMASK        0x00000001UL /** 0000000000000001  < External Pin Reset */
+#define RMU_RSTCAUSE_WDOGRST_XMASK       0x00000003UL /** 0000000000000011  < Watchdog Reset */
+#define RMU_RSTCAUSE_LOCKUPRST_XMASK     0x0000EFDFUL /** 1110111111011111  < LOCKUP Reset */
+#define RMU_RSTCAUSE_SYSREQRST_XMASK     0x0000EF9FUL /** 1110111110011111  < System Request Reset */
+#define RMU_RSTCAUSE_EM4RST_XMASK        0x00000719UL /** 0000011100011001  < EM4 Reset */
+#define RMU_RSTCAUSE_EM4WURST_XMASK      0x00000619UL /** 0000011000011001  < EM4 Wake-up Reset */
+#define RMU_RSTCAUSE_BODAVDD0_XMASK      0x0000041FUL /** 0000010000011111  < AVDD0 Bod Reset */
+#define RMU_RSTCAUSE_BODAVDD1_XMASK      0x0000021FUL /** 0000001000011111  < AVDD1 Bod Reset */
+#define RMU_RSTCAUSE_BUBODVDDDREG_XMASK  0x00000001UL /** 0000000000000001  < Backup Brown Out Detector, VDD_DREG */
+#define RMU_RSTCAUSE_BUBODBUVIN_XMASK    0x00000001UL /** 0000000000000001  < Backup Brown Out Detector, BU_VIN */
+#define RMU_RSTCAUSE_BUBODUNREG_XMASK    0x00000001UL /** 0000000000000001  < Backup Brown Out Detector Unregulated Domain */
+#define RMU_RSTCAUSE_BUBODREG_XMASK      0x00000001UL /** 0000000000000001  < Backup Brown Out Detector Regulated Domain */
+#define RMU_RSTCAUSE_BUMODERST_XMASK     0x00000001UL /** 0000000000000001  < Backup mode reset */
+#define NUM_RSTCAUSES                              16
 
+/* EFM32XG1X */
 #elif ((_RMU_RSTCAUSE_MASK & 0x0FFFFFFF) == 0x00010F1DUL)
-#define RMU_RSTCAUSE_PORST_XMASK         (0x00000000) /**0b0000000000000000  < Power On Reset */
-#define RMU_RSTCAUSE_BODAVDD_XMASK       (0x00000001) /**0b0000000000000001  < AVDD Bod Reset */
-#define RMU_RSTCAUSE_BODDVDD_XMASK       (0x00000003) /**0b0000000000000011  < DVDD Bod Reset */
-#define RMU_RSTCAUSE_BODREGRST_XMASK     (0x0000000F) /**0b0000000000001111  < Brown Out Detector Regulated Domain Reset */
-#define RMU_RSTCAUSE_EXTRST_XMASK        (0x0000000F) /**0b0000000000001111  < External Pin Reset */
-#define RMU_RSTCAUSE_LOCKUPRST_XMASK     (0x0000001F) /**0b0000000000011111  < LOCKUP Reset */
-#define RMU_RSTCAUSE_SYSREQRST_XMASK     (0x0000001F) /**0b0000000000011111  < System Request Reset */
-#define RMU_RSTCAUSE_WDOGRST_XMASK       (0x0000001F) /**0b0000000000011111  < Watchdog Reset */
-#define RMU_RSTCAUSE_EM4RST_XMASK        (0x00000003) /**0b0000000000000011  < EM4H/S Reset */
-#define NUM_RSTCAUSES                             (9)
+#define RMU_RSTCAUSE_PORST_XMASK         0x00000000UL /** 0000000000000000  < Power On Reset */
+#define RMU_RSTCAUSE_BODAVDD_XMASK       0x00000001UL /** 0000000000000001  < AVDD BOD Reset */
+#define RMU_RSTCAUSE_BODDVDD_XMASK       0x00000001UL /** 0000000000000001  < DVDD BOD Reset */
+#define RMU_RSTCAUSE_BODREGRST_XMASK     0x00000001UL /** 0000000000000001  < Regulated Domain (DEC) BOD Reset */
+#define RMU_RSTCAUSE_EXTRST_XMASK        0x00000001UL /** 0000000000000001  < External Pin Reset */
+#define RMU_RSTCAUSE_LOCKUPRST_XMASK     0x0000001DUL /** 0000000000011101  < LOCKUP Reset */
+#define RMU_RSTCAUSE_SYSREQRST_XMASK     0x0000001DUL /** 0000000000011101  < System Request Reset */
+#define RMU_RSTCAUSE_WDOGRST_XMASK       0x0000001DUL /** 0000000000011101  < Watchdog Reset */
+#define RMU_RSTCAUSE_EM4RST_XMASK        0x0000001DUL /** 0000000000011101  < EM4H/S Reset */
+#define NUM_RSTCAUSES                               9
 
 #else
-#warning "RMU_RSTCAUSE XMASKs are not defined for this family."
+#error "RMU_RSTCAUSE XMASKs are not defined for this family."
 #endif
 
 /*******************************************************************************
@@ -123,8 +135,10 @@
 /** Reset cause mask type. */
 typedef struct
 {
+  /** Reset-cause 1 bits */
   uint32_t resetCauseMask;
-  uint32_t dontCareMask;
+  /** Reset-cause 0 and "don't care" bits */
+  uint32_t resetCauseZeroXMask;
 } RMU_ResetCauseMasks_Typedef;
 
 
@@ -209,7 +223,7 @@ void RMU_ResetControl(RMU_Reset_TypeDef reset, RMU_ResetMode_TypeDef mode)
 #endif
   uint32_t shift;
 
-  shift = EFM32_CTZ((uint32_t)reset);
+  shift = SL_CTZ((uint32_t)reset);
 #if defined(_RMU_CTRL_PINRMODE_MASK)
   val = (uint32_t)mode << shift;
   RMU->CTRL = (RMU->CTRL & ~reset) | val;
@@ -272,19 +286,46 @@ void RMU_ResetCauseClear(void)
  ******************************************************************************/
 uint32_t RMU_ResetCauseGet(void)
 {
+#define LB_CLW0                 (* (volatile uint32_t *)(LOCKBITS_BASE + 122))
+#define LB_CLW0_PINRESETSOFT    (1 << 2)
+
+
 #if !defined(EMLIB_REGRESSION_TEST)
   uint32_t rstCause = RMU->RSTCAUSE;
 #endif
   uint32_t validRstCause = 0;
+  uint32_t zeroXMask;
   uint32_t i;
 
   for (i = 0; i < NUM_RSTCAUSES; i++)
   {
-    /* Checks to see if rstCause matches a RSTCAUSE and is not excluded by the X-mask */
-    if ((rstCause & resetCauseMasks[i].resetCauseMask)
-        && !(rstCause & resetCauseMasks[i].dontCareMask))
+    zeroXMask = resetCauseMasks[i].resetCauseZeroXMask;
+#if defined( _SILICON_LABS_32B_PLATFORM_2 )
+    /* Handle soft/hard pin reset */
+    if (!(LB_CLW0 & LB_CLW0_PINRESETSOFT))
     {
-      /* Adds the reset-cause to list of real reset-causes */
+      /* RSTCAUSE_EXTRST must be 0 if pin reset is configured as hard reset */
+      switch (resetCauseMasks[i].resetCauseMask)
+      {
+        case RMU_RSTCAUSE_LOCKUPRST:
+          /* Fallthrough */
+        case RMU_RSTCAUSE_SYSREQRST:
+          /* Fallthrough */
+        case RMU_RSTCAUSE_WDOGRST:
+          /* Fallthrough */
+        case RMU_RSTCAUSE_EM4RST:
+          zeroXMask |= RMU_RSTCAUSE_EXTRST;
+          break;
+      }
+    }
+#endif
+
+    /* Check reset cause requirements. Note that a bit is "don't care" if 0 in
+       both resetCauseMask and resetCauseZeroXMask. */
+    if ((rstCause & resetCauseMasks[i].resetCauseMask)
+        && !(rstCause & zeroXMask))
+    {
+      /* Add this reset-cause to the mask of qualified reset-causes */
       validRstCause |= resetCauseMasks[i].resetCauseMask;
     }
   }
@@ -293,5 +334,5 @@ uint32_t RMU_ResetCauseGet(void)
 
 
 /** @} (end addtogroup RMU) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* defined(RMU_COUNT) && (RMU_COUNT > 0) */

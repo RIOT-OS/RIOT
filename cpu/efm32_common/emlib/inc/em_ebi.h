@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_ebi.h
  * @brief External Bus Iterface (EBI) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_EBI_H__
-#define __SILICON_LABS_EM_EBI_H__
+#ifndef EM_EBI_H
+#define EM_EBI_H
 
 #include "em_device.h"
 #if defined(EBI_COUNT) && (EBI_COUNT > 0)
@@ -45,7 +45,7 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -833,7 +833,7 @@ void EBI_AddressTimingSet(int setupCycles, int holdCycles);
 void EBI_PolaritySet(EBI_Line_TypeDef line, EBI_Polarity_TypeDef polarity);
 
 /** @} (end addtogroup EBI) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
@@ -841,4 +841,4 @@ void EBI_PolaritySet(EBI_Line_TypeDef line, EBI_Polarity_TypeDef polarity);
 
 #endif /* defined(EBI_COUNT) && (EBI_COUNT > 0) */
 
-#endif /* __SILICON_LABS_EM_EBI_H__ */
+#endif /* EM_EBI_H */

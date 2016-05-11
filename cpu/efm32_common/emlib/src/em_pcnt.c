@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_pcnt.c
  * @brief Pulse Counter (PCNT) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -38,13 +38,18 @@
 #include "em_bus.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup PCNT
  * @brief Pulse Counter (PCNT) Peripheral API
+ * @details
+ *  This module contains functions to control the PCNT peripheral of Silicon
+ *  Labs 32-bit MCUs and SoCs. The PCNT decodes incoming pulses. The module has
+ *  a quadrature mode which may be used to decode the speed and direction of a
+ *  mechanical shaft.
  * @{
  ******************************************************************************/
 
@@ -692,25 +697,25 @@ void PCNT_Reset(PCNT_TypeDef *pcnt)
  ******************************************************************************/
 void PCNT_FilterConfiguration(PCNT_TypeDef *pcnt, const PCNT_Filter_TypeDef *config, bool enable) {
   uint32_t ovscfg = 0;
-  
+
   EFM_ASSERT(PCNT_REF_VALID(pcnt));
-  
+
   /* Construct new filter setting value */
   ovscfg  = ((config->filtLen & _PCNT_OVSCFG_FILTLEN_MASK) << _PCNT_OVSCFG_FILTLEN_SHIFT)
             | ((config->flutterrm & 0x1) << _PCNT_OVSCFG_FLUTTERRM_SHIFT);
-  
+
   /* Set new configuration. LF register requires sync check before writing. */
   PCNT_Sync(pcnt, PCNT_SYNCBUSY_OVSCFG);
   pcnt->OVSCFG = ovscfg;
 
-  
+
   /* Set new state of filter. LF register requires sync check before writing. */
   PCNT_Sync(pcnt, PCNT_SYNCBUSY_CTRL);
-  if(enable) 
+  if(enable)
   {
     pcnt->CTRL |= PCNT_CTRL_FILT;
-  } 
-  else 
+  }
+  else
   {
     pcnt->CTRL &= ~PCNT_CTRL_FILT;
   }
@@ -747,9 +752,9 @@ void PCNT_TCCConfiguration(PCNT_TypeDef *pcnt, const PCNT_TCC_TypeDef *config){
                   | _PCNT_CTRL_PRSGATEEN_MASK
                   | _PCNT_CTRL_TCCPRSPOL_MASK
                   | _PCNT_CTRL_TCCPRSSEL_MASK;
-  
+
   EFM_ASSERT(PCNT_REF_VALID(pcnt));
-  
+
   /* construct TCC part of configuration register */
   ctrl |= (config->mode          << _PCNT_CTRL_TCCMODE_SHIFT   ) & _PCNT_CTRL_TCCMODE_MASK;
   ctrl |= (config->prescaler     << _PCNT_CTRL_TCCPRESC_SHIFT  ) & _PCNT_CTRL_TCCPRESC_MASK;
@@ -757,7 +762,7 @@ void PCNT_TCCConfiguration(PCNT_TypeDef *pcnt, const PCNT_TCC_TypeDef *config){
   ctrl |= (config->tccPRS        << _PCNT_CTRL_TCCPRSSEL_SHIFT ) & _PCNT_CTRL_TCCPRSSEL_MASK;
   ctrl |= (config->prsPolarity   << _PCNT_CTRL_TCCPRSPOL_SHIFT ) & _PCNT_CTRL_TCCPRSPOL_MASK;
   ctrl |= (config->prsGateEnable << _PCNT_CTRL_PRSGATEEN_SHIFT ) & _PCNT_CTRL_PRSGATEEN_MASK;
-  
+
   /* Load new TCC config to PCNT. LF register requires sync check before write. */
   PCNT_Sync(pcnt, PCNT_SYNCBUSY_CTRL);
   pcnt->CTRL = (pcnt->CTRL & (~mask)) | ctrl;
@@ -843,5 +848,5 @@ void PCNT_TopSet(PCNT_TypeDef *pcnt, uint32_t val)
 }
 
 /** @} (end addtogroup PCNT) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* defined(PCNT_COUNT) && (PCNT_COUNT > 0) */

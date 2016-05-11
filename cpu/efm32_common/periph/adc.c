@@ -19,124 +19,90 @@
  */
 
 #include "cpu.h"
+#include "mutex.h"
 
 #include "periph_conf.h"
 #include "periph/adc.h"
 
 #include "em_cmu.h"
 #include "em_adc.h"
+#include "em_common_utils.h"
 
 /* guard file in case no ADC device is defined */
 #if ADC_NUMOF
 
-typedef struct {
-    ADC_Res_TypeDef res;
-    uint32_t shift;
-    uint32_t max_value;
-} adc_state_t;
+static mutex_t adc_lock[ADC_NUMOF] = {
+#if ADC_0_EN
+    [ADC_0] = MUTEX_INIT,
+#endif
+#if ADC_1_EN
+    [ADC_1] = MUTEX_INIT,
+#endif
+};
 
-static adc_state_t adc_state[ADC_NUMOF];
-
-int adc_init(adc_t dev, adc_precision_t precision)
+int adc_init(adc_t line)
 {
-    /* check if device is valid */
-    if (dev >= ADC_NUMOF) {
+    /* check if line is valid */
+    if (line >= ADC_NUMOF) {
         return -1;
     }
 
-    /* store precision, because it is used during scan, not in init */
-    switch (precision) {
-        case ADC_RES_6BIT:
-            adc_state[dev].res = adcRes6Bit;
-            adc_state[dev].shift = 0;
-            adc_state[dev].max_value = (1 << 6) - 1;
-            break;
-        case ADC_RES_8BIT:
-            adc_state[dev].res = adcRes8Bit;
-            adc_state[dev].shift = 0;
-            adc_state[dev].max_value = (1 << 8) - 1;
-            break;
-        case ADC_RES_10BIT:
-            adc_state[dev].res = adcRes12Bit;
-            adc_state[dev].shift = 2;
-            adc_state[dev].max_value = (1 << 12) - 1;
-        case ADC_RES_12BIT:
-            adc_state[dev].res = adcRes12Bit;
-            adc_state[dev].shift = 0;
-            adc_state[dev].max_value = (1 << 12) - 1;
-            break;
-        default:
-            /* not supported */
-            return -1;
-    }
+    uint8_t dev = adc_channel_config[line].dev;
 
     /* enable clock */
     CMU_ClockEnable(cmuClock_HFPER, true);
     CMU_ClockEnable(adc_config[dev].cmu, true);
 
     /* reset and initialize peripheral */
-    ADC_Init_TypeDef init = ADC_INIT_DEFAULT;
-
-    init.timebase = ADC_TimebaseCalc(0);
-    init.prescale = ADC_PrescaleCalc(400000, 0);
+    EFM32_CREATE_INIT(init, ADC_Init_TypeDef, ADC_INIT_DEFAULT,
+        .conf.timebase = ADC_TimebaseCalc(0),
+        .conf.prescale = ADC_PrescaleCalc(400000, 0)
+    );
 
     ADC_Reset(adc_config[dev].dev);
-    ADC_Init(adc_config[dev].dev, &init);
+    ADC_Init(adc_config[dev].dev, &init.conf);
 
     return 0;
 }
 
-int adc_sample(adc_t dev, int channel)
+int adc_sample(adc_t line, adc_res_t res)
 {
-    /* check if channel is valid */
-    if (channel >= adc_config[dev].channels) {
-        return -1;
-    }
+    uint8_t dev = adc_channel_config[line].dev;
+
+    /* lock device */
+    mutex_lock(&adc_lock[dev]);
 
     /* setup channel */
-    uint8_t index = adc_config[dev].channel_offset + channel;
-
-    ADC_InitSingle_TypeDef init = ADC_INITSINGLE_DEFAULT;
-
-    init.reference = adc_channel_config[index].reference;
+    EFM32_CREATE_INIT(init, ADC_InitSingle_TypeDef, ADC_INITSINGLE_DEFAULT,
+        .conf.acqTime = adc_channel_config[line].acq_time,
+        .conf.reference = adc_channel_config[line].reference,
+        .conf.resolution = (ADC_Res_TypeDef) res,
 #ifdef _SILICON_LABS_32B_PLATFORM_1
-    init.input = adc_channel_config[index].input;
+        .conf.input = adc_channel_config[line].input,
 #else
-    init.posSel = adc_channel_config[index].input;
+        .conf.posSel = adc_channel_config[line].input,
 #endif
-    init.resolution = adc_state[dev].res;
-    init.acqTime = adc_channel_config[index].acq_time;
+    );
 
-    ADC_InitSingle(adc_config[dev].dev, &init);
+    ADC_InitSingle(adc_config[dev].dev, &init.conf);
 
-    /* start conversion */
+    /* start conversion and block until it completes */
     ADC_Start(adc_config[dev].dev, adcStartSingle);
 
-    /* wait until the ADC has warmed up */
     while (adc_config[dev].dev->STATUS & ADC_STATUS_SINGLEACT);
 
-    /* read sample and shift it to match resolution */
-    return ADC_DataSingleGet(adc_config[dev].dev) >> adc_state[dev].shift;
-}
+    int result = ADC_DataSingleGet(adc_config[dev].dev);
 
-void adc_poweron(adc_t dev)
-{
-    CMU_ClockEnable(adc_config[dev].cmu, true);
-}
+    /* EFM32 has no 6, 8 or 12-bit resolution, therefore use 12-bit sample
+        and shift it by two to yield a 10-bit sample */
+    if (res == ADC_RES_10BIT) {
+        result = result >> 2;
+    }
 
-void adc_poweroff(adc_t dev)
-{
-    CMU_ClockEnable(adc_config[dev].cmu, false);
-}
+    /* unlock device */
+    mutex_unlock(&adc_lock[dev]);
 
-int adc_map(adc_t dev, int value, int min, int max)
-{
-    return ((max - min) / adc_state[dev].max_value) * value;
-}
-
-float adc_mapf(adc_t dev, int value, float min, float max)
-{
-    return ((max - min) / ((float) adc_state[dev].max_value)) * value;
+    return result;
 }
 
 #endif /* ADC_NUMOF */

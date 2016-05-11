@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_adc.h
  * @brief Analog to Digital Converter (ADC) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_ADC_H__
-#define __SILICON_LABS_EM_ADC_H__
+#ifndef EM_ADC_H
+#define EM_ADC_H
 
 #include "em_device.h"
 #if defined( ADC_COUNT ) && ( ADC_COUNT > 0 )
@@ -43,7 +43,7 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -197,8 +197,15 @@ typedef enum
   /** Buffered VDD. */
   adcRefVDD       = _ADC_SINGLECTRL_REF_VDD,
 
+#if defined( _ADC_SINGLECTRL_REF_5VDIFF )
   /** Internal differential 5V reference. */
   adcRef5VDIFF    = _ADC_SINGLECTRL_REF_5VDIFF,
+#endif
+
+#if defined( _ADC_SINGLECTRL_REF_5V )
+  /** Internal 5V reference. */
+  adcRef5V        = _ADC_SINGLECTRL_REF_5V,
+#endif
 
   /** Single ended external reference from pin 6. */
   adcRefExtSingle = _ADC_SINGLECTRL_REF_EXTSINGLE,
@@ -248,6 +255,13 @@ typedef enum
 #endif
 } ADC_Ref_TypeDef;
 
+/** @cond DO_NOT_INCLUDE_WITH_DOXYGEN */
+/* Deprecated enum names */
+#if !defined( _ADC_SINGLECTRL_REF_5VDIFF )
+#define adcRef5VDIFF adcRef5V
+#endif
+/** @endcond */
+
 
 /** Sample resolution. */
 typedef enum
@@ -279,7 +293,6 @@ typedef enum
   adcSingleInputVrefDiv2 = _ADC_SINGLECTRL_INPUTSEL_VREFDIV2, /**< Vref divided by 2. */
   adcSingleInputDACOut0  = _ADC_SINGLECTRL_INPUTSEL_DAC0OUT0, /**< DAC output 0. */
   adcSingleInputDACOut1  = _ADC_SINGLECTRL_INPUTSEL_DAC0OUT1, /**< DAC output 1. */
-  /* TBD: Use define when available */
   adcSingleInputATEST    = 15,                                /**< ATEST. */
 
   /* Differential mode enabled */
@@ -287,12 +300,11 @@ typedef enum
   adcSingleInputCh2Ch3   = _ADC_SINGLECTRL_INPUTSEL_CH2CH3,   /**< Positive Ch2, negative Ch3. */
   adcSingleInputCh4Ch5   = _ADC_SINGLECTRL_INPUTSEL_CH4CH5,   /**< Positive Ch4, negative Ch5. */
   adcSingleInputCh6Ch7   = _ADC_SINGLECTRL_INPUTSEL_CH6CH7,   /**< Positive Ch6, negative Ch7. */
-  /* TBD: Use define when available */
   adcSingleInputDiff0    = 4                                  /**< Differential 0. */
 } ADC_SingleInput_TypeDef;
 
 /** @cond DO_NOT_INCLUDE_WITH_DOXYGEN */
-/* Legacy enum names */
+/* Deprecated enum names */
 #define adcSingleInpCh0       adcSingleInputCh0
 #define adcSingleInpCh1       adcSingleInputCh1
 #define adcSingleInpCh2       adcSingleInputCh2
@@ -489,7 +501,8 @@ typedef enum
   adcPosSelIO0         = _ADC_SINGLECTRL_POSSEL_IO0,
   adcPosSelIO1         = _ADC_SINGLECTRL_POSSEL_IO1,
   adcPosSelVSP         = _ADC_SINGLECTRL_POSSEL_VSP,
-  adcPosSelSP0         = _ADC_SINGLECTRL_POSSEL_SP0,
+  adcPosSelOPA2        = _ADC_SINGLECTRL_POSSEL_OPA2,
+  adcPosSelOPA3        = _ADC_SINGLECTRL_POSSEL_OPA3,
   adcPosSelTEMP        = _ADC_SINGLECTRL_POSSEL_TEMP,
   adcPosSelDAC0OUT0    = _ADC_SINGLECTRL_POSSEL_DAC0OUT0,
   adcPosSelTESTP       = _ADC_SINGLECTRL_POSSEL_TESTP,
@@ -939,9 +952,11 @@ typedef struct
   adcAcqTime1,               /* 1 ADC_CLK cycle acquisition time. */              \
   adcRef1V25,                /* 1.25V internal reference. */                      \
   adcRes12Bit,               /* 12 bit resolution. */                             \
-  0,                         /* Default ADC inputs */                             \
-  0,                         /* Default input mask (all off) */                   \
-  _ADC_SCANNEGSEL_RESETVALUE,/* Default negative select for positive ternimal */  \
+  {                                                                               \
+    0,                         /* Default ADC inputs */                           \
+    0,                         /* Default input mask (all off) */                 \
+    _ADC_SCANNEGSEL_RESETVALUE,/* Default negative select for positive ternimal */\
+  },                                                                              \
   false,                     /* Single-ended input. */                            \
   false,                     /* PRS disabled. */                                  \
   false,                     /* Right adjust. */                                  \
@@ -1294,11 +1309,11 @@ __STATIC_INLINE void ADC_Start(ADC_TypeDef *adc, ADC_Start_TypeDef cmd)
 
 
 /** @} (end addtogroup ADC) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* defined(ADC_COUNT) && (ADC_COUNT > 0) */
-#endif /* __SILICON_LABS_EM_ADC_H__ */
+#endif /* EM_ADC_H */

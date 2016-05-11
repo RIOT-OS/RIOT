@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file
  * @brief Real Time Counter with Calendar (RTCC) Peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -35,13 +35,17 @@
 #include "em_bus.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup RTCC
  * @brief Real Time Counter (RTCC) Peripheral API
+ * @details
+ *  This module contains functions to control the RTCC peripheral of Silicon
+ *  Labs 32-bit MCUs and SoCs. The RTCC ensures timekeeping in low energy modes.
+ *  The RTCC also includes a BCD calendar mode for easy time and date keeping.
  * @{
  ******************************************************************************/
 
@@ -175,6 +179,6 @@ void RTCC_StatusClear( void )
 }
 
 /** @} (end addtogroup RTCC) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #endif /* defined( RTCC_COUNT ) && ( RTCC_COUNT == 1 ) */

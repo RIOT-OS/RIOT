@@ -31,6 +31,7 @@
 
 #include "em_cmu.h"
 #include "em_i2c.h"
+#include "em_common_utils.h"
 
 /* guard file in case no I2C device is defined */
 #if I2C_NUMOF
@@ -47,42 +48,14 @@ static mutex_t i2c_lock[I2C_NUMOF] = {
 };
 
 /**
- * @brief Convert speeds to integers
- */
-static uint32_t speed_to_freq(i2c_speed_t speed)
-{
-    uint32_t freq = 100000;
-
-    switch (speed) {
-        case I2C_SPEED_LOW:
-            freq = 10000;
-            break;
-        case I2C_SPEED_NORMAL:
-            freq = 100000;
-            break;
-        case I2C_SPEED_FAST:
-            freq = 400000;
-            break;
-        case I2C_SPEED_FAST_PLUS:
-            freq = 1000000;
-            break;
-        case I2C_SPEED_HIGH:
-            freq = 3400000;
-            break;
-    }
-
-    return freq;
-}
-
-/**
  * @brief   Start and track an I2C transfer.
  */
 static void _transfer(i2c_t dev, I2C_TransferSeq_TypeDef *transfer)
 {
     i2c_progress[dev] = I2C_TransferInit(i2c_config[dev].dev, transfer);
 
+    /* the transfer progresses via the interrupt handler */
     while (i2c_progress[dev] == i2cTransferInProgress) {
-        /* the transfer progresses via the interrupt handler */
         __WFI();
     }
 }
@@ -99,23 +72,23 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     CMU_ClockEnable(i2c_config[dev].cmu, true);
 
     /* configure the pins */
-    gpio_init(i2c_config[dev].scl_pin, GPIO_DIR_BI, GPIO_NOPULL);
-    gpio_init(i2c_config[dev].sda_pin, GPIO_DIR_BI, GPIO_NOPULL);
+    gpio_init(i2c_config[dev].scl_pin, GPIO_OD);
+    gpio_init(i2c_config[dev].sda_pin, GPIO_OD);
 
-    /* ensure slave is in a known state, which it may not after a reset */
+    /* ensure slave is in a known state, which it may not be after a reset */
     for (int i = 0; i < 9; i++) {
         gpio_set(i2c_config[dev].scl_pin);
         gpio_clear(i2c_config[dev].scl_pin);
     }
 
     /* reset and initialize the peripheral */
-    I2C_Init_TypeDef init = I2C_INIT_DEFAULT;
-
-    init.enable = false;
-    init.freq = speed_to_freq(speed);
+    EFM32_CREATE_INIT(init, I2C_Init_TypeDef, I2C_INIT_DEFAULT,
+        .conf.enable = false,
+        .conf.freq = (uint32_t) speed
+    );
 
     I2C_Reset(i2c_config[dev].dev);
-    I2C_Init(i2c_config[dev].dev, &init);
+    I2C_Init(i2c_config[dev].dev, &init.conf);
 
     /* configure pin functions */
 #ifdef _SILICON_LABS_32B_PLATFORM_1

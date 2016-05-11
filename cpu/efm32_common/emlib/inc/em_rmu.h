@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_rmu.h
  * @brief Reset Management Unit (RMU) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_RMU_H__
-#define __SILICON_LABS_EM_RMU_H__
+#ifndef EM_RMU_H
+#define EM_RMU_H
 
 #include "em_device.h"
 #if defined(RMU_COUNT) && (RMU_COUNT > 0)
@@ -44,7 +44,7 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -140,11 +140,11 @@ __STATIC_INLINE uint32_t RMU_UserResetStateGet(void)
 #endif
 
 /** @} (end addtogroup RMU) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* defined(RMU_COUNT) && (RMU_COUNT > 0) */
-#endif /* __SILICON_LABS_EM_RMU_H__ */
+#endif /* EM_RMU_H */

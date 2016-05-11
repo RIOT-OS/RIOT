@@ -8,10 +8,15 @@
 extern "C" {
 #endif
 
-/**
- * @brief   Conversion macros for RTCC_DATE and RTCC_TIME registers.
+/***************************************************************************//**
+ * @brief
+ *   Conversion macros for RTCC_DATE and RTCC_TIME registers.
+ *
+ * @note
+ *   Values are expected to be in a valid within the date and time domain.
+ *
  * @{
- */
+ ******************************************************************************/
 #define RTCC_BCD2Second(x)     (((((x) & _RTCC_TIME_SECT_MASK) >> _RTCC_TIME_SECT_SHIFT) * 10) + (((x) & _RTCC_TIME_SECU_MASK) >> _RTCC_TIME_SECU_SHIFT))
 #define RTCC_BCD2Minute(x)     (((((x) & _RTCC_TIME_MINT_MASK) >> _RTCC_TIME_MINT_SHIFT) * 10) + (((x) & _RTCC_TIME_MINU_MASK) >> _RTCC_TIME_MINU_SHIFT))
 #define RTCC_BCD2Hour(x)       (((((x) & _RTCC_TIME_HOURT_MASK) >> _RTCC_TIME_HOURT_SHIFT) * 10) + (((x) & _RTCC_TIME_HOURU_MASK) >> _RTCC_TIME_HOURU_SHIFT))
@@ -31,10 +36,15 @@ extern "C" {
 #define RTCC_DayOfWeek2BCD(x)  ((((x) % 10) << _RTCC_DATE_DAYOW_SHIFT) & _RTCC_DATE_DAYOW_MASK)
 /** @} */
 
-/**
- * @brief   Conversion macros for RTCC_CC_DATE and RTCC_CC_TIME registers.
+/***************************************************************************//**
+ * @brief
+ *   Conversion macros for RTCC_CC_DATE and RTCC_CC_TIME registers.
+ *
+ * @note
+ *   Values are expected to be in a valid within the date and time domain.
+ *
  * @{
- */
+ ******************************************************************************/
 #define RTCC_Channel_BCD2Second(x) (((((x) & _RTCC_CC_TIME_SECT_MASK) >> _RTCC_CC_TIME_SECT_SHIFT) * 10) + (((x) & _RTCC_CC_TIME_SECU_MASK) >> _RTCC_CC_TIME_SECU_SHIFT))
 #define RTCC_Channel_BCD2Minute(x) (((((x) & _RTCC_CC_TIME_MINT_MASK) >> _RTCC_CC_TIME_MINT_SHIFT) * 10) + (((x) & _RTCC_CC_TIME_MINU_MASK) >> _RTCC_CC_TIME_MINU_SHIFT))
 #define RTCC_Channel_BCD2Hour(x)   (((((x) & _RTCC_CC_TIME_HOURT_MASK) >> _RTCC_CC_TIME_HOURT_SHIFT) * 10) + (((x) & _RTCC_CC_TIME_HOURU_MASK) >> _RTCC_CC_TIME_HOURU_SHIFT))

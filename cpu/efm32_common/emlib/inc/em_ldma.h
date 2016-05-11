@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_ldma.h
  * @brief Direct memory access (LDMA) API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_LDMA_H__
-#define __SILICON_LABS_EM_LDMA_H__
+#ifndef EM_LDMA_H
+#define EM_LDMA_H
 
 #include "em_device.h"
 
@@ -45,7 +45,7 @@ extern "C" {
 
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -1210,6 +1210,7 @@ typedef struct
  ******************************************************************************/
 
 void LDMA_DeInit( void );
+void LDMA_EnableChannelRequest( int ch, bool enable);
 void LDMA_Init( LDMA_Init_t *init );
 void LDMA_StartTransfer(  int ch,
                           LDMA_TransferCfg_t *transfer,
@@ -1320,11 +1321,11 @@ __STATIC_INLINE void LDMA_IntSet(uint32_t flags)
 }
 
 /** @} (end addtogroup LDMA) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* defined( LDMA_PRESENT ) && ( LDMA_COUNT == 1 ) */
-#endif /* __SILICON_LABS_EM_LDMA_H__ */
+#endif /* EM_LDMA_H */

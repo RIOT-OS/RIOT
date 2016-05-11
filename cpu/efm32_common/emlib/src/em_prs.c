@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_prs.c
  * @brief Peripheral Reflex System (PRS) Peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -36,13 +36,17 @@
 #include "em_assert.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup PRS
  * @brief Peripheral Reflex System (PRS) Peripheral API
+ * @details
+ *  This module contains functions to control the PRS peripheral of Silicon
+ *  Labs 32-bit MCUs and SoCs. The PRS allows configurable, fast and autonomous
+ *  communication between peripherals on the MCU or SoC.
  * @{
  ******************************************************************************/
 
@@ -122,5 +126,5 @@ void PRS_SourceAsyncSignalSet(unsigned int ch,
 #endif
 
 /** @} (end addtogroup PRS) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* defined(PRS_COUNT) && (PRS_COUNT > 0) */

@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_dma.c
  * @brief Direct memory access (DMA) module peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -38,7 +38,7 @@
 #include "em_bus.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -295,13 +295,8 @@ void DMA_IRQHandler(void)
   pending  = DMA->IF;
   pending &= DMA->IEN;
 
-  /* Check for bus error */
-  if (pending & DMA_IF_ERR)
-  {
-    /* Loop here to enable the debugger to see what has happened */
-    while (1)
-      ;
-  }
+  /* Assert on bus error. */
+  EFM_ASSERT(!(pending & DMA_IF_ERR));
 
   /* Process all pending channel interrupts. First process channels */
   /* defined with high priority, then those with default priority. */
@@ -1015,6 +1010,35 @@ bool DMA_ChannelEnabled(unsigned int channel)
 
 /***************************************************************************//**
  * @brief
+ *   Enable or disable a DMA channel request.
+ *
+ * @details
+ *   Use this function to enable or disable a DMA channel request. This will
+ *   prevent the DMA from proceeding after its current transaction if disabled.
+ *
+ * @param[in] channel
+ *   DMA channel to enable or disable request on.
+ *
+ * @param[in] enable
+ *   If 'true' request will be enabled. If 'false' request will be disabled.
+ ******************************************************************************/
+void DMA_ChannelRequestEnable(unsigned int channel, bool enable)
+{
+  EFM_ASSERT(channel < DMA_CHAN_COUNT);
+
+  if (enable)
+  {
+    BUS_RegBitWrite (&DMA->CHREQMASKC, channel, 1);
+  }
+  else
+  {
+    BUS_RegBitWrite (&DMA->CHREQMASKS, channel, 1);
+  }
+}
+
+
+/***************************************************************************//**
+ * @brief
  *   Initializes DMA controller.
  *
  * @details
@@ -1227,5 +1251,5 @@ void DMA_Reset(void)
 
 
 /** @} (end addtogroup DMA) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* defined( DMA_PRESENT ) */

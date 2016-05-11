@@ -29,6 +29,7 @@
 
 #include "em_cmu.h"
 #include "em_rtc.h"
+#include "em_common_utils.h"
 
 /* guard file in case no RTC device is defined */
 #if RTC_NUMOF
@@ -53,7 +54,8 @@ static void _set_alarm(void)
 {
     uint32_t overflows = (rtc_state.alarm >> RTC_SHIFT_VALUE);
 
-    /* check if alarm is in reach of RTC counter */
+    /* check if alarm is in reach of RTC counter, which basically means that
+       the first 8 bits created by software now match */
     if (overflows == rtc_state.overflows) {
         /* disable interrupt so it doesn't accidentally trigger */
         RTC_IntDisable(RTC_IEN_COMP0);
@@ -80,13 +82,13 @@ void rtc_init(void)
     rtc_state.overflows = 0;
 
     /* reset and initialze the peripheral */
-    RTC_Init_TypeDef init = RTC_INIT_DEFAULT;
-
-    init.enable = false;
-    init.comp0Top = false;
+    EFM32_CREATE_INIT(init, RTC_Init_TypeDef, RTC_INIT_DEFAULT,
+        .conf.enable = false,
+        .conf.comp0Top = false
+    );
 
     RTC_Reset();
-    RTC_Init(&init);
+    RTC_Init(&init.conf);
 
     /* enable interrupts */
     RTC_IntEnable(RTC_IEN_OF);

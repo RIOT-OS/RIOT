@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_rtc.h
  * @brief Real Time Counter (RTC) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_RTC_H__
-#define __SILICON_LABS_EM_RTC_H__
+#ifndef EM_RTC_H
+#define EM_RTC_H
 
 #include "em_device.h"
 #if defined(RTC_COUNT) && (RTC_COUNT > 0)
@@ -43,7 +43,7 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -91,6 +91,20 @@ __STATIC_INLINE uint32_t RTC_CounterGet(void)
 {
   return RTC->CNT;
 }
+
+#if !defined(_EFM32_GECKO_FAMILY)
+/***************************************************************************//**
+ * @brief
+ *   Set the RTC counter value.
+ *
+ * @param[in] value
+ *   The new RTC counter value.
+ ******************************************************************************/
+__STATIC_INLINE void RTC_CounterSet(uint32_t value)
+{
+  RTC->CNT = value;
+}
+#endif
 
 void RTC_CounterReset(void);
 void RTC_Enable(bool enable);
@@ -204,11 +218,11 @@ __STATIC_INLINE void RTC_IntSet(uint32_t flags)
 void RTC_Reset(void);
 
 /** @} (end addtogroup RTC) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* defined(RTC_COUNT) && (RTC_COUNT > 0) */
-#endif /* __SILICON_LABS_EM_RTC_H__ */
+#endif /* EM_RTC_H */

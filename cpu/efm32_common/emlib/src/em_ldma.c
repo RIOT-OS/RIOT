@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_ldma.c
  * @brief Direct memory access (LDMA) module peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -41,7 +41,7 @@
 #include "em_int.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -251,6 +251,27 @@ void LDMA_DeInit( void )
   LDMA->IEN  = 0;
   LDMA->CHEN = 0;
   CMU_ClockEnable( cmuClock_LDMA, false );
+}
+
+/***************************************************************************//**
+ * @brief
+ *   Enable or disable a LDMA channel request.
+ *
+ * @details
+ *   Use this function to enable or disable a LDMA channel request. This will
+ *   prevent the LDMA from proceeding after its current transaction if disabled.
+ *
+ * @param[in] channel
+ *   LDMA channel to enable or disable requests on.
+ *
+ * @param[in] enable
+ *   If 'true' request will be enabled. If 'false' request will be disabled.
+ ******************************************************************************/
+void LDMA_EnableChannelRequest( int ch, bool enable)
+{
+  EFM_ASSERT( ch < DMA_CHAN_COUNT );
+
+  BUS_RegBitWrite (&LDMA->REQDIS, ch, !enable);
 }
 
 /***************************************************************************//**
@@ -495,5 +516,5 @@ uint32_t LDMA_TransferRemainingCount( int ch )
 }
 
 /** @} (end addtogroup LDMA) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* defined( LDMA_PRESENT ) && ( LDMA_COUNT == 1 ) */

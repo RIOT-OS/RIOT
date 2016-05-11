@@ -1,28 +1,28 @@
 /***************************************************************************//**
  * @file em_assert.h
  * @brief Emlib peripheral API "assert" implementation.
- * @version 4.2.1
+ * @version 4.3.0
  *
  * @details
- * By default, emlib library assert usage is not included in order to reduce
- * footprint and processing overhead. Further, emlib assert usage is decoupled
+ * By default, EMLIB library assert usage is not included in order to reduce
+ * footprint and processing overhead. Further, EMLIB assert usage is decoupled
  * from ISO C assert handling (NDEBUG usage), to allow a user to use ISO C
- * assert without including emlib assert statements.
+ * assert without including EMLIB assert statements.
  *
- * Below are available defines for controlling emlib assert inclusion. The defines
+ * Below are available defines for controlling EMLIB assert inclusion. The defines
  * are typically defined for a project to be used by the preprocessor.
  *
- * @li If DEBUG_EFM is defined, the internal emlib library assert handling will
+ * @li If DEBUG_EFM is defined, the internal EMLIB library assert handling will
  * be used, which may be a quite rudimentary implementation.
  *
  * @li If DEBUG_EFM_USER is defined instead, the user must provide their own
  * assert handling routine (assertEFM()).
  *
- * As indicated above, if none of the above defines are used, emlib assert
+ * As indicated above, if none of the above defines are used, EMLIB assert
  * statements are not compiled.
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -48,8 +48,8 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_ASSERT_H__
-#define __SILICON_LABS_EM_ASSERT_H__
+#ifndef EM_ASSERT_H
+#define EM_ASSERT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -76,4 +76,4 @@ void assertEFM(const char *file, int line);
 }
 #endif
 
-#endif /* __SILICON_LABS_EM_ASSERT_H__ */
+#endif /* EM_ASSERT_H */

@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_letimer.h
  * @brief Low Energy Timer (LETIMER) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_LETIMER_H__
-#define __SILICON_LABS_EM_LETIMER_H__
+#ifndef EM_LETIMER_H
+#define EM_LETIMER_H
 
 #include <stdbool.h>
 #include "em_device.h"
@@ -42,7 +42,7 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -311,11 +311,11 @@ void LETIMER_Reset(LETIMER_TypeDef *letimer);
 
 
 /** @} (end addtogroup LETIMER) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* defined(LETIMER_COUNT) && (LETIMER_COUNT > 0) */
-#endif /* __SILICON_LABS_EM_LETIMER_H__ */
+#endif /* EM_LETIMER_H */

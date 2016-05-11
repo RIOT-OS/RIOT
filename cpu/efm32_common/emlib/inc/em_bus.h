@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_bus.h
  * @brief RAM and peripheral bit-field set and clear API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_BUS__
-#define __SILICON_LABS_EM_BUS__
+#ifndef EM_BUS__
+#define EM_BUS__
 
 #include "em_device.h"
 
@@ -40,13 +40,15 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup BUS
  * @brief BUS RAM and register bit/field read/write API
+ * @details
+ *  API to perform bitbanded and masked accesses to SRAM and peripheral memory.
  * @{
  ******************************************************************************/
 
@@ -318,10 +320,10 @@ __STATIC_INLINE uint32_t BUS_RegMaskedRead(volatile const uint32_t *addr,
 
 
 /** @} (end addtogroup BUS) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __SILICON_LABS_EM_BUS__ */
+#endif /* EM_BUS__ */

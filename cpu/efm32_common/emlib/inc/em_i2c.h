@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_i2c.h
  * @brief Inter-intergrated circuit (I2C) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef __SILICON_LABS_EM_I2C_H__
-#define __SILICON_LABS_EM_I2C_H__
+#ifndef EM_I2C_H
+#define EM_I2C_H
 
 #include "em_device.h"
 #if defined(I2C_COUNT) && (I2C_COUNT > 0)
@@ -43,7 +43,7 @@ extern "C" {
 #endif
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -521,11 +521,11 @@ I2C_TransferReturn_TypeDef I2C_TransferInit(I2C_TypeDef *i2c,
                                             I2C_TransferSeq_TypeDef *seq);
 
 /** @} (end addtogroup I2C) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* defined(I2C_COUNT) && (I2C_COUNT > 0) */
-#endif /* __SILICON_LABS_EM_I2C_H__ */
+#endif /* EM_I2C_H */

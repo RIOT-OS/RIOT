@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_aes.c
  * @brief Advanced Encryption Standard (AES) accelerator peripheral API.
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -35,7 +35,7 @@
 
 #include "em_assert.h"
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
@@ -1383,5 +1383,5 @@ void AES_OFB256(uint8_t *out,
 
 
 /** @} (end addtogroup AES) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* defined(AES_COUNT) && (AES_COUNT > 0) */

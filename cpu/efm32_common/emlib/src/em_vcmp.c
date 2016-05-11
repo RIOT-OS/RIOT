@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_vcmp.c
  * @brief Voltage Comparator (VCMP) peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -36,13 +36,17 @@
 #include "em_assert.h"
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup VCMP
  * @brief Voltage Comparator (VCMP) Peripheral API
+ * @details
+ *  This module contains functions to control the VCMP peripheral of Silicon
+ *  Labs 32-bit MCUs and SoCs. The VCMP monitors the input voltage supply and
+ *  generates interrupts on events using as little as 100 nA.
  * @{
  ******************************************************************************/
 
@@ -180,5 +184,5 @@ void VCMP_TriggerSet(int level)
 
 
 /** @} (end addtogroup VCMP) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* defined(VCMP_COUNT) && (VCMP_COUNT > 0) */

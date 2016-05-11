@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_burtc.c
  * @brief Backup Real Time Counter (BURTC) Peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -35,13 +35,18 @@
 #if defined(BURTC_PRESENT)
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup BURTC
  * @brief Backup Real Time Counter (BURTC) Peripheral API
+ * @details
+ *  This module contains functions to control the BURTC peripheral of Silicon
+ *  Labs 32-bit MCUs. The Backup Real Time Counter allows timekeeping in all
+ *  energy modes. The Backup RTC is also available when the system is in backup
+ *  mode.
  * @{
  ******************************************************************************/
 
@@ -88,7 +93,7 @@ __STATIC_INLINE void regSync(uint32_t mask)
      activated, or when no clock is selected for the BURTC. If no clock is
      selected, then the sync is done once the clock source is set. */
   if ((BURTC->FREEZE & BURTC_FREEZE_REGFREEZE)
-      || ((BURTC->CTRL & _BURTC_CTRL_CLKSEL_MASK) != _BURTC_CTRL_CLKSEL_NONE))
+      || ((BURTC->CTRL & _BURTC_CTRL_CLKSEL_MASK) == BURTC_CTRL_CLKSEL_NONE))
   {
     return;
   }
@@ -309,6 +314,6 @@ uint32_t BURTC_ClockFreqGet(void)
 
 
 /** @} (end addtogroup BURTC) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 
 #endif /* BURTC_PRESENT */

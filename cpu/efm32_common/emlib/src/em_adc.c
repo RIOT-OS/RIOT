@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file em_adc.c
  * @brief Analog to Digital Converter (ADC) Peripheral API
- * @version 4.2.1
+ * @version 4.3.0
  *******************************************************************************
  * @section License
- * <b>(C) Copyright 2015 Silicon Labs, http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  *******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -38,13 +38,17 @@
 #include <stddef.h>
 
 /***************************************************************************//**
- * @addtogroup EM_Library
+ * @addtogroup emlib
  * @{
  ******************************************************************************/
 
 /***************************************************************************//**
  * @addtogroup ADC
  * @brief Analog to Digital Converter (ADC) Peripheral API
+ * @details
+ *  This module contains functions to control the ADC peripheral of Silicon
+ *  Labs 32-bit MCUs and SoCs. The ADC is used to convert analog signals into a
+ *  digital representation.
  * @{
  ******************************************************************************/
 
@@ -1078,5 +1082,5 @@ uint8_t ADC_TimebaseCalc(uint32_t hfperFreq)
 
 
 /** @} (end addtogroup ADC) */
-/** @} (end addtogroup EM_Library) */
+/** @} (end addtogroup emlib) */
 #endif /* defined(ADC_COUNT) && (ADC_COUNT > 0) */
