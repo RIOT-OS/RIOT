@@ -48,8 +48,16 @@ static int write(void *dev, phydat_t *state)
     return -ENOTSUP;
 }
 
+static int test(void *dev)
+{
+    mma8652_t *d = (mma8652_t *)dev;
+
+    return mma8652_test(d);
+}
+
 const saul_driver_t mma8652_saul_driver = {
     .read = read_acc,
     .write = write,
+    .test = test,
     .type = SAUL_SENSE_ACCEL,
 };

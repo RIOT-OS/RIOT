@@ -75,11 +75,13 @@ static int write(void *dev, phydat_t *state)
 const saul_driver_t lsm303dlhc_saul_acc_driver = {
     .read = read_acc,
     .write = write,
+    .test = saul_test_notsup,
     .type = SAUL_SENSE_ACCEL,
 };
 
 const saul_driver_t lsm303dlhc_saul_mag_driver = {
     .read = read_mag,
     .write = write,
+    .test = saul_test_notsup,
     .type = SAUL_SENSE_MAG,
 };
