@@ -289,7 +289,7 @@ static int _set(gnrc_netdev2_t *gnrc_netdev2, netopt_t opt, void *val, size_t le
     }
     else {
 #endif
-        res = dev->driver->set((netdev2_t *)dev, opt, val, len);
+        res = dev->netdev.driver->set((netdev2_t *)dev, opt, val, len);
 #ifdef MODULE_NETDEV_RETRANS
     }
 #endif
@@ -317,7 +317,7 @@ static int _get(gnrc_netdev2_t *gnrc_netdev2, netopt_t opt, void *val, size_t ma
     }
     else {
 #endif
-        res = dev->driver->get((netdev2_t *)dev, opt, val, max_len);
+        res = dev->netdev.driver->get((netdev2_t *)dev, opt, val, max_len);
 #ifdef MODULE_NETDEV_RETRANS
     }
 #endif
