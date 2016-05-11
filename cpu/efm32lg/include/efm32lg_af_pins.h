@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file efm32lg_af_pins.h
  * @brief EFM32LG_AF_PINS register and bit field definitions
- * @version 4.2.1
+ * @version 4.3.0
  ******************************************************************************
  * @section License
- * <b>Copyright 2015 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,

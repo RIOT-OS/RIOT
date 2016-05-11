@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file system_efm32lg.c
  * @brief CMSIS Cortex-M3 System Layer for EFM32LG devices.
- * @version 4.2.1
+ * @version 4.3.0
  ******************************************************************************
  * @section License
- * <b>Copyright 2015 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -125,8 +125,6 @@ uint32_t SystemCoreClockGet(void)
   uint32_t ret;
 
   ret = SystemHFClockGet();
-  /* Leopard/Giant Gecko has an additional divider */
-  ret =  ret / (1 + ((CMU->CTRL & _CMU_CTRL_HFCLKDIV_MASK)>>_CMU_CTRL_HFCLKDIV_SHIFT));
   ret >>= (CMU->HFCORECLKDIV & _CMU_HFCORECLKDIV_HFCORECLKDIV_MASK) >>
           _CMU_HFCORECLKDIV_HFCORECLKDIV_SHIFT;
 
@@ -142,7 +140,7 @@ uint32_t SystemCoreClockGet(void)
  *   Get the maximum core clock frequency.
  *
  * @note
- *   This is an EFR32 proprietary function, not part of the CMSIS definition.
+ *   This is an EFM32 proprietary function, not part of the CMSIS definition.
  *
  * @return
  *   The maximum core clock frequency in Hz.
@@ -235,7 +233,8 @@ uint32_t SystemHFClockGet(void)
       break;
   }
 
-  return ret;
+  return ret / (1U + ((CMU->CTRL & _CMU_CTRL_HFCLKDIV_MASK)
+                      >> _CMU_CTRL_HFCLKDIV_SHIFT));
 }
 
 

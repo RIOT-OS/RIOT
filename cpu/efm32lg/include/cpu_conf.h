@@ -22,6 +22,8 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #include "em_device.h"
 
 #ifdef __cplusplus
@@ -29,9 +31,9 @@ extern "C" {
 #endif
 
 /**
-* @brief   ARM Cortex-M3 specific CPU configuration
-* @{
-*/
+ * @brief   ARM Cortex-M3 specific CPU configuration
+ * @{
+ */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
 #define CPU_IRQ_NUMOF                   (EMU_IRQn + 1)
 #define CPU_FLASH_BASE                  FLASH_BASE
