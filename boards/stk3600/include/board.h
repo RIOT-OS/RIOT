@@ -87,17 +87,6 @@ extern "C" {
 #define LED1_ON             gpio_set(LED1_PIN)
 #define LED1_OFF            gpio_clear(LED1_PIN)
 #define LED1_TOGGLE         gpio_toggle(LED1_PIN)
-
-/* for compatability to other boards */
-#define LED_GREEN_ON        LED1_ON
-#define LED_GREEN_OFF       LED1_OFF
-#define LED_GREEN_TOGGLE    LED1_TOGGLE
-#define LED_ORANGE_ON       /* not available */
-#define LED_ORANGE_OFF      /* not available */
-#define LED_ORANGE_TOGGLE   /* not available */
-#define LED_RED_ON          LED0_ON
-#define LED_RED_OFF         LED0_OFF
-#define LED_RED_TOGGLE      LED0_TOGGLE
 /** @} */
 
 /**

@@ -41,58 +41,63 @@ extern "C" {
 /** @} */
 
 /**
- * @brief ADC configuration
+ * @brief   ADC configuration
  * @{
  */
+static const adc_conf_t adc_config[] = {
+    {
+        ADC0,                               /* device */
+        cmuClock_ADC0,                      /* CMU register */
+    }
+};
+
 static const adc_chan_conf_t adc_channel_config[] = {
     {
+        0,                                  /* device index */
         adcSingleInputTemp,                 /* channel to use */
+        adcRef1V25,                         /* channel reference */
+        adcAcqTime8                         /* acquisition time */
+    },
+    {
+        0,                                  /* device index */
+        adcSingleInputVDDDiv3,              /* channel to use */
         adcRef1V25,                         /* channel reference */
         adcAcqTime8                         /* acquisition time */
     }
 };
 
-static const adc_conf_t adc_config[] = {
-    {
-        ADC0,                               /* device */
-        cmuClock_ADC0,                      /* CMU register */
-        1,                                  /* number of channels */
-        0,                                  /* channel offset */
-    }
-};
-
-#define ADC_NUMOF           (1U)
-#define ADC_0_EN            1
-#define ADC_MAX_CHANNELS    1
+#define ADC_NUMOF           (2U)
 /** @} */
 
 /**
- * @brief DAC configuration
+ * @brief   Crypto configuration.
+ */
+#define HWCRYPTO_NUMOF      (1U)
+
+/**
+ * @brief   DAC configuration
  * @{
  */
-static const dac_chan_conf_t dac_channel_config[] = {
-    {
-        0                                   /* channel index */
-    }
-};
-
 static const dac_conf_t dac_config[] = {
     {
         DAC0,                               /* device */
         cmuClock_DAC0,                      /* CMU register */
-        dacRefVDD,                          /* voltage reference */
-        1,                                  /* number of channels */
-        0,                                  /* channel offset */
+    }
+};
+
+static const dac_chan_conf_t dac_channel_config[] = {
+    {
+        0,                                  /* DAC channel index */
+        1,                                  /* channel to use */
+        dacRefVDD,                          /* channel reference */
     }
 };
 
 #define DAC_NUMOF           (1U)
-#define DAC_0_EN            1
-#define DAC_MAX_CHANNELS    1
 /** @} */
 
 /**
- * @brief I2C configuration
+ * @brief   I2C configuration
  * @{
  */
 static const i2c_conf_t i2c_config[] = {
@@ -137,13 +142,12 @@ static const pwm_conf_t pwm_config[] = {
         cmuClock_TIMER3,            /* CMU register */
         TIMER3_IRQn,                /* IRQ base channel */
         1,                          /* number of channels */
-        0                           /* channel offset */
+        pwm_channel_config          /* first channel config */
     }
 };
 
 #define PWM_NUMOF                    (1U)
 #define PWM_0_EN                     1
-#define PWM_0_CHANNELS               1
 /** @} */
 
 /**
@@ -167,7 +171,7 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
- * @brief SPI configuration
+ * @brief   SPI configuration
  * @{
  */
 static const spi_dev_t spi_config[] = {
@@ -191,9 +195,9 @@ static const spi_dev_t spi_config[] = {
     }
 };
 
-#define SPI_0_EN            (1U)
+#define SPI_NUMOF           (2U)
+#define SPI_0_EN            1
 #define SPI_1_EN            1
-#define SPI_NUMOF           2
 /** @} */
 
 /**
