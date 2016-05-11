@@ -28,3 +28,9 @@ int saul_notsup(void *dev, phydat_t *dat)
     (void)dat;
     return -ENOTSUP;
 }
+
+int saul_test_notsup(void *dev)
+{
+    (void)dev;
+    return -ENOTSUP;
+}
