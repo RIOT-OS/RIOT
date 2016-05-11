@@ -140,8 +140,8 @@ static int calc_and_compare_hash(const char *str, const unsigned char *expected)
     sha256_context_t sha256;
 
     sha256_init(&sha256);
-    sha256_update(&sha256, str, strlen(str));
-    sha256_final(hash, &sha256);
+    sha256_update(&sha256, (uint8_t*)str, strlen(str));
+    sha256_final(&sha256, hash);
 
     return (memcmp(expected, hash, SHA256_DIGEST_LENGTH) == 0);
 }

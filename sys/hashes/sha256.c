@@ -190,7 +190,7 @@ void sha256_init(sha256_context_t *ctx)
 }
 
 /* Add bytes into the hash */
-void sha256_update(sha256_context_t *ctx, const void *in, size_t len)
+void sha256_update(sha256_context_t *ctx, const uint8_t *data, size_t len)
 {
     /* Number of bytes left in the buffer from previous updates */
     uint32_t r = (ctx->count[1] >> 3) & 0x3f;
@@ -208,12 +208,12 @@ void sha256_update(sha256_context_t *ctx, const void *in, size_t len)
 
     /* Handle the case where we don't need to perform any transforms */
     if (len < 64 - r) {
-        memcpy(&ctx->buf[r], in, len);
+        memcpy(&ctx->buf[r], data, len);
         return;
     }
 
     /* Finish the current block */
-    const unsigned char *src = in;
+    const unsigned char *src = data;
 
     memcpy(&ctx->buf[r], src, 64 - r);
     sha256_transform(ctx->state, ctx->buf);
@@ -235,13 +235,13 @@ void sha256_update(sha256_context_t *ctx, const void *in, size_t len)
  * SHA-256 finalization.  Pads the input data, exports the hash value,
  * and clears the context state.
  */
-void sha256_final(unsigned char digest[32], sha256_context_t *ctx)
+void sha256_final(sha256_context_t *ctx, uint8_t *dst)
 {
     /* Add padding */
     sha256_pad(ctx);
 
     /* Write the hash */
-    be32enc_vect(digest, ctx->state, 32);
+    be32enc_vect(dst, ctx->state, 32);
 
     /* Clear the context state */
     memset((void *) ctx, 0, sizeof(*ctx));
@@ -258,7 +258,7 @@ unsigned char *sha256(const unsigned char *d, size_t n, unsigned char *md)
 
     sha256_init(&c);
     sha256_update(&c, d, n);
-    sha256_final(md, &c);
+    sha256_final(&c, md);
 
     return md;
 }
@@ -301,8 +301,8 @@ const unsigned char *hmac_sha256(const unsigned char *key,
 
     sha256_init(&c);
     sha256_update(&c, i_key_pad, SHA256_INTERNAL_BLOCK_SIZE);
-    sha256_update(&c, message, message_length);
-    sha256_final(tmp, &c);
+    sha256_update(&c, (uint8_t *)message, message_length);
+    sha256_final(&c, tmp);
 
     static unsigned char m[SHA256_DIGEST_LENGTH];
 
@@ -317,7 +317,7 @@ const unsigned char *hmac_sha256(const unsigned char *key,
     sha256_init(&c);
     sha256_update(&c, o_key_pad, SHA256_INTERNAL_BLOCK_SIZE);
     sha256_update(&c, tmp, SHA256_DIGEST_LENGTH);
-    sha256_final(result, &c);
+    sha256_final(&c, result);
 
     return result;
 }
@@ -333,7 +333,7 @@ static inline void sha256_inplace(unsigned char element[SHA256_DIGEST_LENGTH])
     sha256_context_t ctx;
     sha256_init(&ctx);
     sha256_update(&ctx, element, SHA256_DIGEST_LENGTH);
-    sha256_final(element, &ctx);
+    sha256_final(&ctx, element);
 }
 
 unsigned char *sha256_chain(const unsigned char *seed, size_t seed_length,
@@ -385,7 +385,7 @@ unsigned char *sha256_chain_with_waypoints(const unsigned char *seed,
             sha256_context_t ctx;
             sha256_init(&ctx);
             sha256_update(&ctx, waypoints[(i - 1)].element, SHA256_DIGEST_LENGTH);
-            sha256_final(waypoints[i].element, &ctx);
+            sha256_final(&ctx, waypoints[i].element);
             waypoints[i].index = i;
         }
 

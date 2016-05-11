@@ -66,27 +66,27 @@ typedef struct {
 /**
  * @brief Initialize SHA-1 message digest context
  *
- * @param[in] s     Pointer to the SHA-1 context to initialize
+ * @param[in] ctx     Pointer to the SHA-1 context to initialize
  */
-void sha1_init(sha1_context *s);
+void sha1_init(sha1_context *ctx);
 
 /**
  * @brief Update the SHA-1 context with a portion of the message being hashed
  *
- * @param[in] s     Pointer to the SHA-1 context to update
- * @param[in] data  Pointer to the buffer to be hashed
- * @param[in] len   Length of the buffer
+ * @param[in] ctx       Pointer to the SHA-1 context to update
+ * @param[in] data      Input data
+ * @param[in] len       Length of @p data
  */
-void sha1_update(sha1_context *s, const unsigned char *data, size_t len);
+void sha1_update(sha1_context *ctx, const uint8_t *data, size_t len);
 
 /**
  * @brief Finalizes the SHA-1 message digest
  *
- * @param[in] s     Pointer to the SHA-1 context
+ * @param[in] ctx     Pointer to the SHA-1 context
+ * @param[out] dst    Result location, must be 20 byte
  *
- * @return Calculated digest
  */
-uint8_t *sha1_final(sha1_context *s);
+void sha1_final(sha1_context *ctx, uint8_t *dst);
 
 /**
  * @brief   Calculate a SHA1 hash from the given data
@@ -100,20 +100,20 @@ void sha1(uint8_t *dst, const uint8_t *src, size_t len);
 /**
  * @brief Initialize SHA-1 message digest context with MAC
  *
- * @param[in] s             Pointer to the SHA-1 context to initialize
+ * @param[in] ctx           Pointer to the SHA-1 context to initialize
  * @param[in] key           Key used in the HMAC-SHA1 computation
  * @param[in] key_length    The size in bytes of @p key
  */
-void sha1_init_hmac(sha1_context *s, const unsigned char *key, size_t key_length);
+void sha1_init_hmac(sha1_context *ctx, const uint8_t *key, size_t key_length);
 
 /**
  * @brief Finalizes the SHA-1 message digest with MAC
  *
  * @param[in] s     Pointer to the SHA-1 context
- *
+ * @param[out] dst      Result location, must be 20 byte
  * @return Calculated digest
  */
-uint8_t* sha1_final_hmac(sha1_context *s);
+void sha1_final_hmac(sha1_context *ctx, uint8_t *dst);
 
 #ifdef __cplusplus
 }

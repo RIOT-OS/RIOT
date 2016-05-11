@@ -60,7 +60,7 @@ static void test_sha256_hash_chain(void)
         sha256_context_t ctx;
         sha256_init(&ctx);
         sha256_update(&ctx, tmp_element, SHA256_DIGEST_LENGTH);
-        sha256_final(tmp_element, &ctx);
+        sha256_final(&ctx, tmp_element);
 
         TEST_ASSERT(sha256_chain_verify_element(tmp_element, i,
                                                 tail_hash_chain_element, elements) == 0);
