@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2016 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       SAUL registry implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Vincent Dupont <vincent@otakeys.com>
  *
  * @}
  */
@@ -125,4 +127,13 @@ int saul_reg_write(saul_reg_t *dev, phydat_t *data)
         return -ENODEV;
     }
     return dev->driver->write(dev->dev, data);
+}
+
+int saul_reg_test(saul_reg_t *dev)
+{
+
+    if (dev == NULL) {
+        return -ENODEV;
+    }
+    return dev->driver->test(dev->dev);
 }
