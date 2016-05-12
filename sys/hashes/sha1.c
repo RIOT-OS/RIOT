@@ -180,7 +180,7 @@ void sha1_init_hmac(sha1_context *ctx, const uint8_t *key, size_t key_length)
     if (key_length > SHA1_BLOCK_LENGTH) {
         /* Hash long keys */
         sha1_init(ctx);
-        while(key_length--) {
+        while (key_length--) {
             sha1_update_byte(ctx, *key++);
         }
         sha1_final(ctx, ctx->key_buffer);
