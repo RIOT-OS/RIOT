@@ -61,8 +61,8 @@ static const timer_conf_t timer_config[] = {
 #define UART_HWFLOWCTRL     1
 #define UART_PIN_RX         11
 #define UART_PIN_TX         9
-#define UART_PIN_RTS	    8
-#define UART_PIN_CTS	    10
+#define UART_PIN_RTS        8
+#define UART_PIN_CTS        10
 /** @} */
 
 /**
