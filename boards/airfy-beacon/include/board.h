@@ -34,7 +34,6 @@
 #define XTIMER                      (0)
 #define XTIMER_CHAN                 (0)
 #define XTIMER_MASK                 (0xff000000)
-#define XTIMER_SHIFT_ON_COMPARE     (2)
 #define XTIMER_BACKOFF              (40)
 /** @} */
 

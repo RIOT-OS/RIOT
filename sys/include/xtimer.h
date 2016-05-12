@@ -432,25 +432,6 @@ void _xtimer_sleep(uint32_t offset, uint32_t long_offset);
 static inline void xtimer_spin_until(uint32_t value);
 /** @} */
 
-#if XTIMER_MASK
-#ifndef XTIMER_SHIFT_ON_COMPARE
-/**
- * @brief ignore some bits when comparing timer values
- *
- * (only relevant when XTIMER_MASK != 0, e.g., timers < 32bit.)
- *
- * When combining _lltimer_now() and _high_cnt, we have to get the same value in
- * order to work around a race between overflowing _lltimer_now() and OR'ing the
- * resulting values.
- * But some platforms are too slow to get the same timer
- * value twice, so we use this define to ignore some of the bits.
- *
- * Use tests/xtimer_shift_on_compare to find the correct value for your MCU.
- */
-#define XTIMER_SHIFT_ON_COMPARE     (0)
-#endif
-#endif
-
 #ifndef XTIMER_MIN_SPIN
 /**
  * @brief Minimal value xtimer_spin() can spin
@@ -461,12 +442,18 @@ static inline void xtimer_spin_until(uint32_t value);
 static inline uint32_t xtimer_now(void)
 {
 #if XTIMER_MASK
-    uint32_t a, b;
+    uint32_t latched_high_cnt, now;
+
+    /* _high_cnt can change at any time, so check the value before
+     * and after reading the low-level timer. If it hasn't changed,
+     * then it can be safely applied to the timer count. */
+
     do {
-        a = _lltimer_now() | _high_cnt;
-        b = _lltimer_now() | _high_cnt;
-    } while ((a >> XTIMER_SHIFT_ON_COMPARE) != (b >> XTIMER_SHIFT_ON_COMPARE));
-    return b;
+        latched_high_cnt = _high_cnt;
+        now = _lltimer_now();
+    } while (_high_cnt != latched_high_cnt);
+
+    return latched_high_cnt | now;
 #else
     return _lltimer_now();
 #endif
