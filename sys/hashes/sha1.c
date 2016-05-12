@@ -111,7 +111,7 @@ static void sha1_add_uncounted(sha1_context *s, uint8_t data)
 static void sha1_update_byte(sha1_context *ctx, uint8_t data)
 {
     ++ctx->byte_count;
-    sha1_add_uncounted(ctx, data++);
+    sha1_add_uncounted(ctx, data);
 }
 
 void sha1_update(sha1_context *ctx, const uint8_t *data, size_t len)
