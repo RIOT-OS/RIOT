@@ -21,7 +21,7 @@
  #include "periph_conf.h"
 
 #ifndef HF_CLOCK_SOURCE
-#define HF_CLOCK_SOURCE DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL_RCOSC /* set 48MHz RCOSC */
+#define HF_CLOCK_SOURCE DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL_XOSC /* set 48MHz XOSC */
 #endif
 #ifndef LF_CLOCK_SOURCE
 #define LF_CLOCK_SOURCE DDI_0_OSC_CTL0_SCLK_LF_SRC_SEL_HF_RCOSC /* set 31.25kHz derived from 48MHz RCOSC */
