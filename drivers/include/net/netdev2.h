@@ -20,13 +20,20 @@
  *
  * Example call flow:
  *
- * 1. packet arrives -> driver calls netdev2->event_callback with
- *    event==NETDEV_EVENT_ISR (from interrupt routine)
- * 2. event_callback wakes up upper layer thread
- * 3. upper layer calls netdev2->driver.isr()
- * 4. netdev2->driver.isr() calls netdev2->event_callback() with
- *    event==NETDEV_EVENT_RX_COMPLETE
- * 5. netdev2->event_callback() uses netdev2->driver.recv() to fetch packet
+ * 1. packet arrives for device
+ * 2. The driver previously registered an ISR for handling received packets.
+ *    This ISR then calls @ref netdev2_t::event_callback "netdev->event_callback()"
+ *    with `event` := @ref NETDEV2_EVENT_ISR (from Interrupt Service Routine)
+ *    which wakes up event handler
+ * 3. event handler calls @ref netdev2_driver_t::isr "netdev2->driver->isr()"
+ *    (from thread context)
+ * 4. @ref netdev2_driver_t::isr "netdev->driver->isr()" calls
+ *    @ref netdev2_t::event_callback "netdev->event_callback()" with
+ *    `event` := @ref NETDEV2_EVENT_RX_COMPLETE
+ * 5. @ref netdev2_t::event_callback "netdev->event_callback()" uses
+ *    @ref netdev2_driver_t::recv "netdev2->driver->recv()" to fetch packet
+ *
+ * ![RX event example](riot-netdev-rx.svg)
  *
  * @file
  * @brief       Definitions low-level network driver interface
