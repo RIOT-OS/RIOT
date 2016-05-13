@@ -40,7 +40,7 @@ extern "C" {
 #define CMDR_CMDID_BLE_GENERIC_RX 0x1809
 #define CMDR_CMDID_BLE_TX_TEST    0x180A
 /* BLE immediate commands */
-#define CMDR_CMDID_BLE_ADV_PAYLOAD    0x180A0000
+#define CMDR_CMDID_BLE_ADV_PAYLOAD    0x1001
 /**@}*/
 
 /**
