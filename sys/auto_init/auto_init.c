@@ -256,4 +256,13 @@ void auto_init(void)
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
+
+#ifdef MODULE_AUTO_INIT_GNRC_RPL
+
+#ifdef MODULE_GNRC_RPL
+    extern void auto_init_gnrc_rpl(void);
+    auto_init_gnrc_rpl();
+#endif
+
+#endif /* MODULE_AUTO_INIT_GNRC_RPL */
 }
