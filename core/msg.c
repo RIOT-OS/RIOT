@@ -216,8 +216,11 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
     sched_set_status(me, STATUS_REPLY_BLOCKED);
     me->wait_data = (void*) reply;
 
+    /* we re-use (abuse) reply for sending, because wait_data might be
+     * overwritten if the target is not in RECEIVE_BLOCKED */
+    *reply = *m;
     /* msg_send blocks until reply received */
-    return _msg_send(m, target_pid, true, state);
+    return _msg_send(reply, target_pid, true, state);
 }
 
 int msg_reply(msg_t *m, msg_t *reply)
