@@ -33,8 +33,8 @@ extern "C" {
 #define CLOCK_CORECLOCK     (72000000U)             /* targeted core clock frequency */
 /* configuration of PLL prescaler and multiply values */
 /* CORECLOCK := CLOCK_SOURCE / PLL_DIV * PLL_MUL */
-#define CLOCK_PLL_DIV       RCC_CFGR_PLLXTPRE_HSE_DIV2
-#define CLOCK_PLL_MUL       RCC_CFGR_PLLMULL9
+#define CLOCK_PLL_DIV       (2)
+#define CLOCK_PLL_MUL       (9)
 /* configuration of peripheral bus clock prescalers */
 #define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1      /* AHB clock -> 72MHz */
 #define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1     /* APB2 clock -> 72MHz */
