@@ -147,6 +147,15 @@ bool rfc_nop_test(void)
     return status == R_OP_STATUS_DONE_OK;
 }
 
+static bool rfc_start_rat(void)
+{
+    direct_command_t ratCommand;
+    ratCommand.commandID = CMDR_CMDID_START_RAT;
+    RFC_DBELL->CMDR = (uint32_t) (&ratCommand);
+    while (!RFC_DBELL->CMDSTA); /* wait for cmd ack */
+    return RFC_DBELL->CMDSTA == CMDSTA_RESULT_DONE;
+}
+
 void rfc_prepare(void)
 {
     /* RFC POWER DOMAIN CLOCK GATE */
@@ -169,4 +178,7 @@ void rfc_prepare(void)
 
     /* RFC IRQ */
     rfc_irq_enable();
+
+    /*RFC TIMER */
+    rfc_start_rat();
 }
