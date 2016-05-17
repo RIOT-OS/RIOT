@@ -441,6 +441,7 @@ endif
 
 ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
   USEPKG += libfixmath
+  USEMODULE += libfixmath
 endif
 
 ifneq (,$(filter fib,$(USEMODULE)))
