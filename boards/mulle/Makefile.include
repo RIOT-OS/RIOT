@@ -76,10 +76,10 @@ ifeq ($(PORT),)
   # try to find tty name by serial number, only works on Linux currently.
   ifeq ($(OS),Linux)
     ifneq ($(PROGRAMMER_SERIAL),)
-      PORT := $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh '^$(PROGRAMMER_SERIAL)$$')
+      PORT := $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh '^$(PROGRAMMER_SERIAL)$$'))
     else
       # find-tty.sh will return the first USB tty if no serial is given.
-      PORT := $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh)
+      PORT := $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh))
   endif
   else ifeq ($(OS),Darwin)
     ifneq ($(PROGRAMMER_SERIAL),)
