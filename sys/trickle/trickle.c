@@ -46,7 +46,7 @@ void trickle_interval(trickle_t *trickle)
     DEBUG("trickle: I == %" PRIu32 "\n", trickle->I);
 
     trickle->c = 0;
-    trickle->t = (trickle->I / 2) + (random_uint32() % ((trickle->I / 2) + 1));
+    trickle->t = (trickle->I / 2) + random_uint32_range(0, (trickle->I / 2) + 1);
 
     trickle->msg_callback_time = trickle->t * SEC_IN_MS;
     xtimer_set_msg64(&trickle->msg_callback_timer, trickle->msg_callback_time,
@@ -73,7 +73,7 @@ void trickle_start(kernel_pid_t pid, trickle_t *trickle, uint16_t interval_msg_t
     trickle->k = k;
     trickle->Imin = Imin;
     trickle->Imax = Imax;
-    trickle->I = trickle->Imin + (random_uint32() % (4 * trickle->Imin));
+    trickle->I = trickle->Imin + random_uint32_range(0, 4 * trickle->Imin);
     trickle->pid = pid;
     trickle->msg_interval.content.ptr = (char *)trickle;
     trickle->msg_interval.type = interval_msg_type;
