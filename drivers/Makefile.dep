@@ -116,8 +116,11 @@ endif
 ifneq (,$(filter kw2xrf,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += netif
+  USEMODULE += netdev2_ieee802154
   ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-    USEMODULE += gnrc_nomac
+	# XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
+	# as all drivers are ported to netdev2
+    USEMODULE += gnrc_netdev2
   endif
 endif
 
