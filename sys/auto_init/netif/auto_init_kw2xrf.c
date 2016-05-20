@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- * Copyright (C) 2015 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2016 PHYTEC Messtechnik GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -24,7 +24,7 @@
 #include "log.h"
 #include "board.h"
 #include "net/gnrc/netdev2.h"
-#include "net/gnrc/nomac.h"
+#include "net/gnrc/netdev2/ieee802154.h"
 #include "net/gnrc.h"
 
 #include "kw2xrf.h"
@@ -42,7 +42,8 @@
 #define KW2XRF_NUM (sizeof(kw2xrf_params)/sizeof(kw2xrf_params[0]))
 
 static kw2xrf_t kw2xrf_devs[KW2XRF_NUM];
-static char _nomac_stacks[KW2XRF_NUM][KW2XRF_MAC_STACKSIZE];
+static gnrc_netdev2_t gnrc_adpt[KW2XRF_NUM];
+static char _nomac_stacks[KW2XRF_MAC_STACKSIZE][KW2XRF_NUM];
 
 void auto_init_kw2xrf(void)
 {
@@ -51,19 +52,18 @@ void auto_init_kw2xrf(void)
 
         LOG_DEBUG("[auto_init_netif] initializing kw2xrf #%u\n", i);
 
-        int res = kw2xrf_init(&kw2xrf_devs[i],
-                p->spi,
-                p->spi_speed,
-                p->cs_pin,
-                p->int_pin);
-
+        kw2xrf_setup(&kw2xrf_devs[i], (kw2xrf_params_t*) p);
+        int res = gnrc_netdev2_ieee802154_init(&gnrc_adpt[i],
+                                               (netdev2_ieee802154_t *)&kw2xrf_devs[i]);
         if (res < 0) {
             LOG_ERROR("[auto_init_netif] initializing kw2xrf #%u\n", i);
         }
         else {
-            gnrc_nomac_init(_nomac_stacks[i],
-                            KW2XRF_MAC_STACKSIZE, KW2XRF_MAC_PRIO,
-                            "kw2xrf", (gnrc_netdev_t *)&kw2xrf_devs[i]);
+            gnrc_netdev2_init(_nomac_stacks[i],
+                              KW2XRF_MAC_STACKSIZE,
+                              KW2XRF_MAC_PRIO,
+                              "kw2xrf",
+                              &gnrc_adpt[i]);
         }
     }
 }
