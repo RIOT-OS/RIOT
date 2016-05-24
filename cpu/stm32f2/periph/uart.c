@@ -18,6 +18,7 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Hermann Lelong <hermann@otakeys.com>
  * @author      Toon Stegen <toon.stegen@altran.com>
+ * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  *
  * @}
  */
@@ -25,9 +26,9 @@
 #include "cpu.h"
 #include "thread.h"
 #include "sched.h"
-#include "mutex.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
+#include "periph/dma.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -46,13 +47,6 @@ static inline USART_TypeDef *_dev(uart_t uart)
 }
 
 /**
- * @brief   Transmission locks
- */
-static mutex_t tx_sync[UART_NUMOF];
-
-static mutex_t tx_lock[UART_NUMOF];
-
-/**
  * @brief   Find out which peripheral bus the UART device is connected to
  *
  * @return  1: APB1
@@ -66,7 +60,6 @@ static inline int _bus(uart_t uart)
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     USART_TypeDef *dev;
-    DMA_Stream_TypeDef *stream;
     float divider;
     uint16_t mantissa;
     uint8_t fraction;
@@ -96,10 +89,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* remember callback addresses and argument */
     uart_ctx[uart].rx_cb = rx_cb;
     uart_ctx[uart].arg = arg;
-    /* init tx lock */
-    mutex_init(&tx_sync[uart]);
-    mutex_lock(&tx_sync[uart]);
-    mutex_init(&tx_lock[uart]);
 
     /* configure pins */
     gpio_init(uart_config[uart].rx_pin, uart_config[uart].rx_mode);
@@ -133,20 +122,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         dev->CR3 |= USART_CR3_RTSE | USART_CR3_CTSE;
     }
 
-    /* configure the DMA stream for transmission */
-    dma_poweron(uart_config[uart].dma_stream);
-    stream = dma_stream(uart_config[uart].dma_stream);
-    stream->CR = ((uart_config[uart].dma_chan << 25) |
-                  DMA_SxCR_PL_0 |
-                  DMA_SxCR_MINC |
-                  DMA_SxCR_DIR_0 |
-                  DMA_SxCR_TCIE);
-    stream->PAR = (uint32_t)&(dev->DR);
-    stream->FCR = 0;
     /* enable global and receive interrupts */
     NVIC_EnableIRQ(uart_config[uart].irqn);
-    dma_isr_enable(uart_config[uart].dma_stream);
+
     dev->CR1 |= USART_CR1_RXNEIE;
+
     return UART_OK;
 }
 
@@ -162,16 +142,26 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         }
     }
     else {
-        mutex_lock(&tx_lock[uart]);
-        DMA_Stream_TypeDef *stream = dma_stream(uart_config[uart].dma_stream);
-        /* configure and start DMA transfer */
-        stream->M0AR = (uint32_t)data;
-        stream->NDTR = (uint16_t)len;
-        stream->CR |= DMA_SxCR_EN;
-        /* wait for transfer to complete */
-        mutex_lock(&tx_sync[uart]);
-        mutex_unlock(&tx_lock[uart]);
-    }
+        USART_TypeDef *dev = _dev(uart);
+        uint32_t tx_conf = ((uart_config[uart].dma_chan << 25) |
+                            DMA_SxCR_PL_0 |
+                            DMA_SxCR_MINC |
+                            DMA_SxCR_DIR_0 |
+                            DMA_SxCR_TCIE);
+
+        /* acquire dma uart stream */
+        dma_conf_acquire(uart_config[uart].dma_stream);
+        /* UART stream configuration */
+        dma_stream_config(uart_config[uart].dma_stream, (uint32_t)&(dev->DR), tx_conf, (char*) data, (uint16_t)len);
+        /* dma run */
+        dma_enable(uart_config[uart].dma_stream);
+        /* wait until end of transmission */
+        dma_transmission_acquire(uart_config[uart].dma_stream);
+        /* release dma uart stream */
+        dma_conf_release(uart_config[uart].dma_stream);
+        /* disable dma */
+        dma_disable(uart_config[uart].dma_stream);
+   }
 }
 
 void uart_poweron(uart_t uart)
@@ -205,30 +195,10 @@ static inline void irq_handler(int uart, USART_TypeDef *dev)
     }
 }
 
-static inline void dma_handler(int uart, int stream)
-{
-    /* clear DMA done flag */
-    if (stream < 4) {
-        dma_base(stream)->LIFCR = dma_ifc(stream);
-    }
-    else {
-        dma_base(stream)->HIFCR = dma_ifc(stream);
-    }
-    mutex_unlock(&tx_sync[uart]);
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
-}
-
 #ifdef UART_0_ISR
 void UART_0_ISR(void)
 {
     irq_handler(0, uart_config[0].dev);
-}
-
-void UART_0_DMA_ISR(void)
-{
-    dma_handler(0, uart_config[0].dma_stream);
 }
 #endif
 
@@ -237,22 +207,12 @@ void UART_1_ISR(void)
 {
     irq_handler(1, uart_config[1].dev);
 }
-
-void UART_1_DMA_ISR(void)
-{
-    dma_handler(1, uart_config[1].dma_stream);
-}
 #endif
 
 #ifdef UART_2_ISR
 void UART_2_ISR(void)
 {
     irq_handler(2, uart_config[2].dev);
-}
-
-void UART_2_DMA_ISR(void)
-{
-    dma_handler(2, uart_config[2].dma_stream);
 }
 #endif
 
@@ -261,11 +221,6 @@ void UART_3_ISR(void)
 {
     irq_handler(3, uart_config[3].dev);
 }
-
-void UART_3_DMA_ISR(void)
-{
-    dma_handler(3, uart_config[3].dma_stream);
-}
 #endif
 
 #ifdef UART_4_ISR
@@ -273,21 +228,11 @@ void UART_4_ISR(void)
 {
     irq_handler(4, uart_config[4].dev);
 }
-
-void UART_4_DMA_ISR(void)
-{
-    dma_handler(4, uart_config[4].dma_stream);
-}
 #endif
 
 #ifdef UART_5_ISR
 void UART_5_ISR(void)
 {
     irq_handler(5, uart_config[5].dev);
-}
-
-void UART_5_DMA_ISR(void)
-{
-    dma_handler(5, uart_config[5].dma_stream);
 }
 #endif

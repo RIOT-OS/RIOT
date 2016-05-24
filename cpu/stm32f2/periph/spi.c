@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Hamburg University of Applied Sciences
+ * Copyright (C) 2016  OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -16,6 +17,7 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  *
  * @}
  */
@@ -24,6 +26,7 @@
 #include "board.h"
 #include "cpu.h"
 #include "mutex.h"
+#include "periph/dma.h"
 #include "periph/spi.h"
 #include "periph_conf.h"
 #include "thread.h"
@@ -34,6 +37,12 @@
 
 /* guard this file in case no SPI device is defined */
 #if SPI_NUMOF
+
+#define SPI_DMAReq_Rx               (uint32_t)(1)
+#define SPI_DMAReq_Tx               (uint32_t)(2)
+
+static inline void spi_dma_enable(SPI_TypeDef* spi_dev, uint32_t spi_dma_req);
+static inline void spi_dma_disable(SPI_TypeDef* spi_dev, uint32_t spi_dma_req);
 
 /**
  * @brief Data-structure holding the state for a SPI device
@@ -141,16 +150,23 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     spi_conf_pins(dev);
 
     /**************** SPI-Init *****************/
-    spi_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);/* Activate the SPI mode (Reset I2SMOD bit in I2SCFGR register) */
+    /* Activate the SPI mode (Reset I2SMOD bit in I2SCFGR register) */
+    spi_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);
+
     spi_port->CR1 = 0;
     spi_port->CR2 = 0;
+
     /* the NSS (chip select) is managed purely by software */
     spi_port->CR1 |= SPI_CR1_SSM | SPI_CR1_SSI;
-    spi_port->CR1 |= (speed_devider << 3);  /* Define serial clock baud rate. 001 leads to f_PCLK/4 */
-    spi_port->CR1 |= (SPI_CR1_MSTR);  /* 1: master configuration */
+    /* Define serial clock baud rate. 001 leads to f_PCLK/4 */
+    spi_port->CR1 |= (speed_devider << 3);
+    /* 1: master configuration */
+    spi_port->CR1 |= (SPI_CR1_MSTR);
     spi_port->CR1 |= (conf);
+
     /* enable SPI */
     spi_port->CR1 |= (SPI_CR1_SPE);
+
     return 0;
 }
 
@@ -416,9 +432,112 @@ void spi_poweroff(spi_t dev)
     }
 }
 
+int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
+{
+    SPI_TypeDef* spi_dev;
+    uint32_t tx_stream;
+    uint32_t rx_stream;
+    uint32_t tx_channel;
+    uint32_t rx_channel;
+    uint32_t tx_conf;
+    uint32_t rx_conf;
+    uint32_t periph_addr_reg;
+
+    switch (dev) {
+#if SPI_0_EN
+        case SPI_0:
+            spi_dev = SPI_0_DEV;
+
+            tx_stream = SPI_0_DMA_TX_STREAM;
+            rx_stream = SPI_0_DMA_RX_STREAM;
+            tx_channel = SPI_0_DMA_TX_CHANNEL;
+            rx_channel = SPI_0_DMA_RX_CHANNEL;
+            break;
+#endif /* SPI_0_EN */
+#if SPI_1_EN
+        case SPI_1:
+            spi_dev = SPI_1_DEV;
+
+            tx_stream = SPI_1_DMA_TX_STREAM;
+            rx_stream = SPI_1_DMA_RX_STREAM;
+            tx_channel = SPI_1_DMA_TX_CHANNEL;
+            rx_channel = SPI_1_DMA_RX_CHANNEL;
+            break;
+#endif /* SPI_1_EN */
+#if SPI_2_EN
+        case SPI_2:
+            spi_dev = SPI_2_DEV;
+
+            tx_stream = SPI_2_DMA_TX_STREAM;
+            rx_stream = SPI_2_DMA_RX_STREAM;
+            tx_channel = SPI_2_DMA_TX_CHANNEL;
+            rx_channel = SPI_2_DMA_RX_CHANNEL;
+            break;
+#endif /* SPI_2_EN */
+        default:
+            return -1;
+    }
+
+    periph_addr_reg = (uint32_t)&(spi_dev->DR);
+
+    /* DMA configuration */
+    if (in == NULL) {
+        /* channel - medium priority - memory to peripheral - memory increment - complete interrupt enable */
+        tx_conf = ((tx_channel << 25) | DMA_SxCR_PL_0 | DMA_SxCR_DIR_0 | DMA_SxCR_MINC | DMA_SxCR_TCIE);
+        /* channel - medium priority - peripheral to memory - memory increment - complete interrupt enable */
+        rx_conf = ((rx_channel << 25) | DMA_SxCR_PL_0 | DMA_SxCR_MINC | DMA_SxCR_TCIE);
+    }
+    else {
+        /* channel - medium priority - memory to peripheral - complete interrupt enable*/
+        tx_conf = ((tx_channel << 25) | DMA_SxCR_PL_0 | DMA_SxCR_DIR_0 | DMA_SxCR_TCIE);
+        /* channel - medium priority - peripheral to memory - memory increment - complete interrupt enable */
+        rx_conf = ((rx_channel << 25) | DMA_SxCR_PL_0 | DMA_SxCR_MINC | DMA_SxCR_TCIE);
+    }
+
+    /* acquire dma spi rx and tx streams */
+    dma_conf_acquire(tx_stream);
+    dma_conf_acquire(rx_stream);
+
+    /* streams configuration */
+    dma_stream_config(tx_stream, periph_addr_reg, tx_conf, out, (uint16_t)length);
+    dma_stream_config(rx_stream, periph_addr_reg, rx_conf, in, (uint16_t)length);
+
+    /* enable spi in Tx and Rx mode */
+    spi_dma_enable(spi_dev, (SPI_DMAReq_Rx | SPI_DMAReq_Tx));
+
+    /* run dma */
+    dma_enable(tx_stream);
+    dma_enable(rx_stream);
+
+    /* wait end of transmission */
+    dma_transmission_acquire(tx_stream);
+    dma_transmission_acquire(rx_stream);
+
+    /* release dma spi rx and tx streams */
+    dma_conf_release(tx_stream);
+    dma_conf_release(rx_stream);
+
+    /* disable dma */
+    dma_disable(tx_stream);
+    dma_disable(rx_stream);
+
+    return length;
+}
+
+static inline void spi_dma_enable(SPI_TypeDef* spi_dev, uint32_t spi_dma_req)
+{
+    /* enable the selected SPI DMA requests */
+    spi_dev->CR2 |= spi_dma_req;
+}
+
+static inline void spi_dma_disable(SPI_TypeDef* spi_dev, uint32_t spi_dma_req)
+{
+    /* disable the selected SPI DMA requests */
+    spi_dev->CR2 &= (uint16_t)~spi_dma_req;
+}
+
 static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev)
 {
-
     if (spi->SR & SPI_SR_RXNE) {
         char data;
         data = spi->DR;

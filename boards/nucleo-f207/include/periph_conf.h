@@ -14,8 +14,8 @@
  * @name        Peripheral MCU configuration for the nucleo-f207 board
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
- * @author      Aurelien Gonce <aurelien.gonce@altran.fr>
  * @author      Toon Stegen <toon.stegen@altran.com>
+ * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  */
 
 #ifndef PERIPH_CONF_H_
@@ -216,6 +216,11 @@ static const uart_conf_t uart_config[] = {
 #define SPI_0_BUS_DIV           1   /* 1 -> SPI bus runs with half CPU clock, 0 -> quarter CPU clock */
 #define SPI_0_IRQ               SPI1_IRQn
 #define SPI_0_IRQ_HANDLER       isr_spi1
+/* SPI 0 dma configuration */
+#define SPI_0_DMA_RX_STREAM     0 /* Rx stream 0 or 2 channel 3 */
+#define SPI_0_DMA_RX_CHANNEL    3
+#define SPI_0_DMA_TX_STREAM     3 /* Tx stream 3 or 5 channel 3 */
+#define SPI_0_DMA_TX_CHANNEL    3
 /* SPI 0 pin configuration */
 #define SPI_0_SCK_PORT          GPIOA       /* A5 pin is shared with the green LED. */
 #define SPI_0_SCK_PIN           5
@@ -237,6 +242,11 @@ static const uart_conf_t uart_config[] = {
 #define SPI_1_BUS_DIV           0   /* 1 -> SPI bus runs with half CPU clock, 0 -> quarter CPU clock */
 #define SPI_1_IRQ               SPI2_IRQn
 #define SPI_1_IRQ_HANDLER       isr_spi2
+/* SPI 1 dma configuration */
+#define SPI_1_DMA_RX_STREAM     3   /* Rx stream 3 channel 0 */
+#define SPI_1_DMA_RX_CHANNEL    0
+#define SPI_1_DMA_TX_STREAM     4   /* Tx stream 4 channel 0 */
+#define SPI_1_DMA_TX_CHANNEL    0
 /* SPI 1 pin configuration */
 #define SPI_1_SCK_PORT          GPIOB
 #define SPI_1_SCK_PIN           3
