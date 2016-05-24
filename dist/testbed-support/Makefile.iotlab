@@ -48,7 +48,7 @@ iotlab-exp: $(IOTLAB_AUTH) all
 	$(eval NEW_ID := $(shell experiment-cli submit -d $(IOTLAB_DURATION) $(NODES_PARAM) -n $(IOTLAB_EXP_NAME) | grep -Eo '[[:digit:]]+'))
 	$(AD)experiment-cli wait -i $(NEW_ID)
 
-    ifdef $(IOTLAB_LOGGING)
+    ifdef IOTLAB_LOGGING
 	    $(AD)ssh -t $(IOTLAB_AUTHORITY) "tmux new -d -s riot-$(NEW_ID)\
 	    'script -fac "'"'"serial_aggregator -i $(NEW_ID)"'"'"\
 	     RIOT_LOG-$(IOTLAB_EXP_NAME)-$(NEW_ID)'"
