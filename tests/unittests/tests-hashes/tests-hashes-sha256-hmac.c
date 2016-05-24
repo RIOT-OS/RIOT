@@ -18,7 +18,7 @@
 #include "tests-hashes.h"
 
 static int compare_str_vs_digest(const char *str,
-                                 const unsigned char hash[SHA256_DIGEST_LENGTH])
+                                 const uint8_t hash[SHA256_DIGEST_LENGTH])
 {
     char ch[3] = { 0, 0, 0 };
     size_t iter_hash = 0;
@@ -39,7 +39,7 @@ static void test_hashes_hmac_sha256_hash_sequence(void)
     unsigned char key[64];
     /* prepare an empty key */
     memset((void*)key, 0x0, 64);
-    static unsigned char hmac[SHA256_DIGEST_LENGTH];
+    static uint8_t hmac[SHA256_DIGEST_LENGTH];
 
     /* use an empty message */
     const unsigned *m = NULL;

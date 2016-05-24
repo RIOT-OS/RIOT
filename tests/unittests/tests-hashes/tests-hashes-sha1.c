@@ -112,7 +112,7 @@ static int calc_and_compare_hash(const char *str, const char *expected,
 {
     sha1_context ctx;
 
-    uint8_t *hash;
+    uint8_t hash[SHA1_DIGEST_LENGTH];
     char tmp[(3 * SHA1_DIGEST_LENGTH) + 1];
 
     /* calculate hash */
@@ -120,7 +120,7 @@ static int calc_and_compare_hash(const char *str, const char *expected,
     for (long int i = 0; i < repeatcount; ++i) {
         sha1_update(&ctx, (unsigned char*) str, strlen(str));
     }
-    hash = sha1_final(&ctx);
+    sha1_final(&ctx, hash);
     /* copy hash to string */
     for (size_t i = 0; i < SHA1_DIGEST_LENGTH; i++) {
         sprintf(&(tmp[i * 3]), "%02X ", (unsigned) hash[i]);
@@ -150,19 +150,20 @@ static int calc_and_compare_hash_hmac(const char *str, const char *expected,
 {
     sha1_context ctx;
 
-    uint8_t *hash;
+    uint8_t hash[SHA1_DIGEST_LENGTH];
     char tmp[(3 * SHA1_DIGEST_LENGTH) + 1];
 
     /* calculate hash */
     sha1_init_hmac(&ctx, key, key_len);
     sha1_update(&ctx, (unsigned char*) str, strlen(str));
 
-    hash = sha1_final_hmac(&ctx);
+    sha1_final_hmac(&ctx, hash);
     /* copy hash to string */
     for (size_t i = 0; i < SHA1_DIGEST_LENGTH; i++) {
         sprintf(&(tmp[i * 3]), "%02X ", (unsigned) hash[i]);
     }
     tmp[SHA1_DIGEST_LENGTH* 2] = '\0';
+
     /* compare with result string */
     return strncmp(tmp, expected, strlen((char*) tmp));
 }
