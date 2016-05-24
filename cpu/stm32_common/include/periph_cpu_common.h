@@ -31,15 +31,6 @@ extern "C" {
 #define CPUID_LEN           (12U)
 
 /**
- * @brief   Use the shared SPI functions
- * @{
- */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
-/** @} */
-
-/**
  * @brief   Available peripheral buses
  */
 typedef enum {
