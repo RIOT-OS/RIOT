@@ -373,6 +373,11 @@ static void _send_to_iface(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
         gnrc_pktbuf_release(pkt);
         return;
     }
+#ifdef MODULE_NETSTATS_IPV6
+    if_entry->stats.tx_success++;
+    if_entry->stats.tx_bytes += gnrc_pkt_len(pkt->next);
+#endif
+
 #ifdef MODULE_GNRC_SIXLOWPAN
     if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
         DEBUG("ipv6: send to 6LoWPAN instead\n");
@@ -419,6 +424,9 @@ static void _send_unicast(kernel_pid_t iface, uint8_t *dst_l2addr,
 
     DEBUG("ipv6: send unicast over interface %" PRIkernel_pid "\n", iface);
     /* and send to interface */
+#ifdef MODULE_NETSTATS_IPV6
+    gnrc_ipv6_netif_get_stats(iface)->tx_unicast_count++;
+#endif
     _send_to_iface(iface, pkt);
 }
 
@@ -486,6 +494,9 @@ static inline void _send_multicast_over_iface(kernel_pid_t iface, gnrc_pktsnip_t
     DEBUG("ipv6: send multicast over interface %" PRIkernel_pid "\n", iface);
     /* mark as multicast */
     ((gnrc_netif_hdr_t *)pkt->data)->flags |= GNRC_NETIF_HDR_FLAGS_MULTICAST;
+#ifdef MODULE_NETSTATS_IPV6
+    gnrc_ipv6_netif_get_stats(iface)->tx_mcast_count++;
+#endif
     /* and send to interface */
     _send_to_iface(iface, pkt);
 }
@@ -788,6 +799,13 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
     if (netif != NULL) {
         iface = ((gnrc_netif_hdr_t *)netif->data)->if_pid;
+
+#ifdef MODULE_NETSTATS_IPV6
+        assert(iface);
+        netstats_t *stats = gnrc_ipv6_netif_get_stats(iface);
+        stats->rx_count++;
+        stats->rx_bytes += (gnrc_pkt_len(pkt) - netif->size);
+#endif
     }
 
     first_ext = pkt;

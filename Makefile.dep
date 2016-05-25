@@ -507,6 +507,10 @@ ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
   USEMODULE += netopt
 endif
 
+ifneq (,$(filter netstats_%, $(USEMODULE)))
+  USEMODULE += netstats
+endif
+
 ifneq (,$(filter pthread,$(USEMODULE)))
     USEMODULE += xtimer
     USEMODULE += timex
