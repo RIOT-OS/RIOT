@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    driver_si70xx Si70xx
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Driver for the Si7006/13/20/21 temperature and humidity sensor.
  * @{
  *
