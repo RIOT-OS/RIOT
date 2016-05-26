@@ -114,7 +114,7 @@ bool rfc_setup_ble(void)
     return status == R_OP_STATUS_DONE_OK;
 }
 
-void rfc_beacon(void)
+void rfc_ble_beacon(void)
 {
     ble_rop_cmd_t rop;
     memset(&rop, 0, sizeof(rop));

@@ -25,7 +25,7 @@
 /* TODO derive an interface when there is enough to derive from */
 void rfc_prepare(void);
 bool rfc_setup_ble(void);
-void rfc_beacon(void);
+void rfc_ble_beacon(void);
 
 int main(void)
 {
@@ -44,7 +44,7 @@ int main(void)
             __asm__ volatile("nop\n");
         }
 
-        rfc_beacon();
+        rfc_ble_beacon();
 
         LED1_TOGGLE;
     }
