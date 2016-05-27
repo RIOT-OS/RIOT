@@ -84,8 +84,8 @@ extern "C"
 {
 #endif
 
-#ifndef TMP006_I2C_ADDRESS
-#define TMP006_I2C_ADDRESS         0x41 /**< TMP006 Sensor Default Address */
+#ifndef TMP006_ADDR
+#define TMP006_ADDR                0x40 /**< TMP006 Sensor Default Address */
 #endif
 
 #ifndef TMP006_CONVERSION_TIME
