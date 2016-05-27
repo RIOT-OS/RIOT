@@ -20,20 +20,23 @@
  * @}
  */
 
-#ifndef TEST_TMP006_I2C
-#error "TEST_TMP006_I2C not defined"
-#endif
-#ifndef TEST_TMP006_ADDR
-#error "TEST_TMP006_ADDR not defined"
-#endif
-#ifndef TEST_TMP006_CONFIG_CR
-#error "TEST_TMP006_ADDR not defined"
-#endif
-
 #include <stdio.h>
 
 #include "xtimer.h"
 #include "tmp006.h"
+
+#ifdef TMP006_I2C
+#define TEST_TMP006_I2C TMP006_I2C
+#else
+#define TEST_TMP006_I2C I2C_0
+#endif
+#ifdef TMP006_ADDR
+#define TEST_TMP006_ADDR TMP006_ADDR
+#else
+#define TEST_TMP006_ADDR 0x40
+#endif
+
+#define TEST_TMP006_CONFIG_CR       TMP006_CONFIG_CR_DEF /**< Default for Testing */
 
 int main(void)
 {
