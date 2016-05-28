@@ -58,6 +58,9 @@ endif
 ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
     DIRS += net/gnrc/link_layer/netdev2
 endif
+ifneq (,$(filter gnrc_ppp,$(USEMODULE)))
+    DIRS += net/gnrc/link_layer/ppp
+endif
 ifneq (,$(filter fib,$(USEMODULE)))
     DIRS += net/network_layer/fib
 endif
