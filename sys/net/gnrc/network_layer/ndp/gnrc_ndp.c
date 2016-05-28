@@ -460,8 +460,10 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                 /* XXX: can't just use GNRC_NETAPI_MSG_TYPE_SND, since the next retransmission
                  * must also be set. */
                 nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
-                xtimer_set_msg(&nc_entry->rtr_adv_timer, delay, &nc_entry->rtr_adv_msg,
-                               gnrc_ipv6_pid);
+                if (nc_entry) {
+                    xtimer_set_msg(&nc_entry->rtr_adv_timer, delay, &nc_entry->rtr_adv_msg,
+                                   gnrc_ipv6_pid);
+                }
             }
 #endif
         }

@@ -79,9 +79,7 @@ static inline unsigned int cib_avail(cib_t *__restrict cib)
  */
 static inline int cib_get(cib_t *__restrict cib)
 {
-    unsigned int avail = cib_avail(cib);
-
-    if (avail > 0) {
+    if (cib->write_count > cib->read_count) {
         return (int) (cib->read_count++ & cib->mask);
     }
 

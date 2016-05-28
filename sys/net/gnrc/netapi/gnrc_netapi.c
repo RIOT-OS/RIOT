@@ -54,6 +54,7 @@ static inline int _get_set(kernel_pid_t pid, uint16_t type,
     cmd.content.ptr = (void *)&o;
     /* trigger the netapi */
     msg_send_receive(&cmd, &ack, pid);
+    assert(ack.type == GNRC_NETAPI_MSG_TYPE_ACK);
     /* return the ACK message's value */
     return (int)ack.content.value;
 }

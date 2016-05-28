@@ -32,13 +32,36 @@
 #elif CLOCK_HSI
 #define CLOCK_CR_SOURCE            RCC_CR_HSION
 #define CLOCK_CR_SOURCE_RDY        RCC_CR_HSIRDY
-#define CLOCK_PLL_SOURCE           (0)
+#define CLOCK_PLL_DIVMSK           0
+#define CLOCK_PLL_SOURCE           0
+#define CLOCK_DISABLE_HSI          0
+
+#if (CLOCK_PLL_DIV != 1)
+#error "HSI clock cannot be divided"
+#endif
+
 #elif CLOCK_HSE
 #define CLOCK_CR_SOURCE            RCC_CR_HSEON
 #define CLOCK_CR_SOURCE_RDY        RCC_CR_HSERDY
 #define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC
+#define CLOCK_DISABLE_HSI          1
+
+#if (CLOCK_PLL_DIV == 2)
+#define CLOCK_PLL_DIVMSK           RCC_CFGR_PLLXTPRE
+#elif (CLOCK_PLL_DIV == 1)
+#define CLOCK_PLL_DIVMSK           0
+#else
+#error "HSE divider must be 1 or 2"
+#endif
+
 #else
 #error "Please provide CLOCK_HSI or CLOCK_HSE in boards/NAME/includes/perhip_cpu.h"
+#endif
+
+#if CLOCK_PLL_MUL > 16
+#error "PLL multiplier cannot exceed 16 times"
+#elif CLOCK_PLL_MUL < 2
+#error "PLL multiplier cannot be set to 1 or lower"
 #endif
 
 static void clk_init(void);
@@ -89,7 +112,7 @@ static void clk_init(void)
     RCC->CFGR |= (uint32_t)CLOCK_APB1_DIV;
     /*  PLL configuration: PLLCLK = CLOCK_SOURCE / PLL_DIV * PLL_MUL */
     RCC->CFGR &= ~((uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
-    RCC->CFGR |= (uint32_t)(CLOCK_PLL_SOURCE | CLOCK_PLL_DIV | CLOCK_PLL_MUL);
+    RCC->CFGR |= (uint32_t)(CLOCK_PLL_SOURCE | CLOCK_PLL_DIVMSK | ((CLOCK_PLL_MUL - 2) << 18));
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
     /* Wait till PLL is ready */
@@ -99,4 +122,9 @@ static void clk_init(void)
     RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
     /* Wait till PLL is used as system clock source */
     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
+
+#if CLOCK_DISABLE_HSI
+    RCC->CR &= ~(RCC_CR_HSION);
+    while ((RCC->CR & RCC_CR_HSIRDY) != 0) {}
+#endif
 }

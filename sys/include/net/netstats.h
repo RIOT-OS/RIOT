@@ -18,12 +18,23 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
+#include <stdint.h>
+
 #ifndef NETSTATS_H
 #define NETSTATS_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name @ref net_netstats module names
+ * @{
+ */
+#define NETSTATS_LAYER2     (0x01)
+#define NETSTATS_IPV6       (0x02)
+#define NETSTATS_ALL        (0xFF)
+/** @} */
 
 /**
  * @brief       Global statistics struct

@@ -29,10 +29,10 @@ desvirt-check-topo-args: desvirt-check
     endif
 
 desvirt-define: desvirt-check-topo-file
-	cd $(TOOL_DIR) && ./vnet -d $(TOOL_DIR)/.desvirt/$(TOPO_FLE) -n $(basename $(TOPO))
+	cd $(TOOL_DIR) && ./vnet -d $(TOOL_DIR)/.desvirt/ -n $(basename $(TOPO))
 
 desvirt-undefine: desvirt-check-topo-file
-	cd $(TOOL_DIR) && ./vnet -u $(TOOL_DIR)/.desvirt/$(TOPO_FLE) -n $(basename $(TOPO))
+	cd $(TOOL_DIR) && ./vnet -u $(TOOL_DIR)/.desvirt/ -n $(basename $(TOPO))
 
 desvirt-start: desvirt-check-topo-file
 	cd $(TOOL_DIR) && ./vnet -s -n $(basename $(TOPO))
