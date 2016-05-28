@@ -18,6 +18,7 @@ extern "C" {
 #define SIM900_MAX_CMD_SIZE (100U)
 #define SIM900_APN_SIZE (40U)
 
+#define DUMMY_ADDR_LEN (6)
 
 /**
  * @brief	Enum of possible states of sim900 device
@@ -44,7 +45,8 @@ typedef enum {
 typedef struct sim900_t {
     pppdev_t netdev;                            /**< extended pppdev structure */
     uart_t uart;                                /**< UART port of device */
-    uint8_t rx_buf[SIM900_MAX_CMD_SIZE];        /**< rx buffer */
+    uint8_t *rx_buf;                            /**< rx buffer */
+    size_t rx_len;                            /**< len of rx buffer */
     uint16_t rx_count;                          /**< number of bytes received from device */
     uint16_t int_count;                         /**< same as rx_count, but as a temporal variable in interrupt context */
     dev_state_t state;                          /**< state of device */
@@ -64,6 +66,7 @@ typedef struct sim900_t {
     uint32_t rx_accm;                           /**< Async Control Character Map for reception */
     uint8_t apn[SIM900_APN_SIZE];               /**< stores APN name */
     uint8_t apn_len;                            /**< stores APN name */
+    uint8_t mac_addr[DUMMY_ADDR_LEN];                            /**< Dummy MAC holder*/
 } sim900_t;
 
 /**
@@ -71,6 +74,8 @@ typedef struct sim900_t {
  */
 typedef struct sim900_params_t {
     uart_t uart; /**< UART port of device */
+	uint8_t *buf; /**< Pointer to rx buffer */
+	uint16_t buf_len; /**< Len of rx buffer */
 } sim900_params_t;
 
 /**

@@ -207,6 +207,11 @@ void auto_init(void)
     auto_init_netdev2_tap();
 #endif
 
+#ifdef MODULE_SIM900
+    extern void auto_init_sim900(void);
+    auto_init_sim900();
+#endif
+
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
 #ifdef MODULE_GNRC_IPV6_NETIF

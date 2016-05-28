@@ -22,6 +22,8 @@
 #include <string.h>
 
 #include "sim900.h"
+#include "net/eui64.h"
+#include "periph/cpuid.h"
 
 #define PPPINITFCS16    0xffff
 #define PPPGOODFCS16    0xf0b8
@@ -52,10 +54,12 @@
 #define SIM900_DATAMODE_DELAY (1000000U)
 #define SIM900_LINKDOWN_DELAY (1000000U)
 
-
+#define DUMMY_ADDR_LEN (6)
+#define DEFAULT_ACCM (0xffffffff)
 void pdp_netattach_timeout(sim900_t *dev);
 void pdp_netattach(sim900_t *dev);
 void pdp_check_netattach(sim900_t *dev);
+void dial_up(sim900_t *dev);
 
 static inline void _reset_at_status(sim900_t *dev)
 {
@@ -113,6 +117,10 @@ static inline void _rx_escape_next(sim900_t *dev)
 static inline void _write_rx_char(sim900_t *dev, uint8_t data)
 {
     uint8_t c;
+
+	/* Prevent buffer overflow. Shouldn't happen, but just in case. Pkt will be dropped due to wrong checksum */
+	if(dev->int_count >= dev->rx_len)
+		dev->int_count = 0;
 
     if (!(data <= HDLC_SIX_CMPL && dev->rx_accm & (1 << data))) {
         dev->ppp_rx_state = PPP_RX_STARTED;
@@ -270,7 +278,7 @@ void check_data_mode(sim900_t *dev)
         puts("Failed to enter data mode");
 
         /* Force dial-up again */
-        _send_driver_event(&dev->msg, PPPDEV_LINK_DOWN_EVENT);
+		dial_up(dev);
     }
 }
 
@@ -324,26 +332,28 @@ void dial_up(sim900_t *dev)
     at_timeout(dev, SIM900_DATAMODE_DELAY, &check_device_status);
 }
 
-int sim900_set(pppdev_t *dev, uint8_t opt, void *value, size_t value_len)
+int sim900_set(pppdev_t *dev, netopt_t opt, void *value, size_t value_len)
 {
     sim900_t *d = (sim900_t *) dev;
     network_uint32_t *nu32;
 
     nu32 = (network_uint32_t *) value;
     switch (opt) {
-        case PPPOPT_ACCM_RX:
+        case NETOPT_PPP_ACCM_RX:
             d->rx_accm = byteorder_ntohl(*nu32);
             break;
-        case PPPOPT_ACCM_TX:
+        case NETOPT_PPP_ACCM_TX:
             d->tx_accm = byteorder_ntohl(*nu32);
             break;
-        case PPPOPT_APN_NAME:
+        case NETOPT_APN_NAME:
             if (value_len > SIM900_APN_SIZE) {
                 return -1;
             }
             memcpy(d->apn, value, value_len);
             d->apn_len = value_len;
             break;
+		default:
+			return -ENOTSUP;
     }
     return 0;
 }
@@ -357,8 +367,8 @@ int sim900_init(pppdev_t *d)
     dev->int_fcs = PPPINITFCS16;
     dev->_num_esc = 0;
     dev->_stream = 0;
-    dev->rx_accm = 0;
-    dev->tx_accm = 0;
+    dev->rx_accm = DEFAULT_ACCM;
+    dev->tx_accm = DEFAULT_ACCM;
     dev->mac_pid = thread_getpid();
     memset(dev->apn, 0, SIM900_APN_SIZE);
 
@@ -400,9 +410,67 @@ void driver_events(pppdev_t *d, uint8_t event)
     }
 }
 
-int sim900_get(pppdev_t *dev, uint8_t opt, void *value, size_t max_lem)
+static int _get_iid(pppdev_t *pppdev, eui64_t *value, size_t max_len)
 {
-    return 0;
+    if (max_len < sizeof(eui64_t)) {
+        return -EOVERFLOW;
+    }
+
+    uint8_t addr[DUMMY_ADDR_LEN];
+    pppdev->driver->get(pppdev, NETOPT_ADDRESS, addr, DUMMY_ADDR_LEN);
+    value->uint8[0] = addr[0] ^ 0x02;
+    value->uint8[1] = addr[1];
+    value->uint8[2] = addr[2];
+    value->uint8[3] = 0xff;
+    value->uint8[4] = 0xfe;
+    value->uint8[5] = addr[3];
+    value->uint8[6] = addr[4];
+    value->uint8[7] = addr[5];
+
+    return sizeof(eui64_t);
+}
+
+static void _set_mac_address(sim900_t *dev)
+{
+	uint8_t len;
+#if CPUID_LEN
+#	if CPUID_LEN < DUMMY_ADDR_LEN
+	uint8_t cpuid[DUMMY_ADDR_LEN];
+	len = DUMMY_ADDR_LEN;
+#	else
+	uint8_t cpuid[CPUID_LEN];
+	len = CPUID_LEN;
+#endif
+#endif
+
+	memset(&dev->mac_addr, 0, DUMMY_ADDR_LEN);
+#if CPUID_LEN
+	memset(cpuid, 0, len);
+	cpuid_get(cpuid);
+	memcpy(&dev->mac_addr, cpuid, len);
+	for(int i=0;i<DUMMY_ADDR_LEN-len;i++)
+	{
+		dev->mac_addr[len+i] = cpuid[0] ^ cpuid[i%len];
+	}
+
+#endif
+	dev->mac_addr[0] &= ~(0x01);
+	dev->mac_addr[0] |= 0x02;
+}
+
+int sim900_get(pppdev_t *dev, netopt_t opt, void *value, size_t max_lem)
+{
+	/*Fake values*/
+	switch(opt)
+	{
+		case NETOPT_ADDRESS:
+			memcpy(value, ((sim900_t*) dev)->mac_addr, DUMMY_ADDR_LEN);
+			return DUMMY_ADDR_LEN;
+		case NETOPT_IPV6_IID:
+			return _get_iid(dev, value, DUMMY_ADDR_LEN);
+		default:
+			return -ENOTSUP;
+	}
 }
 
 int sim900_dialup(pppdev_t *dev)
@@ -436,5 +504,8 @@ void sim900_setup(sim900_t *dev, const sim900_params_t *params)
 {
     dev->netdev.driver = &pppdev_driver_sim900;
     dev->uart = (uart_t) params->uart;
+	dev->rx_buf = (uint8_t*) params->buf;
+	dev->rx_len = (uint16_t) params->buf_len;
+	_set_mac_address(dev);
     mutex_init(&dev->out_mutex);
 }
