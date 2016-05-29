@@ -21,6 +21,7 @@
 #ifndef BMP180_H_
 #define BMP180_H_
 
+#include "saul.h"
 #include "periph/i2c.h"
 
 #ifdef __cplusplus
@@ -62,6 +63,28 @@ typedef struct {
     bmp180_calibration_t calibration;  /**< Device calibration */
     uint8_t oversampling;              /**< Oversampling mode */
 } bmp180_t;
+
+
+/**
+ * @brief Device initialization parameters
+ */
+typedef struct {
+    i2c_t i2c_dev;
+    uint8_t mode;
+} bmp180_params_t;
+
+/**
+ * @brief export SAUL endpoints
+ * @{
+ */
+extern const saul_driver_t bmp180_temperature_saul_driver;
+extern const saul_driver_t bmp180_pressure_saul_driver;
+/** @} */
+
+/**
+ * @brief auto-initialize all configured BMP180 devices
+ */
+void bmp180_auto_init(void);
 
 /**
  * @brief Initialize the given BMP180 device
