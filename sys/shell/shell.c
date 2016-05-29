@@ -32,6 +32,7 @@
 #include "shell.h"
 #include "shell_commands.h"
 
+#ifndef SHELL_NO_ECHO
 #ifdef MODULE_NEWLIB
 /* use local copy of putchar, as it seems to be inlined,
  * enlarging code by 50% */
@@ -40,6 +41,7 @@ static void _putchar(int c) {
 }
 #else
 #define _putchar putchar
+#endif
 #endif
 
 static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
