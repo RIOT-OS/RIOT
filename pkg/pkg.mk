@@ -9,8 +9,8 @@ PKG_BUILDDIR?=$(BINDIRBASE)/pkg/$(BOARD)/$(PKG_NAME)
 git-download: $(PKG_BUILDDIR)/.git-downloaded
 
 GIT_APPLY_PATCHES:=if test -d "$(PKG_DIR)"/patches; then \
-	git -C "$(PKG_BUILDDIR)" am --ignore-whitespace "$(PKG_DIR)"/patches/*.patch; \
-	fi
+    cd "$(PKG_BUILDDIR)" && git am --ignore-whitespace "$(PKG_DIR)"/patches/*.patch; \
+  fi
 
 $(PKG_BUILDDIR)/.git-downloaded:
 	rm -Rf $(PKG_BUILDDIR)
@@ -21,8 +21,8 @@ $(PKG_BUILDDIR)/.git-downloaded:
 
 clean::
 	@test -d $(PKG_BUILDDIR) && { \
-		git -C $(PKG_BUILDDIR) clean -f ; \
-		git -C $(PKG_BUILDDIR) checkout "$(PKG_VERSION)"; \
+		cd $(PKG_BUILDDIR) && git clean -f ; \
+		cd $(PKG_BUILDDIR) && git checkout "$(PKG_VERSION)"; \
 		$(GIT_APPLY_PATCHES) ; \
 		touch $(PKG_BUILDDIR)/.git-downloaded ; \
 	} > /dev/null 2>&1 || true
