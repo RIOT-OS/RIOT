@@ -123,6 +123,13 @@ static const uart_conf_t uart_config[] = {
 #define SPI_0_MISO_PIN      GPIO_PIN(PORT_B,16)
 /** @} */
 
+/**
+ * @brief PWM configuration
+ * @{
+ */
+#define PWM_NUMOF           0
+/** @} */
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

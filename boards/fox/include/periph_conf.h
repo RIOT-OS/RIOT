@@ -169,6 +169,13 @@ static const uart_conf_t uart_config[] = {
 #define I2C_0_SDA_PIN       GPIO_PIN(PORT_B,7)
 /** @} */
 
+/**
+ * @brief PWM configuration
+ * @{
+ */
+#define PWM_NUMOF           0
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

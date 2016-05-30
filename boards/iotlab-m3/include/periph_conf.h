@@ -175,6 +175,21 @@ static const uart_conf_t uart_config[] = {
 #define I2C_0_SDA_PIN       GPIO_PIN(PORT_B,7)
 /** @} */
 
+/**
+ * @brief PWM configuration
+ * @{
+ */
+#define PWM_EN              1
+
+static const pwm_conf_t pwm_config[] =
+{
+    { TIM4, AFIO_MAPR_TIM4_REMAP_NOREMAP, RCC_APB1ENR_TIM4EN, APB1, {
+            { GPIO_PIN(PORT_B, 9), 3 },
+    } }
+};
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
