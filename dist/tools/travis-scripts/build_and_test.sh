@@ -69,6 +69,11 @@ then
         exit $RESULT
     fi
 
+    if [ "$BUILDTEST_MCU_GROUP" == "host" ]; then
+        make -C dist/tools
+        exit $?
+    fi
+
     if [ "$BUILDTEST_MCU_GROUP" == "x86" ]
     then
         make -C ./tests/unittests all-debug test BOARD=native TERMPROG='gdb -batch -ex r -ex bt $(ELF)' || exit
