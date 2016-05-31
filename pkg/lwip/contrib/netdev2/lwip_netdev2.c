@@ -148,7 +148,7 @@ err_t lwip_netdev2_init(struct netif *netif)
     netif->flags |= NETIF_FLAG_LINK_UP;
     netif->flags |= NETIF_FLAG_IGMP;
     netif->flags |= NETIF_FLAG_MLD6;
-    netdev->isr_arg = netif;
+    netdev->context = netif;
     netdev->event_callback = _event_cb;
 #if LWIP_IPV6_AUTOCONFIG
     netif->ip6_autoconfig_enabled = 1;
@@ -224,7 +224,7 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event, void *arg)
         }
     }
     else {
-        struct netif *netif = dev->isr_arg;
+        struct netif *netif = dev->context;
         switch (event) {
             case NETDEV2_EVENT_RX_COMPLETE: {
                 struct pbuf *p = _get_recv_pkt(dev);
