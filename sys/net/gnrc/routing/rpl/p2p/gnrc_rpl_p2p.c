@@ -348,7 +348,7 @@ void gnrc_rpl_p2p_recv_DRO(gnrc_pktsnip_t *pkt, ipv6_addr_t *src)
 
     if (gnrc_ipv6_netif_find_by_addr(&me, &addr) == dodag->iface) {
         fib_add_entry(&gnrc_ipv6_fib_table, dodag->iface, p2p_ext->target.u8,
-                      sizeof(ipv6_addr_t), FIB_FLAG_NET_PREFIX, src->u8,
+                      sizeof(ipv6_addr_t), 0x0, src->u8,
                       sizeof(ipv6_addr_t), FIB_FLAG_RPL_ROUTE,
                       p2p_ext->dodag->default_lifetime *
                       p2p_ext->dodag->lifetime_unit * SEC_IN_MS);
