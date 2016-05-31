@@ -53,7 +53,7 @@ size_t ieee802154_set_frame_hdr(uint8_t *buf, const uint8_t *src, size_t src_len
 
     /* fill in destination address */
     if (bcast) {
-        /* no AUTOACK for broadcast */
+        /* no ACK_REQ for broadcast */
         buf[0] &= ~IEEE802154_FCF_ACK_REQ;
         buf[1] &= ~IEEE802154_FCF_DST_ADDR_MASK;
         buf[1] |= IEEE802154_FCF_DST_ADDR_SHORT;
