@@ -76,6 +76,7 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
 endif
 
 ifneq (,$(filter trickle,$(USEMODULE)))
+  USEMODULE += random
   USEMODULE += xtimer
 endif
 
