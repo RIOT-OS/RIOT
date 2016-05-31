@@ -404,6 +404,7 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
 #   else
     uint8_t cpuid[CPUID_LEN];
 #endif
+    uint16_t addr_short = 0;
     eui64_t addr_long;
 #endif
 
@@ -435,11 +436,16 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
 
     cpuid_get(cpuid);
 
+    /* generate short hardware address if CPUID_LEN > 0 */
+    for (int i = 0; i < CPUID_LEN; i++) {
+        /* XOR each even byte of the CPUID with LSB of short address
+           and each odd byte with MSB */
+        addr_short ^= (uint16_t)(cpuid[i] << ((i & 0x01) * 8));
+    }
 #if CPUID_LEN > IEEE802154_LONG_ADDRESS_LEN
     for (int i = IEEE802154_LONG_ADDRESS_LEN; i < CPUID_LEN; i++) {
         cpuid[i & 0x07] ^= cpuid[i];
     }
-
 #endif
     /* make sure we mark the address as non-multicast and not globally unique */
     cpuid[0] &= ~(0x01);
@@ -447,7 +453,7 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     /* copy and set long address */
     memcpy(&addr_long, cpuid, IEEE802154_LONG_ADDRESS_LEN);
     kw2xrf_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
-    kw2xrf_set_addr(dev, NTOHS(addr_long.uint16[0].u16));
+    kw2xrf_set_addr(dev, addr_short);
 #else
     kw2xrf_set_addr_long(dev, KW2XRF_DEFAULT_SHORT_ADDR);
     kw2xrf_set_addr(dev, KW2XRF_DEFAULT_ADDR_LONG);
