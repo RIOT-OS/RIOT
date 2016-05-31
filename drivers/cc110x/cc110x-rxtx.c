@@ -347,7 +347,7 @@ int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
 
     unsigned retries;
     for (retries = 0; retries < CC110X_CCA_MAXTRIES; retries++) {
-        xtimer_usleep(CC110X_CCA_RETRY_DELAY * (genrand_uint32() >> 22));
+        xtimer_usleep(CC110X_CCA_RETRY_DELAY * (random_uint32() >> 22));
         if (cc110x_cca(dev)) {
             break;
         }
