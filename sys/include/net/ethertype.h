@@ -40,7 +40,7 @@ extern "C" {
 /**
  * @brief   6LoWPAN header encoding.
  *
- * @see     https://tools.ietf.org/html/draft-droms-6lo-ethertype-request-00
+ * @see     https://tools.ietf.org/html/draft-ietf-6lo-ethertype-request-00
  *
  * `0x87dd` is free according to
  * [IANA database](http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml)
