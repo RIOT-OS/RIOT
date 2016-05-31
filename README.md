@@ -28,7 +28,7 @@ The friendly Operating System for IoT!
 
 RIOT is a real-time multi-threading operating system that supports a range of
 devices that are typically found in the Internet of Things (IoT): 
-8-bit microcontrollers, 16-bit microcontrollers and light-weight 32-bit processors.
+8-bit, 16-bit and 32-bit microcontrollers.
 
 RIOT is based on the following design principles: energy-efficiency, real-time
 capabilities, small memory footprint, modularity, and uniform API access,
@@ -54,10 +54,10 @@ RIOT is based on a microkernel architecture, and provides features including, bu
 * IPv6
 * 6LoWPAN (RFC4944, RFC6282, and RFC6775)
 * UDP
-* RPL 
+* RPL (storing mode, P2P mode)
 * CoAP
 * CCN-Lite
-* ...
+
 
 ## GETTING STARTED
 * You want to start the RIOT? Just follow our [Getting started documentation](https://github.com/RIOT-OS/RIOT/wiki/Introduction)
