@@ -57,7 +57,7 @@ static err_t _eth_link_output(struct netif *netif, struct pbuf *p);
 #ifdef MODULE_LWIP_SIXLOWPAN
 static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p);
 #endif
-static void _event_cb(netdev2_t *dev, netdev2_event_t event, void *arg);
+static void _event_cb(netdev2_t *dev, netdev2_event_t event);
 static void *_event_loop(void *arg);
 
 err_t lwip_netdev2_init(struct netif *netif)
@@ -209,9 +209,8 @@ static struct pbuf *_get_recv_pkt(netdev2_t *dev)
     return p;
 }
 
-static void _event_cb(netdev2_t *dev, netdev2_event_t event, void *arg)
+static void _event_cb(netdev2_t *dev, netdev2_event_t event)
 {
-    (void)arg;
     if (event == NETDEV2_EVENT_ISR) {
         assert(_pid != KERNEL_PID_UNDEF);
         msg_t msg;
