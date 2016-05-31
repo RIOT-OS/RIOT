@@ -36,10 +36,11 @@ independent of the underlying hardware (this API offers partial POSIX
 compliance).
 
 RIOT is developed by an international open source community which is
-independent of specific vendors (e.g. similarly to the Linux community)
-and is licensed with a non-viral copyleft license (LGPLv2.1), which allows
+independent of specific vendors (e.g. similarly to the Linux community).
+RIOT is licensed with LGPLv2.1, a copyleft license which fosters
 indirect business models around the free open-source software platform
-provided by RIOT.
+provided by RIOT, e.g. it is possible to link closed-source code with the
+LGPL code.
 
 ## FEATURES
 
