@@ -39,7 +39,9 @@ const char *state_names[] = {
     [STATUS_MUTEX_BLOCKED] = "bl mutex",
     [STATUS_RECEIVE_BLOCKED] = "bl rx",
     [STATUS_SEND_BLOCKED] = "bl send",
-    [STATUS_REPLY_BLOCKED] = "bl reply"
+    [STATUS_REPLY_BLOCKED] = "bl reply",
+    [STATUS_FLAG_BLOCKED_ANY] = "bl anyfl",
+    [STATUS_FLAG_BLOCKED_ALL] = "bl allfl"
 };
 
 /**
