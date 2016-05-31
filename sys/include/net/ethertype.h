@@ -45,6 +45,9 @@ extern "C" {
  * `0x87dd` is free according to
  * [IANA database](http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml)
  *
+ * To configure interface to use with GNRC set `GNRC_SIXLOENC_IFACE` to the PID
+ * of the corresponding interface.
+ *
  * @warning EXPERIMENTAL!!1!
  * @note    Use proper value when draft becomes RFC.
  */
