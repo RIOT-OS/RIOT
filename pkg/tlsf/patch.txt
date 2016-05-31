@@ -90,7 +90,7 @@ index 0000000..2d8bb4d
 +
 +#endif
 diff --git tlsf.c tlsf.c
-index 3fb5ebd..dce152c 100644
+index 3fb5ebd..99c84b2 100644
 --- tlsf.c
 +++ tlsf.c
 @@ -25,4 +24,0 @@ enum tlsf_private
@@ -130,6 +130,12 @@ index 3fb5ebd..dce152c 100644
 @@ -345 +337 @@ static void mapping_search(size_t size, int* fli, int* sli)
 -static block_header_t* search_suitable_block(control_t* control, int* fli, int* sli)
 +static block_header_t* search_suitable_block(int* fli, int* sli)
+@@ -354 +346 @@ static block_header_t* search_suitable_block(control_t* control, int* fli, int*
+-	unsigned int sl_map = control->sl_bitmap[fl] & (~0 << sl);
++	unsigned int sl_map = control->sl_bitmap[fl] & (((unsigned int)~0) << sl);
+@@ -358 +350 @@ static block_header_t* search_suitable_block(control_t* control, int* fli, int*
+-		const unsigned int fl_map = control->fl_bitmap & (~0 << (fl + 1));
++		const unsigned int fl_map = control->fl_bitmap & (((unsigned int)~0) << (fl + 1));
 @@ -378 +370 @@ static block_header_t* search_suitable_block(control_t* control, int* fli, int*
 -static void remove_free_block(control_t* control, block_header_t* block, int fl, int sl)
 +static void remove_free_block(block_header_t* block, int fl, int sl)
