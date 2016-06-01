@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 #define THREAD_STACKSIZE_IDLE      (96)
-#define MSP430_ISR_STACK_SIZE           (256)
+#define ISR_STACKSIZE              (256)
 
 #ifndef GNRC_PKTBUF_SIZE
 #define GNRC_PKTBUF_SIZE                (2560)    /* TODO: Make this value

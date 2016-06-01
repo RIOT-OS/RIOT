@@ -75,7 +75,7 @@ extern volatile int __irq_is_in;
 /**
  * @brief   Memory used as stack for the interrupt context
  */
-extern char __isr_stack[MSP430_ISR_STACK_SIZE];
+extern char __isr_stack[ISR_STACKSIZE];
 
 /**
  * @brief   Save the current thread context from inside an ISR
@@ -126,7 +126,7 @@ static inline void __attribute__((always_inline)) __restore_context(void)
 static inline void __attribute__((always_inline)) __enter_isr(void)
 {
     __save_context();
-    __asm__("mov.w %0,r1" : : "i"(__isr_stack + MSP430_ISR_STACK_SIZE));
+    __asm__("mov.w %0,r1" : : "i"(__isr_stack + ISR_STACKSIZE));
     __irq_is_in = 1;
 }
 
