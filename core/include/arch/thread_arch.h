@@ -59,6 +59,11 @@ typedef void *(*thread_task_func_t)(void *arg);
 char *thread_arch_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size);
 
 /**
+ * @brief   Get the number of bytes used on the ISR stack
+ */
+int thread_arch_isr_stack_usage(void);
+
+/**
  * @brief Print the current stack to stdout
  */
 void thread_arch_stack_print(void);
