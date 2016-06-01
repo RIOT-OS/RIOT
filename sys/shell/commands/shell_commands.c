@@ -87,6 +87,9 @@ extern int _random_get(int argc, char **argv);
 #ifdef MODULE_GNRC_NETIF
 extern int _netif_config(int argc, char **argv);
 extern int _netif_send(int argc, char **argv);
+//#ifdef MODULE_NETDEV2_IEEE802154
+extern int _iwpan_config(int argc, char **argv);
+//#endif
 #endif
 
 #ifdef MODULE_FIB
@@ -178,6 +181,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_GNRC_NETIF
     {"ifconfig", "Configure network interfaces", _netif_config},
     {"txtsnd", "Sends a custom string as is over the link layer", _netif_send },
+//#ifdef MODULE_NETDEV2_IEEE802154
+    {"iwpan", "Configure 802.15.4 PHY", _iwpan_config },
+//#endif
 #endif
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
