@@ -111,6 +111,10 @@
 #include "xtimer.h"
 #include "trickle.h"
 
+#ifdef MODULE_NETSTATS_RPL
+#include "net/rpl/rpl_netstats.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -447,6 +451,13 @@ extern kernel_pid_t gnrc_rpl_pid;
  */
 extern const ipv6_addr_t ipv6_addr_all_rpl_nodes;
 
+#ifdef MODULE_NETSTATS_RPL
+/**
+ * @brief Statistics for RPL control messages
+ */
+extern netstats_rpl_t gnrc_rpl_netstats;
+#endif
+
 /**
  * @brief Initialization of the RPL thread.
  *
@@ -525,9 +536,11 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
  * @param[in] dio       Pointer to the DIO message.
  * @param[in] iface     Interface PID of the incoming DIO.
  * @param[in] src       Pointer to the source address of the IPv6 packet.
+ * @param[in] dst       Pointer to the destination address of the IPv6 packet.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src, uint16_t len);
+void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
+                       uint16_t len);
 
 /**
  * @brief   Parse a DAO.
@@ -535,18 +548,23 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
  * @param[in] dao       Pointer to the DAO message.
  * @param[in] iface     Interface PID of the incoming DIO.
  * @param[in] src       Pointer to the source address of the IPv6 packet.
+ * @param[in] dst       Pointer to the destination address of the IPv6 packet.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src, uint16_t len);
+void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
+                       uint16_t len);
 
 /**
  * @brief   Parse a DAO-ACK.
  *
  * @param[in] dao_ack   Pointer to the DAO-ACK message.
  * @param[in] iface     Interface PID of the incoming DIO.
+ * @param[in] src       Pointer to the source address of the IPv6 packet.
+ * @param[in] dst       Pointer to the destination address of the IPv6 packet.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, uint16_t len);
+void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, ipv6_addr_t *src,
+                           ipv6_addr_t *dst, uint16_t len);
 
 /**
  * @brief   Delay the DAO sending interval
