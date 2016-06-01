@@ -34,7 +34,7 @@ static gpio_isr_ctx_t gpio_chan[GPIO_ISR_CHAN_NUMOF];
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    if ((pin < 0) || (pin > 31))
+    if ((unsigned int)pin > 31)
         return -1;
 
     /* enable GPIO clock */
