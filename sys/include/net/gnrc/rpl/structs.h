@@ -33,6 +33,31 @@ extern "C" {
 #include "trickle.h"
 
 /**
+ * @name Option lengths
+ * @{
+ */
+#define GNRC_RPL_OPT_DODAG_CONF_LEN         (14)
+#define GNRC_RPL_OPT_PREFIX_INFO_LEN        (30)
+#define GNRC_RPL_OPT_TARGET_LEN             (18)
+#define GNRC_RPL_OPT_TRANSIT_INFO_LEN       (4)
+/** @} */
+
+/**
+ * @name DAO flag macros
+ * @{
+ */
+#define GNRC_RPL_DAO_D_BIT                  (1 << 6)
+#define GNRC_RPL_DAO_K_BIT                  (1 << 7)
+/** @} */
+
+/**
+ * @name DAO-ACK flag macros
+ * @{
+ */
+#define GNRC_RPL_DAO_ACK_D_BIT              (1 << 7)
+/** @} */
+
+/**
  * @anchor GNRC_RPL_REQ_DIO_OPTS
  * @name DIO Options for gnrc_rpl_dodag_t::dio_opts
  * @{

@@ -72,6 +72,12 @@
  *   interface exists (`GNRC_NETIF_NUMOF > 1`)
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  *   CFLAGS += -DGNRC_RPL_DEFAULT_NETIF=6
+ *
+ * - By default, all incoming control messages get checked for validation.
+ *   This validation can be disabled in case the involved RPL implementations
+ *   are known to produce valid messages.
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ *   CFLAGS += -DGNRC_RPL_WITHOUT_VALIDATION
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @{
