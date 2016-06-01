@@ -30,7 +30,7 @@
 
 static void usage(void)
 {
-    fprintf(stderr, "usage: ethos <tap> <serial>\n");
+    fprintf(stderr, "usage: eth_over_serial <tap> <serial>\n");
 }
 
 static void checked_write(int handle, void *buffer, int nbyte)

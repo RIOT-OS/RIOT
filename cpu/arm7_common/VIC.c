@@ -14,20 +14,20 @@
 static inline unsigned __get_cpsr(void)
 {
     unsigned long retval;
-    __asm__ volatile(" mrs  %0, cpsr" : "=r"(retval) : /* no inputs */);
+    asm volatile(" mrs  %0, cpsr" : "=r"(retval) : /* no inputs */);
     return retval;
 }
 
 int irq_is_in(void)
 {
     int retval;
-    __asm__ volatile(" mrs  %0, cpsr" : "=r"(retval) : /* no inputs */);
+    asm volatile(" mrs  %0, cpsr" : "=r"(retval) : /* no inputs */);
     return (retval & INTMode) == 18;
 }
 
 static inline void __set_cpsr(unsigned val)
 {
-    __asm__ volatile(" msr  cpsr, %0" : /* no outputs */ : "r"(val));
+    asm volatile(" msr  cpsr, %0" : /* no outputs */ : "r"(val));
 }
 
 unsigned irq_disable(void)

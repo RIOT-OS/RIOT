@@ -41,7 +41,7 @@ void panic_arch(void)
 #ifdef DEVELHELP
     print_ipsr();
     /* The bkpt instruction will signal to the debugger to break here. */
-    __asm__("bkpt #0");
+    __ASM("bkpt #0");
     /* enter infinite loop, into deepest possible sleep mode */
     while (1) {
         lpm_set(LPM_OFF);

@@ -31,10 +31,13 @@
 #include "lwip/conn.h"
 #endif
 
+<<<<<<< HEAD
 #ifdef MODULE_EMB6_CONN_UDP
 #include "emb6/conn/udp.h"
 #endif
 
+=======
+>>>>>>> origin/newmaster
 #ifdef __cplusplus
 extern "C" {
 #endif
