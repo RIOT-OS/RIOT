@@ -24,6 +24,10 @@
 #include "config.h"
 #endif
 
+#ifdef MODULE_BMP180
+#include "bmp180.h"
+#endif
+
 #ifdef MODULE_SHT11
 #include "sht11.h"
 #endif
@@ -108,6 +112,10 @@ void auto_init(void)
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");
     rtc_init();
+#endif
+#ifdef MODULE_BMP180
+    DEBUG("Auto init BMP180 module.\n");
+    bmp180_auto_init();
 #endif
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");
