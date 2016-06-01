@@ -171,7 +171,7 @@ do_debug() {
     # save PID for terminating the server afterwards
     DBG_PID=$?
     # connect to the GDB server
-    ${DBG} ${TUI} -ex "tar ext :${GDB_PORT}" ${ELFFILE}
+    ${DBG} -q ${TUI} -ex "tar ext :${GDB_PORT}" ${ELFFILE}
     # clean up
     kill ${DBG_PID}
 }
