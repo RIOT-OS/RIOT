@@ -489,6 +489,8 @@ static inline void _stop(SercomI2cm *dev)
     while(dev->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
     /* Stop command */
     dev->CTRLB.reg |= SERCOM_I2CM_CTRLB_CMD(3);
+    /* Wait for bus to be idle again */
+    while(dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE(1)) {}
     DEBUG("Stop sent\n");
 }
 
