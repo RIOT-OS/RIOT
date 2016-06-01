@@ -13,7 +13,7 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#include "thread_arch.h"
+#include "arch/thread_arch.h"
 
 /* This function calculates the ISR_usage */
 int thread_arch_isr_stack_usage(void)
