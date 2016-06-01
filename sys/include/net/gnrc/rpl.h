@@ -24,6 +24,25 @@
  *   USEMODULE += gnrc_rpl
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
+ * - RPL auto-initialization on interface
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ *   USEMODULE += auto_init_gnrc_rpl
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * Auto-Initialization
+ * -------------------
+ *
+ * If the application defines only one interface (`GNRC_NETIF_NUMOF == 1`),
+ * then RPL will be initialized on this interface.
+ *
+ * If the application defines several interfaces (`GNRC_NETIF_NUMOF > 1`),
+ * then RPL will be initialized on the interface `GNRC_RPL_DEFAULT_NETIF`.
+ * Your application is responsible for setting `GNRC_RPL_DEFAULT_NETIF` to a
+ * valid interface PID, e.g. via `CFLAGS`.
+ *
+ * Initializing RPL on multiple interfaces automatically is currently not supported.
+ * Call `gnrc_rpl_init()` manually from your application for the desired interfaces in this case.
+ *
  * CFLAGS
  * ------
  *
@@ -47,6 +66,12 @@
  *   only a DODAG once a DODAG_CONF is received.
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  *   CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * - Set interface for auto-initialization if more than one
+ *   interface exists (`GNRC_NETIF_NUMOF > 1`)
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ *   CFLAGS += -DGNRC_RPL_DEFAULT_NETIF=6
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @{
