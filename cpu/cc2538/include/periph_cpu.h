@@ -22,6 +22,7 @@
 #include <stdint.h>
 
 #include "cc2538_ssi.h"
+#include "cc2538_gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,6 +39,8 @@ extern "C" {
  */
 #define HAVE_GPIO_T
 typedef uint32_t gpio_t;
+
+#define GPIO_PIN(port_num, bit_num) GPIO_PXX_TO_NUM(port_num, bit_num)
 /** @} */
 
 /**
