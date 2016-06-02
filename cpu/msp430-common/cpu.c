@@ -33,6 +33,13 @@ __attribute__((naked)) void thread_yield_higher(void)
     UNREACHABLE();
 }
 
+/* This function calculates the ISR_usage */
+int thread_arch_isr_stack_usage(void)
+{
+    /* TODO */
+    return -1;
+}
+
 NORETURN void cpu_switch_context_exit(void)
 {
     sched_active_thread = sched_threads[0];

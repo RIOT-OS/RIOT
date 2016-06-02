@@ -71,6 +71,16 @@ void ps(void)
 #endif
            "state");
 
+#ifdef DEVELHELP
+    int isr_usage = thread_arch_isr_stack_usage();                                 /* ISR stack usage */
+    printf("\t  - | isr_stack            | -        - |"
+           "   - | %5i (%5i) | -\n", ISR_STACKSIZE, isr_usage);
+    overall_stacksz += ISR_STACKSIZE;
+    if (isr_usage > 0) {
+        overall_used += isr_usage;
+    }
+#endif
+
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
         thread_t *p = (thread_t *)sched_threads[i];
 
