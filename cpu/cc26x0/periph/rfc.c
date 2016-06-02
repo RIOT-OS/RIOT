@@ -131,6 +131,7 @@ bool rfc_ping_test(void)
     pingCommand.commandID = CMDR_CMDID_PING;
     RFC_DBELL->CMDR = (uint32_t) (&pingCommand);
     while (!RFC_DBELL->CMDSTA); /* wait for cmd execution */
+    printf("rfc_ping fails without a printf reading cmdsta %lu\n", RFC_DBELL->CMDSTA);
     return RFC_DBELL->CMDSTA == CMDSTA_RESULT_DONE;
 }
 
