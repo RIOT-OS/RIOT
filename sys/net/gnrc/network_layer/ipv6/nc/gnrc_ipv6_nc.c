@@ -60,7 +60,7 @@ static void _nc_remove(kernel_pid_t iface, gnrc_ipv6_nc_t *entry)
 
     gnrc_ipv6_netif_t *if_entry = gnrc_ipv6_netif_get(iface);
 
-    if ((if_entry != NULL) && (if_entry->rtr_adv_msg.content.ptr == (char *) entry)) {
+    if ((if_entry != NULL) && (if_entry->rtr_adv_msg.content.ptr == entry)) {
         /* cancel timer set by gnrc_ndp_rtr_sol_handle */
         xtimer_remove(&if_entry->rtr_adv_timer);
     }
@@ -175,18 +175,18 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_add(kernel_pid_t iface, const ipv6_addr_t *ipv6_add
 
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
     free_entry->type_timeout_msg.type = GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT;
-    free_entry->type_timeout_msg.content.ptr = (char *) free_entry;
+    free_entry->type_timeout_msg.content.ptr = free_entry;
 #endif
 
     free_entry->rtr_timeout_msg.type = GNRC_NDP_MSG_RTR_TIMEOUT;
-    free_entry->rtr_timeout_msg.content.ptr = (char *) free_entry;
+    free_entry->rtr_timeout_msg.content.ptr = free_entry;
 
 #if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
     free_entry->rtr_adv_msg.type = GNRC_NDP_MSG_RTR_ADV_DELAY;
-    free_entry->rtr_adv_msg.content.ptr = (char *) free_entry;
+    free_entry->rtr_adv_msg.content.ptr = free_entry;
 #endif
 
-    free_entry->nbr_sol_msg.content.ptr = (char *) free_entry;
+    free_entry->nbr_sol_msg.content.ptr = free_entry;
 
     return free_entry;
 }

@@ -290,7 +290,7 @@ static void _send(gnrc_pktsnip_t *pkt)
 
         /* set the outgoing message's fields */
         msg.type = GNRC_SIXLOWPAN_MSG_FRAG_SND;
-        msg.content.ptr = (void *)&fragment_msg;
+        msg.content.ptr = &fragment_msg;
         /* send message to self */
         msg_send_to_self(&msg);
     }
@@ -332,12 +332,12 @@ static void *_event_loop(void *args)
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 DEBUG("6lo: GNRC_NETDEV_MSG_TYPE_RCV received\n");
-                _receive((gnrc_pktsnip_t *)msg.content.ptr);
+                _receive(msg.content.ptr);
                 break;
 
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("6lo: GNRC_NETDEV_MSG_TYPE_SND received\n");
-                _send((gnrc_pktsnip_t *)msg.content.ptr);
+                _send(msg.content.ptr);
                 break;
 
             case GNRC_NETAPI_MSG_TYPE_GET:
@@ -349,7 +349,7 @@ static void *_event_loop(void *args)
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
             case GNRC_SIXLOWPAN_MSG_FRAG_SND:
                 DEBUG("6lo: send fragmented event received\n");
-                gnrc_sixlowpan_frag_send((gnrc_sixlowpan_msg_frag_t *)msg.content.ptr);
+                gnrc_sixlowpan_frag_send(msg.content.ptr);
                 break;
 #endif
 

@@ -44,7 +44,7 @@ void *thread1(void *arg)
     /* step 2: send message, turning its status into STATUS_REPLY_BLOCKED */
     msg_send_receive(&msg, &reply, p_main);
     printf("received: %" PRIkernel_pid ", %u \n", reply.sender_pid, reply.type);
-    printf("pointer: %s\n", reply.content.ptr);
+    printf("pointer: %s\n", (char *)reply.content.ptr);
 
     printf("THREAD %" PRIkernel_pid " SHOULD BE BLOCKING :(\n", p1);
 

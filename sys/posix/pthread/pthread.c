@@ -108,7 +108,7 @@ static void *pthread_reaper(void *arg)
     while (1) {
         msg_t m;
         msg_receive(&m);
-        DEBUG("pthread_reaper(): free(%p)\n", (void *)m.content.ptr);
+        DEBUG("pthread_reaper(): free(%p)\n", m.content.ptr);
         free(m.content.ptr);
     }
 

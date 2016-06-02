@@ -57,7 +57,7 @@ int sema_destroy(sema_t *sema)
         msg_t msg;
         kernel_pid_t pid = (kernel_pid_t)next->data;
         msg.type = MSG_DESTROYED;
-        msg.content.ptr = (void *) sema;
+        msg.content.ptr = sema;
         msg_send_int(&msg, pid);
     }
     irq_restore(old_state);
@@ -77,7 +77,7 @@ int sema_wait_timed_msg(sema_t *sema, uint64_t timeout, msg_t *msg)
         old_state = irq_disable();
         timeout_timer.target = 0, timeout_timer.long_target = 0;
         timeout_msg.type = MSG_TIMEOUT;
-        timeout_msg.content.ptr = (char *)sema;
+        timeout_msg.content.ptr = sema;
         /* we will stay in the same stack context so we can use timeout_msg */
         xtimer_set_msg64(&timeout_timer, timeout, &timeout_msg, sched_active_pid);
         irq_restore(old_state);
@@ -111,7 +111,7 @@ int sema_wait_timed_msg(sema_t *sema, uint64_t timeout, msg_t *msg)
         }
         priority_queue_remove(&sema->queue, &n);
         irq_restore(old_state);
-        if (msg->content.ptr != (void *)sema) {
+        if (msg->content.ptr != sema) {
             return -EAGAIN;
         }
 
@@ -164,7 +164,7 @@ int sema_post(sema_t *sema)
         DEBUG("sema_post: %" PRIkernel_pid ": waking up %" PRIkernel_pid "\n",
               sched_active_thread->pid, next_process->pid);
         msg.type = MSG_SIGNAL;
-        msg.content.ptr = (void *) sema;
+        msg.content.ptr = sema;
         msg_send_int(&msg, pid);
         irq_restore(old_state);
         sched_switch(prio);

@@ -404,7 +404,7 @@ void msg_queue_print(void)
         msg_t *m = &msg_array[i];
         printf("    * %u: sender: %" PRIkernel_pid ", type: 0x%04" PRIu16
                ", content: %" PRIu32 " (%p)\n", i, m->sender_pid, m->type,
-               m->content.value, (void *)m->content.ptr);
+               m->content.value, m->content.ptr);
     }
 
     irq_restore(state);

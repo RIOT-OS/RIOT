@@ -48,7 +48,7 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
         msg_t msg;
 
         msg.type = MSG_TYPE_ISR;
-        msg.content.ptr = (void *) dev;
+        msg.content.ptr = dev;
 
         if (msg_send(&msg, _recv_pid) <= 0) {
             puts("gnrc_netdev2: possibly lost interrupt.");
@@ -75,7 +75,7 @@ void *_recv_thread(void *arg)
         msg_t msg;
         msg_receive(&msg);
         if (msg.type == MSG_TYPE_ISR) {
-            netdev2_t *dev = (netdev2_t *)msg.content.ptr;
+            netdev2_t *dev = msg.content.ptr;
             dev->driver->isr(dev);
         }
         else {

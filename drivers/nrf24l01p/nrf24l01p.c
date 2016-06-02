@@ -1019,7 +1019,7 @@ void nrf24l01p_rx_cb(void *arg)
     if (dev->listener != KERNEL_PID_UNDEF) {
         msg_t m;
         m.type = RCV_PKT_NRF24L01P;
-        m.content.ptr = (char *)dev;
+        m.content.ptr = dev;
         /* transmit more things here ? */
         msg_send_int(&m, dev->listener);
     }
