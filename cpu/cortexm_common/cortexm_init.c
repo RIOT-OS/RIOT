@@ -46,7 +46,7 @@ void cortexm_init(void)
     /* set SVC interrupt to same priority as the rest */
     NVIC_SetPriority(SVCall_IRQn, CPU_DEFAULT_IRQ_PRIO);
     /* initialize all vendor specific interrupts with the same value */
-    for (int i = 0; i < (int)CPU_IRQ_NUMOF; i++) {
+    for (unsigned i = 0; i < CPU_IRQ_NUMOF; i++) {
         NVIC_SetPriority((IRQn_Type) i, CPU_DEFAULT_IRQ_PRIO);
     }
 
