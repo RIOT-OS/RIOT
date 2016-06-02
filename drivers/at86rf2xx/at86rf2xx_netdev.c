@@ -61,7 +61,7 @@ static void _irq_handler(void *arg)
     netdev2_t *dev = (netdev2_t *) arg;
 
     if (dev->event_callback) {
-        dev->event_callback(dev, NETDEV2_EVENT_ISR, NULL);
+        dev->event_callback(dev, NETDEV2_EVENT_ISR);
     }
 }
 
@@ -606,7 +606,7 @@ static void _isr(netdev2_t *netdev)
                   AT86RF2XX_TRX_STATE_MASK__TRAC;
 
     if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__RX_START) {
-        netdev->event_callback(netdev, NETDEV2_EVENT_RX_STARTED, NULL);
+        netdev->event_callback(netdev, NETDEV2_EVENT_RX_STARTED);
         DEBUG("[at86rf2xx] EVT - RX_START\n");
     }
 
@@ -617,7 +617,7 @@ static void _isr(netdev2_t *netdev)
             if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)) {
                 return;
             }
-            netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE, NULL);
+            netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
         }
         else if (state == AT86RF2XX_STATE_TX_ARET_ON ||
                  state == AT86RF2XX_STATE_BUSY_TX_ARET) {
@@ -635,15 +635,15 @@ static void _isr(netdev2_t *netdev)
                 switch (trac_status) {
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
-                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE, NULL);
+                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE);
                         DEBUG("[at86rf2xx] TX SUCCESS\n");
                         break;
                     case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
-                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_NOACK, NULL);
+                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_NOACK);
                         DEBUG("[at86rf2xx] TX NO_ACK\n");
                         break;
                     case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
-                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_MEDIUM_BUSY, NULL);
+                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_MEDIUM_BUSY);
                         DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
                         break;
                     default:

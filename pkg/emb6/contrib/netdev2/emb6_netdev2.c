@@ -80,9 +80,8 @@ static void _get_recv_pkt(void)
     }
 }
 
-static void _event_cb(netdev2_t *dev, netdev2_event_t event, void *arg)
+static void _event_cb(netdev2_t *dev, netdev2_event_t event)
 {
-    (void)arg;
     if (event == NETDEV2_EVENT_ISR) {
         /* EVENT_TYPE_PCK_LL is supposed to be used by drivers, so use it
          * (though NETDEV2_EVENT_ISR technically doesn't only signify
