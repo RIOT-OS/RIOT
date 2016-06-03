@@ -575,7 +575,7 @@ inline static size_t iphc_nhc_udp_encode(gnrc_pktsnip_t *udp, ipv6_hdr_t *ipv6_h
     else {
         /* shrink udp allocation to final size */
         gnrc_pktbuf_realloc_data(udp, nhc_len);
-        DEBUG("6lo iphc nhc: set udp len to %d\n", nhc_len);
+        DEBUG("6lo iphc nhc: set udp len to %d\n", (int) nhc_len);
     }
 
     return nhc_len;
