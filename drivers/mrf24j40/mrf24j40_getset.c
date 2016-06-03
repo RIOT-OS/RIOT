@@ -78,6 +78,8 @@ void mrf24j40_set_chan(mrf24j40_t *dev, uint8_t channel)
     dev->chan = channel;
 
     mrf24j40_configure_phy(dev);
+    // TODO
+    // noch mal überprüfen
 }
 
 uint16_t mrf24j40_get_pan(mrf24j40_t *dev)

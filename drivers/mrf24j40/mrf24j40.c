@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Hochschule für Angewandte Wissenschaften Hamburg
+ * Copyright (C) 2016 Hochschule fÃ¼r Angewandte Wissenschaften Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,41 +13,35 @@
  * @file
  * @brief       Implementation of public functions for MRF24J40 drivers
  *
- * @author      Bernhard Nägele <bernhard@naegele-privat.de>
+ * @author      Bernhard NÃ¤gele <bernhard@naegele-privat.de>
+ * @author      Tobias Fredersdorf <tobias.fredersdorf@haw-hamburg.de>
  *
  * @}
  */
 
-//#include "periph/cpuid.h"
-//#include "byteorder.h"
-//#include "net/ieee802154.h"
-//#include "net/gnrc.h"
+#include "periph/cpuid.h"
+#include "byteorder.h"
+#include "net/ieee802154.h"
+#include "net/gnrc.h"
 #include "mrf24j40.h"
 #include "mrf24j40_registers.h"
 #include "mrf24j40_internal.h"
-// #include "mrf24j40_netdev.h"
+#include "mrf24j40_netdev.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-
-void mrf24j40_set_interrupts(mrf24j40_t *dev) {
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0b11110110);
-}
-
-
-void mrf24j40_clear_irq_flags(mrf24j40_t *dev) {
-	mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);   /* clear by read */
-}
-
-static void _irq_handler(void *arg)
+void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params)
 {
-    msg_t msg;
-    mrf24j40_t *dev = (mrf24j40_t *) arg;
+    netdev2_t *netdev = (netdev2_t *)dev;
 
-    /* tell driver thread about the interrupt */
-    msg.type = GNRC_NETDEV_MSG_TYPE_EVENT;
-    msg_send(&msg, dev->mac_pid);
+    netdev->driver = &mrf24j40_driver;
+    /* initialize device descriptor */
+    memcpy(&dev->params, params, sizeof(at86rf2xx_params_t));
+    dev->idle_state = MRF24J40_RFSTATE_RX;
+    dev->state = MRF24J40_RFSTATE_SLEEP;
+    /* initialise SPI */
+    spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING, params->spi_speed);
 }
 
 int mrf24j40_init(mrf24j40_t *dev, spi_t spi, spi_speed_t spi_speed,
@@ -128,7 +122,7 @@ void mrf24j40_reset(mrf24j40_t *dev)
     /* set default TX power */
     mrf24j40_set_txpower(dev, MRF24J40_DEFAULT_TXPOWER);
 
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x04);	//  – Reset RF state machine.
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x04);	//  â€“ Reset RF state machine.
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x00);	// part 2
 
 	xtimer_usleep(20);				/* Delay at least 192us */
@@ -200,3 +194,58 @@ void mrf24j40_reset(mrf24j40_t *dev)
     DEBUG("mrf24j40_reset(): reset complete.\n");
 }
 
+void mrf24j40_tx_prepare(mrf24j40_t *dev)
+{
+    
+    mrf24j40_set_state(dev, MRF24J40_RFSTATE_TX);
+    dev->tx_frame_len = IEEE802154_FCS_LEN;
+}
+
+size_t mrf24j40_tx_load(mrf24j40_t *dev, uint8_t *data,
+                         size_t len)
+{
+    dev->tx_frame_len += (uint8_t)len;
+    mrf24j40_tx_write(dev, data, len);
+    return len;
+}
+
+void mrf24j40_tx_exec(mrf24j40_t *dev)
+{
+    netdev2_t *netdev = (netdev2_t *)dev;
+
+    /* write frame length field in FIFO */
+    mrf24j40_tx_write(dev, 0, &(dev->tx_frame_len), 1);
+    /* trigger sending of pre-loaded frame */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON,1);
+    if (netdev->event_callback &&
+        (dev->netdev.flags & MRF24J40_OPT_TELL_TX_START)) {
+        netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED, NULL);
+    }
+}
+
+/*size_t mrf24j40_tx_len(mrf24j40_t *dev)
+{
+    uint8_t phr;
+
+    mrf24j40_fb_read(dev, &phr, 1);
+
+    /* ignore MSB (refer p.80) and substract length of FCS field 
+    return (size_t)((phr & 0x7f) - 2);
+}*/
+
+void mrf24j40_rx_read(mrf24j40_t *dev, uint8_t *data, size_t len)
+{
+    mrf24j40_rx_read_int(dev,data,len);
+}
+
+size_t mrf24j40_send(mrf24j40_t *dev, uint8_t *data, size_t len)
+{
+    /* check data length */
+    if (len > MRF24J40_MAX_PKT_LENGTH) {
+        return 0;
+    }
+    mrf24j40_tx_prepare(dev);
+    mrf24j40_tx_load(dev, data, len, 0);
+    mrf24j40_tx_exec(dev);
+    return len;
+}

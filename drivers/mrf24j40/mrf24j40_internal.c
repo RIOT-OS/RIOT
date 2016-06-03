@@ -78,18 +78,33 @@ uint8_t mrf24j40_get_status(const mrf24j40_t *dev)
                 & MRF24J40_RFSTATE_MASK_RFSTATE;
 }
 
-void mrf24j40_sram_read(const at86rf2xx_t *dev,
+void mrf24j40_tx_read(const mrf24j40_t *dev,
                          uint8_t *data,
                          const size_t len)
 {
-	for(uint16_t i = 0; i < len; i++)
-    	data[i] = mrf24j40_reg_read_long(dev->spi, i)
+	for(uint8_t i = 0; i < len; i++)
+    	data[i] = mrf24j40_reg_read_long(dev->spi, i);
 }
 
-void mrf24j40_sram_write(const at86rf2xx_t *dev,
+void mrf24j40_tx_write(const mrf24j40_t *dev,
                           const uint8_t *data,
                           const size_t len)
 {
-    for(uint16_t i = 0; i < len; i++)
-    	mrf24j40_reg_write_long(dev->spi, i, data[i])
+    for(uint8_t i = 0; i < len; i++)
+    	mrf24j40_reg_write_long(dev->spi, i, data[i]);
+    
 }
+
+void mrf24j40_rx_read_int(const mrf24j40_t *dev,
+                        uint8_t *data,
+                         const size_t len)
+{   uint16_t x = 768;
+    for(int i = 0; i < len; i++)
+
+        data[i] = mrf24j40_reg_read_long(dev->spi, x);
+        x += 8;
+
+}
+
+
+

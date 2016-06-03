@@ -463,3 +463,37 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
     }
 
     return res;
+}
+
+static void _isr(netdev2_t *netdev)
+{
+    mrf24j40_t *dev = (mrf24j40_t *) netdev;
+    uint8_t irq_mask;
+    uint8_t state;
+
+    /* If transceiver is sleeping register access is impossible and frames are
+     * lost anyway, so return immediately.
+     */
+    state = mrf24j40_get_status(dev);
+    if (state == MRF24J40_STATE_SLEEP) {
+        return;
+    }
+
+    /* read (consume) device status */
+    irq_mask = mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);
+
+    if (irq_mask & MRF24J40_IRQ_STATUS_MASK__TRX_END) {
+        if (state == MRF24J40_RFSTATE_RX){
+            if (!(dev->netdev.flags & MRF24J40_OPT_TELL_RX_END)) {
+                return;
+            }
+            netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE, NULL);
+        }
+        else if (state == MRF24J40_RFSTATE_TX) {
+            mrf24j40_set_state(dev, dev->idle_state);
+            if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END)) {
+                netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE, NULL);
+            }
+        }
+    }
+}
