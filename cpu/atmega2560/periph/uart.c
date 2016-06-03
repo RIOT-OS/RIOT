@@ -105,7 +105,7 @@ ISR(UART_0_ISR, ISR_BLOCK)
 }
 #endif /* UART_0_ISR */
 
-#if UART_1_ISR
+#ifdef UART_1_ISR
 ISR(UART_1_ISR, ISR_BLOCK)
 {
     __enter_isr();
@@ -114,7 +114,7 @@ ISR(UART_1_ISR, ISR_BLOCK)
 }
 #endif /* UART_1_ISR */
 
-#if UART_2_ISR
+#ifdef UART_2_ISR
 ISR(UART_2_ISR, ISR_BLOCK)
 {
     __enter_isr();
@@ -123,7 +123,7 @@ ISR(UART_2_ISR, ISR_BLOCK)
 }
 #endif /* UART_2_ISR */
 
-#if UART_3_ISR
+#ifdef UART_3_ISR
 ISR(UART_3_ISR, ISR_BLOCK)
 {
     __enter_isr();
