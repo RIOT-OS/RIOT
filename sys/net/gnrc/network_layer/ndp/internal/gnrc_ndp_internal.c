@@ -51,7 +51,7 @@ static inline void _send_delayed(xtimer_t *t, msg_t *msg, uint32_t interval, gnr
 {
     xtimer_remove(t);
     msg->type = GNRC_NETAPI_MSG_TYPE_SND;
-    msg->content.ptr = (char *) pkt;
+    msg->content.ptr = pkt;
     xtimer_set_msg(t, interval, msg, gnrc_ipv6_pid);
 }
 

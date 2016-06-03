@@ -88,14 +88,14 @@ static void *_nomac_thread(void *args)
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("nomac: GNRC_NETAPI_MSG_TYPE_SND received\n");
-                dev->driver->send_data(dev, (gnrc_pktsnip_t *)msg.content.ptr);
+                dev->driver->send_data(dev, msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
                 /* TODO: filter out MAC layer options -> for now forward
                          everything to the device driver */
                 DEBUG("nomac: GNRC_NETAPI_MSG_TYPE_SET received\n");
                 /* read incoming options */
-                opt = (gnrc_netapi_opt_t *)msg.content.ptr;
+                opt = msg.content.ptr;
                 /* set option for device driver */
                 res = dev->driver->set(dev, opt->opt, opt->data, opt->data_len);
                 DEBUG("nomac: response of netdev->set: %i\n", res);
@@ -109,7 +109,7 @@ static void *_nomac_thread(void *args)
                          everything to the device driver */
                 DEBUG("nomac: GNRC_NETAPI_MSG_TYPE_GET received\n");
                 /* read incoming options */
-                opt = (gnrc_netapi_opt_t *)msg.content.ptr;
+                opt = msg.content.ptr;
                 /* get option from device driver */
                 res = dev->driver->get(dev, opt->opt, opt->data, opt->data_len);
                 DEBUG("nomac: response of netdev->get: %i\n", res);

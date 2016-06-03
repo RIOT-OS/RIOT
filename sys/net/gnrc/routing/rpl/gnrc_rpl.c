@@ -210,21 +210,21 @@ static void *_event_loop(void *args)
                 break;
             case GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL:
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL received\n");
-                trickle = (trickle_t *) msg.content.ptr;
+                trickle = msg.content.ptr;
                 if (trickle && (trickle->callback.func != NULL)) {
                     trickle_interval(trickle);
                 }
                 break;
             case GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK:
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK received\n");
-                trickle = (trickle_t *) msg.content.ptr;
+                trickle = msg.content.ptr;
                 if (trickle && (trickle->callback.func != NULL)) {
                     trickle_callback(trickle);
                 }
                 break;
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 DEBUG("RPL: GNRC_NETAPI_MSG_TYPE_RCV received\n");
-                _receive((gnrc_pktsnip_t *)msg.content.ptr);
+                _receive(msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 break;

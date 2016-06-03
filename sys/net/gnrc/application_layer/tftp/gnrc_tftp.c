@@ -485,7 +485,7 @@ int _tftp_server(tftp_context_t *ctxt)
 
                 /* release packet if we received one */
                 if (msg.type == GNRC_NETAPI_MSG_TYPE_RCV) {
-                    gnrc_pktbuf_release((gnrc_pktsnip_t *) msg.content.ptr);
+                    gnrc_pktbuf_release(msg.content.ptr);
                 }
             }
 
@@ -544,7 +544,7 @@ int _tftp_do_client_transfer(tftp_context_t *ctxt)
 
         /* release packet if we received one */
         if (msg.type == GNRC_NETAPI_MSG_TYPE_RCV) {
-            gnrc_pktbuf_release((gnrc_pktsnip_t *) msg.content.ptr);
+            gnrc_pktbuf_release(msg.content.ptr);
         }
     }
 
@@ -595,7 +595,7 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
         return TS_BUSY;
     }
 
-    gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)(m->content.ptr);
+    gnrc_pktsnip_t *pkt = m->content.ptr;
 
     gnrc_pktsnip_t *tmp;
     tmp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UDP);

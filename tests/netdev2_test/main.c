@@ -165,7 +165,7 @@ static int test_receive(void)
         puts("Expected netapi receive message");
         return 0;
     }
-    pkt = (gnrc_pktsnip_t *)msg.content.ptr;
+    pkt = msg.content.ptr;
     /* check payload */
     if (pkt->size != _tmp_len - sizeof(ethernet_hdr_t)) {
         puts("Payload of unexpected size");

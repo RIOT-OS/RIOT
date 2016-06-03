@@ -203,7 +203,7 @@ int nhdp_register_if(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
 
     /* Start sending periodic HELLO */
     signal_msg.type = HELLO_TIMER;
-    signal_msg.content.ptr = (char *) if_entry;
+    signal_msg.content.ptr = if_entry;
     /* TODO: msg_send or msg_try_send? */
     msg_try_send(&signal_msg, nhdp_pid);
 
@@ -255,7 +255,7 @@ static void *_nhdp_runner(void *arg)
         switch (msg_rcvd.type) {
             case HELLO_TIMER:
                 mutex_lock(&send_rcv_mutex);
-                if_entry = (nhdp_if_entry_t *) msg_rcvd.content.ptr;
+                if_entry = msg_rcvd.content.ptr;
 
                 nhdp_writer_send_hello(if_entry);
 

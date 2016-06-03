@@ -28,7 +28,7 @@ static inline void _reschedule_rtr_sol(gnrc_ipv6_netif_t *iface, uint32_t delay)
 {
     xtimer_remove(&iface->rtr_sol_timer);
     iface->rtr_sol_msg.type = GNRC_NDP_MSG_RTR_SOL_RETRANS;
-    iface->rtr_sol_msg.content.ptr = (char *) iface;
+    iface->rtr_sol_msg.content.ptr = iface;
     xtimer_set_msg(&iface->rtr_sol_timer, delay, &iface->rtr_sol_msg, gnrc_ipv6_pid);
 }
 

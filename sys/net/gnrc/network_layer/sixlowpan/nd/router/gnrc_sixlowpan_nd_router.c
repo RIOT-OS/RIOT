@@ -243,7 +243,7 @@ void gnrc_sixlowpan_nd_opt_abr_handle(kernel_pid_t iface, ndp_rtr_adv_t *rtr_adv
 
     xtimer_remove(&abr->ltimer);
     abr->ltimer_msg.type = GNRC_SIXLOWPAN_ND_MSG_ABR_TIMEOUT;
-    abr->ltimer_msg.content.ptr = (char *) abr;
+    abr->ltimer_msg.content.ptr = abr;
     xtimer_set_msg(&abr->ltimer, t, &abr->ltimer_msg, gnrc_ipv6_pid);
 }
 

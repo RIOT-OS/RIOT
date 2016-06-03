@@ -216,7 +216,7 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
         msg_t msg;
 
         msg.type = LWIP_NETDEV2_MSG_TYPE_EVENT;
-        msg.content.ptr = (char *)dev;
+        msg.content.ptr = dev;
 
         if (msg_send(&msg, _pid) <= 0) {
             DEBUG("lwip_netdev2: possibly lost interrupt.\n");
@@ -251,7 +251,7 @@ static void *_event_loop(void *arg)
         msg_t msg;
         msg_receive(&msg);
         if (msg.type == LWIP_NETDEV2_MSG_TYPE_EVENT) {
-            netdev2_t *dev = (netdev2_t *)msg.content.ptr;
+            netdev2_t *dev = msg.content.ptr;
             dev->driver->isr(dev);
         }
     }

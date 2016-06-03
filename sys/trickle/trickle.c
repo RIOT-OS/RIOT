@@ -75,9 +75,9 @@ void trickle_start(kernel_pid_t pid, trickle_t *trickle, uint16_t interval_msg_t
     trickle->Imax = Imax;
     trickle->I = trickle->Imin + random_uint32_range(0, 4 * trickle->Imin);
     trickle->pid = pid;
-    trickle->msg_interval.content.ptr = (char *)trickle;
+    trickle->msg_interval.content.ptr = trickle;
     trickle->msg_interval.type = interval_msg_type;
-    trickle->msg_callback.content.ptr = (char *)trickle;
+    trickle->msg_callback.content.ptr = trickle;
     trickle->msg_callback.type = callback_msg_type;
 
     trickle_interval(trickle);

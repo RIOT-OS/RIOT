@@ -166,7 +166,7 @@ void xtimer_now_timex(timex_t *out)
 static void _setup_timer_msg(msg_t *m, xtimer_t *t)
 {
     m->type = MSG_XTIMER;
-    m->content.ptr = (char *) m;
+    m->content.ptr = m;
 
     t->target = t->long_target = 0;
 }
@@ -175,7 +175,7 @@ static void _setup_timer_msg(msg_t *m, xtimer_t *t)
 static int _msg_wait(msg_t *m, msg_t *tmsg, xtimer_t *t)
 {
     msg_receive(m);
-    if (m->type == MSG_XTIMER && m->content.ptr == (char *) tmsg) {
+    if (m->type == MSG_XTIMER && m->content.ptr == tmsg) {
         /* we hit the timeout */
         return -1;
     }
