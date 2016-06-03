@@ -289,15 +289,10 @@ int printf(const char *format, ...)
 {
     int r;
     va_list argp;
-    char *m;
 
     va_start(argp, format);
-    if ((m = make_message(format, argp)) == NULL) {
-        err(EXIT_FAILURE, "malloc");
-    }
-    r = _native_write(STDOUT_FILENO, m, strlen(m));
+    r = vfprintf(stdout, format, argp);
     va_end(argp);
-    free(m);
 
     return r;
 }
@@ -305,13 +300,30 @@ int printf(const char *format, ...)
 
 int vprintf(const char *format, va_list argp)
 {
+    return vfprintf(stdout, format, argp);
+}
+
+int fprintf(FILE *fp, const char *format, ...)
+{
+    int r;
+    va_list argp;
+
+    va_start(argp, format);
+    r = vfprintf(fp, format, argp);
+    va_end(argp);
+
+    return r;
+}
+
+int vfprintf(FILE *fp, const char *format, va_list argp)
+{
     int r;
     char *m;
 
     if ((m = make_message(format, argp)) == NULL) {
         err(EXIT_FAILURE, "malloc");
     }
-    r = _native_write(STDOUT_FILENO, m, strlen(m));
+    r = _native_write(fileno(fp), m, strlen(m));
     free(m);
 
     return r;
