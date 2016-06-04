@@ -294,6 +294,13 @@ static void _iwpan_list(kernel_pid_t dev)
         linebreak = true;
     }
 
+    res = gnrc_netapi_get(dev, NETOPT_ACK_REQ, 0, &enable, sizeof(enable));
+
+    if ((res >= 0) && (enable == NETOPT_ENABLE)) {
+        printf("ACKREQ  ");
+        linebreak = true;
+    }
+
     res = gnrc_netapi_get(dev, NETOPT_PRELOADING, 0, &enable, sizeof(enable));
 
     if ((res >= 0) && (enable == NETOPT_ENABLE)) {
@@ -696,7 +703,7 @@ static int _iwpan_flag(char *cmd, kernel_pid_t dev, char *flag)
         return _iwpan_set_flag(dev, NETOPT_AUTOACK, set);
     }
     else if (strcmp(flag, "ackreq") == 0) {
-        return _iwpan_set_flag(dev, NETOPT_AUTOACK, set);
+        return _iwpan_set_flag(dev, NETOPT_ACK_REQ, set);
     }
     else if (strcmp(flag, "raw") == 0) {
         return _iwpan_set_flag(dev, NETOPT_RAWMODE, set);
