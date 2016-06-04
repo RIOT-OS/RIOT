@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    pkg_lwip_conn   Connection type definitions for lwIP
+ * @defgroup    pkg_lwip_conn   Connectivity type definitions for lwIP
  * @ingroup     pkg_lwip
  * @{
  *
@@ -28,21 +28,21 @@ extern "C" {
  * @brief   Generic @ref net_conn object for lwIP (used internally)
  */
 struct conn {
-    struct netconn *lwip_conn;  /**< stack-internal connection object */
+    struct netconn *lwip_conn;  /**< stack-internal connectivity object */
 };
 
 /**
  * @brief   @ref net_conn_ip definition for lwIP
  */
 struct conn_ip {
-    struct netconn *lwip_conn;  /**< stack-internal connection object */
+    struct netconn *lwip_conn;  /**< stack-internal connectivity object */
 };
 
 /**
  * @brief   @ref net_conn_udp definition for lwIP
  */
 struct conn_udp {
-    struct netconn *lwip_conn;  /**< stack-internal connection object */
+    struct netconn *lwip_conn;  /**< stack-internal connectivity object */
 };
 
 /**

@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    net_conn_tcp    TCP connections
+ * @defgroup    net_conn_tcp    TCP connectivity
  * @ingroup     net_conn
- * @brief       Connection submodule for TCP connections
+ * @brief       Connectivity submodule for TCP connectivity
  * @{
  *
  * @file
- * @brief   TCP connection definitions
+ * @brief   TCP connectivity definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -37,15 +37,15 @@ extern "C" {
 struct conn_tcp;
 
 /**
- * @brief   Implementation-specific type of a TCP connection object
+ * @brief   Implementation-specific type of a TCP connectivity object
  */
 typedef struct conn_tcp conn_tcp_t;
 
 /**
- * @brief   Creates a new TCP connection object
+ * @brief   Creates a new TCP connectivity object
  *
- * @param[out] conn     Preallocated connection object. Must fill the size of the stack-specific
- *                      connection desriptor.
+ * @param[out] conn     Preallocated connectivity object. Must fill the size of the stack-specific
+ *                      connectivity desriptor.
  * @param[in] addr      The local network layer address for @p conn.
  * @param[in] addr_len  The length of @p addr. Must be fitting for the @p family.
  * @param[in] family    The family of @p addr (see @ref net_af).
@@ -61,16 +61,16 @@ int conn_tcp_create(conn_tcp_t *conn, const void *addr, size_t addr_len, int fam
 /**
  * @brief   Closes a TCP connection
  *
- * @param[in,out] conn  A TCP connection object.
+ * @param[in,out] conn  A TCP connectivity object.
  */
 void conn_tcp_close(conn_tcp_t *conn);
 
 /**
  * @brief   Gets the local address of a TCP connection
  *
- * @param[in] conn  A TCP connection object.
+ * @param[in] conn  A TCP connectivity object.
  * @param[out] addr The local network layer address. Must have space for any address of
- *                  the connection's family.
+ *                  the connectivity's family.
  * @param[out] port The local TCP port.
  *
  * @return  length of @p addr on success.
@@ -83,9 +83,9 @@ int conn_tcp_getlocaladdr(conn_tcp_t *conn, void *addr, uint16_t *port);
 /**
  * @brief   Gets the address of the connected peer of a TCP connection
  *
- * @param[in] conn  A TCP connection object.
+ * @param[in] conn  A TCP connectivity object.
  * @param[out] addr The network layer address of the connected peer. Must have space for any
- *                  address of the connection's family.
+ *                  address of the connectivity's family.
  * @param[out] port The TCP port of the connected peer.
  *
  * @return  length of @p addr on success.
@@ -98,7 +98,7 @@ int conn_tcp_getpeeraddr(conn_tcp_t *conn, void *addr, uint16_t *port);
 /**
  * @brief   Connects to a remote TCP peer
  *
- * @param[in] conn      A TCP connection object.
+ * @param[in] conn      A TCP connectivity object.
  * @param[in] addr      The remote network layer address for @p conn.
  * @param[in] addr_len  Length of @p addr.
  * @param[in] port      The remote TCP port for @p conn.
@@ -110,10 +110,10 @@ int conn_tcp_getpeeraddr(conn_tcp_t *conn, void *addr, uint16_t *port);
 int conn_tcp_connect(conn_tcp_t *conn, const void *addr, size_t addr_len, uint16_t port);
 
 /**
- * @brief   Marks connection to listen for a connection request by a remote TCP peer
+ * @brief   Marks connectivity to listen for a connection request by a remote TCP peer
  *
- * @param[in] conn      A TCP connection object.
- * @param[in] queue_len Maximum length of the queue for connection requests.
+ * @param[in] conn      A TCP connectivity object.
+ * @param[in] queue_len Maximum length of the queue for connectivity requests.
  *                      An implementation may choose to silently adapt this value to its needs
  *                      (setting it to a minimum or maximum value). Any negative number must be
  *                      set at least to 0.
@@ -127,8 +127,8 @@ int conn_tcp_listen(conn_tcp_t *conn, int queue_len);
 /**
  * @brief   Receives and handles TCP connection requests from other peers
  *
- * @param[in] conn      A TCP connection object.
- * @param[out] out_conn A new TCP connection object for the established connection.
+ * @param[in] conn      A TCP connectivity object.
+ * @param[out] out_conn A new TCP connectivity object for the established connectivity.
  *
  * @return  0 on success.
  * @return  any other negative number in case of an error. For portability implementations should
@@ -139,7 +139,7 @@ int conn_tcp_accept(conn_tcp_t *conn, conn_tcp_t *out_conn);
 /**
  * @brief   Receives a TCP message
  *
- * @param[in] conn      A TCP connection object.
+ * @param[in] conn      A TCP connectivity object.
  * @param[out] data     Pointer where the received data should be stored.
  * @param[in] max_len   Maximum space available at @p data.
  *
@@ -156,7 +156,7 @@ int conn_tcp_recv(conn_tcp_t *conn, void *data, size_t max_len);
 /**
  * @brief   Sends a TCP message
  *
- * @param[in] conn  A TCP connection object.
+ * @param[in] conn  A TCP connectivity object.
  * @param[in] data  Pointer where the received data should be stored.
  * @param[in] len   Maximum space available at @p data.
  *

@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    net_conn_udp    UDP connections
+ * @defgroup    net_conn_udp    UDP connectivity
  * @ingroup     net_conn
- * @brief       Connection submodule for UDP connections
+ * @brief       Connectivity submodule for UDP connectivity
  * @{
  *
  * @file
- * @brief   UDP connection definitions
+ * @brief   UDP connectivity definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -45,15 +45,15 @@ extern "C" {
 struct conn_udp;
 
 /**
- * @brief   Implementation-specific type of a UDP connection object
+ * @brief   Implementation-specific type of a UDP connectivity object
  */
 typedef struct conn_udp conn_udp_t;
 
 /**
- * @brief   Creates a new UDP connection object
+ * @brief   Creates a new UDP connectivity object
  *
- * @param[out] conn     Preallocated connection object. Must fill the size of the stack-specific
- *                      connection desriptor.
+ * @param[out] conn     Preallocated connectivity object. Must fill the size of the stack-specific
+ *                      connectivity desriptor.
  * @param[in] addr      The local network layer address for @p conn.
  * @param[in] addr_len  The length of @p addr. Must be fitting for the @p family.
  * @param[in] family    The family of @p addr (see @ref net_af).
@@ -71,18 +71,18 @@ int conn_udp_create(conn_udp_t *conn, const void *addr, size_t addr_len, int fam
                     uint16_t port);
 
 /**
- * @brief   Closes a UDP connection
+ * @brief   Closes a UDP connectivity
  *
- * @param[in,out] conn  A UDP connection object.
+ * @param[in,out] conn  A UDP connectivity object.
  */
 void conn_udp_close(conn_udp_t *conn);
 
 /**
- * @brief   Gets the local address of a UDP connection
+ * @brief   Gets the local address of a UDP connectivity
  *
- * @param[in] conn  A UDP connection object.
+ * @param[in] conn  A UDP connectivity object.
  * @param[out] addr The local network layer address. Must have space for any address of
- *                  the connection's family.
+ *                  the connectivity object's family.
  * @param[out] port The local UDP port.
  *
  * @return  length of @p addr on success.
@@ -95,11 +95,11 @@ int conn_udp_getlocaladdr(conn_udp_t *conn, void *addr, uint16_t *port);
 /**
  * @brief   Receives a UDP message
  *
- * @param[in] conn      A UDP connection object.
+ * @param[in] conn      A UDP connectivity object.
  * @param[out] data     Pointer where the received data should be stored.
  * @param[in] max_len   Maximum space available at @p data.
  * @param[out] addr     NULL pointer or the sender's network layer address. Must have space
- *                      for any address of the connection's family.
+ *                      for any address of the connectivity object's family.
  * @param[out] addr_len Length of @p addr. Can be NULL if @p addr is NULL.
  * @param[out] port     NULL pointer or the sender's UDP port.
  *

@@ -7,7 +7,8 @@
  */
 
 /**
- * @defgroup    net_gnrc_conn   GNRC-specific implementation of the connection API
+ * @defgroup    net_gnrc_conn   GNRC-specific implementation of the connectivity
+ *                              API
  * @ingroup     net_gnrc
  * @brief       Provides an implementation of the @ref net_conn by the
  *              @ref net_gnrc
@@ -33,52 +34,52 @@ extern "C" {
 #endif
 
 /**
- * @brief   Connection base class
+ * @brief   Connectivity base class
  * @internal
  */
 typedef struct {
-    gnrc_nettype_t l3_type;                     /**< Network layer type of the connection */
-    gnrc_nettype_t l4_type;                     /**< Transport layer type of the connection */
-    gnrc_netreg_entry_t netreg_entry;           /**< @p net_ng_netreg entry for the connection */
+    gnrc_nettype_t l3_type;                     /**< Network layer type of the connectivity */
+    gnrc_nettype_t l4_type;                     /**< Transport layer type of the connectivity */
+    gnrc_netreg_entry_t netreg_entry;           /**< @p net_ng_netreg entry for the connectivity */
 } conn_t;
 
 /**
- * @brief   Raw connection type
+ * @brief   Raw connectivity type
  * @internal
  * @extends conn_t
  */
 struct conn_ip {
-    gnrc_nettype_t l3_type;                     /**< Network layer type of the connection. */
-    gnrc_nettype_t l4_type;                     /**< Transport layer type of the connection.
+    gnrc_nettype_t l3_type;                     /**< Network layer type of the connectivity. */
+    gnrc_nettype_t l4_type;                     /**< Transport layer type of the connectivity.
                                                  *   Always GNRC_NETTYPE_UNDEF */
-    gnrc_netreg_entry_t netreg_entry;           /**< @p net_ng_netreg entry for the connection */
+    gnrc_netreg_entry_t netreg_entry;           /**< @p net_ng_netreg entry for the connectivity */
     uint8_t local_addr[sizeof(ipv6_addr_t)];    /**< local IP address */
     size_t local_addr_len;                      /**< length of struct conn_ip::local_addr */
 };
 
 /**
- * @brief   UDP connection type
+ * @brief   UDP connectivity type
  * @internal
  * @extends conn_t
  */
 struct conn_udp {
-    gnrc_nettype_t l3_type;                     /**< Network layer type of the connection.
+    gnrc_nettype_t l3_type;                     /**< Network layer type of the connectivity.
                                                  *   Always GNRC_NETTYPE_IPV6 */
-    gnrc_nettype_t l4_type;                     /**< Transport layer type of the connection.
+    gnrc_nettype_t l4_type;                     /**< Transport layer type of the connectivity.
                                                  *   Always GNRC_NETTYPE_UDP */
-    gnrc_netreg_entry_t netreg_entry;           /**< @p net_ng_netreg entry for the connection */
+    gnrc_netreg_entry_t netreg_entry;           /**< @p net_ng_netreg entry for the connectivity */
     uint8_t local_addr[sizeof(ipv6_addr_t)];    /**< local IP address */
     size_t local_addr_len;                      /**< length of struct conn_ip::local_addr */
 };
 
 /**
- * @brief  Bind connection to demux context
+ * @brief  Bind connectivity to demux context
  *
  * @internal
  *
  * @param[out] entry    @ref net_ng_netreg entry.
  * @param[in] type      @ref net_ng_nettype.
- * @param[in] demux_ctx demux context (port or proto) for the connection.
+ * @param[in] demux_ctx demux context (port or proto) for the connectivity.
  */
 static inline void gnrc_conn_reg(gnrc_netreg_entry_t *entry, gnrc_nettype_t type,
                                  uint32_t demux_ctx)
@@ -89,16 +90,16 @@ static inline void gnrc_conn_reg(gnrc_netreg_entry_t *entry, gnrc_nettype_t type
 }
 
 /**
- * @brief   Sets local address for a connection
+ * @brief   Sets local address for a connectivity
  *
  * @internal
  *
- * @param[out] conn_addr    Pointer to the local address on the connection.
+ * @param[out] conn_addr    Pointer to the local address on the connectivity.
  * @param[in] addr          An IPv6 address.
  *
  * @return  true, if @p addr was a legal address (`::`, `::1` or an address assigned to any
- *          interface of this node) for the connection.
- * @return  false if @p addr was not a legal address for the connection.
+ *          interface of this node) for the connectivity.
+ * @return  false if @p addr was not a legal address for the connectivity.
  */
 bool gnrc_conn6_set_local_addr(uint8_t *conn_addr, const ipv6_addr_t *addr);
 
@@ -107,11 +108,11 @@ bool gnrc_conn6_set_local_addr(uint8_t *conn_addr, const ipv6_addr_t *addr);
  *
  * @internal
  *
- * @param[in] conn      Connection object.
+ * @param[in] conn      Connectivity object.
  * @param[out] data     Pointer where the received data should be stored.
  * @param[in] max_len   Maximum space available at @p data.
- * @param[out] addr     NULL pointer or the sender's IP address. Must fit address of connection's
- *                      family if not NULL.
+ * @param[out] addr     NULL pointer or the sender's IP address. Must fit address of
+ *                      the connectivity object's family if not NULL.
  * @param[out] addr_len Length of @p addr. May be NULL if @p addr is NULL.
  * @param[out] port     NULL pointer or the sender's port.
  *

@@ -11,7 +11,7 @@
  * @ingroup     emb6
  * @brief       UDP conn for emb6
  *
- * For this implementation to receive with an open connection only with one
+ * For this implementation to receive with an open connectivity only with one
  * thread at once. If you use @ref conn_udp_recvfrom() with more than one thread
  * simultaneously, it will return `-EALREADY`.
  *
@@ -43,9 +43,9 @@ extern "C" {
  */
 struct conn_udp {
     struct udp_socket sock;         /**< emb6 internal socket */
-    mutex_t mutex;                  /**< mutex for the connection */
+    mutex_t mutex;                  /**< mutex for the connectivity object */
     kernel_pid_t waiting_thread;    /**< thread waiting for an incoming packet
-                                     *   on this connection */
+                                     *   on this connectivity object */
     struct {
         uint16_t src_port;          /**< source port */
         const ipv6_addr_t *src;     /**< source address */
