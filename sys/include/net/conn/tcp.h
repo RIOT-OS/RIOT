@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    net_conn_tcp    TCP connections
+ * @defgroup    net_conn_tcp    TCP connectivity
  * @ingroup     net_conn
- * @brief       Connection submodule for TCP connections
+ * @brief       Connectivity submodule for TCP connectivity
  * @{
  *
  * @file
- * @brief   TCP connection definitions
+ * @brief   TCP connectivity definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -22,6 +22,8 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+
+#include "net/conn/ep.h"
 
 #ifdef MODULE_GNRC_CONN_TCP
 #include "net/gnrc/conn.h"
@@ -32,140 +34,157 @@ extern "C" {
 #endif
 
 /**
- * @brief   Forward declaration of @ref conn_tcp_t to allow for external definition.
- */
-struct conn_tcp;
-
-/**
- * @brief   Implementation-specific type of a TCP connection object
+ * @brief   Implementation-specific type of a TCP connectivity object
+ *
+ * `struct conn_tcp` needs to be defined by stack-specific implementation.
  */
 typedef struct conn_tcp conn_tcp_t;
 
 /**
- * @brief   Creates a new TCP connection object
+ * @brief   Creates a new TCP connectivity object
  *
- * @param[out] conn     Preallocated connection object. Must fill the size of the stack-specific
- *                      connection desriptor.
- * @param[in] addr      The local network layer address for @p conn.
- * @param[in] addr_len  The length of @p addr. Must be fitting for the @p family.
- * @param[in] family    The family of @p addr (see @ref net_af).
- * @param[in] port      The local TCP port for @p conn.
+ * @pre `(conn != NULL)`
+ * @pre `(local == NULL) || (local->port != 0)`
+ *
+ * @param[out] conn     Preallocated connectivity object. Must fill the size of
+ *                      the stack-specific connectivity descriptor.
+ * @param[in] local     Local end point for the connectivity object.
+ *                      May be NULL to solicit implicit bind when @p remote is
+ *                      not NULL.
+ *                      conn_ep_tcp_t::netif must either be
+ *                      @ref CONN_EP_ANY_NETIF or equal to conn_ep_tcp_t::netif
+ *                      of @p remote if `remote != NULL`.
+ * @param[in] remote    Remote end point for the connectivity object.
+ *                      May be NULL. In this case the connectivity object is a
+ *                      listening connectivity object. Call
+ *                      @ref conn_tcp_accept() to wait for incoming connection
+ *                      requests.
+ *                      conn_ep_tcp_t::netif must either be
+ *                      @ref CONN_EP_ANY_NETIF or equal to conn_ep_tcp_t::netif
+ *                      of @p local if `local != NULL`.
  *
  * @return  0 on success.
- * @return  any other negative number in case of an error. For portability implementations should
- *          draw inspiration of the errno values from the POSIX' bind() function specification.
+ * @return  -EADDRINUSE, if `local != NULL` and the stack reports that @p local
+ *          is already use elsewhere
+ * @return  -EAFNOSUPPORT, if `local != NULL` or `remote != NULL` and
+ *          conn_ep_tcp_t::family of @p local or @p remote is not supported.
+ * @return  -ECONNREFUSED, if `remote != NULL`, but no-one is listening on this
+ *          address.
+ * @return  -EINVAL, if conn_ep_tcp_t::netif of @p local or @p remote is not a
+ *          valid interface or contradict each other (i.e.
+ *          `(local->netif != remote->netif) &&
+ *          ((local->netif != CONN_EP_ANY_NETIF) ||
+ *          (remote->netif != CONN_EP_ANY_NETIF))` if neither is `NULL`).
+ * @return  -ENETUNREACH, if `remote != NULL`, but network is not reachable.
+ * @return  -ENOMEM, if system was not able to allocate sufficient memory to
+ *          establish connection.
+ * @return  -EPERM, if connections to @p remote are not permitted on the system
+ *          (e.g. by firewall rules).
+ * @return  -ETIMEDOUT, if `remote != NULL`, but the connection attempt timed
+ *          out.
  */
-int conn_tcp_create(conn_tcp_t *conn, const void *addr, size_t addr_len, int family,
-                    uint16_t port);
+int conn_tcp_create(conn_tcp_t *conn, const conn_ep_tcp_t *local,
+                    const conn_ep_tcp_t *remote);
 
 /**
  * @brief   Closes a TCP connection
  *
- * @param[in,out] conn  A TCP connection object.
+ * @pre `(conn != NULL)`
+ *
+ * @param[in,out] conn  A TCP connectivity object.
  */
 void conn_tcp_close(conn_tcp_t *conn);
 
 /**
- * @brief   Gets the local address of a TCP connection
+ * @brief   Gets the local end point of a TCP connectivity
  *
- * @param[in] conn  A TCP connection object.
- * @param[out] addr The local network layer address. Must have space for any address of
- *                  the connection's family.
- * @param[out] port The local TCP port.
+ * @pre `(conn != NULL) && (ep != NULL)`
  *
- * @return  length of @p addr on success.
- * @return  any other negative number in case of an error. For portability implementations should
- *          draw inspiration of the errno values from the POSIX' getsockname() function
- *          specification.
- */
-int conn_tcp_getlocaladdr(conn_tcp_t *conn, void *addr, uint16_t *port);
-
-/**
- * @brief   Gets the address of the connected peer of a TCP connection
- *
- * @param[in] conn  A TCP connection object.
- * @param[out] addr The network layer address of the connected peer. Must have space for any
- *                  address of the connection's family.
- * @param[out] port The TCP port of the connected peer.
- *
- * @return  length of @p addr on success.
- * @return  any other negative number in case of an error. For portability implementations should
- *          draw inspiration of the errno values from the POSIX' getpeername() function
- *          specification.
- */
-int conn_tcp_getpeeraddr(conn_tcp_t *conn, void *addr, uint16_t *port);
-
-/**
- * @brief   Connects to a remote TCP peer
- *
- * @param[in] conn      A TCP connection object.
- * @param[in] addr      The remote network layer address for @p conn.
- * @param[in] addr_len  Length of @p addr.
- * @param[in] port      The remote TCP port for @p conn.
+ * @param[in] conn  A TCP connectivity object.
+ * @param[out] ep   The local end point.
  *
  * @return  0 on success.
- * @return  any other negative number in case of an error. For portability implementations should
- *          draw inspiration of the errno values from the POSIX' connect() function specification.
+ * @return  -EADDRNOTAVAIL, when @p conn has no local end point.
  */
-int conn_tcp_connect(conn_tcp_t *conn, const void *addr, size_t addr_len, uint16_t port);
+int conn_tcp_get_local(conn_tcp_t *conn, conn_ep_tcp_t *ep);
 
 /**
- * @brief   Marks connection to listen for a connection request by a remote TCP peer
+ * @brief   Gets the remote end point of a TCP connectivity
  *
- * @param[in] conn      A TCP connection object.
- * @param[in] queue_len Maximum length of the queue for connection requests.
- *                      An implementation may choose to silently adapt this value to its needs
- *                      (setting it to a minimum or maximum value). Any negative number must be
- *                      set at least to 0.
+ * @pre `(conn != NULL) && (ep != NULL)`
+ *
+ * @param[in] conn  A TCP connectivity object.
+ * @param[out] ep   The remote end point.
  *
  * @return  0 on success.
- * @return  any other negative number in case of an error. For portability implementations should
- *          draw inspiration of the errno values from the POSIX' listen() function specification.
+ * @return  -ENOTCONN, when @p conn is not connected to a remote end point.
  */
-int conn_tcp_listen(conn_tcp_t *conn, int queue_len);
+int conn_tcp_get_remote(conn_tcp_t *conn, conn_ep_tcp_t *ep);
 
 /**
  * @brief   Receives and handles TCP connection requests from other peers
  *
- * @param[in] conn      A TCP connection object.
- * @param[out] out_conn A new TCP connection object for the established connection.
+ * @pre `(conn != NULL) && (out_conn != NULL)`
+ *
+ * @param[in] conn      A TCP connectivity object.
+ * @param[out] out_conn A new TCP connectivity object for the established
+ *                      connectivity.
  *
  * @return  0 on success.
- * @return  any other negative number in case of an error. For portability implementations should
- *          draw inspiration of the errno values from the POSIX' accept() function specification.
+ * @return  -EINVAL, if @p conn is not listening (`remote != NULL` on
+ *          `conn_tcp_create()`).
+ * @return  -ENOMEM, if system was not able to allocate sufficient memory to
+ *          establish connection.
+ * @return  -EPERM, if connections on local endpoint of @p conn are not
+ *          permitted on this system (e.g. by firewall rules).
+ * @return  -ETIMEDOUT, if the operation timed out stack-internally.
  */
 int conn_tcp_accept(conn_tcp_t *conn, conn_tcp_t *out_conn);
 
 /**
  * @brief   Receives a TCP message
  *
- * @param[in] conn      A TCP connection object.
+ * @pre `(conn != NULL) && (data != NULL) && (max_len > 0)`
+ *
+ * @param[in] conn      A TCP connectivity object.
  * @param[out] data     Pointer where the received data should be stored.
  * @param[in] max_len   Maximum space available at @p data.
+ *                      If received data exceeds @p max_len the data is
+ *                      truncated and the remaining data can be retrieved
+ *                      later on.
+ * @param[in] timeout   Timeout for receive in microseconds.
+ *                      This value can be ignored (no timeout) if the
+ *                      @ref sys_xtimer module is not present and the stack does
+ *                      not support timeouts on its own.
+ *                      May be 0 for no timeout.
  *
  * @note    Function may block.
  *
  * @return  The number of bytes received on success.
  * @return  0, if no received data is available, but everything is in order.
- * @return  any other negative number in case of an error. For portability, implementations should
- *          draw inspiration of the errno values from the POSIX' recv(), recvfrom(), or recvmsg()
- *          function specification.
+ * @return  -ECONNREFUSED, if remote end point of @p conn refused to allow the
+ *          connection.
+ * @return  -ENOTCONN, when @p conn is not connected to a remote end point.
+ * @return  -ETIMEDOUT, if @p timeout expired.
  */
-int conn_tcp_recv(conn_tcp_t *conn, void *data, size_t max_len);
+int conn_tcp_recv(conn_tcp_t *conn, void *data, size_t max_len,
+                  uint32_t timeout);
 
 /**
  * @brief   Sends a TCP message
  *
- * @param[in] conn  A TCP connection object.
+ * @pre `(conn != NULL) && (data != NULL) && (max > 0)`
+ *
+ * @param[in] conn  A TCP connectivity object.
  * @param[in] data  Pointer where the received data should be stored.
  * @param[in] len   Maximum space available at @p data.
  *
  * @note    Function may block.
  *
  * @return  The number of bytes send on success.
- * @return  any other negative number in case of an error. For portability, implementations should
- *          draw inspiration of the errno values from the POSIX' send(), sendfrom(), or sendmsg()
- *          function specification.
+ * @return  -ECONNRESET, if connection was reset by remote end point.
+ * @return  -ENOBUFS, if no memory was available to send @p data.
+ * @return  -ENOTCONN, if @p conn is not connected to a remote end point.
  */
 int conn_tcp_send(conn_tcp_t *conn, const void *data, size_t len);
 

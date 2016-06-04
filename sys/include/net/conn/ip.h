@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    net_conn_ip     Raw IPv4/IPv6 connections
+ * @defgroup    net_conn_ip     Raw IPv4/IPv6 connectivity
  * @ingroup     net_conn
- * @brief       Connection submodule for raw IPv4/IPv6 connections
+ * @brief       Connectivity submodule for raw IPv4/IPv6 connectivity
  * @{
  *
  * @file
- * @brief   Raw IPv4/IPv6 connection definitions
+ * @brief   Raw IPv4/IPv6 connectivity definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -22,6 +22,8 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+
+#include "net/conn/ep.h"
 
 #ifdef MODULE_GNRC_CONN_IP
 #include "net/gnrc/conn.h"
@@ -36,93 +38,208 @@ extern "C" {
 #endif
 
 /**
- * @brief   Forward declaration of @ref conn_ip_t to allow for external definition.
- */
-struct conn_ip;
-
-/**
- * @brief   Implementation-specific type of a raw IPv4/IPv6 connection object
+ * @brief   Implementation-specific type of a raw IPv4/IPv6 connectivity object
+ *
+ * `struct conn_ip` needs to be defined by stack-specific a implementation.
  */
 typedef struct conn_ip conn_ip_t;
 
 /**
- * @brief   Creates a new raw IPv4/IPv6 connection object
+ * @brief   Creates a new raw IPv4/IPv6 connectivity object
  *
- * @param[out] conn     Preallocated connection object. Must fill the size of the stack-specific
- *                      connection desriptor.
- * @param[in] addr      The local IP address for @p conn.
- * @param[in] addr_len  Length of @p addr. Must be fitting for the @p family.
- * @param[in] family    The family of @p addr (see @ref net_af).
- * @param[in] proto     @ref net_protnum for the IPv6 packets to receive.
+ * @pre `(conn != NULL)`
+ *
+ * @param[out] conn     Preallocated connectivity object. Must fill the size of
+ *                      the stack-specific connectivity descriptor.
+ * @param[in] local     Local end point for the connectivity object.
+ *                      May be NULL to solicit implicit bind on
+ *                      @ref conn_ip_sendto() and @ref conn_ip_send().
+ *                      conn_ep_ip_t::netif must either be
+ *                      @ref CONN_EP_ANY_NETIF or equal to conn_ep_ip_t::netif
+ *                      of @p remote if `remote != NULL`.
+ * @param[in] remote    Remote end point for the connectivity object.
+ *                      May be `NULL` but then the `remote` parameter of
+ *                      @ref conn_ip_sendto() may not be `NULL` and
+ *                      @ref conn_ip_send() will always error with return value
+ *                      -ENOTCONN. conn_ep_ip_t::port may not be 0 if
+ *                      `remote != NULL`.
+ *                      conn_ep_ip_t::netif must either be
+ *                      @ref CONN_EP_ANY_NETIF or equal to conn_ep_ip_t::netif
+ *                      of @p local if `local != NULL`.
+ * @param[in] proto     Protocol to use in the raw IPv4/IPv6 connectivity object
+ *                      (the `protocol` header field in IPv4 and the `next_header`
+ *                      field in IPv6).
  *
  * @return  0 on success.
- * @return  any other negative number in case of an error. For portability implementations should
- *          draw inspiration of the errno values from the POSIX' bind() function specification.
+ * @return  -EADDRINUSE, if `local != NULL` and the stack reports that @p local is
+ *          already use elsewhere
+ * @return  -EAFNOSUPPORT, if `local != NULL` or `remote != NULL` and
+ *          conn_ep_ip_t::family of @p local or @p remote is not supported.
+ * @return  -EINVAL, if `proto` is not supported or if conn_ep_ip_t::netif of
+ *          @p local or @p remote is not a valid interface or contradict each
+ *          other (i.e. `(local->netif != remote->netif) &&
+ *          ((local->netif != CONN_EP_ANY_NETIF) ||
+ *          (remote->netif != CONN_EP_ANY_NETIF))` if neither is `NULL`).
+ * @return  -EPROTONOSUPPORT, if `local != NULL` or `remote != NULL` and
+ *          proto is not supported by conn_ep_ip_t::family of @p local or @p
+ *          remote.
  */
-int conn_ip_create(conn_ip_t *conn, const void *addr, size_t addr_len, int family, int proto);
+int conn_ip_create(conn_ip_t *conn, const conn_ep_ip_t *local,
+                   const conn_ep_ip_t *remote, uint8_t proto);
 
 /**
- * @brief   Closes a raw IPv4/IPv6 connection
+ * @brief   Closes a raw IPv4/IPv6 connectivity
  *
- * @param[in,out] conn  A raw IPv4/IPv6 connection object.
+ * @pre `(conn != NULL)`
+ *
+ * @param[in,out] conn  A raw IPv4/IPv6 connectivity object.
  */
 void conn_ip_close(conn_ip_t *conn);
 
 /**
- * @brief   Gets the local address of a raw IPv4/IPv6 connection
+ * @brief   Gets the local end point of a raw IPv4/IPv6 connectivity
  *
- * @param[in] conn  A raw IPv4/IPv6 connection object.
- * @param[out] addr The local IP address. Must have space for any address of the connection's
- *                  family.
+ * @pre `(conn != NULL) && (ep != NULL)`
  *
- * @return  length of @p addr on success.
- * @return  any other negative number in case of an error. For portability implementations should
- *          draw inspiration of the errno values from the POSIX' getsockname() function
- *          specification.
+ * @param[in] conn  A raw IPv4/IPv6 connectivity object.
+ * @param[out] ep   The local end point.
+ *
+ * @return  0 on success.
+ * @return  -EADDRNOTAVAIL, when @p conn has no end point bound to it.
  */
-int conn_ip_getlocaladdr(conn_ip_t *conn, void *addr);
+int conn_ip_get_local(conn_ip_t *conn, conn_ep_ip_t *ep);
+
+/**
+ * @brief   Gets the remote end point of a UDP connectivity
+ *
+ * @pre `(conn != NULL) && (ep != NULL)`
+ *
+ * @param[in] conn  A UDP connectivity object.
+ * @param[out] ep   The remote end point.
+ *
+ * @return  0 on success.
+ * @return  -ENOTCONN, when @p conn has no remote end point bound to it.
+ */
+int conn_ip_get_remote(conn_ip_t *conn, conn_ep_ip_t *ep);
+
+/**
+ * @brief   Receives a message over IPv4/IPv6 from remote end point
+ *
+ * @pre `(conn != NULL) && (data != NULL) && (max_len > 0)`
+ *
+ * @param[in] conn      A raw IPv4/IPv6 connectivity object.
+ * @param[out] data     Pointer where the received data should be stored.
+ * @param[in] max_len   Maximum space available at @p data.
+ *                      If received data exceeds @p max_len the data is
+ *                      truncated and the remaining data can be retrieved
+ *                      later on.
+ * @param[in] timeout   Timeout for receive in microseconds.
+ *                      This value can be ignored (no timeout) if the
+ *                      @ref sys_xtimer module is not present and the stack does
+ *                      not support timeouts on its own.
+ *                      May be 0 for no timeout.
+ * @param[out] remote   Remote end point of the received data.
+ *                      May be NULL, if it is not required by the application.
+ *
+ * @note    Function blocks if no packet is currently waiting.
+ *
+ * @return  The number of bytes received on success.
+ * @return  0, if no received data is available, but everything is in order.
+ * @return  -EAFNOSUPPORT, if `remote != NULL` and conn_ep_ip_t::family of
+ *          @p remote is != 0 and not supported.
+ * @return  -EPROTO, if @p remote did not equal the remote of @p conn.
+ * @return  -ETIMEDOUT, if @p timeout expired.
+ */
+int conn_ip_recvfrom(conn_ip_t *conn, void *data, size_t max_len,
+                     uint32_t timeout, conn_ep_ip_t *remote);
 
 /**
  * @brief   Receives a message over IPv4/IPv6
  *
- * @param[in] conn      A raw IPv4/IPv6 connection object.
+ * @pre `(conn != NULL) && (data != NULL) && (max_len > 0)`
+ *
+ * @param[in] conn      A raw IPv4/IPv6 connectivity object.
  * @param[out] data     Pointer where the received data should be stored.
  * @param[in] max_len   Maximum space available at @p data.
- * @param[out] addr     NULL pointer or the sender's IP address. Must have space for any address
- *                      of the connection's family.
- * @param[out] addr_len Length of @p addr. Can be NULL if @p addr is NULL.
+ *                      If received data exceeds @p max_len the data is
+ *                      truncated and the remaining data can be retrieved
+ *                      later on.
+ * @param[in] timeout   Timeout for receive in microseconds.
+ *                      This value can be ignored (no timeout) if the
+ *                      @ref sys_xtimer module is not present and the stack does
+ *                      not support timeouts on its own.
+ *                      May be 0 for no timeout.
  *
- * @note    Function may block.
+ * @note    Function blocks if no packet is currently waiting.
  *
  * @return  The number of bytes received on success.
  * @return  0, if no received data is available, but everything is in order.
- * @return  any other negative number in case of an error. For portability, implementations should
- *          draw inspiration of the errno values from the POSIX' recv(), recvfrom(), or recvmsg()
- *          function specification.
+ * @return  -EPROTO, if source address of received packet did not equal
+ *          the remote of @p conn.
+ * @return  -ETIMEDOUT, if @p timeout expired.
  */
-int conn_ip_recvfrom(conn_ip_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len);
+static inline int conn_ip_recv(conn_ip_t *conn, void *data, size_t max_len,
+                               uint32_t timeout)
+{
+    return conn_ip_recvfrom(conn, data, max_len, timeout, NULL);
+}
 
 /**
- * @brief   Sends a message over IPv4/IPv6
+ * @brief   Sends a message over IPv4/IPv6 to remote end point
  *
+ * @pre `(if (len != 0): (data != NULL))`
+ *
+ * @param[in] conn      A raw IPv4/IPv6 connectivity object. May be NULL.
+ *                      A sensible local end point should be selected by the
+ *                      stack in that case.
  * @param[in] data      Pointer where the received data should be stored.
+ *                      May be `NULL` if `len == 0`.
  * @param[in] len       Maximum space available at @p data.
- * @param[in] src       The source address. May be NULL for all any interface address.
- * @param[in] src_len   Length of @p src.
- * @param[in] dst       The receiver's network address.
- * @param[in] dst_len   Length of @p dst.
- * @param[in] family    The family of @p src and @p dst (see @ref net_af).
- * @param[in] proto     @ref net_protnum for the IPv6 packets to set.
+ * @param[in] remote    Remote end point for the send data.
+ *                      May be `NULL`, if @p conn has a remote end point.
  *
- * @note    Function may block.
+ * @note    Function blocks until packet is handed to the stack.
  *
  * @return  The number of bytes send on success.
- * @return  any other negative number in case of an error. For portability, implementations should
- *          draw inspiration of the errno values from the POSIX' send(), sendfrom(), or sendmsg()
- *          function specification.
+ * @return  -ENOBUFS, if no memory was available to send @p data.
+ * @return  -ENOTCONN, if `remote == NULL`, but @p conn has no remote end point.
  */
-int conn_ip_sendto(const void *data, size_t len, const void *src, size_t src_len,
-                   void *dst, size_t dst_len, int family, int proto);
+int conn_ip_sendto(conn_ip_t *conn, const void *data, size_t len,
+                   conn_ep_ip_t *remote);
+
+
+/**
+ * @brief   Sends a message over IPv4/IPv6 to remote end point
+ *
+ * @pre `(if (len != 0): (data != NULL))`
+ *
+ * @param[in] conn      A raw IPv4/IPv6 connectivity object. May be NULL.
+ *                      A sensible local end point should be selected by the
+ *                      stack in that case.
+ * @param[in] data      Pointer where the received data should be stored.
+ *                      May be `NULL` if `len == 0`.
+ * @param[in] len       Maximum space available at @p data.
+ * @param[in] remote       Remote end point for the send data.
+ *                      May be `NULL`, if @p conn has a remote end point.
+ *                      conn_ep_ip_t::family may be AF_UNSPEC, if local
+ *                      end point of @p conn provides this information.
+ *
+ * @note    Function blocks until packet is handed to the stack.
+ *
+ * @return  The number of bytes send on success.
+ * @return  -EAFNOSUPPORT, if `remote != NULL` and conn_ep_ip_t::family of
+ *          @p remote is != AF_UNSPEC and not supported.
+ * @return  -EINVAL, if conn_ep_ip_t::netif of @p remote is not a valid
+ *          interface or contradicts the given local interface (i.e.
+ *          neither the local endpoint of `conn` nor remote are assigned to
+ *          `CONN_EP_ANY_NETIF` but are nevertheless different.
+ * @return  -ENOBUFS, if no memory was available to send @p data.
+ * @return  -ENOTCONN, if @p conn has no remote end point.
+ */
+static inline int conn_ip_send(conn_ip_t *conn, const void *data, size_t len)
+{
+    return conn_ip_sendto(conn, data, len, NULL);
+}
 
 #ifdef __cplusplus
 }

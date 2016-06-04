@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    net_conn_udp    UDP connections
+ * @defgroup    net_conn_udp    UDP connectivity
  * @ingroup     net_conn
- * @brief       Connection submodule for UDP connections
+ * @brief       Connectivity submodule for UDP connectivity
  * @{
  *
  * @file
- * @brief   UDP connection definitions
+ * @brief   UDP connectivity definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -22,6 +22,8 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+
+#include "net/conn/ep.h"
 
 #ifdef MODULE_GNRC_CONN_UDP
 #include "net/gnrc/conn.h"
@@ -40,107 +42,205 @@ extern "C" {
 #endif
 
 /**
- * @brief   Forward declaration of @ref conn_udp_t to allow for external definition.
- */
-struct conn_udp;
-
-/**
- * @brief   Implementation-specific type of a UDP connection object
+ * @brief   Implementation-specific type of a UDP connectivity object
+ *
+ * `struct conn_udp` needs to be defined by stack-specific implementation.
  */
 typedef struct conn_udp conn_udp_t;
 
 /**
- * @brief   Creates a new UDP connection object
+ * @brief   Creates a new UDP connectivity object
  *
- * @param[out] conn     Preallocated connection object. Must fill the size of the stack-specific
- *                      connection desriptor.
- * @param[in] addr      The local network layer address for @p conn.
- * @param[in] addr_len  The length of @p addr. Must be fitting for the @p family.
- * @param[in] family    The family of @p addr (see @ref net_af).
- * @param[in] port      The local UDP port for @p conn.
+ * @pre `(conn != NULL)`
+ * @pre `(local == NULL) || (local->port != 0)`
+ * @pre `(remote == NULL) || (remote->port != 0)`
  *
- * @todo    With @ref net_gnrc @ref conn_udp_recvfrom needs to be called from the
- *          same thread as for this function. This is undesired behavior and
- *          will be fixed in upcoming versions of RIOT.
+ * @param[out] conn     Preallocated connectivity object. Must fill the size of the
+ *                      stack-specific connectivity desriptor.
+ * @param[in] local     Local end point for the connectivity object.
+ *                      May be `NULL` to solicit implicit bind on
+ *                      @ref conn_udp_sendto() and @ref conn_udp_send().
+ *                      conn_ep_udp_t::port may not be 0 if `local != NULL`.
+ *                      conn_ep_udp_t::netif must either be
+ *                      @ref CONN_EP_ANY_NETIF or equal to conn_ep_udp_t::netif
+ *                      of @p remote if `remote != NULL`.
+ * @param[in] remote    Remote end point for the connectivity object.
+ *                      May be `NULL` but then the `remote` parameter of
+ *                      @ref conn_udp_sendto() may not be `NULL` and
+ *                      @ref conn_udp_send() will always error with return value
+ *                      -ENOTCONN. conn_ep_udp_t::port may not be 0 if
+ *                      `remote != NULL`.
+ *                      conn_ep_udp_t::netif must either be
+ *                      @ref CONN_EP_ANY_NETIF or equal to conn_ep_udp_t::netif
+ *                      of @p local if `local != NULL`.
  *
  * @return  0 on success.
- * @return  any other negative number in case of an error. For portability implementations should
- *          draw inspiration of the errno values from the POSIX' bind() function specification.
+ * @return  -EADDRINUSE, if `local != NULL` and the stack reports that @p local is
+ *          already use elsewhere
+ * @return  -EAFNOSUPPORT, if `local != NULL` or `remote != NULL` and
+ *          conn_ep_udp_t::family of @p local or @p remote is not supported.
+ * @return  -EINVAL, if conn_ep_udp_t::netif of @p local or @p remote is not a
+ *          valid interface or contradict each other (i.e.
+ *          `(local->netif != remote->netif) &&
+ *          ((local->netif != CONN_EP_ANY_NETIF) ||
+ *          (remote->netif != CONN_EP_ANY_NETIF))` if neither is `NULL`).
+ *          `
  */
-int conn_udp_create(conn_udp_t *conn, const void *addr, size_t addr_len, int family,
-                    uint16_t port);
+int conn_udp_create(conn_udp_t *conn, const conn_ep_udp_t *local,
+                    conn_ep_udp_t *remote);
 
 /**
- * @brief   Closes a UDP connection
+ * @brief   Closes a UDP connectivity
  *
- * @param[in,out] conn  A UDP connection object.
+ * @pre `(conn != NULL)`
+ *
+ * @param[in,out] conn  A UDP connectivity object.
  */
 void conn_udp_close(conn_udp_t *conn);
 
 /**
- * @brief   Gets the local address of a UDP connection
+ * @brief   Gets the local end point of a UDP connectivity
  *
- * @param[in] conn  A UDP connection object.
- * @param[out] addr The local network layer address. Must have space for any address of
- *                  the connection's family.
- * @param[out] port The local UDP port.
+ * @pre `(conn != NULL) && (ep != NULL)`
  *
- * @return  length of @p addr on success.
- * @return  any other negative number in case of an error. For portability implementations should
- *          draw inspiration of the errno values from the POSIX' getsockname() function
- *          specification.
+ * @param[in] conn  A UDP connectivity object.
+ * @param[out] ep   The local end point.
+ *
+ * @return  0 on success.
+ * @return  -EADDRNOTAVAIL, when @p conn has no local end point.
  */
-int conn_udp_getlocaladdr(conn_udp_t *conn, void *addr, uint16_t *port);
+int conn_udp_get_local(conn_udp_t *conn, conn_ep_udp_t *ep);
+
+/**
+ * @brief   Gets the remote end point of a UDP connectivity
+ *
+ * @pre `(conn != NULL) && (ep != NULL)`
+ *
+ * @param[in] conn  A UDP connectivity object.
+ * @param[out] ep   The remote end point.
+ *
+ * @return  0 on success.
+ * @return  -ENOTCONN, when @p conn has no remote end point bound to it.
+ */
+int conn_udp_get_remote(conn_udp_t *conn, conn_ep_udp_t *ep);
+
+/**
+ * @brief   Receives a UDP message from a remote end point
+ *
+ * @pre `(conn != NULL) && (data != NULL) && (max_len > 0)`
+ *
+ * @param[in] conn      A raw IPv4/IPv6 connectivity object.
+ * @param[out] data     Pointer where the received data should be stored.
+ * @param[in] max_len   Maximum space available at @p data.
+ *                      If received data exceeds @p max_len the data is
+ *                      truncated and the remaining data can be retrieved
+ *                      later on.
+ * @param[in] timeout   Timeout for receive in microseconds.
+ *                      This value can be ignored (no timeout) if the
+ *                      @ref sys_xtimer module is not present and the stack does
+ *                      not support timeouts on its own.
+ *                      May be 0 for no timeout.
+ * @param[out] remote   Remote end point of the received data.
+ *                      May be `NULL`, if it is not required by the application.
+ *
+ * @note    Function blocks if no packet is currently waiting.
+ *
+ * @return  The number of bytes received on success.
+ * @return  0, if no received data is available, but everything is in order.
+ * @return  -EAFNOSUPPORT, if `remote != NULL` and conn_ep_udp_t::family of
+ *          @p remote is != 0 and not supported.
+ * @return  -EPROTO, if @p remote did not equal the remote of @p conn.
+ * @return  -ETIMEDOUT, if @p timeout expired.
+ */
+int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len,
+                      uint32_t timeout, conn_ep_udp_t *remote);
 
 /**
  * @brief   Receives a UDP message
  *
- * @param[in] conn      A UDP connection object.
+ * @pre `(conn != NULL) && (data != NULL) && (max_len > 0)`
+ *
+ * @param[in] conn      A raw IPv4/IPv6 connectivity object. May be `NULL`.
+ *                      A sensible local end point should be selected by the
+ *                      stack in that case.
  * @param[out] data     Pointer where the received data should be stored.
  * @param[in] max_len   Maximum space available at @p data.
- * @param[out] addr     NULL pointer or the sender's network layer address. Must have space
- *                      for any address of the connection's family.
- * @param[out] addr_len Length of @p addr. Can be NULL if @p addr is NULL.
- * @param[out] port     NULL pointer or the sender's UDP port.
+ *                      If received data exceeds @p max_len the data is
+ *                      truncated and the remaining data can be retrieved
+ *                      later on.
+ * @param[in] timeout   Timeout for receive in microseconds.
+ *                      This value can be ignored (no timeout) if the
+ *                      @ref sys_xtimer module is not present and the stack does
+ *                      not support timeouts on its own.
+ *                      May be 0 for no timeout.
  *
- * @note    Function may block.
- *
- * @todo    With @ref net_gnrc this function needs to be called from the same
- *          thread as @ref conn_udp_create. This is undesired behavior and will
- *          be fixed in upcoming versions of RIOT.
+ * @note    Function blocks if no packet is currently waiting.
  *
  * @return  The number of bytes received on success.
  * @return  0, if no received data is available, but everything is in order.
- * @return  any other negative number in case of an error. For portability, implementations should
- *          draw inspiration of the errno values from the POSIX' recv(), recvfrom(), or recvmsg()
- *          function specification.
+ * @return  -EPROTO, if source address of received packet did not equal
+ *          the remote of @p conn.
+ * @return  -ETIMEDOUT, if @p timeout expired.
  */
-int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
-                      uint16_t *port);
+static inline int conn_udp_recv(conn_udp_t *conn, void *data, size_t max_len,
+                                uint32_t timeout)
+{
+    return conn_udp_recvfrom(conn, data, max_len, timeout, NULL);
+}
+
+/**
+ * @brief   Sends a UDP message to remote end point
+ *
+ * @pre `(if (len != 0): (data != NULL))`
+ *
+ * @param[in] conn      A raw IPv4/IPv6 connectivity object. May be `NULL`.
+ *                      A sensible local end point should be selected by the
+ *                      stack in that case.
+ * @param[in] data      Pointer where the received data should be stored.
+ *                      May be `NULL` if `len == 0`.
+ * @param[in] len       Maximum space available at @p data.
+ * @param[in] remote    Remote end point for the send data.
+ *                      May be `NULL`, if @p conn has a remote end point.
+ *                      conn_ep_udp_t::family may be AF_UNSPEC, if local
+ *                      end point of @p conn provides this information.
+ *
+ * @note    Function blocks until packet is handed to the stack.
+ *
+ * @return  The number of bytes sent on success.
+ * @return  -EAFNOSUPPORT, if `remote != NULL` and conn_ep_udp_t::family of
+ *          @p remote is != AF_UNSPEC and not supported.
+ * @return  -EINVAL, if conn_ep_udp_t::netif of @p remote is not a valid
+ *          interface or contradicts the given local interface (i.e.
+ *          neither the local endpoint of `conn` nor remote are assigned to
+ *          `CONN_EP_ANY_NETIF` but are nevertheless different.
+ * @return  -ENOBUFS, if no memory was available to send @p data.
+ * @return  -ENOTCONN, if `remote == NULL`, but @p conn has no remote end point.
+ */
+int conn_udp_sendto(conn_udp_t *conn, const void *data, size_t len,
+                    conn_ep_udp_t *remote);
 
 /**
  * @brief   Sends a UDP message
  *
- * @param[in] data      Pointer to the data to send.
- * @param[in] len       Length of the @p data to send.
- * @param[in] src       The source address. May be NULL for any interface address.
- * @param[in] src_len   Length of @p src. May be 0 if @p src is NULL
- * @param[in] dst       The receiver's network address.
- * @param[in] dst_len   Length of @p dst.
- * @param[in] family    The family of @p src and @p dst (see @ref net_af).
- * @param[in] sport     The source UDP port.
- * @param[in] dport     The receiver's UDP port.
+ * @pre `(if (len != 0): (data != NULL))`
  *
- * @note    Function may block.
+ * @param[in] conn      A raw IPv4/IPv6 connectivity object. May be `NULL`.
+ *                      A sensible local end point should be selected by the
+ *                      stack in that case.
+ * @param[in] data      Pointer where the received data should be stored.
+ *                      May be `NULL` if `len == 0`.
+ * @param[in] len       Maximum space available at @p data.
+ *
+ * @note    Function blocks until packet is handed to the stack.
  *
  * @return  The number of bytes sent on success.
- * @return  any other negative number in case of an error. For portability, implementations should
- *          draw inspiration of the errno values from the POSIX' send(), sendfrom(), or sendmsg()
- *          function specification.
+ * @return  -ENOBUFS, if no memory was available to send @p data.
+ * @return  -ENOTCONN, if @p conn has no remote end point.
  */
-int conn_udp_sendto(const void *data, size_t len, const void *src, size_t src_len,
-                    const void *dst, size_t dst_len, int family, uint16_t sport,
-                    uint16_t dport);
+static inline int conn_udp_send(conn_udp_t *conn, const void *data, size_t len)
+{
+    return conn_udp_sendto(conn, data, len, NULL);
+}
 
 #ifdef __cplusplus
 }
