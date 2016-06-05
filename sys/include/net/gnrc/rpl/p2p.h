@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_rpl_p2p Reactive Discovery of P2P Routes in LLNs
+ * @defgroup    net_gnrc_rpl_p2p Reactive Discovery of P2P Routes in LLNs
  * @ingroup     net_gnrc_rpl
  * @brief       Implementation of P2P-RPL
  * @see <a href="https://tools.ietf.org/html/rfc6997">
