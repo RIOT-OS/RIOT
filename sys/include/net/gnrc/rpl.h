@@ -51,7 +51,7 @@
  *   CFLAGS += -DGNRC_RPL_WITHOUT_PIO
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- *  - Modify trickle parameters
+ * - Modify trickle parameters
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS=20
  *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_INTERVAL_MIN=3
@@ -72,6 +72,7 @@
  *   interface exists (`GNRC_NETIF_NUMOF > 1`)
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  *   CFLAGS += -DGNRC_RPL_DEFAULT_NETIF=6
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - By default, all incoming control messages get checked for validation.
  *   This validation can be disabled in case the involved RPL implementations
