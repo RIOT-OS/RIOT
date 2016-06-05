@@ -35,13 +35,13 @@
 
 
 /** @brief Current value for mac_min_be parameter */
-static uint8_t mac_min_be = MAC_MIN_BE_DEFAULT;
+static uint8_t mac_min_be = CSMA_SENDER_MIN_BE_DEFAULT;
 
 /** @brief Current value for mac_max_be parameter */
-static uint8_t mac_max_be = MAC_MAX_BE_DEFAULT;
+static uint8_t mac_max_be = CSMA_SENDER_MAX_BE_DEFAULT;
 
 /** @brief Current value for mac_max_csma_backoffs parameter */
-static uint8_t mac_max_csma_backoffs = MAC_MAX_CSMA_BACKOFFS_DEFAULT;
+static uint8_t mac_max_csma_backoffs = CSMA_SENDER_MAX_BACKOFFS_DEFAULT;
 
 
 /*--------------------- "INTERNAL" UTILITY FUNCTIONS ---------------------*/
@@ -62,11 +62,11 @@ static inline uint32_t choose_backoff_period(int be)
     if (be > mac_max_be) {
         be = mac_max_be;
     }
-    uint32_t max_backoff = ((1 << be) - 1) * A_UNIT_BACKOFF_PERIOD_MICROSEC;
+    uint32_t max_backoff = ((1 << be) - 1) * CSMA_SENDER_BACKOFF_PERIOD_UNIT;
 
     uint32_t period = random_uint32() % max_backoff;
-    if (period < A_UNIT_BACKOFF_PERIOD_MICROSEC) {
-        period = A_UNIT_BACKOFF_PERIOD_MICROSEC;
+    if (period < CSMA_SENDER_BACKOFF_PERIOD_UNIT) {
+        period = CSMA_SENDER_BACKOFF_PERIOD_UNIT;
     }
 
     return period;
@@ -116,23 +116,23 @@ static int send_if_cca(gnrc_netdev_t *device, gnrc_pktsnip_t *data)
 
 /*------------------------- "EXPORTED" FUNCTIONS -------------------------*/
 
-void set_csma_mac_min_be(uint8_t val)
+void csma_sender_set_min_be(uint8_t val)
 {
     mac_min_be = val;
 }
 
-void set_csma_mac_max_be(uint8_t val)
+void csma_sender_set_max_be(uint8_t val)
 {
     mac_max_be = val;
 }
 
-void set_csma_mac_max_csma_backoffs(uint8_t val)
+void csma_sender_set_max_backoffs(uint8_t val)
 {
     mac_max_csma_backoffs = val;
 }
 
 
-int csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
+int csma_sender_csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
 {
     netopt_enable_t hwfeat;
 
@@ -202,7 +202,7 @@ int csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
 }
 
 
-int cca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
+int csma_sender_cca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
 {
     netopt_enable_t hwfeat;
 

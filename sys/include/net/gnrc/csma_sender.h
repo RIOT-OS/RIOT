@@ -35,23 +35,23 @@ extern "C" {
 /**
  * @brief Default Minimal CSMA/CA Backoff Exponent
  */
-#define MAC_MIN_BE_DEFAULT               (3U)
+#define CSMA_SENDER_MIN_BE_DEFAULT          (3U)
 
 /**
  * @brief Default Maximal CSMA/CA Backoff Exponent
  */
-#define MAC_MAX_BE_DEFAULT               (5U)
+#define CSMA_SENDER_MAX_BE_DEFAULT          (5U)
 
 /**
  * @brief Default Maximal number of retries for sending
  *        a given packet with the CSMA/CA method
  */
-#define MAC_MAX_CSMA_BACKOFFS_DEFAULT    (4U)
+#define CSMA_SENDER_MAX_BACKOFFS_DEFAULT    (4U)
 
 /**
  * @brief CSMA/CA backoff period, in microseconds
  */
-#define A_UNIT_BACKOFF_PERIOD_MICROSEC   (320U)
+#define CSMA_SENDER_BACKOFF_PERIOD_UNIT     (320U)
 
 /**
  * @brief Define a different (non-standard) value for
@@ -59,7 +59,7 @@ extern "C" {
  *
  * @param[in] val     new value for macMinBE
  */
-void set_csma_mac_min_be(uint8_t val);
+void csma_sender_set_min_be(uint8_t val);
 
 /**
  * @brief Define a different (non-standard) value for
@@ -67,7 +67,7 @@ void set_csma_mac_min_be(uint8_t val);
  *
  * @param[in] val     new value for macMaxBE
  */
-void set_csma_mac_max_be(uint8_t val);
+void csma_sender_set_max_be(uint8_t val);
 
 /**
  * @brief Define a different (non-standard) value for
@@ -75,7 +75,7 @@ void set_csma_mac_max_be(uint8_t val);
  *
  * @param[in] val     new value for macMaxCSMABackoffs
  */
-void set_csma_mac_max_csma_backoffs(uint8_t val);
+void csma_sender_set_max_backoffs(uint8_t val);
 
 /**
  * @brief   Sends a 802.15.4 frame using the CSMA/CA method
@@ -97,7 +97,7 @@ void set_csma_mac_max_csma_backoffs(uint8_t val);
  * @return              -EBUSY if radio medium never was available
  *                      to send the given data
  */
-int csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt);
+int csma_sender_csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt);
 
 /**
  * @brief   Sends a 802.15.4 frame when medium is avaiable.
@@ -108,7 +108,7 @@ int csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt);
  * It is especially useful for broadcasting specific packets,
  * like beacons; or for many sending packets in burst. <br/>
  * ATTENTION: It only tries to send the given data once. If you want the
- * complete CSMA/CA procedure with retries, use @c csma_ca_send().
+ * complete CSMA/CA procedure with retries, use @c csma_sender_csma_ca_send().
  *
  * @param[in] dev       netdev device, needs to be already initialized
  * @param[in] pkt       pointer to the data in the packet buffer;
@@ -124,7 +124,7 @@ int csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt);
  * @return              -EBUSY if radio medium was not available
  *                      to send the given data
  */
-int cca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt);
+int csma_sender_cca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt);
 
 
 #ifdef __cplusplus
