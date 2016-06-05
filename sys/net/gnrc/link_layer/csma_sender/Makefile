@@ -1,6 +1,3 @@
-MODULE = gnrc_csma_sender
-
-USEMODULE += xtimer
-USEMODULE += random
+MODULE := gnrc_csma_sender
 
 include $(RIOTBASE)/Makefile.base

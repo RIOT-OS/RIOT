@@ -10,6 +10,11 @@ ifneq (,$(filter ccn-lite,$(USEPKG)))
     export CFLAGS += -DCCNL_RIOT
 endif
 
+ifneq (,$(filter gnrc_csma_sender,$(USEMODULE)))
+  USEMODULE += random
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE += conn_udp
   USEMODULE += xtimer
