@@ -81,6 +81,8 @@ void csma_sender_set_max_backoffs(uint8_t val);
 /**
  * @brief   Sends a 802.15.4 frame using the CSMA/CA method
  *
+ * @pre `dev != NULL`
+ *
  * If the transceiver can (and is configured to) do hardware-assisted
  * CSMA/CA, this feature is used. Otherwise, a software procedure is used.
  *
@@ -102,6 +104,8 @@ int csma_sender_csma_ca_send(netdev2_t *dev, struct iovec *vector,
 
 /**
  * @brief   Sends a 802.15.4 frame when medium is avaiable.
+ *
+ * @pre `dev != NULL`
  *
  * This function is useful for sending packets without the whole CSMA/CA
  * procedure, but *after* ensuring medium is available, that is after a

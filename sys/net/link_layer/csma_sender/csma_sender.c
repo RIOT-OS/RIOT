@@ -16,6 +16,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
 
@@ -138,6 +139,7 @@ int csma_sender_csma_ca_send(netdev2_t *dev, struct iovec *vector,
 {
     netopt_enable_t hwfeat;
 
+    assert(dev);
     /* Does the transceiver do automatic CSMA/CA when sending? */
     int res = dev->driver->get(dev,
                                NETOPT_CSMA,
@@ -210,6 +212,7 @@ int csma_sender_cca_send(netdev2_t *dev, struct iovec *vector, unsigned count)
 {
     netopt_enable_t hwfeat;
 
+    assert(dev);
     /* Does the transceiver do automatic CCA before sending? */
     int res = dev->driver->get(dev,
                                NETOPT_AUTOCCA,
