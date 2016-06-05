@@ -19,7 +19,6 @@
 #include <errno.h>
 #include <stdbool.h>
 
-#include "kernel.h"
 #include "xtimer.h"
 #include "random.h"
 #include "net/gnrc/csma_sender.h"
@@ -65,7 +64,7 @@ static inline uint32_t choose_backoff_period(int be)
     }
     uint32_t max_backoff = ((1 << be) - 1) * A_UNIT_BACKOFF_PERIOD_MICROSEC;
 
-    uint32_t period = genrand_uint32() % max_backoff;
+    uint32_t period = random_uint32() % max_backoff;
     if (period < A_UNIT_BACKOFF_PERIOD_MICROSEC) {
         period = A_UNIT_BACKOFF_PERIOD_MICROSEC;
     }
@@ -167,7 +166,7 @@ int csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
 
     /* if we arrive here, then we must perform the CSMA/CA procedure
        ourselves by software */
-    genrand_init(xtimer_now());
+    random_init(xtimer_now());
     DEBUG("csma: Starting software CSMA/CA....\n");
 
     int nb = 0, be = mac_min_be;

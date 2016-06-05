@@ -22,8 +22,8 @@
 
 #ifndef GNRC_CSMA_SENDER_H_
 #define GNRC_CSMA_SENDER_H_
+#include <stdint.h>
 
-#include "kernel.h"
 #include "net/gnrc.h"
 
 
