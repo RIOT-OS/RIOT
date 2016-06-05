@@ -22,6 +22,11 @@
 #include "board.h"
 #include "net/gnrc/netdev2.h"
 #include "net/gnrc/netdev2/ieee802154.h"
+#ifdef MODULE_GNRC_COSENS
+#include "net/gnrc/cosens.h"
+#else
+#include "net/gnrc/nomac.h"
+#endif
 #include "net/gnrc.h"
 
 #include "at86rf2xx.h"
@@ -63,6 +68,16 @@ void auto_init_at86rf2xx(void)
                               AT86RF2XX_MAC_PRIO,
                               "at86rf2xx",
                               &gnrc_adpt[i]);
+#ifdef MODULE_GNRC_COSENS
+            /* start the 'gnrc_cosens' module */
+            gnrc_cosens_init(_at86rf2xx_stacks[i],
+                             AT86RF2XX_MAC_STACKSIZE, AT86RF2XX_MAC_PRIO,
+                             "at86rf2xx", (gnrc_netdev_t *)&at86rf2xx_devs[i]);
+#else
+            gnrc_nomac_init(_at86rf2xx_stacks[i],
+                            AT86RF2XX_MAC_STACKSIZE, AT86RF2XX_MAC_PRIO,
+                            "at86rf2xx", (gnrc_netdev_t *)&at86rf2xx_devs[i]);
+#endif
         }
     }
 }
