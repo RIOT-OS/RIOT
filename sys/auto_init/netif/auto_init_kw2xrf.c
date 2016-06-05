@@ -22,7 +22,11 @@
 #ifdef MODULE_KW2XRF
 
 #include "board.h"
+#ifdef MODULE_GNRC_802154_BASIC_MAC
+#include "net/gnrc/ieee_802154_basic_mac.h"
+#else
 #include "net/gnrc/nomac.h"
+#endif
 #include "net/gnrc.h"
 
 #include "kw2xrf.h"
@@ -41,7 +45,7 @@
 #define KW2XRF_NUM (sizeof(kw2xrf_params)/sizeof(kw2xrf_params[0]))
 
 static kw2xrf_t kw2xrf_devs[KW2XRF_NUM];
-static char _nomac_stacks[KW2XRF_MAC_STACKSIZE][KW2XRF_NUM];
+static char _mac_stacks[KW2XRF_MAC_STACKSIZE][KW2XRF_NUM];
 
 void auto_init_kw2xrf(void)
 {
@@ -59,9 +63,16 @@ void auto_init_kw2xrf(void)
             DEBUG("Error initializing KW2xrf radio device!");
         }
         else {
-            gnrc_nomac_init(_nomac_stacks[i],
+#ifdef MODULE_GNRC_802154_BASIC_MAC
+            /* start the 'gnrc_802154_basic_mac' module */
+            gnrc_802154_basic_mac_init(_mac_stacks[i],
                             KW2XRF_MAC_STACKSIZE, KW2XRF_MAC_PRIO,
                             "kw2xrf", (gnrc_netdev_t *)&kw2xrf_devs[i]);
+#else
+            gnrc_nomac_init(_mac_stacks[i],
+                            KW2XRF_MAC_STACKSIZE, KW2XRF_MAC_PRIO,
+                            "kw2xrf", (gnrc_netdev_t *)&kw2xrf_devs[i]);
+#endif
         }
     }
 }

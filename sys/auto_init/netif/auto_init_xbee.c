@@ -20,7 +20,11 @@
 #ifdef MODULE_XBEE
 
 #include "board.h"
+#ifdef MODULE_GNRC_802154_BASIC_MAC
+#include "net/gnrc/ieee_802154_basic_mac.h"
+#else
 #include "net/gnrc/nomac.h"
+#endif
 #include "net/gnrc.h"
 
 #include "xbee.h"
@@ -43,7 +47,7 @@ static xbee_t xbee_devs[XBEE_NUM];
 /**
  * @brief   Stacks for the MAC layer threads
  */
-static char _nomac_stacks[XBEE_MAC_STACKSIZE][XBEE_NUM];
+static char _mac_stacks[XBEE_MAC_STACKSIZE][XBEE_NUM];
 
 void auto_init_xbee(void)
 {
@@ -56,9 +60,16 @@ void auto_init_xbee(void)
             DEBUG("Error initializing XBee radio device!");
         }
         else {
-            gnrc_nomac_init(_nomac_stacks[i],
-                            XBEE_MAC_STACKSIZE, XBEE_MAC_PRIO, "xbee",
-                            (gnrc_netdev_t *)&xbee_devs[i]);
+#ifdef MODULE_GNRC_802154_BASIC_MAC
+            /* start the 'gnrc_802154_basic_mac' module */
+            gnrc_802154_basic_mac_init(_mac_stacks[i],
+                            XBEE_MAC_STACKSIZE, XBEE_MAC_PRIO,
+                            "xbee", (gnrc_netdev_t *)&xbee_devs[i]);
+#else
+            gnrc_nomac_init(_mac_stacks[i],
+                            XBEE_MAC_STACKSIZE, XBEE_MAC_PRIO,
+                            "xbee", (gnrc_netdev_t *)&xbee_devs[i]);
+#endif
         }
     }
 }
