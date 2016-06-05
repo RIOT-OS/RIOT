@@ -142,20 +142,21 @@ int csma_sender_csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
                                (void *) &hwfeat,
                                sizeof(netopt_enable_t));
     bool ok = false;
+
     switch (res) {
-    case -ENODEV:
-        /* invalid device pointer given */
-        return -ENODEV;
-    case -ENOTSUP:
-        /* device doesn't make auto-CSMA/CA */
-        break;
-    case -EOVERFLOW:  /* (normally impossible...*/
-    case -ECANCELED:
-        DEBUG("csma: !!! DEVICE DRIVER FAILURE! TRANSMISSION ABORTED!\n");
-        /* internal driver error! */
-        return -ECANCELED;
-    default:
-        ok = (hwfeat == NETOPT_ENABLE);
+        case -ENODEV:
+            /* invalid device pointer given */
+            return -ENODEV;
+        case -ENOTSUP:
+            /* device doesn't make auto-CSMA/CA */
+            break;
+        case -EOVERFLOW: /* (normally impossible...*/
+        case -ECANCELED:
+            DEBUG("csma: !!! DEVICE DRIVER FAILURE! TRANSMISSION ABORTED!\n");
+            /* internal driver error! */
+            return -ECANCELED;
+        default:
+            ok = (hwfeat == NETOPT_ENABLE);
     }
 
     if (ok) {
@@ -181,7 +182,8 @@ int csma_sender_csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
         if (res >= 0) {
             /* TX done */
             return res;
-        } else if (res != -EBUSY) {
+        }
+        else if (res != -EBUSY) {
             /* something has gone wrong, return the error code */
             return res;
         }
@@ -212,20 +214,21 @@ int csma_sender_cca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
                                (void *) &hwfeat,
                                sizeof(netopt_enable_t));
     bool ok = false;
+
     switch (res) {
-    case -ENODEV:
-        /* invalid device pointer given */
-        return -ENODEV;
-    case -ENOTSUP:
-        /* device doesn't make auto-CCA */
-        break;
-    case -EOVERFLOW:  /* (normally impossible...*/
-    case -ECANCELED:
-        /* internal driver error! */
-        DEBUG("csma: !!! DEVICE DRIVER FAILURE! TRANSMISSION ABORTED!\n");
-        return -ECANCELED;
-    default:
-        ok = (hwfeat == NETOPT_ENABLE);
+        case -ENODEV:
+            /* invalid device pointer given */
+            return -ENODEV;
+        case -ENOTSUP:
+            /* device doesn't make auto-CCA */
+            break;
+        case -EOVERFLOW: /* (normally impossible...*/
+        case -ECANCELED:
+            /* internal driver error! */
+            DEBUG("csma: !!! DEVICE DRIVER FAILURE! TRANSMISSION ABORTED!\n");
+            return -ECANCELED;
+        default:
+            ok = (hwfeat == NETOPT_ENABLE);
     }
 
     if (ok) {
