@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_gnrc_csma_sender  CSMA/CA helper
- * @ingroup     net_gnrc
+ * @defgroup    net_csma_sender  CSMA/CA helper
+ * @ingroup     net
  * @brief       This interface allows code from layer 2 (MAC) or higher
  *              to send packets with CSMA/CA, whatever the abilities and/or
  *              configuration of a given radio transceiver device are.
@@ -20,11 +20,12 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
-#ifndef GNRC_CSMA_SENDER_H_
-#define GNRC_CSMA_SENDER_H_
+#ifndef CSMA_SENDER_H_
+#define CSMA_SENDER_H_
+
 #include <stdint.h>
 
-#include "net/gnrc.h"
+#include "net/netdev2.h"
 
 
 #ifdef __cplusplus
@@ -84,9 +85,8 @@ void csma_sender_set_max_backoffs(uint8_t val);
  * CSMA/CA, this feature is used. Otherwise, a software procedure is used.
  *
  * @param[in] dev       netdev device, needs to be already initialized
- * @param[in] pkt       pointer to the data in the packet buffer;
- *                      it must be a complete 802.15.4-compliant frame,
- *                      ready to be sent to the radio transceiver
+ * @param[in] vector    pointer to the data
+ * @param[in] count     number of elements in @p vector
  *
  * @return              number of bytes that were actually send out
  * @return              -ENODEV if @p dev is invalid
@@ -97,7 +97,8 @@ void csma_sender_set_max_backoffs(uint8_t val);
  * @return              -EBUSY if radio medium never was available
  *                      to send the given data
  */
-int csma_sender_csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt);
+int csma_sender_csma_ca_send(netdev2_t *dev, struct iovec *vector,
+                             unsigned count);
 
 /**
  * @brief   Sends a 802.15.4 frame when medium is avaiable.
@@ -114,9 +115,8 @@ int csma_sender_csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt);
  *          @ref csma_sender_csma_ca_send().
  *
  * @param[in] dev       netdev device, needs to be already initialized
- * @param[in] pkt       pointer to the data in the packet buffer;
- *                      it must be a complete 802.15.4-compliant frame,
- *                      ready to be sent to the radio transceiver
+ * @param[in] vector    pointer to the data
+ * @param[in] count     number of elements in @p vector
  *
  * @return              number of bytes that were actually send out
  * @return              -ENODEV if @p dev is invalid
@@ -127,13 +127,13 @@ int csma_sender_csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt);
  * @return              -EBUSY if radio medium was not available
  *                      to send the given data
  */
-int csma_sender_cca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt);
+int csma_sender_cca_send(netdev2_t *dev, struct iovec *vector, unsigned count);
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GNRC_CSMA_SENDER_H_ */
+#endif /* CSMA_SENDER_H_ */
 
 /** @} */

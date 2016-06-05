@@ -7,9 +7,6 @@ endif
 ifneq (,$(filter gnrc_conn_udp,$(USEMODULE)))
     DIRS += conn/udp
 endif
-ifneq (,$(filter gnrc_csma_sender,$(USEMODULE)))
-    DIRS += link_layer/csma_sender
-endif
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
     DIRS += network_layer/icmpv6
 endif
