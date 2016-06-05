@@ -25,7 +25,7 @@
 #include <string.h>
 #include <inttypes.h>
 
-static const char * expected_result = "2016.0";
+static const char * expected_result = "2016.03";
 static const double floating_point_value = 2016.0317;
 
 int main(void)
@@ -33,7 +33,7 @@ int main(void)
     const uint8_t str_len = strlen(expected_result);
     char result[str_len];
     snprintf(result, str_len + 1,
-             "%.f", floating_point_value);
+             "%.2f", floating_point_value);
 
     printf("Value displayed: %s\n", result);
 
