@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 INRIA
+ * Copyright (C) 2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,6 +14,7 @@
  * @brief       Implementation of the CSMA/CA helper
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @}
  */
 
@@ -35,16 +37,12 @@
 #include <inttypes.h>
 #endif
 
-
-/** @brief Current value for mac_min_be parameter */
-static uint8_t mac_min_be = CSMA_SENDER_MIN_BE_DEFAULT;
-
-/** @brief Current value for mac_max_be parameter */
-static uint8_t mac_max_be = CSMA_SENDER_MAX_BE_DEFAULT;
-
-/** @brief Current value for mac_max_csma_backoffs parameter */
-static uint8_t mac_max_csma_backoffs = CSMA_SENDER_MAX_BACKOFFS_DEFAULT;
-
+const csma_sender_conf_t CSMA_SENDER_CONF_DEFAULT = {
+    CSMA_SENDER_MIN_BE_DEFAULT,
+    CSMA_SENDER_MAX_BE_DEFAULT,
+    CSMA_SENDER_MAX_BACKOFFS_DEFAULT,
+    CSMA_SENDER_BACKOFF_PERIOD_UNIT
+};
 
 /*--------------------- "INTERNAL" UTILITY FUNCTIONS ---------------------*/
 
@@ -56,13 +54,14 @@ static uint8_t mac_max_csma_backoffs = CSMA_SENDER_MAX_BACKOFFS_DEFAULT;
  *
  * @return              An adequate random backoff exponent in microseconds
  */
-static inline uint32_t choose_backoff_period(int be)
+static inline uint32_t choose_backoff_period(int be,
+                                             const csma_sender_conf_t *conf)
 {
-    if (be < mac_min_be) {
-        be = mac_min_be;
+    if (be < conf->min_be) {
+        be = conf->min_be;
     }
-    if (be > mac_max_be) {
-        be = mac_max_be;
+    if (be > conf->max_be) {
+        be = conf->max_be;
     }
     uint32_t max_backoff = ((1 << be) - 1) * CSMA_SENDER_BACKOFF_PERIOD_UNIT;
 
@@ -118,28 +117,16 @@ static int send_if_cca(netdev2_t *device, struct iovec *vector, unsigned count)
 
 /*------------------------- "EXPORTED" FUNCTIONS -------------------------*/
 
-void csma_sender_set_min_be(uint8_t val)
-{
-    mac_min_be = val;
-}
-
-void csma_sender_set_max_be(uint8_t val)
-{
-    mac_max_be = val;
-}
-
-void csma_sender_set_max_backoffs(uint8_t val)
-{
-    mac_max_csma_backoffs = val;
-}
-
-
 int csma_sender_csma_ca_send(netdev2_t *dev, struct iovec *vector,
-                             unsigned count)
+                             unsigned count, const csma_sender_conf_t *conf)
 {
     netopt_enable_t hwfeat;
 
     assert(dev);
+    /* choose default configuration if none is given */
+    if (conf == NULL) {
+        conf = &CSMA_SENDER_CONF_DEFAULT;
+    }
     /* Does the transceiver do automatic CSMA/CA when sending? */
     int res = dev->driver->get(dev,
                                NETOPT_CSMA,
@@ -174,11 +161,11 @@ int csma_sender_csma_ca_send(netdev2_t *dev, struct iovec *vector,
     random_init(xtimer_now());
     DEBUG("csma: Starting software CSMA/CA....\n");
 
-    int nb = 0, be = mac_min_be;
+    int nb = 0, be = conf->min_be;
 
-    while (nb <= mac_max_csma_backoffs) {
+    while (nb <= conf->max_be) {
         /* delay for an adequate random backoff period */
-        uint32_t bp = choose_backoff_period(be);
+        uint32_t bp = choose_backoff_period(be, conf);
         xtimer_usleep(bp);
 
         /* try to send after a CCA */
@@ -195,8 +182,8 @@ int csma_sender_csma_ca_send(netdev2_t *dev, struct iovec *vector,
         /* medium is busy: increment CSMA counters */
         DEBUG("csma: Radio medium busy.\n");
         be++;
-        if (be > mac_max_be) {
-            be = mac_max_be;
+        if (be > conf->max_be) {
+            be = conf->max_be;
         }
         nb++;
         /* ... and try again if we have no exceeded the retry limit */

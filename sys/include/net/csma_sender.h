@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 INRIA
+ * Copyright (C) 2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  * @brief       Interface definition for the CSMA/CA helper
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
 #ifndef CSMA_SENDER_H_
@@ -32,51 +34,49 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief Default Minimal CSMA/CA Backoff Exponent
  */
+#ifndef CSMA_SENDER_MIN_BE_DEFAULT
 #define CSMA_SENDER_MIN_BE_DEFAULT          (3U)
+#endif
 
 /**
  * @brief Default Maximal CSMA/CA Backoff Exponent
  */
+#ifndef CSMA_SENDER_MAX_BE_DEFAULT
 #define CSMA_SENDER_MAX_BE_DEFAULT          (5U)
+#endif
 
 /**
  * @brief Default Maximal number of retries for sending
  *        a given packet with the CSMA/CA method
  */
+#ifndef CSMA_SENDER_MAX_BACKOFFS_DEFAULT
 #define CSMA_SENDER_MAX_BACKOFFS_DEFAULT    (4U)
+#endif
 
 /**
  * @brief CSMA/CA backoff period, in microseconds
  */
+#ifndef CSMA_SENDER_BACKOFF_PERIOD_UNIT
 #define CSMA_SENDER_BACKOFF_PERIOD_UNIT     (320U)
+#endif
 
 /**
- * @brief Define a different (non-standard) value for
- *        the CSMA macMinBE parameter.
- *
- * @param[in] val     new value for macMinBE
+ * @brief   Configuration type for backoff
  */
-void csma_sender_set_min_be(uint8_t val);
+typedef struct {
+    uint8_t min_be;             /**< minimum backoff exponent */
+    uint8_t max_be;             /**< maximum backoff exponent */
+    uint16_t max_backoffs;      /**< maximum number of retries */
+    uint32_t backoff_period;    /**< backoff period in microseconds */
+} csma_sender_conf_t;
 
 /**
- * @brief Define a different (non-standard) value for
- *        the CSMA macMaxBE parameter.
- *
- * @param[in] val     new value for macMaxBE
+ * @brief   Default configuration.
  */
-void csma_sender_set_max_be(uint8_t val);
-
-/**
- * @brief Define a different (non-standard) value for
- *        the CSMA macMaxCSMABackoffs parameter.
- *
- * @param[in] val     new value for macMaxCSMABackoffs
- */
-void csma_sender_set_max_backoffs(uint8_t val);
+extern const csma_sender_conf_t CSMA_SENDER_CONF_DEFAULT;
 
 /**
  * @brief   Sends a 802.15.4 frame using the CSMA/CA method
@@ -89,6 +89,8 @@ void csma_sender_set_max_backoffs(uint8_t val);
  * @param[in] dev       netdev device, needs to be already initialized
  * @param[in] vector    pointer to the data
  * @param[in] count     number of elements in @p vector
+ * @param[in] conf      configuration for the backoff;
+ *                      will be set to @ref CSMA_SENDER_CONF_DEFAULT if NULL.
  *
  * @return              number of bytes that were actually send out
  * @return              -ENODEV if @p dev is invalid
@@ -100,7 +102,7 @@ void csma_sender_set_max_backoffs(uint8_t val);
  *                      to send the given data
  */
 int csma_sender_csma_ca_send(netdev2_t *dev, struct iovec *vector,
-                             unsigned count);
+                             unsigned count, const csma_sender_conf_t *conf);
 
 /**
  * @brief   Sends a 802.15.4 frame when medium is avaiable.
