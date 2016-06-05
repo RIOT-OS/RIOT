@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_csma_sender  Helper interface to send packets via CSMA/CA
+ * @defgroup    net_gnrc_csma_sender  CSMA/CA helper
  * @ingroup     net_gnrc
  * @brief       This interface allows code from layer 2 (MAC) or higher
  *              to send packets with CSMA/CA, whatever the abilities and/or
@@ -103,12 +103,15 @@ int csma_sender_csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt);
  * @brief   Sends a 802.15.4 frame when medium is avaiable.
  *
  * This function is useful for sending packets without the whole CSMA/CA
- * procedure, but *after* ensuring medium is available, that is :
- * after a successful CCA. <br/>
- * It is especially useful for broadcasting specific packets,
- * like beacons; or for many sending packets in burst. <br/>
- * ATTENTION: It only tries to send the given data once. If you want the
- * complete CSMA/CA procedure with retries, use @c csma_sender_csma_ca_send().
+ * procedure, but *after* ensuring medium is available, that is after a
+ * successful CCA.
+ *
+ * It is especially useful for broadcasting specific packets, like beacons; or
+ * for many sending packets in burst.
+ *
+ * @warning **ATTENTION:** It only tries to send the given data once. If you
+ *          want the complete CSMA/CA procedure with retries, use
+ *          @ref csma_sender_csma_ca_send().
  *
  * @param[in] dev       netdev device, needs to be already initialized
  * @param[in] pkt       pointer to the data in the packet buffer;

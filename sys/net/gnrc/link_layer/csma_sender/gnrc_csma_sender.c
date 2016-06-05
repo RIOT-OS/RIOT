@@ -81,9 +81,10 @@ static inline uint32_t choose_backoff_period(int be)
  *                      it must be a complete 802.15.4-compliant frame,
  *                      ready to be sent to the radio transceiver
  *
- * @return              the return value of device driver's @c send_data()
- *                      function if medium was avilable
- * @return              -ECANCELED if an internal driver error occured
+ * @return              the return value of device driver's
+ *                      gnrc_netdev_driver_t::send_data()
+ *                      function if medium was available
+ * @return              -ECANCELED if an internal driver error occurred
  * @return              -EBUSY if radio medium was not available
  *                      to send the given data
  */
