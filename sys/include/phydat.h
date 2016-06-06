@@ -79,6 +79,8 @@ enum {
     UNIT_TEMP_C,    /**< degree Celsius */
     UNIT_TEMP_F,    /**< degree Fahrenheit */
     UNIT_TEMP_K,    /**< Kelvin */
+    /* illuminance */
+    UNIT_LUX,       /**< Lux (lx) */
     /* dimension */
     UNIT_M,         /**< meters */
     UNIT_M2,        /**< square meters */
