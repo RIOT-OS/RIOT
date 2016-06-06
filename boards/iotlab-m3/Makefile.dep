@@ -1,11 +1,6 @@
-ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
-  USEMODULE += at86rf231
-endif
+include $(RIOTBOARD)/iotlab-common/Makefile.dep
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
-  USEMODULE += saul_gpio
   USEMODULE += isl29020
   USEMODULE += lps331ap
-  USEMODULE += l3g4200d
-  USEMODULE += lsm303dlhc
 endif

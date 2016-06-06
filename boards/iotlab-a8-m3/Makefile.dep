@@ -1,0 +1,1 @@
+include $(RIOTBOARD)/iotlab-common/Makefile.dep

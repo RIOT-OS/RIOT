@@ -35,14 +35,14 @@ extern "C" {
 #define SPI_0_EN            1
 
 /* SPI 0 device configuration */
-#define SPI_0_DEV           SPI1
-#define SPI_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
-#define SPI_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_SPI1EN))
+#define SPI_0_DEV           SPI2
+#define SPI_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_SPI2EN)
+#define SPI_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_SPI2EN))
 #define SPI_0_BUS_DIV       1   /* 1 -> SPI runs with full CPU clock, 0 -> half CPU clock */
 /* SPI 0 pin configuration */
-#define SPI_0_CLK_PIN       GPIO_PIN(PORT_A,5)
-#define SPI_0_MOSI_PIN      GPIO_PIN(PORT_A,7)
-#define SPI_0_MISO_PIN      GPIO_PIN(PORT_A,6)
+#define SPI_0_CLK_PIN       GPIO_PIN(PORT_B,13)
+#define SPI_0_MISO_PIN      GPIO_PIN(PORT_B,14)
+#define SPI_0_MOSI_PIN      GPIO_PIN(PORT_B,15)
 /** @} */
 
 #ifdef __cplusplus
