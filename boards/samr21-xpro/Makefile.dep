@@ -1,5 +1,18 @@
 ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
   USEMODULE += at86rf233
+  ifeq ($(filter gnrc_s_cosens_node,$(USEMODULE)),)
+    ifeq ($(filter gnrc_s_cosens_router,$(USEMODULE)),)
+      USEMODULE += gnrc_nomac
+    endif
+  endif
+endif
+ifneq (,$(filter gnrc_s_cosens_node,$(USEMODULE)))
+    USEMODULE += gnrc_csma_sender
+    USEMODULE += random
+endif
+ifneq (,$(filter gnrc_s_cosens_router,$(USEMODULE)))
+    USEMODULE += gnrc_csma_sender
+    USEMODULE += random
 endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))

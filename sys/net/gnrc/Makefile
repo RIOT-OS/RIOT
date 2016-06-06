@@ -91,6 +91,12 @@ endif
 ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
     DIRS += routing/rpl/p2p
 endif
+ifneq (,$(filter gnrc_s_cosens_node,$(USEMODULE)))
+    DIRS += link_layer/s_cosens_node
+endif
+ifneq (,$(filter gnrc_s_cosens_router,$(USEMODULE)))
+    DIRS += link_layer/s_cosens_router
+endif
 ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
     DIRS += network_layer/sixlowpan
 endif
