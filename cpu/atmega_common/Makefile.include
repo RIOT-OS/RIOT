@@ -1,5 +1,11 @@
 # Target architecture for the build. Use avr if you are unsure.
 export TARGET_ARCH ?= avr
 
+# export the peripheral drivers to be linked into the final binary
+export USEMODULE += periph
+
+# the atmel port uses uart_stdio
+export USEMODULE += uart_stdio
+
 # include module specific includes
 export INCLUDES += -I$(RIOTCPU)/atmega_common/include -isystem$(RIOTCPU)/atmega_common/avr-libc-extra

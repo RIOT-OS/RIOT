@@ -13,9 +13,6 @@ export USEMODULE += uart_stdio
 # define path to atmega common module, which is needed for this CPU
 export ATMEGA_COMMON = $(RIOTCPU)/atmega_common/
 
-# define the linker script to use for this CPU
-#export LINKERSCRIPT = $(RIOTCPU)/$(CPU)/ldscripts/atmega2560.ld
-
 # explicitly tell the linker to link the syscalls and startup code.
 #   Without this the interrupt vectors will not be linked correctly!
 export UNDEF += $(BINDIR)cpu/startup.o
