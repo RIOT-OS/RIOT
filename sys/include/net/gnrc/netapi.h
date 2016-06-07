@@ -36,6 +36,21 @@
  * USEMODULE += gnrc_netapi_mbox
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * @}
+ *
+ * @defgroup    net_gnrc_netapi_callbacks   Callback extension
+ * @ingroup     net_gnrc_netapi
+ * @brief       Callback extension for @ref net_gnrc_netapi
+ * @{
+ * @details The submodule `gnrc_netapi_callbacks` provides an extension for
+ *          callbacks to run GNRC thread-less.
+ *
+ * To use, add the module `gnrc_netapi_callbacks` to the `USEMODULE` macro in
+ * your application's Makefile:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ * USEMODULE += gnrc_netapi_callbacks
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * @}
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */

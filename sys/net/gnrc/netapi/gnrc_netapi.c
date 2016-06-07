@@ -102,7 +102,7 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
         gnrc_pktbuf_hold(pkt, numof - 1);
 
         while (sendto) {
-#ifdef MODULE_GNRC_NETAPI_MBOX
+#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
             int release = 0;
             switch (sendto->type) {
                 case GNRC_NETREG_TYPE_DEFAULT:
@@ -111,12 +111,19 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
                         release = 1;
                     }
                     break;
+#ifdef MODULE_GNRC_NETAPI_MBOX
                 case GNRC_NETREG_TYPE_MBOX:
                     if (_snd_rcv_mbox(sendto->target.mbox, cmd, pkt) < 1) {
                         /* unable to dispatch packet */
                         release = 1;
                     }
                     break;
+#endif
+#ifdef MODULE_GNRC_NETAPI_CALLBACKS
+                case GNRC_NETREG_TYPE_CB:
+                    sendto->target.cbd->cb(cmd, pkt, sendto->target.cbd->ctx);
+                    break;
+#endif
                 default:
                     /* unknown dispatch type */
                     release = 1;
