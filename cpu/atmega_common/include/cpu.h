@@ -24,8 +24,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef __ATMEGA_COMMON_H
-#define __ATMEGA_COMMON_H
+#ifndef ATMEGA_COMMON_H
+#define ATMEGA_COMMON_H
 
 #include <stdio.h>
 #include <stdint.h>
@@ -83,5 +83,5 @@ static inline void cpu_print_last_instruction(void)
 }
 #endif
 
-#endif /* __ATMEGA_COMMON_H */
+#endif /* ATMEGA_COMMON_H */
 /** @} */

@@ -32,8 +32,8 @@
    ---------------------------------------------------------------------------*/
 
 
-#ifndef __CMSIS_GCC_H
-#define __CMSIS_GCC_H
+#ifndef CMSIS_GCC_H
+#define CMSIS_GCC_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -1378,4 +1378,4 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __SMMLA (int32_t op1
 }
 #endif
 
-#endif /* __CMSIS_GCC_H */
+#endif /* CMSIS_GCC_H */
