@@ -31,8 +31,8 @@ extern "C" {
 /**
  * @brief   Define the CPU model for the <msp430.h>
  */
-#ifndef __MSP430F1612__
-#define __MSP430F1612__
+#ifndef MSP430F1612
+#define MSP430F1612
 #endif
 
 /**

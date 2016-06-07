@@ -37,8 +37,8 @@ extern "C" {
 /**
  * @brief   Define the CPU model for the <msp430.h>
  */
-#ifndef __MSP430F1611__
-#define __MSP430F1611__
+#ifndef MSP430F1611
+#define MSP430F1611
 #endif
 
 /**
@@ -104,4 +104,5 @@ extern "C" {
 #endif
 
 /** @} */
+
 #endif /*  TELOSB_BOARD_H */
