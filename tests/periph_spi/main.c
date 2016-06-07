@@ -37,11 +37,15 @@ enum {
 
 static int spi_dev = -1;
 static gpio_t spi_cs = -1;
-static int spi_mode = -1;
-static int spi_speed = -1;
+static int spi_mode_int = -1;
+static spi_conf_t spi_mode = -1;
+static int spi_speed_int = -1;
+static spi_speed_t spi_speed = -1;
+
+/* 0 for slave, 1 for master, -1 for not initialized */
 static int spi_master = -1;
 static int port = -1;
-static int pin = -1;           /* 0 for slave, 1 for master, -1 for not initialized */
+static int pin = -1;
 
 static char buffer[256];       /* temporary buffer */
 static char rx_buffer[256];    /* global receive buffer */
@@ -90,17 +94,50 @@ int parse_spi_dev(int argc, char **argv)
     pin = atoi(argv[3]);
     spi_cs = GPIO_PIN(port,pin);
     if (argc >= 5) {
-        spi_mode = argv[4][0] - '0';
-        if (spi_mode < 0 || spi_mode > 3) {
+        spi_mode_int = argv[4][0] - '0';
+        if (spi_mode_int < 0 || spi_mode_int > 3) {
             puts("error: invalid MODE value given");
             return -2;
+        } else {
+            switch (spi_mode_int) {
+                case 0:
+                    spi_mode = SPI_CONF_FIRST_RISING;
+                    break;
+                case 1:
+                    spi_mode = SPI_CONF_SECOND_RISING;
+                    break;
+                case 2:
+                    spi_mode = SPI_CONF_FIRST_FALLING;
+                    break;
+                case 3:
+                    spi_mode = SPI_CONF_SECOND_FALLING;
+                    break;
+            }
         }
     }
     if (argc >= 6) {
-        spi_speed = argv[5][0] - '0';
-        if (spi_speed < 0 || spi_speed > 4) {
+        spi_speed_int = argv[5][0] - '0';
+        if (spi_speed_int < 0 || spi_speed_int > 4) {
             puts("error: invalid SPEED value given");
             return -3;
+        } else {
+            switch (spi_speed_int) {
+                case 0:
+                    spi_speed = SPI_SPEED_100KHZ;
+                    break;
+                case 1:
+                    spi_speed = SPI_SPEED_400KHZ;
+                    break;
+                case 2:
+                    spi_speed = SPI_SPEED_1MHZ;
+                    break;
+                case 3:
+                    spi_speed = SPI_SPEED_5MHZ;
+                    break;
+                case 4:
+                    spi_speed = SPI_SPEED_10MHZ;
+                    break;
+            }
         }
     }
     return 0;
