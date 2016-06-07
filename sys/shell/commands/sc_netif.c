@@ -167,7 +167,7 @@ static void _hl_usage(char *cmd_name)
 
 static void _flag_usage(char *cmd_name)
 {
-    printf("usage: %s <if_id> [-]{promisc|autoack|csma|autocca|cca_threshold|preload|iphc|rtr_adv}\n", cmd_name);
+    printf("usage: %s <if_id> [-]{promisc|autoack|ack_req|csma|autocca|cca_threshold|preload|iphc|rtr_adv}\n", cmd_name);
 }
 
 static void _add_usage(char *cmd_name)
@@ -377,6 +377,13 @@ static void _netif_list(kernel_pid_t dev)
 
     if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("AUTOACK  ");
+        linebreak = true;
+    }
+
+    res = gnrc_netapi_get(dev, NETOPT_ACK_REQ, 0, &enable, sizeof(enable));
+
+    if ((res >= 0) && (enable == NETOPT_ENABLE)) {
+        printf("ACK_REQ  ");
         linebreak = true;
     }
 
@@ -824,6 +831,9 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
     }
     else if (strcmp(flag, "autoack") == 0) {
         return _netif_set_flag(dev, NETOPT_AUTOACK, set);
+    }
+    else if (strcmp(flag, "ack_req") == 0) {
+        return _netif_set_flag(dev, NETOPT_ACK_REQ, set);
     }
     else if (strcmp(flag, "raw") == 0) {
         return _netif_set_flag(dev, NETOPT_RAWMODE, set);
