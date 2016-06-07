@@ -39,6 +39,17 @@ extern "C" {
 #define GNRC_NETREG_DEMUX_CTX_ALL   (0xffff0000)
 
 /**
+ * @brief   Initializes a netreg entry statically with PID
+ *
+ * @param[in] demux_ctx The @ref gnrc_netreg_entry_t::demux_ctx "demux context"
+ *                      for the netreg entry
+ * @param[in] pid       The PID of the registering thread
+ *
+ * @return  An initialized netreg entry
+ */
+#define GNRC_NETREG_ENTRY_INIT_PID(demux_ctx, pid)  { NULL, demux_ctx, pid }
+
+/**
  * @brief   Entry to the @ref net_gnrc_netreg
  */
 typedef struct gnrc_netreg_entry {
@@ -64,6 +75,24 @@ typedef struct gnrc_netreg_entry {
  * @brief   Initializes module.
  */
 void gnrc_netreg_init(void);
+
+/**
+ * @brief   Initializes a netreg entry statically with PID
+ *
+ * @param[out] entry    A netreg entry
+ * @param[in] demux_ctx The @ref gnrc_netreg_entry_t::demux_ctx "demux context"
+ *                      for the netreg entry
+ * @param[in] pid       The PID of the registering thread
+ *
+ */
+static inline void gnrc_netreg_entry_init_pid(gnrc_netreg_entry_t *entry,
+                                              uint32_t demux_ctx,
+                                              kernel_pid_t pid)
+{
+    entry->next = NULL;
+    entry->demux_ctx = demux_ctx;
+    entry->pid = pid;
+}
 
 /**
  * @brief   Registers a thread to the registry.
