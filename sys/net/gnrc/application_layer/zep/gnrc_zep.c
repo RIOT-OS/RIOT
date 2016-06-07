@@ -557,13 +557,10 @@ void *_event_loop(void *args)
     msg_t msg, ack, msg_q[GNRC_ZEP_MSG_QUEUE_SIZE];
     gnrc_netdev_t *dev = (gnrc_netdev_t *)args;
     gnrc_netapi_opt_t *opt;
-    gnrc_netreg_entry_t my_reg = { NULL, ((gnrc_zep_t *)args)->src_port,
-                                   KERNEL_PID_UNDEF
-                                 };
+    gnrc_netreg_entry_t my_reg = GNRC_NETREG_ENTRY_INIT_PID(((gnrc_zep_t *)args)->src_port,
+                                                            sched_active_pid);
 
     msg_init_queue(msg_q, GNRC_ZEP_MSG_QUEUE_SIZE);
-
-    my_reg.pid = thread_getpid();
 
     gnrc_netreg_register(GNRC_NETTYPE_UDP, &my_reg);
 

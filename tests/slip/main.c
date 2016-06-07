@@ -30,14 +30,12 @@
  */
 int main(void)
 {
-    gnrc_netreg_entry_t dump;
+    gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                          gnrc_pktdump_pid);
 
     puts("SLIP test");
 
-    /* initialize and register pktdump */
-    dump.pid = gnrc_pktdump_pid;
-    dump.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
-
+    /* register pktdump */
     if (dump.pid <= KERNEL_PID_UNDEF) {
         puts("Error starting pktdump thread");
         return -1;

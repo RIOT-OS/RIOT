@@ -22,8 +22,8 @@
 #include "tests-netreg.h"
 
 static gnrc_netreg_entry_t entries[] = {
-    { NULL, TEST_UINT16, TEST_UINT8 },
-    { NULL, TEST_UINT16, TEST_UINT8 + 1 }
+    GNRC_NETREG_ENTRY_INIT_PID(TEST_UINT16, TEST_UINT8),
+    GNRC_NETREG_ENTRY_INIT_PID(TEST_UINT16, TEST_UINT8 + 1)
 };
 
 static void set_up(void)

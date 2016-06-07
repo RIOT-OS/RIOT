@@ -77,7 +77,7 @@ typedef struct gnrc_netreg_entry {
 void gnrc_netreg_init(void);
 
 /**
- * @brief   Initializes a netreg entry statically with PID
+ * @brief   Initializes a netreg entry dynamically with PID
  *
  * @param[out] entry    A netreg entry
  * @param[in] demux_ctx The @ref gnrc_netreg_entry_t::demux_ctx "demux context"

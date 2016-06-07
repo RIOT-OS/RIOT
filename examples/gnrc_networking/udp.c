@@ -28,7 +28,8 @@
 #include "timex.h"
 #include "xtimer.h"
 
-static gnrc_netreg_entry_t server = { NULL, GNRC_NETREG_DEMUX_CTX_ALL, KERNEL_PID_UNDEF };
+static gnrc_netreg_entry_t server = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                               KERNEL_PID_UNDEF);
 
 
 static void send(char *addr_str, char *port_str, char *data, unsigned int num,

@@ -211,10 +211,10 @@ int _ccnl_interest(int argc, char **argv)
     memset(_int_buf, '\0', BUF_SIZE);
     memset(_cont_buf, '\0', BUF_SIZE);
     for (int cnt = 0; cnt < CCNL_INTEREST_RETRIES; cnt++) {
-        gnrc_netreg_entry_t _ne;
+        gnrc_netreg_entry_t _ne =
+            GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                       sched_active_pid);
         /* register for content chunks */
-        _ne.demux_ctx =  GNRC_NETREG_DEMUX_CTX_ALL;
-        _ne.pid = sched_active_pid;
         gnrc_netreg_register(GNRC_NETTYPE_CCN_CHUNK, &_ne);
 
         struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL, 0);

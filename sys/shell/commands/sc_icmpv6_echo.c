@@ -153,7 +153,8 @@ int _icmpv6_ping(int argc, char **argv)
     ipv6_addr_t addr;
     kernel_pid_t src_iface;
     msg_t msg;
-    gnrc_netreg_entry_t my_entry = { NULL, ICMPV6_ECHO_REP, thread_getpid() };
+    gnrc_netreg_entry_t my_entry = GNRC_NETREG_ENTRY_INIT_PID(ICMPV6_ECHO_REP,
+                                                              sched_active_pid);
     uint32_t min_rtt = UINT32_MAX, max_rtt = 0;
     uint64_t sum_rtt = 0;
     uint64_t ping_start;
