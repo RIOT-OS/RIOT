@@ -138,6 +138,30 @@ static gnrc_pktsnip_t *_mark_extension_header(gnrc_pktsnip_t *current,
     return next;
 }
 
+static inline bool _has_valid_size(gnrc_pktsnip_t *pkt, uint8_t nh)
+{
+    ipv6_ext_t *ext;
+
+    if (pkt->size < sizeof(ipv6_ext_t)) {
+        return false;
+    }
+
+    ext = pkt->data;
+
+    switch (nh) {
+        case PROTNUM_IPV6_EXT_RH:
+        case PROTNUM_IPV6_EXT_HOPOPT:
+        case PROTNUM_IPV6_EXT_DST:
+        case PROTNUM_IPV6_EXT_FRAG:
+        case PROTNUM_IPV6_EXT_AH:
+        case PROTNUM_IPV6_EXT_ESP:
+        case PROTNUM_IPV6_EXT_MOB:
+            return ((ext->len * IPV6_EXT_LEN_UNIT) + IPV6_EXT_LEN_UNIT) <= pkt->size;
+
+        default:
+            return true;
+    }
+}
 
 /*
  *         current                 pkt
@@ -158,6 +182,13 @@ void gnrc_ipv6_ext_demux(kernel_pid_t iface,
         switch (nh) {
             case PROTNUM_IPV6_EXT_RH:
 #ifdef MODULE_GNRC_RPL_SRH
+                /* if current != pkt, size is already checked */
+                if (current == pkt && !_has_valid_size(pkt, nh)) {
+                    DEBUG("ipv6_ext: invalid size\n");
+                    gnrc_pktbuf_release(pkt);
+                    return;
+                }
+
                 switch (_handle_rh(current, pkt)) {
                     case GNRC_IPV6_EXT_OK:
                         /* We are the final destination. So proceeds like normal packet. */
@@ -191,6 +222,14 @@ void gnrc_ipv6_ext_demux(kernel_pid_t iface,
             case PROTNUM_IPV6_EXT_ESP:
             case PROTNUM_IPV6_EXT_MOB:
                 /* TODO: add handling of types */
+
+                /* if current != pkt, size is already checked */
+                if (current == pkt && !_has_valid_size(pkt, nh)) {
+                    DEBUG("ipv6_ext: invalid size\n");
+                    gnrc_pktbuf_release(pkt);
+                    return;
+                }
+
                 nh = ext->nh;
                 DEBUG("ipv6_ext: next header = %" PRIu8 "\n", nh);
 
