@@ -18,6 +18,7 @@
  * @}
  */
 
+#include "mbox.h"
 #include "msg.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/pktbuf.h"
@@ -74,6 +75,22 @@ static inline int _snd_rcv(kernel_pid_t pid, uint16_t type, gnrc_pktsnip_t *pkt)
     return ret;
 }
 
+#ifdef MODULE_GNRC_NETAPI_MBOX
+static inline int _snd_rcv_mbox(mbox_t *mbox, uint16_t type, gnrc_pktsnip_t *pkt)
+{
+    msg_t msg;
+    /* set the outgoing message's fields */
+    msg.type = type;
+    msg.content.ptr = (void *)pkt;
+    /* send message */
+    int ret = mbox_try_put(mbox, &msg);
+    if (ret < 1) {
+        DEBUG("gnrc_netapi: dropped message to %p (was full)\n", mbox);
+    }
+    return ret;
+}
+#endif
+
 int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
                          uint16_t cmd, gnrc_pktsnip_t *pkt)
 {
@@ -85,10 +102,35 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
         gnrc_pktbuf_hold(pkt, numof - 1);
 
         while (sendto) {
-            if (_snd_rcv(sendto->pid, cmd, pkt) < 1) {
+#ifdef MODULE_GNRC_NETAPI_MBOX
+            int release = 0;
+            switch (sendto->type) {
+                case GNRC_NETREG_TYPE_DEFAULT:
+                    if (_snd_rcv(sendto->target.pid, cmd, pkt) < 1) {
+                        /* unable to dispatch packet */
+                        release = 1;
+                    }
+                    break;
+                case GNRC_NETREG_TYPE_MBOX:
+                    if (_snd_rcv_mbox(sendto->target.mbox, cmd, pkt) < 1) {
+                        /* unable to dispatch packet */
+                        release = 1;
+                    }
+                    break;
+                default:
+                    /* unknown dispatch type */
+                    release = 1;
+                    break;
+            }
+            if (release) {
+                gnrc_pktbuf_release(pkt);
+            }
+#else
+            if (_snd_rcv(sendto->target.pid, cmd, pkt) < 1) {
                 /* unable to dispatch packet */
                 gnrc_pktbuf_release(pkt);
             }
+#endif
             sendto = gnrc_netreg_getnext(sendto);
         }
     }

@@ -57,6 +57,10 @@ ifneq (,$(filter gnrc_conn_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
 endif
 
+ifneq (,$(filter gnrc_netapi_mbox,$(USEMODULE)))
+  USEMODULE += core_mbox
+endif
+
 ifneq (,$(filter netdev2_tap,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += netdev2_eth

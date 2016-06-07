@@ -27,8 +27,22 @@
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/pkt.h"
 
+#ifdef MODULE_GNRC_NETAPI_MBOX
+#include "mbox.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(DOXYGEN)
+typedef enum {
+    GNRC_NETREG_TYPE_DEFAULT = 0,
+#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(DOXYGEN)
+    GNRC_NETREG_TYPE_MBOX,
+#endif
+    GNRC_NETREG_TYPE_CB,
+} gnrc_netreg_type_t;
 #endif
 
 /**
@@ -47,7 +61,30 @@ extern "C" {
  *
  * @return  An initialized netreg entry
  */
-#define GNRC_NETREG_ENTRY_INIT_PID(demux_ctx, pid)  { NULL, demux_ctx, pid }
+#ifdef MODULE_GNRC_NETAPI_MBOX
+#define GNRC_NETREG_ENTRY_INIT_PID(demux_ctx, pid)  { NULL, demux_ctx, \
+                                                      GNRC_NETREG_TYPE_DEFAULT, \
+                                                      { pid } }
+#else
+#define GNRC_NETREG_ENTRY_INIT_PID(demux_ctx, pid)  { NULL, demux_ctx, { pid } }
+#endif
+
+#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(DOXYGEN)
+/**
+ * @brief   Initializes a netreg entry statically with mbox
+ *
+ * @param[in] demux_ctx The @ref gnrc_netreg_entry_t::demux_ctx "demux context"
+ *                      for the netreg entry
+ * @param[in] mbox      Target @ref core_mbox "mailbox" for the registry entry
+ *
+ * @note    Only available with @ref net_gnrc_netreg_extra.
+ *
+ * @return  An initialized netreg entry
+ */
+#define GNRC_NETREG_ENTRY_INIT_MBOX(demux_ctx, mbox) { NULL, demux_ctx, \
+                                                       GNRC_NETREG_TYPE_MBOX, \
+                                                       { .mbox = mbox } }
+#endif
 
 /**
  * @brief   Entry to the @ref net_gnrc_netreg
@@ -68,7 +105,26 @@ typedef struct gnrc_netreg_entry {
      *          ports in UDP/TCP, or similar.
      */
     uint32_t demux_ctx;
-    kernel_pid_t pid;       /**< The PID of the registering thread */
+#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(DOXYGEN)
+    /**
+     * @brief   Type of the registry entry
+     *
+     * @note    Only available with @ref net_gnrc_netapi_mbox or
+     *          @ref net_gnrc_netapi_callbacks.
+     */
+    gnrc_netreg_type_t type;
+#endif
+    union {
+        kernel_pid_t pid;       /**< The PID of the registering thread */
+#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(DOXYGEN)
+        /**
+         * @brief   Target @ref core_mbox "mailbox" for the registry entry
+         *
+         * @note    Only available with @ref net_gnrc_netapi_mbox.
+         */
+        mbox_t *mbox;
+#endif
+    } target;                   /**< Target for the registry entry */
 } gnrc_netreg_entry_t;
 
 /**
@@ -91,8 +147,33 @@ static inline void gnrc_netreg_entry_init_pid(gnrc_netreg_entry_t *entry,
 {
     entry->next = NULL;
     entry->demux_ctx = demux_ctx;
-    entry->pid = pid;
+#ifdef MODULE_GNRC_NETAPI_MBOX
+    entry->type = GNRC_NETREG_TYPE_DEFAULT;
+#endif
+    entry->target.pid = pid;
 }
+
+#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(DOXYGEN)
+/**
+ * @brief   Initializes a netreg entry dynamically with mbox
+ *
+ * @param[out] entry    A netreg entry
+ * @param[in] demux_ctx The @ref gnrc_netreg_entry_t::demux_ctx "demux context"
+ *                      for the netreg entry
+ * @param[in] mbox      Target @ref core_mbox "mailbox" for the registry entry
+ *
+ * @note    Only available with @ref net_gnrc_netapi_mbox.
+ */
+static inline void gnrc_netreg_entry_init_mbox(gnrc_netreg_entry_t *entry,
+                                               uint32_t demux_ctx,
+                                               mbox_t *mbox)
+{
+    entry->next = NULL;
+    entry->demux_ctx = demux_ctx;
+    entry->type = GNRC_NETREG_TYPE_MBOX;
+    entry->target.mbox = mbox;
+}
+#endif
 
 /**
  * @brief   Registers a thread to the registry.

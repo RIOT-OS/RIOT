@@ -21,6 +21,21 @@
  * @file
  * @brief       Generic interface to communicate with GNRC modules
  *
+ * @defgroup    net_gnrc_netapi_mbox   Mailbox IPC extension
+ * @ingroup     net_gnrc_netapi
+ * @brief       @ref core_mbox "Mailbox IPC" extension for @ref net_gnrc_netapi
+ * @{
+ *
+ * @details The submodule `gnrc_netapi_mbox` provides an extension for
+ *          @ref core_mbox "Mailbox IPC".
+ *
+ * To use, add the module `gnrc_netapi_mbox` to the `USEMODULE` macro in your
+ * application's Makefile:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ * USEMODULE += gnrc_netapi_mbox
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * @}
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
