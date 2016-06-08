@@ -32,8 +32,8 @@
    ---------------------------------------------------------------------------*/
 
 
-#ifndef __CMSIS_ARMCC_V6_H
-#define __CMSIS_ARMCC_V6_H
+#ifndef CMSIS_ARMCC_V6_H
+#define CMSIS_ARMCC_V6_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -1804,4 +1804,4 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __SMMLA (int32_t op1, in
 }
 #endif
 
-#endif /* __CMSIS_ARMCC_V6_H */
+#endif /* CMSIS_ARMCC_V6_H */
