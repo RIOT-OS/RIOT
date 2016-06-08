@@ -97,7 +97,7 @@ void xtimer_now_timex(timex_t *out);
 void xtimer_init(void);
 
 /**
- * @brief Stop execution of a thread for some time
+ * @brief Pause the execution of a thread for some seconds
  *
  * When called from an ISR, this function will spin and thus block the MCU in
  * interrupt context for the specified amount in *seconds*, so don't *ever* use
@@ -108,7 +108,7 @@ void xtimer_init(void);
 static void xtimer_sleep(uint32_t seconds);
 
 /**
- * @brief Stop execution of a thread for some time
+ * @brief Pause the execution of a thread for some microseconds
  *
  * When called from an ISR, this function will spin and thus block the MCU for
  * the specified amount in microseconds, so only use it there for *very* short

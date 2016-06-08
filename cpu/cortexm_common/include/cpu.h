@@ -49,6 +49,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief Interrupt stack canary value
+ *
+ * @note 0xe7fe is the ARM Thumb machine code equivalent of asm("bl #-2\n") or
+ * 'while (1);', i.e. an infinite loop.
+ * @internal
+ */
+#define STACK_CANARY_WORD   (0xE7FEE7FEu)
+
+/**
  * @brief   Initialization of the CPU
  */
 void cpu_init(void);
@@ -63,7 +72,7 @@ void cortexm_init(void);
  */
 static inline void cpu_print_last_instruction(void)
 {
-    register uint32_t *lr_ptr;
+    uint32_t *lr_ptr;
     __asm__ __volatile__("mov %0, lr" : "=r"(lr_ptr));
     printf("%p\n", (void*) lr_ptr);
 }

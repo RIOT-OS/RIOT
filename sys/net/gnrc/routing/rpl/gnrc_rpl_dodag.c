@@ -264,11 +264,10 @@ void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
 
 void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
 {
-    uint32_t now = xtimer_now();
-
     /* update Parent lifetime */
     if (parent != NULL) {
-        parent->lifetime = (now / SEC_IN_USEC) + ((dodag->default_lifetime * dodag->lifetime_unit));
+        uint32_t now = xtimer_now();
+        parent->lifetime = (now / SEC_IN_USEC) + (dodag->default_lifetime * dodag->lifetime_unit);
 #ifdef MODULE_GNRC_RPL_P2P
         if (dodag->instance->mop != GNRC_RPL_P2P_MOP) {
 #endif

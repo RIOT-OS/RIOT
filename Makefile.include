@@ -58,19 +58,17 @@ COLOR_ECHO   := /bin/echo
 
 OS := $(shell uname)
 
-ifeq (, ${JENKINS_URL})
-  ifeq (0,  $(shell tput colors 2>&1 > /dev/null; echo $$?))
-    COLOR_GREEN  := \033[1;32m
-    COLOR_RED    := \033[1;31m
-    COLOR_YELLOW := \033[1;33m
-    COLOR_PURPLE := \033[1;35m
-    COLOR_RESET  := \033[0m
-    ifeq ($(OS),Darwin)
-      COLOR_ECHO   := echo -e
-      SHELL=bash
-    else
-      COLOR_ECHO   := /bin/echo -e
-    endif
+ifeq (0,  $(shell tput colors 2>&1 > /dev/null; echo $$?))
+  COLOR_GREEN  := \033[1;32m
+  COLOR_RED    := \033[1;31m
+  COLOR_YELLOW := \033[1;33m
+  COLOR_PURPLE := \033[1;35m
+  COLOR_RESET  := \033[0m
+  ifeq ($(OS),Darwin)
+    COLOR_ECHO   := echo -e
+    SHELL=bash
+  else
+    COLOR_ECHO   := /bin/echo -e
   endif
 endif
 
@@ -394,7 +392,7 @@ include $(RIOTBASE)/Makefile.buildtests
 # Export variables used throughout the whole make system:
 include $(RIOTBASE)/Makefile.vars
 
-# Warn if the selected board and drivers don't provide all needed featues:
+# Warn if the selected board and drivers don't provide all needed features:
 ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   EXPECT_ERRORS :=
   EXPECT_CONFLICT :=

@@ -139,16 +139,16 @@ void *nrf24l01p_rx_handler(void *arg)
                 puts("Received packet.");
 
                 /* CE low */
-                nrf24l01p_stop((nrf24l01p_t *)m.content.ptr);
+                nrf24l01p_stop(m.content.ptr);
 
                 /* read payload */
-                nrf24l01p_read_payload((nrf24l01p_t *)m.content.ptr, rx_buf, NRF24L01P_MAX_DATA_LENGTH);
+                nrf24l01p_read_payload(m.content.ptr, rx_buf, NRF24L01P_MAX_DATA_LENGTH);
 
                 /* flush rx fifo */
-                nrf24l01p_flush_rx_fifo((nrf24l01p_t *)m.content.ptr);
+                nrf24l01p_flush_rx_fifo(m.content.ptr);
 
                 /* CE high */
-                nrf24l01p_start((nrf24l01p_t *)m.content.ptr);
+                nrf24l01p_start(m.content.ptr);
 
                 /* print rx buffer */
                 for (int i = 0; i < NRF24L01P_MAX_DATA_LENGTH; i++) {

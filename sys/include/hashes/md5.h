@@ -69,8 +69,7 @@ extern "C" {
 /**
  * @brief   MD5 calculation context
  */
-typedef struct
-{
+typedef struct {
     uint32_t len;       /**< overall number of bytes processed */
     uint32_t abcd[4];   /**< virtual registers for hash calculation */
     int b_used;         /**< number of bytes used in the current block */

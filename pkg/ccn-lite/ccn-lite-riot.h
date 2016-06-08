@@ -137,6 +137,12 @@ extern "C" {
 extern struct ccnl_relay_s ccnl_relay;
 
 /**
+ * @brief Function pointer type for local producer function
+ */
+typedef int (*ccnl_producer_func)(struct ccnl_relay_s *relay, struct
+                                  ccnl_face_s *from, struct ccnl_pkt_s *pkt);
+
+/**
  * @brief   Start the main CCN-Lite event-loop
  *
  * @return  The PID of the event-loop's thread
@@ -207,6 +213,16 @@ int ccnl_fib_rem_entry(struct ccnl_relay_s *relay, struct ccnl_prefix_s *pfx, st
  * @par[in] relay   Local relay struct
  */
 void ccnl_fib_show(struct ccnl_relay_s *relay);
+
+/**
+ * @brief Set a local producer function
+ *
+ * Setting a local producer function allows to generate content on the fly or
+ * react otherwise on any kind of incoming interest.
+ *
+ * @param[in] func  The function to be called first for any incoming interest
+ */
+void ccnl_set_local_producer(ccnl_producer_func func);
 
 #ifdef __cplusplus
 }

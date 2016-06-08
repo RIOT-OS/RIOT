@@ -453,26 +453,6 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, uint8_t *data, size_t len,
  */
 void at86rf2xx_tx_exec(at86rf2xx_t *dev);
 
-/**
- * @brief   Read the length of a received packet
- *
- * @param dev               device to read from
- *
- * @return                  overall length of a received packet in byte
- */
-size_t at86rf2xx_rx_len(at86rf2xx_t *dev);
-
-/**
- * @brief   Read a chunk of data from the receive buffer of the given device
- *
- * @param[in]  dev          device to read from
- * @param[out] data         buffer to write data to
- * @param[in]  len          number of bytes to read from device
- * @param[in]  offset       offset in the receive buffer
- */
-void at86rf2xx_rx_read(at86rf2xx_t *dev, uint8_t *data, size_t len,
-                       size_t offset);
-
 #ifdef __cplusplus
 }
 #endif

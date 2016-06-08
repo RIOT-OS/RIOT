@@ -26,6 +26,10 @@
 #include "xtimer.h"
 #endif
 
+#ifdef MODULE_TLSF
+#include "tlsf.h"
+#endif
+
 /* list of states copied from tcb.h */
 const char *state_names[] = {
     [STATUS_RUNNING] = "running",
@@ -35,7 +39,9 @@ const char *state_names[] = {
     [STATUS_MUTEX_BLOCKED] = "bl mutex",
     [STATUS_RECEIVE_BLOCKED] = "bl rx",
     [STATUS_SEND_BLOCKED] = "bl send",
-    [STATUS_REPLY_BLOCKED] = "bl reply"
+    [STATUS_REPLY_BLOCKED] = "bl reply",
+    [STATUS_FLAG_BLOCKED_ANY] = "bl anyfl",
+    [STATUS_FLAG_BLOCKED_ALL] = "bl allfl"
 };
 
 /**
@@ -64,6 +70,16 @@ void ps(void)
            "name",
 #endif
            "state");
+
+#ifdef DEVELHELP
+    int isr_usage = thread_arch_isr_stack_usage();                                 /* ISR stack usage */
+    printf("\t  - | isr_stack            | -        - |"
+           "   - | %5i (%5i) | -\n", ISR_STACKSIZE, isr_usage);
+    overall_stacksz += ISR_STACKSIZE;
+    if (isr_usage > 0) {
+        overall_used += isr_usage;
+    }
+#endif
 
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
         thread_t *p = (thread_t *)sched_threads[i];
@@ -112,5 +128,9 @@ void ps(void)
 #ifdef DEVELHELP
     printf("\t%5s %-21s|%13s%6s %5i (%5i)\n", "|", "SUM", "|", "|",
            overall_stacksz, overall_used);
+#   ifdef MODULE_TLSF
+    puts("\nHeap usage:");
+    tlsf_walk_pool(NULL);
+#   endif
 #endif
 }

@@ -211,7 +211,7 @@ do_debug() {
             -l /dev/null & \
             echo \$! > $OCD_PIDFILE" &
     # connect to the GDB server
-    ${DBG} ${TUI} -ex "tar ext :${GDB_PORT}" ${ELFFILE}
+    ${DBG} -q ${TUI} -ex "tar ext :${GDB_PORT}" ${ELFFILE}
     # will be called by trap
     cleanup() {
         OCD_PID="$(cat $OCD_PIDFILE)"

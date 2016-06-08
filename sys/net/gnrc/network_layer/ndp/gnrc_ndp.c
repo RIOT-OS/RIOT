@@ -442,7 +442,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                 gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
                 if (nc_entry != NULL) {
                     if_entry->rtr_adv_msg.type = GNRC_NDP_MSG_RTR_ADV_SIXLOWPAN_DELAY;
-                    if_entry->rtr_adv_msg.content.ptr = (char *) nc_entry;
+                    if_entry->rtr_adv_msg.content.ptr = nc_entry;
                     xtimer_set_msg(&if_entry->rtr_adv_timer, delay, &if_entry->rtr_adv_msg,
                                    gnrc_ipv6_pid);
                 }
@@ -451,7 +451,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
             if (ipv6_addr_is_unspecified(&ipv6->src)) {
                 /* either multicast, if source unspecified */
                 if_entry->rtr_adv_msg.type = GNRC_NDP_MSG_RTR_ADV_RETRANS;
-                if_entry->rtr_adv_msg.content.ptr = (char *) if_entry;
+                if_entry->rtr_adv_msg.content.ptr = if_entry;
                 xtimer_set_msg(&if_entry->rtr_adv_timer, delay, &if_entry->rtr_adv_msg,
                                gnrc_ipv6_pid);
             }
@@ -460,8 +460,10 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                 /* XXX: can't just use GNRC_NETAPI_MSG_TYPE_SND, since the next retransmission
                  * must also be set. */
                 nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
-                xtimer_set_msg(&nc_entry->rtr_adv_timer, delay, &nc_entry->rtr_adv_msg,
-                               gnrc_ipv6_pid);
+                if (nc_entry) {
+                    xtimer_set_msg(&nc_entry->rtr_adv_timer, delay, &nc_entry->rtr_adv_msg,
+                                   gnrc_ipv6_pid);
+                }
             }
 #endif
         }

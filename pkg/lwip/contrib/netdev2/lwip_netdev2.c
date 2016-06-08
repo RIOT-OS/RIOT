@@ -57,7 +57,7 @@ static err_t _eth_link_output(struct netif *netif, struct pbuf *p);
 #ifdef MODULE_LWIP_SIXLOWPAN
 static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p);
 #endif
-static void _event_cb(netdev2_t *dev, netdev2_event_t event, void *arg);
+static void _event_cb(netdev2_t *dev, netdev2_event_t event);
 static void *_event_loop(void *arg);
 
 err_t lwip_netdev2_init(struct netif *netif)
@@ -148,7 +148,7 @@ err_t lwip_netdev2_init(struct netif *netif)
     netif->flags |= NETIF_FLAG_LINK_UP;
     netif->flags |= NETIF_FLAG_IGMP;
     netif->flags |= NETIF_FLAG_MLD6;
-    netdev->isr_arg = netif;
+    netdev->context = netif;
     netdev->event_callback = _event_cb;
 #if LWIP_IPV6_AUTOCONFIG
     netif->ip6_autoconfig_enabled = 1;
@@ -209,22 +209,21 @@ static struct pbuf *_get_recv_pkt(netdev2_t *dev)
     return p;
 }
 
-static void _event_cb(netdev2_t *dev, netdev2_event_t event, void *arg)
+static void _event_cb(netdev2_t *dev, netdev2_event_t event)
 {
-    (void)arg;
     if (event == NETDEV2_EVENT_ISR) {
         assert(_pid != KERNEL_PID_UNDEF);
         msg_t msg;
 
         msg.type = LWIP_NETDEV2_MSG_TYPE_EVENT;
-        msg.content.ptr = (char *)dev;
+        msg.content.ptr = dev;
 
         if (msg_send(&msg, _pid) <= 0) {
             DEBUG("lwip_netdev2: possibly lost interrupt.\n");
         }
     }
     else {
-        struct netif *netif = dev->isr_arg;
+        struct netif *netif = dev->context;
         switch (event) {
             case NETDEV2_EVENT_RX_COMPLETE: {
                 struct pbuf *p = _get_recv_pkt(dev);
@@ -252,7 +251,7 @@ static void *_event_loop(void *arg)
         msg_t msg;
         msg_receive(&msg);
         if (msg.type == LWIP_NETDEV2_MSG_TYPE_EVENT) {
-            netdev2_t *dev = (netdev2_t *)msg.content.ptr;
+            netdev2_t *dev = msg.content.ptr;
             dev->driver->isr(dev);
         }
     }

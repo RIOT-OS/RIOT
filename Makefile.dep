@@ -76,6 +76,7 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
 endif
 
 ifneq (,$(filter trickle,$(USEMODULE)))
+  USEMODULE += random
   USEMODULE += xtimer
 endif
 
@@ -132,8 +133,7 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan
   USEMODULE += gnrc_sixlowpan_ctx
-# NHC is broken, so disable it for now.
-# USEMODULE += gnrc_sixlowpan_iphc_nhc
+  USEMODULE += gnrc_sixlowpan_iphc_nhc
 endif
 
 ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
@@ -365,7 +365,7 @@ ifneq (,$(filter lwip_sixlowpan,$(USEMODULE)))
   USEMODULE += lwip_ipv6_autoconfig
 endif
 
-ifneq (,$(filter lwip_ipv6_autoconfig,$(USEMODULE)))
+ifneq (,$(filter lwip_ipv6_autoconfig lwip_ipv6_mld,$(USEMODULE)))
   USEMODULE += lwip_ipv6
 endif
 
@@ -441,6 +441,7 @@ endif
 
 ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
   USEPKG += libfixmath
+  USEMODULE += libfixmath
 endif
 
 ifneq (,$(filter fib,$(USEMODULE)))
@@ -505,6 +506,10 @@ endif
 
 ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
   USEMODULE += netopt
+endif
+
+ifneq (,$(filter netstats_%, $(USEMODULE)))
+  USEMODULE += netstats
 endif
 
 ifneq (,$(filter pthread,$(USEMODULE)))

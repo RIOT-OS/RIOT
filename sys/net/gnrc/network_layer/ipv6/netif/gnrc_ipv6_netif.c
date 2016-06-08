@@ -156,7 +156,7 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
     }
 
     tmp_addr->valid_timeout_msg.type = GNRC_NDP_MSG_ADDR_TIMEOUT;
-    tmp_addr->valid_timeout_msg.content.ptr = (char *) &tmp_addr->addr;
+    tmp_addr->valid_timeout_msg.content.ptr = &tmp_addr->addr;
 
     return &(tmp_addr->addr);
 }
@@ -896,6 +896,14 @@ void gnrc_ipv6_netif_init_by_dev(void)
 #endif
     }
 }
+
+#ifdef MODULE_NETSTATS_IPV6
+netstats_t *gnrc_ipv6_netif_get_stats(kernel_pid_t pid)
+{
+    gnrc_ipv6_netif_t *iface = gnrc_ipv6_netif_get(pid);
+    return &(iface->stats);
+}
+#endif
 
 /**
  * @}

@@ -499,7 +499,12 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
         switch (iphc_hdr[payload_offset] & NHC_ID_MASK) {
             case NHC_UDP_ID:
                 payload_offset = iphc_nhc_udp_decode(pkt, dec_hdr, datagram_size,
-                                                     payload_offset + offset) - offset;
+                                                     payload_offset + offset);
+
+                if (payload_offset != 0) {
+                    payload_offset -= offset;
+                }
+
                 *nh_len += sizeof(udp_hdr_t);
                 break;
 
@@ -575,7 +580,7 @@ inline static size_t iphc_nhc_udp_encode(gnrc_pktsnip_t *udp, ipv6_hdr_t *ipv6_h
     else {
         /* shrink udp allocation to final size */
         gnrc_pktbuf_realloc_data(udp, nhc_len);
-        DEBUG("6lo iphc nhc: set udp len to %d\n", nhc_len);
+        DEBUG("6lo iphc nhc: set udp len to %d\n", (int) nhc_len);
     }
 
     return nhc_len;

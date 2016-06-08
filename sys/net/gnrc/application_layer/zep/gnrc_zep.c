@@ -573,7 +573,7 @@ void *_event_loop(void *args)
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 DEBUG("zep: GNRC_NETAPI_MSG_TYPE_RCV\n");
-                ringbuffer_add(&_rx_buf, (char *)(&msg.content.ptr),
+                ringbuffer_add(&_rx_buf, (void*)&msg.content.ptr,
                                sizeof(gnrc_pktsnip_t *));
                 ack.type = GNRC_NETDEV_MSG_TYPE_EVENT;
                 ack.content.value = _EVENT_RX_STARTED;
@@ -582,12 +582,12 @@ void *_event_loop(void *args)
 
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("zep: GNRC_NETAPI_MSG_TYPE_SND\n");
-                _send(dev, (gnrc_pktsnip_t *)msg.content.ptr);
+                _send(dev, msg.content.ptr);
                 break;
 
             case GNRC_NETAPI_MSG_TYPE_GET:
                 DEBUG("zep: GNRC_NETAPI_MSG_TYPE_GET\n");
-                opt = (gnrc_netapi_opt_t *)msg.content.ptr;
+                opt = msg.content.ptr;
                 ack.type = GNRC_NETAPI_MSG_TYPE_ACK;
                 ack.content.value = _get(dev, opt->opt, opt->data, opt->data_len);
                 msg_reply(&msg, &ack);
@@ -595,7 +595,7 @@ void *_event_loop(void *args)
 
             case GNRC_NETAPI_MSG_TYPE_SET:
                 DEBUG("zep: GNRC_NETAPI_MSG_TYPE_SET\n");
-                opt = (gnrc_netapi_opt_t *)msg.content.ptr;
+                opt = msg.content.ptr;
                 ack.type = GNRC_NETAPI_MSG_TYPE_ACK;
                 ack.content.value = _set(dev, opt->opt, opt->data, opt->data_len);
                 msg_reply(&msg, &ack);

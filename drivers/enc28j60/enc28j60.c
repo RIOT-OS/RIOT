@@ -216,7 +216,7 @@ static void mac_set(enc28j60_t *dev, uint8_t *mac)
 static void on_int(void *arg)
 {
     netdev2_t *netdev = (netdev2_t *)arg;
-    netdev->event_callback(arg, NETDEV2_EVENT_ISR, netdev->isr_arg);
+    netdev->event_callback(arg, NETDEV2_EVENT_ISR);
 }
 
 static int nd_send(netdev2_t *netdev, const struct iovec *data, int count)
@@ -400,17 +400,17 @@ static void nd_isr(netdev2_t *netdev)
             /* go and tell the new link layer state to upper layers */
             if (cmd_r_phy(dev, REG_PHY_PHSTAT2) & PHSTAT2_LSTAT) {
                 DEBUG("[enc28j60] isr: link up!\n");
-                netdev->event_callback(netdev, NETDEV2_EVENT_LINK_UP, NULL);
+                netdev->event_callback(netdev, NETDEV2_EVENT_LINK_UP);
             }
             else {
                 DEBUG("[enc28j60] isr: link down!\n");
-                netdev->event_callback(netdev, NETDEV2_EVENT_LINK_DOWN, NULL);
+                netdev->event_callback(netdev, NETDEV2_EVENT_LINK_DOWN);
             }
         }
         if (eir & EIR_PKTIF) {
             do {
                 DEBUG("[enc28j60] isr: packet received\n");
-                netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE, NULL);
+                netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
             } while (cmd_rcr(dev, REG_B1_EPKTCNT, 1) > 0);
         }
         if (eir & EIR_RXERIF) {
@@ -419,7 +419,7 @@ static void nd_isr(netdev2_t *netdev)
         }
         if (eir & EIR_TXIF) {
             DEBUG("[enc28j60] isr: packet transmitted\n");
-            netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE, NULL);
+            netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE);
             cmd_bfc(dev, REG_EIR, -1, EIR_TXIF);
         }
         if (eir & EIR_TXERIF) {

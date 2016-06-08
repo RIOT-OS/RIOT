@@ -218,33 +218,6 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev)
                         AT86RF2XX_TRX_STATE__TX_START);
     if (netdev->event_callback &&
         (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_START)) {
-        netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED, NULL);
+        netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED);
     }
-}
-
-size_t at86rf2xx_rx_len(at86rf2xx_t *dev)
-{
-    uint8_t phr;
-
-    at86rf2xx_fb_read(dev, &phr, 1);
-
-    /* ignore MSB (refer p.80) and substract length of FCS field */
-    return (size_t)((phr & 0x7f) - 2);
-}
-
-void at86rf2xx_rx_read(at86rf2xx_t *dev, uint8_t *data, size_t len,
-                       size_t offset)
-{
-    /* when reading from SRAM, the different chips from the AT86RF2xx family
-     * behave differently: the AT86F233, the AT86RF232 and the ATRF86212B return
-     * frame length field (PHR) at position 0 and the first data byte at
-     * position 1.
-     * The AT86RF231 does not return the PHR field and return
-     * the first data byte at position 0.
-     */
-#ifndef MODULE_AT86RF231
-    at86rf2xx_sram_read(dev, offset + 1, data, len);
-#else
-    at86rf2xx_sram_read(dev, offset, data, len);
-#endif
 }

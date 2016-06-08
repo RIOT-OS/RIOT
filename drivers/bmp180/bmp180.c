@@ -19,13 +19,21 @@
  */
 
 #include <math.h>
+
+#include "log.h"
 #include "bmp180.h"
 #include "bmp180_internals.h"
+#include "bmp180_params.h"
 #include "periph/i2c.h"
 #include "xtimer.h"
 
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
+
+/**
+ * @brief   Allocation of memory for device descriptors
+ */
+bmp180_t bmp180_devs[BMP180_NUMOF];
 
 /* Internal function prototypes */
 static int _read_ut(bmp180_t *dev, int32_t *ut);
@@ -97,6 +105,21 @@ int bmp180_init(bmp180_t *dev, i2c_t i2c, uint8_t mode)
     DEBUG("MC: %i\n",  (int)dev->calibration.mc);
     DEBUG("MD: %i\n",  (int)dev->calibration.md);
     return 0;
+}
+
+void bmp180_auto_init(void)
+{
+    for (unsigned i = 0; i < BMP180_NUMOF; i++) {
+        if (bmp180_init(&bmp180_devs[i], bmp180_params[i].i2c_dev, bmp180_params[i].mode) < 0) {
+            LOG_ERROR("Unable to initialize BMP180 sensor #%i\n", i);
+        }
+#ifdef MODULE_SAUL_REG
+        for (int j = 0; j < 2; j++) {
+            bmp180_saul_reg[i][j].dev = &bmp180_devs[i];
+            saul_reg_add(&bmp180_saul_reg[i][j]);
+        }
+#endif
+    }
 }
 
 int bmp180_read_temperature(bmp180_t *dev, int32_t *temperature)

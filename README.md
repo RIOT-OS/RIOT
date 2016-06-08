@@ -26,13 +26,26 @@
 
 The friendly Operating System for IoT!
 
-## FEATURES
-RIOT OS is an operating system for Internet of Things (IoT) devices. It is based on a microkernel and designed for
-* energy efficiency
-* hardware independent development
-* a high degree of modularity
+RIOT is a real-time multi-threading operating system that supports a range of
+devices that are typically found in the Internet of Things (IoT): 
+8-bit, 16-bit and 32-bit microcontrollers.
 
-Its features comprise
+RIOT is based on the following design principles: energy-efficiency, real-time
+capabilities, small memory footprint, modularity, and uniform API access,
+independent of the underlying hardware (this API offers partial POSIX
+compliance).
+
+RIOT is developed by an international open source community which is
+independent of specific vendors (e.g. similarly to the Linux community).
+RIOT is licensed with LGPLv2.1, a copyleft license which fosters
+indirect business models around the free open-source software platform
+provided by RIOT, e.g. it is possible to link closed-source code with the
+LGPL code.
+
+## FEATURES
+
+RIOT is based on a microkernel architecture, and provides features including, but not limited to:
+
 * a preemptive, tickless scheduler with priorities
 * flexible memory management
 * high resolution, long-term timers
@@ -41,9 +54,10 @@ Its features comprise
 * IPv6
 * 6LoWPAN (RFC4944, RFC6282, and RFC6775)
 * UDP
-* RPL (storing mode)
+* RPL (storing mode, P2P mode)
 * CoAP
 * CCN-Lite
+
 
 ## GETTING STARTED
 * You want to start the RIOT? Just follow our [Getting started documentation](https://github.com/RIOT-OS/RIOT/wiki/Introduction)

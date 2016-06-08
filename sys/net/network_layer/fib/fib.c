@@ -345,7 +345,7 @@ static int fib_signal_rp(fib_table_t *table, uint16_t type, uint8_t *dat,
     for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
         if (table->notify_rp[i] != KERNEL_PID_UNDEF) {
             DEBUG("[fib_signal_rp] send msg@: %p to pid[%d]: %d\n", \
-                  (void *)msg.content.ptr, (int)i, (int)(table->notify_rp[i]));
+                  msg.content.ptr, (int)i, (int)(table->notify_rp[i]));
 
             /* do only signal a RP if its registered prefix matches */
             if (type != FIB_MSG_RP_SIGNAL_SOURCE_ROUTE_CREATED) {

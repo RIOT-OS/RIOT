@@ -42,6 +42,8 @@ static void _async_io_isr(void) {
 
     int max_fd = 0;
 
+    struct timeval timeout = { .tv_usec = 0 };
+
     for (int i = 0; i < _next_index; i++) {
         FD_SET(_fds[i], &rfds);
 
@@ -50,7 +52,7 @@ static void _async_io_isr(void) {
         }
     }
 
-    if (real_select(max_fd + 1, &rfds, NULL, NULL, NULL) > 0) {
+    if (real_select(max_fd + 1, &rfds, NULL, NULL, &timeout) > 0) {
         for (int i = 0; i < _next_index; i++) {
             if (FD_ISSET(_fds[i], &rfds)) {
                 _native_async_read_callbacks[i](_fds[i]);

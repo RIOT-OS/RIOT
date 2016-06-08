@@ -1,3 +1,3 @@
-MODULE = libfixmath-unittests
+MODULE = iotlab-common
 
 include $(RIOTBASE)/Makefile.base

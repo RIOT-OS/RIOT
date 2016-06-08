@@ -69,6 +69,14 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
 
     assert(ipv6 != NULL);
 
+    if (icmpv6->size < sizeof(icmpv6_hdr_t)) {
+        DEBUG("icmpv6: packet too short.\n");
+        return;
+    }
+
+    /* Note: size will be checked again in gnrc_icmpv6_echo_req_handle,
+             gnrc_ndp_rtr_sol_handle, and others */
+
     hdr = (icmpv6_hdr_t *)icmpv6->data;
 
     if (_calc_csum(icmpv6, ipv6, pkt)) {

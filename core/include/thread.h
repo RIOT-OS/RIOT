@@ -102,29 +102,47 @@ struct _thread {
 #endif
 };
 
- /**
+/**
  * @def THREAD_STACKSIZE_DEFAULT
  * @brief A reasonable default stack size that will suffice most smaller tasks
+ *
+ * @note This value must be defined by the CPU specific implementation, please
+ *       take a look at @c cpu/$CPU/include/cpu_conf.h
  */
 #ifndef THREAD_STACKSIZE_DEFAULT
 #error THREAD_STACKSIZE_DEFAULT must be defined per CPU
+#endif
+#ifdef DOXYGEN
+#define THREAD_STACKSIZE_DEFAULT
 #endif
 
 /**
  * @def THREAD_STACKSIZE_IDLE
  * @brief Size of the idle task's stack in bytes
+ *
+ * @note This value must be defined by the CPU specific implementation, please
+ *       take a look at @c cpu/$CPU/include/cpu_conf.h
  */
 #ifndef THREAD_STACKSIZE_IDLE
 #error THREAD_STACKSIZE_IDLE must be defined per CPU
+#endif
+#ifdef DOXYGEN
+#define THREAD_STACKSIZE_IDLE
 #endif
 
 /**
  * @def THREAD_EXTRA_STACKSIZE_PRINTF
  * @ingroup conf
  * @brief Size of the task's printf stack in bytes
+ *
+ * @note This value must be defined by the CPU specific implementation, please
+ *       take a look at @c cpu/$CPU/include/cpu_conf.h
  */
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF
 #error THREAD_EXTRA_STACKSIZE_PRINTF must be defined per CPU
+#endif
+#ifdef DOXYGEN
+#define THREAD_EXTRA_STACKSIZE_PRINTF
 #endif
 
 /**
@@ -191,7 +209,8 @@ struct _thread {
  *
  * Creating a new thread is done in two steps:
  * 1. the new thread's stack is initialized depending on the platform
- * 2. the new thread is added to the scheduler to be run
+ * 2. the new thread is added to the scheduler and the scheduler is run (if not
+ *    indicated otherwise)
  *
  * As RIOT is using a fixed priority scheduling algorithm, threads are
  * scheduled based on their priority. The priority is fixed for every thread

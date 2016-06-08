@@ -186,7 +186,7 @@ typedef struct {
                                      by msg_send. */
     uint16_t type;              /**< Type field. */
     union {
-        char *ptr;              /**< Pointer content field. */
+        void *ptr;              /**< Pointer content field. */
         uint32_t value;         /**< Value content field. */
     } content;                  /**< Content of the message. */
 } msg_t;

@@ -164,7 +164,7 @@ static int _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
 static void _netdev2_cc110x_isr(void *arg)
 {
     netdev2_t *netdev2 = (netdev2_t*) arg;
-    netdev2->event_callback(netdev2, NETDEV2_EVENT_ISR, netdev2->isr_arg);
+    netdev2->event_callback(netdev2, NETDEV2_EVENT_ISR);
 }
 
 static void _netdev2_cc110x_rx_callback(void *arg)
@@ -172,7 +172,7 @@ static void _netdev2_cc110x_rx_callback(void *arg)
     netdev2_t *netdev2 = (netdev2_t*) arg;
     cc110x_t *cc110x = &((netdev2_cc110x_t*) arg)->cc110x;
     gpio_irq_disable(cc110x->params.gdo2);
-    netdev2->event_callback(netdev2, NETDEV2_EVENT_RX_COMPLETE, NULL);
+    netdev2->event_callback(netdev2, NETDEV2_EVENT_RX_COMPLETE);
 }
 
 static void _isr(netdev2_t *dev)

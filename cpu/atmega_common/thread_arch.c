@@ -198,6 +198,13 @@ void thread_arch_stack_print(void)
     printf("stack size: %u bytes\n", size);
 }
 
+/* This function calculates the ISR_usage */
+int thread_arch_isr_stack_usage(void)
+{
+    /* TODO */
+    return -1;
+}
+
 void thread_arch_start_threading(void) __attribute__((naked));
 void thread_arch_start_threading(void)
 {
