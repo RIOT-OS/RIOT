@@ -11,12 +11,12 @@
  * @{
  *
  * @file
- * @brief       Unittests for the ``netif`` module
+ * @brief       Unittests for the ``gnrc_netif`` module
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef TESTS_NETIF_H_
-#define TESTS_NETIF_H_
+#ifndef TESTS_GNRC_NETIF_H_
+#define TESTS_GNRC_NETIF_H_
 
 #include "embUnit.h"
 
@@ -27,11 +27,11 @@ extern "C" {
 /**
  * @brief   The entry point of this test suite.
  */
-void tests_netif(void);
+void tests_gnrc_netif(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* TESTS_NETIF_H_ */
+#endif /* TESTS_GNRC_NETIF_H_ */
 /** @} */

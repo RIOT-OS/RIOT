@@ -20,14 +20,14 @@
 #include "net/gnrc/netif.h"
 
 #include "unittests-constants.h"
-#include "tests-netif.h"
+#include "tests-gnrc_netif.h"
 
 static void set_up(void)
 {
     gnrc_netif_init();
 }
 
-static void test_ng_netif_add__KERNEL_PID_UNDEF(void)
+static void test_gnrc_netif_add__KERNEL_PID_UNDEF(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t size;
@@ -37,7 +37,7 @@ static void test_ng_netif_add__KERNEL_PID_UNDEF(void)
     TEST_ASSERT_EQUAL_INT(0, size);
 }
 
-static void test_ng_netif_add__memfull(void)
+static void test_gnrc_netif_add__memfull(void)
 {
     for (int i = 0; i < GNRC_NETIF_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_netif_add(TEST_UINT8 + i));
@@ -46,7 +46,7 @@ static void test_ng_netif_add__memfull(void)
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_netif_add(TEST_UINT8 - 1));
 }
 
-static void test_ng_netif_add__success(void)
+static void test_gnrc_netif_add__success(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t size;
@@ -58,7 +58,7 @@ static void test_ng_netif_add__success(void)
     TEST_ASSERT_EQUAL_INT(TEST_UINT8, ifs[0]);
 }
 
-static void test_ng_netif_add__duplicate_entry(void)
+static void test_gnrc_netif_add__duplicate_entry(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t size;
@@ -72,12 +72,12 @@ static void test_ng_netif_add__duplicate_entry(void)
     TEST_ASSERT_EQUAL_INT(TEST_UINT8, ifs[0]);
 }
 
-static void test_ng_netif_remove__KERNEL_PID_UNDEF(void)
+static void test_gnrc_netif_remove__KERNEL_PID_UNDEF(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t size;
 
-    test_ng_netif_add__success();
+    test_gnrc_netif_add__success();
 
     gnrc_netif_remove(KERNEL_PID_UNDEF);
 
@@ -86,12 +86,12 @@ static void test_ng_netif_remove__KERNEL_PID_UNDEF(void)
     TEST_ASSERT_EQUAL_INT(TEST_UINT8, ifs[0]);
 }
 
-static void test_ng_netif_remove__not_an_if(void)
+static void test_gnrc_netif_remove__not_an_if(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t size;
 
-    test_ng_netif_add__success();
+    test_gnrc_netif_add__success();
 
     gnrc_netif_remove(TEST_UINT8 + 1);
 
@@ -100,12 +100,12 @@ static void test_ng_netif_remove__not_an_if(void)
     TEST_ASSERT_EQUAL_INT(TEST_UINT8, ifs[0]);
 }
 
-static void test_ng_netif_remove__success(void)
+static void test_gnrc_netif_remove__success(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t size;
 
-    test_ng_netif_add__success();
+    test_gnrc_netif_add__success();
 
     gnrc_netif_remove(TEST_UINT8);
 
@@ -113,16 +113,17 @@ static void test_ng_netif_remove__success(void)
     TEST_ASSERT_EQUAL_INT(0, size);
 }
 
-static void test_ng_netif_get__empty(void)
+static void test_gnrc_netif_get__empty(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t size = gnrc_netif_get(ifs);
+
     TEST_ASSERT_EQUAL_INT(0, size);
 }
 
-/* takes one out of the middle of the netif list and checks if all interfaces
+/* takes one out of the middle of the gnrc_netif list and checks if all interfaces
  * are gotten regardless */
-static void test_ng_netif_get__success_3_minus_one(void)
+static void test_gnrc_netif_get__success_3_minus_one(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t size;
@@ -146,7 +147,7 @@ static void test_ng_netif_get__success_3_minus_one(void)
     TEST_ASSERT_EQUAL_INT(size, count);
 }
 
-static void test_ng_netif_get__full(void)
+static void test_gnrc_netif_get__full(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t size;
@@ -159,7 +160,7 @@ static void test_ng_netif_get__full(void)
     TEST_ASSERT_EQUAL_INT(GNRC_NETIF_NUMOF, size);
 }
 
-static void test_ng_netif_exist(void)
+static void test_gnrc_netif_exist(void)
 {
     TEST_ASSERT_EQUAL_INT(0, gnrc_netif_add(0));
     TEST_ASSERT_EQUAL_INT(0, gnrc_netif_add(1));
@@ -175,24 +176,24 @@ static void test_ng_netif_exist(void)
     }
 }
 
-static void test_ng_netif_addr_to_str__out_too_short(void)
+static void test_gnrc_netif_addr_to_str__out_too_short(void)
 {
-    static const uint8_t addr[] = {0x05, 0xcd};
+    static const uint8_t addr[] = { 0x05, 0xcd };
     char out[2];
 
     TEST_ASSERT_NULL(gnrc_netif_addr_to_str(out, sizeof(out), addr, sizeof(addr)));
 }
 
-static void test_ng_netif_addr_to_str__success(void)
+static void test_gnrc_netif_addr_to_str__success(void)
 {
-    static const uint8_t addr[] = {0x05, 0xcd};
+    static const uint8_t addr[] = { 0x05, 0xcd };
     char out[3 * sizeof(addr)];
 
     TEST_ASSERT_EQUAL_STRING("05:cd", gnrc_netif_addr_to_str(out, sizeof(out),
-                             addr, sizeof(addr)));
+                                                             addr, sizeof(addr)));
 }
 
-static void test_ng_netif_addr_from_str__out_too_short(void)
+static void test_gnrc_netif_addr_from_str__out_too_short(void)
 {
     static const char str[] = "05:cd";
     uint8_t out[1];
@@ -200,7 +201,7 @@ static void test_ng_netif_addr_from_str__out_too_short(void)
     TEST_ASSERT_EQUAL_INT(0, gnrc_netif_addr_from_str(out, sizeof(out), str));
 }
 
-static void test_ng_netif_addr_from_str__omitted_delimitter(void)
+static void test_gnrc_netif_addr_from_str__omitted_delimitter(void)
 {
     static const char str[] = "4567:cd";
     uint8_t out[3];
@@ -211,7 +212,7 @@ static void test_ng_netif_addr_from_str__omitted_delimitter(void)
     TEST_ASSERT_EQUAL_INT(0xcd, out[2]);
 }
 
-static void test_ng_netif_addr_from_str__ill_formated2(void)
+static void test_gnrc_netif_addr_from_str__ill_formated2(void)
 {
     static const char str[] = TEST_STRING8;
     uint8_t out[sizeof(str)];
@@ -219,7 +220,7 @@ static void test_ng_netif_addr_from_str__ill_formated2(void)
     TEST_ASSERT_EQUAL_INT(0, gnrc_netif_addr_from_str(out, sizeof(out), str));
 }
 
-static void test_ng_netif_addr_from_str__dash_delimitter(void)
+static void test_gnrc_netif_addr_from_str__dash_delimitter(void)
 {
     static const char str[] = "05-cd";
     uint8_t out[2];
@@ -229,7 +230,7 @@ static void test_ng_netif_addr_from_str__dash_delimitter(void)
     TEST_ASSERT_EQUAL_INT(0xcd, out[1]);
 }
 
-static void test_ng_netif_addr_from_str__zero_omitted_back(void)
+static void test_gnrc_netif_addr_from_str__zero_omitted_back(void)
 {
     static const char str[] = "05:c";
     uint8_t out[2];
@@ -239,7 +240,7 @@ static void test_ng_netif_addr_from_str__zero_omitted_back(void)
     TEST_ASSERT_EQUAL_INT(0x0c, out[1]);
 }
 
-static void test_ng_netif_addr_from_str__zero_omitted_front(void)
+static void test_gnrc_netif_addr_from_str__zero_omitted_front(void)
 {
     static const char str[] = "5:cd";
     uint8_t out[2];
@@ -249,7 +250,7 @@ static void test_ng_netif_addr_from_str__zero_omitted_front(void)
     TEST_ASSERT_EQUAL_INT(0xcd, out[1]);
 }
 
-static void test_ng_netif_addr_from_str__ill_trailing_delimitter(void)
+static void test_gnrc_netif_addr_from_str__ill_trailing_delimitter(void)
 {
     static const char str[] = "05:cd:";
     uint8_t out[sizeof(str)];
@@ -257,7 +258,7 @@ static void test_ng_netif_addr_from_str__ill_trailing_delimitter(void)
     TEST_ASSERT_EQUAL_INT(0, gnrc_netif_addr_from_str(out, sizeof(out), str));
 }
 
-static void test_ng_netif_addr_from_str__ill_leading_delimitter(void)
+static void test_gnrc_netif_addr_from_str__ill_leading_delimitter(void)
 {
     static const char str[] = ":05:cd";
     uint8_t out[sizeof(str)];
@@ -265,7 +266,7 @@ static void test_ng_netif_addr_from_str__ill_leading_delimitter(void)
     TEST_ASSERT_EQUAL_INT(0, gnrc_netif_addr_from_str(out, sizeof(out), str));
 }
 
-static void test_ng_netif_addr_from_str__ill_extra_delimitter(void)
+static void test_gnrc_netif_addr_from_str__ill_extra_delimitter(void)
 {
     static const char str[] = "05::cd";
     uint8_t out[sizeof(str)];
@@ -273,7 +274,7 @@ static void test_ng_netif_addr_from_str__ill_extra_delimitter(void)
     TEST_ASSERT_EQUAL_INT(0, gnrc_netif_addr_from_str(out, sizeof(out), str));
 }
 
-static void test_ng_netif_addr_from_str__success(void)
+static void test_gnrc_netif_addr_from_str__success(void)
 {
     static const char str[] = "05:cd";
     uint8_t out[2];
@@ -283,41 +284,41 @@ static void test_ng_netif_addr_from_str__success(void)
     TEST_ASSERT_EQUAL_INT(0xcd, out[1]);
 }
 
-Test *tests_netif_tests(void)
+Test *tests_gnrc_netif_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_ng_netif_add__KERNEL_PID_UNDEF),
-        new_TestFixture(test_ng_netif_add__memfull),
-        new_TestFixture(test_ng_netif_add__success),
-        new_TestFixture(test_ng_netif_add__duplicate_entry),
-        new_TestFixture(test_ng_netif_remove__KERNEL_PID_UNDEF),
-        new_TestFixture(test_ng_netif_remove__not_an_if),
-        new_TestFixture(test_ng_netif_remove__success),
-        new_TestFixture(test_ng_netif_get__empty),
-        new_TestFixture(test_ng_netif_get__success_3_minus_one),
-        new_TestFixture(test_ng_netif_get__full),
-        new_TestFixture(test_ng_netif_exist),
-        new_TestFixture(test_ng_netif_addr_to_str__out_too_short),
-        new_TestFixture(test_ng_netif_addr_to_str__success),
-        new_TestFixture(test_ng_netif_addr_from_str__out_too_short),
-        new_TestFixture(test_ng_netif_addr_from_str__omitted_delimitter),
-        new_TestFixture(test_ng_netif_addr_from_str__ill_formated2),
-        new_TestFixture(test_ng_netif_addr_from_str__dash_delimitter),
-        new_TestFixture(test_ng_netif_addr_from_str__zero_omitted_back),
-        new_TestFixture(test_ng_netif_addr_from_str__zero_omitted_front),
-        new_TestFixture(test_ng_netif_addr_from_str__ill_trailing_delimitter),
-        new_TestFixture(test_ng_netif_addr_from_str__ill_leading_delimitter),
-        new_TestFixture(test_ng_netif_addr_from_str__ill_extra_delimitter),
-        new_TestFixture(test_ng_netif_addr_from_str__success),
+        new_TestFixture(test_gnrc_netif_add__KERNEL_PID_UNDEF),
+        new_TestFixture(test_gnrc_netif_add__memfull),
+        new_TestFixture(test_gnrc_netif_add__success),
+        new_TestFixture(test_gnrc_netif_add__duplicate_entry),
+        new_TestFixture(test_gnrc_netif_remove__KERNEL_PID_UNDEF),
+        new_TestFixture(test_gnrc_netif_remove__not_an_if),
+        new_TestFixture(test_gnrc_netif_remove__success),
+        new_TestFixture(test_gnrc_netif_get__empty),
+        new_TestFixture(test_gnrc_netif_get__success_3_minus_one),
+        new_TestFixture(test_gnrc_netif_get__full),
+        new_TestFixture(test_gnrc_netif_exist),
+        new_TestFixture(test_gnrc_netif_addr_to_str__out_too_short),
+        new_TestFixture(test_gnrc_netif_addr_to_str__success),
+        new_TestFixture(test_gnrc_netif_addr_from_str__out_too_short),
+        new_TestFixture(test_gnrc_netif_addr_from_str__omitted_delimitter),
+        new_TestFixture(test_gnrc_netif_addr_from_str__ill_formated2),
+        new_TestFixture(test_gnrc_netif_addr_from_str__dash_delimitter),
+        new_TestFixture(test_gnrc_netif_addr_from_str__zero_omitted_back),
+        new_TestFixture(test_gnrc_netif_addr_from_str__zero_omitted_front),
+        new_TestFixture(test_gnrc_netif_addr_from_str__ill_trailing_delimitter),
+        new_TestFixture(test_gnrc_netif_addr_from_str__ill_leading_delimitter),
+        new_TestFixture(test_gnrc_netif_addr_from_str__ill_extra_delimitter),
+        new_TestFixture(test_gnrc_netif_addr_from_str__success),
     };
 
-    EMB_UNIT_TESTCALLER(netif_tests, set_up, NULL, fixtures);
+    EMB_UNIT_TESTCALLER(gnrc_netif_tests, set_up, NULL, fixtures);
 
-    return (Test *)&netif_tests;
+    return (Test *)&gnrc_netif_tests;
 }
 
-void tests_netif(void)
+void tests_gnrc_netif(void)
 {
-    TESTS_RUN(tests_netif_tests());
+    TESTS_RUN(tests_gnrc_netif_tests());
 }
 /** @} */
