@@ -131,15 +131,16 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
             nettype = GNRC_NETTYPE_UNDEF;
     }
 
-    /* copy packet payload into pktbuf */
-    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, cc110x_pkt->data,
-            payload_length, nettype);
+    gnrc_pktsnip_t *pkt = NULL;
+    if (payload_length > 0) {
+        /* copy packet payload into pktbuf */
+        pkt = gnrc_pktbuf_add(NULL, cc110x_pkt->data, payload_length, nettype);
 
-    if(!pkt) {
-        DEBUG("cc110x: _recv: cannot allocate pktsnip.\n");
-        return NULL;
+        if(!pkt) {
+            DEBUG("cc110x: _recv: cannot allocate pktsnip.\n");
+            return NULL;
+        }
     }
-
 
     gnrc_pktsnip_t *netif_hdr;
     netif_hdr = gnrc_pktbuf_add(NULL, NULL,
@@ -148,7 +149,9 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
 
     if (netif_hdr == NULL) {
         DEBUG("gnrc_netdev2_cc110x: no space left in packet buffer\n");
-        gnrc_pktbuf_release(pkt);
+        if (pkt != NULL) {
+            gnrc_pktbuf_release(pkt);
+        }
         return NULL;
     }
 
@@ -176,8 +179,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
     od_hex_dump(cc110x_pkt->data, payload_length, OD_WIDTH_DEFAULT);
 #endif
 
-
-    pkt->next = netif_hdr;
+    LL_APPEND(pkt, netif_hdr);
 
     return pkt;
 }

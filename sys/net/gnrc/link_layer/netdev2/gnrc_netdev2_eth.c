@@ -72,8 +72,11 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
 
         ethernet_hdr_t *hdr = (ethernet_hdr_t *)eth_hdr->data;
 
-        /* set payload type from ethertype */
-        pkt->type = gnrc_nettype_from_ethertype(byteorder_ntohs(hdr->type));
+        /* if pkt has payload */
+        if (pkt != eth_hdr) {
+            /* set payload type from ethertype */
+            pkt->type = gnrc_nettype_from_ethertype(byteorder_ntohs(hdr->type));
+        }
 
         /* create netif header */
         gnrc_pktsnip_t *netif_hdr;
@@ -100,8 +103,14 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
         od_hex_dump(hdr, nread, OD_WIDTH_DEFAULT);
 #endif
 
-        gnrc_pktbuf_remove_snip(pkt, eth_hdr);
-        LL_APPEND(pkt, netif_hdr);
+        /* if pkt has payload */
+        if (pkt != eth_hdr) {
+            gnrc_pktbuf_remove_snip(pkt, eth_hdr);
+            LL_APPEND(pkt, netif_hdr);
+        }
+        else {  /* no payload? => just return netif_hdr */
+            pkt = netif_hdr;
+        }
     }
 
 out:
