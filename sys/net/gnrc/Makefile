@@ -112,6 +112,15 @@ endif
 ifneq (,$(filter gnrc_slip,$(USEMODULE)))
     DIRS += link_layer/slip
 endif
+ifneq (,$(filter gnrc_sock,$(USEMODULE)))
+    DIRS += sock
+endif
+ifneq (,$(filter gnrc_sock_ip,$(USEMODULE)))
+    DIRS += sock/ip
+endif
+ifneq (,$(filter gnrc_sock_udp,$(USEMODULE)))
+    DIRS += sock/udp
+endif
 ifneq (,$(filter gnrc_udp,$(USEMODULE)))
     DIRS += transport_layer/udp
 endif
