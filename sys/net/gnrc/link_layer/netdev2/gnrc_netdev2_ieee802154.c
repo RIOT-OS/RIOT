@@ -120,9 +120,9 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
             DEBUG("_recv_ieee802154: received packet from %s of length %u\n",
                   gnrc_netif_addr_to_str(src_str, sizeof(src_str),
                                          gnrc_netif_hdr_get_src_addr(hdr),
-                                         hdr->src_l2addr_len), nread);
+                                         hdr->src_l2addr_len), nread + mhr_len);
 #if defined(MODULE_OD)
-            od_hex_dump(pkt->data, nread, OD_WIDTH_DEFAULT);
+            od_hex_dump(hdr, nread + mhr_len, OD_WIDTH_DEFAULT);
 #endif
 #endif
             /* if pkt has payload */
