@@ -130,10 +130,16 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
                 pkt->type = state->proto;
                 DEBUG("_recv_ieee802154: reallocating.\n");
                 gnrc_pktbuf_realloc_data(pkt, nread);
+                /* replace IEEE 802.15.4 header with generic netif header */
+                gnrc_pktbuf_remove_snip(pkt, ieee802154_hdr);
+                LL_APPEND(pkt, netif_hdr);
             }
-            /* replace IEEE 802.15.4 header with generic netif header */
-            gnrc_pktbuf_remove_snip(pkt, ieee802154_hdr);
-            LL_APPEND(pkt, netif_hdr);
+            else {
+                /* packet has no payload so just release original header */
+                gnrc_pktbuf_release(ieee802154_hdr);
+                /* and return netif header */
+                pkt = netif_hdr;
+            }
         }
     }
 
