@@ -116,27 +116,24 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
             hdr->if_pid = thread_getpid();
+#if ENABLE_DEBUG
             DEBUG("_recv_ieee802154: received packet from %s of length %u\n",
                   gnrc_netif_addr_to_str(src_str, sizeof(src_str),
                                          gnrc_netif_hdr_get_src_addr(hdr),
                                          hdr->src_l2addr_len), nread);
+#if defined(MODULE_OD)
+            od_hex_dump(pkt->data, nread, OD_WIDTH_DEFAULT);
+#endif
+#endif
             /* if pkt has payload */
             if (pkt != ieee802154_hdr) {
                 pkt->type = state->proto;
-#if ENABLE_DEBUG
-#if defined(MODULE_OD)
-                od_hex_dump(pkt->data, nread, OD_WIDTH_DEFAULT);
-#endif
-#endif
-                gnrc_pktbuf_remove_snip(pkt, ieee802154_hdr);
-                LL_APPEND(pkt, netif_hdr);
-
                 DEBUG("_recv_ieee802154: reallocating.\n");
                 gnrc_pktbuf_realloc_data(pkt, nread);
             }
-            else {  /* no payload? => just return netif_hdr */
-                pkt = netif_hdr;
-            }
+            /* replace IEEE 802.15.4 header with generic netif header */
+            gnrc_pktbuf_remove_snip(pkt, ieee802154_hdr);
+            LL_APPEND(pkt, netif_hdr);
         }
     }
 

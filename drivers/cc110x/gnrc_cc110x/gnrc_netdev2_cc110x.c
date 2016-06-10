@@ -149,7 +149,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
 
     if (netif_hdr == NULL) {
         DEBUG("gnrc_netdev2_cc110x: no space left in packet buffer\n");
-        if (pkt != NULL) {
+        if (pkt != NULL) {  /* may be if payload_length == 0 */
             gnrc_pktbuf_release(pkt);
         }
         return NULL;

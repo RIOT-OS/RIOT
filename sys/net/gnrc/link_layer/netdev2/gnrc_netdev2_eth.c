@@ -102,15 +102,9 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
 #if defined(MODULE_OD) && ENABLE_DEBUG
         od_hex_dump(hdr, nread, OD_WIDTH_DEFAULT);
 #endif
-
-        /* if pkt has payload */
-        if (pkt != eth_hdr) {
-            gnrc_pktbuf_remove_snip(pkt, eth_hdr);
-            LL_APPEND(pkt, netif_hdr);
-        }
-        else {  /* no payload? => just return netif_hdr */
-            pkt = netif_hdr;
-        }
+        /* replace IEEE 802.15.4 header with generic netif header */
+        gnrc_pktbuf_remove_snip(pkt, eth_hdr);
+        LL_APPEND(pkt, netif_hdr);
     }
 
 out:
