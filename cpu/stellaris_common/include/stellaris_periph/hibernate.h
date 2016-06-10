@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HIBERNATE_H__
-#define __HIBERNATE_H__
+#ifndef HIBERNATE_H_
+#define HIBERNATE_H_
 
 //*****************************************************************************
 //
@@ -164,4 +164,4 @@ extern unsigned long HibernateBatCheckDone(void);
 }
 #endif
 
-#endif  // __HIBERNATE_H__
+#endif  /* HIBERNATE_H_ */
