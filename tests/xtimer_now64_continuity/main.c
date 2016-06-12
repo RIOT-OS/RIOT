@@ -22,28 +22,30 @@
 #include <stdint.h>
 
 #include "xtimer.h"
-
-#define ITERATIONS (100000LU)
-#define MAXDIFF 1000
+#include "fmt.h"
+#include "irq.h"
 
 int main(void)
 {
-    uint32_t n = ITERATIONS;
-    uint64_t now;
-    uint64_t before = xtimer_now64();
+    uint32_t before = xtimer_now();
+    uint32_t now;
 
-    while(--n) {
-        now = xtimer_now64();
-        if ((now-before) > MAXDIFF) {
+    print_u32_hex(XTIMER_MSBMASK);
+    print_u32_hex(XTIMER_MSBMASK);
+    puts("");
+
+    do {
+        now = xtimer_now();
+        irq_disable();
+        print_u32_hex(now);
+        puts("");
+        if (now < before) {
             puts("TEST FAILED.");
             break;
         }
         before = now;
-    }
-
-    if (!n) {
-        puts("TEST SUCCESSFUL.");
-    }
+        irq_enable();
+    } while(1);
 
     return 0;
 }
