@@ -12842,6 +12842,9 @@ typedef struct
 #define ETH_MACCR_BL_Msk                              (0x3U << ETH_MACCR_BL_Pos) /*!< 0x00000060 */
 #define ETH_MACCR_BL                                  ETH_MACCR_BL_Msk         /* Back-off limit: random integer number (r) of slot time delays before rescheduling
                                                        a transmission attempt during retries after a collision: 0 =< r <2^k */
+#define ETH_MACCR_CSTF_Pos                            (25U)
+#define ETH_MACCR_CSTF_Msk                            (0x1U << ETH_MACCR_CSTF_Pos) /*!< 0x02000000 */
+#define ETH_MACCR_CSTF                                ETH_MACCR_CSTF_Msk       /* CRC stripping for Type frames */
 #define ETH_MACCR_BL_10                               0x00000000U              /* k = min (n, 10) */
 #define ETH_MACCR_BL_8                                0x00000020U              /* k = min (n, 8) */
 #define ETH_MACCR_BL_4                                0x00000040U              /* k = min (n, 4) */
