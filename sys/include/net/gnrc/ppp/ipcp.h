@@ -26,29 +26,28 @@
 extern "C" {
 #endif
 
-#define IPCP_OPT_IP_ADDRESS (3) /**< code of IP Address option */
-#define IPCP_RESTART_TIMER (3000000U) /**< restart time value for IPCP */
+#define IPCP_OPT_IP_ADDRESS (3)         /**< code of IP Address option */
+#define IPCP_RESTART_TIMER (3000000U)   /**< restart time value for IPCP */
 
 
 /**
  * @brief IPCP options
  */
-typedef enum{
-	IPCP_IPADDRESS, /**< IP address option */
-	IPCP_NUMOPTS
+typedef enum {
+    IPCP_IPADDRESS, /**< IP address option */
+    IPCP_NUMOPTS
 } ipcp_options_t;
 
 /**
  * @brief definition of IPCP protocol
  * @extends ppp_fsm_t
  */
-typedef struct ipcp_t
-{
-	ppp_fsm_t fsm; /**< base fsm class */
-	ipv4_addr_t local_ip; /**< local ip address obtained from ppp device */
-	ipv4_addr_t ip; /**< ip address of ppp device */
-	fsm_conf_t ipcp_opts[IPCP_NUMOPTS]; /**< configuration options for IPCP */
-	int ip_id; /**< id of ip packet */
+typedef struct ipcp_t {
+    ppp_fsm_t fsm;                      /**< base fsm class */
+    ipv4_addr_t local_ip;               /**< local ip address obtained from ppp device */
+    ipv4_addr_t ip;                     /**< ip address of ppp device */
+    fsm_conf_t ipcp_opts[IPCP_NUMOPTS]; /**< configuration options for IPCP */
+    int ip_id;                          /**< id of ip packet */
 } ipcp_t;
 
 /**
@@ -57,11 +56,10 @@ typedef struct ipcp_t
  *
  * @details since most mobile operators don't support IPv6, it's necessary to use a tunnel for transmitting data
  */
-typedef struct ppp_ipv4_t
-{
-	ppp_protocol_t prot; /**< base ppp_protocol class */
-	ipv4_addr_t tunnel_addr; /**< IPv4 address of tunnel */
-	uint16_t tunnel_port; /**< UDP port of tunnel */
+typedef struct ppp_ipv4_t {
+    ppp_protocol_t prot;        /**< base ppp_protocol class */
+    ipv4_addr_t tunnel_addr;    /**< IPv4 address of tunnel */
+    uint16_t tunnel_port;       /**< UDP port of tunnel */
 } ppp_ipv4_t;
 
 struct gnrc_pppdev_t;
@@ -107,7 +105,7 @@ int ppp_ipv4_send(struct gnrc_pppdev_t *ppp_dev, gnrc_pktsnip_t *pkt);
  * @param ppp_dev pointer to gnrc ppp interface
  * @param pkt encapsulated packet
  *
- * @return 
+ * @return
  */
 int ppp_ipv4_recv(struct gnrc_pppdev_t *ppp_dev, gnrc_pktsnip_t *pkt);
 

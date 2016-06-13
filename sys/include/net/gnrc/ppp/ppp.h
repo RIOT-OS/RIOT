@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief  Definitions and interface of gnrc ppp 
+ * @brief  Definitions and interface of gnrc ppp
  *
  * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
@@ -45,61 +45,59 @@ extern "C" {
 #define PPP_HDLC_CONTROL (0x03) /**< HDLC control field for PPP */
 
 
-#define AUTH_PAP (1) /**< Label of PAP authentication */
+#define AUTH_PAP (1)            /**< Label of PAP authentication */
 
-#define PPP_CONF_REQ (1) /**< Code of Configure Request packet */
-#define PPP_CONF_ACK (2) /**< Code of Configure Ack packet */
-#define PPP_CONF_NAK (3) /**< Code of Configure NAK packet */
-#define PPP_CONF_REJ (4) /**< Code of Configure Reject packet */
-#define PPP_TERM_REQ (5) /**< Code of Temrminate Request packet */
-#define PPP_TERM_ACK (6) /**< Code of Terminate ACK packet */
-#define PPP_CODE_REJ (7) /**< Code of Code Reject packet */
-#define PPP_PROT_REJ (8) /**< Code of Protocol Reject packet */
-#define PPP_ECHO_REQ (9) /**< Code of Echo Request packet */
-#define PPP_ECHO_REP (10) /**< Code of Echo Reply packet */
-#define PPP_DISC_REQ (11) /**< Code of Discard Request packet */
-#define PPP_IDENT (12) /**< Code of Identification (not used yet) */
-#define PPP_TIME_REM (13) /**< Code of Time Remaining /not used yet) */
-#define PPP_UNKNOWN_CODE (0) /**< Code for Unknown Code packet (internal use)*/
+#define PPP_CONF_REQ (1)        /**< Code of Configure Request packet */
+#define PPP_CONF_ACK (2)        /**< Code of Configure Ack packet */
+#define PPP_CONF_NAK (3)        /**< Code of Configure NAK packet */
+#define PPP_CONF_REJ (4)        /**< Code of Configure Reject packet */
+#define PPP_TERM_REQ (5)        /**< Code of Temrminate Request packet */
+#define PPP_TERM_ACK (6)        /**< Code of Terminate ACK packet */
+#define PPP_CODE_REJ (7)        /**< Code of Code Reject packet */
+#define PPP_PROT_REJ (8)        /**< Code of Protocol Reject packet */
+#define PPP_ECHO_REQ (9)        /**< Code of Echo Request packet */
+#define PPP_ECHO_REP (10)       /**< Code of Echo Reply packet */
+#define PPP_DISC_REQ (11)       /**< Code of Discard Request packet */
+#define PPP_IDENT (12)          /**< Code of Identification (not used yet) */
+#define PPP_TIME_REM (13)       /**< Code of Time Remaining /not used yet) */
+#define PPP_UNKNOWN_CODE (0)    /**< Code for Unknown Code packet (internal use)*/
 
-#define BROADCAST_LCP (0xff) /**< Shortcut to LCP message */
-#define BROADCAST_NCP (0xfe) /**< Broadcast message to al NCP available */
+#define BROADCAST_LCP (0xff)    /**< Shortcut to LCP message */
+#define BROADCAST_NCP (0xfe)    /**< Broadcast message to al NCP available */
 
 
 #define GNRC_PPP_MSG_QUEUE_SIZE (20)
 
-#define PPPDEV_MSG_TYPE_EVENT (100) /**< Messages for PPP device drive */
-#define GNRC_PPPDEV_MSG_TYPE_EVENT (101) /**< Messages for GNRC PPP layer */
+#define PPPDEV_MSG_TYPE_EVENT (100)         /**< Messages for PPP device drive */
+#define GNRC_PPPDEV_MSG_TYPE_EVENT (101)    /**< Messages for GNRC PPP layer */
 
-#define DCP_MONITOR_INIT_DELAY (15000000) /**< Time that the monitor should wait after the LCP initiation before monitoring */
-#define DCP_MONITOR_TIMEOUT (10000000) /**< time between LCP Echo request monitoriin */
-#define DCP_DEAD_COUNTER (5) /**< Number of failed LCP Echo Request responses before assuming the ppp device is dead */
+#define DCP_MONITOR_INIT_DELAY (15000000)   /**< Time that the monitor should wait after the LCP initiation before monitoring */
+#define DCP_MONITOR_TIMEOUT (10000000)      /**< time between LCP Echo request monitoriin */
+#define DCP_DEAD_COUNTER (5)                /**< Number of failed LCP Echo Request responses before assuming the ppp device is dead */
 
 
 /**
  * @brief list of events for gnrc_ppp
  */
-typedef enum
-{
-	PPP_LINKUP, /**< link up event for a protocol */
-	PPP_RECV, /**< protocol received a packet */
-	PPP_TIMEOUT, /**< protocol received a timeout message */
-	PPP_LINKDOWN, /**< link down event for a protocol */
-	PPP_UL_STARTED, /**< upper layer of a protocol started */
-	PPP_UL_FINISHED, /**< upper layer of a protocol finished */
-	PPP_MONITOR, /**< Message for the monitor */
-	PPP_LINK_ALIVE, /**< Message from LCP to DCP indicating the link is alive */
-	PPP_DIALUP /**< Event for starting dialup process */
+typedef enum {
+    PPP_LINKUP,         /**< link up event for a protocol */
+    PPP_RECV,           /**< protocol received a packet */
+    PPP_TIMEOUT,        /**< protocol received a timeout message */
+    PPP_LINKDOWN,       /**< link down event for a protocol */
+    PPP_UL_STARTED,     /**< upper layer of a protocol started */
+    PPP_UL_FINISHED,    /**< upper layer of a protocol finished */
+    PPP_MONITOR,        /**< Message for the monitor */
+    PPP_LINK_ALIVE,     /**< Message from LCP to DCP indicating the link is alive */
+    PPP_DIALUP          /**< Event for starting dialup process */
 } ppp_dev_event_t;
 
 /*Deprecated. Not used in gnrc_ppp*/
-typedef enum
-{
-	PPP_LINK_DEAD,
-	PPP_LINK_ESTABLISHED,
-	PPP_AUTHENTICATION,
-	PPP_NETWORK,
-	PPP_TERMINATION
+typedef enum {
+    PPP_LINK_DEAD,
+    PPP_LINK_ESTABLISHED,
+    PPP_AUTHENTICATION,
+    PPP_NETWORK,
+    PPP_TERMINATION
 } ppp_state_t;
 
 typedef struct pppdev_t pppdev_t;
@@ -107,25 +105,23 @@ typedef struct pppdev_t pppdev_t;
 /**
  * @brief data type for handling driver representation of ppp device
  */
-typedef struct pppdev_driver_t
-{
-	int (*send)(pppdev_t *dev, const struct iovec *vector, int count);
-	int (*recv)(pppdev_t *dev, char *buf, int len, void *info);
-	void (*driver_ev)(pppdev_t *dev, uint8_t event);
-	int (*init)(pppdev_t *dev);
-	int (*set)(pppdev_t *dev, netopt_t opt, void *value, size_t value_len);
-	int (*get)(pppdev_t *dev, netopt_t opt, void *value, size_t max_len);
-	int (*dial_up)(pppdev_t *dev);
-	int (*link_down)(pppdev_t *dev);
+typedef struct pppdev_driver_t {
+    int (*send)(pppdev_t *dev, const struct iovec *vector, int count);
+    int (*recv)(pppdev_t *dev, char *buf, int len, void *info);
+    void (*driver_ev)(pppdev_t *dev, uint8_t event);
+    int (*init)(pppdev_t *dev);
+    int (*set)(pppdev_t *dev, netopt_t opt, void *value, size_t value_len);
+    int (*get)(pppdev_t *dev, netopt_t opt, void *value, size_t max_len);
+    int (*dial_up)(pppdev_t *dev);
+    int (*link_down)(pppdev_t *dev);
 } pppdev_driver_t;
 
 
 /**
  * @brief base class of a ppp device
  */
-typedef struct pppdev_t
-{
-	const pppdev_driver_t *driver; /**< pointer to driver representation */
+typedef struct pppdev_t {
+    const pppdev_driver_t *driver; /**< pointer to driver representation */
 } pppdev_t;
 
 
@@ -133,24 +129,23 @@ typedef struct pppdev_t
  * @brief class of custom driver control protocol
  * @extends ppp_protocol_t
  *
- * @details the DCP is in charge of monitoring the link and exchanging messages with the ppp device 
+ * @details the DCP is in charge of monitoring the link and exchanging messages with the ppp device
  */
-typedef struct dcp_t
-{
-	ppp_protocol_t prot; /**< base ppp_protocol_t object */
-	msg_t timer_msg; /**< msg struct for handling timeouts messages */
-	xtimer_t xtimer; /**< xtimer struct for sending timeout messages */
-	uint8_t dead_counter; /**< when reaches zero, the link is assumed to be dead */
+typedef struct dcp_t {
+    ppp_protocol_t prot;    /**< base ppp_protocol_t object */
+    msg_t timer_msg;        /**< msg struct for handling timeouts messages */
+    xtimer_t xtimer;        /**< xtimer struct for sending timeout messages */
+    uint8_t dead_counter;   /**< when reaches zero, the link is assumed to be dead */
 } dcp_t;
 
 
 /**
  * @brief GNRC PPP main struct
  */
-typedef struct gnrc_pppdev_t{
-	ppp_protocol_t *protocol[NUM_OF_PROTS]; /**< array of PPP sub protocols */
-	pppdev_t *netdev; /**< pointer to ppp device */
-	uint8_t state; /**< State of gnrc_ppp. Unused and will be removed */
+typedef struct gnrc_pppdev_t {
+    ppp_protocol_t *protocol[NUM_OF_PROTS]; /**< array of PPP sub protocols */
+    pppdev_t *netdev;                       /**< pointer to ppp device */
+    uint8_t state;                          /**< State of gnrc_ppp. Unused and will be removed */
 } gnrc_pppdev_t;
 
 
@@ -236,7 +231,7 @@ void gnrc_ppp_dispatch_pkt(msg_t *msg, kernel_pid_t pid);
 void gnrc_ppp_dial_up(msg_t *msg, kernel_pid_t pid);
 
 /**
- * @brief Disconnect ppp. 
+ * @brief Disconnect ppp.
  *
  * @param msg pointer to msg structure
  * @param pid pid of GNRC ppp
@@ -269,7 +264,7 @@ int gnrc_ppp_set_opt(gnrc_pppdev_t *dev, netopt_t opt, void *value, size_t value
  * @return pid of GNRC PPP
  */
 kernel_pid_t gnrc_pppdev_init(char *stack, int stacksize, char priority,
-                        const char *name, gnrc_pppdev_t *gnrc_pppdev);
+                              const char *name, gnrc_pppdev_t *gnrc_pppdev);
 
 
 /**
@@ -313,7 +308,7 @@ void send_configure_nak(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id,
 void send_configure_rej(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *opts);
 
 /**
- * @brief 
+ * @brief
  *
  * @param dev pointer to gnrc ppp interface
  * @param protocol nettype of packet

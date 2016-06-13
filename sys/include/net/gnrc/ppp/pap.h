@@ -31,17 +31,16 @@ extern "C" {
  * @brief definition of PAP protocol
  * @extends ppp_protocol_t
  */
-typedef struct pap_t
-{
-	ppp_protocol_t prot; /**< base ppp_protocol class */
-	char username[20]; /**< user name of PAP */
-	size_t user_size; /**< user size */
-	char password[20]; /**< password of PAP */
-	size_t pass_size; /**< password size */
-	uint8_t counter; /**< attempts counter of PAP */
-	uint8_t id; /**< last configure request id of PAP packet */
-	xtimer_t xtimer; /**< xtimer structure for timeouts */
-	msg_t timer_msg; /**< msg structure for timeout messages */
+typedef struct pap_t {
+    ppp_protocol_t prot;    /**< base ppp_protocol class */
+    char username[20];      /**< user name of PAP */
+    size_t user_size;       /**< user size */
+    char password[20];      /**< password of PAP */
+    size_t pass_size;       /**< password size */
+    uint8_t counter;        /**< attempts counter of PAP */
+    uint8_t id;             /**< last configure request id of PAP packet */
+    xtimer_t xtimer;        /**< xtimer structure for timeouts */
+    msg_t timer_msg;        /**< msg structure for timeout messages */
 } pap_t;
 
 /**
