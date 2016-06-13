@@ -22,6 +22,7 @@ void _print_usage(char* p_name)
 	printf("usage: %s apn <if> <apn_address> [<apn_username> [<apn_pass>]]\n", p_name);
 	printf("usage: %s dial_up <if>\n", p_name);
 	printf("usage: %s tunnel <if> <tunnel_ipv4_address> <udp port>\n", p_name);
+	printf("usage: %s status <if>\n", p_name);
 }
 int ppp_cmd(int argc, char **argv)
 {
