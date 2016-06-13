@@ -99,9 +99,9 @@ read all notes for best practice.
    (http://lists.riot-os.org/mailman/listinfo/notifications)
 
 ## LICENSE
-* All sources and binaries that have been developed at Freie Universität Berlin are
-  licensed under the GNU Lesser General Public License version 2.1 as published by the
-  Free Software Foundation.
+* Most of the code developed by the RIOT community is licensed under the GNU
+  Lesser General Public License (LGPL) version 2.1 as published by the Free
+  Software Foundation.
 * Some external sources, especially files developed by SICS are published under
   a separate license.
 
