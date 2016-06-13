@@ -44,13 +44,16 @@ LGPL code.
 
 ## FEATURES
 
-RIOT is based on a microkernel architecture, and provides features including, but not limited to:
+RIOT is based on a microkernel architecture, and provides features including,
+but not limited to:
 
 * a preemptive, tickless scheduler with priorities
 * flexible memory management
 * high resolution, long-term timers
 * support for AVR, MSP430, ARM7, and ARM Cortex-M on over 50 boards
-* the native port allows to run RIOT as-is on Linux, BSD, and MacOS. Multiple instances of RIOT running on a single machine can also be interconnected via a simple virtual Ethernet bridge
+* the native port allows to run RIOT as-is on Linux, BSD, and MacOS. Multiple
+  instances of RIOT running on a single machine can also be interconnected via
+  a simple virtual Ethernet bridge
 * IPv6
 * 6LoWPAN (RFC4944, RFC6282, and RFC6775)
 * UDP
@@ -60,14 +63,18 @@ RIOT is based on a microkernel architecture, and provides features including, bu
 
 
 ## GETTING STARTED
-* You want to start the RIOT? Just follow our [Getting started documentation](https://github.com/RIOT-OS/RIOT/wiki/Introduction)
-* The RIOT API itself can be built from the code using doxygen. The latest version is uploaded daily to http://riot-os.org/api.
+* You want to start the RIOT? Just follow our [Getting started
+  documentation](https://github.com/RIOT-OS/RIOT/wiki/Introduction)
+* The RIOT API itself can be built from the code using doxygen. The latest
+  version is uploaded daily to http://riot-os.org/api.
 
 ### USING THE NATIVE PORT WITH NETWORKING
-If you compile RIOT for the native cpu and include the `netdev2_tap` module, you can specify a network interface like this: `PORT=tap0 make term`
+If you compile RIOT for the native cpu and include the `netdev2_tap` module,
+you can specify a network interface like this: `PORT=tap0 make term`
 
 #### SETTING UP A TAP NETWORK
-There is a shellscript in `RIOT/dist/tools/tapsetup` called `tapsetup` which you can use to create a network of tap interfaces.
+There is a shellscript in `RIOT/dist/tools/tapsetup` called `tapsetup` which
+you can use to create a network of tap interfaces.
 
 *USAGE*
 To create a bridge and two (or count at your option) tap interfaces:
@@ -76,7 +83,9 @@ To create a bridge and two (or count at your option) tap interfaces:
 
 ## CONTRIBUTE
 
-To contribute something to RIOT, please refer to the [development procedures](https://github.com/RIOT-OS/RIOT/wiki/Development-procedures) and read all notes for best practice.
+To contribute something to RIOT, please refer to the [development
+procedures](https://github.com/RIOT-OS/RIOT/wiki/Development-procedures) and
+read all notes for best practice.
 
 ## MAILING LISTS
 * RIOT OS kernel developers list
@@ -86,7 +95,8 @@ To contribute something to RIOT, please refer to the [development procedures](ht
 * RIOT commits
  * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
- * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+ * notifications@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/notifications)
 
 ## LICENSE
 * All sources and binaries that have been developed at Freie Universität Berlin are
