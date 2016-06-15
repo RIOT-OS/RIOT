@@ -126,8 +126,7 @@ typedef enum {
  */
 #ifndef HAVE_HWCRYPTO_CIPHER_CONTEXT_T
 typedef struct {
-    hwcrypto_cipher_t cipher;                       /**< selected cipher method */
-    uint8_t __attribute__ ((aligned)) key[32];      /**< context for up to 256-bit key */
+    hwcrypto_cipher_t cipher;         /**< selected cipher method */
 } hwcrypto_cipher_context_t;
 #endif
 
@@ -141,8 +140,7 @@ typedef struct {
  */
 #ifndef HAVE_HWCRYPTO_HASH_CONTEXT_T
 typedef struct {
-    hwcrypto_hash_t hash;                           /**< selected hash method */
-    uint8_t __attribute__ ((aligned)) digest[32];   /**< digest for up to 256-bit hash */
+    hwcrypto_hash_t hash;             /**< selected hash method */
 } hwcrypto_hash_context_t;
 #endif
 
@@ -177,7 +175,7 @@ int hwcrypto_init(void);
  */
 int hwcrypto_cipher_init(hwcrypto_cipher_context_t* context,
                          hwcrypto_cipher_t cipher,
-                         uint8_t* key,
+                         const uint8_t* key,
                          uint32_t key_size);
 
 /**
@@ -202,7 +200,7 @@ int hwcrypto_cipher_init(hwcrypto_cipher_context_t* context,
  * @return                  -2 if block_size is invalid
  */
 int hwcrypto_cipher_encrypt(hwcrypto_cipher_context_t* context,
-                            uint8_t *plain_block,
+                            const uint8_t *plain_block,
                             uint8_t *cipher_block,
                             uint32_t block_size);
 
@@ -227,7 +225,7 @@ int hwcrypto_cipher_encrypt(hwcrypto_cipher_context_t* context,
  * @return                  -2 if block_size is invalid
  */
 int hwcrypto_cipher_decrypt(hwcrypto_cipher_context_t* context,
-                            uint8_t *cipher_block,
+                            const uint8_t *cipher_block,
                             uint8_t *plain_block,
                             uint32_t block_size);
 
@@ -264,7 +262,7 @@ int hwcrypto_hash_init(hwcrypto_hash_context_t* context, hwcrypto_hash_t hash);
  * @return                  -3 if digest could not be updated
  */
 int hwcrypto_hash_update(hwcrypto_hash_context_t* context,
-                         uint8_t* block,
+                         const uint8_t* block,
                          uint32_t block_size);
 
 /**

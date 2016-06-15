@@ -25,17 +25,12 @@
 #include "crypto/aes.h"
 #include "crypto/twofish.h"
 
+#include "hashes/md5.h"
+#include "hashes/sha1.h"
 #include "hashes/sha256.h"
 
 #include "periph/rtt.h"
 #include "periph/hwcrypto.h"
-
-/**
- * @brief   Length of the benchmark in seconds.
- */
-#ifndef CRYPTO_BENCHMARK_DURATION
-#define CRYPTO_BENCHMARK_DURATION (10U)
-#endif
 
 /**
  * @brief   Dummy data buffer (don't care about contents). Must be aligned for
@@ -131,6 +126,46 @@ static uint32_t benchmark_crypto_twofish(uint32_t duration)
     /* run the benchmark until alarm triggers */
     while (!stop) {
         twofish_encrypt(&context, data, data);
+        ops++;
+    }
+
+    return ops;
+}
+
+static uint32_t benchmark_crypto_md5(uint32_t duration)
+{
+    md5_ctx_t context;
+    uint32_t ops = 0;
+
+    /* prepare cipher */
+    md5_init(&context);
+
+    /* prepare alarm */
+    benchmark_start(duration);
+
+    /* run the benchmark until alarm triggers */
+    while (!stop) {
+        md5_update(&context, data, 16);
+        ops++;
+    }
+
+    return ops;
+}
+
+static uint32_t benchmark_crypto_sha1(uint32_t duration)
+{
+    sha1_context context;
+    uint32_t ops = 0;
+
+    /* prepare cipher */
+    sha1_init(&context);
+
+    /* prepare alarm */
+    benchmark_start(duration);
+
+    /* run the benchmark until alarm triggers */
+    while (!stop) {
+        sha1_update(&context, data, 20);
         ops++;
     }
 
@@ -251,7 +286,7 @@ static uint32_t benchmark_hwcrypto_sha256(uint32_t duration)
 
 int main(void)
 {
-    uint32_t duration = CRYPTO_BENCHMARK_DURATION;
+    uint32_t duration = 10;
     uint32_t ops;
 
     /* prepare ticker */
@@ -261,35 +296,41 @@ int main(void)
     puts("Starting benchmarks.\n");
 
     ops = benchmark_crypto_3des(duration);
-    printf("CRYPTO 3DES: %lu ops in %lu seconds.\n", ops, duration);
+    printf("CRYPTO 3DES: completed %lu ops in %lu seconds.\n", ops, duration);
 
     ops = benchmark_crypto_aes128(duration);
-    printf("CRYPTO AES128: %lu ops in %lu seconds.\n", ops, duration);
+    printf("CRYPTO AES128: completed %lu ops in %lu seconds.\n", ops, duration);
 
     ops = benchmark_crypto_twofish(duration);
-    printf("CRYPTO TWOFISH: %lu ops in %lu seconds.\n", ops, duration);
+    printf("CRYPTO TWOFISH: completed %lu ops in %lu seconds.\n", ops, duration);
+
+    ops = benchmark_crypto_md5(duration);
+    printf("CRYPTO MD5: completed %lu ops in %lu seconds.\n", ops, duration);
+
+    ops = benchmark_crypto_sha1(duration);
+    printf("CRYPTO SHA1: completed %lu ops in %lu seconds.\n", ops, duration);
 
     ops = benchmark_crypto_sha256(duration);
-    printf("CRYPTO SHA256: %lu ops in %lu seconds.\n", ops, duration);
+    printf("CRYPTO SHA256: completed %lu ops in %lu seconds.\n", ops, duration);
 
 #ifdef HAVE_HWCRYPTO_AES128
     ops = benchmark_hwcrypto_aes128(duration);
-    printf("HWCRYPTO AES128: %lu ops in %lu seconds.\n", ops, duration);
+    printf("HWCRYPTO AES128: completed %lu ops in %lu seconds.\n", ops, duration);
 #endif
 
 #ifdef HAVE_HWCRYPTO_AES256
     ops = benchmark_hwcrypto_aes256(duration);
-    printf("HWCRYPTO AES256: %lu ops in %lu seconds.\n", ops, duration);
+    printf("HWCRYPTO AES256: completed %lu ops in %lu seconds.\n", ops, duration);
 #endif
 
 #ifdef HAVE_HWCRYPTO_SHA1
     ops = benchmark_hwcrypto_sha1(duration);
-    printf("HWCRYPTO SHA1: %lu ops in %lu seconds.\n", ops, duration);
+    printf("HWCRYPTO SHA1: completed %lu ops in %lu seconds.\n", ops, duration);
 #endif
 
 #ifdef HAVE_HWCRYPTO_SHA256
     ops = benchmark_hwcrypto_sha256(duration);
-    printf("HWCRYPTO SHA256: %lu ops in %lu seconds.\n", ops, duration);
+    printf("HWCRYPTO SHA256: completed %lu ops in %lu seconds.\n", ops, duration);
 #endif
 
     puts("Benchmarks done!\n");
