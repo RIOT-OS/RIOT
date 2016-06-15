@@ -393,34 +393,47 @@ static void _send_to_iface(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
     }
 }
 
-/* functions for sending */
-static void _send_unicast(kernel_pid_t iface, uint8_t *dst_l2addr,
-                          uint16_t dst_l2addr_len, gnrc_pktsnip_t *pkt)
+static gnrc_pktsnip_t *_create_netif_hdr(uint8_t *dst_l2addr,
+                                         uint16_t dst_l2addr_len,
+                                         gnrc_pktsnip_t *pkt)
 {
-    gnrc_pktsnip_t *netif;
-
-    if (pkt->type == GNRC_NETTYPE_NETIF) {
-        /* great: someone already added a netif_hdr_t we assume it's wrong
-         * to keep it simple
-         * XXX: alternative would be to check if gnrc_netif_hdr_t::dst_l2addr_len
-         * is long enough and only then to throw away the header. This causes
-         * to much overhead IMHO */
-        DEBUG("ipv6: removed old interface header\n");
-        pkt = gnrc_pktbuf_remove_snip(pkt, pkt);
-    }
-
-    DEBUG("ipv6: add interface header to packet\n");
-    netif = gnrc_netif_hdr_build(NULL, 0, dst_l2addr, dst_l2addr_len);
+    gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst_l2addr, dst_l2addr_len);
 
     if (netif == NULL) {
         DEBUG("ipv6: error on interface header allocation, dropping packet\n");
         gnrc_pktbuf_release(pkt);
-        return;
+        return NULL;
+    }
+
+    if (pkt->type == GNRC_NETTYPE_NETIF) {
+        /* remove old netif header, since checking it for correctness would
+         * cause to much overhead.
+         * netif header might have been allocated by some higher layer either
+         * to set a sending interface or some flags. Interface was already
+         * copied using iface parameter, so we only need to copy the flags
+         * (minus the broadcast/multicast flags) */
+        DEBUG("ipv6: copy old interface header flags\n");
+        gnrc_netif_hdr_t *netif_new = netif->data, *netif_old = pkt->data;
+        netif_new->flags = netif_old->flags & \
+                           ~(GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST);
+        DEBUG("ipv6: removed old interface header\n");
+        pkt = gnrc_pktbuf_remove_snip(pkt, pkt);
     }
 
     /* add netif to front of the pkt list */
     LL_PREPEND(pkt, netif);
 
+    return pkt;
+}
+
+/* functions for sending */
+static void _send_unicast(kernel_pid_t iface, uint8_t *dst_l2addr,
+                          uint16_t dst_l2addr_len, gnrc_pktsnip_t *pkt)
+{
+    DEBUG("ipv6: add interface header to packet\n");
+    if ((pkt = _create_netif_hdr(dst_l2addr, dst_l2addr_len, pkt)) == NULL) {
+        return;
+    }
     DEBUG("ipv6: send unicast over interface %" PRIkernel_pid "\n", iface);
     /* and send to interface */
 #ifdef MODULE_NETSTATS_IPV6
@@ -521,14 +534,12 @@ static void _send_multicast(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 
 
 #if GNRC_NETIF_NUMOF > 1
-    /* netif header not present: send over all interfaces */
+    /* interface not given: send over all interfaces */
     if (iface == KERNEL_PID_UNDEF) {
-        assert(pkt == ipv6);
         /* send packet to link layer */
         gnrc_pktbuf_hold(pkt, ifnum - 1);
 
         for (size_t i = 0; i < ifnum; i++) {
-            gnrc_pktsnip_t *netif;
             if (prep_hdr) {
                 /* need to get second write access (duplication) to fill IPv6
                  * header interface-local */
@@ -564,24 +575,14 @@ static void _send_multicast(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                 }
             }
 
-            /* allocate interface header */
-            netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-
-            if (netif == NULL) {
-                DEBUG("ipv6: error on interface header allocation, "
-                      "dropping packet\n");
-                gnrc_pktbuf_release(ipv6);
+            if ((ipv6 = _create_netif_hdr(NULL, 0, ipv6)) == NULL) {
                 return;
             }
-
-            LL_PREPEND(ipv6, netif);
 
             _send_multicast_over_iface(ifs[i], ipv6);
         }
     }
     else {
-        /* iface != KERNEL_PID_UNDEF implies that netif header is present */
-        assert(pkt != ipv6);
         if (prep_hdr) {
             if (_fill_ipv6_hdr(iface, ipv6, payload) < 0) {
                 /* error on filling up header */
@@ -595,20 +596,12 @@ static void _send_multicast(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 #else   /* GNRC_NETIF_NUMOF */
     (void)ifnum; /* not used in this build branch */
     if (iface == KERNEL_PID_UNDEF) {
-        gnrc_pktsnip_t *netif;
         iface = ifs[0];
 
         /* allocate interface header */
-        netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-
-        if (netif == NULL) {
-            DEBUG("ipv6: error on interface header allocation, "
-                  "dropping packet\n");
-            gnrc_pktbuf_release(pkt);
+        if ((pkt = _create_netif_hdr(NULL, 0, pkt)) == NULL) {
             return;
         }
-
-        LL_PREPEND(pkt, netif);
     }
 
     if (prep_hdr) {
