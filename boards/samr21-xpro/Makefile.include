@@ -1,5 +1,5 @@
 # define the cpu used by SAMR21 Xplained Pro board
-export CPU = samd21
+export CPU = samr21
 export CPU_MODEL = samr21x18a
 
 # set default port depending on operating system

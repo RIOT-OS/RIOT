@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_samd21
+ * @ingroup     cpu_samr21
  * @{
  * @file
  * @brief       Low-level RTC driver implementation
