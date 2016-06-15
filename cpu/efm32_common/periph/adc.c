@@ -76,7 +76,7 @@ int adc_sample(adc_t line, adc_res_t res)
     EFM32_CREATE_INIT(init, ADC_InitSingle_TypeDef, ADC_INITSINGLE_DEFAULT,
         .conf.acqTime = adc_channel_config[line].acq_time,
         .conf.reference = adc_channel_config[line].reference,
-        .conf.resolution = (ADC_Res_TypeDef) res,
+        .conf.resolution = (ADC_Res_TypeDef) (res & 0xFF),
 #ifdef _SILICON_LABS_32B_PLATFORM_1
         .conf.input = adc_channel_config[line].input,
 #else
@@ -93,11 +93,9 @@ int adc_sample(adc_t line, adc_res_t res)
 
     int result = ADC_DataSingleGet(adc_config[dev].dev);
 
-    /* EFM32 has no 6, 8 or 12-bit resolution, therefore use 12-bit sample
-        and shift it by two to yield a 10-bit sample */
-    if (res == ADC_RES_10BIT) {
-        result = result >> 2;
-    }
+    /* for resolutions that are not really supported, shift the result (for
+       instance, 10 bit resolution is created by shifting a 12 bit sample). */
+    result = result >> (res >> 4);
 
     /* unlock device */
     mutex_unlock(&adc_lock[dev]);

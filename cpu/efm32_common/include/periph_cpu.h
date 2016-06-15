@@ -47,15 +47,21 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Internal macro for combining ADC resolution (x) with number of
+ *          shifts (y).
+ */
+#define ADC_MODE(x, y)     ((y << 4) | x)
+
+/**
  * @brief   Possible ADC resolution settings
  * @{
  */
 #define HAVE_ADC_RES_T
 typedef enum {
-    ADC_RES_6BIT = adcRes6Bit,        /**< ADC resolution: 6 bit */
-    ADC_RES_8BIT = adcRes8Bit,        /**< ADC resolution: 8 bit */
-    ADC_RES_10BIT = adcRes12Bit,      /**< ADC resolution: 10 bit (shifted from 12 bit) */
-    ADC_RES_12BIT = adcRes12Bit,      /**< ADC resolution: 12 bit */
+    ADC_RES_6BIT = ADC_MODE(adcRes6Bit, 0),     /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT = ADC_MODE(adcRes8Bit, 0),     /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = ADC_MODE(adcRes12Bit, 2),   /**< ADC resolution: 10 bit (shifted from 12 bit) */
+    ADC_RES_12BIT = ADC_MODE(adcRes12Bit, 0),   /**< ADC resolution: 12 bit */
 } adc_res_t;
 /** @} */
 
@@ -64,19 +70,19 @@ typedef enum {
  * @{
  */
 typedef struct {
-    ADC_TypeDef *dev;               /**< ADC device used */
-    CMU_Clock_TypeDef cmu;          /**< the device CMU channel */
+    ADC_TypeDef *dev;                 /**< ADC device used */
+    CMU_Clock_TypeDef cmu;            /**< the device CMU channel */
 } adc_conf_t;
 
 typedef struct {
-    uint8_t dev;                    /**< device index */
+    uint8_t dev;                      /**< device index */
 #ifdef _SILICON_LABS_32B_PLATFORM_1
-    ADC_SingleInput_TypeDef input;  /**< input channel */
+    ADC_SingleInput_TypeDef input;    /**< input channel */
 #else
-    ADC_PosSel_TypeDef input;       /**< input channel */
+    ADC_PosSel_TypeDef input;         /**< input channel */
 #endif
-    ADC_Ref_TypeDef reference;      /**< channel voltage reference */
-    ADC_AcqTime_TypeDef acq_time;   /**< channel acquisition time */
+    ADC_Ref_TypeDef reference;        /**< channel voltage reference */
+    ADC_AcqTime_TypeDef acq_time;     /**< channel acquisition time */
 } adc_chan_conf_t;
 /** @} */
 
@@ -91,14 +97,14 @@ typedef struct {
  */
 #if defined(DAC_COUNT) && DAC_COUNT > 0
 typedef struct {
-    DAC_TypeDef *dev;               /**< DAC device used */
-    CMU_Clock_TypeDef cmu;          /**< the device CMU channel */
+    DAC_TypeDef *dev;       /**< DAC device used */
+    CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
 } dac_conf_t;
 
 typedef struct {
-    uint8_t dev;                    /**< device index */
-    uint8_t index;                  /**< channel index */
-    DAC_Ref_TypeDef ref;            /**< channel voltage reference */
+    uint8_t dev;            /**< device index */
+    uint8_t index;          /**< channel index */
+    DAC_Ref_TypeDef ref;    /**< channel voltage reference */
 } dac_chan_conf_t;
 #endif
 /** @} */
@@ -146,12 +152,12 @@ enum {
  */
 #define HAVE_GPIO_MODE_T
 typedef enum {
-    GPIO_IN    = GPIO_MODE(gpioModeInput, 0),          /**< pin as input */
-    GPIO_IN_PD = GPIO_MODE(gpioModeInputPull, 0),      /**< pin as input with pull-down */
-    GPIO_IN_PU = GPIO_MODE(gpioModeInputPull, 1),      /**< pin as input with pull-up */
-    GPIO_OUT   = GPIO_MODE(gpioModePushPull, 0),       /**< pin as output */
-    GPIO_OD    = GPIO_MODE(gpioModeWiredAnd, 1),       /**< pin as open-drain */
-    GPIO_OD_PU = GPIO_MODE(gpioModeWiredAndPullUp, 1), /**< pin as open-drain with pull-up */
+    GPIO_IN    = GPIO_MODE(gpioModeInput, 0),             /**< pin as input */
+    GPIO_IN_PD = GPIO_MODE(gpioModeInputPull, 0),         /**< pin as input with pull-down */
+    GPIO_IN_PU = GPIO_MODE(gpioModeInputPull, 1),         /**< pin as input with pull-up */
+    GPIO_OUT   = GPIO_MODE(gpioModePushPull, 0),          /**< pin as output */
+    GPIO_OD    = GPIO_MODE(gpioModeWiredAnd, 1),          /**< pin as open-drain */
+    GPIO_OD_PU = GPIO_MODE(gpioModeWiredAndPullUp, 1),    /**< pin as open-drain with pull-up */
 } gpio_mode_t;
 /** @} */
 
@@ -216,11 +222,11 @@ typedef struct {
 } pwm_chan_conf_t;
 
 typedef struct {
-    TIMER_TypeDef *dev;             /**< TIMER device used */
-    CMU_Clock_TypeDef cmu;          /**< the device CMU channel */
-    IRQn_Type irq;                  /**< the devices base IRQ channel */
-    uint8_t channels;               /**< the number of available channels */
-    const pwm_chan_conf_t* channel; /**< pointer to first channel config */
+    TIMER_TypeDef *dev;               /**< TIMER device used */
+    CMU_Clock_TypeDef cmu;            /**< the device CMU channel */
+    IRQn_Type irq;                    /**< the devices base IRQ channel */
+    uint8_t channels;                 /**< the number of available channels */
+    const pwm_chan_conf_t* channel;   /**< pointer to first channel config */
 } pwm_conf_t;
 /** @} */
 
@@ -299,9 +305,9 @@ typedef struct {
 } timer_dev_t;
 
 typedef struct {
-    timer_dev_t prescaler;     /**< the lower numbered neighboring timer */
-    timer_dev_t timer;         /**< the higher numbered timer */
-    IRQn_Type irq;             /**< number of the higher timer IRQ channel */
+    timer_dev_t prescaler;  /**< the lower numbered neighboring timer */
+    timer_dev_t timer;      /**< the higher numbered timer */
+    IRQn_Type irq;          /**< number of the higher timer IRQ channel */
 } timer_conf_t;
 /** @} */
 
