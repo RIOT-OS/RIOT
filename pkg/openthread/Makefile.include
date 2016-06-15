@@ -1,0 +1,3 @@
+INCLUDES += -I$(BINDIRBASE)/pkg/$(BOARD)/openthread/include
+$(info HELLOOOOOOOOOOOOOOOOOOOOOOO)
+
