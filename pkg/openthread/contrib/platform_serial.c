@@ -1,4 +1,6 @@
 #include <platform/serial.h>
+#include <stdint.h>
+#include <stdio.h>
 
 ThreadError otPlatSerialEnable(void)
 {
@@ -20,10 +22,6 @@ void otPlatSerialSignalSendDone(void)
 }
 
 void otPlatSerialHandleSendDone(void)
-{
-}
-
-void otPlatSerialSignalReceive(void)
 {
 }
 

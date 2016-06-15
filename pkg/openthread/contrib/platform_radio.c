@@ -39,7 +39,7 @@ ThreadError otPlatRadioIdle(void)
 	return kThreadError_None;
 }
 
-ThreadError otPlatRadioReceive(RadioPacket *aPacket)
+ThreadError otPlatRadioReceive(uint8_t aChannel)
 {
 	return kThreadError_None;
 }
@@ -53,7 +53,7 @@ ThreadError otPlatRadioHandleReceiveDone(void)
 	return kThreadError_None;
 }
 
-ThreadError otPlatRadioTransmit(RadioPacket *aPacket)
+ThreadError otPlatRadioTransmit(void)
 {
 	return kThreadError_None;
 }
@@ -67,7 +67,7 @@ ThreadError otPlatRadioHandleTransmitDone(bool *aFramePending)
 	return kThreadError_None;
 }
 
-int8_t otPlatRadioGetNoiseFloor()
+int8_t otPlatRadioGetNoiseFloor(void)
 {
 	return 0;
 }

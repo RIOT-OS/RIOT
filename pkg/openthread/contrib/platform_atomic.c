@@ -1,4 +1,4 @@
-#include <platform/atomic.h>
+#include <stdint.h>
 
 uint32_t otPlatAtomicBegin(void)
 {

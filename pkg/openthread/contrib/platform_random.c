@@ -1,4 +1,5 @@
 #include <platform/random.h>
+#include <stdint.h>
 
 void otPlatRandomInit(void)
 {

@@ -1,4 +1,5 @@
 #include <platform/alarm.h>
+#include <stdint.h>
 
 void otPlatAlarmInit(void)
 {
@@ -14,6 +15,7 @@ void otPlatAlarmStop(void)
 
 uint32_t otPlatAlarmGetNow(void)
 {
+	return 0;
 }
 
 void otPlatAlarmSignalFired(void)
