@@ -10,5 +10,6 @@ all: git-download
 		$($(PKG_BUILDIR)/configure --host=$(TARGET_ARCH))
 		$(MAKE) -C $(PKG_BUILDDIR)
 		cp $(PKG_BUILDDIR)/src/core/libopenthread.a $(BINDIR)/$(PKG_NAME).a
+		cp $(PKG_BUILDDIR)/third_party/mbedtls/libmbedcrypto.a $(BINDIR)/$(PKG_NAME)_crypto.a
 
 include $(RIOTBASE)/pkg/pkg.mk

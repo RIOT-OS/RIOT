@@ -1,4 +1,5 @@
 #include <platform/radio.h>
+#include <stdio.h>
 
 ThreadError otPlatRadioSetPanId(uint16_t panid)
 {
@@ -44,13 +45,10 @@ ThreadError otPlatRadioReceive(uint8_t aChannel)
 	return kThreadError_None;
 }
 
-void otPlatRadioSignalReceiveDone(void)
-{
-}
 
-ThreadError otPlatRadioHandleReceiveDone(void)
+RadioPacket *otPlatRadioGetTransmitBuffer(void)
 {
-	return kThreadError_None;
+	return NULL;
 }
 
 ThreadError otPlatRadioTransmit(void)
@@ -58,16 +56,22 @@ ThreadError otPlatRadioTransmit(void)
 	return kThreadError_None;
 }
 
-void otPlatRadioSignalTransmitDone(void)
-{
-}
-
-ThreadError otPlatRadioHandleTransmitDone(bool *aFramePending)
-{
-	return kThreadError_None;
-}
 
 int8_t otPlatRadioGetNoiseFloor(void)
 {
 	return 0;
+}
+
+otRadioCaps otPlatRadioGetCaps(void)
+{
+	return kRadioCapsNone;
+}
+
+bool otPlatRadioGetPromiscuous(void)
+{
+	return false;
+}
+
+void otPlatRadioSetPromiscuous(bool aEnable)
+{
 }

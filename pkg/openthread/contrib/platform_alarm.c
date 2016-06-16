@@ -14,6 +14,3 @@ uint32_t otPlatAlarmGetNow(void)
 	return 0;
 }
 
-void otPlatAlarmFired(void)
-{
-}

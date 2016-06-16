@@ -17,23 +17,10 @@ ThreadError otPlatSerialSend(const uint8_t *aBuf, uint16_t aBufLength)
 	return kThreadError_None;
 }
 
-void otPlatSerialSignalSendDone(void)
+void otPlatSerialSendDone(void)
 {
 }
 
-void otPlatSerialHandleSendDone(void)
-{
-}
-
-void otPlatSerialSignalReceive(void)
-{
-}
-
-const uint8_t *otPlatSerialGetReceivedBytes(uint16_t *aBufLength)
-{
-	return NULL;
-}
-
-void otPlatSerialHandleReceiveDone(void)
+void otPlatSerialReceived(const uint8_t *aBuf, uint16_t aBufLength)
 {
 }
