@@ -223,21 +223,6 @@ void mrf24j40_tx_exec(mrf24j40_t *dev)
     }
 }
 
-/*size_t mrf24j40_tx_len(mrf24j40_t *dev)
-{
-    uint8_t phr;
-
-    mrf24j40_fb_read(dev, &phr, 1);
-
-    /* ignore MSB (refer p.80) and substract length of FCS field 
-    return (size_t)((phr & 0x7f) - 2);
-}*/
-
-void mrf24j40_rx_read(mrf24j40_t *dev, uint8_t *data, size_t len)
-{
-    mrf24j40_rx_read_int(dev,data,len);
-}
-
 size_t mrf24j40_send(mrf24j40_t *dev, uint8_t *data, size_t len)
 {
     /* check data length */
