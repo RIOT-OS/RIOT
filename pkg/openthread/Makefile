@@ -7,9 +7,10 @@ PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/$(PKG_NAME)
 
 all: git-download
 		$($(PKG_BUILDIR)/bootstrap)
-		$($(PKG_BUILDIR)/configure --host=$(TARGET_ARCH))
+		$($(PKG_BUILDIR)/configure --enabe-cli --host=$(TARGET_ARCH))
 		$(MAKE) -C $(PKG_BUILDDIR)
 		cp $(PKG_BUILDDIR)/src/core/libopenthread.a $(BINDIR)/$(PKG_NAME).a
 		cp $(PKG_BUILDDIR)/third_party/mbedtls/libmbedcrypto.a $(BINDIR)/$(PKG_NAME)_crypto.a
+		cp $(PKG_BUILDDIR)/src/cli/libopenthread-cli.a $(BINDIR)/$(PKG_NAME)_cli.a
 
 include $(RIOTBASE)/pkg/pkg.mk
