@@ -1,6 +1,7 @@
 # define the cpu used by SAMR21 Xplained Pro board
 export CPU = samd21
 export CPU_MODEL = samr21x18a
+export CFLAGS += -D__SAMR21G18A__
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/cmsis/samr21/include
 
 # set default port depending on operating system
