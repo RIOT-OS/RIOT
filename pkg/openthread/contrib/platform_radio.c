@@ -75,3 +75,12 @@ bool otPlatRadioGetPromiscuous(void)
 void otPlatRadioSetPromiscuous(bool aEnable)
 {
 }
+
+void PlatformRadioInit(void)
+{
+}
+
+int PlatformRadioProcess(void)
+{
+	return 0;
+}

@@ -1,3 +1,4 @@
-INCLUDES += -I$(BINDIRBASE)/pkg/$(BOARD)/openthread/include
+INCLUDES += -I$(RIOTBASE)/pkg/openthread/include \
+			-I$(BINDIRBASE)/pkg/$(BOARD)/openthread/include 
 
 DIRS += $(RIOTBASE)/pkg/openthread/contrib

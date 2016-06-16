@@ -20,5 +20,6 @@ FEATURES_REQUIRED+=cpp
 
 USEMODULE+=openthread_contrib
 USEMODULE+=openthread_crypto
+USEMODULE+=openthread_cli
 include $(RIOTBASE)/Makefile.include
 $(info $(INCLUDES))

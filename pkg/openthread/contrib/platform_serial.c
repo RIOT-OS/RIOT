@@ -17,10 +17,6 @@ ThreadError otPlatSerialSend(const uint8_t *aBuf, uint16_t aBufLength)
 	return kThreadError_None;
 }
 
-void otPlatSerialSendDone(void)
-{
-}
-
-void otPlatSerialReceived(const uint8_t *aBuf, uint16_t aBufLength)
+void PlatformSerialProcess(void)
 {
 }

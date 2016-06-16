@@ -14,3 +14,11 @@ uint32_t otPlatAlarmGetNow(void)
 	return 0;
 }
 
+void PlatformAlarmInit(void)
+{
+
+}
+
+void PlatformAlarmProcess(void)
+{
+}

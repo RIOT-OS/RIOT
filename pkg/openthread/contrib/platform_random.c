@@ -5,3 +5,7 @@ uint32_t otPlatRandomGet(void)
 {
 	return 0;
 }
+
+void PlatformRandomInit(void)
+{
+}
