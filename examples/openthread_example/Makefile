@@ -12,7 +12,7 @@ RIOTBASE ?= $(CURDIR)/../..
 CFLAGS += -DDEVELHELP
 
 # Change this to 0 show compiler invocation lines by default:
-QUIET ?= 0
+QUIET ?= 1
 
 USEPKG=openthread
 
@@ -21,5 +21,7 @@ FEATURES_REQUIRED+=cpp
 USEMODULE+=openthread_contrib
 USEMODULE+=openthread_crypto
 USEMODULE+=openthread_cli
+USEMODULE+=xtimer
+USEMODULE += gnrc_netdev_default
+
 include $(RIOTBASE)/Makefile.include
-$(info $(INCLUDES))
