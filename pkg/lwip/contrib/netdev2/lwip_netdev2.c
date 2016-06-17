@@ -149,7 +149,6 @@ err_t lwip_netdev2_init(struct netif *netif)
     netif->flags |= NETIF_FLAG_IGMP;
     netif->flags |= NETIF_FLAG_MLD6;
     netdev->context = netif;
-    netdev->event_callback = _event_cb;
 #if LWIP_IPV6_AUTOCONFIG
     netif->ip6_autoconfig_enabled = 1;
 #endif
