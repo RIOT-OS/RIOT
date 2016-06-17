@@ -21,6 +21,7 @@ FEATURES_REQUIRED+=cpp
 USEMODULE+=openthread_contrib
 USEMODULE+=openthread_crypto
 USEMODULE+=openthread_cli
+
 USEMODULE+=xtimer
 USEMODULE += gnrc_netdev_default
 
