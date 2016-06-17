@@ -63,7 +63,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count);
 static int _recv(netdev2_t *netdev, char* buf, int len, void *info);
 static int _init(netdev2_t *dev);
 static void _isr(netdev2_t *dev);
-int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len);
+static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len);
 
 const static netdev2_driver_t netdev2_driver_encx24j600 = {
     .send = _send,
@@ -307,10 +307,6 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count) {
     encx24j600_t * dev = (encx24j600_t *) netdev;
     lock(dev);
 
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += count;
-#endif
-
     /* wait until previous packet has been sent */
     while ((reg_get(dev, ENC_ECON1) & ENC_TXRTS));
 
@@ -332,6 +328,10 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count) {
     /* wait for sending to complete */
     /* (not sure if it is needed, keeping the line uncommented) */
     /*while ((reg_get(dev, ENC_ECON1) & ENC_TXRTS));*/
+
+#ifdef MODULE_NETSTATS_L2
+    netdev->stats.tx_bytes += len;
+#endif
 
     unlock(dev);
 
@@ -393,7 +393,7 @@ static int _recv(netdev2_t *netdev, char* buf, int len, void *info)
     return payload_len;
 }
 
-int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
+static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
 {
     int res = 0;
 
