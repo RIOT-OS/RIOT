@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include "msg.h"
+#include <stdio.h>
 #include <openthread.h>
 #include <cli/cli-serial.h>
 #include "platform.h"
@@ -36,8 +36,7 @@ int main(void)
 			case OPENTHREAD_NETDEV2_MSG_TYPE_EVENT:
 				break;
 		}*/
-		printf("%i\n", getchar());
-		puts("Hola");
+		//printf("%i\n", getchar());
 	}
 
     return 0;

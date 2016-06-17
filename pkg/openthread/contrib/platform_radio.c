@@ -34,16 +34,19 @@ void send_pkt(netdev2_t *dev)
 
 ThreadError otPlatRadioSetPanId(uint16_t panid)
 {
+	(void) panid;
 	return kThreadError_None;
 }
 
 ThreadError otPlatRadioSetExtendedAddress(uint8_t *aExtendedAddress)
 {
+	(void) aExtendedAddress;
 	return kThreadError_None;
 }
 
 ThreadError otPlatRadioSetShortAddress(uint16_t aShortAddress)
 {
+	(void) aShortAddress;
 	return kThreadError_None;
 }
 

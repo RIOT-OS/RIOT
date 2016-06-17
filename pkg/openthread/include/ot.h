@@ -5,10 +5,10 @@
 extern "C" {
 #endif
 
-#include "net/netdev2.h"
 #include "net/netopt.h"
 #include "net/ieee802154.h"
 #include "net/ethernet.h"
+#include "net/netdev2.h"
 
 #define OPENTHREAD_XTIMER_MSG_TYPE_EVENT (0x2235)
 #define OPENTHREAD_NETDEV2_MSG_TYPE_EVENT (0x2236)

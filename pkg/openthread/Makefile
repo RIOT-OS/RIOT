@@ -5,6 +5,12 @@ PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/$(PKG_NAME)
 
 .PHONY: all
 
+$(info $(TARGET_ARCH))
+$(info $(TARGET_ARCH))
+$(info $(TARGET_ARCH))
+$(info $(TARGET_ARCH))
+$(info $(TARGET_ARCH))
+$(info $(TARGET_ARCH))
 all: git-download
 		PREFIX=/ sh -c '$(MAKE) -C $(PKG_BUILDDIR)'
 		cp $(PKG_BUILDDIR)/src/core/libopenthread.a $(BINDIR)/$(PKG_NAME).a

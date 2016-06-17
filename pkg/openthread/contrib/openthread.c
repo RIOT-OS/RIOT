@@ -35,7 +35,7 @@ void otSignalTaskletPending(void)
 static uint8_t _tmp_buf[OPENTHREAD_NETDEV2_BUFLEN];
 static kernel_pid_t _pid;
 
-static void _event_cb(netdev2_t *dev, netdev2_event_t event)
+void _event_cb(netdev2_t *dev, netdev2_event_t event)
 {
     if (event == NETDEV2_EVENT_ISR) {
         assert(_pid != KERNEL_PID_UNDEF);
