@@ -72,18 +72,18 @@ typedef struct {
 
 #define RFC_DBELL ((cc26x0_rfc_dbell_regs_t *)(RFC_DBELL_BASE))
 
-#define CMDR_TYPE_mask            0x3
+#define CMDR_TYPE_MASK            0x3
 #define CMDR_TYPE_ROP_IMM         0x0
 /* pointer is 32-bit word aligned and the 2 LSB are not stored (implicit 0) */
-#define CMDR_CMDPTR_pos           2 /* used for immediate and radio commands */
-#define CMDR_CMDPTR_mask          0xFFFFFFFC
+#define CMDR_CMDPTR_POS           2 /* used for immediate and radio commands */
+#define CMDR_CMDPTR_MASK          0xFFFFFFFC
 #define CMDR_TYPE_DIRECT          0x1
-#define CMDR_OPTPAREXT_pos        2 /* used for direct commands */
-#define CMDR_OPTPAREXT_mask       0xFC
-#define CMDR_OPTPAR_pos           8
-#define CMDR_OPTPAR_mask          0xFF00
-#define CMDR_CMDID_pos            16
-#define CMDR_CMDID_mask           0xFFFF0000
+#define CMDR_OPTPAREXT_POS        2 /* used for direct commands */
+#define CMDR_OPTPAREXT_MASK       0xFC
+#define CMDR_OPTPAR_POS           8
+#define CMDR_OPTPAR_MASK          0xFF00
+#define CMDR_CMDID_POS            16
+#define CMDR_CMDID_MASK           0xFFFF0000
 /**
  * @addtogroup cc2x0_rop_command_ids
  * @{
@@ -130,9 +130,9 @@ typedef struct {
 #define CMDR_CMDID_REM_PENDING_ENTRIES  0x0009 /* TODO format */
 /**@}*/
 
-#define CMDSTA_RESULT_mask    0xFF
-#define CMDSTA_RET_VAL_pos    8 /* MSB first */
-#define CMDSTA_RET_VAL_mask   0xFFFFFF00
+#define CMDSTA_RESULT_MASK    0xFF
+#define CMDSTA_RET_VAL_POS    8 /* MSB first */
+#define CMDSTA_RET_VAL_MASK   0xFFFFFF00
 
 #define CMDSTA_RESULT_PENDING         0x00
 #define CMDSTA_RESULT_DONE            0x01
@@ -251,14 +251,14 @@ typedef struct {
 #define RFCPEIEN_BOOT_DONE            0x40000000
 #define RFCPEIEN_INTERNAL_ERROR       0x80000000
 
-#define SYSGPOCTL_GPOCTL0_pos         0x0
-#define SYSGPOCTL_GPOCTL0_len         4
-#define SYSGPOCTL_GPOCTL1_pos         0x4
-#define SYSGPOCTL_GPOCTL1_len         4
-#define SYSGPOCTL_GPOCTL2_pos         0x8
-#define SYSGPOCTL_GPOCTL2_len         4
-#define SYSGPOCTL_GPOCTL3_pos         0xc
-#define SYSGPOCTL_GPOCTL3_len         4
+#define SYSGPOCTL_GPOCTL0_POS         0x0
+#define SYSGPOCTL_GPOCTL0_LEN         4
+#define SYSGPOCTL_GPOCTL1_POS         0x4
+#define SYSGPOCTL_GPOCTL1_LEN         4
+#define SYSGPOCTL_GPOCTL2_POS         0x8
+#define SYSGPOCTL_GPOCTL2_LEN         4
+#define SYSGPOCTL_GPOCTL3_POS         0xc
+#define SYSGPOCTL_GPOCTL3_LEN         4
 
 #define SYSGPOCTL_GPOCTL_CPE0         0x0
 #define SYSGPOCTL_GPOCTL_CPE1         0x1
@@ -367,7 +367,7 @@ struct __attribute__ ((packed)) radio_op_command_s {
 #define R_OP_STATUS_ERROR_RXOVF         0x080b
 #define R_OP_STATUS_ERROR_NO_RX         0x080c
 
-#define R_OP_STARTTRIG_TYPE_mask            0xF
+#define R_OP_STARTTRIG_TYPE_MASK            0xF
 #define R_OP_STARTTRIG_TYPE_TRIG_NOW        0x0
 #define R_OP_STARTTRIG_TYPE_TRIG_NEVER      0x1
 #define R_OP_STARTTRIG_TYPE_TRIG_ABSTIME    0x2
@@ -380,8 +380,8 @@ struct __attribute__ ((packed)) radio_op_command_s {
 #define R_OP_STARTTRIG_TYPE_REL_EVT2        0x9
 #define R_OP_STARTTRIG_TYPE_EXTERNAL        0xA
 #define R_OP_STARTTRIG_ALT_TRIG             0x10
-#define R_OP_STARTTRIG_TRIG_NO_mask         0x60
-#define R_OP_STARTTRIG_TRIG_NO_pos          5
+#define R_OP_STARTTRIG_TRIG_NO_MASK         0x60
+#define R_OP_STARTTRIG_TRIG_NO_POS          5
 #define R_OP_STARTTRIG_PAST_TRIG            0x80
 
 /* for R_OP_STARTTRIG_TYPE_EXTERNAL startTime describes the trigger this way: */
@@ -391,15 +391,15 @@ struct __attribute__ ((packed)) radio_op_command_s {
 #define R_OP_STARTTIME_SOURCE_GPI0          0x1200 /* TODO wtf does this mean for a 5-bit field? */
 #define R_OP_STARTTIME_SOURCE_GPI1          0x1300 /* 22: RFC_GPI0, 23: RFC_GPI1 assuming octal - above is binary... */
 
-#define R_OP_CONDITION_RULE_mask            0x0F
+#define R_OP_CONDITION_RULE_MASK            0x0F
 #define R_OP_CONDITION_RULE_ALWAYS          0x00
 #define R_OP_CONDITION_RULE_NEVER           0x01
 #define R_OP_CONDITION_RULE_STOP_ON_FALSE   0x02
 #define R_OP_CONDITION_RULE_STOP_ON_TRUE    0x03
 #define R_OP_CONDITION_RULE_SKIP_ON_FALSE   0x04
 #define R_OP_CONDITION_RULE_SKIP_ON_TRUE    0x05
-#define R_OP_CONDITION_NSKIP_pos            4
-#define R_OP_CONDITION_NSKIP_mask           0xF0
+#define R_OP_CONDITION_NSKIP_POS            4
+#define R_OP_CONDITION_NSKIP_MASK           0xF0
 /**@}*/
 
 
@@ -486,12 +486,12 @@ typedef struct {
 #define DATA_ENTRY_STATUS_BUSY          2
 #define DATA_ENTRY_STATUS_FINISHED      3
 
-#define DATA_ENTRY_CONFIG_TYPE_mask     0x3
+#define DATA_ENTRY_CONFIG_TYPE_MASK     0x3
 #define DATA_ENTRY_CONFIG_TYPE_GENERAL  0x0
 #define DATA_ENTRY_CONFIG_TYPE_MULTIRX  0x1
 #define DATA_ENTRY_CONFIG_TYPE_PTR      0x2
-#define DATA_ENTRY_CONFIG_LENSZ_pos     4
-#define DATA_ENTRY_CONFIG_LENSZ_mask    0xC
+#define DATA_ENTRY_CONFIG_LENSZ_POS     4
+#define DATA_ENTRY_CONFIG_LENSZ_MASK    0xC
 #define DATA_ENTRY_CONFIG_LENSZ_NOLEN   0x0
 #define DATA_ENTRY_CONFIG_LENSZ_1BYTE   0x1
 #define DATA_ENTRY_CONFIG_LENSZ_2BYTE   0x2
