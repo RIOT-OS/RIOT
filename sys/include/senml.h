@@ -91,26 +91,13 @@ typedef enum {
 } senml_value_type_t;
 
 
-/*! Buffer that holds arbitrary binary data */
-typedef struct {
-    uint8_t *p;     //!< Pointer to the actual data
-    size_t   len;   //!< Size of the data in bytes
-} senml_bin_data_t;
-
-
 /*! struct that contains base information which applies to all subsequent entries */
 typedef struct {
     uint8_t             version;         //!< SenML version of this pack
     char               *base_name;       //!< Concatenated with name attribute gives sensor's UID
     double              base_time;       //!< Update time values are relative to this time
     char               *base_unit;       //!< When all values have the same unit, set this field
-    senml_value_type_t  base_value_type; //!< Indicates which type the base value is of
-    union {
-        double            base_value_f;    //!< A base value of type float
-        char             *base_value_s;    //!< A base value of type string
-        bool              base_value_b;    //!< A boolean base value (FIXME is this sensible?)
-        senml_bin_data_t  base_value_bin;  //!< A binary base value (FIXME is this sensible?)
-    } base_value;
+    double              base_value;
 } senml_base_info_t;
 
 
@@ -120,13 +107,13 @@ typedef struct {
     char              *unit;        //!< Unit of the measurement
     double             time;        //!< Time (seconds since unix epoch) of the measurement
     unsigned int       update_time; //!< Time before sensor provides an updated measurement
-    // [type]          value_sum    // FIXME clear definition missing
+    double             value_sum;   //!< Integrated sum of the values over time
     senml_value_type_t value_type;  //!< Indicates which type the value is of
     union {
-        double            value_f;   //!< A value of type float
-        char             *value_s;   //!< A value of type string
-        bool              value_b;   //!< A boolean value
-        senml_bin_data_t  value_bin; //!< A binary value (FIXME don't know how to handle this yet)
+        double            f;  //!< A float value
+        char             *s;  //!< A string value
+        bool              b;  //!< A boolean value
+        char             *d;  //!< A data value (binary data, base64 encoded)
     } value;
 } senml_record_t;
 

@@ -85,19 +85,7 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
                     pack->base_info->base_unit = tmp_val;
                 }
                 else if (!strcmp(tmp_key, SJ_BASE_VALUE)) {
-                    if (t->type == JSMN_STRING) {
-                        pack->base_info->base_value_type = SENML_TYPE_STRING;
-                        pack->base_info->base_value.base_value_s = tmp_val;
-                    }
-                    else if (tmp_val[0] == 't' || tmp_val[0] == 'f') {
-                        pack->base_info->base_value_type = SENML_TYPE_BOOL;
-                        pack->base_info->base_value.base_value_b = (tmp_val[0] == 't') ? true : false;
-                    }
-                    else if (tmp_val[0] == '-' || isdigit(tmp_val[0])) {
-                        pack->base_info->base_value_type = SENML_TYPE_FLOAT;
-                        pack->base_info->base_value.base_value_f = atof(tmp_val);
-                    }
-                    // FIXME ignoring binary values for now b/c unclear definition
+                    pack->base_info->base_value = atof(tmp_val);
                 }
             }
 
@@ -109,27 +97,27 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
             }
             else if (!strcmp(tmp_key, SJ_VALUE)) {
                 (pack->records)[array_num].value_type = SENML_TYPE_FLOAT;
-                (pack->records)[array_num].value.value_f = atof(tmp_val);
+                (pack->records)[array_num].value.f = atof(tmp_val);
             }
             else if (!strcmp(tmp_key, SJ_STRING_VALUE)) {
                 (pack->records)[array_num].value_type = SENML_TYPE_STRING;
-                (pack->records)[array_num].value.value_s = tmp_val;
+                (pack->records)[array_num].value.s = tmp_val;
             }
             else if (!strcmp(tmp_key, SJ_BOOL_VALUE)) {
                 (pack->records)[array_num].value_type = SENML_TYPE_BOOL;
                 if (!strcmp(tmp_val, "true")) {
-                    (pack->records)[array_num].value.value_b = true;
+                    (pack->records)[array_num].value.b = true;
                 }
                 else if (!strcmp(tmp_val, "false")) {
-                    (pack->records)[array_num].value.value_b = false;
+                    (pack->records)[array_num].value.b = false;
                 }
             }
             else if (!strcmp(tmp_key, SJ_DATA_VALUE)) {
                 (pack->records)[array_num].value_type = SENML_TYPE_BINARY;
-                // FIXME not clear how binary data is represented, so ignoring it for now
+                (pack->records)[array_num].value.d = tmp_val;
             }
             else if (!strcmp(tmp_key, SJ_VALUE_SUM)) {
-                // FIXME the draft does not say how to handle the value sum, so ignoring it for now
+                (pack->records)[array_num].value_sum = atof(tmp_val);
             }
             else if (!strcmp(tmp_key, SJ_TIME)) {
                 (pack->records)[array_num].time = atof(tmp_val);
@@ -214,22 +202,9 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
         }
     }
 
-    if (pack->base_info->base_value_type != SENML_TYPE_UNDEF) {
-        if (pack->base_info->base_value_type == SENML_TYPE_FLOAT) {
-            chars_written = snprintf(&output[insert_pos], len - 2, "\"bv\":%f,",
-                                     pack->base_info->base_value.base_value_f);
-        }
-        else if (pack->base_info->base_value_type == SENML_TYPE_STRING) {
-            chars_written = snprintf(&output[insert_pos], len - 2, "\"bv\":\"%s\",",
-                                     pack->base_info->base_value.base_value_s);
-        }
-        else if (pack->base_info->base_value_type == SENML_TYPE_BOOL) {
-            chars_written = snprintf(&output[insert_pos], len - 2, "\"bv\":%s,",
-                                     pack->base_info->base_value.base_value_b ? "true" : "false");
-        }
-        else if (pack->base_info->base_value_type == SENML_TYPE_BINARY) {
-            // FIXME unclear how binary data is represented, ignoring it for now
-        }
+    if (pack->base_info->base_value != 0) {
+        chars_written = snprintf(&output[insert_pos], len - 2, "\"bv\":%f,",
+                                 pack->base_info->base_value);
 
         insert_pos += chars_written;
         len -= chars_written;
@@ -298,18 +273,19 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
         if (curr_record->value_type != SENML_TYPE_UNDEF) {
             if (curr_record->value_type == SENML_TYPE_FLOAT) {
                 chars_written = snprintf(&output[insert_pos], len - 2, "\"v\":%f",
-                                         curr_record->value.value_f);
+                                         curr_record->value.f);
             }
             else if (curr_record->value_type == SENML_TYPE_STRING) {
-                chars_written = snprintf(&output[insert_pos], len - 2, "\"v\":\"%s\"",
-                                         curr_record->value.value_s);
+                chars_written = snprintf(&output[insert_pos], len - 2, "\"vs\":\"%s\"",
+                                         curr_record->value.s);
             }
             else if (curr_record->value_type == SENML_TYPE_BOOL) {
-                chars_written = snprintf(&output[insert_pos], len - 2, "\"v\":%s",
-                                         curr_record->value.value_b ? "true" : "false");
+                chars_written = snprintf(&output[insert_pos], len - 2, "\"vb\":%s",
+                                         curr_record->value.b ? "true" : "false");
             }
             else if (curr_record->value_type == SENML_TYPE_BINARY) {
-                // FIXME unclear how binary data is represented, ignoring it for now
+                chars_written = snprintf(&output[insert_pos], len - 2, "\"vd\":\"%s\"",
+                                         curr_record->value.d);
             }
 
             insert_pos += chars_written;
