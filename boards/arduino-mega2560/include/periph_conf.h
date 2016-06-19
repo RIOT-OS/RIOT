@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
+ * Copyright (C) 2014-2016 Freie Universität Berlin
+ *               2014 Hinnerk van Bruinehsen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Peripheral MCU configuration for the Arduino Mega 2560 board
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef PERIPH_CONF_H_
@@ -57,109 +59,26 @@ extern "C" {
 
 /**
  * @brief   UART configuration
+ *
+ * The UART devices have fixed pin mappings, so all we need to do, is to specify
+ * which devices we would like to use and their corresponding RX interrupts. See
+ * the reference manual for the fixed pin mapping.
+ *
  * @{
  */
 #define UART_NUMOF          (4U)
-#define UART_0_EN           1
-#define UART_1_EN           1
-#define UART_2_EN           1
-#define UART_3_EN           1
 
-/* UART 0 registers */
-#define UART0_CTRL_STAT_A   UCSR0A
-#define UART0_CTRL_STAT_B   UCSR0B
-#define UART0_CTRL_STAT_C   UCSR0C
-#define UART0_BAUD_RATE_L   UBRR0L
-#define UART0_BAUD_RATE_H   UBRR0H
-#define UART0_DATA_REGISTER UDR0
+#define UART_0              MEGA_UART0
+#define UART_0_ISR          USART0_RX_vect
 
-/* Flags */
-#define UART0_RX_COMPLETE   RXC0
-#define UART0_DATA_EMPTY    UDRE0
-#define UART0_RX_EN         RXEN0
-#define UART0_TX_EN         TXEN0
-#define UART0_RXC_IRQ_EN    RXCIE0
-#define UART0_TXC_IRQ_EN    TXCIE0
-#define UART0_8BIT_SIZE     (1 << UCSZ00) | (1 << UCSZ01)
+#define UART_1              MEGA_UART1
+#define UART_1_ISR          USART1_RX_vect
 
-/* UART0 helper macros */
-#define UART0_RX_TX_EN      UART0_CTRL_STAT_B |= (1 << UART0_RX_EN) | (1 << UART0_TX_EN)
-#define UART0_RX_IRQ_EN     UART0_CTRL_STAT_B |= (1 << UART0_RXC_IRQ_EN)
-#define UART0_SET_8BIT_SIZE UART0_CTRL_STAT_C |= UART0_8BIT_SIZE
-#define UART0_RECEIVED_DATA (UART0_CTRL_STAT_A & (1 << UART0_RX_COMPLETE))
-#define UART0_DTREG_EMPTY   (UART0_CTRL_STAT_A & (1 << UART0_DATA_EMPTY))
+#define UART_2              MEGA_UART2
+#define UART_2_ISR          USART2_RX_vect
 
-/* UART 1 registers */
-#define UART1_CTRL_STAT_A   UCSR1A
-#define UART1_CTRL_STAT_B   UCSR1B
-#define UART1_CTRL_STAT_C   UCSR1C
-#define UART1_BAUD_RATE_L   UBRR1L
-#define UART1_BAUD_RATE_H   UBRR1H
-#define UART1_DATA_REGISTER UDR1
-
-/* Flags */
-#define UART1_RX_COMPLETE   RXC1
-#define UART1_DATA_EMPTY    UDRE1
-#define UART1_RX_EN         RXEN1
-#define UART1_TX_EN         TXEN1
-#define UART1_RXC_IRQ_EN    RXCIE1
-#define UART1_TXC_IRQ_EN    TXCIE1
-#define UART1_8BIT_SIZE     (1 << UCSZ10) | (1 << UCSZ11)
-
-/* UART1 helper macros */
-#define UART1_RX_TX_EN      UART1_CTRL_STAT_B |= (1 << UART1_RX_EN) | (1 << UART1_TX_EN)
-#define UART1_RX_IRQ_EN     UART1_CTRL_STAT_B |= (1 << UART1_RXC_IRQ_EN)
-#define UART1_SET_8BIT_SIZE UART1_CTRL_STAT_C |= UART1_8BIT_SIZE
-#define UART1_RECEIVED_DATA (UART1_CTRL_STAT_A & (1 << UART1_RX_COMPLETE))
-#define UART1_DTREG_EMPTY   (UART1_CTRL_STAT_A & (1 << UART1_DATA_EMPTY))
-
-/* UART 2 registers */
-#define UART2_CTRL_STAT_A   UCSR2A
-#define UART2_CTRL_STAT_B   UCSR2B
-#define UART2_CTRL_STAT_C   UCSR2C
-#define UART2_BAUD_RATE_L   UBRR2L
-#define UART2_BAUD_RATE_H   UBRR2H
-#define UART2_DATA_REGISTER UDR2
-
-/* Flags */
-#define UART2_RX_COMPLETE   RXC2
-#define UART2_DATA_EMPTY    UDRE2
-#define UART2_RX_EN         RXEN2
-#define UART2_TX_EN         TXEN2
-#define UART2_RXC_IRQ_EN    RXCIE2
-#define UART2_TXC_IRQ_EN    TXCIE2
-#define UART2_8BIT_SIZE     (1 << UCSZ20) | (1 << UCSZ21)
-
-/* UART2 helper macros */
-#define UART2_RX_TX_EN      UART2_CTRL_STAT_B |= (1 << UART2_RX_EN) | (1 << UART2_TX_EN)
-#define UART2_RX_IRQ_EN     UART2_CTRL_STAT_B |= (1 << UART2_RXC_IRQ_EN)
-#define UART2_SET_8BIT_SIZE UART2_CTRL_STAT_C |= UART2_8BIT_SIZE
-#define UART2_RECEIVED_DATA (UART2_CTRL_STAT_A & (1 << UART2_RX_COMPLETE))
-#define UART2_DTREG_EMPTY   (UART2_CTRL_STAT_A & (1 << UART2_DATA_EMPTY))
-
-/* UART 2 registers */
-#define UART3_CTRL_STAT_A   UCSR3A
-#define UART3_CTRL_STAT_B   UCSR3B
-#define UART3_CTRL_STAT_C   UCSR3C
-#define UART3_BAUD_RATE_L   UBRR3L
-#define UART3_BAUD_RATE_H   UBRR3H
-#define UART3_DATA_REGISTER UDR3
-
-/* Flags */
-#define UART3_RX_COMPLETE   RXC3
-#define UART3_DATA_EMPTY    UDRE3
-#define UART3_RX_EN         RXEN3
-#define UART3_TX_EN         TXEN3
-#define UART3_RXC_IRQ_EN    RXCIE3
-#define UART3_TXC_IRQ_EN    TXCIE3
-#define UART3_8BIT_SIZE     (1 << UCSZ30) | (1 << UCSZ31)
-
-/* UART3 helper macros */
-#define UART3_RX_TX_EN      UART3_CTRL_STAT_B |= (1 << UART3_RX_EN) | (1 << UART3_TX_EN)
-#define UART3_RX_IRQ_EN     UART3_CTRL_STAT_B |= (1 << UART3_RXC_IRQ_EN)
-#define UART3_SET_8BIT_SIZE UART3_CTRL_STAT_C |= UART3_8BIT_SIZE
-#define UART3_RECEIVED_DATA (UART3_CTRL_STAT_A & (1 << UART3_RX_COMPLETE))
-#define UART3_DTREG_EMPTY   (UART3_CTRL_STAT_A & (1 << UART3_DATA_EMPTY))
+#define UART_3              MEGA_UART3
+#define UART_3_ISR          USART3_RX_vect
 /** @} */
 
 /**
