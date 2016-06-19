@@ -48,6 +48,23 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
 
     char *tmp_key, *tmp_val;
 
+    bool base_values_checked = false;
+    
+    for (int k = 0; k < num_toks; k++) {
+        if (tokens[k].type == JSMN_ARRAY) {
+            printf("JSMN_ARRAY\n");
+        }
+        else if (tokens[k].type == JSMN_OBJECT) {
+            printf("JSMN_OBJECT\n");
+        }
+        else if (tokens[k].type == JSMN_STRING) {
+            printf("JSMN_STRING\n");
+        }
+        else if (tokens[k].type == JSMN_PRIMITIVE) {
+            printf("JSMN_PRIMITIVE\n");
+        }
+    }
+
     for (size_t i = 0, j = num_toks; j > 0; i++, j--) {
         jsmntok_t *t = &tokens[i];
 
@@ -71,7 +88,7 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
             tmp_val = &input[t->start];
             input[t->end] = '\0';
 
-            if (array_num == 0) {
+            if (array_num == 0 && !base_values_checked) {
                 if (!strcmp(tmp_key, SJ_VERSION)) {
                     pack->base_info->version = (uint8_t)atoi(tmp_val);
                 }
@@ -86,6 +103,14 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
                 }
                 else if (!strcmp(tmp_key, SJ_BASE_VALUE)) {
                     pack->base_info->base_value = atof(tmp_val);
+                }
+                else {   // no more base information
+                    base_values_checked = true;
+                }
+                
+                if (tokens[i + 1].type == JSMN_OBJECT) {
+                    base_values_checked = true;
+                    array_num = -1;
                 }
             }
 
