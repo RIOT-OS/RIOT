@@ -257,10 +257,14 @@ void thread_arch_stack_print(void)
 /* This function returns the number of bytes used on the ISR stack */
 int thread_arch_isr_stack_usage(void)
 {
-    uint32_t  *ptr = &_sstack;
+    uint32_t *ptr = &_sstack;
 
-    while (*(ptr++) == STACK_CANARY_WORD) {}
-    return (ISR_STACKSIZE - (ptr - &_sstack));
+    while(((*ptr) == STACK_CANARY_WORD) && (ptr < &_estack)) {
+        ++ptr;
+    }
+
+    ptrdiff_t num_used_words = &_estack - ptr;
+    return num_used_words * sizeof(*ptr);
 }
 
 __attribute__((naked)) void NORETURN thread_arch_start_threading(void)
