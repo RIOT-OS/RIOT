@@ -60,7 +60,7 @@ void ps(void)
 #endif
             "%-9sQ | pri "
 #ifdef DEVELHELP
-           "| stack ( used) | location   "
+           "| stack ( used) | base       | current    "
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
            "| runtime | switches"
@@ -104,7 +104,7 @@ void ps(void)
 #endif
                    " | %-8s %.1s | %3i"
 #ifdef DEVELHELP
-                   " | %5i (%5i) | %p "
+                   " | %5i (%5i) | %10p | %10p "
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
                    " | %6.3f%% |  %8d"
@@ -116,7 +116,7 @@ void ps(void)
 #endif
                    sname, queued, p->priority
 #ifdef DEVELHELP
-                   , p->stack_size, stacksz, (void *)p->stack_start
+                   , p->stack_size, stacksz, (void *)p->stack_start, (void *)p->sp
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
                    , runtime_ticks, switches
