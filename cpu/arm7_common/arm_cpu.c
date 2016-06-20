@@ -35,6 +35,18 @@ int thread_arch_isr_stack_usage(void)
     return -1;
 }
 
+void *thread_arch_isr_stack_pointer(void)
+{
+    /* TODO */
+    return (void *)-1;
+}
+
+void *thread_arch_isr_stack_start(void)
+{
+    /* TODO */
+    return (void *)-1;
+}
+
 /*----------------------------------------------------------------------------
  * Processor specific routine - here for ARM7
  * sizeof(void*) = sizeof(int)

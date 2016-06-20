@@ -117,6 +117,16 @@ void thread_yield_higher(void)
     irq_restore(old_intr);
 }
 
+void *thread_arch_isr_stack_pointer(void)
+{
+    return isr_context.uc_stack.ss_sp;
+}
+
+void *thread_arch_isr_stack_start(void)
+{
+    return isr_stack;
+}
+
 void isr_cpu_switch_context_exit(void)
 {
     DEBUG("XXX: cpu_switch_context_exit(), num_tasks = %d\n", sched_num_threads);
