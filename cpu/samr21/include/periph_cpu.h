@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup         cpu_samd21
+ * @ingroup         cpu_samr21
  * @{
  *
  * @file
@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Available ports on the SAMD21
+ * @brief   Available ports on the SAMR21
  */
 enum {
     PA = 0,                 /**< port A */

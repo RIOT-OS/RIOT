@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup  cpu_samd21
+ * @ingroup  cpu_samr21
  * @{
  * @file
  * @brief       Low-level I2C driver implementation
@@ -34,7 +34,7 @@
 /* guard file in case no I2C device is defined */
 #if I2C_NUMOF
 
-#define SAMD21_I2C_TIMEOUT  (65535)
+#define SAMR21_I2C_TIMEOUT  (65535)
 
 /* static function definitions */
 static inline int _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag);
@@ -196,7 +196,7 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 
     /* Start timeout if bus state is unknown. */
     while (!(I2CSercom->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE(1))) {
-        if(timeout_counter++ >= SAMD21_I2C_TIMEOUT) {
+        if(timeout_counter++ >= SAMR21_I2C_TIMEOUT) {
             /* Timeout, force bus state to idle. */
             I2CSercom->STATUS.reg = SERCOM_I2CM_STATUS_BUSSTATE(1);
         }
@@ -379,7 +379,7 @@ static int _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag)
     /* Wait for response on bus. */
     while (!(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_MB)
            && !(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_SB)) {
-        if (++timeout_counter >= SAMD21_I2C_TIMEOUT) {
+        if (++timeout_counter >= SAMR21_I2C_TIMEOUT) {
             DEBUG("STATUS_ERR_TIMEOUT\n");
             return -1;
         }
@@ -431,7 +431,7 @@ static inline int _write(SercomI2cm *dev, char *data, int length)
         DEBUG("Wait for response.\n");
         while (!(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_MB)
                && !(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_SB)) {
-            if (++timeout_counter >= SAMD21_I2C_TIMEOUT) {
+            if (++timeout_counter >= SAMR21_I2C_TIMEOUT) {
                 DEBUG("STATUS_ERR_TIMEOUT\n");
                 return -1;
             }
@@ -471,7 +471,7 @@ static inline int _read(SercomI2cm *dev, char *data, int length)
         timeout_counter = 0;
         while (!(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_MB)
                && !(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_SB)) {
-            if (++timeout_counter >= SAMD21_I2C_TIMEOUT) {
+            if (++timeout_counter >= SAMR21_I2C_TIMEOUT) {
                 DEBUG("STATUS_ERR_TIMEOUT\n");
                 return -1;
             }
