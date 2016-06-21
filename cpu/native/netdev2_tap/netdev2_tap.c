@@ -59,7 +59,7 @@
 #include "net/netopt.h"
 #include "net/eui64.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 /* support one tap interface for now */
@@ -213,6 +213,7 @@ static void _continue_reading(netdev2_tap_t *dev)
 
 static int _recv(netdev2_t *netdev2, void *buf, size_t len, void *info)
 {
+	DEBUG("Here\n");
     netdev2_tap_t *dev = (netdev2_tap_t*)netdev2;
     (void)info;
 

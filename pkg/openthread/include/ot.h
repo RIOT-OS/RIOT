@@ -22,6 +22,7 @@ typedef struct {
 void recv_pkt(netdev2_t *dev, uint8_t *buf);
 void send_pkt(netdev2_t *dev);
 void openthread_init(void);
+void radio_init(uint8_t *tb);
 void set_netdev(netdev2_t *dev);
 #ifdef __cplusplus
 }

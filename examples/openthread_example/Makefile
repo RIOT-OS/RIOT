@@ -22,5 +22,6 @@ USEMODULE+=openthread_cli
 
 USEMODULE+=xtimer
 USEMODULE += gnrc_netdev_default
+USEMODULE+=random
 
 include $(RIOTBASE)/Makefile.include

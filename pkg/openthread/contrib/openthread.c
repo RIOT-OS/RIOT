@@ -1,7 +1,6 @@
 
 #include "thread.h"
 #include <assert.h>
-#include "debug.h"
 
 #ifdef MODULE_NETDEV2_TAP
 #include "netdev2_tap.h"
@@ -16,6 +15,7 @@
 #include "ot.h"
 
 #define ENABLE_DEBUG (1)
+#include "debug.h"
 
 #ifdef MODULE_AT86RF2XX     /* is mutual exclusive with above ifdef */
 #define OPENTHREAD_NETIF_NUMOF        (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
@@ -38,11 +38,13 @@ extern netdev2_tap_t netdev2_tap;
 
 void otSignalTaskletPending(void)
 {
-
+	//printf("Tasklet pending\n");
 }
 
 
 static uint8_t _tmp_buf[OPENTHREAD_NETDEV2_BUFLEN];
+static uint8_t transmit_buf[OPENTHREAD_NETDEV2_BUFLEN];
+
 static kernel_pid_t _pid;
 
 void _event_cb(netdev2_t *dev, netdev2_event_t event)
@@ -55,7 +57,7 @@ void _event_cb(netdev2_t *dev, netdev2_event_t event)
         msg.content.ptr = dev;
 
         if (msg_send(&msg, _pid) <= 0) {
-            DEBUG("lwip_netdev2: possibly lost interrupt.\n");
+            DEBUG("openthread_netdev2: possibly lost interrupt.\n");
         }
     }
 	else
@@ -63,6 +65,7 @@ void _event_cb(netdev2_t *dev, netdev2_event_t event)
 		switch(event)
 		{
 			case NETDEV2_EVENT_RX_COMPLETE:
+				DEBUG("openthread: Receiving pkt\n");
 				recv_pkt(dev, _tmp_buf);
 				break;
 			case NETDEV2_EVENT_TX_COMPLETE:
@@ -93,6 +96,7 @@ void openthread_init(void)
 #endif
 		netdev->driver->init(netdev);
 		netdev->event_callback = _event_cb;
+		radio_init(transmit_buf);
 		set_netdev(netdev);
 }
 

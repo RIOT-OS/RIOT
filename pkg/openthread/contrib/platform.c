@@ -38,8 +38,7 @@
 
 void PlatformInit(void)
 {
-	puts("Hello");
-    //otPlatSerialEnable();
+    otPlatSerialEnable();
 }
 
 void PlatformProcessDrivers(void)

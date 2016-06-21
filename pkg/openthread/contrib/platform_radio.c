@@ -3,6 +3,12 @@
 #include <platform/radio.h>
 #include "ot.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
+#include "errno.h"
+
+
 static RadioPacket sTransmitFrame;
 static RadioPacket sReceiveFrame;
 
@@ -32,30 +38,72 @@ void send_pkt(netdev2_t *dev)
 	otPlatRadioTransmitDone(en == NETOPT_ENABLE ? true : false, kThreadError_None);
 }
 
+int get_state(void)
+{
+	netopt_state_t en;
+	int res =_dev->driver->get(_dev, NETOPT_STATE, &en, sizeof(netopt_state_t));
+	if(res == -ENOTSUP)
+		return -1;
+	return en;
+}
+
+bool dev_is_off(void)
+{
+	int res = get_state();
+	return res == NETOPT_STATE_OFF;
+}
+bool dev_is_sleep(void)
+{
+	int res = get_state();
+	return res == NETOPT_STATE_SLEEP;
+}
+
+bool dev_is_ready(void)
+{
+	int res = get_state();
+	return res < 0 || res == NETOPT_STATE_IDLE;
+}
+
+bool dev_is_tx_or_rx(void)
+{
+	int res = get_state();
+	return res == NETOPT_STATE_RX || res == NETOPT_STATE_TX;
+}
+
+void radio_init(uint8_t *tb)
+{
+	sTransmitFrame.mPsdu = tb;
+	sTransmitFrame.mLength = 0;
+}
 ThreadError otPlatRadioSetPanId(uint16_t panid)
 {
+	DEBUG("openthread: otPlatRadioSetPanId\n");
 	(void) panid;
 	return kThreadError_None;
 }
 
 ThreadError otPlatRadioSetExtendedAddress(uint8_t *aExtendedAddress)
 {
+	DEBUG("openthread: otPlatRadioSetExtendedAddress\n");
 	(void) aExtendedAddress;
 	return kThreadError_None;
 }
 
 ThreadError otPlatRadioSetShortAddress(uint16_t aShortAddress)
 {
+	DEBUG("openthread: otPlatRadioSetShortAddress\n");
 	(void) aShortAddress;
 	return kThreadError_None;
 }
 
 ThreadError otPlatRadioEnable(void)
 {
-	netopt_state_t en;
-	_dev->driver->get(_dev, NETOPT_STATE, &en, sizeof(netopt_state_t));
-	if(en != NETOPT_STATE_OFF)
+	DEBUG("openthread: otPlatRadioEnable\n");
+	if(dev_is_off())
+	{
+		DEBUG("openthread: otPlatRadioEnable: Radio was enabled\n");
 		return kThreadError_Busy;
+	}
 
 	netopt_state_t st = NETOPT_STATE_IDLE;
 	_dev->driver->set(_dev, NETOPT_STATE, &st, sizeof(netopt_state_t));
@@ -64,6 +112,7 @@ ThreadError otPlatRadioEnable(void)
 
 ThreadError otPlatRadioDisable(void)
 {
+	DEBUG("openthread: otPlatRadioDisable\n");
 	netopt_state_t st = NETOPT_STATE_OFF;
 	_dev->driver->set(_dev, NETOPT_STATE, &st, sizeof(netopt_state_t));
 	return kThreadError_None;
@@ -71,9 +120,8 @@ ThreadError otPlatRadioDisable(void)
 
 ThreadError otPlatRadioSleep(void)
 {
-	netopt_state_t en;
-	_dev->driver->get(_dev, NETOPT_STATE, &en, sizeof(netopt_state_t));
-	if(en != NETOPT_STATE_IDLE)
+	DEBUG("openthread: otPlatRadioSleep\n");
+	if(dev_is_ready())
 		return kThreadError_Busy;
 
 	netopt_state_t st = NETOPT_STATE_SLEEP;
@@ -83,10 +131,9 @@ ThreadError otPlatRadioSleep(void)
 
 ThreadError otPlatRadioIdle(void)
 {
-	netopt_state_t en;
-	_dev->driver->get(_dev, NETOPT_STATE, &en, sizeof(netopt_state_t));
+	DEBUG("openthread: otPlatRadioIdle\n");
 	
-	if(en == NETOPT_STATE_RX || en == NETOPT_STATE_TX)
+	if(dev_is_tx_or_rx())
 		return kThreadError_Busy;
 
 	netopt_state_t st = NETOPT_STATE_IDLE;
@@ -97,9 +144,8 @@ ThreadError otPlatRadioIdle(void)
 
 ThreadError otPlatRadioReceive(uint8_t aChannel)
 {
-	netopt_state_t en;
-	_dev->driver->get(_dev, NETOPT_STATE, &en, sizeof(netopt_state_t));
-	if(en != NETOPT_STATE_IDLE)
+	DEBUG("openthread: otPlatRadioReceive\n");
+	if(!dev_is_ready())
 		return kThreadError_Busy;
 
 	uint16_t channel = aChannel;
@@ -110,15 +156,19 @@ ThreadError otPlatRadioReceive(uint8_t aChannel)
 
 RadioPacket *otPlatRadioGetTransmitBuffer(void)
 {
+	DEBUG("openthread: otPlatRadioGetTransmitBuffer\n");
 	return &sTransmitFrame;
 }
 
 ThreadError otPlatRadioTransmit(void)
 {
-	netopt_state_t en;
-	_dev->driver->get(_dev, NETOPT_STATE, &en, sizeof(netopt_state_t));
-	if(en != NETOPT_STATE_IDLE)
+	DEBUG("openthread: otPlatRadioTransmit\n");
+
+	if(!dev_is_ready())
+	{
+		DEBUG("I'm exiting\n");
 		return kThreadError_Busy;
+	}
 
 	struct iovec pkt;
 	pkt.iov_base = sTransmitFrame.mPsdu;
@@ -139,16 +189,19 @@ ThreadError otPlatRadioTransmit(void)
 
 int8_t otPlatRadioGetNoiseFloor(void)
 {
+	DEBUG("openthread: otPlatRadioGetNoiseFloor\n");
 	return 0;
 }
 
 otRadioCaps otPlatRadioGetCaps(void)
 {
+	DEBUG("openthread: otPlatRadioGetCaps\n");
 	return kRadioCapsNone;
 }
 
 bool otPlatRadioGetPromiscuous(void)
 {
+	DEBUG("openthread: otPlatRadioGetPromiscuous\n");
 	netopt_enable_t en;
 	_dev->driver->get(_dev, NETOPT_PROMISCUOUSMODE, &en, sizeof(en));
 	return en == NETOPT_ENABLE ? true : false;
@@ -156,6 +209,7 @@ bool otPlatRadioGetPromiscuous(void)
 
 void otPlatRadioSetPromiscuous(bool aEnable)
 {
+	DEBUG("openthread: otPlatRadioSetPromiscuous\n");
 	netopt_enable_t en = (aEnable) ? NETOPT_ENABLE : NETOPT_DISABLE;
 	_dev->driver->set(_dev, NETOPT_PROMISCUOUSMODE, &en, sizeof(en));
 }

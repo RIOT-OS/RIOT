@@ -16,7 +16,7 @@ ThreadError otPlatSerialDisable(void)
 
 ThreadError otPlatSerialSend(const uint8_t *aBuf, uint16_t aBufLength)
 {
-	printf("%*s", aBufLength, aBuf);
+	printf("%.*s", aBufLength, aBuf);
 	otPlatSerialSendDone();
 	return kThreadError_None;
 }
