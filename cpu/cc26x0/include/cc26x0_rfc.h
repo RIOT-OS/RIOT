@@ -251,13 +251,13 @@ typedef struct {
 #define RFCPEIEN_BOOT_DONE            0x40000000
 #define RFCPEIEN_INTERNAL_ERROR       0x80000000
 
-#define SYSGPOCTL_GPOCTL0_POS         0x0
+#define SYSGPOCTL_GPOCTL0_POS         0
 #define SYSGPOCTL_GPOCTL0_LEN         4
-#define SYSGPOCTL_GPOCTL1_POS         0x4
+#define SYSGPOCTL_GPOCTL1_POS         4
 #define SYSGPOCTL_GPOCTL1_LEN         4
-#define SYSGPOCTL_GPOCTL2_POS         0x8
+#define SYSGPOCTL_GPOCTL2_POS         8
 #define SYSGPOCTL_GPOCTL2_LEN         4
-#define SYSGPOCTL_GPOCTL3_POS         0xc
+#define SYSGPOCTL_GPOCTL3_POS         12
 #define SYSGPOCTL_GPOCTL3_LEN         4
 
 #define SYSGPOCTL_GPOCTL_CPE0         0x0
