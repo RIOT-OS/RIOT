@@ -3,6 +3,10 @@
 #include <assert.h>
 #include "debug.h"
 
+#ifdef MODULE_NETDEV2_TAP
+#include "netdev2_tap.h"
+#endif
+
 #ifdef MODULE_AT86RF2XX
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"
@@ -18,6 +22,11 @@
 #endif
 
 
+#ifdef MODULE_NETDEV2_TAP
+#define LWIP_NETIF_NUMOF        (1)
+#endif
+
+
 #ifdef MODULE_AT86RF2XX
 static at86rf2xx_t at86rf2xx_dev;
 #endif
@@ -25,6 +34,7 @@ static at86rf2xx_t at86rf2xx_dev;
 
 
 #define OPENTHREAD_NETDEV2_BUFLEN (ETHERNET_MAX_LEN)
+extern netdev2_tap_t netdev2_tap;
 
 void otSignalTaskletPending(void)
 {
@@ -76,9 +86,13 @@ void openthread_init(void)
 #ifdef MODULE_AT86RF2XX
         at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0]);
 		netdev2_t *netdev = (netdev2_t*) &at86rf2xx_dev;
+#endif
+
+#ifdef MODULE_NETDEV2_TAP
+	netdev2_t *netdev = (netdev2_t*) &netdev2_tap;
+#endif
 		netdev->driver->init(netdev);
 		netdev->event_callback = _event_cb;
 		set_netdev(netdev);
-#endif
 }
 

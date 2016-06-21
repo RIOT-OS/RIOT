@@ -85,11 +85,13 @@ ThreadError otPlatRadioIdle(void)
 {
 	netopt_state_t en;
 	_dev->driver->get(_dev, NETOPT_STATE, &en, sizeof(netopt_state_t));
+	
 	if(en == NETOPT_STATE_RX || en == NETOPT_STATE_TX)
 		return kThreadError_Busy;
 
 	netopt_state_t st = NETOPT_STATE_IDLE;
 	_dev->driver->set(_dev, NETOPT_STATE, &st, sizeof(netopt_state_t));
+
 	return kThreadError_None;
 }
 

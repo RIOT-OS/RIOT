@@ -12,7 +12,12 @@ extern "C" {
 
 #define OPENTHREAD_XTIMER_MSG_TYPE_EVENT (0x2235)
 #define OPENTHREAD_NETDEV2_MSG_TYPE_EVENT (0x2236)
+#define OPENTHREAD_SERIAL_MSG_TYPE_EVENT (0x2237)
 
+typedef struct {
+	void *buf;
+	size_t len;
+} serial_msg_t;
 
 void recv_pkt(netdev2_t *dev, uint8_t *buf);
 void send_pkt(netdev2_t *dev);

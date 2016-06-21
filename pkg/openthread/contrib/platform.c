@@ -47,5 +47,4 @@ void PlatformProcessDrivers(void)
     // should sleep and wait for interrupts here
 
     PlatformSerialProcess();
-    PlatformRadioProcess();
 }
