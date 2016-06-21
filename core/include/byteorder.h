@@ -21,8 +21,14 @@
 
 #include <stdint.h>
 
-#if defined(__MACH__)
-#   include "clang_compat.h"
+#if defined(__clang__)
+# undef HTONS
+# undef HTONL
+# undef HTONLL
+# undef NTOHS
+# undef NTOHL
+# undef NTOHLL
+# undef HAVE_NO_BUILTIN_BSWAP16
 #endif
 
 #ifdef __cplusplus

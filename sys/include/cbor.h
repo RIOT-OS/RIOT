@@ -94,7 +94,7 @@
  * -  24-31: (Reserved)      - No support
  * - 32-255: (Unassigned)    - No support
  *
- * @todo API for Indefinite-Length Byte Strings and Text Strings
+ * @todo: API for Indefinite-Length Byte Strings and Text Strings
  *       (see https://tools.ietf.org/html/rfc7049#section-2.2.2)
  */
 
@@ -103,7 +103,9 @@
 
 #ifndef CBOR_NO_CTIME
 /* 'strptime' is only declared when this macro is defined */
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE
+#endif
 #endif
 
 #include <stdbool.h>
@@ -395,6 +397,22 @@ size_t cbor_deserialize_byte_string(const cbor_stream_t *stream, size_t offset,
                                     char *val, size_t length);
 
 size_t cbor_serialize_unicode_string(cbor_stream_t *stream, const char *val);
+
+/**
+ * @brief Deserialize bytes/unicode from @p stream to @p val (without copy)
+ *
+ * @param[in] stream The stream to deserialize
+ * @param[in] offset The offset within the stream where to start deserializing
+ * @param[out] val   Pointer to a char *
+ * @param[out] length Pointer to a size_t to store the size of the string
+ *
+ * @return Number of bytes written into @p val
+ */
+size_t cbor_deserialize_byte_string_no_copy(const cbor_stream_t *stream, size_t offset,
+                                    unsigned char **val, size_t *length);
+
+size_t cbor_deserialize_unicode_string_no_copy(const cbor_stream_t *stream, size_t offset,
+                                    unsigned char **val, size_t *length);
 
 /**
  * @brief Deserialize unicode string from @p stream to @p val
