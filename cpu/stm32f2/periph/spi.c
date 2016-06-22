@@ -91,6 +91,9 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     uint8_t speed_devider;
     SPI_TypeDef *spi_port;
 
+    uint32_t tx_stream;
+    uint32_t rx_stream;
+
     switch (speed) {
         case SPI_SPEED_100KHZ:
             return -2;          /* not possible for stm32f2, APB2 minimum is 328 kHz */
@@ -120,6 +123,9 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             SPI_0_SCK_PORT_CLKEN();
             SPI_0_MISO_PORT_CLKEN();
             SPI_0_MOSI_PORT_CLKEN();
+
+            tx_stream = SPI_0_DMA_TX_STREAM;
+            rx_stream = SPI_0_DMA_RX_STREAM;
             break;
 #endif /* SPI_0_EN */
 #if SPI_1_EN
@@ -130,6 +136,9 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             SPI_1_SCK_PORT_CLKEN();
             SPI_1_MISO_PORT_CLKEN();
             SPI_1_MOSI_PORT_CLKEN();
+
+            tx_stream = SPI_1_DMA_TX_STREAM;
+            rx_stream = SPI_1_DMA_RX_STREAM;
             break;
 #endif /* SPI_1_EN */
 #if SPI_2_EN
@@ -140,6 +149,9 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             SPI_2_SCK_PORT_CLKEN();
             SPI_2_MISO_PORT_CLKEN();
             SPI_2_MOSI_PORT_CLKEN();
+
+            tx_stream = SPI_2_DMA_TX_STREAM;
+            rx_stream = SPI_2_DMA_RX_STREAM;
             break;
 #endif /* SPI_2_EN */
         default:
@@ -163,6 +175,10 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     /* 1: master configuration */
     spi_port->CR1 |= (SPI_CR1_MSTR);
     spi_port->CR1 |= (conf);
+
+    /* dma init */
+    dma_stream_init(tx_stream);
+    dma_stream_init(rx_stream);
 
     /* enable SPI */
     spi_port->CR1 |= (SPI_CR1_SPE);
