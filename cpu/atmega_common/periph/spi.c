@@ -24,6 +24,9 @@
 #include "mutex.h"
 #include "periph/spi.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 /* guard this file in case no SPI device is defined */
 #if SPI_NUMOF
 
@@ -39,6 +42,7 @@ static mutex_t lock = MUTEX_INIT;
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
+    DEBUG("spi.c: conf = %d, speed = %d\n", conf, speed);
     /* make sure device is valid (there is only one...) */
     if (dev != 0) {
         return -1;
@@ -63,8 +67,10 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     SPSR = (speed >> S2X_SHIFT);
     SPCR = ((1 << SPE) | (1 << MSTR) | conf | (speed & SPEED_MASK));
 
-    /* clear interrupt flag */
+    /* clear interrupt flag by reading SPSR */
     (void)SPSR;
+
+    /* clear data register */
     (void)SPDR;
 
     return 0;

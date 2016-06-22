@@ -28,6 +28,9 @@
 #include "periph/timer.h"
 #include "periph_conf.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 /**
  * @brief   All timers have three channels
  */
@@ -60,7 +63,7 @@ typedef struct {
  * @brief   Allocate memory for saving the device states
  * @{
  */
-#if TIMER_NUMOF
+#ifdef TIMER_NUMOF
 static ctx_t ctx[] = {
 #ifdef TIMER_0
     { TIMER_0, TIMER_0_MASK, TIMER_0_FLAG, NULL, NULL, 0, 0 },
@@ -86,6 +89,7 @@ static ctx_t *ctx[] = {{ NULL }};
  */
 int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
+    DEBUG("timer.c: freq = %ld\n", freq);
     uint8_t pre = 0;
 
     /* make sure given device is valid */
@@ -100,6 +104,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
         }
     }
     if (pre == PRESCALE_NUMOF) {
+        DEBUG("timer.c: prescaling failed!\n");
         return -1;
     }
 
@@ -116,6 +121,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 
     /* enable timer with calculated prescaler */
     ctx[tim].dev->CRB = (pre + 1);
+    DEBUG("timer.c: prescaler set at %d\n", pre + 1);
 
     return 0;
 }
@@ -175,12 +181,13 @@ void timer_irq_disable(tim_t tim)
     *ctx[tim].mask = 0;
 }
 
-static inline void _isr(int num, int chan)
+#ifdef TIMER_NUMOF
+static inline void _isr(tim_t tim, int chan)
 {
     __enter_isr();
 
-    *ctx[num].mask &= ~(1 << (chan + OCIE1A));
-    ctx[num].cb(ctx[num].arg, chan);
+    *ctx[tim].mask &= ~(1 << (chan + OCIE1A));
+    ctx[tim].cb(ctx[tim].arg, chan);
 
     if (sched_context_switch_request) {
         thread_yield();
@@ -188,6 +195,7 @@ static inline void _isr(int num, int chan)
 
     __exit_isr();
 }
+#endif
 
 #ifdef TIMER_0
 ISR(TIMER_0_ISRA, ISR_BLOCK)

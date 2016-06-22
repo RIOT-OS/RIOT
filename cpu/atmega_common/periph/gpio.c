@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 HAW Hamburg
+ *               2016 INRIA
 
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -12,9 +13,10 @@
  * @{
  *
  * @file
- * @brief       Low-level GPIO driver implementation for ATmega2560
+ * @brief       Low-level GPIO driver implementation for ATmega family
  *
  * @author      René Herthel <rene-herthel@outlook.de>
+ * @author      Francisco Acosta <francisco.acosta@inria.fr>
  *
  * @}
  */
@@ -32,7 +34,16 @@
 #define GPIO_OFFSET_PORT_H      (0xCB)
 #define GPIO_OFFSET_PIN_PORT    (0x02)
 #define GPIO_OFFSET_PIN_PIN     (0x03)
+
+/*
+ * @brief     Define GPIO interruptions for an specific atmega CPU, by default
+ *            2 (for small atmega CPUs)
+ */
+#if defined(__AVR_ATmega2560__)
 #define GPIO_EXT_INT_NUMOF      (8U)
+#else
+#define GPIO_EXT_INT_NUMOF      (2U)
+#endif
 
 static gpio_isr_ctx_t config[GPIO_EXT_INT_NUMOF];
 
@@ -226,6 +237,7 @@ ISR(INT1_vect, ISR_BLOCK)
     irq_handler(1); /**< predefined interrupt pin */
 }
 
+#if defined(__AVR_ATmega2560__)
 ISR(INT2_vect, ISR_BLOCK)
 {
     irq_handler(2); /**< predefined interrupt pin */
@@ -255,3 +267,4 @@ ISR(INT7_vect, ISR_BLOCK)
 {
     irq_handler(7); /**< predefined interrupt pin */
 }
+#endif
