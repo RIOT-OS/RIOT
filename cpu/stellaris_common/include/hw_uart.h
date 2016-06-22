@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_UART_H__
-#define __HW_UART_H__
+#ifndef HW_UART_H_
+#define HW_UART_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -527,4 +527,4 @@ extern "C" {
 }
 #endif
 
-#endif // __HW_UART_H__
+#endif /* HW_UART_H_ */

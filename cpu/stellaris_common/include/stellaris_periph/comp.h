@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __COMP_H__
-#define __COMP_H__
+#ifndef COMP_H_
+#define COMP_H_
 
 //*****************************************************************************
 //
@@ -142,4 +142,4 @@ extern void ComparatorIntClear(unsigned long ulBase, unsigned long ulComp);
 }
 #endif
 
-#endif // __COMP_H__
+#endif /* COMP_H_ */

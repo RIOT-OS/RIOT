@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_SSI_H__
-#define __HW_SSI_H__
+#ifndef HW_SSI_H_
+#define HW_SSI_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -249,4 +249,4 @@ extern "C" {
 }
 #endif
 
-#endif // __HW_SSI_H__
+#endif /* HW_SSI_H_ */
