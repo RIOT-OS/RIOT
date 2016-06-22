@@ -34,7 +34,10 @@ static at86rf2xx_t at86rf2xx_dev;
 
 
 #define OPENTHREAD_NETDEV2_BUFLEN (ETHERNET_MAX_LEN)
+
+#ifdef MODULE_NETDEV2_TAP
 extern netdev2_tap_t netdev2_tap;
+#endif
 
 void otSignalTaskletPending(void)
 {
