@@ -6,18 +6,20 @@ This is a test application for the U8g2 package. This package is a graphical dis
 ## Usage
 This test application will initialize the U8g2 to output on one of the following:
 
-* output to stdout virtual screen.
+* output to terminal virtual screen.
 * output to SDL virtual screen.
 * output to I2C graphics screen.
 * output to SPI graphics screen.
 
-### Output to stdout
+Note: you may have to run `make clean` between different output modes.
+
+### Output to terminal
 To output to this virtual screen, supply `TEST_U8G2_OUTPUT=1` to the `make` command.
 
 ### Output to SDL
 To output to this virtual screen, supply `TEST_U8G2_OUTPUT=2` to the `make` command.
 
-This is a native-only option.
+This is a native-only option and requires SDL (32-bits) to be installed.
 
 ### Output to SPI
 To output to screen, supply `TEST_U8G2_OUTPUT=3` to the `make` command.
