@@ -427,11 +427,9 @@ void rtt_handler(uint32_t event)
  * @param[in] data          optional parameter
  */
 // TODO: Don't use global variables
-//static void _event_cb(gnrc_netdev_event_t event, void *data)
-static void _event_cb(netdev2_t* dev, netdev2_event_t event, void *data)
+static void _event_cb(netdev2_t* dev, netdev2_event_t event)
 {
-	(void) data;
-	gnrc_netdev2_t *gnrc_netdev2 = (gnrc_netdev2_t*) dev->isr_arg;
+	gnrc_netdev2_t *gnrc_netdev2 = (gnrc_netdev2_t*) dev->context;
 
 	if (event == NETDEV2_EVENT_ISR) {
 		msg_t msg;
@@ -552,7 +550,7 @@ static void *_lwmac_thread(void *args)
 
 	/* register the event callback with the device driver */
 	dev->event_callback = _event_cb;
-	dev->isr_arg = (void*) gnrc_netdev2;
+	dev->context = (void*) gnrc_netdev2;
 
     /* Enable RX- and TX-started interrupts  */
     netopt_enable_t enable = NETOPT_ENABLE;
