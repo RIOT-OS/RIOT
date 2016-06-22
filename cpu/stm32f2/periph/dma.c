@@ -30,6 +30,12 @@
 #include "debug.h"
 
 /**
+ * @brief   initialization flag
+ */
+#define DMA_INIT_DONE        (uint16_t)(0x0001)
+static uint16_t dma_init_status = 0x0000;
+
+/**
  * @brief   INTERRUPT FLAG MASK
  */
 #define DMA_STREAM_IT_MASK   (uint32_t)(DMA_LISR_FEIF0 | DMA_LISR_DMEIF0 | \
@@ -221,34 +227,39 @@ void dma_stream_init(dma_t stream_dev)
 {
     DMA_Stream_TypeDef* stream = dma_stream(stream_dev);
 
-    /* check if EN bit is set to clear it */
-    if ( (stream->CR & DMA_SxCR_EN) == DMA_SxCR_EN) {
-        /* disable the selected DMA Stream by clearing EN bit */
-        stream->CR &= ~(uint32_t)DMA_SxCR_EN;
+    /* check init already done */
+    if ( ((dma_init_status >> stream_dev) & DMA_INIT_DONE) != DMA_INIT_DONE) {
+        dma_init_status |= DMA_INIT_DONE << stream_dev;
 
-        /* Wait until the stream is ready to be configured */
-        while( (stream->CR & DMA_SxCR_EN) == DMA_SxCR_EN);
+        /* check if EN bit is set to clear it */
+        if ( (stream->CR & DMA_SxCR_EN) == DMA_SxCR_EN) {
+            /* disable the selected DMA Stream by clearing EN bit */
+            stream->CR &= ~(uint32_t)DMA_SxCR_EN;
+
+            /* Wait until the stream is ready to be configured */
+            while( (stream->CR & DMA_SxCR_EN) == DMA_SxCR_EN);
+        }
+
+        /* init all registers */
+        stream->CR = 0;
+        stream->PAR = 0;
+        stream->NDTR = 0;
+        stream->M0AR = 0;
+        stream->M1AR = 0;
+        stream->FCR = 0;
+
+        /* clear all flags */
+        dma_clear_all_flags(stream_dev);
+
+        /* init configuration mutex */
+        mutex_init(&dma_conf_sync[stream_dev]);
+
+        /* init transmission mutex */
+        mutex_init(&dma_trans_sync[stream_dev]);
+
+        /* lock transmission mutex */
+        dma_transmission_acquire(stream_dev);
     }
-
-    /* init all registers */
-    stream->CR = 0;
-    stream->PAR = 0;
-    stream->NDTR = 0;
-    stream->M0AR = 0;
-    stream->M1AR = 0;
-    stream->FCR = 0;
-
-    /* clear all flags */
-    dma_clear_all_flags(stream_dev);
-
-    /* init configuration mutex */
-    mutex_init(&dma_conf_sync[stream_dev]);
-
-    /* init transmission mutex */
-    mutex_init(&dma_trans_sync[stream_dev]);
-
-    /* lock transmission mutex */
-    dma_transmission_acquire(stream_dev);
 }
 
 void dma_stream_config(dma_t stream_dev, uint32_t periph_addr_reg, uint32_t dma_config, char* data, uint16_t length)

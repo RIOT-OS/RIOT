@@ -122,6 +122,9 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         dev->CR3 |= USART_CR3_RTSE | USART_CR3_CTSE;
     }
 
+    /* dma init */
+    dma_stream_init(uart_config[uart].dma_stream);
+
     /* enable global and receive interrupts */
     NVIC_EnableIRQ(uart_config[uart].irqn);
 
