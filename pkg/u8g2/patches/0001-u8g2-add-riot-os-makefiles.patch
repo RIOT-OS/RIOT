@@ -1,4 +1,4 @@
-From e074858e002cd96e86d7400e377897e6b646bbd5 Mon Sep 17 00:00:00 2001
+From 96295dd6b68eee06e736ccf84b3225682a912230 Mon Sep 17 00:00:00 2001
 From: Bas Stottelaar <basstottelaar@gmail.com>
 Date: Tue, 24 May 2016 20:17:39 +0200
 Subject: [PATCH 1/2] u8g2: add riot-os makefiles.

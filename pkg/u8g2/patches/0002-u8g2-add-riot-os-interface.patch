@@ -1,17 +1,37 @@
-From 4f00ec2e28975b6fddbf82e5bfe9a86647aa6c58 Mon Sep 17 00:00:00 2001
+From 454b1b8fd9732642a74d1269b74a569e418ae9db Mon Sep 17 00:00:00 2001
 From: Bas Stottelaar <basstottelaar@gmail.com>
-Date: Sat, 11 Jun 2016 15:54:41 +0200
+Date: Wed, 22 Jun 2016 18:04:31 +0200
 Subject: [PATCH 2/2] u8g2: add riot-os interface.
 
 ---
+ csrc/u8g2.h        |   4 +-
  csrc/u8g2_riotos.c | 161 +++++++++++++++++++++++++++++++++++++++++++++++++++++
  csrc/u8x8.h        |  17 +++++-
- 2 files changed, 175 insertions(+), 3 deletions(-)
+ 3 files changed, 178 insertions(+), 4 deletions(-)
  create mode 100644 csrc/u8g2_riotos.c
 
+diff --git a/csrc/u8g2.h b/csrc/u8g2.h
+index 32a9570..c8cc1de 100644
+--- a/csrc/u8g2.h
++++ b/csrc/u8g2.h
+@@ -343,6 +343,9 @@ struct u8g2_struct
+ #define u8g2_SetMenuDownPin(u8g2, val) u8x8_SetMenuDownPin(u8g2_GetU8x8(u8g2), (val))
+ #endif
+ 
++#define u8g2_SetPins(u8x8,pins,pins_enabled) u8x8_SetPins(u8g2_GetU8x8(&u8g2), pins, pins_enabled)
++#define u8g2_SetDevice(u8x8,device) u8x8_SetDevice(u8g2_GetU8x8(&u8g2), device)
++
+ /*==========================================*/
+ /* u8g2_setup.c */
+ 
+@@ -1441,4 +1444,3 @@ extern const uint8_t u8g2_font_pcsenior_8u[] U8G2_FONT_SECTION("u8g2_font_pcseni
+ 
+ 
+ #endif
+-
 diff --git a/csrc/u8g2_riotos.c b/csrc/u8g2_riotos.c
 new file mode 100644
-index 0000000..cf171f9
+index 0000000..4b0f896
 --- /dev/null
 +++ b/csrc/u8g2_riotos.c
 @@ -0,0 +1,161 @@
@@ -58,7 +78,7 @@ index 0000000..cf171f9
 +static void u8x8_enable_pins(gpio_t* pins, uint32_t pins_enabled)
 +{
 +    uint8_t i;
-+    
++
 +    for (i = 0; i < 32; i++) {
 +        if (pins_enabled & (1 << i)) {
 +            if (pins[i] != GPIO_UNDEF) {
@@ -115,8 +135,8 @@ index 0000000..cf171f9
 +            spi_transfer_bytes(dev, (char *) arg_ptr, NULL, arg_int);
 +            break;
 +        case U8X8_MSG_BYTE_INIT:
-+            spi_init_master(dev, 
-+                            u8x8_takeover_edge_to_spi_conf(u8g2->display_info->sck_takeover_edge), 
++            spi_init_master(dev,
++                            u8x8_takeover_edge_to_spi_conf(u8g2->display_info->sck_takeover_edge),
 +                            u8x8_pulse_width_to_spi_speed(u8g2->display_info->sck_pulse_width_ns));
 +            break;
 +        case U8X8_MSG_BYTE_SET_DC:
@@ -177,7 +197,7 @@ index 0000000..cf171f9
 +}
 +#endif /* I2C_NUMOF */
 diff --git a/csrc/u8x8.h b/csrc/u8x8.h
-index 1a8fff9..d3c4022 100644
+index 13050f6..36eeab0 100644
 --- a/csrc/u8x8.h
 +++ b/csrc/u8x8.h
 @@ -107,6 +107,8 @@
@@ -213,8 +233,8 @@ index 1a8fff9..d3c4022 100644
  };
  
  #define u8x8_GetCols(u8x8) ((u8x8)->display_info->tile_width)
-@@ -325,6 +331,8 @@ struct u8x8_struct
- #define u8x8_SetMenuHomePin(u8x8, val) u8x8_SetPin((u8x8),U8X8_PIN_MENU_HOME,(val))
+@@ -327,6 +333,8 @@ struct u8x8_struct
+ #define u8x8_SetMenuDownPin(u8x8, val) u8x8_SetPin((u8x8),U8X8_PIN_MENU_DOWN,(val))
  #endif
  
 +#define u8x8_SetPins(u8x8,pins,pins_enabled) {(u8x8)->pins = (pins); (u8x8)->pins_enabled = (pins_enabled);}
@@ -222,7 +242,7 @@ index 1a8fff9..d3c4022 100644
  
  /*==========================================*/
  
-@@ -777,6 +785,9 @@ extern const uint8_t u8x8_font_pcsenior_u[] U8X8_FONT_SECTION("u8x8_font_pcsenio
+@@ -781,6 +789,9 @@ extern const uint8_t u8x8_font_pcsenior_u[] U8X8_FONT_SECTION("u8x8_font_pcsenio
  
  /* end font list */
  
