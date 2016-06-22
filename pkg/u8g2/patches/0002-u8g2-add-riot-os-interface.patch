@@ -1,4 +1,4 @@
-From 454b1b8fd9732642a74d1269b74a569e418ae9db Mon Sep 17 00:00:00 2001
+From e6838299ea324752a559ce1a583c7e2259a121b8 Mon Sep 17 00:00:00 2001
 From: Bas Stottelaar <basstottelaar@gmail.com>
 Date: Wed, 22 Jun 2016 18:04:31 +0200
 Subject: [PATCH 2/2] u8g2: add riot-os interface.
