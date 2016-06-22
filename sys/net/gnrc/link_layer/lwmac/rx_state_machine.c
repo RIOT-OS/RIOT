@@ -184,7 +184,6 @@ static bool _lwmac_rx_update(lwmac_t* lwmac)
 
         /* Construct NETIF header and insert address for WA packet */
         gnrc_netif_hdr_init(nethdr_wa, 0, lwmac->rx.l2_addr.len);
-        gnrc_netif_hdr_set_dst_addr(nethdr_wa, lwmac->rx.l2_addr.addr, lwmac->rx.l2_addr.len);
 
         /* Send WA as broadcast*/
         nethdr_wa->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;

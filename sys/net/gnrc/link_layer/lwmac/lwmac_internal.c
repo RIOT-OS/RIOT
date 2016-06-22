@@ -67,7 +67,7 @@ int _find_neighbour(lwmac_t* lwmac, uint8_t* dst_addr, int addr_len)
 {
     lwmac_tx_neighbour_t* neighbours = lwmac->tx.neighbours;
 
-    for(int i = 0; i < LWMAC_NEIGHBOUR_COUNT; i++) {
+	for(int i = 0; i <= LWMAC_NEIGHBOUR_COUNT; i++) {
         if(neighbours[i].l2_addr.len == addr_len) {
             if(memcmp(&(neighbours[i].l2_addr.addr), dst_addr, addr_len) == 0) {
                 return i;
@@ -83,15 +83,18 @@ int _find_neighbour(lwmac_t* lwmac, uint8_t* dst_addr, int addr_len)
 int _free_neighbour(lwmac_t* lwmac)
 {
     lwmac_tx_neighbour_t* neighbours = lwmac->tx.neighbours;
+	const size_t neighbour_count = sizeof(lwmac->tx.neighbours) /
+	                              sizeof(lwmac->tx.neighbours[0]);
 
-    for(int i = 0; i < LWMAC_NEIGHBOUR_COUNT; i++) {
+	/* Don't attempt to free broadcast neighbour, so start at index 1 */
+	for(int i = 1; i < neighbour_count; i++) {
         if( (packet_queue_length(&(neighbours[i].queue)) == 0) &&
             (&neighbours[i] != lwmac->tx.current_neighbour) ) {
             /* Mark as free */
             neighbours[i].l2_addr.len = 0;
             return i;
         }
-    }
+	}
     return -1;
 }
 
@@ -105,7 +108,7 @@ int _alloc_neighbour(lwmac_t* lwmac)
         if(neighbours[i].l2_addr.len == 0) {
             packet_queue_init(&(neighbours[i].queue),
                               lwmac->tx._queue_nodes,
-                              (sizeof(lwmac->tx._queue_nodes) / sizeof(packet_queue_node_t)));
+			                  LWMAC_TX_QUEUE_SIZE);
             return i;
         }
     }
