@@ -7,6 +7,10 @@
 #include "debug.h"
 
 #include "errno.h"
+#include "net/ethernet/hdr.h"
+#include "net/ethertype.h"
+#include "byteorder.h"
+#include <string.h>
 
 
 static RadioPacket sTransmitFrame;
@@ -19,10 +23,16 @@ void set_netdev(netdev2_t *dev)
 	_dev = dev;
 }
 
+static inline void _addr_set_broadcast(uint8_t *dst)
+{
+	memset(dst, 0xff, ETHERNET_ADDR_LEN);
+}
+
 void recv_pkt(netdev2_t *dev, uint8_t *buf)
 {
 	int len = dev->driver->recv(dev, (char*) buf, sizeof(buf), NULL);
 
+	printf("Len is %i\n", len);
 	assert(((unsigned)len) <= UINT16_MAX);
 	sReceiveFrame.mPsdu = buf;
 	sReceiveFrame.mLength = len;
@@ -78,7 +88,7 @@ void radio_init(uint8_t *tb)
 ThreadError otPlatRadioSetPanId(uint16_t panid)
 {
 	DEBUG("openthread: otPlatRadioSetPanId\n");
-	(void) panid;
+	_dev->driver->set(_dev, NETOPT_NID, &panid, sizeof(uint16_t));	
 	return kThreadError_None;
 }
 
@@ -86,6 +96,9 @@ ThreadError otPlatRadioSetExtendedAddress(uint8_t *aExtendedAddress)
 {
 	DEBUG("openthread: otPlatRadioSetExtendedAddress\n");
 	(void) aExtendedAddress;
+#ifndef MODULE_NETDEV2_TAP
+	_dev->driver->set(_dev, NETOPT_ADDRESS_LONG, &aExtendedAddress, IEEE802154_LONG_ADDRESS_LEN);	
+#endif
 	return kThreadError_None;
 }
 
@@ -93,6 +106,9 @@ ThreadError otPlatRadioSetShortAddress(uint16_t aShortAddress)
 {
 	DEBUG("openthread: otPlatRadioSetShortAddress\n");
 	(void) aShortAddress;
+#ifndef MODULE_NETDEV2_TAP
+	_dev->driver->set(_dev, NETOPT_ADDRESS, &aShortAddress, sizeof(uint16_t));	
+#endif
 	return kThreadError_None;
 }
 
@@ -166,11 +182,15 @@ ThreadError otPlatRadioTransmit(void)
 
 	if(!dev_is_ready())
 	{
-		DEBUG("I'm exiting\n");
 		return kThreadError_Busy;
 	}
 
 	struct iovec pkt;
+	ethernet_hdr_t hdr;
+	hdr.type = byteorder_htons(ETHERTYPE_UNKNOWN);
+	_dev->driver->get(_dev, NETOPT_ADDRESS, hdr.src, ETHERNET_ADDR_LEN);
+	_addr_set_broadcast(hdr.dst);
+
 	pkt.iov_base = sTransmitFrame.mPsdu;
 	pkt.iov_len = sTransmitFrame.mLength;
 

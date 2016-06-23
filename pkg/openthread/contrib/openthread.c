@@ -17,21 +17,27 @@
 #define ENABLE_DEBUG (1)
 #include "debug.h"
 
+#include "platform.h"
+#include "platform/alarm.h"
+#include "platform/serial.h"
+
+#define OPENTHREAD_QUEUE_LEN      (8)
+
+#include <cli/cli-serial.h>
+
 #ifdef MODULE_AT86RF2XX     /* is mutual exclusive with above ifdef */
 #define OPENTHREAD_NETIF_NUMOF        (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
 #endif
 
 
 #ifdef MODULE_NETDEV2_TAP
-#define LWIP_NETIF_NUMOF        (1)
+#define OPENTHREAD_NETIF_NUMOF        (1)
 #endif
 
 
 #ifdef MODULE_AT86RF2XX
 static at86rf2xx_t at86rf2xx_dev;
 #endif
-
-
 
 #define OPENTHREAD_NETDEV2_BUFLEN (ETHERNET_MAX_LEN)
 
@@ -41,15 +47,52 @@ extern netdev2_tap_t netdev2_tap;
 
 void otSignalTaskletPending(void)
 {
-	//printf("Tasklet pending\n");
 }
 
 
 static uint8_t _tmp_buf[OPENTHREAD_NETDEV2_BUFLEN];
 static uint8_t transmit_buf[OPENTHREAD_NETDEV2_BUFLEN];
+static msg_t _queue[OPENTHREAD_QUEUE_LEN];
 
 static kernel_pid_t _pid;
 
+void *ot_thread(void *arg)
+{
+    (void) arg;
+    PlatformInit();
+    openthread_init();
+    otInit();
+	otCliSerialInit();
+	msg_init_queue(_queue, OPENTHREAD_QUEUE_LEN);
+	netdev2_t *dev;
+	serial_msg_t *ser;
+	msg_t msg;
+
+	while(1)
+	{
+		otProcessNextTasklet();
+		msg_receive(&msg);
+		switch(msg.type)
+		{
+			case OPENTHREAD_XTIMER_MSG_TYPE_EVENT:
+				DEBUG("openthread: otPlatAlarmFired\n");
+				otPlatAlarmFired();
+				break;
+			case OPENTHREAD_NETDEV2_MSG_TYPE_EVENT:
+				dev = (netdev2_t*) msg.content.ptr;
+				DEBUG("openthread: Called driver isr\n");
+				    dev->driver->isr(dev);
+				break;
+			case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
+				ser = (serial_msg_t*) msg.content.ptr;
+				otPlatSerialReceived((uint8_t*) ser->buf, ser->len);
+				break;
+				
+		}
+	}
+
+    return NULL;
+}
 void _event_cb(netdev2_t *dev, netdev2_event_t event)
 {
     if (event == NETDEV2_EVENT_ISR) {

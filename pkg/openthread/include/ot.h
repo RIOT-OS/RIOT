@@ -24,6 +24,7 @@ void send_pkt(netdev2_t *dev);
 void openthread_init(void);
 void radio_init(uint8_t *tb);
 void set_netdev(netdev2_t *dev);
+void *ot_thread(void *arg);
 #ifdef __cplusplus
 }
 #endif

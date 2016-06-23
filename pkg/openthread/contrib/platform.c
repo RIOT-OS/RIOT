@@ -40,10 +40,3 @@ void PlatformInit(void)
 {
     otPlatSerialEnable();
 }
-
-void PlatformProcessDrivers(void)
-{
-    // should sleep and wait for interrupts here
-
-    PlatformSerialProcess();
-}
