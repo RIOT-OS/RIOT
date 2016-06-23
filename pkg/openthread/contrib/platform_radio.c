@@ -96,9 +96,7 @@ ThreadError otPlatRadioSetExtendedAddress(uint8_t *aExtendedAddress)
 {
 	DEBUG("openthread: otPlatRadioSetExtendedAddress\n");
 	(void) aExtendedAddress;
-#ifndef MODULE_NETDEV2_TAP
 	_dev->driver->set(_dev, NETOPT_ADDRESS_LONG, &aExtendedAddress, IEEE802154_LONG_ADDRESS_LEN);	
-#endif
 	return kThreadError_None;
 }
 
@@ -106,9 +104,7 @@ ThreadError otPlatRadioSetShortAddress(uint16_t aShortAddress)
 {
 	DEBUG("openthread: otPlatRadioSetShortAddress\n");
 	(void) aShortAddress;
-#ifndef MODULE_NETDEV2_TAP
 	_dev->driver->set(_dev, NETOPT_ADDRESS, &aShortAddress, sizeof(uint16_t));	
-#endif
 	return kThreadError_None;
 }
 
