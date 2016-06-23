@@ -15,10 +15,8 @@ static msg_t ot_alarm_msg;
 void otPlatAlarmStartAt(uint32_t aT0, uint32_t aDt)
 {
 	DEBUG("openthread: otPlatAlarmStartAt: aT0: %i, aDT: %i\n", (int) aT0, (int) aDt);
-	//xtimer_remove(&ot_timer);
 	ot_alarm_msg.type = OPENTHREAD_XTIMER_MSG_TYPE_EVENT;
 	int dt = aT0+aDt-xtimer_now();
-	DEBUG("Dt is %i\n", dt);
 	if(dt <= 0)
 		msg_send(&ot_alarm_msg, thread_getpid());
 	else
