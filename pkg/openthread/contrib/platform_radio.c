@@ -182,10 +182,6 @@ ThreadError otPlatRadioTransmit(void)
 	}
 
 	struct iovec pkt;
-	ethernet_hdr_t hdr;
-	hdr.type = byteorder_htons(ETHERTYPE_UNKNOWN);
-	_dev->driver->get(_dev, NETOPT_ADDRESS, hdr.src, ETHERNET_ADDR_LEN);
-	_addr_set_broadcast(hdr.dst);
 
 	pkt.iov_base = sTransmitFrame.mPsdu;
 	pkt.iov_len = sTransmitFrame.mLength;
