@@ -101,10 +101,26 @@ void reset_handler_default(void)
 
 #if MODULE_NEWLIB
     /* initialize std-c library (this must be done after board_init) */
-    extern void __libc_init_array(void);
-    __libc_init_array();
+    // extern void __libc_init_array(void);
+    // __libc_init_array();
+    /* manually call other contructors in __init_array which haven't been called */
+    #include "uart_stdio.h"
+    uart_stdio_init();
+    typedef void (*func_ptr)(void);
+    extern func_ptr __init_array_start[];
+    extern func_ptr __init_array_end[];
+    int size = __init_array_end - __init_array_start;
+    int i, flag = 0;
+    for (i = 0; i < size; i++) {
+        if (__init_array_start[i] == reset_handler_default) {
+            flag = 1;
+            continue;
+        }
+        if (flag == 1){
+            (__init_array_start[i])();
+        }
+    }
 #endif
-
     /* startup the kernel */
     kernel_init();
 }
