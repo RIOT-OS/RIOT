@@ -31,6 +31,12 @@
 #include "panic.h"
 #include "vectors_cortexm.h"
 
+extern void (*__preinit_array_start []) (void) __attribute__((weak));
+extern void (*__preinit_array_end []) (void) __attribute__((weak));
+extern void (*__init_array_start []) (void) __attribute__((weak));
+extern void (*__init_array_end []) (void) __attribute__((weak));
+extern void _init (void);
+
 /**
  * @brief   Memory markers, defined in the linker script
  * @{
@@ -67,6 +73,19 @@ __attribute__((weak)) void post_startup (void)
 {
 }
 
+void __libc_init_array (void)
+{
+  size_t count;
+  size_t i;
+  count = __preinit_array_end - __preinit_array_start;
+  for (i = 0; i < count; i++)
+    __preinit_array_start[i] ();
+  _init ();
+  count = __init_array_end - __init_array_start;
+  for (i = 0; i < count; i++)
+    __init_array_start[i] ();
+}
+
 void reset_handler_default(void)
 {
     uint32_t *dst;
@@ -100,26 +119,7 @@ void reset_handler_default(void)
     board_init();
 
 #if MODULE_NEWLIB
-    /* initialize std-c library (this must be done after board_init) */
-    // extern void __libc_init_array(void);
-    // __libc_init_array();
-    /* manually call other contructors in __init_array which haven't been called */
-    #include "uart_stdio.h"
-    uart_stdio_init();
-    typedef void (*func_ptr)(void);
-    extern func_ptr __init_array_start[];
-    extern func_ptr __init_array_end[];
-    int size = __init_array_end - __init_array_start;
-    int i, flag = 0;
-    for (i = 0; i < size; i++) {
-        if (__init_array_start[i] == reset_handler_default) {
-            flag = 1;
-            continue;
-        }
-        if (flag == 1){
-            (__init_array_start[i])();
-        }
-    }
+	__libc_init_array();
 #endif
     /* startup the kernel */
     kernel_init();

@@ -6,8 +6,9 @@
 #include "xtimer.h"
 #include "msg.h"
 #include "random.h"
+#include "cpuid.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 
@@ -30,7 +31,7 @@ int main(void)
     sm.len = 0;
 	int now = xtimer_now();
 	DEBUG("Waiting for seed. Please press enter\n");
-	while(1)
+	while(0)
 	{
 		if(getchar() == '\r' || getchar() == '\n')
 		{
@@ -43,7 +44,17 @@ int main(void)
     kernel_pid_t pid = thread_create(ot_thread_stack, sizeof(ot_thread_stack),
                             THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
 			                                ot_thread, NULL, "ot_thread");
-	while(1)
+    DEBUG("Starting main's loop\n");
+#ifdef CPUID_LEN
+    char cpu_id[CPUID_LEN];
+    cpuid_get(cpu_id);
+    printf("The cpu id is: %.*s\n",CPUID_LEN,  cpuid);
+#endif
+    (void) msg;
+    (void) p;
+    (void) pid;
+
+/*	while(1)
 	{
         *p = getchar();
         if(*p == '\r' || *p == '\n')
@@ -56,6 +67,6 @@ int main(void)
         {
             p++;
         }
-	}
+	}*/
 	return 0;
 }
