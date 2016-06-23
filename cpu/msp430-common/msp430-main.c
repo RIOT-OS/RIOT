@@ -104,9 +104,11 @@ init_ports(void)
 }
 
 /*---------------------------------------------------------------------------*/
+#if !(MODULE_NEWLIB)
 /* msp430-ld may align _end incorrectly. Workaround in cpu_init. */
 extern int _end;        /* Not in sys/unistd.h */
 static char *cur_break = (char *) &_end;
+#endif
 
 void msp430_cpu_init(void)
 {
@@ -115,15 +117,18 @@ void msp430_cpu_init(void)
     //  lpm_init();
     irq_enable();
 
+#if !(MODULE_NEWLIB)
     if ((uintptr_t)cur_break & 1) { /* Workaround for msp430-ld bug!*/
         cur_break++;
     }
+#endif
 }
 /*---------------------------------------------------------------------------*/
 #define asmv(arg) __asm__ __volatile__(arg)
 
-#define STACK_EXTRA 32
+#if !(MODULE_NEWLIB)
 
+#define STACK_EXTRA 32
 
 /*
  * Allocate memory from the heap. Check that we don't collide with the
@@ -150,6 +155,7 @@ void *sbrk(int incr)
     */
     return old_break;
 }
+#endif
 /*---------------------------------------------------------------------------*/
 /*
  * Mask all interrupts that can be masked.
