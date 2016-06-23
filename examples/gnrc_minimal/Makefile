@@ -9,6 +9,21 @@ RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h
 
+## Uncomment to support the XBee module and nomac
+#USEMODULE += xbee
+#USEMODULE += gnrc_nomac
+
+## set default UART to use in case none was defined
+#XBEE_UART ?= "UART_NUMOF-1"
+
+## export UART to params file
+#CFLAGS += -DXBEE_UART=$(XBEE_UART)
+
+## add current directory to the include path. Putting it in CFLAGS will make
+## it go to the beginning, before the standard includes.
+## That way xbee_params.h get's included and auto configuration can pick it up.
+#CFLAGS += -I$(CURDIR)
+
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
