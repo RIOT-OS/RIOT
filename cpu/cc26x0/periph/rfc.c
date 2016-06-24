@@ -18,7 +18,7 @@
 void isr_rfc_cmd_ack(void)
 {
     /*ROP ack = op submitted, DIR or IMM ack = op executed*/
-    printf("Command acknowledged. CMDSTA: 0x%" PRIu32 " \n", RFC_DBELL->CMDSTA);
+    printf("Command acknowledged. CMDSTA: 0x%" PRIx32 " \n", RFC_DBELL->CMDSTA);
     RFC_DBELL->RFACKIFG = 0;
 }
 
