@@ -29,18 +29,18 @@ extern "C" {
  * @{
  */
 /* BLE radio operation commands */
-#define CMDR_CMDID_BLE_SLAVE      (0x1801)
-#define CMDR_CMDID_BLE_MASTER     (0x1802)
-#define CMDR_CMDID_BLE_ADV        (0x1803)
-#define CMDR_CMDID_BLE_ADV_DIR    (0x1804)
-#define CMDR_CMDID_BLE_ADV_NC     (0x1805)
-#define CMDR_CMDID_BLE_ADV_SCAN   (0x1806)
-#define CMDR_CMDID_BLE_SCANNER    (0x1807)
-#define CMDR_CMDID_BLE_INITIATOR  (0x1808)
-#define CMDR_CMDID_BLE_GENERIC_RX (0x1809)
-#define CMDR_CMDID_BLE_TX_TEST    (0x180A)
+#define CMDR_CMDID_BLE_SLAVE        (0x1801)
+#define CMDR_CMDID_BLE_MASTER       (0x1802)
+#define CMDR_CMDID_BLE_ADV          (0x1803)
+#define CMDR_CMDID_BLE_ADV_DIR      (0x1804)
+#define CMDR_CMDID_BLE_ADV_NC       (0x1805)
+#define CMDR_CMDID_BLE_ADV_SCAN     (0x1806)
+#define CMDR_CMDID_BLE_SCANNER      (0x1807)
+#define CMDR_CMDID_BLE_INITIATOR    (0x1808)
+#define CMDR_CMDID_BLE_GENERIC_RX   (0x1809)
+#define CMDR_CMDID_BLE_TX_TEST      (0x180A)
 /* BLE immediate commands */
-#define CMDR_CMDID_BLE_ADV_PAYLOAD    (0x1001)
+#define CMDR_CMDID_BLE_ADV_PAYLOAD  (0x1001)
 /**@}*/
 
 /**
@@ -48,15 +48,15 @@ extern "C" {
  * @{
  */
 /* operation finished normally */
-#define R_OP_STATUS_BLE_DONE_OK         (0x1400)
-#define R_OP_STATUS_BLE_DONE_RXTIMEOUT  (0x1401)
-#define R_OP_STATUS_BLE_DONE_NOSYNC     (0x1402)
-#define R_OP_STATUS_BLE_DONE_RXERR      (0x1403)
-#define R_OP_STATUS_BLE_DONE_CONNECT    (0x1404)
-#define R_OP_STATUS_BLE_DONE_MAXNACK    (0x1405)
-#define R_OP_STATUS_BLE_DONE_ENDED      (0x1406)
-#define R_OP_STATUS_BLE_DONE_ABORT      (0x1407)
-#define R_OP_STATUS_BLE_DONE_STOPPED    (0x1408)
+#define R_OP_STATUS_BLE_DONE_OK             (0x1400)
+#define R_OP_STATUS_BLE_DONE_RXTIMEOUT      (0x1401)
+#define R_OP_STATUS_BLE_DONE_NOSYNC         (0x1402)
+#define R_OP_STATUS_BLE_DONE_RXERR          (0x1403)
+#define R_OP_STATUS_BLE_DONE_CONNECT        (0x1404)
+#define R_OP_STATUS_BLE_DONE_MAXNACK        (0x1405)
+#define R_OP_STATUS_BLE_DONE_ENDED          (0x1406)
+#define R_OP_STATUS_BLE_DONE_ABORT          (0x1407)
+#define R_OP_STATUS_BLE_DONE_STOPPED        (0x1408)
 /* operation finished with error */
 #define R_OP_STATUS_BLE_ERROR_PAR           (0x1800)
 #define R_OP_STATUS_BLE_ERROR_RXBUF         (0x1801)
