@@ -51,7 +51,7 @@ int main(void)
 
     uint32_t cnt;
     while (1) {
-        for (cnt = 0; cnt < 100000; cnt++) {
+        for (cnt = 0; cnt < 1000000; cnt++) {
             asm volatile("nop\n");
             __asm__ volatile("nop\n");
         }
