@@ -29,20 +29,20 @@ extern "C" {
  * @{
  */
 /* background */
-#define CMDR_CMDID_IEEE_RX              0x2801
-#define CMDR_CMDID_IEEE_ED_SCAN         0x2802
+#define CMDR_CMDID_IEEE_RX              (0x2801)
+#define CMDR_CMDID_IEEE_ED_SCAN         (0x2802)
 /* foreground */
-#define CMDR_CMDID_IEEE_TX              0x2C01
-#define CMDR_CMDID_IEEE_CSMA            0x2C02
-#define CMDR_CMDID_IEEE_RX_ACK          0x2C03
-#define CMDR_CMDID_IEEE_ABORT_BG        0x2C04
+#define CMDR_CMDID_IEEE_TX              (0x2C01)
+#define CMDR_CMDID_IEEE_CSMA            (0x2C02)
+#define CMDR_CMDID_IEEE_RX_ACK          (0x2C03)
+#define CMDR_CMDID_IEEE_ABORT_BG        (0x2C04)
 /* immediate */
-#define CMDR_CMDID_IEEE_MOD_CCA         0x2001
-#define CMDR_CMDID_IEEE_MOD_FILT        0x2002
-#define CMDR_CMDID_IEEE_MOD_SRC_MATCH   0x2003
-#define CMDR_CMDID_IEEE_ABORT_FG        0x2401
-#define CMDR_CMDID_IEEE_STOP_FG         0x2402
-#define CMDR_CMDID_IEEE_CCA_REQ         0x2403
+#define CMDR_CMDID_IEEE_MOD_CCA         (0x2001)
+#define CMDR_CMDID_IEEE_MOD_FILT        (0x2002)
+#define CMDR_CMDID_IEEE_MOD_SRC_MATCH   (0x2003)
+#define CMDR_CMDID_IEEE_ABORT_FG        (0x2401)
+#define CMDR_CMDID_IEEE_STOP_FG         (0x2402)
+#define CMDR_CMDID_IEEE_CCA_REQ         (0x2403)
 /**@}*/
 
 #ifdef __cplusplus
