@@ -75,14 +75,14 @@ typedef struct {
 #define CMDR_TYPE_MASK            (0x3)
 #define CMDR_TYPE_ROP_IMM         (0x0)
 /* pointer is 32-bit word aligned and the 2 LSB are not stored (implicit 0) */
-#define CMDR_CMDPTR_POS           (2) /* used for immediate and radio commands */
+#define CMDR_CMDPTR_POS           (0x2) /* used for immediate and radio commands */
 #define CMDR_CMDPTR_MASK          (0xFFFFFFFC)
 #define CMDR_TYPE_DIRECT          (0x1)
-#define CMDR_OPTPAREXT_POS        (2) /* used for direct commands */
+#define CMDR_OPTPAREXT_POS        (0x2) /* used for direct commands */
 #define CMDR_OPTPAREXT_MASK       (0xFC)
-#define CMDR_OPTPAR_POS           (8)
+#define CMDR_OPTPAR_POS           (0x8)
 #define CMDR_OPTPAR_MASK          (0xFF00)
-#define CMDR_CMDID_POS            (16)
+#define CMDR_CMDID_POS            (0x10)
 #define CMDR_CMDID_MASK           (0xFFFF0000)
 /**
  * @addtogroup cc2x0_rop_command_ids
@@ -131,7 +131,7 @@ typedef struct {
 /**@}*/
 
 #define CMDSTA_RESULT_MASK    (0xFF)
-#define CMDSTA_RET_VAL_POS    (8) /* MSB first */
+#define CMDSTA_RET_VAL_POS    (0x8) /* MSB first */
 #define CMDSTA_RET_VAL_MASK   (0xFFFFFF00)
 
 #define CMDSTA_RESULT_PENDING         (0x00)
@@ -251,14 +251,14 @@ typedef struct {
 #define RFCPEIEN_BOOT_DONE            (0x40000000)
 #define RFCPEIEN_INTERNAL_ERROR       (0x80000000)
 
-#define SYSGPOCTL_GPOCTL0_POS         (0)
-#define SYSGPOCTL_GPOCTL0_LEN         (4)
-#define SYSGPOCTL_GPOCTL1_POS         (4)
-#define SYSGPOCTL_GPOCTL1_LEN         (4)
-#define SYSGPOCTL_GPOCTL2_POS         (8)
-#define SYSGPOCTL_GPOCTL2_LEN         (4)
-#define SYSGPOCTL_GPOCTL3_POS         (12)
-#define SYSGPOCTL_GPOCTL3_LEN         (4)
+#define SYSGPOCTL_GPOCTL0_POS         (0x0)
+#define SYSGPOCTL_GPOCTL0_LEN         (0x4)
+#define SYSGPOCTL_GPOCTL1_POS         (0x4)
+#define SYSGPOCTL_GPOCTL1_LEN         (0x4)
+#define SYSGPOCTL_GPOCTL2_POS         (0x8)
+#define SYSGPOCTL_GPOCTL2_LEN         (0x4)
+#define SYSGPOCTL_GPOCTL3_POS         (0xC)
+#define SYSGPOCTL_GPOCTL3_LEN         (0x4)
 
 #define SYSGPOCTL_GPOCTL_CPE0         (0x0)
 #define SYSGPOCTL_GPOCTL_CPE1         (0x1)
@@ -381,7 +381,7 @@ struct __attribute__ ((packed)) radio_op_command_s {
 #define R_OP_STARTTRIG_TYPE_EXTERNAL        (0xA)
 #define R_OP_STARTTRIG_ALT_TRIG             (0x10)
 #define R_OP_STARTTRIG_TRIG_NO_MASK         (0x60)
-#define R_OP_STARTTRIG_TRIG_NO_POS          (5)
+#define R_OP_STARTTRIG_TRIG_NO_POS          (0x5)
 #define R_OP_STARTTRIG_PAST_TRIG            (0x80)
 
 /* for R_OP_STARTTRIG_TYPE_EXTERNAL startTime describes the trigger this way: */
@@ -398,7 +398,7 @@ struct __attribute__ ((packed)) radio_op_command_s {
 #define R_OP_CONDITION_RULE_STOP_ON_TRUE    (0x03)
 #define R_OP_CONDITION_RULE_SKIP_ON_FALSE   (0x04)
 #define R_OP_CONDITION_RULE_SKIP_ON_TRUE    (0x05)
-#define R_OP_CONDITION_NSKIP_POS            (4)
+#define R_OP_CONDITION_NSKIP_POS            (0x4)
 #define R_OP_CONDITION_NSKIP_MASK           (0xF0)
 /**@}*/
 
@@ -481,16 +481,16 @@ typedef struct {
 } data_queue_t;
 
 
-#define DATA_ENTRY_STATUS_PENDING       (0)
-#define DATA_ENTRY_STATUS_ACTIVE        (1)
-#define DATA_ENTRY_STATUS_BUSY          (2)
-#define DATA_ENTRY_STATUS_FINISHED      (3)
+#define DATA_ENTRY_STATUS_PENDING       (0x0)
+#define DATA_ENTRY_STATUS_ACTIVE        (0x1)
+#define DATA_ENTRY_STATUS_BUSY          (0x2)
+#define DATA_ENTRY_STATUS_FINISHED      (0x3)
 
 #define DATA_ENTRY_CONFIG_TYPE_MASK     (0x3)
 #define DATA_ENTRY_CONFIG_TYPE_GENERAL  (0x0)
 #define DATA_ENTRY_CONFIG_TYPE_MULTIRX  (0x1)
 #define DATA_ENTRY_CONFIG_TYPE_PTR      (0x2)
-#define DATA_ENTRY_CONFIG_LENSZ_POS     (4)
+#define DATA_ENTRY_CONFIG_LENSZ_POS     (0x4)
 #define DATA_ENTRY_CONFIG_LENSZ_MASK    (0xC)
 #define DATA_ENTRY_CONFIG_LENSZ_NOLEN   (0x0)
 #define DATA_ENTRY_CONFIG_LENSZ_1BYTE   (0x1)
