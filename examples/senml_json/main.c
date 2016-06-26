@@ -88,12 +88,9 @@ int main(void)
     pack.records   = records;
     pack.num       = 5;
 
-    // the base info does not have to be in a separate record, i.e. the curly braces between
-    // "bv":999.888 and "n":"voltage" could be removed
-
     char input[] = "[{\"bn\":\"urn:dev:ow:10e2073a01080063\",\"bt\":1276020076.001,\"bu\":\"A\","
-                   "\"bver\":5, \"bv\":999.888},"
-                   "{\"n\":\"voltage\",\"u\":\"V\",\"v\":120.1,\"ut\":12},"
+                   "\"bver\":5, \"bv\":999.888,"
+                   "\"n\":\"voltage\",\"u\":\"V\",\"v\":120.1,\"ut\":12},"
                    "{\"ut\":8,\"n\":\"current\",\"u\":\"Cel\",\"t\":-5,\"v\":1.2},"
                    "{\"vb\":true, \"n\":\"fitzgerald\",\"ut\":24},"
                    "{\"n\":\"john\",\"s\":9217864},"
