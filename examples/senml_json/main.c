@@ -42,7 +42,7 @@ static void senml_print_record(const senml_record_t *record)
     printf("Name:\t\t%s\n", record->name ? record->name : "NULL");
     printf("Unit:\t\t%s\n", record->unit ? record->unit : "NULL");
     printf("Time:\t\t%f\n", record->time);
-    printf("Update Time:\t%u\n", record->update_time);
+    printf("Update Time:\t%f\n", record->update_time);
 
     if (record->value_type == SENML_TYPE_FLOAT) {
         printf("Float Value:\t%f\n", record->value.f);

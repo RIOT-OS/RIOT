@@ -123,7 +123,7 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
                 (pack->records)[array_num].time = atof(tmp_val);
             }
             else if (!strcmp(tmp_key, SJ_UPDATE_TIME)) {
-                (pack->records)[array_num].update_time = (unsigned int)atoi(tmp_val);
+                (pack->records)[array_num].update_time = atof(tmp_val);
             }
         }
     }
@@ -259,7 +259,7 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
         }
 
         if (curr_record->update_time != 0) {
-            chars_written = snprintf(&output[insert_pos], len - 2, "\"ut\":%u,",
+            chars_written = snprintf(&output[insert_pos], len - 2, "\"ut\":%f,",
                                      curr_record->update_time);
 
             insert_pos += chars_written;

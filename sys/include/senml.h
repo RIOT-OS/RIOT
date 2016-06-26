@@ -106,7 +106,7 @@ typedef struct {
     char              *name;        //!< Sensor's name, will be appended to base name if provided
     char              *unit;        //!< Unit of the measurement
     double             time;        //!< Time (seconds since unix epoch) of the measurement
-    unsigned int       update_time; //!< Time before sensor provides an updated measurement
+    double             update_time; //!< Time before sensor provides an updated measurement
     double             value_sum;   //!< Integrated sum of the values over time
     senml_value_type_t value_type;  //!< Indicates which type the value is of
     union {
