@@ -57,8 +57,14 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
         }
 
         if (t->type == JSMN_OBJECT) {
-            array_num++;
             last_type = JSMN_OBJECT;
+            array_num++;
+
+            if (array_num >= pack->num) {
+                DEBUG("ERROR: number of records exceeds pack->num\n");
+                return -1;
+            }
+
             continue;
         }
 
