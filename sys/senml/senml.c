@@ -60,7 +60,8 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
             last_type = JSMN_OBJECT;
             array_num++;
 
-            if (array_num >= pack->num) {
+            // the cast to unsigned int is ok because array_num will be >= 0 at this point
+            if ((unsigned int)array_num >= pack->num) {
                 DEBUG("ERROR: number of records exceeds pack->num\n");
                 return -1;
             }
