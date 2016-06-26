@@ -29,7 +29,7 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
 
     jsmn_init(&parser);
 
-    jsmn_parse(&parser, input, strlen(input), tokens, num_toks);
+    num_toks = jsmn_parse(&parser, input, strlen(input), tokens, num_toks);
 
     if (num_toks == JSMN_ERROR_INVAL || num_toks == JSMN_ERROR_PART) {
         DEBUG("ERROR: unable to parse JSON string #2\n");
