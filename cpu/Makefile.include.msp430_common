@@ -13,9 +13,6 @@ export ASFLAGS += $(CFLAGS_CPU) --defsym $(CPU_MODEL)=1 $(CFLAGS_DBG)
 # export linker flags
 export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc
 
-export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/msp430-common/ldscripts
-export LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL).ld -Wl,--fatal-warnings
-
 # Import all toolchain settings
 include $(RIOTCPU)/Makefile.include.$(TOOLCHAIN)
 
@@ -46,9 +43,8 @@ ifeq (1,$(MSP430_USE_NEWLIB))
 # use newlib as libc
 export USEMODULE += newlib
 
-# Some compatibility definitions for using the TI provided ldscripts with RIOT's
-# newlib syscalls.c
-CFLAGS_MEMMAP = -D_sheap=end -D_eheap=__stack -D_end=end
+export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/msp430-common/ldscripts
+export LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL).ld -Wl,--fatal-warnings
 
 # use the nano-specs of Newlib when available
 ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
