@@ -35,6 +35,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "async_read.h"
+
 #include "kernel_init.h"
 #include "cpu.h"
 #include "irq.h"
@@ -533,7 +535,10 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     native_cpu_init();
     native_interrupt_init();
 #ifdef MODULE_NETDEV_TAP
-    for (int i = 0; i < NETDEV_TAP_MAX; i++) {
+    /* configure signal handler for fds */
+    native_async_read_setup();
+
+for (int i = 0; i < NETDEV_TAP_MAX; i++) {
         netdev_tap_params[i].tap_name = &argv[optind + i];
     }
 #endif

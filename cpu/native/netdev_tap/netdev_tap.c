@@ -362,7 +362,6 @@ static int _init(netdev_t *netdev)
             dev->addr[3], dev->addr[4], dev->addr[5]);
 
     /* configure signal handler for fds */
-    native_async_read_setup();
     native_async_read_add_handler(dev->tap_fd, netdev, _tap_isr);
 
 #ifdef MODULE_NETSTATS_L2
