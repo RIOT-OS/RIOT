@@ -51,8 +51,8 @@
   * @{
   */
 
-#ifndef __STM32L1XX_H
-#define __STM32L1XX_H
+#ifndef STM32L1XX_H
+#define STM32L1XX_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -6661,7 +6661,7 @@ typedef struct
 }
 #endif
 
-#endif /* __STM32L1XX_H */
+#endif /* STM32L1XX_H */
 
 /**
   * @}
