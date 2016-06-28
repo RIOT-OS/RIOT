@@ -26,7 +26,7 @@
 #include "rfc5444/rfc5444_print.h"
 #include "kernel_types.h"
 
-#include "aodvv2/types.h"
+#include "net/gnrc/aodvv2/types.h"
 
 #ifdef __cplusplus
 extern "C" {

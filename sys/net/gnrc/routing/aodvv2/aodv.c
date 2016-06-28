@@ -19,9 +19,9 @@
  */
 
 #include "aodv.h"
-#include "aodvv2/aodvv2.h"
 #include "aodv_debug.h"
 #include "net/fib.h"
+#include "net/gnrc/aodvv2.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -141,12 +141,7 @@ void *fib_signal_handler_thread(void *arg)
     ipv6_addr_t dest;
     struct netaddr na_dest;
 
-    if (msg_init_queue(fib_msgq, FIB_MSG_Q_SIZE) !=0)
-    {
-        DEBUG("ERROR: Couldn't init message queue for fib_signal_handler_thread\n");
-        exit(1);
-    }
-
+    msg_init_queue(fib_msgq, FIB_MSG_Q_SIZE);
     int err = fib_register_rp(&gnrc_ipv6_fib_table, &aodvv2_prefix.u8[0], aodvv2_address_type_size);
     if ( err != 0) {
         DEBUG("ERROR: cannot register at fib, error code:\n");
@@ -438,15 +433,14 @@ static void _aodv_send(ipv6_addr_t addr, uint16_t port, void *data, size_t data_
         return;
     }
     /* allocate UDP header, set payload, set source port := destination port */
-    pkt_with_udp = gnrc_udp_hdr_build(payload, (uint8_t*)&port, 2, (uint8_t*)&port, 2);
+    pkt_with_udp = gnrc_udp_hdr_build(payload, port, port);
     if (pkt_with_udp == NULL) {
         DEBUG("Error: unable to allocate UDP header\n");
         gnrc_pktbuf_release(payload);
         return;
     }
     /* allocate IPv6 header, set pkt_with_udp as payload */
-    pkt_with_ip = gnrc_ipv6_hdr_build(pkt_with_udp, (uint8_t*)&_v6_addr_local, aodvv2_address_type_size,
-                                    (uint8_t *)&addr, sizeof(addr));
+    pkt_with_ip = gnrc_ipv6_hdr_build(pkt_with_udp, &_v6_addr_local, &addr);
     if (pkt_with_ip == NULL) {
         DEBUG("Error: unable to allocate IPv6 header\n");
         gnrc_pktbuf_release(pkt_with_udp);

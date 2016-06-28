@@ -20,7 +20,8 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
+#include "timex.h"
 
 #include "routingtable.h"
 #include "aodv_debug.h"
@@ -140,7 +141,7 @@ void routingtable_break_and_get_all_hopping_over(struct netaddr *hop,
  */
 static void _reset_entry_if_stale(uint8_t i)
 {
-    vtimer_now(&now);
+    xtimer_now_timex(&now);
     timex_t lastUsed, expirationTime;
 
     if (timex_cmp(routing_table[i].expirationTime, null_time) == 0) {

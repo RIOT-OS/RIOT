@@ -18,6 +18,7 @@
  */
 
 #include "utils.h"
+#include "timex.h"
 
 #include "aodv_debug.h"
 
@@ -157,7 +158,7 @@ bool rreqtable_is_redundant(struct aodvv2_packet_data *packet_data)
         }
 
         /* Since we've changed RREQ info, update the timestamp */
-        vtimer_now(&now);
+        xtimer_now_timex(&now);
         comparable_rreq->timestamp = now;
     }
 
@@ -214,7 +215,7 @@ static void _add_rreq(struct aodvv2_packet_data *packet_data)
  */
 static void _reset_entry_if_stale(uint8_t i)
 {
-    vtimer_now(&now);
+    xtimer_now_timex(&now);
 
     if (timex_cmp(rreq_table[i].timestamp, null_time) == 0) {
         return;

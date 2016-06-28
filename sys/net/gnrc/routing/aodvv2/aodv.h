@@ -23,11 +23,11 @@
 #include "net/gnrc/udp.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc.h"
+#include "net/gnrc/aodvv2/types.h"
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/pkt.h"
 #include "net/eui64.h"
 
-#include "aodvv2/types.h"
 #include "constants.h"
 #include "seqnum.h"
 #include "routingtable.h"

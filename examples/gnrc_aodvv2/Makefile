@@ -1,11 +1,12 @@
 # name of your application
-APPLICATION = gnrc_networking
+APPLICATION = gnrc_aodvv2
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
+CFLAGS += -DTEST_SETUP #-DDEVELHELP
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos msb-430 msb-430h nrf51dongle \
                           nrf6310 nucleo-f103 nucleo-f334 pca10000 pca10005 spark-core \
@@ -32,10 +33,6 @@ USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
-
-# Set a custom 802.15.4 channel if needed
-DEFAULT_CHANNEL ?= 26
-CFLAGS += -DDEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

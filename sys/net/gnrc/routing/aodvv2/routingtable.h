@@ -24,7 +24,7 @@
 
 #include "common/netaddr.h"
 
-#include "aodvv2/types.h"
+#include "net/gnrc/aodvv2/types.h"
 #include "constants.h"
 #include "seqnum.h"
 

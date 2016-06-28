@@ -283,10 +283,11 @@ endif
 ifneq (,$(filter aodvv2,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_router_default
   USEMODULE += gnrc_conn_udp
-  USEMODULE += vtimer
+  USEMODULE += xtimer
   USEMODULE += oonf_common
   USEMODULE += oonf_rfc5444
   USEMODULE += fib
+  USEMODULE += timex
 endif
 
 ifneq (,$(filter sixlowpan,$(USEMODULE)))

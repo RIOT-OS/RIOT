@@ -20,7 +20,7 @@
 #ifndef AODVV2_CONSTANTS_H_
 #define AODVV2_CONSTANTS_H_
 
-#include "aodvv2/types.h"
+#include "net/gnrc/aodvv2/types.h"
 
 #include "common/netaddr.h"
 

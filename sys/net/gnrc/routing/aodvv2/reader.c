@@ -299,7 +299,7 @@ static enum rfc5444_result _cb_rreq_end_callback(
      * one more hop. */
     packet_data.origNode.metric = _get_route_cost(packet_data.metricType,
                                                   packet_data.origNode.metric);
-    vtimer_now(&now);
+    xtimer_now_timex(&now);
     packet_data.timestamp = now;
 
     /* for every relevant
@@ -514,7 +514,7 @@ static enum rfc5444_result _cb_rrep_end_callback(
      * one more hop. */
     packet_data.targNode.metric = _get_route_cost(packet_data.metricType,
                                                   packet_data.targNode.metric);
-    vtimer_now(&now);
+    xtimer_now_timex(&now);
     packet_data.timestamp = now;
 
     /* for every relevant address (RteMsg.Addr) in the RteMsg, HandlingRtr
