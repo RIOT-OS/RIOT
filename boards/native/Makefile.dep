@@ -19,3 +19,9 @@ ifneq (,$(filter socket_zep,$(USEMODULE)))
   USEMODULE += checksum
   USEMODULE += random
 endif
+
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+  USEMODULE += iolist
+  USEMODULE += periph_hwrng
+  USEMODULE += netdev_raw802154
+endif

@@ -117,6 +117,12 @@ ifneq (,$(filter gnrc_netapi_mbox,$(USEMODULE)))
   USEMODULE += core_mbox
 endif
 
+ifneq (,$(filter netdev_raw802154,$(USEMODULE)))
+  USEMODULE += netif
+  USEMODULE += ieee802154
+  USEMODULE += netdev_ieee802154
+endif
+
 ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += netdev_eth
