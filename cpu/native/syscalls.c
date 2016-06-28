@@ -88,6 +88,7 @@ int (*real_setitimer)(int which, const struct itimerval
 int (*real_setsid)(void);
 int (*real_setsockopt)(int socket, ...);
 int (*real_socket)(int domain, int type, int protocol);
+int (*real_shutdown)(int sockfd, int how);
 int (*real_unlink)(const char *);
 long int (*real_random)(void);
 const char* (*real_gai_strerror)(int errcode);
@@ -470,6 +471,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_setsid) = dlsym(RTLD_NEXT, "setsid");
     *(void **)(&real_setsockopt) = dlsym(RTLD_NEXT, "setsockopt");
     *(void **)(&real_socket) = dlsym(RTLD_NEXT, "socket");
+    *(void **)(&real_shutdown) = dlsym(RTLD_NEXT, "shutdown");
     *(void **)(&real_unlink) = dlsym(RTLD_NEXT, "unlink");
     *(void **)(&real_random) = dlsym(RTLD_NEXT, "random");
     *(void **)(&real_execve) = dlsym(RTLD_NEXT, "execve");

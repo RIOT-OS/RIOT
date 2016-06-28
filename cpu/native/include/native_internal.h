@@ -122,6 +122,7 @@ extern int (*real_setitimer)(int which, const struct itimerval
 extern int (*real_setsid)(void);
 extern int (*real_setsockopt)(int socket, ...);
 extern int (*real_socket)(int domain, int type, int protocol);
+extern int (*real_shutdown)(int sockfd, int how);
 extern int (*real_printf)(const char *format, ...);
 extern int (*real_unlink)(const char *);
 extern long int (*real_random)(void);
