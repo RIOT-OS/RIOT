@@ -177,33 +177,6 @@ static inline bool _is_addr_multicast(uint8_t *addr)
     return (addr[0] & 0x01);
 }
 
-static void _continue_reading(netdev_tap_t *dev)
-{
-    /* work around lost signals */
-    fd_set rfds;
-    struct timeval t;
-    memset(&t, 0, sizeof(t));
-    FD_ZERO(&rfds);
-    FD_SET(dev->tap_fd, &rfds);
-
-    _native_in_syscall++; /* no switching here */
-
-    if (real_select(dev->tap_fd + 1, &rfds, NULL, NULL, &t) == 1) {
-        int sig = SIGIO;
-        extern int _sig_pipefd[2];
-        extern ssize_t (*real_write)(int fd, const void * buf, size_t count);
-        real_write(_sig_pipefd[1], &sig, sizeof(int));
-        _native_sigpend++;
-        DEBUG("netdev_tap: sigpend++\n");
-    }
-    else {
-        DEBUG("netdev_tap: native_async_read_continue\n");
-        native_async_read_continue(dev->tap_fd);
-    }
-
-    _native_in_syscall--;
-}
-
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     netdev_tap_t *dev = (netdev_tap_t*)netdev;
@@ -226,7 +199,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
             real_read(dev->tap_fd, buf, sizeof(buf));
 
-            _continue_reading(dev);
+            native_async_continue_reading(dev->tap_fd);
         }
 
         /* no way of figuring out packet size without racey buffering,
@@ -252,7 +225,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             return 0;
         }
 
-        _continue_reading(dev);
+        native_async_continue_reading(dev->tap_fd);
 
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.rx_count++;

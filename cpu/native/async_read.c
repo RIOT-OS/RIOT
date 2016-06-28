@@ -20,11 +20,15 @@
 #include <err.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
 
 #include "async_read.h"
 #include "native_internal.h"
+
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
 static int _next_index;
 static int _fds[ASYNC_READ_NUMOF];
@@ -88,6 +92,31 @@ void native_async_read_continue(int fd) {
 #endif
 }
 
+void native_async_continue_reading(int fd)
+{
+    /* work around lost signals */
+    fd_set rfds;
+    struct timeval t;
+    memset(&t, 0, sizeof(t));
+    FD_ZERO(&rfds);
+    FD_SET(fd, &rfds);
+
+    _native_in_syscall++; /* no switching here */
+
+    if (real_select(fd + 1, &rfds, NULL, NULL, &t) == 1) {
+        int sig = SIGIO;
+        extern int _sig_pipefd[2];
+        extern ssize_t (*real_write)(int fd, const void * buf, size_t count);
+        real_write(_sig_pipefd[1], &sig, sizeof(int));
+        _native_sigpend++;
+    }
+    else {
+        native_async_read_continue(fd);
+    }
+
+    _native_in_syscall--;
+}
+
 void native_async_read_add_handler(int fd, void *arg, native_async_read_callback_t handler) {
     if (_next_index >= ASYNC_READ_NUMOF) {
         err(EXIT_FAILURE, "native_async_read_add_handler(): too many callbacks");
@@ -121,6 +150,7 @@ static void _sigio_child(int index)
     int fd = _fds[index];
     pid_t parent = _native_pid;
     pid_t child;
+
     if ((child = real_fork()) == -1) {
         err(EXIT_FAILURE, "sigio_child: fork");
     }
