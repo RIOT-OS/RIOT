@@ -69,7 +69,7 @@ void *second_thread(void *arg)
              NULL,
              "nr4")
         ) == -1) {
-        puts("2nd: Error creating 4rd thread.");
+        puts("2nd: Error creating 4th thread.");
     }
 
     puts("2nd: exiting");
@@ -89,7 +89,7 @@ int main(void)
              NULL,
              "nr2")
         ) == -1) {
-        puts("main: Error creating 3rd thread.");
+        puts("main: Error creating 2nd thread.");
     }
 
     puts("main: exiting");
