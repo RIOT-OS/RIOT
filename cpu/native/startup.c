@@ -30,6 +30,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifdef __MACH__
+#include "net/if_var.h"
+#else
+#include "net/if.h"
+#endif
+
 #include "async_read.h"
 
 #include "kernel_init.h"
@@ -53,6 +59,12 @@ const char *_native_unix_socket_path = NULL;
 #include "netdev2_tap.h"
 extern netdev2_tap_t netdev2_tap;
 char *tap_dev = NULL;
+#endif
+
+#ifdef MODULE_NETDEV2_RAW802154
+#include "netdev2_raw802154.h"
+extern netdev2_raw802154_t netdev2_raw802154;
+char *raw802154_ifname = NULL;
 #endif
 
 /**
@@ -200,7 +212,7 @@ void usage_exit(void)
 {
     real_printf("usage: %s", _progname);
 
-    real_printf(" [-i <id>] [-d] [-e|-E] [-o] [-c <tty device>] [-t <tap device>]\n");
+    real_printf(" [-i <id>] [-d] [-e|-E] [-o] [-c <tty device>] [-t <tap device>] [-r <wpan interface> [-ra]]\n");
 
     real_printf(" help: %s -h\n", _progname);
 
@@ -221,6 +233,11 @@ void usage_exit(void)
 #ifdef MODULE_NETDEV2_TAP
 "\
 -t <tap>    specify path to tap device\n"
+#endif
+#ifdef MODULE_NETDEV2_RAW802154
+"\
+-r <ifname> specify 802.15.4 interface\n\
+-ra         generate a random extended address instead default one"
 #endif
     );
 
@@ -246,6 +263,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     char *stdouttype = "stdio";
     char *stdiotype = "stdio";
     int uart = 0;
+#ifdef MODULE_NETDEV2_RAW802154
+    int raw802154_rand_addr = 0;
+#endif
 
     for (; argp < argc; argp++) {
         char *arg = argv[argp];
@@ -312,6 +332,20 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
             tap_dev = argv[argp];
         }
 #endif
+#ifdef MODULE_NETDEV2_RAW802154
+        else if (strcmp("-r", arg) == 0) {
+            if (argp + 1 < argc) {
+                argp++;
+            }
+            else {
+                usage_exit();
+            }
+            raw802154_ifname = argv[argp];
+        }
+        else if (strcmp("-ra", arg) == 0) {
+            raw802154_rand_addr = 1;
+        }
+#endif
         else {
             usage_exit();
         }
@@ -327,14 +361,22 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 
     native_cpu_init();
     native_interrupt_init();
-#ifdef MODULE_NETDEV2_TAP
+#if defined(MODULE_NETDEV2_TAP) || defined(MODULE_NETDEV2_RAW802154)
     /* configure signal handler for fds */
     native_async_read_setup();
-
+#endif
+#ifdef MODULE_NETDEV2_TAP
     if (tap_dev) {
         netdev2_tap_params_t p;
         p.tap_name = &(argv[1]);
         netdev2_tap_setup(&netdev2_tap, &p);
+    }
+#endif
+#ifdef MODULE_NETDEV2_RAW802154
+    if (raw802154_ifname) {
+        char ifname[IFNAMSIZ + 1];
+        strncpy(ifname, raw802154_ifname, IFNAMSIZ);
+        netdev2_raw802154_setup(&netdev2_raw802154, ifname, raw802154_rand_addr);
     }
 #endif
 
