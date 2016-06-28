@@ -50,6 +50,7 @@ const char *_native_unix_socket_path = NULL;
 #ifdef MODULE_NETDEV2_TAP
 #include "netdev2_tap.h"
 extern netdev2_tap_t netdev2_tap;
+char *tap_dev = NULL;
 #endif
 
 /**
@@ -197,11 +198,7 @@ void usage_exit(void)
 {
     real_printf("usage: %s", _progname);
 
-#if defined(MODULE_NETDEV2_TAP)
-    real_printf(" <tap interface>");
-#endif
-
-    real_printf(" [-i <id>] [-d] [-e|-E] [-o] [-c <tty device>]\n");
+    real_printf(" [-i <id>] [-d] [-e|-E] [-o] [-c <tty device>] [-t <tap device>]\n");
 
     real_printf(" help: %s -h\n", _progname);
 
@@ -218,7 +215,12 @@ void usage_exit(void)
             daemon/socket io)\n\
 -o          redirect stdout to file (/tmp/riot.stdout.PID) when not attached\n\
             to socket\n\
--c          specify TTY device for UART\n");
+-c          specify TTY device for UART\n"
+#ifdef MODULE_NETDEV2_TAP
+"\
+-t <tap>    specify path to tap device\n"
+#endif
+    );
 
     real_printf("\n\
 The order of command line arguments matters.\n");
@@ -242,19 +244,6 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     char *stdouttype = "stdio";
     char *stdiotype = "stdio";
     int uart = 0;
-
-#if defined(MODULE_NETDEV2_TAP)
-    if (
-            (argc < 2)
-            || (
-                (strcmp("-h", argv[argp]) == 0)
-                || (strcmp("--help", argv[argp]) == 0)
-               )
-       ) {
-        usage_exit();
-    }
-    argp++;
-#endif
 
     for (; argp < argc; argp++) {
         char *arg = argv[argp];
@@ -310,6 +299,17 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 
             tty_uart_setup(uart++, argv[argp]);
         }
+#ifdef MODULE_NETDEV2_TAP
+        else if (strcmp("-t", arg) == 0) {
+            if (argp + 1 < argc) {
+                argp++;
+            }
+            else {
+                usage_exit();
+            }
+            tap_dev = argv[argp];
+        }
+#endif
         else {
             usage_exit();
         }
@@ -326,9 +326,11 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     native_cpu_init();
     native_interrupt_init();
 #ifdef MODULE_NETDEV2_TAP
-    netdev2_tap_params_t p;
-    p.tap_name = &(argv[1]);
-    netdev2_tap_setup(&netdev2_tap, &p);
+    if (tap_dev) {
+        netdev2_tap_params_t p;
+        p.tap_name = &(argv[1]);
+        netdev2_tap_setup(&netdev2_tap, &p);
+    }
 #endif
 
     board_init();
