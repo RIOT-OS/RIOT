@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef HW_I2C_H_
-#define HW_I2C_H_
+#ifndef STELLARIS_HW_I2C_H_
+#define STELLARIS_HW_I2C_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -494,4 +494,4 @@ extern "C" {
 }
 #endif
 
-#endif /* HW_I2C_H_ */
+#endif /* STELLARIS_HW_I2C_H_ */
