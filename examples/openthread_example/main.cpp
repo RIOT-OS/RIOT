@@ -6,7 +6,6 @@
 #include "xtimer.h"
 #include "msg.h"
 #include "random.h"
-#include "cpuid.h"
 
 #define ENABLE_DEBUG (1)
 #include "debug.h"
@@ -46,11 +45,6 @@ int main(void)
                            THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
 			                                ot_thread, NULL, "ot_thread");
     DEBUG("Starting main's loop\n");
-#ifdef CPUID_LEN
-    char cpu_id[CPUID_LEN];
-    cpuid_get(cpu_id);
-    printf("The cpu id is: %.*s\n",CPUID_LEN,  cpuid);
-#endif
     (void) msg;
     (void) p;
     (void) pid;
