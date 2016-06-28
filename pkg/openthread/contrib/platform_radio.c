@@ -30,21 +30,25 @@ static inline void _addr_set_broadcast(uint8_t *dst)
 
 void recv_pkt(netdev2_t *dev, uint8_t *buf)
 {
+	/* Read data from driver */
 	int len = dev->driver->recv(dev, (char*) buf, sizeof(buf), NULL);
-
-	printf("Len is %i\n", len);
 	assert(((unsigned)len) <= UINT16_MAX);
+
+	/* Fill OT receive frame */
 	sReceiveFrame.mPsdu = buf;
 	sReceiveFrame.mLength = len;
 
+	/* Tell OpenThread that receive has finished */
 	otPlatRadioReceiveDone(&sReceiveFrame, kThreadError_None);
 }
 
 void send_pkt(netdev2_t *dev)
 {
+	/* Check if IEEE802.15 ACK is enabled */
 	netopt_enable_t en;
 	_dev->driver->get(dev, NETOPT_ACK_REQ, &en, sizeof(netopt_enable_t));
 	
+	/*Tell OpenThread that transmission has finished. In case ACK_REQ is activated, first argument must be true.*/
 	otPlatRadioTransmitDone(en == NETOPT_ENABLE ? true : false, kThreadError_None);
 }
 
@@ -52,8 +56,10 @@ int get_state(void)
 {
 	netopt_state_t en;
 	int res =_dev->driver->get(_dev, NETOPT_STATE, &en, sizeof(netopt_state_t));
+
 	if(res == -ENOTSUP)
 		return -1;
+
 	return en;
 }
 

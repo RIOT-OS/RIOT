@@ -46,11 +46,12 @@ static kernel_pid_t _pid;
 
 void *ot_thread(void *arg)
 {
-    (void) arg;
+	(void) arg;
     PlatformInit();
     openthread_init();
     otInit();
 	otCliSerialInit();
+
 	msg_init_queue(_queue, OPENTHREAD_QUEUE_LEN);
 	netdev2_t *dev;
 	serial_msg_t *ser;
@@ -123,10 +124,10 @@ void openthread_init(void)
 #ifdef MODULE_AT86RF2XX
         at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0]);
 		netdev2_t *netdev = (netdev2_t*) &at86rf2xx_dev;
-#endif
 		netdev->driver->init(netdev);
 		netdev->event_callback = _event_cb;
 		radio_init(transmit_buf);
 		set_netdev(netdev);
+#endif
 }
 
