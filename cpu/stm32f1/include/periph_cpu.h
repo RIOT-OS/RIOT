@@ -51,6 +51,7 @@ extern "C" {
  */
 #define GPIO_MODE(mode, cnf, odr)       (mode | (cnf << 2) | (odr << 4))
 
+#ifndef DOXYGEN
 /**
  * @brief   Override GPIO mode options
  *
@@ -67,6 +68,7 @@ typedef enum {
     GPIO_OD_PU = (0xff)                 /**< not supported by HW */
 } gpio_mode_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Override values for pull register configuration
@@ -80,6 +82,7 @@ typedef enum {
 } gpio_pp_t;
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override flank configuration values
  * @{
@@ -91,6 +94,7 @@ typedef enum {
     GPIO_BOTH = 3           /**< emit interrupt on both flanks */
 } gpio_flank_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Available ports on the STM32F1 family

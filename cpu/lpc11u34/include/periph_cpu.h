@@ -47,6 +47,7 @@ extern "C" {
  */
 #define ADC_NUMOF           (10U)
 
+#ifndef DOXYGEN
 /**
  * @brief   Override the ADC resolution settings
  * @{
@@ -61,6 +62,7 @@ typedef enum {
     ADC_RES_16BIT,          /**< ADC resolution: 16 bit */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 #ifdef __cplusplus
 }
