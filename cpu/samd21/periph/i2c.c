@@ -23,7 +23,6 @@
 #include "mutex.h"
 #include "periph_conf.h"
 #include "periph/i2c.h"
-#include "instance/instance_sercom3.h"
 
 #include "sched.h"
 #include "thread.h"
