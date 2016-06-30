@@ -84,6 +84,13 @@
 #define TIMER_3_ISR_2       isr_timer3_chan1
 /** @} */
 
+/**
+ * @name Radio peripheral configuration
+ * @{
+ */
+#define RADIO_IRQ_PRIO      1
+/** @} */
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
