@@ -19,11 +19,8 @@ USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_udp
 # Add a routing protocol
 USEMODULE += aodvv2
-#USEMODULE += auto_init_gnrc_rpl
 # This application dumps received packets to STDIO using the pktdump module
 USEMODULE += gnrc_pktdump
-# Additional networking modules that can be dropped if not needed
-USEMODULE += gnrc_icmpv6_echo
 # Add also the shell, some shell commands
 USEMODULE += shell
 USEMODULE += shell_commands
@@ -35,10 +32,6 @@ USEMODULE += netstats_ipv6
 # which is not needed in a production environment but helps in the
 # development process:
 CFLAGS += -DDEVELHELP
-
-# Comment this out to join RPL DODAGs even if DIOs do not contain
-# DODAG Configuration Options (see the doc for more info)
-# CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
