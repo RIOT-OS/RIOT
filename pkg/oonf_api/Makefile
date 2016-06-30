@@ -7,6 +7,8 @@ INCLUDES += -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/sys/net/include \
 			-I$(RIOTBASE)/sys/posix/include
 endif
 
+CFLAGS += -Wno-reserved-id-macro -Wno-keyword-macro
+
 MODULE:=$(PKG_NAME)
 
 .PHONY: all
