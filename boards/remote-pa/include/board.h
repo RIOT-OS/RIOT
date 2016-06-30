@@ -10,11 +10,11 @@
 /**
  * @defgroup    board_remote Re-Mote
  * @ingroup     boards
- * @brief       Support for the Re-Mote board
+ * @brief       Support for the Re-Mote board prototype A
  * @{
  *
  * @file
- * @brief       Board specific definitions for the Re-Mote board
+ * @brief       Board specific definitions for the Re-Mote board prototype A
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *              Antonio Lignan <alinan@zolertia.com>
@@ -25,6 +25,7 @@
 
 #include "cpu.h"
 #include "periph/gpio.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -56,17 +57,6 @@
 /** @} */
 
 /**
- * @name Flash Customer Configuration Area (CCA) parameters
- * @{
- */
-#ifndef UPDATE_CCA
-#define UPDATE_CCA                1
-#endif
-#define CCA_BACKDOOR_ENABLE       1
-#define CCA_BACKDOOR_PORT_A_PIN   3 /**< Select button */
-#define CCA_BACKDOOR_ACTIVE_LEVEL 0 /**< Active low */
-/** @} */
-/**
  * @name 2.4GHz RF switch controlled by SW
  * @{
  */
@@ -76,22 +66,6 @@
 #define RF_SWITCH_INTERNAL  (RF_SWITCH_PORT->DATA &= ~(1 << RF_SWITCH_PIN))
 #define RF_SWITCH_TOGGLE    (RF_SWITCH_PORT->DATA ^= (1 << RF_SWITCH_PIN))
 /** @} */
-
-/**
- * @name xtimer configuration
- * @{
- */
-#define XTIMER              TIMER_0
-#define XTIMER_CHAN         (0)
-#define XTIMER_SHIFT        (-4)
-#define XTIMER_BACKOFF      (50)
-#define XTIMER_ISR_BACKOFF  (40)
-/** @} */
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 } /* end extern "C" */

@@ -1,11 +1,11 @@
-Zolertia Re-Mote platform
+Zolertia RE-Mote platform
 ============================================
 
 <a href="url"><img src="http://goo.gl/3AGZkI" align="center" height="320" ></a>
 
-The Re-Mote platform is a IoT Hardware development platform based on TI's CC2538
-system on chip (SoC), featuring an ARM Cortex-M3 with 512KB flash, 32Kb RAM,
-double RF interface, and the following goodies:
+The RE-Mote platform (prototype A) is a IoT Hardware development platform based
+on TI's CC2538 system on chip (SoC), featuring an ARM Cortex-M3 with 512KB
+flash, 32Kb RAM, double RF interface, and the following goodies:
 
 * ISM 2.4-GHz IEEE 802.15.4 & Zigbee compliant.
 * ISM 868-, 915-, 920-, 950-MHz ISM/SRD Band.
@@ -18,6 +18,9 @@ double RF interface, and the following goodies:
 * Built-in TMP102 temperature sensor
 * Small form-factor (as the Z1 mote, half the size of an Arduino) 57x35 mm.
 
+This version was the first RE-Mote prototype, available to select users and beta
+testers.  A commercially available new model (namely the Revision A) is also
+ported to RIOT.
 
 Port Features
 =============
@@ -36,7 +39,6 @@ In terms of hardware support, the following drivers have been implemented:
 And under work or pending at cc2538 base cpu:
 
     * RF 2.4GHz built-in in CC2538 (PR #2198)
-    * SPI/I2C library
     * Built-in core temperature and battery sensor.
     * TMP102 temperature sensor driver.
     * CC1120 sub-1GHz radio interface.
@@ -108,10 +110,8 @@ On Linux:
 
 More Reading
 ============
-1. [Zolertia Re-Mote website][remote-site]
 2. [CC2538 System-on-Chip Solution for 2.4-GHz IEEE 802.15.4 and ZigBee applications (SWRU319B)][cc2538]
 3. [CC1120 sub-1GHz RF transceiver][cc1120]
 
-[remote-site]: http://www.zolertia.io/products "Zolertia Re-Mote"
 [cc1120]: http://www.ti.com/cc1120 "CC1120"
 [cc2538]: http://www.ti.com/product/cc2538     "CC2538"
