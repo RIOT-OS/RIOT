@@ -133,7 +133,9 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     uint8_t pin_num = _pin_num(pin);
 
     if ((_port_num(pin) == PORT_D && pin_num > 3)
+#if defined (PORTE)
          || (_port_num(pin) == PORT_E && pin_num < 4)
+#endif
          || ((mode != GPIO_IN) && (mode != GPIO_IN_PU))) {
         return -1;
     }

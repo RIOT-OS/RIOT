@@ -104,6 +104,7 @@ extern "C" {
  */
 #define SPI_NUMOF           1           /* set to 0 to disable SPI */
 #define SPI_0_EN            1           /* remove once SPI rework is done */
+#define MEGA_PRR            PRR0        /* Power Reduction Resgister */
 /** @} */
 
 #ifdef __cplusplus
