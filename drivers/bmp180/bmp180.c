@@ -65,10 +65,12 @@ int bmp180_init(bmp180_t *dev, i2c_t i2c, uint8_t mode)
     /* Acquire exclusive access */
     i2c_acquire(dev->i2c_dev);
 
-    /* Check sensor ID */
-    char checkid;
-    i2c_write_byte(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_ID);
-    i2c_read_reg(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_ID, &checkid);
+    /* Check sensor ID (retry a few times, it may fail at first) */
+    char checkid = 0;
+    for (size_t ix = 0; checkid == 0 && ix < 3; ++ix) {
+	i2c_write_byte(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_ID);
+	i2c_read_reg(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_ID, &checkid);
+    }
     if (checkid != 0x55) {
         DEBUG("[Error] Wrong device ID\n");
         return -1;
