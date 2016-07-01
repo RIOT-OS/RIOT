@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
+ *               2016 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Auto initialization for CC2420 network devices
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Francisco Acosta <francisco.acosta@inria.fr>
  */
 
 #ifdef MODULE_CC2420
@@ -34,9 +36,8 @@
  * @brief   MAC layer stack parameters
  * @{
  */
-// #define STACKSIZE           (THREAD_STACKSIZE_DEFAULT)
-#define STACKSIZE           (THREAD_STACKSIZE_MAIN)
-#define PRIO                (THREAD_PRIORITY_MAIN - 4)
+#define CC2420_MAC_STACKSIZE           (THREAD_STACKSIZE_MAIN)
+#define CC2420_MAC_PRIO                (THREAD_PRIORITY_MAIN - 4)
 /** @} */
 
 /**
@@ -48,9 +49,9 @@
  * @brief   Allocate memory for dev descriptors, stacks, and 802.15.4 adaption
  * @{
  */
-static cc2420_t devs[CC2420_NUMOF];
-static gnrc_netdev2_t adpt[CC2420_NUMOF];
-static char stacks[CC2420_NUMOF][STACKSIZE];
+static cc2420_t cc2420_devs[CC2420_NUMOF];
+static gnrc_netdev2_t gnrc_adpt[CC2420_NUMOF];
+static char _cc2420_stacks[CC2420_NUMOF][CC2420_MAC_STACKSIZE];
 /** @} */
 
 void auto_init_cc2420(void)
@@ -58,15 +59,18 @@ void auto_init_cc2420(void)
     for (unsigned i = 0; i < CC2420_NUMOF; i++) {
         DEBUG("Initializing CC2420 radios #%u\n", i);
 
-        cc2420_setup(&devs[i], &cc2420_params[i]);
-        int res = gnrc_netdev2_ieee802154_init(&adpt[i],
-                                               (netdev2_ieee802154_t *)&devs[i]);
+        cc2420_setup(&cc2420_devs[i], &cc2420_params[i]);
+        int res = gnrc_netdev2_ieee802154_init(&gnrc_adpt[i],
+                                               (netdev2_ieee802154_t *)&cc2420_devs[i]);
 
         if (res < 0) {
             DEBUG("Error initializing CC2420 radio device!\n");
         }
         else {
-            gnrc_netdev2_init(stacks[i], STACKSIZE, PRIO, "cc2420", &adpt[i]);
+            gnrc_netdev2_init(_cc2420_stacks[i],
+                              CC2420_MAC_STACKSIZE,
+                              CC2420_MAC_PRIO,
+                              "cc2420", &gnrc_adpt[i]);
         }
     }
 }
