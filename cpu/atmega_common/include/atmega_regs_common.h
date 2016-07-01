@@ -61,56 +61,60 @@ typedef struct {
 } mega_uart_t;
 
 /**
- * @brief    Base register address definitions
+ * @brief    Timer register definitions and instances
  * @{
  */
+#if defined(TCCR1A)
 #define MEGA_TIMER1_BASE        (uint16_t *)(&TCCR1A)
-#if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega1281__)
-#define MEGA_TIMER3_BASE        (uint16_t *)(&TCCR3A)
-#define MEGA_TIMER4_BASE        (uint16_t *)(&TCCR4A)
-#define MEGA_TIMER5_BASE        (uint16_t *)(&TCCR5A)
-#endif
-/** @} */
-
-/**
- * @brief    Base register address definitions
- * @{
- */
-#define MEGA_UART0_BASE         ((uint16_t *)(&UCSR0A))
-#if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega1281__)
-#define MEGA_UART1_BASE         ((uint16_t *)(&UCSR1A))
-#define MEGA_UART2_BASE         ((uint16_t *)(&UCSR2A))
-#define MEGA_UART3_BASE         ((uint16_t *)(&UCSR3A))
-#endif
-/** @} */
-
-/**
- * @brief    Peripheral instances
- * @{
- */
 #define MEGA_TIMER1             ((mega_timer_t *)MEGA_TIMER1_BASE)
-#if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega1281__)
+#endif
+
+#if defined(TCCR3A)
+#define MEGA_TIMER3_BASE        (uint16_t *)(&TCCR3A)
 #define MEGA_TIMER3             ((mega_timer_t *)MEGA_TIMER3_BASE)
+#endif
+
+#if defined(TCCR4A)
+#define MEGA_TIMER4_BASE        (uint16_t *)(&TCCR4A)
 #define MEGA_TIMER4             ((mega_timer_t *)MEGA_TIMER4_BASE)
+#endif
+
+#if defined(TCCR5A)
+#define MEGA_TIMER5_BASE        (uint16_t *)(&TCCR5A)
 #define MEGA_TIMER5             ((mega_timer_t *)MEGA_TIMER5_BASE)
 #endif
 /** @} */
 
+
 /**
- * @brief    Peripheral instances
+ * @brief    Peripheral register definitions and instances
  * @{
  */
+#if defined(UCSR0A)
+#define MEGA_UART0_BASE         ((uint16_t *)(&UCSR0A))
 #define MEGA_UART0              ((mega_uart_t *)MEGA_UART0_BASE)
-#if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega1281__)
+#endif
+
+#if defined(UCSR1A)
+#define MEGA_UART1_BASE         ((uint16_t *)(&UCSR1A))
 #define MEGA_UART1              ((mega_uart_t *)MEGA_UART1_BASE)
+#endif
+
+#if defined(UCSR2A)
+#define MEGA_UART2_BASE         ((uint16_t *)(&UCSR2A))
 #define MEGA_UART2              ((mega_uart_t *)MEGA_UART2_BASE)
+#endif
+
+#if defined(UCSR3A)
+#define MEGA_UART3_BASE         ((uint16_t *)(&UCSR3A))
 #define MEGA_UART3              ((mega_uart_t *)MEGA_UART3_BASE)
 #endif
 /** @} */
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ATMEGA2560_REGS_H */
+#endif /* ATMEGA_REGS_COMMON_H */
 /** @} */

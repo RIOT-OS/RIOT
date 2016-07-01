@@ -8,11 +8,11 @@
  */
 
 /**
- * @ingroup     cpu_atmega2560
+ * @ingroup     driver_periph
  * @{
  *
  * @file
- * @brief       Low-level SPI driver implementation
+ * @brief       Low-level SPI driver implementation for ATmega family
  *
  * @author      Daniel Amkaer Sorensen <daniel.amkaer@gmail.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

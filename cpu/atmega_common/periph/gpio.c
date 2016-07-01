@@ -39,8 +39,18 @@
  * @brief     Define GPIO interruptions for an specific atmega CPU, by default
  *            2 (for small atmega CPUs)
  */
-#if defined(__AVR_ATmega2560__)
-#define GPIO_EXT_INT_NUMOF      (8U)
+#if defined(INT2_vect)
+#define GPIO_EXT_INT_NUMOF      (3U)
+#elif defined(INT3_vect)
+#define GPIO_EXT_INT_NUMOF      (4U)
+#elif defined(INT4_vect)
+#define GPIO_EXT_INT_NUMOF      (4U)
+#elif defined(INT5_vect)
+#define GPIO_EXT_INT_NUMOF      (4U)
+#elif defined(INT6_vect)
+#define GPIO_EXT_INT_NUMOF      (4U)
+#elif defined(INT7_vect)
+#define GPIO_EXT_INT_NUMOF      (4U)
 #else
 #define GPIO_EXT_INT_NUMOF      (2U)
 #endif
@@ -237,32 +247,42 @@ ISR(INT1_vect, ISR_BLOCK)
     irq_handler(1); /**< predefined interrupt pin */
 }
 
-#if defined(__AVR_ATmega2560__)
+#if defined(INT2_vect)
 ISR(INT2_vect, ISR_BLOCK)
 {
     irq_handler(2); /**< predefined interrupt pin */
 }
+#endif
 
+#if defined(INT3_vect)
 ISR(INT3_vect, ISR_BLOCK)
 {
     irq_handler(3); /**< predefined interrupt pin */
 }
+#endif
 
+#if defined(INT4_vect)
 ISR(INT4_vect, ISR_BLOCK)
 {
     irq_handler(4); /**< predefined interrupt pin */
 }
+#endif
 
+#if defined(INT5_vect)
 ISR(INT5_vect, ISR_BLOCK)
 {
     irq_handler(5); /**< predefined interrupt pin */
 }
+#endif
 
+#if defined(INT6_vect)
 ISR(INT6_vect, ISR_BLOCK)
 {
     irq_handler(6); /**< predefined interrupt pin */
 }
+#endif
 
+#if defined(INT7_vect)
 ISR(INT7_vect, ISR_BLOCK)
 {
     irq_handler(7); /**< predefined interrupt pin */
