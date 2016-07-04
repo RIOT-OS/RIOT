@@ -1,0 +1,47 @@
+1. If this api is required, the contents below should be added to the mtdi_conf.h
+
+/******************************** mtdi_conf.h ********************************/ 
+/**
+ * Config of MTDI devices
+ */
+#define MTDI_NUMOF          1
+#define MTDI_0_EN           1
+
+typedef enum {
+#if MTDI_0_EN
+    FLASH_MEMORY_0 = 0,          /**< MTD device 0 */
+#endif
+} mtdi_t;
+
+#include <mtdi.h>
+
+extern mtdi_desc_t mx25v_flash_interface;
+
+static const mtdi_conf_t mtdi_conf[] = {
+    {
+            .dev = &(mx25v_flash[MX25V_0]),
+            .api = &(mx25v_flash_interface),
+    },
+};
+/******************************** mtdi_conf.h ********************************/
+
+2. HOW TO USE THE API:
+
+/** initialize and get status **/
+    mtd_sta_t status;
+    status = mtdi_conf[FLASH_MEMORY_0].api.mtdi_init(mtdi_conf[FLASH_MEMORY_0].dev);
+    status = mtdi_conf[FLASH_MEMORY_0].api.mtdi_status(mtdi_conf[FLASH_MEMORY_0].dev);
+
+/** read and write 3 pages from page 12 **/
+    mtd_result_t result;
+    unsigned long first_page = 12;
+    unsigned long number_of_page = 3;
+    unsigned char buff[PAGE_SIZE * number_of_page];
+    result = mtdi_conf[FLASH_MEMORY_0].api.mtdi_read(mtdi_conf[FLASH_MEMORY_0].dev, buff, first_page, number_of_page);
+    result = mtdi_conf[FLASH_MEMORY_0].api.mtdi_write(mtdi_conf[FLASH_MEMORY_0].dev, buff, first_page, number_of_page);
+
+/** erase 2 sectors from the sector 0 **/
+    mtd_result_t result;
+    unsigned long first_sector = 0;
+    unsigned long number_of_sector = 2;
+    result = mtdi_conf_dev[FLASH_MEMORY_0].api.mtdi_erase(mtdi_conf[FLASH_MEMORY_0].dev, first_sector, number_of_sector);
