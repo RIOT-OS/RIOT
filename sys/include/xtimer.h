@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2016 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,8 +14,7 @@
  *            timers, get current system time, and let a thread sleep for
  *            a certain amount of time.
  *
- * The implementation takes one low-level timer that is supposed to run at 1MHz
- * speed and multiplexes it.
+ * The implementation takes one low-level timer and multiplexes it.
  *
  * Insertion and removal of timers has O(n) complexity with (n) being the
  * number of active timers.  The reason for this is that multiplexing is
@@ -24,6 +24,7 @@
  * @file
  * @brief   xtimer interface definitions
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 #ifndef XTIMER_H
 #define XTIMER_H
