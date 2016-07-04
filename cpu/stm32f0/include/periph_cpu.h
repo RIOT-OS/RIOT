@@ -35,6 +35,7 @@ extern "C" {
  */
 #define GPIO_MODE(io, pr, ot)   ((io << 0) | (pr << 2) | (ot << 4))
 
+#ifndef DOXYGEN
 /**
  * @brief   Override GPIO mode options
  * @{
@@ -61,6 +62,7 @@ typedef enum {
     GPIO_BOTH = 3           /**< emit interrupt on both flanks */
 } gpio_flank_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Available ports on the STM32F4 family
@@ -83,6 +85,7 @@ typedef enum {
     GPIO_AF3,               /**< use alternate function 3 */
 } gpio_af_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Override ADC resolution values
  * @{
@@ -97,6 +100,7 @@ typedef enum {
     ADC_RES_16BIT = (0xff)          /**< not applicable */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   ADC line configuration values

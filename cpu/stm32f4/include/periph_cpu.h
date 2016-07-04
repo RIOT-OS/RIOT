@@ -43,6 +43,7 @@ extern "C" {
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override the ADC resolution configuration
  * @{
@@ -57,6 +58,7 @@ typedef enum {
     ADC_RES_16BIT = 2            /**< ADC resolution: 16 bit (not supported)*/
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Generate GPIO mode bitfields
@@ -68,6 +70,7 @@ typedef enum {
  */
 #define GPIO_MODE(io, pr, ot)   ((io << 0) | (pr << 2) | (ot << 4))
 
+#ifndef DOXYGEN
 /**
  * @brief   Override GPIO mode options
  * @{
@@ -82,6 +85,7 @@ typedef enum {
     GPIO_OD_PU = GPIO_MODE(1, 1, 1)     /**< open-drain with pull-up */
 } gpio_mode_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Available ports on the STM32F4 family

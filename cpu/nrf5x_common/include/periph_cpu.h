@@ -63,6 +63,7 @@ extern "C" {
  */
 #define GPIO_MODE(oe, ic, pr)   (oe | (ic << 1) | (pr << 2))
 
+#ifndef DOXYGEN
 /**
  * @brief   Override GPIO modes
  *
@@ -109,6 +110,7 @@ typedef enum {
     ADC_RES_16BIT = 0xf3    /**< ADC resolution: 16 bit */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Timer configuration options

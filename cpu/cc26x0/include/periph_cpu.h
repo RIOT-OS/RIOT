@@ -30,6 +30,7 @@ extern "C" {
  */
 #define CPUID_LEN           (16U)
 
+#ifndef DOXYGEN
 /**
  * @brief   Override GPIO mode values
  */
@@ -52,6 +53,7 @@ typedef enum {
     GPIO_RISING = IOCFG_EDGEDET_RISING,
     GPIO_BOTH = IOCFG_EDGEDET_BOTH
 } gpio_flank_t;
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Timer configuration options

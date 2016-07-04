@@ -37,6 +37,7 @@ extern "C" {
  */
 #define GPIO_MODE(io, pr, ot)   ((io << 0) | (pr << 2) | (ot << 4))
 
+#ifndef DOXYGEN
 /**
  * @brief   Override GPIO mode options
  * @{
@@ -51,6 +52,7 @@ typedef enum {
     GPIO_OD_PU = GPIO_MODE(1, 1, 1)     /**< open-drain with pull-up */
 } gpio_mode_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Available ports on the STM32L1 family
