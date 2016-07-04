@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __UART_H__
-#define __UART_H__
+#ifndef STELLARIS_UART_H_
+#define STELLARIS_UART_H_
 
 //*****************************************************************************
 //
@@ -272,4 +272,4 @@ extern void UART9BitAddrSend(unsigned long ulBase, unsigned char ucAddr);
 }
 #endif
 
-#endif //  __UART_H__
+#endif /*  STELLARIS_UART_H_ */

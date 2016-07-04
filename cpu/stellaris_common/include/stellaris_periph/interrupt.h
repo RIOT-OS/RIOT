@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __INTERRUPT_H__
-#define __INTERRUPT_H__
+#ifndef STELLARIS_INTERRUPT_H_
+#define STELLARIS_INTERRUPT_H_
 
 //*****************************************************************************
 //
@@ -90,4 +90,4 @@ extern unsigned long IntPriorityMaskGet(void);
 }
 #endif
 
-#endif // __INTERRUPT_H__
+#endif /* STELLARIS_INTERRUPT_H_ */

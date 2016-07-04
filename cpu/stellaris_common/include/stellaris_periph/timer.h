@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __TIMER_H__
-#define __TIMER_H__
+#ifndef STELLARIS_TIMER_H_
+#define STELLARIS_TIMER_H_
 
 //*****************************************************************************
 //
@@ -233,4 +233,4 @@ extern void TimerQuiesce(unsigned long ulBase);
 }
 #endif
 
-#endif // __TIMER_H__
+#endif /* STELLARIS_TIMER_H_ */
