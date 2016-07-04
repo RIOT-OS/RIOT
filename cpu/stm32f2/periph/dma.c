@@ -264,6 +264,7 @@ void dma_stream_init(dma_t stream_dev)
 
 void dma_stream_config(dma_t stream_dev, uint32_t periph_addr_reg, uint32_t dma_config, char* data, uint16_t length)
 {
+    volatile uint32_t periph_addr = periph_addr_reg;
     DMA_Stream_TypeDef *stream = dma_stream(stream_dev);
     char temp_data = 0;
 
@@ -271,7 +272,7 @@ void dma_stream_config(dma_t stream_dev, uint32_t periph_addr_reg, uint32_t dma_
     dma_poweron(stream_dev);
 
     /* peripheral address register */
-    stream->PAR = periph_addr_reg;
+    stream->PAR = periph_addr;
 
     /* configure the FIFO usage */
     stream->FCR = 0;
