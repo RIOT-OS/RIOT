@@ -11,7 +11,7 @@
  *
  * @file
  * @brief       Register definitions for Texas Instruments INA226 High-Side or Low-Side Measurement,
- * 				Bi-Directional Current and Power Monitor with I2C Compatible Interface
+ *                 Bi-Directional Current and Power Monitor with I2C Compatible Interface
  *
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
@@ -38,10 +38,10 @@ typedef enum ina226_reg {
     INA226_REG_POWER           = 0x03, /**< Power register (read only) */
     INA226_REG_CURRENT         = 0x04, /**< Current register (read only) */
     INA226_REG_CALIBRATION     = 0x05, /**< Calibration register (read/write) */
-	INA226_REG_MASK_ENABLE     = 0x06, /**< Mask/Enable register (read/write) */
-	INA226_REG_ALERT_LIMIT     = 0x07, /**< Alert Limit register (read/write) */
-	INA226_REG_MANUFACTURER_ID = 0xFE, /**< Manufacturer ID register (read only) */
-	INA226_REG_DIE_ID          = 0xFF, /**< Die ID register (read only) */
+    INA226_REG_MASK_ENABLE     = 0x06, /**< Mask/Enable register (read/write) */
+    INA226_REG_ALERT_LIMIT     = 0x07, /**< Alert Limit register (read/write) */
+    INA226_REG_MANUFACTURER_ID = 0xFE, /**< Manufacturer ID register (read only) */
+    INA226_REG_DIE_ID          = 0xFF, /**< Die ID register (read only) */
 
 } ina226_reg_t;
 
@@ -51,16 +51,16 @@ typedef enum ina226_reg {
  */
 typedef enum ina226_mask_enable_reg_bit {
     INA226_MASK_ENABLE_LEN     = 0x0001, /**< Alert Latch Enable */
-	INA226_MASK_ENABLE_APOL    = 0x0002, /**< Alert Polarity bit */
-	INA226_MASK_ENABLE_OVF     = 0x0004, /**< Math Overflow Flag */
-	INA226_MASK_ENABLE_CVRF    = 0x0008, /**< Conversion Ready Flag */
-	INA226_MASK_ENABLE_AFF     = 0x0010, /**< Alert Function Flag */
-	INA226_MASK_ENABLE_CNVR    = 0x0400, /**< Conversion Ready */
-	INA226_MASK_ENABLE_POL     = 0x0800, /**< Power Over-Limit */
-	INA226_MASK_ENABLE_BUL     = 0x1000, /**< Bus Voltage Under-Voltage */
-	INA226_MASK_ENABLE_BOL     = 0x2000, /**< Bus Voltage Over-Voltage */
-	INA226_MASK_ENABLE_SUL     = 0x4000, /**< Shunt Voltage Under-Voltage */
-	INA226_MASK_ENABLE_SOL     = 0x8000, /**< Shunt Voltage Over-Voltage */
+    INA226_MASK_ENABLE_APOL    = 0x0002, /**< Alert Polarity bit */
+    INA226_MASK_ENABLE_OVF     = 0x0004, /**< Math Overflow Flag */
+    INA226_MASK_ENABLE_CVRF    = 0x0008, /**< Conversion Ready Flag */
+    INA226_MASK_ENABLE_AFF     = 0x0010, /**< Alert Function Flag */
+    INA226_MASK_ENABLE_CNVR    = 0x0400, /**< Conversion Ready */
+    INA226_MASK_ENABLE_POL     = 0x0800, /**< Power Over-Limit */
+    INA226_MASK_ENABLE_BUL     = 0x1000, /**< Bus Voltage Under-Voltage */
+    INA226_MASK_ENABLE_BOL     = 0x2000, /**< Bus Voltage Over-Voltage */
+    INA226_MASK_ENABLE_SUL     = 0x4000, /**< Shunt Voltage Under-Voltage */
+    INA226_MASK_ENABLE_SOL     = 0x8000, /**< Shunt Voltage Over-Voltage */
 } ina226_mask_enable_reg_bit_t;
 
 

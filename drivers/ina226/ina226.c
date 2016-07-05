@@ -1,5 +1,4 @@
-/*/*
- *
+/*
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
@@ -10,7 +9,7 @@
  * @{
  * @file
  * @brief       Device driver for Texas Instruments INA226 High-Side or Low-Side Measurement,
- * 				Bi-Directional Current and Power Monitor with I2C Compatible Interface
+ *              Bi-Directional Current and Power Monitor with I2C Compatible Interface
  *
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  * @}
@@ -116,22 +115,22 @@ int ina226_read_power(ina226_t *dev, int16_t *power)
 
 int ina226_read_die_id(ina226_t *dev, uint16_t *id)
 {
-	return ina226_read_reg(dev, INA226_REG_DIE_ID, id);
+    return ina226_read_reg(dev, INA226_REG_DIE_ID, id);
 }
 
 int ina226_read_manufacturer_id(ina226_t *dev, uint16_t *id)
 {
-	return ina226_read_reg(dev, INA226_REG_MANUFACTURER_ID, id);
+    return ina226_read_reg(dev, INA226_REG_MANUFACTURER_ID, id);
 }
 
 int ina226_read_mask_enable(ina226_t *dev, uint16_t *me_val)
 {
-	return ina226_read_reg(dev, INA226_REG_MASK_ENABLE, me_val);
+    return ina226_read_reg(dev, INA226_REG_MASK_ENABLE, me_val);
 }
 
 int ina226_write_mask_enable(ina226_t *dev, uint16_t me_val)
 {
-	return ina226_write_reg(dev, INA226_REG_MASK_ENABLE, me_val);
+    return ina226_write_reg(dev, INA226_REG_MASK_ENABLE, me_val);
 }
 
 int ina226_read_alert_limit(ina226_t *dev, uint16_t *alert_limit)
@@ -147,9 +146,9 @@ int ina226_write_alert_limit(ina226_t *dev, uint16_t alert_limit)
 int ina226_activate_int(ina226_t *dev, uint16_t me_config, gpio_t pin, gpio_cb_t callback)
 {
     if (ina226_write_reg(dev, INA226_REG_MASK_ENABLE, me_config) == 0 ) {
-    	return gpio_init_int(pin, GPIO_IN_PU, GPIO_FALLING, callback, dev);
+        return gpio_init_int(pin, GPIO_IN_PU, GPIO_FALLING, callback, dev);
     }
     else {
-    	return -1;
+        return -1;
     }
 }
