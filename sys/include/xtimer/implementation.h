@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 #if XTIMER_MASK
-extern volatile uint32_t _high_cnt;
+extern volatile uint32_t _xtimer_high_cnt;
 #endif
 
 #if (XTIMER_SHIFT < 0)
@@ -56,7 +56,7 @@ extern volatile uint32_t _high_cnt;
 /**
  * @brief returns the (masked) low-level timer counter value.
  */
-static inline uint32_t _lltimer_now(void)
+static inline uint32_t _xtimer_lltimer_now(void)
 {
 #if XTIMER_SHIFT
     return XTIMER_TICKS_TO_USEC((uint32_t)timer_read(XTIMER));
@@ -68,7 +68,7 @@ static inline uint32_t _lltimer_now(void)
 /**
  * @brief drop bits of a value that don't fit into the low-level timer.
  */
-static inline uint32_t _lltimer_mask(uint32_t val)
+static inline uint32_t _xtimer_lltimer_mask(uint32_t val)
 {
     return val & ~XTIMER_MASK_SHIFTED;
 }
@@ -103,31 +103,31 @@ static inline uint32_t xtimer_now(void)
      * then it can be safely applied to the timer count. */
 
     do {
-        latched_high_cnt = _high_cnt;
-        now = _lltimer_now();
-    } while (_high_cnt != latched_high_cnt);
+        latched_high_cnt = _xtimer_high_cnt;
+        now = _xtimer_lltimer_now();
+    } while (_xtimer_high_cnt != latched_high_cnt);
 
     return latched_high_cnt | now;
 #else
-    return _lltimer_now();
+    return _xtimer_lltimer_now();
 #endif
 }
 
 static inline void xtimer_spin_until(uint32_t target) {
 #if XTIMER_MASK
-    target = _lltimer_mask(target);
+    target = _xtimer_lltimer_mask(target);
 #endif
-    while (_lltimer_now() > target);
-    while (_lltimer_now() < target);
+    while (_xtimer_lltimer_now() > target);
+    while (_xtimer_lltimer_now() < target);
 }
 
 static inline void xtimer_spin(uint32_t offset) {
-    uint32_t start = _lltimer_now();
+    uint32_t start = _xtimer_lltimer_now();
 #if XTIMER_MASK
-    offset = _lltimer_mask(offset);
-    while (_lltimer_mask(_lltimer_now() - start) < offset);
+    offset = _xtimer_lltimer_mask(offset);
+    while (_xtimer_lltimer_mask(_xtimer_lltimer_now() - start) < offset);
 #else
-    while ((_lltimer_now() - start) < offset);
+    while ((_xtimer_lltimer_now() - start) < offset);
 #endif
 }
 
