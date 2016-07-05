@@ -25,13 +25,6 @@
 
 #include "periph/timer.h"
 
-/**
- * @brief internal define to allow using variables instead of defines
- */
-#ifdef XTIMER_TRACE
-#include "xtimer_trace.h"
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
