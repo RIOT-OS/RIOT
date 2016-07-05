@@ -49,8 +49,8 @@
   * @{
   */
 
-#ifndef __STM32F303xE_H
-#define __STM32F303xE_H
+#ifndef STM32F303xE_H
+#define STM32F303xE_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -8198,7 +8198,7 @@ typedef struct
 }
 #endif /* __cplusplus */
 
-#endif /* __STM32F303xE_H */
+#endif /* STM32F303xE_H */
 
 /**
   * @}

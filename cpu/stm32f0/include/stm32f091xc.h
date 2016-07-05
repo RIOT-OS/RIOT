@@ -49,8 +49,8 @@
   * @{
   */
 
-#ifndef __STM32F091xC_H
-#define __STM32F091xC_H
+#ifndef STM32F091xC_H
+#define STM32F091xC_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -5765,7 +5765,7 @@ typedef struct
 }
 #endif /* __cplusplus */
 
-#endif /* __STM32F091xC_H */
+#endif /* STM32F091xC_H */
 
 /**
   * @}

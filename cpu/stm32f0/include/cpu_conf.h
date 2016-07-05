@@ -18,8 +18,8 @@
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef __CPU_CONF_H
-#define __CPU_CONF_H
+#ifndef STM32F0_CPU_CONF_H
+#define STM32F0_CPU_CONF_H
 
 #include "cpu_conf_common.h"
 
@@ -49,5 +49,5 @@ extern "C" {
 }
 #endif
 
-#endif /* __CPU_CONF_H */
+#endif /* STM32F0_CPU_CONF_H */
 /** @} */
