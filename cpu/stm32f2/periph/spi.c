@@ -498,16 +498,21 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 
     /* DMA configuration */
     if (in == NULL) {
-        /* channel - medium priority - memory to peripheral - memory increment - complete interrupt enable */
-        tx_conf = ((tx_channel << 25) | DMA_SxCR_PL_0 | DMA_SxCR_DIR_0 | DMA_SxCR_MINC | DMA_SxCR_TCIE);
+        /* channel - medium priority - peripheral to memory - complete interrupt enable */
+        rx_conf = ((rx_channel << 25) | DMA_SxCR_PL_0 | DMA_SxCR_TCIE);
+    }
+    else {
         /* channel - medium priority - peripheral to memory - memory increment - complete interrupt enable */
         rx_conf = ((rx_channel << 25) | DMA_SxCR_PL_0 | DMA_SxCR_MINC | DMA_SxCR_TCIE);
     }
-    else {
+
+    if (out == NULL) {
         /* channel - medium priority - memory to peripheral - complete interrupt enable*/
         tx_conf = ((tx_channel << 25) | DMA_SxCR_PL_0 | DMA_SxCR_DIR_0 | DMA_SxCR_TCIE);
-        /* channel - medium priority - peripheral to memory - memory increment - complete interrupt enable */
-        rx_conf = ((rx_channel << 25) | DMA_SxCR_PL_0 | DMA_SxCR_MINC | DMA_SxCR_TCIE);
+    }
+    else {
+        /* channel - medium priority - memory to peripheral - memory increment - complete interrupt enable */
+        tx_conf = ((tx_channel << 25) | DMA_SxCR_PL_0 | DMA_SxCR_DIR_0 | DMA_SxCR_MINC | DMA_SxCR_TCIE);
     }
 
     /* acquire dma spi rx and tx streams */
