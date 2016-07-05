@@ -25,7 +25,7 @@
 #include "periph_conf.h"
 
 /* only compile this, if the CPU has a DAC */
-#if defined(DAC) || defined(DAC1)
+#if (defined(DAC) || defined(DAC1)) && defined(DAC_CONFIG)
 
 #ifdef DAC2
 #define _DAC(line)          (dac_config[line].dac ? DAC2 : DAC1)
@@ -34,15 +34,9 @@
 #endif
 
 /**
- * @brief   Get the DAC configuration from the board (if configured)
- * @{
+ * @brief   Get the DAC configuration from the board config
  */
-#ifdef DAC_CONFIG
 static const dac_conf_t dac_config[] = DAC_CONFIG;
-#else
-static const dac_conf_t dac_config[] = {};
-#endif
-/** @} */
 
 int8_t dac_init(dac_t line)
 {
@@ -96,4 +90,6 @@ void dac_poweroff(dac_t line)
     DAC->CR &= ~(1 << (16 * dac_config[line].chan));
 }
 
+#else
+typedef int dont_be_pedantic;
 #endif /* DAC */

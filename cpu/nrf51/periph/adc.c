@@ -25,15 +25,11 @@
 #include "periph/adc.h"
 #include "periph_conf.h"
 
+#ifdef ADC_CONFIG
 /**
  * @brief   Load the ADC configuration
- * @{
  */
-#ifdef ADC_CONFIG
 static const uint8_t adc_config[] = ADC_CONFIG;
-#else
-static const uint8_t adc_config[] = {};
-#endif
 
 /**
  * @brief   Lock to prevent concurrency issues when used from different threads
@@ -91,3 +87,7 @@ int adc_sample(adc_t line, adc_res_t res)
 
     return val;
 }
+
+#else
+typedef int dont_be_pedantic;
+#endif /* ADC_CONFIG */
