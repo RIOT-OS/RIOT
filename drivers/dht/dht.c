@@ -152,6 +152,7 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
             else {
                 *temp = (int16_t)raw_temp;
             }
+            break;
         default:
             return -2;
     }
