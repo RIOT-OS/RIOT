@@ -33,14 +33,6 @@ extern "C" {
 extern volatile uint32_t _xtimer_high_cnt;
 #endif
 
-#if (XTIMER_SHIFT < 0)
-#define XTIMER_USEC_TO_TICKS(value) ( (value) << -XTIMER_SHIFT )
-#define XTIMER_TICKS_TO_USEC(value) ( (value) >> -XTIMER_SHIFT )
-#else
-#define XTIMER_USEC_TO_TICKS(value) ( (value) >> XTIMER_SHIFT )
-#define XTIMER_TICKS_TO_USEC(value) ( (value) << XTIMER_SHIFT )
-#endif
-
 /**
  * @brief IPC message type for xtimer msg callback
  */
@@ -51,11 +43,7 @@ extern volatile uint32_t _xtimer_high_cnt;
  */
 static inline uint32_t _xtimer_lltimer_now(void)
 {
-#if XTIMER_SHIFT
-    return XTIMER_TICKS_TO_USEC((uint32_t)timer_read(XTIMER_DEV));
-#else
     return timer_read(XTIMER_DEV);
-#endif
 }
 
 /**
@@ -63,7 +51,7 @@ static inline uint32_t _xtimer_lltimer_now(void)
  */
 static inline uint32_t _xtimer_lltimer_mask(uint32_t val)
 {
-    return val & ~XTIMER_MASK_SHIFTED;
+    return val & ~XTIMER_MASK;
 }
 
 /**
@@ -71,22 +59,36 @@ static inline uint32_t _xtimer_lltimer_mask(uint32_t val)
  * @brief xtimer internal stuff
  * @internal
  */
+uint64_t _xtimer_now64(void);
 int _xtimer_set_absolute(xtimer_t *timer, uint32_t target);
 void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
-void _xtimer_sleep(uint32_t offset, uint32_t long_offset);
+void _xtimer_set(xtimer_t *timer, uint32_t offset);
+void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period);
+void _xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid);
+void _xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid);
+void _xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid);
+void _xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid);
+void _xtimer_set(xtimer_t *timer, uint32_t offset);
+int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t ticks);
+int _xtimer_msg_receive_timeout64(msg_t *msg, uint64_t ticks);
+
+/**
+ * @brief  Sleep for the given number of ticks
+ */
+void _xtimer_tsleep(uint32_t offset, uint32_t long_offset);
 /** @} */
 
 #ifndef XTIMER_MIN_SPIN
 /**
  * @brief Minimal value xtimer_spin() can spin
  */
-#define XTIMER_MIN_SPIN XTIMER_TICKS_TO_USEC(1)
+#define XTIMER_MIN_SPIN _xtimer_usec_from_ticks(1)
 #endif
 
 #ifndef DOXYGEN
 /* Doxygen warns that these are undocumented, but the documentation can be found in xtimer.h */
 
-static inline uint32_t xtimer_now(void)
+static inline uint32_t _xtimer_now(void)
 {
 #if XTIMER_MASK
     uint32_t latched_high_cnt, now;
@@ -106,7 +108,19 @@ static inline uint32_t xtimer_now(void)
 #endif
 }
 
-static inline void xtimer_spin(uint32_t offset) {
+static inline xtimer_ticks32_t xtimer_now(void)
+{
+    xtimer_ticks32_t ret = { .ticks32 = _xtimer_now() };
+    return ret;
+}
+
+static inline xtimer_ticks64_t xtimer_now64(void)
+{
+    xtimer_ticks64_t ret = { .ticks64 = _xtimer_now64() };
+    return ret;
+}
+
+static inline void _xtimer_spin(uint32_t offset) {
     uint32_t start = _xtimer_lltimer_now();
 #if XTIMER_MASK
     offset = _xtimer_lltimer_mask(offset);
@@ -116,24 +130,122 @@ static inline void xtimer_spin(uint32_t offset) {
 #endif
 }
 
+static inline void _xtimer_tsleep32(uint32_t ticks)
+{
+    _xtimer_tsleep(ticks, 0);
+}
+
+static inline void _xtimer_tsleep64(uint64_t ticks)
+{
+    _xtimer_tsleep((uint32_t)ticks, (uint32_t)(ticks >> 32));
+}
+
+static inline void xtimer_spin(xtimer_ticks32_t ticks) {
+    _xtimer_spin(ticks.ticks32);
+}
+
 static inline void xtimer_usleep(uint32_t microseconds)
 {
-    _xtimer_sleep(microseconds, 0);
+    _xtimer_tsleep32(_xtimer_ticks_from_usec(microseconds));
 }
 
 static inline void xtimer_usleep64(uint64_t microseconds)
 {
-    _xtimer_sleep((uint32_t) microseconds, (uint32_t) (microseconds >> 32));
+    _xtimer_tsleep64(_xtimer_ticks_from_usec64(microseconds));
 }
 
 static inline void xtimer_sleep(uint32_t seconds)
 {
-    xtimer_usleep64((uint64_t)seconds * SEC_IN_USEC);
+    _xtimer_tsleep64(_xtimer_ticks_from_usec64((uint64_t)seconds * SEC_IN_USEC));
 }
 
 static inline void xtimer_nanosleep(uint32_t nanoseconds)
 {
-    _xtimer_sleep(nanoseconds / USEC_IN_NS, 0);
+    _xtimer_tsleep32(_xtimer_ticks_from_usec(nanoseconds / USEC_IN_NS));
+}
+
+static inline void xtimer_tsleep32(xtimer_ticks32_t ticks)
+{
+    _xtimer_tsleep32(ticks.ticks32);
+}
+
+static inline void xtimer_tsleep64(xtimer_ticks64_t ticks)
+{
+    _xtimer_tsleep64(ticks.ticks64);
+}
+
+static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup, uint32_t period)
+{
+    _xtimer_periodic_wakeup(&last_wakeup->ticks32, _xtimer_ticks_from_usec(period));
+}
+
+static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid)
+{
+    _xtimer_set_msg(timer, _xtimer_ticks_from_usec(offset), msg, target_pid);
+}
+
+static inline void xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid)
+{
+    _xtimer_set_msg64(timer, _xtimer_ticks_from_usec64(offset), msg, target_pid);
+}
+
+static inline void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid)
+{
+    _xtimer_set_wakeup(timer, _xtimer_ticks_from_usec(offset), pid);
+}
+
+static inline void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
+{
+    _xtimer_set_wakeup64(timer, _xtimer_ticks_from_usec64(offset), pid);
+}
+
+static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
+{
+    _xtimer_set(timer, _xtimer_ticks_from_usec(offset));
+}
+
+static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout)
+{
+    return _xtimer_msg_receive_timeout(msg, _xtimer_ticks_from_usec(timeout));
+}
+
+static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout)
+{
+    return _xtimer_msg_receive_timeout64(msg, _xtimer_ticks_from_usec64(timeout));
+}
+
+static inline xtimer_ticks32_t xtimer_ticks_from_usec(uint32_t usec)
+{
+    xtimer_ticks32_t ticks = { .ticks32 = _xtimer_ticks_from_usec(usec) };
+    return ticks;
+}
+
+static inline xtimer_ticks64_t xtimer_ticks_from_usec64(uint64_t usec)
+{
+    xtimer_ticks64_t ticks = { .ticks64 = _xtimer_ticks_from_usec64(usec) };
+    return ticks;
+}
+
+static inline uint32_t xtimer_usec_from_ticks(xtimer_ticks32_t ticks)
+{
+    return _xtimer_usec_from_ticks(ticks.ticks32);
+}
+
+static inline uint64_t xtimer_usec_from_ticks64(xtimer_ticks64_t ticks)
+{
+    return _xtimer_usec_from_ticks64(ticks.ticks64);
+}
+
+static inline xtimer_ticks32_t xtimer_ticks(uint32_t ticks)
+{
+    xtimer_ticks32_t ret = { .ticks32 = ticks };
+    return ret;
+}
+
+static inline xtimer_ticks64_t xtimer_ticks64(uint64_t ticks)
+{
+    xtimer_ticks64_t ret = { .ticks64 = ticks };
+    return ret;
 }
 
 #endif /* !defined(DOXYGEN) */

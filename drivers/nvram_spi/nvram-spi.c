@@ -40,7 +40,7 @@ typedef enum {
 
 /** @brief Delay to wait between toggling CS pin, on most chips this can probably be
  * removed. */
-#define NVRAM_SPI_CS_TOGGLE_TICKS 1
+#define NVRAM_SPI_CS_TOGGLE_TICKS xtimer_ticks_from_usec(1)
 
 /**
  * @brief Copy data from system memory to NVRAM.
