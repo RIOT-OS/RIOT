@@ -29,19 +29,11 @@
 #define XTIMER_H
 
 #include <stdint.h>
-#include "msg.h"
-#include "periph/timer.h"
 #include "timex.h"
+#include "msg.h"
 
 #include "board.h"
 #include "periph_conf.h"
-
-/**
- * @brief internal define to allow using variables instead of defines
- */
-#ifdef XTIMER_TRACE
-#include "xtimer_trace.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -349,14 +341,6 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_SHIFT (0)
 #endif
 
-#if (XTIMER_SHIFT < 0)
-#define XTIMER_USEC_TO_TICKS(value) ( (value) << -XTIMER_SHIFT )
-#define XTIMER_TICKS_TO_USEC(value) ( (value) >> -XTIMER_SHIFT )
-#else
-#define XTIMER_USEC_TO_TICKS(value) ( (value) >> XTIMER_SHIFT )
-#define XTIMER_TICKS_TO_USEC(value) ( (value) << XTIMER_SHIFT )
-#endif
-
 /*
  * Default xtimer configuration
  */
@@ -405,110 +389,7 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 
 #define XTIMER_MASK_SHIFTED XTIMER_TICKS_TO_USEC(XTIMER_MASK)
 
-#if XTIMER_MASK
-extern volatile uint32_t _high_cnt;
-#endif
-
-/**
- * @brief IPC message type for xtimer msg callback
- */
-#define MSG_XTIMER 12345
-
-/**
- * @brief returns the (masked) low-level timer counter value.
- */
-static inline uint32_t _lltimer_now(void)
-{
-#if XTIMER_SHIFT
-    return XTIMER_TICKS_TO_USEC((uint32_t)timer_read(XTIMER));
-#else
-    return timer_read(XTIMER);
-#endif
-}
-
-/**
- * @brief drop bits of a value that don't fit into the low-level timer.
- */
-static inline uint32_t _lltimer_mask(uint32_t val)
-{
-    return val & ~XTIMER_MASK_SHIFTED;
-}
-
-/**
- * @{
- * @brief xtimer internal stuff
- * @internal
- */
-int _xtimer_set_absolute(xtimer_t *timer, uint32_t target);
-void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
-void _xtimer_sleep(uint32_t offset, uint32_t long_offset);
-static inline void xtimer_spin_until(uint32_t value);
-/** @} */
-
-#ifndef XTIMER_MIN_SPIN
-/**
- * @brief Minimal value xtimer_spin() can spin
- */
-#define XTIMER_MIN_SPIN XTIMER_TICKS_TO_USEC(1)
-#endif
-
-static inline uint32_t xtimer_now(void)
-{
-#if XTIMER_MASK
-    uint32_t latched_high_cnt, now;
-
-    /* _high_cnt can change at any time, so check the value before
-     * and after reading the low-level timer. If it hasn't changed,
-     * then it can be safely applied to the timer count. */
-
-    do {
-        latched_high_cnt = _high_cnt;
-        now = _lltimer_now();
-    } while (_high_cnt != latched_high_cnt);
-
-    return latched_high_cnt | now;
-#else
-    return _lltimer_now();
-#endif
-}
-
-static inline void xtimer_spin_until(uint32_t target) {
-#if XTIMER_MASK
-    target = _lltimer_mask(target);
-#endif
-    while (_lltimer_now() > target);
-    while (_lltimer_now() < target);
-}
-
-static inline void xtimer_spin(uint32_t offset) {
-    uint32_t start = _lltimer_now();
-#if XTIMER_MASK
-    offset = _lltimer_mask(offset);
-    while (_lltimer_mask(_lltimer_now() - start) < offset);
-#else
-    while ((_lltimer_now() - start) < offset);
-#endif
-}
-
-static inline void xtimer_usleep(uint32_t microseconds)
-{
-    _xtimer_sleep(microseconds, 0);
-}
-
-static inline void xtimer_usleep64(uint64_t microseconds)
-{
-    _xtimer_sleep((uint32_t) microseconds, (uint32_t) (microseconds >> 32));
-}
-
-static inline void xtimer_sleep(uint32_t seconds)
-{
-    xtimer_usleep64((uint64_t)seconds * SEC_IN_USEC);
-}
-
-static inline void xtimer_nanosleep(uint32_t nanoseconds)
-{
-    _xtimer_sleep(nanoseconds / USEC_IN_NS, 0);
-}
+#include "xtimer/implementation.h"
 
 #ifdef __cplusplus
 }
