@@ -64,7 +64,7 @@
  * @name xtimer configuration
  * @{
  */
-#define XTIMER              TIMER_0
+#define XTIMER_DEV          TIMER_0
 #define XTIMER_CHAN         (0)
 #define XTIMER_SHIFT        (-4)
 #define XTIMER_BACKOFF      (50)

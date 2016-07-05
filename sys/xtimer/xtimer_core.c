@@ -57,7 +57,7 @@ static inline int _is_set(xtimer_t *timer)
 void xtimer_init(void)
 {
     /* initialize low-level timer */
-    timer_init(XTIMER, XTIMER_USEC_TO_TICKS(1000000ul), _periph_timer_callback, NULL);
+    timer_init(XTIMER_DEV, XTIMER_USEC_TO_TICKS(1000000ul), _periph_timer_callback, NULL);
 
     /* register initial overflow tick */
     _lltimer_set(0xFFFFFFFF);
@@ -158,7 +158,7 @@ static inline void _lltimer_set(uint32_t target)
         target++;
     }
 #endif
-    timer_set_absolute(XTIMER, XTIMER_CHAN, _xtimer_lltimer_mask(target));
+    timer_set_absolute(XTIMER_DEV, XTIMER_CHAN, _xtimer_lltimer_mask(target));
 }
 
 int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)

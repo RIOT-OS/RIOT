@@ -344,11 +344,11 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 /*
  * Default xtimer configuration
  */
-#ifndef XTIMER
+#ifndef XTIMER_DEV
 /**
  * @brief Underlying hardware timer device to assign to xtimer
  */
-#define XTIMER TIMER_DEV(0)
+#define XTIMER_DEV TIMER_DEV(0)
 /**
  * @brief Underlying hardware timer channel to assign to xtimer
  */

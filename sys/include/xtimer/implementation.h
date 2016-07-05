@@ -59,9 +59,9 @@ extern volatile uint32_t _xtimer_high_cnt;
 static inline uint32_t _xtimer_lltimer_now(void)
 {
 #if XTIMER_SHIFT
-    return XTIMER_TICKS_TO_USEC((uint32_t)timer_read(XTIMER));
+    return XTIMER_TICKS_TO_USEC((uint32_t)timer_read(XTIMER_DEV));
 #else
-    return timer_read(XTIMER);
+    return timer_read(XTIMER_DEV);
 #endif
 }
 
