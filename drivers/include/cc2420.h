@@ -1,15 +1,14 @@
 /*
- * Copyright (C) 2015-2016 Freie Universität Berlin
+ * Copyright (C) 2015 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
 
 /**
  * @defgroup    drivers_cc2420 CC2420 driver
- * @ingroup     drivers
- * @brief       Implementation of the CC2420 radio driver
+ * @ingroup     drivers_netdev_netdev2
  * @{
  *
  * @file
@@ -44,10 +43,8 @@ extern "C" {
  *
  * In case this address is used, that short address will be created by using the
  * last two bytes of the long address.
- * @{
  */
 #define CC2420_ADDR_FALLBACK    {0x12, 0x22, 0x33, 0x44, 0x55, 0x66, 0x08, 0x15}
-/** @} */
 
 /**
  * @brief   PAN ID configuration
@@ -81,6 +78,7 @@ enum {
 
 /**
  * @brief   Struct holding all parameters needed for device initialization
+ * @{
  */
 typedef struct cc2420_params {
     spi_t spi;              /**< SPI bus the device is connected to */
@@ -93,19 +91,22 @@ typedef struct cc2420_params {
     gpio_t pin_vrefen;      /**< pin connected to the Vref enable pin */
     gpio_t pin_reset;       /**< pin connected to the reset pin */
 } cc2420_params_t;
+/** @} */
 
 /**
  * @brief   Device descriptor for CC2420 radio devices
+ * @{
  */
 typedef struct {
     /* netdev fields */
-    netdev2_ieee802154_t netdev;
+    netdev2_ieee802154_t netdev;  /**< netdev2 parent struct */
     /* device specific fields */
-    cc2420_params_t params;     /**< hardware interface configuration */
+    cc2420_params_t params;       /**< hardware interface configuration */
     /* device state fields */
-    uint8_t state;              /**< current state of the radio */
-    uint16_t options;           /**< state of used options */
+    uint8_t state;                /**< current state of the radio */
+    uint16_t options;             /**< state of used options */
 } cc2420_t;
+/** @} */
 
 /**
  * @brief   Setup the device descriptor for the given device
@@ -166,7 +167,8 @@ void cc2420_set_addr_short(cc2420_t *dev, uint8_t *addr);
 /**
  * @brief   Get the configured long address of the given device
  *
- * @param[in] dev           device to read from
+ * @param[in]  dev           device to read from
+ * @param[out] addr_long     buffer to save the read address
  *
  * @return                  the currently set (8-byte) long address
  */
@@ -176,7 +178,7 @@ void cc2420_get_addr_long(cc2420_t *dev, uint8_t *addr_long);
  * @brief   Set the long address of the given device
  *
  * @param[in] dev           device to write to
- * @param[in] addr          (8-byte) long address to set
+ * @param[in] addr_long     (8-byte) long address to set
  */
 void cc2420_set_addr_long(cc2420_t *dev, uint8_t *addr_long);
 
@@ -269,7 +271,7 @@ netopt_state_t cc2420_get_state(cc2420_t *dev);
  *
  * @param[in] dev           device to use for sending
  * @param[in] data          data to send (must include IEEE802.15.4 header)
- * @param[in] len           length of @p data
+ * @param[in] count         length of @p data
  *
  * @return                  number of bytes that were actually send
  * @return                  0 on error
@@ -282,7 +284,9 @@ size_t cc2420_send(cc2420_t *dev, const struct iovec *data, int count);
  * This function puts the given device into the TX state, so no receiving of
  * data is possible after it was called.
  *
- * @param[in] dev            device to prepare for sending
+ * @param[in] dev           device to prepare for sending
+ * @param[in] data          data to prepare (must include IEEE802.15.4 header)
+ * @param[in] count         length of @p data
  */
 size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, int count);
 
@@ -297,9 +301,9 @@ void cc2420_tx_exec(cc2420_t *dev);
  * @brief   Read a chunk of data from the receive buffer of the given device
  *
  * @param[in]  dev          device to read from
- * @param[out] data         buffer to write data to
- * @param[in]  len          number of bytes to read from device
- * @param[in]  offset       offset in the receive buffer
+ * @param[out] buf          buffer to write data to
+ * @param[in]  max_len      number of bytes to read from device
+ * @param[in]  info         to be removed
  */
 int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info);
 
