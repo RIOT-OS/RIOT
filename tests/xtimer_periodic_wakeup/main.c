@@ -30,23 +30,25 @@ int32_t res[NUMOF];
 
 int main(void)
 {
-    puts("xtimer_usleep_until test application.\n");
+    puts("xtimer_periodic_wakeup test application.\n");
 
     uint32_t interval = NUMOF;
     int32_t max_diff = INT32_MIN;
     int32_t min_diff = INT32_MAX;
 
     for (int i = 0; i < NUMOF; i++) {
-        printf("Testing interval %u... (now=%"PRIu32")\n", (unsigned)interval, xtimer_now());
+        uint32_t now = xtimer_now();
+        printf("Testing interval %" PRIu32 "... (now=%" PRIu32 ")\n", interval, now);
         uint32_t last_wakeup = xtimer_now();
         uint32_t before = last_wakeup;
-        xtimer_usleep_until(&last_wakeup, (unsigned)interval);
-        res[i] = (xtimer_now()-before)-interval;
+        xtimer_periodic_wakeup(&last_wakeup, interval);
+        now = xtimer_now();
+        res[i] = (now - before) - interval;
         interval -= 1;
     }
 
     for (int i = 0; i < NUMOF; i++) {
-        printf("%4d diff=%"PRIi32"\n", NUMOF-i, res[i]);
+        printf("%4d diff=%" PRIi32 "\n", NUMOF - i, res[i]);
 
         if (res[i] > max_diff) {
             max_diff = res[i];
