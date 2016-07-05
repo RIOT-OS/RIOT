@@ -81,9 +81,9 @@ u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t count)
     LWIP_ASSERT("invalid semaphor", sys_sem_valid(sem));
     if (count != 0) {
         uint64_t stop, start;
-        start = xtimer_now64();
+        start = xtimer_now_usec64();
         int res = sema_wait_timed((sema_t *)sem, count * MS_IN_USEC);
-        stop = xtimer_now64() - start;
+        stop = xtimer_now_usec64() - start;
         if (res == -ETIMEDOUT) {
             return SYS_ARCH_TIMEOUT;
         }
@@ -140,13 +140,13 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
     xtimer_t timer = { .callback = _mbox_timeout, .arg = &mbox->mbox };
     uint64_t start, stop;
 
-    start = xtimer_now64();
+    start = xtimer_now_usec64();
     if (timeout > 0) {
         uint64_t u_timeout = (timeout * MS_IN_USEC);
         _xtimer_set64(&timer, (uint32_t)u_timeout, (uint32_t)(u_timeout >> 32));
     }
     mbox_get(&mbox->mbox, &m);
-    stop = xtimer_now64();
+    stop = xtimer_now_usec64();
     xtimer_remove(&timer);  /* in case timer did not time out */
     switch (m.type) {
         case _MSG_SUCCESS:

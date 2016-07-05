@@ -40,7 +40,7 @@ static uint32_t last = 0;
 static int check_and_read(void *dev, phydat_t *res, int16_t *val, uint8_t unit)
 {
     dht_t *d = (dht_t *)dev;
-    uint32_t now = xtimer_now();
+    uint32_t now = xtimer_now_usec();
 
     if ((now - last) > DHT_SAUL_HOLD_TIME) {
         dht_read(d, &temp, &hum);

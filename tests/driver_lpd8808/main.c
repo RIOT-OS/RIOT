@@ -46,7 +46,7 @@ static color_rgb_t leds[LPD8808_PARAM_LED_CNT];
 
 int main(void)
 {
-    uint32_t now = xtimer_now();
+    xtimer_ticks32_t now = xtimer_now();
     int pos = 0;
     int step = 1;
     color_hsv_t col = { 0.0, 1.0, 1.0 };

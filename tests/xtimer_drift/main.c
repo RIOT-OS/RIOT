@@ -79,7 +79,7 @@ void *slacker_thread(void *arg)
 
         tmsg->msg.type = 12345;
         tmsg->msg.content.ptr = tmsg;
-        xtimer_set_msg(&tmsg->timer, xtimer_ticks_from_usec(tmsg->interval), &tmsg->msg, thread_getpid());
+        xtimer_set_msg(&tmsg->timer, tmsg->interval, &tmsg->msg, thread_getpid());
     }
 }
 
@@ -96,7 +96,8 @@ void *worker_thread(void *arg)
     while (1) {
         msg_t m;
         msg_receive(&m);
-        uint32_t now = xtimer_usec_from_ticks(xtimer_now());
+        xtimer_ticks32_t ticks = xtimer_now();
+        uint32_t now = xtimer_usec_from_ticks(ticks);
         if (start == 0) {
             start = now;
             last = start;
@@ -105,18 +106,15 @@ void *worker_thread(void *arg)
         }
 
         uint32_t us, sec;
-        uint32_t min, hr;
         us = now % SEC_IN_USEC;
         sec = now / SEC_IN_USEC;
-        min = (sec / 60) % 60;
-        hr = sec / 3600;
         if ((loop_counter % TEST_HZ) == 0) {
             uint32_t expected = start + loop_counter * TEST_INTERVAL;
             int32_t drift = now - expected;
             expected = last + TEST_HZ * TEST_INTERVAL;
             int32_t jitter = now - expected;
-            printf("now=%" PRIu32 ".%06" PRIu32 " (%" PRIu32 " hours %" PRIu32 " min), ",
-                sec, us, hr, min);
+            printf("now=%" PRIu32 ".%06" PRIu32 " (0x%08" PRIx32 " ticks), ",
+                sec, us, ticks.ticks32);
             printf("drift=%" PRId32 " us, jitter=%" PRId32 " us\n", drift, jitter);
             last = now;
         }
@@ -192,7 +190,7 @@ int main(void)
 
     xtimer_ticks32_t last_wakeup = xtimer_now();
     while (1) {
-        xtimer_periodic_wakeup(&last_wakeup, xtimer_ticks_from_usec(TEST_INTERVAL));
+        xtimer_periodic_wakeup(&last_wakeup, TEST_INTERVAL);
         msg_try_send(&m, pid3);
     }
 }

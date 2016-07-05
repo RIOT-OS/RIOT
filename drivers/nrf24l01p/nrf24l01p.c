@@ -27,6 +27,9 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#define DELAY_CS_TOGGLE_TICKS       (xtimer_ticks_from_usec(DELAY_CS_TOGGLE_US))
+#define DELAY_AFTER_FUNC_TICKS      (xtimer_ticks_from_usec(DELAY_AFTER_FUNC_US))
+#define DELAY_CHANGE_TXRX_TICKS     (xtimer_ticks_from_usec(DELAY_CHANGE_TXRX_US))
 
 int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer)
 {
@@ -229,7 +232,7 @@ void nrf24l01p_transmit(nrf24l01p_t *dev)
     xtimer_usleep(DELAY_CE_HIGH_US); /* at least 10 us high */
     gpio_clear(dev->ce);
 
-    xtimer_spin(DELAY_CHANGE_TXRX_US);
+    xtimer_spin(DELAY_CHANGE_TXRX_TICKS);
 }
 
 int nrf24l01p_read_payload(nrf24l01p_t *dev, char *answer, unsigned int size)

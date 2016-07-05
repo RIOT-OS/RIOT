@@ -54,9 +54,9 @@ static uint16_t read(gpio_t pin, int bits)
         /* measure the length between the next rising and falling flanks (the
          * time the pin is high - smoke up :-) */
         while (!gpio_read(pin));
-        start = xtimer_now();
+        start = xtimer_now_usec();
         while (gpio_read(pin));
-        end = xtimer_now();
+        end = xtimer_now_usec();
         /* if the high phase was more than 40us, we got a 1 */
         if ((end - start) > PULSE_WIDTH_THRESHOLD) {
             res |= 0x0001;

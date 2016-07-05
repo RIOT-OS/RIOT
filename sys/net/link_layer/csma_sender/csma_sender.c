@@ -158,7 +158,7 @@ int csma_sender_csma_ca_send(netdev2_t *dev, struct iovec *vector,
 
     /* if we arrive here, then we must perform the CSMA/CA procedure
        ourselves by software */
-    random_init(xtimer_now());
+    random_init(_xtimer_now());
     DEBUG("csma: Starting software CSMA/CA....\n");
 
     int nb = 0, be = conf->min_be;

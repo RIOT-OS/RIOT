@@ -604,7 +604,7 @@ static void test_fib_15_get_lifetime(void)
                                                     add_buf_size - 1));
 
     /* assuming some ms passed during these operations... */
-    now = xtimer_now64();
+    now = xtimer_now_usec64();
     uint64_t cmp_lifetime = now + 900000lU;
     uint64_t cmp_max_lifetime = now + 1100000lU;
 

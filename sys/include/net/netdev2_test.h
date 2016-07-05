@@ -39,7 +39,7 @@
  *     (void)vector;
  *     (void)count;
  *
- *     sum += (xtimer_now() - last_start);
+ *     sum += (xtimer_now_usec() - last_start);
  *     mutex_unlock(&wait);
  * }
  *
@@ -52,7 +52,7 @@
  *     // ...
  *     mutex_lock(&wait);
  *     for (int i = 0; i < PKT_NUMBER; i++) {
- *         last_start = xtimer_now();
+ *         last_start = xtimer_now_usec();
  *         conn_udp_sendto("abcd", sizeof("abcd"), NULL, 0, &dst, sizeof(dst),
  *                         AF_INET6, 0xcafe, 0xcafe);
  *         mutex_lock(&wait);
