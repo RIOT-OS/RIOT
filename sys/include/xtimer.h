@@ -144,25 +144,24 @@ static void xtimer_nanosleep(uint32_t nanoseconds);
  */
 static inline void xtimer_spin(uint32_t microseconds);
 
- /**
+/**
  * @brief will cause the calling thread to be suspended until the absolute
- * time (@p last_wakeup + @p interval).
+ * time (@p last_wakeup + @p period).
  *
  * When the function returns, @p last_wakeup is set to
- * (@p last_wakeup + @p interval).
+ * (@p last_wakeup + @p period).
  *
  * This function can be used to create periodic wakeups.
  * @c last_wakeup should be set to xtimer_now() before first call of the
  * function.
  *
- * If the result of (@p last_wakeup + usecs) would be in the past, the function
- * sets @p last_wakeup to @p last_wakeup + @p interval and returns immediately.
+ * If the result of (@p last_wakeup + @p period) would be in the past, the function
+ * sets @p last_wakeup to @p last_wakeup + @p period and returns immediately.
  *
- * @param[in] last_wakeup   base time for the wakeup
- * @param[in] usecs         time in microseconds that will be added to
- *                          last_wakeup
+ * @param[in] last_wakeup   base time stamp for the wakeup
+ * @param[in] period        time in microseconds that will be added to last_wakeup
  */
-void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t usecs);
+void xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period);
 
 /**
  * @brief Set a timer that sends a message
@@ -326,6 +325,29 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_ISR_BACKOFF 20
 #endif
 
+#ifndef XTIMER_PERIODIC_SPIN
+/**
+ * @brief   xtimer_periodic_wakeup spin cutoff
+ *
+ * If the difference between target time and now is less than this value, then
+ * xtimer_periodic_wakeup will use xtimer_spin instead of setting a timer.
+ */
+#define XTIMER_PERIODIC_SPIN (XTIMER_BACKOFF * 2)
+#endif
+
+#ifndef XTIMER_PERIODIC_RELATIVE
+/**
+ * @brief   xtimer_periodic_wakeup relative target cutoff
+ *
+ * If the difference between target time and now is less than this value, then
+ * xtimer_periodic_wakeup will set a relative target time in the future instead
+ * of the true target.
+ *
+ * This is done to prevent target time underflows.
+ */
+#define XTIMER_PERIODIC_RELATIVE (512)
+#endif
+
 #ifndef XTIMER_SHIFT
 /**
  * @brief   xtimer prescaler value
@@ -373,7 +395,6 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_WIDTH (32)
 #endif
 
-#if XTIMER_WIDTH != 32
 /**
  * @brief xtimer timer mask
  *
@@ -383,6 +404,7 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  * For a 16bit timer, the mask would be 0xFFFF0000, for a 24bit timer, the mask
  * would be 0xFF000000.
  */
+#if XTIMER_WIDTH != 32
 #define XTIMER_MASK ((0xffffffff >> XTIMER_WIDTH) << XTIMER_WIDTH)
 #else
 #define XTIMER_MASK (0)
