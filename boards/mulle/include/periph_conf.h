@@ -41,7 +41,6 @@ extern "C"
 #define KINETIS_MCG_ERC_RANGE             0
 #define KINETIS_MCG_ERC_FREQ              (32768U)
 
-/* Base clocks, used by SystemCoreClockUpdate */
 /** Value of the external crystal or oscillator clock frequency in Hz */
 #define CPU_XTAL_CLK_HZ                 8000000u
 /** Value of the external 32k crystal or oscillator clock frequency in Hz */
@@ -67,7 +66,7 @@ extern "C"
 #define TIMER_IRQ_PRIO          CPU_DEFAULT_IRQ_PRIO
 #define TIMER_BASE              PIT
 #define TIMER_MAX_VALUE         (0xffffffff)
-#define TIMER_CLOCK             SystemBusClock
+#define TIMER_CLOCK             CLOCK_BUSCLOCK
 #define TIMER_CLKEN()           (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_PIT_SHIFT) = 1)
 
 /* Timer 0 configuration */
@@ -101,7 +100,7 @@ extern "C"
 #define UART_0_DEV          UART1
 #define UART_0_CLKEN()      (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT) = 1)
 #define UART_0_CLKDIS()     (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT) = 0)
-#define UART_0_CLK          (SystemSysClock)
+#define UART_0_CLK          (DEFAULT_SYSTEM_CLOCK)
 #define UART_0_IRQ_CHAN     UART1_RX_TX_IRQn
 #define UART_0_ISR          isr_uart1_status
 /* UART 0 pin configuration */
@@ -119,7 +118,7 @@ extern "C"
 #define UART_1_DEV          UART0
 #define UART_1_CLKEN()      (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT) = 1)
 #define UART_1_CLKDIS()     (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT) = 0)
-#define UART_1_CLK          (SystemSysClock)
+#define UART_1_CLK          (DEFAULT_SYSTEM_CLOCK)
 #define UART_1_IRQ_CHAN     UART0_RX_TX_IRQn
 #define UART_1_ISR          isr_uart0_status
 /* UART 1 pin configuration */
@@ -188,7 +187,7 @@ static const adc_conf_t adc_config[] = {
 /* PWM 0 device configuration */
 #define PWM_0_DEV           FTM0
 #define PWM_0_CHANNELS      2
-#define PWM_0_CLK           (SystemBusClock)
+#define PWM_0_CLK           (CLOCK_BUSCLOCK)
 #define PWM_0_CLKEN()       (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT) = 1)
 #define PWM_0_CLKDIS()      (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT) = 0)
 
@@ -204,7 +203,7 @@ static const adc_conf_t adc_config[] = {
 /* PWM 1 device configuration */
 #define PWM_1_DEV           FTM1
 #define PWM_1_CHANNELS      2
-#define PWM_1_CLK           (SystemBusClock)
+#define PWM_1_CLK           (CLOCK_BUSCLOCK)
 #define PWM_1_CLKEN()       (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM1_SHIFT) = 1)
 #define PWM_1_CLKDIS()      (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM1_SHIFT) = 0)
 
@@ -246,7 +245,7 @@ static const adc_conf_t adc_config[] = {
 #define SPI_0_IRQ               MULLE_PASTE_PARTS(SPI, SPI_0_INDEX, _IRQn)
 #define SPI_0_IRQ_HANDLER       MULLE_PASTE_PARTS(isr_spi, SPI_0_INDEX, )
 #define SPI_0_IRQ_PRIO          CPU_DEFAULT_IRQ_PRIO
-#define SPI_0_FREQ              SystemBusClock
+#define SPI_0_FREQ              CLOCK_BUSCLOCK
 /* SPI 0 pin configuration */
 #define SPI_0_SCK_PORT          PORTD
 #define SPI_0_SCK_PIN           1
@@ -280,7 +279,7 @@ static const adc_conf_t adc_config[] = {
 #define SPI_1_IRQ               MULLE_PASTE_PARTS(SPI, SPI_1_INDEX, _IRQn)
 #define SPI_1_IRQ_HANDLER       MULLE_PASTE_PARTS(isr_spi, SPI_1_INDEX, )
 #define SPI_1_IRQ_PRIO          CPU_DEFAULT_IRQ_PRIO
-#define SPI_1_FREQ              SystemBusClock
+#define SPI_1_FREQ              CLOCK_BUSCLOCK
 /* SPI 0 pin configuration */
 #define SPI_1_SCK_PORT          PORTE
 #define SPI_1_SCK_PIN           2
@@ -314,7 +313,7 @@ static const adc_conf_t adc_config[] = {
 #define SPI_2_IRQ               MULLE_PASTE_PARTS(SPI, SPI_2_INDEX, _IRQn)
 /* #define SPI_2_IRQ_HANDLER       MULLE_PASTE_PARTS(isr_spi, SPI_2_INDEX, ) */
 #define SPI_2_IRQ_PRIO          CPU_DEFAULT_IRQ_PRIO
-#define SPI_2_FREQ              SystemBusClock
+#define SPI_2_FREQ              CLOCK_BUSCLOCK
 /* SPI 2 pin configuration, must be the same as the other RIOT device using this
  * hardware module */
 #define SPI_2_SCK_PORT          PORTD
@@ -370,7 +369,7 @@ static const adc_conf_t adc_config[] = {
  * @{
  */
 #define I2C_NUMOF               (1U)
-#define I2C_CLK                 SystemBusClock
+#define I2C_CLK                 CLOCK_BUSCLOCK
 #define I2C_0_EN                1
 #define I2C_1_EN                0
 #define I2C_IRQ_PRIO            CPU_DEFAULT_IRQ_PRIO

@@ -105,9 +105,6 @@ void board_init(void)
         __asm__ volatile("nop\n");
     }
 
-    /* Update SystemCoreClock global var */
-    SystemCoreClockUpdate();
-
     /* initialize the CPU */
     cpu_init();
 
