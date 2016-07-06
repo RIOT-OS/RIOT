@@ -6,7 +6,7 @@ BOARD ?= samr21-xpro
 
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := msb-430h stm32f0discovery weio z1
+BOARD_INSUFFICIENT_MEMORY := msb-430h stm32f0discovery telosb weio z1
 
 USEMODULE += emb6_router
 USEMODULE += emb6_conn_udp
