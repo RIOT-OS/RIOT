@@ -312,7 +312,7 @@ clean:
 
 # Remove intermediates, but keep the .elf, .hex and .map etc.
 clean-intermediates:
-	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i clean ; done
+	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
 	-@rm -rf $(BINDIR)/*.a $(BINDIR)/*/
 
 clean-pkg:
