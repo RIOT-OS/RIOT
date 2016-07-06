@@ -35,6 +35,8 @@ static volatile uint32_t _long_cnt = 0;
 volatile uint32_t _xtimer_high_cnt = 0;
 #endif
 
+static inline void xtimer_spin_until(uint32_t value);
+
 static xtimer_t *timer_list_head = NULL;
 static xtimer_t *overflow_list_head = NULL;
 static xtimer_t *long_list_head = NULL;
@@ -54,6 +56,14 @@ static inline int _this_high_period(uint32_t target);
 static inline int _is_set(xtimer_t *timer)
 {
     return (timer->target || timer->long_target);
+}
+
+static inline void xtimer_spin_until(uint32_t target) {
+#if XTIMER_MASK
+    target = _xtimer_lltimer_mask(target);
+#endif
+    while (_xtimer_lltimer_now() > target);
+    while (_xtimer_lltimer_now() < target);
 }
 
 void xtimer_init(void)
