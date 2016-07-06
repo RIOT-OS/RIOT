@@ -43,6 +43,13 @@
 #include "xtimer_trace.h"
 #endif
 
+/**
+ * @brief Define default ticks initialisation if none is defined
+ */
+#ifndef XTIMER_TICKS_INIT
+#define XTIMER_TICKS_INIT       1000000ul
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
