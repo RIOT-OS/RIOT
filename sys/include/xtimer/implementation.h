@@ -31,7 +31,10 @@ extern "C" {
 
 #if XTIMER_MASK
 extern volatile uint32_t _xtimer_high_cnt;
+#define XTIMER_PERIOD_LENGTH    XTIMER_TICKS_TO_USEC(~XTIMER_MASK + 1)
 #endif
+
+#define XTIMER_MSBMASK (((uint32_t)1)<<(XTIMER_WIDTH - 1 + XTIMER_SHIFT))
 
 #if (XTIMER_SHIFT < 0)
 #define XTIMER_USEC_TO_TICKS(value) ( (value) << -XTIMER_SHIFT )
@@ -89,18 +92,26 @@ void _xtimer_sleep(uint32_t offset, uint32_t long_offset);
 static inline uint32_t xtimer_now(void)
 {
 #if XTIMER_MASK
-    uint32_t latched_high_cnt, now;
+    uint32_t high_cnt = _xtimer_high_cnt;
+    uint32_t now = _xtimer_lltimer_now();
 
-    /* _high_cnt can change at any time, so check the value before
-     * and after reading the low-level timer. If it hasn't changed,
-     * then it can be safely applied to the timer count. */
+    /* _xtimer_high_cnt and the underlying hardware timer both count the most
+     * significant bit of the underlying hardware timer.
+     *
+     * Should the counter variable indicate we're in the first half of the
+     * hardware timer period, but the hardware timer indicates otherwise, the
+     * OR handles the missed interrupt.
+     *
+     * Should the counter variable indicate we're in the second half of the
+     * hardware timer period, but the actual timer value does not, we
+     * compensate by adding a half timer period.
+     *
+     * That way, timer overflow interrupts which are up to half a timer period
+     * late can be compensated for.
+     */
 
-    do {
-        latched_high_cnt = _xtimer_high_cnt;
-        now = _xtimer_lltimer_now();
-    } while (_xtimer_high_cnt != latched_high_cnt);
-
-    return latched_high_cnt | now;
+    return (high_cnt | now) +
+        ((uint32_t)((high_cnt & (XTIMER_MSBMASK)) && (~now & XTIMER_MSBMASK))) * (XTIMER_PERIOD_LENGTH >> 1);
 #else
     return _xtimer_lltimer_now();
 #endif
