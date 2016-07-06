@@ -839,6 +839,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/k60/include/MK60DZ10.h \
                          */cpu/kw2x/include/MKW22D5.h \
                          */cpu/k64f/include/MK64F12.h \
+                         */cpu/cc3200/sdk/*
                          */cpu/ezr32wg/include/ezr* \
                          */pkg/*/*/* \
                          */pkg/tlsf/patch.txt \

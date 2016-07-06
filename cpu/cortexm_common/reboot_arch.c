@@ -24,7 +24,16 @@
 
 #include "cpu.h"
 
-void reboot(void)
+#ifndef SYSTEM_RESET
+#define SYSTEM_RESET  NVIC_SystemReset()
+#endif
+
+int reboot(void)
 {
-    NVIC_SystemReset();
+    /* wait a while to make sure the printf is finished */
+    volatile int n = 100000;
+    while(n--);
+    SYSTEM_RESET;
+
+    return -1;
 }
