@@ -169,7 +169,7 @@ static inline void xtimer_spin(uint32_t microseconds);
  * @param[in] usecs         time in microseconds that will be added to
  *                          last_wakeup
  */
-void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t usecs);
+void xtimer_usleep_until(uint64_t *last_wakeup, uint32_t usecs);
 
 /**
  * @brief Set a timer that sends a message
@@ -426,7 +426,6 @@ static inline uint32_t _lltimer_mask(uint32_t val)
  * @brief xtimer internal stuff
  * @internal
  */
-int _xtimer_set_absolute(xtimer_t *timer, uint32_t target);
 void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
 void _xtimer_sleep(uint32_t offset, uint32_t long_offset);
 static inline void xtimer_spin_until(uint32_t value);
