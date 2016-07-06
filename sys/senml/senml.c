@@ -48,6 +48,8 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
 
     char *tmp_key, *tmp_val;
 
+    bool found_base_info = false;
+
     for (size_t i = 0, j = num_toks; j > 0; i++, j--) {
         jsmntok_t *t = &tokens[i];
 
@@ -81,18 +83,23 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
             if (array_num == 0) {
                 if (!strcmp(tmp_key, SJ_VERSION)) {
                     pack->base_info->version = (uint8_t)atoi(tmp_val);
+                    found_base_info = true;
                 }
                 else if (!strcmp(tmp_key, SJ_BASE_NAME)) {
                     pack->base_info->base_name = tmp_val;
+                    found_base_info = true;
                 }
                 else if (!strcmp(tmp_key, SJ_BASE_TIME)) {
                     pack->base_info->base_time = atof(tmp_val);
+                    found_base_info = true;
                 }
                 else if (!strcmp(tmp_key, SJ_BASE_UNIT)) {
                     pack->base_info->base_unit = tmp_val;
+                    found_base_info = true;
                 }
                 else if (!strcmp(tmp_key, SJ_BASE_VALUE)) {
                     pack->base_info->base_value = atof(tmp_val);
+                    found_base_info = true;
                 }
             }
 
@@ -134,6 +141,10 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
             }
         }
     }
+    
+    if (!found_base_info) {
+        pack->base_info = NULL;
+    }
 
     pack->num = (array_num + 1);
 
@@ -143,11 +154,19 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
 
 int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
 {
+    if (len < 3) {
+        DEBUG("ERROR: cannot encode pack to JSON because output buffer is too small\n");
+        return -1;
+    }
+
+    // using len - 3 for content to leave space for closing } and ] and '\0'
+    ssize_t cnt_len = len - 3;
+
     size_t insert_pos = 0;
 
     output[0] = '[';
     insert_pos++;
-    len--;
+    cnt_len--;
 
     int chars_written;
 
@@ -157,71 +176,75 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
 
     output[insert_pos] = '{';
     insert_pos++;
-    len--;
-
-    // using len - 2 to leave space for closing } and ]
+    cnt_len--;
 
     if (pack->base_info->version) {
-        chars_written = snprintf(&output[insert_pos], len - 2, "\"bver\":%u,",
+        chars_written = snprintf(&output[insert_pos], cnt_len, "\"bver\":%u,",
                                  pack->base_info->version);
 
-        insert_pos += chars_written;
-        len -= chars_written;
-
-        if (chars_written >= (ssize_t)len - 2 || chars_written < 0) {
+        if (chars_written >= cnt_len || chars_written < 0) {
             return -1;
         }
+
+        insert_pos += chars_written;
+        cnt_len -= chars_written;
     }
 
     if (pack->base_info->base_name) {
-        chars_written = snprintf(&output[insert_pos], len - 2, "\"bn\":\"%s\",",
+        chars_written = snprintf(&output[insert_pos], cnt_len, "\"bn\":\"%s\",",
                                  pack->base_info->base_name);
 
-        insert_pos += chars_written;
-        len -= chars_written;
-
-        if (chars_written >= (ssize_t)len - 2 || chars_written < 0) {
+        if (chars_written >= cnt_len || chars_written < 0) {
             return -1;
         }
+
+        insert_pos += chars_written;
+        cnt_len -= chars_written;
     }
 
     if (pack->base_info->base_time != 0) {
-        chars_written = snprintf(&output[insert_pos], len - 2, "\"bt\":%f,",
+        chars_written = snprintf(&output[insert_pos], cnt_len, "\"bt\":%f,",
                                  pack->base_info->base_time);
 
-        insert_pos += chars_written;
-        len -= chars_written;
-
-        if (chars_written >= (ssize_t)len - 2 || chars_written < 0) {
+        if (chars_written >= cnt_len || chars_written < 0) {
             return -1;
         }
+
+        insert_pos += chars_written;
+        cnt_len -= chars_written;
     }
 
     if (pack->base_info->base_unit) {
-        chars_written = snprintf(&output[insert_pos], len - 2, "\"bu\":\"%s\",",
+        chars_written = snprintf(&output[insert_pos], cnt_len, "\"bu\":\"%s\",",
                                  pack->base_info->base_unit);
 
-        insert_pos += chars_written;
-        len -= chars_written;
-
-        if (chars_written >= (ssize_t)len - 2 || chars_written < 0) {
+        if (chars_written >= cnt_len || chars_written < 0) {
             return -1;
         }
+
+        insert_pos += chars_written;
+        cnt_len -= chars_written;
     }
 
     if (pack->base_info->base_value != 0) {
-        chars_written = snprintf(&output[insert_pos], len - 2, "\"bv\":%f,",
+        chars_written = snprintf(&output[insert_pos], cnt_len, "\"bv\":%f,",
                                  pack->base_info->base_value);
 
-        insert_pos += chars_written;
-        len -= chars_written;
-
-        if (chars_written >= (ssize_t)len - 2 || chars_written < 0) {
+        if (chars_written >= cnt_len || chars_written < 0) {
             return -1;
         }
+
+        insert_pos += chars_written;
+        cnt_len -= chars_written;
     }
 
     encode_records:
+
+    if (insert_pos == 1) {
+        output[insert_pos] = '{';
+        insert_pos++;
+        cnt_len--;
+    }
 
     for (size_t i = 0; i < pack->num; i++) {
         senml_record_t *curr_record = &(pack->records[i]);
@@ -229,97 +252,106 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
         if (i != 0) {
             output[insert_pos] = '{';
             insert_pos++;
-            len--;
+            cnt_len--;
         }
 
         if (curr_record->name) {
-            chars_written = snprintf(&output[insert_pos], len - 2, "\"n\":\"%s\",", curr_record->name);
+            chars_written = snprintf(&output[insert_pos], cnt_len, "\"n\":\"%s\",",
+                                     curr_record->name);
 
-            insert_pos += chars_written;
-            len -= chars_written;
-
-            if (chars_written >= (ssize_t)len - 2 || chars_written < 0) {
+            if (chars_written >= cnt_len || chars_written < 0) {
                 return -1;
             }
+
+            insert_pos += chars_written;
+            cnt_len -= chars_written;
         }
 
         if (curr_record->unit) {
-            chars_written = snprintf(&output[insert_pos], len - 2, "\"u\":\"%s\",", curr_record->unit);
+            chars_written = snprintf(&output[insert_pos], cnt_len, "\"u\":\"%s\",",
+                                     curr_record->unit);
 
-            insert_pos += chars_written;
-            len -= chars_written;
-
-            if (chars_written >= (ssize_t)len - 2 || chars_written < 0) {
+            if (chars_written >= cnt_len || chars_written < 0) {
                 return -1;
             }
+
+            insert_pos += chars_written;
+            cnt_len -= chars_written;
         }
 
         if (curr_record->time != 0) {
-            chars_written = snprintf(&output[insert_pos], len - 2, "\"t\":%f,", curr_record->time);
+            chars_written = snprintf(&output[insert_pos], cnt_len, "\"t\":%f,",
+                                     curr_record->time);
 
-            insert_pos += chars_written;
-            len -= chars_written;
-
-            if (chars_written >= (ssize_t)len - 2 || chars_written < 0) {
+            if (chars_written >= cnt_len || chars_written < 0) {
                 return -1;
             }
+
+            insert_pos += chars_written;
+            cnt_len -= chars_written;
         }
 
         if (curr_record->update_time != 0) {
-            chars_written = snprintf(&output[insert_pos], len - 2, "\"ut\":%f,",
+            chars_written = snprintf(&output[insert_pos], cnt_len, "\"ut\":%f,",
                                      curr_record->update_time);
 
-            insert_pos += chars_written;
-            len -= chars_written;
-
-            if (chars_written >= (ssize_t)len - 2 || chars_written < 0) {
+            if (chars_written >= cnt_len || chars_written < 0) {
                 return -1;
             }
+
+            insert_pos += chars_written;
+            cnt_len -= chars_written;
         }
 
         if (curr_record->value_type != SENML_TYPE_UNDEF) {
             if (curr_record->value_type == SENML_TYPE_FLOAT) {
-                chars_written = snprintf(&output[insert_pos], len - 2, "\"v\":%f",
+                chars_written = snprintf(&output[insert_pos], cnt_len, "\"v\":%f,",
                                          curr_record->value.f);
             }
             else if (curr_record->value_type == SENML_TYPE_STRING) {
-                chars_written = snprintf(&output[insert_pos], len - 2, "\"vs\":\"%s\"",
+                chars_written = snprintf(&output[insert_pos], cnt_len, "\"vs\":\"%s\",",
                                          curr_record->value.s);
             }
             else if (curr_record->value_type == SENML_TYPE_BOOL) {
-                chars_written = snprintf(&output[insert_pos], len - 2, "\"vb\":%s",
+                chars_written = snprintf(&output[insert_pos], cnt_len, "\"vb\":%s,",
                                          curr_record->value.b ? "true" : "false");
             }
             else if (curr_record->value_type == SENML_TYPE_BINARY) {
-                chars_written = snprintf(&output[insert_pos], len - 2, "\"vd\":\"%s\"",
+                chars_written = snprintf(&output[insert_pos], cnt_len, "\"vd\":\"%s\",",
                                          curr_record->value.d);
             }
 
-            insert_pos += chars_written;
-            len -= chars_written;
-
-            if (chars_written >= (ssize_t)len - 2 || chars_written < 0) {
+            if (chars_written >= cnt_len || chars_written < 0) {
                 return -1;
             }
+
+            insert_pos += chars_written;
+            cnt_len -= chars_written;
         }
+
+        // decrease insert_pos to overwrite trailing comma
+        insert_pos--;
+        cnt_len++;
 
         output[insert_pos] = '}';
         insert_pos++;
-        len--;
+        cnt_len--;
 
         output[insert_pos] = ',';
         insert_pos++;
-        len--;
+        cnt_len--;
     }
 
-    // remove trailing comma
-    if (insert_pos > 2) {
+    // remove trailing comma or unnecessary opening curly brace
+    if (insert_pos >= 2) {
         insert_pos--;
     }
 
     output[insert_pos] = ']';
     insert_pos++;
+
     output[insert_pos] = '\0';
+    insert_pos++;
 
     return 0;
 }
