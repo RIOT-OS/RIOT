@@ -243,7 +243,7 @@ static inline void _lltimer_set(uint32_t target)
     if (_xtimer_lltimer_mask(target - _xtimer_lltimer_now()) > (_xtimer_lltimer_mask(0xFFFFFFFF)>>1) ) {
         target = _xtimer_lltimer_now() + XTIMER_ISR_BACKOFF;
     }
-    timer_set_absolute(XTIMER, XTIMER_CHAN, _xtimer_lltimer_mask(target));
+    timer_set_absolute(XTIMER_DEV, XTIMER_CHAN, _xtimer_lltimer_mask(target));
 }
 
 static void _update_lltimer(void)
