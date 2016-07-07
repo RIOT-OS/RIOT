@@ -37,9 +37,9 @@ extern "C" {
  * @brief   Xtimer configuration
  * @{
  */
-#define XTIMER                      (0)
+#define XTIMER_DEV                  (0)
 #define XTIMER_CHAN                 (0)
-#define XTIMER_MASK                 (0xffff0000)
+#define XTIMER_WIDTH                (16)
 #define XTIMER_BACKOFF              (40)
 /** @} */
 

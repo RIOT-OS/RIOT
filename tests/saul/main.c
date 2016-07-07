@@ -26,7 +26,7 @@
 /**
  * @brief   Read th sensors every second
  */
-#define INTERVAL            (1000000U)
+#define INTERVAL            (1000000LU)
 
 
 int main(void)

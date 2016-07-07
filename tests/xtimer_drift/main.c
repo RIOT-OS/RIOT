@@ -38,9 +38,9 @@
  * TEST_MSG_RX_USLEEP is a tiny sleep inside the message reception thread to
  * cause extra context switches.
  */
-#define TEST_HZ (64)
-#define TEST_INTERVAL (1000000 / TEST_HZ)
-#define TEST_MSG_RX_USLEEP (200)
+#define TEST_HZ (64LU)
+#define TEST_INTERVAL (1000000LU / TEST_HZ)
+#define TEST_MSG_RX_USLEEP (200LU)
 
 char slacker_stack1[THREAD_STACKSIZE_DEFAULT];
 char slacker_stack2[THREAD_STACKSIZE_DEFAULT];
