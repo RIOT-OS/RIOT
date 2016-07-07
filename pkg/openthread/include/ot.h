@@ -19,10 +19,10 @@ typedef struct {
 	size_t len;
 } serial_msg_t;
 
-void recv_pkt(netdev2_t *dev, uint8_t *buf);
+void recv_pkt(netdev2_t *dev);
 void send_pkt(netdev2_t *dev);
 void openthread_init(void);
-void radio_init(uint8_t *tb);
+void radio_init(uint8_t *tb, uint8_t *rb);
 void set_netdev(netdev2_t *dev);
 void *ot_thread(void *arg);
 #ifdef __cplusplus

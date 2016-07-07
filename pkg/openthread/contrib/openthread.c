@@ -10,7 +10,7 @@
 #include "openthread.h"
 #include "ot.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #include "platform.h"
@@ -20,6 +20,7 @@
 #define OPENTHREAD_QUEUE_LEN      (8)
 
 #include <cli/cli-serial.h>
+#include "xtimer.h"
 
 #ifdef MODULE_AT86RF2XX     /* is mutual exclusive with above ifdef */
 #define OPENTHREAD_NETIF_NUMOF        (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
@@ -64,13 +65,13 @@ void *ot_thread(void *arg)
 		switch(msg.type)
 		{
 			case OPENTHREAD_XTIMER_MSG_TYPE_EVENT:
-				DEBUG("openthread: otPlatAlarmFired\n");
+				//DEBUG("openthread: otPlatAlarmFired at %i\n", (int) (xtimer_now()/1000));
 				otPlatAlarmFired();
 				break;
 			case OPENTHREAD_NETDEV2_MSG_TYPE_EVENT:
 				dev = (netdev2_t*) msg.content.ptr;
-				DEBUG("openthread: Called driver isr\n");
-				    dev->driver->isr(dev);
+				//DEBUG("openthread: Called driver isr\n");
+				dev->driver->isr(dev);
 				break;
 			case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
 				ser = (serial_msg_t*) msg.content.ptr;
@@ -101,16 +102,19 @@ void _event_cb(netdev2_t *dev, netdev2_event_t event)
 		{
 			case NETDEV2_EVENT_RX_COMPLETE:
 				DEBUG("openthread: Receiving pkt\n");
-				recv_pkt(dev, _tmp_buf);
+				recv_pkt(dev);
 				break;
 			case NETDEV2_EVENT_TX_COMPLETE:
+				DEBUG("openthread: Sending a pkt\n");
 				send_pkt(dev);
 				break;
 			case NETDEV2_EVENT_TX_NOACK:
-				otPlatRadioTransmitDone(false, kThreadError_NoAck);
+				DEBUG("NETDEV2_EVENT_TX_NOACK\n");
+				//otPlatRadioTransmitDone(false, kThreadError_NoAck);
 				break;
 			case NETDEV2_EVENT_TX_MEDIUM_BUSY:
-				otPlatRadioTransmitDone(false, kThreadError_ChannelAccessFailure);
+				DEBUG("NETDEV2_EVENT_TX_MEDIUM_BUSY\n");
+				//otPlatRadioTransmitDone(false, kThreadError_ChannelAccessFailure);
 				break;
 			default:
 				break;
@@ -124,9 +128,9 @@ void openthread_init(void)
 #ifdef MODULE_AT86RF2XX
         at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0]);
 		netdev2_t *netdev = (netdev2_t*) &at86rf2xx_dev;
+		radio_init(transmit_buf, _tmp_buf);
 		netdev->driver->init(netdev);
 		netdev->event_callback = _event_cb;
-		radio_init(transmit_buf);
 		set_netdev(netdev);
 #endif
 }

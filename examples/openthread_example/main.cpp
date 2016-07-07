@@ -6,15 +6,16 @@
 #include "xtimer.h"
 #include "msg.h"
 #include "random.h"
+#include "string.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #include "periph/cpuid.h"
 
 
 static char buf[100];
-char ot_thread_stack[THREAD_STACKSIZE_MAIN];
+char ot_thread_stack[3*THREAD_STACKSIZE_MAIN];
 
 
 int main(void)
@@ -45,11 +46,17 @@ int main(void)
                            THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
 			                                ot_thread, NULL, "ot_thread");
     DEBUG("Starting main's loop\n");
-    (void) msg;
-    (void) p;
-    (void) pid;
 
-/*	while(1)
+	(void) p;
+	(void) msg;
+	(void) pid;
+#if 0
+	memcpy(p, "start\n",sizeof("start"));
+	sm.len = sizeof("start\n");
+	msg_send(&msg, pid);
+    printf("Go!\n");
+#else
+	while(1)
 	{
         *p = getchar();
         if(*p == '\r' || *p == '\n')
@@ -62,6 +69,7 @@ int main(void)
         {
             p++;
         }
-	}*/
+	}
+#endif
 	return 0;
 }
