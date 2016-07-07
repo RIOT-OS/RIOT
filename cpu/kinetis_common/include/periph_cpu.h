@@ -165,6 +165,42 @@ typedef struct {
 } dac_conf_t;
 
 /**
+ * @brief   CPU specific timer PIT module configuration
+ */
+typedef struct {
+    /** Prescaler channel */
+    uint8_t prescaler_ch;
+    /** Counting channel, will be linked to the prescaler channel */
+    uint8_t count_ch;
+} pit_conf_t;
+
+/**
+ * @brief   CPU specific timer LPTMR module configuration
+ */
+typedef struct {
+    /** LPTMR device base pointer */
+    LPTMR_Type *dev;
+    /** Pointer to module clock gate bit in bitband region, use BITBAND_REGADDR() */
+    uint32_t volatile *clk_gate;
+    /** LPTMR device index */
+    uint8_t index;
+} lptmr_conf_t;
+
+/**
+ * @brief   Possible timer module types
+ */
+enum {
+    TIMER_PIT,
+    TIMER_LPTMR,
+};
+
+/**
+ * @brief   Hardware timer type-specific device macros
+ */
+#define TIMER_PIT_DEV(x)   (TIMER_DEV(0 + (x)))
+#define TIMER_LPTMR_DEV(x) (TIMER_DEV(PIT_NUMOF + (x)))
+
+/**
  * @brief   CPU internal function for initializing PORTs
  *
  * @param[in] pin       pin to initialize

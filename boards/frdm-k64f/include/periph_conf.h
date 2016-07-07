@@ -48,31 +48,31 @@ extern "C"
 #define CLOCK_BUSCLOCK               (CLOCK_CORECLOCK / 2)
 /** @} */
 
-
 /**
  * @name Timer configuration
  * @{
  */
-#define TIMER_NUMOF                  (1U)
-#define TIMER_0_EN                   1
-#define TIMER_1_EN                   0
-#define TIMER_IRQ_PRIO               1
-#define TIMER_BASE                   PIT
-#define TIMER_MAX_VALUE              (0xffffffff)
-#define TIMER_CLOCK                  CLOCK_CORECLOCK
-#define TIMER_CLKEN()                (SIM->SCGC6 |= (SIM_SCGC6_PIT_MASK))
+#define PIT_NUMOF               (2U)
+#define PIT_CONFIG {                 \
+        {                            \
+            .prescaler_ch = 0,       \
+            .count_ch = 1,           \
+        },                           \
+        {                            \
+            .prescaler_ch = 2,       \
+            .count_ch = 3,           \
+        },                           \
+    }
+#define LPTMR_NUMOF             (0U)
+#define LPTMR_CONFIG {}
+#define TIMER_NUMOF             ((PIT_NUMOF) + (LPTMR_NUMOF))
 
-/* Timer 0 configuration */
-#define TIMER_0_PRESCALER_CH         0
-#define TIMER_0_COUNTER_CH           1
-#define TIMER_0_ISR                  isr_pit1
-#define TIMER_0_IRQ_CHAN             PIT1_IRQn
+#define PIT_BASECLOCK           (CLOCK_BUSCLOCK)
+#define PIT_CLOCKGATE           (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_PIT_SHIFT))
+#define PIT_ISR_0               isr_pit1
+#define PIT_ISR_1               isr_pit3
+#define LPTMR_ISR_0             isr_lptmr0
 
-/* Timer 1 configuration */
-#define TIMER_1_PRESCALER_CH         2
-#define TIMER_1_COUNTER_CH           3
-#define TIMER_1_ISR                  isr_pit3
-#define TIMER_1_IRQ_CHAN             PIT3_IRQn
 /** @} */
 
 /**
