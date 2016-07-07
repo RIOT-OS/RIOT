@@ -33,11 +33,6 @@ extern "C" {
  */
 void tty_uart_setup(uart_t uart, const char *name);
 
-/**
- * @brief   closes files opened
- */
-void uart_cleanup(void);
-
 #ifdef __cplusplus
 }
 #endif

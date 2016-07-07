@@ -55,24 +55,12 @@ typedef struct {
 } netdev2_tap_params_t;
 
 /**
- * @brief global device struct. driver only supports one tap device as of now.
- */
-extern netdev2_tap_t netdev2_tap;
-
-/**
  * @brief Setup netdev2_tap_t structure.
  *
  * @param dev       the preallocated netdev2_tap device handle to setup
  * @param params    initialization parameters
  */
 void netdev2_tap_setup(netdev2_tap_t *dev, const netdev2_tap_params_t *params);
-
-/**
- * @brief Cleanup tap resources
- *
- * @param dev  the netdev2_tap device handle to cleanup
- */
-void netdev2_tap_cleanup(netdev2_tap_t *dev);
 
 #ifdef __cplusplus
 }
