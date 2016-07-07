@@ -61,14 +61,11 @@ INCLUDES += -I$(RIOTBASE)/tests/unittests/common
 
 include $(RIOTBASE)/Makefile.include
 
-.PHONY: FORCE $(UNIT_TESTS)
+.PHONY: $(UNIT_TESTS)
 
-FORCE:
-	touch $(CURDIR)/main.c
+all:
 
-all: FORCE
-
-$(UNIT_TESTS): FORCE all
+$(UNIT_TESTS): all
 
 charCOMMA := ,
 
