@@ -51,9 +51,10 @@ void tty_uart_setup(uart_t uart, const char *filename)
     tty_device_filenames[uart] = strndup(filename, PATH_MAX - 1);
 }
 
-static void io_signal_handler(int fd)
+static void io_signal_handler(int fd, void *arg)
 {
     uart_t uart;
+    (void) arg;
 
     for (uart = 0; uart < UART_NUMOF; uart++) {
         if (tty_fds[uart] == fd) {
@@ -151,7 +152,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     uart_config[uart].arg = arg;
 
     native_async_read_setup();
-    native_async_read_add_handler(tty_fds[uart], io_signal_handler);
+    native_async_read_add_handler(tty_fds[uart], NULL, io_signal_handler);
 
     return 0;
 }
