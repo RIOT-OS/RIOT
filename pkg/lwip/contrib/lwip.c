@@ -20,6 +20,7 @@
 
 #ifdef MODULE_NETDEV2_TAP
 #include "netdev2_tap.h"
+#include "netdev2_tap_params.h"
 #endif
 
 #ifdef MODULE_AT86RF2XX
@@ -33,7 +34,7 @@
 #include "debug.h"
 
 #ifdef MODULE_NETDEV2_TAP
-#define LWIP_NETIF_NUMOF        (1)
+#define LWIP_NETIF_NUMOF        (NETDEV2_TAP_MAX)
 #endif
 
 #ifdef MODULE_AT86RF2XX     /* is mutual exclusive with above ifdef */
@@ -42,6 +43,10 @@
 
 #ifdef LWIP_NETIF_NUMOF
 static struct netif netif[LWIP_NETIF_NUMOF];
+#endif
+
+#ifdef MODULE_NETDEV2_TAP
+static netdev2_tap_t netdev2_taps[LWIP_NETIF_NUMOF];
 #endif
 
 #ifdef MODULE_AT86RF2XX
@@ -53,9 +58,13 @@ void lwip_bootstrap(void)
     /* TODO: do for every eligable netdev2 */
 #ifdef LWIP_NETIF_NUMOF
 #ifdef MODULE_NETDEV2_TAP
-    if (netif_add(&netif[0], &netdev2_tap, lwip_netdev2_init, tcpip_input) == NULL) {
-        DEBUG("Could not add netdev2_tap device\n");
-        return;
+    for (int i = 0; i < LWIP_NETIF_NUMOF; i++) {
+        netdev2_tap_setup(&netdev2_taps[i], &netdev2_tap_params[i]);
+        if (netif_add(&netif[i], &netdev2_taps[i], lwip_netdev2_init,
+                      tcpip_input) == NULL) {
+            DEBUG("Could not add netdev2_tap device\n");
+            return;
+        }
     }
 #elif defined(MODULE_AT86RF2XX)
     for (int i = 0; i < LWIP_NETIF_NUMOF; i++) {

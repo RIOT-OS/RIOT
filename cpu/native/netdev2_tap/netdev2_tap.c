@@ -387,4 +387,3 @@ static int _init(netdev2_t *netdev)
     DEBUG("gnrc_tapnet: initialized.\n");
     return 0;
 }
-
