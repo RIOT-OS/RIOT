@@ -113,7 +113,7 @@ void *ticker(void *arg)
             msg_send(&msg, print_pid);
         }
 
-        xtimer_usleep_until(&base, INT_SHORT);
+        xtimer_periodic_wakeup(&base, INT_SHORT);
     }
 
     return NULL;

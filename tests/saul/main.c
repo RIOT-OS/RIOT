@@ -26,7 +26,7 @@
 /**
  * @brief   Read th sensors every second
  */
-#define INTERVAL            (1000000LU)
+#define INTERVAL            (1LU * SEC_IN_USEC)
 
 
 int main(void)
@@ -50,7 +50,7 @@ int main(void)
             dev = dev->next;
         }
 
-        xtimer_usleep_until(&last, INTERVAL);
+        xtimer_periodic_wakeup(&last, INTERVAL);
     }
 
     return 0;

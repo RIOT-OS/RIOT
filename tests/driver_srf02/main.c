@@ -27,6 +27,7 @@
 
 #include "shell.h"
 #include "xtimer.h"
+#include "timex.h"
 #include "srf02.h"
 
 #ifndef TEST_SRF02_I2C
@@ -36,7 +37,7 @@
 #error "TEST_MODE not defined"
 #endif
 
-#define SAMPLE_PERIOD       (100LU * 1000U)
+#define SAMPLE_PERIOD       (100LU * MS_IN_USEC) /* 100 ms */
 
 static srf02_t dev;
 
@@ -78,7 +79,7 @@ static int cmd_sample(int argc, char **argv)
 
     while(1) {
         sample();
-        xtimer_usleep_until(&wakeup, SAMPLE_PERIOD);
+        xtimer_periodic_wakeup(&wakeup, SAMPLE_PERIOD);
     }
 
     return 0;

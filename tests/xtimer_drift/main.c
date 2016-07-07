@@ -192,7 +192,7 @@ int main(void)
 
     uint32_t last_wakeup = xtimer_now();
     while (1) {
-        xtimer_usleep_until(&last_wakeup, TEST_INTERVAL);
+        xtimer_periodic_wakeup(&last_wakeup, TEST_INTERVAL);
         msg_try_send(&m, pid3);
     }
 }

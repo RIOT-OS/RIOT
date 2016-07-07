@@ -56,7 +56,7 @@ int main(void)
             dac_set(DAC_LINE(i), val);
         }
         val += step;
-        xtimer_usleep_until(&last, DELAY);
+        xtimer_periodic_wakeup(&last, DELAY);
     }
 
     return 0;

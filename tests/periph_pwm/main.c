@@ -27,9 +27,10 @@
 #include <stdio.h>
 
 #include "xtimer.h"
+#include "timex.h"
 #include "periph/pwm.h"
 
-#define INTERVAL    (10000U)
+#define INTERVAL    (10LU * MS_IN_USEC) /* 10 ms */
 #define STEP        (10)
 
 #define MODE        PWM_LEFT
@@ -71,7 +72,7 @@ int main(void)
             step = -step;
         }
 
-        xtimer_usleep_until(&last_wakeup, INTERVAL);
+        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
     }
 
     return 0;
