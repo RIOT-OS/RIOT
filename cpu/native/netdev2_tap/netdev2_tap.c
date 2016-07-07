@@ -390,16 +390,3 @@ static int _init(netdev2_t *netdev)
     return 0;
 }
 
-void netdev2_tap_cleanup(netdev2_tap_t *dev)
-{
-    /* Do we have a device */
-    if (!dev) {
-        return;
-    }
-
-    /* cleanup signal handling */
-    native_async_read_cleanup();
-
-    /* close the tap device */
-    real_close(dev->tap_fd);
-}
