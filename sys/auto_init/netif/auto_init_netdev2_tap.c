@@ -25,7 +25,7 @@
 #include "netdev2_tap.h"
 #include "net/gnrc/netdev2/eth.h"
 
-extern netdev2_tap_t netdev2_tap;
+static netdev2_tap_t netdev2_tap;
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
