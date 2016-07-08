@@ -93,6 +93,10 @@ ifneq (,$(filter sema,$(USEMODULE)))
     DIRS += sema
 endif
 
+ifneq (,$(filter constfs,$(USEMODULE)))
+    DIRS += fs/constfs
+endif
+
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
 include $(RIOTBASE)/Makefile.base
