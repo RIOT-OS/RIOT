@@ -37,9 +37,10 @@ USEMODULE += saul_reg
 USEMODULE += saul_default
 USEMODULE += auto_init_saul
 
-BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 iotlab-a8-m3 mulle native nrf51dongle \
-	nrf6310 pba-d-01-kw2x pca10000 pca10005 saml21-xpro samr21-xpro spark-core \
-	telosb yunjia-nrf51822 z1
+BOARD_PROVIDES_NETIF := airfy-beacon cc2538dk fox iotlab-m3 iotlab-a8-m3 mulle \
+        native nrf51dongle nrf6310 openmote-cc2538 pba-d-01-kw2x pca10000 pca10005 \
+        remote-pa remote-reva saml21-xpro samr21-xpro spark-core telosb \
+        yunjia-nrf51822 z1
 
 ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
   # Use modules for networking
