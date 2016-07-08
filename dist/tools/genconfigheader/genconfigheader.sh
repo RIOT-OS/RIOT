@@ -23,7 +23,7 @@ shift
 
 MD5SUM=md5sum
 if [ "$(uname -s)" = "Darwin" ]; then
-  MD5SUM=md5 -r
+  MD5SUM="md5 -r"
 fi
 
 # atomically update the file
