@@ -28,10 +28,10 @@ In terms of hardware support, the following drivers have been implemented:
     * LEDs
     * Buttons
     * RF switch to programatically drive either 2.4GHz or sub-1GHz to a single RP-SMA
+    * RF 2.4GHz built-in in CC2538
 
 And under work or pending at cc2538 base cpu:
 
-    * RF 2.4GHz built-in in CC2538
     * Built-in core temperature and battery sensor.
     * CC1200 sub-1GHz radio interface.
     * Micro-SD external storage.
