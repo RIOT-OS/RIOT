@@ -225,6 +225,11 @@ void auto_init(void)
     auto_init_netdev2_tap();
 #endif
 
+#ifdef MODULE_NORDIC_SOFTDEVICE_BLE
+    extern void gnrc_nordic_ble_6lowpan_init(void);
+    gnrc_nordic_ble_6lowpan_init();
+#endif
+
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
 #ifdef MODULE_GNRC_IPV6_NETIF

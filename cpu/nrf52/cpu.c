@@ -20,6 +20,8 @@
  * @}
  */
 
+#define DONT_OVERRIDE_NVIC
+
 #include "cpu.h"
 #include "periph_conf.h"
 
@@ -28,14 +30,16 @@ static bool ftpan_32(void);
 static bool ftpan_37(void);
 static bool ftpan_36(void);
 
+#ifdef SOFTDEVICE_PRESENT
+#include "softdevice_handler.h"
+uint8_t _ble_evt_buffer[BLE_STACK_EVT_MSG_BUF_SIZE];
+#endif
+
 /**
  * @brief   Initialize the CPU, set IRQ priorities
  */
 void cpu_init(void)
 {
-    /* set pendSV interrupt to lowest possible priority */
-    NVIC_SetPriority(PendSV_IRQn, 0xff);
-
     /* Workaround for FTPAN-32
      * "DIF: Debug session automatically enables TracePort pins." */
     if (ftpan_32()) {
@@ -63,6 +67,20 @@ void cpu_init(void)
     NRF_CLOCK->TASKS_HFCLKSTART = 1;
 
     while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
+#endif
+
+    /* softdevice needs to be enabled from ISR context */
+#ifdef SOFTDEVICE_PRESENT
+    softdevice_handler_init(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, &_ble_evt_buffer,
+            BLE_STACK_EVT_MSG_BUF_SIZE, NULL);
+#endif
+    /* call cortexm default initialization */
+    cortexm_init();
+
+#ifdef SOFTDEVICE_PRESENT
+    /* fixup swi0 (used as softdevice PendSV trampoline) */
+    NVIC_EnableIRQ(SWI0_EGU0_IRQn);
+    NVIC_SetPriority(SWI0_EGU0_IRQn, 6);
 #endif
 }
 
