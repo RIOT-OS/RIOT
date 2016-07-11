@@ -601,6 +601,10 @@ ifneq (,$(filter constfs,$(USEMODULE)))
   USEMODULE += vfs
 endif
 
+ifneq (,$(filter devfs,$(USEMODULE)))
+  USEMODULE += vfs
+endif
+
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
