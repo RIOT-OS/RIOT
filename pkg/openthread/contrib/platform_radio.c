@@ -23,9 +23,55 @@ void set_netdev(netdev2_t *dev)
 	_dev = dev;
 }
 
-static inline void _addr_set_broadcast(uint8_t *dst)
+uint16_t get_channel(void)
 {
-	memset(dst, 0xff, ETHERNET_ADDR_LEN);
+	uint16_t channel;
+	_dev->driver->get(_dev, NETOPT_CHANNEL, &channel, sizeof(uint16_t));
+	return channel;
+}
+
+int set_channel(uint16_t channel)
+{
+	return _dev->driver->set(_dev, NETOPT_CHANNEL, &channel, sizeof(uint16_t));
+}
+
+int16_t get_power(void)
+{
+	int16_t power;
+	_dev->driver->get(_dev, NETOPT_TX_POWER, &power, sizeof(int16_t));
+	return power;
+}
+
+int set_power(int16_t power)
+{
+	return _dev->driver->set(_dev, NETOPT_TX_POWER, &power, sizeof(int16_t));
+}
+
+int set_panid(uint16_t panid)
+{
+	return _dev->driver->set(_dev, NETOPT_NID, &panid, sizeof(uint16_t));	
+}
+
+int set_long_addr(uint8_t *ext_addr)
+{
+	return _dev->driver->set(_dev, NETOPT_ADDRESS_LONG, ext_addr, IEEE802154_LONG_ADDRESS_LEN);	
+}
+
+int set_addr(uint16_t addr)
+{
+	return _dev->driver->set(_dev, NETOPT_ADDRESS, &addr, sizeof(uint16_t));	
+}
+
+netopt_enable_t is_promiscuous(void)
+{
+	netopt_enable_t en;
+	_dev->driver->get(_dev, NETOPT_PROMISCUOUSMODE, &en, sizeof(en));
+	return en == NETOPT_ENABLE ? true : false;;
+}
+
+int set_promiscuous(netopt_enable_t enable)
+{
+	return _dev->driver->set(_dev, NETOPT_PROMISCUOUSMODE, &enable, sizeof(enable));
 }
 
 void recv_pkt(netdev2_t *dev)
@@ -49,13 +95,8 @@ void recv_pkt(netdev2_t *dev)
 	/* Fill OT receive frame */
 	sReceiveFrame.mLength = len;
 
-	uint16_t channel;
-	int16_t mPower;
-
-	_dev->driver->get(_dev, NETOPT_CHANNEL, &channel, sizeof(uint16_t));
-	_dev->driver->get(_dev, NETOPT_TX_POWER, &mPower, sizeof(int16_t));
-
-	sReceiveFrame.mPower = mPower;
+	//get_channel(dev);
+	sReceiveFrame.mPower = get_power();
 
 	/* Tell OpenThread that receive has finished */
 	DEBUG("recv_pkt res: %i\n", res);
@@ -91,21 +132,23 @@ int get_state(void)
 	return en;
 }
 
+void set_state(netopt_state_t state)
+{
+	_dev->driver->set(_dev, NETOPT_STATE, &state, sizeof(netopt_state_t));
+}
+
 bool dev_is_off(void)
 {
-	int res = get_state();
-	return res == NETOPT_STATE_OFF;
+	return get_state() == NETOPT_STATE_OFF;
 }
 bool dev_is_sleep(void)
 {
-	int res = get_state();
-	return res == NETOPT_STATE_SLEEP;
+	return get_state() == NETOPT_STATE_SLEEP;
 }
 
 bool dev_is_ready(void)
 {
-	int res = get_state();
-	return res == NETOPT_STATE_IDLE;
+	return get_state() == NETOPT_STATE_IDLE;
 }
 
 bool dev_is_tx_or_rx(void)
@@ -121,34 +164,34 @@ void radio_init(uint8_t *tb, uint8_t *rb)
 	sReceiveFrame.mPsdu = rb;
 	sReceiveFrame.mLength = 0;
 }
+
 ThreadError otPlatRadioSetPanId(uint16_t panid)
 {
 	DEBUG("openthread: otPlatRadioSetPanId: setting PAN ID to %04x\n", panid);
-	uint16_t reverse = ((panid & 0xff) << 8) | ((panid >> 8) & 0xff);
-	_dev->driver->set(_dev, NETOPT_NID, &reverse, sizeof(uint16_t));	
+	set_panid(((panid & 0xff) << 8) | ((panid >> 8) & 0xff));
 	return kThreadError_None;
 }
 
 ThreadError otPlatRadioSetExtendedAddress(uint8_t *aExtendedAddress)
 {
 	DEBUG("openthread: otPlatRadioSetExtendedAddress\n");
-	uint8_t reverse[IEEE802154_LONG_ADDRESS_LEN];
+
+	uint8_t reversed_addr[IEEE802154_LONG_ADDRESS_LEN];
 	for(int i=0;i<IEEE802154_LONG_ADDRESS_LEN;i++)
 	{
-		reverse[i] = aExtendedAddress[IEEE802154_LONG_ADDRESS_LEN-1-i];
-		DEBUG("%02x ", reverse[i]);
+		reversed_addr[i] = aExtendedAddress[IEEE802154_LONG_ADDRESS_LEN-1-i];
+		DEBUG("%02x ", reversed_addr[i]);
 	}
 	DEBUG("\n");
-	(void) aExtendedAddress;
-	_dev->driver->set(_dev, NETOPT_ADDRESS_LONG, &reverse, IEEE802154_LONG_ADDRESS_LEN);	
+	set_long_addr(reversed_addr);
 	return kThreadError_None;
 }
 
 ThreadError otPlatRadioSetShortAddress(uint16_t aShortAddress)
 {
 	DEBUG("openthread: otPlatRadioSetShortAddress: setting address to %04x\n", aShortAddress);
-	uint16_t reverse = ((aShortAddress & 0xff) << 8) | ((aShortAddress >> 8) & 0xff);
-	_dev->driver->set(_dev, NETOPT_ADDRESS, &reverse, sizeof(uint16_t));	
+
+	set_addr(((aShortAddress & 0xff) << 8) | ((aShortAddress >> 8) & 0xff));
 	return kThreadError_None;
 }
 
@@ -183,8 +226,7 @@ ThreadError otPlatRadioSleep(void)
 		return kThreadError_Busy;
 	}
 
-	netopt_state_t st = NETOPT_STATE_SLEEP;
-	_dev->driver->set(_dev, NETOPT_STATE, &st, sizeof(netopt_state_t));
+	set_state(NETOPT_STATE_SLEEP);
 	return kThreadError_None;
 }
 
@@ -202,8 +244,7 @@ ThreadError otPlatRadioIdle(void)
 		return kThreadError_Busy;
 	}
 
-	netopt_state_t st = NETOPT_STATE_IDLE;
-	_dev->driver->set(_dev, NETOPT_STATE, &st, sizeof(netopt_state_t));
+	set_state(NETOPT_STATE_IDLE);
 
 	return kThreadError_None;
 }
@@ -244,10 +285,8 @@ ThreadError otPlatRadioTransmit(void)
 	pkt.iov_len = sTransmitFrame.mLength;
 
 	/*Set channel and power based on transmit frame */
-	uint16_t channel = sTransmitFrame.mChannel;
-	int16_t mPower = sTransmitFrame.mPower;
-	_dev->driver->set(_dev, NETOPT_CHANNEL, &channel, sizeof(uint16_t));
-	_dev->driver->set(_dev, NETOPT_TX_POWER, &mPower, sizeof(int16_t));
+	set_channel(sTransmitFrame.mChannel);
+	set_power(sTransmitFrame.mPower);
 
 	_dev->driver->send(_dev, &pkt, 1);
 
@@ -270,16 +309,12 @@ otRadioCaps otPlatRadioGetCaps(void)
 bool otPlatRadioGetPromiscuous(void)
 {
 	DEBUG("openthread: otPlatRadioGetPromiscuous\n");
-	netopt_enable_t en;
-	_dev->driver->get(_dev, NETOPT_PROMISCUOUSMODE, &en, sizeof(en));
-	DEBUG("otPlatRadioGetPromiscuous: %i\n", en);
-	return en == NETOPT_ENABLE ? true : false;
+	return is_promiscuous();
 }
 
 void otPlatRadioSetPromiscuous(bool aEnable)
 {
 	DEBUG("openthread: otPlatRadioSetPromiscuous\n");
-	netopt_enable_t en = (aEnable) ? NETOPT_ENABLE : NETOPT_DISABLE;
-	_dev->driver->set(_dev, NETOPT_PROMISCUOUSMODE, &en, sizeof(en));
+	 set_promiscuous((aEnable) ? NETOPT_ENABLE : NETOPT_DISABLE);
 }
 
