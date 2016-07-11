@@ -561,3 +561,34 @@ ifneq (,$(filter random,$(USEMODULE)))
         USEMODULE += tinymt32
     endif
 endif
+
+
+ifneq (,$(filter openthread,$(USEMODULE)))
+  USEMODULE += openthread_core
+  USEMODULE += openthread_contrib
+  USEPKG += openthread
+  USEMODULE+=xtimer
+
+  FEATURES_REQUIRED += cpp
+  FEATURES_REQUIRED += periph_spi periph_gpio
+endif
+
+ifneq (,$(filter openthread_contrib,$(USEMODULE)))
+  USEMODULE+=openthread_contrib_netdev2
+endif
+
+
+ifneq (,$(filter openthread_core,$(USEMODULE)))
+  USEMODULE+=openthread_core_common
+  USEMODULE+=openthread_core_coap
+  USEMODULE+=openthread_core_thread
+  USEMODULE+=openthread_core_net
+  USEMODULE+=openthread_core_crypto
+  USEMODULE+=openthread_core_mac
+  USEMODULE+=mbedtls
+  USEMODULE+=mbedtls_lib
+endif
+
+
+
+
