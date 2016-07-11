@@ -39,7 +39,9 @@ static int spi_dev = -1;
 static gpio_t spi_cs = -1;
 static int spi_mode = -1;
 static int spi_speed = -1;
-static int spi_master = -1;     /* 0 for slave, 1 for master, -1 for not initialized */
+static int spi_master = -1;
+static int port = -1;
+static int pin = -1;           /* 0 for slave, 1 for master, -1 for not initialized */
 
 static char buffer[256];       /* temporary buffer */
 static char rx_buffer[256];    /* global receive buffer */
@@ -52,7 +54,6 @@ static char* mem = "Hello Master! abcdefghijklmnopqrstuvwxyz 0123456789 "
 int parse_spi_dev(int argc, char **argv)
 {
     /* reset default values */
-    int port, pin;
     spi_dev = SPI_0;
     spi_mode = SPI_CONF_FIRST_RISING;
     spi_speed = SPI_SPEED_1MHZ;
@@ -184,14 +185,14 @@ int cmd_init_master(int argc, char **argv)
     }
     res = gpio_init(spi_cs, GPIO_OUT);
     if (res < 0){
-        printf("gpio_init: error initializing GPIO_%ld as CS line (code %i)\n",
-                (long)spi_cs, res);
+        printf("gpio_init: error initializing GPIO_PIN(%i, %i) as CS line (code %i)\n",
+                port, pin, res);
         return 1;
     }
     gpio_set(spi_cs);
     spi_master = 1;
-    printf("SPI_%i successfully initialized as master, cs: GPIO_%ld, mode: %i, speed: %i\n",
-            spi_dev, (long)spi_cs, spi_mode, spi_speed);
+    printf("SPI_%i successfully initialized as master, cs: GPIO_PIN(%i, %i), mode: %i, speed: %i\n",
+            spi_dev, port, pin, spi_mode, spi_speed);
     return 0;
 }
 
@@ -212,13 +213,13 @@ int cmd_init_slave(int argc, char **argv)
     }
     res = gpio_init_int(spi_cs, GPIO_IN, GPIO_FALLING, slave_on_cs, 0);
     if (res < 0){
-        printf("gpio_init_int: error initializing GPIO_%ld as CS line (code %i)\n",
-                (long)spi_cs, res);
+        printf("gpio_init_int: error initializing GPIO_PIN(%i, %i) as CS line (code %i)\n",
+                port, pin, res);
         return 1;
     }
     spi_master = 0;
-    printf("SPI_%i successfully initialized as slave, cs: GPIO_%ld, mode: %i\n",
-            spi_dev, (long)spi_cs, spi_mode);
+    printf("SPI_%i successfully initialized as slave, cs: GPIO_PIN(%i, %i), mode: %i\n",
+            spi_dev, port, pin, spi_mode);
     return 0;
 }
 
