@@ -10,3 +10,7 @@ ifneq (,$(filter openthread_contrib,$(USEMODULE)))
  DIRS += $(RIOTBASE)/pkg/openthread/contrib
  DIRS += $(RIOTBASE)/pkg/openthread/contrib/netdev2
 endif
+
+ifneq (,$(filter openthread_cli,$(USEMODULE)))
+ DIRS += $(RIOTBASE)/pkg/openthread/contrib/cli
+endif
