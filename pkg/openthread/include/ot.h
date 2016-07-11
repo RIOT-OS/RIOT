@@ -21,10 +21,14 @@ typedef struct {
 
 void recv_pkt(netdev2_t *dev);
 void send_pkt(netdev2_t *dev);
-void openthread_init(void);
+void openthread_bootstrap(void);
 void radio_init(uint8_t *tb, uint8_t *rb);
 void set_netdev(netdev2_t *dev);
-void *ot_thread(void *arg);
+void *_openthread_event_loop(void *arg);
+int openthread_netdev2_init(char *stack, int stacksize, char priority,
+		                        const char *name);
+
+void _event_cb(netdev2_t *dev, netdev2_event_t event);
 #ifdef __cplusplus
 }
 #endif

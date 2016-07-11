@@ -15,7 +15,7 @@
 
 
 static char buf[100];
-char ot_thread_stack[3*THREAD_STACKSIZE_MAIN];
+static char ot_thread_stack[3*THREAD_STACKSIZE_MAIN];
 
 
 int main(void)
@@ -42,14 +42,12 @@ int main(void)
     random_init(123);
 #endif
 
-   kernel_pid_t pid = thread_create(ot_thread_stack, sizeof(ot_thread_stack),
-                           THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
-			                                ot_thread, NULL, "ot_thread");
+    kernel_pid_t pid = openthread_netdev2_init(ot_thread_stack, sizeof(ot_thread_stack), THREAD_PRIORITY_MAIN - 1,
+            "ot_thread");
     DEBUG("Starting main's loop\n");
 
 	(void) p;
 	(void) msg;
-	(void) pid;
 #if 0
 	memcpy(p, "start\n",sizeof("start"));
 	sm.len = sizeof("start\n");
