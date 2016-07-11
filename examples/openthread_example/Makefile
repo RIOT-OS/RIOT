@@ -17,10 +17,8 @@ QUIET ?= 1
 USEMODULE+=openthread
 USEMODULE+=openthread_cli
 
-
-USEMODULE+=netstats_l2
-
 USEMODULE += at86rf233
+
 USEMODULE+=random
 USEMODULE+=hashes
 USEMODULE+=crypto

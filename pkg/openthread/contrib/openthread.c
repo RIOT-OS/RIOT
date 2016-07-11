@@ -20,6 +20,8 @@
 
 #include <cli/cli-serial.h>
 #include "xtimer.h"
+#include "random.h"
+#include "periph/cpuid.h"
 
 #ifdef MODULE_AT86RF2XX     /* is mutual exclusive with above ifdef */
 #define OPENTHREAD_NETIF_NUMOF        (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
@@ -45,6 +47,19 @@ void otSignalTaskletPending(void)
 
 void openthread_bootstrap(void)
 {
+#ifdef CPUID_LEN
+    char cpu_id[CPUID_LEN];
+    cpuid_get(cpu_id);
+    int seed = 0;
+    for(int i=0;i<(int) CPUID_LEN;i++)
+    {
+        seed += cpu_id[i];
+    }
+    random_init(seed);
+#else
+    random_init(123);
+#endif
+
 #ifdef MODULE_AT86RF2XX
         at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0]);
 		netdev2_t *netdev = (netdev2_t*) &at86rf2xx_dev;
