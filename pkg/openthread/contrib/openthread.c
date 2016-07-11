@@ -39,8 +39,9 @@ void otSignalTaskletPending(void)
 }
 
 
-static uint8_t _tmp_buf[OPENTHREAD_NETDEV2_BUFLEN];
-static uint8_t transmit_buf[OPENTHREAD_NETDEV2_BUFLEN];
+static uint8_t rx_buf[OPENTHREAD_NETDEV2_BUFLEN];
+static uint8_t tx_buf[OPENTHREAD_NETDEV2_BUFLEN];
+
 static msg_t _queue[OPENTHREAD_QUEUE_LEN];
 
 static kernel_pid_t _pid;
@@ -110,11 +111,11 @@ void _event_cb(netdev2_t *dev, netdev2_event_t event)
 				break;
 			case NETDEV2_EVENT_TX_NOACK:
 				DEBUG("NETDEV2_EVENT_TX_NOACK\n");
-				//otPlatRadioTransmitDone(false, kThreadError_NoAck);
+				otPlatRadioTransmitDone(false, kThreadError_NoAck);
 				break;
 			case NETDEV2_EVENT_TX_MEDIUM_BUSY:
 				DEBUG("NETDEV2_EVENT_TX_MEDIUM_BUSY\n");
-				//otPlatRadioTransmitDone(false, kThreadError_ChannelAccessFailure);
+				otPlatRadioTransmitDone(false, kThreadError_ChannelAccessFailure);
 				break;
 			default:
 				break;
@@ -128,7 +129,7 @@ void openthread_init(void)
 #ifdef MODULE_AT86RF2XX
         at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0]);
 		netdev2_t *netdev = (netdev2_t*) &at86rf2xx_dev;
-		radio_init(transmit_buf, _tmp_buf);
+		radio_init(tx_buf, rx_buf);
 		netdev->driver->init(netdev);
 		netdev->event_callback = _event_cb;
 		set_netdev(netdev);
