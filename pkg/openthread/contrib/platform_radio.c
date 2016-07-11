@@ -82,16 +82,6 @@ void recv_pkt(netdev2_t *dev)
 	assert(len <= (unsigned) UINT16_MAX);
 	int res = dev->driver->recv(dev, (char*) sReceiveFrame.mPsdu, len, NULL);
 
-
-#if 0
-	DEBUG("Len is: %i\n", len);
-	DEBUG("After receive: ");
-	for(int i=0;i<len;i++)
-	{
-		DEBUG("%02x ", sReceiveFrame.mPsdu[i]);
-	}
-	printf("\n");
-#endif
 	/* Fill OT receive frame */
 	sReceiveFrame.mLength = len;
 
@@ -105,15 +95,6 @@ void recv_pkt(netdev2_t *dev)
 
 void send_pkt(netdev2_t *dev)
 {
-#if 1
-	DEBUG("Sent:");
-	for(int i=0;i<sTransmitFrame.mLength;i++)
-	{
-		DEBUG("%02x ", sTransmitFrame.mPsdu[i]);
-	}
-	DEBUG("\n");
-#endif
-
 	/*Tell OpenThread that transmission has finished.*/
 	otPlatRadioTransmitDone(false, kThreadError_None);
 }
