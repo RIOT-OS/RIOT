@@ -18,11 +18,6 @@ static RadioPacket sReceiveFrame;
 
 static netdev2_t *_dev;
 
-void set_netdev(netdev2_t *dev)
-{
-	_dev = dev;
-}
-
 uint16_t get_channel(void)
 {
 	uint16_t channel;
@@ -138,12 +133,13 @@ bool dev_is_tx_or_rx(void)
 	return res == NETOPT_STATE_RX || res == NETOPT_STATE_TX;
 }
 
-void radio_init(uint8_t *tb, uint8_t *rb)
+void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb)
 {
 	sTransmitFrame.mPsdu = tb;
 	sTransmitFrame.mLength = 0;
 	sReceiveFrame.mPsdu = rb;
 	sReceiveFrame.mLength = 0;
+	_dev = dev;
 }
 
 ThreadError otPlatRadioSetPanId(uint16_t panid)

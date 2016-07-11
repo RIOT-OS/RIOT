@@ -1,4 +1,3 @@
-
 #include "thread.h"
 #include <assert.h>
 
@@ -39,6 +38,7 @@ static at86rf2xx_t at86rf2xx_dev;
 static uint8_t rx_buf[OPENTHREAD_NETDEV2_BUFLEN];
 static uint8_t tx_buf[OPENTHREAD_NETDEV2_BUFLEN];
 
+static char ot_thread_stack[3*THREAD_STACKSIZE_MAIN];
 
 
 void otSignalTaskletPending(void)
@@ -57,16 +57,18 @@ void openthread_bootstrap(void)
     }
     random_init(seed);
 #else
-    random_init(123);
+    random_init(0);
 #endif
 
 #ifdef MODULE_AT86RF2XX
-        at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0]);
-		netdev2_t *netdev = (netdev2_t*) &at86rf2xx_dev;
-		radio_init(tx_buf, rx_buf);
-		netdev->driver->init(netdev);
-		netdev->event_callback = _event_cb;
-		set_netdev(netdev);
+	at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0]);
+	netdev2_t *netdev = (netdev2_t*) &at86rf2xx_dev;
 #endif
+
+	netdev->driver->init(netdev);
+	netdev->event_callback = _event_cb;
+
+	openthread_radio_init(netdev, tx_buf, rx_buf);
+    openthread_netdev2_init(ot_thread_stack, sizeof(ot_thread_stack), THREAD_PRIORITY_MAIN - 1, "ot_thread");
 }
 

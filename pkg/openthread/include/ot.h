@@ -9,6 +9,7 @@ extern "C" {
 #include "net/ieee802154.h"
 #include "net/ethernet.h"
 #include "net/netdev2.h"
+#include "thread.h"
 
 #define OPENTHREAD_XTIMER_MSG_TYPE_EVENT (0x2235)
 #define OPENTHREAD_NETDEV2_MSG_TYPE_EVENT (0x2236)
@@ -22,13 +23,13 @@ typedef struct {
 void recv_pkt(netdev2_t *dev);
 void send_pkt(netdev2_t *dev);
 void openthread_bootstrap(void);
-void radio_init(uint8_t *tb, uint8_t *rb);
-void set_netdev(netdev2_t *dev);
+void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb);
 void *_openthread_event_loop(void *arg);
 int openthread_netdev2_init(char *stack, int stacksize, char priority,
 		                        const char *name);
 
 void _event_cb(netdev2_t *dev, netdev2_event_t event);
+kernel_pid_t openthread_get_pid(void);
 #ifdef __cplusplus
 }
 #endif

@@ -22,6 +22,7 @@ static kernel_pid_t _pid;
 
 void *_openthread_event_loop(void *arg)
 {
+	_pid = thread_getpid();
     PlatformInit();
     otInit();
 	otCliSerialInit();
@@ -94,6 +95,10 @@ void _event_cb(netdev2_t *dev, netdev2_event_t event)
 	}
 }
 
+kernel_pid_t openthread_get_pid(void)
+{
+	return _pid;
+}
 int openthread_netdev2_init(char *stack, int stacksize, char priority,
 		                        const char *name)
 {
