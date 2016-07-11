@@ -574,7 +574,7 @@ ifneq (,$(filter openthread,$(USEMODULE)))
 endif
 
 
-ifneq (,$(filter openthread_contrib,$(USEMODULE)))
+ifneq (,$(filter openthread_cli,$(USEMODULE)))
   USEMODULE+=openthread_contrib_cli
 endif
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))

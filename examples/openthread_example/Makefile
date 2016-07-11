@@ -15,7 +15,7 @@ CFLAGS += -DDEVELHELP -Wall
 QUIET ?= 1
 
 USEMODULE+=openthread
-USEMODULE+=openthread_cli
+#USEMODULE+=openthread_cli
 
 USEMODULE += at86rf233
 

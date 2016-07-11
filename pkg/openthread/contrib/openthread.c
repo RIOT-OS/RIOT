@@ -40,11 +40,6 @@ static uint8_t tx_buf[OPENTHREAD_NETDEV2_BUFLEN];
 
 static char ot_thread_stack[3*THREAD_STACKSIZE_MAIN];
 
-
-void otSignalTaskletPending(void)
-{
-}
-
 void openthread_bootstrap(void)
 {
 #ifdef CPUID_LEN

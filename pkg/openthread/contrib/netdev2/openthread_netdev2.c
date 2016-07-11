@@ -20,17 +20,27 @@ static msg_t _queue[OPENTHREAD_QUEUE_LEN];
 
 static kernel_pid_t _pid;
 
+void otSignalTaskletPending(void)
+{
+}
+
 void *_openthread_event_loop(void *arg)
 {
 	_pid = thread_getpid();
     PlatformInit();
     otInit();
-	otCliSerialInit();
 
 	msg_init_queue(_queue, OPENTHREAD_QUEUE_LEN);
 	netdev2_t *dev;
-	serial_msg_t *ser;
 	msg_t msg;
+
+#ifdef MODULE_OPENTHREAD_CLI
+	serial_msg_t *ser;
+	otCliSerialInit();
+#else
+	otEnable();
+	otProcessNextTasklet();
+#endif
 
 	while(1)
 	{
@@ -45,10 +55,12 @@ void *_openthread_event_loop(void *arg)
 				dev = (netdev2_t*) msg.content.ptr;
 				dev->driver->isr(dev);
 				break;
+#ifdef MODULE_OPENTHREAD_CLI
 			case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
 				ser = (serial_msg_t*) msg.content.ptr;
 				otPlatSerialReceived((uint8_t*) ser->buf, ser->len);
 				break;
+#endif
 				
 		}
 	}
