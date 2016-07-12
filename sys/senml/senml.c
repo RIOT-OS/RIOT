@@ -164,7 +164,7 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
     size_t ins_pos_after_bi; // stores value of ins_pos after inserting base info to check
                              // whether all records provided were empty
 
-    int chars_written;       // stores return values of snprintf calls: negative value indicates
+    int chars_written = 0;   // stores return values of snprintf calls: negative value indicates
                              // error, value >= buf_len indicates insufficient space in output
 
     output[ins_pos] = '[';
@@ -239,9 +239,9 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
         buf_len -= chars_written;
     }
 
-    ins_pos_after_bi = ins_pos;
-
 encode_records:
+
+    ins_pos_after_bi = ins_pos;
 
     if (pack->num == 0) {
         // this means no base info and no records
