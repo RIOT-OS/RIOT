@@ -70,7 +70,7 @@ typedef struct nvram {
      * @return           Number of bytes written on success
      * @return           <0 on errors
      */
-    int (*write)(struct nvram *dev, uint8_t *src, uint32_t dst, size_t size);
+    int (*write)(struct nvram *dev, const uint8_t *src, uint32_t dst, size_t size);
 
     /** @brief Device capacity */
     size_t size;
