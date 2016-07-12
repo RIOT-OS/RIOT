@@ -28,7 +28,6 @@
 #include "arch/thread_arch.h"
 #include "cpu_conf.h"
 #include "sched.h"
-#include "clist.h"
 
 #ifdef MODULE_CORE_THREAD_FLAGS
 #include "thread_flags.h"
