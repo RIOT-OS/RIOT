@@ -24,4 +24,8 @@ USEMODULE+=hashes
 USEMODULE+=crypto
 USEMODULE+=cipher_modes
 
+USEMODULE += shell
+USEMODULE += shell_commands
+USEMODULE += ps
+
 include $(RIOTBASE)/Makefile.include
