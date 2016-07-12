@@ -176,8 +176,14 @@ export PREFIX ?= $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
 # Import all toolchain settings
 include $(RIOTCPU)/Makefile.include.$(TOOLCHAIN)
 
+# Add standard include directories
+INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
+
 # mandatory includes!
-include $(RIOTBASE)/Makefile.modules
+include $(RIOTBASE)/Makefile.pseudomodules
+include $(RIOTBASE)/Makefile.defaultmodules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
@@ -491,6 +497,9 @@ include $(RIOTBASE)/dist/tools/desvirt/Makefile.desvirt
 
 # include bindist target
 include $(RIOTBASE)/Makefile.bindist
+
+# Add all USEMODULE modules to CFLAGS
+include $(RIOTBASE)/Makefile.modules
 
 # Build a header file with all common macro definitions and undefinitions
 # make it phony to force re-run of the script every time even if the file exists

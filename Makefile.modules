@@ -1,11 +1,5 @@
-include $(RIOTBASE)/Makefile.pseudomodules
-include $(RIOTBASE)/Makefile.defaultmodules
-
 USEMODULE := $(filter-out $(filter-out $(FEATURES_PROVIDED), $(FEATURES_OPTIONAL)), $(sort $(USEMODULE)))
 
-INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
 ED = $(addprefix FEATURE_,$(sort $(filter $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))))
 ED += $(addprefix MODULE_,$(sort $(USEMODULE) $(USEPKG)))
 EXTDEFINES = $(addprefix -D,$(shell echo '$(ED)' | tr 'a-z-' 'A-Z_'))
