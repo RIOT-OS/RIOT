@@ -133,7 +133,7 @@ void sched_set_status(thread_t *process, unsigned int status)
         if (!(process->status >= STATUS_ON_RUNQUEUE)) {
             DEBUG("sched_set_status: adding thread %" PRIkernel_pid " to runqueue %" PRIu16 ".\n",
                   process->pid, process->priority);
-            clist_insert(&sched_runqueues[process->priority], &(process->rq_entry));
+            clist_rpush(&sched_runqueues[process->priority], &(process->rq_entry));
             runqueue_bitcache |= 1 << process->priority;
         }
     }
@@ -141,7 +141,7 @@ void sched_set_status(thread_t *process, unsigned int status)
         if (process->status >= STATUS_ON_RUNQUEUE) {
             DEBUG("sched_set_status: removing thread %" PRIkernel_pid " to runqueue %" PRIu16 ".\n",
                   process->pid, process->priority);
-            clist_remove_head(&sched_runqueues[process->priority]);
+            clist_lpop(&sched_runqueues[process->priority]);
 
             if (!sched_runqueues[process->priority].next) {
                 runqueue_bitcache &= ~(1 << process->priority);
