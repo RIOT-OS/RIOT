@@ -36,6 +36,10 @@ USEMODULE += gnrc_icmpv6_echo
 # Use minimal standard PRNG
 USEMODULE += prng_minstd
 
+# Set a custom 802.15.4 channel if needed
+DEFAULT_CHANNEL ?= 26
+CFLAGS += -DDEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
+
 CFLAGS += -DGNRC_PKTBUF_SIZE=512 -DGNRC_IPV6_NETIF_ADDR_NUMOF=4 -DGNRC_IPV6_NC_SIZE=1
 
 # Change this to 0 show compiler invocation lines by default:

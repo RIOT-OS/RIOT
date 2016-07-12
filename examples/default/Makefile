@@ -70,4 +70,8 @@ ifneq (,$(filter msba2,$(BOARD)))
   USEMODULE += random
 endif
 
+# Set a custom 802.15.4 channel if needed
+DEFAULT_CHANNEL ?= 26
+CFLAGS += -DDEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
+
 include $(RIOTBASE)/Makefile.include

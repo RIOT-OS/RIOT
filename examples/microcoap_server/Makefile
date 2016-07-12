@@ -33,6 +33,10 @@ CFLAGS += -DMICROCOAP_DEBUG
 # include this for printing IP addresses
 USEMODULE += shell_commands
 
+# Set a custom 802.15.4 channel if needed
+DEFAULT_CHANNEL ?= 26
+CFLAGS += -DDEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
+
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:

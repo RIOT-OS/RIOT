@@ -63,12 +63,18 @@ extern "C" {
 /* the AT86RF212B has a sub-1GHz radio */
 #define AT86RF2XX_MIN_CHANNEL           (0)
 #define AT86RF2XX_MAX_CHANNEL           (10)
+#ifdef DEFAULT_CHANNEL
+#define AT86RF2XX_DEFAULT_CHANNEL (DEFAULT_CHANNEL)
+#endif
 #ifndef AT86RF2XX_DEFAULT_CHANNEL
 #define AT86RF2XX_DEFAULT_CHANNEL       (5)
 #endif
 #else
 #define AT86RF2XX_MIN_CHANNEL           (11U)
 #define AT86RF2XX_MAX_CHANNEL           (26U)
+#ifdef DEFAULT_CHANNEL
+#define AT86RF2XX_DEFAULT_CHANNEL (DEFAULT_CHANNEL)
+#endif
 #ifndef AT86RF2XX_DEFAULT_CHANNEL
 #define AT86RF2XX_DEFAULT_CHANNEL       (26U)
 #endif
