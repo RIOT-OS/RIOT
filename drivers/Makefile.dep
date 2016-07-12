@@ -92,6 +92,7 @@ ifneq (,$(filter mpu9150,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nvram_spi,$(USEMODULE)))
+    USEMODULE += nvram
     USEMODULE += xtimer
 endif
 
