@@ -38,7 +38,8 @@ static at86rf2xx_t at86rf2xx_dev;
 static uint8_t rx_buf[OPENTHREAD_NETDEV2_BUFLEN];
 static uint8_t tx_buf[OPENTHREAD_NETDEV2_BUFLEN];
 
-static char ot_thread_stack[3*THREAD_STACKSIZE_MAIN];
+static char ot_thread_stack[2*THREAD_STACKSIZE_MAIN];
+
 
 void openthread_bootstrap(void)
 {
