@@ -150,6 +150,7 @@ ifneq (,$(filter nrfmin,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nvram_spi,$(USEMODULE)))
+    USEMODULE += nvram
     USEMODULE += xtimer
 endif
 
