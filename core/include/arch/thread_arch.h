@@ -64,6 +64,16 @@ char *thread_arch_stack_init(thread_task_func_t task_func, void *arg, void *stac
 int thread_arch_isr_stack_usage(void);
 
 /**
+ * @brief   Get the current ISR stack pointer
+ */
+void *thread_arch_isr_stack_pointer(void);
+
+/**
+ * @brief   Get the start of the ISR stack
+ */
+void *thread_arch_isr_stack_start(void);
+
+/**
  * @brief Print the current stack to stdout
  */
 void thread_arch_stack_print(void);

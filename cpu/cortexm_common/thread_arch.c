@@ -267,6 +267,17 @@ int thread_arch_isr_stack_usage(void)
     return num_used_words * sizeof(*ptr);
 }
 
+void *thread_arch_isr_stack_pointer(void)
+{
+    void *msp = (void *)__get_MSP();
+    return msp;
+}
+
+void *thread_arch_isr_stack_start(void)
+{
+    return (void *)&_sstack;
+}
+
 __attribute__((naked)) void NORETURN thread_arch_start_threading(void)
 {
     __asm__ volatile (

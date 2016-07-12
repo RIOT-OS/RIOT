@@ -40,6 +40,18 @@ int thread_arch_isr_stack_usage(void)
     return -1;
 }
 
+void *thread_arch_isr_stack_pointer(void)
+{
+    /* TODO */
+    return (void *)-1;
+}
+
+void *thread_arch_isr_stack_start(void)
+{
+    /* TODO */
+    return (void *)-1;
+}
+
 NORETURN void cpu_switch_context_exit(void)
 {
     sched_active_thread = sched_threads[0];

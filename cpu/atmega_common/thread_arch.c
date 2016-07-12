@@ -205,6 +205,18 @@ int thread_arch_isr_stack_usage(void)
     return -1;
 }
 
+void *thread_arch_isr_stack_pointer(void)
+{
+    /* TODO */
+    return (void *)-1;
+}
+
+void *thread_arch_isr_stack_start(void)
+{
+    /* TODO */
+    return (void *)-1;
+}
+
 void thread_arch_start_threading(void) __attribute__((naked));
 void thread_arch_start_threading(void)
 {

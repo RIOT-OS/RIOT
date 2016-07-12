@@ -60,7 +60,7 @@ void ps(void)
 #endif
             "%-9sQ | pri "
 #ifdef DEVELHELP
-           "| stack ( used) | location   "
+           "| stack ( used) | base       | current    "
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
            "| runtime | switches"
@@ -72,9 +72,11 @@ void ps(void)
            "state");
 
 #ifdef DEVELHELP
-    int isr_usage = thread_arch_isr_stack_usage();                                 /* ISR stack usage */
+    int isr_usage = thread_arch_isr_stack_usage();
+    void *isr_start = thread_arch_isr_stack_start();
+    void *isr_sp = thread_arch_isr_stack_pointer();
     printf("\t  - | isr_stack            | -        - |"
-           "   - | %5i (%5i) | -\n", ISR_STACKSIZE, isr_usage);
+           "   - | %5i (%5i) | %10p | %10p\n", ISR_STACKSIZE, isr_usage, isr_start, isr_sp);
     overall_stacksz += ISR_STACKSIZE;
     if (isr_usage > 0) {
         overall_used += isr_usage;
@@ -104,7 +106,7 @@ void ps(void)
 #endif
                    " | %-8s %.1s | %3i"
 #ifdef DEVELHELP
-                   " | %5i (%5i) | %p "
+                   " | %5i (%5i) | %10p | %10p "
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
                    " | %6.3f%% |  %8d"
@@ -116,7 +118,7 @@ void ps(void)
 #endif
                    sname, queued, p->priority
 #ifdef DEVELHELP
-                   , p->stack_size, stacksz, (void *)p->stack_start
+                   , p->stack_size, stacksz, (void *)p->stack_start, (void *)p->sp
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
                    , runtime_ticks, switches
