@@ -57,6 +57,10 @@ static void senml_print_record(const senml_record_t *record)
         printf("Data Value:\t%s\n", record->value.d);
     }
 
+    if (record->value_sum != 0) {
+        printf("Value Sum:\t%f\n", record->value_sum);
+    }
+
     printf("\n");
 }
 
@@ -77,29 +81,26 @@ int main(void)
 {
     // decode a SenML document in JSON format
 
-    senml_base_info_t base_info;
-    senml_record_t    records[5];
-    senml_pack_t      pack;
+    char input[] = "[{\"bver\":5, \"bn\":\"urn:dev:mac:0024befffe804ff1\", \"bt\":1468341362,"
+                   "\"n\":\"voltage\", \"u\":\"V\", \"v\":230.05, \"t\":1, \"ut\":1},"
+                   "{\"n\":\"current\", \"u\":\"A\", \"v\":1.65, \"t\":1, \"ut\":1},"
+                   "{\"n\":\"bindump\", \"vd\":\"U2VuTUwgaXMgc28gY29vbCEK\"}]";
 
-    memset(&base_info, 0, sizeof(senml_base_info_t));
-    memset(records, 0, sizeof(records));
+    senml_base_info_t base_info_dec;
+    senml_record_t    records_dec[3];
+    senml_pack_t      pack_dec;
 
-    pack.base_info = &base_info;
-    pack.records   = records;
-    pack.num       = 5;
+    memset(&base_info_dec, 0, sizeof(senml_base_info_t));
+    memset(records_dec, 0, sizeof(records_dec));
 
-    char input[] = "[{\"bn\":\"urn:dev:ow:10e2073a01080063\",\"bt\":1276020076.001,\"bu\":\"A\","
-                   "\"bver\":5, \"bv\":999.888,"
-                   "\"n\":\"voltage\",\"u\":\"V\",\"v\":120.1,\"ut\":12},"
-                   "{\"ut\":8,\"n\":\"current\",\"u\":\"Cel\",\"t\":-5,\"v\":1.2},"
-                   "{\"vb\":true, \"n\":\"fitzgerald\",\"ut\":24},"
-                   "{\"n\":\"john\",\"s\":9217864},"
-                   "{\"n\":\"name\",\"t\":-5,\"ut\":10,\"vd\":\"U2VuTUwgaXMgc28gY29vbCEK\"}]";
+    pack_dec.base_info = &base_info_dec;
+    pack_dec.records   = records_dec;
+    pack_dec.num       = 3;
 
-    int rc = senml_decode_json_s(input, &pack);
+    int rc = senml_decode_json_s(input, &pack_dec);
 
     if (rc == 0) {
-        senml_print_pack(&pack);
+        senml_print_pack(&pack_dec);
     }
     else {
         printf("decoding senml document failed\n");
@@ -112,7 +113,7 @@ int main(void)
 
     unsigned char data_value[len];
 
-    rc = base64_decode((unsigned char *)records[4].value.d, strlen(records[4].value.d),
+    rc = base64_decode((unsigned char *)records_dec[2].value.d, strlen(records_dec[2].value.d),
                        data_value, &len);
 
     data_value[len] = '\0';
@@ -126,13 +127,45 @@ int main(void)
     }
 
     // encode a senml_pack_t to JSON
+    
+    senml_base_info_t base_info_enc;
+    senml_record_t    records_enc[2];
+    senml_pack_t      pack_enc;
 
-    char json[512];
+    memset(&base_info_enc, 0, sizeof(senml_base_info_t));
+    memset(records_enc, 0, sizeof(records_enc));
 
-    rc = senml_encode_json_s(&pack, json, 512);
+    pack_enc.base_info = &base_info_enc;
+    pack_enc.records   = records_enc;
+    pack_enc.num       = 2;
+    
+    base_info_enc.version    = 5;
+    base_info_enc.base_name  = "urn:dev:mac:0024befffe804ff2";
+    base_info_enc.base_time  = 1468342153;
+    base_info_enc.base_unit  = NULL;
+    base_info_enc.base_value = 0.0;
+    
+    records_enc[0].name        = "temperature";
+    records_enc[0].unit        = "Cel";
+    records_enc[0].time        = -1;
+    records_enc[0].update_time = 5;
+    records_enc[0].value_type  = SENML_TYPE_FLOAT;
+    records_enc[0].value.f     = 21.5;
+    
+    records_enc[1].name        = "water";
+    records_enc[1].unit        = "l";
+    records_enc[1].time        = -1;
+    records_enc[1].update_time = 60;
+    records_enc[1].value_type  = SENML_TYPE_FLOAT;
+    records_enc[1].value.f     = 1.2;
+    records_enc[1].value_sum   = 7865.4;
+
+    char output[512];
+
+    rc = senml_encode_json_s(&pack_enc, output, 512);
 
     if (rc == 0) {
-        printf("%s\n", json);
+        printf("%s\n", output);
     }
     else {
         printf("encoding data failed\n");
