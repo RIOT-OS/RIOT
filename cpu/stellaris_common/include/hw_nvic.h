@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef HW_NVIC_H_
-#define HW_NVIC_H_
+#ifndef STELLARIS_HW_NVIC_H_
+#define STELLARIS_HW_NVIC_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -1722,4 +1722,4 @@ extern "C" {
 }
 #endif
 
-#endif /* HW_NVIC_H_ */
+#endif /* STELLARIS_HW_NVIC_H_ */
