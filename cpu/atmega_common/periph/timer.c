@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Low-level timer driver implementation for the ATmega2560 CPU
+ * @brief       Low-level timer driver implementation for the ATmega family
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
