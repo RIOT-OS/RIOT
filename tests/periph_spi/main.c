@@ -229,7 +229,7 @@ int cmd_init_master(int argc, char **argv)
     gpio_set(spi_cs);
     spi_master = 1;
     printf("SPI_%i successfully initialized as master, cs: GPIO_PIN(%i, %i), mode: %i, speed: %i\n",
-            spi_dev, port, pin, spi_mode, spi_speed);
+            spi_dev, port, pin, spi_mode_int, spi_speed_int);
     return 0;
 }
 
@@ -256,7 +256,7 @@ int cmd_init_slave(int argc, char **argv)
     }
     spi_master = 0;
     printf("SPI_%i successfully initialized as slave, cs: GPIO_PIN(%i, %i), mode: %i\n",
-            spi_dev, port, pin, spi_mode);
+            spi_dev, port, pin, spi_mode_int);
     return 0;
 }
 
