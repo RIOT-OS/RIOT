@@ -579,6 +579,7 @@ ifneq (,$(filter openthread_cli,$(USEMODULE)))
 endif
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
   USEMODULE+=openthread_contrib_netdev2
+  USEMODULE+=openthread_contrib_conn
 endif
 
 

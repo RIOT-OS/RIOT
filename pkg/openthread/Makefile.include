@@ -9,6 +9,7 @@ INCLUDES += -I$(RIOTBASE)/pkg/openthread/include \
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
  DIRS += $(RIOTBASE)/pkg/openthread/contrib
  DIRS += $(RIOTBASE)/pkg/openthread/contrib/netdev2
+ DIRS += $(RIOTBASE)/pkg/openthread/contrib/conn
 endif
 
 ifneq (,$(filter openthread_cli,$(USEMODULE)))
