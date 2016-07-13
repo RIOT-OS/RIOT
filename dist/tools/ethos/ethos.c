@@ -22,11 +22,14 @@
 #include <sys/time.h>
 #include <stdlib.h>
 
+#include <netdb.h>
+
 #include <termios.h>
 
 #define MTU 9000
 
 #define TRACE(x)
+#define TTY_TIMEOUT_MS (500)
 
 #define case_baudrate(val)    \
     case val:                 \
@@ -35,9 +38,13 @@
 
 #define BAUDRATE_DEFAULT B115200
 
+#define TCP_DEV "tcp:"
+#define IOTLAB_TCP_PORT "20000"
+
 static void usage(void)
 {
-    fprintf(stderr, "usage: ethos <tap> <serial> [baudrate]\n");
+    fprintf(stderr, "Usage: ethos <tap> <serial> [baudrate]\n");
+    fprintf(stderr, "       ethos <tap> tcp:<host> [port]\n");
 }
 
 static void checked_write(int handle, void *buffer, int nbyte)
@@ -69,7 +76,8 @@ int set_serial_attribs (int fd, int speed, int parity)
                                         /* no canonical processing*/
     tty.c_oflag = 0;                    /* no remapping, no delays*/
     tty.c_cc[VMIN]  = 0;                /* read doesn't block*/
-    tty.c_cc[VTIME] = 5;                /* 0.5 seconds read timeout*/
+    tty.c_cc[VTIME] = TTY_TIMEOUT_MS / 100; /* 0.5 seconds read timeout*/
+                                            /* in tenths of a second*/
 
     tty.c_iflag &= ~(IXON | IXOFF | IXANY); /* shut off xon/xoff ctrl*/
 
@@ -100,7 +108,8 @@ void set_blocking (int fd, int should_block)
     }
 
     tty.c_cc[VMIN]  = should_block ? 1 : 0;
-    tty.c_cc[VTIME] = 5;            /* 0.5 seconds read timeout*/
+    tty.c_cc[VTIME] = TTY_TIMEOUT_MS / 100; /* 0.5 seconds read timeout*/
+                                            /* in tenths of a second*/
 
     if (tcsetattr (fd, TCSANOW, &tty) != 0)
         perror("error setting term attributes");
@@ -276,6 +285,11 @@ static void _clear_neighbor_cache(const char *ifname)
 
 static int _parse_baudrate(const char *arg, unsigned *baudrate)
 {
+    if (arg == NULL) {
+        *baudrate = BAUDRATE_DEFAULT;
+        return 0;
+    }
+
     switch(strtol(arg, (char**)NULL, 10)) {
     case 9600:
         *baudrate = B9600;
@@ -339,10 +353,137 @@ static int _parse_baudrate(const char *arg, unsigned *baudrate)
     return 0;
 }
 
+int _parse_tcp_arg(char *name, char *port_arg, char **host, char **port)
+{
+    /* Remove 'tcp:' */
+    name = &name[sizeof(TCP_DEV) - 1];
+
+    /* Set default if NULL */
+    if (!port_arg) {
+        port_arg = IOTLAB_TCP_PORT;
+    }
+
+    *host = name;
+    *port = port_arg;
+
+    return 0;
+}
+
+/* Adapted from 'getaddrinfo' manpage example */
+int _tcp_connect(char *host, char *port)
+{
+    int sfd = -1;
+    struct addrinfo hints, *result, *rp;
+
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+
+    int s = getaddrinfo(host, port, &hints, &result);
+    if (s) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+        return -1;
+    }
+
+    /* getaddrinfo() returns a list of address structures.
+       Try each address until we successfully connect(2).
+       If socket(2) (or connect(2)) fails, we (close the socket
+       and) try the next address. */
+    for (rp = result; rp != NULL; rp = rp->ai_next) {
+        sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if (sfd == -1)
+            continue;
+
+        if (connect(sfd, rp->ai_addr, rp->ai_addrlen) != -1)
+            break;
+
+        close(sfd);
+    }
+
+    freeaddrinfo(result);
+
+    if (rp == NULL) {
+        fprintf(stderr, "Could not connect to '%s:%s'\n", host, port);
+        return -1;
+    }
+
+    return sfd;
+}
+
+int _set_socket_timeout(int sfd)
+{
+    struct timeval timeout = {
+        .tv_sec = 0,
+        .tv_usec = TTY_TIMEOUT_MS * 1000,
+    };
+
+    if (setsockopt(sfd, SOL_SOCKET, SO_RCVTIMEO,
+                   (char *)&timeout, sizeof(timeout)) == -1) {
+        perror("setsockopt failed\n");
+        return 1;
+    }
+
+    if (setsockopt(sfd, SOL_SOCKET, SO_SNDTIMEO,
+                   (char *)&timeout, sizeof(timeout)) == -1) {
+        perror("setsockopt failed\n");
+        return 1;
+    }
+    return 0;
+}
+
+int _open_tcp_connection(char *name, char *port_arg)
+{
+    char *host;
+    char *port;
+
+    int ret = _parse_tcp_arg(name, port_arg, &host, &port);
+    if (ret) {
+        fprintf(stderr, "Error while parsing tcp arguments\n");
+        return -1;
+    }
+
+    int sfd = _tcp_connect(host, port);
+    if (_set_socket_timeout(sfd)) {
+        fprintf(stderr, "Error while setting socket options\n");
+        return -1;
+    }
+    return sfd;
+}
+
+int _open_serial_connection(char *name, char *baudrate_arg)
+{
+    unsigned baudrate = 0;
+    if (_parse_baudrate(baudrate_arg, &baudrate) == -1) {
+        fprintf(stderr, "Invalid baudrate specified: %s\n", baudrate_arg);
+        return 1;
+    }
+
+    int serial_fd = open(name, O_RDWR | O_NOCTTY | O_SYNC);
+
+    if (serial_fd < 0) {
+        fprintf(stderr, "Error opening serial device %s\n", name);
+        return -1;
+    }
+
+    set_serial_attribs(serial_fd, baudrate, 0);
+    set_blocking(serial_fd, 1);
+
+    return serial_fd;
+}
+
+int _open_connection(char *name, char* option)
+{
+    if (strncmp(name, TCP_DEV, strlen(TCP_DEV)) == 0) {
+        return _open_tcp_connection(name, option);
+    } else {
+        return _open_serial_connection(name, option);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     char inbuf[MTU];
-    unsigned baudrate = BAUDRATE_DEFAULT;
+    char *serial_option = NULL;
 
     serial_t serial = {0};
 
@@ -351,9 +492,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    if (argc >= 4 && _parse_baudrate(argv[3], &baudrate) == -1) {
-        fprintf(stderr, "Invalid baudrate specified: %s\n", argv[3]);
-        return 1;
+    if (argc >= 4) {
+        serial_option = argv[3];
     }
 
     char ifname[IFNAMSIZ];
@@ -364,15 +504,12 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    int serial_fd = open(argv[2], O_RDWR | O_NOCTTY | O_SYNC);
 
+    int serial_fd = _open_connection(argv[2], serial_option);
     if (serial_fd < 0) {
         fprintf(stderr, "Error opening serial device %s\n", argv[2]);
         return 1;
     }
-
-    set_serial_attribs(serial_fd, baudrate, 0);
-    set_blocking(serial_fd, 1);
 
     fd_set readfds;
     int max_fd = (serial_fd > tap_fd) ? serial_fd : tap_fd;
