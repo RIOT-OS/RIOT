@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Device driver implementation for the LSM303DLHC light sensor
+ * @brief       Device driver implementation for the LSM303DLHC 3D accelerometer/magnetometer.
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
