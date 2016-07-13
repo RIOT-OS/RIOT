@@ -10,6 +10,8 @@
 
 #include <cli/cli.hpp>
 #include <net/ipv6/addr.h>
+#include "net/conn/udp.h"
+#include "conn.h"
 
 #ifndef MODULE_OPENTHREAD_CLI
 int state_cmd(int argc, char **argv)
@@ -51,52 +53,21 @@ int ipaddr_cmd(int argc, char **argv)
         }
     return 0;
 }
-
-static otUdpSocket mSocket;
-static otMessageInfo mPeer;
-
-void HandleUdpReceived(void *aContext, otMessage aMessage, const otMessageInfo *aMessageInfo)
-{
-    printf("Hello\n");
-}
+static conn_udp_t conn_obj;
 
 int udp_cmd(int argc, char **argv)
 {
-    otSockAddr sockaddr = {};
-    sockaddr.mPort = 7335;
-
-    otOpenUdpSocket(&mSocket, &HandleUdpReceived, NULL);
-    otBindUdpSocket(&mSocket, &sockaddr);
+    conn_udp_create(&conn_obj, NULL, 0, 0, 7335);
+    conn_udp_recvfrom(&conn_obj, NULL, 0,NULL, NULL, 0);
     return 0;
 }
 
 int udp_send_cmd(int argc, char **argv)
 {
     char buf[] = "hola";
-    otMessage message;
-
-    ipv6_addr_t addr;
     char *addr_str = argv[1];
-    ipv6_addr_from_str(&addr, addr_str);
-    printf("Ip address: %s\n", addr_str);
-
-    otSockAddr peer = {};
-    peer.mPort = 7335;
-    printf("\n");
-    for(int i=0;i<16;i++)
-    {
-        peer.mAddress.mFields.m8[i] = addr.u8[i];
-    }
-    printf("\n");
-    mSocket.mPeerName = peer;
-
-    message = otNewUdpMessage();
-    printf("message %i\n", (int) message);
-    printf("otSetMessageLength %i\n",otSetMessageLength(message, 4));
-    printf("otWriteMessage %i\n",otWriteMessage(message, 0, buf, 4));
-    mPeer.mPeerAddr = peer.mAddress;
-    mPeer.mPeerPort = peer.mPort;
-    otSendUdp(&mSocket, message, &mPeer);
+    conn_udp_sendto(buf, 4, NULL, 0, addr_str, 0, 0, 0, 7335);
+    printf("Finishing sending\n");
     return 0;
 }
 
