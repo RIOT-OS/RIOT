@@ -1,6 +1,9 @@
 APPLICATION = pkg_u8g2
 include ../Makefile.tests_common
 
+# These boards have not sufficient memory
+BOARD_BLACKLIST += chronos msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
+
 USEMODULE += xtimer
 
 USEPKG += u8g2
