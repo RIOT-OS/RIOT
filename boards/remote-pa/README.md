@@ -34,11 +34,11 @@ In terms of hardware support, the following drivers have been implemented:
     * ADC
     * LEDs
     * Buttons
-    * Internal/external 2.4GHz antenna switch controllable by SW.
+    * Internal/external 2.4GHz antenna switch controllable by SW
+    * RF 2.4GHz built-in in CC2538
 
 And under work or pending at cc2538 base cpu:
 
-    * RF 2.4GHz built-in in CC2538 (PR #2198)
     * Built-in core temperature and battery sensor.
     * TMP102 temperature sensor driver.
     * CC1120 sub-1GHz radio interface.

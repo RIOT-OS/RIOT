@@ -14,6 +14,7 @@ ifeq ($(PROGRAMMER),jlink)
   export JLINK_DEVICE := cc2538sf53
   export JLINK_FLASH_ADDR := 200000
   export JLINK_IF := JTAG
+  export TUI := 1
   include $(RIOTBOARD)/Makefile.include.jlink
 else
   export OFLAGS = -O binary
@@ -24,3 +25,6 @@ endif
 
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
+
+# Include board dependencies
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
