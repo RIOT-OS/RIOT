@@ -32,9 +32,22 @@ extern "C" {
  * @brief   ARM Cortex-M specific CPU configuration
  * @{
  */
-#define CPU_DEFAULT_IRQ_PRIO            (1U)
-#define CPU_IRQ_NUMOF                   (38)
+#define CPU_DEFAULT_IRQ_PRIO            (2U)
+#define CPU_IRQ_NUMOF                   (38U)
 #define CPU_FLASH_BASE                  (0x00000000)
+/** @} */
+
+/**
+ * @brief   SoftDevice settings
+ * @{
+ */
+#ifdef SOFTDEVICE_PRESENT
+#ifndef DONT_OVERRIDE_NVIC
+#include "nrf_soc.h"
+#undef NVIC_SetPriority
+#define NVIC_SetPriority    sd_nvic_SetPriority
+#endif /* DONT_OVERRIDE_NVIC */
+#endif /* SOFTDEVICE_PRESENT */
 /** @} */
 
 #ifdef __cplusplus
