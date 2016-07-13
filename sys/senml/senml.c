@@ -167,6 +167,9 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
     int chars_written = 0;   // stores return values of snprintf calls: negative value indicates
                              // error, value >= buf_len indicates insufficient space in output
 
+    bool insert_opening_brace = true;  // is used to check whether '{' has to be inserted after
+                                       // we the first record is empty but base info is provided
+
     output[ins_pos] = '[';
     ins_pos++;
     buf_len--;
@@ -271,7 +274,7 @@ encode_records:
 
         size_t buf_len_old;
 
-        if (i != 0 || ins_pos == 1) {
+        if ((i != 0 || ins_pos == 1) && insert_opening_brace) {
             output[ins_pos] = '{';
             ins_pos++;
             buf_len--;
@@ -366,8 +369,14 @@ encode_records:
         }
 
         if (buf_len == buf_len_old) {   // record was empty, no values inserted: remove '{'
-            ins_pos--;
-            buf_len++;
+            if (i != 0) {
+                ins_pos--;
+                buf_len++;
+            }
+            else {
+                insert_opening_brace = false;
+            }
+
             continue;
         }
 
@@ -385,6 +394,8 @@ encode_records:
 
         ins_pos++;
         buf_len--;
+
+        insert_opening_brace = true;
 
         if ((i + 1 < pack->num) && buf_len == 0) {   // no space left for next record
             return -1;
