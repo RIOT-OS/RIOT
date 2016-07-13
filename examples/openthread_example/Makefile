@@ -27,5 +27,6 @@ USEMODULE+=cipher_modes
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
+USEMODULE += ipv6_addr
 
 include $(RIOTBASE)/Makefile.include
