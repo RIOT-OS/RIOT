@@ -40,6 +40,9 @@ static mtdi_sta_t _init(mtdi_dev_t *mtdi_dev)
 
     if (!f) {
         f = fopen(_fname, "w+");
+        if (!f) {
+            return MTDI_STA_NODISK;
+        }
         for (unsigned long i = 0; i < NATIVE_MTDI_FLASH_SIZE; i++) {
             fputc(0xff, f);
         }
@@ -56,7 +59,14 @@ static mtdi_result_t _read(mtdi_dev_t *mtdi_dev, unsigned char *buff, unsigned l
 
     DEBUG("native_mtdi: read from page %lu count %lu\n", addr, size);
 
+    if (addr + size > NATIVE_MTDI_FLASH_SIZE) {
+        return MTDI_RES_PARERR;
+    }
+
     FILE *f = fopen(_fname, "r");
+    if (!f) {
+        return MTDI_RES_NOTRDY;
+    }
     fseek(f, addr, SEEK_SET);
     fread(buff, 1, size, f);
     fclose(f);
@@ -70,9 +80,23 @@ static mtdi_result_t _write(mtdi_dev_t *mtdi_dev, const unsigned char *buff, uns
 
     DEBUG("native_mtdi: write from page %lu count %lu\n", addr, size);
 
+    if (addr + size > NATIVE_MTDI_FLASH_SIZE) {
+        return MTDI_RES_PARERR;
+    }
+    if (addr % NATIVE_MTDI_SECTOR_SIZE + size > NATIVE_MTDI_SECTOR_SIZE) {
+        return MTDI_RES_PARERR;
+    }
+
     FILE *f = fopen(_fname, "r+");
+    if (!f) {
+        return MTDI_RES_NOTRDY;
+    }
     fseek(f, addr, SEEK_SET);
-    fwrite(buff, 1, size, f);
+    for (unsigned long i = 0; i < size; i++) {
+        uint8_t c = fgetc(f);
+        fseek(f, -1, SEEK_CUR);
+        fputc(c & buff[i], f);
+    }
     fclose(f);
 
     return MTDI_RES_OK;
@@ -84,7 +108,17 @@ static mtdi_result_t _erase(mtdi_dev_t *mtdi_dev, unsigned long addr, unsigned l
 
     DEBUG("native_mtdi: erase from sector %lu count %lu\n", addr, size);
 
+    if (addr + size > NATIVE_MTDI_FLASH_SIZE) {
+        return MTDI_RES_PARERR;
+    }
+    if (addr % NATIVE_MTDI_SECTOR_SIZE != 0 || size % NATIVE_MTDI_SECTOR_SIZE != 0) {
+        return MTDI_RES_PARERR;
+    }
+
     FILE *f = fopen(_fname, "r+");
+    if (!f) {
+        return MTDI_RES_NOTRDY;
+    }
     fseek(f, addr, SEEK_SET);
     for (unsigned long i = 0; i < size; i++) {
         fputc(0xff, f);
