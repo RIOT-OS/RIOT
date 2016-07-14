@@ -83,7 +83,7 @@ static mtdi_result_t _write(mtdi_dev_t *mtdi_dev, const unsigned char *buff, uns
     if (addr + size > NATIVE_MTDI_FLASH_SIZE) {
         return MTDI_RES_PARERR;
     }
-    if (addr % NATIVE_MTDI_SECTOR_SIZE + size > NATIVE_MTDI_SECTOR_SIZE) {
+    if (((addr % NATIVE_MTDI_SECTOR_SIZE) + size) > NATIVE_MTDI_SECTOR_SIZE) {
         return MTDI_RES_PARERR;
     }
 
@@ -111,7 +111,7 @@ static mtdi_result_t _erase(mtdi_dev_t *mtdi_dev, unsigned long addr, unsigned l
     if (addr + size > NATIVE_MTDI_FLASH_SIZE) {
         return MTDI_RES_PARERR;
     }
-    if (addr % NATIVE_MTDI_SECTOR_SIZE != 0 || size % NATIVE_MTDI_SECTOR_SIZE != 0) {
+    if (((addr % NATIVE_MTDI_SECTOR_SIZE) != 0) || ((size % NATIVE_MTDI_SECTOR_SIZE) != 0)) {
         return MTDI_RES_PARERR;
     }
 
