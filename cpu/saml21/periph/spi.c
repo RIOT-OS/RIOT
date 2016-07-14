@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup     cpu_samd21
+ * @ingroup     cpu_saml21
  * @{
  *
  * @file        spi.c
