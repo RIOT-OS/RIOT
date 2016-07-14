@@ -818,13 +818,10 @@ EXCLUDE_SYMLINKS       = NO
 # exclude all test directories for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = */board/*/tools/* \
-                         */cpu/*/include/component/* \
-                         */cpu/*/include/instance/* \
-                         */cpu/*/include/pio/* \
-                         */cpu/*/include/atmel/* \
+                         */cpu/sam*/include/atmel/* \
+                         */cpu/sam*/include/cmsis/* \
                          */cpu/sam3/include/sam3* \
                          */cpu/sam3/include/system_sam*.h \
-                         */cpu/samr21/include/samd21.h \
                          */cpu/lpc*/include/core_cm*.h \
                          */cpu/cortexm_common/include/core_cm*.h \
                          */cpu/stm32f*/include/stm32f* \
