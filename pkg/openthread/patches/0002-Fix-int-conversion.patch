@@ -1,0 +1,25 @@
+From 1ba963145a479519b4a3c2b875823bae3327875d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jos=C3=A9=20Ignacio=20Alamos=20Aste?= <jialamos@uc.cl>
+Date: Thu, 14 Jul 2016 17:33:08 +0200
+Subject: [PATCH] Fixed int
+
+---
+ src/cli/cli.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/cli/cli.cpp b/src/cli/cli.cpp
+index a25d70e..4e27775 100644
+--- a/src/cli/cli.cpp
++++ b/src/cli/cli.cpp
+@@ -578,7 +578,7 @@ void Interpreter::HandleEchoResponse(void *aContext, Message &aMessage, const Ip
+                           HostSwap16(aMessageInfo.GetPeerAddr().mFields.m16[7]));
+     sServer->OutputFormat(": icmp_seq=%d hlim=%d", icmp6Header.GetSequence(), aMessageInfo.mHopLimit);
+ 
+-    if (aMessage.Read(aMessage.GetOffset() + sizeof(icmp6Header), sizeof(uint32_t), &timestamp) >= sizeof(uint32_t))
++    if ((int) aMessage.Read(aMessage.GetOffset() + sizeof(icmp6Header), sizeof(uint32_t), &timestamp) >= (int) sizeof(uint32_t))
+     {
+         sServer->OutputFormat(" time=%dms", Timer::GetNow() - HostSwap32(timestamp));
+     }
+-- 
+2.7.4 (Apple Git-66)
+
