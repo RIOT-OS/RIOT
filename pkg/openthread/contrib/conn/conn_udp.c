@@ -35,20 +35,11 @@ int conn_udp_sendto(const void *data, size_t len, const void *src, size_t src_le
                     const void *dst, size_t dst_len, int family, uint16_t sport,
                     uint16_t dport)
 {
-	if(dst_len != 16)
+	if(dst_len != 16 || src_len != 16)
 		return -1;
+
     otMessage message;
 	otUdpSocket mSocket;
-
-    ipv6_addr_t addr;
-    const char *addr_str = dst;
-    ipv6_addr_from_str(&addr, addr_str);
-
-    otSockAddr peer = {};
-    peer.mPort = dport;
-
-	//Set dest addr
-	memcpy(&peer.mAddress.mFields, &addr, 16);
 
     message = otNewUdpMessage();
     otSetMessageLength(message, len);
@@ -57,17 +48,16 @@ int conn_udp_sendto(const void *data, size_t len, const void *src, size_t src_le
 	otMessageInfo mPeer;
 
 	//Set source address
-	mPeer.mSockAddr = mSocket.mSockName.mAddress;
-	mPeer.mSockAddr.mFields.m8[0] = 0x69;
+	memcpy(&mPeer.mSockAddr.mFields, src, src_len);
 
 	//Set source port
 	mSocket.mSockName.mPort = 74;
 
 	//Set dest address
-    mPeer.mPeerAddr = peer.mAddress;
+	memcpy(&mPeer.mPeerAddr.mFields, dst, dst_len);
 
 	//Set dest port
-    mPeer.mPeerPort = peer.mPort;
+    mPeer.mPeerPort = dport;
 
 	//Send UDP packet through OT
     otSendUdp(&mSocket, message, &mPeer);
@@ -81,14 +71,9 @@ void conn_udp_close(conn_udp_t *conn)
 
 int conn_udp_getlocaladdr(conn_udp_t *conn, void *addr, uint16_t *port)
 {
-	/*otSockAddr address = conn->mSocket.mSockName;
-	printf("\n");
-    for(int i=0;i<16;i++)
-    {
-		printf("%i ",address.mAddress.mFields.m8[i]);
-    }
-	printf("\n");*/
-    return 0;
+	memcpy(addr, &sockaddr.mAddress.mFields, 16);
+    *port = sockaddr.mPort;
+    return 16;
 }
 
 int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len, uint16_t *port)
