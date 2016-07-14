@@ -43,8 +43,8 @@ typedef enum {
  * @{
  */
 typedef enum {
-    MTDI_STA_INIT    = 0x00, /**< Drive initialized */
-    MTDI_STA_NOINIT  = 0x01, /**< Drive not initialized */
+    MTDI_STA_NOINIT  = 0x00, /**< Drive not initialized */
+    MTDI_STA_INIT    = 0x01, /**< Drive initialized */
     MTDI_STA_NODISK  = 0x02, /**< No medium in the drive */
     MTDI_STA_PROTECT = 0x04  /**< Write protected */
 } mtdi_sta_t;
@@ -60,12 +60,12 @@ typedef enum {
  * @{
  */
 #define MTDI_CTRL_SYNC           0   /**< Flush disk cache (for write functions) */
-#define MTDI_GET_PAGE_COUNT      1   /**< Get media size (for only f_mkfs()) */
-#define MTDI_GET_PAGE_SIZE       2   /**< Get page size (for multiple sector size (_MAX_SS >= 1024)) */
-#define MTDI_GET_SECTOR_COUNT    3   /**< Get media size (for only f_mkfs()) */
-#define MTDI_GET_SECTOR_SIZE     4   /**< Get sector size (for multiple sector size (_MAX_SS >= 1024)) */
-#define MTDI_GET_BLOCK_SIZE      5   /**< Get erase block size (for only f_mkfs()) */
-#define MTDI_CTRL_ERASE_BLOCK    6   /**< Force erased a block of blocks (for only _USE_ERASE) */
+#define MTDI_GET_PAGE_COUNT      1   /**< Get media size */
+#define MTDI_GET_PAGE_SIZE       2   /**< Get page size */
+#define MTDI_GET_SECTOR_COUNT    3   /**< Get media size */
+#define MTDI_GET_SECTOR_SIZE     4   /**< Get sector size */
+#define MTDI_GET_BLOCK_SIZE      5   /**< Get erase block size */
+#define MTDI_CTRL_ERASE_BLOCK    6   /**< Force erased a block of blocks */
 #define MTDI_CTRL_POWER          7   /**< Get/Set power status */
 #define MTDI_CTRL_LOCK           8   /**< Lock/Unlock media removal */
 #define MTDI_CTRL_EJECT          9   /**< Eject media */
@@ -95,6 +95,21 @@ typedef struct {
     const mtdi_desc_t *driver;
 } mtdi_dev_t;
 
+
+/**
+ * @brief MTD driver interface
+ *
+ * This define the functions to access a MTD.
+ *
+ * A MTD is composed of pages combined into sectors. A sector is the smallest erasable unit.
+ * The number of pages in a sector must be constant for the whole MTD.
+ *
+ * Most of the flash filesystems implementation will use pages as basic unit for writing.
+ * This interface does not limit the writing on bage boundaries but user must not write on
+ * multiple sector.
+ *
+ * The erase is available only for entire sectors.
+ */
 struct mtdi_desc {
     /**
      * @brief Initialize Memory Technology Device (MTD)
@@ -119,7 +134,9 @@ struct mtdi_desc {
 
 
     /**
-     * @brief Read pages over the Memory Technology Device (MTD)
+     * @brief Read from the Memory Technology Device (MTD)
+     *
+     * No alignment is required on @p addr and @p size.
      *
      * @param[in] mtdi_dev  Pointer to the selected driver
      * @param[out] buff     Pointer to the data buffer to store read data
@@ -136,7 +153,10 @@ struct mtdi_desc {
 
 
     /**
-     * @brief Write pages over the Memory Technology Device (MTD)
+     * @brief Write to the Memory Technology Device (MTD)
+     *
+     * @p addr + @p size must be inside a sector boundary. @p addr can be anywhere
+     * but the buffer cannot overlap two sectors.
      *
      * @param[in] mtdi_dev  Pointer to the selected driver
      * @param[in] buff      Pointer to the data to be written
@@ -153,6 +173,8 @@ struct mtdi_desc {
 
     /**
      * @brief Erase sector over the Memory Technology Device (MTD)
+     *
+     * @p addr must be aligned on a sector boundary. @p size must be a sector size.
      *
      * @param[in] mtdi_dev  Pointer to the selected driver
      * @param[in] addr      Starting address
