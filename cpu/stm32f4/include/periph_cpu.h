@@ -76,6 +76,38 @@ typedef struct {
 } adc_conf_t;
 
 /**
+ * @brief   DAC line configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the line */
+    uint8_t chan;           /**< DAC device used for this line */
+} dac_conf_t;
+
+/**
+ * @brief   Ethernet Peripheral configuration
+ */
+typedef struct {
+    enum {
+        MII = 18,                       /**< Configuration for MII */
+        RMII = 9,                       /**< Configuration for RMII */
+        SMI = 2,                        /**< Configuration for SMI */
+    } mode;                             /**< Select configuration mode */
+    enum {
+        ETH_SPEED_10T_HD = 0x0000,
+        ETH_SPEED_10T_FD = 0x0100,
+        ETH_SPEED_100TX_HD = 0x2000,
+        ETH_SPEED_100TX_FD = 0x2100,
+    } speed;                            /**< Speed selection */
+    uint8_t dma_stream;                 /**< DMA stream used for TX */
+    uint8_t dma_chan;                   /**< DMA channel used for TX */
+    char mac[6];                        /**< Et hernet MAC address */
+    char phy_addr;                      /**< PHY address */
+    gpio_t pins[];                      /**< Pins to use. MII requires 18 pins,
+                                             RMII 9 and SMI 9. Not all speeds are
+                                             supported by all modes. */
+} eth_conf_t;
+
+/**
  * @brief   Power on the DMA device the given stream belongs to
  *
  * @param[in] stream    logical DMA stream
