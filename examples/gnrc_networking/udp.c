@@ -51,12 +51,15 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
 
     for (unsigned int i = 0; i < num; i++) {
         gnrc_pktsnip_t *payload, *udp, *ip;
+        unsigned payload_size;
         /* allocate payload */
         payload = gnrc_pktbuf_add(NULL, data, strlen(data), GNRC_NETTYPE_UNDEF);
         if (payload == NULL) {
             puts("Error: unable to copy data to packet buffer");
             return;
         }
+        /* store size for output */
+        payload_size = (unsigned)payload->size;
         /* allocate UDP header, set source port := destination port */
         udp = gnrc_udp_hdr_build(payload, port, port);
         if (udp == NULL) {
@@ -77,8 +80,10 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
             gnrc_pktbuf_release(ip);
             return;
         }
-        printf("Success: send %u byte to [%s]:%u\n", (unsigned)payload->size,
-               addr_str, port);
+        /* access to `payload` was implicitly given up with the send operation above
+         * => use temporary variable for output */
+        printf("Success: send %u byte to [%s]:%u\n", payload_size, addr_str,
+               port);
         xtimer_usleep(delay);
     }
 }
