@@ -57,8 +57,23 @@ static conn_udp_t conn_obj;
 
 int udp_cmd(int argc, char **argv)
 {
-    conn_udp_create(&conn_obj, NULL, 0, 0, 7335);
-    conn_udp_recvfrom(&conn_obj, NULL, 0,NULL, NULL, 0);
+    char *addr_str = argv[1];
+    ipv6_addr_t ad;
+    ipv6_addr_from_str(&ad, addr_str);
+    conn_udp_create(&conn_obj, &ad, 0, 0, 7335);
+    conn_udp_getlocaladdr(&conn_obj, NULL, 0);
+    char data[10];
+    uint16_t port;
+    char addr[16];
+    size_t addr_len;
+    conn_udp_recvfrom(&conn_obj, data, 16,addr, &addr_len, &port);
+    printf("Port was: %i\n", port);
+    printf("And address was: \n");
+    for(int i=0;i<16;i++)
+    {
+        printf("%02x ",addr[i]);
+    }
+    printf("\n");
     return 0;
 }
 
@@ -66,7 +81,7 @@ int udp_send_cmd(int argc, char **argv)
 {
     char buf[] = "hola";
     char *addr_str = argv[1];
-    conn_udp_sendto(buf, 4, NULL, 0, addr_str, 0, 0, 0, 7335);
+    conn_udp_sendto(buf, 4, NULL, 16, addr_str, 16, 0, 0, 7335);
     printf("Finishing sending\n");
     return 0;
 }

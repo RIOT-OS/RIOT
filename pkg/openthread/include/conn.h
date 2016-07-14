@@ -14,6 +14,11 @@ struct conn_udp {
 	kernel_pid_t receiver_pid;
 };
 
+typedef struct conn_udp_msg_t {
+	otMessage message;
+	otMessageInfo *message_info;
+} conn_udp_msg_t;
+
 #ifdef __cplusplus
 }
 #endif
