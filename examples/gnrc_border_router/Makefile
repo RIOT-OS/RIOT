@@ -17,7 +17,10 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk msb-430 msb-430h pca10000 pc
 ifeq (,$(filter native,$(BOARD)))
 GNRC_NETIF_NUMOF := 2
 USEMODULE += ethos gnrc_netdev2
-CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=115200 -DUSE_ETHOS_FOR_STDIO
+
+# ethos baudrate can be configured from make command
+ETHOS_BAUDRATE ?= 115200
+CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE) -DUSE_ETHOS_FOR_STDIO
 FEATURES_REQUIRED += periph_uart
 endif
 
