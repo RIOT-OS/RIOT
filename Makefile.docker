@@ -7,6 +7,7 @@ export DOCKER_MAKECMDGOALS_POSSIBLE = \
   buildtest \
   scan-build \
   scan-build-analyze \
+  tests-% \
   #
 export DOCKER_MAKECMDGOALS = $(filter $(DOCKER_MAKECMDGOALS_POSSIBLE),$(MAKECMDGOALS))
 
