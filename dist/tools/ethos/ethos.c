@@ -28,9 +28,16 @@
 
 #define TRACE(x)
 
+#define case_baudrate(val)    \
+    case val:                 \
+        *baudrate = B ## val; \
+        break
+
+#define BAUDRATE_DEFAULT B115200
+
 static void usage(void)
 {
-    fprintf(stderr, "usage: ethos <tap> <serial>\n");
+    fprintf(stderr, "usage: ethos <tap> <serial> [baudrate]\n");
 }
 
 static void checked_write(int handle, void *buffer, int nbyte)
@@ -267,14 +274,85 @@ static void _clear_neighbor_cache(const char *ifname)
     }
 }
 
+static int _parse_baudrate(const char *arg, unsigned *baudrate)
+{
+    switch(strtol(arg, (char**)NULL, 10)) {
+    case 9600:
+        *baudrate = B9600;
+        break;
+    case 19200:
+        *baudrate = B19200;
+        break;
+    case 38400:
+        *baudrate = B38400;
+        break;
+    case 57600:
+        *baudrate = B57600;
+        break;
+    case 115200:
+        *baudrate = B115200;
+        break;
+    /* the following baudrates might not be available on all platforms */
+    #ifdef B234000
+        case_baudrate(230400);
+    #endif
+    #ifdef B460800
+        case_baudrate(460800);
+    #endif
+    #ifdef B500000
+        case_baudrate(500000);
+    #endif
+    #ifdef B576000
+        case_baudrate(576000);
+    #endif
+    #ifdef B921600
+        case_baudrate(921600);
+    #endif
+    #ifdef B1000000
+        case_baudrate(1000000);
+    #endif
+    #ifdef B1152000
+        case_baudrate(1152000);
+    #endif
+    #ifdef B1500000
+        case_baudrate(1500000);
+    #endif
+    #ifdef B2000000
+        case_baudrate(2000000);
+    #endif
+    #ifdef B2500000
+        case_baudrate(2500000);
+    #endif
+    #ifdef B3000000
+        case_baudrate(3000000);
+    #endif
+    #ifdef B3500000
+        case_baudrate(3500000);
+    #endif
+    #ifdef B4000000
+        case_baudrate(4000000);
+    #endif
+    default:
+        return -1;
+    }
+
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     char inbuf[MTU];
+    unsigned baudrate = BAUDRATE_DEFAULT;
 
     serial_t serial = {0};
 
     if (argc < 3) {
         usage();
+        return 1;
+    }
+
+    if (argc >= 4 && _parse_baudrate(argv[3], &baudrate) == -1) {
+        fprintf(stderr, "Invalid baudrate specified: %s\n", argv[3]);
         return 1;
     }
 
@@ -293,7 +371,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    set_serial_attribs(serial_fd, B115200, 0);
+    set_serial_attribs(serial_fd, baudrate, 0);
     set_blocking(serial_fd, 1);
 
     fd_set readfds;
