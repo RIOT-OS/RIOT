@@ -56,7 +56,7 @@ extern "C" {
                                                  after CS */
 #define CC110X_GDO1_LOW_RETRY       (100)   /**< Max. retries for SO to go low
                                                  after CS */
-#ifndef CC100X_DEFAULT_CHANNEL
+#ifndef CC110X_DEFAULT_CHANNEL
 #define CC110X_DEFAULT_CHANNEL      (0)     /**< The default channel number */
 #endif
 #define CC110X_MIN_CHANNR           (0)     /**< lowest possible channel number */
