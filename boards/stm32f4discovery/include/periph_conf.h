@@ -264,6 +264,41 @@ static const spi_conf_t spi_config[] = {
 #define I2C_0_SDA_CLKEN()   (periph_clk_en(AHB1, RCC_AHB1ENR_GPIOBEN))
 /** @} */
 
+/**
+ * @name ETH configuration
+ * @{
+ */
+#define ETH_NUMOF           (1)
+#define ETH_RX_BUFFER_COUNT (4)
+#define ETH_TX_BUFFER_COUNT (4)
+
+#define ETH_RX_BUFFER_SIZE (1524)
+#define ETH_TX_BUFFER_SIZE (1524)
+
+#define ETH_DMA_ISR        isr_dma2_stream0
+
+static const eth_conf_t eth_config = {
+    .mode = RMII,
+    .mac = { 1, 2, 3, 4, 5, 6 },
+    .speed = FULLDUPLEX_100Mbps,
+    .dma_chan = 0,
+    .dma_stream = 8,
+    .phy_addr = 0x01,
+    .pins = {
+        GPIO_PIN(PORT_B, 12),
+        GPIO_PIN(PORT_B, 13),
+        GPIO_PIN(PORT_B, 11),
+        GPIO_PIN(PORT_C, 4),
+        GPIO_PIN(PORT_C, 5),
+        GPIO_PIN(PORT_A, 7),
+        GPIO_PIN(PORT_C, 1),
+        GPIO_PIN(PORT_A, 2),
+        GPIO_PIN(PORT_A, 1),
+    }
+};
+
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
