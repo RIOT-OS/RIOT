@@ -7,8 +7,9 @@ export DOCKER_MAKECMDGOALS_POSSIBLE = \
   buildtest \
   scan-build \
   scan-build-analyze \
+  tests-% \
   #
-export DOCKER_MAKECMDGOALS = $(filter $(MAKECMDGOALS),$(DOCKER_MAKECMDGOALS_POSSIBLE))
+export DOCKER_MAKECMDGOALS = $(filter $(DOCKER_MAKECMDGOALS_POSSIBLE),$(MAKECMDGOALS))
 
 # Docker creates the files .dockerinit and .dockerenv in the root directory of
 # the container, we check for the files to determine if we are inside a container.
