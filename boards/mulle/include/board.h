@@ -24,6 +24,7 @@
 #include "cpu.h"
 #include "periph_conf.h"
 #include "mulle-nvram.h"
+#include "mtd.h"
 
 /* Use the on board RTC 32kHz clock for LPTMR clocking. */
 #undef LPTIMER_CLKSRC
@@ -145,6 +146,22 @@ void board_init(void);
 #define MULLE_NVRAM_SPI_CS              GPIO_PIN(PORT_D, 6) /**< FRAM CS pin */
 #define MULLE_NVRAM_CAPACITY            512     /**< FRAM size, in bytes */
 #define MULLE_NVRAM_SPI_ADDRESS_COUNT   1       /**< FRAM addressing size, in bytes */
+/** @} */
+
+/**
+ * @name Mulle NOR flash hardware configuration
+ */
+/** @{ */
+#define MULLE_NOR_SPI_DEV               SPI_DEV(0)
+#define MULLE_NOR_SPI_CLK               SPI_CLK_5MHZ
+#define MULLE_NOR_SPI_CS                SPI_HWCS(2) /**< Flash CS pin */
+/** @} */
+/**
+ * @name MTD configuration
+ */
+/** @{ */
+extern mtd_dev_t *mtd0;
+#define MTD_0 mtd0
 /** @} */
 
 /**
