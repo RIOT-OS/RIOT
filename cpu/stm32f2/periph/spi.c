@@ -534,13 +534,13 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     dma_transmission_acquire(tx_stream);
     dma_transmission_acquire(rx_stream);
 
-    /* release dma spi rx and tx streams */
-    dma_conf_release(tx_stream);
-    dma_conf_release(rx_stream);
-
     /* disable dma */
     dma_disable(tx_stream);
     dma_disable(rx_stream);
+
+    /* release dma spi rx and tx streams */
+    dma_conf_release(tx_stream);
+    dma_conf_release(rx_stream);
 
     return length;
 }
