@@ -557,3 +557,16 @@ ifneq (,$(filter random,$(USEMODULE)))
         USEMODULE += tinymt32
     endif
 endif
+
+ifneq (,$(filter ndn-riot,$(USEMODULE)))
+    USEMODULE += ndn-encoding
+    USEMODULE += gnrc
+    USEMODULE += xtimer
+endif
+
+ifneq (,$(filter ndn-encoding,$(USEMODULE)))
+    USEMODULE += gnrc_pktbuf
+    USEMODULE += random
+    USEMODULE += hashes
+    USEPKG += micro-ecc
+endif
