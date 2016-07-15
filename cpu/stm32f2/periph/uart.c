@@ -160,10 +160,10 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         dma_enable(uart_config[uart].dma_stream);
         /* wait until end of transmission */
         dma_transmission_acquire(uart_config[uart].dma_stream);
-        /* release dma uart stream */
-        dma_conf_release(uart_config[uart].dma_stream);
         /* disable dma */
         dma_disable(uart_config[uart].dma_stream);
+        /* release dma uart stream */
+        dma_conf_release(uart_config[uart].dma_stream);
    }
 }
 
