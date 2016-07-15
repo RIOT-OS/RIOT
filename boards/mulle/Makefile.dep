@@ -14,6 +14,7 @@ USEMODULE += nvram_spi
 USEMODULE += nvram
 USEMODULE += devfs
 USEMODULE += mtd_spi_nor
+USEMODULE += spiffs
 
 #FEATURES_REQUIRED += periph_spi
 

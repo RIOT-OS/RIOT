@@ -42,8 +42,28 @@
 #include "net/gnrc.h"
 #endif
 
+#include "mtd_spi_nor.h"
+#include "fs/spiffs_fs.h"
+
+extern mtd_spi_nor_t mulle_nor_dev;
+
+static struct spiffs_desc spiffs_desc = {
+    .lock = MUTEX_INIT,
+    .dev = (mtd_dev_t *)&mulle_nor_dev,
+};
+
+static vfs_mount_t _test_spiffs_mount = {
+    .fs = &spiffs_file_system,
+    .mount_point = "/",
+    .private_data = &spiffs_desc,
+};
+
 int main(void)
 {
+    int mulle_nor_init(void);
+    mulle_nor_init();
+
+    vfs_mount(&_test_spiffs_mount);
 #ifdef MODULE_LTC4150
     ltc4150_start();
 #endif
