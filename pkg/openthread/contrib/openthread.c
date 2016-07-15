@@ -26,8 +26,6 @@
 #define OPENTHREAD_NETIF_NUMOF        (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
 #endif
 
-
-
 #ifdef MODULE_AT86RF2XX
 static at86rf2xx_t at86rf2xx_dev;
 #endif

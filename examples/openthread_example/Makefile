@@ -15,9 +15,10 @@ CFLAGS += -DDEVELHELP -Wall
 QUIET ?= 1
 
 USEMODULE+=openthread
-#USEMODULE+=openthread_cli
+USEMODULE+=openthread_cli
 
 USEMODULE += at86rf233
+#USEMODULE += kw2xrf
 
 USEMODULE+=random
 USEMODULE+=hashes
@@ -28,5 +29,7 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += ipv6_addr
+
+FEATURES_REQUIRED += periph_i2c
 
 include $(RIOTBASE)/Makefile.include

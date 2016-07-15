@@ -12,6 +12,8 @@
 #include <net/ipv6/addr.h>
 #include "net/conn/udp.h"
 #include "conn.h"
+#include "periph_conf.h"
+#include "periph/i2c.h"
 
 #ifndef MODULE_OPENTHREAD_CLI
 int state_cmd(int argc, char **argv)
@@ -62,11 +64,11 @@ int udp_cmd(int argc, char **argv)
     ipv6_addr_from_str(&ad, addr_str);
     conn_udp_create(&conn_obj, &ad, 0, 0, 7335);
     //conn_udp_getlocaladdr(&conn_obj, NULL, 0);
-    char data[10];
+    /*char data[10];
     uint16_t port;
     char addr[16];
-    size_t addr_len;
-    conn_udp_recvfrom(&conn_obj, data, 16, addr, &addr_len, &port);
+    size_t addr_len;*/
+    /*conn_udp_recvfrom(&conn_obj, data, 16, addr, &addr_len, &port);
     printf("Port was: %i\n", port);
     printf("And address was: \n");
     for(int i=0;i<16;i++)
@@ -79,14 +81,15 @@ int udp_cmd(int argc, char **argv)
     {
         printf("%i ", data[i]);
     }
-    printf("\n");
+    printf("\n");*/
     return 0;
 }
 
 int udp_send_cmd(int argc, char **argv)
 {
-    char buf[] = "hola";
     char *addr_str = argv[1];
+    uint16_t port = atoi(argv[2]);
+    size_t payload_size = strlen(argv[3]);
 
     ipv6_addr_t addr;
     ipv6_addr_from_str(&addr, addr_str);
@@ -94,21 +97,27 @@ int udp_send_cmd(int argc, char **argv)
     char srcaddr[16];
     srcaddr[0] = 69;
 
-    conn_udp_sendto(buf, 4, srcaddr, 16, &addr, 16, 0, 0, 7335);
-    printf("Finishing sending\n");
+    conn_udp_sendto(argv[3], payload_size, srcaddr, 16, &addr, 16, 0, 0, port);
+    printf("Sent.\n");
     return 0;
 }
 
 static const shell_command_t shell_commands[] = {
         { "state", "get OpenThread state", state_cmd },
-        { "udp", "start udp server", udp_cmd },
-        { "send_udp", "send udp to address", udp_send_cmd },
+        //{ "udp", "start udp server", udp_cmd },
+        { "udp", "send udp to given address and port", udp_send_cmd },
         { "ipaddr", "get ip addrs", ipaddr_cmd },
             { NULL, NULL, NULL }
 };
 
 void cli_run(void)
 {
+    /*char addr_str[16];
+    memset(addr_str, 0, 16);
+    ipv6_addr_t ad;
+    ipv6_addr_from_str(&ad, addr_str);
+    conn_udp_create(&conn_obj, &ad, 0, 0, 7335);*/
+
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 }

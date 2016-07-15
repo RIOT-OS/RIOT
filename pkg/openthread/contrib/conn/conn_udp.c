@@ -11,8 +11,18 @@ static msg_t _msg;
 static conn_udp_msg_t msg_info;
 static otSockAddr sockaddr = {};
 
+char tmp[100];
+
 void HandleUdpReceived(void *aContext, otMessage aMessage, const otMessageInfo *aMessageInfo)
 {
+	int msg_length, msg_offset;
+	msg_offset = otGetMessageOffset(aMessage);
+	msg_length = otGetMessageLength(aMessage)-msg_offset;
+	otReadMessage(aMessage, msg_offset, tmp, msg_length);
+
+	printf("Received UDP packet. Content: <");
+	printf("%.*s", msg_length, tmp);
+	printf(">\n");
 	msg_info.message = aMessage;
 	msg_info.message_info  = (otMessageInfo*) aMessageInfo;
 	_msg.type = OPENTHREAD_MSG_TYPE_RECV;
@@ -81,7 +91,7 @@ int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len, void *addr, 
 	msg_t msg;
 	conn->receiver_pid = thread_getpid();
 	conn_udp_msg_t *cudp;
-	int msg_length, msg_offset;;
+	int msg_length, msg_offset;
 	while(1)
 	{
 		msg_receive(&msg);
