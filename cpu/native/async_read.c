@@ -20,11 +20,15 @@
 #include <err.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
 
 #include "async_read.h"
 #include "native_internal.h"
+
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
 static int _next_index;
 static int _fds[ASYNC_READ_NUMOF];
@@ -84,6 +88,33 @@ void native_async_read_continue(int fd) {
         }
     }
 #endif
+}
+
+void native_async_continue_reading(int fd)
+{
+    /* work around lost signals */
+    fd_set rfds;
+    struct timeval t;
+    memset(&t, 0, sizeof(t));
+    FD_ZERO(&rfds);
+    FD_SET(fd, &rfds);
+
+    _native_in_syscall++; /* no switching here */
+
+    if (real_select(fd + 1, &rfds, NULL, NULL, &t) == 1) {
+        int sig = SIGIO;
+        extern int _sig_pipefd[2];
+        extern ssize_t (*real_write)(int fd, const void * buf, size_t count);
+        real_write(_sig_pipefd[1], &sig, sizeof(int));
+        _native_sigpend++;
+        DEBUG("netdev2_raw802154: sigpend++\n");
+    }
+    else {
+        DEBUG("netdev2_raw802154: native_async_read_continue\n");
+        native_async_read_continue(fd);
+    }
+
+    _native_in_syscall--;
 }
 
 void native_async_read_add_handler(int fd, native_async_read_callback_t handler) {

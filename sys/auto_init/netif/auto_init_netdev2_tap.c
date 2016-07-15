@@ -26,6 +26,7 @@
 #include "net/gnrc/netdev2/eth.h"
 
 extern netdev2_tap_t netdev2_tap;
+extern char *tap_dev;
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
@@ -42,6 +43,10 @@ static gnrc_netdev2_t _gnrc_netdev2_tap;
 
 void auto_init_netdev2_tap(void)
 {
+    if (!tap_dev) {
+        return;
+    }
+
     gnrc_netdev2_eth_init(&_gnrc_netdev2_tap, (netdev2_t*)&netdev2_tap);
 
     gnrc_netdev2_init(_netdev2_eth_stack, TAP_MAC_STACKSIZE,
