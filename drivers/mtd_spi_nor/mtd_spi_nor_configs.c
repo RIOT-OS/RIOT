@@ -1,0 +1,42 @@
+/*
+ * Copyright (C) 2016 Eistec AB
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
+ */
+
+/**
+ * @ingroup     drivers_mtd_spi_nor
+ * @{
+ *
+ * @file
+ * @brief       Configurations for some known serial flash memory devices
+ *
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ */
+
+#include <stdint.h>
+#include "mtd_spi_nor.h"
+
+/* Define opcode tables for SPI NOR flash memory devices here. */
+
+/* Linker garbage collection (gcc -fdata-sections -Wl,--gc-sections) should ensure
+ * that only the tables that are actually used by the application will take up
+ * space in the .rodata section in program ROM. */
+
+const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default = {
+    .rdid         = 0x9f,
+    .wren         = 0x06,
+    .rdsr         = 0x05,
+    .wrsr         = 0x01,
+    .read         = 0x03,
+    .page_program = 0x02,
+    .sector_erase = 0xd8,
+    .chip_erase   = 0xc7,
+    .sleep        = 0xb9,
+    .wake         = 0xab,
+};
+
+/** @} */
