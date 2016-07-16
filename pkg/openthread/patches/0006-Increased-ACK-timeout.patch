@@ -1,0 +1,25 @@
+From f57eb6d415ebdfd183bc2bcc869800d3f67ac749 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jos=C3=A9=20Ignacio=20Alamos=20Aste?= <jialamos@uc.cl>
+Date: Thu, 14 Jul 2016 21:53:57 +0200
+Subject: [PATCH] Increased ACK timeout
+
+---
+ src/core/mac/mac.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/core/mac/mac.hpp b/src/core/mac/mac.hpp
+index 97bbba4..debe38c 100644
+--- a/src/core/mac/mac.hpp
++++ b/src/core/mac/mac.hpp
+@@ -74,7 +74,7 @@ enum
+     kMinBackoff           = 16,                    ///< Minimum backoff (milliseconds).
+     kMaxFrameAttempts     = kMaxFrameRetries + 1,  ///< Number of transmission attempts.
+ 
+-    kAckTimeout           = 16,                    ///< Timeout for waiting on an ACK (milliseconds).
++    kAckTimeout           = 40,                    ///< Timeout for waiting on an ACK (milliseconds).
+     kDataPollTimeout      = 100,                   ///< Timeout for receiving Data Frame (milliseconds).
+     kNonceSize            = 13,                    ///< Size of IEEE 802.15.4 Nonce (bytes).
+ 
+-- 
+2.7.4 (Apple Git-66)
+
