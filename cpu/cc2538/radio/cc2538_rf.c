@@ -65,13 +65,13 @@ bool cc2538_channel_clear(void)
     if (RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE == FSM_STATE_IDLE) {
         bool result;
         cc2538_on();
-        RFCORE_WAIT_UNTIL(RFCORE->cc2538_rfcore_xreg_rssistat.XREG_RSSISTATbits.RSSI_VALID);
+        RFCORE_WAIT_UNTIL(RFCORE->XREG_RSSISTATbits.RSSI_VALID);
         result = BOOLEAN(RFCORE->XREG_FSMSTAT1bits.CCA);
         cc2538_off();
         return result;
     }
     else {
-        RFCORE_WAIT_UNTIL(RFCORE->cc2538_rfcore_xreg_rssistat.XREG_RSSISTATbits.RSSI_VALID);
+        RFCORE_WAIT_UNTIL(RFCORE->XREG_RSSISTATbits.RSSI_VALID);
         return BOOLEAN(RFCORE->XREG_FSMSTAT1bits.CCA);
     }
 }

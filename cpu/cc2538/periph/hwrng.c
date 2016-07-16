@@ -48,7 +48,7 @@ void hwrng_init(void)
      * have died out. A convenient way to do this is to wait for the RSSI-valid
      * signal to go high."
      */
-    while (!RFCORE->cc2538_rfcore_xreg_rssistat.XREG_RSSISTATbits.RSSI_VALID);
+    while (!RFCORE->XREG_RSSISTATbits.RSSI_VALID);
 
     /*
      * Form the seed by concatenating bits from IF_ADC in the RF receive path.
@@ -58,7 +58,7 @@ void hwrng_init(void)
      */
     for (i = 0; (i < 8) || (seed == 0) || (seed == 0x8003); i++) {
         seed <<= 2;
-        seed ^= RFCORE->cc2538_rfcore_xreg_rfrnd.XREG_RFRND;
+        seed ^= RFCORE->XREG_RFRND;
     }
 
     /* Seed the high byte first: */
