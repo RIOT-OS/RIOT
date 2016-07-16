@@ -112,13 +112,13 @@ static const shell_command_t shell_commands[] = {
 
 void cli_run(void)
 {
-    /*char addr_str[16];
+    char addr_str[16];
     memset(addr_str, 0, 16);
     ipv6_addr_t ad;
     ipv6_addr_from_str(&ad, addr_str);
-    conn_udp_create(&conn_obj, &ad, 0, 0, 7335);*/
+    conn_udp_create(&conn_obj, &ad, 0, 0, 7335);
 
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    char line_buf[3*SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 }
 #endif

@@ -44,7 +44,7 @@ void openthread_bootstrap(void)
 #ifdef CPUID_LEN
     char cpu_id[CPUID_LEN];
     cpuid_get(cpu_id);
-    int seed = 0;
+    uint32_t seed = 0;
     for(int i=0;i<(int) CPUID_LEN;i++)
     {
         seed += cpu_id[i];
