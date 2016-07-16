@@ -31,6 +31,17 @@ ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
     USEMODULE += fmt
 endif
 
+ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
+    USEMODULE += softdevice_handler
+    USEMODULE += ble_common
+    USEMODULE += ble_6lowpan
+    USEMODULE += gnrc_sixlowpan
+    USEMODULE += gnrc_sixlowpan_iphc
+    USEMODULE += gnrc_ipv6_default
+    USEMODULE += gnrc_netdev2
+    USEMODULE += gnrc_ipv6_netif
+endif
+
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pktbuf,$(USEMODULE))))
   USEMODULE += gnrc
 endif
