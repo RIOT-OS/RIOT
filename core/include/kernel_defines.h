@@ -31,8 +31,8 @@
  * @details     For a struct `TYPE` with a member `MEMBER`,
  *              given a pointer `PTR` to `TYPE::MEMBER` this function returns a pointer
  *              to the instance of `TYPE`.
- * @details     E.g. for `struct my_struct_t { ...; something_t n; ... } my_struct;`,
- *              `&my_struct == container_of(&my_struct.n, struct my_struct_t, n)`.
+ * @details     E.g. for `struct my_struct { ...; something_t n; ... } my_struct_t;`,
+ *              `&my_struct == container_of(&my_struct.n, my_struct_t, n)`.
  * @param[in]   PTR      pointer to a member
  * @param[in]   TYPE     a type name (a struct or union), container of PTR
  * @param[in]   MEMBER   name of the member of TYPE which PTR points to
