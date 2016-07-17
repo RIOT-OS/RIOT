@@ -6,8 +6,10 @@
 #include "at86rf2xx_params.h"
 #endif
 
-#include "openthread.h"
-#include "ot.h"
+#ifdef MODULE_KW2XRF
+#include "kw2xrf.h"
+#include "kw2xrf_params.h"
+#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -22,16 +24,26 @@
 #include "random.h"
 #include "periph/cpuid.h"
 
+#include "openthread.h"
+#include "ot.h"
+
 #ifdef MODULE_AT86RF2XX     /* is mutual exclusive with above ifdef */
 #define OPENTHREAD_NETIF_NUMOF        (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
+#endif
+
+#ifdef MODULE_KW2XRF
+#define OPENTHREAD_NETIF_NUMOF        (sizeof(kw2xrf_params) / sizeof(kw2xrf_params[0]))
 #endif
 
 #ifdef MODULE_AT86RF2XX
 static at86rf2xx_t at86rf2xx_dev;
 #endif
 
-#define OPENTHREAD_NETDEV2_BUFLEN (ETHERNET_MAX_LEN)
+#ifdef MODULE_KW2XRF
+static kw2xrf_t kw2xrf_dev;
+#endif
 
+#define OPENTHREAD_NETDEV2_BUFLEN (ETHERNET_MAX_LEN)
 
 static uint8_t rx_buf[OPENTHREAD_NETDEV2_BUFLEN];
 static uint8_t tx_buf[OPENTHREAD_NETDEV2_BUFLEN];
@@ -57,6 +69,11 @@ void openthread_bootstrap(void)
 #ifdef MODULE_AT86RF2XX
 	at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0]);
 	netdev2_t *netdev = (netdev2_t*) &at86rf2xx_dev;
+#endif
+
+#ifdef MODULE_KW2XRF
+	kw2xrf_setup(&kw2xrf_dev, &kw2xrf_params[0]);
+	netdev2_t *netdev = (netdev2_t*) &kw2xrf_dev;
 #endif
 
 	netdev->driver->init(netdev);
