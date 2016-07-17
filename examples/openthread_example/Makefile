@@ -18,6 +18,7 @@ USEMODULE+=openthread
 USEMODULE+=openthread_cli
 
 USEMODULE += at86rf233
+#USEMODULE += at86rf231
 #USEMODULE += kw2xrf
 
 USEMODULE+=random
