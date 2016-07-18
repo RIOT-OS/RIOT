@@ -5,8 +5,8 @@ DIRS += periph
 ifneq (,$(filter netdev2_tap,$(USEMODULE)))
 	DIRS += netdev2_tap
 endif
-ifneq (,$(filter mtdi_native,$(USEMODULE)))
-	DIRS += mtdi
+ifneq (,$(filter mtd_native,$(USEMODULE)))
+	DIRS += mtd
 endif
 
 include $(RIOTBASE)/Makefile.base
