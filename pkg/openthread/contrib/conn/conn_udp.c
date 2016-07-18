@@ -5,6 +5,7 @@
 #include "string.h"
 #include <net/ipv6/addr.h>
 #include "ot.h"
+#include "errno.h"
 
 static msg_t _msg;
 
