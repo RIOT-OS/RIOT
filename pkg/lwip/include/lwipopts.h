@@ -52,9 +52,9 @@ extern "C" {
 
 #ifdef MODULE_LWIP_ETHERNET
 #define LWIP_ETHERNET           (1)
-#else  /* MODULE_LWIP_IPV4 */
+#else  /* MODULE_LWIP_ETHERNET */
 #define LWIP_ETHERNET           (0)
-#endif /* MODULE_LWIP_IPV4 */
+#endif /* MODULE_LWIP_ETHERNET */
 
 #ifdef MODULE_LWIP_IGMP
 #define LWIP_IGMP               (1)
