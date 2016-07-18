@@ -4,9 +4,9 @@
 #include "openthread.h"
 
 #include "platform/alarm.h"
-#include "platform/serial.h"
+#include "platform/uart.h"
 
-#include <cli/cli-serial.h>
+#include <cli/cli-uart.h>
 #include <assert.h>
 
 #define ENABLE_DEBUG (0)
@@ -36,7 +36,7 @@ void *_openthread_event_loop(void *arg)
 
 #ifdef MODULE_OPENTHREAD_CLI
 	serial_msg_t *ser;
-	otCliSerialInit();
+	otCliUartInit();
 #else
 	otEnable();
 	otProcessNextTasklet();
@@ -58,7 +58,7 @@ void *_openthread_event_loop(void *arg)
 #ifdef MODULE_OPENTHREAD_CLI
 			case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
 				ser = (serial_msg_t*) msg.content.ptr;
-				otPlatSerialReceived((uint8_t*) ser->buf, ser->len);
+				otPlatUartReceived((uint8_t*) ser->buf, ser->len);
 				break;
 #endif
 				
