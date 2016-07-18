@@ -16,10 +16,10 @@
 
 #include "platform.h"
 #include "platform/alarm.h"
-#include "platform/serial.h"
+#include "platform/uart.h"
 
 
-#include <cli/cli-serial.h>
+#include <cli/cli-uart.h>
 #include "xtimer.h"
 #include "random.h"
 #include "periph/cpuid.h"

@@ -32,11 +32,11 @@
  *   This file includes the platform-specific initializers.
  */
 
-#include <platform/serial.h>
+#include <platform/uart.h>
 #include "platform.h"
 #include <stdio.h>
 
 void PlatformInit(void)
 {
-    otPlatSerialEnable();
+    otPlatUartEnable();
 }
