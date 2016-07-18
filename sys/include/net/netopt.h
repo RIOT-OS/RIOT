@@ -234,7 +234,7 @@ typedef enum {
      * unless it was explicitly allowed at build time,
      * therefore it should be secured with an additional macro in the device driver.
      * For development and certification purposes only, this test modes can disturb
-     * normal radio communications and exceed the limits, established by 
+     * normal radio communications and exceed the limits, established by
      * the regulatory authority.
      *
      */
