@@ -87,6 +87,22 @@ static inline int cib_get(cib_t *__restrict cib)
 }
 
 /**
+ * @brief Get the index of the next item in buffer without removing it.
+ *
+ * @param[in,out] cib   corresponding *cib* to buffer.
+ *                      Must not be NULL.
+ * @return index of next item, -1 if the buffer is empty
+ */
+static inline int cib_peek(cib_t *__restrict cib)
+{
+    if (cib->write_count > cib->read_count) {
+        return (int) (cib->read_count & cib->mask);
+    }
+
+    return -1;
+}
+
+/**
  * @brief Get index for item in buffer to put to.
  *
  * @param[in,out] cib   corresponding *cib* to buffer.
