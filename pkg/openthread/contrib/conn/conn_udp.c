@@ -34,7 +34,7 @@ int conn_udp_create(conn_udp_t *conn, const void *addr, size_t addr_len, int fam
 int conn_udp_sendto(const void *data, size_t len, const void *src, size_t src_len,
                     const void *dst, size_t dst_len, int family, uint16_t sport,
                     uint16_t dport)
-
+{
 	if(dst_len != sizeof(ipv6_addr_t) || src_len != sizeof(ipv6_addr_t))
 		return -EINVAL;
 
