@@ -1,0 +1,25 @@
+From c29274f843711013b1990c97909bb3fabe78d8b4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jos=C3=A9=20Ignacio=20Alamos=20Aste?= <jialamos@uc.cl>
+Date: Thu, 14 Jul 2016 21:55:09 +0200
+Subject: [PATCH] Enabled OT DEBUG
+
+---
+ src/core/openthread-core-config.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/core/openthread-core-config.h b/src/core/openthread-core-config.h
+index e825781..e85cf2c 100644
+--- a/src/core/openthread-core-config.h
++++ b/src/core/openthread-core-config.h
+@@ -141,7 +141,7 @@
+  *
+  */
+ #ifndef OPENTHREAD_CONFIG_LOG_LEVEL
+-#define OPENTHREAD_CONFIG_LOG_LEVEL                         OPENTHREAD_LOG_LEVEL_CRIT
++#define OPENTHREAD_CONFIG_LOG_LEVEL                         OPENTHREAD_LOG_LEVEL_DEBG
+ #endif  // OPENTHREAD_CONFIG_LOG_LEVEL
+ 
+ /**
+-- 
+2.7.4 (Apple Git-66)
+
