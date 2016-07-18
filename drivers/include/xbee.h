@@ -72,6 +72,9 @@ extern "C" {
 /**
  * @brief   Default channel used after initialization
  */
+#ifdef DEFAULT_CHANNEL
+#define XBEE_DEFAULT_CHANNEL (DEFAULT_CHANNEL)
+#endif
 #ifndef XBEE_DEFAULT_CHANNEL
 #define XBEE_DEFAULT_CHANNEL        (23U)
 #endif

@@ -57,7 +57,12 @@ extern "C" {
   */
 #define CC2420_CHAN_MIN         (11U)
 #define CC2420_CHAN_MAX         (26U)
+#ifdef DEFAULT_CHANNEL
+#define CC2420_CHAN_DEFAULT     (DEFAULT_CHANNEL)
+#endif
+#ifndef CC2420_CHAN_DEFAULT
 #define CC2420_CHAN_DEFAULT     (26U)
+#endif
 /** @} */
 
 /**
