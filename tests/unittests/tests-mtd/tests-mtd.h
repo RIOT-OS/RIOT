@@ -15,8 +15,8 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
-#ifndef TESTS_MTD_H_
-#define TESTS_MTD_H_
+#ifndef TESTS_MTD_H
+#define TESTS_MTD_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_mtd(void);
 }
 #endif
 
-#endif /* TESTS_MTD_H_ */
+#endif /* TESTS_MTD_H */
 /** @} */
