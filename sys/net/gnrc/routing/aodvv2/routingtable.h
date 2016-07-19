@@ -80,20 +80,44 @@ struct netaddr *routingtable_get_next_hop(struct netaddr *dest, aodvv2_metric_t 
  * @brief     Add new entry to routing table, if there is no other entry
  *            to the same destination.
  *
- * @param[in] entry        The routing table entry to add
+ * @param[in] addr           The destination address of the new route
+ * @param[in] seqnum         The sequence number associated with the route towrds addr
+ * @param[in] nextHopAddr    The next hop towards addr
+ * @param[in] metricType     The metric type of the route towards addr
+ * @param[in] metric         The metric value of the route
+ * @param[in] state          The state of the route
+ * @param[in] timestamp      The time at wich the route info was received
  */
-void routingtable_add_entry(struct aodvv2_routing_entry_t *entry);
+void routingtable_add_entry(struct netaddr *addr, aodvv2_seqnum_t *seqnum,
+                            struct netaddr *nextHopAddr, aodvv2_metric_t *metricType,
+                            uint8_t metric, uint8_t state, timex_t *timestamp);
 
 /**
  * @brief     Retrieve pointer to a routing table entry.
- *            To edit, simply follow the pointer.
  *            Returns NULL if addr is not in routing table.
  *
- * @param[in] addr          The address towards which the route should point
+ * @param[in] addr          The destination address of the desired route
  * @param[in] metricType    Metric Type of the desired route
  * @return                  Routing table entry if it exists, NULL otherwise
  */
 struct aodvv2_routing_entry_t *routingtable_get_entry(struct netaddr *addr, aodvv2_metric_t metricType);
+
+/**
+ * @brief     Edit routing table entry @param entry.
+ *            Returns NULL if addr is not in routing table.
+ *
+ * @param[in] entry          The routing table entry to be edited
+ * @param[in] seqnum         The (new) sequence number
+ * @param[in] nextHopAddr    The (new) next hop towards addr
+ * @param[in] metric         The (new) metric value
+ * @param[in] state          The (new) route state
+ * @param[in] timestamp      The time at wich the new route info was received
+ * @return                   Routing table entry if it exists, NULL otherwise
+ */
+struct aodvv2_routing_entry_t *routingtable_update_entry(
+                            struct aodvv2_routing_entry_t *entry,
+                            aodvv2_seqnum_t *seqnum, struct netaddr *nextHopAddr,
+                            uint8_t metric, uint8_t state, timex_t *timestamp);
 
 /**
  * @brief     Delete routing table entry towards addr with metric type MetricType,

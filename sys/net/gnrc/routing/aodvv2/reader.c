@@ -312,19 +312,17 @@ static enum rfc5444_result _cb_rreq_end_callback(
 
     if (!rt_entry || (rt_entry->metricType != packet_data.metricType)) {
 
-        struct aodvv2_routing_entry_t *tmp_rt_entry = (struct aodvv2_routing_entry_t *)
-                                                       malloc(sizeof(struct aodvv2_routing_entry_t));
-        memset(tmp_rt_entry, 0, sizeof(*tmp_rt_entry));
-
-        routingtable_fill_routing_entry_t_rreq(&packet_data, tmp_rt_entry);
-        routingtable_add_entry(tmp_rt_entry);
+        routingtable_add_entry(&packet_data.origNode.addr,
+                               &packet_data.origNode.seqnum,
+                               &packet_data.sender, &packet_data.metricType,
+                               packet_data.origNode.metric, ROUTE_STATE_ACTIVE,
+                               &packet_data.timestamp);
 
         /* add entry to FIB */
-        fib_add_entry(&gnrc_ipv6_fib_table, aodvv2_if_id, tmp_rt_entry->addr._addr,
-                      sizeof(ipv6_addr_t), 0, tmp_rt_entry->nextHopAddr._addr,
+        fib_add_entry(&gnrc_ipv6_fib_table, aodvv2_if_id,
+                      packet_data.origNode.addr._addr,
+                      sizeof(ipv6_addr_t), 0, packet_data.sender._addr,
                       sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
-
-        free(tmp_rt_entry);
     }
     else {
         if (!routingtable_offers_improvement(rt_entry, &packet_data.origNode)) {
@@ -334,7 +332,10 @@ static enum rfc5444_result _cb_rreq_end_callback(
         /* The incoming routing information is better than existing routing
          * table information and SHOULD be used to improve the route table. */
         AODV_DEBUG("\tUpdating Routing Table entry...\n");
-        routingtable_fill_routing_entry_t_rreq(&packet_data, rt_entry);
+
+        routingtable_update_entry(rt_entry, &packet_data.origNode.seqnum,
+                                  &packet_data.sender, packet_data.origNode.metric,
+                                  ROUTE_STATE_ACTIVE, &packet_data.timestamp);
 
         /* update the FIB */
         fib_update_entry(&gnrc_ipv6_fib_table, rt_entry->addr._addr, sizeof(ipv6_addr_t),
@@ -497,19 +498,16 @@ static enum rfc5444_result _cb_rrep_end_callback(
 
     if (!rt_entry || (rt_entry->metricType != packet_data.metricType)) {
 
-        struct aodvv2_routing_entry_t *tmp_rt_entry = (struct aodvv2_routing_entry_t *)
-                                                       malloc(sizeof(struct aodvv2_routing_entry_t));
-        memset(tmp_rt_entry, 0, sizeof(*tmp_rt_entry));
-
-        routingtable_fill_routing_entry_t_rrep(&packet_data, tmp_rt_entry);
-        routingtable_add_entry(tmp_rt_entry);
+        routingtable_add_entry(&packet_data.targNode.addr,
+                               &packet_data.targNode.seqnum,
+                               &packet_data.sender, &packet_data.metricType,
+                               packet_data.targNode.metric, ROUTE_STATE_ACTIVE,
+                               &packet_data.timestamp);
 
         /* add entry to FIB */
-        fib_add_entry(&gnrc_ipv6_fib_table, aodvv2_if_id, tmp_rt_entry->addr._addr,
-                      sizeof(ipv6_addr_t), 0, tmp_rt_entry->nextHopAddr._addr,
+        fib_add_entry(&gnrc_ipv6_fib_table, aodvv2_if_id, packet_data.targNode.addr._addr,
+                      sizeof(ipv6_addr_t), 0, packet_data.sender._addr,
                       sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
-
-        free(tmp_rt_entry);
     }
     else {
         if (!routingtable_offers_improvement(rt_entry, &packet_data.targNode)) {
@@ -519,8 +517,10 @@ static enum rfc5444_result _cb_rrep_end_callback(
         /* The incoming routing information is better than existing routing
          * table information and SHOULD be used to improve the route table. */
         AODV_DEBUG("\tUpdating Routing Table entry...\n");
-        routingtable_fill_routing_entry_t_rrep(&packet_data, rt_entry);
 
+        routingtable_update_entry(rt_entry, &packet_data.targNode.seqnum,
+                                  &packet_data.sender, packet_data.targNode.metric,
+                                  ROUTE_STATE_ACTIVE, &packet_data.timestamp);
         /* update the FIB */
         fib_update_entry(&gnrc_ipv6_fib_table, rt_entry->addr._addr, sizeof(ipv6_addr_t),
                          rt_entry->nextHopAddr._addr, sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
