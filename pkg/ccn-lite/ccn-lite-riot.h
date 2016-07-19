@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 INRIA
+ * Copyright (C) 2015, 2016 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -145,6 +145,16 @@ extern "C" {
  * Message type for advancing the ageing timer
  */
 #define CCNL_MSG_AGEING         (0x1702)
+
+/**
+ * Maximum number of elements that can be cached
+ */
+#ifndef CCNL_CACHE_SIZE
+#define CCNL_CACHE_SIZE     (5)
+#endif
+#ifdef DOXYGEN
+#define CCNL_CACHE_SIZE
+#endif
 
 /**
  * Struct holding CCN-Lite's central relay information
