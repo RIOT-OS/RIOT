@@ -21,8 +21,8 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef MTD_H_
-#define MTD_H_
+#ifndef MTD_H
+#define MTD_H
 
 #include <stdint.h>
 
@@ -213,4 +213,4 @@ int mtd_ioctl(mtd_dev_t *mtd, unsigned char ctrl, void *buf);
 #endif
 
 /** @} */
-#endif /* MTD_H_ */
+#endif /* MTD_H */

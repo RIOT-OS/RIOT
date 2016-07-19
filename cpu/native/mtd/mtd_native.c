@@ -33,7 +33,7 @@ static mtd_sta_t _init(mtd_dev_t *dev)
         if (!f) {
             return MTD_STA_NODISK;
         }
-        for (unsigned long i = 0; i < NATIVE_MTD_FLASH_SIZE; i++) {
+        for (unsigned long i = 0; i < MTD_NATIVE_FLASH_SIZE; i++) {
             real_fputc(0xff, f);
         }
     }
@@ -49,7 +49,7 @@ static mtd_res_t _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
 
     DEBUG("mtd_native: read from page %" PRIu32 " count %" PRIu32 "\n", addr, size);
 
-    if (addr + size > NATIVE_MTD_FLASH_SIZE) {
+    if (addr + size > MTD_NATIVE_FLASH_SIZE) {
         return MTD_RES_PARERR;
     }
 
@@ -70,10 +70,10 @@ static mtd_res_t _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_
 
     DEBUG("mtd_native: write from page %" PRIu32 " count %" PRIu32 "\n", addr, size);
 
-    if (addr + size > NATIVE_MTD_FLASH_SIZE) {
+    if (addr + size > MTD_NATIVE_FLASH_SIZE) {
         return MTD_RES_PARERR;
     }
-    if (((addr % NATIVE_MTD_SECTOR_SIZE) + size) > NATIVE_MTD_SECTOR_SIZE) {
+    if (((addr % MTD_NATIVE_SECTOR_SIZE) + size) > MTD_NATIVE_SECTOR_SIZE) {
         return MTD_RES_PARERR;
     }
 
@@ -98,10 +98,10 @@ static mtd_res_t _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 
     DEBUG("mtd_native: erase from sector %" PRIu32 " count %" PRIu32 "\n", addr, size);
 
-    if (addr + size > NATIVE_MTD_FLASH_SIZE) {
+    if (addr + size > MTD_NATIVE_FLASH_SIZE) {
         return MTD_RES_PARERR;
     }
-    if (((addr % NATIVE_MTD_SECTOR_SIZE) != 0) || ((size % NATIVE_MTD_SECTOR_SIZE) != 0)) {
+    if (((addr % MTD_NATIVE_SECTOR_SIZE) != 0) || ((size % MTD_NATIVE_SECTOR_SIZE) != 0)) {
         return MTD_RES_PARERR;
     }
 
