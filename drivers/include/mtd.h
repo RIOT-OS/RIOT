@@ -197,6 +197,16 @@ struct mtd_desc {
                        void *buff);
 };
 
+int mtd_init(mtd_dev_t *mtd);
+
+int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count);
+
+int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
+
+int mtd_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t count);
+
+int mtd_ioctl(mtd_dev_t *mtd, unsigned char ctrl, void *buf);
+
 
 #ifdef __cplusplus
 }
