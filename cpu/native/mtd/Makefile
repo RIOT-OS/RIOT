@@ -1,4 +1,4 @@
-MODULE := mtdi_native
+MODULE := mtd_native
 
 include $(RIOTBASE)/Makefile.base
 

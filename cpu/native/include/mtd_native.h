@@ -29,13 +29,21 @@ extern "C" {
 #define NATIVE_MTD_FLASH_SIZE    (NATIVE_MTD_SECTOR_SIZE * NATIVE_MTD_SECTOR_NUM)
 #endif
 
-#define MTD_NATIVE_DESC(_dev) \
-    static mtd_dev_t _dev = { \
-        .driver = &native_flash_driver, \
-        .sector_count = NATIVE_MTD_SECTOR_NUM, \
-        .pages_per_sector = NATIVE_MTD_SECTOR_SIZE / NATIVE_MTD_PAGE_SIZE, \
-        .page_size = NATIVE_MTD_PAGE_SIZE, \
+#define MTD_NATIVE_DESC(_dev, _name) \
+    static mtd_native_dev_t _dev = { \
+        .dev = { \
+            .driver = &native_flash_driver, \
+            .sector_count = NATIVE_MTD_SECTOR_NUM, \
+            .pages_per_sector = NATIVE_MTD_SECTOR_SIZE / NATIVE_MTD_PAGE_SIZE, \
+            .page_size = NATIVE_MTD_PAGE_SIZE, \
+        }, \
+        .fname = _name, \
     }
+
+typedef struct mtd_native_dev {
+    mtd_dev_t dev;
+    char *fname;
+} mtd_native_dev_t;
 
 extern const mtd_desc_t native_flash_driver;
 
