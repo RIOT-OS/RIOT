@@ -311,34 +311,6 @@ static enum rfc5444_result _cb_rreq_end_callback(
     rt_entry = routingtable_get_entry(&packet_data.origNode.addr, packet_data.metricType);
 
     if (!rt_entry || (rt_entry->metricType != packet_data.metricType)) {
-        /* CAUTION SUPER HACKY FIX FIXME ASAP
-        problem: sometimes we get broadcasted RREQs from 2 hop neighbors and then
-        AODVv2 gets super confused when they're not in the routing table and starts a
-        Route discovery to find them and all hell breaks loose. let's see if we can fix
-        this (horribly).
-
-        (another fix would be to stop bouncing the RREP back to the sender and asking
-        the routing table for the next hop (or just send towards TargNode and let the
-        network stack figure out the rest?))
-        TODO evaluate that
-        */
-
-        /* TODO: proper bidirectionality detection as described in the draft now (v10 or higher)
-
-        ipv6_addr_t sender_tmp;
-        netaddr_to_ipv6_addr_t(&packet_data.sender, &sender_tmp);
-
-        ipv6_addr_t nxt_hop;
-        size_t nxt_hop_size = sizeof(ipv6_addr_t);
-        uint32_t next_hop_flags = 0;
-        if(fib_get_next_hop(&aodvv2_if_id,
-                            &nxt_hop.u8[0], &nxt_hop_size, &next_hop_flags,
-                            &sender_tmp.u8[0], sizeof(ipv6_addr_t), 0) != 0) {
-            DEBUG("OH NOES! No bidirectional link to sender. Dropping packet.\n");
-            return RFC5444_DROP_PACKET;
-        }
-        */
-        /* HACKY FIX ENDS HERE */
 
         struct aodvv2_routing_entry_t *tmp_rt_entry = (struct aodvv2_routing_entry_t *)
                                                        malloc(sizeof(struct aodvv2_routing_entry_t));
@@ -524,33 +496,6 @@ static enum rfc5444_result _cb_rrep_end_callback(
     rt_entry = routingtable_get_entry(&packet_data.targNode.addr, packet_data.metricType);
 
     if (!rt_entry || (rt_entry->metricType != packet_data.metricType)) {
-        /* CAUTION SUPER HACKY FIX FIXME ASAP
-        problem: sometimes we get broadcasted RREQs from 2 hop neighbors and then
-        AODVv2 gets super confused when they're not in the routing table and starts a
-        Route discovery to find them and all hell breaks loose. let's see if we can fix
-        this (horribly).
-
-        (another fix would be to stop bouncing the RREP back to the sender and asking
-        the routing table for the next hop (or just send towards TargNode and let the network stack figure out the rest?))
-        TODO evaluate that
-        */
-
-        /* TODO: proper bidirectionality detection as described in the draft now (v10 or higher)
-
-        ipv6_addr_t sender_tmp;
-        netaddr_to_ipv6_addr_t(&packet_data.sender, &sender_tmp);
-
-        ipv6_addr_t nxt_hop;
-        size_t nxt_hop_size = sizeof(ipv6_addr_t);
-        uint32_t next_hop_flags = 0;
-        if(fib_get_next_hop(&aodvv2_if_id,
-                            &nxt_hop.u8[0], &nxt_hop_size, &next_hop_flags,
-                            &sender_tmp.u8[0], sizeof(ipv6_addr_t), 0) != 0) {
-            DEBUG("OH NOES! No bidirectional link to sender. Dropping packet.\n");
-            return RFC5444_DROP_PACKET;
-        }
-        */
-        /* HACKY FIX ENDS HERE */
 
         struct aodvv2_routing_entry_t *tmp_rt_entry = (struct aodvv2_routing_entry_t *)
                                                        malloc(sizeof(struct aodvv2_routing_entry_t));
