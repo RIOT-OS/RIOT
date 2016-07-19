@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2016 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @file
  * @brief       Example application for demonstrating the RIOT network stack
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Sebastian Meiling <sebastian.meiling@haw-hamburg.de>
  *
  * @}
  */
