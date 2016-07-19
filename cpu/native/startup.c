@@ -52,6 +52,10 @@ const char *_native_unix_socket_path = NULL;
 extern netdev2_tap_t netdev2_tap;
 #endif
 
+#ifdef MODULE_MTD_NATIVE
+const char *_native_mtd_file = NULL;
+#endif
+
 /**
  * initialize _native_null_in_pipe to allow for reading from stdin
  * @param stdiotype: "stdio" (only initialize pipe) or any string
@@ -201,13 +205,20 @@ void usage_exit(void)
     real_printf(" <tap interface>");
 #endif
 
+#ifdef MODULE_MTD_NATIVE
+    real_printf(" [-f <mtd>]");
+#endif
+
     real_printf(" [-i <id>] [-d] [-e|-E] [-o] [-c <tty device>]\n");
 
     real_printf(" help: %s -h\n", _progname);
 
     real_printf("\nOptions:\n\
 -h          help\n");
-
+#ifdef MODULE_MTD_NATIVE
+    real_printf("\
+-f <mtd>    specify a file for mtd flash emulation\n");
+#endif
     real_printf("\
 -i <id>     specify instance id (set by config module)\n\
 -s <seed>   specify srandom(3) seed (/dev/random is used instead of\n\
@@ -310,6 +321,17 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 
             tty_uart_setup(uart++, argv[argp]);
         }
+#ifdef MODULE_MTD_NATIVE
+        else if (strcmp("-f", arg) == 0) {
+            /* parse optional path */
+            if ((argp + 1 < argc) && (argv[argp + 1][0] != '-')) {
+                _native_mtd_file = argv[++argp];
+            }
+            else {
+                    usage_exit();
+            }
+        }
+#endif
         else {
             usage_exit();
         }
