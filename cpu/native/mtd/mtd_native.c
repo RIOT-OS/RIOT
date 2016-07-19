@@ -21,15 +21,22 @@
 static mtd_sta_t _init(mtd_dev_t *dev)
 {
     mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
+    const char *name;
 
     DEBUG("mtd_native: init\n");
-    assert(_dev->fname != NULL);
 
-    FILE *f = real_fopen(_dev->fname, "r");
+    if (_native_mtd_file != NULL) {
+        name = _native_mtd_file;
+    }
+    else {
+        name = _dev->fname;
+    }
+
+    FILE *f = real_fopen(name, "r");
 
     if (!f) {
-        DEBUG("mtd_native: init: creating file %s\n", _dev->fname);
-        f = real_fopen(_dev->fname, "w+");
+        DEBUG("mtd_native: init: creating file %s\n", name);
+        f = real_fopen(name, "w+");
         if (!f) {
             return MTD_STA_NODISK;
         }
@@ -46,14 +53,22 @@ static mtd_sta_t _init(mtd_dev_t *dev)
 static mtd_res_t _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
 {
     mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
+    const char *name;
 
     DEBUG("mtd_native: read from page %" PRIu32 " count %" PRIu32 "\n", addr, size);
+
+    if (_native_mtd_file != NULL) {
+        name = _native_mtd_file;
+    }
+    else {
+        name = _dev->fname;
+    }
 
     if (addr + size > MTD_NATIVE_FLASH_SIZE) {
         return MTD_RES_PARERR;
     }
 
-    FILE *f = real_fopen(_dev->fname, "r");
+    FILE *f = real_fopen(name, "r");
     if (!f) {
         return MTD_RES_NOTRDY;
     }
@@ -67,8 +82,16 @@ static mtd_res_t _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
 static mtd_res_t _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
 {
     mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
+    const char *name;
 
     DEBUG("mtd_native: write from page %" PRIu32 " count %" PRIu32 "\n", addr, size);
+
+    if (_native_mtd_file != NULL) {
+        name = _native_mtd_file;
+    }
+    else {
+        name = _dev->fname;
+    }
 
     if (addr + size > MTD_NATIVE_FLASH_SIZE) {
         return MTD_RES_PARERR;
@@ -77,7 +100,7 @@ static mtd_res_t _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_
         return MTD_RES_PARERR;
     }
 
-    FILE *f = real_fopen(_dev->fname, "r+");
+    FILE *f = real_fopen(name, "r+");
     if (!f) {
         return MTD_RES_NOTRDY;
     }
@@ -95,8 +118,16 @@ static mtd_res_t _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_
 static mtd_res_t _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 {
     mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
+    const char *name;
 
     DEBUG("mtd_native: erase from sector %" PRIu32 " count %" PRIu32 "\n", addr, size);
+
+    if (_native_mtd_file != NULL) {
+        name = _native_mtd_file;
+    }
+    else {
+        name = _dev->fname;
+    }
 
     if (addr + size > MTD_NATIVE_FLASH_SIZE) {
         return MTD_RES_PARERR;
@@ -105,7 +136,7 @@ static mtd_res_t _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
         return MTD_RES_PARERR;
     }
 
-    FILE *f = real_fopen(_dev->fname, "r+");
+    FILE *f = real_fopen(name, "r+");
     if (!f) {
         return MTD_RES_NOTRDY;
     }

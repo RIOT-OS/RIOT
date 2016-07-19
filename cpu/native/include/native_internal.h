@@ -162,6 +162,10 @@ ssize_t _native_read(int fd, void *buf, size_t count);
 ssize_t _native_write(int fd, const void *buf, size_t count);
 ssize_t _native_writev(int fildes, const struct iovec *iov, int iovcnt);
 
+#ifdef MODULE_MTD_NATIVE
+extern const char *_native_mtd_file;
+#endif
+
 /**
  * register interrupt handler handler for interrupt sig
  */
