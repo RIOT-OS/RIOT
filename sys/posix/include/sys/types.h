@@ -7,10 +7,10 @@
  * directory for more details.
  */
 
- #ifndef AVR_TYPES_H
- #define AVR_TYPES_H
+#ifndef SYS_TYPES_H
+#define SYS_TYPES_H
 
-#include <inttypes.h>
+#include <stdint.h>
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -31,16 +31,14 @@ typedef     uint32_t key_t;       /**< Used for XSI interprocess communication *
 typedef     uint32_t mode_t;      /**< Used for some file attributes */
 typedef     uint16_t nlink_t;     /**< Used for link counts */
 typedef     uint32_t off_t;       /**< Used for file sizes */
-typedef      int16_t pid_t;       /**< Used for process IDs and process group IDs */
+typedef          int pid_t;       /**< Used for process IDs and process group IDs */
 typedef unsigned int size_t;      /**< Used for sizes of objects */
 typedef   signed int ssize_t;     /**< Used for a count of bytes or an error indication */
 typedef      int32_t suseconds_t; /**< Used for time in microseconds */
-#if 0
-/* Also defined in avr-libc-extra/time.h */
 typedef      int32_t time_t;      /**< Used for time in seconds */
-#endif
 typedef     uint32_t timer_t;     /**< Used for timer ID returned by timer_create() */
 typedef     uint16_t uid_t;       /**< Used for user IDs */
+typedef     uint32_t useconds_t;  /**< Used for time in microseconds */
 
 #ifdef __cplusplus
 }
