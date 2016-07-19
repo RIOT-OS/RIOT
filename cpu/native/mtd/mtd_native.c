@@ -7,65 +7,68 @@
  */
 
 #include <stdio.h>
+#include <assert.h>
+#include <inttypes.h>
 
 #include "mtd.h"
 #include "mtd_native.h"
 
+#include "native_internal.h"
+
 #define ENABLE_DEBUG (1)
 #include "debug.h"
 
-static const char _fname[] = "MEMORY.bin";
-
 static mtd_sta_t _init(mtd_dev_t *dev)
 {
-    (void) dev;
+    mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
 
     DEBUG("mtd_native: init\n");
+    assert(_dev->fname != NULL);
 
-    FILE *f = fopen(_fname, "r");
+    FILE *f = real_fopen(_dev->fname, "r");
 
     if (!f) {
-        DEBUG("mtd_native: init: creating file %s\n" _fname);
-        f = fopen(_fname, "w+");
+        DEBUG("mtd_native: init: creating file %s\n", _dev->fname);
+        f = real_fopen(_dev->fname, "w+");
         if (!f) {
             return MTD_STA_NODISK;
         }
         for (unsigned long i = 0; i < NATIVE_MTD_FLASH_SIZE; i++) {
-            fputc(0xff, f);
+            real_fputc(0xff, f);
         }
     }
 
-    fclose(f);
+    real_fclose(f);
 
     return MTD_STA_INIT;
 }
 
 static mtd_res_t _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
 {
-    (void) dev;
+    mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
 
-    DEBUG("mtd_native: read from page %lu count %lu\n", addr, size);
+    DEBUG("mtd_native: read from page %" PRIu32 " count %" PRIu32 "\n", addr, size);
 
     if (addr + size > NATIVE_MTD_FLASH_SIZE) {
         return MTD_RES_PARERR;
     }
 
-    FILE *f = fopen(_fname, "r");
+    FILE *f = real_fopen(_dev->fname, "r");
     if (!f) {
         return MTD_RES_NOTRDY;
     }
-    fseek(f, addr, SEEK_SET);
-    fread(buff, 1, size, f);
-    fclose(f);
+    real_fseek(f, addr, SEEK_SET);
+    real_fread(buff, 1, size, f);
+    real_fclose(f);
 
     return MTD_RES_OK;
 }
 
-static mtd_res_t _write(mtd_dev_t *mtd_dev, const void *buff, uint32_t addr, uint32_t size)
+static mtd_res_t _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
 {
-    (void) mtd_dev;
+    mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
 
-    DEBUG("mtd_native: write from page %lu count %lu\n", addr, size);
+    DEBUG("mtd_native: write from page %" PRIu32 " count %" PRIu32 "\n", addr, size);
 
     if (addr + size > NATIVE_MTD_FLASH_SIZE) {
         return MTD_RES_PARERR;
@@ -74,26 +77,26 @@ static mtd_res_t _write(mtd_dev_t *mtd_dev, const void *buff, uint32_t addr, uin
         return MTD_RES_PARERR;
     }
 
-    FILE *f = fopen(_fname, "r+");
+    FILE *f = real_fopen(_dev->fname, "r+");
     if (!f) {
         return MTD_RES_NOTRDY;
     }
     fseek(f, addr, SEEK_SET);
     for (unsigned long i = 0; i < size; i++) {
-        uint8_t c = fgetc(f);
-        fseek(f, -1, SEEK_CUR);
-        fputc(c & buff[i], f);
+        uint8_t c = real_fgetc(f);
+        real_fseek(f, -1, SEEK_CUR);
+        real_fputc(c & ((uint8_t*)buff)[i], f);
     }
-    fclose(f);
+    real_fclose(f);
 
     return MTD_RES_OK;
 }
 
 static mtd_res_t _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 {
-    (void) dev;
+    mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
 
-    DEBUG("mtd_native: erase from sector %lu count %lu\n", addr, size);
+    DEBUG("mtd_native: erase from sector %" PRIu32 " count %" PRIu32 "\n", addr, size);
 
     if (addr + size > NATIVE_MTD_FLASH_SIZE) {
         return MTD_RES_PARERR;
@@ -102,15 +105,15 @@ static mtd_res_t _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
         return MTD_RES_PARERR;
     }
 
-    FILE *f = fopen(_fname, "r+");
+    FILE *f = real_fopen(_dev->fname, "r+");
     if (!f) {
         return MTD_RES_NOTRDY;
     }
     fseek(f, addr, SEEK_SET);
     for (unsigned long i = 0; i < size; i++) {
-        fputc(0xff, f);
+        real_fputc(0xff, f);
     }
-    fclose(f);
+    real_fclose(f);
 
     return MTD_RES_OK;
 }
@@ -119,12 +122,14 @@ static mtd_res_t _ioctl(mtd_dev_t *dev, unsigned char ctl, void *buf)
 {
     mtd_res_t ret = MTD_RES_WRPRT;
     (void) dev;
+    (void) ctl;
+    (void) buf;
 
     return ret;
 }
 
 
-const mtdi_desc_t native_flash_driver = {
+const mtd_desc_t native_flash_driver = {
     .read = _read,
     .ioctl = _ioctl,
     .write = _write,
