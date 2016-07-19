@@ -90,16 +90,9 @@ void _event_cb(netdev2_t *dev, netdev2_event_t event)
 				recv_pkt(dev);
 				break;
 			case NETDEV2_EVENT_TX_COMPLETE:
-				DEBUG("openthread: NETDEV2_EVENT_TX_COMPLETE\n");
-				send_pkt(dev);
-				break;
 			case NETDEV2_EVENT_TX_NOACK:
-				DEBUG("openthread: NETDEV2_EVENT_TX_NOACK\n");
-				otPlatRadioTransmitDone(false, kThreadError_NoAck);
-				break;
 			case NETDEV2_EVENT_TX_MEDIUM_BUSY:
-				DEBUG("openthread: NETDEV2_EVENT_TX_MEDIUM_BUSY\n");
-				otPlatRadioTransmitDone(false, kThreadError_ChannelAccessFailure);
+				send_pkt(dev, event);
 				break;
 			default:
 				break;

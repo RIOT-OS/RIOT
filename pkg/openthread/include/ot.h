@@ -22,7 +22,7 @@ typedef struct {
 } serial_msg_t;
 
 void recv_pkt(netdev2_t *dev);
-void send_pkt(netdev2_t *dev);
+void send_pkt(netdev2_t *dev, netdev2_event_t event);
 void openthread_bootstrap(void);
 void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb);
 void *_openthread_event_loop(void *arg);

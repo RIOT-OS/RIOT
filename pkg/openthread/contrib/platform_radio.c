@@ -3,7 +3,7 @@
 #include <platform/radio.h>
 #include "ot.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #include "errno.h"
@@ -69,31 +69,6 @@ int set_promiscuous(netopt_enable_t enable)
 	return _dev->driver->set(_dev, NETOPT_PROMISCUOUSMODE, &enable, sizeof(enable));
 }
 
-void recv_pkt(netdev2_t *dev)
-{
-	/* Read data from driver */
-	int len = dev->driver->recv(dev, NULL, 0, NULL);
-
-	assert(len <= (unsigned) UINT16_MAX);
-	int res = dev->driver->recv(dev, (char*) sReceiveFrame.mPsdu, len, NULL);
-
-	/* Fill OT receive frame */
-	sReceiveFrame.mLength = len;
-
-	//get_channel(dev);
-	sReceiveFrame.mPower = get_power();
-
-	/* Tell OpenThread that receive has finished */
-	DEBUG("recv_pkt res: %i\n", res);
-	otPlatRadioReceiveDone(res > 0 ? &sReceiveFrame : NULL, kThreadError_None);
-}
-
-void send_pkt(netdev2_t *dev)
-{
-	/*Tell OpenThread that transmission has finished.*/
-	otPlatRadioTransmitDone(false, kThreadError_None);
-}
-
 int get_state(void)
 {
 	netopt_state_t en;
@@ -122,7 +97,12 @@ bool dev_is_sleep(void)
 	return get_state() == NETOPT_STATE_SLEEP;
 }
 
-bool dev_is_ready(void)
+bool dev_is_idle(void)
+{
+	return get_state() == NETOPT_STATE_IDLE_NO_RX;
+}
+
+bool dev_is_listening(void)
 {
 	return get_state() == NETOPT_STATE_IDLE;
 }
@@ -140,6 +120,55 @@ void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb)
 	sReceiveFrame.mPsdu = rb;
 	sReceiveFrame.mLength = 0;
 	_dev = dev;
+}
+
+void recv_pkt(netdev2_t *dev)
+{
+	/* Read data from driver */
+	int len = dev->driver->recv(dev, NULL, 0, NULL);
+
+	assert(len <= (unsigned) UINT16_MAX);
+	int res = dev->driver->recv(dev, (char*) sReceiveFrame.mPsdu, len, NULL);
+
+	/* Fill OT receive frame */
+	sReceiveFrame.mLength = len;
+
+	//get_channel(dev);
+	sReceiveFrame.mPower = get_power();
+
+	/* Turn off rx */
+	set_state(NETOPT_STATE_IDLE_NO_RX);
+
+	/* Tell OpenThread that receive has finished */
+	DEBUG("recv_pkt res: %i\n", res);
+	otPlatRadioReceiveDone(res > 0 ? &sReceiveFrame : NULL, kThreadError_None);
+}
+
+void send_pkt(netdev2_t *dev, netdev2_event_t event)
+{
+	/* Turn off rx */
+	set_state(NETOPT_STATE_IDLE_NO_RX);
+	switch(event)
+	{
+		case NETDEV2_EVENT_TX_COMPLETE:
+			DEBUG("openthread: NETDEV2_EVENT_TX_COMPLETE\n");
+			otPlatRadioTransmitDone(false, kThreadError_None);
+			break;
+		case NETDEV2_EVENT_TX_COMPLETE_DATA_PENDING:
+			DEBUG("openthread: NETDEV2_EVENT_TX_COMPLETE_DATA_PENDING\n");
+			otPlatRadioTransmitDone(true, kThreadError_None);
+			break;
+		case NETDEV2_EVENT_TX_NOACK:
+			DEBUG("openthread: NETDEV2_EVENT_TX_NOACK\n");
+			otPlatRadioTransmitDone(false, kThreadError_NoAck);
+			break;
+		case NETDEV2_EVENT_TX_MEDIUM_BUSY:
+			DEBUG("openthread: NETDEV2_EVENT_TX_MEDIUM_BUSY\n");
+			otPlatRadioTransmitDone(false, kThreadError_ChannelAccessFailure);
+			break;
+		default:
+			break;
+	}
 }
 
 ThreadError otPlatRadioSetPanId(uint16_t panid)
@@ -197,7 +226,7 @@ ThreadError otPlatRadioDisable(void)
 ThreadError otPlatRadioSleep(void)
 {
 	DEBUG("openthread: otPlatRadioSleep\n");
-	if(!dev_is_ready())
+	if(!dev_is_idle() || !dev_is_listening())
 	{
 		DEBUG("openthread: otPlatRadioSleep: Couldn't sleep\n");
 		return kThreadError_Busy;
@@ -211,17 +240,20 @@ ThreadError otPlatRadioIdle(void)
 {
 	DEBUG("openthread: otPlatRadioIdle\n");
 	
-	int res = get_state();
-	if(res == NETOPT_STATE_IDLE)
+	if(dev_is_idle())
+	{
+		DEBUG("openthread: device was idle\n");
 		return kThreadError_None;
+	}
 
+	int res = get_state();
 	if(res == NETOPT_STATE_RX || res == NETOPT_STATE_OFF)
 	{
 		DEBUG("openthread: OtPlatRadioIdle: Busy\n");
 		return kThreadError_Busy;
 	}
 
-	set_state(NETOPT_STATE_IDLE);
+	set_state(NETOPT_STATE_IDLE_NO_RX);
 
 	return kThreadError_None;
 }
@@ -229,11 +261,14 @@ ThreadError otPlatRadioIdle(void)
 ThreadError otPlatRadioReceive(uint8_t aChannel)
 {
 	DEBUG("openthread: otPlatRadioReceive\n");
-	if(!dev_is_ready())
+	if(!dev_is_idle())
 	{
 		DEBUG("openthread: otPlatRadioReceive: Device not ready\n");
 		return kThreadError_Busy;
 	}
+
+	/*turn on rx*/
+	set_state(NETOPT_STATE_IDLE);
 
 	sReceiveFrame.mChannel = aChannel;
 	return kThreadError_None;
@@ -250,7 +285,7 @@ ThreadError otPlatRadioTransmit(void)
 {
 	DEBUG("openthread: otPlatRadioTransmit\n");
 
-	if(!dev_is_ready())
+	if(!dev_is_idle())
 	{
 		DEBUG("openthread: otPlatRadioTransmit: Device not ready\n");
 		return kThreadError_Busy;
