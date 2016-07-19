@@ -6,10 +6,16 @@
  * directory for more details.
  */
 
-#ifndef ATMEGA_TIME_H
-#define ATMEGA_TIME_H
+/* If building on native we need to use the system libraries instead */
+#ifdef CPU_NATIVE
+#pragma GCC system_header
+/* without the GCC pragma above #include_next will trigger a pedantic error */
+#include_next <sys/time.h>
+#else
+#ifndef SYS_TIME_H_
+#define SYS_TIME_H_
 
-#include <sys/types.h>
+#include <sys/types.h> /* for time_t, suseconds_t */
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,4 +30,6 @@ struct timeval {
 }
 #endif
 
-#endif /* ATMEGA_TIME_H */
+#endif /* SYS_TIME_H_ */
+
+#endif /* CPU_NATIVE */

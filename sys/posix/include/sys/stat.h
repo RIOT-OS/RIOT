@@ -12,8 +12,10 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-/* This header is only used when newlib is not available (e.g. avr) */
-#if MODULE_NEWLIB
+/* If building on native we need to use the system libraries instead */
+#ifdef CPU_NATIVE
+#pragma GCC system_header
+/* without the GCC pragma above #include_next will trigger a pedantic error */
 #include_next <sys/stat.h>
 #else
 #ifndef SYS_STAT_H_
@@ -119,8 +121,8 @@ int    utimensat(int, const char *, const struct timespec [2], int);
 }
 #endif
 
-#endif
+#endif /* SYS_STAT_H_ */
 
-#endif
+#endif /* CPU_NATIVE */
 
 /** @} */

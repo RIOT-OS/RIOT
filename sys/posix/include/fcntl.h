@@ -12,6 +12,12 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
+/* If building on native we need to use the system libraries instead */
+#ifdef CPU_NATIVE
+#pragma GCC system_header
+/* without the GCC pragma above #include_next will trigger a pedantic error */
+#include_next <fcntl.h>
+#else
 #ifndef FCNTL_H_
 #define FCNTL_H_
 
@@ -57,6 +63,8 @@ int  posix_fallocate(int, off_t, off_t);
 }
 #endif
 
-#endif
+#endif /* FCNTL_H_ */
+
+#endif /* CPU_NATIVE */
 
 /** @} */

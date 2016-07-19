@@ -12,6 +12,12 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
+/* If building on native we need to use the system libraries instead */
+#ifdef CPU_NATIVE
+#pragma GCC system_header
+/* without the GCC pragma above #include_next will trigger a pedantic error */
+#include_next <sys/statvfs.h>
+#else
 #ifndef SYS_STATVFS_H_
 #define SYS_STATVFS_H_
 
@@ -51,6 +57,8 @@ enum {
 }
 #endif
 
-#endif
+#endif /* SYS_STATVFS_H_ */
+
+#endif /* CPU_NATIVE */
 
 /** @} */

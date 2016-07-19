@@ -7,8 +7,14 @@
  * directory for more details.
  */
 
-#ifndef SYS_TYPES_H
-#define SYS_TYPES_H
+/* If building on native we need to use the system libraries instead */
+#ifdef CPU_NATIVE
+#pragma GCC system_header
+/* without the GCC pragma above #include_next will trigger a pedantic error */
+#include_next <sys/types.h>
+#else
+#ifndef SYS_TYPES_H_
+#define SYS_TYPES_H_
 
 #include <stdint.h>
 #include <stddef.h>
@@ -44,4 +50,6 @@ typedef     uint32_t useconds_t;  /**< Used for time in microseconds */
 }
 #endif
 
-#endif /* ifndef AVR_TYPES_H */
+#endif /* SYS_TYPES_H_ */
+
+#endif /* CPU_NATIVE */
