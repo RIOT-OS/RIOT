@@ -635,6 +635,10 @@ static void _isr(netdev2_t *netdev)
                  state == AT86RF2XX_STATE_BUSY_TX_ARET) {
             /* check for more pending TX calls and return to idle state if
              * there are none */
+#ifdef MODULE_OPENTHREAD
+			if(dev->pending_tx == 0)
+				return;
+#endif
             assert(dev->pending_tx != 0);
             if ((--dev->pending_tx) == 0) {
                 at86rf2xx_set_state(dev, dev->idle_state);
