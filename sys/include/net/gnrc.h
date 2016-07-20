@@ -10,6 +10,9 @@
  * @defgroup    net_gnrc    Generic (GNRC) network stack
  * @ingroup     net
  * @brief       RIOT's modular default IP network stack.
+ * @see         [Martine Lenders' master thesis](http://doc.riot-os.org/mlenders_msc.pdf)
+ *              about GNRC's design and evaluation and the slide set of
+ *              [its defense](http://doc.riot-os.org/mlenders_msc_def.pdf).
  *
  * About
  * =====
