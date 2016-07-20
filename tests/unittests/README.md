@@ -92,7 +92,7 @@ make term
 ## Writing unit tests
 ### File struture
 RIOT uses [*embUnit*](http://embunit.sourceforge.net/) for unit testing.
-All unit tests are organized in ``tests/unittests`` and can be build module-wise, if needed.
+All unit tests are organized in ``tests/unittests`` and can be built module-wise, if needed.
 For each module there exists a ``tests-<modulename>/tests-<modulename>.h`` file, at least one C file in ``tests-<modulename>/`` and a ``tests-<modulename>/Makefile``.
 It is recommended to add a C file named ``tests-<modulename>/tests-<modulename>-<headername>.c`` for every header file that defines functions (or macros) implemented in the module.
 If there is only one such header file ``tests-<modulename>/tests-<modulename>.c`` should suffice.
