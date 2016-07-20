@@ -1,8 +1,6 @@
 APPLICATION = driver_bmp180
 include ../Makefile.tests_common
 
-FEATURES_REQUIRED = periph_i2c
-
 USEMODULE += bmp180
 USEMODULE += xtimer
 USEMODULE += printf_float
