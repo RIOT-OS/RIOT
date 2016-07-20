@@ -123,6 +123,7 @@ static uint8_t mx25v_wait_ready(mx25v_t *mx25v_dev, uint32_t time_to_wait)
 
     /* wait for device ready or timeout reached */
     while (mx25v_is_flash_busy(mx25v_dev) == 1 && time < timeout) {
+        xtimer_usleep(time_to_wait / 2);
         time = xtimer_now();
     }
 
