@@ -116,7 +116,7 @@ static int devfs_opendir(vfs_DIR *dirp, const char *dirname, const char *abs_pat
         /* We keep it simple and only support a flat file system, only a root directory */
         return -ENOENT;
     }
-    dirp->private_data.ptr = _devfs_list.next;
+    dirp->private_data.ptr = NULL;
     return 0;
 }
 
@@ -125,17 +125,21 @@ static int devfs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
     DEBUG("devfs_readdir: %p, %p\n", (void *)dirp, (void *)entry);
     mutex_lock(&_devfs_mutex);
     clist_node_t *it = dirp->private_data.ptr;
-    if (it == NULL) {
-        /* empty list */
-        mutex_unlock(&_devfs_mutex);
-        return 0;
-    }
-    it = it->next;
     if (it == _devfs_list.next) {
         /* end of list was reached */
         mutex_unlock(&_devfs_mutex);
         return 0;
     }
+    if (it == NULL) {
+        /* first readdir after opendir */
+        it = _devfs_list.next;
+        if (it == NULL) {
+            /* empty list */
+            mutex_unlock(&_devfs_mutex);
+            return 0;
+        }
+    }
+    it = it->next;
     dirp->private_data.ptr = it;
     mutex_unlock(&_devfs_mutex);
     devfs_t *devp = container_of(it, devfs_t, list_entry);
@@ -187,12 +191,14 @@ int devfs_register(devfs_t *devp)
             if (it == &devp->list_entry) {
                 /* Already registered */
                 mutex_unlock(&_devfs_mutex);
+                DEBUG("devfs_register: %p already registered\n", (void *)devp);
                 return -EEXIST;
             }
             devfs_t *devit = container_of(it, devfs_t, list_entry);
             if (strcmp(devit->path, devp->path) == 0) {
                 /* Path already registered */
                 mutex_unlock(&_devfs_mutex);
+                DEBUG("devfs_register: \"%s\" occupied\n", devp->path);
                 return -EEXIST;
             }
         } while(it != _devfs_list.next);
