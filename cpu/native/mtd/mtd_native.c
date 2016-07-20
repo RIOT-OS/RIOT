@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <inttypes.h>
+#include <errno.h>
 
 #include "mtd.h"
 #include "mtd_native.h"
@@ -50,7 +51,7 @@ static mtd_sta_t _init(mtd_dev_t *dev)
     return MTD_STA_INIT;
 }
 
-static mtd_res_t _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
+static int _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
 {
     mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
     const char *name;
@@ -65,21 +66,21 @@ static mtd_res_t _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
     }
 
     if (addr + size > MTD_NATIVE_FLASH_SIZE) {
-        return MTD_RES_PARERR;
+        return -EOVERFLOW;
     }
 
     FILE *f = real_fopen(name, "r");
     if (!f) {
-        return MTD_RES_NOTRDY;
+        return -EAGAIN;
     }
     real_fseek(f, addr, SEEK_SET);
-    real_fread(buff, 1, size, f);
+    size = real_fread(buff, 1, size, f);
     real_fclose(f);
 
-    return MTD_RES_OK;
+    return size;
 }
 
-static mtd_res_t _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
+static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
 {
     mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
     const char *name;
@@ -94,15 +95,15 @@ static mtd_res_t _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_
     }
 
     if (addr + size > MTD_NATIVE_FLASH_SIZE) {
-        return MTD_RES_PARERR;
+        return -EOVERFLOW;
     }
     if (((addr % MTD_NATIVE_SECTOR_SIZE) + size) > MTD_NATIVE_SECTOR_SIZE) {
-        return MTD_RES_PARERR;
+        return -EOVERFLOW;
     }
 
     FILE *f = real_fopen(name, "r+");
     if (!f) {
-        return MTD_RES_NOTRDY;
+        return -EAGAIN;
     }
     fseek(f, addr, SEEK_SET);
     for (unsigned long i = 0; i < size; i++) {
@@ -112,10 +113,10 @@ static mtd_res_t _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_
     }
     real_fclose(f);
 
-    return MTD_RES_OK;
+    return size;
 }
 
-static mtd_res_t _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
+static int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 {
     mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
     const char *name;
@@ -130,15 +131,15 @@ static mtd_res_t _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
     }
 
     if (addr + size > MTD_NATIVE_FLASH_SIZE) {
-        return MTD_RES_PARERR;
+        return -EOVERFLOW;
     }
     if (((addr % MTD_NATIVE_SECTOR_SIZE) != 0) || ((size % MTD_NATIVE_SECTOR_SIZE) != 0)) {
-        return MTD_RES_PARERR;
+        return -EOVERFLOW;
     }
 
     FILE *f = real_fopen(name, "r+");
     if (!f) {
-        return MTD_RES_NOTRDY;
+        return -EAGAIN;
     }
     fseek(f, addr, SEEK_SET);
     for (unsigned long i = 0; i < size; i++) {
@@ -146,12 +147,12 @@ static mtd_res_t _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
     }
     real_fclose(f);
 
-    return MTD_RES_OK;
+    return size;
 }
 
-static mtd_res_t _ioctl(mtd_dev_t *dev, unsigned char ctl, void *buf)
+static int _ioctl(mtd_dev_t *dev, unsigned char ctl, void *buf)
 {
-    mtd_res_t ret = MTD_RES_WRPRT;
+    int ret = -EAGAIN;
     (void) dev;
     (void) ctl;
     (void) buf;

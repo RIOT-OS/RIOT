@@ -12,6 +12,7 @@
  * @file
  */
 #include <string.h>
+#include <errno.h>
 
 #include "embUnit.h"
 
@@ -40,10 +41,10 @@ static void test_mtd_erase(void)
     mtd_dev_t *dev = (mtd_dev_t*) &_dev;
 
     int ret = mtd_erase(dev, 0, dev->pages_per_sector * dev->page_size);
-    TEST_ASSERT_EQUAL_INT(ret, 0);
+    TEST_ASSERT_EQUAL_INT(ret, dev->pages_per_sector * dev->page_size);
 
     ret = mtd_erase(dev, 0, dev->pages_per_sector);
-    TEST_ASSERT_EQUAL_INT(ret, MTD_RES_PARERR);
+    TEST_ASSERT_EQUAL_INT(ret, -EOVERFLOW);
 }
 
 static void test_mtd_write_read(void)
@@ -54,9 +55,10 @@ static void test_mtd_write_read(void)
     char buf_read[sizeof(buf) + sizeof(buf_empty)];
 
     int ret = mtd_write(dev, buf, 0, sizeof(buf));
-    TEST_ASSERT_EQUAL_INT(ret, 0);
+    TEST_ASSERT_EQUAL_INT(ret, sizeof(buf));
 
     ret = mtd_read(dev, buf_read, 0, sizeof(buf_read));
+    TEST_ASSERT_EQUAL_INT(ret, sizeof(buf_read));
     TEST_ASSERT_EQUAL_INT(memcmp(buf, buf_read, sizeof(buf)), 0);
     TEST_ASSERT_EQUAL_INT(memcmp(buf_empty, buf_read + sizeof(buf), sizeof(buf_empty)), 0);
 }

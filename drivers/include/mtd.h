@@ -30,15 +30,6 @@
 extern "C" {
 #endif
 
-/** Results of Memory Functions */
-typedef enum {
-    MTD_RES_OK = 0,     /**< 0: Successful */
-    MTD_RES_ERROR,      /**< 1: R/W Error */
-    MTD_RES_WRPRT,      /**< 2: Write Protected */
-    MTD_RES_NOTRDY,     /**< 3: Not Ready */
-    MTD_RES_PARERR      /**< 4: Invalid Parameter */
-} mtd_res_t;
-
 /**
  * @name Disk Status Bits
  * @{
@@ -138,13 +129,13 @@ struct mtd_desc {
      * @param[in]  addr     Starting address
      * @param[in]  size     Number of bytes
      *
-     * @return @ref MTD_RES_OK on success
-     * @return any other @ref mtd_res_t value on error
+     * @return 0 on success
+     * @return < 0 value on error
      */
-    mtd_res_t (*read)(mtd_dev_t *dev,
-                      void *buff,
-                      uint32_t addr,
-                      uint32_t size);
+    int (*read)(mtd_dev_t *dev,
+                void *buff,
+                uint32_t addr,
+                uint32_t size);
 
 
     /**
@@ -158,13 +149,13 @@ struct mtd_desc {
      * @param[in] addr      Starting address
      * @param[in] size      Number of bytes
      *
-     * @return @ref MTD_RES_OK on success
-     * @return any other @ref mtd_res_t value on error
+     * @return 0 on success
+     * @return < 0 value on error
      */
-    mtd_res_t (*write)(mtd_dev_t *dev,
-                       const void *buff,
-                       uint32_t addr,
-                       uint32_t size);
+    int (*write)(mtd_dev_t *dev,
+                 const void *buff,
+                 uint32_t addr,
+                 uint32_t size);
 
     /**
      * @brief Erase sector over the Memory Technology Device (MTD)
@@ -175,12 +166,12 @@ struct mtd_desc {
      * @param[in] addr      Starting address
      * @param[in] size      Number of bytes
      *
-     * @return @ref MTD_RES_OK on success
-     * @return any other @ref mtd_res_t value on error
+     * @return 0 on success
+     * @return < 0 value on error
      */
-    mtd_res_t (*erase)(mtd_dev_t *dev,
-                       uint32_t addr,
-                       uint32_t size);
+    int (*erase)(mtd_dev_t *dev,
+                 uint32_t addr,
+                 uint32_t size);
 
     /**
      * @brief IOCTL functions for the Memory Technology Device (MTD)
@@ -189,22 +180,71 @@ struct mtd_desc {
      * @param[in] ctrl      Control code
      * @param[in,out] buff  Buffer to send/receive data block
      *
-     * @return @ref MTD_RES_OK on success
-     * @return any other @ref mtd_res_t value on error
+     * @return 0 on success
+     * @return < 0 value on error
      */
-    mtd_res_t (*ioctl)(mtd_dev_t *dev,
-                       unsigned char ctrl,
-                       void *buff);
+    int (*ioctl)(mtd_dev_t *dev,
+                 unsigned char ctrl,
+                 void *buff);
 };
 
+/**
+ * @brief mtd_init Initialize a MTD device
+ *
+ * @param mtd the device to initialize
+ *
+ * @return
+ */
 int mtd_init(mtd_dev_t *mtd);
 
+/**
+ * @brief mtd_read Read data from a MTD device
+ *
+ * @param      mtd   the device to read from
+ * @param[out] dest  the buffer to fill in
+ * @param[in]  addr  the start address to read from
+ * @param[in]  count the number of bytes to read
+ *
+ * @return the number of byte actually read
+ * @return < 0 if an error occured
+ */
 int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count);
 
+/**
+ * @brief mtd_read write data to a MTD device
+ *
+ * @param      mtd   the device to write to
+ * @param[in]  src   the buffer to write
+ * @param[in]  addr  the start address to write to
+ * @param[in]  count the number of bytes to write
+ *
+ * @return the number of byte actually written
+ * @return < 0 if an error occured
+ */
 int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
 
+/**
+ * @brief mtd_erase Erase sectors of a MTD device
+ *
+ * @param      mtd   the device to erase
+ * @param[in]  addr  the address of the first sector to erase
+ * @param[in]  count the number of bytes to erase
+ *
+ * @return 0 if erase successful
+ * @return < 0 if an error occured
+ */
 int mtd_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t count);
 
+/**
+ * @brief mtd_ioctl IOCTL on a MTD device
+ *
+ * @param         mtd  the device to access
+ * @param[in]     ctrl the value to get/set
+ * @param[in,out] buf  the buffer to get/set
+ *
+ * @return 0 if ioctl successful
+ * @return < 0 if an error occured
+ */
 int mtd_ioctl(mtd_dev_t *mtd, unsigned char ctrl, void *buf);
 
 
