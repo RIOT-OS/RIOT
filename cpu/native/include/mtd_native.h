@@ -13,11 +13,10 @@
 extern "C" {
 #endif
 
+#include "board.h"
+
 #ifndef MTD_NATIVE_PAGE_SIZE
 #define MTD_NATIVE_PAGE_SIZE     256
-#endif
-#ifndef MTD_NATIVE_PAGE_NUM
-#define MTD_NATIVE_PAGE_NUM      32768
 #endif
 #ifndef MTD_NATIVE_SECTOR_SIZE
 #define MTD_NATIVE_SECTOR_SIZE   4096
