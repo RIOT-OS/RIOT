@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_isl29020
+ * @ingroup     driver_l3g4200d
  * @{
  *
  * @file
