@@ -19,13 +19,14 @@
  */
 #include <stddef.h>
 
-#include <board.h>
-#include <xtimer.h>
-#include <cpu.h>
-#include <mutex.h>
-#include <periph/spi.h>
-#include <periph/gpio.h>
-#include <mx25v.h>
+#include "board.h"
+#include "xtimer.h"
+#include "cpu.h"
+#include "mutex.h"
+#include "periph/spi.h"
+#include "periph/gpio.h"
+#include "timex.h"
+#include "mx25v.h"
 
 /**
  * @brief MX25V instruction code
@@ -51,11 +52,11 @@
 /** @} */
 
 /** Timeout value for waiting operation done */
-#define MX25V_WRITE_STATUS_TIME (uint32_t)(5000)        /* write status time: TYP. 5  ms */
-#define MX25V_SECTOR_ERASE_TIME (uint32_t)(60000)       /* sector erase time: TYP. 60 ms */
-#define MX25V_BLOCK_ERASE_TIME  (uint32_t)(1000000)     /* block erase time:  TYP. 1  s */
-#define MX25V_CHIP_ERASE_TIME   (uint32_t)(15000000)    /* chip erase time:   TYP. 7  s */
-#define MX25V_PAGE_PROG_TIME    (uint32_t)(1400)        /* page program time: TYP. 1.4ms */
+#define MX25V_WRITE_STATUS_TIME (uint32_t)(5 * MS_IN_USEC)    /* write status time: TYP. 5  ms */
+#define MX25V_SECTOR_ERASE_TIME (uint32_t)(60 * MS_IN_USEC)   /* sector erase time: TYP. 60 ms */
+#define MX25V_BLOCK_ERASE_TIME  (uint32_t)(1 * SEC_IN_USEC)   /* block erase time:  TYP. 1  s */
+#define MX25V_CHIP_ERASE_TIME   (uint32_t)(15 * SEC_IN_USEC)  /* chip erase time:   TYP. 7  s */
+#define MX25V_PAGE_PROG_TIME    (uint32_t)(1400)              /* page program time: TYP. 1.4ms */
 
 /**
  * @brief Send command to set or reset WEL bit.
