@@ -197,6 +197,7 @@ static inline clist_node_t *clist_lpeek(const clist_node_t *list)
     if (list->next) {
         return list->next->next;
     }
+    return NULL;
 }
 
 /**
