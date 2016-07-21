@@ -184,7 +184,7 @@ void cc2538_set_chan(unsigned int chan)
 
 void cc2538_set_freq(unsigned int MHz)
 {
-    DEBUG("%s(%u): Setting frequency to ", __FUNCTION__, freq);
+    DEBUG("%s(%u): Setting frequency to ", __FUNCTION__, MHz);
 
     if (MHz < IEEE802154_MIN_FREQ) {
         MHz = IEEE802154_MIN_FREQ;
@@ -250,6 +250,6 @@ void cc2538_set_tx_power(int dBm)
         dBm = OUTPUT_POWER_MAX;
     }
 
-    DEBUG("%idBm (range %i-%i dBm)\n", OUTPUT_POWER_MIN, OUTPUT_POWER_MAX);
+    DEBUG("%idBm (range %i-%i dBm)\n", dBm, OUTPUT_POWER_MIN, OUTPUT_POWER_MAX);
     RFCORE_XREG_TXPOWER = power_lut[dBm - OUTPUT_POWER_MIN];
 }
