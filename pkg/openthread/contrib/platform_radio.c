@@ -3,7 +3,7 @@
 #include <platform/radio.h>
 #include "ot.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #include "errno.h"
@@ -72,14 +72,7 @@ int set_promiscuous(netopt_enable_t enable)
 int get_state(void)
 {
 	netopt_state_t en;
-	int res =_dev->driver->get(_dev, NETOPT_STATE, &en, sizeof(netopt_state_t));
-
-	if(res == -ENOTSUP)
-	{
-		DEBUG("openthread: Get state: No such option\n");
-		return -1;
-	}
-
+	_dev->driver->get(_dev, NETOPT_STATE, &en, sizeof(netopt_state_t));
 	return en;
 }
 
@@ -92,6 +85,7 @@ bool dev_is_off(void)
 {
 	return get_state() == NETOPT_STATE_OFF;
 }
+
 bool dev_is_sleep(void)
 {
 	return get_state() == NETOPT_STATE_SLEEP;
@@ -125,22 +119,24 @@ void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb)
 void recv_pkt(netdev2_t *dev)
 {
 	/* Read data from driver */
+	int res;
 	int len = dev->driver->recv(dev, NULL, 0, NULL);
-
-	assert(len <= (unsigned) UINT16_MAX);
-	int res = dev->driver->recv(dev, (char*) sReceiveFrame.mPsdu, len, NULL);
+	if(len > UINT16_MAX)
+	{
+		res = 0;
+		goto exit;
+	}
+	res = dev->driver->recv(dev, (char*) sReceiveFrame.mPsdu, len, NULL);
 
 	/* Fill OT receive frame */
 	sReceiveFrame.mLength = len;
-
-	//get_channel(dev);
 	sReceiveFrame.mPower = get_power();
 
+exit:
 	/* Turn off rx */
 	set_state(NETOPT_STATE_IDLE_NO_RX);
 
 	/* Tell OpenThread that receive has finished */
-	DEBUG("recv_pkt res: %i\n", res);
 	otPlatRadioReceiveDone(res > 0 ? &sReceiveFrame : NULL, kThreadError_None);
 }
 
@@ -181,14 +177,11 @@ ThreadError otPlatRadioSetPanId(uint16_t panid)
 ThreadError otPlatRadioSetExtendedAddress(uint8_t *aExtendedAddress)
 {
 	DEBUG("openthread: otPlatRadioSetExtendedAddress\n");
-
 	uint8_t reversed_addr[IEEE802154_LONG_ADDRESS_LEN];
 	for(int i=0;i<IEEE802154_LONG_ADDRESS_LEN;i++)
 	{
 		reversed_addr[i] = aExtendedAddress[IEEE802154_LONG_ADDRESS_LEN-1-i];
-		DEBUG("%02x ", reversed_addr[i]);
 	}
-	DEBUG("\n");
 	set_long_addr(reversed_addr);
 	return kThreadError_None;
 }
@@ -196,7 +189,6 @@ ThreadError otPlatRadioSetExtendedAddress(uint8_t *aExtendedAddress)
 ThreadError otPlatRadioSetShortAddress(uint16_t aShortAddress)
 {
 	DEBUG("openthread: otPlatRadioSetShortAddress: setting address to %04x\n", aShortAddress);
-
 	set_addr(((aShortAddress & 0xff) << 8) | ((aShortAddress >> 8) & 0xff));
 	return kThreadError_None;
 }
@@ -210,16 +202,14 @@ ThreadError otPlatRadioEnable(void)
 		return kThreadError_Busy;
 	}
 
-	netopt_state_t st = NETOPT_STATE_SLEEP;
-	_dev->driver->set(_dev, NETOPT_STATE, &st, sizeof(netopt_state_t));
+	set_state(NETOPT_STATE_SLEEP);
 	return kThreadError_None;
 }
 
 ThreadError otPlatRadioDisable(void)
 {
 	DEBUG("openthread: otPlatRadioDisable\n");
-	netopt_state_t st = NETOPT_STATE_OFF;
-	_dev->driver->set(_dev, NETOPT_STATE, &st, sizeof(netopt_state_t));
+	set_state(NETOPT_STATE_OFF);
 	return kThreadError_None;
 }
 
@@ -287,7 +277,7 @@ ThreadError otPlatRadioTransmit(void)
 
 	if(!dev_is_idle())
 	{
-		DEBUG("openthread: otPlatRadioTransmit: Device not ready\n");
+		DEBUG("openthread: otPlatRadioTransmit: Device not ready. (Assert triggered in OpenThread)\n");
 		return kThreadError_Busy;
 	}
 
