@@ -81,9 +81,14 @@ void set_state(netopt_state_t state)
 	_dev->driver->set(_dev, NETOPT_STATE, &state, sizeof(netopt_state_t));
 }
 
-bool dev_is_off(void)
+bool is_off(void)
 {
 	return get_state() == NETOPT_STATE_OFF;
+}
+
+void off(void)
+{
+	set_state(NETOPT_STATE_OFF);
 }
 
 bool dev_is_sleep(void)
@@ -91,14 +96,49 @@ bool dev_is_sleep(void)
 	return get_state() == NETOPT_STATE_SLEEP;
 }
 
+void sleep(void)
+{
+	set_state(NETOPT_STATE_SLEEP);
+}
+
 bool dev_is_idle(void)
 {
 	return get_state() == NETOPT_STATE_IDLE_NO_RX;
 }
 
+void idle(void)
+{
+	set_state(NETOPT_STATE_IDLE_NO_RX);
+}
+
 bool dev_is_listening(void)
 {
 	return get_state() == NETOPT_STATE_IDLE;
+}
+
+void listen(void)
+{
+	set_state(NETOPT_STATE_IDLE);
+}
+
+bool is_rx(void)
+{
+	return get_state() == NETOPT_STATE_RX;
+}
+
+void rx(void)
+{
+	set_state(NETOPT_STATE_RX);
+}
+
+bool is_tx(void)
+{
+	return get_state() == NETOPT_STATE_TX;
+}
+
+void tx(void)
+{
+	set_state(NETOPT_STATE_TX);
 }
 
 bool dev_is_tx_or_rx(void)
@@ -128,7 +168,7 @@ void recv_pkt(netdev2_t *dev)
 	sReceiveFrame.mPower = get_power();
 
 	/* Turn off rx */
-	set_state(NETOPT_STATE_IDLE_NO_RX);
+	idle();
 
 	/* Tell OpenThread that receive has finished */
 	otPlatRadioReceiveDone(res > 0 ? &sReceiveFrame : NULL, kThreadError_None);
@@ -137,7 +177,8 @@ void recv_pkt(netdev2_t *dev)
 void send_pkt(netdev2_t *dev, netdev2_event_t event)
 {
 	/* Turn off rx */
-	set_state(NETOPT_STATE_IDLE_NO_RX);
+	idle();
+
 	switch(event)
 	{
 		case NETDEV2_EVENT_TX_COMPLETE:
@@ -190,20 +231,20 @@ ThreadError otPlatRadioSetShortAddress(uint16_t aShortAddress)
 ThreadError otPlatRadioEnable(void)
 {
 	DEBUG("openthread: otPlatRadioEnable\n");
-	if(!dev_is_off())
+	if(!is_off())
 	{
 		DEBUG("openthread: otPlatRadioEnable: Radio was enabled\n");
 		return kThreadError_Busy;
 	}
 
-	set_state(NETOPT_STATE_SLEEP);
+	sleep();
 	return kThreadError_None;
 }
 
 ThreadError otPlatRadioDisable(void)
 {
 	DEBUG("openthread: otPlatRadioDisable\n");
-	set_state(NETOPT_STATE_OFF);
+	off();
 	return kThreadError_None;
 }
 
@@ -216,7 +257,7 @@ ThreadError otPlatRadioSleep(void)
 		return kThreadError_Busy;
 	}
 
-	set_state(NETOPT_STATE_SLEEP);
+	sleep();
 	return kThreadError_None;
 }
 
@@ -230,14 +271,14 @@ ThreadError otPlatRadioIdle(void)
 		return kThreadError_None;
 	}
 
-	int res = get_state();
-	if(res == NETOPT_STATE_RX || res == NETOPT_STATE_OFF)
+	if(is_rx() || is_off())
 	{
 		DEBUG("openthread: OtPlatRadioIdle: Busy\n");
 		return kThreadError_Busy;
 	}
 
-	set_state(NETOPT_STATE_IDLE_NO_RX);
+	sleep();
+	idle();
 
 	return kThreadError_None;
 }
@@ -252,7 +293,7 @@ ThreadError otPlatRadioReceive(uint8_t aChannel)
 	}
 
 	/*turn on rx*/
-	set_state(NETOPT_STATE_IDLE);
+	listen();
 
 	sReceiveFrame.mChannel = aChannel;
 	return kThreadError_None;
