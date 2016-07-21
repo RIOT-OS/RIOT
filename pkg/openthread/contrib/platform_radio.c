@@ -292,10 +292,11 @@ ThreadError otPlatRadioReceive(uint8_t aChannel)
 		return kThreadError_Busy;
 	}
 
+	set_channel(aChannel);
+	sReceiveFrame.mChannel = aChannel;
 	/*turn on rx*/
 	listen();
 
-	sReceiveFrame.mChannel = aChannel;
 	return kThreadError_None;
 }
 
