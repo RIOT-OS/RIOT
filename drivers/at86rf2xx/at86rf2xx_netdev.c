@@ -638,8 +638,9 @@ static void _isr(netdev2_t *netdev)
 #ifdef MODULE_OPENTHREAD
 			if(dev->pending_tx == 0)
 				return;
-#endif
+#else
             assert(dev->pending_tx != 0);
+#endif
             if ((--dev->pending_tx) == 0) {
                 at86rf2xx_set_state(dev, dev->idle_state);
                 DEBUG("[at86rf2xx] return to state 0x%x\n", dev->idle_state);
