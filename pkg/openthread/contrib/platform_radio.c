@@ -119,20 +119,14 @@ void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb)
 void recv_pkt(netdev2_t *dev)
 {
 	/* Read data from driver */
-	int res;
 	int len = dev->driver->recv(dev, NULL, 0, NULL);
-	if(len > UINT16_MAX)
-	{
-		res = 0;
-		goto exit;
-	}
-	res = dev->driver->recv(dev, (char*) sReceiveFrame.mPsdu, len, NULL);
+	assert(len <= (unsigned) UINT16_MAX);
+	int res = dev->driver->recv(dev, (char*) sReceiveFrame.mPsdu, len, NULL);
 
 	/* Fill OT receive frame */
 	sReceiveFrame.mLength = len;
 	sReceiveFrame.mPower = get_power();
 
-exit:
 	/* Turn off rx */
 	set_state(NETOPT_STATE_IDLE_NO_RX);
 
