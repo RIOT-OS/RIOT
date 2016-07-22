@@ -194,38 +194,41 @@ __attribute__((naked)) void hard_fault_default(void)
 
 __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, uint32_t exc_return, uint32_t* r4_to_r11_stack)
 {
+#if CPU_HAS_EXTENDED_FAULT_REGISTERS
+    /* Copy status register contents to local stack storage, this must be
+     * done before any calls to other functions to avoid corrupting the
+     * register contents. */
+    uint32_t bfar  = SCB->BFAR;
+    uint32_t mmfar = SCB->MMFAR;
+    uint32_t cfsr  = SCB->CFSR;
+    uint32_t hfsr  = SCB->HFSR;
+    uint32_t dfsr  = SCB->DFSR;
+    uint32_t afsr  = SCB->AFSR;
+#endif
+    uint32_t pc;
+    uint32_t* orig_sp;
+
     /* Check if the ISR stack overflowed previously. Not possible to detect
      * after output may also have overflowed it. */
     if(*(&_sstack) != STACK_CANARY_WORD) {
         puts("\nISR stack overflowed");
     }
     /* Sanity check stack pointer and give additional feedback about hard fault */
-    if( corrupted ) {
+    if(corrupted) {
         puts("Stack pointer corrupted, reset to top of stack");
-    } else {
-#if CPU_HAS_EXTENDED_FAULT_REGISTERS
-        /* Copy status register contents to local stack storage, this must be
-         * done before any calls to other functions to avoid corrupting the
-         * register contents. */
-        uint32_t bfar  = SCB->BFAR;
-        uint32_t mmfar = SCB->MMFAR;
-        uint32_t cfsr  = SCB->CFSR;
-        uint32_t hfsr  = SCB->HFSR;
-        uint32_t dfsr  = SCB->DFSR;
-        uint32_t afsr  = SCB->AFSR;
-#endif
-
+    }
+    else {
         uint32_t  r0 = sp[0];
         uint32_t  r1 = sp[1];
         uint32_t  r2 = sp[2];
         uint32_t  r3 = sp[3];
         uint32_t r12 = sp[4];
         uint32_t  lr = sp[5];  /* Link register. */
-        uint32_t  pc = sp[6];  /* Program counter. */
+                  pc = sp[6];  /* Program counter. */
         uint32_t psr = sp[7];  /* Program status register. */
 
         /* Reconstruct original stack pointer before fault occurred */
-        uint32_t* orig_sp = sp + 8;
+        orig_sp = sp + 8;
         if (psr & SCB_CCR_STKALIGN_Msk) {
             /* Stack was not 8-byte aligned */
             orig_sp += 1;
@@ -244,23 +247,26 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
                "   pc: 0x%08" PRIx32 "\n"
                "  psr: 0x%08" PRIx32 "\n\n",
                r12, lr, pc, psr);
+    }
 #if CPU_HAS_EXTENDED_FAULT_REGISTERS
-        puts("FSR/FAR:");
-        printf(" CFSR: 0x%08" PRIx32 "\n", cfsr);
-        printf(" HFSR: 0x%08" PRIx32 "\n", hfsr);
-        printf(" DFSR: 0x%08" PRIx32 "\n", dfsr);
-        printf(" AFSR: 0x%08" PRIx32 "\n", afsr);
-        if (((cfsr & SCB_CFSR_BUSFAULTSR_Msk) >> SCB_CFSR_BUSFAULTSR_Pos) & 0x80) {
-            /* BFAR valid flag set */
-            printf(" BFAR: 0x%08" PRIx32 "\n", bfar);
-        }
-        if (((cfsr & SCB_CFSR_MEMFAULTSR_Msk) >> SCB_CFSR_MEMFAULTSR_Pos) & 0x80) {
-            /* MMFAR valid flag set */
-            printf("MMFAR: 0x%08" PRIx32 "\n", mmfar);
-        }
+    puts("FSR/FAR:");
+    printf(" CFSR: 0x%08" PRIx32 "\n", cfsr);
+    printf(" HFSR: 0x%08" PRIx32 "\n", hfsr);
+    printf(" DFSR: 0x%08" PRIx32 "\n", dfsr);
+    printf(" AFSR: 0x%08" PRIx32 "\n", afsr);
+    if (((cfsr & SCB_CFSR_BUSFAULTSR_Msk) >> SCB_CFSR_BUSFAULTSR_Pos) & 0x80) {
+        /* BFAR valid flag set */
+        printf(" BFAR: 0x%08" PRIx32 "\n", bfar);
+    }
+    if (((cfsr & SCB_CFSR_MEMFAULTSR_Msk) >> SCB_CFSR_MEMFAULTSR_Pos) & 0x80) {
+        /* MMFAR valid flag set */
+        printf("MMFAR: 0x%08" PRIx32 "\n", mmfar);
+    }
 #endif
-        puts("Misc");
-        printf("EXC_RET: 0x%08" PRIx32 "\n", exc_return);
+    puts("Misc");
+    printf("EXC_RET: 0x%08" PRIx32 "\n", exc_return);
+
+    if (!corrupted) {
         puts("Attempting to reconstruct state for debugging...");
         printf("In GDB:\n  set $pc=0x%" PRIx32 "\n  frame 0\n  bt\n", pc);
         int stack_left = _stack_size_left(HARDFAULT_HANDLER_REQUIRED_STACK_SPACE);
@@ -295,8 +301,8 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
               [extra_stack] "r" (r4_to_r11_stack)
             : "r0","r1","r2","r3","r12"
             );
-        __BKPT(1);
     }
+    __BKPT(1);
 
     core_panic(PANIC_HARD_FAULT, "HARD FAULT HANDLER");
 }
