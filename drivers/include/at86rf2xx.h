@@ -261,6 +261,8 @@ void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t chan);
  */
 uint8_t at86rf2xx_get_page(at86rf2xx_t *dev);
 
+
+bool at86rf2xx_get_pdt_dis(at86rf2xx_t *dev);
 /**
  * @brief   Set the channel page of the given device
  *

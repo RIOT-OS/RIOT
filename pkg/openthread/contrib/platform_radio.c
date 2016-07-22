@@ -3,7 +3,7 @@
 #include <platform/radio.h>
 #include "ot.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #include "errno.h"
@@ -139,7 +139,7 @@ void enable_rx(void)
 
 void disable_rx(void)
 {
-	netopt_enable_t enable = false;
+	netopt_enable_t enable = true;
 	_dev->driver->set(_dev, NETOPT_RX_LISTENING, &enable, sizeof(enable));
 }
 
@@ -156,15 +156,22 @@ void recv_pkt(netdev2_t *dev)
 {
 	/* Read data from driver */
 	int len = dev->driver->recv(dev, NULL, 0, NULL);
-	assert(len <= (unsigned) UINT16_MAX);
-	int res = dev->driver->recv(dev, (char*) sReceiveFrame.mPsdu, len, NULL);
+
+	idle();
+	disable_rx();
+
+	if((len > (unsigned) UINT16_MAX))
+	{
+		otPlatRadioReceiveDone(NULL, kThreadError_Abort);			
+		return;
+	}
 
 	/* Fill OT receive frame */
 	sReceiveFrame.mLength = len;
 	sReceiveFrame.mPower = get_power();
 
-	idle();
-	disable_rx();
+
+	int res = dev->driver->recv(dev, (char*) sReceiveFrame.mPsdu, len, NULL);
 
 	/* Tell OpenThread that receive has finished */
 	otPlatRadioReceiveDone(res > 0 ? &sReceiveFrame : NULL, kThreadError_None);
@@ -321,6 +328,7 @@ ThreadError otPlatRadioTransmit(void)
 	set_power(sTransmitFrame.mPower);
 
 	_dev->driver->send(_dev, &pkt, 1);
+	enable_rx();
 
 	return kThreadError_None;
 }

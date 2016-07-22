@@ -210,6 +210,8 @@ netopt_state_t _get_state(at86rf2xx_t *dev)
         case AT86RF2XX_STATE_SLEEP:
             return NETOPT_STATE_SLEEP;
         case AT86RF2XX_STATE_BUSY_RX_AACK:
+			if(at86rf2xx_get_pdt_dis(dev))
+				return NETOPT_STATE_IDLE;
             return NETOPT_STATE_RX;
         case AT86RF2XX_STATE_BUSY_TX_ARET:
         case AT86RF2XX_STATE_TX_ARET_ON:
@@ -367,6 +369,10 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
             }
             break;
 
+		case NETOPT_RX_LISTENING:
+            *((bool *)val) = at86rf2xx_get_pdt_dis(dev) ? true : false;
+            res = sizeof(bool);
+			break;
         default:
             res = -ENOTSUP;
     }
@@ -619,7 +625,7 @@ static void _isr(netdev2_t *netdev)
         if (state == AT86RF2XX_STATE_RX_AACK_ON ||
             state == AT86RF2XX_STATE_BUSY_RX_AACK) {
             DEBUG("[at86rf2xx] EVT - RX_END\n");
-            if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)) {
+            if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END) || !at86rf2xx_get_pdt_dis(dev)) {
                 return;
             }
             netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);

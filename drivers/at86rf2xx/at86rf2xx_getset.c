@@ -324,6 +324,11 @@ void at86rf2xx_set_cca_threshold(at86rf2xx_t *dev, int8_t value)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__CCA_THRES, value);
 }
 
+bool at86rf2xx_get_pdt_dis(at86rf2xx_t *dev)
+{
+	return (at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN) & 0x80) ? false : true;
+}
+
 void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
 {
     uint8_t tmp;
