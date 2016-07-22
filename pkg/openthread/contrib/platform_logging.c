@@ -9,6 +9,7 @@
 
 #include <platform/logging.h>
 
+/* adapted from OpenThread posix example */
 void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
 {
     va_list args;

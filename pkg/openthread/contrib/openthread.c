@@ -27,6 +27,7 @@
 #include "openthread.h"
 #include "ot.h"
 
+
 #ifdef MODULE_AT86RF2XX     /* is mutual exclusive with above ifdef */
 #define OPENTHREAD_NETIF_NUMOF        (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
 #endif

@@ -91,17 +91,12 @@ void off(void)
 	set_state(NETOPT_STATE_OFF);
 }
 
-bool dev_is_sleep(void)
-{
-	return get_state() == NETOPT_STATE_SLEEP;
-}
-
 void sleep(void)
 {
 	set_state(NETOPT_STATE_SLEEP);
 }
 
-bool dev_is_idle(void)
+bool is_idle(void)
 {
 	return get_state() == NETOPT_STATE_IDLE;
 }
@@ -160,6 +155,7 @@ void recv_pkt(netdev2_t *dev)
 	idle();
 	disable_rx();
 
+	/* very unlikely */
 	if((len > (unsigned) UINT16_MAX))
 	{
 		otPlatRadioReceiveDone(NULL, kThreadError_Abort);			
@@ -201,7 +197,6 @@ void send_pkt(netdev2_t *dev, netdev2_event_t event)
 			break;
 	}
 
-	/* Turn off rx */
 	disable_rx();
 	idle();
 
@@ -256,7 +251,7 @@ ThreadError otPlatRadioDisable(void)
 ThreadError otPlatRadioSleep(void)
 {
 	DEBUG("openthread: otPlatRadioSleep\n");
-	if(!dev_is_idle())
+	if(!is_idle())
 	{
 		DEBUG("openthread: otPlatRadioSleep: Couldn't sleep\n");
 		return kThreadError_Busy;
@@ -285,7 +280,7 @@ ThreadError otPlatRadioIdle(void)
 ThreadError otPlatRadioReceive(uint8_t aChannel)
 {
 	DEBUG("openthread: otPlatRadioReceive\n");
-	if(!dev_is_idle())
+	if(!is_idle())
 	{
 		DEBUG("openthread: otPlatRadioReceive: Device not ready\n");
 		return kThreadError_Busy;
@@ -294,7 +289,6 @@ ThreadError otPlatRadioReceive(uint8_t aChannel)
 	set_channel(aChannel);
 	sReceiveFrame.mChannel = aChannel;
 
-	/*turn on rx*/
 	enable_rx();
 
 	return kThreadError_None;
@@ -311,9 +305,12 @@ ThreadError otPlatRadioTransmit(void)
 {
 	DEBUG("openthread: otPlatRadioTransmit\n");
 
-	if(!dev_is_idle())
+	if(!is_idle())
 	{
 		DEBUG("openthread: otPlatRadioTransmit: Device not ready.\n");
+		
+		/* OpenThread will assert(false) if this function returns kThreadError_None. 
+		 * These asserts don't throw core_panic, so it's better to assert here.*/
 		assert(false);
 		return kThreadError_Busy;
 	}
@@ -343,6 +340,7 @@ int8_t otPlatRadioGetNoiseFloor(void)
 otRadioCaps otPlatRadioGetCaps(void)
 {
 	DEBUG("openthread: otPlatRadioGetCaps\n");
+	/* change to kRadioCapsAckTimeout if supported by driver */
 	return kRadioCapsNone;
 }
 

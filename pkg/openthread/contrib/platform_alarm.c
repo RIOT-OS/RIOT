@@ -12,10 +12,12 @@
 static xtimer_t ot_timer;
 static msg_t ot_alarm_msg;
 
+/* starts an aDt millisecs alarm when current time is aT0 millisecs */
 void otPlatAlarmStartAt(uint32_t aT0, uint32_t aDt)
 {
 	DEBUG("openthread: otPlatAlarmStartAt: aT0: %i, aDT: %i\n", (int) aT0, (int) aDt);
 	ot_alarm_msg.type = OPENTHREAD_XTIMER_MSG_TYPE_EVENT;
+
 	int dt = aDt*1000;
 	if(dt == 0)
 	{
@@ -27,12 +29,14 @@ void otPlatAlarmStartAt(uint32_t aT0, uint32_t aDt)
 	}
 }
 
+/* stop alarms */
 void otPlatAlarmStop(void)
 {
 	DEBUG("openthread: otPlatAlarmStop\n");
 	xtimer_remove(&ot_timer);
 }
 
+/* return running time in millisecs */
 uint32_t otPlatAlarmGetNow(void)
 {
 	uint32_t now = xtimer_now()/1000;
