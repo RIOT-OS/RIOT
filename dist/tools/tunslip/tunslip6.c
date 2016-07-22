@@ -184,221 +184,218 @@ serial_to_tun(FILE *inslip, int outfd)
     goto after_fread;
 #endif
 
-read_more:
+    while (1) {
+        if (inbufptr >= sizeof(uip.inbuf)) {
+            if (timestamp) {
+                stamptime();
+            }
 
-    if (inbufptr >= sizeof(uip.inbuf)) {
-        if (timestamp) {
-            stamptime();
+            fprintf(stderr, "*** dropping large %d byte packet\n", inbufptr);
+            inbufptr = 0;
         }
 
-        fprintf(stderr, "*** dropping large %d byte packet\n", inbufptr);
-        inbufptr = 0;
-    }
-
-    ret = fread(&c, 1, 1, inslip);
+        ret = fread(&c, 1, 1, inslip);
 #ifdef linux
-after_fread:
+    after_fread:
 #endif
 
-    if (ret == -1) {
-        err(1, "serial_to_tun: read");
-    }
+        if (ret == -1) {
+            err(1, "serial_to_tun: read");
+        }
 
-    if (ret == 0) {
-        clearerr(inslip);
-        return;
-    }
+        if (ret == 0) {
+            clearerr(inslip);
+            return;
+        }
 
-    /*  fprintf(stderr, ".");*/
-    switch (c) {
-        case SLIP_END:
-            if (inbufptr > 0) {
-                if (uip.inbuf[0] == '!') {
-                    if (uip.inbuf[1] == 'M') {
-                        /* Read gateway MAC address and autoconfigure tap0 interface */
-                        char macs[24];
-                        int i, pos;
+        /*  fprintf(stderr, ".");*/
+        switch (c) {
+            case SLIP_END:
+                if (inbufptr > 0) {
+                    if (uip.inbuf[0] == '!') {
+                        if (uip.inbuf[1] == 'M') {
+                            /* Read gateway MAC address and autoconfigure tap0 interface */
+                            char macs[24];
+                            int i, pos;
 
-                        for (i = 0, pos = 0; i < 16; i++) {
-                            macs[pos++] = uip.inbuf[2 + i];
+                            for (i = 0, pos = 0; i < 16; i++) {
+                                macs[pos++] = uip.inbuf[2 + i];
 
-                            if ((i & 1) == 1 && i < 14) {
-                                macs[pos++] = ':';
+                                if ((i & 1) == 1 && i < 14) {
+                                    macs[pos++] = ':';
+                                }
                             }
+
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            macs[pos] = '\0';
+                            //	  printf("*** Gateway's MAC address: %s\n", macs);
+                            fprintf(stderr, "*** Gateway's MAC address: %s\n", macs);
+
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            ssystem("ifconfig %s down", tundev);
+
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            ssystem("ifconfig %s hw ether %s", tundev, &macs[6]);
+
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            ssystem("ifconfig %s up", tundev);
                         }
-
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        macs[pos] = '\0';
-                        //	  printf("*** Gateway's MAC address: %s\n", macs);
-                        fprintf(stderr, "*** Gateway's MAC address: %s\n", macs);
-
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        ssystem("ifconfig %s down", tundev);
-
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        ssystem("ifconfig %s hw ether %s", tundev, &macs[6]);
-
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        ssystem("ifconfig %s up", tundev);
                     }
-                }
-                else if (uip.inbuf[0] == '?') {
-                    if (uip.inbuf[1] == 'P') {
-                        /* Prefix info requested */
-                        struct in6_addr addr;
-                        int i;
-                        char *s = strchr(ipaddr, '/');
+                    else if (uip.inbuf[0] == '?') {
+                        if (uip.inbuf[1] == 'P') {
+                            /* Prefix info requested */
+                            struct in6_addr addr;
+                            int i;
+                            char *s = strchr(ipaddr, '/');
 
-                        if (s != NULL) {
-                            *s = '\0';
+                            if (s != NULL) {
+                                *s = '\0';
+                            }
+
+                            inet_pton(AF_INET6, ipaddr, &addr);
+
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            fprintf(stderr, "*** Address:%s => %02x%02x:%02x%02x:%02x%02x:%02x%02x\n",
+                                    ipaddr,
+                                    addr.s6_addr[0], addr.s6_addr[1],
+                                    addr.s6_addr[2], addr.s6_addr[3],
+                                    addr.s6_addr[4], addr.s6_addr[5],
+                                    addr.s6_addr[6], addr.s6_addr[7]);
+                            slip_send(slipfd, '!');
+                            slip_send(slipfd, 'P');
+
+                            for (i = 0; i < 8; i++) {
+                                /* need to call the slip_send_char for stuffing */
+                                slip_send_char(slipfd, addr.s6_addr[i]);
+                            }
+
+                            slip_send(slipfd, SLIP_END);
                         }
-
-                        inet_pton(AF_INET6, ipaddr, &addr);
-
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        fprintf(stderr, "*** Address:%s => %02x%02x:%02x%02x:%02x%02x:%02x%02x\n",
-                                //         printf("*** Address:%s => %02x%02x:%02x%02x:%02x%02x:%02x%02x\n",
-                                ipaddr,
-                                addr.s6_addr[0], addr.s6_addr[1],
-                                addr.s6_addr[2], addr.s6_addr[3],
-                                addr.s6_addr[4], addr.s6_addr[5],
-                                addr.s6_addr[6], addr.s6_addr[7]);
-                        slip_send(slipfd, '!');
-                        slip_send(slipfd, 'P');
-
-                        for (i = 0; i < 8; i++) {
-                            /* need to call the slip_send_char for stuffing */
-                            slip_send_char(slipfd, addr.s6_addr[i]);
-                        }
-
-                        slip_send(slipfd, SLIP_END);
-                    }
 
 #define DEBUG_LINE_MARKER '\r'
-                }
-                else if (uip.inbuf[0] == DEBUG_LINE_MARKER) {
-                    fwrite(uip.inbuf + 1, inbufptr - 1, 1, stdout);
-                }
-                else if (is_sensible_string(uip.inbuf, inbufptr)) {
-                    if (verbose == 1) { /* strings already echoed below for verbose>1 */
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        fwrite(uip.inbuf, inbufptr, 1, stdout);
                     }
-                }
-                else {
-                    if (verbose > 2) {
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        printf("Packet from SLIP of length %d - write TUN\n", inbufptr);
-
-                        if (verbose > 4) {
-#if WIRESHARK_IMPORT_FORMAT
-                            printf("0000");
-
-                            for (i = 0; i < inbufptr; i++) {
-                                printf(" %02x", uip.inbuf[i]);
+                    else if (uip.inbuf[0] == DEBUG_LINE_MARKER) {
+                        fwrite(uip.inbuf + 1, inbufptr - 1, 1, stdout);
+                    }
+                    else if (is_sensible_string(uip.inbuf, inbufptr)) {
+                        if (verbose == 1) { /* strings already echoed below for verbose>1 */
+                            if (timestamp) {
+                                stamptime();
                             }
+
+                            fwrite(uip.inbuf, inbufptr, 1, stdout);
+                        }
+                    }
+                    else {
+                        if (verbose > 2) {
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            printf("Packet from SLIP of length %d - write TUN\n", inbufptr);
+
+                            if (verbose > 4) {
+#if WIRESHARK_IMPORT_FORMAT
+                                printf("0000");
+
+                                for (i = 0; i < inbufptr; i++) {
+                                    printf(" %02x", uip.inbuf[i]);
+                                }
 
 #else
-                            printf("         ");
+                                printf("         ");
 
-                            for (i = 0; i < inbufptr; i++) {
-                                printf("%02x", uip.inbuf[i]);
+                                for (i = 0; i < inbufptr; i++) {
+                                    printf("%02x", uip.inbuf[i]);
 
-                                if ((i & 3) == 3) {
-                                    printf(" ");
+                                    if ((i & 3) == 3) {
+                                        printf(" ");
+                                    }
+
+                                    if ((i & 15) == 15) {
+                                        printf("\n         ");
+                                    }
                                 }
-
-                                if ((i & 15) == 15) {
-                                    printf("\n         ");
-                                }
-                            }
 
 #endif
-                            printf("\n");
+                                printf("\n");
+                            }
+                        }
+
+                        if (write(outfd, uip.inbuf, inbufptr) != inbufptr) {
+                            err(1, "serial_to_tun: write");
                         }
                     }
 
-                    if (write(outfd, uip.inbuf, inbufptr) != inbufptr) {
-                        err(1, "serial_to_tun: write");
+                    inbufptr = 0;
+                }
+
+                break;
+
+            case SLIP_ESC:
+                if (fread(&c, 1, 1, inslip) != 1) {
+                    clearerr(inslip);
+                    /* Put ESC back and give up! */
+                    ungetc(SLIP_ESC, inslip);
+                    return;
+                }
+
+                switch (c) {
+                    case SLIP_ESC_END:
+                        c = SLIP_END;
+                        break;
+
+                    case SLIP_ESC_ESC:
+                        c = SLIP_ESC;
+                        break;
+                }
+
+                /* FALLTHROUGH */
+            default:
+                uip.inbuf[inbufptr++] = c;
+
+                /* Echo lines as they are received for verbose=2,3,5+ */
+                /* Echo all printable characters for verbose==4 */
+                if ((verbose == 2) || (verbose == 3) || (verbose > 4)) {
+                    if (c == '\n') {
+                        if (is_sensible_string(uip.inbuf, inbufptr)) {
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            fwrite(uip.inbuf, inbufptr, 1, stdout);
+                            inbufptr = 0;
+                        }
+                    }
+                }
+                else if (verbose == 4) {
+                    if (c == 0 || c == '\r' || c == '\n' || c == '\t' || (c >= ' ' && c <= '~')) {
+                        fwrite(&c, 1, 1, stdout);
+
+                        if (c == '\n') if (timestamp) {
+                                stamptime();
+                            }
                     }
                 }
 
-                inbufptr = 0;
-            }
-
-            break;
-
-        case SLIP_ESC:
-            if (fread(&c, 1, 1, inslip) != 1) {
-                clearerr(inslip);
-                /* Put ESC back and give up! */
-                ungetc(SLIP_ESC, inslip);
-                return;
-            }
-
-            switch (c) {
-                case SLIP_ESC_END:
-                    c = SLIP_END;
-                    break;
-
-                case SLIP_ESC_ESC:
-                    c = SLIP_ESC;
-                    break;
-            }
-
-            /* FALLTHROUGH */
-        default:
-            uip.inbuf[inbufptr++] = c;
-
-            /* Echo lines as they are received for verbose=2,3,5+ */
-            /* Echo all printable characters for verbose==4 */
-            if ((verbose == 2) || (verbose == 3) || (verbose > 4)) {
-                if (c == '\n') {
-                    if (is_sensible_string(uip.inbuf, inbufptr)) {
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        fwrite(uip.inbuf, inbufptr, 1, stdout);
-                        inbufptr = 0;
-                    }
-                }
-            }
-            else if (verbose == 4) {
-                if (c == 0 || c == '\r' || c == '\n' || c == '\t' || (c >= ' ' && c <= '~')) {
-                    fwrite(&c, 1, 1, stdout);
-
-                    if (c == '\n') if (timestamp) {
-                            stamptime();
-                        }
-                }
-            }
-
-            break;
+                break;
+        }
     }
-
-    goto read_more;
 }
 
 unsigned char slip_buf[2000];
