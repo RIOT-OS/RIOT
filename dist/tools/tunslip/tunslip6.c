@@ -34,6 +34,9 @@
 
 /* Below define allows importing saved output into Wireshark as "Raw IP" packet type */
 #define WIRESHARK_IMPORT_FORMAT 1
+/* for cfmakeraw on Linux */
+#define _BSD_SOURCE 1
+#define _DEFAULT_SOURCE 1
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -170,11 +173,11 @@ serial_to_tun(FILE *inslip, int outfd)
     static union {
         unsigned char inbuf[2000];
     } uip;
-    static int inbufptr = 0;
-    int ret, i;
+    static unsigned int inbufptr = 0;
+    int ret;
     unsigned char c;
 
-#ifdef linux
+#ifdef __linux__
     ret = fread(&c, 1, 1, inslip);
 
     if (ret == -1 || ret == 0) {
@@ -195,7 +198,7 @@ serial_to_tun(FILE *inslip, int outfd)
         }
 
         ret = fread(&c, 1, 1, inslip);
-#ifdef linux
+#ifdef __linux__
     after_fread:
 #endif
 
@@ -216,9 +219,9 @@ serial_to_tun(FILE *inslip, int outfd)
                         if (uip.inbuf[1] == 'M') {
                             /* Read gateway MAC address and autoconfigure tap0 interface */
                             char macs[24];
-                            int i, pos;
+                            unsigned int pos = 0;
 
-                            for (i = 0, pos = 0; i < 16; i++) {
+                            for (unsigned int i = 0; i < 16; i++) {
                                 macs[pos++] = uip.inbuf[2 + i];
 
                                 if ((i & 1) == 1 && i < 14) {
@@ -231,7 +234,6 @@ serial_to_tun(FILE *inslip, int outfd)
                             }
 
                             macs[pos] = '\0';
-                            //	  printf("*** Gateway's MAC address: %s\n", macs);
                             fprintf(stderr, "*** Gateway's MAC address: %s\n", macs);
 
                             if (timestamp) {
@@ -257,7 +259,6 @@ serial_to_tun(FILE *inslip, int outfd)
                         if (uip.inbuf[1] == 'P') {
                             /* Prefix info requested */
                             struct in6_addr addr;
-                            int i;
                             char *s = strchr(ipaddr, '/');
 
                             if (s != NULL) {
@@ -279,7 +280,7 @@ serial_to_tun(FILE *inslip, int outfd)
                             slip_send(slipfd, '!');
                             slip_send(slipfd, 'P');
 
-                            for (i = 0; i < 8; i++) {
+                            for (unsigned int i = 0; i < 8; i++) {
                                 /* need to call the slip_send_char for stuffing */
                                 slip_send_char(slipfd, addr.s6_addr[i]);
                             }
@@ -313,14 +314,14 @@ serial_to_tun(FILE *inslip, int outfd)
 #if WIRESHARK_IMPORT_FORMAT
                                 printf("0000");
 
-                                for (i = 0; i < inbufptr; i++) {
+                                for (unsigned int i = 0; i < inbufptr; i++) {
                                     printf(" %02x", uip.inbuf[i]);
                                 }
 
 #else
                                 printf("         ");
 
-                                for (i = 0; i < inbufptr; i++) {
+                                for (unsigned int i = 0; i < inbufptr; i++) {
                                     printf("%02x", uip.inbuf[i]);
 
                                     if ((i & 3) == 3) {
@@ -399,7 +400,7 @@ serial_to_tun(FILE *inslip, int outfd)
 }
 
 unsigned char slip_buf[2000];
-int slip_end, slip_begin;
+unsigned int slip_end, slip_begin;
 
 void
 slip_send_char(int fd, unsigned char c)
@@ -419,17 +420,6 @@ slip_send_char(int fd, unsigned char c)
             slip_send(fd, c);
             break;
     }
-}
-
-void
-slip_send(int fd, unsigned char c)
-{
-    if (slip_end >= sizeof(slip_buf)) {
-        err(1, "slip_send overflow");
-    }
-
-    slip_buf[slip_end] = c;
-    slip_end++;
 }
 
 int
@@ -453,7 +443,7 @@ slip_flushbuf(int fd)
         err(1, "slip_flushbuf write failed");
     }
     else if (n == -1) {
-        PROGRESS("Q");		/* Outqueueis full! */
+        PROGRESS("Q");      /* Outqueue is full! */
     }
     else {
         slip_begin += n;
@@ -461,6 +451,21 @@ slip_flushbuf(int fd)
         if (slip_begin == slip_end) {
             slip_begin = slip_end = 0;
         }
+    }
+}
+
+void
+slip_send(int fd, unsigned char c)
+{
+    if (slip_end >= sizeof(slip_buf)) {
+        err(1, "slip_send overflow");
+    }
+
+    slip_buf[slip_end] = c;
+    slip_end++;
+    if (slip_end >= sizeof(slip_buf)) {
+        /* attempt to flush what is in the buffer */
+        slip_flushbuf(fd);
     }
 }
 
@@ -542,9 +547,10 @@ tun_to_serial(int infd, int outfd)
     struct {
         unsigned char inbuf[2000];
     } uip;
-    int size;
 
-    if ((size = read(infd, uip.inbuf, 2000)) == -1) {
+    int size = read(infd, uip.inbuf, 2000);
+
+    if (size == -1) {
         err(1, "tun_to_serial: read");
     }
 
@@ -613,7 +619,7 @@ stty_telos(int fd)
 
 #endif
 
-    usleep(10 * 1000);		/* Wait for hardware 10ms. */
+    usleep(10 * 1000);      /* Wait for hardware 10ms. */
 
     /* Flush input and output buffers. */
     if (tcflush(fd, TCIOFLUSH) == -1) {
@@ -630,7 +636,7 @@ devopen(const char *dev, int flags)
     return open(t, flags);
 }
 
-#ifdef linux
+#ifdef __linux__
 #include <linux/if.h>
 #include <linux/if_tun.h>
 
@@ -669,6 +675,7 @@ tun_alloc(char *dev, int tap)
 int
 tun_alloc(char *dev, int tap)
 {
+    (void) tap;
     return devopen(dev, O_RDWR);
 }
 #endif
@@ -683,7 +690,7 @@ cleanup(void)
     }
 
     ssystem("ifconfig %s down", tundev);
-#ifndef linux
+#ifndef __linux__
     ssystem("sysctl -w net.ipv6.conf.all.forwarding=1");
 #endif
 
@@ -727,7 +734,7 @@ void
 sigcleanup(int signo)
 {
     fprintf(stderr, "signal %d\n", signo);
-    exit(0);			/* exit(0) will call cleanup() */
+    exit(0);            /* exit(0) will call cleanup() */
 }
 
 static int got_sigalarm;
@@ -735,6 +742,7 @@ static int got_sigalarm;
 void
 sigalarm(int signo)
 {
+    (void) signo; /* not used */
     got_sigalarm = 1;
     return;
 }
@@ -742,7 +750,7 @@ sigalarm(int signo)
 void
 sigalarm_reset()
 {
-#ifdef linux
+#ifdef __linux__
 #define TIMEOUT (997*1000)
 #else
 #define TIMEOUT (2451*1000)
@@ -754,7 +762,7 @@ sigalarm_reset()
 void
 ifconf(const char *tundev, const char *ipaddr)
 {
-#ifdef linux
+#ifdef __linux__
 
     if (timestamp) {
         stamptime();
@@ -787,7 +795,7 @@ ifconf(const char *tundev, const char *ipaddr)
         ai = 0;
         cc = scc = 0;
 
-        while (c = *ptr++) {
+        while ((c = *(ptr++))) {
             if (c == '/') {
                 break;
             }
@@ -882,7 +890,7 @@ ifconf(const char *tundev, const char *ipaddr)
     }
 
     ssystem("sysctl -w net.inet.ip.forwarding=1");
-#endif /* !linux */
+#endif /* !__linux__ */
 
     if (timestamp) {
         stamptime();
@@ -1019,7 +1027,7 @@ main(int argc, char **argv)
 
     switch (baudrate) {
         case -2:
-            break;			/* Use default. */
+            break;          /* Use default. */
 
         case 9600:
             b_rate = B9600;
@@ -1197,11 +1205,11 @@ main(int argc, char **argv)
         /*       got_sigalarm = 0; */
         /*     } */
 
-        if (!slip_empty()) {		/* Anything to flush? */
+        if (!slip_empty()) {        /* Anything to flush? */
             FD_SET(slipfd, &wset);
         }
 
-        FD_SET(slipfd, &rset);	/* Read from slip ASAP! */
+        FD_SET(slipfd, &rset);  /* Read from slip ASAP! */
 
         if (slipfd > maxfd) {
             maxfd = slipfd;
@@ -1251,13 +1259,14 @@ main(int argc, char **argv)
             if (delaymsec == 0) {
                 if (slip_empty() && FD_ISSET(tunfd, &rset)) {
                     int size = tun_to_serial(tunfd, slipfd);
+                    (void) size; /* fix warning unused but set variable */
                     slip_flushbuf(slipfd);
                     sigalarm_reset();
 
                     if (basedelay) {
                         struct timeval tv;
                         gettimeofday(&tv, NULL) ;
-                        //         delaymsec=basedelay*(1+(size/120));//multiply by # of 6lowpan packets?
+                        // delaymsec=basedelay*(1+(size/120));//multiply by # of 6lowpan packets?
                         delaymsec = basedelay;
                         delaystartsec = tv.tv_sec;
                         delaystartmsec = tv.tv_usec / 1000;
