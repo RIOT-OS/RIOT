@@ -149,18 +149,34 @@ stamptime(void)
 int
 is_sensible_string(const unsigned char *s, int len)
 {
-    int i;
+    if(len > 0) {
+        if (s[0] == 0x60) {
+            /* Possibly IPv6 packet with default traffic class, assume non-printable */
+            return 0;
+        }
+    }
 
-    for (i = 1; i < len; i++) {
+    int ret = 0;
+    for (int i = 1; i < len; i++) {
         if (s[i] == 0 || s[i] == '\r' || s[i] == '\n' || s[i] == '\t') {
             continue;
         }
         else if (s[i] < ' ' || '~' < s[i]) {
             return 0;
         }
+        /* only return 1 if the string contains at least one letter or number */
+        if('A' <= s[i] && s[i] <= 'Z') {
+            ret = 1;
+        }
+        else if('a' <= s[i] && s[i] <= 'z') {
+            ret = 1;
+        }
+        else if('0' <= s[i] && s[i] <= '9') {
+            ret = 1;
+        }
     }
 
-    return 1;
+    return ret;
 }
 
 /*
