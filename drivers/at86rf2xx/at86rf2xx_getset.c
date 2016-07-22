@@ -366,6 +366,12 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
                 tmp |= AT86RF2XX_IRQ_STATUS_MASK__RX_START;
                 at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
                 break;
+			case AT86RF2XX_OPT_RX_LISTENING:
+                DEBUG("[at86rf2xx] opt: enabling listening of pkt\n");
+                tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN);
+				tmp &= ~(0x80);
+				at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, tmp); 
+				break;
             default:
                 /* do nothing */
                 break;
@@ -407,6 +413,12 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
                 tmp &= ~AT86RF2XX_IRQ_STATUS_MASK__RX_START;
                 at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
                 break;
+			case AT86RF2XX_OPT_RX_LISTENING:
+                DEBUG("[at86rf2xx] opt: disabling listening of pkt\n");
+                tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN);
+                tmp |= 0x80;
+				at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, tmp); 
+				break;
             default:
                 /* do nothing */
                 break;

@@ -190,11 +190,6 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
         case NETOPT_STATE_IDLE:
             at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
             break;
-#ifdef MODULE_OPENTHREAD
-		case NETOPT_STATE_IDLE_NO_RX:
-            at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
-			break;
-#endif
         case NETOPT_STATE_TX:
             if (dev->netdev.flags & AT86RF2XX_OPT_PRELOADING) {
                 at86rf2xx_tx_exec(dev);
@@ -216,16 +211,9 @@ netopt_state_t _get_state(at86rf2xx_t *dev)
             return NETOPT_STATE_SLEEP;
         case AT86RF2XX_STATE_BUSY_RX_AACK:
             return NETOPT_STATE_RX;
-#ifdef MODULE_OPENTHREAD
-        case AT86RF2XX_STATE_BUSY_TX_ARET:
-            return NETOPT_STATE_TX;
-        case AT86RF2XX_STATE_TX_ARET_ON:
-            return NETOPT_STATE_IDLE_NO_RX;
-#else
         case AT86RF2XX_STATE_BUSY_TX_ARET:
         case AT86RF2XX_STATE_TX_ARET_ON:
             return NETOPT_STATE_TX;
-#endif
         case AT86RF2XX_STATE_RX_AACK_ON:
         default:
             return NETOPT_STATE_IDLE;
@@ -578,6 +566,11 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             }
             break;
 
+		case NETOPT_RX_LISTENING:
+            at86rf2xx_set_option(dev, AT86RF2XX_OPT_RX_LISTENING,
+                                 ((bool *)val)[0]);
+            res = sizeof(netopt_enable_t);
+			break;
         default:
             break;
     }

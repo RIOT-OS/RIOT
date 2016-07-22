@@ -3,7 +3,7 @@
 #include <platform/radio.h>
 #include "ot.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #include "errno.h"
@@ -103,20 +103,10 @@ void sleep(void)
 
 bool dev_is_idle(void)
 {
-	return get_state() == NETOPT_STATE_IDLE_NO_RX;
-}
-
-void idle(void)
-{
-	set_state(NETOPT_STATE_IDLE_NO_RX);
-}
-
-bool dev_is_listening(void)
-{
 	return get_state() == NETOPT_STATE_IDLE;
 }
 
-void listen(void)
+void idle(void)
 {
 	set_state(NETOPT_STATE_IDLE);
 }
@@ -141,10 +131,16 @@ void tx(void)
 	set_state(NETOPT_STATE_TX);
 }
 
-bool dev_is_tx_or_rx(void)
+void enable_rx(void)
 {
-	int res = get_state();
-	return res == NETOPT_STATE_RX || res == NETOPT_STATE_TX;
+	netopt_enable_t enable = true;
+	_dev->driver->set(_dev, NETOPT_RX_LISTENING, &enable, sizeof(enable));
+}
+
+void disable_rx(void)
+{
+	netopt_enable_t enable = false;
+	_dev->driver->set(_dev, NETOPT_RX_LISTENING, &enable, sizeof(enable));
 }
 
 void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb)
@@ -167,8 +163,8 @@ void recv_pkt(netdev2_t *dev)
 	sReceiveFrame.mLength = len;
 	sReceiveFrame.mPower = get_power();
 
-	/* Turn off rx */
 	idle();
+	disable_rx();
 
 	/* Tell OpenThread that receive has finished */
 	otPlatRadioReceiveDone(res > 0 ? &sReceiveFrame : NULL, kThreadError_None);
@@ -176,9 +172,6 @@ void recv_pkt(netdev2_t *dev)
 
 void send_pkt(netdev2_t *dev, netdev2_event_t event)
 {
-	/* Turn off rx */
-	idle();
-
 	switch(event)
 	{
 		case NETDEV2_EVENT_TX_COMPLETE:
@@ -200,6 +193,11 @@ void send_pkt(netdev2_t *dev, netdev2_event_t event)
 		default:
 			break;
 	}
+
+	/* Turn off rx */
+	disable_rx();
+	idle();
+
 }
 
 ThreadError otPlatRadioSetPanId(uint16_t panid)
@@ -251,7 +249,7 @@ ThreadError otPlatRadioDisable(void)
 ThreadError otPlatRadioSleep(void)
 {
 	DEBUG("openthread: otPlatRadioSleep\n");
-	if(!dev_is_idle() || !dev_is_listening())
+	if(!dev_is_idle())
 	{
 		DEBUG("openthread: otPlatRadioSleep: Couldn't sleep\n");
 		return kThreadError_Busy;
@@ -265,19 +263,13 @@ ThreadError otPlatRadioIdle(void)
 {
 	DEBUG("openthread: otPlatRadioIdle\n");
 	
-	if(dev_is_idle())
-	{
-		DEBUG("openthread: device was idle\n");
-		return kThreadError_None;
-	}
-
 	if(is_rx() || is_off())
 	{
 		DEBUG("openthread: OtPlatRadioIdle: Busy\n");
 		return kThreadError_Busy;
 	}
 
-	sleep();
+	disable_rx();
 	idle();
 
 	return kThreadError_None;
@@ -294,8 +286,9 @@ ThreadError otPlatRadioReceive(uint8_t aChannel)
 
 	set_channel(aChannel);
 	sReceiveFrame.mChannel = aChannel;
+
 	/*turn on rx*/
-	listen();
+	enable_rx();
 
 	return kThreadError_None;
 }
@@ -313,7 +306,8 @@ ThreadError otPlatRadioTransmit(void)
 
 	if(!dev_is_idle())
 	{
-		DEBUG("openthread: otPlatRadioTransmit: Device not ready. (Assert triggered in OpenThread)\n");
+		DEBUG("openthread: otPlatRadioTransmit: Device not ready.\n");
+		assert(false);
 		return kThreadError_Busy;
 	}
 

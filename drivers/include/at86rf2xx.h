@@ -136,6 +136,7 @@ extern "C" {
                                                      *   start */
 #define AT86RF2XX_OPT_TELL_RX_END    (0x4000)       /**< notify MAC layer on RX
                                                      *   finished */
+#define AT86RF2XX_OPT_RX_LISTENING    (0x8000)       /**< receive status */
 /** @} */
 
 /**
