@@ -8,3 +8,5 @@ install:
 
 uninstall:
 	rm -f $(foreach bin,$(BIN),$(PREFIX)/bin/$(bin))
+
+CFLAGS += -Wall -Wextra -pedantic
