@@ -147,7 +147,7 @@ stamptime(void)
 }
 
 int
-is_sensible_string(const unsigned char *s, int len)
+is_sensible_string(const unsigned char *s, size_t len)
 {
     if(len > 0) {
         if (s[0] == 0x60) {
@@ -157,7 +157,7 @@ is_sensible_string(const unsigned char *s, int len)
     }
 
     int ret = 0;
-    for (int i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; i++) {
         if (s[i] == 0 || s[i] == '\r' || s[i] == '\n' || s[i] == '\t') {
             continue;
         }
