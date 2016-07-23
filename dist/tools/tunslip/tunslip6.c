@@ -157,7 +157,7 @@ is_sensible_string(const unsigned char *s, int len)
     }
 
     int ret = 0;
-    for (int i = 1; i < len; i++) {
+    for (int i = 0; i < len; i++) {
         if (s[i] == 0 || s[i] == '\r' || s[i] == '\n' || s[i] == '\t') {
             continue;
         }
