@@ -277,6 +277,10 @@ void auto_init(void)
     extern void auto_init_mma8652(void);
     auto_init_mma8652();
 #endif
+#ifdef MODULE_SI70XX
+    extern void auto_init_si70xx(void);
+    auto_init_si70xx();
+#endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 

@@ -19,12 +19,12 @@
  */
 
 
-#include "si70xx.h"
-
 #include "xtimer.h"
 
+#include "si70xx.h"
+
 /**
- * @brief       Utility method to perform and reconstruct a measurement.
+ * @brief   Utility method to perform and reconstruct a measurement.
  */
 static uint32_t si70xx_measure(si70xx_t *dev, uint8_t command)
 {

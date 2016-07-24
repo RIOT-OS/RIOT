@@ -21,8 +21,6 @@
 #ifndef SI70XX_H_
 #define SI70XX_H_
 
-#include <stdint.h>
-
 #include "periph/i2c.h"
 
 #ifdef __cplusplus
@@ -39,7 +37,7 @@ extern "C" {
 #define SI70XX_ADDRESS_SI7021       (0x80)
 
 /**
- * @name Si70xx device commands
+ * @name Si70xx device commands.
  * @{
  */
 #define SI70XX_MEASURE_RH_HOLD      (0xE5)
@@ -61,7 +59,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name Si70xx register values
+ * @name Si70xx register values.
  * @{
  */
 #define SI70XX_ID_SI7006            (0x06)
@@ -74,12 +72,20 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Si70xx device descriptor
+ * @brief Si70xx device descriptor.
  */
 typedef struct {
     i2c_t i2c_dev;              /**< I2C bus the sensors is connected to */
     uint8_t address;            /**< sensor address */
 } si70xx_t;
+
+/**
+ * @brief Device initialization parameters.
+ */
+typedef struct {
+    i2c_t i2c_dev;              /**< I2C bus the sensor is connected to */
+    uint8_t address;            /**< sensor address */
+} si70xx_params_t;
 
 /**
  * @brief   Test if the device id and revision number are as expected.
