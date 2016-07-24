@@ -42,15 +42,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Some members of the Cortex-M family have architecture specific
- *          atomic operations in atomic_arch.c
- */
-#if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
-    defined(CPU_ARCH_CORTEX_M4F)
-#define ARCH_HAS_ATOMIC_COMPARE_AND_SWAP 1
-#endif
-
-/**
  * @brief Interrupt stack canary value
  *
  * @note 0xe7fe is the ARM Thumb machine code equivalent of asm("bl #-2\n") or
