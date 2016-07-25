@@ -13,11 +13,13 @@
 #include <string.h>
 
 
+
 static RadioPacket sTransmitFrame;
 static RadioPacket sReceiveFrame;
 
 static netdev2_t *_dev;
 
+/* asks the driver the current 15.4 channel */
 uint16_t get_channel(void)
 {
 	uint16_t channel;
@@ -25,11 +27,13 @@ uint16_t get_channel(void)
 	return channel;
 }
 
+/* set 15.4 channel */
 int set_channel(uint16_t channel)
 {
 	return _dev->driver->set(_dev, NETOPT_CHANNEL, &channel, sizeof(uint16_t));
 }
 
+/*get transmission power from driver */
 int16_t get_power(void)
 {
 	int16_t power;
@@ -37,26 +41,31 @@ int16_t get_power(void)
 	return power;
 }
 
+/* set transmission power */
 int set_power(int16_t power)
 {
 	return _dev->driver->set(_dev, NETOPT_TX_POWER, &power, sizeof(int16_t));
 }
 
+/* set IEEE802.15.4 PAN ID */
 int set_panid(uint16_t panid)
 {
 	return _dev->driver->set(_dev, NETOPT_NID, &panid, sizeof(uint16_t));	
 }
 
+/* set extended HW address */
 int set_long_addr(uint8_t *ext_addr)
 {
 	return _dev->driver->set(_dev, NETOPT_ADDRESS_LONG, ext_addr, IEEE802154_LONG_ADDRESS_LEN);	
 }
 
+/* set short address */
 int set_addr(uint16_t addr)
 {
 	return _dev->driver->set(_dev, NETOPT_ADDRESS, &addr, sizeof(uint16_t));	
 }
 
+/* check the state of promiscuous mode */
 netopt_enable_t is_promiscuous(void)
 {
 	netopt_enable_t en;
@@ -64,11 +73,13 @@ netopt_enable_t is_promiscuous(void)
 	return en == NETOPT_ENABLE ? true : false;;
 }
 
+/* set the state of promiscuous mode */
 int set_promiscuous(netopt_enable_t enable)
 {
 	return _dev->driver->set(_dev, NETOPT_PROMISCUOUSMODE, &enable, sizeof(enable));
 }
 
+/* wrapper for getting device state */
 int get_state(void)
 {
 	netopt_state_t en;
@@ -76,68 +87,63 @@ int get_state(void)
 	return en;
 }
 
+/* wrapper for setting device state */
 void set_state(netopt_state_t state)
 {
 	_dev->driver->set(_dev, NETOPT_STATE, &state, sizeof(netopt_state_t));
 }
 
+/* checks if the device is off */
 bool is_off(void)
 {
 	return get_state() == NETOPT_STATE_OFF;
 }
 
+/* sets device state to OFF */
 void off(void)
 {
 	set_state(NETOPT_STATE_OFF);
 }
 
+/* sets device state to SLEEP */
 void sleep(void)
 {
 	set_state(NETOPT_STATE_SLEEP);
 }
 
+/* check if device state is IDLE */
 bool is_idle(void)
 {
 	return get_state() == NETOPT_STATE_IDLE;
 }
 
+/* set device state to IDLE */
 void idle(void)
 {
 	set_state(NETOPT_STATE_IDLE);
 }
 
+/* check if device is receiving a packet */
 bool is_rx(void)
 {
 	return get_state() == NETOPT_STATE_RX;
 }
 
-void rx(void)
-{
-	set_state(NETOPT_STATE_RX);
-}
-
-bool is_tx(void)
-{
-	return get_state() == NETOPT_STATE_TX;
-}
-
-void tx(void)
-{
-	set_state(NETOPT_STATE_TX);
-}
-
+/* turn on packet reception */
 void enable_rx(void)
 {
 	netopt_enable_t enable = true;
 	_dev->driver->set(_dev, NETOPT_RX_LISTENING, &enable, sizeof(enable));
 }
 
+/* turn off packet reception */
 void disable_rx(void)
 {
 	netopt_enable_t enable = true;
 	_dev->driver->set(_dev, NETOPT_RX_LISTENING, &enable, sizeof(enable));
 }
 
+/* init framebuffers and initial state */
 void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb)
 {
 	sTransmitFrame.mPsdu = tb;
@@ -149,11 +155,13 @@ void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb)
 	_dev->driver->set(_dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
 }
 
+/* Called upon NETDEV2_EVENT_RX_COMPLETE event */
 void recv_pkt(netdev2_t *dev)
 {
-	/* Read data from driver */
+	/* Read frame length from driver */
 	int len = dev->driver->recv(dev, NULL, 0, NULL);
 
+	/* Since OpenThread does the synchronization of rx/tx, it's necessary to turn off the receiver now */
 	idle();
 	disable_rx();
 
@@ -164,19 +172,22 @@ void recv_pkt(netdev2_t *dev)
 		return;
 	}
 
-	/* Fill OT receive frame */
+	/* Fill OpenThread receive frame */
 	sReceiveFrame.mLength = len;
 	sReceiveFrame.mPower = get_power();
 
 
+	/* Read received frame */
 	int res = dev->driver->recv(dev, (char*) sReceiveFrame.mPsdu, len, NULL);
 
 	/* Tell OpenThread that receive has finished */
-	otPlatRadioReceiveDone(res > 0 ? &sReceiveFrame : NULL, kThreadError_None);
+	otPlatRadioReceiveDone(res > 0 ? &sReceiveFrame : NULL, res > 0 ?kThreadError_None : kThreadError_Abort);
 }
 
+/* Called upon TX event */
 void send_pkt(netdev2_t *dev, netdev2_event_t event)
 {
+	/* Tell OpenThread transmission is done depending on the NETDEV2 event */
 	switch(event)
 	{
 		case NETDEV2_EVENT_TX_COMPLETE:
@@ -199,11 +210,13 @@ void send_pkt(netdev2_t *dev, netdev2_event_t event)
 			break;
 	}
 
+	/* Since the transmission is finished, turn off reception */
 	disable_rx();
 	idle();
 
 }
 
+/* OpenThread will call this for setting PAN ID */
 ThreadError otPlatRadioSetPanId(uint16_t panid)
 {
 	DEBUG("openthread: otPlatRadioSetPanId: setting PAN ID to %04x\n", panid);
@@ -211,6 +224,7 @@ ThreadError otPlatRadioSetPanId(uint16_t panid)
 	return kThreadError_None;
 }
 
+/* OpenThread will call this for setting extended address */
 ThreadError otPlatRadioSetExtendedAddress(uint8_t *aExtendedAddress)
 {
 	DEBUG("openthread: otPlatRadioSetExtendedAddress\n");
@@ -223,6 +237,7 @@ ThreadError otPlatRadioSetExtendedAddress(uint8_t *aExtendedAddress)
 	return kThreadError_None;
 }
 
+/* OpenThread will call this for setting short address */
 ThreadError otPlatRadioSetShortAddress(uint16_t aShortAddress)
 {
 	DEBUG("openthread: otPlatRadioSetShortAddress: setting address to %04x\n", aShortAddress);
@@ -230,6 +245,7 @@ ThreadError otPlatRadioSetShortAddress(uint16_t aShortAddress)
 	return kThreadError_None;
 }
 
+/* OpenThread will call this for enabling the radio */
 ThreadError otPlatRadioEnable(void)
 {
 	DEBUG("openthread: otPlatRadioEnable\n");
@@ -243,6 +259,7 @@ ThreadError otPlatRadioEnable(void)
 	return kThreadError_None;
 }
 
+/* OpenThread will call this for disabling the radio */
 ThreadError otPlatRadioDisable(void)
 {
 	DEBUG("openthread: otPlatRadioDisable\n");
@@ -250,6 +267,7 @@ ThreadError otPlatRadioDisable(void)
 	return kThreadError_None;
 }
 
+/* OpenThread will call this for setting device state to SLEEP */
 ThreadError otPlatRadioSleep(void)
 {
 	DEBUG("openthread: otPlatRadioSleep\n");
@@ -263,6 +281,7 @@ ThreadError otPlatRadioSleep(void)
 	return kThreadError_None;
 }
 
+/* OpenThread will call this for setting the device state to IDLE */
 ThreadError otPlatRadioIdle(void)
 {
 	DEBUG("openthread: otPlatRadioIdle\n");
@@ -273,12 +292,15 @@ ThreadError otPlatRadioIdle(void)
 		return kThreadError_Busy;
 	}
 
+	/* OpenThread will call this before calling otPlatRadioTransmit.
+	 * If a packet is received between this function and otPlatRadioTransmit OpenThread will fail! */
 	disable_rx();
 	idle();
 
 	return kThreadError_None;
 }
 
+/*OpenThread will call this for waiting the reception of a packet */
 ThreadError otPlatRadioReceive(uint8_t aChannel)
 {
 	DEBUG("openthread: otPlatRadioReceive\n");
@@ -291,18 +313,21 @@ ThreadError otPlatRadioReceive(uint8_t aChannel)
 	set_channel(aChannel);
 	sReceiveFrame.mChannel = aChannel;
 
+	/* enable the reception of packets */
 	enable_rx();
 
 	return kThreadError_None;
 }
 
 
+/* OpenThread will call this function to get the transmit buffer */
 RadioPacket *otPlatRadioGetTransmitBuffer(void)
 {
 	DEBUG("openthread: otPlatRadioGetTransmitBuffer\n");
 	return &sTransmitFrame;
 }
 
+/* OpenThread will call this for transmitting a packet*/
 ThreadError otPlatRadioTransmit(void)
 {
 	DEBUG("openthread: otPlatRadioTransmit\n");
@@ -319,6 +344,7 @@ ThreadError otPlatRadioTransmit(void)
 
 	struct iovec pkt;
 
+	/* Populate iovec with transmit data */
 	pkt.iov_base = sTransmitFrame.mPsdu;
 	pkt.iov_len = sTransmitFrame.mLength;
 
@@ -326,19 +352,24 @@ ThreadError otPlatRadioTransmit(void)
 	set_channel(sTransmitFrame.mChannel);
 	set_power(sTransmitFrame.mPower);
 
+	/* send packet though netdev2 */
 	_dev->driver->send(_dev, &pkt, 1);
+
+	/* need for waiting ACK */
 	enable_rx();
 
 	return kThreadError_None;
 }
 
 
+/* OpenThread will call this for getting the Noise Floor */
 int8_t otPlatRadioGetNoiseFloor(void)
 {
 	DEBUG("openthread: otPlatRadioGetNoiseFloor\n");
 	return 0;
 }
 
+/* OpenThread will call this for getting the radio caps */
 otRadioCaps otPlatRadioGetCaps(void)
 {
 	DEBUG("openthread: otPlatRadioGetCaps\n");
@@ -346,12 +377,14 @@ otRadioCaps otPlatRadioGetCaps(void)
 	return kRadioCapsNone;
 }
 
+/* OpenThread will call this for getting the state of promiscuous mode */
 bool otPlatRadioGetPromiscuous(void)
 {
 	DEBUG("openthread: otPlatRadioGetPromiscuous\n");
 	return is_promiscuous();
 }
 
+/* OpenThread will call this for setting the state of promiscuous mode */
 void otPlatRadioSetPromiscuous(bool aEnable)
 {
 	DEBUG("openthread: otPlatRadioSetPromiscuous\n");

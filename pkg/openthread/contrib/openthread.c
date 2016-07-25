@@ -48,12 +48,12 @@ static kw2xrf_t kw2xrf_dev;
 
 static uint8_t rx_buf[OPENTHREAD_NETDEV2_BUFLEN];
 static uint8_t tx_buf[OPENTHREAD_NETDEV2_BUFLEN];
-
-static char ot_thread_stack[3*THREAD_STACKSIZE_MAIN];
+static char ot_thread_stack[2*THREAD_STACKSIZE_MAIN];
 
 
 void openthread_bootstrap(void)
 {
+	/* init random */
 #ifdef CPUID_LEN
     char cpu_id[CPUID_LEN];
     cpuid_get(cpu_id);
@@ -67,6 +67,7 @@ void openthread_bootstrap(void)
     random_init(0);
 #endif
 
+	/* setup netdev modules */
 #ifdef MODULE_AT86RF2XX
 	at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0]);
 	netdev2_t *netdev = (netdev2_t*) &at86rf2xx_dev;

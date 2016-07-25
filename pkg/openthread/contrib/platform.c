@@ -39,17 +39,14 @@
 
 static mutex_t mtx = MUTEX_INIT;
 
+/* call this when calling an OpenThread function */
 void begin_mutex(void)
 {
 	mutex_lock(&mtx);
 }
 
+/* call this after an OpenThread function is called */
 void end_mutex(void)
 {
 	mutex_unlock(&mtx);
-}
-
-void PlatformInit(void)
-{
-    otPlatUartEnable();
 }

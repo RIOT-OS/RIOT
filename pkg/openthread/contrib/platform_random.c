@@ -6,6 +6,7 @@
 #define ENABLE_DEBUG (1)
 #include "debug.h"
 
+/* OpenThread will call this for getting a random value */
 uint32_t otPlatRandomGet(void)
 {
 	return random_uint32();

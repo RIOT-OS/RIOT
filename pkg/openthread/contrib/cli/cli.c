@@ -10,6 +10,7 @@
 
 static char buf[100];
 
+/* init and run OpeanThread's Command Line Interface */
 void openthread_cli_run(void)
 {
 	msg_t msg;
