@@ -17,9 +17,19 @@ QUIET ?= 1
 USEMODULE+=openthread
 USEMODULE+=openthread_cli
 
-#USEMODULE += at86rf233
-USEMODULE += at86rf231
-#USEMODULE += kw2xrf
+
+ifneq (,$(filter samr21-xpro,$(BOARD)))
+  DRIVER := at86rf233
+endif
+ifneq (,$(filter iotlab-m3 fox,$(BOARD)))
+  DRIVER := at86rf231
+endif
+
+ifneq (,$(filter at86rf2%,$(DRIVER)))
+  FEATURES_REQUIRED = periph_spi periph_gpio
+endif
+
+USEMODULE += $(DRIVER)
 
 USEMODULE+=random
 USEMODULE+=hashes
@@ -30,7 +40,5 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += ipv6_addr
-
-FEATURES_REQUIRED += periph_i2c
 
 include $(RIOTBASE)/Makefile.include
