@@ -33,6 +33,7 @@ void _event_cb(netdev2_t *dev, netdev2_event_t event);
 kernel_pid_t openthread_get_pid(void);
 void begin_mutex(void);
 void end_mutex(void);
+void ot_random_init(void);
 #ifdef __cplusplus
 }
 #endif

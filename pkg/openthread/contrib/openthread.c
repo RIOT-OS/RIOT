@@ -68,18 +68,7 @@ void end_mutex(void)
 void openthread_bootstrap(void)
 {
 	/* init random */
-#ifdef CPUID_LEN
-    char cpu_id[CPUID_LEN];
-    cpuid_get(cpu_id);
-    uint32_t seed = 0;
-    for(int i=0;i<(int) CPUID_LEN;i++)
-    {
-        seed += cpu_id[i];
-    }
-    random_init(seed);
-#else
-    random_init(0);
-#endif
+	ot_random_init();
 
 	/* setup netdev modules */
 #ifdef MODULE_AT86RF2XX
