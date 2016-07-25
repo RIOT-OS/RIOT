@@ -7,15 +7,10 @@
  */
 
 /**
- * @ingroup     pkg_openthread
  * @{
  *
  * @file
- * @brief       OpenThread platform abstraction for random numbers
- *
- * @author      José Ignacio Alamos <jialamos@uc.cl>
- *
- * @}
+ * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
 
 #include <stdint.h>
@@ -50,3 +45,4 @@ uint32_t otPlatRandomGet(void)
 	return random_uint32();
 }
 
+/** @} */

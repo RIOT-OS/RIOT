@@ -7,16 +7,12 @@
  */
 
 /**
- * @ingroup     pkg_openthread
  * @{
  *
  * @file
- * @brief       Conn UDP wrappers for OpenThread
- *
- * @author      José Ignacio Alamos <jialamos@uc.cl>
- *
- * @}
+ * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
+
 #include "net/conn/udp.h"
 #include "conn.h"
 #include "stdio.h"
@@ -129,3 +125,4 @@ int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len, void *addr, 
 	}
 	return 0;
 }
+/** @} */

@@ -7,15 +7,10 @@
  */
 
 /**
- * @ingroup     pkg_openthread
  * @{
  *
  * @file
- * @brief       Port of OpenThread
- *
- * @author      José Ignacio Alamos <jialamos@uc.cl>
- *
- * @}
+ * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
 
 #include "thread.h"
@@ -104,3 +99,4 @@ void openthread_bootstrap(void)
     openthread_netdev2_init(ot_thread_stack, sizeof(ot_thread_stack), THREAD_PRIORITY_MAIN - 1, "ot_thread", netdev);
 }
 
+/** @} */

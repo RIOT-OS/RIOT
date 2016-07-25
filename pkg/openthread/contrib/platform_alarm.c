@@ -7,15 +7,10 @@
  */
 
 /**
- * @ingroup     pkg_openthread
  * @{
  *
  * @file
- * @brief       OpenThread platform abstraction for timers
- *
- * @author      José Ignacio Alamos <jialamos@uc.cl>
- *
- * @}
+ * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
 
 #include <stdint.h>
@@ -63,3 +58,4 @@ uint32_t otPlatAlarmGetNow(void)
 	DEBUG("openthread: otPlatAlarmGetNow: %i\n", (int) now);
 	return now;
 }
+/** @} */

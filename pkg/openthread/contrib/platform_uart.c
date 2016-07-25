@@ -7,15 +7,10 @@
  */
 
 /**
- * @ingroup     pkg_openthread
  * @{
  *
  * @file
- * @brief       OpenThread platform abstraction for UART
- *
- * @author      José Ignacio Alamos <jialamos@uc.cl>
- *
- * @}
+ * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
 
 #include <stdint.h>
@@ -47,3 +42,4 @@ ThreadError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
 	return kThreadError_None;
 }
 
+/** @} */

@@ -1,3 +1,17 @@
+/*
+ * Copyright (C) 2016 José Ignacio Alamos
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @{
+ *
+ * @file
+ * @author  José Ignacio Alamos <jialamos@uc.cl>
+ */
 #include "msg.h"
 #include <stdio.h>
 #include "ot.h"
@@ -38,3 +52,4 @@ void openthread_cli_run(void)
         }
 	}
 }
+/** @} */

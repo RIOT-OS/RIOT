@@ -7,15 +7,10 @@
  */
 
 /**
- * @ingroup     pkg_openthread
  * @{
  *
  * @file
- * @brief       OpenThread platform abstraction for radio
- *
- * @author      José Ignacio Alamos <jialamos@uc.cl>
- *
- * @}
+ * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
 
 #include <stdio.h>
@@ -409,3 +404,4 @@ void otPlatRadioSetPromiscuous(bool aEnable)
 	 set_promiscuous((aEnable) ? NETOPT_ENABLE : NETOPT_DISABLE);
 }
 
+/** @} */

@@ -7,15 +7,10 @@
  */
 
 /**
- * @ingroup     pkg_openthread
  * @{
  *
  * @file
- * @brief       netdev2 abstraction of OpenThread
- *
- * @author      José Ignacio Alamos <jialamos@uc.cl>
- *
- * @}
+ * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
 
 #include "ot.h"
@@ -165,3 +160,4 @@ int openthread_netdev2_init(char *stack, int stacksize, char priority,
 
    return _pid;
 }
+/** @} */
