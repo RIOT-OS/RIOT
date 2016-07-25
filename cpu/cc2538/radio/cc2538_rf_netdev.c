@@ -300,12 +300,19 @@ static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
         /* GNRC wants to know how much data we've got for it */
         pkt_len = rfcore_read_byte();
 
-        /* If the value of the first byte of the RX FIFO does not correspond
-           to the amount of data received, then drop the packet. */
-        if (pkt_len != RFCORE_XREG_RXFIFOCNT) {
+        /* Make sure pkt_len is sane */
+        if (pkt_len > CC2538_RF_MAX_DATA_LEN) {
             RFCORE_SFR_RFST = ISFLUSHRX;
             mutex_unlock(&dev->mutex);
             return -EOVERFLOW;
+        }
+
+        /* CRC check */
+        if (!(rfcore_peek_rx_fifo(pkt_len) & 0x80)) {
+            /* CRC failed; discard packet */
+            RFCORE_SFR_RFST = ISFLUSHRX;
+            mutex_unlock(&dev->mutex);
+            return -ENODATA;
         }
 
         if (len > 0) {
