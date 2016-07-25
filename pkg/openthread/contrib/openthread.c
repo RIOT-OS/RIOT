@@ -14,7 +14,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#include "platform.h"
 #include "platform/alarm.h"
 #include "platform/uart.h"
 
@@ -25,6 +24,7 @@
 #include "periph/cpuid.h"
 
 #include "openthread.h"
+#include "mutex.h"
 #include "ot.h"
 
 
@@ -50,6 +50,20 @@ static uint8_t rx_buf[OPENTHREAD_NETDEV2_BUFLEN];
 static uint8_t tx_buf[OPENTHREAD_NETDEV2_BUFLEN];
 static char ot_thread_stack[2*THREAD_STACKSIZE_MAIN];
 
+
+static mutex_t mtx = MUTEX_INIT;
+
+/* call this when calling an OpenThread function */
+void begin_mutex(void)
+{
+	mutex_lock(&mtx);
+}
+
+/* call this after an OpenThread function is called */
+void end_mutex(void)
+{
+	mutex_unlock(&mtx);
+}
 
 void openthread_bootstrap(void)
 {

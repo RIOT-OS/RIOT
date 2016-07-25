@@ -1,6 +1,5 @@
 #include "ot.h"
 #include "msg.h"
-#include "platform.h"
 #include "openthread.h"
 
 #include "platform/alarm.h"

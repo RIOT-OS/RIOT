@@ -31,6 +31,8 @@ int openthread_netdev2_init(char *stack, int stacksize, char priority,
 
 void _event_cb(netdev2_t *dev, netdev2_event_t event);
 kernel_pid_t openthread_get_pid(void);
+void begin_mutex(void);
+void end_mutex(void);
 #ifdef __cplusplus
 }
 #endif
