@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Eistec AB
+ * Copyright (C) 2015-2016 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -99,21 +99,21 @@ typedef uint64_t I8;
  * @param[in]  n         width of the data, in bytes
  */
 #define TEMPLATE_ATOMIC_COMPARE_EXCHANGE_N(n) \
-    bool __atomic_compare_exchange_##n (volatile void *ptr, void *expected, I##n desired, \
+    bool __atomic_compare_exchange_##n (I##n *ptr, I##n *expected, I##n desired, \
         bool weak, int success_memorder, int failure_memorder) \
     { \
         (void) weak;                       \
         (void) success_memorder;           \
         (void) failure_memorder;           \
         unsigned int mask = irq_disable(); \
-        I##n cur = *((I##n*)ptr);          \
-        if (cur != *((I##n*)expected)) {   \
-            *((I##n*)expected) = cur;      \
+        I##n cur = *ptr;                   \
+        if (cur != *expected) {            \
+            *expected = cur;               \
             irq_restore(mask);             \
             return false;                  \
         }                                  \
                                            \
-        *((volatile I##n*)ptr) = desired;  \
+        *ptr = desired;                    \
         irq_restore(mask);                 \
         return true;                       \
     }
@@ -127,12 +127,12 @@ typedef uint64_t I8;
  * @param[in]  prefixop  optional prefix unary operator (use ~ for inverting, NAND, NOR etc)
  */
 #define TEMPLATE_ATOMIC_FETCH_OP_N(opname, op, n, prefixop) \
-    I##n __atomic_fetch_##opname##_##n(volatile void *ptr, I##n val, int memmodel) \
+    I##n __atomic_fetch_##opname##_##n(I##n *ptr, I##n val, int memmodel) \
     { \
         unsigned int mask = irq_disable();    \
         (void)memmodel;                       \
-        I##n tmp = *((I##n*)ptr);             \
-        *((I##n*)ptr) = prefixop(tmp op val); \
+        I##n tmp = *ptr;                      \
+        *ptr = prefixop(tmp op val);          \
         irq_restore(mask);                    \
         return tmp;                           \
     }
@@ -146,12 +146,12 @@ typedef uint64_t I8;
  * @param[in]  prefixop  optional prefix unary operator (use ~ for inverting, NAND, NOR etc)
  */
 #define TEMPLATE_ATOMIC_OP_FETCH_N(opname, op, n, prefixop) \
-    I##n __atomic_##opname##_fetch_##n(volatile void *ptr, I##n val, int memmodel) \
+    I##n __atomic_##opname##_fetch_##n(I##n *ptr, I##n val, int memmodel) \
     { \
         (void)memmodel;                                 \
         unsigned int mask = irq_disable();              \
-        *((I##n*)ptr) = prefixop(*((I##n*)ptr) op val); \
-        I##n tmp = *((I##n*)ptr);                       \
+        I##n tmp = prefixop((*ptr) op val);             \
+        *ptr = tmp;                                     \
         irq_restore(mask);                              \
         return tmp;                                     \
     }
