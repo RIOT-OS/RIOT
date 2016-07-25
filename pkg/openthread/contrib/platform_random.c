@@ -5,6 +5,7 @@
 
 #define ENABLE_DEBUG (1)
 #include "debug.h"
+#include "periph/cpuid.h"
 
 /* OpenThread will call this for getting a random value */
 
