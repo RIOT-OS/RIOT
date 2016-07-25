@@ -21,7 +21,6 @@
 #include <cli/cli-uart.h>
 #include "xtimer.h"
 #include "random.h"
-#include "periph/cpuid.h"
 
 #include "openthread.h"
 #include "mutex.h"

@@ -20,7 +20,7 @@ void ot_random_init(void)
     }
     random_init(seed);
 #else
-    random_init(0);
+	#error "CPU not supported (current CPU doesn't provide CPUID, required for entropy)"
 #endif
 }
 
