@@ -1,0 +1,2 @@
+USEPKG += tweetnacl
+USEMODULE += random
