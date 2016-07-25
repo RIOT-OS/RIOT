@@ -74,9 +74,11 @@ int bmp180_init(bmp180_t *dev, i2c_t i2c, uint8_t mode)
         return -1;
     }
 
+    /* adding delay before reading calibration values to avoid timing issues */
+    xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
+
     char buffer[22] = {0};
     /* Read calibration values, using contiguous register addresses */
-    i2c_write_byte(dev->i2c_dev, BMP180_ADDR, (char)BMP180_CALIBRATION_AC1);
     if (i2c_read_regs(dev->i2c_dev, BMP180_ADDR, BMP180_CALIBRATION_AC1, buffer, 22) < 0) {
         DEBUG("[Error] Cannot read calibration registers.\n");
         i2c_release(dev->i2c_dev);
