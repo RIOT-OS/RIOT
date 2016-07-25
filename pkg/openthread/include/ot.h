@@ -48,18 +48,65 @@ typedef struct {
 	size_t len; /**< length of the message */
 } serial_msg_t;
 
+/**
+ * @brief   gets packet from driver and tells OpenThread about the reception.
+ *
+ * @internal
+ */
 void recv_pkt(netdev2_t *dev);
+
+/**
+ * @brief   Inform OpenThread when tx is finished
+ *
+ * @internal
+ */
 void send_pkt(netdev2_t *dev, netdev2_event_t event);
+
+/**
+ * @brief   bootstrap OpenThread
+ *
+ */
 void openthread_bootstrap(void);
+
+/**
+ * @brief   init OpenThread radio
+ *
+ */
 void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb);
-void *_openthread_event_loop(void *arg);
+
+
+/**
+ * @brief   Starts OpenThread thread.
+ *
+ */
 int openthread_netdev2_init(char *stack, int stacksize, char priority, const char *name, netdev2_t *netdev);
 
-void _event_cb(netdev2_t *dev, netdev2_event_t event);
+/**
+ * @brief   get PID of OpenThread thread.
+ *
+ */
 kernel_pid_t openthread_get_pid(void);
+
+
+/**
+ * @brief   begin OpenThread mutex. Must be called before calling any OpenThread function.
+ *
+ */
 void begin_mutex(void);
+
+/**
+ * @brief   end OpenThread mutex
+ *
+ */
 void end_mutex(void);
+
+
+/**
+ * @brief   Init OpenThread random
+ *
+ */
 void ot_random_init(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -22,6 +22,10 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Run OpenThread CLI
+ *
+ */
 void openthread_cli_run(void);
 
 #ifdef __cplusplus

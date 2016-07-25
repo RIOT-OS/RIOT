@@ -25,15 +25,23 @@ extern "C" {
 #endif
 
 
+/**
+ *  * @brief   conn_udp definition for OpenThread
+ *  
+ */
 struct conn_udp {
-	otUdpSocket mSocket;
-	otMessageInfo mPeer;
-	kernel_pid_t receiver_pid;
+	otUdpSocket mSocket; /**< OpenThread UDP socket */
+	otMessageInfo mPeer; /**< Information about peer */
+	kernel_pid_t receiver_pid; /**< PID of thread listening to packets */
 };
 
+/**
+ *  * @brief   Contains packets and relevant information.
+ *  
+ */
 typedef struct conn_udp_msg_t {
-	otMessage message;
-	otMessageInfo *message_info;
+	otMessage message; /**< the message received */
+	otMessageInfo *message_info; /**< information about the message */
 } conn_udp_msg_t;
 
 #ifdef __cplusplus
