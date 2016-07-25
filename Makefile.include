@@ -3,6 +3,9 @@
 
 all:
 
+all-debug: all
+    ALL_DEBUG_BUILD=1
+
 # set undefined variables
 RIOTBASE       ?= $(dir $(lastword $(MAKEFILE_LIST)))
 CCACHE_BASEDIR ?= $(RIOTBASE)

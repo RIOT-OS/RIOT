@@ -2,10 +2,11 @@
 export TARGET_ARCH ?= msp430
 
 # define build specific options
-CFLAGS_CPU   = -mmcu=$(CPU_MODEL)
-CFLAGS_LINK  =
-CFLAGS_DBG   = -gdwarf-2
-CFLAGS_OPT  ?= -Os
+CFLAGS_CPU    = -mmcu=$(CPU_MODEL)
+CFLAGS_LINK   =
+CFLAGS_DBG    = -gdwarf-2
+CFLAGS_OPT   ?= -Os
+MUST_OPTIMIZE = 1
 # export compiler flags
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 # export assmebly flags
