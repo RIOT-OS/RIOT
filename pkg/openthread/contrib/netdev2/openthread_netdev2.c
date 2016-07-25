@@ -20,6 +20,7 @@ static msg_t _queue[OPENTHREAD_QUEUE_LEN];
 
 static kernel_pid_t _pid;
 
+
 void otSignalTaskletPending(void)
 {
 }
@@ -44,12 +45,16 @@ void *_openthread_event_loop(void *arg)
 
 	while(1)
 	{
+		begin_mutex();
 		otProcessNextTasklet();
+		end_mutex();
 		msg_receive(&msg);
 		switch(msg.type)
 		{
 			case OPENTHREAD_XTIMER_MSG_TYPE_EVENT:
+				begin_mutex();
 				otPlatAlarmFired();
+				end_mutex();
 				break;
 			case OPENTHREAD_NETDEV2_MSG_TYPE_EVENT:
 				dev = (netdev2_t*) msg.content.ptr;
@@ -58,7 +63,9 @@ void *_openthread_event_loop(void *arg)
 #ifdef MODULE_OPENTHREAD_CLI
 			case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
 				ser = (serial_msg_t*) msg.content.ptr;
+				begin_mutex();
 				otPlatUartReceived((uint8_t*) ser->buf, ser->len);
+				end_mutex();
 				break;
 #endif
 				

@@ -35,6 +35,19 @@
 #include <platform/uart.h>
 #include "platform.h"
 #include <stdio.h>
+#include "mutex.h"
+
+static mutex_t mtx = MUTEX_INIT;
+
+void begin_mutex(void)
+{
+	mutex_lock(&mtx);
+}
+
+void end_mutex(void)
+{
+	mutex_unlock(&mtx);
+}
 
 void PlatformInit(void)
 {

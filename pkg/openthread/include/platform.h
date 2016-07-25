@@ -41,6 +41,8 @@
 extern "C" {
 #endif
 
+void begin_mutex(void);
+void end_mutex(void);
 /**
  * This method performs all platform-specific initialization.
  *
