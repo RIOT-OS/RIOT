@@ -27,6 +27,14 @@ size_t ieee802154_set_frame_hdr(uint8_t *buf, const uint8_t *src, size_t src_len
     uint8_t type = (flags & IEEE802154_FCF_TYPE_MASK);
     uint8_t bcast = (flags & IEEE802154_BCAST);
 
+    if (dst_pan.u16 == src_pan.u16 &&
+        (src_len != 0 && dst_len != 0)) {
+        flags |= IEEE802154_FCF_PAN_COMP;
+    }
+    else {
+        flags &= ~IEEE802154_FCF_PAN_COMP;
+    }
+
     buf[0] = flags & (~IEEE802154_BCAST);
     buf[1] = IEEE802154_FCF_VERS_V1;
 
