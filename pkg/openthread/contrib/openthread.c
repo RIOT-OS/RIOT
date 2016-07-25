@@ -81,10 +81,7 @@ void openthread_bootstrap(void)
 	netdev2_t *netdev = (netdev2_t*) &kw2xrf_dev;
 #endif
 
-	netdev->driver->init(netdev);
-	netdev->event_callback = _event_cb;
-
 	openthread_radio_init(netdev, tx_buf, rx_buf);
-    openthread_netdev2_init(ot_thread_stack, sizeof(ot_thread_stack), THREAD_PRIORITY_MAIN - 1, "ot_thread");
+    openthread_netdev2_init(ot_thread_stack, sizeof(ot_thread_stack), THREAD_PRIORITY_MAIN - 1, "ot_thread", netdev);
 }
 

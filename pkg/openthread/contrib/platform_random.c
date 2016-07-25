@@ -7,8 +7,7 @@
 #include "debug.h"
 #include "periph/cpuid.h"
 
-/* OpenThread will call this for getting a random value */
-
+/* init random */
 void ot_random_init(void)
 {
 #ifdef CPUID_LEN
@@ -25,6 +24,7 @@ void ot_random_init(void)
 #endif
 }
 
+/* OpenThread will call this to get a random number */
 uint32_t otPlatRandomGet(void)
 {
 	return random_uint32();

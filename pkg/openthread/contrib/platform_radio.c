@@ -151,8 +151,6 @@ void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb)
 	sReceiveFrame.mPsdu = rb;
 	sReceiveFrame.mLength = 0;
 	_dev = dev;
-	netopt_enable_t enable = NETOPT_ENABLE;
-	_dev->driver->set(_dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
 }
 
 /* Called upon NETDEV2_EVENT_RX_COMPLETE event */

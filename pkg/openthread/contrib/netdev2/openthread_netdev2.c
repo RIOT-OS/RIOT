@@ -122,8 +122,15 @@ kernel_pid_t openthread_get_pid(void)
 
 /* starts OpenThread thread */
 int openthread_netdev2_init(char *stack, int stacksize, char priority,
-		                        const char *name)
+		                        const char *name, netdev2_t *netdev)
 {
+
+	netdev->driver->init(netdev);
+	netdev->event_callback = _event_cb;
+
+	netopt_enable_t enable = NETOPT_ENABLE;
+	netdev->driver->set(netdev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
+
    _pid = thread_create(stack, stacksize,
                            priority, THREAD_CREATE_STACKTEST,
 			                                _openthread_event_loop, NULL, name);

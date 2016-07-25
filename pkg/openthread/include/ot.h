@@ -26,8 +26,7 @@ void send_pkt(netdev2_t *dev, netdev2_event_t event);
 void openthread_bootstrap(void);
 void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb);
 void *_openthread_event_loop(void *arg);
-int openthread_netdev2_init(char *stack, int stacksize, char priority,
-		                        const char *name);
+int openthread_netdev2_init(char *stack, int stacksize, char priority, const char *name, netdev2_t *netdev);
 
 void _event_cb(netdev2_t *dev, netdev2_event_t event);
 kernel_pid_t openthread_get_pid(void);
