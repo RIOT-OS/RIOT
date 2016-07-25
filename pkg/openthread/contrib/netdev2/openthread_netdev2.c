@@ -1,10 +1,28 @@
+/*
+ * Copyright (C) 2016 José Ignacio Alamos
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     pkg_openthread
+ * @{
+ *
+ * @file
+ * @brief       netdev2 abstraction of OpenThread
+ *
+ * @author      José Ignacio Alamos <jialamos@uc.cl>
+ *
+ * @}
+ */
+
 #include "ot.h"
 #include "msg.h"
 #include "openthread.h"
-
 #include "platform/alarm.h"
 #include "platform/uart.h"
-
 #include <cli/cli-uart.h>
 #include <assert.h>
 
@@ -29,7 +47,11 @@ void otSignalTaskletPending(void)
 void *_openthread_event_loop(void *arg)
 {
 	_pid = thread_getpid();
+
+	/* enable OpenThread UART */
     otPlatUartEnable();
+
+	/* init OpenThread */
     otInit();
 
 	msg_init_queue(_queue, OPENTHREAD_QUEUE_LEN);
@@ -40,7 +62,10 @@ void *_openthread_event_loop(void *arg)
 	serial_msg_t *ser;
 	otCliUartInit();
 #else
+	/* equivalent to "start" command of OpenThread CLI */
 	otEnable();
+
+	/* It's necessary to call this after otEnable. Otherwise will freeze */
 	otProcessNextTasklet();
 #endif
 

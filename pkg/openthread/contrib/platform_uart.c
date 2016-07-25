@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2016 José Ignacio Alamos
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     pkg_openthread
+ * @{
+ *
+ * @file
+ * @brief       OpenThread platform abstraction for UART
+ *
+ * @author      José Ignacio Alamos <jialamos@uc.cl>
+ *
+ * @}
+ */
+
 #include <stdint.h>
 #include <stdio.h>
 
