@@ -32,9 +32,6 @@ endif
 USEMODULE += $(DRIVER)
 
 USEMODULE+=random
-USEMODULE+=hashes
-USEMODULE+=crypto
-USEMODULE+=cipher_modes
 
 USEMODULE += shell
 USEMODULE += shell_commands
