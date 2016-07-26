@@ -13,7 +13,7 @@ as `make BOARD=myplatform`.
 
 If XBee is connected to a UART port other than 0, change `XBEE_UART` variable
 in the Makefile. If the baudrate is other than 9600, configure it in
-`xbee_conf.h`.
+`xbee_params.h`.
 
 ![organization of modules and devices](img/page_001.png)
 
@@ -21,13 +21,17 @@ in the Makefile. If the baudrate is other than 9600, configure it in
 
 ### OS X
 
+Tips: You may need GNU binutils to build RIOT on OS X.
+You may need to set PATH to binutils installation directory manually.
+
 #### Scenario 1, getting started.
 
 1. Install [TunTap] (http://tuntaposx.sourceforge.net/).
-2. `sudo ./bin/native/gnrc_xbee_border_router.elf tap0 -c /dev/tty.usbserial-00000000`
+2. `sudo ./bin/native/gnrc_xbee_border_router.elf tap0 -c /dev/tty.usbserial-00000000`,
+   where `/dev/tty.usbserial-00000000` is replaced with your device file.
 3. In RIOT: `ifconfig`.
    You will see two interfaces: one for wireless (XBee) and one for wired
-   (ethernet).
+   (ethernet). If not, check `xbee_params.h` for baudrate.
 4. In RIOT: `ifconfig 6 add unicast fd00::2/64`, where 6 is replaced with
    the ID of the wireless interface.
 5. In RIOT: `ifconfig 7 add unicast fd01::2/64`, where 7 is replaced with
@@ -38,8 +42,8 @@ in the Makefile. If the baudrate is other than 9600, configure it in
    You will see responces from RIOT.
 8. On OS X, `sudo route -n add -inet6 -prefixlen 64 fd00:: fd01::2`.
 9. Optionally, on OS X, `ping6 fd00::3`.
-   RIOT searches `fd00::3` over XBee, so that you will see LEDs, if present, on
-   your USB-serial interface blinking.
+   RIOT searches `fd00::3` over XBee, so you will see LEDs on your USB-serial
+   adapter, if present,  blinking.
 
 ![](img/page_002.png)
 
@@ -72,8 +76,8 @@ Suppose we have two OS Xs, `OS X 1` and `OS X 2`, with XBees connected.
     with the ID of the wired interface.
 11. On OS X 2, `sudo ifconfig tap0 inet6 fd02::1/64 up`.
     Now tap0 has `fd02::1` on OS X 2, `fd02::2` on RIOT 2.
-12. On OS X 2, `sudo route -n add -inet6 -prefixlen 64 fd00:: fd01::2`.
-13. On OS X 2, `sudo route -n add -inet6 -prefixlen 64 fd01:: fd01::2`.
+12. On OS X 2, `sudo route -n add -inet6 -prefixlen 64 fd00:: fd02::2`.
+13. On OS X 2, `sudo route -n add -inet6 -prefixlen 64 fd01:: fd02::2`.
 14. On OS X 2, `nc -6 -l 8888`.
 15. On OS X 1, `nc -6 fd02::1 8888`.
 16. On OS X 1, type some lines on the terminal. The lines will appear on OS X 2.
@@ -91,7 +95,7 @@ with `OS X 3` but `OS X 1` cannot communicate with `OS X 3` directly.  Uncomment
 ![](img/page_005.png)
 
 1. On OS X 1, `sudo ./bin/native/gnrc_xbee_border_router.elf tap0 -c /dev/tty.usbserial-00000000`.
-2. On OS X 2 and 3, goto `examples/gnrc_border_router` directory then
+2. On OS X 2 and 3, goto `examples/gnrc_xbee_router` directory, then
    `sudo ./bin/native/gnrc_xbee_router.elf -c /dev/tty.usbserial-00000000`.
 3. In RIOT 1: `ifconfig 6 add unicast fd00::2/64`, where 6 is replaced with
    the ID of the wireless interface.
