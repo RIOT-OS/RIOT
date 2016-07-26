@@ -204,7 +204,7 @@ void sha256_init(sha256_context_t *ctx)
 }
 
 /* Add bytes into the hash */
-void sha256_update(sha256_context_t *ctx, const uint8_t *data, size_t len)
+void sha256_update(sha256_context_t *ctx, const void *data, size_t len)
 {
     /* Number of bytes left in the buffer from previous updates */
     uint32_t r = (ctx->count[1] >> 3) & 0x3f;
@@ -249,7 +249,7 @@ void sha256_update(sha256_context_t *ctx, const uint8_t *data, size_t len)
  * SHA-256 finalization.  Pads the input data, exports the hash value,
  * and clears the context state.
  */
-void sha256_final(sha256_context_t *ctx, uint8_t *dst)
+void sha256_final(sha256_context_t *ctx, void *dst)
 {
     /* Add padding */
     sha256_pad(ctx);
@@ -261,27 +261,24 @@ void sha256_final(sha256_context_t *ctx, uint8_t *dst)
     memset((void *) ctx, 0, sizeof(*ctx));
 }
 
-unsigned char *sha256(const unsigned char *d, size_t n, unsigned char *md)
+void *sha256(const void *data, size_t len, void *digest)
 {
     sha256_context_t c;
     static unsigned char m[SHA256_DIGEST_LENGTH];
 
-    if (md == NULL) {
-        md = m;
+    if (digest == NULL) {
+        digest = m;
     }
 
     sha256_init(&c);
-    sha256_update(&c, d, n);
-    sha256_final(&c, md);
+    sha256_update(&c, data, len);
+    sha256_final(&c, digest);
 
-    return md;
+    return digest;
 }
 
-const unsigned char *hmac_sha256(const unsigned char *key,
-                                 size_t key_length,
-                                 const unsigned *message,
-                                 size_t message_length,
-                                 unsigned char *result)
+const void *hmac_sha256(const void *key, size_t key_length,
+                        const void *data, size_t len, void *digest)
 {
     unsigned char k[SHA256_INTERNAL_BLOCK_SIZE];
 
@@ -316,13 +313,13 @@ const unsigned char *hmac_sha256(const unsigned char *key,
 
     sha256_init(&c);
     sha256_update(&c, i_key_pad, SHA256_INTERNAL_BLOCK_SIZE);
-    sha256_update(&c, (uint8_t *)message, message_length);
+    sha256_update(&c, data, len);
     sha256_final(&c, tmp);
 
     static unsigned char m[SHA256_DIGEST_LENGTH];
 
-    if (result == NULL) {
-        result = m;
+    if (digest == NULL) {
+        digest = m;
     }
 
     /*
@@ -332,9 +329,9 @@ const unsigned char *hmac_sha256(const unsigned char *key,
     sha256_init(&c);
     sha256_update(&c, o_key_pad, SHA256_INTERNAL_BLOCK_SIZE);
     sha256_update(&c, tmp, SHA256_DIGEST_LENGTH);
-    sha256_final(&c, result);
+    sha256_final(&c, digest);
 
-    return result;
+    return digest;
 }
 
 /**
@@ -352,8 +349,8 @@ static inline void sha256_inplace(unsigned char element[SHA256_DIGEST_LENGTH])
     sha256_final(&ctx, element);
 }
 
-unsigned char *sha256_chain(const unsigned char *seed, size_t seed_length,
-                            size_t elements, unsigned char *tail_element)
+void *sha256_chain(const void *seed, size_t seed_length,
+                   size_t elements, void *tail_element)
 {
     unsigned char tmp_element[SHA256_DIGEST_LENGTH];
 
@@ -374,12 +371,12 @@ unsigned char *sha256_chain(const unsigned char *seed, size_t seed_length,
     return tail_element;
 }
 
-unsigned char *sha256_chain_with_waypoints(const unsigned char *seed,
-                                           size_t seed_length,
-                                           size_t elements,
-                                           unsigned char *tail_element,
-                                           sha256_chain_idx_elm_t *waypoints,
-                                           size_t *waypoints_length)
+void *sha256_chain_with_waypoints(const void *seed,
+                                  size_t seed_length,
+                                  size_t elements,
+                                  void *tail_element,
+                                  sha256_chain_idx_elm_t *waypoints,
+                                  size_t *waypoints_length)
 {
     /* assert if no sha256-chain can be created */
     assert(elements >= 2);
@@ -452,9 +449,9 @@ unsigned char *sha256_chain_with_waypoints(const unsigned char *seed,
     }
 }
 
-int sha256_chain_verify_element(unsigned char *element,
+int sha256_chain_verify_element(void *element,
                                 size_t element_index,
-                                unsigned char *tail_element,
+                                void *tail_element,
                                 size_t chain_length)
 {
     unsigned char tmp_element[SHA256_DIGEST_LENGTH];
@@ -464,7 +461,7 @@ int sha256_chain_verify_element(unsigned char *element,
     /* assert if we have an index mismatch */
     assert(delta_count >= 1);
 
-    memcpy((void *)tmp_element, (void *)element, SHA256_DIGEST_LENGTH);
+    memcpy((void *)tmp_element, element, SHA256_DIGEST_LENGTH);
 
     /* perform all consecutive iterations down to tail_element */
     for (int i = 0; i < (delta_count - 1); ++i) {
