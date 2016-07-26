@@ -39,9 +39,6 @@ static unsigned char _cont_buf[BUF_SIZE];
 static const char *_default_content = "Start the RIOT!";
 static unsigned char _out[CCNL_MAX_PACKET_SIZE];
 
-/* check for one-time initialization */
-static bool started = false;
-
 /* usage for open command */
 static void _open_usage(void)
 {
@@ -51,8 +48,8 @@ static void _open_usage(void)
 int _ccnl_open(int argc, char **argv)
 {
     /* check if already running */
-    if (started) {
-        puts("Already opened an interface for CCN!");
+    if (ccnl_relay.ifcount >= CCNL_MAX_INTERFACES) {
+        puts("Already opened max. number of interfaces for CCN!");
         return -1;
     }
 
@@ -77,8 +74,6 @@ int _ccnl_open(int argc, char **argv)
         puts("Error registering at network interface!");
         return -1;
     }
-
-    started = true;
 
     return 0;
 }
