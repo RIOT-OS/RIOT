@@ -458,6 +458,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     uint32_t tx_conf;
     uint32_t rx_conf;
     uint32_t periph_addr_reg;
+    char temp_local;
 
     switch (dev) {
 #if SPI_0_EN
@@ -500,6 +501,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     if (in == NULL) {
         /* channel - medium priority - peripheral to memory - complete interrupt enable */
         rx_conf = ((rx_channel << 25) | DMA_SxCR_PL_0 | DMA_SxCR_TCIE);
+	in = &temp_local;
     }
     else {
         /* channel - medium priority - peripheral to memory - memory increment - complete interrupt enable */
@@ -509,6 +511,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     if (out == NULL) {
         /* channel - medium priority - memory to peripheral - complete interrupt enable*/
         tx_conf = ((tx_channel << 25) | DMA_SxCR_PL_0 | DMA_SxCR_DIR_0 | DMA_SxCR_TCIE);
+	out = &temp_local;
     }
     else {
         /* channel - medium priority - memory to peripheral - memory increment - complete interrupt enable */
@@ -527,20 +530,21 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     spi_dma_enable(spi_dev, (SPI_DMAReq_Rx | SPI_DMAReq_Tx));
 
     /* run dma */
-    dma_enable(tx_stream);
     dma_enable(rx_stream);
+    dma_enable(tx_stream);
 
     /* wait end of transmission */
-    dma_transmission_acquire(tx_stream);
     dma_transmission_acquire(rx_stream);
+    dma_transmission_acquire(tx_stream);
 
+    spi_dma_disable(spi_dev, (SPI_DMAReq_Rx | SPI_DMAReq_Tx));
     /* disable dma */
     dma_disable(tx_stream);
     dma_disable(rx_stream);
 
     /* release dma spi rx and tx streams */
-    dma_conf_release(tx_stream);
     dma_conf_release(rx_stream);
+    dma_conf_release(tx_stream);
 
     return length;
 }
