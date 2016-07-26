@@ -26,6 +26,8 @@
 #include <periph/dma.h>
 #include <periph_conf.h>
 
+#include "assert.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -262,16 +264,16 @@ void dma_stream_init(dma_t stream_dev)
     }
 }
 
-void dma_stream_config(dma_t stream_dev, uint32_t periph_addr_reg, uint32_t dma_config, char* data, uint16_t length)
+void dma_stream_config(dma_t stream_dev, uint32_t periph_addr_reg, uint32_t dma_config, void* data, uint16_t length)
 {
-    volatile uint32_t periph_addr = periph_addr_reg;
+    assert(data!=NULL);
     DMA_Stream_TypeDef *stream = dma_stream(stream_dev);
 
     /* power on */
     dma_poweron(stream_dev);
 
     /* peripheral address register */
-    stream->PAR = periph_addr;
+    stream->PAR = periph_addr_reg;
 
     /* configure the FIFO usage */
     stream->FCR = 0;
@@ -280,9 +282,7 @@ void dma_stream_config(dma_t stream_dev, uint32_t periph_addr_reg, uint32_t dma_
     stream->CR = dma_config;
 
     /* set the memory address in the DMA_SxMA0R register */
-    if (data != NULL) {
-        stream->M0AR = (uint32_t)data;
-    }
+    stream->M0AR = (uint32_t)data;
 
     /* configure the total number of data items to be transferred */
     stream->NDTR = length;

@@ -123,7 +123,7 @@ void dma_stream_init(dma_t stream_dev);
  * @param[in] length            Number of bytes to transfer
  *
  */
-void dma_stream_config(dma_t stream_dev, uint32_t periph_addr_reg, uint32_t dma_config, char* data, uint16_t length);
+void dma_stream_config(dma_t stream_dev, uint32_t periph_addr_reg, uint32_t dma_config, void* data, uint16_t length);
 
 /**
  * @brief enable the given DMA device
