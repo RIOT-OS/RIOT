@@ -1,0 +1,24 @@
+From d198300a06e3ecb37ab0a6cb147a6fa388304b0d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jos=C3=A9=20Ignacio=20Alamos=20Aste?= <jialamos@uc.cl>
+Date: Tue, 26 Jul 2016 11:39:30 +0200
+Subject: [PATCH] Fixed unused variable
+
+---
+ src/ncp/ncp_uart.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/ncp/ncp_uart.cpp b/src/ncp/ncp_uart.cpp
+index bdfaeb2..12f88b1 100644
+--- a/src/ncp/ncp_uart.cpp
++++ b/src/ncp/ncp_uart.cpp
+@@ -119,6 +119,7 @@ NcpUart::OutboundFrameFeedMessage(Message &message)
+     ThreadError errorCode;
+     uint16_t inLength;
+     uint16_t outLength;
++    (void) outLength;
+     uint8_t inBuf[16];
+ 
+     for (int offset = 0; offset < message.GetLength(); offset += sizeof(inBuf))
+-- 
+2.7.4 (Apple Git-66)
+

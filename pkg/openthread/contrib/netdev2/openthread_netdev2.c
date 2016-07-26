@@ -21,6 +21,10 @@
 #include <cli/cli-uart.h>
 #include <assert.h>
 
+#ifdef MODULE_OPENTHREAD_NCP
+#include <ncp/ncp.h>
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -60,6 +64,9 @@ void *_openthread_event_loop(void *arg)
 	/* equivalent to "start" command of OpenThread CLI */
 	otEnable();
 
+#ifdef MODULE_OPENTHREAD_NCP
+	otNcpInit();
+#endif
 	/* It's necessary to call this after otEnable. Otherwise will freeze */
 	otProcessNextTasklet();
 #endif

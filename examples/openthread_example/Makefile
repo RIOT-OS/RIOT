@@ -16,6 +16,7 @@ QUIET ?= 1
 
 USEMODULE+=openthread
 USEMODULE+=openthread_cli
+#USEMODULE+=openthread_ncp
 
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))

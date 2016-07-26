@@ -1,0 +1,25 @@
+From 7a9c20aa02daf56d441e3ca104e850cf0b5bbfcf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jos=C3=A9=20Ignacio=20Alamos=20Aste?= <jialamos@uc.cl>
+Date: Tue, 26 Jul 2016 11:36:06 +0200
+Subject: [PATCH] Fixed comparation between unsigned and signed in ncp_base
+
+---
+ src/ncp/ncp_base.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ncp/ncp_base.cpp b/src/ncp/ncp_base.cpp
+index df61a2b..24d8102 100644
+--- a/src/ncp/ncp_base.cpp
++++ b/src/ncp/ncp_base.cpp
+@@ -831,7 +831,7 @@ NcpBase::OutboundFrameFeedVPacked(const char *pack_format, va_list args)
+ 
+     packed_len = spinel_datatype_vpack(buf, sizeof(buf), pack_format, args);
+ 
+-    if ((packed_len > 0) && (packed_len <= sizeof(buf)))
++    if ((packed_len > 0) && (packed_len <= (int) sizeof(buf)))
+     {
+         errorCode = OutboundFrameFeedData(buf, packed_len);
+     }
+-- 
+2.7.4 (Apple Git-66)
+

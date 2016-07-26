@@ -1,7 +1,7 @@
-From a84e23d04f47294eb084cf70e83fd48736b5cff5 Mon Sep 17 00:00:00 2001
+From 030fd3cd68a0be8522d2e97a8aec776e9036cddd Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jos=C3=A9=20Ignacio=20Alamos=20Aste?= <jialamos@uc.cl>
 Date: Thu, 14 Jul 2016 17:13:10 +0200
-Subject: [PATCH] Makefile changes
+Subject: [PATCH 1/2] Makefile changes
 
 ---
  Makefile                                  |  17 +++
@@ -305,6 +305,44 @@ index 00528b3..54f5734 100644
 -else
 -	del /Q /F *.o libmbed*
 -endif
++include $(RIOTBASE)/Makefile.base
+-- 
+2.7.4 (Apple Git-66)
+
+
+From f1ca06d439346c6a6658465a059bce1aa31e7905 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jos=C3=A9=20Ignacio=20Alamos=20Aste?= <jialamos@uc.cl>
+Date: Tue, 26 Jul 2016 11:30:19 +0200
+Subject: [PATCH 2/2] Added RIOT makefiles
+
+---
+ Makefile         | 5 +++++
+ src/ncp/Makefile | 3 +++
+ 2 files changed, 8 insertions(+)
+ create mode 100644 src/ncp/Makefile
+
+diff --git a/Makefile b/Makefile
+index 17a8c1c..61a1cde 100644
+--- a/Makefile
++++ b/Makefile
+@@ -14,4 +14,9 @@ ifneq (,$(filter openthread_core,$(USEMODULE)))
+  DIRS += src/cli
+ endif
+ 
++ifneq (,$(filter openthread_ncp,$(USEMODULE)))
++ DIRS += src/ncp
++endif
++
++
+ include $(RIOTBASE)/Makefile.base
+diff --git a/src/ncp/Makefile b/src/ncp/Makefile
+new file mode 100644
+index 0000000..0f8e655
+--- /dev/null
++++ b/src/ncp/Makefile
+@@ -0,0 +1,3 @@
++MODULE := openthread_ncp
++
 +include $(RIOTBASE)/Makefile.base
 -- 
 2.7.4 (Apple Git-66)
