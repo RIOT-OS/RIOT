@@ -94,7 +94,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 
     stk = stack_start;
 
-    p = (ucontext_t *)(stk + ((stacksize - sizeof(ucontext_t)) / sizeof(void *)));
+    p = (ucontext_t *)(stk + (stacksize - sizeof(ucontext_t)));
     stacksize -= sizeof(ucontext_t);
 
     if (getcontext(p) == -1) {
