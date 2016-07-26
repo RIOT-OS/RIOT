@@ -46,7 +46,9 @@ static int crashed = 0;
 /* WARNING: this function NEVER returns! */
 NORETURN void core_panic(core_panic_t crash_code, const char *message)
 {
+#ifdef NDEBUG
     (void) crash_code;
+#endif
 
     if (crashed == 0) {
         /* print panic message to console (if possible) */
