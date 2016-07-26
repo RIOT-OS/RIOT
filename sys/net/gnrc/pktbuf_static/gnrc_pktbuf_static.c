@@ -94,8 +94,8 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, void *data, size_t size,
 {
     gnrc_pktsnip_t *pkt;
 
-    if ((size == 0) || (size > GNRC_PKTBUF_SIZE)) {
-        DEBUG("pktbuf: size (%u) == 0 || size == GNRC_PKTBUF_SIZE (%u)\n",
+    if (size > GNRC_PKTBUF_SIZE) {
+        DEBUG("pktbuf: size (%u) > GNRC_PKTBUF_SIZE (%u)\n",
               (unsigned)size, GNRC_PKTBUF_SIZE);
         return NULL;
     }
@@ -122,19 +122,17 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
         mutex_unlock(&_mutex);
         return NULL;
     }
-    else if (size == pkt->size) {
-        pkt->type = type;
-        mutex_unlock(&_mutex);
-        return pkt;
-    }
+    /* create new snip descriptor for marked data */
     marked_snip = _pktbuf_alloc(sizeof(gnrc_pktsnip_t));
     if (marked_snip == NULL) {
         DEBUG("pktbuf: could not reallocate marked section.\n");
         mutex_unlock(&_mutex);
         return NULL;
     }
-    /* would not fit unused marker => move data around */
-    if ((size < required_new_size) || ((pkt->size - size) < sizeof(_unused_t))) {
+    /* marked data would not fit _unused_t marker => move data around to allow
+     * for proper free */
+    if ((pkt->size != size) &&
+        ((size < required_new_size) || ((pkt->size - size) < sizeof(_unused_t)))) {
         void *new_data_rest;
         new_data_marked = _pktbuf_alloc(size);
         if (new_data_marked == NULL) {
@@ -159,7 +157,9 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
     }
     else {
         new_data_marked = pkt->data;
-        pkt->data = ((uint8_t *)pkt->data) + size;
+        /* if (pkt->size - size) != 0 take remainder of data, otherwise set NULL */
+        pkt->data = (pkt->size != size) ? (((uint8_t *)pkt->data) + size) :
+                                          NULL;
     }
     pkt->size -= size;
     _set_pktsnip(marked_snip, pkt->next, new_data_marked, size, type);
@@ -174,17 +174,23 @@ int gnrc_pktbuf_realloc_data(gnrc_pktsnip_t *pkt, size_t size)
                           _align(sizeof(_unused_t)) : _align(size);
 
     mutex_lock(&_mutex);
-    assert((pkt != NULL) && (pkt->data != NULL) && _pktbuf_contains(pkt->data));
-    if (size == 0) {
-        DEBUG("pktbuf: size == 0\n");
-        mutex_unlock(&_mutex);
-        return ENOMEM;
-    }
+    assert(pkt != NULL);
+    assert(((pkt->size == 0) && (pkt->data == NULL)) ||
+           ((pkt->size > 0) && (pkt->data != NULL) && _pktbuf_contains(pkt->data)));
+    /* new size and old size are equal */
     if (size == pkt->size) {
+        /* nothing to do */
         mutex_unlock(&_mutex);
         return 0;
     }
-    if ((size > pkt->size) ||                               /* new size does not fit */
+    /* new size is 0 and data pointer isn't already NULL */
+    if ((size == 0) && (pkt->data != NULL)) {
+        /* set data pointer to NULL */
+        _pktbuf_free(pkt->data, pkt->size);
+        pkt->data = NULL;
+    }
+    /* if new size is bigger than old size */
+    else if ((size > pkt->size) ||                          /* new size does not fit */
         ((pkt->size - aligned_size) < sizeof(_unused_t))) { /* resulting hole would not fit marker */
         void *new_data = _pktbuf_alloc(size);
         if (new_data == NULL) {
@@ -192,15 +198,15 @@ int gnrc_pktbuf_realloc_data(gnrc_pktsnip_t *pkt, size_t size)
             mutex_unlock(&_mutex);
             return ENOMEM;
         }
-        memcpy(new_data, pkt->data, (pkt->size < size) ? pkt->size : size);
+        if (pkt->data != NULL) {            /* if old data exist */
+            memcpy(new_data, pkt->data, (pkt->size < size) ? pkt->size : size);
+        }
         _pktbuf_free(pkt->data, pkt->size);
         pkt->data = new_data;
     }
-    else {
-        if (_align(pkt->size) > aligned_size) {
-            _pktbuf_free(((uint8_t *)pkt->data) + aligned_size,
-                         pkt->size - aligned_size);
-        }
+    else if (_align(pkt->size) > aligned_size) {
+        _pktbuf_free(((uint8_t *)pkt->data) + aligned_size,
+                     pkt->size - aligned_size);
     }
     pkt->size = size;
     mutex_unlock(&_mutex);
@@ -397,17 +403,19 @@ static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, void *data, size_t siz
                                     gnrc_nettype_t type)
 {
     gnrc_pktsnip_t *pkt = _pktbuf_alloc(sizeof(gnrc_pktsnip_t));
-    void *_data;
+    void *_data = NULL;
 
     if (pkt == NULL) {
         DEBUG("pktbuf: error allocating new packet snip\n");
         return NULL;
     }
-    _data = _pktbuf_alloc(size);
-    if (_data == NULL) {
-        DEBUG("pktbuf: error allocating data for new packet snip\n");
-        _pktbuf_free(pkt, sizeof(gnrc_pktsnip_t));
-        return NULL;
+    if (size > 0) {
+        _data = _pktbuf_alloc(size);
+        if (_data == NULL) {
+            DEBUG("pktbuf: error allocating data for new packet snip\n");
+            _pktbuf_free(pkt, sizeof(gnrc_pktsnip_t));
+            return NULL;
+        }
     }
     _set_pktsnip(pkt, next, _data, size, type);
     if (data != NULL) {
