@@ -41,14 +41,14 @@
 #define SPI_DMAReq_Rx               (uint32_t)(1)
 #define SPI_DMAReq_Tx               (uint32_t)(2)
 
-static inline void spi_dma_enable(SPI_TypeDef* spi_dev, uint32_t spi_dma_req);
-static inline void spi_dma_disable(SPI_TypeDef* spi_dev, uint32_t spi_dma_req);
+static inline void spi_dma_enable(SPI_TypeDef *spi_dev, uint32_t spi_dma_req);
+static inline void spi_dma_disable(SPI_TypeDef *spi_dev, uint32_t spi_dma_req);
 
 /**
  * @brief Data-structure holding the state for a SPI device
  */
 typedef struct {
-    char(*cb)(char data);
+    char (*cb)(char data);
 } spi_state_t;
 
 static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev);
@@ -127,7 +127,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             tx_stream = SPI_0_DMA_TX_STREAM;
             rx_stream = SPI_0_DMA_RX_STREAM;
             break;
-#endif /* SPI_0_EN */
+#endif  /* SPI_0_EN */
 #if SPI_1_EN
         case SPI_1:
             spi_port = SPI_1_DEV;
@@ -140,7 +140,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             tx_stream = SPI_1_DMA_TX_STREAM;
             rx_stream = SPI_1_DMA_RX_STREAM;
             break;
-#endif /* SPI_1_EN */
+#endif  /* SPI_1_EN */
 #if SPI_2_EN
         case SPI_2:
             spi_port = SPI_2_DEV;
@@ -153,7 +153,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             tx_stream = SPI_2_DMA_TX_STREAM;
             rx_stream = SPI_2_DMA_RX_STREAM;
             break;
-#endif /* SPI_2_EN */
+#endif  /* SPI_2_EN */
         default:
             return -2;
     }
@@ -186,7 +186,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     return 0;
 }
 
-int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
+int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
 {
     SPI_TypeDef *spi_port;
 
@@ -200,8 +200,8 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             SPI_0_MISO_PORT_CLKEN();
             SPI_0_MOSI_PORT_CLKEN();
             /* configure interrupt channel */
-            NVIC_SetPriority(SPI_0_IRQ, SPI_IRQ_PRIO); /* set SPI interrupt priority */
-            NVIC_EnableIRQ(SPI_0_IRQ); /* set SPI interrupt priority */
+            NVIC_SetPriority(SPI_0_IRQ, SPI_IRQ_PRIO);  /* set SPI interrupt priority */
+            NVIC_EnableIRQ(SPI_0_IRQ);                  /* set SPI interrupt priority */
             break;
 #endif /* SPI_0_EN */
 #if SPI_1_EN
@@ -216,7 +216,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             NVIC_SetPriority(SPI_1_IRQ, SPI_IRQ_PRIO);
             NVIC_EnableIRQ(SPI_1_IRQ);
             break;
-#endif /* SPI_1_EN */
+#endif  /* SPI_1_EN */
 #if SPI_2_EN
         case SPI_2:
             spi_port = SPI_2_DEV;
@@ -229,7 +229,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             NVIC_SetPriority(SPI_2_IRQ, SPI_IRQ_PRIO);
             NVIC_EnableIRQ(SPI_2_IRQ);
             break;
-#endif /* SPI_2_EN */
+#endif  /* SPI_2_EN */
         default:
             return -1;
     }
@@ -244,7 +244,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
     /* enable RXNEIE flag to enable rx buffer not empty interrupt */
     spi_port->CR2 |= (SPI_CR2_RXNEIE); /*1:not masked */
     spi_port->CR1 |= (conf);
-     /* the NSS (chip select) is managed by software and NSS is low (slave enabled) */
+    /* the NSS (chip select) is managed by software and NSS is low (slave enabled) */
     spi_port->CR1 |= SPI_CR1_SSM;
     /* set callback */
     spi_config[dev].cb = cb;
@@ -271,7 +271,7 @@ int spi_conf_pins(spi_t dev)
             pin[2] = SPI_0_MISO_PIN;
             af[2] = SPI_0_MISO_AF;
             break;
-#endif /* SPI_0_EN */
+#endif  /* SPI_0_EN */
 #if SPI_1_EN
         case SPI_1:
             port[0] = SPI_1_SCK_PORT;
@@ -284,7 +284,7 @@ int spi_conf_pins(spi_t dev)
             pin[2] = SPI_1_MISO_PIN;
             af[2] = SPI_1_MISO_AF;
             break;
-#endif /* SPI_1_EN */
+#endif  /* SPI_1_EN */
 #if SPI_2_EN
         case SPI_2:
             port[0] = SPI_2_SCK_PORT;
@@ -297,7 +297,7 @@ int spi_conf_pins(spi_t dev)
             pin[2] = SPI_2_MISO_PIN;
             af[2] = SPI_2_MISO_AF;
             break;
-#endif /* SPI_2_EN */
+#endif  /* SPI_2_EN */
         default:
             return -1;
     }
@@ -366,10 +366,10 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
             return -1;
     }
 
-    while (!(spi_port->SR & SPI_SR_TXE));
+    while (!(spi_port->SR & SPI_SR_TXE)) {}
     spi_port->DR = out;
 
-    while (!(spi_port->SR & SPI_SR_RXNE));
+    while (!(spi_port->SR & SPI_SR_RXNE)) {}
 
     if (in != NULL) {
         *in = spi_port->DR;
@@ -429,19 +429,19 @@ void spi_poweroff(spi_t dev)
     switch (dev) {
 #if SPI_0_EN
         case SPI_0:
-            while (SPI_0_DEV->SR & SPI_SR_BSY);
+            while (SPI_0_DEV->SR & SPI_SR_BSY) {}
             SPI_0_CLKDIS();
             break;
 #endif
 #if SPI_1_EN
         case SPI_1:
-            while (SPI_1_DEV->SR & SPI_SR_BSY);
+            while (SPI_1_DEV->SR & SPI_SR_BSY) {} 
             SPI_1_CLKDIS();
             break;
 #endif
 #if SPI_2_EN
         case SPI_2:
-            while (SPI_2_DEV->SR & SPI_SR_BSY);
+            while (SPI_2_DEV->SR & SPI_SR_BSY) {}
             SPI_2_CLKDIS();
             break;
 #endif
@@ -450,7 +450,7 @@ void spi_poweroff(spi_t dev)
 
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
-    SPI_TypeDef* spi_dev;
+    SPI_TypeDef *spi_dev;
     uint32_t tx_stream;
     uint32_t rx_stream;
     uint32_t tx_channel;
@@ -470,7 +470,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
             tx_channel = SPI_0_DMA_TX_CHANNEL;
             rx_channel = SPI_0_DMA_RX_CHANNEL;
             break;
-#endif /* SPI_0_EN */
+#endif  /* SPI_0_EN */
 #if SPI_1_EN
         case SPI_1:
             spi_dev = SPI_1_DEV;
@@ -480,7 +480,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
             tx_channel = SPI_1_DMA_TX_CHANNEL;
             rx_channel = SPI_1_DMA_RX_CHANNEL;
             break;
-#endif /* SPI_1_EN */
+#endif  /* SPI_1_EN */
 #if SPI_2_EN
         case SPI_2:
             spi_dev = SPI_2_DEV;
@@ -490,7 +490,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
             tx_channel = SPI_2_DMA_TX_CHANNEL;
             rx_channel = SPI_2_DMA_RX_CHANNEL;
             break;
-#endif /* SPI_2_EN */
+#endif  /* SPI_2_EN */
         default:
             return -1;
     }
@@ -539,7 +539,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 
     /* disable spi in Tx and Rx mode */
     spi_dma_disable(spi_dev, (SPI_DMAReq_Rx | SPI_DMAReq_Tx));
-    
+
     /* disable dma */
     dma_disable(tx_stream);
     dma_disable(rx_stream);
@@ -551,16 +551,16 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     return length;
 }
 
-static inline void spi_dma_enable(SPI_TypeDef* spi_dev, uint32_t spi_dma_req)
+static inline void spi_dma_enable(SPI_TypeDef *spi_dev, uint32_t spi_dma_req)
 {
     /* enable the selected SPI DMA requests */
     spi_dev->CR2 |= spi_dma_req;
 }
 
-static inline void spi_dma_disable(SPI_TypeDef* spi_dev, uint32_t spi_dma_req)
+static inline void spi_dma_disable(SPI_TypeDef *spi_dev, uint32_t spi_dma_req)
 {
     /* disable the selected SPI DMA requests */
-    spi_dev->CR2 &= (uint16_t)~spi_dma_req;
+    spi_dev->CR2 &= (uint16_t) ~spi_dma_req;
 }
 
 static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev)

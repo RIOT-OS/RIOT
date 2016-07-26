@@ -63,7 +63,8 @@ static inline void dma_poweron(dma_t stream_dev)
 {
     if (stream_dev < 8) {
         RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
-    } else {
+    }
+    else {
         RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
     }
 }
@@ -92,6 +93,7 @@ static inline DMA_TypeDef *dma_base(dma_t stream_dev)
 static inline DMA_Stream_TypeDef *dma_stream(dma_t stream_dev)
 {
     uint32_t base = (uint32_t)dma_base(stream_dev);
+
     return (DMA_Stream_TypeDef *)(base + (0x10 + (0x18 * (stream_dev & 0x7))));
 }
 
@@ -178,7 +180,7 @@ static inline uint32_t dma_all_flags(dma_t stream_dev)
  */
 static void dma_clear_all_flags(dma_t stream_dev)
 {
-    DMA_TypeDef* stream_base = dma_base(stream_dev);
+    DMA_TypeDef *stream_base = dma_base(stream_dev);
 
     /* Clear all flags */
     if (dma_hl(stream_dev) == 0) {
@@ -227,19 +229,19 @@ int dma_transmission_release(dma_t stream_dev)
 
 void dma_stream_init(dma_t stream_dev)
 {
-    DMA_Stream_TypeDef* stream = dma_stream(stream_dev);
+    DMA_Stream_TypeDef *stream = dma_stream(stream_dev);
 
     /* check init already done */
-    if ( ((dma_init_status >> stream_dev) & DMA_INIT_DONE) != DMA_INIT_DONE) {
+    if (((dma_init_status >> stream_dev) & DMA_INIT_DONE) != DMA_INIT_DONE) {
         dma_init_status |= DMA_INIT_DONE << stream_dev;
 
         /* check if EN bit is set to clear it */
-        if ( (stream->CR & DMA_SxCR_EN) == DMA_SxCR_EN) {
+        if ((stream->CR & DMA_SxCR_EN) == DMA_SxCR_EN) {
             /* disable the selected DMA Stream by clearing EN bit */
             stream->CR &= ~(uint32_t)DMA_SxCR_EN;
 
             /* Wait until the stream is ready to be configured */
-            while( (stream->CR & DMA_SxCR_EN) == DMA_SxCR_EN);
+            while ((stream->CR & DMA_SxCR_EN) == DMA_SxCR_EN) {}
         }
 
         /* init all registers */
@@ -264,9 +266,9 @@ void dma_stream_init(dma_t stream_dev)
     }
 }
 
-void dma_stream_config(dma_t stream_dev, uint32_t periph_addr_reg, uint32_t dma_config, void* data, uint16_t length)
+void dma_stream_config(dma_t stream_dev, uint32_t periph_addr_reg, uint32_t dma_config, void *data, uint16_t length)
 {
-    assert(data!=NULL);
+    assert(data != NULL);
     DMA_Stream_TypeDef *stream = dma_stream(stream_dev);
 
     /* power on */
@@ -309,7 +311,7 @@ void dma_disable(dma_t stream_dev)
 
 void dma_clear_ifc_flag(dma_t stream_dev)
 {
-    DMA_TypeDef* stream_base = dma_base(stream_dev);
+    DMA_TypeDef *stream_base = dma_base(stream_dev);
 
     /* clear DMA flag */
     if (dma_hl(stream_dev) == 0) {
