@@ -29,8 +29,8 @@
 /**
  * @brief data type for priority queue nodes
  */
-typedef struct priority_queue_node_t {
-    struct priority_queue_node_t *next; /**< next queue node */
+typedef struct priority_queue_node {
+    struct priority_queue_node *next;   /**< next queue node */
     uint32_t priority;                  /**< queue node priority */
     unsigned int data;                  /**< queue node data */
 } priority_queue_node_t;
@@ -38,7 +38,7 @@ typedef struct priority_queue_node_t {
 /**
  * @brief data type for priority queues
  */
-typedef struct queue {
+typedef struct {
     priority_queue_node_t *first;        /**< first queue node */
 } priority_queue_t;
 

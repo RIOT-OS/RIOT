@@ -18,14 +18,19 @@
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
+#ifndef STM32F0_CPU_CONF_H
+#define STM32F0_CPU_CONF_H
+
+#include "cpu_conf_common.h"
 
 #ifdef CPU_MODEL_STM32F051R8
 #include "stm32f051x8.h"
 #endif
 #ifdef CPU_MODEL_STM32F091RC
 #include "stm32f091xc.h"
+#endif
+#ifdef CPU_MODEL_STM32F072RB
+#include "stm32f072xb.h"
 #endif
 
 #ifdef __cplusplus
@@ -44,5 +49,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
+#endif /* STM32F0_CPU_CONF_H */
 /** @} */

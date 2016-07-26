@@ -26,6 +26,15 @@ MEMORY
     ram   (rwx) : ORIGIN = 0x20000000, LENGTH = 32K
 }
 
-INCLUDE cc2538.ld
+/* MCU Specific Section Definitions */
+SECTIONS
+{
+    .flashcca :
+    {
+        KEEP(*(.flashcca))
+    } > cca
+}
+
+INCLUDE cortexm_base.ld
 
 /* @} */

@@ -36,7 +36,7 @@ extern "C" {
 #define THREAD_STACKSIZE_MINIMUM            (163840)
 /* native internal */
 #define THREAD_STACKSIZE_MINIMUM            (163840)
-#define NATIVE_ISR_STACKSIZE                (163840)
+#define ISR_STACKSIZE                       (163840)
 
 #else /* Linux etc. */
 #define THREAD_STACKSIZE_DEFAULT            (8192)
@@ -46,7 +46,7 @@ extern "C" {
 /* for core/include/thread.h */
 #define THREAD_STACKSIZE_MINIMUM            (8192)
 /* native internal */
-#define NATIVE_ISR_STACKSIZE                (8192)
+#define ISR_STACKSIZE                       (8192)
 #endif /* OS */
 /** @} */
 
@@ -54,6 +54,11 @@ extern "C" {
  * @brief   Native internal Ethernet protocol number
  */
 #define NATIVE_ETH_PROTO 0x1234
+
+#if (defined(GNRC_PKTBUF_SIZE)) && (GNRC_PKTBUF_SIZE < 2048)
+#   undef  GNRC_PKTBUF_SIZE
+#   define GNRC_PKTBUF_SIZE     (2048)
+#endif
 
 #ifdef __cplusplus
 }

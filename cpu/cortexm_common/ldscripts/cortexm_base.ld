@@ -101,6 +101,16 @@ SECTIONS
     . = ALIGN(4);
     _etext = .;
 
+    /* stack section */
+    .stack (NOLOAD):
+    {
+        . = ALIGN(8);
+        _sstack = .;
+        KEEP (*(.isr_stack))
+        . = ALIGN(8);
+        _estack = .;
+    } > ram
+
     .relocate : AT (_etext)
     {
         . = ALIGN(4);
@@ -122,16 +132,6 @@ SECTIONS
         . = ALIGN(4);
         _ebss = . ;
         _ezero = .;
-    } > ram
-
-    /* stack section */
-    .stack (NOLOAD):
-    {
-        . = ALIGN(8);
-        _sstack = .;
-        KEEP (*(.isr_stack))
-        . = ALIGN(8);
-        _estack = .;
     } > ram
 
     /* heap section */

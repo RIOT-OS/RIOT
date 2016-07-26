@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef ADC_H
-#define ADC_H
+#ifndef STELLARIS_ADC_H
+#define STELLARIS_ADC_H
 
 //*****************************************************************************
 //
@@ -308,4 +308,4 @@ extern unsigned long ADCPhaseDelayGet(unsigned long ulBase);
 }
 #endif
 
-#endif // ADC_H
+#endif /* STELLARIS_ADC_H */

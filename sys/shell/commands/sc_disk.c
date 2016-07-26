@@ -27,7 +27,7 @@
 
 static inline uint8_t sector_read(unsigned char *read_buf, unsigned long sector, unsigned long length, unsigned long offset)
 {
-    if (MCI_read(read_buf, sector, 1) == RES_OK) {
+    if (mci_read(read_buf, sector, 1) == DISKIO_RES_OK) {
         printf("[disk] Read sector %lu (%lu):\n", sector, offset);
 
         for (unsigned long i = offset + 1; i <= offset + length; i++) {
@@ -51,7 +51,7 @@ int _get_sectorsize(int argc, char **argv)
     (void) argv;
 
     unsigned short ssize;
-    if (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK) {
+    if (mci_ioctl(GET_SECTOR_SIZE, &ssize) == DISKIO_RES_OK) {
         printf("[disk] sector size is %u\n", ssize);
 
         return 0;
@@ -69,7 +69,7 @@ int _get_blocksize(int argc, char **argv)
     (void) argv;
 
     unsigned long bsize;
-    if (MCI_ioctl(GET_BLOCK_SIZE, &bsize) == RES_OK) {
+    if (mci_ioctl(GET_BLOCK_SIZE, &bsize) == DISKIO_RES_OK) {
         printf("[disk] block size is %lu\n", bsize);
 
         return 0;
@@ -87,7 +87,7 @@ int _get_sectorcount(int argc, char **argv)
     (void) argv;
 
     unsigned long scount;
-    if (MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) {
+    if (mci_ioctl(GET_SECTOR_COUNT, &scount) == DISKIO_RES_OK) {
         printf("[disk] sector count is %lu\n", scount);
 
         return 0;
@@ -107,7 +107,7 @@ int _read_sector(int argc, char **argv)
 
         unsigned long sectornr = atol(argv[1]);
 
-        if ((MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) && (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK)) {
+        if ((mci_ioctl(GET_SECTOR_COUNT, &scount) == DISKIO_RES_OK) && (mci_ioctl(GET_SECTOR_SIZE, &ssize) == DISKIO_RES_OK)) {
             unsigned char read_buf[ssize];
 
             if (sector_read(read_buf, sectornr, ssize, 0)) {
@@ -138,7 +138,7 @@ int _read_bytes(int argc, char **argv)
     length = atoi(argv[2]);
 
     /* get card info */
-    if ((MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) && (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK)) {
+    if ((mci_ioctl(GET_SECTOR_COUNT, &scount) == DISKIO_RES_OK) && (mci_ioctl(GET_SECTOR_SIZE, &ssize) == DISKIO_RES_OK)) {
         /* calculate sector and offset position */
         sector = (offset / ssize) + 1;
         offset = (offset % ssize);

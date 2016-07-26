@@ -188,8 +188,8 @@ void msp430_init_dco(void)
 #else
     /* default values for quick start-up */
     DCOCTL = 0x00;   /* avoid possible temporary overclocking... */
-    BCSCTL1 = 0x0d;
-    DCOCTL = 0x9a;
+    BCSCTL1 = 0x8d;  /* as seen in Contiki code */
+    DCOCTL = 0x88;   /* as seen in Contiki code */
 #endif
 
     /* Other clock configuration */
@@ -215,7 +215,7 @@ void board_init(void)
     /* initializes DCO */
     msp430_init_dco();
 
-    /* initialize STDIO */
+    /* initialize STDIO over UART */
     uart_stdio_init();
 
     /* enable interrupts */

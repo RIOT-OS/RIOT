@@ -23,7 +23,7 @@
  * Application developers are free to use this module.
  * Be aware of portability issues.
  *
- * You most likely want to use the vtimer interface instead.
+ * You most likely want to use the xtimer interface instead.
  *
  * @ingroup x86-irq
  * @{

@@ -26,14 +26,14 @@
 #include "xtimer.h"
 #include "thread.h"
 
-#define TEST_SECONDS        (10U)
+#define TEST_SECONDS        (10LU)
 #define TEST_TIME           (TEST_SECONDS * SEC_IN_USEC)
 #define STACKSIZE_TIMER     (THREAD_STACKSIZE_DEFAULT)
 
 char stack_timer1[STACKSIZE_TIMER];
 char stack_timer2[STACKSIZE_TIMER];
 
-long unsigned int count = 0;
+unsigned int count = 0;
 
 void* timer_func1(void* arg)
 {
@@ -55,10 +55,9 @@ void* timer_func2(void* arg)
 
 int main(void)
 {
-
     puts("xTimer hang test\n");
 
-    printf("This test will print \"Testing... (<percentage>)\" every 100ms for %u seconds.\n", TEST_SECONDS);
+    printf("This test will print \"Testing... (<percentage>)\" every 100ms for %u seconds.\n", (unsigned)TEST_SECONDS);
     printf("If it stops before, the test failed.\n\n");
 
     thread_create(stack_timer1,
@@ -81,8 +80,8 @@ int main(void)
     while(xtimer_now() < end)
     {
         count++;
-        xtimer_usleep(100U * 1000);
-        printf("Testing... (%lu%%)\n", count);
+        xtimer_usleep(100LU * 1000);
+        printf("Testing... (%u%%)\n", count);
     }
 
     printf("Test successful.\n");

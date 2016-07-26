@@ -30,24 +30,29 @@ extern "C" {
 #endif
 
 /**
- * @name Macros for controlling the on-board LEDs.
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_GREEN_PIN       0x08
-#define LED_BLUE_PIN        0x04
-#define LED_RED_PIN         0x02
+#define LED0_PIN            GPIO_PIN(5, 7)
+#define LED1_PIN            GPIO_PIN(5, 2)
+#define LED2_PIN            GPIO_PIN(5, 1)
 
-#define LED_GREEN_ON        GPIO_PORTF_DATA_R |= LED_GREEN_PIN
-#define LED_GREEN_OFF       GPIO_PORTF_DATA_R &= ~(LED_GREEN_PIN)
-#define LED_GREEN_TOGGLE    /* not available */
+#define LED_PORT            (GPIO_PORTF_DATA_R)
+#define LED0_MASK           (1 << 7)
+#define LED1_MASK           (1 << 2)
+#define LED2_MASK           (1 << 1)
 
-#define LED_BLUE_ON         GPIO_PORTF_DATA_R |= LED_BLUE_PIN
-#define LED_BLUE_OFF        GPIO_PORTF_DATA_R &= ~(LED_BLUE_PIN)
-#define LED_BLUE_TOGGLE     /* not available */
+#define LED0_ON             (LED_PORT |=  LED0_MASK)
+#define LED0_OFF            (LED_PORT &= ~LED0_MASK)
+#define LED0_TOGGLE         (LED_PORT ^=  LED0_MASK)
 
-#define LED_RED_ON          GPIO_PORTF_DATA_R |= LED_RED_PIN
-#define LED_RED_OFF         GPIO_PORTF_DATA_R &= ~(LED_RED_PIN)
-#define LED_RED_TOGGLE      /* not available */
+#define LED1_ON             (LED_PORT |=  LED1_MASK)
+#define LED1_OFF            (LED_PORT &= ~LED1_MASK)
+#define LED1_TOGGLE         (LED_PORT ^=  LED1_MASK)
+
+#define LED2_ON             (LED_PORT |=  LED2_MASK)
+#define LED2_OFF            (LED_PORT &= ~LED2_MASK)
+#define LED2_TOGGLE         (LED_PORT ^=  LED2_MASK)
 /* @} */
 
 /**

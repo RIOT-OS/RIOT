@@ -90,6 +90,8 @@ typedef enum {
                                  *   the current state */
     NETOPT_AUTOACK,             /**< en/disable link layer auto ACKs or read
                                  *   the current state */
+    NETOPT_ACK_REQ,             /**< en/disable acknowledgement requests or
+                                 *   read the current state */
     NETOPT_RETRANS,             /**< get/set the maximum number of
                                  *   retransmissions. */
     NETOPT_PROTO,               /**< get/set the protocol for the layer
@@ -168,7 +170,7 @@ typedef enum {
      * If the interface is wireless this function will return -ENOTSUP, a
      * positive value otherwise.
      *
-     * @note Setting this option will always return -EONOTSUP.
+     * @note Setting this option will always return -ENOTSUP.
      */
     NETOPT_IS_WIRED,
 
@@ -198,6 +200,20 @@ typedef enum {
      * to network environment can improve QoS, especially in WSN.
      */
     NETOPT_CCA_THRESHOLD,
+
+    /**
+     * @brief get statistics about sent and received packets and data of the device or protocol
+     *
+     * Expects a pointer to a @ref netstats_t struct that will be pointed to
+     * the corresponding @ref netstats_t of the module.
+     */
+    NETOPT_STATS,
+
+    /**
+     * @brief en/disable encryption.
+     */
+    NETOPT_ENCRYPTION,        /**< en/disable encryption */
+    NETOPT_ENCRYPTION_KEY,    /**< set encryption key */
 
     /* add more options if needed */
 

@@ -44,7 +44,7 @@ extern "C" {
 void x86_init_threading(void);
 
 /**
- * @brief   The getter/setter for inISR() for the x86 port.
+ * @brief   The getter/setter for irq_is_in() for the x86 port.
  */
 extern bool x86_in_isr;
 

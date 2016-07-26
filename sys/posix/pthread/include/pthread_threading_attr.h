@@ -26,7 +26,7 @@ extern "C" {
  * @details   A zeroed out datum is default initiliazed.
  * @see       pthread_create() for further information
  */
-typedef struct pthread_attr
+typedef struct
 {
     uint8_t detached; /**< Start in detached state. */
     char *ss_sp; /**< Stack to use for new thread. */

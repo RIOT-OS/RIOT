@@ -164,8 +164,7 @@ bool i2c_stop(uint8_t i2c_interface)
             I20CONCLR = I2CONCLR_SIC; /* Clear SI flag */
 
             /*--- Wait for STOP detected ---*/
-            while (I20CONSET & I2CONSET_STO)
-                ;
+            while (I20CONSET & I2CONSET_STO) {}
 
             break;
 
@@ -175,8 +174,7 @@ bool i2c_stop(uint8_t i2c_interface)
             I21CONCLR = I2CONCLR_SIC; /* Clear SI flag */
 
             /*--- Wait for STOP detected ---*/
-            while (I21CONSET & I2CONSET_STO)
-                ;
+            while (I21CONSET & I2CONSET_STO) {}
 
             break;
 
@@ -185,8 +183,7 @@ bool i2c_stop(uint8_t i2c_interface)
             I22CONCLR = I2CONCLR_SIC; /* Clear SI flag */
 
             /*--- Wait for STOP detected ---*/
-            while (I22CONSET & I2CONSET_STO)
-                ;
+            while (I22CONSET & I2CONSET_STO) {}
     }
 
     //  puts("...i2c_stop ended\n");
@@ -469,7 +466,7 @@ void i2c_interface0_master_handler(void) //__irq
     state_value = I20STAT;
 
     //IENABLE;          /* handles nested interrupt */
-    //enableIRQ();
+    //irq_enable();
     switch (state_value) {
         case 0x08: /* A Start condition is issued. */
             //puts("A Start condition is issued\n");
@@ -592,7 +589,7 @@ void i2c_interface0_master_handler(void) //__irq
     }
 
     //IDISABLE;
-    //disableIRQ();
+    //irq_disable();
     //puts("leave I2C handler function\n");
     VICVectAddr = 0; /* Acknowledge Interrupt */
 }
@@ -611,7 +608,7 @@ void i2c_interface1_master_handler(void) //__irq
     state_value = I21STAT;
 
     //IENABLE;    /* handles nested interrupt */
-    //enableIRQ();
+    //irq_enable();
     switch (state_value) {
         case 0x08: /* A Start condition is issued. */
             //puts("A Start condition is issued\n");
@@ -735,7 +732,7 @@ void i2c_interface1_master_handler(void) //__irq
     }
 
     //IDISABLE;
-    //disableIRQ();
+    //irq_disable();
     //puts("leave I2C handler function\n");
     VICVectAddr = 0; /* Acknowledge Interrupt */
 }
@@ -754,7 +751,7 @@ void i2c_interface2_master_handler(void) //__irq
     state_value = I22STAT;
 
     //IENABLE;  /* handles nested interrupt */
-    //enableIRQ();
+    //irq_enable();
     switch (state_value) {
         case 0x08: /* A Start condition is issued. */
             //puts("A Start condition is issued\n");
@@ -878,7 +875,7 @@ void i2c_interface2_master_handler(void) //__irq
     }
 
     //IDISABLE;
-    //disableIRQ();
+    //irq_disable();
     //puts("leave I2C handler function\n");
     VICVectAddr = 0; /* Acknowledge Interrupt */
 }

@@ -193,7 +193,7 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
             break;
 
         case XCVSEQ_RECEIVE:
-            dev->state = NETOPT_STATE_IDLE;
+            dev->state = NETOPT_STATE_RX;
             break;
 
         case XCVSEQ_TRANSMIT:
@@ -304,7 +304,7 @@ void kw2xrf_init_interrupts(kw2xrf_t *dev, gpio_t int_pin)
     kw2xrf_write_dreg(MKW2XDM_PHY_CTRL3, reg);
 
     /* set up GPIO-pin used for IRQ */
-    gpio_init_int(int_pin, GPIO_NOPULL, GPIO_FALLING, &kw2xrf_irq_handler, dev);
+    gpio_init_int(int_pin, GPIO_IN, GPIO_FALLING, &kw2xrf_irq_handler, dev);
 }
 
 int kw2xrf_set_pan(kw2xrf_t *dev, uint16_t pan)
@@ -373,17 +373,20 @@ int kw2xrf_set_addr(kw2xrf_t *dev, uint16_t addr)
      * 0 for unicast addresses */
     dev->addr_short[1] &= 0x7F;
 #endif
-    kw2xrf_write_iregs(MKW2XDMI_MACSHORTADDRS0_LSB, val_ar, 2);
+    kw2xrf_write_iregs(MKW2XDMI_MACSHORTADDRS0_LSB, val_ar,
+                       IEEE802154_SHORT_ADDRESS_LEN);
+
     return sizeof(uint16_t);
 }
 
 int kw2xrf_set_addr_long(kw2xrf_t *dev, uint64_t addr)
 {
-    for (int i = 0; i < 8; i++) {
-        dev->addr_long[i] = (addr >> ((7 - i) * 8));
+    for (int i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
+        dev->addr_long[i] = (addr >> ((IEEE802154_LONG_ADDRESS_LEN - 1 - i) * 8));
     }
 
-    kw2xrf_write_iregs(MKW2XDMI_MACLONGADDRS0_0, (dev->addr_long), 8);
+    kw2xrf_write_iregs(MKW2XDMI_MACLONGADDRS0_0, (dev->addr_long),
+                       IEEE802154_LONG_ADDRESS_LEN);
 
     return sizeof(uint64_t);
 }
@@ -395,7 +398,13 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     uint8_t tmp[2];
     kw2xrf_gpio_int = int_pin;
 #if CPUID_LEN
+/* make sure that the buffer is always big enough to store a 64bit value */
+#   if CPUID_LEN < IEEE802154_LONG_ADDRESS_LEN
+    uint8_t cpuid[IEEE802154_LONG_ADDRESS_LEN];
+#   else
     uint8_t cpuid[CPUID_LEN];
+#endif
+    uint16_t addr_short = 0;
     eui64_t addr_long;
 #endif
 
@@ -422,29 +431,29 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     dev->option = 0;
 
 #if CPUID_LEN
+    /* in case CPUID_LEN < 8, fill missing bytes with zeros */
+    memset(cpuid, 0, CPUID_LEN);
+
     cpuid_get(cpuid);
 
-#if CPUID_LEN < 8
-
-    /* in case CPUID_LEN < 8, fill missing bytes with zeros */
-    for (int i = CPUID_LEN; i < 8; i++) {
-        cpuid[i] = 0;
+    /* generate short hardware address if CPUID_LEN > 0 */
+    for (int i = 0; i < CPUID_LEN; i++) {
+        /* XOR each even byte of the CPUID with LSB of short address
+           and each odd byte with MSB */
+        addr_short ^= (uint16_t)(cpuid[i] << ((i & 0x01) * 8));
     }
-
-#else
-
-    for (int i = 8; i < CPUID_LEN; i++) {
+#if CPUID_LEN > IEEE802154_LONG_ADDRESS_LEN
+    for (int i = IEEE802154_LONG_ADDRESS_LEN; i < CPUID_LEN; i++) {
         cpuid[i & 0x07] ^= cpuid[i];
     }
-
 #endif
     /* make sure we mark the address as non-multicast and not globally unique */
     cpuid[0] &= ~(0x01);
     cpuid[0] |= 0x02;
     /* copy and set long address */
-    memcpy(&addr_long, cpuid, 8);
+    memcpy(&addr_long, cpuid, IEEE802154_LONG_ADDRESS_LEN);
     kw2xrf_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
-    kw2xrf_set_addr(dev, NTOHS(addr_long.uint16[0].u16));
+    kw2xrf_set_addr(dev, addr_short);
 #else
     kw2xrf_set_addr_long(dev, KW2XRF_DEFAULT_SHORT_ADDR);
     kw2xrf_set_addr(dev, KW2XRF_DEFAULT_ADDR_LONG);
@@ -516,8 +525,8 @@ uint64_t kw2xrf_get_addr_long(kw2xrf_t *dev)
     uint64_t addr;
     uint8_t *ap = (uint8_t *)(&addr);
 
-    for (int i = 0; i < 8; i++) {
-        ap[i] = dev->addr_long[7 - i];
+    for (int i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
+        ap[i] = dev->addr_long[IEEE802154_LONG_ADDRESS_LEN - 1 - i];
     }
 
     return addr;
@@ -581,10 +590,10 @@ int kw2xrf_get(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             }
 
             if (dev->option & KW2XRF_OPT_SRC_ADDR_LONG) {
-                *((uint16_t *)value) = 8;
+                *((uint16_t *)value) = IEEE802154_LONG_ADDRESS_LEN;
             }
             else {
-                *((uint16_t *)value) = 2;
+                *((uint16_t *)value) = IEEE802154_SHORT_ADDRESS_LEN;
             }
 
             return sizeof(uint16_t);
@@ -603,11 +612,11 @@ int kw2xrf_get(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             }
             if (dev->option & KW2XRF_OPT_SRC_ADDR_LONG) {
                 uint64_t addr = kw2xrf_get_addr_long(dev);
-                ieee802154_get_iid(value, (uint8_t *)&addr, 8);
+                ieee802154_get_iid(value, (uint8_t *)&addr, IEEE802154_LONG_ADDRESS_LEN);
             }
             else {
                 uint16_t addr = kw2xrf_get_addr_short(dev);
-                ieee802154_get_iid(value, (uint8_t *)&addr, 2);
+                ieee802154_get_iid(value, (uint8_t *)&addr, IEEE802154_SHORT_ADDRESS_LEN);
             }
             return sizeof(eui64_t);
 
@@ -783,11 +792,11 @@ int kw2xrf_set(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t value_le
                 return -EOVERFLOW;
             }
 
-            if (*((uint16_t *)value) == 2) {
+            if (*((uint16_t *)value) == IEEE802154_SHORT_ADDRESS_LEN) {
                 kw2xrf_set_option(dev, KW2XRF_OPT_SRC_ADDR_LONG,
                                   false);
             }
-            else if (*((uint16_t *)value) == 8) {
+            else if (*((uint16_t *)value) == IEEE802154_LONG_ADDRESS_LEN) {
                 kw2xrf_set_option(dev, KW2XRF_OPT_SRC_ADDR_LONG,
                                   true);
             }
@@ -902,10 +911,10 @@ static size_t _get_frame_hdr_len(uint8_t *mhr)
         }
 
         if (tmp == IEEE802154_FCF_SRC_ADDR_SHORT) {
-            return (len + 2);
+            return (len + IEEE802154_SHORT_ADDRESS_LEN);
         }
         else if (tmp == IEEE802154_FCF_SRC_ADDR_LONG) {
-            return (len + 8);
+            return (len + IEEE802154_LONG_ADDRESS_LEN);
         }
     }
 
@@ -925,10 +934,10 @@ static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
     tmp = mhr[1] & IEEE802154_FCF_SRC_ADDR_MASK;
 
     if (tmp == IEEE802154_FCF_SRC_ADDR_SHORT) {
-        src_len = 2;
+        src_len = IEEE802154_SHORT_ADDRESS_LEN;
     }
     else if (tmp == IEEE802154_FCF_SRC_ADDR_LONG) {
-        src_len = 8;
+        src_len = IEEE802154_LONG_ADDRESS_LEN;
     }
     else if (tmp == 0) {
         src_len = 0;
@@ -940,10 +949,10 @@ static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
     tmp = mhr[1] & IEEE802154_FCF_DST_ADDR_MASK;
 
     if (tmp == IEEE802154_FCF_DST_ADDR_SHORT) {
-        dst_len = 2;
+        dst_len = IEEE802154_SHORT_ADDRESS_LEN;
     }
     else if (tmp == IEEE802154_FCF_DST_ADDR_LONG) {
-        dst_len = 8;
+        dst_len = IEEE802154_LONG_ADDRESS_LEN;
     }
     else if (tmp == 0) {
         dst_len = 0;
@@ -1008,7 +1017,7 @@ void _receive_data(kw2xrf_t *dev)
         return;
     }
 
-    /* If RAW-mode is selected direclty forward pkt, MAC does the rest */
+    /* If RAW-mode is selected directly forward pkt, MAC does the rest */
     if (dev->option & KW2XRF_OPT_RAWDUMP) {
         payload = gnrc_pktbuf_add(NULL, NULL, pkt_len, GNRC_NETTYPE_UNDEF);
 
@@ -1043,8 +1052,8 @@ void _receive_data(kw2xrf_t *dev)
     netif->if_pid = thread_getpid();
     netif->lqi = dev->buf[pkt_len];
     /* lqi and rssi are directly related to each other in the kw2x-device.
-     * The rssi-unit is dBm and in this case alwaysnegative, nevertheless
-     * a positive value is reported.
+     * The rssi-unit is dBm and in this case always negative, nevertheless a
+     * positive value is reported.
      */
     netif->rssi = -((netif->lqi) - 286.6) / 2.69333;
 
@@ -1139,7 +1148,7 @@ int _assemble_tx_buf(kw2xrf_t *dev, gnrc_pktsnip_t *pkt)
         dev->buf[index++] = 0xff;
         dev->buf[index++] = 0xff;
     }
-    else if (hdr->dst_l2addr_len == 2) {
+    else if (hdr->dst_l2addr_len == IEEE802154_SHORT_ADDRESS_LEN) {
         /* set to short addressing mode */
         dev->buf[2] |= IEEE802154_FCF_DST_ADDR_SHORT;
         /* set destination address, byte order is inverted */
@@ -1147,12 +1156,12 @@ int _assemble_tx_buf(kw2xrf_t *dev, gnrc_pktsnip_t *pkt)
         dev->buf[index++] = dst_addr[1];
         dev->buf[index++] = dst_addr[0];
     }
-    else if (hdr->dst_l2addr_len == 8) {
+    else if (hdr->dst_l2addr_len == IEEE802154_LONG_ADDRESS_LEN) {
         /* default to use long address mode for src and dst */
         dev->buf[2] |= IEEE802154_FCF_DST_ADDR_LONG;
         /* set destination address located directly after gnrc_ifhrd_t in memory */
         uint8_t *dst_addr = gnrc_netif_hdr_get_dst_addr(hdr);
-        for (int i = 7;  i >= 0; i--) {
+        for (int i = IEEE802154_LONG_ADDRESS_LEN - 1;  i >= 0; i--) {
             dev->buf[index++] = dst_addr[i];
         }
     }
@@ -1170,15 +1179,15 @@ int _assemble_tx_buf(kw2xrf_t *dev, gnrc_pktsnip_t *pkt)
     }
 
     /* insert source address according to length */
-    if (hdr->src_l2addr_len == 2) {
+    if (hdr->src_l2addr_len == IEEE802154_SHORT_ADDRESS_LEN) {
         dev->buf[2] |= IEEE802154_FCF_SRC_ADDR_SHORT;
         dev->buf[index++] = (uint8_t)(dev->addr_short[0]);
         dev->buf[index++] = (uint8_t)(dev->addr_short[1]);
     }
     else {
         dev->buf[2] |= IEEE802154_FCF_SRC_ADDR_LONG;
-        memcpy(&(dev->buf[index]), dev->addr_long, 8);
-        index += 8;
+        memcpy(&(dev->buf[index]), dev->addr_long, IEEE802154_LONG_ADDRESS_LEN);
+        index += IEEE802154_LONG_ADDRESS_LEN;
     }
     /* set sequence number */
     dev->buf[3] = dev->seq_nr++;
@@ -1191,6 +1200,10 @@ int kw2xrf_send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
 {
     int index = 0;
     kw2xrf_t *dev = (kw2xrf_t *) netdev;
+
+    if ((dev->option & KW2XRF_OPT_PRELOADING) == NETOPT_DISABLE) {
+        kw2xrf_set_sequence(dev, XCVSEQ_TRANSMIT);
+    }
 
     if (pkt == NULL) {
         return -ENOMSG;

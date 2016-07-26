@@ -22,7 +22,6 @@
 #include "irq.h"
 #include "sched.h"
 #include "sema.h"
-#include "tcb.h"
 #include "timex.h"
 #include "thread.h"
 #include "xtimer.h"
@@ -59,7 +58,7 @@ int sem_trywait(sem_t *sem)
         errno = EINVAL;
         return -1;
     }
-    old_state = disableIRQ();
+    old_state = irq_disable();
     value = sem->value;
     if (value == 0) {
         errno = EAGAIN;
@@ -70,7 +69,7 @@ int sem_trywait(sem_t *sem)
         sem->value = value - 1;
     }
 
-    restoreIRQ(old_state);
+    irq_restore(old_state);
     return result;
 }
 

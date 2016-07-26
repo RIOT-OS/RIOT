@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef HW_MEMMAP_H
-#define HW_MEMMAP_H
+#ifndef STELLARIS_HW_MEMMAP_H
+#define STELLARIS_HW_MEMMAP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -169,4 +169,4 @@ extern "C" {
 }
 #endif
 
-#endif // HW_MEMMAP_H
+#endif /* STELLARIS_HW_MEMMAP_H */

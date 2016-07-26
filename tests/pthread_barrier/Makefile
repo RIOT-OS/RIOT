@@ -2,7 +2,7 @@
 APPLICATION = pthread_barrier
 include ../Makefile.tests_common
 
-BOARD_BLACKLIST := arduino-mega2560
+BOARD_BLACKLIST := arduino-mega2560 waspmote-pro
 # arduino-mega2560: unknown type name: clockid_t
 
 # exclude boards with insufficient memory

@@ -99,7 +99,9 @@
 #include "thread.h"
 #include "irq.h"
 #include "cpu.h"
-#include "kernel_internal.h"
+
+extern uint32_t _estack;
+extern uint32_t _sstack;
 
 /**
  * @brief   Noticeable marker marking the beginning of a stack segment
@@ -252,9 +254,33 @@ void thread_arch_stack_print(void)
     printf("current stack size: %i byte\n", count);
 }
 
+/* This function returns the number of bytes used on the ISR stack */
+int thread_arch_isr_stack_usage(void)
+{
+    uint32_t *ptr = &_sstack;
+
+    while(((*ptr) == STACK_CANARY_WORD) && (ptr < &_estack)) {
+        ++ptr;
+    }
+
+    ptrdiff_t num_used_words = &_estack - ptr;
+    return num_used_words * sizeof(*ptr);
+}
+
+void *thread_arch_isr_stack_pointer(void)
+{
+    void *msp = (void *)__get_MSP();
+    return msp;
+}
+
+void *thread_arch_isr_stack_start(void)
+{
+    return (void *)&_sstack;
+}
+
 __attribute__((naked)) void NORETURN thread_arch_start_threading(void)
 {
-    __ASM volatile (
+    __asm__ volatile (
     "bl     irq_arch_enable               \n" /* enable IRQs to make the SVC
                                            * interrupt is reachable */
     "svc    #1                            \n" /* trigger the SVC interrupt */
@@ -272,7 +298,7 @@ void thread_arch_yield(void)
 
 __attribute__((naked)) void arch_context_switch(void)
 {
-    __ASM volatile (
+    __asm__ volatile (
     /* PendSV handler entry point */
     ".global isr_pendsv               \n"
     ".thumb_func                      \n"

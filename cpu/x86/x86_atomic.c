@@ -34,7 +34,7 @@
 int atomic_cas(atomic_int_t *dest, int known_value, int new_value)
 {
     uint8_t successful;
-    asm volatile ("lock cmpxchgl %2, %0\n"
+    __asm__ volatile ("lock cmpxchgl %2, %0\n"
                   "seteb %1"
                   : "+m"(ATOMIC_VALUE(*dest)), "=g"(successful)
                   : "r"(new_value), "a"(known_value)

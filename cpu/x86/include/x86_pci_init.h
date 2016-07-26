@@ -31,4 +31,4 @@ void x86_init_pci_devices(void);
 }
 #endif
 
-#endif
+#endif /* X86_PCI_INIT_H */

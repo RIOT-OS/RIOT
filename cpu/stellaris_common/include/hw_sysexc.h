@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef HW_SYSEXC_H
-#define HW_SYSEXC_H
+#ifndef STELLARIS_HW_SYSEXC_H
+#define STELLARIS_HW_SYSEXC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -136,4 +136,4 @@ extern "C" {
 }
 #endif
 
-#endif // HW_SYSEXC_H
+#endif /* STELLARIS_HW_SYSEXC_H */

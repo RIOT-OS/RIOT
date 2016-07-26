@@ -27,8 +27,11 @@ extern "C" {
 
 /**
  * @brief Integer variable for use in atomic counters.
+ *
+ * @note    This type is a struct for hard type checking (let the compiler warn
+ *          if int is assigned regularly).
  */
-typedef struct atomic_int {
+typedef struct {
     volatile int value;         /**< the actual value */
 } atomic_int_t;
 

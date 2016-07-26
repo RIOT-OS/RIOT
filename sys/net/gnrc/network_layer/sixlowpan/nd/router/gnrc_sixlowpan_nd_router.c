@@ -112,9 +112,7 @@ static inline bool _is_me(ipv6_addr_t *addr)
 
 void gnrc_sixlowpan_nd_router_set_rtr_adv(gnrc_ipv6_netif_t *netif, bool enable)
 {
-    ipv6_addr_t all_routers = IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
-
-    if (enable && (gnrc_ipv6_netif_add_addr(netif->pid, &all_routers, 128,
+    if (enable && (gnrc_ipv6_netif_add_addr(netif->pid, &ipv6_addr_all_routers_link_local, 128,
                                             GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST) != NULL)) {
         mutex_lock(&netif->mutex);
         netif->flags |= GNRC_IPV6_NETIF_FLAGS_RTR_ADV;
@@ -128,7 +126,7 @@ void gnrc_sixlowpan_nd_router_set_rtr_adv(gnrc_ipv6_netif_t *netif, bool enable)
     }
     else {
         netif->flags &= ~GNRC_IPV6_NETIF_FLAGS_RTR_ADV;
-        gnrc_ipv6_netif_remove_addr(netif->pid, &all_routers);
+        gnrc_ipv6_netif_remove_addr(netif->pid, (ipv6_addr_t *)&ipv6_addr_all_routers_link_local);
     }
 }
 
@@ -245,7 +243,7 @@ void gnrc_sixlowpan_nd_opt_abr_handle(kernel_pid_t iface, ndp_rtr_adv_t *rtr_adv
 
     xtimer_remove(&abr->ltimer);
     abr->ltimer_msg.type = GNRC_SIXLOWPAN_ND_MSG_ABR_TIMEOUT;
-    abr->ltimer_msg.content.ptr = (char *) abr;
+    abr->ltimer_msg.content.ptr = abr;
     xtimer_set_msg(&abr->ltimer, t, &abr->ltimer_msg, gnrc_ipv6_pid);
 }
 

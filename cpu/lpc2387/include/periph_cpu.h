@@ -56,19 +56,14 @@ void gpio_init_states(void);
 
 #define GPIO_PIN(port, pin) (port*32 + pin)
 
-#define HAVE_GPIO_PP_T
-typedef enum {
-    GPIO_PULLUP = 0,        /**< enable internal pull-up resistor */
-    GPIO_NOPULL = 2,        /**< do not use internal pull resistors */
-    GPIO_PULLDOWN = 3       /**< enable internal pull-down resistor */
-} gpio_pp_t;
-
+#ifndef DOXYGEN
 #define HAVE_GPIO_FLANK_T
 typedef enum {
     GPIO_FALLING = 1,       /**< emit interrupt on falling flank */
     GPIO_RISING = 2,        /**< emit interrupt on rising flank */
     GPIO_BOTH = 3           /**< emit interrupt on both flanks */
 } gpio_flank_t;
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Number of available timer channels

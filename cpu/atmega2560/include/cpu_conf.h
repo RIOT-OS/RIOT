@@ -7,6 +7,7 @@
  */
 
 /**
+ * @ingroup         cpu_atmega2560
  * @{
  *
  * @file
@@ -19,6 +20,7 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include "atmega_regs_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,6 +40,7 @@ extern "C" {
 #endif
 
 #define THREAD_STACKSIZE_IDLE      (128)
+#define ISR_STACKSIZE              (0)
 /** @} */
 
 #ifdef __cplusplus

@@ -7,19 +7,7 @@
 # directory for more details.
 #
 
-set -e
-
-set_result() {
-    NEW_RESULT=$1
-    LAST_RESULT=$2
-
-    if [ $LAST_RESULT -ne 0 ] && [ $NEW_RESULT -eq 0 ]
-    then
-        NEW_RESULT=$LAST_RESULT
-    fi
-
-    echo $NEW_RESULT
-}
+CI_BASE_BRANCH=${CI_BASE_BRANCH:-master}
 
 if [[ $BUILDTEST_MCU_GROUP ]]
 then
@@ -27,48 +15,75 @@ then
     if [ "$BUILDTEST_MCU_GROUP" == "static-tests" ]
     then
         RESULT=0
+        RECALL="$1"
 
-        git rebase master || git rebase --abort
-        RESULT=$(set_result $? $RESULT)
+        if git diff ${CI_BASE_BRANCH} HEAD -- .travis.yml &> /dev/null; then
+            # check if .travis.yml was changed in the current PR and skip if so
+            if ! git diff --name-only $(git merge-base HEAD ${CI_BASE_BRANCH})..HEAD -- \
+                .travis.yml &> 1; then
+                echo "==============================================================" >&2
+                echo -e "\033[1;31m.travis.yml differs in upstream.\033[0m"
+                echo -e "\033[1;31mPlease rebase your PR to current upstream or expect errors!!!!\033[0m" >&2
+                echo "    git fetch https://github.com/RIOT-OS/RIOT ${CI_BASE_BRANCH}" >&2
+                echo "    git rebase FETCH_HEAD" >&2
+                echo "    git push -f origin $(git rev-parse --abbrev-ref HEAD)" >&2
+                echo "==============================================================" >&2
+                return 1
+            fi
+        fi
 
-        ./dist/tools/whitespacecheck/check.sh master
-        RESULT=$(set_result $? $RESULT)
+        if [ "$RECALL" != "recall" ]; then
+            if git diff ${CI_BASE_BRANCH} HEAD -- "$0" &> /dev/null; then
+                git rebase ${CI_BASE_BRANCH} || git rebase --abort
 
-        ./dist/tools/licenses/check.sh master --diff-filter=MR --error-exitcode=0
-        RESULT=$(set_result $? $RESULT)
+                "$0" "recall"
+                exit $?
+            fi
+        fi
 
-        ./dist/tools/licenses/check.sh master --diff-filter=AC
-        RESULT=$(set_result $? $RESULT)
+        trap "RESULT=1" ERR
 
-        ./dist/tools/doccheck/check.sh master
-        RESULT=$(set_result $? $RESULT)
+        git rebase ${CI_BASE_BRANCH} || git rebase --abort
+        if [ $RESULT -ne 0 ]; then
+            exit $RESULT
+        fi
 
-        ./dist/tools/externc/check.sh master
-        RESULT=$(set_result $? $RESULT)
+        ./dist/tools/whitespacecheck/check.sh ${CI_BASE_BRANCH}
+
+        ./dist/tools/licenses/check.sh ${CI_BASE_BRANCH} --diff-filter=MR --error-exitcode=0
+
+        ./dist/tools/licenses/check.sh ${CI_BASE_BRANCH} --diff-filter=AC
+
+        ./dist/tools/doccheck/check.sh ${CI_BASE_BRANCH}
+
+        ./dist/tools/externc/check.sh ${CI_BASE_BRANCH}
 
         # TODO:
-        #   Remove all but `master` parameters to cppcheck (and remove second
+        #   Remove all but `${CI_BASE_BRANCH}` parameters to cppcheck (and remove second
         #   invocation) once all warnings of cppcheck have been taken care of
-        #   in master.
-        ./dist/tools/cppcheck/check.sh master --diff-filter=MR --error-exitcode=0
-        RESULT=$(set_result $? $RESULT)
+        #   in ${CI_BASE_BRANCH}.
+        ./dist/tools/cppcheck/check.sh ${CI_BASE_BRANCH} --diff-filter=MR --error-exitcode=0
 
-        ./dist/tools/cppcheck/check.sh master --diff-filter=AC
-        RESULT=$(set_result $? $RESULT)
+        ./dist/tools/cppcheck/check.sh ${CI_BASE_BRANCH} --diff-filter=AC
 
-        ./dist/tools/pr_check/pr_check.sh master
-        RESULT=$(set_result $? $RESULT)
+        ./dist/tools/pr_check/pr_check.sh ${CI_BASE_BRANCH}
 
         exit $RESULT
     fi
 
+    if [ "$BUILDTEST_MCU_GROUP" == "host" ]; then
+        make -C dist/tools
+        exit $?
+    fi
+
     if [ "$BUILDTEST_MCU_GROUP" == "x86" ]
     then
-        make -C ./tests/unittests all test BOARD=native || exit
+        make -C ./tests/unittests all-debug test BOARD=native TERMPROG='gdb -batch -ex r -ex bt $(ELF)' || exit
         # TODO:
         #   Reenable once https://github.com/RIOT-OS/RIOT/issues/2300 is
         #   resolved:
         #   - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
     fi
-    ./dist/tools/compile_test/compile_test.py $TRAVIS_BRANCH
+    BASE_BRANCH="${TRAVIS_BRANCH:-${CI_BASE_BRANCH}}"
+    ./dist/tools/compile_test/compile_test.py $BASE_BRANCH
 fi

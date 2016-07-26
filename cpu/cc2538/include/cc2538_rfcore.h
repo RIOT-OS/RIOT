@@ -54,7 +54,17 @@ typedef struct {
     cc2538_reg_t FFSM_SHORT_ADDR0;        /**< RF Local address information */
     cc2538_reg_t FFSM_SHORT_ADDR1;        /**< RF Local address information */
     cc2538_reg_t RESERVED1[10];           /**< Reserved bytes */
-    cc2538_reg_t XREG_FRMFILT0;           /**< RF Frame Filter 0 */
+
+    union {
+        cc2538_reg_t XREG_FRMFILT0;       /**< RF Frame Filter 0 */
+        struct {
+            cc2538_reg_t FRAME_FILTER_EN  :  1;
+            cc2538_reg_t PAN_COORDINATOR  :  1;
+            cc2538_reg_t MAX_FRAME_VERSION:  2;
+            cc2538_reg_t RESERVED         : 28;
+        } XREG_FRMFILT0bits;
+    };
+
     cc2538_reg_t XREG_FRMFILT1;           /**< RF Frame Filter 1 */
     cc2538_reg_t XREG_SRCMATCH;           /**< RF Source address matching and pending bits */
     cc2538_reg_t XREG_SRCSHORTEN0;        /**< RF Short address matching */
@@ -63,7 +73,20 @@ typedef struct {
     cc2538_reg_t XREG_SRCEXTEN0;          /**< RF Extended address matching */
     cc2538_reg_t XREG_SRCEXTEN1;          /**< RF Extended address matching */
     cc2538_reg_t XREG_SRCEXTEN2;          /**< RF Extended address matching */
-    cc2538_reg_t XREG_FRMCTRL0;           /**< RF Frame handling */
+
+    union {
+        cc2538_reg_t XREG_FRMCTRL0;       /**< RF Frame handling */
+        struct {
+            cc2538_reg_t TX_MODE          :  2;
+            cc2538_reg_t RX_MODE          :  2;
+            cc2538_reg_t ENERGY_SCAN      :  1;
+            cc2538_reg_t AUTOACK          :  1;
+            cc2538_reg_t AUTOCRC          :  1;
+            cc2538_reg_t APPEND_DATA_MODE :  1;
+            cc2538_reg_t RESERVED         : 24;
+        } XREG_FRMCTRL0bits;
+    };
+
     cc2538_reg_t XREG_FRMCTRL1;           /**< RF Frame handling */
     cc2538_reg_t XREG_RXENABLE;           /**< RF RX enabling */
     cc2538_reg_t XREG_RXMASKSET;          /**< RF RX enabling */
@@ -72,8 +95,32 @@ typedef struct {
     cc2538_reg_t XREG_FREQCTRL;           /**< RF Controls the RF frequency */
     cc2538_reg_t XREG_TXPOWER;            /**< RF Controls the output power */
     cc2538_reg_t XREG_TXCTRL;             /**< RF Controls the TX settings */
-    cc2538_reg_t XREG_FSMSTAT0;           /**< RF Radio status register */
-    cc2538_reg_t XREG_FSMSTAT1;           /**< RF Radio status register */
+
+    union {
+        cc2538_reg_t XREG_FSMSTAT0;       /**< RF Radio status register */
+        struct {
+            cc2538_reg_t FSM_FFCTRL_STATE :  6;
+            cc2538_reg_t CAL_RUNNING      :  1;
+            cc2538_reg_t CAL_DONE         :  1;
+            cc2538_reg_t RESERVED         : 24;
+        } XREG_FSMSTAT0bits;
+    };
+
+    union {
+        cc2538_reg_t XREG_FSMSTAT1;       /**< RF Radio status register */
+        struct {
+            cc2538_reg_t RX_ACTIVE        :  1;
+            cc2538_reg_t TX_ACTIVE        :  1;
+            cc2538_reg_t LOCK_STATUS      :  1;
+            cc2538_reg_t SAMPLED_CCA      :  1;
+            cc2538_reg_t CCA              :  1;
+            cc2538_reg_t SFD              :  1;
+            cc2538_reg_t FIFOP            :  1;
+            cc2538_reg_t FIFO             :  1;
+            cc2538_reg_t RESERVED         : 24;
+        } XREG_FSMSTAT1bits;
+    };
+
     cc2538_reg_t XREG_FIFOPCTRL;          /**< RF FIFOP threshold */
     cc2538_reg_t XREG_FSMCTRL;            /**< RF FSM options */
     cc2538_reg_t XREG_CCACTRL0;           /**< RF CCA threshold */
@@ -89,7 +136,7 @@ typedef struct {
             cc2538_reg_t RSSI_VALID :  1; /**< RSSI value is valid */
             cc2538_reg_t RESERVED   : 31; /**< Reserved bits */
         } XREG_RSSISTATbits;
-    } cc2538_rfcore_xreg_rssistat;
+    };
 
     cc2538_reg_t XREG_RXFIRST;            /**< RF First byte in RX FIFO */
     cc2538_reg_t XREG_RXFIFOCNT;          /**< RF Number of bytes in RX FIFO */
@@ -115,7 +162,7 @@ typedef struct {
             cc2538_reg_t QRND       :  1; /**< Random bit from the Q channel of the receiver */
             cc2538_reg_t RESERVED   : 30; /**< Reserved bits */
         } XREG_RFRNDbits;
-    } cc2538_rfcore_xreg_rfrnd;
+    };
 
     cc2538_reg_t XREG_MDMCTRL0;           /**< RF Controls modem */
     cc2538_reg_t XREG_MDMCTRL1;           /**< RF Controls modem */

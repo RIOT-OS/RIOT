@@ -151,4 +151,4 @@ extern "C" {
 }
 #endif
 
-#endif // LPC2387_H
+#endif /* LPC2387_H */

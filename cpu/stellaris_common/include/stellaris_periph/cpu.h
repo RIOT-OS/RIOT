@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef CPU_H
-#define CPU_H
+#ifndef STELLARIS_CPU_H
+#define STELLARIS_CPU_H
 
 //*****************************************************************************
 //
@@ -72,4 +72,4 @@ extern void CPUbasepriSet(unsigned long ulNewBasepri);
 }
 #endif
 
-#endif // CPU_H
+#endif /* STELLARIS_CPU_H */

@@ -55,11 +55,11 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
     dev->params = *params;
 
     /* Configure chip-select */
-    gpio_init(dev->params.cs, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(dev->params.cs, GPIO_OUT);
     gpio_set(dev->params.cs);
 
     /* Configure GDO1 */
-    gpio_init(dev->params.gdo1, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init(dev->params.gdo1, GPIO_IN);
 
     /* Configure SPI */
     spi_acquire(dev->params.spi);
@@ -87,12 +87,13 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
     cc110x_set_channel(dev, CC110X_DEFAULT_CHANNEL);
 
     /* set default node id */
-#ifdef CPUID_LEN
-    if (CPUID_LEN>0) {
-        char cpuid[CPUID_LEN];
-        cpuid_get(cpuid);
-        cc110x_set_address(dev, (uint8_t) cpuid[CPUID_LEN-1]);
+#if CPUID_LEN
+    char cpuid[CPUID_LEN];
+    cpuid_get(cpuid);
+    for (int i = 1; i < CPUID_LEN; i++) {
+        cpuid[0] ^= cpuid[i];
     }
+    cc110x_set_address(dev, (uint8_t) cpuid[0]);
 #endif
 
     LOG_INFO("cc110x: initialized with address=%u and channel=%i\n",

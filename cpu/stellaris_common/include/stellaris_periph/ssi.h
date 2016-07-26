@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef SSI_H
-#define SSI_H
+#ifndef STELLARIS_SSI_H
+#define STELLARIS_SSI_H
 
 //*****************************************************************************
 //
@@ -148,4 +148,4 @@ extern unsigned long SSIClockSourceGet(unsigned long ulBase);
 }
 #endif
 
-#endif // SSI_H
+#endif /* STELLARIS_SSI_H */

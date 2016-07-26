@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef HIBERNATE_H
-#define HIBERNATE_H
+#ifndef STELLARIS_HIBERNATE_H
+#define STELLARIS_HIBERNATE_H
 
 //*****************************************************************************
 //
@@ -164,4 +164,4 @@ extern unsigned long HibernateBatCheckDone(void);
 }
 #endif
 
-#endif  // HIBERNATE_H
+#endif  /* STELLARIS_HIBERNATE_H */

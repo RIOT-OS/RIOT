@@ -27,7 +27,7 @@ extern "C" {
  * @brief     Ringbuffer.
  * @details   Non thread-safe FIFO ringbuffer implementation around a `char` array.
  */
-typedef struct ringbuffer {
+typedef struct {
     char *buf;          /**< Buffer to operate on. */
     unsigned int size;  /**< Size of buf. */
     unsigned int start; /**< Current read position in the ring buffer. */

@@ -20,9 +20,9 @@
 
 #include <stdio.h>
 
+#include "lpm.h"
 #include "arch/lpm_arch.h"
 #include "cpu.h"
-#include "kernel.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -62,7 +62,7 @@ enum lpm_mode lpm_arch_set(enum lpm_mode target)
     PM->SLEEPCFG.bit.SLEEPMODE = mode;
 
     /* make sure value has been set */
-    while (PM->SLEEPCFG.bit.SLEEPMODE != mode);
+    while (PM->SLEEPCFG.bit.SLEEPMODE != mode) {}
 
     /* ensure all memory accesses have completed */
     __DSB();

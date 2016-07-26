@@ -38,8 +38,8 @@
 //
 //*****************************************************************************
 
-#ifndef ROM_MAP_H
-#define ROM_MAP_H
+#ifndef STELLARIS_ROM_MAP_H
+#define STELLARIS_ROM_MAP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -5080,4 +5080,4 @@ extern "C" {
 }
 #endif
 
-#endif // ROM_MAP_H
+#endif /* STELLARIS_ROM_MAP_H */

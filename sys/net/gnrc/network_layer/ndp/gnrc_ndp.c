@@ -181,7 +181,7 @@ void gnrc_ndp_nbr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
             /* see https://tools.ietf.org/html/rfc6775#section-6.5.2 */
             eui64_t iid;
             ieee802154_get_iid(&iid, ar_opt->eui64.uint8, sizeof(eui64_t));
-            ipv6_addr_set_iid(&nbr_adv_dst, iid.uint64.u64);
+            ipv6_addr_set_aiid(&nbr_adv_dst, iid.uint8);
             ipv6_addr_set_link_local_prefix(&nbr_adv_dst);
         }
     }
@@ -381,6 +381,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
     gnrc_ipv6_netif_t *if_entry = gnrc_ipv6_netif_get(iface);
 
     if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) {
+        gnrc_ipv6_nc_t *nc_entry;
         int sicmpv6_size = (int)icmpv6_size, l2src_len = 0;
         uint8_t l2src[GNRC_IPV6_NC_L2_ADDR_MAX];
         uint16_t opt_offset = 0;
@@ -432,7 +433,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                 ms = GNRC_SIXLOWPAN_ND_MAX_RTR_ADV_DELAY;
             }
 #endif
-            delay = genrand_uint32_range(0, ms);
+            delay = random_uint32_range(0, ms);
             xtimer_remove(&if_entry->rtr_adv_timer);
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
             /* in case of a 6LBR we have to check if the interface is actually
@@ -441,7 +442,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                 gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
                 if (nc_entry != NULL) {
                     if_entry->rtr_adv_msg.type = GNRC_NDP_MSG_RTR_ADV_SIXLOWPAN_DELAY;
-                    if_entry->rtr_adv_msg.content.ptr = (char *) nc_entry;
+                    if_entry->rtr_adv_msg.content.ptr = nc_entry;
                     xtimer_set_msg(&if_entry->rtr_adv_timer, delay, &if_entry->rtr_adv_msg,
                                    gnrc_ipv6_pid);
                 }
@@ -450,7 +451,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
             if (ipv6_addr_is_unspecified(&ipv6->src)) {
                 /* either multicast, if source unspecified */
                 if_entry->rtr_adv_msg.type = GNRC_NDP_MSG_RTR_ADV_RETRANS;
-                if_entry->rtr_adv_msg.content.ptr = (char *) if_entry;
+                if_entry->rtr_adv_msg.content.ptr = if_entry;
                 xtimer_set_msg(&if_entry->rtr_adv_timer, delay, &if_entry->rtr_adv_msg,
                                gnrc_ipv6_pid);
             }
@@ -458,11 +459,19 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                 /* or unicast, if source is known */
                 /* XXX: can't just use GNRC_NETAPI_MSG_TYPE_SND, since the next retransmission
                  * must also be set. */
-                gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
-                xtimer_set_msg(&nc_entry->rtr_adv_timer, delay, &nc_entry->rtr_adv_msg,
-                               gnrc_ipv6_pid);
+                nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
+                if (nc_entry) {
+                    xtimer_set_msg(&nc_entry->rtr_adv_timer, delay, &nc_entry->rtr_adv_msg,
+                                   gnrc_ipv6_pid);
+                }
             }
 #endif
+        }
+        nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
+        if (nc_entry != NULL) {
+            /* unset isRouter flag
+             * (https://tools.ietf.org/html/rfc4861#section-6.2.6) */
+            nc_entry->flags &= ~GNRC_IPV6_NC_IS_ROUTER;
         }
     }
     /* otherwise ignore silently */
@@ -471,7 +480,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 
 static inline void _set_reach_time(gnrc_ipv6_netif_t *if_entry, uint32_t mean)
 {
-    uint32_t reach_time = genrand_uint32_range(GNRC_NDP_MIN_RAND, GNRC_NDP_MAX_RAND);
+    uint32_t reach_time = random_uint32_range(GNRC_NDP_MIN_RAND, GNRC_NDP_MAX_RAND);
 
     if_entry->reach_time_base = mean;
     /* to avoid floating point number computation and have higher value entropy, the
@@ -506,7 +515,7 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
     if (nc_entry == NULL) { /* not in default router list */
         /* create default router list entry */
         nc_entry = gnrc_ipv6_nc_add(iface, &ipv6->src, NULL, 0,
-                                    GNRC_IPV6_NC_IS_ROUTER);
+                                    GNRC_IPV6_NC_STATE_STALE | GNRC_IPV6_NC_IS_ROUTER);
         if (nc_entry == NULL) {
             DEBUG("ndp: error on default router list entry creation\n");
             return;

@@ -18,8 +18,10 @@
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
+#ifndef STM32F4_CPU_CONF_H
+#define STM32F4_CPU_CONF_H
+
+#include "cpu_conf_common.h"
 
 #if defined(CPU_MODEL_STM32F401RE)
 #include "stm32f401xe.h"
@@ -46,5 +48,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
+#endif /* STM32F4_CPU_CONF_H */
 /** @} */

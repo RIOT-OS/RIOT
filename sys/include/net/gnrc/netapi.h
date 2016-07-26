@@ -28,7 +28,6 @@
 #ifndef GNRC_NETAPI_H_
 #define GNRC_NETAPI_H_
 
-#include "kernel.h"
 #include "thread.h"
 #include "net/netopt.h"
 #include "net/gnrc/nettype.h"

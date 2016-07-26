@@ -31,6 +31,16 @@
 #include "sys/socket.h"
 #include "netinet/in.h"
 
+#ifdef  MODULE_CONN_IP
+#   include "net/conn/ip.h"
+#endif  /* MODULE_CONN_IP */
+#ifdef  MODULE_CONN_TCP
+#   include "net/conn/tcp.h"
+#endif  /* MODULE_CONN_TCP */
+#ifdef  MODULE_CONN_UDP
+#   include "net/conn/udp.h"
+#endif  /* MODULE_CONN_UDP */
+
 #define SOCKET_POOL_SIZE    (4)
 
 /**
@@ -188,7 +198,7 @@ static int _implicit_bind(socket_t *s, void *addr)
     int res;
 
     /* TODO: ensure that this port hasn't been used yet */
-    s->src_port = (uint16_t)genrand_uint32_range(1LU << 10U, 1LU << 16U);
+    s->src_port = (uint16_t)random_uint32_range(1LU << 10U, 1LU << 16U);
 
     /* find the best matching source address */
     if ((best_match = conn_find_best_source(addr)) == NULL) {

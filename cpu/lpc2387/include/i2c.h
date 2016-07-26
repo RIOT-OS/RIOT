@@ -334,4 +334,4 @@ void i2c_disable_pull_up_resistor(uint8_t i2c_interface);
 }
 #endif
 
-#endif /* end I2C_H */
+#endif /* I2C_H */

@@ -51,6 +51,8 @@ Vagrant.configure(2) do |config|
                   '--vendorid', '0x03eb', '--productid',  '0x2111']
     vb.customize ['usbfilter', 'add', '0', '--target', :id, '--name', 'Arduino Mega 2560',
                   '--vendorid', '0x2341', '--productid',  '0x0042']
+    vb.customize ['usbfilter', 'add', '0', '--target', :id, '--name', 'Phytec phyWAVE KW22',
+                  '--vendorid', '0x0d28', '--productid',  '0x0204']
   end
 
   config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"

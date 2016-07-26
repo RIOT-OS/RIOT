@@ -19,6 +19,7 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include "cpu_conf_common.h"
 #include "cc2538.h"
 #include "cc2538_gpio.h"
 #include "cc2538_uart.h"

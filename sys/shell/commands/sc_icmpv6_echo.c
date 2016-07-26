@@ -108,7 +108,9 @@ int _handle_reply(gnrc_pktsnip_t *pkt, uint32_t time)
                ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
                byteorder_ntohs(icmpv6_hdr->id), seq, (unsigned)ipv6_hdr->hl,
                time / MS_IN_USEC, time % MS_IN_USEC);
+#ifdef MODULE_GNRC_IPV6_NC
         gnrc_ipv6_nc_still_reachable(&ipv6_hdr->src);
+#endif
     }
     else {
         puts("error: unexpected parameters");
@@ -124,7 +126,7 @@ static void _print_stats(char *addr_str, int success, int count, uint64_t total_
     printf("--- %s ping statistics ---\n", addr_str);
 
     if (success > 0) {
-        uint32_t avg_rtt = (uint32_t)sum_rtt / count;  /* get average */
+        uint32_t avg_rtt = (uint32_t)(sum_rtt / count); /* get average */
         printf("%d packets transmitted, %d received, %d%% packet loss, time %"
                PRIu32 ".06%" PRIu32 " s\n", count, success,
                (100 - ((success * 100) / count)),
@@ -254,8 +256,7 @@ int _icmpv6_ping(int argc, char **argv)
 
         _set_payload(pkt->data, payload_len);
 
-        pkt = gnrc_netreg_hdr_build(GNRC_NETTYPE_IPV6, pkt, NULL, 0, addr.u8,
-                                    sizeof(ipv6_addr_t));
+        pkt = gnrc_ipv6_hdr_build(pkt, NULL, &addr);
 
         if (pkt == NULL) {
             puts("error: packet buffer full");
@@ -288,7 +289,7 @@ int _icmpv6_ping(int argc, char **argv)
                 case GNRC_NETAPI_MSG_TYPE_RCV:
                     stop = xtimer_now() - start;
 
-                    gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)msg.content.ptr;
+                    gnrc_pktsnip_t *pkt = msg.content.ptr;
                     success += _handle_reply(pkt, stop);
                     gnrc_pktbuf_release(pkt);
 
@@ -317,7 +318,7 @@ int _icmpv6_ping(int argc, char **argv)
         while (msg_try_receive(&msg) > 0) {
             if (msg.type == GNRC_NETAPI_MSG_TYPE_RCV) {
                 printf("dropping additional response packet (probably caused by duplicates)\n");
-                gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)msg.content.ptr;
+                gnrc_pktsnip_t *pkt = msg.content.ptr;
                 gnrc_pktbuf_release(pkt);
             }
         }
@@ -341,7 +342,7 @@ int _icmpv6_ping(int argc, char **argv)
     while (msg_try_receive(&msg) > 0) {
         if (msg.type == GNRC_NETAPI_MSG_TYPE_RCV) {
             printf("dropping additional response packet (probably caused by duplicates)\n");
-            gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)msg.content.ptr;
+            gnrc_pktsnip_t *pkt = msg.content.ptr;
             gnrc_pktbuf_release(pkt);
         }
     }

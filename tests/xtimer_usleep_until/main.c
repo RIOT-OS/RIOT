@@ -33,6 +33,8 @@ int main(void)
     puts("xtimer_usleep_until test application.\n");
 
     uint32_t interval = NUMOF;
+    int32_t max_diff = INT32_MIN;
+    int32_t min_diff = INT32_MAX;
 
     for (int i = 0; i < NUMOF; i++) {
         printf("Testing interval %u... (now=%"PRIu32")\n", (unsigned)interval, xtimer_now());
@@ -46,11 +48,19 @@ int main(void)
     for (int i = 0; i < NUMOF; i++) {
         printf("%4d diff=%"PRIi32"\n", NUMOF-i, res[i]);
 
-        if (res[i] < -1000 || res[i] > 1000) {
-            puts("too large difference.\n");
-            puts("Test Failed.\n");
-            return 1;
+        if (res[i] > max_diff) {
+            max_diff = res[i];
         }
+        if (res[i] < min_diff) {
+            min_diff = res[i];
+        }
+    }
+    printf("\nMin/max error: %" PRId32 "/%" PRId32 "\n", min_diff, max_diff);
+
+    if (min_diff < -1000 || max_diff > 1000) {
+        puts("too large difference.\n");
+        puts("Test Failed.\n");
+        return 1;
     }
 
     printf("\nTest complete.\n");

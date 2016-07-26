@@ -19,8 +19,10 @@
  * @author          Katja Kirstein <katja.kirstein@haw-hamburg.de>
  */
 
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
+#ifndef STM32F3_CPU_CONF_H
+#define STM32F3_CPU_CONF_H
+
+#include "cpu_conf_common.h"
 
 #ifdef CPU_MODEL_STM32F303VC
 #include "stm32f303xc.h"
@@ -50,5 +52,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
+#endif /* STM32F3_CPU_CONF_H */
 /** @} */

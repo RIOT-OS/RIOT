@@ -26,22 +26,22 @@ extern "C" {
 /**
  * @brief   NHDP address representation
  */
-typedef struct nhdp_addr_t {
+typedef struct nhdp_addr {
     uint8_t *addr;                      /**< Pointer to the address data */
     size_t addr_size;                   /**< Size in bytes of the address */
     uint8_t addr_type;                  /**< AF type for the address */
     uint8_t usg_count;                  /**< Usage count in information bases */
     uint8_t in_tmp_table;               /**< Signals usage in a writers temp table */
     uint16_t tmp_metric_val;            /**< Encoded metric value used during HELLO processing */
-    struct nhdp_addr_t *next;           /**< Pointer to next address (used in central storage) */
+    struct nhdp_addr *next;             /**< Pointer to next address (used in central storage) */
 } nhdp_addr_t;
 
 /**
  * @brief   Container for NHDP address storage in a list
  */
-typedef struct nhdp_addr_entry_t {
-    struct nhdp_addr_t *address;        /**< Pointer to NHDP address storage entry */
-    struct nhdp_addr_entry_t *next;     /**< Pointer to the next address list element */
+typedef struct nhdp_addr_entry {
+    struct nhdp_addr *address;          /**< Pointer to NHDP address storage entry */
+    struct nhdp_addr_entry *next;       /**< Pointer to the next address list element */
 } nhdp_addr_entry_t;
 
 /**

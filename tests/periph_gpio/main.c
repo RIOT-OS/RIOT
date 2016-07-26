@@ -29,101 +29,81 @@ static void cb(void *arg)
     printf("INT: external interrupt from pin %i\n", (int)arg);
 }
 
-static int parse_pull(char *val)
+static int init_pin(int argc, char **argv, gpio_mode_t mode)
 {
-    switch (atoi(val)) {
-        case 0:
-            return GPIO_NOPULL;
-        case 1:
-            return GPIO_PULLUP;
-        case 2:
-            return GPIO_PULLDOWN;
-        default:
-            puts("Error: invalid pull configuration");
-            return -1;
+    int po, pi;
+
+    if (argc < 3) {
+        printf("usage: %s <port> <pin>\n", argv[0]);
+        return 1;
     }
+
+    po = atoi(argv[1]);
+    pi = atoi(argv[2]);
+
+    if (gpio_init(GPIO_PIN(po, pi), mode) < 0) {
+        printf("Error to initialize GPIO_PIN(%i, %02i)\n", po, pi);
+        return 1;
+    }
+
+    return 0;
 }
 
 static int init_out(int argc, char **argv)
 {
-    int port, pin, pull;
-
-    if (argc < 3) {
-        printf("usage: %s <port> <pin> [pull_config]\n", argv[0]);
-        puts("      pull_config: 0: no pull resistor (default)\n"
-             "                   1: pull up\n"
-             "                   2: pull down");
-        return 1;
-    }
-    port = atoi(argv[1]);
-    pin = atoi(argv[2]);
-    if (argc >= 4) {
-        pull = parse_pull(argv[3]);
-        if (pull < 0) {
-            return 1;
-        }
-    }
-    else {
-        pull = GPIO_NOPULL;
-    }
-    if (gpio_init(GPIO_PIN(port, pin), GPIO_DIR_OUT, pull) < 0) {
-        printf("Error while initializing  PORT_%i.%i as output\n", port, pin);
-        return 1;
-    }
-    printf("PORT_%i.%i initialized successful as output\n", port, pin);
-
-    return 0;
+    return init_pin(argc, argv, GPIO_OUT);
 }
 
 static int init_in(int argc, char **argv)
 {
-    int port, pin, pull;
+    return init_pin(argc, argv, GPIO_IN);
+}
 
-    if (argc < 3) {
-        printf("usage: %s <port> <pin> [pull_config]\n", argv[0]);
-        puts("      pull_config: 0: no pull resistor (default)\n"
-             "                   1: pull up\n"
-             "                   2: pull down");
-        return 1;
-    }
-    port = atoi(argv[1]);
-    pin = atoi(argv[2]);
-    if (argc >= 4) {
-        pull = parse_pull(argv[3]);
-        if (pull < 0) {
-            return 1;
-        }
-    }
-    else {
-        pull = GPIO_NOPULL;
-    }
-    if (gpio_init(GPIO_PIN(port, pin), GPIO_DIR_IN, pull) < 0) {
-        printf("Error while initializing  PORT_%i.%02i as input\n", port, pin);
-        return 1;
-    }
-    printf("PORT_%i.%02i initialized successful as input\n", port, pin);
+static int init_in_pu(int argc, char **argv)
+{
+    return init_pin(argc, argv, GPIO_IN_PU);
+}
 
-    return 0;
+static int init_in_pd(int argc, char **argv)
+{
+    return init_pin(argc, argv, GPIO_IN_PD);
+}
+
+static int init_od(int argc, char **argv)
+{
+    return init_pin(argc, argv, GPIO_OD);
+}
+
+static int init_od_pu(int argc, char **argv)
+{
+    return init_pin(argc, argv, GPIO_OD_PU);
 }
 
 static int init_int(int argc, char **argv)
 {
-    int port, pin, flank, pull;
+    int po, pi;
+    gpio_mode_t mode = GPIO_IN;
+    gpio_flank_t flank;
+    int fl, pr;
 
     if (argc < 4) {
         printf("usage: %s <port> <pin> <flank> [pull_config]\n", argv[0]);
-        puts("      flank:       0: falling\n"
-             "                   1: rising\n"
-             "                   2: both\n"
-             "      pull_config: 0: no pull resistor (default)\n"
-             "                   1: pull up\n"
-             "                   2: pull down");
+        puts("\tflank:\n"
+             "\t0: falling\n"
+             "\t1: rising\n"
+             "\t2: both\n"
+             "\tpull_config:\n"
+             "\t0: no pull resistor (default)\n"
+             "\t1: pull up\n"
+             "\t2: pull down");
         return 1;
     }
-    port = atoi(argv[1]);
-    pin = atoi(argv[2]);
-    flank = atoi(argv[3]);
-    switch (flank) {
+
+    po = atoi(argv[1]);
+    pi = atoi(argv[2]);
+
+    fl = atoi(argv[3]);
+    switch (fl) {
         case 0:
             flank = GPIO_FALLING;
             break;
@@ -134,25 +114,33 @@ static int init_int(int argc, char **argv)
             flank = GPIO_BOTH;
             break;
         default:
-            printf("wrong flank setting.\n");
-            return 0;
-    }
-    if (argc >= 5) {
-        pull = parse_pull(argv[4]);
-        if (pull < 0) {
+            puts("error: invalid value for active flank");
             return 1;
+    }
+
+    if (argc >= 5) {
+        pr = atoi(argv[4]);
+        switch (pr) {
+            case 0:
+                mode = GPIO_IN;
+                break;
+            case 1:
+                mode = GPIO_IN_PU;
+                break;
+            case 2:
+                mode = GPIO_IN_PD;
+                break;
+            default:
+                puts("error: invalid pull resistor option");
+                return 1;
         }
     }
-    else {
-        pull = GPIO_NOPULL;
-    }
-    if (gpio_init_int(GPIO_PIN(port, pin), pull, flank, cb, (void *)pin) < 0) {
-        printf("Error while initializing  PORT_%i.%02i as external interrupt\n",
-               port, pin);
+
+    if (gpio_init_int(GPIO_PIN(po, pi), mode, flank, cb, (void *)pi) < 0) {
+        printf("error: init_int of GPIO_PIN(%i, %i) failed\n", po, pi);
         return 1;
     }
-    printf("PORT_%i.%02i initialized successful as external interrupt\n",
-           port, pin);
+    printf("GPIO_PIN(%i, %i) successfully initialized as ext int\n", po, pi);
 
     return 0;
 }
@@ -165,64 +153,64 @@ static int read(int argc, char **argv)
         printf("usage: %s <port> <pin>\n", argv[0]);
         return 1;
     }
+
     port = atoi(argv[1]);
     pin = atoi(argv[2]);
+
     if (gpio_read(GPIO_PIN(port, pin))) {
-        printf("PORT_%i.%02i is HIGH\n", port, pin);
+        printf("GPIO_PIN(%i.%02i) is HIGH\n", port, pin);
     }
     else {
-        printf("PORT_%i.%02i is LOW\n", port, pin);
+        printf("GPIO_PIN(%i.%02i) is LOW\n", port, pin);
     }
+
     return 0;
 }
 
 static int set(int argc, char **argv)
 {
-    int port, pin;
-
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
         return 1;
     }
-    port = atoi(argv[1]);
-    pin = atoi(argv[2]);
 
-    gpio_set(GPIO_PIN(port, pin));
+    gpio_set(GPIO_PIN(atoi(argv[1]), atoi(argv[2])));
+
     return 0;
 }
 
 static int clear(int argc, char **argv)
 {
-    int port, pin;
-
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
         return 1;
     }
-    port = atoi(argv[1]);
-    pin = atoi(argv[2]);
-    gpio_clear(GPIO_PIN(port, pin));
+
+    gpio_clear(GPIO_PIN(atoi(argv[1]), atoi(argv[2])));
+
     return 0;
 }
 
 static int toggle(int argc, char **argv)
 {
-    int port, pin;
-
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
         return 1;
     }
-    port = atoi(argv[1]);
-    pin = atoi(argv[2]);
-    gpio_toggle(GPIO_PIN(port, pin));
+
+    gpio_toggle(GPIO_PIN(atoi(argv[1]), atoi(argv[2])));
+
     return 0;
 }
 
 static const shell_command_t shell_commands[] = {
-    { "init_in", "initialize pin as output", init_in },
-    { "init_out", "initialize pin as input", init_out },
-    { "init_int", "initialize pin as EXTI", init_int },
+    { "init_out", "init as output (push-pull mode)", init_out },
+    { "init_in", "init as input w/o pull resistor", init_in },
+    { "init_in_pu", "init as input with pull-up", init_in_pu },
+    { "init_in_pd", "init as input with pull-down", init_in_pd },
+    { "init_od", "init as output (open-drain without pull resistor)", init_od },
+    { "init_od_pu", "init as output (open-drain with pull-up)", init_od_pu },
+    { "init_int", "init as external INT w/o pull resistor", init_int },
     { "read", "read pin status", read },
     { "set", "set pin to HIGH", set },
     { "clear", "set pin to LOW", clear },

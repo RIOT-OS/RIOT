@@ -32,29 +32,11 @@ extern "C" {
  * @brief   Xtimer configuration
  * @{
  */
-#define XTIMER                      (0)
+#define XTIMER_DEV                  (0)
 #define XTIMER_CHAN                 (0)
-#define XTIMER_MASK                 (0xff000000)
-#define XTIMER_SHIFT_ON_COMPARE     (2)
+#define XTIMER_WIDTH                (24)
 #define XTIMER_BACKOFF              (40)
 /** @} */
-
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_RED_PIN         1
-
-#define LED_RED_ON          (NRF_GPIO->OUTSET = (1 << LED_RED_PIN))
-#define LED_RED_OFF         (NRF_GPIO->OUTCLR = (1 << LED_RED_PIN))
-#define LED_RED_TOGGLE      (NRF_GPIO->OUT ^= (1 << LED_RED_PIN))
-#define LED_GREEN_ON        /* not available */
-#define LED_GREEN_OFF       /* not available */
-#define LED_GREEN_TOGGLE    /* not available */
-#define LED_BLUE_ON         /* not available */
-#define LED_BLUE_OFF        /* not available */
-#define LED_BLUE_TOGGLE     /* not available */
-/* @} */
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

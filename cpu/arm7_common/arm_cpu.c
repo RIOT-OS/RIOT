@@ -18,16 +18,33 @@
 
 #include <stdio.h>
 #include "arm_cpu.h"
-#include "sched.h"
-#include "kernel.h"
-#include "kernel_internal.h"
+#include "thread.h"
 
 #define STACK_MARKER    (0x77777777)
 #define REGISTER_CNT    (12)
 
 void thread_yield_higher(void)
 {
-    asm("svc 0\n");
+    __asm__("svc 0\n");
+}
+
+/* This function calculates the ISR_usage */
+int thread_arch_isr_stack_usage(void)
+{
+    /* TODO */
+    return -1;
+}
+
+void *thread_arch_isr_stack_pointer(void)
+{
+    /* TODO */
+    return (void *)-1;
+}
+
+void *thread_arch_isr_stack_start(void)
+{
+    /* TODO */
+    return (void *)-1;
 }
 
 /*----------------------------------------------------------------------------
@@ -74,7 +91,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 void thread_print_stack(void)
 {
     register void *stack = 0;
-    asm("mov %0, sp" : "=r"(stack));
+    __asm__("mov %0, sp" : "=r"(stack));
 
     register unsigned int *s = (unsigned int *)stack;
     printf("task: %X SP: %X\n", (unsigned int) sched_active_thread, (unsigned int) stack);

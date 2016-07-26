@@ -16,19 +16,31 @@ RIOT provides three shell to interact with the CCN-Lite stack:
                 incorrect ID, you should get an error message.) You have to
                 call this command, before you can actually send or receive
                 anything.
-* `ccnl_int` - generates and sends out an Interest. The command expects one
-               mandatory and one optional parameter. The first parameter
-               specifies the exact name (or a prefix) to request, the second
-               parameter specifies the link-layer address of the relay to use.
-               If the second parameter is omitted, the Interest will be
-               broadcasted. You may call it like this:
-               `ccnl_int /riot/peter/schmerzl b6:e5:94:26:ab:da`
-* `ccnl_cont` - generates and populates Content. The command expects one
-               mandatory and one optional parameter. The first parameter
-               specifies the name of the content to be created, the second
-               parameter specifies the content itself. The second parameter may
-               include spaces, e.g. you can call:
-               `ccnl_cont /riot/peter/schmerzl Hello World! Hello RIOT!`
+* `ccnl_int`  - generates and sends out an Interest. The command expects one
+                mandatory and one optional parameter. The first parameter
+                specifies the exact name (or a prefix) to request, the second
+                parameter specifies the link-layer address of the relay to use.
+                If the second parameter is omitted, the Interest will be
+                broadcasted. You may call it like this:
+                `ccnl_int /riot/peter/schmerzl b6:e5:94:26:ab:da`
+* `ccnl_cont` - generates and populates content. The command expects one
+                mandatory and one optional parameter. The first parameter
+                specifies the name of the content to be created, the second
+                parameter specifies the content itself. The second parameter
+                may include spaces, e.g. you can call:
+                `ccnl_cont /riot/peter/schmerzl Hello World! Hello RIOT!`
+* `ccnl_fib`  - modifies the FIB or shows its current state. If the command is
+                called without parameters, it will print the current state of
+                the FIB. It can also be called with the action parameters `add`
+                or `del` to add or delete an entry from the FIB, e.g.
+                `ccnl_fib add /riot/peter/schmerzl ab:cd:ef:01:23:45:67:89`
+                will add an entry for `/riot/peter/schmerzl` with
+                `ab:cd:ef:01:23:45:67:89` as a next hop and
+                `ccnl_fib del /riot/peter/schmerzl`
+                will remove the entry for `/riot/peter/schmerzl` and
+                `ccnl_fib del ab:cd:ef:01:23:45:67:89`
+                will remove all entries with `ab:cd:ef:01:23:45:67:89` as a
+                next hop.
 
 ## Example setup
 
@@ -39,11 +51,32 @@ An example usage of this application could be setup like this:
    windows.
 3. Call `make -B clean all term` in the first terminal and `PORT=tap1 make
    term` in the second one.
-4. Enter `open 3` in both terminals.
+4. Enter `ccnl_open 3` in both terminals.
 5. Enter `ccnl_cont /riot/peter/schmerzl Hello World! Hello RIOT!` on the first
    terminal.
-6. Enter `ccnl_int /riot/peter/schmerzl` in the second terminal.
-7. See the content being displayed. Be happy!
+6. Add a FIB entry for this prefix on the second node, e.g. using the broadcast
+   address: `ccnl_fib add /riot/peter/schmerzl ff:ff:ff:ff:ff:ff`
+7. Enter `ccnl_int /riot/peter/schmerzl` in the second terminal.
+8. See the content being displayed. Be happy!
+
+## Makefile configuration
+
+The ccn-lite package provides several configuration options through defines
+that can be set in the application Makefile. The following options are
+mandatory for now:
+* `CFLAGS += -DUSE_LINKLAYER`         - use CCN directly over the link layer
+* `CFLAGS += -DCCNL_UAPI_H_`          - tell ccn-lite to use the UAPI
+* `CFLAGS += -DUSE_SUITE_NDNTLV`      - use NDNTLV packet format
+* `CFLAGS += -DNEEDS_PREFIX_MATCHING` - enables prefix matching
+* `CFLAGS += -DNEEDS_PACKET_CRAFTING` - enable userspace packet creation
+Here's a list of some additional interesting options:
+* `CFLAGS += -DUSE_RONR`              - enable Reactive Optimistic Name-based
+                                        Routing (RONR)
+* `CFLAGS += -DUSE_STATS`             - enable statistics
+* `CFLAGS += -DUSE_DUP_CHECK`         - enable duplicate checks when forwarding
+* `CFLAGS += -DUSE_HMAC256`             - HMAC256 signed packets for CCNx1.0
+                                        encoding
+
 
 ## Wireshark dissector
 

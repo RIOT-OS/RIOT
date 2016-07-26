@@ -17,10 +17,10 @@
  * @author      Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
  */
 
-#ifndef _BASE64_ENCODER_DECODER_H
-#define _BASE64_ENCODER_DECODER_H
+#ifndef BASE64_ENCODER_DECODER_H_
+#define BASE64_ENCODER_DECODER_H_
 
-#include <stdlib.h>
+#include <stddef.h> /* for size_t */
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,4 +79,4 @@ int base64_decode(unsigned char *base64_in, size_t base64_in_size, \
 #endif
 
 /** @} */
-#endif /* _BASE64_ENCODER_DECODER_H */
+#endif /* BASE64_ENCODER_DECODER_H_ */

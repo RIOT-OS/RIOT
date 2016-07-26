@@ -18,6 +18,7 @@
 #include <stdlib.h>
 
 #include "inttypes.h"
+#include "random.h"
 #include "trickle.h"
 
 #define ENABLE_DEBUG    (0)
@@ -33,27 +34,19 @@ void trickle_callback(trickle_t *trickle)
 
 void trickle_interval(trickle_t *trickle)
 {
+    uint32_t max_interval;
+
     trickle->I = trickle->I * 2;
-    DEBUG("TRICKLE new Interval %" PRIu32 "\n", trickle->I);
+    max_interval = trickle->Imin << trickle->Imax;
 
-    if (trickle->I == 0) {
-        DEBUG("%s:%d in %s: [WARNING] Interval was 0\n", RIOT_FILE_RELATIVE,
-              __LINE__, DEBUG_FUNC);
-
-        if (trickle->Imax == 0) {
-            DEBUG("%s:%d in %s: [WARNING] Imax == 0\n", RIOT_FILE_RELATIVE,
-                  __LINE__, DEBUG_FUNC);
-        }
-
-        trickle->I = (trickle->Imin << trickle->Imax);
+    if ((trickle->I == 0) || (trickle->I > max_interval)) {
+        trickle->I = max_interval;
     }
 
-    if (trickle->I > (trickle->Imin << trickle->Imax)) {
-        trickle->I = (trickle->Imin << trickle->Imax);
-    }
+    DEBUG("trickle: I == %" PRIu32 "\n", trickle->I);
 
     trickle->c = 0;
-    trickle->t = (trickle->I / 2) + (rand() % ((trickle->I / 2) + 1));
+    trickle->t = (trickle->I / 2) + random_uint32_range(0, (trickle->I / 2) + 1);
 
     trickle->msg_callback_time = trickle->t * SEC_IN_MS;
     xtimer_set_msg64(&trickle->msg_callback_timer, trickle->msg_callback_time,
@@ -80,11 +73,11 @@ void trickle_start(kernel_pid_t pid, trickle_t *trickle, uint16_t interval_msg_t
     trickle->k = k;
     trickle->Imin = Imin;
     trickle->Imax = Imax;
-    trickle->I = trickle->Imin + (rand() % (4 * trickle->Imin));
+    trickle->I = trickle->Imin + random_uint32_range(0, 4 * trickle->Imin);
     trickle->pid = pid;
-    trickle->msg_interval.content.ptr = (char *)trickle;
+    trickle->msg_interval.content.ptr = trickle;
     trickle->msg_interval.type = interval_msg_type;
-    trickle->msg_callback.content.ptr = (char *)trickle;
+    trickle->msg_callback.content.ptr = trickle;
     trickle->msg_callback.type = callback_msg_type;
 
     trickle_interval(trickle);

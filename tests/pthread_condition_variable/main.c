@@ -23,7 +23,7 @@
 #include "thread.h"
 
 static mutex_t mutex = MUTEX_INIT;
-static struct pthread_cond_t cv;
+static pthread_cond_t cv;
 static volatile int is_finished;
 static volatile long count;
 static volatile long expected_value;

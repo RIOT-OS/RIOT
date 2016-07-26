@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef SYSTICK_H
-#define SYSTICK_H
+#ifndef STELLARIS_SYSTICK_H_
+#define STELLARIS_SYSTICK_H_
 
 //*****************************************************************************
 //
@@ -75,4 +75,4 @@ extern unsigned long SysTickValueGet(void);
 }
 #endif
 
-#endif // SYSTICK_H
+#endif /* STELLARIS_SYSTICK_H */

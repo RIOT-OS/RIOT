@@ -7077,4 +7077,4 @@
 #endif
 
 /*lint --flb "Leave library region" */
-#endif
+#endif /* NRF51_BITS_H */

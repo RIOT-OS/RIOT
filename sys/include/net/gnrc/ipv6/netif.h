@@ -25,12 +25,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "kernel_macros.h"
+#include "kernel_defines.h"
 #include "kernel_types.h"
 #include "mutex.h"
 #include "net/ipv6.h"
 #include "net/ipv6/addr.h"
-#include "vtimer.h"
+#include "net/netstats.h"
 #include "xtimer.h"
 
 #ifdef __cplusplus
@@ -345,6 +345,9 @@ typedef struct {
     xtimer_t rtr_adv_timer; /**< Timer for periodic router advertisements */
     msg_t rtr_adv_msg;      /**< msg_t for gnrc_ipv6_netif_t::rtr_adv_timer */
 #endif
+#ifdef MODULE_NETSTATS_IPV6
+    netstats_t stats;                       /**< transceiver's statistics */
+#endif
 } gnrc_ipv6_netif_t;
 
 /**
@@ -509,9 +512,10 @@ ipv6_addr_t *gnrc_ipv6_netif_match_prefix(kernel_pid_t pid, const ipv6_addr_t *p
  * @brief   Searches for the best address on an interface usable as a
  *          source address for a given destination address.
  *
- * @param[in] pid   The PID to the interface.
- * @param[in] dest  The destination address you want to find a destination
- *                  address for.
+ * @param[in] pid     The PID to the interface.
+ * @param[in] dest    The destination address you want to find a destination
+ *                    address for.
+ * @param[in] ll_only If only link local addresses qualify
  *
  * @todo Rule 4 from RFC 6724 is currently not implemented. Has to updated as
  *       soon as gnrc supports Mobile IP.
@@ -526,7 +530,7 @@ ipv6_addr_t *gnrc_ipv6_netif_match_prefix(kernel_pid_t pid, const ipv6_addr_t *p
  * @return  NULL, if no matching address can be found on the interface.
  * @return  NULL, if @p pid is no interface.
  */
-ipv6_addr_t *gnrc_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ipv6_addr_t *dest);
+ipv6_addr_t *gnrc_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ipv6_addr_t *dest, bool ll_only);
 
 /**
  * @brief   Get interface specific meta-information on an address
@@ -586,6 +590,18 @@ static inline bool gnrc_ipv6_netif_addr_is_non_unicast(const ipv6_addr_t *addr)
  *          be called in an interface's thread (will otherwise hang up).
  */
 void gnrc_ipv6_netif_init_by_dev(void);
+
+/**
+ * @brief   Get sent and received statistics about IPv6 traffic on this interface.
+ *
+ * @note    This function is only available if compiled with module `netstats_ipv6`.
+ *
+ * @param[in] pid   The PID to the interface.
+ *
+ * @return  A @ref netstats_t pointer to the statistics.
+ * @return  NULL if no statistics are available.
+ */
+netstats_t *gnrc_ipv6_netif_get_stats(kernel_pid_t pid);
 
 #ifdef __cplusplus
 }

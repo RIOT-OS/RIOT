@@ -26,7 +26,6 @@
 
 #include "cpu_conf.h"
 #include "irq.h"
-#include "kernel_internal.h"
 #include "msg.h"
 #include "mutex.h"
 #include "priority_queue.h"
@@ -47,16 +46,16 @@
 
 #include "debug.h"
 
-enum pthread_thread_status {
+typedef enum {
     PTS_RUNNING,
     PTS_DETACHED,
     PTS_ZOMBIE,
-};
+} pthread_thread_status_t;
 
-typedef struct pthread_thread {
+typedef struct {
     kernel_pid_t thread_pid;
 
-    enum pthread_thread_status status;
+    pthread_thread_status_t status;
     kernel_pid_t joining_thread;
     void *returnval;
     bool should_cancel;
@@ -72,7 +71,7 @@ typedef struct pthread_thread {
 } pthread_thread_t;
 
 static pthread_thread_t *volatile pthread_sched_threads[MAXTHREADS];
-static struct mutex_t pthread_mutex;
+static mutex_t pthread_mutex;
 
 static volatile kernel_pid_t pthread_reaper_pid = KERNEL_PID_UNDEF;
 
@@ -207,7 +206,7 @@ void pthread_exit(void *retval)
             }
         }
 
-        disableIRQ();
+        irq_disable();
         if (self->stack) {
             msg_t m;
             m.content.ptr = self->stack;

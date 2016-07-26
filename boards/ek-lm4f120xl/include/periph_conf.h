@@ -92,6 +92,13 @@ extern "C" {
 #define UART_1_ISR          isr_uart1
 /** @} */
 
+/**
+ * @brief   ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (12)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

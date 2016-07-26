@@ -35,7 +35,18 @@ extern "C" {
 #define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
 #define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1
 #define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV2
-#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_1
+#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_2
+/** @} */
+
+/**
+ * @brief   DAC configuration
+ * @{
+ */
+#define DAC_CONFIG {                \
+    { GPIO_PIN(PORT_A, 4), 0, 0 },  \
+}
+
+#define DAC_NUMOF           (1)
 /** @} */
 
 /**

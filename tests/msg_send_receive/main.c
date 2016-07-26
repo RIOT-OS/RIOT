@@ -45,7 +45,7 @@ static void *thread1(void *args)
     int counter = 0, success = 1;
 
     msg_resp.content.ptr = NULL;
-    msg_req.content.ptr = (void *) &counter;
+    msg_req.content.ptr = &counter;
 
     for (int i = 0; i < TEST_EXECUTION_NUM; i++) {
         msg_send_receive(&msg_req, &msg_resp, thread2_pid);
@@ -76,7 +76,7 @@ static void *thread2(void *args)
     msg_t msg_req, msg_resp;
     int counter = 0;
 
-    msg_resp.content.ptr = (void *) &counter;
+    msg_resp.content.ptr = &counter;
 
     for (int i = 0; i < TEST_EXECUTION_NUM; i++) {
         msg_receive(&msg_req);

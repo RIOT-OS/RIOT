@@ -69,6 +69,14 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
 
     assert(ipv6 != NULL);
 
+    if (icmpv6->size < sizeof(icmpv6_hdr_t)) {
+        DEBUG("icmpv6: packet too short.\n");
+        return;
+    }
+
+    /* Note: size will be checked again in gnrc_icmpv6_echo_req_handle,
+             gnrc_ndp_rtr_sol_handle, and others */
+
     hdr = (icmpv6_hdr_t *)icmpv6->data;
 
     if (_calc_csum(icmpv6, ipv6, pkt)) {
@@ -121,7 +129,7 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
             break;
 
         default:
-            DEBUG("icmpv6: unknown type field %" PRIu8 "\n", hdr->type);
+            DEBUG("icmpv6: unknown type field %u\n", hdr->type);
             break;
     }
 
@@ -131,7 +139,7 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
     sendto = gnrc_netreg_lookup(GNRC_NETTYPE_ICMPV6, hdr->type);
 
     if (sendto == NULL) {
-        DEBUG("icmpv6: no receivers for ICMPv6 type %" PRIu8 "\n", hdr->type);
+        DEBUG("icmpv6: no receivers for ICMPv6 type %u\n", hdr->type);
         /* don't release: IPv6 does this */
         return;
     }
@@ -161,7 +169,7 @@ gnrc_pktsnip_t *gnrc_icmpv6_build(gnrc_pktsnip_t *next, uint8_t type, uint8_t co
         return NULL;
     }
 
-    DEBUG("icmpv6: Building ICMPv6 message with type=%" PRIu8 ", code=%" PRIu8 "\n",
+    DEBUG("icmpv6: Building ICMPv6 message with type=%u, code=%u\n",
           type, code);
     icmpv6 = (icmpv6_hdr_t *)pkt->data;
     icmpv6->type = type;

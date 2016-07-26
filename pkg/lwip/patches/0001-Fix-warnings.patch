@@ -1,0 +1,29 @@
+From 0e28e1cd26c1de2ccf48bea9013676ef1d4d69b7 Mon Sep 17 00:00:00 2001
+From: Martine Lenders <mail@martine-lenders.eu>
+Date: Thu, 12 Nov 2015 16:36:00 +0100
+Subject: [PATCH 1/2] Fix warnings
+
+---
+ src/include/lwip/debug.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/include/lwip/debug.h b/src/include/lwip/debug.h
+index 973a633..c7b3c9c 100644
+--- a/src/include/lwip/debug.h
++++ b/src/include/lwip/debug.h
+@@ -67,8 +67,10 @@
+  * -- To disable assertions define LWIP_NOASSERT in arch/cc.h.
+  */
+ #ifndef LWIP_NOASSERT
+-#define LWIP_ASSERT(message, assertion) do { if(!(assertion)) \
+-  LWIP_PLATFORM_ASSERT(message); } while(0)
++#define LWIP_ASSERT(message, assertion) \
++    if(!(assertion)) { \
++        LWIP_PLATFORM_ASSERT(message); \
++    }
+ #ifndef LWIP_PLATFORM_ASSERT
+ #error "If you want to use LWIP_ASSERT, LWIP_PLATFORM_ASSERT(message) needs to be defined in your arch/cc.h"
+ #endif
+-- 
+1.9.1
+

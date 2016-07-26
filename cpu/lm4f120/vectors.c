@@ -156,7 +156,7 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void *) (0UL),                 /* Reserved                         47 */
     (void *) (0UL),                 /* Reserved                         48 */
     (void *) isr_uart2,             /* UART 2                           49 */
-    (void *) isr_ssi2,              /* SSI 1                            50 */
+    (void *) isr_ssi1,              /* SSI 1                            50 */
     (void *) isr_timer3a,           /* 16/32 bit timer 3 A              51 */
     (void *) isr_timer3b,           /* 16/32 bit timer 3 B              52 */
     (void *) isr_i2c1,              /* I2C 1                            53 */

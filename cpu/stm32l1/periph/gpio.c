@@ -63,32 +63,31 @@ static inline int _pin_num(gpio_t pin)
     return (pin & 0x0f);
 }
 
-int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
+int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     GPIO_TypeDef *port = _port(pin);
     int pin_num = _pin_num(pin);
 
     /* enable clock */
     RCC->AHBENR |= (RCC_AHBENR_GPIOAEN << _port_num(pin));
-    /* configure pull register */
-    port->PUPDR &= ~(3 << (2 * pin_num));
-    port->PUPDR |= (pullup << (2 * pin_num));
-    /* set direction */
-    if (dir == GPIO_DIR_OUT) {
-        port->MODER &= ~(3 << (2 * pin_num));   /* set pin to output mode */
-        port->MODER |= (1 << (2 * pin_num));
-        port->OTYPER &= ~(1 << pin_num);        /* set to push-pull */
-        port->OSPEEDR |= (3 << (2 * pin_num));  /* set to high speed */
-        port->ODR &= ~(1 << pin_num);           /* set pin to low signal */
-    }
-    else {
-        port->MODER &= ~(3 << (2 * pin_num));   /* configure pin as input */
-    }
+
+    /* set mode */
+    port->MODER &= ~(0x3 << (2 * pin_num));
+    port->MODER |=  ((mode & 0x3) << (2 * pin_num));
+    /* set pull resistor configuration */
+    port->PUPDR &= ~(0x3 << (2 * pin_num));
+    port->PUPDR |=  (((mode >> 2) & 0x3) << (2 * pin_num));
+    /* set output mode */
+    port->OTYPER &= ~(1 << pin_num);
+    port->OTYPER |=  (((mode >> 4) & 0x1) << pin_num);
+    /* finally set pin speed to maximum and reset output */
+    port->OSPEEDR |= (3 << (2 * pin_num));
+    port->BRR = (1 << pin_num);
+
     return 0;
 }
 
-int gpio_init_int(gpio_t pin,
-                   gpio_pp_t pullup, gpio_flank_t flank,
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                    gpio_cb_t cb, void *arg)
 {
     int pin_num = _pin_num(pin);
@@ -100,7 +99,7 @@ int gpio_init_int(gpio_t pin,
     /* enable the SYSCFG clock */
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
     /* initialize pin as input */
-    gpio_init(pin, GPIO_DIR_IN, pullup);
+    gpio_init(pin, mode);
     /* enable global pin interrupt */
     if (pin_num < 5) {
         NVIC_EnableIRQ(EXTI0_IRQn + pin_num);
@@ -147,6 +146,15 @@ void gpio_init_af(gpio_t pin, gpio_af_t af)
     /* set selected function */
     port->AFR[(pin_num > 7) ? 1 : 0] &= ~(0xf << ((pin_num & 0x07) * 4));
     port->AFR[(pin_num > 7) ? 1 : 0] |= (af << ((pin_num & 0x07) * 4));
+}
+
+void gpio_init_analog(gpio_t pin)
+{
+    /* enable clock, needed as this function can be used without calling
+     * gpio_init first */
+    RCC->AHBENR |= (RCC_AHBENR_GPIOAEN << _port_num(pin));
+    /* set to analog mode */
+    _port(pin)->MODER |= (0x3 << (2 * _pin_num(pin)));
 }
 
 void gpio_irq_enable(gpio_t pin)
@@ -204,9 +212,11 @@ void gpio_write(gpio_t pin, int value)
 
 void isr_exti(void)
 {
+    /* only generate interrupts against lines which have their IMR set */
+    uint32_t pending_isr = (EXTI->PR & EXTI->IMR);
     for (int i = 0; i < GPIO_ISR_CHAN_NUMOF; i++) {
-        if (EXTI->PR & (1 << i)) {
-            EXTI->PR |= (1 << i);               /* clear by writing a 1 */
+        if (pending_isr & (1 << i)) {
+            EXTI->PR = (1 << i);                /* clear by writing a 1 */
             exti_chan[i].cb(exti_chan[i].arg);
         }
     }

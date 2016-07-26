@@ -22,7 +22,7 @@
 #ifndef GNRC_PKTDUMP_H_
 #define GNRC_PKTDUMP_H_
 
-#include "kernel.h"
+#include "kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,12 +50,9 @@ extern "C" {
 #endif
 
 /**
- * @brief   Get the PID of the pktdump thread
- *
- * @return  PID of the pktdump thread
- * @return  @ref KERNEL_PID_UNDEF if not initialized
+ * @brief   The PID of the pktdump thread
  */
-kernel_pid_t gnrc_pktdump_getpid(void);
+extern kernel_pid_t gnrc_pktdump_pid;
 
 /**
  * @brief   Start the packet dump thread and listening for incoming packets

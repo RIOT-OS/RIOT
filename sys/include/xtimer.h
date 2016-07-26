@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2016 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,8 +14,7 @@
  *            timers, get current system time, and let a thread sleep for
  *            a certain amount of time.
  *
- * The implementation takes one low-level timer that is supposed to run at 1MHz
- * speed and multiplexes it.
+ * The implementation takes one low-level timer and multiplexes it.
  *
  * Insertion and removal of timers has O(n) complexity with (n) being the
  * number of active timers.  The reason for this is that multiplexing is
@@ -24,24 +24,17 @@
  * @file
  * @brief   xtimer interface definitions
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 #ifndef XTIMER_H
 #define XTIMER_H
 
 #include <stdint.h>
-#include "msg.h"
-#include "periph/timer.h"
 #include "timex.h"
+#include "msg.h"
 
 #include "board.h"
 #include "periph_conf.h"
-
-/**
- * @brief internal define to allow using variables instead of defines
- */
-#ifdef XTIMER_TRACE
-#include "xtimer_trace.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,7 +43,7 @@ extern "C" {
 /**
  * @brief xtimer callback type
  */
-typedef void (*timer_callback_t)(void*);
+typedef void (*xtimer_callback_t)(void*);
 
 /**
  * @brief xtimer timer structure
@@ -59,7 +52,7 @@ typedef struct xtimer {
     struct xtimer *next;        /**< reference to next timer in timer lists */
     uint32_t target;            /**< lower 32bit absolute target time */
     uint32_t long_target;       /**< upper 32bit absolute target time */
-    timer_callback_t callback;  /**< callback function to call when timer
+    xtimer_callback_t callback;  /**< callback function to call when timer
                                      expires */
     void *arg;                  /**< argument to pass to callback function */
 } xtimer_t;
@@ -97,7 +90,7 @@ void xtimer_now_timex(timex_t *out);
 void xtimer_init(void);
 
 /**
- * @brief Stop execution of a thread for some time
+ * @brief Pause the execution of a thread for some seconds
  *
  * When called from an ISR, this function will spin and thus block the MCU in
  * interrupt context for the specified amount in *seconds*, so don't *ever* use
@@ -108,7 +101,7 @@ void xtimer_init(void);
 static void xtimer_sleep(uint32_t seconds);
 
 /**
- * @brief Stop execution of a thread for some time
+ * @brief Pause the execution of a thread for some microseconds
  *
  * When called from an ISR, this function will spin and thus block the MCU for
  * the specified amount in microseconds, so only use it there for *very* short
@@ -180,7 +173,9 @@ void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t usecs);
  * The mesage struct specified by msg parameter will not be copied, e.g., it
  * needs to point to valid memory until the message has been delivered.
  *
- * @param[in] timer         timer struct to work with
+ * @param[in] timer         timer struct to work with.
+ *                          Its xtimer_t::target and xtimer_t::long_target
+ *                          fields need to be initialized with 0 on first use.
  * @param[in] offset        microseconds from now
  * @param[in] msg           ptr to msg that will be sent
  * @param[in] target_pid    pid the message will be sent to
@@ -196,7 +191,9 @@ void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t t
  * The mesage struct specified by msg parameter will not be copied, e.g., it
  * needs to point to valid memory until the message has been delivered.
  *
- * @param[in] timer         timer struct to work with
+ * @param[in] timer         timer struct to work with.
+ *                          Its xtimer_t::target and xtimer_t::long_target
+ *                          fields need to be initialized with 0 on first use.
  * @param[in] offset        microseconds from now
  * @param[in] msg           ptr to msg that will be sent
  * @param[in] target_pid    pid the message will be sent to
@@ -209,7 +206,9 @@ void xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t
  * This function sets a timer that will wake up a thread when the timer has
  * expired.
  *
- * @param[in] timer         timer struct to work with
+ * @param[in] timer         timer struct to work with.
+ *                          Its xtimer_t::target and xtimer_t::long_target
+ *                          fields need to be initialized with 0 on first use
  * @param[in] offset        microseconds from now
  * @param[in] pid           pid of the thread that will be woken up
  */
@@ -221,7 +220,9 @@ void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid);
  * This function sets a timer that will wake up a thread when the timer has
  * expired.
  *
- * @param[in] timer         timer struct to work with
+ * @param[in] timer         timer struct to work with.
+ *                          Its xtimer_t::target and xtimer_t::long_target
+ *                          fields need to be initialized with 0 on first use
  * @param[in] offset        microseconds from now
  * @param[in] pid           pid of the thread that will be woken up
  */
@@ -239,7 +240,9 @@ void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid);
  * context (unless offset < XTIMER_BACKOFF). DON'T USE THIS FUNCTION unless you
  * know *exactly* what that means.
  *
- * @param[in] timer     the timer structure to use
+ * @param[in] timer     the timer structure to use.
+ *                      Its xtimer_t::target and xtimer_t::long_target
+ *                      fields need to be initialized with 0 on first use
  * @param[in] offset    time in microseconds from now specifying that timer's
  *                      callback's execution time
  */
@@ -251,11 +254,8 @@ void xtimer_set(xtimer_t *timer, uint32_t offset);
  * @note this function runs in O(n) with n being the number of active timers
  *
  * @param[in] timer ptr to timer structure that will be removed
- *
- * @return  1 on success
- * @return  0 when timer was not active
  */
-int xtimer_remove(xtimer_t *timer);
+void xtimer_remove(xtimer_t *timer);
 
 /**
  * @brief receive a message blocking but with timeout
@@ -326,7 +326,8 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_ISR_BACKOFF 20
 #endif
 
-/*
+#ifndef XTIMER_SHIFT
+/**
  * @brief   xtimer prescaler value
  *
  * xtimer assumes it is running with an underlying 1MHz timer.
@@ -338,30 +339,41 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  *
  * For example, if the timer is running with 250khz, set XTIMER_SHIFT to 2.
  */
-#ifndef XTIMER_SHIFT
 #define XTIMER_SHIFT (0)
 #endif
 
-/**
- * @brief set xtimer default timer configuration
- * @{
+/*
+ * Default xtimer configuration
  */
-#ifndef XTIMER
-#define XTIMER (0)
+#ifndef XTIMER_DEV
+/**
+ * @brief Underlying hardware timer device to assign to xtimer
+ */
+#define XTIMER_DEV TIMER_DEV(0)
+/**
+ * @brief Underlying hardware timer channel to assign to xtimer
+ */
 #define XTIMER_CHAN (0)
 
-#if TIMER_0_MAX_VALUE == 0xffffff
-#define XTIMER_MASK 0xff000000
-#elif TIMER_0_MAX_VALUE == 0xffff
-#define XTIMER_MASK 0xffff0000
+#if (TIMER_0_MAX_VALUE) == 0xfffffful
+#define XTIMER_WIDTH (24)
+#elif (TIMER_0_MAX_VALUE) == 0xffff
+#define XTIMER_WIDTH (16)
 #endif
 
 #endif
+
+#ifndef XTIMER_WIDTH
 /**
- * @}
+ * @brief xtimer timer width
+ *
+ * This value specifies the width (in bits) of the hardware timer used by xtimer.
+ * Default is 32.
  */
+#define XTIMER_WIDTH (32)
+#endif
 
-#ifndef XTIMER_MASK
+#if XTIMER_WIDTH != 32
 /**
  * @brief xtimer timer mask
  *
@@ -369,138 +381,16 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  * counts to, e.g., 0xffffffff & ~TIMER_MAXVALUE.
  *
  * For a 16bit timer, the mask would be 0xFFFF0000, for a 24bit timer, the mask
- * would be 0xFF000000. Don't set this for 32bit timers.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
+ * would be 0xFF000000.
  */
+#define XTIMER_MASK ((0xffffffff >> XTIMER_WIDTH) << XTIMER_WIDTH)
+#else
 #define XTIMER_MASK (0)
 #endif
-#define XTIMER_MASK_SHIFTED (XTIMER_MASK << XTIMER_SHIFT)
 
-#ifndef XTIMER_USLEEP_UNTIL_OVERHEAD
-/**
- * @brief xtimer_usleep_until overhead value
- *
- * This value specifies the time a xtimer_usleep_until will be late
- * if uncorrected.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
- */
-#define XTIMER_USLEEP_UNTIL_OVERHEAD 10
-#endif
+#define XTIMER_MASK_SHIFTED XTIMER_TICKS_TO_USEC(XTIMER_MASK)
 
-#if XTIMER_MASK
-extern volatile uint32_t _high_cnt;
-#endif
-
-/**
- * @brief IPC message type for xtimer msg callback
- */
-#define MSG_XTIMER 12345
-
-/**
- * @brief returns the (masked) low-level timer counter value.
- */
-static inline uint32_t _lltimer_now(void)
-{
-#if XTIMER_SHIFT
-    return ((uint32_t)timer_read(XTIMER)) << XTIMER_SHIFT;
-#else
-    return timer_read(XTIMER);
-#endif
-}
-
-/**
- * @brief drop bits of a value that don't fit into the low-level timer.
- */
-static inline uint32_t _lltimer_mask(uint32_t val)
-{
-    return val & ~XTIMER_MASK_SHIFTED;
-}
-
-/**
- * @{
- * @brief xtimer internal stuff
- * @internal
- */
-int _xtimer_set_absolute(xtimer_t *timer, uint32_t target);
-void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
-void _xtimer_sleep(uint32_t offset, uint32_t long_offset);
-static inline void xtimer_spin_until(uint32_t value);
-/** @} */
-
-#if XTIMER_MASK
-#ifndef XTIMER_SHIFT_ON_COMPARE
-/**
- * @brief ignore some bits when comparing timer values
- *
- * (only relevant when XTIMER_MASK != 0, e.g., timers < 32bit.)
- *
- * When combining _lltimer_now() and _high_cnt, we have to get the same value in
- * order to work around a race between overflowing _lltimer_now() and OR'ing the
- * resulting values.
- * But some platforms are too slow to get the same timer
- * value twice, so we use this define to ignore some of the bits.
- *
- * Use tests/xtimer_shift_on_compare to find the correct value for your MCU.
- */
-#define XTIMER_SHIFT_ON_COMPARE     (0)
-#endif
-#endif
-
-#ifndef XTIMER_MIN_SPIN
-/**
- * @brief Minimal value xtimer_spin() can spin
- */
-#define XTIMER_MIN_SPIN (1<<XTIMER_SHIFT)
-#endif
-
-static inline uint32_t xtimer_now(void)
-{
-#if XTIMER_MASK
-    uint32_t a, b;
-    do {
-        a = _lltimer_now() | _high_cnt;
-        b = _lltimer_now() | _high_cnt;
-    } while ((a >> XTIMER_SHIFT_ON_COMPARE) != (b >> XTIMER_SHIFT_ON_COMPARE));
-    return b;
-#else
-    return _lltimer_now();
-#endif
-}
-
-static inline void xtimer_spin_until(uint32_t target) {
-#if XTIMER_MASK
-    target = _lltimer_mask(target);
-#endif
-    while (_lltimer_now() > target);
-    while (_lltimer_now() < target);
-}
-
-static inline void xtimer_spin(uint32_t offset) {
-    uint32_t start = _lltimer_now();
-    while ((_lltimer_now() - start) < offset);
-}
-
-static inline void xtimer_usleep(uint32_t microseconds)
-{
-    _xtimer_sleep(microseconds, 0);
-}
-
-static inline void xtimer_usleep64(uint64_t microseconds)
-{
-    _xtimer_sleep((uint32_t) microseconds, (uint32_t) (microseconds >> 32));
-}
-
-static inline void xtimer_sleep(uint32_t seconds)
-{
-    xtimer_usleep64((uint64_t)seconds * SEC_IN_USEC);
-}
-
-static inline void xtimer_nanosleep(uint32_t nanoseconds)
-{
-    _xtimer_sleep(nanoseconds / USEC_IN_NS, 0);
-}
+#include "xtimer/implementation.h"
 
 #ifdef __cplusplus
 }

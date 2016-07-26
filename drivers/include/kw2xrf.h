@@ -65,7 +65,12 @@ extern "C" {
 /**
  * @brief   Default channel used after initialization
  */
+#ifdef DEFAULT_CHANNEL
+#define KW2XRF_DEFAULT_CHANNEL (DEFAULT_CHANNEL)
+#endif
+#ifndef KW2XRF_DEFAULT_CHANNEL
 #define KW2XRF_DEFAULT_CHANNEL        (26U)
+#endif
 
 /**
  * @brief   Default TX_POWER in dbm used after initialization

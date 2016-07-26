@@ -25,8 +25,8 @@
 
 #include <stdint.h>
 
-#include "kernel.h"
 #include "mutex.h"
+#include "xtimer.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
 #include "net/gnrc.h"
@@ -39,7 +39,11 @@ extern "C" {
 /**
  * @brief   Maximum payload length that can be send
  */
+#ifdef MODULE_XBEE_ENCRYPTION
+#define XBEE_MAX_PAYLOAD_LENGTH     (95U)
+#else
 #define XBEE_MAX_PAYLOAD_LENGTH     (100U)
+#endif
 
 /**
  * @brief   Maximum packet length, including XBee API frame overhead
@@ -68,7 +72,12 @@ extern "C" {
 /**
  * @brief   Default channel used after initialization
  */
-#define XBEE_DEFAULT_CHANNEL        (26U)
+#ifdef DEFAULT_CHANNEL
+#define XBEE_DEFAULT_CHANNEL (DEFAULT_CHANNEL)
+#endif
+#ifndef XBEE_DEFAULT_CHANNEL
+#define XBEE_DEFAULT_CHANNEL        (23U)
+#endif
 
 /**
  * @name    Address flags
@@ -141,6 +150,18 @@ typedef struct {
 } xbee_t;
 
 /**
+ * @brief   auto_init struct holding Xbee device initalization params
+ */
+typedef struct xbee_params {
+    uart_t uart;            /**< UART interfaced the device is connected to */
+    uint32_t baudrate;      /**< baudrate to use */
+    gpio_t sleep_pin;       /**< GPIO pin that is connected to the SLEEP pin
+                                 set to GPIO_UNDEF if not used */
+    gpio_t reset_pin;      /**< GPIO pin that is connected to the STATUS pin
+                                 set to GPIO_UNDEF if not used */
+} xbee_params_t;
+
+/**
  * @brief   Reference to the XBee driver interface
  */
 extern const gnrc_netdev_driver_t xbee_driver;
@@ -149,31 +170,13 @@ extern const gnrc_netdev_driver_t xbee_driver;
  * @brief   Initialize the given Xbee device
  *
  * @param[out] dev          Xbee device to initialize
- * @param[in]  uart         UART interfaced the device is connected to
- * @param[in]  baudrate     baudrate to use
- * @param[in]  sleep_pin    GPIO pin that is connected to the SLEEP pin, set to
- *                          GPIO_UNDEF if not used
- * @param[in]  status_pin   GPIO pin that is connected to the STATUS pin, set to
- *                          GPIO_UNDEF if not used
+ * @param[in]  params       parameters for device initialization
  *
  * @return                  0 on success
  * @return                  -ENODEV on invalid device descriptor
  * @return                  -ENXIO on invalid UART or GPIO pins
  */
-int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
-              gpio_t sleep_pin, gpio_t status_pin);
-
-/**
- * @brief   auto_init struct holding Xbee device initalization params
- */
-typedef struct xbee_params {
-    uart_t uart;            /**< UART interfaced the device is connected to */
-    uint32_t baudrate;      /**< baudrate to use */
-    gpio_t sleep_pin;       /**< GPIO pin that is connected to the SLEEP pin
-                                 set to GPIO_UNDEF if not used */
-    gpio_t status_pin;      /**< GPIO pin that is connected to the STATUS pin
-                                 set to GPIO_UNDEF if not used */
-} xbee_params_t;
+int xbee_init(xbee_t *dev, const xbee_params_t *params);
 
 #ifdef __cplusplus
 }

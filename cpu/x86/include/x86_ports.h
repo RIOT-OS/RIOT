@@ -42,7 +42,7 @@ static inline uint8_t __attribute__((always_inline)) inb(uint16_t port)
 {
     /* See [IA32-v2a] "IN". */
     uint8_t data;
-    asm volatile("inb %w1, %b0" : "=a"(data) : "Nd"(port));
+    __asm__ volatile("inb %w1, %b0" : "=a"(data) : "Nd"(port));
     return data;
 }
 
@@ -55,7 +55,7 @@ static inline uint8_t __attribute__((always_inline)) inb(uint16_t port)
 static inline void __attribute__((always_inline)) insb(uint16_t port, void *addr, size_t cnt)
 {
     /* See [IA32-v2a] "INS". */
-    asm volatile("rep insb" : "+D"(addr), "+c"(cnt) : "d"(port) : "memory");
+    __asm__ volatile("rep insb" : "+D"(addr), "+c"(cnt) : "d"(port) : "memory");
 }
 
 /**
@@ -67,7 +67,7 @@ static inline uint16_t __attribute__((always_inline)) inw(uint16_t port)
 {
     uint16_t data;
     /* See [IA32-v2a] "IN". */
-    asm volatile("inw %w1, %w0" : "=a"(data) : "Nd"(port));
+    __asm__ volatile("inw %w1, %w0" : "=a"(data) : "Nd"(port));
     return data;
 }
 
@@ -80,7 +80,7 @@ static inline uint16_t __attribute__((always_inline)) inw(uint16_t port)
 static inline void __attribute__((always_inline)) insw(uint16_t port, void *addr, size_t cnt)
 {
     /* See [IA32-v2a] "INS". */
-    asm volatile("rep insw" : "+D"(addr), "+c"(cnt) : "d"(port) : "memory");
+    __asm__ volatile("rep insw" : "+D"(addr), "+c"(cnt) : "d"(port) : "memory");
 }
 
 /**
@@ -92,7 +92,7 @@ static inline uint32_t __attribute__((always_inline)) inl(uint16_t port)
 {
     /* See [IA32-v2a] "IN". */
     uint32_t data;
-    asm volatile("inl %w1, %0" : "=a"(data) : "Nd"(port));
+    __asm__ volatile("inl %w1, %0" : "=a"(data) : "Nd"(port));
     return data;
 }
 
@@ -105,7 +105,7 @@ static inline uint32_t __attribute__((always_inline)) inl(uint16_t port)
 static inline void __attribute__((always_inline)) insl(uint16_t port, void *addr, size_t cnt)
 {
     /* See [IA32-v2a] "INS". */
-    asm volatile("rep insl" : "+D"(addr), "+c"(cnt) : "d"(port) : "memory");
+    __asm__ volatile("rep insl" : "+D"(addr), "+c"(cnt) : "d"(port) : "memory");
 }
 
 /**
@@ -116,7 +116,7 @@ static inline void __attribute__((always_inline)) insl(uint16_t port, void *addr
 static inline void __attribute__((always_inline)) outb(uint16_t port, uint8_t data)
 {
     /* See [IA32-v2b] "OUT". */
-    asm volatile("outb %b0, %w1" : : "a"(data), "Nd"(port));
+    __asm__ volatile("outb %b0, %w1" : : "a"(data), "Nd"(port));
 }
 
 /**
@@ -128,7 +128,7 @@ static inline void __attribute__((always_inline)) outb(uint16_t port, uint8_t da
 static inline void __attribute__((always_inline)) outsb(uint16_t port, const void *addr, size_t cnt)
 {
     /* See [IA32-v2b] "OUTS". */
-    asm volatile("rep outsb" : "+S"(addr), "+c"(cnt) : "d"(port));
+    __asm__ volatile("rep outsb" : "+S"(addr), "+c"(cnt) : "d"(port));
 }
 
 /**
@@ -139,7 +139,7 @@ static inline void __attribute__((always_inline)) outsb(uint16_t port, const voi
 static inline void __attribute__((always_inline)) outw(uint16_t port, uint16_t data)
 {
     /* See [IA32-v2b] "OUT". */
-    asm volatile("outw %w0, %w1" : : "a"(data), "Nd"(port));
+    __asm__ volatile("outw %w0, %w1" : : "a"(data), "Nd"(port));
 }
 
 /**
@@ -151,7 +151,7 @@ static inline void __attribute__((always_inline)) outw(uint16_t port, uint16_t d
 static inline void __attribute__((always_inline)) outsw(uint16_t port, const void *addr, size_t cnt)
 {
     /* See [IA32-v2b] "OUTS". */
-    asm volatile("rep outsw" : "+S"(addr), "+c"(cnt) : "d"(port));
+    __asm__ volatile("rep outsw" : "+S"(addr), "+c"(cnt) : "d"(port));
 }
 
 /**
@@ -162,7 +162,7 @@ static inline void __attribute__((always_inline)) outsw(uint16_t port, const voi
 static inline void __attribute__((always_inline)) outl(uint16_t port, uint32_t data)
 {
     /* See [IA32-v2b] "OUT". */
-    asm volatile("outl %0, %w1" : : "a"(data), "Nd"(port));
+    __asm__ volatile("outl %0, %w1" : : "a"(data), "Nd"(port));
 }
 
 /**
@@ -174,7 +174,7 @@ static inline void __attribute__((always_inline)) outl(uint16_t port, uint32_t d
 static inline void __attribute__((always_inline)) outsl(uint16_t port, const void *addr, size_t cnt)
 {
     /* See [IA32-v2b] "OUTS". */
-    asm volatile("rep outsl" : "+S"(addr), "+c"(cnt) : "d"(port));
+    __asm__ volatile("rep outsl" : "+S"(addr), "+c"(cnt) : "d"(port));
 }
 
 /**
@@ -182,7 +182,7 @@ static inline void __attribute__((always_inline)) outsl(uint16_t port, const voi
  */
 static inline void  __attribute__((always_inline)) io_wait(void)
 {
-    asm volatile("   jmp 1f\n"
+    __asm__ volatile("   jmp 1f\n"
                  "1: jmp 2f\n"
                  "2:");
 }

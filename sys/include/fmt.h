@@ -7,14 +7,16 @@
  */
 
 /**
- * @defgroup  sys_fmt string formatting
- * @ingroup   sys
- * @brief     Provides simple string formatting functions
+ * @defgroup    sys_fmt string formatting
+ * @ingroup     sys
+ * @brief       Provides simple string formatting functions
  *
  * @{
+ *
  * @file
- * @brief   string formatting API
- * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @brief       String formatting API
+ *
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #ifndef FMT_H_
@@ -100,6 +102,21 @@ size_t fmt_u64_hex(char *out, uint64_t val);
 size_t fmt_u32_dec(char *out, uint32_t val);
 
 /**
+ * @brief Convert a uint64 value to decimal string.
+ *
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @note This adds ~400b of code when used.
+ *
+ * @param[out]  out  Pointer to output buffer, or NULL
+ * @param[in]   val  Value to convert
+ *
+ * @return      nr of digits written to (or needed in) @p out
+ */
+size_t fmt_u64_dec(char *out, uint64_t val);
+
+/**
  * @brief Convert a uint16 value to decimal string.
  *
  * If @p out is NULL, will only return the number of bytes that would have
@@ -126,6 +143,49 @@ size_t fmt_u16_dec(char *out, uint16_t val);
  * @return      nr of characters written to (or needed in) @p out
  */
 size_t fmt_s32_dec(char *out, int32_t val);
+
+/**
+ * @brief Convert a int16 value to decimal string.
+ *
+ * Will add a leading "-" if @p val is negative.
+ *
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @param[out]  out  Pointer to output buffer, or NULL
+ * @param[in]   val  Value to convert
+ *
+ * @return      nr of characters written to (or needed in) @p out
+ */
+size_t fmt_s16_dec(char *out, int16_t val);
+
+/**
+ * @brief Convert 16-bit fixed point number to a decimal string
+ *
+ * The input for this function is a signed 16-bit integer holding the fixed
+ * point value as well as an unsigned integer defining the position of the
+ * decimal point, so this value defines the number of decimal digits after the
+ * decimal point.
+ *
+ * The resulting string will always be patted with zeros after the decimal point.
+ *
+ * For example: if @p val is -3548 and @p fp_digits is 2, the resulting string
+ * will be "-35.48". For @p val := 12010 and @p fp_digits := 3 the result will
+ * be "12.010".
+ *
+ * Will add a leading "-" if @p val is negative.
+ *
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @param[out] out          Pointer to the output buffer, or NULL
+ * @param[in]  val          Fixed point value, MUST be <= 4
+ * @param[in]  fp_digits    Number of digits after the decimal point
+ *
+ * @return      Length of the resulting string
+ * @return      0 if @p fp_digits is > 4
+ */
+size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits);
 
 /**
  * @brief Count characters until '\0' (exclusive) in @p str
@@ -198,6 +258,15 @@ void print_u32_hex(uint32_t val);
  * @param[in]   val  Value to print
  */
 void print_u64_hex(uint64_t val);
+
+/**
+ * @brief Print uint64 value as decimal to stdout
+ *
+ * @note This used fmt_u64_dec(), which uses ~400b of code.
+ *
+ * @param[in]   val  Value to print
+ */
+void print_u64_dec(uint64_t val);
 
 /**
  * @brief Print null-terminated string to stdout

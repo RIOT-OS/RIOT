@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef SYSEXC_H
-#define SYSEXC_H
+#ifndef STELLARIS_SYSEXC_H
+#define STELLARIS_SYSEXC_H
 
 //*****************************************************************************
 //
@@ -86,4 +86,4 @@ extern void SysExcIntClear(unsigned long ulIntFlags);
 }
 #endif
 
-#endif // SYSEXC_H
+#endif /* STELLARIS_SYSEXC_H */

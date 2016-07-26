@@ -31,35 +31,29 @@ extern "C" {
 #endif
 
 /**
- * @name LED pin definitions
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_PORT            LPC_GPIO
-#define LED1_PIN            BIT13
-#define LED2_PIN            BIT14
-#define LED3_PIN            BIT15
-/** @} */
+#define LED0_PIN            GPIO_PIN(0, 13)
+#define LED1_PIN            GPIO_PIN(0, 14)
+#define LED2_PIN            GPIO_PIN(0, 15)
 
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED1_ON              (LED_PORT->CLR[1] = LED1_PIN)
-#define LED1_OFF             (LED_PORT->SET[1] = LED1_PIN)
-#define LED1_TOGGLE          (LED_PORT->NOT[1] = LED1_PIN)
-#define LED2_ON              (LED_PORT->CLR[1] = LED2_PIN)
-#define LED2_OFF             (LED_PORT->SET[1] = LED2_PIN)
-#define LED2_TOGGLE          (LED_PORT->NOT[1] = LED2_PIN)
-#define LED3_ON              (LED_PORT->CLR[1] = LED3_PIN)
-#define LED3_OFF             (LED_PORT->SET[1] = LED3_PIN)
-#define LED3_TOGGLE          (LED_PORT->NOT[1] = LED3_PIN)
-/* for compatibility to other boards */
-#define LED_GREEN_ON        LED2_ON
-#define LED_GREEN_OFF       LED2_OFF
-#define LED_GREEN_TOGGLE    LED2_TOGGLE
-#define LED_RED_ON          LED1_ON
-#define LED_RED_OFF         LED1_OFF
-#define LED_RED_TOGGLE      LED1_TOGGLE
+#define LED_PORT            LPC_GPIO
+#define LED0_MASK           BIT13
+#define LED1_MASK           BIT14
+#define LED2_MASK           BIT15
+
+#define LED0_ON             (LED_PORT->CLR[1] = LED0_MASK)
+#define LED0_OFF            (LED_PORT->SET[1] = LED0_MASK)
+#define LED0_TOGGLE         (LED_PORT->NOT[1] = LED0_MASK)
+
+#define LED1_ON             (LED_PORT->CLR[1] = LED1_MASK)
+#define LED1_OFF            (LED_PORT->SET[1] = LED1_MASK)
+#define LED1_TOGGLE         (LED_PORT->NOT[1] = LED1_MASK)
+
+#define LED2_ON             (LED_PORT->CLR[1] = LED2_MASK)
+#define LED2_OFF            (LED_PORT->SET[1] = LED2_MASK)
+#define LED2_TOGGLE         (LED_PORT->NOT[1] = LED2_MASK)
 /** @} */
 
 /**

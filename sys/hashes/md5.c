@@ -97,10 +97,10 @@ static const uint32_t T[4][16] = {
  * All of these operations are bitwise, and so not impacted by endian-ness.
  * @{
  */
-#define md5F( X, Y, Z ) ( ((X) & (Y)) | ((~(X)) & (Z)) )
-#define md5G( X, Y, Z ) ( ((X) & (Z)) | ((Y) & (~(Z))) )
-#define md5H( X, Y, Z ) ( (X) ^ (Y) ^ (Z) )
-#define md5I( X, Y, Z ) ( (Y) ^ ((X) | (~(Z))) )
+#define md5F( X, Y, Z ) (((X) &(Y)) | ((~(X)) & (Z)))
+#define md5G( X, Y, Z ) (((X) &(Z)) | ((Y) &(~(Z))))
+#define md5H( X, Y, Z ) ((X) ^ (Y) ^ (Z))
+#define md5I( X, Y, Z ) ((Y) ^ ((X) | (~(Z))))
 /** @} */
 
 /**
@@ -109,7 +109,7 @@ static const uint32_t T[4][16] = {
  * A value of 0 for <idx> indicates the lowest order byte, while 3 indicates
  * the highest order byte.
  */
-#define GETBYTE(L, idx) ((uint8_t)(( L >> (((idx) & 0x03) << 3) ) & 0xFF))
+#define GETBYTE(L, idx) ((uint8_t)((L >> (((idx) & 0x03) << 3)) & 0xFF))
 
 /**
  * @brief   Permute the ABCD "registers" using the 64-byte <block> as a driver
@@ -144,14 +144,14 @@ static void permute(uint32_t abcd[4], const uint8_t block[64] )
     uint32_t x[16];
 
     /* Store the current ABCD values for later re-use */
-    for(int i = 0; i < 4; i++ ) {
+    for (int i = 0; i < 4; i++) {
         keep_abcd[i] = abcd[i];
     }
 
     /* Convert the input block into an array of unsigned longs, taking care
      * to read the block in Little Endian order (the algorithm assumes this).
      * The uint32_t values are then handled in host order. */
-    for(int i = 0, j = 0; i < 16; i++ ) {
+    for (int i = 0, j = 0; i < 16; i++) {
         x[i]  =  (uint32_t)block[j++];
         x[i] |= ((uint32_t)block[j++] << 8);
         x[i] |= ((uint32_t)block[j++] << 16);
@@ -171,23 +171,23 @@ static void permute(uint32_t abcd[4], const uint8_t block[64] )
      *
      * (My implementation appears to be a poor compromise between speed, size,
      * and clarity.  Ugh.  [crh]) */
-    for(int round = 0; round < 4; round++) {
-        for(int i = 0; i < 16; i++) {
+    for (int round = 0; round < 4; round++) {
+        for (int i = 0; i < 16; i++) {
             /* <j> handles the rotation of ABCD */
             int j = (4 - (i % 4)) & 0x3;
             /* <s> is the bit shift for this iteration */
-            s = S[round][i%4];
+            s = S[round][i % 4];
 
             /* Copy the b,c,d values per ABCD rotation. This isn't really
              * necessary, it just looks clean & will hopefully be optimized
              * away. */
-            b = abcd[(j+1) & 0x3];
-            c = abcd[(j+2) & 0x3];
-            d = abcd[(j+3) & 0x3];
+            b = abcd[(j + 1) & 0x3];
+            c = abcd[(j + 2) & 0x3];
+            d = abcd[(j + 3) & 0x3];
 
             /* The actual perumation function.
              * This is broken out to minimize the code within the switch(). */
-            switch( round ) {
+            switch (round) {
                 case 0:         /* round 1 */
                     a = md5F( b, c, d ) + x[i];
                     break;
@@ -201,14 +201,14 @@ static void permute(uint32_t abcd[4], const uint8_t block[64] )
                     a = md5I( b, c, d ) + x[ K[2][i] ];
                     break;
             }
-            a = 0xFFFFFFFF & ( abcd[j] + a + T[round][i] );
-            abcd[j] = b + (0xFFFFFFFF & (( a << s ) | ( a >> (32 - s) )));
-      }
+            a = 0xFFFFFFFF & (abcd[j] + a + T[round][i]);
+            abcd[j] = b + (0xFFFFFFFF & ((a << s) | (a >> (32 - s))));
+        }
     }
 
     /* Use the stored original A, B, C, D values to perform
      * one last convolution. */
-    for(int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
         abcd[i] = (abcd[i] + keep_abcd[i]);
     }
 }
@@ -239,10 +239,10 @@ void md5_update(md5_ctx_t *ctx, const uint8_t *data, size_t len)
 
     /* Copy the new block's data into the context block.
      * Call the permute() function whenever the context block is full. */
-    for(size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; i++) {
         ctx->block[ctx->b_used] = data[i];
         (ctx->b_used)++;
-        if(64 == ctx->b_used) {
+        if (64 == ctx->b_used) {
             permute(ctx->abcd, ctx->block);
             ctx->b_used = 0;
         }
@@ -263,15 +263,15 @@ void md5_final(md5_ctx_t *ctx, uint8_t *dst)
     (ctx->b_used)++;
 
     /* Zero out any remaining free bytes in the context block. */
-    for(int i = ctx->b_used; i < 64; i++) {
+    for (int i = ctx->b_used; i < 64; i++) {
         ctx->block[i] = 0;
     }
 
     /* We need 8 bytes to store the length field.
      * If we don't have 8, call permute() and reset the context block. */
-    if(56 < ctx->b_used) {
+    if (56 < ctx->b_used) {
         permute(ctx->abcd, ctx->block);
-        for(int i = 0; i < 64; i++) {
+        for (int i = 0; i < 64; i++) {
             ctx->block[i] = 0;
         }
     }
@@ -281,18 +281,18 @@ void md5_final(md5_ctx_t *ctx, uint8_t *dst)
      *        and shifted to the correct position.  This neatly avoids
      *        any MAXINT numeric overflow issues. */
     l = ctx->len << 3;
-    for(int i = 0; i < 4; i++) {
-        ctx->block[56+i] |= GETBYTE(l, i);
+    for (int i = 0; i < 4; i++) {
+        ctx->block[56 + i] |= GETBYTE(l, i);
     }
     ctx->block[60] = ((GETBYTE(ctx->len, 3) & 0xE0) >> 5);  /* See Above! */
     permute(ctx->abcd, ctx->block);
 
     /* Now copy the result into the output buffer and we're done */
-    for(int i = 0; i < 4; i++) {
-        dst[ 0+i] = GETBYTE(ctx->abcd[0], i);
-        dst[ 4+i] = GETBYTE(ctx->abcd[1], i);
-        dst[ 8+i] = GETBYTE(ctx->abcd[2], i);
-        dst[12+i] = GETBYTE(ctx->abcd[3], i);
+    for (int i = 0; i < 4; i++) {
+        dst[ 0 + i] = GETBYTE(ctx->abcd[0], i);
+        dst[ 4 + i] = GETBYTE(ctx->abcd[1], i);
+        dst[ 8 + i] = GETBYTE(ctx->abcd[2], i);
+        dst[12 + i] = GETBYTE(ctx->abcd[3], i);
     }
 }
 

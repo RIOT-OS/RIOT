@@ -1,4 +1,3 @@
-MODULE = board
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
+MODULE = avsextrem-drivers
 
 include $(RIOTBASE)/Makefile.base

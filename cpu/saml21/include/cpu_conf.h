@@ -18,6 +18,8 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #include "atmel/saml21.h"
 
 #ifdef __cplusplus

@@ -22,6 +22,7 @@
 #define PERIPH_PWM_H
 
 #include <stdint.h>
+#include <limits.h>
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -53,7 +54,7 @@ extern "C" {
  * @{
  */
 #ifndef PWM_UNDEF
-#define PWM_UNDEF           (-1)
+#define PWM_UNDEF           (UINT_MAX)
 #endif
 /** @} */
 
@@ -140,7 +141,7 @@ void pwm_stop(pwm_t dev);
 /**
  * @brief   Power on the PWM device
  *
- * When the device is powered on the first time, not configuration is set. If
+ * When the device is powered on the first time, no configuration is set. If
  * the device is powered back on, after having been initialized and powered off
  * before, the PWM device will continue its operation with the previously set
  * configuration. So there is no need in re-initializing then.

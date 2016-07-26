@@ -37,16 +37,17 @@ USEMODULE += saul_reg
 USEMODULE += saul_default
 USEMODULE += auto_init_saul
 
-BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 mulle native nrf51dongle \
-	nrf6310 pba-d-01-kw2x pca10000 pca10005 saml21-xpro samr21-xpro spark-core \
-	yunjia-nrf51822
+BOARD_PROVIDES_NETIF := airfy-beacon cc2538dk fox iotlab-m3 iotlab-a8-m3 mulle \
+        native nrf51dongle nrf6310 openmote-cc2538 pba-d-01-kw2x pca10000 pca10005 \
+        remote-pa remote-reva saml21-xpro samr21-xpro spark-core telosb \
+        yunjia-nrf51822 z1
 
 ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
   # Use modules for networking
   # gnrc is a meta module including all required, basic gnrc networking modules
   USEMODULE += gnrc
   # use the default network interface for the board
-  USEMODULE += gnrc_netif_default
+  USEMODULE += gnrc_netdev_default
   # automatically initialize the network interface
   USEMODULE += auto_init_gnrc_netif
   # the application dumps received packets to stdout
@@ -68,5 +69,9 @@ ifneq (,$(filter msba2,$(BOARD)))
   USEMODULE += mci
   USEMODULE += random
 endif
+
+# Set a custom 802.15.4 channel if needed
+DEFAULT_CHANNEL ?= 26
+CFLAGS += -DDEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
 
 include $(RIOTBASE)/Makefile.include

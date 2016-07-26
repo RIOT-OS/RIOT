@@ -38,61 +38,66 @@ buildtest:
 	@ \
 	BUILDTESTOK=true; \
 	APP_RETRY=0; \
-	rm -rf "$$BINDIRBASE"; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
-		RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_MEMORY) | grep $${BOARD} 2>&1 >/dev/null && echo 1); \
-		${COLOR_ECHO} -n "Building for $${BOARD} "; \
-		[ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
-		for NTH_TRY in 1 2 3; do \
-			${COLOR_ECHO} -n ".. "; \
-			LOG=$$(env -i \
-					HOME=$${HOME} \
-					PATH=$${PATH} \
-					BOARD=$${BOARD} \
-					CCACHE=$${CCACHE} \
-					CCACHE_DIR=$${CCACHE_DIR} \
-					CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
-					RIOTBASE=$${RIOTBASE} \
-					RIOTBOARD=$${RIOTBOARD} \
-					RIOTCPU=$${RIOTCPU} \
-					BINDIRBASE=$${BINDIRBASE} \
-					RIOTNOLINK=$${RIOTNOLINK} \
-					RIOT_VERSION=$${RIOT_VERSION} \
-					WERROR=$${WERROR} \
-					LTO=$${LTO} \
-					$(MAKE) -j$(NPROC) 2>&1) ; \
-			if [ "$${?}" = "0" ]; then \
-				${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
-				if [ -n "$${BUILDTEST_VERBOSE}" ]; then \
-					echo "$${LOG}" | tail -n +2 | head -n -2 | grep -v -E '^Building application|^\"make|^patching' | awk 'NF'; \
-				fi; \
-			elif [ -n "$${RIOT_DO_RETRY}" ] && [ "$${APP_RETRY}" -lt "3" ] && [ $${NTH_TRY} != 3 ]; then \
-				${COLOR_ECHO} -n "${COLOR_PURPLE}retrying${COLOR_RESET} "; \
-				continue; \
-			else \
-				${COLOR_ECHO} "${COLOR_RED}failed${COLOR_RESET}"; \
-				if [ -n "$${BUILDTEST_VERBOSE}" ]; then \
-					echo "$${LOG}" | grep -v -E '^\"make'; \
-				fi; \
-				APP_RETRY=`expr $${APP_RETRY} + 1`; \
-				BUILDTESTOK=false; \
-			fi; \
-			break; \
-		done; \
-		env -i \
-			HOME=$${HOME} \
-			PATH=$${PATH} \
-			BOARD=$${BOARD} \
-			CCACHE=$${CCACHE} \
-			CCACHE_DIR=$${CCACHE_DIR} \
-			CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
-			RIOTBASE=$${RIOTBASE} \
-			RIOTBOARD=$${RIOTBOARD} \
-			RIOTCPU=$${RIOTCPU} \
-			BINDIRBASE=$${BINDIRBASE} \
-			RIOTNOLINK=$${RIOTNOLINK} \
-			RIOT_VERSION=$${RIOT_VERSION} \
-			$(MAKE) clean-intermediates 2>&1 >/dev/null || true; \
+	  RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_MEMORY) | grep $${BOARD} 2>&1 >/dev/null && echo 1); \
+	  ${COLOR_ECHO} -n "Building for $${BOARD} "; \
+	  [ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
+	  for NTH_TRY in 1 2 3; do \
+	    ${COLOR_ECHO} -n ".. "; \
+	    if [ "$$NTH_TRY" != "3" ]; then export _CCACHE=$$CCACHE; else export _CCACHE=""; fi ; \
+	    LOG=$$(env -i \
+	        HOME=$${HOME} \
+	        PATH=$${PATH} \
+	        BOARD=$${BOARD} \
+	        CCACHE=$${_CCACHE} \
+	        $${CCACHE_DIR:+CCACHE_DIR=$${CCACHE_DIR}} \
+	        $${GIT_CACHE_DIR:+GIT_CACHE_DIR=$${GIT_CACHE_DIR}} \
+	        CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
+	        RIOTBASE=$${RIOTBASE} \
+	        RIOTBOARD=$${RIOTBOARD} \
+	        RIOTCPU=$${RIOTCPU} \
+	        RIOTPKG=$${RIOTPKG} \
+	        BINDIRBASE=$${BINDIRBASE} \
+	        RIOTNOLINK=$${RIOTNOLINK} \
+	        RIOT_VERSION=$${RIOT_VERSION} \
+	        WERROR=$${WERROR} \
+	        LTO=$${LTO} \
+	        TOOLCHAIN=$${TOOLCHAIN} \
+	        $(MAKE) -j$(NPROC) clean all 2>&1) ; \
+	    if [ "$${?}" = "0" ]; then \
+	      ${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
+	      if [ -n "$${BUILDTEST_VERBOSE}" ]; then \
+	        echo "$${LOG}" | tail -n +2 | head -n -2 | grep -v -E '^Building application|^\"make|^patching' | awk 'NF'; \
+	      fi; \
+	    elif [ -n "$${RIOT_DO_RETRY}" ] && [ "$${APP_RETRY}" -lt "3" ] && [ $${NTH_TRY} != 3 ]; then \
+	      ${COLOR_ECHO} -n "${COLOR_PURPLE}retrying${COLOR_RESET} "; \
+	      continue; \
+	    else \
+	      ${COLOR_ECHO} "${COLOR_RED}failed${COLOR_RESET}"; \
+	      if [ -n "$${BUILDTEST_VERBOSE}" ]; then \
+	        echo "$${LOG}" | grep -v -E '^\"make'; \
+	      fi; \
+	      APP_RETRY=`expr $${APP_RETRY} + 1`; \
+	      BUILDTESTOK=false; \
+	    fi; \
+	    break; \
+	  done; \
+	  env -i \
+	    HOME=$${HOME} \
+	    PATH=$${PATH} \
+	    BOARD=$${BOARD} \
+	    CCACHE=$${CCACHE} \
+	    $${CCACHE_DIR:+CCACHE_DIR=$${CCACHE_DIR}} \
+	    CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
+	    $${GIT_CACHE_DIR:+GIT_CACHE_DIR=$${GIT_CACHE_DIR}} \
+	    RIOTBASE=$${RIOTBASE} \
+	    RIOTBOARD=$${RIOTBOARD} \
+	    RIOTCPU=$${RIOTCPU} \
+	    RIOTPKG=$${RIOTPKG} \
+	    BINDIRBASE=$${BINDIRBASE} \
+	    RIOTNOLINK=$${RIOTNOLINK} \
+	    RIOT_VERSION=$${RIOT_VERSION} \
+	    $(MAKE) clean-intermediates 2>&1 >/dev/null || true; \
 	done; \
 	$${BUILDTESTOK}
 endif # BUILD_IN_DOCKER
@@ -126,6 +131,7 @@ info-buildsizes:
 	    RIOTBASE=$${RIOTBASE} \
 	    RIOTBOARD=$${RIOTBOARD} \
 	    RIOTCPU=$${RIOTCPU} \
+	    RIOTPKG=$${RIOTPKG} \
 	    BINDIRBASE=$${BINDIRBASE} \
 	    $(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${BOARD}"; \
 	done;
@@ -142,6 +148,7 @@ info-buildsizes-diff:
 	      RIOTBASE=$${RIOTBASE} \
 	      RIOTBOARD=$${RIOTBOARD} \
 	      RIOTCPU=$${RIOTCPU} \
+	      RIOTPKG=$${RIOTPKG} \
 	      BINDIRBASE=$${BINDIRBASE} \
 	      $(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4; \
 	  done | \
@@ -175,6 +182,7 @@ info-build:
 	@echo 'RIOTBASE:  $(RIOTBASE)'
 	@echo 'RIOTBOARD: $(RIOTBOARD)'
 	@echo 'RIOTCPU:   $(RIOTCPU)'
+	@echo 'RIOTPKG:   $(RIOTPKG)'
 	@echo ''
 	@echo 'DEFAULT_MODULE: $(sort $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE)))'
 	@echo 'DISABLE_MODULE: $(sort $(DISABLE_MODULE))'
@@ -295,5 +303,5 @@ info-files:
 	    echo "$$CPPSRC" | xargs dirname -- | sort | uniq | xargs -I{} find {} -name "Makefile*"; \
 	    echo "$$CPPSRC" | xargs $(CXX) $(CXXFLAGS) $(INCLUDES) -MM 2> /dev/null | grep -o "[^ ]\+\.h"; \
 	  fi; \
-	  $(foreach pkg,$(USEPKG),find $(RIOTBASE)/pkg/$(pkg) -type f;) \
+	  $(foreach pkg,$(USEPKG),find $(RIOTPKG)/$(pkg) -type f;) \
 	) | sort | uniq | sed 's#$(RIOTBASE)/##'

@@ -27,18 +27,45 @@
 extern "C" {
 #endif
 
+#include "net/gnrc/ipv6/netif.h"
 #include "net/ipv6/addr.h"
 #include "xtimer.h"
 #include "trickle.h"
 
 /**
- * @name Bit positions and shifts for gnrc_rpl_dodag_t::req_opts
+ * @name Option lengths
  * @{
  */
-#define GNRC_RPL_REQ_OPT_DODAG_CONF_SHIFT       (0)
-#define GNRC_RPL_REQ_OPT_DODAG_CONF             (1 << GNRC_RPL_REQ_OPT_DODAG_CONF_SHIFT)
-#define GNRC_RPL_REQ_OPT_PREFIX_INFO_SHIFT      (1)
-#define GNRC_RPL_REQ_OPT_PREFIX_INFO            (1 << GNRC_RPL_REQ_OPT_PREFIX_INFO_SHIFT)
+#define GNRC_RPL_OPT_DODAG_CONF_LEN         (14)
+#define GNRC_RPL_OPT_PREFIX_INFO_LEN        (30)
+#define GNRC_RPL_OPT_TARGET_LEN             (18)
+#define GNRC_RPL_OPT_TRANSIT_INFO_LEN       (4)
+/** @} */
+
+/**
+ * @name DAO flag macros
+ * @{
+ */
+#define GNRC_RPL_DAO_D_BIT                  (1 << 6)
+#define GNRC_RPL_DAO_K_BIT                  (1 << 7)
+/** @} */
+
+/**
+ * @name DAO-ACK flag macros
+ * @{
+ */
+#define GNRC_RPL_DAO_ACK_D_BIT              (1 << 7)
+/** @} */
+
+/**
+ * @anchor GNRC_RPL_REQ_DIO_OPTS
+ * @name DIO Options for gnrc_rpl_dodag_t::dio_opts
+ * @{
+ */
+#define GNRC_RPL_REQ_DIO_OPT_DODAG_CONF_SHIFT       (0)
+#define GNRC_RPL_REQ_DIO_OPT_DODAG_CONF             (1 << GNRC_RPL_REQ_DIO_OPT_DODAG_CONF_SHIFT)
+#define GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO_SHIFT      (1)
+#define GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO            (1 << GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO_SHIFT)
 /** @} */
 
 /**
@@ -211,11 +238,9 @@ typedef struct {
  */
 struct gnrc_rpl_dodag {
     ipv6_addr_t dodag_id;           /**< id of the DODAG */
+    gnrc_ipv6_netif_addr_t *netif_addr; /**< netif address for this DODAG */
     gnrc_rpl_parent_t *parents;     /**< pointer to the parents list of this DODAG */
     gnrc_rpl_instance_t *instance;  /**< pointer to the instance that this dodag is part of */
-    uint8_t prefix_len;             /**< length of the prefix for the DODAG id */
-    uint32_t addr_preferred;        /**< time in seconds the DODAG id is preferred */
-    uint32_t addr_valid;            /**< time in seconds the DODAG id is valid */
     uint8_t dtsn;                   /**< DAO Trigger Sequence Number */
     uint8_t prf;                    /**< preferred flag */
     uint8_t dio_interval_doubl;     /**< trickle Imax parameter */
@@ -223,6 +248,7 @@ struct gnrc_rpl_dodag {
     uint8_t dio_redun;              /**< trickle k parameter */
     uint8_t default_lifetime;       /**< lifetime of routes (lifetime * unit) */
     uint16_t lifetime_unit;         /**< unit in seconds of the lifetime */
+    kernel_pid_t iface;             /**< interface PID this DODAG operates on */
     uint8_t version;                /**< version of this DODAG */
     uint8_t grounded;               /**< grounded flag */
     uint16_t my_rank;               /**< rank/position in the DODAG */
@@ -230,7 +256,8 @@ struct gnrc_rpl_dodag {
     uint8_t dao_seq;                /**< dao sequence number */
     uint8_t dao_counter;            /**< amount of retried DAOs */
     bool dao_ack_received;          /**< flag to check for DAO-ACK */
-    uint8_t req_opts;               /**< flags that represent option requests */
+    uint8_t dio_opts;               /**< options in the next DIO
+                                         (see @ref GNRC_RPL_REQ_DIO_OPTS "DIO Options") */
     uint8_t dao_time;               /**< time to schedule a DAO in seconds */
     trickle_t trickle;              /**< trickle representation */
 };

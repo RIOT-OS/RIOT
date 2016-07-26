@@ -58,6 +58,7 @@ typedef uint32_t gpio_t;
  */
 #define GPIO_PIN(x, y)      (((gpio_t)(&PORT->Group[x])) | y)
 
+#ifndef DOXYGEN
 /**
  * @brief   Override active flank configuration values
  * @{
@@ -69,6 +70,7 @@ typedef enum {
     GPIO_BOTH = 3           /**< emit interrupt on both flanks */
 } gpio_flank_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Available MUX values for configuring a pin's alternate function

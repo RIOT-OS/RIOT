@@ -28,9 +28,23 @@
 
 #define TRACE(x)
 
+#define case_baudrate(val)    \
+    case val:                 \
+        *baudrate = B ## val; \
+        break
+
+#define BAUDRATE_DEFAULT B115200
+
 static void usage(void)
 {
-    fprintf(stderr, "usage: eth_over_serial <tap> <serial>\n");
+    fprintf(stderr, "usage: ethos <tap> <serial> [baudrate]\n");
+}
+
+static void checked_write(int handle, void *buffer, int nbyte)
+{
+    if (write(handle, buffer, nbyte) != nbyte) {
+        fprintf(stderr, "write to fd %i failed: %s\n", handle, strerror(errno));
+    }
 }
 
 int set_serial_attribs (int fd, int speed, int parity)
@@ -227,17 +241,17 @@ static void _write_escaped(int fd, char* buf, ssize_t n)
             case LINE_FRAME_DELIMITER:
                 out[0] = LINE_ESC_CHAR;
                 out[1] = (LINE_FRAME_DELIMITER ^ 0x20);
-                write(fd, out, 2);
+                checked_write(fd, out, 2);
                 escaped++;
                 break;
             case LINE_ESC_CHAR:
                 out[0] = LINE_ESC_CHAR;
                 out[1] = (LINE_ESC_CHAR ^ 0x20);
-                write(fd, out, 2);
+                checked_write(fd, out, 2);
                 escaped++;
                 break;
             default:
-                write(fd, &c, 1);
+                checked_write(fd, &c, 1);
         }
     }
 }
@@ -246,26 +260,99 @@ static void _send_hello(int serial_fd, serial_t *serial, unsigned type)
 {
     char delim = LINE_FRAME_DELIMITER;
     char head[] = { LINE_FRAME_DELIMITER, LINE_ESC_CHAR, (type ^ 0x20) };
-    write(serial_fd, head, sizeof(head));
-    write(serial_fd, serial->local_l2_addr, 6);
-    write(serial_fd, &delim, 1);
+    checked_write(serial_fd, head, sizeof(head));
+    checked_write(serial_fd, serial->local_l2_addr, 6);
+    checked_write(serial_fd, &delim, 1);
 }
 
 static void _clear_neighbor_cache(const char *ifname)
 {
     char tmp[20 + IFNAMSIZ];
     snprintf(tmp, sizeof(tmp), "ip neigh flush dev %s", ifname);
-    system(tmp);
+    if (system(tmp) < 0) {
+        fprintf(stderr, "error while flushing device neighbor cache\n");
+    }
+}
+
+static int _parse_baudrate(const char *arg, unsigned *baudrate)
+{
+    switch(strtol(arg, (char**)NULL, 10)) {
+    case 9600:
+        *baudrate = B9600;
+        break;
+    case 19200:
+        *baudrate = B19200;
+        break;
+    case 38400:
+        *baudrate = B38400;
+        break;
+    case 57600:
+        *baudrate = B57600;
+        break;
+    case 115200:
+        *baudrate = B115200;
+        break;
+    /* the following baudrates might not be available on all platforms */
+    #ifdef B234000
+        case_baudrate(230400);
+    #endif
+    #ifdef B460800
+        case_baudrate(460800);
+    #endif
+    #ifdef B500000
+        case_baudrate(500000);
+    #endif
+    #ifdef B576000
+        case_baudrate(576000);
+    #endif
+    #ifdef B921600
+        case_baudrate(921600);
+    #endif
+    #ifdef B1000000
+        case_baudrate(1000000);
+    #endif
+    #ifdef B1152000
+        case_baudrate(1152000);
+    #endif
+    #ifdef B1500000
+        case_baudrate(1500000);
+    #endif
+    #ifdef B2000000
+        case_baudrate(2000000);
+    #endif
+    #ifdef B2500000
+        case_baudrate(2500000);
+    #endif
+    #ifdef B3000000
+        case_baudrate(3000000);
+    #endif
+    #ifdef B3500000
+        case_baudrate(3500000);
+    #endif
+    #ifdef B4000000
+        case_baudrate(4000000);
+    #endif
+    default:
+        return -1;
+    }
+
+    return 0;
 }
 
 int main(int argc, char *argv[])
 {
     char inbuf[MTU];
+    unsigned baudrate = BAUDRATE_DEFAULT;
 
     serial_t serial = {0};
 
     if (argc < 3) {
         usage();
+        return 1;
+    }
+
+    if (argc >= 4 && _parse_baudrate(argv[3], &baudrate) == -1) {
+        fprintf(stderr, "Invalid baudrate specified: %s\n", argv[3]);
         return 1;
     }
 
@@ -284,7 +371,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    set_serial_attribs(serial_fd, B115200, 0);
+    set_serial_attribs(serial_fd, baudrate, 0);
     set_blocking(serial_fd, 1);
 
     fd_set readfds;
@@ -317,10 +404,10 @@ int main(int argc, char *argv[])
                     if (res) {
                         switch (serial.frametype) {
                             case LINE_FRAME_TYPE_DATA:
-                                write(tap_fd, serial.frame, serial.framebytes);
+                                checked_write(tap_fd, serial.frame, serial.framebytes);
                                 break;
                             case LINE_FRAME_TYPE_TEXT:
-                                write(STDOUT_FILENO, serial.frame, serial.framebytes);
+                                checked_write(STDOUT_FILENO, serial.frame, serial.framebytes);
                                 break;
                             case LINE_FRAME_TYPE_HELLO:
                             case LINE_FRAME_TYPE_HELLO_REPLY:
@@ -353,9 +440,9 @@ int main(int argc, char *argv[])
                 continue;
             }
             char delim = LINE_FRAME_DELIMITER;
-            write(serial_fd, &delim, 1);
+            checked_write(serial_fd, &delim, 1);
             _write_escaped(serial_fd, inbuf, res);
-            write(serial_fd, &delim, 1);
+            checked_write(serial_fd, &delim, 1);
         }
 
         if (FD_ISSET(STDIN_FILENO, &readfds)) {
@@ -368,9 +455,9 @@ int main(int argc, char *argv[])
             if (res) {
                 char delim = LINE_FRAME_DELIMITER;
                 char head[] = { LINE_FRAME_DELIMITER, LINE_ESC_CHAR, (LINE_FRAME_TYPE_TEXT ^ 0x20) };
-                write(serial_fd, head, sizeof(head));
+                checked_write(serial_fd, head, sizeof(head));
                 _write_escaped(serial_fd, inbuf, res);
-                write(serial_fd, &delim, 1);
+                checked_write(serial_fd, &delim, 1);
             }
         }
     }

@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef HW_ADC_H
-#define HW_ADC_H
+#ifndef STELLARIS_HW_ADC_H
+#define STELLARIS_HW_ADC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -1357,4 +1357,4 @@ extern "C" {
 }
 #endif
 
-#endif // HW_ADC_H
+#endif /* STELLARIS_HW_ADC_H */

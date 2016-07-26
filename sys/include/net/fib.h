@@ -37,14 +37,15 @@ extern "C" {
 /**
  * @brief Routing Protocol (RP) message content to request/reply notification
  */
-typedef struct rp_address_msg_t {
+typedef struct {
     uint8_t *address;      /**< The pointer to the address */
     uint8_t address_size;  /**< The address size */
     uint32_t address_flags; /**< The flags for the given address */
 } rp_address_msg_t;
 
 /**
- * @brief message type for RP notification: unreachable destination
+ * @brief message type for RP notification: no route to destination available,
+ *        start route discovery if appropriate
  */
 #define FIB_MSG_RP_SIGNAL_UNREACHABLE_DESTINATION (0x99)
 
@@ -54,14 +55,14 @@ typedef struct rp_address_msg_t {
 #define FIB_MSG_RP_SIGNAL_DESTINATION_USED (0x98)
 
 /**
- * @brief message type for RP notification: sr created
+ * @brief message type for RP notification: source route created
  */
 #define FIB_MSG_RP_SIGNAL_SOURCE_ROUTE_CREATED (0x97)
 
 /**
  * @brief entry used to collect available destinations
  */
-typedef struct fib_destination_set_entry_t {
+typedef struct {
     uint8_t dest[UNIVERSAL_ADDRESS_SIZE]; /**< The destination address */
     size_t dest_size;    /**< The destination address size */
 } fib_destination_set_entry_t;
@@ -77,9 +78,14 @@ typedef struct fib_destination_set_entry_t {
 #define FIB_FLAG_RPL_ROUTE (1UL << 0)
 
 /**
- * @brief flag to identify if the FIB-Entry is a net prefix (MSB == 1)
+ * @brief flag used as shift for the net prefix length in bits
  */
-#define FIB_FLAG_NET_PREFIX (1UL<<31)
+#define FIB_FLAG_NET_PREFIX_SHIFT (24)
+
+/**
+ * @brief flag used as mask for the net prefix length in bits
+ */
+#define FIB_FLAG_NET_PREFIX_MASK (0xffUL << FIB_FLAG_NET_PREFIX_SHIFT)
 
 /**
  * @brief initializes all FIB entries with 0
@@ -158,6 +164,17 @@ int fib_update_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
  * @param[in] dst_size      the destination address size
  */
 void fib_remove_entry(fib_table_t *table, uint8_t *dst, size_t dst_size);
+
+/**
+ * @brief removes all entries from the corresponding FIB table and interface combination
+ *
+ * @note if interface is KERNEL_PID_UNDEF, then all entries regardless of the interface
+ *       will be removed.
+ *
+ * @param[in] table         the fib table to flush
+ * @param[in] interface     entries associated with this interface will be removed
+ */
+void fib_flush(fib_table_t *table, kernel_pid_t interface);
 
 /**
  * @brief provides a next hop for a given destination
@@ -277,6 +294,7 @@ int fib_sr_set(fib_table_t *table, fib_sr_t *fib_sr, kernel_pid_t *sr_iface_id,
 /**
 * @brief deletes the sr
 *
+* @param[in] table the fib instance to access
 * @param[in, out] fib_sr pointer to the source route to be deleted
 *
 * @return 0 on success
@@ -415,7 +433,7 @@ int fib_sr_entry_get_address(fib_table_t *table, fib_sr_t *fib_sr, fib_sr_entry_
 * @param[out] sr_iface_id pointer to the store the iface_id for this route
 * @param[in, out] sr_flags pointer to store the flags of this route
 * @param[out] addr_list pointer to the location for storing the source route addresses
-* @param[in, out] addr_list_elements the number of elements available in addr_list
+* @param[in, out] addr_list_size the number of elements available in addr_list
 * @param[in, out] element_size the provided size for one element in addr_list
 * @param[in] reverse indicator if the hops should be stored in reverse order
 * @param[in, out] fib_sr pointer for cosecutive receiving matching source routes.

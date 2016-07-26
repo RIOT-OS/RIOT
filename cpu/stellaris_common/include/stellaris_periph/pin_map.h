@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef PIN_MAP_H
-#define PIN_MAP_H
+#ifndef STELLARIS_PIN_MAP_H
+#define STELLARIS_PIN_MAP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -454,4 +454,4 @@ extern "C" {
 }
 #endif
 
-#endif // PIN_MAP_H
+#endif /* STELLARIS_PIN_MAP_H */

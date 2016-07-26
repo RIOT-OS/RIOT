@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef HW_UART_H
-#define HW_UART_H
+#ifndef STELLARIS_HW_UART_H
+#define STELLARIS_HW_UART_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -527,4 +527,4 @@ extern "C" {
 }
 #endif
 
-#endif // HW_UART_H
+#endif /* STELLARIS_HW_UART_H */

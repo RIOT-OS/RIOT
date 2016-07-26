@@ -85,7 +85,7 @@ extern "C" {
 /**
  * @brief           This type is unused right now, and only exists for POSIX compatibility.
  */
-typedef struct pthread_mutexattr
+typedef struct
 {
     int pshared;    /**< Whether to share the mutex with child processes. */
     int kind;       /**< Type of the mutex. */

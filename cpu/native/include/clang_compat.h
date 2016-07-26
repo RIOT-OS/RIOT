@@ -9,6 +9,7 @@
  */
 
 #ifndef CLANG_COMPAT_H
+#define CLANG_COMPAT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,4 +26,4 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* CLANG_COMPAT_H */

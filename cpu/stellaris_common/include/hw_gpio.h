@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef HW_GPIO_H
-#define HW_GPIO_H
+#ifndef STELLARIS_HW_GPIO_H
+#define STELLARIS_HW_GPIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -197,4 +197,4 @@ extern "C" {
 }
 #endif
 
-#endif // HW_GPIO_H
+#endif /* STELLARIS_HW_GPIO_H */

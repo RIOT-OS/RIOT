@@ -98,17 +98,17 @@ void x86_init_gdt(void)
         .offset = (unsigned long) &gdt_entries[0],
     };
 
-    asm volatile ("" :: "a"(0x0010));
+    __asm__ volatile ("" :: "a"(0x0010));
 
-    asm volatile ("lgdt %0" :: "m"(gdt));
-    asm volatile ("ljmp $0x0008, $1f\n"
+    __asm__ volatile ("lgdt %0" :: "m"(gdt));
+    __asm__ volatile ("ljmp $0x0008, $1f\n"
                   "1:");
 
-    asm volatile ("mov %ax, %ds");
-    asm volatile ("mov %ax, %es");
-    asm volatile ("mov %ax, %fs");
-    asm volatile ("mov %ax, %gs");
-    asm volatile ("mov %ax, %ss");
+    __asm__ volatile ("mov %ax, %ds");
+    __asm__ volatile ("mov %ax, %es");
+    __asm__ volatile ("mov %ax, %fs");
+    __asm__ volatile ("mov %ax, %gs");
+    __asm__ volatile ("mov %ax, %ss");
 }
 
 /* Addresses in PDPT, PD, and PT are linear addresses. */
@@ -193,7 +193,7 @@ static void init_pagetable(void)
 static void set_temp_page(uint64_t addr)
 {
     static_pts[TEMP_PAGE_PT][TEMP_PAGE_PTE] = addr != -1ull ? addr | PT_P | PT_RW | pt_xd : 0;
-    asm volatile ("invlpg (%0)" :: "r"(&TEMP_PAGE));
+    __asm__ volatile ("invlpg (%0)" :: "r"(&TEMP_PAGE));
 }
 
 static inline uint64_t min64(uint64_t a, uint64_t b)
@@ -283,13 +283,14 @@ static bool add_pages_to_pool(uint64_t start, uint64_t end)
 
 static void init_free_pages(void)
 {
-    printf("Kernel memory: %p - %p\r\n", &_kernel_memory_start, &_kernel_memory_end);
-    printf("  .text:   %p - %p\r\n", &_section_text_start, &_section_text_end);
-    printf("  .rodata: %p - %p\r\n", &_section_rodata_start, &_section_rodata_end);
-    printf("  .data:   %p - %p\r\n", &_section_data_start, &_section_data_end);
-    printf("  .bss:    %p - %p\r\n", &_section_bss_start, &_section_bss_end);
-    printf("Unmapped memory: %p - %p\r\n", &_kernel_memory_end, &_heap_start);
-    printf("Heap start: %p\r\n", &_heap_start);
+    printf("Kernel memory: %p - %p\r\n",
+           (void *)&_kernel_memory_start, (void *)&_kernel_memory_end);
+    printf("  .text:   %p - %p\r\n", (void *)&_section_text_start, (void *)&_section_text_end);
+    printf("  .rodata: %p - %p\r\n", (void *)&_section_rodata_start, (void *)&_section_rodata_end);
+    printf("  .data:   %p - %p\r\n", (void *)&_section_data_start, (void *)&_section_data_end);
+    printf("  .bss:    %p - %p\r\n", (void *)&_section_bss_start, (void *)&_section_bss_end);
+    printf("Unmapped memory: %p - %p\r\n", (void *)&_kernel_memory_end, (void *)&_heap_start);
+    printf("Heap start: %p\r\n", (void *)&_heap_start);
 
     unsigned long cnt = 0;
     uint64_t start, len;
@@ -350,7 +351,7 @@ static void pagefault_handler(uint8_t intr_num, struct x86_pushad *orig_ctx, uns
     else if ((pte != NO_PTE) && !(pte & PT_P) && (pte & PT_HEAP_BIT)) {
         /* mark as present */
         TEMP_PAGE.indices[(virtual_addr >> 12) % 512] |= PT_P;
-        asm volatile ("invlpg (%0)" :: "r"(virtual_addr));
+        __asm__ volatile ("invlpg (%0)" :: "r"(virtual_addr));
 
         /* initialize for easier debugging */
         uint32_t *p = (uint32_t *) (virtual_addr & ~0xfff);
@@ -428,7 +429,7 @@ static void virtual_pages_set_bits(uint32_t virtual_addr, unsigned pages, uint64
 
         uint64_t old_physical_addr = x86_get_pte(virtual_addr) & PT_ADDR_MASK;
         TEMP_PAGE.indices[pte_i] = old_physical_addr | bits;
-        asm volatile ("invlpg (%0)" :: "r"(virtual_addr));
+        __asm__ volatile ("invlpg (%0)" :: "r"(virtual_addr));
 
         virtual_addr += 0x1000;
     }

@@ -22,7 +22,6 @@
 #include "mutex.h"
 #include "thread.h"
 #include "sched.h"
-#include "kernel.h"
 #include "periph_conf.h"
 #include "periph/cpuid.h"
 #include "nrfmin.h"
@@ -190,7 +189,7 @@ static void _switch_to_idle(void)
     /* witch to idle state */
     NRF_RADIO->EVENTS_DISABLED = 0;
     NRF_RADIO->TASKS_DISABLE = 1;
-    while (NRF_RADIO->EVENTS_DISABLED == 0);
+    while (NRF_RADIO->EVENTS_DISABLED == 0) {}
     _state = STATE_IDLE;
 }
 
@@ -280,7 +279,7 @@ int _set_address(uint8_t *val, size_t len)
         return -EINVAL;
     }
     /* keep track of state */
-    while (_state == STATE_TX);
+    while (_state == STATE_TX) {}
     if (_state == STATE_RX) {
         is_rx = 1;
         _switch_to_idle();
@@ -317,7 +316,7 @@ int _set_channel(uint8_t *val, size_t len)
         return -EINVAL;
     }
     /* remember state */
-    while (_state == STATE_TX);
+    while (_state == STATE_TX) {}
     if (_state == STATE_RX) {
         is_rx = 1;
         _switch_to_idle();
@@ -353,7 +352,7 @@ int _set_pan(uint8_t *val, size_t len)
         return -EINVAL;
     }
     /* remember state */
-    while (_state == STATE_TX);
+    while (_state == STATE_TX) {}
     if (_state == STATE_RX) {
         is_rx = 1;
         _switch_to_idle();
@@ -611,7 +610,7 @@ int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
            dst_addr[0], dst_addr[1], size);
 
     /* wait for any ongoing transmission to finish */
-    while (_state == STATE_TX);
+    while (_state == STATE_TX) {}
     /* write data into TX buffer */
     payload = pkt->next;
     _tx_buf.length = 6 + size;

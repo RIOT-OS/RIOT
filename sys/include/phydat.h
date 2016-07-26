@@ -79,6 +79,8 @@ enum {
     UNIT_TEMP_C,    /**< degree Celsius */
     UNIT_TEMP_F,    /**< degree Fahrenheit */
     UNIT_TEMP_K,    /**< Kelvin */
+    /* illuminance */
+    UNIT_LUX,       /**< Lux (lx) */
     /* dimension */
     UNIT_M,         /**< meters */
     UNIT_M2,        /**< square meters */
@@ -162,10 +164,8 @@ const char *phydat_unit_to_str(uint8_t unit);
  * etc) otherwise.
  *
  * @param[in] scale     scale factor to convert
- * @param[in] str       buffer to write the result into, MUST be at least of
- *                      length @p PHYDAT_SCALE_STR_MAXLEN
  */
-void phydat_scale_to_str(int8_t scale, char *str);
+char phydat_scale_to_str(int8_t scale);
 
 #ifdef __cplusplus
 }

@@ -22,7 +22,6 @@
 
 #include <avr/wdt.h>
 
-#include "kernel.h"
 #include "cpu.h"
 
 void reboot(void)

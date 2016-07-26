@@ -123,7 +123,7 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src,
  * This macro is primarily an optimization to not go into the function defined
  * above.
  */
-#define gnrc_ndp_internal_send_rtr_adv(iface, dst, fin)
+#define gnrc_ndp_internal_send_rtr_adv(iface, src, dst, fin)
 #endif
 
 /**

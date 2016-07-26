@@ -25,6 +25,13 @@
  * While you can use the ciphers functions directly, you should resort to
  * the generic API for block ciphers whenever possible.
  *
+ * Additionally you need to set a CFLAG for each cipher you want to use in your Makefile:
+ *  * AES-128: CFLAGS += -DCRYPTO_AES
+ *  * 3DES:    CFLAGS += -DCRYPTO_THREEDES
+ *  * Twofish: CFLAGS += -DCRYPTO_TWOFISH
+ * Setting the CFLAGS initializes a sufficient large buffer size of the cipher_context_t,
+ * used by the ciphers for en-/de-cryption operations.
+ *
  * Example:
  * @code
  *  #include "crypto/ciphers.h"

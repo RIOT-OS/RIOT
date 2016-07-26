@@ -1,15 +1,19 @@
-/**
+/*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2016 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
+ */
+
+/**
  * @ingroup xtimer
  * @{
  * @file
  * @brief xtimer convenience functionality
  * @author Kaspar Schleiser <kaspar@schleiser.de>
+ * @author Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @}
  */
 
@@ -36,9 +40,10 @@ static void _callback_unlock_mutex(void* arg)
 
 void _xtimer_sleep(uint32_t offset, uint32_t long_offset)
 {
-    if (inISR()) {
+    if (irq_is_in()) {
         assert(!long_offset);
         xtimer_spin(offset);
+        return;
     }
 
     xtimer_t timer;
@@ -165,7 +170,7 @@ void xtimer_now_timex(timex_t *out)
 static void _setup_timer_msg(msg_t *m, xtimer_t *t)
 {
     m->type = MSG_XTIMER;
-    m->content.ptr = (char *) m;
+    m->content.ptr = m;
 
     t->target = t->long_target = 0;
 }
@@ -174,7 +179,7 @@ static void _setup_timer_msg(msg_t *m, xtimer_t *t)
 static int _msg_wait(msg_t *m, msg_t *tmsg, xtimer_t *t)
 {
     msg_receive(m);
-    if (m->type == MSG_XTIMER && m->content.ptr == (char *) tmsg) {
+    if (m->type == MSG_XTIMER && m->content.ptr == tmsg) {
         /* we hit the timeout */
         return -1;
     }
