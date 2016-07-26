@@ -266,7 +266,6 @@ void dma_stream_config(dma_t stream_dev, uint32_t periph_addr_reg, uint32_t dma_
 {
     volatile uint32_t periph_addr = periph_addr_reg;
     DMA_Stream_TypeDef *stream = dma_stream(stream_dev);
-    char temp_data = 0;
 
     /* power on */
     dma_poweron(stream_dev);
@@ -283,11 +282,6 @@ void dma_stream_config(dma_t stream_dev, uint32_t periph_addr_reg, uint32_t dma_
     /* set the memory address in the DMA_SxMA0R register */
     if (data != NULL) {
         stream->M0AR = (uint32_t)data;
-    }
-    else {
-        /* disable memory increment when data is NULL */
-        stream->CR &= ~(uint32_t)DMA_SxCR_MINC;
-        stream->M0AR = (uint32_t)&temp_data;
     }
 
     /* configure the total number of data items to be transferred */
