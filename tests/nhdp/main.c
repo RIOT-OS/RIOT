@@ -18,6 +18,6 @@
 
 int main(void)
 {
-    printf("NHDP compiled!");
+    puts("NHDP compiled!");
     return 0;
 }
