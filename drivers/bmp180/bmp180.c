@@ -67,17 +67,23 @@ int bmp180_init(bmp180_t *dev, i2c_t i2c, uint8_t mode)
 
     /* Check sensor ID */
     char checkid;
-    i2c_write_byte(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_ID);
     i2c_read_reg(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_ID, &checkid);
     if (checkid != 0x55) {
         DEBUG("[Error] Wrong device ID\n");
+        i2c_release(dev->i2c_dev);
         return -1;
     }
 
+    /* adding delay before reading calibration values to avoid timing issues */
+    xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
+
     char buffer[22] = {0};
     /* Read calibration values, using contiguous register addresses */
-    i2c_write_byte(dev->i2c_dev, BMP180_ADDR, BMP180_CALIBRATION_AC1);
-    i2c_read_regs(dev->i2c_dev, BMP180_ADDR, BMP180_CALIBRATION_AC1, buffer, 22);
+    if (i2c_read_regs(dev->i2c_dev, BMP180_ADDR, BMP180_CALIBRATION_AC1, buffer, 22) < 0) {
+        DEBUG("[Error] Cannot read calibration registers.\n");
+        i2c_release(dev->i2c_dev);
+        return -1;
+    }
     dev->calibration.ac1 = (int16_t)(buffer[0] << 8)   | buffer[1];
     dev->calibration.ac2 = (int16_t)(buffer[2] << 8)   | buffer[3];
     dev->calibration.ac3 = (int16_t)(buffer[4] << 8)   | buffer[4];
@@ -114,7 +120,7 @@ void bmp180_auto_init(void)
             LOG_ERROR("Unable to initialize BMP180 sensor #%i\n", i);
         }
 #ifdef MODULE_SAUL_REG
-        for (int j = 0; j < 2; j++) {
+        for (unsigned j = 0; j < 2; j++) {
             bmp180_saul_reg[i][j].dev = &bmp180_devs[i];
             saul_reg_add(&bmp180_saul_reg[i][j]);
         }
@@ -126,9 +132,7 @@ int bmp180_read_temperature(bmp180_t *dev, int32_t *temperature)
 {
     int32_t ut, b5;
     /* Acquire exclusive access */
-    if (i2c_acquire(dev->i2c_dev)) {
-        return -1;
-    }
+    i2c_acquire(dev->i2c_dev);
 
     /* Read uncompensated value */
     _read_ut(dev, &ut);
@@ -145,13 +149,11 @@ int bmp180_read_temperature(bmp180_t *dev, int32_t *temperature)
 
 int bmp180_read_pressure(bmp180_t *dev, int32_t *pressure)
 {
-    int32_t ut, up, x1, x2, x3, b3, b5, b6, p;
+    int32_t ut = 0, up = 0, x1, x2, x3, b3, b5, b6, p;
     uint32_t b4, b7;
 
     /* Acquire exclusive access */
-    if (i2c_acquire(dev->i2c_dev)) {
-        return -1;
-    }
+    i2c_acquire(dev->i2c_dev);
 
     /* Read uncompensated values: first temperature, second pressure */
     _read_ut(dev, &ut);
@@ -218,7 +220,11 @@ static int _read_ut(bmp180_t *dev, int32_t *output)
     char control[2] = { BMP180_REGISTER_CONTROL, BMP180_TEMPERATURE_COMMAND };
     i2c_write_bytes(dev->i2c_dev, BMP180_ADDR, control, 2);
     xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
-    i2c_read_regs(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_DATA, ut, 2);
+    if (i2c_read_regs(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_DATA, ut, 2) < 0) {
+        DEBUG("[Error] Cannot read uncompensated temperature.\n");
+        i2c_release(dev->i2c_dev);
+        return -1;
+    }
     *output = ( ut[0] << 8 ) | ut[1];
 
     DEBUG("UT: %i\n", (int)*output);
@@ -249,7 +255,11 @@ static int _read_up(bmp180_t *dev, int32_t *output)
         xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
         break;
     }
-    i2c_read_regs(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_DATA, up, 3);
+    if (i2c_read_regs(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_DATA, up, 3) < 0) {
+        DEBUG("[Error] Cannot read uncompensated pressure.\n");
+        i2c_release(dev->i2c_dev);
+        return -1;
+    }
 
     *output = ((up[0] << 16) | (up[1] << 8) | up[2]) >> (8 - dev->oversampling);
 
