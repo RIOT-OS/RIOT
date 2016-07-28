@@ -333,6 +333,10 @@ void od(const void *data, size_t data_len, uint8_t width, uint16_t flags)
     uint8_t date_length = _length(flags);
     char bytes_format[_log10(date_length) + 7];
 
+    if (data_len == 0) {
+        return;
+    }
+
     _address_format(address_format, flags);
     _bytes_format(bytes_format, flags);
 
