@@ -387,7 +387,7 @@ otRadioCaps otPlatRadioGetCaps(void)
 {
 	DEBUG("openthread: otPlatRadioGetCaps\n");
 	/* change to kRadioCapsAckTimeout if supported by driver */
-	return kRadioCapsNone;
+	return kRadioCapsAckTimeout;
 }
 
 /* OpenThread will call this for getting the state of promiscuous mode */
