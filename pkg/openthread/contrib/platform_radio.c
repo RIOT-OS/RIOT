@@ -115,13 +115,13 @@ bool is_off(void)
 }
 
 /* sets device state to OFF */
-void off(void)
+void ot_off(void)
 {
 	set_state(NETOPT_STATE_OFF);
 }
 
 /* sets device state to SLEEP */
-void sleep(void)
+void ot_sleep(void)
 {
 	set_state(NETOPT_STATE_SLEEP);
 }
@@ -133,7 +133,7 @@ bool is_idle(void)
 }
 
 /* set device state to IDLE */
-void idle(void)
+void ot_idle(void)
 {
 	set_state(NETOPT_STATE_IDLE);
 }
@@ -175,7 +175,7 @@ void recv_pkt(netdev2_t *dev)
 	int len = dev->driver->recv(dev, NULL, 0, NULL);
 
 	/* Since OpenThread does the synchronization of rx/tx, it's necessary to turn off the receiver now */
-	idle();
+	ot_idle();
 	disable_rx();
 
 	/* very unlikely */
@@ -225,7 +225,7 @@ void send_pkt(netdev2_t *dev, netdev2_event_t event)
 
 	/* Since the transmission is finished, turn off reception */
 	disable_rx();
-	idle();
+	ot_idle();
 
 }
 
@@ -268,7 +268,7 @@ ThreadError otPlatRadioEnable(void)
 		return kThreadError_Busy;
 	}
 
-	sleep();
+	ot_sleep();
 	return kThreadError_None;
 }
 
@@ -276,7 +276,7 @@ ThreadError otPlatRadioEnable(void)
 ThreadError otPlatRadioDisable(void)
 {
 	DEBUG("openthread: otPlatRadioDisable\n");
-	off();
+	ot_off();
 	return kThreadError_None;
 }
 
@@ -290,7 +290,7 @@ ThreadError otPlatRadioSleep(void)
 		return kThreadError_Busy;
 	}
 
-	sleep();
+	ot_sleep();
 	return kThreadError_None;
 }
 
@@ -308,7 +308,7 @@ ThreadError otPlatRadioIdle(void)
 	/* OpenThread will call this before calling otPlatRadioTransmit.
 	 * If a packet is received between this function and otPlatRadioTransmit OpenThread will fail! */
 	disable_rx();
-	idle();
+	ot_idle();
 
 	return kThreadError_None;
 }
