@@ -386,7 +386,7 @@ int8_t otPlatRadioGetNoiseFloor(void)
 otRadioCaps otPlatRadioGetCaps(void)
 {
 	DEBUG("openthread: otPlatRadioGetCaps\n");
-	/* change to kRadioCapsAckTimeout if supported by driver */
+	/* all drivers should handle ACK, including call of NETDEV2_EVENT_TX_NOACK */
 	return kRadioCapsAckTimeout;
 }
 
