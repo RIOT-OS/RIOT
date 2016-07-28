@@ -352,7 +352,7 @@ void i2c_poweroff(i2c_t dev)
 #if I2C_0_EN
         case I2C_0:
             while(I2C_0_DEV.SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
-            I2C_0_DEV.CTRLA.reg |= SERCOM_I2CM_CTRLA_ENABLE;
+            I2C_0_DEV.CTRLA.bit.ENABLE = 0;
             break;
 #endif
         default:
