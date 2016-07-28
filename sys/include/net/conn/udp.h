@@ -35,6 +35,10 @@
 #include "emb6/conn/udp.h"
 #endif
 
+#ifdef MODULE_OPENTHREAD
+#include "conn.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

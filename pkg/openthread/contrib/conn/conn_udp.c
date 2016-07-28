@@ -125,4 +125,8 @@ int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len, void *addr, 
 	}
 	return 0;
 }
-/** @} */
+
+ipv6_addr_t *conn_find_best_source(const ipv6_addr_t *dst)
+{
+	return (ipv6_addr_t*) &sockaddr.mAddress.mFields;
+}
