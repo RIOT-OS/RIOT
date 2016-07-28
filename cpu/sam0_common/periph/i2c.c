@@ -48,7 +48,7 @@ static inline int _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag);
 static inline int _write(SercomI2cm *dev, const uint8_t *data, int length);
 static inline int _read(SercomI2cm *dev, uint8_t *data, int length);
 static inline void _stop(SercomI2cm *dev);
-static inline int _wait_for_response(SercomI2cm *dev);
+static inline int _wait_for_response(SercomI2cm *dev, uint32_t max_timeout_counter);
 
 /**
  * @brief Array holding one pre-initialized mutex for each I2C device
@@ -392,8 +392,15 @@ static int _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag)
     dev->ADDR.reg = (address << 1) | rw_flag | (0 << SERCOM_I2CM_ADDR_HS_Pos);
 
     /* Wait for response on bus. */
-    if (_wait_for_response(dev) < 0)
-        return -1;
+    if (rw_flag == I2C_FLAG_READ) {
+        /* Some devices (e.g. SHT2x) can hold the bus while preparing the reply */
+        if (_wait_for_response(dev, 100 * SAMD21_I2C_TIMEOUT) < 0)
+            return -1;
+    }
+    else {
+        if (_wait_for_response(dev, SAMD21_I2C_TIMEOUT) < 0)
+            return -1;
+    }
 
     /* Check for address response error unless previous error is detected. */
     /* Check for error and ignore bus-error; workaround for BUSSTATE
@@ -437,7 +444,8 @@ static inline int _write(SercomI2cm *dev, const uint8_t *data, int length)
         DEBUG("Written byte #%i to data reg, now waiting for DR to be empty again\n", buffer_counter);
         dev->DATA.reg = data[buffer_counter++];
 
-        if (_wait_for_response(dev) < 0)
+        /* Wait for response on bus. */
+        if (_wait_for_response(dev, SAMD21_I2C_TIMEOUT) < 0)
             return -1;
 
         /* Check for NACK from slave. */
@@ -469,8 +477,8 @@ static inline int _read(SercomI2cm *dev, uint8_t *data, int length)
         /* Save data to buffer. */
         data[count] = dev->DATA.reg;
 
-        /* Wait for response. */
-        if (_wait_for_response(dev) < 0)
+        /* Wait for response on bus. */
+        if (_wait_for_response(dev, SAMD21_I2C_TIMEOUT) < 0)
             return -1;
 
         count++;
@@ -491,13 +499,13 @@ static inline void _stop(SercomI2cm *dev)
     DEBUG("Stop sent\n");
 }
 
-static inline int _wait_for_response(SercomI2cm *dev)
+static inline int _wait_for_response(SercomI2cm *dev, uint32_t max_timeout_counter)
 {
     uint32_t timeout_counter = 0;
     DEBUG("Wait for response.\n");
     while (!(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_MB)
            && !(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_SB)) {
-        if (++timeout_counter >= SAMD21_I2C_TIMEOUT) {
+        if (++timeout_counter >= max_timeout_counter) {
             DEBUG("STATUS_ERR_TIMEOUT\n");
             return -1;
         }
