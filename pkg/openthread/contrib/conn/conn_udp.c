@@ -22,6 +22,9 @@
 #include "ot.h"
 #include "errno.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 static msg_t _msg;
 
 static conn_udp_msg_t msg_info;
@@ -29,6 +32,7 @@ static otSockAddr sockaddr = {};
 
 void HandleUdpReceived(void *aContext, otMessage aMessage, const otMessageInfo *aMessageInfo)
 {
+	DEBUG("openthread: Received UDP packet\n");
 	msg_info.message = aMessage;
 	msg_info.message_info  = (otMessageInfo*) aMessageInfo;
 	_msg.type = OPENTHREAD_MSG_TYPE_RECV;
@@ -39,6 +43,7 @@ void HandleUdpReceived(void *aContext, otMessage aMessage, const otMessageInfo *
 
 int conn_udp_create(conn_udp_t *conn, const void *addr, size_t addr_len, int family, uint16_t port)
 {
+	DEBUG("openthread: conn_udp_create\n");
 	memcpy(&sockaddr.mAddress.mFields, addr, addr_len);
     sockaddr.mPort = port;
 
@@ -53,7 +58,8 @@ int conn_udp_sendto(const void *data, size_t len, const void *src, size_t src_le
                     const void *dst, size_t dst_len, int family, uint16_t sport,
                     uint16_t dport)
 {
-	if(dst_len != sizeof(ipv6_addr_t) || src_len != sizeof(ipv6_addr_t))
+	DEBUG("openthread: conn_udp_sendto\n");
+	if(dst_len != sizeof(ipv6_addr_t) || (src != NULL && src_len != sizeof(ipv6_addr_t)))
 		return -EINVAL;
 
     otMessage message;
@@ -88,6 +94,7 @@ int conn_udp_sendto(const void *data, size_t len, const void *src, size_t src_le
 
 void conn_udp_close(conn_udp_t *conn)
 {
+	DEBUG("openthread: conn_udp_close\n");
 	begin_mutex();
 	otCloseUdpSocket(&conn->mSocket);
 	end_mutex();
@@ -95,6 +102,7 @@ void conn_udp_close(conn_udp_t *conn)
 
 int conn_udp_getlocaladdr(conn_udp_t *conn, void *addr, uint16_t *port)
 {
+	DEBUG("openthread: conn_udp_getlocaladdr\n");
 	memcpy(addr, &sockaddr.mAddress.mFields, sizeof(ipv6_addr_t));
     *port = sockaddr.mPort;
     return sizeof(ipv6_addr_t);
@@ -102,6 +110,7 @@ int conn_udp_getlocaladdr(conn_udp_t *conn, void *addr, uint16_t *port)
 
 int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len, uint16_t *port)
 {
+	DEBUG("openthread: conn_udp_recv_from\n");
 	msg_t msg;
 	conn->receiver_pid = thread_getpid();
 	conn_udp_msg_t *cudp;
@@ -123,10 +132,11 @@ int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len, void *addr, 
 			break;
 		}
 	}
-	return 0;
+	return msg_length;
 }
 
 ipv6_addr_t *conn_find_best_source(const ipv6_addr_t *dst)
 {
-	return (ipv6_addr_t*) &sockaddr.mAddress.mFields;
+	DEBUG("openthread: Finding best source\n");
+	return NULL;
 }
