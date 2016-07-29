@@ -91,7 +91,7 @@ void *_openthread_event_loop(void *arg)
 				dev = (netdev2_t*) msg.content.ptr;
 				dev->driver->isr(dev);
 				break;
-#ifdef MODULE_OPENTHREAD_CLI
+#if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
 			case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
 				/* Tell OpenThread about the receotion of a CLI command */
 				begin_mutex();

@@ -1,4 +1,4 @@
-#ifdef MODULE_OPENTHREAD_CLI
+#if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
 #include "ot-cli.h"
 #else
 #include <openthread.h>
