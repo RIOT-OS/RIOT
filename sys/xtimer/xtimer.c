@@ -58,50 +58,66 @@ void _xtimer_sleep(uint32_t offset, uint32_t long_offset)
     mutex_lock(&mutex);
 }
 
-void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t interval) {
+void xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
     xtimer_t timer;
     mutex_t mutex = MUTEX_INIT;
 
     timer.callback = _callback_unlock_mutex;
     timer.arg = (void*) &mutex;
 
-    uint32_t target = *last_wakeup + interval;
-
+    uint32_t target = (*last_wakeup) + period;
     uint32_t now = xtimer_now();
     /* make sure we're not setting a value in the past */
-    if (now < *last_wakeup) {
-        /* base timer overflowed */
-        if (!((target < *last_wakeup) && (target > now))) {
+    if (now < (*last_wakeup)) {
+        /* base timer overflowed between last_wakeup and now */
+        if (!((now < target) && (target < (*last_wakeup)))) {
+            /* target time has already passed */
             goto out;
         }
     }
-    else if (! ((target < *last_wakeup) || (target > now))) {
-        goto out;
+    else {
+        /* base timer did not overflow */
+        if ((((*last_wakeup) <= target) && (target <= now))) {
+            /* target time has already passed */
+            goto out;
+        }
     }
 
-    /* For large offsets, set an absolute target time, as
-     * it is more exact.
-     *
-     * As that might cause an underflow, for small offsets,
-     * use a relative offset, as that can never underflow.
-     *
+    /*
+     * For large offsets, set an absolute target time.
+     * As that might cause an underflow, for small offsets, set a relative
+     * target time.
      * For very small offsets, spin.
      */
+    /*
+     * Note: last_wakeup _must never_ specify a time in the future after
+     * _xtimer_periodic_sleep returns.
+     * If this happens, last_wakeup may specify a time in the future when the
+     * next call to _xtimer_periodic_sleep is made, which in turn will trigger
+     * the overflow logic above and make the next timer fire too early, causing
+     * last_wakeup to point even further into the future, leading to a chain
+     * reaction.
+     *
+     * tl;dr Don't return too early!
+     */
     uint32_t offset = target - now;
-
-    if (offset > (XTIMER_BACKOFF * 2)) {
-        mutex_lock(&mutex);
-        if (offset >> 9) { /* >= 512 */
-            offset = target;
-        }
-        else {
-            offset += xtimer_now();
-        }
-        _xtimer_set_absolute(&timer, offset);
-        mutex_lock(&mutex);
+    DEBUG("xps, now: %9" PRIu32 ", tgt: %9" PRIu32 ", off: %9" PRIu32 "\n", now, target, offset);
+    if (offset < XTIMER_PERIODIC_SPIN) {
+        xtimer_spin(offset);
     }
     else {
-        xtimer_spin(offset);
+        if (offset < XTIMER_PERIODIC_RELATIVE) {
+            /* NB: This will overshoot the target by the amount of time it took
+             * to get here from the beginning of xtimer_periodic_wakeup()
+             *
+             * Since interrupts are normally enabled inside this function, this time may
+             * be undeterministic. */
+            target = xtimer_now() + offset;
+        }
+        mutex_lock(&mutex);
+        DEBUG("xps, abs: %" PRIu32 "\n", target);
+        _xtimer_set_absolute(&timer, target);
+        mutex_lock(&mutex);
     }
 
 out:
