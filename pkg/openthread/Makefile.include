@@ -17,4 +17,8 @@ ifneq (,$(filter openthread_cli,$(USEMODULE)))
  DIRS += $(RIOTBASE)/pkg/openthread/contrib/cli
 endif
 
+ifneq (,$(filter openthread_ncp,$(USEMODULE)))
+ DIRS += $(RIOTBASE)/pkg/openthread/contrib/cli
+endif
+
 
