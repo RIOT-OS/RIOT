@@ -58,7 +58,6 @@ void *_openthread_event_loop(void *arg)
 	msg_t msg;
 
 #ifdef MODULE_OPENTHREAD_CLI
-	serial_msg_t *ser;
 	otCliUartInit();
 #else
 	/* equivalent to "start" command of OpenThread CLI */
@@ -95,9 +94,8 @@ void *_openthread_event_loop(void *arg)
 #ifdef MODULE_OPENTHREAD_CLI
 			case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
 				/* Tell OpenThread about the receotion of a CLI command */
-				ser = (serial_msg_t*) msg.content.ptr;
 				begin_mutex();
-				otPlatUartReceived((uint8_t*) ser->buf, ser->len);
+				otPlatUartReceived((uint8_t*) msg.content.ptr, 1);
 				end_mutex();
 				break;
 #endif

@@ -26,7 +26,7 @@ extern "C" {
  * @brief   Run OpenThread CLI
  *
  */
-void openthread_cli_run(void);
+void openthread_uart_run(void);
 
 #ifdef __cplusplus
 }

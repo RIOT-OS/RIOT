@@ -125,8 +125,8 @@ void cli_run(void)
 
 int main(void)
 {
-#ifdef MODULE_OPENTHREAD_CLI
-    openthread_cli_run();
+#if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
+    openthread_uart_run();
 #else
     cli_run();
 #endif
