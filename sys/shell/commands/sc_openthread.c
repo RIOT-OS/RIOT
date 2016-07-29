@@ -19,6 +19,7 @@
 #include <openthread.h>
 #include <stdio.h>
 #include "byteorder.h"
+#include "net/ipv6/addr.h"
 
 int _openthread_state(int argc, char **argv)
 {
@@ -47,15 +48,8 @@ int _openthread_ipaddr(int argc, char **argv)
 {
     for (const otNetifAddress *addr = otGetUnicastAddresses(); addr; addr = addr->mNext)
         {
-            printf("%x:%x:%x:%x:%x:%x:%x:%x\r\n",
-                                  byteorder_ntohs(*((network_uint16_t*) &addr->mAddress.mFields.m16[0])),
-                                  byteorder_ntohs(*((network_uint16_t*) &addr->mAddress.mFields.m16[1])),
-                                  byteorder_ntohs(*((network_uint16_t*) &addr->mAddress.mFields.m16[2])),
-                                  byteorder_ntohs(*((network_uint16_t*) &addr->mAddress.mFields.m16[3])),
-                                  byteorder_ntohs(*((network_uint16_t*) &addr->mAddress.mFields.m16[4])),
-                                  byteorder_ntohs(*((network_uint16_t*) &addr->mAddress.mFields.m16[5])),
-                                  byteorder_ntohs(*((network_uint16_t*) &addr->mAddress.mFields.m16[6])),
-                                  byteorder_ntohs(*((network_uint16_t*) &addr->mAddress.mFields.m16[7])));
+			ipv6_addr_print((ipv6_addr_t*) &addr->mAddress.mFields);
+			printf("\n");
         }
     return 0;
 }
