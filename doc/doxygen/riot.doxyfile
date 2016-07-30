@@ -832,7 +832,6 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/nrf5*/include/nrf5*.h \
                          */cpu/lpc1768/include/LPC17xx.h \
                          */cpu/lpc11u34/include/LPC11Uxx.h \
-                         */boards/*/include/periph_conf.h \
                          */cpu/x86/include/x86_pci.h \
                          */cpu/stm32l1/include/stm32l1xx.h \
                          */cpu/k60/include/MK60D10.h \
