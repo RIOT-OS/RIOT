@@ -33,8 +33,15 @@
 #include "periph/i2c.h"
 
 #define ENABLE_DEBUG    (0)
+/* Define ENABLE_TRACE to 1 to enable printing of all TX/RX bytes to UART for extra verbose debugging */
+#define ENABLE_TRACE    (0)
 #include "debug.h"
 
+#if ENABLE_TRACE
+#define TRACE(...) DEBUG(__VA_ARGS__)
+#else
+#define TRACE(...)
+#endif
 /* guard file in case no I2C device is defined */
 #if I2C_NUMOF
 
@@ -76,6 +83,7 @@ int i2c_release(i2c_t dev)
 
 int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 {
+    DEBUG("i2c_init_master: %lu, %lu\n", (unsigned long)dev, (unsigned long) speed);
     I2C_Type *i2c;
     PORT_Type *i2c_port;
     int pin_scl = 0;
@@ -175,6 +183,7 @@ static inline int _i2c_start(I2C_Type *dev, uint8_t address, uint8_t rw_flag)
 {
     /* bus free ? */
     if (dev->S & I2C_S_BUSY_MASK) {
+        DEBUG("i2c:_start: bus busy\n");
         return -1;
     }
 
@@ -186,6 +195,7 @@ static inline int _i2c_start(I2C_Type *dev, uint8_t address, uint8_t rw_flag)
     /* wait for bus-busy to be set */
     while (!(dev->S & I2C_S_BUSY_MASK)) {
         if (_i2c_arbitration_lost(dev)) {
+            DEBUG("i2c:_start: arbitration lost\n");
             return -1;
         }
     }
@@ -196,11 +206,13 @@ static inline int _i2c_start(I2C_Type *dev, uint8_t address, uint8_t rw_flag)
     dev->S = I2C_S_IICIF_MASK;
 
     if (_i2c_arbitration_lost(dev)) {
+        DEBUG("i2c:_start: arbitration lost late\n");
         return -1;
     }
 
     /* check for receive acknowledge */
     if (dev->S & I2C_S_RXAK_MASK) {
+        DEBUG("i2c:_start: no addr ack\n");
         return -1;
     }
 
@@ -219,11 +231,13 @@ static inline int _i2c_restart(I2C_Type *dev, uint8_t address, uint8_t rw_flag)
     dev->S = I2C_S_IICIF_MASK;
 
     if (_i2c_arbitration_lost(dev)) {
+        DEBUG("i2c:_restart: arbitration lost\n");
         return -1;
     }
 
     /* check for receive acknowledge */
     if (dev->S & I2C_S_RXAK_MASK) {
+        DEBUG("i2c:_restart: no addr ack\n");
         return -1;
     }
 
@@ -251,6 +265,7 @@ static inline int _i2c_receive(I2C_Type *dev, uint8_t *data, int length)
         dev->S = I2C_S_IICIF_MASK;
 
         if (_i2c_arbitration_lost(dev)) {
+            DEBUG("i2c:_receive: arbitration lost (to go=%d)\n", length);
             return -1;
         }
 
@@ -268,6 +283,7 @@ static inline int _i2c_receive(I2C_Type *dev, uint8_t *data, int length)
         }
 
         data[n] = (char)dev->D;
+        TRACE("i2c: rx: %02x\n", (unsigned int)data[n]);
         n++;
     }
 
@@ -279,6 +295,7 @@ static inline int _i2c_transmit(I2C_Type *dev, uint8_t *data, int length)
     int n = 0;
 
     while (length > 0) {
+        TRACE("i2c: tx: %02x\n", (unsigned int)data[n]);
         dev->D = data[n];
 
         while (!(dev->S & I2C_S_IICIF_MASK));
