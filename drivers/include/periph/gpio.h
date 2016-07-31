@@ -64,25 +64,26 @@
 extern "C" {
 #endif
 
-/**
- * @brief   Default GPIO macro maps port-pin tuples to the pin value
- */
-#ifndef GPIO_PIN
-#define GPIO_PIN(x,y)       ((x & 0) | y)
-#endif
-
-/**
- * @brief   Define global value for GPIO not defined
- */
-#ifndef GPIO_UNDEF
-#define GPIO_UNDEF          (UINT_MAX)
-#endif
-
-/**
- * @brief   Define the default GPIO type identifier
- */
 #ifndef HAVE_GPIO_T
+/**
+ * @brief   GPIO type identifier
+ */
 typedef unsigned int gpio_t;
+#endif
+
+#ifndef GPIO_PIN
+/**
+ * @brief   Convert (port, pin) tuple to @c gpio_t value
+ */
+/* Default GPIO macro maps port-pin tuples to the pin value */
+#define GPIO_PIN(x,y)       ((gpio_t)((x & 0) | y))
+#endif
+
+#ifndef GPIO_UNDEF
+/**
+ * @brief   GPIO pin not defined
+ */
+#define GPIO_UNDEF          ((gpio_t)(UINT_MAX))
 #endif
 
 /**
@@ -140,8 +141,7 @@ typedef struct {
  * @brief   Initialize the given pin as general purpose input or output
  *
  * @param[in] pin       pin to initialize
- * @param[in] dir       direction for the pin, input or output
- * @param[in] pullup    define what pull resistors should be used
+ * @param[in] mode      mode of the pin, see @c gpio_mode_t
  *
  * @return              0 on success
  * @return              -1 on error
@@ -157,7 +157,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode);
  * The interrupt is activated automatically after the initialization.
  *
  * @param[in] pin       pin to initialize
- * @param[in] pullup    define what pull resistors should be enabled
+ * @param[in] mode      mode of the pin, see @c gpio_mode_t
  * @param[in] flank     define the active flank(s)
  * @param[in] cb        callback that is called from interrupt context
  * @param[in] arg       optional argument passed to the callback
@@ -169,14 +169,14 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg);
 
 /**
- * @brief   Enable pin's interrupt if configured as interrupt source
+ * @brief   Enable pin interrupt if configured as interrupt source
  *
  * @param[in] pin       the pin to enable the interrupt for
  */
 void gpio_irq_enable(gpio_t pin);
 
 /**
- * @brief   Disable the pin's interrupt if configured as interrupt source
+ * @brief   Disable the pin interrupt if configured as interrupt source
  *
  * @param[in] pin       the pin to disable the interrupt for
  */
@@ -186,10 +186,9 @@ void gpio_irq_disable(gpio_t pin);
  * @brief   Get the current value of the given pin
  *
  * @param[in] pin       the pin to read
- * @return              the current value, 0 for LOW, != 0 for HIGH
  *
  * @return              0 when pin is LOW
- * @return              greater 0 for HIGH
+ * @return              >0 for HIGH
  */
 int gpio_read(gpio_t pin);
 
