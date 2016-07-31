@@ -40,13 +40,12 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_AC_INSTANCE_
 #define _SAMR21_AC_INSTANCE_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========== Register definition for AC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -82,14 +81,10 @@ extern "C" {
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for AC peripheral ========== */
-#define AC_CMP_NUM                  2
-#define AC_GCLK_ID_ANA              32
-#define AC_GCLK_ID_DIG              31
-#define AC_NUM_CMP                  AC_CMP_NUM
-#define AC_PAIRS                    1
-
-#ifdef __cplusplus
-}
-#endif
+#define AC_CMP_NUM                  2        // Number of comparators
+#define AC_GCLK_ID_ANA              32       // Index of Generic Clock for analog
+#define AC_GCLK_ID_DIG              31       // Index of Generic Clock for digital
+#define AC_NUM_CMP                  2       
+#define AC_PAIRS                    1        // Number of pairs of comparators
 
 #endif /* _SAMR21_AC_INSTANCE_ */

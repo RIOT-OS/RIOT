@@ -40,13 +40,12 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_SERCOM2_INSTANCE_
 #define _SAMR21_SERCOM2_INSTANCE_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========== Register definition for SERCOM2 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -138,14 +137,10 @@ extern "C" {
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for SERCOM2 peripheral ========== */
-#define SERCOM2_DMAC_ID_RX          5
-#define SERCOM2_DMAC_ID_TX          6
-#define SERCOM2_GCLK_ID_CORE        22
-#define SERCOM2_GCLK_ID_SLOW        19
-#define SERCOM2_INT_MSB             6
-
-#ifdef __cplusplus
-}
-#endif
+#define SERCOM2_DMAC_ID_RX          5        // Index of DMA RX trigger
+#define SERCOM2_DMAC_ID_TX          6        // Index of DMA TX trigger
+#define SERCOM2_GCLK_ID_CORE        22       // Index of Generic Clock for Core
+#define SERCOM2_GCLK_ID_SLOW        19       // Index of Generic Clock for SMbus timeout
+#define SERCOM2_INT_MSB             6       
 
 #endif /* _SAMR21_SERCOM2_INSTANCE_ */

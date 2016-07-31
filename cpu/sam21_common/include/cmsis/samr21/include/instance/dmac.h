@@ -40,13 +40,12 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_DMAC_INSTANCE_
 #define _SAMR21_DMAC_INSTANCE_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========== Register definition for DMAC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -56,6 +55,7 @@ extern "C" {
 #define REG_DMAC_CRCCHKSUM         (0x41004808U) /**< \brief (DMAC) CRC Checksum */
 #define REG_DMAC_CRCSTATUS         (0x4100480CU) /**< \brief (DMAC) CRC Status */
 #define REG_DMAC_DBGCTRL           (0x4100480DU) /**< \brief (DMAC) Debug Control */
+#define REG_DMAC_QOSCTRL           (0x4100480EU) /**< \brief (DMAC) QOS Control */
 #define REG_DMAC_SWTRIGCTRL        (0x41004810U) /**< \brief (DMAC) Software Trigger Control */
 #define REG_DMAC_PRICTRL0          (0x41004814U) /**< \brief (DMAC) Priority Control 0 */
 #define REG_DMAC_INTPEND           (0x41004820U) /**< \brief (DMAC) Interrupt Pending */
@@ -79,6 +79,7 @@ extern "C" {
 #define REG_DMAC_CRCCHKSUM         (*(RwReg  *)0x41004808U) /**< \brief (DMAC) CRC Checksum */
 #define REG_DMAC_CRCSTATUS         (*(RwReg8 *)0x4100480CU) /**< \brief (DMAC) CRC Status */
 #define REG_DMAC_DBGCTRL           (*(RwReg8 *)0x4100480DU) /**< \brief (DMAC) Debug Control */
+#define REG_DMAC_QOSCTRL           (*(RwReg8 *)0x4100480EU) /**< \brief (DMAC) QOS Control */
 #define REG_DMAC_SWTRIGCTRL        (*(RwReg  *)0x41004810U) /**< \brief (DMAC) Software Trigger Control */
 #define REG_DMAC_PRICTRL0          (*(RwReg  *)0x41004814U) /**< \brief (DMAC) Priority Control 0 */
 #define REG_DMAC_INTPEND           (*(RwReg16*)0x41004820U) /**< \brief (DMAC) Interrupt Pending */
@@ -98,18 +99,14 @@ extern "C" {
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for DMAC peripheral ========== */
-#define DMAC_CH_BITS                len(bin(DMAC_CH_NUM - 1))-2
-#define DMAC_CH_NUM                 12
-#define DMAC_CLK_AHB_ID             5
-#define DMAC_EVIN_NUM               4
-#define DMAC_EVOUT_NUM              4
-#define DMAC_LVL_BITS               len(bin(DMAC_LVL_NUM - 1))-2
-#define DMAC_LVL_NUM                4
-#define DMAC_TRIG_BITS              len(bin(DMAC_TRIG_NUM - 1))-2
-#define DMAC_TRIG_NUM               45
-
-#ifdef __cplusplus
-}
-#endif
+#define DMAC_CH_BITS                4        // Number of bits to select channel
+#define DMAC_CH_NUM                 12       // Number of channels
+#define DMAC_CLK_AHB_ID             5        // AHB clock index
+#define DMAC_EVIN_NUM               4        // Number of input events
+#define DMAC_EVOUT_NUM              4        // Number of output events
+#define DMAC_LVL_BITS               2        // Number of bit to select level priority
+#define DMAC_LVL_NUM                4        // Enable priority level number
+#define DMAC_TRIG_BITS              6        // Number of bits to select trigger source
+#define DMAC_TRIG_NUM               45       // Number of peripheral triggers
 
 #endif /* _SAMR21_DMAC_INSTANCE_ */

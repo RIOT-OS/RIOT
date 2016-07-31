@@ -40,13 +40,12 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_PM_INSTANCE_
 #define _SAMR21_PM_INSTANCE_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========== Register definition for PM peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -82,14 +81,10 @@ extern "C" {
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for PM peripheral ========== */
-#define PM_CTRL_MCSEL_DFLL48M       3
-#define PM_CTRL_MCSEL_GCLK          0
-#define PM_CTRL_MCSEL_OSC8M         1
-#define PM_CTRL_MCSEL_XOSC          2
-#define PM_PM_CLK_APB_NUM           2
-
-#ifdef __cplusplus
-}
-#endif
+#define PM_CTRL_MCSEL_DFLL48M       3       
+#define PM_CTRL_MCSEL_GCLK          0       
+#define PM_CTRL_MCSEL_OSC8M         1       
+#define PM_CTRL_MCSEL_XOSC          2       
+#define PM_PM_CLK_APB_NUM           2       
 
 #endif /* _SAMR21_PM_INSTANCE_ */

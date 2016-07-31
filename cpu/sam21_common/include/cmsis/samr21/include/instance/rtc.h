@@ -40,13 +40,12 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_RTC_INSTANCE_
 #define _SAMR21_RTC_INSTANCE_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========== Register definition for RTC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -110,16 +109,12 @@ extern "C" {
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for RTC peripheral ========== */
-#define RTC_ALARM_NUM               1
-#define RTC_COMP16_NUM              2
-#define RTC_COMP32_NUM              RTC_ALARM_NUM
-#define RTC_GCLK_ID                 4
-#define RTC_NUM_OF_ALARMS           RTC_ALARM_NUM
-#define RTC_NUM_OF_COMP16           RTC_COMP16_NUM
-#define RTC_NUM_OF_COMP32           RTC_COMP32_NUM
-
-#ifdef __cplusplus
-}
-#endif
+#define RTC_ALARM_NUM               1        // Number of Alarms
+#define RTC_COMP16_NUM              2        // Number of 16-bit Comparators
+#define RTC_COMP32_NUM              1        // Number of 32-bit Comparators
+#define RTC_GCLK_ID                 4        // Index of Generic Clock
+#define RTC_NUM_OF_ALARMS           1        // Number of Alarms (obsolete)
+#define RTC_NUM_OF_COMP16           2        // Number of 16-bit Comparators (obsolete)
+#define RTC_NUM_OF_COMP32           1        // Number of 32-bit Comparators (obsolete)
 
 #endif /* _SAMR21_RTC_INSTANCE_ */

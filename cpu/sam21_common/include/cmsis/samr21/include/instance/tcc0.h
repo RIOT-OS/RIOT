@@ -40,13 +40,12 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_TCC0_INSTANCE_
 #define _SAMR21_TCC0_INSTANCE_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========== Register definition for TCC0 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -54,10 +53,10 @@ extern "C" {
 #define REG_TCC0_CTRLBCLR          (0x42002004U) /**< \brief (TCC0) Control B Clear */
 #define REG_TCC0_CTRLBSET          (0x42002005U) /**< \brief (TCC0) Control B Set */
 #define REG_TCC0_SYNCBUSY          (0x42002008U) /**< \brief (TCC0) Synchronization Busy */
-#define REG_TCC0_FCTRLA            (0x4200200CU) /**< \brief (TCC0) Recoverable FaultA Configuration */
-#define REG_TCC0_FCTRLB            (0x42002010U) /**< \brief (TCC0) Recoverable FaultB Configuration */
+#define REG_TCC0_FCTRLA            (0x4200200CU) /**< \brief (TCC0) Recoverable Fault A Configuration */
+#define REG_TCC0_FCTRLB            (0x42002010U) /**< \brief (TCC0) Recoverable Fault B Configuration */
 #define REG_TCC0_WEXCTRL           (0x42002014U) /**< \brief (TCC0) Waveform Extension Configuration */
-#define REG_TCC0_DRVCTRL           (0x42002018U) /**< \brief (TCC0) Driver Configuration */
+#define REG_TCC0_DRVCTRL           (0x42002018U) /**< \brief (TCC0) Driver Control */
 #define REG_TCC0_DBGCTRL           (0x4200201EU) /**< \brief (TCC0) Debug Control */
 #define REG_TCC0_EVCTRL            (0x42002020U) /**< \brief (TCC0) Event Control */
 #define REG_TCC0_INTENCLR          (0x42002024U) /**< \brief (TCC0) Interrupt Enable Clear */
@@ -84,10 +83,10 @@ extern "C" {
 #define REG_TCC0_CTRLBCLR          (*(RwReg8 *)0x42002004U) /**< \brief (TCC0) Control B Clear */
 #define REG_TCC0_CTRLBSET          (*(RwReg8 *)0x42002005U) /**< \brief (TCC0) Control B Set */
 #define REG_TCC0_SYNCBUSY          (*(RoReg  *)0x42002008U) /**< \brief (TCC0) Synchronization Busy */
-#define REG_TCC0_FCTRLA            (*(RwReg  *)0x4200200CU) /**< \brief (TCC0) Recoverable FaultA Configuration */
-#define REG_TCC0_FCTRLB            (*(RwReg  *)0x42002010U) /**< \brief (TCC0) Recoverable FaultB Configuration */
+#define REG_TCC0_FCTRLA            (*(RwReg  *)0x4200200CU) /**< \brief (TCC0) Recoverable Fault A Configuration */
+#define REG_TCC0_FCTRLB            (*(RwReg  *)0x42002010U) /**< \brief (TCC0) Recoverable Fault B Configuration */
 #define REG_TCC0_WEXCTRL           (*(RwReg  *)0x42002014U) /**< \brief (TCC0) Waveform Extension Configuration */
-#define REG_TCC0_DRVCTRL           (*(RwReg  *)0x42002018U) /**< \brief (TCC0) Driver Configuration */
+#define REG_TCC0_DRVCTRL           (*(RwReg  *)0x42002018U) /**< \brief (TCC0) Driver Control */
 #define REG_TCC0_DBGCTRL           (*(RwReg8 *)0x4200201EU) /**< \brief (TCC0) Debug Control */
 #define REG_TCC0_EVCTRL            (*(RwReg  *)0x42002020U) /**< \brief (TCC0) Event Control */
 #define REG_TCC0_INTENCLR          (*(RwReg  *)0x42002024U) /**< \brief (TCC0) Interrupt Enable Clear */
@@ -112,8 +111,8 @@ extern "C" {
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for TCC0 peripheral ========== */
-#define TCC0_CC_NUM                 4
-#define TCC0_DITHERING              1
+#define TCC0_CC_NUM                 4        // Number of Compare/Capture units
+#define TCC0_DITHERING              1        // Dithering feature implemented
 #define TCC0_DMAC_ID_MC_0           14
 #define TCC0_DMAC_ID_MC_1           15
 #define TCC0_DMAC_ID_MC_2           16
@@ -121,19 +120,15 @@ extern "C" {
 #define TCC0_DMAC_ID_MC_LSB         14
 #define TCC0_DMAC_ID_MC_MSB         17
 #define TCC0_DMAC_ID_MC_SIZE        4
-#define TCC0_DMAC_ID_OVF            13
-#define TCC0_DTI                    1
-#define TCC0_EXT                    (TCC0_DITHERING*16+TCC0_PG*8+TCC0_SWAP*4+TCC0_DTI*2+TCC0_OTMX*1)
-#define TCC0_GCLK_ID                26
-#define TCC0_MASTER                 0
-#define TCC0_OTMX                   1
-#define TCC0_OW_NUM                 8
-#define TCC0_PG                     1
-#define TCC0_SIZE                   24
-#define TCC0_SWAP                   1
-
-#ifdef __cplusplus
-}
-#endif
+#define TCC0_DMAC_ID_OVF            13       // DMA overflow/underflow/retrigger trigger
+#define TCC0_DTI                    1        // Dead-Time-Insertion feature implemented
+#define TCC0_EXT                    31       // (@_DITHERING*16+@_PG*8+@_SWAP*4+@_DTI*2+@_OTMX*1)
+#define TCC0_GCLK_ID                26       // Index of Generic Clock
+#define TCC0_OTMX                   1        // Output Matrix feature implemented
+#define TCC0_OW_NUM                 8        // Number of Output Waveforms
+#define TCC0_PG                     1        // Pattern Generation feature implemented
+#define TCC0_SIZE                   24      
+#define TCC0_SWAP                   1        // DTI outputs swap feature implemented
+#define TCC0_TYPE                   0        // TCC type 0 : NA, 1 : Master, 2 : Slave
 
 #endif /* _SAMR21_TCC0_INSTANCE_ */

@@ -40,13 +40,12 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_DSU_INSTANCE_
 #define _SAMR21_DSU_INSTANCE_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========== Register definition for DSU peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -98,10 +97,6 @@ extern "C" {
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for DSU peripheral ========== */
-#define DSU_CLK_HSB_ID              3
-
-#ifdef __cplusplus
-}
-#endif
+#define DSU_CLK_HSB_ID              3        // Index of AHB clock in PM.AHBMASK register
 
 #endif /* _SAMR21_DSU_INSTANCE_ */

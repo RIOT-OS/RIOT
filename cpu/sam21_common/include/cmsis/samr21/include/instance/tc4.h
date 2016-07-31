@@ -40,13 +40,12 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_TC4_INSTANCE_
 #define _SAMR21_TC4_INSTANCE_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========== Register definition for TC4 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -96,24 +95,20 @@ extern "C" {
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for TC4 peripheral ========== */
-#define TC4_CC8_NUM                 2
-#define TC4_CC16_NUM                2
-#define TC4_CC32_NUM                2
-#define TC4_DITHERING_EXT           0
+#define TC4_CC8_NUM                 2        // Number of 8-bit Counters
+#define TC4_CC16_NUM                2        // Number of 16-bit Counters
+#define TC4_CC32_NUM                2        // Number of 32-bit Counters
+#define TC4_DITHERING_EXT           0        // Dithering feature implemented
 #define TC4_DMAC_ID_MC_0            28
 #define TC4_DMAC_ID_MC_1            29
 #define TC4_DMAC_ID_MC_LSB          28
 #define TC4_DMAC_ID_MC_MSB          29
 #define TC4_DMAC_ID_MC_SIZE         2
-#define TC4_DMAC_ID_OVF             27
-#define TC4_GCLK_ID                 28
-#define TC4_MASTER                  1
-#define TC4_OW_NUM                  2
-#define TC4_PERIOD_EXT              0
-#define TC4_SHADOW_EXT              0
-
-#ifdef __cplusplus
-}
-#endif
+#define TC4_DMAC_ID_OVF             27       // Indexes of DMA Overflow trigger
+#define TC4_GCLK_ID                 28       // Index of Generic Clock
+#define TC4_MASTER                  1       
+#define TC4_OW_NUM                  2        // Number of Output Waveforms
+#define TC4_PERIOD_EXT              0        // Period feature implemented
+#define TC4_SHADOW_EXT              0        // Shadow feature implemented
 
 #endif /* _SAMR21_TC4_INSTANCE_ */

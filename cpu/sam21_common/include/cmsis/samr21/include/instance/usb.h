@@ -40,18 +40,18 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_USB_INSTANCE_
 #define _SAMR21_USB_INSTANCE_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========== Register definition for USB peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_USB_CTRLA              (0x41005000U) /**< \brief (USB) Control A */
 #define REG_USB_SYNCBUSY           (0x41005002U) /**< \brief (USB) Synchronization Busy */
+#define REG_USB_QOSCTRL            (0x41005003U) /**< \brief (USB) USB Quality Of Service */
 #define REG_USB_FSMSTATUS          (0x4100500DU) /**< \brief (USB) Finite State Machine Status */
 #define REG_USB_DESCADD            (0x41005024U) /**< \brief (USB) Descriptor Address */
 #define REG_USB_PADCAL             (0x41005028U) /**< \brief (USB) USB PAD Calibration */
@@ -195,6 +195,7 @@ extern "C" {
 #else
 #define REG_USB_CTRLA              (*(RwReg8 *)0x41005000U) /**< \brief (USB) Control A */
 #define REG_USB_SYNCBUSY           (*(RoReg8 *)0x41005002U) /**< \brief (USB) Synchronization Busy */
+#define REG_USB_QOSCTRL            (*(RwReg8 *)0x41005003U) /**< \brief (USB) USB Quality Of Service */
 #define REG_USB_FSMSTATUS          (*(RoReg8 *)0x4100500DU) /**< \brief (USB) Finite State Machine Status */
 #define REG_USB_DESCADD            (*(RwReg  *)0x41005024U) /**< \brief (USB) Descriptor Address */
 #define REG_USB_PADCAL             (*(RwReg16*)0x41005028U) /**< \brief (USB) USB PAD Calibration */
@@ -338,13 +339,9 @@ extern "C" {
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for USB peripheral ========== */
-#define USB_EPT_NBR                 USB_EPT_NUM
-#define USB_EPT_NUM                 8
-#define USB_GCLK_ID                 6
-#define USB_PIPE_NUM                8
-
-#ifdef __cplusplus
-}
-#endif
+#define USB_EPT_NBR                 8        // Number of USB end points (obsolete)
+#define USB_EPT_NUM                 8        // Number of USB end points
+#define USB_GCLK_ID                 6        // Index of Generic Clock
+#define USB_PIPE_NUM                8        // Number of USB pipes
 
 #endif /* _SAMR21_USB_INSTANCE_ */

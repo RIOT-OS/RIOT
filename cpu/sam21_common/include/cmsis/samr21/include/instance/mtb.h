@@ -40,13 +40,12 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_MTB_INSTANCE_
 #define _SAMR21_MTB_INSTANCE_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========== Register definition for MTB peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -103,8 +102,5 @@ extern "C" {
 #define REG_MTB_CID3               (*(RoReg  *)0x41006FFCU) /**< \brief (MTB) CoreSight */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _SAMR21_MTB_INSTANCE_ */

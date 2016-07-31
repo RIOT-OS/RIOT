@@ -40,13 +40,12 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_NVMCTRL_INSTANCE_
 #define _SAMR21_NVMCTRL_INSTANCE_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========== Register definition for NVMCTRL peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -72,29 +71,25 @@ extern "C" {
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for NVMCTRL peripheral ========== */
-#define NVMCTRL_AUX0_ADDRESS        (NVMCTRL_USER_PAGE_ADDRESS + 0x00004000)
-#define NVMCTRL_AUX1_ADDRESS        (NVMCTRL_USER_PAGE_ADDRESS + 0x00006000)
-#define NVMCTRL_AUX2_ADDRESS        (NVMCTRL_USER_PAGE_ADDRESS + 0x00008000)
-#define NVMCTRL_AUX3_ADDRESS        (NVMCTRL_USER_PAGE_ADDRESS + 0x0000A000)
-#define NVMCTRL_CLK_AHB_ID          4
+#define NVMCTRL_AUX0_ADDRESS        0x00804000
+#define NVMCTRL_AUX1_ADDRESS        0x00806000
+#define NVMCTRL_AUX2_ADDRESS        0x00808000
+#define NVMCTRL_AUX3_ADDRESS        0x0080A000
+#define NVMCTRL_CLK_AHB_ID          4        // Index of AHB Clock in PM.AHBMASK register
 #define NVMCTRL_FACTORY_WORD_IMPLEMENTED_MASK 0xC0000007FFFFFFFF
-#define NVMCTRL_FLASH_SIZE          (NVMCTRL_PAGES*NVMCTRL_PAGE_SIZE)
-#define NVMCTRL_LOCKBIT_ADDRESS     (NVMCTRL_USER_PAGE_ADDRESS + 0x00002000)
-#define NVMCTRL_PAGES               4096
-#define NVMCTRL_PAGE_HW             (NVMCTRL_PAGE_SIZE/2)
-#define NVMCTRL_PAGE_SIZE           (1<<NVMCTRL_PSZ_BITS)
-#define NVMCTRL_PAGE_W              (NVMCTRL_PAGE_SIZE/4)
-#define NVMCTRL_PMSB                3
-#define NVMCTRL_PSZ_BITS            6
-#define NVMCTRL_ROW_PAGES           4
-#define NVMCTRL_ROW_SIZE            (NVMCTRL_PAGE_SIZE*NVMCTRL_ROW_PAGES)
-#define NVMCTRL_TEMP_LOG_ADDRESS    (NVMCTRL_USER_PAGE_ADDRESS + 0x00006030)
-#define NVMCTRL_USER_PAGE_ADDRESS   (FLASH_ADDR + NVMCTRL_USER_PAGE_OFFSET)
+#define NVMCTRL_FLASH_SIZE          262144  
+#define NVMCTRL_LOCKBIT_ADDRESS     0x00802000
+#define NVMCTRL_PAGES               4096    
+#define NVMCTRL_PAGE_HW             32      
+#define NVMCTRL_PAGE_SIZE           64      
+#define NVMCTRL_PAGE_W              16      
+#define NVMCTRL_PMSB                3       
+#define NVMCTRL_PSZ_BITS            6       
+#define NVMCTRL_ROW_PAGES           4       
+#define NVMCTRL_ROW_SIZE            256     
+#define NVMCTRL_TEMP_LOG_ADDRESS    0x00806030
+#define NVMCTRL_USER_PAGE_ADDRESS   0x00800000
 #define NVMCTRL_USER_PAGE_OFFSET    0x00800000
 #define NVMCTRL_USER_WORD_IMPLEMENTED_MASK 0xC01FFFFFFFFFFFFF
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _SAMR21_NVMCTRL_INSTANCE_ */

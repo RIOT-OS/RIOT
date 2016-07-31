@@ -40,13 +40,12 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_RFCTRL_COMPONENT_
 #define _SAMR21_RFCTRL_COMPONENT_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR RFCTRL */
@@ -74,27 +73,27 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define RFCTRL_FECFG_OFFSET         0x0          /**< \brief (RFCTRL_FECFG offset) Front-end control bus configuration */
-#define RFCTRL_FECFG_RESETVALUE     0x0000       /**< \brief (RFCTRL_FECFG reset_value) Front-end control bus configuration */
+#define RFCTRL_FECFG_RESETVALUE     0x0000ul     /**< \brief (RFCTRL_FECFG reset_value) Front-end control bus configuration */
 
 #define RFCTRL_FECFG_F0CFG_Pos      0            /**< \brief (RFCTRL_FECFG) Front-end control signal 0 configuration */
-#define RFCTRL_FECFG_F0CFG_Msk      (0x3u << RFCTRL_FECFG_F0CFG_Pos)
+#define RFCTRL_FECFG_F0CFG_Msk      (0x3ul << RFCTRL_FECFG_F0CFG_Pos)
 #define RFCTRL_FECFG_F0CFG(value)   ((RFCTRL_FECFG_F0CFG_Msk & ((value) << RFCTRL_FECFG_F0CFG_Pos)))
 #define RFCTRL_FECFG_F1CFG_Pos      2            /**< \brief (RFCTRL_FECFG) Front-end control signal 1 configuration */
-#define RFCTRL_FECFG_F1CFG_Msk      (0x3u << RFCTRL_FECFG_F1CFG_Pos)
+#define RFCTRL_FECFG_F1CFG_Msk      (0x3ul << RFCTRL_FECFG_F1CFG_Pos)
 #define RFCTRL_FECFG_F1CFG(value)   ((RFCTRL_FECFG_F1CFG_Msk & ((value) << RFCTRL_FECFG_F1CFG_Pos)))
 #define RFCTRL_FECFG_F2CFG_Pos      4            /**< \brief (RFCTRL_FECFG) Front-end control signal 2 configuration */
-#define RFCTRL_FECFG_F2CFG_Msk      (0x3u << RFCTRL_FECFG_F2CFG_Pos)
+#define RFCTRL_FECFG_F2CFG_Msk      (0x3ul << RFCTRL_FECFG_F2CFG_Pos)
 #define RFCTRL_FECFG_F2CFG(value)   ((RFCTRL_FECFG_F2CFG_Msk & ((value) << RFCTRL_FECFG_F2CFG_Pos)))
 #define RFCTRL_FECFG_F3CFG_Pos      6            /**< \brief (RFCTRL_FECFG) Front-end control signal 3 configuration */
-#define RFCTRL_FECFG_F3CFG_Msk      (0x3u << RFCTRL_FECFG_F3CFG_Pos)
+#define RFCTRL_FECFG_F3CFG_Msk      (0x3ul << RFCTRL_FECFG_F3CFG_Pos)
 #define RFCTRL_FECFG_F3CFG(value)   ((RFCTRL_FECFG_F3CFG_Msk & ((value) << RFCTRL_FECFG_F3CFG_Pos)))
 #define RFCTRL_FECFG_F4CFG_Pos      8            /**< \brief (RFCTRL_FECFG) Front-end control signal 4 configuration */
-#define RFCTRL_FECFG_F4CFG_Msk      (0x3u << RFCTRL_FECFG_F4CFG_Pos)
+#define RFCTRL_FECFG_F4CFG_Msk      (0x3ul << RFCTRL_FECFG_F4CFG_Pos)
 #define RFCTRL_FECFG_F4CFG(value)   ((RFCTRL_FECFG_F4CFG_Msk & ((value) << RFCTRL_FECFG_F4CFG_Pos)))
 #define RFCTRL_FECFG_F5CFG_Pos      10           /**< \brief (RFCTRL_FECFG) Front-end control signal 5 configuration */
-#define RFCTRL_FECFG_F5CFG_Msk      (0x3u << RFCTRL_FECFG_F5CFG_Pos)
+#define RFCTRL_FECFG_F5CFG_Msk      (0x3ul << RFCTRL_FECFG_F5CFG_Pos)
 #define RFCTRL_FECFG_F5CFG(value)   ((RFCTRL_FECFG_F5CFG_Msk & ((value) << RFCTRL_FECFG_F5CFG_Pos)))
-#define RFCTRL_FECFG_MASK           0x0FFFu      /**< \brief (RFCTRL_FECFG) MASK Register */
+#define RFCTRL_FECFG_MASK           0x0FFFul     /**< \brief (RFCTRL_FECFG) MASK Register */
 
 /** \brief RFCTRL hardware registers */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -104,9 +103,5 @@ typedef struct {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /*@}*/
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _SAMR21_RFCTRL_COMPONENT_ */

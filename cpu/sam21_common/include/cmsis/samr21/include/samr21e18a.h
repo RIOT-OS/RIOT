@@ -1,7 +1,7 @@
 /**
  * \file
  *
- * \brief Header file for SAMR21G18A
+ * \brief Header file for SAMR21E18A
  *
  * Copyright (c) 2014 Atmel Corporation. All rights reserved.
  *
@@ -44,13 +44,13 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
-#ifndef _SAMR21G18A_
-#define _SAMR21G18A_
+#ifndef _SAMR21E18A_
+#define _SAMR21E18A_
 
 /**
  * \ingroup SAMR21_definitions
- * \addtogroup SAMR21G18A_definitions SAMR21G18A definitions
- * This file defines all structures and symbols for SAMR21G18A:
+ * \addtogroup SAMR21E18A_definitions SAMR21E18A definitions
+ * This file defines all structures and symbols for SAMR21E18A:
  *   - registers and bitfields
  *   - peripheral base address
  *   - peripheral ID
@@ -87,9 +87,9 @@ typedef volatile       uint8_t  RwReg8;  /**< Read-Write  8-bit register (volati
 #endif
 
 /* ************************************************************************** */
-/**  CMSIS DEFINITIONS FOR SAMR21G18A */
+/**  CMSIS DEFINITIONS FOR SAMR21E18A */
 /* ************************************************************************** */
-/** \defgroup SAMR21G18A_cmsis CMSIS Definitions */
+/** \defgroup SAMR21E18A_cmsis CMSIS Definitions */
 /*@{*/
 
 /** Interrupt Number Definition */
@@ -101,35 +101,35 @@ typedef enum IRQn
   SVCall_IRQn              = -5, /**< 11 Cortex-M0+ SV Call Interrupt           */
   PendSV_IRQn              = -2, /**< 14 Cortex-M0+ Pend SV Interrupt           */
   SysTick_IRQn             = -1, /**< 15 Cortex-M0+ System Tick Interrupt       */
-  /******  SAMR21G18A-specific Interrupt Numbers ***********************/
-  PM_IRQn                  =  0, /**<  0 SAMR21G18A Power Manager (PM) */
-  SYSCTRL_IRQn             =  1, /**<  1 SAMR21G18A System Control (SYSCTRL) */
-  WDT_IRQn                 =  2, /**<  2 SAMR21G18A Watchdog Timer (WDT) */
-  RTC_IRQn                 =  3, /**<  3 SAMR21G18A Real-Time Counter (RTC) */
-  EIC_IRQn                 =  4, /**<  4 SAMR21G18A External Interrupt Controller (EIC) */
-  NVMCTRL_IRQn             =  5, /**<  5 SAMR21G18A Non-Volatile Memory Controller (NVMCTRL) */
-  DMAC_IRQn                =  6, /**<  6 SAMR21G18A Direct Memory Access Controller (DMAC) */
-  USB_IRQn                 =  7, /**<  7 SAMR21G18A Universal Serial Bus (USB) */
-  EVSYS_IRQn               =  8, /**<  8 SAMR21G18A Event System Interface (EVSYS) */
-  SERCOM0_IRQn             =  9, /**<  9 SAMR21G18A Serial Communication Interface 0 (SERCOM0) */
-  SERCOM1_IRQn             = 10, /**< 10 SAMR21G18A Serial Communication Interface 1 (SERCOM1) */
-  SERCOM2_IRQn             = 11, /**< 11 SAMR21G18A Serial Communication Interface 2 (SERCOM2) */
-  SERCOM3_IRQn             = 12, /**< 12 SAMR21G18A Serial Communication Interface 3 (SERCOM3) */
-  SERCOM4_IRQn             = 13, /**< 13 SAMR21G18A Serial Communication Interface 4 (SERCOM4) */
-  SERCOM5_IRQn             = 14, /**< 14 SAMR21G18A Serial Communication Interface 5 (SERCOM5) */
-  TCC0_IRQn                = 15, /**< 15 SAMR21G18A Timer Counter Control 0 (TCC0) */
-  TCC1_IRQn                = 16, /**< 16 SAMR21G18A Timer Counter Control 1 (TCC1) */
-  TCC2_IRQn                = 17, /**< 17 SAMR21G18A Timer Counter Control 2 (TCC2) */
-  TC3_IRQn                 = 18, /**< 18 SAMR21G18A Basic Timer Counter 3 (TC3) */
-  TC4_IRQn                 = 19, /**< 19 SAMR21G18A Basic Timer Counter 4 (TC4) */
-  TC5_IRQn                 = 20, /**< 20 SAMR21G18A Basic Timer Counter 5 (TC5) */
-  TC6_IRQn                 = 21, /**< 21 SAMR21G18A Basic Timer Counter 6 (TC6) */
-  TC7_IRQn                 = 22, /**< 22 SAMR21G18A Basic Timer Counter 7 (TC7) */
-  ADC_IRQn                 = 23, /**< 23 SAMR21G18A Analog Digital Converter (ADC) */
-  AC_IRQn                  = 24, /**< 24 SAMR21G18A Analog Comparators (AC) */
-  DAC_IRQn                 = 25, /**< 25 SAMR21G18A Digital Analog Converter (DAC) */
-  PTC_IRQn                 = 26, /**< 26 SAMR21G18A Peripheral Touch Controller (PTC) */
-  I2S_IRQn                 = 27, /**< 27 SAMR21G18A Inter-IC Sound Interface (I2S) */
+  /******  SAMR21E18A-specific Interrupt Numbers ***********************/
+  PM_IRQn                  =  0, /**<  0 SAMR21E18A Power Manager (PM) */
+  SYSCTRL_IRQn             =  1, /**<  1 SAMR21E18A System Control (SYSCTRL) */
+  WDT_IRQn                 =  2, /**<  2 SAMR21E18A Watchdog Timer (WDT) */
+  RTC_IRQn                 =  3, /**<  3 SAMR21E18A Real-Time Counter (RTC) */
+  EIC_IRQn                 =  4, /**<  4 SAMR21E18A External Interrupt Controller (EIC) */
+  NVMCTRL_IRQn             =  5, /**<  5 SAMR21E18A Non-Volatile Memory Controller (NVMCTRL) */
+  DMAC_IRQn                =  6, /**<  6 SAMR21E18A Direct Memory Access Controller (DMAC) */
+  USB_IRQn                 =  7, /**<  7 SAMR21E18A Universal Serial Bus (USB) */
+  EVSYS_IRQn               =  8, /**<  8 SAMR21E18A Event System Interface (EVSYS) */
+  SERCOM0_IRQn             =  9, /**<  9 SAMR21E18A Serial Communication Interface 0 (SERCOM0) */
+  SERCOM1_IRQn             = 10, /**< 10 SAMR21E18A Serial Communication Interface 1 (SERCOM1) */
+  SERCOM2_IRQn             = 11, /**< 11 SAMR21E18A Serial Communication Interface 2 (SERCOM2) */
+  SERCOM3_IRQn             = 12, /**< 12 SAMR21E18A Serial Communication Interface 3 (SERCOM3) */
+  SERCOM4_IRQn             = 13, /**< 13 SAMR21E18A Serial Communication Interface 4 (SERCOM4) */
+  SERCOM5_IRQn             = 14, /**< 14 SAMR21E18A Serial Communication Interface 5 (SERCOM5) */
+  TCC0_IRQn                = 15, /**< 15 SAMR21E18A Timer Counter Control 0 (TCC0) */
+  TCC1_IRQn                = 16, /**< 16 SAMR21E18A Timer Counter Control 1 (TCC1) */
+  TCC2_IRQn                = 17, /**< 17 SAMR21E18A Timer Counter Control 2 (TCC2) */
+  TC3_IRQn                 = 18, /**< 18 SAMR21E18A Basic Timer Counter 3 (TC3) */
+  TC4_IRQn                 = 19, /**< 19 SAMR21E18A Basic Timer Counter 4 (TC4) */
+  TC5_IRQn                 = 20, /**< 20 SAMR21E18A Basic Timer Counter 5 (TC5) */
+  TC6_IRQn                 = 21, /**< 21 SAMR21E18A Basic Timer Counter 6 (TC6) */
+  TC7_IRQn                 = 22, /**< 22 SAMR21E18A Basic Timer Counter 7 (TC7) */
+  ADC_IRQn                 = 23, /**< 23 SAMR21E18A Analog Digital Converter (ADC) */
+  AC_IRQn                  = 24, /**< 24 SAMR21E18A Analog Comparators (AC) */
+  DAC_IRQn                 = 25, /**< 25 SAMR21E18A Digital Analog Converter (DAC) */
+  PTC_IRQn                 = 26, /**< 26 SAMR21E18A Peripheral Touch Controller (PTC) */
+  I2S_IRQn                 = 27, /**< 27 SAMR21E18A Inter-IC Sound Interface (I2S) */
 
   PERIPH_COUNT_IRQn        = 28  /**< Number of peripheral IDs */
 } IRQn_Type;
@@ -248,9 +248,9 @@ void I2S_Handler                 ( void );
 /*@}*/
 
 /* ************************************************************************** */
-/**  SOFTWARE PERIPHERAL API DEFINITION FOR SAMR21G18A */
+/**  SOFTWARE PERIPHERAL API DEFINITION FOR SAMR21E18A */
 /* ************************************************************************** */
-/** \defgroup SAMR21G18A_api Peripheral Software API */
+/** \defgroup SAMR21E18A_api Peripheral Software API */
 /*@{*/
 
 #include "component/ac.h"
@@ -277,9 +277,9 @@ void I2S_Handler                 ( void );
 /*@}*/
 
 /* ************************************************************************** */
-/**  REGISTERS ACCESS DEFINITIONS FOR SAMR21G18A */
+/**  REGISTERS ACCESS DEFINITIONS FOR SAMR21E18A */
 /* ************************************************************************** */
-/** \defgroup SAMR21G18A_reg Registers Access Definitions */
+/** \defgroup SAMR21E18A_reg Registers Access Definitions */
 /*@{*/
 
 #include "instance/ac.h"
@@ -317,9 +317,9 @@ void I2S_Handler                 ( void );
 /*@}*/
 
 /* ************************************************************************** */
-/**  PERIPHERAL ID DEFINITIONS FOR SAMR21G18A */
+/**  PERIPHERAL ID DEFINITIONS FOR SAMR21E18A */
 /* ************************************************************************** */
-/** \defgroup SAMR21G18A_id Peripheral Ids Definitions */
+/** \defgroup SAMR21E18A_id Peripheral Ids Definitions */
 /*@{*/
 
 // Peripheral instances on HPB0 bridge
@@ -365,9 +365,9 @@ void I2S_Handler                 ( void );
 /*@}*/
 
 /* ************************************************************************** */
-/**  BASE ADDRESS DEFINITIONS FOR SAMR21G18A */
+/**  BASE ADDRESS DEFINITIONS FOR SAMR21E18A */
 /* ************************************************************************** */
-/** \defgroup SAMR21G18A_base Peripheral Base Address Definitions */
+/** \defgroup SAMR21E18A_base Peripheral Base Address Definitions */
 /*@{*/
 
 #if defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)
@@ -523,16 +523,16 @@ void I2S_Handler                 ( void );
 /*@}*/
 
 /* ************************************************************************** */
-/**  PORT DEFINITIONS FOR SAMR21G18A */
+/**  PORT DEFINITIONS FOR SAMR21E18A */
 /* ************************************************************************** */
-/** \defgroup SAMR21G18A_port PORT Definitions */
+/** \defgroup SAMR21E18A_port PORT Definitions */
 /*@{*/
 
-#include "pio/samr21g18a.h"
+#include "pio/samr21e18a.h"
 /*@}*/
 
 /* ************************************************************************** */
-/**  MEMORY MAPPING DEFINITIONS FOR SAMR21G18A */
+/**  MEMORY MAPPING DEFINITIONS FOR SAMR21E18A */
 /* ************************************************************************** */
 
 #define FLASH_SIZE            0x40000UL /* 256 kB */
@@ -544,13 +544,13 @@ void I2S_Handler                 ( void );
 #define FLASH_USER_PAGE_ADDR  (0x00800000UL) /**< FLASH_USER_PAGE base address */
 #define HMCRAMC0_ADDR         (0x20000000UL) /**< HMCRAMC0 base address */
 
-#define DSU_DID_RESETVALUE    0x10010019UL
+#define DSU_DID_RESETVALUE    0x1001001CUL
 #define EIC_EXTINT_NUM        16
 #define PORT_GROUPS           3
 #define SIP_CONFIG            RF233
 
 /* ************************************************************************** */
-/**  ELECTRICAL DEFINITIONS FOR SAMR21G18A */
+/**  ELECTRICAL DEFINITIONS FOR SAMR21E18A */
 /* ************************************************************************** */
 
 
@@ -560,4 +560,4 @@ void I2S_Handler                 ( void );
 
 /*@}*/
 
-#endif /* SAMR21G18A_H */
+#endif /* SAMR21E18A_H */

@@ -1,7 +1,7 @@
 /**
  * \file
  *
- * \brief Peripheral I/O description for SAMR21G18A
+ * \brief Peripheral I/O description for SAMR21G17A
  *
  * Copyright (c) 2014 Atmel Corporation. All rights reserved.
  *
@@ -44,8 +44,8 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
-#ifndef _SAMR21G18A_PIO_
-#define _SAMR21G18A_PIO_
+#ifndef _SAMR21G17A_PIO_
+#define _SAMR21G17A_PIO_
 
 #define PIN_PA00                           0  /**< \brief Pin Number for PA00 */
 #define PORT_PA00                 (1ul <<  0) /**< \brief PORT Mask  for PA00 */
@@ -928,4 +928,4 @@
 #define PINMUX_PA15F_RFCTRL_FECTRL5  ((PIN_PA15F_RFCTRL_FECTRL5 << 16) | MUX_PA15F_RFCTRL_FECTRL5)
 #define PORT_PA15F_RFCTRL_FECTRL5  (1ul << 15)
 
-#endif /* _SAMR21G18A_PIO_ */
+#endif /* _SAMR21G17A_PIO_ */

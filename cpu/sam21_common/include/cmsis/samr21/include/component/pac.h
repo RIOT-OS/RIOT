@@ -40,13 +40,12 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_PAC_COMPONENT_
 #define _SAMR21_PAC_COMPONENT_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR PAC */
@@ -69,12 +68,12 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define PAC_WPCLR_OFFSET            0x0          /**< \brief (PAC_WPCLR offset) Write Protection Clear */
-#define PAC_WPCLR_RESETVALUE        0x00000000   /**< \brief (PAC_WPCLR reset_value) Write Protection Clear */
+#define PAC_WPCLR_RESETVALUE        0x00000000ul /**< \brief (PAC_WPCLR reset_value) Write Protection Clear */
 
 #define PAC_WPCLR_WP_Pos            1            /**< \brief (PAC_WPCLR) Write Protection Clear */
-#define PAC_WPCLR_WP_Msk            (0x7FFFFFFFu << PAC_WPCLR_WP_Pos)
+#define PAC_WPCLR_WP_Msk            (0x7FFFFFFFul << PAC_WPCLR_WP_Pos)
 #define PAC_WPCLR_WP(value)         ((PAC_WPCLR_WP_Msk & ((value) << PAC_WPCLR_WP_Pos)))
-#define PAC_WPCLR_MASK              0xFFFFFFFEu  /**< \brief (PAC_WPCLR) MASK Register */
+#define PAC_WPCLR_MASK              0xFFFFFFFEul /**< \brief (PAC_WPCLR) MASK Register */
 
 /* -------- PAC_WPSET : (PAC Offset: 0x4) (R/W 32) Write Protection Set -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -88,12 +87,12 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define PAC_WPSET_OFFSET            0x4          /**< \brief (PAC_WPSET offset) Write Protection Set */
-#define PAC_WPSET_RESETVALUE        0x00000000   /**< \brief (PAC_WPSET reset_value) Write Protection Set */
+#define PAC_WPSET_RESETVALUE        0x00000000ul /**< \brief (PAC_WPSET reset_value) Write Protection Set */
 
 #define PAC_WPSET_WP_Pos            1            /**< \brief (PAC_WPSET) Write Protection Set */
-#define PAC_WPSET_WP_Msk            (0x7FFFFFFFu << PAC_WPSET_WP_Pos)
+#define PAC_WPSET_WP_Msk            (0x7FFFFFFFul << PAC_WPSET_WP_Pos)
 #define PAC_WPSET_WP(value)         ((PAC_WPSET_WP_Msk & ((value) << PAC_WPSET_WP_Pos)))
-#define PAC_WPSET_MASK              0xFFFFFFFEu  /**< \brief (PAC_WPSET) MASK Register */
+#define PAC_WPSET_MASK              0xFFFFFFFEul /**< \brief (PAC_WPSET) MASK Register */
 
 /** \brief PAC hardware registers */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -104,9 +103,5 @@ typedef struct {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /*@}*/
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _SAMR21_PAC_COMPONENT_ */

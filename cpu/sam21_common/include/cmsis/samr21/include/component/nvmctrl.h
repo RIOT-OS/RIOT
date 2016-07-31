@@ -40,13 +40,12 @@
  * \asf_license_stop
  *
  */
+ /**
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
 
 #ifndef _SAMR21_NVMCTRL_COMPONENT_
 #define _SAMR21_NVMCTRL_COMPONENT_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR NVMCTRL */
@@ -530,9 +529,5 @@ typedef struct {
 #define WDT_FUSES_WINDOW_1(value)   ((WDT_FUSES_WINDOW_1_Msk & ((value) << WDT_FUSES_WINDOW_1_Pos)))
 
 /*@}*/
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _SAMR21_NVMCTRL_COMPONENT_ */
