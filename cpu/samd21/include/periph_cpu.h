@@ -38,7 +38,7 @@ enum {
  * @brief   Generate GPIO mode bitfields
  *
  * We use 3 bit to determine the pin functions:
- * - bit 0: PU or PU
+ * - bit 0: PD(0) or PU(1)
  * - bit 1: input enable
  * - bit 2: pull enable
  */
@@ -86,6 +86,8 @@ typedef struct {
     gpio_t rx_pin;          /**< pin used for RX */
     gpio_t tx_pin;          /**< pin used for TX */
     gpio_mux_t mux;         /**< alternative function for pins */
+    sercom_rxpad_t rx_pad;  /**< pad selection for RX */
+    sercom_uart_txpad_t tx_pad; /**< pad selection for TX */
 } uart_conf_t;
 
 /**

@@ -120,6 +120,27 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
+void gpio_init_sercom(gpio_t pin, gpio_mux_t mux)
+{
+    PortGroup* port = _port(pin);
+    int pin_pos = _pin_pos(pin);
+    uint32_t temp;
+
+    if ( (pin_pos & 1) ) { // is pin odd?
+        // Get whole current setup for both odd and even pins and remove odd one
+        temp = port->PMUX[pin_pos >> 1].reg & PORT_PMUX_PMUXE(0xF);
+        // Set new muxing
+        port->PMUX[pin_pos >> 1].reg = temp | PORT_PMUX_PMUXO(mux);
+    } else {
+        // Get whole current setup for both odd and even pins and remove even one
+        temp = port->PMUX[pin_pos >> 1].reg & PORT_PMUX_PMUXO(0xF);
+        // Set new muxing
+        port->PMUX[pin_pos >> 1].reg = temp | PORT_PMUX_PMUXE(mux);
+    }
+    // Enable port mux
+    port->PINCFG[pin_pos].reg |= PORT_PINCFG_PMUXEN;
+}
+
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                     gpio_cb_t cb, void *arg)
 {
