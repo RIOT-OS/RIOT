@@ -70,12 +70,11 @@ static mutex_t locks[] = {
 int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 {
     SercomI2cm *I2CSercom = 0;
-    PortGroup *port_group;
-    uint8_t pin_scl = 0;
-    uint8_t pin_sda = 0;
-    uint32_t i2c_pins = 0;
+    gpio_t pin_scl = 0;
+    gpio_t pin_sda = 0;
+    gpio_mux_t mux;
     uint32_t clock_source_speed = 0;
-    uint8_t sercom_core = 0;
+    uint8_t sercom_gclk_id = 0;
     uint8_t sercom_gclk_id_slow = 0;
 
     uint32_t timeout_counter = 0;
@@ -85,19 +84,19 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 #if I2C_0_EN
         case I2C_0:
             I2CSercom = &I2C_0_DEV;
-            port_group = &I2C_0_PORT;
-            pin_scl = I2C_SDA;
-            pin_sda = I2C_SCL;
-            i2c_pins = I2C_0_PINS;
+            pin_sda = I2C_0_SDA;
+            pin_scl = I2C_0_SCL;
+            mux = I2C_0_MUX;
             clock_source_speed = CLOCK_CORECLOCK;
-            sercom_core = SERCOM3_GCLK_ID_CORE;
-            sercom_gclk_id_slow = SERCOM3_GCLK_ID_SLOW ;
+            sercom_gclk_id = I2C_0_GCLK_ID;
+            sercom_gclk_id_slow = I2C_0_GCLK_ID_SLOW ;
             break;
 #endif
         default:
             DEBUG("I2C FALSE VALUE\n");
             return -1;
     }
+
     /* DISABLE I2C MASTER */
     i2c_poweroff(dev);
 
@@ -106,12 +105,12 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     while(I2CSercom->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
 
     /* Turn on power manager for sercom */
-    PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << (sercom_core - 20));
+    PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << (sercom_gclk_id - GCLK_CLKCTRL_ID_SERCOM0_CORE_Val));
 
     /* I2C using CLK GEN 0 */
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
                          GCLK_CLKCTRL_GEN_GCLK0 |
-                         GCLK_CLKCTRL_ID(sercom_core));
+                         GCLK_CLKCTRL_ID(sercom_gclk_id));
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
@@ -132,32 +131,8 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     }
 
     /************ SERCOM PAD0 - SDA and SERCOM PAD1 - SCL *************/
-    /* DIR + INEN at one: in/out pin. DIRSET modifies DIR in order to set I2C SDA/SCL on output */
-    port_group->DIRSET.reg = (1 << pin_scl);
-    port_group->DIRSET.reg = (1 << pin_sda);
-
-    /* The Write Configuration register (WRCONFIG) requires the
-     * pins to to grouped into two 16-bit half-words (PIN are set up to 31) */
-    uint32_t lower_pin_mask = (i2c_pins & 0xFFFF);
-    uint32_t upper_pin_mask = (i2c_pins >> 16);
-
-    port_group->WRCONFIG.reg =
-          (lower_pin_mask << PORT_WRCONFIG_PINMASK_Pos) \
-        | PORT_WRCONFIG_PMUXEN \
-        | PORT_WRCONFIG_PMUX(0x3) \
-        | PORT_WRCONFIG_INEN \
-        | PORT_WRCONFIG_WRPMUX \
-        | PORT_WRCONFIG_WRPINCFG;
-
-    port_group->WRCONFIG.reg =
-          (upper_pin_mask << PORT_WRCONFIG_PINMASK_Pos) \
-        | PORT_WRCONFIG_PMUXEN \
-        | PORT_WRCONFIG_PMUX(0x3) \
-        | PORT_WRCONFIG_INEN \
-        | PORT_WRCONFIG_WRPMUX \
-        | PORT_WRCONFIG_WRPINCFG \
-        | PORT_WRCONFIG_HWSEL;
-
+    gpio_init_sercom(pin_sda, mux);
+    gpio_init_sercom(pin_scl, mux);
 
     /* I2C CONFIGURATION */
     while(I2CSercom->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
@@ -448,7 +423,7 @@ static inline int _write(SercomI2cm *dev, char *data, int length)
         /* Wait for hardware module to sync */
         while(dev->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
 
-        DEBUG("Written %i byte to data reg, now waiting for DR to be empty again\n", buffer_counter);
+        DEBUG("Written byte #%i to data reg, now waiting for DR to be empty again\n", buffer_counter);
         dev->DATA.reg = data[buffer_counter++];
 
         DEBUG("Wait for response.\n");

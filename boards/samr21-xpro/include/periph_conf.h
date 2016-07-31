@@ -204,11 +204,13 @@ static const pwm_conf_t pwm_config[] = {
 #define I2C_0_DEV           SERCOM3->I2CM
 #define I2C_0_IRQ           SERCOM3_IRQn
 #define I2C_0_ISR           isr_sercom3
+/* I2C 0 GCLK */
+#define I2C_0_GCLK_ID       SERCOM3_GCLK_ID_CORE
+#define I2C_0_GCLK_ID_SLOW  SERCOM3_GCLK_ID_SLOW
 /* I2C 0 pin configuration */
-#define I2C_0_PORT          (PORT->Group[0])
-#define I2C_SDA             PIN_PA16
-#define I2C_SCL             PIN_PA17
-#define I2C_0_PINS          (PORT_PA16 | PORT_PA17)
+#define I2C_0_SDA           GPIO_PIN(PA, 16)
+#define I2C_0_SCL           GPIO_PIN(PA, 17)
+#define I2C_0_MUX           GPIO_MUX_D
 
 /**
  * @name RTC configuration
