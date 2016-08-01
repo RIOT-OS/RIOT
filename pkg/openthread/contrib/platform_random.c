@@ -29,22 +29,22 @@ void ot_random_init(void)
     char cpu_id[CPUID_LEN];
     cpuid_get(cpu_id);
     uint32_t seed = 0;
-    for(int i=0;i<(int) CPUID_LEN;i++)
-    {
+    for (int i = 0; i < (int) CPUID_LEN; i++) {
         seed += cpu_id[i];
     }
     random_init(seed);
 #else
-	#error "CPU not supported (current CPU doesn't provide CPUID, required for entropy)"
+    #error "CPU not supported (current CPU doesn't provide CPUID, required for entropy)"
 #endif
 }
 
 /* OpenThread will call this to get a random number */
 uint32_t otPlatRandomGet(void)
 {
-	uint32_t rand_val = random_uint32();
-	DEBUG("otPlatRandomGet: %i\n", (int) rand_val);
-	return rand_val;
+    uint32_t rand_val = random_uint32();
+
+    DEBUG("otPlatRandomGet: %i\n", (int) rand_val);
+    return rand_val;
 }
 
 /** @} */

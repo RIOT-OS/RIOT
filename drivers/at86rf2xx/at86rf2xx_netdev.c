@@ -211,9 +211,10 @@ netopt_state_t _get_state(at86rf2xx_t *dev)
             return NETOPT_STATE_SLEEP;
         case AT86RF2XX_STATE_BUSY_RX_AACK:
 #ifdef MODULE_OPENTHREAD
-		/* Required for OpenThread abstraction */
-			if(at86rf2xx_receiver_listening(dev))
-				return NETOPT_STATE_IDLE;
+            /* Required for OpenThread abstraction */
+            if (at86rf2xx_receiver_listening(dev)) {
+                return NETOPT_STATE_IDLE;
+            }
 #endif
             return NETOPT_STATE_RX;
         case AT86RF2XX_STATE_BUSY_TX_ARET:
@@ -373,10 +374,10 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
 #ifdef MODULE_OPENTHREAD
-		case NETOPT_RX_LISTENING:
+        case NETOPT_RX_LISTENING:
             *((bool *)val) = at86rf2xx_receiver_listening(dev) ? true : false;
             res = sizeof(bool);
-			break;
+            break;
 #endif
         default:
             res = -ENOTSUP;
@@ -577,12 +578,12 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             }
             break;
 
-#ifdef MODULE_OPENTHREAD	
-		case NETOPT_RX_LISTENING:
+#ifdef MODULE_OPENTHREAD
+        case NETOPT_RX_LISTENING:
             at86rf2xx_set_option(dev, AT86RF2XX_OPT_RX_LISTENING,
                                  ((bool *)val)[0]);
             res = sizeof(netopt_enable_t);
-			break;
+            break;
 #endif
         default:
             break;

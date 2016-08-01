@@ -30,32 +30,31 @@ static msg_t ot_alarm_msg;
 /* OpenThread will call this for starting an aDt millisecs alarm when current time is aT0 millisecs */
 void otPlatAlarmStartAt(uint32_t aT0, uint32_t aDt)
 {
-	DEBUG("openthread: otPlatAlarmStartAt: aT0: %i, aDT: %i\n", (int) aT0, (int) aDt);
-	ot_alarm_msg.type = OPENTHREAD_XTIMER_MSG_TYPE_EVENT;
+    DEBUG("openthread: otPlatAlarmStartAt: aT0: %i, aDT: %i\n", (int) aT0, (int) aDt);
+    ot_alarm_msg.type = OPENTHREAD_XTIMER_MSG_TYPE_EVENT;
 
-	int dt = aDt*1000;
-	if(dt == 0)
-	{
-		msg_send(&ot_alarm_msg, thread_getpid());
-	}
-	else
-	{
-		xtimer_set_msg(&ot_timer, dt, &ot_alarm_msg, thread_getpid());
-	}
+    int dt = aDt * 1000;
+    if (dt == 0) {
+        msg_send(&ot_alarm_msg, thread_getpid());
+    }
+    else {
+        xtimer_set_msg(&ot_timer, dt, &ot_alarm_msg, thread_getpid());
+    }
 }
 
 /* OpenThread will call this to stop alarms */
 void otPlatAlarmStop(void)
 {
-	DEBUG("openthread: otPlatAlarmStop\n");
-	xtimer_remove(&ot_timer);
+    DEBUG("openthread: otPlatAlarmStop\n");
+    xtimer_remove(&ot_timer);
 }
 
 /* OpenThread will call this for getting running time in millisecs */
 uint32_t otPlatAlarmGetNow(void)
 {
-	uint32_t now = xtimer_now()/1000;
-	DEBUG("openthread: otPlatAlarmGetNow: %i\n", (int) now);
-	return now;
+    uint32_t now = xtimer_now() / 1000;
+
+    DEBUG("openthread: otPlatAlarmGetNow: %i\n", (int) now);
+    return now;
 }
 /** @} */

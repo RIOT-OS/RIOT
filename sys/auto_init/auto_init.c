@@ -170,8 +170,8 @@ void auto_init(void)
     lwip_bootstrap();
 #endif
 #ifdef MODULE_OPENTHREAD
-	extern void openthread_bootstrap(void);
-	openthread_bootstrap();
+    extern void openthread_bootstrap(void);
+    openthread_bootstrap();
 #endif
 
 /* initialize network devices */

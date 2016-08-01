@@ -34,18 +34,18 @@ extern "C" {
 #include "net/netdev2.h"
 #include "thread.h"
 
-#define OPENTHREAD_XTIMER_MSG_TYPE_EVENT (0x2235) /**< xtimer message receiver event*/
-#define OPENTHREAD_NETDEV2_MSG_TYPE_EVENT (0x2236) /**< message received from driver */
-#define OPENTHREAD_SERIAL_MSG_TYPE_EVENT (0x2237) /**< event indicating a serial (UART) message was sent to OpenThread */
-#define OPENTHREAD_MSG_TYPE_RECV (0x2238) /**< event for frame reception */
+#define OPENTHREAD_XTIMER_MSG_TYPE_EVENT (0x2235)   /**< xtimer message receiver event*/
+#define OPENTHREAD_NETDEV2_MSG_TYPE_EVENT (0x2236)  /**< message received from driver */
+#define OPENTHREAD_SERIAL_MSG_TYPE_EVENT (0x2237)   /**< event indicating a serial (UART) message was sent to OpenThread */
+#define OPENTHREAD_MSG_TYPE_RECV (0x2238)           /**< event for frame reception */
 
 /**
  *  * @brief   Struct containing a serial message
- *  
+ *
  */
 typedef struct {
-	void *buf; /**< buffer containing the message */
-	size_t len; /**< length of the message */
+    void *buf;  /**< buffer containing the message */
+    size_t len; /**< length of the message */
 } serial_msg_t;
 
 /**

@@ -221,14 +221,14 @@ typedef enum {
     /**
      * @brief en/disable encryption.
      */
-    NETOPT_ENCRYPTION,        /**< en/disable encryption */
-    NETOPT_ENCRYPTION_KEY,    /**< set encryption key */
+    NETOPT_ENCRYPTION,          /**< en/disable encryption */
+    NETOPT_ENCRYPTION_KEY,      /**< set encryption key */
 
 #ifdef MODULE_OPENTHREAD
-	/**
-	 * @brief enable/disable receiver
-	 */
-	NETOPT_RX_LISTENING,
+    /**
+     * @brief enable/disable receiver
+     */
+    NETOPT_RX_LISTENING,
 #endif
 
     /**
