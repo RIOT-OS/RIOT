@@ -29,6 +29,8 @@
 #include "periph/spi.h"
 #include "nvram-spi.h"
 #include "xtimer.h"
+#include "rtc.h"
+#include "clist.h"
 
 static nvram_t mulle_nvram_dev;
 nvram_t *mulle_nvram = &mulle_nvram_dev;
@@ -36,6 +38,14 @@ static nvram_spi_params_t nvram_spi_params = {
         .spi = MULLE_NVRAM_SPI_DEV,
         .cs = MULLE_NVRAM_SPI_CS,
         .address_count = MULLE_NVRAM_SPI_ADDRESS_COUNT,
+};
+
+extern const rtc_ops_t binrtc_ops;
+
+static rtc_t cpu_rtc = {
+    .rtc_op = &binrtc_ops,
+    .list_entry = CLIST_INIT,
+    .name = "cpu",
 };
 
 /** @brief Initialize the GPIO pins controlling the power switches. */
@@ -120,6 +130,8 @@ void board_init(void)
         /* Increment boot counter */
         increase_boot_count();
     }
+
+    rtc_register(&cpu_rtc);
 }
 
 static inline void power_pins_init(void)
