@@ -48,6 +48,14 @@
 #include "xtimer.h"
 #endif
 
+#if MODULE_RTC
+#include "rtc.h"
+#ifndef RTC_DEFAULT_DEV
+#define RTC_DEFAULT_DEV cpu_rtc
+#endif
+extern rtc_t RTC_DEFAULT_DEV;
+#endif
+
 #ifdef MODULE_GNRC_SIXLOWPAN
 #include "net/gnrc/sixlowpan.h"
 #endif
@@ -104,6 +112,10 @@ void auto_init(void)
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
+#endif
+#if MODULE_RTC
+    rtc_register(&RTC_DEFAULT_DEV);
+    rtc_init(&RTC_DEFAULT_DEV);
 #endif
 #ifdef MODULE_BMP180
     DEBUG("Auto init BMP180 module.\n");
