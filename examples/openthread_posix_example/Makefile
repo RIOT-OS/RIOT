@@ -1,4 +1,4 @@
-APPLICATION = openthread_example
+APPLICATION = openthread_posix_example
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= samr21-xpro
@@ -43,5 +43,9 @@ USEMODULE += ipv6_addr
 #required for C++ compiling
 CXXEXFLAGS += -fno-rtti
 USEMODULE += cpp11-compat
+
+# Needed by posix_sockets example
+USEMODULE += posix_sockets
+USEMODULE += conn_udp
 
 include $(RIOTBASE)/Makefile.include
