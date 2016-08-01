@@ -18,7 +18,7 @@
 #include <legacymsp430.h>
 #include "irq.h"
 #include "cpu.h"
-#include "cc430-rtc.h"
+#include "rtc.h"
 
 /* Alarm callback */
 static rtc_alarm_cb_t _cb;
@@ -30,25 +30,39 @@ static struct tm time_to_set;
 static int set_time = 0;
 kernel_pid_t rtc_second_pid = KERNEL_PID_UNDEF;
 
-void rtc_init(void)
+
+static int cc430_rtc_init(rtc_t *rtc);
+static int cc430_rtc_set_time(rtc_t *rtc, const struct tm *localt);
+static int cc430_rtc_get_time(rtc_t *rtc, struct tm *localt);
+static int cc430_rtc_set_alarm(rtc_t *rtc, const struct tm *localt, rtc_alarm_cb_t cb, void *arg);
+static int cc430_rtc_get_alarm(rtc_t *rtc, struct tm *localt);
+static void cc430_rtc_clear_alarm(rtc_t *rtc);
+
+static const rtc_ops_t cc430_rtc_ops = {
+    .init = cc430_rtc_init,
+    .get_time = cc430_rtc_get_time,
+    .set_time = cc430_rtc_set_time,
+    .get_alarm = cc430_rtc_get_alarm,
+    .set_alarm = cc430_rtc_set_alarm,
+    .clear_alarm = cc430_rtc_clear_alarm,
+};
+
+rtc_t cpu_rtc = {
+    .rtc_op = &cc430_rtc_ops,
+    .name = "cpu",
+};
+
+int cc430_rtc_init(rtc_t *rtc)
 {
+    (void)rtc;
     /* Set to calendar mode */
     RTCCTL1 |= RTCMODE_H;
-}
-
-void rtc_poweron(void)
-{
     /* Set RTC operational */
     RTCCTL1 &= ~RTCHOLD_H;
+    return 0;
 }
 
-void rtc_poweroff(void)
-{
-    /* Stop RTC */
-    RTCCTL1 |= RTCHOLD_H;
-}
-
-int rtc_set_time(struct tm *localt)
+int cc430_rtc_set_time(rtc_t *rtc, const struct tm *localt)
 {
     if (localt == NULL) {
         return -1;
@@ -60,17 +74,7 @@ int rtc_set_time(struct tm *localt)
     return 0;
 }
 
-/*---------------------------------------------------------------------------
-time_t rtc_time(void) {
-    time_t sec;
-    struct tm t;
-    rtc_get_localtime(&t);
-    sec = mktime(&t);
-    return sec;
-}
-*/
-
-int rtc_get_time(struct tm *localt)
+int cc430_rtc_get_time(rtc_t *rtc, struct tm *localt)
 {
     uint8_t success = 0;
     uint8_t i;
@@ -128,7 +132,7 @@ int rtc_get_time(struct tm *localt)
     return 0;
 }
 
-int rtc_set_alarm(struct tm *localt, rtc_alarm_cb_t cb, void *arg)
+int cc430_rtc_set_alarm(rtc_t *rtc, const struct tm *localt, rtc_alarm_cb_t cb, void *arg)
 {
     if (localt != NULL) {
         RTCAMIN = localt->tm_min;
@@ -151,7 +155,7 @@ int rtc_set_alarm(struct tm *localt, rtc_alarm_cb_t cb, void *arg)
     return -2;
 }
 
-int rtc_get_alarm(struct tm *localt)
+int cc430_rtc_get_alarm(rtc_t *rtc, struct tm *localt)
 {
      if (localt != NULL) {
         localt->tm_sec = -1;
@@ -170,7 +174,7 @@ int rtc_get_alarm(struct tm *localt)
     return -1;
 }
 
-void rtc_clear_alarm(void)
+void cc430_rtc_clear_alarm(rtc_t *rtc)
 {
     /* reset all AE bits */
     RTCAHOUR &= ~BIT7;
