@@ -650,7 +650,7 @@ static void _isr(netdev2_t *netdev)
                         DEBUG("[at86rf2xx] TX SUCCESS\n");
                         break;
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
-                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE);
+                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE_DATA_PENDING);
                         DEBUG("[at86rf2xx] TX SUCCESS DATA PENDING\n");
                         break;
 #else
