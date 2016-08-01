@@ -324,10 +324,12 @@ void at86rf2xx_set_cca_threshold(at86rf2xx_t *dev, int8_t value)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__CCA_THRES, value);
 }
 
-bool at86rf2xx_get_pdt_dis(at86rf2xx_t *dev)
+#ifdef MODULE_OPENTHREAD
+bool at86rf2xx_receiver_listening(at86rf2xx_t *dev)
 {
 	return (at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN) & 0x80) ? false : true;
 }
+#endif
 
 void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
 {
@@ -371,12 +373,14 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
                 tmp |= AT86RF2XX_IRQ_STATUS_MASK__RX_START;
                 at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
                 break;
+#ifdef MODULE_OPENTHREAD
 			case AT86RF2XX_OPT_RX_LISTENING:
                 DEBUG("[at86rf2xx] opt: enabling listening of pkt\n");
                 tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN);
 				tmp &= ~(0x80);
 				at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, tmp); 
 				break;
+#endif
             default:
                 /* do nothing */
                 break;
@@ -418,12 +422,14 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
                 tmp &= ~AT86RF2XX_IRQ_STATUS_MASK__RX_START;
                 at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
                 break;
+#ifdef MODULE_OPENTHREAD
 			case AT86RF2XX_OPT_RX_LISTENING:
                 DEBUG("[at86rf2xx] opt: disabling listening of pkt\n");
                 tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN);
                 tmp |= 0x80;
 				at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, tmp); 
 				break;
+#endif
             default:
                 /* do nothing */
                 break;
