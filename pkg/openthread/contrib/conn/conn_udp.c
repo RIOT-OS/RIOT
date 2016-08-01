@@ -14,7 +14,7 @@
  */
 
 #include "net/conn/udp.h"
-#include "conn.h"
+#include "openthread/conn.h"
 #include "stdio.h"
 #include <openthread.h>
 #include "string.h"

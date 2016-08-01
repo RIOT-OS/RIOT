@@ -36,7 +36,7 @@
 #endif
 
 #ifdef MODULE_OPENTHREAD
-#include "conn.h"
+#include "openthread/conn.h"
 #endif
 
 #ifdef __cplusplus

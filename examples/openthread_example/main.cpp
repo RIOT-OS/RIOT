@@ -2,14 +2,6 @@
 
 #include "shell.h"
 #include "shell_commands.h"
-#include <stdio.h>
-
-#include <cli/cli.hpp>
-#include <net/ipv6/addr.h>
-#include "net/conn/udp.h"
-#include "conn.h"
-#include "periph_conf.h"
-#include "periph/i2c.h"
 
 
 int main(void)
