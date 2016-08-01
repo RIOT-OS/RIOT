@@ -96,6 +96,8 @@
  */
 typedef list_node_t clist_node_t;
 
+#define CLIST_INIT(last) (clist_node_t){ .next = (last) }
+
 /**
  * @brief Appends *new_node* at the end of *list
  *
