@@ -138,5 +138,7 @@ int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len, void *addr, 
 ipv6_addr_t *conn_find_best_source(const ipv6_addr_t *dst)
 {
 	DEBUG("openthread: Finding best source\n");
+
+	/* This function will be unused in the new conn API. Return NULL for now */
 	return NULL;
 }
