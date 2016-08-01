@@ -107,6 +107,16 @@ void end_mutex(void);
  */
 void ot_random_init(void);
 
+
+#if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
+/**
+ * @brief   Run OpenThread UART simulator (stdio)
+ *
+ */
+void openthread_uart_run(void);
+#endif
+
+
 #ifdef __cplusplus
 }
 #endif

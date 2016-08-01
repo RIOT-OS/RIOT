@@ -12,17 +12,3 @@ ifneq (,$(filter openthread_contrib,$(USEMODULE)))
  DIRS += $(RIOTBASE)/pkg/openthread/contrib/netdev2
  DIRS += $(RIOTBASE)/pkg/openthread/contrib/conn
 endif
-
-ifneq (,$(filter openthread_cli,$(USEMODULE)))
- DIRS += $(RIOTBASE)/pkg/openthread/contrib/cli
-endif
-
-ifneq (,$(filter openthread_ncp,$(USEMODULE)))
- DIRS += $(RIOTBASE)/pkg/openthread/contrib/cli
-endif
-
-ifneq (,$(filter openthread_ncp,$(USEMODULE)))
- DIRS += $(RIOTBASE)/pkg/openthread/contrib/cli
-endif
-
-

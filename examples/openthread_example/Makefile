@@ -15,8 +15,9 @@ CFLAGS += -DDEVELHELP -Wall
 QUIET ?= 1
 
 USEMODULE+=openthread
-USEMODULE+=openthread_cli
-#USEMODULE+=openthread_ncp
+
+#Comment this line for using RIOT shell with OpenThread
+#USEMODULE+=openthread_cli
 
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))

@@ -67,6 +67,24 @@ static char ot_thread_stack[2*THREAD_STACKSIZE_MAIN];
 
 static mutex_t mtx = MUTEX_INIT;
 
+
+#if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
+/* init and run OpeanThread's UART simulation (sdtio) */
+void openthread_uart_run(void)
+{
+	char c;
+	msg_t msg;
+	msg.type = OPENTHREAD_SERIAL_MSG_TYPE_EVENT;
+	msg.content.ptr = &c;
+
+	while(1)
+	{
+        c = getchar();
+		msg_send(&msg, openthread_get_pid());
+	}
+}
+#endif
+
 /* call this when calling an OpenThread function */
 void begin_mutex(void)
 {
