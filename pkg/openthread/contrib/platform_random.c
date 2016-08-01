@@ -18,7 +18,7 @@
 #include <platform/random.h>
 #include "random.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 #include "periph/cpuid.h"
 
@@ -42,7 +42,9 @@ void ot_random_init(void)
 /* OpenThread will call this to get a random number */
 uint32_t otPlatRandomGet(void)
 {
-	return random_uint32();
+	uint32_t rand_val = random_uint32();
+	DEBUG("otPlatRandomGet: %i\n", (int) rand_val);
+	return rand_val;
 }
 
 /** @} */
