@@ -81,7 +81,7 @@
 #ifndef CLIST_H
 #define CLIST_H
 
-#include <stddef.h>
+#include <stddef.h> /* for NULL */
 #include "list.h"
 
 #ifdef __cplusplus
@@ -96,7 +96,7 @@
  */
 typedef list_node_t clist_node_t;
 
-#define CLIST_INIT(last) (clist_node_t){ .next = (last) }
+#define CLIST_INIT (clist_node_t){ .next = NULL }
 
 /**
  * @brief Appends *new_node* at the end of *list
