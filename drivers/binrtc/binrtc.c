@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_rtc
+ * @ingroup     drivers_rtc_binrtc
  *
  * @{
  *
