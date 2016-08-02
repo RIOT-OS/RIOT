@@ -210,6 +210,12 @@ netopt_state_t _get_state(at86rf2xx_t *dev)
         case AT86RF2XX_STATE_SLEEP:
             return NETOPT_STATE_SLEEP;
         case AT86RF2XX_STATE_BUSY_RX_AACK:
+#ifdef MODULE_OPENTHREAD
+            /* Required for OpenThread abstraction */
+            if (at86rf2xx_receiver_listening(dev)) {
+                return NETOPT_STATE_IDLE;
+            }
+#endif
             return NETOPT_STATE_RX;
         case AT86RF2XX_STATE_BUSY_TX_ARET:
         case AT86RF2XX_STATE_TX_ARET_ON:
@@ -367,6 +373,12 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
             }
             break;
 
+#ifdef MODULE_OPENTHREAD
+        case NETOPT_RX_LISTENING:
+            *((bool *)val) = at86rf2xx_receiver_listening(dev) ? true : false;
+            res = sizeof(bool);
+            break;
+#endif
         default:
             res = -ENOTSUP;
     }
@@ -566,6 +578,13 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             }
             break;
 
+#ifdef MODULE_OPENTHREAD
+        case NETOPT_RX_LISTENING:
+            at86rf2xx_set_option(dev, AT86RF2XX_OPT_RX_LISTENING,
+                                 ((bool *)val)[0]);
+            res = sizeof(netopt_enable_t);
+            break;
+#endif
         default:
             break;
     }
@@ -614,9 +633,17 @@ static void _isr(netdev2_t *netdev)
         if (state == AT86RF2XX_STATE_RX_AACK_ON ||
             state == AT86RF2XX_STATE_BUSY_RX_AACK) {
             DEBUG("[at86rf2xx] EVT - RX_END\n");
+
+#ifdef MODULE_OPENTHREAD
+            if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END) || !at86rf2xx_receiver_listening(dev)) {
+                return;
+            }
+#else
             if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)) {
                 return;
             }
+#endif
+
             netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
         }
         else if (state == AT86RF2XX_STATE_TX_ARET_ON ||
@@ -633,11 +660,22 @@ static void _isr(netdev2_t *netdev)
 
             if (netdev->event_callback && (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END)) {
                 switch (trac_status) {
+#ifdef MODULE_OPENTHREAD
+                    case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
+                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE);
+                        DEBUG("[at86rf2xx] TX SUCCESS\n");
+                        break;
+                    case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
+                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE_DATA_PENDING);
+                        DEBUG("[at86rf2xx] TX SUCCESS DATA PENDING\n");
+                        break;
+#else
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
                         netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE);
                         DEBUG("[at86rf2xx] TX SUCCESS\n");
                         break;
+#endif
                     case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
                         netdev->event_callback(netdev, NETDEV2_EVENT_TX_NOACK);
                         DEBUG("[at86rf2xx] TX NO_ACK\n");

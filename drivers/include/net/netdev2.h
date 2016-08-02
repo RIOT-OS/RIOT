@@ -69,15 +69,18 @@ enum {
  *          upper layer
  */
 typedef enum {
-    NETDEV2_EVENT_ISR,              /**< driver needs it's ISR handled */
-    NETDEV2_EVENT_RX_STARTED,       /**< started to receive a packet */
-    NETDEV2_EVENT_RX_COMPLETE,      /**< finished receiving a packet */
-    NETDEV2_EVENT_TX_STARTED,       /**< started to transfer a packet */
-    NETDEV2_EVENT_TX_COMPLETE,      /**< finished transferring packet */
-    NETDEV2_EVENT_TX_NOACK,         /**< ACK requested but not received */
-    NETDEV2_EVENT_TX_MEDIUM_BUSY,   /**< couldn't transfer packet */
-    NETDEV2_EVENT_LINK_UP,          /**< link established */
-    NETDEV2_EVENT_LINK_DOWN,        /**< link gone */
+    NETDEV2_EVENT_ISR,                      /**< driver needs it's ISR handled */
+    NETDEV2_EVENT_RX_STARTED,               /**< started to receive a packet */
+    NETDEV2_EVENT_RX_COMPLETE,              /**< finished receiving a packet */
+    NETDEV2_EVENT_TX_STARTED,               /**< started to transfer a packet */
+    NETDEV2_EVENT_TX_COMPLETE,              /**< finished transferring packet */
+#ifdef MODULE_OPENTHREAD
+    NETDEV2_EVENT_TX_COMPLETE_DATA_PENDING, /**< finished transferring packet and has data pending flag **/
+#endif
+    NETDEV2_EVENT_TX_NOACK,                 /**< ACK requested but not received */
+    NETDEV2_EVENT_TX_MEDIUM_BUSY,           /**< couldn't transfer packet */
+    NETDEV2_EVENT_LINK_UP,                  /**< link established */
+    NETDEV2_EVENT_LINK_DOWN,                /**< link gone */
     /* expand this list if needed */
 } netdev2_event_t;
 
@@ -115,7 +118,7 @@ typedef void (*netdev2_event_cb_t)(netdev2_t *dev, netdev2_event_t event);
 struct netdev2 {
     const struct netdev2_driver *driver;    /**< ptr to that driver's interface. */
     netdev2_event_cb_t event_callback;      /**< callback for device events */
-    void* context;                          /**< ptr to network stack context */
+    void *context;                          /**< ptr to network stack context */
 #ifdef MODULE_NETSTATS_L2
     netstats_t stats;                       /**< transceiver's statistics */
 #endif
