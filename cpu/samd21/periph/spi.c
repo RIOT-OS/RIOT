@@ -29,6 +29,7 @@
 #include "board.h"
 #define ENABLE_DEBUG (0)
 #include "debug.h"
+
 #if SPI_0_EN  || SPI_1_EN
 
 /**
@@ -64,7 +65,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     uint8_t   cpha = 0;
     uint8_t   cpol = 0;
     uint32_t   f_baud = 0;
-    switch(speed)
+    switch (speed)
     {
     case SPI_SPEED_100KHZ:
         f_baud = 100000;
@@ -90,7 +91,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         return -1;
 #endif
     }
-    switch(conf)
+    switch (conf)
     {
     case SPI_CONF_FIRST_RISING: /**< first data bit is transacted on the first rising SCK edge */
         cpha = 0;
@@ -109,9 +110,9 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         cpol = 1;
         break;
     }
-    switch(dev)
+    switch (dev)
     {
-#ifdef SPI_0_EN
+#if SPI_0_EN
     case SPI_0:
         spi_dev = &SPI_0_DEV;
 
@@ -149,7 +150,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         dipo  = SPI_0_DIPO;
         break;
 #endif
-#ifdef SPI_1_EN
+#if SPI_1_EN
     case SPI_1:
         spi_dev = &SPI_1_DEV;
 
@@ -192,19 +193,19 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     _spi_poweroff(spi_dev);
 
     spi_dev->CTRLA.reg |= SERCOM_SPI_CTRLA_MODE_SPI_MASTER;
-    while (spi_dev->SYNCBUSY.reg) {}
+    while (spi_dev->SYNCBUSY.reg) {}	// ???? not needed
 
-    spi_dev->BAUD.bit.BAUD = (uint8_t) (((uint32_t)CLOCK_CORECLOCK) / (2 * f_baud) - 1); /* Syncronous mode*/
+    spi_dev->BAUD.bit.BAUD = (uint8_t) (((uint32_t)CLOCK_CORECLOCK) / (2 * f_baud) - 1); /* Synchronous mode*/
 
+    spi_dev->CTRLA.reg |= SERCOM_SPI_CTRLA_DOPO(dopo)
+                       |  SERCOM_SPI_CTRLA_DIPO(dipo)
+                       |  (cpha << SERCOM_SPI_CTRLA_CPHA_Pos)
+                       |  (cpol << SERCOM_SPI_CTRLA_CPOL_Pos);
+    while (spi_dev->SYNCBUSY.reg) {}	// ???? not needed
 
-    spi_dev->CTRLA.reg |= (SERCOM_SPI_CTRLA_DOPO(dopo))
-                          |  (SERCOM_SPI_CTRLA_DIPO(dipo))
-                          |  (cpha << SERCOM_SPI_CTRLA_CPHA_Pos)
-                          |  (cpol << SERCOM_SPI_CTRLA_CPOL_Pos);
-
-    while (spi_dev->SYNCBUSY.reg) {}
+    /* datasize 0 => 8 bits */
     spi_dev->CTRLB.reg = (SERCOM_SPI_CTRLB_CHSIZE(0) | SERCOM_SPI_CTRLB_RXEN);
-    while(spi_dev->SYNCBUSY.reg) {}
+    while (spi_dev->SYNCBUSY.reg) {}	// ???? Only wait for clear of spi_dev->SYNCBUSY.bit.CTRLB
 
     /* enable */
     _spi_poweron(spi_dev);
@@ -247,12 +248,12 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 
     switch(dev)
     {
-#ifdef SPI_0_EN
+#if SPI_0_EN
     case SPI_0:
         spi_dev = &(SPI_0_DEV);
         break;
 #endif
-#ifdef SPI_1_EN
+#if SPI_1_EN
     case SPI_1:
         spi_dev = &(SPI_1_DEV);
         break;
