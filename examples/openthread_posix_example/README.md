@@ -4,7 +4,7 @@ This example shows the `posix_sockets` example running with OpenThread as networ
 as the `posix_sockets` example, but includes 2 extra commands for obtaining node ip address and Thread status.
 
 
-## About Thread stack ##
+## About Thread stack
 You can find more information about Thread networks in
 http://threadgroup.org/Portals/0/documents/whitepapers/Thread%20Stack%20Fundamentals_v2_public.pdf
 
@@ -13,7 +13,7 @@ http://threadgroup.org/Portals/0/documents/whitepapers/Thread%20Stack%20Fundamen
 * `ot_state` - shows the Thread state of a node (leader, router, child)
 * `ot_ipaddr` - shows the IP addresses associated to a node (link local, mesh, etc).
 
-## Example setup ##
+## Example setup
 An example usage of this application could be the following setup (tested in IoT-LAB):
 
 1. Flash nodes with `make BOARD=<target> clean all flash`
@@ -39,19 +39,19 @@ An example usage of this application could be the following setup (tested in IoT
    children by routers, etc).
 
 
-#Port status
+## Port status
 * Only `conn_udp` supported for the moment (no `conn_ip` yet)
 * `ifconfig` not supported yet (use `ot_ipaddr` for ip addresses)
 * OpenThread and this port are still under development. If you find any bug please report it via Github issues.
 * Only tested with at86rf2xx radios.
 
-#Known issues
+## Known issues
 
 * When the network traffic is really high, sometimes some nodes crash silently. 
 * In some cases there are isolated leaders that are not able to recover to the main partition. These won't affect the
   rest of the network, but this node becomes unreachable.
 
-#Future work
+## Future work
 
 * Add support for Thread Border Router via NEST's Wpantund (https://github.com/openthread/wpantund)
 * Adapt to new conn API.
