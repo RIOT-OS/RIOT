@@ -105,8 +105,8 @@ extern "C" {
  */
 static const uart_conf_t uart_config[] = {
     /* device, RX pin, TX pin, mux */
-    {&SERCOM0->USART, GPIO_PIN(PA,5), GPIO_PIN(PA,4), GPIO_MUX_D},
-    {&SERCOM5->USART, GPIO_PIN(PA,23), GPIO_PIN(PA,22), GPIO_MUX_D},
+    {&SERCOM0->USART, GPIO_PIN(PA,5),  GPIO_PIN(PA,4),  GPIO_MUX_D, SERCOM_RX_PAD_1, UART_TX_PAD_0},
+    {&SERCOM5->USART, GPIO_PIN(PA,23), GPIO_PIN(PA,22), GPIO_MUX_D, SERCOM_RX_PAD_1, UART_TX_PAD_0},
 };
 
 /* interrupt function name mapping */

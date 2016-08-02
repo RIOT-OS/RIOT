@@ -86,11 +86,12 @@ static int init_base(uart_t uart, uint32_t baudrate)
     /* reset the UART device */
     dev->CTRLA.reg = SERCOM_USART_CTRLA_SWRST;
     while (dev->SYNCBUSY.reg & SERCOM_USART_SYNCBUSY_SWRST) {}
-    /* set asynchronous mode w/o parity, LSB first, PAD0 to TX, PAD1 to RX and
+    /* set asynchronous mode w/o parity, LSB first, PADn to TX, PADn to RX and
      * use internal clock */
     dev->CTRLA.reg = (SERCOM_USART_CTRLA_DORD |
-                      SERCOM_USART_CTRLA_RXPO(0x1) |
-                      SERCOM_USART_CTRLA_SAMPR(0x1) |
+                      SERCOM_USART_CTRLA_TXPO(uart_config[uart].tx_pad) |
+                      SERCOM_USART_CTRLA_RXPO(uart_config[uart].rx_pad) |
+                      SERCOM_USART_CTRLA_SAMPR(0x1) |			// 1: x16 sample rate
                       SERCOM_USART_CTRLA_MODE_USART_INT_CLK);
     /* set baudrate */
     dev->BAUD.FRAC.FP = (baud % 10);
