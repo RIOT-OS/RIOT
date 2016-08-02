@@ -36,6 +36,9 @@
 #define SAMD21_I2C_TIMEOUT  (65535)
 
 /* static function definitions */
+static void _i2c_poweron(SercomI2cm *sercom);
+static void _i2c_poweroff(SercomI2cm *sercom);
+
 static inline int _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag);
 static inline int _write(SercomI2cm *dev, char *data, int length);
 static inline int _read(SercomI2cm *dev, char *data, int length);
@@ -332,13 +335,21 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
     return length;
 }
 
+static void _i2c_poweron(SercomI2cm *sercom)
+{
+    if (sercom == NULL) {
+        return;
+    }
+    sercom->CTRLA.bit.ENABLE = 1;
+    while (sercom->SYNCBUSY.bit.ENABLE) {}
+}
+
 void i2c_poweron(i2c_t dev)
 {
     switch (dev) {
 #if I2C_0_EN
         case I2C_0:
-            while(I2C_0_DEV.SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
-            I2C_0_DEV.CTRLA.bit.ENABLE = 1;
+            _i2c_poweron(&I2C_0_DEV);
             break;
 #endif
         default:
@@ -346,13 +357,21 @@ void i2c_poweron(i2c_t dev)
     }
 }
 
+static void _i2c_poweroff(SercomI2cm *sercom)
+{
+    if (sercom == NULL) {
+        return;
+    }
+    sercom->CTRLA.bit.ENABLE = 0;
+    while (sercom->SYNCBUSY.bit.ENABLE) {}
+}
+
 void i2c_poweroff(i2c_t dev)
 {
     switch (dev) {
 #if I2C_0_EN
         case I2C_0:
-            while(I2C_0_DEV.SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
-            I2C_0_DEV.CTRLA.reg |= SERCOM_I2CM_CTRLA_ENABLE;
+            _i2c_poweroff(&I2C_0_DEV);
             break;
 #endif
         default:
