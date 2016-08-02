@@ -15,6 +15,7 @@ ifneq (,$(filter at86rf2%,$(USEMODULE)))
 	# as all drivers are ported to netdev2
     USEMODULE += gnrc_netdev2
   endif
+  FEATURES_REQUIRED += periph_spi
 endif
 
 ifneq (,$(filter bh1750fvi,$(USEMODULE)))
