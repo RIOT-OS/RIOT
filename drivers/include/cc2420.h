@@ -281,7 +281,7 @@ netopt_state_t cc2420_get_state(cc2420_t *dev);
  * @return                  number of bytes that were actually send
  * @return                  0 on error
  */
-size_t cc2420_send(cc2420_t *dev, const struct iovec *data, int count);
+size_t cc2420_send(cc2420_t *dev, const struct iovec *data, unsigned count);
 
 /**
  * @brief   Prepare for sending of data
@@ -293,7 +293,7 @@ size_t cc2420_send(cc2420_t *dev, const struct iovec *data, int count);
  * @param[in] data          data to prepare (must include IEEE802.15.4 header)
  * @param[in] count         length of @p data
  */
-size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, int count);
+size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, unsigned count);
 
 /**
  * @brief   Trigger sending of data previously loaded into transmit buffer

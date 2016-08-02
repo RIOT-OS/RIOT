@@ -143,7 +143,7 @@ bool cc2420_cca(cc2420_t *dev)
     return gpio_read(dev->params.pin_cca);
 }
 
-size_t cc2420_send(cc2420_t *dev, const struct iovec *data, int count)
+size_t cc2420_send(cc2420_t *dev, const struct iovec *data, unsigned count)
 {
     size_t n = cc2420_tx_prepare(dev, data, count);
 
@@ -154,7 +154,7 @@ size_t cc2420_send(cc2420_t *dev, const struct iovec *data, int count)
     return n;
 }
 
-size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, int count)
+size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, unsigned count)
 {
     size_t pkt_len = 2;     /* include the FCS (frame check sequence) */
 
@@ -162,7 +162,7 @@ size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, int count)
     while (cc2420_get_state(dev) & NETOPT_STATE_TX) {}
 
     /* get and check the length of the packet */
-    for (int i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
         pkt_len += data[i].iov_len;
     }
     if (pkt_len >= CC2420_PKT_MAXLEN) {

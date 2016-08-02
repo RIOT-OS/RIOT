@@ -59,8 +59,8 @@ static inline int _packets_available(encx24j600_t *dev);
 static void _get_mac_addr(netdev2_t *dev, uint8_t* buf);
 
 /* netdev2 interface */
-static int _send(netdev2_t *netdev, const struct iovec *vector, int count);
-static int _recv(netdev2_t *netdev, char* buf, int len, void *info);
+static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count);
+static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev2_t *dev);
 static void _isr(netdev2_t *dev);
 static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len);
@@ -303,7 +303,7 @@ static int _init(netdev2_t *encdev)
     return 0;
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, int count) {
+static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count) {
     encx24j600_t * dev = (encx24j600_t *) netdev;
     lock(dev);
 
@@ -358,7 +358,7 @@ static void _get_mac_addr(netdev2_t *encdev, uint8_t* buf)
     unlock(dev);
 }
 
-static int _recv(netdev2_t *netdev, char* buf, int len, void *info)
+static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
 {
     encx24j600_t * dev = (encx24j600_t *) netdev;
     encx24j600_frame_hdr_t hdr;

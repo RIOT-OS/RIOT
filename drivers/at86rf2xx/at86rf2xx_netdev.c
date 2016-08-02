@@ -40,8 +40,8 @@
 
 #define _MAX_MHR_OVERHEAD   (25)
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, int count);
-static int _recv(netdev2_t *netdev, char *buf, int len, void *info);
+static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count);
+static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev2_t *netdev);
 static void _isr(netdev2_t *netdev);
 static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len);
@@ -97,7 +97,7 @@ static int _init(netdev2_t *netdev)
     return 0;
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
+static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
     const struct iovec *ptr = vector;
@@ -106,7 +106,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
     at86rf2xx_tx_prepare(dev);
 
     /* load packet data into FIFO */
-    for (int i = 0; i < count; i++, ptr++) {
+    for (unsigned i = 0; i < count; i++, ptr++) {
         /* current packet data + FCS too long */
         if ((len + ptr->iov_len + 2) > AT86RF2XX_MAX_PKT_LENGTH) {
             DEBUG("[at86rf2xx] error: packet too large (%u byte) to be send\n",
@@ -127,7 +127,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
     return (int)len;
 }
 
-static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
+static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
     uint8_t phr;
