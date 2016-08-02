@@ -1,0 +1,14 @@
+INCLUDES += -I$(RIOTBASE)/pkg/openthread/include \
+			-I$(BINDIRBASE)/pkg/$(BOARD)/openthread/include \
+			-I$(BINDIRBASE)/pkg/$(BOARD)/openthread/src/core \
+			-I$(BINDIRBASE)/pkg/$(BOARD)/openthread/src/ncp \
+			-I$(BINDIRBASE)/pkg/$(BOARD)/openthread/src \
+			-I$(BINDIRBASE)/pkg/$(BOARD)/openthread/third_party/mbedtls \
+			-I$(BINDIRBASE)/pkg/$(BOARD)/openthread/third_party/mbedtls/repo/include
+
+
+ifneq (,$(filter openthread_contrib,$(USEMODULE)))
+ DIRS += $(RIOTBASE)/pkg/openthread/contrib
+ DIRS += $(RIOTBASE)/pkg/openthread/contrib/netdev2
+ DIRS += $(RIOTBASE)/pkg/openthread/contrib/conn
+endif
