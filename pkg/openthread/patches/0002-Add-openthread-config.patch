@@ -1,0 +1,153 @@
+From 6e6a4c3ca025b4814a6520c8df751193a8353b70 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jos=C3=A9=20Ignacio=20Alamos=20Aste?= <jialamos@uc.cl>
+Date: Mon, 18 Jul 2016 16:39:29 +0200
+Subject: [PATCH] Added openthread-config file
+
+---
+ include/openthread-config.h | 134 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 134 insertions(+)
+ create mode 100644 include/openthread-config.h
+
+diff --git a/include/openthread-config.h b/include/openthread-config.h
+new file mode 100644
+index 0000000..7efe8bc
+--- /dev/null
++++ b/include/openthread-config.h
+@@ -0,0 +1,134 @@
++/* include/openthread-config.h.  Generated from openthread-config.h.in by configure.  */
++/* include/openthread-config.h.in.  Generated from configure.ac by autoheader.  */
++
++/* Define to 1 if your C++ compiler doesn't accept -c and -o together. */
++/* #undef CXX_NO_MINUS_C_MINUS_O */
++
++/* Define to 1 if you have the <dlfcn.h> header file. */
++/* #undef HAVE_DLFCN_H */
++
++/* Define to 1 if you have the <inttypes.h> header file. */
++#define HAVE_INTTYPES_H 1
++
++/* Define to 1 if you have the `memcpy' function. */
++#define HAVE_MEMCPY 1
++
++/* Define to 1 if you have the <memory.h> header file. */
++/* #undef HAVE_MEMORY_H */
++
++/* Define to 1 if stdbool.h conforms to C99. */
++#define HAVE_STDBOOL_H 1
++
++/* Define to 1 if you have the <stdint.h> header file. */
++#define HAVE_STDINT_H 1
++
++/* Define to 1 if you have the <stdlib.h> header file. */
++#define HAVE_STDLIB_H 1
++
++/* Define to 1 if you have the <strings.h> header file. */
++#define HAVE_STRINGS_H 1
++
++/* Define to 1 if you have the <string.h> header file. */
++#define HAVE_STRING_H 1
++
++/* Define to 1 if you have the <sys/stat.h> header file. */
++/*#define HAVE_SYS_STAT_H 1 */
++
++/* Define to 1 if you have the <sys/types.h> header file. */
++#define HAVE_SYS_TYPES_H 1
++
++/* Define to 1 if you have the <unistd.h> header file. */
++#define HAVE_UNISTD_H 1
++
++/* Define to 1 if the system has the type `_Bool'. */
++#define HAVE__BOOL 1
++
++/* Define to the sub-directory in which libtool stores uninstalled libraries.
++   */
++#define LT_OBJDIR ".libs/"
++
++/* Define to 1 if your C compiler doesn't accept -c and -o together. */
++/* #undef NO_MINUS_C_MINUS_O */
++
++/* OpenThread examples */
++#define OPENTHREAD_EXAMPLES RIOT
++
++/* Define to 1 if you want to use cc2538 examples */
++//#define OPENTHREAD_EXAMPLES_CC2538 1
++
++/* Define to 1 if you want to use posix examples */
++//#define OPENTHREAD_EXAMPLES_POSIX 
++
++/* Name of package */
++#define PACKAGE "openthread"
++
++/* Define to the address where bug reports for this package should be sent. */
++#define PACKAGE_BUGREPORT "openthread-devel@googlegroups.com"
++
++/* Define to the full name of this package. */
++#define PACKAGE_NAME "OPENTHREAD"
++
++/* Define to the full name and version of this package. */
++#define PACKAGE_STRING "OPENTHREAD g6d48a7b"
++
++/* Define to the one symbol short name of this package. */
++#define PACKAGE_TARNAME "openthread"
++
++/* Define to the home page for this package. */
++#define PACKAGE_URL "http://github.com/openthread/openthread"
++
++/* Define to the version of this package. */
++#define PACKAGE_VERSION "g6d48a7b"
++
++/* Define to 1 if you have the ANSI C header files. */
++#define STDC_HEADERS 1
++
++/* Version number of package */
++#define VERSION "g6d48a7b"
++
++/* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
++   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
++   #define below would cause a syntax error. */
++/* #undef _UINT32_T */
++
++/* Define for Solaris 2.5.1 so the uint64_t typedef from <sys/synch.h>,
++   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
++   #define below would cause a syntax error. */
++/* #undef _UINT64_T */
++
++/* Define for Solaris 2.5.1 so the uint8_t typedef from <sys/synch.h>,
++   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
++   #define below would cause a syntax error. */
++/* #undef _UINT8_T */
++
++/* Define to the type of a signed integer type of width exactly 16 bits if
++   such a type exists and the standard includes do not define it. */
++/* #undef int16_t */
++
++/* Define to the type of a signed integer type of width exactly 32 bits if
++   such a type exists and the standard includes do not define it. */
++/* #undef int32_t */
++
++/* Define to the type of a signed integer type of width exactly 64 bits if
++   such a type exists and the standard includes do not define it. */
++/* #undef int64_t */
++
++/* Define to the type of a signed integer type of width exactly 8 bits if such
++   a type exists and the standard includes do not define it. */
++/* #undef int8_t */
++
++/* Define to the type of an unsigned integer type of width exactly 16 bits if
++   such a type exists and the standard includes do not define it. */
++/* #undef uint16_t */
++
++/* Define to the type of an unsigned integer type of width exactly 32 bits if
++   such a type exists and the standard includes do not define it. */
++/* #undef uint32_t */
++
++/* Define to the type of an unsigned integer type of width exactly 64 bits if
++   such a type exists and the standard includes do not define it. */
++/* #undef uint64_t */
++
++/* Define to the type of an unsigned integer type of width exactly 8 bits if
++   such a type exists and the standard includes do not define it. */
++/* #undef uint8_t */
+-- 
+2.7.4 (Apple Git-66)
+
