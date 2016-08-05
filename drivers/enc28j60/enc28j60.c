@@ -219,7 +219,7 @@ static void on_int(void *arg)
     netdev->event_callback(arg, NETDEV2_EVENT_ISR);
 }
 
-static int nd_send(netdev2_t *netdev, const struct iovec *data, int count)
+static int nd_send(netdev2_t *netdev, const struct iovec *data, unsigned count)
 {
     enc28j60_t *dev = (enc28j60_t *)netdev;
     uint8_t ctrl = 0;
@@ -248,7 +248,7 @@ static int nd_send(netdev2_t *netdev, const struct iovec *data, int count)
     return c;
 }
 
-static int nd_recv(netdev2_t *netdev, char *buf, int max_len, void *info)
+static int nd_recv(netdev2_t *netdev, void *buf, size_t max_len, void *info)
 {
     enc28j60_t *dev = (enc28j60_t *)netdev;
     uint8_t head[6];

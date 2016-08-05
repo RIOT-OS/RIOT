@@ -35,8 +35,8 @@
 
 static int  _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len);
 static int  _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len);
-static int  _send(netdev2_t *netdev, const struct iovec *vector, int count);
-static int  _recv(netdev2_t *netdev, char *buf, int len, void *info);
+static int  _send(netdev2_t *netdev, const struct iovec *vector, unsigned count);
+static int  _recv(netdev2_t *netdev, void *buf, size_t len, void *info);
 static void _isr(netdev2_t *netdev);
 static int  _init(netdev2_t *dev);
 
@@ -253,7 +253,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *value, size_t value_len)
     return res;
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
+static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
 {
     int pkt_len = 0;
 
@@ -268,7 +268,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
        start of the FIFO, so we can come back and update it later */
     rfcore_write_byte(0);
 
-    for (int i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
         pkt_len += vector[i].iov_len;
 
         if (pkt_len > CC2538_RF_MAX_DATA_LEN) {
@@ -289,7 +289,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
     return pkt_len;
 }
 
-static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
+static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
 {
     cc2538_rf_t *dev = (cc2538_rf_t *) netdev;
     size_t pkt_len;

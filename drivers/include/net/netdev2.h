@@ -137,7 +137,7 @@ typedef struct netdev2_driver {
      *
      * @return nr of bytes sent, or <=0 on error
      */
-    int (*send)(netdev2_t *dev, const struct iovec *vector, int count);
+    int (*send)(netdev2_t *dev, const struct iovec *vector, unsigned count);
 
     /**
      * @brief Get a received frame
@@ -158,7 +158,7 @@ typedef struct netdev2_driver {
      * @return nr of bytes read if buf != NULL
      * @return packet size if buf == NULL
      */
-    int (*recv)(netdev2_t *dev, char *buf, int len, void *info);
+    int (*recv)(netdev2_t *dev, void *buf, size_t len, void *info);
 
     /**
      * @brief the driver's initialization function

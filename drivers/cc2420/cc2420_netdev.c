@@ -39,8 +39,8 @@
 #include "debug.h"
 
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, int count);
-static int _recv(netdev2_t *netdev, char *buf, int len, void *info);
+static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count);
+static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev2_t *netdev);
 static void _isr(netdev2_t *netdev);
 static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len);
@@ -151,16 +151,16 @@ static void _isr(netdev2_t *netdev)
     netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
+static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
 {
     cc2420_t *dev = (cc2420_t *)netdev;
     return (int)cc2420_send(dev, vector, count);
 }
 
-static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
+static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
 {
     cc2420_t *dev = (cc2420_t *)netdev;
-    return (int)cc2420_rx(dev, (uint8_t *)buf, len, info);
+    return (int)cc2420_rx(dev, buf, len, info);
 }
 
 static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
