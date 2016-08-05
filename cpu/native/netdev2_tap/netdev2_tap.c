@@ -307,8 +307,9 @@ void netdev2_tap_setup(netdev2_tap_t *dev, const netdev2_tap_params_t *params) {
     strncpy(dev->tap_name, *(params->tap_name), IFNAMSIZ);
 }
 
-static void _tap_isr(int fd) {
+static void _tap_isr(int fd, void *arg) {
     (void) fd;
+    (void) arg;
 
     netdev2_t *netdev = (netdev2_t *)&netdev2_tap;
 
@@ -393,7 +394,7 @@ static int _init(netdev2_t *netdev)
 
     /* configure signal handler for fds */
     native_async_read_setup();
-    native_async_read_add_handler(dev->tap_fd, _tap_isr);
+    native_async_read_add_handler(dev->tap_fd, NULL, _tap_isr);
 
 #ifdef MODULE_NETSTATS_L2
     memset(&netdev->stats, 0, sizeof(netstats_t));
