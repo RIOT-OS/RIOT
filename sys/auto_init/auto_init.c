@@ -229,6 +229,11 @@ void auto_init(void)
     gnrc_nordic_ble_6lowpan_init();
 #endif
 
+#ifdef MODULE_W5100
+    extern void auto_init_w5100(void);
+    auto_init_w5100();
+#endif
+
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
 #ifdef MODULE_GNRC_IPV6_NETIF
