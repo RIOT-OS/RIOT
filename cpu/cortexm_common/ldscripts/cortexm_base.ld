@@ -31,6 +31,9 @@ OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 SEARCH_DIR(.)
 
+/* This is only used by gdb to understand where to start */
+ENTRY(reset_handler_default)
+
 /* Section Definitions */
 SECTIONS
 {
