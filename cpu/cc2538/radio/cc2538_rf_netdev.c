@@ -260,7 +260,8 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
     cc2538_rf_t *dev = (cc2538_rf_t *) netdev;
     mutex_lock(&dev->mutex);
 
-    /* Flush TX FIFO */
+    /* Flush TX FIFO once no transmission in progress */
+    RFCORE_WAIT_UNTIL(RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE == 0);
     RFCORE_SFR_RFST = ISFLUSHTX;
 
     /* The first byte of the TX FIFO must be the packet length,
