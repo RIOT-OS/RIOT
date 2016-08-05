@@ -21,6 +21,7 @@ endif
 
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += gnrc_netif
+  USEMODULE += gnrc_netdev2
   USEMODULE += netdev_default
 endif
 

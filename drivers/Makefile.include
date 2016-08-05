@@ -70,3 +70,6 @@ endif
 ifneq (,$(filter lpd8808,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lpd8808/include
 endif
+ifneq (,$(filter w5100,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/w5100/include
+endif

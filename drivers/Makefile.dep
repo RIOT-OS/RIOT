@@ -136,6 +136,10 @@ ifneq (,$(filter srf08,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter w5100,$(USEMODULE)))
+  USEMODULE += netdev2_eth
+endif
+
 ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += xtimer
