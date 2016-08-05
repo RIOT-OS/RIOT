@@ -202,6 +202,15 @@ typedef enum {
     NETOPT_CCA_THRESHOLD,
 
     /**
+     * @brief CCA mode for the radio transceiver
+     *
+     * Get/set the CCA mode as uint8_t
+     * corresponding to the respective PHY standard.
+     * - IEEE 802.15.4: @ref netdev2_ieee802154_cca_mode_t
+     */
+    NETOPT_CCA_MODE,
+
+    /**
      * @brief get statistics about sent and received packets and data of the device or protocol
      *
      * Expects a pointer to a @ref netstats_t struct that will be pointed to
@@ -214,6 +223,22 @@ typedef enum {
      */
     NETOPT_ENCRYPTION,        /**< en/disable encryption */
     NETOPT_ENCRYPTION_KEY,    /**< set encryption key */
+
+    /**
+     * @brief Test mode for the radio, e.g. for CE or FCC certification
+     *
+     * Get/set the test mode as type @ref netopt_rf_testmode_t or as uint8_t
+     * if the radio supports other vendor specific test modes.
+     *
+     * @note Setting this option should always return -ENOTSUP,
+     * unless it was explicitly allowed at build time,
+     * therefore it should be secured with an additional macro in the device driver.
+     * For development and certification purposes only, this test modes can disturb
+     * normal radio communications and exceed the limits, established by
+     * the regulatory authority.
+     *
+     */
+    NETOPT_RF_TESTMODE,
 
     /* add more options if needed */
 
@@ -254,6 +279,16 @@ typedef enum {
                                  *   state of the network device is @ref NETOPT_STATE_IDLE */
     /* add other states if needed */
 } netopt_state_t;
+
+/**
+ * @brief   Option parameter to be used with @ref NETOPT_RF_TESTMODE
+ */
+typedef enum {
+    NETOPT_RF_TESTMODE_IDLE = 0,    /**< idle mode, radio off */
+    NETOPT_RF_TESTMODE_CRX,         /**< continuous rx mode */
+    NETOPT_RF_TESTMODE_CTX_CW,      /**< carrier wave continuous tx mode */
+    NETOPT_RF_TESTMODE_CTX_PRBS9,   /**< PRBS9 continuous tx mode */
+} netopt_rf_testmode_t;
 
 /**
  * @brief   Get a string ptr corresponding to opt, for debugging
