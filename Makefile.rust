@@ -25,4 +25,4 @@ all: xargo
 
 xargo:
 	@mkdir -p $(BINDIR)/_extra_libs
-	@PATH=$${PATH}:$(RIOTBASE)/dist/rust xargo build -v --target $(RUST_TARGET)
+	@PATH=$${PATH}:$(RIOTBASE)/dist/rust xargo build --target $(RUST_TARGET) ${CARGO_FLAGS}

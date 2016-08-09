@@ -17,4 +17,7 @@ BOARD ?= samr21-xpro
 # the current directory will be built using xargo.
 CARGO_BUILD=1
 
+# set extra flags if needed
+#CARGO_FLAGS += --release
+
 include $(RIOTBASE)/Makefile.include

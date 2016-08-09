@@ -264,7 +264,7 @@ ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
 	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
-	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(wildcard $(BINDIR)/_extra_libs/*.a) $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map $(LINKFLAGPREFIX)--cref $(LINKFLAGS)
+	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $$(test -d $(BINDIR)/_extra_libs && find $(BINDIR)/_extra_libs -name '*.a') $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map $(LINKFLAGPREFIX)--cref $(LINKFLAGS)
 endif
 	$(AD)$(SIZE) $(ELFFILE)
 	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
