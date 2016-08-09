@@ -1,0 +1,21 @@
+#!/bin/sh
+
+[ -z "$BINDIR" ] && {
+    echo "$0: BINDIR not defined!" 1&>2
+    exit 1
+}
+
+_EXTRA_LIBS=${BINDIR}/_extra_libs
+mkdir -p ${_EXTRA_LIBS}
+
+while true; do
+    [ -z "$1" ] && exit 0
+    [ -f "$1" ] && {
+        if [[ "$1" == *.o ]]; then
+            ${AR} r ${_EXTRA_LIBS}/_objects.a $1
+        elif [[ "$1" == *.rlib ]]; then
+            cp $1 ${_EXTRA_LIBS}/$(basename $1).a
+        fi
+    }
+    shift
+done

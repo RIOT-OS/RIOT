@@ -521,3 +521,7 @@ endif
 CFLAGS := $(patsubst -D%,,$(CFLAGS))
 CFLAGS := $(patsubst -U%,,$(CFLAGS))
 CFLAGS += -include '$(RIOTBUILD_CONFIG_HEADER_C)'
+
+ifeq (1,$(CARGO_BUILD))
+    include $(RIOTBASE)/Makefile.rust
+endif
