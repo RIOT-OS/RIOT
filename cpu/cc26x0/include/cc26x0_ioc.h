@@ -128,6 +128,104 @@ typedef struct {
 #define IOCFG_INPUT_ENABLE              0x20000000
 
 #define IOCFG_HYST_ENABLE               0x40000000
+
+//*****************************************************************************
+//
+// Defines for enabling/disabling an IO
+//
+//*****************************************************************************
+#define IOC_SLEW_ENABLE         0x00001000
+#define IOC_SLEW_DISABLE        0x00000000
+#define IOC_INPUT_ENABLE        0x20000000
+#define IOC_INPUT_DISABLE       0x00000000
+#define IOC_HYST_ENABLE         0x40000000
+#define IOC_HYST_DISABLE        0x00000000
+
+//*****************************************************************************
+//
+// Values that can be used to set the shutdown mode of an IO
+//
+//*****************************************************************************
+#define IOC_NO_WAKE_UP          0x00000000
+#define IOC_WAKE_ON_LOW         0x10000000
+#define IOC_WAKE_ON_HIGH        0x18000000
+
+//*****************************************************************************
+//
+// Values that can be used to set the IO Mode of an IO
+//
+//*****************************************************************************
+#define IOC_IOMODE_NORMAL       0x00000000  // Normal Input/Output
+#define IOC_IOMODE_INV          0x01000000  // Inverted Input/Output
+#define IOC_IOMODE_OPEN_DRAIN_NORMAL \
+0x04000000  // Open Drain, Normal Input/Output
+#define IOC_IOMODE_OPEN_DRAIN_INV \
+0x05000000  // Open Drain, Inverted
+// Input/Output
+#define IOC_IOMODE_OPEN_SRC_NORMAL \
+0x06000000  // Open Source, Normal Input/Output
+#define IOC_IOMODE_OPEN_SRC_INV \
+0x07000000  // Open Source, Inverted
+// Input/Output
+
+//*****************************************************************************
+//
+// Values that can be used to set the edge detection on an IO
+//
+//*****************************************************************************
+#define IOC_NO_EDGE             0x00000000  // No edge detection
+#define IOC_FALLING_EDGE        0x00010000  // Edge detection on falling edge
+#define IOC_RISING_EDGE         0x00020000  // Edge detection on rising edge
+#define IOC_BOTH_EDGES          0x00030000  // Edge detection on both edges
+#define IOC_INT_ENABLE          0x00040000  // Enable interrupt on edge detect
+#define IOC_INT_DISABLE         0x00000000  // Disable interrupt on edge detect
+#define IOC_INT_M               0x00070000  // Int config mask
+
+//*****************************************************************************
+//
+// Values that be used to set pull on an IO
+//
+//*****************************************************************************
+#define IOC_NO_IOPULL           0x00006000  // No IO pull
+#define IOC_IOPULL_UP           0x00004000  // Pull up
+#define IOC_IOPULL_DOWN         0x00002000  // Pull down
+#define IOC_IOPULL_M            0x00006000  // Pull config mask
+#define IOC_IOPULL_M            0x00006000
+
+//*****************************************************************************
+//
+// Values that can be used to select the drive strength of an IO
+//
+//*****************************************************************************
+#define IOC_CURRENT_2MA         0x00000000  // 2mA drive strength
+#define IOC_CURRENT_4MA         0x00000400  // 4mA drive strength
+#define IOC_CURRENT_8MA         0x00000800  // 4 or 8mA drive strength
+#define IOC_CURRENT_16MA        0x00000C00  // Up to 16mA drive strength
+
+#define IOC_STRENGTH_AUTO       0x00000000  // Automatic Drive Strength
+// (2/4/8 mA @ VVDS)
+#define IOC_STRENGTH_MAX        0x00000300  // Maximum Drive Strength
+// (2/4/8 mA @ 1.8V)
+#define IOC_STRENGTH_MED        0x00000200  // Medium Drive Strength
+// (2/4/8 mA @ 2.5V)
+#define IOC_STRENGTH_MIN        0x00000100  // Minimum Drive Strength
+// (2/4/8 mA @ 3.3V)
+//*****************************************************************************
+//
+// Defines for standard IO setup
+//
+//*****************************************************************************
+#define IOC_STD_INPUT           (IOC_CURRENT_2MA | IOC_STRENGTH_AUTO |      \
+IOC_NO_IOPULL | IOC_SLEW_DISABLE |         \
+IOC_HYST_DISABLE | IOC_NO_EDGE |           \
+IOC_INT_DISABLE | IOC_IOMODE_NORMAL |      \
+IOC_NO_WAKE_UP | IOC_INPUT_ENABLE )
+#define IOC_STD_OUTPUT          (IOC_CURRENT_2MA | IOC_STRENGTH_AUTO |      \
+IOC_NO_IOPULL | IOC_SLEW_DISABLE |         \
+IOC_HYST_DISABLE | IOC_NO_EDGE |           \
+IOC_INT_DISABLE | IOC_IOMODE_NORMAL |      \
+IOC_NO_WAKE_UP | IOC_INPUT_DISABLE )
+
 /** @} */
 
 
