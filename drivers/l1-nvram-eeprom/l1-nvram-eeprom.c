@@ -12,7 +12,6 @@
 #include "stm32l1xx.h"
 
 #include "nvram.h"
-#include "xtimer.h"
 #include "assert.h"
 
 #include "l1-nvram-eeprom.h"
