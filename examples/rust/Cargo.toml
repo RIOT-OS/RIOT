@@ -5,3 +5,7 @@ authors = ["Kaspar Schleiser <kaspar@schleiser.de>"]
 
 [dependencies]
 riot = "0.1.0"
+
+[profile.release]
+panic = "abort"
+lto = true
