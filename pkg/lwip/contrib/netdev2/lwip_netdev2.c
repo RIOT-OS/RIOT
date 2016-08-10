@@ -26,7 +26,9 @@
 #include "netif/etharp.h"
 #include "netif/lowpan6.h"
 
+#include "net/eui64.h"
 #include "net/ieee802154.h"
+#include "net/ipv6/addr.h"
 #include "net/netdev2.h"
 #include "net/netopt.h"
 #include "utlist.h"
@@ -121,12 +123,13 @@ err_t lwip_netdev2_init(struct netif *netif)
 #ifdef MODULE_LWIP_SIXLOWPAN
         case NETDEV2_TYPE_IEEE802154:
         {
-            u16_t pan_id;
-            if (netdev->driver->get(netdev, NETOPT_NID, &pan_id,
-                                    sizeof(pan_id)) < 0) {
+            u16_t val;
+            ipv6_addr_t *addr;
+            if (netdev->driver->get(netdev, NETOPT_NID, &val,
+                                    sizeof(val)) < 0) {
                 return ERR_IF;
             }
-            lowpan6_set_pan_id(pan_id);
+            lowpan6_set_pan_id(val);
             netif->hwaddr_len = (u8_t)netdev->driver->get(netdev, NETOPT_ADDRESS_LONG,
                                                           netif->hwaddr, sizeof(netif->hwaddr));
             if (netif->hwaddr_len > sizeof(netif->hwaddr)) {
@@ -137,7 +140,26 @@ err_t lwip_netdev2_init(struct netif *netif)
             if (res != ERR_OK) {
                 return res;
             }
-            netif_create_ip6_linklocal_address(netif, 0);   /* 0: hwaddr is assumed to be 64-bit */
+            /* assure usage of long address as source address */
+            val = netif->hwaddr_len;
+            if (netdev->driver->set(netdev, NETOPT_SRC_LEN, &val, sizeof(val)) < 0) {
+                return ERR_IF;
+            }
+            /* netif_create_ip6_linklocal_address() does weird byte-swapping
+             * with full IIDs, so let's do it ourselves */
+            addr = (ipv6_addr_t *)&(netif->ip6_addr[0]);
+            if (netdev->driver->get(netdev, NETOPT_IPV6_IID, &addr->u8[8], sizeof(eui64_t)) < 0) {
+                return ERR_IF;
+            }
+            ipv6_addr_set_link_local_prefix(addr);
+            /* Set address state. */
+#if LWIP_IPV6_DUP_DETECT_ATTEMPTS
+            /* Will perform duplicate address detection (DAD). */
+            netif->ip6_addr_state[0] = IP6_ADDR_TENTATIVE;
+#else
+            /* Consider address valid. */
+            netif->ip6_addr_state[0] = IP6_ADDR_PREFERRED;
+#endif /* LWIP_IPV6_AUTOCONFIG */
             break;
         }
 #endif
