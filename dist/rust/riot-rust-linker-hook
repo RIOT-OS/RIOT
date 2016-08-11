@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 [ -z "$BINDIR" ] && {
     echo "$0: BINDIR not defined!" 1&>2
