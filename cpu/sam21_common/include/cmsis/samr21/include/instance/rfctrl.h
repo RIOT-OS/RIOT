@@ -55,6 +55,6 @@
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for RFCTRL peripheral ========== */
-#define RFCTRL_FBUSMSB              5       
+#define RFCTRL_FBUSMSB              5
 
 #endif /* _SAMR21_RFCTRL_INSTANCE_ */
