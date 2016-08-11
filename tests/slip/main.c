@@ -36,7 +36,7 @@ int main(void)
     puts("SLIP test");
 
     /* register pktdump */
-    if (dump.pid <= KERNEL_PID_UNDEF) {
+    if (dump.target.pid <= KERNEL_PID_UNDEF) {
         puts("Error starting pktdump thread");
         return -1;
     }

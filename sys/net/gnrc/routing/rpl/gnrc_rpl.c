@@ -68,7 +68,7 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
         }
 
         _me_reg.demux_ctx = ICMPV6_RPL_CTRL;
-        _me_reg.pid = gnrc_rpl_pid;
+        _me_reg.target.pid = gnrc_rpl_pid;
         /* register interest in all ICMPv6 packets */
         gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &_me_reg);
 
