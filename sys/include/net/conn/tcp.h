@@ -162,6 +162,7 @@ int conn_tcp_accept(conn_tcp_t *conn, conn_tcp_t *out_conn);
  *
  * @return  The number of bytes received on success.
  * @return  0, if no received data is available, but everything is in order.
+ * @return  -EADDRNOTAVAIL, if local of @p conn is not given.
  * @return  -ECONNREFUSED, if remote end point of @p conn refused to allow the
  *          connection.
  * @return  -ENOTCONN, when @p conn is not connected to a remote end point.
@@ -183,7 +184,7 @@ int conn_tcp_recv(conn_tcp_t *conn, void *data, size_t max_len,
  *
  * @return  The number of bytes send on success.
  * @return  -ECONNRESET, if connection was reset by remote end point.
- * @return  -ENOBUFS, if no memory was available to send @p data.
+ * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ENOTCONN, if @p conn is not connected to a remote end point.
  */
 int conn_tcp_send(conn_tcp_t *conn, const void *data, size_t len);

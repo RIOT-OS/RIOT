@@ -87,7 +87,7 @@ typedef struct conn_udp conn_udp_t;
  *          `
  */
 int conn_udp_create(conn_udp_t *conn, const conn_ep_udp_t *local,
-                    conn_ep_udp_t *remote);
+                    const conn_ep_udp_t *remote);
 
 /**
  * @brief   Closes a UDP connectivity
@@ -140,6 +140,7 @@ int conn_udp_get_remote(conn_udp_t *conn, conn_ep_udp_t *ep);
  *                      @ref sys_xtimer module is not present and the stack does
  *                      not support timeouts on its own.
  *                      May be 0 for no timeout.
+ *                      Must be 0 if @ref sys_xtimer module is not present.
  * @param[out] remote   Remote end point of the received data.
  *                      May be `NULL`, if it is not required by the application.
  *
@@ -147,9 +148,11 @@ int conn_udp_get_remote(conn_udp_t *conn, conn_ep_udp_t *ep);
  *
  * @return  The number of bytes received on success.
  * @return  0, if no received data is available, but everything is in order.
- * @return  -EAFNOSUPPORT, if `remote != NULL` and conn_ep_udp_t::family of
- *          @p remote is != 0 and not supported.
- * @return  -EPROTO, if @p remote did not equal the remote of @p conn.
+ * @return  -EADDRNOTAVAIL, if local of @p conn is not given.
+ * @return  -ENOBUFS, if buffer space is not large enough to store received
+ *          data.
+ * @return  -EPROTO, if source address of received packet did not equal
+ *          the remote of @p conn.
  * @return  -ETIMEDOUT, if @p timeout expired.
  */
 int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len,
@@ -178,6 +181,9 @@ int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len,
  *
  * @return  The number of bytes received on success.
  * @return  0, if no received data is available, but everything is in order.
+ * @return  -EADDRNOTAVAIL, if local of @p conn is not given.
+ * @return  -ENOBUFS, if buffer space is not large enough to store received
+ *          data.
  * @return  -EPROTO, if source address of received packet did not equal
  *          the remote of @p conn.
  * @return  -ETIMEDOUT, if @p timeout expired.
@@ -203,6 +209,7 @@ static inline int conn_udp_recv(conn_udp_t *conn, void *data, size_t max_len,
  *                      May be `NULL`, if @p conn has a remote end point.
  *                      conn_ep_udp_t::family may be AF_UNSPEC, if local
  *                      end point of @p conn provides this information.
+ *                      conn_ep_udp_t::port may not be 0.
  *
  * @note    Function blocks until packet is handed to the stack.
  *
@@ -213,11 +220,12 @@ static inline int conn_udp_recv(conn_udp_t *conn, void *data, size_t max_len,
  *          interface or contradicts the given local interface (i.e.
  *          neither the local endpoint of `conn` nor remote are assigned to
  *          `CONN_EP_ANY_NETIF` but are nevertheless different.
- * @return  -ENOBUFS, if no memory was available to send @p data.
+ * @return  -EINVAL, if conn_ep_udp_t::port of @p remote is 0.
+ * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ENOTCONN, if `remote == NULL`, but @p conn has no remote end point.
  */
 int conn_udp_sendto(conn_udp_t *conn, const void *data, size_t len,
-                    conn_ep_udp_t *remote);
+                    const conn_ep_udp_t *remote);
 
 /**
  * @brief   Sends a UDP message
@@ -234,7 +242,7 @@ int conn_udp_sendto(conn_udp_t *conn, const void *data, size_t len,
  * @note    Function blocks until packet is handed to the stack.
  *
  * @return  The number of bytes sent on success.
- * @return  -ENOBUFS, if no memory was available to send @p data.
+ * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ENOTCONN, if @p conn has no remote end point.
  */
 static inline int conn_udp_send(conn_udp_t *conn, const void *data, size_t len)

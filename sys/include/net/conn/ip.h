@@ -145,9 +145,11 @@ int conn_ip_get_remote(conn_ip_t *conn, conn_ep_ip_t *ep);
  *
  * @return  The number of bytes received on success.
  * @return  0, if no received data is available, but everything is in order.
- * @return  -EAFNOSUPPORT, if `remote != NULL` and conn_ep_ip_t::family of
- *          @p remote is != 0 and not supported.
- * @return  -EPROTO, if @p remote did not equal the remote of @p conn.
+ * @return  -EADDRNOTAVAIL, if local of @p conn is not given.
+ * @return  -ENOBUFS, if buffer space is not large enough to store received
+ *          data.
+ * @return  -EPROTO, if source address of received packet did not equal
+ *          the remote of @p conn.
  * @return  -ETIMEDOUT, if @p timeout expired.
  */
 int conn_ip_recvfrom(conn_ip_t *conn, void *data, size_t max_len,
@@ -174,6 +176,9 @@ int conn_ip_recvfrom(conn_ip_t *conn, void *data, size_t max_len,
  *
  * @return  The number of bytes received on success.
  * @return  0, if no received data is available, but everything is in order.
+ * @return  -EADDRNOTAVAIL, if local of @p conn is not given.
+ * @return  -ENOBUFS, if buffer space is not large enough to store received
+ *          data.
  * @return  -EPROTO, if source address of received packet did not equal
  *          the remote of @p conn.
  * @return  -ETIMEDOUT, if @p timeout expired.
@@ -197,15 +202,19 @@ static inline int conn_ip_recv(conn_ip_t *conn, void *data, size_t max_len,
  * @param[in] len       Maximum space available at @p data.
  * @param[in] remote    Remote end point for the send data.
  *                      May be `NULL`, if @p conn has a remote end point.
+ *                      conn_ep_ip_t::family may be AF_UNSPEC, if local
+ *                      end point of @p conn provides this information.
  *
  * @note    Function blocks until packet is handed to the stack.
  *
  * @return  The number of bytes send on success.
- * @return  -ENOBUFS, if no memory was available to send @p data.
+ * @return  -EAFNOSUPPORT, if `remote != NULL` and conn_ep_ip_t::family of
+ *          @p remote is != AF_UNSPEC and not supported.
+ * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ENOTCONN, if `remote == NULL`, but @p conn has no remote end point.
  */
 int conn_ip_sendto(conn_ip_t *conn, const void *data, size_t len,
-                   conn_ep_ip_t *remote);
+                   const conn_ep_ip_t *remote);
 
 
 /**
@@ -219,21 +228,15 @@ int conn_ip_sendto(conn_ip_t *conn, const void *data, size_t len,
  * @param[in] data      Pointer where the received data should be stored.
  *                      May be `NULL` if `len == 0`.
  * @param[in] len       Maximum space available at @p data.
- * @param[in] remote       Remote end point for the send data.
- *                      May be `NULL`, if @p conn has a remote end point.
- *                      conn_ep_ip_t::family may be AF_UNSPEC, if local
- *                      end point of @p conn provides this information.
  *
  * @note    Function blocks until packet is handed to the stack.
  *
  * @return  The number of bytes send on success.
- * @return  -EAFNOSUPPORT, if `remote != NULL` and conn_ep_ip_t::family of
- *          @p remote is != AF_UNSPEC and not supported.
  * @return  -EINVAL, if conn_ep_ip_t::netif of @p remote is not a valid
  *          interface or contradicts the given local interface (i.e.
  *          neither the local endpoint of `conn` nor remote are assigned to
  *          `CONN_EP_ANY_NETIF` but are nevertheless different.
- * @return  -ENOBUFS, if no memory was available to send @p data.
+ * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ENOTCONN, if @p conn has no remote end point.
  */
 static inline int conn_ip_send(conn_ip_t *conn, const void *data, size_t len)
