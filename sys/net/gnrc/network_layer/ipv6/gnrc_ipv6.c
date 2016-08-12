@@ -168,7 +168,6 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *current, gnrc_pktsnip_t
         case PROTNUM_ICMPV6:
             DEBUG("ipv6: handle ICMPv6 packet (nh = %u)\n", nh);
             gnrc_icmpv6_demux(iface, pkt);
-            gnrc_pktbuf_release(pkt);
             return;
 #endif
 #ifdef MODULE_GNRC_IPV6_EXT
