@@ -17,8 +17,8 @@
  * @}
  */
 
- #include "cpu.h"
- #include "periph_conf.h"
+#include "cpu.h"
+#include "periph_conf.h"
 
 #ifndef HF_CLOCK_SOURCE
 #define HF_CLOCK_SOURCE DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL_XOSC /* set 48MHz XOSC */
