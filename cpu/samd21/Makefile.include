@@ -1,7 +1,5 @@
 export CPU_ARCH = cortex-m0plus
 export CPU_FAM  = samd21
 
-INCLUDES += -I$(RIOTCPU)/sam21_common/include/cmsis/samr21/include
-
 include $(RIOTCPU)/sam21_common/Makefile.include
 include $(RIOTCPU)/Makefile.include.cortexm_common

@@ -20,7 +20,7 @@
 
 #include "cpu_conf_common.h"
 
-#include "samr21g18a.h"
+#include "sam0.h"
 
 #ifdef __cplusplus
 extern "C" {

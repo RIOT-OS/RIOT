@@ -1,6 +1,5 @@
-# export the CPU family so we can differentiate between them in the code
-FAM = $(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
-export CFLAGS += -DCPU_FAM_$(FAM)
+# Define the CPU family so we can differentiate between them in the code
+CFLAGS += -DCPU_FAM_$(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
 
 # this CPU implementation doesn't use CMSIS initialization
 export CFLAGS += -DDONT_USE_CMSIS_INIT
