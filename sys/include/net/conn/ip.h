@@ -20,6 +20,7 @@
 #ifndef NET_CONN_IP_H_
 #define NET_CONN_IP_H_
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -220,7 +221,7 @@ int conn_ip_sendto(conn_ip_t *conn, const void *data, size_t len,
 /**
  * @brief   Sends a message over IPv4/IPv6 to remote end point
  *
- * @pre `(if (len != 0): (data != NULL))`
+ * @pre `(conn != NULL) && (if (len != 0): (data != NULL))`
  *
  * @param[in] conn      A raw IPv4/IPv6 connectivity object. May be NULL.
  *                      A sensible local end point should be selected by the
@@ -241,6 +242,7 @@ int conn_ip_sendto(conn_ip_t *conn, const void *data, size_t len,
  */
 static inline int conn_ip_send(conn_ip_t *conn, const void *data, size_t len)
 {
+    assert(conn != NULL);
     return conn_ip_sendto(conn, data, len, NULL);
 }
 

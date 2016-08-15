@@ -20,6 +20,7 @@
 #ifndef NET_CONN_UDP_H_
 #define NET_CONN_UDP_H_
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -230,7 +231,7 @@ int conn_udp_sendto(conn_udp_t *conn, const void *data, size_t len,
 /**
  * @brief   Sends a UDP message
  *
- * @pre `(if (len != 0): (data != NULL))`
+ * @pre `(conn != NULL) && (if (len != 0): (data != NULL))`
  *
  * @param[in] conn      A raw IPv4/IPv6 connectivity object. May be `NULL`.
  *                      A sensible local end point should be selected by the
@@ -247,6 +248,7 @@ int conn_udp_sendto(conn_udp_t *conn, const void *data, size_t len,
  */
 static inline int conn_udp_send(conn_udp_t *conn, const void *data, size_t len)
 {
+    assert(conn != NULL);
     return conn_udp_sendto(conn, data, len, NULL);
 }
 
