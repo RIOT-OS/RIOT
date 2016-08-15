@@ -32,6 +32,16 @@
 #if SPI_0_EN  || SPI_1_EN
 
 /**
+ * @brief Internal helper function to do the actual work for spi_poweroff
+ */
+static void _spi_poweroff(SercomSpi* spi_dev);
+
+/**
+ * @brief Internal helper function to do the actual work for spi_poweron
+ */
+static void _spi_poweron(SercomSpi* spi_dev);
+
+/**
  * @brief Array holding one pre-initialized mutex for each SPI device
  */
 static mutex_t locks[] =  {
@@ -177,8 +187,10 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     default:
         return -1;
     }
-    spi_dev->CTRLA.bit.ENABLE = 0;  /* Disable spi to write confs */
-    while (spi_dev->SYNCBUSY.reg) {}
+
+    /* Disable spi to write confs */
+    _spi_poweroff(spi_dev);
+
     spi_dev->CTRLA.reg |= SERCOM_SPI_CTRLA_MODE_SPI_MASTER;
     while (spi_dev->SYNCBUSY.reg) {}
 
@@ -193,7 +205,9 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     while (spi_dev->SYNCBUSY.reg) {}
     spi_dev->CTRLB.reg = (SERCOM_SPI_CTRLB_CHSIZE(0) | SERCOM_SPI_CTRLB_RXEN);
     while(spi_dev->SYNCBUSY.reg) {}
-    spi_poweron(dev);
+
+    /* enable */
+    _spi_poweron(spi_dev);
     return 0;
 }
 
@@ -258,37 +272,51 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     return 1;
 }
 
+static void _spi_poweron(SercomSpi* spi_dev)
+{
+    if (spi_dev == NULL) {
+        return;
+    }
+    spi_dev->CTRLA.reg |= SERCOM_SPI_CTRLA_ENABLE;
+    while (spi_dev->SYNCBUSY.bit.ENABLE) {}
+}
+
 void spi_poweron(spi_t dev)
 {
     switch(dev) {
-#ifdef SPI_0_EN
+#if SPI_0_EN
     case SPI_0:
-        SPI_0_DEV.CTRLA.reg |= SERCOM_SPI_CTRLA_ENABLE;
-        while(SPI_0_DEV.SYNCBUSY.bit.ENABLE) {}
+        _spi_poweron(&SPI_0_DEV);
         break;
 #endif
-#ifdef SPI_1_EN
+#if SPI_1_EN
     case SPI_1:
-        SPI_1_DEV.CTRLA.reg |= SERCOM_SPI_CTRLA_ENABLE;
-        while(SPI_1_DEV.SYNCBUSY.bit.ENABLE) {}
+        _spi_poweron(&SPI_1_DEV);
         break;
 #endif
     }
 }
 
+static void _spi_poweroff(SercomSpi* spi_dev)
+{
+    if (spi_dev == NULL) {
+        return;
+    }
+    spi_dev->CTRLA.bit.ENABLE = 0; /* Disable spi */
+    while (spi_dev->SYNCBUSY.bit.ENABLE) {}
+}
+
 void spi_poweroff(spi_t dev)
 {
     switch(dev) {
-#ifdef SPI_0_EN
+#if SPI_0_EN
     case SPI_0:
-        SPI_0_DEV.CTRLA.bit.ENABLE = 0; /* Disable spi */
-        while(SPI_0_DEV.SYNCBUSY.bit.ENABLE) {}
+        _spi_poweroff(&SPI_0_DEV);
         break;
 #endif
-#ifdef SPI_1_EN
+#if SPI_1_EN
     case SPI_1:
-        SPI_1_DEV.CTRLA.bit.ENABLE = 0; /* Disable spi */
-        while(SPI_1_DEV.SYNCBUSY.bit.ENABLE) {}
+        _spi_poweroff(&SPI_1_DEV);
         break;
 #endif
     }
