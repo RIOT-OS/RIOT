@@ -156,24 +156,6 @@ void routingtable_break_and_get_all_hopping_over(struct netaddr *hop,
 bool routingtable_offers_improvement(struct aodvv2_routing_entry_t *rt_entry,
                                      struct node_data *node_data);
 
-/**
- * Fills a routing table entry with the data of a RREQ.
- * @param packet_data         the RREQ's data
- * @param rt_entry            the routing table entry to fill
- * @param link_cost           the link cost for this RREQ
- */
-void routingtable_fill_routing_entry_t_rreq(struct aodvv2_packet_data *packet_data,
-                                            struct aodvv2_routing_entry_t *rt_entry);
-
-/**
- * Fills a routing table entry with the data of a RREP.
- * @param packet_data         the RREP's data
- * @param rt_entry            the routing table entry to fill
- * @param link_cost           the link cost for this RREP
- */
-void routingtable_fill_routing_entry_t_rrep(struct aodvv2_packet_data *packet_data,
-                                            struct aodvv2_routing_entry_t *rt_entry);
-
 void print_routingtable(void);
 void print_routingtable_entry(struct aodvv2_routing_entry_t *rt_entry);
 
