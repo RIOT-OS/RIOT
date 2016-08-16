@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 
+#include "cc2538_gptimer.h"
 #include "cc2538_ssi.h"
 #include "cc2538_gpio.h"
 
@@ -72,6 +73,15 @@ typedef struct {
     gpio_t sck_pin;         /**< pin used for SCK */
     gpio_t cs_pin;          /**< pin used for CS */
 } periph_spi_conf_t;
+
+/**
+ * @brief   Timer configuration data
+ */
+typedef struct {
+    cc2538_gptimer_t *dev;  /**< timer device */
+    uint_fast8_t channels;  /**< number of channels */
+    uint_fast8_t cfg;       /**< timer config word */
+} timer_conf_t;
 
 #ifdef __cplusplus
 }
