@@ -81,5 +81,5 @@ CCN-Lite upstream configuration - a different Ethertype (`0x0801` instead of
 
 The simplest way to get this working is to copy the `ndn.lua` file into your
 local Wireshark plugin directory (e.g. `$HOME/.wireshark/plugins`) and update
-https://github.com/named-data/ndn-tools/blob/master/tools/dissect-wireshark/ndn.lua#L408
+https://github.com/named-data/ndn-tools/blob/master/tools/dissect-wireshark/ndn.lua#L424
 to `0x0801).
