@@ -386,7 +386,6 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
     int res, pin, irq_num;
-    uint32_t mask;
     cc2538_gpio_t* instance;
 
     /* Note: gpio_init() also checks if the gpio is enabled. */
@@ -400,34 +399,34 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
     gpio_config[dev].arg = arg;
 
     pin = pin_lut[dev];
-    mask = GPIO_PIN_MASK(GPIO_BIT_NUM(pin));
+    int bit_num = GPIO_BIT_NUM(pin);
 
     instance = GPIO_NUM_TO_DEV(pin);
 
     /* Enable power-up interrupts for this GPIO port: */
-    SYS_CTRL_IWE |= BIT(GPIO_NUM_TO_PORT_NUM(pin));
+    BITBAND_VAR32(SYS_CTRL_IWE, GPIO_NUM_TO_PORT_NUM(pin)) = 1;
 
     switch(flank) {
         case GPIO_FALLING:
-            instance->IBE         &= ~mask;     /**< Not both edges */
-            instance->IEV         &= ~mask;     /**< Falling edge */
-            instance->P_EDGE_CTRL |=  BIT(pin); /**< Falling edge power-up interrupt */
+            BITBAND_VAR32(instance->IBE, bit_num) = 0;     /**< Not both edges */
+            BITBAND_VAR32(instance->IEV, bit_num) = 0;     /**< Falling edge */
+            BITBAND_VAR32(instance->P_EDGE_CTRL, pin) = 1; /**< Falling edge power-up interrupt */
             break;
 
         case GPIO_RISING:
-            instance->IBE         &= ~mask;     /**< Not both edges */
-            instance->IEV         |=  mask;     /**< Rising edge */
-            instance->P_EDGE_CTRL &= ~BIT(pin); /**< Rising edge power-up interrupt */
+            BITBAND_VAR32(instance->IBE, bit_num) = 0;     /**< Not both edges */
+            BITBAND_VAR32(instance->IEV, bit_num) = 1;     /**< Rising edge */
+            BITBAND_VAR32(instance->P_EDGE_CTRL, pin) = 0; /**< Rising edge power-up interrupt */
             break;
 
         case GPIO_BOTH:
-            instance->IBE = mask;               /**< Both edges */
+            BITBAND_VAR32(instance->IBE, bit_num) = 1;     /**< Both edges */
             break;
     }
 
-    instance->IS     &= ~mask;                  /**< Edge triggered (as opposed to level-triggered) */
-    instance->IC     |=  mask;                  /**< Clear any preexisting interrupt state */
-    instance->PI_IEN |= BIT(pin);               /**< Enable power-up interrupts for this pin */
+    BITBAND_VAR32(instance->IS, bit_num) = 0; /**< Edge triggered (as opposed to level-triggered) */
+    BITBAND_VAR32(instance->IC, bit_num) = 1; /**< Clear any preexisting interrupt state */
+    BITBAND_VAR32(instance->PI_IEN, pin) = 1; /**< Enable power-up interrupts for this pin */
 
     /* Set interrupt priority for the whole GPIO port: */
     irq_num = GPIO_PORT_A_IRQn + GPIO_NUM_TO_PORT_NUM(pin);
@@ -437,7 +436,7 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
     NVIC_EnableIRQ(irq_num);
 
     /* Enable interrupts for the specific pin: */
-    instance->IE |= mask;
+    BITBAND_VAR32(instance->IE, bit_num) = 1;
 
     return 0;
 }
@@ -446,7 +445,7 @@ void gpio_irq_enable(gpio_t dev)
 {
     if (gpio_enabled(dev)) {
         int pin = pin_lut[dev];
-        GPIO_NUM_TO_DEV(pin)->IE |= GPIO_PIN_MASK(GPIO_BIT_NUM(pin));
+        BITBAND_VAR32(GPIO_NUM_TO_DEV(pin)->IE, GPIO_BIT_NUM(pin)) = 1;
     }
 }
 
@@ -454,7 +453,7 @@ void gpio_irq_disable(gpio_t dev)
 {
     if (gpio_enabled(dev)) {
         int pin = pin_lut[dev];
-        GPIO_NUM_TO_DEV(pin)->IE &= ~GPIO_PIN_MASK(GPIO_BIT_NUM(pin));
+        BITBAND_VAR32(GPIO_NUM_TO_DEV(pin)->IE, GPIO_BIT_NUM(pin)) = 0;
     }
 }
 
@@ -467,7 +466,7 @@ int gpio_read(gpio_t dev)
     }
 
     pin = pin_lut[dev];
-    return (GPIO_NUM_TO_DEV(pin)->DATA >> GPIO_BIT_NUM(pin)) & 1;
+    return BITBAND_VAR32(GPIO_NUM_TO_DEV(pin)->DATA, GPIO_BIT_NUM(pin));
 }
 
 void gpio_set(gpio_t dev)
@@ -479,7 +478,7 @@ void gpio_set(gpio_t dev)
     }
 
     pin = pin_lut[dev];
-    GPIO_NUM_TO_DEV(pin)->DATA |= GPIO_PIN_MASK(GPIO_BIT_NUM(pin));
+    BITBAND_VAR32(GPIO_NUM_TO_DEV(pin)->DATA, GPIO_BIT_NUM(pin)) = 1;
 }
 
 void gpio_clear(gpio_t dev)
@@ -491,7 +490,7 @@ void gpio_clear(gpio_t dev)
     }
 
     pin = pin_lut[dev];
-    GPIO_NUM_TO_DEV(pin)->DATA &= ~GPIO_PIN_MASK(GPIO_BIT_NUM(pin));
+    BITBAND_VAR32(GPIO_NUM_TO_DEV(pin)->DATA, GPIO_BIT_NUM(pin)) = 0;
 }
 
 void gpio_toggle(gpio_t dev)
