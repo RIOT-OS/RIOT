@@ -31,7 +31,6 @@ QUIET ?= 1
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += config
 # include and auto-initialize all available sensors
 USEMODULE += saul_reg
 USEMODULE += saul_default
