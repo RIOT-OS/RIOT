@@ -31,6 +31,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <sys/types.h>
 
 #include "net/sock/addr.h"
 
@@ -59,7 +60,7 @@ typedef struct {
 /**
  * @brief   Implementation-specific type of a raw IPv4/IPv6 sock object
  *
- * `struct sock_ip` needs to be defined by stack-specific a implementation.
+ * `struct sock_ip` needs to be defined by stack-specific `sock_types.h`.
  */
 typedef struct sock_ip sock_ip_t;
 
@@ -172,8 +173,8 @@ int sock_ip_get_remote(sock_ip_t *sock, sock_ip_ep_t *ep);
  *          the remote of @p sock.
  * @return  -ETIMEDOUT, if @p timeout expired.
  */
-int sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
-                 uint32_t timeout, sock_ip_ep_t *remote);
+ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
+                     uint32_t timeout, sock_ip_ep_t *remote);
 
 /**
  * @brief   Sends a message over IPv4/IPv6 to remote end point
@@ -199,20 +200,10 @@ int sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
  * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ENOTCONN, if `remote == NULL`, but @p sock has no remote end point.
  */
-int sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
-                 const sock_ip_ep_t *remote);
+ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
+                     const sock_ip_ep_t *remote);
 
-#ifdef MODULE_EMB6_SOCK_IP
-#include "emb6/sock.h"
-#endif
-
-#ifdef MODULE_GNRC_SOCK_IP
-#include "net/gnrc/sock.h"
-#endif
-
-#ifdef MODULE_LWIP_SOCK_IP
-#include "lwip/sock.h"
-#endif
+#include "sock_types.h"
 
 #ifdef __cplusplus
 }

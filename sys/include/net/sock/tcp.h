@@ -30,6 +30,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <sys/types.h>
 
 #include "net/sock/addr.h"
 
@@ -59,14 +60,15 @@ typedef struct {
 /**
  * @brief   Implementation-specific type of a TCP sock object
  *
- * `struct sock_tcp` needs to be defined by stack-specific implementation.
+ * `struct sock_tcp` needs to be defined by stack-specific `sock_types.h`.
  */
 typedef struct sock_tcp sock_tcp_t;
 
 /**
  * @brief   Implementation-specific type of a TCP listening queue
  *
- * `struct sock_tcp_queue` needs to be defined by stack-specific implementation.
+ * `struct sock_tcp_queue` needs to be defined by stack-specific
+ * `sock_types.h`.
  */
 typedef struct sock_tcp_queue sock_tcp_queue_t;
 
@@ -213,8 +215,8 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock);
  * @return  -ENOTCONN, when @p sock is not connected to a remote end point.
  * @return  -ETIMEDOUT, if @p timeout expired.
  */
-int sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
-                  uint32_t timeout);
+ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
+                      uint32_t timeout);
 
 /**
  * @brief   Writes data to an established TCP stream
@@ -232,19 +234,9 @@ int sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
  * @return  -ENOMEM, if no memory was available to written @p data.
  * @return  -ENOTCONN, if @p sock is not connected to a remote end point.
  */
-int sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len);
+ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len);
 
-#ifdef MODULE_EMP6_SOCK_TCP
-#include "emb6/sock.h"
-#endif
-
-#ifdef MODULE_GNRC_SOCK_TCP
-#include "net/gnrc/sock.h"
-#endif
-
-#ifdef MODULE_LWIP_SOCK_TCP
-#include "lwip/sock.h"
-#endif
+#include "sock_types.h"
 
 #ifdef __cplusplus
 }

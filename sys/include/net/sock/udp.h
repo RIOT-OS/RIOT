@@ -31,6 +31,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <sys/types.h>
 
 #include "net/sock/addr.h"
 
@@ -60,7 +61,7 @@ typedef struct {
 /**
  * @brief   Implementation-specific type of a UDP sock object
  *
- * `struct sock_udp` needs to be defined by stack-specific implementation.
+ * `struct sock_udp` needs to be defined by stack-specific `sock_types.h`.
  */
 typedef struct sock_udp sock_udp_t;
 
@@ -172,8 +173,8 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep);
  *          the remote of @p sock.
  * @return  -ETIMEDOUT, if @p timeout expired.
  */
-int sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
-                  uint32_t timeout, sock_udp_ep_t *remote);
+ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
+                      uint32_t timeout, sock_udp_ep_t *remote);
 
 /**
  * @brief   Sends a UDP message to remote end point
@@ -205,20 +206,10 @@ int sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
  * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ENOTCONN, if `remote == NULL`, but @p sock has no remote end point.
  */
-int sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
-                  const sock_udp_ep_t *remote);
+ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
+                      const sock_udp_ep_t *remote);
 
-#ifdef MODULE_EMB6_SOCK_UDP
-#include "emb6/sock.h"
-#endif
-
-#ifdef MODULE_GNRC_SOCK_UDP
-#include "net/gnrc/sock.h"
-#endif
-
-#ifdef MODULE_LWIP_SOCK_UDP
-#include "lwip/sock.h"
-#endif
+#include "sock_types.h"
 
 #ifdef __cplusplus
 }
