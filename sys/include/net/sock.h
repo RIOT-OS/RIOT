@@ -13,7 +13,7 @@
  * @defgroup    net_sock    Sock API
  * @ingroup     net
  * @brief       Provides a minimal common API for applications to connect to the
- *              different network stacks.
+ *              different network stacks
  *
  * About
  * =====
@@ -92,7 +92,7 @@ extern "C" {
 
 #if defined(DOXYGEN)
 /**
- * @brief compile flag to activate IPv6 support for sock.
+ * @brief compile flag to activate IPv6 support for sock
  */
 #define SOCK_HAS_IPV6
 #endif
@@ -129,7 +129,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Abstract IP end point and end point for a raw IP sock object.
+ * @brief   Abstract IP end point and end point for a raw IP sock object
  */
 typedef struct {
     /**
