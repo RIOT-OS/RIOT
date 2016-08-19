@@ -32,32 +32,13 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
-#include "net/sock/addr.h"
+#include "net/sock.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * @brief   An end point for a TCP sock object
- */
-typedef struct {
-    uint16_t family;        /**< family of sock_ip_ep_t::addr as defined in @ref net_af */
-
-    /**
-     * @brief   stack-specific network interface ID
-     *
-     * @todo    port to common network interface identifiers in PR #5511.
-     *
-     * Use @ref SOCK_ADDR_ANY_NETIF for any interface.
-     * For reception this is the local interface the message came over,
-     * for transmission, this is the local interface the message should be send
-     * over
-     */
-    uint16_t netif;
-    sock_addr_ip_t addr;    /**< IP address */
-    uint16_t port;          /**< port for the TCP end point */
-} sock_tcp_ep_t;
+typedef struct _sock_tl_ep sock_tcp_ep_t;   /**< An end point for a TCP sock object */
 
 /**
  * @brief   Implementation-specific type of a TCP sock object
@@ -103,7 +84,7 @@ typedef struct sock_tcp_queue sock_tcp_queue_t;
  * @return  -ETIMEDOUT, if the connection attempt to @p remote timed out.
  */
 int sock_tcp_connect(sock_tcp_t *sock, const sock_tcp_ep_t *remote,
-                     uint16_t local_port, uint32_t flags);
+                     uint16_t local_port, uint16_t flags);
 
 /**
  * @brief   Listen for an incoming connection request on @p local end point
@@ -128,7 +109,7 @@ int sock_tcp_connect(sock_tcp_t *sock, const sock_tcp_ep_t *remote,
  */
 int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
                     sock_tcp_t[] queue_array, unsigned queue_len,
-                    uint32_t flags);
+                    uint16_t flags);
 
 /**
  * @brief   Disconnects a TCP connection

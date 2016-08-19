@@ -18,6 +18,7 @@
  * About
  * =====
  *
+ * ~~~~~~~~~~~~~~~~~~~~
  *    +---------------+
  *    |  Application  |
  *    +---------------+
@@ -31,6 +32,7 @@
  *    +---------------+
  *    | Network Stack |
  *    +---------------+
+ * ~~~~~~~~~~~~~~~~~~~~
  *
  * This module provides a minimal set of functions to establish connections or
  * send and receives datagrams using different types of communication. Together,
@@ -65,27 +67,24 @@
  * the network stack underneath to be switched simply by changing the
  * `USEMODULE` definitions in the application's Makefile.
  *
- * @{
- *
- * @file
- * @brief   Sock API definitions
- *
  * @author  Alexander Aring <aar@pengutronix.de>
  * @author  Simon Brummer <simon.brummer@haw-hamburg.de>
  * @author  Cenk Gündoğan <mail@cgundogan.de>
  * @author  Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * @{
+ *
+ * @file
+ * @brief   Common sock API definitions
+ *
+ * @author  Martine Lenders <m.lenders@fu-berlin.de>
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #ifndef NET_SOCK_H_
 #define NET_SOCK_H_
-
-#include <stdbool.h>
-
-#include "net/sock/ip.h"
-#include "net/sock/tcp.h"
-#include "net/sock/udp.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -99,12 +98,79 @@ extern "C" {
 #endif
 
 /**
- * @brief   Common flags for @ref net_conn
+ * @brief       Common flags for @ref net_conn
+ * @name        net_sock_flags
  * @{
  */
-#define SOCK_FLAGS_REUSE_EP     (0x00000001)    /**< allow to reuse end point on bind */
+#define SOCK_FLAGS_REUSE_EP     (0x0001)    /**< allow to reuse end point on bind */
 /** @} */
 
+
+/**
+ * @brief   Special netif ID for "any interface"
+ * @todo    Use an equivalent defintion from PR #5511
+ */
+#define SOCK_ADDR_ANY_NETIF (0)
+
+/**
+ * @brief   Address to bind to any IPv4 address
+ */
+#define SOCK_IPV4_EP_ANY(netif) { .family = AF_INET, \
+                                  .addr = { .ipv4 = 0U }, \
+                                  .netif = (netif) }
+
+#if defined(SOCK_HAS_IPV6) || defined(DOXYGEN)
+/**
+ * @brief   Address to bind to any IPv6 address
+ */
+#define SOCK_IPV6_EP_ANY(netif) { .family = AF_INET6, \
+                                  .addr = { .ipv6 = { 0 } }, \
+                                  .netif = (netif) }
+#endif
+
+/**
+ * @brief   Abstract IP end point and end point for a raw IP sock object.
+ */
+typedef struct {
+    /**
+     * @brief family of sock_ip_ep_t::addr
+     *
+     * @see @ref net_af
+     */
+    int family;
+
+    union {
+#if defined(SOCK_HAS_IPV6) || defined(DOXYGEN)
+        /**
+         * @brief IPv6 address mode
+         *
+         * @note only available if @ref SOCK_HAS_IPV6 is defined.
+         */
+        uint8_t ipv6[16];
+#endif
+        uint32_t ipv4;      /**< IPv4 address mode */
+    } addr;                 /**< address */
+
+    /**
+     * @brief   stack-specific network interface ID
+     *
+     * @todo    port to common network interface identifiers in PR #5511.
+     *
+     * Use @ref SOCK_ADDR_ANY_NETIF for any interface.
+     * For reception this is the local interface the message came over,
+     * for transmission, this is the local interface the message should be send
+     * over
+     */
+    uint16_t netif;
+} sock_ip_ep_t;
+
+/**
+ * @brief   Common IP-based transport layer end point
+ */
+typedef struct _sock_tl_ep {
+    sock_ip_ep_t ip;        /**< IP end point */
+    uint16_t port;          /**< transport layer port */
+};
 
 #ifdef __cplusplus
 }

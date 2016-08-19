@@ -33,32 +33,13 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
-#include "net/sock/addr.h"
+#include "net/sock.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * @brief   An end point for a UDP sock object
- */
-typedef struct {
-    uint16_t family;        /**< family of sock_ip_ep_t::addr as defined in @ref net_af */
-
-    /**
-     * @brief   stack-specific network interface ID
-     *
-     * @todo    port to common network interface identifiers in PR #5511.
-     *
-     * Use @ref SOCK_ADDR_ANY_NETIF for any interface.
-     * For reception this is the local interface the message came over,
-     * for transmission, this is the local interface the message should be send
-     * over
-     */
-    uint16_t netif;
-    sock_addr_ip_t addr;    /**< IP address */
-    uint16_t port;          /**< port for the UDP end point */
-} sock_udp_ep_t;
+typedef struct _sock_tl_ep sock_tcp_ep_t;   /**< An end point for a TCP sock object */
 
 /**
  * @brief   Implementation-specific type of a UDP sock object
@@ -107,7 +88,7 @@ typedef struct sock_udp sock_udp_t;
  *          `
  */
 int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
-                    const sock_udp_ep_t *remote, uint32_t flags);
+                    const sock_udp_ep_t *remote, uint16_t flags);
 
 /**
  * @brief   Closes a UDP sock object

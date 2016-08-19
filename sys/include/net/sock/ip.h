@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
-#include "net/sock/addr.h"
+#include "net/sock.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -108,7 +108,7 @@ typedef struct sock_ip sock_ip_t;
  *          remote.
  */
 int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
-                   const sock_ip_ep_t *remote, uint8_t proto, uint32_t flags);
+                   const sock_ip_ep_t *remote, uint8_t proto, uint16_t flags);
 
 /**
  * @brief   Closes a raw IPv4/IPv6 sock object
