@@ -37,12 +37,12 @@ extern "C" {
 /**
  * @brief   Address to bind to any IPv4 address
  */
-#define SOCK_ADDR_IPV4_ADDR_ANY (0U)
+#define SOCK_ADDR_IPV4_ANY  (0U)
 
 /**
  * @brief   Address to bind to any IPv6 address
  */
-#define SOCK_ADDR_IPV6_ADDR_ANY { { 0 } }
+#define SOCK_ADDR_IPV6_ANY  { { 0 } }
 
 typedef uint32_t sock_addr_ipv4_t;
 
