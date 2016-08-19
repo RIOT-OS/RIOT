@@ -81,6 +81,7 @@ typedef struct sock_tcp_queue sock_tcp_queue_t;
  *                      the stack-specific sock descriptor.
  * @param[in] remote    Remote end point for the sock object.
  * @param[in] flags     Flags for the sock object. See also @ref net_sock_flags.
+ *                      May be 0.
  *
  * @return  0 on success.
  * @return  -EADDRINUSE, if `(flags & SOCK_FLAGS_REUSE_EP) == 0` and
@@ -111,7 +112,7 @@ int sock_tcp_connect(sock_tcp_t *sock, const sock_tcp_ep_t *remote,
  *                          descriptor.
  * @param[in] queue_len     Length of @p queue_array.
  * @param[in] flags         Flags for the listening queue. See also
- *                          @ref net_sock_flags.
+ *                          @ref net_sock_flags. May be 0.
  *
  * @return  0 on success.
  * @return  -EADDRINUSE, if `(flags & SOCK_FLAGS_REUSE_EP) == 0` and

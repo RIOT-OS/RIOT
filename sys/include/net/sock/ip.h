@@ -88,6 +88,7 @@ typedef struct sock_ip sock_ip_t;
  *                      (the `protocol` header field in IPv4 and the `next_header`
  *                      field in IPv6).
  * @param[in] flags     Flags for the sock object. See also @ref net_sock_flags.
+ *                      May be 0.
  *
  * @return  0 on success.
  * @return  -EADDRINUSE, if `local != NULL` and the stack reports that @p local is

@@ -63,16 +63,6 @@ typedef union {
     sock_addr_ipv4_t ipv4;  /**< IPv4 address mode */
 } sock_addr_ip_t;
 
-/**
- * @brief   Address to bind to any IPv4 address
- */
-static const sock_addr_ipv4_t sock_addr_ipv4_any = SOCK_ADDR_IPV4_ADDR_ANY;
-
-/**
- * @brief   Address to bind to any IPv6 address
- */
-static const sock_addr_ipv6_t sock_addr_ipv6_any = SOCK_ADDR_IPV6_ADDR_ANY;
-
 #ifdef __cplusplus
 }
 #endif
