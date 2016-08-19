@@ -42,11 +42,12 @@ extern "C" {
  * @brief   An end point for a TCP sock object
  */
 typedef struct {
-    sock_addr_ip_t addr;    /**< IP address */
-    int family;             /**< family of sock_tcp_ep_t::addr */
+    uint16_t family;        /**< family of sock_ip_ep_t::addr as defined in @ref net_af */
 
     /**
-     * @brief   network interface ID as defined in @ref net_netif
+     * @brief   stack-specific network interface ID
+     *
+     * @todo    port to common network interface identifiers in PR #5511.
      *
      * Use @ref SOCK_ADDR_ANY_NETIF for any interface.
      * For reception this is the local interface the message came over,
@@ -54,6 +55,7 @@ typedef struct {
      * over
      */
     uint16_t netif;
+    sock_addr_ip_t addr;    /**< IP address */
     uint16_t port;          /**< port for the TCP end point */
 } sock_tcp_ep_t;
 

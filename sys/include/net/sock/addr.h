@@ -29,8 +29,8 @@ extern "C" {
 #endif
 
 /**
- * @brief   Special @ref net_netif "netif" ID for "any interface"
- * @todo    Define in @ref net_netif
+ * @brief   Special netif ID for "any interface"
+ * @todo    Use an equivalent defintion from #5511
  */
 #define SOCK_ADDR_ANY_NETIF (0)
 
@@ -57,8 +57,13 @@ typedef struct {
  * @brief   Type to abstract both IPv4 and IPv6 addresses
  */
 typedef union {
-#ifdef SOCK_HAS_IPV6
-    sock_addr_ipv6_t ipv6;  /**< IPv6 address mode */
+#if defined(SOCK_HAS_IPV6) || defined(DOXYGEN)
+    /**
+     * @brief IPv6 address mode
+     *
+     * @note only available if @ref SOCK_HAS_IPV6 is defined.
+     */
+    sock_addr_ipv6_t ipv6;
 #endif
     sock_addr_ipv4_t ipv4;  /**< IPv4 address mode */
 } sock_addr_ip_t;

@@ -91,6 +91,21 @@
 extern "C" {
 #endif
 
+#if defined(DOXYGEN)
+/**
+ * @brief compile flag to activate IPv6 support for sock.
+ */
+#define SOCK_HAS_IPV6
+#endif
+
+/**
+ * @brief   Common flags for @ref net_conn
+ * @{
+ */
+#define SOCK_FLAGS_REUSE_EP     (0x00000001)    /**< allow to reuse end point on bind */
+/** @} */
+
+
 #ifdef __cplusplus
 }
 #endif
