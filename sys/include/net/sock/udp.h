@@ -39,7 +39,7 @@
 extern "C" {
 #endif
 
-typedef struct _sock_tl_ep sock_tcp_ep_t;   /**< An end point for a TCP sock object */
+typedef struct _sock_tl_ep sock_udp_ep_t;   /**< An end point for a UDP sock object */
 
 /**
  * @brief   Implementation-specific type of a UDP sock object
