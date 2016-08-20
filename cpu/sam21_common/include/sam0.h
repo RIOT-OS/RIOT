@@ -19,10 +19,18 @@
 #ifndef SAM0_H
 #define SAM0_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined(__SAMR21G18A__) || defined(__ATSAMR21G18A__)
 #include "cmsis/samr21/include/samr21g18a.h"
 #else
   #error "Unsupported SAM0 variant."
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* SAM0_H */
