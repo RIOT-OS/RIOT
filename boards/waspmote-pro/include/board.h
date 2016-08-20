@@ -151,6 +151,19 @@ extern "C" {
 /** @} */
 
 /**
+ * Context swap defines
+ * Setup to use PB5 which is pin change interrupt 5
+ * This emulates a software triggered interrupt
+ **/
+#define AVR_CONTEXT_SWAP_INIT do { \
+    DDRB |= (1 << PB5); \
+    PCICR |= (1 << PCIE0); \
+    PCMSK0 |= (1 << PCINT5); \
+} while (0)
+#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT0_vect
+#define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB5)
+
+/**
  * @brief xtimer configuration values
  * @{
  */
