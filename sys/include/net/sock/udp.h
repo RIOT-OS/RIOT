@@ -55,8 +55,7 @@ typedef struct sock_udp sock_udp_t;
  * @pre `(local == NULL) || (local->port != 0)`
  * @pre `(remote == NULL) || (remote->port != 0)`
  *
- * @param[out] sock     Preallocated sock object. Must fill the size of the
- *                      stack-specific sock descriptor.
+ * @param[out] sock     The resulting sock object.
  * @param[in] local     Local end point for the sock object.
  *                      May be `NULL` to solicit implicit bind on
  *                      @ref sock_udp_send().

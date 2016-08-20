@@ -62,8 +62,7 @@ typedef struct sock_tcp_queue sock_tcp_queue_t;
  * @pre `remote != NULL`
  * @pre `local_port != 0`
  *
- * @param[out] sock     Preallocated sock object. Must fill the size of
- *                      the stack-specific sock descriptor.
+ * @param[out] sock     The resulting sock object.
  * @param[in] remote    Remote end point for the sock object.
  * @param[in] flags     Flags for the sock object. See also @ref net_sock_flags.
  *                      May be 0.
@@ -89,12 +88,9 @@ int sock_tcp_connect(sock_tcp_t *sock, const sock_tcp_ep_t *remote,
 /**
  * @brief   Listen for an incoming connection request on @p local end point
  *
- * @param[in] queue         Preallocated listening queue object. Must fill the
- *                          size of the stack-specific queue descriptor.
+ * @param[in] queue         The resulting listening queue.
  * @param[in] remote        Local end point to listen on.
- * @param[in] queue_array   Preallocated array of sock objects. Each sock object
- *                          must fill the size of the stack-specific sock
- *                          descriptor.
+ * @param[in] queue_array   Array of sock objects.
  * @param[in] queue_len     Length of @p queue_array.
  * @param[in] flags         Flags for the listening queue. See also
  *                          @ref net_sock_flags. May be 0.

@@ -71,8 +71,7 @@ typedef struct sock_ip sock_ip_t;
  *
  * @pre `(sock != NULL)`
  *
- * @param[out] sock     Preallocated sock object. Must fill the size of
- *                      the stack-specific sock descriptor.
+ * @param[out] sock     The resulting sock object.
  * @param[in] local     Local end point for the sock object.
  *                      May be NULL to solicit implicit bind on
  *                      @ref sock_ip_send().
