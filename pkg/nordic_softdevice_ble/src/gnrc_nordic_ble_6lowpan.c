@@ -127,6 +127,11 @@ static void _handle_raw_sixlowpan(ble_mac_inbuf_t *inbuf)
 
 static int _send(gnrc_pktsnip_t *pkt)
 {
+    if (pkt == NULL) {
+        DEBUG("_send_ble: pkt was NULL\n");
+        return -EINVAL;
+    }
+
     gnrc_netif_hdr_t *netif_hdr;
     gnrc_pktsnip_t *payload = pkt->next;
     uint8_t *dst;
@@ -139,10 +144,6 @@ static int _send(gnrc_pktsnip_t *pkt)
     uint8_t *buf = _sendbuf;
     unsigned len = 0;
 
-    if (pkt == NULL) {
-        DEBUG("_send_ble: pkt was NULL\n");
-        return -EINVAL;
-    }
     if (pkt->type != GNRC_NETTYPE_NETIF) {
         DEBUG("_send_ble: first header is not generic netif header\n");
         return -EBADMSG;
