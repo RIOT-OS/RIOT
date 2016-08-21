@@ -77,6 +77,9 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __get_CONTROL(void)
   uint32_t result;
 
   __ASM volatile ("MRS %0, control" : "=r" (result) );
+  /* cppcheck thinks result may be uninitialized here, but the variable is
+   * assigned via the above inline assembler instruction. */
+  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
@@ -131,6 +134,9 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __get_IPSR(void)
   uint32_t result;
 
   __ASM volatile ("MRS %0, ipsr" : "=r" (result) );
+  /* cppcheck thinks result may be uninitialized here, but the variable is
+   * assigned via the above inline assembler instruction. */
+  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
@@ -161,6 +167,9 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __get_APSR(void)
   uint32_t result;
 
   __ASM volatile ("MRS %0, apsr" : "=r" (result) );
+  /* cppcheck thinks result may be uninitialized here, but the variable is
+   * assigned via the above inline assembler instruction. */
+  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
@@ -191,6 +200,9 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __get_xPSR(void)
   uint32_t result;
 
   __ASM volatile ("MRS %0, xpsr" : "=r" (result) );
+  /* cppcheck thinks result may be uninitialized here, but the variable is
+   * assigned via the above inline assembler instruction. */
+  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
@@ -221,6 +233,9 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __get_PSP(void)
   register uint32_t result;
 
   __ASM volatile ("MRS %0, psp"  : "=r" (result) );
+  /* cppcheck thinks result may be uninitialized here, but the variable is
+   * assigned via the above inline assembler instruction. */
+  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
@@ -275,6 +290,9 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __get_MSP(void)
   register uint32_t result;
 
   __ASM volatile ("MRS %0, msp" : "=r" (result) );
+  /* cppcheck thinks result may be uninitialized here, but the variable is
+   * assigned via the above inline assembler instruction. */
+  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
@@ -329,6 +347,9 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __get_PRIMASK(void)
   uint32_t result;
 
   __ASM volatile ("MRS %0, primask" : "=r" (result) );
+  /* cppcheck thinks result may be uninitialized here, but the variable is
+   * assigned via the above inline assembler instruction. */
+  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
