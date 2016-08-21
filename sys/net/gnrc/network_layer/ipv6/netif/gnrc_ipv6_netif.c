@@ -791,9 +791,6 @@ void gnrc_ipv6_netif_init_by_dev(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t ifnum = gnrc_netif_get(ifs);
-#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
-    bool abr_init = false;
-#endif
 
     for (size_t i = 0; i < ifnum; i++) {
         ipv6_addr_t addr;
@@ -877,6 +874,7 @@ void gnrc_ipv6_netif_init_by_dev(void)
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
         if (ipv6_if->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+            bool abr_init = false;
             /* first interface wins */
             if (!abr_init) {
                 gnrc_sixlowpan_nd_router_abr_create(&addr, 0);
