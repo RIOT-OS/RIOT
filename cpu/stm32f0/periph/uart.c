@@ -113,24 +113,38 @@ int init_base(uart_t uart, uint32_t baudrate)
             return -1;
     }
 
+    /* cppcheck thinks port and dev may be NULL here, but both variables are
+     * assigned in all non-returning branches of the switch at the top of
+     * this function. */
+
     /* configure RX and TX pins, set pin to use alternative function mode */
+    /* cppcheck-suppress nullPointer */
     port->MODER &= ~(3 << (rx_pin * 2) | 3 << (tx_pin * 2));
+    /* cppcheck-suppress nullPointer */
     port->MODER |= 2 << (rx_pin * 2) | 2 << (tx_pin * 2);
     /* and assign alternative function */
     if (rx_pin < 8) {
+        /* cppcheck-suppress nullPointer */
         port->AFR[0] &= ~(0xf << (rx_pin * 4));
+        /* cppcheck-suppress nullPointer */
         port->AFR[0] |= af << (rx_pin * 4);
     }
     else {
+        /* cppcheck-suppress nullPointer */
         port->AFR[1] &= ~(0xf << ((rx_pin - 8) * 4));
+        /* cppcheck-suppress nullPointer */
         port->AFR[1] |= af << ((rx_pin - 8) * 4);
     }
     if (tx_pin < 8) {
+        /* cppcheck-suppress nullPointer */
         port->AFR[0] &= ~(0xf << (tx_pin * 4));
+        /* cppcheck-suppress nullPointer */
         port->AFR[0] |= af << (tx_pin * 4);
     }
     else {
+        /* cppcheck-suppress nullPointer */
         port->AFR[1] &= ~(0xf << ((tx_pin - 8) * 4));
+        /* cppcheck-suppress nullPointer */
         port->AFR[1] |= af << ((tx_pin - 8) * 4);
     }
 
@@ -138,9 +152,11 @@ int init_base(uart_t uart, uint32_t baudrate)
     mid = (CLOCK_CORECLOCK / baudrate);
     mantissa = (uint16_t)(mid / 16);
     fraction = (uint8_t)(mid - (mantissa * 16));
+    /* cppcheck-suppress nullPointer */
     dev->BRR = ((mantissa & 0x0fff) << 4) | (0x0f & fraction);
 
     /* enable receive and transmit mode */
+    /* cppcheck-suppress nullPointer */
     dev->CR1 |= USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
 
     return 0;
