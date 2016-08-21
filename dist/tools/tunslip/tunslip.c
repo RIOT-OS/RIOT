@@ -274,7 +274,7 @@ relay_dhcp_to_client(int slipfd)
 
             case DHCP_OPTION_MSG_TYPE:
                 msg_type = p[2];
-
+                /* deliberate fall-through */
             case DHCP_OPTION_SUBNET_MASK:
             case DHCP_OPTION_ROUTER:
             case DHCP_OPTION_LEASE_TIME:
