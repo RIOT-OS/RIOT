@@ -84,7 +84,7 @@ static int init_int(int argc, char **argv)
     int po, pi;
     gpio_mode_t mode = GPIO_IN;
     gpio_flank_t flank;
-    int fl, pr;
+    int fl;
 
     if (argc < 4) {
         printf("usage: %s <port> <pin> <flank> [pull_config]\n", argv[0]);
@@ -119,7 +119,7 @@ static int init_int(int argc, char **argv)
     }
 
     if (argc >= 5) {
-        pr = atoi(argv[4]);
+        int pr = atoi(argv[4]);
         switch (pr) {
             case 0:
                 mode = GPIO_IN;
