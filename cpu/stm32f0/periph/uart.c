@@ -113,6 +113,12 @@ int init_base(uart_t uart, uint32_t baudrate)
             return -1;
     }
 
+    /* Make sure port and dev are != NULL here, i.e. that the variables are
+     * assigned in all non-returning branches of the switch at the top of this
+     * function. */
+    assert(port != NULL);
+    assert(dev != NULL);
+
     /* configure RX and TX pins, set pin to use alternative function mode */
     port->MODER &= ~(3 << (rx_pin * 2) | 3 << (tx_pin * 2));
     port->MODER |= 2 << (rx_pin * 2) | 2 << (tx_pin * 2);
