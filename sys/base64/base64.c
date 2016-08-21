@@ -83,9 +83,9 @@ int base64_encode(unsigned char *data_in, size_t data_in_size, \
     unsigned char nNum = 0;
     int nLst = 0;
     int njump = 0;
-    unsigned char tmpval;
 
     for (int i = 0; i < (int)(data_in_size); ++i) {
+        unsigned char tmpval;
         njump++;
         tmpval = *(data_in + i);
 
