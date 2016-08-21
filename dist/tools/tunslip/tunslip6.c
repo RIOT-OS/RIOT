@@ -130,7 +130,7 @@ stamptime(void)
             msecs += 1000;
         }
 
-        fprintf(stderr, "%04lu.%03lu ", secs, msecs);
+        fprintf(stderr, "%04li.%03li ", secs, msecs);
     }
     else {
         startsecs = secs;
