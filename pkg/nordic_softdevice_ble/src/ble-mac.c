@@ -172,13 +172,12 @@ int ble_mac_send(uint8_t dest[8], void *data, size_t len)
     od_hex_dump(data, len, OD_WIDTH_DEFAULT);
 #endif
 
-    int i;
     ble_ipsp_handle_t *handle;
     int ret = -1;
 
     if ((!dest) || _is_broadcast(dest)) {
         DEBUG("broadcast\n");
-        for (i = 0; i < BLE_MAC_MAX_INTERFACE_NUM; i++) {
+        for (int i = 0; i < BLE_MAC_MAX_INTERFACE_NUM; i++) {
             if (interfaces[i].handle.cid != 0 && interfaces[i].handle.conn_handle != 0) {
                 ret = _send_to_peer(&interfaces[i].handle, data, len);
                 DEBUG("ret=%i\n", ret);
