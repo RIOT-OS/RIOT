@@ -53,7 +53,7 @@ int main(void)
             int_hum = hum / 10;
             dec_hum = hum - (int_hum * 10);
 
-            printf("DHT device #%i - ", i);
+            printf("DHT device #%u - ", i);
             printf("temp: %i.%i°C, ", int_temp, dec_temp);
             printf("relative humidity: %i.%i%%\n", int_hum, dec_hum);
 
