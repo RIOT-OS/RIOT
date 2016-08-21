@@ -100,7 +100,7 @@ static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
 
     if (to_read) {
         cc110x_readburst_reg(dev, CC110X_RXFIFO,
-                ((char *)&pkt_buf->packet)+pkt_buf->pos, to_read);
+                ((uint8_t *)&pkt_buf->packet)+pkt_buf->pos, to_read);
         pkt_buf->pos += to_read;
     }
 
@@ -108,7 +108,7 @@ static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
         uint8_t status[2];
         /* full packet received. */
         /* Read the 2 appended status bytes (status[0] = RSSI, status[1] = LQI) */
-        cc110x_readburst_reg(dev, CC110X_RXFIFO, (char *)status, 2);
+        cc110x_readburst_reg(dev, CC110X_RXFIFO, status, 2);
 
         /* Store RSSI value of packet */
         pkt_buf->rssi = status[I_RSSI];
@@ -195,7 +195,7 @@ static void _tx_continue(cc110x_t *dev)
     int to_send = left > fifo ? fifo : left;
 
     /* Write packet into TX FIFO */
-    cc110x_writeburst_reg(dev, CC110X_TXFIFO, ((char *)pkt)+dev->pkt_buf.pos, to_send);
+    cc110x_writeburst_reg(dev, CC110X_TXFIFO, ((uint8_t *)pkt) + dev->pkt_buf.pos, to_send);
     dev->pkt_buf.pos += to_send;
 
     if (left == size) {

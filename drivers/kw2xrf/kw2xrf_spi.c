@@ -90,7 +90,7 @@ uint8_t kw2xrf_read_dreg(uint8_t addr)
     uint8_t value;
     kw2xrf_spi_transfer_head();
     spi_transfer_reg(kw2xrf_spi, (addr | MKW2XDRF_REG_READ),
-                     0x0, (char *)&value);
+                     0x0, &value);
     kw2xrf_spi_transfer_tail();
     return value;
 }
@@ -109,7 +109,7 @@ void kw2xrf_write_iregs(uint8_t addr, uint8_t *buf, uint8_t length)
 
     kw2xrf_spi_transfer_head();
     spi_transfer_regs(kw2xrf_spi, MKW2XDM_IAR_INDEX,
-                      (char *)ibuf, NULL, length + 1);
+                      ibuf, NULL, length + 1);
     kw2xrf_spi_transfer_tail();
 
     return;
@@ -125,7 +125,7 @@ void kw2xrf_read_iregs(uint8_t addr, uint8_t *buf, uint8_t length)
 
     kw2xrf_spi_transfer_head();
     spi_transfer_regs(kw2xrf_spi, MKW2XDM_IAR_INDEX | MKW2XDRF_REG_READ,
-                      (char *)ibuf, (char *)ibuf, length + 1);
+                      ibuf, ibuf, length + 1);
     kw2xrf_spi_transfer_tail();
 
     for (uint8_t i = 0; i < length; i++) {
@@ -139,7 +139,7 @@ void kw2xrf_write_fifo(uint8_t *data, uint8_t length)
 {
     kw2xrf_spi_transfer_head();
     spi_transfer_regs(kw2xrf_spi, MKW2XDRF_BUF_WRITE,
-                      (char *)data, NULL, length);
+                      data, NULL, length);
     kw2xrf_spi_transfer_tail();
 }
 
@@ -147,7 +147,7 @@ void kw2xrf_read_fifo(uint8_t *data, uint8_t length)
 {
     kw2xrf_spi_transfer_head();
     spi_transfer_regs(kw2xrf_spi, MKW2XDRF_BUF_READ, NULL,
-                      (char *)data, length);
+                      data, length);
     kw2xrf_spi_transfer_tail();
 }
 /** @} */

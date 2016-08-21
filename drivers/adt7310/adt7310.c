@@ -99,7 +99,7 @@ static int adt7310_read_reg(const adt7310_t *dev, const uint8_t addr, const uint
     /* Perform the transaction */
     gpio_clear(dev->cs);
 
-    if (spi_transfer_regs(dev->spi, command, NULL, (char *)buf, len) < len) {
+    if (spi_transfer_regs(dev->spi, command, NULL, buf, len) < len) {
         status = -1;
     }
 
@@ -131,7 +131,7 @@ static int adt7310_write_reg(const adt7310_t *dev, const uint8_t addr,
     /* Perform the transaction */
     gpio_clear(dev->cs);
 
-    if (spi_transfer_regs(dev->spi, command, (char *)buf, NULL, len) < len) {
+    if (spi_transfer_regs(dev->spi, command, buf, NULL, len) < len) {
         status = -1;
     }
 

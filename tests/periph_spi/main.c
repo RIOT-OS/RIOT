@@ -47,8 +47,8 @@ static int spi_master = -1;
 static int port = -1;
 static int pin = -1;
 
-static char buffer[256];       /* temporary buffer */
-static char rx_buffer[256];    /* global receive buffer */
+static uint8_t buffer[256];       /* temporary buffer */
+static uint8_t rx_buffer[256];    /* global receive buffer */
 static int rx_counter = 0;
 
 static volatile int state;
@@ -143,7 +143,7 @@ int parse_spi_dev(int argc, char **argv)
     return 0;
 }
 
-void print_bytes(char* title, char* chars, int length)
+void print_bytes(char* title, uint8_t* chars, int length)
 {
     printf("%4s", title);
     for (int i = 0; i < length; i++) {
@@ -174,7 +174,7 @@ void slave_on_cs(void *arg)
     rw = INIT;
 }
 
-char slave_on_data(char data)
+uint8_t slave_on_data(uint8_t data)
 {
     rx_buffer[rx_counter] = data;
     rx_counter++;
@@ -280,7 +280,7 @@ int cmd_transfer(int argc, char **argv)
     /* do the actual data transfer */
     spi_acquire(spi_dev);
     gpio_clear(spi_cs);
-    res = spi_transfer_bytes(spi_dev, hello, buffer, strlen(hello));
+    res = spi_transfer_bytes(spi_dev, (uint8_t *)hello, buffer, strlen(hello));
     gpio_set(spi_cs);
     spi_release(spi_dev);
 
@@ -291,7 +291,7 @@ int cmd_transfer(int argc, char **argv)
     }
     else {
         printf("Transfered %i bytes:\n", res);
-        print_bytes("MOSI", hello, res);
+        print_bytes("MOSI", (uint8_t *)hello, res);
         print_bytes("MISO", buffer, res);
         return 0;
     }

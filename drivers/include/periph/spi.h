@@ -142,7 +142,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed);
  * @return              0 on success
  * @return              -1 on error
  */
-int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data));
+int spi_init_slave(spi_t dev, spi_conf_t conf, uint8_t (*cb)(uint8_t data));
 
 /**
  * @brief Configure SCK, MISO and MOSI pins for the given SPI device
@@ -186,7 +186,7 @@ int spi_release(spi_t dev);
  * @return              Number of bytes that were transfered
  * @return              -1 on error
  */
-int spi_transfer_byte(spi_t dev, char out, char *in);
+int spi_transfer_byte(spi_t dev, uint8_t out, uint8_t *in);
 
 /**
  * @brief Transfer a number bytes on the given SPI bus
@@ -199,7 +199,7 @@ int spi_transfer_byte(spi_t dev, char out, char *in);
  * @return              Number of bytes that were transfered
  * @return              -1 on error
  */
-int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length);
+int spi_transfer_bytes(spi_t dev, uint8_t *out, uint8_t *in, unsigned int length);
 
 /**
  * @brief Transfer one byte to/from a given register address
@@ -216,7 +216,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length);
  * @return              Number of bytes that were transfered
  * @return              -1 on error
  */
-int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in);
+int spi_transfer_reg(spi_t dev, uint8_t reg, uint8_t out, uint8_t *in);
 
 /**
  * @brief Transfer a number of bytes from/to a given register address
@@ -234,7 +234,7 @@ int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in);
  * @return              Number of bytes that were transfered
  * @return              -1 on error
  */
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length);
+int spi_transfer_regs(spi_t dev, uint8_t reg, uint8_t *out, uint8_t *in, unsigned int length);
 
 /**
  * @brief Tell the SPI driver that a new transaction was started. Call only when SPI in slave mode!
@@ -242,7 +242,7 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
  * @param[in] dev       SPI device that is active
  * @param[in] reset_val The byte that is send to the master as first byte
  */
-void spi_transmission_begin(spi_t dev, char reset_val);
+void spi_transmission_begin(spi_t dev, uint8_t reset_val);
 
 /**
  * @brief Power on the given SPI device

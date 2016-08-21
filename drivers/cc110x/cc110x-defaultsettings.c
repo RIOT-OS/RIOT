@@ -29,7 +29,7 @@
  * @note    If changed in size, adjust MAX_OUTPUT_POWER definition
  *          in CC110x interface
 */
-const char cc110x_default_pa_table[8] = {
+const uint8_t cc110x_default_pa_table[8] = {
     0x00,   /*< -52 dBm */
     0x0D,   /*< -20 dBm */
     0x34,   /*< -10 dBm */
@@ -40,12 +40,12 @@ const char cc110x_default_pa_table[8] = {
     0xC3    /*< +10 dBm */
 };
 
-const char cc110x_default_base_freq[3] = { 0x21, 0x71, 0x7F };
+const uint8_t cc110x_default_base_freq[3] = { 0x21, 0x71, 0x7F };
 
 /**
  * @brief cc110x default settings
  */
-const char cc110x_default_conf[] = {
+const uint8_t cc110x_default_conf[] = {
     0x06, /* IOCFG2 */
     0x2E, /* IOCFG1 */
     /* some boards use cc110x' GDO0 as clock source, so for those, we allow

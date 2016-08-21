@@ -39,14 +39,14 @@ char *cc110x_state_to_text(uint8_t state);
 int cc110x_rd_set_mode(cc110x_t *dev, int mode);
 uint8_t cc110x_get_buffer_pos(cc110x_t *dev);
 void cc110x_isr_handler(cc110x_t *dev, void(*callback)(void*), void*arg);
-void cc110x_set_base_freq_raw(cc110x_t *dev, const char* freq_array);
+void cc110x_set_base_freq_raw(cc110x_t *dev, const uint8_t* freq_array);
 void cc110x_setup_rx_mode(cc110x_t *dev);
 void cc110x_switch_to_pwd(cc110x_t *dev);
 void cc110x_switch_to_rx(cc110x_t *dev);
 void cc110x_wakeup_from_rx(cc110x_t *dev);
 void cc110x_write_register(cc110x_t *dev, uint8_t r, uint8_t value);
 
-extern const char cc110x_default_conf[];
+extern const uint8_t cc110x_default_conf[];
 extern const uint8_t cc110x_default_conf_size;
 extern const uint8_t cc110x_pa_table[];
 

@@ -133,7 +133,7 @@ typedef enum {
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer);
+int nrf24l01p_read_reg(nrf24l01p_t *dev, uint8_t reg, uint8_t *answer);
 
 /**
 * @brief Write one register to the nrf24l01+ transceiver.
@@ -145,7 +145,7 @@ int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write);
+int nrf24l01p_write_reg(nrf24l01p_t *dev, uint8_t reg, uint8_t write);
 
 /**
 * @brief Initialize the nrf24l01+ transceiver.
@@ -202,7 +202,7 @@ void nrf24l01p_transmit(nrf24l01p_t *dev);
 * @return           Number of bytes that were transfered.
 * @return           -1 on error.
 */
-int nrf24l01p_read_payload(nrf24l01p_t *dev, char *answer, unsigned int size);
+int nrf24l01p_read_payload(nrf24l01p_t *dev, uint8_t *answer, unsigned int size);
 
 /**
 * @brief Register a given ID to the nrf24l01+ transceiver.
@@ -280,7 +280,7 @@ void nrf24l01p_stop(nrf24l01p_t *dev);
 * @return           Number of bytes that were transfered.
 * @return           -1 on error.
 */
-int nrf24l01p_preload(nrf24l01p_t *dev, char *data, unsigned int size);
+int nrf24l01p_preload(nrf24l01p_t *dev, uint8_t *data, unsigned int size);
 
 /**
 * @brief Set the RF channel for the nrf24l01+ transceiver.
@@ -322,7 +322,7 @@ int nrf24l01p_set_address_width(nrf24l01p_t *dev, nrf24l01p_aw_t aw);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char width);
+int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint8_t width);
 
 /**
 * @brief Set the TX address for the nrf24l01+ transceiver (byte array).
@@ -339,7 +339,7 @@ int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char
 * @return           Address length on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_tx_address(nrf24l01p_t *dev, char *saddr, unsigned int length);
+int nrf24l01p_set_tx_address(nrf24l01p_t *dev, uint8_t *saddr, unsigned int length);
 
 /**
 * @brief Set the TX address for the nrf24l01+ transceiver (long int).
@@ -369,7 +369,7 @@ int nrf24l01p_set_tx_address_long(nrf24l01p_t *dev, uint64_t saddr, unsigned int
 * @return           Address length on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *saddr, unsigned int length);
+int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint8_t *saddr, unsigned int length);
 
 /**
 * @brief Set the RX address for the nrf24l01+ transceiver (long int).
@@ -490,7 +490,7 @@ int nrf24l01p_reset_all_interrupts(nrf24l01p_t *dev);
 * @return           1 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_reset_interrupts(nrf24l01p_t *dev, char intrs);
+int nrf24l01p_reset_interrupts(nrf24l01p_t *dev, uint8_t intrs);
 
 /**
 * @brief Mask one interrupt on the nrf24l01+ transceiver.
@@ -506,7 +506,7 @@ int nrf24l01p_reset_interrupts(nrf24l01p_t *dev, char intrs);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_mask_interrupt(nrf24l01p_t *dev, char intr);
+int nrf24l01p_mask_interrupt(nrf24l01p_t *dev, uint8_t intr);
 
 /**
 * @brief Unmask one interrupt on the nrf24l01+ transceiver.
@@ -522,7 +522,7 @@ int nrf24l01p_mask_interrupt(nrf24l01p_t *dev, char intr);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_unmask_interrupt(nrf24l01p_t *dev, char intr);
+int nrf24l01p_unmask_interrupt(nrf24l01p_t *dev, uint8_t intr);
 
 /**
 * @brief Enable RX datapipe on the nrf24l01+ transceiver.
@@ -573,7 +573,7 @@ int nrf24l01p_enable_crc(nrf24l01p_t *dev, nrf24l01p_crc_t crc);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_setup_auto_ack(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l01p_retransmit_delay_t delay_retrans, char count_retrans);
+int nrf24l01p_setup_auto_ack(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l01p_retransmit_delay_t delay_retrans, uint8_t count_retrans);
 
 /**
 * @brief Disable automatic ACK on the nrf24l01+ transceiver.

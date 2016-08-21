@@ -118,7 +118,7 @@ uint8_t cc110x_set_address(cc110x_t *dev, uint8_t address)
     return 0;
 }
 
-void cc110x_set_base_freq_raw(cc110x_t *dev, const char* freq_array)
+void cc110x_set_base_freq_raw(cc110x_t *dev, const uint8_t* freq_array)
 {
 #if ENABLE_DEBUG == 1
     uint8_t _tmp[] = { freq_array[2], freq_array[1], freq_array[0], 0x00};

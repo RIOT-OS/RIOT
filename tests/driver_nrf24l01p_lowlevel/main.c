@@ -55,7 +55,7 @@ static int cmd_print_regs(int argc, char **argv);
 static int cmd_its(int argc, char **argv);
 
 void printbin(unsigned byte);
-void print_register(char reg, int num_bytes);
+void print_register(uint8_t reg, int num_bytes);
 
 static nrf24l01p_t nrf24l01p_0;
 
@@ -81,10 +81,10 @@ void prtbin(unsigned byte)
 /**
  * @print register
  */
-void print_register(char reg, int num_bytes)
+void print_register(uint8_t reg, int num_bytes)
 {
 
-    char buf_return[num_bytes];
+    uint8_t buf_return[num_bytes];
     int ret;
 
 
@@ -124,7 +124,7 @@ void *nrf24l01p_rx_handler(void *arg)
     msg_t msg_q[1];
     msg_init_queue(msg_q, 1);
     unsigned int pid = thread_getpid();
-    char rx_buf[NRF24L01P_MAX_DATA_LENGTH];
+    uint8_t rx_buf[NRF24L01P_MAX_DATA_LENGTH];
 
     puts("Registering nrf24l01p_rx_handler thread...");
     nrf24l01p_register(&nrf24l01p_0, &pid);
@@ -214,7 +214,7 @@ int cmd_send(int argc, char **argv)
     puts("Send");
 
     int status = 0;
-    char tx_buf[NRF24L01P_MAX_DATA_LENGTH];
+    uint8_t tx_buf[NRF24L01P_MAX_DATA_LENGTH];
 
     /* fill TX buffer with numbers 32..1 */
     for (int i = 0; i < sizeof(tx_buf); i++) {

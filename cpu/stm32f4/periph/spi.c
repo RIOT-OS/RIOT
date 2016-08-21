@@ -39,7 +39,7 @@
  * @brief Data-structure holding the state for a SPI device
  */
 typedef struct {
-    char(*cb)(char data);
+    uint8_t (*cb)(uint8_t data);
 } spi_state_t;
 
 static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev);
@@ -154,7 +154,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     return 0;
 }
 
-int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
+int spi_init_slave(spi_t dev, spi_conf_t conf, uint8_t (*cb)(uint8_t data))
 {
     SPI_TypeDef *spi_port;
 
@@ -310,7 +310,7 @@ int spi_release(spi_t dev)
     return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+int spi_transfer_byte(spi_t dev, uint8_t out, uint8_t *in)
 {
     SPI_TypeDef *spi_port;
 
@@ -349,7 +349,7 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     return 1;
 }
 
-void spi_transmission_begin(spi_t dev, char reset_val)
+void spi_transmission_begin(spi_t dev, uint8_t reset_val)
 {
 
     switch (dev) {
@@ -420,7 +420,7 @@ static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev)
 {
 
     if (spi->SR & SPI_SR_RXNE) {
-        char data;
+        uint8_t data;
         data = spi->DR;
         data = spi_config[dev].cb(data);
         spi->DR = data;

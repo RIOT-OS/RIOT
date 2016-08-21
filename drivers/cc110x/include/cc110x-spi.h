@@ -37,7 +37,7 @@ extern "C" {
  * @param buffer    Data to be written
  * @param count     Size of data
  */
-void cc110x_writeburst_reg(cc110x_t *dev, uint8_t addr, const char *buffer, uint8_t count);
+void cc110x_writeburst_reg(cc110x_t *dev, uint8_t addr, const uint8_t *buffer, uint8_t count);
 
 /**
  * @brief Read a set of bytes using burst mode (if available)
@@ -47,7 +47,7 @@ void cc110x_writeburst_reg(cc110x_t *dev, uint8_t addr, const char *buffer, uint
  * @param buffer    Buffer to store read data
  * @param count     Size of data to be read
  */
-void cc110x_readburst_reg(cc110x_t *dev, uint8_t addr, char *buffer, uint8_t count);
+void cc110x_readburst_reg(cc110x_t *dev, uint8_t addr, uint8_t *buffer, uint8_t count);
 
 /**
  * @brief Write one byte to a register

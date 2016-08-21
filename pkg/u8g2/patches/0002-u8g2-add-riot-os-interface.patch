@@ -134,7 +134,7 @@ index 0000000..7106e07
 +
 +    switch (msg) {
 +        case U8X8_MSG_BYTE_SEND:
-+            spi_transfer_bytes(dev, (char *) arg_ptr, NULL, arg_int);
++            spi_transfer_bytes(dev, (uint8_t *) arg_ptr, NULL, arg_int);
 +            break;
 +        case U8X8_MSG_BYTE_INIT:
 +            spi_init_master(dev,
