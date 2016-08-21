@@ -299,7 +299,7 @@ void
 write_to_serial(int outfd, void *inbuf, int len)
 {
     u_int8_t *p = inbuf;
-    int i, ecode;
+    int i;
 
     /*  printf("Got packet of length %d - write SLIP\n", len);*/
     /*  print_packet(p, len);*/
