@@ -198,18 +198,18 @@ static inline uint16_t *_get_uint16_ptr(void *ptr)
 
 static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
 {
+    if ((netdev == NULL) || (netdev->driver != &_zep_driver)) {
+        DEBUG("zep: wrong device on sending\n");
+        gnrc_pktbuf_release(pkt);
+        return -ENODEV;
+    }
+
     gnrc_zep_t *dev = (gnrc_zep_t *)netdev;
     gnrc_pktsnip_t *ptr, *new_pkt, *hdr;
     gnrc_zep_hdr_t *zep;
     size_t payload_len = gnrc_pkt_len(pkt->next), hdr_len, mhr_offset;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN], *data;
     uint16_t fcs = 0;
-
-    if ((netdev == NULL) || (netdev->driver != &_zep_driver)) {
-        DEBUG("zep: wrong device on sending\n");
-        gnrc_pktbuf_release(pkt);
-        return -ENODEV;
-    }
 
     /* create 802.15.4 header */
     hdr_len = _make_data_frame_hdr(dev, mhr, (gnrc_netif_hdr_t *)pkt->data);
