@@ -38,6 +38,8 @@ RUN apt-get -y install build-essential \
  gcc-msp430 \
  pcregrep libpcre3 \
  qemu-system-x86 python3 \
+ cmake \
+ bsdmainutils \
  g++-multilib \
  gcc-avr binutils-avr avr-libc \
  subversion curl wget python p7zip unzip parallel
