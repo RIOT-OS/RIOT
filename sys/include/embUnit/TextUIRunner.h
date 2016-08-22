@@ -32,8 +32,8 @@
  *
  * $Id: TextUIRunner.h,v 1.3 2003/09/06 13:28:27 arms22 Exp $
  */
-#ifndef __TEXTUIRUNNER_H__
-#define __TEXTUIRUNNER_H__
+#ifndef EMBUNIT_TEXTUIRUNNER_H_
+#define EMBUNIT_TEXTUIRUNNER_H_
 
 #include "Outputter.h"
 
@@ -53,4 +53,4 @@ void TextUIRunner_end(void);
 }
 #endif
 
-#endif/*__TEXTUIRUNNER_H__*/
+#endif/* EMBUNIT_TEXTUIRUNNER_H_ */

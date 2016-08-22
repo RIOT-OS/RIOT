@@ -32,8 +32,8 @@
  *
  * $Id: embUnit.h,v 1.4 2004/02/10 16:16:19 arms22 Exp $
  */
-#ifndef __EMBUNIT_H__
-#define __EMBUNIT_H__
+#ifndef EMBUNIT_EMBUNIT_H_
+#define EMBUNIT_EMBUNIT_H_
 
 #include <embUnit/Test.h>
 #include <embUnit/TestCase.h>
@@ -55,4 +55,4 @@ extern "C" {
 }
 #endif
 
-#endif/*__EMBUNIT_H__*/
+#endif/* EMBUNIT_EMBUNIT_H_ */
