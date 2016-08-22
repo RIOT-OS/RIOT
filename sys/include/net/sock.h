@@ -116,7 +116,6 @@ extern "C" {
  * @brief   Address to bind to any IPv4 address
  */
 #define SOCK_IPV4_EP_ANY        { .family = AF_INET, \
-                                  .addr = { .ipv4 = 0U }, \
                                   .netif = SOCK_ADDR_ANY_NETIF }
 
 #if defined(SOCK_HAS_IPV6) || defined(DOXYGEN)
@@ -124,7 +123,6 @@ extern "C" {
  * @brief   Address to bind to any IPv6 address
  */
 #define SOCK_IPV6_EP_ANY        { .family = AF_INET6, \
-                                  .addr = { .ipv6 = { 0 } }, \
                                   .netif = SOCK_ADDR_ANY_NETIF }
 #endif
 
