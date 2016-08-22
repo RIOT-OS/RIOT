@@ -166,7 +166,36 @@ typedef struct {
  * @brief   Common IP-based transport layer end point
  */
 struct _sock_tl_ep {
-    sock_ip_ep_t ip;        /**< IP end point */
+    /**
+     * @brief family of sock_ip_ep_t::addr
+     *
+     * @see @ref net_af
+     */
+    int family;
+
+    union {
+#if defined(SOCK_HAS_IPV6) || defined(DOXYGEN)
+        /**
+         * @brief IPv6 address mode
+         *
+         * @note only available if @ref SOCK_HAS_IPV6 is defined.
+         */
+        uint8_t ipv6[16];
+#endif
+        uint32_t ipv4;      /**< IPv4 address mode */
+    } addr;                 /**< address */
+
+    /**
+     * @brief   stack-specific network interface ID
+     *
+     * @todo    port to common network interface identifiers in PR #5511.
+     *
+     * Use @ref SOCK_ADDR_ANY_NETIF for any interface.
+     * For reception this is the local interface the message came over,
+     * for transmission, this is the local interface the message should be send
+     * over
+     */
+    uint16_t netif;
     uint16_t port;          /**< transport layer port */
 };
 
