@@ -40,26 +40,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   An end point for a raw IPv4/IPv6 sock object
- */
-typedef struct {
-    uint16_t family;        /**< family of sock_ip_ep_t::addr as defined in @ref net_af */
-
-    /**
-     * @brief   stack-specific network interface ID
-     *
-     * @todo    port to common network interface identifiers in PR #5511.
-     *
-     * Use @ref SOCK_ADDR_ANY_NETIF for any interface.
-     * For reception this is the local interface the message came over,
-     * for transmission, this is the local interface the message should be send
-     * over
-     */
-    uint16_t netif;
-    sock_addr_ip_t addr;    /**< IP address */
-} sock_ip_ep_t;
-
-/**
  * @brief   Implementation-specific type of a raw IPv4/IPv6 sock object
  *
  * `struct sock_ip` needs to be defined by stack-specific `sock_types.h`.

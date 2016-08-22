@@ -167,7 +167,7 @@ typedef struct {
 /**
  * @brief   Common IP-based transport layer end point
  */
-typedef struct _sock_tl_ep {
+struct _sock_tl_ep {
     sock_ip_ep_t ip;        /**< IP end point */
     uint16_t port;          /**< transport layer port */
 };
