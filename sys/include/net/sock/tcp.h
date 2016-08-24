@@ -189,6 +189,8 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock);
  * @return  The number of bytes read on success.
  * @return  0, if no read data is available, but everything is in order.
  * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
+ * @return  -ECONNABORTED, if the connection is aborted while waiting for the
+ *          next data.
  * @return  -ECONNREFUSED, if remote end point of @p sock refused to allow the
  *          connection.
  * @return  -ENOTCONN, when @p sock is not connected to a remote end point.
@@ -209,6 +211,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
  * @note    Function may block.
  *
  * @return  The number of bytes written on success.
+ * @return  -ECONNABORTED, if the connection is aborted while sending @p data.
  * @return  -ECONNRESET, if connection was reset by remote end point.
  * @return  -ENOMEM, if no memory was available to written @p data.
  * @return  -ENOTCONN, if @p sock is not connected to a remote end point.
