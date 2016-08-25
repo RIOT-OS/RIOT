@@ -73,8 +73,8 @@ typedef struct sock_ip sock_ip_t;
  *                      May be 0.
  *
  * @return  0 on success.
- * @return  -EADDRINUSE, if `local != NULL` and the stack reports that @p local is
- *          already use elsewhere
+ * @return  -EADDRINUSE, if `local != NULL` and the stack reports that @p local
+ *          is already used elsewhere
  * @return  -EAFNOSUPPORT, if `local != NULL` or `remote != NULL` and
  *          sock_ip_ep_t::family of @p local or @p remote is not supported.
  * @return  -EINVAL, if `proto` is not supported or if sock_ip_ep_t::netif of

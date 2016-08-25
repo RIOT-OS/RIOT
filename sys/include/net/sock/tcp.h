@@ -97,7 +97,7 @@ int sock_tcp_connect(sock_tcp_t *sock, const sock_tcp_ep_t *remote,
  *
  * @return  0 on success.
  * @return  -EADDRINUSE, if `(flags & SOCK_FLAGS_REUSE_EP) == 0` and
- *          @p local_port is already used elsewhere
+ *          @p local is already used elsewhere
  * @return  -EAFNOSUPPORT, if sock_tcp_ep_t::family of @p local is not
  *          supported.
  * @return  -EINVAL, if sock_tcp_ep_t::netif of @p local is not a valid
