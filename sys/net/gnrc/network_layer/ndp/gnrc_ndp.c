@@ -117,13 +117,13 @@ void gnrc_ndp_nbr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
         (ipv6_addr_is_unspecified(&ipv6->src) &&
          ipv6_addr_is_solicited_node(&ipv6->dst))) {
         DEBUG("ndp: neighbor solicitation was invalid.\n");
-        /* ipv6 releases */
+        /* icmpv6 releases */
         return;
     }
     if ((tgt = gnrc_ipv6_netif_find_addr(iface, &nbr_sol->tgt)) == NULL) {
         DEBUG("ndp: Target address is not to interface %" PRIkernel_pid "\n",
               iface);
-        /* ipv6 releases */
+        /* icmpv6 releases */
         return;
     }
     sicmpv6_size -= sizeof(ndp_nbr_sol_t);
@@ -228,14 +228,14 @@ void gnrc_ndp_nbr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
         (icmpv6_size < sizeof(ndp_nbr_adv_t)) ||
         ipv6_addr_is_multicast(&nbr_adv->tgt)) {
         DEBUG("ndp: neighbor advertisement was invalid.\n");
-        /* ipv6 releases */
+        /* icmpv6 releases */
         return;
     }
 
     if (nc_entry == NULL) {
         /* see https://tools.ietf.org/html/rfc4861#section-7.2.5 */
         DEBUG("ndp: no neighbor cache entry found for advertisement's target\n");
-        /* ipv6 releases */
+        /* icmpv6 releases */
         return;
     }
 
@@ -507,7 +507,7 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
         (ipv6->hl != 255) || (rtr_adv->code != 0) ||
         (icmpv6_size < sizeof(ndp_rtr_adv_t))) {
         DEBUG("ndp: router advertisement was invalid\n");
-        /* ipv6 releases */
+        /* icmpv6 releases */
         return;
     }
     /* get source from default router list */
