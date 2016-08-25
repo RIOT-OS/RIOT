@@ -102,6 +102,7 @@ int sock_tcp_connect(sock_tcp_t *sock, const sock_tcp_ep_t *remote,
  *          supported.
  * @return  -EINVAL, if sock_tcp_ep_t::netif of @p local is not a valid
  *          interface.
+ * @return  -ENOMEM, if no memory was available to listen on @p queue.
  */
 int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
                     sock_tcp_t[] queue_array, unsigned queue_len,
@@ -191,8 +192,8 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock);
  * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
  * @return  -ECONNABORTED, if the connection is aborted while waiting for the
  *          next data.
- * @return  -ECONNREFUSED, if remote end point of @p sock refused to allow the
- *          connection.
+ * @return  -ECONNRESET, if the connection was forcibly closed by remote end
+ *          point of @p sock.
  * @return  -ENOTCONN, when @p sock is not connected to a remote end point.
  * @return  -ETIMEDOUT, if @p timeout expired.
  */
@@ -211,8 +212,10 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
  * @note    Function may block.
  *
  * @return  The number of bytes written on success.
- * @return  -ECONNABORTED, if the connection is aborted while sending @p data.
- * @return  -ECONNRESET, if connection was reset by remote end point.
+ * @return  -ECONNABORTED, if the connection is aborted while waiting for the
+ *          next data.
+ * @return  -ECONNRESET, if the connection was forcibly closed by remote end
+ *          point of @p sock.
  * @return  -ENOMEM, if no memory was available to written @p data.
  * @return  -ENOTCONN, if @p sock is not connected to a remote end point.
  */
