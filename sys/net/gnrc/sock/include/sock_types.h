@@ -52,6 +52,17 @@ typedef struct gnrc_sock_reg {
 } gnrc_sock_reg_t;
 
 /**
+ * @brief   Raw IP sock type
+ * @internal
+ */
+struct sock_ip {
+    gnrc_sock_reg_t reg;                /**< netreg info */
+    sock_ip_ep_t local;                 /**< local end-point */
+    sock_ip_ep_t remote;                /**< remote end-point */
+    uint16_t flags;                     /**< option flags */
+};
+
+/**
  * @brief   UDP sock type
  * @internal
  */
