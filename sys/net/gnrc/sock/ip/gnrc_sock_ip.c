@@ -43,8 +43,6 @@ int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
         }
         memcpy(&sock->local, local, sizeof(sock_ip_t));
     }
-    gnrc_sock_create(&sock->reg, GNRC_NETTYPE_IPV6,
-                     proto);
     memset(&sock->remote, 0, sizeof(sock_ip_t));
     if (remote != NULL) {
         if (gnrc_af_not_supported(remote->family)) {
@@ -55,6 +53,8 @@ int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
         }
         memcpy(&sock->remote, remote, sizeof(sock_ip_t));
     }
+    gnrc_sock_create(&sock->reg, GNRC_NETTYPE_IPV6,
+                     proto);
     sock->flags = flags;
     return 0;
 }
