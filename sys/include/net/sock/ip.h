@@ -168,6 +168,9 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
  * @param[in] data      Pointer where the received data should be stored.
  *                      May be `NULL` if `len == 0`.
  * @param[in] len       Maximum space available at @p data.
+ * @param[in] proto     Protocol to use in the packet send, in case
+ *                      `sock == NULL`. If `sock != NULL` this parameter will be
+ *                      ignored.
  * @param[in] remote    Remote end point for the send data.
  *                      May be `NULL`, if @p sock has a remote end point.
  *                      sock_ip_ep_t::family may be AF_UNSPEC, if local
@@ -180,9 +183,11 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
  *          @p remote is != AF_UNSPEC and not supported.
  * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ENOTCONN, if `remote == NULL`, but @p sock has no remote end point.
+ * @return  -EPROTOTYPE, if `sock == NULL` and @p proto is not by
+ *          sock_ip_ep_t::family of @p remote.
  */
 ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
-                     const sock_ip_ep_t *remote);
+                     uint8_t proto, const sock_ip_ep_t *remote);
 
 #include "sock_types.h"
 
