@@ -378,7 +378,7 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
 
                 uint32_t fib_dst_flags = 0;
 
-                if (target->prefix_length < IPV6_ADDR_BIT_LEN) {
+                if (target->prefix_length <= IPV6_ADDR_BIT_LEN) {
                     fib_dst_flags = ((uint32_t)(target->prefix_length) << FIB_FLAG_NET_PREFIX_SHIFT);
                 }
 
