@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    net_conn_ip     Raw IPv4/IPv6 connections
+ * @defgroup    net_conn_ip     Raw IPv4/IPv6 connectivity
  * @ingroup     net_conn
- * @brief       Connection submodule for raw IPv4/IPv6 connections
+ * @brief       Connectivity submodule for raw IPv4/IPv6 connectivity
  * @{
  *
  * @file
- * @brief   Raw IPv4/IPv6 connection definitions
+ * @brief   Raw IPv4/IPv6 connectivity definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -41,15 +41,15 @@ extern "C" {
 struct conn_ip;
 
 /**
- * @brief   Implementation-specific type of a raw IPv4/IPv6 connection object
+ * @brief   Implementation-specific type of a raw IPv4/IPv6 connectivity object
  */
 typedef struct conn_ip conn_ip_t;
 
 /**
- * @brief   Creates a new raw IPv4/IPv6 connection object
+ * @brief   Creates a new raw IPv4/IPv6 connectivity object
  *
- * @param[out] conn     Preallocated connection object. Must fill the size of the stack-specific
- *                      connection desriptor.
+ * @param[out] conn     Preallocated connectivity object. Must fill the size of the
+ *                      stack-specific connectivity desriptor.
  * @param[in] addr      The local IP address for @p conn.
  * @param[in] addr_len  Length of @p addr. Must be fitting for the @p family.
  * @param[in] family    The family of @p addr (see @ref net_af).
@@ -62,16 +62,16 @@ typedef struct conn_ip conn_ip_t;
 int conn_ip_create(conn_ip_t *conn, const void *addr, size_t addr_len, int family, int proto);
 
 /**
- * @brief   Closes a raw IPv4/IPv6 connection
+ * @brief   Closes a raw IPv4/IPv6 connectivity
  *
- * @param[in,out] conn  A raw IPv4/IPv6 connection object.
+ * @param[in,out] conn  A raw IPv4/IPv6 connectivity object.
  */
 void conn_ip_close(conn_ip_t *conn);
 
 /**
- * @brief   Gets the local address of a raw IPv4/IPv6 connection
+ * @brief   Gets the local end point of a raw IPv4/IPv6 connectivity
  *
- * @param[in] conn  A raw IPv4/IPv6 connection object.
+ * @param[in] conn  A raw IPv4/IPv6 connectivity object.
  * @param[out] addr The local IP address. Must have space for any address of the connection's
  *                  family.
  *
@@ -85,7 +85,7 @@ int conn_ip_getlocaladdr(conn_ip_t *conn, void *addr);
 /**
  * @brief   Receives a message over IPv4/IPv6
  *
- * @param[in] conn      A raw IPv4/IPv6 connection object.
+ * @param[in] conn      A raw IPv4/IPv6 connectivity object.
  * @param[out] data     Pointer where the received data should be stored.
  * @param[in] max_len   Maximum space available at @p data.
  * @param[out] addr     NULL pointer or the sender's IP address. Must have space for any address

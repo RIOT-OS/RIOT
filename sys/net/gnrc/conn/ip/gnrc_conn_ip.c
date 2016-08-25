@@ -104,7 +104,7 @@ int conn_ip_sendto(const void *data, size_t len, const void *src, size_t src_len
                 gnrc_pktbuf_release(pkt);
                 return -ENOMEM;
             }
-            /* set next header to connection's proto */
+            /* set next header to connectivity object's proto */
             ipv6_hdr_t *ipv6_hdr = hdr->data;
             ipv6_hdr->nh = (uint8_t)proto;
             pkt = hdr;
