@@ -1,0 +1,65 @@
+From 52f695a0d7fb3bf270f1a3738f57ee0f2115edc1 Mon Sep 17 00:00:00 2001
+From: Christian Mehlis <mehlis@inf.fu-berlin.de>
+Date: Mon, 3 Mar 2014 16:29:29 +0100
+Subject: [PATCH 6/6] switch to blocking io
+
+---
+ net.c | 4 +++-
+ net.h | 5 ++++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/net.c b/net.c
+index 602090d..6df57b3 100644
+--- a/net.c
++++ b/net.c
+@@ -832,7 +832,7 @@ check_opt_size(coap_opt_t *opt, unsigned char *maxpos) {
+ }
+ 
+ int
+-coap_read( coap_context_t *ctx ) {
++coap_read( coap_context_t *ctx, pthread_mutex_t *mtx) {
+ #ifdef WITH_POSIX
+   static char buf[COAP_MAX_PDU_SIZE];
+ #endif
+@@ -858,8 +858,10 @@ coap_read( coap_context_t *ctx ) {
+   coap_address_init(&src);
+ 
+ #ifdef WITH_POSIX
++  pthread_mutex_unlock(mtx);
+   bytes_read = recvfrom(ctx->sockfd, buf, sizeof(buf), 0,
+ 			&src.addr.sa, &src.size);
++  pthread_mutex_lock(mtx);
+ #endif /* WITH_POSIX */
+ #ifdef WITH_CONTIKI
+   if(uip_newdata()) {
+diff --git a/net.h b/net.h
+index 38bc09a..5e31f97 100644
+--- a/net.h
++++ b/net.h
+@@ -35,11 +35,14 @@ extern "C" {
+ #ifdef HAVE_SYS_TIME_H
+ #include <sys/time.h>
+ #endif
++#include <pthread.h>
+ 
+ #ifdef WITH_LWIP
+ #include <lwip/ip_addr.h>
+ #endif
+ 
++#include <pthread.h>
++
+ #include "option.h"
+ #include "address.h"
+ #include "prng.h"
+@@ -338,7 +341,7 @@ coap_tid_t coap_retransmit( coap_context_t *context, coap_queue_t *node );
+  * and a new node with the parsed PDU is added to the receive queue in the specified context
+  * object.
+  */
+-int coap_read( coap_context_t *context );
++int coap_read( coap_context_t *context, pthread_mutex_t *mtx );
+ 
+ /** 
+  * Calculates a unique transaction id from given arguments @p peer and
+-- 
+1.9.0
+
