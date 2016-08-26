@@ -32,6 +32,8 @@
 extern "C" {
 #endif
 
+#define CONN_NO_TIMEOUT                         (UINT32_MAX)
+
 /**
  * @brief   Connection base class
  * @internal
@@ -118,11 +120,36 @@ bool gnrc_conn6_set_local_addr(uint8_t *conn_addr, const ipv6_addr_t *addr);
  * @return  The number of bytes received on success.
  * @return  0, if no received data is available, but everything is in order.
  * @return  -ENOMEM, if received data was more than max_len.
- * @returne -ETIMEDOUT, if more than 3 IPC messages were not @ref net_ng_netapi receive commands
+ * @return  -ETIMEDOUT, if more than 3 IPC messages were not @ref net_ng_netapi receive commands
  *          with the required headers in the packet
  */
 int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
                        uint16_t *port);
+
+/**
+ * @brief   Generic recvfrom
+ *
+ * @internal
+ *
+ * @param[in] conn      Connection object.
+ * @param[out] data     Pointer where the received data should be stored.
+ * @param[in] max_len   Maximum space available at @p data.
+ * @param[out] addr     NULL pointer or the sender's IP address. Must fit address of connection's
+ *                      family if not NULL.
+ * @param[out] addr_len Length of @p addr. May be NULL if @p addr is NULL.
+ * @param[out] port     NULL pointer or the sender's port.
+ * @param[in] timeout   The timeout in milliseconds the receive should wait, 0 if the function
+ *                      should never block and CONN_NO_TIMEOUT if the function should never timeout.
+ *
+ * @return  The number of bytes received on success.
+ * @return  0, if no received data is available, but everything is in order.
+ * @return  -ENOMEM, if received data was more than max_len.
+ * @return  -ETIMEDOUT, if more than 3 IPC messages were not @ref net_ng_netapi receive commands
+ *           with the required headers in the packet
+ * @return  -EWOULDBLOCK, if a timeout of 0 is given and there is no message available
+ */
+int gnrc_conn_recvfrom_timeout(conn_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
+                               uint16_t *port, uint32_t timeout);
 
 #ifdef __cplusplus
 }
