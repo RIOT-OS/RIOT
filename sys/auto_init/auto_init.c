@@ -20,10 +20,6 @@
 
 #include "auto_init.h"
 
-#ifdef MODULE_CONFIG
-#include "config.h"
-#endif
-
 #ifdef MODULE_BMP180
 #include "bmp180.h"
 #endif
@@ -97,11 +93,6 @@
 
 void auto_init(void)
 {
-#ifdef MODULE_CONFIG
-    DEBUG("Auto init loading config\n");
-    config_load();
-#endif
-
 #ifdef MODULE_TINYMT32
     random_init(0);
 #endif
