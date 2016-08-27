@@ -42,9 +42,22 @@ endif
 # Unwanted flags for c++
 CXXUWFLAGS += -std=%
 
-ifeq ($(LTO),yes)
-  $(info Building with Link-Time-Optimizations is currently an experimental feature. Expect broken binaries.)
-  LTOFLAGS = -flto -ffat-lto-objects
+# Translate yes/no into 1/0
+# Backwards-compatibility case to handle LTO=yes
+ifdef LTO
+  ifeq ($(LTO),yes)
+    override LTO := 1
+  endif
+  ifeq ($(LTO),no)
+    override LTO := 0
+  endif
+  export LTO
+else
+  export LTO := 0
+endif
+ifeq ($(LTO),1)
+  $(warning Building with Link-Time-Optimizations is currently an experimental feature. Expect broken binaries.)
+  LTOFLAGS = -flto
   CFLAGS += ${LTOFLAGS}
   LINKFLAGS += ${LTOFLAGS}
 endif

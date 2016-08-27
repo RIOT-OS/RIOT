@@ -66,7 +66,8 @@ void _init(void)
 /**
  * @brief Free resources on NewLib de-initialization, not used for RIOT
  */
-void _fini(void)
+/* __attribute__((used)) fixes linker errors when building with LTO, but without nano.specs */
+__attribute__((used)) void _fini(void)
 {
     /* nothing to do here */
 }

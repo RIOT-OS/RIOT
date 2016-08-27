@@ -14,7 +14,11 @@ USEMODULE += native-drivers
 export PREFIX =
 export CC ?= $(PREFIX)gcc
 export CXX ?= $(PREFIX)g++
-export AR ?= $(PREFIX)ar
+ifeq ($(LTO),1)
+export AR = $(PREFIX)gcc-ar
+else
+export AR = $(PREFIX)ar
+endif
 export AS ?= $(PREFIX)as
 export LINK ?= $(PREFIX)gcc
 export SIZE ?= $(PREFIX)size
@@ -41,7 +45,6 @@ export GPROF ?= gprof
 
 # basic cflags:
 export CFLAGS += -Wall -Wextra -pedantic
-export CFLAGS += -ffunction-sections -fdata-sections
 ifeq ($(shell uname -m),x86_64)
 export CFLAGS += -m32
 endif
@@ -72,6 +75,10 @@ export LINKFLAGS += -L $(BINDIR)
 else
 export LINKFLAGS += -ldl
 endif
+
+# clean up unused functions
+export CFLAGS += -ffunction-sections -fdata-sections
+export LINKFLAGS += -Wl,--gc-sections
 
 # set the tap interface for term/valgrind
 ifneq (,$(filter netdev2_tap,$(USEMODULE)))

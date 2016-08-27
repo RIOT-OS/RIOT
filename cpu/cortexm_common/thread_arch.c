@@ -282,7 +282,7 @@ __attribute__((naked)) void NORETURN thread_arch_start_threading(void)
 {
     __asm__ volatile (
     "bl     irq_arch_enable               \n" /* enable IRQs to make the SVC
-                                           * interrupt is reachable */
+                                               * interrupt is reachable */
     "svc    #1                            \n" /* trigger the SVC interrupt */
     "unreachable%=:                       \n" /* this loop is unreachable */
     "b      unreachable%=                 \n" /* loop indefinitely */
@@ -296,13 +296,31 @@ void thread_arch_yield(void)
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
-__attribute__((naked)) void arch_context_switch(void)
+void arch_context_switch(void);
+void arch_context_restore(void);
+
+__attribute__((naked)) void isr_svc(void)
 {
-    __asm__ volatile (
-    /* PendSV handler entry point */
-    ".global isr_pendsv               \n"
-    ".thumb_func                      \n"
-    "isr_pendsv:                      \n"
+    __ASM volatile (
+    "b arch_context_restore\n"
+    );
+}
+
+__attribute__((naked)) void isr_pendsv(void)
+{
+    __ASM volatile (
+    "b arch_context_switch\n"
+    );
+}
+
+__attribute__((used)) void arch_sched_run(void)
+{
+    sched_run();
+}
+
+__attribute__((naked,used)) void arch_context_switch(void)
+{
+    __ASM volatile (
     /* save context by pushing unsaved registers to the stack */
     /* {r0-r3,r12,LR,PC,xPSR} are saved automatically on exception entry */
     ".thumb_func                      \n"
@@ -332,16 +350,16 @@ __attribute__((naked)) void arch_context_switch(void)
     "ldr    r1, =sched_active_thread  \n" /* load address of current tcb */
     "ldr    r1, [r1]                  \n" /* dereference pdc */
     "str    r0, [r1]                  \n" /* write r0 to pdc->sp */
-    /* SVC handler entry point */
-    /* PendSV will continue from above and through this part as well */
-    ".global isr_svc                  \n"
-    ".thumb_func                      \n"
-    "isr_svc:                         \n"
     /* perform scheduling */
-    "bl     sched_run                 \n"
+    "bl     arch_sched_run            \n"
+    "b      arch_context_restore      \n"
+    );
+}
+
+__attribute__((naked,used)) void arch_context_restore(void)
+{
+    __ASM volatile (
     /* restore context and return from exception */
-    ".thumb_func                      \n"
-    "context_restore:                 \n"
 #if defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS)
     "mov    lr, sp                    \n" /* save MSR stack pointer for later */
     "ldr    r0, =sched_active_thread  \n" /* load address of current TCB */
