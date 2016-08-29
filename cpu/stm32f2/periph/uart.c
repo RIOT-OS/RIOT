@@ -53,13 +53,10 @@ static inline USART_TypeDef *_dev(uart_t uart)
 
 /**
  * @brief   Find out which peripheral bus the UART device is connected to
- *
- * @return  1: APB1
- * @return  2: APB2
  */
-static inline int _bus(uart_t uart)
+static inline bus_t _bus(uart_t uart)
 {
-    return (uart_config[uart].rcc_mask < RCC_APB1ENR_USART2EN) ? 2 : 1;
+    return (uart_config[uart].rcc_mask < RCC_APB1ENR_USART2EN) ? APB2 : APB1;
 }
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
@@ -77,7 +74,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
     /* check if baudrate is reachable and choose the right oversampling method*/
-    max_clock = (_bus(uart) == 1) ? CLOCK_APB1 : CLOCK_APB2;
+    max_clock = (_bus(uart) == APB1) ? CLOCK_APB1 : CLOCK_APB2;
 
     if (baudrate < (max_clock / 16)) {
         over8 = 0;
@@ -117,7 +114,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev->CR3 = 0;
     dev->CR2 = 0;
 
-    if(uart_config[uart].hw_flow_ctrl) {
+    if (uart_config[uart].hw_flow_ctrl) {
         gpio_init(uart_config[uart].cts_pin, uart_config[uart].cts_mode);
         gpio_init(uart_config[uart].rts_pin, uart_config[uart].rts_mode);
         gpio_init_af(uart_config[uart].cts_pin, uart_config[uart].af);
@@ -154,7 +151,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     if (irq_is_in()) {
         /* send data by active waiting on the TXE flag */
         uint16_t todo = dma_suspend(uart_config[uart].dma_stream);
-        if(todo >0){
+        if (todo > 0) {
             uart_dma_disable(dev);
 #ifdef DEVELHELP
             write_byte(uart, '<');
@@ -186,8 +183,8 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         /* acquire dma uart stream */
         dma_conf_acquire(uart_config[uart].dma_stream);
         /* UART stream configuration */
-        dma_stream_config(uart_config[uart].dma_stream, (uint32_t)&(dev->DR), 
-               tx_conf, (char*) data, (uint16_t)len);
+        dma_stream_config(uart_config[uart].dma_stream, (uint32_t)&(dev->DR),
+                          tx_conf, (char *) data, (uint16_t)len);
 
         uart_dma_enable(dev);
         /* dma run */
@@ -217,22 +214,12 @@ static inline void uart_dma_disable(USART_TypeDef *uart_dev)
 
 void uart_poweron(uart_t uart)
 {
-    if (_bus(uart) == 1) {
-        RCC->APB1ENR |= uart_config[uart].rcc_mask;
-    }
-    else {
-        RCC->APB2ENR |= uart_config[uart].rcc_mask;
-    }
+    periph_clk_en(_bus(uart), uart_config[uart].rcc_mask);
 }
 
 void uart_poweroff(uart_t uart)
 {
-    if (_bus(uart) == 1) {
-        RCC->APB1ENR &= ~(uart_config[uart].rcc_mask);
-    }
-    else {
-        RCC->APB2ENR &= ~(uart_config[uart].rcc_mask);
-    }
+    periph_clk_dis(_bus(uart), uart_config[uart].rcc_mask);
 }
 
 static inline void irq_handler(int uart, USART_TypeDef *dev)
