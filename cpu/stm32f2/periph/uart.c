@@ -138,6 +138,14 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return UART_OK;
 }
 
+void static inline write_byte(uart_t uart, uint8_t value)
+{
+    USART_TypeDef *dev = _dev(uart);
+
+    while (!(dev->SR & USART_SR_TXE)) {}
+    dev->DR = value;
+}
+
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     /* in case we are inside an ISR, we need to send blocking */
@@ -148,12 +156,21 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         uint16_t todo = dma_suspend(uart_config[uart].dma_stream);
         if(todo >0){
             uart_dma_disable(dev);
+#ifdef DEVELHELP
+            write_byte(uart, '<');
+#endif
         }
+#ifdef DEVELHELP
+        write_byte(uart, '|');
+#endif
         for (int i = 0; i < len; i++) {
             while (!(dev->SR & USART_SR_TXE)) {}
             dev->DR = data[i];
         }
-        if(todo > 0){
+        if (todo > 0) {
+#ifdef DEVELHELP
+            write_byte(uart, '>');
+#endif
             while (!(dev->SR & USART_SR_TXE)) {}
             uart_dma_enable(dev);
             dma_resume(uart_config[uart].dma_stream, todo);
