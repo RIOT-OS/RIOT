@@ -19,6 +19,7 @@
  * @author      Hermann Lelong <hermann@otakeys.com>
  * @author      Toon Stegen <toon.stegen@altran.com>
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
+ * @author      Pieter Willemsen <pieter.willemsen@altran.com>
  *
  * @}
  */
@@ -32,6 +33,10 @@
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
+
+static inline void uart_dma_enable(USART_TypeDef *uart_dev);
+static inline void uart_dma_disable(USART_TypeDef *uart_dev);
+void static inline write_byte(uart_t uart, uint8_t value);
 
 /**
  * @brief   Allocate memory to store the callback functions
@@ -109,7 +114,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     if (over8) {
         dev->CR1 |= USART_CR1_OVER8;
     }
-    dev->CR3 = USART_CR3_DMAT;
+    dev->CR3 = 0;
     dev->CR2 = 0;
 
     if(uart_config[uart].hw_flow_ctrl) {
@@ -136,16 +141,25 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     /* in case we are inside an ISR, we need to send blocking */
+    USART_TypeDef *dev = _dev(uart);
+
     if (irq_is_in()) {
         /* send data by active waiting on the TXE flag */
-        USART_TypeDef *dev = _dev(uart);
+        uint16_t todo = dma_suspend(uart_config[uart].dma_stream);
+        if(todo >0){
+            uart_dma_disable(dev);
+        }
         for (int i = 0; i < len; i++) {
-            while (!(dev->SR & USART_SR_TXE));
+            while (!(dev->SR & USART_SR_TXE)) {}
             dev->DR = data[i];
+        }
+        if(todo > 0){
+            while (!(dev->SR & USART_SR_TXE)) {}
+            uart_dma_enable(dev);
+            dma_resume(uart_config[uart].dma_stream, todo);
         }
     }
     else {
-        USART_TypeDef *dev = _dev(uart);
         uint32_t tx_conf = ((uart_config[uart].dma_chan << 25) |
                             DMA_SxCR_PL_0 |
                             DMA_SxCR_MINC |
@@ -155,16 +169,33 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         /* acquire dma uart stream */
         dma_conf_acquire(uart_config[uart].dma_stream);
         /* UART stream configuration */
-        dma_stream_config(uart_config[uart].dma_stream, (uint32_t)&(dev->DR), tx_conf, (char*) data, (uint16_t)len);
+        dma_stream_config(uart_config[uart].dma_stream, (uint32_t)&(dev->DR), 
+               tx_conf, (char*) data, (uint16_t)len);
+
+        uart_dma_enable(dev);
         /* dma run */
         dma_enable(uart_config[uart].dma_stream);
         /* wait until end of transmission */
         dma_transmission_acquire(uart_config[uart].dma_stream);
+
+        uart_dma_disable(dev);
         /* disable dma */
         dma_disable(uart_config[uart].dma_stream);
         /* release dma uart stream */
         dma_conf_release(uart_config[uart].dma_stream);
-   }
+    }
+}
+
+static inline void uart_dma_enable(USART_TypeDef *uart_dev)
+{
+    /* enable the selected uart DMA transmission requests */
+    uart_dev->CR3 |= USART_CR3_DMAT;
+}
+
+static inline void uart_dma_disable(USART_TypeDef *uart_dev)
+{
+    /* disable the selected uart DMA transmission requests */
+    uart_dev->CR3 &= (uint16_t) ~USART_CR3_DMAT;
 }
 
 void uart_poweron(uart_t uart)

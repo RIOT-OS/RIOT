@@ -16,6 +16,7 @@
  * @brief       Low-level DMA peripheral driver interface definitions
  *
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
+ * @author      Pieter Willemsen <pieter.willemsen@altran.com>
  */
 #ifndef DMA_H
 #define DMA_H
@@ -84,7 +85,7 @@ int dma_transmission_acquire(dma_t stream_dev);
  * This function releases the thread to continue its work. This function is
  * called internally of this driver during interruption at the end of
  * transmission.
- * this function should be called by users.
+ * this function shouldn't be called by users.
  *
  * @param[in] stream_dev        DMA device to release
  *
@@ -158,6 +159,29 @@ void dma_disable(dma_t stream_dev);
  *
  */
 void dma_clear_ifc_flag(dma_t stream_dev);
+
+/**
+ * @brief interrupts the given running DMA
+ *
+ * If the given dma is running disables it and returns the number of data items
+ * left todo. To finish the suspended transmission call dma_resume or to discard
+ * the transmission call the dma_transmission_release function.
+ *
+ * @param[out] stream_dev       DMA device to interrupt
+ *
+ * @return                      0 dma wasn't running
+ * @return                      >0 number of data items that weren't transfered
+ *
+ */
+uint16_t dma_suspend(dma_t stream_dev);
+
+/**
+ * @brief resumes the given suspended DMA
+ *
+ * @param[out] stream_dev       DMA device to resume
+ * @param[in] todo	        number of data items left to transfer
+ */
+void dma_resume(dma_t stream_dev, uint16_t todo);
 
 #ifdef __cplusplus
 }
