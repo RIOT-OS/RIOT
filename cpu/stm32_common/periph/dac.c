@@ -48,15 +48,13 @@ int8_t dac_init(dac_t line)
     gpio_init_analog(dac_config[line].pin);
     /* enable the DAC's clock */
 #if defined(DAC2)
-    RCC->APB1ENR |= dac_config[line].dac
-            ? RCC_APB1ENR_DAC2EN
-            : RCC_APB1ENR_DAC1EN;
+    periph_clk_en(APB1, dac_config[line].dac ?
+                  RCC_APB1ENR_DAC2EN : RCC_APB1ENR_DAC1EN);
 #elif defined(DAC1)
-    RCC->APB1ENR |= RCC_APB1ENR_DAC1EN;
+    periph_clk_en(APB1, RCC_APB1ENR_DAC1EN);
 #else
-    RCC->APB1ENR |= RCC_APB1ENR_DACEN;
+    periph_clk_en(APB1, RCC_APB1ENR_DACEN);
 #endif
-
     /* reset output and enable the line's channel */
     dac_set(line, 0);
     dac_poweron(line);

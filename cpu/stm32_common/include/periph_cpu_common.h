@@ -42,10 +42,19 @@ extern "C" {
 /**
  * @brief   Available peripheral buses
  */
-enum {
+typedef enum {
     APB1,           /**< APB1 bus */
-    APB2            /**< APB2 bus */
-};
+    APB2,           /**< APB2 bus */
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1)
+    AHB,           /**< AHB bus */
+#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) 
+    AHB1,           /**< AHB1 bus */
+    AHB2,           /**< AHB2 bus */
+    AHB3            /**< AHB3 bus */
+#else
+#warning "unsupported stm32XX family"
+#endif
+} bus_t;
 
 /**
  * @brief   Overwrite the default gpio_t type definition
@@ -71,7 +80,7 @@ typedef uint32_t gpio_t;
  * @param[in] bus       bus the peripheral is connected to
  * @param[in] mask      bit in the RCC enable register
  */
-void periph_clk_en(uint8_t bus, uint32_t mask);
+void periph_clk_en(bus_t bus, uint32_t mask);
 
 /**
  * @brief   Disable the given peripheral clock
@@ -79,7 +88,7 @@ void periph_clk_en(uint8_t bus, uint32_t mask);
  * @param[in] bus       bus the peripheral is connected to
  * @param[in] mask      bit in the RCC enable register
  */
-void periph_clk_dis(uint8_t bus, uint32_t mask);
+void periph_clk_dis(bus_t bus, uint32_t mask);
 
 /**
  * @brief   Configure the given pin to be used as ADC input

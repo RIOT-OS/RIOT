@@ -20,20 +20,66 @@
 
 #include "periph_cpu_common.h"
 
-void periph_clk_en(uint8_t bus, uint32_t mask)
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
+void periph_clk_en(bus_t bus, uint32_t mask)
 {
     if (bus == APB1) {
         RCC->APB1ENR |= mask;
-    } else {
+    }
+    else if (bus == APB2) {
         RCC->APB2ENR |= mask;
     }
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1)
+    else if (bus == AHB) {
+        RCC->AHBENR |= mask;
+    }
+#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
+    else if (bus == AHB1) {
+        RCC->AHB1ENR |= mask;
+    }
+    else if (bus == AHB2) {
+        RCC->AHB2ENR |= mask;
+    }
+    else if (bus == AHB3) {
+        RCC->AHB3ENR |= mask;
+    }
+#else
+#warning "add support for stm32 family to this function"
+#endif
+    else {
+        DEBUG("unsupported bus %d\n", (int)bus);
+    }
+    __DSB();
 }
 
-void periph_clk_dis(uint8_t bus, uint32_t mask)
+void periph_clk_dis(bus_t bus, uint32_t mask)
 {
     if (bus == APB1) {
         RCC->APB1ENR &= ~(mask);
-    } else {
+    }
+    else if (bus == APB2) {
         RCC->APB2ENR &= ~(mask);
+    }
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1)
+    else if (bus == AHB) {
+        RCC->AHBENR &= ~(mask);
+    }
+#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
+    else if (bus == AHB1) {
+        RCC->AHB1ENR &= ~(mask);
+    }
+    else if (bus == AHB2) {
+        RCC->AHB2ENR &= ~(mask);
+    }
+    else if (bus == AHB3) {
+        RCC->AHB3ENR &= ~(mask);
+    }
+#else
+#warning "add support for stm32 family to this function"
+#endif
+    else {
+        DEBUG("unsupported bus %d\n", (int)bus);
     }
 }
