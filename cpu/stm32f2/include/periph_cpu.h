@@ -53,15 +53,6 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   Available peripheral buses
- */
-enum {
-    AHB1,           /**< AHB1 bus */
-    AHB2,           /**< AHB2 bus */
-    AHB3            /**< AHB3 bus */
-};
-
-/**
  * @brief   Available ports on the STM32F2 family
  */
 enum {
@@ -104,13 +95,13 @@ typedef enum {
 typedef struct {
     uint8_t tim;            /**< timer used */
     GPIO_TypeDef *port;     /**< pwm device */
-    uint8_t bus;            /**< AHBx bus */
+    bus_t bus;              /**< AHBx bus */
     uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
     uint8_t CH0;            /**< channel 0 */
     uint8_t CH1;            /**< channel 1 */
     uint8_t CH2;            /**< channel 2 */
     uint8_t CH3;            /**< channel 3 */
-    uint8_t AF;             /**< alternate function */
+    gpio_af_t AF;           /**< alternate function */
 } pwm_conf_t;
 
 
@@ -172,12 +163,12 @@ typedef struct {
  */
 #define HAVE_ADC_RES_T
 typedef enum {
-    ADC_RES_6BIT  = 0x03000000,  /**< ADC resolution: 6 bit */
-    ADC_RES_8BIT  = 0x02000000,  /**< ADC resolution: 8 bit */
-    ADC_RES_10BIT = 0x01000000,  /**< ADC resolution: 10 bit */
-    ADC_RES_12BIT = 0x00000000,  /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT = 1,           /**< ADC resolution: 14 bit (not supported) */
-    ADC_RES_16BIT = 2            /**< ADC resolution: 16 bit (not supported)*/
+    ADC_RES_6BIT  = 0x03000000,     /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = 0x02000000,     /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = 0x01000000,     /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = 0x00000000,     /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 1,              /**< ADC resolution: 14 bit (not supported) */
+    ADC_RES_16BIT = 2               /**< ADC resolution: 16 bit (not supported)*/
 } adc_res_t;
 /** @} */
 
