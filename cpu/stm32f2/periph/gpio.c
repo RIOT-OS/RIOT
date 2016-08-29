@@ -68,7 +68,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     int pin_num = _pin_num(pin);
 
     /* enable clock */
-    RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN << _port_num(pin));
+    periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
 
     /* set mode */
     port->MODER &= ~(0x3 << (2 * pin_num));
@@ -87,7 +87,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                   gpio_cb_t cb, void *arg)
+                  gpio_cb_t cb, void *arg)
 {
     int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
@@ -96,7 +96,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     exti_chan[pin_num].cb = cb;
     exti_chan[pin_num].arg = arg;
     /* enable the SYSCFG clock */
-    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+    periph_clk_en(APB2, RCC_APB2ENR_SYSCFGEN);
     /* initialize pin as input */
     gpio_init(pin, mode);
     /* enable global pin interrupt */
@@ -150,7 +150,7 @@ void gpio_init_af(gpio_t pin, gpio_af_t af)
 void gpio_init_analog(gpio_t pin)
 {
     /* enable clock */
-    RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN << _port_num(pin));
+    periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
     /* set to analog mode */
     _port(pin)->MODER |= (0x3 << (2 * _pin_num(pin)));
 }
@@ -172,7 +172,8 @@ int gpio_read(gpio_t pin)
 
     if (port->MODER & (3 << (pin_num * 2))) {   /* if configured as output */
         return port->ODR & (1 << pin_num);      /* read output data reg */
-    } else {
+    }
+    else {
         return port->IDR & (1 << pin_num);      /* else read input data reg */
     }
 }
@@ -191,7 +192,8 @@ void gpio_toggle(gpio_t pin)
 {
     if (gpio_read(pin)) {
         gpio_clear(pin);
-    } else {
+    }
+    else {
         gpio_set(pin);
     }
 }
@@ -200,7 +202,8 @@ void gpio_write(gpio_t pin, int value)
 {
     if (value) {
         gpio_set(pin);
-    } else {
+    }
+    else {
         gpio_clear(pin);
     }
 }
@@ -209,6 +212,7 @@ void isr_exti(void)
 {
     /* only generate interrupts against lines which have their IMR set */
     uint32_t pending_isr = (EXTI->PR & EXTI->IMR);
+
     for (unsigned i = 0; i < GPIO_ISR_CHAN_NUMOF; i++) {
         if (pending_isr & (1 << i)) {
             EXTI->PR = (1 << i);                /* clear by writing a 1 */
