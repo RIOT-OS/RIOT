@@ -14,6 +14,7 @@
  * @brief       Low-level DMA driver implementation
  *
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
+ * @author      Pieter Willemsen <pieter.willemsen@altran.com>
  *
  * @}
  */
@@ -55,6 +56,11 @@ static mutex_t dma_conf_sync[DMA_NUMOF];
 static mutex_t dma_trans_sync[DMA_NUMOF];
 
 /**
+ * @brief   start transfer length (used for suspend/resume functionality)
+ */
+static uint16_t dma_start_length[DMA_NUMOF];
+
+/**
  * @brief   Power on the DMA device the given stream belongs to
  *
  * @param[in] stream_dev    logical DMA stream
@@ -67,6 +73,7 @@ static inline void dma_poweron(dma_t stream_dev)
     else {
         RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
     }
+    __DSB();
 }
 
 /**
@@ -148,6 +155,38 @@ static inline void dma_isr_enable(dma_t stream_dev)
     }
     else if (stream_dev < 16) {
         NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream_dev - 13)));
+    }
+}
+
+static inline void dma_isr_disable(dma_t stream_dev)
+{
+    if (stream_dev < 7) {
+        NVIC_DisableIRQ((IRQn_Type)((int)DMA1_Stream0_IRQn + stream_dev));
+    }
+    else if (stream_dev == 7) {
+        NVIC_DisableIRQ((IRQn_Type)DMA1_Stream7_IRQn);
+    }
+    else if (stream_dev < 13) {
+        NVIC_DisableIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + (stream_dev - 8)));
+    }
+    else if (stream_dev < 16) {
+        NVIC_DisableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream_dev - 13)));
+    }
+}
+
+static inline void dma_isr_clear(dma_t stream_dev)
+{
+    if (stream_dev < 7) {
+        NVIC_ClearPendingIRQ((IRQn_Type)((int)DMA1_Stream0_IRQn + stream_dev));
+    }
+    else if (stream_dev == 7) {
+        NVIC_ClearPendingIRQ((IRQn_Type)DMA1_Stream7_IRQn);
+    }
+    else if (stream_dev < 13) {
+        NVIC_ClearPendingIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + (stream_dev - 8)));
+    }
+    else if (stream_dev < 16) {
+        NVIC_ClearPendingIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream_dev - 13)));
     }
 }
 
@@ -289,6 +328,9 @@ void dma_stream_config(dma_t stream_dev, uint32_t periph_addr_reg, uint32_t dma_
     /* configure the total number of data items to be transferred */
     stream->NDTR = length;
 
+    /* save total number of data items */
+    dma_start_length[stream_dev] = length;
+
     /* enable interrupt */
     dma_isr_enable(stream_dev);
 }
@@ -299,6 +341,7 @@ void dma_enable(dma_t stream_dev)
 
     /* enable the selected DMA Stream by setting EN bit */
     stream->CR |= (uint32_t)DMA_SxCR_EN;
+    while( (stream->CR & DMA_SxCR_EN) != DMA_SxCR_EN){}
 }
 
 void dma_disable(dma_t stream_dev)
@@ -319,6 +362,33 @@ void dma_clear_ifc_flag(dma_t stream_dev)
     }
     else {
         stream_base->HIFCR = dma_ifc(stream_dev);
+    }
+}
+
+uint16_t dma_suspend(dma_t stream_dev)
+{
+    DMA_Stream_TypeDef *stream = dma_stream(stream_dev);
+    uint16_t left = 0;
+    
+    if ((stream->CR & DMA_SxCR_EN) == DMA_SxCR_EN) {
+        dma_isr_disable(stream_dev);
+        stream->CR &= ~(uint32_t)DMA_SxCR_EN;
+        while ((stream->CR & DMA_SxCR_EN) == DMA_SxCR_EN) {}
+        dma_clear_all_flags(stream_dev);
+        left = stream->NDTR;
+        dma_isr_clear(stream_dev);
+    }
+    return left;
+}
+
+void dma_resume(dma_t stream_dev, uint16_t todo)
+{
+    if(todo > 0) {
+        DMA_Stream_TypeDef *stream = dma_stream(stream_dev);
+        dma_isr_enable(stream_dev);
+        stream->NDTR = todo; 
+        stream->M0AR += dma_start_length[stream_dev] - todo;
+        stream->CR |= (uint32_t)DMA_SxCR_EN;
     }
 }
 
