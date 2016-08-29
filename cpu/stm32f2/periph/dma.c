@@ -21,11 +21,11 @@
 #include <stdio.h>
 #include <stddef.h>
 
-#include <board.h>
-#include <cpu.h>
-#include <mutex.h>
-#include <periph/dma.h>
-#include <periph_conf.h>
+#include "board.h"
+#include "cpu.h"
+#include "mutex.h"
+#include "periph/dma.h"
+#include "periph_conf.h"
 
 #include "assert.h"
 
@@ -68,12 +68,11 @@ static uint16_t dma_start_length[DMA_NUMOF];
 static inline void dma_poweron(dma_t stream_dev)
 {
     if (stream_dev < 8) {
-        RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
+        periph_clk_en(AHB1, RCC_AHB1ENR_DMA1EN);
     }
     else {
-        RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
+        periph_clk_en(AHB1, RCC_AHB1ENR_DMA2EN);
     }
-    __DSB();
 }
 
 /**
@@ -383,10 +382,10 @@ uint16_t dma_suspend(dma_t stream_dev)
 
 void dma_resume(dma_t stream_dev, uint16_t todo)
 {
-    if(todo > 0) {
+    if (todo > 0) {
         DMA_Stream_TypeDef *stream = dma_stream(stream_dev);
         dma_isr_enable(stream_dev);
-        stream->NDTR = todo; 
+        stream->NDTR = todo;
         stream->M0AR += dma_start_length[stream_dev] - todo;
         stream->CR |= (uint32_t)DMA_SxCR_EN;
     }
