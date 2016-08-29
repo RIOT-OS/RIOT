@@ -1,7 +1,8 @@
 APPLICATION = driver_slip
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h nucleo-f334 stm32f0discovery weio nucleo-f030
+BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h nucleo-f334 stm32f0discovery weio \
+                          nucleo-f030
 
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc
