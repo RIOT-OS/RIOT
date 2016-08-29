@@ -29,6 +29,7 @@
 #include "cc26x0_fcfg.h"
 #include "cc26x0_gpio.h"
 #include "cc26x0_gpt.h"
+#include "cc26x0_hapi.h"
 #include "cc26x0_i2c.h"
 #include "cc26x0_ioc.h"
 #include "cc26x0_prcm.h"
