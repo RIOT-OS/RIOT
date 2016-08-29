@@ -32,7 +32,11 @@ export CPU = x86
 
 # toolchain config
 export CC ?= $(PREFIX)gcc
-export AR ?= $(PREFIX)ar
+ifeq ($(LTO),1)
+export AR = $(PREFIX)gcc-ar
+else
+export AR = $(PREFIX)ar
+endif
 export AS ?= $(PREFIX)as
 export RANLIB ?= $(PREFIX)ranlib
 export LINK ?= $(RIOTBASE)/boards/x86-multiboot-common/dist/link $(PREFIX)gcc
@@ -46,6 +50,11 @@ LINKFLAGS += -m32 -nostdlib -nostdinc -nostartfiles -nodefaultlibs \
              --prefix=$(NEWLIB_BASE) \
              -Wl,-rpath,$(NEWLIB_BASE)/lib \
              -T$(RIOTBASE)/boards/x86-multiboot-common/linker.ld
+
+# clean up unused functions
+export CFLAGS += -ffunction-sections -fdata-sections
+export LINKFLAGS += -Wl,--gc-sections
+
 UNDEF += $(BINDIR)x86-multiboot-common/startup.o
 
 BASELIBS += $(NEWLIB_BASE)/lib/libc.a \

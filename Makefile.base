@@ -23,7 +23,7 @@ ${DIRS:%=CLEAN--%}:
 	"$(MAKE)" -C ${@:CLEAN--%=%} clean
 
 ifeq ($(strip $(SRC)),)
-    SRC := $(wildcard *.c)
+    SRC := $(filter-out $(SRC_NOLTO), $(wildcard *.c))
 endif
 ifeq ($(strip $(SRCXX)),)
     SRCXX := $(wildcard *.cpp)
@@ -35,10 +35,12 @@ ifeq ($(strip $(ASSMSRC)),)
     ASSMSRC := $(wildcard *.S)
 endif
 
-OBJC    := $(SRC:%.c=$(BINDIR)$(MODULE)/%.o)
-OBJCXX  := $(SRCXX:%.cpp=$(BINDIR)$(MODULE)/%.o)
-ASMOBJ  := $(ASMSRC:%.s=$(BINDIR)$(MODULE)/%.o)
-ASSMOBJ := $(ASSMSRC:%.S=$(BINDIR)$(MODULE)/%.o)
+OBJC_LTO    := $(SRC:%.c=$(BINDIR)$(MODULE)/%.o)
+OBJC_NOLTO  := $(SRC_NOLTO:%.c=$(BINDIR)$(MODULE)/%.o)
+OBJC        := $(OBJC_NOLTO) $(OBJC_LTO)
+OBJCXX      := $(SRCXX:%.cpp=$(BINDIR)$(MODULE)/%.o)
+ASMOBJ      := $(ASMSRC:%.s=$(BINDIR)$(MODULE)/%.o)
+ASSMOBJ     := $(ASSMSRC:%.S=$(BINDIR)$(MODULE)/%.o)
 
 OBJ := $(OBJC) $(OBJCXX) $(ASMOBJ) $(ASSMOBJ)
 DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
@@ -55,6 +57,8 @@ $(BINDIR)$(MODULE).a: $(OBJ) | ${DIRS:%=ALL--%}
 CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 
 # compile and generate dependency info
+
+$(OBJC_LTO): CFLAGS+=$(LTOFLAGS)
 
 $(OBJC): $(BINDIR)$(MODULE)/%.o: %.c $(RIOTBUILD_CONFIG_HEADER_C)
 	$(AD)$(CCACHE) $(CC) \
