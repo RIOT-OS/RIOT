@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 INRIA
+ * Copyright (C) 2015, 2016 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -131,6 +131,38 @@ extern "C" {
  */
 #define CCNL_QUEUE_SIZE     (8)
 
+typedef struct {
+    struct ccnl_prefix_s *prefix;
+    unsigned char *buf;
+    size_t buflen;
+} ccnl_interest_t;
+
+
+/**
+ * Maximum string length for prefix representation
+ */
+#define CCNL_PREFIX_BUFSIZE     (50)
+
+/**
+ * Message type for signalling a timeout while waiting for a content chunk
+ */
+#define CCNL_MSG_TIMEOUT        (0x1701)
+
+/**
+ * Message type for advancing the ageing timer
+ */
+#define CCNL_MSG_AGEING         (0x1702)
+
+/**
+ * Maximum number of elements that can be cached
+ */
+#ifndef CCNL_CACHE_SIZE
+#define CCNL_CACHE_SIZE     (5)
+#endif
+#ifdef DOXYGEN
+#define CCNL_CACHE_SIZE
+#endif
+
 /**
  * Struct holding CCN-Lite's central relay information
  */
@@ -139,8 +171,15 @@ extern struct ccnl_relay_s ccnl_relay;
 /**
  * @brief Function pointer type for local producer function
  */
-typedef int (*ccnl_producer_func)(struct ccnl_relay_s *relay, struct
-                                  ccnl_face_s *from, struct ccnl_pkt_s *pkt);
+typedef int (*ccnl_producer_func)(struct ccnl_relay_s *relay,
+                                  struct ccnl_face_s *from,
+                                  struct ccnl_pkt_s *pkt);
+
+/**
+ * @brief Function pointer type for caching strategy function
+ */
+typedef int (*ccnl_cache_strategy_func)(struct ccnl_relay_s *relay,
+                                        struct ccnl_content_s *c);
 
 /**
  * @brief   Start the main CCN-Lite event-loop
@@ -164,17 +203,15 @@ int ccnl_open_netif(kernel_pid_t if_pid, gnrc_nettype_t netreg_type);
 /**
  * @brief Sends out an Interest
  *
- * @param[in] suite     CCN packet format
- * @param[in] name      The name that is requested
- * @param[in] chunknum  Number of the requested content chunk
+ * @param[in] prefix    The name that is requested
  * @param[out] buf      Buffer to write the content chunk to
  * @param[in] buf_len   Size of @p buf
  *
- * @return 0 on successfully sent Interest
- * @return -1 if Interested couldn't be sent
+ * @return pointer to the successfully sent Interest
+ * @return NULL if Interest couldn't be sent
  */
-int ccnl_send_interest(int suite, char *name, unsigned int *chunknum,
-                       unsigned char *buf, size_t buf_len);
+struct ccnl_interest_s *ccnl_send_interest(struct ccnl_prefix_s *prefix,
+                                           unsigned char *buf, size_t buf_len);
 
 /**
  * @brief Wait for incoming content chunk
@@ -223,6 +260,21 @@ void ccnl_fib_show(struct ccnl_relay_s *relay);
  * @param[in] func  The function to be called first for any incoming interest
  */
 void ccnl_set_local_producer(ccnl_producer_func func);
+
+/**
+ * @brief Set a function to control the caching strategy
+ *
+ * The given function will be called if the cache is full and a new content
+ * chunk arrives. It shall remove (at least) one entry from the cache.
+ *
+ * If the return value of @p func is 0, the default caching strategy will be
+ * applied by the CCN-lite stack. If the return value is 1, it is assumed that
+ * (at least) one entry has been removed from the cache.
+ *
+ * @param[in] func  The function to be called for an incoming content chunk if
+ *                  the cache is full.
+ */
+void ccnl_set_cache_strategy_remove(ccnl_cache_strategy_func func);
 
 #ifdef __cplusplus
 }
