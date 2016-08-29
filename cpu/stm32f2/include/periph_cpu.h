@@ -53,15 +53,6 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   Available peripheral buses
- */
-enum {
-    AHB1,           /**< AHB1 bus */
-    AHB2,           /**< AHB2 bus */
-    AHB3            /**< AHB3 bus */
-};
-
-/**
  * @brief   Available ports on the STM32F2 family
  */
 enum {
@@ -161,9 +152,9 @@ void gpio_init_analog(gpio_t pin);
 static inline void dma_poweron(int stream)
 {
     if (stream < 8) {
-        RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
+        periph_clk_en(AHB1, RCC_AHB1ENR_DMA1EN);
     } else {
-        RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
+        periph_clk_en(AHB1, RCC_AHB1ENR_DMA2EN);
     }
 }
 

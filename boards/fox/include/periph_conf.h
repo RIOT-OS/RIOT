@@ -125,8 +125,8 @@ static const uart_conf_t uart_config[] = {
 
 /* SPI 0 device configuration */
 #define SPI_0_DEV           SPI2
-#define SPI_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_SPI2EN)
-#define SPI_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_SPI2EN))
+#define SPI_0_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_SPI2EN))
+#define SPI_0_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_SPI2EN))
 #define SPI_0_BUS_DIV       0   /* 1 -> SPI runs with full CPU clock, 0 -> half CPU clock */
 /* SPI 0 pin configuration */
 #define SPI_0_CLK_PIN       GPIO_PIN(PORT_B,13)
@@ -160,8 +160,8 @@ static const uart_conf_t uart_config[] = {
 
 /* I2C 0 device configuration */
 #define I2C_0_DEV           I2C1
-#define I2C_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_I2C1EN)
-#define I2C_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN))
+#define I2C_0_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_I2C1EN))
+#define I2C_0_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_I2C1EN))
 #define I2C_0_EVT_IRQ       I2C1_EV_IRQn
 #define I2C_0_EVT_ISR       isr_i2c1_ev
 #define I2C_0_ERR_IRQ       I2C1_ER_IRQn

@@ -75,7 +75,7 @@ static void clk_init(void)
     /* Flash 1 wait state */
     FLASH->ACR |= CLOCK_FLASH_LATENCY;
     /* Power enable */
-    RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
     /* Select the Voltage Range 1 (1.8 V) */
     PWR->CR = PWR_CR_VOS_0;
     /* Wait Until the Voltage Regulator is ready */
