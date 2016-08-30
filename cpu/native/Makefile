@@ -10,6 +10,10 @@ ifneq (,$(filter mtd_native,$(USEMODULE)))
 	DIRS += mtd
 endif
 
+ifneq (,$(filter mci,$(USEMODULE)))
+	DIRS += mci
+endif
+
 include $(RIOTBASE)/Makefile.base
 
 INCLUDES = $(NATIVEINCLUDES)
