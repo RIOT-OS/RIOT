@@ -198,6 +198,7 @@ static void _send(gnrc_pktsnip_t *pkt)
         gnrc_pktbuf_release(pkt);
         return;
     }
+    tmp->next = udp_snip;
     hdr = (udp_hdr_t *)udp_snip->data;
     /* fill in size field */
     hdr->length = byteorder_htons(gnrc_pkt_len(udp_snip));
