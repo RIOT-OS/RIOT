@@ -13,6 +13,7 @@ RIOTBASE ?= $(CURDIR)/../..
 #CFLAGS += -DDEVELHELP
 
 USEMODULE += mci
+USEMODULE += flash_sim
 USEMODULE += ftl
 USEMODULE += xtimer
 

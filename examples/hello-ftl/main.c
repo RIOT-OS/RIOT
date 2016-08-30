@@ -73,14 +73,14 @@ ftl_partition_s *partitions[] = {
 int write(const unsigned char *buffer, uint32_t page, uint32_t offset, uint16_t length) {
     assert__(offset == 0);
     assert__(length == device.subpage_size);
-    int ret = MCI_write(buffer, page, 1);
+    int ret = mci_write(buffer, page, 1);
     return ret;
 }
 
 int read(unsigned char *buffer, uint32_t page, uint32_t offset, uint16_t length) {
     assert__(offset == 0);
     assert__(length == device.subpage_size);
-    int ret = MCI_read(buffer, page, 1);
+    int ret = mci_read(buffer, page, 1);
     return ret;
 }
 
@@ -88,7 +88,7 @@ int erase(uint32_t block) {
     unsigned int buff[2];
     buff[0] = block * device.pages_per_block;
     buff[1] = (block + 1) * device.pages_per_block - 1;
-    int ret = MCI_ioctl(CTRL_ERASE_SECTOR, &buff);
+    int ret = mci_ioctl(CTRL_ERASE_SECTOR, &buff);
     return ret;
 }
 
@@ -103,5 +103,6 @@ int main(void)
     ret = ftl_read_raw(&index_partition, device._subpage_buffer, 0);
     assert__(ret == 0);
 
+    printf("Success\n");
     return 0;
 }
