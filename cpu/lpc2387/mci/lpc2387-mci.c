@@ -477,7 +477,7 @@ static int wait_ready(unsigned short tmr)
 {
     unsigned long rc;
 
-    uint32_t stoppoll = xtimer_now() + tmr * 100;
+    uint32_t stoppoll = xtimer_now() + tmr * MS_IN_USEC;
     bool bBreak = false;
 
     while (xtimer_now() < stoppoll/*Timer[0]*/) {
