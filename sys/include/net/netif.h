@@ -27,6 +27,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Special identifier for "any interface" e.g. for usage with socks
+ *
+ * @todo    Add reference to sock module when #5758 was merged.
+ */
+#define NETIF_ANY       (0)
+
+/**
  * @brief   Maximum length of the optional interface names
  */
 #define NETIF_NAME_LEN  (4U)
@@ -86,9 +93,6 @@ int netif_add(netif_t *netif);
  * @brief   Get ID (position in @ref netifs, with 1 being the first) of
  *          interface
  *
- * @note    The ID starts with 1 so 0 can be a special value (e.g. "any interface"
- *          when using with @ref net_conn "conn")
- *
  * @param[in] netif An interface.
  *
  * @return  The ID of @p netif.
@@ -99,9 +103,6 @@ int netif_get_id(netif_t *netif);
 /**
  * @brief   Get ID (position in @ref netifs, with 1 being the first) of
  *          interface
- *
- * @note    The ID starts with 1 so 0 can be a special value (e.g. "any interface"
- *          when using with @ref net_conn "conn")
  *
  * @param[in] id    An ID for an interface. This parameter is of type `int`,
  *                  so it is easily usable with the result from
