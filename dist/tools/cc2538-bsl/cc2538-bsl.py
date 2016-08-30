@@ -48,6 +48,7 @@ import os
 import subprocess
 import struct
 import binascii
+import time
 
 #version
 VERSION_STRING = "1.0"
@@ -121,6 +122,9 @@ class CommandInterface(object):
         self.sp.setRTS(1)
         self.sp.setRTS(0)
         self.sp.setDTR(0)
+
+        # Wait for the board to reset
+        time.sleep(0.5)
 
     def close(self):
         self.sp.close()
