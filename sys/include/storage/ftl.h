@@ -14,37 +14,37 @@
  *              to flash-based data storage devices.
  *
 
-Current flash storage chips commonly have blocksizes of 2k or more. The RIOT FTL divides
+TOOD: Move this. The RIOT FTL divides
 each page on the flash device into one or more so-called subpages to reduce the size of
 the required read/write buffers. Each subpage is optionally attached with an error
 correction code.
 
-On initialization, the device is divided into two partitions, the index partition intended
-for metadata and the data partition.
+
 
 Initialization
 ==============
 
 In order to make use of the FTL, it needs to be initialized with the parameters
-particular to the flash device you wish to use:
+particular to the flash device you wish to use, i.e.:
 
-- The device page size
+- Its page size
 - The amount of pages in each erase block
-- The total amount of pages on the devices (or as many as you wish to address)
+- The total amount of pages on the device (or as many as you wish to address through the FTL)
 
 In addition, a subpage size fitting the storage device needs to be chosen, knowing that
 the FTL will allocate a read/write buffer of the same size. There are some constraints
 to keep in mind when choosing the subpage size:
 
-- Size of the ECC scales increases with the subpage size (see #ftl_ecc_size).
+- Size of the ECC scales with the subpage size (see #ftl_ecc_size).
 - The target flash storage must support at least (page size)/(subpage size) sequential
   writes to the same page (without having to erase the resident block).
-- Since each subpage is preceded by a dedicated header, the metadata to data ratio will
+- Since each subpage is preceded by a dedicated fixed-size header, the metadata to data ratio will
   gets worse with decreasing subpage size.
 
 Lastly, the FTL needs to be given three callbacks for reading/writing raw data and for
 erasing a single block. For the required signature please see the write/read/erase members
 of #ftl_device_s.
+
 
 Example
 -------
@@ -112,7 +112,7 @@ Writing data with an ECC works similarly:
 
     assert(header.data_length == 503);
 
-To know in advance how much data can be written per page, one can use the
+To know in advance how much data can be written per subpage, one can use the
 #ftl_data_per_subpage function:
 
     int data_length = ftl_data_per_subpage(&device, false);
@@ -120,6 +120,11 @@ To know in advance how much data can be written per page, one can use the
 
     assert(data_length == 509);
     assert(data_length_with_ecc == 503);
+
+ECC
+===
+
+TODO: write about ecc
 
  *
  *
@@ -148,65 +153,65 @@ extern "C" {
 struct ftl_device_s;
 
 /**
- * @brief Describes a partition on a device managed by the FTL.
+ * @brief A partition on a device managed by the FTL.
  */
-typedef struct {
+typedef struct ftl_partition_s {
     struct ftl_device_s *device;    //!< The device on which the partition is located
-    uint32_t base_offset;           //!< Zero-indexed absolute offset of the partition __in blocks__.
-    uint32_t size;                  //!< Size of the partition __in blocks__.
+    uint32_t base_offset;           //!< Zero-indexed absolute offset of the partition __in blocks__
+    uint32_t size;                  //!< Size of the partition __in blocks__
 
-    uint32_t next_subpage;             //!< The next page to be written by the FTL
-    uint32_t last_written_subpage;     //!< Page that was last written in this partition.
-                                    //   Must not necessarily be next_page-1, because block
-                                    //   may have been faulty.
+    /**
+     * The next page to be written by the FTL, or in other words,
+     * the first known free page
+     */
+    uint32_t next_subpage;
 
-    // See Sect. Free Space Management
+    /**
+     * Page that was last written in this partition. Must not necessarily be next_page-1,
+     * because the previous block may have been faulty
+     */
+    uint32_t last_written_subpage;
+
     uint32_t erased_until;          //!< Pointer to the last erased block
     uint32_t free_until;            //!< Pointer to the last known free block
 } ftl_partition_s;
 
-// typedef struct {
-
-// } ftl_;
-
 /**
- * @brief Describes a device managed by the FTL.
+ * @brief A device managed by the FTL.
  */
 typedef struct ftl_device_s {
     uint32_t metadata_version;
 
-    uint32_t total_pages;       //!< Total amount of pages configured for the device
-    uint16_t page_size;         //!< Page size configured for the device
-    uint16_t subpage_size;      //!< Subpage size
-    uint16_t pages_per_block;   //!< Amount of pages inside an erase segment (block)
-    uint8_t ecc_size;           //!< Size of the ECC determined for device's subpage size
-    bool is_initialized;
+    uint32_t total_pages;     //!< Total amount of pages configured for the device
+    uint16_t page_size;       //!< Page size configured for the device
+    uint16_t subpage_size;    //!< Size of a single subpage in bytes
+    uint16_t pages_per_block; //!< Amount of pages inside an erase segment (block)
+    uint8_t ecc_size;         //!< Size of the ECC determined for device's subpage size
+    bool is_initialized;      //!< Whether #ftl_init was successfully called
 
+    uint8_t partition_count;      //!< Number of partitions allocated for this device
+    ftl_partition_s **partitions; //!< Array of partitions allocated for this device
 
-
-    uint8_t partition_count;
-    ftl_partition_s **partitions;
-
-    unsigned char *_subpage_buffer;  //!< Buffer for subpage read/write operations.
-    unsigned char *_ecc_buffer;   //!< Buffer for ECC calculation
+    unsigned char *_subpage_buffer; //!< Buffer for subpage read/write operations.
+    unsigned char *_ecc_buffer;     //!< Buffer for ECC calculation
 
     /**
      * Callback which must write a data buffer of the given length to a certain offset
      * inside a page.
      */
     int (*_write)(const unsigned char *buffer,
-                         uint32_t page,
-                         uint32_t offset,
-                         uint16_t length);
+                              uint32_t page,
+                              uint32_t offset,
+                              uint16_t length);
 
     /**
      * Callback which must read a data segment of the given length from a certain offset
      * inside a page and writes it to the given data buffer.
      */
     int (*_read)(unsigned char *buffer,
-                        uint32_t page,
-                        uint32_t offset,
-                        uint16_t length);
+                       uint32_t page,
+                       uint32_t offset,
+                       uint16_t length);
 
     /**
      * Callback which must erase the given block.
@@ -215,7 +220,7 @@ typedef struct ftl_device_s {
 
 
     /**
-     * Callback which must erase |length| blocks starting at "start_block".
+     * Callback which must erase "length" blocks starting at "start_block".
      */
     int (*_bulk_erase)(uint32_t start_block, uint32_t length);
 } ftl_device_s;
@@ -226,11 +231,34 @@ typedef struct ftl_device_s {
  * The header may be followed by an ECC of the size defined in ::ftl_device_s's ecc_size.
  * TODO adjust according to thesis
  */
-typedef struct __attribute__((__packed__)) {
+typedef struct __attribute__((__packed__)) subpageheader_s {
     unsigned int data_length:16;    //!< Length of the data written to this subpage
     unsigned int ecc_enabled:1;     //!< If the header is directly followed by an ECC
     unsigned int reserved:7;        //!< Reserved for future use
 } subpageheader_s;
+
+/**
+ * The ftl_metadata_header is always written at the start of a metadata subpage,
+ * followed by the the following (in this order)
+ *
+ *    - `$partition_count * sizeof(ftl_partition_s)` bytes of partition information
+ *    - `$foreign_metadata_length` bytes of metadata belonging to the OSL, or another
+ *      system built on top of the FTL.
+ */
+typedef struct __attribute__((__packed__)) ftl_metadata_header_s {
+    /**
+     * Sequential version number to decide whether any given metadata subpage is more
+     * recent than another
+     */
+    uint32_t version;
+
+    /**
+     * Foreign metadata (bytes) stored by the storage layer operating above the FTL
+     */
+    uint16_t foreign_metadata_length;
+
+    uint8_t partition_count; //!< Number of known partitions in this metadata chunk
+} ftl_metadata_header_s;
 
 /** @} */
 
@@ -274,9 +302,9 @@ int ftl_init(ftl_device_s *device);
  * @return           Any error code that #ftl_read_raw may return
  */
 int ftl_read(const ftl_partition_s *partition,
-                     unsigned char *buffer,
-                     subpageheader_s *header,
-                     uint32_t subpage);
+             unsigned char *buffer,
+             subpageheader_s *header,
+             uint32_t subpage);
 
 /**
  * @brief Writes a single subpage, including its header, without error correction
@@ -293,8 +321,8 @@ int ftl_read(const ftl_partition_s *partition,
  * @return             -EFBIG if the given data does not fit into a subpage
  */
 int ftl_write(ftl_partition_s *partition,
-                      const unsigned char *buffer,
-                      uint16_t data_length);
+              const unsigned char *buffer,
+              uint16_t data_length);
 
 /**
  * @brief Same as #ftl_write, but adds an error correction code (ECC) to the written subpage
@@ -308,8 +336,8 @@ int ftl_write(ftl_partition_s *partition,
  * @see #ftl_write
  */
 int ftl_write_ecc(ftl_partition_s *partition,
-                      const unsigned char *buffer,
-                      uint16_t data_length);
+                  const unsigned char *buffer,
+                  uint16_t data_length);
 
 
 /**
@@ -341,8 +369,8 @@ int ftl_erase(const ftl_partition_s *partition, uint32_t block);
  * @return 0 or an error code
  */
 int ftl_write_raw(const ftl_partition_s *partition,
-                          const unsigned char *buffer,
-                          uint32_t subpage);
+                  const unsigned char *buffer,
+                  uint32_t subpage);
 
 /**
  * @brief Reads a single subpage from the given partition into the buffer, __including
@@ -357,32 +385,38 @@ int ftl_write_raw(const ftl_partition_s *partition,
  * @return    -EFAULT if an invalid subpage is given
  */
 int ftl_read_raw(const ftl_partition_s *partition,
-                         unsigned char *buffer,
-                         uint32_t subpage);
+                 unsigned char *buffer,
+                 uint32_t subpage);
 
+/** @} */
 
 
 /**
- * The ftl_metadata_header is always written at the start of a page, followed by the
- * the following (in this order)
- *
- *    - $partition_count * sizeof(ftl_partition_s) bytes of partition information
- *    - $foreign_metadata_length bytes of metadata belonging to the OSL, or another
- *      system built on top of the FTL.
+ * @name Functions for metadata handling
+ * @{
  */
-typedef struct __attribute__((__packed__)) {
-    uint32_t version;
-    uint16_t foreign_metadata_length;
-    uint8_t partition_count;
-} ftl_metadata_header_s;
 
 
-int ftl_load_metadata_page_with_version(ftl_device_s *device, uint32_t version, uint32_t *source_page);
-int ftl_write_metadata(ftl_device_s *device, const void *metadata, uint16_t length);
-int32_t ftl_load_latest_metadata(ftl_device_s *device, void *buffer, ftl_metadata_header_s *header, bool set_ftl_state);
-int32_t ftl_load_metadata(ftl_device_s *device, void *buffer, ftl_metadata_header_s *header, uint32_t version, bool set_ftl_state);
+int ftl_load_metadata_page_with_version(ftl_device_s *device,
+                                        uint32_t version,
+                                        uint32_t *source_page);
 
+int ftl_write_metadata(ftl_device_s *device,
+                       const void *metadata,
+                       uint16_t length);
 
+int32_t ftl_load_latest_metadata(ftl_device_s *device,
+                                 void *buffer,
+                                 ftl_metadata_header_s *header,
+                                 bool set_ftl_state);
+
+int32_t ftl_load_metadata(ftl_device_s *device,
+                          void *buffer,
+                          ftl_metadata_header_s *header,
+                          uint32_t version,
+                          bool set_ftl_state);
+
+/** @} */
 
 /**
  * @name Utility functions without side-effects
