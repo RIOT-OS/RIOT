@@ -3,7 +3,12 @@ dist: trusty
 
 language: generic
 
-cache: apt
+cache:
+    apt: true
+    directories:
+        - toolchain
+        - pkg/libfixmath/checkout
+        - pkg/tlsf/tlsf-3.0.zip
 
 env:
     global:
