@@ -65,11 +65,11 @@ struct netaddr *routingtable_get_next_hop(struct netaddr *dest, aodvv2_metric_t 
 }
 
 void routingtable_add_entry(struct netaddr *addr, aodvv2_seqnum_t *seqnum,
-                            struct netaddr *nextHopAddr, aodvv2_metric_t *metricType,
+                            struct netaddr *nextHopAddr, aodvv2_metric_t metricType,
                             uint8_t metric, uint8_t state, timex_t *timestamp)
 {
     /* only add if we don't already know the address */
-    if (routingtable_get_entry(addr, *metricType)) {
+    if (routingtable_get_entry(addr, metricType)) {
         /* stop compiler from complaining about unused entries
         (TODO am I shooting myself in the foot here?)*/
         (void) seqnum;
@@ -84,7 +84,7 @@ void routingtable_add_entry(struct netaddr *addr, aodvv2_seqnum_t *seqnum,
         if (routingtable[i].addr._type == AF_UNSPEC) {
             // TODO: is the memcpy here correct or do I need another & ?
             memcpy(&(routingtable[i].addr), addr, sizeof(struct netaddr));
-            (routingtable[i].metricType) = *metricType;
+            (routingtable[i].metricType) = metricType;
             routingtable_update_entry(&routingtable[i], seqnum, nextHopAddr,
                                       metric, state, timestamp);
 

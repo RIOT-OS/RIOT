@@ -67,21 +67,22 @@ struct aodvv2_routing_entry_t
 void routingtable_init(void);
 
 /**
- * @brief     Get next hop towards dest.
- *            Returns NULL if dest is not in routing table.
+ * @brief     Get next hop towards @param dest.
+ *            Returns NULL if @param dest is not in the routing table.
  *
  * @param[in] dest        Destination of the packet
  * @param[in] metricType  Metric Type of the desired route
  * @return                next hop towards dest if it exists, NULL otherwise
  */
-struct netaddr *routingtable_get_next_hop(struct netaddr *dest, aodvv2_metric_t metricType);
+struct netaddr *routingtable_get_next_hop(struct netaddr *dest,
+                                          aodvv2_metric_t metricType);
 
 /**
  * @brief     Add new entry to routing table, if there is no other entry
  *            to the same destination.
  *
  * @param[in] addr           The destination address of the new route
- * @param[in] seqnum         The sequence number associated with the route towrds addr
+ * @param[in] seqnum         The sequence number associated with the route towards addr
  * @param[in] nextHopAddr    The next hop towards addr
  * @param[in] metricType     The metric type of the route towards addr
  * @param[in] metric         The metric value of the route
@@ -89,18 +90,19 @@ struct netaddr *routingtable_get_next_hop(struct netaddr *dest, aodvv2_metric_t 
  * @param[in] timestamp      The time at wich the route info was received
  */
 void routingtable_add_entry(struct netaddr *addr, aodvv2_seqnum_t *seqnum,
-                            struct netaddr *nextHopAddr, aodvv2_metric_t *metricType,
+                            struct netaddr *nextHopAddr, aodvv2_metric_t metricType,
                             uint8_t metric, uint8_t state, timex_t *timestamp);
 
 /**
  * @brief     Retrieve pointer to a routing table entry.
- *            Returns NULL if addr is not in routing table.
+ *            Returns NULL if @param addr is not in routing table.
  *
  * @param[in] addr          The destination address of the desired route
  * @param[in] metricType    Metric Type of the desired route
  * @return                  Routing table entry if it exists, NULL otherwise
  */
-struct aodvv2_routing_entry_t *routingtable_get_entry(struct netaddr *addr, aodvv2_metric_t metricType);
+struct aodvv2_routing_entry_t *routingtable_get_entry(struct netaddr *addr,
+                                                      aodvv2_metric_t metricType);
 
 /**
  * @brief     Edit routing table entry @param entry.
@@ -120,8 +122,8 @@ struct aodvv2_routing_entry_t *routingtable_update_entry(
                             uint8_t metric, uint8_t state, timex_t *timestamp);
 
 /**
- * @brief     Delete routing table entry towards addr with metric type MetricType,
- *            if it exists.
+ * @brief     Delete routing table entry towards @param addr with metric type
+ *            MetricType, if it exists.
  *
  * @param[in] addr          The address towards which the route should point
  * @param[in] metricType    Metric Type of the desired route
@@ -130,11 +132,11 @@ void routingtable_delete_entry(struct netaddr *addr, aodvv2_metric_t metricType)
 
 /**
  * Find all routing table entries that use hop as their nextHopAddress, mark them
- * as broken, write the active one into unreachable_nodes[] and increment len
- * accordingly. (Sorry about the Name.)
+ * as broken, write the active one into unreachable_nodes[] and increment
+ * @param len accordingly. (Sorry about the Name.)
  *
  * @param hop                 Address of the newly unreachable next hop
- * @param unreachable_nodes[] array of newlu unreachable nodes to be filled.
+ * @param unreachable_nodes[] array of newly unreachable nodes to be filled.
  *                            should be empty.
  * @param len                 size_t* which will contain the length of
  *                            unreachable_nodes[] after execution

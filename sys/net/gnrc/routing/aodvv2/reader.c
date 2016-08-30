@@ -314,7 +314,7 @@ static enum rfc5444_result _cb_rreq_end_callback(
 
         routingtable_add_entry(&packet_data.origNode.addr,
                                &packet_data.origNode.seqnum,
-                               &packet_data.sender, &packet_data.metricType,
+                               &packet_data.sender, packet_data.metricType,
                                packet_data.origNode.metric, ROUTE_STATE_ACTIVE,
                                &packet_data.timestamp);
 
@@ -500,7 +500,7 @@ static enum rfc5444_result _cb_rrep_end_callback(
 
         routingtable_add_entry(&packet_data.targNode.addr,
                                &packet_data.targNode.seqnum,
-                               &packet_data.sender, &packet_data.metricType,
+                               &packet_data.sender, packet_data.metricType,
                                packet_data.targNode.metric, ROUTE_STATE_ACTIVE,
                                &packet_data.timestamp);
 
