@@ -24,7 +24,7 @@ env:
 
 before_install:
     - source ./dist/tools/pr_check/check_labels.sh
-    - test -z "$TRAVIS_PULL_REQUEST" || test "$BUILDTEST_MCU_GROUP" = "static-tests" || check_gh_label "Ready for CI build" || exit 1
+    - test -z "$TRAVIS_PULL_REQUEST" || check_gh_label "Ready for CI build" || exit 1
     - sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
     - sudo apt-get update -qq
 
