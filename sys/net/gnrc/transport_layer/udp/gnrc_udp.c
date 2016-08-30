@@ -165,6 +165,7 @@ static void _send(gnrc_pktsnip_t *pkt)
 {
     udp_hdr_t *hdr;
     gnrc_pktsnip_t *udp_snip, *tmp;
+    gnrc_nettype_t target_type = pkt->type;
 
     /* write protect first header */
     tmp = gnrc_pktbuf_start_write(pkt);
@@ -203,8 +204,14 @@ static void _send(gnrc_pktsnip_t *pkt)
     /* fill in size field */
     hdr->length = byteorder_htons(gnrc_pkt_len(udp_snip));
 
+    /* set to IPv6, if first header is netif header */
+    if (target_type == GNRC_NETTYPE_NETIF) {
+        target_type = pkt->next->type;
+    }
+
     /* and forward packet to the network layer */
-    if (!gnrc_netapi_dispatch_send(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
+    if (!gnrc_netapi_dispatch_send(target_type, GNRC_NETREG_DEMUX_CTX_ALL,
+                                   pkt)) {
         DEBUG("udp: cannot send packet: network layer not found\n");
         gnrc_pktbuf_release(pkt);
     }
