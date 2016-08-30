@@ -3,7 +3,10 @@ dist: trusty
 
 language: generic
 
-cache: apt
+cache:
+    - apt
+    - directories:
+        - pkg
 
 env:
     global:
