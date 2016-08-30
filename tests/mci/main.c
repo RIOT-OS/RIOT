@@ -76,17 +76,17 @@ void sprint_double(char *buffer, double x, int precision) {
 }
 
 static void write_test_sector(int sector_number) {
-    DSTATUS status;
+    diskio_sta_t status;
     printf("About to write the following to sector %d:\n%s\n", sector_number, teststring2);
-    status = MCI_write(teststring2, sector_number, 1);
+    status = mci_write(teststring2, sector_number, 1);
     printf("MCI write status: 0x%hhx\n", status);
     TEST_ASSERT_EQUAL_INT(0, status);
 }
 
 static void read_test_sector(int sector_number, bool test_empty) {
-    DSTATUS status;
+    diskio_sta_t status;
     printf("About to read from SDCard sector %d\n", sector_number);
-    status = MCI_read(read_buffer, sector_number, 1);
+    status = mci_read(read_buffer, sector_number, 1);
     _zero_end_strings();
     printf("MCI read status: 0x%hhx\n", status);
     printf("Read the following:\n'%s'\n", read_buffer);
@@ -101,12 +101,12 @@ static void read_test_sector(int sector_number, bool test_empty) {
 }
 
 static void erase_block(int block_number) {
-    DSTATUS status;
+    diskio_sta_t status;
     printf("About to erase block %d\n", block_number);
     unsigned long params[2];
     params[0] = 1024*block_number; // start
     params[1] = 1024*(block_number+1)-1; // end
-    status = MCI_ioctl(CTRL_ERASE_SECTOR, &params);
+    status = mci_ioctl(CTRL_ERASE_SECTOR, &params);
     TEST_ASSERT_EQUAL_INT(0, status);
     printf("MCI read status: 0x%hhx\n", status);
 }
@@ -114,29 +114,29 @@ static void erase_block(int block_number) {
 
 static void main_test(void)
 {
-    DSTATUS status = MCI_initialize();
+    diskio_sta_t status = mci_initialize();
     printf("MCI status: 0x%hhx\n", status);
 
-    if(status == STA_NOINIT) {
+    if(status == DISKIO_STA_NOINIT) {
         printf("Could not initialize MCI interface :(\n");
-    } else if(status == STA_NODISK) {
+    } else if(status == DISKIO_STA_NODISK) {
         printf("NO SDCard detected. Aborting\n");
-    } else if(status == STA_PROTECT) {
+    } else if(status == DISKIO_STA_PROTECT) {
         printf("SDCard is in read-only mode\n");
     }
 
     TEST_ASSERT_EQUAL_INT(0, status);
 
     unsigned long sector_count = 0;
-    MCI_ioctl(GET_SECTOR_COUNT, &sector_count);
+    mci_ioctl(GET_SECTOR_COUNT, &sector_count);
     printf("sector_count: %lu\n", sector_count);
 
     unsigned short sector_size = 0;
-    MCI_ioctl(GET_SECTOR_SIZE, &sector_size);
+    mci_ioctl(GET_SECTOR_SIZE, &sector_size);
     printf("sector_size: %hu\n", sector_size);
 
     unsigned long block_size = 0;
-    MCI_ioctl(GET_BLOCK_SIZE, &block_size);
+    mci_ioctl(GET_BLOCK_SIZE, &block_size);
     printf("block_size: %lu\n", block_size);
 
     double capacity = (1.0 * sector_size * sector_count) / (1024 * 1024 * 1024);
@@ -170,7 +170,7 @@ static void main_test(void)
     printf("write\n");
     for(int i=0; i<10; i++) {
         xtimer_now_timex(&then);
-        status = MCI_write(teststring2, i, 1);
+        status = mci_write(teststring2, i, 1);
         TEST_ASSERT_EQUAL_INT(0, status);
         xtimer_now_timex(&now);
         elapsed = timex_sub(now, then);
@@ -181,7 +181,7 @@ static void main_test(void)
     printf("read\n");
     for(int i=0; i<10; i++) {
         xtimer_now_timex(&then);
-        status = MCI_read(teststring2, i, 1);
+        status = mci_read(teststring2, i, 1);
         TEST_ASSERT_EQUAL_INT(0, status);
         xtimer_now_timex(&now);
         elapsed = timex_sub(now, then);
@@ -192,19 +192,19 @@ static void main_test(void)
     unsigned char op_sector_count = 1; // Read/write single sector
 
     printf("About to write the following sector 0:\n%s\n", teststring1);
-    status = MCI_write(teststring1, 0, op_sector_count);
+    status = mci_write(teststring1, 0, op_sector_count);
     printf("MCI write status: 0x%hhx\n", status);
     TEST_ASSERT_EQUAL_INT(0, status);
 
     // printf("About to write the following to sector 1:\n%s\n", teststring2);
-    // status = MCI_write(teststring2, 1, op_sector_count);
+    // status = mci_write(teststring2, 1, op_sector_count);
     // printf("MCI write status: 0x%hhx\n", status);
     // TEST_ASSERT_EQUAL_INT(0, status);
 
     write_test_sector(1);
 
     printf("About to read from SDCard sector 0\n");
-    status = MCI_read(read_buffer, 0, op_sector_count);
+    status = mci_read(read_buffer, 0, op_sector_count);
     _zero_end_strings();
     printf("MCI read status: 0x%hhx\n", status);
     printf("Read the following:\n'%s'\n", read_buffer);
