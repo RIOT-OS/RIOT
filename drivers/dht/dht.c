@@ -46,10 +46,10 @@ dht_t dht_devs[DHT_NUMOF];
 
 static uint16_t read(gpio_t pin, int bits)
 {
-    uint32_t start, end;
     uint16_t res = 0;
 
     for (int i = 0; i < bits; i++) {
+        uint32_t start, end;
         res <<= 1;
         /* measure the length between the next rising and falling flanks (the
          * time the pin is high - smoke up :-) */

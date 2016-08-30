@@ -119,15 +119,23 @@ static int init_base(uart_t uart, uint32_t baudrate)
     gpio_init(rx_pin, GPIO_IN);
     gpio_init_af(rx_pin, af);
 
+    /* cppcheck thinks dev may be NULL here, but the variable is
+     * assigned in all non-returning branches of the switch at the top of
+     * this function. */
+
     /* uart_configure UART to mode 8N1 with given baudrate */
     clk /= baudrate;
     mantissa = (uint16_t)(clk / 16);
     fraction = (uint8_t)(clk - (mantissa * 16));
+    /* cppcheck-suppress nullPointer */
     dev->BRR = ((mantissa & 0x0fff) << 4) | (0x0f & fraction);
 
     /* enable receive and transmit mode */
+    /* cppcheck-suppress nullPointer */
     dev->CR3 = 0;
+    /* cppcheck-suppress nullPointer */
     dev->CR2 = 0;
+    /* cppcheck-suppress nullPointer */
     dev->CR1 |= USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
 
     return 0;
@@ -157,8 +165,12 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
             return;
     }
 
+    /* cppcheck thinks dev may be NULL here, but the variable is
+     * assigned in all non-returning branches of the switch at the top of
+     * this function. */
     for (size_t i = 0; i < len; i++) {
         while (!(dev->SR & USART_SR_TXE)) {}
+        /* cppcheck-suppress nullPointer */
         dev->DR = data[i];
     }
 }

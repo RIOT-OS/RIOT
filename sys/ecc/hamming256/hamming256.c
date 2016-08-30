@@ -273,8 +273,8 @@ void hamming_compute256x( const uint8_t *pucData, uint32_t dwSize, uint8_t *puCo
 {
     DEBUG("hamming_compute256x()\n\r");
 
-    uint8_t padding;
     while (dwSize > 0) {
+        uint8_t padding;
         padding = 0;
         if (dwSize < 256) {
             padding = 256 - dwSize;
@@ -290,13 +290,12 @@ void hamming_compute256x( const uint8_t *pucData, uint32_t dwSize, uint8_t *puCo
 
 uint8_t hamming_verify256x( uint8_t *pucData, uint32_t dwSize, const uint8_t *pucCode )
 {
-    uint8_t error;
     uint8_t result = 0;
 
     DEBUG( "hamming_verify256x()\n\r" );
 
-    uint8_t padding;
     while (dwSize > 0) {
+        uint8_t error, padding;
         padding = 0;
         if (dwSize < 256) {
             padding = 256 - dwSize;

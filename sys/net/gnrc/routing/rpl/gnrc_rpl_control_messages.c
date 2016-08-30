@@ -720,9 +720,9 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
 
     /* add external and RPL FIB entries */
     for (size_t i = 0; i < gnrc_ipv6_fib_table.size; ++i) {
-        ipv6_addr_t *addr;
         fib_entry_t *fentry = &gnrc_ipv6_fib_table.data.entries[i];
         if (fentry->lifetime != 0) {
+            ipv6_addr_t *addr;
             if (!(fentry->next_hop_flags & FIB_FLAG_RPL_ROUTE)) {
                 ptr = &tmp;
                 if (!ext_processed) {
