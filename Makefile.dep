@@ -605,6 +605,12 @@ ifneq (,$(filter devfs,$(USEMODULE)))
   USEMODULE += vfs
 endif
 
+ifneq (,$(filter vfs,$(USEMODULE)))
+    ifeq (native, $(BOARD))
+        USEMODULE += native_vfs
+    endif
+endif
+
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
