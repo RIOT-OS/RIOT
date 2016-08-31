@@ -144,7 +144,7 @@ void mrf24j40_assert_sleep(mrf24j40_t *dev);
  *
  * @param[in] dev       device to reset
  */
-	void mrf24j40_hardware_reset(mrf24j40_t *dev);
+void mrf24j40_hardware_reset(mrf24j40_t *dev);
 
 
 /**
@@ -152,7 +152,7 @@ void mrf24j40_assert_sleep(mrf24j40_t *dev);
  *
  * @param[in] dev
  */
-	void mrf24j40_print_tx_norm_buf(mrf24j40_t *dev);
+void mrf24j40_print_tx_norm_buf(mrf24j40_t *dev);
 
 /**
  * @brief   Set PHY parameters based on channel and page number

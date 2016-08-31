@@ -33,11 +33,6 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
-/**
- * define some additional shell commands
- */
-
-
 int main(void)
 {
     /* we need a message queue for the thread running the shell in order to

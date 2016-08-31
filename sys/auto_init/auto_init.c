@@ -20,10 +20,6 @@
 
 #include "auto_init.h"
 
-#ifdef MODULE_CONFIG
-#include "config.h"
-#endif
-
 #ifdef MODULE_BMP180
 #include "bmp180.h"
 #endif
@@ -97,11 +93,6 @@
 
 void auto_init(void)
 {
-#ifdef MODULE_CONFIG
-    DEBUG("Auto init loading config\n");
-    config_load();
-#endif
-
 #ifdef MODULE_TINYMT32
     random_init(0);
 #endif
@@ -210,6 +201,11 @@ void auto_init(void)
     auto_init_cc110x();
 #endif
 
+#ifdef MODULE_CC2538_RF
+    extern void auto_init_cc2538_rf(void);
+    auto_init_cc2538_rf();
+#endif
+
 #ifdef MODULE_XBEE
     extern void auto_init_xbee(void);
     auto_init_xbee();
@@ -223,6 +219,11 @@ void auto_init(void)
 #ifdef MODULE_NETDEV2_TAP
     extern void auto_init_netdev2_tap(void);
     auto_init_netdev2_tap();
+#endif
+
+#ifdef MODULE_NORDIC_SOFTDEVICE_BLE
+    extern void gnrc_nordic_ble_6lowpan_init(void);
+    gnrc_nordic_ble_6lowpan_init();
 #endif
 
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
@@ -271,6 +272,10 @@ void auto_init(void)
 #ifdef MODULE_MMA8652
     extern void auto_init_mma8652(void);
     auto_init_mma8652();
+#endif
+#ifdef MODULE_SI70XX
+    extern void auto_init_si70xx(void);
+    auto_init_si70xx();
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */

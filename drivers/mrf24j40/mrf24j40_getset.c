@@ -69,9 +69,9 @@ static const int16_t tx_pow_to_dbm[] = {0, 0, -1, -2, -3, -4, -5, -6,
 										-30, -30, -31, -32, -33, -34, -35, -36};
 
 static const uint8_t dbm_to_tx_pow[] = {0xf8, 0xf0, 0xe8, 0xe0, 0xd8, 0xd0, 0xc8, 0xc0,
-                                        0xb8, 0xb0, 0xa8, 0xa8, 0x98, 0x90, 0x88, 0x80,
-                                        0x78, 0x70, 0x68, 0x60, 0x58, 0x50, 0x48, 0x40,
-                                        0x38, 0x30, 0x28, 0x20, 0x18, 0x10, 0x08, 0x00};
+										0xb8, 0xb0, 0xa8, 0xa8, 0x98, 0x90, 0x88, 0x80,
+										0x78, 0x70, 0x68, 0x60, 0x58, 0x50, 0x48, 0x40,
+										0x38, 0x30, 0x28, 0x20, 0x18, 0x10, 0x08, 0x00};
 
 uint16_t mrf24j40_get_addr_short(mrf24j40_t *dev)
 {
@@ -150,40 +150,39 @@ void mrf24j40_set_chan(mrf24j40_t *dev, uint8_t channel)
 
     switch(channel)
     {
-    	case 11: 	channel_value = 0x03;
-    				break;
-    	case 12: 	channel_value = 0x13;
-    				break;
-    	case 13: 	channel_value = 0x23;
-    				break;
-    	case 14: 	channel_value = 0x33;
-    				break;
-    	case 15: 	channel_value = 0x43;
-    				break;
-    	case 16: 	channel_value = 0x53;
-    				break;
-    	case 17: 	channel_value = 0x63;
-    				break;
-    	case 18: 	channel_value = 0x73;
-    				break;
-    	case 19: 	channel_value = 0x83;
-    				break;
-    	case 20: 	channel_value = 0x93;
-    				break;
-    	case 21: 	channel_value = 0xa3;
-    				break;
-    	case 22: 	channel_value = 0xb3;
-    				break;
-    	case 23: 	channel_value = 0xc3;
-    				break;
-    	case 24: 	channel_value = 0xd3;
-    				break;
-    	case 25: 	channel_value = 0xe3;
-    				break;
-    	case 26: 	channel_value = 0xf3;
-    				break;
-    	default:
-    		channel_value = 0x3;
+		case 11:	channel_value = 0x03;
+					break;
+		case 12:	channel_value = 0x13;
+					break;
+		case 13:	channel_value = 0x23;
+					break;
+		case 14:	channel_value = 0x33;
+					break;
+		case 15:	channel_value = 0x43;
+					break;
+		case 16:	channel_value = 0x53;
+					break;
+		case 17:	channel_value = 0x63;
+					break;
+		case 18:	channel_value = 0x73;
+					break;
+		case 19:	channel_value = 0x83;
+					break;
+		case 20:	channel_value = 0x93;
+					break;
+		case 21:	channel_value = 0xa3;
+					break;
+		case 22:	channel_value = 0xb3;
+					break;
+		case 23:	channel_value = 0xc3;
+					break;
+		case 24:	channel_value = 0xd3;
+					break;
+		case 25:	channel_value = 0xe3;
+					break;
+		case 26:	channel_value = 0xf3;
+					break;
+		default:	channel_value = 0x3;
     }
 
     mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON0, channel_value);

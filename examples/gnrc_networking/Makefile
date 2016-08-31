@@ -20,8 +20,8 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_udp
 # Add a routing protocol
-SEMODULE += gnrc_rpl
-#SEMODULE += auto_init_gnrc_rpl
+USEMODULE += gnrc_rpl
+USEMODULE += auto_init_gnrc_rpl
 # This application dumps received packets to STDIO using the pktdump module
 USEMODULE += gnrc_pktdump
 # Additional networking modules that can be dropped if not needed
@@ -30,22 +30,17 @@ USEMODULE += gnrc_icmpv6_echo
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-#USEMODULE += netstats_l2
-#USEMODULE += netstats_ipv6
+USEMODULE += netstats_l2
+USEMODULE += netstats_ipv6
+
+# Set a custom 802.15.4 channel if needed
+DEFAULT_CHANNEL ?= 26
+CFLAGS += -DDEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
 CFLAGS += -DDEVELHELP
-
-# Reduce sizes for GNRC's packet buffer and neighbor cache
-# (for native we need a bigger buffer, because the tap driver temporarily
-# allocates ~1500 bytes)
-ifneq (,$(filter native,$(BOARD)))
-    CFLAGS += -DGNRC_PKTBUF_SIZE=2048 -DGNRC_IPV6_NC_SIZE=1
-else
-    CFLAGS += -DGNRC_PKTBUF_SIZE=512 -DGNRC_IPV6_NC_SIZE=0
-endif
 
 # Comment this out to join RPL DODAGs even if DIOs do not contain
 # DODAG Configuration Options (see the doc for more info)
