@@ -61,7 +61,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     DDRB |= ((1 << DDB2) | (1 << DDB1) | (1 << DDB0));
 
     /* make sure the SPI is not powered off */
-    PRR0 &= ~(1 << PRSPI);
+    MEGA_PRR &= ~(1 << PRSPI);
 
     /* configure as master, with given mode and clock */
     SPSR = (speed >> S2X_SHIFT);
