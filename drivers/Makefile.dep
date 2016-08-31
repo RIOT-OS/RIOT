@@ -17,14 +17,22 @@ ifneq (,$(filter at86rf2%,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter mrf24j40,$(USEMODULE)))
+  USEMODULE += mrf24j40
+  USEMODULE += xtimer
+  USEMODULE += netif
+  USEMODULE += ieee802154
+  USEMODULE += netdev2_ieee802154
+  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+	# XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
+	# as all drivers are ported to netdev2
+    USEMODULE += gnrc_netdev2
+  endif
+endif
+
 ifneq (,$(filter bh1750fvi,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_i2c
-endif
-
-ifneq (,$(filter bmp180,$(USEMODULE)))
-    FEATURES_REQUIRED += periph_i2c
-    USEMODULE += xtimer
 endif
 
 ifneq (,$(filter cc110x,$(USEMODULE)))
@@ -110,11 +118,6 @@ endif
 
 ifneq (,$(filter sht11,$(USEMODULE)))
     USEMODULE += xtimer
-endif
-
-ifneq (,$(filter si70xx,$(USEMODULE)))
-    USEMODULE += xtimer
-    FEATURES_REQUIRED += periph_i2c
 endif
 
 ifneq (,$(filter srf02,$(USEMODULE)))
