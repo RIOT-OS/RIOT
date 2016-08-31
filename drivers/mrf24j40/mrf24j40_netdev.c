@@ -52,8 +52,7 @@ const netdev2_driver_t mrf24j40_driver = {
     .set = _set,
 };
 
-static void _irq_handler(void *arg)
-{
+static void _irq_handler(void *arg){
     netdev2_t *dev = (netdev2_t *) arg;
 
     if (dev->event_callback) {
@@ -61,8 +60,7 @@ static void _irq_handler(void *arg)
     }
 }
 
-static int _init(netdev2_t *netdev)
-{
+static int _init(netdev2_t *netdev){
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
 
     /* initialise GPIOs */
@@ -86,14 +84,14 @@ static int _init(netdev2_t *netdev)
     memset(&netdev->stats, 0, sizeof(netstats_t));
 #endif
     /* reset device to default values and put it into RX state */
-    mrf24j40_reset(dev);											/* is done later */
+    mrf24j40_reset(dev);                                            /* is done later */
 
     return 0;
 }
 
 static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
 {
-	uint8_t tmp;
+    uint8_t tmp;
 
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
     const struct iovec *ptr = vector;
@@ -102,13 +100,11 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
     mrf24j40_tx_prepare(dev);
 
     /* load packet data into FIFO */
-    for (int i = 0; i < count; i++, ptr++)
-    {
+    for (int i = 0; i < count; i++, ptr++) {
         /* current packet data + FCS too long */
-        if ((len + ptr->iov_len + 2) > MRF24J40_MAX_PKT_LENGTH)
-        {
+        if ((len + ptr->iov_len + 2) > MRF24J40_MAX_PKT_LENGTH) {
             DEBUG("[mrf24j40] error: packet too large (%u byte) to be send\n",
-                   (unsigned)len + 2);
+                  (unsigned)len + 2);
             return -EOVERFLOW;
         }
 
@@ -121,8 +117,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
 
     /* send data out directly if pre-loading is disabled */
     tmp = (!(dev->netdev.flags & MRF24J40_OPT_PRELOADING));
-    if (!(dev->netdev.flags & MRF24J40_OPT_PRELOADING))
-    {
+    if (!(dev->netdev.flags & MRF24J40_OPT_PRELOADING)) {
         mrf24j40_tx_exec(dev);
     }
     /* return the number of bytes that were actually send out */
@@ -130,8 +125,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
 
 }
 
-static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
-{
+static int _recv(netdev2_t *netdev, char *buf, int len, void *info){
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
     uint8_t phr;
     size_t pkt_len;
@@ -164,15 +158,13 @@ static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
         mrf24j40_rx_fifo_read(dev, 0, &(radio_info->lqi), 1);
         mrf24j40_rx_fifo_read(dev, 0, &(radio_info->rssi), 1);
     }
-    else
-    {
+    else {
     }
 
     return pkt_len;
 }
 
-static int _set_state(mrf24j40_t *dev, netopt_state_t state)
-{
+static int _set_state(mrf24j40_t *dev, netopt_state_t state){
     switch (state) {
         case NETOPT_STATE_SLEEP:
             mrf24j40_set_state(dev, MRF24J40_PSEUDO_STATE_SLEEP);
@@ -194,8 +186,7 @@ static int _set_state(mrf24j40_t *dev, netopt_state_t state)
     return sizeof(netopt_state_t);
 }
 
-netopt_state_t _get_state(mrf24j40_t *dev)
-{
+netopt_state_t _get_state(mrf24j40_t *dev){
     switch (mrf24j40_get_status(dev)) {
         case MRF24J40_PSEUDO_STATE_SLEEP:
             return NETOPT_STATE_SLEEP;
@@ -210,8 +201,7 @@ netopt_state_t _get_state(mrf24j40_t *dev)
     }
 }
 
-static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
-{
+static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len){
     mrf24j40_t *dev = (mrf24j40_t *) netdev;
 
     if (netdev == NULL) {
@@ -220,14 +210,14 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     /* getting these options doesn't require the transceiver to be responsive */
     switch (opt) {
-    	case NETOPT_CHANNEL_PAGE:
-    		if (max_len < sizeof(uint16_t)) {
-    			return -EOVERFLOW;
-    		}
-    		((uint8_t *)val)[1] = 0;
-    		((uint8_t *)val)[0] = 0;
+        case NETOPT_CHANNEL_PAGE:
+            if (max_len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            ((uint8_t *)val)[1] = 0;
+            ((uint8_t *)val)[0] = 0;
 
-    		return sizeof(uint16_t);
+            return sizeof(uint16_t);
 
         case NETOPT_MAX_PACKET_SIZE:
             if (max_len < sizeof(int16_t)) {
@@ -286,7 +276,7 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
                 !!(dev->netdev.flags & MRF24J40_OPT_CSMA);
             return sizeof(netopt_enable_t);
         default:
-          /* Can still be handled in second switch */
+            /* Can still be handled in second switch */
             break;
     }
 
@@ -306,8 +296,7 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
     }
 
     /* these options require the transceiver to be not sleeping*/
-   switch (opt)
-   {
+    switch (opt) {
         case NETOPT_TX_POWER:
             if (max_len < sizeof(int16_t)) {
                 res = -EOVERFLOW;
@@ -329,8 +318,7 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
         case NETOPT_IS_CHANNEL_CLR:
-            if (mrf24j40_cca(dev))
-            {
+            if (mrf24j40_cca(dev)) {
                 *((netopt_enable_t *)val) = NETOPT_ENABLE;
             }
             else {
@@ -363,16 +351,15 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
             res = -ENOTSUP;
     }
 
-   /* go back to sleep if were sleeping */
-   if (old_state == MRF24J40_PSEUDO_STATE_SLEEP) {
-       mrf24j40_set_state(dev, MRF24J40_PSEUDO_STATE_SLEEP);
-   }
+    /* go back to sleep if were sleeping */
+    if (old_state == MRF24J40_PSEUDO_STATE_SLEEP) {
+        mrf24j40_set_state(dev, MRF24J40_PSEUDO_STATE_SLEEP);
+    }
 
     return res;
 }
 
-static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
-{
+static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len){
     mrf24j40_t *dev = (mrf24j40_t *) netdev;
     int res = 0;
 
@@ -385,8 +372,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
         mrf24j40_assert_awake(dev);
     }
 
-    switch (opt)
-    {
+    switch (opt) {
         case NETOPT_ADDRESS:
             if (len > sizeof(uint16_t)) {
                 res = -EOVERFLOW;
@@ -398,7 +384,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             break;
 
         case NETOPT_ADDRESS_LONG:
-           if (len > sizeof(uint64_t)) {
+            if (len > sizeof(uint64_t)) {
                 res = -EOVERFLOW;
             }
             else {
@@ -471,7 +457,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
 
         case NETOPT_AUTOACK:
             mrf24j40_set_option(dev, MRF24J40_OPT_AUTOACK,
-                                 ((bool *)val)[0]);
+                                ((bool *)val)[0]);
             /* don't set res to set netdev2_ieee802154_t::flags */
             break;
 
@@ -487,13 +473,13 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
 
         case NETOPT_PRELOADING:
             mrf24j40_set_option(dev, MRF24J40_OPT_PRELOADING,
-                                 ((bool *)val)[0]);
+                                ((bool *)val)[0]);
             res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_PROMISCUOUSMODE:
             mrf24j40_set_option(dev, MRF24J40_OPT_PROMISCUOUS,
-                                 ((bool *)val)[0]);
+                                ((bool *)val)[0]);
             res = sizeof(netopt_enable_t);
             break;
 
@@ -505,7 +491,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
 //
         case NETOPT_RX_END_IRQ:
             mrf24j40_set_option(dev, MRF24J40_OPT_TELL_RX_END,
-                                 ((bool *)val)[0]);
+                                ((bool *)val)[0]);
             res = sizeof(netopt_enable_t);
             break;
 
@@ -523,7 +509,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
 //
         case NETOPT_CSMA:
             mrf24j40_set_option(dev, MRF24J40_OPT_CSMA,
-                                 ((bool *)val)[0]);
+                                ((bool *)val)[0]);
             res = sizeof(netopt_enable_t);
             break;
 
@@ -559,8 +545,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
         mrf24j40_set_state(dev, MRF24J40_STATE_SLEEP);
     }
 
-    if (res == -ENOTSUP)
-    {
+    if (res == -ENOTSUP) {
         res = netdev2_ieee802154_set((netdev2_ieee802154_t *)netdev, opt,
                                      val, len);
     }
@@ -568,8 +553,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
     return res;
 }
 
-static void _isr(netdev2_t *netdev)
-{
+static void _isr(netdev2_t *netdev){
     mrf24j40_t *dev = (mrf24j40_t *) netdev;
     uint8_t intstat;
     uint8_t state;
@@ -581,46 +565,39 @@ static void _isr(netdev2_t *netdev)
      * lost anyway, so return immediately.
      */
     state = mrf24j40_get_status(dev);
-    if (state == MRF24J40_PSEUDO_STATE_SLEEP)
-    {
-    	/* re-enable IRQs */
-    	mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0b11110110);
+    if (state == MRF24J40_PSEUDO_STATE_SLEEP) {
+        /* re-enable IRQs */
+        mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0b11110110);
 
         return;
     }
 
     /* read (consume) device status */
-    intstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT); 	/* Interrupt status */
-	state = mrf24j40_get_status(dev);								/* radio chip status */
+    intstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);   /* Interrupt status */
+    state = mrf24j40_get_status(dev);                               /* radio chip status */
 
-    if (!(intstat & MRF24J40_INTSTAT_MASK__RXIF)) 		/* IRQ, but no Receive IRQ */
-    {
-        if (state == MRF24J40_PSEUDO_STATE_RX_AACK_ON)
-        {
+    if (!(intstat & MRF24J40_INTSTAT_MASK__RXIF)) {                 /* IRQ, but no Receive IRQ */
+        if (state == MRF24J40_PSEUDO_STATE_RX_AACK_ON) {
             DEBUG("[mrf24j40] EVT - RX_END\n");
-            if (!(dev->netdev.flags & MRF24J40_OPT_TELL_RX_END))
-            {
+            if (!(dev->netdev.flags & MRF24J40_OPT_TELL_RX_END)) {
                 return;
             }
             netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
         }
         else if (state == MRF24J40_PSEUDO_STATE_TX_ARET_ON ||
-                 state == MRF24J40_PSEUDO_STATE_BUSY_TX_ARET)
-        {
+                 state == MRF24J40_PSEUDO_STATE_BUSY_TX_ARET) {
             /* check for more pending TX calls and return to idle state if
              * there are none */
             assert(dev->pending_tx != 0);
-            if ((--dev->pending_tx) == 0)
-            {
+            if ((--dev->pending_tx) == 0) {
                 mrf24j40_set_state(dev, dev->idle_state);
                 DEBUG("[mrf24j40] return to state 0x%x\n", dev->idle_state);
             }
 
             DEBUG("[mrf24j40] EVT - TX_END\n");
 
-            if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END))
-            {
-                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_NOACK);
+            if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END)) {
+                netdev->event_callback(netdev, NETDEV2_EVENT_TX_NOACK);
             }
         }
     }

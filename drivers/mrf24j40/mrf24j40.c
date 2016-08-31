@@ -48,8 +48,8 @@ void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params)
 
 void mrf24j40_reset(mrf24j40_t *dev)
 {
-	uint8_t tmp_rxmcr;
-	uint8_t tmp_txmcr;
+    uint8_t tmp_rxmcr;
+    uint8_t tmp_txmcr;
 
 #if CPUID_LEN
 /* make sure that the buffer is always big enough to store a 64bit value */
@@ -99,48 +99,48 @@ void mrf24j40_reset(mrf24j40_t *dev)
     mrf24j40_set_pan(dev, MRF24J40_DEFAULT_PANID);
 
     /* Here starts init-process as described on MRF24J40 Manual Chap. 3.2 */
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_PACON2, 0x98);	/* Initialize FIFOEN = 1 and TXONTS = 0x6 */
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_TXSTBL, 0x95);	/* Initialize RFSTBL = 0x9. */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_PACON2, 0x98);   /* Initialize FIFOEN = 1 and TXONTS = 0x6 */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_TXSTBL, 0x95);   /* Initialize RFSTBL = 0x9. */
     /* set default channel */
-    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON0, 0x03);	/* Initialize RFOPT = 0x03. */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON0, 0x03);    /* Initialize RFOPT = 0x03. */
 
-    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON1, 0x01);	/* VCO optimization */
-    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON2, 0x80);	/* Bit 7 = PLL Enable */
-    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON6, 0x90);	/* Filter control / clk recovery ctrl. / Battery monitor */
-    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON7, 0x80);	/* Sleep clock selection -> int. 100kHz clk */
-    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON8, 0x10);	/* VCO control */
-    mrf24j40_reg_write_long(dev, MRF24J40_REG_SLPCON1, 0x21);	/* CLKOUT pin enable  / sleep clk divider */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON1, 0x01);    /* VCO optimization */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON2, 0x80);    /* Bit 7 = PLL Enable */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON6, 0x90);    /* Filter control / clk recovery ctrl. / Battery monitor */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON7, 0x80);    /* Sleep clock selection -> int. 100kHz clk */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON8, 0x10);    /* VCO control */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_SLPCON1, 0x21);   /* CLKOUT pin enable  / sleep clk divider */
 
     /* Configuration for nonbeacon-enabled device */
-    tmp_rxmcr = mrf24j40_reg_read_short(dev, MRF24J40_REG_RXMCR);	/* read modify write */
+    tmp_rxmcr = mrf24j40_reg_read_short(dev, MRF24J40_REG_RXMCR);   /* read modify write */
     tmp_rxmcr &= 0b11110111;
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RXMCR, tmp_rxmcr);
-    tmp_txmcr = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXMCR);	/* read modify write */
+    tmp_txmcr = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXMCR);   /* read modify write */
     tmp_txmcr &= 0b11011111;
     mrf24j40_reg_write_short(dev, MRF24J40_REG_TXMCR, tmp_txmcr);
-	/* End nonbeacon-enabled config. */
+    /* End nonbeacon-enabled config. */
 
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG2, 0x80);		/* CCA Mode 1: energy above threshold / clear CCA bits */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG2, 0x80);       /* CCA Mode 1: energy above threshold / clear CCA bits */
 //    mrf24j40_reg_write_short(dev, MRF24J40_REG_CCAEDTH, 0x60);	/* Energy detection threshold */
-    mrf24j40_set_cca_threshold(dev, -69);							/* Energy detection threshold -69dBm */
+    mrf24j40_set_cca_threshold(dev, -69);                           /* Energy detection threshold -69dBm */
 //    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG6, 0x40);		/* Append RSSI to RXFIFO */
 
     /* configure Immediate Sleep and Wake-Up mode */
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_RXFLUSH, 0x1);		/* Reset RXFIFO pointer , cleared by hardware*/
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, 0x80);		/* enable Immediate Wake-up mode */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_RXFLUSH, 0x1);       /* Reset RXFIFO pointer , cleared by hardware*/
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, 0x80);      /* enable Immediate Wake-up mode */
 
 
 //    mrf24j40_configure_phy(dev);
     /* set default channel */
-    mrf24j40_set_chan(dev, MRF24J40_DEFAULT_CHANNEL);				/* Set Channel - bits[7:4] + RF Optimization */
-																	/* 0000 = chan 11, 0001 = chan 12 .....1111 = chan 26 */
+    mrf24j40_set_chan(dev, MRF24J40_DEFAULT_CHANNEL);               /* Set Channel - bits[7:4] + RF Optimization */
+                                                                    /* 0000 = chan 11, 0001 = chan 12 .....1111 = chan 26 */
 
 
     /* set default TX power */
-	mrf24j40_set_txpower(dev, MRF24J40_DEFAULT_TXPOWER);
+    mrf24j40_set_txpower(dev, MRF24J40_DEFAULT_TXPOWER);
 
     /* reset RF state machine */
-	mrf24j40_reset_state_machine(dev);
+    mrf24j40_reset_state_machine(dev);
 
     /* set default options */
     mrf24j40_set_option(dev, NETDEV2_IEEE802154_PAN_COMP, true);
@@ -163,7 +163,7 @@ void mrf24j40_reset(mrf24j40_t *dev)
     /* set interrupt pin polarity / active high */
     mrf24j40_reg_write_long(dev, MRF24J40_REG_SLPCON0, 0x3);
     /* clear interrupt flags (cleared by read) */
-    mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT));		
+    mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);
     /* mrf24j40_set_interrupts (transmit and receive-irq) */
     mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0b11110110);
 
@@ -183,24 +183,22 @@ bool mrf24j40_cca(mrf24j40_t *dev)
     mrf24j40_assert_awake(dev);
 
     /* trigger CCA measurment */
-	/* take a look onto datasheet chapter 3.6.1 */
-	mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG6, MRF24J40_BBREG6_MASK__RSSIMODE1);
+    /* take a look onto datasheet chapter 3.6.1 */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG6, MRF24J40_BBREG6_MASK__RSSIMODE1);
     /* wait for result to be ready */
     do {
         status = mrf24j40_reg_read_short(dev, MRF24J40_REG_BBREG6);
     } while (!(status & MRF24J40_BBREG2_MASK__RSSIRDY));
     /* return according to measurement */
-  	tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_CCAEDTH);		/* Energy detection threshold */
-  	printf("\nmrf24j40_cca : Threshold-Value = %x\n", (int)tmp);
-  	tmp_rssi = mrf24j40_reg_read_long(dev, MRF24J40_REG_RSSI);
-  	printf("mrf24j40_cca : Measured Value = %x\n", (int)tmp_rssi);
-    if (tmp_rssi < tmp)
-    {
-    	return true;			
+    tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_CCAEDTH);       /* Energy detection threshold */
+    printf("\nmrf24j40_cca : Threshold-Value = %x\n", (int)tmp);
+    tmp_rssi = mrf24j40_reg_read_long(dev, MRF24J40_REG_RSSI);
+    printf("mrf24j40_cca : Measured Value = %x\n", (int)tmp_rssi);
+    if (tmp_rssi < tmp) {
+        return true;
     }
-    else
-    {
-    	return false;
+    else {
+        return false;
     }
 }
 
@@ -221,7 +219,7 @@ size_t mrf24j40_send(mrf24j40_t *dev, uint8_t *data, size_t len)
 
 void mrf24j40_tx_prepare(mrf24j40_t *dev)
 {
-   uint8_t state;
+    uint8_t state;
 
     dev->pending_tx++;
 
@@ -241,7 +239,7 @@ void mrf24j40_tx_prepare(mrf24j40_t *dev)
 
 size_t mrf24j40_tx_load(mrf24j40_t *dev, uint8_t *data, size_t len, size_t offset)
 {
-	uint8_t i;
+    uint8_t i;
 
     dev->tx_frame_len += (uint8_t)len;
 
@@ -252,7 +250,7 @@ size_t mrf24j40_tx_load(mrf24j40_t *dev, uint8_t *data, size_t len, size_t offse
 
 void mrf24j40_tx_exec(mrf24j40_t *dev)
 {
-	uint8_t tmp;
+    uint8_t tmp;
 
     netdev2_t *netdev = (netdev2_t *)dev;
 
@@ -265,8 +263,7 @@ void mrf24j40_tx_exec(mrf24j40_t *dev)
 
     mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, tmp);
 
-    if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_START))
-    {
+    if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_START)) {
         netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED);
     }
 }

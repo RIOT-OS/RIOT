@@ -55,9 +55,9 @@ extern "C" {
 /** @} */
 
 /**
-  * @brief   Channel configuration
-  * @{
-  */
+ * @brief   Channel configuration
+ * @{
+ */
 #define MRF24J40_MIN_CHANNEL           (11U)
 #define MRF24J40_MAX_CHANNEL           (26U)
 #define MRF24J40_DEFAULT_CHANNEL       (26U)
@@ -118,17 +118,17 @@ extern "C" {
  * @brief   Flags for PSEUDO DEVICE INTERNAL STATES
  * @{
  */
-#define MRF24J40_PSEUDO_STATE_TRX_OFF      (0x0)     /**< idle */
-#define MRF24J40_PSEUDO_STATE_PLL_ON       (0x1)     /**< ready to transmit */
-#define MRF24J40_PSEUDO_STATE_SLEEP        (0x2)     /**< sleep mode */
-#define MRF24J40_PSEUDO_STATE_BUSY_RX_AACK (0x3)     /**< busy receiving data */
-#define MRF24J40_PSEUDO_STATE_BUSY_TX_ARET (0x4)     /**< busy transmitting data */
-#define MRF24J40_PSEUDO_STATE_RX_AACK_ON   (0x5)     /**< wait for incoming data */
-#define MRF24J40_PSEUDO_STATE_RX_AACK_OFF  (0x6)     /**< wait for incoming data, no automatic Acknowledge */
-#define MRF24J40_PSEUDO_STATE_TX_ARET_ON   (0x7)     /**< ready for sending data */
-#define MRF24J40_PSEUDO_STATE_TX_ARET_OFF  (0x8)     /**< ready for sending data */
-#define MRF24J40_PSEUDO_STATE_IN_PROGRESS  (0x9)     /**< ongoing state conversion */
-#define MRF24J40_PSEUDO_STATE_BUSY_TX_ARET_OFF (0xa) /**< busy transmitting data */
+#define MRF24J40_PSEUDO_STATE_TRX_OFF      (0x0)        /**< idle */
+#define MRF24J40_PSEUDO_STATE_PLL_ON       (0x1)        /**< ready to transmit */
+#define MRF24J40_PSEUDO_STATE_SLEEP        (0x2)        /**< sleep mode */
+#define MRF24J40_PSEUDO_STATE_BUSY_RX_AACK (0x3)        /**< busy receiving data */
+#define MRF24J40_PSEUDO_STATE_BUSY_TX_ARET (0x4)        /**< busy transmitting data */
+#define MRF24J40_PSEUDO_STATE_RX_AACK_ON   (0x5)        /**< wait for incoming data */
+#define MRF24J40_PSEUDO_STATE_RX_AACK_OFF  (0x6)        /**< wait for incoming data, no automatic Acknowledge */
+#define MRF24J40_PSEUDO_STATE_TX_ARET_ON   (0x7)        /**< ready for sending data */
+#define MRF24J40_PSEUDO_STATE_TX_ARET_OFF  (0x8)        /**< ready for sending data */
+#define MRF24J40_PSEUDO_STATE_IN_PROGRESS  (0x9)        /**< ongoing state conversion */
+#define MRF24J40_PSEUDO_STATE_BUSY_TX_ARET_OFF (0xa)    /**< busy transmitting data */
 /** @} */
 
 /**
@@ -141,15 +141,15 @@ extern "C" {
  */
 //#define AT86RF2XX_OPT_SRC_ADDR_LONG  (NETDEV2_IEEE802154_SRC_MODE_LONG) /**< legacy define */
 //#define AT86RF2XX_OPT_RAWDUMP        (NETDEV2_IEEE802154_RAW)           /**< legacy define */
-#define MRF24J40_OPT_AUTOACK         (NETDEV2_IEEE802154_ACK_REQ)       /**< legacy define */
+#define MRF24J40_OPT_AUTOACK         (NETDEV2_IEEE802154_ACK_REQ)   /**< legacy define */
 
-#define MRF24J40_OPT_CSMA           (0x0100)       /**< CSMA active */
-#define MRF24J40_OPT_PROMISCUOUS    (0x0200)       /**< promiscuous mode active */
-#define MRF24J40_OPT_PRELOADING     (0x0400)       /**< preloading enabled */
-#define MRF24J40_OPT_TELL_TX_START  (0x0800)       /**< notify MAC layer on TX start */
-#define MRF24J40_OPT_TELL_TX_END    (0x1000)       /**< notify MAC layer on TX finished */
-#define MRF24J40_OPT_TELL_RX_START  (0x2000)       /**< notify MAC layer on RX start */
-#define MRF24J40_OPT_TELL_RX_END    (0x4000)       /**< notify MAC layer on RX */
+#define MRF24J40_OPT_CSMA           (0x0100)                        /**< CSMA active */
+#define MRF24J40_OPT_PROMISCUOUS    (0x0200)                        /**< promiscuous mode active */
+#define MRF24J40_OPT_PRELOADING     (0x0400)                        /**< preloading enabled */
+#define MRF24J40_OPT_TELL_TX_START  (0x0800)                        /**< notify MAC layer on TX start */
+#define MRF24J40_OPT_TELL_TX_END    (0x1000)                        /**< notify MAC layer on TX finished */
+#define MRF24J40_OPT_TELL_RX_START  (0x2000)                        /**< notify MAC layer on RX start */
+#define MRF24J40_OPT_TELL_RX_END    (0x4000)                        /**< notify MAC layer on RX */
 
 
 /**
@@ -160,7 +160,7 @@ typedef struct mrf24j40_params {
     spi_speed_t spi_speed;  /**< SPI speed to use */
     gpio_t cs_pin;          /**< GPIO pin connected to chip select */
     gpio_t int_pin;         /**< GPIO pin connected to the interrupt pin */
-    gpio_t sleep_pin;        /**< GPIO pin connected to the sleep pin */
+    gpio_t sleep_pin;       /**< GPIO pin connected to the sleep pin */
     gpio_t reset_pin;       /**< GPIO pin connected to the reset pin */
 } mrf24j40_params_t;
 
@@ -173,13 +173,13 @@ typedef struct {
      * @brief   device specific fields
      * @{
      */
-    mrf24j40_params_t params;  		        /**< parameters for initialization */
+    mrf24j40_params_t params;               /**< parameters for initialization */
     uint8_t state;                          /**< current state of the radio */
     uint8_t tx_frame_len;                   /**< length of the current TX frame */
-    uint8_t idle_state;                 	/**< state to return to after sending */
-    uint8_t pending_tx;                 	/**< keep track of pending TX calls
-                                             this is required to know when to
-                                             return to @ref mrf24j40_t::idle_state */
+    uint8_t idle_state;                     /**< state to return to after sending */
+    uint8_t pending_tx;                     /**< keep track of pending TX calls
+                                               this is required to know when to
+                                               return to @ref mrf24j40_t::idle_state */
 } mrf24j40_t;
 
 
@@ -392,7 +392,7 @@ void mrf24j40_set_csma_backoff_exp(mrf24j40_t *dev, uint8_t min, uint8_t max);
  * @param[in] dev           device to write to
  * @param[in] entropy       11 bit of entropy as seed for random backoff
  */
-void mrf24j40_set_csma_seed(mrf24j40_t *dev, uint8_t entropy[2]);
+void mrf24j40_set_csma_seed(mrf24j40_t * dev, uint8_t entropy[2]);
 
 /**
  * @brief   Get the CCA threshold value
@@ -484,7 +484,7 @@ void mrf24j40_tx_prepare(mrf24j40_t *dev);
  * @return                  offset + number of bytes written
  */
 size_t mrf24j40_tx_load(mrf24j40_t *dev, uint8_t *data, size_t len,
-                         size_t offset);
+                        size_t offset);
 
 /**
  * @brief   Trigger sending of data previously loaded into transmit buffer
@@ -511,7 +511,7 @@ size_t mrf24j40_rx_len(mrf24j40_t *dev);
  * @param[in]  offset       offset in the receive buffer
  */
 void mrf24j40_rx_read(mrf24j40_t *dev, uint8_t *data, size_t len,
-                       size_t offset);
+                      size_t offset);
 
 /**
  * @brief   Configures the PHY of the radio device / sets channel / Transmit-Power / delay

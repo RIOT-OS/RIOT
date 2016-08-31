@@ -17,7 +17,7 @@
 #include "mrf24j40.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 /**
