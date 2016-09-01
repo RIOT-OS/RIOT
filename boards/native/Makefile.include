@@ -78,7 +78,12 @@ endif
 
 # clean up unused functions
 export CFLAGS += -ffunction-sections -fdata-sections
+ifeq ($(shell uname -s),Darwin)
+export LINKFLAGS += -Wl,-dead_strip
+else
 export LINKFLAGS += -Wl,--gc-sections
+endif
+export LINKFLAGS += -ffunction-sections
 
 # set the tap interface for term/valgrind
 ifneq (,$(filter netdev2_tap,$(USEMODULE)))
