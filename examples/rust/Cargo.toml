@@ -4,8 +4,9 @@ version = "0.1.0"
 authors = ["Kaspar Schleiser <kaspar@schleiser.de>"]
 
 [dependencies]
-riot = "0.1.0"
+riot = "0.1.1"
 
 [profile.release]
 panic = "abort"
 lto = true
+opt-level = "s"
