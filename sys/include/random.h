@@ -28,6 +28,8 @@
 
 #include <inttypes.h>
 
+#include "dev_random.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -42,6 +44,19 @@ extern "C" {
  * @param s seed for the PRNG
  */
 void random_init(uint32_t s);
+
+/**
+ * @brief   initializes PRNG with a hardware generated seed.
+ *
+ * @pre     @ref dev_random_init() must have been called.
+ */
+static inline void random_auto_init(void)
+{
+    uint32_t seed;
+
+    dev_random_read(&seed, sizeof(seed));
+    random_init(seed);
+}
 
 /**
  * @brief initialize by an array with array-length

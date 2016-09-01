@@ -20,6 +20,7 @@
 #ifdef MODULE_AT86RF2XX
 
 #include "board.h"
+#include "dev_random.h"
 #include "net/gnrc/netdev2.h"
 #include "net/gnrc/netdev2/ieee802154.h"
 #include "net/gnrc.h"
@@ -45,6 +46,13 @@ static at86rf2xx_t at86rf2xx_devs[AT86RF2XX_NUM];
 static gnrc_netdev2_t gnrc_adpt[AT86RF2XX_NUM];
 static char _at86rf2xx_stacks[AT86RF2XX_MAC_STACKSIZE][AT86RF2XX_NUM];
 
+#define AT86RF2XX_IS_DEV_RANDOM     (DEV_RANDOM_SRC == DEV_RANDOM_SRC_AT86RF2XX) && \
+                                    (defined(MODULE_AT86RF231) || defined(MODULE_AT86RF233))
+
+#if AT86RF2XX_IS_DEV_RANDOM
+at86rf2xx_t *dev_random_at86rf2xx = NULL;
+#endif
+
 void auto_init_at86rf2xx(void)
 {
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
@@ -67,6 +75,9 @@ void auto_init_at86rf2xx(void)
                               &gnrc_adpt[i]);
         }
     }
+#if AT86RF2XX_IS_DEV_RANDOM
+    dev_random_at86rf2xx = &at86rf2xx_devs[0];    /* TODO: make sure it is the right dev type */
+#endif
 }
 #else
 typedef int dont_be_pedantic;
