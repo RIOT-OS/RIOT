@@ -23,6 +23,7 @@
 #define BOARD_H_
 
 #include "cpu.h"
+#include "dev_random_src.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
 
@@ -49,6 +50,15 @@ extern "C" {
                                      .int_pin = GPIO_PIN(PB, 0), \
                                      .sleep_pin = GPIO_PIN(PA, 20), \
                                      .reset_pin = GPIO_PIN(PB, 15)}
+
+/**
+ * @brief   @ref sys_dev_random configuration
+ * @{
+ */
+#ifdef MODULE_AT86RF233
+#define DEV_RANDOM_SRC              DEV_RANDOM_SRC_AT86RF2XX
+#endif
+/** @} */
 
 /**
  * @brief   LED pin definitions and handlers

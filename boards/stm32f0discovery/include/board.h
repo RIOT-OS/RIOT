@@ -22,10 +22,22 @@
 #define BOARD_H_
 
 #include "cpu.h"
+#include "dev_random_src.h"
+#include "periph/adc.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   @ref sys_dev_random configuration
+ * @{
+ */
+#ifndef DEV_RANDOM_ADC
+#define DEV_RANDOM_ADC              ADC_LINE(ADC_NUMOF - 1)
+#endif
+#define DEV_RANDOM_SRC              DEV_RANDOM_SRC_PERIPH_ADC
+/** @} */
 
 /**
  * @name Macros for controlling the on-board LEDs.

@@ -22,6 +22,7 @@
 #define BOARD_H_
 
 #include "cpu.h"
+#include "dev_random_src.h"
 #include "periph_conf.h"
 #include "mulle-nvram.h"
 
@@ -32,6 +33,13 @@
 
 /** Disable hardware watchdog, for debugging purposes, don't use this on production builds. */
 #define DISABLE_WDOG    1
+
+/**
+ * @brief   @ref sys_dev_random configuration
+ * @{
+ */
+#define DEV_RANDOM_SRC              DEV_RANDOM_SRC_PERIPH_HWRNG
+/** @} */
 
 /**
  * @brief   xtimer configuration

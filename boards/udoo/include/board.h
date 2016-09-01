@@ -23,10 +23,18 @@
 
 #include "cpu.h"
 #include "cpu_conf.h"
+#include "dev_random_src.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   @ref sys_dev_random configuration
+ * @{
+ */
+#define DEV_RANDOM_SRC              DEV_RANDOM_SRC_PERIPH_HWRNG
+/** @} */
 
 /**
  * @brief   LED pin definitions and handlers
