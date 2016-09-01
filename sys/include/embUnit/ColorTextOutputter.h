@@ -11,8 +11,8 @@
  *
  * @file    ColorTextOutputter.h
  */
-#ifndef __COLORTEXTOUTPUTTER_H__
-#define __COLORTEXTOUTPUTTER_H__
+#ifndef EMBUNIT_COLORTEXTOUTPUTTER_H_
+#define EMBUNIT_COLORTEXTOUTPUTTER_H_
 
 #include "Outputter.h"
 
@@ -26,5 +26,5 @@ OutputterRef ColorTextOutputter_outputter(void);
 }
 #endif
 
-#endif/*__COLORTEXTOUTPUTTER_H__*/
+#endif/* EMBUNIT_COLORTEXTOUTPUTTER_H_ */
 /** @} */

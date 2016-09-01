@@ -32,8 +32,8 @@
  *
  * $Id: TestListener.h,v 1.4 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef __TESTLISTENER_H__
-#define __TESTLISTENER_H__
+#ifndef EMBUNIT_TESTLISTENER_H_
+#define EMBUNIT_TESTLISTENER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,4 +67,4 @@ struct __TestListner {
 }
 #endif
 
-#endif/*__TESTLISTENER_H__*/
+#endif/* EMBUNIT_TESTLISTENER_H_ */

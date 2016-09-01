@@ -32,8 +32,8 @@
  *
  * $Id: stdImpl.h,v 1.4 2004/02/10 16:15:25 arms22 Exp $
  */
-#ifndef __STDIMPL_H__
-#define __STDIMPL_H__
+#ifndef EMBUNIT_STDIMPL_H_
+#define EMBUNIT_STDIMPL_H_
 
 #ifdef  __cplusplus
 extern "C" {
@@ -59,4 +59,4 @@ static inline char* stdimpl_itoa(int v,char *string,int r)
 }
 #endif
 
-#endif/*__STDIMPL_H__*/
+#endif/* EMBUNIT_STDIMPL_H_ */
