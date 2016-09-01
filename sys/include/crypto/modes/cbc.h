@@ -17,8 +17,8 @@
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
 
-#ifndef __CRYPTO_MODES_CBC_H_
-#define __CRYPTO_MODES_CBC_H_
+#ifndef CRYPTO_MODES_CBC_H_
+#define CRYPTO_MODES_CBC_H_
 
 #include "crypto/ciphers.h"
 
@@ -58,4 +58,4 @@ int cipher_decrypt_cbc(cipher_t* cipher, uint8_t iv[16], uint8_t* input,
 }
 #endif
 
-#endif /* __CRYPTO_MODES_CBC_H_ */
+#endif /* CRYPTO_MODES_CBC_H_ */

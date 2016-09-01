@@ -17,8 +17,8 @@
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
 
-#ifndef __CRYPTO_MODES_HELPER_H_
-#define __CRYPTO_MODES_HELPER_H_
+#ifndef CRYPTO_MODES_HELPER_H_
+#define CRYPTO_MODES_HELPER_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -53,4 +53,4 @@ int crypto_equals(uint8_t *a, uint8_t *b, size_t len);
 }
 #endif
 
-#endif /* __CRYPTO_MODES_HELPER_H_ */
+#endif /* CRYPTO_MODES_HELPER_H_ */

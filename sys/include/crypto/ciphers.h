@@ -19,8 +19,8 @@
  * @author      Mark Essien <markessien@gmail.com>
  */
 
-#ifndef __CIPHERS_H_
-#define __CIPHERS_H_
+#ifndef CRYPTO_CIPHERS_H_
+#define CRYPTO_CIPHERS_H_
 
 #include <stdint.h>
 
@@ -169,4 +169,4 @@ int cipher_get_block_size(const cipher_t* cipher);
 #endif
 
 /** @} */
-#endif /* __CIPHERS_H_ */
+#endif /* CRYPTO_CIPHERS_H_ */
