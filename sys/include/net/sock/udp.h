@@ -84,7 +84,8 @@ typedef struct sock_udp sock_udp_t;
  *          `(local->netif != remote->netif) &&
  *          ((local->netif != SOCK_ADDR_ANY_NETIF) ||
  *          (remote->netif != SOCK_ADDR_ANY_NETIF))` if neither is `NULL`).
- *          `
+ * @return  -ENOMEM, if the stack can't provide enough resources for `sock` to
+ *          be created.
  */
 int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
                     const sock_udp_ep_t *remote, uint16_t flags);
@@ -151,6 +152,7 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep);
  * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
  * @return  -ENOBUFS, if buffer space is not large enough to store received
  *          data.
+ * @return  -ENOMEM, if no memory was available to receive @p data.
  * @return  -EPROTO, if source address of received packet did not equal
  *          the remote of @p sock.
  * @return  -ETIMEDOUT, if @p timeout expired.
@@ -180,6 +182,8 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
  * @return  The number of bytes sent on success.
  * @return  -EAFNOSUPPORT, if `remote != NULL` and sock_udp_ep_t::family of
  *          @p remote is != AF_UNSPEC and not supported.
+ * @return  -EHOSTUNREACH, if @p remote or remote end point of @p sock is not
+ *          reachable.
  * @return  -EINVAL, if sock_udp_ep_t::netif of @p remote is not a valid
  *          interface or contradicts the given local interface (i.e.
  *          neither the local end point of `sock` nor remote are assigned to

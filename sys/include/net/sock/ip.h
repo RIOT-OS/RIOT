@@ -82,6 +82,8 @@ typedef struct sock_ip sock_ip_t;
  *          other (i.e. `(local->netif != remote->netif) &&
  *          ((local->netif != SOCK_ADDR_ANY_NETIF) ||
  *          (remote->netif != SOCK_ADDR_ANY_NETIF))` if neither is `NULL`).
+ * @return  -ENOMEM, if the stack can't provide enough resources for `sock` to
+ *          be created.
  * @return  -EPROTONOSUPPORT, if `local != NULL` or `remote != NULL` and
  *          proto is not supported by sock_ip_ep_t::family of @p local or @p
  *          remote.
@@ -150,6 +152,7 @@ int sock_ip_get_remote(sock_ip_t *sock, sock_ip_ep_t *ep);
  * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
  * @return  -ENOBUFS, if buffer space is not large enough to store received
  *          data.
+ * @return  -ENOMEM, if no memory was available to receive @p data.
  * @return  -EPROTO, if source address of received packet did not equal
  *          the remote of @p sock.
  * @return  -ETIMEDOUT, if @p timeout expired.
@@ -181,6 +184,8 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
  * @return  The number of bytes send on success.
  * @return  -EAFNOSUPPORT, if `remote != NULL` and sock_ip_ep_t::family of
  *          @p remote is != AF_UNSPEC and not supported.
+ * @return  -EHOSTUNREACH, if @p remote or remote end point of @p sock is not
+ *          reachable.
  * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ENOTCONN, if `remote == NULL`, but @p sock has no remote end point.
  * @return  -EPROTOTYPE, if `sock == NULL` and @p proto is not by
