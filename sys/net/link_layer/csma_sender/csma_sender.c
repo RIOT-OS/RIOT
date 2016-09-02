@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 INRIA
+ * Copyright (C) 2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,18 +14,20 @@
  * @brief       Implementation of the CSMA/CA helper
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @}
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
 
-#include "kernel.h"
 #include "xtimer.h"
 #include "random.h"
-#include "net/gnrc/csma_sender.h"
-#include "net/gnrc.h"
+#include "net/netdev2.h"
 #include "net/netopt.h"
+
+#include "net/csma_sender.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -34,16 +37,12 @@
 #include <inttypes.h>
 #endif
 
-
-/** @brief Current value for mac_min_be parameter */
-static uint8_t mac_min_be = MAC_MIN_BE_DEFAULT;
-
-/** @brief Current value for mac_max_be parameter */
-static uint8_t mac_max_be = MAC_MAX_BE_DEFAULT;
-
-/** @brief Current value for mac_max_csma_backoffs parameter */
-static uint8_t mac_max_csma_backoffs = MAC_MAX_CSMA_BACKOFFS_DEFAULT;
-
+const csma_sender_conf_t CSMA_SENDER_CONF_DEFAULT = {
+    CSMA_SENDER_MIN_BE_DEFAULT,
+    CSMA_SENDER_MAX_BE_DEFAULT,
+    CSMA_SENDER_MAX_BACKOFFS_DEFAULT,
+    CSMA_SENDER_BACKOFF_PERIOD_UNIT
+};
 
 /*--------------------- "INTERNAL" UTILITY FUNCTIONS ---------------------*/
 
@@ -55,19 +54,20 @@ static uint8_t mac_max_csma_backoffs = MAC_MAX_CSMA_BACKOFFS_DEFAULT;
  *
  * @return              An adequate random backoff exponent in microseconds
  */
-static inline uint32_t choose_backoff_period(int be)
+static inline uint32_t choose_backoff_period(int be,
+                                             const csma_sender_conf_t *conf)
 {
-    if (be < mac_min_be) {
-        be = mac_min_be;
+    if (be < conf->min_be) {
+        be = conf->min_be;
     }
-    if (be > mac_max_be) {
-        be = mac_max_be;
+    if (be > conf->max_be) {
+        be = conf->max_be;
     }
-    uint32_t max_backoff = ((1 << be) - 1) * A_UNIT_BACKOFF_PERIOD_MICROSEC;
+    uint32_t max_backoff = ((1 << be) - 1) * CSMA_SENDER_BACKOFF_PERIOD_UNIT;
 
-    uint32_t period = genrand_uint32() % max_backoff;
-    if (period < A_UNIT_BACKOFF_PERIOD_MICROSEC) {
-        period = A_UNIT_BACKOFF_PERIOD_MICROSEC;
+    uint32_t period = random_uint32() % max_backoff;
+    if (period < CSMA_SENDER_BACKOFF_PERIOD_UNIT) {
+        period = CSMA_SENDER_BACKOFF_PERIOD_UNIT;
     }
 
     return period;
@@ -78,17 +78,17 @@ static inline uint32_t choose_backoff_period(int be)
  * @brief Perform a CCA and send the given packet if medium is available
  *
  * @param[in] device    netdev device, needs to be already initialized
- * @param[in] data      pointer to the data in the packet buffer;
- *                      it must be a complete 802.15.4-compliant frame,
- *                      ready to be sent to the radio transceiver
+ * @param[in] vector    pointer to the data
+ * @param[in] count     number of elements in @p vector
  *
- * @return              the return value of device driver's @c send_data()
- *                      function if medium was avilable
- * @return              -ECANCELED if an internal driver error occured
+ * @return              the return value of device driver's
+ *                      netdev2_driver_t::send() function if medium was
+ *                      available
+ * @return              -ECANCELED if an internal driver error occurred
  * @return              -EBUSY if radio medium was not available
  *                      to send the given data
  */
-static int send_if_cca(gnrc_netdev_t *device, gnrc_pktsnip_t *data)
+static int send_if_cca(netdev2_t *device, struct iovec *vector, unsigned count)
 {
     netopt_enable_t hwfeat;
 
@@ -107,7 +107,7 @@ static int send_if_cca(gnrc_netdev_t *device, gnrc_pktsnip_t *data)
     /* if medium is clear, send the packet and return */
     if (hwfeat == NETOPT_ENABLE) {
         DEBUG("csma: Radio medium available: sending packet.\n");
-        return device->driver->send_data(device, data);
+        return device->driver->send(device, vector, count);
     }
 
     /* if we arrive here, medium was not available for transmission */
@@ -117,72 +117,64 @@ static int send_if_cca(gnrc_netdev_t *device, gnrc_pktsnip_t *data)
 
 /*------------------------- "EXPORTED" FUNCTIONS -------------------------*/
 
-void set_csma_mac_min_be(uint8_t val)
-{
-    mac_min_be = val;
-}
-
-void set_csma_mac_max_be(uint8_t val)
-{
-    mac_max_be = val;
-}
-
-void set_csma_mac_max_csma_backoffs(uint8_t val)
-{
-    mac_max_csma_backoffs = val;
-}
-
-
-int csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
+int csma_sender_csma_ca_send(netdev2_t *dev, struct iovec *vector,
+                             unsigned count, const csma_sender_conf_t *conf)
 {
     netopt_enable_t hwfeat;
 
+    assert(dev);
+    /* choose default configuration if none is given */
+    if (conf == NULL) {
+        conf = &CSMA_SENDER_CONF_DEFAULT;
+    }
     /* Does the transceiver do automatic CSMA/CA when sending? */
     int res = dev->driver->get(dev,
                                NETOPT_CSMA,
                                (void *) &hwfeat,
                                sizeof(netopt_enable_t));
     bool ok = false;
+
     switch (res) {
-    case -ENODEV:
-        /* invalid device pointer given */
-        return -ENODEV;
-    case -ENOTSUP:
-        /* device doesn't make auto-CSMA/CA */
-        break;
-    case -EOVERFLOW:  /* (normally impossible...*/
-    case -ECANCELED:
-        DEBUG("csma: !!! DEVICE DRIVER FAILURE! TRANSMISSION ABORTED!\n");
-        /* internal driver error! */
-        return -ECANCELED;
-    default:
-        ok = (hwfeat == NETOPT_ENABLE);
+        case -ENODEV:
+            /* invalid device pointer given */
+            return -ENODEV;
+        case -ENOTSUP:
+            /* device doesn't make auto-CSMA/CA */
+            break;
+        case -EOVERFLOW: /* (normally impossible...*/
+        case -ECANCELED:
+            DEBUG("csma: !!! DEVICE DRIVER FAILURE! TRANSMISSION ABORTED!\n");
+            /* internal driver error! */
+            return -ECANCELED;
+        default:
+            ok = (hwfeat == NETOPT_ENABLE);
     }
 
     if (ok) {
         /* device does CSMA/CA all by itself: let it do its job */
         DEBUG("csma: Network device does hardware CSMA/CA\n");
-        return dev->driver->send_data(dev, pkt);
+        return dev->driver->send(dev, vector, count);
     }
 
     /* if we arrive here, then we must perform the CSMA/CA procedure
        ourselves by software */
-    genrand_init(xtimer_now());
+    random_init(xtimer_now());
     DEBUG("csma: Starting software CSMA/CA....\n");
 
-    int nb = 0, be = mac_min_be;
+    int nb = 0, be = conf->min_be;
 
-    while (nb <= mac_max_csma_backoffs) {
+    while (nb <= conf->max_be) {
         /* delay for an adequate random backoff period */
-        uint32_t bp = choose_backoff_period(be);
+        uint32_t bp = choose_backoff_period(be, conf);
         xtimer_usleep(bp);
 
         /* try to send after a CCA */
-        res = send_if_cca(dev, pkt);
+        res = send_if_cca(dev, vector, count);
         if (res >= 0) {
             /* TX done */
             return res;
-        } else if (res != -EBUSY) {
+        }
+        else if (res != -EBUSY) {
             /* something has gone wrong, return the error code */
             return res;
         }
@@ -190,8 +182,8 @@ int csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
         /* medium is busy: increment CSMA counters */
         DEBUG("csma: Radio medium busy.\n");
         be++;
-        if (be > mac_max_be) {
-            be = mac_max_be;
+        if (be > conf->max_be) {
+            be = conf->max_be;
         }
         nb++;
         /* ... and try again if we have no exceeded the retry limit */
@@ -203,41 +195,43 @@ int csma_ca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
 }
 
 
-int cca_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
+int csma_sender_cca_send(netdev2_t *dev, struct iovec *vector, unsigned count)
 {
     netopt_enable_t hwfeat;
 
+    assert(dev);
     /* Does the transceiver do automatic CCA before sending? */
     int res = dev->driver->get(dev,
                                NETOPT_AUTOCCA,
                                (void *) &hwfeat,
                                sizeof(netopt_enable_t));
     bool ok = false;
+
     switch (res) {
-    case -ENODEV:
-        /* invalid device pointer given */
-        return -ENODEV;
-    case -ENOTSUP:
-        /* device doesn't make auto-CCA */
-        break;
-    case -EOVERFLOW:  /* (normally impossible...*/
-    case -ECANCELED:
-        /* internal driver error! */
-        DEBUG("csma: !!! DEVICE DRIVER FAILURE! TRANSMISSION ABORTED!\n");
-        return -ECANCELED;
-    default:
-        ok = (hwfeat == NETOPT_ENABLE);
+        case -ENODEV:
+            /* invalid device pointer given */
+            return -ENODEV;
+        case -ENOTSUP:
+            /* device doesn't make auto-CCA */
+            break;
+        case -EOVERFLOW: /* (normally impossible...*/
+        case -ECANCELED:
+            /* internal driver error! */
+            DEBUG("csma: !!! DEVICE DRIVER FAILURE! TRANSMISSION ABORTED!\n");
+            return -ECANCELED;
+        default:
+            ok = (hwfeat == NETOPT_ENABLE);
     }
 
     if (ok) {
         /* device does auto-CCA: let him do its job */
         DEBUG("csma: Network device does auto-CCA checking.\n");
-        return dev->driver->send_data(dev, pkt);
+        return dev->driver->send(dev, vector, count);
     }
 
     /* if we arrive here, we must do CCA ourselves to see if radio medium
        is clear before sending */
-    res = send_if_cca(dev, pkt);
+    res = send_if_cca(dev, vector, count);
     if (res == -EBUSY) {
         DEBUG("csma: Transmission cancelled!\n");
     }
