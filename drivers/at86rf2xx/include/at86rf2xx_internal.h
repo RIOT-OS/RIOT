@@ -163,6 +163,16 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
  */
 void at86rf2xx_configure_phy(at86rf2xx_t *dev);
 
+#if defined MODULE_AT86RF233 || defined MODULE_AT86RF231
+/**
+ * @brief   Read random data from the RNG
+ *
+ * @param[in] dev       device to configure
+ * @param[out] data     buffer to copy the random data to
+ * @param[in]  len      number of random bytes to store in data
+ */
+void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, const size_t len);
+#endif
 
 #ifdef __cplusplus
 }
