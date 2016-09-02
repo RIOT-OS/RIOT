@@ -129,7 +129,7 @@ extern "C" {
 #define LWIP_UDPLITE            (0)
 #endif /* MODULE_LWIP_UDPLITE */
 
-#ifdef MODULE_LWIP_CONN
+#if defined(MODULE_LWIP_CONN) || defined(MODULE_LWIP_SOCK)
 #define LWIP_NETCONN            (1)
 #else
 #define LWIP_NETCONN            (0)
