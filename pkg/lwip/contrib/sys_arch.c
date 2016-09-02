@@ -28,6 +28,9 @@
 #include "thread.h"
 #include "xtimer.h"
 
+#define _MSG_SUCCESS    (0x5cac)
+#define _MSG_TIMEOUT    (0x5cad)
+
 void sys_init(void)
 {
     return;
@@ -95,110 +98,80 @@ u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t count)
 err_t sys_mbox_new(sys_mbox_t *mbox, int size)
 {
     (void)size;
-    mbox->waiting = 0;
-    cib_init(&mbox->cib, SYS_MBOX_SIZE);
-    mutex_init(&mbox->mutex);
-    if (sema_create(&mbox->not_empty, 0) < 0) {
-        return ERR_VAL;
-    }
-    if (sema_create(&mbox->not_full, 0) < 0) {
-        return ERR_VAL;
-    }
+    mbox_init(&mbox->mbox, mbox->msgs, SYS_MBOX_SIZE);
     return ERR_OK;
 }
 
 void sys_mbox_free(sys_mbox_t *mbox)
 {
-    sema_destroy(&mbox->not_empty);
-    sema_destroy(&mbox->not_full);
+    (void)mbox;
+    return;
 }
 
 void sys_mbox_post(sys_mbox_t *mbox, void *msg)
 {
-    int idx;
+    msg_t m = { .content = { .ptr = msg }, .type = _MSG_SUCCESS };
 
     LWIP_ASSERT("invalid mbox", sys_mbox_valid(mbox));
-    mutex_lock(&mbox->mutex);
-    while ((idx = cib_put(&mbox->cib)) < 0) {
-        mbox->waiting++;
-        mutex_unlock(&mbox->mutex);
-        sema_wait_timed(&mbox->not_full, 0);
-        mutex_lock(&mbox->mutex);
-        mbox->waiting--;
-    }
-    mbox->msgs[idx] = msg;
-    if (cib_avail(&mbox->cib) == 1) {
-        sema_post(&mbox->not_empty);
-    }
-    mutex_unlock(&mbox->mutex);
+    mbox_put(&mbox->mbox, &m);
 }
 
 err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
 {
-    int idx;
+    msg_t m = { .content = { .ptr = msg }, .type = _MSG_SUCCESS };
 
-    LWIP_ASSERT("invalid mbox", sys_mbox_valid(mbox));
-    mutex_lock(&mbox->mutex);
-    if ((idx = cib_put(&mbox->cib)) < 0) {
-        mutex_unlock(&mbox->mutex);
+    if (mbox_try_put(&mbox->mbox, &m)) {
+        return ERR_OK;
+    }
+    else {
         return ERR_MEM;
     }
-    mbox->msgs[idx] = msg;
-    if (cib_avail(&mbox->cib) == 1) {
-        sema_post(&mbox->not_empty);
-    }
-    mutex_unlock(&mbox->mutex);
-    return ERR_OK;
+}
+
+static void _mbox_timeout(void *arg)
+{
+    msg_t m = { .type = _MSG_TIMEOUT };
+    mbox_put(arg, &m);
 }
 
 u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
 {
-    u32_t time_needed = 0;
-    unsigned int idx;
+    msg_t m;
+    xtimer_t timer = { .callback = _mbox_timeout, .arg = &mbox->mbox };
+    uint64_t start, stop;
 
-    LWIP_ASSERT("invalid mbox", sys_mbox_valid(mbox));
-    mutex_lock(&mbox->mutex);
-    while (cib_avail(&mbox->cib) == 0) {
-        sys_sem_t *not_empty = (sys_sem_t *)(&mbox->not_empty);
-        mutex_unlock(&mbox->mutex);
-        if (timeout != 0) {
-            time_needed = sys_arch_sem_wait(not_empty, timeout);
-            if (time_needed == SYS_ARCH_TIMEOUT) {
-                return SYS_ARCH_TIMEOUT;
-            }
-        }
-        else {
-            sys_arch_sem_wait(not_empty, 0);
-        }
-        mutex_lock(&mbox->mutex);
+    start = xtimer_now64();
+    if (timeout > 0) {
+        uint64_t u_timeout = (timeout * MS_IN_USEC);
+        _xtimer_set64(&timer, (uint32_t)u_timeout, (uint32_t)(u_timeout >> 32));
     }
-    idx = cib_get(&mbox->cib);
-    if (msg != NULL) {
-        *msg = mbox->msgs[idx];
+    mbox_get(&mbox->mbox, &m);
+    stop = xtimer_now64();
+    switch (m.type) {
+        case _MSG_SUCCESS:
+            *msg = m.content.ptr;
+            return (u32_t)((stop - start) / MS_IN_USEC);
+        case _MSG_TIMEOUT:
+            break;
+        default:    /* should not happen */
+            LWIP_ASSERT("invalid message received", false);
+            break;
     }
-    if (mbox->waiting) {
-        sema_post(&mbox->not_full);
-    }
-    mutex_unlock(&mbox->mutex);
-    return time_needed;
+    return SYS_ARCH_TIMEOUT;
 }
 
 u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
 {
-    int idx;
+    msg_t m;
 
-    LWIP_ASSERT("invalid mbox", sys_mbox_valid(mbox));
-    mutex_lock(&mbox->mutex);
-    if (cib_avail(&mbox->cib) == 0) {
-        mutex_unlock(&mbox->mutex);
+    if (mbox_try_get(&mbox->mbox, &m)) {
+        LWIP_ASSERT("invalid message received", (m.type == _MSG_SUCCESS));
+        *msg = m.content.ptr;
+        return ERR_OK;
+    }
+    else {
         return SYS_MBOX_EMPTY;
     }
-    idx = cib_get(&mbox->cib);
-    if (msg != NULL) {
-        *msg = mbox->msgs[idx];
-    }
-    mutex_unlock(&mbox->mutex);
-    return 0;
 }
 
 sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread, void *arg,
