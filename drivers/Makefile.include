@@ -10,6 +10,9 @@ endif
 ifneq (,$(filter kw2xrf,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/kw2xrf/include
 endif
+ifneq (,$(filter io1_xplained,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/io1_xplained/include
+endif
 ifneq (,$(filter isl29020,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/isl29020/include
 endif
