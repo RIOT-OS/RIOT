@@ -32,7 +32,9 @@
 #ifdef CPU_MODEL_STM32F072RB
 #include "stm32f072xb.h"
 #endif
-
+#ifdef CPU_MODEL_STM32F030R8
+#include "stm32f030x8.h"
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
