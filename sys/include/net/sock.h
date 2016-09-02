@@ -86,6 +86,8 @@
 #ifndef NET_SOCK_H_
 #define NET_SOCK_H_
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
