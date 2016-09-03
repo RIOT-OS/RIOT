@@ -23,6 +23,7 @@
 #include "debug.h"
 
 #include "netdev2_tap.h"
+#include "net/gnrc/netdev2.h"
 #include "net/gnrc/netdev2/eth.h"
 
 extern netdev2_tap_t netdev2_tap;
@@ -32,7 +33,9 @@ extern netdev2_tap_t netdev2_tap;
  * @{
  */
 #define TAP_MAC_STACKSIZE           (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
-#define TAP_MAC_PRIO                (THREAD_PRIORITY_MAIN - 3)
+#ifndef TAP_MAC_PRIO
+#define TAP_MAC_PRIO                (GNRC_NETDEV2_MAC_PRIO)
+#endif
 
 /**
  * @brief   Stacks for the MAC layer threads

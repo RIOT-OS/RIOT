@@ -35,7 +35,9 @@
  * @{
  */
 #define AT86RF2XX_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
-#define AT86RF2XX_MAC_PRIO          (THREAD_PRIORITY_MAIN - 4)
+#ifndef AT86RF2XX_MAC_PRIO
+#define AT86RF2XX_MAC_PRIO          (GNRC_NETDEV2_MAC_PRIO)
+#endif
 
 #define AT86RF2XX_NUM (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
 

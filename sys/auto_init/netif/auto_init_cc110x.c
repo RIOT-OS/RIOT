@@ -35,7 +35,9 @@
  * @{
  */
 #define CC110X_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
-#define CC110X_MAC_PRIO          (THREAD_PRIORITY_MAIN - 3)
+#ifndef CC110X_MAC_PRIO
+#define CC110X_MAC_PRIO          (GNRC_NETDEV2_MAC_PRIO)
+#endif
 
 #define CC110X_NUM (sizeof(cc110x_params)/sizeof(cc110x_params[0]))
 
