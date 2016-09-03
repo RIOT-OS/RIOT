@@ -24,7 +24,6 @@
 
 #include <stdbool.h>
 
-#include "mutex.h"
 #include "net/netdev2.h"
 #include "net/netdev2/ieee802154.h"
 
@@ -179,7 +178,6 @@ enum {
 typedef struct {
     netdev2_ieee802154_t netdev;  /**< netdev2 parent struct */
     uint8_t state;                /**< current state of the radio */
-    mutex_t mutex;                /**< device access lock */
 } cc2538_rf_t;
 
 /**
