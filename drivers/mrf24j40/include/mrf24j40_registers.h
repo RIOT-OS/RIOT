@@ -18,7 +18,7 @@ extern "C" {
 
 /**
  * @brief SPI access specifiers
- **@{
+ ***@{
  */
 #define MRF24J40_SHORT_ADDR_TRANS       (0x00)
 #define MRF24J40_LONG_ADDR_TRANS        (0x80)
@@ -29,8 +29,19 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Short-Register addresses
+ * @brief FIFO-Address-Map
  **@{
+ */
+#define MRF24J40_TX_NORMAL_FIFO                     (0x000)
+#define MRF24J40_TX_BEACON_FIFO                     (0x080)
+#define MRF24J40_TX_GTS1_FIFO                       (0x100)
+#define MRF24J40_TX_GTS2_FIFO                       (0x180)
+#define MRF24J40_RX_FIFO                            (0x300)
+/** @} */
+
+/**
+ * @brief Short-Register addresses
+ ***@{
  */
 #define MRF24J40_REG_RXMCR              (0x00)
 #define MRF24J40_REG_PANIDL             (0x01)
@@ -94,7 +105,7 @@ extern "C" {
 
 /**
  * @brief Long-Register addresses
- **@{
+ ***@{
  */
 #define MRF24J40_REG_RFCON0             (0x200)
 #define MRF24J40_REG_RFCON1             (0x201)
@@ -229,8 +240,7 @@ extern "C" {
  */
 #define MRF24J40_TXMCR__CSMA_CSMABF             (0b100)
 #define MRF24J40_TXMCR__MAX_BACKOFF             (0b111)
-#define MRF24J40_TXMCR__CSMA_MACMAXBE           (0b11000)
-#define MRF24J40_TXMCR__SLOTTED                 (0b100000)
+#define MRF24J40_TXMCR_MASK__MACMINBE           (0b00011000)
 
 #define MRF24J40_TXMCR_MASK__NOCSMA             (0b10000000)
 #define MRF24J40_TXMCR_MASK__BATLIFEXT          (0b01000000)
@@ -241,11 +251,11 @@ extern "C" {
  * @brief   Bitfield definitions for the RXMCR register
  * @{
  */
-#define MRF24J40_RXMCR__NOACKRSP                (0b100000)
-#define MRF24J40_RXMCR__PANCOORD                (0b1000)
-#define MRF24J40_RXMCR__COORD                   (0b100)
-#define MRF24J40_RXMCR__ERRPKT                  (0b10)
-#define MRF24J40_RXMCR__PROMI                   (0b1)
+#define MRF24J40_RXMCR_MASK__NOACKRSP                (0b00100000)
+#define MRF24J40_RXMCR_MASK__PANCOORD                (0b00001000)
+#define MRF24J40_RXMCR_MASK__COORD                   (0b00000100)
+#define MRF24J40_RXMCR_MASK__ERRPKT                  (0b00000010)
+#define MRF24J40_RXMCR_MASK__PROMI                   (0b00000001)
 /** @} */
 
 /**

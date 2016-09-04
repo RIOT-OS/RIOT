@@ -118,17 +118,16 @@ extern "C" {
  * @brief   Flags for PSEUDO DEVICE INTERNAL STATES
  * @{
  */
-#define MRF24J40_PSEUDO_STATE_TRX_OFF      (0x0)        /**< idle */
-#define MRF24J40_PSEUDO_STATE_PLL_ON       (0x1)        /**< ready to transmit */
-#define MRF24J40_PSEUDO_STATE_SLEEP        (0x2)        /**< sleep mode */
-#define MRF24J40_PSEUDO_STATE_BUSY_RX_AACK (0x3)        /**< busy receiving data */
-#define MRF24J40_PSEUDO_STATE_BUSY_TX_ARET (0x4)        /**< busy transmitting data */
-#define MRF24J40_PSEUDO_STATE_RX_AACK_ON   (0x5)        /**< wait for incoming data */
-#define MRF24J40_PSEUDO_STATE_RX_AACK_OFF  (0x6)        /**< wait for incoming data, no automatic Acknowledge */
-#define MRF24J40_PSEUDO_STATE_TX_ARET_ON   (0x7)        /**< ready for sending data */
-#define MRF24J40_PSEUDO_STATE_TX_ARET_OFF  (0x8)        /**< ready for sending data */
-#define MRF24J40_PSEUDO_STATE_IN_PROGRESS  (0x9)        /**< ongoing state conversion */
-#define MRF24J40_PSEUDO_STATE_BUSY_TX_ARET_OFF (0xa)    /**< busy transmitting data */
+#define MRF24J40_PSEUDO_STATE_TRX_OFF      (0x08)       /**< idle */
+#define MRF24J40_PSEUDO_STATE_RX_ON        (0x06)
+#define MRF24J40_PSEUDO_STATE_PLL_ON       (0x09)       /**< ready to transmit */
+#define MRF24J40_PSEUDO_STATE_SLEEP        (0x0f)       /**< sleep mode */
+#define MRF24J40_PSEUDO_STATE_BUSY_RX_AACK (0x11)       /**< busy receiving data */
+#define MRF24J40_PSEUDO_STATE_BUSY_TX_ARET (0x12)       /**< busy transmitting data */
+#define MRF24J40_PSEUDO_STATE_RX_AACK_ON   (0x16)       /**< wait for incoming data */
+#define MRF24J40_PSEUDO_STATE_TX_ARET_ON   (0x19)       /**< ready for sending data */
+#define MRF24J40_PSEUDO_STATE_TX_ARET_OFF  (0x19)       /**< ready for sending data */
+#define MRF24J40_PSEUDO_STATE_IN_PROGRESS  (0x1f)       /**< ongoing state conversion */
 /** @} */
 
 /**
@@ -139,18 +138,23 @@ extern "C" {
  *
  * @{
  */
-//#define AT86RF2XX_OPT_SRC_ADDR_LONG  (NETDEV2_IEEE802154_SRC_MODE_LONG) /**< legacy define */
-//#define AT86RF2XX_OPT_RAWDUMP        (NETDEV2_IEEE802154_RAW)           /**< legacy define */
-#define MRF24J40_OPT_AUTOACK         (NETDEV2_IEEE802154_ACK_REQ)   /**< legacy define */
+#define MRF24J40_OPT_SRC_ADDR_LONG  (NETDEV2_IEEE802154_SRC_MODE_LONG)  /**< legacy define */
+#define MRF24J40_OPT_RAWDUMP        (NETDEV2_IEEE802154_RAW)            /**< legacy define */
+#define MRF24J40_OPT_AUTOACK        (NETDEV2_IEEE802154_ACK_REQ)        /**< legacy define */
 
-#define MRF24J40_OPT_CSMA           (0x0100)                        /**< CSMA active */
-#define MRF24J40_OPT_PROMISCUOUS    (0x0200)                        /**< promiscuous mode active */
-#define MRF24J40_OPT_PRELOADING     (0x0400)                        /**< preloading enabled */
-#define MRF24J40_OPT_TELL_TX_START  (0x0800)                        /**< notify MAC layer on TX start */
-#define MRF24J40_OPT_TELL_TX_END    (0x1000)                        /**< notify MAC layer on TX finished */
-#define MRF24J40_OPT_TELL_RX_START  (0x2000)                        /**< notify MAC layer on RX start */
-#define MRF24J40_OPT_TELL_RX_END    (0x4000)                        /**< notify MAC layer on RX */
-
+#define MRF24J40_OPT_CSMA           (0x0100)                            /**< CSMA active */
+#define MRF24J40_OPT_PROMISCUOUS    (0x0200)                            /**< promiscuous mode
+                                                                         *   active */
+#define MRF24J40_OPT_PRELOADING     (0x0400)                            /**< preloading enabled */
+#define MRF24J40_OPT_TELL_TX_START  (0x0800)                            /**< notify MAC layer on TX
+                                                                         *   start */
+#define MRF24J40_OPT_TELL_TX_END    (0x1000)                            /**< notify MAC layer on TX
+                                                                         *   finished */
+#define MRF24J40_OPT_TELL_RX_START  (0x2000)                            /**< notify MAC layer on RX
+                                                                         *   start */
+#define MRF24J40_OPT_TELL_RX_END    (0x4000)                            /**< notify MAC layer on RX
+                                                                         *   finished */
+/** @} */
 
 /**
  * @brief struct holding all params needed for device initialization

@@ -6,7 +6,6 @@
  * @brief       Implementation of driver internal functions
  *
  * @author      Tobias Fredersdorf <tobias.fredersdorf@haw-hamburg.de>
- * @author      <neo@nenaco.de>
  *
  * @}
  */
@@ -89,6 +88,7 @@ void mrf24j40_tx_normal_fifo_read(const mrf24j40_t *dev, const uint16_t offset, 
     spi_release(dev->params.spi);
 }
 
+
 void mrf24j40_tx_normal_fifo_write(const mrf24j40_t *dev,
                                    const uint16_t offset,
                                    const uint8_t *data,
@@ -116,8 +116,7 @@ void mrf24j40_rx_fifo_read(const mrf24j40_t *dev, const uint16_t offset, uint8_t
 {
     uint16_t rx_addr;
 
-    /* rx-fifo is at address 0x300 */
-    rx_addr = 0x300 + offset;
+    rx_addr = MRF24J40_RX_FIFO + offset;
 
     uint8_t reg1, reg2;
     reg1 = MRF24J40_LONG_ADDR_TRANS | (rx_addr >> 3);
@@ -130,7 +129,6 @@ void mrf24j40_rx_fifo_read(const mrf24j40_t *dev, const uint16_t offset, uint8_t
     gpio_set(dev->params.cs_pin);
     spi_release(dev->params.spi);
 }
-
 
 void mrf24j40_rx_fifo_write(const mrf24j40_t *dev, const uint16_t offset, const uint8_t *data, const size_t len)
 {
@@ -146,8 +144,9 @@ uint8_t mrf24j40_get_status(const mrf24j40_t *dev)
     uint8_t rfstate;
     uint8_t rxmcr;
     uint8_t txstat;
+    uint8_t txncon;
 
-    /* radio chip states:
+    /*
      *  0xe0 = RTSEL2
         0xc0 = RTSEL1
         0xa0 = RX
@@ -156,26 +155,30 @@ uint8_t mrf24j40_get_status(const mrf24j40_t *dev)
         0x40 = SLEEP
         0x20 = CALFIL
         0x00 = RESET
-
-        not very exhausting, therefore introducing PSEUDO-STATES
      */
 
     rfstate = mrf24j40_reg_read_long(dev, MRF24J40_REG_RFSTATE);
     rxmcr = mrf24j40_reg_read_short(dev, MRF24J40_REG_RXMCR);
     txstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT);
+    txncon = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXNCON);
 
-    if ((rfstate == MRF24J40_RFSTATE_SLEEP) && (rxmcr & MRF24J40_RXMCR__NOACKRSP)) {
+    if (rfstate == MRF24J40_RFSTATE_SLEEP) {
         return MRF24J40_PSEUDO_STATE_SLEEP;
     }
-
-    else if ((rfstate == MRF24J40_RFSTATE_RX) && (rxmcr & MRF24J40_RXMCR__NOACKRSP)) {
-        return MRF24J40_PSEUDO_STATE_RX_AACK_OFF;
+    else if ((rfstate == MRF24J40_RFSTATE_RX) && ((txncon & MRF24J40_TXNCON_MASK__TXNACKREQ))) {
+        return MRF24J40_PSEUDO_STATE_TX_ARET_ON;
+    }
+    else if ((rfstate == MRF24J40_RFSTATE_RX) && (rxmcr & MRF24J40_RXMCR_MASK__NOACKRSP)) {
+        return MRF24J40_PSEUDO_STATE_RX_ON;
+    }
+    else if ((rfstate == MRF24J40_RFSTATE_RX) && (!(rxmcr & MRF24J40_RXMCR_MASK__NOACKRSP))) {
+        return MRF24J40_PSEUDO_STATE_RX_AACK_ON;
     }
     else if ((rfstate == MRF24J40_RFSTATE_RX) && (txstat & MRF24J40_TXSTAT_MASK__TXNSTAT)) {
-        return MRF24J40_PSEUDO_STATE_BUSY_TX_ARET_OFF;
+        return MRF24J40_PSEUDO_STATE_BUSY_TX_ARET;
     }
     else {
-        return MRF24J40_PSEUDO_STATE_RX_AACK_ON;
+        return MRF24J40_PSEUDO_STATE_SLEEP;
     }
 }
 
@@ -186,7 +189,6 @@ void mrf24j40_assert_awake(mrf24j40_t *dev)
     if (mrf24j40_get_status(dev) == MRF24J40_PSEUDO_STATE_SLEEP) {
 
         /* set uController pin to high */
-        /* waking up by using registers seems not to work. Use hardware solution (Sleep-Pin) */
         gpio_set(dev->params.sleep_pin);
 
         /* reset state machine */
@@ -198,8 +200,8 @@ void mrf24j40_assert_awake(mrf24j40_t *dev)
          */
         xtimer_usleep(MRF24J40_WAKEUP_DELAY);
 
-        /* enable again IRQs (transmit and receive */
-        mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0b11110110);
+        /* enable again IRQs */
+        mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0b11110110);     /* enables Transmit- and Receive-IRQ */
     }
 }
 
@@ -219,10 +221,6 @@ void mrf24j40_hardware_reset(mrf24j40_t *dev)
 
 void mrf24j40_configure_phy(mrf24j40_t *dev)
 {
-
-//	mrf24j40_set_chan(dev, MRF24J40_DEFAULT_CHANNEL);		/* delay included in mrf24j40_set_chan */
     mrf24j40_set_chan(dev, dev->netdev.chan);
 }
-
-
 

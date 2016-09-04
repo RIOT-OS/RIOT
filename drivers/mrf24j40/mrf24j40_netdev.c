@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016 Hochschule für Angewandte Wissenschaften Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -12,7 +13,7 @@
  * @file
  * @brief       Netdev adaption for the MRF24J40 drivers
  *
- * @author      <neo@nenaco.de>
+ * @author      Tobias Fredersdorf <Tobias.Fredersdorf@haw-hamburg.de>
  *
  * @}
  */
@@ -52,7 +53,8 @@ const netdev2_driver_t mrf24j40_driver = {
     .set = _set,
 };
 
-static void _irq_handler(void *arg){
+static void _irq_handler(void *arg)
+{
     netdev2_t *dev = (netdev2_t *) arg;
 
     if (dev->event_callback) {
@@ -60,7 +62,8 @@ static void _irq_handler(void *arg){
     }
 }
 
-static int _init(netdev2_t *netdev){
+static int _init(netdev2_t *netdev)
+{
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
 
     /* initialise GPIOs */
@@ -108,7 +111,6 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
             return -EOVERFLOW;
         }
 
-
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.tx_bytes += len;
 #endif
@@ -125,13 +127,14 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
 
 }
 
-static int _recv(netdev2_t *netdev, char *buf, int len, void *info){
+static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
+{
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
     uint8_t phr;
     size_t pkt_len;
 
-    /* get the size of the received packet / receive FIFO is at address 0x300 */
-    phr = mrf24j40_reg_read_long(dev, 0x300);
+    /* get the size of the received packet */
+    phr = mrf24j40_reg_read_long(dev, MRF24J40_RX_FIFO);
 
     pkt_len = phr;
 
@@ -156,6 +159,7 @@ static int _recv(netdev2_t *netdev, char *buf, int len, void *info){
     if (info != NULL) {
         netdev2_ieee802154_rx_info_t *radio_info = info;
         mrf24j40_rx_fifo_read(dev, 0, &(radio_info->lqi), 1);
+
         mrf24j40_rx_fifo_read(dev, 0, &(radio_info->rssi), 1);
     }
     else {
@@ -164,7 +168,30 @@ static int _recv(netdev2_t *netdev, char *buf, int len, void *info){
     return pkt_len;
 }
 
-static int _set_state(mrf24j40_t *dev, netopt_state_t state){
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+static int _set_state(mrf24j40_t *dev, netopt_state_t state)
+{
     switch (state) {
         case NETOPT_STATE_SLEEP:
             mrf24j40_set_state(dev, MRF24J40_PSEUDO_STATE_SLEEP);
@@ -186,7 +213,8 @@ static int _set_state(mrf24j40_t *dev, netopt_state_t state){
     return sizeof(netopt_state_t);
 }
 
-netopt_state_t _get_state(mrf24j40_t *dev){
+netopt_state_t _get_state(mrf24j40_t *dev)
+{
     switch (mrf24j40_get_status(dev)) {
         case MRF24J40_PSEUDO_STATE_SLEEP:
             return NETOPT_STATE_SLEEP;
@@ -201,7 +229,8 @@ netopt_state_t _get_state(mrf24j40_t *dev){
     }
 }
 
-static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len){
+static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
+{
     mrf24j40_t *dev = (mrf24j40_t *) netdev;
 
     if (netdev == NULL) {
@@ -215,6 +244,7 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len){
                 return -EOVERFLOW;
             }
             ((uint8_t *)val)[1] = 0;
+//          ((uint8_t *)val)[0] = mrf24j40_get_page(dev);
             ((uint8_t *)val)[0] = 0;
 
             return sizeof(uint16_t);
@@ -359,7 +389,8 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len){
     return res;
 }
 
-static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len){
+static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
+{
     mrf24j40_t *dev = (mrf24j40_t *) netdev;
     int res = 0;
 
@@ -368,9 +399,9 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len){
     }
 
     /* temporarily wake up if sleeping */
-    if (old_state == MRF24J40_STATE_SLEEP) {
-        mrf24j40_assert_awake(dev);
-    }
+//    if (old_state == MRF24J40_STATE_SLEEP) {
+//        mrf24j40_assert_awake(dev);
+//    }
 
     switch (opt) {
         case NETOPT_ADDRESS:
@@ -540,10 +571,10 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len){
     }
 
     /* go back to sleep if were sleeping and state hasn't been changed */
-    if ((old_state == MRF24J40_STATE_SLEEP) &&
-        (opt != NETOPT_STATE)) {
-        mrf24j40_set_state(dev, MRF24J40_STATE_SLEEP);
-    }
+//    if ((old_state == MRF24J40_STATE_SLEEP) &&
+//        (opt != NETOPT_STATE)) {
+//        mrf24j40_set_state(dev, MRF24J40_STATE_SLEEP);
+//    }
 
     if (res == -ENOTSUP) {
         res = netdev2_ieee802154_set((netdev2_ieee802154_t *)netdev, opt,
@@ -553,10 +584,14 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len){
     return res;
 }
 
-static void _isr(netdev2_t *netdev){
+static void _isr(netdev2_t *netdev)
+{
     mrf24j40_t *dev = (mrf24j40_t *) netdev;
     uint8_t intstat;
+    uint8_t txstat;
     uint8_t state;
+
+//    uint8_t tmp;
 
     /* Disable IRQs */
     mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0xff);
@@ -576,14 +611,17 @@ static void _isr(netdev2_t *netdev){
     intstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);   /* Interrupt status */
     state = mrf24j40_get_status(dev);                               /* radio chip status */
 
-    if (!(intstat & MRF24J40_INTSTAT_MASK__RXIF)) {                 /* IRQ, but no Receive IRQ */
-        if (state == MRF24J40_PSEUDO_STATE_RX_AACK_ON) {
+    /* equal to TRX_END */
+    if (!(intstat & MRF24J40_INTSTAT_MASK__RXIF)) {     /* IRQ, but no Receive IRQ */
+        if (state == MRF24J40_PSEUDO_STATE_RX_AACK_ON ||
+            state == MRF24J40_PSEUDO_STATE_BUSY_RX_AACK) {
             DEBUG("[mrf24j40] EVT - RX_END\n");
             if (!(dev->netdev.flags & MRF24J40_OPT_TELL_RX_END)) {
                 return;
             }
             netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
         }
+
         else if (state == MRF24J40_PSEUDO_STATE_TX_ARET_ON ||
                  state == MRF24J40_PSEUDO_STATE_BUSY_TX_ARET) {
             /* check for more pending TX calls and return to idle state if
@@ -595,11 +633,29 @@ static void _isr(netdev2_t *netdev){
             }
 
             DEBUG("[mrf24j40] EVT - TX_END\n");
-
             if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END)) {
-                netdev->event_callback(netdev, NETDEV2_EVENT_TX_NOACK);
+                txstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT);
+
+                /* transmision failed */
+                if (txstat & MRF24J40_TXSTAT_MASK__TXNSTAT) {
+                    /* TX_NOACK - CCAFAIL */
+                    if (txstat & MRF24J40_TXSTAT_MASK__CCAFAIL) {
+                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_MEDIUM_BUSY);
+                        DEBUG("[mrf24j40] TX_CHANNEL_ACCESS_FAILURE\n");
+                    }
+                    /* check max retries */
+                    else if (txstat & 0xc0) {
+                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_NOACK);
+                        DEBUG("[mrf24j40] TX NO_ACK\n");
+                    }
+                }
+                else {
+
+                }
             }
         }
     }
+    /* Enable IRQs */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0b11110110);
 }
 
