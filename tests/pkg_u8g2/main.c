@@ -18,42 +18,45 @@
  * @}
  */
 
-#define TEST_U8G2_OUTPUT_STDOUT 1
-#define TEST_U8G2_OUTPUT_SDL 2
-#define TEST_U8G2_OUTPUT_SPI 3
-#define TEST_U8G2_OUTPUT_I2C 4
+#define TEST_OUTPUT_STDOUT 1
+#define TEST_OUTPUT_SDL 2
+#define TEST_OUTPUT_SPI 3
+#define TEST_OUTPUT_I2C 4
 
-#ifndef TEST_U8G2_OUTPUT
-#error "TEST_U8G2_OUTPUT not defined"
-#endif
-#ifndef TEST_U8G2_DISPLAY
-#error "TEST_U8G2_DISPLAY not defined"
+#ifndef TEST_OUTPUT
+#error "TEST_OUTPUT not defined"
 #endif
 
-#if TEST_U8G2_OUTPUT == TEST_U8G2_OUTPUT_I2C
-#ifndef TEST_U8G2_I2C
-#error "TEST_U8G2_I2C not defined"
+#if TEST_OUTPUT == TEST_OUTPUT_I2C
+#ifndef TEST_I2C
+#error "TEST_I2C not defined"
 #endif
-#ifndef TEST_U8G2_ADDR
-#error "TEST_U8G2_ADDR not defined"
+#ifndef TEST_ADDR
+#error "TEST_ADDR not defined"
 #endif
-#ifndef TEST_U8G2_PIN_RESET
-#error "TEST_U8G2_PIN_RESET not defined"
+#ifndef TEST_DISPLAY
+#error "TEST_DISPLAY not defined"
+#endif
+#ifndef TEST_PIN_RESET
+#error "TEST_PIN_RESET not defined"
 #endif
 #endif
 
-#if TEST_U8G2_OUTPUT == TEST_U8G2_OUTPUT_SPI
-#ifndef TEST_U8G2_SPI
-#error "TEST_U8G2_SPI not defined"
+#if TEST_OUTPUT == TEST_OUTPUT_SPI
+#ifndef TEST_SPI
+#error "TEST_SPI not defined"
 #endif
-#ifndef TEST_U8G2_PIN_CS
-#error "TEST_U8G2_PIN_CS not defined"
+#ifndef TEST_DISPLAY
+#error "TEST_DISPLAY not defined"
 #endif
-#ifndef TEST_U8G2_PIN_DC
-#error "TEST_U8G2_PIN_DC not defined"
+#ifndef TEST_PIN_CS
+#error "TEST_PIN_CS not defined"
 #endif
-#ifndef TEST_U8G2_PIN_RESET
-#error "TEST_U8G2_PIN_RESET not defined"
+#ifndef TEST_PIN_DC
+#error "TEST_PIN_DC not defined"
+#endif
+#ifndef TEST_PIN_RESET
+#error "TEST_PIN_RESET not defined"
 #endif
 #endif
 
@@ -92,16 +95,16 @@ static const uint8_t logo[] = {
     0x00, 0x00, 0x00, 0x00
 };
 
-#if (TEST_U8G2_OUTPUT == TEST_U8G2_OUTPUT_I2C) || (TEST_U8G2_OUTPUT == TEST_U8G2_OUTPUT_SPI)
+#if (TEST_OUTPUT == TEST_OUTPUT_I2C) || (TEST_OUTPUT == TEST_OUTPUT_SPI)
 /**
  * @brief   RIOT-OS pin maping of U8g2 pin numbers to RIOT-OS GPIO pins.
  * @note    To minimize the overhead, you can implement an alternative for
  *          u8x8_gpio_and_delay_riotos.
  */
 static gpio_t pins[] = {
-    [U8X8_PIN_CS] = TEST_U8G2_PIN_CS,
-    [U8X8_PIN_DC] = TEST_U8G2_PIN_DC,
-    [U8X8_PIN_RESET] = TEST_U8G2_PIN_RESET
+    [U8X8_PIN_CS] = TEST_PIN_CS,
+    [U8X8_PIN_DC] = TEST_PIN_DC,
+    [U8X8_PIN_RESET] = TEST_PIN_RESET
 };
 
 /**
@@ -120,38 +123,38 @@ int main(void)
     u8g2_t u8g2;
 
     /* initialize to stdout */
-#if TEST_U8G2_OUTPUT == TEST_U8G2_OUTPUT_STDOUT
-    puts("initializing to stdout.");
+#if TEST_OUTPUT == TEST_OUTPUT_STDOUT
+    puts("Initializing to stdout.");
 
     u8g2_SetupBuffer_Utf8(&u8g2, U8G2_R0);
 #endif
 
     /* initialize to virtual SDL (native only) */
-#if TEST_U8G2_OUTPUT == TEST_U8G2_OUTPUT_SDL
-    puts("initializing to SDL.");
+#if TEST_OUTPUT == TEST_OUTPUT_SDL
+    puts("Initializing to SDL.");
 
     u8g2_SetupBuffer_SDL_128x64_4(&u8g2, U8G2_R0);
 #endif
 
     /* initialize to SPI */
-#if TEST_U8G2_OUTPUT == TEST_U8G2_OUTPUT_SPI
-    puts("initializing to SPI.");
+#if TEST_OUTPUT == TEST_OUTPUT_SPI
+    puts("Initializing to SPI.");
 
-    TEST_U8G2_DISPLAY(&u8g2, U8G2_R0, u8x8_byte_riotos_hw_spi, u8x8_gpio_and_delay_riotos);
+    TEST_DISPLAY(&u8g2, U8G2_R0, u8x8_byte_riotos_hw_spi, u8x8_gpio_and_delay_riotos);
 
     u8g2_SetPins(&u8g2, pins, pins_enabled);
-    u8g2_SetDevice(&u8g2, TEST_U8G2_SPI);
+    u8g2_SetDevice(&u8g2, TEST_SPI);
 #endif
 
     /* initialize to I2C */
-#if TEST_U8G2_OUTPUT == TEST_U8G2_OUTPUT_I2C
-    puts("initializing to I2C.");
+#if TEST_OUTPUT == TEST_OUTPUT_I2C
+    puts("Initializing to I2C.");
 
-    TEST_U8G2_DISPLAY(&u8g2, U8G2_R0, u8x8_byte_riotos_hw_i2c, u8x8_gpio_and_delay_riotos);
+    TEST_DISPLAY(&u8g2, U8G2_R0, u8x8_byte_riotos_hw_i2c, u8x8_gpio_and_delay_riotos);
 
     u8g2_SetPins(&u8g2, pins, pins_enabled);
-    u8g2_SetDevice(&u8g2, TEST_U8G2_I2C);
-    u8g2_SetI2CAddress(&u8g2, TEST_U8G2_ADDR);
+    u8g2_SetDevice(&u8g2, TEST_I2C);
+    u8g2_SetI2CAddress(&u8g2, TEST_ADDR);
 #endif
 
     /* initialize the display */
@@ -172,14 +175,16 @@ int main(void)
 
             if (screen == 0) {
                 u8g2_DrawStr(&u8g2, 12, 22, "THIS");
-            } else if (screen == 1) {
+            }
+            else if (screen == 1) {
                 u8g2_DrawStr(&u8g2, 24, 22, "IS");
-            } else if (screen == 2) {
+            }
+            else if (screen == 2) {
                 u8g2_DrawBitmap(&u8g2, 0, 0, 8, 32, logo);
             }
         } while (u8g2_NextPage(&u8g2));
 
-#if TEST_U8G2_OUTPUT == TEST_U8G2_OUTPUT_STDOUT
+#if TEST_OUTPUT == TEST_OUTPUT_STDOUT
         /* transfer screen buffer to stdout */
         utf8_show();
 #endif
