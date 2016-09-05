@@ -1,0 +1,10 @@
+USEMODULE += arduino-common
+
+# add arduino-common include path
+INCLUDES += -I$(RIOTBOARD)/arduino-common/include
+
+#export needed for flash rule
+export LINUX_PORT = /dev/ttyUSB0
+export PROGRAMMER_SPEED = 57600
+
+include $(RIOTBOARD)/arduino-common/Makefile.include
