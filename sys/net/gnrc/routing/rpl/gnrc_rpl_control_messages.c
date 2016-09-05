@@ -720,7 +720,6 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
 
     /* add external and RPL FIB entries */
     for (size_t i = 0; i < gnrc_ipv6_fib_table.size; ++i) {
-        ipv6_addr_t *addr;
         fib_entry_t *fentry = &gnrc_ipv6_fib_table.data.entries[i];
         if (fentry->lifetime != 0) {
             if (!(fentry->next_hop_flags & FIB_FLAG_RPL_ROUTE)) {
@@ -747,7 +746,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
                     int_processed = true;
                 }
             }
-            addr = (ipv6_addr_t *) fentry->global->address;
+            ipv6_addr_t *addr = (ipv6_addr_t *) fentry->global->address;
             if (ipv6_addr_is_global(addr)) {
                 size_t prefix_length = (fentry->global_flags >> FIB_FLAG_NET_PREFIX_SHIFT);
 
