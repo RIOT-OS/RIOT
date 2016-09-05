@@ -249,7 +249,7 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
     cc2538_ssi_t* ssi = spi_config[dev].dev;
-    typeof(length) tx_n = 0, rx_n = 0;
+    unsigned int tx_n = 0, rx_n = 0;
 
     if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
