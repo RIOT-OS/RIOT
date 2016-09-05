@@ -46,7 +46,7 @@ export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
 # basic cflags:
-export CFLAGS += -Wall -Wextra -pedantic
+export CFLAGS += -Wall -Wextra -pedantic -std=gnu99
 ifeq ($(shell uname -m),x86_64)
 export CFLAGS += -m32
 endif
