@@ -54,3 +54,7 @@ your host system and use the VM for compiling, flashing devices and running the 
 For new boards it is necessary to add new udev rules to `dist/tools/vagrant/udev_rules` and
 additional usb filters to the Vagrantfile so that VirtualBox is able to capture the devices.
 The needed `vendor id` and `product id` can be obtained by running `vboxmanage list usbhost`.
+
+### Virtualbox (for Linux Users)
+Additionally, in order to allow USB access from within the guest system, the host system user
+must be a member of the `vboxusers` group (see [here](https://www.virtualbox.org/manual/ch02.html#idm1051)).
