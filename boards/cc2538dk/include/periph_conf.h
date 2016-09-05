@@ -139,6 +139,13 @@ static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
  */
 #define ADC_NUMOF           (1)
 #define ADC_ALS_PIN         6
+
+static const uint8_t periph_adc_map[ADC_NUMOF] = {
+    ADC_ALS_PIN,
+};
+
+#define ADC_LINE(x)         periph_adc_map[x]
+
 /** @} */
 
 /**
