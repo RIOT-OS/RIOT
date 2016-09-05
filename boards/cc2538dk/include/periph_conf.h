@@ -134,6 +134,14 @@ static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
 /** @} */
 
 /**
+ * @name ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (1)
+#define ADC_ALS_PIN         6
+/** @} */
+
+/**
  * @name GPIO configuration
  * @{
  */
