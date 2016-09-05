@@ -54,8 +54,7 @@
 #include "periph/adc.h"
 #include "cc2538.h"
 
-enum{
-
+enum {
     EOC = 1,  
     STSEL = 3, 
 };
@@ -64,7 +63,7 @@ int adc_init(adc_t line)
 {
     cc2538_soc_adc_t *adcaccess;
     adcaccess = SOC_ADC;
-    
+
     /* Setting up ADC */
     gpio_hardware_control(GPIO_PXX_TO_NUM(PORT_A, line));
     IOC_PXX_OVER[GPIO_PXX_TO_NUM(PORT_A, line)] = IOC_OVERRIDE_ANA;
@@ -72,21 +71,21 @@ int adc_init(adc_t line)
     /* Start conversions when ADCCON1.STSEL = 1 */
     adcaccess->cc2538_adc_adccon1.ADCCON1 |= 
         adcaccess->cc2538_adc_adccon1.ADCCON1bits.STSEL;
-    
+
     return 0;
 }
 
 int adc_sample(adc_t line, adc_res_t res)
 {
-
     cc2538_soc_adc_t *adcaccess = SOC_ADC;
     int16_t result;
 
     /* Note - This has been hard coded . 
-        Can choose from any of the choices below: 
-        SOC_ADC_ADCCON_REF_INT or 
-        SOC_ADC_ADCCON_REF_EXT_SINGLE or 
-        SOC_ADC_ADCCON_REF_AVDD5  */
+     *  Can choose from any of the choices below: 
+     *  SOC_ADC_ADCCON_REF_INT or 
+     *  SOC_ADC_ADCCON_REF_EXT_SINGLE or 
+     *  SOC_ADC_ADCCON_REF_AVDD5
+     */
     uint8_t refvoltage = SOC_ADC_ADCCON_REF_AVDD5; 
 
     /* Start a single extra conversion with the given parameters. */
@@ -103,24 +102,6 @@ int adc_sample(adc_t line, adc_res_t res)
     result  = (((adcaccess->ADCL) & 0xfc));
     result |= (((adcaccess->ADCH) & 0xff) << 8);
 
-    switch (res)
-    {
-        case ADC_RES_7BIT:
-            result = result >> SOCADC_7_BIT_RSHIFT;
-            break;
-        case ADC_RES_9BIT:
-            result = result >> SOCADC_9_BIT_RSHIFT;
-            break;
-        case ADC_RES_10BIT:
-            result = result >> SOCADC_10_BIT_RSHIFT;
-            break;
-        case ADC_RES_12BIT:
-            result = result >> SOCADC_12_BIT_RSHIFT;
-            break;
-        default:
-            return -1;
-    }
-
-    /* Return conversion result */
-    return result;
+    /* Return conversion result in mV */
+    return result / 10;
 }
