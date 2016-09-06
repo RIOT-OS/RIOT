@@ -80,6 +80,8 @@ else
   OPEN   := xdg-open
 endif
 
+QUIET ?= 1
+
 ifeq ($(QUIET),1)
   AD=@
   MAKEFLAGS += --no-print-directory
