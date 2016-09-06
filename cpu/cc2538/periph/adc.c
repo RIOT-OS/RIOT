@@ -40,7 +40,7 @@
  * @author      Benoît Thébaudeau <benoit.thebaudeau@advansee.com>
  * @author      Ankith ShashiKanthReddy (anrg.usc.edu) <ashashik@usc.edu>
  * @author      Jason A. Tran (anrg.usc.edu) <jasontra@usc.edu>
- * 
+ *
  * @}
   */
 
@@ -55,8 +55,8 @@
 #include "cc2538.h"
 
 enum {
-    EOC = 1,  
-    STSEL = 3, 
+    EOC = 1,
+    STSEL = 3,
 };
 
 int adc_init(adc_t line)
@@ -69,7 +69,7 @@ int adc_init(adc_t line)
     IOC_PXX_OVER[GPIO_PXX_TO_NUM(PORT_A, line)] = IOC_OVERRIDE_ANA;
 
     /* Start conversions when ADCCON1.STSEL = 1 */
-    adcaccess->cc2538_adc_adccon1.ADCCON1 |= 
+    adcaccess->cc2538_adc_adccon1.ADCCON1 |=
         adcaccess->cc2538_adc_adccon1.ADCCON1bits.STSEL;
 
     return 0;
@@ -80,21 +80,21 @@ int adc_sample(adc_t line, adc_res_t res)
     cc2538_soc_adc_t *adcaccess = SOC_ADC;
     int16_t result;
 
-    /* Note - This has been hard coded . 
-     *  Can choose from any of the choices below: 
-     *  SOC_ADC_ADCCON_REF_INT or 
-     *  SOC_ADC_ADCCON_REF_EXT_SINGLE or 
+    /* Note - This has been hard coded .
+     *  Can choose from any of the choices below:
+     *  SOC_ADC_ADCCON_REF_INT or
+     *  SOC_ADC_ADCCON_REF_EXT_SINGLE or
      *  SOC_ADC_ADCCON_REF_AVDD5
      */
-    uint8_t refvoltage = SOC_ADC_ADCCON_REF_AVDD5; 
+    uint8_t refvoltage = SOC_ADC_ADCCON_REF_AVDD5;
 
     /* Start a single extra conversion with the given parameters. */
-    adcaccess->ADCCON3 = ((adcaccess->ADCCON3) & 
+    adcaccess->ADCCON3 = ((adcaccess->ADCCON3) &
         ~(SOC_ADC_ADCCON3_EREF | SOC_ADC_ADCCON3_EDIV | SOC_ADC_ADCCON3_ECH)) |
             refvoltage | res | line;
 
     /* Poll until end of conversion */
-    while ((adcaccess->cc2538_adc_adccon1.ADCCON1 & 
+    while ((adcaccess->cc2538_adc_adccon1.ADCCON1 &
         adcaccess->cc2538_adc_adccon1.ADCCON1bits.EOC) == 0);
 
     /* Read conversion result, reading SOC_ADC_ADCH last to clear

@@ -75,7 +75,7 @@ typedef struct {
 #define SOC_ADC_ADCCON_REF_EXT_DIFF     (3 << 6)    /**< External reference on AIN6-AIN7 differential input */
 #define SOC_ADC_ADCCON_CH_GND           0xC         /**< GND */
 /** @} */
-    
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
