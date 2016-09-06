@@ -4,9 +4,9 @@
 ## About
 This repository includes a [Vagrantfile](https://github.com/RIOT-OS/RIOT/blob/master/Vagrantfile)
 to create and control a Linux virtual machine based on an Ubuntu 16.04 (64-bit) image that contains
-all necessary toolchains and dependencies to build and flash compatible devices with RIOT-OS.
+all necessary toolchains and dependencies to build and flash compatible devices with RIOT.
 The advantage of using this VM is to have a reproducable, portable and even disposable environment
-that can be used to develop for RIOT-OS with decreased setup times and without the requirement of
+that can be used to develop for RIOT with decreased setup times and without the requirement of
 making changes to the underlying host system.
 
 ## Requirements
@@ -16,7 +16,7 @@ Make sure your system satisfies the latest version of all following dependencies
 * [Vagrant](https://www.vagrantup.com/downloads.html)
 
 ## Usage
-The following commands must be run from the RIOT-OS root directory on the host system.
+The following commands must be run from the RIOT root directory on the host system.
 
 ```
 vagrant up
@@ -42,13 +42,13 @@ vagrant provision
 This will re-run the [provisioning script](https://github.com/RIOT-OS/RIOT/tree/master/dist/tools/vagrant/bootstrap.sh).
 
 ## Inside the VM
-Once logged in to the VM via `vagrant ssh` you can find the RIOT-OS root directory in your
-working directory. This is a shared directory and stays synchronized with your RIOT-OS directory
+Once logged in to the VM via `vagrant ssh` you can find the RIOT root directory in your
+working directory. This is a shared directory and stays synchronized with your RIOT directory
 on the host system. All changes made will be mirrored from the host system to the guest system
 and vice versa.
 
-This feature allows you to conveniently develop code for RIOT-OS with your preferred IDE on
-your host system and use the VM for compiling, flashing devices and running the native port of RIOT-OS.
+This feature allows you to conveniently develop code for RIOT with your preferred IDE on
+your host system and use the VM for compiling, flashing devices and running the native port of RIOT.
 
 ## Additional Information
 For new boards it is necessary to add new udev rules to `dist/tools/vagrant/udev_rules` and
