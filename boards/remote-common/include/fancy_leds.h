@@ -42,11 +42,11 @@
     j = k > 400 ? 800 - k : k;                \
     led##_ON;                                 \
     for(i = 0; i < j; ++i) {                  \
-      asm("nop");                             \
+      __asm__("nop");                             \
     }                                         \
     led##_OFF;                                \
     for(i = 0; i < 400 - j; ++i) {            \
-      asm("nop");                             \
+      __asm__("nop");                             \
     }                                         \
   }
 
