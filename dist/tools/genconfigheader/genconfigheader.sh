@@ -22,7 +22,7 @@ OUTPUTFILE="$1"
 shift
 
 MD5SUM=md5sum
-if [ "$(uname -s)" = "Darwin" ]; then
+if [ "$(uname -s)" = "Darwin" -o "$(uname -s)" = "FreeBSD" ]; then
   MD5SUM="md5 -r"
 fi
 
