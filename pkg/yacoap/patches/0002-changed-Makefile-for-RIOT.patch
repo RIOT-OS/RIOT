@@ -1,0 +1,42 @@
+From 6fce34b6aea10d6b83bef807c0985621c9592dd6 Mon Sep 17 00:00:00 2001
+From: smlng <s@mlng.net>
+Date: Wed, 31 Aug 2016 09:47:54 +0200
+Subject: [PATCH 2/4] changed Makefile for RIOT
+
+---
+ Makefile | 25 +------------------------
+ 1 file changed, 1 insertion(+), 24 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 2ef4532..48422e9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,24 +1 @@
+-CFLAGS += -fPIC -std=c99 -Wall -Wextra -Werror -O2 -I.
+-LDFLAGS = -shared
+-DIRS = example tests
+-SRC = coap.c coap_dump.c coap_parse.c
+-OBJ = $(SRC:%.c=%.o)
+-DEPS = $(SRC:%.c=%.d)
+-TARGET_LIB = libyacoap.so # target lib
+-
+-.PHONY: all
+-all: ${TARGET_LIB}
+-
+--include $(DEPS)
+-
+-$(TARGET_LIB): $(OBJ)
+-	$(CC) ${LDFLAGS} -o $@ $^
+-
+-%.o: %.c %.d
+-	@$(CC) -c $(CFLAGS) -o $@ $<
+-
+-%.d: %.c
+-	@$(CC) -MM $(CFLAGS) $< > $@
+-
+-clean:
+-	@$(RM) $(TARGET_LIB) $(OBJ) $(DEPS)
++include $(RIOTBASE)/Makefile.base
+-- 
+2.9.3
+

@@ -1,0 +1,746 @@
+From 75dc3ebcde0f7c06f621692bdf64600df2ce6267 Mon Sep 17 00:00:00 2001
+From: smlng <s@mlng.net>
+Date: Wed, 31 Aug 2016 09:46:37 +0200
+Subject: [PATCH 1/4] delete example, tests, and dump files
+
+---
+ coap_dump.c         |  59 -------------------------
+ coap_dump.h         |  35 ---------------
+ example/Makefile    |  21 ---------
+ example/main.c      |  85 -----------------------------------
+ example/resources.c |  82 ----------------------------------
+ tests/Makefile      |  38 ----------------
+ tests/piggyback.c   | 114 -----------------------------------------------
+ tests/request_get.c | 105 --------------------------------------------
+ tests/request_put.c | 124 ----------------------------------------------------
+ 9 files changed, 663 deletions(-)
+ delete mode 100644 coap_dump.c
+ delete mode 100644 coap_dump.h
+ delete mode 100644 example/Makefile
+ delete mode 100644 example/main.c
+ delete mode 100644 example/resources.c
+ delete mode 100644 tests/Makefile
+ delete mode 100644 tests/piggyback.c
+ delete mode 100644 tests/request_get.c
+ delete mode 100644 tests/request_put.c
+
+diff --git a/coap_dump.c b/coap_dump.c
+deleted file mode 100644
+index 59e4f04..0000000
+--- a/coap_dump.c
++++ /dev/null
+@@ -1,59 +0,0 @@
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <stdint.h>
+-
+-#include "coap.h"
+-#include "coap_dump.h"
+-
+-#if YACOAP_DEBUG
+-
+-static void _dump_header(const coap_header_t *hdr);
+-static void _dump_options(const coap_option_t *opts, const size_t numopt);
+-
+-/* --- PRIVATE -------------------------------------------------------------- */
+-static void _dump_header(const coap_header_t *hdr)
+-{
+-    printf("Header:\n");
+-    printf("  ver  0x%02X\n", hdr->ver);
+-    printf("  t    0x%02X\n", hdr->t);
+-    printf("  tkl  0x%02X\n", hdr->tkl);
+-    printf("  code 0x%02X\n", hdr->code);
+-    printf("  id   0x%04X\n", hdr->id);
+-}
+-
+-static void _dump_options(const coap_option_t *opts, const size_t numopt)
+-{
+-    printf(" Options:\n");
+-    for (size_t i = 0; i < numopt; ++i) {
+-        printf("  0x%02X [ ", opts[i].num);
+-        coap_dump(opts[i].buf.p, opts[i].buf.len, true);
+-        printf(" ]\n");
+-    }
+-}
+-
+-/* --- PUBLIC --------------------------------------------------------------- */
+-void coap_dump(const uint8_t *buf, size_t buflen, bool bare)
+-{
+-    if (bare) {
+-        while(buflen--) {
+-            printf("%02X%s", *buf++, (buflen > 0) ? " " : "");
+-        }
+-    }
+-    else {
+-        printf("Dump: ");
+-        while(buflen--) {
+-            printf("%02X%s", *buf++, (buflen > 0) ? " " : "");
+-        }
+-        printf("\n");
+-    }
+-}
+-
+-void coap_dump_packet(const coap_packet_t *pkt)
+-{
+-    _dump_header(&pkt->hdr);
+-    _dump_options(pkt->opts, pkt->numopts);
+-    printf("Payload: ");
+-    coap_dump(pkt->payload.p, pkt->payload.len, true);
+-    printf("\n");
+-}
+-#endif /* YACOAP_DEBUG */
+diff --git a/coap_dump.h b/coap_dump.h
+deleted file mode 100644
+index 68b6eec..0000000
+--- a/coap_dump.h
++++ /dev/null
+@@ -1,35 +0,0 @@
+-#ifndef COAP_DUMP_H
+-#define COAP_DUMP_H 1
+-
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-
+-#include "coap.h"
+-
+-#if YACOAP_DEBUG
+-
+-/**
+- * Dumps the content of \p buf as hexadecimal.
+- *
+- * @param[in] buf The buffer to be dumped.
+- * @param[in] buflen The length of \p buf in bytes.
+- * @param[in] bare If true, "Dump:" and a the newline character are printed
+- * before the actual values.
+- */
+-void coap_dump(const uint8_t *buf, size_t buflen, bool bare);
+-
+-/**
+- * Dumps all values of a CoAP packet (including payload) as hexadecimal.
+- *
+- * @param[in] pkt Pointer to the packet whose content is to be dumped.
+- */
+-void coap_dump_packet(const coap_packet_t *pkt);
+-
+-#endif /* YACOAP_DEBUG */
+-
+-#ifdef __cplusplus
+-}
+-#endif
+-
+-#endif
+diff --git a/example/Makefile b/example/Makefile
+deleted file mode 100644
+index 329cab9..0000000
+--- a/example/Makefile
++++ /dev/null
+@@ -1,21 +0,0 @@
+-CFLAGS += -std=c99 -Wall -Wextra -Werror -O2 -I../.
+-SRC = ../coap.c ../coap_parse.c ../coap_dump.c main.c resources.c
+-OBJ = $(SRC:%.c=%.o)
+-DEPS = $(SRC:%.c=%.d)
+-EXEC = coap-server
+-
+-all: $(EXEC)
+-
+--include $(DEPS)
+-
+-$(EXEC): $(OBJ)
+-	@$(CC) $(CFLAGS) -o $@ $^
+-
+-%.o: %.c %.d
+-	@$(CC) -c $(CFLAGS) -o $@ $<
+-
+-%.d: %.c
+-	@$(CC) -MM $(CFLAGS) $< > $@
+-
+-clean:
+-	@$(RM) $(EXEC) $(OBJ) $(DEPS)
+diff --git a/example/main.c b/example/main.c
+deleted file mode 100644
+index 5b7c1e9..0000000
+--- a/example/main.c
++++ /dev/null
+@@ -1,85 +0,0 @@
+-#include <arpa/inet.h>
+-#include <sys/socket.h>
+-#include <netinet/in.h>
+-#include <stdio.h>
+-#include <stdbool.h>
+-#include <strings.h>
+-
+-#include "coap.h"
+-#include "coap_dump.h"
+-
+-extern void resource_setup(const coap_resource_t *resources);
+-extern coap_resource_t resources[];
+-
+-int main(void)
+-{
+-    int fd;
+-#ifdef IPV6
+-    struct sockaddr_in6 servaddr, cliaddr;
+-#else /* IPV6 */
+-    struct sockaddr_in servaddr, cliaddr;
+-#endif /* IPV6 */
+-    uint8_t buf[1024];
+-
+-#ifdef IPV6
+-    fd = socket(AF_INET6,SOCK_DGRAM,0);
+-#else /* IPV6 */
+-    fd = socket(AF_INET,SOCK_DGRAM,0);
+-#endif /* IPV6 */
+-
+-    bzero(&servaddr,sizeof(servaddr));
+-#ifdef IPV6
+-    servaddr.sin6_family = AF_INET6;
+-    servaddr.sin6_addr = in6addr_any;
+-    servaddr.sin6_port = htons(COAP_DEFAULT_PORT);
+-#else /* IPV6 */
+-    servaddr.sin_family = AF_INET;
+-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+-    servaddr.sin_port = htons(COAP_DEFAULT_PORT);
+-#endif /* IPV6 */
+-    bind(fd,(struct sockaddr *)&servaddr, sizeof(servaddr));
+-
+-    resource_setup(resources);
+-
+-    while(1)
+-    {
+-        int n, rc;
+-        socklen_t len = sizeof(cliaddr);
+-        coap_packet_t pkt;
+-
+-        n = recvfrom(fd, buf, sizeof(buf), 0, (struct sockaddr *)&cliaddr, &len);
+-#ifdef YACOAP_DEBUG
+-        printf("Received: ");
+-        coap_dump(buf, n, true);
+-        printf("\n");
+-#endif
+-
+-        if ((rc = coap_parse(buf, n, &pkt)) > COAP_ERR)
+-            printf("Bad packet rc=%d\n", rc);
+-        else
+-        {
+-            size_t buflen = sizeof(buf);
+-            coap_packet_t rsppkt;
+-#ifdef YACOAP_DEBUG
+-            coap_dump_packet(&pkt);
+-#endif
+-            coap_handle_request(resources, &pkt, &rsppkt);
+-
+-            if ((rc = coap_build(&rsppkt, buf, &buflen)) > COAP_ERR)
+-                printf("coap_build failed rc=%d\n", rc);
+-            else
+-            {
+-#ifdef YACOAP_DEBUG
+-                printf("Sending: ");
+-                coap_dump(buf, buflen, true);
+-                printf("\n");
+-#endif
+-#ifdef YACOAP_DEBUG
+-                coap_dump_packet(&rsppkt);
+-#endif
+-
+-                sendto(fd, buf, buflen, 0, (struct sockaddr *)&cliaddr, sizeof(cliaddr));
+-            }
+-        }
+-    }
+-}
+diff --git a/example/resources.c b/example/resources.c
+deleted file mode 100644
+index 3494789..0000000
+--- a/example/resources.c
++++ /dev/null
+@@ -1,82 +0,0 @@
+-#include <stdbool.h>
+-#include <stdio.h>
+-#include <string.h>
+-#include "coap.h"
+-
+-static char light = '0';
+-const uint16_t rsplen = 128;
+-static char rsp[128] = "";
+-
+-void resource_setup(const coap_resource_t *resources)
+-{
+-    coap_make_link_format(resources, rsp, rsplen);
+-    printf("resources: %s\n", rsp);
+-}
+-
+-static const coap_resource_path_t path_well_known_core = {2, {".well-known", "core"}};
+-static int handle_get_well_known_core(const coap_resource_t *resource,
+-                                      const coap_packet_t *inpkt,
+-                                      coap_packet_t *pkt)
+-{
+-    printf("handle_get_well_known_core\n");
+-    return coap_make_response(inpkt->hdr.id, &inpkt->tok,
+-                              COAP_TYPE_ACK, COAP_RSPCODE_CONTENT,
+-                              resource->content_type,
+-                              (const uint8_t *)rsp, strlen(rsp),
+-                              pkt);
+-}
+-
+-static const coap_resource_path_t path_light = {1, {"light"}};
+-static int handle_get_light(const coap_resource_t *resource,
+-                            const coap_packet_t *inpkt,
+-                            coap_packet_t *pkt)
+-{
+-    printf("handle_get_light\n");
+-    return coap_make_response(inpkt->hdr.id, &inpkt->tok,
+-                              COAP_TYPE_ACK, COAP_RSPCODE_CONTENT,
+-                              resource->content_type,
+-                              (const uint8_t *)&light, 1,
+-                              pkt);
+-}
+-
+-static int handle_put_light(const coap_resource_t *resource,
+-                            const coap_packet_t *inpkt,
+-                            coap_packet_t *pkt)
+-{
+-    printf("handle_put_light\n");
+-    if (inpkt->payload.len == 0) {
+-        return coap_make_response(inpkt->hdr.id, &inpkt->tok,
+-                                  COAP_TYPE_ACK, COAP_RSPCODE_BAD_REQUEST,
+-                                  NULL, NULL, 0,
+-                                  pkt);
+-    }
+-    if (inpkt->payload.p[0] == '1') {
+-        light = '1';
+-        printf("Light ON\n");
+-    }
+-    else {
+-        light = '0';
+-        printf("Light OFF\n");
+-    }
+-    return coap_make_response(inpkt->hdr.id, &inpkt->tok,
+-                              COAP_TYPE_ACK, COAP_RSPCODE_CHANGED,
+-                              resource->content_type,
+-                              (const uint8_t *)&light, 1,
+-                              pkt);
+-}
+-
+-coap_resource_t resources[] =
+-{
+-    {COAP_RDY, COAP_METHOD_GET, COAP_TYPE_ACK,
+-        handle_get_well_known_core, &path_well_known_core,
+-        COAP_SET_CONTENTTYPE(COAP_CONTENTTYPE_APP_LINKFORMAT)},
+-    {COAP_RDY, COAP_METHOD_GET, COAP_TYPE_ACK,
+-        handle_get_light, &path_light,
+-        COAP_SET_CONTENTTYPE(COAP_CONTENTTYPE_TXT_PLAIN)},
+-    {COAP_RDY, COAP_METHOD_PUT, COAP_TYPE_ACK,
+-        handle_put_light, &path_light,
+-        COAP_SET_CONTENTTYPE(COAP_CONTENTTYPE_NONE)},
+-    {(coap_state_t)0, (coap_method_t)0, (coap_msgtype_t)0,
+-        NULL, NULL,
+-        COAP_SET_CONTENTTYPE(COAP_CONTENTTYPE_NONE)}
+-};
+diff --git a/tests/Makefile b/tests/Makefile
+deleted file mode 100644
+index 8c0b910..0000000
+--- a/tests/Makefile
++++ /dev/null
+@@ -1,38 +0,0 @@
+-CFLAGS += -std=c99 -Wall -Wextra -Werror -O2 -I../.
+-
+-PBSRC = ../coap.c ../coap_parse.c piggyback.c
+-PBOBJ = $(PBSRC:%.c=%.o)
+-PBDEPS = $(PBSRC:%.c=%.d)
+-PBEXEC = piggyback
+-
+-GETSRC = ../coap.c ../coap_parse.c request_get.c
+-GETOBJ = $(GETSRC:%.c=%.o)
+-GETDEPS = $(GETSRC:%.c=%.d)
+-GETEXEC = request_get
+-
+-PUTSRC = ../coap.c ../coap_parse.c request_put.c
+-PUTOBJ = $(PUTSRC:%.c=%.o)
+-PUTDEPS = $(PUTSRC:%.c=%.d)
+-PUTEXEC = request_put
+-
+-all: $(PBEXEC) $(GETEXEC) $(PUTEXEC)
+-
+--include $(DEPS)
+-
+-$(PBEXEC): $(PBOBJ)
+-	@$(CC) $(CFLAGS) -o $@ $^
+-
+-$(GETEXEC): $(GETOBJ)
+-	@$(CC) $(CFLAGS) -o $@ $^
+-
+-$(PUTEXEC): $(PUTOBJ)
+-	@$(CC) $(CFLAGS) -o $@ $^
+-
+-%.o: %.c %.d
+-	@$(CC) -c $(CFLAGS) -o $@ $<
+-
+-%.d: %.c
+-	@$(CC) -MM $(CFLAGS) $< > $@
+-
+-clean:
+-	@$(RM) $(PBEXEC) $(GETEXEC) $(PUTEXEC) $(PBOBJ) $(GETOBJ) $(PUTOBJ) $(PBDEPS) $(PUTDEPS) $(GETDEPS)
+diff --git a/tests/piggyback.c b/tests/piggyback.c
+deleted file mode 100644
+index a3444c9..0000000
+--- a/tests/piggyback.c
++++ /dev/null
+@@ -1,114 +0,0 @@
+-#include <arpa/inet.h>
+-#include <sys/socket.h>
+-#include <netinet/in.h>
+-#include <stdio.h>
+-#include <stdbool.h>
+-#include <strings.h>
+-
+-#include "coap.h"
+-
+-const uint16_t rsplen = 128;
+-static char rsp[128] = "";
+-
+-static const coap_resource_path_t path_well_known_core = {2, {".well-known", "core"}};
+-static int handle_get_well_known_core(const coap_resource_t *resource,
+-                                      const coap_packet_t *inpkt,
+-                                      coap_packet_t *pkt)
+-{
+-    printf("handle_get_well_known_core\n");
+-    return coap_make_response(inpkt->hdr.id, &inpkt->tok,
+-                              COAP_TYPE_ACK, COAP_RSPCODE_CONTENT,
+-                              resource->content_type,
+-                              (const uint8_t *)RIOT_BOARD, strlen(RIOT_BOARD),
+-                              pkt);
+-}
+-
+-static const coap_resource_path_t path_piggyback = {1, {"piggyback"}};
+-static int handle_get_piggyback(const coap_resource_t *resource,
+-                                const coap_packet_t *inpkt,
+-                                coap_packet_t *pkt)
+-{
+-    printf("handle_get_piggyback\n");
+-    return coap_make_response(inpkt->hdr.id, &inpkt->tok,
+-                              COAP_TYPE_ACK, COAP_RSPCODE_CONTENT,
+-                              resource->content_type,
+-                              (const uint8_t *)path_piggyback.items[0], 9,
+-                              pkt);
+-}
+-
+-static const coap_resource_path_t path_separate = {1, {"separate"}};
+-static int handle_get_separate(const coap_resource_t *resource,
+-                               const coap_packet_t *inpkt,
+-                               coap_packet_t *pkt)
+-{
+-    printf("handle_get_separate\n");
+-    return coap_make_response(inpkt->hdr.id, &inpkt->tok,
+-                              resource->msg_type, COAP_RSPCODE_CONTENT,
+-                              resource->content_type,
+-                              (const uint8_t *)path_separate.items[0], 8,
+-                              pkt);
+-}
+-
+-coap_resource_t resources[] =
+-{
+-    {COAP_RDY, COAP_METHOD_GET, COAP_TYPE_ACK,
+-        handle_get_well_known_core, &path_well_known_core,
+-        COAP_SET_CONTENTTYPE(COAP_CONTENTTYPE_APP_LINKFORMAT)},
+-    {COAP_RDY, COAP_METHOD_GET, COAP_TYPE_ACK,
+-        handle_get_piggyback, &path_piggyback,
+-        COAP_SET_CONTENTTYPE(COAP_CONTENTTYPE_TXT_PLAIN)},
+-    {COAP_RDY, COAP_METHOD_GET, COAP_TYPE_NONCON,
+-        handle_get_separate, &path_separate,
+-        COAP_SET_CONTENTTYPE(COAP_CONTENTTYPE_TXT_PLAIN)},
+-    {(coap_state_t)0, (coap_method_t)0, (coap_msgtype_t)0,
+-        NULL, NULL,
+-        COAP_SET_CONTENTTYPE(COAP_CONTENTTYPE_NONE)}
+-};
+-
+-int main(void)
+-{
+-    int fd;
+-    struct sockaddr_in6 servaddr, cliaddr;
+-    uint8_t buf[1024];
+-
+-    bzero(&servaddr,sizeof(servaddr));
+-    servaddr.sin6_family = AF_INET6;
+-    servaddr.sin6_addr = in6addr_any;
+-    servaddr.sin6_port = htons(COAP_DEFAULT_PORT);
+-
+-    fd = socket(AF_INET6,SOCK_DGRAM,0);
+-    bind(fd,(struct sockaddr *)&servaddr, sizeof(servaddr));
+-
+-    coap_make_link_format(resources, rsp, rsplen);
+-
+-    while(1)
+-    {
+-        int n, rc;
+-        socklen_t len = sizeof(cliaddr);
+-        coap_packet_t pkt;
+-
+-        n = recvfrom(fd, buf, sizeof(buf), 0, (struct sockaddr *)&cliaddr, &len);
+-        printf("received message of %d bytes\n", n);
+-
+-        if ((rc = coap_parse(buf, n, &pkt)) > COAP_ERR) {
+-            printf("Bad packet rc=%d\n", rc);
+-        }
+-        else {
+-            for (int state = COAP_RSP_WAIT; state != COAP_RSP_SEND; ) {
+-                size_t buflen = sizeof(buf);
+-                coap_packet_t rsppkt;
+-                state = coap_handle_request(resources, &pkt, &rsppkt);
+-
+-                if ((rc = coap_build(&rsppkt, buf, &buflen)) > COAP_ERR) {
+-                    printf("coap_build failed rc=%d\n", rc);
+-                    break;
+-                }
+-                else {
+-                    printf("send response\n");
+-                    sendto(fd, buf, buflen, 0, (struct sockaddr *)&cliaddr, sizeof(cliaddr));
+-                }
+-            }
+-        }
+-    }
+-    return 0;
+-}
+diff --git a/tests/request_get.c b/tests/request_get.c
+deleted file mode 100644
+index 0323970..0000000
+--- a/tests/request_get.c
++++ /dev/null
+@@ -1,105 +0,0 @@
+-#include <errno.h>
+-#include <arpa/inet.h>
+-#include <sys/socket.h>
+-#include <sys/types.h>
+-#include <netinet/in.h>
+-#include <netdb.h>
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <stdbool.h>
+-#include <string.h>
+-#include <unistd.h>
+-
+-#include "coap.h"
+-
+-#define DSTPORT     "5683"
+-
+-static const coap_resource_path_t path_well_known_core = {2, {".well-known", "core"}};
+-static int handle_get_well_known_core(const coap_resource_t *resource,
+-                                      const coap_packet_t *reqpkt,
+-                                      coap_packet_t *rsppkt)
+-{
+-
+-    (void) resource;
+-    (void) reqpkt;
+-    printf("handle_get_well_known_core\n");
+-    printf("  content: %.*s\n", (int)rsppkt->payload.len, (char *)rsppkt->payload.p);
+-    return COAP_RSP_RECV;
+-}
+-
+-coap_resource_t resources[] =
+-{
+-    {COAP_RDY, COAP_METHOD_GET, COAP_TYPE_ACK,
+-        handle_get_well_known_core, &path_well_known_core,
+-        COAP_SET_CONTENTTYPE(COAP_CONTENTTYPE_APP_LINKFORMAT)},
+-    {(coap_state_t)0, (coap_method_t)0, (coap_msgtype_t)0,
+-        NULL, NULL,
+-        COAP_SET_CONTENTTYPE(COAP_CONTENTTYPE_NONE)}
+-};
+-
+-int main(int argc, char *argv[])
+-{
+-    int fd;
+-    struct addrinfo hints, *dstinfo, *p;
+-    int rv;
+-
+-    if (argc != 2) {
+-        fprintf(stderr, "USAGE: %s hostname\n", argv[0]);
+-        return 1;
+-    }
+-    memset(&hints, 0, sizeof(hints));
+-    hints.ai_family = AF_UNSPEC;
+-    hints.ai_socktype = SOCK_DGRAM;
+-
+-    if ((rv = getaddrinfo(argv[1], DSTPORT, &hints, &dstinfo)) != 0) {
+-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+-        return 1;
+-    }
+-
+-    for (p = dstinfo; p != NULL; p = p->ai_next) {
+-        if ((fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+-            perror("socket");
+-            continue;
+-        }
+-        break;
+-    }
+-    if (p == NULL) {
+-        fprintf(stderr, "failed to bind socket\n");
+-        return 2;
+-    }
+-
+-    int n, rc;
+-    struct sockaddr_storage cliaddr;
+-    socklen_t len = sizeof(cliaddr);
+-    coap_packet_t req, rsp;
+-    uint16_t msgid = 42;
+-    printf(" + coap_make_request\n");
+-    coap_make_request(msgid, NULL, &resources[0], NULL, 0, &req);
+-    uint8_t buf[1024];
+-    size_t buflen = sizeof(buf);
+-    if ((rc = coap_build(&req, buf, &buflen)) > COAP_ERR) {
+-        printf("coap_build failed rc=%d\n", rc);
+-        return 1;
+-    }
+-    else {
+-        printf("send request\n");
+-        if ((n = sendto(fd, buf, buflen, 0, p->ai_addr, p->ai_addrlen)) == -1) {
+-            perror("sendto");
+-            return 1;
+-        }
+-        printf("wait for response ...\n");
+-        for (int state = COAP_RSP_WAIT; state != COAP_RSP_RECV; ) {
+-            n = recvfrom(fd, buf, sizeof(buf), 0, (struct sockaddr *)&cliaddr, &len);
+-            printf("received message of %d bytes\n", n);
+-            if ((rc = coap_parse(buf, n, &rsp)) > COAP_ERR) {
+-                printf("Bad packet rc=%d\n", rc);
+-                return 1;
+-            }
+-            state = coap_handle_response(resources, &req, &rsp);
+-        }
+-    }
+-    // cleanup and exit
+-    freeaddrinfo(dstinfo);
+-    close(fd);
+-    return 0;
+-}
+diff --git a/tests/request_put.c b/tests/request_put.c
+deleted file mode 100644
+index 1e69e21..0000000
+--- a/tests/request_put.c
++++ /dev/null
+@@ -1,124 +0,0 @@
+-#include <errno.h>
+-#include <arpa/inet.h>
+-#include <sys/socket.h>
+-#include <sys/types.h>
+-#include <netinet/in.h>
+-#include <netdb.h>
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <stdbool.h>
+-#include <string.h>
+-#include <unistd.h>
+-
+-#include "coap.h"
+-
+-#define DSTPORT     "5683"
+-
+-static int handle_request_put_response(const coap_resource_t *resource,
+-                                       const coap_packet_t *reqpkt,
+-                                       coap_packet_t *rsppkt)
+-{
+-
+-    (void) resource;
+-    (void) reqpkt;
+-    printf("handle_request_put_response\n");
+-    if (rsppkt->hdr.t == COAP_TYPE_ACK) {
+-        printf("  ACK\n");
+-        return COAP_RDY;
+-    }
+-    printf("  INVALID\n");
+-    return COAP_ACK_WAIT;
+-}
+-
+-coap_resource_t resources[] =
+-{
+-    {COAP_RDY, COAP_METHOD_PUT, COAP_TYPE_CON,
+-        handle_request_put_response, NULL,
+-        COAP_SET_CONTENTTYPE(COAP_CONTENTTYPE_TXT_PLAIN)},
+-    {(coap_state_t)0, (coap_method_t)0, (coap_msgtype_t)0,
+-        NULL, NULL,
+-        COAP_SET_CONTENTTYPE(COAP_CONTENTTYPE_NONE)}
+-};
+-
+-int main(int argc, char *argv[])
+-{
+-    int fd;
+-    struct addrinfo hints, *dstinfo, *p;
+-    int rv;
+-
+-    if (argc != 4) {
+-        fprintf(stderr, "USAGE: %s hostname path content\n", argv[0]);
+-        return 1;
+-    }
+-
+-    coap_resource_path_t path_request_put;
+-    path_request_put.count = 1;
+-    path_request_put.items[0] = &argv[2][0];
+-    for (size_t c = 0; c < strlen(argv[2]); ++c) {
+-        if (argv[2][c] == '/')
+-            ++path_request_put.count;
+-        if (path_request_put.count > COAP_MAX_PATHITEMS) {
+-            fprintf(stderr, "path has to many elements: %d\n", path_request_put.count);
+-            return 1;
+-        }
+-        path_request_put.items[path_request_put.count] = &argv[2][c+1];
+-    }
+-
+-    resources[0].path = &path_request_put;
+-
+-    memset(&hints, 0, sizeof(hints));
+-    hints.ai_family = AF_UNSPEC;
+-    hints.ai_socktype = SOCK_DGRAM;
+-
+-    if ((rv = getaddrinfo(argv[1], DSTPORT, &hints, &dstinfo)) != 0) {
+-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+-        return 1;
+-    }
+-
+-    for (p = dstinfo; p != NULL; p = p->ai_next) {
+-        if ((fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+-            perror("socket");
+-            continue;
+-        }
+-        break;
+-    }
+-    if (p == NULL) {
+-        fprintf(stderr, "failed to bind socket\n");
+-        return 2;
+-    }
+-
+-    int n, rc;
+-    struct sockaddr_storage cliaddr;
+-    socklen_t len = sizeof(cliaddr);
+-    coap_packet_t req, rsp;
+-    uint16_t msgid = 42;
+-    printf("coap_make_request\n");
+-    coap_make_request(msgid, NULL, &resources[0], (uint8_t *)argv[3], strlen(argv[3]), &req);
+-    uint8_t buf[1024];
+-    size_t buflen = sizeof(buf);
+-    if ((rc = coap_build(&req, buf, &buflen)) > COAP_ERR) {
+-        printf("coap_build failed rc=%d\n", rc);
+-        return 1;
+-    }
+-    else {
+-        printf("send request\n");
+-        if ((n = sendto(fd, buf, buflen, 0, p->ai_addr, p->ai_addrlen)) == -1) {
+-            perror("sendto");
+-            return 1;
+-        }
+-        printf("wait for response ...\n");
+-        for (int state = COAP_ACK_WAIT; state != COAP_RDY; ) {
+-            n = recvfrom(fd, buf, sizeof(buf), 0, (struct sockaddr *)&cliaddr, &len);
+-            printf("received message of %d bytes\n", n);
+-            if ((rc = coap_parse(buf, n, &rsp)) > COAP_ERR) {
+-                printf("Bad packet rc=%d\n", rc);
+-                return 1;
+-            }
+-            state = coap_handle_response(resources, &req, &rsp);
+-        }
+-    }
+-    // cleanup and exit
+-    freeaddrinfo(dstinfo);
+-    close(fd);
+-    return 0;
+-}
+-- 
+2.9.3
+
