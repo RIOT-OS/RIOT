@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2016 smlng <s@mlng.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     examples
+ * @{
+ *
+ * @file
+ * @brief       YaCoAP handler functions and definition of CoAP resources
+ *
+ * @author      smlng <s@mlng.net>
+ *
+ * @}
+ */
+
 // standard
 #include <inttypes.h>
 #include <stdio.h>
