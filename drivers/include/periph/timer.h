@@ -153,7 +153,7 @@ unsigned int timer_read(tim_t dev);
  *
  * This function is only needed if the timer was stopped manually before.
  *
- * @param[in] dev           the timer device to stop
+ * @param[in] dev           the timer device to start
  */
 void timer_start(tim_t dev);
 
