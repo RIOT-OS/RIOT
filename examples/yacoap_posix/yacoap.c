@@ -334,7 +334,7 @@ int coap_put(const char *ip, const char *path, const char *content)
             return 1;
         }
         printf("wait for response ...\n");
-        for (int state = COAP_ACK_WAIT; state != COAP_RDY; ) {
+        for (int state = COAP_ACK_WAIT; state != COAP_ACK_RECV; ) {
             socklen_t len = sizeof(cliaddr);
             n = recvfrom(fd, buf, sizeof(buf), 0, (struct sockaddr *)&cliaddr, &len);
             printf("received message of %d bytes\n", n);
