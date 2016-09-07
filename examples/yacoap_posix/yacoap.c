@@ -206,7 +206,7 @@ static int handle_request_put_response(const coap_resource_t *resource,
 // CoAP client resources for requests
 coap_resource_t requests[] =
 {
-    {COAP_RDY, COAP_METHOD_GET, COAP_TYPE_ACK,
+    {COAP_RDY, COAP_METHOD_GET, COAP_TYPE_CON,
         handle_request_get_response, &path_well_known_core,
         COAP_SET_CONTENTTYPE(COAP_CONTENTTYPE_APP_LINKFORMAT)},
     {COAP_RDY, COAP_METHOD_PUT, COAP_TYPE_CON,
