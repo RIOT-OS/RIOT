@@ -447,6 +447,7 @@ static inline int _write(SercomI2cm *dev, char *data, int length)
         dev->DATA.reg = data[buffer_counter++];
 
         DEBUG("Wait for response.\n");
+        timeout_counter = 0;
         while (!(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_MB)
                && !(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_SB)) {
             if (++timeout_counter >= SAMD21_I2C_TIMEOUT) {
