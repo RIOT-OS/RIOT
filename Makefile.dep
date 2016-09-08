@@ -411,6 +411,7 @@ endif
 
 ifneq (,$(filter lwip,$(USEMODULE)))
   USEPKG += lwip
+  USEMODULE += core_mbox
   USEMODULE += lwip_api
   USEMODULE += lwip_contrib
   USEMODULE += lwip_core
