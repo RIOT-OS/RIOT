@@ -141,7 +141,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     *ctx[tim].flag &= ~(1 << (channel + OCF1A));
     *ctx[tim].mask |=  (1 << (channel + OCIE1A));
 
-    return 0;
+    return 1;
 }
 
 int timer_clear(tim_t tim, int channel)
