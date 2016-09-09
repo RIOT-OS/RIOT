@@ -35,6 +35,11 @@
 
 #define SAMD21_I2C_TIMEOUT  (65535)
 
+#define BUSSTATE_UNKNOWN SERCOM_I2CM_STATUS_BUSSTATE(0)
+#define BUSSTATE_IDLE SERCOM_I2CM_STATUS_BUSSTATE(1)
+#define BUSSTATE_OWNER SERCOM_I2CM_STATUS_BUSSTATE(2)
+#define BUSSTATE_BUSY SERCOM_I2CM_STATUS_BUSSTATE(3)
+
 /* static function definitions */
 static void _i2c_poweron(SercomI2cm *sercom);
 static void _i2c_poweroff(SercomI2cm *sercom);
@@ -197,10 +202,10 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     i2c_poweron(dev);
 
     /* Start timeout if bus state is unknown. */
-    while (!(I2CSercom->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE(1))) {
+    while ((I2CSercom->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk) == BUSSTATE_UNKNOWN) {
         if(timeout_counter++ >= SAMD21_I2C_TIMEOUT) {
             /* Timeout, force bus state to idle. */
-            I2CSercom->STATUS.reg = SERCOM_I2CM_STATUS_BUSSTATE(1);
+            I2CSercom->STATUS.reg = BUSSTATE_IDLE;
         }
     }
     return 0;
@@ -435,7 +440,7 @@ static inline int _write(SercomI2cm *dev, char *data, int length)
     DEBUG("Looping through bytes\n");
     while (tmp_data_length--) {
         /* Check that bus ownership is not lost. */
-        if (!(dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE(2))) {
+        if ((dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk) != BUSSTATE_OWNER) {
             DEBUG("STATUS_ERR_PACKET_COLLISION\n");
             return -2;
         }
@@ -475,7 +480,7 @@ static inline int _read(SercomI2cm *dev, char *data, int length)
     /* Read data buffer. */
     while (count != length) {
         /* Check that bus ownership is not lost. */
-        if (!(dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE(2))) {
+        if ((dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk) != BUSSTATE_OWNER) {
             DEBUG("STATUS_ERR_PACKET_COLLISION\n");
             return -2;
         }
@@ -508,7 +513,7 @@ static inline void _stop(SercomI2cm *dev)
     /* Stop command */
     dev->CTRLB.reg |= SERCOM_I2CM_CTRLB_CMD(3);
     /* Wait for bus to be idle again */
-    while(dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE(1)) {}
+    while((dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk) != BUSSTATE_IDLE) {}
     DEBUG("Stop sent\n");
 }
 
