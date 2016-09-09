@@ -72,60 +72,6 @@ static const uint8_t dbm_to_tx_pow[] = { 0xf8, 0xf0, 0xe8, 0xe0, 0xd8, 0xd0, 0xc
                                          0x78, 0x70, 0x68, 0x60, 0x58, 0x50, 0x48, 0x40,
                                          0x38, 0x30, 0x28, 0x20, 0x18, 0x10, 0x08, 0x00 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 uint16_t mrf24j40_get_addr_short(mrf24j40_t *dev)
 {
     return (dev->netdev.short_addr[0] << 8) | dev->netdev.short_addr[1];
@@ -171,7 +117,6 @@ uint8_t mrf24j40_get_chan(mrf24j40_t *dev)
 {
     return dev->netdev.chan;
 }
-
 
 void mrf24j40_set_chan(mrf24j40_t *dev, uint8_t channel)
 {
@@ -271,7 +216,6 @@ void mrf24j40_set_pan(mrf24j40_t *dev, uint16_t pan)
     mrf24j40_reg_write_short(dev, MRF24J40_REG_PANIDL, le_pan.u8[0]);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_PANIDH, le_pan.u8[1]);
 }
-
 
 int16_t mrf24j40_get_txpower(mrf24j40_t *dev)
 {
@@ -492,7 +436,6 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
     }
 }
 
-
 static inline void _set_state(mrf24j40_t *dev, uint8_t state)
 {
     uint8_t tmp_txncon;
@@ -569,7 +512,6 @@ void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
     }
 }
 
-
 void mrf24j40_reset_state_machine(mrf24j40_t *dev)
 {
     uint8_t rfstate;
@@ -590,5 +532,4 @@ void mrf24j40_software_reset(mrf24j40_t *dev)
         softrst = mrf24j40_reg_read_short(dev, MRF24J40_REG_SOFTRST);
     } while (softrst != 0);        /* wait until soft-reset has finished */
 }
-
 
