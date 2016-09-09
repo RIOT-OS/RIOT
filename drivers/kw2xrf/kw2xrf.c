@@ -91,14 +91,6 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state);
 
 int kw2xrf_set_tx_power(kw2xrf_t *dev, int8_t *val, size_t len)
 {
-    if (val[0] > MKW2XDRF_OUTPUT_POWER_MAX) {
-        val[0] = MKW2XDRF_OUTPUT_POWER_MAX;
-    }
-
-    if (val[0] < MKW2XDRF_OUTPUT_POWER_MIN) {
-        val[0] = MKW2XDRF_OUTPUT_POWER_MIN;
-    }
-
     uint8_t level = pow_lt[val[0] - MKW2XDRF_OUTPUT_POWER_MIN];
     kw2xrf_write_dreg(MKW2XDM_PA_PWR, MKW2XDM_PA_PWR(level));
     return 2;
@@ -817,8 +809,15 @@ int kw2xrf_set(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t value_le
             if (value_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
-
+            /* correct value if out of valid range */
+            if (*(int16_t *)value > MKW2XDRF_OUTPUT_POWER_MAX) {
+                *(int16_t *)value = MKW2XDRF_OUTPUT_POWER_MAX;
+            }
+            else if (*(int16_t *)value < MKW2XDRF_OUTPUT_POWER_MIN) {
+                *(int16_t *)value = MKW2XDRF_OUTPUT_POWER_MIN;
+            }
             kw2xrf_set_tx_power(dev, (int8_t *)value, value_len);
+            dev->tx_power = *((uint16_t *)value);
             return sizeof(uint16_t);
 
         case NETOPT_CCA_THRESHOLD:
