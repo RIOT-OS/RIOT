@@ -18,7 +18,7 @@ extern "C" {
 
 /**
  * @brief SPI access specifiers
- ***@{
+ ****@{
  */
 #define MRF24J40_SHORT_ADDR_TRANS       (0x00)
 #define MRF24J40_LONG_ADDR_TRANS        (0x80)
@@ -30,7 +30,7 @@ extern "C" {
 
 /**
  * @brief FIFO-Address-Map
- **@{
+ ***@{
  */
 #define MRF24J40_TX_NORMAL_FIFO                     (0x000)
 #define MRF24J40_TX_BEACON_FIFO                     (0x080)
@@ -41,7 +41,7 @@ extern "C" {
 
 /**
  * @brief Short-Register addresses
- ***@{
+ ****@{
  */
 #define MRF24J40_REG_RXMCR              (0x00)
 #define MRF24J40_REG_PANIDL             (0x01)
@@ -105,7 +105,7 @@ extern "C" {
 
 /**
  * @brief Long-Register addresses
- ***@{
+ ****@{
  */
 #define MRF24J40_REG_RFCON0             (0x200)
 #define MRF24J40_REG_RFCON1             (0x201)
@@ -178,7 +178,6 @@ extern "C" {
 
 #define MRF24J40_REG_TXMCR_CSMA_BACKOFF_MASK    (0x1F)
 #define MRF24J40_WAKEUP_DELAY                   (2000U)
-
 
 
 /**
@@ -256,6 +255,13 @@ extern "C" {
 #define MRF24J40_RXMCR_MASK__COORD                   (0b00000100)
 #define MRF24J40_RXMCR_MASK__ERRPKT                  (0b00000010)
 #define MRF24J40_RXMCR_MASK__PROMI                   (0b00000001)
+/** @} */
+
+/**
+ * @brief   Bitfield definitions for the BBREG1 register
+ * @{
+ */
+#define MRF24J40_BBREG1_MASK__RXDECINV               (0b00000100)
 /** @} */
 
 /**

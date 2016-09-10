@@ -15,8 +15,63 @@
 #include "mrf24j40_internal.h"
 #include "mrf24j40_registers.h"
 
+void mrf24j40_init(mrf24j40_t *dev)
+{
+    uint8_t softrst;
+    uint8_t order;
+    uint8_t rfstate;
 
-void mrf24j40_reg_write_short(const mrf24j40_t *dev, const uint8_t addr, const uint8_t value)
+    gpio_clear(dev->params.reset_pin);
+    xtimer_usleep(500);         /* Datasheet - Not specified */
+    gpio_set(dev->params.reset_pin);
+    xtimer_usleep(2000);        /* Datenblatt MRF24J40 ~2ms */
+
+    /* do a soft reset */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_SOFTRST, 0x7); // from manual
+    do {
+        softrst = mrf24j40_reg_read_short(dev, MRF24J40_REG_SOFTRST);
+    } while ((softrst & 0x07) != 0);        /* wait until soft-reset has finished */
+
+    /* Check if MRF24J40 is available */
+    order = mrf24j40_reg_read_short(dev, MRF24J40_REG_ORDER);
+    if (order != 0xFF) {
+    }
+
+    /* Here starts init-process as described on MRF24J40 Manual Chap. 3.2 */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_PACON2, 0x98);           /* Initialize FIFOEN = 1 and TXONTS = 0x6 */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_TXSTBL, 0x95);           /* Initialize RFSTBL = 0x9. */
+    /* set default channel */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON1, 0x01);            /* VCO optimization */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON2, 0x80);            /* Bit 7 = PLL Enable */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON6, 0x90);            /* Filter control / clk recovery ctrl. / Battery monitor */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON7, 0x80);            /* Sleep clock selection -> int. 100kHz clk */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON8, 0x10);            /* VCO control */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_SLPCON1, 0x21);           /* CLKOUT pin enable  / sleep clk divider */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG2, 0x80);           /* CCA Mode 1: energy above threshold / clear CCA bits */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_CCAEDTH, 0x60);          /* Energy detection threshold -69dBm */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG6, 0x40);           /* Append RSSI to RXFIFO */
+
+    /* set interrupt pin polarity */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_SLPCON0, 0x2);        /* IRQ-Pin -> rising edge */
+    /* mrf24j40_set_interrupts */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0xf6);       /* enables Transmit- and Receive-IRQ */
+    /* set default channel */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON0, 0xf3);        /* Default channel = 26 */
+    /* set default TX power - Reset default = Max -> nothing to do */
+//	mrf24j40_set_txpower(dev, MRF24J40_DEFAULT_TXPOWER);
+    /* reset RF state machine */
+    mrf24j40_reset_state_machine(dev);
+
+    xtimer_usleep(200);
+    //Delay for 192 us after RF State Machine Reset
+
+    do {
+        rfstate = mrf24j40_reg_read_long(dev, MRF24J40_REG_RFSTATE);
+    } while ((rfstate & 0xA0) != 0xa0);
+    //Wait until the RFSTATE machine indicates RX state
+}
+
+void mrf24j40_reg_write_short(mrf24j40_t *dev, const uint8_t addr, const uint8_t value)
 {
     spi_acquire(dev->params.spi);
     gpio_clear(dev->params.cs_pin);
@@ -25,7 +80,7 @@ void mrf24j40_reg_write_short(const mrf24j40_t *dev, const uint8_t addr, const u
     spi_release(dev->params.spi);
 }
 
-uint8_t mrf24j40_reg_read_short(const mrf24j40_t *dev, const uint8_t addr)
+uint8_t mrf24j40_reg_read_short(mrf24j40_t *dev, const uint8_t addr)
 {
     char value;
 
@@ -39,7 +94,7 @@ uint8_t mrf24j40_reg_read_short(const mrf24j40_t *dev, const uint8_t addr)
 }
 
 
-void mrf24j40_reg_write_long(const mrf24j40_t *dev, const uint16_t addr, const uint8_t value)
+void mrf24j40_reg_write_long(mrf24j40_t *dev, const uint16_t addr, const uint8_t value)
 {
     uint8_t reg1, reg2;
 
@@ -55,7 +110,7 @@ void mrf24j40_reg_write_long(const mrf24j40_t *dev, const uint16_t addr, const u
 }
 
 
-uint8_t mrf24j40_reg_read_long(const mrf24j40_t *dev, const uint16_t addr)
+uint8_t mrf24j40_reg_read_long(mrf24j40_t *dev, const uint16_t addr)
 {
     uint8_t reg1, reg2;
 
@@ -73,7 +128,7 @@ uint8_t mrf24j40_reg_read_long(const mrf24j40_t *dev, const uint16_t addr)
     return (uint8_t)value;
 }
 
-void mrf24j40_tx_normal_fifo_read(const mrf24j40_t *dev, const uint16_t offset, uint8_t *data, const size_t len)
+void mrf24j40_tx_normal_fifo_read(mrf24j40_t *dev, const uint16_t offset, uint8_t *data, const size_t len)
 {
     uint8_t reg1, reg2;
 
@@ -89,7 +144,7 @@ void mrf24j40_tx_normal_fifo_read(const mrf24j40_t *dev, const uint16_t offset, 
 }
 
 
-void mrf24j40_tx_normal_fifo_write(const mrf24j40_t *dev,
+void mrf24j40_tx_normal_fifo_write(mrf24j40_t *dev,
                                    const uint16_t offset,
                                    const uint8_t *data,
                                    const size_t len)
@@ -112,7 +167,7 @@ void mrf24j40_tx_normal_fifo_write(const mrf24j40_t *dev,
     spi_release(dev->params.spi);
 }
 
-void mrf24j40_rx_fifo_read(const mrf24j40_t *dev, const uint16_t offset, uint8_t *data, const size_t len)
+void mrf24j40_rx_fifo_read(mrf24j40_t *dev, const uint16_t offset, uint8_t *data, const size_t len)
 {
     uint16_t rx_addr;
 
@@ -130,7 +185,7 @@ void mrf24j40_rx_fifo_read(const mrf24j40_t *dev, const uint16_t offset, uint8_t
     spi_release(dev->params.spi);
 }
 
-void mrf24j40_rx_fifo_write(const mrf24j40_t *dev, const uint16_t offset, const uint8_t *data, const size_t len)
+void mrf24j40_rx_fifo_write(mrf24j40_t *dev, const uint16_t offset, const uint8_t *data, const size_t len)
 {
     uint16_t i;
 
@@ -139,7 +194,7 @@ void mrf24j40_rx_fifo_write(const mrf24j40_t *dev, const uint16_t offset, const 
     }
 }
 
-uint8_t mrf24j40_get_status(const mrf24j40_t *dev)
+uint8_t mrf24j40_get_status(mrf24j40_t *dev)
 {
     uint8_t rfstate;
     uint8_t rxmcr;
@@ -182,10 +237,8 @@ uint8_t mrf24j40_get_status(const mrf24j40_t *dev)
     }
 }
 
-
 void mrf24j40_assert_awake(mrf24j40_t *dev)
 {
-
     if (mrf24j40_get_status(dev) == MRF24J40_PSEUDO_STATE_SLEEP) {
 
         /* set uController pin to high */

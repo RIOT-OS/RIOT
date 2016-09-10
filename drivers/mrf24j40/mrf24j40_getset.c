@@ -118,10 +118,10 @@ uint8_t mrf24j40_get_chan(mrf24j40_t *dev)
     return dev->netdev.chan;
 }
 
+
 void mrf24j40_set_chan(mrf24j40_t *dev, uint8_t channel)
 {
     uint8_t channel_value;
-    uint8_t tmp;
 
     if ((channel < MRF24J40_MIN_CHANNEL) ||
         (channel > MRF24J40_MAX_CHANNEL) ||
@@ -193,11 +193,14 @@ void mrf24j40_set_chan(mrf24j40_t *dev, uint8_t channel)
      * after a channel frequency change. Then, delay at least 192 us after
      * the RF State Machine Reset, to allow the RF circuitry to calibrate.
      */
-    tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_RFCTL);
-    tmp |= 0b00000100;
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, tmp);
-    tmp &= 0b11111011;
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, tmp);
+//    tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_RFCTL);
+//    tmp |= 0b00000100;
+//    mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, tmp);
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x04);
+//    tmp &= 0b11111011;
+//    mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, tmp);
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x00);
+
     xtimer_usleep(200);             /* Delay at least 192us */
 }
 
@@ -212,7 +215,6 @@ void mrf24j40_set_pan(mrf24j40_t *dev, uint16_t pan)
 
     dev->netdev.pan = pan;
     DEBUG("pan0: %u, pan1: %u\n", le_pan.u8[0], le_pan.u8[1]);
-
     mrf24j40_reg_write_short(dev, MRF24J40_REG_PANIDL, le_pan.u8[0]);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_PANIDH, le_pan.u8[1]);
 }
@@ -230,7 +232,9 @@ void mrf24j40_set_txpower(mrf24j40_t *dev, int16_t txpower)
     uint8_t txpower_reg_value;
 
     txpower_reg_value = dbm_to_tx_pow[txpower];
+
     mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON3, txpower_reg_value);
+
 }
 
 uint8_t mrf24j40_get_max_retries(mrf24j40_t *dev)
@@ -321,7 +325,6 @@ int8_t mrf24j40_get_cca_threshold(mrf24j40_t *dev)
                             40, 40, 39, 39, 39, 39, 39, 38, \
                             38, 38, 38, 37, 37, 37, 36, 30 };
 
-
     tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_CCAEDTH);   /* Energy detection threshold */
     return(dBm_value[tmp]);                                     /* in dBm */
 }
@@ -403,6 +406,7 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
         switch (option) {
             case MRF24J40_OPT_CSMA:
                 DEBUG("[mrf24j40] opt: disabling CSMA mode\n");
+
                 tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXMCR);
                 tmp |= MRF24J40_TXMCR_MASK__NOCSMA;
                 /* MACMINBE<1:0>: The minimum value of the backoff exponent
@@ -410,6 +414,7 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
                  * to ‘0’, collision avoidance is disabled. */
                 tmp &= ~MRF24J40_TXMCR_MASK__MACMINBE;
                 mrf24j40_reg_write_short(dev, MRF24J40_REG_TXMCR, tmp);
+
                 break;
             case MRF24J40_OPT_PROMISCUOUS:
                 DEBUG("[mrf24j40] opt: disabling PROMISCUOUS mode\n");
@@ -467,7 +472,6 @@ void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
 
     old_state = mrf24j40_get_status(dev);
 
-
     if (state == old_state) {
         return;
     }
@@ -488,8 +492,7 @@ void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
     if (state == MRF24J40_PSEUDO_STATE_SLEEP) {     /* Datasheet chapter 3.15.2 IMMEDIATE SLEEP AND WAKE-UP MODE */
 
         /* set sleep/wake-pin on uController to low */
-//        gpio_clear(dev->params.sleep_pin);
-        GPIOB->BRR = (1 << 9);
+        gpio_clear(dev->params.sleep_pin);
 
         /* set sleep/wake pin polarity high on radio chip to high and enable it */
         mrf24j40_reg_write_short(dev, MRF24J40_REG_RXFLUSH, 0x60);
@@ -514,13 +517,9 @@ void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
 
 void mrf24j40_reset_state_machine(mrf24j40_t *dev)
 {
-    uint8_t rfstate;
-
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x04);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x00);
     xtimer_usleep(200);             /* Delay at least 192us */
-
-    rfstate = mrf24j40_reg_read_long(dev, MRF24J40_REG_RFSTATE);
 }
 
 void mrf24j40_software_reset(mrf24j40_t *dev)
@@ -532,4 +531,5 @@ void mrf24j40_software_reset(mrf24j40_t *dev)
         softrst = mrf24j40_reg_read_short(dev, MRF24J40_REG_SOFTRST);
     } while (softrst != 0);        /* wait until soft-reset has finished */
 }
+
 

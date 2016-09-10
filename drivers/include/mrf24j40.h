@@ -37,14 +37,10 @@
 extern "C" {
 #endif
 
-
-
-
 /**
  * @brief   Maximum possible packet size in byte
  */
 #define MRF24J40_MAX_PKT_LENGTH        (127)
-
 
 /**
  * @brief   Default addresses used if the CPUID module is not present
@@ -69,7 +65,6 @@ extern "C" {
  * @todo    Read some global network stack specific configuration value
  */
 #define MRF24J40_DEFAULT_PANID         (0x0023)
-
 
 /**
  * @brief   Default TX power (0dBm)
@@ -186,8 +181,6 @@ typedef struct {
                                                return to @ref mrf24j40_t::idle_state */
 } mrf24j40_t;
 
-
-
 /**
  * @brief   Setup an MRF24J40 based device state
  *
@@ -205,11 +198,6 @@ void mrf24j40_set_interrupts(mrf24j40_t *dev);
  * @brief clears interrupt flags
  */
 void mrf24j40_clear_irq_flags(mrf24j40_t *dev);
-
-
-//int mrf24j40_init(mrf24j40_t *dev, spi_t spi, spi_speed_t spi_speed,
-//                   gpio_t cs_pin, gpio_t int_pin,
-//                   gpio_t sleep_pin, gpio_t reset_pin);
 
 /**
  * @brief   Trigger a hardware reset and configure radio with default values
