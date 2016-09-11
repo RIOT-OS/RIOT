@@ -288,7 +288,7 @@ endif
 info-concurrency:
 	@echo "$(NPROC)"
 
-info-files: QUITE := 0
+info-files: QUIET := 0
 info-files:
 	@( \
 	  echo "$(abspath $(shell echo "$(MAKEFILE_LIST)"))" | tr ' ' '\n'; \
