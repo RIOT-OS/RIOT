@@ -31,7 +31,8 @@ void periph_clk_en(bus_t bus, uint32_t mask)
     else if (bus == APB2) {
         RCC->APB2ENR |= mask;
     }
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1)
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1)\
+    || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
     else if (bus == AHB) {
         RCC->AHBENR |= mask;
     }
@@ -62,7 +63,8 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
     else if (bus == APB2) {
         RCC->APB2ENR &= ~(mask);
     }
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1)
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1)\
+    || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
     else if (bus == AHB) {
         RCC->AHBENR &= ~(mask);
     }
