@@ -128,8 +128,6 @@ static const timer_conf_t timer_config[TIMER_NUMOF] = {
 #define TIMER_3_ISR         isr_tim4
 /** @} */
 
-
-
 /**
  * @brief   UART configuration
  * @{
@@ -140,10 +138,12 @@ static const uart_conf_t uart_config[] = {
         .rcc_mask     = RCC_APB1ENR_USART3EN,
         .rx_pin       = GPIO_PIN(PORT_D, 9),
         .tx_pin       = GPIO_PIN(PORT_D, 8),
-        .rts_pin      = GPIO_PIN(PORT_D, 12),
-        .cts_pin      = GPIO_PIN(PORT_D, 11),
         .rx_mode      = GPIO_IN,
         .tx_mode      = GPIO_OUT,
+        .rts_pin      = GPIO_PIN(PORT_D, 12),
+        .cts_pin      = GPIO_PIN(PORT_D, 11),
+        .rts_mode     = GPIO_OUT,
+        .cts_mode     = GPIO_IN,
         .af           = GPIO_AF7,
         .irqn         = USART3_IRQn,
         .dma_stream   = 3,
@@ -155,10 +155,10 @@ static const uart_conf_t uart_config[] = {
         .rcc_mask     = RCC_APB1ENR_USART2EN,
         .rx_pin       = GPIO_PIN(PORT_D, 6),
         .tx_pin       = GPIO_PIN(PORT_D, 5),
-        .rts_pin      = GPIO_PIN(PORT_D, 4),
-        .cts_pin      = GPIO_PIN(PORT_D, 3),
         .rx_mode      = GPIO_IN,
         .tx_mode      = GPIO_OUT,
+        .rts_pin      = GPIO_PIN(PORT_D, 4),
+        .cts_pin      = GPIO_PIN(PORT_D, 3),
         .rts_mode     = GPIO_OUT,
         .cts_mode     = GPIO_IN,
         .af           = GPIO_AF7,
@@ -172,10 +172,10 @@ static const uart_conf_t uart_config[] = {
         .rcc_mask     = RCC_APB2ENR_USART1EN,
         .rx_pin       = GPIO_PIN(PORT_A, 10),
         .tx_pin       = GPIO_PIN(PORT_A, 9),
-        .rts_pin      = GPIO_PIN(PORT_A, 12),
-        .cts_pin      = GPIO_PIN(PORT_A, 11),
         .rx_mode      = GPIO_IN,
         .tx_mode      = GPIO_OUT,
+        .rts_pin      = GPIO_PIN(PORT_A, 12),
+        .cts_pin      = GPIO_PIN(PORT_A, 11),
         .rts_mode     = GPIO_OUT,
         .cts_mode     = GPIO_IN,
         .af           = GPIO_AF7,
