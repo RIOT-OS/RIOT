@@ -148,22 +148,6 @@ bool is_rx(void)
     return get_state() == NETOPT_STATE_RX;
 }
 
-/* turn on packet reception */
-void enable_rx(void)
-{
-    netopt_enable_t enable = true;
-
-    _dev->driver->set(_dev, NETOPT_RX_LISTENING, &enable, sizeof(enable));
-}
-
-/* turn off packet reception */
-void disable_rx(void)
-{
-    netopt_enable_t enable = true;
-
-    _dev->driver->set(_dev, NETOPT_RX_LISTENING, &enable, sizeof(enable));
-}
-
 /* init framebuffers and initial state */
 void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb)
 {
@@ -182,7 +166,6 @@ void recv_pkt(netdev2_t *dev)
 
     /* Since OpenThread does the synchronization of rx/tx, it's necessary to turn off the receiver now */
     ot_idle();
-    disable_rx();
 
     /* very unlikely */
     if ((len > (unsigned) UINT16_MAX)) {
@@ -227,8 +210,6 @@ void send_pkt(netdev2_t *dev, netdev2_event_t event)
             break;
     }
 
-    /* Since the transmission is finished, turn off reception */
-    disable_rx();
     ot_idle();
 
 }
@@ -307,7 +288,6 @@ ThreadError otPlatRadioIdle(void)
 
     /* OpenThread will call this before calling otPlatRadioTransmit.
      * If a packet is received between this function and otPlatRadioTransmit OpenThread will fail! */
-    disable_rx();
     ot_idle();
 
     return kThreadError_None;
@@ -324,9 +304,6 @@ ThreadError otPlatRadioReceive(uint8_t aChannel)
 
     set_channel(aChannel);
     sReceiveFrame.mChannel = aChannel;
-
-    /* enable the reception of packets */
-    enable_rx();
 
     return kThreadError_None;
 }
@@ -365,9 +342,6 @@ ThreadError otPlatRadioTransmit(void)
 
     /* send packet though netdev2 */
     _dev->driver->send(_dev, &pkt, 1);
-
-    /* need for waiting ACK */
-    enable_rx();
 
     return kThreadError_None;
 }
