@@ -4,6 +4,7 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED = periph_i2c
 
 USEMODULE += mma8652
+#USEMODULE += mma8652_int
 USEMODULE += xtimer
 
 # set default device parameters in case they are undefined

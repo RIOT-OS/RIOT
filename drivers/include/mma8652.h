@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2016 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -24,6 +25,7 @@
  * @brief       Interface definition for the MMA8652 accelerometer driver.
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
+ * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  */
 
 #ifndef MMA8652_H
@@ -31,6 +33,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "periph/gpio.h"
 #include "periph/i2c.h"
 
 #ifdef __cplusplus
@@ -66,6 +69,15 @@ enum {
     MMA8x5x_TYPE_MAX,
 };
 
+#ifdef MODULE_MMA8652_INT
+typedef struct {
+    gpio_t pin;         /**< mma8x5x pin interrupt */
+    uint8_t source;     /**< mma8x5x interrupt source */
+    gpio_cb_t cb;       /**< mma8x5x interrupt callback */
+    void *arg;          /**< mma8x5x interrupt argument */
+} mma8652_int_t;
+#endif
+
 /**
  * @brief Device descriptor for MMA8652 accelerometer.
  */
@@ -75,6 +87,10 @@ typedef struct {
     bool initialized;       /**< accelerometer status, true if accelerometer is initialized */
     int16_t scale;          /**< each count corresponds to (1/scale) g */
     uint8_t type;           /**< mma8x5x type */
+#ifdef MODULE_MMA8652_INT
+    mma8652_int_t int1;     /**< mma8x5x interrupt struct 1 */
+    mma8652_int_t int2;     /**< mma8x5x interrupt struct 2 */
+#endif
 } mma8652_t;
 
 /**
@@ -86,6 +102,10 @@ typedef struct {
     uint8_t rate;           /**< accelerometer's sampling rate */
     uint8_t scale;          /**< accelerometer's scale factor */
     uint8_t type;           /**< mma8x5x type */
+#ifdef MODULE_MMA8652_INT
+    mma8652_int_t *int1;    /**< mma8x5x interrupt struct 1 */
+    mma8652_int_t *int2;    /**< mma8x5x interrupt struct 2 */
+#endif
 } mma8652_params_t;
 
 /**
@@ -190,6 +210,106 @@ int mma8652_is_ready(mma8652_t *dev);
  * @return                  -1 on error
  */
 int mma8652_read(mma8652_t *dev, int16_t *x, int16_t *y, int16_t *z, uint8_t *status);
+
+/**
+ * @brief Read one byte from a register at the MMA8652 device.
+ *
+ * @param[in]  dev          device descriptor of accelerometer
+ * @param[in]  reg          the register address on the targeted MMA8652 device
+ * @param[out] data         the result that was read
+ *
+ * @return                  0 on success
+ * @return                  -1 on error
+ */
+int mma8682_read_reg(mma8652_t *dev, uint8_t reg, uint8_t *data);
+
+/**
+ * @brief Read the interruption status byte from the MMA8652 device.
+ *
+ * @param[in]  dev          device descriptor of accelerometer
+ * @param[out] data         the result that was read from the interruption status
+ *
+ * @return                  0 on success
+ * @return                  -1 on error
+ */
+int mma8682_read_interruption_status(mma8652_t *dev, uint8_t *data);
+
+/**
+ * @brief Read the Portrait/Landscape status byte from the MMA8652 device.
+ *
+ * @param[in]  dev          device descriptor of accelerometer
+ * @param[out] data         the result that was read from the Portrait/Landscape status
+ *
+ * @return                  0 on success
+ * @return                  -1 on error
+ */
+int mma8682_read_pl_status(mma8652_t *dev, uint8_t *data);
+
+/**
+ * @brief Read the freefall/motion status byte from the MMA8652 device.
+ *
+ * @param[in]  dev          device descriptor of accelerometer
+ * @param[out] data         the result that was read from the freefall/motion status
+ *
+ * @return                  0 on success
+ * @return                  -1 on error
+ */
+int mma8682_read_freefall_motion_status(mma8652_t *dev, uint8_t *data);
+
+#ifdef MODULE_MMA8652_INT
+/**
+ * @brief Initialize the MMA8652 accelerometer driver with interruptions.
+ *
+ * @param[out] dev          device descriptor of accelerometer to initialize
+ * @param[in]  i2c          I2C bus the accelerometer is connected to
+ * @param[in]  address      accelerometer's I2C slave address
+ * @param[in]  dr           output data rate selection in WAKE mode
+ * @param[in]  range        full scale range
+ * @param[in]  type         mma8x5x type
+ * @param[in]  int1         interruption device descriptor of the int1 pin
+ * @param[in]  int2         interruption device descriptor of the int2 pin
+ *
+ * @return                  0 on success
+ * @return                  -1 if parameters are wrong
+ * @return                  -2 if initialization of I2C bus failed
+ * @return                  -3 if accelerometer test failed
+ * @return                  -4 if setting to STANDBY mode failed
+ * @return                  -5 if accelerometer configuration failed
+ * @return                  -6 if int1 pins configuration failed
+ * @return                  -7 if int2 pins configuration failed
+ * @return                  -13 if int1 and int2 pins configuration failed
+ */
+int mma8652_init_int(mma8652_t *dev, i2c_t i2c, uint8_t address, uint8_t dr,
+           uint8_t range, uint8_t type, mma8652_int_t *int1, mma8652_int_t *int2);
+
+/**
+ * @brief Set the int1 pins interruption to the desired source.
+ *
+ * @param[in]  dev          device descriptor of accelerometer
+ * @param[in]  int_source   the int_source to interrupt
+ *
+ * @return                  0 on success
+ * @return                  any other negative number in case of an error. For
+ *                          portability implementations should draw inspiration
+ *                          of the errno values from the POSIX' bind() function
+ *                          specification.
+ */
+int mma8652_set_int1(mma8652_t *dev, uint8_t int_source);
+
+/**
+ * @brief Set the int2 pins interruption to the desired source.
+ *
+ * @param[in]  dev          device descriptor of accelerometer
+ * @param[in]  int_source   the int_source to interrupt
+ *
+ * @return                  0 on success
+ * @return                  any other negative number in case of an error. For
+ *                          portability implementations should draw inspiration
+ *                          of the errno values from the POSIX' bind() function
+ *                          specification.
+ */
+int mma8652_set_int2(mma8652_t *dev, uint8_t int_source);
+#endif
 
 #ifdef __cplusplus
 }

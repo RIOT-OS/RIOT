@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2016 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Register definition for the MMA8652 accelerometer driver.
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
+ * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  *
  */
 
@@ -105,6 +107,7 @@ extern "C"
 #define MMA8652_SYSMOD_FGT_MASK             0x7C
 #define MMA8652_SYSMOD_FGERR                (1 << 7)
 
+#define MMA8652_INT_SOURCE_NONE             (0)
 #define MMA8652_INT_SOURCE_DRDY             (1 << 0)
 #define MMA8652_INT_SOURCE_FF_MT            (1 << 2)
 #define MMA8652_INT_SOURCE_PULSE            (1 << 3)

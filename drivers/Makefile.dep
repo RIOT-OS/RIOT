@@ -73,6 +73,10 @@ ifneq (,$(filter ltc4150,$(USEMODULE)))
     USEMODULE += xtimer
 endif
 
+ifneq (,$(filter mma8652_int,$(USEMODULE)))
+    USEMODULE += mma8652
+endif
+
 ifneq (,$(filter mpu9150,$(USEMODULE)))
     USEMODULE += xtimer
 endif

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
+ * Copyright (C) 2016 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Auto initialization of MMA8652 accelerometer
  *
  * @author      Cenk Gündoğan <mail@cgundogan.de>
+ * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  *
  * @}
  */
@@ -57,7 +59,11 @@ void auto_init_mma8652(void)
 
         DEBUG("[auto_init_saul] initializing mma8652 acc sensor\n");
 
+#ifndef MODULE_MMA8652_INT
         if (mma8652_init(&mma8652_devs[i], p->i2c, p->addr, p->rate, p->scale, p->type) < 0) {
+#else
+        if (mma8652_init_int(&mma8652_devs[i], p->i2c, p->addr, p->rate, p->scale, p->type, p->int1, p->int2) < 0) {
+#endif
             DEBUG("[auto_init_saul] error during initialization\n");
             return;
         }

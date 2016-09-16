@@ -31,6 +31,7 @@ PSEUDOMODULES += lwip_stats
 PSEUDOMODULES += lwip_tcp
 PSEUDOMODULES += lwip_udp
 PSEUDOMODULES += lwip_udplite
+PSEUDOMODULES += mma8652_int
 PSEUDOMODULES += netdev_default
 PSEUDOMODULES += netif
 PSEUDOMODULES += netstats_l2
