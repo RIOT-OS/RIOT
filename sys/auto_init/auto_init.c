@@ -24,6 +24,10 @@
 #include "bmp180.h"
 #endif
 
+#ifdef MODULE_IO1_XPLAINED
+#include "io1_xplained.h"
+#endif
+
 #ifdef MODULE_SHT11
 #include "sht11.h"
 #endif
@@ -107,6 +111,10 @@ void auto_init(void)
 #ifdef MODULE_BMP180
     DEBUG("Auto init BMP180 module.\n");
     bmp180_auto_init();
+#endif
+#ifdef MODULE_IO1_XPLAINED
+    DEBUG("Auto init IO1 Xplained extension module.\n");
+    io1_xplained_auto_init();
 #endif
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");
