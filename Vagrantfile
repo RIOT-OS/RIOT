@@ -5,6 +5,8 @@ Vagrant.configure(2) do |config|
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
 
+  config.vm.define "RIOT", primary: true
+
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "boxcutter/ubuntu1604"
@@ -22,6 +24,13 @@ Vagrant.configure(2) do |config|
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
   config.vm.synced_folder ".", "/home/vagrant/RIOT"
+
+  config.vm.define "tutorials", autostart: false do |tutorials|
+      tutorials.vm.synced_folder "../.", "/home/vagrant/Tutorials"
+      config.vm.provider "virtualbox" do |vb|
+        vb.name = "RIOT VM - Tutorials"
+      end
+  end
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
