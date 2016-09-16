@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+require 'fileutils'
+
 Vagrant.configure(2) do |config|
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
@@ -55,6 +57,9 @@ Vagrant.configure(2) do |config|
                   '--vendorid', '0x0d28', '--productid',  '0x0204']
   end
 
-  config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
+  if File.exists?(File.join(Dir.home, ".gitconfig"))
+    config.vm.provision "file", source: File.join(Dir.home, ".gitconfig"), destination: ".gitconfig"
+  end
+
   config.vm.provision "shell", path: "dist/tools/vagrant/bootstrap.sh"
 end
