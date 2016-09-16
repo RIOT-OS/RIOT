@@ -85,6 +85,15 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat
         case kLogRegionMem:
             fprintf(stderr, "MEM  ");
             break;
+		
+		case kLogRegionNcp:
+            fprintf(stderr, "NCP  ");
+            break;
+
+		case kLogRegionMeshCoP:
+            fprintf(stderr, "MESHCOP  ");
+            break;
+
     }
 
     va_start(args, aFormat);
