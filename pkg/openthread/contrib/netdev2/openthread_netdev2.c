@@ -50,9 +50,6 @@ void *_openthread_event_loop(void *arg)
     /* enable OpenThread UART */
     otPlatUartEnable();
 
-    /* init OpenThread */
-    otInit();
-
     msg_init_queue(_queue, OPENTHREAD_QUEUE_LEN);
     netdev2_t *dev;
     msg_t msg;
