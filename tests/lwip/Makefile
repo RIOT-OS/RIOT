@@ -4,7 +4,8 @@ BOARD ?= iotlab-m3
 
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_BLACKLIST := arduino-mega2560 msb-430h telosb waspmote-pro z1
+BOARD_BLACKLIST := arduino-mega2560 msb-430h telosb waspmote-pro z1 arduino-uno \
+                   arduino-duemilanove
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-mega2560 msb-430h nrf6310 \
                              nucleo-f334 pca10005 stm32f0discovery telosb \
                              weio yunjia-nrf51822 z1
