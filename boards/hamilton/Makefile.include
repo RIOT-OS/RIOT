@@ -1,0 +1,23 @@
+# define the cpu used by Hamilton
+export CPU = samd21
+export CPU_MODEL = samr21x18a
+
+## setup the boards dependencies
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+
+
+# debugger config
+export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+export DEBUGSERVER = JLinkGDBServer -device atsamr21e18a -if swd
+export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+
+export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+export FFLAGS  = $(BINDIR) $(HEXFILE)
+
+export OFLAGS    = -O binary --gap-fill 0xff
+export HEXFILE = $(ELFFILE:.elf=.bin)
+export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
+export RESET_FLAGS = $(BINDIR)
+
+export TERMPROG = JLinkRTTClient
+export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
