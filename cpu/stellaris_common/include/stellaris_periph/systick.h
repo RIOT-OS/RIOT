@@ -75,4 +75,4 @@ extern unsigned long SysTickValueGet(void);
 }
 #endif
 
-#endif /* STELLARIS_SYSTICK_H_ */
+#endif /* STELLARIS_SYSTICK_H */

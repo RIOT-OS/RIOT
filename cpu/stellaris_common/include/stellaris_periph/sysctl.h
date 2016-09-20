@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef STELLARIS_SYSCTL_H_
-#define STELLARIS_SYSCTL_H_
+#ifndef STELLARIS_SYSCTL_H
+#define STELLARIS_SYSCTL_H
 
 //*****************************************************************************
 //
@@ -639,4 +639,4 @@ extern unsigned long SysCtlI2SMClkSet(unsigned long ulInputClock,
 }
 #endif
 
-#endif /* STELLARIS_SYSCTL_H_ */
+#endif /* STELLARIS_SYSCTL_H */

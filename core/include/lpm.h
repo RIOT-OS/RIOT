@@ -20,8 +20,8 @@
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  */
 
-#ifndef LPM_H_
-#define LPM_H_
+#ifndef LPM_H
+#define LPM_H
 
 #include "arch/lpm_arch.h"
 
@@ -73,5 +73,5 @@ extern volatile int lpm_prevent_sleep;
 }
 #endif
 
-#endif /* __LPM_H_ */
+#endif /* LPM_H */
 /** @} */
