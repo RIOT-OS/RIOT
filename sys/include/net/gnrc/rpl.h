@@ -180,12 +180,16 @@ extern "C" {
  *          RFC 6550, section 17
  *      </a>
  */
+#ifndef GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE
 #define GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE (256)
+#endif
 
 /**
  * @brief   Maximum rank increase
  */
+#ifndef GNRC_RPL_DEFAULT_MAX_RANK_INCREASE
 #define GNRC_RPL_DEFAULT_MAX_RANK_INCREASE (0)
+#endif
 
 /**
  * @brief   Number of implemented Objective Functions
@@ -200,7 +204,9 @@ extern "C" {
 /**
  * @brief   Default Instance ID
  */
+#ifndef GNRC_RPL_DEFAULT_INSTANCE
 #define GNRC_RPL_DEFAULT_INSTANCE (0)
+#endif
 
 /**
  * @name RPL Mode of Operations
@@ -210,9 +216,10 @@ extern "C" {
 #define GNRC_RPL_MOP_NON_STORING_MODE    (0x01)
 #define GNRC_RPL_MOP_STORING_MODE_NO_MC  (0x02)
 #define GNRC_RPL_MOP_STORING_MODE_MC     (0x03)
+
 /** default MOP set on compile time */
 #ifndef GNRC_RPL_DEFAULT_MOP
-#   define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_STORING_MODE_NO_MC
+#define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_STORING_MODE_NO_MC
 #endif
 /** @} */
 
@@ -279,8 +286,12 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
  * default lifetime will be multiplied by the lifetime unit to obtain the resulting lifetime
  * @{
  */
+#ifndef GNRC_RPL_DEFAULT_LIFETIME
 #define GNRC_RPL_DEFAULT_LIFETIME (60)
+#endif
+#ifndef GNRC_RPL_LIFETIME_UNIT
 #define GNRC_RPL_LIFETIME_UNIT (2)
+#endif
 /** @} */
 
 /**
@@ -295,6 +306,10 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 
 /**
  * @brief Default prefix valid and preferred time for the DODAG id
+ * @note Currently not used, but needed for RIOs
+ * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7.5">
+ *          Route Information
+ *      </a>
  */
 #define GNRC_RPL_DEFAULT_PREFIX_LIFETIME  (0xFFFFFFFF)
 
@@ -310,10 +325,18 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
  * @name Parameters used for DAO handling
  * @{
  */
+#ifndef GNRC_RPL_DAO_SEND_RETRIES
 #define GNRC_RPL_DAO_SEND_RETRIES (4)
+#endif
+#ifndef GNRC_RPL_DEFAULT_WAIT_FOR_DAO_ACK
 #define GNRC_RPL_DEFAULT_WAIT_FOR_DAO_ACK (3)
+#endif
+#ifndef GNRC_RPL_REGULAR_DAO_INTERVAL
 #define GNRC_RPL_REGULAR_DAO_INTERVAL (60)
+#endif
+#ifndef GNRC_RPL_DEFAULT_DAO_DELAY
 #define GNRC_RPL_DEFAULT_DAO_DELAY (5)
+#endif
 /** @} */
 
 /**
