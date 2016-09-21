@@ -284,6 +284,9 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /**
  * @name Default parent and route entry lifetime
  * default lifetime will be multiplied by the lifetime unit to obtain the resulting lifetime
+ * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7.6">
+            DODAG Configuration
+        </a>
  * @{
  */
 #ifndef GNRC_RPL_DEFAULT_LIFETIME
@@ -318,6 +321,9 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 
 /**
  * @name Parameters used for DAO handling
+ * @see <a href="https://tools.ietf.org/html/rfc6550#section-17">
+            RPL Constants and Variables
+        </a>
  * @{
  */
 #ifndef GNRC_RPL_DAO_SEND_RETRIES
