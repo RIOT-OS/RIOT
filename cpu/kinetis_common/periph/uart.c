@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016 Eistec AB
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
  * Copyright (C) 2014 Freie Universität Berlin
  *
@@ -17,22 +18,23 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Johann Fischer <j.fischer@phytec.de>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */
 
-#include <math.h>
-
 #include "cpu.h"
 #include "thread.h"
 #include "sched.h"
+#include "mutex.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
+#include "dma.h"
 
 #ifndef KINETIS_UART_ADVANCED
-/**
- * Attempts to determine the type of the UART,
- * using the BRFA field in the UART C4 register.
+/*
+ * Attempt to determine the type of the UART using the BRFA field in the UART
+ * C4 register.
  */
 #ifdef UART_C4_BRFA
 #define KINETIS_UART_ADVANCED    1
@@ -43,6 +45,83 @@
  * @brief Allocate memory to store the callback functions.
  */
 static uart_isr_ctx_t config[UART_NUMOF];
+
+/**
+ * @brief Mutex for protecting uart_write
+ */
+static mutex_t _uart_write_mutex[UART_NUMOF] = {
+#if UART_NUMOF >= 1
+    MUTEX_INIT,
+#endif
+#if UART_NUMOF >= 2
+    MUTEX_INIT,
+#endif
+#if UART_NUMOF >= 3
+    MUTEX_INIT,
+#endif
+#if UART_NUMOF >= 4
+    MUTEX_INIT,
+#endif
+#if UART_NUMOF >= 5
+    MUTEX_INIT,
+#endif
+};
+
+/**
+ * @brief Mutex for signalling DMA transfers
+ */
+static mutex_t _uart_dma_mutex[UART_NUMOF];
+
+typedef struct {
+    int8_t channel;
+    uint8_t source;
+} uart_dma_config_t;
+
+/**
+ * @brief Mapping from UART device number to DMA channel and source
+ */
+static const uart_dma_config_t _uart_dma_config[UART_NUMOF] = {
+#if UART_NUMOF >= 1
+#if UART_0_EN && defined(UART_0_DMA_CHAN)
+    [UART_DEV(0)] = { .channel = UART_0_DMA_CHAN, .source = UART_0_DMA_SOURCE },
+#else
+    [UART_DEV(0)] = { .channel = -1, .source = 0 },
+#endif
+#endif
+#if UART_NUMOF >= 2
+#if UART_1_EN && defined(UART_1_DMA_CHAN)
+    [UART_DEV(1)] = { .channel = UART_1_DMA_CHAN, .source = UART_1_DMA_SOURCE },
+#else
+    [UART_DEV(1)] = { .channel = -1, .source = 0 },
+#endif
+#endif
+#if UART_NUMOF >= 3
+#if UART_2_EN && defined(UART_2_DMA_CHAN)
+    [UART_DEV(2)] = { .channel = UART_2_DMA_CHAN, .source = UART_2_DMA_SOURCE },
+#else
+    [UART_DEV(2)] = { .channel = -1, .source = 0 },
+#endif
+#endif
+#if UART_NUMOF >= 4
+#if UART_3_EN && defined(UART_3_DMA_CHAN)
+    [UART_DEV(3)] = { .channel = UART_3_DMA_CHAN, .source = UART_3_DMA_SOURCE },
+#else
+    [UART_DEV(3)] = { .channel = -1, .source = 0 },
+#endif
+#endif
+#if UART_NUMOF >= 5
+#if UART_4_EN && defined(UART_4_DMA_CHAN)
+    [UART_DEV(4)] = { .channel = UART_4_DMA_CHAN, .source = UART_4_DMA_SOURCE },
+#else
+    [UART_DEV(4)] = { .channel = -1, .source = 0 },
+#endif
+#endif
+};
+
+/**
+ * @brief List of pointers to all UART device register groups
+ */
+static KINETIS_UART * const _uart_base_ptrs[] = UART_BASE_PTRS;
 
 static inline void kinetis_set_brfa(KINETIS_UART *dev, uint32_t baudrate, uint32_t clk)
 {
@@ -64,32 +143,62 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         return res;
     }
 
+    /* initialize and lock DMA mutex */
+    mutex_init(&_uart_dma_mutex[uart]);
+    mutex_lock(&_uart_dma_mutex[uart]);
+
     /* remember callback addresses */
     config[uart].rx_cb = rx_cb;
     config[uart].arg = arg;
 
-    /* enable receive interrupt */
+    /* enable interrupt source */
     switch (uart) {
 #if UART_0_EN
-
-        case UART_0:
+        case UART_DEV(0):
             NVIC_SetPriority(UART_0_IRQ_CHAN, UART_IRQ_PRIO);
             NVIC_EnableIRQ(UART_0_IRQ_CHAN);
-            UART_0_DEV->C2 |= (1 << UART_C2_RIE_SHIFT);
             break;
 #endif
 #if UART_1_EN
-
-        case UART_1:
+        case UART_DEV(1):
             NVIC_SetPriority(UART_1_IRQ_CHAN, UART_IRQ_PRIO);
             NVIC_EnableIRQ(UART_1_IRQ_CHAN);
-            UART_1_DEV->C2 |= (1 << UART_C2_RIE_SHIFT);
             break;
 #endif
-
+#if UART_2_EN
+        case UART_DEV(2):
+            NVIC_SetPriority(UART_2_IRQ_CHAN, UART_IRQ_PRIO);
+            NVIC_EnableIRQ(UART_2_IRQ_CHAN);
+            break;
+#endif
+#if UART_3_EN
+        case UART_DEV(3):
+            NVIC_SetPriority(UART_3_IRQ_CHAN, UART_IRQ_PRIO);
+            NVIC_EnableIRQ(UART_3_IRQ_CHAN);
+            break;
+#endif
+#if UART_4_EN
+        case UART_DEV(4):
+            NVIC_SetPriority(UART_4_IRQ_CHAN, UART_IRQ_PRIO);
+            NVIC_EnableIRQ(UART_4_IRQ_CHAN);
+            break;
+#endif
         default:
             return -2;
-            break;
+    }
+    KINETIS_UART *dev = _uart_base_ptrs[uart];
+
+    if (_uart_dma_config[uart].channel >= 0) {
+        dma_init(_uart_dma_config[uart].channel, _uart_dma_config[uart].source);
+        /* Enable DMA for TX operation, use normal IRQ for RX */
+        dev->C5 = UART_C5_TDMAS_MASK;
+        /* let the TDRE flag trigger DMA requests */
+        dev->C2 |= (UART_C2_TIE_MASK);
+    }
+
+    if (rx_cb != NULL) {
+        /* Enable receiver and receiver interrupt */
+        dev->C2 |= (UART_C2_RE_MASK | UART_C2_RIE_MASK);
     }
 
     return 0;
@@ -97,52 +206,57 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 static int init_base(uart_t uart, uint32_t baudrate)
 {
-    KINETIS_UART *dev;
-    PORT_Type *port;
     uint32_t clk;
     uint16_t ubd;
-    uint8_t tx_pin = 0;
-    uint8_t rx_pin = 0;
-    uint8_t af;
 
     switch (uart) {
 #if UART_0_EN
-
-        case UART_0:
-            dev = UART_0_DEV;
-            port = UART_0_PORT;
+        case UART_DEV(0):
+            gpio_init_port(UART_0_TX_GPIO, UART_0_TX_AF);
+            gpio_init_port(UART_0_RX_GPIO, UART_0_RX_AF);
             clk = UART_0_CLK;
-            tx_pin = UART_0_TX_PIN;
-            rx_pin = UART_0_RX_PIN;
-            af = UART_0_AF;
-            UART_0_PORT_CLKEN();
             UART_0_CLKEN();
             break;
 #endif
 #if UART_1_EN
-
-        case UART_1:
-            dev = UART_1_DEV;
-            port = UART_1_PORT;
+        case UART_DEV(1):
+            gpio_init_port(UART_1_TX_GPIO, UART_1_TX_AF);
+            gpio_init_port(UART_1_RX_GPIO, UART_1_RX_AF);
             clk = UART_1_CLK;
-            tx_pin = UART_1_TX_PIN;
-            rx_pin = UART_1_RX_PIN;
-            af = UART_1_AF;
-            UART_1_PORT_CLKEN();
             UART_1_CLKEN();
             break;
 #endif
-
+#if UART_2_EN
+        case UART_DEV(2):
+            gpio_init_port(UART_2_TX_GPIO, UART_2_TX_AF);
+            gpio_init_port(UART_2_RX_GPIO, UART_2_RX_AF);
+            clk = UART_2_CLK;
+            UART_2_CLKEN();
+            break;
+#endif
+#if UART_3_EN
+        case UART_DEV(3):
+            gpio_init_port(UART_3_TX_GPIO, UART_3_TX_AF);
+            gpio_init_port(UART_3_RX_GPIO, UART_3_RX_AF);
+            clk = UART_3_CLK;
+            UART_3_CLKEN();
+            break;
+#endif
+#if UART_4_EN
+        case UART_DEV(4):
+            gpio_init_port(UART_4_TX_GPIO, UART_4_TX_AF);
+            gpio_init_port(UART_4_RX_GPIO, UART_4_RX_AF);
+            clk = UART_4_CLK;
+            UART_4_CLKEN();
+            break;
+#endif
         default:
             return -1;
     }
+    KINETIS_UART *dev = _uart_base_ptrs[uart];
 
-    /* configure RX and TX pins, set pin to use alternative function mode */
-    port->PCR[rx_pin] = PORT_PCR_MUX(af);
-    port->PCR[tx_pin] = PORT_PCR_MUX(af);
-
-    /* disable transmitter and receiver */
-    dev->C2 &= ~(UART_C2_TE_MASK | UART_C2_RE_MASK);
+    /* disable transmitter and receiver, and disable all interrupt sources */
+    dev->C2 = 0;
     /* set defaults, 8-bit mode, no parity */
     dev->C1 = 0;
 
@@ -155,6 +269,12 @@ static int init_base(uart_t uart, uint32_t baudrate)
     kinetis_set_brfa(dev, baudrate, clk);
 
 #if KINETIS_UART_ADVANCED
+    /* Clear overrun status flag and RDRF by reading S1 then reading D */
+    volatile uint8_t tmp = dev->S1;
+    (void) tmp;
+    tmp = dev->D;
+    (void) tmp;
+
     /* Enable FIFO buffers */
     dev->PFIFO |= UART_PFIFO_RXFE_MASK | UART_PFIFO_TXFE_MASK;
     /* Set level to trigger TDRE flag whenever there is space in the TXFIFO */
@@ -177,46 +297,126 @@ static int init_base(uart_t uart, uint32_t baudrate)
     dev->CFIFO = UART_CFIFO_RXFLUSH_MASK | UART_CFIFO_TXFLUSH_MASK;
 #endif
 
-    /* enable transmitter and receiver */
-    dev->C2 |= UART_C2_TE_MASK | UART_C2_RE_MASK;
+    /* enable transmitter */
+    dev->C2 |= UART_C2_TE_MASK;
     return 0;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    KINETIS_UART *dev;
+    KINETIS_UART *dev = _uart_base_ptrs[uart];
 
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            dev = UART_0_DEV;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            dev = UART_1_DEV;
-            break;
-#endif
-        default:
-            return;
+    if (_uart_dma_config[uart].channel < 0) {
+        for (size_t i = 0; i < len; i++) {
+            while (!(dev->S1 & UART_S1_TDRE_MASK)) {}
+            dev->D = data[i];
+        }
     }
+    else {
+        uint8_t channel = _uart_dma_config[uart].channel;
+        if (irq_is_in()) {
+            /* Put DMA on hold for the time being to avoid bus races */
+            BITBAND_REG8(dev->C2, UART_C2_TIE_SHIFT) = 0;
+            /* wait for any ongoing DMA transfer to complete */
+            while (DMA_DEV->TCD[channel].CSR & DMA_CSR_ACTIVE_MASK) {}
 
-    for (size_t i = 0; i < len; i++) {
-        while (!(dev->S1 & UART_S1_TDRE_MASK));
-        dev->D = data[i];
+            for (size_t i = 0; i < len; i++) {
+                while (!(dev->S1 & UART_S1_TDRE_MASK)) {}
+                dev->D = data[i];
+            }
+            /* Resume DMA transfers again */
+            BITBAND_REG8(dev->C2, UART_C2_TIE_SHIFT) = 1;
+        }
+        else {
+            mutex_lock(&_uart_write_mutex[uart]);
+            /* Select source address */
+            DMA_DEV->TCD[channel].SADDR = (uint32_t)data;
+            /* Source step size */
+            DMA_DEV->TCD[channel].SOFF = DMA_SOFF_SOFF(sizeof(*data));
+            /* Destination address */
+            DMA_DEV->TCD[channel].DADDR = (uint32_t)(&dev->D);
+            /* Destination step size */
+            DMA_DEV->TCD[channel].DOFF = DMA_DOFF_DOFF(0);
+            /* Set source and destination width to 1 byte */
+            DMA_DEV->TCD[channel].ATTR = DMA_ATTR_DSIZE(DMA_ACCESS_SIZE_8BIT) | DMA_ATTR_SSIZE(DMA_ACCESS_SIZE_8BIT);
+            /* Set minor loop count */
+            DMA_DEV->TCD[channel].NBYTES_MLOFFNO = DMA_NBYTES_MLOFFNO_NBYTES(1);
+            /* Set major loop count */
+            /* The DMA engine can only handle up to 2**15 major loop iterations */
+            assert(len <= (DMA_CITER_ELINKNO_CITER_MASK >> DMA_CITER_ELINKNO_CITER_SHIFT));
+            DMA_DEV->TCD[channel].CITER_ELINKNO = DMA_CITER_ELINKNO_CITER(len);
+            DMA_DEV->TCD[channel].BITER_ELINKNO = DMA_BITER_ELINKNO_BITER(len);
+            /* Set control register */
+            /* Disable DMA requests after major loop finishes, interrupt on end of major loop */
+            DMA_DEV->TCD[channel].CSR = DMA_CSR_DREQ_MASK | DMA_CSR_INTMAJOR_MASK;
+            /* Enable requests on the chosen DMA channel */
+            dma_channel_enable(channel);
+            /* lock DMA mutex, DMA ISR will unlock it */
+            mutex_lock(&_uart_dma_mutex[uart]);
+
+            mutex_unlock(&_uart_write_mutex[uart]);
+        }
     }
 }
+
+static inline void dma_handler(uart_t uart)
+{
+    /* Clear DMA interrupt flag */
+    dma_clear_irq(_uart_dma_config[uart].channel);
+
+    /* Unlock the waiting mutex */
+    mutex_unlock(&_uart_dma_mutex[uart]);
+
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
+}
+
+#if UART_0_EN && defined(UART_0_DMA_CHAN)
+void UART_0_DMA_ISR(void)
+{
+    dma_handler(UART_DEV(0));
+}
+#endif
+
+#if UART_1_EN && defined(UART_1_DMA_CHAN)
+void UART_1_DMA_ISR(void)
+{
+    dma_handler(UART_DEV(1));
+}
+#endif
+
+#if UART_2_EN && defined(UART_2_DMA_CHAN)
+void UART_2_DMA_ISR(void)
+{
+    dma_handler(UART_DEV(2));
+}
+#endif
+
+#if UART_3_EN && defined(UART_3_DMA_CHAN)
+void UART_3_DMA_ISR(void)
+{
+    dma_handler(UART_DEV(3));
+}
+#endif
+
+#if UART_4_EN && defined(UART_4_DMA_CHAN)
+void UART_4_DMA_ISR(void)
+{
+    dma_handler(UART_DEV(4));
+}
+#endif
 
 static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
 {
     /*
-    * On Cortex-M0, it happens that S1 is read with LDR
-    * instruction instead of LDRB. This will read the data register
-    * at the same time and arrived byte will be lost. Maybe it's a GCC bug.
-    *
-    * Observed with: arm-none-eabi-gcc (4.8.3-8+..)
-    * It does not happen with: arm-none-eabi-gcc (4.8.3-9+11)
-    */
+     * On Cortex-M0, it happens that S1 is read with LDR
+     * instruction instead of LDRB. This will read the data register
+     * at the same time and arrived byte will be lost. Maybe it's a GCC bug.
+     *
+     * Observed with: arm-none-eabi-gcc (4.8.3-8+..)
+     * It does not happen with: arm-none-eabi-gcc (4.8.3-9+11)
+     */
 
     if (dev->S1 & UART_S1_RDRF_MASK) {
         /* RDRF flag will be cleared when dev-D was read */
@@ -232,24 +432,46 @@ static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
     if (dev->S1 & UART_S1_OR_MASK) {
         dev->S1 = UART_S1_OR_MASK;
     }
+#else
+    /* the advanced UART clears the OR flag above when D is read after reading S1 */
 #endif
 
     if (sched_context_switch_request) {
         thread_yield();
     }
-
 }
 
 #if UART_0_EN
 void UART_0_ISR(void)
 {
-    irq_handler(UART_0, UART_0_DEV);
+    irq_handler(UART_DEV(0), UART_0_DEV);
 }
 #endif
 
 #if UART_1_EN
 void UART_1_ISR(void)
 {
-    irq_handler(UART_1, UART_1_DEV);
+    irq_handler(UART_DEV(1), UART_1_DEV);
+}
+#endif
+
+#if UART_2_EN
+void UART_2_ISR(void)
+{
+    irq_handler(UART_DEV(2), UART_2_DEV);
+}
+#endif
+
+#if UART_3_EN
+void UART_3_ISR(void)
+{
+    irq_handler(UART_DEV(3), UART_3_DEV);
+}
+#endif
+
+#if UART_4_EN
+void UART_4_ISR(void)
+{
+    irq_handler(UART_DEV(4), UART_4_DEV);
 }
 #endif

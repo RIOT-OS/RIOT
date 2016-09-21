@@ -24,6 +24,8 @@
  * @}
  */
 
+#include <stdint.h>
+#include <stddef.h>
 #include "sched.h"
 #include "thread.h"
 #include "cpu.h"

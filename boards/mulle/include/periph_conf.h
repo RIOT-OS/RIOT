@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2015 Eistec AB
+ * Copyright (C) 2015-2016 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
  * details.
  */
-
 
 /**
  * @ingroup     board_mulle
@@ -94,49 +93,76 @@ extern "C"
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (2U)
+#define UART_NUMOF          (5U)
 #define UART_0_EN           1
 #define UART_1_EN           1
+/* The UART2 hardware module on the MK60D10 is only muxable to the pins used for
+ * SPI_0 on Mulle and are not available on the expansion port */
 #define UART_2_EN           0
-#define UART_3_EN           0
-#define UART_4_EN           0
+#define UART_3_EN           1
+#define UART_4_EN           1
 #define UART_IRQ_PRIO       CPU_DEFAULT_IRQ_PRIO
 
+/* Use UART1 for standard I/O */
+#define UART_STDIO_DEV      UART_DEV(1)
+
 /* UART 0 device configuration */
-#define UART_0_DEV          UART1
-#define UART_0_CLKEN()      (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT) = 1)
-#define UART_0_CLKDIS()     (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT) = 0)
+#define UART_0_DEV          UART0
+#define UART_0_CLKEN()      (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT) = 1)
+#define UART_0_CLKDIS()     (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT) = 0)
 #define UART_0_CLK          (SystemSysClock)
-#define UART_0_IRQ_CHAN     UART1_RX_TX_IRQn
-#define UART_0_ISR          isr_uart1_status
+#define UART_0_IRQ_CHAN     UART0_RX_TX_IRQn
+#define UART_0_ISR          isr_uart0_status
 /* UART 0 pin configuration */
-#define UART_0_PORT_CLKEN() (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTC_SHIFT) = 1)
-#define UART_0_PORT         PORTC
-#define UART_0_TX_PIN       4
-#define UART_0_RX_PIN       3
-/* Function number in pin multiplex, see K60 Sub-Family Reference Manual,
- * section 10.3.1 K60 Signal Multiplexing and Pin Assignments */
-#define UART_0_AF           3
-#define UART_0_TX_PCR_MUX   3
-#define UART_0_RX_PCR_MUX   3
+#define UART_0_TX_GPIO      GPIO_PIN(PORT_A, 14)
+#define UART_0_TX_AF        GPIO_AF_3
+#define UART_0_RX_GPIO      GPIO_PIN(PORT_A, 15)
+#define UART_0_RX_AF        GPIO_AF_3
 
 /* UART 1 device configuration */
-#define UART_1_DEV          UART0
-#define UART_1_CLKEN()      (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT) = 1)
-#define UART_1_CLKDIS()     (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT) = 0)
+#define UART_1_DEV          UART1
+#define UART_1_CLKEN()      (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT) = 1)
+#define UART_1_CLKDIS()     (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT) = 0)
 #define UART_1_CLK          (SystemSysClock)
-#define UART_1_IRQ_CHAN     UART0_RX_TX_IRQn
-#define UART_1_ISR          isr_uart0_status
+#define UART_1_IRQ_CHAN     UART1_RX_TX_IRQn
+#define UART_1_ISR          isr_uart1_status
+#define UART_1_DMA_CHAN     15
+#define UART_1_DMA_SOURCE   DMA_SOURCE_UART1_TX
+#define UART_1_DMA_IRQ      DMA15_IRQn
+#define UART_1_DMA_ISR      isr_dma15_complete
 /* UART 1 pin configuration */
-#define UART_1_PORT_CLKEN() (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTA_SHIFT) = 1)
-#define UART_1_PORT         PORTA
-#define UART_1_TX_PIN       14
-#define UART_1_RX_PIN       15
-/* Function number in pin multiplex, see K60 Sub-Family Reference Manual,
- * section 10.3.1 K60 Signal Multiplexing and Pin Assignments */
-#define UART_1_AF           3
-#define UART_1_TX_PCR_MUX   3
-#define UART_1_RX_PCR_MUX   3
+/* The chosen pins are normally connected to RX/TX on the USB to UART adapter on
+ * the programmer board */
+#define UART_1_TX_GPIO      GPIO_PIN(PORT_C, 4)
+#define UART_1_TX_AF        GPIO_AF_3
+#define UART_1_RX_GPIO      GPIO_PIN(PORT_C, 3)
+#define UART_1_RX_AF        GPIO_AF_3
+
+/* UART 3 device configuration */
+#define UART_3_DEV          UART3
+#define UART_3_CLKEN()      (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART3_SHIFT) = 1)
+#define UART_3_CLKDIS()     (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART3_SHIFT) = 0)
+#define UART_3_CLK          (SystemBusClock)
+#define UART_3_IRQ_CHAN     UART3_RX_TX_IRQn
+#define UART_3_ISR          isr_uart3_status
+/* UART 3 pin configuration */
+#define UART_3_TX_GPIO      GPIO_PIN(PORT_B, 11)
+#define UART_3_TX_AF        GPIO_AF_3
+#define UART_3_RX_GPIO      GPIO_PIN(PORT_B, 10)
+#define UART_3_RX_AF        GPIO_AF_3
+
+/* UART 4 device configuration */
+#define UART_4_DEV          UART4
+#define UART_4_CLKEN()      (BITBAND_REG32(SIM->SCGC1, SIM_SCGC1_UART4_SHIFT) = 1)
+#define UART_4_CLKDIS()     (BITBAND_REG32(SIM->SCGC1, SIM_SCGC1_UART4_SHIFT) = 0)
+#define UART_4_CLK          (SystemBusClock)
+#define UART_4_IRQ_CHAN     UART4_RX_TX_IRQn
+#define UART_4_ISR          isr_uart4_status
+/* UART 4 pin configuration */
+#define UART_4_TX_GPIO      GPIO_PIN(PORT_E, 24)
+#define UART_4_TX_AF        GPIO_AF_3
+#define UART_4_RX_GPIO      GPIO_PIN(PORT_E, 25)
+#define UART_4_RX_AF        GPIO_AF_3
 
 /** @} */
 
@@ -369,7 +395,6 @@ static const adc_conf_t adc_config[] = {
 
 /** @} */
 
-
 /**
  * @name I2C configuration
  * @{
@@ -419,7 +444,6 @@ static const adc_conf_t adc_config[] = {
  */
 #define GPIO_IRQ_PRIO       CPU_DEFAULT_IRQ_PRIO
 /** @} */
-
 
 /**
  * @name RTC configuration
