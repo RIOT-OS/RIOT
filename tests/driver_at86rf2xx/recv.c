@@ -87,7 +87,7 @@ void recv(netdev2_t *dev)
         printf("0, ");
     }
     printf("PAN comp.: ");
-    if (buffer[0] & IEEE802154_FCF_ACK_REQ) {
+    if (buffer[0] & IEEE802154_FCF_PAN_COMP) {
         puts("1");
     }
     else {
