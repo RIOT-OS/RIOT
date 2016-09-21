@@ -66,6 +66,7 @@ static void *idle_thread(void *arg)
     (void) arg;
 
     while (1) {
+        IWDG->KR = 0xAAAA; /* reset watchdog counter of Photon */
         pm_set_lowest();
     }
 

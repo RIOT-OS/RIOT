@@ -216,4 +216,16 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_dcmi,               /* DCMI */
     (void*) isr_cryp,               /* CRYP crypto */
     (void*) isr_hash_rng,           /* Hash and Rng */
+
+    /* The following elements are needed for Particle photon bootloader
+     * See also:
+     *          'module_info_t' in particle firmware
+     *          https://github.com/spark/firmware/blob/9a99ba61c7b6399ccdf8a1238d05803beb7bd1ee/dynalib/inc/module_info.h#L44
+     *
+     * TODO: move this out from 'interrupt_vector'
+     */
+    (void*) interrupt_vector,       /* Particle Photon module start */
+    (void*) 0x8100000 - 1,          /* Particle Photon module end */
+    (void*) 0,                      /* 16 bit reserved values and 16 bit module version */
+    (void*) 6,                      /* The platform this module was compiled for. (16 bit) */
 };

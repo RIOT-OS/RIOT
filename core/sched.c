@@ -81,6 +81,7 @@ schedstat sched_pidlist[KERNEL_PID_LAST + 1];
 
 int __attribute__((used)) sched_run(void)
 {
+    IWDG->KR = 0xAAAA; /* reset watchdog counter */
     sched_context_switch_request = 0;
 
     thread_t *active_thread = (thread_t *)sched_active_thread;

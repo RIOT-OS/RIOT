@@ -1,0 +1,19 @@
+# define the cpu used by the particle photon board
+export CPU = stm32f2
+export CPU_MODEL = stm32f205rg
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyUSB0
+
+export BINFILE = $(patsubst %.elf,%.bin,$(ELFFILE))
+
+export FLASHER = dfu-util
+export DEBUGGER = # particle photon has no debugger
+export RESET = # dfu-util has no support for resetting the device
+
+export OFLAGS = -O binary
+export FFLAGS = -d 2b04:d006 -a 0 -s 0x08020000:leave -D "$(HEXFILE)"
+export TERMFLAGS = -p $(PORT)
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
