@@ -26,7 +26,7 @@
 #include "board.h"
 #include "cpu.h"
 #include "mutex.h"
-#include "periph/dma.h"
+#include "dma.h"
 #include "periph/spi.h"
 #include "periph_conf.h"
 #include "thread.h"

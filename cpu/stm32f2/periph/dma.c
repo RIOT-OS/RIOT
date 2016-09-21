@@ -24,7 +24,7 @@
 #include "board.h"
 #include "cpu.h"
 #include "mutex.h"
-#include "periph/dma.h"
+#include "dma.h"
 #include "periph_conf.h"
 
 #include "assert.h"
