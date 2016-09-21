@@ -56,3 +56,8 @@ your host system and use the VM for compiling, flashing devices and running the 
     The needed `vendor id` and `product id` can be obtained by running `vboxmanage list usbhost`.
   * For Linux Host Systems: Additionally, in order to allow USB access from within the guest system, the host system user
     must be a member of the `vboxusers` group (see [here](https://www.virtualbox.org/manual/ch02.html#idm1051)).
+2. You can forward ports on the virtual machine with the following command:
+
+   ```
+   config.vm.network "forwarded_port", guest: <port_1>, host: <port_2>
+   ```
