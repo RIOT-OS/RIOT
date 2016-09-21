@@ -287,17 +287,12 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
  * @{
  */
 #ifndef GNRC_RPL_DEFAULT_LIFETIME
-#define GNRC_RPL_DEFAULT_LIFETIME (60)
+#define GNRC_RPL_DEFAULT_LIFETIME (5)
 #endif
 #ifndef GNRC_RPL_LIFETIME_UNIT
-#define GNRC_RPL_LIFETIME_UNIT (2)
+#define GNRC_RPL_LIFETIME_UNIT (60)
 #endif
 /** @} */
-
-/**
- * @brief Interval of the void _update_lifetime() function
- */
-#define GNRC_RPL_LIFETIME_STEP (2)
 
 /**
  * @brief Default prefix length for the DODAG id
@@ -335,7 +330,7 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define GNRC_RPL_REGULAR_DAO_INTERVAL (60)
 #endif
 #ifndef GNRC_RPL_DEFAULT_DAO_DELAY
-#define GNRC_RPL_DEFAULT_DAO_DELAY (5)
+#define GNRC_RPL_DEFAULT_DAO_DELAY (1)
 #endif
 /** @} */
 
@@ -376,7 +371,7 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /**
  * @brief Rank of the root node
  */
-#define GNRC_RPL_ROOT_RANK (256)
+#define GNRC_RPL_ROOT_RANK (GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE)
 
 /**
  *  @brief  DIS ICMPv6 code
