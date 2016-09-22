@@ -32,7 +32,9 @@
  * @{
  */
 #define CC2538_MAC_STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
-#define CC2538_MAC_PRIO            (THREAD_PRIORITY_MAIN - 4)
+#ifndef CC2538_MAC_PRIO
+#define CC2538_MAC_PRIO            (GNRC_NETDEV2_MAC_PRIO)
+#endif
 
 static cc2538_rf_t cc2538_rf_dev;
 static gnrc_netdev2_t gnrc_adpt;

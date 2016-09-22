@@ -37,7 +37,9 @@
  * @{
  */
 #define CC2420_MAC_STACKSIZE           (THREAD_STACKSIZE_MAIN)
-#define CC2420_MAC_PRIO                (THREAD_PRIORITY_MAIN - 4)
+#ifndef CC2420_MAC_PRIO
+#define CC2420_MAC_PRIO                (GNRC_NETDEV2_MAC_PRIO)
+#endif
 /** @} */
 
 /**

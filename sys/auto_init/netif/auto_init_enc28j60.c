@@ -33,8 +33,10 @@
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define MAC_STACKSIZE   (THREAD_STACKSIZE_DEFAULT)
-#define MAC_PRIO        (THREAD_PRIORITY_MAIN - 4)
+#define ENC28J60_MAC_STACKSIZE   (THREAD_STACKSIZE_DEFAULT)
+#ifndef ENC28J60_MAC_PRIO
+#define ENC28J60_MAC_PRIO        (GNRC_NETDEV2_MAC_PRIO)
+#endif
 /*** @} */
 
 /**
@@ -53,7 +55,7 @@ static gnrc_netdev2_t gnrc_adpt[ENC28J60_NUM];
 /**
  * @brief   Stacks for the MAC layer threads
  */
-static char stack[MAC_STACKSIZE][ENC28J60_NUM];
+static char stack[ENC28J60_MAC_STACKSIZE][ENC28J60_NUM];
 
 
 void auto_init_enc28j60(void)
@@ -65,7 +67,7 @@ void auto_init_enc28j60(void)
         /* initialize netdev2 <-> gnrc adapter state */
         gnrc_netdev2_eth_init(&gnrc_adpt[i], (netdev2_t *)&dev[i]);
         /* start gnrc netdev2 thread */
-        gnrc_netdev2_init(stack[i], MAC_STACKSIZE, MAC_PRIO,
+        gnrc_netdev2_init(stack[i], ENC28J60_MAC_STACKSIZE, ENC28J60_MAC_PRIO,
                           "gnrc_enc28j60", &gnrc_adpt[i]);
     }
 }

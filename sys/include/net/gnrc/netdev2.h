@@ -37,6 +37,10 @@
 extern "C" {
 #endif
 
+#ifndef GNRC_NETDEV2_MAC_PRIO
+#define GNRC_NETDEV2_MAC_PRIO   (THREAD_PRIORITY_MAIN - 5)
+#endif
+
 /**
  * @brief   Type for @ref msg_t if device fired an event
  */
