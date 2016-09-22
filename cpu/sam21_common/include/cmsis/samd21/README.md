@@ -24,3 +24,23 @@ the variant, for example `__SAMD21J18A__`.  This define must be set in the
 
 Be aware that if you want to make changes to any file in this tree that the
 changes will be lost when a new ASF release is going to be used.
+
+## Trailing White Space
+
+Because of the whitespace check (dist/tools/whitespacecheck/check.sh) all
+the trailing white space had to be removed.  Please take this into account
+when comparing to the original ASF distribution.
+
+    find include/ -name '*.h' -exec sed -i 's/\s*$//' '{}' +
+
+## LITTLE_ENDIAN
+
+These include files define `LITTLE_ENDIAN`.  But we think this is wrong.  It
+seems more logical to let the compiler decide in which mode the ARM code is
+to be translated.  In include/machine/endian.h there is already a define of
+`LITTLE_ENDIAN` (and `BIG_ENDIAN`) for a different purpose.
+
+So, we decided to remove the define from the ASF CMSIS files.  The command
+for it (running from this directory) is:
+
+    find include/ -name '*.h' -exec sed -i '/^#define\s\s*LITTLE_ENDIAN/d' '{}' +
