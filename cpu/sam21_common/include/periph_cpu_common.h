@@ -87,12 +87,81 @@ typedef enum {
 } gpio_mux_t;
 
 /**
+ * @brief   Possible pad selections for SERCOM RX (inspired by Arduino)
+ */
+typedef enum {
+    SERCOM_RX_PAD_0 = 0x0,  /**< select pad 0 */
+    SERCOM_RX_PAD_1 = 0x1,  /**< select pad 1 */
+    SERCOM_RX_PAD_2 = 0x2,  /**< select pad 2 */
+    SERCOM_RX_PAD_3 = 0x3,  /**< select pad 3 */
+} sercom_rxpad_t;
+
+/**
+ * @brief   Possible pad selections for SERCOM UART TX (inspired by Arduino)
+ */
+typedef enum {
+    UART_TX_PAD_0 = 0x0,    /**< select pad 0, only UART */
+    UART_TX_PAD_2 = 0x1,    /**< select pad 2, only UART */
+    UART_TX_RTS_CTS_PAD_0_2_3 = 0x2,    /**< select pad 0, 2 and 3, only UART, TX on PAD0, RTS on PAD2 and CTS on PAD3 */
+} sercom_uart_txpad_t;
+
+/**
+ * @brief   Possible pad selections for SERCOM SPI output (inspired by Arduino)
+ */
+typedef enum {
+    SPI_PAD_0_SCK_1 = 0,    /**< select pad 0, SCK pad1, only SPI */
+    SPI_PAD_2_SCK_3 = 1,    /**< select pad 2, SCK pad3, only SPI */
+    SPI_PAD_3_SCK_1 = 2,    /**< select pad 3, SCK pad1, only SPI */
+    SPI_PAD_0_SCK_3 = 3,    /**< select pad 0, SCK pad3, only SPI */
+} sercom_spi_txpad_t;
+
+/**
+ * @brief   Possible selections for SERCOM SPI data size (inspired by Arduino)
+ */
+typedef enum
+{
+    SPI_CHAR_SIZE_8_BITS = 0x0ul,
+    SPI_CHAR_SIZE_9_BITS = 0x1ul,
+} sercom_spi_charsize_t;
+
+/**
+ * @brief   Possible selections for SERCOM data (bit) order (inspired by Arduino)
+ */
+typedef enum
+{
+    MSB_FIRST = 0,
+    LSB_FIRST = 1,
+} sercom_data_order_t;
+
+/**
+ * @brief   Possible selections for SERCOM SPI clock mode (inspired by Arduino)
+ */
+typedef enum
+{
+    SERCOM_SPI_MODE_0 = 0,      // CPOL : 0  | CPHA : 0
+    SERCOM_SPI_MODE_1 = 1,      // CPOL : 0  | CPHA : 1
+    SERCOM_SPI_MODE_2 = 2,      // CPOL : 1  | CPHA : 0
+    SERCOM_SPI_MODE_3 = 3,      // CPOL : 1  | CPHA : 1
+} sercom_spi_clockmode_t;
+
+/**
  * @brief   Set up alternate function (PMUX setting) for a PORT pin
  *
- * @param[in] dev   Pin to set the multiplexing for
+ * @param[in] pin   Pin to set the multiplexing for
  * @param[in] mux   Mux value
  */
-void gpio_init_mux(gpio_t dev, gpio_mux_t mux);
+void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
+
+/**
+ * @brief   Set up PORT pin for SERCOM usage
+ *
+ * This function initializes the pin for SERCOM usage. It is derived
+ * from Arduino's pinPeripheral() in wiring_private.c
+ *
+ * @param[in] pin   Pin to set the multiplexing for
+ * @param[in] mux   Mux value
+ */
+void gpio_init_sercom(gpio_t pin, gpio_mux_t mux);
 
 #ifdef __cplusplus
 }

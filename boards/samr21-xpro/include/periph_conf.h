@@ -105,8 +105,8 @@ extern "C" {
  */
 static const uart_conf_t uart_config[] = {
     /* device, RX pin, TX pin, mux */
-    {&SERCOM0->USART, GPIO_PIN(PA,5), GPIO_PIN(PA,4), GPIO_MUX_D},
-    {&SERCOM5->USART, GPIO_PIN(PA,23), GPIO_PIN(PA,22), GPIO_MUX_D},
+    {&SERCOM0->USART, GPIO_PIN(PA,5),  GPIO_PIN(PA,4),  GPIO_MUX_D, SERCOM_RX_PAD_1, UART_TX_PAD_0},
+    {&SERCOM5->USART, GPIO_PIN(PA,23), GPIO_PIN(PA,22), GPIO_MUX_D, SERCOM_RX_PAD_1, UART_TX_PAD_0},
 };
 
 /* interrupt function name mapping */
@@ -160,34 +160,32 @@ static const pwm_conf_t pwm_config[] = {
 #define SPI_1_EN           1
 
 /*      SPI0             */
-#define SPI_0_DEV          SERCOM4->SPI
-#define SPI_IRQ_0          SERCOM4_IRQn
-#define SPI_0_DOPO         (1)
-#define SPI_0_DIPO         (0)
-
-#define SPI_0_SCLK_DEV     PORT->Group[2]
-#define SPI_0_SCLK_PIN     (18)
-
-#define SPI_0_MISO_DEV     PORT->Group[2]
-#define SPI_0_MISO_PIN     (19)
-
-#define SPI_0_MOSI_DEV     PORT->Group[1]
-#define SPI_0_MOSI_PIN     (30)
+#define SPI_0_DEV           SERCOM4->SPI
+#define SPI_IRQ_0           SERCOM4_IRQn
+#define SPI_0_GCLK_ID       SERCOM4_GCLK_ID_CORE
+/* SPI 0 pin configuration */
+#define SPI_0_SCLK          GPIO_PIN(PC, 18)
+#define SPI_0_SCLK_MUX      GPIO_MUX_F
+#define SPI_0_MISO          GPIO_PIN(PC, 19)
+#define SPI_0_MISO_MUX      GPIO_MUX_F
+#define SPI_0_MISO_PAD      SERCOM_RX_PAD_0
+#define SPI_0_MOSI          GPIO_PIN(PB, 30)
+#define SPI_0_MOSI_MUX      GPIO_MUX_F
+#define SPI_0_MOSI_PAD      SPI_PAD_2_SCK_3
 
 /*      SPI1             */
-#define SPI_1_DEV          SERCOM5->SPI
-#define SPI_IRQ_1          SERCOM5_IRQn
-#define SPI_1_DOPO         (1)
-#define SPI_1_DIPO         (0)
-
-#define SPI_1_SCLK_DEV     PORT->Group[1]
-#define SPI_1_SCLK_PIN     (23)
-
-#define SPI_1_MISO_DEV     PORT->Group[1]
-#define SPI_1_MISO_PIN     (02)
-
-#define SPI_1_MOSI_DEV     PORT->Group[1]
-#define SPI_1_MOSI_PIN     (22)
+#define SPI_1_DEV           SERCOM5->SPI
+#define SPI_IRQ_1           SERCOM5_IRQn
+#define SPI_1_GCLK_ID       SERCOM5_GCLK_ID_CORE
+/* SPI 1 pin configuration */
+#define SPI_1_SCLK          GPIO_PIN(PB, 23)
+#define SPI_1_SCLK_MUX      GPIO_MUX_D
+#define SPI_1_MISO          GPIO_PIN(PB, 02)
+#define SPI_1_MISO_MUX      GPIO_MUX_D
+#define SPI_1_MISO_PAD      SERCOM_RX_PAD_0
+#define SPI_1_MOSI          GPIO_PIN(PB, 22)
+#define SPI_1_MOSI_MUX      GPIO_MUX_D
+#define SPI_1_MOSI_PAD      SPI_PAD_2_SCK_3
 /** @} */
 
 /**
@@ -204,11 +202,13 @@ static const pwm_conf_t pwm_config[] = {
 #define I2C_0_DEV           SERCOM3->I2CM
 #define I2C_0_IRQ           SERCOM3_IRQn
 #define I2C_0_ISR           isr_sercom3
+/* I2C 0 GCLK */
+#define I2C_0_GCLK_ID       SERCOM3_GCLK_ID_CORE
+#define I2C_0_GCLK_ID_SLOW  SERCOM3_GCLK_ID_SLOW
 /* I2C 0 pin configuration */
-#define I2C_0_PORT          (PORT->Group[0])
-#define I2C_SDA             PIN_PA16
-#define I2C_SCL             PIN_PA17
-#define I2C_0_PINS          (PORT_PA16 | PORT_PA17)
+#define I2C_0_SDA           GPIO_PIN(PA, 16)
+#define I2C_0_SCL           GPIO_PIN(PA, 17)
+#define I2C_0_MUX           GPIO_MUX_D
 
 /**
  * @name RTC configuration

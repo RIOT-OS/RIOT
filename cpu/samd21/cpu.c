@@ -71,7 +71,7 @@ static void clk_init(void)
     GCLK->GENDIV.reg =  (GCLK_GENDIV_DIV(CLOCK_PLL_DIV) |
                         GCLK_GENDIV_ID(0));
     GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN |
-                         GCLK_GENCTRL_SRC_FDPLL96M |
+                         GCLK_GENCTRL_SRC_FDPLL |
                          GCLK_GENCTRL_ID(0));
 #else /* do not use PLL, use internal 8MHz oscillator directly */
     GCLK->GENDIV.reg =  (GCLK_GENDIV_DIV(CLOCK_DIV) |
