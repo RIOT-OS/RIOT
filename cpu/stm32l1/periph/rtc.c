@@ -83,7 +83,7 @@ void rtc_init(void)
 int rtc_set_time(struct tm *time)
 {
     /* Enable write access to RTC registers */
-    RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
     PWR->CR |= PWR_CR_DBP;
 
     /* Unlock RTC write protection */
@@ -127,7 +127,7 @@ int rtc_get_time(struct tm *time)
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
     /* Enable write access to RTC registers */
-    RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
     PWR->CR |= PWR_CR_DBP;
 
     /* Unlock RTC write protection */
@@ -193,7 +193,7 @@ void rtc_clear_alarm(void)
 void rtc_poweron(void)
 {
     /* Enable write access to RTC registers */
-    RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
     PWR->CR |= PWR_CR_DBP;
 
     /* Reset RTC domain */
@@ -217,7 +217,7 @@ void rtc_poweron(void)
 void rtc_poweroff(void)
 {
     /* Enable write access to RTC registers */
-    RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
     PWR->CR |= PWR_CR_DBP;
 
     /* Reset RTC domain */

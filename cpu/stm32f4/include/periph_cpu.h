@@ -175,10 +175,10 @@ void gpio_init_af(gpio_t pin, gpio_af_t af);
 static inline void dma_poweron(int stream)
 {
     if (stream < 8) {
-        RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
+        periph_clk_en(AHB1, RCC_AHB1ENR_DMA1EN);
     }
     else {
-        RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
+        periph_clk_en(AHB1, RCC_AHB1ENR_DMA2EN);
     }
 }
 

@@ -64,7 +64,7 @@ extern "C" {
 #define TIMER_0_CHANNELS    4
 #define TIMER_0_FREQ        (CLOCK_CORECLOCK / 2)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
+#define TIMER_0_CLKEN()     (periph_clk_en(APB1, RCC_APB1ENR_TIM2EN))
 #define TIMER_0_ISR         isr_tim2
 #define TIMER_0_IRQ_CHAN    TIM2_IRQn
 
@@ -73,7 +73,7 @@ extern "C" {
 #define TIMER_1_CHANNELS    4
 #define TIMER_1_FREQ        (CLOCK_CORECLOCK / 2)
 #define TIMER_1_MAX_VALUE   (0xffffffff)
-#define TIMER_1_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM5EN)
+#define TIMER_1_CLKEN()     (periph_clk_en(APB1, RCC_APB1ENR_TIM5EN))
 #define TIMER_1_ISR         isr_tim5
 #define TIMER_1_IRQ_CHAN    TIM5_IRQn
 /** @} */

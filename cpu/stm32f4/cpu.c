@@ -89,7 +89,7 @@ static void cpu_clock_init(void)
     /* setup power module */
 
     /* enable the power module */
-    RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
     /* set the voltage scaling to 1 to enable the maximum frequency */
     PWR->CR |= PWR_CR_VOS_1;
 

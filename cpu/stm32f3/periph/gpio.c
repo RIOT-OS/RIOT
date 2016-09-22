@@ -67,7 +67,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     int pin_num = _pin_num(pin);
 
     /* enable clock */
-    RCC->AHBENR |= (RCC_AHBENR_GPIOAEN << _port_num(pin));
+    periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
 
     /* set mode */
     port->MODER &= ~(0x3 << (2 * pin_num));
@@ -95,7 +95,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     exti_chan[pin_num].cb = cb;
     exti_chan[pin_num].arg = arg;
     /* enable the SYSCFG clock */
-    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+    periph_clk_en(APB2, RCC_APB2ENR_SYSCFGEN);
     /* configure pin as input */
     gpio_init(pin, mode);
     /* enable global pin interrupt */
@@ -150,7 +150,7 @@ void gpio_init_analog(gpio_t pin)
 {
     /* enable clock, needed as this function can be used without calling
      * gpio_init first */
-    RCC->AHBENR |= (RCC_AHBENR_GPIOAEN << _port_num(pin));
+    periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
     /* set to analog mode */
     _port(pin)->MODER |= (0x3 << (2 * _pin_num(pin)));
 }

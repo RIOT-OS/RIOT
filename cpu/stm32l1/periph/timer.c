@@ -58,7 +58,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     isr_ctx[dev].cb = cb;
     isr_ctx[dev].arg = arg;
     /* enable peripheral clock */
-    RCC->APB1ENR |= (1 << timer_config[dev].rcc);
+    periph_clk_en(APB1, (1 << timer_config[dev].rcc));
     /* reset timer and configure to up-counting mode */
     tim->CR1 = 0;
     tim->CR2 = 0;

@@ -49,7 +49,7 @@ extern "C" {
 #define TIMER_0_CHANNELS    4
 #define TIMER_0_FREQ        (CLOCK_CORECLOCK)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
+#define TIMER_0_CLKEN()     (periph_clk_en(APB1, RCC_APB1ENR_TIM2EN))
 #define TIMER_0_ISR         isr_tim2
 #define TIMER_0_IRQ_CHAN    TIM2_IRQn
 /** @} */
@@ -65,26 +65,26 @@ extern "C" {
 
 /* UART 0 device configuration */
 #define UART_0_DEV          USART1
-#define UART_0_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_USART1EN)
-#define UART_0_CLKDIS()     (RCC->APB2ENR &= (~RCC_APB2ENR_USART1EN))
+#define UART_0_CLKEN()      (periph_clk_en(APB2, RCC_APB2ENR_USART1EN))
+#define UART_0_CLKDIS()     (periph_clk_dis(APB2, RCC_APB2ENR_USART1EN))
 #define UART_0_IRQ          USART1_IRQn
 #define UART_0_ISR          isr_usart1
 /* UART 0 pin configuration */
 #define UART_0_PORT         GPIOB
-#define UART_0_PORT_CLKEN() (RCC->AHBENR |= RCC_AHBENR_GPIOBEN)
+#define UART_0_PORT_CLKEN() (periph_clk_en(AHB, RCC_AHBENR_GPIOBEN))
 #define UART_0_RX_PIN       7
 #define UART_0_TX_PIN       6
 #define UART_0_AF           0
 
 /* UART 1 device configuration */
 #define UART_1_DEV          USART2
-#define UART_1_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART2EN)
-#define UART_1_CLKDIS()     (RCC->APB1ENR &= (~RCC_APB1ENR_USART2EN))
+#define UART_1_CLKEN()      (periph_clk_en(APB1, RCC_APB1ENR_USART2EN))
+#define UART_1_CLKDIS()     (periph_clk_dis(APB1, RCC_APB1ENR_USART2EN))
 #define UART_1_IRQ          USART2_IRQn
 #define UART_1_ISR          isr_usart2
 /* UART 1 pin configuration */
 #define UART_1_PORT         GPIOA
-#define UART_1_PORT_CLKEN() (RCC->AHBENR |= RCC_AHBENR_GPIOAEN)
+#define UART_1_PORT_CLKEN() (periph_clk_en(AHB, RCC_AHBENR_GPIOAEN))
 #define UART_1_RX_PIN       3
 #define UART_1_TX_PIN       2
 #define UART_1_AF           1
@@ -127,13 +127,13 @@ extern "C" {
 
 /* SPI 0 device config */
 #define SPI_0_DEV           SPI1
-#define SPI_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
-#define SPI_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_SPI1EN))
+#define SPI_0_CLKEN()       (periph_clk_en(APB2, RCC_APB2ENR_SPI1EN))
+#define SPI_0_CLKDIS()      (periph_clk_dis(APB2, RCC_APB2ENR_SPI1EN))
 #define SPI_0_IRQ           SPI1_IRQn
 #define SPI_0_ISR           isr_spi1
 /* SPI 1 pin configuration */
 #define SPI_0_PORT          GPIOA
-#define SPI_0_PORT_CLKEN()  (RCC->AHBENR |= RCC_AHBENR_GPIOAEN)
+#define SPI_0_PORT_CLKEN()  (periph_clk_en(AHB, RCC_AHBENR_GPIOAEN))
 #define SPI_0_PIN_SCK       5
 #define SPI_0_PIN_MISO      6
 #define SPI_0_PIN_MOSI      7
@@ -141,13 +141,13 @@ extern "C" {
 
 /* SPI 1 device config */
 #define SPI_1_DEV           SPI2
-#define SPI_1_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_SPI2EN)
-#define SPI_1_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_SPI2EN))
+#define SPI_1_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_SPI2EN))
+#define SPI_1_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_SPI2EN))
 #define SPI_1_IRQ           SPI2_IRQn
 #define SPI_1_ISR           isr_spi2
 /* SPI 1 pin configuration */
 #define SPI_1_PORT          GPIOB
-#define SPI_1_PORT_CLKEN()  (RCC->AHBENR |= RCC_AHBENR_GPIOBEN)
+#define SPI_1_PORT_CLKEN()  (periph_clk_en(AHB, RCC_AHBENR_GPIOBEN))
 #define SPI_1_PIN_SCK       13
 #define SPI_1_PIN_MISO      14
 #define SPI_1_PIN_MOSI      15

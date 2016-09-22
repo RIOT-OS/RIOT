@@ -43,10 +43,10 @@ static inline USART_TypeDef *dev(uart_t uart)
 static void clk_en(uart_t uart)
 {
     if (uart_config[uart].bus == APB1) {
-        RCC->APB1ENR |= uart_config[uart].rcc_pin;
+        periph_clk_en(APB1, uart_config[uart].rcc_pin);
     }
     else {
-        RCC->APB2ENR |= uart_config[uart].rcc_pin;
+        periph_clk_en(APB2, uart_config[uart].rcc_pin);
     }
 }
 
