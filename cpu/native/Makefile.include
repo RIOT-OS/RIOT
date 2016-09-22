@@ -8,6 +8,8 @@ endif
 USEMODULE += periph
 USEMODULE += periph_uart
 
+LINKFLAGS += -T$(RIOTCPU)/native/ldscripts/xfa.ld
+
 # include common peripheral initialization
 USEMODULE += periph_common
 
