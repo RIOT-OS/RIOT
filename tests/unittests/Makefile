@@ -6,7 +6,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk chronos msb-430 msb-430h pca
                           telosb wsn430-v1_3b wsn430-v1_4 z1 nucleo-f103 \
                           nucleo-f334 yunjia-nrf51822 samr21-xpro \
                           arduino-mega2560 airfy-beacon nrf51dongle nrf6310 \
-                          weio waspmote-pro nucleo-f072
+                          weio waspmote-pro nucleo-f072 arduino-uno \
+                          arduino-duemilanove
 
 USEMODULE += embunit
 
@@ -27,7 +28,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon arduino-due cc2538dk ek-lm4f120xl f4vi1 fox 
                        yunjia-nrf51822
 DISABLE_TEST_FOR_ARM_CORTEX_M := tests-relic
 
-AVR_BOARDS := arduino-mega2560 waspmote-pro
+AVR_BOARDS := arduino-mega2560 waspmote-pro arduino-uno arduino-duemilanove
 DISABLE_TEST_FOR_AVR := tests-relic
 
 MSP430_BOARDS :=  chronos msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
