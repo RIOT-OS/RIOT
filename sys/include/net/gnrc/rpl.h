@@ -180,12 +180,16 @@ extern "C" {
  *          RFC 6550, section 17
  *      </a>
  */
+#ifndef GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE
 #define GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE (256)
+#endif
 
 /**
  * @brief   Maximum rank increase
  */
+#ifndef GNRC_RPL_DEFAULT_MAX_RANK_INCREASE
 #define GNRC_RPL_DEFAULT_MAX_RANK_INCREASE (0)
+#endif
 
 /**
  * @brief   Number of implemented Objective Functions
@@ -200,7 +204,9 @@ extern "C" {
 /**
  * @brief   Default Instance ID
  */
+#ifndef GNRC_RPL_DEFAULT_INSTANCE
 #define GNRC_RPL_DEFAULT_INSTANCE (0)
+#endif
 
 /**
  * @name RPL Mode of Operations
@@ -210,9 +216,10 @@ extern "C" {
 #define GNRC_RPL_MOP_NON_STORING_MODE    (0x01)
 #define GNRC_RPL_MOP_STORING_MODE_NO_MC  (0x02)
 #define GNRC_RPL_MOP_STORING_MODE_MC     (0x03)
+
 /** default MOP set on compile time */
 #ifndef GNRC_RPL_DEFAULT_MOP
-#   define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_STORING_MODE_NO_MC
+#define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_STORING_MODE_NO_MC
 #endif
 /** @} */
 
@@ -277,16 +284,18 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /**
  * @name Default parent and route entry lifetime
  * default lifetime will be multiplied by the lifetime unit to obtain the resulting lifetime
+ * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7.6">
+            DODAG Configuration
+        </a>
  * @{
  */
-#define GNRC_RPL_DEFAULT_LIFETIME (60)
-#define GNRC_RPL_LIFETIME_UNIT (2)
+#ifndef GNRC_RPL_DEFAULT_LIFETIME
+#define GNRC_RPL_DEFAULT_LIFETIME (5)
+#endif
+#ifndef GNRC_RPL_LIFETIME_UNIT
+#define GNRC_RPL_LIFETIME_UNIT (60)
+#endif
 /** @} */
-
-/**
- * @brief Interval of the void _update_lifetime() function
- */
-#define GNRC_RPL_LIFETIME_STEP (2)
 
 /**
  * @brief Default prefix length for the DODAG id
@@ -295,6 +304,10 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 
 /**
  * @brief Default prefix valid and preferred time for the DODAG id
+ * @note Currently not used, but needed for RIOs
+ * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7.5">
+ *          Route Information
+ *      </a>
  */
 #define GNRC_RPL_DEFAULT_PREFIX_LIFETIME  (0xFFFFFFFF)
 
@@ -308,12 +321,23 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 
 /**
  * @name Parameters used for DAO handling
+ * @see <a href="https://tools.ietf.org/html/rfc6550#section-17">
+            RPL Constants and Variables
+        </a>
  * @{
  */
+#ifndef GNRC_RPL_DAO_SEND_RETRIES
 #define GNRC_RPL_DAO_SEND_RETRIES (4)
+#endif
+#ifndef GNRC_RPL_DEFAULT_WAIT_FOR_DAO_ACK
 #define GNRC_RPL_DEFAULT_WAIT_FOR_DAO_ACK (3)
+#endif
+#ifndef GNRC_RPL_REGULAR_DAO_INTERVAL
 #define GNRC_RPL_REGULAR_DAO_INTERVAL (60)
-#define GNRC_RPL_DEFAULT_DAO_DELAY (5)
+#endif
+#ifndef GNRC_RPL_DEFAULT_DAO_DELAY
+#define GNRC_RPL_DEFAULT_DAO_DELAY (1)
+#endif
 /** @} */
 
 /**
@@ -353,7 +377,7 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /**
  * @brief Rank of the root node
  */
-#define GNRC_RPL_ROOT_RANK (256)
+#define GNRC_RPL_ROOT_RANK (GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE)
 
 /**
  *  @brief  DIS ICMPv6 code
