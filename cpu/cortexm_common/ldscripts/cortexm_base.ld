@@ -84,6 +84,10 @@ SECTIONS
         KEEP (*crtend.o(.dtors))
 
         . = ALIGN(4);
+        KEEP (*(SORT(.xfa.*)))
+        KEEP (*(.xfa))
+
+        . = ALIGN(4);
         _efixed = .;            /* End of text section */
     } > rom
 
