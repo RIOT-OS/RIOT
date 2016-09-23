@@ -1,17 +1,17 @@
-From fb1e697384794d8cb92c6cadb729b6d9a01ffdfe Mon Sep 17 00:00:00 2001
+From 68fcbaf8eb8b2e2c1abe319fb74f75f0a75c330e Mon Sep 17 00:00:00 2001
 From: Bas Stottelaar <basstottelaar@gmail.com>
 Date: Wed, 22 Jun 2016 18:04:31 +0200
 Subject: [PATCH 2/2] u8g2: add riot-os interface.
 
 ---
  csrc/u8g2.h        |   4 +-
- csrc/u8g2_riotos.c | 157 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ csrc/u8g2_riotos.c | 163 +++++++++++++++++++++++++++++++++++++++++++++++++++++
  csrc/u8x8.h        |  17 +++++-
- 3 files changed, 174 insertions(+), 4 deletions(-)
+ 3 files changed, 180 insertions(+), 4 deletions(-)
  create mode 100644 csrc/u8g2_riotos.c
 
 diff --git a/csrc/u8g2.h b/csrc/u8g2.h
-index dcf5518..14bc3c7 100644
+index b65c9f1..bd8c485 100644
 --- a/csrc/u8g2.h
 +++ b/csrc/u8g2.h
 @@ -362,6 +362,9 @@ void u8g2_ClearDisplay(u8g2_t *u8g2);
@@ -24,17 +24,17 @@ index dcf5518..14bc3c7 100644
  /*==========================================*/
  /* u8g2_setup.c */
  
-@@ -1565,4 +1568,3 @@ extern const uint8_t u8g2_font_px437wyse700b_mn[] U8G2_FONT_SECTION("u8g2_font_p
+@@ -1663,4 +1666,3 @@ extern const uint8_t u8g2_font_px437wyse700b_mn[] U8G2_FONT_SECTION("u8g2_font_p
  
  
  #endif
 -
 diff --git a/csrc/u8g2_riotos.c b/csrc/u8g2_riotos.c
 new file mode 100644
-index 0000000..c614aa6
+index 0000000..7106e07
 --- /dev/null
 +++ b/csrc/u8g2_riotos.c
-@@ -0,0 +1,157 @@
+@@ -0,0 +1,163 @@
 +#include "u8g2.h"
 +
 +#include "xtimer.h"
@@ -106,13 +106,19 @@ index 0000000..c614aa6
 +            xtimer_nanosleep(arg_int * 100);
 +            break;
 +        case U8X8_MSG_GPIO_CS:
-+            gpio_write(u8g2->pins[U8X8_PIN_CS], arg_int);
++            if (u8g2->pins_enabled & (1 << U8X8_PIN_CS)) {
++                gpio_write(u8g2->pins[U8X8_PIN_CS], arg_int);
++            }
 +            break;
 +        case U8X8_MSG_GPIO_DC:
-+            gpio_write(u8g2->pins[U8X8_PIN_DC], arg_int);
++            if (u8g2->pins_enabled & (1 << U8X8_PIN_DC)) {
++                gpio_write(u8g2->pins[U8X8_PIN_DC], arg_int);
++            }
 +            break;
 +        case U8X8_MSG_GPIO_RESET:
-+            gpio_write(u8g2->pins[U8X8_PIN_RESET], arg_int);
++            if (u8g2->pins_enabled & (1 << U8X8_PIN_RESET)) {
++                gpio_write(u8g2->pins[U8X8_PIN_RESET], arg_int);
++            }
 +            break;
 +        default:
 +            return 0;
@@ -193,7 +199,7 @@ index 0000000..c614aa6
 +}
 +#endif /* I2C_NUMOF */
 diff --git a/csrc/u8x8.h b/csrc/u8x8.h
-index 953b6ab..3ff4a4d 100644
+index dd74869..7c45b6a 100644
 --- a/csrc/u8x8.h
 +++ b/csrc/u8x8.h
 @@ -107,6 +107,8 @@
@@ -229,7 +235,7 @@ index 953b6ab..3ff4a4d 100644
  };
  
  #define u8x8_GetCols(u8x8) ((u8x8)->display_info->tile_width)
-@@ -336,6 +342,8 @@ struct u8x8_struct
+@@ -337,6 +343,8 @@ struct u8x8_struct
  #define u8x8_SetMenuDownPin(u8x8, val) u8x8_SetPin((u8x8),U8X8_PIN_MENU_DOWN,(val))
  #endif
  
@@ -238,7 +244,7 @@ index 953b6ab..3ff4a4d 100644
  
  /*==========================================*/
  
-@@ -817,6 +825,9 @@ extern const uint8_t u8x8_font_pxplustandynewtv_u[] U8X8_FONT_SECTION("u8x8_font
+@@ -818,6 +826,9 @@ extern const uint8_t u8x8_font_pxplustandynewtv_u[] U8X8_FONT_SECTION("u8x8_font
  
  /* end font list */
  
