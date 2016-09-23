@@ -88,7 +88,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                   gpio_cb_t cb, void *arg)
+                  gpio_cb_t cb, void *arg)
 {
     int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
@@ -214,6 +214,7 @@ void isr_exti(void)
 {
     /* only generate interrupts against lines which have their IMR set */
     uint32_t pending_isr = (EXTI->PR & EXTI->IMR);
+
     for (int i = 0; i < GPIO_ISR_CHAN_NUMOF; i++) {
         if (pending_isr & (1 << i)) {
             EXTI->PR = (1 << i);                /* clear by writing a 1 */

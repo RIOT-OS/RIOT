@@ -30,11 +30,11 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define RTT_FLAG_RTOFF       ((uint16_t)0x0020)  /**< RTC Operation OFF flag */
-#define RTT_FLAG_RSF         ((uint16_t)0x0008)  /**< Registers Synchronized flag */
-#define RTT_FLAG_OW          ((uint16_t)0x0004)  /**< Overflow flag */
-#define RTT_FLAG_ALR         ((uint16_t)0x0002)  /**< Alarm flag */
-#define RTT_FLAG_SEC         ((uint16_t)0x0001)  /**< Second flag */
+#define RTT_FLAG_RTOFF       ((uint16_t)0x0020)     /**< RTC Operation OFF flag */
+#define RTT_FLAG_RSF         ((uint16_t)0x0008)     /**< Registers Synchronized flag */
+#define RTT_FLAG_OW          ((uint16_t)0x0004)     /**< Overflow flag */
+#define RTT_FLAG_ALR         ((uint16_t)0x0002)     /**< Alarm flag */
+#define RTT_FLAG_SEC         ((uint16_t)0x0001)     /**< Second flag */
 
 inline void _rtt_enter_config_mode(void);
 inline void _rtt_leave_config_mode(void);
@@ -69,8 +69,8 @@ void rtt_init(void)
     /* Set RTC counter LSB word */
     RTT_DEV->CNTL = 0x0000;
     /* set prescaler */
-    RTT_DEV->PRLH = ((RTT_PRESCALER>>16)&0x000f);
-    RTT_DEV->PRLL = (RTT_PRESCALER&0xffff);
+    RTT_DEV->PRLH = ((RTT_PRESCALER >> 16) & 0x000f);
+    RTT_DEV->PRLL = (RTT_PRESCALER & 0xffff);
 
     _rtt_leave_config_mode();
 }
@@ -98,7 +98,7 @@ uint32_t rtt_get_counter(void)
     /* wait for syncronization */
     while (!(RTT_DEV->CRL & RTT_FLAG_RSF)) {}
 
-    return (((uint32_t)RTT_DEV->CNTH << 16 ) | (uint32_t)(RTT_DEV->CNTL));
+    return (((uint32_t)RTT_DEV->CNTH << 16) | (uint32_t)(RTT_DEV->CNTL));
 }
 
 void rtt_set_counter(uint32_t counter)
@@ -118,7 +118,7 @@ uint32_t rtt_get_alarm(void)
     /* wait for syncronization */
     while (!(RTT_DEV->CRL & RTT_FLAG_RSF)) {}
 
-    return (((uint32_t)RTT_DEV->ALRH << 16 ) | (uint32_t)(RTT_DEV->ALRL));
+    return (((uint32_t)RTT_DEV->ALRH << 16) | (uint32_t)(RTT_DEV->ALRL));
 }
 
 void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)

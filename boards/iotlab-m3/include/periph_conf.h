@@ -40,9 +40,9 @@ extern "C" {
 #define SPI_0_CLKDIS()      (periph_clk_dis(APB2, RCC_APB2ENR_SPI1EN))
 #define SPI_0_BUS_DIV       1   /* 1 -> SPI runs with full CPU clock, 0 -> half CPU clock */
 /* SPI 0 pin configuration */
-#define SPI_0_CLK_PIN       GPIO_PIN(PORT_A,5)
-#define SPI_0_MOSI_PIN      GPIO_PIN(PORT_A,7)
-#define SPI_0_MISO_PIN      GPIO_PIN(PORT_A,6)
+#define SPI_0_CLK_PIN       GPIO_PIN(PORT_A, 5)
+#define SPI_0_MOSI_PIN      GPIO_PIN(PORT_A, 7)
+#define SPI_0_MISO_PIN      GPIO_PIN(PORT_A, 6)
 /** @} */
 
 #ifdef __cplusplus

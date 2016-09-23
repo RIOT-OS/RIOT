@@ -127,9 +127,9 @@ static const uart_conf_t uart_config[] = {
 #define SPI_0_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_SPI2EN))
 #define SPI_0_BUS_DIV       0   /* 1 -> SPI runs with full CPU clock, 0 -> half CPU clock */
 /* SPI 0 pin configuration */
-#define SPI_0_CLK_PIN       GPIO_PIN(PORT_B,13)
-#define SPI_0_MOSI_PIN      GPIO_PIN(PORT_B,15)
-#define SPI_0_MISO_PIN      GPIO_PIN(PORT_B,14)
+#define SPI_0_CLK_PIN       GPIO_PIN(PORT_B, 13)
+#define SPI_0_MOSI_PIN      GPIO_PIN(PORT_B, 15)
+#define SPI_0_MISO_PIN      GPIO_PIN(PORT_B, 14)
 /** @} */
 
 /**
@@ -149,7 +149,7 @@ static const uart_conf_t uart_config[] = {
 
 /**
  * @name I2C configuration
-  * @{
+ * @{
  */
 #define I2C_NUMOF           (1U)
 #define I2C_0_EN            1
@@ -165,8 +165,8 @@ static const uart_conf_t uart_config[] = {
 #define I2C_0_ERR_IRQ       I2C1_ER_IRQn
 #define I2C_0_ERR_ISR       isr_i2c1_er
 /* I2C 0 pin configuration */
-#define I2C_0_SCL_PIN       GPIO_PIN(PORT_B,6)
-#define I2C_0_SDA_PIN       GPIO_PIN(PORT_B,7)
+#define I2C_0_SCL_PIN       GPIO_PIN(PORT_B, 6)
+#define I2C_0_SDA_PIN       GPIO_PIN(PORT_B, 7)
 /** @} */
 
 #ifdef __cplusplus

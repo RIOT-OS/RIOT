@@ -417,6 +417,7 @@ static inline void _stop(I2C_TypeDef *i2c)
 void I2C_0_ERR_ISR(void)
 {
     unsigned state = I2C1->SR1;
+
     DEBUG("\n\n### I2C1 ERROR OCCURED ###\n");
     DEBUG("status: %08x\n", state);
     if (state & I2C_SR1_OVR) {
@@ -448,6 +449,7 @@ void I2C_0_ERR_ISR(void)
 void I2C_1_ERR_ISR(void)
 {
     unsigned state = I2C2->SR1;
+
     DEBUG("\n\n### I2C2 ERROR OCCURED ###\n");
     DEBUG("status: %08x\n", state);
     if (state & I2C_SR1_OVR) {
@@ -473,6 +475,6 @@ void I2C_1_ERR_ISR(void)
     }
     while (1) {}
 }
-#endif /* I2C_1_EN */
+#endif  /* I2C_1_EN */
 
-#endif /* I2C_NUMOF */
+#endif  /* I2C_NUMOF */

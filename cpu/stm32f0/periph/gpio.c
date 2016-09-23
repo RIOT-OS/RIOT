@@ -184,7 +184,8 @@ void gpio_toggle(gpio_t pin)
 {
     if (gpio_read(pin)) {
         _port(pin)->BRR = (1 << _pin_num(pin));
-    } else {
+    }
+    else {
         _port(pin)->BSRR = (1 << _pin_num(pin));
     }
 }
@@ -193,7 +194,8 @@ void gpio_write(gpio_t pin, int value)
 {
     if (value) {
         _port(pin)->BSRR = (1 << _pin_num(pin));
-    } else {
+    }
+    else {
         _port(pin)->BRR = (1 << _pin_num(pin));
     }
 }
@@ -202,6 +204,7 @@ void isr_exti(void)
 {
     /* only generate interrupts against lines which have their IMR set */
     uint32_t pending_isr = (EXTI->PR & EXTI->IMR);
+
     for (size_t i = 0; i < EXTI_NUMOF; i++) {
         if (pending_isr & (1 << i)) {
             EXTI->PR = (1 << i);        /* clear by writing a 1 */

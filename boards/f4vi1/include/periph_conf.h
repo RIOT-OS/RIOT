@@ -31,7 +31,7 @@ extern "C" {
  * @name Clock system configuration
  * @{
  */
-#define CLOCK_HSE           (16000000U)          /* external oscillator */
+#define CLOCK_HSE           (16000000U)         /* external oscillator */
 #define CLOCK_CORECLOCK     (168000000U)        /* desired core clock frequency */
 
 /* the actual PLL values are automatically generated */
@@ -86,8 +86,8 @@ static const uart_conf_t uart_config[] = {
     {
         .dev        = USART6,
         .rcc_mask   = RCC_APB2ENR_USART6EN,
-        .rx_pin     = GPIO_PIN(PORT_C,7),
-        .tx_pin     = GPIO_PIN(PORT_C,6),
+        .rx_pin     = GPIO_PIN(PORT_C, 7),
+        .tx_pin     = GPIO_PIN(PORT_C, 6),
         .af         = GPIO_AF8,
         .bus        = APB2,
         .irqn       = USART6_IRQn,

@@ -77,6 +77,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
     int now = timer_read(dev);
+
     return timer_set_absolute(dev, channel, now + timeout - 1);
 }
 

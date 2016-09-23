@@ -86,7 +86,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                   gpio_cb_t cb, void *arg)
+                  gpio_cb_t cb, void *arg)
 {
     int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
@@ -172,7 +172,8 @@ int gpio_read(gpio_t pin)
 
     if (port->MODER & (3 << (pin_num * 2))) {   /* if configured as output */
         return port->ODR & (1 << pin_num);      /* read output data reg */
-    } else {
+    }
+    else {
         return port->IDR & (1 << pin_num);      /* else read input data reg */
     }
 }
@@ -191,7 +192,8 @@ void gpio_toggle(gpio_t pin)
 {
     if (gpio_read(pin)) {
         gpio_clear(pin);
-    } else {
+    }
+    else {
         gpio_set(pin);
     }
 }
@@ -200,7 +202,8 @@ void gpio_write(gpio_t pin, int value)
 {
     if (value) {
         gpio_set(pin);
-    } else {
+    }
+    else {
         gpio_clear(pin);
     }
 }
@@ -209,6 +212,7 @@ void isr_exti(void)
 {
     /* only generate interrupts against lines which have their IMR set */
     uint32_t pending_isr = (EXTI->PR & EXTI->IMR);
+
     for (int i = 0; i < EXTI_NUMOF; i++) {
         if (pending_isr & (1 << i)) {
             EXTI->PR = (1 << i);                /* clear by writing a 1 */

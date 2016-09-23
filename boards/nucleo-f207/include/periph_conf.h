@@ -133,7 +133,7 @@ static const timer_conf_t timer_config[TIMER_NUMOF] = {
  * @{
  */
 static const uart_conf_t uart_config[] = {
-     {
+    {
         .dev          = USART3,
         .rcc_mask     = RCC_APB1ENR_USART3EN,
         .rx_pin       = GPIO_PIN(PORT_D, 9),

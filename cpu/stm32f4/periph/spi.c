@@ -39,7 +39,7 @@
  * @brief Data-structure holding the state for a SPI device
  */
 typedef struct {
-    char(*cb)(char data);
+    char (*cb)(char data);
 } spi_state_t;
 
 static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev);
@@ -112,7 +112,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             SPI_0_MISO_PORT_CLKEN();
             SPI_0_MOSI_PORT_CLKEN();
             break;
-#endif /* SPI_0_EN */
+#endif  /* SPI_0_EN */
 #if SPI_1_EN
         case SPI_1:
             spi_port = SPI_1_DEV;
@@ -122,7 +122,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             SPI_1_MISO_PORT_CLKEN();
             SPI_1_MOSI_PORT_CLKEN();
             break;
-#endif /* SPI_1_EN */
+#endif  /* SPI_1_EN */
 #if SPI_2_EN
         case SPI_2:
             spi_port = SPI_2_DEV;
@@ -132,7 +132,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             SPI_2_MISO_PORT_CLKEN();
             SPI_2_MOSI_PORT_CLKEN();
             break;
-#endif /* SPI_2_EN */
+#endif  /* SPI_2_EN */
         default:
             return -2;
     }
@@ -147,14 +147,14 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     /* the NSS (chip select) is managed purely by software */
     spi_port->CR1 |= SPI_CR1_SSM | SPI_CR1_SSI;
     spi_port->CR1 |= (speed_devider << 3);  /* Define serial clock baud rate. 001 leads to f_PCLK/4 */
-    spi_port->CR1 |= (SPI_CR1_MSTR);  /* 1: master configuration */
+    spi_port->CR1 |= (SPI_CR1_MSTR);        /* 1: master configuration */
     spi_port->CR1 |= (conf);
     /* enable SPI */
     spi_port->CR1 |= (SPI_CR1_SPE);
     return 0;
 }
 
-int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
+int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
 {
     SPI_TypeDef *spi_port;
 
@@ -168,8 +168,8 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             SPI_0_MISO_PORT_CLKEN();
             SPI_0_MOSI_PORT_CLKEN();
             /* configure interrupt channel */
-            NVIC_SetPriority(SPI_0_IRQ, SPI_IRQ_PRIO); /* set SPI interrupt priority */
-            NVIC_EnableIRQ(SPI_0_IRQ); /* set SPI interrupt priority */
+            NVIC_SetPriority(SPI_0_IRQ, SPI_IRQ_PRIO);  /* set SPI interrupt priority */
+            NVIC_EnableIRQ(SPI_0_IRQ);                  /* set SPI interrupt priority */
             break;
 #endif /* SPI_0_EN */
 #if SPI_1_EN
@@ -184,7 +184,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             NVIC_SetPriority(SPI_1_IRQ, SPI_IRQ_PRIO);
             NVIC_EnableIRQ(SPI_1_IRQ);
             break;
-#endif /* SPI_1_EN */
+#endif  /* SPI_1_EN */
 #if SPI_2_EN
         case SPI_2:
             spi_port = SPI_2_DEV;
@@ -197,7 +197,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             NVIC_SetPriority(SPI_2_IRQ, SPI_IRQ_PRIO);
             NVIC_EnableIRQ(SPI_2_IRQ);
             break;
-#endif /* SPI_2_EN */
+#endif  /* SPI_2_EN */
         default:
             return -1;
     }
@@ -212,7 +212,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
     /* enable RXNEIE flag to enable rx buffer not empty interrupt */
     spi_port->CR2 |= (SPI_CR2_RXNEIE); /*1:not masked */
     spi_port->CR1 |= (conf);
-     /* the NSS (chip select) is managed by software and NSS is low (slave enabled) */
+    /* the NSS (chip select) is managed by software and NSS is low (slave enabled) */
     spi_port->CR1 |= SPI_CR1_SSM;
     /* set callback */
     spi_config[dev].cb = cb;
@@ -239,7 +239,7 @@ int spi_conf_pins(spi_t dev)
             pin[2] = SPI_0_MISO_PIN;
             af[2] = SPI_0_MISO_AF;
             break;
-#endif /* SPI_0_EN */
+#endif  /* SPI_0_EN */
 #if SPI_1_EN
         case SPI_1:
             port[0] = SPI_1_SCK_PORT;
@@ -252,7 +252,7 @@ int spi_conf_pins(spi_t dev)
             pin[2] = SPI_1_MISO_PIN;
             af[2] = SPI_1_MISO_AF;
             break;
-#endif /* SPI_1_EN */
+#endif  /* SPI_1_EN */
 #if SPI_2_EN
         case SPI_2:
             port[0] = SPI_2_SCK_PORT;
@@ -265,7 +265,7 @@ int spi_conf_pins(spi_t dev)
             pin[2] = SPI_2_MISO_PIN;
             af[2] = SPI_2_MISO_AF;
             break;
-#endif /* SPI_2_EN */
+#endif  /* SPI_2_EN */
         default:
             return -1;
     }

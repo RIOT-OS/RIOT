@@ -22,14 +22,14 @@
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
  * @name Clock system configuration
  * @{
  **/
-#define CLOCK_HSE           (8000000U)             /* frequency of external oscillator */
+#define CLOCK_HSE           (8000000U)              /* frequency of external oscillator */
 #define CLOCK_CORECLOCK     (72000000U)             /* targeted core clock frequency */
 /* configuration of PLL prescaler and multiply values */
 /* CORECLOCK := HSE / PLL_HSE_DIV * PLL_HSE_MUL */
@@ -46,12 +46,12 @@
 #define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_2
 /** @} */
 
- /**
-  * @brief   DAC configuration
-  * @{
-  */
+/**
+ * @brief   DAC configuration
+ * @{
+ */
  #define DAC_NUMOF           (0)
- /** @} */
+/** @} */
 
 /**
  * @name ADC configuration
@@ -118,9 +118,9 @@ static const uart_conf_t uart_config[] = {
 #define SPI_0_CLKDIS()      (periph_clk_dis(APB2, RCC_APB2ENR_SPI1EN))
 #define SPI_0_BUS_DIV       0   /* 1 -> SPI runs with full CPU clock, 0 -> half CPU clock */
 /* SPI 0 pin configuration */
-#define SPI_0_CLK_PIN       GPIO_PIN(PORT_B,15)
-#define SPI_0_MOSI_PIN      GPIO_PIN(PORT_B,17)
-#define SPI_0_MISO_PIN      GPIO_PIN(PORT_B,16)
+#define SPI_0_CLK_PIN       GPIO_PIN(PORT_B, 15)
+#define SPI_0_MOSI_PIN      GPIO_PIN(PORT_B, 17)
+#define SPI_0_MISO_PIN      GPIO_PIN(PORT_B, 16)
 /** @} */
 
 #ifdef __cplusplus

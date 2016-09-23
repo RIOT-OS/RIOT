@@ -30,16 +30,16 @@
 
 #define RTC_WRITE_PROTECTION_KEY1   (0xCA)
 #define RTC_WRITE_PROTECTION_KEY2   (0x53)
-#define RTC_SYNC_PRESCALER          (0xff) /**< prescaler for 32.768 kHz oscillator */
-#define RTC_ASYNC_PRESCALER         (0x7f) /**< prescaler for 32.768 kHz oscillator */
+#define RTC_SYNC_PRESCALER          (0xff)  /**< prescaler for 32.768 kHz oscillator */
+#define RTC_ASYNC_PRESCALER         (0x7f)  /**< prescaler for 32.768 kHz oscillator */
 
-#define MCU_YEAR_OFFSET              (100) /**< struct tm counts years since 1900
-                                               but RTC has only two-digit year
-                                               hence the offset of 100 years. */
+#define MCU_YEAR_OFFSET              (100)  /**< struct tm counts years since 1900
+                                                but RTC has only two-digit year
+                                                hence the offset of 100 years. */
 
 typedef struct {
-    rtc_alarm_cb_t cb;        /**< callback called from RTC interrupt */
-    void *arg;                /**< argument passed to the callback */
+    rtc_alarm_cb_t cb;          /**< callback called from RTC interrupt */
+    void *arg;                  /**< argument passed to the callback */
 } rtc_state_t;
 
 static rtc_state_t rtc_callback;
@@ -62,7 +62,7 @@ void rtc_init(void)
     /* Enter RTC Init mode */
     RTC->ISR = 0;
     RTC->ISR |= RTC_ISR_INIT;
-    while ( (RTC->ISR & RTC_ISR_INITF) == 0 );
+    while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
 
     /* Set 24-h clock */
     RTC->CR |= RTC_CR_FMT;
@@ -74,7 +74,7 @@ void rtc_init(void)
     RTC->PRER |= (RTC_ASYNC_PRESCALER << 16);
 
     /* Exit RTC init mode */
-    RTC->ISR &= (uint32_t)~RTC_ISR_INIT;
+    RTC->ISR &= (uint32_t) ~RTC_ISR_INIT;
 
     /* Enable RTC write protection */
     RTC->WPR = 0xff;
@@ -92,7 +92,7 @@ int rtc_set_time(struct tm *time)
 
     /* Enter RTC Init mode */
     RTC->ISR |= RTC_ISR_INIT;
-    while ( (RTC->ISR & RTC_ISR_INITF) == 0 );
+    while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
 
 
     RTC->DR = ( (((uint32_t)byte2bcd(time->tm_year - MCU_YEAR_OFFSET) << 16) & (RTC_DR_YT | RTC_DR_YU) ) |
@@ -104,7 +104,7 @@ int rtc_set_time(struct tm *time)
                 (((uint32_t)byte2bcd(time->tm_sec)  <<  0) & (RTC_TR_ST | RTC_TR_SU) ) );
 
     /* Exit RTC init mode */
-    RTC->ISR &= (uint32_t)~RTC_ISR_INIT;
+    RTC->ISR &= (uint32_t) ~RTC_ISR_INIT;
     /* Enable RTC write protection */
     RTC->WPR = RTC_WPR_KEY;
     return 0;
@@ -117,8 +117,9 @@ int rtc_get_time(struct tm *time)
     time->tm_mon  = (((RTC->DR & RTC_DR_MT)  >> 12) * 10) + ((RTC->DR & RTC_DR_MU)  >>  8) - 1;
     time->tm_mday = (((RTC->DR & RTC_DR_DT)  >>  4) * 10) + ((RTC->DR & RTC_DR_DU)  >>  0);
     time->tm_hour = (((RTC->TR & RTC_TR_HT)  >> 20) * 10) + ((RTC->TR & RTC_TR_HU)  >> 16);
-    if ( RTC->TR & RTC_TR_PM )
+    if (RTC->TR & RTC_TR_PM) {
         time->tm_hour += 12;
+    }
     time->tm_min  = (((RTC->TR & RTC_TR_MNT) >> 12) * 10) + ((RTC->TR & RTC_TR_MNU) >>  8);
     time->tm_sec  = (((RTC->TR & RTC_TR_ST)  >>  4) * 10) + ((RTC->TR & RTC_TR_SU)  >>  0);
     return 0;
@@ -136,22 +137,22 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 
     /* Enter RTC Init mode */
     RTC->ISR |= RTC_ISR_INIT;
-    while ( (RTC->ISR & RTC_ISR_INITF) == 0 );
+    while ((RTC->ISR & RTC_ISR_INITF) == 0) ;
 
     RTC->CR &= ~(RTC_CR_ALRAE);
-    while ( (RTC->ISR & RTC_ISR_ALRAWF) == 0 );
+    while ((RTC->ISR & RTC_ISR_ALRAWF) == 0) ;
     RTC->ALRMAR &= ~(RTC_ALRMAR_MSK1 | RTC_ALRMAR_MSK2 | RTC_ALRMAR_MSK3 | RTC_ALRMAR_MSK4);
-    RTC->ALRMAR = ( (((uint32_t)byte2bcd(time->tm_mday) << 24) & (RTC_ALRMAR_DT | RTC_ALRMAR_DU) ) |
-                    (((uint32_t)byte2bcd(time->tm_hour) << 16) & (RTC_ALRMAR_HT | RTC_ALRMAR_HU) ) |
-                    (((uint32_t)byte2bcd(time->tm_min)  <<  8) & (RTC_ALRMAR_MNT| RTC_ALRMAR_MNU)) |
-                    (((uint32_t)byte2bcd(time->tm_sec)  <<  0) & (RTC_ALRMAR_ST | RTC_ALRMAR_SU) ) );
+    RTC->ALRMAR = ((((uint32_t)byte2bcd(time->tm_mday) << 24) & (RTC_ALRMAR_DT | RTC_ALRMAR_DU)) |
+                   (((uint32_t)byte2bcd(time->tm_hour) << 16) & (RTC_ALRMAR_HT | RTC_ALRMAR_HU)) |
+                   (((uint32_t)byte2bcd(time->tm_min) <<  8) & (RTC_ALRMAR_MNT | RTC_ALRMAR_MNU)) |
+                   (((uint32_t)byte2bcd(time->tm_sec) <<  0) & (RTC_ALRMAR_ST | RTC_ALRMAR_SU)));
     /* Enable Alarm A */
     RTC->CR |= RTC_CR_ALRAE;
     RTC->CR |= RTC_CR_ALRAIE;
     RTC->ISR &= ~(RTC_ISR_ALRAF);
 
     /* Exit RTC init mode */
-    RTC->ISR &= (uint32_t)~RTC_ISR_INIT;
+    RTC->ISR &= (uint32_t) ~RTC_ISR_INIT;
     /* Enable RTC write protection */
     RTC->WPR = 0xFF;
 
@@ -173,8 +174,9 @@ int rtc_get_alarm(struct tm *time)
     time->tm_mon  = (((RTC->DR     & RTC_DR_MT)      >> 12) * 10) + ((RTC->DR & RTC_DR_MU)          >>  8) - 1;
     time->tm_mday = (((RTC->ALRMAR & RTC_ALRMAR_DT)  >> 28) * 10) + ((RTC->ALRMAR & RTC_ALRMAR_DU)  >> 24);
     time->tm_hour = (((RTC->ALRMAR & RTC_ALRMAR_HT)  >> 20) * 10) + ((RTC->ALRMAR & RTC_ALRMAR_HU)  >> 16);
-    if ( (RTC->ALRMAR & RTC_ALRMAR_PM) && (RTC->CR & RTC_CR_FMT) )
+    if ((RTC->ALRMAR & RTC_ALRMAR_PM) && (RTC->CR & RTC_CR_FMT)) {
         time->tm_hour += 12;
+    }
     time->tm_min  = (((RTC->ALRMAR & RTC_ALRMAR_MNT) >> 12) * 10) + ((RTC->ALRMAR & RTC_ALRMAR_MNU) >>  8);
     time->tm_sec  = (((RTC->ALRMAR & RTC_ALRMAR_ST)  >>  4) * 10) + ((RTC->ALRMAR & RTC_ALRMAR_SU)  >>  0);
     return 0;
@@ -204,7 +206,7 @@ void rtc_poweron(void)
     RCC->CSR &= ~(RCC_CSR_LSEON);
     RCC->CSR &= ~(RCC_CSR_LSEBYP);
     RCC->CSR |= RCC_CSR_LSEON;
-    while ( (RCC->CSR & RCC_CSR_LSERDY) == 0 );
+    while ((RCC->CSR & RCC_CSR_LSERDY) == 0) {}
 
     /* Switch RTC to LSE clock source */
     RCC->CSR &= ~(RCC_CSR_RTCSEL);
@@ -248,15 +250,14 @@ void isr_rtc_alarm(void)
  */
 static uint8_t byte2bcd(uint8_t value)
 {
-  uint8_t bcdhigh = 0;
+    uint8_t bcdhigh = 0;
 
-  while (value >= 10)
-  {
-    bcdhigh++;
-    value -= 10;
-  }
+    while (value >= 10) {
+        bcdhigh++;
+        value -= 10;
+    }
 
-  return  ((uint8_t)(bcdhigh << 4) | value);
+    return  ((uint8_t)(bcdhigh << 4) | value);
 }
 
 #endif /* RTC_NUMOF */
