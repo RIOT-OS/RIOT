@@ -143,11 +143,10 @@ int _ccnl_content(int argc, char **argv)
 static struct ccnl_face_s *_intern_face_get(char *addr_str)
 {
     /* initialize address with 0xFF for broadcast */
-    size_t addr_len = MAX_ADDR_LEN;
     uint8_t relay_addr[MAX_ADDR_LEN];
     memset(relay_addr, UINT8_MAX, MAX_ADDR_LEN);
+    size_t addr_len = gnrc_netif_addr_from_str(relay_addr, sizeof(relay_addr), addr_str);
 
-    addr_len = gnrc_netif_addr_from_str(relay_addr, sizeof(relay_addr), addr_str);
     if (addr_len == 0) {
         printf("Error: %s is not a valid link layer address\n", addr_str);
         return NULL;

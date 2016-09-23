@@ -236,7 +236,7 @@ int _icmpv6_ping(int argc, char **argv)
 
     while ((remaining--) > 0) {
         gnrc_pktsnip_t *pkt;
-        uint32_t start, stop, timeout = 1 * SEC_IN_USEC;
+        uint32_t start, timeout = 1 * SEC_IN_USEC;
 
         pkt = gnrc_icmpv6_echo_build(ICMPV6_ECHO_REQ, id, ++max_seq_expected,
                                      NULL, payload_len);
@@ -277,6 +277,7 @@ int _icmpv6_ping(int argc, char **argv)
 
         /* TODO: replace when #4219 was fixed */
         if (xtimer_msg_receive_timeout64(&msg, (uint64_t)timeout) >= 0) {
+            uint32_t stop;
             switch (msg.type) {
                 case GNRC_NETAPI_MSG_TYPE_RCV:
                     stop = xtimer_now() - start;
