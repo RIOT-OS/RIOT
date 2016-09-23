@@ -113,6 +113,10 @@ static int init_base(uart_t uart, uint32_t baudrate)
             return -1;
     }
 
+    /* Make sure dev is != NULL here, i.e. that the variable is assigned in
+     * all non-returning branches of the switch at the top of this function. */
+    assert(dev != NULL);
+
     /* uart_configure RX and TX pins, set pin to use alternative function mode */
     gpio_init(tx_pin, GPIO_OUT);
     gpio_init_af(tx_pin, af);
@@ -156,6 +160,10 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         default:
             return;
     }
+
+    /* Make sure dev is != NULL here, i.e. that the variable is assigned in
+     * all non-returning branches of the switch at the top of this function. */
+    assert(dev != NULL);
 
     for (size_t i = 0; i < len; i++) {
         while (!(dev->SR & USART_SR_TXE)) {}
