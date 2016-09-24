@@ -225,7 +225,7 @@ void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
     size_t payload_len = gnrc_pkt_len(fragment_msg->pkt->next);
     msg_t msg;
 
-#if defined(DEVELHELP) && defined(ENABLE_DEBUG)
+#if defined(DEVELHELP) && ENABLE_DEBUG
     if (iface == NULL) {
         DEBUG("6lo frag: iface == NULL, expect segmentation fault.\n");
         /* remove original packet from packet buffer */
