@@ -242,7 +242,7 @@ void i2c_release(i2c_t dev);
  * @return                  I2C_ADDR_NACK if response to address byte was NACK
  * @return                  I2C_ERR for any other error
  */
-int i2c_read(i2c_t dev, uint16_t addr, uint8_t *data, size_t len, uint8_t flags);
+int i2c_read(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t flags);
 
 /**
  * @brief   Convenience function for reading data from a given register address
@@ -263,7 +263,7 @@ int i2c_read(i2c_t dev, uint16_t addr, uint8_t *data, size_t len, uint8_t flags)
  * @return                  I2C_ERR for any other error
  */
 int i2c_read_reg(ic2_t dev, uint16_t addr, uint16_t reg,
-                 uint8_t *data, size_t len, uint8_t flags);
+                 void *data, size_t len, uint8_t flags);
 
 /**
  * @brief   Write data from/to the given I2C device
@@ -279,7 +279,7 @@ int i2c_read_reg(ic2_t dev, uint16_t addr, uint16_t reg,
  * @return                  I2C_ERR for any other error
  */
 int i2c_write(i2c_t dev, uint16_t addr,
-              const uint8_t *data, size_t len, uint8_t flags);
+              const void *data, size_t len, uint8_t flags);
 
 /**
  * @brief   Convenience function for writing a single byte onto the bus
@@ -316,7 +316,7 @@ int i2c_write_byte(i2c_t dev, uint16_t addr, uint8_t data, uint8_t flags);
  * @return                  I2C_ERR for any other error
  */
 int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
-                  const uint8_t *data, size_t len, uint8_t flags);
+                  const void *data, size_t len, uint8_t flags);
 
 #ifdef __cplusplus
 }
