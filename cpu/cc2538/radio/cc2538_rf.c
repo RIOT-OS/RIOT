@@ -174,7 +174,5 @@ void cc2538_setup(cc2538_rf_t *dev)
 
     netdev->driver = &cc2538_rf_driver;
 
-    mutex_init(&dev->mutex);
-
     cc2538_init();
 }
