@@ -158,7 +158,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
      *  - init cpha/cpol, BAUD.reg
      *  - enable SPI
      */
-
+    gpio_init(pin_miso, GPIO_IN_PD);
     gpio_init_sercom(pin_sclk, mux_sclk);
     gpio_init_sercom(pin_miso, mux_miso);
     gpio_init_sercom(pin_mosi, mux_mosi);
