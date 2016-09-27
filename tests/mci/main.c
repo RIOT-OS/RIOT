@@ -198,11 +198,6 @@ static void main_test(void)
     printf("MCI write status: 0x%hhx\n", status);
     TEST_ASSERT_EQUAL_INT(0, status);
 
-    // printf("About to write the following to sector 1:\n%s\n", teststring2);
-    // status = mci_write(teststring2, 1, op_sector_count);
-    // printf("MCI write status: 0x%hhx\n", status);
-    // TEST_ASSERT_EQUAL_INT(0, status);
-
     write_test_sector(1);
 
     printf("About to read from SDCard sector 0\n");
