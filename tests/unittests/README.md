@@ -24,6 +24,13 @@ make term
 
 or flash them to your board as you would flash any RIOT application to the board (see [[board documentation|RIOT-Platforms]]).
 
+You can debug your tests by running
+
+```bash
+make debug
+```
+and using GDB as usual.
+
 ### Other output formats
 Other output formats using [*embUnit*](http://embunit.sourceforge.net/)'s ``textui`` library are available by setting the environment variable ``OUTPUT``:
 
