@@ -62,9 +62,12 @@ diskio_sta_t mci_initialize(void) {
     fs.page_size = NATIVE_MCI_SECTOR_SIZE;
     fs.block_size = NATIVE_MCI_BLOCK_SIZE;
     fs.storage_size = NATIVE_MCI_SIZE;
-    flash_sim_init(&fs);
 
-    return DISKIO_RES_OK;
+    if(flash_sim_init(&fs) == 0) {
+        return DISKIO_RES_OK;
+    } else {
+        return DISKIO_RES_ERROR;
+    }
 }
 
 diskio_sta_t mci_status(void) {
@@ -79,7 +82,9 @@ diskio_result_t mci_read(unsigned char *buff, unsigned long sector, unsigned cha
 
     for(unsigned int i=0; i<count; i++) {
         unsigned char *page_buffer = buff + (i * NATIVE_MCI_SECTOR_SIZE);
-        flash_sim_read(&fs, page_buffer, sector + i);
+        if(flash_sim_read(&fs, page_buffer, sector + i) != 0) {
+            return DISKIO_RES_ERROR;
+        }
     }
 
     return DISKIO_RES_OK;
@@ -93,7 +98,9 @@ diskio_result_t mci_write(const unsigned char *buff, unsigned long sector, unsig
 
     for(unsigned int i=0; i<count; i++) {
         unsigned char *page_buffer = ((unsigned char*) buff) + (i * NATIVE_MCI_SECTOR_SIZE);
-        flash_sim_write(&fs, page_buffer, sector + i);
+        if(flash_sim_write(&fs, page_buffer, sector + i) != 0) {
+            return DISKIO_RES_ERROR;
+        }
     }
 
     return DISKIO_RES_OK;
@@ -134,8 +141,12 @@ diskio_result_t mci_ioctl(
                 return DISKIO_RES_PARERR;
             }
 
-            flash_sim_erase(&fs, block);
-            res = DISKIO_RES_OK;
+            if(flash_sim_erase(&fs, block) == 0) {
+                res = DISKIO_RES_OK;
+            } else {
+                res = DISKIO_RES_ERROR;
+            }
+
             break;
 
         /* Get card type flags (1 byte) */
