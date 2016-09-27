@@ -92,7 +92,8 @@ extern "C" {
  *
  * @note Another name for ::DEBUG_PRINT
  */
-#define DEBUG(...) DEBUG_PRINT(__VA_ARGS__)
+#define DEBUG(...) DEBUG_PRINT("%s:%d: ", DEBUG_FUNC, __LINE__); \
+                   DEBUG_PRINT(__VA_ARGS__)
 #else
 #define DEBUG(...)
 #endif
