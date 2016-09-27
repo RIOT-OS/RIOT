@@ -13,7 +13,7 @@
  * @file        tests-gnrc_aodvv2.h
  * @brief       Unittests for the ``aodvv2`` module
  *
- * @author      Lotte Steenbrink <lotte.steenbrink@haw-hamburg.de>
+ * @author      Lotte Steenbrink <lotte@zombietetris.de>
  */
 #ifndef TESTS_GNRC_AODVV2_H_
 #define TESTS_GNRC_AODVV2_H_
@@ -37,11 +37,11 @@ void tests_gnrc_aodvv2(void);
 Test *tests_gnrc_aodvv2_seqnum_tests(void);
 
 /**
- * @brief   Generates tests for aodvv2/routingtable.h and aodvv2/utils.h
+ * @brief   Generates tests for aodvv2/routingtable.h
  *
  * @return  embUnit tests if successful, NULL if not.
  */
-Test *tests_gnrc_aodvv2_table_tests(void);
+Test *tests_gnrc_aodvv2_routingtable_tests(void);
 
 #ifdef __cplusplus
 }
