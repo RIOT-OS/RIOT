@@ -299,7 +299,7 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void* info)
 
     if (buf) {
         if (len < (int)dev->last_framesize) {
-            DEBUG("ethos _recv(): receive buffer too small.");
+            DEBUG("ethos _recv(): receive buffer too small.\n");
             return -1;
         }
 
@@ -307,7 +307,7 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void* info)
         dev->last_framesize = 0;
 
         if ((tsrb_get(&dev->inbuf, buf, len) != len)) {
-            DEBUG("ethos _recv(): inbuf doesn't contain enough bytes.");
+            DEBUG("ethos _recv(): inbuf doesn't contain enough bytes.\n");
             return -1;
         }
 
