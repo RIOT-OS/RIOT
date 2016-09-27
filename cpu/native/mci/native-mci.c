@@ -13,14 +13,14 @@
 
 /**
  * @file
- * @brief   Emulates the MCI storage driver by providing an in-memory
- *          backend. It is 8MiB by default and its size can be increased
- *          using `NATIVE_MCI_SIZE_MULTIPLIER` which gets multiplied by
- *          one MiB, resulting in the actual size of the virtual disk.
- *          Additional parameters are:
+ * @brief   Implements the MCI storage driver by using the flash_sim component
+ *          as backend. It is 8 MiB by default and its size can be increased
+ *          using `NATIVE_MCI_SIZE_MIB` which specifies the MCI storage size in MiB.
  *
- *              Sector (page) size: 512B
- *              Eerase Block size: 512KiB (524288 Bytes)
+ *          Additional properties are:
+ *
+ *              Sector (page) size: 512 B
+ *              Erase block size: 512 KiB (524288 Bytes)
  *
  * @author  Lucas Jenß <lucas@x3ro.de>
  *
@@ -35,11 +35,11 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#ifndef NATIVE_MCI_SIZE_MULTIPLIER
-#define NATIVE_MCI_SIZE_MULTIPLIER 8
+#ifndef NATIVE_MCI_SIZE_MIB
+#define NATIVE_MCI_SIZE_MIB 8
 #endif
 
-#define NATIVE_MCI_SIZE (1024 * 1024 * NATIVE_MCI_SIZE_MULTIPLIER)
+#define NATIVE_MCI_SIZE (1024 * 1024 * NATIVE_MCI_SIZE_MIB)
 #define NATIVE_MCI_SECTOR_SIZE (512)
 #define NATIVE_MCI_BLOCK_SIZE (512 * 1024)
 #define NATIVE_MCI_SECTOR_COUNT (NATIVE_MCI_SIZE / NATIVE_MCI_SECTOR_SIZE)
