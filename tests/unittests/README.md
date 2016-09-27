@@ -22,7 +22,7 @@ You then can run the tests by calling
 make term
 ```
 
-or flash them to your board as you would flash any RIOT application to the board (see [[board documentation|RIOT-Platforms]]).
+or flash them to your board as you would flash any RIOT application to the board (see [board documentation|RIOT-Platforms](https://github.com/RIOT-OS/RIOT/wiki/RIOT-Platforms)).
 
 ### Other output formats
 Other output formats using [*embUnit*](http://embunit.sourceforge.net/)'s ``textui`` library are available by setting the environment variable ``OUTPUT``:
