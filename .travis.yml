@@ -21,6 +21,7 @@ env:
         - BUILDTEST_MCU_GROUP=avr8
         - BUILDTEST_MCU_GROUP=msp430
         - BUILDTEST_MCU_GROUP=arm7
+        - BUILDTEST_MCU_GROUP=host
 
 before_install:
     - source ./dist/tools/pr_check/check_labels.sh
