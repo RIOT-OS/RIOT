@@ -71,15 +71,15 @@ ftl_partition_s *partitions[] = {
 };
 
 int write(const unsigned char *buffer, uint32_t page, uint32_t offset, uint16_t length) {
-    assert__(offset == 0);
-    assert__(length == device.subpage_size);
+    assert(offset == 0);
+    assert(length == device.subpage_size);
     int ret = mci_write(buffer, page, 1);
     return ret;
 }
 
 int read(unsigned char *buffer, uint32_t page, uint32_t offset, uint16_t length) {
-    assert__(offset == 0);
-    assert__(length == device.subpage_size);
+    assert(offset == 0);
+    assert(length == device.subpage_size);
     int ret = mci_read(buffer, page, 1);
     return ret;
 }
@@ -98,10 +98,10 @@ int main(void)
 
     device.partitions = partitions;
     ret = ftl_init(&device);
-    assert__(ret == 0);
+    assert(ret == 0);
 
     ret = ftl_read_raw(&index_partition, device._subpage_buffer, 0);
-    assert__(ret == 0);
+    assert(ret == 0);
 
     printf("Success\n");
     return 0;
