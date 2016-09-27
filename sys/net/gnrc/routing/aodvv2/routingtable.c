@@ -157,8 +157,10 @@ void routingtable_break_and_get_all_hopping_over(struct netaddr *hop,
                 unreachable_nodes[*len].seqnum = routingtable[i].seqnum;
 
                 (*len)++;
+
                 DEBUG("\t[routing] unreachable node found: %s\n", netaddr_to_string(&nbuf, &routingtable[i].nextHopAddr));
             }
+
             routingtable[i].state = ROUTE_STATE_INVALID;
             DEBUG("\t[routing] number of unreachable nodes: %i\n", *len);
         }

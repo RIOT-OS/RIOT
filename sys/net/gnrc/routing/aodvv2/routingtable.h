@@ -87,7 +87,7 @@ struct netaddr *routingtable_get_next_hop(struct netaddr *dest,
  * @param[in] metricType     The metric type of the route towards addr
  * @param[in] metric         The metric value of the route
  * @param[in] state          The state of the route
- * @param[in] timestamp      The time at wich the route info was received
+ * @param[in] timestamp      The time at which the route info was received
  */
 void routingtable_add_entry(struct netaddr *addr, aodvv2_seqnum_t *seqnum,
                             struct netaddr *nextHopAddr, aodvv2_metric_t metricType,
@@ -113,7 +113,7 @@ struct aodvv2_routing_entry_t *routingtable_get_entry(struct netaddr *addr,
  * @param[in] nextHopAddr    The (new) next hop towards addr
  * @param[in] metric         The (new) metric value
  * @param[in] state          The (new) route state
- * @param[in] timestamp      The time at wich the new route info was received
+ * @param[in] timestamp      The time at which the new route info was received
  * @return                   Routing table entry if it exists, NULL otherwise
  */
 struct aodvv2_routing_entry_t *routingtable_update_entry(

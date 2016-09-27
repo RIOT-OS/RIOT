@@ -616,6 +616,9 @@ static enum rfc5444_result _cb_rerr_blocktlv_addresstlvs_okay(struct rfc5444_rea
         fib_remove_entry(&gnrc_ipv6_fib_table, packet_data.origNode.addr._addr, sizeof(ipv6_addr_t));
     }
 
+    /* TODO: run routingtable_break_and_get_all_hopping_over() in addr, remove
+       from fib also and include in RERR! */
+
     return RFC5444_OKAY;
 }
 
