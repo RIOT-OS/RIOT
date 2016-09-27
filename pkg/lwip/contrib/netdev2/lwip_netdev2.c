@@ -46,7 +46,6 @@
 #define ETHERNET_IFNAME1 'E'
 #define ETHERNET_IFNAME2 'T'
 
-/* running number for different interfaces */
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static char _stack[LWIP_NETDEV2_STACKSIZE];
 static msg_t _queue[LWIP_NETDEV2_QUEUE_LEN];
