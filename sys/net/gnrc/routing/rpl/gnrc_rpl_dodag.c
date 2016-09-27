@@ -401,16 +401,16 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
         inst->max_rank_inc = GNRC_RPL_DEFAULT_MAX_RANK_INCREASE;
     }
     else if (inst == NULL) {
-        DEBUG("RPL: could not allocate memory for a new instance with id %d", instance_id);
+        DEBUG("RPL: could not allocate memory for a new instance with id %d\n", instance_id);
         return NULL;
     }
     else {
-        DEBUG("RPL: instance (%d) exists", instance_id);
+        DEBUG("RPL: instance (%d) exists\n", instance_id);
         return NULL;
     }
 
     if (!gnrc_rpl_dodag_init(inst, dodag_id, iface, netif_addr)) {
-        DEBUG("RPL: could not initialize DODAG");
+        DEBUG("RPL: could not initialize DODAG\n");
         gnrc_rpl_instance_remove(inst);
         return NULL;
     }

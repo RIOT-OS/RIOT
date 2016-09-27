@@ -275,7 +275,7 @@ static int _recv(netdev2_t *netdev2, void *buf, size_t len, void *info)
         }
     }
     else if (nread == 0) {
-        DEBUG("_native_handle_tap_input: ignoring null-event");
+        DEBUG("_native_handle_tap_input: ignoring null-event\n");
     }
     else {
         errx(EXIT_FAILURE, "internal error _rx_event");

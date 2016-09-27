@@ -145,7 +145,7 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
     netdev2_t *dev = gnrc_netdev2->dev;
 
     if (pkt == NULL) {
-        DEBUG("gnrc_netdev2_eth: pkt was NULL");
+        DEBUG("gnrc_netdev2_eth: pkt was NULL\n");
         return -EINVAL;
     }
 

@@ -93,6 +93,7 @@ static void pir_send_msg(pir_t *dev, pir_event_t event)
             dev->msg_thread_pid = KERNEL_PID_UNDEF;
             break;
     }
+    DEBUG("\n");
 }
 
 static void pir_callback(void *arg)

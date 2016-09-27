@@ -59,7 +59,7 @@ void auto_init_kw2xrf(void)
                 p->int_pin);
 
         if (res < 0) {
-            DEBUG("Error initializing KW2xrf radio device!");
+            DEBUG("Error initializing KW2xrf radio device!\n");
         }
         else {
             gnrc_nomac_init(_nomac_stacks[i],

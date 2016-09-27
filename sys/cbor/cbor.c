@@ -224,6 +224,7 @@ void dump_memory(const unsigned char *data, size_t size)
     for (size_t i = 0; i < size; ++i) {
         DEBUG("%02X", data[i]);
     }
+    DEBUG("\n");
 }
 #endif /* CBOR_NO_PRINT */
 
@@ -874,7 +875,7 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
                 offset += inner_read_bytes = cbor_stream_decode_at(stream, offset, indent + 2);
 
                 if (inner_read_bytes == 0) {
-                    DEBUG("Failed to read array item at position %d", i);
+                    DEBUG("Failed to read array item at position %d\n", i);
                     break;
                 }
 
@@ -908,7 +909,7 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
                 offset += value_read_bytes = cbor_stream_decode_at(stream, offset, indent + 2); /* value */
 
                 if (key_read_bytes == 0 || value_read_bytes == 0) {
-                    DEBUG("Failed to read key-value pair at position %d", i);
+                    DEBUG("Failed to read key-value pair at position %d\n", i);
                     break;
                 }
 
