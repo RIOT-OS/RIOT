@@ -47,7 +47,6 @@
 #define ETHERNET_IFNAME2 'T'
 
 /* running number for different interfaces */
-static uint8_t _num = 0;
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static char _stack[LWIP_NETDEV2_STACKSIZE];
 static msg_t _queue[LWIP_NETDEV2_QUEUE_LEN];
@@ -88,13 +87,11 @@ err_t lwip_netdev2_init(struct netif *netif)
                             sizeof(dev_type)) < 0) {
         return ERR_IF;
     }
-    netif->num = _num++;
 #if LWIP_NETIF_HOSTNAME
     netif->hostname = "riot";
 #endif /* LWIP_NETIF_HOSTNAME */
 
     /* XXX: for now assume its Ethernet, since netdev2 is implemented only by ethernet drivers */
-    netif->flags = 0;
     switch (dev_type) {
 #ifdef MODULE_NETDEV2_ETH
         case NETDEV2_TYPE_ETHERNET:
