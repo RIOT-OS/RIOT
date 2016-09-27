@@ -232,7 +232,7 @@ void md5_init(md5_ctx_t *ctx)
     ctx->abcd[3] = 0x10325476;
 }
 
-void md5_update(md5_ctx_t *ctx, const uint8_t *data, size_t len)
+void md5_update(md5_ctx_t *ctx, const void *data, size_t len)
 {
     /* Add the new block's length to the total length. */
     ctx->len += (uint32_t)len;
@@ -240,7 +240,9 @@ void md5_update(md5_ctx_t *ctx, const uint8_t *data, size_t len)
     /* Copy the new block's data into the context block.
      * Call the permute() function whenever the context block is full. */
     for (size_t i = 0; i < len; i++) {
-        ctx->block[ctx->b_used] = data[i];
+        const uint8_t *d = data;
+
+        ctx->block[ctx->b_used] = d[i];
         (ctx->b_used)++;
         if (64 == ctx->b_used) {
             permute(ctx->abcd, ctx->block);
@@ -250,7 +252,7 @@ void md5_update(md5_ctx_t *ctx, const uint8_t *data, size_t len)
 }
 
 
-void md5_final(md5_ctx_t *ctx, uint8_t *dst)
+void md5_final(md5_ctx_t *ctx, void *digest)
 {
     uint32_t l;
 
@@ -289,18 +291,20 @@ void md5_final(md5_ctx_t *ctx, uint8_t *dst)
 
     /* Now copy the result into the output buffer and we're done */
     for (int i = 0; i < 4; i++) {
-        dst[ 0 + i] = GETBYTE(ctx->abcd[0], i);
-        dst[ 4 + i] = GETBYTE(ctx->abcd[1], i);
-        dst[ 8 + i] = GETBYTE(ctx->abcd[2], i);
-        dst[12 + i] = GETBYTE(ctx->abcd[3], i);
+        uint8_t *d = digest;
+
+        d[ 0 + i] = GETBYTE(ctx->abcd[0], i);
+        d[ 4 + i] = GETBYTE(ctx->abcd[1], i);
+        d[ 8 + i] = GETBYTE(ctx->abcd[2], i);
+        d[12 + i] = GETBYTE(ctx->abcd[3], i);
     }
 }
 
-void md5(uint8_t *dst, const uint8_t *src, size_t len)
+void md5(void *digest, const void *data, size_t len)
 {
     md5_ctx_t ctx;
 
     md5_init(&ctx);
-    md5_update(&ctx, src, len);
-    md5_final(&ctx, dst);
+    md5_update(&ctx, data, len);
+    md5_final(&ctx, digest);
 }
