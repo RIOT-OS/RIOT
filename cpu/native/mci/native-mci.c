@@ -141,7 +141,7 @@ diskio_result_t mci_ioctl(
                 return DISKIO_RES_PARERR;
             }
 
-            if(flash_sim_erase(&fs, block) == 0) {
+            if(flash_sim_erase(&fs, block/1024) == 0) {
                 res = DISKIO_RES_OK;
             } else {
                 res = DISKIO_RES_ERROR;

@@ -189,6 +189,8 @@ static void main_test(void)
         printf("%s, \n", sprint_buffer);
     }
 
+    erase_block(0);
+
     unsigned char op_sector_count = 1; // Read/write single sector
 
     printf("About to write the following sector 0:\n%s\n", teststring1);
