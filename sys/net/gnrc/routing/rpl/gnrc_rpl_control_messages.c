@@ -23,6 +23,10 @@
 #include "net/gnrc.h"
 #include "net/eui64.h"
 
+#ifdef MODULE_NETSTATS_RPL
+#include "gnrc_rpl_internal/netstats.h"
+#endif
+
 #include "net/gnrc/rpl.h"
 #ifndef GNRC_RPL_WITHOUT_VALIDATION
 #include "gnrc_rpl_internal/validation.h"
@@ -215,6 +219,11 @@ void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
     }
     pkt = tmp;
 
+#ifdef MODULE_NETSTATS_RPL
+    gnrc_rpl_netstats_tx_DIO(&gnrc_rpl_netstats, gnrc_pkt_len(pkt),
+                             (destination && !ipv6_addr_is_multicast(destination)));
+#endif
+
     gnrc_rpl_send(pkt, dodag->iface, NULL, destination, &dodag->dodag_id);
 }
 
@@ -246,6 +255,11 @@ void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
     /* TODO add padding may be removed if packet size grows */
     memcpy((dis + 1), padding, sizeof(padding));
 
+#ifdef MODULE_NETSTATS_RPL
+    gnrc_rpl_netstats_tx_DIS(&gnrc_rpl_netstats, gnrc_pkt_len(pkt),
+                             (destination && !ipv6_addr_is_multicast(destination)));
+#endif
+
     gnrc_rpl_send(pkt, KERNEL_PID_UNDEF, NULL, destination, (inst? &(inst->dodag.dodag_id) : NULL));
 }
 
@@ -254,14 +268,17 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
 {
     /* TODO handle Solicited Information Option */
     (void)iface;
+    (void)dis;
+    (void)len;
+
+#ifdef MODULE_NETSTATS_RPL
+    gnrc_rpl_netstats_rx_DIS(&gnrc_rpl_netstats, len, (dst && !ipv6_addr_is_multicast(dst)));
+#endif
 
 #ifndef GNRC_RPL_WITHOUT_VALIDATION
     if (!gnrc_rpl_validation_DIS(dis, len)) {
         return;
     }
-#else
-    (void) dis;
-    (void) len;
 #endif
 
     if (ipv6_addr_is_multicast(dst)) {
@@ -437,10 +454,16 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
     return true;
 }
 
-void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src, uint16_t len)
+void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
+                       uint16_t len)
 {
+    (void) dst;
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
+
+#ifdef MODULE_NETSTATS_RPL
+    gnrc_rpl_netstats_rx_DIO(&gnrc_rpl_netstats, len, (dst && !ipv6_addr_is_multicast(dst)));
+#endif
 
 #ifndef GNRC_RPL_WITHOUT_VALIDATION
     if (!gnrc_rpl_validation_DIO(dio, len)) {
@@ -821,6 +844,11 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
     }
     pkt = tmp;
 
+#ifdef MODULE_NETSTATS_RPL
+    gnrc_rpl_netstats_tx_DAO(&gnrc_rpl_netstats, gnrc_pkt_len(pkt),
+                             (destination && !ipv6_addr_is_multicast(destination)));
+#endif
+
     gnrc_rpl_send(pkt, dodag->iface, NULL, destination, &dodag->dodag_id);
 
     GNRC_RPL_COUNTER_INCREMENT(dodag->dao_seq);
@@ -868,12 +896,23 @@ void gnrc_rpl_send_DAO_ACK(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, 
     dao_ack->dao_sequence = seq;
     dao_ack->status = 0;
 
+#ifdef MODULE_NETSTATS_RPL
+    gnrc_rpl_netstats_tx_DAO_ACK(&gnrc_rpl_netstats, gnrc_pkt_len(pkt),
+                                 (destination && !ipv6_addr_is_multicast(destination)));
+#endif
+
     gnrc_rpl_send(pkt, dodag->iface, NULL, destination, &dodag->dodag_id);
 }
 
-void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src, uint16_t len)
+void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
+                       uint16_t len)
 {
     (void)iface;
+    (void)dst;
+
+#ifdef MODULE_NETSTATS_RPL
+    gnrc_rpl_netstats_rx_DAO(&gnrc_rpl_netstats, len, (dst && !ipv6_addr_is_multicast(dst)));
+#endif
 
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
@@ -931,19 +970,25 @@ void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src
     gnrc_rpl_delay_dao(dodag);
 }
 
-void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, uint16_t len)
+void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, ipv6_addr_t *src,
+                           ipv6_addr_t *dst, uint16_t len)
 {
     (void)iface;
+    (void)src;
+    (void)dst;
+    (void) len;
 
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
+
+#ifdef MODULE_NETSTATS_RPL
+    gnrc_rpl_netstats_rx_DAO_ACK(&gnrc_rpl_netstats, len, (dst && !ipv6_addr_is_multicast(dst)));
+#endif
 
 #ifndef GNRC_RPL_WITHOUT_VALIDATION
     if (!gnrc_rpl_validation_DAO_ACK(dao_ack, len)) {
         return;
     }
-#else
-    (void) len;
 #endif
 
     if ((inst = gnrc_rpl_instance_get(dao_ack->instance_id)) == NULL) {

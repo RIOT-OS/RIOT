@@ -43,6 +43,10 @@ static uint8_t _instance_id;
 gnrc_rpl_instance_t gnrc_rpl_instances[GNRC_RPL_INSTANCES_NUMOF];
 gnrc_rpl_parent_t gnrc_rpl_parents[GNRC_RPL_PARENTS_NUMOF];
 
+#ifdef MODULE_NETSTATS_RPL
+netstats_rpl_t gnrc_rpl_netstats;
+#endif
+
 static void _update_lifetime(void);
 static void _dao_handle_send(gnrc_rpl_dodag_t *dodag);
 static void _receive(gnrc_pktsnip_t *pkt);
@@ -70,6 +74,10 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
 
         gnrc_rpl_of_manager_init();
         xtimer_set_msg(&_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
+
+#ifdef MODULE_NETSTATS_RPL
+        memset(&gnrc_rpl_netstats, 0, sizeof(gnrc_rpl_netstats));
+#endif
     }
 
     /* register all_RPL_nodes multicast address */
@@ -149,17 +157,17 @@ static void _receive(gnrc_pktsnip_t *icmpv6)
         case GNRC_RPL_ICMPV6_CODE_DIO:
             DEBUG("RPL: DIO received\n");
             gnrc_rpl_recv_DIO((gnrc_rpl_dio_t *)(icmpv6_hdr + 1), iface, &ipv6_hdr->src,
-                              byteorder_ntohs(ipv6_hdr->len));
+                              &ipv6_hdr->dst, byteorder_ntohs(ipv6_hdr->len));
             break;
         case GNRC_RPL_ICMPV6_CODE_DAO:
             DEBUG("RPL: DAO received\n");
             gnrc_rpl_recv_DAO((gnrc_rpl_dao_t *)(icmpv6_hdr + 1), iface, &ipv6_hdr->src,
-                              byteorder_ntohs(ipv6_hdr->len));
+                              &ipv6_hdr->dst, byteorder_ntohs(ipv6_hdr->len));
             break;
         case GNRC_RPL_ICMPV6_CODE_DAO_ACK:
             DEBUG("RPL: DAO-ACK received\n");
-            gnrc_rpl_recv_DAO_ACK((gnrc_rpl_dao_ack_t *)(icmpv6_hdr + 1), iface,
-                                  byteorder_ntohs(ipv6_hdr->len));
+            gnrc_rpl_recv_DAO_ACK((gnrc_rpl_dao_ack_t *)(icmpv6_hdr + 1), iface, &ipv6_hdr->src,
+                                  &ipv6_hdr->dst, byteorder_ntohs(ipv6_hdr->len));
             break;
 #ifdef MODULE_GNRC_RPL_P2P
         case GNRC_RPL_P2P_ICMPV6_CODE_DRO:
