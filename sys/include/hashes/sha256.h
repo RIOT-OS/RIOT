@@ -89,51 +89,48 @@ void sha256_init(sha256_context_t *ctx);
 /**
  * @brief Add bytes into the hash
  *
- * @param ctx  sha256_context_t handle to use
- * @param[in] data      Input data
- * @param[in] len       Length of @p data
+ * @param ctx      sha256_context_t handle to use
+ * @param[in] data Input data
+ * @param[in] len  Length of @p data
  */
-void sha256_update(sha256_context_t *ctx, const uint8_t *data, size_t len);
+void sha256_update(sha256_context_t *ctx, const void *data, size_t len);
 
 /**
  * @brief SHA-256 finalization.  Pads the input data, exports the hash value,
  * and clears the context state.
  *
- * @param digest resulting digest, this is the hash of all the bytes
  * @param ctx    sha256_context_t handle to use
+ * @param digest resulting digest, this is the hash of all the bytes
  */
-void sha256_final(sha256_context_t *ctx, uint8_t *dst);
+void sha256_final(sha256_context_t *ctx, void *digest);
 
 /**
  * @brief A wrapper function to simplify the generation of a hash, this is
  * usefull for generating sha256 for one buffer
  *
- * @param d pointer to the buffer to generate hash from
- * @param n length of the buffer
- * @param md optional pointer to an array for the result, length must be
- *           SHA256_DIGEST_LENGTH
- *           if md == NULL, one static buffer is used
+ * @param data   pointer to the buffer to generate hash from
+ * @param len    length of the buffer
+ * @param digest optional pointer to an array for the result, length must be
+ *               SHA256_DIGEST_LENGTH
+ *               if digest == NULL, one static buffer is used
  */
-unsigned char *sha256(const unsigned char *d, size_t n, unsigned char *md);
+void *sha256(const void *data, size_t len, void *digest);
 
 /**
  * @brief function to compute a hmac-sha256 from a given message
  *
  * @param[in] key key used in the hmac-sha256 computation
  * @param[in] key_length the size in bytes of the key
- * @param[in] message pointer to the message to generate the hmac-sha256
- * @param[in] message_length the length of the message in bytes
- * @param[out] result the computed hmac-sha256,
+ * @param[in] data pointer to the buffer to generate the hmac-sha256
+ * @param[in] len the length of the message in bytes
+ * @param[out] digest the computed hmac-sha256,
  *             length MUST be SHA256_DIGEST_LENGTH
- *             if result == NULL, a static buffer is used
+ *             if digest == NULL, a static buffer is used
  * @returns pointer to the resulting digest.
  *          if result == NULL the pointer points to the static buffer
  */
-const unsigned char *hmac_sha256(const unsigned char *key,
-                                 size_t key_length,
-                                 const unsigned *message,
-                                 size_t message_length,
-                                 unsigned char *result);
+const void *hmac_sha256(const void *key, size_t key_length,
+                        const void *data, size_t len, void *digest);
 
 /**
  * @brief function to produce a hash chain statring with a given seed element.
@@ -149,8 +146,8 @@ const unsigned char *hmac_sha256(const unsigned char *key,
  *
  * @returns pointer to tail_element
  */
-unsigned char *sha256_chain(const unsigned char *seed, size_t seed_length,
-                            size_t elements, unsigned char *tail_element);
+void *sha256_chain(const void *seed, size_t seed_length,
+                   size_t elements, void *tail_element);
 
 /**
  * @brief function to produce a hash chain statring with a given seed element.
@@ -180,12 +177,10 @@ unsigned char *sha256_chain(const unsigned char *seed, size_t seed_length,
  *
  * @returns pointer to tail_element
  */
-unsigned char *sha256_chain_with_waypoints(const unsigned char *seed,
-                                           size_t seed_length,
-                                           size_t elements,
-                                           unsigned char *tail_element,
-                                           sha256_chain_idx_elm_t *waypoints,
-                                           size_t *waypoints_length);
+void *sha256_chain_with_waypoints(const void *seed, size_t seed_length,
+                                  size_t elements, void *tail_element,
+                                  sha256_chain_idx_elm_t *waypoints,
+                                  size_t *waypoints_length);
 
 /**
  * @brief function to verify if a given chain element is part of the chain.
@@ -198,9 +193,9 @@ unsigned char *sha256_chain_with_waypoints(const unsigned char *seed,
  * @returns 0 if element is verified to be part of the chain at element_index
  *          1 if the element cannot be verified as part of the chain
  */
-int sha256_chain_verify_element(unsigned char *element,
+int sha256_chain_verify_element(void *element,
                                 size_t element_index,
-                                unsigned char *tail_element,
+                                void *tail_element,
                                 size_t chain_length);
 
 #ifdef __cplusplus
