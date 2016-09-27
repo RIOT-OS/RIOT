@@ -12,9 +12,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define MYDEBUG(...) DEBUG("%s: ", __FUNCTION__); \
-                     DEBUG(__VA_ARGS__)
-
 #define FLASH_SIM_FILENAME "flash_sim.dat"
 
 bool _valid_struct_params(flash_sim *fs) {
@@ -39,7 +36,7 @@ int flash_sim_init(flash_sim *fs) {
     }
 
     if(fs->_fp == NULL) {
-        MYDEBUG("failed opening file %s\n", FLASH_SIM_FILENAME);
+        DEBUG("failed opening file %s\n", FLASH_SIM_FILENAME);
         return -EBADFD;
     }
 
@@ -56,19 +53,19 @@ int flash_sim_init(flash_sim *fs) {
 
 int flash_sim_format(flash_sim *fs) {
     if(fs->_fp == NULL) {
-        MYDEBUG("struct was not initialized\n");
+        DEBUG("struct was not initialized\n");
         return -ENODEV;
     }
 
     int ret = fclose(fs->_fp);
     if(ret != 0) {
-        MYDEBUG("could not close file\n");
+        DEBUG("could not close file\n");
         return -EBADFD;
     }
 
     fs->_fp = fopen(FLASH_SIM_FILENAME, "w+");
     if(fs->_fp == NULL) {
-        MYDEBUG("failed opening file %s\n", FLASH_SIM_FILENAME);
+        DEBUG("failed opening file %s\n", FLASH_SIM_FILENAME);
         return -EBADFD;
     }
 
@@ -80,22 +77,22 @@ int flash_sim_format(flash_sim *fs) {
 }
 
 int flash_sim_read(const flash_sim *fs, void *buffer, uint32_t page) {
-    MYDEBUG("page = %u\n", page);
+    DEBUG("page = %u\n", page);
 
     if(fs->_fp == NULL) {
-        MYDEBUG("struct was not initialized\n");
+        DEBUG("struct was not initialized\n");
         return -ENODEV;
     }
 
     int ret = fseek(fs->_fp, page * fs->page_size, SEEK_SET);
     if(ret != 0) {
-        MYDEBUG("seek failed: out of range\n");
+        DEBUG("seek failed: out of range\n");
         return -EFAULT;
     }
 
     ret = fread(buffer, fs->page_size, 1, fs->_fp);
     if(ret != 1) {
-        MYDEBUG("read failed: out of range\n");
+        DEBUG("read failed: out of range\n");
         return -EFAULT;
     }
 
@@ -120,7 +117,7 @@ int flash_sim_write_partial(const flash_sim *fs, const void *buffer, uint32_t pa
     unsigned char *page_buffer = malloc(fs->page_size);
     int ret = flash_sim_read(fs, page_buffer, page);
     if(ret != 0) {
-        MYDEBUG("read failed page = %u\n", page);
+        DEBUG("read failed page = %u\n", page);
         free(page_buffer);
         return ret;
     }
@@ -128,7 +125,7 @@ int flash_sim_write_partial(const flash_sim *fs, const void *buffer, uint32_t pa
     memcpy(page_buffer+offset, buffer, length);
     ret = flash_sim_write(fs, page_buffer, page);
     if(ret != 0) {
-        MYDEBUG("write failed page = %u\n", page);
+        DEBUG("write failed page = %u\n", page);
         free(page_buffer);
         return ret;
     }
@@ -137,10 +134,10 @@ int flash_sim_write_partial(const flash_sim *fs, const void *buffer, uint32_t pa
 }
 
 int flash_sim_write(const flash_sim *fs, const void *buffer, uint32_t page) {
-    MYDEBUG("page = %u\n", page);
+    DEBUG("page = %u\n", page);
 
     if(fs->_fp == NULL) {
-        MYDEBUG("struct was not initialized\n");
+        DEBUG("struct was not initialized\n");
         return -ENODEV;
     }
 
@@ -148,7 +145,7 @@ int flash_sim_write(const flash_sim *fs, const void *buffer, uint32_t page) {
     unsigned char *page_buffer = malloc(fs->page_size);
     int ret = flash_sim_read(fs, page_buffer, page);
     if(ret != 0) {
-        MYDEBUG("read failed page = %u\n", page);
+        DEBUG("read failed page = %u\n", page);
         free(page_buffer);
         return ret;
     }
@@ -162,24 +159,24 @@ int flash_sim_write(const flash_sim *fs, const void *buffer, uint32_t page) {
     free(page_buffer);
 
     if(!valid_write) {
-        MYDEBUG("write failed - would have set bits back to 1\n");
+        DEBUG("write failed - would have set bits back to 1\n");
         return -EIO;
     }
 
     ret = fseek(fs->_fp, page * fs->page_size, SEEK_SET);
     if(ret != 0) {
-        MYDEBUG("seek failed: out of range\n");
+        DEBUG("seek failed: out of range\n");
         return -EFAULT;
     }
 
 #if ENABLE_DEBUG
     long pos = ftell(fs->_fp);
-    MYDEBUG("writing to offset %ld\n", pos);
+    DEBUG("writing to offset %ld\n", pos);
 #endif
 
     ret = fwrite(buffer, fs->page_size, 1, fs->_fp);
     if(ret != 1) {
-        MYDEBUG("write failed\n");
+        DEBUG("write failed\n");
         return -EBADFD;
     }
 
@@ -188,10 +185,10 @@ int flash_sim_write(const flash_sim *fs, const void *buffer, uint32_t page) {
 }
 
 int flash_sim_erase(const flash_sim *fs, uint32_t block) {
-    MYDEBUG("block = %u\n", block);
+    DEBUG("block = %u\n", block);
 
     if(fs->_fp == NULL) {
-        MYDEBUG("struct was not initialized\n");
+        DEBUG("struct was not initialized\n");
         return -ENODEV;
     }
 
@@ -201,14 +198,14 @@ int flash_sim_erase(const flash_sim *fs, uint32_t block) {
     int ret = fseek(fs->_fp, block * fs->block_size, SEEK_SET);
     if(ret != 0) {
         free(buffer);
-        MYDEBUG("seek failed: out of range\n");
+        DEBUG("seek failed: out of range\n");
         return -EFAULT;
     }
 
     ret = fwrite(buffer, fs->block_size, 1, fs->_fp);
     if(ret != 1) {
         free(buffer);
-        MYDEBUG("write failed\n");
+        DEBUG("write failed\n");
         return -EBADFD;
     }
 
