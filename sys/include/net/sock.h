@@ -126,7 +126,7 @@ extern "C" {
 #define SOCK_IPV4_EP_ANY        { .family = AF_INET, \
                                   .netif = SOCK_ADDR_ANY_NETIF }
 
-#if defined(SOCK_HAS_IPV6) || defined(DOXYGEN)
+#if defined(SOCK_HAS_IPV6)
 /**
  * @brief   Address to bind to any IPv6 address
  */
@@ -146,7 +146,7 @@ typedef struct {
     int family;
 
     union {
-#if defined(SOCK_HAS_IPV6) || defined(DOXYGEN)
+#if defined(SOCK_HAS_IPV6)
         /**
          * @brief IPv6 address mode
          *
@@ -182,7 +182,7 @@ struct _sock_tl_ep {
     int family;
 
     union {
-#if defined(SOCK_HAS_IPV6) || defined(DOXYGEN)
+#if defined(SOCK_HAS_IPV6)
         /**
          * @brief IPv6 address mode
          *
