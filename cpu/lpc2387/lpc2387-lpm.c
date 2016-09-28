@@ -103,7 +103,7 @@ enum lpm_mode lpm_set(enum lpm_mode target)
 
     lpm = target;
 
-    DEBUG("# LPM power down %u -> %u", lpm, target);
+    DEBUG("# LPM power down %u -> %u\n", lpm, target);
 
     PCON |= target_flags;                                       // set target power mode
     return last_lpm;

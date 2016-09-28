@@ -96,7 +96,7 @@ static ble_mac_interface_t *ble_mac_interface_lookup(ble_ipsp_handle_t *handle)
 static ble_mac_interface_t *ble_mac_interface_add(uint8_t peer[8],
                                                   ble_ipsp_handle_t *handle)
 {
-    DEBUG("ble_mac_interface_add()");
+    DEBUG("ble_mac_interface_add()\n");
     for (int i = 0; i < BLE_MAC_MAX_INTERFACE_NUM; i++) {
         if (interfaces[i].handle.conn_handle == 0 && interfaces[i].handle.cid == 0) {
             memcpy(&interfaces[i].handle, handle, sizeof(ble_ipsp_handle_t));
@@ -118,7 +118,7 @@ static ble_mac_interface_t *ble_mac_interface_add(uint8_t peer[8],
  */
 static void ble_mac_interface_delete(ble_mac_interface_t *interface)
 {
-    DEBUG("ble_mac_interface_delete()");
+    DEBUG("ble_mac_interface_delete()\n");
     memset(interface, 0, sizeof(ble_mac_interface_t));
 }
 

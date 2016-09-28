@@ -53,14 +53,14 @@ void auto_init_cc110x(void)
         DEBUG("Initializing CC110X radio at SPI_%i\n", p->spi);
         int res = netdev2_cc110x_setup(&cc110x_devs[i], p);
         if (res < 0) {
-            DEBUG("Error initializing CC110X radio device!");
+            DEBUG("Error initializing CC110X radio device!\n");
         }
         else {
             gnrc_netdev2_cc110x_init(&_gnrc_netdev2_devs[i], &cc110x_devs[i]);
             res = gnrc_netdev2_init(_stacks[i], CC110X_MAC_STACKSIZE,
                     CC110X_MAC_PRIO, "cc110x", &_gnrc_netdev2_devs[i]);
             if (res < 0) {
-                DEBUG("Error starting gnrc_cc110x thread for CC110X!");
+                DEBUG("Error starting gnrc_cc110x thread for CC110X!\n");
             }
         }
     }

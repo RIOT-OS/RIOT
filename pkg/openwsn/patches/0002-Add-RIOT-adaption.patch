@@ -643,7 +643,7 @@ index 0000000..203550c
 +      val=radiotimer_getCapturedTime();
 +      radio_vars.startFrame_cb(val);
 +   }
-+   DEBUG("SENT");
++   DEBUG("SENT\n");
 +}
 +
 +//===== RX

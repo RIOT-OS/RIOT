@@ -107,12 +107,12 @@ int srf08_get_distances(srf08_t *dev, uint16_t *range_array, int num_echos, srf0
     i2c_release(dev->i2c);
 
     if (!status) {
-        DEBUG("Write the ranging command to the i2c-interface is failed");
+        DEBUG("Write the ranging command to the i2c-interface is failed\n");
         return -1;
     }
 
     if(max_reg_no_read > SRF08_MAX_REGISTER_NUMBER) {
-        DEBUG("Too many echos requested. Max. is 17");
+        DEBUG("Too many echos requested. Max. is 17\n");
         return -2;
     }
 
@@ -130,7 +130,7 @@ int srf08_get_distances(srf08_t *dev, uint16_t *range_array, int num_echos, srf0
         i2c_release(dev->i2c);
 
         if (!status) {
-            DEBUG("Read the echo bytes from the i2c-interface is failed");
+            DEBUG("Read the echo bytes from the i2c-interface is failed\n");
             return -3;
         }
 

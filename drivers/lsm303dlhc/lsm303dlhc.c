@@ -48,12 +48,12 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, i2c_t i2c, gpio_t acc_pin, gpio_t mag_pin
     i2c_acquire(dev->i2c);
     i2c_init_master(i2c, I2C_SPEED_NORMAL);
 
-    DEBUG("lsm303dlhc reboot ");
+    DEBUG("lsm303dlhc reboot...");
     res = i2c_write_reg(dev->i2c, dev->acc_address,
                         LSM303DLHC_REG_CTRL5_A, LSM303DLHC_REG_CTRL5_A_BOOT);
     /* Release the bus for other threads. */
     i2c_release(dev->i2c);
-    DEBUG("[OK]");
+    DEBUG("[OK]\n");
 
     /* configure accelerometer */
     /* enable all three axis and set sample rate */

@@ -114,7 +114,7 @@ int ccm_compute_adata_mac(cipher_t* cipher, uint8_t* auth_data,
             auth_data_encoded[1] = auth_data_len & 0xFF;
             auth_data_encoded[0] = (auth_data_len >> 8) & 0xFF;
         } else {
-            DEBUG("UNSUPPORTED Adata length");
+            DEBUG("UNSUPPORTED Adata length\n");
             return -1;
         }
 

@@ -56,7 +56,7 @@ void auto_init_xbee(void)
         int res = xbee_init(&xbee_devs[i], (xbee_params_t*) p);
 
         if (res < 0) {
-            DEBUG("Error initializing XBee radio device!");
+            DEBUG("Error initializing XBee radio device!\n");
         }
         else {
             gnrc_nomac_init(_nomac_stacks[i],
