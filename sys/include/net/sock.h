@@ -94,9 +94,15 @@ extern "C" {
 
 #if defined(DOXYGEN)
 /**
- * @brief compile flag to activate IPv6 support for sock
+ * @name Compile Flags
+ * @brief Flags to de/activate certain functionalities
+ * @{
+ */
+/**
+ * @brief activate IPv6 support for sock
  */
 #define SOCK_HAS_IPV6
+/** @} */
 #endif
 
 /**
