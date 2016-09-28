@@ -94,9 +94,15 @@ extern "C" {
 
 #if defined(DOXYGEN)
 /**
- * @brief compile flag to activate IPv6 support for sock
+ * @name Compile Flags
+ * @brief Flags to de/activate certain functionalities
+ * @{
+ */
+/**
+ * @brief activate IPv6 support for sock
  */
 #define SOCK_HAS_IPV6
+/** @} */
 #endif
 
 /**
@@ -120,7 +126,7 @@ extern "C" {
 #define SOCK_IPV4_EP_ANY        { .family = AF_INET, \
                                   .netif = SOCK_ADDR_ANY_NETIF }
 
-#if defined(SOCK_HAS_IPV6) || defined(DOXYGEN)
+#if defined(SOCK_HAS_IPV6)
 /**
  * @brief   Address to bind to any IPv6 address
  */
@@ -140,7 +146,7 @@ typedef struct {
     int family;
 
     union {
-#if defined(SOCK_HAS_IPV6) || defined(DOXYGEN)
+#if defined(SOCK_HAS_IPV6)
         /**
          * @brief IPv6 address mode
          *
@@ -176,7 +182,7 @@ struct _sock_tl_ep {
     int family;
 
     union {
-#if defined(SOCK_HAS_IPV6) || defined(DOXYGEN)
+#if defined(SOCK_HAS_IPV6)
         /**
          * @brief IPv6 address mode
          *
