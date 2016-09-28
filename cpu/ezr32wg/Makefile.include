@@ -1,3 +1,7 @@
 export CPU_ARCH = cortex-m4f
 
+ifndef (,$(filter periph_uart,$(FEATURES_REQUIRED)))
+  FEATURES_REQUIRED += periph_gpio
+endif
+
 include $(RIOTCPU)/Makefile.include.cortexm_common

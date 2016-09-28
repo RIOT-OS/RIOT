@@ -3,6 +3,10 @@ export CPU_FAM  = stm32f4
 
 USEMODULE += pm_layered
 
+ifndef (,$(filter periph_uart,$(FEATURES_REQUIRED)))
+  FEATURES_REQUIRED += periph_gpio
+endif
+
 include $(RIOTCPU)/stm32_common/Makefile.include
 
 include $(RIOTCPU)/Makefile.include.cortexm_common
