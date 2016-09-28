@@ -52,6 +52,13 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 }
 #endif
 
+#ifdef PERIPH_SPI_NEEDS_TRANSFER_BYTE
+int spi_transfer_byte(spi_t dev, char out, char *in)
+{
+    return spi_transfer_bytes(dev, &out, in, 1);
+}
+#endif
+
 #ifdef PERIPH_SPI_NEEDS_TRANSFER_REG
 int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
 {
