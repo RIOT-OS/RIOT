@@ -1,6 +1,2 @@
 # the board uses the GPIO driver for LED initialization
 FEATURES_REQUIRED += periph_gpio
-
-ifneq (,$(filter saul_default,$(USEMODULE)))
-  USEMODULE += saul_gpio
-endif

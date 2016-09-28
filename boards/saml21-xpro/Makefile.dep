@@ -1,0 +1,2 @@
+# the board uses the GPIO driver to initialize its LED
+FEATURES_REQUIRED += periph_gpio

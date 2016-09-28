@@ -1,3 +1,6 @@
+# the board uses the GPIO driver for LED initialization
+FEATURES_REQUIRED += periph_gpio
+
 ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += kw2xrf
 endif
