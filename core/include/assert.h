@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 INRIA
+ * Copyright (C) 2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,8 @@
  * @brief       POSIX.1-2008 compliant version of the assert macro
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      René Kijewski <rene.kijewski@fu-berlin.de>
+ * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
 
 #ifndef ASSERT_H
@@ -25,10 +28,45 @@
 extern "C" {
 #endif
 
+#ifdef DOXYGEN
+/**
+ * @brief   Activate verbose output for @ref assert() when defined.
+ *
+ * Without this macro defined the @ref assert() macro will just print the
+ * address of the code line the assertion failed in. With the macro defined
+ * the macro will also print the file, the code line and the function this macro
+ * failed in.
+ *
+ * To define just add it to your `CFLAGS` in your application's Makefile:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ * CFLAGS += -DDEBUG_ASSERT_VERBOSE
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+#define DEBUG_ASSERT_VERBOSE
+#endif
+
 /**
  * @brief   the string that is passed to panic in case of a failing assertion
  */
 extern const char assert_crash_message[];
+
+#ifdef NDEBUG
+#define assert(ignore)((void) 0)
+#elif defined(DEBUG_ASSERT_VERBOSE)
+#include <stdio.h>
+
+/**
+ * @brief   Function to handle failed assertion
+ *
+ * @note    This function was introduced for memory size optimization
+ *
+ * @warning this function **NEVER** returns!
+ *
+ * @param[in] file  The file name of the file the assertion failed in
+ * @param[in] line  The code line of @p file the assertion failed in
+ */
+NORETURN void _assert_failure(const char *file, unsigned line);
 
 /**
  * @brief    abort the program if assertion is false
@@ -42,7 +80,11 @@ extern const char assert_crash_message[];
  * The purpose of this macro is to help programmers find bugs in their
  * programs.
  *
- * If `NDEBUG` is not defined, a failed assertion generates output similar to:
+ * With @ref DEBUG_ASSERT_VERBOSE defined this will print also the file, the
+ * line and the function this assertion failed in.
+ *
+ * If `NDEBUG` and @ref DEBUG_ASSERT_VERBOSE are not defined, a failed assertion
+ * generates output similar to:
  *
  *     0x89abcdef
  *     *** RIOT kernel panic:
@@ -54,10 +96,13 @@ extern const char assert_crash_message[];
  * `addr2line` (or e.g. `arm-none-eabi-addr2line` for ARM-based code), `objdump`,
  * or `gdb` (with the command `info line *(0x89abcdef)`) to identify the line
  * the assertion failed in.
+ *
+ * @see http://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
  */
-
-#ifdef NDEBUG
-#define assert(ignore)((void) 0)
+#define assert(cond) \
+    if (!(cond)) { \
+        _assert_failure(RIOT_FILE_RELATIVE, __LINE__); \
+    }
 #else
 #define assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, assert_crash_message))
 #endif
