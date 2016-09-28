@@ -59,18 +59,30 @@ static void test_pktbuf_init(void)
 
 static void test_pktbuf_add__pkt_NULL__data_NULL__size_0(void)
 {
-    TEST_ASSERT_NULL(gnrc_pktbuf_add(NULL, NULL, 0, GNRC_NETTYPE_TEST));
-    TEST_ASSERT(gnrc_pktbuf_is_empty());
+    gnrc_pktsnip_t *pkt;
+
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_pktbuf_add(NULL, NULL, 0, GNRC_NETTYPE_TEST)));
+    TEST_ASSERT_NULL(pkt->next);
+    TEST_ASSERT_NULL(pkt->data);
+    TEST_ASSERT_EQUAL_INT(0, pkt->size);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_TEST, pkt->type);
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(!gnrc_pktbuf_is_empty());
 }
 
 static void test_pktbuf_add__pkt_NOT_NULL__data_NULL__size_0(void)
 {
+    gnrc_pktsnip_t *pkt;
     gnrc_pktsnip_t *next = gnrc_pktbuf_add(NULL, TEST_STRING4, sizeof(TEST_STRING4),
                                            GNRC_NETTYPE_TEST);
 
     TEST_ASSERT_NOT_NULL(next);
 
-    TEST_ASSERT_NULL(gnrc_pktbuf_add(next, NULL, 0, GNRC_NETTYPE_TEST));
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_pktbuf_add(next, NULL, 0, GNRC_NETTYPE_TEST)));
+    TEST_ASSERT(pkt->next = next);
+    TEST_ASSERT_NULL(pkt->data);
+    TEST_ASSERT_EQUAL_INT(0, pkt->size);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_TEST, pkt->type);
     TEST_ASSERT_NULL(next->next);
     TEST_ASSERT_EQUAL_STRING(TEST_STRING4, next->data);
     TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING4), next->size);
@@ -81,19 +93,31 @@ static void test_pktbuf_add__pkt_NOT_NULL__data_NULL__size_0(void)
 
 static void test_pktbuf_add__pkt_NULL__data_NOT_NULL__size_0(void)
 {
-    TEST_ASSERT_NULL(gnrc_pktbuf_add(NULL, TEST_STRING8, 0, GNRC_NETTYPE_TEST));
-    TEST_ASSERT(gnrc_pktbuf_is_empty());
+    gnrc_pktsnip_t *pkt;
+
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_pktbuf_add(NULL, TEST_STRING8, 0, GNRC_NETTYPE_TEST)));
+    TEST_ASSERT_NULL(pkt->next);
+    TEST_ASSERT_NULL(pkt->data);
+    TEST_ASSERT_EQUAL_INT(0, pkt->size);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_TEST, pkt->type);
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(!gnrc_pktbuf_is_empty());
 }
 
 static void test_pktbuf_add__pkt_NOT_NULL__data_NOT_NULL__size_0(void)
 {
+    gnrc_pktsnip_t *pkt;
     gnrc_pktsnip_t *next = gnrc_pktbuf_add(NULL, TEST_STRING4, sizeof(TEST_STRING4),
                                            GNRC_NETTYPE_TEST);
 
     TEST_ASSERT_NOT_NULL(next);
 
-    TEST_ASSERT_NULL(gnrc_pktbuf_add(next, TEST_STRING8, 0, GNRC_NETTYPE_TEST));
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_pktbuf_add(next, TEST_STRING8, 0, GNRC_NETTYPE_TEST)));
 
+    TEST_ASSERT(pkt->next = next);
+    TEST_ASSERT_NULL(pkt->data);
+    TEST_ASSERT_EQUAL_INT(0, pkt->size);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_TEST, pkt->type);
     TEST_ASSERT_NULL(next->next);
     TEST_ASSERT_EQUAL_STRING(TEST_STRING4, next->data);
     TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING4), next->size);
@@ -235,6 +259,18 @@ static void test_pktbuf_add__unaligned_in_aligned_hole(void)
     gnrc_pktbuf_release(pkt1);
     gnrc_pktbuf_release(pkt3);
     gnrc_pktbuf_release(pkt4);
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+}
+
+static void test_pktbuf_add__0_sized_release(void)
+{
+    gnrc_pktsnip_t *pkt1 = gnrc_pktbuf_add(NULL, NULL, 0, GNRC_NETTYPE_TEST);
+    gnrc_pktsnip_t *pkt2 = gnrc_pktbuf_add(NULL, NULL, 8, GNRC_NETTYPE_TEST);
+
+    gnrc_pktbuf_release(pkt1);
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(!gnrc_pktbuf_is_empty());
+    gnrc_pktbuf_release(pkt2);
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
@@ -428,11 +464,43 @@ static void test_pktbuf_mark__success_small(void)
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
+static void test_pktbuf_mark__success_equally_sized(void)
+{
+    gnrc_pktsnip_t *pkt1 = gnrc_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
+                                           GNRC_NETTYPE_TEST);
+    gnrc_pktsnip_t *pkt2;
+
+    TEST_ASSERT_NOT_NULL(pkt1);
+    TEST_ASSERT_NOT_NULL((pkt2 = gnrc_pktbuf_mark(pkt1, sizeof(TEST_STRING16),
+                                                  GNRC_NETTYPE_UNDEF)));
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(pkt1->next == pkt2);
+    TEST_ASSERT_NULL(pkt1->data);
+    TEST_ASSERT_EQUAL_INT(0, pkt1->size);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_TEST, pkt1->type);
+    TEST_ASSERT_EQUAL_INT(1, pkt1->users);
+    TEST_ASSERT_NULL(pkt2->next);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(TEST_STRING16, pkt2->data, pkt2->size));
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING16), pkt2->size);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_UNDEF, pkt2->type);
+    TEST_ASSERT_EQUAL_INT(1, pkt2->users);
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+
+    /* check if everything can be cleaned up */
+    gnrc_pktbuf_release(pkt1);
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+}
+
 static void test_pktbuf_realloc_data__size_0(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, sizeof(TEST_STRING8), GNRC_NETTYPE_TEST);
 
-    TEST_ASSERT_EQUAL_INT(ENOMEM, gnrc_pktbuf_realloc_data(pkt, 0));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_pktbuf_realloc_data(pkt, 0));
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT_NULL(pkt->data);
+    TEST_ASSERT_EQUAL_INT(0, pkt->size);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_TEST, pkt->type);
     gnrc_pktbuf_release(pkt);
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
@@ -557,6 +625,26 @@ static void test_pktbuf_realloc_data__success2(void)
     TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING16), pkt->size);
     TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_TEST, pkt->type);
     TEST_ASSERT_EQUAL_INT(1, pkt->users);
+}
+
+static void test_pktbuf_realloc_data__success3(void)
+{
+    gnrc_pktsnip_t *pkt;
+
+    pkt = gnrc_pktbuf_add(NULL, NULL, 0, GNRC_NETTYPE_TEST);
+
+    TEST_ASSERT_NOT_NULL(pkt);
+    TEST_ASSERT_NULL(pkt->data);
+
+    TEST_ASSERT_EQUAL_INT(0, gnrc_pktbuf_realloc_data(pkt, sizeof(TEST_STRING16)));
+    TEST_ASSERT_NULL(pkt->next);
+    TEST_ASSERT_NOT_NULL(pkt->data);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING16), pkt->size);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_TEST, pkt->type);
+    TEST_ASSERT_EQUAL_INT(1, pkt->users);
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    gnrc_pktbuf_release(pkt);
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
 static void test_pktbuf_hold__pkt_null(void)
@@ -739,6 +827,7 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_add__success),
         new_TestFixture(test_pktbuf_add__packed_struct),
         new_TestFixture(test_pktbuf_add__unaligned_in_aligned_hole),
+        new_TestFixture(test_pktbuf_add__0_sized_release),
         new_TestFixture(test_pktbuf_mark__pkt_NULL__size_0),
         new_TestFixture(test_pktbuf_mark__pkt_NULL__size_not_0),
         new_TestFixture(test_pktbuf_mark__pkt_NOT_NULL__size_0),
@@ -747,6 +836,7 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_mark__success_large),
         new_TestFixture(test_pktbuf_mark__success_aligned),
         new_TestFixture(test_pktbuf_mark__success_small),
+        new_TestFixture(test_pktbuf_mark__success_equally_sized),
         new_TestFixture(test_pktbuf_realloc_data__size_0),
         new_TestFixture(test_pktbuf_realloc_data__memfull),
         new_TestFixture(test_pktbuf_realloc_data__nomemenough),
@@ -755,6 +845,7 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_realloc_data__alignment),
         new_TestFixture(test_pktbuf_realloc_data__success),
         new_TestFixture(test_pktbuf_realloc_data__success2),
+        new_TestFixture(test_pktbuf_realloc_data__success3),
         new_TestFixture(test_pktbuf_hold__pkt_null),
         new_TestFixture(test_pktbuf_hold__pkt_external),
         new_TestFixture(test_pktbuf_hold__success),

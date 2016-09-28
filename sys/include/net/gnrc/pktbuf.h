@@ -71,16 +71,19 @@ void gnrc_pktbuf_init(void);
  *          function externally. This will most likely create memory leaks or
  *          not allowed memory access.
  *
+ * @pre size < GNRC_PKTBUF_SIZE
+ *
  * @param[in] next      Next gnrc_pktsnip_t in the packet. Leave NULL if you
  *                      want to create a new packet.
  * @param[in] data      Data of the new gnrc_pktsnip_t. If @p data is NULL no data
  *                      will be inserted into `result`.
- * @param[in] size      Length of @p data. May not be 0.
+ * @param[in] size      Length of @p data. If this value is 0 the
+ *                      gnrc_pktsnip::data field of the newly created snip will
+ *                      be NULL.
  * @param[in] type      Protocol type of the gnrc_pktsnip_t.
  *
  * @return  Pointer to the packet part that represents the new gnrc_pktsnip_t.
  * @return  NULL, if no space is left in the packet buffer.
- * @return  NULL, if @p size == 0.
  */
 gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, void *data, size_t size,
                                 gnrc_nettype_t type);
@@ -89,8 +92,9 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, void *data, size_t size,
  * @brief   Marks the first @p size bytes in a received packet with a new
  *          packet snip that is appended to the packet.
  *
- *  Graphically this can be represented as follows:
- *  @code
+ * Graphically this can be represented as follows:
+ *
+ * ~~~~~~~~~~~~~~~~~~~
  * Before                                    After
  * ======                                    =====
  *                                                       (next)
@@ -99,7 +103,10 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, void *data, size_t size,
  * +--------------------------------+        +----------------+---------------+
  * +--------------------------------+        +----------------+---------------+
  *  \__________pkt->size___________/          \_result->size_/ \__pkt->size__/
- *  @endcode
+ * ~~~~~~~~~~~~~~~~~~~
+ *
+ * If `size == pkt->size` then the resulting snip will point to NULL in its
+ * gnrc_pktsnip_t::data field and its gnrc_pktsnip_t::size field will be 0.
  *
  * @pre @p pkt != NULL && @p size != 0
  *
@@ -117,7 +124,9 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
  * @brief   Reallocates gnrc_pktsnip_t::data of @p pkt in the packet buffer, without
  *          changing the content.
  *
- * @pre gnrc_pktsnip_t::data of @p pkt is in the packet buffer.
+ * @pre `pkt != NULL`
+ * @pre `(pkt->size > 0) <=> (pkt->data != NULL)`
+ * @pre gnrc_pktsnip_t::data of @p pkt is in the packet buffer if it is not NULL.
  *
  * @details If enough memory is available behind it or @p size is smaller than
  *          the original size of the packet then gnrc_pktsnip_t::data of @p pkt will
@@ -128,7 +137,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
  * @param[in] size  The size for @p pkt.
  *
  * @return  0, on success
- * @return  ENOMEM, if no space is left in the packet buffer or size was 0.
+ * @return  ENOMEM, if no space is left in the packet buffer.
  */
 int gnrc_pktbuf_realloc_data(gnrc_pktsnip_t *pkt, size_t size);
 
