@@ -381,6 +381,7 @@ endif
 
 ifneq (,$(filter isrpipe,$(USEMODULE)))
   USEMODULE += tsrb
+  FEATURES_REQUIRED += periph_uart
 endif
 
 ifneq (,$(filter posix,$(USEMODULE)))
