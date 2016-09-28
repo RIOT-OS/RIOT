@@ -24,6 +24,7 @@
 
 #include "cpu.h"
 #include "mutex.h"
+#include "assert.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
 #include "periph/spi.h"
@@ -213,18 +214,43 @@ int spi_release(spi_t dev)
     return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
     (void)dev;
-    char tmp;
-    while (!(SPI_IF & SPI_IE_TX_BIT)) {}
-    SPI_DEV->TXBUF = (uint8_t)out;
-    while (!(SPI_IF & SPI_IE_RX_BIT)) {}
-    tmp = (char)SPI_DEV->RXBUF;
-    if (in) {
-        *in = tmp;
+
+    assert(out || in);
+
+    /* if we only send out data, we do this the fast way... */
+    if (!in) {
+        for (unsigned i = 0; i < length; i++) {
+            while (!(SPI_IF & SPI_IE_TX_BIT)) {}
+            SPI_DEV->TXBUF = (uint8_t)out[i];
+        }
+        /* finally we need to wait, until all transfers are complete */
+#ifndef SPI_USE_USCI
+        while (!(SPI_IF & SPI_IE_TX_BIT) || !(SPI_IF & SPI_IE_RX_BIT)) {}
+#else
+        while (SPI_DEV->STAT & USCI_SPI_STAT_UCBUSY) {}
+#endif
+        SPI_DEV->RXBUF;
     }
-    return 1;
+    else if (!out) {
+        for (unsigned i = 0; i < length; i++) {
+            SPI_DEV->TXBUF = 0;
+            while (!(SPI_IF & SPI_IE_RX_BIT)) {}
+            in[i] = (char)SPI_DEV->RXBUF;
+        }
+    }
+    else {
+        for (unsigned i = 0; i < length; i++) {
+            while (!(SPI_IF & SPI_IE_TX_BIT)) {}
+            SPI_DEV->TXBUF = out[i];
+            while (!(SPI_IF & SPI_IE_RX_BIT)) {}
+            in[i] = (char)SPI_DEV->RXBUF;
+        }
+    }
+
+    return length;
 }
 
 void spi_poweron(spi_t dev)
