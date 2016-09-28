@@ -12,7 +12,246 @@
 /**
  * @defgroup    net_sock_ip     Raw IPv4/IPv6 sock API
  * @ingroup     net_sock
- * @brief       Sock Submodule for raw IPv4/IPv6
+ * @brief       Sock submodule for raw IPv4/IPv6
+ *
+ * How To Use
+ * ----------
+ * First you need to @ref including-modules "include" a module that implements
+ * this API in your application's Makefile. For example the implementation for
+ * @ref net_gnrc "GNRC" is called `gnrc_sock_ip`.
+ *
+ * ### A Simple IPv6 Server
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * #include <stdio.h>
+ *
+ * #include "net/af.h"
+ * #include "net/protnum.h"
+ * #include "net/sock/ip.h"
+ *
+ * uint8_t buf[128];
+ *
+ * int main(void)
+ * {
+ *     sock_ip_ep_t local = SOCK_IPV6_EP_ANY;
+ *     sock_ip_t sock;
+ *
+ *     if (sock_ip_create(&sock, &local, NULL, PROTNUM_IPV6_NONXT, 0) < 0) {
+ *         puts("Error creating raw IP sock");
+ *         return 1;
+ *     }
+ *
+ *     while (1) {
+ *         sock_ip_ep_t remote;
+ *         ssize_t res;
+ *
+ *         if ((res = sock_ip_recv(&sock, buf, sizeof(buf), 0, &remote)) >= 0) {
+ *             puts("Received a message");
+ *             if (sock_ip_send(&sock, buf, res, 0, &remote) < 0) {
+ *                 puts("Error sending reply");
+ *             }
+ *         }
+ *     }
+ *
+ *     return 0;
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * Above you see a simple IPv6 server. Don't forget to also
+ * @ref including-modules "include" the IPv6 module of your networking
+ * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc GNRC) and at least
+ * one network device.
+ *
+ * After including header files for the @ref net_af "address families",
+ * @ref net_protnum "protocol numbers" and the @ref net_sock_ip "raw `sock`s"
+ * themselves, we create some buffer space `buf` to store the data received by
+ * the server:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * #include "net/af.h"
+ * #include "net/protnum.h"
+ * #include "net/sock/ip.h"
+ *
+ * uint8_t buf[128];
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * To be able to listen for incoming packets we bind the `sock` by setting a
+ * local end point (even if we just state here, that we just want to bind it to
+ * any IPv6 address).
+ *
+ * We then proceed to create the `sock`. It is bound to `local` and listens for
+ * IPv6 packets with @ref ipv6_hdr_t::nh "next header field"
+ * @ref PROTNUM_IPV6_NONXT. Since we don't need any further configuration we set
+ * the flags to 0. In case of an error we stop the program:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ *     sock_ip_ep_t local = SOCK_IPV6_EP_ANY;
+ *     sock_ip_t sock;
+ *
+ *     if (sock_ip_create(&sock, &local, NULL, PROTNUM_IPV6_NONXT, 0) < 0) {
+ *         puts("Error creating raw IP sock");
+ *         return 1;
+ *     }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * The application then waits indefinitely for an incoming message in
+ * `buf` from `remote`. If we want to timeout this wait period we could
+ * alternatively set the `timeout` parameter of @ref sock_ip_recv() to a
+ * value `> 0`. If an error occurs on receive we just ignore it and continue
+ * looping.
+ *
+ * If we receive a message we use its `remote` to reply. Note since the `proto`
+ * was already set during @ref sock_ip_create() we can just leave `proto` for
+ * the @ref sock_ip_send() set to 0 (it is ignored by that function in that case
+ * anyway). In case of an error on send we print an according message:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ *     while (1) {
+ *         sock_ip_ep_t remote;
+ *         ssize_t res;
+ *
+ *         if ((res = sock_ip_recv(&sock, buf, sizeof(buf), 0, &remote)) >= 0) {
+ *             puts("Received a message");
+ *             if (sock_ip_send(&sock, buf, res, 0, &remote) < 0) {
+ *                 puts("Error sending reply");
+ *             }
+ *         }
+ *     }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * ### A Simple IPv6 Client
+ * There are two kinds of clients. Those that do expect a reply and those who
+ * don't. A client that does not require a reply is very simple to implement in
+ * one line:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * res = sock_ip_send(NULL, data, data_len, PROTNUM, &remote);
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * With `data` being the data sent, `data_len` the length of `data`, `PROTNUM`
+ * the next header number for the sent packet and `remote` the remote end point
+ * the packet that is to be sent.
+ *
+ * To see some other capabilities we look at a more complex example in form of
+ * the counter of the echo server above:
+ *
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * #include <stdio.h>
+ *
+ * #include "net/af.h"
+ * #include "net/protnum.h"
+ * #include "net/ipv6/addr.h"
+ * #include "net/sock/ip.h"
+ * #include "xtimer.h"
+ *
+ * uint8_t buf[7];
+ *
+ * int main(void)
+ * {
+ *     sock_ip_ep_t local = SOCK_IPV6_EP_ANY;
+ *     sock_ip_t sock;
+ *
+ *     if (sock_ip_create(&sock, &local, NULL, PROTNUM_IPV6_NONXT, 0) < 0) {
+ *         puts("Error creating raw IP sock");
+ *         return 1;
+ *     }
+ *
+ *     while (1) {
+ *         sock_ip_ep_t remote = { .family = AF_INET6 };
+ *         ssize_t res;
+ *
+ *         ipv6_addr_set_all_nodes_multicast((ipv6_addr_t *)&remote.addr.ipv6,
+ *                                           IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
+ *
+ *         if (sock_ip_send(&sock, "Hello!", sizeof("Hello!"), 0, &remote) < 0) {
+ *             puts("Error sending message");
+ *             sock_ip_close(&sock);
+ *             return 1;
+ *         }
+ *         if ((res = sock_ip_recv(&sock, buf, sizeof(buf), 1 * SEC_IN_USEC,
+ *                                 NULL)) < 0) {
+ *             if (res == -ETIMEDOUT) {
+ *                 puts("Timed out");
+ *             }
+ *             else {
+ *                 puts("Error receiving message");
+ *             }
+ *         }
+ *         else {
+ *             printf("Received message: \"");
+ *             for (int i = 0; i < res; i++) {
+ *                 printf("%c", buf[i]);
+ *             }
+ *             printf("\"\n");
+ *         }
+ *         xtimer_sleep(1);
+ *     }
+ *
+ *     return 0;
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * Again: Don't forget to also @ref including-modules "include" the IPv6 module
+ * of your networking implementation (e.g. `gnrc_ipv6_default` for
+ * @ref net_gnrc GNRC) and at least one network device.
+ *
+ * We first create again a `sock` with a local end point bound to any IPv6
+ * address. Note that we also could specify the remote end point here and not
+ * use it with @ref sock_ip_send().
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ *     sock_ip_ep_t local = SOCK_IPV6_EP_ANY;
+ *     sock_ip_t sock;
+ *
+ *     if (sock_ip_create(&sock, &local, NULL, PROTNUM_IPV6_NONXT, 0) < 0) {
+ *         puts("Error creating raw IP sock");
+ *         return 1;
+ *     }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * We then create a remote end point for the [link-local all nodes multicast
+ * address](https://tools.ietf.org/html/rfc4291#page-16) (`ff02::1`) and send
+ * a "Hello!" message to that end point.
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ *         sock_ip_ep_t remote = { .family = AF_INET6 };
+ *         ssize_t res;
+ *
+ *         ipv6_addr_set_all_nodes_multicast((ipv6_addr_t *)&remote.addr.ipv6,
+ *                                           IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
+ *
+ *         if (sock_ip_send(&sock, "Hello!", sizeof("Hello!"), 0, &remote) < 0) {
+ *             puts("Error sending message");
+ *             sock_ip_close(&sock);
+ *             return 1;
+ *         }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * We then wait a second for a reply and print it when it is received.
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ *         if ((res = sock_ip_recv(&sock, buf, sizeof(buf), 1 * SEC_IN_USEC,
+ *                                 NULL)) < 0) {
+ *             if (res == -ETIMEDOUT) {
+ *                 puts("Timed out");
+ *             }
+ *             else {
+ *                 puts("Error receiving message");
+ *             }
+ *         }
+ *         else {
+ *             printf("Received message: \"");
+ *             for (int i = 0; i < res; i++) {
+ *                 printf("%c", buf[i]);
+ *             }
+ *             printf("\"\n");
+ *         }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * Finally, we wait a second before sending out the next "Hello!" with
+ * `xtimer_sleep(1)`.
+ *
  * @{
  *
  * @file
@@ -40,9 +279,10 @@ extern "C" {
 #endif
 
 /**
- * @brief   Implementation-specific type of a raw IPv4/IPv6 sock object
+ * @brief   Type for a raw IPv4/IPv6 sock object
  *
- * `struct sock_ip` needs to be defined by stack-specific `sock_types.h`.
+ * @note API implementors: `struct sock_ip` needs to be defined by
+ *       implementation-specific `sock_types.h`.
  */
 typedef struct sock_ip sock_ip_t;
 
@@ -53,11 +293,10 @@ typedef struct sock_ip sock_ip_t;
  *
  * @param[out] sock     The resulting sock object.
  * @param[in] local     Local end point for the sock object.
- *                      May be NULL to solicit implicit bind on
- *                      @ref sock_ip_send().
- *                      sock_ip_ep_t::netif must either be
+ *                      May be NULL. sock_ip_ep_t::netif must either be
  *                      @ref SOCK_ADDR_ANY_NETIF or equal to sock_ip_ep_t::netif
  *                      of @p remote if `remote != NULL`.
+ *                      If NULL @ref sock_ip_send() may bind implicitly.
  * @param[in] remote    Remote end point for the sock object.
  *                      May be `NULL` but then the `remote` parameter of
  *                      @ref sock_ip_send() may not be `NULL` or it will always
@@ -69,12 +308,12 @@ typedef struct sock_ip sock_ip_t;
  * @param[in] proto     Protocol to use in the raw IPv4/IPv6 sock object
  *                      (the `protocol` header field in IPv4 and the `next_header`
  *                      field in IPv6).
- * @param[in] flags     Flags for the sock object. See also @ref net_sock_flags.
- *                      May be 0.
+ * @param[in] flags     Flags for the sock object. See also
+ *                      [sock flags](net_sock_flags). May be 0.
  *
  * @return  0 on success.
- * @return  -EADDRINUSE, if `local != NULL` and the stack reports that @p local
- *          is already used elsewhere
+ * @return  -EADDRINUSE, if `local != NULL` and @p local is already used
+ *          elsewhere
  * @return  -EAFNOSUPPORT, if `local != NULL` or `remote != NULL` and
  *          sock_ip_ep_t::family of @p local or @p remote is not supported.
  * @return  -EINVAL, if `proto` is not supported or if sock_ip_ep_t::netif of
@@ -82,8 +321,8 @@ typedef struct sock_ip sock_ip_t;
  *          other (i.e. `(local->netif != remote->netif) &&
  *          ((local->netif != SOCK_ADDR_ANY_NETIF) ||
  *          (remote->netif != SOCK_ADDR_ANY_NETIF))` if neither is `NULL`).
- * @return  -ENOMEM, if the stack can't provide enough resources for `sock` to
- *          be created.
+ * @return  -ENOMEM, if not enough resources can be provided for `sock` to be
+ *          created.
  * @return  -EPROTONOSUPPORT, if `local != NULL` or `remote != NULL` and
  *          proto is not supported by sock_ip_ep_t::family of @p local or @p
  *          remote.
@@ -103,6 +342,13 @@ void sock_ip_close(sock_ip_t *sock);
 /**
  * @brief   Gets the local end point of a raw IPv4/IPv6 sock object
  *
+ * This gets the local end point of a raw IPv4/IPv6 sock object. Note that this
+ * might not be the same end point you added in @ref sock_ip_create(), but an
+ * end point more suitable for the implementation. Examples for this might be
+ * that if sock_ip_ep_t::netif is given in @ref sock_ip_create(), the
+ * implementation might choose to return the address on this interface the
+ * @p sock is bound to in @p ep's sock_ip_ep_t::addr.
+ *
  * @pre `(sock != NULL) && (ep != NULL)`
  *
  * @param[in] sock  A raw IPv4/IPv6 sock object.
@@ -117,6 +363,13 @@ int sock_ip_get_local(sock_ip_t *sock, sock_ip_ep_t *ep);
  * @brief   Gets the remote end point of a UDP sock object
  *
  * @pre `(sock != NULL) && (ep != NULL)`
+ *
+ * This gets the remote end point of a raw IPv4/IPv6 sock object. Note that this
+ * might not be the same end point you added in @ref sock_ip_create(), but an
+ * end point more suitable for the implementation. Examples for this might be
+ * that if sock_ip_ep_t::netif is given in @ref sock_ip_create(), the
+ * implementation might choose to return the address on this interface the
+ * @p sock is bound to in @p ep's sock_ip_ep_t::addr.
  *
  * @param[in] sock  A UDP sock object.
  * @param[out] ep   The remote end point.
@@ -134,13 +387,10 @@ int sock_ip_get_remote(sock_ip_t *sock, sock_ip_ep_t *ep);
  * @param[in] sock      A raw IPv4/IPv6 sock object.
  * @param[out] data     Pointer where the received data should be stored.
  * @param[in] max_len   Maximum space available at @p data.
- *                      If received data exceeds @p max_len the data is
- *                      truncated and the remaining data can be retrieved
- *                      later on.
  * @param[in] timeout   Timeout for receive in microseconds.
  *                      This value can be ignored (no timeout) if the
- *                      @ref sys_xtimer module is not present and the stack does
- *                      not support timeouts on its own.
+ *                      @ref sys_xtimer module is not present or the
+ *                      implementation does not support timeouts on its own.
  *                      May be 0 for no timeout.
  * @param[out] remote   Remote end point of the received data.
  *                      May be NULL, if it is not required by the application.
@@ -167,21 +417,19 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
  *
  * @param[in] sock      A raw IPv4/IPv6 sock object. May be NULL.
  *                      A sensible local end point should be selected by the
- *                      stack in that case.
+ *                      implementation in that case.
  * @param[in] data      Pointer where the received data should be stored.
  *                      May be `NULL` if `len == 0`.
  * @param[in] len       Maximum space available at @p data.
- * @param[in] proto     Protocol to use in the packet send, in case
+ * @param[in] proto     Protocol to use in the packet sent, in case
  *                      `sock == NULL`. If `sock != NULL` this parameter will be
  *                      ignored.
- * @param[in] remote    Remote end point for the send data.
+ * @param[in] remote    Remote end point for the sent data.
  *                      May be `NULL`, if @p sock has a remote end point.
  *                      sock_ip_ep_t::family may be AF_UNSPEC, if local
  *                      end point of @p sock provides this information.
  *
- * @note    Function blocks until packet is handed to the stack.
- *
- * @return  The number of bytes send on success.
+ * @return  The number of bytes sent on success.
  * @return  -EAFNOSUPPORT, if `remote != NULL` and sock_ip_ep_t::family of
  *          @p remote is != AF_UNSPEC and not supported.
  * @return  -EHOSTUNREACH, if @p remote or remote end point of @p sock is not

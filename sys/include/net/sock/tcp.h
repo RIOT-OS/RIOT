@@ -13,6 +13,15 @@
  * @defgroup    net_sock_tcp    TCP sock API
  * @ingroup     net_sock
  * @brief       Sock submodule for TCP
+ *
+ * How To Use
+ * ----------
+ * First you need to @ref including-modules "include" a module that implements
+ * this API in your application's Makefile. For example the implementation for
+ * @ref net_gnrc "GNRC" is called `gnrc_sock_udp`.
+ *
+ * @todo add detailed examples when implementation exists.
+ *
  * @{
  *
  * @file
@@ -41,17 +50,18 @@ extern "C" {
 typedef struct _sock_tl_ep sock_tcp_ep_t;   /**< An end point for a TCP sock object */
 
 /**
- * @brief   Implementation-specific type of a TCP sock object
+ * @brief   Type for a TCP sock object
  *
- * `struct sock_tcp` needs to be defined by stack-specific `sock_types.h`.
+ * @note API implementors: `struct sock_tcp` needs to be defined by
+ *       implementation-specific `sock_types.h`.
  */
 typedef struct sock_tcp sock_tcp_t;
 
 /**
- * @brief   Implementation-specific type of a TCP listening queue
+ * @brief   Type for a TCP listening queue
  *
- * `struct sock_tcp_queue` needs to be defined by stack-specific
- * `sock_types.h`.
+ * @note API implementors: `struct sock_tcp_queue` needs to be defined by
+ *                          implementation-specific `sock_types.h`.
  */
 typedef struct sock_tcp_queue sock_tcp_queue_t;
 
@@ -164,7 +174,7 @@ int sock_tcp_get_remote(sock_tcp_t *sock, sock_tcp_ep_t *ep);
  *          establish connection.
  * @return  -EPERM, if connections on local end point of @p queue are not
  *          permitted on this system (e.g. by firewall rules).
- * @return  -ETIMEDOUT, if the operation timed out stack-internally.
+ * @return  -ETIMEDOUT, if the operation timed out internally.
  */
 int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock);
 
@@ -181,8 +191,8 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock);
  *                      later on.
  * @param[in] timeout   Timeout for receive in microseconds.
  *                      This value can be ignored (no timeout) if the
- *                      @ref sys_xtimer module is not present and the stack does
- *                      not support timeouts on its own.
+ *                      @ref sys_xtimer module is not present and the
+ *                      implementation does not support timeouts on its own.
  *                      May be 0 for no timeout.
  *
  * @note    Function may block.
