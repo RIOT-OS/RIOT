@@ -55,15 +55,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Standard input/output device configuration
- * @{
- */
-#define UART_STDIO_DEV              (UART_DEV(0))
-#define UART_STDIO_BAUDRATE         (115200U)
-#define UART_STDIO_RX_BUFSIZE       (64U)
-/** @} */
-
-/**
  * @brief   CPU core configuration
  *
  * @todo    Move this to the periph_conf.h

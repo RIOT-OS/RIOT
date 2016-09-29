@@ -29,11 +29,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Use the UART 0 for STDIO on this board
- */
-#define UART_STDIO_DEV      UART_DEV(0)
-
-/**
 * @brief As the CPU is too slow to handle 115200 baud, we set the default
 *        baudrate to 9600 for this board
 */
