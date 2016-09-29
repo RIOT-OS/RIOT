@@ -30,7 +30,7 @@ extern "C" {
  */
 #if defined(CPU_MODEL_STM32F401RE)
 #define ADC_DEVS            (1U)
-#elif defined(CPU_MODEL_STM32F407VG) || defined(CPU_MODEL_STM32F415RG)
+#elif defined(CPU_MODEL_STM32F407VG) || defined(CPU_MODEL_STM32F415RG) || defined(CPU_MODEL_STM32F446RE)
 #define ADC_DEVS            (3U)
 #endif
 

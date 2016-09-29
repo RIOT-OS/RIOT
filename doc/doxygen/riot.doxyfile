@@ -840,6 +840,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */pkg/tlsf/patch.txt \
                          */sys/random/tinymt32/* \
                          */cpu/stm32f2/include/stm32f2*.h \
+                         */cpu/stm32f4/include/stm32f4*.h \
 
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
