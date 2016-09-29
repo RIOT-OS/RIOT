@@ -19,6 +19,7 @@
 #include <stdbool.h>
 
 #include "byteorder.h"
+#include "net/ethernet/hdr.h"
 #include "net/ieee802154.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc.h"
@@ -208,6 +209,25 @@ inline static size_t iphc_nhc_udp_decode(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t **d
 }
 #endif
 
+static inline void _get_iid(eui64_t *eui64, const uint8_t *addr,
+                                size_t addr_len)
+{
+#ifdef MODULE_GNRC_SIXLOENC
+    if (addr_len == ETHERNET_ADDR_LEN) {
+        eui64->uint8[0] = addr[0] ^ 0x02;
+        eui64->uint8[1] = addr[1];
+        eui64->uint8[2] = addr[2];
+        eui64->uint8[3] = 0xff;
+        eui64->uint8[4] = 0xfe;
+        eui64->uint8[5] = addr[3];
+        eui64->uint8[6] = addr[4];
+        eui64->uint8[7] = addr[5];
+        return;
+    }
+#endif
+    ieee802154_get_iid(eui64, addr, addr_len);
+}
+
 size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
                                   size_t datagram_size, size_t offset,
                                   size_t *nh_len)
@@ -322,9 +342,9 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
             break;
 
         case IPHC_SAC_SAM_L2:
-            ieee802154_get_iid((eui64_t *)(&ipv6_hdr->src.u64[1]),
-                               gnrc_netif_hdr_get_src_addr(netif_hdr),
-                               netif_hdr->src_l2addr_len);
+            _get_iid((eui64_t *)(&ipv6_hdr->src.u64[1]),
+                     gnrc_netif_hdr_get_src_addr(netif_hdr),
+                     netif_hdr->src_l2addr_len);
             ipv6_addr_set_link_local_prefix(&ipv6_hdr->src);
             break;
 
@@ -352,9 +372,9 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
 
         case IPHC_SAC_SAM_CTX_L2:
             assert(ctx != NULL);
-            ieee802154_get_iid((eui64_t *)(&ipv6_hdr->src.u64[1]),
-                               gnrc_netif_hdr_get_src_addr(netif_hdr),
-                               netif_hdr->src_l2addr_len);
+            _get_iid((eui64_t *)(&ipv6_hdr->src.u64[1]),
+                     gnrc_netif_hdr_get_src_addr(netif_hdr),
+                     netif_hdr->src_l2addr_len);
             ipv6_addr_init_prefix(&ipv6_hdr->src, &ctx->prefix,
                                   ctx->prefix_len);
             break;
@@ -400,9 +420,9 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
             break;
 
         case IPHC_M_DAC_DAM_U_L2:
-            ieee802154_get_iid((eui64_t *)(&ipv6_hdr->dst.u64[1]),
-                               gnrc_netif_hdr_get_dst_addr(netif_hdr),
-                               netif_hdr->dst_l2addr_len);
+            _get_iid((eui64_t *)(&ipv6_hdr->dst.u64[1]),
+                     gnrc_netif_hdr_get_dst_addr(netif_hdr),
+                     netif_hdr->dst_l2addr_len);
             ipv6_addr_set_link_local_prefix(&ipv6_hdr->dst);
             break;
 
@@ -423,9 +443,9 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
             break;
 
         case IPHC_M_DAC_DAM_U_CTX_L2:
-            ieee802154_get_iid((eui64_t *)(&ipv6_hdr->dst.u64[1]),
-                               gnrc_netif_hdr_get_dst_addr(netif_hdr),
-                               netif_hdr->dst_l2addr_len);
+            _get_iid((eui64_t *)(&ipv6_hdr->dst.u64[1]),
+                     gnrc_netif_hdr_get_dst_addr(netif_hdr),
+                     netif_hdr->dst_l2addr_len);
             ipv6_addr_init_prefix(&ipv6_hdr->dst, &ctx->prefix,
                                   ctx->prefix_len);
             break;
@@ -723,8 +743,8 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
                 (netif_hdr->src_l2addr_len == 4) ||
                 (netif_hdr->src_l2addr_len == 8)) {
                 /* prefer to create IID from netif header if available */
-                ieee802154_get_iid(&iid, gnrc_netif_hdr_get_src_addr(netif_hdr),
-                                   netif_hdr->src_l2addr_len);
+                _get_iid(&iid, gnrc_netif_hdr_get_src_addr(netif_hdr),
+                         netif_hdr->src_l2addr_len);
             }
             else {
                 /* but take from driver otherwise */
@@ -844,8 +864,8 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
             }
         }
 
-        ieee802154_get_iid(&iid, gnrc_netif_hdr_get_dst_addr(netif_hdr),
-                           netif_hdr->dst_l2addr_len);
+        _get_iid(&iid, gnrc_netif_hdr_get_dst_addr(netif_hdr),
+                 netif_hdr->dst_l2addr_len);
 
         if ((ipv6_hdr->dst.u64[1].u64 == iid.uint64.u64) ||
             _context_overlaps_iid(dst_ctx, &(ipv6_hdr->dst), &iid)) {

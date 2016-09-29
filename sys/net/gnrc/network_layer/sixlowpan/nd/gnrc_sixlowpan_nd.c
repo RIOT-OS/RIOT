@@ -40,9 +40,18 @@ static inline uint32_t _binary_exp_backoff(uint32_t base_sec, unsigned int exp)
     return random_uint32_range(0, (1 << exp)) * base_sec;
 }
 
-static inline void _revert_iid(uint8_t *iid)
+static inline uint8_t _revert_iid(uint8_t *iid)
 {
     iid[0] ^= 0x02;
+#ifdef MODULE_GNRC_SIXLOENC
+    if ((iid[3] = 0xff) && (iid[4] = 0xfe)) {
+        iid[3] = iid[5];
+        iid[4] = iid[6];
+        iid[5] = iid[7];
+        return sizeof(eui64_t) - 2;
+    }
+#endif
+    return sizeof(eui64_t);
 }
 
 void gnrc_sixlowpan_nd_init(gnrc_ipv6_netif_t *iface)
@@ -196,9 +205,8 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
         kernel_pid_t ifs[GNRC_NETIF_NUMOF];
         size_t ifnum = gnrc_netif_get(ifs);
         /* we don't need address resolution, the EUI-64 is in next_hop's IID */
-        *l2addr_len = sizeof(eui64_t);
         memcpy(l2addr, &next_hop->u8[8], sizeof(eui64_t));
-        _revert_iid(l2addr);
+        *l2addr_len = _revert_iid(l2addr);
         if (iface == KERNEL_PID_UNDEF) {
             for (unsigned i = 0; i < ifnum; i++) {
                 gnrc_ipv6_netif_t *ipv6_if = gnrc_ipv6_netif_get(ifs[i]);
