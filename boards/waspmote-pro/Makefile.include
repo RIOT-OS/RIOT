@@ -26,10 +26,6 @@ else
   # TODO: fix for building under windows
 endif
 
-# setup the boards dependencies
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
-
-
 export FLASHER
 export PORT
 export DIST_PATH = $(RIOTBOARD)/$(BOARD)/dist

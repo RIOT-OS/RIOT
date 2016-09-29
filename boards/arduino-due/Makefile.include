@@ -12,6 +12,3 @@ export OFLAGS = -O binary
 
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
-
-# also include optional dependencies
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep

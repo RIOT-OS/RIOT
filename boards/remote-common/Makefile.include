@@ -33,6 +33,3 @@ export INCLUDES += -I$(RIOTBOARD)/remote-common/include
 
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
-
-# Include board dependencies
-include $(RIOTBOARD)/remote-common/Makefile.dep

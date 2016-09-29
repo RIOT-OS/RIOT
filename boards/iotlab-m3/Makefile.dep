@@ -1,5 +1,3 @@
-include $(RIOTBOARD)/iotlab-common/Makefile.dep
-
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += isl29020
   USEMODULE += lps331ap
