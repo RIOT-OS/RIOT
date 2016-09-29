@@ -76,7 +76,7 @@ volatile uint32_t ADEVCFG2_B1 __attribute__ ((used, section(".adevcfg2_b1"))) = 
  * DEVCFG1_B2  @ 0x1FC6FFC8 (config space 1)
  * ADEVCFG1_B2 @ 0x1FC6FF48 (alternate devcfg1 in config space 2)
  *
- * 	FNOSC		SPLL		Oscillator Selection Bits	System PLL
+ *  FNOSC		SPLL		Oscillator Selection Bits	System PLL
  *	DMTINTV		WIN_127_128	DMT Count Window Interval	Window/Interval value is 127/128 counter value
  *	FSOSCEN		OFF		Secondary Oscillator Enable	Disable SOSC
  *	IESO		ON		Internal/External Switch Over	Enabled
@@ -142,10 +142,10 @@ volatile uint32_t ADEVCFG0_B1  __attribute__ ((used, section(".adevcfg0_b1"))) =
  * CP	OFF	Code Protect	Protection Disabled
  */
 
-volatile uint32_t DEVCP0_LA	__attribute__ ((used, section(".devcp0_la"))) = 0xFFFFFFFF;
-volatile uint32_t ADEVCP0_LA	__attribute__ ((used, section(".adevcp0_la"))) = 0xFFFFFFFF;
-volatile uint32_t DEVCP0_B1	__attribute__ ((used, section(".devcp0_b1"))) = 0xFFFFFFFF;
-volatile uint32_t ADEVCP0_B1	__attribute__ ((used, section(".adevcp0_b1"))) = 0xFFFFFFFF;
+volatile uint32_t DEVCP0_LA __attribute__ ((used, section(".devcp0_la"))) = 0xFFFFFFFF;
+volatile uint32_t ADEVCP0_LA    __attribute__ ((used, section(".adevcp0_la"))) = 0xFFFFFFFF;
+volatile uint32_t DEVCP0_B1 __attribute__ ((used, section(".devcp0_b1"))) = 0xFFFFFFFF;
+volatile uint32_t ADEVCP0_B1    __attribute__ ((used, section(".adevcp0_b1"))) = 0xFFFFFFFF;
 /* uint32_t DEVCP0_B2	__attribute__ ((section(".devcp0_b1"))) = 0xFFFFFFFF; not needed by default */
 /* uint32_t ADEVCP0_B2	__attribute__ ((section(".adevcp0_b1"))) = 0xFFFFFFFF; not needed by default */
 
@@ -157,8 +157,8 @@ volatile uint32_t ADEVCP0_B1	__attribute__ ((used, section(".adevcp0_b1"))) = 0x
  * CSEQ		Boot Flash Complement Sequence Number
  */
 
-volatile uint32_t SEQ_LA[4] __attribute__ ((used, section(".seq_la"))) = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
-volatile uint32_t SEQ_B1[4] __attribute__ ((used, section(".seq_b1"))) = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+volatile uint32_t SEQ_LA[4] __attribute__ ((used, section(".seq_la"))) = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
+volatile uint32_t SEQ_B1[4] __attribute__ ((used, section(".seq_b1"))) = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
 /* uint32_t SEQ_B2[4] __attribute__ ((section(".seq_b2"))) = {0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF}; Not needed by default */
 
 
@@ -187,6 +187,6 @@ volatile uint32_t ADEVSIGN_B2 __attribute__ ((used, section(".adevsign_b2"))) = 
  */
 void dummy(void)
 {
-	(void)1;
+    (void)1;
 }
 

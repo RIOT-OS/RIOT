@@ -16,17 +16,18 @@ void lpm_arch_init(void)
 
 enum lpm_mode lpm_arch_set(enum lpm_mode target)
 {
-	if (target == LPM_IDLE || target == LPM_SLEEP) {
-	/* Dont wait if interrupts are not enabled - we would never return!*/
-		if (mips32_get_c0(C0_STATUS) & SR_IE)
-			asm volatile("wait");
-	}
-	return LPM_ON; /* once wait returns we are back 'on' */
+    if (target == LPM_IDLE || target == LPM_SLEEP) {
+        /* Dont wait if interrupts are not enabled - we would never return!*/
+        if (mips32_get_c0(C0_STATUS) & SR_IE) {
+            asm volatile ("wait");
+        }
+    }
+    return LPM_ON; /* once wait returns we are back 'on' */
 }
 
 enum lpm_mode lpm_arch_get(void)
 {
-	return 0;
+    return 0;
 }
 
 void lpm_arch_awake(void)

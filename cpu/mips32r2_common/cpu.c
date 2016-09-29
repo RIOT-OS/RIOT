@@ -42,36 +42,37 @@ extern char _edata __attribute__((section("data")));
 void software_init_hook(void)
 {
 #ifdef FLASH_XIP
-	/* copy initialised data from its LMA to VMA */
-	memcpy(&_fdata, &_rom_data_copy, (int)&_edata -(int)&_fdata);
+    /* copy initialised data from its LMA to VMA */
+    memcpy(&_fdata, &_rom_data_copy, (int)&_edata - (int)&_fdata);
 #endif
 
-	atexit(_fini);
-	_init();
+    atexit(_fini);
+    _init();
 
-	mips_start();
+    mips_start();
 
-	exit(-1);
+    exit(-1);
 }
 
 
 void mips_start(void)
 {
-	cpu_init_early();
-	board_init();
+    cpu_init_early();
+    board_init();
 
 #if MODULE_NEWLIB
 #error "This Port is designed to work with the (newlib) C library provided with the mips sdk toolchain"
 #endif
 
-	/* kernel_init */
-	kernel_init();
+    /* kernel_init */
+    kernel_init();
 }
 
 void panic_arch(void)
 {
-	printf("\nPANIC!\n");
-	assert(0);
-	while (1) {}
+    printf("\nPANIC!\n");
+    assert(0);
+    while (1) {
+    }
 }
 

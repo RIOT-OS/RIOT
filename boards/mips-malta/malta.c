@@ -17,8 +17,8 @@
 
 static void malta_reset(void)
 {
-	*(volatile long *)MIPS_MALTA_ADDR = MIPS_MALTA_VAL_RST;
-	asm volatile ("wait");
+    *(volatile long *)MIPS_MALTA_ADDR = MIPS_MALTA_VAL_RST;
+    asm volatile ("wait");
 }
 
 void board_init(void)
@@ -28,5 +28,5 @@ void board_init(void)
 
 void reboot(void)
 {
-	malta_reset();
+    malta_reset();
 }

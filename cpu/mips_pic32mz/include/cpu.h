@@ -23,8 +23,8 @@ extern "C" {
 extern void dummy(void);
 static inline void cpu_init_early(void)
 {
-	/* Stop the linker from throwing away the PIC32 config register settings */
-	dummy();
+    /* Stop the linker from throwing away the PIC32 config register settings */
+    dummy();
 }
 
 

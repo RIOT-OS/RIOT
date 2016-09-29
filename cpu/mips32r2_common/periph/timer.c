@@ -54,138 +54,138 @@ static volatile int spurious_int;
 
 int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
-	int i;
+    int i;
 
-	if (dev != 0) {
-		return -1;
-	}
+    if (dev != 0) {
+        return -1;
+    }
 
-	(void)freq; /*Cannot adjust Frequency */
+    (void)freq; /*Cannot adjust Frequency */
 
-	timer_isr_ctx.cb = cb;
-	timer_isr_ctx.arg = arg;
+    timer_isr_ctx.cb = cb;
+    timer_isr_ctx.arg = arg;
 
-	/* Clear down soft counters */
-	for (i = 0; i < CHANNELS; i++) {
-		compares[i] = 0;
-	}
+    /* Clear down soft counters */
+    for (i = 0; i < CHANNELS; i++) {
+        compares[i] = 0;
+    }
 
-	counter = 1 << TIMER_ACCURACY_SHIFT;
+    counter = 1 << TIMER_ACCURACY_SHIFT;
 
-	/* Set compare up */
-	mips_setcompare(mips_getcount() + TICKS_PER_US * TIMER_ACCURACY);
+    /* Set compare up */
+    mips_setcompare(mips_getcount() + TICKS_PER_US * TIMER_ACCURACY);
 
-	/* Start the timer if stopped */
-	mips32_bc_c0(C0_CAUSE, CR_DC);
+    /* Start the timer if stopped */
+    mips32_bc_c0(C0_CAUSE, CR_DC);
 
-	/* Enable Timer Interrupts */
+    /* Enable Timer Interrupts */
 #if defined (PIC32MX) || defined(PIC32MZ)
 
 #ifdef PIC32MZ
-	volatile uint32_t * const _IEC0_SET = (uint32_t *) 0xbf8100c8;
-	volatile uint32_t * const _IPC0 = (uint32_t *) 0xbf810140;
+    volatile uint32_t *const _IEC0_SET = (uint32_t *) 0xbf8100c8;
+    volatile uint32_t *const _IPC0 = (uint32_t *) 0xbf810140;
 #else /*MX*/
-	volatile uint32_t * const _IEC0_SET = (uint32_t *) 0xbf881068;
-	volatile uint32_t * const _IPC0 = (uint32_t *) 0xbf881090;
+    volatile uint32_t *const _IEC0_SET = (uint32_t *) 0xbf881068;
+    volatile uint32_t *const _IPC0 = (uint32_t *) 0xbf881090;
 #endif
-	/* Enable IRQ 0 CPU timer interrupt */
-	*_IEC0_SET = 0x1;
+    /* Enable IRQ 0 CPU timer interrupt */
+    *_IEC0_SET = 0x1;
 
-	/* Set IRQ 0 to priority 1.0 */
-	*_IPC0 = 0x4;
+    /* Set IRQ 0 to priority 1.0 */
+    *_IPC0 = 0x4;
 #else
-	mips32_bs_c0(C0_STATUS, SR_HINT5);
+    mips32_bs_c0(C0_STATUS, SR_HINT5);
 #endif
 
-	return 0;
+    return 0;
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
-	if (dev != 0) {
-		return -1;
-	}
+    if (dev != 0) {
+        return -1;
+    }
 
-	if (channel >= CHANNELS) {
-		return -1;
-	}
+    if (channel >= CHANNELS) {
+        return -1;
+    }
 
-	timeout >>= TIMER_ACCURACY_SHIFT;
-	timeout <<= TIMER_ACCURACY_SHIFT;
+    timeout >>= TIMER_ACCURACY_SHIFT;
+    timeout <<= TIMER_ACCURACY_SHIFT;
 
-	uint32_t status = irq_arch_disable();
-	compares[channel] = counter + timeout;
-	irq_arch_restore(status);
+    uint32_t status = irq_arch_disable();
+    compares[channel] = counter + timeout;
+    irq_arch_restore(status);
 
-	return channel;
+    return channel;
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-	if (dev != 0) {
-		return -1;
-	}
+    if (dev != 0) {
+        return -1;
+    }
 
-	if (channel >= CHANNELS) {
-		return -1;
-	}
+    if (channel >= CHANNELS) {
+        return -1;
+    }
 
-	value >>= TIMER_ACCURACY_SHIFT;
-	value <<= TIMER_ACCURACY_SHIFT;
+    value >>= TIMER_ACCURACY_SHIFT;
+    value <<= TIMER_ACCURACY_SHIFT;
 
-	uint32_t status = irq_arch_disable();
-	compares[channel] = value;
-	irq_arch_restore(status);
+    uint32_t status = irq_arch_disable();
+    compares[channel] = value;
+    irq_arch_restore(status);
 
-	return channel;
+    return channel;
 }
 
 int timer_clear(tim_t dev, int channel)
 {
-	if (dev != 0) {
-		return -1;
-	}
+    if (dev != 0) {
+        return -1;
+    }
 
-	if (channel >= CHANNELS) {
-		return -1;
-	}
+    if (channel >= CHANNELS) {
+        return -1;
+    }
 
-	uint32_t status = irq_arch_disable();
-	compares[channel] = 0;
-	irq_arch_restore(status);
+    uint32_t status = irq_arch_disable();
+    compares[channel] = 0;
+    irq_arch_restore(status);
 
-	return channel;
+    return channel;
 }
 
 unsigned int timer_read(tim_t dev)
 {
-	if (dev != 0) {
-		return -1;
-	}
-	return counter;
+    if (dev != 0) {
+        return -1;
+    }
+    return counter;
 }
 
 void timer_start(tim_t dev)
 {
-	mips32_bc_c0(C0_CAUSE, CR_DC);
+    mips32_bc_c0(C0_CAUSE, CR_DC);
 }
 
 void timer_stop(tim_t dev)
 {
-	mips32_bs_c0(C0_CAUSE, CR_DC);
+    mips32_bs_c0(C0_CAUSE, CR_DC);
 }
 
 void timer_irq_enable(tim_t dev)
 {
 #if defined (PIC32MX) || defined(PIC32MZ)
 #ifdef PIC32MZ
-	volatile uint32_t * const _IEC0_SET = (uint32_t *) 0xbf8100c8;
+    volatile uint32_t *const _IEC0_SET = (uint32_t *) 0xbf8100c8;
 #else /*MX*/
-	volatile uint32_t * const _IEC0_SET = (uint32_t *) 0xbf881068;
+    volatile uint32_t *const _IEC0_SET = (uint32_t *) 0xbf881068;
 #endif
-	*_IEC0_SET = 0x1;
+    *_IEC0_SET = 0x1;
 #else
-	mips32_bs_c0(C0_STATUS, SR_HINT5);
+    mips32_bs_c0(C0_STATUS, SR_HINT5);
 #endif
 }
 
@@ -193,13 +193,13 @@ void timer_irq_disable(tim_t dev)
 {
 #if defined (PIC32MX) || defined(PIC32MZ)
 #ifdef PIC32MZ
-	volatile uint32_t * const _IEC0_CLR = (uint32_t *) 0xbf8100c4;
+    volatile uint32_t *const _IEC0_CLR = (uint32_t *) 0xbf8100c4;
 #else /*MX*/
-	volatile uint32_t * const _IEC0_CLR = (uint32_t *) 0xbf881064;
+    volatile uint32_t *const _IEC0_CLR = (uint32_t *) 0xbf881064;
 #endif
-	*_IEC0_CLR = 0x1;
+    *_IEC0_CLR = 0x1;
 #else
-	mips32_bc_c0(C0_STATUS, SR_HINT5);
+    mips32_bc_c0(C0_STATUS, SR_HINT5);
 #endif
 }
 
@@ -226,55 +226,60 @@ void __attribute__ ((interrupt("vector=sw0"), keep_interrupts_masked)) _mips_isr
 void __attribute__ ((interrupt("vector=hw5"))) _mips_isr_hw5(void)
 #endif
 {
-	register int cr = mips_getcr();
-	if (cr & CR_TI) {
+    register int cr = mips_getcr();
+
+    if (cr & CR_TI) {
 
 #if defined(PIC32MX) || defined(PIC32MZ)
-		/* ACK The timer interrupt*/
+        /* ACK The timer interrupt*/
 #ifdef PIC32MZ
-		volatile uint32_t * const _IFS0_CLR = (uint32_t *) 0xbf810044;
-#else /*MX*/
-		volatile uint32_t * const _IFS0_CLR = (uint32_t *) 0xbf881034;
+        volatile uint32_t *const _IFS0_CLR = (uint32_t *) 0xbf810044;
+#else   /*MX*/
+        volatile uint32_t *const _IFS0_CLR = (uint32_t *) 0xbf881034;
 #endif
-		*_IFS0_CLR = 0x1;
+        *_IFS0_CLR = 0x1;
 #endif
 
 
-		uint32_t status = irq_arch_disable();
-		counter += TIMER_ACCURACY;
-		irq_arch_restore(status);
+        uint32_t status = irq_arch_disable();
+        counter += TIMER_ACCURACY;
+        irq_arch_restore(status);
 
-		if (counter == compares[0]) {
-		/*
-		 * The Xtimer code expects the ISR to take some time
-		 * but our counter is a fake software one, so bump it a
-		 * bit to give the impression some time elapsed in the ISR.
-		 * Without this the callback ( _shoot(timer) on xtimer_core.c )
-		 * never fires.
-		 */
-			counter += TIMER_ACCURACY;
-			timer_isr_ctx.cb(timer_isr_ctx.arg, 0);
+        if (counter == compares[0]) {
+            /*
+             * The Xtimer code expects the ISR to take some time
+             * but our counter is a fake software one, so bump it a
+             * bit to give the impression some time elapsed in the ISR.
+             * Without this the callback ( _shoot(timer) on xtimer_core.c )
+             * never fires.
+             */
+            counter += TIMER_ACCURACY;
+            timer_isr_ctx.cb(timer_isr_ctx.arg, 0);
 
-			if (sched_context_switch_request)
-				thread_yield();
-		}
-		if (counter == compares[1]) {
-			timer_isr_ctx.cb(timer_isr_ctx.arg, 1);
+            if (sched_context_switch_request) {
+                thread_yield();
+            }
+        }
+        if (counter == compares[1]) {
+            timer_isr_ctx.cb(timer_isr_ctx.arg, 1);
 
-			if (sched_context_switch_request)
-				thread_yield();
-		}
-		if (counter == compares[2]) {
-			timer_isr_ctx.cb(timer_isr_ctx.arg, 2);
+            if (sched_context_switch_request) {
+                thread_yield();
+            }
+        }
+        if (counter == compares[2]) {
+            timer_isr_ctx.cb(timer_isr_ctx.arg, 2);
 
-			if(sched_context_switch_request)
-				thread_yield();
-		}
+            if (sched_context_switch_request) {
+                thread_yield();
+            }
+        }
 
-		mips_setcompare(mips_getcount() + TICKS_PER_US * TIMER_ACCURACY);
+        mips_setcompare(mips_getcount() + TICKS_PER_US * TIMER_ACCURACY);
 
-	} else {
-		spurious_int++;
-	}
+    }
+    else {
+        spurious_int++;
+    }
 }
 
