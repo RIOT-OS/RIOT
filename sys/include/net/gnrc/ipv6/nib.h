@@ -178,15 +178,26 @@ void gnrc_ipv6_nib_delete_neighbor(const ipv6_addr_t *ipv6);
 void gnrc_ipv6_nib_mark_reachable(const ipv6_addr_t *ipv6);
 
 /**
- * @brief   Iterates over all neighbor cache entries in NIB
+ * @brief   Iterates over all neighbor cache entries in the NIB
  *
  * @param[in] prev  Previous neighbor cache entry.
  *                  May be NULL to start iteration.
  *
  * @return  Neighbor cache entry after @p prev.
- * @return  NULL if @p prev is the last neighbor cache entry in NIB.
+ * @return  NULL if @p prev is the last neighbor cache entry in the NIB.
  */
 const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_nc(const gnrc_ipv6_nib_t *prev);
+
+/**
+ * @brief   Iterates over all destination cache entries in the NIB
+ *
+ * @param[in] prev  Previous destination cache entry.
+ *                  May be NULL to start iteration.
+ *
+ * @return  Destination cache entry after @p prev.
+ * @return  NULL if @p prev is the last destination cache entry in the NIB.
+ */
+const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_dc(const gnrc_ipv6_nib_t *prev);
 
 /**
  * @brief   Adds or updates a prefix to manage by the NIB
@@ -206,7 +217,7 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_nc(const gnrc_ipv6_nib_t *prev);
  * router advertisement, if this is possible within the rate-limiting
  * constraints or restrictions specified in
  * [RFC 4861](https://tools.ietf.org/html/rfc4861) and
- * [RFC 6775](https://tools.ietf.org/html/rfc6775)
+ * [RFC 6775](https://tools.ietf.org/html/rfc6775).
  *
  * @return  The (created) NIB entry on success.
  * @return  NULL, if prefix list is full.
@@ -216,6 +227,35 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_set_prefix(unsigned iface,
                                                 uint8_t pfx_len,
                                                 uint32_t valid
                                                 uint32_t pref);
+
+/**
+ * @brief   Deletes a prefix from the NIB
+ *
+ * @pre (if dst != NULL: pfx_len > 0)
+ *
+ * @param[in] dst       Destination of the route.
+ *                      May be NULL for default route.
+ * @param[in] pfx_len   Prefix length of @p dst if it is a prefix.
+ *                      May be 0 for default route.
+ *
+ * This change effects the prefix list and thus may also trigger an unsolicited
+ * router advertisement, if this is possible within the rate-limiting
+ * constraints or restrictions specified in
+ * [RFC 4861](https://tools.ietf.org/html/rfc4861) and
+ * [RFC 6775](https://tools.ietf.org/html/rfc6775)
+ */
+void gnrc_ipv6_nib_del_prefix(const ipv6_addr_t *pfx, uint8_t pfx_len);
+
+/**
+ * @brief   Iterates over all prefix list entries in the NIB
+ *
+ * @param[in] prev  Previous prefix list entry.
+ *                  May be NULL to start iteration.
+ *
+ * @return  Prefix list entry entry after @p prev.
+ * @return  NULL if @p prev is the last prefix list entry in the NIB.
+ */
+const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_pl(const gnrc_ipv6_nib_t *prev);
 
 /**
  * @brief   Adds a route to the NIB
@@ -232,14 +272,12 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_set_prefix(unsigned iface,
  *                      May be 0 for default route.
  * @param[in] next_hop  Next hop to @p dst. May be NULL to just forward over
  *                      @p iface.
+ * @param[in] ltime     Lifetime in centiseconds. `UINT32_MAX` for infinite
+ *                      lifetime.
  *
- * If `dst != NULL`, `pfx_len < 128`, and `next_hop == 0` the entry is added to
- * the prefix list so this may also trigger an unsolicited router advertisement,
- * if this is possible within the rate-limiting constraints or restrictions
- * specified in
- * [RFC 4861](https://tools.ietf.org/html/rfc4861) and
- * [RFC 6775](https://tools.ietf.org/html/rfc6775). The lifetimes required in
- * @ref gnrc_ipv6_nib_set_prefix() are assumed to be infinite.
+ * Adds a route to the NIB. Depending of weather @p dst is NULL or not this
+ * route can either end up in the default router list (`dst == NULL`) or
+ * forwarding table (`dst != NULL`).
  *
  * @return  The (created) NIB entry on success.
  * @return  NULL, if forwarding table is full.
@@ -247,47 +285,20 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_set_prefix(unsigned iface,
 const gnrc_ipv6_nib_t *gnrc_ipv6_nib_add_route(unsigned iface,
                                                const ipv6_addr_t *dst,
                                                uint8_t pfx_len,
-                                               const ipv6_addr_t *next_hop);
+                                               const ipv6_addr_t *next_hop,
+                                               uint32_t ltime);
 
 /**
- * @brief   Deletes all occurrences of a route to the NIB
+ * @brief   Deletes a forwarding table entry from the NIB
  *
- * @pre (if dst != NULgL: pfx_len > 0)
+ * @pre (if dst != NULL: pfx_len > 0)
  *
  * @param[in] dst       Destination of the route.
  *                      May be NULL for default route.
  * @param[in] pfx_len   Prefix length of @p dst if it is a prefix.
  *                      May be 0 for default route.
- *
- * If this change effects the prefix list this may also trigger an unsolicited
- * router advertisement, if this is possible within the rate-limiting
- * constraints or restrictions specified in
- * [RFC 4861](https://tools.ietf.org/html/rfc4861) and
- * [RFC 6775](https://tools.ietf.org/html/rfc6775)
  */
 void gnrc_ipv6_nib_del_route(const ipv6_addr_t *dst, uint8_t pfx_len);
-
-/**
- * @brief   Iterates over all destination cache entries in the NIB
- *
- * @param[in] prev  Previous destination cache entry.
- *                  May be NULL to start iteration.
- *
- * @return  Destination cache entry after @p prev.
- * @return  NULL if @p prev is the last destination cache entry in NIB.
- */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_dc(const gnrc_ipv6_nib_t *prev);
-
-/**
- * @brief   Iterates over all prefix list entries in the NIB
- *
- * @param[in] prev  Previous prefix list entry.
- *                  May be NULL to start iteration.
- *
- * @return  Prefix list entry entry after @p prev.
- * @return  NULL if @p prev is the last prefix list entry in NIB.
- */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_pl(const gnrc_ipv6_nib_t *prev);
 
 /**
  * @brief   Iterates over all default router list entries in the NIB
@@ -296,7 +307,7 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_pl(const gnrc_ipv6_nib_t *prev);
  *                  May be NULL to start iteration.
  *
  * @return  Default router list entry entry after @p prev.
- * @return  NULL if @p prev is the last default router list entry in NIB.
+ * @return  NULL if @p prev is the last default router list entry in the NIB.
  */
 const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_drl(const gnrc_ipv6_nib_t *prev);
 
@@ -313,7 +324,7 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_drl(const gnrc_ipv6_nib_t *prev);
  * @ref gnrc_ipv6_nib_set_prefix().
  *
  * @return  Previous forwarding table entry entry after @p prev.
- * @return  NULL if @p prev is the last forwarding table entry in NIB.
+ * @return  NULL if @p prev is the last forwarding table entry in the NIB.
  */
 const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_ft(const gnrc_ipv6_nib_t *prev);
 
@@ -351,7 +362,17 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_add_6lo_ctx(unsigned iface,
  *
  * @return  6LoWPAN compression context table entry after @p prev.
  * @return  NULL if @p prev is the last 6LoWPAN compression context table entry
- *          in NIB.
+ *          in the NIB.
+ */
+const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_ctx(const gnrc_ipv6_nib_t *prev);
+
+/**
+ * @brief   Iterates over all entries in the NIB
+ *
+ * @param[in] prev  Previous NIB entry. May be NULL to start iteration.
+ *
+ * @return  NIB entry after @p prev.
+ * @return  NULL if @p prev is the last entry in the NIB.
  */
 const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_ctx(const gnrc_ipv6_nib_t *prev);
 
