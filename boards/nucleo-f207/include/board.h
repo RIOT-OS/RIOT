@@ -27,6 +27,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /**
  * @brief   LED pin definitions and handlers
  * @{
@@ -55,16 +56,6 @@ extern "C" {
 #define LED2_OFF            (GPIOB->BSRR = (LED2_MASK << 16))
 #define LED2_TOGGLE         (GPIOB->ODR  ^= LED2_MASK)
 /** @} */
-
-/**
- * @brief Use the 1st UART for STDIO on this board
- */
-#define UART_STDIO_DEV      UART_DEV(0)
-
-/**
- * @brief   User button
- */
-#define BTN_B1_PIN          GPIO_PIN(PORT_C, 13)
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
