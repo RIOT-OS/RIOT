@@ -395,6 +395,7 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_WIDTH (32)
 #endif
 
+#if (XTIMER_WIDTH != 32) || DOXYGEN
 /**
  * @brief xtimer timer mask
  *
@@ -404,7 +405,6 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  * For a 16bit timer, the mask would be 0xFFFF0000, for a 24bit timer, the mask
  * would be 0xFF000000.
  */
-#if XTIMER_WIDTH != 32
 #define XTIMER_MASK ((0xffffffff >> XTIMER_WIDTH) << XTIMER_WIDTH)
 #else
 #define XTIMER_MASK (0)
