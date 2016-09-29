@@ -1,3 +1,10 @@
+#
+OLD_USEMODULE := $(sort $(USEMODULE))
+OLD_USEPKG := $(sort $(USEPKG))
+
+# include board dependencies
+-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+
 # pull dependencies from drivers
 include $(RIOTBASE)/drivers/Makefile.dep
 
@@ -554,4 +561,14 @@ ifneq (,$(filter random,$(USEMODULE)))
     ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
         USEMODULE += tinymt32
     endif
+endif
+
+# include package dependencies
+-include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
+
+# recursively catch transitive dependencies
+USEMODULE := $(sort $(USEMODULE))
+USEPKG := $(sort $(USEPKG))
+ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
+    include $(RIOTBASE)/Makefile.dep
 endif
