@@ -97,6 +97,7 @@ export TERMFLAGS := $(PORT) $(TERMFLAGS)
 export ASFLAGS =
 export DEBUGGER_FLAGS = -q --args $(ELF) $(TERMFLAGS)
 term-valgrind: export VALGRIND_FLAGS ?= \
+	--leak-check=full \
 	--track-origins=yes \
 	--fullpath-after=$(RIOTBASE)/ \
 	--read-var-info=yes
