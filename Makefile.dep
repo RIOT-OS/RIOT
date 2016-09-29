@@ -8,10 +8,6 @@ OLD_USEPKG := $(sort $(USEPKG))
 # pull dependencies from drivers
 include $(RIOTBASE)/drivers/Makefile.dep
 
-ifneq (,$(filter ccn-lite,$(USEPKG)))
-    export CFLAGS += -DCCNL_RIOT
-endif
-
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += xtimer
