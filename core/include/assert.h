@@ -20,6 +20,7 @@
 #define ASSERT_H
 
 #include "panic.h"
+#include "stdio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,9 +45,11 @@ extern const char assert_crash_message[];
  */
 
 #ifdef NDEBUG
+#define silent_assert(ignore)((void) 0)
 #define assert(ignore)((void) 0)
 #else
-#define assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, assert_crash_message))
+#define silent_assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, assert_crash_message))
+#define assert(cond) for ( ; !(cond) ; silent_assert(cond) ) { printf("Assertion failed in %s:%d\n", __FILE__, __LINE__); }
 #endif
 
 #ifdef __cplusplus
