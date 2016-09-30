@@ -45,8 +45,8 @@ static void _i2c_poweron(SercomI2cm *sercom);
 static void _i2c_poweroff(SercomI2cm *sercom);
 
 static inline int _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag);
-static inline int _write(SercomI2cm *dev, char *data, int length);
-static inline int _read(SercomI2cm *dev, char *data, int length);
+static inline int _write(SercomI2cm *dev, const uint8_t *data, int length);
+static inline int _read(SercomI2cm *dev, uint8_t *data, int length);
 static inline void _stop(SercomI2cm *dev);
 
 /**
@@ -204,12 +204,12 @@ int i2c_release(i2c_t dev)
     return 0;
 }
 
-int i2c_read_byte(i2c_t dev, uint8_t address, char *data)
+int i2c_read_byte(i2c_t dev, uint8_t address, void *data)
 {
     return i2c_read_bytes(dev, address, data, 1);
 }
 
-int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 {
     SercomI2cm *i2c;
 
@@ -232,12 +232,12 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
     return length;
 }
 
-int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, char *data)
+int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data)
 {
     return i2c_read_regs(dev, address, reg, data, 1);
 }
 
-int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
+int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int length)
 {
     SercomI2cm *i2c;
 
@@ -252,19 +252,19 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int lengt
     }
 
     /* start transmission and send slave address */
-    if(_start(i2c, address, I2C_FLAG_WRITE) < 0) return 0;
+    if (_start(i2c, address, I2C_FLAG_WRITE) < 0) return 0;
     /* send register address/command and wait for complete transfer to
      * be finished */
-    if(_write(i2c, (char *)(&reg), 1) < 0) return 0;
+    if (_write(i2c, &reg, 1) < 0) return 0;
     return i2c_read_bytes(dev, address, data, length);
 }
 
-int i2c_write_byte(i2c_t dev, uint8_t address, char data)
+int i2c_write_byte(i2c_t dev, uint8_t address, uint8_t data)
 {
     return i2c_write_bytes(dev, address, &data, 1);
 }
 
-int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
 {
     SercomI2cm *I2CSercom;
 
@@ -285,12 +285,12 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
 }
 
 
-int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, char data)
+int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data)
 {
     return i2c_write_regs(dev, address, reg, &data, 1);
 }
 
-int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
+int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, int length)
 {
     SercomI2cm *i2c;
 
@@ -305,11 +305,11 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
         }
 
     /* start transmission and send slave address */
-    if(_start(i2c, address, I2C_FLAG_WRITE) < 0) return 0;
+    if (_start(i2c, address, I2C_FLAG_WRITE) < 0) return 0;
     /* send register address and wait for complete transfer to be finished */
-    if(_write(i2c, (char *)(&reg), 1) < 0) return 0;
+    if (_write(i2c, &reg, 1) < 0) return 0;
     /* write data to register */
-    if(_write(i2c, data, length) < 0) return 0;
+    if (_write(i2c, data, length) < 0) return 0;
     /* finish transfer */
     _stop(i2c);
     return length;
@@ -405,7 +405,7 @@ static int _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag)
     return 0;
 }
 
-static inline int _write(SercomI2cm *dev, char *data, int length)
+static inline int _write(SercomI2cm *dev, const uint8_t *data, int length)
 {
     uint16_t tmp_data_length = length;
     uint32_t timeout_counter = 0;
@@ -445,7 +445,7 @@ static inline int _write(SercomI2cm *dev, char *data, int length)
     return 0;
 }
 
-static inline int _read(SercomI2cm *dev, char *data, int length)
+static inline int _read(SercomI2cm *dev, uint8_t *data, int length)
 {
     uint32_t timeout_counter = 0;
     uint8_t count = 0;

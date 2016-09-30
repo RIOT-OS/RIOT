@@ -60,7 +60,7 @@
 int tmp006_test(tmp006_t *dev)
 {
     int status;
-    char reg[2];
+    uint8_t reg[2];
     uint16_t tmp;
 
     /* Acquire exclusive access to the bus. */
@@ -84,7 +84,7 @@ int tmp006_test(tmp006_t *dev)
 int tmp006_init(tmp006_t *dev, i2c_t i2c, uint8_t address, uint8_t conv_rate)
 {
     int status;
-    char reg[2];
+    uint8_t reg[2];
 
     /* write device descriptor */
     dev->i2c = i2c;
@@ -109,8 +109,8 @@ int tmp006_init(tmp006_t *dev, i2c_t i2c, uint8_t address, uint8_t conv_rate)
     }
 
     uint16_t tmp = TMP006_CONFIG_CR(conv_rate);
-    reg[0] = (uint8_t)(tmp >> 8);
-    reg[1] = (uint8_t)tmp;
+    reg[0] = (tmp >> 8);
+    reg[1] = tmp;
 
     /* Acquire exclusive access to the bus. */
     i2c_acquire(dev->i2c);
@@ -127,10 +127,10 @@ int tmp006_init(tmp006_t *dev, i2c_t i2c, uint8_t address, uint8_t conv_rate)
 int tmp006_reset(tmp006_t *dev)
 {
     int status;
-    char reg[2];
+    uint8_t reg[2];
     uint16_t tmp = TMP006_CONFIG_RST;
-    reg[0] = (uint8_t)(tmp >> 8);
-    reg[1] = (uint8_t)tmp;
+    reg[0] = (tmp >> 8);
+    reg[1] = tmp;
     dev->initialized = false;
 
     /* Acquire exclusive access to the bus. */
@@ -147,7 +147,7 @@ int tmp006_reset(tmp006_t *dev)
 int tmp006_set_active(tmp006_t *dev)
 {
     int status;
-    char reg[2];
+    uint8_t reg[2];
 
     if (dev->initialized == false) {
         return -1;
@@ -160,7 +160,7 @@ int tmp006_set_active(tmp006_t *dev)
         return -1;
     }
 
-    reg[0] |= (uint8_t)(TMP006_CONFIG_MOD(TMP006_CONFIG_MOD_CC) >> 8);
+    reg[0] |= (TMP006_CONFIG_MOD(TMP006_CONFIG_MOD_CC) >> 8);
 
     status = i2c_write_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2);
     if (status != 2) {
@@ -174,7 +174,7 @@ int tmp006_set_active(tmp006_t *dev)
 int tmp006_set_standby(tmp006_t *dev)
 {
     int status;
-    char reg[2];
+    uint8_t reg[2];
 
     i2c_acquire(dev->i2c);
     status = i2c_read_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2);
@@ -184,7 +184,7 @@ int tmp006_set_standby(tmp006_t *dev)
     }
     i2c_release(dev->i2c);
 
-    reg[0] &= ~(uint8_t)(TMP006_CONFIG_MOD(TMP006_CONFIG_MOD_CC) >> 8);
+    reg[0] &= ~(TMP006_CONFIG_MOD(TMP006_CONFIG_MOD_CC) >> 8);
 
     i2c_acquire(dev->i2c);
     status = i2c_write_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2);
@@ -199,7 +199,7 @@ int tmp006_set_standby(tmp006_t *dev)
 int tmp006_read(tmp006_t *dev, int16_t *rawv, int16_t *rawt, uint8_t *drdy)
 {
     int status;
-    char buf[2];
+    uint8_t buf[2];
 
     if (dev->initialized == false) {
         return -1;
@@ -214,7 +214,7 @@ int tmp006_read(tmp006_t *dev, int16_t *rawv, int16_t *rawt, uint8_t *drdy)
     }
     i2c_release(dev->i2c);
 
-    *drdy = buf[1] & (uint8_t)(TMP006_CONFIG_DRDY);
+    *drdy = buf[1] & (TMP006_CONFIG_DRDY);
 
     if (!(*drdy)) {
         /* conversion in progress */

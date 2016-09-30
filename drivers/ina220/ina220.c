@@ -34,7 +34,7 @@
 static int ina220_read_reg(ina220_t *dev, uint8_t reg, uint16_t *out)
 {
     union {
-        char c[2];
+        uint8_t c[2];
         uint16_t u16;
     } tmp = { .u16 = 0 };
     int status = 0;
@@ -53,7 +53,7 @@ static int ina220_read_reg(ina220_t *dev, uint8_t reg, uint16_t *out)
 static int ina220_write_reg(ina220_t *dev, uint8_t reg, uint16_t in)
 {
     union {
-        char c[2];
+        uint8_t c[2];
         uint16_t u16;
     } tmp = { .u16 = 0 };
     int status = 0;

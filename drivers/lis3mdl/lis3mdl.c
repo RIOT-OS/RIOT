@@ -59,7 +59,7 @@ int lis3mdl_init(lis3mdl_t *dev,
                  lis3mdl_odr_t odr,
                  lis3mdl_scale_t scale,
                  lis3mdl_op_t op_mode) {
-    char tmp;
+    uint8_t tmp;
 
     dev->i2c = i2c;
     dev->addr = address;
@@ -98,7 +98,7 @@ int lis3mdl_init(lis3mdl_t *dev,
 
 void lis3mdl_read_mag(lis3mdl_t *dev, lis3mdl_3d_data_t *data)
 {
-    char tmp[2] = {0, 0};
+    uint8_t tmp[2] = {0, 0};
 
     i2c_acquire(dev->i2c);
 
@@ -126,7 +126,7 @@ void lis3mdl_read_mag(lis3mdl_t *dev, lis3mdl_3d_data_t *data)
 void lis3mdl_read_temp(lis3mdl_t *dev, int16_t *value)
 {
     i2c_acquire(dev->i2c);
-    i2c_read_regs(dev->i2c, dev->addr, LIS3MDL_TEMP_OUT_L_REG, (char*)value, 2);
+    i2c_read_regs(dev->i2c, dev->addr, LIS3MDL_TEMP_OUT_L_REG, (uint8_t*)value, 2);
     i2c_release(dev->i2c);
 
     *value = _twos_complement(*value);
@@ -145,8 +145,8 @@ void lis3mdl_enable(lis3mdl_t *dev)
 
 void lis3mdl_disable(lis3mdl_t *dev)
 {
-    char tmp = ( LIS3MDL_MASK_REG3_LOW_POWER_EN   /**< enable power-down mode */
-               | LIS3MDL_MASK_REG3_Z_LOW_POWER);  /**< Z-axis low-power mode */
+    uint8_t tmp = ( LIS3MDL_MASK_REG3_LOW_POWER_EN   /**< enable power-down mode */
+                  | LIS3MDL_MASK_REG3_Z_LOW_POWER);  /**< Z-axis low-power mode */
 
     i2c_acquire(dev->i2c);
     i2c_write_reg(dev->i2c, dev->addr, LIS3MDL_CTRL_REG3, tmp);

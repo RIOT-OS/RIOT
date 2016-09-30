@@ -61,7 +61,7 @@ int srf02_init(srf02_t *dev, i2c_t i2c, uint8_t addr)
 {
     dev->i2c = i2c;
     dev->addr = (addr >> 1);    /* internally we right align the 7-bit addr */
-    char rev;
+    uint8_t rev;
 
     /* Acquire exclusive access to the bus. */
     i2c_acquire(dev->i2c);
@@ -97,7 +97,7 @@ void srf02_trigger(srf02_t *dev, srf02_mode_t mode)
 
 uint16_t srf02_read(srf02_t *dev)
 {
-    char res[2];
+    uint8_t res[2];
 
     /* read the results */
     i2c_acquire(dev->i2c);

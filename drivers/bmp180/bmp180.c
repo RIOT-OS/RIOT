@@ -66,7 +66,7 @@ int bmp180_init(bmp180_t *dev, i2c_t i2c, uint8_t mode)
     i2c_acquire(dev->i2c_dev);
 
     /* Check sensor ID */
-    char checkid;
+    uint8_t checkid;
     i2c_read_reg(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_ID, &checkid);
     if (checkid != 0x55) {
         DEBUG("[Error] Wrong device ID\n");
@@ -77,7 +77,7 @@ int bmp180_init(bmp180_t *dev, i2c_t i2c, uint8_t mode)
     /* adding delay before reading calibration values to avoid timing issues */
     xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
 
-    char buffer[22] = {0};
+    uint8_t buffer[22] = {0};
     /* Read calibration values, using contiguous register addresses */
     if (i2c_read_regs(dev->i2c_dev, BMP180_ADDR, BMP180_CALIBRATION_AC1, buffer, 22) < 0) {
         DEBUG("[Error] Cannot read calibration registers.\n");
@@ -216,8 +216,8 @@ int bmp180_sealevel_pressure(bmp180_t *dev, int32_t altitude, int32_t *pressure_
 static int _read_ut(bmp180_t *dev, int32_t *output)
 {
     /* Read UT (Uncompsensated Temperature value) */
-    char ut[2] = {0};
-    char control[2] = { BMP180_REGISTER_CONTROL, BMP180_TEMPERATURE_COMMAND };
+    uint8_t ut[2] = {0};
+    uint8_t control[2] = { BMP180_REGISTER_CONTROL, BMP180_TEMPERATURE_COMMAND };
     i2c_write_bytes(dev->i2c_dev, BMP180_ADDR, control, 2);
     xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
     if (i2c_read_regs(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_DATA, ut, 2) < 0) {
@@ -235,8 +235,8 @@ static int _read_ut(bmp180_t *dev, int32_t *output)
 static int _read_up(bmp180_t *dev, int32_t *output)
 {
     /* Read UP (Uncompsensated Pressure value) */
-    char up[3] = {0};
-    char control[2] = { BMP180_REGISTER_CONTROL, BMP180_PRESSURE_COMMAND | (dev->oversampling & 0x3) << 6 };
+    uint8_t up[3] = {0};
+    uint8_t control[2] = { BMP180_REGISTER_CONTROL, BMP180_PRESSURE_COMMAND | (dev->oversampling & 0x3) << 6 };
     i2c_write_bytes(dev->i2c_dev, BMP180_ADDR, control, 2);
     switch (dev->oversampling) {
     case BMP180_ULTRALOWPOWER:

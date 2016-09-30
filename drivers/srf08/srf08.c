@@ -95,8 +95,8 @@ int srf08_get_distances(srf08_t *dev, uint16_t *range_array, int num_echos, srf0
 {
     int status;
     int echo_number = 0;
-    char range_bytes[sizeof(uint16_t)];
-    char register_location;
+    uint8_t range_bytes[sizeof(uint16_t)];
+    uint8_t register_location;
     char max_reg_no_read = (num_echos * sizeof(range_bytes)) +1;
 
     /* Acquire exclusive access to the bus. */
