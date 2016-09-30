@@ -39,20 +39,20 @@ extern "C" {
  */
 
 #define NETDEV2_IEEE802154_SEND_MASK        (0x0028)    /**< flags to take for send packets */
-#define NETDEV2_IEEE802154_RESV1            (0x0001)    /**< reserved flag */
 #define NETDEV2_IEEE802154_RAW              (0x0002)    /**< pass raw frame to upper layer */
 /**
  * @brief   use long source addres (set) or short source address (unset)
  */
 #define NETDEV2_IEEE802154_SRC_MODE_LONG    (0x0004)
-#define NETDEV2_IEEE802154_SECURITY_EN      (0x0008)    /**< enable security */
-#define NETDEV2_IEEE802154_RESV2            (0x0010)    /**< reserved flag */
+/**
+ * @brief enable security
+ */
+#define NETDEV2_IEEE802154_SECURITY_EN      (IEEE802154_FCF_SECURITY_EN)
 
 /**
  * @brief   request ACK from receiver
  */
-#define NETDEV2_IEEE802154_ACK_REQ          (0x0020)
-#define NETDEV2_IEEE802154_RESV3            (0x0080)    /**< reserved flag */
+#define NETDEV2_IEEE802154_ACK_REQ          (IEEE802154_FCF_ACK_REQ)
 /**
  * @}
  */
