@@ -102,6 +102,17 @@ typedef unsigned int uart_t;
 typedef void(*uart_rx_cb_t)(void *arg, uint8_t data);
 
 /**
+ * @brief   parity mode enum
+ * @{
+ */
+typedef enum {
+	uart_parity_none = 0,
+	uart_parity_even = 1,
+	uart_parity_odd  = 2,
+} uart_parity;
+/** @} */
+
+/**
  * @brief   Interrupt context for a UART device
  * @{
  */
@@ -162,6 +173,50 @@ void uart_poweron(uart_t uart);
  * @param[in] uart          the UART device to power off
  */
 void uart_poweroff(uart_t uart);
+
+/**
+ * @brief flush UART TX buffer
+ *
+ * wait until UART TX buffer is empty
+ *
+ * @param[in] uart          the UART device to flush
+ */
+void uart_flush(uart_t uart);
+
+/**
+ * @brief set UART baudrate
+ *
+ * @param[in] uart          the UART device to set baud rate
+ * @param[in] baudrate      baud rate
+ *
+ * @return                  0 on success
+ * @return                  -1 on invalid UART device
+ * @return                  -2 on inapplicable baudrate
+ */
+int uart_set_baudrate(uart_t uart, uint32_t baudrate);
+
+/**
+ * @brief set UART parity
+ *
+ * @param[in] uart          the UART device to set parity mode
+ * @param[in] parity        parity mode
+ *
+ * @return                  0 on success
+ * @return                  -1 on invalid UART device
+ * @return                  -2 on inapplicable parity
+ */
+int uart_set_parity(uart_t uart, uart_parity parity);
+
+/**
+ * @brief set UART stop bits
+ *
+ * @param[in] uart          the UART device to set stop bits
+ * @param[in] sb            number of stop bits
+ *
+ * @return                  0 on success
+ * @return                  -1 on inapplicable stop bits number
+ */
+int uart_set_stopbits(uart_t uart, uint8_t sb);
 
 #ifdef __cplusplus
 }

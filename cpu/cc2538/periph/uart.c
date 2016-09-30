@@ -353,3 +353,136 @@ void uart_poweroff(uart_t uart)
 {
     (void) uart;
 }
+
+void uart_flush(uart_t uart)
+{
+	//TODO: check/test
+    cc2538_uart_t *u;
+
+    switch (uart) {
+#if UART_0_EN
+        case UART_0:
+            u = UART_0_DEV;
+            break;
+#endif
+#if UART_1_EN
+        case UART_1:
+            u = UART_1_DEV;
+            break;
+#endif
+        default:
+            return;
+    }
+
+    /* stupid busy waiting, could be improved... */
+	while(u->cc2538_uart_fr.FRbits.TXFE == 0);
+}
+
+int uart_set_baudrate(uart_t uart, uint32_t baudrate)
+{
+    cc2538_uart_t *u;
+
+    switch (uart) {
+#if UART_0_EN
+        case UART_0:
+            u = UART_0_DEV;
+            break;
+#endif
+#if UART_1_EN
+        case UART_1:
+            u = UART_1_DEV;
+            break;
+#endif
+        default:
+            return -1;
+    }
+
+    /* Save LCRH */
+    cc2538_reg_t lcrh;
+    lcrh = u->cc2538_uart_lcrh.LCRH;
+
+    /* Set the divisor for the baud rate generator */
+    uint32_t divisor = sys_clock_freq();
+    divisor <<= UART_CTL_HSE_VALUE + 2;
+    divisor += baudrate / 2; /**< Avoid a rounding error */
+    divisor /= baudrate;
+    u->IBRD = divisor >> DIVFRAC_NUM_BITS;
+    u->FBRD = divisor & DIVFRAC_MASK;
+
+    /* Restore LCRH */
+    u->cc2538_uart_lcrh.LCRH = lcrh;
+
+	return 0;
+}
+
+int uart_set_parity(uart_t uart, uart_parity parity)
+{
+    cc2538_uart_t *u;
+
+    switch (uart) {
+#if UART_0_EN
+        case UART_0:
+            u = UART_0_DEV;
+            break;
+#endif
+#if UART_1_EN
+        case UART_1:
+            u = UART_1_DEV;
+            break;
+#endif
+        default:
+            return -1;
+    }
+
+    switch(parity){
+		case uart_parity_none:
+			u->cc2538_uart_lcrh.LCRHbits.EPS = 0;
+			u->cc2538_uart_lcrh.LCRHbits.PEN = 0;
+			break;
+		case uart_parity_even:
+			u->cc2538_uart_lcrh.LCRHbits.EPS = 1;
+			u->cc2538_uart_lcrh.LCRHbits.PEN = 1;
+			break;
+		case uart_parity_odd:
+			u->cc2538_uart_lcrh.LCRHbits.EPS = 0;
+			u->cc2538_uart_lcrh.LCRHbits.PEN = 1;
+			break;
+		default:
+			return -2;
+    }
+
+    return 0;
+}
+
+int uart_set_stopbits(uart_t uart, uint8_t sb)
+{
+    cc2538_uart_t *u;
+
+    switch (uart) {
+#if UART_0_EN
+        case UART_0:
+            u = UART_0_DEV;
+            break;
+#endif
+#if UART_1_EN
+        case UART_1:
+            u = UART_1_DEV;
+            break;
+#endif
+        default:
+            return -1;
+    }
+
+    switch(sb){
+		case 1:
+			u->cc2538_uart_lcrh.LCRHbits.STP2 = 0;
+			break;
+		case 2:
+			u->cc2538_uart_lcrh.LCRHbits.STP2 = 1;
+			break;
+		default:
+			return -2;
+    }
+
+    return 0;
+}
