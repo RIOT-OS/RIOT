@@ -15,8 +15,11 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <string.h>
 
 #include "net/ieee802154.h"
+
+const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN] = IEEE802154_ADDR_BCAST;
 
 size_t ieee802154_set_frame_hdr(uint8_t *buf, const uint8_t *src, size_t src_len,
                                 const uint8_t *dst, size_t dst_len,
@@ -25,15 +28,12 @@ size_t ieee802154_set_frame_hdr(uint8_t *buf, const uint8_t *src, size_t src_len
 {
     int pos = 3;    /* 0-1: FCS, 2: seq */
     uint8_t type = (flags & IEEE802154_FCF_TYPE_MASK);
-    uint8_t bcast = (flags & IEEE802154_BCAST);
 
-    buf[0] = flags & (~IEEE802154_BCAST);
+    buf[0] = flags;
     buf[1] = IEEE802154_FCF_VERS_V1;
 
     if (((src_len != 0) && (src == NULL)) ||
-        ((!bcast) && (dst_len != 0) && (dst == NULL)) ||
-        ((flags & IEEE802154_FCF_PAN_COMP) &&
-         (((!bcast) && (dst_len == 0)) || (src_len == 0)))) {
+        ((dst_len != 0) && (dst == NULL))) {
         return 0;
     }
 
@@ -46,39 +46,34 @@ size_t ieee802154_set_frame_hdr(uint8_t *buf, const uint8_t *src, size_t src_len
     /* set sequence number */
     buf[2] = seq;
 
-    if (bcast || (dst_len != 0)) {
+    if (dst_len != 0) {
         buf[pos++] = dst_pan.u8[0];
         buf[pos++] = dst_pan.u8[1];
     }
 
     /* fill in destination address */
-    if (bcast) {
-        /* no ACK_REQ for broadcast */
-        buf[0] &= ~IEEE802154_FCF_ACK_REQ;
-        buf[1] &= ~IEEE802154_FCF_DST_ADDR_MASK;
-        buf[1] |= IEEE802154_FCF_DST_ADDR_SHORT;
-        buf[pos++] = 0xff;
-        buf[pos++] = 0xff;
-    }
-    else {
-        switch (dst_len) {
-            case 0:
-                buf[1] |= IEEE802154_FCF_DST_ADDR_VOID;
-                break;
-            case 2:
-                buf[1] |= IEEE802154_FCF_DST_ADDR_SHORT;
-                buf[pos++] = dst[1];
-                buf[pos++] = dst[0];
-                break;
-            case 8:
-                buf[1] |= IEEE802154_FCF_DST_ADDR_LONG;
-                for (int i = 7; i >= 0; i--) {
-                    buf[pos++] = dst[i];
-                }
-                break;
-            default:
-                return 0;
-        }
+    switch (dst_len) {
+        case 0:
+            buf[1] |= IEEE802154_FCF_DST_ADDR_VOID;
+            break;
+        case 2:
+            if (memcmp(dst, ieee802154_addr_bcast,
+                       sizeof(ieee802154_addr_bcast)) == 0) {
+                /* do not request ACKs for broadcast address */
+                buf[0] &= ~IEEE802154_FCF_ACK_REQ;
+            }
+            buf[1] |= IEEE802154_FCF_DST_ADDR_SHORT;
+            buf[pos++] = dst[1];
+            buf[pos++] = dst[0];
+            break;
+        case 8:
+            buf[1] |= IEEE802154_FCF_DST_ADDR_LONG;
+            for (int i = 7; i >= 0; i--) {
+                buf[pos++] = dst[i];
+            }
+            break;
+        default:
+            return 0;
     }
 
     /* fill in source PAN ID (if applicable) */
