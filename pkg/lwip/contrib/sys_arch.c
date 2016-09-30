@@ -147,6 +147,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
     }
     mbox_get(&mbox->mbox, &m);
     stop = xtimer_now64();
+    xtimer_remove(&timer);  /* in case timer did not time out */
     switch (m.type) {
         case _MSG_SUCCESS:
             *msg = m.content.ptr;
