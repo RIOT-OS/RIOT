@@ -119,9 +119,8 @@ extern "C" {
  *                      first byte of the IEEE 802.15.4 FCF. This means that
  *                      it encompasses the type values,
  *                      @ref IEEE802154_FCF_SECURITY_EN,
- *                      @ref IEEE802154_FCF_FRAME_PEND,
- *                      @ref IEEE802154_FCF_ACK_REQ, and
- *                      @ref IEEE802154_FCF_PAN_COMP.
+ *                      @ref IEEE802154_FCF_FRAME_PEND, and
+ *                      @ref IEEE802154_FCF_ACK_REQ.
  *                      Additionally the @ref IEEE802154_BCAST flag can be set
  *                      do ignore @p dst and @p dst_len and just set `ff:ff`
  *                      (broadcast) as destination address

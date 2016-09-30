@@ -38,7 +38,7 @@ extern "C" {
  * @{
  */
 
-#define NETDEV2_IEEE802154_SEND_MASK        (0x0068)    /**< flags to take for send packets */
+#define NETDEV2_IEEE802154_SEND_MASK        (0x0028)    /**< flags to take for send packets */
 #define NETDEV2_IEEE802154_RESV1            (0x0001)    /**< reserved flag */
 #define NETDEV2_IEEE802154_RAW              (0x0002)    /**< pass raw frame to upper layer */
 /**
@@ -52,7 +52,6 @@ extern "C" {
  * @brief   request ACK from receiver
  */
 #define NETDEV2_IEEE802154_ACK_REQ          (0x0020)
-#define NETDEV2_IEEE802154_PAN_COMP         (0x0040)    /**< compress source PAN ID */
 #define NETDEV2_IEEE802154_RESV3            (0x0080)    /**< reserved flag */
 /**
  * @}

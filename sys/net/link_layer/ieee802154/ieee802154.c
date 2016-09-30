@@ -82,10 +82,15 @@ size_t ieee802154_set_frame_hdr(uint8_t *buf, const uint8_t *src, size_t src_len
     }
 
     /* fill in source PAN ID (if applicable) */
-    if (!(flags & IEEE802154_FCF_PAN_COMP) && (src_len != 0)) {
-        /* (little endian) */
-        buf[pos++] = src_pan.u8[0];
-        buf[pos++] = src_pan.u8[1];
+    if (src_len != 0) {
+        if ((dst_len != 0) && (src_pan.u16 == dst_pan.u16)) {
+            buf[0] |= IEEE802154_FCF_PAN_COMP;
+        }
+        else {
+            /* (little endian) */
+            buf[pos++] = src_pan.u8[0];
+            buf[pos++] = src_pan.u8[1];
+        }
     }
 
     /* fill in source address */
