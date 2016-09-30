@@ -68,13 +68,14 @@ static void test_ieee802154_set_frame_hdr_bcast_src0(void)
                                 IEEE802154_FCF_DST_ADDR_SHORT,
                             TEST_UINT8,
                             dst_pan.u8[0], dst_pan.u8[1],
-                            0xff, 0xff };
+                            ieee802154_addr_bcast[0], ieee802154_addr_bcast[1] };
     uint8_t res[sizeof(exp)];
-    const uint8_t flags = IEEE802154_BCAST;
+    const uint8_t flags = 0;
 
     TEST_ASSERT_EQUAL_INT(sizeof(exp),
                           ieee802154_set_frame_hdr(res, NULL, 0,
-                                                   NULL, 0,
+                                                   ieee802154_addr_bcast,
+                                                   IEEE802154_ADDR_BCAST_LEN,
                                                    src_pan, dst_pan,
                                                    flags, TEST_UINT8));
     TEST_ASSERT_EQUAL_INT(0, memcmp(exp, res, sizeof(exp)));
@@ -92,70 +93,16 @@ static void test_ieee802154_set_frame_hdr_bcast_src2(void)
                                 IEEE802154_FCF_SRC_ADDR_SHORT,
                             TEST_UINT8,
                             dst_pan.u8[0], dst_pan.u8[1],
-                            0xff, 0xff,
+                            ieee802154_addr_bcast[0], ieee802154_addr_bcast[1],
                             src_pan.u8[0], src_pan.u8[1],
                             src.u8[1], src.u8[0] };
     uint8_t res[sizeof(exp)];
-    const uint8_t flags = IEEE802154_BCAST;
+    const uint8_t flags = 0;
 
     TEST_ASSERT_EQUAL_INT(sizeof(exp),
                           ieee802154_set_frame_hdr(res, src.u8, sizeof(src),
-                                                   NULL, 0,
-                                                   src_pan, dst_pan,
-                                                   flags, TEST_UINT8));
-    TEST_ASSERT_EQUAL_INT(0, memcmp(exp, res, sizeof(exp)));
-}
-
-static void test_ieee802154_set_frame_hdr_bcast_dst2_src2(void)
-{
-    const network_uint16_t src = byteorder_htons(TEST_UINT16);
-    const le_uint16_t src_pan = byteorder_htols(TEST_UINT16 + 1);
-    const network_uint16_t dst = byteorder_htons(TEST_UINT16);
-    const le_uint16_t dst_pan = byteorder_htols(TEST_UINT16 + 2);
-    /* IEEE 802.15.4 is little endian! */
-    const uint8_t exp[] = { 0x00,
-                            IEEE802154_FCF_VERS_V1 |
-                                IEEE802154_FCF_DST_ADDR_SHORT |
-                                IEEE802154_FCF_SRC_ADDR_SHORT,
-                            TEST_UINT8,
-                            dst_pan.u8[0], dst_pan.u8[1],
-                            0xff, 0xff,
-                            src_pan.u8[0], src_pan.u8[1],
-                            src.u8[1], src.u8[0] };
-    uint8_t res[sizeof(exp)];
-    const uint8_t flags = IEEE802154_BCAST; /* broadcast flag lets dst be ignored */
-
-    TEST_ASSERT_EQUAL_INT(sizeof(exp),
-                          ieee802154_set_frame_hdr(res, src.u8, sizeof(src),
-                                                   dst.u8, sizeof(dst),
-                                                   src_pan, dst_pan,
-                                                   flags, TEST_UINT8));
-    TEST_ASSERT_EQUAL_INT(0, memcmp(exp, res, sizeof(exp)));
-}
-
-static void test_ieee802154_set_frame_hdr_bcast_dst8_src2(void)
-{
-    const network_uint16_t src = byteorder_htons(TEST_UINT16);
-    const le_uint16_t src_pan = byteorder_htols(TEST_UINT16 + 1);
-    const network_uint64_t dst = byteorder_htonll(TEST_UINT64);
-    const le_uint16_t dst_pan = byteorder_htols(TEST_UINT16 + 2);
-    /* IEEE 802.15.4 is little endian! */
-    const uint8_t exp[] = { 0x00,
-                            IEEE802154_FCF_VERS_V1 |
-                                /* broadcast address is short */
-                                IEEE802154_FCF_DST_ADDR_SHORT |
-                                IEEE802154_FCF_SRC_ADDR_SHORT,
-                            TEST_UINT8,
-                            dst_pan.u8[0], dst_pan.u8[1],
-                            0xff, 0xff,
-                            src_pan.u8[0], src_pan.u8[1],
-                            src.u8[1], src.u8[0] };
-    uint8_t res[sizeof(exp)];
-    const uint8_t flags = IEEE802154_BCAST; /* broadcast flag lets dst be ignored */
-
-    TEST_ASSERT_EQUAL_INT(sizeof(exp),
-                          ieee802154_set_frame_hdr(res, src.u8, sizeof(src),
-                                                   dst.u8, sizeof(dst),
+                                                   ieee802154_addr_bcast,
+                                                   IEEE802154_ADDR_BCAST_LEN,
                                                    src_pan, dst_pan,
                                                    flags, TEST_UINT8));
     TEST_ASSERT_EQUAL_INT(0, memcmp(exp, res, sizeof(exp)));
@@ -1071,8 +1018,6 @@ Test *tests_ieee802154_tests(void)
         new_TestFixture(test_ieee802154_set_frame_hdr_flags0_non_beacon_non_ack),
         new_TestFixture(test_ieee802154_set_frame_hdr_bcast_src0),
         new_TestFixture(test_ieee802154_set_frame_hdr_bcast_src2),
-        new_TestFixture(test_ieee802154_set_frame_hdr_bcast_dst2_src2),
-        new_TestFixture(test_ieee802154_set_frame_hdr_bcast_dst8_src2),
         new_TestFixture(test_ieee802154_set_frame_hdr_bcast_src8),
         new_TestFixture(test_ieee802154_set_frame_hdr_dst2_src0),
         new_TestFixture(test_ieee802154_set_frame_hdr_dst2_src2),
