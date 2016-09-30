@@ -140,11 +140,11 @@ do_flash() {
     /bin/echo -n "" > ${BINDIR}/burn.seg
     # create temporary burn file
     if [ ! -z "${JLINK_PRE_FLASH}" ]; then
-        echo "${JLINK_PRE_FLASH}" >> ${BINDIR}/burn.seg
+        printf "${JLINK_PRE_FLASH}\n" >> ${BINDIR}/burn.seg
     fi
     echo "loadbin ${HEXFILE} ${JLINK_FLASH_ADDR}" >> ${BINDIR}/burn.seg
     if [ ! -z "${JLINK_POST_FLASH}" ]; then
-        echo "${JLINK_POST_FLASH}" >> ${BINDIR}/burn.seg
+        printf "${JLINK_POST_FLASH}\n" >> ${BINDIR}/burn.seg
     fi
     cat ${RIOTBASE}/dist/tools/jlink/reset.seg >> ${BINDIR}/burn.seg
     # flash device
