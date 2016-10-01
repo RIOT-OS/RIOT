@@ -51,7 +51,7 @@ extern "C" {
  * @warning EXPERIMENTAL!!1!
  * @note    Use proper value when draft becomes RFC.
  */
-#define ETHERTYPE_6LOENC        (0x87dd)
+#define ETHERTYPE_6LOENC        (0x88b6)
 #define ETHERTYPE_UNKNOWN       (0xffff)    /**< Reserved (no protocol specified) */
 
 #ifdef __cplusplus
