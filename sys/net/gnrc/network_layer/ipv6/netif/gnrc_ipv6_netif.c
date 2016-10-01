@@ -803,6 +803,7 @@ static inline bool _is_6lo_iface(kernel_pid_t iface)
             (if_type == GNRC_NETTYPE_SIXLOWPAN));
 #endif
 #else
+    (void)iface;
     return false;
 #endif
 }
