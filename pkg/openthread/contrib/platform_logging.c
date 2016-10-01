@@ -94,6 +94,10 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat
             fprintf(stderr, "MESHCOP  ");
             break;
 
+		case kLogRegionNetDiag:
+            fprintf(stderr, "NDG  ");
+            break;
+
     }
 
     va_start(args, aFormat);
