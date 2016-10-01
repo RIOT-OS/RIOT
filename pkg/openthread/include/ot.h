@@ -53,14 +53,14 @@ typedef struct {
  *
  * @internal
  */
-void recv_pkt(netdev2_t *dev);
+void recv_pkt(netdev2_t *dev, otInstance *aInstance);
 
 /**
  * @brief   Inform OpenThread when tx is finished
  *
  * @internal
  */
-void send_pkt(netdev2_t *dev, netdev2_event_t event);
+void send_pkt(netdev2_t *dev, netdev2_event_t event, otInstance *aInstance);
 
 /**
  * @brief   bootstrap OpenThread

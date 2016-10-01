@@ -35,6 +35,7 @@
 static msg_t _queue[OPENTHREAD_QUEUE_LEN];
 
 static kernel_pid_t _pid;
+static otInstance *sInstance;
 
 
 /* OpenThread will call this when switching state from empty tasklet to non-empty tasklet. */
@@ -78,7 +79,7 @@ void *_openthread_event_loop(void *arg)
             case OPENTHREAD_XTIMER_MSG_TYPE_EVENT:
                 /* Tell OpenThread a time event was received */
                 begin_mutex();
-                otPlatAlarmFired();
+                otPlatAlarmFired(sInstance);
                 end_mutex();
                 break;
             case OPENTHREAD_NETDEV2_MSG_TYPE_EVENT:
@@ -118,13 +119,13 @@ void _event_cb(netdev2_t *dev, netdev2_event_t event)
         switch (event) {
             case NETDEV2_EVENT_RX_COMPLETE:
                 DEBUG("openthread_netdev2: Reception of a pcket\n");
-                recv_pkt(dev);
+                recv_pkt(dev, sInstance);
                 break;
             case NETDEV2_EVENT_TX_COMPLETE:
             case NETDEV2_EVENT_TX_NOACK:
             case NETDEV2_EVENT_TX_MEDIUM_BUSY:
                 DEBUG("openthread_netdev2: Transmission of a pcket\n");
-                send_pkt(dev, event);
+                send_pkt(dev, event, sInstance);
                 break;
             default:
                 break;
