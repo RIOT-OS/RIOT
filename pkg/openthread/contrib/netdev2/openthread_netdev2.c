@@ -39,7 +39,7 @@ static otInstance *sInstance;
 
 
 /* OpenThread will call this when switching state from empty tasklet to non-empty tasklet. */
-void otSignalTaskletPending(void)
+void otSignalTaskletPending(otInstance *aInstance)
 {
     //Unused
 }
@@ -58,20 +58,18 @@ void *_openthread_event_loop(void *arg)
 #ifdef MODULE_OPENTHREAD_CLI
     otCliUartInit();
 #else
-    /* equivalent to "start" command of OpenThread CLI */
-    otEnable();
 
 #ifdef MODULE_OPENTHREAD_NCP
     otNcpInit();
 #endif
     /* It's necessary to call this after otEnable. Otherwise will freeze */
-    otProcessNextTasklet();
+    otProcessQueuedTasklets(sInstance);
 #endif
 
     while (1) {
         /* Process OpenThread tasklets */
         begin_mutex();
-        otProcessNextTasklet();
+		otProcessQueuedTasklets(sInstance);
         end_mutex();
 
         msg_receive(&msg);
