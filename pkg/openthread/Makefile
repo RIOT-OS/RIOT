@@ -1,6 +1,6 @@
 PKG_NAME=openthread
 PKG_URL=git://github.com/openthread/openthread.git
-PKG_VERSION=0d54e51ebead7011bf81014b5f48c63557f5973b
+PKG_VERSION=95d2e8cdecc096efbf3287e6607c7b441086c115
 PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/$(PKG_NAME)
 
 .PHONY: all
