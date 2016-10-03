@@ -587,6 +587,7 @@ ifneq (,$(filter openthread_core,$(USEMODULE)))
   USEMODULE+=openthread_core_net
   USEMODULE+=openthread_core_crypto
   USEMODULE+=openthread_core_mac
+  USEMODULE+=openthread_core_meshcop
   USEMODULE+=mbedtls
   USEMODULE+=mbedtls_lib
 endif
