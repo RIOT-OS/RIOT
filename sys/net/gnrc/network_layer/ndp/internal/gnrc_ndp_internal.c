@@ -253,7 +253,7 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
     size_t src_len = 0;
 
     DEBUG("ndp internal: send neighbor solicitation (iface: %" PRIkernel_pid ", tgt: %s, ",
-          iface, ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
+          iface, ipv6_addr_to_str(addr_str, src ? src : &ipv6_addr_unspecified, sizeof(addr_str)));
     DEBUG("dst: %s)\n", ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
 
     /* check if there is a fitting source address to target */
