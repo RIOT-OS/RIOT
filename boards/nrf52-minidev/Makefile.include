@@ -1,0 +1,29 @@
+# define the cpu used by the nRF52 DK
+export CPU = nrf52
+export CPU_MODEL = nrf52xxaa
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+
+# setup the boards dependencies
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+
+# Define the flash-tool and default port:
+export PROGRAMMER ?= openocd
+
+ifeq ($(PROGRAMMER),openocd)
+else ifeq ($(PROGRAMMER),jlink)
+	# setup JLink for flashing
+	export JLINK_DEVICE := nrf52
+	# special options when using SoftDevice
+	ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
+		export JLINK_PRE_FLASH := erase\nloadfile $(BINDIR)/softdevice.hex
+		export JLINK_FLASH_ADDR := 0x1f000
+		export LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
+	endif
+endif
+include $(RIOTBOARD)/Makefile.include.$(PROGRAMMER)
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
