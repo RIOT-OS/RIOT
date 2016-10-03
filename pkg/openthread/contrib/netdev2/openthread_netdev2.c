@@ -56,7 +56,7 @@ void *_openthread_event_loop(void *arg)
     msg_t msg;
 
 #ifdef MODULE_OPENTHREAD_CLI
-    otCliUartInit();
+    otCliUartInit(sInstance);
 #else
 
 #ifdef MODULE_OPENTHREAD_NCP

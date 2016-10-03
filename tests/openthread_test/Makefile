@@ -17,7 +17,7 @@ QUIET ?= 1
 USEMODULE+=openthread
 
 #Comment this line for using RIOT shell with OpenThread
-#USEMODULE+=openthread_cli
+USEMODULE+=openthread_cli
 
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))
