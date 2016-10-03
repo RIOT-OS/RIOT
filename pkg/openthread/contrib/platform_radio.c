@@ -235,6 +235,23 @@ ThreadError otPlatRadioSetExtendedAddress(otInstance *aInstance, uint8_t *aExten
     return kThreadError_None;
 }
 
+/* OpenThread will call this for getting IEEE EUI64 */
+void otPlatRadioGetIeeeEui64(otInstance *aInstance, uint8_t *aIeeeEui64)
+{
+	/*Dummy data*/
+	/* TODO */
+	char NODE_ID = 1;
+	(void)aInstance;
+    aIeeeEui64[0] = 0x18;
+    aIeeeEui64[1] = 0xb4;
+    aIeeeEui64[2] = 0x30;
+    aIeeeEui64[3] = 0x00;
+    aIeeeEui64[4] = (NODE_ID >> 24) & 0xff;
+    aIeeeEui64[5] = (NODE_ID >> 16) & 0xff;
+    aIeeeEui64[6] = (NODE_ID >> 8) & 0xff;
+    aIeeeEui64[7] = NODE_ID & 0xff;
+}
+
 /* OpenThread will call this for setting short address */
 ThreadError otPlatRadioSetShortAddress(otInstance *aInstance, uint16_t aShortAddress)
 {
