@@ -9,11 +9,6 @@
 #include <mips/m32c0.h>
 #include "arch/lpm_arch.h"
 
-void lpm_arch_init(void)
-{
-
-}
-
 enum lpm_mode lpm_arch_set(enum lpm_mode target)
 {
     if (target == LPM_IDLE || target == LPM_SLEEP) {
@@ -27,20 +22,5 @@ enum lpm_mode lpm_arch_set(enum lpm_mode target)
 
 enum lpm_mode lpm_arch_get(void)
 {
-    return 0;
-}
-
-void lpm_arch_awake(void)
-{
-
-}
-
-void lpm_arch_begin_awake(void)
-{
-
-}
-
-void lpm_arch_end_awake(void)
-{
-
+    return LPM_ON;
 }
