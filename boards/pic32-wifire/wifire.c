@@ -29,7 +29,7 @@ void board_init(void)
 
     /* intialise UART used for debug (printf) */
 #ifdef DEBUG_VIA_UART
-    uart_init(DEBUG_VIA_UART, 9600, NULL, 0);
+    uart_init(DEBUG_VIA_UART, DEBUG_UART_BAUD, NULL, 0);
 #endif
 }
 

@@ -14,7 +14,9 @@
 extern "C" {
 #endif
 
-/* Peripheral clock frequency need for UART baud rate calculation */
+#include "p32mx470f512h.h"
+
+/* Peripheral clock frequency needed for UART baud rate calculation */
 #define PERIPHERAL_CLOCK 120000000  /* Hz */
 
 /* Tick per uS need by timer code */

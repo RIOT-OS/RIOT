@@ -22,6 +22,7 @@ extern "C" {
 
 /* Route debug output to UART 4 (the USB one via FTDI chip) */
 #define DEBUG_VIA_UART 3
+#define DEBUG_UART_BAUD 9600
 
 #ifdef __cplusplus
 }

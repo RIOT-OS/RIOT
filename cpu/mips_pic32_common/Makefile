@@ -4,12 +4,6 @@ else
 MIPS_ELF_ROOT?=/opt/imgtec/Toolchains/mips-mti-elf/2016.05-03
 endif
 
-# define the module that is build
-MODULE = cpu
-
-# add a list of subdirectories, that should also be build
-DIRS += $(RIOTCPU)/mips_pic32_common $(RIOTCPU)/mips32r2_common
+DIRS = periph
 
 include $(RIOTBASE)/Makefile.base
-
-

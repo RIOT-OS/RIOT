@@ -8,7 +8,6 @@
 #include "periph/uart.h"
 #include "periph_uart.h"
 
-
 static inline void w32(uint32_t addr, uint32_t val)
 {
     *((volatile uint32_t *)addr) = val;
@@ -29,7 +28,7 @@ void board_init(void)
 
     /* intialise UART used for debug (printf) */
 #ifdef DEBUG_VIA_UART
-    uart_init(DEBUG_VIA_UART, 9600, NULL, 0);
+    uart_init(DEBUG_VIA_UART, DEBUG_UART_BAUD, NULL, 0);
 #endif
 }
 

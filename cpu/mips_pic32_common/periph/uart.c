@@ -32,7 +32,6 @@
 #define UxTXREG(U)  U.regs[0x20/4]
 #define UxRXREG(U)  U.regs[0x30/4]
 #define UxBRG(U)    U.regs[0x40/4]
-#define UART_BASE   0xBF806000
 #define UART_REGS_SPACING 0x200
 
 /* PERIPHERAL_CLOCK must be defined in board file */
@@ -53,7 +52,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 	/* Pin Mux should be setup in board file */
 
-	pic_uart[uart].regs = (volatile uint32_t *)(UART_BASE + (uart-1) * UART_REGS_SPACING);
+	pic_uart[uart].regs = (volatile uint32_t *)(_UART1_BASE_ADDRESS + (uart-1) * UART_REGS_SPACING);
 	pic_uart[uart].clock = PERIPHERAL_CLOCK;
 
 

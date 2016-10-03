@@ -10,6 +10,8 @@
 extern "C" {
 #endif
 
+#include "p32mz2048efg100.h"
+
 /* Peripheral clock frequency need for UART baud rate calculation */
 #define PERIPHERAL_CLOCK 100000000  /* Hz */
 
