@@ -97,6 +97,11 @@ void end_mutex(void)
     mutex_unlock(&mtx);
 }
 
+void otPlatReset(otInstance *aInstance)
+{
+	/*TODO: Implement*/
+	(void)aInstance;
+}
 void openthread_bootstrap(void)
 {
     /* init random */
