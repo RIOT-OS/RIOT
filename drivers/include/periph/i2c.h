@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,9 +11,44 @@
  * @ingroup     drivers_periph
  * @brief       Low-level I2C peripheral driver
  *
- * @{
- * @file
- * @brief       Low-level I2C peripheral driver interface definition
+ * This interface provides a simple abstraction to use the MCUs I2C peripherals.
+ * It provides support for 7-bit and 10-bit addressing and can be used for
+ * different kind of register addressing schemes.
+ *
+ * Example for reading a 8-bit register on a device, using a 10-bit device
+ * address and 8-bit register addresses and using a RESTART condition (CAUTION:
+ * this example does not check any return values...):
+ *
+ * @code{c}
+ * // initialize the bus
+ * i2c_init(dev);
+ * ...
+ * // before accessing the bus, we need to acquire it
+ * i2c_acquire(dev);
+ * // next we write the register address, but create no STOP condition when done
+ * i2c_write_byte(dev, device_addr, reg_addr, (i2C_NOSTOP | I2C_ADDR10));
+ * // and now we read the register value
+ * i2c_read(dev, device_addr, &reg_value, 1, I2C_ADDR10);
+ * // finally we have to release the bus
+ * i2c_release(dev);
+ * @endcode
+ *
+ * Example for writing a 16-bit register with 16-bit register addressing and
+ * 7-bit device addressing:
+ *
+ * @code{c}
+ * // initialize the bus
+ * i2c_init(dev);
+ * ...
+ * // first, acquire the shared bus again
+ * i2c_acquire(dev);
+ * // write the 16-bit register address to the device and prevent STOP condition
+ * i2c_write(dev, device_addr, reg_addr, I2C_NOSTOP);
+ * // and write the data after a REPEATED START
+ * i2c_write(dev, device_addr, reg_data, 2, 0);
+ * // and finally free the bus again
+ * i2c_release(dev);
+ * @endcode
  *
  * The I2C signal lines SDA/SCL need external pull-up resistors which connect
  * the lines to the positive voltage supply Vcc. The I2C driver implementation
@@ -44,39 +79,27 @@
  * For more details refer to section 7.1 in:<br>
  * http://www.nxp.com/documents/user_manual/UM10204.pdf
  *
- * @note        The current version of this interface only supports the
-                7-bit addressing mode.
+ * @{
+ * @file
+ * @brief       Low-level I2C peripheral driver interface definition
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-#ifndef I2C_H
-#define I2C_H
+#ifndef PERIPH_I2C_H
+#define PERIPH_I2C_H
 
 #include <stdint.h>
+#include <stddef.h>
 #include <limits.h>
 
+#include "periph_conf.h"
 #include "periph_cpu.h"
-/**
- * @todo    Remove dev_enums.h include once all platforms are ported to the
- *          updated periph interface
- */
-#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   Flag signaling a write operation on the bus
- */
-#define I2C_FLAG_WRITE      0
-
-/**
- * @brief   Flag signaling a read operation on the bus
- */
-#define I2C_FLAG_READ       1
 
 /**
  * @brief   Default I2C device access macro
@@ -106,6 +129,11 @@ typedef unsigned int i2c_t;
 /**  @} */
 
 /**
+ * @brief   Read bit needs to be set when reading
+ */
+#define I2C_READ            (0x0001)
+
+/**
  * @brief   Default mapping of I2C bus speed values
  * @{
  */
@@ -121,16 +149,66 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   Initialize an I2C device to run as bus master
+ * @brief   I2C transfer flags
+ * @{
+ */
+#ifndef HAVE_I2C_FLAGS_T
+typedef enum {
+    I2C_ADDR10  = 0x01,     /**< use 10-bit device addressing */
+    I2C_REG16   = 0x02,     /**< use 16-bit register addressing */
+    I2C_NOSTOP  = 0x04,     /**< do not issue a STOP condition after transfer */
+    I2C_NOSTART = 0x08      /**< skip START sequence, ignores address field */
+} i2c_flags_t;
+#endif
+/** @} */
+
+/**
+ * @brief   I2C transfer results
+ */
+enum {
+    /**
+     * @brief   All bytes were transferred successfully
+     */
+    I2C_ACK = 0,
+    /**
+     * @brief   NACK when transferring the address byte
+     *
+     * After the address + the read/write bit were send, we got an NACK as
+     * response. This means most probably, that there is no slave with the used
+     * address on the bus, or the slave did just not respond for some reason.
+     */
+    I2C_ADDR_NACK = -1,
+    /**
+     * @brief   NACK while writing data bytes
+     *
+     * The slave responded to a data byte written to it with a NACK.
+     */
+    I2C_DATA_NACK = -2,
+     /**
+      * @brief   Internal error
+      *
+      * This status code is returned, on any other internal error that might
+      * have occurred. Possible reasons are not supported modes (e.g. 10-bit
+      * addressing).
+      */
+    I2C_ERR = -3
+};
+
+/**
+ * @brief   Initialize the given I2C bus
  *
- * @param[in] dev           the device to initialize
- * @param[in] speed         the selected bus speed
+ * The given I2C device will be initialized with the parameters as specified in
+ * the boards periph_conf.h, using the pins and the speed value given there.
+ *
+ * The bus MUST not be acquired before initializing it, as this is handled
+ * internally by the i2c_init function!
+ *
+ * @param[in] dev       the device to initialize
  *
  * @return                  0 on successful initialization
  * @return                  -1 on undefined device given
- * @return                  -2 on unsupported speed value
  */
-int i2c_init_master(i2c_t dev, i2c_speed_t speed);
+int i2c_init(i2c_t dev);
 
 /**
  * @brief   Get mutually exclusive access to the given I2C bus
@@ -138,150 +216,111 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed);
  * In case the I2C device is busy, this function will block until the bus is
  * free again.
  *
- * @param[in] dev       I2C device to access
+ * @param[in] dev           I2C device to access
  *
- * @return              0 on success
- * @return              -1 on error
+ * @return                  0 on success
  */
 int i2c_acquire(i2c_t dev);
 
 /**
  * @brief   Release the given I2C device to be used by others
  *
- * @param[in] dev       I2C device to release
- *
- * @return              0 on success
- * @return              -1 on error
+ * @param[in] dev           I2C device to release
  */
-int i2c_release(i2c_t dev);
+void i2c_release(i2c_t dev);
 
 /**
- * @brief   Read one byte from an I2C device with the given address
+ * @brief   Read data from the given I2C device
  *
  * @param[in]  dev          I2C peripheral device
- * @param[in]  address      bus address of the target device
- * @param[out] data         the result that was read
+ * @param[in]  addr         7-bit or 10-bit device address (right-aligned)
+ * @param[out] data         memory location to store received data
+ * @param[in]  len          the number of bytes to read into @p data
+ * @param[in]  flags        optional flags (see @ref i2c_flags_t)
  *
- * @return                  the number of bytes that were read
- * @return                  -1 on undefined device given
- * @return                  -2 on invalid address
+ * @return                  I2C_ACK on successful transfer of @p len byte
+ * @return                  I2C_ADDR_NACK if response to address byte was NACK
+ * @return                  I2C_ERR for any other error
  */
-int i2c_read_byte(i2c_t dev, uint8_t address, char *data);
+int i2c_read(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t flags);
 
 /**
- * @brief   Read multiple bytes from an I2C device with the given address
+ * @brief   Convenience function for reading data from a given register address
+ *
+ * @note    This function is using a repeated start sequence for reading from
+ *          the specified register address.
  *
  * @param[in]  dev          I2C peripheral device
- * @param[in]  address      bus address of the target device
+ * @param[in]  reg          register address to read from (8- or 16-bit,
+ *                          right-aligned)
+ * @param[in]  addr         7-bit or 10-bit device address (right-aligned)
+ * @param[out] data         memory location to store received data
+ * @param[in]  len          the number of bytes to read into @p data
+ * @param[in]  flags        optional flags (see @ref i2c_flags_t)
+ *
+ * @return                  I2C_ACK on successful transfer of @p len byte
+ * @return                  I2C_ADDR_NACK if response to address byte was NACK
+ * @return                  I2C_ERR for any other error
+ */
+int i2c_read_reg(ic2_t dev, uint16_t addr, uint16_t reg,
+                 void *data, size_t len, uint8_t flags);
+
+/**
+ * @brief   Write data from/to the given I2C device
+ *
+ * @param[in]  dev          I2C peripheral device
+ * @param[in]  addr         7-bit or 10-bit device address (right-aligned)
  * @param[out] data         array holding the received bytes
- * @param[in]  length       the number of bytes to read into `data`
+ * @param[in]  len          the number of bytes to read into @p data
+ * @param[in]  flags        optional flags (see @ref i2c_flags_t)
  *
- * @return                  the number of bytes that were read
- * @return                  -1 on undefined device given
+ * @return                  I2C_ACK on successful transfer of @p len byte
+ * @return                  I2C_ADDR_NACK if response to address byte was NACK
+ * @return                  I2C_ERR for any other error
  */
-int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length);
+int i2c_write(i2c_t dev, uint16_t addr,
+              const void *data, size_t len, uint8_t flags);
 
 /**
- * @brief   Read one byte from a register at the I2C slave with the given
- *          address
+ * @brief   Convenience function for writing a single byte onto the bus
+ *
+ * @param[in] dev           I2C peripheral device
+ * @param[in] addr          7-bit or 10-bit device address (right-aligned)
+ * @param[in] data          byte to write to the device
+ * @param[in] flags         optional flags (see @ref i2c_flags_t)
+ *
+ * @return                  I2C_ACK on successful transfer of @p data
+ * @return                  I2C_ADDR_NACK if response to address byte was NACK
+ * @return                  I2C_DATA_NACK if response to the data byte was NACK
+ * @return                  I2C_ERR for any other error
+ */
+int i2c_write_byte(i2c_t dev, uint16_t addr, uint8_t data, uint8_t flags);
+
+/**
+ * @brief   Convenience function for writing data to a given register address
+ *
+ * @note    This function is using a repeated start sequence for writing to the
+ *          specified register address.
  *
  * @param[in]  dev          I2C peripheral device
- * @param[in]  address      bus address of the target device
- * @param[in]  reg          the register address on the targeted I2C device
- * @param[out] data         the result that was read
+ * @param[in]  reg          register address to read from (8- or 16-bit,
+ *                          right-aligned)
+ * @param[in]  addr         7-bit or 10-bit device address (right-aligned)
+ * @param[out] data         memory location to store received data
+ * @param[in]  len          the number of bytes to read into @p data
+ * @param[in]  flags        optional flags (see @ref i2c_flags_t)
  *
- * @return                  the number of bytes that were read
- * @return                  -1 on undefined device given
+ * @return                  I2C_ACK on successful transfer of @p data
+ * @return                  I2C_ADDR_NACK if response to address byte was NACK
+ * @return                  I2C_DATA_NACK if response to the data byte was NACK
+ * @return                  I2C_ERR for any other error
  */
-int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, char *data);
-
-/**
- * @brief   Read multiple bytes from a register at the I2C slave with the given
- *          address
- *
- * @param[in]  dev          I2C peripheral device
- * @param[in]  address      bus address of the target device
- * @param[in]  reg          the register address on the targeted I2C device
- * @param[out] data         array holding the received bytes
- * @param[in]  length       the number of bytes to read into `data`
- *
- * @return                  the number of bytes that were read
- * @return                  -1 on undefined device given
- */
-int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg,
-                  char *data, int length);
-
-/**
- * @brief   Write one byte to an I2C device with the given address
- *
- * @param[in] dev           I2C peripheral device
- * @param[in] address       bus address of the target device
- * @param[in] data          byte to write to the device
- *
- * @return                  the number of bytes that were written
- * @return                  -1 on undefined device given
- */
-int i2c_write_byte(i2c_t dev, uint8_t address, char data);
-
-/**
- * @brief   Write multiple bytes to an I2C device with the given address
- *
- * @param[in] dev           I2C peripheral device
- * @param[in] address       bus address of the target device
- * @param[in] data          array with bytes to write to the target device
- * @param[in] length        number of bytes to write to the target device
- *
- * @return                  the number of bytes that were written
- * @return                  -1 on undefined device given
- */
-int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length);
-
-/**
- * @brief   Write one byte to a register at the I2C slave with the given address
- *
- * @param[in] dev           I2C peripheral device
- * @param[in] address       bus address of the target device
- * @param[in] reg           the register address on the targeted I2C device
- * @param[in] data          byte to write to the device
- *
- * @return                  the number of bytes that were written
- * @return                  -1 on undefined device given
- */
-int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, char data);
-
-/**
- * @brief   Write multiple bytes to a register at the I2C slave with the given
- *          address
- *
- * @param[in] dev           I2C peripheral device
- * @param[in] address       bus address of the target device
- * @param[in] reg           the register address on the targeted I2C device
- * @param[in] data          array with bytes to write to the target device
- * @param[in] length        number of bytes to write to the target device
- *
- * @return                  the number of bytes that were written
- * @return                  -1 on undefined device given
- */
-int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg,
-                   char *data, int length);
-
-/**
- * @brief   Power on the given I2C peripheral
- *
- * @param[in] dev           the I2C device to power on
- */
-void i2c_poweron(i2c_t dev);
-
-/**
- * @brief   Power off the given I2C peripheral
- *
- * @param[in] dev           the I2C device to power off
- */
-void i2c_poweroff(i2c_t dev);
+int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
+                  const void *data, size_t len, uint8_t flags);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* I2C_H */
+#endif /* PERIPH_I2C_H */
 /** @} */
