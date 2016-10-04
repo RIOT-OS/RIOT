@@ -61,13 +61,16 @@ extern "C" {
     #define CIPHER_MAX_CONTEXT_SIZE 1
 #endif
 
-/**
- * error codes
- */
+/* return codes */
+
 #define CIPHER_ERR_INVALID_KEY_SIZE   -3
 #define CIPHER_ERR_INVALID_LENGTH     -4
 #define CIPHER_ERR_ENC_FAILED         -5
 #define CIPHER_ERR_DEC_FAILED         -6
+/** Is returned by the cipher_init functions, if the coresponding alogirithm has not been included in the build */
+#define CIPHER_ERR_BAD_CONTEXT_SIZE    0
+/**  Returned by cipher_init upon succesful initialization of a cipher. */
+#define CIPHER_INIT_SUCCESS            1
 
 /**
  * @brief   the context for cipher-operations
@@ -127,8 +130,9 @@ typedef struct {
  * @param key        encryption key to use
  * @param key_size   length of the encryption key
  *
- * @return  1 if the initialization was successful or 0 in case of an error. 
+ * @return  CIPHER_INIT_SUCCESS if the initialization was successful.
  *          The command may be unsuccessful if the key size is not valid.
+ *          CIPHER_ERR_BAD_CONTEXT_SIZE if CIPHER_MAX_CONTEXT_SIZE has not been defined (which means that the cipher has not been included in the build)
  */
 int cipher_init(cipher_t* cipher, cipher_id_t cipher_id, const uint8_t* key,
                 uint8_t key_size);

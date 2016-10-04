@@ -80,8 +80,9 @@ typedef struct {
  * @param       keySize   the size of the key
  * @param       key       a pointer to the key
  *
- * @return  1 if the initialization was successful or 0 in case of an error. 
+ * @return  CIPHER_INIT_SUCCESS if the initialization was successful.
  *          The command may be unsuccessful if the key size is not valid.
+ *          CIPHER_ERR_BAD_CONTEXT_SIZE if CIPHER_MAX_CONTEXT_SIZE has not been defined (which means that the cipher has not been included in the build)
  */
 int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize);
 
