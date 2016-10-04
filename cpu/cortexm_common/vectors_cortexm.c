@@ -205,8 +205,8 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
     uint32_t dfsr  = SCB->DFSR;
     uint32_t afsr  = SCB->AFSR;
 #endif
-    uint32_t pc=0;
-    uint32_t* orig_sp=NULL;
+    uint32_t pc = 0;
+    uint32_t* orig_sp = NULL;
 
     /* Check if the ISR stack overflowed previously. Not possible to detect
      * after output may also have overflowed it. */
