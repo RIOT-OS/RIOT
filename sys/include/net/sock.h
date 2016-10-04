@@ -12,8 +12,7 @@
 /**
  * @defgroup    net_sock    Sock API
  * @ingroup     net
- * @brief       Provides a minimal common API for applications to connect to the
- *              different network stacks
+ * @brief       Provides a network API for applications and library
  *
  * About
  * =====
@@ -34,38 +33,54 @@
  *    +---------------+
  * ~~~~~~~~~~~~~~~~~~~~
  *
- * This module provides a minimal set of functions to establish connections or
- * send and receives datagrams using different types of communication. Together,
- * they serve as a common API that connects application- and network stack code.
+ * This module provides a set of functions to establish connections or send and
+ * receive datagrams using different types of protocols. Together, they serve as
+ * an API that allows an application or library to connect to a network.
  *
- * Currently the following sock types are defined:
+ * It was designed with the following priorities in mind
+ *
+ * 1. No need for dynamic memory allocation
+ * 2. User friendliness
+ * 3. Simplicity
+ * 4. Efficiency (at both front- and backend)
+ * 5. Portability
+ *
+ * Currently the following `sock` types are defined:
  *
  * * @ref sock_ip_t (net/sock/ip.h): raw IP sock
  * * @ref sock_tcp_t (net/sock/tcp.h): TCP sock
  * * @ref sock_udp_t (net/sock/udp.h): UDP sock
  *
- * Each network stack must implement at least one sock type.
- *
- * Note that there might be no relation between the different sock types.
- * For simplicity and modularity this API doesn't put any restriction of the
- * actual implementation of the type. For example, one implementation might
- * choose to have all sock types have a common base class or use the raw IP
- * sock type to send e.g. UDP packets, while others will keep them
- * completely separate from each other.
+ * Note that there might be no relation between the different `sock` types.
+ * So casting e.g. `sock_ip_t` to `sock_udp_t` might not be as straight forward,
+ * as you think depending on the networking architecture.
  *
  * How To Use
  * ==========
  *
  * A RIOT application uses the functions provided by one or more of the
- * sock type headers (for example @ref sock_udp), regardless of the
+ * `sock` type headers (for example @ref sock_udp_t), regardless of the
  * network stack it uses.
  * The network stack used under the bonnet is specified by including the
- * appropriate module (for example USEMODULE += gnrc_sock_udp)
+ * appropriate module (for example `USEMODULE += gnrc_sock_udp` for
+ * [GNRC's](net_gnrc) version of this API).
  *
  * This allows for network stack agnostic code on the application layer.
  * The application code to establish a connection is always the same, allowing
  * the network stack underneath to be switched simply by changing the
  * `USEMODULE` definitions in the application's Makefile.
+ *
+ * The actual code very much depends on the used `sock` type. Please refer to
+ * their documentation for specific examples.
+ *
+ * Implementor Notes
+ * =================
+ * ### Type definition
+ * For simplicity and modularity this API doesn't put any restriction on the
+ * actual implementation of the type. For example, one implementation might
+ * choose to have all `sock` types having a common base class or use the raw IP
+ * `sock` type to send e.g. UDP packets, while others will keep them
+ * completely separate from each other.
  *
  * @author  Alexander Aring <aar@pengutronix.de>
  * @author  Simon Brummer <simon.brummer@haw-hamburg.de>
@@ -94,14 +109,18 @@ extern "C" {
 
 #if defined(DOXYGEN)
 /**
- * @brief compile flag to activate IPv6 support for sock
+ * @name        Compile flags
+ * @brief       Flags to (de)activate certain functionalities
+ * @{
  */
-#define SOCK_HAS_IPV6
+#define SOCK_HAS_IPV6       /**< activate IPv6 support */
+/** @} */
 #endif
 
 /**
- * @brief       Common flags for @ref net_conn
- * @name        net_sock_flags
+ * @name        Sock flags
+ * @brief       Common flags for @ref net_sock
+ * @anchor      net_sock_flags
  * @{
  */
 #define SOCK_FLAGS_REUSE_EP     (0x0001)    /**< allow to reuse end point on bind */
@@ -140,7 +159,7 @@ typedef struct {
     int family;
 
     union {
-#if defined(SOCK_HAS_IPV6) || defined(DOXYGEN)
+#ifdef SOCK_HAS_IPV6
         /**
          * @brief IPv6 address mode
          *
@@ -176,7 +195,7 @@ struct _sock_tl_ep {
     int family;
 
     union {
-#if defined(SOCK_HAS_IPV6) || defined(DOXYGEN)
+#ifdef SOCK_HAS_IPV6
         /**
          * @brief IPv6 address mode
          *
