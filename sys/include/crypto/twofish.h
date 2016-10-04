@@ -222,8 +222,8 @@ typedef struct {
  * @param   key_size    key size in bytes
  * @param   key         pointer to the key
  *
- * @return  Whether initialization was successful. The command may be
- *          unsuccessful if the key size is not valid.
+ * @return  1 if the initialization was successful or 0 in case of an error. 
+ *          The command may be unsuccessful if the key size is not valid.
  */
 int twofish_init(cipher_context_t *context, const uint8_t *key, uint8_t key_size);
 

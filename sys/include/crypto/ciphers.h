@@ -126,6 +126,9 @@ typedef struct {
  * @param cipher_id  cipher algorithm id
  * @param key        encryption key to use
  * @param key_size   length of the encryption key
+ *
+ * @return  1 if the initialization was successful or 0 in case of an error. 
+ *          The command may be unsuccessful if the key size is not valid.
  */
 int cipher_init(cipher_t* cipher, cipher_id_t cipher_id, const uint8_t* key,
                 uint8_t key_size);
