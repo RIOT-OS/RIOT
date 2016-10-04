@@ -48,6 +48,8 @@ void *_openthread_event_loop(void *arg)
 {
     _pid = thread_getpid();
 
+	sInstance = otInstanceInit();
+	printf("Buffer length is: \n");
     /* enable OpenThread UART */
     otPlatUartEnable();
 
@@ -157,5 +159,53 @@ int openthread_netdev2_init(char *stack, int stacksize, char priority,
     }
 
     return _pid;
+}
+void otPlatRadioEnableSrcMatch(otInstance *aInstance, bool aEnable)
+{
+    (void)aInstance;
+    (void)aEnable;
+}
+
+ThreadError otPlatRadioAddSrcMatchShortEntry(otInstance *aInstance, const uint16_t aShortAddress)
+{
+    (void)aInstance;
+    (void)aShortAddress;
+    return kThreadError_None;
+}
+
+ThreadError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const uint8_t *aExtAddress)
+{
+    (void)aInstance;
+    (void)aExtAddress;
+    return kThreadError_None;
+}
+
+ThreadError otPlatRadioClearSrcMatchShortEntry(otInstance *aInstance, const uint16_t aShortAddress)
+{
+    (void)aInstance;
+    (void)aShortAddress;
+    return kThreadError_None;
+}
+
+ThreadError otPlatRadioClearSrcMatchExtEntry(otInstance *aInstance, const uint8_t *aExtAddress)
+{
+    (void)aInstance;
+    (void)aExtAddress;
+    return kThreadError_None;
+}
+
+void otPlatRadioClearSrcMatchShortEntries(otInstance *aInstance)
+{
+    (void)aInstance;
+}
+
+void otPlatRadioClearSrcMatchExtEntries(otInstance *aInstance)
+{
+    (void)aInstance;
+}
+int8_t otPlatRadioGetRssi(otInstance *aInstance)
+{
+	(void)aInstance;
+	return 0;
 }
 /** @} */
