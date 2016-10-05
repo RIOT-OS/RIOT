@@ -104,9 +104,22 @@ extern "C" {
  * @{
  */
 static const uart_conf_t uart_config[] = {
-    /* device, RX pin, TX pin, mux */
-    {&SERCOM0->USART, GPIO_PIN(PA,5),  GPIO_PIN(PA,4),  GPIO_MUX_D, SERCOM_RX_PAD_1, UART_TX_PAD_0},
-    {&SERCOM5->USART, GPIO_PIN(PA,23), GPIO_PIN(PA,22), GPIO_MUX_D, SERCOM_RX_PAD_1, UART_TX_PAD_0},
+    {
+        .dev    = &SERCOM0->USART,
+        .rx_pin = GPIO_PIN(PA,5),
+        .tx_pin = GPIO_PIN(PA,4),
+        .mux    = GPIO_MUX_D,
+        .rx_pad = UART_PAD_RX_1,
+        .tx_pad = UART_PAD_TX_0
+    },
+    {
+        .dev    = &SERCOM5->USART,
+        .rx_pin = GPIO_PIN(PA,23),
+        .tx_pin = GPIO_PIN(PA,22),
+        .mux    = GPIO_MUX_D,
+        .rx_pad = UART_PAD_RX_1,
+        .tx_pad = UART_PAD_TX_0
+    }
 };
 
 /* interrupt function name mapping */
@@ -168,10 +181,10 @@ static const pwm_conf_t pwm_config[] = {
 #define SPI_0_SCLK_MUX      GPIO_MUX_F
 #define SPI_0_MISO          GPIO_PIN(PC, 19)
 #define SPI_0_MISO_MUX      GPIO_MUX_F
-#define SPI_0_MISO_PAD      SERCOM_RX_PAD_0
+#define SPI_0_MISO_PAD      SPI_PAD_MISO_0
 #define SPI_0_MOSI          GPIO_PIN(PB, 30)
 #define SPI_0_MOSI_MUX      GPIO_MUX_F
-#define SPI_0_MOSI_PAD      SPI_PAD_2_SCK_3
+#define SPI_0_MOSI_PAD      SPI_PAD_MOSI_2_SCK_3
 
 /*      SPI1             */
 #define SPI_1_DEV           SERCOM5->SPI
@@ -182,10 +195,10 @@ static const pwm_conf_t pwm_config[] = {
 #define SPI_1_SCLK_MUX      GPIO_MUX_D
 #define SPI_1_MISO          GPIO_PIN(PB, 02)
 #define SPI_1_MISO_MUX      GPIO_MUX_D
-#define SPI_1_MISO_PAD      SERCOM_RX_PAD_0
+#define SPI_1_MISO_PAD      SPI_PAD_MISO_0
 #define SPI_1_MOSI          GPIO_PIN(PB, 22)
 #define SPI_1_MOSI_MUX      GPIO_MUX_D
-#define SPI_1_MOSI_PAD      SPI_PAD_2_SCK_3
+#define SPI_1_MOSI_PAD      SPI_PAD_MOSI_2_SCK_3
 /** @} */
 
 /**
