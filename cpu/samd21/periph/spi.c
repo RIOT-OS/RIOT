@@ -67,8 +67,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     gpio_mux_t mux_sclk = 0;
     gpio_mux_t mux_miso = 0;
     gpio_mux_t mux_mosi = 0;
-    sercom_spi_txpad_t  dopo = 0;
-    sercom_rxpad_t      dipo = 0;
+    spi_mosipad_t mosi_pad = 0;
+    spi_misopad_t miso_pad = 0;
     uint32_t   cpha = 0;
     uint32_t   cpol = 0;
     uint32_t   f_baud = 0;
@@ -129,8 +129,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         mux_miso = SPI_0_MISO_MUX;
         pin_mosi = SPI_0_MOSI;
         mux_mosi = SPI_0_MOSI_MUX;
-        dopo = SPI_0_MOSI_PAD;
-        dipo = SPI_0_MISO_PAD;
+        mosi_pad = SPI_0_MOSI_PAD;
+        miso_pad = SPI_0_MISO_PAD;
         break;
 #endif
 #if SPI_1_EN
@@ -143,8 +143,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         mux_miso = SPI_1_MISO_MUX;
         pin_mosi = SPI_1_MOSI;
         mux_mosi = SPI_1_MOSI_MUX;
-        dopo = SPI_1_MOSI_PAD;
-        dipo = SPI_1_MISO_PAD;
+        mosi_pad = SPI_1_MOSI_PAD;
+        miso_pad = SPI_1_MISO_PAD;
         break;
 #endif
     default:
@@ -191,8 +191,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 
     spi_dev->BAUD.bit.BAUD = (uint8_t) (((uint32_t)CLOCK_CORECLOCK) / (2 * f_baud) - 1); /* Synchronous mode*/
 
-    spi_dev->CTRLA.reg |= SERCOM_SPI_CTRLA_DOPO(dopo)
-                       |  SERCOM_SPI_CTRLA_DIPO(dipo)
+    spi_dev->CTRLA.reg |= SERCOM_SPI_CTRLA_DOPO(mosi_pad)
+                       |  SERCOM_SPI_CTRLA_DIPO(miso_pad)
                        |  cpha
                        |  cpol;
     while (spi_dev->SYNCBUSY.reg) {}	// ???? not needed
