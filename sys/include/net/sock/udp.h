@@ -322,8 +322,9 @@ typedef struct sock_udp sock_udp_t;
  *         elsewhere
  * @return  -EAFNOSUPPORT, if `local != NULL` or `remote != NULL` and
  *          sock_udp_ep_t::family of @p local or @p remote is not supported.
- * @return  -EINVAL, if sock_udp_ep_t::netif of @p local or @p remote is not a
- *          valid interface or contradict each other (i.e.
+ * @return  -EINVAL, if sock_udp_ep_t::addr of @p remote is an invalid address.
+ * @return  -EINVAL, if sock_udp_ep_t::netif of @p local or @p remote are not a
+ *          valid interfaces or contradict each other (i.e.
  *          `(local->netif != remote->netif) &&
  *          ((local->netif != SOCK_ADDR_ANY_NETIF) ||
  *          (remote->netif != SOCK_ADDR_ANY_NETIF))` if neither is `NULL`).
@@ -420,6 +421,7 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
  *          @p remote is != AF_UNSPEC and not supported.
  * @return  -EHOSTUNREACH, if @p remote or remote end point of @p sock is not
  *          reachable.
+ * @return  -EINVAL, if sock_udp_ep_t::addr of @p remote is an invalid address.
  * @return  -EINVAL, if sock_udp_ep_t::netif of @p remote is not a valid
  *          interface or contradicts the given local interface (i.e.
  *          neither the local end point of `sock` nor remote are assigned to

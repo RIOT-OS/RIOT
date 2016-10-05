@@ -316,9 +316,10 @@ typedef struct sock_ip sock_ip_t;
  *          elsewhere
  * @return  -EAFNOSUPPORT, if `local != NULL` or `remote != NULL` and
  *          sock_ip_ep_t::family of @p local or @p remote is not supported.
- * @return  -EINVAL, if `proto` is not supported or if sock_ip_ep_t::netif of
- *          @p local or @p remote is not a valid interface or contradict each
- *          other (i.e. `(local->netif != remote->netif) &&
+ * @return  -EINVAL, if sock_ip_ep_t::addr of @p remote is an invalid address.
+ * @return  -EINVAL, if sock_ip_ep_t::netif of @p local or @p remote are not
+ *          valid interfaces or contradict each other
+ *          (i.e. `(local->netif != remote->netif) &&
  *          ((local->netif != SOCK_ADDR_ANY_NETIF) ||
  *          (remote->netif != SOCK_ADDR_ANY_NETIF))` if neither is `NULL`).
  * @return  -ENOMEM, if not enough resources can be provided for `sock` to be
@@ -432,6 +433,9 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
  * @return  The number of bytes sent on success.
  * @return  -EAFNOSUPPORT, if `remote != NULL` and sock_ip_ep_t::family of
  *          @p remote is != AF_UNSPEC and not supported.
+ * @return  -EINVAL, if sock_ip_ep_t::addr of @p remote is an invalid address.
+ * @return  -EINVAL, if sock_ip_ep_t::netif of @p remote is not a
+ *          valid interface or contradicts the local interface of @p sock.
  * @return  -EHOSTUNREACH, if @p remote or remote end point of @p sock is not
  *          reachable.
  * @return  -ENOMEM, if no memory was available to send @p data.
