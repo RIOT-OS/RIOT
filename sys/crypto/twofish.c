@@ -483,7 +483,7 @@ int twofish_init(cipher_context_t *context, const uint8_t *key,
     // Make sure that context is large enough. If this is not the case,
     // you should build with -DTWOFISH.
     if(CIPHER_MAX_CONTEXT_SIZE < TWOFISH_CONTEXT_SIZE) {
-        return 0;
+        return CIPHER_ERR_BAD_CONTEXT_SIZE;
     }
 
     //key must be at least CIPHERS_MAX_KEY_SIZE Bytes long
@@ -499,7 +499,7 @@ int twofish_init(cipher_context_t *context, const uint8_t *key,
         }
     }
 
-    return 1;
+    return CIPHER_INIT_SUCCESS;
 }
 
 /**
