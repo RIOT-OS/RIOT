@@ -152,17 +152,6 @@ typedef enum
  */
 void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
 
-/**
- * @brief   Set up PORT pin for SERCOM usage
- *
- * This function initializes the pin for SERCOM usage. It is derived
- * from Arduino's pinPeripheral() in wiring_private.c
- *
- * @param[in] pin   Pin to set the multiplexing for
- * @param[in] mux   Mux value
- */
-void gpio_init_sercom(gpio_t pin, gpio_mux_t mux);
-
 #ifdef __cplusplus
 }
 #endif
