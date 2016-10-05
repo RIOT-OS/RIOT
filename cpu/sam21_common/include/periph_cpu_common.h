@@ -116,24 +116,6 @@ typedef enum {
 } sercom_spi_txpad_t;
 
 /**
- * @brief   Possible selections for SERCOM SPI data size (inspired by Arduino)
- */
-typedef enum
-{
-    SPI_CHAR_SIZE_8_BITS = 0x0ul,
-    SPI_CHAR_SIZE_9_BITS = 0x1ul,
-} sercom_spi_charsize_t;
-
-/**
- * @brief   Possible selections for SERCOM data (bit) order (inspired by Arduino)
- */
-typedef enum
-{
-    MSB_FIRST = 0,
-    LSB_FIRST = 1,
-} sercom_data_order_t;
-
-/**
  * @brief   Possible selections for SERCOM SPI clock mode (inspired by Arduino)
  */
 typedef enum
