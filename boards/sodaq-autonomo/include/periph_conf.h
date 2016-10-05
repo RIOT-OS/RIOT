@@ -102,11 +102,38 @@ extern "C" {
  * See Table 6.1 of the SAM D21 Datasheet
  */
 static const uart_conf_t uart_config[] = {
-    /* device, RX pin, TX pin, mux, RX pad, TX pad */
-    {&SERCOM0->USART, GPIO_PIN(PA,9),  GPIO_PIN(PA,10), GPIO_MUX_C, SERCOM_RX_PAD_1, UART_TX_PAD_2},
-    {&SERCOM5->USART, GPIO_PIN(PB,31), GPIO_PIN(PB,30), GPIO_MUX_D, SERCOM_RX_PAD_1, UART_TX_RTS_CTS_PAD_0_2_3},
-    {&SERCOM4->USART, GPIO_PIN(PB,13), GPIO_PIN(PA,14), GPIO_MUX_C, SERCOM_RX_PAD_1, UART_TX_PAD_2},
-    {&SERCOM1->USART, GPIO_PIN(PA,17), GPIO_PIN(PA,18), GPIO_MUX_C, SERCOM_RX_PAD_1, UART_TX_PAD_2},
+    {
+        .dev    = &SERCOM0->USART,
+        .rx_pin = GPIO_PIN(PA,9),
+        .tx_pin = GPIO_PIN(PA,10),
+        .mux    = GPIO_MUX_C,
+        .rx_pad = UART_PAD_RX_1,
+        .tx_pad = UART_PAD_TX_2
+    },
+    {
+        .dev    = &SERCOM5->USART,
+        .rx_pin = GPIO_PIN(PB,31),
+        .tx_pin = GPIO_PIN(PB,30),
+        .mux    = GPIO_MUX_D,
+        .rx_pad = UART_PAD_RX_1,
+        .tx_pad = UART_PAD_TX_0_RTS_2_CTS_3
+    },
+    {
+        .dev    = &SERCOM4->USART,
+        .rx_pin = GPIO_PIN(PB,13),
+        .tx_pin = GPIO_PIN(PA,14),
+        .mux    = GPIO_MUX_C,
+        .rx_pad = UART_PAD_RX_1,
+        .tx_pad = UART_PAD_TX_2
+    },
+    {
+        .dev    = &SERCOM1->USART,
+        .rx_pin = GPIO_PIN(PA,17),
+        .tx_pin = GPIO_PIN(PA,18),
+        .mux    = GPIO_MUX_C,
+        .rx_pad = UART_PAD_RX_1,
+        .tx_pad = UART_PAD_TX_2
+    }
 };
 
 /* interrupt function name mapping */
@@ -170,10 +197,10 @@ static const pwm_conf_t pwm_config[] = {
 #define SPI_0_SCLK_MUX      GPIO_MUX_D
 #define SPI_0_MISO          GPIO_PIN(PA, 22)
 #define SPI_0_MISO_MUX      GPIO_MUX_C
-#define SPI_0_MISO_PAD      SERCOM_RX_PAD_0
+#define SPI_0_MISO_PAD      SPI_PAD_MISO_0
 #define SPI_0_MOSI          GPIO_PIN(PA, 20)
 #define SPI_0_MOSI_MUX      GPIO_MUX_D
-#define SPI_0_MOSI_PAD      SPI_PAD_2_SCK_3
+#define SPI_0_MOSI_PAD      SPI_PAD_MOSI_2_SCK_3
 
 // How/where do we define SS?
 #define SPI_0_SS            GPIO_PIN(PA, 23)
