@@ -100,6 +100,20 @@ static inline xtimer_ticks64_t xtimer_now64(void);
 void xtimer_now_timex(timex_t *out);
 
 /**
+ * @brief get the current system time in microseconds since start
+ *
+ * This is a convenience function for @c xtimer_usec_from_ticks(xtimer_now())
+ */
+static inline uint32_t xtimer_now_usec(void);
+
+/**
+ * @brief get the current system time in microseconds since start
+ *
+ * This is a convenience function for @c xtimer_usec_from_ticks64(xtimer_now64())
+ */
+static inline uint64_t xtimer_now_usec64(void);
+
+/**
  * @brief xtimer initialization function
  *
  * This sets up xtimer. Has to be called once at system boot.

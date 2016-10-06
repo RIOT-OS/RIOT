@@ -120,6 +120,16 @@ static inline xtimer_ticks64_t xtimer_now64(void)
     return ret;
 }
 
+static inline uint32_t xtimer_now_usec(void)
+{
+    return xtimer_usec_from_ticks(xtimer_now());
+}
+
+static inline uint64_t xtimer_now_usec64(void)
+{
+    return xtimer_usec_from_ticks64(xtimer_now64());
+}
+
 static inline void _xtimer_spin(uint32_t offset) {
     uint32_t start = _xtimer_lltimer_now();
 #if XTIMER_MASK
