@@ -709,7 +709,7 @@ static void test_fib_16_prefix_match(void)
 */
 static void test_fib_17_get_entry_set(void)
 {
-    size_t addr_buf_size = 16;
+    static const size_t addr_buf_size = 16;
     char addr_dst[addr_buf_size];
     char addr_nxt[addr_buf_size];
 
@@ -742,13 +742,12 @@ static void test_fib_17_get_entry_set(void)
     arr_size = 20;
 
     memset(prefix,0, addr_buf_size);
-    /* cppcheck: prefix is set to all 0 before adding an address
-    */
+    /* cppcheck: prefix is set to all 0 before adding an address */
     /* cppcheck-suppress redundantCopy */
     snprintf(prefix, addr_buf_size, "Test address 0");
 
     ret = fib_get_destination_set(&test_fib_table,
-                                  (uint8_t *)prefix, addr_buf_size-1,
+                                  (uint8_t *)prefix, addr_buf_size - 1,
                                   &arr_dst[0], &arr_size);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
@@ -756,11 +755,13 @@ static void test_fib_17_get_entry_set(void)
     TEST_ASSERT_EQUAL_INT(20, arr_size);
     arr_size = 20;
 
-    memset(prefix,0, addr_buf_size);
+    memset(prefix, 0, addr_buf_size);
+    /* cppcheck: prefix is set to all 0 before adding an address */
+    /* cppcheck-suppress redundantCopy */
     snprintf(prefix, addr_buf_size, "Test address");
 
     ret = fib_get_destination_set(&test_fib_table,
-                                  (uint8_t *)prefix, addr_buf_size-1,
+                                  (uint8_t *)prefix, addr_buf_size - 1,
                                   &arr_dst[0], &arr_size);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
