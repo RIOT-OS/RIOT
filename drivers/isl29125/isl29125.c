@@ -46,7 +46,7 @@ int isl29125_init(isl29125_t *dev, i2c_t i2c, gpio_t gpio,
     dev->gpio = gpio;
 
     /* configuration 1: operation mode, range, resolution */
-    char conf1 = 0x00;
+    uint8_t conf1 = 0x00;
     conf1 |= mode;
     conf1 |= range;
     conf1 |= resolution;
@@ -66,7 +66,7 @@ int isl29125_init(isl29125_t *dev, i2c_t i2c, gpio_t gpio,
 
     /* verify the device ID */
     DEBUG("isl29125_init: i2c_read_reg\n");
-    char reg_id;
+    uint8_t reg_id;
     int ret = i2c_read_reg(dev->i2c, ISL29125_I2C_ADDRESS, ISL29125_REG_ID, &reg_id);
     if ((reg_id == ISL29125_ID) && (ret == 1)) {
         DEBUG("isl29125_init: ID successfully verified\n");
@@ -98,7 +98,7 @@ void isl29125_read_rgb_lux(isl29125_t *dev, isl29125_rgb_t *dest)
     (void) i2c_acquire(dev->i2c);
 
     /* read values */
-    char bytes[6];
+    uint8_t bytes[6];
     (void) i2c_read_regs(dev->i2c, ISL29125_I2C_ADDRESS, ISL29125_REG_GDLB, bytes, 6);
 
     /* release the I2C bus */
@@ -126,7 +126,7 @@ void isl29125_read_rgb_color(isl29125_t *dev, color_rgb_t *dest)
     (void) i2c_acquire(dev->i2c);
 
     /* read values */
-    char bytes[6];
+    uint8_t bytes[6];
     (void) i2c_read_regs(dev->i2c, ISL29125_I2C_ADDRESS, ISL29125_REG_GDLB, bytes, 6);
 
     /* release the I2C bus */
@@ -142,7 +142,7 @@ void isl29125_read_rgb_color(isl29125_t *dev, color_rgb_t *dest)
 
 void isl29125_set_mode(isl29125_t *dev, isl29125_mode_t mode)
 {
-    char conf1;
+    uint8_t conf1;
 
     (void) i2c_acquire(dev->i2c);
 

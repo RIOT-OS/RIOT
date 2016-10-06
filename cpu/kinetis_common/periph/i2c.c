@@ -282,7 +282,7 @@ static inline int _i2c_receive(I2C_Type *dev, uint8_t *data, int length)
             dev->C1 &= ~I2C_C1_MST_MASK;
         }
 
-        data[n] = (char)dev->D;
+        data[n] = dev->D;
         TRACE("i2c: rx: %02x\n", (unsigned int)data[n]);
         n++;
     }
@@ -290,12 +290,12 @@ static inline int _i2c_receive(I2C_Type *dev, uint8_t *data, int length)
     return n;
 }
 
-static inline int _i2c_transmit(I2C_Type *dev, uint8_t *data, int length)
+static inline int _i2c_transmit(I2C_Type *dev, const uint8_t *data, int length)
 {
     int n = 0;
 
     while (length > 0) {
-        TRACE("i2c: tx: %02x\n", (unsigned int)data[n]);
+        TRACE("i2c: tx: %02x\n", data[n]);
         dev->D = data[n];
 
         while (!(dev->S & I2C_S_IICIF_MASK));
@@ -331,12 +331,12 @@ static inline void _i2c_reset(I2C_Type *dev)
 }
 
 
-int i2c_read_byte(i2c_t dev, uint8_t address, char *data)
+int i2c_read_byte(i2c_t dev, uint8_t address, void *data)
 {
     return i2c_read_bytes(dev, address, data, 1);
 }
 
-int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 {
     I2C_Type *i2c;
     int n = 0;
@@ -369,12 +369,12 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
     return n;
 }
 
-int i2c_write_byte(i2c_t dev, uint8_t address, char data)
+int i2c_write_byte(i2c_t dev, uint8_t address, uint8_t data)
 {
     return i2c_write_bytes(dev, address, &data, 1);
 }
 
-int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
 {
     I2C_Type *i2c;
     int n = 0;
@@ -396,19 +396,19 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
         return -1;
     }
 
-    n = _i2c_transmit(i2c, (uint8_t *)data, length);
+    n = _i2c_transmit(i2c, data, length);
     _i2c_stop(i2c);
 
     return n;
 }
 
-int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, char *data)
+int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data)
 {
     return i2c_read_regs(dev, address, reg, data, 1);
 
 }
 
-int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
+int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int length)
 {
     I2C_Type *i2c;
     int n = 0;
@@ -454,12 +454,12 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int lengt
     return n;
 }
 
-int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, char data)
+int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data)
 {
     return i2c_write_regs(dev, address, reg, &data, 1);
 }
 
-int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
+int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, int length)
 {
     I2C_Type *i2c;
     int n = 0;
@@ -488,7 +488,7 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
         return n;
     }
 
-    n = _i2c_transmit(i2c, (uint8_t *)data, length);
+    n = _i2c_transmit(i2c, data, length);
     _i2c_stop(i2c);
 
     return n;

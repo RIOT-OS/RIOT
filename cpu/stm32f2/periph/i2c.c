@@ -38,13 +38,13 @@
 #define I2C_MAX_LOOP_CNT 10000
 
 /* static function definitions */
-static int _read_bytes(I2C_TypeDef *i2c, uint8_t address, char *data, int length, char *err);
+static int _read_bytes(I2C_TypeDef *i2c, uint8_t address, uint8_t *data, int length, uint8_t *err);
 static void _i2c_init(I2C_TypeDef *i2c, int ccr);
 static void _pin_config(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin_scl, int pin_sda);
-static int _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, char *err);
+static int _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, uint8_t *err);
 static inline void _clear_addr(I2C_TypeDef *dev);
-static inline int _write(I2C_TypeDef *dev, char *data, int length, char *err);
-static inline int _stop(I2C_TypeDef *dev, char *err);
+static inline int _write(I2C_TypeDef *dev, const uint8_t *data, int length, uint8_t *err);
+static inline int _stop(I2C_TypeDef *dev, uint8_t *err);
 static inline int _wait_ready(I2C_TypeDef *dev);
 
 /**
@@ -65,7 +65,7 @@ static mutex_t locks[] =  {
 #endif
 };
 
-static char err_flag[] = {
+static uint8_t err_flag[] = {
 #if I2C_0_EN
     [I2C_0] = 0x00,
 #endif
@@ -211,12 +211,12 @@ int i2c_release(i2c_t dev)
     return 0;
 }
 
-int i2c_read_byte(i2c_t dev, uint8_t address, char *data)
+int i2c_read_byte(i2c_t dev, uint8_t address, void *data)
 {
     return i2c_read_bytes(dev, address, data, 1);
 }
 
-int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 {
     I2C_TypeDef *i2c;
 
@@ -252,7 +252,7 @@ static inline int _wait_ready(I2C_TypeDef *dev)
     return 0;
 }
 
-static int _read_bytes(I2C_TypeDef *i2c, uint8_t address, char *data, int length, char *err)
+static int _read_bytes(I2C_TypeDef *i2c, uint8_t address, uint8_t *data, int length, uint8_t *err)
 {
     unsigned int state;
     int i = 0;
@@ -289,7 +289,7 @@ static int _read_bytes(I2C_TypeDef *i2c, uint8_t address, char *data, int length
             }
 
             DEBUG("Read received data\n");
-            *data = (char)i2c->DR;
+            *data = i2c->DR;
 
             /* wait until STOP is cleared by hardware */
             cnt = 0;
@@ -332,11 +332,11 @@ static int _read_bytes(I2C_TypeDef *i2c, uint8_t address, char *data, int length
             DEBUG("Crit block: set STOP and read first byte\n");
             state = irq_disable();
             i2c->CR1 |= (I2C_CR1_STOP);
-            data[0] = (char)i2c->DR;
+            data[0] = i2c->DR;
             irq_restore(state);
 
             DEBUG("read second byte\n");
-            data[1] = (char)i2c->DR;
+            data[1] = i2c->DR;
 
             DEBUG("wait for STOP bit to be cleared again\n");
 
@@ -371,7 +371,7 @@ static int _read_bytes(I2C_TypeDef *i2c, uint8_t address, char *data, int length
                 }
 
                 DEBUG("Copy byte from DR\n");
-                data[i++] = (char)i2c->DR;
+                data[i++] = i2c->DR;
             }
 
             DEBUG("Reading the last 3 bytes, waiting for BTF flag\n");
@@ -388,12 +388,12 @@ static int _read_bytes(I2C_TypeDef *i2c, uint8_t address, char *data, int length
 
             DEBUG("Crit block: set STOP and read N-2 byte\n");
             state = irq_disable();
-            data[i++] = (char)i2c->DR;
+            data[i++] = i2c->DR;
             i2c->CR1 |= (I2C_CR1_STOP);
             irq_restore(state);
 
             DEBUG("Read N-1 byte\n");
-            data[i++] = (char)i2c->DR;
+            data[i++] = i2c->DR;
 
             cnt = 0;
             *err = 0;
@@ -404,7 +404,7 @@ static int _read_bytes(I2C_TypeDef *i2c, uint8_t address, char *data, int length
 
             DEBUG("Read last byte\n");
 
-            data[i++] = (char)i2c->DR;
+            data[i++] = i2c->DR;
 
             DEBUG("wait for STOP bit to be cleared again\n");
 
@@ -423,12 +423,12 @@ static int _read_bytes(I2C_TypeDef *i2c, uint8_t address, char *data, int length
     return length;
 }
 
-int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, char *data)
+int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data)
 {
     return i2c_read_regs(dev, address, reg, data, 1);
 }
 
-int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
+int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int length)
 {
     I2C_TypeDef *i2c;
     int res;
@@ -464,12 +464,12 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int lengt
     return _read_bytes(i2c, address, data, length, &err_flag[dev]);
 }
 
-int i2c_write_byte(i2c_t dev, uint8_t address, char data)
+int i2c_write_byte(i2c_t dev, uint8_t address, uint8_t data)
 {
     return i2c_write_bytes(dev, address, &data, 1);
 }
 
-int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
 {
     I2C_TypeDef *i2c;
     int res;
@@ -520,12 +520,12 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
     return length;
 }
 
-int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, char data)
+int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data)
 {
     return i2c_write_regs(dev, address, reg, &data, 1);
 }
 
-int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
+int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, int length)
 {
     I2C_TypeDef *i2c;
     int res;
@@ -555,7 +555,7 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
     }
     _clear_addr(i2c);
     /* send register address and wait for complete transfer to be finished*/
-    res = _write(i2c, (char *)(&reg), 1, &err_flag[dev]);
+    res = _write(i2c, &reg, 1, &err_flag[dev]);
     if (res != 0) {
         return res;
     }
@@ -608,7 +608,7 @@ void i2c_poweroff(i2c_t dev)
     }
 }
 
-static int _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, char *err)
+static int _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, uint8_t *err)
 {
     int cnt = 0;
 
@@ -646,13 +646,13 @@ static inline void _clear_addr(I2C_TypeDef *dev)
     DEBUG("Cleared address\n");
 }
 
-static inline int _write(I2C_TypeDef *dev, char *data, int length, char *err)
+static inline int _write(I2C_TypeDef *dev, const uint8_t *data, int length, uint8_t *err)
 {
     DEBUG("Looping through bytes\n");
 
     for (int i = 0; i < length; i++) {
         /* write data to data register */
-        dev->DR = (uint8_t)data[i];
+        dev->DR = data[i];
         DEBUG("Written %i byte to data reg, now waiting for DR to be empty again\n", i);
 
         /* wait for transfer to finish */
@@ -669,7 +669,7 @@ static inline int _write(I2C_TypeDef *dev, char *data, int length, char *err)
     return 0;
 }
 
-static inline int _stop(I2C_TypeDef *dev, char *err)
+static inline int _stop(I2C_TypeDef *dev, uint8_t *err)
 {
     /* make sure last byte was send */
     DEBUG("Wait if last byte hasn't been sent\n");
