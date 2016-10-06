@@ -110,13 +110,15 @@ static inline uint32_t _xtimer_now(void)
 
 static inline xtimer_ticks32_t xtimer_now(void)
 {
-    xtimer_ticks32_t ret = { .ticks32 = _xtimer_now() };
+    xtimer_ticks32_t ret;
+    ret.ticks32 = _xtimer_now();
     return ret;
 }
 
 static inline xtimer_ticks64_t xtimer_now64(void)
 {
-    xtimer_ticks64_t ret = { .ticks64 = _xtimer_now64() };
+    xtimer_ticks64_t ret;
+    ret.ticks64 = _xtimer_now64();
     return ret;
 }
 
@@ -226,13 +228,15 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout)
 
 static inline xtimer_ticks32_t xtimer_ticks_from_usec(uint32_t usec)
 {
-    xtimer_ticks32_t ticks = { .ticks32 = _xtimer_ticks_from_usec(usec) };
+    xtimer_ticks32_t ticks;
+    ticks.ticks32 = _xtimer_ticks_from_usec(usec);
     return ticks;
 }
 
 static inline xtimer_ticks64_t xtimer_ticks_from_usec64(uint64_t usec)
 {
-    xtimer_ticks64_t ticks = { .ticks64 = _xtimer_ticks_from_usec64(usec) };
+    xtimer_ticks64_t ticks;
+    ticks.ticks64 = _xtimer_ticks_from_usec64(usec);
     return ticks;
 }
 
@@ -248,32 +252,37 @@ static inline uint64_t xtimer_usec_from_ticks64(xtimer_ticks64_t ticks)
 
 static inline xtimer_ticks32_t xtimer_ticks(uint32_t ticks)
 {
-    xtimer_ticks32_t ret = { .ticks32 = ticks };
+    xtimer_ticks32_t ret;
+    ret.ticks32 = ticks;
     return ret;
 }
 
 static inline xtimer_ticks64_t xtimer_ticks64(uint64_t ticks)
 {
-    xtimer_ticks64_t ret = { .ticks64 = ticks };
+    xtimer_ticks64_t ret;
+    ret.ticks64 = ticks;
     return ret;
 }
 
 static inline xtimer_ticks32_t xtimer_diff(xtimer_ticks32_t a, xtimer_ticks32_t b)
 {
-    xtimer_ticks32_t ret = { .ticks32 = (a.ticks32 - b.ticks32) };
+    xtimer_ticks32_t ret;
+    ret.ticks32 = a.ticks32 - b.ticks32;
     return ret;
 }
 
 static inline xtimer_ticks64_t xtimer_diff64(xtimer_ticks64_t a, xtimer_ticks64_t b)
 {
-    xtimer_ticks64_t ret = { .ticks64 = (a.ticks64 - b.ticks64) };
+    xtimer_ticks64_t ret;
+    ret.ticks64 = a.ticks64 - b.ticks64;
     return ret;
 }
 
 static inline xtimer_ticks32_t xtimer_diff32_64(xtimer_ticks64_t a, xtimer_ticks64_t b)
 {
-    uint64_t diff = (a.ticks64 - b.ticks64);
-    xtimer_ticks32_t ret = { .ticks32 = (uint32_t) diff };
+    uint64_t diff = a.ticks64 - b.ticks64;
+    xtimer_ticks32_t ret;
+    ret.ticks32 = diff;
     return ret;
 }
 
