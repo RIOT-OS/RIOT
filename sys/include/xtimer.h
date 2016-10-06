@@ -376,6 +376,56 @@ static inline xtimer_ticks32_t xtimer_ticks(uint32_t ticks);
 static inline xtimer_ticks64_t xtimer_ticks64(uint64_t ticks);
 
 /**
+ * @brief Compute difference between two xtimer time stamps
+ *
+ * @param[in] a  left operand
+ * @param[in] b  right operand
+ *
+ * @return @p a - @p b
+ */
+static inline xtimer_ticks32_t xtimer_diff(xtimer_ticks32_t a, xtimer_ticks32_t b);
+
+/**
+ * @brief Compute difference between two xtimer time stamps, 64 bit version
+ *
+ * @param[in] a  left operand
+ * @param[in] b  right operand
+ *
+ * @return @p a - @p b
+ */
+static inline xtimer_ticks64_t xtimer_diff64(xtimer_ticks64_t a, xtimer_ticks64_t b);
+
+/**
+ * @brief Compute 32 bit difference between two 64 bit xtimer time stamps
+ *
+ * @param[in] a  left operand
+ * @param[in] b  right operand
+ *
+ * @return @p a - @p b cast truncated to 32 bit
+ */
+static inline xtimer_ticks32_t xtimer_diff32_64(xtimer_ticks64_t a, xtimer_ticks64_t b);
+
+/**
+ * @brief Compare two xtimer time stamps
+ *
+ * @param[in] a  left operand
+ * @param[in] b  right operand
+ *
+ * @return @p a < @p b
+ */
+static inline bool xtimer_less(xtimer_ticks32_t a, xtimer_ticks32_t b);
+
+/**
+ * @brief Compare two xtimer time stamps, 64 bit version
+ *
+ * @param[in] a  left operand
+ * @param[in] b  right operand
+ *
+ * @return @p a < @p b
+ */
+static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b);
+
+/**
  * @brief xtimer backoff value
  *
  * All timers that are less than XTIMER_BACKOFF microseconds in the future will

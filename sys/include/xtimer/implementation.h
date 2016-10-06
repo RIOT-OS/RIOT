@@ -258,6 +258,35 @@ static inline xtimer_ticks64_t xtimer_ticks64(uint64_t ticks)
     return ret;
 }
 
+static inline xtimer_ticks32_t xtimer_diff(xtimer_ticks32_t a, xtimer_ticks32_t b)
+{
+    xtimer_ticks32_t ret = { .ticks32 = (a.ticks32 - b.ticks32) };
+    return ret;
+}
+
+static inline xtimer_ticks64_t xtimer_diff64(xtimer_ticks64_t a, xtimer_ticks64_t b)
+{
+    xtimer_ticks64_t ret = { .ticks64 = (a.ticks64 - b.ticks64) };
+    return ret;
+}
+
+static inline xtimer_ticks32_t xtimer_diff32_64(xtimer_ticks64_t a, xtimer_ticks64_t b)
+{
+    uint64_t diff = (a.ticks64 - b.ticks64);
+    xtimer_ticks32_t ret = { .ticks32 = (uint32_t) diff };
+    return ret;
+}
+
+static inline bool xtimer_less(xtimer_ticks32_t a, xtimer_ticks32_t b)
+{
+    return (a.ticks32 < b.ticks32);
+}
+
+static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b)
+{
+    return (a.ticks64 < b.ticks64);
+}
+
 #endif /* !defined(DOXYGEN) */
 
 #ifdef __cplusplus
