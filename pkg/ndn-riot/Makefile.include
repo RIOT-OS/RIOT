@@ -1,0 +1,2 @@
+INCLUDES += -I$(PKGDIRBASE)
+USEMODULE += ndn-encoding
