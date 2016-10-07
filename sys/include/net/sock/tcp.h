@@ -83,6 +83,7 @@ typedef struct sock_tcp_queue sock_tcp_queue_t;
  * @return  -EAFNOSUPPORT, if sock_tcp_ep_t::family of @p remote is not
  *          supported.
  * @return  -ECONNREFUSED, if no-one is listening on the @p remote end point.
+ * @return  -EINVAL, if sock_tcp_ep_t::addr of @p remote is an invalid address.
  * @return  -EINVAL, if sock_tcp_ep_t::netif of @p remote is not a valid
  *          interface.
  * @return  -ENETUNREACH, if network defined by @p remote is not reachable.
