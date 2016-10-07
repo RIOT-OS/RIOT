@@ -87,33 +87,44 @@ typedef enum {
 } gpio_mux_t;
 
 /**
- * @brief   Possible pad selections for SERCOM RX (inspired by Arduino)
+ * @brief   Available values for SERCOM UART RX pad selection
  */
 typedef enum {
-    SERCOM_RX_PAD_0 = 0x0,  /**< select pad 0 */
-    SERCOM_RX_PAD_1 = 0x1,  /**< select pad 1 */
-    SERCOM_RX_PAD_2 = 0x2,  /**< select pad 2 */
-    SERCOM_RX_PAD_3 = 0x3,  /**< select pad 3 */
-} sercom_rxpad_t;
+    UART_PAD_RX_0 = 0x0,    /**< use pad 0 for RX line */
+    UART_PAD_RX_1 = 0x1,    /**< select pad 1 */
+    UART_PAD_RX_2 = 0x2,    /**< select pad 2 */
+    UART_PAD_RX_3 = 0x3,    /**< select pad 3 */
+} uart_rxpad_t;
 
 /**
- * @brief   Possible pad selections for SERCOM UART TX (inspired by Arduino)
+ * @brief   Available values for SERCOM UART TX pad selection
  */
 typedef enum {
-    UART_TX_PAD_0 = 0x0,    /**< select pad 0, only UART */
-    UART_TX_PAD_2 = 0x1,    /**< select pad 2, only UART */
-    UART_TX_RTS_CTS_PAD_0_2_3 = 0x2,    /**< select pad 0, 2 and 3, only UART, TX on PAD0, RTS on PAD2 and CTS on PAD3 */
-} sercom_uart_txpad_t;
+    UART_PAD_TX_0             = 0x0,    /**< select pad 0 */
+    UART_PAD_TX_2             = 0x1,    /**< select pad 2 */
+    UART_PAD_TX_0_RTS_2_CTS_3 = 0x2,    /**< TX is pad 0, on top RTS on pad 2
+                                         *   and CTS on pad 3 */
+} uart_txpad_t;
 
 /**
- * @brief   Possible pad selections for SERCOM SPI output (inspired by Arduino)
+ * @brief   Available values for SERCOM SPI MISO pad selection
  */
 typedef enum {
-    SPI_PAD_0_SCK_1 = 0,    /**< select pad 0, SCK pad1, only SPI */
-    SPI_PAD_2_SCK_3 = 1,    /**< select pad 2, SCK pad3, only SPI */
-    SPI_PAD_3_SCK_1 = 2,    /**< select pad 3, SCK pad1, only SPI */
-    SPI_PAD_0_SCK_3 = 3,    /**< select pad 0, SCK pad3, only SPI */
-} sercom_spi_txpad_t;
+    SPI_PAD_MISO_0 = 0x0,       /**< use pad 0 for MISO line */
+    SPI_PAD_MISO_1 = 0x1,       /**< use pad 0 for MISO line */
+    SPI_PAD_MISO_2 = 0x2,       /**< use pad 0 for MISO line */
+    SPI_PAD_MISO_3 = 0x3,       /**< use pad 0 for MISO line */
+} spi_misopad_t;
+
+/**
+ * @brief   Available values for SERCOM SPI MOSI and SCK pad selection
+ */
+typedef enum {
+    SPI_PAD_MOSI_0_SCK_1 = 0x0, /**< use pad 0 for MOSI, pad 1 for SCK */
+    SPI_PAD_MOSI_2_SCK_3 = 0x1, /**< use pad 2 for MOSI, pad 3 for SCK */
+    SPI_PAD_MOSI_3_SCK_1 = 0x2, /**< use pad 3 for MOSI, pad 1 for SCK */
+    SPI_PAD_MOSI_0_SCK_3 = 0x3, /**< use pad 0 for MOSI, pad 3 for SCK */
+} spi_mosipad_t;
 
 /**
  * @brief   Possible selections for SERCOM SPI clock mode (inspired by Arduino)
