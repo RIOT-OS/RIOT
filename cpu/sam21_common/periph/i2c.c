@@ -131,8 +131,8 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     }
 
     /************ SERCOM PAD0 - SDA and SERCOM PAD1 - SCL *************/
-    gpio_init_sercom(pin_sda, mux);
-    gpio_init_sercom(pin_scl, mux);
+    gpio_init_mux(pin_sda, mux);
+    gpio_init_mux(pin_scl, mux);
 
     /* I2C CONFIGURATION */
     while(I2CSercom->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
