@@ -11,7 +11,7 @@
 
 /*
  * Note banked access only applies to MZ part MX only has 1 set of registers similar to the MZ's lower alias.
- * Thus when working with MX parts comment out the *_B* entries, not the address in the comments are different for MX too
+ * Thus when working with MX parts comment out the *_B* entries, note the address in the comments are different for MX too
  * so a different linker script is required between MX and MZ to place these registers at the correct addresses.
  * MM parts have completely different config registers, so this file is not applicable.
  *
@@ -152,7 +152,7 @@ volatile uint32_t ADEVCFG2_B1 __attribute__ ((used, section(".adevcfg2_b1"))) =
  *  FSOSCEN     OFF         Secondary Oscillator Enable Disable SOSC
  *  IESO        ON          Internal/External Switch Over   Enabled
  *  POSCMOD     EC          Primary Oscillator Configuration    External clock mode
- *  OSCIOFNC    OFF         CLKO Output Signal Active on the OSCO Pin   Disabled
+ *  OSCIOFNC    OFF         CLKO Output Signal Active on the OSCO Pin   Disabled (1)
  *  FCKSM       CSDCMD      Clock Switching and Monitor Selection   Clock Switch Disabled, FSCM Disabled
  *  WDTPS       PS1048576   Watchdog Timer Postscaler   1:1048576
  *  WDTSPGM     STOP        Watchdog Timer Stop During Flash Programming    WDT stops during Flash programming
@@ -170,7 +170,7 @@ volatile uint32_t DEVCFG1_LA  __attribute__ ((used, section(".devcfg1_la"))) =
     & (~_DEVCFG1_FSOSCEN_MASK     |  0        << _DEVCFG1_FSOSCEN_POSITION)
     & (~_DEVCFG1_IESO_MASK        |  1        << _DEVCFG1_IESO_POSITION)
     & (~_DEVCFG1_POSCMOD_MASK     |  0x0      << _DEVCFG1_POSCMOD_POSITION)
-    & (~_DEVCFG1_OSCIOFNC_MASK    |  0        << _DEVCFG1_OSCIOFNC_POSITION)
+    & (~_DEVCFG1_OSCIOFNC_MASK    |  1        << _DEVCFG1_OSCIOFNC_POSITION)
     & (~_DEVCFG1_FCKSM_MASK       |  0x0      << _DEVCFG1_FCKSM_POSITION)
     & (~_DEVCFG1_WDTPS_MASK       |  0x14     << _DEVCFG1_WDTPS_POSITION)
     & (~_DEVCFG1_WDTSPGM_MASK     |  1        << _DEVCFG1_WDTSPGM_POSITION)
@@ -187,7 +187,7 @@ volatile uint32_t ADEVCFG1_LA __attribute__ ((used, section(".adevcfg1_la"))) =
     & (~_DEVCFG1_FSOSCEN_MASK     |  0        << _DEVCFG1_FSOSCEN_POSITION)
     & (~_DEVCFG1_IESO_MASK        |  1        << _DEVCFG1_IESO_POSITION)
     & (~_DEVCFG1_POSCMOD_MASK     |  0x0      << _DEVCFG1_POSCMOD_POSITION)
-    & (~_DEVCFG1_OSCIOFNC_MASK    |  0        << _DEVCFG1_OSCIOFNC_POSITION)
+    & (~_DEVCFG1_OSCIOFNC_MASK    |  1        << _DEVCFG1_OSCIOFNC_POSITION)
     & (~_DEVCFG1_FCKSM_MASK       |  0x0      << _DEVCFG1_FCKSM_POSITION)
     & (~_DEVCFG1_WDTPS_MASK       |  0x14     << _DEVCFG1_WDTPS_POSITION)
     & (~_DEVCFG1_WDTSPGM_MASK     |  1        << _DEVCFG1_WDTSPGM_POSITION)
@@ -204,7 +204,7 @@ volatile uint32_t DEVCFG1_B1  __attribute__ ((used, section(".devcfg1_b1"))) =
     & (~_DEVCFG1_FSOSCEN_MASK     |  0        << _DEVCFG1_FSOSCEN_POSITION)
     & (~_DEVCFG1_IESO_MASK        |  1        << _DEVCFG1_IESO_POSITION)
     & (~_DEVCFG1_POSCMOD_MASK     |  0x0      << _DEVCFG1_POSCMOD_POSITION)
-    & (~_DEVCFG1_OSCIOFNC_MASK    |  0        << _DEVCFG1_OSCIOFNC_POSITION)
+    & (~_DEVCFG1_OSCIOFNC_MASK    |  1        << _DEVCFG1_OSCIOFNC_POSITION)
     & (~_DEVCFG1_FCKSM_MASK       |  0x0      << _DEVCFG1_FCKSM_POSITION)
     & (~_DEVCFG1_WDTPS_MASK       |  0x14     << _DEVCFG1_WDTPS_POSITION)
     & (~_DEVCFG1_WDTSPGM_MASK     |  1        << _DEVCFG1_WDTSPGM_POSITION)
@@ -221,7 +221,7 @@ volatile uint32_t ADEVCFG1_B1 __attribute__ ((used, section(".adevcfg1_b1"))) =
     & (~_DEVCFG1_FSOSCEN_MASK     |  0        << _DEVCFG1_FSOSCEN_POSITION)
     & (~_DEVCFG1_IESO_MASK        |  1        << _DEVCFG1_IESO_POSITION)
     & (~_DEVCFG1_POSCMOD_MASK     |  0x0      << _DEVCFG1_POSCMOD_POSITION)
-    & (~_DEVCFG1_OSCIOFNC_MASK    |  0        << _DEVCFG1_OSCIOFNC_POSITION)
+    & (~_DEVCFG1_OSCIOFNC_MASK    |  1        << _DEVCFG1_OSCIOFNC_POSITION)
     & (~_DEVCFG1_FCKSM_MASK       |  0x0      << _DEVCFG1_FCKSM_POSITION)
     & (~_DEVCFG1_WDTPS_MASK       |  0x14     << _DEVCFG1_WDTPS_POSITION)
     & (~_DEVCFG1_WDTSPGM_MASK     |  1        << _DEVCFG1_WDTSPGM_POSITION)
