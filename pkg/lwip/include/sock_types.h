@@ -25,6 +25,14 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Raw IP sock type
+ * @internal
+ */
+struct sock_ip {
+    struct netconn *conn;
+};
+
+/**
  * @brief   UDP sock type
  * @internal
  */

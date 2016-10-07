@@ -22,6 +22,9 @@ ifneq (,$(filter lwip_sock,$(USEMODULE)))
   endif
   DIRS += $(RIOTBASE)/pkg/lwip/contrib/sock
 endif
+ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib/sock/ip
+endif
 ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib/sock/udp
 endif
