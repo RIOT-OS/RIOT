@@ -52,18 +52,21 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     SPI_DEV->TCTL = (USART_TCTL_SSEL_SMCLK | USART_TCTL_STC);
     /* set polarity and phase */
     switch (conf) {
+        case SPI_CONF_FIRST_RISING:
+            SPI_DEV->TCTL |= (USART_TCTL_CKPH & ~(USART_TCTL_CKPL));
+            break;
         case SPI_CONF_SECOND_RISING:
-            SPI_DEV->TCTL |= USART_TCTL_CKPH;
+            SPI_DEV->TCTL |= (~(USART_TCTL_CKPH) & ~(USART_TCTL_CKPL));
             break;
         case SPI_CONF_FIRST_FALLING:
-            SPI_DEV->TCTL |= SPI_CONF_FIRST_FALLING;
+            SPI_DEV->TCTL |= (USART_TCTL_CKPH & USART_TCTL_CKPL);
             break;
         case SPI_CONF_SECOND_FALLING:
-            SPI_DEV->TCTL |= (USART_TCTL_CKPH | SPI_CONF_FIRST_FALLING);
+            SPI_DEV->TCTL |= (~(USART_TCTL_CKPH) & USART_TCTL_CKPL);
             break;
         default:
-            /* do nothing */
-            break;
+            /* invalid clock setting */
+            return -2;
     }
     /* configure clock - we use no modulation for now */
     uint32_t br = CLOCK_CMCLK;
@@ -122,20 +125,20 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     /* set polarity and phase */
     switch (conf) {
         case SPI_CONF_FIRST_RISING:
-            SPI_DEV->CTL0 |= (USCI_SPI_CTL0_CKPH & ~(USCI_SPI_CTL0_CKPL));
+            SPI_DEV->CTL0 |= USCI_SPI_CTL0_CKPH;
             break;
         case SPI_CONF_SECOND_RISING:
-            SPI_DEV->CTL0 |= (~(USCI_SPI_CTL0_CKPH) & ~(USCI_SPI_CTL0_CKPL));
+            /* nothong to be done here */
             break;
         case SPI_CONF_FIRST_FALLING:
             SPI_DEV->CTL0 |= (USCI_SPI_CTL0_CKPH & USCI_SPI_CTL0_CKPL);
             break;
         case SPI_CONF_SECOND_FALLING:
-            SPI_DEV->CTL0 |= (~(USCI_SPI_CTL0_CKPH) & USCI_SPI_CTL0_CKPL);
+            SPI_DEV->CTL0 |= USCI_SPI_CTL0_CKPL;
             break;
         default:
-            /* do nothing */
-            break;
+            /* invalid clock setting */
+            return -2;
     }
     /* configure clock - we use no modulation for now */
     uint32_t br = CLOCK_CMCLK;
