@@ -108,7 +108,7 @@ static const uart_conf_t uart_config[] = {
         .tx_pin = GPIO_PIN(PA,10),
         .mux    = GPIO_MUX_C,
         .rx_pad = UART_PAD_RX_1,
-        .tx_pad = UART_PAD_TX_2
+        .tx_pad = UART_PAD_TX_2,
     },
     {
         .dev    = &SERCOM5->USART,
@@ -116,7 +116,7 @@ static const uart_conf_t uart_config[] = {
         .tx_pin = GPIO_PIN(PB,30),
         .mux    = GPIO_MUX_D,
         .rx_pad = UART_PAD_RX_1,
-        .tx_pad = UART_PAD_TX_0_RTS_2_CTS_3
+        .tx_pad = UART_PAD_TX_0_RTS_2_CTS_3,
     },
     {
         .dev    = &SERCOM4->USART,
@@ -124,7 +124,7 @@ static const uart_conf_t uart_config[] = {
         .tx_pin = GPIO_PIN(PA,14),
         .mux    = GPIO_MUX_C,
         .rx_pad = UART_PAD_RX_1,
-        .tx_pad = UART_PAD_TX_2
+        .tx_pad = UART_PAD_TX_2,
     },
     {
         .dev    = &SERCOM1->USART,
@@ -132,8 +132,8 @@ static const uart_conf_t uart_config[] = {
         .tx_pin = GPIO_PIN(PA,18),
         .mux    = GPIO_MUX_C,
         .rx_pad = UART_PAD_RX_1,
-        .tx_pad = UART_PAD_TX_2
-    }
+        .tx_pad = UART_PAD_TX_2,
+    },
 };
 
 /* interrupt function name mapping */
