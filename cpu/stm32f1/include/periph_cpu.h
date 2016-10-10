@@ -41,6 +41,13 @@ extern "C" {
 #define TIMER_MAXVAL        (0xffff)
 
 /**
+ * @brief declare needed generic SPI functions
+ * @{
+ */
+#undef PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+
+/**
  * @brief   Generate GPIO mode bitfields
  *
  * We use 4 bit to determine the pin functions:
