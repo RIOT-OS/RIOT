@@ -308,12 +308,20 @@ int lwip_sock_create(struct netconn **conn, const struct _sock_tl_ep *local,
 #if LWIP_TCP
                 case ERR_BUF:
                     res = -ENOMEM;
+                    break;
                 case ERR_INPROGRESS:
                     res = -EINPROGRESS;
+                    break;
                 case ERR_ISCONN:
                     res = -EISCONN;
+                    break;
+                case ERR_IF:
                 case ERR_RTE:
                     res = -ENETUNREACH;
+                    break;
+                case ERR_ABRT:
+                    res = -ETIMEDOUT;
+                    break;
 #endif
                 case ERR_USE:
                     res = -EADDRINUSE;
@@ -407,6 +415,7 @@ int lwip_sock_get_addr(struct netconn *conn, struct _sock_tl_ep *ep, u8_t local)
     return 0;
 }
 
+#if defined(MODULE_LWIP_SOCK_UDP) || defined(MODULE_LWIP_SOCK_IP)
 int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf)
 {
     int res;
@@ -445,6 +454,7 @@ int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf)
 #endif
     return res;
 }
+#endif /* defined(MODULE_LWIP_SOCK_UDP) || defined(MODULE_LWIP_SOCK_IP) */
 
 
 ssize_t lwip_sock_send(struct netconn **conn, const void *data, size_t len,
@@ -453,6 +463,7 @@ ssize_t lwip_sock_send(struct netconn **conn, const void *data, size_t len,
     ip_addr_t remote_addr;
     struct netconn *tmp;
     struct netbuf *buf;
+    size_t written = len;   /* only changed for TCP */
     int res;
     err_t err;
     u16_t remote_port = 0;
@@ -503,12 +514,20 @@ ssize_t lwip_sock_send(struct netconn **conn, const void *data, size_t len,
     if (remote != NULL) {
         err = netconn_sendto(tmp, buf, &remote_addr, remote_port);
     }
+#if LWIP_TCP
+    else if (tmp->type & NETCONN_TCP) {
+        err = netconn_write_partly(tmp, data, len, 0, &written);
+        if (err == ERR_OK) {
+            res = (ssize_t)written;
+        }
+    }
+#endif /* LWIP_TCP */
     else {
         err = netconn_send(tmp, buf);
     }
     switch (err) {
         case ERR_OK:
-            res = len;
+            res = (ssize_t)written;
             if (conn != NULL) {
                 *conn = tmp;
             }
