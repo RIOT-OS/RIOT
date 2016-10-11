@@ -2,7 +2,7 @@ ifneq (,$(filter dht,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/dht/include
 endif
 ifneq (,$(filter at86rf2xx,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at86rf2xx/include
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at86rf2xx/inclu
 endif
 ifneq (,$(filter mrf24j40,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mrf24j40/include
@@ -141,4 +141,7 @@ ifneq (,$(filter adcxx1c,$(USEMODULE)))
 endif
 ifneq (,$(filter sx127%,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/sx127x/include
+endif
+ifneq (,$(filter esp8266,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/esp8266/include
 endif
