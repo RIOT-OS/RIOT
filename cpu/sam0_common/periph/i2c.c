@@ -44,7 +44,7 @@
 static void _i2c_poweron(SercomI2cm *sercom);
 static void _i2c_poweroff(SercomI2cm *sercom);
 
-static inline int _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag);
+static int _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag);
 static inline int _write(SercomI2cm *dev, const uint8_t *data, int length);
 static inline int _read(SercomI2cm *dev, uint8_t *data, int length);
 static inline void _stop(SercomI2cm *dev);
