@@ -59,8 +59,8 @@
  *
  * Above you see a simple IPv6 server. Don't forget to also
  * @ref including-modules "include" the IPv6 module of your networking
- * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc GNRC) and at least
- * one network device.
+ * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc "GNRC") and at
+ * least one network device.
  *
  * After including header files for the @ref net_af "address families",
  * @ref net_protnum "protocol numbers" and the @ref net_sock_ip "raw `sock`s"
@@ -194,7 +194,7 @@
  *
  * Again: Don't forget to also @ref including-modules "include" the IPv6 module
  * of your networking implementation (e.g. `gnrc_ipv6_default` for
- * @ref net_gnrc GNRC) and at least one network device.
+ * @ref net_gnrc "GNRC") and at least one network device.
  *
  * We first create again a `sock` with a local end point bound to any IPv6
  * address. Note that we also could specify the remote end point here and not

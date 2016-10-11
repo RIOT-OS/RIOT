@@ -60,11 +60,11 @@
  *
  * Above you see a simple UDP echo server. Don't forget to also
  * @ref including-modules "include" the IPv6 module of your networking
- * implementation (e.g. gnrc_ipv6_default` for @ref net_gnrc GNRC) and at least
+ * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc GNRC) and at least
  * one network device.
  *
  * After including header files for the @ref net_af "address families" and
- * the @ref net_sock_ip "raw `sock`s" themselves, we create some buffer space
+ * the @ref net_sock_udp "UDP `sock`s" themselves, we create some buffer space
  * `buf` to store the data received by the server:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
@@ -75,7 +75,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * To be able to listen for incoming packets we bind the `sock` by setting a
- * local end point with with a port (`12345` in this case).
+ * local end point with a port (`12345` in this case).
  *
  * We then proceed to create the `sock`. It is bound to `local` and thus listens
  * for UDP packets with @ref udp_hdr_t::dst_port "destination port" `12345`.
@@ -194,7 +194,7 @@
  *
  * Again: Don't forget to also @ref including-modules "include" the IPv6 module
  * of your networking implementation (e.g. `gnrc_ipv6_default` for
- * @ref net_gnrc GNRC) and at least one network device.
+ * @ref net_gnrc "GNRC") and at least one network device.
  *
  * We first create again a `sock` with a local end point bound to any IPv6
  * address and some port. Note that we also could specify the remote here and
