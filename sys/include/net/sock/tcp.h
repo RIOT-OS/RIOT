@@ -191,16 +191,17 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock);
  *                      truncated and the remaining data can be retrieved
  *                      later on.
  * @param[in] timeout   Timeout for receive in microseconds.
- *                      This value can be ignored (no timeout) if the
- *                      @ref sys_xtimer module is not present and the
- *                      implementation does not support timeouts on its own.
- *                      May be 0 for no timeout.
+ *                      If 0 and no data is available, the function returns
+ *                      immediately.
+ *                      May be SOCK_NO_TIMEOUT for no timeout (wait until data
+ *                      is available).
  *
  * @note    Function may block.
  *
  * @return  The number of bytes read on success.
  * @return  0, if no read data is available, but everything is in order.
  * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
  * @return  -ECONNABORTED, if the connection is aborted while waiting for the
  *          next data.
  * @return  -ECONNRESET, if the connection was forcibly closed by remote end

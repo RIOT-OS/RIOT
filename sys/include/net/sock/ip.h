@@ -45,7 +45,8 @@
  *         sock_ip_ep_t remote;
  *         ssize_t res;
  *
- *         if ((res = sock_ip_recv(&sock, buf, sizeof(buf), 0, &remote)) >= 0) {
+ *         if ((res = sock_ip_recv(&sock, buf, sizeof(buf), SOCK_NO_TIMEOUT,
+ *                                 &remote)) >= 0) {
  *             puts("Received a message");
  *             if (sock_ip_send(&sock, buf, res, 0, &remote) < 0) {
  *                 puts("Error sending reply");
@@ -97,8 +98,8 @@
  * The application then waits indefinitely for an incoming message in
  * `buf` from `remote`. If we want to timeout this wait period we could
  * alternatively set the `timeout` parameter of @ref sock_ip_recv() to a
- * value `> 0`. If an error occurs on receive we just ignore it and continue
- * looping.
+ * value `!= SOCK_NO_TIMEOUT`. If an error occurs on receive we just ignore it
+ * and continue looping.
  *
  * If we receive a message we use its `remote` to reply. Note since the `proto`
  * was already set during @ref sock_ip_create() we can just leave `proto` for
@@ -110,7 +111,8 @@
  *         sock_ip_ep_t remote;
  *         ssize_t res;
  *
- *         if ((res = sock_ip_recv(&sock, buf, sizeof(buf), 0, &remote)) >= 0) {
+ *         if ((res = sock_ip_recv(&sock, buf, sizeof(buf), SOCK_NO_TIMEOUT,
+ *                                 &remote)) >= 0) {
  *             puts("Received a message");
  *             if (sock_ip_send(&sock, buf, res, 0, &remote) < 0) {
  *                 puts("Error sending reply");
@@ -389,10 +391,10 @@ int sock_ip_get_remote(sock_ip_t *sock, sock_ip_ep_t *ep);
  * @param[out] data     Pointer where the received data should be stored.
  * @param[in] max_len   Maximum space available at @p data.
  * @param[in] timeout   Timeout for receive in microseconds.
- *                      This value can be ignored (no timeout) if the
- *                      @ref sys_xtimer module is not present or the
- *                      implementation does not support timeouts on its own.
- *                      May be 0 for no timeout.
+ *                      If 0 and no data is available, the function returns
+ *                      immediately.
+ *                      May be SOCK_NO_TIMEOUT for no timeout (wait until data
+ *                      is available).
  * @param[out] remote   Remote end point of the received data.
  *                      May be NULL, if it is not required by the application.
  *
@@ -401,6 +403,7 @@ int sock_ip_get_remote(sock_ip_t *sock, sock_ip_ep_t *ep);
  * @return  The number of bytes received on success.
  * @return  0, if no received data is available, but everything is in order.
  * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
  * @return  -ENOBUFS, if buffer space is not large enough to store received
  *          data.
  * @return  -ENOMEM, if no memory was available to receive @p data.
