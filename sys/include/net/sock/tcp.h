@@ -461,6 +461,7 @@ int sock_tcp_queue_get_local(sock_tcp_queue_t *queue, sock_tcp_ep_t *ep);
  *                      data is available).
  *
  * @return  0 on success.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
  * @return  -ECONNABORTED, if the connection to @p sock has been aborted while
  *          in this function
  * @return  -EINVAL, if @p queue was not initialized using
