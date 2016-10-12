@@ -480,7 +480,6 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock);
  *
  * @return  The number of bytes read on success.
  * @return  0, if no read data is available, but everything is in order.
- * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
  * @return  -EAGAIN, if @p timeout is `0` and no data is available.
  * @return  -ECONNABORTED, if the connection is aborted while waiting for the
  *          next data.
