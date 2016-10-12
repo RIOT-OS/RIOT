@@ -393,8 +393,8 @@ int sock_ip_get_remote(sock_ip_t *sock, sock_ip_ep_t *ep);
  * @param[in] timeout   Timeout for receive in microseconds.
  *                      If 0 and no data is available, the function returns
  *                      immediately.
- *                      May be SOCK_NO_TIMEOUT for no timeout (wait until data
- *                      is available).
+ *                      May be @ref SOCK_NO_TIMEOUT for no timeout (wait until
+ *                      data is available).
  * @param[out] remote   Remote end point of the received data.
  *                      May be NULL, if it is not required by the application.
  *

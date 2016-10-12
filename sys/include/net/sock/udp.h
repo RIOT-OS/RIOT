@@ -109,7 +109,8 @@
  *         sock_udp_ep_t remote;
  *         ssize_t res;
  *
- *         if ((res = sock_udp_recv(&sock, buf, sizeof(buf), SOCK_NO_TIMEOUT, &remote)) >= 0) {
+ *         if ((res = sock_udp_recv(&sock, buf, sizeof(buf), SOCK_NO_TIMEOUT,
+ *                                  &remote)) >= 0) {
  *             puts("Received a message");
  *             if (sock_udp_send(&sock, buf, res, &remote) < 0) {
  *                 puts("Error sending reply");
@@ -380,8 +381,8 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep);
  * @param[in] timeout   Timeout for receive in microseconds.
  *                      If 0 and no data is available, the function returns
  *                      immediately.
- *                      May be SOCK_NO_TIMEOUT for no timeout (wait until data
- *                      is available).
+ *                      May be @ref SOCK_NO_TIMEOUT for no timeout (wait until
+ *                      data is available).
  * @param[out] remote   Remote end point of the received data.
  *                      May be `NULL`, if it is not required by the application.
  *
