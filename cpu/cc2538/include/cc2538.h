@@ -133,6 +133,9 @@ typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IE
 
 #define SRAM_BB_BASE                0x22000000 /**< SRAM base address in the bit-band region */
 
+#define FLASH_SIZE					0x00080000 /* 512 KiB */
+#define FLASH_PAGE_NUM				256
+
 /** @} */
 
 /** @name CC2538 Special Function Registers
