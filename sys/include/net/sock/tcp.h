@@ -54,7 +54,8 @@
  *
  *             puts("Reading data");
  *             while (read_res >= 0) {
- *                 read_res = sock_tcp_read(sock, &buf, sizeof(buf), 0);
+ *                 read_res = sock_tcp_read(sock, &buf, sizeof(buf),
+ *                                          SOCK_NO_TIMEOUT);
  *                 if (read_res < 0) {
  *                     puts("Disconnected");
  *                     break;
@@ -125,14 +126,16 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * The application then waits indefinitely for an incoming connection with
- * `sock_tcp_accept()`. If an error occurs during that we print an error message
- * but proceed waiting.
+ * `sock_tcp_accept()`. If we want to timeout this wait period we could
+ * alternatively set the `timeout` parameter of @ref sock_tcp_accept() to a
+ * value != @ref SOCK_NO_TIMEOUT. If an error occurs during that we print an
+ * error message but proceed waiting.
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  *     while (1) {
  *         sock_tcp_t *sock;
  *
- *         if (sock_tcp_accept(&queue, &sock) < 0) {
+ *         if (sock_tcp_accept(&queue, &sock, SOCK_NO_TIMEOUT) < 0) {
  *             puts("Error accepting new sock");
  *         }
  *         else {
@@ -140,15 +143,17 @@
  *
  * On successful connection establishment with a client we get a connected
  * `sock` object and we try to read the incoming stream into `buf` using
- * `sock_tcp_read()` on that `sock`. If we error we break the read loop and
- * disconnect the `sock`.
+ * `sock_tcp_read()` on that `sock`. Again, we could use another timeout period
+ * than @ref SOCK_NO_TIMEOUT with this function. If we error we break the read
+ * loop and disconnect the `sock`.
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  *             int read_res = 0;
  *
  *             puts("Reading data");
  *             while (read_res >= 0) {
- *                 read_res = sock_tcp_read(sock, &buf, sizeof(buf), 0);
+ *                 read_res = sock_tcp_read(sock, &buf, sizeof(buf),
+ *                                          SOCK_NO_TIMEOUT);
  *                 if (read_res < 0) {
  *                     puts("Disconnected");
  *                     break;
@@ -211,7 +216,8 @@
  *         puts("Errored on write");
  *     }
  *     else {
- *         if ((res = sock_tcp_read(&sock, &buf, sizeof(buf), 0)) < 0) {
+ *         if ((res = sock_tcp_read(&sock, &buf, sizeof(buf),
+ *                                  SOCK_NO_TIMEOUT)) < 0) {
  *             puts("Disconnected");
  *         }
  *         printf("Read: \"");
@@ -228,7 +234,7 @@
  * Above you see a simple TCP echo client. Again: Don't forget to also
  * @ref including-modules "include" the IPv6 module of your networking
  * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc "GNRC") and at
- * least one network device. Additionally, for the IPv6 address parsing you need
+ * least one network device. Ad0)ditionally, for the IPv6 address parsing you need
  * the @ref net_ipv6_addr "IPv6 address module".
  *
  * This time instead of creating a listening queue we create a connected `sock`
@@ -265,7 +271,8 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  *     else {
- *         if ((res = sock_tcp_read(&sock, &buf, sizeof(buf), 0)) < 0) {
+ *         if ((res = sock_tcp_read(&sock, &buf, sizeof(buf),
+ *                                  SOCK_NO_TIMEOUT)) < 0) {
  *             puts("Disconnected");
  *         }
  *         printf("Read: \"");
@@ -384,7 +391,9 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
 /**
  * @brief   Disconnects a TCP connection
  *
- * @pre `sock != NULL`
+ * @pre `sock != NULL` If we want to timeout this wait period we could
+ * alternatively set the `timeout` parameter of @ref sock_tcp_accept() to a
+ * value != @ref SOCK_NO_TIMEOUT.
  *
  * @param[in] sock  A TCP sock object.
  */
@@ -443,8 +452,13 @@ int sock_tcp_queue_get_local(sock_tcp_queue_t *queue, sock_tcp_ep_t *ep);
  *
  * @pre `(queue != NULL) && (sock != NULL)`
  *
- * @param[in] queue A TCP listening queue.
- * @param[out] sock A new TCP sock object for the established sock object.
+ * @param[in] queue     A TCP listening queue.
+ * @param[out] sock     A new TCP sock object for the established sock object.
+ * @param[in] timeout   Timeout for accept in microseconds.
+ *                      If 0 and no data is available, the function returns
+ *                      immediately.
+ *                      May be @ref SOCK_NO_TIMEOUT for no timeout (wait until
+ *                      data is available).
  *
  * @return  0 on success.
  * @return  -ECONNABORTED, if the connection to @p sock has been aborted while
@@ -457,7 +471,8 @@ int sock_tcp_queue_get_local(sock_tcp_queue_t *queue, sock_tcp_ep_t *ep);
  *          permitted on this system (e.g. by firewall rules).
  * @return  -ETIMEDOUT, if the operation timed out internally.
  */
-int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock);
+int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
+                    uint32_t timeout);
 
 /**
  * @brief   Reads data from an established TCP stream
@@ -473,8 +488,8 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock);
  * @param[in] timeout   Timeout for receive in microseconds.
  *                      If 0 and no data is available, the function returns
  *                      immediately.
- *                      May be SOCK_NO_TIMEOUT for no timeout (wait until data
- *                      is available).
+ *                      May be @ref SOCK_NO_TIMEOUT for no timeout (wait until
+ *                      data is available).
  *
  * @note    Function may block.
  *
