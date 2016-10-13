@@ -372,6 +372,7 @@ ifneq (,$(filter newlib,$(USEMODULE)))
 endif
 
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
+  USEMODULE += bitfield
   USEMODULE += posix
   USEMODULE += random
 endif

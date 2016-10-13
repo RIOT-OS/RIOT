@@ -8,7 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := nucleo-f334 stm32f0discovery weio nucleo-f030 \
                              nucleo32-f042
 
 USEMODULE += gnrc_ipv6
-USEMODULE += gnrc_conn_udp
+USEMODULE += gnrc_sock_udp
 USEMODULE += nhdp
 
 include $(RIOTBASE)/Makefile.include

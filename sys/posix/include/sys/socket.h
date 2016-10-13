@@ -51,6 +51,29 @@ extern "C" {
 #endif
 
 /**
+ * @brief Maximum number of sockets available on for creation with @ref socket()
+ */
+#ifndef SOCKET_POOL_SIZE
+#ifdef MODULE_SOCK_TCP
+#define SOCKET_POOL_SIZE        (6)    /* define enough for accepted sockets */
+#else
+#define SOCKET_POOL_SIZE        (4)
+#endif
+#endif
+
+/**
+ * @brief Maximum number of incoming TCP connections a listening socket can
+ *        handle
+ */
+#ifndef SOCKET_TCP_QUEUE_SIZE
+#ifdef MODULE_SOCK_TCP
+#define SOCKET_TCP_QUEUE_SIZE   (2)
+#else
+#define SOCKET_TCP_QUEUE_SIZE   (0)
+#endif
+#endif
+
+/**
  * @brief   Maximum data length for a socket address.
  *
  * It is assumed that struct sockaddr_in6 is currently the longest socket address struct.
@@ -294,31 +317,6 @@ int getsockname(int socket, struct sockaddr *__restrict address,
 int listen(int socket, int backlog);
 
 /**
- * @brief   Receive a message from a connected socket.
- * @details Shall receive a message from a connection-mode or
- *          connectionless-mode socket. It is normally used with connected
- *          sockets because it does not permit the application to retrieve the
- *          source address of received data.
- *
- * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/recv.html">
- *          The Open Group Base Specification Issue 7, recv
- *      </a>
- *
- * @param[in] socket    Specifies the socket file descriptor.
- * @param[out] buffer   Points to a buffer where the message should be stored.
- * @param[in] length    Specifies the length in bytes of the buffer pointed to
- *                      by the buffer argument.
- * @param[in] flags     Specifies the type of message reception. Support for
- *                      values other than 0 is not implemented yet.
- *
- * @return  Upon successful completion, recv() shall return the length of the
- *          message in bytes. If no messages are available to be received and
- *          the peer has performed an orderly shutdown, recv() shall return 0.
- *          Otherwise, -1 shall be returned and errno set to indicate the error.
- */
-ssize_t recv(int socket, void *buffer, size_t length, int flags);
-
-/**
  * @brief   Receive a message from a socket.
  * @details The recvfrom() function shall receive a message from a
  *          connection-mode or connectionless-mode socket. It is normally used
@@ -357,27 +355,32 @@ ssize_t recvfrom(int socket, void *__restrict buffer, size_t length, int flags,
                  socklen_t *__restrict address_len);
 
 /**
- * @brief   Send a message on a socket.
- * @details Shall initiate transmission of a message from the specified socket
- *          to its peer. The send() function shall send a message only when the
- *          socket is connected. If the socket is a connectionless-mode socket,
- *          the message shall be sent to the pre-specified peer address.
+ * @brief   Receive a message from a connected socket.
+ * @details Shall receive a message from a connection-mode or
+ *          connectionless-mode socket. It is normally used with connected
+ *          sockets because it does not permit the application to retrieve the
+ *          source address of received data.
  *
- * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/send.html">
- *          The Open Group Base Specification Issue 7, send
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/recv.html">
+ *          The Open Group Base Specification Issue 7, recv
  *      </a>
  *
  * @param[in] socket    Specifies the socket file descriptor.
- * @param[in] buffer    Points to the buffer containing the message to send.
- * @param[in] length    Specifies the length of the message in bytes.
- * @param[in] flags     Specifies the type of message reception. Support
- *                      for values other than 0 is not implemented yet.
+ * @param[out] buffer   Points to a buffer where the message should be stored.
+ * @param[in] length    Specifies the length in bytes of the buffer pointed to
+ *                      by the buffer argument.
+ * @param[in] flags     Specifies the type of message reception. Support for
+ *                      values other than 0 is not implemented yet.
  *
- * @return  Upon successful completion, send() shall return the number of bytes
- *          sent. Otherwise, -1 shall be returned and errno set to indicate the
- *          error.
+ * @return  Upon successful completion, recv() shall return the length of the
+ *          message in bytes. If no messages are available to be received and
+ *          the peer has performed an orderly shutdown, recv() shall return 0.
+ *          Otherwise, -1 shall be returned and errno set to indicate the error.
  */
-ssize_t send(int socket, const void *buffer, size_t length, int flags);
+static inline ssize_t recv(int socket, void *buffer, size_t length, int flags)
+{
+    return recvfrom(socket, buffer, length, flags, NULL, NULL);
+}
 
 /**
  * @brief   Send a message on a socket.
@@ -422,6 +425,33 @@ ssize_t send(int socket, const void *buffer, size_t length, int flags);
  */
 ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
                const struct sockaddr *address, socklen_t address_len);
+
+/**
+ * @brief   Send a message on a socket.
+ * @details Shall initiate transmission of a message from the specified socket
+ *          to its peer. The send() function shall send a message only when the
+ *          socket is connected. If the socket is a connectionless-mode socket,
+ *          the message shall be sent to the pre-specified peer address.
+ *
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/send.html">
+ *          The Open Group Base Specification Issue 7, send
+ *      </a>
+ *
+ * @param[in] socket    Specifies the socket file descriptor.
+ * @param[in] buffer    Points to the buffer containing the message to send.
+ * @param[in] length    Specifies the length of the message in bytes.
+ * @param[in] flags     Specifies the type of message reception. Support
+ *                      for values other than 0 is not implemented yet.
+ *
+ * @return  Upon successful completion, send() shall return the number of bytes
+ *          sent. Otherwise, -1 shall be returned and errno set to indicate the
+ *          error.
+ */
+static inline ssize_t send(int socket, const void *buffer, size_t length,
+                           int flags)
+{
+    return sendto(socket, buffer, length, flags, NULL, 0);
+}
 
 /**
  * @brief   Create an endpoint for communication.
