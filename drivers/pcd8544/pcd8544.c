@@ -130,7 +130,7 @@ static const uint8_t _ascii[][5] = {
     {0x10, 0x08, 0x08, 0x10, 0x08},/* 7e ~ */
 };
 
-static const char _riot[] = {
+static const uint8_t _riot[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -197,7 +197,7 @@ static const char _riot[] = {
 };
 
 
-static void _write(pcd8544_t *dev, uint8_t is_data, char data)
+static void _write(pcd8544_t *dev, uint8_t is_data, uint8_t data)
 {
     /* set command or data mode */
     gpio_write(dev->mode, is_data);
@@ -293,7 +293,7 @@ void pcd8544_riot(pcd8544_t *dev)
     pcd8544_write_img(dev, _riot);
 }
 
-void pcd8544_write_img(pcd8544_t *dev, const char img[])
+void pcd8544_write_img(pcd8544_t *dev, const uint8_t img[])
 {
     /* set initial position */
     _set_x(dev, 0);

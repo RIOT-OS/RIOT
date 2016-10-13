@@ -85,7 +85,7 @@ int lis3dh_read_xyz(const lis3dh_t *dev, lis3dh_data_t *acc_data)
     /* Perform the transaction */
     gpio_clear(dev->cs);
 
-    if (spi_transfer_regs(dev->spi, addr, NULL, (char *)acc_data,
+    if (spi_transfer_regs(dev->spi, addr, NULL, (uint8_t *)acc_data,
                           sizeof(lis3dh_data_t)) != sizeof(lis3dh_data_t)) {
         /* Transfer error */
         gpio_set(dev->cs);
@@ -234,7 +234,7 @@ static int lis3dh_read_regs(const lis3dh_t *dev, const lis3dh_reg_t reg, const u
     /* Perform the transaction */
     gpio_clear(dev->cs);
 
-    if (spi_transfer_regs(dev->spi, addr, NULL, (char *)buf, len) < 0) {
+    if (spi_transfer_regs(dev->spi, addr, NULL, buf, len) < 0) {
         /* Transfer error */
         gpio_set(dev->cs);
         /* Release the bus for other threads. */

@@ -110,7 +110,7 @@ void pcd8544_set_bias(pcd8544_t *dev, uint8_t bias);
 /**
  * @brief   Write an image to memory of the given display
  *
- * The image must be given as a char array with 504 elements. Each bit in the
+ * The image must be given as a byte array with 504 elements. Each bit in the
  * array represents one pixel on the display. Each byte in the array contains
  * 8 stacked pixels, from top to bottom. So byte[0] contains the pixels from
  * (0,0) to (0,7), byte[1] (1,0) to (1,7) and byte[503] the pixels from
@@ -118,9 +118,9 @@ void pcd8544_set_bias(pcd8544_t *dev, uint8_t bias);
  * datasheet.
  *
  * @param[in] dev           device descriptor of display to use
- * @param[in] img           char array with image data (must be of size := 504)
+ * @param[in] img           byte array with image data (must be of size := 504)
  */
-void pcd8544_write_img(pcd8544_t *dev, const char img[]);
+void pcd8544_write_img(pcd8544_t *dev, const uint8_t img[]);
 
 /**
  * @brief   Write a single ASCII character to the display

@@ -98,7 +98,7 @@ static void switch_bank(enc28j60_t *dev, int8_t bank)
 
 static uint8_t cmd_rcr(enc28j60_t *dev, uint8_t reg, int8_t bank)
 {
-    char res;
+    uint8_t res;
 
     switch_bank(dev, bank);
     gpio_clear(dev->cs_pin);
@@ -109,7 +109,7 @@ static uint8_t cmd_rcr(enc28j60_t *dev, uint8_t reg, int8_t bank)
 
 static uint8_t cmd_rcr_miimac(enc28j60_t *dev, uint8_t reg, int8_t bank)
 {
-    char res[2];
+    uint8_t res[2];
 
     switch_bank(dev, bank);
     gpio_clear(dev->cs_pin);
@@ -122,7 +122,7 @@ static void cmd_wcr(enc28j60_t *dev, uint8_t reg, int8_t bank, uint8_t value)
 {
     switch_bank(dev, bank);
     gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi, CMD_WCR | reg, (char)value, 0);
+    spi_transfer_reg(dev->spi, CMD_WCR | reg, value, 0);
     gpio_set(dev->cs_pin);
 }
 
@@ -182,14 +182,14 @@ static void cmd_w_phy(enc28j60_t *dev, uint8_t reg, uint16_t val)
 static void cmd_rbm(enc28j60_t *dev, uint8_t *data, size_t len)
 {
     gpio_clear(dev->cs_pin);
-    spi_transfer_regs(dev->spi, CMD_RBM, NULL, (char *)data, len);
+    spi_transfer_regs(dev->spi, CMD_RBM, NULL, data, len);
     gpio_set(dev->cs_pin);
 }
 
 static void cmd_wbm(enc28j60_t *dev, uint8_t *data, size_t len)
 {
     gpio_clear(dev->cs_pin);
-    spi_transfer_regs(dev->spi, CMD_WBM, (char *)data, NULL, len);
+    spi_transfer_regs(dev->spi, CMD_WBM, data, NULL, len);
     gpio_set(dev->cs_pin);
 }
 

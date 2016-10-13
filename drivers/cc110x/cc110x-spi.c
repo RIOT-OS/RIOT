@@ -72,19 +72,19 @@ void cc110x_cs(cc110x_t *dev)
 #endif
 }
 
-void cc110x_writeburst_reg(cc110x_t *dev, uint8_t addr, const char *src, uint8_t count)
+void cc110x_writeburst_reg(cc110x_t *dev, uint8_t addr, const uint8_t *src, uint8_t count)
 {
     unsigned int cpsr;
     spi_acquire(dev->params.spi);
     cpsr = irq_disable();
     cc110x_cs(dev);
-    spi_transfer_regs(dev->params.spi, addr | CC110X_WRITE_BURST, (char *)src, 0, count);
+    spi_transfer_regs(dev->params.spi, addr | CC110X_WRITE_BURST, (uint8_t *)src, 0, count);
     gpio_set(dev->params.cs);
     irq_restore(cpsr);
     spi_release(dev->params.spi);
 }
 
-void cc110x_readburst_reg(cc110x_t *dev, uint8_t addr, char *buffer, uint8_t count)
+void cc110x_readburst_reg(cc110x_t *dev, uint8_t addr, uint8_t *buffer, uint8_t count)
 {
     int i = 0;
     unsigned int cpsr;
@@ -115,7 +115,7 @@ void cc110x_write_reg(cc110x_t *dev, uint8_t addr, uint8_t value)
 
 uint8_t cc110x_read_reg(cc110x_t *dev, uint8_t addr)
 {
-    char result;
+    uint8_t result;
     unsigned int cpsr;
     spi_acquire(dev->params.spi);
     cpsr = irq_disable();
@@ -129,7 +129,7 @@ uint8_t cc110x_read_reg(cc110x_t *dev, uint8_t addr)
 
 uint8_t cc110x_read_status(cc110x_t *dev, uint8_t addr)
 {
-    char result;
+    uint8_t result;
     unsigned int cpsr;
     spi_acquire(dev->params.spi);
     cpsr = irq_disable();
@@ -143,7 +143,7 @@ uint8_t cc110x_read_status(cc110x_t *dev, uint8_t addr)
 
 uint8_t cc110x_get_reg_robust(cc110x_t *dev, uint8_t addr)
 {
-    char result, result2;
+    uint8_t result, result2;
     unsigned int cpsr;
     spi_acquire(dev->params.spi);
     cpsr = irq_disable();
@@ -166,7 +166,7 @@ uint8_t cc110x_strobe(cc110x_t *dev, uint8_t c)
     }
 #endif
 
-    char result;
+    uint8_t result;
     unsigned int cpsr;
     spi_acquire(dev->params.spi);
     cpsr = irq_disable();

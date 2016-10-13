@@ -441,7 +441,7 @@ static mutex_t *locks_map[] = {
 };
 
 typedef struct {
-    char(*cb)(char data);
+    uint8_t (*cb)(uint8_t data);
 } spi_state_t;
 
 static inline void irq_handler_transfer(SPI_Type *spi, spi_t dev);
@@ -781,7 +781,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     return 0;
 }
 
-int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
+int spi_init_slave(spi_t dev, spi_conf_t conf, uint8_t (*cb)(uint8_t data))
 {
     SPI_Type *spi_dev;
 
@@ -886,7 +886,7 @@ static inline uint8_t spi_transfer_internal(SPI_Type *spi_dev, uint32_t flags, u
     return (uint8_t)spi_dev->POPR;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+int spi_transfer_byte(spi_t dev, uint8_t out, uint8_t *in)
 {
     SPI_Type *spi_dev;
     uint8_t byte_in;
@@ -969,13 +969,13 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     spi_dev->SR = SPI_SR_EOQF_MASK;
 
     if (in != NULL) {
-        *in = (char)byte_in;
+        *in = byte_in;
     }
 
     return 1;
 }
 
-int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
+int spi_transfer_bytes(spi_t dev, uint8_t *out, uint8_t *in, unsigned int length)
 {
     SPI_Type *spi_dev;
     uint8_t byte_in;
@@ -1071,7 +1071,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 
         if (in != NULL) {
             /* Save input byte to buffer */
-            in[i] = (char)byte_in;
+            in[i] = byte_in;
         }
     }
 
@@ -1081,7 +1081,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     return i;
 }
 
-int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
+int spi_transfer_reg(spi_t dev, uint8_t reg, uint8_t out, uint8_t *in)
 {
     SPI_Type *spi_dev;
     uint8_t byte_in;
@@ -1168,7 +1168,7 @@ int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
 
     if (in != NULL) {
         /* Save input byte to buffer */
-        *in = (char)byte_in;
+        *in = byte_in;
     }
 
     /* Clear End-of-Queue status flag */
@@ -1177,7 +1177,7 @@ int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
     return 2;
 }
 
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length)
+int spi_transfer_regs(spi_t dev, uint8_t reg, uint8_t *out, uint8_t *in, unsigned int length)
 {
     SPI_Type *spi_dev;
     uint8_t byte_in;
@@ -1278,7 +1278,7 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
 
         if (in != NULL) {
             /* Save input byte to buffer */
-            in[i] = (char)byte_in;
+            in[i] = byte_in;
         }
     }
 
@@ -1288,7 +1288,7 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
     return i;
 }
 
-void spi_transmission_begin(spi_t dev, char reset_val)
+void spi_transmission_begin(spi_t dev, uint8_t reset_val)
 {
 
     switch (dev) {
@@ -1489,8 +1489,8 @@ static inline void irq_handler_transfer(SPI_Type *spi, spi_t dev)
 {
 
     if (spi->SR & SPI_SR_RFDF_MASK) {
-        char data;
-        data = (char)spi->POPR;
+        uint8_t data;
+        data = spi->POPR;
         data = spi_config[dev].cb(data);
         spi->PUSHR = SPI_PUSHR_CTAS(0)
                      | SPI_PUSHR_EOQ_MASK

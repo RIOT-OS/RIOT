@@ -171,7 +171,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 
 #endif  /* SPI_USE_USCI */
 
-int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
+int spi_init_slave(spi_t dev, spi_conf_t conf, uint8_t (*cb)(uint8_t data))
 {
     /* not supported so far */
     (void)dev;
@@ -180,7 +180,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
     return -1;
 }
 
-void spi_transmission_begin(spi_t dev, char reset_val)
+void spi_transmission_begin(spi_t dev, uint8_t reset_val)
 {
     /* not supported so far */
     (void)dev;
@@ -210,14 +210,14 @@ int spi_release(spi_t dev)
     return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+int spi_transfer_byte(spi_t dev, uint8_t out, uint8_t *in)
 {
     (void)dev;
-    char tmp;
+    uint8_t tmp;
     while (!(SPI_IF & SPI_IE_TX_BIT)) {}
     SPI_DEV->TXBUF = (uint8_t)out;
     while (!(SPI_IF & SPI_IE_RX_BIT)) {}
-    tmp = (char)SPI_DEV->RXBUF;
+    tmp = SPI_DEV->RXBUF;
     if (in) {
         *in = tmp;
     }

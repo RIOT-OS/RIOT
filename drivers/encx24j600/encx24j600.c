@@ -50,7 +50,7 @@
 #define TX_BUFFER_END   (RX_BUFFER_START)
 #define TX_BUFFER_START (TX_BUFFER_END - TX_BUFFER_LEN)
 
-static void cmd(encx24j600_t *dev, char cmd);
+static void cmd(encx24j600_t *dev, uint8_t cmd);
 static void reg_set(encx24j600_t *dev, uint8_t reg, uint16_t value);
 static uint16_t reg_get(encx24j600_t *dev, uint8_t reg);
 static void reg_clear_bits(encx24j600_t *dev, uint8_t reg, uint16_t mask);
@@ -145,7 +145,7 @@ static void _isr(netdev2_t *netdev)
     unlock(dev);
 }
 
-static inline void enc_spi_transfer(encx24j600_t *dev, char *out, char *in, int len)
+static inline void enc_spi_transfer(encx24j600_t *dev, uint8_t *out, uint8_t *in, int len)
 {
     spi_acquire(dev->spi);
     gpio_clear(dev->cs);
@@ -156,8 +156,8 @@ static inline void enc_spi_transfer(encx24j600_t *dev, char *out, char *in, int 
 
 static inline uint16_t reg_get(encx24j600_t *dev, uint8_t reg)
 {
-    char cmd[4] = { ENC_RCRU, reg, 0, 0 };
-    char result[4];
+    uint8_t cmd[4] = { ENC_RCRU, reg, 0, 0 };
+    uint8_t result[4];
 
     enc_spi_transfer(dev, cmd, result, 4);
 
@@ -169,7 +169,7 @@ static void phy_reg_set(encx24j600_t *dev, uint8_t reg, uint16_t value) {
     reg_set(dev, ENC_MIWR, value);
 }
 
-static void cmd(encx24j600_t *dev, char cmd) {
+static void cmd(encx24j600_t *dev, uint8_t cmd) {
     spi_acquire(dev->spi);
     gpio_clear(dev->cs);
     spi_transfer_byte(dev->spi, cmd, NULL);
@@ -177,7 +177,7 @@ static void cmd(encx24j600_t *dev, char cmd) {
     spi_release(dev->spi);
 }
 
-static void cmdn(encx24j600_t *dev, uint8_t cmd, char *out, char *in, int len) {
+static void cmdn(encx24j600_t *dev, uint8_t cmd, uint8_t *out, uint8_t *in, int len) {
     spi_acquire(dev->spi);
     gpio_clear(dev->cs);
     spi_transfer_byte(dev->spi, cmd, NULL);
@@ -188,19 +188,19 @@ static void cmdn(encx24j600_t *dev, uint8_t cmd, char *out, char *in, int len) {
 
 static void reg_set(encx24j600_t *dev, uint8_t reg, uint16_t value)
 {
-    char cmd[4] = { ENC_WCRU, reg, value, value >> 8 };
+    uint8_t cmd[4] = { ENC_WCRU, reg, value, value >> 8 };
     enc_spi_transfer(dev, cmd, NULL, 4);
 }
 
 static void reg_set_bits(encx24j600_t *dev, uint8_t reg, uint16_t mask)
 {
-    char cmd[4] = { ENC_BFSU, reg, mask, mask >> 8 };
+    uint8_t cmd[4] = { ENC_BFSU, reg, mask, mask >> 8 };
     enc_spi_transfer(dev, cmd, NULL, 4);
 }
 
 static void reg_clear_bits(encx24j600_t *dev, uint8_t reg, uint16_t mask)
 {
-    char cmd[4] = { ENC_BFCU, reg, mask, mask >> 8 };
+    uint8_t cmd[4] = { ENC_BFCU, reg, mask, mask >> 8 };
     enc_spi_transfer(dev, cmd, NULL, 4);
 }
 
@@ -213,11 +213,11 @@ static void reg_clear_bits(encx24j600_t *dev, uint8_t reg, uint16_t mask)
  * @param     ptr   pointer to buffer to read from / write to
  * @param[in] len   nr of bytes to read/write
  */
-static void sram_op(encx24j600_t *dev, uint16_t cmd, uint16_t addr, char *ptr, int len)
+static void sram_op(encx24j600_t *dev, uint16_t cmd, uint16_t addr, uint8_t *ptr, int len)
 {
     uint16_t reg;
-    char* in = NULL;
-    char* out = NULL;
+    uint8_t* in = NULL;
+    uint8_t* out = NULL;
 
     /* determine pointer addr
      *
@@ -367,7 +367,7 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     lock(dev);
 
     /* read frame header */
-    sram_op(dev, ENC_RRXDATA, dev->rx_next_ptr, (char*)&hdr, sizeof(hdr));
+    sram_op(dev, ENC_RRXDATA, dev->rx_next_ptr, (uint8_t*)&hdr, sizeof(hdr));
 
     /* hdr.frame_len given by device contains 4 bytes checksum */
     size_t payload_len = hdr.frame_len - 4;

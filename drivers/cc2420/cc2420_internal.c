@@ -29,11 +29,11 @@
 
 uint8_t cc2420_strobe(const cc2420_t *dev, const uint8_t command)
 {
-    char res;
+    uint8_t res;
 
     spi_acquire(dev->params.spi);
     gpio_clear(dev->params.pin_cs);
-    spi_transfer_byte(dev->params.spi, (char)command, (char *)&res);
+    spi_transfer_byte(dev->params.spi, (uint8_t)command, &res);
     gpio_set(dev->params.pin_cs);
     spi_release(dev->params.spi);
 
@@ -49,7 +49,7 @@ void cc2420_reg_write(const cc2420_t *dev,
     spi_acquire(dev->params.spi);
     gpio_clear(dev->params.pin_cs);
     spi_transfer_regs(dev->params.spi, CC2420_REG_WRITE | addr,
-                      (char *)&tmp, NULL, 2);
+                      (uint8_t *)&tmp, NULL, 2);
     gpio_set(dev->params.pin_cs);
     spi_release(dev->params.spi);
 }
@@ -61,7 +61,7 @@ uint16_t cc2420_reg_read(const cc2420_t *dev, const uint8_t addr)
     spi_acquire(dev->params.spi);
     gpio_clear(dev->params.pin_cs);
     spi_transfer_regs(dev->params.spi, CC2420_REG_READ | addr,
-                      NULL, (char *)&tmp, 2);
+                      NULL, (uint8_t *)&tmp, 2);
     gpio_set(dev->params.pin_cs);
     spi_release(dev->params.spi);
 
@@ -71,13 +71,13 @@ uint16_t cc2420_reg_read(const cc2420_t *dev, const uint8_t addr)
 void cc2420_ram_read(const cc2420_t *dev, const uint16_t addr,
                      uint8_t *data, const size_t len)
 {
-    char tmp[] = { (CC2420_RAM      | (addr & 0x7f)),
-                   (CC2420_RAM_READ | ((addr >> 1) & 0xc0)) };
+    uint8_t tmp[] = { (CC2420_RAM      | (addr & 0x7f)),
+                      (CC2420_RAM_READ | ((addr >> 1) & 0xc0)) };
 
     spi_acquire(dev->params.spi);
     gpio_clear(dev->params.pin_cs);
     spi_transfer_bytes(dev->params.spi, tmp, NULL, 2);
-    spi_transfer_bytes(dev->params.spi, NULL, (char*)data, len);
+    spi_transfer_bytes(dev->params.spi, NULL, data, len);
     gpio_set(dev->params.pin_cs);
     spi_release(dev->params.spi);
 }
@@ -85,13 +85,13 @@ void cc2420_ram_read(const cc2420_t *dev, const uint16_t addr,
 void cc2420_ram_write(const cc2420_t *dev, const uint16_t addr,
                       const uint8_t *data, const size_t len)
 {
-    char tmp[] = { (CC2420_RAM       | (addr & 0x7f)),
-                   (CC2420_RAM_WRITE | ((addr >> 1) & 0xc0)) };
+    uint8_t tmp[] = { (CC2420_RAM       | (addr & 0x7f)),
+                      (CC2420_RAM_WRITE | ((addr >> 1) & 0xc0)) };
 
     spi_acquire(dev->params.spi);
     gpio_clear(dev->params.pin_cs);
     spi_transfer_bytes(dev->params.spi, tmp, NULL, 2);
-    spi_transfer_bytes(dev->params.spi, (char*)data, NULL, len);
+    spi_transfer_bytes(dev->params.spi, (uint8_t *)data, NULL, len);
     gpio_set(dev->params.pin_cs);
     spi_release(dev->params.spi);
 }
@@ -101,7 +101,7 @@ void cc2420_fifo_read(const cc2420_t *dev, uint8_t *data, const size_t len)
     spi_acquire(dev->params.spi);
     gpio_clear(dev->params.pin_cs);
     spi_transfer_regs(dev->params.spi, CC2420_FIFO_READ,
-                      NULL, (char *)data, len);
+                      NULL, data, len);
     gpio_set(dev->params.pin_cs);
     spi_release(dev->params.spi);
 }
@@ -111,7 +111,7 @@ void cc2420_fifo_write(const cc2420_t *dev, uint8_t *data, const size_t len)
     spi_acquire(dev->params.spi);
     gpio_clear(dev->params.pin_cs);
     spi_transfer_regs(dev->params.spi, CC2420_FIFO_WRITE,
-                      (char *)data, NULL, len);
+                      data, NULL, len);
     gpio_set(dev->params.pin_cs);
     spi_release(dev->params.spi);
 }

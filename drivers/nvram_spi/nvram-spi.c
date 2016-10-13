@@ -126,7 +126,7 @@ static int nvram_spi_write(nvram_t *dev, const uint8_t *src, uint32_t dst, size_
     int status;
     union {
         uint32_t u32;
-        char c[4];
+        uint8_t c[4];
     } addr;
     /* Address is expected by the device as big-endian, i.e. network byte order,
      * we utilize the network byte order macros here. */
@@ -155,7 +155,7 @@ static int nvram_spi_write(nvram_t *dev, const uint8_t *src, uint32_t dst, size_
         return status;
     }
     /* Keep holding CS and write data */
-    status = spi_transfer_bytes(spi_dev->spi, (char *)src, NULL, len);
+    status = spi_transfer_bytes(spi_dev->spi, (uint8_t *)src, NULL, len);
     if (status < 0)
     {
         return status;
@@ -173,7 +173,7 @@ static int nvram_spi_read(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len)
     int status;
     union {
         uint32_t u32;
-        char c[4];
+        uint8_t c[4];
     } addr;
     /* Address is expected by the device as big-endian, i.e. network byte order,
      * we utilize the network byte order macros here. */
@@ -191,7 +191,7 @@ static int nvram_spi_read(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len)
         return status;
     }
     /* Keep holding CS and read data */
-    status = spi_transfer_bytes(spi_dev->spi, NULL, (char *)dst, len);
+    status = spi_transfer_bytes(spi_dev->spi, NULL, dst, len);
     if (status < 0)
     {
         return status;
@@ -237,7 +237,7 @@ static int nvram_spi_write_9bit_addr(nvram_t *dev, const uint8_t *src, uint32_t 
         return status;
     }
     /* Keep holding CS and write data */
-    status = spi_transfer_bytes(spi_dev->spi, (char *)src, NULL, len);
+    status = spi_transfer_bytes(spi_dev->spi, (uint8_t *)src, NULL, len);
     if (status < 0)
     {
         return status;
@@ -265,13 +265,13 @@ static int nvram_spi_read_9bit_addr(nvram_t *dev, uint8_t *dst, uint32_t src, si
     spi_acquire(spi_dev->spi);
     gpio_clear(spi_dev->cs);
     /* Write command and address */
-    status = spi_transfer_reg(spi_dev->spi, (char)cmd, addr, NULL);
+    status = spi_transfer_reg(spi_dev->spi, cmd, addr, NULL);
     if (status < 0)
     {
         return status;
     }
     /* Keep holding CS and read data */
-    status = spi_transfer_bytes(spi_dev->spi, NULL, (char *)dst, len);
+    status = spi_transfer_bytes(spi_dev->spi, NULL, dst, len);
     if (status < 0)
     {
         return status;

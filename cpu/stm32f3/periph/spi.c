@@ -40,7 +40,7 @@
 #if SPI_NUMOF
 
 typedef struct {
-    char(*cb)(char data);
+    uint8_t (*cb)(uint8_t data);
 } spi_state_t;
 
 /* static device mapping */
@@ -154,7 +154,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     return 0;
 }
 
-int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
+int spi_init_slave(spi_t dev, spi_conf_t conf, uint8_t (*cb)(uint8_t data))
 {
     switch (dev) {
 #if SPI_0_EN
@@ -306,9 +306,9 @@ int spi_release(spi_t dev)
     return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+int spi_transfer_byte(spi_t dev, uint8_t out, uint8_t *in)
 {
-    char tmp;
+    uint8_t tmp;
 
     /* recast to uint_8 to force 8bit access */
     volatile uint8_t *DR = (volatile uint8_t*) &spi[dev]->DR;
@@ -333,7 +333,7 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     return 1;
 }
 
-void spi_transmission_begin(spi_t dev, char reset_val)
+void spi_transmission_begin(spi_t dev, uint8_t reset_val)
 {
     if ((unsigned int)dev < SPI_NUMOF) {
         spi[dev]->DR = reset_val;
@@ -389,7 +389,7 @@ static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev)
 {
 
     if (spi->SR & SPI_SR_RXNE) {
-        char data;
+        uint8_t data;
         data = spi->DR;
         data = spi_config[dev].cb(data);
         spi->DR = data;

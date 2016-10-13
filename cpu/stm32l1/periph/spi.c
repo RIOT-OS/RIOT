@@ -108,7 +108,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     return 0;
 }
 
-int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
+int spi_init_slave(spi_t dev, spi_conf_t conf, uint8_t (*cb)(uint8_t data))
 {
     /* due to issues with the send buffer, the slave mode is not (yet) supported */
     return -1;
@@ -174,9 +174,9 @@ int spi_release(spi_t dev)
     return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+int spi_transfer_byte(spi_t dev, uint8_t out, uint8_t *in)
 {
-    char tmp;
+    uint8_t tmp;
     SPI_TypeDef *spi = 0;
 
     switch (dev) {
@@ -219,7 +219,7 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     return 1;
 }
 
-void spi_transmission_begin(spi_t dev, char reset_val)
+void spi_transmission_begin(spi_t dev, uint8_t reset_val)
 {
     /* slave mode is not (yet) supported */
 }

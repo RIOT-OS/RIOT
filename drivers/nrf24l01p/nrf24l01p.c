@@ -28,7 +28,7 @@
 #include "debug.h"
 
 
-int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer)
+int nrf24l01p_read_reg(nrf24l01p_t *dev, uint8_t reg, uint8_t *answer)
 {
     int status;
 
@@ -47,10 +47,10 @@ int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer)
     return (status < 0) ? status : 0;
 }
 
-int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write)
+int nrf24l01p_write_reg(nrf24l01p_t *dev, uint8_t reg, uint8_t write)
 {
     int status;
-    char reg_content;
+    uint8_t reg_content;
 
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi);
@@ -71,8 +71,8 @@ int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write)
 int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq)
 {
     int status;
-    char INITIAL_TX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
-    char INITIAL_RX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
+    uint8_t INITIAL_TX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
+    uint8_t INITIAL_RX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
 
     dev->spi = spi;
     dev->ce = ce;
@@ -199,7 +199,7 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
 
 int nrf24l01p_on(nrf24l01p_t *dev)
 {
-    char read;
+    uint8_t read;
     int status;
 
     nrf24l01p_read_reg(dev, REG_CONFIG, &read);
@@ -212,7 +212,7 @@ int nrf24l01p_on(nrf24l01p_t *dev)
 
 int nrf24l01p_off(nrf24l01p_t *dev)
 {
-    char read;
+    uint8_t read;
     int status;
 
     nrf24l01p_read_reg(dev, REG_CONFIG, &read);
@@ -232,7 +232,7 @@ void nrf24l01p_transmit(nrf24l01p_t *dev)
     xtimer_spin(DELAY_CHANGE_TXRX_US);
 }
 
-int nrf24l01p_read_payload(nrf24l01p_t *dev, char *answer, unsigned int size)
+int nrf24l01p_read_payload(nrf24l01p_t *dev, uint8_t *answer, unsigned int size)
 {
     int status;
 
@@ -283,7 +283,7 @@ void nrf24l01p_stop(nrf24l01p_t *dev)
     gpio_clear(dev->ce);
 }
 
-int nrf24l01p_preload(nrf24l01p_t *dev, char *data, unsigned int size)
+int nrf24l01p_preload(nrf24l01p_t *dev, uint8_t *data, unsigned int size)
 {
     int status;
 
@@ -316,7 +316,7 @@ int nrf24l01p_set_channel(nrf24l01p_t *dev, uint8_t chan)
 
 int nrf24l01p_set_address_width(nrf24l01p_t *dev, nrf24l01p_aw_t aw)
 {
-    char aw_setup;
+    uint8_t aw_setup;
     nrf24l01p_read_reg(dev, REG_SETUP_AW, &aw_setup);
 
     xtimer_spin(DELAY_AFTER_FUNC_TICKS);
@@ -344,9 +344,9 @@ int nrf24l01p_set_address_width(nrf24l01p_t *dev, nrf24l01p_aw_t aw)
     return nrf24l01p_write_reg(dev, REG_SETUP_AW, aw_setup);
 }
 
-int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char width)
+int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint8_t width)
 {
-    char pipe_pw_address;
+    uint8_t pipe_pw_address;
 
     switch (pipe) {
         case NRF24L01P_PIPE0:
@@ -390,7 +390,7 @@ int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char
 
 
 
-int nrf24l01p_set_tx_address(nrf24l01p_t *dev, char *saddr, unsigned int length)
+int nrf24l01p_set_tx_address(nrf24l01p_t *dev, uint8_t *saddr, unsigned int length)
 {
     int status;
 
@@ -413,7 +413,7 @@ int nrf24l01p_set_tx_address_long(nrf24l01p_t *dev, uint64_t saddr, unsigned int
 {
     int status;
 
-    char buf[length];
+    uint8_t buf[length];
 
     if (length <= INITIAL_ADDRESS_WIDTH) {
         for (int i = 0; i < length; i++) {
@@ -444,7 +444,7 @@ uint64_t nrf24l01p_get_tx_address_long(nrf24l01p_t *dev)
 {
     int status;
     uint64_t saddr_64 = 0;
-    char addr_array[INITIAL_ADDRESS_WIDTH];
+    uint8_t addr_array[INITIAL_ADDRESS_WIDTH];
 
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi);
@@ -472,10 +472,10 @@ uint64_t nrf24l01p_get_tx_address_long(nrf24l01p_t *dev)
 }
 
 
-int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *saddr, unsigned int length)
+int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint8_t *saddr, unsigned int length)
 {
     int status;
-    char pipe_addr;
+    uint8_t pipe_addr;
 
     switch (pipe) {
         case NRF24L01P_PIPE0:
@@ -525,7 +525,7 @@ int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *s
 
 int nrf24l01p_set_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint64_t saddr, unsigned int length)
 {
-    char buf[length];
+    uint8_t buf[length];
 
     if (length <= INITIAL_ADDRESS_WIDTH) {
         for (int i = 0; i < length; i++) {
@@ -544,10 +544,10 @@ int nrf24l01p_set_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, ui
 uint64_t nrf24l01p_get_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 {
     int status;
-    char pipe_addr;
+    uint8_t pipe_addr;
     uint64_t saddr_64 = 0;
 
-    char addr_array[INITIAL_ADDRESS_WIDTH];
+    uint8_t addr_array[INITIAL_ADDRESS_WIDTH];
 
     switch (pipe) {
         case NRF24L01P_PIPE0:
@@ -604,7 +604,7 @@ uint64_t nrf24l01p_get_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pip
 
 int nrf24l01p_set_datarate(nrf24l01p_t *dev, nrf24l01p_dr_t dr)
 {
-    char rf_setup;
+    uint8_t rf_setup;
 
     nrf24l01p_read_reg(dev, REG_RF_SETUP, &rf_setup);
 
@@ -632,7 +632,7 @@ int nrf24l01p_set_datarate(nrf24l01p_t *dev, nrf24l01p_dr_t dr)
 
 int nrf24l01p_get_status(nrf24l01p_t *dev)
 {
-    char status;
+    uint8_t status;
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi);
     gpio_clear(dev->cs);
@@ -650,7 +650,7 @@ int nrf24l01p_get_status(nrf24l01p_t *dev)
 
 int nrf24l01p_set_power(nrf24l01p_t *dev, int pwr)
 {
-    char rf_setup;
+    uint8_t rf_setup;
 
     nrf24l01p_read_reg(dev, REG_RF_SETUP, &rf_setup);
 
@@ -678,7 +678,7 @@ int nrf24l01p_set_power(nrf24l01p_t *dev, int pwr)
 
 int nrf24l01p_get_power(nrf24l01p_t *dev)
 {
-    char rf_setup;
+    uint8_t rf_setup;
     int pwr;
 
     nrf24l01p_read_reg(dev, REG_RF_SETUP, &rf_setup);
@@ -705,7 +705,7 @@ int nrf24l01p_get_power(nrf24l01p_t *dev)
 
 int nrf24l01p_set_txmode(nrf24l01p_t *dev)
 {
-    char conf;
+    uint8_t conf;
     int status;
 
     nrf24l01p_stop(dev);
@@ -725,7 +725,7 @@ int nrf24l01p_set_txmode(nrf24l01p_t *dev)
 
 int nrf24l01p_set_rxmode(nrf24l01p_t *dev)
 {
-    char conf;
+    uint8_t conf;
     int status;
 
     nrf24l01p_unmask_interrupt(dev, MASK_RX_DR);
@@ -745,7 +745,7 @@ int nrf24l01p_set_rxmode(nrf24l01p_t *dev)
 }
 
 
-int nrf24l01p_reset_interrupts(nrf24l01p_t *dev, char intrs)
+int nrf24l01p_reset_interrupts(nrf24l01p_t *dev, uint8_t intrs)
 {
     return nrf24l01p_write_reg(dev, REG_STATUS, intrs);
 }
@@ -755,9 +755,9 @@ int nrf24l01p_reset_all_interrupts(nrf24l01p_t *dev)
     return nrf24l01p_write_reg(dev, REG_STATUS, ALL_INT_MASK);
 }
 
-int nrf24l01p_mask_interrupt(nrf24l01p_t *dev, char intr)
+int nrf24l01p_mask_interrupt(nrf24l01p_t *dev, uint8_t intr)
 {
-    char conf;
+    uint8_t conf;
 
     nrf24l01p_read_reg(dev, REG_CONFIG, &conf);
     conf |= intr;
@@ -765,9 +765,9 @@ int nrf24l01p_mask_interrupt(nrf24l01p_t *dev, char intr)
     return nrf24l01p_write_reg(dev, REG_CONFIG, conf);
 }
 
-int nrf24l01p_unmask_interrupt(nrf24l01p_t *dev, char intr)
+int nrf24l01p_unmask_interrupt(nrf24l01p_t *dev, uint8_t intr)
 {
-    char conf;
+    uint8_t conf;
 
     nrf24l01p_read_reg(dev, REG_CONFIG, &conf);
     conf &= ~intr;
@@ -777,9 +777,9 @@ int nrf24l01p_unmask_interrupt(nrf24l01p_t *dev, char intr)
 
 int nrf24l01p_enable_dynamic_payload(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 {
-    char feature_val;
-    char en_aa_val;
-    char dynpd_val;
+    uint8_t feature_val;
+    uint8_t en_aa_val;
+    uint8_t dynpd_val;
     int pipe_mask = 0;
     int dpl_mask = 0;
 
@@ -852,7 +852,7 @@ int nrf24l01p_enable_dynamic_payload(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 
 int nrf24l01p_enable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 {
-    char pipe_conf;
+    uint8_t pipe_conf;
 
     nrf24l01p_read_reg(dev, REG_EN_RXADDR, &pipe_conf);
     pipe_conf |= (1 << pipe);
@@ -862,7 +862,7 @@ int nrf24l01p_enable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 
 int nrf24l01p_disable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 {
-    char pipe_conf;
+    uint8_t pipe_conf;
 
     nrf24l01p_read_reg(dev, REG_EN_RXADDR, &pipe_conf);
     pipe_conf &= ~(1 << pipe);
@@ -874,7 +874,7 @@ int nrf24l01p_disable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 
 int nrf24l01p_enable_crc(nrf24l01p_t *dev, nrf24l01p_crc_t crc)
 {
-    char conf;
+    uint8_t conf;
 
     nrf24l01p_read_reg(dev, REG_CONFIG, &conf);
 
@@ -894,9 +894,9 @@ int nrf24l01p_enable_crc(nrf24l01p_t *dev, nrf24l01p_crc_t crc)
     return nrf24l01p_write_reg(dev, REG_CONFIG, (conf | EN_CRC));
 }
 
-int nrf24l01p_setup_auto_ack(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l01p_retransmit_delay_t delay_retrans, char count_retrans)
+int nrf24l01p_setup_auto_ack(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l01p_retransmit_delay_t delay_retrans, uint8_t count_retrans)
 {
-    char en_aa;
+    uint8_t en_aa;
     int status;
     nrf24l01p_read_reg(dev, REG_EN_AA, &en_aa);
 
@@ -944,7 +944,7 @@ int nrf24l01p_setup_auto_ack(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l0
 
 int nrf24l01p_enable_dynamic_ack(nrf24l01p_t *dev)
 {
-    char feature;
+    uint8_t feature;
 
     if (nrf24l01p_read_reg(dev, REG_FEATURE, &feature) < 0){
         DEBUG("Can't read FEATURE reg\n");
@@ -969,7 +969,7 @@ int nrf24l01p_disable_all_auto_ack(nrf24l01p_t *dev)
 int nrf24l01p_flush_tx_fifo(nrf24l01p_t *dev)
 {
     int status;
-    char reg_content;
+    uint8_t reg_content;
 
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi);
@@ -989,7 +989,7 @@ int nrf24l01p_flush_tx_fifo(nrf24l01p_t *dev)
 int nrf24l01p_flush_rx_fifo(nrf24l01p_t *dev)
 {
     int status;
-    char reg_content;
+    uint8_t reg_content;
 
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi);

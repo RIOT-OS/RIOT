@@ -117,7 +117,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     return 0;
 }
 
-int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
+int spi_init_slave(spi_t dev, spi_conf_t conf, uint8_t (*cb)(uint8_t data))
 {
     (void) dev;
     (void) conf;
@@ -175,23 +175,23 @@ int spi_release(spi_t dev)
     return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+int spi_transfer_byte(spi_t dev, uint8_t out, uint8_t *in)
 {
     return spi_transfer_bytes(dev, &out, in, 1);
 }
 
-int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
+int spi_transfer_bytes(spi_t dev, uint8_t *out, uint8_t *in, unsigned int length)
 {
     if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
 
     for (unsigned i = 0; i < length; i++) {
-        char tmp = (out) ? out[i] : 0;
+        uint8_t tmp = (out) ? out[i] : 0;
         spi[dev]->EVENTS_READY = 0;
         spi[dev]->TXD = (uint8_t)tmp;
         while (spi[dev]->EVENTS_READY != 1) {}
-        tmp = (char)spi[dev]->RXD;
+        tmp = spi[dev]->RXD;
         if (in) {
             in[i] = tmp;
         }
@@ -200,19 +200,19 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     return length;
 }
 
-int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
+int spi_transfer_reg(spi_t dev, uint8_t reg, uint8_t out, uint8_t *in)
 {
     spi_transfer_byte(dev, reg, 0);
     return spi_transfer_byte(dev, out, in);
 }
 
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length)
+int spi_transfer_regs(spi_t dev, uint8_t reg, uint8_t *out, uint8_t *in, unsigned int length)
 {
     spi_transfer_byte(dev, reg, 0);
     return spi_transfer_bytes(dev, out, in, length);
 }
 
-void spi_transmission_begin(spi_t dev, char reset_val)
+void spi_transmission_begin(spi_t dev, uint8_t reset_val)
 {
     (void) dev;
     (void) reset_val;

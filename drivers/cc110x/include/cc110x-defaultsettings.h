@@ -30,12 +30,12 @@ extern "C" {
 
 #ifndef CC110X_DEFAULT_PATABLE
 #define CC110X_DEFAULT_PATABLE cc110x_default_pa_table
-extern const char cc110x_default_pa_table[8];
+extern const uint8_t cc110x_default_pa_table[8];
 #endif
 
 #ifndef CC110X_DEFAULT_FREQ
 #define CC110X_DEFAULT_FREQ cc110x_default_base_freq
-extern const char cc110x_default_base_freq[3];
+extern const uint8_t cc110x_default_base_freq[3];
 #endif
 
 #ifdef __cplusplus
