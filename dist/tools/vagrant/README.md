@@ -3,8 +3,7 @@
 
 ## About
 This repository includes a [Vagrantfile](https://github.com/RIOT-OS/RIOT/blob/master/Vagrantfile)
-to create and control a Linux virtual machine based on an Ubuntu 16.04 (64-bit) image that contains
-all necessary toolchains and dependencies to build and flash compatible devices with RIOT.
+to download and control a pre-configured Linux virtual machine (VM) based on an Ubuntu 16.04 (64-bit) image that contains all necessary toolchains and dependencies to build and flash compatible devices with RIOT.
 The advantage of using this VM is to have a reproducible, portable and even disposable environment
 that can be used to develop for RIOT with decreased setup times and without the requirement of
 making changes to the underlying host system.
@@ -15,7 +14,14 @@ Make sure your system satisfies the latest version of all following dependencies
 * [VirtualBox Extension Pack](https://www.virtualbox.org/wiki/Downloads)
 * [Vagrant](https://www.vagrantup.com/downloads.html)
 
-## Usage
+## Selecting a non-default VM (optional)
+In case a non-default VM should be used, one can easily adapt the source for the vagrant box. This is done by the following command.
+
+```
+vagrant box add RIOT-VM <path to box>
+```
+
+## General usage
 The following commands must be run from the RIOT root directory on the host system.
 
 ```
