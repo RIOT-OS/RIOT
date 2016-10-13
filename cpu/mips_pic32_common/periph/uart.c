@@ -13,7 +13,7 @@
 
 #define UxMODE(U)      U.regs[0x00/4]
 #define UxMODECLR(U)   U.regs[0x04/4]
-#define UxMODESET(U)   U.regs[0x04/4]
+#define UxMODESET(U)   U.regs[0x08/4]
 #define ON  0x8000
 #define STSEL   1
 #define PDSEL_9N    6
