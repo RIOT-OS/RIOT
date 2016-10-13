@@ -33,13 +33,7 @@ This will shut down the VM gracefully.
 ```
 vagrant destroy
 ```
-This will reset your VM to the default state. All modifications made to the VM by the
-[provisioning script](https://github.com/RIOT-OS/RIOT/tree/master/dist/tools/vagrant/bootstrap.sh)
-and by you will be removed.
-```
-vagrant provision
-```
-This will re-run the [provisioning script](https://github.com/RIOT-OS/RIOT/tree/master/dist/tools/vagrant/bootstrap.sh).
+This will reset your VM to the default state.
 
 ## Inside the VM
 Once logged in to the VM via `vagrant ssh` you can find the RIOT root directory in your
