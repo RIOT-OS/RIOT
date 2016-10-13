@@ -102,6 +102,16 @@ typedef struct gnrc_netdev2 {
      * @brief general information for the MAC protocol
      */
     uint16_t mac_info;
+
+    /**
+     * @brief device's l2 address
+     */
+    uint8_t  l2_addr[GNRC_NETIF_HDR_L2ADDR_MAX_LEN];
+
+    /**
+     * @brief device's l2 address length
+     */
+    uint8_t  l2_addr_len;
 #endif
 } gnrc_netdev2_t;
 

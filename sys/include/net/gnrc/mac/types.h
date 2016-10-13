@@ -29,8 +29,8 @@
 #include <xtimer.h>
 #include <net/netdev2.h>
 #include <net/gnrc/netdev2.h>
+#include <net/gnrc/netif/hdr.h>
 #include <net/gnrc.h>
-
 
 #ifdef __cplusplus
 extern "C" {
