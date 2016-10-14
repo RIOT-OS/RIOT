@@ -274,7 +274,7 @@ relay_dhcp_to_client(int slipfd)
 
             case DHCP_OPTION_MSG_TYPE:
                 msg_type = p[2];
-
+                /* deliberate fall-through */
             case DHCP_OPTION_SUBNET_MASK:
             case DHCP_OPTION_ROUTER:
             case DHCP_OPTION_LEASE_TIME:
@@ -969,8 +969,7 @@ int
 main(int argc, char **argv)
 {
     int c;
-    int tunfd, slipfd, maxfd;
-    int ret;
+    int tunfd, slipfd;
     fd_set rset, wset;
     FILE *inslip;
     const char *siodev = NULL;
@@ -1196,7 +1195,7 @@ main(int argc, char **argv)
     ifconf(tundev, ipaddr, netmask);
 
     while (1) {
-        maxfd = 0;
+        int maxfd = 0;
         FD_ZERO(&rset);
         FD_ZERO(&wset);
 
@@ -1237,7 +1236,7 @@ main(int argc, char **argv)
             }
         }
 
-        ret = select(maxfd + 1, &rset, &wset, NULL, NULL);
+        int ret = select(maxfd + 1, &rset, &wset, NULL, NULL);
 
         if (ret == -1 && errno != EINTR) {
             err(1, "select");
