@@ -294,6 +294,10 @@ void auto_init(void)
     extern void auto_init_bmp180(void);
     auto_init_bmp180();
 #endif
+#ifdef MODULE_BME280
+    extern void auto_init_bme280(void);
+    auto_init_bme280();
+#endif
 #ifdef MODULE_JC42
     extern void auto_init_jc42(void);
     auto_init_jc42();
