@@ -33,7 +33,8 @@ int gnrc_netdev2_ieee802154_init(gnrc_netdev2_t *gnrc_netdev2,
     gnrc_netdev2->send = _send;
     gnrc_netdev2->recv = _recv;
     gnrc_netdev2->dev = (netdev2_t *)dev;
-
+    gnrc_netdev2->_set_netdev_state = _set_netdev_state;
+    gnrc_netdev2->_get_netdev_state = _get_netdev_state;
     return 0;
 }
 
@@ -216,6 +217,23 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
     /* release old data */
     gnrc_pktbuf_release(pkt);
     return res;
+}
+
+static int _set_netdev_state(struct gnrc_netdev2 *dev, netopt_state_t devstate)
+{
+	return dev->dev->driver->set(dev->dev, NETOPT_STATE, &devstate, sizeof(devstate));
+}
+
+static netopt_state_t _get_netdev_state(struct gnrc_netdev2 *dev)
+{
+    netopt_state_t state;
+	if (0 < dev->dev->driver->get(dev->dev,
+                                  NETOPT_STATE,
+                                  &state,
+                                  sizeof(state))) {
+        return state;
+    }
+    return -1;
 }
 
 /** @} */
