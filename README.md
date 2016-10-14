@@ -63,8 +63,7 @@ but not limited to:
 
 
 ## GETTING STARTED
-* You want to start the RIOT? Just follow our [Getting started
-  documentation](https://github.com/RIOT-OS/RIOT/wiki/Introduction)
+* You want to start the RIOT? Just follow our [quickstart guide](http://doc.riot-os.org/index.html#the-quickest-start) or the [getting started documentation](http://doc.riot-os.org/getting-started.html).
 * The RIOT API itself can be built from the code using doxygen. The latest
   version is uploaded daily to http://riot-os.org/api.
 
