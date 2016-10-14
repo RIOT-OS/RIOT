@@ -33,3 +33,7 @@ void board_init(void)
 #endif
 }
 
+void reboot(void)
+{
+    /* TODO, note this is needed to get 'default' example to build */
+}
