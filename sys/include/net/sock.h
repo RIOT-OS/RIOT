@@ -222,7 +222,7 @@ struct _sock_tl_ep {
      * over
      */
     uint16_t netif;
-    uint16_t port;          /**< transport layer port */
+    uint16_t port;          /**< transport layer port (in host byte order) */
 };
 
 #ifdef __cplusplus
