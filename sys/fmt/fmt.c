@@ -24,11 +24,11 @@
 #include <unistd.h>
 #include <string.h>
 
-#ifdef __WITH_AVRLIBC__
-#include <stdio.h>  /* for fwrite() */
-#else
+#ifdef MODULE_NEWLIB
 /* work around broken sys/posix/unistd.h */
 ssize_t write(int fildes, const void *buf, size_t nbyte);
+#else
+#include <stdio.h>  /* for fwrite() */
 #endif
 
 #include "fmt.h"
