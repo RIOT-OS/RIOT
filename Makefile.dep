@@ -411,6 +411,22 @@ ifneq (,$(filter lwip_conn_udp,$(USEMODULE)))
   USEMODULE += lwip_udp
 endif
 
+ifneq (,$(filter lwip_sock_%,$(USEMODULE)))
+  USEMODULE += lwip_sock
+endif
+
+ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
+  USEMODULE += lwip_raw
+endif
+
+ifneq (,$(filter lwip_sock_tcp,$(USEMODULE)))
+  USEMODULE += lwip_tcp
+endif
+
+ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
+  USEMODULE += lwip_udp
+endif
+
 ifneq (,$(filter lwip_%,$(USEMODULE)))
   USEMODULE += lwip
 endif
@@ -436,6 +452,7 @@ endif
 
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   USEMODULE += sema
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter sema,$(USEMODULE)))
