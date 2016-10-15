@@ -1,6 +1,9 @@
 # define the cpu used by the arduino uno and duemilanove boards
 export CPU = atmega328p
 
+# include optional dependencies
+include $(RIOTBOARD)/arduino-common/Makefile.dep
+
 # define port used to flash the board
 OS = $(shell uname)
 ifeq ($(OS),Linux)
