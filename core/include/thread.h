@@ -11,6 +11,100 @@
  * @ingroup     core
  * @brief       Support for multi-threading
  *
+ * Priorities
+ * ==========
+ *
+ * As RIOT is using a fixed priority @ref core_sched "scheduling algorithm",
+ * threads are scheduled based on their priority. The priority is fixed for
+ * every thread and specified during the thread's creation by the `priority`
+ * parameter.
+ *
+ * The lower the priority value, the higher the priority of the thread,
+ * with 0 being the highest possible priority.
+ *
+ * The lowest possible priority is @ref THREAD_PRIORITY_IDLE - 1.
+ *
+ * @note Assigning the same priority to two or more threads is usually not a
+ *       good idea. A thread in RIOT may run until it yields (@ref
+ *       thread_yield) or another thread with higher priority is runnable (@ref
+ *       STATUS_ON_RUNQUEUE) again. Multiple threads with the same priority
+ *       will therefore be scheduled cooperatively: when one of them is running,
+ *       all others with the same priority depend on it to yield (or be interrupted
+ *       by a thread with higher priority).
+ *       This may make it difficult to determine when which of them gets
+ *       scheduled and how much CPU time they will get. In most applications,
+ *       the number of threads in application is significantly smaller than the
+ *       number of available priorities, so assigning distinct priorities per
+ *       thread should not be a problem. Only assign the same priority to
+ *       multiple threads if you know what you are doing!
+ *
+ * Thread Behavior
+ * ===============
+ * In addition to the priority, flags can be used when creating a thread to
+ * alter the thread's behavior after creation. The following flags are available:
+ *
+ *  Flags                         | Description
+ *  ----------------------------- | --------------------------------------------------
+ *  @ref THREAD_CREATE_SLEEPING   | the thread will sleep until woken up manually
+ *  @ref THREAD_CREATE_WOUT_YIELD | the thread might not run immediately after creation
+ *  @ref THREAD_CREATE_STACKTEST  | measures the stack's memory usage
+ *
+ * Thread creation
+ * ===============
+ * Creating a new thread is internally done in two steps:
+ * 1. the new thread's stack is initialized depending on the platform
+ * 2. the new thread is added to the scheduler and the scheduler is run (if not
+ *    indicated otherwise)
+ *
+ * @note Creating threads from within an ISR is currently supported, however it
+ *       is considered to be a bad programming practice and we strongly
+ *       discourage you from doing so.
+ *
+ * Usage
+ * -----
+ * ~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * char rcv_thread_stack[THREAD_STACKSIZE_MAIN];
+ *
+ * void *rcv_thread(void *arg)
+ * {
+ *     msg_t m;
+ *
+ *     while (1) {
+ *         msg_receive(&m);
+ *         printf("Got msg from %" PRIkernel_pid "\n", m.sender_pid);
+ *     }
+ *
+ *     return NULL;
+ * }
+ *
+ * int main(void)
+ * {
+ *     thread_create(rcv_thread_stack, sizeof(rcv_thread_stack),
+ *                   THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+ *                   rcv_thread, NULL, "rcv_thread");
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * Reading from the top down, you can see that first, stack memory for our thread
+ * `rcv_thread` is preallocated, followed by an implementation of the thread's
+ * function. Communication between threads is done using @ref core_msg: in this
+ * case, `rcv_thread` will print the process id of each thread that sent a
+ * message to `rcv_thread`.
+ *
+ * After it has been properly defined, `rcv_thread` is created with a call to
+ * @ref thread_create() in `main()`. It is assigned a priority of
+ * `THREAD_PRIORITY_MAIN - 1`, i.e. a slightly *higher* priority than the main
+ * thread. Since neither the `THREAD_CREATE_SLEEPING` nor the
+ * `THREAD_CREATE_WOUT_YIELD` flag is set, `rcv_thread` will be executed
+ * immediately.
+ *
+ * @note If the messages to the thread are sent using @ref msg_try_send() or
+ *       from an ISR, activate your thread's message queue by calling
+ *       @ref msg_init_queue() to prevent messages from being dropped when
+ *       they can't be handled right away. The same applies if you'd like
+ *       msg_send() to your thread to be non-blocking. For more details, see
+ *       @ref core_msg "the Messaging documentation".
+ *
  * @{
  *
  * @file
@@ -185,7 +279,7 @@ struct _thread {
  * @{
  */
 /**
- * @brief Set the new thread to sleeping
+ * @brief Set the new thread to sleeping. It must be woken up manually.
  **/
 #define THREAD_CREATE_SLEEPING          (1)
 
@@ -195,60 +289,30 @@ struct _thread {
 #define THREAD_AUTO_FREE                (2)
 
 /**
- * @brief Do not automatically call thread_yield() after creation
+ * @brief Do not automatically call thread_yield() after creation: the newly
+ *        created thread might not run immediately. Purely for optimization.
+ *        Any other context switch (i.e. an interrupt) can still start the
+ *        thread at any time!
  */
 #define THREAD_CREATE_WOUT_YIELD        (4)
 
  /**
   * @brief Write markers into the thread's stack to measure stack usage (for
-  *        debugging)
+  *        debugging and profiling purposes)
   */
 #define THREAD_CREATE_STACKTEST         (8)
 /** @} */
 
 /**
- * @brief Creates a new thread
+ * @brief Creates a new thread.
  *
- * Creating a new thread is done in two steps:
- * 1. the new thread's stack is initialized depending on the platform
- * 2. the new thread is added to the scheduler and the scheduler is run (if not
- *    indicated otherwise)
+ * For an in-depth discussion of thread priorities, behavior and and flags,
+ * see @ref core_thread.
  *
- * As RIOT is using a fixed priority scheduling algorithm, threads are
- * scheduled based on their priority. The priority is fixed for every thread
- * and specified during the threads creation by the *priority* parameter.
- *
- * A low value for *priority* number means the thread having a high priority
- * with 0 being the highest possible priority.
- *
- * The lowest possible priority is *THREAD_PRIORITY_IDLE - 1*. The value is depending
- * on the platforms architecture, e.g. 30 in 32-bit systems, 14 in 16-bit systems.
- *
- * @note Assigning the same priority to two or more threads is usually not a
- *       good idea. A thread in RIOT may run until it yields (@ref
- *       thread_yield) or another thread with higher priority is runnable (@ref
- *       STATUS_ON_RUNQUEUE) again. Having multiple threads with the same
- *       priority may make it difficult to determine when which of them gets
- *       scheduled and how much CPU time they will get. In most applications,
- *       the number of threads in application is significantly smaller than the
- *       number of available priorities, so assigning distinct priorities per
- *       thread should not be a problem. Only assign the same priority to
- *       multiple threads if you know what you are doing!
- *
- *
- * In addition to the priority, the *flags* argument can be used to alter the
- * newly created threads behavior after creation. The following flags are available:
- *  - THREAD_CREATE_SLEEPING    the newly created thread will be put to sleeping
- *                              state and must be woken up manually
- *  - THREAD_CREATE_WOUT_YIELD  the newly created thread will not run
- *                              immediately after creation
- *  - THREAD_CREATE_STACKTEST   write markers into the thread's stack to measure
- *                              the stack's memory usage (for debugging and
- *                              profiling purposes)
- *
- * @note Currently we support creating threads from within an ISR, however it
- *       is considered to be a bad programming practice and we strongly discourage
- *       it.
+ * @note Avoid assigning the same priority to two or more threads.
+ * @note Creating threads from within an ISR is currently supported, however it
+ *       is considered to be a bad programming practice and we strongly
+ *       discourage you from doing so.
  *
  * @param[out] stack    start address of the preallocated stack memory
  * @param[in] stacksize the size of the thread's stack in bytes
@@ -302,7 +366,7 @@ void thread_sleep(void);
  *          if there is no other ready thread with the same or a higher priority.
  *
  *          Differently from thread_yield_higher() the current thread will be put to the
- *          end of the threads in its priority class.
+ *          end of the thread's in its priority class.
  *
  * @see     thread_yield_higher()
  */
