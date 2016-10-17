@@ -7,5 +7,7 @@ FEATURES_REQUIRED = periph_uart periph_gpio
 
 USEMODULE += esp8266
 USEMODULE += ipv4_addr
+USEMODULE += xtimer
 
 include $(RIOTBASE)/Makefile.include
+include $(RIOTBASE)/pkg/tlsf/Makefile.include
