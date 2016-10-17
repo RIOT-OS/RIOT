@@ -38,8 +38,13 @@ extern "C" {
 #   define THREAD_STACKSIZE_DEFAULT   (256)
 #endif
 
-#define THREAD_STACKSIZE_IDLE      (128)
-#define ISR_STACKSIZE              (0)
+#ifndef THREAD_STACKSIZE_IDLE
+#   define THREAD_STACKSIZE_IDLE      (128)
+#endif
+
+#ifndef ISR_STACKSIZE
+#   define ISR_STACKSIZE              (0)
+#endif
 /** @} */
 
 #ifdef __cplusplus
