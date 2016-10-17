@@ -10,6 +10,7 @@
 #include <mips/m32c0.h>
 #include <mips/regdef.h>
 #include <mips/asm.h>
+#include <string.h>
 
 #include <periph/timer.h>
 #include "cpu_conf.h"
@@ -54,11 +55,7 @@ static volatile int spurious_int;
 
 int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
-    int i;
-
-    if (dev != 0) {
-        return -1;
-    }
+    assert(dev == 0);
 
     (void)freq; /*Cannot adjust Frequency */
 
@@ -66,11 +63,9 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     timer_isr_ctx.arg = arg;
 
     /* Clear down soft counters */
-    for (i = 0; i < CHANNELS; i++) {
-        compares[i] = 0;
-    }
+    memset((void *)compares, 0, sizeof(compares));
 
-    counter = 1 << TIMER_ACCURACY_SHIFT;
+    counter = (1 << TIMER_ACCURACY_SHIFT);
 
     /* Set compare up */
     mips_setcompare(mips_getcount() + TICKS_PER_US * TIMER_ACCURACY);
@@ -102,13 +97,8 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
-    if (dev != 0) {
-        return -1;
-    }
-
-    if (channel >= CHANNELS) {
-        return -1;
-    }
+    assert(dev == 0);
+    assert(channel < CHANNELS);
 
     timeout >>= TIMER_ACCURACY_SHIFT;
     timeout <<= TIMER_ACCURACY_SHIFT;
@@ -122,13 +112,8 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    if (dev != 0) {
-        return -1;
-    }
-
-    if (channel >= CHANNELS) {
-        return -1;
-    }
+    assert(dev == 0);
+    assert(channel < CHANNELS);
 
     value >>= TIMER_ACCURACY_SHIFT;
     value <<= TIMER_ACCURACY_SHIFT;
@@ -142,13 +127,8 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_clear(tim_t dev, int channel)
 {
-    if (dev != 0) {
-        return -1;
-    }
-
-    if (channel >= CHANNELS) {
-        return -1;
-    }
+    assert(dev == 0);
+    assert(channel < CHANNELS);
 
     uint32_t status = irq_arch_disable();
     compares[channel] = 0;
@@ -159,9 +139,8 @@ int timer_clear(tim_t dev, int channel)
 
 unsigned int timer_read(tim_t dev)
 {
-    if (dev != 0) {
-        return -1;
-    }
+    assert(dev == 0);
+
     return counter;
 }
 
