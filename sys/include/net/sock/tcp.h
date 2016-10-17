@@ -83,6 +83,7 @@ typedef struct sock_tcp_queue sock_tcp_queue_t;
  * @return  -EAFNOSUPPORT, if sock_tcp_ep_t::family of @p remote is not
  *          supported.
  * @return  -ECONNREFUSED, if no-one is listening on the @p remote end point.
+ * @return  -EINVAL, if sock_tcp_ep_t::addr of @p remote is an invalid address.
  * @return  -EINVAL, if sock_tcp_ep_t::netif of @p remote is not a valid
  *          interface.
  * @return  -ENETUNREACH, if network defined by @p remote is not reachable.
@@ -115,7 +116,7 @@ int sock_tcp_connect(sock_tcp_t *sock, const sock_tcp_ep_t *remote,
  * @return  -ENOMEM, if no memory was available to listen on @p queue.
  */
 int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
-                    sock_tcp_t[] queue_array, unsigned queue_len,
+                    sock_tcp_t *queue_array, unsigned queue_len,
                     uint16_t flags);
 
 /**
@@ -190,16 +191,17 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock);
  *                      truncated and the remaining data can be retrieved
  *                      later on.
  * @param[in] timeout   Timeout for receive in microseconds.
- *                      This value can be ignored (no timeout) if the
- *                      @ref sys_xtimer module is not present and the
- *                      implementation does not support timeouts on its own.
- *                      May be 0 for no timeout.
+ *                      If 0 and no data is available, the function returns
+ *                      immediately.
+ *                      May be SOCK_NO_TIMEOUT for no timeout (wait until data
+ *                      is available).
  *
  * @note    Function may block.
  *
  * @return  The number of bytes read on success.
  * @return  0, if no read data is available, but everything is in order.
  * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
  * @return  -ECONNABORTED, if the connection is aborted while waiting for the
  *          next data.
  * @return  -ECONNRESET, if the connection was forcibly closed by remote end

@@ -144,9 +144,11 @@
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * @note It is necessary to react with a reply message to the other thread for
- *       @ref GNRC_NETAPI_MSG_TYPE_SET and @ref GNRC_NETAPI_MSG_TYPE_GET
- *       commands
+ * @note When receiving a message of type @ref GNRC_NETAPI_MSG_TYPE_SET or
+ *       @ref GNRC_NETAPI_MSG_TYPE_GET, it is necessary to acknowledge it by
+ *       calling @ref msg_reply() with a message of type
+ *       @ref GNRC_NETAPI_MSG_TYPE_ACK which contains the actual size of the
+ *       GET message's content on success or an error code otherwise.
  *
  * @note Do not forget to unregister with @ref gnrc_netreg_unregister() if you
  *       leave the function
@@ -155,11 +157,22 @@
  * Transmitting Packets
  * --------------------
  *
- * To relay the @ref net_gnrc_pkt to interested threads the @ref
- * net_gnrc_netapi offers a dispatch functionality. The following example
- * sketches the usage and assumes a valid @ref net_gnrc_pkt named `pkt`.
+ * A packet is transmitted by relaying it to threads interested in handling (and
+ * dispatching) packets of its type. To do this, the @ref net_gnrc_netapi
+ * offers dispatch helper functions called @ref gnrc_netapi_dispatch_send()
+ * and gnrc_netapi_dispatch_receive().
+ *
+ * The following example sketches the usage and assumes a valid @ref
+ * net_gnrc_pkt named `pkt`.
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * gnrc_pktsnip_t *pkt;
+ *
+ * pkt = gnrc_pktbuf_add(NULL, data, size, GNRC_NETTYPE_UNDEF);
+ * if (pkt == NULL) {
+ *      puts("Error: unable to copy data to packet buffer\n");
+ *      return;
+ * }
  * if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, 80, pkt)) {
  *      puts("Error: no thread is interested");
  *      gnrc_pktbuf_release(pkt);
@@ -167,13 +180,28 @@
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * The @ref net_gnrc_pkt "pkt" will be send to all threads that registered for
- * @ref GNRC_NETTYPE_UDP and the demux context `80`. Every registered thread
+ * First, the data to be sent is added to the @ref net_gnrc_pktbuf "packet buffer".
+ * This ensures its intactness during the sending process. After the data to be
+ * sent has been added to the packet buffer, its parent data structure can safely
+ * be freed or re-used.
+ *
+ * Then, the @ref net_gnrc_pkt "pkt" will be sent to all threads that registered
+ * for @ref GNRC_NETTYPE_UDP and the demux context `80`. Every registered thread
  * will receive a @ref GNRC_NETAPI_MSG_TYPE_SND command and can access the @ref
- * net_gnrc_pkt. If @ref gnrc_netapi_dispatch_send() is replaced by @ref
+ * net_gnrc_pkt. Note that at this point, the threads receiving pkt act as its
+ * owners, so please don't modify pkt after calling any dispatch function.
+ *
+ * If @ref gnrc_netapi_dispatch_send() is replaced by @ref
  * gnrc_netapi_dispatch_receive() then threads will receive the @ref
  * GNRC_NETAPI_MSG_TYPE_RCV command instead, again with access to the @ref
  * net_gnrc_pkt.
+ *
+ * @note If the data to be sent requires extra headers to be added for successful
+ *       transmission (in the example, this would be IP and UDP headers), these
+ *       have to be built manually before calling @ref gnrc_netapi_dispatch_send().
+ *       In the interest of conciseness, this is omitted in this tutorial;
+ *       please refer to @ref gnrc_udp_hdr_build(), @ref gnrc_ipv6_hdr_build()
+ *       etc. for more information.
  *
  * How To Use
  * ==========

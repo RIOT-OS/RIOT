@@ -188,7 +188,7 @@ index 0000000..7106e07
 +            index = 0;
 +            break;
 +        case U8X8_MSG_BYTE_END_TRANSFER:
-+            i2c_write_bytes(dev, u8x8_GetI2CAddress(u8g2), (char *) buffer, index);
++            i2c_write_bytes(dev, u8x8_GetI2CAddress(u8g2), buffer, index);
 +            i2c_release(dev);
 +            break;
 +        default:

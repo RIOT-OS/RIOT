@@ -283,6 +283,9 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
 
     RFCORE_SFR_RFST = ISTXON;
 
+    /* Wait for transmission to complete */
+    RFCORE_WAIT_UNTIL(RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE == 0);
+
     return pkt_len;
 }
 

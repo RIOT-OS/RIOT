@@ -64,7 +64,7 @@
 
 int hdc1000_test(hdc1000_t *dev)
 {
-    char reg[2];
+    uint8_t reg[2];
     uint16_t tmp;
 
     i2c_acquire(dev->i2c);
@@ -84,7 +84,7 @@ int hdc1000_test(hdc1000_t *dev)
 
 int hdc1000_init(hdc1000_t *dev, i2c_t i2c, uint8_t address)
 {
-    char reg[2];
+    uint8_t reg[2];
 
     /* write device descriptor */
     dev->i2c = i2c;
@@ -105,8 +105,8 @@ int hdc1000_init(hdc1000_t *dev, i2c_t i2c, uint8_t address)
 
     /* set 14 bit resolution for both sensors and sequence mode */
     uint16_t tmp = HDC1000_CONFG_SEQ_MOD;
-    reg[0] = (uint8_t)(tmp >> 8);
-    reg[1] = (uint8_t)tmp;
+    reg[0] = (tmp >> 8);
+    reg[1] = tmp;
 
     i2c_acquire(dev->i2c);
     if (i2c_write_regs(dev->i2c, dev->addr, HDC1000_CONFG, reg, 2) != 2) {
@@ -121,10 +121,10 @@ int hdc1000_init(hdc1000_t *dev, i2c_t i2c, uint8_t address)
 
 int hdc1000_reset(hdc1000_t *dev)
 {
-    char reg[2];
+    uint8_t reg[2];
     uint16_t tmp = HDC1000_CONFG_RST;
-    reg[0] = (uint8_t)(tmp >> 8);
-    reg[1] = (uint8_t)tmp;
+    reg[0] = (tmp >> 8);
+    reg[1] = tmp;
     dev->initialized = false;
 
     i2c_acquire(dev->i2c);
@@ -159,7 +159,7 @@ int hdc1000_startmeasure(hdc1000_t *dev)
 
 int hdc1000_read(hdc1000_t *dev, uint16_t *rawtemp, uint16_t *rawhum)
 {
-    char buf[4];
+    uint8_t buf[4];
 
     if (dev->initialized == false) {
         return -1;

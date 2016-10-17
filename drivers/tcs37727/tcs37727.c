@@ -33,7 +33,7 @@
 
 static int tcs37727_test(tcs37727_t *dev)
 {
-    char id;
+    uint8_t id;
 
     i2c_acquire(dev->i2c);
 
@@ -103,7 +103,7 @@ int tcs37727_set_rgbc_active(tcs37727_t *dev)
     }
 
     i2c_acquire(dev->i2c);
-    if (i2c_read_regs(dev->i2c, dev->addr, TCS37727_ENABLE, (char *)&reg, 1) != 1) {
+    if (i2c_read_regs(dev->i2c, dev->addr, TCS37727_ENABLE, &reg, 1) != 1) {
         i2c_release(dev->i2c);
         return -1;
     }
@@ -128,7 +128,7 @@ int tcs37727_set_rgbc_standby(tcs37727_t *dev)
     }
 
     i2c_acquire(dev->i2c);
-    if (i2c_read_regs(dev->i2c, dev->addr, TCS37727_ENABLE, (char *)&reg, 1) != 1) {
+    if (i2c_read_regs(dev->i2c, dev->addr, TCS37727_ENABLE, &reg, 1) != 1) {
         i2c_release(dev->i2c);
         return -1;
     }
@@ -206,7 +206,7 @@ static uint8_t tcs37727_trim_gain(tcs37727_t *dev, int rawc)
 
     i2c_acquire(dev->i2c);
     uint8_t reg = 0;
-    if (i2c_read_reg(dev->i2c, dev->addr, TCS37727_CONTROL, (char *)&reg) != 1) {
+    if (i2c_read_reg(dev->i2c, dev->addr, TCS37727_CONTROL, &reg) != 1) {
         i2c_release(dev->i2c);
         return -2;
     }
@@ -224,7 +224,7 @@ static uint8_t tcs37727_trim_gain(tcs37727_t *dev, int rawc)
 
 int tcs37727_read(tcs37727_t *dev, tcs37727_data_t *data)
 {
-    char buf[8];
+    uint8_t buf[8];
 
     if (dev->initialized == false) {
         return -1;

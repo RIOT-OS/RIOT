@@ -32,7 +32,7 @@ static uint32_t si70xx_measure(si70xx_t *dev, uint8_t command)
 
     i2c_acquire(dev->i2c_dev);
     i2c_write_byte(dev->i2c_dev, dev->address, command);
-    i2c_read_bytes(dev->i2c_dev, dev->address, (char *) result, 2);
+    i2c_read_bytes(dev->i2c_dev, dev->address, result, 2);
     i2c_release(dev->i2c_dev);
 
     /* reconstruct raw result */
@@ -137,15 +137,15 @@ uint64_t si70xx_get_serial(si70xx_t *dev)
     out[1] = SI70XX_READ_ID_FIRST_B;
 
     i2c_acquire(dev->i2c_dev);
-    i2c_write_bytes(dev->i2c_dev, dev->address, (char *) out, 2);
-    i2c_read_bytes(dev->i2c_dev, dev->address, (char *) in_first, 8);
+    i2c_write_bytes(dev->i2c_dev, dev->address, out, 2);
+    i2c_read_bytes(dev->i2c_dev, dev->address, in_first, 8);
 
     /* read the higher bytes */
     out[0] = SI70XX_READ_ID_SECOND_A;
     out[1] = SI70XX_READ_ID_SECOND_B;
 
-    i2c_write_bytes(dev->i2c_dev, dev->address, (char *) out, 2);
-    i2c_read_bytes(dev->i2c_dev, dev->address, (char *) in_second, 8);
+    i2c_write_bytes(dev->i2c_dev, dev->address, out, 2);
+    i2c_read_bytes(dev->i2c_dev, dev->address, in_second, 8);
     i2c_release(dev->i2c_dev);
 
     /* calculate the ID */
@@ -172,8 +172,8 @@ uint8_t si70xx_get_revision(si70xx_t *dev)
     out[1] = SI70XX_READ_REVISION_B;
 
     i2c_acquire(dev->i2c_dev);
-    i2c_write_bytes(dev->i2c_dev, dev->address, (char *) out, 2);
-    i2c_read_byte(dev->i2c_dev, dev->address, (char *) &in);
+    i2c_write_bytes(dev->i2c_dev, dev->address, out, 2);
+    i2c_read_byte(dev->i2c_dev, dev->address, &in);
     i2c_release(dev->i2c_dev);
 
     return in;
