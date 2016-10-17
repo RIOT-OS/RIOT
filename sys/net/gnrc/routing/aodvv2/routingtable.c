@@ -276,6 +276,7 @@ static void print_json_added_rt_entry(struct aodvv2_routing_entry_t *entry)
 #endif
 }
 
+// TODO: add ifdef DEBUGs or something
 void print_routingtable(void)
 {
     printf("===== BEGIN ROUTING TABLE ===================\n");

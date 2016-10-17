@@ -36,7 +36,7 @@ static void *_aodv_receiver_thread(void *arg);
 static void *_aodv_sender_thread(void *arg);
 static void *fib_signal_handler_thread(void *arg);
 
-static void _deep_free_msg_container(struct msg_container *msg_container);
+//static void _deep_free_msg_container(struct msg_container *msg_container);
 static void _write_packet(struct rfc5444_writer *wr __attribute__ ((unused)),
                           struct rfc5444_writer_target *iface __attribute__((unused)),
                           void *buffer, size_t length);
@@ -59,7 +59,7 @@ static aodvv2_metric_t _metric_type;
 static int sender_thread;
 static struct autobuf _hexbuf;
 static ipv6_addr_t _v6_addr_mcast, _v6_addr_loopback;
-static ipv6_addr_t _v6_addr_local;
+/*static*/ ipv6_addr_t _v6_addr_local;
 static struct netaddr na_local; /* the same as _v6_addr_local, but to save us
                                  * constant calls to ipv6_addr_t_to_netaddr()... */
 static struct writer_target *wt;
@@ -73,6 +73,20 @@ static int aodvv2_address_type_size;
 
 struct netaddr na_mcast;
 kernel_pid_t aodvv2_if_id;
+
+/* TODO: can I share some of those (& the mutexes) without creating a bottleneck?*/
+struct aodvv2_packet_data rreq_packet_data;
+struct rreq_rrep_data rreq_data;
+struct msg_container rreq_msg_container;
+
+struct aodvv2_packet_data rrep_packet_data;
+struct rreq_rrep_data rrep_data;
+struct netaddr rrep_next_hop;
+struct msg_container rrep_msg_container;
+
+struct rerr_data rerr_data;
+struct netaddr rerr_next_hop;
+struct msg_container rerr_msg_container;
 
 void aodv_init(kernel_pid_t interface)
 {
@@ -167,7 +181,7 @@ void *fib_signal_handler_thread(void *arg)
                 seqnum_inc();
 
                 /* Build new RREQ */
-                struct aodvv2_packet_data rreq_data = (struct aodvv2_packet_data) {
+                struct aodvv2_packet_data rreq_init_data = (struct aodvv2_packet_data) {
                     .hoplimit = AODVV2_MAX_HOPCOUNT,
                     .metricType = _metric_type,
                     .origNode = (struct node_data) {
@@ -184,7 +198,7 @@ void *fib_signal_handler_thread(void *arg)
 
                 AODV_DEBUG("\tstarting route discovery towards %s... \n",
                       ipv6_addr_to_str(addr_str, &dest, IPV6_ADDR_MAX_STR_LEN));
-                aodv_send_rreq(&rreq_data);
+                aodv_send_rreq(&rreq_init_data);
             }
             else {
                 /* Reply to the FIB so that it can stop blocking */
@@ -200,23 +214,21 @@ void aodv_send_rreq(struct aodvv2_packet_data *packet_data)
     /* Make sure only one thread is dispatching a RREQ at a time */
     mutex_lock(&rreq_mutex);
 
-    struct aodvv2_packet_data *pd = malloc(sizeof(struct aodvv2_packet_data));
-    memcpy(pd, packet_data, sizeof(struct aodvv2_packet_data));
+    /* TODO do I need this memcpy? */
+    memcpy(&rreq_packet_data, packet_data, sizeof(struct aodvv2_packet_data));
 
-    struct rreq_rrep_data *rd = malloc(sizeof(struct rreq_rrep_data));
-    *rd = (struct rreq_rrep_data) {
+    rreq_data = (struct rreq_rrep_data) {
         .next_hop = &na_mcast,
-        .packet_data = pd,
+        .packet_data = &rreq_packet_data,
     };
 
-    struct msg_container *mc = malloc(sizeof(struct msg_container));
-    *mc = (struct msg_container) {
+    rreq_msg_container = (struct msg_container) {
         .type = RFC5444_MSGTYPE_RREQ,
-        .data = rd
+        .data = &rreq_data,
     };
 
     msg_t msg;
-    msg.content.ptr = (char *) mc;
+    msg.content.ptr = &rreq_msg_container;
 
     msg_try_send(&msg, sender_thread);
     mutex_unlock(&rreq_mutex);
@@ -227,26 +239,31 @@ void aodv_send_rrep(struct aodvv2_packet_data *packet_data, struct netaddr *next
     /* Make sure only one thread is dispatching a RREP at a time */
     mutex_lock(&rrep_mutex);
 
-    struct aodvv2_packet_data *pd = malloc(sizeof(struct aodvv2_packet_data));
-    memcpy(pd, packet_data, sizeof(struct aodvv2_packet_data));
+    memcpy(&rrep_packet_data, packet_data, sizeof(struct aodvv2_packet_data));
+    memcpy(&rrep_next_hop, next_hop, sizeof(struct netaddr));
 
-    struct netaddr *nh = malloc(sizeof(struct netaddr));
-    memcpy(nh, next_hop, sizeof(struct netaddr));
+    // TODO DELETEME (for debugging only)
+    struct netaddr_str nbuf;
+    char addr_str[40];
+    printf("[@ send 1] %s next hop %s\n", ipv6_addr_to_str(addr_str, &_v6_addr_local, 40),
+                                          netaddr_to_string(&nbuf, next_hop));
+    printf("[@ send 1] %s origaddr %s\n", ipv6_addr_to_str(addr_str, &_v6_addr_local, 40),
+                                          netaddr_to_string(&nbuf, &packet_data->origNode.addr));
+    printf("[@ send 1] %s targaddr %s\n", ipv6_addr_to_str(addr_str, &_v6_addr_local, 40),
+        netaddr_to_string(&nbuf, &packet_data->targNode.addr));
 
-    struct rreq_rrep_data *rd = malloc(sizeof(struct rreq_rrep_data));
-    *rd = (struct rreq_rrep_data) {
-        .next_hop = nh,
-        .packet_data = pd,
+    rrep_data = (struct rreq_rrep_data) {
+        .next_hop = &rrep_next_hop,
+        .packet_data = &rrep_packet_data,
     };
 
-    struct msg_container *mc = malloc(sizeof(struct msg_container));
-    *mc = (struct msg_container) {
+    rrep_msg_container = (struct msg_container) {
         .type = RFC5444_MSGTYPE_RREP,
-        .data = rd
+        .data = &rrep_data
     };
 
     msg_t msg;
-    msg.content.ptr = (char *) mc;
+    msg.content.ptr = &rrep_msg_container;
 
     msg_try_send(&msg, sender_thread);
     mutex_unlock(&rrep_mutex);
@@ -257,22 +274,22 @@ void aodv_send_rerr(struct unreachable_node unreachable_nodes[], size_t len, str
     /* Make sure only one thread is dispatching a RERR at a time */
     mutex_lock(&rerr_mutex);
 
-    struct rerr_data *rerrd = malloc(sizeof(struct rerr_data));
-    *rerrd = (struct rerr_data) {
+    memcpy(&rerr_next_hop, next_hop, sizeof(struct netaddr));
+
+    rerr_data = (struct rerr_data) {
         .unreachable_nodes = unreachable_nodes,
         .len = len,
         .hoplimit = AODVV2_MAX_HOPCOUNT,
-        .next_hop = next_hop
+        .next_hop = &rerr_next_hop
     };
 
-    struct msg_container *mc2 = malloc(sizeof(struct msg_container));
-    *mc2 = (struct msg_container) {
+    rerr_msg_container = (struct msg_container) {
         .type = RFC5444_MSGTYPE_RERR,
-        .data = rerrd
+        .data = &rerr_data
     };
 
     msg_t msg2;
-    msg2.content.ptr = (char *) mc2;
+    msg2.content.ptr = &rerr_msg_container;
 
     msg_try_send(&msg2, sender_thread);
     mutex_unlock(&rerr_mutex);
@@ -348,7 +365,7 @@ static void *_aodv_sender_thread(void *arg)
         else {
             AODV_DEBUG("ERROR: Couldn't identify Message\n");
         }
-        _deep_free_msg_container(mc);
+        //_deep_free_msg_container(mc);
     }
 
     return NULL;
@@ -449,6 +466,7 @@ static void _aodv_send(ipv6_addr_t addr, uint16_t port, void *data, size_t data_
     /* all headers are set, send packet */
     if(!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, pkt_with_ip)) {
         DEBUG("Error sending packet\n");
+        gnrc_pktbuf_release(pkt_with_ip);
     }
 }
 
@@ -479,6 +497,7 @@ static void _write_packet(struct rfc5444_writer *wr __attribute__ ((unused)),
     netaddr_to_ipv6_addr_t(&wt->target_addr, &addr_send);
 
     /* When originating a RREQ, add it to our RREQ table/update its predecessor */
+    // TOOD: shouldn't this be moved to the fib thread?!
     if (wt->type == RFC5444_MSGTYPE_RREQ
         && netaddr_cmp(&wt->packet_data.origNode.addr, &na_local) == 0) {
         DEBUG("originating RREQ with SeqNum %d towards %s via %s; updating RREQ table...\n",
@@ -522,6 +541,7 @@ static void print_json_pkt_sent(struct writer_target *wt)
 }
 
 /* free the matryoshka doll of cobbled-together structs that the sender_thread receives */
+/* TODO deleteme
 static void _deep_free_msg_container(struct msg_container *mc)
 {
     int type = mc->type;
@@ -541,3 +561,4 @@ static void _deep_free_msg_container(struct msg_container *mc)
     free(mc->data);
     free(mc);
 }
+*/

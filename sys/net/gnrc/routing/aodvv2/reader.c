@@ -675,6 +675,8 @@ void aodv_packet_reader_cleanup(void)
 
 int aodv_packet_reader_handle_packet(void *buffer, size_t length, struct netaddr *sender)
 {
+    /* clear leftover data & init*/
+    packet_data = (struct aodvv2_packet_data) {0};
     memcpy(&packet_data.sender, sender, sizeof(*sender));
 
     return rfc5444_reader_handle_packet(&reader, buffer, length);

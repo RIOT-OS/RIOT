@@ -269,7 +269,7 @@ void aodv_packet_writer_send_rreq(struct aodvv2_packet_data *packet_data, struct
         return;
     }
 
-    /* Make sure no other thread is using the writer right now */
+    // TODO: memcpy necessary?
     memcpy(&_target.packet_data, packet_data, sizeof(struct aodvv2_packet_data));
     _target.type = RFC5444_MSGTYPE_RREQ;
     _target.packet_data.hoplimit = packet_data->hoplimit;
@@ -296,6 +296,7 @@ void aodv_packet_writer_send_rrep(struct aodvv2_packet_data *packet_data, struct
         return;
     }
 
+    // TODO: memcpy necessary?
     memcpy(&_target.packet_data, packet_data, sizeof(struct aodvv2_packet_data));
     _target.type = RFC5444_MSGTYPE_RREP;
     _target.packet_data.hoplimit = AODVV2_MAX_HOPCOUNT;
