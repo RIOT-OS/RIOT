@@ -1,1 +1,1 @@
-# File must exist for RIOT to build.
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/
