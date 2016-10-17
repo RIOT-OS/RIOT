@@ -88,7 +88,9 @@ void rreqtable_init(void);
 
 /**
  * Check if a RREQ is redundant, i.e. was received from another node already.
- * Behaves as described in Sections 5.7. and 7.6.
+ * If it is not redundant, add it to the RREQ table. (TODO split this up into 2
+ * functions)
+ *
  * @param packet_data  data of the RREQ in question
  * @return             true if packet_data is redundant, false otherwise.
  */

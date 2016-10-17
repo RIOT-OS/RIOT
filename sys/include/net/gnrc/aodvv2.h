@@ -34,6 +34,8 @@ extern "C" {
 
 /**
  * @brief   Initialize the AODVv2 routing protocol.
+ *
+ * @param interface   The interface AODVv2 operates on and finds routes for.
  */
 void aodv_init(kernel_pid_t interface);
 

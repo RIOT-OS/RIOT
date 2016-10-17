@@ -353,11 +353,11 @@ static enum rfc5444_result _cb_rreq_end_callback(
 
         /* make sure to start with a clean metric value */
         packet_data.targNode.metric = 0;
-        aodv_send_rrep(&packet_data, &packet_data.sender);
+        aodv_packet_writer_send_rrep(&packet_data, &packet_data.sender);
     }
     else {
         AODV_DEBUG("I am not TargNode, forwarding RREQ\n");
-        aodv_send_rreq(&packet_data);
+        aodv_packet_writer_send_rreq(&packet_data, &aodvv2_netaddr_mcast);
     }
     return RFC5444_OKAY;
 }
@@ -370,6 +370,7 @@ static enum rfc5444_result _cb_rreq_end_callback(
  */
 static enum rfc5444_result _cb_rrep_blocktlv_messagetlvs_okay(struct rfc5444_reader_tlvblock_context *cont)
 {
+
     if (!cont->has_hoplimit) {
         AODV_DEBUG("\tERROR: missing hop limit\n");
         return RFC5444_DROP_PACKET;
@@ -538,8 +539,15 @@ static enum rfc5444_result _cb_rrep_end_callback(
         /* If HandlingRtr is not RREQ_Gen then the outgoing RREP is sent to the
          * Route.NextHopAddress for the RREP.AddrBlk[OrigNodeNdx]. */
         AODV_DEBUG("Not my RREP, passing it on to the next hop\n");
-        aodv_send_rrep(&packet_data,
-                       routingtable_get_next_hop(&packet_data.origNode.addr,packet_data.metricType));
+
+        // TODO DELETEME (for debugging only)
+        print_routingtable();
+        struct netaddr_str nbuf;
+        printf("%s\n", netaddr_to_string(&nbuf, routingtable_get_next_hop(&packet_data.origNode.addr,packet_data.metricType)));
+
+        aodv_packet_writer_send_rrep(&packet_data, routingtable_get_next_hop(
+                                                    &packet_data.origNode.addr,
+                                                    packet_data.metricType));
     }
     return RFC5444_OKAY;
 }
@@ -567,7 +575,8 @@ static enum rfc5444_result _cb_rerr_blocktlv_messagetlvs_okay(struct rfc5444_rea
     return RFC5444_OKAY;
 }
 
-static enum rfc5444_result _cb_rerr_blocktlv_addresstlvs_okay(struct rfc5444_reader_tlvblock_context *cont)
+static enum rfc5444_result _cb_rerr_blocktlv_addresstlvs_okay(
+                                struct rfc5444_reader_tlvblock_context *cont)
 {
 #if AODV_DEBUG
     /* cppcheck-suppress unusedVariable as nbuf is needed by AODV_DEBUG. */
@@ -599,13 +608,15 @@ static enum rfc5444_result _cb_rerr_blocktlv_addresstlvs_okay(struct rfc5444_rea
     }
 
     /* Check if there is an entry for unreachable node in our routing table */
-    unreachable_entry = routingtable_get_entry(&packet_data.origNode.addr, packet_data.metricType);
+    unreachable_entry = routingtable_get_entry(&packet_data.origNode.addr,
+                                                packet_data.metricType);
     if (unreachable_entry) {
         AODV_DEBUG("\t found possibly unreachable entry.\n");
 
         /* check if route to unreachable node has to be marked as broken and RERR has to be forwarded */
         if (netaddr_cmp(&unreachable_entry->nextHopAddr, &packet_data.sender) == 0
-                && (!tlv || seqnum_cmp(unreachable_entry->seqnum, packet_data.origNode.seqnum) == 0)) {
+                && (!tlv || seqnum_cmp(unreachable_entry->seqnum,
+                                       packet_data.origNode.seqnum) == 0)) {
             unreachable_entry->state = ROUTE_STATE_INVALID;
             unreachable_nodes[num_unreachable_nodes].addr = packet_data.origNode.addr;
             unreachable_nodes[num_unreachable_nodes].seqnum = packet_data.origNode.seqnum;
@@ -613,7 +624,8 @@ static enum rfc5444_result _cb_rerr_blocktlv_addresstlvs_okay(struct rfc5444_rea
         }
 
         /* remove entry from FIB */
-        fib_remove_entry(&gnrc_ipv6_fib_table, packet_data.origNode.addr._addr, sizeof(ipv6_addr_t));
+        fib_remove_entry(&gnrc_ipv6_fib_table, packet_data.origNode.addr._addr,
+                         sizeof(ipv6_addr_t));
     }
 
     /* TODO: run routingtable_break_and_get_all_hopping_over() in addr, remove
@@ -622,7 +634,9 @@ static enum rfc5444_result _cb_rerr_blocktlv_addresstlvs_okay(struct rfc5444_rea
     return RFC5444_OKAY;
 }
 
-static enum rfc5444_result _cb_rerr_end_callback(struct rfc5444_reader_tlvblock_context *cont, bool dropped)
+static enum rfc5444_result _cb_rerr_end_callback(
+                                struct rfc5444_reader_tlvblock_context *cont,
+                                bool dropped)
 {
     (void) cont;
 
@@ -636,7 +650,8 @@ static enum rfc5444_result _cb_rerr_end_callback(struct rfc5444_reader_tlvblock_
         return RFC5444_DROP_PACKET;
     }
     /* gather all unreachable nodes and put them into a RERR */
-    aodv_send_rerr(unreachable_nodes, num_unreachable_nodes, &na_mcast);
+    aodv_packet_writer_send_rerr(unreachable_nodes, num_unreachable_nodes,
+                                 AODVV2_MAX_HOPCOUNT, &aodvv2_netaddr_mcast);
     return RFC5444_OKAY;
 }
 

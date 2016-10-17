@@ -51,11 +51,8 @@ enum tlv_index
     TLV_METRIC,
 };
 
-/* my multicast address */
-extern struct netaddr na_mcast;
-
-// TODO DELETEME (for debugging only)
-extern ipv6_addr_t _v6_addr_local;
+/* the multicast address for this router */
+extern struct netaddr aodvv2_netaddr_mcast;
 
 /* the interface this protocol operates on */
 extern kernel_pid_t aodvv2_if_id;

@@ -322,6 +322,7 @@ void aodv_packet_writer_send_rerr(struct unreachable_node unreachable_nodes[], s
 {
     AODV_DEBUG("%s()\n", __func__);
 
+    // TODO: shouldn't hoplimit be always 1 because a RERR is always regenerated?
     if ((unreachable_nodes == NULL) || (next_hop == NULL)) {
         return;
     }
