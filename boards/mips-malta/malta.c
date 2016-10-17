@@ -23,7 +23,7 @@ static void malta_reset(void)
 
 void board_init(void)
 {
-
+    /* Board initialisation is done by the bootloader (u-boot) on Malta */
 }
 
 void reboot(void)
