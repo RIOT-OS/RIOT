@@ -21,14 +21,14 @@ extern "C" {
 #define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT (THREAD_EXTRA_STACKSIZE_PRINTF)
 
 #ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT   (256)
+#   define THREAD_STACKSIZE_DEFAULT         (256)
 #endif
 
 #define THREAD_STACKSIZE_IDLE      (96)
 #define ISR_STACKSIZE              (256)
 
 #ifndef GNRC_PKTBUF_SIZE
-#define GNRC_PKTBUF_SIZE                (2560)    /* TODO: Make this value
+#   define GNRC_PKTBUF_SIZE                (2560)    /* TODO: Make this value
                                                    * overall MTU dependent */
 #endif
 /** @} */
