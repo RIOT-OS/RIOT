@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 #ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT        (4096)
+#define THREAD_STACKSIZE_DEFAULT        (2048)
 #endif
 
 #ifndef THREAD_STACKSIZE_IDLE
@@ -26,7 +26,13 @@ extern "C" {
  * EXTRA PRINTF needed when debug logging turned on on code which
  * runs on this thread eg timer debug
  */
-#define THREAD_STACKSIZE_IDLE           (1024 + THREAD_EXTRA_STACKSIZE_PRINTF)
+
+#ifdef NDEBUG
+#define THREAD_STACKSIZE_IDLE           (512)
+#else
+#define THREAD_STACKSIZE_IDLE           (512 + THREAD_EXTRA_STACKSIZE_PRINTF)
+#endif
+
 #endif
 
 #define ISR_STACKSIZE                   (0)

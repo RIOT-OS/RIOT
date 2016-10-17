@@ -1,11 +1,9 @@
 /*
  * Copyright 2016, Imagination Technologies Limited and/or its
  *                 affiliated group companies.
- *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
  */
 
 #ifndef _CPU_CONF_H_
@@ -16,11 +14,11 @@ extern "C" {
 #endif
 
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF
-#define THREAD_EXTRA_STACKSIZE_PRINTF   (2048)
+#define THREAD_EXTRA_STACKSIZE_PRINTF   (1024)
 #endif
 
 #ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT        (4096)
+#define THREAD_STACKSIZE_DEFAULT        (2048)
 #endif
 
 #ifndef THREAD_STACKSIZE_IDLE
@@ -28,7 +26,13 @@ extern "C" {
  * EXTRA PRINTF needed when debug logging turned on on code which
  * runs on this thread eg timer debug
  */
-#define THREAD_STACKSIZE_IDLE           (1024 + THREAD_EXTRA_STACKSIZE_PRINTF)
+
+#ifdef NDEBUG
+#define THREAD_STACKSIZE_IDLE           (512)
+#else
+#define THREAD_STACKSIZE_IDLE           (512 + THREAD_EXTRA_STACKSIZE_PRINTF)
+#endif
+
 #endif
 
 #define ISR_STACKSIZE                   (0)
