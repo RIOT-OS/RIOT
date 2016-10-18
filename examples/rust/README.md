@@ -1,6 +1,7 @@
 # Introduction
 
-"Rust is a systems programming language that runs blazingly fast, prevents segfaults, and guarantees thread safety."
+"Rust is a systems programming language that runs blazingly fast, prevents
+segfaults, and guarantees thread safety."
 
 This example shows how to write a RIOT application using Rust.
 
