@@ -116,6 +116,10 @@
 #ifndef THREAD_H
 #define THREAD_H
 
+#if USE_NEWLIB_THREAD_SAFE
+#include <sys/reent.h>
+#endif
+
 #include "clist.h"
 #include "cib.h"
 #include "msg.h"
@@ -189,6 +193,9 @@ struct _thread {
     msg_t *msg_array;               /**< memory holding messages        */
 #endif
 
+#ifdef USE_NEWLIB_THREAD_SAFE
+    struct _reent newlib_reent; /**< thread's re-entrent object     */
+#endif
 #if defined DEVELHELP || defined(SCHED_TEST_STACK)
     char *stack_start;              /**< thread's stack start address   */
 #endif

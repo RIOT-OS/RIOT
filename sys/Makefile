@@ -95,6 +95,9 @@ endif
 ifneq (,$(filter sema,$(USEMODULE)))
     DIRS += sema
 endif
+ifneq (,$(filter newlib_thread_safe,$(USEMODULE)))
+    DIRS += newlib/thread_safe
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
