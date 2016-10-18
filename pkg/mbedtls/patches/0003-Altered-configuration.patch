@@ -1,0 +1,43 @@
+From c44f9fc8413bfdbee5408d6edca0306fb15e459d Mon Sep 17 00:00:00 2001
+From: Mathias Tausig <mathias.tausig@fh-campuswien.ac.at>
+Date: Mon, 17 Oct 2016 16:03:07 +0200
+Subject: [PATCH 3/3] Altered configuration
+
+---
+ include/mbedtls/config.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/mbedtls/config.h b/include/mbedtls/config.h
+index 8e263b0..9320f2c 100644
+--- a/include/mbedtls/config.h
++++ b/include/mbedtls/config.h
+@@ -775,7 +775,7 @@
+  *
+  * Enable functions that use the filesystem.
+  */
+-#define MBEDTLS_FS_IO
++//#define MBEDTLS_FS_IO
+ 
+ /**
+  * \def MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
+@@ -1958,7 +1958,7 @@
+  *
+  * This module provides networking routines.
+  */
+-#define MBEDTLS_NET_C
++//#define MBEDTLS_NET_C
+ 
+ /**
+  * \def MBEDTLS_OID_C
+@@ -2338,7 +2338,7 @@
+  *
+  * This module is used by the HAVEGE random number generator.
+  */
+-#define MBEDTLS_TIMING_C
++//#define MBEDTLS_TIMING_C
+ 
+ /**
+  * \def MBEDTLS_VERSION_C
+-- 
+2.7.4
+
