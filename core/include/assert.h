@@ -41,6 +41,19 @@ extern const char assert_crash_message[];
  *
  * The purpose of this macro is to help programmers find bugs in their
  * programs.
+ *
+ * If `NDEBUG` is not defined, a failed assertion generates output similar to:
+ *
+ *     0x89abcdef
+ *     *** RIOT kernel panic:
+ *     FAILED ASSERTION.
+ *
+ *     ...
+ *
+ * Where 0x89abcdef is an address. This address can be used with tools like
+ * `addr2line` (or e.g. `arm-none-eabi-addr2line` for ARM-based code), `objdump`,
+ * or `gdb` (with the command `info line *(0x89abcdef)`) to identify the line
+ * the assertion failed in.
  */
 
 #ifdef NDEBUG
