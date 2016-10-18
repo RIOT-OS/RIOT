@@ -561,3 +561,11 @@ ifneq (,$(filter random,$(USEMODULE)))
         USEMODULE += tinymt32
     endif
 endif
+
+ifneq (,$(filter constfs,$(USEMODULE)))
+  USEMODULE += vfs
+endif
+
+ifneq (,$(filter devfs,$(USEMODULE)))
+  USEMODULE += vfs
+endif
