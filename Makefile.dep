@@ -569,7 +569,6 @@ ifneq (,$(filter random,$(USEMODULE)))
     endif
 endif
 
-
 ifneq (,$(filter openthread,$(USEMODULE)))
   USEMODULE += openthread_core
   USEMODULE += openthread_contrib
@@ -580,12 +579,10 @@ ifneq (,$(filter openthread,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi periph_gpio
 endif
 
-
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
   USEMODULE+=openthread_contrib_netdev2
   USEMODULE+=openthread_contrib_conn
 endif
-
 
 ifneq (,$(filter openthread_core,$(USEMODULE)))
   USEMODULE+=openthread_core_common
@@ -597,7 +594,3 @@ ifneq (,$(filter openthread_core,$(USEMODULE)))
   USEMODULE+=mbedtls
   USEMODULE+=mbedtls_lib
 endif
-
-
-
-
