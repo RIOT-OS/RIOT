@@ -124,20 +124,20 @@ extern "C" {
 #define AT86RF2XX_OPT_RAWDUMP        (NETDEV2_IEEE802154_RAW)           /**< legacy define */
 #define AT86RF2XX_OPT_AUTOACK        (NETDEV2_IEEE802154_ACK_REQ)       /**< legacy define */
 
-#define AT86RF2XX_OPT_CSMA           (0x0100)                           /**< CSMA active */
-#define AT86RF2XX_OPT_PROMISCUOUS    (0x0200)                           /**< promiscuous mode
-                                                                         *   active */
-#define AT86RF2XX_OPT_PRELOADING     (0x0400)                           /**< preloading enabled */
-#define AT86RF2XX_OPT_TELL_TX_START  (0x0800)                           /**< notify MAC layer on TX
-                                                                         *   start */
-#define AT86RF2XX_OPT_TELL_TX_END    (0x1000)                           /**< notify MAC layer on TX
-                                                                         *   finished */
-#define AT86RF2XX_OPT_TELL_RX_START  (0x2000)                           /**< notify MAC layer on RX
-                                                                         *   start */
-#define AT86RF2XX_OPT_TELL_RX_END    (0x4000)                           /**< notify MAC layer on RX
-                                                                         *   finished */
+#define AT86RF2XX_OPT_CSMA           (0x0100)       /**< CSMA active */
+#define AT86RF2XX_OPT_PROMISCUOUS    (0x0200)       /**< promiscuous mode
+                                                     *   active */
+#define AT86RF2XX_OPT_PRELOADING     (0x0400)       /**< preloading enabled */
+#define AT86RF2XX_OPT_TELL_TX_START  (0x0800)       /**< notify MAC layer on TX
+                                                     *   start */
+#define AT86RF2XX_OPT_TELL_TX_END    (0x1000)       /**< notify MAC layer on TX
+                                                     *   finished */
+#define AT86RF2XX_OPT_TELL_RX_START  (0x2000)       /**< notify MAC layer on RX
+                                                     *   start */
+#define AT86RF2XX_OPT_TELL_RX_END    (0x4000)       /**< notify MAC layer on RX
+                                                     *   finished */
 #ifdef MODULE_OPENTHREAD
-#define AT86RF2XX_OPT_RX_LISTENING    (0x8000)                          /**< detection of reception active */
+#define AT86RF2XX_OPT_RX_LISTENING    (0x8000)      /**< detection of reception active */
 #endif
 /** @} */
 
