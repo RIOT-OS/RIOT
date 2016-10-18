@@ -73,7 +73,6 @@ ifneq (,$(filter openthread,$(USEMODULE)))
   SRC += sc_openthread.c
 endif
 
-
 # TODO
 # Conditional building not possible at the moment due to
 # https://github.com/RIOT-OS/RIOT/issues/2058
