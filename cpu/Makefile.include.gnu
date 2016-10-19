@@ -9,11 +9,16 @@ endif
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
-ifneq ("$(wildcard $(PREFIX)objcopy)","")
-export OBJCOPY ?= $(PREFIX)objcopy
+ifeq (,$(OBJCOPY))
+ifneq (,$(shell command -v $(PREFIX)objcopy 2>/dev/null))
+export OBJCOPY = $(PREFIX)objcopy
 else
-export OBJCOPY ?= gobjcopy
-export OFLAGS ?= -O ihex
+ifneq (,$(shell command -v gobjcopy 2>/dev/null))
+export OBJCOPY = gobjcopy
+else
+export OBJCOPY = objcopy
+endif
+endif
 endif
 export OBJDUMP = $(PREFIX)objdump
 export DBG = $(GDBPREFIX)gdb
