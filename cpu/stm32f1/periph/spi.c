@@ -187,7 +187,6 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
 
     SPI_TypeDef *spi;
-    int transferred = 0;
 
     switch (dev) {
 #if SPI_0_EN
@@ -242,7 +241,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     }
 #endif /*ENABLE_DEBUG */
 
-    return transferred;
+    return length;
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)
