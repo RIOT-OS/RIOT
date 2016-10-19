@@ -95,6 +95,7 @@ extern "C" {
  * @brief   Flags for device internal states (see datasheet)
  * @{
  */
+#define AT86RF2XX_STATE_P_ON           (0x00)     /**< initial power on */
 #define AT86RF2XX_STATE_FORCE_TRX_OFF  (0x03)     /**< force transition to idle */
 #define AT86RF2XX_STATE_TRX_OFF        (0x08)     /**< idle */
 #define AT86RF2XX_STATE_PLL_ON         (0x09)     /**< ready to transmit */
