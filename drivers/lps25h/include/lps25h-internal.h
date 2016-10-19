@@ -43,7 +43,7 @@ extern "C" {
 #define LPS25H_REG_INT_SOURCE           (0x25)
 /** RESERVED 0x26                     */
 #define LPS25H_REG_STATUS_REG           (0x27)
-#define LPS25H_REG_PRESS_POUT_XL        (0x28)
+#define LPS25H_REG_PRESS_OUT_XL         (0x28)
 #define LPS25H_REG_PRESS_OUT_L          (0x29)
 #define LPS25H_REG_PRESS_OUT_H          (0x2A)
 #define LPS25H_REG_TEMP_OUT_L           (0x2B)
