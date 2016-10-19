@@ -1,0 +1,1 @@
+include $(RIOTBASE)/drivers/mpu_common/Makefile.include

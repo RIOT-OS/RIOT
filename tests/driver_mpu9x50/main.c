@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2016 RIOT-OS
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,9 +11,10 @@
  * @{
  *
  * @file
- * @brief       Test application for the MPU-9150 Nine-Axis driver
+ * @brief       Test application for the MPU-9X50 Nine-Axis driver
  *
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
+ * @auhtor      smlng <s@mlng.net>
  *
  * @}
  */
@@ -31,7 +32,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "mpu9150.h"
+#include "mpu_common.h"
 #include "xtimer.h"
 #include "board.h"
 
@@ -39,15 +40,15 @@
 
 int main(void)
 {
-    mpu9150_t dev;
-    mpu9150_results_t measurement;
+    mpu_dev_t dev;
+    mpu_results_t measurement;
     int32_t temperature;
     int result;
 
-    puts("MPU-9150 test application\n");
+    puts("MPU-9X50 test application\n");
 
     printf("+------------Initializing------------+\n");
-    result = mpu9150_init(&dev, TEST_I2C, TEST_HW_ADDR, TEST_COMP_ADDR);
+    result = mpu_init(&dev, TEST_I2C, TEST_HW_ADDR, TEST_COMP_ADDR);
 
     if (result == -1) {
         puts("[Error] The given i2c is not enabled");
@@ -58,12 +59,12 @@ int main(void)
         return 1;
     }
 
-    mpu9150_set_sample_rate(&dev, 200);
+    mpu_set_sample_rate(&dev, 200);
     if (dev.conf.sample_rate != 200) {
         puts("[Error] The sample rate was not set correctly");
         return 1;
     }
-    mpu9150_set_compass_sample_rate(&dev, 100);
+    mpu_set_compass_sample_rate(&dev, 100);
     if (dev.conf.compass_sample_rate != 100) {
         puts("[Error] The compass sample rate was not set correctly");
         return 1;
@@ -82,19 +83,19 @@ int main(void)
     printf("\n+--------Starting Measurements--------+\n");
     while (1) {
         /* Get accel data in milli g */
-        mpu9150_read_accel(&dev, &measurement);
+        mpu_read_accel(&dev, &measurement);
         printf("Accel data [milli g] - X: %"PRId16"   Y: %"PRId16"   Z: %"PRId16"\n",
                 measurement.x_axis, measurement.y_axis, measurement.z_axis);
         /* Get gyro data in dps */
-        mpu9150_read_gyro(&dev, &measurement);
+        mpu_read_gyro(&dev, &measurement);
         printf("Gyro data [dps] - X: %"PRId16"   Y: %"PRId16"   Z: %"PRId16"\n",
                 measurement.x_axis, measurement.y_axis, measurement.z_axis);
         /* Get compass data in mikro Tesla */
-        mpu9150_read_compass(&dev, &measurement);
+        mpu_read_compass(&dev, &measurement);
         printf("Compass data [mikro T] - X: %"PRId16"   Y: %"PRId16"   Z: %"PRId16"\n",
                 measurement.x_axis, measurement.y_axis, measurement.z_axis);
         /* Get temperature in milli degrees celsius */
-        mpu9150_read_temperature(&dev, &temperature);
+        mpu_read_temperature(&dev, &temperature);
         printf("Temperature [milli deg] : %"PRId32"\n", temperature);
         printf("\n+-------------------------------------+\n");
 
