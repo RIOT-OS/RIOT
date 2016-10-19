@@ -26,8 +26,6 @@
 
 /**
  * @brief   PATABLE with available output powers
- * @note    If changed in size, adjust MAX_OUTPUT_POWER definition
- *          in CC110x interface
 */
 const char cc110x_default_pa_table[8] = {
     0x00,   /*< -52 dBm */

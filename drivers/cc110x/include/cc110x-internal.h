@@ -61,6 +61,10 @@ extern "C" {
 #endif
 #define CC110X_MIN_CHANNR           (0)     /**< lowest possible channel number */
 #define CC110X_MAX_CHANNR           (0)     /**< highest possible channel number */
+#define CC110X_CCA_MAXTRIES         (10)    /**< Max TX retries if CCA not clear */
+#define CC110X_CCA_RETRY_DELAY      (10)    /**< time in us to wait between CCA
+                                                 retries, will get multiplied by
+                                                 a random value (0..255) */
 
 /**
  * @name    State values for state machine
@@ -196,9 +200,8 @@ typedef struct {
  * @brief   Statistic interface for debugging
  */
 typedef struct cc110x_statistic {
-    uint32_t    packets_in;             /**< total nr of packets received */
+    uint32_t    packets_in;             /**< successfully received packets */
     uint32_t    packets_in_crc_fail;    /**< dropped because of invalid crc */
-    uint32_t    packets_in_while_tx;    /**< receive while tx */
     uint32_t    raw_packets_out;        /**< packets sent */
 } cc110x_statistic_t;
 

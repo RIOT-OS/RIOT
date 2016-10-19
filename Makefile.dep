@@ -561,3 +561,8 @@ ifneq (,$(filter random,$(USEMODULE)))
         USEMODULE += tinymt32
     endif
 endif
+
+ifneq (,$(filter cc110x,$(USEMODULE)))
+    USEMODULE += xtimer random
+    DISABLE_MODULE += gnrc_sixlowpan_iphc
+endif
