@@ -13,10 +13,10 @@ include $(MIPS_ELF_ROOT)/share/mips/rules/mipshal.mk
 export CFLAGS_CPU   = -EL -march=m4k
 export CFLAGS_LINK  = -ffunction-sections -fno-builtin -fshort-enums
 export CFLAGS_DBG = -O0 -g2
-export CFLAGS_OPT = -Os
+export CFLAGS_OPT = -Os -g2
 
-export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) -DSKIP_COPY_TO_RAM
-#$(CFLAGS_OPT)
+export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_OPT) -DSKIP_COPY_TO_RAM
+#$(CFLAGS_DBG)
 
 export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
 

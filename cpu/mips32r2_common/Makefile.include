@@ -12,10 +12,10 @@ include $(MIPS_ELF_ROOT)/share/mips/rules/mipshal.mk
 export CFLAGS_CPU   = -EL -march=mips32r2 -msoft-float
 export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
 export CFLAGS_DBG = -O0 -g2
-export CFLAGS_OPT = -Os
+export CFLAGS_OPT = -Os -g2
 
-export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG)
-#$(CFLAGS_OPT)
+export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_OPT)
+#$(CFLAGS_DBG)
 
 export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
 
