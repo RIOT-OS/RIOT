@@ -27,7 +27,7 @@
 #include "lps25h.h"
 #include "include/lps25h-internal.h"
 
-#define ENABLE_DEBUG       (1)
+#define ENABLE_DEBUG       ()
 #include "debug.h"
 
 /**
@@ -56,8 +56,8 @@
 static inline int _twos_complement(int value, int mask)
 {
     if (value & mask) {
-        value = ~(value & !(mask)) + 1;
-        return ~(value & !(mask));
+        value = ~(value & ~(mask)) + 1;
+        return ~(value & ~(mask));
     }
     else {
         return value;
@@ -109,7 +109,7 @@ int lps25h_read_temp(lps25h_t *dev)
 
     val = (tmp[1] << 8) | tmp[0];
 
-        DEBUG("LPS25H: raw temperature: %i\n", val);
+    DEBUG("LPS25H: raw temperature: %i\n", val);
     val = _twos_complement(val, MASK_16BIT_MSB);
 
 
@@ -121,10 +121,10 @@ int lps25h_read_temp(lps25h_t *dev)
 int lps25h_read_pres(lps25h_t *dev)
 {
     char tmp[3] = {0, 0, 0};
-    int16_t val = 0;
+    int32_t val = 0;
 
     i2c_acquire(dev->i2c);
-    i2c_read_regs(dev->i2c, dev->addr, LPS25H_REG_PRESS_POUT_XL, &tmp[0], 3);
+    i2c_read_regs(dev->i2c, dev->addr, LPS25H_REG_PRESS_OUT_XL, &tmp[0], 3);
     i2c_release(dev->i2c);
 
     val = (tmp[2] << 16) | (tmp[1] << 8) | tmp[0];
