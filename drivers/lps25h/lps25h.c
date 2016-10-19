@@ -27,7 +27,7 @@
 #include "lps25h.h"
 #include "include/lps25h-internal.h"
 
-#define ENABLE_DEBUG       ()
+#define ENABLE_DEBUG       (0)
 #include "debug.h"
 
 /**
