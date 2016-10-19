@@ -8,8 +8,5 @@ include $(RIOTBOARD)/Makefile.include.serial
 # this board uses openocd
 include $(RIOTBOARD)/Makefile.include.openocd
 
-# include dependencies
-include $(RIOTBOARD)/nucleo-common/Makefile.dep
-
 # add the common header files to the include path
 INCLUDES += -I$(RIOTBOARD)/nucleo-common/include

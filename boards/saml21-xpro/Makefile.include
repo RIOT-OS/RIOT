@@ -3,9 +3,6 @@ export CPU = saml21
 export CPU_MODEL = saml21j18a
 export CFLAGS += -D__SAML21J18A__
 
-# include dependencies
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
-
 # setup serial terminal
 PORT_LINUX ?= /dev/ttyACM0
 include $(RIOTBOARD)/Makefile.include.serial

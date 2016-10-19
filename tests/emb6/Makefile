@@ -8,6 +8,8 @@ RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := msb-430h stm32f0discovery telosb weio z1
 
+USEPKG += emb6
+
 USEMODULE += emb6_router
 USEMODULE += emb6_conn_udp
 USEMODULE += ipv6_addr
