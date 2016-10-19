@@ -53,7 +53,7 @@ int main(void)
         temp = lps25h_read_temp(&dev);
         pres = lps25h_read_pres(&dev);
 
-        printf("Pressure: %3i bar - Temperature: %3i °C\n", pres, temp);
+        printf("Pressure: %3i hPa - Temperature: %3i °C\n", pres, temp);
 
         xtimer_usleep(SLEEP);
     }

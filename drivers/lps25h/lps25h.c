@@ -131,7 +131,7 @@ int lps25h_read_pres(lps25h_t *dev)
 
     val = _twos_complement(val, MASK_24BIT_MSB);
 
-    DEBUG("LPS25H: raw pressure: %i\n", val);
+    DEBUG("LPS25H: raw pressure: %li\n", val);
 
     return (int)(((float)val) / PRES_DIVIDER);
 }
