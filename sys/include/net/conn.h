@@ -15,6 +15,7 @@
  * About
  * =====
  *
+ * ~~~~~~~~~~~~~~~~~~~~~
  *    +---------------+
  *    |  Application  |
  *    +---------------+
@@ -28,6 +29,7 @@
  *    +---------------+
  *    | Network Stack |
  *    +---------------+
+ * ~~~~~~~~~~~~~~~~~~~~~
  *
  * This module provides a minimal set of functions to establish a connection using
  * different types of connections. Together, they serve as a common API
