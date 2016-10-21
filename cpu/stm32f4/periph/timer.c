@@ -77,9 +77,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     /* set auto-reload and prescaler values and load new values */
     timer->EGR |= TIM_EGR_UG;
 
-    /* enable the timer's interrupt */
-    timer_irq_enable(dev);
-
     /* start the timer */
     timer_start(dev);
 
@@ -228,42 +225,6 @@ void timer_stop(tim_t dev)
 #if TIMER_1_EN
         case TIMER_1:
             TIMER_1_DEV->CR1 &= ~TIM_CR1_CEN;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
-void timer_irq_enable(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            NVIC_EnableIRQ(TIMER_0_IRQ_CHAN);
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            NVIC_EnableIRQ(TIMER_1_IRQ_CHAN);
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
-void timer_irq_disable(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            NVIC_DisableIRQ(TIMER_0_IRQ_CHAN);
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            NVIC_DisableIRQ(TIMER_1_IRQ_CHAN);
             break;
 #endif
         case TIMER_UNDEFINED:

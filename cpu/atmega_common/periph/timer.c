@@ -170,17 +170,6 @@ void timer_start(tim_t tim)
     ctx[tim].dev->CRB = ctx[tim].mode;
 }
 
-void timer_irq_enable(tim_t tim)
-{
-    *ctx[tim].mask = ctx[tim].isrs;
-}
-
-void timer_irq_disable(tim_t tim)
-{
-    ctx[tim].isrs = *(ctx[tim].mask);
-    *ctx[tim].mask = 0;
-}
-
 #ifdef TIMER_NUMOF
 static inline void _isr(tim_t tim, int chan)
 {

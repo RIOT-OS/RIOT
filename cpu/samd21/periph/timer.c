@@ -121,9 +121,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     config[dev].cb = cb;
     config[dev].arg = arg;
 
-    /* enable interrupts for given timer */
-    timer_irq_enable(dev);
-
     timer_start(dev);
 
     return 0;
@@ -283,42 +280,6 @@ void timer_start(tim_t dev)
 #if TIMER_1_EN
         case TIMER_1:
             TIMER_1_DEV.CTRLA.bit.ENABLE = 1;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
-void timer_irq_enable(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            NVIC_EnableIRQ(TC3_IRQn);
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            NVIC_EnableIRQ(TC4_IRQn);
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
-void timer_irq_disable(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            NVIC_DisableIRQ(TC3_IRQn);
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            NVIC_DisableIRQ(TC4_IRQn);
             break;
 #endif
         case TIMER_UNDEFINED:

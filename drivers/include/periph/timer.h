@@ -166,20 +166,6 @@ void timer_start(tim_t dev);
  */
 void timer_stop(tim_t dev);
 
-/**
- * @brief Enable the interrupts for the given timer
- *
- * @param[in] dev           timer to enable interrupts for
- */
-void timer_irq_enable(tim_t dev);
-
-/**
- * @brief Disable interrupts for the given timer
- *
- * @param[in] dev           the timer to disable interrupts for
- */
-void timer_irq_disable(tim_t dev);
-
 #ifdef __cplusplus
 }
 #endif
