@@ -38,7 +38,7 @@ typedef struct {
     reg32_t EXT_LF_CLK; /**< extern LF clock config */
     reg32_t MODE_CONF_1; /**< mode config 1 */
     reg32_t SIZE_AND_DIS_FLAGS; /**< CCFG size and disable flags */
-    reg32_t MODE_CONF; /**< mmode config 0 */
+    reg32_t MODE_CONF; /**< mode config 0 */
     reg32_t VOLT_LOAD_0; /**< voltage load 0 */
     reg32_t VOLT_LOAD_1; /**< voltage load 1 */
     reg32_t RTC_OFFSET; /**< RTC offset */
