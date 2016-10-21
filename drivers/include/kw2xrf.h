@@ -28,6 +28,7 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "net/gnrc/netdev.h"
+#include "net/ieee802154.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,7 +37,7 @@ extern "C" {
 /**
  * @brief   Maximum packet length
  */
-#define KW2XRF_MAX_PKT_LENGTH         (127U)
+#define KW2XRF_MAX_PKT_LENGTH         (IEEE802154_FRAME_LEN_MAX)
 
 /**
  * @brief   Default protocol for data that is coming in
@@ -60,7 +61,7 @@ extern "C" {
 /**
  * @brief   Default PAN ID used after initialization
  */
-#define KW2XRF_DEFAULT_PANID          (0x0023)
+#define KW2XRF_DEFAULT_PANID          (IEEE802154_DEFAULT_PANID)
 
 /**
  * @brief   Default channel used after initialization
@@ -69,13 +70,13 @@ extern "C" {
 #define KW2XRF_DEFAULT_CHANNEL (DEFAULT_CHANNEL)
 #endif
 #ifndef KW2XRF_DEFAULT_CHANNEL
-#define KW2XRF_DEFAULT_CHANNEL        (26U)
+#define KW2XRF_DEFAULT_CHANNEL        (IEEE802154_DEFAULT_CHANNEL)
 #endif
 
 /**
  * @brief   Default TX_POWER in dbm used after initialization
  */
-#define KW2XRF_DEFAULT_TX_POWER       (0)
+#define KW2XRF_DEFAULT_TX_POWER       (IEEE802154_DEFAULT_TXPOWER)
 
 /**
  * @brief   Maximum output power of the kw2x device in dBm

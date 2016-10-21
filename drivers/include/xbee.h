@@ -67,17 +67,12 @@ extern "C" {
 /**
  * @brief   Default PAN ID used after initialization
  */
-#define XBEE_DEFAULT_PANID          (0x0023)
+#define XBEE_DEFAULT_PANID          (IEEE802154_DEFAULT_PANID)
 
 /**
  * @brief   Default channel used after initialization
  */
-#ifdef DEFAULT_CHANNEL
-#define XBEE_DEFAULT_CHANNEL (DEFAULT_CHANNEL)
-#endif
-#ifndef XBEE_DEFAULT_CHANNEL
-#define XBEE_DEFAULT_CHANNEL        (23U)
-#endif
+#define XBEE_DEFAULT_CHANNEL        (IEEE802154_DEFAULT_CHANNEL)
 
 /**
  * @name    Address flags
