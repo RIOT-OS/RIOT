@@ -1220,10 +1220,14 @@ int _netif_config(int argc, char **argv)
     printf("usage: %s [<if_id>]\n", argv[0]);
     _set_usage(argv[0]);
     _mtu_usage(argv[0]);
+#ifdef MODULE_GNRC_IPV6_NETIF
     _hl_usage(argv[0]);
+#endif
     _flag_usage(argv[0]);
     _add_usage(argv[0]);
     _del_usage(argv[0]);
+#ifdef MODULE_NETSTATS
     _stats_usage(argv[0]);
+#endif
     return 1;
 }
