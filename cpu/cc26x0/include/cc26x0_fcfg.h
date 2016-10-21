@@ -131,6 +131,34 @@ typedef struct {
 
 #define FCFG ((fcfg_regs_t *) (FCFG_BASE)) /**< FCFG register bank */
 
+
+/**
+ * @brief   FCFG register values
+ * @{
+ */
+#define FCFG_MODE_CONF_1_DEVICE_MINOR_REV_MASK              (0x000000FF)
+
+#define FCFG_AMPCOMP_TH1_HPMRAMP1_TH_MASK                   (0x0000003F)
+#define FCFG_AMPCOMP_TH1_IBIASCAP_LPTOHP_OL_CNT_MASK        (0x000003C0)
+#define FCFG_AMPCOMP_TH1_HPMRAMP3_HTH_MASK                  (0x0000FC00)
+#define FCFG_AMPCOMP_TH1_HPMRAMP3_LTH_MASK                  (0x00FC0000)
+
+#define FCFG_AMPCOMP_TH2_ADC_COMP_AMPTH_HPM_MASK            (0x000000FC)
+#define FCFG_AMPCOMP_TH2_ADC_COMP_AMPTH_LPM_MASK            (0x0000FC00)
+#define FCFG_AMPCOMP_TH2_LPMUPDATE_HTM_MASK                 (0x00FC0000)
+#define FCFG_AMPCOMP_TH2_LPMUPDATE_LTH_MASK                 (0xFC000000)
+
+#define FCFG_AMPCOMP_CTRL1_IBIASCAP_HPTOLP_OL_CNT_MASK      (0x0000000F)
+#define FCFG_AMPCOMP_CTRL1_CAP_STEP_MASK                    (0x000000F0)
+#define FCFG_AMPCOMP_CTRL1_LPM_IBIAS_WAIT_CNT_FINAL_MASK    (0x0000FF00)
+#define FCFG_AMPCOMP_CTRL1_IBIAS_INIT_MASK                  (0x000F0000)
+#define FCFG_AMPCOMP_CTRL1_IBIAS_OFFSET_MASK                (0x00F00000)
+#define FCFG_AMPCOMP_CTRL1_AMPCOMP_REQ_MODE                 (0x40000000)
+
+#define FCFG_ANABYPASS_VALUE2_XOSC_HF_IBIASTHERM_MASK       (0x00003FFF)
+/** @} */
+
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
