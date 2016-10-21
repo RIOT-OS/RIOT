@@ -61,6 +61,44 @@ typedef struct {
 
 #define CCFG ((ccfg_regs_t *) (CCFG_BASE + 0xFA8)) /**< CCFG register bank */
 
+/**
+ * @brief   CCFG register values
+ * @{
+ */
+#define CCFG_EXT_LF_CLK_RTC_INCREMENT_MASK              (0x00FFFFFF)
+#define CCFG_EXT_LF_CLK_DIO_MASK                        (0xFF000000)
+
+#define CCFG_MODE_CONF_1_XOSC_MAX_START_MASK            (0x000000FF)
+#define CCFG_MODE_CONF_1_DELTA_IBIAS_OFFSET_MASK        (0x00000F00)
+#define CCFG_MODE_CONF_1_DELTA_IBIAS_INIT_MASK          (0x0000F000)
+#define CCFG_MODE_CONF_1_ALT_DCDC_IPEAK_MASK            (0x00070000)
+#define CCFG_MODE_CONF_1_ALT_DCDC_DITHER_EN             (0x00080000)
+#define CCFG_MODE_CONF_1_ALT_DCDC_VMIN_MASK             (0x00F00000)
+
+#define CCFG_SIZE_AND_DIS_FLAGS_DIS_XOSC_OVR            (0x00000001)
+#define CCFG_SIZE_AND_DIS_FLAGS_DIS_ALT_DCDC_SETTING    (0x00000002)
+#define CCFG_SIZE_AND_DIS_FLAGS_DISABLE_FLAGS_MASK      (0x0000FFFC)
+#define CCFG_SIZE_AND_DIS_FLAGS_SIZE_OF_CCFG_MASK       (0xFFFF0000)
+
+#define CCFG_MODE_CONF_VDDR_CAP_MASK                    (0x000000FF)
+#define CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_MASK         (0x0000FF00)
+#define CCFG_MODE_CONF_HF_COMP                          (0x00010000)
+#define CCFG_MODE_CONF_XOSC_CAP_MOD                     (0x00020000)
+#define CCFG_MODE_CONF_XOSC_FREQ_MASK                   (0x000C0000)
+#define CCFG_MODE_CONF_RTC_COMP                         (0x00100000)
+#define CCFG_MODE_CONF_SCLK_LF_OPTION_MASK              (0x00C00000)
+#define CCFG_MODE_CONF_VDDS_BOD_LEVEL                   (0x01000000)
+#define CCFG_MODE_CONF_VDDR_EXT_LOAD                    (0x02000000)
+#define CCFG_MODE_CONF_DCDC_ACTIVE                      (0x04000000)
+#define CCFG_MODE_CONF_DCDC_RECHARGE                    (0x08000000)
+#define CCFG_MODE_CONF_VDDR_TRIM_SLEEP_DELTA_MASK       (0xF0000000)
+
+#define CCFG_BL_CONFIG_BL_ENABLE_MASK                   (0x000000FF)
+#define CCFG_BL_CONFIG_BL_PIN_NUMBER_MASK               (0x0000FF00)
+#define CCFG_BL_CONFIG_BL_LEVEL                         (0x00010000)
+#define CCFG_BL_CONFIG_BOOTLOADER_ENABLE_MASK           (0xFF000000)
+/** @} */
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
