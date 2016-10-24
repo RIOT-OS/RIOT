@@ -231,7 +231,15 @@ int hwcrypto_cipher_init(hwcrypto_cipher_context_t* context,
 /**
  * @brief   Set an option for the given cipher context.
  *
- * If the given option is not supported by the 
+ * If the given option or value is not supported by the cipher, an error code
+ * is returned.
+ *
+ * This operation may alter the peripheral's state, therefore it should be used
+ * exclusively. A context may become invalid after the peripheral is powered
+ * off and on again.
+ *
+ * The behaviour is undefined if this method is used after one or more 
+ * encryption or decryption round(s).
  *
  * @param[inout] context    initialized cipher context
  * @param[in] option        option to set from @p hwcrypto_opt_t
