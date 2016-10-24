@@ -28,6 +28,6 @@ export INCLUDES += -I$(RIOTBOARD)/msba2-common/include -I$(RIOTBOARD)/msba2-comm
 
 export OFLAGS = -O ihex
 
-export UNDEF += $(BINDIR)cpu/startup.o
+export UNDEF += $(BINDIR)/cpu/startup.o
 
 USEMODULE += msba2-common-drivers

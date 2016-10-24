@@ -9,7 +9,7 @@ MODULE ?= $(shell basename $(CURDIR))
 
 .PHONY: all ${DIRS:%=ALL--%} ${DIRS:%=CLEAN--%}
 
-all: $(BINDIR)$(MODULE).a ..nothing
+all: $(BINDIR)/$(MODULE).a ..nothing
 
 ..nothing:
 	@:
@@ -35,22 +35,22 @@ ifeq ($(strip $(ASSMSRC)),)
     ASSMSRC := $(wildcard *.S)
 endif
 
-OBJC_LTO    := $(SRC:%.c=$(BINDIR)$(MODULE)/%.o)
-OBJC_NOLTO  := $(SRC_NOLTO:%.c=$(BINDIR)$(MODULE)/%.o)
+OBJC_LTO    := $(SRC:%.c=$(BINDIR)/$(MODULE)/%.o)
+OBJC_NOLTO  := $(SRC_NOLTO:%.c=$(BINDIR)/$(MODULE)/%.o)
 OBJC        := $(OBJC_NOLTO) $(OBJC_LTO)
-OBJCXX      := $(SRCXX:%.cpp=$(BINDIR)$(MODULE)/%.o)
-ASMOBJ      := $(ASMSRC:%.s=$(BINDIR)$(MODULE)/%.o)
-ASSMOBJ     := $(ASSMSRC:%.S=$(BINDIR)$(MODULE)/%.o)
+OBJCXX      := $(SRCXX:%.cpp=$(BINDIR)/$(MODULE)/%.o)
+ASMOBJ      := $(ASMSRC:%.s=$(BINDIR)/$(MODULE)/%.o)
+ASSMOBJ     := $(ASSMSRC:%.S=$(BINDIR)/$(MODULE)/%.o)
 
 OBJ := $(OBJC) $(OBJCXX) $(ASMOBJ) $(ASSMOBJ)
 DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
 
-$(BINDIR)$(MODULE)/:
+$(BINDIR)/$(MODULE)/:
 	$(AD)mkdir -p $@
 
-$(BINDIR)$(MODULE).a $(OBJ): | $(BINDIR)$(MODULE)/
+$(BINDIR)/$(MODULE).a $(OBJ): | $(BINDIR)/$(MODULE)/
 
-$(BINDIR)$(MODULE).a: $(OBJ) | ${DIRS:%=ALL--%}
+$(BINDIR)/$(MODULE).a: $(OBJ) | ${DIRS:%=ALL--%}
 	$(AD)$(AR) $(ARFLAGS) $@ $?
 
 
@@ -60,22 +60,22 @@ CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 
 $(OBJC_LTO): CFLAGS+=$(LTOFLAGS)
 
-$(OBJC): $(BINDIR)$(MODULE)/%.o: %.c $(RIOTBUILD_CONFIG_HEADER_C)
+$(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(RIOTBUILD_CONFIG_HEADER_C)
 	$(AD)$(CCACHE) $(CC) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
-$(OBJCXX): $(BINDIR)$(MODULE)/%.o: %.cpp $(RIOTBUILD_CONFIG_HEADER_C)
+$(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.cpp $(RIOTBUILD_CONFIG_HEADER_C)
 	$(AD)$(CCACHE) $(CXX) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CXXFLAGS) $(INCLUDES) $(CXXINCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
-$(ASMOBJ): $(BINDIR)$(MODULE)/%.o: %.s
+$(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
 	$(AD)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
-$(ASSMOBJ): $(BINDIR)$(MODULE)/%.o: %.S
+$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 # pull in dependency info for *existing* .o files

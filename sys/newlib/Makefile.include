@@ -1,4 +1,4 @@
-UNDEF := $(BINDIR)newlib_syscalls_default/syscalls.o $(UNDEF)
+UNDEF := $(BINDIR)/newlib_syscalls_default/syscalls.o $(UNDEF)
 
 ifneq (,$(filter newlib_nano,$(USEMODULE)))
   # Test if nano.specs is available
