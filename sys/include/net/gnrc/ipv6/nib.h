@@ -51,6 +51,77 @@ extern "C" {
 #endif
 
 /**
+ * @{
+ * @brief   Compile flags to (de-)activate certain features for NIB
+ */
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_NBR_SOL
+#define GNRC_IPV6_NIB_DO_HANDLE_NBR_SOL     (1) /**< handling of Neighbor Solicitations */
+#endif
+
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_NBR_ADV
+#define GNRC_IPV6_NIB_DO_HANDLE_NBR_ADV     (1) /**< handling of Neighbor Advertisements */
+#endif
+
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_RTR_SOL
+#define GNRC_IPV6_NIB_DO_HANDLE_RTR_SOL     (0) /**< handling of Router solicitations */
+#endif
+
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_RTR_ADV
+#define GNRC_IPV6_NIB_DO_HANDLE_RTR_ADV     (1) /**< handling of Router Advertisements */
+#endif
+
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_REDIRECT
+#define GNRC_IPV6_NIB_DO_HANDLE_REDIRECT    (0) /**< handling of Redirect Messages */
+#endif
+
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_DAR
+#define GNRC_IPV6_NIB_DO_HANDLE_DAR         (0) /**< handling of Duplicate Address Confirmations */
+#endif
+
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_DAC
+#define GNRC_IPV6_NIB_DO_HANDLE_DAC         (0) /**< handling of Duplicate Address Requests */
+#endif
+
+/**
+ * @brief   Handling of Source Link-layer Address Option
+ */
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_SL2AO
+#define GNRC_IPV6_NIB_DO_HANDLE_SL2AO       (1)
+#endif
+
+/**
+ * @brief   Handling of Target Link-layer Address Option
+ */
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_TL2AO
+#define GNRC_IPV6_NIB_DO_HANDLE_TL2AO       (0)
+#endif
+
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_PIO
+#define GNRC_IPV6_NIB_DO_HANDLE_PIO         (1) /**< handling of Prefix Information Option */
+#endif
+
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_RHO
+#define GNRC_IPV6_NIB_DO_HANDLE_RHO         (0) /**< handling of Redirect Header Option */
+#endif
+
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_MTUO
+#define GNRC_IPV6_NIB_DO_HANDLE_MTUO        (1) /**< handling of MTU Option */
+#endif
+
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_ARO
+#define GNRC_IPV6_NIB_DO_HANDLE_ARO         (0) /**< handling of Address Registration Option */
+#endif
+
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_6CO
+#define GNRC_IPV6_NIB_DO_HANDLE_6CO         (0) /**< handling of 6LoWPAN Context Option */
+#endif
+
+#ifndef GNRC_IPV6_NIB_DO_HANDLE_ABRO
+#define GNRC_IPV6_NIB_DO_HANDLE_ABRO        (0) /**< handling of Authoritive Border Router Option */
+#endif
+/** @} */
+
+/**
  * @brief   States for neighbor unreachability detection
  *
  * @see [RFC 4861, section 7.3.2](https://tools.ietf.org/html/rfc4861#section-7.3.2)
@@ -376,9 +447,13 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_ctx(const gnrc_ipv6_nib_t *prev);
  */
 const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_ctx(const gnrc_ipv6_nib_t *prev);
 
+#if GNRC_IPV6_NIB_DO_HANDLE_NBR_SOL || defined(DOXYGEN)
 /**
  * @brief   Handles a neighbor solicitation message and all its options and adds
  *          to the NIB accordingly
+ *
+ * If @ref GNRC_IPV6_NIB_DO_HANDLE_NBR_SOL is 0 at compile time any incoming
+ * neighbor solicitation will be silently ignored.
  *
  * Additional behavior not specified in RFC: if the link-layer does not have
  * link-layer addresses, a neighbor cache entry is created for ipv6_hdr_t::src
@@ -399,10 +474,18 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_ctx(const gnrc_ipv6_nib_t *prev);
 void gnrc_ipv6_nib_handle_nbr_sol(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
                                   const ndp_nbr_sol_t *nbr_sol,
                                   size_t nbr_sol_len);
+#else   /* GNRC_IPV6_NIB_DO_HANDLE_NBR_SOL */
+/* NOP if neighbor solicitations shouldn't be handled */
+#define gnrc_ipv6_nib_handle_nbr_sol(iface, ipv6_hdr, nbr_sol, nbr_sol_len)
+#endif  /* GNRC_IPV6_NIB_DO_HANDLE_NBR_SOL */
 
+#if GNRC_IPV6_NIB_DO_HANDLE_NBR_ADV || defined(DOXYGEN)
 /**
  * @brief   Handles a neighbor advertisement message and all its options and
  *          adds to the NIB accordingly
+ *
+ * If @ref GNRC_IPV6_NIB_DO_HANDLE_NBR_ADV is 0 at compile time any incoming
+ * neighbor advertisement will be silently ignored.
  *
  * @see [RFC 4861, section 7.1.2](https://tools.ietf.org/html/rfc4861#section-7.1.2)
  * @see [RFC 4861, section 7.2.5](https://tools.ietf.org/html/rfc4861#section-7.2.5)
@@ -417,11 +500,18 @@ void gnrc_ipv6_nib_handle_nbr_sol(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
 void gnrc_ipv6_nib_handle_nbr_adv(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
                                   const ndp_nbr_adv_t *nbr_adv,
                                   size_t nbr_adv_len);
+#else   /* GNRC_IPV6_NIB_DO_HANDLE_NBR_ADV */
+/* NOP if neighbor advertisements shouldn't be handled */
+#define gnrc_ipv6_nib_handle_nbr_adv(iface, ipv6_hdr, nbr_adv, nbr_adv_len)
+#endif  /* GNRC_IPV6_NIB_DO_HANDLE_NBR_ADV */
 
-
+#if GNRC_IPV6_NIB_DO_HANDLE_RTR_SOL || defined(DOXYGEN)
 /**
  * @brief   Handles a router solicitation message and all its options and adds
  *          to the NIB accordingly
+ *
+ * If @ref GNRC_IPV6_NIB_DO_HANDLE_RTR_SOL is 0 at compile time any incoming
+ * router solicitation will be silently ignored.
  *
  * Additional behavior not specified in RFC: if the link-layer does not have
  * link-layer addresses, a neighbor cache entry is created for ipv6_hdr_t::src
@@ -441,10 +531,18 @@ void gnrc_ipv6_nib_handle_nbr_adv(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
 void gnrc_ipv6_nib_handle_rtr_sol(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
                                   const ndp_rtr_sol_t *rtr_sol,
                                   size_t rtr_sol_len);
+#else   /* GNRC_IPV6_NIB_DO_HANDLE_RTR_SOL */
+/* NOP if router solicitations shouldn't be handled */
+#define gnrc_ipv6_nib_handle_rtr_sol(iface, ipv6_hdr, rtr_sol, rtr_sol_len)
+#endif  /* GNRC_IPV6_NIB_DO_HANDLE_RTR_SOL */
 
+#if GNRC_IPV6_NIB_DO_HANDLE_RTR_ADV || defined(DOXYGEN)
 /**
  * @brief   Handles a router advertisement message and all its options and adds
  *          to the NIB accordingly
+ *
+ * If @ref GNRC_IPV6_NIB_DO_HANDLE_RTR_ADV is 0 at compile time any incoming
+ * router advertisement will be silently ignored.
  *
  * Additional behavior not specified in RFC: if the link-layer does not have
  * link-layer addresses, a neighbor cache entry is created for ipv6_hdr_t::src
@@ -466,10 +564,18 @@ void gnrc_ipv6_nib_handle_rtr_sol(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
 void gnrc_ipv6_nib_handle_rtr_adv(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
                                   const ndp_rtr_adv_t *rtr_adv,
                                   size_t rtr_adv_len);
+#else   /* GNRC_IPV6_NIB_DO_HANDLE_RTR_ADV */
+/* NOP if router advertisements shouldn't be handled */
+#define gnrc_ipv6_nib_handle_rtr_adv(iface, ipv6_hdr, rtr_adv, rtr_adv_len)
+#endif  /* GNRC_IPV6_NIB_DO_HANDLE_RTR_ADV */
 
+#if GNRC_IPV6_NIB_DO_HANDLE_REDIRECT || defined(DOXYGEN)
 /**
  * @brief   Handles a redirect message and all its options and adds to the NIB
  *          accordingly
+ *
+ * If @ref GNRC_IPV6_NIB_DO_HANDLE_REDIRECT is 0 at compile time any incoming
+ * redirect message will be silently ignored.
  *
  * Additional behavior not specified in RFC: if the link-layer does not have
  * link-layer addresses, a neighbor cache entry is created for ipv6_hdr_t::src
@@ -488,22 +594,56 @@ void gnrc_ipv6_nib_handle_rtr_adv(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
 void gnrc_ipv6_nib_handle_redirect(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
                                    const ndp_redirect_t *redirect,
                                    size_t redirect_len);
+#else   /* GNRC_IPV6_NIB_DO_HANDLE_REDIRECT */
+/* NOP if redirect messages shouldn't be handled */
+#define gnrc_ipv6_nib_handle_redirect(iface, ipv6_hdr, redirect, redirect_len)
+#endif  /* GNRC_IPV6_NIB_DO_HANDLE_REDIRECT */
 
+#if GNRC_IPV6_NIB_DO_HANDLE_DAR || defined(DOXYGEN)
 /**
- * @brief   Handles a duplicate address message and all its options and adds to
+ * @brief   Handles a duplicate address requests and all its options and adds to
  *          the NIB accordingly
+ *
+ * If @ref GNRC_IPV6_NIB_DO_HANDLE_DAR is 0 at compile time any incoming
+ * duplicate address request will be silently ignored.
  *
  * @see [RFC 6775, section 8.2.1](https://tools.ietf.org/html/rfc6775#section-8.2.1)
  * @see [RFC 6775, section 8.2.4](https://tools.ietf.org/html/rfc6775#section-8.2.4)
+ *
+ * @param[in] iface     Interface the duplicate address request came over.
+ * @param[in] ipv6_hdr  The IPv6 header of the duplicate address request.
+ * @param[in] dar       The duplicate address request to handle.
+ * @param[in] dar_len   Length of @p dar.
+ */
+void gnrc_ipv6_nib_handle_dar(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
+                              const sixlowpan_nd_da_t *dar, size_t dar_len);
+#else   /* GNRC_IPV6_NIB_DO_HANDLE_DAR */
+/* NOP if duplicate address requests shouldn't be handled */
+#define gnrc_ipv6_nib_handle_dar(iface, ipv6_hdr, da, da_len)
+#endif  /* GNRC_IPV6_NIB_DO_HANDLE_DAR */
+
+#if GNRC_IPV6_NIB_DO_HANDLE_DAR || defined(DOXYGEN)
+/**
+ * @brief   Handles a duplicate address confirmation and all its options and adds to
+ *          the NIB accordingly
+ *
+ * If @ref GNRC_IPV6_NIB_DO_HANDLE_DAC is 0 at compile time any incoming
+ * duplicate address request will be silently ignored.
+ *
+ * @see [RFC 6775, section 8.2.1](https://tools.ietf.org/html/rfc6775#section-8.2.1)
  * @see [RFC 6775, section 8.2.5](https://tools.ietf.org/html/rfc6775#section-8.2.5)
  *
- * @param[in] iface     Interface the duplicate address message came over.
- * @param[in] ipv6_hdr  The IPv6 header of the duplicate address message.
- * @param[in] da        The duplicate address message to handle.
- * @param[in] da_len    Length of @p da.
+ * @param[in] iface     Interface the duplicate address confirmation came over.
+ * @param[in] ipv6_hdr  The IPv6 header of the duplicate address confirmation.
+ * @param[in] dac       The duplicate address confirmation to handle.
+ * @param[in] dac_len   Length of @p dac.
  */
-void gnrc_ipv6_nib_handle_da(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
-                             const ndp_redirect_t *da, size_t da_len);
+void gnrc_ipv6_nib_handle_dac(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
+                              const sixlowpan_nd_da_t *dac, size_t dac_len);
+#else   /* GNRC_IPV6_NIB_DO_HANDLE_DAC */
+/* NOP if duplicate address confirmation shouldn't be handled */
+#define gnrc_ipv6_nib_handle_dac(iface, ipv6_hdr, da, da_len)
+#endif  /* GNRC_IPV6_NIB_DO_HANDLE_DAC */
 
 /**
  * @brief   Prints a NIB entry as neighbor cache entry
