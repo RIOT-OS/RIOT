@@ -12,9 +12,14 @@ RIOTMAKE       ?= $(RIOTBASE)/makefiles
 RIOTPKG        ?= $(RIOTBASE)/pkg
 RIOTPROJECT    ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 GITCACHE       ?= $(RIOTBASE)/dist/tools/git/git-cache
+FW_METADATA    ?= $(RIOTBASE)/dist/tools/firmware_metadata
 APPDIR         ?= $(CURDIR)
 BINDIRBASE     ?= $(APPDIR)/bin
+ifdef FW_SLOT
+BINDIR         ?= $(BINDIRBASE)/$(BOARD)/slot$(FW_SLOT)
+else
 BINDIR         ?= $(BINDIRBASE)/$(BOARD)
+endif
 PKGDIRBASE     ?= $(BINDIRBASE)/pkg/$(BOARD)
 
 __DIRECTORY_VARIABLES := \
@@ -41,6 +46,7 @@ override RIOTMAKE       := $(abspath $(RIOTMAKE))
 override RIOTPKG        := $(abspath $(RIOTPKG))
 override RIOTPROJECT    := $(abspath $(RIOTPROJECT))
 override GITCACHE       := $(abspath $(GITCACHE))
+override FW_METADATA    := $(abspath $(FW_METADATA))
 override APPDIR         := $(abspath $(APPDIR))
 override BINDIRBASE     := $(abspath $(BINDIRBASE))
 override BINDIR         := $(abspath $(BINDIR))
@@ -274,12 +280,16 @@ endif
 # the binaries to link
 BASELIBS += $(BINDIR)/${APPLICATION}.a
 BASELIBS += $(APPDEPS)
+BASELIBS += $(SINGLE_SLOT)
 
 .PHONY: all clean flash term doc debug debug-server reset objdump help info-modules
 .PHONY: ..in-docker-container
 
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
+ifdef FW_SLOT
+BINFILE ?= $(ELFFILE:.elf=.bin)
+endif
 
 # variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)
@@ -288,6 +298,17 @@ CPPMIX ?= $(if $(wildcard *.cpp),1,)
 LINKFLAGPREFIX ?= -Wl,
 
 DIRS += $(EXTERNAL_MODULE_DIRS)
+
+# needed for bootloader...
+ifdef FW_SLOT
+TMPBIN          = $(ELFFILE:.elf=.bin)
+SLOTFILE        = $(ELFFILE:.elf=slot$(FW_SLOT).o)
+METADATA_FILE   = $(BINDIR)/$(APPLICATION)-metadata-$(APPID)-$(VERSION).bin
+FW_BINFILE      = $(BINDIR)/$(APPLICATION)-slot$(FW_SLOT)-$(APPID)-$(VERSION).bin
+FW_OBJFILE      = $(BINDIR)/$(APPLICATION)-slot$(FW_SLOT)-$(APPID)-$(VERSION).o
+BOOTLOADER_FILE = $(abspath $(BINDIR)/bootloader-$(APPLICATION).elf)
+HEXFILE         = $(BOOTLOADER_FILE:.elf=.hex)
+endif #FW_SLOT
 
 ifeq ($(BUILD_IN_DOCKER),1)
 all: ..in-docker-container
@@ -303,8 +324,37 @@ else
 endif
 	$(Q)$(SIZE) $(ELFFILE)
 	$(Q)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
+ifdef FW_SLOTS
+	$(Q)$(OBJCOPY) -O binary $(ELFFILE) $(BINFILE)
+endif
 endif
 endif # BUILD_IN_DOCKER
+
+
+ifdef FW_SLOT
+firmware-slot: $(FW_OBJFILE)
+$(FW_OBJFILE): all generate-metadata
+	$(Q)$(OBJCOPY) -O binary $(ELFFILE) $(TMPBIN)
+	$(Q)$(FW_METADATA)/bin/generate-metadata $(TMPBIN) $(VERSION) $(APPID) $(METADATA_FILE)
+	$(Q)srec_cat $(TMPBIN) -binary -offset $(FW_METADATA_SPACE) $(METADATA_FILE) -binary -o $(FW_BINFILE) -binary
+	$(Q)$(FW_METADATA)/bin/generate-metadata $(FW_BINFILE) $(VERSION) $(APPID) $(METADATA_FILE) --with-metadata
+	$(Q)srec_cat $(TMPBIN) -binary -offset $(FW_METADATA_SPACE) $(METADATA_FILE) -binary -o $(FW_BINFILE) -binary
+	$(Q)$(OBJCOPY) --output-target elf32-littlearm --binary-architecture=arm \
+		--change-section-vma .data=$(OFFSET_SLOT_$(FW_SLOT))\
+		--change-section-lma .data=$(OFFSET_SLOT_$(FW_SLOT))\
+		--rename-section .data=.slot.$(FW_SLOT).text         \
+		--input-target binary $(FW_BINFILE) \
+		$(FW_OBJFILE)
+
+bootloader: $(FW_OBJFILE)
+	$(Q)env -i ELFFILE=$(BOOTLOADER_FILE) PATH=$(PATH) \
+		make BOARD=$(BOARD) SINGLE_SLOT=$(FW_OBJFILE) -C $(RIOTBASE)/bootloader all
+
+generate-metadata: $(FW_METADATA)/bin/generate-metadata
+
+$(FW_METADATA)/bin/generate-metadata:
+	$(Q)env -i FW_METADATA_SPACE=$(FW_METADATA_SPACE) make -C $(FW_METADATA)
+endif # FW_SLOT
 
 ..compiler-check:
 	@command -v $(CC) >/dev/null 2>&1 || \
@@ -314,6 +364,13 @@ endif # BUILD_IN_DOCKER
 
 ..build-message:
 	@$(COLOR_ECHO) '${COLOR_GREEN}Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".${COLOR_RESET}'
+
+ifdef FW_SLOT
+	@$(COLOR_ECHO) '${COLOR_PURPLE}This is a build for FW slot $(FW_SLOT).${COLOR_RESET}'
+endif
+ifeq ($(BOOTLOADER),1)
+	@$(COLOR_ECHO) '${COLOR_PURPLE}This is a Bootloader build.${COLOR_RESET}'
+endif
 	@$(COLOR_ECHO)
 
 # add extra include paths for packages in $(USEMODULE)
