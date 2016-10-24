@@ -277,7 +277,9 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
 
         rfcore_write_fifo(vector[i].iov_base, vector[i].iov_len);
     }
-
+    #ifdef MODULE_NETSTATS_L2
+            netdev->stats.tx_bytes += pkt_len;
+    #endif
     /* Set first byte of TX FIFO to the packet length */
     rfcore_poke_tx_fifo(0, pkt_len + CC2538_AUTOCRC_LEN);
 
@@ -323,7 +325,10 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
         /* GNRC is expecting len bytes of data */
         pkt_len = len;
     }
-
+    #ifdef MODULE_NETSTATS_L2
+        netdev->stats.rx_count++;
+        netdev->stats.rx_bytes += pkt_len;
+    #endif
     rfcore_read_fifo(buf, pkt_len);
 
     if (info != NULL && RFCORE->XREG_RSSISTATbits.RSSI_VALID) {
@@ -388,6 +393,9 @@ static int _init(netdev2_t *netdev)
     dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
 #elif MODULE_GNRC
     dev->netdev.proto = GNRC_NETTYPE_UNDEF;
+#endif
+#ifdef MODULE_NETSTATS_L2
+    memset(&netdev->stats, 0, sizeof(netstats_t));
 #endif
 
     return 0;
