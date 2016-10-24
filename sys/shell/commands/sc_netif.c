@@ -73,7 +73,7 @@ static bool _is_iface(kernel_pid_t dev)
     return false;
 }
 
-#if defined(MODULE_NETSTATS)
+#ifdef MODULE_NETSTATS
 const char *_netstats_module_to_str(uint8_t module)
 {
     switch (module) {
@@ -129,7 +129,7 @@ static int _netif_stats(kernel_pid_t dev, unsigned module, bool reset)
     }
     return res;
 }
-#endif
+#endif // MODULE_NETSTATS
 
 static void _set_usage(char *cmd_name)
 {
@@ -160,10 +160,12 @@ static void _mtu_usage(char *cmd_name)
     printf("usage: %s <if_id> mtu <n>\n", cmd_name);
 }
 
+#ifdef MODULE_GNRC_IPV6_NETIF
 static void _hl_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> hl <n>\n", cmd_name);
 }
+#endif
 
 static void _flag_usage(char *cmd_name)
 {
@@ -182,11 +184,13 @@ static void _del_usage(char *cmd_name)
            cmd_name);
 }
 
+#ifdef MODULE_NETSTATS
 static void _stats_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> stats [l2|ipv6] [reset]\n", cmd_name);
     puts("       reset can be only used if the module is specified.");
 }
+#endif
 
 static void _print_netopt(netopt_t opt)
 {
