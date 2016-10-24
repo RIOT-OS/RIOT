@@ -12,6 +12,7 @@ RIOTMAKE       ?= $(RIOTBASE)/makefiles
 RIOTPKG        ?= $(RIOTBASE)/pkg
 RIOTPROJECT    ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 GITCACHE       ?= $(RIOTBASE)/dist/tools/git/git-cache
+FW_METADATA    ?= $(RIOTBASE)/dist/tools/firmware_metadata
 APPDIR         ?= $(CURDIR)
 BINDIRBASE     ?= $(APPDIR)/bin
 BINDIR         ?= $(BINDIRBASE)/$(BOARD)
@@ -41,6 +42,7 @@ override RIOTMAKE       := $(abspath $(RIOTMAKE))
 override RIOTPKG        := $(abspath $(RIOTPKG))
 override RIOTPROJECT    := $(abspath $(RIOTPROJECT))
 override GITCACHE       := $(abspath $(GITCACHE))
+override FW_METADATA    := $(abspath $(FW_METADATA))
 override APPDIR         := $(abspath $(APPDIR))
 override BINDIRBASE     := $(abspath $(BINDIRBASE))
 override BINDIR         := $(abspath $(BINDIR))
@@ -280,6 +282,7 @@ BASELIBS += $(APPDEPS)
 
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
+BINFILE ?= $(ELFFILE:.elf=.bin)
 
 # variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)
@@ -303,8 +306,17 @@ else
 endif
 	$(Q)$(SIZE) $(ELFFILE)
 	$(Q)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
+	$(Q)$(OBJCOPY) -O binary $(ELFFILE) $(BINFILE)
 endif
 endif # BUILD_IN_DOCKER
+
+firmware-metadata: all generate-metadata
+	$(Q)$(FW_METADATA)/bin/generate-metadata $(BINFILE) $(VERSION) $(APPID) $(BINDIR)/firmware-metadata.bin
+
+generate-metadata: $(FW_METADATA)/bin/generate-metadata
+
+$(FW_METADATA)/bin/generate-metadata:
+	$(Q)env -i make -C $(FW_METADATA)
 
 ..compiler-check:
 	@command -v $(CC) >/dev/null 2>&1 || \
