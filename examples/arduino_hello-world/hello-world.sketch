@@ -13,6 +13,15 @@
 #define ARDUINO_LED     (0)
 #endif
 
+// For some boards RIOT defines a macro assigning the required baudrate of the
+// serial link. If this macro is not set, the default baudrate is set to
+// 115200.
+#ifdef UART_STDIO_BAUDRATE
+#define SERIAL_BAUDRATE UART_STDIO_BAUDRATE
+#else
+#define SERIAL_BAUDRATE 115200
+#endif
+
 // Assign the default LED pin
 int ledPin = ARDUINO_LED;
 
@@ -26,8 +35,9 @@ void setup(void)
 {
     // configure the LED pin to be output
     pinMode(ledPin, OUTPUT);
-    // configure the first serial port to run with a baudrate of 115200
-    Serial.begin(115200);
+    // configure the first serial port to run with the previously defined
+    // baudrate
+    Serial.begin(SERIAL_BAUDRATE);
     // say hello
     Serial.println("Hello Arduino!");
 }
