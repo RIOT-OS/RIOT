@@ -36,13 +36,13 @@
  * @brief   Dummy data buffer (don't care about contents). Must be aligned for
  *          performance reasons.
  */
-static uint8_t __attribute__ ((aligned)) data[32];
+static hwcrypto_block_t data[32];
 
 /**
  * @brief   Dummy key (don't care about actual key). Must be aligned for
  *          performance reasons.
  */
-static uint8_t __attribute__ ((aligned)) key[32];
+static hwcrypto_block_t key[32];
 
 /**
  * @brief   Global flag to stop benchmark that is set when alarm is triggered.
@@ -200,7 +200,9 @@ static uint32_t benchmark_hwcrypto_aes128(uint32_t duration)
 
     /* prepare cipher */
     hwcrypto_init();
-    hwcrypto_cipher_init(&context, HWCRYPTO_AES128, key, 16);
+    hwcrypto_cipher_init(&context, HWCRYPTO_AES128);
+    hwcrypto_cipher_set(&context, HWCRYPTO_OPT_MODE, HWCRYPTO_MODE_ECB, sizeof(hwcrypto_mode_t));
+    hwcrypto_cipher_set(&context, HWCRYPTO_OPT_KEY, key, 16);
 
     /* prepare alarm */
     benchmark_start(duration);
@@ -223,7 +225,9 @@ static uint32_t benchmark_hwcrypto_aes256(uint32_t duration)
 
     /* prepare cipher */
     hwcrypto_init();
-    hwcrypto_cipher_init(&context, HWCRYPTO_AES256, key, 32);
+    hwcrypto_cipher_init(&context, HWCRYPTO_AES256);
+    hwcrypto_cipher_set(&context, HWCRYPTO_OPT_MODE, HWCRYPTO_MODE_ECB, sizeof(hwcrypto_mode_t));
+    hwcrypto_cipher_set(&context, HWCRYPTO_OPT_KEY, key, 32);
 
     /* prepare alarm */
     benchmark_start(duration);
