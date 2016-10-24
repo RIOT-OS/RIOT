@@ -17,7 +17,7 @@
  * more operations than the software alternative.
  *
  * This driver provides an abstract for the different ciphers and hashes that
- * may be supported. Using HAVE_HWCRYPTO_xxx defines, software can choose to
+ * may be supported. Using HAVE_HWCRYPTO_xxx defines, software may choose to
  * use the hardware crypto alternative, or fall back to a software variant.
  *
  * Current interface is optimized for (as)symmetric block ciphers and block
@@ -52,13 +52,16 @@ extern "C" {
 /**
  * @brief   Supported ciphers.
  *
- * Define HAVE_HWCRYPTO_xxx in your CPUs periph_cpu.h if needed.
+ * Define HAVE_HWCRYPTO_xxx in your target's periph_cpu.h if needed.
  *
  * Extend at will.
  */
 typedef enum {
 #ifdef HAVE_HWCRYPTO_AES128
     HWCRYPTO_AES128,                  /**< AES128 cipher */
+#endif
+#ifdef HAVE_HWCRYPTO_AES192
+    HWCRYPTO_AES192,                  /**< AES192 cipher */
 #endif
 #ifdef HAVE_HWCRYPTO_AES256
     HWCRYPTO_AES256,                  /**< AES256 cipher */
@@ -81,6 +84,9 @@ typedef enum {
 #ifdef HAVE_HWCRYPTO_RSA2048
     HWCRYPTO_RSA2048,                 /**< RSA2048 cipher */
 #endif
+#ifdef HAVE_HWCRYPTO_RSA4096
+    HWCRYPTO_RSA4096,                 /**< RSA4096 cipher */
+#endif
 #ifdef HAVE_HWCRYPTO_ECC128
     HWCRYPTO_ECC128,                  /**< ECC128 cipher */
 #endif
@@ -90,7 +96,7 @@ typedef enum {
 #ifdef HAVE_HWCRYPTO_ECC256
     HWCRYPTO_ECC256,                  /**< ECC256 cipher */
 #endif
-    HWCRYPT_CIPHER_NULL,
+    HWCRYPT_CIPHER_NUMOF              /**< number of ciphers available */
 } hwcrypto_cipher_t;
 
 /**
@@ -110,11 +116,60 @@ typedef enum {
 #ifdef HAVE_HWCRYPTO_SHA1
     HWCRYPTO_SHA1,                    /**< SHA1 hashing algorithm */
 #endif
-#ifdef HAVE_HWCRYPTO_SHA256
-    HWCRYPTO_SHA256,                  /**< SHA256 hashing algorithm */
+#ifdef HAVE_HWCRYPTO_SHA3
+    HWCRYPTO_SHA3,                    /**< SHA3 hashing algorithm */
 #endif
-    HWCRYPT_HASH_NULL
+#ifdef HAVE_HWCRYPTO_SHA224
+    HWCRYPTO_SHA224,                  /**< SHA224 hashing algorithm */
+#endif
+#ifdef HAVE_HWCRYPTO_SHA384
+    HWCRYPTO_SHA384,                  /**< SHA384 hashing algorithm */
+#endif
+#ifdef HAVE_HWCRYPTO_SHA512
+    HWCRYPTO_SHA512,                  /**< SHA512 hashing algorithm */
+#endif
+    HWCRYPT_HASH_NUMOF                /**< number of hashes available */
 } hwcrypto_hash_t;
+
+/**
+ * @brief   Setup options for cipher and hash methods.
+ *
+ * Extend at will.
+ */
+typedef enum {
+    HWCRYPTO_OPT_KEY,
+    HWCRYPTO_OPT_IV,
+    HWCRYPTO_OPT_COUNTER,
+    HWCRYPTO_OPT_PADDING,
+    HWCRYPTO_OPT_MODE
+} hwcrypto_opt_t;
+
+/**
+ * @brief   Supported cipher modes of operation, to be used with
+ *          @p HWCRYPTO_OPT_MODE.
+ *
+ * Extend at will.
+ */
+typedef enum {
+    HWCRYPTO_MODE_ECB,                /**< electronic codebook mode */
+    HWCRYPTO_MODE_CBC,                /**< cipher block chaining mode */
+    HWCRYPTO_MODE_CFB,                /**< cipher feedback mode */
+    HWCRYPTO_MODE_OFB,                /**< output feedback mode */
+    HWCRYPTO_MODE_CTR                 /**< counter mode */
+} hwcrypto_mode_t;
+
+/**
+ * @brief   Default type for one single byte for blocks of cipher or plain
+ *          data.
+ *
+ * Some crypto devices need aligned blocks, therefore override if needed.
+ *
+ * @{
+ */
+#ifndef HAVE_HWCRYPTO_BLOCK_T
+typedef uint8_t hwcrypto_block_t; /* default to no alignment */
+#endif
+/** @} */
 
 /**
  * @brief   Default cipher context type for ciphers with keys up to 256 bits.
@@ -164,19 +219,33 @@ int hwcrypto_init(void);
  * exclusively. A context may become invalid after the peripheral is powered
  * off and on again.
  *
- * @param[in] context       the timer to initialize
- * @param[in] cipher        requested number of ticks per second
- * @param[in] key           this callback is called in interrupt context, the
- * @param[in] key_size      argument to the callback
+ * @param[inout] context    cipher context to initialize
+ * @param[in] cipher        cipher to initialize
  *
  * @return                  0 on success
  * @return                  -1 if cipher is not supported
- * @return                  -2 if key_size is incorrect
  */
 int hwcrypto_cipher_init(hwcrypto_cipher_context_t* context,
-                         hwcrypto_cipher_t cipher,
-                         const uint8_t* key,
-                         uint32_t key_size);
+                         hwcrypto_cipher_t cipher);
+
+/**
+ * @brief   Set an option for the given cipher context.
+ *
+ * If the given option is not supported by the 
+ *
+ * @param[inout] context    initialized cipher context
+ * @param[in] option        option to set from @p hwcrypto_opt_t
+ * @param[in] value         pointer to option value
+ * @param[in] size          option size
+ *
+ * @return                  0 on success
+ * @return                  -1 if option is not supported or applicable
+ * @return                  -2 if value is not supported or applicable
+ */
+int hwcrypto_cipher_set(hwcrypto_cipher_context_t* context,
+                        hwcrypto_opt_t option,
+                        const void* value,
+                        uint32_t size);
 
 /**
  * @brief   Perform a cipher encrypt operation for an initialized context.
@@ -190,7 +259,7 @@ int hwcrypto_cipher_init(hwcrypto_cipher_context_t* context,
  * exclusively. A context may become invalid after the peripheral is powered
  * off and on again.
  *
- * @param[in] context       initialized cipher context
+ * @param[inout] context    initialized cipher context
  * @param[in] plain_block   the plain input buffer
  * @param[out] cipher_block the cipher output buffer (may overlap plain_block)
  * @param[in] block_size    size of the plain_block and cipher_block in bytes
@@ -200,8 +269,8 @@ int hwcrypto_cipher_init(hwcrypto_cipher_context_t* context,
  * @return                  -2 if block_size is invalid
  */
 int hwcrypto_cipher_encrypt(hwcrypto_cipher_context_t* context,
-                            const uint8_t *plain_block,
-                            uint8_t *cipher_block,
+                            const hwcrypto_block_t *plain_block,
+                            hwcrypto_block_t *cipher_block,
                             uint32_t block_size);
 
 /**
@@ -215,7 +284,7 @@ int hwcrypto_cipher_encrypt(hwcrypto_cipher_context_t* context,
  * This operation may alter the peripheral's state, therefore it should be used
  * exclusively.
  *
- * @param[in] context       initialized cipher context
+ * @param[inout] context    initialized cipher context
  * @param[in] cipher_block  the cipher input buffer
  * @param[out] plain_block  the plain output buffer (may overlap cipher_block)
  * @param[in] block_size    size of the cipher_block and plain_block in bytes
@@ -225,8 +294,8 @@ int hwcrypto_cipher_encrypt(hwcrypto_cipher_context_t* context,
  * @return                  -2 if block_size is invalid
  */
 int hwcrypto_cipher_decrypt(hwcrypto_cipher_context_t* context,
-                            const uint8_t *cipher_block,
-                            uint8_t *plain_block,
+                            const hwcrypto_block_t *cipher_block,
+                            hwcrypto_block_t *plain_block,
                             uint32_t block_size);
 
 /**
@@ -236,7 +305,7 @@ int hwcrypto_cipher_decrypt(hwcrypto_cipher_context_t* context,
  * exclusively. A context may become invalid after the peripheral is powered
  * off and on inbetween.
  *
- * @param[in] context       hash context
+ * @param[inout] context    hash context
  * @param[in] hash          desired hash algorithm
  *
  * @return                  0 on success
@@ -252,7 +321,7 @@ int hwcrypto_hash_init(hwcrypto_hash_context_t* context, hwcrypto_hash_t hash);
  * exclusively. A context may become invalid after the peripheral is powered
  * off and on inbetween.
  *
- * @param[in] context       initialized hash context
+ * @param[inout] context    initialized hash context
  * @param[in] block         block of data to update digest with
  * @param[in] block_size    number of bytes in data block
  *
@@ -262,7 +331,7 @@ int hwcrypto_hash_init(hwcrypto_hash_context_t* context, hwcrypto_hash_t hash);
  * @return                  -3 if digest could not be updated
  */
 int hwcrypto_hash_update(hwcrypto_hash_context_t* context,
-                         const uint8_t* block,
+                         const hwcrypto_block_t* block,
                          uint32_t block_size);
 
 /**
@@ -271,7 +340,7 @@ int hwcrypto_hash_update(hwcrypto_hash_context_t* context,
  * This operation may alter the peripheral's state, therefore it should be used
  * exclusively.
  *
- * @param[in] context       initialized hash context
+ * @param[inout] context    initialized hash context
  * @param[out] cipher       result output buffer
  * @param[in] result_size   number of bytes to copy from digest to result
  *
@@ -279,7 +348,7 @@ int hwcrypto_hash_update(hwcrypto_hash_context_t* context,
  * @return                  -1 if hash is not supported
  */
 int hwcrypto_hash_final(hwcrypto_hash_context_t* context,
-                        uint8_t* result,
+                        hwcrypto_block_t* result,
                         uint32_t result_size);
 
 /**
