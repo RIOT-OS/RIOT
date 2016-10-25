@@ -36,7 +36,7 @@ export OFLAGS =
 endif
 endif
 
-export DEBUGGER = gdb
+export DEBUGGER ?= $(shell command -v $(PREFIX)gdb gdb lldb | head -n 1)
 export TERMPROG ?= $(ELF)
 export FLASHER = true
 export VALGRIND ?= valgrind
@@ -95,7 +95,11 @@ endif
 export TERMFLAGS := $(PORT) $(TERMFLAGS)
 
 export ASFLAGS =
+ifeq ($(shell basename $(DEBUGGER)),lldb)
+export DEBUGGER_FLAGS = -- $(ELF) $(TERMFLAGS)
+else
 export DEBUGGER_FLAGS = -q --args $(ELF) $(TERMFLAGS)
+endif
 term-valgrind: export VALGRIND_FLAGS ?= \
 	--leak-check=full \
 	--track-origins=yes \
