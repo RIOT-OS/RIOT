@@ -29,6 +29,10 @@
 #include "irq.h"
 #include "log.h"
 
+#ifdef MODULE_MPU_STACK_GUARD
+#include "mpu.h"
+#endif
+
 #ifdef MODULE_SCHEDSTATISTICS
 #include "xtimer.h"
 #endif
@@ -114,6 +118,16 @@ int __attribute__((used)) sched_run(void)
     next_thread->status = STATUS_RUNNING;
     sched_active_pid = next_thread->pid;
     sched_active_thread = (volatile thread_t *) next_thread;
+
+#ifdef MODULE_MPU_STACK_GUARD
+    mpu_configure(
+        1,                                                /* MPU region 1 */
+        (uintptr_t)sched_active_thread->stack_start + 31, /* Base Address (rounded up) */
+        MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B)   /* Attributes and Size */
+    );
+
+    mpu_enable();
+#endif
 
     DEBUG("sched_run: done, changed sched_active_thread.\n");
 
