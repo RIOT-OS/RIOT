@@ -148,15 +148,15 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
         at86rf2xx_fb_stop(dev);
         return pkt_len;
     }
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.rx_count++;
-    netdev->stats.rx_bytes += pkt_len;
-#endif
     /* not enough space in buf */
     if (pkt_len > len) {
         at86rf2xx_fb_stop(dev);
         return -ENOBUFS;
     }
+    #ifdef MODULE_NETSTATS_L2
+        netdev->stats.rx_count++;
+        netdev->stats.rx_bytes += pkt_len;
+    #endif
     /* copy payload */
     at86rf2xx_fb_read(dev, (uint8_t *)buf, pkt_len);
 

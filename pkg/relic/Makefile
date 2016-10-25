@@ -11,7 +11,7 @@ endif
 
 all: $(PKG_BUILDDIR)/Makefile
 	"$(MAKE)" -C $(PKG_BUILDDIR) && \
-	cp $(PKG_BUILDDIR)/lib/librelic_s.a $(BINDIR)$(PKG_NAME).a
+	cp $(PKG_BUILDDIR)/lib/librelic_s.a $(BINDIR)/$(PKG_NAME).a
 
 $(PKG_BUILDDIR)/comp-options.cmake: fix_source
 	cd "$(PKG_BUILDDIR)" && perl $(PKG_DIR)/generate-cmake-xcompile.perl > comp-options.cmake
@@ -24,5 +24,5 @@ fix_source: git-download
 	./fix-old-style-definitions.sh $(PKG_BUILDDIR)
 
 clean::
-	@rm -rf $(BINDIR)$(PKG_NAME).a
+	@rm -rf $(BINDIR)/$(PKG_NAME).a
 include $(RIOTBASE)/pkg/pkg.mk

@@ -1,12 +1,10 @@
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
-
 export NATIVEINCLUDES += -DNATIVE_INCLUDES
 export NATIVEINCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/
 export NATIVEINCLUDES += -I$(RIOTBASE)/core/include/
 export NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 
 export CPU = native
-export ELF = $(BINDIR)$(APPLICATION).elf
+export ELF = $(BINDIR)/$(APPLICATION).elf
 
 USEMODULE += native-drivers
 
@@ -174,4 +172,4 @@ eval-gprof:
 eval-cachegrind:
 	$(CGANNOTATE) $(shell ls -rt cachegrind.out* | tail -1)
 
-export UNDEF += $(BINDIR)cpu/startup.o
+export UNDEF += $(BINDIR)/cpu/startup.o

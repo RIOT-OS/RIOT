@@ -1,14 +1,12 @@
+#
+OLD_USEMODULE := $(sort $(USEMODULE))
+OLD_USEPKG := $(sort $(USEPKG))
+
+# include board dependencies
+-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+
 # pull dependencies from drivers
 include $(RIOTBASE)/drivers/Makefile.dep
-
-ifneq (,$(filter libcoap,$(USEPKG)))
-    USEMODULE += posix_sockets
-    USEMODULE += gnrc_conn_udp
-endif
-
-ifneq (,$(filter ccn-lite,$(USEPKG)))
-    export CFLAGS += -DCCNL_RIOT
-endif
 
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
@@ -360,29 +358,6 @@ ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter emb6_conn_udp,$(USEMODULE)))
-  USEMODULE += emb6_sock
-endif
-
-ifneq (,$(filter emb6_%,$(USEMODULE)))
-  USEMODULE += emb6
-endif
-
-ifneq (,$(filter emb6,$(USEMODULE)))
-  USEPKG += emb6
-  USEMODULE += emb6_bsp
-  USEMODULE += emb6_common
-  USEMODULE += emb6_contrib
-  USEMODULE += emb6_ipv6
-  USEMODULE += emb6_ipv6_multicast
-  USEMODULE += emb6_llsec
-  USEMODULE += emb6_mac
-  USEMODULE += emb6_netdev2
-  USEMODULE += emb6_rpl
-  USEMODULE += emb6_sicslowpan
-  USEMODULE += emb6_utils
-endif
-
 ifneq (,$(filter lwip_sixlowpan,$(USEMODULE)))
   USEMODULE += lwip_ipv6_autoconfig
 endif
@@ -560,4 +535,14 @@ ifneq (,$(filter random,$(USEMODULE)))
     ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
         USEMODULE += tinymt32
     endif
+endif
+
+# include package dependencies
+-include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
+
+# recursively catch transitive dependencies
+USEMODULE := $(sort $(USEMODULE))
+USEPKG := $(sort $(USEPKG))
+ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
+    include $(RIOTBASE)/Makefile.dep
 endif

@@ -48,7 +48,7 @@ int main(void)
 #ifdef DEVELHELP
     P(name);
 #endif
-#if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
+#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || defined(MODULE_MPU_STACK_GUARD)
     P(stack_start);
 #endif
 

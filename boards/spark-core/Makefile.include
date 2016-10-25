@@ -2,6 +2,9 @@
 export CPU = stm32f1
 export CPU_MODEL = stm32f103cb
 
+# the spark-core uses its own custom linkerscript...
+export LINKER_SCRIPT = stm32f103cb_sparkcore.ld
+
 # set the default port
 export PORT ?= /dev/ttyUSB0
 

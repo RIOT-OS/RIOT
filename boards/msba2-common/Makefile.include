@@ -23,12 +23,11 @@ ifeq ($(PORT),)
 endif
 export FFLAGS = $(PORT) $(HEXFILE)
 export TERMFLAGS += -tg -p "$(PORT)"
-include $(RIOTBOARD)/msba2-common/Makefile.dep
 
 export INCLUDES += -I$(RIOTBOARD)/msba2-common/include -I$(RIOTBOARD)/msba2-common/drivers/include
 
 export OFLAGS = -O ihex
 
-export UNDEF += $(BINDIR)cpu/startup.o
+export UNDEF += $(BINDIR)/cpu/startup.o
 
 USEMODULE += msba2-common-drivers

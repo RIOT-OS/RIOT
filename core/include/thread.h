@@ -189,7 +189,7 @@ struct _thread {
     msg_t *msg_array;               /**< memory holding messages        */
 #endif
 
-#if defined DEVELHELP || defined(SCHED_TEST_STACK)
+#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || defined(MODULE_MPU_STACK_GUARD)
     char *stack_start;              /**< thread's stack start address   */
 #endif
 #ifdef DEVELHELP

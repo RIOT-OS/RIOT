@@ -55,7 +55,7 @@ LINKFLAGS += -m32 -nostdlib -nostdinc -nostartfiles -nodefaultlibs \
 export CFLAGS += -ffunction-sections -fdata-sections
 export LINKFLAGS += -Wl,--gc-sections
 
-UNDEF += $(BINDIR)x86-multiboot-common/startup.o
+UNDEF += $(BINDIR)/x86-multiboot-common/startup.o
 
 BASELIBS += $(NEWLIB_BASE)/lib/libc.a \
             $(NEWLIB_BASE)/lib/libm.a

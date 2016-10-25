@@ -28,8 +28,13 @@
 #include "cpu.h"
 #include "kernel_init.h"
 #include "board.h"
+#include "mpu.h"
 #include "panic.h"
 #include "vectors_cortexm.h"
+
+#ifndef SRAM_BASE
+#define SRAM_BASE 0
+#endif
 
 /**
  * @brief   Memory markers, defined in the linker script
@@ -47,6 +52,8 @@ extern uint32_t _estack;
 extern uint32_t _sram;
 extern uint32_t _eram;
 /** @} */
+
+static const uintptr_t stack_base = (uintptr_t)&_sstack;
 
 /**
  * @brief   Allocation of the interrupt stack
@@ -93,6 +100,18 @@ void reset_handler_default(void)
     for (dst = &_szero; dst < &_ezero; ) {
         *(dst++) = 0;
     }
+
+#ifdef MODULE_MPU_STACK_GUARD
+    if (stack_base != SRAM_BASE) {
+        mpu_configure(
+            0,                                              /* MPU region 0 */
+            stack_base + 31,                                /* Base Address (rounded up) */
+            MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B) /* Attributes and Size */
+        );
+
+        mpu_enable();
+    }
+#endif
 
     post_startup();
 
