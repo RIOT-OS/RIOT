@@ -61,7 +61,7 @@ static void my_cbor_print(const cbor_stream_t *stream)
     TEST_ASSERT(cbor_serialize_##function_suffix(&stream, input)); \
     CBOR_CHECK_SERIALIZED(stream, data, sizeof(data)); \
     cbor_stream_t tmp = {data, sizeof(data), sizeof(data)}; \
-    TEST_ASSERT(cbor_deserialize_##function_suffix(&tmp, 0, &buffer)); \
+    TEST_ASSERT_EQUAL_INT(sizeof(data), cbor_deserialize_##function_suffix(&tmp, 0, &buffer)); \
     CBOR_CHECK_DESERIALIZED(input, buffer, comparator); \
 } while (0)
 

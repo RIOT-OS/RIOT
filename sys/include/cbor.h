@@ -221,7 +221,7 @@ size_t cbor_serialize_int(cbor_stream_t *stream, int val);
  * @param[in] offset The offset within the stream where to start deserializing
  * @param[out] val   Pointer to destination array
  *
- * @return Number of bytes written into @p val
+ * @return Number of bytes read from @p stream
  */
 size_t cbor_deserialize_int(const cbor_stream_t *stream, size_t offset,
                             int *val);
@@ -243,7 +243,7 @@ size_t cbor_serialize_uint64_t(cbor_stream_t *stream, uint64_t val);
  * @param[in] offset The offset within the stream where to start deserializing
  * @param[out] val   Pointer to destination array
  *
- * @return Number of bytes written into @p val
+ * @return Number of bytes read from @p stream
  */
 size_t cbor_deserialize_uint64_t(const cbor_stream_t *stream, size_t offset,
                                  uint64_t *val);
@@ -265,7 +265,7 @@ size_t cbor_serialize_int64_t(cbor_stream_t *stream, int64_t val);
  * @param[in] offset The offset within the stream where to start deserializing
  * @param[out] val   Pointer to destination array
  *
- * @return Number of bytes written into @p val
+ * @return Number of bytes read from @p stream
  */
 size_t cbor_deserialize_int64_t(const cbor_stream_t *stream, size_t offset,
                                 int64_t *val);
@@ -287,7 +287,7 @@ size_t cbor_serialize_bool(cbor_stream_t *stream, bool val);
  * @param[in] offset The offset within the stream where to start deserializing
  * @param[out] val   Pointer to destination array
  *
- * @return Number of bytes written into @p val
+ * @return Number of bytes read from @p stream
  */
 size_t cbor_deserialize_bool(const cbor_stream_t *stream, size_t offset,
                              bool *val);
@@ -311,7 +311,7 @@ size_t cbor_serialize_float_half(cbor_stream_t *stream, float val);
  * @param[in] offset The offset within the stream where to start deserializing
  * @param[out] val   Pointer to destination array
  *
- * @return Number of bytes written into @p val
+ * @return Number of bytes read from @p stream
  */
 size_t cbor_deserialize_float_half(const cbor_stream_t *stream, size_t offset,
                                    float *val);
@@ -332,7 +332,7 @@ size_t cbor_serialize_float(cbor_stream_t *stream, float val);
  * @param[in] offset The offset within the stream where to start deserializing
  * @param[out] val   Pointer to destination array
  *
- * @return Number of bytes written into @p val
+ * @return Number of bytes read from @p stream
  */
 size_t cbor_deserialize_float(const cbor_stream_t *stream, size_t offset,
                               float *val);
@@ -354,7 +354,7 @@ size_t cbor_serialize_double(cbor_stream_t *stream, double val);
  * @param[in] offset The offset within the stream where to start deserializing
  * @param[out] val   Pointer to destination array
  *
- * @return Number of bytes written into @p val
+ * @return Number of bytes read from @p stream
  */
 size_t cbor_deserialize_double(const cbor_stream_t *stream, size_t offset,
                                double *val);
@@ -389,7 +389,7 @@ size_t cbor_serialize_byte_stringl(cbor_stream_t *stream, const char *val, size_
  * @param[out] val   Pointer to destination array
  * @param[in] length Length of destination array
  *
- * @return Number of bytes written into @p val
+ * @return Number of bytes read from @p stream
  */
 size_t cbor_deserialize_byte_string(const cbor_stream_t *stream, size_t offset,
                                     char *val, size_t length);
@@ -404,7 +404,7 @@ size_t cbor_serialize_unicode_string(cbor_stream_t *stream, const char *val);
  * @param[out] val   Pointer to destination array
  * @param[in] length Length of destination array
  *
- * @return Number of bytes written into @p val
+ * @return Number of bytes read from @p stream
  */
 size_t cbor_deserialize_unicode_string(const cbor_stream_t *stream,
                                        size_t offset, char *val, size_t length);
