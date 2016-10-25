@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_uart periph_gpio
 
-BOARD_INSUFFICIENT_MEMORY := stm32f0discovery weio
+BOARD_INSUFFICIENT_MEMORY := stm32f0discovery weio nucleo-f030
 
 USEMODULE += xbee
 USEMODULE += gnrc_netif
