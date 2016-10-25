@@ -31,7 +31,8 @@ static char nomac_stack[THREAD_STACKSIZE_DEFAULT];
 int main(void)
 {
     gnrc_netdev_t dev;
-    gnrc_netreg_entry_t netobj;
+    gnrc_netreg_entry_t netobj = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                            gnrc_pktdump_pid);
 
     puts("\nManual test for the minimal NRF51822 radio driver\n");
     puts("Use the 'ifconfig' and 'txtsnd' shell commands to verify the driver");
@@ -41,8 +42,6 @@ int main(void)
     gnrc_nomac_init(nomac_stack, sizeof(nomac_stack), 5, "nomac", &dev);
 
     /* initialize packet dumper */
-    netobj.pid = gnrc_pktdump_pid;
-    netobj.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &netobj);
 
     /* initialize and run the shell */

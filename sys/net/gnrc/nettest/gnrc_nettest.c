@@ -111,7 +111,8 @@ gnrc_nettest_res_t gnrc_nettest_send(kernel_pid_t pid, gnrc_pktsnip_t *in,
                                      const gnrc_pktsnip_t **exp_out,
                                      gnrc_nettype_t exp_type, uint32_t exp_demux_ctx)
 {
-    gnrc_netreg_entry_t reg_entry = { NULL, exp_demux_ctx, thread_getpid() };
+    gnrc_netreg_entry_t reg_entry = GNRC_NETREG_ENTRY_INIT_PID(exp_demux_ctx,
+                                                               sched_active_pid);
     gnrc_nettest_res_t res;
 
     gnrc_netreg_register(exp_type, &reg_entry);
@@ -147,7 +148,8 @@ gnrc_nettest_res_t gnrc_nettest_receive(kernel_pid_t pid, gnrc_pktsnip_t *in,
                                         const gnrc_pktsnip_t **exp_out,
                                         gnrc_nettype_t exp_type, uint32_t exp_demux_ctx)
 {
-    gnrc_netreg_entry_t reg_entry = { NULL, exp_demux_ctx, thread_getpid() };
+    gnrc_netreg_entry_t reg_entry = GNRC_NETREG_ENTRY_INIT_PID(exp_demux_ctx,
+                                                               sched_active_pid);
     gnrc_nettest_res_t res;
 
     gnrc_netreg_register(exp_type, &reg_entry);

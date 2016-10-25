@@ -66,10 +66,9 @@
  *     static msg_t _msg_q[Q_SZ];
  *     (void)arg;
  *     msg_init_queue(_msg_q, Q_SZ);
- *     gnrc_netreg_entry me_reg = {
- *             .demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL,
- *             .pid = thread_getpid()
- *         };
+ *     gnrc_netreg_entry me_reg = GNRC_NETREG_ENTRY_INIT_PID(
+ *                                      GNRC_NETREG_DEMUX_CTX_ALL,
+ *                                      sched_active_pid);
  *     gnrc_netreg_register(GNRC_NETTYPE_IPV6, &me_reg);
  *     while (1) {
  *         msg_receive(&msg);

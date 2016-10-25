@@ -123,10 +123,10 @@ static void _send_packet(void)
         0x00, 0x00, 0x00, 0x00,
     };
 
-    gnrc_netreg_entry_t dump_6lowpan = { NULL, GNRC_NETREG_DEMUX_CTX_ALL, gnrc_pktdump_pid };
-    gnrc_netreg_entry_t dump_ipv6 = { NULL, GNRC_NETREG_DEMUX_CTX_ALL, gnrc_pktdump_pid };
-    gnrc_netreg_entry_t dump_udp = { NULL, GNRC_NETREG_DEMUX_CTX_ALL, gnrc_pktdump_pid };
-    gnrc_netreg_entry_t dump_udp_61616 = { NULL, 61616, gnrc_pktdump_pid };
+    gnrc_netreg_entry_t dump_6lowpan = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL, gnrc_pktdump_pid);
+    gnrc_netreg_entry_t dump_ipv6 = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL, gnrc_pktdump_pid);
+    gnrc_netreg_entry_t dump_udp = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL, gnrc_pktdump_pid);
+    gnrc_netreg_entry_t dump_udp_61616 = GNRC_NETREG_ENTRY_INIT_PID(61616, gnrc_pktdump_pid);
 
     gnrc_netreg_register(GNRC_NETTYPE_SIXLOWPAN, &dump_6lowpan);
     gnrc_netreg_register(GNRC_NETTYPE_IPV6, &dump_ipv6);
