@@ -1,0 +1,31 @@
+FEATURES_REQUIRED += periph_spi periph_gpio
+
+BOARD_INSUFFICIENT_MEMORY += msb-430h nucleo-f334 stm32f0discovery weio z1
+
+USEMODULE += enc28j60
+USEMODULE += gnrc_netdev2
+USEMODULE += gnrc_netdev_default
+USEMODULE += auto_init_gnrc_netif
+USEMODULE += gnrc_ipv6_router_default
+
+# set board specific peripheral configurations
+ifneq (,$(filter stm32f4discovery,$(BOARD)))
+  ENC28_SPI ?= SPI_1
+  ENC28_CS  ?= GPIO_PIN\(PORT_B,12\)
+  ENC28_INT ?= GPIO_PIN\(PORT_B,11\)
+  ENC28_RST ?= GPIO_PIN\(PORT_B,10\)
+endif
+
+# fallback: set SPI bus and pins to default values
+ENC28_SPI ?= SPI_0
+ENC28_CS  ?= GPIO_PIN\(0,0\)
+ENC28_INT ?= GPIO_PIN\(0,1\)
+ENC28_RST ?= GPIO_PIN\(0,2\)
+
+# export SPI and pins
+CFLAGS += -DENC28J60_PARAM_SPI=$(ENC28_SPI)
+CFLAGS += -DENC28J60_PARAM_CS=$(ENC28_CS)
+CFLAGS += -DENC28J60_PARAM_INT=$(ENC28_INT)
+CFLAGS += -DENC28J60_PARAM_RESET=$(ENC28_RST)
+
+DRIVERS += x
