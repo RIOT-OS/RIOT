@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2016 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Register definition for the MMA8652 accelerometer driver.
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
+ * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  *
  */
 
@@ -25,6 +27,8 @@
 extern "C"
 {
 #endif
+
+#include "mma8652.h"
 
 #define MMA8652_STATUS              0x00 /**< Data or FIFO Status */
 #define MMA8652_OUT_X_MSB           0x01 /**< [7:0] are 8 MSBs of X data */
@@ -103,6 +107,7 @@ extern "C"
 #define MMA8652_SYSMOD_FGT_MASK             0x7C
 #define MMA8652_SYSMOD_FGERR                (1 << 7)
 
+#define MMA8652_INT_SOURCE_NONE             (0)
 #define MMA8652_INT_SOURCE_DRDY             (1 << 0)
 #define MMA8652_INT_SOURCE_FF_MT            (1 << 2)
 #define MMA8652_INT_SOURCE_PULSE            (1 << 3)
@@ -246,7 +251,14 @@ extern "C"
 /**
  * @brief Device ID
  */
-#define MMA8652_ID          0x4A
+static const uint8_t mma8x5x_device_id[MMA8x5x_TYPE_MAX] =
+{
+    0x4A, /* MMA8652_ID */
+    0x5A, /* MMA8653_ID */
+    0x1A, /* MMA8451_ID */
+    0x2A, /* MMA8452_ID */
+    0x3A, /* MMA8453_ID */
+};
 
 #ifdef __cplusplus
 }
