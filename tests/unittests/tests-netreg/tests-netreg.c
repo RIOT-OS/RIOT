@@ -45,7 +45,7 @@ static void test_netreg_register__success(void)
     TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
     TEST_ASSERT_NOT_NULL((res = gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16)));
     TEST_ASSERT_EQUAL_INT(TEST_UINT16, res->demux_ctx);
-    TEST_ASSERT_EQUAL_INT(TEST_UINT8, res->pid);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT8, res->target.pid);
     TEST_ASSERT_NULL((gnrc_netreg_getnext(res)));
 }
 
@@ -66,7 +66,7 @@ void test_netreg_unregister__success2(void)
     gnrc_netreg_unregister(GNRC_NETTYPE_TEST, &entries[0]);
     TEST_ASSERT_NOT_NULL((res = gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16)));
     TEST_ASSERT_EQUAL_INT(TEST_UINT16, res->demux_ctx);
-    TEST_ASSERT_EQUAL_INT(TEST_UINT8 + 1, res->pid);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT8 + 1, res->target.pid);
     gnrc_netreg_unregister(GNRC_NETTYPE_TEST, &entries[1]);
     TEST_ASSERT_NULL(gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16));
 }
@@ -80,7 +80,7 @@ void test_netreg_unregister__success3(void)
     gnrc_netreg_unregister(GNRC_NETTYPE_TEST, &entries[1]);
     TEST_ASSERT_NOT_NULL((res = gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16)));
     TEST_ASSERT_EQUAL_INT(TEST_UINT16, res->demux_ctx);
-    TEST_ASSERT_EQUAL_INT(TEST_UINT8, res->pid);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT8, res->target.pid);
     gnrc_netreg_unregister(GNRC_NETTYPE_TEST, &entries[0]);
     TEST_ASSERT_NULL(gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16));
 }

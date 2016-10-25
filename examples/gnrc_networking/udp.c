@@ -94,7 +94,7 @@ static void start_server(char *port_str)
     uint16_t port;
 
     /* check if server is already running */
-    if (server.pid != KERNEL_PID_UNDEF) {
+    if (server.target.pid != KERNEL_PID_UNDEF) {
         printf("Error: server already running on port %" PRIu32 "\n",
                server.demux_ctx);
         return;
@@ -106,7 +106,7 @@ static void start_server(char *port_str)
         return;
     }
     /* start server (which means registering pktdump for the chosen port) */
-    server.pid = gnrc_pktdump_pid;
+    server.target.pid = gnrc_pktdump_pid;
     server.demux_ctx = (uint32_t)port;
     gnrc_netreg_register(GNRC_NETTYPE_UDP, &server);
     printf("Success: started UDP server on port %" PRIu16 "\n", port);
@@ -115,13 +115,13 @@ static void start_server(char *port_str)
 static void stop_server(void)
 {
     /* check if server is running at all */
-    if (server.pid == KERNEL_PID_UNDEF) {
+    if (server.target.pid == KERNEL_PID_UNDEF) {
         printf("Error: server was not running\n");
         return;
     }
     /* stop server */
     gnrc_netreg_unregister(GNRC_NETTYPE_UDP, &server);
-    server.pid = KERNEL_PID_UNDEF;
+    server.target.pid = KERNEL_PID_UNDEF;
     puts("Success: stopped UDP server");
 }
 
