@@ -20,8 +20,8 @@
  * @author      Simon Brummer <brummer.simon@googlemail.com>
  */
 
-#ifndef __COLOR_H
-#define __COLOR_H
+#ifndef COLOR_H
+#define COLOR_H
 
 #include <stdint.h>
 
@@ -137,5 +137,5 @@ void color_rgb_complementary(const color_rgb_t *rgb, color_rgb_t *comp_rgb);
 }
 #endif
 
-#endif /* __COLOR_H */
+#endif /* COLOR_H */
 /** @} */

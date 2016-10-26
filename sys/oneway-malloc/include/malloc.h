@@ -27,8 +27,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef __MALLOC_H
-#define __MALLOC_H
+#ifndef MALLOC_H
+#define MALLOC_H
 
 #include <stdlib.h>
 
@@ -77,7 +77,7 @@ void free(void *ptr);
 }
 #endif
 
-#endif /* __MALLOC_H */
+#endif /* MALLOC_H */
 
 /**
  * @}

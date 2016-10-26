@@ -18,8 +18,8 @@
  * @brief       Utility library for comparing and computing timestamps
  */
 
-#ifndef __TIMEX_H
-#define __TIMEX_H
+#ifndef TIMEX_H
+#define TIMEX_H
 
 #include <stdint.h>
 #include <inttypes.h>
@@ -184,4 +184,4 @@ const char *timex_to_str(timex_t t, char *timestamp);
 #endif
 
 /** @} */
-#endif /* __TIMEX_H */
+#endif /* TIMEX_H */
