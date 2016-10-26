@@ -140,12 +140,20 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
             LOG_INFO("Initialize broadcasting\n");
             lwmac_set_timeout(lwmac, TIMEOUT_BROADCAST_END, LWMAC_BROADCAST_DURATION_US);
 
+            gnrc_pktsnip_t* pkt_payload;
+
             /* Prepare packet with LwMAC header*/
             lwmac_frame_broadcast_t hdr = {};
             hdr.header.type = FRAMETYPE_BROADCAST;
             hdr.seq_nr = lwmac->tx.bcast_seqnr++;
 
+            pkt_payload = pkt->next;
             pkt->next = gnrc_pktbuf_add(pkt->next, &hdr, sizeof(hdr), GNRC_NETTYPE_LWMAC);
+            if(pkt->next == NULL) {
+                LOG_ERROR("Cannot allocate pktbuf of type FRAMETYPE_BROADCAST\n");
+                lwmac->tx.packet->next = pkt_payload;
+                GOTO_TX_STATE(TX_STATE_FAILED, true);
+            }
 
             /* No Auto-ACK for broadcast packets */
             netopt_enable_t autoack = NETOPT_DISABLE;
@@ -159,7 +167,11 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
             /* Don't let the packet be released yet, we want to send it again */
             gnrc_pktbuf_hold(pkt, 1);
 
-			lwmac->netdev->send(lwmac->netdev, pkt);
+            int res = lwmac->netdev->send(lwmac->netdev, pkt);
+            if(res < 0){
+                LOG_ERROR("Send broadcast pkt failed.");
+                GOTO_TX_STATE(TX_STATE_FAILED, true);
+            }
             _set_netdev_state(lwmac, NETOPT_STATE_TX);
 
             lwmac_set_timeout(lwmac, TIMEOUT_NEXT_BROADCAST, LWMAC_TIME_BETWEEN_BROADCAST_US);
@@ -173,6 +185,7 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         LOG_DEBUG("TX_STATE_SEND_WR\n");
 
         gnrc_pktsnip_t* pkt;
+        gnrc_pktsnip_t* pkt_lwmac;
         gnrc_netif_hdr_t *nethdr;
         uint8_t* dst_addr = NULL;
         int addr_len;
@@ -194,9 +207,13 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
             GOTO_TX_STATE(TX_STATE_FAILED, true);
         }
 
+        /* track the location of this lwmac_frame_wr_t header */
+        pkt_lwmac = pkt;
+
         pkt = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_netif_hdr_t) + addr_len, GNRC_NETTYPE_NETIF);
         if(pkt == NULL) {
             LOG_ERROR("Cannot allocate pktbuf of type GNRC_NETTYPE_NETIF\n");
+            gnrc_pktbuf_release(pkt_lwmac);
             GOTO_TX_STATE(TX_STATE_FAILED, true);
         }
 
@@ -214,7 +231,14 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
 
         /* Prepare WR, this will discard any frame in the transceiver that has
          * possibly arrived in the meantime but we don't care at this point. */
-		lwmac->netdev->send(lwmac->netdev, pkt);
+        int res = lwmac->netdev->send(lwmac->netdev, pkt);
+        if(res < 0){
+            LOG_ERROR("Send WR failed.");
+            if(pkt != NULL){
+                gnrc_pktbuf_release(pkt);
+            }
+            GOTO_TX_STATE(TX_STATE_FAILED, true);
+        }
 
         /* First WR, try to catch wakeup phase */
         if(lwmac->tx.wr_sent == 0) {
@@ -392,6 +416,7 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         LOG_DEBUG("TX_STATE_SEND_DATA\n");
 
         gnrc_pktsnip_t* pkt = lwmac->tx.packet;
+        gnrc_pktsnip_t* pkt_payload;
 
         /* Enable Auto ACK again */
         netopt_enable_t autoack = NETOPT_ENABLE;
@@ -405,12 +430,23 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         netopt_enable_t csma_enable = NETOPT_ENABLE;
 		lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_CSMA, &csma_enable, sizeof(csma_enable));
 
+        pkt_payload = pkt->next;
+
         /* Insert lwMAC header above NETIF header */
         lwmac_hdr_t hdr = {FRAMETYPE_DATA};
         pkt->next = gnrc_pktbuf_add(pkt->next, &hdr, sizeof(hdr), GNRC_NETTYPE_LWMAC);
+        if(pkt->next == NULL){
+            LOG_ERROR("Cannot allocate pktbuf of type FRAMETYPE_DATA\n");
+            lwmac->tx.packet->next = pkt_payload;
+            GOTO_TX_STATE(TX_STATE_FAILED, true);
+        }
 
         /* Send data */
-		lwmac->netdev->send(lwmac->netdev, pkt);
+        int res = lwmac->netdev->send(lwmac->netdev, pkt);
+        if(res < 0){
+            LOG_ERROR("Send data failed.");
+            GOTO_TX_STATE(TX_STATE_FAILED, true);
+        }
         _set_netdev_state(lwmac, NETOPT_STATE_TX);
 
         /* Packet has been released by netdev, so drop pointer */
