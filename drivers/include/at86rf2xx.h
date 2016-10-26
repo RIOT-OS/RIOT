@@ -30,6 +30,7 @@
 #define AT86RF2XX_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "board.h"
 #include "periph/spi.h"
