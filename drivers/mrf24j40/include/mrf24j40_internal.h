@@ -34,6 +34,7 @@ void mrf24j40_init(mrf24j40_t *dev);
  *
  * @return the value of the specified register
  */
+
 uint8_t mrf24j40_reg_read_short(mrf24j40_t *dev, const uint8_t addr);
 
 /**
@@ -43,8 +44,8 @@ uint8_t mrf24j40_reg_read_short(mrf24j40_t *dev, const uint8_t addr);
  * @param[in] addr address of the register to write
  * @param[in] value value to write to the given register
  */
-void mrf24j40_reg_write_short(mrf24j40_t *dev, const uint8_t addr, const uint8_t value);
 
+void mrf24j40_reg_write_short(mrf24j40_t *dev, const uint8_t addr, const uint8_t value);
 /**
  * @brief Read from a register with a  at address `addr` from device `dev`. Register with 10bit address
  *
@@ -53,6 +54,7 @@ void mrf24j40_reg_write_short(mrf24j40_t *dev, const uint8_t addr, const uint8_t
  *
  * @return the value of the specified register
  */
+
 uint8_t mrf24j40_reg_read_long(mrf24j40_t *dev, const uint16_t addr);
 
 /**
@@ -62,7 +64,9 @@ uint8_t mrf24j40_reg_read_long(mrf24j40_t *dev, const uint16_t addr);
  * @param[in] addr address of the register to write
  * @param[in] value value to write to the given register
  */
+
 void mrf24j40_reg_write_long(mrf24j40_t *dev, const uint16_t addr, const uint8_t value);
+
 
 /**
  * @brief   Convenience function for reading the status of the given device
@@ -72,6 +76,7 @@ void mrf24j40_reg_write_long(mrf24j40_t *dev, const uint16_t addr, const uint8_t
  * @return              internal status of the given device
  */
 uint8_t mrf24j40_get_status(mrf24j40_t *dev);
+
 
 /**
  * @brief   Read a chunk of data from the TX Normal FIFO area of the given device
@@ -113,6 +118,7 @@ void mrf24j40_rx_fifo_read(mrf24j40_t *dev, const uint16_t offset, uint8_t *data
  */
 void mrf24j40_rx_fifo_write(mrf24j40_t *dev, const uint16_t offset, const uint8_t *data, const size_t len);
 
+
 /**
  * @brief   Convenience function for reading the status of the given device
  *
@@ -122,12 +128,14 @@ void mrf24j40_rx_fifo_write(mrf24j40_t *dev, const uint16_t offset, const uint8_
  */
 uint8_t mrf24j40_get_status(mrf24j40_t *dev);
 
+
 /**
  * @brief   Wake up from sleep mode
  *
  * @param[in] dev       device to eventually wake up
  */
 void mrf24j40_assert_awake(mrf24j40_t *dev);
+
 
 /**
  * @brief   Set device to sleep mode
@@ -136,6 +144,7 @@ void mrf24j40_assert_awake(mrf24j40_t *dev);
  */
 void mrf24j40_assert_sleep(mrf24j40_t *dev);
 
+
 /**
  * @brief   Trigger a hardware reset
  *
@@ -143,12 +152,22 @@ void mrf24j40_assert_sleep(mrf24j40_t *dev);
  */
 void mrf24j40_hardware_reset(mrf24j40_t *dev);
 
+
 /**
  * @brief   Test routine to test FIFO values
  *
  * @param[in] dev
  */
 void mrf24j40_print_tx_norm_buf(mrf24j40_t *dev);
+
+
+/**
+ * @brief   Test routine to test FIFO values
+ *
+ * @param[in] dev
+ */
+void mrf24j40_print_rx_buf(mrf24j40_t *dev);
+
 
 /**
  * @brief   Set PHY parameters based on channel and page number

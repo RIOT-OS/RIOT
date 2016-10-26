@@ -94,7 +94,7 @@ static int _init(netdev2_t *netdev)
 
 static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
 {
-    uint8_t tmp;
+//	uint8_t tmp;
 
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
     const struct iovec *ptr = vector;
@@ -111,15 +111,17 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
             return -EOVERFLOW;
         }
 
-
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.tx_bytes += len;
 #endif
         len = mrf24j40_tx_load(dev, ptr->iov_base, ptr->iov_len, len);
+        if (i == 0) {
+            dev->header_len = len;
+        }
+
     }
 
     /* send data out directly if pre-loading is disabled */
-    tmp = (!(dev->netdev.flags & MRF24J40_OPT_PRELOADING));
     if (!(dev->netdev.flags & MRF24J40_OPT_PRELOADING)) {
         mrf24j40_tx_exec(dev);
     }
@@ -134,6 +136,8 @@ static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
     uint8_t phr;
     size_t pkt_len;
+    uint16_t lqi_offset;
+    uint16_t rssi_offset;
 
     /* Turn off reception of packets off the air. This prevents the
      * device from overwriting the buffer while we're reading it.
@@ -161,19 +165,19 @@ static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
         return -ENOBUFS;
     }
     /* copy payload */
-    mrf24j40_rx_fifo_read(dev, 0, (uint8_t *)buf, pkt_len);
-
-    /* Ignore FCS but advance read */
-    mrf24j40_rx_fifo_read(dev, 0, NULL, 2);
+    mrf24j40_rx_fifo_read(dev, 1, (uint8_t *)buf, pkt_len);
 
     if (info != NULL) {
         netdev2_ieee802154_rx_info_t *radio_info = info;
-        mrf24j40_rx_fifo_read(dev, 0, &(radio_info->lqi), 1);
+        lqi_offset = 1 + phr;
+        rssi_offset = 1 + phr + 1;
 
-        mrf24j40_rx_fifo_read(dev, 0, &(radio_info->rssi), 1);
+        mrf24j40_rx_fifo_read(dev, lqi_offset, &(radio_info->lqi), 1);
+        mrf24j40_rx_fifo_read(dev, rssi_offset, &(radio_info->rssi), 1);
     }
-    else {
-    }
+
+    /* Reset FIFO Pointer */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_RXFLUSH, 0x01);
 
     /* Turn on reception of packets off the air */
     bbreg1 = mrf24j40_reg_read_short(dev, MRF24J40_REG_BBREG1);
@@ -182,6 +186,7 @@ static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
 
     return pkt_len;
 }
+
 
 static int _set_state(mrf24j40_t *dev, netopt_state_t state)
 {
@@ -585,43 +590,25 @@ static void _isr(netdev2_t *netdev)
     uint8_t txstat;
     uint8_t state;
 
-//    uint8_t tmp;
-
     /* Disable IRQs */
     mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0xff);
 
-    /* If transceiver is sleeping register access is impossible and frames are
-     * lost anyway, so return immediately.
-     */
+    /* read interrupt status register */
+    intstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);   /* Interrupt status */
+    txstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT);
+
     state = mrf24j40_get_status(dev);
+
     if (state == MRF24J40_PSEUDO_STATE_SLEEP) {
         /* re-enable IRQs */
         mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0b11110110);
         return;
     }
 
-    /* read (consume) device status */
-    intstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);   /* Interrupt status */
+    /* TRANSMIT INTERRUPT OCCURED */
     if (intstat & MRF24J40_INTSTAT_MASK__TXNIF) {
-    }
-    if (intstat & MRF24J40_INTSTAT_MASK__RXIF) {
-    }
+        if (state == MRF24J40_PSEUDO_STATE_TX_ARET_ON || state == MRF24J40_PSEUDO_STATE_BUSY_TX_ARET) {
 
-    state = mrf24j40_get_status(dev);                               /* radio chip status */
-
-    /* equal to AT86RF2XX-TRX_END - Send or Receive Interrupt*/
-    if ((intstat & MRF24J40_INTSTAT_MASK__RXIF) || (intstat & MRF24J40_INTSTAT_MASK__TXNIF)) {
-        if (state == MRF24J40_PSEUDO_STATE_RX_AACK_ON ||
-            state == MRF24J40_PSEUDO_STATE_BUSY_RX_AACK) {
-            DEBUG("[mrf24j40] EVT - RX_END\n");
-            if (!(dev->netdev.flags & MRF24J40_OPT_TELL_RX_END)) {
-                return;
-            }
-            netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
-        }
-
-        else if (state == MRF24J40_PSEUDO_STATE_TX_ARET_ON ||
-                 state == MRF24J40_PSEUDO_STATE_BUSY_TX_ARET) {
             /* check for more pending TX calls and return to idle state if
              * there are none */
             assert(dev->pending_tx != 0);
@@ -632,19 +619,21 @@ static void _isr(netdev2_t *netdev)
 
             DEBUG("[mrf24j40] EVT - TX_END\n");
             if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END)) {
-                txstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT);
 
                 /* transmision failed */
                 if (txstat & MRF24J40_TXSTAT_MASK__TXNSTAT) {
                     /* TX_NOACK - CCAFAIL */
-                    if (txstat & MRF24J40_TXSTAT_MASK__CCAFAIL) {
+//                  if (txstat & MRF24J40_TXSTAT_MASK__CCAFAIL)
+                    if (txstat & 0x21) {
                         netdev->event_callback(netdev, NETDEV2_EVENT_TX_MEDIUM_BUSY);
                         DEBUG("[mrf24j40] TX_CHANNEL_ACCESS_FAILURE\n");
+                        mrf24j40_reset(dev);    /* workaround I don't know how to reset TXNRETRY and CCAFAIL */
                     }
                     /* check max retries */
-                    else if (txstat & 0xc0) {
+                    else if (txstat & 0xc1) {
                         netdev->event_callback(netdev, NETDEV2_EVENT_TX_NOACK);
                         DEBUG("[mrf24j40] TX NO_ACK\n");
+                        mrf24j40_reset(dev);    /* workaround I don't know how to reset TXNRETRY and CCAFAIL */
                     }
                 }
                 else {
@@ -652,7 +641,27 @@ static void _isr(netdev2_t *netdev)
                 }
             }
         }
+        else {
+            if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END)) {
+                netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE);
+            }
+        }
     }
+
+    /*****RECEIVE INTERRUPT OCCURED*****/
+    if (intstat & MRF24J40_INTSTAT_MASK__RXIF) {
+        if (state == MRF24J40_PSEUDO_STATE_RX_AACK_ON || state == MRF24J40_PSEUDO_STATE_BUSY_RX_AACK) {
+            DEBUG("[mrf24j40] EVT - RX_END\n");
+            if (!(dev->netdev.flags & MRF24J40_OPT_TELL_RX_END)) {
+                /* re-enable IRQs */
+                mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0b11110110);
+                return;
+            }
+            netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
+        }
+    } // end of RXIF check
+
+
     /* Enable IRQs */
     mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0b11110110);
 }

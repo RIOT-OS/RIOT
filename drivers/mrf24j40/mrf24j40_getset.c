@@ -72,6 +72,7 @@ static const uint8_t dbm_to_tx_pow[] = { 0xf8, 0xf0, 0xe8, 0xe0, 0xd8, 0xd0, 0xc
                                          0x78, 0x70, 0x68, 0x60, 0x58, 0x50, 0x48, 0x40,
                                          0x38, 0x30, 0x28, 0x20, 0x18, 0x10, 0x08, 0x00 };
 
+
 uint16_t mrf24j40_get_addr_short(mrf24j40_t *dev)
 {
     return (dev->netdev.short_addr[0] << 8) | dev->netdev.short_addr[1];
@@ -193,12 +194,7 @@ void mrf24j40_set_chan(mrf24j40_t *dev, uint8_t channel)
      * after a channel frequency change. Then, delay at least 192 us after
      * the RF State Machine Reset, to allow the RF circuitry to calibrate.
      */
-//    tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_RFCTL);
-//    tmp |= 0b00000100;
-//    mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, tmp);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x04);
-//    tmp &= 0b11111011;
-//    mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, tmp);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x00);
 
     xtimer_usleep(200);             /* Delay at least 192us */
@@ -209,29 +205,62 @@ uint16_t mrf24j40_get_pan(mrf24j40_t *dev)
     return dev->netdev.pan;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void mrf24j40_set_pan(mrf24j40_t *dev, uint16_t pan)
 {
+//	printf("\nmrf24j40_set_pan: Die PANID ist: %x\n", (int)pan);
     le_uint16_t le_pan = byteorder_btols(byteorder_htons(pan));
 
     dev->netdev.pan = pan;
     DEBUG("pan0: %u, pan1: %u\n", le_pan.u8[0], le_pan.u8[1]);
+//    printf("mrf24j40_set_pan: Die PANIDL lautet: %u\n", le_pan.u8[0]);
+//    printf("mrf24j40_set_pan: Die PANIDH lautet: %u\n", le_pan.u8[1]);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_PANIDL, le_pan.u8[0]);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_PANIDH, le_pan.u8[1]);
+
+//    printf("mrf24j40_set_pan: Die PANIDL lautet: %u\n", (int)mrf24j40_reg_read_short(dev, MRF24J40_REG_PANIDL));
+//    printf("mrf24j40_set_pan: Die PANIDH lautet: %u\n", (int)mrf24j40_reg_read_short(dev, MRF24J40_REG_PANIDH));
+
 }
+
 
 int16_t mrf24j40_get_txpower(mrf24j40_t *dev)
 {
     uint8_t txpower;
 
     txpower = mrf24j40_reg_read_long(dev, MRF24J40_REG_RFCON3);
+//	printf("\nmrf24j40_get_txpower: txpower = %x\n", (int)txpower);
     return tx_pow_to_dbm[txpower];
 }
 
 void mrf24j40_set_txpower(mrf24j40_t *dev, int16_t txpower)
 {
+    printf("\nmrf24j40_set_txpower : txpower = %d\n", (int)txpower);
     uint8_t txpower_reg_value;
 
     txpower_reg_value = dbm_to_tx_pow[txpower];
+    printf("mrf24j40_set_txpower : txpower_reg_value = %x\n", (int)txpower_reg_value);
 
     mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON3, txpower_reg_value);
 
@@ -325,7 +354,10 @@ int8_t mrf24j40_get_cca_threshold(mrf24j40_t *dev)
                             40, 40, 39, 39, 39, 39, 39, 38, \
                             38, 38, 38, 37, 37, 37, 36, 30 };
 
-    tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_CCAEDTH);   /* Energy detection threshold */
+
+    tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_CCAEDTH);       /* Energy detection threshold */
+    printf("\nmrf24j40_get_cca_threshold : dBm_value = %d\n", (int)dBm_value[tmp]);
+
     return(dBm_value[tmp]);                                     /* in dBm */
 }
 
@@ -350,6 +382,7 @@ void mrf24j40_set_cca_threshold(mrf24j40_t *dev, int8_t value)
         value = -value;
     }
 
+    printf("\nmrf24j40_set_cca_threshold : register-value to set = %x\n", (int)RSSI_value[value]);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_CCAEDTH, RSSI_value[value]);
 }
 
@@ -358,6 +391,7 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
     uint8_t tmp;
 
     DEBUG("set option %i to %i\n", option, state);
+//    printf("\nset option %i to %i\n", option, state);
 
     /* set option field */
     if (state) {
@@ -381,6 +415,7 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
                 break;
             case MRF24J40_OPT_PROMISCUOUS:
                 DEBUG("[mrf24j40] opt: enabling PROMISCUOUS mode\n");
+//                printf("\nmrf24j40_set_option: Enable Promiscuous Mode\n");
                 /* disable auto ACKs in promiscuous mode */
                 tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_RXMCR);
                 tmp |= MRF24J40_RXMCR_MASK__NOACKRSP;
@@ -391,9 +426,12 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
                 break;
             case MRF24J40_OPT_AUTOACK:
                 DEBUG("[mrf24j40] opt: enabling auto ACKs\n");
+//                printf("\nmrf24j40_set_option: Enable AUTO-ACK\n");
                 tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_RXMCR);
+//                printf("nmrf24j40_set_option: RXMCR-alt = %x\n ", (int)tmp);
                 tmp &= ~MRF24J40_RXMCR_MASK__NOACKRSP;
                 mrf24j40_reg_write_short(dev, MRF24J40_REG_RXMCR, tmp);
+//                printf("nmrf24j40_set_option: RXMCR-neu = %x\n ", (int)mrf24j40_reg_read_short(dev, MRF24J40_REG_RXMCR));
                 break;
             default:
                 /* do nothing */
@@ -406,6 +444,7 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
         switch (option) {
             case MRF24J40_OPT_CSMA:
                 DEBUG("[mrf24j40] opt: disabling CSMA mode\n");
+//                printf("\nmrf24j40_set_option: Disable CSMA\n");
 
                 tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXMCR);
                 tmp |= MRF24J40_TXMCR_MASK__NOCSMA;
@@ -414,10 +453,12 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
                  * to ‘0’, collision avoidance is disabled. */
                 tmp &= ~MRF24J40_TXMCR_MASK__MACMINBE;
                 mrf24j40_reg_write_short(dev, MRF24J40_REG_TXMCR, tmp);
+//                printf("mrf24j40_set_option : TXMCR after NOCSMA = %x\n", (int)mrf24j40_reg_read_short(dev,MRF24J40_REG_TXMCR));
 
                 break;
             case MRF24J40_OPT_PROMISCUOUS:
                 DEBUG("[mrf24j40] opt: disabling PROMISCUOUS mode\n");
+//                printf("\nmrf24j40_set_option: Disable Promiscuous Mode\n");
                 /* disable promiscuous mode */
                 tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_RXMCR);
                 tmp &= ~MRF24J40_RXMCR_MASK__PROMI;
@@ -430,9 +471,12 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
                 break;
             case MRF24J40_OPT_AUTOACK:
                 DEBUG("[mrf24j40] opt: disabling auto ACKs\n");
+//                printf("\nmrf24j40_set_option: Disable AUTO-ACK\n");
                 tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_RXMCR);
+//                printf("\nmrf24j40_set_option: RXMCR-alt = %x\n", (int)tmp);
                 tmp |= MRF24J40_RXMCR_MASK__NOACKRSP;
                 mrf24j40_reg_write_short(dev, MRF24J40_REG_RXMCR, tmp);
+//                printf("\nmrf24j40_set_option: RXMCR-neu = %x\n", (int)mrf24j40_reg_read_short(dev, MRF24J40_REG_RXMCR));
                 break;
             default:
                 /* do nothing */
@@ -441,21 +485,31 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
     }
 }
 
+
 static inline void _set_state(mrf24j40_t *dev, uint8_t state)
 {
+//	uint8_t tmp_rfstate;
+//	uint8_t tmp_rfctl;
+//	uint8_t tmp_softrst;
+//	uint8_t tmp_slpack;
     uint8_t tmp_txncon;
     uint8_t tmp_rxmcr;
-    uint8_t old_state;
 
-    old_state = mrf24j40_get_status(dev);
+//	uint8_t old_state;
+
+//    old_state = mrf24j40_get_status(dev);
+
+//    printf("\n_set_state : old_state (PSEUDO) = %x\n", (int)old_state);
 
     switch (state) {
         case MRF24J40_PSEUDO_STATE_TX_ARET_ON:
+//			printf("_set_state: auf TX_ARET_ON umsetzen\n");
             tmp_txncon = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXNCON);
             tmp_txncon |= MRF24J40_TXNCON_MASK__TXNACKREQ;
             mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, tmp_txncon);
             break;
         case MRF24J40_PSEUDO_STATE_RX_AACK_ON:
+//			printf("\n_set_state: auf RX_AACK_ON umsetzen\n");
             tmp_rxmcr = mrf24j40_reg_read_short(dev, MRF24J40_REG_RXMCR);
             tmp_rxmcr &= ~MRF24J40_RXMCR_MASK__NOACKRSP;
             mrf24j40_reg_write_short(dev, MRF24J40_REG_RXMCR, tmp_rxmcr);
@@ -472,7 +526,9 @@ void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
 
     old_state = mrf24j40_get_status(dev);
 
+
     if (state == old_state) {
+        printf("mrf24j40_set_state : Keine State-Aenderung -> return");
         return;
     }
 
@@ -492,7 +548,8 @@ void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
     if (state == MRF24J40_PSEUDO_STATE_SLEEP) {     /* Datasheet chapter 3.15.2 IMMEDIATE SLEEP AND WAKE-UP MODE */
 
         /* set sleep/wake-pin on uController to low */
-        gpio_clear(dev->params.sleep_pin);
+//        gpio_clear(dev->params.sleep_pin);
+        GPIOB->BRR = (1 << 9);
 
         /* set sleep/wake pin polarity high on radio chip to high and enable it */
         mrf24j40_reg_write_short(dev, MRF24J40_REG_RXFLUSH, 0x60);
@@ -515,6 +572,7 @@ void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
     }
 }
 
+
 void mrf24j40_reset_state_machine(mrf24j40_t *dev)
 {
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x04);
@@ -526,6 +584,7 @@ void mrf24j40_software_reset(mrf24j40_t *dev)
 {
     uint8_t softrst;
 
+    printf("\nmrf24j40_software_reset : \n");
     mrf24j40_reg_write_short(dev, MRF24J40_REG_SOFTRST, 0x7); // from manual
     do {
         softrst = mrf24j40_reg_read_short(dev, MRF24J40_REG_SOFTRST);
