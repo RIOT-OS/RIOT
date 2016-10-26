@@ -46,7 +46,7 @@ extern "C" {
 /**
  * @brief   Maximum possible packet size in byte
  */
-#define AT86RF2XX_MAX_PKT_LENGTH        (127)
+#define AT86RF2XX_MAX_PKT_LENGTH        (IEEE802154_FRAME_LEN_MAX)
 
 /**
  * @brief   Default addresses used if the CPUID module is not present
@@ -62,23 +62,13 @@ extern "C" {
  */
 #ifdef MODULE_AT86RF212B
 /* the AT86RF212B has a sub-1GHz radio */
-#define AT86RF2XX_MIN_CHANNEL           (0)
-#define AT86RF2XX_MAX_CHANNEL           (10)
-#ifdef DEFAULT_CHANNEL
-#define AT86RF2XX_DEFAULT_CHANNEL (DEFAULT_CHANNEL)
-#endif
-#ifndef AT86RF2XX_DEFAULT_CHANNEL
-#define AT86RF2XX_DEFAULT_CHANNEL       (5)
-#endif
+#define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN_SUBGHZ)
+#define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX_SUBGHZ)
+#define AT86RF2XX_DEFAULT_CHANNEL       (IEEE802154_DEFAULT_SUBGHZ_CHANNEL)
 #else
-#define AT86RF2XX_MIN_CHANNEL           (11U)
-#define AT86RF2XX_MAX_CHANNEL           (26U)
-#ifdef DEFAULT_CHANNEL
-#define AT86RF2XX_DEFAULT_CHANNEL (DEFAULT_CHANNEL)
-#endif
-#ifndef AT86RF2XX_DEFAULT_CHANNEL
-#define AT86RF2XX_DEFAULT_CHANNEL       (26U)
-#endif
+#define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN)
+#define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX)
+#define AT86RF2XX_DEFAULT_CHANNEL       (IEEE802154_DEFAULT_CHANNEL)
 #endif
 /** @} */
 
@@ -87,12 +77,12 @@ extern "C" {
  *
  * @todo    Read some global network stack specific configuration value
  */
-#define AT86RF2XX_DEFAULT_PANID         (0x0023)
+#define AT86RF2XX_DEFAULT_PANID         (IEEE802154_DEFAULT_PANID)
 
 /**
  * @brief   Default TX power (0dBm)
  */
-#define AT86RF2XX_DEFAULT_TXPOWER       (0U)
+#define AT86RF2XX_DEFAULT_TXPOWER       (IEEE802154_DEFAULT_TXPOWER)
 
 /**
  * @brief   Base (minimal) RSSI value in dBm

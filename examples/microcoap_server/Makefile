@@ -33,10 +33,6 @@ CFLAGS += -DMICROCOAP_DEBUG
 # include this for printing IP addresses
 USEMODULE += shell_commands
 
-# Set a custom 802.15.4 channel if needed
-DEFAULT_CHANNEL ?= 26
-CFLAGS += -DDEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
@@ -60,3 +56,17 @@ endif
 QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
+
+# Set a custom channel if needed
+ifeq (,$(filter cc110x,$(USEMODULE)))     # radio is cc110x sub-GHz
+  DEFAULT_CHANNEL ?= 0
+  CFLAGS += -DCC110X_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
+else
+  ifeq (,$(filter at86rf212b,$(USEMODULE)))   # radio is IEEE 802.15.4 sub-GHz
+    DEFAULT_CHANNEL ?= 5
+    CFLAGS += -DIEEE802154_DEFAULT_SUBGHZ_CHANNEL=$(DEFAULT_CHANNEL)
+  else                                      # radio is IEEE 802.15.4 2.4 GHz
+    DEFAULT_CHANNEL ?= 26
+    CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
+  endif
+endif

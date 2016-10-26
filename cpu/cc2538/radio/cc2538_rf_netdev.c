@@ -187,8 +187,8 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *value, size_t value_len)
             }
             else {
                 uint8_t chan = ((uint8_t *)value)[0];
-                if (chan < IEEE802154_MIN_CHANNEL ||
-                    chan > IEEE802154_MAX_CHANNEL) {
+                if (chan < IEEE802154_CHANNEL_MIN ||
+                    chan > IEEE802154_CHANNEL_MAX) {
                     res = -EINVAL;
                 }
                 else {

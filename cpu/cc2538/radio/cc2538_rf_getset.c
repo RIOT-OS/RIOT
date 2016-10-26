@@ -169,15 +169,15 @@ void cc2538_set_chan(unsigned int chan)
 {
     DEBUG("%s(%u): Setting channel to ", __FUNCTION__, chan);
 
-    if (chan < IEEE802154_MIN_CHANNEL) {
-        chan = IEEE802154_MIN_CHANNEL;
+    if (chan < IEEE802154_CHANNEL_MIN) {
+        chan = IEEE802154_CHANNEL_MIN;
     }
-    else if (chan > IEEE802154_MAX_CHANNEL) {
-        chan = IEEE802154_MAX_CHANNEL;
+    else if (chan > IEEE802154_CHANNEL_MAX) {
+        chan = IEEE802154_CHANNEL_MAX;
     }
 
-    DEBUG("%i (range %i-%i)\n", chan, IEEE802154_MIN_CHANNEL,
-                                      IEEE802154_MAX_CHANNEL);
+    DEBUG("%i (range %i-%i)\n", chan, IEEE802154_CHANNEL_MIN,
+                                      IEEE802154_CHANNEL_MAX);
 
     cc2538_set_freq(IEEE802154_CHAN2FREQ(chan));
 }
