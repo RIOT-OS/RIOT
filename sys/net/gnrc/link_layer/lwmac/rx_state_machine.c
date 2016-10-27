@@ -172,6 +172,7 @@ static bool _lwmac_rx_update(lwmac_t* lwmac)
         lwmac_frame_wa_t lwmac_hdr;
         lwmac_hdr.header.type = FRAMETYPE_WA;
         lwmac_hdr.dst_addr = lwmac->rx.l2_addr;
+        lwmac_hdr.current_phase = _phase_now();
 
         pkt = gnrc_pktbuf_add(NULL, &lwmac_hdr, sizeof(lwmac_hdr), GNRC_NETTYPE_LWMAC);
         if(pkt == NULL) {

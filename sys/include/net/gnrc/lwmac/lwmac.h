@@ -70,7 +70,7 @@ extern "C" {
  *         implementation
  */
 #ifndef LWMAC_WR_BEFORE_PHASE_US
-#define LWMAC_WR_BEFORE_PHASE_US        (500U)
+#define LWMAC_WR_BEFORE_PHASE_US        (1000U)
 #endif
 
 /* WR preparation overhead before it can be sent (higher with debugging output).

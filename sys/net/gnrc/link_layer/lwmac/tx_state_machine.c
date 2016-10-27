@@ -279,12 +279,6 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
             while(rtt_get_counter() < wait_until);
         }
 
-        /* Save timestamp in case this WR reaches the destination node so that
-         * we know it's wakeup phase relative to ours for the next time. This
-         * is not exactly the time the WR was completely sent, but the timing
-         * we can reproduce here. */
-        lwmac->tx.timestamp = rtt_get_counter();
-
         /* Trigger sending frame */
         _set_netdev_state(lwmac, NETOPT_STATE_TX);
 
@@ -408,6 +402,17 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
                 continue;
             }
 
+            /* calculate the phase of the receiver based on WA */
+            lwmac->tx.timestamp = _phase_now();
+            lwmac_frame_wa_t* wa_hdr;
+            wa_hdr = _gnrc_pktbuf_find(pkt, GNRC_NETTYPE_LWMAC);
+            if(lwmac->tx.timestamp >= wa_hdr->current_phase){
+                lwmac->tx.timestamp = lwmac->tx.timestamp - wa_hdr->current_phase;
+            }else{
+                lwmac->tx.timestamp += RTT_US_TO_TICKS(LWMAC_WAKEUP_INTERVAL_US);
+                lwmac->tx.timestamp -= wa_hdr->current_phase;
+            }
+
             /* No need to keep pkt anymore */
             gnrc_pktbuf_release(pkt);
 
@@ -433,13 +438,9 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
             break;
         }
 
-        /* WR arrived at destination, so calculate destination wakeup phase
-         * based on the timestamp of the WR we sent */
-         uint32_t new_phase = _ticks_to_phase(lwmac->tx.timestamp);
-
         /* Save newly calculated phase for destination */
-        lwmac->tx.current_neighbour->phase = new_phase;
-        LOG_INFO("New phase: %"PRIu32"\n", new_phase);
+        lwmac->tx.current_neighbour->phase = lwmac->tx.timestamp;
+        LOG_INFO("New phase: %"PRIu32"\n", lwmac->tx.timestamp);
 
         /* We've got our WA, so discard the rest, TODO: no flushing */
         packet_queue_flush(&lwmac->rx.queue);

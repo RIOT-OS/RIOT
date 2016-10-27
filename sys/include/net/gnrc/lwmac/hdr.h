@@ -68,6 +68,7 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed)) {
     lwmac_hdr_t header;
     l2_addr_t dst_addr; /**< WA is broadcast, so destination address needed */
+    uint32_t current_phase;
 } lwmac_frame_wa_t;
 
 /**
