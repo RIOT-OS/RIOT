@@ -195,8 +195,8 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         gnrc_pktsnip_t* pkt;
         gnrc_pktsnip_t* pkt_lwmac;
         gnrc_netif_hdr_t *nethdr;
-        uint8_t* dst_addr = NULL;
-        int addr_len;
+        //uint8_t* dst_addr = NULL;
+        //int addr_len;
 
         /* if found ongoing transmission,
          * quit this cycle for collision avoidance. */
@@ -207,16 +207,17 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
             GOTO_TX_STATE(TX_STATE_FAILED, true);
         }
 
-        /* Get destination address */
+        /* Get destination address
         addr_len = _get_dest_address(lwmac->tx.packet, &dst_addr);
         if(addr_len <= 0 || addr_len > 8) {
             LOG_ERROR("Invalid address length: %i\n", addr_len);
             GOTO_TX_STATE(TX_STATE_FAILED, true);
-        }
+        }*/
 
         /* Assemble WR */
         lwmac_frame_wr_t wr_hdr = {};
         wr_hdr.header.type = FRAMETYPE_WR;
+        wr_hdr.dst_addr = lwmac->tx.current_neighbour->l2_addr;
 
         pkt = gnrc_pktbuf_add(NULL, &wr_hdr, sizeof(wr_hdr), GNRC_NETTYPE_LWMAC);
         if(pkt == NULL) {
@@ -227,7 +228,7 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         /* track the location of this lwmac_frame_wr_t header */
         pkt_lwmac = pkt;
 
-        pkt = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_netif_hdr_t) + addr_len, GNRC_NETTYPE_NETIF);
+        pkt = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_netif_hdr_t), GNRC_NETTYPE_NETIF);
         if(pkt == NULL) {
             LOG_ERROR("Cannot allocate pktbuf of type GNRC_NETTYPE_NETIF\n");
             gnrc_pktbuf_release(pkt_lwmac);
@@ -239,8 +240,11 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         nethdr = (gnrc_netif_hdr_t*) _gnrc_pktbuf_find(pkt, GNRC_NETTYPE_NETIF);
 
         /* Construct NETIF header and insert address for WR packet */
-        gnrc_netif_hdr_init(nethdr, 0, addr_len);
-        gnrc_netif_hdr_set_dst_addr(nethdr, dst_addr, addr_len);
+        gnrc_netif_hdr_init(nethdr, 0, 0);
+        //gnrc_netif_hdr_set_dst_addr(nethdr, dst_addr, addr_len);
+
+        /* Send WR as broadcast*/
+        nethdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
 
         /* Disable Auto ACK */
         netopt_enable_t autoack = NETOPT_DISABLE;

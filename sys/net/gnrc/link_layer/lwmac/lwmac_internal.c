@@ -353,7 +353,10 @@ int _parse_packet(gnrc_pktsnip_t* pkt, lwmac_packet_info_t* info)
     if(lwmac_hdr->type == FRAMETYPE_WA) {
         /* WA is broadcast, so get dst address out of header instead of netif */
         info->dst_addr = ((lwmac_frame_wa_t*)lwmac_hdr)->dst_addr;
-    } else {
+    }else if(lwmac_hdr->type == FRAMETYPE_WR){
+        /* WR is broadcast, so get dst address out of header instead of netif */
+        info->dst_addr = ((lwmac_frame_wr_t*)lwmac_hdr)->dst_addr;
+    }else {
         if(netif_hdr->dst_l2addr_len) {
             info->dst_addr.len = netif_hdr->dst_l2addr_len;
             memcpy(info->dst_addr.addr,
