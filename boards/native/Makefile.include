@@ -36,7 +36,11 @@ export OFLAGS =
 endif
 endif
 
-export DEBUGGER ?= $(shell command -v $(PREFIX)gdb gdb lldb | head -n 1)
+ifeq ($(shell uname -s),Darwin)
+export DEBUGGER ?= lldb
+else
+export DEBUGGER ?= gdb
+endif
 export TERMPROG ?= $(ELF)
 export FLASHER = true
 export VALGRIND ?= valgrind
