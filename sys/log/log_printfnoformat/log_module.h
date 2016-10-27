@@ -20,8 +20,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef __LOG_FORMAT_H
-#define __LOG_FORMAT_H
+#ifndef LOG_FORMAT_H
+#define LOG_FORMAT_H
 
 #include <stdio.h>
 
@@ -47,4 +47,4 @@ static inline void log_write(unsigned level, const char *format, ...) {
 }
 #endif
 /**@}*/
-#endif /* __LOG_FORMAT_H */
+#endif /* LOG_FORMAT_H */
