@@ -196,7 +196,7 @@ int uart_mode(uart_t uart, uint8_t databits,
  *
  * @param[in] uart          the UART device to flush
  */
-void uart_flush(uart_t uart);
+void uart_txflush(uart_t uart);
 
 #ifdef __cplusplus
 }

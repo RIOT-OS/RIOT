@@ -422,7 +422,7 @@ int uart_mode(uart_t uart, uint8_t databits,
     return 0;
 }
 
-void uart_flush(uart_t uart)
+void uart_txflush(uart_t uart)
 {
 	//TODO: check/test
     cc2538_uart_t *u;
