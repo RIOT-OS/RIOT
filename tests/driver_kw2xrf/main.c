@@ -26,14 +26,13 @@
 
 int main(void)
 {
-    gnrc_netreg_entry_t dump;
+    gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                          gnrc_pktdump_pid);
 
     puts("KW2XRF device driver test");
 
     /* register the pktdump thread */
     puts("Register the packet dump thread for GNRC_NETTYPE_UNDEF packets");
-    dump.pid = gnrc_pktdump_pid;
-    dump.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
     /* start the shell */

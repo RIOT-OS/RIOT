@@ -24,6 +24,7 @@
 
 #include <stdbool.h>
 
+#include "net/ieee802154.h"
 #include "net/netdev2.h"
 #include "net/netdev2/ieee802154.h"
 
@@ -45,25 +46,18 @@ extern "C" {
 #define IEEE802154_MIN_FREQ         (2405) /**< Min. frequency (2405 MHz) */
 #define IEEE802154_MAX_FREQ         (2480) /**< Max. frequency (2480 MHz) */
 
-#define IEEE802154_MIN_CHANNEL      (11)   /**< Min. channel (2405 MHz) */
-#define IEEE802154_MAX_CHANNEL      (26)   /**< Max. channel (2480 MHz) */
 #define IEEE802154_CHANNEL_SPACING  (5)    /**< Channel spacing in MHz  */
 
-#define IEEE802154_CHAN2FREQ(chan)  ( IEEE802154_MIN_FREQ + ((chan) - IEEE802154_MIN_CHANNEL) * IEEE802154_CHANNEL_SPACING )
-#define IEEE802154_FREQ2CHAN(freq)  ( IEEE802154_MIN_CHANNEL + ((freq) - IEEE802154_MIN_FREQ) / IEEE802154_CHANNEL_SPACING )
+#define IEEE802154_CHAN2FREQ(chan)  ( IEEE802154_MIN_FREQ + ((chan) - IEEE802154_CHANNEL_MIN) * IEEE802154_CHANNEL_SPACING )
+#define IEEE802154_FREQ2CHAN(freq)  ( IEEE802154_CHANNEL_MIN + ((freq) - IEEE802154_MIN_FREQ) / IEEE802154_CHANNEL_SPACING )
 /* /TODO */
 
 #define CC2538_MIN_FREQ             (2394)
 #define CC2538_MAX_FREQ             (2507)
 
-#define CC2538_RF_POWER_DEFAULT     (3)    /**< Default output power in dBm */
-#ifdef DEFAULT_CHANNEL
-#define CC2538_RF_CHANNEL_DEFAULT   (DEFAULT_CHANNEL)
-#endif
-#ifndef CC2538_RF_CHANNEL_DEFAULT
-#define CC2538_RF_CHANNEL_DEFAULT   (26U)
-#endif
-#define CC2538_RF_PANID_DEFAULT     (0x0023)
+#define CC2538_RF_POWER_DEFAULT     (IEEE802154_DEFAULT_TXPOWER)    /**< Default output power in dBm */
+#define CC2538_RF_CHANNEL_DEFAULT   (IEEE802154_DEFAULT_CHANNEL)
+#define CC2538_RF_PANID_DEFAULT     (IEEE802154_DEFAULT_PANID)
 
 #define OUTPUT_POWER_MIN            (-24)  /**< Min output power in dBm */
 #define OUTPUT_POWER_MAX            (7)    /**< Max output power in dBm */

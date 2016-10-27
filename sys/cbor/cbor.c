@@ -522,7 +522,7 @@ size_t cbor_deserialize_float(const cbor_stream_t *stream, size_t offset, float 
 
     if (*data == CBOR_FLOAT32) {
         *val = ntohf(*(uint32_t *)(data + 1));
-        return 4;
+        return 5;
     }
 
     return 0;

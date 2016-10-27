@@ -154,6 +154,7 @@ uint8_t at86rf2xx_get_page(at86rf2xx_t *dev)
 #ifdef MODULE_AT86RF212B
     return dev->page;
 #else
+    (void) dev;
     return 0;
 #endif
 }
@@ -167,6 +168,9 @@ void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page)
     dev->page = page;
 
     at86rf2xx_configure_phy(dev);
+#else
+    (void) dev;
+    (void) page;
 #endif
 }
 

@@ -14,6 +14,10 @@
 
 #include "tests-checksum.h"
 
+/* String is longer than 20 so it checks the wrap-around property of
+ * fletcher16 */
+static const unsigned char wrap_around_data[] = "u9k89rm88z58f3hGxTfgG3BnyKnyRP";
+
 static int calc_and_compare_checksum(const unsigned char *buf, size_t len,
                                      uint16_t expected)
 {
@@ -59,12 +63,22 @@ static void test_checksum_fletcher16_atoe(void)
     TEST_ASSERT(calc_and_compare_checksum(buf, sizeof(buf) - 1, expect));
 }
 
+static void test_checksum_fletcher16_wrap_around(void)
+{
+    /* verified with http://www.nitrxgen.net/hashgen/ */
+    uint16_t expect = 0xf122;
+
+    TEST_ASSERT(calc_and_compare_checksum(wrap_around_data,
+                                          sizeof(wrap_around_data) - 1, expect));
+}
+
 Test *tests_checksum_fletcher16_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_checksum_fletcher16_empty),
         new_TestFixture(test_checksum_fletcher16_0to1_undetected),
         new_TestFixture(test_checksum_fletcher16_atoe),
+        new_TestFixture(test_checksum_fletcher16_wrap_around),
     };
 
     EMB_UNIT_TESTCALLER(checksum_fletcher16_tests, NULL, NULL, fixtures);

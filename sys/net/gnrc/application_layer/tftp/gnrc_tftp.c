@@ -454,8 +454,8 @@ int _tftp_server(tftp_context_t *ctxt)
 {
     msg_t msg;
     bool active = true;
-    gnrc_netreg_entry_t entry = { NULL, GNRC_TFTP_DEFAULT_DST_PORT,
-                                  thread_getpid() };
+    gnrc_netreg_entry_t entry = GNRC_NETREG_ENTRY_INIT_PID(GNRC_TFTP_DEFAULT_DST_PORT,
+                                                           sched_active_pid);
 
     while (active) {
         int ret = TS_BUSY;
@@ -520,7 +520,8 @@ int _tftp_do_client_transfer(tftp_context_t *ctxt)
     tftp_state ret = TS_BUSY;
 
     /* register our DNS response listener */
-    gnrc_netreg_entry_t entry = { NULL, ctxt->src_port, thread_getpid() };
+    gnrc_netreg_entry_t entry = GNRC_NETREG_ENTRY_INIT_PID(ctxt->src_port,
+                                                           sched_active_pid);
 
     if (gnrc_netreg_register(GNRC_NETTYPE_UDP, &entry)) {
         DEBUG("tftp: error starting server.\n");
@@ -636,9 +637,8 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
             }
 
             /* register a listener for the UDP port */
-            ctxt->entry.next = NULL;
-            ctxt->entry.demux_ctx = ctxt->src_port;
-            ctxt->entry.pid = thread_getpid();
+            gnrc_netreg_entry_init_pid(&(ctxt->entry), ctxt->src_port,
+                                       sched_active_pid);
             gnrc_netreg_register(GNRC_NETTYPE_UDP, &(ctxt->entry));
 
             /* try to decode the options */

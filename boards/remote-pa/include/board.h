@@ -57,6 +57,13 @@
 /** @} */
 
 /**
+ * @name User button pin definition
+ * @{
+ */
+#define BUTTON_GPIO         GPIO_9_PIN
+/** @} */
+
+/**
  * @name 2.4GHz RF switch controlled by SW
  * @{
  */

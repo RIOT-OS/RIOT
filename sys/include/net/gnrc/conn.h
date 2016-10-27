@@ -83,8 +83,7 @@ struct conn_udp {
 static inline void gnrc_conn_reg(gnrc_netreg_entry_t *entry, gnrc_nettype_t type,
                                  uint32_t demux_ctx)
 {
-    entry->pid = sched_active_pid;
-    entry->demux_ctx = demux_ctx;
+    gnrc_netreg_entry_init_pid(entry, demux_ctx, sched_active_pid);
     gnrc_netreg_register(type, entry);
 }
 
