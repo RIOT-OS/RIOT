@@ -58,6 +58,19 @@ ifneq (,$(filter gnrc_conn_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
 endif
 
+ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
+  USEMODULE += gnrc_sock
+endif
+
+ifneq (,$(filter gnrc_sock_udp,$(USEMODULE)))
+  USEMODULE += gnrc_udp
+  USEMODULE += random     # to generate random ports
+endif
+
+ifneq (,$(filter gnrc_sock,$(USEMODULE)))
+  USEMODULE += gnrc_netapi_mbox
+endif
+
 ifneq (,$(filter gnrc_netapi_mbox,$(USEMODULE)))
   USEMODULE += core_mbox
 endif
