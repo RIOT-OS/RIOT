@@ -20,6 +20,7 @@
 #include <net/gnrc.h>
 #include <net/gnrc/lwmac/lwmac.h>
 #include <net/gnrc/lwmac/packet_queue.h>
+#include <random.h>
 
 #include "include/tx_state_machine.h"
 #include "include/timeout.h"
@@ -197,6 +198,10 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         gnrc_netif_hdr_t *nethdr;
         //uint8_t* dst_addr = NULL;
         //int addr_len;
+
+        uint32_t random_backoff;
+        random_backoff = random_uint32_range(0, LWMAC_RANDOM_BEFORE_WR_US);
+        xtimer_usleep(random_backoff);
 
         /* if found ongoing transmission,
          * quit this cycle for collision avoidance. */
