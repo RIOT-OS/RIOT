@@ -9,6 +9,7 @@
 /**
  * @defgroup    net_conn    Application connection API
  * @ingroup     net
+ * @deprecated  Please use @ref net_sock instead
  * @brief       Provides a minimal common API for applications to connect to the
  *              different network stacks.
  *

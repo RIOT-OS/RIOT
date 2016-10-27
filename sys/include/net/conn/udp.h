@@ -9,6 +9,7 @@
 /**
  * @defgroup    net_conn_udp    UDP connections
  * @ingroup     net_conn
+ * @deprecated  Please use @ref net_sock_udp instead
  * @brief       Connection submodule for UDP connections
  * @{
  *

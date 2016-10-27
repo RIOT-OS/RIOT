@@ -9,6 +9,7 @@
 /**
  * @defgroup    net_conn_tcp    TCP connections
  * @ingroup     net_conn
+ * @deprecated  Please use @ref net_sock_tcp instead
  * @brief       Connection submodule for TCP connections
  * @{
  *
