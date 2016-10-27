@@ -73,6 +73,20 @@ extern "C" {
  */
 #define SPI_NUMOF          (1)
 #define SPI_0_EN           1
+
+/*      SPI0             */
+#define SPI_0_DEV           SERCOM0->SPI
+#define SPI_IRQ_0           SERCOM0_IRQn
+#define SPI_0_GCLK_ID       SERCOM0_GCLK_ID_CORE
+/* SPI 0 pin configuration */
+#define SPI_0_SCLK          GPIO_PIN(PA, 07)
+#define SPI_0_SCLK_MUX      GPIO_MUX_D
+#define SPI_0_MISO          GPIO_PIN(PA, 04)
+#define SPI_0_MISO_MUX      GPIO_MUX_D
+#define SPI_0_MISO_PAD      SPI_PAD_MISO_0
+#define SPI_0_MOSI          GPIO_PIN(PA, 06)
+#define SPI_0_MOSI_MUX      GPIO_MUX_D
+#define SPI_0_MOSI_PAD      SPI_PAD_MOSI_2_SCK_3
 /** @} */
 
 /**
