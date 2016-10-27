@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# test
+
 require 'fileutils'
 
 RIOTBASE ||= "./"
