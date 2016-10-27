@@ -108,7 +108,7 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
 
         /* if found ongoing transmission,
          * quit this cycle for collision avoidance. */
-        if(_get_netdev_state(&lwmac) == NETOPT_STATE_RX) {
+        if(_get_netdev_state(lwmac) == NETOPT_STATE_RX){
             _queue_tx_packet(lwmac, lwmac->tx.packet);
             /* drop pointer so it wont be free'd */
             lwmac->tx.packet = NULL;
@@ -200,7 +200,7 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
 
         /* if found ongoing transmission,
          * quit this cycle for collision avoidance. */
-        if(_get_netdev_state(&lwmac) == NETOPT_STATE_RX) {
+        if(_get_netdev_state(lwmac) == NETOPT_STATE_RX) {
             _queue_tx_packet(lwmac, lwmac->tx.packet);
             /* drop pointer so it wont be free'd */
             lwmac->tx.packet = NULL;
