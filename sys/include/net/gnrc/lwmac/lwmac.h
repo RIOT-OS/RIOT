@@ -37,7 +37,7 @@ extern "C" {
 
 /* The Maximum WR duration time */
 #ifndef LWMAC_PREAMBLE_DURATION_US
-#define LWMAC_PREAMBLE_DURATION_US      ((13*LWMAC_WAKEUP_INTERVAL_US)/10)
+#define LWMAC_PREAMBLE_DURATION_US      ((21*LWMAC_WAKEUP_INTERVAL_US)/10)
 #endif
 
 /* Timeout to send the next WR in case no WA has been received during that
@@ -70,7 +70,7 @@ extern "C" {
  *         implementation
  */
 #ifndef LWMAC_WR_BEFORE_PHASE_US
-#define LWMAC_WR_BEFORE_PHASE_US        (1000U)
+#define LWMAC_WR_BEFORE_PHASE_US        (1300U)
 #endif
 
 /* WR preparation overhead before it can be sent (higher with debugging output).
