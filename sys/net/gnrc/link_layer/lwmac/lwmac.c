@@ -280,8 +280,8 @@ bool lwmac_update(void)
             lwmac_rx_stop(&lwmac);
             /* Dispatch received packets, timing is not critical anymore */
             _dispatch(lwmac.rx.dispatch_buffer);
-            /* Go back to sleep after successful transaction */
-            lwmac_set_state(SLEEPING);
+            /* Go back to Listen after successful transaction */
+            lwmac_set_state(LISTENING);
             break;
         default:
             lwmac_rx_update(&lwmac);

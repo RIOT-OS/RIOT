@@ -106,6 +106,15 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         lwmac_clear_timeout(lwmac, TIMEOUT_NEXT_BROADCAST);
         lwmac_clear_timeout(lwmac, TIMEOUT_BROADCAST_END);
 
+        /* if found ongoing transmission,
+         * quit this cycle for collision avoidance. */
+        if(_get_netdev_state(&lwmac) == NETOPT_STATE_RX) {
+            _queue_tx_packet(lwmac, lwmac->tx.packet);
+            /* drop pointer so it wont be free'd */
+            lwmac->tx.packet = NULL;
+            GOTO_TX_STATE(TX_STATE_FAILED, true);
+        }
+
         if(_packet_is_broadcast(lwmac->tx.packet)) {
             /* Set CSMA retries as configured and enable */
             uint8_t csma_retries = LWMAC_BROADCAST_CSMA_RETRIES;
@@ -116,9 +125,8 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
 
             GOTO_TX_STATE(TX_STATE_SEND_BROADCAST, true);
         } else {
-            /* Don't attempt to send a WR if channel is busy to get timings
-             * right, will be changed for sending DATA packet */
-            netopt_enable_t csma_disable = NETOPT_DISABLE;
+            /* Use CSMA for the first WR */
+            netopt_enable_t csma_disable = NETOPT_ENABLE;
 			lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_CSMA, &csma_disable, sizeof(csma_disable));
 
             GOTO_TX_STATE(TX_STATE_SEND_WR, true);
@@ -189,6 +197,15 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         gnrc_netif_hdr_t *nethdr;
         uint8_t* dst_addr = NULL;
         int addr_len;
+
+        /* if found ongoing transmission,
+         * quit this cycle for collision avoidance. */
+        if(_get_netdev_state(&lwmac) == NETOPT_STATE_RX) {
+            _queue_tx_packet(lwmac, lwmac->tx.packet);
+            /* drop pointer so it wont be free'd */
+            lwmac->tx.packet = NULL;
+            GOTO_TX_STATE(TX_STATE_FAILED, true);
+        }
 
         /* Get destination address */
         addr_len = _get_dest_address(lwmac->tx.packet, &dst_addr);
@@ -282,7 +299,10 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         }
 
         if(lwmac->tx.wr_sent == 0) {
-            lwmac_set_timeout(lwmac, TIMEOUT_NO_RESPONSE, LWMAC_WAKEUP_INTERVAL_US);
+            lwmac_set_timeout(lwmac, TIMEOUT_NO_RESPONSE, LWMAC_PREAMBLE_DURATION_US);
+            /* Only the first WR use CSMA */
+            netopt_enable_t csma_disable = NETOPT_DISABLE;
+            lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_CSMA, &csma_disable, sizeof(csma_disable));
         }
 
         lwmac->tx.wr_sent++;
@@ -365,6 +385,17 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
 
             if(info.header->type == FRAMETYPE_BROADCAST) {
                 continue;
+            }
+
+            /* if found anther node is also trying to send data,
+             * quit this cycle for collision avoidance. */
+            if(info.header->type == FRAMETYPE_WR){
+                _queue_tx_packet(lwmac, lwmac->tx.packet);
+                /* drop pointer so it wont be free'd */
+                lwmac->tx.packet = NULL;
+                postponed = true;
+                gnrc_pktbuf_release(pkt);
+                break;
             }
 
             if(info.header->type != FRAMETYPE_WA) {

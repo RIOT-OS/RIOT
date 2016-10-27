@@ -35,6 +35,11 @@ extern "C" {
 #define LWMAC_WAKEUP_INTERVAL_US        (100U * 1000)
 #endif
 
+/* The Maximum WR duration time */
+#ifndef LWMAC_PREAMBLE_DURATION_US
+#define LWMAC_PREAMBLE_DURATION_US      ((13*LWMAC_WAKEUP_INTERVAL_US)/10)
+#endif
+
 /* Timeout to send the next WR in case no WA has been received during that
  * time. It is referenced to the beginning of both WRs, but due to internal
  * overhead, the exact spacing is slightly higher.
