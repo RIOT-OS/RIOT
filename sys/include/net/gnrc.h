@@ -55,7 +55,8 @@
  * Hence, a thread for @ref net_gnrc "GNRC" will usually consist of four basic
  * steps.
  *
- * 1. Initialize a message queue
+ * 1. Initialize a message queue (note that its size **must** be a power of two,
+ *    see @ref msg_init_queue())
  * 2. register for a @ref net_gnrc_nettype
  * 3. wait for a message
  * 4. react appropriately to a message and return to 3.
