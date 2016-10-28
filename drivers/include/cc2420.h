@@ -304,6 +304,9 @@ void cc2420_tx_exec(cc2420_t *dev);
  * @param[out] buf          buffer to write data to
  * @param[in]  max_len      number of bytes to read from device
  * @param[in]  info         to be removed
+ *
+ * @return                  the number of bytes in the Rx FIFO
+ * @return                  the number of bytes written to @p buf if present
  */
 int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info);
 
