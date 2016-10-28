@@ -1,5 +1,5 @@
 /*
- * Copyright (C) Cr0s
+ * Copyright (C) Unwired Devices [info@unwds.com]
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @file
  * @brief   Common header for sx1276 tests
  *
- * @author  Cr0s
+ * @author  Eugene P. [ep@unwds.com]
  */
 #ifndef COMMON_H_
 #define COMMON_H_
