@@ -184,8 +184,7 @@ void uart_poweroff(uart_t uart);
  *
  * This function reconfigures the UART mode (data bits, stop bits, parity).
  * Before doing this, it waits until all data in the UART TX buffer have been
- * sent out. Effects to the receive process are undefined, any negotiation with
- * connected devices is up to higher protocol layers.
+ * sent out. During the mode change, the UART receive is disabled.
  *
  * @param[in] uart          the UART device to set parity mode
  * @param[in] databits      number of databits

@@ -359,8 +359,6 @@ int uart_mode(uart_t uart, uint8_t databits,
 {
     cc2538_uart_t *u;
 
-    uart_flushtx(uart);
-
     switch (uart) {
 #if UART_0_EN
         case UART_0:
@@ -376,6 +374,13 @@ int uart_mode(uart_t uart, uint8_t databits,
             return -1;
     }
 
+    /* flush TX buffer before mode switch */
+    uart_txflush(uart);
+
+    /* disable RX during mode switch */
+
+    u->cc2538_uart_ctl.CTLbits.RXE = 0;
+
     switch(databits){
         case 5:
             u->cc2538_uart_lcrh.LCRHbits.WLEN = WLEN_5_BITS;
@@ -390,6 +395,7 @@ int uart_mode(uart_t uart, uint8_t databits,
             u->cc2538_uart_lcrh.LCRHbits.WLEN = WLEN_8_BITS;
             break;
         default:
+            u->cc2538_uart_ctl.CTLbits.RXE = 1;
             return -2;
     }
 
@@ -401,6 +407,7 @@ int uart_mode(uart_t uart, uint8_t databits,
             u->cc2538_uart_lcrh.LCRHbits.STP2 = 1;
             break;
         default:
+            u->cc2538_uart_ctl.CTLbits.RXE = 1;
             return -2;
     }
 
@@ -418,9 +425,11 @@ int uart_mode(uart_t uart, uint8_t databits,
             u->cc2538_uart_lcrh.LCRHbits.PEN = 1;
             break;
         default:
+            u->cc2538_uart_ctl.CTLbits.RXE = 1;
             return -2;
     }
 
+    u->cc2538_uart_ctl.CTLbits.RXE = 1;
     return 0;
 }
 
