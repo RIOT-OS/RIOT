@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Cr0s
+ * Copyright (C) 2016 Unwired Devices [info@unwds.com]
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @{
  * @file
  * @brief       SX1276 FSK registers
- * @author      Cr0s
+ * @author      Eugene P. [ep@unwds.com]
  */
 
 #ifndef SX1276_REGS_FSK_H
