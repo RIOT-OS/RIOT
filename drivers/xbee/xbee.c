@@ -530,7 +530,7 @@ int xbee_init(xbee_t *dev, const xbee_params_t *params)
     dev->resp_limit = 1;    /* needs to be greater then 0 initially */
     dev->rx_count = 0;
     /* initialize UART and GPIO pins */
-    if (uart_init(params->uart, params->baudrate, _rx_cb, dev) < 0) {
+    if (uart_init(params->uart, params->baudrate, _rx_cb, dev) != UART_OK) {
         DEBUG("xbee: Error initializing UART\n");
         return -ENXIO;
     }
