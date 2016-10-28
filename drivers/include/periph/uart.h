@@ -94,13 +94,13 @@ typedef unsigned int uart_t;
 /** @} */
 
 /**
- * @brief   parity mode enum
+ * @brief   Parity modes
  * @{
  */
 typedef enum {
-	UART_NONE,
-	UART_EVEN,
-	UART_ODD,
+    UART_NONE,
+    UART_EVEN,
+    UART_ODD,
 } uart_parity_t;
 /** @} */
 
@@ -132,6 +132,8 @@ typedef struct {
  * - no parity
  * - 1 stop bit
  * - baudrate as given
+ * If needed, data bits, stop bits, and parity can be changed with
+ * uart_mode() afterwards.
  *
  * @param[in] uart          UART device to initialize
  * @param[in] baudrate      desired baudrate in baud/s
@@ -150,8 +152,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg);
  * @brief   Write data from the given buffer to the specified UART device
  *
  * This function is blocking, as it will only return after @p len bytes from the
- * given buffer have been send. The way this data is send is up to the
- * implementation: active waiting, interrupt driven, DMA, etc.
+ * given buffer have been written into the UARTs TX FIFO. It does not guarantee,
+ * that all data have already been sent by the UART when the function returns.
+ * If necessary, use uart_txflush() afterwards to wait until this is done. The
+ * way this data is send to the UART is up to the implementation: active
+ * waiting, interrupt driven, DMA, etc.
  *
  * @param[in] uart          UART device to use for transmission
  * @param[in] data          data buffer to send
@@ -175,7 +180,12 @@ void uart_poweron(uart_t uart);
 void uart_poweroff(uart_t uart);
 
 /**
- * @brief set UART mode
+ * @brief Configure UART mode
+ *
+ * This function reconfigures the UART mode (data bits, stop bits, parity).
+ * Before doing this, it waits until all data in the UART TX buffer have been
+ * sent out. Effects to the receive process are undefined, any negotiation with
+ * connected devices is up to higher protocol layers.
  *
  * @param[in] uart          the UART device to set parity mode
  * @param[in] databits      number of databits
@@ -187,12 +197,12 @@ void uart_poweroff(uart_t uart);
  * @return                  -2 on inapplicable parity
  */
 int uart_mode(uart_t uart, uint8_t databits,
-		uint8_t stopbits, uart_parity_t parity);
+    uint8_t stopbits, uart_parity_t parity);
 
 /**
- * @brief flush UART TX buffer
+ * @brief Flush UART TX buffer
  *
- * wait until UART TX buffer is empty
+ * Block until TX buffer is empty and all bytes have been shifted out
  *
  * @param[in] uart          the UART device to flush
  */

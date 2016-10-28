@@ -355,9 +355,11 @@ void uart_poweroff(uart_t uart)
 }
 
 int uart_mode(uart_t uart, uint8_t databits,
-		uint8_t stopbits, uart_parity_t parity)
+    uint8_t stopbits, uart_parity_t parity)
 {
     cc2538_uart_t *u;
+
+    uart_flushtx(uart);
 
     switch (uart) {
 #if UART_0_EN
@@ -375,48 +377,48 @@ int uart_mode(uart_t uart, uint8_t databits,
     }
 
     switch(databits){
-		case 5:
-			u->cc2538_uart_lcrh.LCRHbits.WLEN = WLEN_5_BITS;
-			break;
-		case 6:
-			u->cc2538_uart_lcrh.LCRHbits.WLEN = WLEN_6_BITS;
-			break;
-		case 7:
-			u->cc2538_uart_lcrh.LCRHbits.WLEN = WLEN_7_BITS;
-			break;
-		case 8:
-			u->cc2538_uart_lcrh.LCRHbits.WLEN = WLEN_8_BITS;
-			break;
-		default:
-			return -2;
+        case 5:
+            u->cc2538_uart_lcrh.LCRHbits.WLEN = WLEN_5_BITS;
+            break;
+        case 6:
+            u->cc2538_uart_lcrh.LCRHbits.WLEN = WLEN_6_BITS;
+            break;
+        case 7:
+            u->cc2538_uart_lcrh.LCRHbits.WLEN = WLEN_7_BITS;
+            break;
+        case 8:
+            u->cc2538_uart_lcrh.LCRHbits.WLEN = WLEN_8_BITS;
+            break;
+        default:
+            return -2;
     }
 
     switch(stopbits){
-		case 1:
-			u->cc2538_uart_lcrh.LCRHbits.STP2 = 0;
-			break;
-		case 2:
-			u->cc2538_uart_lcrh.LCRHbits.STP2 = 1;
-			break;
-		default:
-			return -2;
+        case 1:
+            u->cc2538_uart_lcrh.LCRHbits.STP2 = 0;
+            break;
+        case 2:
+            u->cc2538_uart_lcrh.LCRHbits.STP2 = 1;
+            break;
+        default:
+            return -2;
     }
 
     switch(parity){
-		case UART_NONE:
-			u->cc2538_uart_lcrh.LCRHbits.EPS = 0;
-			u->cc2538_uart_lcrh.LCRHbits.PEN = 0;
-			break;
-		case UART_EVEN:
-			u->cc2538_uart_lcrh.LCRHbits.EPS = 1;
-			u->cc2538_uart_lcrh.LCRHbits.PEN = 1;
-			break;
-		case UART_ODD:
-			u->cc2538_uart_lcrh.LCRHbits.EPS = 0;
-			u->cc2538_uart_lcrh.LCRHbits.PEN = 1;
-			break;
-		default:
-			return -2;
+        case UART_NONE:
+            u->cc2538_uart_lcrh.LCRHbits.EPS = 0;
+            u->cc2538_uart_lcrh.LCRHbits.PEN = 0;
+            break;
+        case UART_EVEN:
+            u->cc2538_uart_lcrh.LCRHbits.EPS = 1;
+            u->cc2538_uart_lcrh.LCRHbits.PEN = 1;
+            break;
+        case UART_ODD:
+            u->cc2538_uart_lcrh.LCRHbits.EPS = 0;
+            u->cc2538_uart_lcrh.LCRHbits.PEN = 1;
+            break;
+        default:
+            return -2;
     }
 
     return 0;
@@ -424,7 +426,6 @@ int uart_mode(uart_t uart, uint8_t databits,
 
 void uart_txflush(uart_t uart)
 {
-	//TODO: check/test
     cc2538_uart_t *u;
 
     switch (uart) {
@@ -443,5 +444,5 @@ void uart_txflush(uart_t uart)
     }
 
     /* stupid busy waiting, could be improved... */
-	while(u->cc2538_uart_fr.FRbits.TXFE == 0);
+    while(u->cc2538_uart_fr.FRbits.TXFE == 0);
 }
