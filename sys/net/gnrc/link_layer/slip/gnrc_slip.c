@@ -259,7 +259,7 @@ kernel_pid_t gnrc_slip_init(gnrc_slip_dev_t *dev, uart_t uart, uint32_t baudrate
     /* initialize UART */
     DEBUG("slip: initialize UART_%d with baudrate %" PRIu32 "\n", uart,
           baudrate);
-    if (uart_init(uart, baudrate, _slip_rx_cb, dev) < 0) {
+    if (uart_init(uart, baudrate, _slip_rx_cb, dev) != UART_OK) {
         DEBUG("slip: error initializing UART_%i with baudrate %" PRIu32 "\n",
               uart, baudrate);
         return -ENODEV;
