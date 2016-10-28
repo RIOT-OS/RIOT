@@ -41,7 +41,7 @@ static uart_isr_ctx_t uart_config;
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     if (uart != 0) {
-        return -1;
+        return UART_NODEV;
     }
 
     /* remember callback addresses and argument */
@@ -122,7 +122,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
             NRF_UART0->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud921600;
             break;
         default:
-            return -2;
+            return UART_NOBAUD;
     }
 
     /* enable the UART device */
@@ -133,7 +133,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* enable global and receiving interrupt */
     NVIC_EnableIRQ(UART_IRQN);
     NRF_UART0->INTENSET = UART_INTENSET_RXDRDY_Msk;
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)

@@ -48,7 +48,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* check if device is valid and get base register address */
     if (dev >= UART_NUMOF) {
-        return -1;
+        return UART_NODEV;
     }
     uart = _uart(dev);
 
@@ -77,7 +77,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     uart->IEN |= USART_IEN_RXDATAV;
     /* enable receiver and transmitter */
     uart->CMD = USART_CMD_TXEN | USART_CMD_RXEN;
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t dev, const uint8_t *data, size_t len)

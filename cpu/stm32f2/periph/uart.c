@@ -75,7 +75,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* check if given UART device does exist */
     if (uart < 0 || uart >= UART_NUMOF) {
-        return -1;
+        return UART_NODEV;
     }
 
     /* check if baudrate is reachable and choose the right oversampling method*/
@@ -88,7 +88,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         over8 = 1;
     }
     else {
-        return -2;
+        return UART_NOBAUD;
     }
 
     /* get UART base address */
@@ -147,7 +147,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     NVIC_EnableIRQ(uart_config[uart].irqn);
     dma_isr_enable(uart_config[uart].dma_stream);
     dev->CR1 |= USART_CR1_RXNEIE;
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)

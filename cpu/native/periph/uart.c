@@ -98,7 +98,7 @@ static void io_signal_handler(int fd, void *arg)
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     if (uart >= UART_NUMOF) {
-        return -1;
+        return UART_NODEV;
     }
 
     struct termios termios;
@@ -133,7 +133,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     case 115200: speed = B115200; break;
     case 230400: speed = B230400 ; break;
     default:
-        return -1;
+        return UART_NOBAUD;
         break;
     }
 
@@ -143,7 +143,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     tty_fds[uart] = real_open(tty_device_filenames[uart], O_RDWR | O_NONBLOCK);
 
     if (tty_fds[uart] < 0) {
-        return -3;
+        return UART_INTERR;
     }
 
     tcsetattr(tty_fds[uart], TCSANOW, &termios);
@@ -154,7 +154,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     native_async_read_setup();
     native_async_read_add_handler(tty_fds[uart], NULL, io_signal_handler);
 
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)

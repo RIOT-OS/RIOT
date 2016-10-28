@@ -160,8 +160,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* initialize basic functionality */
     int res = init_base(uart, baudrate);
-
-    if (res != 0) {
+    if (res != UART_OK) {
         return res;
     }
 
@@ -183,9 +182,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
             NVIC_EnableIRQ(UART1_IRQn);
             break;
 #endif
+        default:
+            return UART_NODEV;
     }
 
-    return 0;
+    return UART_OK;
 }
 
 static int init_base(uart_t uart, uint32_t baudrate)
@@ -240,7 +241,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
 
         default:
             (void)u;
-            return -1;
+            return UART_NODEV;
     }
 
 #if UART_0_EN || UART_1_EN
@@ -313,7 +314,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     /* UART Enable */
     u->cc2538_uart_ctl.CTLbits.UARTEN = 1;
 
-    return 0;
+    return UART_OK;
 #endif /* UART_0_EN || UART_1_EN */
 }
 

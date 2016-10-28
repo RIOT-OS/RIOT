@@ -39,8 +39,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* initialize basic functionality */
     int res = init_base(uart, baudrate);
-    if (res != 0) {
-        return res;
+    if (res != UART_OK) {
+        return UART_NODEV;
     }
 
     /* register callbacks */
@@ -55,7 +55,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
             UART_0_DEV.INTENSET.bit.RXC = 1;
         break;
     }
-    return 0;
+    return UART_OK;
 }
 
 static int init_base(uart_t uart, uint32_t baudrate)
@@ -113,11 +113,11 @@ static int init_base(uart_t uart, uint32_t baudrate)
 #endif
         default:
             (void)baud_calculated;
-            return -1;
+            return UART_NODEV;
     }
 
     uart_poweron(uart);
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)

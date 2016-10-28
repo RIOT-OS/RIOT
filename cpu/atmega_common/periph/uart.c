@@ -114,7 +114,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* make sure the given device is valid */
     if (uart >= UART_NUMOF) {
-        return -1;
+        return UART_NODEV;
     }
 
     /* register interrupt context */
@@ -132,7 +132,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* enable RX and TX and the RX interrupt */
     dev[uart]->CSRB = ((1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0));
 
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
