@@ -125,11 +125,11 @@ static int cmd_init(int argc, char **argv)
 
     /* initialize UART */
     res = uart_init(UART_DEV(dev), baud, rx_cb, (void *)dev);
-    if (res == -1) {
+    if (res == UART_NOBAUD) {
         printf("Error: Given baudrate (%u) not possible\n", (unsigned int)baud);
         return 1;
     }
-    else if (res < -1) {
+    else if (res != UART_OK) {
         puts("Error: Unable to initialize UART device\n");
         return 1;
     }
