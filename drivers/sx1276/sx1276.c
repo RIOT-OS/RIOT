@@ -12,7 +12,7 @@
  * @file
  * @brief       Basic functionality of sx1276 driver
  *
- * @author      Cr0s
+ * @author      Eugene P. [ep@unwds.com]
  * @}
  */
 #include <stdbool.h>
