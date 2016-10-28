@@ -215,6 +215,11 @@ void auto_init(void)
     auto_init_netdev_tap();
 #endif
 
+#ifdef MODULE_SOCKET_ZEP
+    extern void auto_init_socket_zep(void);
+    auto_init_socket_zep();
+#endif
+
 #ifdef MODULE_NORDIC_SOFTDEVICE_BLE
     extern void gnrc_nordic_ble_6lowpan_init(void);
     gnrc_nordic_ble_6lowpan_init();
