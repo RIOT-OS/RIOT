@@ -66,6 +66,9 @@ endif
 ifneq (,$(filter ccn-lite-utils,$(USEMODULE)))
   SRC += sc_ccnl.c
 endif
+ifneq (,$(filter sntp,$(USEMODULE)))
+  SRC += sc_sntp.c
+endif
 
 # TODO
 # Conditional building not possible at the moment due to

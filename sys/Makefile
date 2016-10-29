@@ -89,6 +89,10 @@ ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
     DIRS += net/gnrc/application_layer/uhcpc
 endif
 
+ifneq (,$(filter sntp,$(USEMODULE)))
+    DIRS += net/application_layer/sntp
+endif
+
 ifneq (,$(filter netopt,$(USEMODULE)))
     DIRS += net/crosslayer/netopt
 endif
