@@ -221,11 +221,18 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
         if (sock != NULL) {
             /* bind sock object implicitly */
             sock->local.port = src_port;
+            if (remote == NULL) {
+                sock->local.family = sock->remote.family;
+            }
+            else {
+                sock->local.family = remote->family;
+            }
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
             /* prepend to current socks */
             sock->reg.next = (gnrc_sock_reg_t *)_udp_socks;
             _udp_socks = sock;
 #endif
+            gnrc_sock_create(&sock->reg, GNRC_NETTYPE_UDP, src_port);
         }
     }
     else {
