@@ -45,7 +45,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-volatile int native_interrupts_enabled;
+volatile int native_interrupts_enabled = 0;
 volatile int _native_in_isr;
 volatile int _native_in_syscall;
 
@@ -279,6 +279,7 @@ void native_irq_handler(void)
 void isr_set_sigmask(ucontext_t *ctx)
 {
     ctx->uc_sigmask = _native_sig_set_dint;
+    native_interrupts_enabled = 0;
 }
 
 /**
@@ -323,7 +324,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     }
 
     native_isr_context.uc_stack.ss_sp = __isr_stack;
-    native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+    native_isr_context.uc_stack.ss_size = sizeof(__isr_stack);
     native_isr_context.uc_stack.ss_flags = 0;
     makecontext(&native_isr_context, native_irq_handler, 0);
     _native_cur_ctx = (ucontext_t *)sched_active_thread->sp;
@@ -343,11 +344,11 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
 #elif defined(__FreeBSD__)
     _native_saved_eip = ((struct sigcontext *)context)->sc_eip;
     ((struct sigcontext *)context)->sc_eip = (unsigned int)&_native_sig_leave_tramp;
-#else
-#ifdef __arm__
+#else /* Linux */
+#if defined(__arm__)
     _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.arm_pc;
     ((ucontext_t *)context)->uc_mcontext.arm_pc = (unsigned int)&_native_sig_leave_tramp;
-#else
+#else /* Linux/x86 */
     //printf("\n\033[31mEIP:\t%p\ngo switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP]);
     _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP];
     ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
@@ -465,7 +466,6 @@ void native_interrupt_init(void)
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
                    (void *)__isr_stack, (void*)((int)__isr_stack + sizeof(__isr_stack)));
 
-    native_interrupts_enabled = 1;
     _native_sigpend = 0;
 
     for (int i = 0; i < 255; i++) {
@@ -509,13 +509,13 @@ void native_interrupt_init(void)
     }
 
     native_isr_context.uc_stack.ss_sp = __isr_stack;
-    native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+    native_isr_context.uc_stack.ss_size = sizeof(__isr_stack);
     native_isr_context.uc_stack.ss_flags = 0;
     _native_isr_ctx = &native_isr_context;
 
     static stack_t sigstk;
     sigstk.ss_sp = sigalt_stk;
-    sigstk.ss_size = SIGSTKSZ;
+    sigstk.ss_size = sizeof(__isr_stack);
     sigstk.ss_flags = 0;
 
     if (sigaltstack(&sigstk, NULL) < 0) {
