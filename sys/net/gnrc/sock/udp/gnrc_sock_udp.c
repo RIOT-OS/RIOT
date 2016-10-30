@@ -182,7 +182,7 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     }
     if ((remote == NULL) &&
         /* sock can't be NULL as per assertion above */
-        (sock->remote.port == AF_UNSPEC)) {
+        (sock->remote.family == AF_UNSPEC)) {
         return -ENOTCONN;
     }
     /* compiler evaluates lazily so this isn't a redundundant check and cppcheck
