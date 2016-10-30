@@ -234,10 +234,11 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
     assert(ipv6_iface != NULL);
 #endif
     gnrc_pktsnip_t *hdr, *pkt = NULL;
-    /* both suppressions, since they are needed in the MODULE_GNRC_SIXLOWPAN_ND branch */
-    /* cppcheck-suppress variableScope */
+    /* cppcheck-suppress variableScope
+     * (reason: they are needed in the MODULE_GNRC_SIXLOWPAN_ND branch) */
     uint8_t l2src[8];
-    /* cppcheck-suppress variableScope */
+    /* cppcheck-suppress variableScope
+     * (reason: they are needed in the MODULE_GNRC_SIXLOWPAN_ND branch) */
     size_t l2src_len = 0;
 
     DEBUG("ndp internal: send neighbor solicitation (iface: %" PRIkernel_pid ", src: %s, ",
