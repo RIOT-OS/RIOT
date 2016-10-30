@@ -88,11 +88,8 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
 #ifdef MODULE_NETDEV_RETRANS
             case NETDEV2_EVENT_TX_NOACK:
                 DEBUG("gnrc_netdev2: no ACK received or medium busy: retrans count is = %u\n", (unsigned) gnrc_netdev2->retrans_head->cnt);
-                if (!gnrc_netdev2->retrans_head) {
-                    DEBUG("\n!!! gnrc_netdev2: queue is empty while retransmitting, this shouldn't happen!\n\n");
-                    break;
-                }
-                else if (gnrc_netdev2->retrans_head->cnt-- <= 0) {
+                assert(gnrc_netdev2->retrans_head);
+                if (gnrc_netdev2->retrans_head->cnt-- <= 0) {
                     DEBUG("giving up sending, removing from buffer and queue: %p\n", (void*)gnrc_netdev2->retrans_head->pkt);
                     gnrc_pktbuf_release(gnrc_netdev2->retrans_head->pkt);
                     gnrc_netdev2->retrans_head->pkt = NULL;
@@ -109,16 +106,11 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
                 dev->stats.tx_success++;
 #endif
 #ifdef MODULE_NETDEV_RETRANS
-                if (!gnrc_netdev2->retrans_head) {
-                    DEBUG("\n!!! gnrc_netdev2: queue is empty while handling ACK, this shouldn't happen!\n\n");
-                    break;
-                }
-                else {
-                    DEBUG("packet sent, removing from buffer and queue: %p\n", (void*) gnrc_netdev2->retrans_head->pkt);
-                    gnrc_pktbuf_release(gnrc_netdev2->retrans_head->pkt);
-                    gnrc_netdev2->retrans_head->pkt = NULL;
-                    gnrc_pktqueue_remove_head((gnrc_pktqueue_t**)&(gnrc_netdev2->retrans_head));
-                }
+                assert(gnrc_netdev2->retrans_head);
+                DEBUG("packet sent, removing from buffer and queue: %p\n", (void*) gnrc_netdev2->retrans_head->pkt);
+                gnrc_pktbuf_release(gnrc_netdev2->retrans_head->pkt);
+                gnrc_netdev2->retrans_head->pkt = NULL;
+                gnrc_pktqueue_remove_head((gnrc_pktqueue_t**)&(gnrc_netdev2->retrans_head));
                 /* if there are more packets queued, send them now */
                 if (gnrc_netdev2->retrans_head) {
                     gnrc_netdev2->send(gnrc_netdev2, gnrc_netdev2->retrans_head->pkt);
