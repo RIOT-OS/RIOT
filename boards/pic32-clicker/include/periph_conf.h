@@ -13,7 +13,6 @@
 extern "C" {
 #endif
 
-/* Note this file must exist for xtimer code to build */
 #define TIMER_NUMOF         (1)
 #define TIMER_0_CHANNELS    (3)
 
