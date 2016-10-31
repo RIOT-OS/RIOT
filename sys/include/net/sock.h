@@ -172,7 +172,7 @@ typedef struct {
          */
         uint8_t ipv6[16];
 #endif
-        uint32_t ipv4;      /**< IPv4 address mode */
+        uint8_t ipv4[4];    /**< IPv4 address mode */
     } addr;                 /**< address */
 
     /**
@@ -208,7 +208,7 @@ struct _sock_tl_ep {
          */
         uint8_t ipv6[16];
 #endif
-        uint32_t ipv4;      /**< IPv4 address mode */
+        uint8_t ipv4[4];    /**< IPv4 address mode */
     } addr;                 /**< address */
 
     /**
@@ -222,7 +222,7 @@ struct _sock_tl_ep {
      * over
      */
     uint16_t netif;
-    uint16_t port;          /**< transport layer port */
+    uint16_t port;          /**< transport layer port (in host byte order) */
 };
 
 #ifdef __cplusplus
