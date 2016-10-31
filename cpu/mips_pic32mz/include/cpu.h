@@ -18,7 +18,7 @@ extern "C" {
 #include "irq.h"
 
 /* We run from flash on PIC32 */
-#define FLASH_XIP 1
+#define FLASH_XIP (1)
 
 extern void dummy(void);
 static inline void cpu_init_early(void)

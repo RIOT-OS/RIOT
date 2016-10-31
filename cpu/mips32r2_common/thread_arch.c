@@ -19,8 +19,8 @@
 #include "periph_conf.h" /* for debug uart number */
 #include "periph/uart.h"
 
-#define STACK_END_PAINT 0xdeadc0de
-#define C0_STATUS_EXL 2
+#define STACK_END_PAINT (0xdeadc0de)
+#define C0_STATUS_EXL   (2)
 
 /*
  *    Stack Layout, note struct gpctx is defined in

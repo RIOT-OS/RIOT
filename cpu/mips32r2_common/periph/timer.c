@@ -24,9 +24,9 @@
  * setting TIMER_ACCURACY_SHIFT lower will improve accuracy
  * at the cost of more regular interrupts (hence less power efficient).
  * */
-#define TIMER_ACCURACY_SHIFT 10
-#define TIMER_ACCURACY (1 << TIMER_ACCURACY_SHIFT)
-#define CHANNELS 3
+#define TIMER_ACCURACY_SHIFT (10)
+#define TIMER_ACCURACY       (1 << TIMER_ACCURACY_SHIFT)
+#define CHANNELS             (3)
 
 /* TICKS_PER_US must be set in the board file */
 #ifndef TICKS_PER_US
