@@ -9,12 +9,13 @@ RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_BLACKLIST := z1 wsn430-v1_4 wsn430-v1_3b waspmote-pro arduino-mega2560  \
                    msb-430h msb-430 chronos telosb msbiot cc2538dk \
-                   saml21-xpro samr21-xpro arduino-duemilanove arduino-uno
+                   saml21-xpro samr21-xpro arduino-duemilanove arduino-uno \
+                   nrf52dk # see #6022
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos msb-430 msb-430h nrf51dongle \
                           nrf6310 nucleo-f103 nucleo-f334 pca10000 pca10005 spark-core \
                           stm32f0discovery telosb weio wsn430-v1_3b wsn430-v1_4 \
-                          yunjia-nrf51822 z1 nucleo-f072 cc2650stk nucleo-f030\
+                          yunjia-nrf51822 z1 nucleo-f072 cc2650stk nucleo-f030 \
                           nucleo-f070
 
 # Include packages that pull up and auto-init the link layer.
