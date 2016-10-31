@@ -6,6 +6,17 @@
  * directory for more details.
  */
 
+/**
+ * @defgroup    cpu_mips32r2_commom MIPS32R2 Common
+ * @ingroup     cpu
+ * @{
+ *
+ * @file
+ * @brief       Common implementations and headers for mips32r2 compliant devices
+ *
+ * @author      Imagination Technologies
+ */
+
 #ifndef CPU_H_
 #define CPU_H_
 
@@ -18,16 +29,31 @@ extern "C" {
 
 #include "irq.h"
 
-/* This file must exist else RIOT won't compile */
 
+/**
+ * @brief   Early CPU initialisation
+ *
+ * @todo:   Not supported for generic mips32r2 implementations the bootloader
+ * must have initialised the system
+ */
 static inline void cpu_init_early(void)
 {
+    /* This function must exist else RIOT won't compile */
 }
 
+/**
+ * @brief   Print the last instruction's address
+ *
+ * @todo:   Not supported
+ */
 static inline void cpu_print_last_instruction(void)
 {
+    /* This function must exist else RIOT won't compile */
 }
 
+/**
+ * @brief   Board level initialisation
+ */
 void board_init(void);
 
 #ifdef __cplusplus
@@ -35,3 +61,5 @@ void board_init(void);
 #endif
 
 #endif
+/** @} */
+

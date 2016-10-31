@@ -8,6 +8,18 @@
  *
  */
 
+/**
+ * @defgroup    boards_mips-malta MIPS MALTA
+ * @ingroup     boards
+ * @brief       Board specific files for the MIPS Malta FPGA system
+ * @{
+ *
+ * @file
+ * @brief       Board specific definitions for the MIPS Malta FPGA System.
+ *
+ * @author      Imagination Technologies.
+ */
+
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
@@ -15,7 +27,11 @@
 extern "C" {
 #endif
 
-#define TICKS_PER_US 15 /* needed by timer code */
+/**
+ * @brief Set how many increments of the count register per uS
+ *        needed by timer code
+ */
+#define TICKS_PER_US (15)
 
 #ifdef __cplusplus
 }
@@ -23,3 +39,4 @@ extern "C" {
 
 
 #endif /* _BOARD_H_ */
+/** @} */

@@ -7,6 +7,17 @@
  * directory for more details.
  */
 
+/**
+ * @defgroup    cpu_mips_pic32mx MIPS PIC32MX
+ * @ingroup     cpu
+ * @{
+ *
+ * @file
+ * @brief       main CPU definitions for pic32mx devices.
+ *
+ * @author      Imagination Technologies
+ */
+
 #ifndef _CPU_H_
 #define _CPU_H_
 
@@ -19,23 +30,36 @@ extern "C" {
 #include <assert.h>
 #include "irq.h"
 
-/* We run from flash on PIC32 */
+/**
+ * @brief We run from flash on PIC32
+ */
 #define FLASH_XIP 1
 
+/**
+ * @brief Stop the linker from throwing away the PIC32 config register settings
+ * @{
+ */
 extern void dummy(void);
 static inline void cpu_init_early(void)
 {
-	/* Stop the linker from throwing away the PIC32 config register settings */
 	dummy();
 }
+/** @} */
 
 
-/* This file must exist else RIOT won't compile */
+/**
+ * @brief   Print the last instruction's address
+ *
+ * @todo:   Not supported
+ */
 static inline void cpu_print_last_instruction(void)
 {
-
+    /* This function must exist else RIOT won't compile */
 }
 
+/**
+ * @brief   Board level initialisation
+ */
 void board_init(void);
 
 #ifdef __cplusplus
@@ -43,3 +67,5 @@ void board_init(void);
 #endif
 
 #endif
+/** @} */
+

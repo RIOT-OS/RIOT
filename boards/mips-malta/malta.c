@@ -12,8 +12,8 @@
 
 #include "periph/uart.h"
 
-#define MIPS_MALTA_ADDR 0xbf000500
-#define MIPS_MALTA_VAL_RST 0x42
+#define MIPS_MALTA_ADDR (0xbf000500)
+#define MIPS_MALTA_VAL_RST (0x42)
 
 static void malta_reset(void)
 {
