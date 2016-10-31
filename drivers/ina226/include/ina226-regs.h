@@ -11,7 +11,7 @@
  *
  * @file
  * @brief       Register definitions for Texas Instruments INA226 High-Side or Low-Side Measurement,
- *                 Bi-Directional Current and Power Monitor with I2C Compatible Interface
+ *              Bi-Directional Current and Power Monitor with I2C Compatible Interface
  *
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
@@ -24,7 +24,6 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
-
 
 /**
  * @brief INA226 register addresses
@@ -42,7 +41,6 @@ typedef enum ina226_reg {
     INA226_REG_ALERT_LIMIT     = 0x07, /**< Alert Limit register (read/write) */
     INA226_REG_MANUFACTURER_ID = 0xFE, /**< Manufacturer ID register (read only) */
     INA226_REG_DIE_ID          = 0xFF, /**< Die ID register (read only) */
-
 } ina226_reg_t;
 
 /**
@@ -62,8 +60,6 @@ typedef enum ina226_mask_enable_reg_bit {
     INA226_MASK_ENABLE_SUL     = 0x4000, /**< Shunt Voltage Under-Voltage */
     INA226_MASK_ENABLE_SOL     = 0x8000, /**< Shunt Voltage Over-Voltage */
 } ina226_mask_enable_reg_bit_t;
-
-
 
 
 #ifdef __cplusplus

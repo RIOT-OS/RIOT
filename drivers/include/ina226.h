@@ -27,6 +27,7 @@
 
 #include "periph/gpio.h"
 #include "periph/i2c.h"
+#include "ina226-regs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -132,6 +133,30 @@ typedef enum ina226_OP_mode {
 } ina226_mode_t;
 
 /**
+ * @brief Read one 16 bit register of INA226 device
+ *
+ * @param[in]  dev          device descriptor of sensor
+ * @param[in]  reg          register to read
+ * @param[out] out          pointer to where the register value will be stored
+ *
+ * @return                  0 on success
+ * @return                  <0 on error
+ */
+int ina226_read_reg(ina226_t *dev, uint8_t reg, uint16_t *out);
+
+/**
+ * @brief Write one 16 bit register of INA226 device
+ *
+ * @param[in] dev           device descriptor of sensor
+ * @param[in] reg           register to write
+ * @param[in] in            value to write to register
+ *
+ * @return                  0 on success
+ * @return                  <0 on error
+ */
+int ina226_write_reg(ina226_t *dev, uint8_t reg, uint16_t in);
+
+/**
  * @brief Initialize a current sensor
  *
  * @param[out] dev          device descriptor of sensor to initialize
@@ -144,6 +169,21 @@ typedef enum ina226_OP_mode {
 int ina226_init(ina226_t *dev, i2c_t i2c, uint8_t address);
 
 /**
+ * @brief enable interrupt for the alert pin
+ *
+ * @param[in]  dev          device descriptor of sensor
+ * @param[in]  me_config    the configuration of the mask/enable register (specifies 
+                            which condition triggers the interrupt)
+ * @param[in]  pin          the gpio pin that is connected to the alert pin 
+                            of the ina226 device
+ * @param[in]  callback     function that is called when an interrupt occurs
+ *
+ * @return                     0 on success
+ *                             <0 on error
+ */
+int ina226_activate_int(ina226_t *dev, uint16_t me_config, gpio_t pin, gpio_cb_t callback);
+
+/**
  * @brief Read calibration register
  *
  * @param[in]   dev          device descriptor of sensor to configure
@@ -152,7 +192,10 @@ int ina226_init(ina226_t *dev, i2c_t i2c, uint8_t address);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina226_read_calibration(ina226_t *dev, uint16_t *calibration);
+inline int ina226_read_calibration(ina226_t *dev, uint16_t *calibration)
+{
+    return ina226_read_reg(dev, INA226_REG_CALIBRATION, calibration);
+}
 
 /**
  * @brief Write to calibration register
@@ -163,7 +206,10 @@ int ina226_read_calibration(ina226_t *dev, uint16_t *calibration);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina226_write_calibration(ina226_t *dev, uint16_t calibration);
+inline int ina226_write_calibration(ina226_t *dev, uint16_t calibration)
+{
+    return ina226_write_reg(dev, INA226_REG_CALIBRATION, calibration);
+}
 
 /**
  * @brief Read configuration register
@@ -174,7 +220,10 @@ int ina226_write_calibration(ina226_t *dev, uint16_t calibration);
  * @return                   0 on success
  * @return                   <0 on error
  */
-int ina226_read_config(ina226_t *dev, uint16_t *config);
+inline int ina226_read_config(ina226_t *dev, uint16_t *config)
+{
+    return ina226_read_reg(dev, INA226_REG_CONFIGURATION, config);   
+}
 
 /**
  * @brief Write to configuration register
@@ -185,7 +234,10 @@ int ina226_read_config(ina226_t *dev, uint16_t *config);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina226_write_config(ina226_t *dev, uint16_t config);
+inline int ina226_write_config(ina226_t *dev, uint16_t config)
+{
+    return ina226_write_reg(dev, INA226_REG_CONFIGURATION, config);
+}
 
 /**
  * @brief Read shunt voltage
@@ -201,7 +253,10 @@ int ina226_write_config(ina226_t *dev, uint16_t config);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina226_read_shunt(ina226_t *dev, int16_t *voltage);
+inline int ina226_read_shunt(ina226_t *dev, int16_t *voltage)
+{
+    return ina226_read_reg(dev, INA226_REG_SHUNT_VOLTAGE, (uint16_t *)voltage);
+}
 
 /**
  * @brief Read bus voltage register
@@ -218,7 +273,10 @@ int ina226_read_shunt(ina226_t *dev, int16_t *voltage);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina226_read_bus(ina226_t *dev, int16_t *voltage);
+inline int ina226_read_bus(ina226_t *dev, int16_t *voltage)
+{
+    return ina226_read_reg(dev, INA226_REG_BUS_VOLTAGE, (uint16_t *)voltage);
+}
 
 /**
  * @brief Read shunt current
@@ -229,7 +287,10 @@ int ina226_read_bus(ina226_t *dev, int16_t *voltage);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina226_read_current(ina226_t *dev, int16_t *current);
+inline int ina226_read_current(ina226_t *dev, int16_t *current)
+{
+    return ina226_read_reg(dev, INA226_REG_CURRENT, (uint16_t *)current);
+}
 
 /**
  * @brief Read power consumption
@@ -240,7 +301,10 @@ int ina226_read_current(ina226_t *dev, int16_t *current);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina226_read_power(ina226_t *dev, int16_t *power);
+inline int ina226_read_power(ina226_t *dev, int16_t *power)
+{
+    return ina226_read_reg(dev, INA226_REG_POWER, (uint16_t *)power);
+}
 
 /**
  * @brief read die ID Register
@@ -251,7 +315,10 @@ int ina226_read_power(ina226_t *dev, int16_t *power);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina226_read_die_id(ina226_t *dev, uint16_t *id);
+inline int ina226_read_die_id(ina226_t *dev, uint16_t *id)
+{
+    return ina226_read_reg(dev, INA226_REG_DIE_ID, id);
+}
 
 /**
  * @brief read manufacturer ID Register
@@ -263,7 +330,10 @@ int ina226_read_die_id(ina226_t *dev, uint16_t *id);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina226_read_manufacturer_id(ina226_t *dev, uint16_t *id);
+inline int ina226_read_manufacturer_id(ina226_t *dev, uint16_t *id)
+{
+    return ina226_read_reg(dev, INA226_REG_MANUFACTURER_ID, id);
+}
 
 /**
  * @brief read the mask/enable register
@@ -274,7 +344,10 @@ int ina226_read_manufacturer_id(ina226_t *dev, uint16_t *id);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina226_read_mask_enable(ina226_t *dev, uint16_t *val);
+inline int ina226_read_mask_enable(ina226_t *dev, uint16_t *val)
+{
+    return ina226_read_reg(dev, INA226_REG_MASK_ENABLE, val);
+}
 
 /**
  * @brief write the mask/enable register
@@ -285,7 +358,10 @@ int ina226_read_mask_enable(ina226_t *dev, uint16_t *val);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina226_write_mask_enable(ina226_t *dev, uint16_t val);
+inline int ina226_write_mask_enable(ina226_t *dev, uint16_t val)
+{
+    return ina226_write_reg(dev, INA226_REG_MASK_ENABLE, val);
+}
 
 /**
  * @brief read alert limit register
@@ -296,7 +372,10 @@ int ina226_write_mask_enable(ina226_t *dev, uint16_t val);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina226_read_alert_limit(ina226_t *dev, uint16_t *val);
+inline int ina226_read_alert_limit(ina226_t *dev, uint16_t *val)
+{
+    return ina226_read_reg(dev, INA226_REG_ALERT_LIMIT, val);
+}
 
 /**
  * @brief write alert limit register
@@ -307,22 +386,10 @@ int ina226_read_alert_limit(ina226_t *dev, uint16_t *val);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina226_write_alert_limit(ina226_t *dev, uint16_t val);
-
-/**
- * @brief enable interrupt for the alert pin
- *
- * @param[in]  dev          device descriptor of sensor
- * @param[in]  me_config    the configuration of the mask/enable register (specifies 
-                            which condition triggers the interrupt)
- * @param[in]  pin          the gpio pin that is connected to the alert pin 
-                            of the ina226 device
- * @param[in]  callback     function that is called when an interrupt occurs
- *
- * @return                     0 on success
- *                             <0 on error
- */
-int ina226_activate_int(ina226_t *dev, uint16_t me_config, gpio_t pin, gpio_cb_t callback);
+inline int ina226_write_alert_limit(ina226_t *dev, uint16_t val)
+{
+    return ina226_write_reg(dev, INA226_REG_ALERT_LIMIT, val);
+}
 
 #ifdef __cplusplus
 }
