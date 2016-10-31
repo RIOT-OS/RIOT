@@ -25,7 +25,7 @@ USEMODULE += gnrc_rpl
 USEMODULE += gnrc_icmpv6_echo
 
 #
-USEMODULE += gnrc_conn_udp
+USEMODULE += gnrc_sock_udp
 
 USEPKG += microcoap
 CFLAGS += -DMICROCOAP_DEBUG

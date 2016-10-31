@@ -7,7 +7,7 @@
  */
 
 #include "net/af.h"
-#include "net/conn/udp.h"
+#include "net/sock/udp.h"
 
 #ifdef MICROCOAP_DEBUG
 #define ENABLE_DEBUG (1)
@@ -33,18 +33,18 @@ coap_rw_buffer_t scratch_buf = { scratch_raw, sizeof(scratch_raw) };
 void microcoap_server_loop(void)
 {
 
-    uint8_t laddr[16] = { 0 };
-    uint8_t raddr[16] = { 0 };
-    size_t raddr_len;
-    uint16_t rport;
+    static const sock_udp_ep_t local = { .family = AF_INET6,
+                                         .port = COAP_SERVER_PORT };
+    sock_udp_ep_t remote;
 
-    conn_udp_t conn;
+    sock_udp_t sock;
 
-    int rc = conn_udp_create(&conn, laddr, sizeof(laddr), AF_INET6, COAP_SERVER_PORT);
+    int rc = sock_udp_create(&sock, &local, NULL, 0);
 
     while (1) {
         DEBUG("Waiting for incoming UDP packet...\n");
-        rc = conn_udp_recvfrom(&conn, (char *)_udp_buf, sizeof(_udp_buf), raddr, &raddr_len, &rport);
+        rc = sock_udp_recv(&sock, (char *)_udp_buf, sizeof(_udp_buf),
+                           SOCK_NO_TIMEOUT, &remote);
         if (rc < 0) {
             DEBUG("Error in conn_udp_recvfrom(). rc=%u\n", rc);
             continue;
@@ -82,7 +82,7 @@ void microcoap_server_loop(void)
                 coap_dumpPacket(&rsppkt);
 
                 /* send reply via UDP */
-                rc = conn_udp_sendto(_udp_buf, rsplen, NULL, 0, raddr, raddr_len, AF_INET6, COAP_SERVER_PORT, rport);
+                rc = sock_udp_send(&sock, _udp_buf, rsplen, &remote);
                 if (rc < 0) {
                     DEBUG("Error sending CoAP reply via udp; %u\n", rc);
                 }
