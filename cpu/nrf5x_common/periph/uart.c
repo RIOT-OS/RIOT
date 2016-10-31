@@ -140,12 +140,22 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     if (uart == 0) {
         for (size_t i = 0; i < len; i++) {
+            /* This section of the function is not thread safe:
+                - another thread may mess up with the uart at the same time.
+               In order to avoid an infinite loop in the interrupted thread,
+               the TXRDY flag must be cleared before writing the data to be
+               sent and not after. This way, the higher priority thread will
+               exit this function with the TXRDY flag set, then the interrupted
+               thread may have not transmitted his data but will still exit the
+               while loop.
+            */
+
+            /* reset ready flag */
+            NRF_UART0->EVENTS_TXDRDY = 0;
             /* write data into transmit register */
             NRF_UART0->TXD = data[i];
             /* wait for any transmission to be done */
             while (NRF_UART0->EVENTS_TXDRDY == 0) {}
-            /* reset ready flag */
-            NRF_UART0->EVENTS_TXDRDY = 0;
         }
     }
 }
