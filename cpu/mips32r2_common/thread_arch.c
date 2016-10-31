@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "thread.h"
 #include "cpu.h"
@@ -176,24 +177,9 @@ _mips_handle_exception(struct gpctx *ctx, int exception)
                      * fill out a minimal struct stat.
                      */
                     struct stat *sbuf = (struct stat *)ctx->a[1];
+                    memset(sbuf, 0, sizeof(struct stat));
                     sbuf->st_mode = S_IRUSR | S_IWUSR | S_IWGRP;
                     sbuf->st_blksize = BUFSIZ;
-                    sbuf->st_dev = 0;
-                    sbuf->st_ino = 0;
-                    sbuf->st_nlink = 0;
-                    sbuf->st_uid = 0;
-                    sbuf->st_gid = 0;
-                    sbuf->st_rdev = 0;
-                    sbuf->st_size = 0;
-                    sbuf->st_atime = (time_t) 0;
-                    sbuf->st_spare1 = 0;
-                    sbuf->st_mtime = (time_t) 0;
-                    sbuf->st_spare2 = 0;
-                    sbuf->st_ctime = (time_t) 0;
-                    sbuf->st_spare3 = 0;
-                    sbuf->st_blocks = 0;
-                    sbuf->st_spare4[0] = 0;
-                    sbuf->st_spare4[1] = 0;
                     /* return 0 */
                     ctx->v[0] = 0;
                     ctx->epc += 4; /* move PC past the syscall */
