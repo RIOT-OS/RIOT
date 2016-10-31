@@ -280,8 +280,8 @@ bool lwmac_update(void)
             lwmac_rx_stop(&lwmac);
             /* Dispatch received packets, timing is not critical anymore */
             _dispatch(lwmac.rx.dispatch_buffer);
-            /* Go back to sleep after successful transaction */
-            lwmac_set_state(SLEEPING);
+            /* Go back to Listen after successful transaction */
+            lwmac_set_state(LISTENING);
             break;
         default:
             lwmac_rx_update(&lwmac);
@@ -466,6 +466,11 @@ static void _event_cb(netdev2_t* dev, netdev2_event_t event)
 			 *
 			 * TODO: transceivers might have 2 frame buffers, so make this optional
 			 */
+            if(pkt == NULL){
+                lwmac.rx_started = false;
+                break;
+            }
+
 			if(!lwmac.rx_started) {
 				LOG_WARNING("Maybe sending kicked in and frame buffer is now corrupted\n");
 				gnrc_pktbuf_release(pkt);

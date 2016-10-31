@@ -157,24 +157,34 @@ static bool _lwmac_rx_update(lwmac_t* lwmac)
         LOG_DEBUG("RX_STATE_SEND_WA\n");
 
         gnrc_pktsnip_t* pkt;
+        gnrc_pktsnip_t* pkt_lwmac;
         gnrc_netif_hdr_t* nethdr_wa;
 
         assert(lwmac->rx.l2_addr.len != 0);
+
+        /* if found ongoing transmission,
+         * quit sending WA for collision avoidance. */
+        if(_get_netdev_state(lwmac) == NETOPT_STATE_RX){
+            GOTO_RX_STATE(RX_STATE_FAILED, true);
+        }
 
         /* Assemble WA packet */
         lwmac_frame_wa_t lwmac_hdr;
         lwmac_hdr.header.type = FRAMETYPE_WA;
         lwmac_hdr.dst_addr = lwmac->rx.l2_addr;
+        lwmac_hdr.current_phase = _phase_now();
 
         pkt = gnrc_pktbuf_add(NULL, &lwmac_hdr, sizeof(lwmac_hdr), GNRC_NETTYPE_LWMAC);
         if(pkt == NULL) {
             LOG_ERROR("Cannot allocate pktbuf of type GNRC_NETTYPE_LWMAC\n");
             GOTO_RX_STATE(RX_STATE_FAILED, true);
         }
+        pkt_lwmac = pkt;
 
         pkt = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_netif_hdr_t) + lwmac->rx.l2_addr.len, GNRC_NETTYPE_NETIF);
         if(pkt == NULL) {
             LOG_ERROR("Cannot allocate pktbuf of type GNRC_NETTYPE_NETIF\n");
+            gnrc_pktbuf_release(pkt_lwmac);
             GOTO_RX_STATE(RX_STATE_FAILED, true);
         }
 
@@ -206,7 +216,14 @@ static bool _lwmac_rx_update(lwmac_t* lwmac)
 //        }
 
         /* Send WA */
-		lwmac->netdev->send(lwmac->netdev, pkt);
+		int res = lwmac->netdev->send(lwmac->netdev, pkt);
+		if(res < 0){
+            LOG_ERROR("Send WA failed.");
+            if(pkt != NULL){
+                gnrc_pktbuf_release(pkt);
+            }
+            GOTO_RX_STATE(RX_STATE_FAILED, true);
+        }
         _set_netdev_state(lwmac, NETOPT_STATE_TX);
 
         /* Enable Auto ACK again for data reception */

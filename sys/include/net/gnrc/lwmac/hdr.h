@@ -31,7 +31,7 @@ extern "C" {
 /******************************************************************************/
 
 typedef struct {
-    uint8_t  addr[LWMAC_MAX_L2_ADDR_LEN] __attribute__ ((aligned (LWMAC_MAX_L2_ADDR_LEN)));
+    uint8_t  addr[LWMAC_MAX_L2_ADDR_LEN];// __attribute__ ((aligned (LWMAC_MAX_L2_ADDR_LEN)));
     uint8_t  len;
 } l2_addr_t;
 #define LWMAC_L2_ADDR_INIT      { {0}, 0 }
@@ -59,6 +59,7 @@ typedef struct __attribute__((packed)) {
  */
 typedef struct __attribute__((packed)) {
     lwmac_hdr_t header;
+    l2_addr_t dst_addr; /**< WR is broadcast, so destination address needed */
 } lwmac_frame_wr_t;
 
 /**
@@ -67,6 +68,7 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed)) {
     lwmac_hdr_t header;
     l2_addr_t dst_addr; /**< WA is broadcast, so destination address needed */
+    uint32_t current_phase;
 } lwmac_frame_wa_t;
 
 /**

@@ -20,6 +20,7 @@
 #include <net/gnrc.h>
 #include <net/gnrc/lwmac/lwmac.h>
 #include <net/gnrc/lwmac/packet_queue.h>
+#include <random.h>
 
 #include "include/tx_state_machine.h"
 #include "include/timeout.h"
@@ -106,6 +107,15 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         lwmac_clear_timeout(lwmac, TIMEOUT_NEXT_BROADCAST);
         lwmac_clear_timeout(lwmac, TIMEOUT_BROADCAST_END);
 
+        /* if found ongoing transmission,
+         * quit this cycle for collision avoidance. */
+        if(_get_netdev_state(lwmac) == NETOPT_STATE_RX){
+            _queue_tx_packet(lwmac, lwmac->tx.packet);
+            /* drop pointer so it wont be free'd */
+            lwmac->tx.packet = NULL;
+            GOTO_TX_STATE(TX_STATE_FAILED, true);
+        }
+
         if(_packet_is_broadcast(lwmac->tx.packet)) {
             /* Set CSMA retries as configured and enable */
             uint8_t csma_retries = LWMAC_BROADCAST_CSMA_RETRIES;
@@ -116,9 +126,8 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
 
             GOTO_TX_STATE(TX_STATE_SEND_BROADCAST, true);
         } else {
-            /* Don't attempt to send a WR if channel is busy to get timings
-             * right, will be changed for sending DATA packet */
-            netopt_enable_t csma_disable = NETOPT_DISABLE;
+            /* Use CSMA for the first WR */
+            netopt_enable_t csma_disable = NETOPT_ENABLE;
 			lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_CSMA, &csma_disable, sizeof(csma_disable));
 
             GOTO_TX_STATE(TX_STATE_SEND_WR, true);
@@ -140,12 +149,20 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
             LOG_INFO("Initialize broadcasting\n");
             lwmac_set_timeout(lwmac, TIMEOUT_BROADCAST_END, LWMAC_BROADCAST_DURATION_US);
 
+            gnrc_pktsnip_t* pkt_payload;
+
             /* Prepare packet with LwMAC header*/
             lwmac_frame_broadcast_t hdr = {};
             hdr.header.type = FRAMETYPE_BROADCAST;
             hdr.seq_nr = lwmac->tx.bcast_seqnr++;
 
+            pkt_payload = pkt->next;
             pkt->next = gnrc_pktbuf_add(pkt->next, &hdr, sizeof(hdr), GNRC_NETTYPE_LWMAC);
+            if(pkt->next == NULL) {
+                LOG_ERROR("Cannot allocate pktbuf of type FRAMETYPE_BROADCAST\n");
+                lwmac->tx.packet->next = pkt_payload;
+                GOTO_TX_STATE(TX_STATE_FAILED, true);
+            }
 
             /* No Auto-ACK for broadcast packets */
             netopt_enable_t autoack = NETOPT_DISABLE;
@@ -159,7 +176,11 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
             /* Don't let the packet be released yet, we want to send it again */
             gnrc_pktbuf_hold(pkt, 1);
 
-			lwmac->netdev->send(lwmac->netdev, pkt);
+            int res = lwmac->netdev->send(lwmac->netdev, pkt);
+            if(res < 0){
+                LOG_ERROR("Send broadcast pkt failed.");
+                GOTO_TX_STATE(TX_STATE_FAILED, true);
+            }
             _set_netdev_state(lwmac, NETOPT_STATE_TX);
 
             lwmac_set_timeout(lwmac, TIMEOUT_NEXT_BROADCAST, LWMAC_TIME_BETWEEN_BROADCAST_US);
@@ -173,20 +194,35 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         LOG_DEBUG("TX_STATE_SEND_WR\n");
 
         gnrc_pktsnip_t* pkt;
+        gnrc_pktsnip_t* pkt_lwmac;
         gnrc_netif_hdr_t *nethdr;
-        uint8_t* dst_addr = NULL;
-        int addr_len;
+        //uint8_t* dst_addr = NULL;
+        //int addr_len;
 
-        /* Get destination address */
+        uint32_t random_backoff;
+        random_backoff = random_uint32_range(0, LWMAC_RANDOM_BEFORE_WR_US);
+        xtimer_usleep(random_backoff);
+
+        /* if found ongoing transmission,
+         * quit this cycle for collision avoidance. */
+        if(_get_netdev_state(lwmac) == NETOPT_STATE_RX) {
+            _queue_tx_packet(lwmac, lwmac->tx.packet);
+            /* drop pointer so it wont be free'd */
+            lwmac->tx.packet = NULL;
+            GOTO_TX_STATE(TX_STATE_FAILED, true);
+        }
+
+        /* Get destination address
         addr_len = _get_dest_address(lwmac->tx.packet, &dst_addr);
         if(addr_len <= 0 || addr_len > 8) {
             LOG_ERROR("Invalid address length: %i\n", addr_len);
             GOTO_TX_STATE(TX_STATE_FAILED, true);
-        }
+        }*/
 
         /* Assemble WR */
         lwmac_frame_wr_t wr_hdr = {};
         wr_hdr.header.type = FRAMETYPE_WR;
+        wr_hdr.dst_addr = lwmac->tx.current_neighbour->l2_addr;
 
         pkt = gnrc_pktbuf_add(NULL, &wr_hdr, sizeof(wr_hdr), GNRC_NETTYPE_LWMAC);
         if(pkt == NULL) {
@@ -194,9 +230,13 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
             GOTO_TX_STATE(TX_STATE_FAILED, true);
         }
 
-        pkt = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_netif_hdr_t) + addr_len, GNRC_NETTYPE_NETIF);
+        /* track the location of this lwmac_frame_wr_t header */
+        pkt_lwmac = pkt;
+
+        pkt = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_netif_hdr_t), GNRC_NETTYPE_NETIF);
         if(pkt == NULL) {
             LOG_ERROR("Cannot allocate pktbuf of type GNRC_NETTYPE_NETIF\n");
+            gnrc_pktbuf_release(pkt_lwmac);
             GOTO_TX_STATE(TX_STATE_FAILED, true);
         }
 
@@ -205,8 +245,11 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         nethdr = (gnrc_netif_hdr_t*) _gnrc_pktbuf_find(pkt, GNRC_NETTYPE_NETIF);
 
         /* Construct NETIF header and insert address for WR packet */
-        gnrc_netif_hdr_init(nethdr, 0, addr_len);
-        gnrc_netif_hdr_set_dst_addr(nethdr, dst_addr, addr_len);
+        gnrc_netif_hdr_init(nethdr, 0, 0);
+        //gnrc_netif_hdr_set_dst_addr(nethdr, dst_addr, addr_len);
+
+        /* Send WR as broadcast*/
+        nethdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
 
         /* Disable Auto ACK */
         netopt_enable_t autoack = NETOPT_DISABLE;
@@ -214,7 +257,14 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
 
         /* Prepare WR, this will discard any frame in the transceiver that has
          * possibly arrived in the meantime but we don't care at this point. */
-		lwmac->netdev->send(lwmac->netdev, pkt);
+        int res = lwmac->netdev->send(lwmac->netdev, pkt);
+        if(res < 0){
+            LOG_ERROR("Send WR failed.");
+            if(pkt != NULL){
+                gnrc_pktbuf_release(pkt);
+            }
+            GOTO_TX_STATE(TX_STATE_FAILED, true);
+        }
 
         /* First WR, try to catch wakeup phase */
         if(lwmac->tx.wr_sent == 0) {
@@ -234,12 +284,6 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
             while(rtt_get_counter() < wait_until);
         }
 
-        /* Save timestamp in case this WR reaches the destination node so that
-         * we know it's wakeup phase relative to ours for the next time. This
-         * is not exactly the time the WR was completely sent, but the timing
-         * we can reproduce here. */
-        lwmac->tx.timestamp = rtt_get_counter();
-
         /* Trigger sending frame */
         _set_netdev_state(lwmac, NETOPT_STATE_TX);
 
@@ -257,8 +301,18 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
             break;
         }
 
+        if(lwmac->tx_feedback == TX_FEEDBACK_BUSY) {
+            _queue_tx_packet(lwmac, lwmac->tx.packet);
+            lwmac->tx.packet = NULL;
+            GOTO_TX_STATE(TX_STATE_FAILED, true);
+            break;
+        }
+
         if(lwmac->tx.wr_sent == 0) {
-            lwmac_set_timeout(lwmac, TIMEOUT_NO_RESPONSE, LWMAC_WAKEUP_INTERVAL_US);
+            lwmac_set_timeout(lwmac, TIMEOUT_NO_RESPONSE, LWMAC_PREAMBLE_DURATION_US);
+            /* Only the first WR use CSMA */
+            netopt_enable_t csma_disable = NETOPT_DISABLE;
+            lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_CSMA, &csma_disable, sizeof(csma_disable));
         }
 
         lwmac->tx.wr_sent++;
@@ -343,10 +397,32 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
                 continue;
             }
 
+            /* if found anther node is also trying to send data,
+             * quit this cycle for collision avoidance. */
+            if(info.header->type == FRAMETYPE_WR){
+                _queue_tx_packet(lwmac, lwmac->tx.packet);
+                /* drop pointer so it wont be free'd */
+                lwmac->tx.packet = NULL;
+                postponed = true;
+                gnrc_pktbuf_release(pkt);
+                break;
+            }
+
             if(info.header->type != FRAMETYPE_WA) {
                 LOG_DEBUG("Packet is not WA: 0x%02x\n", info.header->type);
                 gnrc_pktbuf_release(pkt);
                 continue;
+            }
+
+            /* calculate the phase of the receiver based on WA */
+            lwmac->tx.timestamp = _phase_now();
+            lwmac_frame_wa_t* wa_hdr;
+            wa_hdr = _gnrc_pktbuf_find(pkt, GNRC_NETTYPE_LWMAC);
+            if(lwmac->tx.timestamp >= wa_hdr->current_phase){
+                lwmac->tx.timestamp = lwmac->tx.timestamp - wa_hdr->current_phase;
+            }else{
+                lwmac->tx.timestamp += RTT_US_TO_TICKS(LWMAC_WAKEUP_INTERVAL_US);
+                lwmac->tx.timestamp -= wa_hdr->current_phase;
             }
 
             /* No need to keep pkt anymore */
@@ -374,13 +450,9 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
             break;
         }
 
-        /* WR arrived at destination, so calculate destination wakeup phase
-         * based on the timestamp of the WR we sent */
-         uint32_t new_phase = _ticks_to_phase(lwmac->tx.timestamp);
-
         /* Save newly calculated phase for destination */
-        lwmac->tx.current_neighbour->phase = new_phase;
-        LOG_INFO("New phase: %"PRIu32"\n", new_phase);
+        lwmac->tx.current_neighbour->phase = lwmac->tx.timestamp;
+        LOG_INFO("New phase: %"PRIu32"\n", lwmac->tx.timestamp);
 
         /* We've got our WA, so discard the rest, TODO: no flushing */
         packet_queue_flush(&lwmac->rx.queue);
@@ -392,6 +464,7 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         LOG_DEBUG("TX_STATE_SEND_DATA\n");
 
         gnrc_pktsnip_t* pkt = lwmac->tx.packet;
+        gnrc_pktsnip_t* pkt_payload;
 
         /* Enable Auto ACK again */
         netopt_enable_t autoack = NETOPT_ENABLE;
@@ -405,12 +478,23 @@ static bool _lwmac_tx_update(lwmac_t* lwmac)
         netopt_enable_t csma_enable = NETOPT_ENABLE;
 		lwmac->netdev2_driver->set(lwmac->netdev->dev, NETOPT_CSMA, &csma_enable, sizeof(csma_enable));
 
+        pkt_payload = pkt->next;
+
         /* Insert lwMAC header above NETIF header */
         lwmac_hdr_t hdr = {FRAMETYPE_DATA};
         pkt->next = gnrc_pktbuf_add(pkt->next, &hdr, sizeof(hdr), GNRC_NETTYPE_LWMAC);
+        if(pkt->next == NULL){
+            LOG_ERROR("Cannot allocate pktbuf of type FRAMETYPE_DATA\n");
+            lwmac->tx.packet->next = pkt_payload;
+            GOTO_TX_STATE(TX_STATE_FAILED, true);
+        }
 
         /* Send data */
-		lwmac->netdev->send(lwmac->netdev, pkt);
+        int res = lwmac->netdev->send(lwmac->netdev, pkt);
+        if(res < 0){
+            LOG_ERROR("Send data failed.");
+            GOTO_TX_STATE(TX_STATE_FAILED, true);
+        }
         _set_netdev_state(lwmac, NETOPT_STATE_TX);
 
         /* Packet has been released by netdev, so drop pointer */

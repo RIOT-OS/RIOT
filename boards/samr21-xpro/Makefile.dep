@@ -1,5 +1,6 @@
 ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
   USEMODULE += at86rf233
+  USEMODULE += random
   USEMODULE += gnrc_lwmac
 endif
 
