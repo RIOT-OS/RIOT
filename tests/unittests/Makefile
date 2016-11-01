@@ -8,7 +8,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk chronos msb-430 msb-430h pca
                           arduino-mega2560 airfy-beacon nrf51dongle nrf6310 \
                           weio waspmote-pro nucleo-f072 arduino-uno \
                           arduino-duemilanove sodaq-autonomo arduino-zero \
-                          nucleo-f030 nucleo-f070
+                          nucleo-f030 nucleo-f070 nucleo-f091 pba-d-01-kw2x \
+                          saml21-xpro
 
 USEMODULE += embunit
 
