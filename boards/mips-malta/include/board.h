@@ -33,7 +33,7 @@ extern "C" {
  */
 #define TICKS_PER_US (15)
 
-    /**
+/**
  * @brief   Board level initialisation
  */
 void board_init(void);
