@@ -53,8 +53,6 @@ extern uint32_t _sram;
 extern uint32_t _eram;
 /** @} */
 
-static const uintptr_t stack_base = (uintptr_t)&_sstack;
-
 /**
  * @brief   Allocation of the interrupt stack
  */
@@ -102,10 +100,10 @@ void reset_handler_default(void)
     }
 
 #ifdef MODULE_MPU_STACK_GUARD
-    if (stack_base != SRAM_BASE) {
+    if (((uintptr_t)&_sstack) != SRAM_BASE) {
         mpu_configure(
             0,                                              /* MPU region 0 */
-            stack_base + 31,                                /* Base Address (rounded up) */
+            (uintptr_t)&_sstack + 31,                       /* Base Address (rounded up) */
             MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B) /* Attributes and Size */
         );
 
