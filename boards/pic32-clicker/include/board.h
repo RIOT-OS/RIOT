@@ -51,6 +51,11 @@ extern "C" {
  */
 #define PIC32MX (1)
 
+/**
+ * @brief   Board level initialisation
+ */
+void board_init(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -46,10 +46,14 @@ extern "C" {
  */
 #define PIC32MZ (1)
 
+/**
+ * @brief   Board level initialisation
+ */
+void board_init(void);
+
 #ifdef __cplusplus
 }
 #endif
-/** @} */
 
 #endif /* _BOARD_H_ */
-
+/** @} */

@@ -42,7 +42,6 @@ extern "C" {
 extern void dummy(void);
 static inline void cpu_init_early(void)
 {
-    /* Stop the linker from throwing away the PIC32 config register settings */
     dummy();
 }
 /** @} */
@@ -57,14 +56,10 @@ static inline void cpu_print_last_instruction(void)
     /* This function must exist else RIOT won't compile */
 }
 
-/**
- * @brief   Board level initialisation
- */
-void board_init(void);
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+/** @} */
+

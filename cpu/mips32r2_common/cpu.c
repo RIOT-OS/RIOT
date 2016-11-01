@@ -11,13 +11,14 @@
 #include <mips/regdef.h>
 #include <mips/asm.h>
 #include <string.h>
+#include <assert.h>
 
 #include "periph/uart.h"
-#include "cpu.h"
-#include "kernel_init.h"
+#include "periph/timer.h"
 #include "arch/panic_arch.h"
-#include <periph/timer.h>
-#include <assert.h>
+#include "kernel_init.h"
+#include "cpu.h"
+#include "board.h"
 
 void mips_start(void);
 
