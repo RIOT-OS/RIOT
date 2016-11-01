@@ -95,9 +95,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     gptimer->cc2538_gptimer_tamr.TAMRbits.TACDIR = 1; /**< Count up */
     gptimer->cc2538_gptimer_tamr.TAMRbits.TAMIE  = 1; /**< Enable the Timer A Match Interrupt */
 
-    /* Enable interrupts for given timer: */
-    timer_irq_enable(dev);
-
     /* Enable the timer: */
     gptimer->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
 
@@ -331,82 +328,6 @@ void timer_start(tim_t dev)
 
         case TIMER_UNDEFINED:
             break;
-    }
-}
-
-void timer_irq_enable(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            NVIC_SetPriority(TIMER_0_IRQn_1, TIMER_IRQ_PRIO);
-            NVIC_SetPriority(TIMER_0_IRQn_2, TIMER_IRQ_PRIO);
-            NVIC_EnableIRQ(TIMER_0_IRQn_1);
-            NVIC_EnableIRQ(TIMER_0_IRQn_2);
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            NVIC_SetPriority(TIMER_1_IRQn_1, TIMER_IRQ_PRIO);
-            NVIC_SetPriority(TIMER_1_IRQn_2, TIMER_IRQ_PRIO);
-            NVIC_EnableIRQ(TIMER_1_IRQn_1);
-            NVIC_EnableIRQ(TIMER_1_IRQn_2);
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            NVIC_SetPriority(TIMER_2_IRQn_1, TIMER_IRQ_PRIO);
-            NVIC_SetPriority(TIMER_2_IRQn_2, TIMER_IRQ_PRIO);
-            NVIC_EnableIRQ(TIMER_2_IRQn_1);
-            NVIC_EnableIRQ(TIMER_2_IRQn_2);
-            break;
-#endif
-#if TIMER_3_EN
-        case TIMER_3:
-            NVIC_SetPriority(TIMER_3_IRQn_1, TIMER_IRQ_PRIO);
-            NVIC_SetPriority(TIMER_3_IRQn_2, TIMER_IRQ_PRIO);
-            NVIC_EnableIRQ(TIMER_3_IRQn_1);
-            NVIC_EnableIRQ(TIMER_3_IRQn_2);
-            break;
-#endif
-
-        case TIMER_UNDEFINED:
-        default:
-            return;
-    }
-}
-
-void timer_irq_disable(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            NVIC_DisableIRQ(TIMER_0_IRQn_1);
-            NVIC_DisableIRQ(TIMER_0_IRQn_2);
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            NVIC_DisableIRQ(TIMER_1_IRQn_1);
-            NVIC_DisableIRQ(TIMER_1_IRQn_2);
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            NVIC_DisableIRQ(TIMER_2_IRQn_1);
-            NVIC_DisableIRQ(TIMER_2_IRQn_2);
-            break;
-#endif
-#if TIMER_3_EN
-        case TIMER_3:
-            NVIC_DisableIRQ(TIMER_3_IRQn_1);
-            NVIC_DisableIRQ(TIMER_3_IRQn_2);
-            break;
-#endif
-
-        case TIMER_UNDEFINED:
-        default:
-            return;
     }
 }
 
