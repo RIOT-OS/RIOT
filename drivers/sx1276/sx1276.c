@@ -840,21 +840,22 @@ void sx1276_start_cad(sx1276_t *dev)
         break;
         case SX1276_MODEM_LORA:
         {
+			/* Disable all interrupts except CAD-related */
             sx1276_reg_write(dev, SX1276_REG_LR_IRQFLAGSMASK, SX1276_RF_LORA_IRQFLAGS_RXTIMEOUT |
                              SX1276_RF_LORA_IRQFLAGS_RXDONE |
                              SX1276_RF_LORA_IRQFLAGS_PAYLOADCRCERROR |
                              SX1276_RF_LORA_IRQFLAGS_VALIDHEADER |
                              SX1276_RF_LORA_IRQFLAGS_TXDONE |
-                                                                //SX1276_RF_LORA_IRQFLAGS_CADDONE |
-                             SX1276_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL   // |
-                                                                //SX1276_RF_LORA_IRQFLAGS_CADDETECTED
+                                                                /*SX1276_RF_LORA_IRQFLAGS_CADDONE |*/
+                             SX1276_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL   /* |
+                                                                SX1276_RF_LORA_IRQFLAGS_CADDETECTED*/
                              );
 
-            // DIO3=CADDone
+            /* DIO3 = CADDone */
             sx1276_reg_write(dev,
                              SX1276_REG_DIOMAPPING1,
                              (sx1276_reg_read(dev, SX1276_REG_DIOMAPPING1)
-                              & SX1276_RF_LORA_DIOMAPPING1_DIO0_MASK) | SX1276_RF_LORA_DIOMAPPING1_DIO0_00);
+                              & SX1276_RF_LORA_DIOMAPPING1_DIO3_MASK) | SX1276_RF_LORA_DIOMAPPING1_DIO3_00);
 
             sx1276_set_status(dev,  SX1276_RF_CAD);
             sx1276_set_op_mode(dev, SX1276_RF_LORA_OPMODE_CAD);
