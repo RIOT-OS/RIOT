@@ -76,6 +76,9 @@ endif
 ifneq (,$(filter gnrc_pktbuf_static,$(USEMODULE)))
     DIRS += pktbuf_static
 endif
+ifneq (,$(filter gnrc_priority_pktqueue,$(USEMODULE)))
+    DIRS += priority_pktqueue
+endif
 ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
     DIRS += pktdump
 endif
