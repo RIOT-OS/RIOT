@@ -96,6 +96,10 @@ ifneq (,$(filter gnrc_zep,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter gcoap,$(USEMODULE)))
+  USEMODULE += gnrc_udp
+endif
+
 ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
   USEMODULE += gnrc_udp
   USEMODULE += xtimer

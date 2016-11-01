@@ -1,0 +1,9 @@
+USEPKG += nanocoap
+# Required by nanocoap to compile nanocoap_sock.
+USEMODULE += gnrc_sock_udp
+
+# Specify the mandatory networking modules
+USEMODULE += gcoap
+USEMODULE += gnrc_ipv6
+
+USEMODULE += random
