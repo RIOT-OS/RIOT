@@ -30,49 +30,32 @@ extern "C" {
  * @name Timer peripheral configuration
  * @{
  */
-#define TIMER_NUMOF         GPTIMER_NUMOF
-#define TIMER_0_EN          1
-#define TIMER_1_EN          1
-#define TIMER_2_EN          1
-#define TIMER_3_EN          1
+static const timer_conf_t timer_config[] = {
+    {
+        .dev      = GPTIMER0,
+        .channels = 2,
+        .cfg      = GPTMCFG_16_BIT_TIMER, /* required for XTIMER */
+    },
+    {
+        .dev      = GPTIMER1,
+        .channels = 1,
+        .cfg      = GPTMCFG_32_BIT_TIMER,
+    },
+    {
+        .dev      = GPTIMER2,
+        .channels = 1,
+        .cfg      = GPTMCFG_32_BIT_TIMER,
+    },
+    {
+        .dev      = GPTIMER3,
+        .channels = 1,
+        .cfg      = GPTMCFG_32_BIT_TIMER,
+    },
+};
+
+#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 
 #define TIMER_IRQ_PRIO      1
-
-/* Timer 0 configuration */
-#define TIMER_0_DEV         GPTIMER0
-#define TIMER_0_CHANNELS    1
-#define TIMER_0_MAX_VALUE   0xffffffff
-#define TIMER_0_IRQn_1      GPTIMER_0A_IRQn
-#define TIMER_0_IRQn_2      GPTIMER_0B_IRQn
-#define TIMER_0_ISR_1       isr_timer0_chan0
-#define TIMER_0_ISR_2       isr_timer0_chan1
-
-/* Timer 1 configuration */
-#define TIMER_1_DEV         GPTIMER1
-#define TIMER_1_CHANNELS    1
-#define TIMER_1_MAX_VALUE   0xffffffff
-#define TIMER_1_IRQn_1      GPTIMER_1A_IRQn
-#define TIMER_1_IRQn_2      GPTIMER_1B_IRQn
-#define TIMER_1_ISR_1       isr_timer1_chan0
-#define TIMER_1_ISR_2       isr_timer1_chan1
-
-/* Timer 2 configuration */
-#define TIMER_2_DEV         GPTIMER2
-#define TIMER_2_CHANNELS    1
-#define TIMER_2_MAX_VALUE   0xffffffff
-#define TIMER_2_IRQn_1      GPTIMER_2A_IRQn
-#define TIMER_2_IRQn_2      GPTIMER_2B_IRQn
-#define TIMER_2_ISR_1       isr_timer2_chan0
-#define TIMER_2_ISR_2       isr_timer2_chan1
-
-/* Timer 3 configuration */
-#define TIMER_3_DEV         GPTIMER3
-#define TIMER_3_CHANNELS    1
-#define TIMER_3_MAX_VALUE   0xffffffff
-#define TIMER_3_IRQn_1      GPTIMER_3A_IRQn
-#define TIMER_3_IRQn_2      GPTIMER_3B_IRQn
-#define TIMER_3_ISR_1       isr_timer3_chan0
-#define TIMER_3_ISR_2       isr_timer3_chan1
 /** @} */
 
 
