@@ -94,7 +94,6 @@ static int _init(netdev2_t *netdev)
 
 static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
 {
-//	uint8_t tmp;
 
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
     const struct iovec *ptr = vector;

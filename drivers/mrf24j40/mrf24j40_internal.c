@@ -105,8 +105,7 @@ void mrf24j40_reg_write_long(mrf24j40_t *dev, const uint16_t addr, const uint8_t
     reg1 = MRF24J40_LONG_ADDR_TRANS | (addr >> 3);
     reg2 = (addr << 5) | MRF24J40_ACCESS_WRITE_LNG;
     spi_acquire(dev->params.spi);
-
-    (dev->params.cs_pin);
+    gpio_clear(dev->params.cs_pin);
     spi_transfer_byte(dev->params.spi, reg1, 0);
     spi_transfer_byte(dev->params.spi, reg2, 0);
     spi_transfer_byte(dev->params.spi, value, 0);
