@@ -7,6 +7,11 @@
  * @defgroup    boards_pic32-wifire Digilent PIC32 WiFire
  * @ingroup     boards
  * @brief       board configuration for the Digilent PIC32 WiFire
+ * @details
+ * See:
+ * http://store.digilentinc.com/chipkit-wi-fire-wifi-enabled-mz-microcontroller-board/
+ * for more information on the board.
+ *
  * @{
  *
  * @file

@@ -9,6 +9,7 @@
 /**
  * @defgroup    cpu_mips32r2_commom MIPS32R2 Common
  * @ingroup     cpu
+ * @brief       Common implementations and headers for mips32r2 compliant devices
  * @{
  *
  * @file
