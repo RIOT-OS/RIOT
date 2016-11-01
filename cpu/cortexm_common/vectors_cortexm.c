@@ -53,7 +53,9 @@ extern uint32_t _sram;
 extern uint32_t _eram;
 /** @} */
 
+#ifdef MODULE_MPU_STACK_GUARD
 static const uintptr_t stack_base = (uintptr_t)&_sstack;
+#endif
 
 /**
  * @brief   Allocation of the interrupt stack
