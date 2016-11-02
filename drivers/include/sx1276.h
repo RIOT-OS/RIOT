@@ -37,7 +37,8 @@ extern "C" {
  * Radio driver supported modems.
  */
 typedef enum {
-    SX1276_MODEM_FSK = 0, SX1276_MODEM_LORA,
+    SX1276_MODEM_FSK = 0, 
+    SX1276_MODEM_LORA,
 } sx1276_radio_modems_t;
 
 /**
@@ -107,7 +108,12 @@ typedef struct {
  * Radio driver internal state machine states definition.
  */
 typedef enum {
-    SX1276_RF_IDLE = 0, SX1276_RF_RX_RUNNING, SX1276_RF_TX_RUNNING, SX1276_RF_CAD,
+    SX1276_RF_IDLE = 0,
+    
+    SX1276_RF_RX_RUNNING,
+    SX1276_RF_TX_RUNNING,
+    
+    SX1276_RF_CAD,
 } sx1276_radio_state_t;
 
 /**
