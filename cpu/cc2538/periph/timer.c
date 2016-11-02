@@ -18,8 +18,8 @@
  * @}
  */
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <assert.h>
+#include <stdint.h>
 
 #include "board.h"
 #include "cpu.h"
@@ -28,17 +28,44 @@
 #include "periph/timer.h"
 #include "periph_conf.h"
 
-#define TIMER_A_IRQ_MASK 0x000000ff
-#define TIMER_B_IRQ_MASK 0x0000ff00
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
-#define NUM_CHANNELS     1
+#define LOAD_VALUE               0xffff
+
+#define TIMER_A_IRQ_MASK         0x000000ff
+#define TIMER_B_IRQ_MASK         0x0000ff00
+
+#define BIT(n)                   ( 1UL << (n) )
+
+/* GPTIMER_CTL Bits: */
+#define TBEN                     BIT(8)
+#define TAEN                     BIT(0)
+
+/* GPTIMER_TnMR Bits: */
+#define TnCMIE                   BIT(5)
+#define TnCDIR                   BIT(4)
+
+/* GPTIMER_IMR Bits: */
+#define TBMIM                    BIT(11)
+#define TAMIM                    BIT(4)
+
+/* Convert a gptimer instance pointer to a GPTimer number */
+#define GPTIMER_GET_NUM(gptimer) ( ((uintptr_t)(gptimer) >> 12) & 0x3 )
+
+#define match_bit(chan)          ( (chan)? TBMIM : TAMIM )
 
 /**
  * @brief Timer state memory
  */
-static timer_isr_ctx_t config[TIMER_NUMOF];
-static unsigned long config_freq[TIMER_NUMOF];
+static timer_isr_ctx_t config[GPTIMER_NUMOF];
 
+static const int IRQn_lut[GPTIMER_NUMOF] = {
+    GPTIMER_0A_IRQn,
+    GPTIMER_1A_IRQn,
+    GPTIMER_2A_IRQn,
+    GPTIMER_3A_IRQn
+};
 
 /**
  * @brief Setup the given timer
@@ -46,43 +73,22 @@ static unsigned long config_freq[TIMER_NUMOF];
  */
 int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
-    cc2538_gptimer_t *gptimer;
+    cc2538_gptimer_t *gptimer = timer_config[dev].dev;
     unsigned int gptimer_num;
+    uint32_t chan_mode;
 
-    /* select the timer and enable the timer specific peripheral clocks */
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            gptimer = TIMER_0_DEV;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            gptimer = TIMER_1_DEV;
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            gptimer = TIMER_2_DEV;
-            break;
-#endif
-#if TIMER_3_EN
-        case TIMER_3:
-            gptimer = TIMER_3_DEV;
-            break;
-#endif
+    DEBUG("%s(%u, %lu, %p, %p)\n", __FUNCTION__, dev, freq, cb, arg);
 
-        case TIMER_UNDEFINED:
-        default:
-            return -1;
+    if (dev >= TIMER_NUMOF) {
+        return -1;
     }
 
-    gptimer_num = ((uintptr_t)gptimer - (uintptr_t)GPTIMER0) / 0x1000;
+    gptimer_num = GPTIMER_GET_NUM(gptimer);
 
     /* Save the callback function: */
-    config[dev].cb = cb;
-    config[dev].arg = arg;
-    config_freq[dev] = freq;
+    assert(gptimer_num < GPTIMER_NUMOF);
+    config[gptimer_num].cb  = cb;
+    config[gptimer_num].arg = arg;
 
     /* Enable the clock for this timer: */
     SYS_CTRL_RCGCGPT |= (1 << gptimer_num);
@@ -90,155 +96,134 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     /* Disable this timer before configuring it: */
     gptimer->cc2538_gptimer_ctl.CTL = 0;
 
-    gptimer->CFG  = GPTMCFG_32_BIT_TIMER;
-    gptimer->cc2538_gptimer_tamr.TAMR = GPTIMER_PERIODIC_MODE;
-    gptimer->cc2538_gptimer_tamr.TAMRbits.TACDIR = 1; /**< Count up */
-    gptimer->cc2538_gptimer_tamr.TAMRbits.TAMIE  = 1; /**< Enable the Timer A Match Interrupt */
+    if (timer_config[dev].cfg == GPTMCFG_32_BIT_TIMER) {
+        /* Count up in periodic mode */
+        chan_mode = TnCMIE | TnCDIR | GPTIMER_PERIODIC_MODE;
+
+        if (timer_config[dev].channels > 1) {
+            DEBUG("Invalid timer_config. Multiple channels are available only in 16-bit mode.");
+            return -1;
+        }
+
+        if (freq != sys_clock_freq()) {
+            DEBUG("In 32-bit mode, the GPTimer frequency must equal the system clock frequency (%u).", sys_clock_freq());
+            return -1;
+        }
+    } else {
+        /* Count down in periodic mode */
+        chan_mode = TnCMIE | GPTIMER_PERIODIC_MODE;
+    }
+
+    gptimer->CFG = timer_config[dev].cfg;
+    gptimer->cc2538_gptimer_tamr.TAMR = chan_mode;
+
+    switch (timer_config[dev].channels) {
+        case 1:
+            /* Enable the timer: */
+            gptimer->cc2538_gptimer_ctl.CTL = TAEN;
+            break;
+
+        case 2:
+            gptimer->cc2538_gptimer_tbmr.TBMR = chan_mode;
+
+            gptimer->TAILR = LOAD_VALUE;
+            gptimer->TBILR = LOAD_VALUE;
+
+            uint32_t prescaler = sys_clock_freq();
+            prescaler += freq / 2;
+            prescaler /= freq;
+            if (prescaler >   0) prescaler--;
+            if (prescaler > 255) prescaler = 255;
+
+            gptimer->TAPR = prescaler;
+            gptimer->TBPR = prescaler;
+
+            /* Enable the timer: */
+            gptimer->cc2538_gptimer_ctl.CTL = TBEN | TAEN;
+            break;
+    }
 
     /* Enable interrupts for given timer: */
     timer_irq_enable(dev);
-
-    /* Enable the timer: */
-    gptimer->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
 
     return 0;
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
-    cc2538_gptimer_t *gptimer;
+    /* get timer base register address */
+    cc2538_gptimer_t *gptimer = timer_config[dev].dev;
 
-    if (channel >= NUM_CHANNELS) {
+    if ( (dev >= TIMER_NUMOF) || (channel >= timer_config[dev].channels) ) {
         return -1;
     }
 
-    /* get timer base register address */
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            gptimer = TIMER_0_DEV;
+    switch (channel) {
+        case 0:
+            /* clear any pending match interrupts */
+            gptimer->ICR = TAMIM;
+
+            /* set timeout value */
+            gptimer->TAMATCHR = (gptimer->CFG == GPTMCFG_32_BIT_TIMER)? (gptimer->TAV + timeout) : (gptimer->TAV - timeout);
+            gptimer->cc2538_gptimer_imr.IMR |= TAMIM; /**< Enable the Timer A Match Interrupt */
             break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            gptimer = TIMER_1_DEV;
+
+        case 1:
+            /* clear any pending match interrupts */
+            gptimer->ICR = TBMIM;
+
+            /* set timeout value */
+            gptimer->TAMATCHR = (gptimer->CFG == GPTMCFG_32_BIT_TIMER)? (gptimer->TBV + timeout) : (gptimer->TBV - timeout);
+            gptimer->cc2538_gptimer_imr.IMR |= TBMIM; /**< Enable the Timer B Match Interrupt */
             break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            gptimer = TIMER_2_DEV;
-            break;
-#endif
-#if TIMER_3_EN
-        case TIMER_3:
-            gptimer = TIMER_3_DEV;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-        default:
-            return -1;
     }
-
-    /* set timeout value */
-    gptimer->ICR           = TIMER_A_IRQ_MASK; /**< Clear any pending interrupt status */
-
-    uint64_t scaled_value = timeout;
-    scaled_value *= RCOSC16M_FREQ;
-    scaled_value += config_freq[dev] / 2;
-    scaled_value /= config_freq[dev];
-    gptimer->TAMATCHR = gptimer->TAV + scaled_value;
-
-    gptimer->cc2538_gptimer_imr.IMRbits.TAMIM = 1; /**< Enable the Timer A Match Interrupt */
 
     return 1;
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    cc2538_gptimer_t *gptimer;
+    DEBUG("%s(%u, %u, %u)\n", __FUNCTION__, dev, channel, value);
 
-    if (channel >= NUM_CHANNELS) {
+    /* get timer base register address */
+    cc2538_gptimer_t *gptimer = timer_config[dev].dev;
+
+    if ( (dev >= TIMER_NUMOF) || (channel >= timer_config[dev].channels) ) {
         return -1;
     }
 
-    /* get timer base register address */
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            gptimer = TIMER_0_DEV;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            gptimer = TIMER_1_DEV;
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            gptimer = TIMER_2_DEV;
-            break;
-#endif
-#if TIMER_3_EN
-        case TIMER_3:
-            gptimer = TIMER_3_DEV;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-        default:
-            return -1;
+    switch (channel) {
+    case 0:
+        /* clear any pending match interrupts */
+        gptimer->ICR = TAMIM;
+
+        gptimer->TAMATCHR = (gptimer->CFG == GPTMCFG_32_BIT_TIMER)? value : (LOAD_VALUE - value);
+        gptimer->cc2538_gptimer_imr.IMR |= TAMIM; /**< Enable the Timer A Match Interrupt */
+        break;
+
+    case 1:
+        /* clear any pending match interrupts */
+        gptimer->ICR = TBMIM;
+
+        gptimer->TBMATCHR = (gptimer->CFG == GPTMCFG_32_BIT_TIMER)? value : (LOAD_VALUE - value);
+        gptimer->cc2538_gptimer_imr.IMR |= TBMIM; /**< Enable the Timer B Match Interrupt */
+        break;
     }
 
     /* set timeout value */
-    gptimer->ICR           = TIMER_A_IRQ_MASK; /**< Clear any pending interrupt status */
-
-    uint64_t scaled_value = value;
-    scaled_value *= config_freq[dev];
-    scaled_value += RCOSC16M_FREQ / 2;
-    scaled_value /= RCOSC16M_FREQ;
-    gptimer->TAMATCHR = (scaled_value > UINT32_MAX)? UINT32_MAX : scaled_value;
-
-    gptimer->cc2538_gptimer_imr.IMRbits.TAMIM = 1; /**< Enable the Timer A Match Interrupt */
 
     return 1;
 }
 
 int timer_clear(tim_t dev, int channel)
 {
-    cc2538_gptimer_t *gptimer;
+    DEBUG("%s(%u, %u)\n", __FUNCTION__, dev, channel);
 
-    if (channel >= NUM_CHANNELS) {
+    if ( (dev >= TIMER_NUMOF) || (channel >= timer_config[dev].channels) ) {
         return -1;
     }
 
-    /* get timer base register address */
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            gptimer = TIMER_0_DEV;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            gptimer = TIMER_1_DEV;
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            gptimer = TIMER_2_DEV;
-            break;
-#endif
-#if TIMER_3_EN
-        case TIMER_3:
-            gptimer = TIMER_3_DEV;
-            break;
-#endif
-
-        case TIMER_UNDEFINED:
-        default:
-            return -1;
-    }
-
-    gptimer->cc2538_gptimer_imr.IMR = 0;
+    timer_config[dev].dev->cc2538_gptimer_imr.IMR &= ~match_bit(channel);
 
     return 1;
 }
@@ -249,27 +234,16 @@ int timer_clear(tim_t dev, int channel)
  */
 unsigned int timer_read(tim_t dev)
 {
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            return (uint64_t)TIMER_0_DEV->TAV * config_freq[TIMER_0] / RCOSC16M_FREQ;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            return (uint64_t)TIMER_1_DEV->TAV * config_freq[TIMER_1] / RCOSC16M_FREQ;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            return (uint64_t)TIMER_2_DEV->TAV * config_freq[TIMER_2] / RCOSC16M_FREQ;
-#endif
-#if TIMER_3_EN
-        case TIMER_3:
-            return (uint64_t)TIMER_3_DEV->TAV * config_freq[TIMER_3] / RCOSC16M_FREQ;
-#endif
+    if (dev >= TIMER_NUMOF) {
+        return 0;
+    }
 
-        case TIMER_UNDEFINED:
-        default:
-            return 0;
+    cc2538_gptimer_t* gptimer = timer_config[dev].dev;
+    if (gptimer->CFG == GPTMCFG_32_BIT_TIMER) {
+        return gptimer->TAV;
+    }
+    else {
+        return LOAD_VALUE - (gptimer->TAV & 0xffff);
     }
 }
 
@@ -278,200 +252,121 @@ unsigned int timer_read(tim_t dev)
  */
 void timer_stop(tim_t dev)
 {
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            break;
-#endif
-#if TIMER_3_EN
-        case TIMER_3:
-            TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            break;
-#endif
+    DEBUG("%s(%u)\n", __FUNCTION__, dev);
 
-        case TIMER_UNDEFINED:
-            break;
+    if (dev < TIMER_NUMOF) {
+        timer_config[dev].dev->cc2538_gptimer_ctl.CTL = 0;
     }
 }
 
 void timer_start(tim_t dev)
 {
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
-            break;
-#endif
-#if TIMER_3_EN
-        case TIMER_3:
-            TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
-            break;
-#endif
+    DEBUG("%s(%u)\n", __FUNCTION__, dev);
 
-        case TIMER_UNDEFINED:
-            break;
+    if (dev < TIMER_NUMOF) {
+        switch (timer_config[dev].channels) {
+            case 1:
+                timer_config[dev].dev->cc2538_gptimer_ctl.CTL = TAEN;
+                break;
+
+            case 2:
+                timer_config[dev].dev->cc2538_gptimer_ctl.CTL = TBEN | TAEN;
+                break;
+        }
     }
 }
 
 void timer_irq_enable(tim_t dev)
 {
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            NVIC_SetPriority(TIMER_0_IRQn_1, TIMER_IRQ_PRIO);
-            NVIC_SetPriority(TIMER_0_IRQn_2, TIMER_IRQ_PRIO);
-            NVIC_EnableIRQ(TIMER_0_IRQn_1);
-            NVIC_EnableIRQ(TIMER_0_IRQn_2);
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            NVIC_SetPriority(TIMER_1_IRQn_1, TIMER_IRQ_PRIO);
-            NVIC_SetPriority(TIMER_1_IRQn_2, TIMER_IRQ_PRIO);
-            NVIC_EnableIRQ(TIMER_1_IRQn_1);
-            NVIC_EnableIRQ(TIMER_1_IRQn_2);
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            NVIC_SetPriority(TIMER_2_IRQn_1, TIMER_IRQ_PRIO);
-            NVIC_SetPriority(TIMER_2_IRQn_2, TIMER_IRQ_PRIO);
-            NVIC_EnableIRQ(TIMER_2_IRQn_1);
-            NVIC_EnableIRQ(TIMER_2_IRQn_2);
-            break;
-#endif
-#if TIMER_3_EN
-        case TIMER_3:
-            NVIC_SetPriority(TIMER_3_IRQn_1, TIMER_IRQ_PRIO);
-            NVIC_SetPriority(TIMER_3_IRQn_2, TIMER_IRQ_PRIO);
-            NVIC_EnableIRQ(TIMER_3_IRQn_1);
-            NVIC_EnableIRQ(TIMER_3_IRQn_2);
-            break;
-#endif
+    DEBUG("%s(%u)\n", __FUNCTION__, dev);
 
-        case TIMER_UNDEFINED:
-        default:
-            return;
+    if (dev < TIMER_NUMOF) {
+        IRQn_Type irqn = IRQn_lut[GPTIMER_GET_NUM(timer_config[dev].dev)];
+
+        NVIC_SetPriority(irqn, TIMER_IRQ_PRIO);
+        NVIC_EnableIRQ(irqn);
+
+        if (timer_config[dev].channels == 2) {
+            irqn++;
+            NVIC_SetPriority(irqn, TIMER_IRQ_PRIO);
+            NVIC_EnableIRQ(irqn);
+        }
     }
 }
 
 void timer_irq_disable(tim_t dev)
 {
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            NVIC_DisableIRQ(TIMER_0_IRQn_1);
-            NVIC_DisableIRQ(TIMER_0_IRQn_2);
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            NVIC_DisableIRQ(TIMER_1_IRQn_1);
-            NVIC_DisableIRQ(TIMER_1_IRQn_2);
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            NVIC_DisableIRQ(TIMER_2_IRQn_1);
-            NVIC_DisableIRQ(TIMER_2_IRQn_2);
-            break;
-#endif
-#if TIMER_3_EN
-        case TIMER_3:
-            NVIC_DisableIRQ(TIMER_3_IRQn_1);
-            NVIC_DisableIRQ(TIMER_3_IRQn_2);
-            break;
-#endif
+    DEBUG("%s(%u)\n", __FUNCTION__, dev);
 
-        case TIMER_UNDEFINED:
-        default:
-            return;
+    if (dev < TIMER_NUMOF) {
+        IRQn_Type irqn = IRQn_lut[GPTIMER_GET_NUM(timer_config[dev].dev)];
+
+        NVIC_DisableIRQ(irqn);
+
+        if (timer_config[dev].channels == 2) {
+            irqn++;
+            NVIC_DisableIRQ(irqn);
+        }
     }
 }
 
-static inline void irq_handler(int tim, int chan)
-{
-    if (config[tim].cb != NULL) {
-        config[tim].cb(config[tim].arg, chan);
+static cc2538_gptimer_t* GPTIMER = GPTIMER0;
+
+static void irq_handler_a(int n) {
+    uint32_t mis;
+
+    /* Latch the active interrupt flags */
+    mis = GPTIMER[n].MIS & TIMER_A_IRQ_MASK;
+
+    /* Clear the latched interrupt flags */
+    GPTIMER[n].ICR = mis;
+
+    if (mis & TAMIM) {
+        /* This is a Timer A Match Interrupt */
+
+        /* Disable further match interrupts for this timer/channel */
+        GPTIMER[n].cc2538_gptimer_imr.IMR &= ~TAMIM;
+
+        /* Invoke the callback function */
+        assert(config[n].cb != NULL);
+        config[n].cb(config[n].arg, 0);
     }
+
     if (sched_context_switch_request) {
         thread_yield();
     }
 }
 
-#if TIMER_0_EN
-void TIMER_0_ISR_1(void)
-{
-    TIMER_0_DEV->ICR = TIMER_A_IRQ_MASK;
-    irq_handler(0, 0);
+static void irq_handler_b(int n) {
+    uint32_t mis;
+
+    /* Latch the active interrupt flags */
+    mis = GPTIMER[n].MIS & TIMER_B_IRQ_MASK;
+
+    /* Clear the latched interrupt flags */
+    GPTIMER[n].ICR = mis;
+
+    if (mis & TBMIM) {
+        /* This is a Timer B Match Interrupt */
+
+        /* Disable further match interrupts for this timer/channel */
+        GPTIMER[n].cc2538_gptimer_imr.IMR &= ~TBMIM;
+
+        /* Invoke the callback function */
+        assert(config[n].cb != NULL);
+        config[n].cb(config[n].arg, 1);
+    }
+
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
 }
 
-void TIMER_0_ISR_2(void)
-{
-    TIMER_0_DEV->ICR = TIMER_B_IRQ_MASK;
-    irq_handler(0, 1);
-}
-#endif /* TIMER_0_EN */
-
-#if TIMER_1_EN
-void TIMER_1_ISR_1(void)
-{
-    TIMER_1_DEV->ICR = TIMER_A_IRQ_MASK;
-    irq_handler(1, 0);
-}
-
-void TIMER_1_ISR_2(void)
-{
-    TIMER_1_DEV->ICR = TIMER_B_IRQ_MASK;
-    irq_handler(1, 1);
-}
-#endif /* TIMER_1_EN */
-
-#if TIMER_2_EN
-void TIMER_2_ISR_1(void)
-{
-    TIMER_2_DEV->ICR = TIMER_A_IRQ_MASK;
-    irq_handler(2, 0);
-}
-
-void TIMER_2_ISR_2(void)
-{
-    TIMER_2_DEV->ICR = TIMER_B_IRQ_MASK;
-    irq_handler(2, 1);
-}
-#endif /* TIMER_2_EN */
-
-#if TIMER_3_EN
-void TIMER_3_ISR_1(void)
-{
-    TIMER_3_DEV->ICR = TIMER_A_IRQ_MASK;
-    irq_handler(3, 0);
-}
-
-void TIMER_3_ISR_2(void)
-{
-    TIMER_3_DEV->ICR = TIMER_B_IRQ_MASK;
-    irq_handler(3, 1);
-}
-#endif /* TIMER_3_EN */
+void isr_timer0_chan0(void) {irq_handler_a(0);}
+void isr_timer0_chan1(void) {irq_handler_b(0);}
+void isr_timer1_chan0(void) {irq_handler_a(1);}
+void isr_timer1_chan1(void) {irq_handler_b(1);}
+void isr_timer2_chan0(void) {irq_handler_a(2);}
+void isr_timer2_chan1(void) {irq_handler_b(2);}
+void isr_timer3_chan0(void) {irq_handler_a(3);}
+void isr_timer3_chan1(void) {irq_handler_b(3);}
