@@ -103,6 +103,13 @@ extern "C" {
 #define SX1276_REG_LR_PLL                                  0x70
 
 /**
+ *	Modem settings for random number generator
+ */
+#define SX1276_RNG_REG_MODEM_CONFIG1 0x0A
+#define SX1276_RNG_REG_MODEM_CONFIG2 0x70
+
+
+/**
  * SX1276 LoRa bits control definition
  */
 

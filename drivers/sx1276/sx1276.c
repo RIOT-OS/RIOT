@@ -308,9 +308,6 @@ void sx1276_set_modem(sx1276_t *dev, sx1276_radio_modems_t modem)
     }
 }
 
-#define RXLORA_RXMODE_RSSI_SX1276_REG_MODEM_CONFIG1 0x0A
-#define RXLORA_RXMODE_RSSI_SX1276_REG_MODEM_CONFIG2 0x70
-
 uint32_t sx1276_random(sx1276_t *dev)
 {
     uint8_t i;
@@ -329,8 +326,8 @@ uint32_t sx1276_random(sx1276_t *dev)
                      SX1276_RF_LORA_IRQFLAGS_CADDETECTED);
 
     sx1276_set_op_mode(dev, SX1276_RF_OPMODE_STANDBY);
-    sx1276_reg_write(dev, SX1276_REG_LR_MODEMCONFIG1, RXLORA_RXMODE_RSSI_SX1276_REG_MODEM_CONFIG1);
-    sx1276_reg_write(dev, SX1276_REG_LR_MODEMCONFIG1, RXLORA_RXMODE_RSSI_SX1276_REG_MODEM_CONFIG2);
+    sx1276_reg_write(dev, SX1276_REG_LR_MODEMCONFIG1, SX1276_RNG_REG_MODEM_CONFIG1);
+    sx1276_reg_write(dev, SX1276_REG_LR_MODEMCONFIG1, SX1276_RNG_REG_MODEM_CONFIG2);
 
     /* Set radio in continuous reception */
     sx1276_set_op_mode(dev, SX1276_RF_OPMODE_RECEIVER);
