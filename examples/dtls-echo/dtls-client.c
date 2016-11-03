@@ -502,18 +502,13 @@ static void client_send(char *addr_str, char *data, unsigned int delay)
 
 int udp_client_cmd(int argc, char **argv)
 {
-    if (argc < 2) {
+    uint32_t delay = 1000000;
+
+    if (argc < 3) {
         printf("usage: %s <addr> <data> [<delay in us>]\n", argv[0]);
         return 1;
     }
-
-    uint32_t delay = 1000000;
-    if (argc < 3) {
-        printf("usage: %s <addr> <data> [<delay in us>]\n",
-               argv[0]);
-        return 1;
-    }
-    if (argc > 3) {
+    else if (argc > 3) {
         delay = (uint32_t)atoi(argv[3]);
     }
     client_send(argv[1], argv[2],  delay);
