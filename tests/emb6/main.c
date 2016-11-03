@@ -15,9 +15,7 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  *
- * This test application tests the gnrc_conn_ip module. If you select protocol 58 you can also
- * test if gnrc is able to deal with multiple subscribers to ICMPv6 (gnrc_icmpv6 and this
- * application).
+ * This test application tests the emb6_conn_ip module.
  *
  * @}
  */
@@ -94,7 +92,7 @@ int main(void)
 {
     netdev2_t *netdev = (netdev2_t *)&at86rf2xx;
 
-    puts("RIOT lwip test application");
+    puts("RIOT emb6 test application");
 
     at86rf2xx_setup(&at86rf2xx, at86rf2xx_params);
     netdev->driver->init((netdev2_t *)&at86rf2xx);
