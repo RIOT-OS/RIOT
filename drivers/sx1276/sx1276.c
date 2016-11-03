@@ -191,7 +191,7 @@ sx1276_init_result_t sx1276_init(sx1276_t *dev)
 
     /* Check presence of SX1276 */
     if (!sx1276_test(dev)) {
-        DEBUG("init_radio: test failed");
+        DEBUG("init_radio: test failed\n");
         return SX1276_ERR_TEST_FAILED;
     }
 
@@ -212,7 +212,7 @@ sx1276_init_result_t sx1276_init(sx1276_t *dev)
                                      "sx1276 DIO handler");
 
     if (pid <= KERNEL_PID_UNDEF) {
-        DEBUG("sx1276: creation of DIO handling thread");
+        DEBUG("sx1276: creation of DIO handling thread\n");
         return SX1276_ERR_THREAD;
     }
     dev->_internal.dio_polling_thread_pid = pid;
@@ -1258,7 +1258,7 @@ void sx1276_on_dio5(void *arg)
 void *dio_polling_thread(void *arg)
 {
 
-    DEBUG("sx1276: dio polling thread started");
+    DEBUG("sx1276: dio polling thread started\n");
 
     sx1276_t *dev = (sx1276_t *) arg;
     msg_t msg_queue[8];
