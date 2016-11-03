@@ -207,9 +207,10 @@ sx1276_init_result_t sx1276_init(sx1276_t *dev)
     sx1276_set_channel(dev, dev->settings.channel);
 
     /* Create DIO event lines handler */
-    kernel_pid_t pid = thread_create((char *) dev->_internal.dio_polling_thread_stack, sizeof(dev->_internal.dio_polling_thread_stack), THREAD_PRIORITY_MAIN,
-                                     THREAD_CREATE_STACKTEST, dio_polling_thread, dev,
-                                     "sx1276 DIO handler");
+    kernel_pid_t pid = thread_create((char *) dev->_internal.dio_polling_thread_stack, 
+							sizeof(dev->_internal.dio_polling_thread_stack), 
+							THREAD_PRIORITY_MAIN, THREAD_CREATE_STACKTEST, 
+							dio_polling_thread, dev, "sx1276 DIO handler");
 
     if (pid <= KERNEL_PID_UNDEF) {
         DEBUG("sx1276: creation of DIO handling thread\n");
@@ -472,8 +473,11 @@ void sx1276_configure_lora(sx1276_t *dev, sx1276_lora_settings_t *settings)
         memcpy(&dev->settings.lora, settings, sizeof(sx1276_lora_settings_t));
     }
 
-    if (((dev->settings.lora.bandwidth == SX1276_BW_125_KHZ) && ((dev->settings.lora.datarate == SX1276_SF11) || (dev->settings.lora.datarate == SX1276_SF12)))
-        || ((dev->settings.lora.bandwidth == SX1276_BW_250_KHZ) && (dev->settings.lora.datarate == SX1276_SF12))) {
+    if (((dev->settings.lora.bandwidth == SX1276_BW_125_KHZ) 
+			&& ((dev->settings.lora.datarate == SX1276_SF11) 
+					|| (dev->settings.lora.datarate == SX1276_SF12)))
+        			|| ((dev->settings.lora.bandwidth == SX1276_BW_250_KHZ) 
+							&& (dev->settings.lora.datarate == SX1276_SF12))) {
         dev->settings.lora.low_datarate_optimize = 0x01;
     }
     else {
