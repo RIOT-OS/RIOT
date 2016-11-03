@@ -160,14 +160,14 @@ static int _init_peripherals(sx1276_t *dev)
     spi_release(dev->spi);
 
     if (res < 0) {
-        printf("sx1276: error initializing SPI_%i device (code %i)\n",
+        DEBUG("sx1276: error initializing SPI_%i device (code %i)\n",
         		dev->spi, res);
         return 0;
     }
 
     res = gpio_init(dev->nss_pin, GPIO_OUT);
     if (res < 0) {
-        printf("sx1276: error initializing GPIO_%ld as CS line (code %i)\n",
+        DEBUG("sx1276: error initializing GPIO_%ld as CS line (code %i)\n",
                (long)dev->nss_pin, res);
         return 0;
     }
@@ -249,7 +249,7 @@ bool sx1276_test(sx1276_t *dev)
     uint8_t version = sx1276_reg_read(dev, SX1276_REG_VERSION);
 
     if (version != VERSION_SX1276 || version == 0x1C) {
-        printf("sx1276: test failed, invalid version number: %d\n", version);
+        DEBUG("sx1276: test failed, invalid version number: %d\n", version);
         return false;
     }
 
