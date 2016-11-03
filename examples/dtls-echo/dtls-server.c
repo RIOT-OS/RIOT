@@ -435,7 +435,7 @@ static void stop_server(void)
 
 int udp_server_cmd(int argc, char **argv)
 {
-    if (argc < 1) {
+    if (argc < 2) {
         printf("usage: %s start|stop\n", argv[0]);
         return 1;
     }
