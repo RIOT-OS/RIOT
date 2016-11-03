@@ -115,9 +115,8 @@ static void _init_isrs(sx1276_t *dev)
 
 static inline void send_event(sx1276_t *dev, sx1276_event_type_t event_type)
 {
-    if (dev->sx1276_event_cb != NULL) {
-        dev->sx1276_event_cb(dev, event_type);
-    }
+	assert(dev->sx1276_event_cb != NULL);
+	dev->sx1276_event_cb(dev, event_type);
 }
 
 /**
