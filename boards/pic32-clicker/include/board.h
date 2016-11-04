@@ -34,13 +34,6 @@ extern "C" {
 #include "p32mx470f512h.h"
 
 /**
- * @brief The peripheral clock is required for the UART Baud rate calculation
- *        It is configured by the 'config' registers (see pic32_config_settings.c)
- *        Note 120MHz is the max F for this device.
- */
-#define PERIPHERAL_CLOCK (120000000)  /* Hz */
-
-/**
  * @brief Set how many increments of the count register per uS
  *        needed by the timer code.
  */

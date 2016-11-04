@@ -30,12 +30,6 @@ extern "C" {
 #include "p32mz2048efg100.h"
 
 /**
- * @brief The peripheral clock is required for the UART Baud rate calculation
- *        It is configured by the 'config' registers (see pic32_config_settings.c)
- */
-#define PERIPHERAL_CLOCK (100000000)  /* Hz */
-
-/**
  * @brief Set how many increments of the count register per uS
  *        needed by the timer code.
  */
