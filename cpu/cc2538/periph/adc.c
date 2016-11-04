@@ -100,6 +100,6 @@ int adc_sample(adc_t line, adc_res_t res)
     result  = (((adcaccess->ADCL) & 0xfc));
     result |= (((adcaccess->ADCH) & 0xff) << 8);
 
-    /* Return conversion result in mV */
-    return result / 10;
+    /* Return conversion result */
+    return result;
 }
