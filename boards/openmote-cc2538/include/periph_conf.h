@@ -89,6 +89,7 @@ static const uint8_t periph_adc_map[ADC_NUMOF] = {
 };
 
 #define ADC_LINE(x)         periph_adc_map[x]
+#define SOC_ADC_ADCCON_REF  SOC_ADC_ADCCON_REF_AVDD5
 /** @} */
 
 /**

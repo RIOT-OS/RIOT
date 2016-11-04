@@ -80,18 +80,16 @@ int adc_sample(adc_t line, adc_res_t res)
     cc2538_soc_adc_t *adcaccess = SOC_ADC;
     int16_t result;
 
-    /* Note - This has been hard coded .
-     *  Can choose from any of the choices below:
+    /*  Allowed values for SOC_ADC_ADCCON_REF:
      *  SOC_ADC_ADCCON_REF_INT or
      *  SOC_ADC_ADCCON_REF_EXT_SINGLE or
      *  SOC_ADC_ADCCON_REF_AVDD5
      */
-    uint8_t refvoltage = SOC_ADC_ADCCON_REF_AVDD5;
 
     /* Start a single extra conversion with the given parameters. */
     adcaccess->ADCCON3 = ((adcaccess->ADCCON3) &
         ~(SOC_ADC_ADCCON3_EREF | SOC_ADC_ADCCON3_EDIV | SOC_ADC_ADCCON3_ECH)) |
-            refvoltage | res | line;
+            SOC_ADC_ADCCON_REF | res | line;
 
     /* Poll until end of conversion */
     while ((adcaccess->cc2538_adc_adccon1.ADCCON1 &
