@@ -1,1 +1,2 @@
+export CPU = mips32r2_common
 export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/
