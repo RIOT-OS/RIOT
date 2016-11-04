@@ -59,7 +59,7 @@ static gcoap_listener_t _default_listener = {
 };
 
 static gcoap_state_t _coap_state = {
-    .netreg_port = {NULL, 0, KERNEL_PID_UNDEF},
+    .netreg_port = GNRC_NETREG_ENTRY_INIT_PID(0, KERNEL_PID_UNDEF),
     .listeners   = &_default_listener,
 };
 
@@ -304,8 +304,7 @@ static void _expire_request(gcoap_request_memo_t *memo)
 static int _register_port(gnrc_netreg_entry_t *netreg_port, uint16_t port)
 {
     if (!gnrc_netreg_lookup(GNRC_NETTYPE_UDP, port)) {
-        netreg_port->demux_ctx  = port;
-        netreg_port->target.pid = _pid;
+        gnrc_netreg_entry_init_pid(netreg_port, port, _pid);
         gnrc_netreg_register(GNRC_NETTYPE_UDP, netreg_port);
         DEBUG("coap: registered UDP port %" PRIu32 "\n",
                netreg_port->demux_ctx);
