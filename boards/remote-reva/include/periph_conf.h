@@ -103,9 +103,9 @@ static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
  * @{
  */
 #define ADC_NUMOF           (3)
-#define ADC1_PIN            5
-#define ADC2_PIN            4
-#define ADC3_PIN            2
+#define ADC1_PIN            GPIO_PA5
+#define ADC2_PIN            GPIO_PA4
+#define ADC3_PIN            GPIO_PA2
 
 static const uint8_t periph_adc_map[ADC_NUMOF] = {
   ADC1_PIN,
