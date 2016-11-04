@@ -110,7 +110,7 @@ static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
 static const uint8_t periph_adc_map[ADC_NUMOF] = {
   ADC1_PIN,
   ADC2_PIN,
-  ADC3_PIN,
+  ADC3_PIN, /* voltage divider with 5/3 relationship to allow 5V sensors */
 };
 
 #define ADC_LINE(x)         periph_adc_map[x]
