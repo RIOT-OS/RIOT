@@ -7,16 +7,16 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_BLACKLIST := z1 wsn430-v1_4 wsn430-v1_3b waspmote-pro arduino-mega2560  \
-                   msb-430h msb-430 chronos telosb msbiot cc2538dk \
-                   saml21-xpro samr21-xpro arduino-duemilanove arduino-uno \
+# TinyDTLS only has support for 32-bit architectures ATM
+BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
+                   msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b wsn430-v1_4 \
+                   z1 \
                    nrf52dk # see #6022
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos msb-430 msb-430h nrf51dongle \
-                          nrf6310 nucleo-f103 nucleo-f334 pca10000 pca10005 spark-core \
-                          stm32f0discovery telosb weio wsn430-v1_3b wsn430-v1_4 \
-                          yunjia-nrf51822 z1 nucleo-f072 cc2650stk nucleo-f030 \
-                          nucleo-f070
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon nrf51dongle nrf6310 nucleo-f103 \
+                             nucleo-f334 pca10000 pca10005 spark-core \
+                             stm32f0discovery weio yunjia-nrf51822 nucleo-f072 \
+                             cc2650stk nucleo-f030 nucleo-f070
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
