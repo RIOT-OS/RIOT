@@ -32,7 +32,7 @@
 #include "embUnit.h"
 #include "../map.h"
 
-#include "kernel_macros.h"
+#include "kernel_defines.h"
 #include "json.h"
 
 #ifdef __cplusplus
