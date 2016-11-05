@@ -7,7 +7,7 @@ else ifeq ($(OS),Darwin)
 endif
 
 ifeq ($(PORT),)
-    $(info Warning: no PORT set!)
+    $(warning No PORT set!)
 endif
 
 export BAUD ?= 115200

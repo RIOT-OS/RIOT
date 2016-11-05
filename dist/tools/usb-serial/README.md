@@ -61,7 +61,7 @@ solution):
 
     # TODO: add support for windows as host platform
     ifeq ($(PORT),)
-      $(info CAUTION: No terminal port for your host system found!)
+      $(warning CAUTION: No terminal port for your host system found!)
     endif
     export PORT
 
