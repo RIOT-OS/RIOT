@@ -281,6 +281,9 @@ endif # BUILD_IN_DOCKER
 	@$(COLOR_ECHO) '${COLOR_GREEN}Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".${COLOR_RESET}'
 	@$(COLOR_ECHO)
 
+..noop:
+	-@:
+
 # add extra include paths for packages in $(USEMODULE)
 export USEMODULE_INCLUDES =
 
