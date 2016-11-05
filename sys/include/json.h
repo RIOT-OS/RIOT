@@ -38,14 +38,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "kernel_macros.h"
-
-#if defined(MODULE_MSP430_COMMON)
-#   include "msp430_types.h"
-#elif !defined(CPU_NATIVE)
-#   include <sys/types.h>
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
