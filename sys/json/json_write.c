@@ -99,7 +99,7 @@ static json_result_t _json_write_in_string(json_write_cookie_t *cookie,
     while (len > 0) {
         size_t bare_characters_len = 0;
         while (bare_characters_len < len) {
-            char c = string[bare_characters_len];
+            unsigned char c = string[bare_characters_len];
             if ((c == '"') || (c == '\\') || (c < ' ')) {
                 break;
             }
@@ -192,8 +192,8 @@ json_result_t json_write_array_close(json_write_cookie_t *cookie)
             return JSON_OKAY;
 
         case JSON_WRITE_STATE_IN_ARRAY:
-            /* fall through */
             cookie->state = JSON_WRITE_STATE_SOMEWHERE;
+            /* fall through */
         case JSON_WRITE_STATE_SOMEWHERE:
             _WRITE_STR("]");
             return JSON_OKAY;
@@ -211,9 +211,7 @@ json_result_t json_write_array_next(json_write_cookie_t *cookie)
     switch (cookie->state) {
         case JSON_WRITE_STATE_IN_STRING:
             _WRITE_STR("\",");
-            cookie->state = JSON_WRITE_STATE_SOMEWHERE;
-            return JSON_OKAY;
-
+            /* fall through */
         case JSON_WRITE_STATE_IN_ARRAY:
             cookie->state = JSON_WRITE_STATE_SOMEWHERE;
             return JSON_OKAY;
