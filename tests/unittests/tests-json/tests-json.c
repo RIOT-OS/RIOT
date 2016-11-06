@@ -94,6 +94,7 @@ void tests_json_read_digit(json_read_cookie_t *cookie, int digit, bool *okay)
 
 EMB_UNIT_TESTFIXTURES(tests_json_fixtures) {
     MAP(TESTS_JSON_NEW_TEST_FIXTURE, TESTS_JSON_ALL)
+    new_TestFixture(tests_json_parsing)
 };
 EMB_UNIT_TESTCALLER(tests_json_tests, NULL, NULL, tests_json_fixtures);
 

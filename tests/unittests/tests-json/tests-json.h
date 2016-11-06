@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014  René Kijewski  <rene.kijewski@fu-berlin.de>
+ * Copyright (C) 2014-2016  René Kijewski  <rene.kijewski@fu-berlin.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -39,6 +39,16 @@
 extern "C" {
 #endif
 
+typedef const struct {
+    const const char *content;
+    const const char *name;
+    const size_t size;
+} json_parsing_test_t;
+
+extern const json_parsing_test_t tests_json_parsing_tests[];
+extern const size_t tests_json_parsing_tests_count;
+
+void tests_json_parsing(void);
 void tests_json(void);
 
 typedef struct {
