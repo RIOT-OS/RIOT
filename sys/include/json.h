@@ -612,6 +612,19 @@ json_result_t json_read_false(json_read_cookie_t *cookie);
 json_result_t json_read_null(json_read_cookie_t *cookie);
 
 /**
+ * @brief Strip a range of of whitespace characters between values.
+ * @details This function is only useful when you need to make sure that all remaining
+ *          data is only spaces/padding. For this usecase @ref JSON_PREMATURELY_ENDED
+ *          is the **good** outcome, and @ref JSON_INVALID_DATA would indicate an error.
+ *
+ *          This function does not return @ref JSON_OKAY in any case.
+ * @param[in] cookie The cookie that was initialized with json_read_init().
+ * @returns @ref JSON_PREMATURELY_ENDED The input was exhausted.
+ * @returns @ref JSON_INVALID_DATA Non-whitespace characters were encountered.
+ */
+json_result_t json_read_read_spaces(json_read_cookie_t *cookie);
+
+/**
  * @}
  */
 
