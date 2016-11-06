@@ -227,13 +227,17 @@ static json_result_t _json_read_in_string(json_read_cookie_t *cookie,
     *done = false;
 
     while (len > 0) {
-        if (_json_read_consume_next(cookie, '"') == JSON_OKAY) {
+        char c;
+        json_result_t consume_result = _json_read_consume_next(cookie, '"');
+        if (consume_result == JSON_PREMATURELY_ENDED) {
+            /* truncated string */
+            return JSON_PREMATURELY_ENDED;
+        }
+        else if (consume_result == JSON_OKAY) {
             *done = true;
             return JSON_OKAY;
         }
-
-        char c;
-        if (_json_read_consume_next(cookie, '\\') == JSON_OKAY) {
+        else if (_json_read_consume_next(cookie, '\\') == JSON_OKAY) {
             json_result_t result;
 
             _DO_OR_FAIL(fill_pushback, cookie);
@@ -274,6 +278,12 @@ static json_result_t _json_read_in_string(json_read_cookie_t *cookie,
                 default:
                     return JSON_INVALID_DATA;
             }
+        }
+        else if (cookie->pushback < ' ') {
+            /* Control characters (U+0000 through U+001F) are forbidden per
+             * http://rfc7159.net/rfc7159#rfc.section.7
+             */
+            return JSON_INVALID_DATA;
         }
         else {
             c = cookie->pushback;
@@ -412,4 +422,13 @@ json_result_t json_read_false(json_read_cookie_t *cookie)
 json_result_t json_read_null(json_read_cookie_t *cookie)
 {
     return _json_read_token(cookie, "null");
+}
+
+json_result_t json_read_read_spaces(json_read_cookie_t *cookie) {
+    json_result_t result = _json_read_advance_to_data(cookie);
+    if (result == JSON_OKAY) {
+        return JSON_INVALID_DATA;
+    } else {
+        return result; /* i.e. JSON_PREMATURELY_ENDED */
+    }
 }
