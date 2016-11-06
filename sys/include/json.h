@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014  René Kijewski  <rene.kijewski@fu-berlin.de>
+ * Copyright (C) 2014-2016  René Kijewski  <rene.kijewski@fu-berlin.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,13 +30,13 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef RIOT__SYS__JSON_H__
-#define RIOT__SYS__JSON_H__
+#ifndef RIOT_SYS_JSON_H_
+#define RIOT_SYS_JSON_H_
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdlib.h>
+#include <sys/types.h>
 
 #ifdef __cplusplus
 extern "C" {

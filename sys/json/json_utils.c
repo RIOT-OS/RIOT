@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014  René Kijewski  <rene.kijewski@fu-berlin.de>
+ * Copyright (C) 2014-2016  René Kijewski  <rene.kijewski@fu-berlin.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
