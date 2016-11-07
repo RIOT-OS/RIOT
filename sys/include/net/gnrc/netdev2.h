@@ -36,6 +36,7 @@
 #include "net/netdev2.h"
 #include "net/gnrc.h"
 #include "net/gnrc/mac/types.h"
+#include "net/ieee802154.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -106,7 +107,7 @@ typedef struct gnrc_netdev2 {
     /**
      * @brief device's l2 address
      */
-    uint8_t  l2_addr[GNRC_NETIF_HDR_L2ADDR_MAX_LEN];
+    uint8_t  l2_addr[IEEE802154_LONG_ADDRESS_LEN];
 
     /**
      * @brief device's l2 address length
