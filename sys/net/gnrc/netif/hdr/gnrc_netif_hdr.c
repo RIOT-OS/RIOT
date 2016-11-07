@@ -38,4 +38,62 @@ gnrc_pktsnip_t *gnrc_netif_hdr_build(uint8_t *src, uint8_t src_len, uint8_t *dst
     return pkt;
 }
 
+uint8_t gnrc_netif_hdr_get_flag(gnrc_pktsnip_t* pkt)
+{
+    gnrc_netif_hdr_t* netif_hdr;
+
+    assert(pkt != NULL);
+    pkt = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
+    if (pkt) {
+        netif_hdr = pkt->data;
+        if (netif_hdr) {
+            return netif_hdr->flags;
+        }
+    }
+
+    return 0U;
+}
+
+int gnrc_netif_hdr_get_dstaddr(gnrc_pktsnip_t* pkt, uint8_t** pointer_to_addr)
+{
+    int res;
+    gnrc_netif_hdr_t* netif_hdr;
+
+    assert(pkt != NULL);
+    pkt = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
+    if (pkt) {
+        netif_hdr = pkt->data;
+        if (netif_hdr) {
+            if ((res = netif_hdr->dst_l2addr_len) <= 0) {
+                return -ENOENT;
+            }
+            *pointer_to_addr = gnrc_netif_hdr_get_dst_addr(netif_hdr);
+            return res;
+        }
+    }
+
+    return -ENOENT;
+}
+
+int gnrc_netif_hdr_get_srcaddr(gnrc_pktsnip_t* pkt, uint8_t** pointer_to_addr)
+{
+    int res;
+    gnrc_netif_hdr_t* netif_hdr;
+
+    assert(pkt != NULL);
+    pkt = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
+    if (pkt) {
+        netif_hdr = pkt->data;
+        if (netif_hdr) {
+            if ((res = netif_hdr->src_l2addr_len) <= 0) {
+                return -ENOENT;
+            }
+            *pointer_to_addr = gnrc_netif_hdr_get_src_addr(netif_hdr);
+            return res;
+        }
+    }
+
+    return -ENOENT;
+}
+
 /** @} */
