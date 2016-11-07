@@ -217,7 +217,7 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
 {
     uint8_t len;
 
-    /* get the packet length (without dropping it) (first byte in RX FIFO */
+    /* get the packet length (without dropping it) (first byte in RX FIFO) */
     cc2420_ram_read(dev, CC2420_RAM_RXFIFO, &len, 1);
     len -= 2;   /* subtract RSSI and FCF */
 
@@ -227,10 +227,13 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
 
     /* if a buffer is given, read (and drop) the packet */
     if (buf) {
+        /* We could the drop length byte here, msp430 platforms don't allow
+         * empty reads so we don't do it and read the length byte again. */
+        cc2420_fifo_read(dev, &len, 1);
+        len -=2; /* subtract RSSI and FCF */
+
         len = (len > max_len) ? max_len : len;
 
-        /* drop length byte */
-        cc2420_fifo_read(dev, NULL, 1);
         /* read fifo contents */
         DEBUG("cc2420: recv: reading %i byte of the packet\n", (int)len);
         cc2420_fifo_read(dev, buf, len);
