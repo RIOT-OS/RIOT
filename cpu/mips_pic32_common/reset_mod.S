@@ -81,7 +81,7 @@ LEAF(__cpu_init)
 
     mfc0  s1, C0_STATUS		  # Read CP0 Status
     ext	  s1, s1, SR_NMI_SHIFT, 1 # extract NMI
-    beqz  s1, init_resources	  # Branch if this is NOT an NMI exception.
+    beqz  s1, init_resources     # /* Branch if this is NOT an NMI exception. */
     move  k0, t9		  # Preserve t9
     move  k1, a0		  # Preserve a0
     li	  $25, 15		  # UHI exception operation
@@ -179,7 +179,7 @@ $Lall_done:
     # If _start returns it will return to this point.
     # Just spin here reporting the exit.
     li	    $25, 1			# UHI exit operation
-    move    $4, v0			# Collect exit code for UHI exit
+    move    $4, v0			# /* Collect exit code for UHI exit */
     sdbbp   1				# Invoke UHI operation
     b       $Lall_done
 END(__cpu_init)
