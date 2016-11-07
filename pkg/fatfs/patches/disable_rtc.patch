@@ -1,0 +1,11 @@
+--- ffconf.h	2016-09-04 21:41:04.000000000 +0200
++++ ffconf_patched.h	2016-11-29 22:04:09.000000000 +0100
+@@ -215,7 +215,7 @@
+ /  Note that enabling exFAT discards C89 compatibility. */
+ 
+ 
+-#define _FS_NORTC	0
++#define _FS_NORTC	1
+ #define _NORTC_MON	1
+ #define _NORTC_MDAY	1
+ #define _NORTC_YEAR	2016

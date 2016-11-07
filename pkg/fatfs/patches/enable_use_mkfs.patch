@@ -1,0 +1,11 @@
+--- ffconf.h	2016-12-20 19:46:33.302977112 +0100
++++ ffconf_patched.h	2016-12-20 19:57:08.246791926 +0100
+@@ -39,7 +39,7 @@
+ /  f_findnext(). (0:Disable, 1:Enable 2:Enable with matching altname[] too) */
+ 
+ 
+-#define	_USE_MKFS		0
++#define	_USE_MKFS		1
+ /* This option switches f_mkfs() function. (0:Disable or 1:Enable) */
+ 
+ 

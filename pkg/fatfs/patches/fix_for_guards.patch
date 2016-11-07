@@ -1,0 +1,194 @@
+--- ./bin/pkg/airfy-beacon/fatfs/ff.c	2016-09-04 21:41:04.000000000 +0200
++++ ./bin/pkg/airfy-beacon/fatfs/ff_patched.c	2017-05-08 21:38:41.707271829 +0200
+@@ -784,7 +784,7 @@
+ {
+ 	UINT i;
+ 
+-	for (i = 0; i < _FS_LOCK && Files[i].fs; i++) ;
++	for (i = 0; i < _FS_LOCK && Files[i].fs; i++) {} ;
+ 	return (i == _FS_LOCK) ? 0 : 1;
+ }
+ 
+@@ -805,7 +805,7 @@
+ 	}
+ 
+ 	if (i == _FS_LOCK) {				/* Not opened. Register it as new. */
+-		for (i = 0; i < _FS_LOCK && Files[i].fs; i++) ;
++		for (i = 0; i < _FS_LOCK && Files[i].fs; i++) {} ;
+ 		if (i == _FS_LOCK) return 0;	/* No free entry to register (int err) */
+ 		Files[i].fs = dp->obj.fs;
+ 		Files[i].clu = dp->obj.sclust;
+@@ -1270,7 +1270,7 @@
+ #if _FS_EXFAT || _USE_TRIM
+ 		if (ecl + 1 == nxt) {	/* Is next cluster contiguous? */
+ 			ecl = nxt;
+-		} else {				/* End of contiguous cluster block */ 
++		} else {				/* End of contiguous cluster block */
+ #if _FS_EXFAT
+ 			if (fs->fs_type == FS_EXFAT) {
+ 				res = change_bitmap(fs, scl, ecl - scl + 1, 0);	/* Mark the cluster block 'free' on the bitmap */
+@@ -1978,12 +1978,12 @@
+ }
+ 
+ 
+-#if !_FS_READONLY || _FS_RPATH != 0 
++#if !_FS_READONLY || _FS_RPATH != 0
+ /*------------------------------------------------*/
+ /* exFAT: Load the object's directory entry block */
+ /*------------------------------------------------*/
+ static
+-FRESULT load_obj_dir (	
++FRESULT load_obj_dir (
+ 	DIR* dp,			/* Blank directory object to be used to access containing direcotry */
+ 	const _FDID* obj	/* Object with containing directory information */
+ )
+@@ -2254,7 +2254,7 @@
+ 
+ 
+ 	if (dp->fn[NSFLAG] & (NS_DOT | NS_NONAME)) return FR_INVALID_NAME;	/* Check name validity */
+-	for (nlen = 0; fs->lfnbuf[nlen]; nlen++) ;	/* Get lfn length */
++	for (nlen = 0; fs->lfnbuf[nlen]; nlen++) {} ;	/* Get lfn length */
+ 
+ #if _FS_EXFAT
+ 	if (fs->fs_type == FS_EXFAT) {	/* On the exFAT volume */
+@@ -2623,7 +2623,7 @@
+ 
+ 	/* Create SFN in directory form */
+ 	mem_set(dp->fn, ' ', 11);
+-	for (si = 0; lfn[si] == ' ' || lfn[si] == '.'; si++) ;	/* Strip leading spaces and dots */
++	for (si = 0; lfn[si] == ' ' || lfn[si] == '.'; si++) {} ;	/* Strip leading spaces and dots */
+ 	if (si) cf |= NS_LOSS | NS_LFN;
+ 	while (di && lfn[di - 1] != '.') di--;	/* Find extension (di<=si: no extension) */
+ 
+@@ -2866,10 +2866,10 @@
+ 
+ 
+ 	if (*path) {	/* If the pointer is not a null */
+-		for (tt = *path; (UINT)*tt >= (_USE_LFN ? ' ' : '!') && *tt != ':'; tt++) ;	/* Find ':' in the path */
++		for (tt = *path; (UINT)*tt >= (_USE_LFN ? ' ' : '!') && *tt != ':'; tt++) {} ;	/* Find ':' in the path */
+ 		if (*tt == ':') {	/* If a ':' is exist in the path name */
+ 			tp = *path;
+-			i = *tp++ - '0'; 
++			i = *tp++ - '0';
+ 			if (i < 10 && tp == tt) {	/* Is there a numeric drive id? */
+ 				if (i < _VOLUMES) {	/* If a drive id is found, get the value and strip it */
+ 					vol = (int)i;
+@@ -3017,7 +3017,7 @@
+ 	if (fmt == 1) {
+ 		QWORD maxlba;
+ 
+-		for (i = BPB_ZeroedEx; i < BPB_ZeroedEx + 53 && fs->win[i] == 0; i++) ;	/* Check zero filler */
++		for (i = BPB_ZeroedEx; i < BPB_ZeroedEx + 53 && fs->win[i] == 0; i++) {} ;	/* Check zero filler */
+ 		if (i < BPB_ZeroedEx + 53) return FR_NO_FILESYSTEM;
+ 
+ 		if (ld_word(fs->win + BPB_FSVerEx) != 0x100) return FR_NO_FILESYSTEM;	/* Check exFAT revision (Must be 1.0) */
+@@ -3891,7 +3891,7 @@
+ 				if (res == FR_NO_FILE) res = FR_INT_ERR;/* It cannot be 'not found'. */
+ 				if (res != FR_OK) break;
+ 				get_fileinfo(&dj, &fno);		/* Get the directory name and push it to the buffer */
+-				for (n = 0; fno.fname[n]; n++) ;
++				for (n = 0; fno.fname[n]; n++) {} ;
+ 				if (i < n + 3) {
+ 					res = FR_NOT_ENOUGH_CORE; break;
+ 				}
+@@ -4939,7 +4939,7 @@
+ 	dj.obj.fs = fs;
+ 
+ 	/* Get length of given volume label */
+-	for (slen = 0; (UINT)label[slen] >= ' '; slen++) ;	/* Get name length */
++	for (slen = 0; (UINT)label[slen] >= ' '; slen++) {} ;	/* Get name length */
+ 
+ #if _FS_EXFAT
+ 	if (fs->fs_type == FS_EXFAT) {	/* On the exFAT volume */
+@@ -4960,7 +4960,7 @@
+ 	} else
+ #endif
+ 	{	/* On the FAT12/16/32 volume */
+-		for ( ; slen && label[slen - 1] == ' '; slen--) ;	/* Remove trailing spaces */
++		for ( ; slen && label[slen - 1] == ' '; slen--) {} ;	/* Remove trailing spaces */
+ 		if (slen) {		/* Is there a volume label to be set? */
+ 			dirvn[0] = 0; i = j = 0;	/* Create volume label in directory form */
+ 			do {
+@@ -5335,7 +5335,7 @@
+ 				if (ch != si) {
+ 					si++; break;		/* Store the up-case char if exist */
+ 				}
+-				for (j = 1; (WCHAR)(si + j) && (WCHAR)(si + j) == ff_wtoupper((WCHAR)(si + j)); j++) ;	/* Get run length of no-case block */
++				for (j = 1; (WCHAR)(si + j) && (WCHAR)(si + j) == ff_wtoupper((WCHAR)(si + j)); j++) {} ;	/* Get run length of no-case block */
+ 				if (j >= 128) {
+ 					ch = 0xFFFF; st = 2; break;	/* Compress the no-case block if run is >= 128 */
+ 				}
+@@ -5366,8 +5366,8 @@
+ 		nb = tbl[0] + tbl[1] + tbl[2];					/* Number of clusters in-use by system */
+ 		do {
+ 			mem_set(buf, 0, szb_buf);
+-			for (i = 0; nb >= 8 && i < szb_buf; buf[i++] = 0xFF, nb -= 8) ;
+-			for (b = 1; nb && i < szb_buf; buf[i] |= b, b <<= 1, nb--) ;
++			for (i = 0; nb >= 8 && i < szb_buf; buf[i++] = 0xFF, nb -= 8) {} ;
++			for (b = 1; nb && i < szb_buf; buf[i] |= b, b <<= 1, nb--) {} ;
+ 			n = (nsect > sz_buf) ? sz_buf : nsect;		/* Write the buffered data */
+ 			if (disk_write(pdrv, buf, sect, n) != RES_OK) return FR_DISK_ERR;
+ 			sect += n; nsect -= n;
+@@ -5427,8 +5427,8 @@
+ 			st_dword(buf + BPB_RootClusEx, 2 + tbl[0] + tbl[1]);	/* Root dir cluster # */
+ 			st_dword(buf + BPB_VolIDEx, GET_FATTIME());				/* VSN */
+ 			st_word(buf + BPB_FSVerEx, 0x100);						/* File system version (1.00) */
+-			for (buf[BPB_BytsPerSecEx] = 0, i = ss; i >>= 1; buf[BPB_BytsPerSecEx]++) ;	/* Log2 of sector size [byte] */
+-			for (buf[BPB_SecPerClusEx] = 0, i = au; i >>= 1; buf[BPB_SecPerClusEx]++) ;	/* Log2 of cluster size [sector] */
++			for (buf[BPB_BytsPerSecEx] = 0, i = ss; i >>= 1; buf[BPB_BytsPerSecEx]++) {} ;	/* Log2 of sector size [byte] */
++			for (buf[BPB_SecPerClusEx] = 0, i = au; i >>= 1; buf[BPB_SecPerClusEx]++) {} ;	/* Log2 of cluster size [sector] */
+ 			buf[BPB_NumFATsEx] = 1;					/* Number of FATs */
+ 			buf[BPB_DrvNumEx] = 0x80;				/* Drive number (for int13) */
+ 			st_word(buf + BS_BootCodeEx, 0xFEEB);	/* Boot code (x86) */
+@@ -5441,13 +5441,13 @@
+ 			mem_set(buf, 0, ss);
+ 			st_word(buf + ss - 2, 0xAA55);	/* Signature (placed at end of sector) */
+ 			for (j = 1; j < 9; j++) {
+-				for (i = 0; i < ss; sum = xsum32(buf[i++], sum)) ;	/* VBR checksum */
++				for (i = 0; i < ss; sum = xsum32(buf[i++], sum)) {} ;	/* VBR checksum */
+ 				if (disk_write(pdrv, buf, sect++, 1) != RES_OK) return FR_DISK_ERR;
+ 			}
+ 			/* OEM/Reserved record (+9..+10) */
+ 			mem_set(buf, 0, ss);
+ 			for ( ; j < 11; j++) {
+-				for (i = 0; i < ss; sum = xsum32(buf[i++], sum)) ;	/* VBR checksum */
++				for (i = 0; i < ss; sum = xsum32(buf[i++], sum)) {} ;	/* VBR checksum */
+ 				if (disk_write(pdrv, buf, sect++, 1) != RES_OK) return FR_DISK_ERR;
+ 			}
+ 			/* Sum record (+11) */
+@@ -5464,7 +5464,7 @@
+ 			if (fmt == FS_FAT32) {	/* FAT32 volume */
+ 				if (!pau) {	/* au auto-selection */
+ 					n = sz_vol / 0x20000;	/* Volume size in unit of 128KS */
+-					for (i = 0, pau = 1; cst32[i] && cst32[i] <= n; i++, pau <<= 1) ;	/* Get from table */
++					for (i = 0, pau = 1; cst32[i] && cst32[i] <= n; i++, pau <<= 1) {} ;	/* Get from table */
+ 				}
+ 				n_clst = sz_vol / pau;	/* Number of clusters */
+ 				sz_fat = (n_clst * 4 + 8 + ss - 1) / ss;	/* FAT size [sector] */
+@@ -5474,7 +5474,7 @@
+ 			} else {				/* FAT12/16 volume */
+ 				if (!pau) {	/* au auto-selection */
+ 					n = sz_vol / 0x1000;	/* Volume size in unit of 4KS */
+-					for (i = 0, pau = 1; cst[i] && cst[i] <= n; i++, pau <<= 1) ;	/* Get from table */
++					for (i = 0, pau = 1; cst[i] && cst[i] <= n; i++, pau <<= 1) {} ;	/* Get from table */
+ 				}
+ 				n_clst = sz_vol / pau;
+ 				if (n_clst > MAX_FAT12) {
+@@ -5682,7 +5682,7 @@
+ 	if (disk_ioctl(pdrv, GET_SECTOR_COUNT, &sz_disk)) return FR_DISK_ERR;
+ 
+ 	/* Determine the CHS without any care of the drive geometry */
+-	for (n = 16; n < 256 && sz_disk / n / 63 > 1024; n *= 2) ;
++	for (n = 16; n < 256 && sz_disk / n / 63 > 1024; n *= 2) {} ;
+ 	if (n == 256) n--;
+ 	e_hd = n - 1;
+ 	sz_cyl = 63 * n;
+@@ -5991,7 +5991,7 @@
+ 		switch (d) {				/* Type is... */
+ 		case 'S' :					/* String */
+ 			p = va_arg(arp, TCHAR*);
+-			for (j = 0; p[j]; j++) ;
++			for (j = 0; p[j]; j++) {} ;
+ 			if (!(f & 2)) {
+ 				while (j++ < w) putc_bfd(&pb, ' ');
+ 			}

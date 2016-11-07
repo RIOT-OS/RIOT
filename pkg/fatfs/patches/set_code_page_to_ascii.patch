@@ -1,0 +1,11 @@
+--- ffconf.h	2016-10-14 16:11:35.060659327 +0200
++++ ffconf_patched.h	2016-10-17 12:16:11.967672504 +0200
+@@ -69,7 +69,7 @@
+ / Locale and Namespace Configurations
+ /---------------------------------------------------------------------------*/
+ 
+-#define _CODE_PAGE	932
++#define _CODE_PAGE	1
+ /* This option specifies the OEM code page to be used on the target system.
+ /  Incorrect setting of the code page can cause a file open failure.
+ /

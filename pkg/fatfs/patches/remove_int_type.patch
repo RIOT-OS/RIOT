@@ -1,0 +1,5 @@
+17a18,19
+> /* removed because it creates a naming clash with cc2538_rfcore.h 
+>  * and it isn't used anyway
+18a21
+> */
