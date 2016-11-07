@@ -11,12 +11,14 @@
  *
  * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #include <stddef.h>
 
 #include "od.h"
 #include "net/gnrc.h"
+#include "net/gnrc/pktqueue.h"
 #include "net/ieee802154.h"
 
 #include "net/gnrc/netdev2/ieee802154.h"
@@ -24,15 +26,51 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#ifdef MODULE_NETDEV_RETRANS
+#define _RETRANS_QUEUE_LEN  (16)
+#define _RETRANS_COUNT      (3)
+
+static netdev2_retrans_queue_t _pkt_nodes[_RETRANS_QUEUE_LEN];
+static uint8_t _netdev2_retrans = _RETRANS_COUNT;
+
+/**
+ * @brief   Allocates a node for the packet queue.
+ *
+ * @param[in] pkt   Packet to add to the packet queue.
+ *
+ * @return  A packet queue node.
+ */
+static netdev2_retrans_queue_t *_alloc_pkt_node(gnrc_pktsnip_t *pkt)
+{
+    for (size_t i = 0; i < sizeof(_pkt_nodes) / sizeof(netdev2_retrans_queue_t); i++) {
+        if ((_pkt_nodes[i].pkt == NULL) && (_pkt_nodes[i].next == NULL)) {
+            _pkt_nodes[i].pkt = pkt;
+            _pkt_nodes[i].cnt = _netdev2_retrans;
+
+            return &(_pkt_nodes[i]);
+        }
+    }
+
+    return NULL;
+}
+#endif
+
 static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2);
 static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt);
+static int _set(gnrc_netdev2_t *netdev, netopt_t opt, void *val, size_t len);
+static int _get(gnrc_netdev2_t *netdev, netopt_t opt, void *val, size_t max_len);
 
 int gnrc_netdev2_ieee802154_init(gnrc_netdev2_t *gnrc_netdev2,
                                  netdev2_ieee802154_t *dev)
 {
     gnrc_netdev2->send = _send;
     gnrc_netdev2->recv = _recv;
+    gnrc_netdev2->set = _set;
+    gnrc_netdev2->get = _get;
     gnrc_netdev2->dev = (netdev2_t *)dev;
+#ifdef MODULE_NETDEV_RETRANS
+    gnrc_netdev2->retrans_head = NULL;
+#endif
 
     return 0;
 }
@@ -213,8 +251,78 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
     else {
         return -ENOBUFS;
     }
+#ifdef MODULE_NETDEV_RETRANS
+    /* queue the packet for potential retransmissions */
+    if (gnrc_netdev2->retrans_head->pkt != pkt) {
+        netdev2_retrans_queue_t *pkt_node = _alloc_pkt_node(pkt);
+        if (pkt_node == NULL) {
+            DEBUG("_send_ieee802154: could not add packet to packet queue\n");
+        }
+        else {
+            gnrc_pktqueue_add((gnrc_pktqueue_t**) &(gnrc_netdev2->retrans_head), (gnrc_pktqueue_t*) pkt_node);
+        }
+    }
+    gnrc_pktbuf_hold(pkt, 1);
+#endif
     /* release old data */
     gnrc_pktbuf_release(pkt);
+    return res;
+}
+
+static int _set(gnrc_netdev2_t *gnrc_netdev2, netopt_t opt, void *val, size_t len)
+{
+    int res = 0;
+    netdev2_ieee802154_t *dev = (netdev2_ieee802154_t *)gnrc_netdev2->dev;
+
+    if (dev == NULL) {
+        return -ENODEV;
+    }
+
+#ifdef MODULE_NETDEV_RETRANS
+    if (opt == NETOPT_RETRANS) {
+        if (len > sizeof(uint8_t)) {
+            res = -EOVERFLOW;
+        }
+        else {
+            _netdev2_retrans = *((uint8_t *)val);
+            res = sizeof(uint8_t);
+        }
+    }
+    else {
+#endif
+        res = dev->netdev.driver->set((netdev2_t *)dev, opt, val, len);
+#ifdef MODULE_NETDEV_RETRANS
+    }
+#endif
+
+    return res;
+}
+
+static int _get(gnrc_netdev2_t *gnrc_netdev2, netopt_t opt, void *val, size_t max_len)
+{
+    int res = 0;
+    netdev2_ieee802154_t *dev = (netdev2_ieee802154_t *)gnrc_netdev2->dev;
+
+    if (dev == NULL) {
+        return -ENODEV;
+    }
+#ifdef MODULE_NETDEV_RETRANS
+    if (opt == NETOPT_RETRANS) {
+        if (max_len < sizeof(uint8_t)) {
+            res = -EOVERFLOW;
+        }
+        else {
+            *((uint8_t *)val) = _netdev2_retrans;
+            res = sizeof(uint8_t);
+        }
+    }
+    else {
+#endif
+        res = dev->netdev.driver->get((netdev2_t *)dev, opt, val, max_len);
+#ifdef MODULE_NETDEV_RETRANS
+    }
+#endif
+
     return res;
 }
 

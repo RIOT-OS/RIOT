@@ -24,6 +24,7 @@
  * The purpose of gnrc_netdev is to bring these two interfaces together.
  *
  * @author    Kaspar Schleiser <kaspar@schleiser.de>
+ * @author    Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #ifndef GNRC_NETDEV2_H
@@ -45,6 +46,15 @@ extern "C" {
  * @brief   Type for @ref msg_t if device fired an event
  */
 #define NETDEV2_MSG_TYPE_EVENT 0x1234
+
+/**
+ * @brief   Queue of packets for link-layer retransmissions
+ */
+typedef struct {
+    struct gnrc_pktqueue *next; /**< next node in queue */
+    gnrc_pktsnip_t *pkt;        /**< pointer to the packet */
+    uint8_t cnt;                /**< remaining number of max. retransmissions */
+} netdev2_retrans_queue_t;
 
 /**
  * @brief Structure holding GNRC netdev2 adapter state
@@ -73,6 +83,34 @@ typedef struct gnrc_netdev2 {
     gnrc_pktsnip_t * (*recv)(struct gnrc_netdev2 *dev);
 
     /**
+     * @brief   Get an option value from a given network device
+     *
+     * @param[in]   dev     network device descriptor
+     * @param[in]   opt     option type
+     * @param[out]  value   pointer to store the option's value in
+     * @param[in]   max_len maximal amount of byte that fit into @p value
+     *
+     * @return              number of bytes written to @p value
+     * @return              <0 on error
+     */
+    int (*get)(struct gnrc_netdev2 *dev, netopt_t opt,
+               void *value, size_t max_len);
+
+    /**
+     * @brief   Set an option value for a given network device
+     *
+     * @param[in] dev       network device descriptor
+     * @param[in] opt       option type
+     * @param[in] value     value to set
+     * @param[in] value_len the length of @p value
+     *
+     * @return              number of bytes used from @p value
+     * @return              <0 on error
+     */
+    int (*set)(struct gnrc_netdev2 *dev, netopt_t opt,
+               void *value, size_t value_len);
+
+    /**
      * @brief netdev2 handle this adapter is working with
      */
     netdev2_t *dev;
@@ -81,6 +119,13 @@ typedef struct gnrc_netdev2 {
      * @brief PID of this adapter for netapi messages
      */
     kernel_pid_t pid;
+
+#ifdef MODULE_NETDEV_RETRANS
+    /**
+     * @brief head of queue for link-layer retransmissions
+     */
+    netdev2_retrans_queue_t *retrans_head;
+#endif
 } gnrc_netdev2_t;
 
 /**

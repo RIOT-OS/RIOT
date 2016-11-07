@@ -15,6 +15,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 
@@ -25,6 +26,7 @@
 
 #include "net/gnrc.h"
 #include "net/gnrc/nettype.h"
+#include "net/gnrc/pktqueue.h"
 #include "net/netdev2.h"
 
 #include "net/gnrc/netdev2.h"
@@ -73,14 +75,48 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
 
                     break;
                 }
-#ifdef MODULE_NETSTATS_L2
             case NETDEV2_EVENT_TX_MEDIUM_BUSY:
+                /* need this IRQ for counting failed transmissions */
+#ifdef MODULE_NETSTATS_L2
                 dev->stats.tx_failed++;
-                break;
-            case NETDEV2_EVENT_TX_COMPLETE:
-                dev->stats.tx_success++;
+                /* if we do netdev retransmissions, we handle failing and
+                 * non-acknowledged transmissions the same way */
+#ifndef MODULE_NETDEV_RETRANS
                 break;
 #endif
+#endif
+#ifdef MODULE_NETDEV_RETRANS
+            case NETDEV2_EVENT_TX_NOACK:
+                DEBUG("gnrc_netdev2: no ACK received or medium busy: retrans count is = %u\n", (unsigned) gnrc_netdev2->retrans_head->cnt);
+                assert(gnrc_netdev2->retrans_head);
+                if (gnrc_netdev2->retrans_head->cnt-- <= 0) {
+                    DEBUG("giving up sending, removing from buffer and queue: %p\n", (void*)gnrc_netdev2->retrans_head->pkt);
+                    gnrc_pktbuf_release(gnrc_netdev2->retrans_head->pkt);
+                    gnrc_netdev2->retrans_head->pkt = NULL;
+                    gnrc_pktqueue_remove_head((gnrc_pktqueue_t**)&(gnrc_netdev2->retrans_head));
+                }
+                /* if there are still packets queued, send them now */
+                if (gnrc_netdev2->retrans_head) {
+                    gnrc_netdev2->send(gnrc_netdev2, gnrc_netdev2->retrans_head->pkt);
+                }
+                break;
+#endif
+            case NETDEV2_EVENT_TX_COMPLETE:
+#ifdef MODULE_NETSTATS_L2
+                dev->stats.tx_success++;
+#endif
+#ifdef MODULE_NETDEV_RETRANS
+                assert(gnrc_netdev2->retrans_head);
+                DEBUG("packet sent, removing from buffer and queue: %p\n", (void*) gnrc_netdev2->retrans_head->pkt);
+                gnrc_pktbuf_release(gnrc_netdev2->retrans_head->pkt);
+                gnrc_netdev2->retrans_head->pkt = NULL;
+                gnrc_pktqueue_remove_head((gnrc_pktqueue_t**)&(gnrc_netdev2->retrans_head));
+                /* if there are more packets queued, send them now */
+                if (gnrc_netdev2->retrans_head) {
+                    gnrc_netdev2->send(gnrc_netdev2, gnrc_netdev2->retrans_head->pkt);
+                }
+#endif
+                break;
             default:
                 DEBUG("gnrc_netdev2: warning: unhandled event %u.\n", event);
         }
@@ -151,7 +187,7 @@ static void *_gnrc_netdev2_thread(void *args)
                 DEBUG("gnrc_netdev2: GNRC_NETAPI_MSG_TYPE_SET received. opt=%s\n",
                         netopt2str(opt->opt));
                 /* set option for device driver */
-                res = dev->driver->set(dev, opt->opt, opt->data, opt->data_len);
+                res = gnrc_netdev2->set(gnrc_netdev2, opt->opt, opt->data, opt->data_len);
                 DEBUG("gnrc_netdev2: response of netdev->set: %i\n", res);
                 /* send reply to calling thread */
                 reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
@@ -164,7 +200,7 @@ static void *_gnrc_netdev2_thread(void *args)
                 DEBUG("gnrc_netdev2: GNRC_NETAPI_MSG_TYPE_GET received. opt=%s\n",
                         netopt2str(opt->opt));
                 /* get option from device driver */
-                res = dev->driver->get(dev, opt->opt, opt->data, opt->data_len);
+                res = gnrc_netdev2->get(gnrc_netdev2, opt->opt, opt->data, opt->data_len);
                 DEBUG("gnrc_netdev2: response of netdev->get: %i\n", res);
                 /* send reply to calling thread */
                 reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
