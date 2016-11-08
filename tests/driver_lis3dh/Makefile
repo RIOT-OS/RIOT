@@ -7,7 +7,7 @@ USEMODULE += lis3dh
 USEMODULE += xtimer
 
 # set default device parameters in case they are undefined
-TEST_LIS3DH_SPI  ?= SPI_0
+TEST_LIS3DH_SPI  ?= SPI_DEV\(0\)
 TEST_LIS3DH_CS   ?= GPIO_PIN\(0,0\)
 TEST_LIS3DH_INT1 ?= GPIO_PIN\(0,1\)
 TEST_LIS3DH_INT2 ?= GPIO_PIN\(0,2\)

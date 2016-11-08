@@ -55,7 +55,7 @@ void auto_init_lis3dh(void)
 
         LOG_DEBUG("[auto_init_saul] initializing lis3dh #%u\n", i);
 
-        res = lis3dh_init(&lis3dh_devs[i], p->spi, p->cs, p->scale);
+        res = lis3dh_init(&lis3dh_devs[i], p->spi, p->clk, p->cs, p->scale);
         if (res < 0) {
             LOG_ERROR("[auto_init_saul] error initializing lis3dh #%u\n", i);
             continue;

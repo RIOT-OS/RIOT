@@ -32,7 +32,7 @@ extern "C" {
  * @{
  */
 #ifndef LIS3DH_PARAM_SPI
-#define LIS3DH_PARAM_SPI            (SPI_0)
+#define LIS3DH_PARAM_SPI            (SPI_DEV(0))
 #endif
 #ifndef LIS3DH_PARAM_CS
 #define LIS3DH_PARAM_CS             (GPIO_PIN(0, 0))
