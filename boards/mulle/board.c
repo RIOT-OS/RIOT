@@ -34,6 +34,7 @@ static nvram_t mulle_nvram_dev;
 nvram_t *mulle_nvram = &mulle_nvram_dev;
 static nvram_spi_params_t nvram_spi_params = {
         .spi = MULLE_NVRAM_SPI_DEV,
+        .clk = MULLE_NVRAM_SPI_CLK,
         .cs = MULLE_NVRAM_SPI_CS,
         .address_count = MULLE_NVRAM_SPI_ADDRESS_COUNT,
 };
@@ -183,10 +184,6 @@ static int mulle_nvram_init(void)
         uint8_t  u8[sizeof(uint32_t)];
     } rec;
     rec.u32 = 0;
-
-    if (spi_init_master(MULLE_NVRAM_SPI_DEV, SPI_CONF_FIRST_RISING, SPI_SPEED_5MHZ) != 0) {
-        return -1;
-    }
 
     if (nvram_spi_init(mulle_nvram, &nvram_spi_params, MULLE_NVRAM_CAPACITY) != 0) {
         return -2;

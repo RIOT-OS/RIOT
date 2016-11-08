@@ -66,6 +66,28 @@ typedef uint16_t gpio_t;
  */
 #define PWM_CHAN_MAX        (4U)
 
+/**
+ * @brief   Define a CPU specific SPI hardware chip select line macro
+ *
+ * We simply map the 5 hardware channels to the numbers [0-4], this still allows
+ * us to differentiate between GPIP_PINs and SPI_HWSC lines.
+ */
+#define SPI_HWCS(x)         (x)
+
+/**
+ * @brief   Kinetis CPUs have a maximum number of 5 hardware chip select lines
+ */
+#define SPI_HWCS_NUMOF      (5)
+
+/**
+ * @brief   This CPU makes use of the following shared SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
 #ifndef DOXYGEN
 /**
  * @brief   Override GPIO modes
@@ -88,7 +110,7 @@ typedef enum {
  *
  * To combine values just aggregate them using a logical OR.
  */
-enum {
+typedef enum {
     GPIO_AF_ANALOG = PORT_PCR_MUX(0),       /**< use pin as analog input */
     GPIO_AF_GPIO   = PORT_PCR_MUX(1),       /**< use pin as GPIO */
     GPIO_AF_2      = PORT_PCR_MUX(2),       /**< use alternate function 2 */
@@ -100,7 +122,7 @@ enum {
     GPIO_PCR_OD    = (PORT_PCR_ODE_MASK),   /**< open-drain mode */
     GPIO_PCR_PD    = (PORT_PCR_PE_MASK),    /**< enable pull-down */
     GPIO_PCR_PU    = (PORT_PCR_PE_MASK | PORT_PCR_PS_MASK)  /**< enable PU */
-};
+} gpio_pcr_t;
 
 #ifndef DOXYGEN
 /**
@@ -161,6 +183,21 @@ typedef enum {
 /** @} */
 #endif /* ndef DOXYGEN */
 
+#ifndef DOXYGEN
+/**
+ * @brief   Override default ADC resolution values
+ * @{
+ */
+#define HAVE_SPI_MODE_T
+typedef enum {
+    SPI_MODE_0 = 0,                                         /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1 = (SPI_CTAR_CPHA_MASK),                      /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2 = (SPI_CTAR_CPOL_MASK),                      /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3 = (SPI_CTAR_CPOL_MASK | SPI_CTAR_CPHA_MASK)  /**< CPOL=1, CPHA=1 */
+} spi_mode_t;
+/** @} */
+#endif /* ndef DOXYGEN */
+
 /**
  * @brief   CPU specific ADC configuration
  */
@@ -216,6 +253,19 @@ typedef struct {
     uint8_t chan_numof;     /**< number of actually configured channels */
     uint8_t ftm_num;        /**< FTM number used */
 } pwm_conf_t;
+
+/**
+ * @brief   SPI module configuration options
+ */
+typedef struct {
+    SPI_Type *dev;                      /**< SPI device to use */
+    gpio_t pin_miso;                    /**< MISO pin used */
+    gpio_t pin_mosi;                    /**< MOSI pin used */
+    gpio_t pin_clk;                     /**< CLK pin used */
+    gpio_t pin_cs[SPI_HWCS_NUMOF];      /**< pins used for HW cs lines */
+    gpio_pcr_t pcr;                     /**< alternate pin function values */
+    uint32_t simmask;                   /**< bit in the SIM register */
+} spi_conf_t;
 
 /**
  * @brief   Possible timer module types
