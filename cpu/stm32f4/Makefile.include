@@ -4,4 +4,5 @@ export CPU_FAM  = stm32f4
 USEMODULE += pm_layered
 
 include $(RIOTCPU)/stm32_common/Makefile.include
+
 include $(RIOTCPU)/Makefile.include.cortexm_common

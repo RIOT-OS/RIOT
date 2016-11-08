@@ -34,15 +34,6 @@ extern "C" {
 #define ADC_DEVS            (3U)
 #endif
 
-/**
- * @brief declare needed generic SPI functions
- * @{
- */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
-/** @} */
-
 #ifndef DOXYGEN
 /**
  * @brief   Override the ADC resolution configuration

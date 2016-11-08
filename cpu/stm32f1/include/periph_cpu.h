@@ -31,11 +31,14 @@ extern "C" {
 #define ADC_DEVS            (2U)
 
 /**
- * @brief declare needed generic SPI functions
- * @{
+ * @brief   All timers for the STM32F1 have 4 CC channels
  */
-#undef PERIPH_SPI_NEEDS_TRANSFER_BYTES
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+#define TIMER_CHANNELS      (4U)
+
+/**
+ * @brief   All timers have a width of 16-bit
+ */
+#define TIMER_MAXVAL        (0xffff)
 
 /**
  * @brief   Generate GPIO mode bitfields
