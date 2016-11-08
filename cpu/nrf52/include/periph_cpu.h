@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Freie Universität Berlin
+ * Copyright (C) 2015-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -31,6 +31,9 @@ extern "C" {
  */
 #define GPIO_BASE           (NRF_P0)
 #define UART_IRQN           (UARTE0_UART0_IRQn)
+#define SPI_SCKSEL          (dev(bus)->PSEL.SCK)
+#define SPI_MOSISEL         (dev(bus)->PSEL.MOSI)
+#define SPI_MISOSEL         (dev(bus)->PSEL.MISO)
 /** @} */
 
 #ifdef __cplusplus

@@ -4,6 +4,7 @@ FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += periph_rtt
+FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 
