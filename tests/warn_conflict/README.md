@@ -9,7 +9,7 @@ It is expected to be presented with a warning on the conflicts with a short desc
 ```
 $ make BOARD=stm32f4discovery
 The following features may conflict: periph_dac periph_spi
-Rationale: On stm32f4discovery boards there are the same pins for the DAC and/or SPI_0.
+Rationale: On stm32f4discovery boards there are the same pins for the DAC and/or SPI_DEV(0).
 
 EXPECT undesired behaviour!
 ```
@@ -23,7 +23,7 @@ Whenever an application, such as this test, requires board features that match a
 
 * Conflicting features are described in groups separated by a `:` (doublecolon) for each feature, e.g.:
 `FEATURES_CONFLICT = periph_spi:periph_dac`, which states that `periph_spi` conflicts with `periph_dac`.
-As seen above, this is the conflict of `SPI_0` pinout is shared with `DAC` on the [stm32f4discovery](https://github.com/RIOT-OS/RIOT/wiki/Board%3A-STM32F4discovery) board.
+As seen above, this is the conflict of `SPI_DEV(0)` pinout is shared with `DAC` on the [stm32f4discovery](https://github.com/RIOT-OS/RIOT/wiki/Board%3A-STM32F4discovery) board.
 
 * Distinct groups of conflicts are whitespace separated, e.g.:
 `featureA:featureB featureC:featureD`, which states that `featureA` conflicts with `featureB`, and `featureC` conflicts with `featureD`.
