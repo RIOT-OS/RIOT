@@ -95,15 +95,9 @@ static int adt7310_read_reg(const adt7310_t *dev, const uint8_t addr, const uint
     int status = 0;
     uint8_t command = ADT7310_CMD_READ | (addr << ADT7310_CMD_ADDR_SHIFT);
     /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi);
+    spi_acquire(dev->spi, dev->cs, SPI_MODE_0, dev->clk);
     /* Perform the transaction */
-    gpio_clear(dev->cs);
-
-    if (spi_transfer_regs(dev->spi, command, NULL, (char *)buf, len) < len) {
-        status = -1;
-    }
-
-    gpio_set(dev->cs);
+    spi_transfer_regs(dev->spi, dev->cs, command, NULL, buf, (size_t)len);
     /* Release the bus for other threads. */
     spi_release(dev->spi);
 
@@ -127,34 +121,28 @@ static int adt7310_write_reg(const adt7310_t *dev, const uint8_t addr,
     int status = 0;
     uint8_t command = ADT7310_CMD_WRITE | (addr << ADT7310_CMD_ADDR_SHIFT);
     /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi);
+    spi_acquire(dev->spi, dev->cs, SPI_MODE_0, dev->clk);
     /* Perform the transaction */
-    gpio_clear(dev->cs);
-
-    if (spi_transfer_regs(dev->spi, command, (char *)buf, NULL, len) < len) {
-        status = -1;
-    }
-
-    gpio_set(dev->cs);
+    spi_transfer_regs(dev->spi, dev->cs, command, buf, NULL, (size_t)len);
     /* Release the bus for other threads. */
     spi_release(dev->spi);
 
     return status;
 }
 
-int adt7310_init(adt7310_t *dev, spi_t spi, gpio_t cs)
+int adt7310_init(adt7310_t *dev, spi_t spi, spi_clk_t clk, gpio_t cs)
 {
     int status;
     uint8_t reg = 0;
     /* write device descriptor */
     dev->spi = spi;
+    dev->clk = clk;
     dev->cs = cs;
     dev->initialized = false;
     dev->high_res = false;
 
     /* CS */
-    gpio_init(dev->cs, GPIO_OUT);
-    gpio_set(dev->cs);
+    spi_init_cs(dev->spi, dev->cs);
 
 #if ENABLE_DEBUG
     for (int i = 0; i < 8; ++i) {
