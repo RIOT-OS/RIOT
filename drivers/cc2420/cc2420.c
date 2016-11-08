@@ -42,7 +42,6 @@ void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params)
     dev->state = CC2420_STATE_IDLE;
     /* reset device descriptor fields */
     dev->options = 0;
-    spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING, dev->params.spi_clk);
 }
 
 int cc2420_init(cc2420_t *dev)
