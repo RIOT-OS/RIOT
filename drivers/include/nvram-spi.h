@@ -38,6 +38,8 @@ extern "C" {
 typedef struct nvram_spi_params {
     /** @brief RIOT SPI device */
     spi_t spi;
+    /** @brief SPI clock speed */
+    spi_clk_t clk;
     /** @brief Chip select pin */
     gpio_t cs;
     /** @brief Number of address bytes following each read/write command. */
