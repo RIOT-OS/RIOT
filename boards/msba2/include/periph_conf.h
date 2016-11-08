@@ -82,10 +82,12 @@ extern "C" {
 
 /**
  * @brief SPI configuration
+ *
+ * The SPI implementation is very much fixed, so we don't need to configure
+ * anything besides the mandatory SPI_NUMOF.
  * @{
  */
 #define SPI_NUMOF           (1)
-#define SPI_0_EN            (1)
 /** @} */
 
 #ifdef __cplusplus
