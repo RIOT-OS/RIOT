@@ -46,8 +46,6 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
     dev->state = AT86RF2XX_STATE_SLEEP;
     dev->pending_tx = 0;
-    /* initialise SPI */
-    spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING, params->spi_speed);
 }
 
 void at86rf2xx_reset(at86rf2xx_t *dev)

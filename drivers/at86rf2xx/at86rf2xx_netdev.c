@@ -70,8 +70,7 @@ static int _init(netdev2_t *netdev)
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
 
     /* initialise GPIOs */
-    gpio_init(dev->params.cs_pin, GPIO_OUT);
-    gpio_set(dev->params.cs_pin);
+    spi_init_cs(dev->params.spi, dev->params.cs_pin);
     gpio_init(dev->params.sleep_pin, GPIO_OUT);
     gpio_clear(dev->params.sleep_pin);
     gpio_init(dev->params.reset_pin, GPIO_OUT);
