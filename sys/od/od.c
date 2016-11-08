@@ -303,12 +303,16 @@ static void _print_date(const void *data, size_t offset, char *format, uint8_t l
             break;
 
         case 8:
+#ifndef MODULE_NEWLIB
             if (flags & OD_FLAGS_BYTES_INT) {
                 printf(format, ((int64_t *)data)[offset]);
             }
             else {
                 printf(format, ((uint64_t *)data)[offset]);
             }
+#else
+            printf("%s", format);
+#endif
 
             break;
 
