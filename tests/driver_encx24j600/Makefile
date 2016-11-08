@@ -22,13 +22,13 @@ CFLAGS += -DGNRC_PKTBUF_SIZE=2048
 ifneq (,$(filter nucleo-f334,$(BOARD)))
 # these settings are probably valid for PoEll-i on most nucelo boards, but
 # tested only on nucleo-f334
-  ENC_SPI ?= SPI_0
+  ENC_SPI ?= SPI_DEV\(0\)
   ENC_CS  ?= GPIO_PIN\(PORT_C,10\)
   ENC_INT ?= GPIO_PIN\(PORT_D,2\)
 endif
 
 # fallback: set SPI bus and pins to default values
-ENC_SPI ?= SPI_0
+ENC_SPI ?= SPI_DEV\(0\)
 ENC_CS  ?= GPIO_PIN\(0,0\)
 ENC_INT ?= GPIO_PIN\(0,1\)
 # export SPI and pins

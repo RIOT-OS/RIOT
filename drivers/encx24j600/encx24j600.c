@@ -37,18 +37,19 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define ENCX24J600_SPI_SPEED SPI_SPEED_1MHZ
+#define SPI_CLK                 SPI_CLK_1MHZ
+#define SPI_MODE                SPI_MODE_0
 
-#define ENCX24J600_INIT_DELAY 100000U
+#define ENCX24J600_INIT_DELAY   (100000U)
 
-#define ENC_BUFFER_START 0x0000
-#define ENC_BUFFER_SIZE  0x6000
-#define ENC_BUFFER_END   0x5FFF
-#define RX_BUFFER_START (0x5340) /* Default value */
-#define RX_BUFFER_END   (ENC_BUFFER_END)
-#define TX_BUFFER_LEN   (0x2000)
-#define TX_BUFFER_END   (RX_BUFFER_START)
-#define TX_BUFFER_START (TX_BUFFER_END - TX_BUFFER_LEN)
+#define ENC_BUFFER_START        (0x0000)
+#define ENC_BUFFER_SIZE         (0x6000)
+#define ENC_BUFFER_END          (0x5FFF)
+#define RX_BUFFER_START         (0x5340) /* Default value */
+#define RX_BUFFER_END           (ENC_BUFFER_END)
+#define TX_BUFFER_LEN           (0x2000)
+#define TX_BUFFER_END           (RX_BUFFER_START)
+#define TX_BUFFER_START         (TX_BUFFER_END - TX_BUFFER_LEN)
 
 static void cmd(encx24j600_t *dev, char cmd);
 static void reg_set(encx24j600_t *dev, uint8_t reg, uint16_t value);
@@ -75,11 +76,11 @@ const static netdev2_driver_t netdev2_driver_encx24j600 = {
 };
 
 static inline void lock(encx24j600_t *dev) {
-    mutex_lock(&dev->mutex);
+    spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
 }
 
 static inline void unlock(encx24j600_t *dev) {
-    mutex_unlock(&dev->mutex);
+    spi_release(dev->spi);
 }
 
 void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params)
@@ -89,8 +90,6 @@ void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params)
     dev->cs = params->cs_pin;
     dev->int_pin = params->int_pin;
     dev->rx_next_ptr = RX_BUFFER_START;
-
-    mutex_init(&dev->mutex);
 }
 
 static void encx24j600_isr(void *arg)
@@ -147,11 +146,7 @@ static void _isr(netdev2_t *netdev)
 
 static inline void enc_spi_transfer(encx24j600_t *dev, char *out, char *in, int len)
 {
-    spi_acquire(dev->spi);
-    gpio_clear(dev->cs);
-    spi_transfer_bytes(dev->spi, out, in, len);
-    gpio_set(dev->cs);
-    spi_release(dev->spi);
+    spi_transfer_bytes(dev->spi, dev->cs, false, out, in, len);
 }
 
 static inline uint16_t reg_get(encx24j600_t *dev, uint8_t reg)
@@ -170,20 +165,12 @@ static void phy_reg_set(encx24j600_t *dev, uint8_t reg, uint16_t value) {
 }
 
 static void cmd(encx24j600_t *dev, char cmd) {
-    spi_acquire(dev->spi);
-    gpio_clear(dev->cs);
-    spi_transfer_byte(dev->spi, cmd, NULL);
-    gpio_set(dev->cs);
-    spi_release(dev->spi);
+    spi_transfer_byte(dev->spi, dev->cs, false, (uint8_t)cmd);
 }
 
 static void cmdn(encx24j600_t *dev, uint8_t cmd, char *out, char *in, int len) {
-    spi_acquire(dev->spi);
-    gpio_clear(dev->cs);
-    spi_transfer_byte(dev->spi, cmd, NULL);
-    spi_transfer_bytes(dev->spi, out, in, len);
-    gpio_set(dev->cs);
-    spi_release(dev->spi);
+    spi_transfer_byte(dev->spi, dev->cs, true, cmd);
+    spi_transfer_bytes(dev->spi, dev->cs, false, out, in, len);
 }
 
 static void reg_set(encx24j600_t *dev, uint8_t reg, uint16_t value)
@@ -249,13 +236,10 @@ static int _init(netdev2_t *encdev)
     DEBUG("encx24j600: starting initialization...\n");
 
     /* setup IO */
-    gpio_init(dev->cs, GPIO_OUT);
-    gpio_set(dev->cs);
-    gpio_init_int(dev->int_pin, GPIO_IN_PU, GPIO_FALLING, encx24j600_isr, (void*)dev);
-
-    if (spi_init_master(dev->spi, SPI_CONF_FIRST_RISING, ENCX24J600_SPI_SPEED) < 0) {
+    if (spi_init_cs(dev->spi, dev->cs) != SPI_OK) {
         return -1;
     }
+    gpio_init_int(dev->int_pin, GPIO_IN_PU, GPIO_FALLING, encx24j600_isr, (void*)dev);
 
     lock(dev);
 

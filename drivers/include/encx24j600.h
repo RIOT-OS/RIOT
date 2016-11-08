@@ -41,7 +41,6 @@ typedef struct {
     gpio_t cs;              /**< SPI chip select pin */
     gpio_t int_pin;         /**< SPI interrupt pin */
     uint16_t rx_next_ptr;   /**< ptr to next packet whithin devices memory */
-    mutex_t mutex;          /**< mutex used to lock device access */
 } encx24j600_t;
 
 /**
