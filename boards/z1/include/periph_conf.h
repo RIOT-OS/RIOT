@@ -76,7 +76,7 @@ extern "C" {
 
 /* SPI configuration */
 #define SPI_USE_USCI
-#define SPI_DEV             (USCI_0_B_SPI)
+#define SPI_BASE            (USCI_0_B_SPI)
 #define SPI_IE              (SFR->IE2)
 #define SPI_IF              (SFR->IFG2)
 #define SPI_IE_RX_BIT       (1 << 2)

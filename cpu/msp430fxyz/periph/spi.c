@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -25,8 +25,6 @@
 #include "cpu.h"
 #include "mutex.h"
 #include "assert.h"
-#include "periph_cpu.h"
-#include "periph_conf.h"
 #include "periph/spi.h"
 
 /**
@@ -34,233 +32,128 @@
  */
 static mutex_t spi_lock = MUTEX_INIT;
 
-/* per default, we use the legacy MSP430 USART module for UART functionality */
-#ifndef SPI_USE_USCI
 
-int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
+void spi_init(spi_t bus)
 {
-    if (dev != 0) {
-        return -2;
-    }
+    assert(bus <= SPI_NUMOF);
 
-    /* reset SPI device */
-    SPI_DEV->CTL = USART_CTL_SWRST;
-    /* configure pins */
-    spi_conf_pins(dev);
-    /* configure USART to SPI mode with SMCLK driving it */
-    SPI_DEV->CTL |= (USART_CTL_CHAR | USART_CTL_SYNC | USART_CTL_MM);
-    SPI_DEV->RCTL = 0;
-    SPI_DEV->TCTL = (USART_TCTL_SSEL_SMCLK | USART_TCTL_STC);
-    /* set polarity and phase */
-    switch (conf) {
-        case SPI_CONF_FIRST_RISING:
-            SPI_DEV->TCTL |= USART_TCTL_CKPH;
-            break;
-        case SPI_CONF_SECOND_RISING:
-            /* nothing to be done here */
-            break;
-        case SPI_CONF_FIRST_FALLING:
-            SPI_DEV->TCTL |= (USART_TCTL_CKPH & USART_TCTL_CKPL);
-            break;
-        case SPI_CONF_SECOND_FALLING:
-            SPI_DEV->TCTL |= USART_TCTL_CKPL;
-            break;
-        default:
-            /* invalid clock setting */
-            return -2;
-    }
-    /* configure clock - we use no modulation for now */
-    uint32_t br = CLOCK_CMCLK;
-    switch (speed) {
-        case SPI_SPEED_100KHZ:
-            br /= 100000;
-            break;
-        case SPI_SPEED_400KHZ:
-            br /= 400000;
-            break;
-        case SPI_SPEED_1MHZ:
-            br /= 1000000;
-            break;
-        case SPI_SPEED_5MHZ:
-            br /= 5000000;
-            break;
-        default:
-            /* other clock speeds are not supported */
-            return -1;
-    }
-
-    /* make sure the is not smaller then 2 */
-    if (br < 2) {
-        br = 2;
-    }
-
-    SPI_DEV->BR0 = (uint8_t)br;
-    SPI_DEV->BR1 = (uint8_t)(br >> 8);
-    SPI_DEV->MCTL = 0;
+/* we need to differentiate between the legacy SPI device and USCI */
+#ifndef SPI_USE_USCI
+    /* put SPI device in reset state */
+    SPI_BASE->CTL = USART_CTL_SWRST;
+    SPI_BASE->CTL |= (USART_CTL_CHAR | USART_CTL_SYNC | USART_CTL_MM);
+    SPI_BASE->RCTL = 0;
+    SPI_BASE->MCTL = 0;
     /* enable SPI mode */
     SPI_ME |= SPI_ME_BIT;
-    /* release from software reset */
-    SPI_DEV->CTL &= ~(USART_CTL_SWRST);
-    return 0;
-}
-
-/* we use alternative SPI code in case the board used the USCI module for SPI
- * instead of the (older) USART module */
-#else   /* SPI_USE_USCI */
-
-int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
-{
-    if (dev != 0) {
-        return -2;
-    }
-
+#else
     /* reset SPI device */
-    SPI_DEV->CTL1 |= USCI_SPI_CTL1_SWRST;
-    /* configure pins */
-    spi_conf_pins(dev);
-    /* configure USART to SPI mode with SMCLK driving it */
-    SPI_DEV->CTL0 |= (USCI_SPI_CTL0_UCSYNC | USCI_SPI_CTL0_MST
-                      | USCI_SPI_CTL0_MODE_0 | USCI_SPI_CTL0_MSB);
-    SPI_DEV->CTL1 |= (USCI_SPI_CTL1_SSEL_SMCLK);
+    SPI_BASE->CTL1 = USCI_SPI_CTL1_SWRST;
+    SPI_BASE->CTL1 |= (USCI_SPI_CTL1_SSEL_SMCLK);
+#endif
 
-    /* set polarity and phase */
-    switch (conf) {
-        case SPI_CONF_FIRST_RISING:
-            SPI_DEV->CTL0 |= USCI_SPI_CTL0_CKPH;
-            break;
-        case SPI_CONF_SECOND_RISING:
-            /* nothing to be done here */
-            break;
-        case SPI_CONF_FIRST_FALLING:
-            SPI_DEV->CTL0 |= (USCI_SPI_CTL0_CKPH & USCI_SPI_CTL0_CKPL);
-            break;
-        case SPI_CONF_SECOND_FALLING:
-            SPI_DEV->CTL0 |= USCI_SPI_CTL0_CKPL;
-            break;
-        default:
-            /* invalid clock setting */
-            return -2;
-    }
-    /* configure clock - we use no modulation for now */
-    uint32_t br = CLOCK_CMCLK;
-    switch (speed) {
-        case SPI_SPEED_100KHZ:
-            br /= 100000;
-            break;
-        case SPI_SPEED_400KHZ:
-            br /= 400000;
-            break;
-        case SPI_SPEED_1MHZ:
-            br /= 1000000;
-            break;
-        case SPI_SPEED_5MHZ:
-            br /= 5000000;
-            break;
-        default:
-            /* other clock speeds are not supported */
-            return -1;
-    }
-
-    /* make sure the is not smaller then 2 */
-    if (br < 2) {
-        br = 2;
-    }
-
-    SPI_DEV->BR0 = (uint8_t)br;
-    SPI_DEV->BR1 = (uint8_t)(br >> 8);
-    /* release from software reset */
-    SPI_DEV->CTL1 &= ~(USCI_SPI_CTL1_SWRST);
-    return 0;
+    /* trigger the pin configuration */
+    spi_init_pins(bus);
 }
 
-#endif  /* SPI_USE_USCI */
-
-int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
+void spi_init_pins(spi_t bus)
 {
-    /* not supported so far */
-    (void)dev;
-    (void)conf;
-    (void)cb;
-    return -1;
-}
-
-void spi_transmission_begin(spi_t dev, char reset_val)
-{
-    /* not supported so far */
-    (void)dev;
-    (void)reset_val;
-}
-
-int spi_conf_pins(spi_t dev)
-{
-    (void)dev;
     gpio_periph_mode(SPI_PIN_MISO, true);
     gpio_periph_mode(SPI_PIN_MOSI, true);
     gpio_periph_mode(SPI_PIN_CLK, true);
-    return 0;
 }
 
-int spi_acquire(spi_t dev)
+int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    (void)dev;
+    if (clk == SPI_CLK_10MHZ) {
+        return SPI_NOCLK;
+    }
+
+    /* lock the bus */
     mutex_lock(&spi_lock);
-    return 0;
+
+    /* calculate baudrate */
+    uint32_t br = CLOCK_CMCLK / clk;
+    /* make sure the is not smaller then 2 */
+    if (br < 2) {
+        br = 2;
+    }
+    SPI_BASE->BR0 = (uint8_t)br;
+    SPI_BASE->BR1 = (uint8_t)(br >> 8);
+
+    /* configure bus mode */
+#ifndef SPI_USE_USCI
+    /* configure mode */
+    SPI_BASE->TCTL = (USART_TCTL_SSEL_SMCLK | USART_TCTL_STC | mode);
+    /* release from software reset */
+    SPI_BASE->CTL &= ~(USART_CTL_SWRST);
+#else
+    /* configure mode */
+    SPI_BASE->CTL0 = (USCI_SPI_CTL0_UCSYNC | USCI_SPI_CTL0_MST|
+                     USCI_SPI_CTL0_MODE_0 | USCI_SPI_CTL0_MSB | mode);
+    /* release from software reset */
+    SPI_BASE->CTL1 &= ~(USCI_SPI_CTL1_SWRST);
+#endif
+
+    return SPI_OK;
 }
 
-int spi_release(spi_t dev)
+void spi_release(spi_t dev)
 {
-    (void)dev;
+    /* put SPI device back in reset state */
+#ifndef SPI_USE_USCI
+    SPI_BASE->CTL |= (USART_CTL_SWRST);
+#else
+    SPI_BASE->CTL1 |= (USCI_SPI_CTL1_SWRST);
+#endif
+
+    /* release the bus */
     mutex_unlock(&spi_lock);
-    return 0;
 }
 
-int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
+void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
+                        const void *out, void *in, size_t len)
 {
-    (void)dev;
+    uint8_t *out_buf = (uint8_t *)out;
+    uint8_t *in_buf = (uint8_t *)in;
 
-    assert(out || in);
+    assert(out_buf || in_buf);
+
+    if (cs != SPI_CS_UNDEF) {
+        gpio_clear((gpio_t)cs);
+    }
 
     /* if we only send out data, we do this the fast way... */
-    if (!in) {
-        for (unsigned i = 0; i < length; i++) {
+    if (!in_buf) {
+        for (size_t i = 0; i < len; i++) {
             while (!(SPI_IF & SPI_IE_TX_BIT)) {}
-            SPI_DEV->TXBUF = (uint8_t)out[i];
+            SPI_BASE->TXBUF = (uint8_t)out_buf[i];
         }
         /* finally we need to wait, until all transfers are complete */
 #ifndef SPI_USE_USCI
         while (!(SPI_IF & SPI_IE_TX_BIT) || !(SPI_IF & SPI_IE_RX_BIT)) {}
 #else
-        while (SPI_DEV->STAT & USCI_SPI_STAT_UCBUSY) {}
+        while (SPI_BASE->STAT & USCI_SPI_STAT_UCBUSY) {}
 #endif
-        SPI_DEV->RXBUF;
+        SPI_BASE->RXBUF;
     }
-    else if (!out) {
-        for (unsigned i = 0; i < length; i++) {
-            SPI_DEV->TXBUF = 0;
+    else if (!out_buf) {
+        for (size_t i = 0; i < len; i++) {
+            SPI_BASE->TXBUF = 0;
             while (!(SPI_IF & SPI_IE_RX_BIT)) {}
-            in[i] = (char)SPI_DEV->RXBUF;
+            in_buf[i] = (char)SPI_BASE->RXBUF;
         }
     }
     else {
-        for (unsigned i = 0; i < length; i++) {
+        for (size_t i = 0; i < len; i++) {
             while (!(SPI_IF & SPI_IE_TX_BIT)) {}
-            SPI_DEV->TXBUF = out[i];
+            SPI_BASE->TXBUF = out_buf[i];
             while (!(SPI_IF & SPI_IE_RX_BIT)) {}
-            in[i] = (char)SPI_DEV->RXBUF;
+            in_buf[i] = (char)SPI_BASE->RXBUF;
         }
     }
 
-    return length;
-}
-
-void spi_poweron(spi_t dev)
-{
-    /* not supported so far */
-    (void)dev;
-}
-
-void spi_poweroff(spi_t dev)
-{
-    /* not supported so far */
-    (void)dev;
+    if ((!cont) && (cs != SPI_CS_UNDEF)) {
+        gpio_set((gpio_t)cs);
+    }
 }

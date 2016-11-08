@@ -75,7 +75,7 @@ extern "C" {
 #define SPI_0_EN            (1U)
 
 /* SPI configuration */
-#define SPI_DEV             (USART_0)
+#define SPI_BASE            (USART_0)
 #define SPI_IE              (SFR->IE1)
 #define SPI_IF              (SFR->IFG1)
 #define SPI_IE_RX_BIT       (1 << 6)

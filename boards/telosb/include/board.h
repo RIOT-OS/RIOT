@@ -102,8 +102,8 @@ extern "C" {
 /**
  * @brief   Definition of the interface to the CC2420 radio
  */
-#define CC2420_PARAMS_BOARD   {.spi        = SPI_0, \
-                               .spi_clk    = SPI_SPEED_1MHZ , \
+#define CC2420_PARAMS_BOARD   {.spi        = SPI_DEV(0), \
+                               .spi_clk    = SPI_CLK_1MHZ , \
                                .pin_cs     = GPIO_PIN(P4, 2), \
                                .pin_fifo   = GPIO_PIN(P1, 3), \
                                .pin_fifop  = GPIO_PIN(P1, 0), \
