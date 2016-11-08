@@ -20,14 +20,11 @@
  * @}
  */
 
-#include <assert.h>
 #include <stdio.h>
-#if (__GNUC__ >= 4) && (__GNUC_MINOR__ > 5)
-#include <intrinsics.h>   // MSP430-gcc compiler instrinsics
-#endif
 
+#include <assert.h>
+#include "cpu.h"
 #include "board.h"
-#include <msp430.h>
 
 #include "lpm.h"
 
@@ -48,34 +45,34 @@ enum lpm_mode lpm_set(enum lpm_mode target)
 
     /* ensure that interrupts are enabled before going to sleep,
        or we're bound to hang our MCU! */
-    assert((target == LPM_ON) || (__read_status_register() & GIE));
+    assert((target == LPM_ON) || (__get_SR_register() & GIE));
 
     switch (target) {
     case LPM_ON:
         /* fully running MCU */
-        __bic_status_register(CPUOFF | OSCOFF | SCG0 | SCG1);
+        __bic_SR_register(CPUOFF | OSCOFF | SCG0 | SCG1);
         break;
     case LPM_IDLE:
         /* lightest mode => LPM0 mode of MSP430 */
-        __bic_status_register(OSCOFF | SCG0 | SCG1);
+        __bic_SR_register(OSCOFF | SCG0 | SCG1);
         /* only stops CPU block */
-        __bis_status_register(CPUOFF);
+        __bis_SR_register(CPUOFF);
         break;
     case LPM_SLEEP:
         /* mid-level mode => LPM1 mode of MSP430 */
-        __bic_status_register(OSCOFF | SCG1);
+        __bic_SR_register(OSCOFF | SCG1);
         /* stops CPU and master clock blocks */
-        __bis_status_register(CPUOFF | SCG0);
+        __bis_SR_register(CPUOFF | SCG0);
         break;
     case LPM_POWERDOWN:
         /* deep-level mode => LPM3 mode of MSP430 */
-        __bic_status_register(OSCOFF);
+        __bic_SR_register(OSCOFF);
         /* stops all blocks except auxiliary clock (timers) */
-        __bis_status_register(CPUOFF | SCG0 | SCG1);
+        __bis_SR_register(CPUOFF | SCG0 | SCG1);
         break;
     case LPM_OFF:
         /* MCU totally down (LPM4), only RESET or NMI can resume execution */
-        __bis_status_register(CPUOFF | OSCOFF | SCG0 | SCG1);
+        __bis_SR_register(CPUOFF | OSCOFF | SCG0 | SCG1);
                                /* all blocks off */
         break;
     default:
@@ -93,7 +90,7 @@ enum lpm_mode lpm_get(void)
 {
     enum lpm_mode current_mode = LPM_UNKNOWN;
 
-    unsigned int current_sr = __read_status_register();
+    unsigned int current_sr = __get_SR_register();
     switch (current_sr & LPM_MASK_SR) {
     case CPUOFF + OSCOFF + SCG0 + SCG1:   /* MSP430's LPM4 */
         current_mode = LPM_OFF;
@@ -120,7 +117,7 @@ enum lpm_mode lpm_get(void)
 inline void lpm_awake(void)
 {
     /* disable all power savings mechanisms */
-    __bic_status_register(CPUOFF | OSCOFF | SCG0 | SCG1);
+    __bic_SR_register(CPUOFF | OSCOFF | SCG0 | SCG1);
 }
 
 /* the following two functions have no actual role to play MSP430s */

@@ -51,6 +51,10 @@ ifeq (,$(NEWLIB_INCLUDE_DIR))
   NEWLIB_INCLUDE_DIR := $(abspath $(wildcard $(dir $(shell which $(PREFIX)gcc))../$(TARGET_ARCH)/include))
 endif
 
+ifeq (,$(NEWLIB_INCLUDE_DIR))
+  $(error Could not determine newlib include path!)
+endif
+
 NEWLIB_INCLUDES := -isystem $(NEWLIB_INCLUDE_DIR)
 
 ifeq (1,$(USE_NEWLIB_NANO))

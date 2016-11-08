@@ -14,4 +14,41 @@ export ASFLAGS += $(CFLAGS_CPU) --defsym $(CPU_MODEL)=1 $(CFLAGS_DBG)
 export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -Wl,--gc-sections -static -lgcc
 
 # Import all toolchain settings
-include $(RIOTCPU)/Makefile.include.gnu
+include $(RIOTCPU)/Makefile.include.$(TOOLCHAIN)
+
+# Test that the compiler exists, try to adjust TARGET_ARCH otherwise
+ifeq (,$(shell sh -c 'command -v $(CC)'))
+export TARGET_ARCH:=$(TARGET_ARCH)-elf
+endif
+
+ifeq (,$(MSP430_USE_NEWLIB))
+# MSPGCC (the old compiler) is usually used with msp-libc, while the new
+# upstream GCC msp430 port (sometimes referred to as the Red Hat MSP430
+# compiler) is usually accompanied by newlib.
+# The new msp430 port started with version 4.9.x, the latest release of the old
+# mspgcc is 4.6.3 from the beginning of 2012 and doesn't look like it will receive
+# any updates. We use the numbers to decide if we use newlib by default.
+CC_VERSION := $(shell $(CC) -dumpversion 2>&1)
+
+ifeq (4.9, $(firstword $(sort 4.9 $(CC_VERSION))))
+# CC_VERSION is at least 4.9
+MSP430_USE_NEWLIB := 1
+else
+MSP430_USE_NEWLIB := 0
+endif
+endif
+
+ifeq (1,$(MSP430_USE_NEWLIB))
+
+# use newlib as libc
+export USEMODULE += newlib
+
+export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/msp430-common/ldscripts
+export LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL).ld -Wl,--fatal-warnings
+
+# use the nano-specs of Newlib when available
+ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+export LINKFLAGS += -specs=nano.specs -lc -lnosys
+endif
+
+endif

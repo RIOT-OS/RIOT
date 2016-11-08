@@ -9,7 +9,11 @@
 #ifndef TIME_H
 #define TIME_H
 
+#if MODULE_NEWLIB
+#include_next <sys/time.h>
+#else
 #include "msp430_types.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

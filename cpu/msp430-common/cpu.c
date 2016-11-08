@@ -62,6 +62,7 @@ NORETURN void cpu_switch_context_exit(void)
     UNREACHABLE();
 }
 
+#if !(MODULE_NEWLIB)
 /**
  * mspgcc handles main specially - it does not return but falls
  * through to section .fini9.
@@ -69,6 +70,7 @@ NORETURN void cpu_switch_context_exit(void)
  * behave like a regular function. This enables a common
  * thread_stack_init behavior. */
 __attribute__((section (".fini9"))) void __main_epilogue(void) { __asm__("ret"); }
+#endif
 
 //----------------------------------------------------------------------------
 // Processor specific routine - here for MSP

@@ -19,6 +19,8 @@
 extern "C" {
 #endif
 
+#if !(MODULE_NEWLIB)
+
 #ifndef EINVAL
 /**
  * @brief defines EINVAL if MSP430 toolchain is too old to provide it itself
@@ -35,7 +37,7 @@ extern "C" {
 #define EOVERFLOW   (65)
 #endif
 
-typedef unsigned long time_t;
+typedef long time_t;
 
 struct timespec {
     time_t  tv_sec;   /* Seconds */
@@ -49,7 +51,9 @@ struct timeval {
 };
 
 /* TODO: remove once msp430 libc supports clockid_t */
-typedef int clockid_t;
+typedef unsigned long clockid_t;
+
+#endif
 
 #ifdef __cplusplus
 }
