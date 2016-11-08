@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <semaphore.h>
 
+#include "fmt.h"
 #include "msg.h"
 #include "timex.h"
 #include "thread.h"
@@ -237,6 +238,7 @@ void test3(void)
 
 void test4(void)
 {
+    char uint64_str[20];
     struct timespec abs;
     uint64_t now, start, stop;
     const uint64_t exp = 1000000;
@@ -259,10 +261,14 @@ void test4(void)
         }
     }
     stop = xtimer_now64() - start;
-    if (stop < exp) {
-        printf("first: waited only %" PRIu64 " usec => FAILED\n", stop);
+    if ((stop < (exp - 100)) || (stop > (exp + 100))) {
+        fmt_u64_dec(uint64_str, stop);
+        printf("first: waited only %s usec => FAILED\n", uint64_str);
     }
-    printf("first: waited %" PRIu64 " usec\n", stop);
+    else {
+        fmt_u64_dec(uint64_str, stop);
+        printf("first: waited %s usec\n", uint64_str);
+    }
 }
 
 int main(void)
