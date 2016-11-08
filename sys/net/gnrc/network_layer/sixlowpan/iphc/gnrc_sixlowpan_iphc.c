@@ -612,20 +612,28 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
     /* check for available contexts */
     if (!ipv6_addr_is_unspecified(&(ipv6_hdr->src))) {
         src_ctx = gnrc_sixlowpan_ctx_lookup_addr(&(ipv6_hdr->src));
+        /* do not use source context for compression if */
+        /* GNRC_SIXLOWPAN_CTX_FLAGS_COMP is not set */
+        if (src_ctx && !(src_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) {
+            src_ctx = NULL;
+        }
     }
 
     if (!ipv6_addr_is_multicast(&ipv6_hdr->dst)) {
         dst_ctx = gnrc_sixlowpan_ctx_lookup_addr(&(ipv6_hdr->dst));
+        /* do not use destination context for compression if */
+        /* GNRC_SIXLOWPAN_CTX_FLAGS_COMP is not set */
+        if (dst_ctx && !(dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) {
+            dst_ctx = NULL;
+        }
     }
 
     /* if contexts available and both != 0 */
     /* since this moves inline_pos we have to do this ahead*/
     if (((src_ctx != NULL) &&
-         ((src_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0) &&
-         (src_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) ||
+            ((src_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0)) ||
         ((dst_ctx != NULL) &&
-         ((dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0) &&
-         (dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP))) {
+            ((dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0))) {
         /* add context identifier extension */
         iphc_hdr[IPHC2_IDX] |= SIXLOWPAN_IPHC2_CID_EXT;
         iphc_hdr[CID_EXT_IDX] = 0;
@@ -704,7 +712,7 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
         iphc_hdr[IPHC2_IDX] |= IPHC_SAC_SAM_UNSPEC;
     }
     else {
-        if ((src_ctx != NULL) && (src_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) {
+        if (src_ctx != NULL) {
             /* stateful source address compression */
             iphc_hdr[IPHC2_IDX] |= SIXLOWPAN_IPHC2_SAC;
 
@@ -829,7 +837,7 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
             }
         }
     }
-    else if ((((dst_ctx != NULL) && (dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) ||
+    else if (((dst_ctx != NULL) ||
               ipv6_addr_is_link_local(&ipv6_hdr->dst)) && (netif_hdr->dst_l2addr_len > 0)) {
         eui64_t iid;
 
