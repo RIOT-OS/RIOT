@@ -71,29 +71,41 @@ static const i2c_conf_t i2c_config[I2C_NUMOF] = {
 /** @} */
 
 /**
+ * @brief   Pre-calculated clock divider values based on a CLOCK_CORECLOCK (32MHz)
+ *
+ * Calculated with (CPSR * (SCR + 1)) = (CLOCK_CORECLOCK / bus_freq), where
+ * CPSR and SCR cannot be larger than 255.
+ */
+static const spi_clk_conf_t spi_clk_config[] = {
+    { .cpsr = 10, .scr = 31 },  /* 100khz */
+    { .cpsr =  1, .scr = 79 },  /* 400khz */
+    { .cpsr =  1, .scr = 31 },  /* 1MHz */
+    { .cpsr =  1, .scr =  6 },  /* ~4.5MHz */
+    { .cpsr =  1, .scr =  2 }   /* ~10.7MHz */
+};
+
+/**
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF           2
-#define SPI_0_EN            1
-#define SPI_1_EN            1
-
-static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
+static const spi_conf_t spi_config[] = {
     {
         .dev      = SSI0,
         .mosi_pin = GPIO_PB1,
         .miso_pin = GPIO_PB3,
         .sck_pin  = GPIO_PB2,
-        .cs_pin   = GPIO_PB5,
+        .cs_pin   = GPIO_PB5
     },
     {
         .dev      = SSI1,
         .mosi_pin = GPIO_PC5,
         .miso_pin = GPIO_PC6,
         .sck_pin  = GPIO_PC4,
-        .cs_pin   = GPIO_PA7,
-    },
+        .cs_pin   = GPIO_PA7
+    }
 };
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 #ifdef __cplusplus

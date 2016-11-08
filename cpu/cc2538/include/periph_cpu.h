@@ -51,9 +51,19 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(port, pin) (gpio_t)(((uint32_t)GPIO_A + (port << 12)) | pin)
 
 /**
+ * @brief   I2C configuration options
+ */
+typedef struct {
+    gpio_t scl_pin;         /**< pin used for SCL */
+    gpio_t sda_pin;         /**< pin used for SDA */
+} i2c_conf_t;
+
+/**
  * @brief declare needed generic SPI functions
  * @{
  */
+#define PERIPH_SPI_NEEDS_INIT_CS
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
@@ -74,12 +84,39 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   I2C configuration options
+ * @brief   Override SPI mode settings
+ * @{
+ */
+#define HAVE_SPI_MODE_T
+typedef enum {
+    SPI_MODE_0 = 0,                             /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1 = (SSI_CR0_SPH),                 /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2 = (SSI_CR0_SPO),                 /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3 = (SSI_CR0_SPO | SSI_CR0_SPH)    /**< CPOL=1, CPHA=1 */
+} spi_mode_t;
+/** @ */
+
+/**
+ * @brief   Override SPI clock settings
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef enum {
+    SPI_CLK_100KHZ = 0,     /**< drive the SPI bus with 100KHz */
+    SPI_CLK_400KHZ = 1,     /**< drive the SPI bus with 400KHz */
+    SPI_CLK_1MHZ   = 2,     /**< drive the SPI bus with 1MHz */
+    SPI_CLK_5MHZ   = 3,     /**< drive the SPI bus with 5MHz */
+    SPI_CLK_10MHZ  = 4      /**< drive the SPI bus with 10MHz */
+} spi_clk_t;
+/** @} */
+
+/**
+ * @brief   Datafields for static SPI clock configuration values
  */
 typedef struct {
-    gpio_t scl_pin;         /**< pin used for SCL */
-    gpio_t sda_pin;         /**< pin used for SDA */
-} i2c_conf_t;
+    uint8_t cpsr;           /**< CPSR clock divider */
+    uint8_t scr;            /**< SCR clock divider */
+} spi_clk_conf_t;
 
 /**
  * @brief   SPI configuration data structure
@@ -91,7 +128,7 @@ typedef struct {
     gpio_t miso_pin;        /**< pin used for MISO */
     gpio_t sck_pin;         /**< pin used for SCK */
     gpio_t cs_pin;          /**< pin used for CS */
-} periph_spi_conf_t;
+} spi_conf_t;
 /** @} */
 
 /**

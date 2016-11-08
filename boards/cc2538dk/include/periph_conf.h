@@ -58,7 +58,6 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_IRQ_PRIO      1
 /** @} */
 
-
 /**
  * @name UART configuration
  * @{
@@ -113,21 +112,34 @@ static const i2c_conf_t i2c_config[I2C_NUMOF] = {
 /** @} */
 
 /**
+ * @brief   Pre-calculated clock divider values based on a CLOCK_CORECLOCK (32MHz)
+ *
+ * Calculated with (CPSR * (SCR + 1)) = (CLOCK_CORECLOCK / bus_freq), where
+ * CPSR and SCR cannot be larger than 255.
+ */
+static const spi_clk_conf_t spi_clk_config[] = {
+    { .cpsr = 10, .scr = 31 },  /* 100khz */
+    { .cpsr =  1, .scr = 79 },  /* 400khz */
+    { .cpsr =  1, .scr = 31 },  /* 1MHz */
+    { .cpsr =  1, .scr =  6 },  /* ~4.5MHz */
+    { .cpsr =  1, .scr =  2 }   /* ~10.7MHz */
+};
+
+/**
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF           1
-#define SPI_0_EN            1
-
-static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
+static const spi_conf_t spi_config[] = {
     {
         .dev      = SSI0,
         .mosi_pin = GPIO_PA4,
         .miso_pin = GPIO_PA5,
         .sck_pin  = GPIO_PA2,
-        .cs_pin   = GPIO_PD0,
-    },
+        .cs_pin   = GPIO_PD0
+    }
 };
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**

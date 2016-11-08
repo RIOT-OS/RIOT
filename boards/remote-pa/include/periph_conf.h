@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
- * Copyright (C) 2015 Zolertia SL
+ * Copyright (C) 2014-2016 Freie Universität Berlin
+ *               2015 Zolertia SL
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -15,7 +15,7 @@
  * @brief       Peripheral MCU configuration for the Re-Mote board prototype A
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- *              Antonio Lignan <alinan@zolertia.com>
+ * @author      Antonio Lignan <alinan@zolertia.com>
  */
 
 #ifndef PERIPH_CONF_H
@@ -71,28 +71,41 @@ static const i2c_conf_t i2c_config[I2C_NUMOF] = {
 /** @} */
 
 /**
+ * @brief   Pre-calculated clock divider values based on a CLOCK_CORECLOCK (32MHz)
+ *
+ * Calculated with (CPSR * (SCR + 1)) = (CLOCK_CORECLOCK / bus_freq), where
+ * CPSR and SCR cannot be larger than 255.
+ */
+static const spi_clk_conf_t spi_clk_config[] = {
+    { .cpsr = 10, .scr = 31 },  /* 100khz */
+    { .cpsr =  1, .scr = 79 },  /* 400khz */
+    { .cpsr =  1, .scr = 31 },  /* 1MHz */
+    { .cpsr =  1, .scr =  6 },  /* ~4.5MHz */
+    { .cpsr =  1, .scr =  2 }   /* ~10.7MHz */
+};
+
+/**
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF           2
-#define SPI_0_EN            1
-#define SPI_1_EN            1
-
-static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
+static const spi_conf_t spi_config[] = {
     {
         .dev      = SSI0,
         .mosi_pin = GPIO_PD0,
         .miso_pin = GPIO_PC4,
         .sck_pin  = GPIO_PD1,
-        .cs_pin   = GPIO_PD3,
+        .cs_pin   = GPIO_PD3
     },
     {
         .dev      = SSI1,
         .mosi_pin = GPIO_PC7,
         .miso_pin = GPIO_PA4,
         .sck_pin  = GPIO_PB5,
-    },
+        .cs_pin   = GPIO_UNDEF
+    }
 };
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 #ifdef __cplusplus
