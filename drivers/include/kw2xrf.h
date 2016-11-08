@@ -130,14 +130,14 @@ typedef struct {
  * @brief   Initialize the given KW2XRF device
  * @param[out] dev          device descriptor
  * @param[in] spi           SPI bus the device is connected to
- * @param[in] spi_speed     SPI speed to use
+ * @param[in] spi_clk       SPI bus clock speed to use
  * @param[in] cs_pin        GPIO pin connected to chip select
  * @param[in] int_pin       GPIO pin connected to the interrupt pin
  *
  * @return                  0 on success
  * @return                  <0 on error
  */
-int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
+int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_clk_t spi_clk,
                     gpio_t cs_pin, gpio_t int_pin);
 
 /**
@@ -145,7 +145,7 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
  */
 typedef struct kw2xrf_params {
     spi_t spi;              /**< SPI bus the device is connected to */
-    spi_speed_t spi_speed;  /**< SPI speed to use */
+    spi_clk_t spi_speed;    /**< SPI speed to use */
     gpio_t cs_pin;          /**< GPIO pin connected to chip select */
     gpio_t int_pin;         /**< GPIO pin connected to the interrupt pin */
 } kw2xrf_params_t;

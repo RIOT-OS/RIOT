@@ -40,7 +40,7 @@ extern "C" {
 #error "Interrupt pin not defined"
 #endif
 #ifndef KWRF_SPI_SPEED
-#define KWRF_SPI_SPEED          (SPI_SPEED_10MHZ)
+#define KWRF_SPI_SPEED          (SPI_CLK_10MHZ)
 #endif
 /**@}*/
 
