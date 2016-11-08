@@ -114,7 +114,12 @@ extern "C" {
 #define OD_FLAGS_LENGTH_1       (0x0010)    /**< 1 byte */
 #define OD_FLAGS_LENGTH_2       (0x0020)    /**< 2 byte */
 #define OD_FLAGS_LENGTH_4       (0x0000)    /**< 4 byte and default */
-#define OD_FLAGS_LENGTH_8       (0x0080)    /**< 8 byte */
+/**
+ * @brief   8 byte
+ *
+ * @warning not working with newlib-nano
+ */
+#define OD_FLAGS_LENGTH_8       (0x0080)
 #define OD_FLAGS_LENGTH_CHAR    (OD_FLAGS_LENGTH_1)    /**< alias for OD_FLAGS_LENGTH_1 */
 #define OD_FLAGS_LENGTH_SHORT   (0x0002)    /**< sizeof(short) byte */
 #define OD_FLAGS_LENGTH_LONG    (0x0004)    /**< sizeof(long) byte */
