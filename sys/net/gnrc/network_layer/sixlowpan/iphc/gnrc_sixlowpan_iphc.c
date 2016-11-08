@@ -612,16 +612,20 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
     /* check for available contexts */
     if (!ipv6_addr_is_unspecified(&(ipv6_hdr->src))) {
         src_ctx = gnrc_sixlowpan_ctx_lookup_addr(&(ipv6_hdr->src));
-        /* do not use for compression if GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK is not set */
-        if (!(src_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP))
+        /* do not use source context for compression if */
+        /* GNRC_SIXLOWPAN_CTX_FLAGS_COMP is not set */
+        if (src_ctx && !(src_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) {
             src_ctx = NULL;
+        }
     }
 
     if (!ipv6_addr_is_multicast(&ipv6_hdr->dst)) {
         dst_ctx = gnrc_sixlowpan_ctx_lookup_addr(&(ipv6_hdr->dst));
-        /* do not use for compression if GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK is not set */
-        if (!(dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP))
+        /* do not use destination context for compression if */
+        /* GNRC_SIXLOWPAN_CTX_FLAGS_COMP is not set */
+        if (dst_ctx && !(dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) {
             dst_ctx = NULL;
+        }
     }
 
     /* if contexts available and both != 0 */
