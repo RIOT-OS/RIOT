@@ -1,0 +1,64 @@
+ifndef MIPS_ELF_ROOT
+    $(error "Please set $$(MIPS_ELF_ROOT) and ensure $$(MIPS_ELF_ROOT)/bin is on your PATH")
+endif
+
+# Target triple for the build.
+export TARGET_ARCH ?= mips-mti-elf
+
+export ABI=32
+export MEMORY_BASE=0x80000000
+export MEMORY_SIZE=128K
+export APP_START=0x80000000
+export ROMABLE = 1
+
+include $(MIPS_ELF_ROOT)/share/mips/rules/mipshal.mk
+
+# define build specific options
+export CFLAGS_CPU   = -EL -march=m4k
+export CFLAGS_LINK  = -ffunction-sections -fno-builtin -fshort-enums
+export CFLAGS_DBG = -O0 -g2
+export CFLAGS_OPT = -Os -g2
+
+export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_OPT) -DSKIP_COPY_TO_RAM
+#$(CFLAGS_DBG)
+
+ifeq ($(USE_HARD_FLOAT),1)
+    export CFLAGS += -mhard-float
+else
+    export CFLAGS += -msoft-float #hard-float is the default so we must set soft-float
+    export LINKFLAGS += -msoft-float
+endif
+
+ifeq ($(USE_DSP),1)
+    export CFLAGS += -mdsp
+endif
+
+export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_OPT) #$(CFLAGS_DBG)
+
+export LINKFLAGS += $(MIPS_HAL_LDFLAGS) -mabi=$(ABI) -Wl,--defsym,__use_excpt_boot=0
+export LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ldscripts/pic32mx512_12_128_uhi.ld
+export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) #$(CFLAGS_OPT)
+export LINKFLAGS += -Wl,--gc-sections
+
+# This CPU implementation is using the new core/CPU interface:
+export CFLAGS += -DCOREIF_NG=1
+
+export USEMODULE += periph
+
+# the pickit programmer (MPLAB-IPE) wants physical addresses in the hex file!!
+export OBJCOPY = objcopy #use system objcopy as toolchain one is broken.
+export OFLAGS += -O ihex \
+				--change-section-lma .bootflash-0xA0000000 \
+				--change-section-lma .exception_vector-0x80000000 \
+				--change-section-lma .text-0x80000000 \
+				--change-section-lma .init-0x80000000 \
+				--change-section-lma .fini-0x80000000 \
+				--change-section-lma .eh_frame-0x80000000 \
+				--change-section-lma .gcc_except_table-0x80000000 \
+				--change-section-lma .jcr-0x80000000 \
+				--change-section-lma .ctors-0x80000000 \
+				--change-section-lma .dtors-0x80000000 \
+				--change-section-lma .rodata-0x80000000 \
+				--change-section-lma .data-0x80000000 \
+				--change-section-lma .bss-0x80000000 \
+				--change-section-lma .startdata-0x80000000 \
