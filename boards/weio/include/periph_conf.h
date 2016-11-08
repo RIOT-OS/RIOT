@@ -81,9 +81,20 @@ extern "C" {
  * @brief SPI configuration
  * @{
  */
-#define SPI_NUMOF           (2U)
-#define SPI_0_EN            1
-#define SPI_1_EN            1
+static const spi_conf_t spi_config[] = {
+    {
+        .dev        = LPC_SSP0,
+        .preset_bit = (1 << 0),
+        .ahb_bit    = (1 << 11)
+    },
+    {
+        .dev        = LPC_SSP1,
+        .preset_bit = (1 << 2),
+        .ahb_bit    = (1 << 18)
+    }
+};
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /* @} */
 
 /**
