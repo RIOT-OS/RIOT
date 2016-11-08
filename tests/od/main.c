@@ -143,6 +143,7 @@ int main(void)
             OD_FLAGS_BYTES_HEX | OD_FLAGS_LENGTH_4));
 
     /* Test different 8-byte-wise byte formats */
+#ifndef MODULE_NEWLIB
     CALL(od(long_str, sizeof(long_str), OD_WIDTH_DEFAULT,
             OD_FLAGS_BYTES_INT | OD_FLAGS_LENGTH_8));
     CALL(od(long_str, sizeof(long_str), OD_WIDTH_DEFAULT,
@@ -151,6 +152,7 @@ int main(void)
             OD_FLAGS_BYTES_UINT | OD_FLAGS_LENGTH_8));
     CALL(od(long_str, sizeof(long_str), OD_WIDTH_DEFAULT,
             OD_FLAGS_BYTES_HEX | OD_FLAGS_LENGTH_8));
+#endif
 
     /* Test different char-wise byte formats */
     CALL(od(long_str, sizeof(long_str), OD_WIDTH_DEFAULT,
