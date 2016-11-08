@@ -28,10 +28,10 @@ extern "C" {
  * @{
  */
 #ifndef W5100_PARAM_SPI
-#define W5100_PARAM_SPI         (SPI_0)
+#define W5100_PARAM_SPI         (SPI_DEV(0))
 #endif
-#ifndef W5100_PARAM_SPI_SPEED
-#define W5100_PARAM_SPI_SPEED   (SPI_SPEED_5MHZ)
+#ifndef W5100_PARAM_SPI_CLK
+#define W5100_PARAM_SPI_CLK     (SPI_CLK_5MHZ)
 #endif
 #ifndef W5100_PARAM_CS
 #define W5100_PARAM_CS          (GPIO_PIN(0, 0))
@@ -46,10 +46,10 @@ extern "C" {
  */
 static const  w5100_params_t w5100_params[] = {
     {
-        .spi       = W5100_PARAM_SPI,
-        .spi_speed = W5100_PARAM_SPI_SPEED,
-        .cs        = W5100_PARAM_CS,
-        .evt       = W5100_PARAM_EVT
+        .spi = W5100_PARAM_SPI,
+        .clk = W5100_PARAM_SPI_CLK,
+        .cs  = W5100_PARAM_CS,
+        .evt = W5100_PARAM_EVT
     },
 };
 /** @} */

@@ -56,7 +56,7 @@ enum {
  */
 typedef struct {
     spi_t spi;              /**< SPI bus used */
-    spi_speed_t spi_speed;  /**< clock speed used on the selected SPI bus */
+    spi_clk_t clk;          /**< clock speed used on the selected SPI bus */
     gpio_t cs;              /**< pin connected to the chip select line */
     gpio_t evt;             /**< pin connected to the INT line */
 } w5100_params_t;
