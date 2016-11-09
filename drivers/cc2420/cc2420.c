@@ -94,7 +94,6 @@ int cc2420_init(cc2420_t *dev)
     cc2420_set_chan(dev, CC2420_CHAN_DEFAULT);
     cc2420_set_txpower(dev, CC2420_TXPOWER_DEFAULT);
 
-
     /* set default options */
     cc2420_set_option(dev, CC2420_OPT_AUTOACK, true);
     cc2420_set_option(dev, CC2420_OPT_CSMA, true);
@@ -124,14 +123,16 @@ int cc2420_init(cc2420_t *dev)
     reg &= ~CC2420_SECCTRL0_RXFIFO_PROT;
     cc2420_reg_write(dev, CC2420_REG_SECCTRL0, reg);
 
-    /* go into RX state */
-    cc2420_set_state(dev, CC2420_GOTO_RX);
-
     /* set preamble length to 3 leading zero byte */
+    /* and turn on hardware CRC generation */
     reg = cc2420_reg_read(dev, CC2420_REG_MDMCTRL0);
     reg &= ~(CC2420_MDMCTRL0_PREAMBLE_M);
     reg |= CC2420_MDMCTRL0_PREAMBLE_3B;
+    reg |= CC2420_MDMCTRL0_AUTOCRC;
     cc2420_reg_write(dev, CC2420_REG_MDMCTRL0, reg);
+
+    /* go into RX state */
+    cc2420_set_state(dev, CC2420_GOTO_RX);
 
     return 0;
 }
@@ -216,22 +217,21 @@ void cc2420_tx_exec(cc2420_t *dev)
 int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
 {
     uint8_t len;
+    uint8_t crc_corr;
 
-    /* get the packet length (without dropping it) (first byte in RX FIFO) */
-    cc2420_ram_read(dev, CC2420_RAM_RXFIFO, &len, 1);
-    len -= 2;   /* subtract RSSI and FCF */
-
-    if (!buf) {
+    /* without a provided buffer, only readout the length and return it */
+    if (buf == NULL) {
+        /* get the packet length (without dropping it) (first byte in RX FIFO) */
+        cc2420_ram_read(dev, CC2420_RAM_RXFIFO, &len, 1);
+        len -= 2;   /* subtract RSSI and FCF */
         DEBUG("cc2420: recv: packet of length %i in RX FIFO\n", (int)len);
     }
-
-    /* if a buffer is given, read (and drop) the packet */
-    if (buf) {
-        /* We could the drop length byte here, msp430 platforms don't allow
-         * empty reads so we don't do it and read the length byte again. */
+    else {
+        /* read length byte */
         cc2420_fifo_read(dev, &len, 1);
-        len -=2; /* subtract RSSI and FCF */
+        len -= 2;   /* subtract RSSI and FCF */
 
+        /* if a buffer is given, read (and drop) the packet */
         len = (len > max_len) ? max_len : len;
 
         /* read fifo contents */
@@ -241,6 +241,15 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
         uint8_t rssi;
         cc2420_fifo_read(dev, &rssi, 1);
         DEBUG("cc2420: recv: RSSI is %i\n", (int)rssi);
+
+        /* fetch and check if CRC_OK bit (MSB) is set */
+        cc2420_fifo_read(dev, &crc_corr, 1);
+        if (!(crc_corr & 0x80)) {
+            DEBUG("cc2420: recv: CRC_OK bit not set, dropping packet\n");
+            /* drop the corrupted frame from the RXFIFO */
+            len = 0;
+        }
+
         /* finally flush the FIFO */
         cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
         cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
