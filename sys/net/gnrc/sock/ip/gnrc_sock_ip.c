@@ -27,7 +27,7 @@
 #include "gnrc_sock_internal.h"
 
 int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
-                    const sock_ip_ep_t *remote, uint8_t proto, uint16_t flags)
+                   const sock_ip_ep_t *remote, uint8_t proto, uint16_t flags)
 {
     assert(sock);
     if ((local != NULL) && (remote != NULL) &&
@@ -36,14 +36,14 @@ int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
         (local->netif != remote->netif)) {
         return -EINVAL;
     }
-    memset(&sock->local, 0, sizeof(sock_ip_t));
+    memset(&sock->local, 0, sizeof(sock_ip_ep_t));
     if (local != NULL) {
         if (gnrc_af_not_supported(local->family)) {
             return -EAFNOSUPPORT;
         }
-        memcpy(&sock->local, local, sizeof(sock_ip_t));
+        memcpy(&sock->local, local, sizeof(sock_ip_ep_t));
     }
-    memset(&sock->remote, 0, sizeof(sock_ip_t));
+    memset(&sock->remote, 0, sizeof(sock_ip_ep_t));
     if (remote != NULL) {
         if (gnrc_af_not_supported(remote->family)) {
             return -EAFNOSUPPORT;
@@ -51,7 +51,7 @@ int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
         if (gnrc_ep_addr_any(remote)) {
             return -EINVAL;
         }
-        memcpy(&sock->remote, remote, sizeof(sock_ip_t));
+        memcpy(&sock->remote, remote, sizeof(sock_ip_ep_t));
     }
     gnrc_sock_create(&sock->reg, GNRC_NETTYPE_IPV6,
                      proto);
