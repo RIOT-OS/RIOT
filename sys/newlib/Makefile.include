@@ -17,6 +17,7 @@ endif
 
 export LINKFLAGS += -lc -lnosys
 
+ifeq (1,$(USE_NEWLIB_NANO))
 # Search for Newlib include directories
 
 # Since Clang is not installed as a separate instance for each crossdev target
@@ -50,14 +51,10 @@ NEWLIB_INCLUDE_DIR ?= $(firstword $(wildcard $(NEWLIB_INCLUDE_PATTERNS)))
 ifeq (,$(NEWLIB_INCLUDE_DIR))
   NEWLIB_INCLUDE_DIR := $(abspath $(wildcard $(dir $(shell which $(PREFIX)gcc))../$(TARGET_ARCH)/include))
 endif
-
-NEWLIB_INCLUDES := -isystem $(NEWLIB_INCLUDE_DIR)
-
-ifeq (1,$(USE_NEWLIB_NANO))
   NEWLIB_NANO_INCLUDE_DIR ?= $(NEWLIB_INCLUDE_DIR)/nano
   # newlib-nano overrides newlib.h and its include dir should therefore go before
   # the regular newlib include dir.
-  NEWLIB_INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(NEWLIB_INCLUDES)
+  NEWLIB_INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR)
 endif
 
 # Newlib includes should go before GCC includes.
