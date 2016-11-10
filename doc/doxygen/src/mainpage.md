@@ -187,8 +187,7 @@ See @ref net for more details on networking code.
 pkg
 ---
 RIOT comes with support for a number of external libraries (e.g.
-[OpenWSN](http://www.openwsn.org/),
-[microcoap](https://github.com/1248/microcoap)). The way they are included is
+[OpenWSN](http://www.openwsn.org/). The way they are included is
 that RIOT ships with a custom Makefile for each supported library that
 downloads the library and optionally applies a number of patches to make it
 work with RIOT. These Makefiles and patches can be found in the `pkg`
