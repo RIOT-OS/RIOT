@@ -55,7 +55,7 @@ void sixlowpan_print(uint8_t *data, size_t size)
         printf("datagram size: %" PRIu16 "\n",
                (uint16_t) (byteorder_ntohs(hdr->disp_size) & SIXLOWPAN_FRAG_SIZE_MASK));
         printf("tag: 0x%" PRIu16 "\n", byteorder_ntohs(hdr->tag));
-        printf("offset: 0x%" PRIu8 "\n", hdr->offset);
+        printf("offset: 0x%u\n", (unsigned)hdr->offset);
 
         od_hex_dump(data + sizeof(sixlowpan_frag_n_t),
                     size - sizeof(sixlowpan_frag_n_t),
@@ -239,8 +239,8 @@ void sixlowpan_print(uint8_t *data, size_t size)
 
         if (data[1] & SIXLOWPAN_IPHC2_CID_EXT) {
             offset += SIXLOWPAN_IPHC_CID_EXT_LEN;
-            printf("SCI: 0x%" PRIx8 "; DCI: 0x%" PRIx8 "\n",
-                   (uint8_t) (data[2] >> 4), (uint8_t) (data[2] & 0xf));
+            printf("SCI: 0x%x, DCI: 0x%x\n", (unsigned)(data[2] >> 4),
+                   (unsigned)(data[2] & 0xf));
         }
 
         od_hex_dump(data + offset, size - offset, OD_WIDTH_DEFAULT);
