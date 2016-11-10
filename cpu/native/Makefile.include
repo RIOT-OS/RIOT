@@ -8,5 +8,5 @@ endif
 export USEMODULE += periph
 
 ifeq ($(shell uname -s),Darwin)
-export CFLAGS += -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE
+export CFLAGS += -D_XOPEN_SOURCE=600 -D_DARWIN_C_SOURCE
 endif
