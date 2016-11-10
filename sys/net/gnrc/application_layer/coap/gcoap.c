@@ -27,11 +27,7 @@
 #include "debug.h"
 
 /** @brief Stack size for module thread */
-#if ENABLE_DEBUG
-#define GCOAP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)
-#else
-#define GCOAP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT)
-#endif
+#define GCOAP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
 
 /* Internal functions */
 static void *_event_loop(void *arg);
