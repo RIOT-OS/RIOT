@@ -6,12 +6,13 @@ git_cache() {
 
 init() {
     set -ex
-    test -d "${GIT_CACHE_DIR}/.git" || {
+    test -d "${GIT_CACHE_DIR}" && git -C ${GIT_CACHE_DIR} rev-parse
+    if (( $? )); then
         mkdir -p "${GIT_CACHE_DIR}"
 
         git_cache init --bare
         git_cache config core.compression 1
-    }
+    fi
     set +ex
 }
 
