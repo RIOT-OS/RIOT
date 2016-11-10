@@ -162,36 +162,16 @@ static void refresh(void *arg, int channel)
 
 void microbit_matrix_init(void)
 {
-    /* initialize columns 1-9 */
-    gpio_init(MICROBIT_LED_COL1, GPIO_OUT);
-    gpio_init(MICROBIT_LED_COL2, GPIO_OUT);
-    gpio_init(MICROBIT_LED_COL3, GPIO_OUT);
-    gpio_init(MICROBIT_LED_COL4, GPIO_OUT);
-    gpio_init(MICROBIT_LED_COL5, GPIO_OUT);
-    gpio_init(MICROBIT_LED_COL6, GPIO_OUT);
-    gpio_init(MICROBIT_LED_COL7, GPIO_OUT);
-    gpio_init(MICROBIT_LED_COL8, GPIO_OUT);
-    gpio_init(MICROBIT_LED_COL9, GPIO_OUT);
-    /* and rows from 1-3 */
-    gpio_init(MICROBIT_LED_ROW1, GPIO_OUT);
-    gpio_init(MICROBIT_LED_ROW2, GPIO_OUT);
-    gpio_init(MICROBIT_LED_ROW3, GPIO_OUT);
-
-    /* all columns are set to high */
-    gpio_set(MICROBIT_LED_COL1);
-    gpio_set(MICROBIT_LED_COL2);
-    gpio_set(MICROBIT_LED_COL3);
-    gpio_set(MICROBIT_LED_COL4);
-    gpio_set(MICROBIT_LED_COL5);
-    gpio_set(MICROBIT_LED_COL6);
-    gpio_set(MICROBIT_LED_COL7);
-    gpio_set(MICROBIT_LED_COL8);
-    gpio_set(MICROBIT_LED_COL9);
-    /* all rows are set to low */
-    gpio_clear(MICROBIT_LED_ROW1);
-    gpio_clear(MICROBIT_LED_ROW2);
-    gpio_clear(MICROBIT_LED_ROW3);
-
+    /* initialize rows */
+    for (int i = 0; i < ROWS_HW; i++) {
+        gpio_init(rows[i], GPIO_OUT);
+        gpio_clear(rows[i]);
+    }
+    /* initialize columns */
+    for (int i = 0; i < COLS_HW; i++) {
+        gpio_init(cols[i], GPIO_OUT);
+        gpio_set(cols[i]);
+    }
     /* and finally initialize and start the refresh timer */
     timer_init(TIMER_DEV(2), 1000000, refresh, NULL);
     timer_set(TIMER_DEV(2), 0, REFRESH);
