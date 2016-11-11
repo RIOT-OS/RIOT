@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,33 +7,38 @@
  */
 
 /**
- * @ingroup     drivers_nrf51822_nrfmin
+ * @ingroup     drivers_nrf51_nrfmin
  * @{
  *
  * @file
- * @brief       Implementation of the nrfmin NRF51822 minimal radio driver
+ * @brief       Implementation of the nrfmin radio driver for nRF51 radios
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
+#include <string.h>
+#include <errno.h>
+
 #include "cpu.h"
 #include "mutex.h"
+#include "assert.h"
+
 #include "periph_conf.h"
 #include "periph/cpuid.h"
-#include "nrfmin.h"
-#include "net/gnrc.h"
 
-#define ENABLE_DEBUG    (0)
+#include "nrfmin.h"
+#include "net/netdev2.h"
+
+#define ENABLE_DEBUG            (0)
 #include "debug.h"
 
 /**
  * @brief   Driver specific device configuration
  * @{
  */
-#define CONF_MODE               RADIO_MODE_MODE_Nrf_2Mbit
-#define CONF_PAYLOAD_LEN        (250U)
+#define CONF_MODE               RADIO_MODE_MODE_Nrf_1Mbit
 #define CONF_LEN                (8U)
 #define CONF_S0                 (0U)
 #define CONF_S1                 (0U)
@@ -50,9 +55,15 @@
  * @brief   Driver specific address configuration
  * @{
  */
-#define CONF_ADDR_PREFIX0       (0xE7E7E7E7)
-#define CONF_ADDR_BCAST         (0xffff)
+#define CONF_ADDR_PREFIX0       (0xe7e7e7e7)
+#define CONF_ADDR_BASE          (0xe7e70000)
+#define CONF_ADDR_BCAST         (CONF_ADDR_BASE | NRFMIN_ADDR_BCAST)
 /** @} */
+
+/**
+ * @brief   We define a pseudo NID for compliance to 6LoWPAN
+ */
+#define CONF_PSEUDO_NID         (0xaffe)
 
 /**
  * @brief   Driver specific (interrupt) events (not all of them used currently)
@@ -66,658 +77,472 @@
 /** @} */
 
 /**
- * @brief   Payload types to use in driver specific framed format
- *
- * We expect the radio to carry either raw link layer data (UNDEF) or network
- * layer data, so no need to map transport layer protocols etc...
- * @{
- */
-#define NRFTYPE_UNDEF           (0x01)
-#define NRFTYPE_SIXLOWPAN       (0x02)
-#define NRFTYPE_IPV6            (0x03)
-#define NRFTYPE_ICMPV6          (0x04)
-/**
- * @}
- */
-
-/**
  * @brief   Possible internal device states
  */
 typedef enum {
-    STATE_OFF,              /**< device is powered off */
-    STATE_IDLE,             /**< device is in idle mode */
-    STATE_RX,               /**< device is in receive mode */
-    STATE_TX,               /**< device is transmitting data */
+    STATE_OFF,                  /**< device is powered off */
+    STATE_IDLE,                 /**< device is in idle mode */
+    STATE_RX,                   /**< device is in receive mode */
+    STATE_TX,                   /**< device is transmitting data */
 } state_t;
 
-/**
- * @brief   In-memory structure of a nrfmin radio packet
- */
-typedef struct __attribute__((packed)) {
-    uint8_t length;                     /**< packet length */
-    uint8_t src_addr[2];                /**< source address of the packet */
-    uint8_t dst_addr[2];                /**< destination address */
-    uint8_t proto;                      /**< protocol of payload */
-    uint8_t payload[CONF_PAYLOAD_LEN];  /**< actual payload */
-} packet_t;
 
 /**
- * @brief   Pointer to the MAC layer event callback
+ * @brief   Since there can only be 1 nrfmin device, we allocate it right here
  */
-static gnrc_netdev_t *_netdev = NULL;
+netdev2_t nrfmin_dev;
 
 /**
- * @brief   Current state of the device
+ * @brief   For faster lookup we remember our own 16-bit address
  */
-static volatile state_t _state = STATE_OFF;
+static uint16_t my_addr;
 
 /**
- * @brief   Address of the device
+ * @brief   We need to keep track of the radio state in SW (-> PAN ID 20)
+ *
+ * See nRF51822 PAN ID 20: RADIO State Register is not functional.
  */
-static uint16_t _addr;
+static volatile state_t state = STATE_OFF;
 
 /**
- * @brief   Transmission buffer
+ * @brief   We also remember the 'long-term' state, so we can resume after TX
  */
-static packet_t _tx_buf;
+static volatile state_t target_state = STATE_OFF;
 
 /**
- * @brief   Hold the state before sending to return to it afterwards
+ * @brief   When sending out data, the data needs to be in one continuous memory
+ *          region. So we need to buffer outgoing data on the driver level.
  */
-static state_t _tx_prestate;
+static nrfmin_pkt_t tx_buf;
 
 /**
- * @brief    Double receive buffers
+ * @brief   As the device is memory mapped, we need some space to save incoming
+ *          data to.
+ *
+ * @todo    Improve the RX buffering to at least use double buffering
  */
-static packet_t _rx_buf[2];
+static nrfmin_pkt_t rx_buf;
 
 /**
- * @brief   Pointer to the free receive buffer
+ * @brief   While we listen for incoming data, we lock the RX buffer
  */
-static volatile int _rx_next = 0;
+static volatile uint8_t rx_lock = 0;
 
-/*
- * Create an internal mapping between NETTYPE and NRFTYPE
+/**
+ * @brief   Set radio into idle (DISABLED) state
  */
-static inline gnrc_nettype_t _nrftype_to_nettype(uint8_t nrftype)
+static void go_idle(void)
 {
-    switch (nrftype) {
-#ifdef MODULE_GNRC_SIXLOWPAN
-        case NRFTYPE_SIXLOWPAN:
-            return GNRC_NETTYPE_SIXLOWPAN;
-#endif
-#ifdef MODULE_GNRC_IPV6
-        case NRFTYPE_IPV6:
-            return GNRC_NETTYPE_IPV6;
-#endif
-#ifdef MODULE_GNRC_ICMPV6
-        case NRFTYPE_ICMPV6:
-            return GNRC_NETTYPE_ICMPV6;
-#endif
-        default:
-            return GNRC_NETTYPE_UNDEF;
-    }
-}
-
-static inline uint8_t _nettype_to_nrftype(gnrc_nettype_t nettype)
-{
-    switch (nettype) {
-#ifdef MODULE_GNRC_SIXLOWPAN
-        case GNRC_NETTYPE_SIXLOWPAN:
-            return NRFTYPE_SIXLOWPAN;
-#endif
-#ifdef MODULE_GNRC_IPV6
-        case GNRC_NETTYPE_IPV6:
-            return NRFTYPE_IPV6;
-#endif
-#ifdef MODULE_GNRC_ICMPV6
-        case GNRC_NETTYPE_ICMPV6:
-            return NRFTYPE_ICMPV6;
-#endif
-        default:
-            return NRFTYPE_UNDEF;
-    }
-}
-
-/*
- * Functions for controlling the radios state
- */
-static void _switch_to_idle(void)
-{
-    /* witch to idle state */
+    /* set device into basic disabled state */
     NRF_RADIO->EVENTS_DISABLED = 0;
     NRF_RADIO->TASKS_DISABLE = 1;
     while (NRF_RADIO->EVENTS_DISABLED == 0) {}
-    _state = STATE_IDLE;
+    /* also release any existing lock on the RX buffer */
+    rx_lock = 0;
+    state = STATE_IDLE;
 }
 
-static void _switch_to_rx(void)
-{
-    /* set pointer to receive buffer */
-    NRF_RADIO->PACKETPTR = (uint32_t)&(_rx_buf[_rx_next]);
-    /* set address */
-    NRF_RADIO->BASE0 &= ~(0xffff);
-    NRF_RADIO->BASE0 |= _addr;
-    /* switch int RX mode */
-    NRF_RADIO->TASKS_RXEN = 1;
-    _state = STATE_RX;
-}
-
-/*
- * Getter and Setter functions
+/**
+ * @brief   Set radio into the target state as defined by `target_state`
+ *
+ * Trick here is, that the driver can go back to it's previous state after a
+ * send operation, so it can differentiate if the driver was in DISABLED or in
+ * RX mode before the send process had started.
  */
-int _get_state(uint8_t *val, size_t max_len)
+static void goto_target_state(void)
 {
-    netopt_state_t state;
+    go_idle();
 
-    if (max_len < sizeof(netopt_state_t)) {
+    if ((target_state == STATE_RX) && (rx_buf.pkt.hdr.len == 0)) {
+        /* set receive buffer and our own address */
+        rx_lock = 1;
+        NRF_RADIO->PACKETPTR = (uint32_t)(&rx_buf);
+        NRF_RADIO->BASE0 = (CONF_ADDR_BASE | my_addr);
+        /* goto RX mode */
+        NRF_RADIO->TASKS_RXEN = 1;
+        state = STATE_RX;
+    }
+
+    if (target_state == STATE_OFF) {
+        NRF_RADIO->POWER = 0;
+        state = STATE_OFF;
+    }
+}
+
+void nrfmin_setup(void)
+{
+    nrfmin_dev.driver = &nrfmin_netdev;
+    nrfmin_dev.event_callback = NULL;
+    nrfmin_dev.context = NULL;
+#ifdef MODULE_NETSTATS_L2
+    memset(&nrfmin_dev.stats, 0, sizeof(netstats_t));;
+#endif
+}
+
+uint16_t nrfmin_get_addr(void)
+{
+    return my_addr;
+}
+
+void nrfmin_get_pseudo_long_addr(uint16_t *addr)
+{
+    for (int i = 0; i < 4; i++) {
+        addr[i] = my_addr;
+    }
+}
+
+void nrfmin_get_iid(uint16_t *iid)
+{
+    iid[0] = 0;
+    iid[1] = 0xff00;
+    iid[2] = 0x00fe;
+    iid[3] = my_addr;
+}
+
+uint16_t nrfmin_get_channel(void)
+{
+    return (uint16_t)(NRF_RADIO->FREQUENCY >> 2);
+}
+
+netopt_state_t nrfmin_get_state(void)
+{
+    switch (state) {
+        case STATE_OFF:  return NETOPT_STATE_OFF;
+        case STATE_IDLE: return NETOPT_STATE_SLEEP;
+        case STATE_RX:   return NETOPT_STATE_IDLE;
+        case STATE_TX:   return NETOPT_STATE_TX;
+        default:         return NETOPT_STATE_RESET;     /* should never show */
+    }
+}
+
+int16_t nrfmin_get_txpower(void)
+{
+    int8_t p = (int8_t)NRF_RADIO->TXPOWER;
+    if (p < 0) {
+        return (int16_t)(0xff00 | p);
+    }
+    return (int16_t)p;
+}
+
+void nrfmin_set_addr(uint16_t addr)
+{
+    my_addr = addr;
+    goto_target_state();
+}
+
+int nrfmin_set_channel(uint16_t chan)
+{
+    if (chan > NRFMIN_CHAN_MAX) {
         return -EOVERFLOW;
     }
-    switch (_state) {
-        case STATE_OFF:
-            state = NETOPT_STATE_OFF;
-            break;
-        case STATE_IDLE:
-            state = NETOPT_STATE_SLEEP;
-            break;
-        case STATE_RX:
-            state = NETOPT_STATE_IDLE;
-            break;
-        case STATE_TX:
-            state = NETOPT_STATE_TX;
-            break;
-        default:
-            return -ECANCELED;
-    }
-    memcpy(val, &state, sizeof(netopt_state_t));
-    return sizeof(netopt_state_t);
+
+    NRF_RADIO->FREQUENCY = (chan << 2);
+    goto_target_state();
+
+    return sizeof(uint16_t);
 }
 
-int _set_state(uint8_t *val, size_t len)
+void nrfmin_set_txpower(int16_t power)
 {
-    netopt_state_t state;
-
-    if (len != sizeof(netopt_state_t)) {
-        return -EINVAL;
+    if (power > 2) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Pos4dBm;
     }
-    /* get target state */
-    memcpy(&state, val, len);
-    /* switch to target state */
-    switch (state) {
+    else if (power > -2) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_0dBm;
+    }
+    else if (power > -6) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg4dBm;
+    }
+    else if (power > -10) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg8dBm;
+    }
+    else if (power > -14) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg12dBm;
+    }
+    else if (power > -18) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg16dBm;
+    }
+    else if (power > -25) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg20dBm;
+    }
+    else {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg30dBm;
+    }
+}
+
+int nrfmin_set_state(netopt_state_t val)
+{
+    /* make sure radio is turned on and no transmission is in progress */
+    NRF_RADIO->POWER = 1;
+
+    switch (val) {
+        case NETOPT_STATE_OFF:
+            target_state = STATE_OFF;
+            break;
         case NETOPT_STATE_SLEEP:
-            _switch_to_idle();
+            target_state = STATE_IDLE;
             break;
         case NETOPT_STATE_IDLE:
-            _switch_to_rx();
+            target_state = STATE_RX;
             break;
         default:
             return -ENOTSUP;
     }
+
+    goto_target_state();
+
     return sizeof(netopt_state_t);
 }
 
-int _get_address(uint8_t *val, size_t max_len)
-{
-    /* check parameters */
-    if (max_len < 2) {
-        return -EOVERFLOW;
-    }
-    /* get address */
-    val[0] = (uint8_t)(_addr >> 8);
-    val[1] = (uint8_t)(_addr);
-    return 2;
-}
 
-int _set_address(uint8_t *val, size_t len)
-{
-    int is_rx = 0;
-
-    /* check parameters */
-    if (len != 2) {
-        return -EINVAL;
-    }
-    /* keep track of state */
-    while (_state == STATE_TX) {}
-    if (_state == STATE_RX) {
-        is_rx = 1;
-        _switch_to_idle();
-    }
-    /* set address */
-    _addr = (((uint16_t)val[0]) << 8) | val[1];
-    NRF_RADIO->BASE0 &= ~(0xffff);
-    NRF_RADIO->BASE0 |= _addr;
-    /* restore old state */
-    if (is_rx) {
-        _switch_to_rx();
-    }
-    return 2;
-}
-
-int _get_channel(uint8_t *val, size_t max_len)
-{
-    /* check parameters */
-    if (max_len < 2) {
-        return -EOVERFLOW;
-    }
-    /* get channel */
-    val[0] = (0x3f & NRF_RADIO->FREQUENCY);
-    val[1] = 0;
-    return 2;
-}
-
-int _set_channel(uint8_t *val, size_t len)
-{
-    int is_rx = 0;
-
-    /* check parameter */
-    if (len != 2 || val[0] > 0x3f) {
-        return -EINVAL;
-    }
-    /* remember state */
-    while (_state == STATE_TX) {}
-    if (_state == STATE_RX) {
-        is_rx = 1;
-        _switch_to_idle();
-    }
-    /* set channel */
-    NRF_RADIO->FREQUENCY = val[0];
-    /* restore state */
-    if (is_rx) {
-        _switch_to_rx();
-    }
-    return 2;
-}
-
-int _get_pan(uint8_t *val, size_t max_len)
-{
-    /* check parameters */
-    if (max_len < 2) {
-        return -EOVERFLOW;
-    }
-    /* get PAN ID */
-    val[0] = (uint8_t)((NRF_RADIO->BASE0 & 0x00ff0000) >> 16);
-    val[1] = (uint8_t)((NRF_RADIO->BASE0 & 0xff000000) >> 24);
-    return 2;
-}
-
-int _set_pan(uint8_t *val, size_t len)
-{
-    int is_rx = 0;
-    uint32_t pan;
-
-    /* check parameter */
-    if (len != 2) {
-        return -EINVAL;
-    }
-    /* remember state */
-    while (_state == STATE_TX) {}
-    if (_state == STATE_RX) {
-        is_rx = 1;
-        _switch_to_idle();
-    }
-    /* set new PAN ID */
-    pan = ((uint32_t)val[1] << 24) | ((uint32_t)val[0] << 16);
-    NRF_RADIO->BASE0   = pan | _addr;
-    NRF_RADIO->BASE1   = pan | CONF_ADDR_BCAST;
-    /* restore state */
-    if (is_rx) {
-        _switch_to_rx();
-    }
-    return 2;
-}
-
-int _get_txpower(uint8_t *val, size_t len)
-{
-    /* check parameters */
-    if (len < 2) {
-        return 0;
-    }
-    /* get value */
-    val[0] = NRF_RADIO->TXPOWER;
-    if (val[0] & 0x80) {
-        val[1] = 0xff;
-    }
-    else {
-        val[1] = 0x00;
-    }
-    return 2;
-}
-
-int _set_txpower(uint8_t *val, size_t len)
-{
-    int8_t power;
-
-    /* check parameters */
-    if (len < 2) {
-        return -EINVAL;
-    }
-    /* get TX power value */
-    power = (int8_t)val[0];
-
-    if (power > 2) {
-        power = 4;
-    }
-    else if (power > -2) {
-        power = 0;
-    }
-    else if (power > -6) {
-        power = -4;
-    }
-    else if (power > -10) {
-        power = -8;
-    }
-    else if (power > -14) {
-        power = -12;
-    }
-    else if (power > -18) {
-        power = -16;
-    }
-    else {
-        power = -20;
-    }
-    NRF_RADIO->TXPOWER = power;
-    return 2;
-}
-
-/*
- * Radio interrupt routine
+/**
+ * @brief   Radio interrupt routine
  */
 void isr_radio(void)
 {
-    msg_t msg;
-
     if (NRF_RADIO->EVENTS_END == 1) {
         NRF_RADIO->EVENTS_END = 0;
         /* did we just send or receive something? */
-        if (_state == STATE_RX) {
+        if (state == STATE_RX) {
             /* drop packet on invalid CRC */
-            if (NRF_RADIO->CRCSTATUS != 1) {
+            if ((NRF_RADIO->CRCSTATUS != 1) || !(nrfmin_dev.event_callback)) {
+                rx_buf.pkt.hdr.len = 0;
+                NRF_RADIO->TASKS_START = 1;
                 return;
             }
-            msg.type = GNRC_NETDEV_MSG_TYPE_EVENT;
-            msg.content.value = ISR_EVENT_RX_DONE;
-            msg_send_int(&msg, _netdev->mac_pid);
-            /* switch buffer */
-            _rx_next = _rx_next ^ 1;
-            NRF_RADIO->PACKETPTR = (uint32_t)&(_rx_buf[_rx_next]);
-            /* go back into receive mode */
-            NRF_RADIO->TASKS_START = 1;
+            rx_lock = 0;
+            nrfmin_dev.event_callback(&nrfmin_dev, NETDEV2_EVENT_ISR);
         }
-        else if (_state == STATE_TX) {
-            /* disable radio again */
-            _switch_to_idle();
-            /* if radio was receiving before, go back into RX state */
-            if (_tx_prestate == STATE_RX) {
-                _switch_to_rx();
-            }
+        else if (state == STATE_TX) {
+            goto_target_state();
         }
     }
+
     cortexm_isr_end();
 }
 
-/*
- * Event handlers
- */
-static void _receive_data(void)
+static int nrfmin_send(netdev2_t *dev, const struct iovec *vector, unsigned count)
 {
-    packet_t *data;
-    gnrc_pktsnip_t *pkt_head;
-    gnrc_pktsnip_t *pkt;
-    gnrc_netif_hdr_t *hdr;
-    gnrc_nettype_t nettype;
+    (void)dev;
 
-    /* only read data if we have somewhere to send it to */
-    if (_netdev->event_cb == NULL) {
-        return;
+    assert((vector != NULL) && (count > 0) && (state != STATE_OFF));
+
+    /* wait for any ongoing transmission to finish and go into idle state */
+    while (state == STATE_TX) {}
+    go_idle();
+
+    /* copy packet data into the transmit buffer */
+    int pos = 0;
+    for (unsigned i = 0; i < count; i++) {
+        if ((pos + vector[i].iov_len) > NRFMIN_PKT_MAX) {
+            DEBUG("[nrfmin] send: unable to do so, packet is too large!\n");
+            return -EOVERFLOW;
+        }
+        memcpy(&tx_buf.raw[pos], vector[i].iov_base, vector[i].iov_len);
+        pos += vector[i].iov_len;
     }
 
-    /* get pointer to RX data buffer */
-    data = &(_rx_buf[_rx_next ^ 1]);
+    /* set output buffer and destination address */
+    nrfmin_hdr_t *hdr = (nrfmin_hdr_t *)vector[0].iov_base;
+    NRF_RADIO->PACKETPTR = (uint32_t)(&tx_buf);
+    NRF_RADIO->BASE0 = (CONF_ADDR_BASE | hdr->dst_addr);
 
-    /* allocate and fill netif header */
-    pkt_head = gnrc_pktbuf_add(NULL, NULL, sizeof(gnrc_netif_hdr_t) + 4,
-                               GNRC_NETTYPE_UNDEF);
-    if (pkt_head == NULL) {
-        DEBUG("nrfmin: Error allocating netif header on RX\n");
-        return;
-    }
-    hdr = (gnrc_netif_hdr_t *)pkt_head->data;
-    gnrc_netif_hdr_init(hdr, 2, 2);
-    hdr->if_pid = _netdev->mac_pid;
-    gnrc_netif_hdr_set_src_addr(hdr, data->src_addr, 2);
-    gnrc_netif_hdr_set_dst_addr(hdr, data->dst_addr, 2);
+    /* trigger the actual transmission */
+    DEBUG("[nrfmin] send: putting %i byte into the ether\n", (int)hdr->len);
+    state = STATE_TX;
+    NRF_RADIO->TASKS_TXEN = 1;
 
-    /* allocate and fill payload */
-    nettype = _nrftype_to_nettype(data->proto);
-    pkt = gnrc_pktbuf_add(pkt_head, data->payload, data->length - 6, nettype);
-    if (pkt == NULL) {
-        DEBUG("nrfmin: Error allocating packet payload on RX\n");
-        gnrc_pktbuf_release(pkt_head);
-        return;
-    }
-
-    /* pass on the received packet */
-    _netdev->event_cb(NETDEV_EVENT_RX_COMPLETE, pkt);
+    return (int)count;
 }
 
-/*
- * Public interface functions
- */
-int nrfmin_init(gnrc_netdev_t *dev)
+static int nrfmin_recv(netdev2_t *dev, void *buf, size_t len, void *info)
+{
+    (void)dev;
+    (void)info;
+
+    assert(state != STATE_OFF);
+
+    int pktlen = (int)rx_buf.pkt.hdr.len;
+
+    /* check if packet data is readable */
+    if (rx_lock || (pktlen == 0)) {
+        DEBUG("[nrfmin] recv: no packet data available\n");
+        return 0;
+    }
+
+    if (buf == NULL) {
+        if (len > 0) {
+            /* drop packet */
+            DEBUG("[nrfmin] recv: dropping packet of length %i\n", pktlen);
+            rx_buf.pkt.hdr.len = 0;
+            goto_target_state();
+        }
+    }
+    else {
+        DEBUG("[nrfmin] recv: reading packet of length %i\n", pktlen);
+
+        pktlen = (len < pktlen) ? len : pktlen;
+        memcpy(buf, rx_buf.raw, pktlen);
+        rx_buf.pkt.hdr.len = 0;
+        goto_target_state();
+    }
+
+    return pktlen;
+}
+
+static int nrfmin_init(netdev2_t *dev)
 {
     uint8_t cpuid[CPUID_LEN];
-    uint8_t tmp;
-    int i;
 
     /* check given device descriptor */
-    if (dev == NULL) {
-        return -ENODEV;
+    assert(dev);
+
+    /* initialize our own address from the CPU ID */
+    my_addr = 0;
+    cpuid_get(cpuid);
+    for (int i = 0; i < CPUID_LEN; i++) {
+        my_addr ^= cpuid[i] << (8 * (i & 0x01));
     }
-    /* set initial values */
-    dev->driver = &nrfmin_driver;
-    dev->event_cb = NULL;
-    dev->mac_pid = KERNEL_PID_UNDEF;
-    /* keep a pointer for future reference */
-    _netdev = dev;
 
     /* power on the NRFs radio */
     NRF_RADIO->POWER = 1;
     /* load driver specific configuration */
     NRF_RADIO->MODE = CONF_MODE;
     /* configure variable parameters to default values */
-    NRF_RADIO->TXPOWER = NRFMIN_DEFAULT_TXPOWER;
-    NRF_RADIO->FREQUENCY = NRFMIN_DEFAULT_CHANNEL;
-    /* get default address from CPU ID */
-    cpuid_get(cpuid);
-    tmp = 0;
-    for (i = 0; i < (CPUID_LEN / 2); i++) {
-        tmp ^= cpuid[i];
-    }
-    _addr = ((uint16_t)tmp) << 8;
-    tmp = 0;
-    for (; i < CPUID_LEN; i++) {
-        tmp ^= cpuid[i];
-    }
-    _addr |= tmp;
+    NRF_RADIO->TXPOWER = NRFMIN_TXPOWER_DEFAULT;
+    NRF_RADIO->FREQUENCY = NRFMIN_CHAN_DEFAULT;
     /* pre-configure radio addresses */
     NRF_RADIO->PREFIX0 = CONF_ADDR_PREFIX0;
-    NRF_RADIO->BASE0   = (NRFMIN_DEFAULT_PAN << 16) | _addr;
-    NRF_RADIO->BASE1   = (NRFMIN_DEFAULT_PAN << 16) | CONF_ADDR_BCAST;
-    NRF_RADIO->TXADDRESS = 0x00UL;      /* always send from address 0 */
-    NRF_RADIO->RXADDRESSES = 0x03UL;    /* listen to addresses 0 and 1 */
+    NRF_RADIO->BASE0   = (CONF_ADDR_BASE | my_addr);
+    NRF_RADIO->BASE1   = CONF_ADDR_BCAST;
+    /* always send from logical address 0 */
+    NRF_RADIO->TXADDRESS = 0x00UL;
+    /* and listen to logical addresses 0 and 1 */
+    NRF_RADIO->RXADDRESSES = 0x03UL;
     /* configure data fields and packet length whitening and endianess */
-    NRF_RADIO->PCNF0 = (CONF_S1 << RADIO_PCNF0_S1LEN_Pos) |
-                       (CONF_S0 << RADIO_PCNF0_S0LEN_Pos) |
-                       (CONF_LEN << RADIO_PCNF0_LFLEN_Pos);
-    NRF_RADIO->PCNF1 = (CONF_WHITENING << RADIO_PCNF1_WHITEEN_Pos) |
-                       (CONF_ENDIAN << RADIO_PCNF1_ENDIAN_Pos) |
-                       (CONF_BASE_ADDR_LEN << RADIO_PCNF1_BALEN_Pos) |
-                       (CONF_STATLEN << RADIO_PCNF1_STATLEN_Pos) |
-                       (CONF_PAYLOAD_LEN << RADIO_PCNF1_MAXLEN_Pos);
-    /* configure CRC unit */
+    NRF_RADIO->PCNF0 = ((CONF_S1 << RADIO_PCNF0_S1LEN_Pos) |
+                        (CONF_S0 << RADIO_PCNF0_S0LEN_Pos) |
+                        (CONF_LEN << RADIO_PCNF0_LFLEN_Pos));
+    NRF_RADIO->PCNF1 = ((CONF_WHITENING << RADIO_PCNF1_WHITEEN_Pos) |
+                        (CONF_ENDIAN << RADIO_PCNF1_ENDIAN_Pos) |
+                        (CONF_BASE_ADDR_LEN << RADIO_PCNF1_BALEN_Pos) |
+                        (CONF_STATLEN << RADIO_PCNF1_STATLEN_Pos) |
+                        (NRFMIN_PKT_MAX << RADIO_PCNF1_MAXLEN_Pos));
+    /* configure the CRC unit */
     NRF_RADIO->CRCCNF = CONF_CRC_LEN;
     NRF_RADIO->CRCPOLY = CONF_CRC_POLY;
     NRF_RADIO->CRCINIT = CONF_CRC_INIT;
     /* set shortcuts for more efficient transfer */
-    NRF_RADIO->SHORTS = (1 << RADIO_SHORTS_READY_START_Pos);
+    NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk;
     /* enable interrupts */
-    NVIC_SetPriority(RADIO_IRQn, RADIO_IRQ_PRIO);
     NVIC_EnableIRQ(RADIO_IRQn);
     /* enable END interrupt */
     NRF_RADIO->EVENTS_END = 0;
-    NRF_RADIO->INTENSET = (1 << RADIO_INTENSET_END_Pos);
+    NRF_RADIO->INTENSET = RADIO_INTENSET_END_Msk;
     /* put device in receive mode */
-    _switch_to_rx();
+    target_state = STATE_RX;
+    goto_target_state();
+
+    DEBUG("[nrfmin] initialization successful\n");
+
     return 0;
 }
 
-int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
+static void nrfmin_isr(netdev2_t *dev)
 {
-    (void)dev;
-    size_t size;
-    size_t pos = 0;
-    uint8_t *dst_addr;
-    gnrc_netif_hdr_t *hdr;
-    gnrc_pktsnip_t *payload;
-
-    /* check packet */
-    if (pkt == NULL || pkt->next == NULL) {
-        DEBUG("nrfmin: Error sending packet: packet incomplete\n");
-        return -ENOMSG;
+    if (nrfmin_dev.event_callback) {
+        nrfmin_dev.event_callback(dev, NETDEV2_EVENT_RX_COMPLETE);
     }
-
-    /* check if payload is withing length bounds */
-    size = gnrc_pkt_len(pkt->next);
-    if (size > CONF_PAYLOAD_LEN) {
-        gnrc_pktbuf_release(pkt);
-        DEBUG("nrfmin: Error sending packet: payload to large\n");
-        return -EOVERFLOW;
-    }
-    /* get netif header and check address length */
-    hdr = (gnrc_netif_hdr_t *)pkt->data;
-    if (hdr->dst_l2addr_len != 2) {
-        DEBUG("nrfmin: Error sending packet: dest address has invalid size\n");
-        gnrc_pktbuf_release(pkt);
-        return -ENOMSG;
-    }
-    dst_addr = gnrc_netif_hdr_get_dst_addr(hdr);
-
-    DEBUG("nrfmin: Sending packet to %02x:%02x - size %u\n",
-           dst_addr[0], dst_addr[1], size);
-
-    /* wait for any ongoing transmission to finish */
-    while (_state == STATE_TX) {}
-    /* write data into TX buffer */
-    payload = pkt->next;
-    _tx_buf.length = 6 + size;
-    _tx_buf.src_addr[0] = (uint8_t)(_addr >> 8);
-    _tx_buf.src_addr[1] = (uint8_t)(_addr);
-    _tx_buf.dst_addr[0] = dst_addr[0];
-    _tx_buf.dst_addr[1] = dst_addr[1];
-    _tx_buf.proto = _nettype_to_nrftype(payload->type);
-    while (payload) {
-        memcpy(&(_tx_buf.payload[pos]), payload->data, payload->size);
-        pos += payload->size;
-        payload = payload->next;
-    }
-
-    /* save old state and switch to idle if applicable */
-    _tx_prestate = _state;
-    if (_tx_prestate == STATE_RX) {
-        _switch_to_idle();
-    }
-    /* set packet pointer to TX buffer and write destination address */
-    NRF_RADIO->PACKETPTR = (uint32_t)(&_tx_buf);
-    NRF_RADIO->BASE0 &= ~(0xffff);
-    NRF_RADIO->BASE0 |= ((((uint16_t)dst_addr[0]) << 8) | dst_addr[1]);
-    /* start transmission */
-    _state = STATE_TX;
-    NRF_RADIO->TASKS_TXEN = 1;
-
-    /* release packet */
-    gnrc_pktbuf_release(pkt);
-    return (int)size;
 }
 
-int _add_event_cb(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb)
-{
-    if (dev->event_cb != NULL) {
-        return -ENOBUFS;
-    }
-    dev->event_cb = cb;
-    return 0;
-}
-
-int _rem_event_cb(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb)
-{
-    if (dev->event_cb == cb) {
-        dev->event_cb = NULL;
-        return 0;
-    }
-    return -ENOENT;
-}
-
-int _get(gnrc_netdev_t *dev, netopt_t opt, void *value, size_t max_len)
+static int nrfmin_get(netdev2_t *dev, netopt_t opt, void *val, size_t max_len)
 {
     (void)dev;
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            return _get_address(value, max_len);
         case NETOPT_CHANNEL:
-            return _get_channel(value, max_len);
-        case NETOPT_NID:
-            return _get_pan(value, max_len);
-        case NETOPT_TX_POWER:
-            return _get_txpower(value, max_len);
+            assert(max_len >= sizeof(uint16_t));
+            *((uint16_t *)val) = nrfmin_get_channel();
+            return sizeof(uint16_t);
+        case NETOPT_ADDRESS:
+            assert(max_len >= sizeof(uint16_t));
+            *((uint16_t *)val) = nrfmin_get_addr();
+            return sizeof(uint16_t);
         case NETOPT_STATE:
-            return _get_state(value, max_len);
+            assert(max_len >= sizeof(netopt_state_t));
+            *((netopt_state_t *)val) = nrfmin_get_state();
+            return sizeof(netopt_state_t);
+        case NETOPT_TX_POWER:
+            assert(max_len >= sizeof(int16_t));
+            *((int16_t *)val) = nrfmin_get_txpower();
+            return sizeof(int16_t);
+        case NETOPT_ADDRESS_LONG:
+            assert(max_len >= sizeof(uint64_t));
+            nrfmin_get_pseudo_long_addr((uint16_t *)val);
+            return sizeof(uint64_t);
+        case NETOPT_ADDR_LEN:
+            assert(max_len >= sizeof(uint16_t));
+            *((uint16_t *)val) = 2;
+            return sizeof(uint16_t);
+        case NETOPT_NID:
+            assert(max_len >= sizeof(uint16_t));
+            *((uint16_t*)val) = CONF_PSEUDO_NID;
+            return sizeof(uint16_t);
+        case NETOPT_PROTO:
+            *((uint16_t *)val) = 809; /* TODO */
+            return 2;
+        case NETOPT_DEVICE_TYPE:
+            assert(max_len >= sizeof(uint16_t));
+            *((uint16_t *)val) = NETDEV2_TYPE_NRFMIN;
+            return sizeof(uint16_t);
+        case NETOPT_IPV6_IID:
+            assert(max_len >= sizeof(uint64_t));
+            nrfmin_get_iid((uint16_t *)val);
+            return sizeof(uint64_t);
         default:
             return -ENOTSUP;
     }
 }
 
-int _set(gnrc_netdev_t *dev, netopt_t opt, void *value, size_t value_len)
+static int nrfmin_set(netdev2_t *dev, netopt_t opt, void *val, size_t len)
 {
     (void)dev;
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            return _set_address(value, value_len);
         case NETOPT_CHANNEL:
-            return _set_channel(value, value_len);
-        case NETOPT_NID:
-            return _set_pan(value, value_len);
-        case NETOPT_TX_POWER:
-            return _set_txpower(value, value_len);
+            assert(len == sizeof(uint16_t));
+            return nrfmin_set_channel(*((uint16_t *)val));
+        case NETOPT_ADDRESS:
+            assert(len == sizeof(uint16_t));
+            nrfmin_set_addr(*((uint16_t *)val));
+            return sizeof(uint16_t);
+        case NETOPT_ADDR_LEN:
+        case NETOPT_SRC_LEN:
+            assert(len == sizeof(uint16_t));
+            if (*((uint16_t *)val) != 2) {
+                return -EAFNOSUPPORT;
+            }
+            return sizeof(uint16_t);
         case NETOPT_STATE:
-            return _set_state(value, value_len);
+            assert(len == sizeof(netopt_state_t));
+            return nrfmin_set_state(*((netopt_state_t *)val));
+        case NETOPT_TX_POWER:
+            assert(len == sizeof(int16_t));
+            nrfmin_set_txpower(*((int16_t *)val));
+            return sizeof(int16_t);
         default:
             return -ENOTSUP;
     }
 }
 
-void _isr_event(gnrc_netdev_t *dev, uint32_t event_type)
-{
-    switch (event_type) {
-        case ISR_EVENT_RX_DONE:
-            _receive_data();
-            break;
-        default:
-            /* do nothing */
-            return;
-    }
-}
-
-/*
- * Mapping of netdev interface
+/**
+ * @brief   Export of the netdev2 interface
  */
-const gnrc_netdev_driver_t nrfmin_driver = {
-    .send_data = _send,
-    .add_event_callback = _add_event_cb,
-    .rem_event_callback = _rem_event_cb,
-    .get = _get,
-    .set = _set,
-    .isr_event = _isr_event,
+const netdev2_driver_t nrfmin_netdev = {
+    .send = nrfmin_send,
+    .recv = nrfmin_recv,
+    .init = nrfmin_init,
+    .isr  = nrfmin_isr,
+    .get  = nrfmin_get,
+    .set  = nrfmin_set
 };
-//

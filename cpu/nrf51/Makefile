@@ -5,7 +5,7 @@ MODULE = cpu
 DIRS = periph $(RIOTCPU)/cortexm_common $(RIOTCPU)/nrf5x_common
 
 # build one of the radio drivers, if enabled
-ifneq (,$(filter radio_nrfmin,$(USEMODULE)))
+ifneq (,$(filter nrfmin,$(USEMODULE)))
     DIRS += radio/nrfmin
 endif
 

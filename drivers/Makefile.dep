@@ -107,6 +107,12 @@ ifneq (,$(filter mpu9150,$(USEMODULE)))
     USEMODULE += xtimer
 endif
 
+ifneq (,$(filter nrfmin,$(USEMODULE)))
+    FEATURES_REQUIRED += radio_nrfmin
+    FEATURES_REQUIRED += periph_cpuid
+    USEMODULE += netif
+endif
+
 ifneq (,$(filter nvram_spi,$(USEMODULE)))
     USEMODULE += xtimer
 endif

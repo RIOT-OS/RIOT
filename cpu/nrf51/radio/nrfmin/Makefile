@@ -1,3 +1,3 @@
-MODULE = radio_nrfmin
+MODULE = nrfmin
 
 include $(RIOTBASE)/Makefile.base
