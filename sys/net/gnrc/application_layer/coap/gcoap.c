@@ -546,7 +546,7 @@ size_t gcoap_req_send(uint8_t *buf, size_t len, ipv6_addr_t *addr, uint16_t port
         memo->resp_handler = resp_handler;
 
         size_t res = _send_buf(buf, len, addr, port);
-        if (res && GCOAP_NON_TIMEOUT) {
+        if (res && (GCOAP_NON_TIMEOUT > 0)) {
             /* start response wait timer */
             memo->timeout_msg.type        = GCOAP_NETAPI_MSG_TYPE_TIMEOUT;
             memo->timeout_msg.content.ptr = (char *)memo;
