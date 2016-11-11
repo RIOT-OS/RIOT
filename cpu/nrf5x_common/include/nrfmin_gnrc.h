@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    drivers_nrf51822_nrfmin_gnrc GNRC adapter for nrfmin
- * @ingroup     drivers_nrf51822_nrfmin
+ * @defgroup    drivers_nrf5x_nrfmin_gnrc GNRC adapter for nrfmin
+ * @ingroup     drivers_nrf5x_nrfmin
  * @brief       Minimal driver for the NRF51 radio
  *
  * @{

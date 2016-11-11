@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_nrf51_nrfmin
+ * @ingroup     drivers_nrf5x_nrfmin
  * @{
  *
  * @file
@@ -428,8 +428,9 @@ static int nrfmin_init(netdev2_t *dev)
                         (CONF_BASE_ADDR_LEN << RADIO_PCNF1_BALEN_Pos) |
                         (CONF_STATLEN << RADIO_PCNF1_STATLEN_Pos) |
                         (NRFMIN_PKT_MAX << RADIO_PCNF1_MAXLEN_Pos));
-    /* configure the CRC unit */
-    NRF_RADIO->CRCCNF = CONF_CRC_LEN;
+    /* configure the CRC unit, we skip the address field as this seems to lead
+     * to wrong checksum calculation on nRF52 devices in some cases */
+    NRF_RADIO->CRCCNF = CONF_CRC_LEN | RADIO_CRCCNF_SKIPADDR_Msk;
     NRF_RADIO->CRCPOLY = CONF_CRC_POLY;
     NRF_RADIO->CRCINIT = CONF_CRC_INIT;
     /* set shortcuts for more efficient transfer */

@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    drivers_nrf51822_nrfmin NRF Minimal Radio Driver
- * @ingroup     drivers_netdev
+ * @defgroup    drivers_nrf5x_nrfmin NRF Minimal Radio Driver
+ * @ingroup     drivers_netdev2
  * @brief       Minimal driver for the NRF51 radio
  *
  * This driver uses the nRF5x radio in a proprietary/custom way, defining our
@@ -42,7 +42,7 @@
  * - dst_addr: 16-bit destination address
  * - proto: type of data transferred (similar to an Ethertype field)
  *
- * SUMMERY:
+ * SUMMARY:
  * This driver / link layer supports:
  *   - 16-bit addressing (16-bit)
  *     -> extract default address from CPU ID

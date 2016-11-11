@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_nrf51_nrfmin
+ * @ingroup     drivers_nrf5x_nrfmin_gnrc
  * @{
  *
  * @file
@@ -81,7 +81,7 @@ static int hdr_netif_to_nrfmin(nrfmin_hdr_t *nrfmin, gnrc_pktsnip_t *pkt)
     return 0;
 }
 
-static int nrfmin_gnrc_send(gnrc_netdev2_t *dev, gnrc_pktsnip_t *pkt)
+static int gnrc_nrfmin_send(gnrc_netdev2_t *dev, gnrc_pktsnip_t *pkt)
 {
     int res;
     struct iovec *vec;
@@ -124,7 +124,7 @@ static int nrfmin_gnrc_send(gnrc_netdev2_t *dev, gnrc_pktsnip_t *pkt)
     return res;
 }
 
-static gnrc_pktsnip_t *nrfmin_gnrc_recv(gnrc_netdev2_t *dev)
+static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netdev2_t *dev)
 {
     int pktsize;
     nrfmin_hdr_t *nrfmin;
@@ -185,14 +185,14 @@ static gnrc_pktsnip_t *nrfmin_gnrc_recv(gnrc_netdev2_t *dev)
     return pkt_snip;
 }
 
-void nrfmin_gnrc_init(void)
+void gnrc_nrfmin_init(void)
 {
     /* setup the NRFMIN driver */
     nrfmin_setup();
 
     /* initialize the GNRC plug struct */
-    plug.send = nrfmin_gnrc_send;
-    plug.recv = nrfmin_gnrc_recv;
+    plug.send = gnrc_nrfmin_send;
+    plug.recv = gnrc_nrfmin_recv;
     plug.dev = &nrfmin_dev;
 
     gnrc_netdev2_init(stack, sizeof(stack),
