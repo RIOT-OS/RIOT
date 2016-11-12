@@ -108,6 +108,18 @@ typedef enum {
 } lsm6ds3_gyr_scale_t;
 
 /**
+ * @brief Data structure holding the full set of configuration parameters
+ */
+typedef struct {
+    i2c_t i2c;                  /**< I2C bus the device is connected to */
+    uint8_t addr;               /**< address on that bus */
+    lsm6ds3_acc_sample_rate_t acc_sample_rate;
+    lsm6ds3_acc_scale_t acc_scale;
+    lsm6ds3_gyr_sample_rate_t gyr_sample_rate;
+    lsm6ds3_gyr_scale_t gyr_scale;
+} lsm6ds3_params_t;
+
+/**
  * @brief Initialize a new LSM6DS3 device.
  *
  * @param[in] dev               device descriptor of an LSM6DS3 device

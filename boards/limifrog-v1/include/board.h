@@ -31,6 +31,12 @@ extern "C" {
 #endif
 
 /**
+ * @brief Define the interface of the LSM6DS3 sensor
+ */
+#define LSM6DS3_I2C         I2C_1
+#define LSM6DS3_ADDR        0x6A
+
+/**
  * @brief   LED pin definitions and handlers
  * @{
  */
