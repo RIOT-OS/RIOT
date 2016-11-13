@@ -573,3 +573,7 @@ USEPKG := $(sort $(USEPKG))
 ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
     include $(RIOTBASE)/Makefile.dep
 endif
+
+USEPKG_BUILDFIRST := nordic_softdevice_ble
+
+USEPKG := $(USEPKG_BUILDFIRST) $(filter-out $(USEPKG_BUILDFIRST),$(USEPKG))
