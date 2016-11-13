@@ -6,20 +6,12 @@
  * directory for more details.
  */
 
-#include "net/uhcp.h"
+#include <arpa/inet.h>
 
 #include "net/af.h"
-#include "net/conn/udp.h"
-#include "net/ipv6/addr.h"
+#include "net/sock/udp.h"
+#include "net/uhcp.h"
 #include "xtimer.h"
-
-static void _timeout(void *arg) {
-    kernel_pid_t pid = *(kernel_pid_t*)arg;
-    msg_t msg;
-    msg_send_int(&msg, pid);
-    msg_send_int(&msg, pid);
-    msg_send_int(&msg, pid);
-}
 
 /**
  * @brief Request prefix from uhcp server
@@ -31,8 +23,12 @@ static void _timeout(void *arg) {
  */
 void uhcp_client(uhcp_iface_t iface)
 {
-    ipv6_addr_t target;
-    ipv6_addr_from_str(&target, "ff15::abcd");
+    sock_udp_t sock;
+    sock_udp_ep_t local = { .family=AF_INET6, .port=UHCP_PORT, .netif=iface };
+    sock_udp_ep_t req_target = { .family=AF_INET6, .port=UHCP_PORT, .netif=iface };
+    sock_udp_ep_t remote;
+
+    inet_pton(AF_INET6, "ff15::abcd", req_target.addr.ipv6);
 
     /* prepare UHCP header */
     uhcp_req_t req;
@@ -40,36 +36,20 @@ void uhcp_client(uhcp_iface_t iface)
     req.prefix_len = 64;
 
     /* create listening socket */
-    ipv6_addr_t zero = {{0}};
-    conn_udp_t conn;
-    int res = conn_udp_create(&conn, &zero, 16, AF_INET6, UHCP_PORT);
+    int res = sock_udp_create(&sock, &local, NULL, 0);
 
-    uint8_t srv_addr[16];
-    size_t srv_addr_len;
-    uint16_t srv_port;
     uint8_t buf[sizeof(uhcp_push_t) + 16];
 
-    kernel_pid_t pid = thread_getpid();
-    xtimer_t timeout;
-    timeout.callback = _timeout;
-    timeout.arg = &pid;
-
     while(1) {
-        xtimer_set(&timeout, 10U*SEC_IN_USEC);
         puts("uhcp_client(): sending REQ...");
-        conn_udp_sendto(&req, sizeof(uhcp_req_t), NULL, 0, &target, 16, AF_INET6 , 12345, 12345);
-        res = conn_udp_recvfrom(&conn, buf, sizeof(buf), srv_addr, &srv_addr_len, &srv_port);
+        sock_udp_send(&sock, &req, sizeof(uhcp_req_t), &req_target);
+        res = sock_udp_recv(&sock, buf, sizeof(buf), 10U*SEC_IN_USEC, &remote);
         if (res > 0) {
-            xtimer_remove(&timeout);
-            uhcp_handle_udp(buf, res, srv_addr, srv_port, iface);
+            uhcp_handle_udp(buf, res, remote.addr.ipv6, remote.port, iface);
             xtimer_sleep(60);
         }
         else {
-            msg_t msg;
-            msg_try_receive(&msg);
-            msg_try_receive(&msg);
-            msg_try_receive(&msg);
-            puts("uhcp_client(): timeout waiting for reply");
+            puts("uhcp_client(): no reply received");
         }
     }
 }
