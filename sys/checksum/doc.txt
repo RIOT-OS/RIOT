@@ -20,8 +20,9 @@
  * flavor of CRC16 (polynomial @$ x^{16} + x^{12} + x^{5} + 1 @$) for big-endian
  * numbers with starting seed `0x1d0f` (though others can be provided), while
  * @ref sys_checksum_ucrc16 is more generalized, since it takes the
- * hexadecimal representation as a parameter and provides functions and
- * standardized polynomials for both big- and little-endian numbers.
+ * hexadecimal representation of the polynomial as a parameter and provides
+ * functions and standardized polynomials for both big- and little-endian
+ * numbers.
  *
  * The caveat of @ref sys_checksum_ucrc16 is that it is significantly slower
  * (approximately factor 8) than @ref sys_checksum_crc16_ccitt since the latter

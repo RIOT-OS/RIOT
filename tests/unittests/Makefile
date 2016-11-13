@@ -1,7 +1,8 @@
 APPLICATION = unittests
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk chronos msb-430 msb-430h pca10000 \
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk chronos ek-lm4f120xl \
+                          msb-430 msb-430h pca10000 \
                           pca10005 spark-core stm32f0discovery stm32f3discovery \
                           telosb wsn430-v1_3b wsn430-v1_4 z1 nucleo-f103 \
                           nucleo-f334 yunjia-nrf51822 samr21-xpro \
@@ -9,7 +10,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk chronos msb-430 msb-430h pca
                           weio waspmote-pro nucleo-f072 arduino-uno \
                           arduino-duemilanove sodaq-autonomo arduino-zero \
                           nucleo-f030 nucleo-f070 nucleo-f091 pba-d-01-kw2x \
-                          saml21-xpro microbit calliope-mini limifrog-v1
+                          saml21-xpro microbit calliope-mini limifrog-v1 \
+                          slwstk6220a
 
 USEMODULE += embunit
 

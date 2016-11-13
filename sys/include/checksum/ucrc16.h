@@ -15,7 +15,7 @@
  * thus very lightweight (memory-wise), but as a caveat slower (about factor 8)
  * than the version with pre-calculated lookup tables.
  *
- * Additionally compared to @ref sys_checksum_crc_ccitt this is a generalized
+ * Additionally compared to @ref sys_checksum_crc16_ccitt this is a generalized
  * implementation. One can easily exchange generator polynomials and starting
  * seeds.
  *
@@ -42,7 +42,7 @@ extern "C" {
  */
 #define UCRC16_CCITT_POLY_BE    (0x1021)    /**< CRC16-CCITT polynomial (big-endian) */
 #define UCRC16_CCITT_POLY_LE    (0x8408)    /**< CRC16-CCITT polynomial (little-endian) */
-/** *} */
+/** @} */
 
 /**
  * @brief   Calculate CRC16 (big-endian version)
