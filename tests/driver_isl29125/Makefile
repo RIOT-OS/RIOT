@@ -1,4 +1,8 @@
 APPLICATION = driver_isl29125
+
+# If no BOARD is found in the environment, use this default:
+BOARD ?= samr21-xpro
+
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_i2c
