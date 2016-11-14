@@ -1,5 +1,6 @@
 /*
  * Copyright 2015 Ludwig Knüpfer
+ * Copyright 2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,8 @@
  * @brief       Test application for the ISL29125 RGB light sensor
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author      Martin Heusmann <martin.heusmann@haw-hamburg.de>
+ * @author      Cenk Gündoğan <mail-github@cgundogan.de>
  *
  * @}
  */
@@ -34,12 +37,22 @@
 
 #define SLEEP       (250 * 1000U)
 
+void cb(void *arg)
+{
+    (void) arg;
+    printf("INT: external interrupt\n");
+}
+
 int main(void)
 {
     isl29125_t dev;
     isl29125_rgb_t data;
     color_rgb_t data8bit;
     memset(&data, 0x00, sizeof(data));
+
+    /* Parameters for testing, change if needed. */
+    uint16_t lower_threshold = 0;
+    uint16_t higher_threshold = 8000;
 
     puts("ISL29125 light sensor test application\n");
     printf("Initializing ISL29125 sensor at I2C_%i... ", TEST_ISL29125_I2C);
@@ -49,6 +62,15 @@ int main(void)
         puts("[OK]\n");
     }
     else {
+        puts("[Failed]");
+        return 1;
+    }
+
+    puts("Initializing interrupt");
+
+    if (isl29125_init_int(&dev, ISL29125_INTERRUPT_STATUS_RED,
+                          ISL29125_INTERRUPT_PERSIST_1, ISL29125_INTERRUPT_CONV_DIS,
+                          lower_threshold, higher_threshold, cb, NULL) != 0) {
         puts("[Failed]");
         return 1;
     }
@@ -80,6 +102,7 @@ int main(void)
         printf("RGB value: (%5i / %5i / %5i) lux\n",
                 (int)data.red, (int)data.green, (int)data.blue);
         xtimer_usleep(SLEEP);
+        printf("IRQ-Status: %i \n", isl29125_read_irq_status(&dev));
     }
 
     return 0;
