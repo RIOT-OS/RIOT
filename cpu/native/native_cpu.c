@@ -189,11 +189,6 @@ void isr_thread_yield(void)
 {
     DEBUG("isr_thread_yield\n");
 
-    if (_native_sigpend > 0) {
-        DEBUG("isr_thread_yield(): handling signals\n\n");
-        native_irq_handler();
-    }
-
     sched_run();
     ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
     DEBUG("isr_thread_yield: switching to(%" PRIkernel_pid ")\n\n", sched_active_pid);
