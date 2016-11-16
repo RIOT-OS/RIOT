@@ -48,8 +48,8 @@
   * @{
   */
 
-#ifndef __STM32F217xx_H
-#define __STM32F217xx_H
+#ifndef STM32F217xx_H
+#define STM32F217xx_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -8052,7 +8052,7 @@ USB_OTG_HostChannelTypeDef;
 }
 #endif /* __cplusplus */
 
-#endif /* __STM32F217xx_H */
+#endif /* STM32F217xx_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 
