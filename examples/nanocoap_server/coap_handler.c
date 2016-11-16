@@ -17,6 +17,7 @@ static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len)
             COAP_FORMAT_TEXT, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
 }
 
+/* must be sorted by path (alphabetically) */
 const coap_resource_t coap_resources[] = {
     COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER,
     { "/riot/board", COAP_GET, _riot_board_handler },
