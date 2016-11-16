@@ -49,8 +49,8 @@
   * @{
   */
 
-#ifndef __STM32F446xx_H
-#define __STM32F446xx_H
+#ifndef STM32F446xx_H
+#define STM32F446xx_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -8262,7 +8262,7 @@ typedef struct
 }
 #endif /* __cplusplus */
 
-#endif /* __STM32F446xx_H */
+#endif /* STM32F446xx_H */
 
 
 
