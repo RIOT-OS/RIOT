@@ -180,6 +180,13 @@ static int init(netdev2_t *netdev)
     wreg(dev, S0_MR, MR_MACRAW);
     wreg(dev, S0_CR, CR_OPEN);
 
+    /* set the source IP address to something random to prevent the device to do
+     * stupid thing (e.g. answering ICMP echo requests on its own) */
+    wreg(dev, REG_SIPR0, 0x01);
+    wreg(dev, REG_SIPR1, 0x01);
+    wreg(dev, REG_SIPR2, 0x01);
+    wreg(dev, REG_SIPR3, 0x01);
+
     /* start receiving packets */
     wreg(dev, S0_CR, CR_RECV);
 
