@@ -201,7 +201,7 @@ static uint16_t tx_upload(w5100_t *dev, uint16_t start, void *data, size_t len)
     }
 }
 
-static int send(netdev2_t *netdev, const struct iovec *vector, int count)
+static int send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
 {
     w5100_t *dev = (w5100_t *)netdev;
     int sum = 0;
@@ -231,9 +231,10 @@ static int send(netdev2_t *netdev, const struct iovec *vector, int count)
     return sum;
 }
 
-static int recv(netdev2_t *netdev, char *buf, int len, void *info)
+static int recv(netdev2_t *netdev, void *buf, size_t len, void *info)
 {
     w5100_t *dev = (w5100_t *)netdev;
+    uint8_t *in_buf = (uint8_t *)buf;
     int n = 0;
 
     uint16_t num = raddr(dev, S0_RX_RSR0, S0_RX_RSR1);
@@ -248,11 +249,11 @@ static int recv(netdev2_t *netdev, char *buf, int len, void *info)
         DEBUG("[w5100] recv: got packet of %i byte (at 0x%04x)\n", n, (int)rp);
 
         /* read the actual data into the given buffer if wanted */
-        if (buf != NULL) {
+        if (in_buf != NULL) {
             uint16_t pos = rp + 2;
             len = (n <= len) ? n : len;
             for (int i = 0; i < (int)len; i++) {
-                buf[i] = rreg(dev, (S0_RX_BASE + ((pos++) & S0_MASK)));
+                in_buf[i] = rreg(dev, (S0_RX_BASE + ((pos++) & S0_MASK)));
             }
 
             DEBUG("[w5100] recv: read %i byte from device (at 0x%04x)\n",
