@@ -29,9 +29,7 @@
 #include <unistd.h>
 
 #ifdef __MACH__
-#define _POSIX_C_SOURCE
 #include <net/if.h>
-#undef _POSIX_C_SOURCE
 #include <sys/types.h>
 #include <ifaddrs.h>
 #include <net/if_dl.h>
