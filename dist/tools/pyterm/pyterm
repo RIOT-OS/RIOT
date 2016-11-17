@@ -148,7 +148,7 @@ class SerCmd(cmd.Cmd):
             os.makedirs(directory)
         logging.basicConfig(filename=directory + os.path.sep + self.run_name +
                             '.log', level=logging.DEBUG, format=self.fmt_str)
-        ch = logging.StreamHandler()
+        ch = logging.StreamHandler(sys.stdout)
         ch.setLevel(logging.DEBUG)
 
         # create logger
