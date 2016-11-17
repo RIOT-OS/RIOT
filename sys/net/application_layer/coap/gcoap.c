@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     net_gnrc_coap
+ * @ingroup     net_gcoap
  * @{
  *
  * @file
@@ -19,7 +19,7 @@
  */
 
 #include <errno.h>
-#include "net/gnrc/coap.h"
+#include "net/gcoap.h"
 #include "random.h"
 #include "thread.h"
 
@@ -31,14 +31,11 @@
 
 /* Internal functions */
 static void *_event_loop(void *arg);
-static int _register_port(gnrc_netreg_entry_t *netreg_port, uint16_t port);
-static void _receive(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, uint16_t port);
-static size_t _send(gnrc_pktsnip_t *coap_snip, ipv6_addr_t *addr, uint16_t port);
+static void _listen(sock_udp_t *sock);
 static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
 static ssize_t _write_options(coap_pkt_t *pdu, uint8_t *buf, size_t len);
 static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len);
 static ssize_t _finish_pdu(coap_pkt_t *pdu, uint8_t *buf, size_t len);
-static size_t _send_buf( uint8_t *buf, size_t len, ipv6_addr_t *src, uint16_t port);
 static void _expire_request(gcoap_request_memo_t *memo);
 static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *pdu,
                                                             uint8_t *buf, size_t len);
@@ -55,97 +52,91 @@ static gcoap_listener_t _default_listener = {
 };
 
 static gcoap_state_t _coap_state = {
-    .netreg_port = GNRC_NETREG_ENTRY_INIT_PID(0, KERNEL_PID_UNDEF),
     .listeners   = &_default_listener,
 };
 
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static char _msg_stack[GCOAP_STACK_SIZE];
+static sock_udp_t _sock;
 
 
 /* Event/Message loop for gcoap _pid thread. */
 static void *_event_loop(void *arg)
 {
     msg_t msg_rcvd, msg_queue[GCOAP_MSG_QUEUE_SIZE];
-    gnrc_pktsnip_t *pkt, *udp_snip, *ipv6_snip;
-    ipv6_addr_t *src_addr;
-    uint16_t port;
-
     (void)arg;
+
     msg_init_queue(msg_queue, GCOAP_MSG_QUEUE_SIZE);
 
-    while (1) {
-        msg_receive(&msg_rcvd);
+    sock_udp_ep_t local;
+    memset(&local, 0, sizeof(sock_udp_ep_t));
+    local.family = AF_INET6;
+    local.netif  = SOCK_ADDR_ANY_NETIF;
+    local.port   = GCOAP_PORT;
 
-        switch (msg_rcvd.type) {
-            case GNRC_NETAPI_MSG_TYPE_RCV:
-                /* find client from UDP destination port */
-                DEBUG("coap: GNRC_NETAPI_MSG_TYPE_RCV\n");
-                pkt = (gnrc_pktsnip_t *)msg_rcvd.content.ptr;
-                if (pkt->type != GNRC_NETTYPE_UNDEF) {
-                    gnrc_pktbuf_release(pkt);
-                    break;
-                }
-                udp_snip = pkt->next;
-                if (udp_snip->type != GNRC_NETTYPE_UDP) {
-                    gnrc_pktbuf_release(pkt);
-                    break;
-                }
-
-                /* read source port and address */
-                port = byteorder_ntohs(((udp_hdr_t *)udp_snip->data)->src_port);
-
-                LL_SEARCH_SCALAR(udp_snip, ipv6_snip, type, GNRC_NETTYPE_IPV6);
-                assert(ipv6_snip != NULL);
-                src_addr = &((ipv6_hdr_t *)ipv6_snip->data)->src;
-
-                _receive(pkt, src_addr, port);
-                break;
-
-            case GCOAP_NETAPI_MSG_TYPE_TIMEOUT:
-                _expire_request((gcoap_request_memo_t *)msg_rcvd.content.ptr);
-                break;
-
-            default:
-                break;
-        }
+    int res = sock_udp_create(&_sock, &local, NULL, 0);
+    if (res < 0) {
+        DEBUG("gcoap: cannot create sock: %d\n", res);
+        return 0;
     }
+
+    while(1) {
+        res = msg_try_receive(&msg_rcvd);
+
+        if (res > 0) {
+            switch (msg_rcvd.type) {
+                case GCOAP_MSG_TYPE_TIMEOUT:
+                    _expire_request((gcoap_request_memo_t *)msg_rcvd.content.ptr);
+                    break;
+                case GCOAP_MSG_TYPE_INTR:
+                    /* next _listen() timeout will account for open requests */
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        _listen(&_sock);
+    }
+
     return 0;
 }
 
-/* Handles incoming network IPC message. */
-static void _receive(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, uint16_t port)
+/* Listen for an incoming CoAP message. */
+static void _listen(sock_udp_t *sock)
 {
     coap_pkt_t pdu;
     uint8_t buf[GCOAP_PDU_BUF_SIZE];
-    size_t pdu_len = 0;
+    sock_udp_ep_t remote;
     gcoap_request_memo_t *memo = NULL;
+    uint8_t open_reqs;
 
-    /* If too big, handle below based on request vs. response */
-    size_t pkt_size = (pkt->size > sizeof(buf))
-                            ? sizeof(buf) : pkt->size;
+    gcoap_op_state(&open_reqs);
 
-    /* Copy request into temporary buffer, and parse it as CoAP. */
-    memcpy(buf, pkt->data, pkt_size);
+    ssize_t res = sock_udp_recv(sock, buf, sizeof(buf),
+                                open_reqs > 0 ? GCOAP_RECV_TIMEOUT : SOCK_NO_TIMEOUT,
+                                &remote);
+    if (res <= 0) {
+#if ENABLE_DEBUG
+        if (res < 0 && res != -ETIMEDOUT) {
+            DEBUG("gcoap: udp recv failure: %d\n", res);
+        }
+#endif
+        return;
+    }
 
-    int result = coap_parse(&pdu, buf, pkt_size);
-    if (result < 0) {
-        DEBUG("gcoap: parse failure: %d\n", result);
+    res = coap_parse(&pdu, buf, res);
+    if (res < 0) {
+        DEBUG("gcoap: parse failure: %d\n", res);
         /* If a response, can't clear memo, but it will timeout later. */
-        goto exit;
+        return;
     }
 
     /* incoming request */
     if (coap_get_code_class(&pdu) == COAP_CLASS_REQ) {
-        if (pkt->size > sizeof(buf)) {
-            DEBUG("gcoap: request too big: %u\n", pkt->size);
-            pdu_len = gcoap_response(&pdu, buf, sizeof(buf),
-                                           COAP_CODE_REQUEST_ENTITY_TOO_LARGE);
-        } else {
-            pdu_len = _handle_req(&pdu, buf, sizeof(buf));
-        }
+        size_t pdu_len = _handle_req(&pdu, buf, sizeof(buf));
         if (pdu_len > 0) {
-            _send_buf(buf, pdu_len, src, port);
+            sock_udp_send(sock, buf, pdu_len, &remote);
         }
     }
     /* incoming response */
@@ -153,17 +144,10 @@ static void _receive(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, uint16_t port)
         _find_req_memo(&memo, &pdu, buf, sizeof(buf));
         if (memo) {
             xtimer_remove(&memo->response_timer);
-            if (pkt->size > sizeof(buf)) {
-                memo->state = GCOAP_MEMO_ERR;
-                DEBUG("gcoap: response too big: %u\n", pkt->size);
-            }
             memo->resp_handler(memo->state, &pdu);
             memo->state = GCOAP_MEMO_UNUSED;
         }
     }
-
-exit:
-    gnrc_pktbuf_release(pkt);
 }
 
 /*
@@ -296,77 +280,6 @@ static void _expire_request(gcoap_request_memo_t *memo)
     }
 }
 
-/* Registers receive/send port with GNRC registry. */
-static int _register_port(gnrc_netreg_entry_t *netreg_port, uint16_t port)
-{
-    if (!gnrc_netreg_lookup(GNRC_NETTYPE_UDP, port)) {
-        gnrc_netreg_entry_init_pid(netreg_port, port, _pid);
-        gnrc_netreg_register(GNRC_NETTYPE_UDP, netreg_port);
-        DEBUG("coap: registered UDP port %" PRIu32 "\n",
-               netreg_port->demux_ctx);
-        return 0;
-    }
-    else {
-        return -EINVAL;
-    }
-}
-
-/*
- * Sends a CoAP message to the provided host/port.
- *
- * @return Length of the packet
- * @return 0 if cannot send
- */
-static size_t _send(gnrc_pktsnip_t *coap_snip, ipv6_addr_t *addr, uint16_t port)
-{
-    gnrc_pktsnip_t *udp, *ip;
-    size_t pktlen;
-
-    /* allocate UDP header */
-    udp = gnrc_udp_hdr_build(coap_snip, (uint16_t)_coap_state.netreg_port.demux_ctx,
-                                                                               port);
-    if (udp == NULL) {
-        DEBUG("gcoap: unable to allocate UDP header\n");
-        gnrc_pktbuf_release(coap_snip);
-        return 0;
-    }
-    /* allocate IPv6 header */
-    ip = gnrc_ipv6_hdr_build(udp, NULL, addr);
-    if (ip == NULL) {
-        DEBUG("gcoap: unable to allocate IPv6 header\n");
-        gnrc_pktbuf_release(udp);
-        return 0;
-    }
-    pktlen = gnrc_pkt_len(ip);          /* count length now; snips deallocated after send */
-
-    /* send message */
-    if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, ip)) {
-        DEBUG("gcoap: unable to locate UDP thread\n");
-        gnrc_pktbuf_release(ip);
-        return 0;
-    }
-    return pktlen;
-}
-
-/*
- * Copies the request/response buffer to a pktsnip and sends it.
- *
- * @return Length of the packet
- * @return 0 if cannot send
- */
-static size_t _send_buf(uint8_t *buf, size_t len, ipv6_addr_t *src, uint16_t port)
-{
-    gnrc_pktsnip_t *snip;
-
-    snip = gnrc_pktbuf_add(NULL, NULL, len, GNRC_NETTYPE_UNDEF);
-    if (!snip) {
-        return 0;
-    }
-    memcpy(snip->data, buf, len);
-
-    return _send(snip, src, port);
-}
-
 /*
  * Handler for /.well-known/core. Lists registered handlers, except for
  * /.well-known/core itself.
@@ -456,10 +369,6 @@ kernel_pid_t gcoap_init(void)
     _pid = thread_create(_msg_stack, sizeof(_msg_stack), THREAD_PRIORITY_MAIN - 1,
                             THREAD_CREATE_STACKTEST, _event_loop, NULL, "coap");
 
-    /* must establish pid first */
-    if (_register_port(&_coap_state.netreg_port, GCOAP_PORT) < 0) {
-        return -EINVAL;
-    }
     /* Blank list of open requests so we know if an entry is available. */
     memset(&_coap_state.open_reqs[0], 0, sizeof(_coap_state.open_reqs));
     /* randomize initial value */
@@ -530,7 +439,22 @@ ssize_t gcoap_finish(coap_pkt_t *pdu, size_t payload_len, unsigned format)
 size_t gcoap_req_send(uint8_t *buf, size_t len, ipv6_addr_t *addr, uint16_t port,
                                                  gcoap_resp_handler_t resp_handler)
 {
+    sock_udp_ep_t remote;
+
+    remote.family = AF_INET6;
+    remote.netif  = SOCK_ADDR_ANY_NETIF;
+    remote.port   = port;
+
+    memcpy(&remote.addr.ipv6[0], &addr->u8[0], sizeof(addr->u8));
+
+    return gcoap_req_send2(buf, len, &remote, resp_handler);
+}
+
+size_t gcoap_req_send2(uint8_t *buf, size_t len, sock_udp_ep_t *remote,
+                                                 gcoap_resp_handler_t resp_handler)
+{
     gcoap_request_memo_t *memo = NULL;
+    assert(remote != NULL);
     assert(resp_handler != NULL);
 
     /* Find empty slot in list of open requests. */
@@ -545,16 +469,28 @@ size_t gcoap_req_send(uint8_t *buf, size_t len, ipv6_addr_t *addr, uint16_t port
         memcpy(&memo->hdr_buf[0], buf, GCOAP_HEADER_MAXLEN);
         memo->resp_handler = resp_handler;
 
-        size_t res = _send_buf(buf, len, addr, port);
+        size_t res = sock_udp_send(&_sock, buf, len, remote);
+
         if (res && (GCOAP_NON_TIMEOUT > 0)) {
-            /* start response wait timer */
-            memo->timeout_msg.type        = GCOAP_NETAPI_MSG_TYPE_TIMEOUT;
-            memo->timeout_msg.content.ptr = (char *)memo;
-            xtimer_set_msg(&memo->response_timer, GCOAP_NON_TIMEOUT,
-                                                  &memo->timeout_msg, _pid);
+            /* interrupt sock listening (to set a listen timeout) */
+            msg_t mbox_msg;
+            mbox_msg.type          = GCOAP_MSG_TYPE_INTR;
+            mbox_msg.content.value = 0;
+            if (mbox_try_put(&_sock.reg.mbox, &mbox_msg)) {
+                /* start response wait timer */
+                memo->timeout_msg.type        = GCOAP_MSG_TYPE_TIMEOUT;
+                memo->timeout_msg.content.ptr = (char *)memo;
+                xtimer_set_msg(&memo->response_timer, GCOAP_NON_TIMEOUT,
+                                                      &memo->timeout_msg, _pid);
+            }
+            else {
+                memo->state = GCOAP_MEMO_UNUSED;
+                DEBUG("gcoap: can't wake up mbox; no timeout for msg\n");
+            }
         }
         else if (!res) {
             memo->state = GCOAP_MEMO_UNUSED;
+            DEBUG("gcoap: sock send failed: %d\n", res);
         }
         return res;
     } else {

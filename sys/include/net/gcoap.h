@@ -9,14 +9,21 @@
 /**
  * @defgroup    net_gcoap  CoAP
  * @ingroup     net
- * @brief       sock-based implementation of CoAP protocol, RFC 7252
+ * @brief       High-level interface to CoAP messaging
  *
- * ## Architecture ##
- * Requests and responses are exchanged via an asynchronous RIOT message
- * processing thread. Depends on nanocoap for base level structs and
- * functionality.
+ * gcoap provides a high-level interface for writing CoAP messages via RIOT's
+ * sock networking API. gcoap internalizes network event processing so an
+ * application only needs to focus on request/response handling. For a server,
+ * gcoap accepts a list of resource paths with callbacks for writing the
+ * response. For a client, gcoap provides a function to send a request, with a
+ * callback for reading the server response. Generation of the request or
+ * response requires from one to three well-defined steps, depending on
+ * inclusion of a payload.
  *
- * Uses a single UDP port for communication to support RFC 6282 compression.
+ * gcoap allocates a RIOT message processing thread, so a single instance can
+ * serve multiple applications. This approach also means gcoap uses a single UDP
+ * port, which supports RFC 6282 compression. Internally, gcoap depends on the
+ * nanocoap package for base level structs and functionality.
  *
  * ## Server Operation ##
  *
@@ -61,11 +68,10 @@
  *
  * ## Client Operation ##
  *
- * gcoap uses RIOT's asynchronous messaging facility to send and receive
- * messages. So, client operation includes two phases:  creating and sending a
- * request, and handling the response aynchronously in a client supplied
- * callback.  See `examples/gcoap/gcoap_cli.c` for a simple example of sending
- * a request and reading the response.
+ * Client operation includes two phases:  creating and sending a request, and
+ * handling the response aynchronously in a client supplied callback.  See
+ * `examples/gcoap/gcoap_cli.c` for a simple example of sending a request and
+ * reading the response.
  *
  * ### Creating a request ###
  *
@@ -85,8 +91,8 @@
  * as described above. The gcoap_request() function is inline, and uses those
  * two functions.
  *
- * Finally, call gcoap_req_send() with the destination host and port, as well
- * as a callback function for the host's response.
+ * Finally, call gcoap_req_send2() for the destination endpoint, as well as a
+ * callback function for the host's response.
  *
  * ### Handling the response ###
  *
@@ -114,13 +120,13 @@
  * header and the payload. So, gcoap provides space in the buffer for them in
  * the request/response ...init() function, and then writes them during
  * gcoap_finish(). We trade some inefficiency/work in the buffer for
- * simplicity for the user.
+ * simplicity in the API.
  *
  * ### Waiting for a response ###
  *
- * We take advantage of RIOT's GNRC stack by using an xtimer to wait for a
- * response, so the gcoap thread does not block while waiting. The user is
- * notified via the same callback whether the message is received or the wait
+ * We take advantage of RIOT's asynchronous messaging by using an xtimer to wait
+ * for a response, so the gcoap thread does not block while waiting. The user is
+ * notified via the same callback, whether the message is received or the wait
  * times out. We track the response with an entry in the
  * `_coap_state.open_reqs` array.
  *
@@ -135,9 +141,7 @@
 #ifndef GCOAP_H
 #define GCOAP_H
 
-#include "net/gnrc.h"
-#include "net/gnrc/ipv6.h"
-#include "net/gnrc/udp.h"
+#include "net/sock/udp.h"
 #include "nanocoap.h"
 #include "xtimer.h"
 
@@ -199,15 +203,27 @@ extern "C" {
 #define GCOAP_MEMO_ERR      (4)  /**< Error processing response packet */
 /** @} */
 
+/** @brief Time in usec that the event loop waits for an incoming CoAP message */
+#define GCOAP_RECV_TIMEOUT   (1 * US_PER_SEC)
+
 /**
+ *
  * @brief Default time to wait for a non-confirmable response, in usec
  *
  * Set to 0 to disable timeout.
  */
 #define GCOAP_NON_TIMEOUT    (5000000U)
 
-/** @brief Identifies a gcoap-specific timeout IPC message */
-#define GCOAP_NETAPI_MSG_TYPE_TIMEOUT    (0x1501)
+/** @brief Identifies waiting timed out for a response to a sent message. */
+#define GCOAP_MSG_TYPE_TIMEOUT    (0x1501)
+
+/**
+ * @brief Identifies a request to interrupt listening for an incoming message
+ *        on a sock.
+ *
+ * Allows the event loop to process IPC messages.
+ */
+#define GCOAP_MSG_TYPE_INTR    (0x1502)
 
 /**
  * @brief  A modular collection of resources for a server
@@ -243,7 +259,6 @@ typedef struct {
  * @brief  Container for the state of gcoap itself
  */
 typedef struct {
-    gnrc_netreg_entry_t netreg_port;   /**< Registration for IP port */
     gcoap_listener_t *listeners;       /**< List of registered listeners */
     gcoap_request_memo_t open_reqs[GCOAP_REQ_WAITING_MAX];
                                        /**< Storage for open requests; if first
@@ -323,7 +338,23 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 }
 
 /**
+ * @brief  Sends a buffer containing a CoAP request to the provided endpoint.
+ *
+ * @param[in] buf Buffer containing the PDU
+ * @param[in] len Length of the buffer
+ * @param[in] remote Destination for the packet
+ * @param[in] resp_handler Callback when response received
+ *
+ * @return length of the packet
+ * @return 0 if cannot send
+ */
+size_t gcoap_req_send2(uint8_t *buf, size_t len, sock_udp_ep_t *remote,
+                                                 gcoap_resp_handler_t resp_handler);
+
+/**
  * @brief  Sends a buffer containing a CoAP request to the provided host/port.
+ *
+ * @deprecated  Please use @ref gcoap_req_send2() instead
  *
  * @param[in] buf Buffer containing the PDU
  * @param[in] len Length of the buffer
