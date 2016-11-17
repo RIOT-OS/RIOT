@@ -1,4 +1,4 @@
-# Default Makefile, for host native networking
+# Default Makefile, for host native GNRC-based networking
 
 # name of your application
 APPLICATION = gcoap
@@ -29,8 +29,6 @@ BOARD_BLACKLIST := nrf52dk
 USEPKG += nanocoap
 # Required by nanocoap, but only due to issue #5959.
 USEMODULE += posix
-# Required by nanocoap to compile nanocoap_sock.
-USEMODULE += gnrc_sock_udp
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
@@ -38,6 +36,7 @@ USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules
 USEMODULE += gnrc_ipv6_default
+USEMODULE += gnrc_sock_udp
 USEMODULE += gcoap
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo

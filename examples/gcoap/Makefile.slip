@@ -1,4 +1,4 @@
-# Border router Makefile for SLIP based networking
+# Border router Makefile for GNRC and SLIP based networking
 # Assumes use of SAMR21 board
 
 # name of your application
@@ -45,14 +45,13 @@ CFLAGS += -DSLIP_BAUDRATE=$(SLIP_BAUDRATE)
 USEPKG += nanocoap
 # Required by nanocoap, but only due to issue #5959.
 USEMODULE += posix
-# Required by nanocoap to compile nanocoap_sock.
-USEMODULE += gnrc_sock_udp
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules
+USEMODULE += gnrc_sock_udp
 USEMODULE += gcoap
 # Add a routing protocol
 USEMODULE += gnrc_rpl

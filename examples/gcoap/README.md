@@ -1,6 +1,6 @@
 # gcoap Example
 
-This application provides command line access to gcoap, a GNRC implementation of CoAP. See the [CoAP spec][1] for background, and the Modules>Networking>GNRC>CoAP topic in the source documentation for the structure of the implementation.
+This application provides command line access to gcoap, a high-level API for CoAP messaging. See the [CoAP spec][1] for background, and the Modules>Networking>CoAP topic in the source documentation for detailed usage instructions and implementation notes.
 
 We support two setup options for this example:
 
