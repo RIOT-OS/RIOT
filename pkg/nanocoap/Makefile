@@ -1,6 +1,6 @@
 PKG_NAME=nanocoap
 PKG_URL=https://github.com/kaspar030/sock
-PKG_VERSION=5649e325a3a9047b48ffbbcc283f7a4558978737
+PKG_VERSION=cf2aff1b4322cee06bb5b24d0215bb764372fba7
 
 .PHONY: all
 
