@@ -26,6 +26,9 @@
 #ifndef TEST_MMA8652_ADDR
 #error "TEST_MMA8652_ADDR not defined"
 #endif
+#ifndef TEST_MMA8x5x_TYPE
+#error "TEST_MMA8x5x_TYPE not defined"
+#endif
 
 #include <stdio.h>
 
@@ -45,7 +48,8 @@ int main(void)
 
     if (mma8652_init(&dev, TEST_MMA8652_I2C, TEST_MMA8652_ADDR,
                      MMA8652_DATARATE_DEFAULT,
-                     MMA8652_FS_RANGE_DEFAULT) == 0) {
+                     MMA8652_FS_RANGE_DEFAULT,
+                     TEST_MMA8x5x_TYPE) == 0) {
         puts("[OK]\n");
     }
     else {

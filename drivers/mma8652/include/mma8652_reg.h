@@ -26,6 +26,8 @@ extern "C"
 {
 #endif
 
+#include "mma8652.h"
+
 #define MMA8652_STATUS              0x00 /**< Data or FIFO Status */
 #define MMA8652_OUT_X_MSB           0x01 /**< [7:0] are 8 MSBs of X data */
 #define MMA8652_OUT_X_LSB           0x02 /**< [7:4] are 4 LSBs of X data */
@@ -246,7 +248,14 @@ extern "C"
 /**
  * @brief Device ID
  */
-#define MMA8652_ID          0x4A
+static const uint8_t mma8x5x_device_id[MMA8x5x_TYPE_MAX] =
+{
+    0x4A, /* MMA8652_ID */
+    0x5A, /* MMA8653_ID */
+    0x1A, /* MMA8451_ID */
+    0x2A, /* MMA8452_ID */
+    0x3A, /* MMA8453_ID */
+};
 
 #ifdef __cplusplus
 }

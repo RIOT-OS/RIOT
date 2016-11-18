@@ -44,14 +44,14 @@ int mma8652_test(mma8652_t *dev)
     }
     i2c_release(dev->i2c);
 
-    if (reg != MMA8652_ID) {
+    if (reg != mma8x5x_device_id[dev->type]) {
         return -1;
     }
 
     return 0;
 }
 
-int mma8652_init(mma8652_t *dev, i2c_t i2c, uint8_t address, uint8_t dr, uint8_t range)
+int mma8652_init(mma8652_t *dev, i2c_t i2c, uint8_t address, uint8_t dr, uint8_t range, uint8_t type)
 {
     uint8_t reg;
 
@@ -60,9 +60,11 @@ int mma8652_init(mma8652_t *dev, i2c_t i2c, uint8_t address, uint8_t dr, uint8_t
     dev->addr = address;
     dev->initialized = false;
 
-    if (dr > MMA8652_DATARATE_1HZ56 || range > MMA8652_FS_RANGE_8G) {
+    if (dr > MMA8652_DATARATE_1HZ56 || range > MMA8652_FS_RANGE_8G || type >= MMA8x5x_TYPE_MAX) {
         return -1;
     }
+
+    dev->type = type;
 
     i2c_acquire(dev->i2c);
     /* initialize the I2C bus */
