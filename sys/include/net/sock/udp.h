@@ -25,7 +25,6 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * #include <stdio.h>
  *
- * #include "net/af.h"
  * #include "net/sock/udp.h"
  *
  * uint8_t buf[128];

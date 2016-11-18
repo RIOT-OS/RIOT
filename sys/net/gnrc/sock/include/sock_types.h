@@ -24,7 +24,9 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "mbox.h"
+#include "net/af.h"
 #include "net/gnrc.h"
 #include "net/gnrc/netreg.h"
 #include "net/sock/ip.h"
