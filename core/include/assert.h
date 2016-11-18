@@ -46,6 +46,10 @@ extern "C" {
 #define DEBUG_ASSERT_VERBOSE
 #endif
 
+#ifndef RIOT_FILE_RELATIVE
+#define RIOT_FILE_RELATIVE  (__FILE__)
+#endif
+
 /**
  * @brief   the string that is passed to panic in case of a failing assertion
  */

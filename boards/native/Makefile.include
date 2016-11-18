@@ -124,6 +124,8 @@ all-asan: export LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g
 
 export INCLUDES += $(NATIVEINCLUDES)
 
+export CFLAGS += -DDEBUG_ASSERT_VERBOSE
+
 # workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52624
 ifneq ($(shell gcc --version | head -1 | grep -E ' (4.6|4.7)'),)
 	export CFLAGS += -DHAVE_NO_BUILTIN_BSWAP16
