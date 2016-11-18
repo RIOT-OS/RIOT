@@ -22,7 +22,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "net/af.h"
 #include "net/sock/udp.h"
 #include "xtimer.h"
 

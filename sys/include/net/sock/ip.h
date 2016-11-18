@@ -25,7 +25,6 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * #include <stdio.h>
  *
- * #include "net/af.h"
  * #include "net/protnum.h"
  * #include "net/sock/ip.h"
  *

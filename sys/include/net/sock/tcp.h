@@ -23,7 +23,6 @@
  * ### A Simple TCP Echo Server
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
- * #include "net/af.h"
  * #include "net/sock/tcp.h"
  *
  * #define SOCK_QUEUE_LEN  (1U)
