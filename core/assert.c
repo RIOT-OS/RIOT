@@ -13,6 +13,8 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <stdio.h>
+
 #include "assert.h"
 
 #ifdef DEBUG_ASSERT_VERBOSE
