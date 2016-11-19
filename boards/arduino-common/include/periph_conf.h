@@ -83,6 +83,21 @@ extern "C" {
 #define MEGA_PRR            PRR         /* Power Reduction Register is PRR */
 /** @} */
 
+/**
+ * @brief ADC configuration
+ *
+ * @{
+ */
+#define ADC_NUMOF       (6)
+    /* ADC Channels */
+#define ADC_CHAN_0           0 // Maybe ADC_PIN_x is better ?
+#define ADC_CHAN_1           1
+#define ADC_CHAN_2           2
+#define ADC_CHAN_3           3
+#define ADC_CHAN_4           4
+#define ADC_CHAN_5           5
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
