@@ -7,13 +7,14 @@
  */
 
 /**
- * @ingroup     driver_mma8652
+ * @ingroup     driver_mma8x5x
  * @{
  *
  * @file
- * @brief       MMA8652 adaption to the RIOT actuator/sensor interface
+ * @brief       MMA8x5x adaption to the RIOT actuator/sensor interface
  *
  * @author      Cenk Gündoğan <mail@cgundogan.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -22,34 +23,20 @@
 #include <stdio.h>
 
 #include "saul.h"
-#include "mma8652.h"
+#include "mma8x5x.h"
 
 static int read_acc(void *dev, phydat_t *res)
 {
-    int16_t x, y, z;
-    uint8_t status;
+    mma8x5x_read((mma8x5x_t *)dev, (mma8x5x_data_t *)res);
 
-    mma8652_t *d = (mma8652_t *)dev;
-    mma8652_read(d, &x, &y, &z, &status);
-
-    res->val[0] = x;
-    res->val[1] = y;
-    res->val[2] = z;
     res->unit = UNIT_G;
     res->scale = -3;
 
     return 3;
 }
 
-static int write(void *dev, phydat_t *state)
-{
-    (void) dev;
-    (void) state;
-    return -ENOTSUP;
-}
-
-const saul_driver_t mma8652_saul_driver = {
+const saul_driver_t mma8x5x_saul_driver = {
     .read = read_acc,
-    .write = write,
+    .write = saul_notsup,
     .type = SAUL_SENSE_ACCEL,
 };
