@@ -26,11 +26,18 @@
 #include "thread.h"
 #include "irq.h"
 #include "div.h"
+#include "list.h"
 
 #include "timex.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+typedef struct {
+    mutex_t *mutex;
+    thread_t *thread;
+    int timeout;
+} mutex_thread_t;
 
 static void _callback_unlock_mutex(void* arg)
 {
@@ -219,4 +226,30 @@ int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout_ticks)
     _setup_timer_msg(&tmsg, &t);
     _xtimer_set_msg(&t, timeout_ticks, &tmsg, sched_active_pid);
     return _msg_wait(msg, &tmsg, &t);
+}
+
+static void _mutex_timeout(void *arg)
+{
+    mutex_thread_t *mt = (mutex_thread_t *)arg;
+
+    mt->timeout = 1;
+    sched_set_status(mt->thread, STATUS_PENDING);
+    list_remove(&mt->mutex->queue, (list_node_t *)&mt->thread->rq_entry);
+    thread_yield_higher();
+}
+
+int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
+{
+    xtimer_t t;
+    mutex_thread_t mt = { mutex, (thread_t *)sched_active_thread, 0 };
+
+    if (timeout != 0) {
+        t.callback = _mutex_timeout;
+        t.arg = (void *)((mutex_thread_t *)&mt);
+        _xtimer_set64(&t, timeout, timeout >> 32);
+    }
+
+    mutex_lock(mutex);
+    xtimer_remove(&t);
+    return -mt.timeout;
 }
