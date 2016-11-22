@@ -282,9 +282,9 @@ void auto_init(void)
     extern void auto_init_lis3dh(void);
     auto_init_lis3dh();
 #endif
-#ifdef MODULE_MMA8652
-    extern void auto_init_mma8652(void);
-    auto_init_mma8652();
+#ifdef MODULE_MMA8X5X
+    extern void auto_init_mma8x5x(void);
+    auto_init_mma8x5x();
 #endif
 #ifdef MODULE_SI70XX
     extern void auto_init_si70xx(void);
