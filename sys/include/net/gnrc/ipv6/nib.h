@@ -51,9 +51,32 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Maximum link-layer length (aligned)
+ */
+#if (GNRC_NETIF_HDR_L2ADDR_MAX_LEN % 8)
+#define GNRC_IPV6_NIB_L2ADDR_MAX_LEN        (((GNRC_NETIF_HDR_L2ADDR_MAX_LEN >> 3) + 1) << 3)
+#else
+#define GNRC_IPV6_NIB_L2ADDR_MAX_LEN        (GNRC_NETIF_HDR_L2ADDR_MAX_LEN)
+#endif
+
+/**
  * @{
  * @brief   Compile flags to (de-)activate certain features for NIB
  */
+#ifndef GNRC_IPV6_NIB_ONLY_DEFAULT_ROUTE
+#define GNRC_IPV6_NIB_ONLY_DEFAULT_ROUTE    (0) /**< only allow for default route (::) as
+                                                 *   destination */
+#endif
+
+#ifndef GNRC_IPV6_NIB_ALWAYS_REV_TRANS
+/**
+ * @brief   Always reverse translate link-local address
+ *
+ * @see [RFC 6775, section 5.6](https://tools.ietf.org/html/rfc6775#section-5.6)
+ */
+#define GNRC_IPV6_NIB_ALWAYS_REV_TRANS      (1)
+#endif
+
 #ifndef GNRC_IPV6_NIB_DO_HANDLE_NBR_SOL
 #define GNRC_IPV6_NIB_DO_HANDLE_NBR_SOL     (1) /**< handling of Neighbor Solicitations */
 #endif
@@ -122,66 +145,136 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   States for neighbor unreachability detection
+ * @{
+ * @name Additional information
+ * @anchor  gnrc_ipv6_nib_info
+ * @brief   Additional information for @ref gnrc_ipv6_nib_t
+ */
+/**
+ * @brief   Mask for neighbor unreachability detection (NUD) states
  *
  * @see [RFC 4861, section 7.3.2](https://tools.ietf.org/html/rfc4861#section-7.3.2)
  * @see [RFC 7048](https://tools.ietf.org/html/rfc7048)
  */
-typedef enum {
-    GNRC_IPV6_NIB_NUD_STATE_UNMANAGED = 0,  /**< not managed by NUD */
-    GNRC_IPV6_NIB_NUD_STATE_UNREACHABLE,    /**< entry is not reachable */
-    GNRC_IPV6_NIB_NUD_STATE_INCOMPLETE,     /**< address resolution is currently performed */
-    GNRC_IPV6_NIB_NUD_STATE_STALE,          /**< address might not be reachable */
-    GNRC_IPV6_NIB_NUD_STATE_DELAY,          /**< NUD will be performed in a moment */
-    GNRC_IPV6_NIB_NUD_STATE_PROBE,          /**< NUD is performed */
-    GNRC_IPV6_NIB_NUD_STATE_REACHABLE,      /**< entry is reachable */
-} gnrc_ipv6_nib_nud_state_t;
+#define GNRC_IPV6_NIB_INFO_NUD_STATE_MASK           (0x0007)
+#define GNRC_IPV6_NIB_INFO_NUD_STATE_UNMANAGED      (0x0000)    /**< not managed by NUD */
+#define GNRC_IPV6_NIB_INFO_NUD_STATE_UNREACHABLE    (0x0001)    /**< entry is not reachable */
 
 /**
- * @brief States for 6LoWPAN address registration (6Lo-AR)
+ * @brief   address resolution is currently performed
  */
-typedef enum {
-    GNRC_IPV6_NIB_AR_STATE_NONE = 0,        /**< not managed by 6Lo-AR */
-    GNRC_IPV6_NIB_AR_STATE_GC,              /**< address can be removed when low on memory */
-    GNRC_IPV6_NIB_AR_STATE_TENTATIVE,       /**< address registration still pending */
-    GNRC_IPV6_NIB_AR_STATE_REGISTERED,      /**< address is registered */
-} gnrc_ipv6_nib_ar_state_t;
+#define GNRC_IPV6_NIB_INFO_NUD_STATE_INCOMPLETE     (0x0002)
+
+/**
+ * @brief   address might not be reachable
+ */
+#define GNRC_IPV6_NIB_INFO_NUD_STATE_STALE          (0x0003)
+
+/**
+ * @brief   NUD will be performed in a moment
+ */
+#define GNRC_IPV6_NIB_INFO_NUD_STATE_DELAY          (0x0004)
+#define GNRC_IPV6_NIB_INFO_NUD_STATE_PROBE          (0x0005)    /**< NUD is performed */
+#define GNRC_IPV6_NIB_INFO_NUD_STATE_REACHABLE      (0x0006)    /**< entry is reachable */
+
+/**
+ * @brief   gnrc_ipv6_nib_t::next_hop is router
+ *
+ * This flag indicates that does not indicate that gnrc_ipv6_nib_t::next_hop is
+ * a router, but it does not necessarily indicate that it is in the default
+ * router list! A neighbor that has this flag unset however **must not** appear
+ * in the default router list.
+ *
+ * @see [RFC 4861, Appendix D](https://tools.ietf.org/html/rfc4861#page-91)
+ */
+#define GNRC_IPV6_NIB_INFO_IS_ROUTER                (0x0008)
+
+/**
+ * @brief   Mask for interface identifier
+ */
+#define GNRC_IPV6_NIB_INFO_IFACE_MASK               (0x01f0)
+
+/**
+ * @brief   Shift position of interface identifier
+ */
+#define GNRC_IPV6_NIB_INFO_IFACE_POS                (8)
+
+/**
+ * @brief Mask for 6LoWPAN address registration (6Lo-AR) states
+ *
+ * @see [RFC 6775, section 3.5](https://tools.ietf.org/html/rfc6775#section-3.5)
+ */
+#define GNRC_IPV6_NIB_INFO_AR_STATE_MASK            (0x0600)
+#define GNRC_IPV6_NIB_INFO_AR_STATE_NONE            (0x0000)    /**< not managed by 6Lo-AR */
+
+/**
+ * @brief   address can be removed when memory is low
+ */
+#define GNRC_IPV6_NIB_INFO_AR_STATE_GC              (0x0200)
+
+/**
+ * @brief   address registration still pending
+ */
+#define GNRC_IPV6_NIB_INFO_AR_STATE_TENTATIVE       (0x0400)
+#define GNRC_IPV6_NIB_INFO_AR_STATE_REGISTERED      (0x0600)    /**< address is registered */
+
+/**
+ * @brief   Use gnrc_ipv6_nib_t::cid for compression of gnrc_ipv6_nib_t::dst
+ *          when using @ref net_gnrc_sixlowpan_iphc
+ */
+#define GNRC_IPV6_NIB_INFO_USE_FOR_COMP             (0x0800)
+
+/**
+ * @brief   Mask for context identifier for gnrc_ipv6_nib_t::dst for stateful
+ *          header compression using @ref net_gnrc_sixlowpan_iphc
+ */
+#define GNRC_IPV6_NIB_INFO_CID_MASK                 (0xf000)
+
+/**
+ * @brief   Shift position of context identifier for stateful header compression
+ */
+#define GNRC_IPV6_NIB_INFO_IFACE_POS                (12)
+/** @} */
 
 /**
  * @brief   A public NIB entry
  */
 typedef struct {
-    const ipv6_addr_t dst;          /**< A destination or prefix to destination */
+#if !GNRC_IPV6_NIB_ONLY_DEFAULT_ROUTE || defined(DOXYGEN)
+    /**
+     * @brief   A destination or prefix to destination
+     *
+     * @note    Only available if @ref GNRC_IPV6_NIB_ONLY_DEFAULT_ROUTE == 0
+     */
+    const ipv6_addr_t dst;
+#endif
     const ipv6_addr_t next_hop;     /**< Next hop to gnrc_ipv6_nib_t::dst */
 #if defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER) || defined(DOXYGEN)
     /**
      * @brief   The neighbors EUI-64 (used for DAD)
-     *
-     * 
      */
     eui64_t eui64;
 #endif
-    const uint8_t l2addr[GNRC_NETIF_HDR_L2ADDR_MAX_LEN];
-                                    /**< L2 address of next hop */
-    const unsigned pfx_len : 8;     /**< prefix-length of gnrc_ipv6_nib_t::dst */
-    const unsigned l2addr_len : 4;  /**< length of gnrc_ipv6_nib_t::l2addr */
-    const gnrc_ipv6_nib_nud_state_t nud_state : 3;
-                                    /**< NUD state of gnrc_ipv6_nib_t::next_hop */
-    const bool is_router : 1;       /**< gnrc_ipv6_nib_t::next_hop is router */
-    const unsigned iface : 5;       /**< interface to gnrc_ipv6_nib_t::dst */
-    const gnrc_ipv6_nib_ar_state_t ar_state : 2;
-                                    /**< 6Lo-AR state of gnrc_ipv6_nib_t::next_hop */
+#if GNRC_IPV6_NIB_ALWAYS_REV_TRANS || defined(DOXYGEN)
     /**
-     * @brief   Use gnrc_ipv6_nib_t::cid for compression of gnrc_ipv6_nib_t::dst
-     *          when using @ref net_gnrc_sixlowpan_iphc
+     * @brief   Link-layer address of gnrc_ipv6_nib_t::next_hop
+     *
+     * @note    Only available if @ref GNRC_IPV6_NIB_ALWAYS_REV_TRANS != 1
      */
-    const bool use_for_comp : 1;
+    const uint8_t l2addr[GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
+#endif
 
     /**
-     * @brief   Context identifier for gnrc_ipv6_nib_t::dst for stateful header
-     *          compression using @ref net_gnrc_sixlowpan_iphc
+     * @brief   Information flags (see
+     *          @ref gnrc_ipv6_nib_info "Additional information")
      */
-    const unsigned cid : 4;
+    const uint16_t info;
+#if GNRC_IPV6_NIB_ONLY_DEFAULT_ROUTE || defined(DOXYGEN)
+    const uint8_t pfx_len;          /**< prefix-length of gnrc_ipv6_nib_t::dst */
+#endif
+#if GNRC_IPV6_NIB_ALWAYS_REV_TRANS || defined(DOXYGLEN)
+    const uint8_t l2addr_len;       /**< length of gnrc_ipv6_nib_t::l2addr */
+#endif
 } gnrc_ipv6_nib_t;
 
 /**
