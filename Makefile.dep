@@ -56,7 +56,7 @@ ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
   USEMODULE += gnrc_ipv6_netif
 endif
 
-ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pktbuf,$(USEMODULE))))
+ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
   USEMODULE += gnrc
 endif
 
@@ -564,6 +564,14 @@ endif
 
 ifneq (,$(filter evtimer,$(USEMODULE)))
   USEMODULE += xtimer
+endif
+
+ifneq (,$(filter can,$(USEMODULE)))
+  USEMODULE += can_raw
+  ifneq (,$(filter can_mbox,$(USEMODULE)))
+    USEMODULE += core_mbox
+  endif
+  USEMODULE += gnrc_pktbuf_static
 endif
 
 ifneq (,$(filter random,$(USEMODULE)))
