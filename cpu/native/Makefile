@@ -10,6 +10,10 @@ ifneq (,$(filter mtd_native,$(USEMODULE)))
 	DIRS += mtd
 endif
 
+ifneq (,$(filter can_linux,$(USEMODULE)))
+        DIRS += can
+endif
+
 include $(RIOTBASE)/Makefile.base
 
 INCLUDES = $(NATIVEINCLUDES)

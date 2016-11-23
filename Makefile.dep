@@ -566,6 +566,10 @@ ifneq (,$(filter evtimer,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter can_linux,$(USEMODULE)))
+    export LINKFLAGS += -lsocketcan
+endif
+
 ifneq (,$(filter can,$(USEMODULE)))
   USEMODULE += can_raw
   USEMODULE += auto_init_can

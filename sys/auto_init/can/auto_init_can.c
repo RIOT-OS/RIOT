@@ -29,4 +29,8 @@ void auto_init_candev(void)
 {
     DEBUG("auto_init_can: init dll\n");
     can_dll_init();
+#ifdef MODULE_CAN_LINUX
+    extern void auto_init_can_native(void);
+    auto_init_can_native();
+#endif
 }
