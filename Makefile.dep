@@ -583,6 +583,12 @@ ifneq (,$(filter can_isotp,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter conn_can,$(USEMODULE)))
+  USEMODULE += can
+  USEMODULE += can_mbox
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter random,$(USEMODULE)))
   # select default prng
   ifeq (,$(filter prng_%,$(USEMODULE)))
