@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 INRIA
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -29,8 +29,9 @@
 #include "xtimer.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
-#include "net/gnrc.h"
+#include "net/netdev2.h"
 #include "net/ieee802154.h"
+#include "net/gnrc/nettype.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,6 +55,11 @@ extern "C" {
  * @brief   Maximum length of a command response
  */
 #define XBEE_MAX_RESP_LENGTH        (16U)
+
+/**
+ * @brief   Maximal possible size of a TX header
+ */
+#define XBEE_MAX_TXHDR_LENGTH       (14U)
 
 /**
  * @brief   Default protocol for data that is coming in
@@ -95,31 +101,43 @@ extern "C" {
  * frame specific data as the frame size, frame type, and checksums.
  */
 typedef enum {
-    XBEE_INT_STATE_IDLE,        /**< waiting for the beginning of a new frame */
-    XBEE_INT_STATE_SIZE1,       /**< waiting for the first byte (MSB) of the
-                                 *   frame size field */
-    XBEE_INT_STATE_SIZE2,       /**< waiting for the second byte (LSB) of the
-                                 *   frame size field */
-    XBEE_INT_STATE_TYPE,        /**< waiting for the frame type field */
-    XBEE_INT_STATE_RESP,        /**< handling incoming data for AT command
-                                 *   responses */
-    XBEE_INT_STATE_RX,          /**< handling incoming data when receiving radio
-                                 *   packets */
+    XBEE_INT_STATE_IDLE,    /**< waiting for the beginning of a new frame */
+    XBEE_INT_STATE_SIZE1,   /**< waiting for the first byte (MSB) of the
+                             *   frame size field */
+    XBEE_INT_STATE_SIZE2,   /**< waiting for the second byte (LSB) of the
+                             *   frame size field */
+    XBEE_INT_STATE_TYPE,    /**< waiting for the frame type field */
+    XBEE_INT_STATE_RESP,    /**< handling incoming data for AT command
+                             *   responses */
+    XBEE_INT_STATE_RX,      /**< handling incoming data when receiving radio
+                             *   packets */
 } xbee_rx_state_t;
+
+/**
+ * @brief   Configuration parameters for XBee devices
+ */
+typedef struct {
+    uart_t uart;            /**< UART interfaced the device is connected to */
+    uint32_t br;            /**< baudrate to use */
+    gpio_t pin_sleep;       /**< GPIO pin that is connected to the SLEEP pin
+                                 set to GPIO_UNDEF if not used */
+    gpio_t pin_reset;      /**< GPIO pin that is connected to the STATUS pin
+                                 set to GPIO_UNDEF if not used */
+} xbee_params_t;
 
 /**
  * @brief   XBee device descriptor
  */
 typedef struct {
     /* netdev fields */
-    gnrc_netdev_driver_t const *driver; /**< pointer to the devices interface */
-    gnrc_netdev_event_cb_t event_cb;    /**< netdev event callback */
-    kernel_pid_t mac_pid;               /**< the driver's thread's PID */
+    const struct netdev2_driver *driver;    /**< ptr to that driver's interface. */
+    netdev2_event_cb_t event_callback;      /**< callback for device events */
+    void* context;                          /**< ptr to network stack context */
+#ifdef MODULE_NETSTATS_L2
+    netstats_t stats;                       /**< transceiver's statistics */
+#endif
     /* device driver specific fields */
-    uart_t uart;                        /**< UART interfaced used */
-    gpio_t reset_pin;                   /**< GPIO pin connected to RESET */
-    gpio_t sleep_pin;                   /**< GPIO pin connected to SLEEP */
-    gnrc_nettype_t proto;               /**< protocol the interface speaks */
+    xbee_params_t p;                    /**< configuration parameters */
     uint8_t options;                    /**< options field */
     uint8_t addr_flags;                 /**< address flags as defined above */
     uint8_t addr_short[2];              /**< onw 802.15.4 short address */
@@ -131,7 +149,8 @@ typedef struct {
     /* values for the UART TX state machine */
     mutex_t tx_lock;                    /**< mutex to allow only one
                                          *   transmission at a time */
-    uint8_t tx_buf[XBEE_MAX_PKT_LENGTH];/**< transmit data buffer */
+    uint8_t cmd_buf[XBEE_MAX_RESP_LENGTH];/**< command data buffer */
+    uint8_t tx_fid;                     /**< TX frame ID */
     /* buffer and synchronization for command responses */
     mutex_t resp_lock;                  /**< mutex for waiting for AT command
                                          *   response frames */
@@ -145,24 +164,23 @@ typedef struct {
 } xbee_t;
 
 /**
- * @brief   auto_init struct holding Xbee device initalization params
+ * @brief   Data structure for extraction L2 information of received packets
  */
-typedef struct xbee_params {
-    uart_t uart;            /**< UART interfaced the device is connected to */
-    uint32_t baudrate;      /**< baudrate to use */
-    gpio_t sleep_pin;       /**< GPIO pin that is connected to the SLEEP pin
-                                 set to GPIO_UNDEF if not used */
-    gpio_t reset_pin;      /**< GPIO pin that is connected to the STATUS pin
-                                 set to GPIO_UNDEF if not used */
-} xbee_params_t;
+typedef struct {
+    uint8_t addr_len;                   /**< L2 address length (SRC and DST) */
+    uint8_t bcast;                      /**< 0 := unicast, 1:=broadcast */
+    uint8_t rssi;                       /**< RSSI value */
+    uint8_t src_addr[8];                /**< L2 source address */
+    uint8_t dst_addr[8];                /**< L2 dst address */
+} xbee_l2hdr_t;
 
 /**
  * @brief   Reference to the XBee driver interface
  */
-extern const gnrc_netdev_driver_t xbee_driver;
+extern const netdev2_driver_t xbee_driver;
 
 /**
- * @brief   Initialize the given Xbee device
+ * @brief   Prepare the given Xbee device
  *
  * @param[out] dev          Xbee device to initialize
  * @param[in]  params       parameters for device initialization
@@ -171,7 +189,34 @@ extern const gnrc_netdev_driver_t xbee_driver;
  * @return                  -ENODEV on invalid device descriptor
  * @return                  -ENXIO on invalid UART or GPIO pins
  */
-int xbee_init(xbee_t *dev, const xbee_params_t *params);
+void xbee_setup(xbee_t *dev, const xbee_params_t *params);
+
+/**
+ * @brief   Put together the internal proprietary XBee header
+ *
+ * @param[out] xhdr         buffer to write the header into, MUST be at least of
+ *                          length XBEE_MAX_TXHDR_LENGTH
+ * @param[in]  payload_len  actual payload length (without the XBee header)
+ * @param[in]  dst_addr     link layer (L2) destination address
+ * @param[in]  addr_len     length of @p dst_addr in byte (MUST be 2 or 8)
+ *
+ * @return  the length of the created header in byte
+ * @return  -EOVERFLOW if @p payload_len is greater than XBEE_MAX_PAYLOAD_LENGTH
+ * @return  -ENOMSG if the given destination address has an invalid length
+ */
+int xbee_build_hdr(xbee_t *dev, uint8_t *xhdr, size_t payload_len,
+                   void *dst_addr, size_t addr_len);
+
+/**
+ * @brief   Extract IEEE802.15.4 L2 header information from the XBee header
+ *
+ * @param[in]  xhdr         XBee header, starting with the API identifier
+ * @param[out] l2hdr        the L2 header information is written here
+ *
+ * @return  the length of the XBee header
+ * @return  -ENOMST if the given XBee header is invalid
+ */
+int xbee_parse_hdr(xbee_t *dev, const uint8_t *xhdr, xbee_l2hdr_t *l2hdr);
 
 #ifdef __cplusplus
 }
