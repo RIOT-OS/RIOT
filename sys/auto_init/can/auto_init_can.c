@@ -25,10 +25,30 @@
 
 #include "can/dll.h"
 
+#ifdef MODULE_CAN_ISOTP
+#include "can/isotp.h"
+
+#ifndef ISOTP_STACK_SIZE
+#define ISOTP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)
+#endif
+
+#ifndef ISOTP_PRIORITY
+#define ISOTP_PRIORITY (THREAD_PRIORITY_MAIN - 2)
+#endif
+
+static char isotp_stack[ISOTP_STACK_SIZE];
+#endif
+
 void auto_init_candev(void)
 {
     DEBUG("auto_init_can: init dll\n");
     can_dll_init();
+
+#ifdef MODULE_CAN_ISOTP
+    DEBUG("auto_init_can: init isotp\n");
+    isotp_init(isotp_stack, ISOTP_STACK_SIZE, ISOTP_PRIORITY, "isotp");
+#endif
+
 #ifdef MODULE_CAN_LINUX
     extern void auto_init_can_native(void);
     auto_init_can_native();
