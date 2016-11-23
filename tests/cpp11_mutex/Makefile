@@ -2,7 +2,7 @@
 APPLICATION = cpp11_mutex
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= native
+BOARD ?= iotlab-m3
 
 # ROM is overflowing for these boards when using
 # gcc-arm-none-eabi-4.9.3.2015q2-1trusty1 from ppa:terry.guo/gcc-arm-embedded
@@ -11,6 +11,9 @@ BOARD ?= native
 # Remove this line if Travis is upgraded to a different toolchain which does
 # not pull in all C++ locale code whenever exceptions are used.
 BOARD_INSUFFICIENT_MEMORY := stm32f0discovery spark-core nucleo-f334
+
+# can't link to libstdc++:i386 on native on both Ubuntu 14.04 and Arch
+BOARD_BLACKLIST := native
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
