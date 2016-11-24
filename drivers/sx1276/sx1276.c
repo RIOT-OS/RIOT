@@ -113,6 +113,22 @@ static void _init_isrs(sx1276_t *dev)
     gpio_init_int(dev->dio3_pin, GPIO_IN, GPIO_RISING, sx1276_on_dio3_isr, dev);
 }
 
+/**
+ *	@brief Checks chip version in SX1276's version registers. As well as checking SPI connectivity
+ */
+static bool _sx1276_test(sx1276_t *dev)
+{
+    /* Read version number and compare with sx1276 assigned revision */
+    uint8_t version = sx1276_reg_read(dev, SX1276_REG_VERSION);
+
+    if (version != VERSION_SX1276 || version == 0x1C) {
+        DEBUG("sx1276: test failed, invalid version number: %d\n", version);
+        return false;
+    }
+
+    return true;
+}
+
 static inline void send_event(sx1276_t *dev, sx1276_event_type_t event_type)
 {
 	assert(dev->sx1276_event_cb != NULL);
@@ -190,7 +206,7 @@ sx1276_init_result_t sx1276_init(sx1276_t *dev)
     _init_timers(dev);
 
     /* Check presence of SX1276 */
-    if (!sx1276_test(dev)) {
+    if (!_sx1276_test(dev)) {
         DEBUG("init_radio: test failed\n");
         return SX1276_ERR_TEST_FAILED;
     }
@@ -242,19 +258,6 @@ void sx1276_set_channel(sx1276_t *dev, uint32_t freq)
 
     /* Restore previous operating mode */
     sx1276_reg_write(dev, SX1276_REG_OPMODE, prev_mode);
-}
-
-bool sx1276_test(sx1276_t *dev)
-{
-    /* Read version number and compare with sx1276 assigned revision */
-    uint8_t version = sx1276_reg_read(dev, SX1276_REG_VERSION);
-
-    if (version != VERSION_SX1276 || version == 0x1C) {
-        DEBUG("sx1276: test failed, invalid version number: %d\n", version);
-        return false;
-    }
-
-    return true;
 }
 
 bool sx1276_is_channel_free(sx1276_t *dev, uint32_t freq, int16_t rssi_thresh)

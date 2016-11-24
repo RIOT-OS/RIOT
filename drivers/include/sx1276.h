@@ -209,14 +209,6 @@ typedef void (sx1276_dio_irq_handler_t)(sx1276_t *dev);
  */
 
 /**
- * @brief Tests the transceiver.
- *
- * @param	[IN]	dev	The sx1276 device structure pointer
- * @return true if test passed, false otherwise
- */
-bool sx1276_test(sx1276_t *dev);
-
-/**
  * @brief Initializes the transceiver.
  *
  * @param	[IN]	dev					The sx1276 device structure pointer
