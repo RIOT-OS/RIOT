@@ -29,6 +29,11 @@
 
 #define SX1276_EVENT_HANDLER_STACK_SIZE 2048
 
+/**
+ * @brief Number of bits to take for SX1276 in order to generate random number in function sx1276_random()
+ */
+#define SX1276_RANDOM_BITS 32
+
 #ifdef __cplusplus
 extern "C" {
 #endif

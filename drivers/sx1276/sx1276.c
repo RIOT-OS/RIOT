@@ -335,7 +335,7 @@ uint32_t sx1276_random(sx1276_t *dev)
     /* Set radio in continuous reception */
     sx1276_set_op_mode(dev, SX1276_RF_OPMODE_RECEIVER);
 
-    for (i = 0; i < 32; i++) {
+    for (i = 0; i < SX1276_RANDOM_BITS; i++) {
         xtimer_usleep(1000); /* wait for the chaos */
 
         /* Non-filtered RSSI value reading. Only takes the LSB value */
