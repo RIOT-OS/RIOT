@@ -7,7 +7,7 @@ USEMODULE += l3g4200d
 USEMODULE += xtimer
 
 # set default device parameters in case they are undefined
-TEST_L3G4200D_I2C  ?= I2C_0
+TEST_L3G4200D_I2C  ?= I2C_DEV\(0\)
 TEST_L3G4200D_ADDR ?= 104
 TEST_L3G4200D_INT  ?= GPIO_PIN\(0,0\)
 TEST_L3G4200D_DRDY ?= GPIO_PIN\(0,1\)

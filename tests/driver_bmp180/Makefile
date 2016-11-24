@@ -6,7 +6,7 @@ USEMODULE += xtimer
 USEMODULE += printf_float
 
 # set default device parameters in case they are undefined
-TEST_I2C                  ?= I2C_0
+TEST_I2C                  ?= I2C_DEV\(0\)
 TEST_MEASURE_OVERSAMPLING ?= BMP180_ULTRALOWPOWER
 TEST_ALTITUDE             ?= 158 # altitude in Polytechnique School campus
 
