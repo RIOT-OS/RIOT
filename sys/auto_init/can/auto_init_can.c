@@ -53,4 +53,9 @@ void auto_init_candev(void)
     extern void auto_init_can_native(void);
     auto_init_can_native();
 #endif
+
+#ifdef MODULE_MCP2515
+    extern void auto_init_can_mcp2515(void);
+    auto_init_can_mcp2515();
+#endif
 }
