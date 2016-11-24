@@ -54,8 +54,18 @@ void auto_init_candev(void)
     auto_init_can_native();
 #endif
 
+#ifdef MODULE_PERIPH_CAN
+    extern void auto_init_periph_can(void);
+    auto_init_periph_can();
+#endif
+
 #ifdef MODULE_ESP_CAN
     extern void auto_init_esp_can(void);
     auto_init_esp_can();
+#endif
+
+#ifdef MODULE_CAN_STM32
+    extern void auto_init_can_stm32(void);
+    auto_init_can_stm32();
 #endif
 }

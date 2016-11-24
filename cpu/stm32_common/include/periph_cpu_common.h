@@ -704,6 +704,10 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
 
 #endif /* MODULE_PERIPH_DMA */
 
+#ifdef MODULE_PERIPH_CAN
+#include "candev_stm32.h"
+#endif
+
 #ifdef __cplusplus
 }
 #endif
