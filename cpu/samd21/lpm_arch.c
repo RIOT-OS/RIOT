@@ -19,6 +19,11 @@
  *
  * @}
  */
+
+#define _COMPILATION_UNIT_NOT_EMPTY
+
+#ifdef MODULE_PM
+
 #include "cpu.h"
 #include "arch/lpm_arch.h"
 
@@ -124,3 +129,5 @@ void lpm_arch_begin_awake(void){ }
 
 /** Not needed */
 void lpm_arch_end_awake(void){ }
+
+#endif /* MODULE_PM */
