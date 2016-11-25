@@ -30,6 +30,7 @@
 #ifndef GNRC_IPV6_NIB_H_
 #define GNRC_IPV6_NIB_H_
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "net/ipv6/addr.h"
@@ -63,18 +64,13 @@ extern "C" {
  * @{
  * @brief   Compile flags to (de-)activate certain features for NIB
  */
-#ifndef GNRC_IPV6_NIB_ONLY_DEFAULT_ROUTE
-#define GNRC_IPV6_NIB_ONLY_DEFAULT_ROUTE    (0) /**< only allow for default route (::) as
-                                                 *   destination */
-#endif
-
 #ifndef GNRC_IPV6_NIB_ALWAYS_REV_TRANS
 /**
  * @brief   Always reverse translate link-local address
  *
  * @see [RFC 6775, section 5.6](https://tools.ietf.org/html/rfc6775#section-5.6)
  */
-#define GNRC_IPV6_NIB_ALWAYS_REV_TRANS      (1)
+#define GNRC_IPV6_NIB_ALWAYS_REV_TRANS      (0)
 #endif
 
 #ifndef GNRC_IPV6_NIB_DO_HANDLE_NBR_SOL
@@ -219,7 +215,7 @@ extern "C" {
 #define GNRC_IPV6_NIB_INFO_AR_STATE_REGISTERED      (0x0600)    /**< address is registered */
 
 /**
- * @brief   Use gnrc_ipv6_nib_t::cid for compression of gnrc_ipv6_nib_t::dst
+ * @brief   Use context identifier for compression of gnrc_ipv6_nib_t::dst
  *          when using @ref net_gnrc_sixlowpan_iphc
  */
 #define GNRC_IPV6_NIB_INFO_USE_FOR_COMP             (0x0800)
@@ -233,21 +229,14 @@ extern "C" {
 /**
  * @brief   Shift position of context identifier for stateful header compression
  */
-#define GNRC_IPV6_NIB_INFO_IFACE_POS                (12)
+#define GNRC_IPV6_NIB_INFO_CID_POS                  (12)
 /** @} */
 
 /**
  * @brief   A public NIB entry
  */
 typedef struct {
-#if !GNRC_IPV6_NIB_ONLY_DEFAULT_ROUTE || defined(DOXYGEN)
-    /**
-     * @brief   A destination or prefix to destination
-     *
-     * @note    Only available if @ref GNRC_IPV6_NIB_ONLY_DEFAULT_ROUTE == 0
-     */
-    const ipv6_addr_t dst;
-#endif
+    const ipv6_addr_t dst;          /**< A destination or prefix to destination */
     const ipv6_addr_t next_hop;     /**< Next hop to gnrc_ipv6_nib_t::dst */
 #if defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER) || defined(DOXYGEN)
     /**
@@ -255,7 +244,7 @@ typedef struct {
      */
     eui64_t eui64;
 #endif
-#if GNRC_IPV6_NIB_ALWAYS_REV_TRANS || defined(DOXYGEN)
+#if !GNRC_IPV6_NIB_ALWAYS_REV_TRANS || defined(DOXYGEN)
     /**
      * @brief   Link-layer address of gnrc_ipv6_nib_t::next_hop
      *
@@ -269,28 +258,75 @@ typedef struct {
      *          @ref gnrc_ipv6_nib_info "Additional information")
      */
     const uint16_t info;
-#if GNRC_IPV6_NIB_ONLY_DEFAULT_ROUTE || defined(DOXYGEN)
     const uint8_t pfx_len;          /**< prefix-length of gnrc_ipv6_nib_t::dst */
-#endif
-#if GNRC_IPV6_NIB_ALWAYS_REV_TRANS || defined(DOXYGLEN)
+#if !GNRC_IPV6_NIB_ALWAYS_REV_TRANS || defined(DOXYGEN)
     const uint8_t l2addr_len;       /**< length of gnrc_ipv6_nib_t::l2addr */
 #endif
 } gnrc_ipv6_nib_t;
 
 /**
- * @brief   Gets next reachable hop to @p dst
+ * @brief   Gets the link-layer address for a NIB entry.
  *
- * @param[in] iface Interface to restrict search to search for next reachable
- *                  hop to. May be KERNEL_PID_UNDEF for any interface.
- * @param[in] dst   The destination address of @p pkt.
- * @param[in] pkt   The Packet
+ * @param[in] entry     A NIB entry.
+ * @param[out] l2addr   The link-layer address of @p entry. Must at least have
+ *                      space for @ref GNRC_IPV6_NIB_L2ADDR_MAX_LEN bytes.
  *
- * @return The NIB to the reachable entry on success.
- * @return NULL, if no reachable next hop was found.
+ * @return  The number of bytes in @p l2addr on success.
+ * @return  0 on failure.
  */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_next_hop(unsigned iface,
-                                              const ipv6_addr_t *dst,
-                                              const gnrc_pktsnip_t *pkt);
+unsigned gnrc_ipv6_nib_get_l2addr(const gnrc_ipv6_nib_t *entry,
+                                  uint8_t *l2addr);
+
+static inline unsigned gnrc_ipv6_nib_get_nud_state(const gnrc_ipv6_nib_t *entry)
+{
+    return (entry->info & GNRC_IPV6_NIB_INFO_NUD_STATE_MASK);
+}
+
+static inline bool gnrc_ipv6_nib_is_router(const gnrc_ipv6_nib_t *entry)
+{
+    return (entry->info & GNRC_IPV6_NIB_INFO_IS_ROUTER);
+}
+
+static inline unsigned gnrc_ipv6_nib_get_iface(const gnrc_ipv6_nib_t *entry)
+{
+    return (entry->info & GNRC_IPV6_NIB_INFO_IFACE_MASK) >>
+           GNRC_IPV6_NIB_INFO_IFACE_POS;
+}
+
+static inline unsigned gnrc_ipv6_nib_get_ar_state(const gnrc_ipv6_nib_t *entry)
+{
+    return (entry->info & GNRC_IPV6_NIB_INFO_AR_STATE_MASK);
+}
+
+static inline bool gnrc_ipv6_nib_use_for_comp(const gnrc_ipv6_nib_t *entry)
+{
+    return (entry->info & GNRC_IPV6_NIB_INFO_USE_FOR_COMP);
+}
+
+static inline bool gnrc_ipv6_nib_get_cid(const gnrc_ipv6_nib_t *entry)
+{
+    return (entry->info & GNRC_IPV6_NIB_INFO_CID_MASK) >>
+           GNRC_IPV6_NIB_INFO_CID_POS;
+}
+
+/**
+ * @brief   Get NIB entry for next reachable hop to @p dst
+ *
+ * @param[in] iface     Interface to restrict search to search for next reachable
+ *                      hop to. May be KERNEL_PID_UNDEF for any interface.
+ * @param[in] dst       The destination address of @p pkt.
+ * @param[in] pkt       The packet to send to @p dst. This is provided to give
+ *                      the routing or address resolution protocol a way to
+ *                      queue the packet for later sending if this is desired.
+ * @param[out] entry    Copy of the NIB entry with the next reachable hop.
+ *
+ * @return 0 on success.
+ * @return -ENETUNREACH, if no next hop to @p dst can be found.
+ * @return -EHOSTUNREACH, if there is a next hop to @p dst, but it is currently
+ *         unreachable.
+ */
+int gnrc_ipv6_nib_next_hop(unsigned iface, const ipv6_addr_t *dst,
+                           const gnrc_pktsnip_t *pkt, gnrc_ipv6_nib_t *entry);
 
 /**
  * @brief   Adds an unmanaged neighbor entry to NIB
@@ -310,13 +346,11 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_next_hop(unsigned iface,
  * If an entry pointing to the same IPv6 address as @p ipv6 exists already it
  * will be overwritten and marked as unmanaged.
  *
- * @return  The (created) NIB entry on success.
- * @return  NULL, if neighbor cache is full and no replacement can be used.
+ * @return  0 on success.
+ * @return  -ENOMEM, if no space is left in neighbor cache.
  */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_set_neighbor(unsigned iface,
-                                                  const ipv6_addr_t *ipv6,
-                                                  const uint8_t *l2addr,
-                                                  size_t l2addr_len);
+int gnrc_ipv6_nib_set_neighbor(unsigned iface, const ipv6_addr_t *ipv6,
+                               const uint8_t *l2addr, size_t l2addr_len);
 
 /**
  * @brief   Deletes neighbor with address @p ipv6 from NIB
@@ -335,45 +369,98 @@ void gnrc_ipv6_nib_delete_neighbor(const ipv6_addr_t *ipv6);
  * @param[in] ipv6 A neighbor's IPv6 address.
  *
  * This function shall be called if an upper layer gets reachability confirmation
- * via its own means (e.g. a TCP connection build-up). Unmanaged neighbor cache
- * entries or entries which next-hop are not in the neighbor cache yet are
- * ignored.
+ * via its own means (e.g. a TCP connection build-up or confirmation). Unmanaged
+ * neighbor cache entries or entries which next-hop are not in the neighbor
+ * cache yet are ignored.
  */
 void gnrc_ipv6_nib_mark_reachable(const ipv6_addr_t *ipv6);
 
 /**
  * @brief   Iterates over all neighbor cache entries in the NIB
  *
- * @param[in] prev  Previous neighbor cache entry.
- *                  May be NULL to start iteration.
+ * @pre (state != NULL) && (entry != NULL)
  *
- * @return  Neighbor cache entry after @p prev.
- * @return  NULL if @p prev is the last neighbor cache entry in the NIB.
+ * @param[in,out] state Iteration state of the neighbor cache. Must point to
+ *                      a NULL pointer to start iteration.
+ * @param[out] entry    The next neighbor cache entry
+ *
+ * Usage example:
+ *
+ * ```C
+ * #include <stdio.h>
+ *
+ * #include "net/ipv6/addr.h"
+ * #include "net/gnrc/ipv6/nib.h"
+ *
+ * int main(void) {
+ *     void *state = NULL;
+ *     char addr_str[IPV6_ADDR_MAX_STR_LEN];
+ *     gnrc_ipv6_nib_t entry;
+ *
+ *     puts("My neighbors:");
+ *     while (gnrc_ipv6_nib_iter_nc(&state, &entry)) {
+ *         printf("* %s\n", ipv6_addr_to_str(addr_str, &entry.next_hop,
+ *                                           sizeof(addr_str)));
+ *     }
+ *     return 0;
+ * }
+ * ```
+ *
+ * @return  true, if iteration can be continued.
+ * @return  false, if @p entry is the last neighbor cache entry in the NIB.
  */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_nc(const gnrc_ipv6_nib_t *prev);
+bool gnrc_ipv6_nib_iter_nc(void **state, gnrc_ipv6_nib_t *entry);
 
 /**
  * @brief   Iterates over all destination cache entries in the NIB
  *
- * @param[in] prev  Previous destination cache entry.
- *                  May be NULL to start iteration.
+ * @pre (state != NULL) && (entry != NULL)
  *
- * @return  Destination cache entry after @p prev.
- * @return  NULL if @p prev is the last destination cache entry in the NIB.
+ * @param[in,out] state Iteration state of the destination cache. Must point to
+ *                      a NULL pointer to start iteration.
+ * @param[out] entry    The next destination cache entry
+ *
+ * Usage example:
+ *
+ * ```C
+ * #include <stdio.h>
+ *
+ * #include "net/ipv6/addr.h"
+ * #include "net/gnrc/ipv6/nib.h"
+ *
+ * int main(void) {
+ *     void *state = NULL;
+ *     char addr_str[IPV6_ADDR_MAX_STR_LEN];
+ *     gnrc_ipv6_nib_t entry;
+ *
+ *     puts("Stored destinations:");
+ *     while (gnrc_ipv6_nib_iter_dc(&state, &entry)) {
+ *         printf("* %s ->", ipv6_addr_to_str(addr_str, &entry.dst,
+ *                                            sizeof(addr_str)));
+ *         printf(" %s\n", ipv6_addr_to_str(addr_str, &entry.next_hop,
+ *                                          sizeof(addr_str)));
+ *     }
+ *     return 0;
+ * }
+ * ```
+ *
+ * @return  true, if iteration can be continued.
+ * @return  false, if @p entry is the last destination cache entry in the NIB.
  */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_dc(const gnrc_ipv6_nib_t *prev);
+bool gnrc_ipv6_nib_iter_dc(void **state, gnrc_ipv6_nib_t *entry);
 
 /**
  * @brief   Adds or updates a prefix to manage by the NIB
  *
  * @pre (iface > KERNEL_PID_UNDEF)
- * @pre (pfx != NULL && pfx_len != 0 && pfx_len < 128)
+ * @pre ((pfx != NULL) && (pfx_len != 0) && (pfx_len <= 128))
  *
  * @param[in] iface     Interface the prefix was added to.
  * @param[in] pfx       The prefix.
- * @param[in] pfx_len   Length of @p pfx
+ * @param[in] pfx_len   Length of @p pfx.
  * @param[in] valid     Valid lifetime in seconds (`UINT32_MAX` for infinite
- *                      lifetime).
+ *                      lifetime). Setting this value to 0 is equivalent to
+ *                      using @ref gnrc_ipv6_nib_del_prefix().
  * @param[in] pref      Preferred lifetime in seconds (`UINT32_MAX` for infinite
  *                      lifetime).
  *
@@ -383,21 +470,18 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_dc(const gnrc_ipv6_nib_t *prev);
  * [RFC 4861](https://tools.ietf.org/html/rfc4861) and
  * [RFC 6775](https://tools.ietf.org/html/rfc6775).
  *
- * @return  The (created) NIB entry on success.
- * @return  NULL, if prefix list is full.
+ * @return  0 on success.
+ * @return  -ENOMEM, if no space is left in prefix list.
  */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_set_prefix(unsigned iface,
-                                                const ipv6_addr_t *pfx,
-                                                uint8_t pfx_len,
-                                                uint32_t valid
-                                                uint32_t pref);
+int gnrc_ipv6_nib_set_prefix(unsigned iface, const ipv6_addr_t *pfx,
+                             uint8_t pfx_len, uint32_t valid, uint32_t pref);
 
 /**
  * @brief   Deletes a prefix from the NIB
  *
- * @pre (if dst != NULL: pfx_len > 0)
+ * @pre (if (pfx != NULL): (pfx_len > 0) && (pfx_len <= 128))
  *
- * @param[in] dst       Destination of the route.
+ * @param[in] pfx       Destination of the route.
  *                      May be NULL for default route.
  * @param[in] pfx_len   Prefix length of @p dst if it is a prefix.
  *                      May be 0 for default route.
@@ -413,21 +497,47 @@ void gnrc_ipv6_nib_del_prefix(const ipv6_addr_t *pfx, uint8_t pfx_len);
 /**
  * @brief   Iterates over all prefix list entries in the NIB
  *
- * @param[in] prev  Previous prefix list entry.
- *                  May be NULL to start iteration.
+ * @pre (state != NULL) && (entry != NULL)
  *
- * @return  Prefix list entry entry after @p prev.
- * @return  NULL if @p prev is the last prefix list entry in the NIB.
+ * @param[in,out] state Iteration state of the prefix list. Must point to
+ *                      a NULL pointer to start iteration.
+ * @param[out] entry    The next prefix list entry
+ *
+ * Usage example:
+ *
+ * ```C
+ * #include <stdio.h>
+ *
+ * #include "net/ipv6/addr.h"
+ * #include "net/gnrc/ipv6/nib.h"
+ *
+ * int main(void) {
+ *     void *state = NULL;
+ *     char addr_str[IPV6_ADDR_MAX_STR_LEN];
+ *     gnrc_ipv6_nib_t entry;
+ *
+ *     puts("My prefixes:");
+ *     while (gnrc_ipv6_nib_iter_pl(&state, &entry)) {
+ *         printf("* %s/%u\n", ipv6_addr_to_str(addr_str, &entry.dst,
+ *                                              sizeof(addr_str)),
+ *                entry.pfx_len);
+ *     }
+ *     return 0;
+ * }
+ * ```
+ *
+ * @return  true, if iteration can be continued.
+ * @return  false, if @p entry is the last prefix list entry in the NIB.
  */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_pl(const gnrc_ipv6_nib_t *prev);
+bool gnrc_ipv6_nib_iter_pl(void **state, gnrc_ipv6_nib_t *entry);
 
 /**
  * @brief   Adds a route to the NIB
  *
  * @pre (iface > KERNEL_PID_UNDEF)
- * @pre (if dst != NULL: pfx_len > 0)
- * @pte (if dst == NULL: next_hop != NULL)
- * @pte (if next_hop == NULL: dst != NULL)
+ * @pre (if (dst != NULL): (pfx_len > 0) && (pfx_len <= 128))
+ * @pre (if (dst == NULL): (next_hop != NULL))
+ * @pre (if (next_hop == NULL): (dst != NULL))
  *
  * @param[in] iface     Interface the route goes over.
  * @param[in] dst       Destination of the route.
@@ -443,19 +553,17 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_pl(const gnrc_ipv6_nib_t *prev);
  * route can either end up in the default router list (`dst == NULL`) or
  * forwarding table (`dst != NULL`).
  *
- * @return  The (created) NIB entry on success.
- * @return  NULL, if forwarding table is full.
+ * @return  0 on success.
+ * @return  -ENOMEM, if no space is left in the forwarding information base.
  */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_add_route(unsigned iface,
-                                               const ipv6_addr_t *dst,
-                                               uint8_t pfx_len,
-                                               const ipv6_addr_t *next_hop,
-                                               uint32_t ltime);
+int gnrc_ipv6_nib_add_route(unsigned iface, const ipv6_addr_t *dst,
+                            uint8_t pfx_len, const ipv6_addr_t *next_hop,
+                            uint32_t ltime);
 
 /**
  * @brief   Deletes a forwarding table entry from the NIB
  *
- * @pre (if dst != NULL: pfx_len > 0)
+ * @pre (if (dst != NULL): (pfx_len > 0) && (pfx_len <= 128))
  *
  * @param[in] dst       Destination of the route.
  *                      May be NULL for default route.
@@ -467,19 +575,69 @@ void gnrc_ipv6_nib_del_route(const ipv6_addr_t *dst, uint8_t pfx_len);
 /**
  * @brief   Iterates over all default router list entries in the NIB
  *
- * @param[in] prev  Previous default router list entry.
- *                  May be NULL to start iteration.
+ * @pre (state != NULL) && (entry != NULL)
  *
- * @return  Default router list entry entry after @p prev.
- * @return  NULL if @p prev is the last default router list entry in the NIB.
+ * @param[in,out] state Iteration state of the default router list. Must point
+ *                      to a NULL pointer to start iteration.
+ * @param[out] entry    The next default router list entry
+ *
+ * Usage example:
+ *
+ * ```C
+ * #include <stdio.h>
+ *
+ * #include "net/ipv6/addr.h"
+ * #include "net/gnrc/ipv6/nib.h"
+ *
+ * int main(void) {
+ *     void *state = NULL;
+ *     char addr_str[IPV6_ADDR_MAX_STR_LEN];
+ *     gnrc_ipv6_nib_t entry;
+ *
+ *     puts("My default routers:");
+ *     while (gnrc_ipv6_nib_iter_drl(&state, &entry)) {
+ *         printf("* %s\n", ipv6_addr_to_str(addr_str, &entry.next_hop,
+ *                                           sizeof(addr_str));
+ *     }
+ *     return 0;
+ * }
+ * ```
+ *
+ * @return  true, if iteration can be continued.
+ * @return  false, if @p entry is the last default router list entry in the NIB.
  */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_drl(const gnrc_ipv6_nib_t *prev);
+bool gnrc_ipv6_nib_iter_drl(void **state, gnrc_ipv6_nib_t *entry);
 
 /**
  * @brief   Iterates over all forwarding table entries in the NIB
  *
- * @param[in] prev  Previous forwarding table entry.
- *                  May be NULL to start iteration.
+ * @pre (state != NULL) && (entry != NULL)
+ *
+ * @param[in,out] state Iteration state of the forwarding table list. Must point
+ *                      to a NULL pointer to start iteration.
+ * @param[out] entry    The next forwarding table entry
+ *
+ * Usage example:
+ *
+ * ```C
+ * #include <stdio.h>
+ *
+ * #include "net/ipv6/addr.h"
+ * #include "net/gnrc/ipv6/nib.h"
+ *
+ * int main(void) {
+ *     void *state = NULL;
+ *     char addr_str[IPV6_ADDR_MAX_STR_LEN];
+ *     gnrc_ipv6_nib_t entry;
+ *
+ *     puts("My default routers:");
+ *     while (gnrc_ipv6_nib_iter_pl(&state, &entry)) {
+ *         printf("* %s\n", ipv6_addr_to_str(addr_str, &entry.next_hop,
+ *                                           sizeof(addr_str));
+ *     }
+ *     return 0;
+ * }
+ * ```
  *
  * Other than the other iterators this one not only includes the entries
  * explicitly added to the forwarding table using @ref gnrc_ipv6_nib_add_route(),
@@ -487,16 +645,16 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_drl(const gnrc_ipv6_nib_t *prev);
  * that were automatically by the neighbor discovery or manually added with
  * @ref gnrc_ipv6_nib_set_prefix().
  *
- * @return  Previous forwarding table entry entry after @p prev.
- * @return  NULL if @p prev is the last forwarding table entry in the NIB.
+ * @return  true, if iteration can be continued.
+ * @return  false, if @p entry is the last forwarding table entry in the NIB.
  */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_ft(const gnrc_ipv6_nib_t *prev);
+bool gnrc_ipv6_nib_iter_ft(void **state, gnrc_ipv6_nib_t *entry);
 
 /**
  * @brief   Adds 6LoWPAN compression context to the NIB
  *
  * @pre (iface > KERNEL_PID_UNDEF)
- * @pre (pfx != NULL && pfx_len != 0)
+ * @pre ((pfx != NULL) && (pfx_len != 0) && (pfx_len < 128))
  *
  * @param[in] iface     Interface the context is valid for.
  * @param[in] pfx       Prefix the context compresses.
@@ -509,36 +667,83 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_ft(const gnrc_ipv6_nib_t *prev);
  * [RFC 4861](https://tools.ietf.org/html/rfc4861) and
  * [RFC 6775](https://tools.ietf.org/html/rfc6775)
  *
- * @return  The (created) NIB entry on success.
+ * @return  0, on success
+ * @return  -ENOMEM, if no space is left in the forwarding information base.
  */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_add_6lo_ctx(unsigned iface,
-                                                 const ipv6_addr_t *pfx,
-                                                 uint8_t pfx_len,
-                                                 uint32_t valid;
-                                                 uint8_t cid);
+int gnrc_ipv6_nib_add_6lo_ctx(unsigned iface, const ipv6_addr_t *pfx,
+                              uint8_t pfx_len, uint32_t valid, uint8_t cid);
 
 /**
  * @brief   Iterates over all 6LoWPAN compression context table entries in the
  *          NIB
  *
- * @param[in] prev  Previous 6LoWPAN compression context table entry.
- *                  May be NULL to start iteration.
+ * @pre (state != NULL) && (entry != NULL)
  *
- * @return  6LoWPAN compression context table entry after @p prev.
- * @return  NULL if @p prev is the last 6LoWPAN compression context table entry
- *          in the NIB.
+ * @param[in,out] state Iteration state of the 6LoWPAN compression context
+ *                      table. Must point to a NULL pointer to start iteration.
+ * @param[out] entry    The next 6LoWPAN compression context table entry
+ *
+ * Usage example:
+ *
+ * ```C
+ * #include <stdio.h>
+ *
+ * #include "net/ipv6/addr.h"
+ * #include "net/gnrc/ipv6/nib.h"
+ *
+ * int main(void) {
+ *     void *state = NULL;
+ *     char addr_str[IPV6_ADDR_MAX_STR_LEN];
+ *     gnrc_ipv6_nib_t entry;
+ *
+ *     puts("My compression contexts:");
+ *     while (gnrc_ipv6_nib_iter_ctx(&state, &entry)) {
+ *         printf("* %u:", gnrc_ipv6_nib_get_cid(&entry));
+ *         printf("%s/%u\n", ipv6_addr_to_str(addr_str, &entry.dst,
+ *                                            sizeof(addr_str), entry.pfx_len);
+ *     }
+ *     return 0;
+ * }
+ * ```
+ *
+ * @return  true, if iteration can be continued.
+ * @return  false, if @p entry is the last 6LoWPAN compression context table
+ *          entry in the NIB.
  */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_ctx(const gnrc_ipv6_nib_t *prev);
+bool gnrc_ipv6_nib_iter_ctx(void **state, gnrc_ipv6_nib_t *entry);
 
 /**
  * @brief   Iterates over all entries in the NIB
  *
- * @param[in] prev  Previous NIB entry. May be NULL to start iteration.
+ * @pre (state != NULL) && (entry != NULL)
  *
- * @return  NIB entry after @p prev.
- * @return  NULL if @p prev is the last entry in the NIB.
+ * @param[in,out] state Iteration state of the NIB. Must point to a NULL pointer
+ *                      to start iteration.
+ * @param[out] entry    The next NIB entry
+ *
+ * Usage example:
+ *
+ * ```C
+ * #include <stdio.h>
+ *
+ * #include "net/ipv6/addr.h"
+ * #include "net/gnrc/ipv6/nib.h"
+ *
+ * int main(void) {
+ *     void *state = NULL;
+ *     gnrc_ipv6_nib_t entry;
+ *
+ *     while (gnrc_ipv6_nib_iter(&state, &entry)) {
+ *         // do stuff with NIB
+ *     }
+ *     return 0;
+ * }
+ * ```
+ *
+ * @return  true, if iteration can be continued.
+ * @return  false, if @p entry is the last entry in the NIB.
  */
-const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_ctx(const gnrc_ipv6_nib_t *prev);
+bool gnrc_ipv6_nib_iter(void **state, gnrc_ipv6_nib_t *entry);
 
 #if GNRC_IPV6_NIB_DO_HANDLE_NBR_SOL || defined(DOXYGEN)
 /**
@@ -550,9 +755,9 @@ const gnrc_ipv6_nib_t *gnrc_ipv6_nib_iter_ctx(const gnrc_ipv6_nib_t *prev);
  *
  * Additional behavior not specified in RFC: if the link-layer does not have
  * link-layer addresses, a neighbor cache entry is created for ipv6_hdr_t::src
- * of @p ipv6_hdr with gnrc_ipv6_nib_t::l2addr_len := 0 (and set to 
- * @ref GNRC_IPV6_NIB_NUD_STATE_STALE), even if the neighbor solicitation does
- * not contain a SLLAO.
+ * of @p ipv6_hdr with gnrc_ipv6_nib_t::l2addr_len := 0 (and set to
+ * @ref GNRC_IPV6_NIB_INFO_NUD_STATE_STALE), even if the neighbor solicitation
+ * does not contain a SLLAO.
  *
  * @see [RFC 4861, section 7.1.1](https://tools.ietf.org/html/rfc4861#section-7.1.1)
  * @see [RFC 4861, section 7.2.3](https://tools.ietf.org/html/rfc4861#section-7.2.3)
@@ -609,8 +814,8 @@ void gnrc_ipv6_nib_handle_nbr_adv(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
  * Additional behavior not specified in RFC: if the link-layer does not have
  * link-layer addresses, a neighbor cache entry is created for ipv6_hdr_t::src
  * of @p ipv6_hdr with gnrc_ipv6_nib_t::l2addr_len := 0 (and set to
- * @ref GNRC_IPV6_NIB_NUD_STATE_STALE), even if the router solicitation does
- * not contain a SLLAO.
+ * @ref GNRC_IPV6_NIB_INFO_NUD_STATE_STALE), even if the router solicitation
+ * does not contain a SLLAO.
  *
  * @see [RFC 4861, section 6.1.1](https://tools.ietf.org/html/rfc4861#section-6.1.1)
  * @see [RFC 4861, section 6.2.6](https://tools.ietf.org/html/rfc4861#section-6.2.6)
@@ -640,8 +845,8 @@ void gnrc_ipv6_nib_handle_rtr_sol(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
  * Additional behavior not specified in RFC: if the link-layer does not have
  * link-layer addresses, a neighbor cache entry is created for ipv6_hdr_t::src
  * of @p ipv6_hdr with gnrc_ipv6_nib_t::l2addr_len := 0 (and set to
- * @ref GNRC_IPV6_NIB_NUD_STATE_STALE), even if the router advertisement does
- * not contain a SLLAO.
+ * @ref GNRC_IPV6_NIB_INFO_NUD_STATE_STALE), even if the router advertisement
+ * does not contain a SLLAO.
  *
  * @see [RFC 4861, section 6.1.2](https://tools.ietf.org/html/rfc4861#section-6.1.2)
  * @see [RFC 4861, section 6.3.4](https://tools.ietf.org/html/rfc4861#section-6.3.4)
@@ -673,7 +878,7 @@ void gnrc_ipv6_nib_handle_rtr_adv(unsigned iface, const ipv6_hdr_t *ipv6_hdr,
  * Additional behavior not specified in RFC: if the link-layer does not have
  * link-layer addresses, a neighbor cache entry is created for ipv6_hdr_t::src
  * of @p ipv6_hdr with gnrc_ipv6_nib_t::l2addr_len := 0 (and set to
- * @ref GNRC_IPV6_NIB_NUD_STATE_STALE), even if the redirect message does
+ * @ref GNRC_IPV6_NIB_INFO_NUD_STATE_STALE), even if the redirect message does
  * not contain a TLLAO.
  *
  * @see [RFC 4861, section 8.1](https://tools.ietf.org/html/rfc4861#section-8.1)
