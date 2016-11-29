@@ -196,12 +196,12 @@ void     hal_watchdogStop(void)
 
 clock_time_t hal_getTick(void)
 {
-    return (clock_time_t)xtimer_now();
+    return (clock_time_t)xtimer_now_usec();
 }
 
 clock_time_t hal_getSec(void)
 {
-    return (clock_time_t)xtimer_now() / SEC_IN_USEC;
+    return (clock_time_t)xtimer_now_usec() / SEC_IN_USEC;
 }
 
 

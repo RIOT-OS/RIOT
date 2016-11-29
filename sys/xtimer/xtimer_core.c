@@ -69,21 +69,21 @@ static inline void xtimer_spin_until(uint32_t target) {
 void xtimer_init(void)
 {
     /* initialize low-level timer */
-    timer_init(XTIMER_DEV, XTIMER_USEC_TO_TICKS(1000000ul), _periph_timer_callback, NULL);
+    timer_init(XTIMER_DEV, XTIMER_HZ, _periph_timer_callback, NULL);
 
     /* register initial overflow tick */
     _lltimer_set(0xFFFFFFFF);
 }
 
-static void _xtimer_now64(uint32_t *short_term, uint32_t *long_term)
+static void _xtimer_now_internal(uint32_t *short_term, uint32_t *long_term)
 {
     uint32_t before, after, long_value;
 
-    /* loop to cope with possible overflow of xtimer_now() */
+    /* loop to cope with possible overflow of _xtimer_now() */
     do {
-        before = xtimer_now();
+        before = _xtimer_now();
         long_value = _long_cnt;
-        after = xtimer_now();
+        after = _xtimer_now();
 
     } while(before > after);
 
@@ -91,10 +91,10 @@ static void _xtimer_now64(uint32_t *short_term, uint32_t *long_term)
     *long_term = long_value;
 }
 
-uint64_t xtimer_now64(void)
+uint64_t _xtimer_now64(void)
 {
     uint32_t short_term, long_term;
-    _xtimer_now64(&short_term, &long_term);
+    _xtimer_now_internal(&short_term, &long_term);
 
     return ((uint64_t)long_term<<32) + short_term;
 }
@@ -104,7 +104,7 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
     DEBUG(" _xtimer_set64() offset=%" PRIu32 " long_offset=%" PRIu32 "\n", offset, long_offset);
     if (!long_offset) {
         /* timer fits into the short timer */
-        xtimer_set(timer, (uint32_t) offset);
+        _xtimer_set(timer, (uint32_t) offset);
     }
     else {
         int state = irq_disable();
@@ -112,7 +112,7 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
             _remove(timer);
         }
 
-        _xtimer_now64(&timer->target, &timer->long_target);
+        _xtimer_now_internal(&timer->target, &timer->long_target);
         timer->target += offset;
         timer->long_target += long_offset;
         if (timer->target < offset) {
@@ -126,7 +126,7 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
     }
 }
 
-void xtimer_set(xtimer_t *timer, uint32_t offset)
+void _xtimer_set(xtimer_t *timer, uint32_t offset)
 {
     DEBUG("timer_set(): offset=%" PRIu32 " now=%" PRIu32 " (%" PRIu32 ")\n", offset, xtimer_now(), _xtimer_lltimer_now());
     if (!timer->callback) {
@@ -137,11 +137,11 @@ void xtimer_set(xtimer_t *timer, uint32_t offset)
     xtimer_remove(timer);
 
     if (offset < XTIMER_BACKOFF) {
-        xtimer_spin(offset);
+        _xtimer_spin(offset);
         _shoot(timer);
     }
     else {
-        uint32_t target = xtimer_now() + offset;
+        uint32_t target = _xtimer_now() + offset;
         _xtimer_set_absolute(timer, target);
     }
 }
@@ -164,18 +164,12 @@ static inline void _lltimer_set(uint32_t target)
         return;
     }
     DEBUG("_lltimer_set(): setting %" PRIu32 "\n", _xtimer_lltimer_mask(target));
-#ifdef XTIMER_SHIFT
-    target = XTIMER_USEC_TO_TICKS(target);
-    if (!target) {
-        target++;
-    }
-#endif
     timer_set_absolute(XTIMER_DEV, XTIMER_CHAN, _xtimer_lltimer_mask(target));
 }
 
 int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
 {
-    uint32_t now = xtimer_now();
+    uint32_t now = _xtimer_now();
     int res = 0;
 
     DEBUG("timer_set_absolute(): now=%" PRIu32 " target=%" PRIu32 "\n", now, target);
@@ -309,7 +303,7 @@ static uint32_t _time_left(uint32_t target, uint32_t reference)
 
 static inline int _this_high_period(uint32_t target) {
 #if XTIMER_MASK
-    return (target & XTIMER_MASK_SHIFTED) == _xtimer_high_cnt;
+    return (target & XTIMER_MASK) == _xtimer_high_cnt;
 #else
     (void)target;
     return 1;
@@ -413,7 +407,7 @@ static void _next_period(void)
 {
 #if XTIMER_MASK
     /* advance <32bit mask register */
-    _xtimer_high_cnt += ~XTIMER_MASK_SHIFTED + 1;
+    _xtimer_high_cnt += ~XTIMER_MASK + 1;
     if (_xtimer_high_cnt == 0) {
         /* high_cnt overflowed, so advance >32bit counter */
         _long_cnt++;

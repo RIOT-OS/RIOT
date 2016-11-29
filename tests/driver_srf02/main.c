@@ -75,7 +75,7 @@ static int cmd_sample(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    uint32_t wakeup = xtimer_now();
+    xtimer_ticks32_t wakeup = xtimer_now();
 
     while(1) {
         sample();

@@ -28,6 +28,7 @@
 #include "mutex.h"
 #include "msg.h"
 #include "xtimer.h"
+#include "timex.h"
 #include "utlist.h"
 
 #define ENABLE_DEBUG (0)
@@ -61,7 +62,7 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
  */
 static void fib_lifetime_to_absolute(uint32_t ms, uint64_t *target)
 {
-    *target = xtimer_now64() + (ms * 1000);
+    *target = xtimer_now_usec64() + (ms * MS_IN_USEC);
 }
 
 /**
@@ -80,7 +81,7 @@ static void fib_lifetime_to_absolute(uint32_t ms, uint64_t *target)
  */
 static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
                           fib_entry_t **entry_arr, size_t *entry_arr_size) {
-    uint64_t now = xtimer_now64();
+    uint64_t now = xtimer_now_usec64();
 
     size_t count = 0;
     size_t prefix_size = 0;
@@ -703,7 +704,7 @@ int fib_sr_create(fib_table_t *table, fib_sr_t **fib_sr, kernel_pid_t sr_iface_i
 */
 static int fib_sr_check_lifetime(fib_sr_t *fib_sr)
 {
-    uint64_t tm = fib_sr->sr_lifetime - xtimer_now64();
+    uint64_t tm = fib_sr->sr_lifetime - xtimer_now_usec64();
     /* check if the lifetime expired */
     if ((int64_t)tm < 0) {
         /* remove this sr if its lifetime expired */
@@ -777,7 +778,7 @@ int fib_sr_read_head(fib_table_t *table, fib_sr_t *fib_sr, kernel_pid_t *iface_i
 
     *iface_id = fib_sr->sr_iface_id;
     *sr_flags = fib_sr->sr_flags;
-    *sr_lifetime = fib_sr->sr_lifetime - xtimer_now64();
+    *sr_lifetime = fib_sr->sr_lifetime - xtimer_now_usec64();
 
     mutex_unlock(&(table->mtx_access));
     return 0;
@@ -1530,7 +1531,7 @@ static void fib_print_address(universal_address_container_t *entry)
 void fib_print_routes(fib_table_t *table)
 {
     mutex_lock(&(table->mtx_access));
-    uint64_t now = xtimer_now64();
+    uint64_t now = xtimer_now_usec64();
 
     if (table->table_type == FIB_TABLE_TYPE_SH) {
         printf("%-" FIB_ADDR_PRINT_LENS "s %-17s %-" FIB_ADDR_PRINT_LENS "s %-10s %-16s"

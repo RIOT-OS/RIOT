@@ -252,7 +252,7 @@ static void *_event_loop(void *args)
 
 void _update_lifetime(void)
 {
-    uint32_t now = xtimer_now();
+    uint32_t now = xtimer_now_usec();
     uint16_t now_sec = now / SEC_IN_USEC;
 
     gnrc_rpl_parent_t *parent;

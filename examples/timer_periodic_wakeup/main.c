@@ -27,11 +27,11 @@
 
 int main(void)
 {
-    uint32_t last_wakeup = xtimer_now();
+    xtimer_ticks32_t last_wakeup = xtimer_now();
 
     while(1) {
         xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
-        printf("slept until %" PRIu32 "\n", xtimer_now());
+        printf("slept until %" PRIu32 "\n", xtimer_usec_from_ticks(xtimer_now()));
     }
 
     return 0;

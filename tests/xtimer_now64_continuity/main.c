@@ -29,10 +29,10 @@
 int main(void)
 {
     uint32_t n = ITERATIONS;
-    uint64_t before = xtimer_now64();
+    uint64_t before = _xtimer_now64();
 
     while(--n) {
-        uint64_t now = xtimer_now64();
+        uint64_t now = _xtimer_now64();
         if ((now-before) > MAXDIFF) {
             puts("TEST FAILED.");
             break;

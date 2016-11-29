@@ -260,7 +260,7 @@ int _gnrc_rpl_dodag_show(void)
     gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
     int8_t cleanup;
-    uint64_t tc, ti, xnow = xtimer_now64();
+    uint64_t tc, ti, xnow = xtimer_now_usec64();
 
     for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
         if (gnrc_rpl_instances[i].state == 0) {

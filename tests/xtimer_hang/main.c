@@ -76,8 +76,9 @@ int main(void)
                   NULL,
                   "timer2");
 
-    uint32_t end = xtimer_now() + TEST_TIME;
-    while(xtimer_now() < end)
+    xtimer_ticks32_t end = xtimer_now();
+    end.ticks32 += _xtimer_ticks_from_usec(TEST_TIME);
+    while(_xtimer_now() < end.ticks32)
     {
         count++;
         xtimer_usleep(100LU * 1000);

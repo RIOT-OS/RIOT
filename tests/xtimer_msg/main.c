@@ -82,11 +82,10 @@ void *timer_thread_local(void *arg)
         msg_t m;
         msg_receive(&m);
 
-        uint32_t now = xtimer_now();
-        int sec, min, hr;
-        sec = now/1000000;
-        min = sec/60;
-        hr = sec/3600;
+        uint32_t now = xtimer_now_usec();
+        int sec = now / 1000000;
+        int min = sec / 60;
+        int hr  = sec / 3600;
         printf("sec=%d min=%d hour=%d\n", sec, min, hr);
     }
 }

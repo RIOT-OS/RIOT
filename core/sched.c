@@ -84,7 +84,7 @@ int __attribute__((used)) sched_run(void)
     }
 
 #ifdef MODULE_SCHEDSTATISTICS
-    unsigned long time = xtimer_now();
+    unsigned long time = _xtimer_now();
 #endif
 
     if (active_thread) {

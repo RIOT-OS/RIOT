@@ -138,7 +138,7 @@ static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
     /* start send data */
     uart_write(dev->uart, dev->tx_buf, size + 6);
 
-    uint64_t sent_time = xtimer_now64();
+    xtimer_ticks64_t sent_time = xtimer_now64();
 
     xtimer_t resp_timer;
 
@@ -149,7 +149,9 @@ static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
 
     /* wait for results */
     while ((dev->resp_limit != dev->resp_count) &&
-           (xtimer_now64() - sent_time < RESP_TIMEOUT_USEC)) {
+           (xtimer_less(
+                xtimer_diff32_64(xtimer_now64(), sent_time),
+                xtimer_ticks_from_usec(RESP_TIMEOUT_USEC)))) {
         mutex_lock(&(dev->resp_lock));
     }
 

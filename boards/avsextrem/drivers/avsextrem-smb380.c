@@ -401,7 +401,7 @@ uint8_t writeRingBuff(int16_t *value)
 
         /* measuring temperature dependent internal sample rate of SMB380 */
         if (smb380_mode == SMB380_CONTINOUS) {
-            tickLastSample = xtimer_now();
+            tickLastSample = xtimer_now_usec();
             tickCurrentSamples++;
         }
 
@@ -1030,7 +1030,7 @@ void SMB380_enableNewDataInt(void)
     SMB380_ssp_read();
     SMB380_Unprepare();
     // measuring temperature dependent internal sample rate of SMB380
-    tickStart = xtimer_now();
+    tickStart = xtimer_now_usec();
     tickCurrentSamples = 0;
     irq_restore(cpsr);
 }
