@@ -73,13 +73,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     }
 
     /* enable pwm peripheral */
-    if (pwm_config[dev].bus == AHB1) {
-        RCC->AHB1ENR |= pwm_config[dev].rcc_mask;
-    } else if (pwm_config[dev].bus == AHB2) {
-        RCC->AHB2ENR |= pwm_config[dev].rcc_mask;
-    } else {
-        RCC->AHB3ENR |= pwm_config[dev].rcc_mask;
-    }
+    periph_clk_en(pwm_config[dev].bus, pwm_config[dev].rcc_mask);
 
     /* setup pins: alternate function */
     for (int i = 0; i < channels; i++) {
@@ -88,7 +82,8 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
         if (pins[i] < 8) {
             port->AFR[0] &= ~(0xf << (pins[i] * 4));
             port->AFR[0] |= (pwm_config[dev].AF << (pins[i] * 4));
-        } else {
+        }
+        else {
             port->AFR[1] &= ~(0xf << ((pins[i] - 8) * 4));
             port->AFR[1] |= (pwm_config[dev].AF << ((pins[i] - 8) * 4));
         }
@@ -160,7 +155,8 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     return freq;
 }
 
-uint8_t pwm_channels(pwm_t dev) {
+uint8_t pwm_channels(pwm_t dev)
+{
     return (timer_config[dev].channels);
 }
 

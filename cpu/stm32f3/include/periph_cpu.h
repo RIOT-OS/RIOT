@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015-2016 Freie Universität Berlin
+ * Copyright (C) 2016 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief           CPU specific definitions for internal peripheral handling
  *
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Aurelien Gonce <aurelien.gonce@altran.com>
  */
 
 #ifndef PERIPH_CPU_H
@@ -24,6 +26,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Use the shared SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
 
 /**
  * @brief   Generate GPIO mode bitfields
