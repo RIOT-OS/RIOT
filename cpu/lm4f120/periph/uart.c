@@ -43,11 +43,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     assert(uart == 0);
     /* Check to make sure the UART peripheral is present */
     if(!ROM_SysCtlPeripheralPresent(SYSCTL_PERIPH_UART0)){
-        return -1;
+        return UART_NODEV;
     }
 
     int res = init_base(uart, baudrate);
-    if(res < 0){
+    if(res != UART_OK){
         return res;
     }
 
@@ -76,7 +76,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
             break;
 #endif
     }
-    return 0;
+    return UART_OK;
 }
 
 static int init_base(uart_t uart, uint32_t baudrate)
@@ -99,8 +99,10 @@ static int init_base(uart_t uart, uint32_t baudrate)
             ROM_UARTEnable(UART0_BASE);
             break;
 #endif
+        default:
+            return UART_NODEV;
         }
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)

@@ -35,7 +35,7 @@ static int init_base(uart_t uart, uint32_t baudrate);
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     int res = init_base(uart, baudrate);
-    if (res < 0) {
+    if (res != UART_OK) {
         return res;
     }
 
@@ -64,7 +64,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 #endif
     }
 
-    return 0;
+    return UART_OK;
 }
 
 static int init_base(uart_t uart, uint32_t baudrate)
@@ -74,7 +74,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
         case UART_0:
             /* this implementation only supports 115200 baud */
             if (baudrate != 115200) {
-                return -2;
+                return UART_NOBAUD;
             }
 
             /* power on UART device and select peripheral clock */
@@ -105,7 +105,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
         case UART_1:
             /* this implementation only supports 115200 baud */
             if (baudrate != 115200) {
-                return -2;
+                return UART_NOBAUD;
             }
 
             /* power on UART device and select peripheral clock */
@@ -133,10 +133,10 @@ static int init_base(uart_t uart, uint32_t baudrate)
             break;
 #endif
         default:
-            return -1;
+            return UART_NODEV;
     }
 
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)

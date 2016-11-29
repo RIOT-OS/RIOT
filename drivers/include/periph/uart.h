@@ -114,6 +114,17 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   Possible UART return values
+ */
+enum {
+    UART_OK         =  0,   /**< everything in order */
+    UART_NODEV      = -1,   /**< invalid UART device given */
+    UART_NOBAUD     = -2,   /**< given baudrate is not applicable */
+    UART_INTERR     = -3,   /**< all other internal errors */
+    UART_NOMODE     = -4    /**< given mode is not applicable */
+};
+
+/**
  * @brief   Initialize a given UART device
  *
  * The UART device will be initialized with the following configuration:
@@ -128,10 +139,10 @@ typedef struct {
  *                          for every byte that is received (RX buffer filled)
  * @param[in] arg           optional context passed to the callback functions
  *
- * @return                  0 on success
- * @return                  -1 on invalid UART device
- * @return                  -2 on inapplicable baudrate
- * @return                  -3 on other errors
+ * @return                  UART_OK on success
+ * @return                  UART_NODEV on invalid UART device
+ * @return                  UART_NOBAUD on inapplicable baudrate
+ * @return                  UART_INTERR on other errors
  */
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg);
 

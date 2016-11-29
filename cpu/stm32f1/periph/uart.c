@@ -58,7 +58,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* make sure the given device is valid */
     if (uart >= UART_NUMOF) {
-        return -1;
+        return UART_NODEV;
     }
 
     /* save ISR context */
@@ -89,7 +89,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev(uart)->CR1 = (USART_CR1_UE | USART_CR1_TE |
                       USART_CR1_RE | USART_CR1_RXNEIE);
 
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
