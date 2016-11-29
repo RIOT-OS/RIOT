@@ -63,13 +63,11 @@
  * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc GNRC) and at least
  * one network device.
  *
- * After including header files for the @ref net_af "address families" and
- * the @ref net_sock_udp "UDP `sock`s" themselves, we create some buffer space
- * `buf` to store the data received by the server:
+ * After including the header file for @ref net_sock_udp "UDP sock", we create some 
+ * buffer space `buf` to store the data received by the server:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
- * #include "net/af.h"
- * #include "net/sock/ip.h"
+ * #include "net/sock/udp.h"
  *
  * uint8_t buf[128];
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -167,7 +165,7 @@
  *                                           IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
  *         if (sock_udp_send(&sock, "Hello!", sizeof("Hello!"), &remote) < 0) {
  *             puts("Error sending message");
- *             sock_udp_close();
+ *             sock_udp_close(&sock);
  *             return 1;
  *         }
  *         if ((res = sock_udp_recv(&sock, buf, sizeof(buf), 1 * SEC_IN_USEC,
