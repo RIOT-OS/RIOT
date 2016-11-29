@@ -28,6 +28,15 @@ endif
 ifeq ($(strip $(SRCXX)),)
     SRCXX := $(wildcard *.cpp)
 endif
+ifeq ($(strip $(RUSTSRC)),)
+    ifneq (,$(wildcard main.rs))
+        CRATE_TYPE = bin
+        RUSTSRC = main.rs
+    else ifneq (,$(wildcard lib.rs))
+        CRATE_TYPE = lib
+        RUSTSRC = lib.rs
+    endif
+endif
 ifeq ($(strip $(ASMSRC)),)
     ASMSRC := $(wildcard *.s)
 endif
@@ -39,6 +48,7 @@ OBJC_LTO    := $(SRC:%.c=$(BINDIR)/$(MODULE)/%.o)
 OBJC_NOLTO  := $(SRC_NOLTO:%.c=$(BINDIR)/$(MODULE)/%.o)
 OBJC        := $(OBJC_NOLTO) $(OBJC_LTO)
 OBJCXX      := $(SRCXX:%.cpp=$(BINDIR)/$(MODULE)/%.o)
+RUSTOBJ     := $(RUSTSRC:%.rs=$(BINDIR)/$(MODULE)/%.o)
 ASMOBJ      := $(ASMSRC:%.s=$(BINDIR)/$(MODULE)/%.o)
 ASSMOBJ     := $(ASSMSRC:%.S=$(BINDIR)/$(MODULE)/%.o)
 
@@ -47,12 +57,6 @@ DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
 
 $(BINDIR)/$(MODULE)/:
 	$(AD)mkdir -p $@
-
-$(BINDIR)/$(MODULE).a $(OBJ): | $(BINDIR)/$(MODULE)/
-
-$(BINDIR)/$(MODULE).a: $(OBJ) | ${DIRS:%=ALL--%}
-	$(AD)$(AR) $(ARFLAGS) $@ $?
-
 
 CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 
@@ -71,6 +75,26 @@ $(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.cpp $(RIOTBUILD_CONFIG_HEADER_C)
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CXXFLAGS) $(INCLUDES) $(CXXINCLUDES) -MD -MP -c -o $@ $(abspath $<)
+
+ifdef CRATE_TYPE
+    include $(RIOTBASE)/Makefile.rust
+endif
+
+ifeq ($(CRATE_TYPE),bin)
+    $(RUSTOBJ): $(RUSTSRC) | $(BINDIR)/$(MODULE)/ ${DIRS:%=ALL--%}
+	$(AD)rustc $(RUSTC_FLAGS) --emit obj -o $@ $<
+    $(BINDIR)/$(MODULE).a: $(RUSTOBJ)
+	$(AD)$(AR) $(ARFLAGS) $@ $<
+else ifeq ($(CRATE_TYPE),lib)
+    $(BINDIR)/$(LIBNAME).rlib: $(RUSTSRC) | $(BINDIR)/$(MODULE)/ ${DIRS:%=ALL--%}
+	$(AD)rustc $(RUSTC_FLAGS) -o $@ $<
+    $(BINDIR)/$(MODULE).a: $(BINDIR)/$(LIBNAME).rlib
+	$(AD)ln -fs $< $@
+else
+    $(BINDIR)/$(MODULE).a $(OBJ): | $(BINDIR)/$(MODULE)/
+    $(BINDIR)/$(MODULE).a: $(OBJ) | ${DIRS:%=ALL--%}
+	$(AD)$(AR) $(ARFLAGS) $@ $?
+endif
 
 $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
 	$(AD)$(AS) $(ASFLAGS) -o $@ $(abspath $<)

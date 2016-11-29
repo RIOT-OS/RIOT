@@ -13,3 +13,6 @@ FEATURES_PROVIDED += ethernet
 
 # The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = x86
+
+# Native rust builds are supported
+FEATURES_PROVIDED += rust_support
