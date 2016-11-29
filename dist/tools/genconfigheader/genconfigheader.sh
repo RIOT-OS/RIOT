@@ -50,6 +50,8 @@ for arg in "$@"; do
     -D*)
       # Strip leading -D
       d=${arg#-D}
+      # Replace '/' with '_'
+      d=$(echo $d | tr '/' '_')
       if [ -z "${d##*=*}" ]; then
         # key=value pairs
         key=${d%%=*}
