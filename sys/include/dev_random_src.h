@@ -31,14 +31,6 @@ extern "C" {
  * @{
  */
 /**
- * @brief   Default randomness source
- *
- * Just let's @ref sys_dev_random always return 0 so ideally this should be
- * overwritten by another randomness source if available.
- */
-#define DEV_RANDOM_SRC_NULL         (0)
-
-/**
  * @brief   Use @ref drivers_periph_hwrng as randomness source
  */
 #define DEV_RANDOM_SRC_PERIPH_HWRNG (1)

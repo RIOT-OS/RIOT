@@ -48,7 +48,8 @@ extern "C" {
  * See @ref dev_random_src.h for supported values
  */
 #ifndef DEV_RANDOM_SRC
-#define DEV_RANDOM_SRC  (DEV_RANDOM_SRC_NULL)
+#define DEV_RANDOM_SRC  (0)
+#error  "No randomness source defined"
 #endif
 
 #if DEV_RANDOM_SRC == DEV_RANDOM_SRC_PERIPH_HWRNG
@@ -98,8 +99,25 @@ static inline void dev_random_read(void *buf, size_t num)
 #if DEV_RANDOM_SRC == DEV_RANDOM_SRC_PERIPH_HWRNG
     hwrng_read(buf, (unsigned int)num);
 #elif DEV_RANDOM_SRC == DEV_RANDOM_SRC_PERIPH_ADC
+    adc_res_t res = ADC_RES_16BIT;
     for (unsigned i = 0; i < num * 8; i++) {
-        bf_set(buf, adc_sample(DEV_RANDOM_ADC, ADC_RES_16BIT) & 0x1);
+        unsigned *ibuf = buf;
+        unsigned ibuf_idx = i / (sizeof(unsigned) * 8);
+        unsigned v;
+        int r = -1;
+
+        while ((r < 0) && (res >= ADC_RES_6BIT)) {
+            r = adc_sample(DEV_RANDOM_ADC, res);
+            if (r < 0) {
+                res--;
+            }
+        }
+        assert(res >= ADC_RES_6BIT);
+
+        ibuf[ibuf_idx] ^= (v << (i % (sizeof(unsigned) * 8)));
+        if (i % (sizeof(unsigned) * 8)) {
+            ibuf[ibuf_idx] = (v >> (sizeof(unsigned) * 8) - (i % (sizeof(unsigned) * 8)));
+        }
     }
 #elif   DEV_RANDOM_SRC == DEV_RANDOM_SRC_AT86RF2XX
     at86rf2xx_get_random(dev_random_at86rf2xx, buf, num);
