@@ -33,12 +33,14 @@ extern "C" {
 extern volatile uint32_t _xtimer_high_cnt;
 #endif
 
+#ifndef XTIMER_USEC_TO_TICKS
 #if (XTIMER_SHIFT < 0)
 #define XTIMER_USEC_TO_TICKS(value) ( (value) << -XTIMER_SHIFT )
 #define XTIMER_TICKS_TO_USEC(value) ( (value) >> -XTIMER_SHIFT )
 #else
 #define XTIMER_USEC_TO_TICKS(value) ( (value) >> XTIMER_SHIFT )
 #define XTIMER_TICKS_TO_USEC(value) ( (value) << XTIMER_SHIFT )
+#endif
 #endif
 
 /**
