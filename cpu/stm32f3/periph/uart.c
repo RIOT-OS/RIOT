@@ -19,8 +19,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/uart.h"
 
 /**
@@ -204,9 +202,7 @@ static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
         /* do nothing on overrun */
         dev->ICR |= USART_ICR_ORECF;
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #if UART_0_EN

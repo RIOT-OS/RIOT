@@ -30,8 +30,6 @@
 #include "mutex.h"
 #include "periph/spi.h"
 #include "periph_conf.h"
-#include "thread.h"
-#include "sched.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -395,9 +393,7 @@ static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev)
         spi->DR = data;
     }
     /* see if a thread with higher priority wants to run now */
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #if SPI_0_EN

@@ -24,8 +24,6 @@
 #include <math.h>
 
 #include "cpu.h"
-#include "thread.h"
-#include "sched.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
 
@@ -232,9 +230,7 @@ static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
     }
 #endif
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 
 }
 

@@ -19,8 +19,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/uart.h"
 
 /**
@@ -131,7 +129,5 @@ void isr_uart(void)
         ctx[0].rx_cb(ctx[0].arg, (uint8_t)UART->DR);
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

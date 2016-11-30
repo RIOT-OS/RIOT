@@ -23,8 +23,6 @@
 
 #include "cpu.h"
 #include "mutex.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 #include "periph/spi.h"
@@ -356,9 +354,7 @@ static inline void irq_handler_transfer(Spi *spi, spi_t dev)
     }
 
     /* See if a thread with higher priority wants to run now */
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #if SPI_0_EN

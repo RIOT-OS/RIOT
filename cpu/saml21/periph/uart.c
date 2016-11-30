@@ -22,8 +22,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/uart.h"
 
 /**
@@ -143,10 +141,7 @@ static inline void irq_handler(uint8_t uartnum, SercomUsart *dev)
         /* clear error flag */
         dev->INTFLAG.bit.ERROR = 1;
     }
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 void uart_poweron(uart_t uart)

@@ -20,8 +20,6 @@
 
 #include "cpu.h"
 #include "mutex.h"
-#include "thread.h"
-#include "sched.h"
 #include "periph_conf.h"
 #include "periph/cpuid.h"
 #include "nrfmin.h"
@@ -454,9 +452,7 @@ void isr_radio(void)
             }
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 /*

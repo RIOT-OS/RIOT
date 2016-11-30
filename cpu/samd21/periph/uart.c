@@ -21,8 +21,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 
 #include "periph/uart.h"
 #include "periph/gpio.h"
@@ -142,9 +140,7 @@ static inline void irq_handler(int dev)
         /* clear error flag */
         uart->INTFLAG.reg = SERCOM_USART_INTFLAG_ERROR;
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef UART_0_ISR

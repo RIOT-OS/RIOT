@@ -22,8 +22,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
@@ -304,9 +302,7 @@ static inline void isr_handler(Pio *port, int port_num)
             exti_ctx[ctx].cb(exti_ctx[ctx].arg);
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 void isr_pioa(void)

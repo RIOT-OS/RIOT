@@ -18,8 +18,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/uart.h"
 
 /**
@@ -136,8 +134,6 @@ void UART_0_ISR(void)
         uint8_t data = (uint8_t)UART_0_DEV->RBR;
         config[UART_0].rx_cb(config[UART_0].arg, data);
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif

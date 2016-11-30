@@ -26,8 +26,6 @@
 #include <stdint.h>
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/uart.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -180,7 +178,5 @@ void isr_uart0(void)
         uint8_t byte = (uint8_t)(NRF_UART0->RXD & 0xff);
         uart_config.rx_cb(uart_config.arg, byte);
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

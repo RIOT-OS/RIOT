@@ -23,8 +23,6 @@
  */
 
 #include "cpu.h"
-#include "thread.h"
-#include "sched.h"
 #include "mutex.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
@@ -200,9 +198,7 @@ static inline void irq_handler(int uart, USART_TypeDef *dev)
         char data = (char)dev->DR;
         uart_ctx[uart].rx_cb(uart_ctx[uart].arg, data);
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 static inline void dma_handler(int uart, int stream)
@@ -215,9 +211,7 @@ static inline void dma_handler(int uart, int stream)
         dma_base(stream)->HIFCR = dma_ifc(stream);
     }
     mutex_unlock(&tx_sync[uart]);
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef UART_0_ISR
