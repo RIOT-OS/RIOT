@@ -36,6 +36,7 @@
 #include "net/netdev2.h"
 #include "net/gnrc.h"
 #include "net/gnrc/mac/types.h"
+#include "net/ieee802154.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -102,6 +103,16 @@ typedef struct gnrc_netdev2 {
      * @brief general information for the MAC protocol
      */
     uint16_t mac_info;
+
+    /**
+     * @brief device's l2 address
+     */
+    uint8_t  l2_addr[IEEE802154_LONG_ADDRESS_LEN];
+
+    /**
+     * @brief device's l2 address length
+     */
+    uint8_t  l2_addr_len;
 #endif
 } gnrc_netdev2_t;
 
