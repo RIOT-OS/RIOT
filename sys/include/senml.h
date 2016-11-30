@@ -24,7 +24,7 @@
  * temperature sensor, could use this media type in protocols such as HTTP or
  * CoAP to transport the measurements of the sensor or to be configured.
  *
- * @see <a href="https://tools.ietf.org/html/draft-ietf-core-senml-00">
+ * @see <a href="https://tools.ietf.org/html/draft-ietf-core-senml-04">
  *      Media Types for Sensor Markup Language (SenML)
  *      </a>
  *
