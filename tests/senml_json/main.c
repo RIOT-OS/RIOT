@@ -56,7 +56,7 @@ static void senml_print_record(const senml_record_t *record)
     else if (record->value_type == SENML_TYPE_BINARY) {
         printf("Data Value:\t%s\n", record->value.d);
     }
-    
+
     if (record->value_sum != 0) {
         printf("Value Sum:\t%f\n", record->value_sum);
     }
@@ -80,7 +80,7 @@ static void senml_print_pack(const senml_pack_t *pack)
 int main(void)
 {
     int rc;
-    
+
     char output[512];
 
     char input_01[] = "[]";
@@ -96,9 +96,9 @@ int main(void)
                       "{\"n\":\"Kim\",\"t\":-10,\"ut\":12,\"vd\":\"U2VuTUwgaXMgc28gY29vbCEK\"}]";
 
     char input_06[] = "[{\"n\":\"Donald\", \"u\":\"W\", \"s\":1240.812, \"t\":987654321}]";
-    
+
     char input_07[] = "[{\"n\":\"Daisy\",\"vb\":true}]";
-    
+
     senml_base_info_t base_info;
     senml_record_t    records[2];
     senml_pack_t      pack;
@@ -111,7 +111,7 @@ int main(void)
     pack.num       = 2;
 
     printf("\nINPUT:\t%s\n\n", input_01);
-    
+
     rc = senml_decode_json_s(input_01, &pack);
 
     if (rc == 0) {
@@ -121,7 +121,7 @@ int main(void)
         printf("ERROR: decoding input_01 failed\n");
         return -1;
     }
-    
+
     rc = senml_encode_json_s(&pack, output, 512);
 
     if (rc == 0) {
@@ -131,17 +131,17 @@ int main(void)
         printf("ERROR: encoding data based on input_01 failed\n");
         return -1;
     }
-    
-    
+
+
     memset(&base_info, 0, sizeof(senml_base_info_t));
     memset(records, 0, sizeof(records));
-    
+
     pack.base_info = &base_info;
     pack.records   = records;
     pack.num       = 2;
-    
+
     printf("\nINPUT:\t%s\n\n", input_02);
-    
+
     rc = senml_decode_json_s(input_02, &pack);
 
     if (rc == 0) {
@@ -151,7 +151,7 @@ int main(void)
         printf("ERROR: decoding input_02 failed\n");
         return -1;
     }
-    
+
     rc = senml_encode_json_s(&pack, output, 512);
 
     if (rc == 0) {
@@ -161,17 +161,17 @@ int main(void)
         printf("ERROR: encoding data based on input_02 failed\n");
         return -1;
     }
-    
-    
+
+
     memset(&base_info, 0, sizeof(senml_base_info_t));
     memset(records, 0, sizeof(records));
-    
+
     pack.base_info = &base_info;
     pack.records   = records;
     pack.num       = 2;
-    
+
     printf("\nINPUT:\t%s\n\n", input_03);
-    
+
     rc = senml_decode_json_s(input_03, &pack);
 
     if (rc == 0) {
@@ -181,7 +181,7 @@ int main(void)
         printf("ERROR: decoding input_03 failed\n");
         return -1;
     }
-    
+
     rc = senml_encode_json_s(&pack, output, 512);
 
     if (rc == 0) {
@@ -191,17 +191,17 @@ int main(void)
         printf("ERROR: encoding data based on input_03 failed\n");
         return -1;
     }
-    
-    
+
+
     memset(&base_info, 0, sizeof(senml_base_info_t));
     memset(records, 0, sizeof(records));
-    
+
     pack.base_info = &base_info;
     pack.records   = records;
     pack.num       = 2;
-    
+
     printf("\nINPUT:\t%s\n\n", input_04);
-    
+
     rc = senml_decode_json_s(input_04, &pack);
 
     if (rc == 0) {
@@ -211,7 +211,7 @@ int main(void)
         printf("ERROR: decoding input_04 failed\n");
         return -1;
     }
-    
+
     rc = senml_encode_json_s(&pack, output, 512);
 
     if (rc == 0) {
@@ -221,17 +221,17 @@ int main(void)
         printf("ERROR: encoding data based on input_04 failed\n");
         return -1;
     }
-    
-    
+
+
     memset(&base_info, 0, sizeof(senml_base_info_t));
     memset(records, 0, sizeof(records));
-    
+
     pack.base_info = &base_info;
     pack.records   = records;
     pack.num       = 2;
-    
+
     printf("\nINPUT:\t%s\n\n", input_05);
-    
+
     rc = senml_decode_json_s(input_05, &pack);
 
     if (rc == 0) {
@@ -241,7 +241,7 @@ int main(void)
         printf("ERROR: decoding input_05 failed\n");
         return -1;
     }
-    
+
     rc = senml_encode_json_s(&pack, output, 512);
 
     if (rc == 0) {
@@ -251,17 +251,17 @@ int main(void)
         printf("ERROR: encoding data based on input_05 failed\n");
         return -1;
     }
-    
-    
+
+
     memset(&base_info, 0, sizeof(senml_base_info_t));
     memset(records, 0, sizeof(records));
-    
+
     pack.base_info = &base_info;
     pack.records   = records;
     pack.num       = 2;
-    
+
     printf("\nINPUT:\t%s\n\n", input_06);
-    
+
     rc = senml_decode_json_s(input_06, &pack);
 
     if (rc == 0) {
@@ -271,7 +271,7 @@ int main(void)
         printf("ERROR: decoding input_06 failed\n");
         return -1;
     }
-    
+
     rc = senml_encode_json_s(&pack, output, 512);
 
     if (rc == 0) {
@@ -281,17 +281,17 @@ int main(void)
         printf("ERROR: encoding data based on input_06 failed\n");
         return -1;
     }
-    
-    
+
+
     memset(&base_info, 0, sizeof(senml_base_info_t));
     memset(records, 0, sizeof(records));
-    
+
     pack.base_info = &base_info;
     pack.records   = records;
     pack.num       = 2;
-    
+
     printf("\nINPUT:\t%s\n\n", input_07);
-    
+
     rc = senml_decode_json_s(input_07, &pack);
 
     if (rc == 0) {
@@ -301,7 +301,7 @@ int main(void)
         printf("ERROR: decoding input_07 failed\n");
         return -1;
     }
-    
+
     rc = senml_encode_json_s(&pack, output, 512);
 
     if (rc == 0) {
