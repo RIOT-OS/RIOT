@@ -122,6 +122,10 @@ ifneq (,$(filter l2filter,$(USEMODULE)))
     DIRS += net/link_layer/l2filter
 endif
 
+ifneq (,$(filter fw_slots,$(USEMODULE)))
+    DIRS += fw_slots
+endif
+
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
 include $(RIOTBASE)/Makefile.base
