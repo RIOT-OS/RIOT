@@ -127,7 +127,7 @@ int main(void)
     }
 
     // encode a senml_pack_t to JSON
-    
+
     senml_base_info_t base_info_enc;
     senml_record_t    records_enc[2];
     senml_pack_t      pack_enc;
@@ -138,20 +138,20 @@ int main(void)
     pack_enc.base_info = &base_info_enc;
     pack_enc.records   = records_enc;
     pack_enc.num       = 2;
-    
+
     base_info_enc.version    = 5;
     base_info_enc.base_name  = "urn:dev:mac:0024befffe804ff2";
     base_info_enc.base_time  = 1468342153;
     base_info_enc.base_unit  = NULL;
     base_info_enc.base_value = 0.0;
-    
+
     records_enc[0].name        = "temperature";
     records_enc[0].unit        = "Cel";
     records_enc[0].time        = -1;
     records_enc[0].update_time = 5;
     records_enc[0].value_type  = SENML_TYPE_FLOAT;
     records_enc[0].value.f     = 21.5;
-    
+
     records_enc[1].name        = "water";
     records_enc[1].unit        = "l";
     records_enc[1].time        = -1;
