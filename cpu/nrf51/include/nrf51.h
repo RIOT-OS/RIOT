@@ -1073,11 +1073,7 @@ typedef struct {                                    /*!< NVMC Structure         
   __I  uint32_t  READY;                             /*!< Ready flag.                                                           */
   __I  uint32_t  RESERVED1[64];
   __IO uint32_t  CONFIG;                            /*!< Configuration register.                                               */
-
-  union {
-    __IO uint32_t  ERASEPCR1;                       /*!< Register for erasing a non-protected non-volatile memory page.        */
-    __IO uint32_t  ERASEPAGE;                       /*!< Register for erasing a non-protected non-volatile memory page.        */
-  } nrf51_unnamed1;
+  __IO uint32_t  ERASEPAGE;                       /*!< Register for erasing a non-protected non-volatile memory page.        */
   __IO uint32_t  ERASEALL;                          /*!< Register for erasing all non-volatile user memory.                    */
   __IO uint32_t  ERASEPCR0;                         /*!< Register for erasing a protected non-volatile memory page.            */
   __IO uint32_t  ERASEUICR;                         /*!< Register for start erasing User Information Congfiguration Registers. */
