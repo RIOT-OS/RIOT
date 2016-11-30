@@ -182,6 +182,8 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
     ins_pos++;
     buf_len--;
 
+    insert_opening_brace = false;
+
     if (pack->base_info->version) {
         chars_written = snprintf(&output[ins_pos], buf_len, "\"bver\":%u,",
                                  pack->base_info->version);
@@ -274,7 +276,7 @@ encode_records:
 
         size_t buf_len_old;
 
-        if ((i != 0 || ins_pos == 1) && insert_opening_brace) {
+        if (insert_opening_brace) {
             output[ins_pos] = '{';
             ins_pos++;
             buf_len--;
@@ -368,8 +370,8 @@ encode_records:
             buf_len -= chars_written;
         }
 
-        if (buf_len == buf_len_old) {   // record was empty, no values inserted: remove '{'
-            if (i != 0) {
+        if (buf_len == buf_len_old) {          // record was empty, no values inserted: remove '{'
+            if (output[ins_pos - 1] == '{') {
                 ins_pos--;
                 buf_len++;
             }
