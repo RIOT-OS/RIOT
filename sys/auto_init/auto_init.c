@@ -182,6 +182,12 @@ void auto_init(void)
     auto_init_at86rf2xx();
 #endif
 
+#ifdef MODULE_AT86RFR2
+    DEBUG("Auto init at86rfr2.\n");
+    extern void auto_init_at86rfr2(void);
+    auto_init_at86rfr2();
+#endif
+
 #ifdef MODULE_CC2420
     extern void auto_init_cc2420(void);
     auto_init_cc2420();
