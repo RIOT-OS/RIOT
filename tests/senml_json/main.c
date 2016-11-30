@@ -100,7 +100,7 @@ int main(void)
     char input_07[] = "[{\"n\":\"Daisy\",\"vb\":true}]";
 
     senml_base_info_t base_info;
-    senml_record_t    records[2];
+    senml_record_t    records[4];
     senml_pack_t      pack;
 
     memset(&base_info, 0, sizeof(senml_base_info_t));
@@ -309,6 +309,49 @@ int main(void)
     }
     else {
         printf("ERROR: encoding data based on input_07 failed\n");
+        return -1;
+    }
+
+
+    memset(&base_info, 0, sizeof(senml_base_info_t));
+    memset(records, 0, sizeof(records));
+
+    pack.base_info = &base_info;
+    pack.records   = records;
+    pack.num       = 4;
+
+    base_info.version    = 5;
+    base_info.base_name  = "urn:dev:mac:0024befffe804ff2";
+    base_info.base_time  = 1468342153;
+    base_info.base_unit  = NULL;
+    base_info.base_value = 0.0;
+
+    records[2].name        = "temperature";
+    records[2].unit        = "Cel";
+    records[2].time        = -1;
+    records[2].update_time = 5;
+    records[2].value_type  = SENML_TYPE_FLOAT;
+    records[2].value.f     = 21.5;
+
+    records[3].name        = "water";
+    records[3].unit        = "l";
+    records[3].time        = -1;
+    records[3].update_time = 60;
+    records[3].value_type  = SENML_TYPE_FLOAT;
+    records[3].value.f     = 1.2;
+    records[3].value_sum   = 7865.4;
+
+    printf("ENCODING DATA...\n\n");
+
+    senml_print_pack(&pack);
+
+    rc = senml_encode_json_s(&pack, output, 512);
+
+    if (rc == 0) {
+        printf("%s\n\n", output);
+    }
+    else {
+        printf("ERROR: encoding data from partially filled array failed\n");
         return -1;
     }
 
