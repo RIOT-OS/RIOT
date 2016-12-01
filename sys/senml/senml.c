@@ -174,77 +174,73 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
     ins_pos++;
     buf_len--;
 
-    if (!pack->base_info) {
-        goto encode_records;
-    }
+    if (pack->base_info) {
+        output[ins_pos] = '{';
+        ins_pos++;
+        buf_len--;
 
-    output[ins_pos] = '{';
-    ins_pos++;
-    buf_len--;
+        insert_opening_brace = false;
 
-    insert_opening_brace = false;
+        if (pack->base_info->version) {
+            chars_written = snprintf(&output[ins_pos], buf_len, "\"bver\":%u,",
+                                     pack->base_info->version);
 
-    if (pack->base_info->version) {
-        chars_written = snprintf(&output[ins_pos], buf_len, "\"bver\":%u,",
-                                 pack->base_info->version);
+            if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
+                return -1;
+            }
 
-        if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
-            return -1;
+            ins_pos += chars_written;
+            buf_len -= chars_written;
         }
 
-        ins_pos += chars_written;
-        buf_len -= chars_written;
-    }
+        if (pack->base_info->base_name) {
+            chars_written = snprintf(&output[ins_pos], buf_len, "\"bn\":\"%s\",",
+                                     pack->base_info->base_name);
 
-    if (pack->base_info->base_name) {
-        chars_written = snprintf(&output[ins_pos], buf_len, "\"bn\":\"%s\",",
-                                 pack->base_info->base_name);
+            if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
+                return -1;
+            }
 
-        if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
-            return -1;
+            ins_pos += chars_written;
+            buf_len -= chars_written;
         }
 
-        ins_pos += chars_written;
-        buf_len -= chars_written;
-    }
+        if (pack->base_info->base_time != 0) {
+            chars_written = snprintf(&output[ins_pos], buf_len, "\"bt\":%f,",
+                                     pack->base_info->base_time);
 
-    if (pack->base_info->base_time != 0) {
-        chars_written = snprintf(&output[ins_pos], buf_len, "\"bt\":%f,",
-                                 pack->base_info->base_time);
+            if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
+                return -1;
+            }
 
-        if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
-            return -1;
+            ins_pos += chars_written;
+            buf_len -= chars_written;
         }
 
-        ins_pos += chars_written;
-        buf_len -= chars_written;
-    }
+        if (pack->base_info->base_unit) {
+            chars_written = snprintf(&output[ins_pos], buf_len, "\"bu\":\"%s\",",
+                                     pack->base_info->base_unit);
 
-    if (pack->base_info->base_unit) {
-        chars_written = snprintf(&output[ins_pos], buf_len, "\"bu\":\"%s\",",
-                                 pack->base_info->base_unit);
+            if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
+                return -1;
+            }
 
-        if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
-            return -1;
+            ins_pos += chars_written;
+            buf_len -= chars_written;
         }
 
-        ins_pos += chars_written;
-        buf_len -= chars_written;
-    }
+        if (pack->base_info->base_value != 0) {
+            chars_written = snprintf(&output[ins_pos], buf_len, "\"bv\":%f,",
+                                     pack->base_info->base_value);
 
-    if (pack->base_info->base_value != 0) {
-        chars_written = snprintf(&output[ins_pos], buf_len, "\"bv\":%f,",
-                                 pack->base_info->base_value);
+            if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
+                return -1;
+            }
 
-        if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
-            return -1;
+            ins_pos += chars_written;
+            buf_len -= chars_written;
         }
-
-        ins_pos += chars_written;
-        buf_len -= chars_written;
     }
-
-encode_records:
 
     ins_pos_after_bi = ins_pos;
 
