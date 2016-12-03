@@ -101,6 +101,10 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
                     pack->base_info->base_value = atof(tmp_val);
                     found_base_info = true;
                 }
+                else if (!strcmp(tmp_key, SJ_BASE_SUM)) {
+                    pack->base_info->base_sum = atof(tmp_val);
+                    found_base_info = true;
+                }
             }
 
             if (!strcmp(tmp_key, SJ_NAME)) {
@@ -232,6 +236,18 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
         if (pack->base_info->base_value != 0) {
             chars_written = snprintf(&output[ins_pos], buf_len, "\"bv\":%f,",
                                      pack->base_info->base_value);
+
+            if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
+                return -1;
+            }
+
+            ins_pos += chars_written;
+            buf_len -= chars_written;
+        }
+
+        if (pack->base_info->base_sum != 0) {
+            chars_written = snprintf(&output[ins_pos], buf_len, "\"bs\":%f,",
+                                     pack->base_info->base_sum);
 
             if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
                 return -1;

@@ -54,6 +54,7 @@ extern "C" {
 #define SJ_BASE_TIME     "bt"   //!< Key for the base time attribute in JSON documents
 #define SJ_BASE_UNIT     "bu"   //!< Key for the base unit attribute in JSON documents
 #define SJ_BASE_VALUE    "bv"   //!< Key for the base value attribute in JSON documents
+#define SJ_BASE_SUM      "bs"   //!< Key for the base sum attribute in JSON documents
 #define SJ_NAME          "n"    //!< Key for the name attribute in JSON documents
 #define SJ_UNIT          "u"    //!< Key for the unit attribute in JSON documents
 #define SJ_VALUE         "v"    //!< Key for the value attribute in JSON documents
@@ -70,6 +71,7 @@ extern "C" {
 #define SC_BASE_TIME     (-3)   //!< Key for the base time attribute in CBOR documents
 #define SC_BASE_UNIT     (-4)   //!< Key for the base unit attribute in CBOR documents
 #define SC_BASE_VALUE    (-5)   //!< Key for the base value attribute in CBOR documents
+#define SC_BASE_SUM      (-6)   //!< Key for the base sum attribute in CBOR documents
 #define SC_NAME          (0)    //!< Key for the name attribute in CBOR documents
 #define SC_UNIT          (1)    //!< Key for the unit attribute in CBOR documents
 #define SC_VALUE         (2)    //!< Key for the value attribute in CBOR documents
@@ -98,6 +100,7 @@ typedef struct {
     double              base_time;       //!< Update time values are relative to this time
     char               *base_unit;       //!< When all values have the same unit, set this field
     double              base_value;
+    double              base_sum;
 } senml_base_info_t;
 
 
