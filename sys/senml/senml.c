@@ -113,6 +113,9 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
             else if (!strcmp(tmp_key, SJ_UNIT)) {
                 (pack->records)[array_num].unit = tmp_val;
             }
+            else if (!strcmp(tmp_key, SJ_LINK)) {
+                (pack->records)[array_num].link = tmp_val;
+            }
             else if (!strcmp(tmp_key, SJ_VALUE)) {
                 (pack->records)[array_num].value_type = SENML_TYPE_FLOAT;
                 (pack->records)[array_num].value.f = atof(tmp_val);
@@ -311,6 +314,18 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
         if (curr_record->unit) {
             chars_written = snprintf(&output[ins_pos], buf_len, "\"u\":\"%s\",",
                                      curr_record->unit);
+
+            if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
+                return -1;
+            }
+
+            ins_pos += chars_written;
+            buf_len -= chars_written;
+        }
+
+        if (curr_record->link) {
+            chars_written = snprintf(&output[ins_pos], buf_len, "\"l\":\"%s\",",
+                                     curr_record->link);
 
             if (chars_written >= (ssize_t)buf_len || chars_written < 0) {
                 return -1;

@@ -64,6 +64,7 @@ extern "C" {
 #define SJ_TIME          "t"    //!< Key for the time attribute in JSON documents
 #define SJ_UPDATE_TIME   "ut"   //!< Key for the update time attribute in JSON documents
 #define SJ_DATA_VALUE    "vd"   //!< Key for the data value attribute in JSON documents
+#define SJ_LINK          "l"    //!< Key for the link attribute in JSON documents
 
 
 #define SC_VERSION       (-1)   //!< Key for the version attribute in CBOR documents
@@ -81,6 +82,7 @@ extern "C" {
 #define SC_TIME          (6)    //!< Key for the time attribute in CBOR documents
 #define SC_UPDATE_TIME   (7)    //!< Key for the update time attribute in CBOR documents
 #define SC_DATA_VALUE    (8)    //!< Key for the data value attribute in CBOR documents
+#define SC_LINK          (9)    //!< Key for the link attribute in CBOR documents
 
 
 /*! The different data types SenML supports */
@@ -108,6 +110,7 @@ typedef struct {
 typedef struct {
     char              *name;        //!< Sensor's name, will be appended to base name if provided
     char              *unit;        //!< Unit of the measurement
+    char              *link;        //!< Link to additional information (must be escaped!)
     double             time;        //!< Time (seconds since unix epoch) of the measurement
     double             update_time; //!< Time before sensor provides an updated measurement
     double             value_sum;   //!< Integrated sum of the values over time
