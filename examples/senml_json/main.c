@@ -41,6 +41,7 @@ static void senml_print_record(const senml_record_t *record)
 {
     printf("Name:\t\t%s\n", record->name ? record->name : "NULL");
     printf("Unit:\t\t%s\n", record->unit ? record->unit : "NULL");
+    printf("Link:\t\t%s\n", record->link ? record->link : "NULL");
     printf("Time:\t\t%f\n", record->time);
     printf("Update Time:\t%f\n", record->update_time);
 
@@ -84,7 +85,8 @@ int main(void)
     char input[] = "[{\"bver\":5, \"bn\":\"urn:dev:mac:0024befffe804ff1\", \"bt\":1468341362,"
                    "\"n\":\"voltage\", \"u\":\"V\", \"v\":230.05, \"t\":1, \"ut\":1},"
                    "{\"n\":\"current\", \"u\":\"A\", \"v\":1.65, \"t\":1, \"ut\":1},"
-                   "{\"n\":\"bindump\", \"vd\":\"U2VuTUwgaXMgc28gY29vbCEK\"}]";
+                   "{\"n\":\"bindump\", \"l\": \"[{\\\"href\\\":\\\"humidity\\\","
+                   "\\\"foo\\\":\\\"bar\\\"}]\", \"vd\":\"U2VuTUwgaXMgc28gY29vbCEK\"}]";
 
     senml_base_info_t base_info_dec;
     senml_record_t    records_dec[3];
@@ -129,7 +131,7 @@ int main(void)
     // encode a senml_pack_t to JSON
 
     senml_base_info_t base_info_enc;
-    senml_record_t    records_enc[2];
+    senml_record_t    records_enc[3];
     senml_pack_t      pack_enc;
 
     memset(&base_info_enc, 0, sizeof(senml_base_info_t));
@@ -137,28 +139,33 @@ int main(void)
 
     pack_enc.base_info = &base_info_enc;
     pack_enc.records   = records_enc;
-    pack_enc.num       = 2;
+    pack_enc.num       = 3;
 
     base_info_enc.version    = 5;
-    base_info_enc.base_name  = "urn:dev:mac:0024befffe804ff2";
-    base_info_enc.base_time  = 1468342153;
-    base_info_enc.base_unit  = NULL;
-    base_info_enc.base_value = 0.0;
+    base_info_enc.base_name  = "urn:dev:mac:0024befffe804ff2;";
+    base_info_enc.base_time  = 1468342153.341;
+    base_info_enc.base_unit  = "Cel";
+    base_info_enc.base_value = 21.0;
 
     records_enc[0].name        = "temperature";
-    records_enc[0].unit        = "Cel";
-    records_enc[0].time        = -1;
+    records_enc[0].time        = -5;
     records_enc[0].update_time = 5;
     records_enc[0].value_type  = SENML_TYPE_FLOAT;
-    records_enc[0].value.f     = 21.5;
+    records_enc[0].value.f     = 0.5;
 
-    records_enc[1].name        = "water";
-    records_enc[1].unit        = "l";
-    records_enc[1].time        = -1;
-    records_enc[1].update_time = 60;
+    records_enc[1].name        = "temperature";
+    records_enc[1].time        = -10;
+    records_enc[1].update_time = 5;
     records_enc[1].value_type  = SENML_TYPE_FLOAT;
-    records_enc[1].value.f     = 1.2;
-    records_enc[1].value_sum   = 7865.4;
+    records_enc[1].value.f     = 0.7;
+
+    records_enc[2].name        = "humidity";
+    records_enc[2].unit        = "%RH";
+    records_enc[2].link        = "[{\\\"href\\\":\\\"humidity\\\",\\\"foo\\\":\\\"bar\\\"}]";
+    records_enc[2].time        = -10;
+    records_enc[2].update_time = 10;
+    records_enc[2].value_type  = SENML_TYPE_FLOAT;
+    records_enc[2].value.f     = 64.2;
 
     char output[512];
 

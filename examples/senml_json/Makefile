@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = senml-test
+APPLICATION = senml-json-example
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
