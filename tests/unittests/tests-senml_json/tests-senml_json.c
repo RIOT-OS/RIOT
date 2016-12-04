@@ -26,51 +26,51 @@
 
 #include "tests-senml_json.h"
 
-char senml_json_empty_doc[]   = "[]";
+static char senml_json_empty_doc[]   = "[]";
 
-char senml_json_nobaseinfo[]  = "[{\"n\":\"urn:dev:ow:10e2073a01080063\",\"u\":\"Cel\","
+static char senml_json_nobaseinfo[]  = "[{\"n\":\"urn:dev:ow:10e2073a01080063\",\"u\":\"Cel\","
                                 "\"t\":1.276020076e+09,\"v\":23.5},"
                                 "{\"n\":\"urn:dev:ow:10e2073a01080063\",\"u\":\"Cel\","
                                 "\"t\":1.276020091e+09,\"v\":23.6}]";
 
-char senml_json_empty_elem[]  = "[{},{\"n\":\"urn:dev:ow:10e2073a01080063\",\"u\":\"Cel\","
+static char senml_json_empty_elem[]  = "[{},{\"n\":\"urn:dev:ow:10e2073a01080063\",\"u\":\"Cel\","
                                 "\"t\":1.276020076e+09,\"v\":23.5},"
                                 "{\"n\":\"urn:dev:ow:10e2073a01080063\",\"u\":\"Cel\","
                                 "\"t\":1.276020091e+09,\"v\":23.6}]";
 
-char senml_json_baseinfo[]    = "[{\"bn\":\"urn:dev:ow:10e2073a01080063\",\"u\":\"Cel\","
+static char senml_json_baseinfo[]    = "[{\"bn\":\"urn:dev:ow:10e2073a01080063\",\"u\":\"Cel\","
                                 "\"t\":1.276020076e+09,\"v\":23.5},{\"u\":\"Cel\","
                                 "\"t\":1.276020091e+09,\"v\":23.6}]";
 
-char senml_json_updatetime[]  = "[{\"n\":\"John\",\"u\":\"V\",\"v\":120.398,\"t\":123456789,"
+static char senml_json_updatetime[]  = "[{\"n\":\"John\",\"u\":\"V\",\"v\":120.398,\"t\":123456789,"
                                 "\"ut\":5}]";
 
-char senml_json_stringvalue[] = "[{\"n\":\"Jackie\",\"vs\":\"what a nice string\","
+static char senml_json_stringvalue[] = "[{\"n\":\"Jackie\",\"vs\":\"what a nice string\","
                                 "\"t\":123456790}]";
 
-char senml_json_basevalues[]  = "[{\"bver\":5,\"bn\":\"riot_device\",\"bt\":123456000,"
+static char senml_json_basevalues[]  = "[{\"bver\":5,\"bn\":\"riot_device\",\"bt\":123456000,"
                                 "\"bu\":\"Cel\",\"bv\":-273.15,\"bs\":89.12,\"n\":\"Hans\","
                                 "\"vs\":\"what a nice string\",\"t\":123456790}]";
 
-char senml_json_datavalue[]   = "[{\"bver\":5,\"bn\":\"riot_device\",\"bt\":123456000,"
+static char senml_json_datavalue[]   = "[{\"bver\":5,\"bn\":\"riot_device\",\"bt\":123456000,"
                                 "\"bu\":\"Cel\",\"bv\":-54.0001,\"n\":\"Kim\",\"t\":-10,"
                                 "\"ut\":12,\"vd\":\"U2VuTUwgaXMgc28gY29vbCEK\"}]";
 
-char senml_json_valuesum[]    = "[{\"n\":\"Donald\",\"u\":\"W\",\"s\":1240.812,\"t\":987654321}]";
+static char senml_json_valuesum[]    = "[{\"n\":\"Donald\",\"u\":\"W\",\"s\":1240.812,\"t\":987654321}]";
 
-char senml_json_boolvalue[]   = "[{\"n\":\"Daisy\",\"vb\":true}]";
+static char senml_json_boolvalue[]   = "[{\"n\":\"Daisy\",\"vb\":true}]";
 
-char senml_json_link[]        = "[{\"n\":\"Link\",\"l\":\"[{\\\"href\\\":\\\"derp\\\","
+static char senml_json_link[]        = "[{\"n\":\"Link\",\"l\":\"[{\\\"href\\\":\\\"derp\\\","
                                 "\\\"foo\\\":\\\"bar\\\"}]\",\"vb\":true}]";
 
-char expected_with_baseinfo[] = "[{\"bver\":5,\"bn\":\"urn:dev:mac:0024befffe804ff2;\","
+static char expected_with_baseinfo[] = "[{\"bver\":5,\"bn\":\"urn:dev:mac:0024befffe804ff2;\","
                                 "\"bt\":1468342153.341000,\"bu\":\"Cel\",\"bv\":21.000000,"
                                 "\"bs\":8237823.412000,"
                                 "\"n\":\"temperature\",\"t\":-5.000000,\"ut\":5.000000,"
                                 "\"v\":0.500000},{\"n\":\"temperature\",\"t\":-10.000000,"
                                 "\"ut\":5.000000,\"v\":0.700000}]";
 
-char expected_no_baseinfo[]   = "[{\"n\":\"float_measure\",\"u\":\"m\",\"t\":1480778196.431000,"
+static char expected_no_baseinfo[]   = "[{\"n\":\"float_measure\",\"u\":\"m\",\"t\":1480778196.431000,"
                                 "\"ut\":10.000000,\"v\":42.195000},{\"n\":\"with_sum\","
                                 "\"u\":\"m\",\"t\":1480778906.541000,\"ut\":10.000000,"
                                 "\"s\":1423576.331000,\"v\":39.190000},{\"n\":\"string_measure\","
@@ -81,7 +81,6 @@ char expected_no_baseinfo[]   = "[{\"n\":\"float_measure\",\"u\":\"m\",\"t\":148
                                 "\\\"bar\\\"}]\",\"t\":1480778629.230000,\"ut\":120.000000,"
                                 "\"vd\":\"VGhpcyBpcyBiaW5hcnkgdmFsdWUK\"}]";
 
-char output[512];
 
 static bool double_almost_equal(float a, float b)
 {
