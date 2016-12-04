@@ -48,6 +48,7 @@ typedef enum {
 #endif
     PANIC_DUMMY_HANDLER,     /**< unhandled interrupt */
 #endif
+    PANIC_SSP,               /**< stack smashing protector failure */
     PANIC_UNDEFINED
 } core_panic_t;
 
