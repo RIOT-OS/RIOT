@@ -34,4 +34,5 @@ Test *tests_senml_json_tests(void);
 #endif
 
 #endif /* TESTS_SENML_JSON */
+
 /** @} */

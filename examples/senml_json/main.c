@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       SenML test application
+ * @brief       SenML example application
  *
  * @author      Lennart Dührsen <lennart.duehrsen@fu-berlin.de>
  *
@@ -80,7 +80,7 @@ static void senml_print_pack(const senml_pack_t *pack)
 
 int main(void)
 {
-    // decode a SenML document in JSON format
+    /* decode a SenML document in JSON format */
 
     char input[] = "[{\"bver\":5, \"bn\":\"urn:dev:mac:0024befffe804ff1\", \"bt\":1468341362,"
                    "\"n\":\"voltage\", \"u\":\"V\", \"v\":230.05, \"t\":1, \"ut\":1},"
@@ -109,7 +109,7 @@ int main(void)
         return -1;
     }
 
-    // decode binary data from record
+    /* decode binary data from record */
 
     size_t len = 128;
 
@@ -128,7 +128,7 @@ int main(void)
         return -1;
     }
 
-    // encode a senml_pack_t to JSON
+    /* encode a senml_pack_t to JSON */
 
     senml_base_info_t base_info_enc;
     senml_record_t    records_enc[3];

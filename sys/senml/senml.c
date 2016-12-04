@@ -62,7 +62,7 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
             last_type = JSMN_OBJECT;
             array_num++;
 
-            // the cast to unsigned int is ok because array_num will be >= 0 at this point
+            /* the cast to unsigned int is ok because array_num will be >= 0 at this point */
             if ((unsigned int)array_num >= pack->num) {
                 DEBUG("ERROR: number of records exceeds pack->num\n");
                 return -1;
@@ -161,21 +161,21 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
 
 int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
 {
-    if (len < 3) {           // we need space for at least '[', ']', and '\0'
+    if (len < 3) {           /* we need space for at least '[', ']', and '\0' */
         return -1;
     }
 
-    size_t ins_pos = 0;      // position in output where next character will be inserted
-    size_t buf_len = len;    // length of space left in output
+    size_t ins_pos = 0;      /* position in output where next character will be inserted */
+    size_t buf_len = len;    /* length of space left in output */
 
-    size_t ins_pos_after_bi; // stores value of ins_pos after inserting base info to check
-                             // whether all records provided were empty
+    size_t ins_pos_after_bi; /* stores value of ins_pos after inserting base info to check
+                                whether all records provided were empty */
 
-    int chars_written = 0;   // stores return values of snprintf calls: negative value indicates
-                             // error, value >= buf_len indicates insufficient space in output
+    int chars_written = 0;   /* stores return values of snprintf calls: negative value indicates
+                                error, value >= buf_len indicates insufficient space in output */
 
-    bool insert_opening_brace = true;  // is used to check whether '{' has to be inserted after
-                                       // we the first record is empty but base info is provided
+    bool insert_opening_brace = true;  /* is used to check whether '{' has to be inserted after
+                                          we the first record is empty but base info is provided */
 
     output[ins_pos] = '[';
     ins_pos++;
@@ -264,7 +264,7 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
     ins_pos_after_bi = ins_pos;
 
     if (pack->num == 0) {
-        // this means no base info and no records
+        /* this means no base info and no records */
         if (ins_pos == 1) {
             output[ins_pos] = ']';
             ins_pos++;
@@ -274,17 +274,17 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
             buf_len--;
             return 0;
         }
-        // this means there is base info but records, which is illegal
+        /* this means there is base info but records, which is illegal */
         else {
             return -1;
         }
     }
 
-    if (buf_len < 4) {   // we now need space for at least '}', ']', '\0' and perhaps '{' before
+    if (buf_len < 4) {   /* we now need space for at least '}', ']', '\0' and perhaps '{' before */
         return -1;
     }
 
-    buf_len -= 1;   // reserve space for '\0' (trailing comma will be overwritten with ']')
+    buf_len -= 1;   /* reserve space for '\0' (trailing comma will be overwritten with ']') */
 
     for (size_t i = 0; i < pack->num; i++) {
         senml_record_t *curr_record = &(pack->records[i]);
@@ -397,7 +397,7 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
             buf_len -= chars_written;
         }
 
-        if (buf_len == buf_len_old) {          // record was empty, no values inserted: remove '{'
+        if (buf_len == buf_len_old) {         /* record was empty, no values inserted: remove '{' */
             if (output[ins_pos - 1] == '{') {
                 ins_pos--;
                 buf_len++;
@@ -409,7 +409,7 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
             continue;
         }
 
-        // otherwise remove trailing ',', then insert '}' and ','
+        /* otherwise remove trailing ',', then insert '}' and ',' */
 
         ins_pos--;
         buf_len++;
@@ -426,7 +426,7 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
 
         insert_opening_brace = true;
 
-        if ((i + 1 < pack->num) && buf_len == 0) {   // no space left for next record
+        if ((i + 1 < pack->num) && buf_len == 0) {   /* no space left for next record */
             return -1;
         }
     }
@@ -436,7 +436,7 @@ int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
         return -1;
     }
 
-    if (ins_pos > 1) {   // if records provided were all empty, don't remove last character
+    if (ins_pos > 1) {   /* if records provided were all empty, don't remove last character */
         ins_pos--;
     }
 
