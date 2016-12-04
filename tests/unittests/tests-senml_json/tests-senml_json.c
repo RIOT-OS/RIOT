@@ -83,7 +83,7 @@ char expected_no_baseinfo[]   = "[{\"n\":\"float_measure\",\"u\":\"m\",\"t\":148
 
 char output[512];
 
-bool double_almost_equal(float a, float b)
+static bool double_almost_equal(float a, float b)
 {
     float diff = fabs(a - b);
 
