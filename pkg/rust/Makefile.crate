@@ -8,10 +8,11 @@ all: | git-download $(BINDIR)/rust/$(PKG_NAME).a
 $(BINDIR)/rust/$(PKG_NAME).a: $(BINDIR)/rust/$(PKG_NAME).rlib
 	$(AD)ln -fs $< $@
 
-$(BINDIR)/rust/$(PKG_NAME).rlib:
+$(BINDIR)/rust/$(PKG_NAME).rlib: $(SOURCE_FILE)
 	$(AD)mkdir -p $(BINDIR)/rust
-	$(AD)rustc $(RUSTC_FLAGS) -o $@ \
-		$(PKG_BUILDDIR)/src/$(PKG_NAME)/lib.rs
+	$(AD)rustc $(RUSTC_FLAGS) -o $@ $(SOURCE_FILE)
 
 include $(RIOTBASE)/Makefile.rust
 include $(RIOTBASE)/pkg/pkg.mk
+
+SOURCE_FILE ?= $(PKG_BUILDDIR)/src/lib.rs
