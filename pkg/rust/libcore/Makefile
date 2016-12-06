@@ -6,8 +6,4 @@ PKG_VERSION  = $(shell ./version.sh)
 USEPKG    =
 USEMODULE =
 
-.PHONY: all
-
-all: $(BINDIR)/rust/$(PKG_NAME).a
-
 include $(RIOTBASE)/pkg/rust/Makefile.crate
