@@ -62,9 +62,9 @@ typedef struct __attribute__((packed)) {
      * * lw_hdr_get_maj()
      */
     uint8_t mt_maj;
-    network_uint32_t addr; /**< 32 bit LoRaWAN address */
+    le_uint32_t addr; /**< 32 bit LoRaWAN address */
     uint8_t fctrl; /**< frame control */
-    network_uint16_t fcnt; /**< frame counter */
+    le_uint16_t fcnt; /**< frame counter */
 } lw_hdr_t;
 
 #include <stdio.h>
