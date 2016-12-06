@@ -564,6 +564,12 @@ ifneq (,$(filter random,$(USEMODULE)))
     endif
 endif
 
+# Automatically include dependencies for rust wrappers
+RUSTMODULES := $(filter rust/%,$(USEMODULE))
+ifneq (,$(RUSTMODULES))
+    USEMODULE += $(RUSTMODULES:rust/%=%)
+endif
+
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 

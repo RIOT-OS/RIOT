@@ -18,6 +18,5 @@ USEPKG += rust/libcore
 
 # Depend on the rust/fmt wrapper for the fmt module.
 USEMODULE += rust/fmt
-USEMODULE += fmt
 
 include $(RIOTBASE)/Makefile.include
