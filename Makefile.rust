@@ -1,15 +1,4 @@
-# Function to get `lib*` name for a module. This is
-# needed because rustc expects files passed to
-# `--extern` to match the pattern `lib*.rlib`.
-define libname
-$(shell dirname $1)/lib$(shell basename $1)
-endef
-
-# Set module name and library name (see above).
 MODULE ?= $(shell basename $(CURDIR))
-ifeq (lib,$(CRATE_TYPE))
-	LIBNAME = $(call libname,$(MODULE))
-endif
 
 # Set crate metadata in case they aren't set.
 CRATE_TYPE ?= bin
@@ -30,12 +19,10 @@ RUSTC_FLAGS += --crate-name $(CRATE_NAME) \
 	       --crate-type $(CRATE_TYPE) \
 	       --target $(RUST_TARGET)
 
-# Include module dependencies in `RUSTC_FLAGS`.
-RUSTMODULE  ?= $(filter rust/%, $(USEMODULE))
-RUSTC_FLAGS += $(foreach dep,$(RUSTMODULE),--extern \
-	$(shell basename $(dep))=$(BINDIR)/$(call libname,$(dep)).rlib)
+# Extract rust crates from `USEPKG` and `USEMODULE`.
+RSMODULE = $(filter rust/%,$(USEMODULE))
+RSPKG    = $(filter rust/%,$(USEPKG))
 
-# Include package dependencies in `RUSTC_FLAGS`.
-RUSTPKG     ?= $(filter rust/%, $(USEPKG))
-RUSTC_FLAGS += $(foreach dep,$(RUSTPKG:rust/lib%=%),\
-	--extern $(dep)=$(BINDIR)/rust/lib$(dep).rlib)
+# Add rust crates with `--extern` to `RUSTC_FLAGS`.
+RUSTC_FLAGS += $(foreach m,$(RSMODULE:rust/%=%) $(RSPKG:rust/lib%=%),\
+	--extern $(m)=$(BINDIR)/rust/lib$(m).rlib)

@@ -86,6 +86,7 @@ ifeq ($(CRATE_TYPE),bin)
     $(BINDIR)/$(MODULE).a: $(RUSTOBJ)
 	$(AD)$(AR) $(ARFLAGS) $@ $<
 else ifeq ($(CRATE_TYPE),lib)
+    LIBNAME = $(MODULE:rust/%=rust/lib%)
     $(BINDIR)/$(LIBNAME).rlib: $(RUSTSRC) | $(BINDIR)/$(MODULE)/ ${DIRS:%=ALL--%}
 	$(AD)rustc $(RUSTC_FLAGS) -o $@ $<
     $(BINDIR)/$(MODULE).a: $(BINDIR)/$(LIBNAME).rlib
