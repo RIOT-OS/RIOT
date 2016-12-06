@@ -1,0 +1,16 @@
+CRATE_NAME ?= $(PKG_NAME)
+CRATE_TYPE  = lib
+
+all: $(BINDIR)/rust/$(PKG_NAME).a
+$(BINDIR)/rust:
+	$(AD)mkdir -p $@
+
+$(BINDIR)/rust/$(PKG_NAME).a: $(BINDIR)/rust/$(PKG_NAME).rlib
+	$(AD)ln -fs $< $@
+
+$(BINDIR)/rust/$(PKG_NAME).rlib: $(BINDIR)/rust git-download
+	$(AD)rustc $(RUSTC_FLAGS) -o $@ \
+		$(PKG_BUILDDIR)/src/$(PKG_NAME)/lib.rs
+
+include $(RIOTBASE)/Makefile.rust
+include $(RIOTBASE)/pkg/pkg.mk

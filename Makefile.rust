@@ -28,10 +28,14 @@ endif
 # Flags to pass to the rust compiler.
 RUSTC_FLAGS += --crate-name $(CRATE_NAME) \
 	       --crate-type $(CRATE_TYPE) \
-	       --target $(RUST_TARGET) \
-	       --extern core=$(BINDIR)/libcore.rlib
+	       --target $(RUST_TARGET)
 
-# Include dependencies in `RUSTC_FLAGS`.
+# Include module dependencies in `RUSTC_FLAGS`.
 RUSTMODULE  ?= $(filter rust/%, $(USEMODULE))
 RUSTC_FLAGS += $(foreach dep,$(RUSTMODULE),--extern \
 	$(shell basename $(dep))=$(BINDIR)/$(call libname,$(dep)).rlib)
+
+# Include package dependencies in `RUSTC_FLAGS`.
+RUSTPKG     ?= $(filter rust/%, $(USEPKG))
+RUSTC_FLAGS += $(foreach dep,$(RUSTPKG:rust/lib%=%),\
+	--extern $(dep)=$(BINDIR)/rust/lib$(dep).rlib)

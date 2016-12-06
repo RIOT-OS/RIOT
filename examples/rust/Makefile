@@ -14,11 +14,11 @@ FEATURES_REQUIRED += rust_support
 BOARD ?= native
 
 # Since we built rust with `#![no_std]` we need libcore.
-USEPKG += libcore
+USEPKG += rust/libcore
 
 # Module dependencies.
 USEMODULE += rust/common # Provides lang_items
 USEMODULE += rust/fmt    # Wrapper for sys/fmt
-USEMODULE += fmt         # Needed by the wrapper
+USEMODULE += fmt
 
 include $(RIOTBASE)/Makefile.include
