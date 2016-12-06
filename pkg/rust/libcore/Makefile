@@ -3,7 +3,7 @@ CRATE_NAME   = core
 PKG_URL      = https://github.com/rust-lang/rust
 PKG_VERSION  = $(shell ./version.sh)
 
-USEPKG    = rust/libcore
+USEPKG    =
 USEMODULE =
 
 include $(RIOTBASE)/pkg/rust/Makefile.crate
