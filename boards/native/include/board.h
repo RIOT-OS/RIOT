@@ -60,6 +60,31 @@ void _native_LED_RED_TOGGLE(void);
 extern mtd_dev_t *mtd0;
 #endif
 
+#ifdef MODULE_SPIFFS
+#define SPIFFS_READ_ONLY 0
+#define SPIFFS_SINGLETON 0
+
+#define SPIFFS_HAL_CALLBACK_EXTRA 1
+
+#define SPIFFS_CACHE 1
+
+#if SPIFFS_SINGLETON == 1
+#define SPIFFS_CFG_PHYS_SZ(ignore)        (0x800000)
+
+#define SPIFFS_CFG_PHYS_ERASE_SZ(ignore)  (4096)
+
+#define SPIFFS_CFG_PHYS_ADDR(ignore)      (0)
+
+#define SPIFFS_CFG_LOG_PAGE_SZ(ignore)    (256)
+
+#define SPIFFS_CFG_LOG_BLOCK_SZ(ignore)   (4096)
+#endif
+
+#if SPIFFS_HAL_CALLBACK_EXTRA == 0
+#define SPIFFS_MTD_DEV (MTD_0)
+#endif
+#endif
+
 #ifdef __cplusplus
 }
 #endif
