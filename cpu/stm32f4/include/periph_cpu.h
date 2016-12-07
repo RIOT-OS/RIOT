@@ -137,16 +137,6 @@ typedef struct {
 } dac_conf_t;
 
 /**
- * @brief   Configure the alternate function for the given pin
- *
- * @note    This is meant for internal use in STM32F4 peripheral drivers only
- *
- * @param[in] pin       pin to configure
- * @param[in] af        alternate function to use
- */
-void gpio_init_af(gpio_t pin, gpio_af_t af);
-
-/**
  * @brief   Power on the DMA device the given stream belongs to
  *
  * @param[in] stream    logical DMA stream

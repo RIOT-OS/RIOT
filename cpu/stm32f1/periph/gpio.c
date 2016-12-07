@@ -134,7 +134,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_init_af(gpio_t pin, gpio_af_out_t af)
+void gpio_init_af(gpio_t pin, gpio_af_t af)
 {
     int pin_num = _pin_num(pin);
     GPIO_TypeDef *port = _port(pin);
