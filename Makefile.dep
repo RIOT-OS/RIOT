@@ -373,7 +373,7 @@ ifneq (,$(filter rtt_stdio,$(USEMODULE)))
 endif
 
 ifneq (,$(filter uart_stdio,$(USEMODULE)))
-  USEMODULE += tsrb
+  USEMODULE += isrpipe
 endif
 
 ifneq (,$(filter isrpipe,$(USEMODULE)))
