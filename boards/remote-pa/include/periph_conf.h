@@ -78,7 +78,6 @@ static const i2c_conf_t i2c_config[I2C_NUMOF] = {
 #define SPI_0_EN            1
 #define SPI_1_EN            1
 
-#ifdef HAVE_PERIPH_SPI_CONF_T
 static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
     {
         .dev      = SSI0,
@@ -94,97 +93,6 @@ static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
         .sck_pin  = GPIO_PB5,
     },
 };
-#endif
-
-/** @} */
-
-/**
- * @name GPIO configuration
- * @{
- */
-#define GPIO_IRQ_PRIO       1
-
-#define GPIO_0_EN           1
-#define GPIO_1_EN           1
-#define GPIO_2_EN           1
-#define GPIO_3_EN           1
-#define GPIO_4_EN           1
-#define GPIO_5_EN           1
-#define GPIO_6_EN           1
-#define GPIO_7_EN           1
-#define GPIO_8_EN           1
-#define GPIO_9_EN           1
-#define GPIO_10_EN          1
-#define GPIO_11_EN          1
-#define GPIO_12_EN          1
-#define GPIO_13_EN          1
-#define GPIO_14_EN          1
-#define GPIO_15_EN          1
-#define GPIO_16_EN          1
-#define GPIO_17_EN          1
-#define GPIO_18_EN          1
-#define GPIO_19_EN          1
-#define GPIO_20_EN          1
-#define GPIO_21_EN          1
-#define GPIO_22_EN          1
-#define GPIO_23_EN          1
-#define GPIO_24_EN          1
-
-/**
- * @brief Port config
- *
- * These defines configures the port settings
- */
-/* GPIO 0 configuration - LED1 Green */
-#define GPIO_0_PIN          GPIO_PD5
-/* GPIO 1 configuration - LED2 Blue */
-#define GPIO_1_PIN          GPIO_PC3
-/* GPIO 2 configuration - LED3 Red */
-#define GPIO_2_PIN          GPIO_PD2
-/* GPIO 3 configuration - UART0 RX */
-#define GPIO_3_PIN          GPIO_PA0
-/* GPIO 4 configuration - UART0 TX */
-#define GPIO_4_PIN          GPIO_PA1
-/* GPIO 5 configuration - UART1 TX */
-#define GPIO_5_PIN          GPIO_PC5
-/* GPIO 6 configuration - UART1 RX */
-#define GPIO_6_PIN          GPIO_PC6
-/* GPIO 7 configuration - UART1 CTS */
-#define GPIO_7_PIN          GPIO_PC1
-/* GPIO 8 configuration - UART RTS */
-#define GPIO_8_PIN          GPIO_PC2
-/* GPIO 9 configuration - User button/Bootloader */
-#define GPIO_9_PIN          GPIO_PA3
-/* GPIO 10 configuration - ADC2 */
-#define GPIO_10_PIN         GPIO_PA6
-/* GPIO 11 configuration - ADC3 */
-#define GPIO_11_PIN         GPIO_PA7
-/* GPIO 12 configuration - SSI0 CC1120 CLK */
-#define GPIO_12_PIN         GPIO_PD1
-/* GPIO 13 configuration - SSI0 CC1120 MOSI */
-#define GPIO_13_PIN         GPIO_PD0
-/* GPIO 14 configuration - SSI0 CC1120 MISO */
-#define GPIO_14_PIN         GPIO_PC4
-/* GPIO 15 configuration - I2C SCL */
-#define GPIO_15_PIN         GPIO_PB1
-/* GPIO 16 configuration - I2C SDA */
-#define GPIO_16_PIN         GPIO_PB0
-/* GPIO 17 configuration - RF SWITCH */
-#define GPIO_17_PIN         GPIO_PD4
-/* GPIO 18 configuration - SSI1 MicroSD CLK */
-#define GPIO_18_PIN         GPIO_PB5
-/* GPIO 19 configuration - SSI1 MicroSD MOSI */
-#define GPIO_19_PIN         GPIO_PC7
-/* GPIO 20 configuration - SSI1 MicroSD MISO */
-#define GPIO_20_PIN         GPIO_PA4
-/* GPIO 21 configuration - CC1120 CSn */
-#define GPIO_21_PIN         GPIO_PD3
-/* GPIO 22 configuration - CC1120 GDO0 */
-#define GPIO_22_PIN         GPIO_PB4
-/* GPIO 23 configuration - CC1120 GDO2 */
-#define GPIO_23_PIN         GPIO_PB3
-/* GPIO 24 configuration - CC1120 Reset */
-#define GPIO_24_PIN         GPIO_PB2
 /** @} */
 
 #ifdef __cplusplus

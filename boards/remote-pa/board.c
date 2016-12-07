@@ -60,7 +60,7 @@ static void rf_switch_init(void)
     RF_SWITCH_PORT->DIR |= (1 << RF_SWITCH_PIN);
 
     /* configure io-mux for used pins */
-    IOC->PC_OVER[RF_SWITCH_PIN] = IOC_OVERRIDE_OE;
+    IOC->OVER[RF_SWITCH_PIN] = IOC_OVERRIDE_OE;
 
     /* Set to default */
     RF_SWITCH_INTERNAL;

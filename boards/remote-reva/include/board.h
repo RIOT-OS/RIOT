@@ -60,8 +60,9 @@
  * @name User button pin definition
  * @{
  */
-#define BUTTON_GPIO     GPIO_3_PIN
+#define BTN0_PIN        GPIO_PIN(0, 3)
 /** @} */
+
 /**
  * @name  RF switch controlled by SW
  * @brief Controls which RF interface goes to the RP-SMA external antenna
