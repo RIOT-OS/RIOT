@@ -13,7 +13,7 @@ FEATURES_REQUIRED += rust_support
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
-# Since we built rust with `#![no_std]` we need libcore.
+# Since we build rust with `#![no_std]` we need libcore.
 USEPKG += rust/libcore
 
 # Depend on the rust/fmt wrapper for the fmt module.
