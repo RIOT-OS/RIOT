@@ -18,7 +18,18 @@
  * @}
  */
 
+#include "periph_conf.h"
 #include "periph_cpu_common.h"
+
+uint32_t periph_apb_clk(uint8_t bus)
+{
+    if (bus == APB1) {
+        return CLOCK_APB1;
+    }
+    else {
+        return CLOCK_APB2;
+    }
+}
 
 void periph_clk_en(uint8_t bus, uint32_t mask)
 {
