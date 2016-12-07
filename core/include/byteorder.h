@@ -20,6 +20,7 @@
 #define BYTEORDER_H_
 
 #include <stdint.h>
+#include <stddef.h>
 
 #if defined(__MACH__)
 #   include "clang_compat.h"
@@ -225,55 +226,104 @@ static inline uint32_t byteorder_swapl(uint32_t v);
 static inline uint64_t byteorder_swapll(uint64_t v);
 
 /**
+ * @def            HTONS(v)
  * @brief          Convert from host byte order to network byte order, 16 bit.
+ * @details        This macro can also be used to statically convert an integer
+ *                 into network byteorder, e.g. to be used in an enum
+ *                 definition.
  * @see            byteorder_htons()
  * @param[in]      v   The integer to convert.
  * @returns        Converted integer.
  */
-static inline uint16_t HTONS(uint16_t v);
 
 /**
+ * @def            HTONL(v)
  * @brief          Convert from host byte order to network byte order, 32 bit.
+ * @details        This macro can also be used to statically convert an integer
+ *                 into network byteorder, e.g. to be used in an enum
+ *                 definition.
  * @see            byteorder_htonl()
  * @param[in]      v   The integer to convert.
  * @returns        Converted integer.
  */
-static inline uint32_t HTONL(uint32_t v);
 
 /**
+ * @def            HTONLL(v)
  * @brief          Convert from host byte order to network byte order, 64 bit.
+ * @details        This macro can also be used to statically convert an integer
+ *                 into network byteorder, e.g. to be used in an enum
+ *                 definition.
  * @see            byteorder_htonll()
  * @param[in]      v   The integer to convert.
  * @returns        Converted integer.
  */
-static inline uint64_t HTONLL(uint64_t v);
 
 /**
+ * @def            NTOHS(v)
  * @brief          Convert from network byte order to host byte order, 16 bit.
+ * @details        This macro can also be used to statically convert an integer
+ *                 into host byteorder, e.g. to be used in an enum
+ *                 definition.
  * @see            byteorder_ntohs()
  * @param[in]      v   The integer to convert.
  * @returns        Converted integer.
  */
-static inline uint16_t NTOHS(uint16_t v);
 
 /**
+ * @def            NTOHL(v)
  * @brief          Convert from network byte order to host byte order, 32 bit.
+ * @details        This macro can also be used to statically convert an integer
+ *                 into host byteorder, e.g. to be used in an enum
+ *                 definition.
  * @see            byteorder_ntohl()
  * @param[in]      v   The integer to convert.
  * @returns        Converted integer.
  */
-static inline uint32_t NTOHL(uint32_t v);
 
 /**
+ * @def            NTOHLL(v)
  * @brief          Convert from network byte order to host byte order, 64 bit.
+ * @details        This macro can also be used to statically convert an integer
+ *                 into host byteorder, e.g. to be used in an enum
+ *                 definition.
  * @see            byteorder_ntohll()
  * @param[in]      v   The integer to convert.
  * @returns        Converted integer.
  */
-static inline uint64_t NTOHLL(uint64_t v);
 
 
 /* **************************** IMPLEMENTATION ***************************** */
+
+
+/**
+ * @brief   Compile time byte-order swapping for 16 bit constants
+ */
+#define byteorder_swapsc(x)  ((uint16_t)(                        \
+                             (((uint16_t)(x) >> 8) & 0x00FF)   | \
+                             (((uint16_t)(x) << 8) & 0xFF00)))
+
+/**
+ * @brief   Compile time byte-order swapping for 32 bit constants
+ */
+#define byteorder_swaplc(x)  ((uint32_t)(                             \
+                             (((uint32_t)(x) >> 24) & 0x000000FF)   | \
+                             (((uint32_t)(x) >> 8)  & 0x0000FF00)   | \
+                             (((uint32_t)(x) << 8)  & 0x00FF0000)   | \
+                             (((uint32_t)(x) << 24) & 0xFF000000)))
+
+/**
+ * @brief   Compile time byte-order swapping for 64 bit constants
+ */
+#define byteorder_swapllc(x) ((uint64_t)(                                   \
+                             (((uint64_t)(x) >> 56) & 0x00000000000000FF) | \
+                             (((uint64_t)(x) >> 40) & 0x000000000000FF00) | \
+                             (((uint64_t)(x) >> 24) & 0x0000000000FF0000) | \
+                             (((uint64_t)(x) >> 8)  & 0x00000000FF000000) | \
+                             (((uint64_t)(x) << 8)  & 0x000000FF00000000) | \
+                             (((uint64_t)(x) << 24) & 0x0000FF0000000000) | \
+                             (((uint64_t)(x) << 40) & 0x00FF000000000000) | \
+                             (((uint64_t)(x) << 56) & 0xFF00000000000000)))
+
 
 #ifdef HAVE_NO_BUILTIN_BSWAP16
 static inline unsigned short __builtin_bswap16(unsigned short a)
@@ -345,7 +395,12 @@ static inline le_uint64_t byteorder_btolll(be_uint64_t v)
  * @brief Swaps the byteorder according to the endianess
  */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#   define _byteorder_swap(V, T) (byteorder_swap##T((V)))
+#   define _byteorder_swap(V, T)                                              \
+        (_Generic(                                                            \
+            ((1 ? (char*) 0 : (void*) (ptrdiff_t) ((V) - (V)))),              \
+            char*: byteorder_swap##T##c((V)),                                 \
+            default: byteorder_swap##T((V))                                   \
+        ))
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #   define _byteorder_swap(V, T) (V)
 #else
@@ -385,38 +440,14 @@ static inline uint64_t byteorder_ntohll(network_uint64_t v)
     return _byteorder_swap(v.u64, ll);
 }
 
-static inline uint16_t HTONS(uint16_t v)
-{
-    return byteorder_htons(v).u16;
-}
+#define HTONS(v)  _byteorder_swap((v), s)
+#define HTONL(v)  _byteorder_swap((v), l)
+#define HTONLL(v) _byteorder_swap((v), ll)
 
-static inline uint32_t HTONL(uint32_t v)
-{
-    return byteorder_htonl(v).u32;
-}
+#define NTOHS(v)  _byteorder_swap((v), s)
+#define NTOHL(v)  _byteorder_swap((v), l)
+#define NTOHLL(v) _byteorder_swap((v), ll)
 
-static inline uint64_t HTONLL(uint64_t v)
-{
-    return byteorder_htonll(v).u64;
-}
-
-static inline uint16_t NTOHS(uint16_t v)
-{
-    network_uint16_t input = { v };
-    return byteorder_ntohs(input);
-}
-
-static inline uint32_t NTOHL(uint32_t v)
-{
-    network_uint32_t input = { v };
-    return byteorder_ntohl(input);
-}
-
-static inline uint64_t NTOHLL(uint64_t v)
-{
-    network_uint64_t input = { v };
-    return byteorder_ntohll(input);
-}
 
 #ifdef __cplusplus
 }
