@@ -167,22 +167,7 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
             return;
     }
 
-    switch (channel) {
-        case 0:
-            tim->CCR1 = value;
-            break;
-        case 1:
-            tim->CCR2 = value;
-            break;
-        case 2:
-            tim->CCR3 = value;
-            break;
-        case 3:
-            tim->CCR4 = value;
-            break;
-        default:
-            return;
-    }
+    tim->CCR[channel] = value;
 }
 
 void pwm_start(pwm_t dev)
