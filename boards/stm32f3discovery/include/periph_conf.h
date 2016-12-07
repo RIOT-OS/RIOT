@@ -36,6 +36,11 @@ extern "C" {
 #define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1
 #define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV2
 #define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_2
+
+/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
+#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB1          (CLOCK_CORECLOCK / 2)
 /** @} */
 
 /**

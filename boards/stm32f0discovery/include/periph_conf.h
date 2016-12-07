@@ -34,6 +34,11 @@ extern "C" {
 
 /* the actual PLL values are automatically generated */
 #define CLOCK_PLL_MUL       (CLOCK_CORECLOCK / CLOCK_HSE)
+
+/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
+#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)
 /** @} */
 
 /**
