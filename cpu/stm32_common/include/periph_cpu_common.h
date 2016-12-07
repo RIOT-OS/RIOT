@@ -133,6 +133,26 @@ typedef struct {
 } pwm_conf_t;
 
 /**
+ * @brief   Structure for UART configuration data
+ */
+typedef struct {
+    USART_TypeDef *dev;     /**< UART device base register address */
+    uint32_t rcc_mask;      /**< bit in clock enable register */
+    gpio_t rx_pin;          /**< RX pin */
+    gpio_t tx_pin;          /**< TX pin */
+#ifndef CPU_FAM_STM32F1
+    gpio_af_t rx_af;        /**< alternate function for RX pin */
+    gpio_af_t tx_af;        /**< alternate function for TX pin */
+#endif
+    uint8_t bus;            /**< APB bus */
+    uint8_t irqn;           /**< IRQ channel */
+#if 0 /* TODO */
+    uint8_t dma_stream;     /**< DMA stream used for TX */
+    uint8_t dma_chan;       /**< DMA channel used for TX */
+#endif
+} uart_conf_t;
+
+/**
  * @brief   Get the actual bus clock frequency for the APB buses
  *
  * @param[in] bus       target APBx bus

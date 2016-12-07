@@ -116,18 +116,6 @@ typedef struct {
 } adc_conf_t;
 
 /**
- * @brief   UART configuration options
- */
-typedef struct {
-    USART_TypeDef *dev;     /**< UART device */
-    gpio_t rx_pin;          /**< TX pin */
-    gpio_t tx_pin;          /**< RX pin */
-    uint32_t rcc_pin;       /**< bit in the RCC register */
-    uint8_t bus;            /**< peripheral bus */
-    uint8_t irqn;           /**< interrupt number */
-} uart_conf_t;
-
-/**
  * @brief   DAC line configuration data
  */
 typedef struct {

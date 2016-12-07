@@ -68,29 +68,6 @@ enum {
 };
 
 /**
- * @brief   Structure for UART configuration data
- * @{
- */
-typedef struct {
-    USART_TypeDef *dev;     /**< UART device base register address */
-    uint32_t rcc_mask;      /**< bit in clock enable register */
-    gpio_t rx_pin;          /**< RX pin */
-    gpio_t tx_pin;          /**< TX pin */
-    gpio_mode_t rx_mode;    /**< RX pin mode */
-    gpio_mode_t tx_mode;    /**< TX pin mode */
-    gpio_t rts_pin;         /**< RTS pin */
-    gpio_t cts_pin;         /**< CTS pin */
-    gpio_mode_t rts_mode;   /**< RTS pin mode */
-    gpio_mode_t cts_mode;   /**< CTS pin mode */
-    gpio_af_t af;           /**< alternate pin function to use */
-    uint8_t irqn;           /**< IRQ channel */
-    uint8_t dma_stream;     /**< DMA stream used for TX */
-    uint8_t dma_chan;       /**< DMA channel used for TX */
-    uint8_t hw_flow_ctrl;   /**< Support for hardware flow control */
-} uart_conf_t;
-/** @} */
-
-/**
  * @brief   Available number of ADC devices
  */
 #define ADC_DEVS            (2U)
