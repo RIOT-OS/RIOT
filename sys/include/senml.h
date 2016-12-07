@@ -13,20 +13,16 @@
  * @{
  *
  * @file
- * @brief       Reference implementation of the Sensor Markup Language (SenML)
+ * @brief Reference implementation of the Media Types for Sensor Measurement Lists (SenML)
  *
- * The Sensor Markup Language is a specification that defines media types for
- * representing simple sensor measurements and device parameters.
- * Representations are defined in JavaScript Object Notation (JSON), Concise
- * Binary Object Representation (CBOR), eXtensible Markup Language (XML), and
- * Efficient XML Interchange (EXI), which share the common SenML data model.
- * This implementation supports only JSON and CBOR. A simple sensor, such as a
- * temperature sensor, could use this media type in protocols such as HTTP or
- * CoAP to transport the measurements of the sensor or to be configured.
+ * SenML is a specification that defines media types for representing simple sensor measurements
+ * and device parameters in the Sensor Measurement Lists (SenML).  Representations are defined in
+ * JavaScript Object Notation (JSON), Concise Binary Object Representation (CBOR), eXtensible
+ * Markup Language (XML), and Efficient XML Interchange (EXI), which share the common SenML data
+ * model. A simple sensor, such as a temperature sensor, could use this media type in protocols
+ * such as HTTP or CoAP to transport the measurements of the sensor or to be configured.
  *
- * @see <a href="https://tools.ietf.org/html/draft-ietf-core-senml-04">
- *      Media Types for Sensor Markup Language (SenML)
- *      </a>
+ * @see [Media Types for Sensor Measurement Lists (SenML)](https://tools.ietf.org/html/draft-ietf-core-senml-04)
  *
  * @author      Lennart Dührsen <lennart.duehrsen@fu-berlin.de>
  */
