@@ -276,6 +276,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len)
     gnrc_pktsnip_t *head;
     struct iovec *vec;
 
+    assert(len != NULL);
     if (pkt == NULL) {
         *len = 0;
         return NULL;
@@ -289,6 +290,8 @@ gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len)
         *len = 0;
         return NULL;
     }
+
+    assert(head->data != NULL);
     vec = (struct iovec *)(head->data);
     /* fill the IOVEC */
     while (pkt != NULL) {
