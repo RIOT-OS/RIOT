@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +14,7 @@
  * @brief       Peripheral MCU configuration for the nucleo-l1 board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef PERIPH_CONF_H_
@@ -81,23 +82,26 @@ static const timer_conf_t timer_config[] = {
 #define RTC_NUMOF           (1U)
 
 /**
- * @brief UART configuration
+ * @brief   UART configuration
+ * @{
  */
-#define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_IRQ_PRIO       1
+static const uart_conf_t uart_config[] = {
+    {
+        .dev      = USART2,
+        .rcc_mask = RCC_APB1ENR_USART2EN,
+        .rx_pin   = GPIO_PIN(PORT_A, 3),
+        .tx_pin   = GPIO_PIN(PORT_A, 2),
+        .rx_af    = GPIO_AF7,
+        .tx_af    = GPIO_AF7,
+        .bus      = APB1,
+        .irqn     = USART2_IRQn
+    }
+};
 
-/* UART 0 device configuration */
-#define UART_0_DEV          USART2
-#define UART_0_CLKEN()      (periph_clk_en(APB1, RCC_APB1ENR_USART2EN))
-#define UART_0_CLK          (CLOCK_CORECLOCK)   /* UART clock runs with 32MHz (F_CPU / 1) */
-#define UART_0_IRQ          USART2_IRQn
-#define UART_0_ISR          isr_usart2
-#define UART_0_BUS_FREQ     32000000
-/* UART 0 pin configuration */
-#define UART_0_RX_PIN       GPIO_PIN(PORT_A, 3)
-#define UART_0_TX_PIN       GPIO_PIN(PORT_A, 2)
-#define UART_0_AF           GPIO_AF7
+#define UART_0_ISR          (isr_usart2)
+
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+/** @} */
 
 /**
  * @brief SPI configuration
