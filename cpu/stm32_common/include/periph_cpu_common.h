@@ -31,6 +31,11 @@ extern "C" {
 #define CPUID_LEN           (12U)
 
 /**
+ * @brief   All STM timers have 4 capture-compare channels
+ */
+#define TIMER_CHAN          (4U)
+
+/**
  * @brief   Use the shared SPI functions
  * @{
  */

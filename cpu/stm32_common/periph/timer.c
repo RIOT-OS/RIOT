@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_stm32f1
+ * @ingroup     cpu_stm32_common
  * @{
  *
  * @file
@@ -54,9 +54,9 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     /* configure the timer as upcounter in continuous mode */
     dev(tim)->CR1  = 0;
     dev(tim)->CR2  = 0;
-    dev(tim)->ARR  = TIMER_MAXVAL;
+    dev(tim)->ARR  = timer_config[tim].max;
     /* set prescaler */
-    dev(tim)->PSC = ((CLOCK_CORECLOCK / freq) - 1);
+    dev(tim)->PSC = ((periph_apb_clk(timer_config[tim].bus) / freq) - 1);
     /* generate an update event to apply our configuration */
     dev(tim)->EGR = TIM_EGR_UG;
 
@@ -76,11 +76,11 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
 
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    if (channel >= TIMER_CHANNELS) {
+    if (channel >= TIMER_CHAN) {
         return -1;
     }
 
-    dev(tim)->CCR[channel] = (value & TIMER_MAXVAL);
+    dev(tim)->CCR[channel] = (value & timer_config[tim].max);
     dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
     dev(tim)->DIER |= (TIM_DIER_CC1IE << channel);
 
@@ -89,7 +89,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 
 int timer_clear(tim_t tim, int channel)
 {
-    if (channel >= TIMER_CHANNELS) {
+    if (channel >= TIMER_CHAN) {
         return -1;
     }
 
@@ -126,7 +126,7 @@ static inline void irq_handler(tim_t tim)
 {
     uint32_t status = (dev(tim)->SR & dev(tim)->DIER);
 
-    for (unsigned int i = 0; i < TIMER_CHANNELS; i++) {
+    for (uint8_t i = 0; i < TIMER_CHAN; i++) {
         if (status & (TIM_SR_CC1IF << i)) {
             dev(tim)->DIER &= ~(TIM_DIER_CC1IE << i);
             isr_ctx[tim].cb(isr_ctx[tim].arg, i);
