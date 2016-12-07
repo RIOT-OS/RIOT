@@ -376,6 +376,10 @@ ifneq (,$(filter uart_stdio,$(USEMODULE)))
   USEMODULE += tsrb
 endif
 
+ifneq (,$(filter isrpipe,$(USEMODULE)))
+  USEMODULE += tsrb
+endif
+
 ifneq (,$(filter posix,$(USEMODULE)))
   USEMODULE += xtimer
 endif
