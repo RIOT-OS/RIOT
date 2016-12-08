@@ -168,7 +168,7 @@ void rtt_poweroff(void)
 {
     PWR->CR |= PWR_CR_DBP;                   /* Allow access to BKP Domain */
     RCC->BDCR &= ~RCC_BDCR_RTCEN;            /* disable RTC */
-    RCC->APB1ENR &= ~(RCC_APB1ENR_BKPEN|RCC_APB1ENR_PWREN); /* disable BKP and PWR, Clock */
+    periph_clk_dis(APB1, (RCC_APB1ENR_BKPEN|RCC_APB1ENR_PWREN)); /* disable BKP and PWR, Clock */
 }
 
 inline void _rtt_enter_config_mode(void)

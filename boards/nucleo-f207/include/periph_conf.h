@@ -67,7 +67,7 @@ static const pwm_conf_t pwm_config[PWM_NUMOF] = {
         .CH1      = 7,
         .CH2      = 8,
         .CH3      = 9,
-        .AF       = 2
+        .AF       = GPIO_AF2
     }
 };
 /** @} */
