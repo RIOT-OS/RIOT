@@ -73,7 +73,13 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 
     /* read speed configuration */
     switch (speed) {
+        case I2C_SPEED_LOW:
+            /* 10Kbit/s */
+            ccr = I2C_APBCLK / 20000;
+            break;
+
         case I2C_SPEED_NORMAL:
+            /* 100Kbit/s */
             ccr = I2C_APBCLK / 200000;
             break;
 
