@@ -5,10 +5,13 @@ CRATE_TYPE  = lib
 
 all: | git-download $(BINDIR)/rust/$(PKG_NAME).a
 
+$(CRATE_DEPS:%=$(BINDIR)/rust/%.rlib):
+	"$(MAKE)" -C $(RIOTPKG)/$(patsubst $(BINDIR)/%.rlib,%,$@)
+
 $(BINDIR)/rust/$(PKG_NAME).a: $(BINDIR)/rust/$(PKG_NAME).rlib
 	$(AD)ln -fs $< $@
 
-$(BINDIR)/rust/$(PKG_NAME).rlib: $(SOURCE_FILE)
+$(BINDIR)/rust/$(PKG_NAME).rlib: $(SOURCE_FILE) $(CRATE_DEPS:%=$(BINDIR)/rust/%.rlib)
 	$(AD)mkdir -p $(BINDIR)/rust
 	$(AD)rustc $(RUSTC_FLAGS) -o $@ $(SOURCE_FILE)
 

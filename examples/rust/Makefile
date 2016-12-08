@@ -14,7 +14,7 @@ FEATURES_REQUIRED += rust_support
 BOARD ?= native
 
 # Since we build rust with `#![no_std]` we need libcore.
-USEPKG += rust/libcore
+USEPKG += rust/libc
 
 # Depend on the rust/fmt wrapper for the fmt module.
 USEMODULE += rust/fmt

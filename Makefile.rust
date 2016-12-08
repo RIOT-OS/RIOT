@@ -21,7 +21,7 @@ RUSTC_FLAGS += --crate-name $(CRATE_NAME) \
 
 # Extract rust crates from `USEPKG` and `USEMODULE`.
 RSMODULE = $(filter rust/%,$(USEMODULE))
-RSPKG    = $(filter rust/%,$(USEPKG))
+RSPKG    = $(filter rust/%,$(USEPKG)) $(CRATE_DEPS:%=rust/%)
 
 # Add rust crates with `--extern` to `RUSTC_FLAGS`.
 RUSTC_FLAGS += $(foreach m,$(RSMODULE:rust/%=%) $(RSPKG:rust/lib%=%),\
