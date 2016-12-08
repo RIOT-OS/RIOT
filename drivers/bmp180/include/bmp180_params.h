@@ -55,30 +55,6 @@ static const bmp180_params_t bmp180_params[] =
 #endif
 };
 
-/**
- * @brief   Get the number of configured BMP180 devices
- */
-#define BMP180_NUMOF       (sizeof(bmp180_params) / sizeof(bmp180_params[0]))
-
-#ifdef MODULE_SAUL_REG
-/**
- * @brief   Allocate and configure entries to the SAUL registry
- */
-saul_reg_t bmp180_saul_reg[][2] =
-{
-    {
-        {
-            .name = "bmp180-temp",
-            .driver = &bmp180_temperature_saul_driver
-        },
-        {
-            .name = "bmp180-press",
-            .driver = &bmp180_pressure_saul_driver
-        },
-    }
-};
-#endif
-
 #ifdef __cplusplus
 }
 #endif
