@@ -223,17 +223,17 @@ static const i2c_conf_t i2c_config[] = {
  * @name    ADC configuration
  * @{
  */
-#define ADC_CONFIG {              \
-    { GPIO_PIN(PORT_C, 0), 10 },  \
-    { GPIO_PIN(PORT_C, 1), 11 },  \
-    { GPIO_PIN(PORT_C, 2), 12 },  \
-    /* ADC Temperature channel */ \
-    { GPIO_UNDEF,          16 },  \
-    /* ADC VREF channel */        \
-    { GPIO_UNDEF,          17 },  \
-}
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_C, 0), .dev = ADC_1, .chan = 10 },
+    { .pin = GPIO_PIN(PORT_C, 1), .dev = ADC_1, .chan = 11 },
+    { .pin = GPIO_PIN(PORT_C, 2), .dev = ADC_1, .chan = 12 },
+    /* ADC Temperature channel */
+    { .pin = GPIO_UNDEF,          .dev = ADC_1, .chan = 16 },
+    /* ADC VREF channel */
+    { .pin = GPIO_UNDEF,          .dev = ADC_1, .chan = 17 }
+};
 
-#define ADC_NUMOF           (5)
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 /**

@@ -246,7 +246,16 @@ static const spi_conf_t spi_config[] = {
  * @name    ADC configuration
  * @{
  */
-#define ADC_NUMOF          (0)
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_A,  3), .dev = ADC_2, .chan =  3 },
+    { .pin = GPIO_PIN(PORT_C,  0), .dev = ADC_2, .chan = 10 },
+    { .pin = GPIO_PIN(PORT_C,  3), .dev = ADC_2, .chan = 13 },
+    { .pin = GPIO_PIN(PORT_F,  3), .dev = ADC_2, .chan =  9 },
+    { .pin = GPIO_PIN(PORT_F,  5), .dev = ADC_2, .chan = 15 },
+    { .pin = GPIO_PIN(PORT_F, 10), .dev = ADC_2, .chan =  8 }
+};
+
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 #ifdef __cplusplus

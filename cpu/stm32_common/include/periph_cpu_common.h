@@ -61,6 +61,20 @@ extern "C" {
 #define TIMER_CHAN          (4U)
 
 /**
+ * @name    Available number of ADC devices
+ * @{
+ */
+#if defined(CPU_MODEL_STM32F407VG) || defined(CPU_MODEL_STM32F415RG) \
+    || defined(CPU_MODEL_STM32F446RE) || defined(CPU_MODEL_STM32F429ZI)
+#define ADC_DEV_NUMOF       (3U)
+#elif defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2)
+#define ADC_DEV_NUMOF       (2U)
+#else
+#define ADC_DEV_NUMOF       (1U)
+#endif
+/** @} */
+
+/**
  * @brief   Use the shared SPI functions
  * @{
  */
@@ -136,6 +150,21 @@ typedef uint32_t gpio_t;
 #define SPI_HWCS(x)         (SPI_HWCS_MASK | x)
 
 /**
+ * @brief   Map ADC device numbers to human readable strings
+ */
+enum {
+    ADC_1 = 0,          /**< ADC1 */
+#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2)
+    ADC_2 = 1,          /**< ADC2 */
+#endif
+#if defined(CPU_MODEL_STM32F407VG) || defined(CPU_MODEL_STM32F415RG) \
+    || defined(CPU_MODEL_STM32F446RE) || defined(CPU_MODEL_STM32F429ZI)
+    ADC_2 = 1,          /**< ADC2 */
+    ADC_3 = 2           /**< ADC3 */
+#endif
+};
+
+/**
  * @brief   Available MUX values for configuring a pin's alternate function
  */
 typedef enum {
@@ -204,6 +233,37 @@ typedef enum {
 /** @} */
 #endif /* ndef DOXYGEN */
 #endif /* ndef CPU_FAM_STM32F1 */
+
+/**
+ * @brief   Override the ADC resolution configuration
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+#if defined(CPU_FAM_STM32F0)
+    ADC_RES_6BIT  = 0x00000018,     /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = 0x00000010,     /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = 0x00000008,     /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = 0x00000000,     /**< ADC resolution: 12 bit */
+#else
+    ADC_RES_6BIT  = 0x03000000,     /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = 0x02000000,     /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = 0x01000000,     /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = 0x00000000,     /**< ADC resolution: 12 bit */
+#endif
+    ADC_RES_14BIT = 1,              /**< ADC resolution: 14 bit (not supported) */
+    ADC_RES_16BIT = 2               /**< ADC resolution: 16 bit (not supported)*/
+} adc_res_t;
+/** @} */
+
+/**
+ * @brief   ADC line configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the channel */
+    uint8_t dev;            /**< ADCx device used for the channel */
+    uint8_t chan;           /**< CPU ADC channel connected to the pin */
+} adc_conf_t;
 
 /**
  * @brief   DAC line configuration data

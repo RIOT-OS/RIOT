@@ -258,16 +258,18 @@ static const spi_conf_t spi_config[] = {
 
 /**
  * @name    ADC configuration
- *
- * We need to define the following fields:
- * PIN, device (ADCx), channel
  * @{
  */
-#define ADC_CONFIG {              \
-    {GPIO_PIN(PORT_A, 3), 0, 3},  \
-    {GPIO_PIN(PORT_C, 0), 1, 0}  \
-}
-#define ADC_NUMOF          (2)
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_A, 3), .dev = ADC_1, .chan =  3 },
+    { .pin = GPIO_PIN(PORT_C, 0), .dev = ADC_1, .chan = 10 },
+    { .pin = GPIO_PIN(PORT_C, 3), .dev = ADC_1, .chan = 13 },
+    { .pin = GPIO_PIN(PORT_C, 1), .dev = ADC_1, .chan = 11 },
+    { .pin = GPIO_PIN(PORT_C, 4), .dev = ADC_1, .chan = 14 },
+    { .pin = GPIO_PIN(PORT_C, 5), .dev = ADC_1, .chan = 15 }
+};
+
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 /**

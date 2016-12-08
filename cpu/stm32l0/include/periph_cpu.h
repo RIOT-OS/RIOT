@@ -45,31 +45,6 @@ enum {
     PORT_H = 7,             /**< port H */
 };
 
-#ifndef DOXYGEN
-/**
- * @brief   Override ADC resolution values
- * @{
- */
-#define HAVE_ADC_RES_T
-typedef enum {
-    ADC_RES_6BIT  = (0x3 << 3),     /**< ADC resolution: 6 bit */
-    ADC_RES_8BIT  = (0x2 << 3),     /**< ADC resolution: 8 bit */
-    ADC_RES_10BIT = (0x1 << 3),     /**< ADC resolution: 10 bit */
-    ADC_RES_12BIT = (0x0 << 3),     /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT = (0xfe),         /**< not applicable */
-    ADC_RES_16BIT = (0xff)          /**< not applicable */
-} adc_res_t;
-/** @} */
-#endif /* ndef DOXYGEN */
-
-/**
- * @brief   ADC line configuration values
- */
-typedef struct {
-    gpio_t pin;             /**< pin to use */
-    uint8_t chan;           /**< internal channel the pin is connected to */
-} adc_conf_t;
-
 /**
  * @brief   I2C configuration data structure
  */

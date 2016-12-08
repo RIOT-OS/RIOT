@@ -105,17 +105,14 @@ static const pwm_conf_t pwm_config[] = {
 
 /**
  * @name    ADC configuration
- *
- * We need to define the following fields:
- * PIN, device (ADCx), channel
  * @{
  */
-#define ADC_CONFIG {             \
-    {GPIO_PIN(PORT_B, 0), 0, 8}, \
-    {GPIO_PIN(PORT_B, 1), 0, 9}  \
-}
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_B, 0), .dev = ADC_1, .chan =  8 },
+    { .pin = GPIO_PIN(PORT_B, 1), .dev = ADC_1, .chan =  9 }
+};
 
-#define ADC_NUMOF           (2)
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 /**

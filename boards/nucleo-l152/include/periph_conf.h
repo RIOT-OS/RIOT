@@ -20,7 +20,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "periph_cpu.h"
+#include "periph_conf_nucleo64.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -217,22 +217,6 @@ static const i2c_conf_t i2c_config[] = {
     {I2C2, GPIO_PIN(PORT_B, 10), GPIO_PIN(PORT_B, 11), GPIO_OD_PU,
      GPIO_AF4, I2C2_ER_IRQn, I2C2_EV_IRQn},
 };
-/** @} */
-
-/**
- * @name   ADC configuration
- * @{
- */
-#define ADC_CONFIG {             \
-    { GPIO_PIN(PORT_A, 0), 0 },  \
-    { GPIO_PIN(PORT_A, 1), 1 },  \
-    { GPIO_PIN(PORT_A, 4), 4 },  \
-    { GPIO_PIN(PORT_B, 0), 8 },  \
-    { GPIO_PIN(PORT_C, 1), 11 }, \
-    { GPIO_PIN(PORT_C, 0), 10 }, \
-}
-
-#define ADC_NUMOF           (6U)
 /** @} */
 
 /**
