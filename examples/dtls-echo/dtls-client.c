@@ -95,9 +95,12 @@ static const unsigned char ecdsa_pub_key_y[] = {
 #endif
 
 /**
- * @brief This care about getting messages and continue with the DTLS flights.
- * This will handle all the packets arriving to the node.
- * Will determine if its from a new DTLS peer or a previous one.
+ * @brief Handles the reception of the DTLS flights.
+ *
+ * Handles all the packets arriving at the node and identifies those that are
+ * DTLS records. Also, it determines if said DTLS record is coming from a new
+ * peer or a currently established peer.
+ *
  */
 static void dtls_handle_read(dtls_context_t *ctx, gnrc_pktsnip_t *pkt)
 {
@@ -105,8 +108,9 @@ static void dtls_handle_read(dtls_context_t *ctx, gnrc_pktsnip_t *pkt)
     static session_t session;
 
     /*
-     * NOTE: GNRC (Non-socket) issue: we need to modify the current
-     * DTLS Context for the IPv6 src (and in a future the port src).
+     * TODO NOTE: GNRC (Non-socket) issue:
+     * The current DTLS Context for the IPv6 src and port src requires to be
+     * modified.
      */
 
     /* Taken from the tftp server example */
@@ -223,8 +227,9 @@ static int peer_verify_ecdsa_key(struct dtls_context_t *ctx,
 #endif /* DTLS_ECC */
 
 /**
- * @brief This will try to transmit using only GNRC stack.
- * This is basically the original send function from gnrc/networking
+ * @brief Handles the transmission of packets. Only GNRC stack (non-socket).
+ *
+ * @note This is basically the original send function from gnrc/networking
  */
 static int gnrc_sending(char *addr_str, char *data, size_t data_len )
 {
@@ -263,8 +268,8 @@ static int gnrc_sending(char *addr_str, char *data, size_t data_len )
 
     /*
      * WARNING: Too fast and the nodes dies in middle of retransmissions.
+     *          Oddly, the 802.15.4 ACK are set when this happens.
      *          This issue appears in the FIT-Lab (m3 motes).
-     *          In native, is not required.
      */
     xtimer_usleep(500000);
 
@@ -279,10 +284,7 @@ static int gnrc_sending(char *addr_str, char *data, size_t data_len )
 }
 
 /**
- * @brief This will print the data read from the Peer.
- * THIS AT THE END of the 6 flights (DTLS App Data).
- * Is here where we know that the connection has finished.
- * TODO: The connected variable could de modified here.
+ * @brief Reception of a DTLS Applicaiton data record.
  */
 static int read_from_peer(struct dtls_context_t *ctx,
                session_t *session, uint8 *data, size_t len)
@@ -300,16 +302,20 @@ static int read_from_peer(struct dtls_context_t *ctx,
 #endif
     return 0;
 
+  /*  TODO: The connected variable could de modified here. */
+
 }
 
 /**
- * @brief  Will try to transmit the next DTLS flight for a speicifc Peer.
- * NOTE:The global buff and buflen is used for be able to transmit the
- * Payload in segmented datagrams.
+ * @brief  Transmits the next DTLS flight for a speicifc Peer.
+ *
  */
 static void try_send(struct dtls_context_t *ctx, session_t *dst)
 {
-
+/*
+ * NOTE:The global buff and buflen is used for be able to transmit the
+ * Payload in segmented datagrams.
+ */
     int res;
 
     res = dtls_write(ctx, dst, (uint8_t *)client_payload, buflen);
@@ -324,7 +330,7 @@ static void try_send(struct dtls_context_t *ctx, session_t *dst)
 }
 
 /**
- * @brief This SIGNAL function will prepare the next DTLS flight to send.
+ * @brief Handles the DTLS communication with the other peer.
  */
 static int send_to_peer(struct dtls_context_t *ctx,
              session_t *session, uint8 *buf, size_t len)
@@ -340,7 +346,7 @@ static int send_to_peer(struct dtls_context_t *ctx,
 
 
     /* TODO: Confirm that indeed len size of data was sent, otherwise
-     * return the correct number of bytes sent
+     * return the correct number of bytes sent.
      */
     gnrc_sending(addr_str, (char *)buf, len);
 
@@ -349,9 +355,10 @@ static int send_to_peer(struct dtls_context_t *ctx,
 
 
 
-/***
- *  This is a custom function for preparing the SIGNAL events and
- *  create a new DTLS context.
+/**
+ *  @brief DTLS variables and register are initialized.
+ *
+ *  Prepares the SIGNAL events and create a new DTLS context.
  */
 static void init_dtls(session_t *dst, char *addr_str)
 {
@@ -377,12 +384,14 @@ static void init_dtls(session_t *dst, char *addr_str)
 #endif
 
     /*
+     *  NOTE:
      *  The objective of ctx->App  is be able to retrieve
      *  enough information for restablishing a connection.
      *  This is to be used in the send_to_peer and (potentially) the
      *  read_from_peer, to continue the transmision with the next
      *  step of the DTLS flights.
-     *  TODO: Take away the DEFAULT_PORT and CLIENT_PORT.
+     *
+     *  TODO: Give control over DEFAULT_PORT and CLIENT_PORT to the user.
      */
     dst->size = sizeof(ipv6_addr_t) + sizeof(unsigned short);
     dst->port =  (unsigned short) DEFAULT_PORT;
@@ -445,31 +454,26 @@ static void client_send(char *addr_str, char *data, unsigned int delay)
     iWatch = MAX_TIMES_TRY_TO_SEND;
 
     /*
-     * dtls_connect is the one who begin all the process.
+     * NOTE:  dtls_connect is the one who begin all the process.
      * However, do it too fast, and the node will attend it before having a
      * valid IPv6 or even a route to the destiny (This could be verified as the
      * sequence number of the first DTLS Hello message will be greater than
      * zero).
      */
-    //connected = dtls_connect(dtls_context, &dst) >= 0;
 
     /*
-     * Until all the data is not sent we remains trying to connect to the
-     * server. Plus a small watchdog.
+     * This loop has as objective to transmit all the DTLS records involved
+     * in the DTLS session. Including the real data to send. There is a
+     * watchdog involved if by any chance the server stop answering.
      */
     while ((buflen > 0) && (iWatch > 0)) {
 
-        /*
-         * NOTE: I (rfuentess) personally think this should be until this point
-         * instead before (that is why the previous  dtls_connect is by defualt
-         * commented..
-         */
         if (!connected) {
             connected = dtls_connect(dtls_context, &dst);
         }
         else if (connected < 0) {
             DEBUG("Client DTLS was unable to establish a channel!\n");
-            /*NOTE: Not sure what to do in this scenario (if can happens)*/
+            /*NOTE: Not sure what to do in this scenario (if it can happen)*/
         }
         else {
             /*TODO: must happens always or only when connected?*/
@@ -477,7 +481,7 @@ static void client_send(char *addr_str, char *data, unsigned int delay)
         }
 
         /*
-         * WARNING: The delay is KEY HERE!  Too fast, and we can kill the
+         * WARNING: The delay is key HERE!  Too fast, and we can kill the
          * DTLS state machine.  Another alternative is change to
          * blocking states (making the watchdog useless)
          *

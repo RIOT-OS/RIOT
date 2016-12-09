@@ -79,7 +79,12 @@ char _server_stack[THREAD_STACKSIZE_MAIN + THREAD_EXTRA_STACKSIZE_PRINTF];
 static kernel_pid_t _dtls_kernel_pid;
 
 /**
- * @brief This care about getting messages and continue with the DTLS flights
+ * @brief Handles the reception of the DTLS flights.
+ *
+ * Handles all the packets arriving at the node and identifies those that are
+ * DTLS records. Also, it determines if said DTLS record is coming from a new
+ * peer or a currently established peer.
+ *
  */
 static void dtls_handle_read(dtls_context_t *ctx, gnrc_pktsnip_t *pkt)
 {
@@ -87,8 +92,9 @@ static void dtls_handle_read(dtls_context_t *ctx, gnrc_pktsnip_t *pkt)
     static session_t session;
 
     /*
-     * NOTE: GNRC (Non-socket) issue: we need to modify the current
-     * DTLS Context for the IPv6 src (and in a future the port src).
+     * TODO NOTE: GNRC (Non-socket) issue:
+     * The current DTLS Context for the IPv6 src and port src requires to be
+     * modified.
      */
 
     /* Taken from the tftp server example */
@@ -119,7 +125,7 @@ static void dtls_handle_read(dtls_context_t *ctx, gnrc_pktsnip_t *pkt)
 
 
 /**
- * @brief We got the TinyDTLS App Data message and answer with the same
+ * @brief Reception of a DTLS Applicaiton data record.
  */
 static int read_from_peer(struct dtls_context_t *ctx,
                           session_t *session, uint8 *data, size_t len)
@@ -133,13 +139,13 @@ static int read_from_peer(struct dtls_context_t *ctx,
         DEBUG("%c", data[i]);
     DEBUG("--- \t Sending echo..\n");
 #endif
-    /* echo incoming application data */
+    /* echo back the application data rcvd. */
     dtls_write(ctx, session, data, len);
     return 0;
 }
 
 /**
- * @brief This will try to transmit using only GNRC stack (non-socket).
+ * @brief Handles the transmission of packets. Only GNRC stack (non-socket).
  */
 static int gnrc_sending(char *addr_str, char *data, size_t data_len, unsigned short rem_port )
 {
@@ -147,7 +153,7 @@ static int gnrc_sending(char *addr_str, char *data, size_t data_len, unsigned sh
     ipv6_addr_t addr;
     gnrc_pktsnip_t *payload, *udp, *ip;
 
-    /* parse destination address */
+    /* Parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
         puts("Error: unable to parse destination address");
         return -1;
@@ -160,7 +166,7 @@ static int gnrc_sending(char *addr_str, char *data, size_t data_len, unsigned sh
         return -1;
     }
 
-    /* allocate UDP header */
+    /* Allocate UDP header */
     udp = gnrc_udp_hdr_build(payload, DEFAULT_PORT, rem_port);
     if (udp == NULL) {
         puts("Error: unable to allocate UDP header");
@@ -168,7 +174,7 @@ static int gnrc_sending(char *addr_str, char *data, size_t data_len, unsigned sh
         return -1;
     }
 
-    /* allocate IPv6 header */
+    /* Allocate IPv6 header */
     ip = gnrc_ipv6_hdr_build(udp, NULL, &addr);
     if (ip == NULL) {
         puts("Error: unable to allocate IPv6 header");
@@ -181,11 +187,12 @@ static int gnrc_sending(char *addr_str, char *data, size_t data_len, unsigned sh
 
     /*
      * WARNING: Too fast and the nodes dies in middle of retransmissions.
-     *         This issue appears in the FIT-Lab (m3 motes).
+     *          Oddly, the 802.15.4 ACK are set when this happens.
+     *          This issue appears in the FIT-Lab (m3 motes).
      */
     xtimer_usleep(500000);
 
-    /* Probably this part will be removed.  **/
+    /*TEST: Probably this part will be removed.  **/
     if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, ip)) {
         puts("Error: unable to locate UDP thread");
         gnrc_pktbuf_release(ip);
@@ -196,7 +203,7 @@ static int gnrc_sending(char *addr_str, char *data, size_t data_len, unsigned sh
 }
 
 /**
- * @brief We communicate with the other peer.
+ * @brief Handles the DTLS communication with the other peer.
  */
 static int send_to_peer(struct dtls_context_t *ctx,
                         session_t *session, uint8 *buf, size_t len)
@@ -296,7 +303,7 @@ static int peer_verify_ecdsa_key(struct dtls_context_t *ctx,
 #endif /* DTLS_ECC */
 
 /**
- * @brief We prepare the DTLS for this node.
+ * @brief DTLS variables and register are initialized.
  */
 static void init_dtls(void)
 {
@@ -324,14 +331,15 @@ static void init_dtls(void)
     DEBUG("DBG-Server On\n");
 
     /*
-     * The context for the server is a little different from the client.
-     * The simplicity of GNRC do not mix transparently with
-     * the DTLS Context. At this point, the server need a fresh context
-     * however dtls_context->app must be populated with an unknown
-     * IPv6 address.
+     * The context for the server is different from the client.
+     * The simplicity of GNRC does not mix transparently with
+     * TinyDTLS Context.
      *
-     * The non-valid Ipv6 address ( :: ) is discarded due the chaos.
-     * For now, the first value will be the loopback.
+     * At this point, the server requires a fresh context, however,
+     * dtls_context->app must be populated with an unknown IPv6 address.
+     * Currently, this is fixed by using the Loopback addresses (::1).
+     * The non-valid Ipv6 address ( :: ) was discarded due to issues with it.
+     *
      */
     char *addr_str = "::1";
 
@@ -367,9 +375,12 @@ void *dtls_server_wrapper(void *arg)
     init_dtls();
 
     /*
-     * FIXME: After mutliple retransmissions, and canceled client's sessions
-     * the server become unable to sent NDP NA messages. Still, the TinyDTLS
+     * FIXME: After mutliple DTLS sessiosn established the server becomes
+     * unable to sent NDP NA messages or even pings. Still, the TinyDTLS
      * debugs seems to be fine.
+     *
+     * NOTE: This seems to be a problem with DTLS Sessions buffer saturating
+     * the avaliable RAM.
      */
 
     while (1) {
@@ -379,8 +390,6 @@ void *dtls_server_wrapper(void *arg)
 
         DEBUG("DBG-Server: Record Rcvd!\n");
         dtls_handle_read(dtls_context, (gnrc_pktsnip_t *)(msg.content.ptr));
-
-        /*TODO: What happens with other clients connecting at the same time? */
 
     } /*While */
 
@@ -401,7 +410,6 @@ static void start_server(void)
         return;
     }
 
-    /*TESTING tinydtls*/
     dtls_init();
 
     /* The server is initialized  */
