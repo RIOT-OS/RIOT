@@ -1,17 +1,19 @@
 CRATE_NAME ?= $(PKG_NAME)
 CRATE_TYPE  = lib
 
+LIBNAME = lib$(CRATE_NAME:lib%=%)
+
 .PHONY: all
 
 all: | git-download $(BINDIR)/rust/$(PKG_NAME).a
 
-$(CRATE_DEPS:%=$(BINDIR)/rust/%.rlib):
-	"$(MAKE)" -C $(RIOTPKG)/$(patsubst $(BINDIR)/%.rlib,%,$@)
+$(CRATE_DEPS:%=$(BINDIR)/rust/%.a):
+	"$(MAKE)" -C $(RIOTPKG)/$(patsubst $(BINDIR)/%.a,%,$@)
 
-$(BINDIR)/rust/$(PKG_NAME).a: $(BINDIR)/rust/$(PKG_NAME).rlib
+$(BINDIR)/rust/$(PKG_NAME).a: $(BINDIR)/rust/$(LIBNAME).rlib
 	$(AD)ln -fs $< $@
 
-$(BINDIR)/rust/$(PKG_NAME).rlib: $(SOURCE_FILE) $(CRATE_DEPS:%=$(BINDIR)/rust/%.rlib)
+$(BINDIR)/rust/$(LIBNAME).rlib: $(SOURCE_FILE) $(CRATE_DEPS:%=$(BINDIR)/rust/%.a)
 	$(AD)mkdir -p $(BINDIR)/rust
 	$(AD)rustc $(RUSTC_FLAGS) -o $@ $(SOURCE_FILE)
 
