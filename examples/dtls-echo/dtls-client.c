@@ -127,7 +127,7 @@ static void dtls_handle_read(dtls_context_t *ctx, gnrc_pktsnip_t *pkt)
     session.size = sizeof(ipv6_addr_t) + sizeof(unsigned short);
     session.port = byteorder_ntohs(udp->src_port);
 
-    DEBUG("DBG-Client: Msg received from \n\t Addr Src: %s"
+    DEBUG("Client: Msg received from \n\t Addr Src: %s"
           "\n\t Current Peer: %s \n", addr_str, (char *)dtls_get_app_data(ctx));
 
     ipv6_addr_from_str(&session.addr, addr_str);
@@ -291,11 +291,15 @@ static int read_from_peer(struct dtls_context_t *ctx,
     (void) session;
     (void) ctx;
     size_t i;
-    printf("\n\n Echo received: ");
+
+#if ENABLE_DEBUG == 1
+    DEBUG("\nClient: DTLS Data received -- ");
     for (i = 0; i < len; i++)
-        printf("%c", data[i]);
-    printf(" \n\n\n");
+        DEBUG("%c", data[i]);
+    DEBUG(" --\n");
+#endif
     return 0;
+
 }
 
 /**
@@ -315,7 +319,7 @@ static void try_send(struct dtls_context_t *ctx, session_t *dst)
         buflen -= res;
     }
     else {
-        DEBUG("DBG-Client: dtls_write returned error!\n" );
+        dtls_crit("Client: dtls_write returned error!\n" );
     }
 }
 
@@ -366,13 +370,12 @@ static void init_dtls(session_t *dst, char *addr_str)
     };
 
 #ifdef DTLS_PSK
-    puts("Client support PSK");
+    DEBUG("Client support PSK");
 #endif
 #ifdef DTLS_ECC
-    puts("Client support ECC");
+    DEBUG("Client support ECC");
 #endif
 
-    DEBUG("DBG-Client: Debug ON");
     /*
      *  The objective of ctx->App  is be able to retrieve
      *  enough information for restablishing a connection.
@@ -385,7 +388,7 @@ static void init_dtls(session_t *dst, char *addr_str)
     dst->port =  (unsigned short) DEFAULT_PORT;
 
     if (ipv6_addr_from_str(&dst->addr, addr_str) == NULL) {
-        puts("ERROR: init_dtls was unable to load the IPv6 addresses!\n");
+        puts("ERROR: init_dtls was unable to load the IPv6 addresses!");
         dtls_context = NULL;
         return;
     }
@@ -420,20 +423,19 @@ static void client_send(char *addr_str, char *data, unsigned int delay)
     dtls_init();
 
     if (gnrc_netreg_register(GNRC_NETTYPE_UDP, &entry)) {
-        puts("Unable to register ports");
+        puts("ERROR: Unable to register ports");
         /*FIXME: Release memory?*/
         return;
     }
 
     if (strlen(data) > DTLS_MAX_BUF) {
-        puts("Data too long ");
+        puts("ERROR: Exceeded max size of DTLS buffer.");
         return;
     }
 
     init_dtls(&dst, addr_str);
     if (!dtls_context) {
-        dtls_emerg("cannot create context\n");
-        puts("Client unable to load context!");
+        puts("ERROR: Client unable to load context!");
         return;
     }
 
@@ -466,7 +468,7 @@ static void client_send(char *addr_str, char *data, unsigned int delay)
             connected = dtls_connect(dtls_context, &dst);
         }
         else if (connected < 0) {
-            puts("Client DTLS was unable to establish a channel!\n");
+            DEBUG("Client DTLS was unable to establish a channel!\n");
             /*NOTE: Not sure what to do in this scenario (if can happens)*/
         }
         else {
@@ -496,8 +498,7 @@ static void client_send(char *addr_str, char *data, unsigned int delay)
     gnrc_netreg_unregister(GNRC_NETTYPE_UDP, &entry);
     connected = 0; /*Probably this should be removed or global */
 
-    /* Permanent or not permanent? */
-    DEBUG("DTLS-Client: DTLS session finished\n");
+    DEBUG("Client DTLS session finished\n");
 }
 
 int udp_client_cmd(int argc, char **argv)

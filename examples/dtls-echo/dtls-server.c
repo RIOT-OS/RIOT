@@ -128,7 +128,7 @@ static int read_from_peer(struct dtls_context_t *ctx,
 
 #if ENABLE_DEBUG == 1
   size_t i;
-  DEBUG("\nDBG-Server: Data from Client: ---");
+  DEBUG("\nServer: Data rcvd: ---");
     for (i = 0; i < len; i++)
         DEBUG("%c", data[i]);
     DEBUG("--- \t Sending echo..\n");
@@ -397,7 +397,7 @@ static void start_server(void)
 
     /* Only one instance of the server */
     if (server.target.pid != KERNEL_PID_UNDEF) {
-        printf("Error: server already running\n");
+        puts("Error: server already running");
         return;
     }
 
@@ -415,14 +415,14 @@ static void start_server(void)
     if (gnrc_netreg_register(GNRC_NETTYPE_UDP, &server) == 0)
       printf("Success: started DTLS server on port %" PRIu16 "\n", port);
    else
-      printf("FAILURE: The UDP port is not registered!\n");
+      puts("ERROR: The UDP port is not registered!");
 }
 
 static void stop_server(void)
 {
     /* check if server is running at all */
     if (server.target.pid == KERNEL_PID_UNDEF) {
-        printf("Error: server was not running\n");
+        puts("Error: server was not running");
         return;
     }
 
@@ -447,7 +447,7 @@ int udp_server_cmd(int argc, char **argv)
         stop_server();
     }
     else {
-        puts("error: invalid command");
+        puts("Error: invalid command");
     }
     return 0;
 }
