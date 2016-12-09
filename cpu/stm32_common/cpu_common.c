@@ -25,30 +25,32 @@
 
 void periph_clk_en(bus_t bus, uint32_t mask)
 {
-    if (bus == APB1) {
-        RCC->APB1ENR |= mask;
-    }
-    else if (bus == APB2) {
-        RCC->APB2ENR |= mask;
-    }
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1)\
-    || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
-    else if (bus == AHB) {
-        RCC->AHBENR |= mask;
-    }
+    switch (bus) {
+        case APB1:
+            RCC->APB1ENR |= mask;
+            break;
+        case APB2:
+            RCC->APB2ENR |= mask;
+            break;
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) \
+            || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+        case AHB:
+            RCC->AHBENR |= mask;
+            break;
 #elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
-    else if (bus == AHB1) {
-        RCC->AHB1ENR |= mask;
-    }
-    else if (bus == AHB2) {
-        RCC->AHB2ENR |= mask;
-    }
-    else if (bus == AHB3) {
-        RCC->AHB3ENR |= mask;
-    }
+        case AHB1:
+            RCC->AHB1ENR |= mask;
+            break;
+        case AHB2:
+            RCC->AHB2ENR |= mask;
+            break;
+        case AHB3:
+            RCC->AHB3ENR |= mask;
+            break;
 #endif
-    else {
-        DEBUG("unsupported bus %d\n", (int)bus);
+        default:
+            DEBUG("unsupported bus %d\n", (int)bus);
+            break;
     }
     /* stm32xx-errata: Delay after a RCC peripheral clock enable */
     __DSB();
@@ -56,29 +58,31 @@ void periph_clk_en(bus_t bus, uint32_t mask)
 
 void periph_clk_dis(bus_t bus, uint32_t mask)
 {
-    if (bus == APB1) {
-        RCC->APB1ENR &= ~(mask);
-    }
-    else if (bus == APB2) {
-        RCC->APB2ENR &= ~(mask);
-    }
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1)\
-    || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
-    else if (bus == AHB) {
-        RCC->AHBENR &= ~(mask);
-    }
+    switch (bus) {
+        case APB1:
+            RCC->APB1ENR &= ~(mask);
+            break;
+        case APB2:
+            RCC->APB2ENR &= ~(mask);
+            break;
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) \
+            || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+        case AHB:
+            RCC->AHBENR &= ~(mask);
+            break;
 #elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
-    else if (bus == AHB1) {
-        RCC->AHB1ENR &= ~(mask);
-    }
-    else if (bus == AHB2) {
-        RCC->AHB2ENR &= ~(mask);
-    }
-    else if (bus == AHB3) {
-        RCC->AHB3ENR &= ~(mask);
-    }
+        case AHB1:
+            RCC->AHB1ENR &= ~(mask);
+            break;
+        case AHB2:
+            RCC->AHB2ENR &= ~(mask);
+            break;
+        case AHB3:
+            RCC->AHB3ENR &= ~(mask);
+            break;
 #endif
-    else {
-        DEBUG("unsupported bus %d\n", (int)bus);
+        default:
+            DEBUG("unsupported bus %d\n", (int)bus);
+            break;
     }
 }
