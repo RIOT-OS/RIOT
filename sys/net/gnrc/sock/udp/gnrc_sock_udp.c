@@ -13,6 +13,7 @@
  * @brief       GNRC implementation of @ref net_sock_udp
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Sebastian Meiling <s@mlng.net>
  */
 
 #include <errno.h>
@@ -31,6 +32,62 @@
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
 static sock_udp_t *_udp_socks = NULL;
 #endif
+
+static uint16_t _udp_port_last = GNRC_UDP_PORTRANGE_MIN;
+
+/* --------------------------------- helper --------------------------------- */
+
+#ifdef MODULE_GNRC_SOCK_CHECK_REUSE
+static bool _udp_src_port_used(uint16_t port)
+{
+    for (sock_udp_t *ptr = _udp_socks; ptr != NULL;
+         ptr = (sock_udp_t *)ptr->reg.next) {
+        bool spec_addr = false;
+        for (unsigned i = 0; i < sizeof(ptr->local.addr); i++) {
+            const uint8_t *const p = (uint8_t *)&ptr->local.addr;
+            if (p[i] != 0) {
+                spec_addr = true;
+            }
+        }
+        if (spec_addr) {
+            continue;
+        }
+        if (ptr->local.port == port) {
+            /* we already have one of this port registered
+             * => generate a new one */
+            return true;
+        }
+    }
+    return false;
+}
+#endif /* MODULE_GNRC_SOCK_CHECK_REUSE */
+
+static uint16_t _udp_src_port(sock_udp_t *sock)
+{
+    uint16_t port = 0;
+    while (port == 0) {
+        port = ((++_udp_port_last)%(GNRC_UDP_PORTRANGE_LEN)) + GNRC_UDP_PORTRANGE_MIN;
+        if (sock != NULL) {
+            sock->local.port = port;
+            #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
+            if (!(sock->flags & SOCK_FLAGS_REUSE_EP) &&
+                _udp_src_port_used(port)) {
+                port = 0;
+            }
+            else {
+                /* prepend to current socks */
+                sock->reg.next = (gnrc_sock_reg_t *)_udp_socks;
+                _udp_socks = sock;
+            }
+            #endif /* MODULE_GNRC_SOCK_CHECK_REUSE */
+            gnrc_sock_create(&sock->reg, GNRC_NETTYPE_UDP, port);
+        }
+    }
+    /* either sock == NULL or SOCK_FLAGS_REUSE_EP is set, so any port will do */
+    return port;
+}
+
+/* --------------------------------- public --------------------------------- */
 
 int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
                     const sock_udp_ep_t *remote, uint16_t flags)
@@ -159,126 +216,75 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     return (int)pkt->size;
 }
 
-ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
-                      const sock_udp_ep_t *remote)
+ssize_t sock_udp_sendto(sock_udp_t *sock, const void *data, size_t len,
+                        const sock_udp_ep_t *dst_udp_ep)
 {
     int res;
+    sock_udp_ep_t src_udp_ep;
     gnrc_pktsnip_t *payload, *pkt;
-    uint16_t src_port = 0, dst_port;
-    sock_ip_ep_t local;
-    sock_ip_ep_t rem;
 
-    assert((sock != NULL) || (remote != NULL));
-    assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
-    if ((remote != NULL) && (sock != NULL) &&
-        (sock->local.netif != SOCK_ADDR_ANY_NETIF) &&
-        (remote->netif != SOCK_ADDR_ANY_NETIF) &&
-        (sock->local.netif != remote->netif)) {
+    assert(dst_udp_ep != NULL)
+    assert((len == 0) || (data != NULL));   /* (len != 0) => (data != NULL) */
+    /* verify destination endpoint */
+    if ((dst_udp_ep->port == 0) || (dst_udp_ep->family == AF_UNSPEC) ||
+        gnrc_ep_addr_any((const sock_ip_ep_t *)dst_udp_ep)) {
         return -EINVAL;
     }
-    if ((remote != NULL) && ((remote->port == 0) ||
-                             gnrc_ep_addr_any((const sock_ip_ep_t *)remote))) {
-        return -EINVAL;
-    }
-    if ((remote == NULL) &&
-        /* sock can't be NULL as per assertion above */
-        (sock->remote.family == AF_UNSPEC)) {
-        return -ENOTCONN;
-    }
-    /* compiler evaluates lazily so this isn't a redundundant check and cppcheck
-     * is being weird here anyways */
-    /* cppcheck-suppress nullPointerRedundantCheck */
-    /* cppcheck-suppress nullPointer */
-    if ((sock == NULL) || (sock->local.family == AF_UNSPEC)) {
-        /* no sock or sock currently unbound */
-        while (src_port == 0) {
-            src_port = (uint16_t)(random_uint32() & UINT16_MAX);
-#ifdef MODULE_GNRC_SOCK_CHECK_REUSE
-            if ((sock == NULL) || !(sock->flags & SOCK_FLAGS_REUSE_EP)) {
-                /* check if port already registered somewhere */
-                for (sock_udp_t *ptr = _udp_socks; ptr != NULL;
-                     ptr = (sock_udp_t *)ptr->reg.next) {
-                    bool spec_addr = false;
-                    for (unsigned i = 0; i < sizeof(ptr->local.addr); i++) {
-                        const uint8_t *const p = (uint8_t *)&ptr->local.addr;
-                        if (p[i] != 0) {
-                            spec_addr = true;
-                        }
-                    }
-                    if (spec_addr) {
-                        continue;
-                    }
-                    if (ptr->local.port == src_port) {
-                        /* we already have one of this port registered
-                         * => generate a new one */
-                        src_port = 0;
-                    }
-                }
-            }
-#endif
-        }
-        memset(&local, 0, sizeof(local));
-        if (sock != NULL) {
-            /* bind sock object implicitly */
-            sock->local.port = src_port;
-            if (remote == NULL) {
-                sock->local.family = sock->remote.family;
-            }
-            else {
-                sock->local.family = remote->family;
-            }
-#ifdef MODULE_GNRC_SOCK_CHECK_REUSE
-            /* prepend to current socks */
-            sock->reg.next = (gnrc_sock_reg_t *)_udp_socks;
-            _udp_socks = sock;
-#endif
-            gnrc_sock_create(&sock->reg, GNRC_NETTYPE_UDP, src_port);
-        }
-    }
-    else {
-        src_port = sock->local.port;
-        memcpy(&local, &sock->local, sizeof(local));
-    }
-    if (remote == NULL) {
-        /* sock can't be NULL at this point */
-        memcpy(&rem, &sock->remote, sizeof(rem));
-        dst_port = sock->remote.port;
-    }
-    else {
-        memcpy(&rem, remote, sizeof(rem));
-        dst_port = remote->port;
-    }
-    if ((remote != NULL) && (remote->family == AF_UNSPEC) &&
-        (sock->remote.family != AF_UNSPEC)) {
-        /* remote was set on create so take its family */
-        rem.family = sock->remote.family;
-    }
-    else if ((remote != NULL) && gnrc_af_not_supported(remote->family)) {
+    else if (gnrc_af_not_supported(dst_udp_ep->family)) {
         return -EAFNOSUPPORT;
     }
-    else if ((local.family == AF_UNSPEC) && (rem.family != AF_UNSPEC)) {
-        /* local was set to 0 above */
-        local.family = rem.family;
+    /* init source endpoint */
+    memset(&src_udp_ep, 0, sizeof(src_udp_ep));
+    if (sock != NULL) {
+        if ((sock->local.family != AF_UNSPEC) &&
+            (sock->local.family != dst_udp_ep->family)) {
+            return -EINVAL;
+        }
+        else if ((sock->local.netif != SOCK_ADDR_ANY_NETIF) &&
+                 (dst_udp_ep->netif != SOCK_ADDR_ANY_NETIF) &&
+                 (sock->local.netif != dst_udp_ep->netif)) {
+            return -EINVAL;
+        }
+        memcpy(&src_udp_ep, &sock->local, sizeof(src_udp_ep));
     }
-    else if ((local.family != AF_UNSPEC) && (rem.family == AF_UNSPEC)) {
-        /* local was given on create, but remote family wasn't given by user and
-         * there was no remote given on create, take from local */
-        rem.family = local.family;
+    if (src_udp_ep.family == AF_UNSPEC) {
+        src_udp_ep.family = dst_udp_ep->family;
     }
+    if (src_udp_ep.port == 0) {
+        src_udp_ep.port = _udp_src_port(sock);
+    }
+    /* build udp packet with payload and header */
     payload = gnrc_pktbuf_add(NULL, (void *)data, len, GNRC_NETTYPE_UNDEF);
     if (payload == NULL) {
         return -ENOMEM;
     }
-    pkt = gnrc_udp_hdr_build(payload, src_port, dst_port);
+    pkt = gnrc_udp_hdr_build(payload, src_udp_ep.port, dst_udp_ep->port);
     if (pkt == NULL) {
         gnrc_pktbuf_release(payload);
         return -ENOMEM;
     }
-    res = gnrc_sock_send(pkt, &local, &rem, PROTNUM_UDP);
-    if (res <= 0) {
-        return res;
+
+    res = gnrc_sock_send(pkt, (sock_ip_ep_t *)&src_udp_ep,
+                         (const sock_ip_ep_t *)dst_udp_ep, PROTNUM_UDP);
+    if (res > 0) {
+        res = res - sizeof(udp_hdr_t);
     }
-    return res - sizeof(udp_hdr_t);
+    return res;
+}
+
+ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
+                      const sock_udp_ep_t *remote)
+{
+    assert((sock != NULL) || (remote != NULL));
+    assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
+    if (remote != NULL) {
+        return sock_udp_sendto(sock, data, len, remote);
+    }
+    /* no explicit udp dst given, check if sock is connected */
+    else if (sock->remote.family == AF_UNSPEC) {
+        return -ENOTCONN;
+    }
+    return sock_udp_sendto(sock, data, len, &sock->remote);
 }
 
 /** @} */

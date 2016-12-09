@@ -63,7 +63,7 @@
  * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc GNRC) and at least
  * one network device.
  *
- * After including the header file for @ref net_sock_udp "UDP sock", we create some 
+ * After including the header file for @ref net_sock_udp "UDP sock", we create some
  * buffer space `buf` to store the data received by the server:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
@@ -398,6 +398,36 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep);
  */
 ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
                       uint32_t timeout, sock_udp_ep_t *remote);
+
+/**
+ * @brief   Sends a UDP message to destination end point
+ *
+ * @pre `(dst_udp_ep != NULL)) && ((len == 0) || (data != NULL))`
+ *
+ * @param[in] sock          A raw IPv4/IPv6 sock object. May be `NULL`.
+ *                          A sensible local end point should be selected by
+ *                          the implementation in that case.
+ * @param[in] data          Pointer where the received data should be stored.
+ *                          May be `NULL` if `len == 0`.
+ * @param[in] len           Maximum space available at @p data.
+ * @param[in] dst_udp_ep    Destination end point for the sent data.
+ *                          sock_udp_ep_t::port must not be 0.
+ *
+ * @return  The number of bytes sent on success.
+ * @return  -EAFNOSUPPORT, if `remote != NULL` and sock_udp_ep_t::family of
+ *          @p remote is != AF_UNSPEC and not supported.
+ * @return  -EHOSTUNREACH, if @p remote or remote end point of @p sock is not
+ *          reachable.
+ * @return  -EINVAL, if sock_udp_ep_t::addr of @p remote is an invalid address.
+ * @return  -EINVAL, if sock_udp_ep_t::netif of @p remote is not a valid
+ *          interface or contradicts the given local interface (i.e.
+ *          neither the local end point of `sock` nor remote are assigned to
+ *          `SOCK_ADDR_ANY_NETIF` but are nevertheless different.
+ * @return  -EINVAL, if sock_udp_ep_t::port of @p remote is 0.
+ * @return  -ENOMEM, if no memory was available to send @p data.
+ */
+ssize_t sock_udp_sendto(sock_udp_t *sock, const void *data, size_t len,
+                        const sock_udp_ep_t *dst_udp_ep);
 
 /**
  * @brief   Sends a UDP message to remote end point
