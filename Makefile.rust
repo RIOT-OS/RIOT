@@ -15,10 +15,9 @@ else
 endif
 
 # Enable some compiler optimizations
+RUSTC_FLAGS += -C opt-level=s
 ifeq (bin,$(CRATE_TYPE))
-	RUSTC_FLAGS ?= -C lto -C opt-level=s
-else
-	RUSTC_FLAGS ?= -C opt-level=s
+	RUSTC_FLAGS += -C lto
 endif
 
 # Flags to pass to the rust compiler.
