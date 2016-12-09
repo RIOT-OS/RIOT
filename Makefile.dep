@@ -567,7 +567,7 @@ endif
 # Automatically include dependencies for rust wrappers
 RUSTMODULES := $(filter rust/%,$(USEMODULE))
 ifneq (,$(RUSTMODULES))
-    USEPKG += rust/libcore
+    USEPKG += rust/core
     USEMODULE += $(RUSTMODULES:rust/%=%)
 endif
 
