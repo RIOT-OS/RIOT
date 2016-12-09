@@ -46,12 +46,11 @@ void periph_clk_en(bus_t bus, uint32_t mask)
     else if (bus == AHB3) {
         RCC->AHB3ENR |= mask;
     }
-#else
-#warning "add support for stm32 family to this function"
 #endif
     else {
         DEBUG("unsupported bus %d\n", (int)bus);
     }
+    /* stm32xx-errata: Delay after a RCC peripheral clock enable */
     __DSB();
 }
 
@@ -78,8 +77,6 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
     else if (bus == AHB3) {
         RCC->AHB3ENR &= ~(mask);
     }
-#else
-#warning "add support for stm32 family to this function"
 #endif
     else {
         DEBUG("unsupported bus %d\n", (int)bus);
