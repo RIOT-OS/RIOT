@@ -53,6 +53,9 @@ extern "C" {
 #define GNRC_UDP_STACK_SIZE     (THREAD_STACKSIZE_DEFAULT)
 #endif
 
+#define GNRC_UDP_PORTRANGE_MIN (49152U)
+#define GNRC_UDP_PORTRANGE_MAX (65535U)
+#define GNRC_UDP_PORTRANGE_LEN (GNRC_UDP_PORTRANGE_MAX - GNRC_UDP_PORTRANGE_MIN)
 /**
  * @brief   Calculate the checksum for the given packet
  *
