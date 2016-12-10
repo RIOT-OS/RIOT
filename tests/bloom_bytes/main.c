@@ -28,6 +28,7 @@
 #include "bloom.h"
 #include "random.h"
 #include "bitfield.h"
+#include "math.h"
 
 #define BLOOM_BITS (1UL << 12)
 #define BLOOM_HASHF (8)
@@ -111,7 +112,16 @@ int main(void)
     double false_positive_rate = (double) in / (double) lenA;
     printf("%f false positive rate.\n", false_positive_rate);
 
+    double expected = pow(1 - exp(((double) -BLOOM_HASHF * lenB) / ((double) BLOOM_BITS)),
+                          BLOOM_HASHF);
+
     bloom_del(&bloom);
-    printf("\nAll done!\n");
+
+    if (fabs(expected - false_positive_rate) < 0.01) {
+        puts("TEST: SUCCESS");
+    }
+    else {
+        puts("TEST: FAIL");
+    }
     return 0;
 }

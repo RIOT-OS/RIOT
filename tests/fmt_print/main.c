@@ -25,7 +25,7 @@
 int main(void)
 {
     print_str("If you can read this:\n");
-    print_str("Test successful.\n");
+    print_str("TEST: SUCCESS\n");
 
     return 0;
 }

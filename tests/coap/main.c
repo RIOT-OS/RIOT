@@ -18,6 +18,6 @@
 
 int main(void)
 {
-    printf("Libcoap compiled!");
+    puts("TEST: SUCCESS");
     return 0;
 }
