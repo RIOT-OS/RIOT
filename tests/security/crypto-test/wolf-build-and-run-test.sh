@@ -8,7 +8,7 @@ check_for_wolfssl() {
         echo "wolfssl found, proceed..."
     else
         echo "failed to find wolfssl"
-        echo "Please clone wolfssl in the RIOT/examples/security directory using the"
+        echo "Please clone wolfssl in the RIOT/tests/security directory using the"
         echo "following commands:"
         echo "------------------------------------------------"
         echo "cd ../"
@@ -24,7 +24,6 @@ check_for_wolfssl() {
 # function for setting up the example   #
 #---------------------------------------#
 wolf_riot_setup () {
-    cp Makefile.wolfcrypttest Makefile
     #copy the test sources here
     cp ../wolfssl/wolfcrypt/test/*.c ./
 
@@ -46,7 +45,6 @@ wolf_riot_cleanup () {
         #leave this line in for testing. Comment it out when you want to build
         # a .elf for flashing to a device
         make clean &> /dev/null
-        rm Makefile
         echo "done cleaning up"
     else
         echo "no cleanup specified, leaving files"

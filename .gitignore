@@ -49,6 +49,5 @@ Makefile.local
 __pycache__
 
 # wolfSSL security
-examples/security/wolfssl
-examples/security/*/*.c
-examples/security/*/Makefile
+tests/security/wolfssl
+tests/security/*/*.c

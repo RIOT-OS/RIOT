@@ -4,10 +4,15 @@ If you find bugs please contact support@wolfssl.com
 
 These are the steps to properly setup a test of wolfssl in RIOT OS:
 
-clone wolfssl one directory up from this example.
-You should end up with RIOT/examples/security/wolfssl
+clone wolfssl in the RIOT examples directory.
+You should end up with RIOT/tests/security/wolfssl
 
 git clone https://github.com/wolfssl/wolfssl
+
+Change to the directory of the desired test case:
+cd <path-to>/RIOT/tests/security/crypto-benchmark
+cd <path-to>/RIOT/tests/security/crypt-test
+cd <path-to>/RIOT/tests/security/tls-client-server-crypto-test
 
 run the script ./wolf-build-and-run-test.sh
 
@@ -15,12 +20,13 @@ That script will perform the following steps:
 1. copy the source files from:
     <wolfssl-root>/src
     <wolfssl-root>/wolfcrypt/src
-    <wolfssl-root>/wolfcrypt/test
+    <wolfssl-root>/wolfcrypt/benchmark
+    <wolfssl-root>/*<relevant test.c>
 
 2. The script will use the provided Makefile to build the example application:
-    "testwolfcrypt.elf"
+    "wolfbenchmark.elf"
     This application will be located here:
-    <path-to>/RIOT/examples/security/crypto-test/bin/native/testwolfcrypt.elf
+    <path-to>/RIOT/tests/security/<test-name>/bin/native/<app name>.elf
 
 3. The script will execute that application. You should see a pass or fail.
 
@@ -41,6 +47,7 @@ That script will perform the following steps:
             If you do make changes in this directory, they will not be tracked
             by GIT
 
+
 NOTE: This test is only for the "native" test. To build for a specific platform
         cd to RIOT directory and run "make doc" to generate doxygen docs.
         (You will need to install doxygen if you don't have it already)
@@ -55,4 +62,6 @@ KNOWN BUGS:
    comment out the -Wold-style-definitions section that starts with:
    "Fast-out on old style function definitions"
 
+2. With gcc the benchmark test currently fails when HAVE_ECC is defined. If
+   using clang it works fine.
 
