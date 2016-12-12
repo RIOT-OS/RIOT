@@ -249,7 +249,7 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
         dst_port = remote->port;
     }
     if ((remote != NULL) && (remote->family == AF_UNSPEC) &&
-        (sock->remote.family != AF_UNSPEC)) {
+        (sock != NULL) && (sock->remote.family != AF_UNSPEC)) {
         /* remote was set on create so take its family */
         rem.family = sock->remote.family;
     }
