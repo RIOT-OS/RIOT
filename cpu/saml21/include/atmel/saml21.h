@@ -70,6 +70,8 @@
   #include "saml21j17a.h"
 #elif defined(__SAML21J18A__) || defined(__ATSAML21J18A__)
   #include "saml21j18a.h"
+#elif defined(__SAML21E18B__) || defined(__ATSAML21E18B__)
+  #include "saml21e18b.h"
 #else
   #error Library does not support the specified device.
 #endif
