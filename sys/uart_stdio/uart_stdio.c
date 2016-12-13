@@ -40,20 +40,20 @@ extern ethos_t ethos;
 #include "debug.h"
 
 static char _rx_buf_mem[UART_STDIO_RX_BUFSIZE];
-static isrpipe_t _isrpipe = ISRPIPE_INIT(_rx_buf_mem);
+isrpipe_t uart_stdio_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
 
 void uart_stdio_init(void)
 {
 #ifndef USE_ETHOS_FOR_STDIO
-    uart_init(UART_STDIO_DEV, UART_STDIO_BAUDRATE, (uart_rx_cb_t) isrpipe_write_one, &_isrpipe);
+    uart_init(UART_STDIO_DEV, UART_STDIO_BAUDRATE, (uart_rx_cb_t) isrpipe_write_one, &uart_stdio_isrpipe);
 #else
-    uart_init(ETHOS_UART, ETHOS_BAUDRATE, (uart_rx_cb_t) isrpipe_write_one, &_isrpipe);
+    uart_init(ETHOS_UART, ETHOS_BAUDRATE, (uart_rx_cb_t) isrpipe_write_one, &uart_stdio_isrpipe);
 #endif
 }
 
 int uart_stdio_read(char* buffer, int count)
 {
-    return isrpipe_read(&_isrpipe, buffer, count);
+    return isrpipe_read(&uart_stdio_isrpipe, buffer, count);
 }
 
 int uart_stdio_write(const char* buffer, int len)
