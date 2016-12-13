@@ -150,6 +150,14 @@ typedef struct {
 } uart_conf_t;
 
 /**
+ * @brief   PWM channel configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< GPIO pin connected to the channel */
+    uint8_t hwchan;         /**< the HW channel used for a logical channel */
+} pwm_chan_conf_t;
+
+/**
  * @brief   Configure the given GPIO pin to be used with the given MUX setting
  *
  * @param[in] pin           GPIO pin to configure
