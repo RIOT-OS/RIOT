@@ -73,52 +73,37 @@ static const pwm_conf_t pwm_config[PWM_NUMOF] = {
 /** @} */
 
 /**
- * @name Timer configuration
+ * @brief   Timer configuration
  * @{
  */
-#define TIMER_NUMOF         (4U)
-#define TIMER_0_EN          1
-#define TIMER_1_EN          1
-#define TIMER_2_EN          1
-#define TIMER_3_EN          1
-#define TIMER_IRQ_PRIO      1
-
-static const timer_conf_t timer_config[TIMER_NUMOF] = {
+static const timer_conf_t timer_config[] = {
     {
         .dev      = TIM2,
-        .channels = 4,
-        .freq     = (CLOCK_APB1 * 2),
+        .max      = 0xffffffff,
         .rcc_mask = RCC_APB1ENR_TIM2EN,
         .bus      = APB1,
-        .irqn     = TIM2_IRQn,
-        .priority = TIMER_IRQ_PRIO
+        .irqn     = TIM2_IRQn
     },
     {
         .dev      = TIM5,
-        .channels = 4,
-        .freq     = (CLOCK_APB1 * 2),
+        .max      = 0xffffffff,
         .rcc_mask = RCC_APB1ENR_TIM5EN,
         .bus      = APB1,
-        .irqn     = TIM5_IRQn,
-        .priority = TIMER_IRQ_PRIO
+        .irqn     = TIM5_IRQn
     },
     {
         .dev      = TIM3,
-        .channels = 4,
-        .freq     = (CLOCK_APB1 * 2),
+        .max      = 0xffffffff,
         .rcc_mask = RCC_APB1ENR_TIM3EN,
         .bus      = APB1,
-        .irqn     = TIM3_IRQn,
-        .priority = TIMER_IRQ_PRIO
+        .irqn     = TIM3_IRQn
     },
     {
         .dev      = TIM4,
-        .channels = 4,
-        .freq     = (CLOCK_APB1 * 2),
+        .max      = 0xffffffff,
         .rcc_mask = RCC_APB1ENR_TIM4EN,
         .bus      = APB1,
-        .irqn     = TIM4_IRQn,
-        .priority = TIMER_IRQ_PRIO
+        .irqn     = TIM4_IRQn
     }
 };
 
@@ -126,6 +111,8 @@ static const timer_conf_t timer_config[TIMER_NUMOF] = {
 #define TIMER_1_ISR         isr_tim5
 #define TIMER_2_ISR         isr_tim3
 #define TIMER_3_ISR         isr_tim4
+
+#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**

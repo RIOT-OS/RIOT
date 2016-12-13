@@ -21,6 +21,8 @@
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,24 +36,30 @@ extern "C" {
 
 /* the actual PLL values are automatically generated */
 #define CLOCK_PLL_MUL       (CLOCK_CORECLOCK / CLOCK_HSE)
+
+/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
+#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)
 /** @} */
 
 /**
- * @brief Timer configuration
+ * @brief   Timer configuration
  * @{
  */
-#define TIMER_NUMOF         (1U)
-#define TIMER_0_EN          1
-#define TIMER_IRQ_PRIO      1
+static const timer_conf_t timer_config[] = {
+    {
+        .dev      = TIM3,
+        .max      = 0x0000ffff,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .bus      = APB1,
+        .irqn     = TIM3_IRQn
+    }
+};
 
-/* Timer 0 configuration */
-#define TIMER_0_DEV         TIM3
-#define TIMER_0_CHANNELS    4
-#define TIMER_0_FREQ        (CLOCK_CORECLOCK)
-#define TIMER_0_MAX_VALUE   (0x0000ffff)
-#define TIMER_0_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM3EN)
-#define TIMER_0_IRQ_CHAN    TIM3_IRQn
 #define TIMER_0_ISR         isr_tim3
+
+#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**

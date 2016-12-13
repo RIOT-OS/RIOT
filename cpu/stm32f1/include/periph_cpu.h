@@ -31,16 +31,6 @@ extern "C" {
 #define ADC_DEVS            (2U)
 
 /**
- * @brief   All timers for the STM32F1 have 4 CC channels
- */
-#define TIMER_CHANNELS      (4U)
-
-/**
- * @brief   All timers have a width of 16-bit
- */
-#define TIMER_MAXVAL        (0xffff)
-
-/**
  * @brief declare needed generic SPI functions
  * @{
  */
@@ -135,16 +125,6 @@ typedef struct {
     uint8_t dev;            /**< ADCx - 1 device used for the channel */
     uint8_t chan;           /**< CPU ADC channel connected to the pin */
 } adc_conf_t;
-
-/**
- * @brief   Timer configuration
- */
-typedef struct {
-    TIM_TypeDef *dev;       /**< timer device */
-    uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
-    uint8_t bus;            /**< APBx bus the timer is clock from */
-    uint8_t irqn;           /**< global IRQ channel */
-} timer_conf_t;
 
 /**
  * @brief   UART configuration options

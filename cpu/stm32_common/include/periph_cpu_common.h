@@ -31,6 +31,11 @@ extern "C" {
 #define CPUID_LEN           (12U)
 
 /**
+ * @brief   All STM timers have 4 capture-compare channels
+ */
+#define TIMER_CHAN          (4U)
+
+/**
  * @brief   Use the shared SPI functions
  * @{
  */
@@ -64,6 +69,26 @@ typedef uint32_t gpio_t;
  * @brief   Define a CPU specific GPIO pin generator macro
  */
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
+
+/**
+ * @brief   Timer configuration
+ */
+typedef struct {
+    TIM_TypeDef *dev;       /**< timer device */
+    uint32_t max;           /**< maximum value to count to (16/32 bit) */
+    uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
+    uint8_t bus;            /**< APBx bus the timer is clock from */
+    uint8_t irqn;           /**< global IRQ channel */
+} timer_conf_t;
+
+/**
+ * @brief   Get the actual bus clock frequency for the APB buses
+ *
+ * @param[in] bus       target APBx bus
+ *
+ * @return              bus clock frequency in Hz
+ */
+uint32_t periph_apb_clk(uint8_t bus);
 
 /**
  * @brief   Enable the given peripheral clock

@@ -852,7 +852,7 @@ typedef struct
   uint16_t      RESERVED10;   /*!< Reserved, 0x2A                                            */
   __IO uint32_t ARR;          /*!< TIM auto-reload register,            Address offset: 0x2C */
   uint32_t      RESERVED12;   /*!< Reserved, 0x30                                            */
-  __IO uint32_t CCR[4];       /*!< TIM capture/compare registers 1-4,      Address offset: 0x34 ++ */
+  __IO uint32_t CCR[4];       /*!< TIM capture/compare registers 1-4,   Address offset: 0x34 ++ */
   uint32_t      RESERVED17;   /*!< Reserved, 0x44                                            */
   __IO uint16_t DCR;          /*!< TIM DMA control register,            Address offset: 0x48 */
   uint16_t      RESERVED18;   /*!< Reserved, 0x4A                                            */

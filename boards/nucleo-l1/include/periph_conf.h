@@ -41,6 +41,11 @@ extern "C" {
 #define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV1     /* APB1 clock -> 32MHz */
 /* configuration of flash access cycles */
 #define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY
+
+/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
+#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)
 /** @} */
 
 /**
@@ -55,12 +60,17 @@ extern "C" {
  * @{
  */
 static const timer_conf_t timer_config[] = {
-    /* device, RCC bit, IRQ bit */
-    {TIM5, 3, TIM5_IRQn},
+    {
+        .dev      = TIM5,
+        .max      = 0xffffffff,
+        .rcc_mask = RCC_APB1ENR_TIM5EN,
+        .bus      = APB1,
+        .irqn     = TIM5_IRQn
+    }
 };
-/* interrupt routines */
+
 #define TIMER_0_ISR         (isr_tim5)
-/* number of defined timers */
+
 #define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 

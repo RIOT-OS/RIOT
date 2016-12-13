@@ -51,31 +51,30 @@ extern "C" {
 /** @} */
 
 /**
- * @name Timer configuration
+ * @brief   Timer configuration
  * @{
  */
-#define TIMER_NUMOF         (2U)
-#define TIMER_0_EN          1
-#define TIMER_1_EN          1
-#define TIMER_IRQ_PRIO      1
+static const timer_conf_t timer_config[] = {
+    {
+        .dev      = TIM2,
+        .max      = 0xffffffff,
+        .rcc_mask = RCC_APB1ENR_TIM2EN,
+        .bus      = APB1,
+        .irqn     = TIM2_IRQn
+    },
+    {
+        .dev      = TIM5,
+        .max      = 0xffffffff,
+        .rcc_mask = RCC_APB1ENR_TIM5EN,
+        .bus      = APB1,
+        .irqn     = TIM5_IRQn
+    }
+};
 
-/* Timer 0 configuration */
-#define TIMER_0_DEV         TIM2
-#define TIMER_0_CHANNELS    4
-#define TIMER_0_FREQ        (CLOCK_CORECLOCK / 2)
-#define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
 #define TIMER_0_ISR         isr_tim2
-#define TIMER_0_IRQ_CHAN    TIM2_IRQn
-
-/* Timer 1 configuration */
-#define TIMER_1_DEV         TIM5
-#define TIMER_1_CHANNELS    4
-#define TIMER_1_FREQ        (CLOCK_CORECLOCK / 2)
-#define TIMER_1_MAX_VALUE   (0xffffffff)
-#define TIMER_1_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM5EN)
 #define TIMER_1_ISR         isr_tim5
-#define TIMER_1_IRQ_CHAN    TIM5_IRQn
+
+#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**

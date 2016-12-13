@@ -102,17 +102,17 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     /* Reset C/C and timer configuration register */
     switch (channels) {
         case 4:
-            tim->CCR4 = 0;
+            tim->CCR[3] = 0;
             /* Fall through */
         case 3:
-            tim->CCR3 = 0;
+            tim->CCR[2] = 0;
             tim->CR2 = 0;
             /* Fall through */
         case 2:
-            tim->CCR2 = 0;
+            tim->CCR[1] = 0;
             /* Fall through */
         case 1:
-            tim->CCR1 = 0;
+            tim->CCR[0] = 0;
             tim->CR1 = 0;
             break;
     }
@@ -211,22 +211,7 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
         value = (uint32_t)tim->ARR;
     }
 
-    switch (channel) {
-        case 0:
-            tim->CCR1 = value;
-            break;
-        case 1:
-            tim->CCR2 = value;
-            break;
-        case 2:
-            tim->CCR3 = value;
-            break;
-        case 3:
-            tim->CCR4 = value;
-            break;
-        default:
-            return;
-    }
+    tim->CCR[channel] = value;
 }
 
 void pwm_start(pwm_t dev)
