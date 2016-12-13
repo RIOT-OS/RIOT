@@ -149,6 +149,14 @@ typedef struct {
     uint8_t irqn;           /**< interrupt number of the device */
 } uart_conf_t;
 
+/**
+ * @brief   Configure the given GPIO pin to be used with the given MUX setting
+ *
+ * @param[in] pin           GPIO pin to configure
+ * @param[in] mux           MUX setting to use
+ */
+void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
+
 #ifdef __cplusplus
 }
 #endif
