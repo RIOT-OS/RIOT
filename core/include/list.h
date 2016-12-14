@@ -7,7 +7,7 @@
  * directory for more details.
  */
 
- /**
+/**
  * @addtogroup  core_util
  * @{
  *
@@ -50,7 +50,8 @@ typedef struct list_node {
  * @param[in] node      list node before new entry
  * @param[in] new_node  list node to insert
  */
-static inline void list_add(list_node_t *node, list_node_t *new_node) {
+static inline void list_add(list_node_t *node, list_node_t *new_node)
+{
     new_node->next = node->next;
     node->next = new_node;
 }
@@ -63,8 +64,10 @@ static inline void list_add(list_node_t *node, list_node_t *new_node) {
  *
  * @return  removed old list head, or NULL if empty
  */
-static inline list_node_t* list_remove_head(list_node_t *list) {
-    list_node_t* head = list->next;
+static inline list_node_t *list_remove_head(list_node_t *list)
+{
+    list_node_t *head = list->next;
+
     if (head) {
         list->next = head->next;
     }
