@@ -65,6 +65,13 @@ Test *tests_core_clist_tests(void);
 Test *tests_core_lifo_tests(void);
 
 /**
+ * @brief   Generates tests for list.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_core_list_tests(void);
+
+/**
  * @brief   Generates tests for priority_queue.h
  *
  * @return  embUnit tests if successful, NULL if not.
