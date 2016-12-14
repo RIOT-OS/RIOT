@@ -103,7 +103,7 @@ static void clk_init(void)
     RCC->CFGR |= (uint32_t) RCC_CFGR_MCO2_0;
     RCC->CFGR &= ~(uint32_t) RCC_CFGR_MCO2_1;
     /* MCO2 prescaler div by 5 */
-    RCC->CFGR |= (uint32_t) RCC_CFGR_MCO2PRE_0 | RCC_CFGR_MCO2PRE_1 | RCC_CFGR_MCO2PRE_2 ;
+    RCC->CFGR |= (uint32_t) ((CLOCK_MC02_PRE + 4 - 2) & 0x7) << 27;
     /* enable PLL I2S clock */
     RCC->CR |= RCC_CR_PLLI2SON;
     /* wait till PLL I2S clock is ready */
