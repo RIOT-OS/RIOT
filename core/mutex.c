@@ -35,8 +35,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define MUTEX_LOCKED ((void*)-1)
-
 int _mutex_lock(mutex_t *mutex, int blocking)
 {
     unsigned irqstate = irq_disable();
