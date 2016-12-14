@@ -392,9 +392,9 @@ gnrc_pktsnip_t *gnrc_ndp_rtr_sol_build(gnrc_pktsnip_t *options);
  * @param[in] cur_hl        Default hop limit for outgoing IP packets, 0 if
  *                          unspecified by this router.
  * @param[in] flags         Flags as defined above.
- *                          @ref GNRC_NDP_RTR_ADV_FLAGS_M == 1 indicates, that the
+ *                          @ref NDP_RTR_ADV_FLAGS_M == 1 indicates, that the
  *                          addresses are managed by DHCPv6,
- *                          @ref GNRC_NDP_RTR_ADV_FLAGS_O == 1 indicates that other
+ *                          @ref NDP_RTR_ADV_FLAGS_O == 1 indicates that other
  *                          configuration information is available via DHCPv6.
  * @param[in] ltime         Lifetime of the default router in seconds.
  * @param[in] reach_time    Time in milliseconds a node should assume a neighbor
