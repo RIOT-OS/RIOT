@@ -6,7 +6,8 @@ git_cache() {
 
 init() {
     set -ex
-    test -d "${GIT_CACHE_DIR}/.git" || {
+    local _git_dir="$(git_cache rev-parse --git-dir 2>/dev/null)"
+    test "$_git_dir" == "." -o "$_git_dir" == ".git" || {
         mkdir -p "${GIT_CACHE_DIR}"
 
         git_cache init --bare
@@ -17,7 +18,19 @@ init() {
 
 add() {
     set -ex
-    git_cache remote add $1 $2
+    if [ $# -eq 1 ]; then
+        local repo="$1"
+        local name="$(_remote_name $repo)"
+    else
+        local repo="$1"
+        local name="$2"
+    fi
+
+    if ! is_cached "$repo"; then
+        git_cache remote add "$name" "$repo"
+    else
+        echo "git-cache: $url already in cache"
+    fi
     set +ex
 }
 
@@ -26,6 +39,17 @@ update() {
     local REMOTE=${1:---all}
     git_cache fetch $REMOTE
     set +ex
+}
+
+is_cached() {
+    set +ex
+    local url="$1"
+    local REMOTES="$(git_cache remote show)"
+    for remote in $REMOTES; do
+        test "$(git_cache remote get-url $remote)" == "$url" && return 0
+    done
+    set -ex
+    return 1
 }
 
 list() {
@@ -50,12 +74,23 @@ _check_commit() {
     git_cache cat-file -e ${1}^{commit}
 }
 
+_remote_name() {
+    basename "$*" .git
+}
+
 clone() {
     set -ex
     local REMOTE="${1}"
     local SHA1="${2}"
-    local REMOTE_NAME="$(basename $REMOTE)"
+    local REMOTE_NAME="$(_remote_name $REMOTE)"
     local TARGET_PATH="${3:-${REMOTE_NAME}}"
+
+    if [ "$GIT_CACHE_AUTOADD" == "1" ]; then
+        if ! is_cached "$REMOTE"; then
+            add "$REMOTE"
+            update "$(_remote_name $REMOTE)"
+        fi
+    fi
 
     if _check_commit $2 2>&1; then
         git init "${TARGET_PATH}"
@@ -76,7 +111,8 @@ usage() {
     echo "usage:"
     echo ""
     echo "    git cache init                initialize git cache"
-    echo "    git cache add <name> <url>    add repository <url> with name <name>"
+    echo "    git cache add <url> [<name>]  add repository <url> with name <name>"
+    echo "                                  (if no name given, use \"basename $url .git\""
     echo "    git cache list                list cached repositories"
     echo "    git cache drop <name>         drop repo from cache"
     echo "    git cache update [<name>]     fetch repo named <name> (or all)"

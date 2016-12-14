@@ -16,6 +16,10 @@ In order to set up the cache, do:
   The used path can be overridden using the "GIT_CACHE_DIR" environment
   variable.
   The cache repository will be used to cache multiple remote repositories.
-- add a repository to the cache: "git cache add \<name\> \<URL\>
+- add a repository to the cache: "git cache add \<URL\> [\<name\>]
 - whenever needed (at least once after adding a repository),
   run "git cache update"
+
+If the GIT_CACHE_AUTOADD environment variable is set to "1", a "git cache
+clone" will add the repository to the cache (and immediately update) if the url
+is not yet in the cache.
