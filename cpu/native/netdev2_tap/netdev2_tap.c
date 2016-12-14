@@ -215,8 +215,6 @@ static int _recv(netdev2_t *netdev2, void *buf, size_t len, void *info)
     (void)info;
 
     if (!buf) {
-        int waiting_bytes;
-
         if (len > 0) {
             /* no memory available in pktbuf, discarding the frame */
             DEBUG("netdev2_tap: discarding the frame\n");
@@ -236,9 +234,9 @@ static int _recv(netdev2_t *netdev2, void *buf, size_t len, void *info)
             _continue_reading(dev);
         }
 
-        /* get number of waiting bytes at dev->tap_fd */
-        real_ioctl(dev->tap_fd, FIONREAD, &waiting_bytes);
-        return waiting_bytes;
+        /* no way of figuring out packet size without racey buffering,
+         * so we return the maximum possible size */
+        return ETHERNET_FRAME_LEN;
     }
 
     int nread = real_read(dev->tap_fd, buf, len);
