@@ -1,7 +1,6 @@
 # define the cpu used by SODAQ Autonomo board
 export CPU = samd21
 export CPU_MODEL = samd21j18a
-CFLAGS += -D__SAMD21J18A__
 
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyACM0

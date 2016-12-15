@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,19 +7,20 @@
  */
 
 /**
+ * @ingroup         cpu_sam21_common
  * @{
  *
  * @file
  * @brief           Implementation specific CPU configuration options
  *
  * @author          Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
 #include "cpu_conf_common.h"
-
 #include "sam0.h"
 
 #ifdef __cplusplus
