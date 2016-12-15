@@ -558,6 +558,10 @@ ifneq (,$(filter phydat,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter tweetnacl,$(USEMODULE)))
+    USEMODULE += random
+endif
+
 ifneq (,$(filter random,$(USEMODULE)))
     # select default prng
     ifeq (,$(filter prng_%,$(USEMODULE)))
