@@ -214,10 +214,10 @@ size_t fmt_str(char *out, const char *str);
  *
  * Will convert up to @p n digits. Stops at any non-digit or '\0' character.
  *
- * @param[out]  str  Pointer to string to read from
+ * @param[in]   str  Pointer to string to read from
  * @param[in]   n    Maximum nr of characters to consider
  *
- * @return      nr of digits read
+ * @return      converted uint32_t value
  */
 uint32_t scn_u32_dec(const char *str, size_t n);
 
