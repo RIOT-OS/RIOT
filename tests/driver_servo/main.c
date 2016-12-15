@@ -30,7 +30,7 @@
 #include "periph/pwm.h"
 #include "servo.h"
 
-#define DEV         PWM_0
+#define DEV         PWM_DEV(0)
 #define CHANNEL     0
 
 #define SERVO_MIN        (1000U)
