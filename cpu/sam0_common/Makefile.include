@@ -5,13 +5,13 @@ CFLAGS += -DCPU_FAM_$(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
 export CFLAGS += -DDONT_USE_CMSIS_INIT
 
 # for the sam[drl] CPUs we hold all linkerscripts in the sam0 common folder
-export LINKFLAGS += -L$(RIOTCPU)/sam21_common/ldscripts
+export LINKFLAGS += -L$(RIOTCPU)/sam0_common/ldscripts
 
 # use common periph functions
 USEMODULE += periph_common
 
-# include sam21 common periph drivers
-USEMODULE += sam21_common_periph
+# include sam0 common periph drivers
+USEMODULE += sam0_common_periph
 
 # export the common include directory
-export INCLUDES += -I$(RIOTCPU)/sam21_common/include
+export INCLUDES += -I$(RIOTCPU)/sam0_common/include

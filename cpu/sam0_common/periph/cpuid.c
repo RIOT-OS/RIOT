@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup  cpu_sam21_common
+ * @addtogroup  cpu_sam0_common
  * @{
  *
  * @file
