@@ -24,14 +24,9 @@
  */
 
 #include "cpu.h"
-#include "periph/gpio.h"
-
-#include "periph_conf.h"
-#include "saml21_periph.h"
-
 #include "sched.h"
 #include "thread.h"
-#include "panic.h"
+#include "periph/gpio.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
