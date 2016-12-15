@@ -1,0 +1,3 @@
+ifneq (,$(filter tweetnacl,$(USEPKG)))
+    USEMODULE += tweetnacl
+endif
