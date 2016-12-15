@@ -141,37 +141,24 @@ static const adc_conf_t adc_config[] = {
 /** @} */
 
 /**
- * @name PWM configuration
+ * @brief   PWM configuration
  * @{
  */
-#define PWM_NUMOF           (1U)
-#define PWM_0_EN            1
-#define PWM_MAX_CHANNELS    4
-#define PWM_MAX_VALUE       0xffff
+static const pwm_conf_t pwm_config[] = {
+    {
+        .ftm        = FTM0,
+        .chan       = {
+            { .pin = GPIO_PIN(PORT_A, 4), .af = 3, .ftm_chan = 1 },
+            { .pin = GPIO_PIN(PORT_D, 4), .af = 4, .ftm_chan = 4 },
+            { .pin = GPIO_PIN(PORT_D, 6), .af = 4, .ftm_chan = 6 },
+            { .pin = GPIO_PIN(PORT_A, 1), .af = 3, .ftm_chan = 1 }
+        },
+        .chan_numof = 4,
+        .ftm_num    = 0
+    }
+};
 
-/* PWM 0 device configuration */
-#define PWM_0_DEV           FTM0
-#define PWM_0_CHANNELS      3
-#define PWM_0_CLK           (48e6)
-#define PWM_0_CLKEN()       (SIM->SCGC6 |= (SIM_SCGC6_FTM0_MASK))
-#define PWM_0_CLKDIS()      (SIM->SCGC6 &= ~(SIM_SCGC6_FTM0_MASK))
-/* PWM 0 pin configuration */
-
-#define PWM_0_CH0_GPIO      GPIO_PIN(PORT_A, 4)
-#define PWM_0_CH0_FTMCHAN   1
-#define PWM_0_CH0_AF        3
-
-#define PWM_0_CH1_GPIO      GPIO_PIN(PORT_D, 4)
-#define PWM_0_CH1_FTMCHAN   4
-#define PWM_0_CH1_AF        4
-
-#define PWM_0_CH2_GPIO      GPIO_PIN(PORT_D, 6)
-#define PWM_0_CH2_FTMCHAN   6
-#define PWM_0_CH2_AF        4
-
-#define PWM_0_CH3_GPIO      GPIO_PIN(PORT_A, 1)
-#define PWM_0_CH3_FTMCHAN   1
-#define PWM_0_CH3_AF        3
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
 /** @} */
 
 
