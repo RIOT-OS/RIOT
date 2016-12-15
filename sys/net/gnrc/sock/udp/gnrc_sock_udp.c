@@ -217,7 +217,7 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     gnrc_pktsnip_t *payload, *pkt;
     uint16_t src_port = 0, dst_port;
     sock_ip_ep_t local;
-    sock_ip_ep_t rem;
+    sock_ip_ep_t *rem;
 
     assert((sock != NULL) || (remote != NULL));
     assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
@@ -275,21 +275,18 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     }
     /* sock can't be NULL at this point */
     if (remote == NULL) {
-        memcpy(&rem, &sock->remote, sizeof(rem));
+        rem = (sock_ip_ep_t *)&sock->remote;
         dst_port = sock->remote.port;
     }
     else {
-        memcpy(&rem, remote, sizeof(rem));
+        rem = (sock_ip_ep_t *)remote;
         dst_port = remote->port;
     }
     /* check for matching address families in local and remote */
-    if ((local.family == AF_UNSPEC) && (rem.family != AF_UNSPEC)) {
-        local.family = rem.family;
+    if (local.family == AF_UNSPEC) {
+        local.family = rem->family;
     }
-    else if ((local.family != AF_UNSPEC) && (rem.family == AF_UNSPEC)) {
-        rem.family = local.family;
-    }
-    else if (local.family != rem.family) {
+    else if (local.family != rem->family) {
         return -EINVAL;
     }
     /* generate payload and header snips */
@@ -302,7 +299,7 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
         gnrc_pktbuf_release(payload);
         return -ENOMEM;
     }
-    res = gnrc_sock_send(pkt, &local, &rem, PROTNUM_UDP);
+    res = gnrc_sock_send(pkt, &local, rem, PROTNUM_UDP);
     if (res > 0) {
         res -= sizeof(udp_hdr_t);
     }
