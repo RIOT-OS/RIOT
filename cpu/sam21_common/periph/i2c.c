@@ -67,6 +67,124 @@ static mutex_t locks[] = {
 #endif
 };
 
+#ifdef __SAML21J18A__
+int i2c_init_master(i2c_t dev, i2c_speed_t speed)
+{
+   SercomI2cm *I2CSercom = 0;
+    gpio_t pin_scl = 0;
+    gpio_t pin_sda = 0;
+    gpio_mux_t mux;
+    uint32_t clock_source_speed = 0;
+    uint8_t sercom_gclk_id = 0;
+//    uint8_t sercom_gclk_id_slow = 0;
+
+    uint32_t timeout_counter = 0;
+    int32_t tmp_baud;
+
+    switch (dev) {
+#if I2C_0_EN
+        case I2C_0:
+            I2CSercom = &I2C_0_DEV;
+            pin_sda = I2C_0_SDA;
+            pin_scl = I2C_0_SCL;
+            mux = I2C_0_MUX;
+            clock_source_speed = CLOCK_CORECLOCK;
+          /*  sercom_gclk_id = I2C_0_GCLK_ID;
+            sercom_gclk_id_slow = I2C_0_GCLK_ID_SLOW ;*/
+            break;
+#endif
+        default:
+            DEBUG("I2C FALSE VALUE\n");
+            return -1;
+    }
+
+    /* DISABLE I2C MASTER */
+    i2c_poweroff(dev);
+
+    /* Reset I2C */
+    I2CSercom->CTRLA.reg = SERCOM_I2CS_CTRLA_SWRST;
+    while(I2CSercom->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
+
+    /* Turn on power manager for sercom */
+    MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM1 << (sercom_gclk_id - SERCOM1_GCLK_ID_CORE));
+
+    /* I2C using CLK GEN 0 */
+    GCLK->PCHCTRL[19].reg = (GCLK_PCHCTRL_CHEN |
+                         GCLK_PCHCTRL_GEN_GCLK0  );
+    while (GCLK->SYNCBUSY.bit.GENCTRL) {}
+
+    GCLK->PCHCTRL[17].reg = (GCLK_PCHCTRL_CHEN |
+                         GCLK_PCHCTRL_GEN_GCLK0  );
+    while (GCLK->SYNCBUSY.bit.GENCTRL) {}
+
+
+    /* Check if module is enabled. */
+    if (I2CSercom->CTRLA.reg & SERCOM_I2CM_CTRLA_ENABLE) {
+        DEBUG("STATUS_ERR_DENIED\n");
+        return -3;
+    }
+    /* Check if reset is in progress. */
+    if (I2CSercom->CTRLA.reg & SERCOM_I2CM_CTRLA_SWRST) {
+        DEBUG("STATUS_BUSY\n");
+        return -3;
+    }
+
+    /************ SERCOM PAD0 - SDA and SERCOM PAD1 - SCL *************/
+    gpio_init_mux(pin_sda, mux);
+    gpio_init_mux(pin_scl, mux);
+
+    /* I2C CONFIGURATION */
+    while(I2CSercom->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
+
+    /* Set sercom module to operate in I2C master mode. */
+    I2CSercom->CTRLA.reg = 0x5 << 2;
+
+    /* Enable Smart Mode (ACK is sent when DATA.DATA is read) */
+    I2CSercom->CTRLB.reg = SERCOM_I2CM_CTRLB_SMEN;
+
+    /* Find and set baudrate. Read speed configuration. Set transfer
+     * speed: SERCOM_I2CM_CTRLA_SPEED(0): Standard-mode (Sm) up to 100
+     * kHz and Fast-mode (Fm) up to 400 kHz */
+    switch (speed) {
+        case I2C_SPEED_NORMAL:
+            tmp_baud = (int32_t)(((clock_source_speed + (2*(100000)) - 1) / (2*(100000))) - 5);
+            if (tmp_baud < 255 && tmp_baud > 0) {
+                I2CSercom->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(0);
+                I2CSercom->BAUD.reg = SERCOM_I2CM_BAUD_BAUD(tmp_baud);
+            }
+            break;
+        case I2C_SPEED_FAST:
+            tmp_baud = (int32_t)(((clock_source_speed + (2*(400000)) - 1) / (2*(400000))) - 5);
+            if (tmp_baud < 255 && tmp_baud > 0) {
+                I2CSercom->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(0);
+                I2CSercom->BAUD.reg = SERCOM_I2CM_BAUD_BAUD(tmp_baud);
+            }
+            break;
+        case I2C_SPEED_HIGH:
+            tmp_baud = (int32_t)(((clock_source_speed + (2*(3400000)) - 1) / (2*(3400000))) - 1);
+            if (tmp_baud < 255 && tmp_baud > 0) {
+                I2CSercom->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(2);
+                I2CSercom->BAUD.reg =SERCOM_I2CM_BAUD_HSBAUD(tmp_baud);
+            }
+            break;
+        default:
+            DEBUG("BAD BAUDRATE\n");
+            return -2;
+    }
+
+    /* ENABLE I2C MASTER */
+    i2c_poweron(dev);
+
+    /* Start timeout if bus state is unknown. */
+    while ((I2CSercom->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk) == BUSSTATE_UNKNOWN) {
+        if(timeout_counter++ >= SAMD21_I2C_TIMEOUT) {
+            /* Timeout, force bus state to idle. */
+            I2CSercom->STATUS.reg = BUSSTATE_IDLE;
+        }
+    }
+    return 0;
+}
+#else
 int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 {
     SercomI2cm *I2CSercom = 0;
@@ -185,6 +303,7 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     }
     return 0;
 }
+#endif
 
 int i2c_acquire(i2c_t dev)
 {

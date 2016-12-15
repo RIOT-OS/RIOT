@@ -31,6 +31,8 @@ extern "C" {
 #include "cmsis/samd21/include/samd21j18a.h"
 #elif defined(__SAMD21G18A__) || defined(__ATSAMD21G18A__)
 #include "cmsis/samd21/include/samd21g18a.h"
+#elif defined(__SAML21J18A__) || defined(__ATSAML21J18A__)
+#include "cmsis/saml21/include/saml21j18a.h"
 #else
   #error "Unsupported SAM0 variant."
 #endif
