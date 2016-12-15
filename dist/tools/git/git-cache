@@ -6,7 +6,7 @@ git_cache() {
 
 init() {
     set -ex
-    test -d "${GIT_CACHE_DIR}/.git" || {
+    test -d "${GIT_CACHE_DIR}" || {
         mkdir -p "${GIT_CACHE_DIR}"
 
         git_cache init --bare
