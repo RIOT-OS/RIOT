@@ -440,6 +440,7 @@ static void *_pktbuf_alloc(size_t size)
         DEBUG("pktbuf: no space left in packet buffer\n");
         return NULL;
     }
+    /* _unused_t struct would fit => add new space at ptr */
     if (sizeof(_unused_t) > (ptr->size - size)) {
         if (prev == NULL) { /* ptr was _first_unused */
             _first_unused = ptr->next;
@@ -450,7 +451,12 @@ static void *_pktbuf_alloc(size_t size)
     }
     else {
         _unused_t *new = (_unused_t *)(((uint8_t *)ptr) + size);
-        if (prev == NULL) { /* ptr was _first_unused */
+
+        if (((((uint8_t *)new) - &(_pktbuf[0])) + sizeof(_unused_t)) > GNRC_PKTBUF_SIZE) {
+            /* content of new would exceed packet buffer size so set to NULL */
+            _first_unused = NULL;
+        }
+        else if (prev == NULL) { /* ptr was _first_unused */
             _first_unused = new;
         }
         else {
@@ -484,6 +490,7 @@ static inline _unused_t *_merge(_unused_t *a, _unused_t *b)
 
 static void _pktbuf_free(void *data, size_t size)
 {
+    size_t bytes_at_end;
     _unused_t *new = (_unused_t *)data, *prev = NULL, *ptr = _first_unused;
 
     if (!_pktbuf_contains(data)) {
@@ -495,6 +502,14 @@ static void _pktbuf_free(void *data, size_t size)
     }
     new->next = ptr;
     new->size = (size < sizeof(_unused_t)) ? _align(sizeof(_unused_t)) : _align(size);
+    /* calculate number of bytes between new _unused_t chunk and end of packet
+     * buffer */
+    bytes_at_end = ((&_pktbuf[0] + GNRC_PKTBUF_SIZE) - (((uint8_t *)new) + new->size));
+    if (bytes_at_end < _align(sizeof(_unused_t))) {
+        /* new is very last segment and there is a little bit of memory left
+         * that wouldn't fit _unused_t (cut of in _pktbuf_alloc()) => re-add it */
+        new->size += bytes_at_end;
+    }
     if (prev == NULL) { /* ptr was _first_unused or data before _first_unused */
         _first_unused = new;
     }
