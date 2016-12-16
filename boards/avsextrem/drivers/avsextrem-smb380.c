@@ -66,7 +66,7 @@ uint8_t counter_Decreasing = 0;
 volatile uint16_t interruptTicksSMB380;
 
 typedef struct {
-    u_int writePointerPos;  //Writepointer position
+    unsigned writePointerPos;  //Writepointer position
     /*
      * check value for updated range settings (only needed for multiplication
      * in Float-mode
