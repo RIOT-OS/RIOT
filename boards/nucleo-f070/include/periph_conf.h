@@ -73,26 +73,26 @@ static const timer_conf_t timer_config[] = {
 
 /* UART 0 device configuration */
 #define UART_0_DEV          USART2
-#define UART_0_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART2EN)
-#define UART_0_CLKDIS()     (RCC->APB1ENR &= (~RCC_APB1ENR_USART2EN))
+#define UART_0_CLKEN()      (periph_clk_en(APB1, RCC_APB1ENR_USART2EN))
+#define UART_0_CLKDIS()     (periph_clk_dis(APB1, RCC_APB1ENR_USART2EN))
 #define UART_0_IRQ          USART2_IRQn
 #define UART_0_ISR          isr_usart2
 /* UART 0 pin configuration */
 #define UART_0_PORT         GPIOA
-#define UART_0_PORT_CLKEN() (RCC->AHBENR |= RCC_AHBENR_GPIOAEN)
+#define UART_0_PORT_CLKEN() (periph_clk_en(AHB, RCC_AHBENR_GPIOAEN))
 #define UART_0_RX_PIN       3
 #define UART_0_TX_PIN       2
 #define UART_0_AF           1
 
 /* UART 1 device configuration */
 #define UART_1_DEV          USART3
-#define UART_1_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART3EN)
-#define UART_1_CLKDIS()     (RCC->APB1ENR &= (~RCC_APB1ENR_USART3EN))
+#define UART_1_CLKEN()      (periph_clk_en(APB1, RCC_APB1ENR_USART3EN))
+#define UART_1_CLKDIS()     (periph_clk_dis(APB1, RCC_APB1ENR_USART3EN))
 #define UART_1_IRQ          USART3_4_IRQn
 #define UART_1_ISR          isr_usart3_8
 /* UART 1 pin configuration */
 #define UART_1_PORT         GPIOC
-#define UART_1_PORT_CLKEN() (RCC->AHBENR |= RCC_AHBENR_GPIOCEN)
+#define UART_1_PORT_CLKEN() (periph_clk_en(AHB, RCC_AHBENR_GPIOCEN))
 #define UART_1_RX_PIN       11
 #define UART_1_TX_PIN       10
 #define UART_1_AF           1

@@ -177,20 +177,20 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 void uart_poweron(uart_t uart)
 {
     if (_bus(uart) == 1) {
-        RCC->APB1ENR |= uart_config[uart].rcc_mask;
+        periph_clk_en(APB1, uart_config[uart].rcc_mask);
     }
     else {
-        RCC->APB2ENR |= uart_config[uart].rcc_mask;
+        periph_clk_en(APB2, uart_config[uart].rcc_mask);
     }
 }
 
 void uart_poweroff(uart_t uart)
 {
     if (_bus(uart) == 1) {
-        RCC->APB1ENR &= ~(uart_config[uart].rcc_mask);
+        periph_clk_dis(APB1, uart_config[uart].rcc_mask);
     }
     else {
-        RCC->APB2ENR &= ~(uart_config[uart].rcc_mask);
+        periph_clk_dis(APB2, uart_config[uart].rcc_mask);
     }
 }
 

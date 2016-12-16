@@ -30,9 +30,9 @@
 void hwrng_init(void)
 {
     /* enable RNG reset state */
-    RCC->AHB2ENR |= RCC_AHB2ENR_RNGEN;
+    periph_clk_en(AHB2, RCC_AHB2ENR_RNGEN);
     /* release RNG from reset state */
-    RCC->AHB2ENR &= ~RCC_AHB2ENR_RNGEN;
+    periph_clk_dis(AHB2, RCC_AHB2ENR_RNGEN);
 }
 
 
@@ -43,7 +43,7 @@ void hwrng_read(uint8_t *buf, unsigned int num)
     unsigned int count = 0;
 
     /* enable RNG reset state */
-    RCC->AHB2ENR |= RCC_AHB2ENR_RNGEN;
+    periph_clk_en(AHB2, RCC_AHB2ENR_RNGEN);
     /* enable the RNG */
     RNG->CR |= RNG_CR_RNGEN;
 
@@ -62,7 +62,7 @@ void hwrng_read(uint8_t *buf, unsigned int num)
     /* disable the RNG */
     RNG->CR &= ~RNG_CR_RNGEN;
     /* release RNG from reset state */
-    RCC->AHB2ENR &= ~RCC_AHB2ENR_RNGEN;
+    periph_clk_dis(AHB2, RCC_AHB2ENR_RNGEN);
 }
 
 #endif /* RANDOM_NUMOF */
