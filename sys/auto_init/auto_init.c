@@ -20,10 +20,6 @@
 
 #include "auto_init.h"
 
-#ifdef MODULE_BMP180
-#include "bmp180.h"
-#endif
-
 #ifdef MODULE_IO1_XPLAINED
 #include "io1_xplained.h"
 #endif
@@ -111,10 +107,6 @@ void auto_init(void)
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");
     rtc_init();
-#endif
-#ifdef MODULE_BMP180
-    DEBUG("Auto init BMP180 module.\n");
-    bmp180_auto_init();
 #endif
 #ifdef MODULE_IO1_XPLAINED
     DEBUG("Auto init IO1 Xplained extension module.\n");
@@ -292,6 +284,10 @@ void auto_init(void)
 #ifdef MODULE_SI70XX
     extern void auto_init_si70xx(void);
     auto_init_si70xx();
+#endif
+#ifdef MODULE_BMP180
+    extern void auto_init_bmp180(void);
+    auto_init_bmp180();
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */

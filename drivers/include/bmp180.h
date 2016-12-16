@@ -69,8 +69,8 @@ typedef struct {
  * @brief Device initialization parameters
  */
 typedef struct {
-    i2c_t i2c_dev;
-    uint8_t mode;
+    i2c_t i2c_dev;   /**< I2C device which is used */
+    uint8_t mode;    /**< Oversampling mode */
 } bmp180_params_t;
 
 /**
@@ -80,11 +80,6 @@ typedef struct {
 extern const saul_driver_t bmp180_temperature_saul_driver;
 extern const saul_driver_t bmp180_pressure_saul_driver;
 /** @} */
-
-/**
- * @brief auto-initialize all configured BMP180 devices
- */
-void bmp180_auto_init(void);
 
 /**
  * @brief Initialize the given BMP180 device
