@@ -1,9 +1,9 @@
 /**
  * \file
  *
- * \brief Top header file for SAML21
+ * \brief Instance description for TRNG
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -40,40 +40,26 @@
  * \asf_license_stop
  *
  */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
- */
 
-#ifndef _SAML21_
-#define _SAML21_
+#ifndef _SAML21_TRNG_INSTANCE_
+#define _SAML21_TRNG_INSTANCE_
 
-/**
- * \defgroup SAML21_definitions SAML21 Device Definitions
- * \brief SAML21 CMSIS Definitions.
- */
-
-#if   defined(__SAML21E15A__) || defined(__ATSAML21E15A__)
-  #include "saml21e15a.h"
-#elif defined(__SAML21E16A__) || defined(__ATSAML21E16A__)
-  #include "saml21e16a.h"
-#elif defined(__SAML21E17A__) || defined(__ATSAML21E17A__)
-  #include "saml21e17a.h"
-#elif defined(__SAML21G16A__) || defined(__ATSAML21G16A__)
-  #include "saml21g16a.h"
-#elif defined(__SAML21G17A__) || defined(__ATSAML21G17A__)
-  #include "saml21g17a.h"
-#elif defined(__SAML21G18A__) || defined(__ATSAML21G18A__)
-  #include "saml21g18a.h"
-#elif defined(__SAML21J16A__) || defined(__ATSAML21J16A__)
-  #include "saml21j16a.h"
-#elif defined(__SAML21J17A__) || defined(__ATSAML21J17A__)
-  #include "saml21j17a.h"
-#elif defined(__SAML21J18A__) || defined(__ATSAML21J18A__)
-  #include "saml21j18a.h"
-#elif defined(__SAML21E18B__) || defined(__ATSAML21E18B__)
-  #include "saml21e18b.h"
+/* ========== Register definition for TRNG peripheral ========== */
+#if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
+#define REG_TRNG_CTRLA             (0x42003800U) /**< \brief (TRNG) Control A */
+#define REG_TRNG_EVCTRL            (0x42003804U) /**< \brief (TRNG) Event Control */
+#define REG_TRNG_INTENCLR          (0x42003808U) /**< \brief (TRNG) Interrupt Enable Clear */
+#define REG_TRNG_INTENSET          (0x42003809U) /**< \brief (TRNG) Interrupt Enable Set */
+#define REG_TRNG_INTFLAG           (0x4200380AU) /**< \brief (TRNG) Interrupt Flag Status and Clear */
+#define REG_TRNG_DATA              (0x42003820U) /**< \brief (TRNG) Output Data */
 #else
-  #error Library does not support the specified device.
-#endif
+#define REG_TRNG_CTRLA             (*(RwReg8 *)0x42003800U) /**< \brief (TRNG) Control A */
+#define REG_TRNG_EVCTRL            (*(RwReg8 *)0x42003804U) /**< \brief (TRNG) Event Control */
+#define REG_TRNG_INTENCLR          (*(RwReg8 *)0x42003808U) /**< \brief (TRNG) Interrupt Enable Clear */
+#define REG_TRNG_INTENSET          (*(RwReg8 *)0x42003809U) /**< \brief (TRNG) Interrupt Enable Set */
+#define REG_TRNG_INTFLAG           (*(RwReg8 *)0x4200380AU) /**< \brief (TRNG) Interrupt Flag Status and Clear */
+#define REG_TRNG_DATA              (*(RoReg  *)0x42003820U) /**< \brief (TRNG) Output Data */
+#endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
-#endif /* _SAML21_ */
+
+#endif /* _SAML21_TRNG_INSTANCE_ */

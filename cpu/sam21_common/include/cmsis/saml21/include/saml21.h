@@ -3,7 +3,7 @@
  *
  * \brief Top header file for SAML21
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -40,9 +40,6 @@
  * \asf_license_stop
  *
  */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
- */
 
 #ifndef _SAML21_
 #define _SAML21_
@@ -52,26 +49,12 @@
  * \brief SAML21 CMSIS Definitions.
  */
 
-#if   defined(__SAML21E15A__) || defined(__ATSAML21E15A__)
-  #include "saml21e15a.h"
-#elif defined(__SAML21E16A__) || defined(__ATSAML21E16A__)
-  #include "saml21e16a.h"
-#elif defined(__SAML21E17A__) || defined(__ATSAML21E17A__)
-  #include "saml21e17a.h"
-#elif defined(__SAML21G16A__) || defined(__ATSAML21G16A__)
-  #include "saml21g16a.h"
-#elif defined(__SAML21G17A__) || defined(__ATSAML21G17A__)
-  #include "saml21g17a.h"
+#if   defined(__SAML21E18A__) || defined(__ATSAML21E18A__)
+  #include "saml21e18a.h"
 #elif defined(__SAML21G18A__) || defined(__ATSAML21G18A__)
   #include "saml21g18a.h"
-#elif defined(__SAML21J16A__) || defined(__ATSAML21J16A__)
-  #include "saml21j16a.h"
-#elif defined(__SAML21J17A__) || defined(__ATSAML21J17A__)
-  #include "saml21j17a.h"
 #elif defined(__SAML21J18A__) || defined(__ATSAML21J18A__)
   #include "saml21j18a.h"
-#elif defined(__SAML21E18B__) || defined(__ATSAML21E18B__)
-  #include "saml21e18b.h"
 #else
   #error Library does not support the specified device.
 #endif
