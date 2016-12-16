@@ -75,16 +75,6 @@ enum {
     PORT_F = 5,             /**< port F */
 };
 
-/**
- * @brief   Available MUX values for configuring a pin's alternate function
- */
-typedef enum {
-    GPIO_AF0 = 0,           /**< use alternate function 0 */
-    GPIO_AF1,               /**< use alternate function 1 */
-    GPIO_AF2,               /**< use alternate function 2 */
-    GPIO_AF3,               /**< use alternate function 3 */
-} gpio_af_t;
-
 #ifndef DOXYGEN
 /**
  * @brief   Override ADC resolution values

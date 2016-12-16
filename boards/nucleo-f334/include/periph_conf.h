@@ -102,6 +102,25 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
+ * @brief   PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .pins     = { GPIO_PIN(PORT_C, 6), GPIO_PIN(PORT_C, 7),
+                      GPIO_PIN(PORT_C, 8), GPIO_PIN(PORT_C, 9) },
+        .af       = GPIO_AF2,
+        .chan     = 4,
+        .bus      = APB1
+    }
+};
+
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+/** @} */
+
+/**
  * @name SPI configuration
  * @{
  */

@@ -34,13 +34,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Make sure the number of available PWM devices is defined
- */
-#ifndef PWM_NUMOF
-#error "PWM_NUMOF undefined for the target platform"
-#endif
-
-/**
  * @brief   Default PWM access macro
  * @{
  */

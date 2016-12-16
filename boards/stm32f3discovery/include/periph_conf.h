@@ -126,44 +126,31 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief PWM configuration
+ * @brief   PWM configuration
  * @{
  */
-#define PWM_NUMOF           (2U)
-#define PWM_0_EN            1
-#define PWM_1_EN            1
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .pins     = { GPIO_PIN(PORT_C, 6), GPIO_PIN(PORT_C, 7),
+                      GPIO_PIN(PORT_C, 8), GPIO_PIN(PORT_C, 9) },
+        .af       = GPIO_AF2,
+        .chan     = 4,
+        .bus      = APB1
+    },
+    {
+        .dev      = TIM4,
+        .rcc_mask = RCC_APB1ENR_TIM4EN,
+        .pins     = { GPIO_PIN(PORT_D, 12), GPIO_PIN(PORT_D, 13),
+                      GPIO_PIN(PORT_D, 14), GPIO_PIN(PORT_D, 15) },
+        .af       = GPIO_AF2,
+        .chan     = 4,
+        .bus      = APB1
+    }
+};
 
-#define PWM_MAX_CHANNELS    4
-
-/* PWM 0 device configuration */
-#define PWM_0_DEV           TIM3
-#define PWM_0_CHANNELS      4
-#define PWM_0_CLK           (72000000U)
-#define PWM_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_TIM3EN)
-#define PWM_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_TIM3EN))
-/* PWM 0 pin configuration */
-#define PWM_0_PORT          GPIOC
-#define PWM_0_PORT_CLKEN()  (RCC->AHBENR |= RCC_AHBENR_GPIOCEN)
-#define PWM_0_PIN_CH0       6
-#define PWM_0_PIN_CH1       7
-#define PWM_0_PIN_CH2       8
-#define PWM_0_PIN_CH3       9
-#define PWM_0_PIN_AF        2
-
-/* PWM 1 device configuration */
-#define PWM_1_DEV           TIM4
-#define PWM_1_CHANNELS      4
-#define PWM_1_CLK           (72000000U)
-#define PWM_1_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_TIM4EN)
-#define PWM_1_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_TIM4EN))
-/* PWM 1 pin configuration */
-#define PWM_1_PORT          GPIOD
-#define PWM_1_PORT_CLKEN()  (RCC->AHBENR |= RCC_AHBENR_GPIODEN)
-#define PWM_1_PIN_CH0       12
-#define PWM_1_PIN_CH1       13
-#define PWM_1_PIN_CH2       14
-#define PWM_1_PIN_CH3       15
-#define PWM_1_PIN_AF        2
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
 /** @} */
 
 /**

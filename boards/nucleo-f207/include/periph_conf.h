@@ -51,25 +51,22 @@ extern "C" {
 /** @} */
 
 /**
- * @name PWM configuration
+ * @brief   PWM configuration
  * @{
  */
-#define PWM_NUMOF         (1U)
-#define PWM_0_EN          1
-
-static const pwm_conf_t pwm_config[PWM_NUMOF] = {
+static const pwm_conf_t pwm_config[] = {
     {
-        .tim      = 2,
-        .port     = GPIOC,
-        .bus      = AHB1,
-        .rcc_mask = RCC_AHB1ENR_GPIOCEN,
-        .CH0      = 6,
-        .CH1      = 7,
-        .CH2      = 8,
-        .CH3      = 9,
-        .AF       = 2
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .pins     = { GPIO_PIN(PORT_C, 6), GPIO_PIN(PORT_C, 7),
+                      GPIO_PIN(PORT_C, 8), GPIO_PIN(PORT_C, 9) },
+        .af       = GPIO_AF2,
+        .chan     = 4,
+        .bus      = APB1
     }
 };
+
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
 /** @} */
 
 /**
@@ -90,13 +87,6 @@ static const timer_conf_t timer_config[] = {
         .rcc_mask = RCC_APB1ENR_TIM5EN,
         .bus      = APB1,
         .irqn     = TIM5_IRQn
-    },
-    {
-        .dev      = TIM3,
-        .max      = 0xffffffff,
-        .rcc_mask = RCC_APB1ENR_TIM3EN,
-        .bus      = APB1,
-        .irqn     = TIM3_IRQn
     },
     {
         .dev      = TIM4,

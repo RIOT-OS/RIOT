@@ -76,24 +76,21 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @name PWM configuration
+ * @brief   PWM configuration
  * @{
  */
-#define PWM_NUMOF           (1U)
-#define PWM_0_EN            1
-#define PWM_MAX_CHANNELS    1                   /* Increase if Timer with more channels is used */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM11,
+        .rcc_mask = RCC_APB2ENR_TIM11EN,
+        .pins     = { GPIO_PIN(PORT_B, 9), GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF },
+        .af       = GPIO_AF3,
+        .chan     = 1,
+        .bus      = APB2
+    }
+};
 
-/* PWM 0 device configuration */
-#define PWM_0_DEV           TIM11
-#define PWM_0_CHANNELS      1
-#define PWM_0_CLK           (168000000U)
-#define PWM_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_TIM11EN)
-#define PWM_0_CLKDIS()      (RCC->APB2ENR &= ~RCC_APB2ENR_TIM11EN)
-/* PWM 0 pin configuration */
-#define PWM_0_PORT          GPIOB
-#define PWM_0_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
-#define PWM_0_PIN_CH0       9
-#define PWM_0_PIN_AF        3
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
 /** @} */
 
 /**
