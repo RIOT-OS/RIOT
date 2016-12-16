@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the SAMR21E18A and SAMR21G18A
+ * @brief           Memory definitions for the SAMR21E18A
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  *

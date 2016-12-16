@@ -1,3 +1,3 @@
-MODULE = sam21_common_periph
+MODULE = sam0_common_periph
 
 include $(RIOTBASE)/Makefile.base

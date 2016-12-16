@@ -821,7 +821,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/*/include/atmel/* \
                          */cpu/sam3/include/sam3* \
                          */cpu/sam3/include/system_sam*.h \
-                         */cpu/sam21_common/include/cmsis/* \
+                         */cpu/sam0_common/include/cmsis/* \
                          */cpu/lpc*/include/core_cm*.h \
                          */cpu/cortexm_common/include/core_cm*.h \
                          */cpu/stm32f*/include/stm32f* \
