@@ -67,8 +67,8 @@ scan-build-analyze: clean
 	  $(COLOR_ECHO) '$(COLOR_YELLOW)Recommend using TOOLCHAIN=llvm for best results.$(COLOR_RESET)'; \
 	  $(COLOR_ECHO) '$(COLOR_YELLOW)Ignore any "error: unknown register name '\''rX'\'' in asm" messages.$(COLOR_RESET)'; \
 	fi
-	$(AD)mkdir -p '$(SCANBUILD_OUTPUTDIR)'
-	$(AD)env -i $(ENVVARS) \
+	$(Q)mkdir -p '$(SCANBUILD_OUTPUTDIR)'
+	$(Q)env -i $(ENVVARS) \
 	    scan-build -o '$(SCANBUILD_OUTPUTDIR)' $(SCANBUILD_ARGS) \
 	      make -C $(CURDIR) all $(strip $(CMDVARS)) FORCE_ASSERTS=1;
 endif # BUILD_IN_DOCKER
