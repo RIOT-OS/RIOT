@@ -83,10 +83,10 @@ endif
 QUIET ?= 1
 
 ifeq ($(QUIET),1)
-  AD=@
+  Q=@
   MAKEFLAGS += --no-print-directory
 else
-  AD=
+  Q=
 endif
 
 # Fail on warnings. Can be overridden by `make WERROR=0`.
