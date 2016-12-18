@@ -56,21 +56,6 @@ then
         RESULT=0
         RECALL="$1"
 
-        if git diff ${CI_BASE_BRANCH} HEAD -- .travis.yml &> /dev/null; then
-            # check if .travis.yml was changed in the current PR and skip if so
-            if ! git diff --name-only $(git merge-base HEAD ${CI_BASE_BRANCH})..HEAD -- \
-                .travis.yml &> 1; then
-                echo "==============================================================" >&2
-                echo -e "\033[1;31m.travis.yml differs in upstream.\033[0m"
-                echo -e "\033[1;31mPlease rebase your PR to current upstream or expect errors!!!!\033[0m" >&2
-                echo "    git fetch https://github.com/RIOT-OS/RIOT ${CI_BASE_BRANCH}" >&2
-                echo "    git rebase FETCH_HEAD" >&2
-                echo "    git push -f origin $(git rev-parse --abbrev-ref HEAD)" >&2
-                echo "==============================================================" >&2
-                return 1
-            fi
-        fi
-
         if [ "$RECALL" != "recall" ]; then
             if git diff ${CI_BASE_BRANCH} HEAD -- "$0" &> /dev/null; then
                 git rebase ${CI_BASE_BRANCH} || git rebase --abort
@@ -124,7 +109,7 @@ then
         #   - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
     fi
 
-    BASE_BRANCH="${TRAVIS_BRANCH:-${CI_BASE_BRANCH}}"
+    BASE_BRANCH="${CI_BASE_BRANCH}"
     ./dist/tools/compile_test/compile_test.py $BASE_BRANCH
     set_result $?
 fi
