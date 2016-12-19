@@ -2,7 +2,7 @@
 
 The include files in the directory tree are copied from ASF.  See
 https://spaces.atmel.com/gf/project/asf/frs/?action=FrsReleaseBrowse&frs_package_id=4
-(dd.  2016-07-22 ASF version 3.32.0 was used)
+(dd.  2016-11-07 ASF version 3.33.0 was used)
 
 The directory tree was copied "as is" and its structure is as follows:
 
