@@ -39,7 +39,7 @@
 #ifdef MODULE_PM
 
 #include "assert.h"
-#include "cpu_pm.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
  extern "C" {
