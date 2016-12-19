@@ -61,3 +61,17 @@ void cortexm_init(void)
     SCB->CCR |= SCB_CCR_STKALIGN_Msk;
 #endif
 }
+
+void cortexm_sleep(int deep)
+{
+    if (deep) {
+        SCB->SCR |=  (SCB_SCR_SLEEPDEEP_Msk);
+    }
+    else {
+        SCB->SCR &= ~(SCB_SCR_SLEEPDEEP_Msk);
+    }
+
+    /* ensure that all memory accesses have completed and trigger sleeping */
+    __DSB();
+    __WFI();
+}
