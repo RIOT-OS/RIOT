@@ -64,13 +64,16 @@ static void test_gcoap__client_get_req(void)
 /*
  * Client GET response success case. Test parsing response.
  * Response for /time resource from libcoap example
+ * Includes 2-byte token
  */
 static void test_gcoap__client_get_resp(void)
 {
     uint8_t buf[GCOAP_PDU_BUF_SIZE];
     coap_pkt_t pdu;
     int res;
-    char exp_payload[] = "Oct 22 10:46:48";
+    size_t hdr_fixed_len = 4;
+    char exp_payload[]   = "Oct 22 10:46:48";
+    size_t exp_tokenlen  = 2;
 
     uint8_t pdu_data[] = {
         0x52, 0x45, 0xe6, 0x02, 0x9b, 0xce, 0xc0, 0x21,
@@ -84,8 +87,8 @@ static void test_gcoap__client_get_resp(void)
 
     TEST_ASSERT_EQUAL_INT(0, res);
     TEST_ASSERT_EQUAL_INT(COAP_CLASS_SUCCESS, coap_get_code_class(&pdu));
-    TEST_ASSERT_EQUAL_INT(GCOAP_TOKENLEN, coap_get_token_len(&pdu));
-    TEST_ASSERT_EQUAL_INT(4 + GCOAP_TOKENLEN, coap_get_total_hdr_len(&pdu));
+    TEST_ASSERT_EQUAL_INT(exp_tokenlen, coap_get_token_len(&pdu));
+    TEST_ASSERT_EQUAL_INT(hdr_fixed_len + exp_tokenlen, coap_get_total_hdr_len(&pdu));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_NON, coap_get_type(&pdu));
     TEST_ASSERT_EQUAL_INT(strlen(exp_payload), pdu.payload_len);
 
