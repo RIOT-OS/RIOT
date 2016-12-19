@@ -3,7 +3,7 @@
  *
  * \brief Instance description for OSCCTRL
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAML21_OSCCTRL_INSTANCE_
@@ -85,14 +82,14 @@
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for OSCCTRL peripheral ========== */
-#define OSCCTRL_DFLL48M_COARSE_MSB  5
-#define OSCCTRL_DFLL48M_FINE_MSB    9
+#define OSCCTRL_DFLL48M_COARSE_MSB  5       
+#define OSCCTRL_DFLL48M_FINE_MSB    9       
 #define OSCCTRL_GCLK_ID_DFLL48      0        // Index of Generic Clock for DFLL48
 #define OSCCTRL_GCLK_ID_FDPLL       1        // Index of Generic Clock for DPLL
 #define OSCCTRL_GCLK_ID_FDPLL32K    2        // Index of Generic Clock for DPLL 32K
-#define OSCCTRL_DFLL48M_VERSION     0x310
-#define OSCCTRL_FDPLL_VERSION       0x200
-#define OSCCTRL_OSC16M_VERSION      0x100
-#define OSCCTRL_XOSC_VERSION        0x120
+#define OSCCTRL_DFLL48M_VERSION     0x310   
+#define OSCCTRL_FDPLL_VERSION       0x200   
+#define OSCCTRL_OSC16M_VERSION      0x100   
+#define OSCCTRL_XOSC_VERSION        0x120   
 
 #endif /* _SAML21_OSCCTRL_INSTANCE_ */

@@ -2,13 +2,17 @@
 
 The include files in the directory tree are copied from ASF.  See
 https://spaces.atmel.com/gf/project/asf/frs/?action=FrsReleaseBrowse&frs_package_id=4
-(dd.  2015-03-12 ASF version 3.22.0 was used)
+(dd.  2016-07-22 ASF version 3.32.0 was used)
 
 The directory tree was copied "as is" and its structure is as follows:
 
     cmsis
     └── saml21
         ├── include
+        │   ├── component
+        │   ├── instance
+        │   └── pio
+        ├── include_b
         │   ├── component
         │   ├── instance
         │   └── pio
@@ -32,6 +36,7 @@ the trailing white space had to be removed.  Please take this into account
 when comparing to the original ASF distribution.
 
     find include/ -name '*.h' -exec sed -i 's/\s*$//' '{}' +
+    find include_b/ -name '*.h' -exec sed -i 's/\s*$//' '{}' +
 
 ## LITTLE_ENDIAN
 
@@ -44,4 +49,5 @@ So, we decided to remove the define from the ASF CMSIS files.  The command
 for it (running from this directory) is:
 
     find include/ -name '*.h' -exec sed -i '/^#define\s\s*LITTLE_ENDIAN/d' '{}' +
+    find include_b/ -name '*.h' -exec sed -i '/^#define\s\s*LITTLE_ENDIAN/d' '{}' +
 

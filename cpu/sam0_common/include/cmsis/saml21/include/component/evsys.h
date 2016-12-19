@@ -3,7 +3,7 @@
  *
  * \brief Component description for EVSYS
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAML21_EVSYS_COMPONENT_
@@ -144,7 +141,7 @@ typedef union {
 #define EVSYS_CHSTATUS_USRRDY11     (1 << EVSYS_CHSTATUS_USRRDY11_Pos)
 #define EVSYS_CHSTATUS_USRRDY_Pos   0            /**< \brief (EVSYS_CHSTATUS) Channel x User Ready */
 #define EVSYS_CHSTATUS_USRRDY_Msk   (0xFFFul << EVSYS_CHSTATUS_USRRDY_Pos)
-#define EVSYS_CHSTATUS_USRRDY(value) ((EVSYS_CHSTATUS_USRRDY_Msk & ((value) << EVSYS_CHSTATUS_USRRDY_Pos)))
+#define EVSYS_CHSTATUS_USRRDY(value) (EVSYS_CHSTATUS_USRRDY_Msk & ((value) << EVSYS_CHSTATUS_USRRDY_Pos))
 #define EVSYS_CHSTATUS_CHBUSY0_Pos  16           /**< \brief (EVSYS_CHSTATUS) Channel 0 Busy */
 #define EVSYS_CHSTATUS_CHBUSY0      (1 << EVSYS_CHSTATUS_CHBUSY0_Pos)
 #define EVSYS_CHSTATUS_CHBUSY1_Pos  17           /**< \brief (EVSYS_CHSTATUS) Channel 1 Busy */
@@ -171,7 +168,7 @@ typedef union {
 #define EVSYS_CHSTATUS_CHBUSY11     (1 << EVSYS_CHSTATUS_CHBUSY11_Pos)
 #define EVSYS_CHSTATUS_CHBUSY_Pos   16           /**< \brief (EVSYS_CHSTATUS) Channel x Busy */
 #define EVSYS_CHSTATUS_CHBUSY_Msk   (0xFFFul << EVSYS_CHSTATUS_CHBUSY_Pos)
-#define EVSYS_CHSTATUS_CHBUSY(value) ((EVSYS_CHSTATUS_CHBUSY_Msk & ((value) << EVSYS_CHSTATUS_CHBUSY_Pos)))
+#define EVSYS_CHSTATUS_CHBUSY(value) (EVSYS_CHSTATUS_CHBUSY_Msk & ((value) << EVSYS_CHSTATUS_CHBUSY_Pos))
 #define EVSYS_CHSTATUS_MASK         0x0FFF0FFFul /**< \brief (EVSYS_CHSTATUS) MASK Register */
 
 /* -------- EVSYS_INTENCLR : (EVSYS Offset: 0x10) (R/W 32) Interrupt Enable Clear -------- */
@@ -244,7 +241,7 @@ typedef union {
 #define EVSYS_INTENCLR_OVR11        (1 << EVSYS_INTENCLR_OVR11_Pos)
 #define EVSYS_INTENCLR_OVR_Pos      0            /**< \brief (EVSYS_INTENCLR) Channel x Overrun Interrupt Enable */
 #define EVSYS_INTENCLR_OVR_Msk      (0xFFFul << EVSYS_INTENCLR_OVR_Pos)
-#define EVSYS_INTENCLR_OVR(value)   ((EVSYS_INTENCLR_OVR_Msk & ((value) << EVSYS_INTENCLR_OVR_Pos)))
+#define EVSYS_INTENCLR_OVR(value)   (EVSYS_INTENCLR_OVR_Msk & ((value) << EVSYS_INTENCLR_OVR_Pos))
 #define EVSYS_INTENCLR_EVD0_Pos     16           /**< \brief (EVSYS_INTENCLR) Channel 0 Event Detection Interrupt Enable */
 #define EVSYS_INTENCLR_EVD0         (1 << EVSYS_INTENCLR_EVD0_Pos)
 #define EVSYS_INTENCLR_EVD1_Pos     17           /**< \brief (EVSYS_INTENCLR) Channel 1 Event Detection Interrupt Enable */
@@ -271,7 +268,7 @@ typedef union {
 #define EVSYS_INTENCLR_EVD11        (1 << EVSYS_INTENCLR_EVD11_Pos)
 #define EVSYS_INTENCLR_EVD_Pos      16           /**< \brief (EVSYS_INTENCLR) Channel x Event Detection Interrupt Enable */
 #define EVSYS_INTENCLR_EVD_Msk      (0xFFFul << EVSYS_INTENCLR_EVD_Pos)
-#define EVSYS_INTENCLR_EVD(value)   ((EVSYS_INTENCLR_EVD_Msk & ((value) << EVSYS_INTENCLR_EVD_Pos)))
+#define EVSYS_INTENCLR_EVD(value)   (EVSYS_INTENCLR_EVD_Msk & ((value) << EVSYS_INTENCLR_EVD_Pos))
 #define EVSYS_INTENCLR_MASK         0x0FFF0FFFul /**< \brief (EVSYS_INTENCLR) MASK Register */
 
 /* -------- EVSYS_INTENSET : (EVSYS Offset: 0x14) (R/W 32) Interrupt Enable Set -------- */
@@ -344,7 +341,7 @@ typedef union {
 #define EVSYS_INTENSET_OVR11        (1 << EVSYS_INTENSET_OVR11_Pos)
 #define EVSYS_INTENSET_OVR_Pos      0            /**< \brief (EVSYS_INTENSET) Channel x Overrun Interrupt Enable */
 #define EVSYS_INTENSET_OVR_Msk      (0xFFFul << EVSYS_INTENSET_OVR_Pos)
-#define EVSYS_INTENSET_OVR(value)   ((EVSYS_INTENSET_OVR_Msk & ((value) << EVSYS_INTENSET_OVR_Pos)))
+#define EVSYS_INTENSET_OVR(value)   (EVSYS_INTENSET_OVR_Msk & ((value) << EVSYS_INTENSET_OVR_Pos))
 #define EVSYS_INTENSET_EVD0_Pos     16           /**< \brief (EVSYS_INTENSET) Channel 0 Event Detection Interrupt Enable */
 #define EVSYS_INTENSET_EVD0         (1 << EVSYS_INTENSET_EVD0_Pos)
 #define EVSYS_INTENSET_EVD1_Pos     17           /**< \brief (EVSYS_INTENSET) Channel 1 Event Detection Interrupt Enable */
@@ -371,45 +368,45 @@ typedef union {
 #define EVSYS_INTENSET_EVD11        (1 << EVSYS_INTENSET_EVD11_Pos)
 #define EVSYS_INTENSET_EVD_Pos      16           /**< \brief (EVSYS_INTENSET) Channel x Event Detection Interrupt Enable */
 #define EVSYS_INTENSET_EVD_Msk      (0xFFFul << EVSYS_INTENSET_EVD_Pos)
-#define EVSYS_INTENSET_EVD(value)   ((EVSYS_INTENSET_EVD_Msk & ((value) << EVSYS_INTENSET_EVD_Pos)))
+#define EVSYS_INTENSET_EVD(value)   (EVSYS_INTENSET_EVD_Msk & ((value) << EVSYS_INTENSET_EVD_Pos))
 #define EVSYS_INTENSET_MASK         0x0FFF0FFFul /**< \brief (EVSYS_INTENSET) MASK Register */
 
 /* -------- EVSYS_INTFLAG : (EVSYS Offset: 0x18) (R/W 32) Interrupt Flag Status and Clear -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-typedef union {
+typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
-    uint32_t OVR0:1;           /*!< bit:      0  Channel 0 Overrun                  */
-    uint32_t OVR1:1;           /*!< bit:      1  Channel 1 Overrun                  */
-    uint32_t OVR2:1;           /*!< bit:      2  Channel 2 Overrun                  */
-    uint32_t OVR3:1;           /*!< bit:      3  Channel 3 Overrun                  */
-    uint32_t OVR4:1;           /*!< bit:      4  Channel 4 Overrun                  */
-    uint32_t OVR5:1;           /*!< bit:      5  Channel 5 Overrun                  */
-    uint32_t OVR6:1;           /*!< bit:      6  Channel 6 Overrun                  */
-    uint32_t OVR7:1;           /*!< bit:      7  Channel 7 Overrun                  */
-    uint32_t OVR8:1;           /*!< bit:      8  Channel 8 Overrun                  */
-    uint32_t OVR9:1;           /*!< bit:      9  Channel 9 Overrun                  */
-    uint32_t OVR10:1;          /*!< bit:     10  Channel 10 Overrun                 */
-    uint32_t OVR11:1;          /*!< bit:     11  Channel 11 Overrun                 */
-    uint32_t :4;               /*!< bit: 12..15  Reserved                           */
-    uint32_t EVD0:1;           /*!< bit:     16  Channel 0 Event Detection          */
-    uint32_t EVD1:1;           /*!< bit:     17  Channel 1 Event Detection          */
-    uint32_t EVD2:1;           /*!< bit:     18  Channel 2 Event Detection          */
-    uint32_t EVD3:1;           /*!< bit:     19  Channel 3 Event Detection          */
-    uint32_t EVD4:1;           /*!< bit:     20  Channel 4 Event Detection          */
-    uint32_t EVD5:1;           /*!< bit:     21  Channel 5 Event Detection          */
-    uint32_t EVD6:1;           /*!< bit:     22  Channel 6 Event Detection          */
-    uint32_t EVD7:1;           /*!< bit:     23  Channel 7 Event Detection          */
-    uint32_t EVD8:1;           /*!< bit:     24  Channel 8 Event Detection          */
-    uint32_t EVD9:1;           /*!< bit:     25  Channel 9 Event Detection          */
-    uint32_t EVD10:1;          /*!< bit:     26  Channel 10 Event Detection         */
-    uint32_t EVD11:1;          /*!< bit:     27  Channel 11 Event Detection         */
-    uint32_t :4;               /*!< bit: 28..31  Reserved                           */
+    __I uint32_t OVR0:1;           /*!< bit:      0  Channel 0 Overrun                  */
+    __I uint32_t OVR1:1;           /*!< bit:      1  Channel 1 Overrun                  */
+    __I uint32_t OVR2:1;           /*!< bit:      2  Channel 2 Overrun                  */
+    __I uint32_t OVR3:1;           /*!< bit:      3  Channel 3 Overrun                  */
+    __I uint32_t OVR4:1;           /*!< bit:      4  Channel 4 Overrun                  */
+    __I uint32_t OVR5:1;           /*!< bit:      5  Channel 5 Overrun                  */
+    __I uint32_t OVR6:1;           /*!< bit:      6  Channel 6 Overrun                  */
+    __I uint32_t OVR7:1;           /*!< bit:      7  Channel 7 Overrun                  */
+    __I uint32_t OVR8:1;           /*!< bit:      8  Channel 8 Overrun                  */
+    __I uint32_t OVR9:1;           /*!< bit:      9  Channel 9 Overrun                  */
+    __I uint32_t OVR10:1;          /*!< bit:     10  Channel 10 Overrun                 */
+    __I uint32_t OVR11:1;          /*!< bit:     11  Channel 11 Overrun                 */
+    __I uint32_t :4;               /*!< bit: 12..15  Reserved                           */
+    __I uint32_t EVD0:1;           /*!< bit:     16  Channel 0 Event Detection          */
+    __I uint32_t EVD1:1;           /*!< bit:     17  Channel 1 Event Detection          */
+    __I uint32_t EVD2:1;           /*!< bit:     18  Channel 2 Event Detection          */
+    __I uint32_t EVD3:1;           /*!< bit:     19  Channel 3 Event Detection          */
+    __I uint32_t EVD4:1;           /*!< bit:     20  Channel 4 Event Detection          */
+    __I uint32_t EVD5:1;           /*!< bit:     21  Channel 5 Event Detection          */
+    __I uint32_t EVD6:1;           /*!< bit:     22  Channel 6 Event Detection          */
+    __I uint32_t EVD7:1;           /*!< bit:     23  Channel 7 Event Detection          */
+    __I uint32_t EVD8:1;           /*!< bit:     24  Channel 8 Event Detection          */
+    __I uint32_t EVD9:1;           /*!< bit:     25  Channel 9 Event Detection          */
+    __I uint32_t EVD10:1;          /*!< bit:     26  Channel 10 Event Detection         */
+    __I uint32_t EVD11:1;          /*!< bit:     27  Channel 11 Event Detection         */
+    __I uint32_t :4;               /*!< bit: 28..31  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
-    uint32_t OVR:12;           /*!< bit:  0..11  Channel x Overrun                  */
-    uint32_t :4;               /*!< bit: 12..15  Reserved                           */
-    uint32_t EVD:12;           /*!< bit: 16..27  Channel x Event Detection          */
-    uint32_t :4;               /*!< bit: 28..31  Reserved                           */
+    __I uint32_t OVR:12;           /*!< bit:  0..11  Channel x Overrun                  */
+    __I uint32_t :4;               /*!< bit: 12..15  Reserved                           */
+    __I uint32_t EVD:12;           /*!< bit: 16..27  Channel x Event Detection          */
+    __I uint32_t :4;               /*!< bit: 28..31  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint32_t reg;                /*!< Type      used for register access              */
 } EVSYS_INTFLAG_Type;
@@ -444,7 +441,7 @@ typedef union {
 #define EVSYS_INTFLAG_OVR11         (1 << EVSYS_INTFLAG_OVR11_Pos)
 #define EVSYS_INTFLAG_OVR_Pos       0            /**< \brief (EVSYS_INTFLAG) Channel x Overrun */
 #define EVSYS_INTFLAG_OVR_Msk       (0xFFFul << EVSYS_INTFLAG_OVR_Pos)
-#define EVSYS_INTFLAG_OVR(value)    ((EVSYS_INTFLAG_OVR_Msk & ((value) << EVSYS_INTFLAG_OVR_Pos)))
+#define EVSYS_INTFLAG_OVR(value)    (EVSYS_INTFLAG_OVR_Msk & ((value) << EVSYS_INTFLAG_OVR_Pos))
 #define EVSYS_INTFLAG_EVD0_Pos      16           /**< \brief (EVSYS_INTFLAG) Channel 0 Event Detection */
 #define EVSYS_INTFLAG_EVD0          (1 << EVSYS_INTFLAG_EVD0_Pos)
 #define EVSYS_INTFLAG_EVD1_Pos      17           /**< \brief (EVSYS_INTFLAG) Channel 1 Event Detection */
@@ -471,7 +468,7 @@ typedef union {
 #define EVSYS_INTFLAG_EVD11         (1 << EVSYS_INTFLAG_EVD11_Pos)
 #define EVSYS_INTFLAG_EVD_Pos       16           /**< \brief (EVSYS_INTFLAG) Channel x Event Detection */
 #define EVSYS_INTFLAG_EVD_Msk       (0xFFFul << EVSYS_INTFLAG_EVD_Pos)
-#define EVSYS_INTFLAG_EVD(value)    ((EVSYS_INTFLAG_EVD_Msk & ((value) << EVSYS_INTFLAG_EVD_Pos)))
+#define EVSYS_INTFLAG_EVD(value)    (EVSYS_INTFLAG_EVD_Msk & ((value) << EVSYS_INTFLAG_EVD_Pos))
 #define EVSYS_INTFLAG_MASK          0x0FFF0FFFul /**< \brief (EVSYS_INTFLAG) MASK Register */
 
 /* -------- EVSYS_SWEVT : (EVSYS Offset: 0x1C) ( /W 32) Software Event -------- */
@@ -529,7 +526,7 @@ typedef union {
 #define EVSYS_SWEVT_CHANNEL11       (1 << EVSYS_SWEVT_CHANNEL11_Pos)
 #define EVSYS_SWEVT_CHANNEL_Pos     0            /**< \brief (EVSYS_SWEVT) Channel x Software Selection */
 #define EVSYS_SWEVT_CHANNEL_Msk     (0xFFFul << EVSYS_SWEVT_CHANNEL_Pos)
-#define EVSYS_SWEVT_CHANNEL(value)  ((EVSYS_SWEVT_CHANNEL_Msk & ((value) << EVSYS_SWEVT_CHANNEL_Pos)))
+#define EVSYS_SWEVT_CHANNEL(value)  (EVSYS_SWEVT_CHANNEL_Msk & ((value) << EVSYS_SWEVT_CHANNEL_Pos))
 #define EVSYS_SWEVT_MASK            0x00000FFFul /**< \brief (EVSYS_SWEVT) MASK Register */
 
 /* -------- EVSYS_CHANNEL : (EVSYS Offset: 0x20) (R/W 32) Channel n -------- */
@@ -554,10 +551,10 @@ typedef union {
 
 #define EVSYS_CHANNEL_EVGEN_Pos     0            /**< \brief (EVSYS_CHANNEL) Event Generator Selection */
 #define EVSYS_CHANNEL_EVGEN_Msk     (0x7Ful << EVSYS_CHANNEL_EVGEN_Pos)
-#define EVSYS_CHANNEL_EVGEN(value)  ((EVSYS_CHANNEL_EVGEN_Msk & ((value) << EVSYS_CHANNEL_EVGEN_Pos)))
+#define EVSYS_CHANNEL_EVGEN(value)  (EVSYS_CHANNEL_EVGEN_Msk & ((value) << EVSYS_CHANNEL_EVGEN_Pos))
 #define EVSYS_CHANNEL_PATH_Pos      8            /**< \brief (EVSYS_CHANNEL) Path Selection */
 #define EVSYS_CHANNEL_PATH_Msk      (0x3ul << EVSYS_CHANNEL_PATH_Pos)
-#define EVSYS_CHANNEL_PATH(value)   ((EVSYS_CHANNEL_PATH_Msk & ((value) << EVSYS_CHANNEL_PATH_Pos)))
+#define EVSYS_CHANNEL_PATH(value)   (EVSYS_CHANNEL_PATH_Msk & ((value) << EVSYS_CHANNEL_PATH_Pos))
 #define   EVSYS_CHANNEL_PATH_SYNCHRONOUS_Val 0x0ul  /**< \brief (EVSYS_CHANNEL) Synchronous path */
 #define   EVSYS_CHANNEL_PATH_RESYNCHRONIZED_Val 0x1ul  /**< \brief (EVSYS_CHANNEL) Resynchronized path */
 #define   EVSYS_CHANNEL_PATH_ASYNCHRONOUS_Val 0x2ul  /**< \brief (EVSYS_CHANNEL) Asynchronous path */
@@ -566,7 +563,7 @@ typedef union {
 #define EVSYS_CHANNEL_PATH_ASYNCHRONOUS (EVSYS_CHANNEL_PATH_ASYNCHRONOUS_Val << EVSYS_CHANNEL_PATH_Pos)
 #define EVSYS_CHANNEL_EDGSEL_Pos    10           /**< \brief (EVSYS_CHANNEL) Edge Detection Selection */
 #define EVSYS_CHANNEL_EDGSEL_Msk    (0x3ul << EVSYS_CHANNEL_EDGSEL_Pos)
-#define EVSYS_CHANNEL_EDGSEL(value) ((EVSYS_CHANNEL_EDGSEL_Msk & ((value) << EVSYS_CHANNEL_EDGSEL_Pos)))
+#define EVSYS_CHANNEL_EDGSEL(value) (EVSYS_CHANNEL_EDGSEL_Msk & ((value) << EVSYS_CHANNEL_EDGSEL_Pos))
 #define   EVSYS_CHANNEL_EDGSEL_NO_EVT_OUTPUT_Val 0x0ul  /**< \brief (EVSYS_CHANNEL) No event output when using the resynchronized or synchronous path */
 #define   EVSYS_CHANNEL_EDGSEL_RISING_EDGE_Val 0x1ul  /**< \brief (EVSYS_CHANNEL) Event detection only on the rising edge of the signal from the event generator when using the resynchronized or synchronous path */
 #define   EVSYS_CHANNEL_EDGSEL_FALLING_EDGE_Val 0x2ul  /**< \brief (EVSYS_CHANNEL) Event detection only on the falling edge of the signal from the event generator when using the resynchronized or synchronous path */
@@ -597,7 +594,7 @@ typedef union {
 
 #define EVSYS_USER_CHANNEL_Pos      0            /**< \brief (EVSYS_USER) Channel Event Selection */
 #define EVSYS_USER_CHANNEL_Msk      (0x1Ful << EVSYS_USER_CHANNEL_Pos)
-#define EVSYS_USER_CHANNEL(value)   ((EVSYS_USER_CHANNEL_Msk & ((value) << EVSYS_USER_CHANNEL_Pos)))
+#define EVSYS_USER_CHANNEL(value)   (EVSYS_USER_CHANNEL_Msk & ((value) << EVSYS_USER_CHANNEL_Pos))
 #define EVSYS_USER_MASK             0x0000001Ful /**< \brief (EVSYS_USER) MASK Register */
 
 /** \brief EVSYS hardware registers */
