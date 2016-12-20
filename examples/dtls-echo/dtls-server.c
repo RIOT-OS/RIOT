@@ -76,8 +76,6 @@ static gnrc_netreg_entry_t server = GNRC_NETREG_ENTRY_INIT_PID(
 #define READER_QUEUE_SIZE (8U)
 char _server_stack[THREAD_STACKSIZE_MAIN + THREAD_EXTRA_STACKSIZE_PRINTF];
 
-static kernel_pid_t _dtls_kernel_pid;
-
 /**
  * @brief Handles the reception of the DTLS flights.
  *
@@ -401,8 +399,6 @@ static void start_server(void)
     uint16_t port;
 
     port = (uint16_t)DEFAULT_PORT;
-
-    (void) _dtls_kernel_pid;
 
     /* Only one instance of the server */
     if (server.target.pid != KERNEL_PID_UNDEF) {
