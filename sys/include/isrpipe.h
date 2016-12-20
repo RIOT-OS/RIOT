@@ -7,10 +7,13 @@
  */
 
 /**
+ * @defgroup isr_pipe ISR Pipe
  * @ingroup sys
+ * @brief ISR -> userspace pipe
+ *
  * @{
  * @file
- * @brief       ISR -> userspace pipe interface
+ * @brief       isrpipe Interface
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
