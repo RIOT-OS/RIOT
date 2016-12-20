@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     cpu_atmega2560
+ * @ingroup     cpu_atmega_common
  * @{
  *
  * @file
@@ -30,6 +30,7 @@ void reboot(void)
      * Since the AVR doesn't support a real software reset, we set the Watchdog
      * Timer on a 250ms timeout. Consider this a kludge.
      */
+    irq_disable();
     wdt_enable(WDTO_250MS);
     while(1);
 }
