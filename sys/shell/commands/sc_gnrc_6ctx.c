@@ -12,6 +12,8 @@
  * @file
  */
 
+/* Required for strtok_r in string.h, when building with -std=c99 */
+#define _DEFAULT_SOURCE 1
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
