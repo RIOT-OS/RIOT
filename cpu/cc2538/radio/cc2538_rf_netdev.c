@@ -295,8 +295,6 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
 
 static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
 {
-    uint8_t corr_val;
-    int8_t rssi_val;
     size_t pkt_len;
 
     if (buf == NULL) {
@@ -335,6 +333,8 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     rfcore_read_fifo(buf, pkt_len);
 
     if (info != NULL && RFCORE->XREG_RSSISTATbits.RSSI_VALID) {
+        uint8_t corr_val;
+        int8_t rssi_val;
         netdev2_ieee802154_rx_info_t *radio_info = info;
         rssi_val = rfcore_read_byte() + CC2538_RSSI_OFFSET;
 
