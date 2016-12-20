@@ -43,6 +43,8 @@
 //#define DEFAULT_PORT 20220    /* DTLS default port  */
 #define DEFAULT_PORT 61618      /* First valid FEBx address  */
 
+#define DTLS_STOP_SERVER_MSG    0x4001
+
 /* TODO: MAke this local! */
 static dtls_context_t *dtls_context = NULL;
 
@@ -366,11 +368,13 @@ void *dtls_server_wrapper(void *arg)
 
     msg_t _reader_queue[READER_QUEUE_SIZE];
     msg_t msg;
+    bool active = true;
 
     /* The GNRC examples uses packet dump but we want a custom one */
     msg_init_queue(_reader_queue, READER_QUEUE_SIZE);
 
-    init_dtls();
+    dtls_init(); /*TinyDTLS mandatory settings*/
+    init_dtls(); /*RIOT GNRC settings for preparing the server*/
 
     /*
      * FIXME: After mutliple DTLS sessiosn established the server becomes
@@ -381,17 +385,24 @@ void *dtls_server_wrapper(void *arg)
      * the avaliable RAM.
      */
 
-    while (1) {
-
-        /* wait for a message */
+    while (active) {
+        /* wait for a (thread) message */
         msg_receive(&msg);
 
-        DEBUG("DBG-Server: Record Rcvd!\n");
-        dtls_handle_read(dtls_context, (gnrc_pktsnip_t *)(msg.content.ptr));
+        /* check if the server stop message has been received */
+        if (msg.type == DTLS_STOP_SERVER_MSG ){
+            active = false;
+            //break;
+        }
+        else { /* Normal operation */
+          DEBUG("DBG-Server: Record Rcvd!\n");
+          dtls_handle_read(dtls_context, (gnrc_pktsnip_t *)(msg.content.ptr));
+        }
 
     } /*While */
 
     dtls_free_context(dtls_context);
+    return (void *) NULL;
 }
 
 static void start_server(void)
@@ -406,13 +417,11 @@ static void start_server(void)
         return;
     }
 
-    dtls_init();
-
     /* The server is initialized  */
     server.target.pid = thread_create(_server_stack, sizeof(_server_stack),
                                THREAD_PRIORITY_MAIN - 1,
                                THREAD_CREATE_STACKTEST,
-                               dtls_server_wrapper, NULL, "DTLS Server");
+                               dtls_server_wrapper, NULL, "DTLS_Server");
 
     /*Uncommon but better be sure */
     if (server.target.pid == EINVAL){
@@ -440,12 +449,20 @@ static void stop_server(void)
         return;
     }
 
-    dtls_free_context(dtls_context);
+    /* prepare the stop message */
+    msg_t m = {
+        thread_getpid(),
+        DTLS_STOP_SERVER_MSG,
+        { NULL }
+    };
 
-    /* stop server */
+    /* send the stop message to thread */
+    msg_send(&m, server.target.pid);
+
+    /* Release UDP port and PID */
     gnrc_netreg_unregister(GNRC_NETTYPE_UDP, &server);
     server.target.pid = KERNEL_PID_UNDEF;
-    puts("Success: stopped DTLS server");
+    DEBUG("Success: stopped DTLS server");
 }
 
 int udp_server_cmd(int argc, char **argv)

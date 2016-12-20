@@ -28,8 +28,7 @@ USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_udp
 # Add a routing protocol
 USEMODULE += gnrc_rpl
-# This application dumps received packets to STDIO using the pktdump module
-USEMODULE += gnrc_pktdump
+
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
 # Add also the shell, some shell commands
