@@ -418,6 +418,16 @@ static void start_server(void)
                                THREAD_CREATE_STACKTEST,
                                dtls_server_wrapper, NULL, "DTLS Server");
 
+    /*Uncommon but better be sure */
+    if (server.target.pid == EINVAL){
+      puts("ERROR: Thread invalid");
+      return;
+    }
+    if (server.target.pid == EOVERFLOW){
+      puts("ERROR: Threads overflow!");
+      return;
+    }
+
     server.demux_ctx = (uint32_t)port;
 
     if (gnrc_netreg_register(GNRC_NETTYPE_UDP, &server) == 0)
