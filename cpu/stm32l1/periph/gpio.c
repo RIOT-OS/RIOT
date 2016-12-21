@@ -171,13 +171,16 @@ int gpio_read(gpio_t pin)
 {
     GPIO_TypeDef *port = _port(pin);
     uint32_t pin_num = _pin_num(pin);
-
-    if (port->MODER & (3 << (pin_num * 2))) {   /* if configured as output */
+    uint8_t port_mode = (port->MODER & (3 << (pin_num * 2))) >> (pin_num * 2);
+    
+    if (port_mode == 1) {   /* if configured as output */
         return port->ODR & (1 << pin_num);      /* read output data reg */
     }
-    else {
-        return port->IDR & (1 << pin_num);      /* else read input data reg */
+    if (port_mode == 0) {   /* if configured as output */
+        return port->IDR & (1 << pin_num);      /* read input data reg */
     }
+    
+    return -1; /* return error if configured as AF or AIN */
 }
 
 void gpio_set(gpio_t pin)
