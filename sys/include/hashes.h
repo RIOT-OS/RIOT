@@ -7,9 +7,7 @@
  */
 
 /**
- * @ingroup     sys_hashes Hashes
- * @ingroup     sys
- * @brief       Hash function library
+ * @ingroup     sys_hashes
  * @{
  *
  * @file
