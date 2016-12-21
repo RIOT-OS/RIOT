@@ -40,7 +40,7 @@ GCC_CXX_INCLUDE_PATTERNS ?= \
 # Try to find the proper multilib directory using GCC, this may fail if a cross-
 # GCC is not installed.
 ifeq ($(GCC_MULTI_DIR),)
-  GCC_MULTI_DIR := $(shell $(PREFIX)gcc -print-multi-directory $(CFLAGS) 2>/dev/null)
+  GCC_MULTI_DIR := $(shell $(PREFIX)gcc $(CFLAGS) -print-multi-directory 2>/dev/null)
 endif
 
 # Tell clang to cross compile
@@ -57,8 +57,8 @@ export LINKFLAGS  += -target $(TARGET_ARCH)
 # previous tool chain installations.
 GCC_CXX_INCLUDES ?= \
     $(addprefix \
-        -isystem $(lastword $(sort \
-            $(foreach pat, $(GCC_CXX_INCLUDE_PATTERNS), $(wildcard $(pat))))), \
+        -isystem $(firstword \
+            $(foreach pat, $(GCC_CXX_INCLUDE_PATTERNS), $(lastword $(sort $(wildcard $(pat)))))), \
         /. /$(TARGET_ARCH)/$(GCC_MULTI_DIR) /backward \
     )
 
