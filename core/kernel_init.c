@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -24,9 +25,14 @@
 #include "kernel_init.h"
 #include "sched.h"
 #include "thread.h"
-#include "lpm.h"
 #include "irq.h"
 #include "log.h"
+
+#ifdef MODULE_PM
+#include "pm.h"
+#else
+#include "lpm.h"
+#endif
 
 #ifdef MODULE_SCHEDSTATISTICS
 #include "sched.h"
@@ -38,8 +44,6 @@
 #ifdef MODULE_AUTO_INIT
 #include <auto_init.h>
 #endif
-
-volatile int lpm_prevent_sleep = 0;
 
 extern int main(void);
 static void *main_trampoline(void *arg)
@@ -61,11 +65,19 @@ static void *main_trampoline(void *arg)
     return NULL;
 }
 
+#ifndef MODULE_PM
+volatile int lpm_prevent_sleep = 0;
+#endif
+
 static void *idle_thread(void *arg)
 {
-    (void) arg;
+    (void)arg;
 
     while (1) {
+#ifdef MODULE_PM
+        pm_set_lowest();
+#else
+        puts("oldidle");
         if (lpm_prevent_sleep) {
             lpm_set(LPM_IDLE);
         }
@@ -74,6 +86,7 @@ static void *idle_thread(void *arg)
             /* lpm_set(LPM_SLEEP); */
             /* lpm_set(LPM_POWERDOWN); */
         }
+#endif
     }
 
     return NULL;
@@ -83,7 +96,7 @@ const char *main_name = "main";
 const char *idle_name = "idle";
 
 static char main_stack[THREAD_STACKSIZE_MAIN];
-static char idle_stack[THREAD_STACKSIZE_IDLE];
+static char idle_stack[THREAD_STACKSIZE_IDLE + 2048];
 
 void kernel_init(void)
 {

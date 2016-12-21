@@ -21,8 +21,13 @@
  */
 
 #include "cpu.h"
-#include "lpm.h"
 #include "log.h"
+
+#ifdef MODULE_PM
+#include "pm.h"
+#else
+#include "lpm.h"
+#endif
 
 #ifdef DEVELHELP
 static void print_ipsr(void)
@@ -44,7 +49,12 @@ void panic_arch(void)
     __asm__("bkpt #0");
     /* enter infinite loop, into deepest possible sleep mode */
     while (1) {
+#ifdef MODULE_PM
+        pm_blocker.val_u32 = 0;
+        pm_set_lowest();
+#else
         lpm_set(LPM_OFF);
+#endif
     }
 #endif
 }

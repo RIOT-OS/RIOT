@@ -68,6 +68,13 @@ void cpu_init(void);
 void cortexm_init(void);
 
 /**
+ * @brief   Put the CPU into (deep) sleep mode, using the `WFI` instruction
+ *
+ * @param[in] deep      !=0 for deep sleep, 0 for light sleep
+ */
+void cortexm_sleep(int deep);
+
+/**
  * @brief   Prints the current content of the link register (lr)
  */
 static inline void cpu_print_last_instruction(void)

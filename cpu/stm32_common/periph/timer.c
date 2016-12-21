@@ -22,6 +22,7 @@
 #include "cpu.h"
 #include "sched.h"
 #include "thread.h"
+#include "pm.h"
 #include "periph/timer.h"
 
 /**
@@ -50,6 +51,11 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 
     /* enable the peripheral clock */
     periph_clk_en(timer_config[tim].bus, timer_config[tim].rcc_mask);
+
+    /* block low power modes only if timer was not enabled before */
+    if (!(dev(tim)->CR1 & TIM_CR1_CEN)) {
+        pm_block(PM_1_STOP);
+    }
 
     /* configure the timer as upcounter in continuous mode */
     dev(tim)->CR1  = 0;
@@ -104,11 +110,17 @@ unsigned int timer_read(tim_t tim)
 
 void timer_start(tim_t tim)
 {
+    if (!(dev(tim)->CR1 & TIM_CR1_CEN)) {
+        pm_block(PM_1_STOP);
+    }
     dev(tim)->CR1 |= TIM_CR1_CEN;
 }
 
 void timer_stop(tim_t tim)
 {
+    if (dev(tim)->CR1 & TIM_CR1_CEN) {
+        pm_unblock(PM_1_STOP);
+    }
     dev(tim)->CR1 &= ~(TIM_CR1_CEN);
 }
 

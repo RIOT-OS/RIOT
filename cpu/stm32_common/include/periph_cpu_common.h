@@ -45,6 +45,22 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   PM configuration
+ */
+#define PM_NUM_MODES        (3U)
+
+/**
+ * @brief   STM32 specific sleep modes
+ * @{
+ */
+enum {
+    PM_0_SLEEP   = 0,       /**< 'light' sleep, wakeup from any interrupt */
+    PM_1_STOP    = 1,       /**< STOP mode with voltage regulator on */
+    PM_2_STANDBY = 2        /**< STANDBY mode, voltage regulator off */
+};
+/** @} */
+
+/**
  * @brief   Available peripheral buses
  */
 typedef enum {
