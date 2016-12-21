@@ -149,6 +149,22 @@ typedef struct {
     uint8_t irqn;           /**< interrupt number of the device */
 } uart_conf_t;
 
+/**
+ * @brief   PWM channel configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< GPIO pin connected to the channel */
+    uint8_t hwchan;         /**< the HW channel used for a logical channel */
+} pwm_chan_conf_t;
+
+/**
+ * @brief   Configure the given GPIO pin to be used with the given MUX setting
+ *
+ * @param[in] pin           GPIO pin to configure
+ * @param[in] mux           MUX setting to use
+ */
+void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
+
 #ifdef __cplusplus
 }
 #endif

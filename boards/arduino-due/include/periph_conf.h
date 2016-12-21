@@ -112,34 +112,18 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name PWM configuration
+ * @brief   PWM configuration
  * @{
  */
-#define PWM_NUMOF           (1U)
-#define PWM_0_EN            (1)
-#define PWM_MAX_VALUE       (0xffff)
-#define PWM_MAX_CHANNELS    (4U)
+static const pwm_chan_conf_t pwm_chan[] = {
+    { .pin = GPIO_PIN(PC, 21), .hwchan = 4, },
+    { .pin = GPIO_PIN(PC, 22), .hwchan = 5, },
+    { .pin = GPIO_PIN(PC, 23), .hwchan = 6, },
+    { .pin = GPIO_PIN(PC, 24), .hwchan = 7, }
+};
 
-/* PWM_0 configuration */
-#define PWM_0_DEV           PWM
-#define PWM_0_PID           ID_PWM
-#define PWM_0_CHANNELS      (4U)
-#define PWM_0_DEV_CH0       (&(PWM_0_DEV->PWM_CH_NUM[4]))
-#define PWM_0_ENA_CH0       PWM_ENA_CHID4
-#define PWM_0_PORT_CH0      PIOC
-#define PWM_0_PIN_CH0       PIO_PC21B_PWML4
-#define PWM_0_DEV_CH1       (&(PWM_0_DEV->PWM_CH_NUM[5]))
-#define PWM_0_ENA_CH1       PWM_ENA_CHID5
-#define PWM_0_PORT_CH1      PIOC
-#define PWM_0_PIN_CH1       PIO_PC22B_PWML5
-#define PWM_0_DEV_CH2       (&(PWM_0_DEV->PWM_CH_NUM[6]))
-#define PWM_0_ENA_CH2       PWM_ENA_CHID6
-#define PWM_0_PORT_CH2      PIOC
-#define PWM_0_PIN_CH2       PIO_PC23B_PWML6
-#define PWM_0_DEV_CH3       (&(PWM_0_DEV->PWM_CH_NUM[7]))
-#define PWM_0_ENA_CH3       PWM_ENA_CHID7
-#define PWM_0_PORT_CH3      PIOC
-#define PWM_0_PIN_CH3       PIO_PC24B_PWML7
+#define PWM_NUMOF           (1U)
+#define PWM_CHAN_NUMOF      (sizeof(pwm_chan) / sizeof(pwm_chan[0]))
 /** @} */
 
 #ifdef __cplusplus
