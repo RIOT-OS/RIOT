@@ -82,8 +82,9 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     port->OTYPER |=  (((mode >> 4) & 0x1) << pin_num);
     /* finally set pin speed to maximum and reset output */
     port->OSPEEDR |= (3 << (2 * pin_num));
+#if defined (STM32L1XX_HD) || defined (STM32L1XX_XL)
     port->BRR = (1 << pin_num);
-
+#endif
     return 0;
 }
 
