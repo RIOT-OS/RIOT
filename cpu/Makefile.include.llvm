@@ -43,10 +43,12 @@ ifeq ($(GCC_MULTI_DIR),)
   GCC_MULTI_DIR := $(shell $(PREFIX)gcc $(CFLAGS) -print-multi-directory 2>/dev/null)
 endif
 
-# Tell clang to cross compile
-export CFLAGS     += -target $(TARGET_ARCH)
-export CXXFLAGS   += -target $(TARGET_ARCH)
-export LINKFLAGS  += -target $(TARGET_ARCH)
+ifneq (,$(TARGET_ARCH))
+  # Tell clang to cross compile
+  export CFLAGS     += -target $(TARGET_ARCH)
+  export CXXFLAGS   += -target $(TARGET_ARCH)
+  export LINKFLAGS  += -target $(TARGET_ARCH)
+endif
 
 # Use the wildcard Makefile function to search for existing directories matching
 # the patterns above. We use the -isystem gcc/clang argument to add the include
