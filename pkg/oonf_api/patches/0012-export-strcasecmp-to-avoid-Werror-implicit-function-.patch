@@ -1,0 +1,25 @@
+From 09fe8f8e97d1a7de0ce8152c4943bd4f507f462f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Cenk=20G=C3=BCndo=C4=9Fan?= <mail@cgundogan.de>
+Date: Thu, 22 Dec 2016 00:31:50 +0100
+Subject: [PATCH] export strcasecmp to avoid
+ [-Werror=implicit-function-declaration]
+
+---
+ src-api/common/string.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src-api/common/string.h b/src-api/common/string.h
+index c392ec3..d5ba064 100644
+--- a/src-api/common/string.h
++++ b/src-api/common/string.h
+@@ -109,6 +109,7 @@ EXPORT char *strarray_get(const struct strarray *array, size_t idx);
+ EXPORT size_t strarray_get_count(const struct strarray *array);
+ 
+ EXPORT int strarray_cmp(const struct strarray *a1, const struct strarray *a2);
++EXPORT int strcasecmp(const char* str1, const char* str2);
+ 
+ /**
+  * @param c character
+-- 
+2.11.0
+
