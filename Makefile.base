@@ -70,7 +70,7 @@ $(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.cpp $(RIOTBUILD_CONFIG_HEADER_C)
 	$(AD)$(CCACHE) $(CXX) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
-		$(CXXFLAGS) $(INCLUDES) $(CXXINCLUDES) -MD -MP -c -o $@ $(abspath $<)
+		$(CXXFLAGS) $(CXXINCLUDES) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
 	$(AD)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
