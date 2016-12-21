@@ -31,6 +31,9 @@ export DBG         = $(GDBPREFIX)gdb
 GCC_CXX_INCLUDE_PATTERNS ?= \
   /etc/alternatives/gcc-$(TARGET_ARCH)-include/c++/*/ \
   /usr/$(TARGET_ARCH)/include/c++/*/ \
+  /usr/lib/gcc/$(TARGET_ARCH)/*/include/g++-v8 \
+  /usr/lib/gcc/$(TARGET_ARCH)/*/include/g++-v7 \
+  /usr/lib/gcc/$(TARGET_ARCH)/*/include/g++-v6 \
   /usr/lib/gcc/$(TARGET_ARCH)/*/include/g++-v5 \
   #
 
