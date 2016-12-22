@@ -40,6 +40,17 @@
 #define SCALE       L3G4200D_SCALE_500DPS
 #define SLEEP       (100 * 1000U)
 
+static const l3g4200d_params_t p = {
+    .dev = {
+        .i2c    = TEST_L3G4200D_I2C,
+        .addr   = TEST_L3G4200D_ADDR,
+        .int1   = TEST_L3G4200D_INT,
+        .int2   = TEST_L3G4200D_DRDY,
+        .scale  = SCALE,
+    },
+    .mode = MODE,
+};
+
 int main(void)
 {
     l3g4200d_t dev;
@@ -47,8 +58,7 @@ int main(void)
 
     puts("L3G4200 gyroscope driver test application\n");
     printf("Initializing L3G4200 sensor at I2C_%i... ", TEST_L3G4200D_I2C);
-    if (l3g4200d_init(&dev, TEST_L3G4200D_I2C, TEST_L3G4200D_ADDR,
-                      TEST_L3G4200D_INT, TEST_L3G4200D_DRDY, MODE, SCALE) == 0) {
+    if (l3g4200d_init(&dev, &p) == 0) {
         puts("[OK]\n");
     }
     else {
