@@ -24,8 +24,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/gpio.h"
 
 #define ENABLE_DEBUG (0)
@@ -216,8 +214,5 @@ void isr_eic(void)
             gpio_config[i].cb(gpio_config[i].arg);
         }
     }
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

@@ -22,8 +22,6 @@
 
 #include "assert.h"
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/uart.h"
 #include "periph_conf.h"
 
@@ -141,7 +139,5 @@ void isr_uart0(void)
             config[UART_0].rx_cb(config[UART_0].arg, (uint8_t)lchar);
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

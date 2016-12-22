@@ -24,8 +24,6 @@
 #include "periph/gpio.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
-#include "thread.h"
-#include "sched.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -223,7 +221,5 @@ void isr_exti(void)
             exti_ctx[i].cb(exti_ctx[i].arg);
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

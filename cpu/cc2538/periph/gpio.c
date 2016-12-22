@@ -21,8 +21,6 @@
 #include <stdint.h>
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
@@ -534,9 +532,7 @@ void isr_gpioa(void)
         mis >>= 1;
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 /** @brief Interrupt service routine for Port B */
@@ -559,9 +555,7 @@ void isr_gpiob(void)
         mis >>= 1;
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 /** @brief Interrupt service routine for Port C */
@@ -584,9 +578,7 @@ void isr_gpioc(void)
         mis >>= 1;
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 /** @brief Interrupt service routine for Port D */
@@ -609,7 +601,5 @@ void isr_gpiod(void)
         mis >>= 1;
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

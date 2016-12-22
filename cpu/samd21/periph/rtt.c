@@ -19,8 +19,6 @@
 #include "cpu.h"
 #include "periph/rtt.h"
 #include "periph_conf.h"
-#include "sched.h"
-#include "thread.h"
 
 /* guard file in case no RTT device was specified */
 #if RTT_NUMOF
@@ -202,9 +200,7 @@ void RTT_ISR(void)
         rtcMode0->INTFLAG.bit.OVF = 1;
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 

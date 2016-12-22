@@ -22,8 +22,6 @@
 
 #include "board.h"
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/uart.h"
 #include "periph_conf.h"
 
@@ -124,9 +122,7 @@ void UART_0_ISR(void)
         reset(UART_0_DEV);
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif /* UART_0_EN */
 
@@ -148,9 +144,7 @@ void UART_1_ISR(void)
         reset(UART_1_DEV);
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif /* UART_1_EN */
 

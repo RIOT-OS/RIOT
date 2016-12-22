@@ -20,8 +20,6 @@
 #include <stdint.h>
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph_conf.h"
 #include "periph/timer.h"
 
@@ -166,9 +164,7 @@ void TIMER_0_ISR(void)
         TIMER_0_DEV->MCR &= ~(1 << 9);
         config[TIMER_0].cb(config[TIMER_0].arg, 3);
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #endif /* TIMER_0_EN */

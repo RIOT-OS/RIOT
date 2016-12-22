@@ -19,8 +19,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 
 #include "periph/uart.h"
 #include "periph/gpio.h"
@@ -104,9 +102,7 @@ static inline void rx_irq(int dev)
         uint8_t data = (uint8_t)_uart(dev)->RXDATA;
         isr_ctx[dev].rx_cb(isr_ctx[dev].arg, data);
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef UART_0_ISR_RX

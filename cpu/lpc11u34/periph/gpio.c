@@ -19,7 +19,6 @@
  */
 
 #include "cpu.h"
-#include "thread.h"
 #include "periph/gpio.h"
 
 /* Static IOCON registers definition */
@@ -463,9 +462,7 @@ static inline void isr_common(uint8_t int_id) {
     LPC_GPIO_PIN_INT->IST |= (1 << int_id); /* Clear pending interrupt */
     gpio_config[int_id].cb(gpio_config[int_id].arg);
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 void isr_pinint0(void)

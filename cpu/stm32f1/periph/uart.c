@@ -27,9 +27,6 @@
 #include "periph/uart.h"
 #include "periph/gpio.h"
 
-#include "sched.h"
-#include "thread.h"
-
 /**
  * @brief Allocate memory to store the callback functions.
  */
@@ -112,9 +109,7 @@ static inline void irq_handler(uart_t uart)
         /* ORE is cleared by reading SR and DR sequentially */
         dev(uart)->DR;
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef UART_0_ISR

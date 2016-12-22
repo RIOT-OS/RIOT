@@ -27,8 +27,6 @@
 #include "mutex.h"
 #include "periph/spi.h"
 #include "periph_conf.h"
-#include "thread.h"
-#include "sched.h"
 
 /* guard file in case no SPI device is defined */
 #if SPI_NUMOF

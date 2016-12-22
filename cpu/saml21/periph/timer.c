@@ -31,8 +31,6 @@
 #include "periph/timer.h"
 #include "periph_conf.h"
 
-#include "sched.h"
-#include "thread.h"
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
@@ -238,9 +236,6 @@ void TIMER_0_ISR(void)
             config[TIMER_0].cb(config[TIMER_0].arg, 1);
         }
     }
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif /* TIMER_0_EN */

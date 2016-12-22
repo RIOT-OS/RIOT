@@ -22,8 +22,6 @@
  * @}
  */
 
-#include "sched.h"
-#include "thread.h"
 #include "periph/timer.h"
 
 #define F_TIMER             (16000000U)     /* the timer is clocked at 16MHz */
@@ -164,9 +162,7 @@ static inline void irq_handler(int num)
             }
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef TIMER_0_ISR

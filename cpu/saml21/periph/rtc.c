@@ -20,8 +20,6 @@
 #include "cpu.h"
 #include "periph/rtc.h"
 #include "periph_conf.h"
-#include "sched.h"
-#include "thread.h"
 
 /* guard file in case no RTC device was specified */
 #if RTC_NUMOF
@@ -231,9 +229,7 @@ void isr_rtc(void)
         * Start RTC again with reference_year 64 years more (Be careful with alarm set) */
         reference_year += 64;
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #endif /* RTC_NUMOF */

@@ -22,7 +22,6 @@
 #include <stdint.h>
 #include "periph/rtt.h"
 #include "board.h"
-#include "thread.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -143,8 +142,5 @@ void isr_rtc(void)
             _cmp0_cb(_cmp0_arg);
         }
     }
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

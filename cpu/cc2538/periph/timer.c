@@ -23,8 +23,6 @@
 
 #include "board.h"
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/timer.h"
 #include "periph_conf.h"
 
@@ -332,9 +330,7 @@ static void irq_handler_a(int n) {
         config[n].cb(config[n].arg, 0);
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 static void irq_handler_b(int n) {
@@ -357,9 +353,7 @@ static void irq_handler_b(int n) {
         config[n].cb(config[n].arg, 1);
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 void isr_timer0_chan0(void) {irq_handler_a(0);}

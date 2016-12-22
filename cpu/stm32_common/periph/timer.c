@@ -20,8 +20,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/timer.h"
 
 /**
@@ -132,9 +130,7 @@ static inline void irq_handler(tim_t tim)
             isr_ctx[tim].cb(isr_ctx[tim].arg, i);
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef TIMER_0_ISR

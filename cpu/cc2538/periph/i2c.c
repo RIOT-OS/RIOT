@@ -24,8 +24,8 @@
 #include <stdint.h>
 
 #include "mutex.h"
+#include "cpu.h"
 #include "periph/i2c.h"
-#include "sched.h"
 #include "thread.h"
 #ifdef MODULE_XTIMER
 #include "xtimer.h"
@@ -210,9 +210,7 @@ void isr_i2c(void)
     /* Unlock the wait mutex */
     mutex_unlock(&i2c_wait_mutex);
 
-        if (sched_context_switch_request) {
-            thread_yield();
-        }
+    cortexm_isr_end();
 }
 
 void cc2538_i2c_init_master(uint32_t speed_hz)

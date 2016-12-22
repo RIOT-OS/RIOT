@@ -27,8 +27,6 @@
 
 #include "cpu.h"
 #include "board.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph_conf.h"
 #include "periph/timer.h"
 
@@ -324,9 +322,7 @@ inline static void pit_irq_handler(tim_t dev)
 
     PIT->CHANNEL[ch].TFLG = PIT_TFLG_TIF_MASK;
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 /* ****** LPTMR module functions ****** */
@@ -572,9 +568,7 @@ inline static void lptmr_irq_handler(tim_t tim)
     /* Clear interrupt flag */
     BITBAND_REG32(hw->CSR, LPTMR_CSR_TCF_SHIFT) = 1;
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 /* ****** Common timer API functions ****** */

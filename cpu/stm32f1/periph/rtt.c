@@ -19,8 +19,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/rtt.h"
 #include "periph_conf.h"
 
@@ -197,9 +195,7 @@ void RTT_ISR(void)
         RTT_DEV->CRL &= ~(RTC_CRL_OWF);
         overflow_cb(overflow_arg);
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #endif /* RTT_NUMOF */
