@@ -17,10 +17,10 @@ all: $(BINDIR)/$(MODULE).a ..nothing
 clean:: ${DIRS:%=CLEAN--%}
 
 ${DIRS:%=ALL--%}:
-	"$(MAKE)" -C ${@:ALL--%=%}
+	$(QQ)"$(MAKE)" -C ${@:ALL--%=%}
 
 ${DIRS:%=CLEAN--%}:
-	"$(MAKE)" -C ${@:CLEAN--%=%} clean
+	$(QQ)"$(MAKE)" -C ${@:CLEAN--%=%} clean
 
 ifeq ($(strip $(SRC)),)
     SRC := $(filter-out $(SRC_NOLTO), $(wildcard *.c))

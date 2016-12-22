@@ -89,6 +89,8 @@ else
   Q=
 endif
 
+QQ=
+
 # Fail on warnings. Can be overridden by `make WERROR=0`.
 WERROR ?= 1
 export WERROR
@@ -211,6 +213,8 @@ ifeq ($(RIOT_CI_BUILD),1)
         $(info CI-build: skipping link step)
         RIOTNOLINK:=1
     endif
+    # be more quiet when building for CI
+    QQ:=@
 endif
 
 # if you want to publish the board into the sources as an uppercase #define
@@ -315,7 +319,7 @@ INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 .PHONY: $(USEPKG:%=${BINDIR}/%.a)
 $(USEPKG:%=${BINDIR}/%.a): $(RIOTBUILD_CONFIG_HEADER_C)
 	@mkdir -p ${BINDIR}
-	"$(MAKE)" -C $(RIOTPKG)/$(patsubst ${BINDIR}/%.a,%,$@)
+	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(patsubst ${BINDIR}/%.a,%,$@)
 
 clean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i clean ; done
