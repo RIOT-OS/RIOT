@@ -57,7 +57,7 @@ CFLAGS += -DDTLSv12 -DWITH_SHA256
 CFLAGS += -DDTLS_PSK
 
 # NOTE: This adds support for TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8
-CFLAGS += -DDTLS_ECC
+#CFLAGS += -DDTLS_ECC
 
 # NOTE: If enabled TinyDTLS' log are disabled (if memory is a issue).
 # WARNING: Sometimes the log leads to Stack pointer corrupted.
