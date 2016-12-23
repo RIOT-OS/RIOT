@@ -91,6 +91,25 @@ static void clk_init(void)
     /* set main PLL division factor for USB OTG FS, SDIO and RNG clocks */
     RCC->PLLCFGR |= (CLOCK_PLL_Q & 0x0F) << 24;
 
+#ifdef ENABLE_PLLI2S_MCO2
+    /* reset PLL I2S config register */
+    RCC->PLLI2SCFGR = 0x00000000U;
+    /* set PLL I2S division factor */
+    RCC->PLLI2SCFGR |= (CLOCK_PLL_I2S_R & 0x07) << 28;
+    /* set PLL I2S multiplication factor */
+    RCC->PLLI2SCFGR |= (CLOCK_PLL_I2S_N & 0x1FF) << 6;
+
+    /* MCO2 output is PLLI2S */
+    RCC->CFGR |= (uint32_t) RCC_CFGR_MCO2_0;
+    RCC->CFGR &= ~(uint32_t) RCC_CFGR_MCO2_1;
+    /* MCO2 prescaler div by 5 */
+    RCC->CFGR |= (uint32_t) ((CLOCK_MC02_PRE + 4 - 2) & 0x7) << 27;
+    /* enable PLL I2S clock */
+    RCC->CR |= RCC_CR_PLLI2SON;
+    /* wait till PLL I2S clock is ready */
+    while ((RCC->CR & RCC_CR_PLLI2SRDY) == 0) {}
+#endif
+
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
     /* Wait till PLL is ready */
