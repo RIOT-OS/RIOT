@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = crypto-benchmark
+APPLICATION = crypto_benchmark
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -7,17 +7,15 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-# Include packages
+# Include packages.
 USEMODULE += crypto
 USEMODULE += hashes
+USEMODULE += xtimer
 
-# Required features
-FEATURES_REQUIRED = periph_rtt
-
-# Optional features
+# Optional features.
 FEATURES_OPTIONAL = periph_hwcrypto
 
-# By defining CRYPTO_THREEDES, cipher_context_t has biggest context of the
+# By defining CRYPTO_THREEDES, cipher_context_t has largest context size of the
 # supported software ciphers.
 CFLAGS += -DCRYPTO_THREEDES
 

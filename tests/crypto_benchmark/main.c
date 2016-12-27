@@ -20,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "crypto/3des.h"
 #include "crypto/aes.h"
@@ -29,23 +30,28 @@
 #include "hashes/sha1.h"
 #include "hashes/sha256.h"
 
-#include "periph/rtt.h"
 #include "periph/hwcrypto.h"
 
-/**
- * @brief   Dummy data buffer (don't care about contents). Must be aligned for
- *          performance reasons.
- */
-static hwcrypto_block_t data[32];
+#include "xtimer.h"
 
 /**
- * @brief   Dummy key (don't care about actual key). Must be aligned for
- *          performance reasons.
+ * @brief   Dummy data buffer (don't care about data).
  */
-static hwcrypto_block_t key[32];
+static uint8_t data[32] __attribute__((aligned));
 
 /**
- * @brief   Global flag to stop benchmark that is set when alarm is triggered.
+ * @brief   Dummy key (don't care about actual key).
+ */
+static uint8_t key[32] __attribute__((aligned));
+
+/**
+ * @brief   Benchmark timer
+ */
+static xtimer_t timer;
+
+/**
+ * @brief   Global flag to stop a running benchmark. Is set when alarm is
+ *          triggered.
  */
 static volatile bool stop;
 
@@ -54,22 +60,24 @@ static volatile bool stop;
  */
 static void benchmark_cb(void *arg)
 {
+    (void) arg;
+
+    xtimer_remove(&timer);
+
     stop = true;
 }
 
 /**
- * @brief   Prepare RTT benchmark.
+ * @brief   Prepare benchmark timer.
  */
 static void benchmark_start(uint32_t duration)
 {
-    uint32_t timeout;
-
-    /* clear stop flag */
     stop = false;
 
-    /* schedule alarm */
-    timeout = rtt_get_counter() + (duration * RTT_FREQUENCY);
-    rtt_set_alarm(timeout, benchmark_cb, 0);
+    timer.callback = benchmark_cb;
+    timer.arg = NULL;
+
+    xtimer_set(&timer, duration * SEC_IN_USEC);
 }
 
 static uint32_t benchmark_crypto_3des(uint32_t duration)
@@ -195,21 +203,20 @@ static uint32_t benchmark_crypto_sha256(uint32_t duration)
 #ifdef HAVE_HWCRYPTO_AES128
 static uint32_t benchmark_hwcrypto_aes128(uint32_t duration)
 {
-    hwcrypto_cipher_context_t context;
+    hwcrypto_cipher_aes128_context_t context;
     uint32_t ops = 0;
 
     /* prepare cipher */
     hwcrypto_init();
-    hwcrypto_cipher_init(&context, HWCRYPTO_AES128);
-    hwcrypto_cipher_set(&context, HWCRYPTO_OPT_MODE, HWCRYPTO_MODE_ECB, sizeof(hwcrypto_mode_t));
-    hwcrypto_cipher_set(&context, HWCRYPTO_OPT_KEY, key, 16);
+    hwcrypto_cipher_init((hwcrypto_cipher_context_t *) &context, HWCRYPTO_AES128, HWCRYPTO_MODE_ECB);
+    hwcrypto_cipher_set((hwcrypto_cipher_context_t *) &context, HWCRYPTO_OPT_KEY, key, 16);
 
     /* prepare alarm */
     benchmark_start(duration);
 
     /* run the benchmark until alarm triggers */
     while (!stop) {
-        hwcrypto_cipher_encrypt(&context, data, data, 16);
+        hwcrypto_cipher_encrypt((hwcrypto_cipher_context_t *) &context, data, data, 16);
         ops++;
     }
 
@@ -220,21 +227,20 @@ static uint32_t benchmark_hwcrypto_aes128(uint32_t duration)
 #ifdef HAVE_HWCRYPTO_AES256
 static uint32_t benchmark_hwcrypto_aes256(uint32_t duration)
 {
-    hwcrypto_cipher_context_t context;
+    hwcrypto_cipher_aes256_context_t context;
     uint32_t ops = 0;
 
     /* prepare cipher */
     hwcrypto_init();
-    hwcrypto_cipher_init(&context, HWCRYPTO_AES256);
-    hwcrypto_cipher_set(&context, HWCRYPTO_OPT_MODE, HWCRYPTO_MODE_ECB, sizeof(hwcrypto_mode_t));
-    hwcrypto_cipher_set(&context, HWCRYPTO_OPT_KEY, key, 32);
+    hwcrypto_cipher_init((hwcrypto_cipher_context_t *) &context, HWCRYPTO_AES256, HWCRYPTO_MODE_ECB);
+    hwcrypto_cipher_set((hwcrypto_cipher_context_t *) &context, HWCRYPTO_OPT_KEY, key, 32);
 
     /* prepare alarm */
     benchmark_start(duration);
 
     /* run the benchmark until alarm triggers */
     while (!stop) {
-        hwcrypto_cipher_encrypt(&context, data, data, 16);
+        hwcrypto_cipher_encrypt((hwcrypto_cipher_context_t *) &context, data, data, 16);
         ops++;
     }
 
@@ -245,19 +251,19 @@ static uint32_t benchmark_hwcrypto_aes256(uint32_t duration)
 #ifdef HAVE_HWCRYPTO_SHA1
 static uint32_t benchmark_hwcrypto_sha1(uint32_t duration)
 {
-    hwcrypto_hash_context_t context;
+    hwcrypto_hash_sha1_context_t context;
     uint32_t ops = 0;
 
     /* prepare cipher */
     hwcrypto_init();
-    hwcrypto_hash_init(&context, HWCRYPTO_SHA1);
+    hwcrypto_hash_init((hwcrypto_hash_context_t *) &context, HWCRYPTO_SHA1);
 
     /* prepare alarm */
     benchmark_start(duration);
 
     /* run the benchmark until alarm triggers */
     while (!stop) {
-        hwcrypto_hash_update(&context, data, 20);
+        hwcrypto_hash_update((hwcrypto_hash_context_t *) &context, data, 20);
         ops++;
     }
 
@@ -268,19 +274,19 @@ static uint32_t benchmark_hwcrypto_sha1(uint32_t duration)
 #ifdef HAVE_HWCRYPTO_SHA256
 static uint32_t benchmark_hwcrypto_sha256(uint32_t duration)
 {
-    hwcrypto_hash_context_t context;
+    hwcrypto_hash_sha256_context_t context;
     uint32_t ops = 0;
 
     /* prepare cipher */
     hwcrypto_init();
-    hwcrypto_hash_init(&context, HWCRYPTO_SHA256);
+    hwcrypto_hash_init((hwcrypto_hash_context_t *) &context, HWCRYPTO_SHA256);
 
     /* prepare alarm */
     benchmark_start(duration);
 
     /* run the benchmark until alarm triggers */
     while (!stop) {
-        hwcrypto_hash_update(&context, data, 32);
+        hwcrypto_hash_update((hwcrypto_hash_context_t *) &context, data, 32);
         ops++;
     }
 
@@ -293,49 +299,46 @@ int main(void)
     uint32_t duration = 10;
     uint32_t ops;
 
-    /* prepare ticker */
-    rtt_init();
-
     /* run tests */
-    puts("Starting benchmarks.\n");
+    puts("Starting benchmarks.");
 
     ops = benchmark_crypto_3des(duration);
-    printf("CRYPTO 3DES: completed %lu ops in %lu seconds.\n", ops, duration);
+    printf("CRYPTO 3DES: completed %" PRIu32 " ops in %" PRIu32 " seconds, %" PRIu32 " ops/sec.\n", ops, duration, ops / duration);
 
     ops = benchmark_crypto_aes128(duration);
-    printf("CRYPTO AES128: completed %lu ops in %lu seconds.\n", ops, duration);
+    printf("CRYPTO AES128: completed %" PRIu32 " ops in %" PRIu32 " seconds, %" PRIu32 " ops/sec\n", ops, duration, ops / duration);
 
     ops = benchmark_crypto_twofish(duration);
-    printf("CRYPTO TWOFISH: completed %lu ops in %lu seconds.\n", ops, duration);
+    printf("CRYPTO TWOFISH: completed %" PRIu32 " ops in %" PRIu32 " seconds, %" PRIu32 " ops/sec\n", ops, duration, ops / duration);
 
     ops = benchmark_crypto_md5(duration);
-    printf("CRYPTO MD5: completed %lu ops in %lu seconds.\n", ops, duration);
+    printf("CRYPTO MD5: completed %" PRIu32 " ops in %" PRIu32 " seconds, %" PRIu32 " ops/sec\n", ops, duration, ops / duration);
 
     ops = benchmark_crypto_sha1(duration);
-    printf("CRYPTO SHA1: completed %lu ops in %lu seconds.\n", ops, duration);
+    printf("CRYPTO SHA1: completed %" PRIu32 " ops in %" PRIu32 " seconds, %" PRIu32 " ops/sec\n", ops, duration, ops / duration);
 
     ops = benchmark_crypto_sha256(duration);
-    printf("CRYPTO SHA256: completed %lu ops in %lu seconds.\n", ops, duration);
+    printf("CRYPTO SHA256: completed %" PRIu32 " ops in %" PRIu32 " seconds, %" PRIu32 " ops/sec\n", ops, duration, ops / duration);
 
 #ifdef HAVE_HWCRYPTO_AES128
     ops = benchmark_hwcrypto_aes128(duration);
-    printf("HWCRYPTO AES128: completed %lu ops in %lu seconds.\n", ops, duration);
+    printf("HWCRYPTO AES128: completed %" PRIu32 " ops in %" PRIu32 " seconds, %" PRIu32 " ops/sec\n", ops, duration, ops / duration);
 #endif
 
 #ifdef HAVE_HWCRYPTO_AES256
     ops = benchmark_hwcrypto_aes256(duration);
-    printf("HWCRYPTO AES256: completed %lu ops in %lu seconds.\n", ops, duration);
+    printf("HWCRYPTO AES256: completed %" PRIu32 " ops in %" PRIu32 " seconds, %" PRIu32 " ops/sec\n", ops, duration, ops / duration);
 #endif
 
 #ifdef HAVE_HWCRYPTO_SHA1
     ops = benchmark_hwcrypto_sha1(duration);
-    printf("HWCRYPTO SHA1: completed %lu ops in %lu seconds.\n", ops, duration);
+    printf("HWCRYPTO SHA1: completed %" PRIu32 " ops in %" PRIu32 " seconds, %" PRIu32 " ops/sec\n", ops, duration, ops / duration);
 #endif
 
 #ifdef HAVE_HWCRYPTO_SHA256
     ops = benchmark_hwcrypto_sha256(duration);
-    printf("HWCRYPTO SHA256: completed %lu ops in %lu seconds.\n", ops, duration);
+    printf("HWCRYPTO SHA256: completed %" PRIu32 " ops in %" PRIu32 " seconds, %" PRIu32 " ops/sec\n", ops, duration, ops / duration);
 #endif
 
-    puts("Benchmarks done!\n");
+    puts("Benchmarks done!");
 }
