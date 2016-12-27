@@ -36,7 +36,7 @@ for FILE in ${FILES}; do
         | sed -e 's/$/ /' \
         | tr -d '\r\n' \
         | sed -e 's/  */ /g' \
-        | grep -v -q '#ifdef __cplusplus extern "C" { #endif'; \
+        | grep -v -q '#ifdef __cplusplus extern "C" {'; \
     then
         EXIT_CODE=1
         echo "file does not have a C++ compatible header: '${FILE}'"
