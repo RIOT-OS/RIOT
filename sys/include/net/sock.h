@@ -63,7 +63,7 @@
  * network stack it uses.
  * The network stack used under the bonnet is specified by including the
  * appropriate module (for example `USEMODULE += gnrc_sock_udp` for
- * [GNRC's](net_gnrc) version of this API).
+ * [GNRC's](@ref net_gnrc) version of this API).
  *
  * This allows for network stack agnostic code on the application layer.
  * The application code to establish a connection is always the same, allowing
