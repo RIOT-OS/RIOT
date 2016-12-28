@@ -1,7 +1,7 @@
 From 43f6e427f934a72d76d3874b5862745ac75bcc35 Mon Sep 17 00:00:00 2001
 From: Mathias Tausig <mathias.tausig@fh-campuswien.ac.at>
 Date: Tue, 25 Oct 2016 10:39:50 +0200
-Subject: [PATCH 2/2] Altered configuration to reduce the size of the binary
+Subject: [PATCH 2/3] Altered configuration to reduce the size of the binary
 
 ---
  src/headers/tfm.h | 72 +++++++++++++++++++++++++++----------------------------
