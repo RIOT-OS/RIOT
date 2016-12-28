@@ -4,6 +4,8 @@ BOARD ?= native
 
 RIOTBASE ?= $(CURDIR)/../..
 
+BOARD_INSUFFICIENT_MEMORY := nucleo-f042
+
 USEMODULE += gnrc_sock_check_reuse
 USEMODULE += gnrc_sock_udp
 USEMODULE += gnrc_ipv6
