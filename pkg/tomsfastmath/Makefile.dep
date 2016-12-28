@@ -1,0 +1,4 @@
+# tomsfastmath requires a 32-bit architecture
+BOARD_BLACKLIST = arduino-duemilanove arduino-mega2560 arduino-uno chronos \
+                  msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b wsn430-v1_4 \
+                  z1 
