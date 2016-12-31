@@ -28,6 +28,11 @@
 #include "at86rf2xx_params.h"
 #endif
 
+#ifdef MODULE_MRF24J40
+#include "mrf24j40.h"
+#include "mrf24j40_params.h"
+#endif
+
 #include "lwip.h"
 
 #define ENABLE_DEBUG    (0)
@@ -39,6 +44,10 @@
 
 #ifdef MODULE_AT86RF2XX     /* is mutual exclusive with above ifdef */
 #define LWIP_NETIF_NUMOF        (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
+#endif
+
+#ifdef MODULE_MRF24J40     /* is mutual exclusive with above ifdef */
+#define LWIP_NETIF_NUMOF        (sizeof(mrf24j40_params) / sizeof(mrf24j40_params[0]))
 #endif
 
 #ifdef LWIP_NETIF_NUMOF
@@ -53,6 +62,10 @@ static netdev2_tap_t netdev2_taps[LWIP_NETIF_NUMOF];
 static at86rf2xx_t at86rf2xx_devs[LWIP_NETIF_NUMOF];
 #endif
 
+#ifdef MODULE_MRF24J40
+static mrf24j40_t mrf24j40_devs[LWIP_NETIF_NUMOF];
+#endif
+
 void lwip_bootstrap(void)
 {
     /* TODO: do for every eligable netdev2 */
@@ -63,6 +76,15 @@ void lwip_bootstrap(void)
         if (netif_add(&netif[i], &netdev2_taps[i], lwip_netdev2_init,
                       tcpip_input) == NULL) {
             DEBUG("Could not add netdev2_tap device\n");
+            return;
+        }
+    }
+#elif defined(MODULE_MRF24J40)
+    for (int i = 0; i < LWIP_NETIF_NUMOF; i++) {
+        mrf24j40_setup(&mrf24j40_devs[i], &mrf24j40_params[i]);
+        if (netif_add(&netif[i], &mrf24j40_devs[i], lwip_netdev2_init,
+                      tcpip_6lowpan_input) == NULL) {
+            DEBUG("Could not add mrf24j40 device\n");
             return;
         }
     }
