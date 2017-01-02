@@ -114,7 +114,7 @@ static void dtls_handle_read(dtls_context_t *ctx, gnrc_pktsnip_t *pkt)
     tmp2 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UDP);
     udp_hdr_t *udp = (udp_hdr_t *)tmp2->data;
 
-    session.size = sizeof(ipv6_addr_t) + sizeof(unsigned short);
+    session.size = sizeof(uint8_t)*16 + sizeof(unsigned short);
     session.port = byteorder_ntohs(udp->src_port);
 
     ipv6_addr_from_str(&session.addr, addr_str);
