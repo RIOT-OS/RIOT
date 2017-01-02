@@ -23,5 +23,5 @@ Vagrant.configure(2) do |config|
   end
 # use a custom provisioning script
 # config.vm.provision "shell", path: "dist/tools/vagrant/bootstrap.sh"
-  config.vm.provision "shell", inline: "wget -q -O /usr/local/bin/git-cache 'https://raw.githubusercontent.com/kaspar030/git-cache/master/git-cache' && chmod +x /usr/local/bin/git-cache && git cache init" # set up and initialize git-cache
+  config.vm.provision "shell", inline: "mv RIOT/dist/tools/git/git-cache /usr/local/bin/ && git cache init" # set up and initialize git-cache
 end
