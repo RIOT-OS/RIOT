@@ -19,10 +19,11 @@ license.
 ## Terminology
 This memo uses the following terminology and acronyms:
 
-- embUnit: a unittest framework for C that is used by RIOT to write unittests
+- embUnit: a unittest framework for C that is used by RIOT to write unittests.
 - pexpect: a python library to interact with the stdio of command-line
-  application
-- CI
+  application.
+- CI system: CI = Continuous Intergration, platform for automated building and
+  testing of provided changes.
 
 ## 1. Introduction
 At the moment of writing there are two strategies for testing: providing a
