@@ -37,6 +37,9 @@ node communicate over the network. From lowest level to highest these are:
 - sock APIs
 - POSIX socket API
 
+Additionally to communicate with a network device driver directly there is
+[`netdev`](http://doc.riot-os.org/group__drivers__netdev__netdev2.html).
+
 Choosing the right API and understanding why the others exist is crucial to
 implement a memory efficient application or networking module in RIOT. As such
 gives this document a recommendation on which API to use based on their
@@ -87,6 +90,8 @@ communication. POSIX sockets shall only be used if a third-party library or
 application is ported to RIOT. `netapi` is recommended for very restricted
 use-cases, where even `sock` is too general or implementations of new modules to
 GNRC.
+`netdev` should only be used for RAW link-layer communication and implementation
+of MAC protocols.
 
 ## Acknowledgements
 TODO
