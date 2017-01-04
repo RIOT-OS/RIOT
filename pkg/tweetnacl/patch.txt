@@ -1,0 +1,16 @@
+--- /dev/null	2016-07-17 11:00:05.792006406 +0200
++++ Makefile	2016-07-25 08:48:09.963160991 +0200
+@@ -0,0 +1,13 @@
++IGNORE_CFLAGS = -Wall -Wextra -pedantic
++LOCAL_CFLAGS = $(filter-out $(IGNORE_CFLAGS),$(CFLAGS))
++
++all : tweetnacl.a
++
++tweetnacl.a : tweetnacl.o
++	$(AD) $(AR) rc tweetnacl.a tweetnacl.o
++
++tweetnacl.o : tweetnacl.c
++	$(AD) $(CC) -c $(LOCAL_CFLAGS) -o tweetnacl.o tweetnacl.c
++
++clean :
++	rm *.o *.a
