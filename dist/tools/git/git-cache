@@ -72,7 +72,11 @@ drop() {
 }
 
 _check_commit() {
-    git_cache cat-file -e ${1}^{commit}
+    if [ -d "${GIT_CACHE_DIR}" ]; then
+        git_cache cat-file -e ${1}^{commit}
+    else
+        false
+    fi
 }
 
 _remote_name() {
@@ -98,7 +102,7 @@ clone() {
         git_cache tag commit$SHA1 $SHA1 || true # ignore possibly already existing tag
         git clone --reference "${GIT_CACHE_DIR}" "${GIT_CACHE_DIR}" "${TARGET_PATH}" --branch commit$SHA1
     else
-        git clone --reference "${GIT_CACHE_DIR}" "${REMOTE}" "${TARGET_PATH}"
+        git clone "${REMOTE}" "${TARGET_PATH}"
         git -C "${TARGET_PATH}" checkout $SHA1
     fi
     set +e
