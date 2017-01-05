@@ -158,15 +158,15 @@ int adc_init(adc_t line)
      * than 12 MHz */
     /* For the calibration it is important that the ADC clock is <= 4 MHz */
     uint32_t adiv;
-    int i = 4;
-    if (CLOCK_BUSCLOCK > (ADC_MAX_CLK * 8)) {
+    if (CLOCK_BUSCLOCK > (ADC_MAX_CLK << 3)) {
         adiv = ADC_CFG1_ADIV(3) | ADC_CFG1_ADICLK(1);
     }
     else {
-        while ((i > 0) && (CLOCK_BUSCLOCK < (ADC_MAX_CLK * i))) {
-            i--;
+        unsigned int i = 0;
+        while ((i < 3) && (CLOCK_BUSCLOCK > (ADC_MAX_CLK << i))) {
+            ++i;
         }
-        adiv = ADC_CFG1_ADIV(i - 1);
+        adiv = ADC_CFG1_ADIV(i);
     }
 
     /* set configuration register 1: clocking and precision */
