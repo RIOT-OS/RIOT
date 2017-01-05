@@ -53,8 +53,15 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     dev(tim)->CR1  = 0;
     dev(tim)->CR2  = 0;
     dev(tim)->ARR  = timer_config[tim].max;
-    /* set prescaler */
+    /* set prescaler: the STM32F1 and STM32F2 introduce a clock multiplier of 2
+     * in the case the APB1 prescaler is != 1, so we need to catch this
+     * -> see reference manual section 7.2.1 and section 5.2, respectively */
+#if (defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2)) \
+    && (CLOCK_APB1 < CLOCK_CORECLOCK)
+    dev(tim)->PSC = (((periph_apb_clk(timer_config[tim].bus) * 2) / freq) - 1);
+#else
     dev(tim)->PSC = ((periph_apb_clk(timer_config[tim].bus) / freq) - 1);
+#endif
     /* generate an update event to apply our configuration */
     dev(tim)->EGR = TIM_EGR_UG;
 
