@@ -72,7 +72,7 @@ int jc42_get_temperature(jc42_t* dev, uint16_t* temperature)
     uint16_t tmp;
 
     /* Read temperature */
-    if(jc42_get_register(dev, JC42_REG_TEMP, &tmp) != 0) {
+    if (jc42_get_register(dev, JC42_REG_TEMP, &tmp) != 0) {
         return JC42_NODEV;
     }
     tmp = NTOHS(tmp);
@@ -87,7 +87,7 @@ int jc42_init(jc42_t* dev, jc42_params_t* params)
     dev->i2c = params->i2c;
     dev->addr = params->addr;
     i2c_acquire(dev->i2c);
-    if(i2c_init_master(dev->i2c, params->speed) != 0) {
+    if (i2c_init_master(dev->i2c, params->speed) != 0) {
         DEBUG("[jc42] Problem initializing I2C master\n");
         i2c_release(dev->i2c);
         return JC42_NOI2C;
@@ -95,7 +95,7 @@ int jc42_init(jc42_t* dev, jc42_params_t* params)
     i2c_release(dev->i2c);
 
     /* Poll the device, fail if unavailable */
-    if(jc42_get_config(dev, &config) != 0) {
+    if (jc42_get_config(dev, &config) != 0) {
         return JC42_NODEV;
     }
 
