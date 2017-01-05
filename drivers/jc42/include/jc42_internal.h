@@ -27,8 +27,8 @@ extern "C" {
  * @name JC42 register addresses
  * @{
  */
-#define JC42_REG_CAP           	        (0x00)
-#define JC42_REG_CONFIG        	        (0x01)
+#define JC42_REG_CAP                    (0x00)
+#define JC42_REG_CONFIG                 (0x01)
 #define JC42_REG_TEMP_UPPER             (0x02)
 #define JC42_REG_TEMP_LOWER             (0x03)
 #define JC42_REG_TEMP_CRITICAL          (0x04)
@@ -36,7 +36,7 @@ extern "C" {
 #define JC42_REG_MANID                  (0x06)
 #define JC42_REG_DEVICEID               (0x07)
 
-#define jc42_BUS_FREE_TIME_US		(1)
+#define jc42_BUS_FREE_TIME_US           (1)
 /** @} */
 
 

@@ -43,8 +43,8 @@ extern "C" {
 #endif
 
 #define JC42_PARAMS_DEFAULT        {.i2c = JC42_PARAM_I2C_DEV,  \
-                                      .speed    = JC42_PARAM_SPEED, \
-                                      .addr     = JC42_PARAM_ADDR }
+                                    .speed    = JC42_PARAM_SPEED, \
+                                    .addr     = JC42_PARAM_ADDR }
 /**@}*/
 
 /**
