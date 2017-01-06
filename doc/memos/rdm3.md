@@ -5,8 +5,7 @@ Date: January 2017
 
 ***
 
-Network programming guide
-=========================
+# Network programming guide
 
 ## Abstract
 This memo describes and justifies the usage and existence of RIOT's various
