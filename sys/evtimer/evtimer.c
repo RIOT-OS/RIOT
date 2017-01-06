@@ -75,7 +75,7 @@ static void _set_timer(xtimer_t *timer, uint32_t offset)
     uint64_t offset_in_us = (uint64_t)offset * 1000;
 
     DEBUG("evtimer: now=%" PRIu32 " setting xtimer to %" PRIu32 ":%" PRIu32 "\n",
-          xtimer_now_usec32(), (uint32_t)(offset_in_us >> 32),
+          xtimer_now_usec(), (uint32_t)(offset_in_us >> 32),
           (uint32_t)(offset_in_us));
     _xtimer_set64(timer, offset_in_us, offset_in_us >> 32);
 }
@@ -93,7 +93,7 @@ static void _update_timer(evtimer_t *evtimer)
 
 static uint32_t _get_offset(xtimer_t *timer)
 {
-    uint64_t now = xtimer_now64();
+    uint64_t now = xtimer_now_usec64();
     uint64_t target = ((uint64_t)timer->long_target) << 32 | timer->target;
 
     if (target <= now) {
