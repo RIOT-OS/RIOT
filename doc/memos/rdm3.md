@@ -3,6 +3,8 @@ Developer Memo: 3
 Author(s): Martine Lenders
 Date: January 2017
 
+***
+
 Network programming guide
 =========================
 
