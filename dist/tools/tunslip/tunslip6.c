@@ -34,6 +34,9 @@
 
 /* Below define allows importing saved output into Wireshark as "Raw IP" packet type */
 #define WIRESHARK_IMPORT_FORMAT 1
+/* for cfmakeraw on Linux */
+#define _BSD_SOURCE 1
+#define _DEFAULT_SOURCE 1
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -144,20 +147,36 @@ stamptime(void)
 }
 
 int
-is_sensible_string(const unsigned char *s, int len)
+is_sensible_string(const unsigned char *s, size_t len)
 {
-    int i;
+    if(len > 0) {
+        if (s[0] == 0x60) {
+            /* Possibly IPv6 packet with default traffic class, assume non-printable */
+            return 0;
+        }
+    }
 
-    for (i = 1; i < len; i++) {
-        if (s[i] == 0 || s[i] == '\r' || s[i] == '\n' || s[i] == '\t') {
+    int ret = 0;
+    for (size_t i = 0; i < len; i++) {
+        if (s[i] == '\r' || s[i] == '\n' || s[i] == '\t') {
             continue;
         }
         else if (s[i] < ' ' || '~' < s[i]) {
             return 0;
         }
+        /* only return 1 if the string contains at least one letter or number */
+        if('A' <= s[i] && s[i] <= 'Z') {
+            ret = 1;
+        }
+        else if('a' <= s[i] && s[i] <= 'z') {
+            ret = 1;
+        }
+        else if('0' <= s[i] && s[i] <= '9') {
+            ret = 1;
+        }
     }
 
-    return 1;
+    return ret;
 }
 
 /*
@@ -170,11 +189,11 @@ serial_to_tun(FILE *inslip, int outfd)
     static union {
         unsigned char inbuf[2000];
     } uip;
-    static int inbufptr = 0;
-    int ret, i;
+    static unsigned int inbufptr = 0;
+    int ret;
     unsigned char c;
 
-#ifdef linux
+#ifdef __linux__
     ret = fread(&c, 1, 1, inslip);
 
     if (ret == -1 || ret == 0) {
@@ -184,225 +203,220 @@ serial_to_tun(FILE *inslip, int outfd)
     goto after_fread;
 #endif
 
-read_more:
+    while (1) {
+        if (inbufptr >= sizeof(uip.inbuf)) {
+            if (timestamp) {
+                stamptime();
+            }
 
-    if (inbufptr >= sizeof(uip.inbuf)) {
-        if (timestamp) {
-            stamptime();
+            fprintf(stderr, "*** dropping large %d byte packet\n", inbufptr);
+            inbufptr = 0;
         }
 
-        fprintf(stderr, "*** dropping large %d byte packet\n", inbufptr);
-        inbufptr = 0;
-    }
-
-    ret = fread(&c, 1, 1, inslip);
-#ifdef linux
-after_fread:
+        ret = fread(&c, 1, 1, inslip);
+#ifdef __linux__
+    after_fread:
 #endif
 
-    if (ret == -1) {
-        err(1, "serial_to_tun: read");
-    }
+        if (ret == -1) {
+            err(1, "serial_to_tun: read");
+        }
 
-    if (ret == 0) {
-        clearerr(inslip);
-        return;
-    }
+        if (ret == 0) {
+            clearerr(inslip);
+            return;
+        }
 
-    /*  fprintf(stderr, ".");*/
-    switch (c) {
-        case SLIP_END:
-            if (inbufptr > 0) {
-                if (uip.inbuf[0] == '!') {
-                    if (uip.inbuf[1] == 'M') {
-                        /* Read gateway MAC address and autoconfigure tap0 interface */
-                        char macs[24];
-                        int i, pos;
+        /*  fprintf(stderr, ".");*/
+        switch (c) {
+            case SLIP_END:
+                if (inbufptr > 0) {
+                    if (uip.inbuf[0] == '!') {
+                        if (uip.inbuf[1] == 'M') {
+                            /* Read gateway MAC address and autoconfigure tap0 interface */
+                            char macs[24];
+                            unsigned int pos = 0;
 
-                        for (i = 0, pos = 0; i < 16; i++) {
-                            macs[pos++] = uip.inbuf[2 + i];
+                            for (unsigned int i = 0; i < 16; i++) {
+                                macs[pos++] = uip.inbuf[2 + i];
 
-                            if ((i & 1) == 1 && i < 14) {
-                                macs[pos++] = ':';
+                                if ((i & 1) == 1 && i < 14) {
+                                    macs[pos++] = ':';
+                                }
                             }
+
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            macs[pos] = '\0';
+                            fprintf(stderr, "*** Gateway's MAC address: %s\n", macs);
+
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            ssystem("ifconfig %s down", tundev);
+
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            ssystem("ifconfig %s hw ether %s", tundev, &macs[6]);
+
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            ssystem("ifconfig %s up", tundev);
                         }
-
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        macs[pos] = '\0';
-                        //	  printf("*** Gateway's MAC address: %s\n", macs);
-                        fprintf(stderr, "*** Gateway's MAC address: %s\n", macs);
-
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        ssystem("ifconfig %s down", tundev);
-
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        ssystem("ifconfig %s hw ether %s", tundev, &macs[6]);
-
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        ssystem("ifconfig %s up", tundev);
                     }
-                }
-                else if (uip.inbuf[0] == '?') {
-                    if (uip.inbuf[1] == 'P') {
-                        /* Prefix info requested */
-                        struct in6_addr addr;
-                        int i;
-                        char *s = strchr(ipaddr, '/');
+                    else if (uip.inbuf[0] == '?') {
+                        if (uip.inbuf[1] == 'P') {
+                            /* Prefix info requested */
+                            struct in6_addr addr;
+                            char *s = strchr(ipaddr, '/');
 
-                        if (s != NULL) {
-                            *s = '\0';
+                            if (s != NULL) {
+                                *s = '\0';
+                            }
+
+                            inet_pton(AF_INET6, ipaddr, &addr);
+
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            fprintf(stderr, "*** Address:%s => %02x%02x:%02x%02x:%02x%02x:%02x%02x\n",
+                                    ipaddr,
+                                    addr.s6_addr[0], addr.s6_addr[1],
+                                    addr.s6_addr[2], addr.s6_addr[3],
+                                    addr.s6_addr[4], addr.s6_addr[5],
+                                    addr.s6_addr[6], addr.s6_addr[7]);
+                            slip_send(slipfd, '!');
+                            slip_send(slipfd, 'P');
+
+                            for (unsigned int i = 0; i < 8; i++) {
+                                /* need to call the slip_send_char for stuffing */
+                                slip_send_char(slipfd, addr.s6_addr[i]);
+                            }
+
+                            slip_send(slipfd, SLIP_END);
                         }
-
-                        inet_pton(AF_INET6, ipaddr, &addr);
-
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        fprintf(stderr, "*** Address:%s => %02x%02x:%02x%02x:%02x%02x:%02x%02x\n",
-                                //         printf("*** Address:%s => %02x%02x:%02x%02x:%02x%02x:%02x%02x\n",
-                                ipaddr,
-                                addr.s6_addr[0], addr.s6_addr[1],
-                                addr.s6_addr[2], addr.s6_addr[3],
-                                addr.s6_addr[4], addr.s6_addr[5],
-                                addr.s6_addr[6], addr.s6_addr[7]);
-                        slip_send(slipfd, '!');
-                        slip_send(slipfd, 'P');
-
-                        for (i = 0; i < 8; i++) {
-                            /* need to call the slip_send_char for stuffing */
-                            slip_send_char(slipfd, addr.s6_addr[i]);
-                        }
-
-                        slip_send(slipfd, SLIP_END);
-                    }
 
 #define DEBUG_LINE_MARKER '\r'
-                }
-                else if (uip.inbuf[0] == DEBUG_LINE_MARKER) {
-                    fwrite(uip.inbuf + 1, inbufptr - 1, 1, stdout);
-                }
-                else if (is_sensible_string(uip.inbuf, inbufptr)) {
-                    if (verbose == 1) { /* strings already echoed below for verbose>1 */
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        fwrite(uip.inbuf, inbufptr, 1, stdout);
                     }
-                }
-                else {
-                    if (verbose > 2) {
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        printf("Packet from SLIP of length %d - write TUN\n", inbufptr);
-
-                        if (verbose > 4) {
-#if WIRESHARK_IMPORT_FORMAT
-                            printf("0000");
-
-                            for (i = 0; i < inbufptr; i++) {
-                                printf(" %02x", uip.inbuf[i]);
+                    else if (uip.inbuf[0] == DEBUG_LINE_MARKER) {
+                        fwrite(uip.inbuf + 1, inbufptr - 1, 1, stdout);
+                    }
+                    else if (is_sensible_string(uip.inbuf, inbufptr)) {
+                        if (verbose == 1) { /* strings already echoed below for verbose>1 */
+                            if (timestamp) {
+                                stamptime();
                             }
+
+                            fwrite(uip.inbuf, inbufptr, 1, stdout);
+                        }
+                    }
+                    else {
+                        if (verbose > 2) {
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            printf("Packet from SLIP of length %d - write TUN\n", inbufptr);
+
+                            if (verbose > 4) {
+#if WIRESHARK_IMPORT_FORMAT
+                                printf("0000");
+
+                                for (unsigned int i = 0; i < inbufptr; i++) {
+                                    printf(" %02x", uip.inbuf[i]);
+                                }
 
 #else
-                            printf("         ");
+                                printf("         ");
 
-                            for (i = 0; i < inbufptr; i++) {
-                                printf("%02x", uip.inbuf[i]);
+                                for (unsigned int i = 0; i < inbufptr; i++) {
+                                    printf("%02x", uip.inbuf[i]);
 
-                                if ((i & 3) == 3) {
-                                    printf(" ");
+                                    if ((i & 3) == 3) {
+                                        printf(" ");
+                                    }
+
+                                    if ((i & 15) == 15) {
+                                        printf("\n         ");
+                                    }
                                 }
-
-                                if ((i & 15) == 15) {
-                                    printf("\n         ");
-                                }
-                            }
 
 #endif
-                            printf("\n");
+                                printf("\n");
+                            }
+                        }
+
+                        if (write(outfd, uip.inbuf, inbufptr) != inbufptr) {
+                            err(1, "serial_to_tun: write");
                         }
                     }
 
-                    if (write(outfd, uip.inbuf, inbufptr) != inbufptr) {
-                        err(1, "serial_to_tun: write");
+                    inbufptr = 0;
+                }
+
+                break;
+
+            case SLIP_ESC:
+                if (fread(&c, 1, 1, inslip) != 1) {
+                    clearerr(inslip);
+                    /* Put ESC back and give up! */
+                    ungetc(SLIP_ESC, inslip);
+                    return;
+                }
+
+                switch (c) {
+                    case SLIP_ESC_END:
+                        c = SLIP_END;
+                        break;
+
+                    case SLIP_ESC_ESC:
+                        c = SLIP_ESC;
+                        break;
+                }
+
+                /* FALLTHROUGH */
+            default:
+                uip.inbuf[inbufptr++] = c;
+
+                /* Echo lines as they are received for verbose=2,3,5+ */
+                /* Echo all printable characters for verbose==4 */
+                if ((verbose == 2) || (verbose == 3) || (verbose > 4)) {
+                    if (c == '\n') {
+                        if (is_sensible_string(uip.inbuf, inbufptr)) {
+                            if (timestamp) {
+                                stamptime();
+                            }
+
+                            fwrite(uip.inbuf, inbufptr, 1, stdout);
+                            inbufptr = 0;
+                        }
+                    }
+                }
+                else if (verbose == 4) {
+                    if (c == 0 || c == '\r' || c == '\n' || c == '\t' || (c >= ' ' && c <= '~')) {
+                        fwrite(&c, 1, 1, stdout);
+
+                        if (c == '\n') if (timestamp) {
+                                stamptime();
+                            }
                     }
                 }
 
-                inbufptr = 0;
-            }
-
-            break;
-
-        case SLIP_ESC:
-            if (fread(&c, 1, 1, inslip) != 1) {
-                clearerr(inslip);
-                /* Put ESC back and give up! */
-                ungetc(SLIP_ESC, inslip);
-                return;
-            }
-
-            switch (c) {
-                case SLIP_ESC_END:
-                    c = SLIP_END;
-                    break;
-
-                case SLIP_ESC_ESC:
-                    c = SLIP_ESC;
-                    break;
-            }
-
-            /* FALLTHROUGH */
-        default:
-            uip.inbuf[inbufptr++] = c;
-
-            /* Echo lines as they are received for verbose=2,3,5+ */
-            /* Echo all printable characters for verbose==4 */
-            if ((verbose == 2) || (verbose == 3) || (verbose > 4)) {
-                if (c == '\n') {
-                    if (is_sensible_string(uip.inbuf, inbufptr)) {
-                        if (timestamp) {
-                            stamptime();
-                        }
-
-                        fwrite(uip.inbuf, inbufptr, 1, stdout);
-                        inbufptr = 0;
-                    }
-                }
-            }
-            else if (verbose == 4) {
-                if (c == 0 || c == '\r' || c == '\n' || c == '\t' || (c >= ' ' && c <= '~')) {
-                    fwrite(&c, 1, 1, stdout);
-
-                    if (c == '\n') if (timestamp) {
-                            stamptime();
-                        }
-                }
-            }
-
-            break;
+                break;
+        }
     }
-
-    goto read_more;
 }
 
 unsigned char slip_buf[2000];
-int slip_end, slip_begin;
+unsigned int slip_end, slip_begin;
 
 void
 slip_send_char(int fd, unsigned char c)
@@ -422,17 +436,6 @@ slip_send_char(int fd, unsigned char c)
             slip_send(fd, c);
             break;
     }
-}
-
-void
-slip_send(int fd, unsigned char c)
-{
-    if (slip_end >= sizeof(slip_buf)) {
-        err(1, "slip_send overflow");
-    }
-
-    slip_buf[slip_end] = c;
-    slip_end++;
 }
 
 int
@@ -456,7 +459,7 @@ slip_flushbuf(int fd)
         err(1, "slip_flushbuf write failed");
     }
     else if (n == -1) {
-        PROGRESS("Q");		/* Outqueueis full! */
+        PROGRESS("Q");      /* Outqueue is full! */
     }
     else {
         slip_begin += n;
@@ -464,6 +467,21 @@ slip_flushbuf(int fd)
         if (slip_begin == slip_end) {
             slip_begin = slip_end = 0;
         }
+    }
+}
+
+void
+slip_send(int fd, unsigned char c)
+{
+    if (slip_end >= sizeof(slip_buf)) {
+        err(1, "slip_send overflow");
+    }
+
+    slip_buf[slip_end] = c;
+    slip_end++;
+    if (slip_end >= sizeof(slip_buf)) {
+        /* attempt to flush what is in the buffer */
+        slip_flushbuf(fd);
     }
 }
 
@@ -545,9 +563,10 @@ tun_to_serial(int infd, int outfd)
     struct {
         unsigned char inbuf[2000];
     } uip;
-    int size;
 
-    if ((size = read(infd, uip.inbuf, 2000)) == -1) {
+    int size = read(infd, uip.inbuf, 2000);
+
+    if (size == -1) {
         err(1, "tun_to_serial: read");
     }
 
@@ -616,7 +635,7 @@ stty_telos(int fd)
 
 #endif
 
-    usleep(10 * 1000);		/* Wait for hardware 10ms. */
+    usleep(10 * 1000);      /* Wait for hardware 10ms. */
 
     /* Flush input and output buffers. */
     if (tcflush(fd, TCIOFLUSH) == -1) {
@@ -633,7 +652,7 @@ devopen(const char *dev, int flags)
     return open(t, flags);
 }
 
-#ifdef linux
+#ifdef __linux__
 #include <linux/if.h>
 #include <linux/if_tun.h>
 
@@ -672,6 +691,7 @@ tun_alloc(char *dev, int tap)
 int
 tun_alloc(char *dev, int tap)
 {
+    (void) tap;
     return devopen(dev, O_RDWR);
 }
 #endif
@@ -686,7 +706,7 @@ cleanup(void)
     }
 
     ssystem("ifconfig %s down", tundev);
-#ifndef linux
+#ifndef __linux__
     ssystem("sysctl -w net.ipv6.conf.all.forwarding=1");
 #endif
 
@@ -730,7 +750,7 @@ void
 sigcleanup(int signo)
 {
     fprintf(stderr, "signal %d\n", signo);
-    exit(0);			/* exit(0) will call cleanup() */
+    exit(0);            /* exit(0) will call cleanup() */
 }
 
 static int got_sigalarm;
@@ -738,6 +758,7 @@ static int got_sigalarm;
 void
 sigalarm(int signo)
 {
+    (void) signo; /* not used */
     got_sigalarm = 1;
     return;
 }
@@ -745,7 +766,7 @@ sigalarm(int signo)
 void
 sigalarm_reset()
 {
-#ifdef linux
+#ifdef __linux__
 #define TIMEOUT (997*1000)
 #else
 #define TIMEOUT (2451*1000)
@@ -757,7 +778,7 @@ sigalarm_reset()
 void
 ifconf(const char *tundev, const char *ipaddr)
 {
-#ifdef linux
+#ifdef __linux__
 
     if (timestamp) {
         stamptime();
@@ -790,7 +811,7 @@ ifconf(const char *tundev, const char *ipaddr)
         ai = 0;
         cc = scc = 0;
 
-        while (c = *ptr++) {
+        while ((c = *(ptr++))) {
             if (c == '/') {
                 break;
             }
@@ -885,7 +906,7 @@ ifconf(const char *tundev, const char *ipaddr)
     }
 
     ssystem("sysctl -w net.inet.ip.forwarding=1");
-#endif /* !linux */
+#endif /* !__linux__ */
 
     if (timestamp) {
         stamptime();
@@ -1022,7 +1043,7 @@ main(int argc, char **argv)
 
     switch (baudrate) {
         case -2:
-            break;			/* Use default. */
+            break;          /* Use default. */
 
         case 9600:
             b_rate = B9600;
@@ -1200,11 +1221,11 @@ main(int argc, char **argv)
         /*       got_sigalarm = 0; */
         /*     } */
 
-        if (!slip_empty()) {		/* Anything to flush? */
+        if (!slip_empty()) {        /* Anything to flush? */
             FD_SET(slipfd, &wset);
         }
 
-        FD_SET(slipfd, &rset);	/* Read from slip ASAP! */
+        FD_SET(slipfd, &rset);  /* Read from slip ASAP! */
 
         if (slipfd > maxfd) {
             maxfd = slipfd;
@@ -1254,13 +1275,14 @@ main(int argc, char **argv)
             if (delaymsec == 0) {
                 if (slip_empty() && FD_ISSET(tunfd, &rset)) {
                     int size = tun_to_serial(tunfd, slipfd);
+                    (void) size; /* fix warning unused but set variable */
                     slip_flushbuf(slipfd);
                     sigalarm_reset();
 
                     if (basedelay) {
                         struct timeval tv;
                         gettimeofday(&tv, NULL) ;
-                        //         delaymsec=basedelay*(1+(size/120));//multiply by # of 6lowpan packets?
+                        // delaymsec=basedelay*(1+(size/120));//multiply by # of 6lowpan packets?
                         delaymsec = basedelay;
                         delaystartsec = tv.tv_sec;
                         delaystartmsec = tv.tv_usec / 1000;
