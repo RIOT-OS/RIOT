@@ -51,7 +51,7 @@ There are a few reasons that speak against providing a test in the [unittests]
 application:
 
 - Unittests are not well suited to test interaction with external entities
-  (other nodes, measuring devices, users, or even other threads)
+  (other nodes, measuring devices, users, or even other threads and timer events)
 - States of a component can only be reseted by restarting the node (e.g. for
   testing the initialization routine of an interface), which is not supported by
   the current embUnit fork (especially when it comes to continuing further tests
