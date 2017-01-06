@@ -22,6 +22,7 @@ endif
 $(PKG_BUILDDIR)/.git-downloaded:
 	rm -Rf $(PKG_BUILDDIR)
 	mkdir -p $(PKG_BUILDDIR)
+	if [ ! -d `$(GITCACHE) show-path` ]; then $(GITCACHE) init; fi
 	$(GITCACHE) clone "$(PKG_URL)" "$(PKG_VERSION)" "$(PKG_BUILDDIR)"
 	$(GIT_APPLY_PATCHES)
 	touch $@
