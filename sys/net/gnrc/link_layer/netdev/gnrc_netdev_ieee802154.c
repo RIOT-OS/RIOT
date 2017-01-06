@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
+ *               2016 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,6 +12,7 @@
  *
  * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #include <stddef.h>
@@ -85,6 +87,10 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev_t *gnrc_netdev)
             gnrc_pktbuf_release(pkt);
             return NULL;
         }
+        if (nread < bytes_expected) {
+            DEBUG("_recv_ieee802154: reallocating.\n");
+            gnrc_pktbuf_realloc_data(pkt, nread);
+        }
         if (!(state->flags & NETDEV_IEEE802154_RAW)) {
             gnrc_pktsnip_t *ieee802154_hdr, *netif_hdr;
             gnrc_netif_hdr_t *hdr;
@@ -98,7 +104,6 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev_t *gnrc_netdev)
                 gnrc_pktbuf_release(pkt);
                 return NULL;
             }
-            nread -= mhr_len;
             /* mark IEEE 802.15.4 header */
             ieee802154_hdr = gnrc_pktbuf_mark(pkt, mhr_len, GNRC_NETTYPE_UNDEF);
             if (ieee802154_hdr == NULL) {
@@ -122,17 +127,14 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev_t *gnrc_netdev)
                   gnrc_netif_addr_to_str(src_str, sizeof(src_str),
                                          gnrc_netif_hdr_get_src_addr(hdr),
                                          hdr->src_l2addr_len),
-                  nread);
+                  nread - mhr_len);
 #if defined(MODULE_OD)
-            od_hex_dump(pkt->data, nread, OD_WIDTH_DEFAULT);
+            od_hex_dump(pkt->data, nread - mhr_len, OD_WIDTH_DEFAULT);
 #endif
 #endif
             gnrc_pktbuf_remove_snip(pkt, ieee802154_hdr);
             LL_APPEND(pkt, netif_hdr);
         }
-
-        DEBUG("_recv_ieee802154: reallocating.\n");
-        gnrc_pktbuf_realloc_data(pkt, nread);
     }
 
     return pkt;
