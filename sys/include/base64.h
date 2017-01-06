@@ -30,7 +30,7 @@ extern "C" {
 #define BASE64_ERROR_BUFFER_OUT       (-1) /**< error value for invalid output buffer pointer  */
 #define BASE64_ERROR_BUFFER_OUT_SIZE  (-2) /**< error value for invalid output buffer size     */
 #define BASE64_ERROR_DATA_IN          (-3) /**< error value for invalid input buffer           */
-#define BASE64_ERROR_DATA_IN_SIZE     (-4) /**< error value for invalid output buffer size     */
+#define BASE64_ERROR_DATA_IN_SIZE     (-4) /**< error value for invalid input buffer size      */
 
 /**
  * @brief           Encodes a given datum to base64 and save the result to the given destination.
