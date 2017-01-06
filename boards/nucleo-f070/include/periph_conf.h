@@ -63,41 +63,37 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief UART configuration
- * @}
+ * @brief   UART configuration
+ * @{
  */
-#define UART_NUMOF          (2U)
-#define UART_0_EN           1
-#define UART_1_EN           1
-#define UART_IRQ_PRIO       1
+static const uart_conf_t uart_config[] = {
+    {
+        .dev        = USART2,
+        .rcc_mask   = RCC_APB1ENR_USART2EN,
+        .rx_pin     = GPIO_PIN(PORT_A, 3),
+        .tx_pin     = GPIO_PIN(PORT_A, 2),
+        .rx_af      = GPIO_AF1,
+        .tx_af      = GPIO_AF1,
+        .bus        = APB1,
+        .irqn       = USART2_IRQn
+    },
+    {
+        .dev        = USART3,
+        .rcc_mask   = RCC_APB1ENR_USART3EN,
+        .rx_pin     = GPIO_PIN(PORT_C, 11),
+        .tx_pin     = GPIO_PIN(PORT_C, 10),
+        .rx_af      = GPIO_AF1,
+        .tx_af      = GPIO_AF1,
+        .bus        = APB1,
+        .irqn       = USART3_4_IRQn
+    }
+};
 
-/* UART 0 device configuration */
-#define UART_0_DEV          USART2
-#define UART_0_CLKEN()      (periph_clk_en(APB1, RCC_APB1ENR_USART2EN))
-#define UART_0_CLKDIS()     (periph_clk_dis(APB1, RCC_APB1ENR_USART2EN))
-#define UART_0_IRQ          USART2_IRQn
-#define UART_0_ISR          isr_usart2
-/* UART 0 pin configuration */
-#define UART_0_PORT         GPIOA
-#define UART_0_PORT_CLKEN() (periph_clk_en(AHB, RCC_AHBENR_GPIOAEN))
-#define UART_0_RX_PIN       3
-#define UART_0_TX_PIN       2
-#define UART_0_AF           1
+#define UART_0_ISR          (isr_usart2)
+#define UART_1_ISR          (isr_usart3_8)
 
-/* UART 1 device configuration */
-#define UART_1_DEV          USART3
-#define UART_1_CLKEN()      (periph_clk_en(APB1, RCC_APB1ENR_USART3EN))
-#define UART_1_CLKDIS()     (periph_clk_dis(APB1, RCC_APB1ENR_USART3EN))
-#define UART_1_IRQ          USART3_4_IRQn
-#define UART_1_ISR          isr_usart3_8
-/* UART 1 pin configuration */
-#define UART_1_PORT         GPIOC
-#define UART_1_PORT_CLKEN() (periph_clk_en(AHB, RCC_AHBENR_GPIOCEN))
-#define UART_1_RX_PIN       11
-#define UART_1_TX_PIN       10
-#define UART_1_AF           1
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
-
 
 /**
  * @brief   ADC configuration

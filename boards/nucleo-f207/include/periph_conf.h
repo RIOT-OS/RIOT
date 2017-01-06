@@ -104,76 +104,64 @@ static const timer_conf_t timer_config[] = {
 
 #define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
-
 /**
  * @brief   UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
-     {
-        .dev          = USART3,
-        .rcc_mask     = RCC_APB1ENR_USART3EN,
-        .rx_pin       = GPIO_PIN(PORT_D, 9),
-        .tx_pin       = GPIO_PIN(PORT_D, 8),
-        .rx_mode      = GPIO_IN,
-        .tx_mode      = GPIO_OUT,
-        .rts_pin      = GPIO_PIN(PORT_D, 12),
-        .cts_pin      = GPIO_PIN(PORT_D, 11),
-        .rts_mode     = GPIO_OUT,
-        .cts_mode     = GPIO_IN,
-        .af           = GPIO_AF7,
-        .irqn         = USART3_IRQn,
-        .dma_stream   = 3,
-        .dma_chan     = 4,
-        .hw_flow_ctrl = 0
+    {
+        .dev        = USART3,
+        .rcc_mask   = RCC_APB1ENR_USART3EN,
+        .rx_pin     = GPIO_PIN(PORT_D, 9),
+        .tx_pin     = GPIO_PIN(PORT_D, 8),
+        .rx_af      = GPIO_AF7,
+        .tx_af      = GPIO_AF7,
+        .bus        = APB1,
+        .irqn       = USART3_IRQn,
+#ifdef UART_USE_DMA
+        .dma_stream = 3,
+        .dma_chan   = 4
+#endif
     },
     {
-        .dev          = USART2,
-        .rcc_mask     = RCC_APB1ENR_USART2EN,
-        .rx_pin       = GPIO_PIN(PORT_D, 6),
-        .tx_pin       = GPIO_PIN(PORT_D, 5),
-        .rx_mode      = GPIO_IN,
-        .tx_mode      = GPIO_OUT,
-        .rts_pin      = GPIO_PIN(PORT_D, 4),
-        .cts_pin      = GPIO_PIN(PORT_D, 3),
-        .rts_mode     = GPIO_OUT,
-        .cts_mode     = GPIO_IN,
-        .af           = GPIO_AF7,
-        .irqn         = USART2_IRQn,
-        .dma_stream   = 6,
-        .dma_chan     = 4,
-        .hw_flow_ctrl = 1
+        .dev        = USART2,
+        .rcc_mask   = RCC_APB1ENR_USART2EN,
+        .rx_pin     = GPIO_PIN(PORT_D, 6),
+        .tx_pin     = GPIO_PIN(PORT_D, 5),
+        .rx_af      = GPIO_AF7,
+        .tx_af      = GPIO_AF7,
+        .bus        = APB1,
+        .irqn       = USART2_IRQn,
+#ifdef UART_USE_DMA
+        .dma_stream = 6,
+        .dma_chan   = 4
+#endif
     },
     {
-        .dev          = USART1,
-        .rcc_mask     = RCC_APB2ENR_USART1EN,
-        .rx_pin       = GPIO_PIN(PORT_A, 10),
-        .tx_pin       = GPIO_PIN(PORT_A, 9),
-        .rx_mode      = GPIO_IN,
-        .tx_mode      = GPIO_OUT,
-        .rts_pin      = GPIO_PIN(PORT_A, 12),
-        .cts_pin      = GPIO_PIN(PORT_A, 11),
-        .rts_mode     = GPIO_OUT,
-        .cts_mode     = GPIO_IN,
-        .af           = GPIO_AF7,
-        .irqn         = USART1_IRQn,
-        .dma_stream   = 7,
-        .dma_chan     = 4,
-        .hw_flow_ctrl = 1
+        .dev        = USART1,
+        .rcc_mask   = RCC_APB2ENR_USART1EN,
+        .rx_pin     = GPIO_PIN(PORT_A, 10),
+        .tx_pin     = GPIO_PIN(PORT_A,  9),
+        .rx_af      = GPIO_AF7,
+        .tx_af      = GPIO_AF7,
+        .bus        = APB2,
+        .irqn       = USART1_IRQn,
+#ifdef UART_USE_DMA
+        .dma_stream = 7,
+        .dma_chan   = 4
+#endif
     }
 };
 
-/* assign ISR vector names */
-#define UART_0_ISR          isr_usart3
-#define UART_0_DMA_ISR      isr_dma1_stream3
+#define UART_0_ISR          (isr_usart3)
+#define UART_0_DMA_ISR      (isr_dma1_stream3)
 
-#define UART_1_ISR          isr_usart2
-#define UART_1_DMA_ISR      isr_dma1_stream6
+#define UART_1_ISR          (isr_usart2)
+#define UART_1_DMA_ISR      (isr_dma1_stream6)
 
-#define UART_2_ISR          isr_usart1
-#define UART_2_DMA_ISR      isr_dma1_stream7
+#define UART_2_ISR          (isr_usart1)
+#define UART_2_DMA_ISR      (isr_dma1_stream7)
 
-/* deduct number of defined UART interfaces */
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 

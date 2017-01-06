@@ -71,37 +71,36 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief UART configuration
+ * @brief   UART configuration
  * @{
  */
-#define UART_NUMOF          (2U)
-#define UART_0_EN           1
-#define UART_1_EN           1
-#define UART_IRQ_PRIO       1
+static const uart_conf_t uart_config[] = {
+    {
+        .dev        = USART3,
+        .rcc_mask   = RCC_APB1ENR_USART3EN,
+        .rx_pin     = GPIO_PIN(PORT_C, 11),
+        .tx_pin     = GPIO_PIN(PORT_C, 10),
+        .rx_af      = GPIO_AF7,
+        .tx_af      = GPIO_AF7,
+        .bus        = APB1,
+        .irqn       = USART3_IRQn
+    },
+    {
+        .dev        = USART1,
+        .rcc_mask   = RCC_APB2ENR_USART1EN,
+        .rx_pin     = GPIO_PIN(PORT_A, 10),
+        .tx_pin     = GPIO_PIN(PORT_A,  9),
+        .rx_af      = GPIO_AF7,
+        .tx_af      = GPIO_AF7,
+        .bus        = APB2,
+        .irqn       = USART1_IRQn
+    }
+};
 
-/* UART 0 device configuration */
-#define UART_0_DEV          USART3
-#define UART_0_CLKEN()      (periph_clk_en(APB1, RCC_APB1ENR_USART3EN))
-#define UART_0_CLK          (CLOCK_CORECLOCK)
-#define UART_0_IRQ          USART3_IRQn
-#define UART_0_ISR          isr_usart3
-#define UART_0_BUS_FREQ     32000000
-/* UART 0 pin configuration */
-#define UART_0_RX_PIN       GPIO_PIN(PORT_C, 11)
-#define UART_0_TX_PIN       GPIO_PIN(PORT_C, 10)
-#define UART_0_AF           GPIO_AF7
+#define UART_0_ISR          (isr_usart3)
+#define UART_1_ISR          (isr_usart1)
 
-/* UART 1 device configuration */
-#define UART_1_DEV          USART1        /* Panasonic PAN1740 BLE module */
-#define UART_1_CLKEN()      (periph_clk_en(APB2, RCC_APB2ENR_USART1EN))
-#define UART_1_CLK          (CLOCK_CORECLOCK)
-#define UART_1_IRQ          USART1_IRQn
-#define UART_1_ISR          isr_usart1
-#define UART_0_BUS_FREQ     32000000
-/* UART 1 pin configuration */
-#define UART_1_RX_PIN       GPIO_PIN(PORT_A, 10)
-#define UART_1_TX_PIN       GPIO_PIN(PORT_A, 9)
-#define UART_1_AF           GPIO_AF7
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**

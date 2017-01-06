@@ -80,25 +80,25 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief UART configuration
- * @}
+ * @brief   UART configuration
+ * @{
  */
-#define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_IRQ_PRIO       1
+static const uart_conf_t uart_config[] = {
+    {
+        .dev      = USART2,
+        .rcc_mask = RCC_APB1ENR_USART2EN,
+        .rx_pin   = GPIO_PIN(PORT_A, 3),
+        .tx_pin   = GPIO_PIN(PORT_A, 2),
+        .rx_af    = GPIO_AF7,
+        .tx_af    = GPIO_AF7,
+        .bus      = APB1,
+        .irqn     = USART2_IRQn
+    }
+};
 
-/* UART 0 device configuration */
-#define UART_0_DEV          USART2
-#define UART_0_CLKEN()      (periph_clk_en(APB1, RCC_APB1ENR_USART2EN))
-#define UART_0_CLK          (CLOCK_CORECLOCK / 2)   /* UART clock runs with 32MHz (F_CPU / 1) */
-#define UART_0_IRQ_CHAN     USART2_IRQn
-#define UART_0_ISR          isr_usart2
-/* UART 0 pin configuration */
-#define UART_0_PORT         GPIOA
-#define UART_0_PORT_CLKEN() (periph_clk_en(AHB, RCC_AHBENR_GPIOAEN))
-#define UART_0_RX_PIN       3
-#define UART_0_TX_PIN       2
-#define UART_0_AF           7
+#define UART_0_ISR          (isr_usart2)
+
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**

@@ -84,6 +84,10 @@ typedef uint32_t gpio_t;
  * @brief   Available MUX values for configuring a pin's alternate function
  */
 typedef enum {
+#ifdef CPU_FAM_STM32F1
+    GPIO_AF_OUT_PP = 0xb,   /**< alternate function output - push-pull */
+    GPIO_AF_OUT_OD = 0xf,   /**< alternate function output - open-drain */
+#else
     GPIO_AF0 = 0,           /**< use alternate function 0 */
     GPIO_AF1,               /**< use alternate function 1 */
     GPIO_AF2,               /**< use alternate function 2 */
@@ -101,6 +105,7 @@ typedef enum {
     GPIO_AF13,              /**< use alternate function 13 */
     GPIO_AF14,              /**< use alternate function 14 */
     GPIO_AF15               /**< use alternate function 15 */
+#endif
 #endif
 } gpio_af_t;
 
@@ -128,6 +133,26 @@ typedef struct {
 } pwm_conf_t;
 
 /**
+ * @brief   Structure for UART configuration data
+ */
+typedef struct {
+    USART_TypeDef *dev;     /**< UART device base register address */
+    uint32_t rcc_mask;      /**< bit in clock enable register */
+    gpio_t rx_pin;          /**< RX pin */
+    gpio_t tx_pin;          /**< TX pin */
+#ifndef CPU_FAM_STM32F1
+    gpio_af_t rx_af;        /**< alternate function for RX pin */
+    gpio_af_t tx_af;        /**< alternate function for TX pin */
+#endif
+    uint8_t bus;            /**< APB bus */
+    uint8_t irqn;           /**< IRQ channel */
+#if 0 /* TODO */
+    uint8_t dma_stream;     /**< DMA stream used for TX */
+    uint8_t dma_chan;       /**< DMA channel used for TX */
+#endif
+} uart_conf_t;
+
+/**
  * @brief   Get the actual bus clock frequency for the APB buses
  *
  * @param[in] bus       target APBx bus
@@ -151,6 +176,14 @@ void periph_clk_en(bus_t bus, uint32_t mask);
  * @param[in] mask      bit in the RCC enable register
  */
 void periph_clk_dis(bus_t bus, uint32_t mask);
+
+/**
+ * @brief   Configure the alternate function for the given pin
+ *
+ * @param[in] pin       pin to configure
+ * @param[in] af        alternate function to use
+ */
+void gpio_init_af(gpio_t pin, gpio_af_t af);
 
 /**
  * @brief   Configure the given pin to be used as ADC input

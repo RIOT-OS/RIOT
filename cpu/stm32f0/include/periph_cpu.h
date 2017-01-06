@@ -65,7 +65,7 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
- * @brief   Available ports on the STM32F4 family
+ * @brief   Available ports on the STM32F0 family
  */
 enum {
     PORT_A = 0,             /**< port A */
@@ -107,16 +107,6 @@ typedef struct {
     gpio_t pin;             /**< pin connected to the line */
     uint8_t chan;           /**< DAC device used for this line */
 } dac_conf_t;
-
-/**
- * @brief   Configure the alternate function for the given pin
- *
- * @note    This is meant for internal use in STM32F4 peripheral drivers only
- *
- * @param[in] pin       pin to configure
- * @param[in] af        alternate function to use
- */
-void gpio_init_af(gpio_t pin, gpio_af_t af);
 
 #ifdef __cplusplus
 }
