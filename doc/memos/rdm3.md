@@ -1,7 +1,7 @@
-RIOT Maintainers Community
-Developer Memo: 3
-Author(s): Martine Lenders
-Date: January 2017
+- RIOT Maintainers Community
+- Developer Memo: 3
+- Author(s): Martine Lenders
+- Date: January 2017
 
 ***
 
