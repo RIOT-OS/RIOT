@@ -1,11 +1,7 @@
 PKG_NAME=relic
-PKG_URL=http://github.com/relic-toolkit/relic.git
+PKG_URL=https://github.com/relic-toolkit/relic.git
 PKG_VERSION=cdcfaeef101d18c3231c3b46359c519dd72682e8
-
-ifneq ($(RIOTBASE),)
-INCLUDES += -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/sys/net/include \
-			-I$(RIOTBASE)/sys/posix/include -I$(RIOTBASE)/sys/posix/pnet/include
-endif
+PKG_LICENSE=LGPL-2.1
 
 .PHONY: all
 
