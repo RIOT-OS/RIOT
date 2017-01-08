@@ -31,8 +31,8 @@
 #ifndef JC42_TEMP_H_
 #define JC42_TEMP_H_
 
-#include <stdint.h>
 #include "periph/i2c.h"
+#include "saul.h"
 
 
 #ifdef __cplusplus

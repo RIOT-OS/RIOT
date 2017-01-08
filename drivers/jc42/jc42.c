@@ -21,11 +21,8 @@
 
 #include "periph/i2c.h"
 #include "byteorder.h"
-#include "xtimer.h"
-#include "saul.h"
 
 #include "jc42.h"
-#include "jc42_params.h"
 #include "jc42_internal.h"
 
 #define ENABLE_DEBUG (0)

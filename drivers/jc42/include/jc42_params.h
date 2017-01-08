@@ -19,10 +19,8 @@
 #ifndef JC42_PARAMS_H
 #define JC42_PARAMS_H
 
-#include "board.h"
 #include "jc42.h"
 #include "periph/i2c.h"
-#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
