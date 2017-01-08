@@ -1,11 +1,7 @@
 PKG_NAME=oonf_api
 PKG_URL=https://github.com/OLSR/OONF.git
 PKG_VERSION=v0.3.0
-
-ifneq ($(RIOTBASE),)
-INCLUDES += -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/sys/net/include \
-			-I$(RIOTBASE)/sys/posix/include
-endif
+PKG_LICENSE=BSD-3-Clause
 
 MODULE:=$(PKG_NAME)
 
