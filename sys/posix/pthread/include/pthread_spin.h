@@ -33,7 +33,7 @@ extern "C" {
  *                  Use irq_disable() and irq_restore() for shortterm locks instead.
  */
 typedef struct {
-    atomic_flag flag;
+    atomic_flag flag; /**< Current lock state */
 } pthread_spinlock_t;
 
 /**
