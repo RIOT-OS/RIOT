@@ -10,6 +10,8 @@ This application serves as simple example for "make bindist".
 It consists of an application module (bindist.a) and another example module
 (abc.a).
 
+See https://github.com/RIOT-OS/RIOT/wiki/LGPL-guide for background information.
+
 ## Instructions
 
 Calling "make bindist" creates a folder "bindist", which only contains the
