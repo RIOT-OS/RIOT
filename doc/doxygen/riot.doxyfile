@@ -828,6 +828,8 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/lpc11u34/include/LPC11Uxx.h \
                          */cpu/lpc1768/include/LPC17xx.h \
                          */cpu/lpc*/include/core_cm*.h \
+                         */cpu/msp430_common/include/stdatomic.h \
+                         */cpu/msp430_common/include/sys/*.h \
                          */cpu/native/osx-libc-extra \
                          */cpu/nrf5*/include/nrf5*.h \
                          */cpu/sam0_common/include/cmsis/* \
