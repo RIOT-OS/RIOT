@@ -19,6 +19,8 @@
 #ifndef REBOOT_H_
 #define REBOOT_H_
 
+#include "periph/pm.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -28,7 +30,10 @@
  *
  * This function is used by core_panic() when the DEVELHELP macro is not defined.
  */
-void reboot(void);
+static inline void reboot(void)
+{
+    pm_reboot();
+}
 
 #ifdef __cplusplus
 }
