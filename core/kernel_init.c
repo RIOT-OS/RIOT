@@ -28,6 +28,8 @@
 #include "irq.h"
 #include "log.h"
 
+#include "periph/pm.h"
+
 #ifdef MODULE_SCHEDSTATISTICS
 #include "sched.h"
 #endif
@@ -64,6 +66,7 @@ static void *idle_thread(void *arg)
     (void) arg;
 
     while (1) {
+        pm_set_lowest();
     }
 
     return NULL;
