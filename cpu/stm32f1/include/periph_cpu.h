@@ -123,6 +123,8 @@ typedef struct {
     uint8_t chan;           /**< DAC device used for this line */
 } dac_conf_t;
 
+#define PM_NUM_MODES    (2U)
+
 #ifdef __cplusplus
 }
 #endif
