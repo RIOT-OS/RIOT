@@ -50,4 +50,3 @@ for it (running from this directory) is:
 
     find include/ -name '*.h' -exec sed -i '/^#define\s\s*LITTLE_ENDIAN/d' '{}' +
     find include_b/ -name '*.h' -exec sed -i '/^#define\s\s*LITTLE_ENDIAN/d' '{}' +
-
