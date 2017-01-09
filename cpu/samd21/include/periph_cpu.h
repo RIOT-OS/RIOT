@@ -102,6 +102,8 @@ static inline int _sercom_id(SercomUsart *sercom)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
 }
 
+#define PM_NUM_MODES    (3)
+
 #ifdef __cplusplus
 }
 #endif
