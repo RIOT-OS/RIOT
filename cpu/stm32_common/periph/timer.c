@@ -131,7 +131,7 @@ static inline void irq_handler(tim_t tim)
 {
     uint32_t status = (dev(tim)->SR & dev(tim)->DIER);
 
-    for (uint8_t i = 0; i < TIMER_CHAN; i++) {
+    for (unsigned int i = 0; i < TIMER_CHAN; i++) {
         if (status & (TIM_SR_CC1IF << i)) {
             dev(tim)->DIER &= ~(TIM_DIER_CC1IE << i);
             isr_ctx[tim].cb(isr_ctx[tim].arg, i);
