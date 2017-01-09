@@ -18,7 +18,6 @@
  */
 
 #include "cpu.h"
-#include "lpm.h"
 
 void panic_arch(void)
 {
@@ -26,9 +25,6 @@ void panic_arch(void)
     WDTCTL = WDTPW | WDTHOLD;
 #ifdef DEVELHELP
     /* enter infinite loop, into deepest possible sleep mode */
-    while (1) {
-        lpm_set(LPM_OFF);
-    }
+    // TODO
 #endif
-
 }

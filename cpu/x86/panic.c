@@ -17,15 +17,12 @@
  */
 
 #include "x86_reboot.h"
-#include "lpm.h"
 
 void panic_arch(void)
 {
 #if DEVELHELP
     /* enter infinite loop, into deepest possible sleep mode */
-    while (1) {
-        lpm_set(LPM_OFF);
-    }
+    // TODO
 #else
     x86_shutdown();
 #endif

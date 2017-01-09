@@ -17,16 +17,13 @@
  */
 
 #include <avr/wdt.h>
-#include "lpm.h"
 
 void panic_arch(void)
 {
     wdt_disable();
 #ifdef DEVELHELP
     /* enter infinite loop, into deepest possible sleep mode */
-    while (1) {
-        lpm_set(LPM_OFF);
-    }
+    // TODO
 #endif
 
 }

@@ -38,8 +38,6 @@
 #include "irq.h"
 #include "cpu.h"
 
-#include "lpm.h"
-
 #include "native_internal.h"
 
 #define ENABLE_DEBUG (0)
@@ -448,7 +446,7 @@ static void native_shutdown(int sig, siginfo_t *info, void *context)
     (void)info;
     (void)context;
 
-    lpm_set(LPM_OFF);
+    // TODO: poweroff
 }
 
 /**

@@ -28,7 +28,6 @@
 #include "kernel_defines.h"
 #include "cpu.h"
 #include "irq.h"
-#include "lpm.h"
 #include "panic.h"
 #include "arch/panic_arch.h"
 #include "reboot.h"
