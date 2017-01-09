@@ -1,2 +1,3 @@
 export USEMODULE += quad_math
+export USEMODULE += periph_common
 export USEPKG += tlsf
