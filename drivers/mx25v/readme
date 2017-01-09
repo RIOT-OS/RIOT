@@ -1,0 +1,25 @@
+1. If this driver is needed, the contents below shloud be added to mx25v_conf.h in board folder
+
+/******************************* mx25v_conf.h ********************************/ 
+/**
+ *  config of mx25v devices
+ */
+#define MX25V_NUMOF         (sizeof(mx25v_flash) / sizeof(mx25v_flash[0]))
+
+typedef enum {
+    MX25V_0 = 0,            /**< MX25V device 0 */
+} mw25v_dev_t;
+
+#include <mx25v.h>
+
+static mx25v_t mx25v_flash[] = {
+    {
+            SPI_0,
+            SPI_CONF_FIRST_RISING,
+            SPI_SPEED_1MHZ,
+            SPI_FLASH_CS_PIN,
+            0,
+            0,
+    },
+};
+/******************************* mx25v_conf.h ********************************/

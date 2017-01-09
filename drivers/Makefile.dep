@@ -107,6 +107,10 @@ ifneq (,$(filter mpu9150,$(USEMODULE)))
     USEMODULE += xtimer
 endif
 
+ifneq (,$(filter mx25v,$(USEMODULE)))
+    USEMODULE += xtimer
+endif
+
 ifneq (,$(filter nvram_spi,$(USEMODULE)))
     USEMODULE += xtimer
 endif

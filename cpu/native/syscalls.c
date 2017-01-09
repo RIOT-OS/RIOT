@@ -89,6 +89,10 @@ int (*real_unlink)(const char *);
 long int (*real_random)(void);
 const char* (*real_gai_strerror)(int errcode);
 FILE* (*real_fopen)(const char *path, const char *mode);
+int (*real_fclose)(FILE *stream);
+int (*real_fseek)(FILE *stream, long offset, int whence);
+int (*real_fputc)(int c, FILE *stream);
+int (*real_fgetc)(FILE *stream);
 mode_t (*real_umask)(mode_t cmask);
 ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
 
@@ -472,6 +476,10 @@ void _native_init_syscalls(void)
     *(void **)(&real_clearerr) = dlsym(RTLD_NEXT, "clearerr");
     *(void **)(&real_umask) = dlsym(RTLD_NEXT, "umask");
     *(void **)(&real_writev) = dlsym(RTLD_NEXT, "writev");
+    *(void **)(&real_fclose) = dlsym(RTLD_NEXT, "fclose");
+    *(void **)(&real_fseek) = dlsym(RTLD_NEXT, "fseek");
+    *(void **)(&real_fputc) = dlsym(RTLD_NEXT, "fputc");
+    *(void **)(&real_fgetc) = dlsym(RTLD_NEXT, "fgetc");
 #ifdef __MACH__
 #else
     *(void **)(&real_clock_gettime) = dlsym(RTLD_NEXT, "clock_gettime");
