@@ -23,6 +23,10 @@
 #include "cpu.h"
 #include "log.h"
 
+#ifdef FEATURE_PERIPH_PM
+#include "periph/pm.h"
+#endif
+
 #ifdef DEVELHELP
 static void print_ipsr(void)
 {
@@ -42,8 +46,4 @@ void panic_arch(void)
     /* The bkpt instruction will signal to the debugger to break here. */
     __asm__("bkpt #0");
 #endif
-
-    /* turn off device if possible */
-    // TODO
-    while (1) { }
 }
