@@ -1,7 +1,7 @@
 PKG_NAME     := libfixmath
 PKG_VERSION  := ad9ed940e57d43432b276e95aee6ca9df6f23ccd
-PKG_URL      := git://github.com/PetteriAimonen/libfixmath
-PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/$(PKG_NAME)
+PKG_URL      := https://github.com/PetteriAimonen/libfixmath
+PKG_LICENSE  := MIT
 
 .PHONY: all
 
