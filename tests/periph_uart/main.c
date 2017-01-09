@@ -69,7 +69,7 @@ static void rx_cb(void *arg, uint8_t data)
     uart_t dev = (uart_t)arg;
 
     ringbuffer_add_one(&(ctx[dev].rx_buf), data);
-    if (data == 0) {
+    if (data == '\n') {
         msg_t msg;
         msg.content.value = (uint32_t)dev;
         msg_send(&msg, printer_pid);
@@ -91,8 +91,8 @@ static void *printer(void *arg)
         printf("UART_DEV(%i) RX: ", dev);
         do {
             c = (int)ringbuffer_get_one(&(ctx[dev].rx_buf));
-            if (c == 0) {
-                puts("");
+            if (c == '\n') {
+                puts("\\n");
             }
             else if (c >= ' ' && c <= '~') {
                 printf("%c", c);
@@ -100,7 +100,7 @@ static void *printer(void *arg)
             else {
                 printf("0x%02x", (unsigned char)c);
             }
-        } while (c != 0);
+        } while (c != '\n');
     }
 
     /* this should never be reached */
@@ -140,6 +140,7 @@ static int cmd_init(int argc, char **argv)
 static int cmd_send(int argc, char **argv)
 {
     int dev;
+    uint8_t endline = (uint8_t)'\n';
 
     if (argc < 3) {
         printf("usage: %s <dev> <data (string)>\n", argv[0]);
@@ -152,7 +153,8 @@ static int cmd_send(int argc, char **argv)
     }
 
     printf("UART_DEV(%i) TX: %s\n", dev, argv[2]);
-    uart_write(UART_DEV(dev), (uint8_t *)argv[2], strlen(argv[2]) + 1);
+    uart_write(UART_DEV(dev), (uint8_t *)argv[2], strlen(argv[2]));
+    uart_write(UART_DEV(dev), &endline, 1);
     return 0;
 }
 
@@ -173,7 +175,8 @@ int main(void)
          "data will be outputted via STDIO. So the easiest way to test an \n"
          "UART interface, is to simply connect the RX with the TX pin. Then \n"
          "you can send data on that interface and you should see the data \n"
-         "being printed to STDOUT\n");
+         "being printed to STDOUT\n\n"
+         "NOTE: all strings need to be '\\n' terminated!\n");
 
     puts("UART INFO:");
     printf("Available devices:               %i\n", UART_NUMOF);
