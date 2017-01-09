@@ -26,24 +26,32 @@
 extern "C" {
 #endif
 
-#if   defined(CPU_MODEL_SAML21E15A)
-  #include "cmsis/saml21/include/saml21e15a.h"
-#elif defined(CPU_MODEL_SAML21E16A)
-  #include "cmsis/saml21/include/saml21e16a.h"
-#elif defined(CPU_MODEL_SAML21E17A)
-  #include "cmsis/saml21/include/saml21e17a.h"
-#elif defined(CPU_MODEL_SAML21G16A)
-  #include "cmsis/saml21/include/saml21g16a.h"
-#elif defined(CPU_MODEL_SAML21G17A)
-  #include "cmsis/saml21/include/saml21g17a.h"
+#if   defined(CPU_MODEL_SAML21E18A)
+  #include "cmsis/saml21/include/saml21e18a.h"
 #elif defined(CPU_MODEL_SAML21G18A)
   #include "cmsis/saml21/include/saml21g18a.h"
-#elif defined(CPU_MODEL_SAML21J16A)
-  #include "cmsis/saml21/include/saml21j16a.h"
-#elif defined(CPU_MODEL_SAML21J17A)
-  #include "cmsis/saml21/include/saml21j17a.h"
 #elif defined(CPU_MODEL_SAML21J18A)
   #include "cmsis/saml21/include/saml21j18a.h"
+#elif defined(CPU_MODEL_SAML21E15B)
+  #include "cmsis/saml21/include_b/saml21e15b.h"
+#elif defined(CPU_MODEL_SAML21E16B)
+  #include "cmsis/saml21/include_b/saml21e16b.h"
+#elif defined(CPU_MODEL_SAML21E17B)
+  #include "cmsis/saml21/include_b/saml21e17b.h"
+#elif defined(CPU_MODEL_SAML21E18B)
+  #include "cmsis/saml21/include_b/saml21e18b.h"
+#elif defined(CPU_MODEL_SAML21G16B)
+  #include "cmsis/saml21/include_b/saml21g16b.h"
+#elif defined(CPU_MODEL_SAML21G17B)
+  #include "cmsis/saml21/include_b/saml21g17b.h"
+#elif defined(CPU_MODEL_SAML21G18B)
+  #include "cmsis/saml21/include_b/saml21g18b.h"
+#elif defined(CPU_MODEL_SAML21J16B)
+  #include "cmsis/saml21/include_b/saml21j16b.h"
+#elif defined(CPU_MODEL_SAML21J17B)
+  #include "cmsis/saml21/include_b/saml21j17b.h"
+#elif defined(CPU_MODEL_SAML21J18B)
+  #include "cmsis/saml21/include_b/saml21j18b.h"
 
 #elif defined(CPU_MODEL_SAMR21E16A)
   #include "cmsis/samr21/include/samr21e16a.h"
