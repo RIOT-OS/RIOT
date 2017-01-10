@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2016 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -37,6 +38,7 @@
  * @brief       Definition of the generic [S]ensor [A]ctuator [U]ber [L]ayer
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
 #ifndef SAUL_H
@@ -131,11 +133,23 @@ typedef int(*saul_read_t)(void *dev, phydat_t *res);
 typedef int(*saul_write_t)(void *dev, phydat_t *data);
 
 /**
+ * @brief   Test a device
+ *
+ * @param[in] dev       device descriptor of the target device
+ *
+ * @return a non negative value if the device test is OK
+ * @return -ENOTSUP if the device does not support this operation
+ * @return any other negative value on error
+ */
+typedef int(*saul_test_t)(void *dev);
+
+/**
  * @brief   Definition of the RIOT actuator/sensor interface
  */
 typedef struct {
     saul_read_t read;       /**< read function pointer */
     saul_write_t write;     /**< write function pointer */
+    saul_test_t test;       /**< test function pointer */
     uint8_t type;           /**< device class the device belongs to */
 } saul_driver_t;
 
@@ -143,6 +157,11 @@ typedef struct {
  * @brief   Default not supported function
  */
 int saul_notsup(void *dev, phydat_t *dat);
+
+/**
+ * @brief   Default test not supported function
+ */
+int saul_test_notsup(void *dev);
 
 /**
  * @brief   Helper function converts a class ID to a string

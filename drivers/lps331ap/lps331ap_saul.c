@@ -41,5 +41,6 @@ static int write(void *dev, phydat_t *state)
 const saul_driver_t lps331ap_saul_driver = {
     .read = read,
     .write = write,
+    .test = saul_test_notsup,
     .type = SAUL_SENSE_PRESS,
 };

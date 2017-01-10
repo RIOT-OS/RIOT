@@ -55,5 +55,6 @@ static int write(void *dev, phydat_t *state)
 const saul_driver_t lis3dh_saul_driver = {
     .read = read_acc,
     .write = write,
+    .test = saul_test_notsup,
     .type = SAUL_SENSE_ACCEL,
 };

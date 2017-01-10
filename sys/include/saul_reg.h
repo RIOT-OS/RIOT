@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2016 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,6 +18,7 @@
  * @brief       SAUL registry interface definition
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
 #ifndef SAUL_REG_H
@@ -126,12 +128,23 @@ int saul_reg_read(saul_reg_t *dev, phydat_t *res);
  * @param[in] dev       device to write to
  * @param[in] data      data to write to the device
  *
- * @return      the number of data elements read to @p res [1-3]
+ * @return      the number of data elements actually written into @p dev [1-3]
  * @return      -ENODEV if given device is invalid
- * @return      -ENOTSUP if read operation is not supported by the device
+ * @return      -ENOTSUP if write operation is not supported by the device
  * @return      -ECANCELED on device errors
  */
 int saul_reg_write(saul_reg_t *dev, phydat_t *data);
+
+/**
+ * @brief   Test the given device
+ *
+ * @param[in] dev       device to test
+ *
+ * @return      0 if test pass successfully
+ * @return      -ENODEV if given device is invalid
+ * @return      -ENOTSUP if test operation is not supported by the device
+ */
+int saul_reg_test(saul_reg_t *dev);
 
 #ifdef __cplusplus
 }
