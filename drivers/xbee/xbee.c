@@ -27,7 +27,6 @@
 #include "msg.h"
 #include "net/eui64.h"
 #include "net/ieee802154.h"
-#include "periph/cpuid.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
