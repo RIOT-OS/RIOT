@@ -103,7 +103,11 @@ ifneq (,$(filter ltc4150,$(USEMODULE)))
     USEMODULE += xtimer
 endif
 
-ifneq (,$(filter mpu9150,$(USEMODULE)))
+ifneq (,$(filter mpu_common,$(USEMODULE)))
+    USEMODULE += xtimer
+endif
+
+ifneq (,$(filter mpu9x50,$(USEMODULE)))
     USEMODULE += xtimer
 endif
 

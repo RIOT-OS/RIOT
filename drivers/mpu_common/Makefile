@@ -1,3 +1,2 @@
-MODULE = mpu9150
-
+MODULE = mpu_common
 include $(RIOTBASE)/Makefile.base

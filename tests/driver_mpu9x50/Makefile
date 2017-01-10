@@ -1,22 +1,22 @@
-APPLICATION = driver_mpu9150
+APPLICATION = driver_mpu9x50
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_i2c
 
-USEMODULE += mpu9150
+USEMODULE += mpu9x50
 USEMODULE += xtimer
 
 # define parameters for selected boards
 ifneq (,$(filter msbiot,$(BOARD)))
-  TEST_I2C       ?= MPU9150_I2C
-  TEST_HW_ADDR   ?= MPU9150_HW_ADDR
-  TEST_COMP_ADDR ?= MPU9150_COMP_ADDR
+  TEST_I2C       ?= MPU9X50_I2C
+  TEST_HW_ADDR   ?= MPU9X50_HW_ADDR
+  TEST_COMP_ADDR ?= MPU9X50_COMP_ADDR
 endif
 
 # set default device parameters in case they are undefined
 TEST_I2C       ?= I2C_0
-TEST_HW_ADDR   ?= MPU9150_HW_ADDR_HEX_68
-TEST_COMP_ADDR ?= MPU9150_COMP_ADDR_HEX_0C
+TEST_HW_ADDR   ?= MPU_HW_ADDR_HEX_68
+TEST_COMP_ADDR ?= MPU_COMP_ADDR_HEX_0C
 
 # export parameters
 CFLAGS += -DTEST_I2C=$(TEST_I2C)
