@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_ppptypes PPP types
+ * @defgroup    net_ppp Point-to-Point Protocol (PPP) Data Link Layer
  * @ingroup     net
  * @brief       PPP types
 
