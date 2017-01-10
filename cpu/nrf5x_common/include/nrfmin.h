@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_nrf5x_nrfmin NRF Minimal Radio Driver
- * @ingroup     drivers_netdev2
+ * @ingroup     drivers_netdev_netdev2
  * @brief       Minimal driver for the NRF51 radio
  *
  * This driver uses the nRF5x radio in a proprietary/custom way, defining our
