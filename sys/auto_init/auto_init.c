@@ -229,6 +229,11 @@ void auto_init(void)
     gnrc_nordic_ble_6lowpan_init();
 #endif
 
+#ifdef MODULE_NRFMIN
+    extern void gnrc_nrfmin_init(void);
+    gnrc_nrfmin_init();
+#endif
+
 #ifdef MODULE_W5100
     extern void auto_init_w5100(void);
     auto_init_w5100();

@@ -49,6 +49,16 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @brief   Due to RAM restrictions, we need to limit the default GNRC packet
+ *          buffer size on these CPUs
+ * @{
+ */
+#ifndef GNRC_PKTBUF_SIZE
+#define GNRC_PKTBUF_SIZE                (2048)
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
