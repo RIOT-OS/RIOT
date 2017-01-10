@@ -20,6 +20,7 @@
 #ifndef PERIPH_CPU_H_
 #define PERIPH_CPU_H_
 
+#include <stdint.h>
 #include "periph/dev_enums.h"
 
 #ifdef __cplusplus
@@ -46,6 +47,40 @@ extern "C" {
  * TODO: check this value
  */
 #define ADC_NUMOF           (10U)
+
+/**
+ * @brief   Override the default GPIO type
+ * @{
+ */
+#define HAVE_GPIO_T
+typedef uint16_t gpio_t;
+/** @} */
+
+/**
+ * @brief   Define a custom GPIO_PIN macro for the lpc11u34
+ */
+#define GPIO_PIN(port, pin)     (gpio_t)((port << 16) | pin)
+
+/**
+ * @brief   Override the default GPIO mode values
+ * @{
+ */
+#define IN                  (0x0000)
+#define OUT                 (0x0001)
+#define PD                  (0x1 << 3)
+#define PU                  (0x2 << 3)
+#define OD                  (0x1 << 10)
+
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN    = (IN),              /**< in without pull resistor */
+    GPIO_IN_PD = (IN | PD),         /**< in with pull-down */
+    GPIO_IN_PU = (IN | PU),         /**< in with pull-up */
+    GPIO_OUT   = (OUT),             /**< push-pull output */
+    GPIO_OD    = (OUT | OD),        /**< open-drain output */
+    GPIO_OD_PU = (OUT | OD | PU)    /**< open-drain output with pull-up */
+} gpio_mode_t;
+/** @} */
 
 #ifndef DOXYGEN
 /**
