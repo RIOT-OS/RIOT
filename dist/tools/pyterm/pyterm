@@ -125,8 +125,9 @@ class SerCmd(cmd.Cmd):
         self.ignores = []
         self.json_regs = dict()
         self.init_cmd = []
+        self.fmt_str = None
         self.load_config()
-        if self.fmt_str == None:
+        if self.fmt_str is None:
             self.fmt_str = default_fmt_str
         else:
             self.fmt_str = str(self.fmt_str.replace('"', '')) + "%(message)s"
