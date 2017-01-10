@@ -42,6 +42,7 @@ endif
 
 ifneq (,$(filter cc2420,$(USEMODULE)))
   USEMODULE += xtimer
+  USEMODULE += uuid
   USEMODULE += netif
   USEMODULE += ieee802154
   USEMODULE += netdev2_ieee802154
