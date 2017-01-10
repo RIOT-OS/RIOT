@@ -455,11 +455,9 @@ static void client_send(char *addr_str, char *data, unsigned int delay)
 
     /*
      * NOTE:  dtls_connect is the one who begin all the process.
-     * However, do it too fast, and the node will attend it before having a
-     * valid IPv6 or even a route to the destiny (This could be verified as the
-     * sequence number of the first DTLS Hello message will be greater than
-     * zero).
+     * But the first message it will not be sent until try_send() is called.
      */
+    connected = dtls_connect(dtls_context, &dst);
 
     /*
      * This loop has as objective to transmit all the DTLS records involved
@@ -468,33 +466,29 @@ static void client_send(char *addr_str, char *data, unsigned int delay)
      */
     while ((buflen > 0) && (iWatch > 0)) {
 
-        if (!connected) {
-            connected = dtls_connect(dtls_context, &dst);
-        }
-        else if (connected < 0) {
-            DEBUG("Client DTLS was unable to establish a channel!\n");
-            /*NOTE: Not sure what to do in this scenario (if it can happen)*/
-        }
-        else {
-            /*TODO: must happens always or only when connected?*/
-            try_send(dtls_context, &dst);
-        }
+      if (connected < 0) {
+        DEBUG("Client DTLS was unable to establish a channel!\n");
+        iWatch = 0;
+      }
+      else {
+        try_send(dtls_context, &dst);
+      }
 
-        /*
-         * WARNING: The delay is key HERE!  Too fast, and we can kill the
-         * DTLS state machine.  Another alternative is change to
-         * blocking states (making the watchdog useless)
-         *
-         * msg_receive(&msg);
-         */
+      /*
+       * WARNING: The delay is key HERE!  Too fast, and we can kill the
+       * DTLS state machine.  Another alternative is change to
+       * blocking states (making the watchdog useless)
+       *
+       * msg_receive(&msg);
+       */
 
-        xtimer_usleep(delay);
+      xtimer_usleep(delay);
 
-        if (msg_try_receive(&msg) == 1) {
-            dtls_handle_read(dtls_context, (gnrc_pktsnip_t *)(msg.content.ptr));
-        }
+      if (msg_try_receive(&msg) == 1) {
+        dtls_handle_read(dtls_context, (gnrc_pktsnip_t *)(msg.content.ptr));
+      }
 
-        iWatch--;
+      iWatch--;
     } /*END while*/
 
     dtls_free_context(dtls_context);
