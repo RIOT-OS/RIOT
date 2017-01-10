@@ -1,10 +1,10 @@
 PKG_NAME=tinydtls
-PKG_URL=git://github.com/rfuentess/TinyDTLS.git
+PKG_URL=https://github.com/rfuentess/TinyDTLS.git
 PKG_VERSION=master
 # (Official) Branch with tested(?) updates before merging to remote master
 #PKG_VERSION=RIOT-Tested-Upgrades
 
-PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/$(PKG_NAME)
+PKG_LICENSE=EPL-1.0,EDL-1.0
 
 .PHONY: all
 
