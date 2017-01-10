@@ -42,6 +42,31 @@ extern "C" {
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
+/**
+ * @name Bit band macros
+ * @{
+ */
+/* Generic bitband conversion routine */
+/** @brief Convert bit-band region address and bit number to bit-band alias address
+ *
+ * @param[in] addr base address in non-bit-banded memory
+ * @param[in] bit  bit number within the word
+ *
+ * @return Address of the bit within the bit-band memory region
+ */
+#define BITBAND_ADDR(addr, bit) ((((uint32_t) (addr)) & 0xF0000000u) + 0x2000000 + ((((uint32_t) (addr)) & 0xFFFFF) << 5) + ((bit) << 2))
+
+/**
+ * @brief Bitband 32 bit access to variable stored in memory
+ *
+ * @param[in] var  a 32-bit lvalue in memory
+ * @param[in] bit  bit number within the word
+ *
+ * @return A 32-bit lvalue corresponding to the bit within the bit-band memory region
+ */
+#define BITBAND_VAR32(var, bit) (*((uint32_t volatile*) BITBAND_ADDR(&(var), (bit))))
+
+/** @} */
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

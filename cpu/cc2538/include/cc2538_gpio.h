@@ -27,6 +27,7 @@
 #include <stdint.h>
 
 #include "cc2538.h"
+#include "cpu_conf.h" /* for BITBAND_VAR32() macro */
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,15 +48,6 @@ enum {
 #define GPIO_PORT_SHIFT 3                              /**< Right-shift amount to obtain the port number from a GPIO number */
 #define GPIO_BITS_PER_PORT ( 1 << GPIO_PORT_SHIFT )    /**< Number of bits per GPIO port (8) */
 #define GPIO_BIT_MASK      ( GPIO_BITS_PER_PORT - 1 )  /**< Mask to obtain the bit number from a GPIO number */
-
-/**
- * @brief Generate a bit mask in which only the specified bit is high.
- *
- * @param[in] n Number of the bit to set high in the mask.
- *
- * @return A bit mask in which bit n is high.
-*/
-#define GPIO_PIN_MASK(n) ( 1 << (n) )
 
 /**
  * @brief Extract the GPIO port number (0-3) from a GPIO number (0-31)
@@ -99,51 +91,51 @@ enum {
  *
  * @param[in] gpio_num GPIO number (0-31)
 */
-#define gpio_hardware_control(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->AFSEL |= GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
+#define gpio_hardware_control(gpio_num) ( BITBAND_VAR32(GPIO_NUM_TO_DEV(gpio_num)->AFSEL, GPIO_BIT_NUM(gpio_num)) = 1 )
 
 /**
  * @brief Enable software control for a given GPIO pin number
  *
  * @param[in] gpio_num GPIO number (0-31)
 */
-#define gpio_software_control(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->AFSEL &= ~GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
+#define gpio_software_control(gpio_num) ( BITBAND_VAR32(GPIO_NUM_TO_DEV(gpio_num)->AFSEL, GPIO_BIT_NUM(gpio_num)) = 0 )
 
 /**
  * @brief Configure the given GPIO as an output
  *
  * @param[in] gpio_num GPIO number (0-31)
 */
-#define gpio_dir_output(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DIR |= GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
+#define gpio_dir_output(gpio_num) ( BITBAND_VAR32(GPIO_NUM_TO_DEV(gpio_num)->DIR, GPIO_BIT_NUM(gpio_num)) = 1 )
 
 /**
  * @brief Configure the given GPIO as an input
  *
  * @param[in] gpio_num GPIO number (0-31)
 */
-#define gpio_dir_input(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DIR &= ~GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
+#define gpio_dir_input(gpio_num) ( BITBAND_VAR32(GPIO_NUM_TO_DEV(gpio_num)->DIR, GPIO_BIT_NUM(gpio_num)) = 0 )
 
-#define cc2538_gpio_read(gpio_num) ( (GPIO_NUM_TO_DEV(gpio_num)->DATA >> GPIO_BIT_NUM(gpio_num)) & 1 )
+#define cc2538_gpio_read(gpio_num) BITBAND_VAR32(GPIO_NUM_TO_DEV(gpio_num)->DATA, GPIO_BIT_NUM(gpio_num))
 
 /**
  * @brief Set a specific GPIO output pin high
  *
  * @param[in] gpio_num GPIO number (0-31)
 */
-#define cc2538_gpio_set(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DATA |= GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
+#define cc2538_gpio_set(gpio_num) ( BITBAND_VAR32(GPIO_NUM_TO_DEV(gpio_num)->DATA, GPIO_BIT_NUM(gpio_num)) = 1 )
 
 /**
  * @brief Set a specific GPIO output pin low
  *
  * @param[in] gpio_num GPIO number (0-31)
 */
-#define cc2538_gpio_clear(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DATA &= ~GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
+#define cc2538_gpio_clear(gpio_num) ( BITBAND_VAR32(GPIO_NUM_TO_DEV(gpio_num)->DATA, GPIO_BIT_NUM(gpio_num)) = 0 )
 
 /**
  * @brief Toggle the output state of a specific GPIO pin
  *
  * @param[in] gpio_num GPIO number (0-31)
 */
-#define cc2538_gpio_toggle(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DATA ^= GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
+#define cc2538_gpio_toggle(gpio_num) ( BITBAND_VAR32(GPIO_NUM_TO_DEV(gpio_num)->DATA, GPIO_BIT_NUM(gpio_num)) ^= 1 )
 
 /** @name Unique names for each GPIO port/pin combination
  * @{
