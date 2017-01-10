@@ -46,7 +46,7 @@ static gnrc_slip_dev_t slip_devs[SLIP_NUM];
 /**
  * @brief   Stacks for the MAC layer threads
  */
-static char _slip_stacks[SLIP_STACKSIZE][SLIP_NUM];
+static char _slip_stacks[SLIP_NUM][SLIP_STACKSIZE];
 
 void auto_init_slip(void)
 {

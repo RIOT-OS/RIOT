@@ -42,7 +42,7 @@
 #define CC110X_NUM (sizeof(cc110x_params)/sizeof(cc110x_params[0]))
 
 static netdev2_cc110x_t cc110x_devs[CC110X_NUM];
-static char _stacks[CC110X_MAC_STACKSIZE][CC110X_NUM];
+static char _stacks[CC110X_NUM][CC110X_MAC_STACKSIZE];
 
 static gnrc_netdev2_t _gnrc_netdev2_devs[CC110X_NUM];
 
