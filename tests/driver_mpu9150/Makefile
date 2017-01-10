@@ -14,7 +14,7 @@ ifneq (,$(filter msbiot,$(BOARD)))
 endif
 
 # set default device parameters in case they are undefined
-TEST_I2C       ?= I2C_0
+TEST_I2C       ?= I2C_DEV\(0\)
 TEST_HW_ADDR   ?= MPU9150_HW_ADDR_HEX_68
 TEST_COMP_ADDR ?= MPU9150_COMP_ADDR_HEX_0C
 

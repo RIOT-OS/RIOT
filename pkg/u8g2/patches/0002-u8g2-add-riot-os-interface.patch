@@ -17,16 +17,16 @@ index b65c9f1..bd8c485 100644
 @@ -362,6 +362,9 @@ void u8g2_ClearDisplay(u8g2_t *u8g2);
  #define u8g2_SetMenuDownPin(u8g2, val) u8x8_SetMenuDownPin(u8g2_GetU8x8(u8g2), (val))
  #endif
- 
+
 +#define u8g2_SetPins(u8x8,pins,pins_enabled) u8x8_SetPins(u8g2_GetU8x8(&u8g2), pins, pins_enabled)
 +#define u8g2_SetDevice(u8x8,device) u8x8_SetDevice(u8g2_GetU8x8(&u8g2), device)
 +
  /*==========================================*/
  /* u8g2_setup.c */
- 
+
 @@ -1663,4 +1666,3 @@ extern const uint8_t u8g2_font_px437wyse700b_mn[] U8G2_FONT_SECTION("u8g2_font_p
- 
- 
+
+
  #endif
 -
 diff --git a/csrc/u8g2_riotos.c b/csrc/u8g2_riotos.c
@@ -164,7 +164,7 @@ index 0000000..7106e07
 +}
 +#endif /* SPI_NUMOF */
 +
-+#if I2C_NUMOF
++#ifdef I2C_NUMOF
 +uint8_t u8x8_byte_riotos_hw_i2c(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 +{
 +    static uint8_t buffer[255];
@@ -205,27 +205,27 @@ index dd74869..7c45b6a 100644
 @@ -107,6 +107,8 @@
  #include <stdint.h>
  #include <stddef.h>
- 
+
 +#include "periph/gpio.h"
 +
  #if defined(__GNUC__) && defined(__AVR__)
  #include <avr/pgmspace.h>
- #endif 
-@@ -154,9 +156,9 @@ extern "C" {
- #  define u8x8_pgm_read(adr) (*(const uint8_t *)(adr)) 
  #endif
- 
+@@ -154,9 +156,9 @@ extern "C" {
+ #  define u8x8_pgm_read(adr) (*(const uint8_t *)(adr))
+ #endif
+
 -#ifdef ARDUINO
 -#define U8X8_USE_PINS
 -#endif
 +//#ifdef ARDUINO
 +//#define U8X8_USE_PINS
 +//#endif
- 
+
  /*==========================================*/
  /* U8X8 typedefs and data structures */
 @@ -316,6 +318,10 @@ struct u8x8_struct
- #ifdef U8X8_USE_PINS 
+ #ifdef U8X8_USE_PINS
    uint8_t pins[U8X8_PIN_CNT];	/* defines a pinlist: Mainly a list of pins for the Arduino Envionment, use U8X8_PIN_xxx to access */
  #endif
 +
@@ -233,27 +233,27 @@ index dd74869..7c45b6a 100644
 +  uint32_t pins_enabled;
 +  uint32_t dev;
  };
- 
+
  #define u8x8_GetCols(u8x8) ((u8x8)->display_info->tile_width)
 @@ -337,6 +343,8 @@ struct u8x8_struct
  #define u8x8_SetMenuDownPin(u8x8, val) u8x8_SetPin((u8x8),U8X8_PIN_MENU_DOWN,(val))
  #endif
- 
+
 +#define u8x8_SetPins(u8x8,pins,pins_enabled) {(u8x8)->pins = (pins); (u8x8)->pins_enabled = (pins_enabled);}
 +#define u8x8_SetDevice(u8x8,device) ((u8x8)->dev = device)
- 
+
  /*==========================================*/
- 
+
 @@ -818,6 +826,9 @@ extern const uint8_t u8x8_font_pxplustandynewtv_u[] U8X8_FONT_SECTION("u8x8_font
- 
+
  /* end font list */
- 
+
 +extern uint8_t u8x8_byte_riotos_hw_spi(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void *arg_ptr);
 +extern uint8_t u8x8_gpio_and_delay_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void *arg_ptr);
 +extern uint8_t u8x8_byte_riotos_hw_i2c(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void *arg_ptr);
- 
+
  #ifdef __cplusplus
  }
--- 
+--
 2.8.1
 

@@ -11,35 +11,19 @@
  * @{
  *
  * @file
- * @brief           CPU specific definitions for handling peripherals
+ * @brief           nRF5x common definitions for handling peripherals
  *
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef CPU_PERIPH_H
-#define CPU_PERIPH_H
+#ifndef PERIPH_CPU_COMMON_H_
+#define PERIPH_CPU_COMMON_H_
 
 #include "cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   Iron out some differences in register and IRQ channel naming between
- *          the different nRFx family members
- * @{
- */
-#if defined(CPU_FAM_NRF51)
-#define GPIO_BASE           (NRF_GPIO)
-#define UART_IRQN           (UART0_IRQn)
-#elif defined(CPU_FAM_NRF52)
-#define GPIO_BASE           (NRF_P0)
-#define UART_IRQN           (UARTE0_UART0_IRQn)
-#else
-#error "nrf5x_common: no valid value for CPU_FAM_XX defined"
-#endif
-/** @} */
 
 /**
  * @brief   Length of the CPU_ID in octets
@@ -116,15 +100,15 @@ typedef enum {
  * @brief   Timer configuration options
  */
 typedef struct {
-    NRF_TIMER_Type *dev;
-    uint8_t channels;
-    uint8_t bitmode;
-    uint8_t irqn;
+    NRF_TIMER_Type *dev;    /**< timer device */
+    uint8_t channels;       /**< number of channels available */
+    uint8_t bitmode;        /**< counter width */
+    uint8_t irqn;           /**< IRQ number of the timer device */
 } timer_conf_t;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* CPU_PERIPH_H */
+#endif /* PERIPH_CPU_COMMON_H_ */
 /** @} */
