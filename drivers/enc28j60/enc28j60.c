@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include "uuid.h"
 #include "mutex.h"
 #include "xtimer.h"
 #include "assert.h"
@@ -29,10 +30,6 @@
 
 #include "enc28j60.h"
 #include "enc28j60_regs.h"
-
-#if CPUID_LEN
-#include "periph/cpuid.h"
-#endif
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -269,7 +266,7 @@ static int nd_recv(netdev2_t *netdev, void *buf, size_t max_len, void *info)
     if (buf != NULL) {
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.rx_count++;
-        netdev2->stats.rx_bytes += size;
+        netdev->stats.rx_bytes += size;
 #endif
         /* read packet content into the supplied buffer */
         if (size <= max_len) {
@@ -354,14 +351,10 @@ static int nd_init(netdev2_t *netdev)
     /* set non-back-to-back inter packet gap -> 0x12 is default */
     cmd_wcr(dev, REG_B2_MAIPGL, 2, MAIPGL_FD);
     /* set default MAC address */
-#if CPUID_LEN
-    uint8_t macbuf[CPUID_LEN];
-    cpuid_get(&macbuf);     /* we get the full ID but use only parts of it */
+    uint8_t macbuf[ETHERNET_ADDR_LEN];
+    uuid_get(macbuf, ETHERNET_ADDR_LEN);
     macbuf[0] |= 0x02;      /* locally administered address */
     macbuf[0] &= ~0x01;     /* unicast address */
-#else
-    uint8_t macbuf[] = ENC28J60_FALLBACK_MAC;
-#endif
     mac_set(dev, macbuf);
 
     /* PHY configuration */
