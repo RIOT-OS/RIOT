@@ -57,7 +57,7 @@ CFLAGS += -DDTLS_PSK
 # WARNING: Sometimes the log leads to Stack pointer corrupted.
 #          The reason is not identified yet.
 #          If said issue appears, enable this line.
-#CFLAGS += -DNDEBUG
+CFLAGS += -DNDEBUG
 
 # NOTE: The configuration for socket or non-socket  communication in TinyDTLS.
 CFLAGS += -DWITH_RIOT_GNRC
