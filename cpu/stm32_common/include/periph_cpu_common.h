@@ -69,6 +69,7 @@ typedef enum {
 #endif
 } bus_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Overwrite the default gpio_t type definition
  * @{
@@ -76,6 +77,7 @@ typedef enum {
 #define HAVE_GPIO_T
 typedef uint32_t gpio_t;
 /** @} */
+#endif
 
 /**
  * @brief   Definition of a fitting UNDEF value
