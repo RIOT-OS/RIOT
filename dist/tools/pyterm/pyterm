@@ -68,7 +68,11 @@ defaultrunname  = "default-run"
 # default logging prefix format string
 default_fmt_str = '%(asctime)s - %(levelname)s # %(message)s'
 
+# default newline setting
 defaultnewline = "LF"
+
+# default prompt character
+defaultprompt  = '>'
 
 
 class SerCmd(cmd.Cmd):
@@ -80,7 +84,8 @@ class SerCmd(cmd.Cmd):
 
     def __init__(self, port=None, baudrate=None, toggle=None, tcp_serial=None,
                  confdir=None, conffile=None, host=None, run_name=None,
-                 log_dir_name=None, newline=None, formatter=None):
+                 log_dir_name=None, newline=None, formatter=None,
+                 serprompt=None):
         """Constructor.
 
         Args:
@@ -106,6 +111,7 @@ class SerCmd(cmd.Cmd):
         self.run_name = run_name
         self.log_dir_name = log_dir_name
         self.newline = newline
+        self.serprompt = serprompt
         if not formatter is None:
             self.fmt_str = formatter
 
@@ -615,6 +621,9 @@ class SerCmd(cmd.Cmd):
                 if (self.newline == "CRLF" and crreceived) or (self.newline == "LF"):
                     self.handle_line(output)
                     output = ""
+            elif c == self.serprompt and output == "":
+                sys.stdout.write('%c ' % self.serprompt)
+                sys.stdout.flush()
             else:
                 output += c
 
@@ -735,13 +744,18 @@ if __name__ == "__main__":
                         "of CR and LF. Examples: -nl=LF, -nl=CRLF. "
                         "(Default is %s)" % defaultnewline,
                         default=defaultnewline)
+    parser.add_argument("-pr", "--prompt",
+                        help="The expected prompt character, default is %c"
+                        % defaultprompt,
+                        default=defaultprompt)
+
     args = parser.parse_args()
 
     if (args.noprefix):
         args.format = ""
     myshell = SerCmd(args.port, args.baudrate, args.toggle, args.tcp_serial,
                      args.directory, args.config, args.host, args.run_name,
-                     args.log_dir_name, args.newline, args.format)
+                     args.log_dir_name, args.newline, args.format, args.prompt)
     myshell.prompt = ''
 
     if args.server and args.tcp_port:
