@@ -160,8 +160,11 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     /* copy payload */
     at86rf2xx_fb_read(dev, (uint8_t *)buf, pkt_len);
 
-    /* Ignore FCS but advance fb read */
-    at86rf2xx_fb_read(dev, NULL, 2);
+    /* Ignore FCS but advance fb read - we must give a temporary buffer here,
+     * as we are not allowed to issue SPI transfers without any buffer */
+    uint8_t tmp[2];
+    at86rf2xx_fb_read(dev, tmp, 2);
+    (void)tmp;
 
     if (info != NULL) {
         netdev2_ieee802154_rx_info_t *radio_info = info;
