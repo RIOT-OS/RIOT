@@ -7,8 +7,8 @@ BOARD_INSUFFICIENT_MEMORY := nucleo-f030 nucleo-f334 stm32f0discovery weio
 
 USEMODULE += xbee
 USEMODULE += gnrc_netif
+USEMODULE += gnrc_netdev2
 USEMODULE += auto_init_gnrc_netif
-USEMODULE += gnrc_nomac
 USEMODULE += gnrc_pktdump
 USEMODULE += shell
 USEMODULE += shell_commands

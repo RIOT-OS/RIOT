@@ -73,3 +73,6 @@ endif
 ifneq (,$(filter w5100,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/w5100/include
 endif
+ifneq (,$(filter xbee,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/xbee/include
+endif
