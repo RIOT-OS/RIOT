@@ -11,7 +11,7 @@ RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo-f030 nucleo-f334 \
                              stm32f0discovery telosb weio wsn430-v1_3b wsn430-v1_4 \
-                             z1
+                             z1 nucleo-f042
 
 # Must read nordic_softdevice_ble package before nanocoap package. However,
 # can't read it explicitly here because it is read later, as a dependency for

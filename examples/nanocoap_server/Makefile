@@ -10,7 +10,8 @@ RIOTBASE ?= $(CURDIR)/../..
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos msb-430 msb-430h nrf51dongle \
                           nrf6310 pca10000 pca10005 spark-core \
                           stm32f0discovery telosb weio wsn430-v1_3b wsn430-v1_4 \
-                          yunjia-nrf51822 z1 nucleo-f072 nucleo-f030
+                          yunjia-nrf51822 z1 nucleo-f072 nucleo-f030 \
+                          nucleo-f042
 
 # blacklist this until #6022 is sorted out
 BOARD_BLACKLIST := nrf52dk
