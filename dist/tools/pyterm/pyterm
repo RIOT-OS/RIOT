@@ -126,9 +126,10 @@ class SerCmd(cmd.Cmd):
         self.json_regs = dict()
         self.init_cmd = []
         self.load_config()
-        self.fmt_str = None
-        if not self.fmt_str:
+        if self.fmt_str == None:
             self.fmt_str = default_fmt_str
+        else:
+            self.fmt_str = str(self.fmt_str.replace('"', '')) + "%(message)s"
 
         # check for a history file
         try:
@@ -459,7 +460,9 @@ class SerCmd(cmd.Cmd):
         """Internal function to laod configuration from file.
         """
         self.config = configparser.SafeConfigParser()
-        self.config.read([self.configdir + os.path.sep + self.configfile])
+        cf = os.path.join(self.configdir, self.configfile)
+        self.config.read(cf)
+        logging.getLogger("").info("Reading file: %s" %  cf)
 
         for sec in self.config.sections():
             if sec == "filters":
