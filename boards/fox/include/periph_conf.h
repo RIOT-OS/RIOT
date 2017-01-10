@@ -42,8 +42,6 @@ extern "C" {
 /* resulting bus clocks */
 #define CLOCK_APB1          (CLOCK_CORECLOCK / 2)
 #define CLOCK_APB2          (CLOCK_CORECLOCK)
-/* configuration of flash access cycles */
-#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_2
 /** @} */
 
 /**
