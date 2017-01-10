@@ -31,6 +31,7 @@ endif
 
 ifneq (,$(filter cc110x,$(USEMODULE)))
   USEMODULE += ieee802154
+  USEMODULE += uuid
   ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
     USEMODULE += gnrc_cc110x
 	# XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
