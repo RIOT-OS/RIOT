@@ -9,9 +9,8 @@ RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h
 
-## Uncomment to support the XBee module and nomac
+## Uncomment to support the XBee module
 #USEMODULE += xbee
-#USEMODULE += gnrc_nomac
 
 ## set default UART to use in case none was defined
 #XBEE_UART ?= "UART_NUMOF-1"
