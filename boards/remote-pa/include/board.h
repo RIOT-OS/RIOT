@@ -60,7 +60,7 @@
  * @name User button pin definition
  * @{
  */
-#define BUTTON_GPIO         GPIO_9_PIN
+#define BTN0_PIN            GPIO_PIN(0, 3)
 /** @} */
 
 /**
