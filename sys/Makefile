@@ -99,6 +99,9 @@ endif
 ifneq (,$(filter sema,$(USEMODULE)))
     DIRS += sema
 endif
+ifneq (,$(filter tweetnacl,$(USEMODULE)))
+    DIRS += $(RIOTBASE)/pkg/tweetnacl/src
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
