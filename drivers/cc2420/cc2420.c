@@ -160,6 +160,7 @@ size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, unsigned count
     size_t pkt_len = 2;     /* include the FCS (frame check sequence) */
 
     /* wait for any ongoing transmissions to be finished */
+    DEBUG("cc2420: tx_exec: waiting for any ongoing transmission\n");
     while (cc2420_get_state(dev) & NETOPT_STATE_TX) {}
 
     /* get and check the length of the packet */
@@ -186,9 +187,6 @@ size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, unsigned count
 
 void cc2420_tx_exec(cc2420_t *dev)
 {
-    /* make sure, any ongoing transmission is finished */
-    DEBUG("cc2420: tx_exec: waiting for any ongoing transmission\n");
-    while (cc2420_get_state(dev) & NETOPT_STATE_TX) {}
     /* trigger the transmission */
     if (dev->options & CC2420_OPT_TELL_TX_START) {
         dev->netdev.netdev.event_callback(&dev->netdev.netdev,
@@ -203,15 +201,6 @@ void cc2420_tx_exec(cc2420_t *dev)
         DEBUG("cc2420: tx_exec: triggering TX without CCA\n");
         cc2420_strobe(dev, CC2420_STROBE_TXON);
     }
-
-    while (gpio_read(dev->params.pin_sfd)) {
-        puts("\t...ongoing}");
-    }
-    if (dev->options & CC2420_OPT_TELL_TX_END) {
-        dev->netdev.netdev.event_callback(&dev->netdev.netdev,
-                                          NETDEV2_EVENT_TX_COMPLETE);
-    }
-    DEBUG("cc2420: tx_exec: TX_DONE\n");
 }
 
 int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
