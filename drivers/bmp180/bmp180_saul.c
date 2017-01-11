@@ -27,7 +27,7 @@
 
 static int32_t temperature, pressure;
 
-static int check_and_read_temperature(void *dev, phydat_t *res)
+static int read_temperature(void *dev, phydat_t *res)
 {
     bmp180_t *d = (bmp180_t *)dev;
 
@@ -38,7 +38,7 @@ static int check_and_read_temperature(void *dev, phydat_t *res)
     return 1;
 }
 
-static int check_and_read_pressure(void *dev, phydat_t *res)
+static int read_pressure(void *dev, phydat_t *res)
 {
     bmp180_t *d = (bmp180_t *)dev;
 
@@ -48,16 +48,6 @@ static int check_and_read_pressure(void *dev, phydat_t *res)
     res->unit = UNIT_PA;
     res->scale = 1;
     return 1;
-}
-
-static int read_temperature(void *dev, phydat_t *res)
-{
-    return check_and_read_temperature(dev, res);
-}
-
-static int read_pressure(void *dev, phydat_t *res)
-{
-    return check_and_read_pressure(dev, res);
 }
 
 const saul_driver_t bmp180_temperature_saul_driver = {
