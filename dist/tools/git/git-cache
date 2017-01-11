@@ -72,11 +72,7 @@ drop() {
 }
 
 _check_commit() {
-    if [ -d "${GIT_CACHE_DIR}" ]; then
-        git_cache cat-file -e ${1}^{commit}
-    else
-        false
-    fi
+    git_cache cat-file -e ${1}^{commit}
 }
 
 _remote_name() {
@@ -90,21 +86,26 @@ clone() {
     local REMOTE_NAME="$(_remote_name $REMOTE)"
     local TARGET_PATH="${3:-${REMOTE_NAME}}"
 
-    if [ "$GIT_CACHE_AUTOADD" = "1" ]; then
-        if ! is_cached "$REMOTE"; then
-            echo "git cache: auto-adding $REMOTE"
-            add "$REMOTE"
-            update "$(_remote_name $REMOTE)"
+    if [ -d "${GIT_CACHE_DIR}" ]; then
+        if [ "$GIT_CACHE_AUTOADD" = "1" ]; then
+            if ! is_cached "$REMOTE"; then
+                echo "git cache: auto-adding $REMOTE"
+                add "$REMOTE"
+                update "$(_remote_name $REMOTE)"
+            fi
         fi
-    fi
 
-    if _check_commit $2 2>&1; then
-        git_cache tag commit$SHA1 $SHA1 || true # ignore possibly already existing tag
-        git clone --reference "${GIT_CACHE_DIR}" "${GIT_CACHE_DIR}" "${TARGET_PATH}" --branch commit$SHA1
+        if _check_commit $2 2>&1; then
+            git_cache tag commit$SHA1 $SHA1 || true # ignore possibly already existing tag
+            REMOTE="${GIT_CACHE_DIR}"
+        fi
+
+        git clone --reference "${GIT_CACHE_DIR}" "${REMOTE}" "${TARGET_PATH}"
     else
         git clone "${REMOTE}" "${TARGET_PATH}"
-        git -C "${TARGET_PATH}" checkout $SHA1
     fi
+
+    git -C "${TARGET_PATH}" checkout $SHA1
     set +e
 }
 
