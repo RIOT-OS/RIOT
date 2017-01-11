@@ -29,6 +29,8 @@
 #include "periph/spi.h"
 #include "nvram-spi.h"
 #include "xtimer.h"
+#include "rtc.h"
+#include "clist.h"
 
 static nvram_t mulle_nvram_dev;
 nvram_t *mulle_nvram = &mulle_nvram_dev;

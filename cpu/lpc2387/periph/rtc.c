@@ -14,7 +14,7 @@
 #include "kernel_types.h"
 
 /* cpu */
-#include "periph/rtc.h"
+#include "rtc.h"
 #include "VIC.h"
 #include "lpc2387.h"
 #include "lpm.h"
@@ -23,18 +23,40 @@
 #include "debug.h"
 
 /* Alarm callback */
-static rtc_alarm_cb_t _cb;
-
-/* Argument to alarm callback */
-static void *_cb_arg;
+static struct {
+    rtc_alarm_cb_t cb;
+    void *arg;
+} _lpc2387_rtc_cb;
 
 /* internal function to set time based on time_t */
 static void _rtc_set(time_t time);
 
 void RTC_IRQHandler(void) __attribute__((interrupt("IRQ")));
 
-void rtc_init(void)
+static int  _lpc2387_rtc_init(rtc_t *rtc);
+static int  _lpc2387_rtc_set_time(rtc_t *rtc, const struct tm *localt);
+static int  _lpc2387_rtc_get_time(rtc_t *rtc, struct tm *localt);
+static int  _lpc2387_rtc_set_alarm(rtc_t *rtc, const struct tm *localt, rtc_alarm_cb_t cb, void *arg);
+static int  _lpc2387_rtc_get_alarm(rtc_t *rtc, struct tm *localt);
+static void _lpc2387_rtc_clear_alarm(rtc_t *rtc);
+
+static const rtc_ops_t _lpc2387_rtc_ops = {
+    .init        = _lpc2387_rtc_init,
+    .get_time    = _lpc2387_rtc_get_time,
+    .set_time    = _lpc2387_rtc_set_time,
+    .get_alarm   = _lpc2387_rtc_get_alarm,
+    .set_alarm   = _lpc2387_rtc_set_alarm,
+    .clear_alarm = _lpc2387_rtc_clear_alarm,
+};
+
+rtc_t cpu_rtc = {
+    .rtc_op = &_lpc2387_rtc_ops,
+    .name = "cpu",
+};
+
+int _lpc2387_rtc_init(rtc_t *rtc)
 {
+    (void)rtc;
     PCONP |= BIT9;
     RTC_AMR = 0xff;                         /* disable alarm irq */
     RTC_CIIR = 0;                           /* disable increase irq */
@@ -52,14 +74,16 @@ void rtc_init(void)
 
     DEBUG("%2lu.%2lu.%4lu  %2lu:%2lu:%2lu\n",
             RTC_DOM, RTC_MONTH, RTC_YEAR, RTC_HOUR, RTC_MIN, RTC_SEC);
+    return 0;
 }
 
 /**
  * @brief   Sets the current time in broken down format directly from to RTC
  * @param[in]   localt      Pointer to structure with time to set
  */
-int rtc_set_time(struct tm *localt)
+int _lpc2387_rtc_set_time(rtc_t *rtc, const struct tm *localt)
 {
+    (void)rtc;
     if (localt == NULL) {
         return -1;
     }
@@ -77,89 +101,77 @@ int rtc_set_time(struct tm *localt)
     return 0;
 }
 
-int rtc_get_time(struct tm *localt)
+int _lpc2387_rtc_get_time(rtc_t *rtc, struct tm *localt)
 {
-    if (localt != NULL) {
-        localt->tm_sec = RTC_SEC;
-        localt->tm_min = RTC_MIN;
-        localt->tm_hour = RTC_HOUR;
-        localt->tm_mday = RTC_DOM;
-        localt->tm_wday = RTC_DOW;
-        localt->tm_yday = RTC_DOY;
-        localt->tm_mon = RTC_MONTH - 1;
-        localt->tm_year = RTC_YEAR;
-        localt->tm_isdst = -1; /* not available */
-        return 0;
-    }
-    return -1;
-}
-
-
-int rtc_set_alarm(struct tm *localt, rtc_alarm_cb_t cb, void *arg)
-{
-    (void) arg;
-    if (localt != NULL) {
-        RTC_ALSEC = localt->tm_sec;
-        RTC_ALMIN = localt->tm_min;
-        RTC_ALHOUR = localt->tm_hour;
-        RTC_ALDOM = localt->tm_mday;
-        RTC_ALDOW = localt->tm_wday;
-        RTC_ALDOY = localt->tm_yday;
-        RTC_ALMON = localt->tm_mon + 1;
-        RTC_ALYEAR = localt->tm_year;
-        RTC_AMR = 0;                                            /* set wich alarm fields to check */
-        DEBUG("alarm set %2lu.%2lu.%4lu  %2lu:%2lu:%2lu\n",
-              RTC_ALDOM, RTC_ALMON, RTC_ALYEAR, RTC_ALHOUR, RTC_ALMIN, RTC_ALSEC);
-
-        _cb = cb;
-        return 0;
-    }
-    else if (cb == NULL) {
+    (void)rtc;
+    if (localt == NULL) {
         return -1;
     }
 
-    RTC_AMR = 0xff;
-    return -2;
+    localt->tm_sec = RTC_SEC;
+    localt->tm_min = RTC_MIN;
+    localt->tm_hour = RTC_HOUR;
+    localt->tm_mday = RTC_DOM;
+    localt->tm_wday = RTC_DOW;
+    localt->tm_yday = RTC_DOY;
+    localt->tm_mon = RTC_MONTH - 1;
+    localt->tm_year = RTC_YEAR;
+    localt->tm_isdst = -1; /* not available */
+
+    return 0;
 }
 
-int rtc_get_alarm(struct tm *localt)
-{
-    if (localt != NULL) {
-        localt->tm_sec = RTC_ALSEC;
-        localt->tm_min = RTC_ALMIN;
-        localt->tm_hour = RTC_ALHOUR;
-        localt->tm_mday = RTC_ALDOM;
-        localt->tm_wday = RTC_ALDOW;
-        localt->tm_yday = RTC_ALDOY;
-        localt->tm_mon = RTC_ALMON - 1;
-        localt->tm_year = RTC_ALYEAR;
-        localt->tm_isdst = -1; /* not available */
 
-        return 0;
+int _lpc2387_rtc_set_alarm(rtc_t *rtc, const struct tm *localt, rtc_alarm_cb_t cb, void *arg)
+{
+    (void)rtc;
+    if (cb == NULL) {
+        return -1;
+    }
+    if (localt == NULL) {
+        return -2;
+    }
+    RTC_ALSEC = localt->tm_sec;
+    RTC_ALMIN = localt->tm_min;
+    RTC_ALHOUR = localt->tm_hour;
+    RTC_ALDOM = localt->tm_mday;
+    RTC_ALDOW = localt->tm_wday;
+    RTC_ALDOY = localt->tm_yday;
+    RTC_ALMON = localt->tm_mon + 1;
+    RTC_ALYEAR = localt->tm_year;
+    RTC_AMR = 0;                                            /* set wich alarm fields to check */
+    DEBUG("alarm set %2lu.%2lu.%4lu  %2lu:%2lu:%2lu\n",
+          RTC_ALDOM, RTC_ALMON, RTC_ALYEAR, RTC_ALHOUR, RTC_ALMIN, RTC_ALSEC);
+    _lpc2387_rtc_cb.cb = cb;
+    _lpc2387_rtc_cb.arg = arg;
+
+    return 0;
+}
+
+int _lpc2387_rtc_get_alarm(rtc_t *rtc, struct tm *localt)
+{
+    (void)rtc;
+    if (localt == NULL) {
+        return -1;
     }
 
-    return -1;
+    localt->tm_sec = RTC_ALSEC;
+    localt->tm_min = RTC_ALMIN;
+    localt->tm_hour = RTC_ALHOUR;
+    localt->tm_mday = RTC_ALDOM;
+    localt->tm_wday = RTC_ALDOW;
+    localt->tm_yday = RTC_ALDOY;
+    localt->tm_mon = RTC_ALMON - 1;
+    localt->tm_year = RTC_ALYEAR;
+    localt->tm_isdst = -1; /* not available */
+
+    return 0;
 }
 
-void rtc_clear_alarm(void)
+void _lpc2387_rtc_clear_alarm(rtc_t *rtc)
 {
+    (void)rtc;
     RTC_AMR = 0xff;
-}
-
-void rtc_poweron(void)
-{
-    PCONP |= BIT9;
-    RTC_ILR = (ILR_RTSSF | ILR_RTCCIF | ILR_RTCALF);    /* clear interrupt flags */
-    RTC_CCR |= CCR_CLKEN;                               /* enable clock */
-    install_irq(RTC_INT, &RTC_IRQHandler, IRQP_RTC);    /* install interrupt handler */
-}
-
-void rtc_poweroff(void)
-{
-    RTC_CCR &= ~CCR_CLKEN;  /* disable clock */
-    install_irq(RTC_INT, NULL, 0);
-    RTC_ILR = 0;
-    PCONP &= ~BIT9;
 }
 
 void RTC_IRQHandler(void)
@@ -175,8 +187,8 @@ void RTC_IRQHandler(void)
     else if (RTC_ILR & ILR_RTCALF) {
         RTC_ILR |= ILR_RTCALF;
         RTC_AMR = 0xff;                     /* disable alarm irq */
-        if (_cb) {
-            _cb(_cb_arg);
+        if (_lpc2387_rtc_cb.cb) {
+            _lpc2387_rtc_cb.cb(_lpc2387_rtc_cb.arg);
         }
         DEBUG("Ring\n");
         lpm_end_awake();
@@ -188,6 +200,6 @@ void RTC_IRQHandler(void)
 static void _rtc_set(time_t time)
 {
     struct tm *localt;
-    localt = localtime(&time);                      /* convert seconds to broken-down time */
-    rtc_set_time(localt);
+    localt = localtime(&time);        /* convert seconds to broken-down time */
+    rtc_set_time(NULL, localt);
 }

@@ -134,6 +134,15 @@ ifneq (,$(filter si70xx,$(USEMODULE)))
     FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter binrtc,$(USEMODULE)))
+  USEMODULE += rtc
+endif
+
+ifneq (,$(filter softrtc,$(USEMODULE)))
+  USEMODULE += rtc
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter srf02,$(USEMODULE)))
   USEMODULE += xtimer
 endif

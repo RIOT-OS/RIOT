@@ -29,10 +29,6 @@
 #include "shell.h"
 #include "shell_commands.h"
 
-#if FEATURE_PERIPH_RTC
-#include "periph/rtc.h"
-#endif
-
 #ifdef MODULE_LTC4150
 #include "ltc4150.h"
 #endif

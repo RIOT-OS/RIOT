@@ -70,11 +70,8 @@ ifneq (,$(filter sntp,$(USEMODULE)))
   SRC += sc_sntp.c
 endif
 
-# TODO
-# Conditional building not possible at the moment due to
-# https://github.com/RIOT-OS/RIOT/issues/2058
-# The implementation is guarded in the source file instead, this
-# should be changed once the issue has been resolved
-SRC += sc_rtc.c
+ifneq (,$(filter rtc,$(USEMODULE)))
+  SRC += sc_rtc.c
+endif
 
 include $(RIOTBASE)/Makefile.base

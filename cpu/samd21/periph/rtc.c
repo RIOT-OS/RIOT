@@ -17,11 +17,8 @@
 
 #include <time.h>
 #include "cpu.h"
-#include "periph/rtc.h"
+#include "rtc.h"
 #include "periph_conf.h"
-
-/* guard file in case no RTC device was specified */
-#if RTC_NUMOF
 
 typedef struct {
     rtc_alarm_cb_t cb;        /**< callback called from RTC interrupt */
@@ -30,13 +27,38 @@ typedef struct {
 
 static rtc_state_t rtc_callback;
 
+static int  _samd21_rtc_init(rtc_t *rtc);
+static int  _samd21_rtc_set_time(rtc_t *rtc, const struct tm *localt);
+static int  _samd21_rtc_get_time(rtc_t *rtc, struct tm *localt);
+static int  _samd21_rtc_set_alarm(rtc_t *rtc, const struct tm *localt, rtc_alarm_cb_t cb, void *arg);
+static int  _samd21_rtc_get_alarm(rtc_t *rtc, struct tm *localt);
+static void _samd21_rtc_clear_alarm(rtc_t *rtc);
+
+static const rtc_ops_t _samd21_rtc_ops = {
+    .init        = _samd21_rtc_init,
+    .get_time    = _samd21_rtc_get_time,
+    .set_time    = _samd21_rtc_set_time,
+    .get_alarm   = _samd21_rtc_get_alarm,
+    .set_alarm   = _samd21_rtc_set_alarm,
+    .clear_alarm = _samd21_rtc_clear_alarm,
+};
+
+rtc_t cpu_rtc = {
+    .rtc_op = &_samd21_rtc_ops,
+    .name = "cpu",
+};
+
+static void _samd21_rtc_poweron(void);
+static void _samd21_rtc_poweroff(void);
+
 /* At 1Hz, RTC goes till 63 years (2^5, see 17.8.22 in datasheet)
 * reference_year is set to 100 (offset) to be in our current time (2000)
 * Thanks to this, the user will be able to set time in 2000's*/
 static uint16_t reference_year = 100;
 
-void rtc_init(void)
+int _samd21_rtc_init(rtc_t *rtc)
 {
+    (void)rtc;
     RtcMode2 *rtcMode2 = &(RTC_DEV);
 
     /* Turn on power manager for RTC */
@@ -59,7 +81,7 @@ void rtc_init(void)
 
     /* DISABLE RTC MASTER */
     while (rtcMode2->STATUS.reg & RTC_STATUS_SYNCBUSY) {}
-    rtc_poweroff();
+    _samd21_rtc_poweroff();
 
     /* Reset RTC */
     while (rtcMode2->STATUS.bit.SYNCBUSY) {}
@@ -71,11 +93,13 @@ void rtc_init(void)
     while (rtcMode2->STATUS.bit.SYNCBUSY) {}
     rtcMode2->INTENSET.reg = RTC_MODE2_INTENSET_OVF;
     while (rtcMode2->STATUS.bit.SYNCBUSY) {}
-    rtc_poweron();
+    _samd21_rtc_poweron();
+    return 0;
 }
 
-int rtc_set_time(struct tm *time)
+int _samd21_rtc_set_time(rtc_t *rtc, const struct tm *time)
 {
+    (void)rtc;
     RtcMode2 *rtcMode2 = &(RTC_DEV);
     if ((time->tm_year < reference_year) || (time->tm_year > reference_year + 63)) {
         return -1;
@@ -92,8 +116,9 @@ int rtc_set_time(struct tm *time)
     return 0;
 }
 
-int rtc_get_time(struct tm *time)
+int _samd21_rtc_get_time(rtc_t *rtc, struct tm *time)
 {
+    (void)rtc;
     RtcMode2 *rtcMode2 = &(RTC_DEV);
     time->tm_year = rtcMode2->CLOCK.bit.YEAR + reference_year;
     if ((time->tm_year < reference_year) || (time->tm_year > (reference_year + 63))) {
@@ -108,10 +133,10 @@ int rtc_get_time(struct tm *time)
     return 0;
 }
 
-int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
+int _samd21_rtc_set_alarm(rtc_t *rtc, const struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
     RtcMode2 *rtcMode2 = &(RTC_DEV);
-    rtc_clear_alarm();
+    rtc_clear_alarm(rtc);
     if ((time->tm_year < reference_year) || (time->tm_year > (reference_year + 63))) {
         return -2;
     }
@@ -140,8 +165,9 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     return 0;
 }
 
-int rtc_get_alarm(struct tm *time)
+int _samd21_rtc_get_alarm(rtc_t *rtc, struct tm *time)
 {
+    (void)rtc;
     RtcMode2 *rtcMode2 = &(RTC_DEV);
     time->tm_year = rtcMode2->Mode2Alarm[0].ALARM.bit.YEAR + reference_year;
     if ((time->tm_year < reference_year) || (time->tm_year > (reference_year + 63))) {
@@ -156,8 +182,9 @@ int rtc_get_alarm(struct tm *time)
     return 0;
 }
 
-void rtc_clear_alarm(void)
+void _samd21_rtc_clear_alarm(rtc_t *rtc)
 {
+    (void)rtc;
     RtcMode2 *rtcMode2 = &(RTC_DEV);
     /* Disable IRQ */
     rtcMode2->INTENCLR.reg = RTC_MODE2_INTENCLR_ALARM0;
@@ -165,14 +192,14 @@ void rtc_clear_alarm(void)
     rtc_callback.arg = NULL;
 }
 
-void rtc_poweron(void)
+void _samd21_rtc_poweron(void)
 {
     RtcMode2 *rtcMode2 = &(RTC_DEV);
     rtcMode2->CTRL.bit.ENABLE = 1;
     while (rtcMode2->STATUS.bit.SYNCBUSY) {}
 }
 
-void rtc_poweroff(void)
+void _samd21_rtc_poweroff(void)
 {
     RtcMode2 *rtcMode2 = &(RTC_DEV);
     rtcMode2->CTRL.bit.ENABLE = 0;
@@ -195,5 +222,3 @@ void isr_rtc(void)
     }
     cortexm_isr_end();
 }
-
-#endif /* RTC_NUMOF */

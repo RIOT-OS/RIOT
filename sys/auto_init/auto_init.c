@@ -44,8 +44,12 @@
 #include "xtimer.h"
 #endif
 
-#ifdef MODULE_RTC
-#include "periph/rtc.h"
+#if MODULE_RTC
+#include "rtc.h"
+#ifndef RTC_DEFAULT_DEV
+#define RTC_DEFAULT_DEV cpu_rtc
+#endif
+extern rtc_t RTC_DEFAULT_DEV;
 #endif
 
 #ifdef MODULE_GNRC_SIXLOWPAN
@@ -104,9 +108,9 @@ void auto_init(void)
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
 #endif
-#ifdef MODULE_RTC
-    DEBUG("Auto init rtc module.\n");
-    rtc_init();
+#if MODULE_RTC
+    rtc_register(&RTC_DEFAULT_DEV);
+    rtc_init(&RTC_DEFAULT_DEV);
 #endif
 #ifdef MODULE_IO1_XPLAINED
     DEBUG("Auto init IO1 Xplained extension module.\n");
