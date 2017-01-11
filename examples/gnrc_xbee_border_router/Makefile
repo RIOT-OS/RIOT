@@ -18,8 +18,12 @@ GNRC_NETIF_NUMOF := 2
 INCLUDES += -I$(CURDIR)
 
 # UART port number
-XBEE_UART = 0
-CFLAGS += -DXBEE_UART=$(XBEE_UART)
+XBEE_PARAM_UART = 0
+CFLAGS += -DXBEE_PARAM_UART=$(XBEE_PARAM_UART)
+
+# UART baud rate
+XBEE_PARAM_BR = 9600U
+CFLAGS += -DXBEE_PARAM_BR=$(XBEE_PARAM_BR)
 
 # Uncomment this for debugging
 CFLAGS += -g
@@ -42,7 +46,7 @@ USEMODULE += gnrc_icmpv6_error
 USEMODULE += gnrc_ipv6_ext
 # XBee network stack
 USEMODULE += xbee
-USEMODULE += gnrc_nomac
+USEMODULE += gnrc_netdev2
 USEMODULE += gnrc_pktdump
 # Add also the shell, some shell commands
 USEMODULE += shell

@@ -11,9 +11,9 @@ feasible to run the example on any RIOT supported platform that is be equipped
 with an IPv6 capable network device. In this case, specify the target platform
 as `make BOARD=myplatform`.
 
-If XBee is connected to a UART port other than 0, change `XBEE_UART` variable
-in the Makefile. If the baudrate is other than 9600, configure it in
-`xbee_params.h`.
+If XBee is connected to a UART port other than 0, change `XBEE_PARAM_UART`
+variable in the Makefile. If the baudrate is other than 9600, change
+`XBEE_PARAM_BR`.
 
 ![organization of modules and devices](img/page_001.png)
 
