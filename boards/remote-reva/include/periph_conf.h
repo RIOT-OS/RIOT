@@ -99,6 +99,25 @@ static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
 /** @} */
 
 /**
+ * @name ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (3)
+#define ADC1_PIN            GPIO_PA5
+#define ADC2_PIN            GPIO_PA4
+#define ADC3_PIN            GPIO_PA2
+
+static const uint8_t periph_adc_map[ADC_NUMOF] = {
+  ADC1_PIN,
+  ADC2_PIN,
+  ADC3_PIN, /* voltage divider with 5/3 relationship to allow 5V sensors */
+};
+
+#define ADC_LINE(x)         periph_adc_map[x]
+#define SOC_ADC_ADCCON_REF  SOC_ADC_ADCCON_REF_AVDD5
+/** @} */
+
+/**
  * @name GPIO configuration
  * @{
  */

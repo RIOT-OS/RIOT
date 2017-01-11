@@ -65,6 +65,34 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
+ * @name ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (7)
+
+#define AD4_PIN             2   /* Single Channel Input to pin AIN2 */
+#define CTS_DI07_PIN        3   /* Single Channel Input to pin AIN3 */
+#define AD5_PIN             4   /* Single Channel Input to pin AIN4 */
+#define AD6_PIN             5   /* Single Channel Input to pin AIN5 */
+#define ON_SLEEP_PIN        6   /* Single Channel Input to pin AIN6 */
+#define DIFF_PINS_2_3       9   /* Differential Input to pins AIN2-AIN3 */
+#define DIFF_PINS_4_5       10  /* Differential Input to pins AIN4-AIN5 */
+
+static const uint8_t periph_adc_map[ADC_NUMOF] = {
+    AD4_PIN,
+    CTS_DI07_PIN,
+    AD5_PIN,
+    AD6_PIN,
+    ON_SLEEP_PIN,
+    DIFF_PINS_2_3,
+    DIFF_PINS_4_5,
+};
+
+#define ADC_LINE(x)         periph_adc_map[x]
+#define SOC_ADC_ADCCON_REF  SOC_ADC_ADCCON_REF_AVDD5
+/** @} */
+
+/**
  * @name UART configuration
  * @{
  */

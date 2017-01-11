@@ -58,6 +58,24 @@ typedef struct {
 
 #define SOC_ADC ( (cc2538_soc_adc_t*)0x400d7000 ) /**< One and only instance of the SOC ADC component */
 
+/** @name SOC_ADC_ADCCON3 register bit masks
+ * @{
+ */
+#define SOC_ADC_ADCCON3_EREF    0x000000C0          /**< Reference voltage for extra */
+#define SOC_ADC_ADCCON3_EDIV    0x00000030          /**< Decimation rate for extra */
+#define SOC_ADC_ADCCON3_ECH     0x0000000F          /**< Single channel select */
+/** @} */
+
+/** @name SOC_ADC_ADCCONx registers field values
+ * @{
+ */
+#define SOC_ADC_ADCCON_REF_INT          (0 << 6)    /**< Internal reference */
+#define SOC_ADC_ADCCON_REF_EXT_SINGLE   (1 << 6)    /**< External reference on AIN7 pin */
+#define SOC_ADC_ADCCON_REF_AVDD5        (2 << 6)    /**< AVDD5 pin */
+#define SOC_ADC_ADCCON_REF_EXT_DIFF     (3 << 6)    /**< External reference on AIN6-AIN7 differential input */
+#define SOC_ADC_ADCCON_CH_GND           0xC         /**< GND */
+/** @} */
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
