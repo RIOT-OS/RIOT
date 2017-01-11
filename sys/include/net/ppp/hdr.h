@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_ppp Header
- * @ingroup     net_ppp_hdr
+ * @defgroup    net_ppphdr Point-to-Point Protocol Header
+ * @ingroup     net_ppp
  * @brief       PPP header abstraction type and helper functions
  * @{
  *
