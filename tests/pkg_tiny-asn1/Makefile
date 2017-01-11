@@ -1,5 +1,6 @@
-APPLICATION = tiny-asn1
+APPLICATION = pkg_tiny-asn1
 include ../Makefile.tests_common
+
 USEPKG += tiny-asn1
 
 include $(RIOTBASE)/Makefile.include

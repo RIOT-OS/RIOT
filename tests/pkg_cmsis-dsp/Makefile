@@ -1,4 +1,4 @@
-APPLICATION = test-cmsis-dsp
+APPLICATION = cmsis-dsp
 include ../Makefile.tests_common
 
 USEPKG += cmsis-dsp
