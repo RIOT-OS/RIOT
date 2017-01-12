@@ -147,7 +147,7 @@ static int _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
 
     switch (opt) {
         case NETOPT_ADDRESS:
-            assert(value_len==ETHERNET_ADDR_LEN);
+            assert(value_len >= ETHERNET_ADDR_LEN);
             _set_mac_addr(dev, (uint8_t*)value);
             break;
         case NETOPT_PROMISCUOUSMODE:
