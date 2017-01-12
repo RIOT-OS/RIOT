@@ -31,6 +31,7 @@
 #include "net/ipv6/hdr.h"
 #include "net/udp.h"
 #include "net/sixlowpan.h"
+#include "net/gnrc/lwmac/hdr.h"
 #include "od.h"
 
 /**
@@ -54,6 +55,12 @@ static void _dump_snip(gnrc_pktsnip_t *pkt)
         case GNRC_NETTYPE_NETIF:
             printf("NETTYPE_NETIF (%i)\n", pkt->type);
             gnrc_netif_hdr_print(pkt->data);
+            break;
+#endif
+#ifdef MODULE_GNRC_LWMAC
+        case GNRC_NETTYPE_LWMAC:
+            printf("GNRC_NETTYPE_LWMAC (%i)\n", pkt->type);
+            lwmac_print_hdr(pkt->data);
             break;
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN
