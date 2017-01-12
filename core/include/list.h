@@ -1,12 +1,13 @@
 /*
  * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2016 TriaGnoSys GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
 
- /**
+/**
  * @addtogroup  core_util
  * @{
  *
@@ -16,6 +17,7 @@
  * Lists are represented as element pointing to the first actual list element.
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Víctor Ariño <victor.arino@zii.aero>
  */
 
 #ifndef LIST_H
@@ -48,7 +50,8 @@ typedef struct list_node {
  * @param[in] node      list node before new entry
  * @param[in] new_node  list node to insert
  */
-static inline void list_add(list_node_t *node, list_node_t *new_node) {
+static inline void list_add(list_node_t *node, list_node_t *new_node)
+{
     new_node->next = node->next;
     node->next = new_node;
 }
@@ -61,12 +64,35 @@ static inline void list_add(list_node_t *node, list_node_t *new_node) {
  *
  * @return  removed old list head, or NULL if empty
  */
-static inline list_node_t* list_remove_head(list_node_t *list) {
-    list_node_t* head = list->next;
+static inline list_node_t *list_remove_head(list_node_t *list)
+{
+    list_node_t *head = list->next;
+
     if (head) {
         list->next = head->next;
     }
     return head;
+}
+
+/**
+ * @brief Removes the node from the list
+ *
+ * @param[in] list  Pointer to the list itself, where list->next points
+ *                  to the root node
+ * @param[in] node  List node to remove from the list
+ *
+ * @return  removed node, or NULL if empty or not found
+ */
+static inline list_node_t *list_remove(list_node_t *list, list_node_t *node)
+{
+    while (list->next) {
+        if (list->next == node) {
+            list->next = node->next;
+            return node;
+        }
+        list = list->next;
+    }
+    return list->next;
 }
 
 #ifdef __cplusplus
