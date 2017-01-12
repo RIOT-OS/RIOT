@@ -126,7 +126,6 @@ int adc_sample(adc_t line, adc_res_t res)
     sample = (int)ADC1->DR;
     ADC1 -> SR &= ~ADC_SR_STRT;
 
-
     /* power off and unlock device again */
     done();
 
