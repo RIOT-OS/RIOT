@@ -18,8 +18,6 @@
  * @}
  */
 
-#include "arch/lpm_arch.h"
-
 #include "cpu.h"
 
 static void _gclk_setup(int gclk, uint32_t reg)
@@ -68,6 +66,4 @@ void cpu_init(void)
     /* Setup GCLK generators */
     _gclk_setup(0, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
     _gclk_setup(1, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSCULP32K);
-
-    lpm_arch_init();
 }

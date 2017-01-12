@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Implementation of the kernels reboot interface
+ * @brief       Implementation of common AVR periph/pm functions
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
@@ -22,9 +22,10 @@
 
 #include <avr/wdt.h>
 
-#include "cpu.h"
+#include "irq.h"
+#include "periph/pm.h"
 
-void reboot(void)
+void pm_reboot(void)
 {
     /*
      * Since the AVR doesn't support a real software reset, we set the Watchdog

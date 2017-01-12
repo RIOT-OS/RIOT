@@ -398,8 +398,8 @@ $(CURDIR)/eclipsesym.xml:
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests
 
-# import list of provided features
--include $(RIOTBOARD)/$(BOARD)/Makefile.features
+# process provided features
+include $(RIOTBASE)/Makefile.features
 
 # Export variables used throughout the whole make system:
 include $(RIOTBASE)/Makefile.vars

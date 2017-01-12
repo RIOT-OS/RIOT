@@ -111,7 +111,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 /******************************************************************************/
 
 /* System reboot */
-void reboot(void)
+void pm_reboot(void)
 {
     /* force an hardware reboot ("Power-Up Clear"), by writing
        an illegal value to the watchdog control register */

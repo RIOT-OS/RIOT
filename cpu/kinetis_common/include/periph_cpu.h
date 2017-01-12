@@ -239,6 +239,11 @@ enum {
  */
 void gpio_init_port(gpio_t pin, uint32_t pcr);
 
+/**
+ * @brief   define number of usable power modes
+ */
+#define PM_NUM_MODES    (1U)
+
 #ifdef __cplusplus
 }
 #endif

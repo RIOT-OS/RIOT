@@ -23,7 +23,6 @@
 #include <errno.h>
 #include <stdio.h>
 #include "thread.h"
-#include "lpm.h"
 
 /* One stack for all threads. DON'T TRY THIS AT HOME!! */
 static char dummy_stack[THREAD_STACKSIZE_DEFAULT];
@@ -49,6 +48,6 @@ int main(void)
     if (-EOVERFLOW == thr_id) {
         puts("Thread creation successful aborted\n");
     }
-    lpm_set(LPM_OFF);
+
     return 0;
 }
