@@ -40,15 +40,30 @@ _add() {
     set +e
 }
 
-_locked() {
-    local lockfile="$1"
-    shift
+if [ "$(uname)" = Darwin ]; then
+    _locked() {
+        local lockfile="$1"
+        shift
 
-    (
+        while ! shlock -p $$ -f $lockfile; do
+            sleep 0.2
+        done
+
+        $*
+
+        rm $lockfile
+    }
+else
+    _locked() {
+        local lockfile="$1"
+        shift
+
+        (
         flock -w 600 9 || exit 1
         $*
-    ) 9>"$lockfile"
-}
+        ) 9>"$lockfile"
+    }
+fi
 
 update() {
     set -e
@@ -108,7 +123,7 @@ _check_commit() {
 }
 
 _remote_name() {
-    echo "$*" | md5sum | cut -d\  -f1
+    echo "$*" | git hash-object --stdin
 }
 
 _tag_to_sha1() {
