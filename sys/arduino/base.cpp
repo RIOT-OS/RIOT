@@ -62,6 +62,6 @@ void delay(int msec)
 
 int analogRead(int pin)
 {
-    adc_init(pin);
-    return adc_sample(pin, (adc_res_t)0);
+    adc_init((adc_t)pin);
+    return adc_sample((adc_t)pin, (adc_res_t)0);
 }
