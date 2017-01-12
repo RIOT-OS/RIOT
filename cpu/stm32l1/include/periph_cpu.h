@@ -16,6 +16,7 @@
  *
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  * @author          Katja Kirstein <katja.kirstein@haw-hamburg.de>
+ * @author          Francisco Molina <francisco.molina@inria.cl>
  */
 
 #ifndef PERIPH_CPU_H
@@ -75,6 +76,13 @@ typedef struct {
     gpio_t pin;             /**< pin connected to the line */
     uint8_t chan;           /**< DAC device used for this line */
 } dac_conf_t;
+
+/**
+ * @brief   Configure the given pin to be used as ADC input
+ *
+ * @param[in] pin       pin to configure
+ */
+void gpio_init_analog(gpio_t pin);
 
 /**
  * @brief   I2C configuration data structure
