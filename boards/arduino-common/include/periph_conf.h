@@ -90,12 +90,12 @@ extern "C" {
  */
 #define ADC_NUMOF       (6)
     /* ADC Channels */
-#define ADC_CHAN_0           0 // Maybe ADC_PIN_x is better ?
-#define ADC_CHAN_1           1
-#define ADC_CHAN_2           2
-#define ADC_CHAN_3           3
-#define ADC_CHAN_4           4
-#define ADC_CHAN_5           5
+#define ADC_PIN_0           0
+#define ADC_PIN_1           1
+#define ADC_PIN_2           2
+#define ADC_PIN_3           3
+#define ADC_PIN_4           4
+#define ADC_PIN_5           5
 /** @} */
 
 #ifdef __cplusplus
