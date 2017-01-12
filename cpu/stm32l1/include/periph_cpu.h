@@ -78,6 +78,43 @@ typedef struct {
 } dac_conf_t;
 
 /**
+ * @brief   ADC channel configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the channel */
+    uint8_t chan;           /**< CPU ADC channel connected to the pin */
+} adc_conf_t;
+
+ /* ADC channels 16 and 17 are not connected to any GPIO */
+#define ADC_VREF_CHANNEL 17
+#define ADC_TEMPERATURE_CHANNEL 16
+
+/**
+ * @brief   Override the ADC resolution configuration
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0x03000000,  /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = 0x02000000,  /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = 0x01000000,  /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = 0x00000000,  /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 1,           /**< ADC resolution: 14 bit (not supported) */
+    ADC_RES_16BIT = 2            /**< ADC resolution: 16 bit (not supported)*/
+} adc_res_t;
+/** @} */
+
+/**
+ * @brief   Configure the alternate function for the given pin
+ *
+ * @note    This is meant for internal use in STM32L1 peripheral drivers only
+ *
+ * @param[in] pin       pin to configure
+ * @param[in] af        alternate function to use
+ */
+void gpio_init_af(gpio_t pin, gpio_af_t af);
+
+/**
  * @brief   Configure the given pin to be used as ADC input
  *
  * @param[in] pin       pin to configure
