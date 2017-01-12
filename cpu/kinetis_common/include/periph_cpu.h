@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -60,6 +60,11 @@ typedef uint16_t gpio_t;
  * - bit 7: output or input mode
  */
 #define GPIO_MODE(pu, pe, od, out)   (pu | (pe << 1) | (od << 5) | (out << 7))
+
+/**
+ * @brief   Define the maximum number of PWM channels that can be configured
+ */
+#define PWM_CHAN_MAX        (4U)
 
 #ifndef DOXYGEN
 /**
@@ -142,6 +147,18 @@ typedef enum {
     ADC_RES_16BIT = ADC_CFG1_MODE(3)    /**< ADC resolution: 16 bit */
 } adc_res_t;
 /** @} */
+
+/**
+ * @brief   Override default PWM mode configuration
+ * @{
+ */
+#define HAVE_PWM_MODE_T
+typedef enum {
+    PWM_LEFT   = (FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK),  /**< left aligned */
+    PWM_RIGHT  = (FTM_CnSC_MSB_MASK | FTM_CnSC_ELSA_MASK),  /**< right aligned */
+    PWM_CENTER = (FTM_CnSC_MSB_MASK)                        /**< center aligned */
+} pwm_mode_t;
+/** @} */
 #endif /* ndef DOXYGEN */
 
 /**
@@ -187,11 +204,25 @@ typedef struct {
 } lptmr_conf_t;
 
 /**
+ * @brief   PWM configuration structure
+ */
+typedef struct {
+    FTM_Type* ftm;          /**< used FTM */
+    struct {                /**< logical channel configuration */
+        gpio_t pin;         /**< GPIO pin used, set to GPIO_UNDEF */
+        uint8_t af;         /**< alternate function mapping */
+        uint8_t ftm_chan;   /**< the actual FTM channel used */
+    } chan[PWM_CHAN_MAX];
+    uint8_t chan_numof;     /**< number of actually configured channels */
+    uint8_t ftm_num;        /**< FTM number used */
+} pwm_conf_t;
+
+/**
  * @brief   Possible timer module types
  */
 enum {
-    TIMER_PIT,
-    TIMER_LPTMR,
+    TIMER_PIT,              /**< PIT */
+    TIMER_LPTMR,            /**< LPTMR */
 };
 
 /**

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Eistec AB
+ *               2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -15,6 +16,7 @@
  * @name        Peripheral MCU configuration for the Eistec Mulle
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef MULLE_PERIPH_CONF_H_
@@ -181,47 +183,35 @@ static const adc_conf_t adc_config[] = {
 /** @} */
 
 /**
- * @name PWM configuration
+ * @brief   PWM configuration
  * @{
  */
-#define PWM_NUMOF           (2U)
-#define PWM_0_EN            1
-#define PWM_1_EN            1
-#define PWM_MAX_CHANNELS    8
-#define PWM_MAX_VALUE       0xffff
+static const pwm_conf_t pwm_config[] = {
+    {
+        .ftm        = FTM0,
+        .chan       = {
+            { .pin = GPIO_PIN(PORT_C, 1), .af = 4, .ftm_chan = 0 },
+            { .pin = GPIO_PIN(PORT_C, 2), .af = 4, .ftm_chan = 1 },
+            { .pin = GPIO_UNDEF,          .af = 0, .ftm_chan = 0 },
+            { .pin = GPIO_UNDEF,          .af = 0, .ftm_chan = 0 }
+        },
+        .chan_numof = 2,
+        .ftm_num    = 0
+    },
+    {
+        .ftm        = FTM1,
+        .chan       = {
+            { .pin = GPIO_PIN(PORT_A, 12), .af = 3, .ftm_chan = 0 },
+            { .pin = GPIO_PIN(PORT_A, 13), .af = 3, .ftm_chan = 1 },
+            { .pin = GPIO_UNDEF,           .af = 0, .ftm_chan = 0 },
+            { .pin = GPIO_UNDEF,           .af = 0, .ftm_chan = 0 }
+        },
+        .chan_numof = 2,
+        .ftm_num    = 1
+    }
+};
 
-/* PWM 0 device configuration */
-#define PWM_0_DEV           FTM0
-#define PWM_0_CHANNELS      2
-#define PWM_0_CLK           (SystemBusClock)
-#define PWM_0_CLKEN()       (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT) = 1)
-#define PWM_0_CLKDIS()      (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT) = 0)
-
-/* PWM 0 pin configuration */
-#define PWM_0_CH0_GPIO      GPIO_PIN(PORT_C, 1)
-#define PWM_0_CH0_FTMCHAN   0
-#define PWM_0_CH0_AF        4
-
-#define PWM_0_CH1_GPIO      GPIO_PIN(PORT_C, 2)
-#define PWM_0_CH1_FTMCHAN   1
-#define PWM_0_CH1_AF        4
-
-/* PWM 1 device configuration */
-#define PWM_1_DEV           FTM1
-#define PWM_1_CHANNELS      2
-#define PWM_1_CLK           (SystemBusClock)
-#define PWM_1_CLKEN()       (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM1_SHIFT) = 1)
-#define PWM_1_CLKDIS()      (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM1_SHIFT) = 0)
-
-/* PWM 1 pin configuration */
-#define PWM_1_CH0_GPIO      GPIO_PIN(PORT_A, 12)
-#define PWM_1_CH0_FTMCHAN   0
-#define PWM_1_CH0_AF        3
-
-#define PWM_1_CH1_GPIO      GPIO_PIN(PORT_A, 13)
-#define PWM_1_CH1_FTMCHAN   1
-#define PWM_1_CH1_AF        3
-
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
 /** @} */
 
 /**

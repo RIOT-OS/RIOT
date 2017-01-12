@@ -125,36 +125,24 @@ static const adc_conf_t adc_config[] = {
 /** @} */
 
 /**
- * @name PWM configuration
+ * @brief   PWM configuration
  * @{
  */
-#define PWM_NUMOF                    (1U)
-#define PWM_0_EN                     1
-#define PWM_MAX_CHANNELS             8
-#define PWM_MAX_VALUE                0xffff
+static const pwm_conf_t pwm_config[] = {
+    {
+        .ftm        = FTM0,
+        .chan       = {
+            { .pin = GPIO_PIN(PORT_A, 4), .af = 3, .ftm_chan = 6 },
+            { .pin = GPIO_PIN(PORT_A, 2), .af = 3, .ftm_chan = 7 },
+            { .pin = GPIO_PIN(PORT_C, 2), .af = 4, .ftm_chan = 1 },
+            { .pin = GPIO_PIN(PORT_C, 3), .af = 4, .ftm_chan = 2 }
+        },
+        .chan_numof = 4,
+        .ftm_num    = 0
+    }
+};
 
-/* PWM 0 device configuration */
-#define PWM_0_DEV                    FTM0
-#define PWM_0_CHANNELS               4
-#define PWM_0_CLK                    CLOCK_CORECLOCK
-#define PWM_0_CLKEN()                (SIM->SCGC6 |= (SIM_SCGC6_FTM0_MASK))
-#define PWM_0_CLKDIS()               (SIM->SCGC6 &= ~(SIM_SCGC6_FTM0_MASK))
-/* Arduino Connector D3 */
-#define PWM_0_CH0_GPIO               GPIO_PIN(PORT_A, 1)
-#define PWM_0_CH0_FTMCHAN            6
-#define PWM_0_CH0_AF                 3
-/* Arduino Connector D5 */
-#define PWM_0_CH1_GPIO               GPIO_PIN(PORT_A, 2)
-#define PWM_0_CH1_FTMCHAN            7
-#define PWM_0_CH1_AF                 3
-/* Arduino Connector D6 */
-#define PWM_0_CH2_GPIO               GPIO_PIN(PORT_C, 2)
-#define PWM_0_CH2_FTMCHAN            1
-#define PWM_0_CH2_AF                 4
-/* Arduino Connector D7 */
-#define PWM_0_CH3_GPIO               GPIO_PIN(PORT_C, 3)
-#define PWM_0_CH3_FTMCHAN            2
-#define PWM_0_CH3_AF                 4
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
 /** @} */
 
 
