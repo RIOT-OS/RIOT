@@ -3,7 +3,7 @@
  *
  * \brief Instance description for OPAMP
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -40,9 +40,6 @@
  * \asf_license_stop
  *
  */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
- */
 
 #ifndef _SAML21_OPAMP_INSTANCE_
 #define _SAML21_OPAMP_INSTANCE_
@@ -51,15 +48,15 @@
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_OPAMP_CTRLA            (0x43001800U) /**< \brief (OPAMP) Control A */
 #define REG_OPAMP_STATUS           (0x43001802U) /**< \brief (OPAMP) Status */
-#define REG_OPAMP_OPAMPCTRL0       (0x43001804U) /**< \brief (OPAMP) OPAMP 0 Control */
-#define REG_OPAMP_OPAMPCTRL1       (0x43001808U) /**< \brief (OPAMP) OPAMP 1 Control */
-#define REG_OPAMP_OPAMPCTRL2       (0x4300180CU) /**< \brief (OPAMP) OPAMP 2 Control */
+#define REG_OPAMP_OPAMPCTRL0       (0x43001804U) /**< \brief (OPAMP) OPAMP Control 0 */
+#define REG_OPAMP_OPAMPCTRL1       (0x43001808U) /**< \brief (OPAMP) OPAMP Control 1 */
+#define REG_OPAMP_OPAMPCTRL2       (0x4300180CU) /**< \brief (OPAMP) OPAMP Control 2 */
 #else
 #define REG_OPAMP_CTRLA            (*(RwReg8 *)0x43001800U) /**< \brief (OPAMP) Control A */
 #define REG_OPAMP_STATUS           (*(RoReg8 *)0x43001802U) /**< \brief (OPAMP) Status */
-#define REG_OPAMP_OPAMPCTRL0       (*(RwReg  *)0x43001804U) /**< \brief (OPAMP) OPAMP 0 Control */
-#define REG_OPAMP_OPAMPCTRL1       (*(RwReg  *)0x43001808U) /**< \brief (OPAMP) OPAMP 1 Control */
-#define REG_OPAMP_OPAMPCTRL2       (*(RwReg  *)0x4300180CU) /**< \brief (OPAMP) OPAMP 2 Control */
+#define REG_OPAMP_OPAMPCTRL0       (*(RwReg  *)0x43001804U) /**< \brief (OPAMP) OPAMP Control 0 */
+#define REG_OPAMP_OPAMPCTRL1       (*(RwReg  *)0x43001808U) /**< \brief (OPAMP) OPAMP Control 1 */
+#define REG_OPAMP_OPAMPCTRL2       (*(RwReg  *)0x4300180CU) /**< \brief (OPAMP) OPAMP Control 2 */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 

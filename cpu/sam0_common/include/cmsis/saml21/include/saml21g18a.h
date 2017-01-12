@@ -3,7 +3,7 @@
  *
  * \brief Header file for SAML21G18A
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAML21G18A_
@@ -135,9 +132,8 @@ typedef enum IRQn
   PTC_IRQn                 = 25, /**< 25 SAML21G18A Peripheral Touch Controller (PTC) */
   AES_IRQn                 = 26, /**< 26 SAML21G18A Advanced Encryption Standard (AES) */
   TRNG_IRQn                = 27, /**< 27 SAML21G18A True Random Generator (TRNG) */
-  PICOP_IRQn               = 28, /**< 28 SAML21G18A PicoProcessor (PICOP) */
 
-  PERIPH_COUNT_IRQn        = 29  /**< Number of peripheral IDs */
+  PERIPH_COUNT_IRQn        = 28  /**< Number of peripheral IDs */
 } IRQn_Type;
 
 typedef struct _DeviceVectors
@@ -191,7 +187,7 @@ typedef struct _DeviceVectors
   void* pfnPTC_Handler;                   /* 25 Peripheral Touch Controller */
   void* pfnAES_Handler;                   /* 26 Advanced Encryption Standard */
   void* pfnTRNG_Handler;                  /* 27 True Random Generator */
-  void* pfnPICOP_Handler;                 /* 28 PicoProcessor */
+  void* pfnReserved28;
 } DeviceVectors;
 
 /* Cortex-M0+ processor handlers */
@@ -229,15 +225,11 @@ void DAC_Handler                 ( void );
 void PTC_Handler                 ( void );
 void AES_Handler                 ( void );
 void TRNG_Handler                ( void );
-void PICOP_Handler               ( void );
 
 /*
  * \brief Configuration of the Cortex-M0+ Processor and Core Peripherals
  */
 
-#ifndef LITTLE_ENDIAN
-#   define LITTLE_ENDIAN       1
-#endif
 #define __CM0PLUS_REV          1         /*!< Core revision r0p1 */
 #define __MPU_PRESENT          0         /*!< MPU present or not */
 #define __NVIC_PRIO_BITS       2         /*!< Number of bits used for Priority Levels */
@@ -262,31 +254,31 @@ void PICOP_Handler               ( void );
 /*@{*/
 
 #include "component/ac.h"
-#include "component/adc.h"
+#include "component/adc_100.h"
 #include "component/aes.h"
 #include "component/ccl.h"
 #include "component/dac.h"
 #include "component/dmac.h"
 #include "component/dsu.h"
-#include "component/eic.h"
+#include "component/eic_100.h"
 #include "component/evsys.h"
-#include "component/gclk.h"
-#include "component/mclk.h"
+#include "component/gclk_100.h"
+#include "component/mclk_100.h"
 #include "component/mtb.h"
-#include "component/nvmctrl.h"
+#include "component/nvmctrl_301.h"
 #include "component/opamp.h"
 #include "component/oscctrl.h"
 #include "component/osc32kctrl.h"
-#include "component/pac.h"
-#include "component/pm.h"
+#include "component/pac_100.h"
+#include "component/pm_100.h"
 #include "component/port.h"
-#include "component/rstc.h"
-#include "component/rtc.h"
+#include "component/rstc_100.h"
+#include "component/rtc_100.h"
 #include "component/sercom.h"
-#include "component/supc.h"
+#include "component/supc_100.h"
 #include "component/tal.h"
-#include "component/tc.h"
-#include "component/tcc.h"
+#include "component/tc_100.h"
+#include "component/tcc_200.h"
 #include "component/trng.h"
 #include "component/usb.h"
 #include "component/wdt.h"
@@ -299,40 +291,40 @@ void PICOP_Handler               ( void );
 /*@{*/
 
 #include "instance/ac.h"
-#include "instance/adc.h"
+#include "instance/adc_100.h"
 #include "instance/aes.h"
 #include "instance/ccl.h"
 #include "instance/dac.h"
 #include "instance/dmac.h"
 #include "instance/dsu.h"
-#include "instance/eic.h"
+#include "instance/eic_100.h"
 #include "instance/evsys.h"
-#include "instance/gclk.h"
-#include "instance/mclk.h"
+#include "instance/gclk_100.h"
+#include "instance/mclk_100.h"
 #include "instance/mtb.h"
-#include "instance/nvmctrl.h"
+#include "instance/nvmctrl_301.h"
 #include "instance/opamp.h"
 #include "instance/oscctrl.h"
 #include "instance/osc32kctrl.h"
-#include "instance/pac.h"
-#include "instance/pm.h"
+#include "instance/pac_100.h"
+#include "instance/pm_100.h"
 #include "instance/port.h"
-#include "instance/rstc.h"
-#include "instance/rtc.h"
+#include "instance/rstc_100.h"
+#include "instance/rtc_100.h"
 #include "instance/sercom0.h"
 #include "instance/sercom1.h"
 #include "instance/sercom2.h"
 #include "instance/sercom3.h"
 #include "instance/sercom4.h"
 #include "instance/sercom5.h"
-#include "instance/supc.h"
+#include "instance/supc_100.h"
 #include "instance/tal.h"
-#include "instance/tc0.h"
-#include "instance/tc1.h"
-#include "instance/tc4.h"
-#include "instance/tcc0.h"
-#include "instance/tcc1.h"
-#include "instance/tcc2.h"
+#include "instance/tc0_100.h"
+#include "instance/tc1_100.h"
+#include "instance/tc4_100.h"
+#include "instance/tcc0_200.h"
+#include "instance/tcc1_200.h"
+#include "instance/tcc2_200.h"
 #include "instance/trng.h"
 #include "instance/usb.h"
 #include "instance/wdt.h"
@@ -613,12 +605,17 @@ void PICOP_Handler               ( void );
 #define FLASH_USER_PAGE_SIZE  64
 #define HSRAM_SIZE            0x8000UL /* 32 kB */
 #define LPRAM_SIZE            0x2000UL /* 8 kB */
-#define PICOPRAM_SIZE         0x1000UL /* 4 kB */
-#define FLASH_ADDR            (0x00000000UL) /**< FLASH base address */
-#define FLASH_USER_PAGE_ADDR  (0x00800000UL) /**< FLASH_USER_PAGE base address */
-#define HSRAM_ADDR            (0x20000000UL) /**< HSRAM base address */
-#define LPRAM_ADDR            (0x30000000UL) /**< LPRAM base address */
-#define PICOPRAM_ADDR         (0x50000000UL) /**< PICOPRAM base address */
+
+#define FLASH_ADDR            (0x00000000u) /**< FLASH base address */
+#define FLASH_USER_PAGE_ADDR  (0x00800000u) /**< FLASH_USER_PAGE base address */
+#define HSRAM_ADDR            (0x20000000u) /**< HSRAM base address */
+#define LPRAM_ADDR            (0x30000000u) /**< LPRAM base address */
+#define HPB0_ADDR             (0x40000000u) /**< HPB0 base address */
+#define HPB1_ADDR             (0x41000000u) /**< HPB1 base address */
+#define HPB2_ADDR             (0x42000000u) /**< HPB2 base address */
+#define HPB3_ADDR             (0x43000000u) /**< HPB3 base address */
+#define HPB4_ADDR             (0x44000000u) /**< HPB4 base address */
+#define PPB_ADDR              (0xE0000000u) /**< PPB base address */
 
 #define DSU_DID_RESETVALUE    0x10810005UL
 #define NVMCTRL_RWW_EEPROM_SIZE 0x2000UL /* 8 kB */

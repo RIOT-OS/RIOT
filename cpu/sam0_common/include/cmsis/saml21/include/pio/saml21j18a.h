@@ -3,7 +3,7 @@
  *
  * \brief Peripheral I/O description for SAML21J18A
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAML21J18A_PIO_
@@ -182,6 +179,38 @@
 #define MUX_PA07A_RSTC_EXTWAKE7            0L
 #define PINMUX_PA07A_RSTC_EXTWAKE7  ((PIN_PA07A_RSTC_EXTWAKE7 << 16) | MUX_PA07A_RSTC_EXTWAKE7)
 #define PORT_PA07A_RSTC_EXTWAKE7   (1ul <<  7)
+#define PIN_PA08A_RSTC_EXTWAKE8            8L  /**< \brief RSTC signal: EXTWAKE8 on PA08 mux A */
+#define MUX_PA08A_RSTC_EXTWAKE8            0L
+#define PINMUX_PA08A_RSTC_EXTWAKE8  ((PIN_PA08A_RSTC_EXTWAKE8 << 16) | MUX_PA08A_RSTC_EXTWAKE8)
+#define PORT_PA08A_RSTC_EXTWAKE8   (1ul <<  8)
+#define PIN_PA09A_RSTC_EXTWAKE9            9L  /**< \brief RSTC signal: EXTWAKE9 on PA09 mux A */
+#define MUX_PA09A_RSTC_EXTWAKE9            0L
+#define PINMUX_PA09A_RSTC_EXTWAKE9  ((PIN_PA09A_RSTC_EXTWAKE9 << 16) | MUX_PA09A_RSTC_EXTWAKE9)
+#define PORT_PA09A_RSTC_EXTWAKE9   (1ul <<  9)
+#define PIN_PA10A_RSTC_EXTWAKE10          10L  /**< \brief RSTC signal: EXTWAKE10 on PA10 mux A */
+#define MUX_PA10A_RSTC_EXTWAKE10           0L
+#define PINMUX_PA10A_RSTC_EXTWAKE10  ((PIN_PA10A_RSTC_EXTWAKE10 << 16) | MUX_PA10A_RSTC_EXTWAKE10)
+#define PORT_PA10A_RSTC_EXTWAKE10  (1ul << 10)
+#define PIN_PA11A_RSTC_EXTWAKE11          11L  /**< \brief RSTC signal: EXTWAKE11 on PA11 mux A */
+#define MUX_PA11A_RSTC_EXTWAKE11           0L
+#define PINMUX_PA11A_RSTC_EXTWAKE11  ((PIN_PA11A_RSTC_EXTWAKE11 << 16) | MUX_PA11A_RSTC_EXTWAKE11)
+#define PORT_PA11A_RSTC_EXTWAKE11  (1ul << 11)
+#define PIN_PA12A_RSTC_EXTWAKE12          12L  /**< \brief RSTC signal: EXTWAKE12 on PA12 mux A */
+#define MUX_PA12A_RSTC_EXTWAKE12           0L
+#define PINMUX_PA12A_RSTC_EXTWAKE12  ((PIN_PA12A_RSTC_EXTWAKE12 << 16) | MUX_PA12A_RSTC_EXTWAKE12)
+#define PORT_PA12A_RSTC_EXTWAKE12  (1ul << 12)
+#define PIN_PA13A_RSTC_EXTWAKE13          13L  /**< \brief RSTC signal: EXTWAKE13 on PA13 mux A */
+#define MUX_PA13A_RSTC_EXTWAKE13           0L
+#define PINMUX_PA13A_RSTC_EXTWAKE13  ((PIN_PA13A_RSTC_EXTWAKE13 << 16) | MUX_PA13A_RSTC_EXTWAKE13)
+#define PORT_PA13A_RSTC_EXTWAKE13  (1ul << 13)
+#define PIN_PA14A_RSTC_EXTWAKE14          14L  /**< \brief RSTC signal: EXTWAKE14 on PA14 mux A */
+#define MUX_PA14A_RSTC_EXTWAKE14           0L
+#define PINMUX_PA14A_RSTC_EXTWAKE14  ((PIN_PA14A_RSTC_EXTWAKE14 << 16) | MUX_PA14A_RSTC_EXTWAKE14)
+#define PORT_PA14A_RSTC_EXTWAKE14  (1ul << 14)
+#define PIN_PA15A_RSTC_EXTWAKE15          15L  /**< \brief RSTC signal: EXTWAKE15 on PA15 mux A */
+#define MUX_PA15A_RSTC_EXTWAKE15           0L
+#define PINMUX_PA15A_RSTC_EXTWAKE15  ((PIN_PA15A_RSTC_EXTWAKE15 << 16) | MUX_PA15A_RSTC_EXTWAKE15)
+#define PORT_PA15A_RSTC_EXTWAKE15  (1ul << 15)
 /* ========== PORT definition for SUPC peripheral ========== */
 #define PIN_PB01H_SUPC_OUT0               33L  /**< \brief SUPC signal: OUT0 on PB01 mux H */
 #define MUX_PB01H_SUPC_OUT0                7L

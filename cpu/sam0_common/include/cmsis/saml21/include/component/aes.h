@@ -3,7 +3,7 @@
  *
  * \brief Component description for AES
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -40,9 +40,6 @@
  * \asf_license_stop
  *
  */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
- */
 
 #ifndef _SAML21_AES_COMPONENT_
 #define _SAML21_AES_COMPONENT_
@@ -54,7 +51,7 @@
 /*@{*/
 
 #define AES_U2238
-#define REV_AES                     0x200
+#define REV_AES                     0x100
 
 /* -------- AES_CTRLA : (AES Offset: 0x00) (R/W 32) Control A -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -87,13 +84,13 @@ typedef union {
 #define AES_CTRLA_ENABLE            (0x1ul << AES_CTRLA_ENABLE_Pos)
 #define AES_CTRLA_AESMODE_Pos       2            /**< \brief (AES_CTRLA) AES Modes of operation */
 #define AES_CTRLA_AESMODE_Msk       (0x7ul << AES_CTRLA_AESMODE_Pos)
-#define AES_CTRLA_AESMODE(value)    ((AES_CTRLA_AESMODE_Msk & ((value) << AES_CTRLA_AESMODE_Pos)))
+#define AES_CTRLA_AESMODE(value)    (AES_CTRLA_AESMODE_Msk & ((value) << AES_CTRLA_AESMODE_Pos))
 #define AES_CTRLA_CFBS_Pos          5            /**< \brief (AES_CTRLA) CFB Types */
 #define AES_CTRLA_CFBS_Msk          (0x7ul << AES_CTRLA_CFBS_Pos)
-#define AES_CTRLA_CFBS(value)       ((AES_CTRLA_CFBS_Msk & ((value) << AES_CTRLA_CFBS_Pos)))
+#define AES_CTRLA_CFBS(value)       (AES_CTRLA_CFBS_Msk & ((value) << AES_CTRLA_CFBS_Pos))
 #define AES_CTRLA_KEYSIZE_Pos       8            /**< \brief (AES_CTRLA) Keysize */
 #define AES_CTRLA_KEYSIZE_Msk       (0x3ul << AES_CTRLA_KEYSIZE_Pos)
-#define AES_CTRLA_KEYSIZE(value)    ((AES_CTRLA_KEYSIZE_Msk & ((value) << AES_CTRLA_KEYSIZE_Pos)))
+#define AES_CTRLA_KEYSIZE(value)    (AES_CTRLA_KEYSIZE_Msk & ((value) << AES_CTRLA_KEYSIZE_Pos))
 #define AES_CTRLA_CIPHER_Pos        10           /**< \brief (AES_CTRLA) Cipher mode */
 #define AES_CTRLA_CIPHER            (0x1ul << AES_CTRLA_CIPHER_Pos)
 #define AES_CTRLA_STARTMODE_Pos     11           /**< \brief (AES_CTRLA) Start mode */
@@ -106,7 +103,7 @@ typedef union {
 #define AES_CTRLA_XORKEY            (0x1ul << AES_CTRLA_XORKEY_Pos)
 #define AES_CTRLA_CTYPE_Pos         16           /**< \brief (AES_CTRLA) Counter measure types */
 #define AES_CTRLA_CTYPE_Msk         (0xFul << AES_CTRLA_CTYPE_Pos)
-#define AES_CTRLA_CTYPE(value)      ((AES_CTRLA_CTYPE_Msk & ((value) << AES_CTRLA_CTYPE_Pos)))
+#define AES_CTRLA_CTYPE(value)      (AES_CTRLA_CTYPE_Msk & ((value) << AES_CTRLA_CTYPE_Pos))
 #define AES_CTRLA_MASK              0x000F7FFFul /**< \brief (AES_CTRLA) MASK Register */
 
 /* -------- AES_CTRLB : (AES Offset: 0x04) (R/W  8) Control B -------- */
@@ -188,11 +185,11 @@ typedef union {
 
 /* -------- AES_INTFLAG : (AES Offset: 0x07) (R/W  8) Interrupt Flag Status -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-typedef union {
+typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
-    uint8_t  ENCCMP:1;         /*!< bit:      0  Encryption Complete                */
-    uint8_t  GFMCMP:1;         /*!< bit:      1  GF Multiplication Complete         */
-    uint8_t  :6;               /*!< bit:  2.. 7  Reserved                           */
+    __I uint8_t  ENCCMP:1;         /*!< bit:      0  Encryption Complete                */
+    __I uint8_t  GFMCMP:1;         /*!< bit:      1  GF Multiplication Complete         */
+    __I uint8_t  :6;               /*!< bit:  2.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } AES_INTFLAG_Type;
@@ -223,7 +220,7 @@ typedef union {
 
 #define AES_DATABUFPTR_INDATAPTR_Pos 0            /**< \brief (AES_DATABUFPTR) Input Data Pointer */
 #define AES_DATABUFPTR_INDATAPTR_Msk (0x3ul << AES_DATABUFPTR_INDATAPTR_Pos)
-#define AES_DATABUFPTR_INDATAPTR(value) ((AES_DATABUFPTR_INDATAPTR_Msk & ((value) << AES_DATABUFPTR_INDATAPTR_Pos)))
+#define AES_DATABUFPTR_INDATAPTR(value) (AES_DATABUFPTR_INDATAPTR_Msk & ((value) << AES_DATABUFPTR_INDATAPTR_Pos))
 #define AES_DATABUFPTR_MASK         0x03ul       /**< \brief (AES_DATABUFPTR) MASK Register */
 
 /* -------- AES_DBGCTRL : (AES Offset: 0x09) ( /W  8) Debug control -------- */

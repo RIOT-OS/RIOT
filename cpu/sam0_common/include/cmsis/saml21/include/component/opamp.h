@@ -3,7 +3,7 @@
  *
  * \brief Component description for OPAMP
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAML21_OPAMP_COMPONENT_
@@ -89,10 +86,6 @@ typedef union {
     uint8_t  READY2:1;         /*!< bit:      2  OPAMP 2 Ready                      */
     uint8_t  :5;               /*!< bit:  3.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
-  struct {
-    uint8_t  READY:3;          /*!< bit:  0.. 2  OPAMP x Ready                      */
-    uint8_t  :5;               /*!< bit:  3.. 7  Reserved                           */
-  } vec;                       /*!< Structure used for vec  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } OPAMP_STATUS_Type;
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
@@ -101,17 +94,14 @@ typedef union {
 #define OPAMP_STATUS_RESETVALUE     0x00ul       /**< \brief (OPAMP_STATUS reset_value) Status */
 
 #define OPAMP_STATUS_READY0_Pos     0            /**< \brief (OPAMP_STATUS) OPAMP 0 Ready */
-#define OPAMP_STATUS_READY0         (1 << OPAMP_STATUS_READY0_Pos)
+#define OPAMP_STATUS_READY0         (0x1ul << OPAMP_STATUS_READY0_Pos)
 #define OPAMP_STATUS_READY1_Pos     1            /**< \brief (OPAMP_STATUS) OPAMP 1 Ready */
-#define OPAMP_STATUS_READY1         (1 << OPAMP_STATUS_READY1_Pos)
+#define OPAMP_STATUS_READY1         (0x1ul << OPAMP_STATUS_READY1_Pos)
 #define OPAMP_STATUS_READY2_Pos     2            /**< \brief (OPAMP_STATUS) OPAMP 2 Ready */
-#define OPAMP_STATUS_READY2         (1 << OPAMP_STATUS_READY2_Pos)
-#define OPAMP_STATUS_READY_Pos      0            /**< \brief (OPAMP_STATUS) OPAMP x Ready */
-#define OPAMP_STATUS_READY_Msk      (0x7ul << OPAMP_STATUS_READY_Pos)
-#define OPAMP_STATUS_READY(value)   ((OPAMP_STATUS_READY_Msk & ((value) << OPAMP_STATUS_READY_Pos)))
+#define OPAMP_STATUS_READY2         (0x1ul << OPAMP_STATUS_READY2_Pos)
 #define OPAMP_STATUS_MASK           0x07ul       /**< \brief (OPAMP_STATUS) MASK Register */
 
-/* -------- OPAMP_OPAMPCTRL : (OPAMP Offset: 0x04) (R/W 32) OPAMP n Control -------- */
+/* -------- OPAMP_OPAMPCTRL : (OPAMP Offset: 0x04) (R/W 32) OPAMP Control n -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 typedef union {
   struct {
@@ -136,8 +126,8 @@ typedef union {
 } OPAMP_OPAMPCTRL_Type;
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
-#define OPAMP_OPAMPCTRL_OFFSET      0x04         /**< \brief (OPAMP_OPAMPCTRL offset) OPAMP n Control */
-#define OPAMP_OPAMPCTRL_RESETVALUE  0x00000000ul /**< \brief (OPAMP_OPAMPCTRL reset_value) OPAMP n Control */
+#define OPAMP_OPAMPCTRL_OFFSET      0x04         /**< \brief (OPAMP_OPAMPCTRL offset) OPAMP Control n */
+#define OPAMP_OPAMPCTRL_RESETVALUE  0x00000000ul /**< \brief (OPAMP_OPAMPCTRL reset_value) OPAMP Control n */
 
 #define OPAMP_OPAMPCTRL_ENABLE_Pos  1            /**< \brief (OPAMP_OPAMPCTRL) Operational Amplifier Enable */
 #define OPAMP_OPAMPCTRL_ENABLE      (0x1ul << OPAMP_OPAMPCTRL_ENABLE_Pos)
@@ -145,7 +135,7 @@ typedef union {
 #define OPAMP_OPAMPCTRL_ANAOUT      (0x1ul << OPAMP_OPAMPCTRL_ANAOUT_Pos)
 #define OPAMP_OPAMPCTRL_BIAS_Pos    3            /**< \brief (OPAMP_OPAMPCTRL) Bias Selection */
 #define OPAMP_OPAMPCTRL_BIAS_Msk    (0x3ul << OPAMP_OPAMPCTRL_BIAS_Pos)
-#define OPAMP_OPAMPCTRL_BIAS(value) ((OPAMP_OPAMPCTRL_BIAS_Msk & ((value) << OPAMP_OPAMPCTRL_BIAS_Pos)))
+#define OPAMP_OPAMPCTRL_BIAS(value) (OPAMP_OPAMPCTRL_BIAS_Msk & ((value) << OPAMP_OPAMPCTRL_BIAS_Pos))
 #define OPAMP_OPAMPCTRL_RUNSTDBY_Pos 6            /**< \brief (OPAMP_OPAMPCTRL) Run in Standby */
 #define OPAMP_OPAMPCTRL_RUNSTDBY    (0x1ul << OPAMP_OPAMPCTRL_RUNSTDBY_Pos)
 #define OPAMP_OPAMPCTRL_ONDEMAND_Pos 7            /**< \brief (OPAMP_OPAMPCTRL) On Demand Control */
@@ -158,16 +148,16 @@ typedef union {
 #define OPAMP_OPAMPCTRL_RES1EN      (0x1ul << OPAMP_OPAMPCTRL_RES1EN_Pos)
 #define OPAMP_OPAMPCTRL_RES1MUX_Pos 11           /**< \brief (OPAMP_OPAMPCTRL) Resistor 1 Mux */
 #define OPAMP_OPAMPCTRL_RES1MUX_Msk (0x3ul << OPAMP_OPAMPCTRL_RES1MUX_Pos)
-#define OPAMP_OPAMPCTRL_RES1MUX(value) ((OPAMP_OPAMPCTRL_RES1MUX_Msk & ((value) << OPAMP_OPAMPCTRL_RES1MUX_Pos)))
+#define OPAMP_OPAMPCTRL_RES1MUX(value) (OPAMP_OPAMPCTRL_RES1MUX_Msk & ((value) << OPAMP_OPAMPCTRL_RES1MUX_Pos))
 #define OPAMP_OPAMPCTRL_POTMUX_Pos  13           /**< \brief (OPAMP_OPAMPCTRL) Potentiometer Selection */
 #define OPAMP_OPAMPCTRL_POTMUX_Msk  (0x7ul << OPAMP_OPAMPCTRL_POTMUX_Pos)
-#define OPAMP_OPAMPCTRL_POTMUX(value) ((OPAMP_OPAMPCTRL_POTMUX_Msk & ((value) << OPAMP_OPAMPCTRL_POTMUX_Pos)))
+#define OPAMP_OPAMPCTRL_POTMUX(value) (OPAMP_OPAMPCTRL_POTMUX_Msk & ((value) << OPAMP_OPAMPCTRL_POTMUX_Pos))
 #define OPAMP_OPAMPCTRL_MUXPOS_Pos  16           /**< \brief (OPAMP_OPAMPCTRL) Positive Input Mux Selection */
 #define OPAMP_OPAMPCTRL_MUXPOS_Msk  (0x7ul << OPAMP_OPAMPCTRL_MUXPOS_Pos)
-#define OPAMP_OPAMPCTRL_MUXPOS(value) ((OPAMP_OPAMPCTRL_MUXPOS_Msk & ((value) << OPAMP_OPAMPCTRL_MUXPOS_Pos)))
+#define OPAMP_OPAMPCTRL_MUXPOS(value) (OPAMP_OPAMPCTRL_MUXPOS_Msk & ((value) << OPAMP_OPAMPCTRL_MUXPOS_Pos))
 #define OPAMP_OPAMPCTRL_MUXNEG_Pos  20           /**< \brief (OPAMP_OPAMPCTRL) Negative Input Mux Selection */
 #define OPAMP_OPAMPCTRL_MUXNEG_Msk  (0x7ul << OPAMP_OPAMPCTRL_MUXNEG_Pos)
-#define OPAMP_OPAMPCTRL_MUXNEG(value) ((OPAMP_OPAMPCTRL_MUXNEG_Msk & ((value) << OPAMP_OPAMPCTRL_MUXNEG_Pos)))
+#define OPAMP_OPAMPCTRL_MUXNEG(value) (OPAMP_OPAMPCTRL_MUXNEG_Msk & ((value) << OPAMP_OPAMPCTRL_MUXNEG_Pos))
 #define OPAMP_OPAMPCTRL_MASK        0x0077FFDEul /**< \brief (OPAMP_OPAMPCTRL) MASK Register */
 
 /** \brief OPAMP hardware registers */
@@ -177,7 +167,7 @@ typedef struct {
        RoReg8                    Reserved1[0x1];
   __I  OPAMP_STATUS_Type         STATUS;      /**< \brief Offset: 0x02 (R/   8) Status */
        RoReg8                    Reserved2[0x1];
-  __IO OPAMP_OPAMPCTRL_Type      OPAMPCTRL[3]; /**< \brief Offset: 0x04 (R/W 32) OPAMP n Control */
+  __IO OPAMP_OPAMPCTRL_Type      OPAMPCTRL[3]; /**< \brief Offset: 0x04 (R/W 32) OPAMP Control n */
 } Opamp;
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 

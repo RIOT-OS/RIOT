@@ -3,7 +3,7 @@
  *
  * \brief Component description for OSC32KCTRL
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -40,9 +40,6 @@
  * \asf_license_stop
  *
  */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
- */
 
 #ifndef _SAML21_OSC32KCTRL_COMPONENT_
 #define _SAML21_OSC32KCTRL_COMPONENT_
@@ -54,7 +51,7 @@
 /*@{*/
 
 #define OSC32KCTRL_U2246
-#define REV_OSC32KCTRL              0x110
+#define REV_OSC32KCTRL              0x100
 
 /* -------- OSC32KCTRL_INTENCLR : (OSC32KCTRL Offset: 0x00) (R/W 32) Interrupt Enable Clear -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -100,11 +97,11 @@ typedef union {
 
 /* -------- OSC32KCTRL_INTFLAG : (OSC32KCTRL Offset: 0x08) (R/W 32) Interrupt Flag Status and Clear -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-typedef union {
+typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
-    uint32_t XOSC32KRDY:1;     /*!< bit:      0  XOSC32K Ready                      */
-    uint32_t OSC32KRDY:1;      /*!< bit:      1  OSC32K Ready                       */
-    uint32_t :30;              /*!< bit:  2..31  Reserved                           */
+    __I uint32_t XOSC32KRDY:1;     /*!< bit:      0  XOSC32K Ready                      */
+    __I uint32_t OSC32KRDY:1;      /*!< bit:      1  OSC32K Ready                       */
+    __I uint32_t :30;              /*!< bit:  2..31  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint32_t reg;                /*!< Type      used for register access              */
 } OSC32KCTRL_INTFLAG_Type;
@@ -156,7 +153,7 @@ typedef union {
 
 #define OSC32KCTRL_RTCCTRL_RTCSEL_Pos 0            /**< \brief (OSC32KCTRL_RTCCTRL) RTC Clock Selection */
 #define OSC32KCTRL_RTCCTRL_RTCSEL_Msk (0x7ul << OSC32KCTRL_RTCCTRL_RTCSEL_Pos)
-#define OSC32KCTRL_RTCCTRL_RTCSEL(value) ((OSC32KCTRL_RTCCTRL_RTCSEL_Msk & ((value) << OSC32KCTRL_RTCCTRL_RTCSEL_Pos)))
+#define OSC32KCTRL_RTCCTRL_RTCSEL(value) (OSC32KCTRL_RTCCTRL_RTCSEL_Msk & ((value) << OSC32KCTRL_RTCCTRL_RTCSEL_Pos))
 #define   OSC32KCTRL_RTCCTRL_RTCSEL_ULP1K_Val 0x0ul  /**< \brief (OSC32KCTRL_RTCCTRL) 1.024kHz from 32kHz internal ULP oscillator */
 #define   OSC32KCTRL_RTCCTRL_RTCSEL_ULP32K_Val 0x1ul  /**< \brief (OSC32KCTRL_RTCCTRL) 32.768kHz from 32kHz internal ULP oscillator */
 #define   OSC32KCTRL_RTCCTRL_RTCSEL_OSC1K_Val 0x2ul  /**< \brief (OSC32KCTRL_RTCCTRL) 1.024kHz from 32.768kHz internal oscillator */
@@ -209,7 +206,7 @@ typedef union {
 #define OSC32KCTRL_XOSC32K_ONDEMAND (0x1ul << OSC32KCTRL_XOSC32K_ONDEMAND_Pos)
 #define OSC32KCTRL_XOSC32K_STARTUP_Pos 8            /**< \brief (OSC32KCTRL_XOSC32K) Oscillator Start-Up Time */
 #define OSC32KCTRL_XOSC32K_STARTUP_Msk (0x7ul << OSC32KCTRL_XOSC32K_STARTUP_Pos)
-#define OSC32KCTRL_XOSC32K_STARTUP(value) ((OSC32KCTRL_XOSC32K_STARTUP_Msk & ((value) << OSC32KCTRL_XOSC32K_STARTUP_Pos)))
+#define OSC32KCTRL_XOSC32K_STARTUP(value) (OSC32KCTRL_XOSC32K_STARTUP_Msk & ((value) << OSC32KCTRL_XOSC32K_STARTUP_Pos))
 #define OSC32KCTRL_XOSC32K_WRTLOCK_Pos 12           /**< \brief (OSC32KCTRL_XOSC32K) Write Lock */
 #define OSC32KCTRL_XOSC32K_WRTLOCK  (0x1ul << OSC32KCTRL_XOSC32K_WRTLOCK_Pos)
 #define OSC32KCTRL_XOSC32K_MASK     0x000017DEul /**< \brief (OSC32KCTRL_XOSC32K) MASK Register */
@@ -251,22 +248,19 @@ typedef union {
 #define OSC32KCTRL_OSC32K_ONDEMAND  (0x1ul << OSC32KCTRL_OSC32K_ONDEMAND_Pos)
 #define OSC32KCTRL_OSC32K_STARTUP_Pos 8            /**< \brief (OSC32KCTRL_OSC32K) Oscillator Start-Up Time */
 #define OSC32KCTRL_OSC32K_STARTUP_Msk (0x7ul << OSC32KCTRL_OSC32K_STARTUP_Pos)
-#define OSC32KCTRL_OSC32K_STARTUP(value) ((OSC32KCTRL_OSC32K_STARTUP_Msk & ((value) << OSC32KCTRL_OSC32K_STARTUP_Pos)))
+#define OSC32KCTRL_OSC32K_STARTUP(value) (OSC32KCTRL_OSC32K_STARTUP_Msk & ((value) << OSC32KCTRL_OSC32K_STARTUP_Pos))
 #define OSC32KCTRL_OSC32K_WRTLOCK_Pos 12           /**< \brief (OSC32KCTRL_OSC32K) Write Lock */
 #define OSC32KCTRL_OSC32K_WRTLOCK   (0x1ul << OSC32KCTRL_OSC32K_WRTLOCK_Pos)
 #define OSC32KCTRL_OSC32K_CALIB_Pos 16           /**< \brief (OSC32KCTRL_OSC32K) Oscillator Calibration */
 #define OSC32KCTRL_OSC32K_CALIB_Msk (0x7Ful << OSC32KCTRL_OSC32K_CALIB_Pos)
-#define OSC32KCTRL_OSC32K_CALIB(value) ((OSC32KCTRL_OSC32K_CALIB_Msk & ((value) << OSC32KCTRL_OSC32K_CALIB_Pos)))
+#define OSC32KCTRL_OSC32K_CALIB(value) (OSC32KCTRL_OSC32K_CALIB_Msk & ((value) << OSC32KCTRL_OSC32K_CALIB_Pos))
 #define OSC32KCTRL_OSC32K_MASK      0x007F17CEul /**< \brief (OSC32KCTRL_OSC32K) MASK Register */
 
 /* -------- OSC32KCTRL_OSCULP32K : (OSC32KCTRL Offset: 0x1C) (R/W 32) 32kHz Ultra Low Power Internal Oscillator (OSCULP32K) Control -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 typedef union {
   struct {
-    uint32_t :1;               /*!< bit:      0  Reserved                           */
-    uint32_t EN32K:1;          /*!< bit:      1  Enable Out 32k                     */
-    uint32_t EN1K:1;           /*!< bit:      2  Enable Out 1k                      */
-    uint32_t :5;               /*!< bit:  3.. 7  Reserved                           */
+    uint32_t :8;               /*!< bit:  0.. 7  Reserved                           */
     uint32_t CALIB:5;          /*!< bit:  8..12  Oscillator Calibration             */
     uint32_t :2;               /*!< bit: 13..14  Reserved                           */
     uint32_t WRTLOCK:1;        /*!< bit:     15  Write Lock                         */
@@ -278,16 +272,12 @@ typedef union {
 
 #define OSC32KCTRL_OSCULP32K_OFFSET 0x1C         /**< \brief (OSC32KCTRL_OSCULP32K offset) 32kHz Ultra Low Power Internal Oscillator (OSCULP32K) Control */
 
-#define OSC32KCTRL_OSCULP32K_EN32K_Pos 1            /**< \brief (OSC32KCTRL_OSCULP32K) Enable Out 32k */
-#define OSC32KCTRL_OSCULP32K_EN32K  (0x1ul << OSC32KCTRL_OSCULP32K_EN32K_Pos)
-#define OSC32KCTRL_OSCULP32K_EN1K_Pos 2            /**< \brief (OSC32KCTRL_OSCULP32K) Enable Out 1k */
-#define OSC32KCTRL_OSCULP32K_EN1K   (0x1ul << OSC32KCTRL_OSCULP32K_EN1K_Pos)
 #define OSC32KCTRL_OSCULP32K_CALIB_Pos 8            /**< \brief (OSC32KCTRL_OSCULP32K) Oscillator Calibration */
 #define OSC32KCTRL_OSCULP32K_CALIB_Msk (0x1Ful << OSC32KCTRL_OSCULP32K_CALIB_Pos)
-#define OSC32KCTRL_OSCULP32K_CALIB(value) ((OSC32KCTRL_OSCULP32K_CALIB_Msk & ((value) << OSC32KCTRL_OSCULP32K_CALIB_Pos)))
+#define OSC32KCTRL_OSCULP32K_CALIB(value) (OSC32KCTRL_OSCULP32K_CALIB_Msk & ((value) << OSC32KCTRL_OSCULP32K_CALIB_Pos))
 #define OSC32KCTRL_OSCULP32K_WRTLOCK_Pos 15           /**< \brief (OSC32KCTRL_OSCULP32K) Write Lock */
 #define OSC32KCTRL_OSCULP32K_WRTLOCK (0x1ul << OSC32KCTRL_OSCULP32K_WRTLOCK_Pos)
-#define OSC32KCTRL_OSCULP32K_MASK   0x00009F06ul /**< \brief (OSC32KCTRL_OSCULP32K) MASK Register */
+#define OSC32KCTRL_OSCULP32K_MASK   0x00009F00ul /**< \brief (OSC32KCTRL_OSCULP32K) MASK Register */
 
 /** \brief OSC32KCTRL hardware registers */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
