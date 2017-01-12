@@ -66,4 +66,15 @@ void cpu_init(void)
     /* Setup GCLK generators */
     _gclk_setup(0, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
     _gclk_setup(1, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSCULP32K);
+
+#ifdef FEATURE_PERIPH_PM
+    /* enable power managemet module */
+    MCLK->APBAMASK.reg |= MCLK_APBAMASK_PM;
+    PM->CTRLA.reg = PM_CTRLA_MASK & (~PM_CTRLA_IORET);
+
+    /* disable brownout detection
+     * (Caused unexplicable reboots from sleep on saml21. /KS)
+     */
+    SUPC->BOD33.bit.ENABLE=0;
+#endif
 }
