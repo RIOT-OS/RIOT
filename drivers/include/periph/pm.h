@@ -12,10 +12,7 @@
  * @brief       The kernels power management interface
  * @{
  *
- * The following functions *must* be available for every platform:
- *
- * pm_reboot()
- * pm_off()
+ * This interface *must* be implemented for every platform in RIOT.
  *
  * @file
  * @brief       Power management interface
