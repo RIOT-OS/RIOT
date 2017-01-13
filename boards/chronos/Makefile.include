@@ -10,4 +10,3 @@ export FFLAGS = rf2500 "prog $(HEXFILE)"
 INCLUDES += -I$(RIOTBOARD)/$(BOARD)/drivers/include
 
 USEMODULE += chronos-drivers
-USEMODULE += periph_common
