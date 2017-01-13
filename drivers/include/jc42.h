@@ -115,7 +115,7 @@ int jc42_set_config(jc42_t* dev, uint16_t data);
  * @return                   0 on success
  * @return                  -1 on error
  */
-int jc42_get_temperature(jc42_t* dev, uint16_t* temperature);
+int jc42_get_temperature(jc42_t* dev, int16_t* temperature);
 
 #ifdef __cplusplus
 }

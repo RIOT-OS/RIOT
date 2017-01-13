@@ -63,7 +63,7 @@ int jc42_set_config(jc42_t* dev, uint16_t data)
     return jc42_set_register(dev, JC42_REG_CONFIG, &data);
 }
 
-int jc42_get_temperature(jc42_t* dev, uint16_t* temperature)
+int jc42_get_temperature(jc42_t* dev, int16_t* temperature)
 {
     struct { signed int x:12;} s;
     uint16_t tmp;
