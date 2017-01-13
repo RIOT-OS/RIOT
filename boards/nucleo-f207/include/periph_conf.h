@@ -203,10 +203,10 @@ static const spi_conf_t spi_config[] = {
     },
     {
         .dev      = SPI2,
-        .mosi_pin = GPIO_PIN(PORT_B, 5),
-        .miso_pin = GPIO_PIN(PORT_B, 4),
-        .sclk_pin = GPIO_PIN(PORT_B, 3),
-        .cs_pin   = GPIO_PIN(PORT_B, 2),
+        .mosi_pin = GPIO_PIN(PORT_B, 15),
+        .miso_pin = GPIO_PIN(PORT_C, 2),
+        .sclk_pin = GPIO_PIN(PORT_B, 13),
+        .cs_pin   = GPIO_PIN(PORT_B, 12),
         .af       = GPIO_AF5,
         .rccmask  = RCC_APB1ENR_SPI2EN,
         .apbbus   = APB1
@@ -255,7 +255,7 @@ static const spi_conf_t spi_config[] = {
  */
 #define ADC_CONFIG {              \
     {GPIO_PIN(PORT_A, 4), 0, 0},  \
-    {GPIO_PIN(PORT_A, 5), 1, 0}  \
+    {GPIO_PIN(PORT_C, 0), 1, 0}  \
 }
 #define ADC_NUMOF          (2)
 
