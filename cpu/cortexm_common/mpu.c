@@ -67,6 +67,9 @@ int mpu_configure(uint_fast8_t region, uintptr_t base, uint_fast32_t attr) {
 
     return 0;
 #else
+    (void)region;
+    (void)base;
+    (void)attr;
     return -1;
 #endif
 }
