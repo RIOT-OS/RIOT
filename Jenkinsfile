@@ -86,6 +86,9 @@ stage("unittests") {
         boardName = boards[i]
         builds['linux_unittests_' + boardName] = make_build("linux && boards && native", boardName, "linux_unittests", unittests)
     }
+
+    builds['macOS_unittests_native'] = make_build("macOS && native", "native", "macOS_unittests", unittests)
+
     /* distribute all builds to the slaves */
     parallel (builds)
 
@@ -105,13 +108,11 @@ stage("tests") {
         builds['linux_other_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_other_tests", other_tests)
     }
 
-
-/*  ignore macOS builds for now - macOS is currently broken for native
     builds['macOS_driver_tests_native'] = make_build("macOS && native", "native", "macOS_driver_tests", driver_tests)
     builds['macOS_pkg_tests_native'] = make_build("macOS && native", "native", "macOS_pkg_tests", pkg_tests)
     builds['macOS_periph_tests_native'] = make_build("macOS && native", "native", "macOS_periph_tests", periph_tests)
     builds['macOS_other_tests_native'] = make_build("macOS && native", "native", "macOS_other_tests", other_tests)
-*/
+
 /*  ignore raspi builds for now - slows down the build (needs investigation)
     builds['raspi_driver_tests_native'] = make_build("raspi && native", "native", "raspi_driver_tests", driver_tests)
     builds['raspi_pkg_tests_native'] = make_build("raspi && native", "native", "raspi_pkg_tests", pkg_tests)
@@ -135,9 +136,8 @@ stage("examples") {
         builds['linux_examples_' + boardName] = make_build("linux && boards && native", boardName, "linux_examples", examples)
     }
 
-/*  ignore macOS builds for now - macOS is currently broken for native
     builds['macOS_examples_native'] = make_build("macOS && native", "native", "macOS_examples", examples)
-*/
+
 /*  ignore raspi builds for now - slows down the build (needs investigation)
     builds['raspi_examples_native'] = make_build("raspi && native", "native", "raspi_examples", examples)
 */
@@ -172,6 +172,7 @@ def make_build(label, board, desc, arg)
                         def ret = sh(returnStatus: true,
                                      script: """#!/bin/bash +ex
                                                 declare -i RESULT=0
+                                                echo \$PATH
                                                 for app in ${apps}; do
                                                     if [[ \$(make -sC \$app info-boards-supported | tr ' ' '\n' | sed -n '/^${board}\$/p') ]]; then
                                                         echo \"\n\nBuilding \$app for ${board}\" >> success_${board}_${desc}.log
