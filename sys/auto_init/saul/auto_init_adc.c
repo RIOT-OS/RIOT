@@ -55,7 +55,7 @@ extern saul_driver_t adc_saul_driver;
 void auto_init_adc(void)
 {
     DEBUG("auto init SAUL ADC\n");
-    for (int i = 0; i < SAUL_ADC_NUMOF; i++) {
+    for (unsigned int i = 0; i < SAUL_ADC_NUMOF; i++) {
         const saul_adc_params_t *p = &saul_adc_params[i];
         saul_adcs[i] = p;
 

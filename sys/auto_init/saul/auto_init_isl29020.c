@@ -51,7 +51,7 @@ extern saul_driver_t isl29020_saul_driver;
 
 void auto_init_isl29020(void)
 {
-    for (int i = 0; i < ISL29020_NUM; i++) {
+    for (unsigned int i = 0; i < ISL29020_NUM; i++) {
         const isl29020_params_t *p = &isl29020_params[i];
 
         DEBUG("[auto_init_saul] initializing isl29020 light sensor\n");
