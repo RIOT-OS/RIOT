@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_periph_pm
+ * @ingroup     sys_pm_layered
  * @{
  *
  * @file
