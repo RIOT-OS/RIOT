@@ -142,12 +142,17 @@ stage("examples") {
     abortOnError("examples failed")
 }
 
+def buildState = 'SUCCESS'
+
 if (currentBuild.result == null) {
     currentBuild.result = 'SUCCESS'
 }
+else if (currentBuild.result != 'SUCCESS') {
+    buildState = 'FAILURE'
+}
 
 /* set commit status in GitHub with url pointing to logs manually (necessary workaround for now) */
-githubNotify context: 'Jenkins', description: "${currentBuild.result}", status: "${currentBuild.result}",targetUrl: "${env.BUILD_URL}artifact"
+githubNotify context: 'Jenkins', description: "${currentBuild.result}", status: buildState, targetUrl: "${env.BUILD_URL}artifact"
 
 /* create a job */
 def make_build(label, board, desc, arg)
@@ -208,7 +213,7 @@ def abortPreviousBuilds()
 def abortOnError(msg)
 {
     if ((currentBuild.result != null) && (currentBuild.result == 'FAILURE')) {
-        githubNotify context: 'Jenkins', description: "${currentBuild.result}", status: "${currentBuild.result}",targetUrl: "${env.BUILD_URL}artifact"
+        githubNotify context: 'Jenkins', description: "${currentBuild.result}", status: 'FAILURE', targetUrl: "${env.BUILD_URL}artifact"
         error msg
     }
 }
