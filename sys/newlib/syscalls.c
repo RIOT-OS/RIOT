@@ -82,8 +82,8 @@ __attribute__((used)) void _fini(void)
  */
 void _exit(int n)
 {
-    LOG_INFO("#! exit %i: resetting\n", n);
-    pm_reboot();
+    LOG_INFO("#! exit %i: powering off\n", n);
+    pm_off();
     while(1);
 }
 
