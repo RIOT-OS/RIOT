@@ -77,7 +77,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     cpuid_get(cpuid);
 
 #if CPUID_LEN > IEEE802154_LONG_ADDRESS_LEN
-    for (int i = IEEE802154_LONG_ADDRESS_LEN; i < CPUID_LEN; i++) {
+    for (unsigned int i = IEEE802154_LONG_ADDRESS_LEN; i < CPUID_LEN; i++) {
         cpuid[i & 0x07] ^= cpuid[i];
     }
 #endif
