@@ -1,4 +1,4 @@
-INCLUDES += -I$(RIOTCPU)/msp430-common/include/
+INCLUDES += -I$(RIOTCPU)/msp430_common/include/
 
 export UNDEF += $(BINDIR)/msp430_common/startup.o
 export USEMODULE += msp430_common
