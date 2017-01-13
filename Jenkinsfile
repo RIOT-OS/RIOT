@@ -213,7 +213,7 @@ def abortPreviousBuilds()
 def abortOnError(msg)
 {
     if ((currentBuild.result != null) && (currentBuild.result == 'FAILURE')) {
-        githubNotify context: 'Jenkins', description: "${currentBuild.result}", status: 'FAILURE', targetUrl: "${env.BUILD_URL}artifact"
+        githubNotify context: 'Jenkins', description: msg, status: 'FAILURE', targetUrl: "${env.BUILD_URL}artifact"
         error msg
     }
 }
