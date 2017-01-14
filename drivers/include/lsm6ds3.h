@@ -163,7 +163,7 @@ void lsm6ds3_read_gyr(lsm6ds3_t *dev, lsm6ds3_3d_data_t *data);
  * @param[in] dev   device descriptor of an LSM6DS3 device
  * @param[in] data  the measured temperature in degree celsius [°C]
  */
-void lsm6ds3_read_temp(lsm6ds3_t *dev, int16_t *value);
+void lsm6ds3_read_temp(lsm6ds3_t *dev, int16_t *data);
 
 /**
  * @brief Enables the sensor.

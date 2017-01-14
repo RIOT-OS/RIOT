@@ -244,7 +244,7 @@ void lsm6ds3_read_gyr(lsm6ds3_t *dev, lsm6ds3_3d_data_t *data)
     data->z_axis = raw[2] * sensitivity / GYR_DIVIDER;
 }
 
-void lsm6ds3_read_temp(lsm6ds3_t *dev, int16_t *value)
+void lsm6ds3_read_temp(lsm6ds3_t *dev, int16_t *data)
 {
     i2c_acquire(dev->i2c);
     i2c_read_regs(dev->i2c, dev->addr, LSM6DS3_OUT_TEMP_L, (char*)value, 2);
