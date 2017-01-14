@@ -182,16 +182,6 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params);
 void at86rf2xx_reset(at86rf2xx_t *dev);
 
 /**
- * @brief   Trigger a clear channel assessment
- *
- * @param[in] dev           device to use
- *
- * @return                  true if channel is clear
- * @return                  false if channel is busy
- */
-bool at86rf2xx_cca(at86rf2xx_t *dev);
-
-/**
  * @brief   Get the short address of the given device
  *
  * @param[in] dev           device to read from
