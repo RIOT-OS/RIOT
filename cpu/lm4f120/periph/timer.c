@@ -46,6 +46,9 @@ static timer_conf_t config[TIMER_NUMOF];
 
 #include "hw_timer.h"
 
+/* enable timer interrupts */
+static inline void _irq_enable(tim_t dev);
+
 /* Missing from driverlib */
 static inline unsigned long
 PRIV_TimerPrescaleSnapshotGet(unsigned long ulbase, unsigned long ultimer) {
@@ -115,7 +118,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
     ROM_TimerIntEnable(timer_base, timer_intbit);
 
-    timer_irq_enable(dev);
+    _irq_enable(dev);
     timer_start(dev);
 
     return 0;
@@ -305,7 +308,7 @@ void timer_stop(tim_t dev)
     ROM_TimerDisable(timer_base, timer_side);
 }
 
-void timer_irq_enable(tim_t dev)
+static inline void _irq_enable(tim_t dev)
 {
     unsigned int timer_intbase;
 
@@ -330,37 +333,6 @@ void timer_irq_enable(tim_t dev)
 
     ROM_IntPrioritySet(timer_intbase, 32);
     ROM_IntEnable(timer_intbase);
-}
-
-void timer_irq_disable(tim_t dev)
-{
-    unsigned int timer_base;
-    unsigned int timer_intbit = TIMER_TIMA_TIMEOUT;
-    unsigned int timer_intbase;
-
-    if (dev >= TIMER_NUMOF){
-        return;
-    }
-
-    switch(dev){
-#if TIMER_0_EN
-    case TIMER_0:
-        timer_base = WTIMER0_BASE;
-        timer_intbase = INT_WTIMER0A;
-        break;
-#endif
-#if TIMER_1_EN
-    case TIMER_1:
-        timer_base = WTIMER1_BASE;
-        timer_intbase = INT_WTIMER1A;
-        break;
-#endif
-    default:
-        return; /* unreachable */
-    }
-
-    ROM_IntEnable(timer_intbase);
-    ROM_TimerIntDisable(timer_base, timer_intbit);
 }
 
 #if TIMER_0_EN

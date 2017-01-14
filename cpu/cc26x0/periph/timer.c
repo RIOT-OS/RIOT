@@ -68,7 +68,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     /* set the timer speed */
     dev(tim)->TAPR = (RCOSC48M_FREQ / freq) - 1;
     /* enable global timer interrupt and start the timer */
-    timer_irq_enable(tim);
+    NVIC_EnableIRQ(GPTIMER_0A_IRQN + (2 * timer_config[tim].num));
     dev(tim)->CTL = GPT_CTL_TAEN;
 
     return 0;
@@ -115,16 +115,6 @@ void timer_stop(tim_t tim)
 void timer_start(tim_t tim)
 {
     dev(tim)->CTL = GPT_CTL_TAEN;
-}
-
-void timer_irq_enable(tim_t tim)
-{
-    NVIC_EnableIRQ(GPTIMER_0A_IRQN + (2 * timer_config[tim].num));
-}
-
-void timer_irq_disable(tim_t tim)
-{
-    NVIC_DisableIRQ(GPTIMER_0A_IRQN + (2 * timer_config[tim].num));
 }
 
 /**

@@ -128,16 +128,6 @@ void timer_start(tim_t dev)
     timer_config[dev].timer->CMD = TIMER_CMD_START;
 }
 
-void timer_irq_enable(tim_t dev)
-{
-    NVIC_EnableIRQ(timer_config[dev].irqn);
-}
-
-void timer_irq_disable(tim_t dev)
-{
-    NVIC_DisableIRQ(timer_config[dev].irqn);
-}
-
 void timer_reset(tim_t dev)
 {
     timer_config[dev].timer->CNT = 0;
