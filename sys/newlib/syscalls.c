@@ -36,9 +36,9 @@
 #include "board.h"
 #include "sched.h"
 #include "thread.h"
-#include "reboot.h"
 #include "irq.h"
 #include "log.h"
+#include "periph/pm.h"
 
 #include "uart_stdio.h"
 
@@ -82,8 +82,8 @@ __attribute__((used)) void _fini(void)
  */
 void _exit(int n)
 {
-    LOG_INFO("#! exit %i: resetting\n", n);
-    reboot();
+    LOG_INFO("#! exit %i: powering off\n", n);
+    pm_off();
     while(1);
 }
 
