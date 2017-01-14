@@ -42,7 +42,7 @@ static timer_isr_ctx_t config[TIMER_NUMOF];
 /**
  * @brief Setup the given timer
  */
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* configure GCLK0 to feed TC0 & TC1*/;
     GCLK->PCHCTRL[TC0_GCLK_ID].reg |= GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;
@@ -52,9 +52,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     switch (dev) {
 #if TIMER_0_EN
     case TIMER_0:
-        if (TIMER_0_DEV.CTRLA.bit.ENABLE) {
-            return 0;
-        }
+        assert(!TIMER_0_DEV.CTRLA.bit.ENABLE);
         MCLK->APBCMASK.reg |= MCLK_APBCMASK_TC0;
         /* reset timer */
         TIMER_0_DEV.CTRLA.bit.SWRST = 1;
@@ -66,7 +64,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 #endif
     case TIMER_UNDEFINED:
     default:
-        return -1;
+        assert(0);
     }
 
     /* save callback */
@@ -77,8 +75,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     timer_irq_enable(dev);
 
     timer_start(dev);
-
-    return 0;
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)

@@ -39,12 +39,10 @@ static timer_isr_ctx_t config[TIMER_NUMOF];
 /**
  * @brief Setup the given timer
  */
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* at the moment, the timer can only run at 1MHz */
-    if (freq != 1000000ul) {
-        return -1;
-    }
+    assert(freq == 1000 * 1000);
 
 /* select the clock generator depending on the main clock source:
  * GCLK0 (1MHz) if we use the internal 8MHz oscillator
@@ -66,9 +64,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     switch (dev) {
 #if TIMER_0_EN
     case TIMER_0:
-        if (TIMER_0_DEV.CTRLA.bit.ENABLE) {
-            return 0;
-        }
+        assert(!TIMER_0_DEV.CTRLA.bit.ENABLE);
         PM->APBCMASK.reg |= PM_APBCMASK_TC3;
         /* reset timer */
         TIMER_0_DEV.CTRLA.bit.SWRST = 1;
@@ -88,9 +84,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 #endif
 #if TIMER_1_EN
     case TIMER_1:
-        if (TIMER_1_DEV.CTRLA.bit.ENABLE) {
-            return 0;
-        }
+        assert(!TIMER_1_DEV.CTRLA.bit.ENABLE);
         PM->APBCMASK.reg |= PM_APBCMASK_TC4;
         /* reset timer */
         TIMER_1_DEV.CTRLA.bit.SWRST = 1;
@@ -112,7 +106,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 #endif
     case TIMER_UNDEFINED:
     default:
-        return -1;
+        assert(0);
     }
 
     /* save callback */
@@ -123,8 +117,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     timer_irq_enable(dev);
 
     timer_start(dev);
-
-    return 0;
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)

@@ -69,7 +69,7 @@ static const int IRQn_lut[GPTIMER_NUMOF] = {
  * @brief Setup the given timer
  *
  */
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     cc2538_gptimer_t *gptimer = timer_config[dev].dev;
     unsigned int gptimer_num;
@@ -77,9 +77,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
     DEBUG("%s(%u, %lu, %p, %p)\n", __FUNCTION__, dev, freq, cb, arg);
 
-    if (dev >= TIMER_NUMOF) {
-        return -1;
-    }
+    assert(dev < TIMER_NUMOF);
 
     gptimer_num = GPTIMER_GET_NUM(gptimer);
 
@@ -98,15 +96,10 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
         /* Count up in periodic mode */
         chan_mode = TnCMIE | TnCDIR | GPTIMER_PERIODIC_MODE;
 
-        if (timer_config[dev].channels > 1) {
-            DEBUG("Invalid timer_config. Multiple channels are available only in 16-bit mode.");
-            return -1;
-        }
+        assert(timer_config[dev].channels <= 1);
 
-        if (freq != sys_clock_freq()) {
-            DEBUG("In 32-bit mode, the GPTimer frequency must equal the system clock frequency (%u).", sys_clock_freq());
-            return -1;
-        }
+        uint32_t scf = sys_clock_freq();
+        assert(freq == scf);
     } else {
         /* Count down in periodic mode */
         chan_mode = TnCMIE | GPTIMER_PERIODIC_MODE;
@@ -143,8 +136,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
     /* Enable interrupts for given timer: */
     timer_irq_enable(dev);
-
-    return 0;
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)

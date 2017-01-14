@@ -40,16 +40,12 @@ static timer_cb_t isr_cb;
 static void *isr_arg;
 
 
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* using fixed TIMER_BASE for now */
-    if (dev != 0) {
-        return -1;
-    }
+    assert(dev == 0);
     /* TODO: configure time-base depending on freq value */
-    if (freq != 1000000ul) {
-        return -1;
-    }
+    assert(freq == 1000 * 1000);
 
     /* reset the timer A configuration */
     TIMER_BASE->CTL = TIMER_CTL_CLR;
@@ -64,7 +60,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     }
     /* start the timer in continuous mode */
     TIMER_BASE->CTL |= TIMER_CTL_MC_CONT;
-    return 0;
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)

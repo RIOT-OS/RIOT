@@ -42,12 +42,10 @@ static inline gpt_reg_t *dev(tim_t tim)
     return timer_config[tim].dev;
 }
 
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* make sure given timer is valid */
-    if (tim >= TIMER_NUMOF) {
-        return -1;
-    }
+    assert(tim < TIMER_NUMOF);
 
     /* enable the times clock */
     PRCM->GPTCLKGR |= (1 << timer_config[tim].num);
@@ -70,8 +68,6 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     /* enable global timer interrupt and start the timer */
     timer_irq_enable(tim);
     dev(tim)->CTL = GPT_CTL_TAEN;
-
-    return 0;
 }
 
 int timer_set(tim_t tim, int channel, unsigned int timeout)

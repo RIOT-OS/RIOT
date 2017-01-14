@@ -65,11 +65,9 @@ static inline unsigned int _llvalue_to_scaled_value(unsigned long long corrected
     return scaledv;
 }
 
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
-    if (dev >= TIMER_NUMOF){
-        return -1;
-    }
+    assert(dev < TIMER_NUMOF);
 
     config[dev].cb = cb;
     config[dev].arg = arg;
@@ -98,7 +96,8 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
         break;
 #endif
     default:
-        return -1; /* unreachable */
+        /* assert a valid timer */
+        assert(0);
     }
 
 
@@ -117,8 +116,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
     timer_irq_enable(dev);
     timer_start(dev);
-
-    return 0;
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)

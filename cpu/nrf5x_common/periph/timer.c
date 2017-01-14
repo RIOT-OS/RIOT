@@ -42,12 +42,10 @@ static inline NRF_TIMER_Type *dev(tim_t tim)
     return timer_config[tim].dev;
 }
 
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* make sure the given timer is valid */
-    if (tim >= TIMER_NUMOF) {
-        return -1;
-    }
+    assert(tim < TIMER_NUMOF);
 
     /* save interrupt context */
     ctx[tim].cb = cb;
@@ -74,9 +72,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
         }
         cando /= 2;
     }
-    if (i == 10) {
-        return -1;
-    }
+    assert(i != 10);
 
     /* reset compare state */
     dev(tim)->EVENTS_COMPARE[0] = 0;
@@ -87,8 +83,6 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     timer_irq_enable(tim);
     /* start the timer */
     dev(tim)->TASKS_START = 1;
-
-    return 0;
 }
 
 int timer_set(tim_t tim, int chan, unsigned int value)

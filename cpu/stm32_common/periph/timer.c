@@ -35,12 +35,10 @@ static inline TIM_TypeDef *dev(tim_t tim)
     return timer_config[tim].dev;
 }
 
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* check if device is valid */
-    if (tim >= TIMER_NUMOF) {
-        return -1;
-    }
+    assert(tim < TIMER_NUMOF);
 
     /* remember the interrupt context */
     isr_ctx[tim].cb = cb;
@@ -69,8 +67,6 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     timer_irq_enable(tim);
     /* reset the counter and start the timer */
     timer_start(tim);
-
-    return 0;
 }
 
 int timer_set(tim_t tim, int channel, unsigned int timeout)

@@ -108,15 +108,13 @@ static inline void pwr_clk_and_isr(tim_t tim)
     }
 }
 
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* get the timers base register */
     lpc23xx_timer_t *dev = get_dev(tim);
 
     /* make sure the timer device is valid */
-    if (dev == NULL) {
-        return -1;
-    }
+    assert(dev != NULL);
 
     /* save the callback */
     isr_ctx[tim].cb = cb;
@@ -130,7 +128,6 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     dev->PR = (CLOCK_PCLK / freq) - 1;
     /* enable timer */
     dev->TCR = 1;
-    return 0;
 }
 
 int timer_set(tim_t tim, int channel, unsigned int timeout)
