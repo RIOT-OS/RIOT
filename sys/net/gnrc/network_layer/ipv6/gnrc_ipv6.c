@@ -745,6 +745,9 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
             return;
         }
 
+        gnrc_netif_hdr_t *netif_hdr = (gnrc_netif_hdr_t*) ptr;
+        netif_hdr->if_pid = GNRC_NETIF_LOOPBACK_PID;
+
         /* add netif to front of the pkt list */
         rcv_pkt->next = ptr;
 
