@@ -8,6 +8,7 @@
 
 /**
  * @defgroup  drivers_pn532 PN532 NFC Reader
+ * @ingroup drivers
  *
  * @{
  * @file
