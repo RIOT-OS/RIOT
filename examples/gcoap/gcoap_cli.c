@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "net/gnrc/coap.h"
+#include "net/gcoap.h"
 #include "od.h"
 #include "fmt.h"
 

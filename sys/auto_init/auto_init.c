@@ -89,7 +89,7 @@
 #endif
 
 #ifdef MODULE_GCOAP
-#include "net/gnrc/coap.h"
+#include "net/gcoap.h"
 #endif
 
 #define ENABLE_DEBUG (0)
