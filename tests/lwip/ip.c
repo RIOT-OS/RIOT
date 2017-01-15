@@ -7,14 +7,12 @@
  */
 
 /**
- * @ingroup     examples
+ * @ingroup     tests
  * @{
  *
  * @file
- * @brief       Demonstrating the sending and receiving of UDP data over POSIX sockets.
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
- *
  * @}
  */
 
@@ -25,44 +23,50 @@
 #include "common.h"
 #include "od.h"
 #include "net/af.h"
-#include "net/conn/ip.h"
+#include "net/sock/ip.h"
 #include "net/ipv6.h"
+#include "shell.h"
 #include "thread.h"
 #include "xtimer.h"
 
-#ifdef MODULE_CONN_IP
-static char conn_inbuf[CONN_INBUF_SIZE];
+#ifdef MODULE_SOCK_IP
+static char sock_inbuf[SOCK_INBUF_SIZE];
 static bool server_running;
-static conn_ip_t server_conn;
+static sock_ip_t server_sock;
 static char server_stack[THREAD_STACKSIZE_DEFAULT];
 static msg_t server_msg_queue[SERVER_MSG_QUEUE_SIZE];
 
 static void *_server_thread(void *args)
 {
-    ipv6_addr_t server_addr = IPV6_ADDR_UNSPECIFIED;
+    sock_ip_ep_t server_addr = SOCK_IPV6_EP_ANY;
     uint8_t protocol;
 
     msg_init_queue(server_msg_queue, SERVER_MSG_QUEUE_SIZE);
     /* parse protocol */
-    protocol = (uint8_t)atoi((char *)args);
-    if (conn_ip_create(&server_conn, &server_addr, sizeof(server_addr), AF_INET6, protocol) < 0) {
+    protocol = atoi(args);
+    if (sock_ip_create(&server_sock, &server_addr, NULL, protocol, 0) < 0) {
         return NULL;
     }
     server_running = true;
     printf("Success: started IP server on protocol %u\n", protocol);
     while (1) {
         int res;
-        ipv6_addr_t src;
-        size_t src_len = sizeof(ipv6_addr_t);
-        if ((res = conn_ip_recvfrom(&server_conn, conn_inbuf, sizeof(conn_inbuf), &src,
-                                    &src_len)) < 0) {
+        sock_ip_ep_t src;
+
+        if ((res = sock_ip_recv(&server_sock, sock_inbuf, sizeof(sock_inbuf),
+                                SOCK_NO_TIMEOUT, &src)) < 0) {
             puts("Error on receive");
         }
         else if (res == 0) {
             puts("No data received");
         }
         else {
-            od_hex_dump(conn_inbuf, res, 0);
+            char addrstr[IPV6_ADDR_MAX_STR_LEN];
+
+            printf("Received IP data from [%s]:\n",
+                   ipv6_addr_to_str(addrstr, (ipv6_addr_t *)&src.addr.ipv6,
+                                    sizeof(addrstr)));
+            od_hex_dump(sock_inbuf, res, 0);
         }
     }
     return NULL;
@@ -71,26 +75,30 @@ static void *_server_thread(void *args)
 static int ip_send(char *addr_str, char *port_str, char *data, unsigned int num,
                    unsigned int delay)
 {
-    ipv6_addr_t src = IPV6_ADDR_UNSPECIFIED, dst;
+    sock_ip_ep_t dst = SOCK_IPV6_EP_ANY;
     uint8_t protocol;
-    uint8_t byte_data[strlen(data) / 2];
+    uint8_t byte_data[SHELL_DEFAULT_BUFSIZE / 2];
     size_t data_len;
 
     /* parse destination address */
-    if (ipv6_addr_from_str(&dst, addr_str) == NULL) {
+    if (ipv6_addr_from_str((ipv6_addr_t *)&dst.addr.ipv6, addr_str) == NULL) {
         puts("Error: unable to parse destination address");
         return 1;
     }
     /* parse protocol */
-    protocol = (uint8_t)atoi(port_str);
+    protocol = atoi(port_str);
     data_len = hex2ints(byte_data, data);
     for (unsigned int i = 0; i < num; i++) {
-        if (conn_ip_sendto(byte_data, data_len, &src, sizeof(src), (struct sockaddr *)&dst,
-                           sizeof(dst), AF_INET6, protocol) < 0) {
+        sock_ip_t *sock = NULL;
+
+        if (server_running) {
+            sock = &server_sock;
+        }
+        if (sock_ip_send(sock, byte_data, data_len, protocol, &dst) < 0) {
             puts("could not send");
         }
         else {
-            printf("Success: send %u byte to %s (next header: %u)\n",
+            printf("Success: send %u byte over IPv6 to %s (next header: %u)\n",
                    (unsigned)data_len, addr_str, protocol);
         }
         xtimer_usleep(delay);
@@ -124,10 +132,10 @@ int ip_cmd(int argc, char **argv)
             return 1;
         }
         if (argc > 5) {
-            num = (uint32_t)atoi(argv[5]);
+            num = atoi(argv[5]);
         }
         if (argc > 6) {
-            delay = (uint32_t)atoi(argv[6]);
+            delay = atoi(argv[6]);
         }
         return ip_send(argv[2], argv[3], argv[4], num, delay);
     }

@@ -11,14 +11,11 @@
  * @{
  *
  * @file
- * @brief       Test for raw IPv6 connections
+ * @brief       Test for lwIP
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  *
- * This test application tests the gnrc_conn_ip module. If you select protocol 58 you can also
- * test if gnrc is able to deal with multiple subscribers to ICMPv6 (gnrc_icmpv6 and this
- * application).
- *
+ * This test application tests the lwIP package.
  * @}
  */
 
@@ -52,18 +49,19 @@ static int ifconfig(int argc, char **argv)
 }
 
 static const shell_command_t shell_commands[] = {
-#ifdef MODULE_CONN_IP
+#ifdef MODULE_SOCK_IP
     { "ip", "Send IP packets and listen for packets of certain type", ip_cmd },
 #endif
-#ifdef MODULE_CONN_UDP
+#ifdef MODULE_SOCK_TCP
+    { "tcp", "Send TCP messages and listen for messages on TCP port", tcp_cmd },
+#endif
+#ifdef MODULE_SOCK_UDP
     { "udp", "Send UDP messages and listen for messages on UDP port", udp_cmd },
 #endif
     { "ifconfig", "Shows assigned IPv6 addresses", ifconfig },
     { NULL, NULL, NULL }
 };
 static char line_buf[SHELL_DEFAULT_BUFSIZE];
-
-char conn_inbuf[CONN_INBUF_SIZE];
 
 int main(void)
 {
