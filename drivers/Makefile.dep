@@ -82,6 +82,10 @@ ifneq (,$(filter io1_xplained,$(USEMODULE)))
   USEMODULE += at30tse75x
 endif
 
+ifneq (,$(filter jc42,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter kw2xrf,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += netif
