@@ -75,12 +75,64 @@ static const uart_conf_t uart_config[] = {
         .bus        = APB1,
         .irqn       = USART2_IRQn
     },
+    {
+        .dev        = USART1,
+        .rcc_mask   = RCC_APB2ENR_USART1EN,
+        .rx_pin     = GPIO_PIN(PORT_A, 10),
+        .tx_pin     = GPIO_PIN(PORT_A, 9),
+        .rx_af      = GPIO_AF1,
+        .tx_af      = GPIO_AF1,
+        .bus        = APB2,
+        .irqn       = USART1_IRQn
+    }
 };
 
 #define UART_0_ISR          (isr_usart2)
+#define UART_1_ISR          (isr_usart1)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
+
+/**
+ * @brief   PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM1,
+        .rcc_mask = RCC_APB2ENR_TIM1EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_A, 8) /* D9 */, .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 } },
+        .af       = GPIO_AF2,
+        .bus      = APB2
+    },
+    {
+        .dev      = TIM14,
+        .rcc_mask = RCC_APB1ENR_TIM14EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 1) /* D6 */, .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 } },
+        .af       = GPIO_AF0,
+        .bus      = APB1
+    },
+    {
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 0) /* D3 */, .cc_chan = 2 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 }},
+        .af       = GPIO_AF1,
+        .bus      = APB1
+    }
+};
+
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+/** @} */
+
 
 /**
  * @name RTC configuration
@@ -97,7 +149,15 @@ static const uart_conf_t uart_config[] = {
  * @brief   ADC configuration
  * @{
  */
-#define ADC_NUMOF          (0)
+#define ADC_CONFIG {            \
+    { GPIO_PIN(PORT_A, 0), 0 }, \
+    { GPIO_PIN(PORT_A, 1), 1 }, \
+    { GPIO_PIN(PORT_A, 3), 3 }, \
+    { GPIO_PIN(PORT_A, 4), 4 }, \
+    { GPIO_PIN(PORT_A, 7), 7 }  \
+}
+
+#define ADC_NUMOF          (5)
 /** @} */
 
 /**
