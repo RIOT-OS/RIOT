@@ -601,7 +601,11 @@ class SerCmd(cmd.Cmd):
                 if os.path.exists(self.port):
                     self.logger.warn("Try to reconnect to %s again..."
                                      % (self.port))
-                    self.serial_connect()
+                    try:
+                        self.serial_connect()
+                        self.logger.info("Reconnected to serial port %s" % self.port)
+                    except serial.SerialException as se:
+                        pass
                 continue
             if c == '\r':
                 if (self.newline == "LFCR" and nlreceived) or (self.newline == "CR"):
