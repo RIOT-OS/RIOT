@@ -58,13 +58,8 @@ static int test_timer(unsigned num)
     }
 
     /* initialize and halt timer */
-    if (timer_init(TIMER_DEV(num), TIM_SPEED, cb, NULL) < 0) {
-        printf("TIMER_%u: ERROR on initialization - skipping\n\n", num);
-        return 0;
-    }
-    else {
-        printf("TIMER_%u: initialization successful\n", num);
-    }
+    timer_init(TIMER_DEV(num), TIM_SPEED, cb, NULL) < 0;
+    printf("TIMER_%u initialized\n", num);
     timer_stop(TIMER_DEV(num));
     printf("TIMER_%u: stopped\n", num);
     /* set each available channel */
