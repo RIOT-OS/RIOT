@@ -69,6 +69,8 @@ node ('master') {
         }
         step([$class: 'ArtifactArchiver', artifacts: "*_static-tests.log", fingerprint: true, allowEmptyArchive: true])
     }
+
+    deleteDir()
 }
 
 stage("unittests") {
@@ -192,6 +194,8 @@ def make_build(label, board, desc, arg)
             }  catch(e) {
                 echo "${e.toString()}"
                 currentBuild.result = 'FAILURE'
+            } finally {
+                deleteDir()
             }
         }
     }
