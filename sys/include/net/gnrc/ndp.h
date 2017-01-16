@@ -553,6 +553,93 @@ gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next);
 #define gnrc_ndp_opt_mtu_build(mtu, next)   (NULL)
 #endif
 
+/**
+ * @brief   Adapter function for new NDP implementation to send precompiled
+ *          neighbor solicitations.
+ *
+ * @todo    Provide own implementation as soon as @ref net_gnrc_ndp is
+ *          refactored for new NDP
+ *
+ * @param[in] iface Interface to send over. May not be 0.
+ * @param[in] src   Source address for the neighbor solicitation. Will be chosen
+ *                  from the interface according to @p dst, if NULL.
+ * @param[in] tgt   Target address for the neighbor solicitation. May not be
+ *                  NULL.
+ * @param[in] dst   Destination address for neighbor solicitation. May not be
+ *                  NULL.
+ */
+static inline void gnrc_ndp_send_nbr_sol(unsigned iface, ipv6_addr_t *src,
+                                         ipv6_addr_t *tgt, ipv6_addr_t *dst)
+{
+    gnrc_ndp_internal_send_nbr_sol((kernel_pid_t)iface, src, tgt, dst);
+}
+
+/**
+ * @brief   Adapter function for new NDP implementation to send precompiled
+ *          neighbor advertisement.
+ *
+ * @todo    Provide own implementation as soon as @ref net_gnrc_ndp is
+ *          refactored for new NDP
+ *
+ * @param[in] iface         Interface to send over. May not be 0.
+ * @param[in] tgt           Target address for the neighbor advertisement. May
+ *                          not be NULL.
+ * @param[in] dst           Destination address for neighbor advertisement. May
+ *                          not be NULL.
+ * @param[in] supply_tl2a   Add target link-layer address option to neighbor
+ *                          advertisement if link-layer has addresses.
+ * @param[in] ext_opts      External options for the neighbor advertisement.
+ *                          Leave NULL for none.
+ *                          **Warning:** these are not tested if they are
+ *                          suitable for a  neighbor advertisement so be sure to check that.
+ *                          **Will be released** in an error case.
+ */
+static inline void gnrc_ndp_send_nbr_adv(unsigned iface, ipv6_addr_t *tgt,
+                                         ipv6_addr_t *dst, bool supply_tl2a,
+                                         gnrc_pktsnip_t *ext_opts)
+{
+    gnrc_ndp_internal_send_nbr_adv((kernel_pid_t)iface, tgt, dst, supply_tl2a,
+                                   ext_opts);
+}
+
+/**
+ * @brief   Adapter function for new NDP implementation to send precompiled
+ *          router solicitations.
+ *
+ * @todo    Provide own implementation as soon as @ref net_gnrc_ndp is
+ *          refactored for new NDP
+ *
+ * @param[in] iface Interface to send over. May not be 0.
+ * @param[in] dst   Destination for the router solicitation. ff02::2 if NULL.
+ */
+static inline void gnrc_ndp_send_rtr_sol(unsigned iface, ipv6_addr_t *dst)
+{
+    gnrc_ndp_internal_send_rtr_sol((kernel_pid_t)iface, dst);
+}
+
+/**
+ * @brief   Adapter function for new NDP implementation to send precompiled
+ *          router advertisement.
+ *
+ * @todo    Provide own implementation as soon as @ref net_gnrc_ndp is
+ *          refactored for new NDP
+ *
+ * @param[in] iface         Interface to send over. May not be 0.
+ * @param[in] src           Source address for the router advertisement.
+ *                          May be NULL to be determined by source address
+ *                          selection (:: if no @p iface has no address).
+ * @param[in] dst           Destination address for router advertisement.
+ *                          @ref IPV6_ADDR_ALL_NODES_LINK_LOCAL if NULL.
+ * @param[in] fin           This is part of the router's final batch of router
+ *                          advertisements before ceasing to be a router (set's
+ *                          router lifetime field to 0).
+ */
+static inline void gnrc_ndp_send_rtr_adv(unsigned iface, ipv6_addr_t *src,
+                                         ipv6_addr_t *dst, bool fin)
+{
+    gnrc_ndp_internal_send_rtr_adv((kernel_pid_t)iface, src, dst, fin);
+}
+
 #ifdef __cplusplus
 }
 #endif
