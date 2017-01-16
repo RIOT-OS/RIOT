@@ -434,8 +434,8 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             }
             else {
                 uint8_t chan = ((uint8_t *)val)[0];
-                if (chan < AT86RF2XX_MIN_CHANNEL ||
-                    chan > AT86RF2XX_MAX_CHANNEL) {
+                if ((chan < AT86RF2XX_MIN_CHANNEL) ||
+                    (chan > AT86RF2XX_MAX_CHANNEL)) {
                     res = -EINVAL;
                     break;
                 }

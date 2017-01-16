@@ -51,7 +51,7 @@ extern saul_driver_t l3g4200d_saul_driver;
 
 void auto_init_l3g4200d(void)
 {
-    for (int i = 0; i < L3G4200D_NUM; i++) {
+    for (unsigned int i = 0; i < L3G4200D_NUM; i++) {
         const l3g4200d_params_t *p = &l3g4200d_params[i];
 
         DEBUG("[auto_init_saul] initializing l3g4200d gyroscope\n");

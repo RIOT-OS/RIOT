@@ -51,7 +51,7 @@ extern saul_driver_t lis3dh_saul_driver;
 
 void auto_init_lis3dh(void)
 {
-    for (int i = 0; i < LIS3DH_NUM; i++) {
+    for (unsigned int i = 0; i < LIS3DH_NUM; i++) {
         const lis3dh_params_t *p = &lis3dh_params[i];
         int res;
 

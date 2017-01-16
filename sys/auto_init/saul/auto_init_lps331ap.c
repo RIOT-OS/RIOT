@@ -51,7 +51,7 @@ extern saul_driver_t lps331ap_saul_driver;
 
 void auto_init_lps331ap(void)
 {
-    for (int i = 0; i < LPS331AP_NUM; i++) {
+    for (unsigned int i = 0; i < LPS331AP_NUM; i++) {
         const lps331ap_params_t *p = &lps331ap_params[i];
 
         DEBUG("[auto_init_saul] initializing lps331ap pressure sensor\n");
