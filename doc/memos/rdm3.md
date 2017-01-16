@@ -25,10 +25,9 @@ This memo uses the following terminology and acronyms:
 - GNRC: RIOT's default network stack
 - netapi: GNRC's inter-modular communication API
 - IPC: Inter-process communication
-- sock: RIOT's primary API for applications to the network stack
+- sock: RIOT's primary API for network applications
 - POSIX: IEEE-standardized interface for operating systems compatibility
-- socket: POSIX' primary API for applications to the networking architecture
-  of an operating system
+- socket: POSIX' primary API for network applications
 
 ## 1. Introduction
 At the moment of writing this document there are three APIs of note to have a
@@ -39,7 +38,8 @@ node communicate over the network. From lowest level to highest these are:
 - POSIX socket API
 
 Additionally to communicate with a network device driver directly there is
-[`netdev`](http://doc.riot-os.org/group__drivers__netdev__netdev2.html).
+[`netdev`](http://doc.riot-os.org/group__drivers__netdev__netdev2.html) which
+is not covered in detail by this document.
 
 Choosing the right API and understanding why the others exist is crucial to
 implement a memory efficient application or networking module in RIOT. As such
