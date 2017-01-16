@@ -32,18 +32,16 @@ application in `tests/` directly. This document provides some recommendations
 on where to put a test and what the minimum requirements for those are.
 
 ## 2. Unittests
-Unittests in RIOT are provided using a costumized fork of the [embUnit]
+Unittests in RIOT are provided using a customized fork of the [embUnit]
 framework. While it is possible to provide a stand-alone application using this
 framework it is recommended to add or extend a test suite in the [unittests]
 application (see [unittests README] for how to do that).
 
-The advantage of that is that this application is at the time of writing this
-document this application is the only one executed by the CI system used by
-RIOT. Even if more applications will be added to that at a later point,
-providing all unittests in one application is still preferred since it reduces
-the number of required builds (resulting in lower build times).
+The advantage of that is that all unittests in one application reduces the
+number of required builds and lesser applications need to be executed on the
+CI system (resulting in lower build and testing times).
 
-For these reasons it is always preferred to provide unittests with a sufficient
+For this reason it is always preferred to provide unittests with a sufficient
 coverage except for reasons discussed in the following section.
 
 ## 2. Stand-alone test application
@@ -74,8 +72,8 @@ be well documented and should show-case features ideally very concentrated (i.e.
 as few features as possible - ideally one - are show-cased in the application).
 If an example is extensive enough to provide an acceptable level of coverage,
 they can be provided alternatively to a stand-alone test application, but it
-shall not be main motivation to provide an example or for a show-case in an
-example.
+must not be main motivation to provide an example or to provide a feature
+show-case in a given example.
 
 To allow for easy testing of an example it is recommended to provide a
 comprehensive [pexpect] script that may utilize the [testrunner] library.
