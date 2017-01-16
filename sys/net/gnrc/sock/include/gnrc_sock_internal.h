@@ -28,7 +28,7 @@
 #include "net/af.h"
 #include "net/gnrc.h"
 #include "net/gnrc/netreg.h"
-#include "net/iana.h"
+#include "net/iana/portrange.h"
 #include "net/sock/ip.h"
 
 #include "sock_types.h"
