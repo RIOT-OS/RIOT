@@ -9,7 +9,7 @@ ifneq (llvm,$(TOOLCHAIN))
 export CFLAGS_CPU  += -mno-thumb-interwork
 endif
 export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
-export CFLAGS_DBG   = -ggdb -g3
+export CFLAGS_DBG  ?= -ggdb -g3
 export CFLAGS_OPT  ?= -Os
 
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
