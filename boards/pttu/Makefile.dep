@@ -1,1 +1,0 @@
-include $(RIOTBOARD)/msba2-common/Makefile.dep
