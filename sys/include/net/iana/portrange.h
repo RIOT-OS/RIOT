@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_iana  IANA Port Numbers
+ * @defgroup    net_iana_portrange  IANA Port Ranges
  * @ingroup     net
  * @brief       Service Name and Transport Protocol Port Number Registry
  * @{
