@@ -35,20 +35,38 @@ extern "C" {
 #define EOVERFLOW   (65)
 #endif
 
+/**
+ * @brief   Definition of `time_t` for the MSP430
+ *
+ * @todo    Remove once msp430 libc supports `time_t`
+ */
 typedef unsigned long time_t;
 
+/**
+ * @brief   Definition of `struct timespec` for the MSP430
+ *
+ * @todo    Remove once msp430 libc supports `struct timespec`
+ */
 struct timespec {
-    time_t  tv_sec;   /* Seconds */
-    long  tv_nsec;    /* Nanoseconds */
+    time_t  tv_sec;     /**< seconds */
+    long  tv_nsec;      /**< nanoseconds */
 };
 
-/* TODO: remove once msp430 libc supports struct timeval */
+/**
+ * @brief   Definition of `struct timeval` for the MSP430
+ *
+ * @todo    Remove once msp430 libc supports struct timeval
+ */
 struct timeval {
-    time_t tv_sec;
-    time_t tv_usec;
+    time_t tv_sec;      /**< seconds */
+    time_t tv_usec;     /**< microseconds */
 };
 
-/* TODO: remove once msp430 libc supports clockid_t */
+/**
+ * @brief   Definition of `clockid_t` for the MSP430
+ *
+ * @todo    Remove once msp430 libc supports clockid_t
+ */
 typedef int clockid_t;
 
 #ifdef __cplusplus
