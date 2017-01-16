@@ -110,7 +110,8 @@ void uart_poweroff(uart_t uart)
     UART_ME &= ~(UART_ME_BITS);
 }
 
-ISR(UART_RX_ISR, isr_uart_0_rx)
+void __attribute__((optimize("omit-frame-pointer"), no_instrument_function,
+                    interrupt (UART_RX_ISR))) isr_uart_0_rx(void)
 {
     __enter_isr();
 

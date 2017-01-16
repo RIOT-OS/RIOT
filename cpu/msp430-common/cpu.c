@@ -18,7 +18,8 @@
  * for thread_yield_higher(), since we rely on the RETI instruction at the end
  * of its execution, in the inlined __restore_context() sub-function
  */
-__attribute__((naked)) void thread_yield_higher(void)
+__attribute__((naked, optimize("omit-frame-pointer"),
+               no_instrument_function)) void thread_yield_higher(void)
 {
     __asm__("push r2"); /* save SR */
     __disable_irq();
