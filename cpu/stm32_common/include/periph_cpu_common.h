@@ -130,15 +130,23 @@ typedef struct {
 } timer_conf_t;
 
 /**
+ * @brief   PWM channel
+ */
+typedef struct {
+    gpio_t pin;             /**< GPIO pin mapped to this channel */
+    uint8_t cc_chan;        /**< capture compare channel used */
+} pwm_chan_t;
+
+/**
  * @brief   PWM configuration
  */
 typedef struct {
-    TIM_TypeDef *dev;       /**< Timer used */
-    uint32_t rcc_mask;      /**< bit in clock enable register */
-    gpio_t pins[4];         /**< pins used, set to GPIO_UNDEF if not used */
-    gpio_af_t af;           /**< alternate function used */
-    uint8_t chan;           /**< number of configured channels */
-    uint8_t bus;            /**< APB bus */
+    TIM_TypeDef *dev;               /**< Timer used */
+    uint32_t rcc_mask;              /**< bit in clock enable register */
+    pwm_chan_t chan[TIMER_CHAN];    /**< channel mapping, set to {GPIO_UNDEF, 0}
+                                     *   if not used */
+    gpio_af_t af;                   /**< alternate function used */
+    uint8_t bus;                    /**< APB bus */
 } pwm_conf_t;
 
 /**

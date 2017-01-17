@@ -58,9 +58,11 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     }
 
     /* configure the used pins */
-    for (unsigned i = 0; i < pwm_config[pwm].chan; i++) {
-        gpio_init(pwm_config[pwm].pins[i], GPIO_OUT);
-        gpio_init_af(pwm_config[pwm].pins[i], pwm_config[pwm].af);
+    unsigned i = 0;
+    while ((i < TIMER_CHAN) && (pwm_config[pwm].chan[i].pin != GPIO_UNDEF)) {
+        gpio_init(pwm_config[pwm].chan[i].pin, GPIO_OUT);
+        gpio_init_af(pwm_config[pwm].chan[i].pin, pwm_config[pwm].af);
+        i++;
     }
 
     /* configure the PWM frequency and resolution by setting the auto-reload
@@ -100,19 +102,26 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 uint8_t pwm_channels(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
-    return pwm_config[pwm].chan;
+
+    unsigned i = 0;
+    while ((i < TIMER_CHAN) && (pwm_config[pwm].chan[i].pin != GPIO_UNDEF)) {
+        i++;
+    }
+    return (uint8_t)i;
 }
 
 void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
 {
-    assert((pwm < PWM_NUMOF) && (channel < pwm_config[pwm].chan));
+    assert((pwm < PWM_NUMOF) &&
+           (channel < TIMER_CHAN) &&
+           (pwm_config[pwm].chan[channel].pin != GPIO_UNDEF));
 
     /* norm value to maximum possible value */
     if (value > dev(pwm)->ARR) {
         value = (uint16_t)dev(pwm)->ARR;
     }
     /* set new value */
-    dev(pwm)->CCR[channel] = value;
+    dev(pwm)->CCR[pwm_config[pwm].chan[channel].cc_chan] = value;
 }
 
 void pwm_start(pwm_t pwm)
