@@ -46,7 +46,7 @@ endif
 # define build specific options
 export CFLAGS_CPU   = -mmcu=atmega1281  $(CFLAGS_FPU)
 export CFLAGS_LINK  = -fno-builtin -fshort-enums
-export CFLAGS_DBG   = -ggdb -g3
+export CFLAGS_DBG  ?= -ggdb -g3
 export CFLAGS_OPT  ?= -Os
 
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)

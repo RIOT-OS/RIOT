@@ -178,7 +178,8 @@ def make_build(label, board, desc, arg)
                                                 for app in ${apps}; do
                                                     if [[ \$(make -sC \$app info-boards-supported | tr ' ' '\n' | sed -n '/^${board}\$/p') ]]; then
                                                         echo \"\n\nBuilding \$app for ${board}\" >> success_${board}_${desc}.log
-                                                        make -j\${NPROC} -C \$app all >> success_${board}_${desc}.log 2>&1 || RESULT=1
+                                                        rm -rf jenkins_bin; mkdir jenkins_bin
+                                                        CFLAGS_DBG=\"\" BINDIR=\$(pwd)/jenkins_bin make -j\${NPROC} -C \$app all >> success_${board}_${desc}.log 2>&1 || RESULT=1
                                                     fi;
                                                 done;
                                                 if ((\$RESULT)); then
