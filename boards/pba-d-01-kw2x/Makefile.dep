@@ -4,4 +4,5 @@ endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += mma8652
+  USEMODULE += hdc1000
 endif
