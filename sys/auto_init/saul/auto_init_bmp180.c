@@ -48,23 +48,6 @@ extern const saul_driver_t bmp180_temperature_saul_driver;
 extern const saul_driver_t bmp180_pressure_saul_driver;
 /** @} */
 
-/**
- * @brief   Allocate and configure entries to the SAUL registry
- */
-saul_reg_t bmp180_saul_reg_info[][2] =
-{
-    {
-        {
-            .name= "bmp180-temp",
-            .driver = &bmp180_temperature_saul_driver
-        },
-        {
-            .name = "bmp180-press",
-            .driver = &bmp180_pressure_saul_driver
-        }
-    }
-};
-
 void auto_init_bmp180(void)
 {
     for (unsigned i = 0; i < BMP180_NUMOF; i++) {
