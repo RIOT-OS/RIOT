@@ -59,10 +59,10 @@ include $(RIOTBASE)/Makefile.include
 .PHONY: host-tools
 
 term: host-tools
-	$(AD)sudo sh $(RIOTBASE)/dist/tools/ethos/start_network.sh $(PORT) $(TAP) $(IPV6_PREFIX)
+	$(Q)sudo sh $(RIOTBASE)/dist/tools/ethos/start_network.sh $(PORT) $(TAP) $(IPV6_PREFIX)
 
 host-tools:
-	$(AD)env -u CC -u CFLAGS make -C $(RIOTBASE)/dist/tools
+	$(Q)env -u CC -u CFLAGS make -C $(RIOTBASE)/dist/tools
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz

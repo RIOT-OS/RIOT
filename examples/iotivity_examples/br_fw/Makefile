@@ -96,7 +96,7 @@ include $(RIOTBASE)/Makefile.include
 .PHONY: host-tools
 
 term: host-tools
-	$(AD) sudo ./start_network_mcast.sh $(PORT) $(TAP) $(IPV6_PREFIX) $(IPV6_MCAST_OIC)
+	$(Q) sudo ./start_network_mcast.sh $(PORT) $(TAP) $(IPV6_PREFIX) $(IPV6_MCAST_OIC)
 
 host-tools:
-	$(AD)env -u CC -u CFLAGS make -C $(RIOTBASE)/dist/tools
+	$(Q)env -u CC -u CFLAGS make -C $(RIOTBASE)/dist/tools

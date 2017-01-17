@@ -83,11 +83,13 @@ endif
 QUIET ?= 1
 
 ifeq ($(QUIET),1)
-  AD=@
+  Q=@
   MAKEFLAGS += --no-print-directory
 else
-  AD=
+  Q=
 endif
+
+QQ=
 
 # Fail on warnings. Can be overridden by `make WERROR=0`.
 WERROR ?= 1
@@ -211,6 +213,8 @@ ifeq ($(RIOT_CI_BUILD),1)
         $(info CI-build: skipping link step)
         RIOTNOLINK:=1
     endif
+    # be more quiet when building for CI
+    QQ:=@
 endif
 
 # if you want to publish the board into the sources as an uppercase #define
@@ -268,15 +272,15 @@ all: ..in-docker-container
 else
 ## make script for your application. Build RIOT-base here!
 all: ..compiler-check ..build-message $(RIOTBUILD_CONFIG_HEADER_C) $(USEPKG:%=${BINDIR}/%.a) $(APPDEPS)
-	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTBASE)/Makefile.application
+	$(Q)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTBASE)/Makefile.application
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
-	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
+	$(Q)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
-	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map $(LINKFLAGPREFIX)--cref $(LINKFLAGS)
+	$(Q)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map $(LINKFLAGPREFIX)--cref $(LINKFLAGS)
 endif
-	$(AD)$(SIZE) $(ELFFILE)
-	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
+	$(Q)$(SIZE) $(ELFFILE)
+	$(Q)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
 endif
 endif # BUILD_IN_DOCKER
 
@@ -303,7 +307,7 @@ endif
 
 # include Makefile.includes for packages in $(USEPKG)
 $(RIOTPKG)/%/Makefile.include::
-	$(AD)"$(MAKE)" -C $(RIOTPKG)/$* Makefile.include
+	$(Q)"$(MAKE)" -C $(RIOTPKG)/$* Makefile.include
 
 .PHONY: $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
@@ -315,7 +319,7 @@ INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 .PHONY: $(USEPKG:%=${BINDIR}/%.a)
 $(USEPKG:%=${BINDIR}/%.a): $(RIOTBUILD_CONFIG_HEADER_C)
 	@mkdir -p ${BINDIR}
-	"$(MAKE)" -C $(RIOTPKG)/$(patsubst ${BINDIR}/%.a,%,$@)
+	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(patsubst ${BINDIR}/%.a,%,$@)
 
 clean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i clean ; done
@@ -349,7 +353,7 @@ term: $(filter flash, $(MAKECMDGOALS))
 	$(TERMPROG) $(TERMFLAGS)
 
 list-ttys:
-	$(AD)$(RIOTBASE)/dist/tools/usb-serial/list-ttys.sh
+	$(Q)$(RIOTBASE)/dist/tools/usb-serial/list-ttys.sh
 
 doc:
 	make -BC $(RIOTBASE) doc
@@ -392,7 +396,7 @@ eclipsesym: $(CURDIR)/eclipsesym.xml
 eclipsesym.xml: $(CURDIR)/eclipsesym.xml
 
 $(CURDIR)/eclipsesym.xml:
-	$(AD)printf "%s\n" $(CC) $(CFLAGS_WITH_MACROS) $(INCLUDES) | \
+	$(Q)printf "%s\n" $(CC) $(CFLAGS_WITH_MACROS) $(INCLUDES) | \
 		$(RIOTBASE)/dist/tools/eclipsesym/cmdline2xml.sh > $@
 
 # Extra make goals for testing and comparing changes.
@@ -476,12 +480,12 @@ else # RIOT_VERSION
   endif
 
   clean:
-	-$(AD)rm -rf $(BINDIR)
+	-$(Q)rm -rf $(BINDIR)
 
   $(BINDIR)/riot-version/$(NUM_RIOT_VERSION)/Makefile.include:
-	$(AD)rm -rf $(@D)
-	$(AD)mkdir -p $(@D)
-	$(AD)cd $(RIOTBASE) && git archive --format=tar $(NUM_RIOT_VERSION) | ( cd $(@D) && tar x 1>&2 )
+	$(Q)rm -rf $(@D)
+	$(Q)mkdir -p $(@D)
+	$(Q)cd $(RIOTBASE) && git archive --format=tar $(NUM_RIOT_VERSION) | ( cd $(@D) && tar x 1>&2 )
 
   ..delegate: $(BINDIR)/riot-version/$(NUM_RIOT_VERSION)/Makefile.include
 	@$(COLOR_ECHO) '$(COLOR_GREEN)Using RIOT_VERSION=${NUM_RIOT_VERSION}$(COLOR_RESET)' 1>&2
@@ -517,7 +521,7 @@ include $(RIOTBASE)/Makefile.modules
 .PHONY: $(RIOTBUILD_CONFIG_HEADER_C)
 $(RIOTBUILD_CONFIG_HEADER_C):
 	@mkdir -p '$(dir $@)'
-	$(AD)'$(RIOTBASE)/dist/tools/genconfigheader/genconfigheader.sh' '$@' $(CFLAGS_WITH_MACROS)
+	$(Q)'$(RIOTBASE)/dist/tools/genconfigheader/genconfigheader.sh' '$@' $(CFLAGS_WITH_MACROS)
 
 CFLAGS_WITH_MACROS := $(CFLAGS)
 

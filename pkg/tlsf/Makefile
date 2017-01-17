@@ -12,17 +12,17 @@ PKG_SRCDIR=$(PKG_BUILDDIR)/src
 all: $(PKG_SRCDIR)/$(PKG_NAME).a
 
 $(PKG_SRCDIR)/$(PKG_NAME).a: $(PKG_SRCDIR)/Makefile
-	$(AD)make -C $(<D)
+	$(Q)make -C $(<D)
 
 $(PKG_SRCDIR)/Makefile: $(PKG_BUILDDIR)/$(PKG_FILE) $(CURDIR)/patch.txt
 	rm -rf $(@D)
 	mkdir -p $(@D)
-	$(AD)cd $(@D) && $(UNZIP_HERE) $(PKG_BUILDDIR)/$(PKG_FILE)
-	$(AD)cd $(@D) && patch --binary -p0 -N -i $(CURDIR)/patch.txt
+	$(Q)cd $(@D) && $(UNZIP_HERE) $(PKG_BUILDDIR)/$(PKG_FILE)
+	$(Q)cd $(@D) && patch --binary -p0 -N -i $(CURDIR)/patch.txt
 
 $(PKG_BUILDDIR)/$(PKG_FILE):
 	@mkdir -p $(@D)
-	$(AD)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)
+	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)
 
 clean::
 	rm -rf $(PKG_SRCDIR)/

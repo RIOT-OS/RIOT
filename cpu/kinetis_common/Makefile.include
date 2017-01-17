@@ -15,7 +15,7 @@ USEMODULE += pm_layered
 
 # Define a recipe to build the watchdog disable binary, used when flashing
 $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin: $(RIOTCPU)/kinetis_common/dist/wdog-disable.s
-	$(AD)$(MAKE) -C $(RIOTCPU)/kinetis_common/dist/ $(notdir $@)
+	$(Q)$(MAKE) -C $(RIOTCPU)/kinetis_common/dist/ $(notdir $@)
 
 # Reset the default goal to not make wdog-disable.bin the default target.
 .DEFAULT_GOAL :=
