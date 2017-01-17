@@ -159,21 +159,21 @@ static const pwm_conf_t pwm_config[] = {
     {
         .dev      = TIM1,
         .rcc_mask = RCC_APB2ENR_TIM1EN,
-        .pins     = { GPIO_PIN(PORT_E,  9), GPIO_PIN(PORT_E, 11),
-                      GPIO_PIN(PORT_E, 11), GPIO_PIN(PORT_E, 14) },
+        .chan     = { { .pin = GPIO_PIN(PORT_E,  9), .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_E, 11), .cc_chan = 1 },
+                      { .pin = GPIO_PIN(PORT_E, 11), .cc_chan = 2 },
+                      { .pin = GPIO_PIN(PORT_E, 14), .cc_chan = 3 } },
         .af       = GPIO_AF1,
-        .chan     = 4,
         .bus      = APB2
     },
-    {
-        .dev      = TIM3,
-        .rcc_mask = RCC_APB1ENR_TIM3EN,
-        .pins     = { GPIO_PIN(PORT_B, 4), GPIO_PIN(PORT_B, 5),
-                      GPIO_PIN(PORT_B, 0), GPIO_PIN(PORT_B, 1) },
-        .af       = GPIO_AF2,
-        .chan     = 4,
-        .bus      = APB1
-    }
+    // {
+    //     .dev      = TIM3,
+    //     .rcc_mask = RCC_APB1ENR_TIM3EN,
+    //     .chan     = { GPIO_PIN(PORT_B, 4), GPIO_PIN(PORT_B, 5),
+    //                   GPIO_PIN(PORT_B, 0), GPIO_PIN(PORT_B, 1) },
+    //     .af       = GPIO_AF2,
+    //     .bus      = APB1
+    // }
 };
 
 #define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
