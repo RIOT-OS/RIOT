@@ -97,6 +97,9 @@ include $(RIOTCPU)/cortexm_common/Makefile.include
 USEMODULE += newlib_nano
 export USE_NANO_SPECS = 1
 
+# all Cortex-M are supported by RIOT's Rust integration
+FEATURES_PROVIDED += rust_support
+
 # Avoid overriding the default rule:
 all:
 

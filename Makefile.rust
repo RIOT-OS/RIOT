@@ -1,0 +1,28 @@
+# RIOT rust support makefile
+
+# make RIOT's linker hook path known to rustc
+export RUST_TARGET_PATH ?= $(RIOTBASE)/dist/rust/targets
+
+# (unfortunately with this set, Cargo somehow fails. Thus we need to keep
+# Cargo's build directory in ./target)
+#export CARGO_TARGET_DIR ?= $(BINDIR)/_cargo
+
+# the rust riot crate depends on fmt
+USEMODULE += fmt
+
+ifneq (,$(filter $(CPU_ARCH), cortex-m0plus cortex-m4f))
+	RUST_TARGET=$(CPU_ARCH)
+else ifeq ($(CPU_ARCH),native)
+$(error Makefile.rust: RIOT rust on native is currently broken.)
+	RUST_TARGET=i586-unknown-linux-gnu
+endif
+
+ifeq (, $(RUST_TARGET))
+$(error Makefile.rust: cannot determine rust target triple!)
+endif
+
+all: xargo
+
+xargo:
+	@mkdir -p $(BINDIR)/_extra_libs
+	@PATH=$${PATH}:$(RIOTBASE)/dist/rust xargo build --target $(RUST_TARGET) ${CARGO_FLAGS}
