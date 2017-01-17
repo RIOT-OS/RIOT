@@ -1,0 +1,97 @@
+#!/bin/sh
+
+export RIOT_CI_BUILD=1
+export STATIC_TESTS=${STATIC_TESTS:-1}
+export CFLAGS_DBG=""
+
+_greplist() {
+    if [ $# -eq 0 ]; then
+        echo cat
+    else
+        echo -n "grep -E ($1"
+        shift
+        for i in $*; do
+            echo -n "|$i"
+        done
+        echo ")"
+    fi
+}
+
+# get list of all app directories
+get_apps() {
+    find tests/ examples/ \
+        -mindepth 2 -maxdepth 2 -name Makefile -type f \
+        | xargs dirname | $(_greplist $APPS) | sort
+}
+
+# take app dir as parameter, print all boards that are supported
+# Only print for boards in $BOARDS.
+get_supported_boards() {
+    local appdir=$1
+    for board in $(make --no-print-directory -C$appdir info-boards-supported 2>/dev/null )
+    do
+        echo $board
+    done | $(_greplist $BOARDS)
+}
+
+# given an app dir as parameter, print "$appdir board" for each supported
+# board. Only print for boards in $BOARDS.
+get_app_board_pairs() {
+    local appdir=$1
+    for board in $(get_supported_boards $appdir)
+    do
+        echo $appdir $board
+    done | $(_greplist $BOARDS)
+}
+
+# use dwqc to create full "appdir board" compile job list
+get_compile_jobs() {
+    get_apps | \
+        dwqc -E BOARDS -E APPS -s \
+        "$0 get_app_board_pairs \${1}" \
+        | xargs '-d\n' -n 1 echo $0 compile
+}
+
+# compile one app for one board. delete intermediates.
+compile() {
+    local appdir=$1
+    local board=$2
+
+    CCACHE_BASEDIR="$(pwd)" BOARD=$board RIOT_CI_BUILD=1 \
+        make -C${appdir} clean all -j${JOBS:-4}
+    RES=$?
+
+    if [ $RES -eq 0 ]; then
+        if [ "$board" = "native" -a "$appdir" = "tests/unittests" ]; then
+            make -C${appdir} test
+            RES=$?
+        fi
+    fi
+
+    BOARD=$board make --no-print-directory -C${appdir} clean clean-intermediates
+
+    return $RES
+}
+
+# execute static tests
+static_tests() {
+    local repo=${CI_BASE_REPO:-https://github.com/RIOT-OS/RIOT}
+    local branch=${CI_BASE_BRANCH:-master}
+
+    OUT="$(git remote add upstream $repo 2>&1 && git fetch upstream ${branch}:${branch} 2>&1)"
+    RES=$?
+    if [ $RES -ne 0 ]; then
+        echo "$OUT"
+        exit 1
+    fi
+
+    BUILDTEST_MCU_GROUP=static-tests ./dist/tools/ci/build_and_test.sh
+}
+
+get_jobs() {
+    [ "$STATIC_TESTS" = "1" ] && \
+        echo "$0 static_tests###{ \"jobdir\" : \"exclusive\" }"
+    get_compile_jobs
+}
+
+$*
