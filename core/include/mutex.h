@@ -55,11 +55,14 @@ typedef struct {
 #define MUTEX_INIT_LOCKED { { MUTEX_LOCKED } }
 
 /**
- * @internal
+ * @cond INTERNAL
  * @brief This is the value of the mutex when locked and no threads are waiting
  *        for it
  */
 #define MUTEX_LOCKED ((void *)-1)
+/**
+ * @endcond
+ */
 
 /**
  * @brief Initializes a mutex object.

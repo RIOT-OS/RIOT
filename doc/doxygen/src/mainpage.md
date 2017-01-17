@@ -43,7 +43,7 @@ RIOT is developed by an open community that anyone is welcome to join:
  - Follow us on [Twitter](https://twitter.com/RIOT_OS) for news from the RIOT
    community.
  - Contact us on IRC for live support and discussions:
-   [irc.freenode.org #riot-os](irc://irc.freenode.org/riot-os)
+   [irc.freenode.org \#riot-os](irc://irc.freenode.org/riot-os)
 
 
 The quickest start                                        {#the-quickest-start}
