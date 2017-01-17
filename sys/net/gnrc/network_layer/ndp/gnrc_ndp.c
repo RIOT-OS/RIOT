@@ -64,7 +64,7 @@ static void _stale_nc(kernel_pid_t iface, ipv6_addr_t *ipaddr, uint8_t *l2addr,
                                                  GNRC_IPV6_NC_STATE_STALE |
                                                  GNRC_IPV6_NC_TYPE_TENTATIVE)) != NULL) {
                     xtimer_set_msg(&nc_entry->type_timeout,
-                                   (GNRC_SIXLOWPAN_ND_TENTATIVE_NCE_LIFETIME * SEC_IN_USEC),
+                                   (GNRC_SIXLOWPAN_ND_TENTATIVE_NCE_LIFETIME * US_PER_SEC),
                                    &nc_entry->type_timeout_msg,
                                    gnrc_ipv6_pid);
                 }
@@ -533,7 +533,7 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
         next_rtr_sol = ltime;
 #endif
-        xtimer_set_msg(&nc_entry->rtr_timeout, (ltime * SEC_IN_USEC),
+        xtimer_set_msg(&nc_entry->rtr_timeout, (ltime * US_PER_SEC),
                        &nc_entry->rtr_timeout_msg, thread_getpid());
     }
     /* set current hop limit from message if available */

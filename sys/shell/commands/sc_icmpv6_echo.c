@@ -107,7 +107,7 @@ int _handle_reply(gnrc_pktsnip_t *pkt, uint32_t time)
                PRIu32 ".%03" PRIu32 " ms\n", (unsigned) icmpv6->size,
                ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
                byteorder_ntohs(icmpv6_hdr->id), seq, (unsigned)ipv6_hdr->hl,
-               time / MS_IN_USEC, time % MS_IN_USEC);
+               time / US_PER_MS, time % US_PER_MS);
 #ifdef MODULE_GNRC_IPV6_NC
         gnrc_ipv6_nc_still_reachable(&ipv6_hdr->src);
 #endif
@@ -130,14 +130,14 @@ static void _print_stats(char *addr_str, int success, int count, uint64_t total_
         printf("%d packets transmitted, %d received, %d%% packet loss, time %"
                PRIu32 ".06%" PRIu32 " s\n", count, success,
                (100 - ((success * 100) / count)),
-               (uint32_t)total_time / SEC_IN_USEC, (uint32_t)total_time % SEC_IN_USEC);
+               (uint32_t)total_time / US_PER_SEC, (uint32_t)total_time % US_PER_SEC);
         printf("rtt min/avg/max = "
                "%" PRIu32 ".%03" PRIu32 "/"
                "%" PRIu32 ".%03" PRIu32 "/"
                "%" PRIu32 ".%03" PRIu32 " ms\n",
-               min_rtt / MS_IN_USEC, min_rtt % MS_IN_USEC,
-               avg_rtt / MS_IN_USEC, avg_rtt % MS_IN_USEC,
-               max_rtt / MS_IN_USEC, max_rtt % MS_IN_USEC);
+               min_rtt / US_PER_MS, min_rtt % US_PER_MS,
+               avg_rtt / US_PER_MS, avg_rtt % US_PER_MS,
+               max_rtt / US_PER_MS, max_rtt % US_PER_MS);
     }
     else {
         printf("%d packets transmitted, 0 received, 100%% packet loss\n", count);
@@ -148,7 +148,7 @@ int _icmpv6_ping(int argc, char **argv)
 {
     int count = 3, success = 0, remaining, stat_interval = 0, stat_counter = 0;
     size_t payload_len = 4;
-    uint32_t delay = 1 * SEC_IN_MS;
+    uint32_t delay = 1 * MS_PER_SEC;
     char *addr_str;
     ipv6_addr_t addr;
     kernel_pid_t src_iface;
@@ -237,7 +237,7 @@ int _icmpv6_ping(int argc, char **argv)
 
     while ((remaining--) > 0) {
         gnrc_pktsnip_t *pkt;
-        uint32_t start, timeout = 1 * SEC_IN_USEC;
+        uint32_t start, timeout = 1 * US_PER_SEC;
 
         pkt = gnrc_icmpv6_echo_build(ICMPV6_ECHO_REQ, id, ++max_seq_expected,
                                      NULL, payload_len);
@@ -318,7 +318,7 @@ int _icmpv6_ping(int argc, char **argv)
         }
 
         if (remaining > 0) {
-            xtimer_usleep64(delay * MS_IN_USEC);
+            xtimer_usleep64(delay * US_PER_MS);
         }
         if ((++stat_counter == stat_interval) || (remaining == 0)) {
             uint64_t total_time = xtimer_now_usec64() - ping_start;

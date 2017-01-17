@@ -276,11 +276,11 @@ int _gnrc_rpl_dodag_show(void)
 
         tc = (((uint64_t) dodag->trickle.msg_callback_timer.long_target << 32)
                 | dodag->trickle.msg_callback_timer.target) - xnow;
-        tc = (int64_t) tc < 0 ? 0 : tc / SEC_IN_USEC;
+        tc = (int64_t) tc < 0 ? 0 : tc / US_PER_SEC;
 
         ti = (((uint64_t) dodag->trickle.msg_interval_timer.long_target << 32)
                 | dodag->trickle.msg_interval_timer.target) - xnow;
-        ti = (int64_t) ti < 0 ? 0 : ti / SEC_IN_USEC;
+        ti = (int64_t) ti < 0 ? 0 : ti / US_PER_SEC;
 
         cleanup = dodag->instance->cleanup < 0 ? 0 : dodag->instance->cleanup;
 
@@ -306,8 +306,8 @@ int _gnrc_rpl_dodag_show(void)
         LL_FOREACH(gnrc_rpl_instances[i].dodag.parents, parent) {
             printf("\t\tparent [addr: %s | rank: %d | lifetime: %" PRIu32 "s]\n",
                     ipv6_addr_to_str(addr_str, &parent->addr, sizeof(addr_str)),
-                    parent->rank, ((int32_t) (parent->lifetime - (((uint32_t) xnow / SEC_IN_USEC))))
-                    < 0 ? 0 : (parent->lifetime - ((uint32_t) xnow / SEC_IN_USEC)));
+                    parent->rank, ((int32_t) (parent->lifetime - (((uint32_t) xnow / US_PER_SEC))))
+                    < 0 ? 0 : (parent->lifetime - ((uint32_t) xnow / US_PER_SEC)));
         }
     }
     return 0;

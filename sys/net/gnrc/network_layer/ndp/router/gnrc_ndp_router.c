@@ -107,7 +107,7 @@ static void _send_rtr_adv(gnrc_ipv6_netif_t *iface, ipv6_addr_t *dst)
         xtimer_remove(&iface->rtr_adv_timer);
         iface->rtr_adv_msg.type = GNRC_NDP_MSG_RTR_ADV_RETRANS;
         iface->rtr_adv_msg.content.ptr = iface;
-        xtimer_set_msg(&iface->rtr_adv_timer, interval * SEC_IN_USEC, &iface->rtr_adv_msg,
+        xtimer_set_msg(&iface->rtr_adv_timer, interval * US_PER_SEC, &iface->rtr_adv_msg,
                        gnrc_ipv6_pid);
     }
     mutex_unlock(&iface->mutex);

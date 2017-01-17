@@ -91,7 +91,7 @@ int dht_init(dht_t *dev, const dht_params_t *params)
     }
     gpio_set(dev->pin);
 
-    xtimer_usleep(2000 * MS_IN_USEC);
+    xtimer_usleep(2000 * US_PER_MS);
 
     DEBUG("dht_init: success\n");
     return 0;
@@ -104,7 +104,7 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
 
     /* send init signal to device */
     gpio_clear(dev->pin);
-    xtimer_usleep(20 * MS_IN_USEC);
+    xtimer_usleep(20 * US_PER_MS);
     gpio_set(dev->pin);
     xtimer_usleep(40);
 

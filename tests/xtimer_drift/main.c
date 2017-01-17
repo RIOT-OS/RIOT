@@ -106,8 +106,8 @@ void *worker_thread(void *arg)
         }
 
         uint32_t us, sec;
-        us = now % SEC_IN_USEC;
-        sec = now / SEC_IN_USEC;
+        us = now % US_PER_SEC;
+        sec = now / US_PER_SEC;
         if ((loop_counter % TEST_HZ) == 0) {
             uint32_t expected = start + loop_counter * TEST_INTERVAL;
             int32_t drift = now - expected;

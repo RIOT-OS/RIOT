@@ -270,7 +270,7 @@ static void clear_nb_addresses(nib_entry_t *nib_entry, timex_t *now)
 static int add_lost_neighbor_address(nhdp_addr_t *lost_addr, timex_t *now)
 {
     nib_lost_address_entry_t *elt;
-    timex_t n_hold = timex_from_uint64(((uint64_t)NHDP_N_HOLD_TIME_MS) * MS_IN_USEC);
+    timex_t n_hold = timex_from_uint64(((uint64_t)NHDP_N_HOLD_TIME_MS) * US_PER_MS);
 
     LL_FOREACH(nib_lost_address_entry_head, elt) {
         if (elt->address == lost_addr) {

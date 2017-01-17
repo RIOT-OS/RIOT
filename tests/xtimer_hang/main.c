@@ -27,7 +27,7 @@
 #include "thread.h"
 
 #define TEST_SECONDS        (10LU)
-#define TEST_TIME           (TEST_SECONDS * SEC_IN_USEC)
+#define TEST_TIME           (TEST_SECONDS * US_PER_SEC)
 #define STACKSIZE_TIMER     (THREAD_STACKSIZE_DEFAULT)
 
 char stack_timer1[STACKSIZE_TIMER];
