@@ -48,17 +48,6 @@ static saul_reg_t saul_entries[JC42_NUMOF];
 extern const saul_driver_t jc42_temperature_saul_driver;
 /** @} */
 
-/**
- * @brief   Allocate and configure entries to the SAUL registry
- */
-saul_reg_t jc42_saul_reg_info[]=
-{
-    {
-        .name= "jc42",
-        .driver = &jc42_temperature_saul_driver
-    }
-};
-
 void auto_init_jc42(void)
 {
     for (unsigned i = 0; i < JC42_NUMOF; i++) {
