@@ -37,7 +37,7 @@
 #error "TEST_MODE not defined"
 #endif
 
-#define SAMPLE_PERIOD       (100LU * MS_IN_USEC) /* 100 ms */
+#define SAMPLE_PERIOD       (100LU * US_PER_MS) /* 100 ms */
 
 static srf02_t dev;
 

@@ -30,7 +30,7 @@
 #include "timex.h"
 #include "periph/pwm.h"
 
-#define INTERVAL    (10LU * MS_IN_USEC) /* 10 ms */
+#define INTERVAL    (10LU * US_PER_MS) /* 10 ms */
 #define STEP        (10)
 
 #define MODE        PWM_LEFT

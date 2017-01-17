@@ -85,7 +85,7 @@ extern "C" {
  * @brief The default timeout of a data packet
  */
 #ifndef GNRC_TFTP_DEFAULT_TIMEOUT
-#define GNRC_TFTP_DEFAULT_TIMEOUT           (1 * SEC_IN_USEC)
+#define GNRC_TFTP_DEFAULT_TIMEOUT           (1 * US_PER_SEC)
 #endif
 
 /**

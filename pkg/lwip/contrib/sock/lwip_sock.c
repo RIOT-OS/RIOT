@@ -412,7 +412,7 @@ int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf)
     }
 #if LWIP_SO_RCVTIMEO
     if ((timeout != 0) && (timeout != SOCK_NO_TIMEOUT)) {
-        netconn_set_recvtimeout(conn, timeout / MS_IN_USEC);
+        netconn_set_recvtimeout(conn, timeout / US_PER_MS);
     }
     else
 #endif

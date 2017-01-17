@@ -113,7 +113,7 @@ extern "C" {
 /**
  * @brief   replacement value (in microseconds) for @ref GNRC_NDP_MAX_RTR_ADV_DELAY
  */
-#define GNRC_SIXLOWPAN_ND_MAX_RTR_ADV_DELAY (2U * SEC_IN_USEC)
+#define GNRC_SIXLOWPAN_ND_MAX_RTR_ADV_DELAY (2U * US_PER_SEC)
 /**
  * @brief   Lifetime of a tentative address entry in seconds
  */

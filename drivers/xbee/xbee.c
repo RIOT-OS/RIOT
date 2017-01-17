@@ -50,7 +50,7 @@
 /**
  * @brief   Timeout for receiving AT command response
  */
-#define RESP_TIMEOUT_USEC           (SEC_IN_USEC)
+#define RESP_TIMEOUT_USEC           (US_PER_SEC)
 
 /**
  * @brief   Start delimiter in API frame mode

@@ -75,7 +75,7 @@ int main(void)
         printf("temperature: %d.%02d C\n", temperature / 100, temperature % 100);
 
         /* sleep between measurements */
-        xtimer_usleep(1000 * MS_IN_USEC);
+        xtimer_usleep(1000 * US_PER_MS);
     }
 
     return 0;

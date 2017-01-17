@@ -22,9 +22,9 @@
 #include "xtimer.h"
 #include "timex.h"
 
-#define ONE_SEC_SLEEP     (1 * SEC_IN_USEC)
-#define FIVE_SEC_SLEEP    (5 * SEC_IN_USEC)
-#define TEN_SEC_SLEEP     (10 * SEC_IN_USEC)
+#define ONE_SEC_SLEEP     (1 * US_PER_SEC)
+#define FIVE_SEC_SLEEP    (5 * US_PER_SEC)
+#define TEN_SEC_SLEEP     (10 * US_PER_SEC)
 
 int main(void)
 {
