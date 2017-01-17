@@ -335,6 +335,10 @@ void auto_init(void)
     extern void auto_init_lsm6dsl(void);
     auto_init_lsm6dsl();
 #endif
+#ifdef MODULE_ADCXX1C
+    extern void auto_init_adcxx1c(void);
+    auto_init_adcxx1c();
+#endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 
