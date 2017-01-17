@@ -13,7 +13,7 @@
 
 static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len)
 {
-    return coap_reply_simple(pkt, buf, len,
+    return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
             COAP_FORMAT_TEXT, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
 }
 
