@@ -65,18 +65,24 @@ int si70xx_init(si70xx_t *dev, i2c_t i2c_dev, uint8_t address)
     /* setup the i2c bus */
     i2c_acquire(dev->i2c_dev);
     int result = i2c_init_master(dev->i2c_dev, I2C_SPEED_NORMAL);
+    i2c_release(dev->i2c_dev);
 
     if (result != 0) {
-        i2c_release(dev->i2c_dev);
+        return result;
+    }
+
+    result = si70xx_test(dev);
+    if (result < 0) {
         return result;
     }
 
     /* initialize the peripheral */
+    i2c_acquire(dev->i2c_dev);
     i2c_write_byte(dev->i2c_dev, dev->address, SI70XX_RESET);
+    i2c_release(dev->i2c_dev);
 
     /* sensor is ready after at most 25 ms */
     xtimer_usleep(25 * MS_IN_USEC);
-    i2c_release(dev->i2c_dev);
 
     return 0;
 }
