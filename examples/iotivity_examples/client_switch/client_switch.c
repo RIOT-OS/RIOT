@@ -76,6 +76,7 @@ stop_observe(void *data)
     return DONE;
 }
 
+#ifdef BUTTON_GPIO
 static void
 put_light(oc_client_response_t *data)
 {
@@ -87,6 +88,7 @@ put_light(oc_client_response_t *data)
         PRINT("client_oic: PUT response code %d\n", data->code);
     }
 }
+#endif
 
 static void
 observe_light(oc_client_response_t *data)
