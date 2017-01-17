@@ -46,7 +46,7 @@
  */
 static xbee_t xbee_devs[XBEE_NUM];
 static gnrc_netdev2_t gnrc_adpt[XBEE_NUM];
-static char stacks[XBEE_MAC_STACKSIZE][XBEE_NUM];
+static char stacks[XBEE_NUM][XBEE_MAC_STACKSIZE];
 
 void auto_init_xbee(void)
 {

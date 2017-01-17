@@ -55,7 +55,7 @@ static gnrc_netdev2_t gnrc_adpt[ENC28J60_NUM];
 /**
  * @brief   Stacks for the MAC layer threads
  */
-static char stack[ENC28J60_MAC_STACKSIZE][ENC28J60_NUM];
+static char stack[ENC28J60_NUM][ENC28J60_MAC_STACKSIZE];
 
 
 void auto_init_enc28j60(void)

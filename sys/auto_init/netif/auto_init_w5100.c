@@ -51,7 +51,7 @@ static gnrc_netdev2_t gnrc_adpt[W5100_NUM];
 /**
  * @brief   Stacks for the MAC layer threads
  */
-static char stack[MAC_STACKSIZE][W5100_NUM];
+static char stack[W5100_NUM][MAC_STACKSIZE];
 
 
 void auto_init_w5100(void)

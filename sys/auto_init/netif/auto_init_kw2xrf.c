@@ -44,7 +44,7 @@
 #define KW2XRF_NUM (sizeof(kw2xrf_params)/sizeof(kw2xrf_params[0]))
 
 static kw2xrf_t kw2xrf_devs[KW2XRF_NUM];
-static char _nomac_stacks[KW2XRF_MAC_STACKSIZE][KW2XRF_NUM];
+static char _nomac_stacks[KW2XRF_NUM][KW2XRF_MAC_STACKSIZE];
 
 void auto_init_kw2xrf(void)
 {
