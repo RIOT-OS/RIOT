@@ -22,4 +22,4 @@ latex:
 	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | doxygen -
 
 clean:
-	-@rm -rf latex man html doxygen_objdb_*.tmp
+	-@rm -rf latex man html doxygen_objdb_*.tmp doxygen_entrydb_*.tmp
