@@ -16,8 +16,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef KERNEL_DEFINES_H_
-#define KERNEL_DEFINES_H_
+#ifndef KERNEL_DEFINES_H
+#define KERNEL_DEFINES_H
 
 #include <stddef.h>
 
@@ -118,5 +118,5 @@
 }
 #endif
 
-#endif /* KERNEL_DEFINES_H_ */
+#endif /* KERNEL_DEFINES_H */
 /** @} */

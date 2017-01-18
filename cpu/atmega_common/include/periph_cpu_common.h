@@ -20,8 +20,8 @@
  * @author          Francisco Acosta <francisco.acosta@inria.fr>
  */
 
-#ifndef PERIPH_CPU_COMMON_H_
-#define PERIPH_CPU_COMMON_H_
+#ifndef PERIPH_CPU_COMMON_H
+#define PERIPH_CPU_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -84,5 +84,5 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_CPU_COMMON_H_ */
+#endif /* PERIPH_CPU_COMMON_H */
 /** @} */

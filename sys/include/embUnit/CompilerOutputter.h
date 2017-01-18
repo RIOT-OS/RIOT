@@ -32,8 +32,8 @@
  *
  * $Id: CompilerOutputter.h,v 1.2 2003/09/06 13:28:27 arms22 Exp $
  */
-#ifndef EMBUNIT_COMPILEROUTPUTTER_H_
-#define EMBUNIT_COMPILEROUTPUTTER_H_
+#ifndef EMBUNIT_COMPILEROUTPUTTER_H
+#define EMBUNIT_COMPILEROUTPUTTER_H
 
 #include "Outputter.h"
 
@@ -47,4 +47,4 @@ OutputterRef CompilerOutputter_outputter(void);
 }
 #endif
 
-#endif/* EMBUNIT_COMPILEROUTPUTTER_H_ */
+#endif/* EMBUNIT_COMPILEROUTPUTTER_H */

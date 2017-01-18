@@ -16,8 +16,8 @@
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef CPU_PERIPH_H_
-#define CPU_PERIPH_H_
+#ifndef CPU_PERIPH_H
+#define CPU_PERIPH_H
 
 #include "cpu.h"
 #include "msp430_regs.h"
@@ -92,5 +92,5 @@ void gpio_periph_mode(gpio_t pin, bool enable);
 }
 #endif
 
-#endif /* CPU_PERIPH_H_ */
+#endif /* CPU_PERIPH_H */
 /** @} */

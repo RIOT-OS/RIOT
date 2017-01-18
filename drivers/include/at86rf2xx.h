@@ -26,8 +26,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef AT86RF2XX_H_
-#define AT86RF2XX_H_
+#ifndef AT86RF2XX_H
+#define AT86RF2XX_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -447,5 +447,5 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev);
 }
 #endif
 
-#endif /* AT86RF2XX_H_ */
+#endif /* AT86RF2XX_H */
 /** @} */

@@ -18,8 +18,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef BMP180_REGS_H_
-#define BMP180_REGS_H_
+#ifndef BMP180_REGS_H
+#define BMP180_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,5 +58,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BMP180_REGS_H_ */
+#endif /* BMP180_REGS_H */
 /** @} */

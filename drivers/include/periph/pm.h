@@ -23,8 +23,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef PM_H_
-#define PM_H_
+#ifndef PM_H
+#define PM_H
 
 #include "assert.h"
 #include "periph_cpu.h"
@@ -54,5 +54,5 @@ void pm_set_lowest(void);
 }
 #endif
 
-#endif /* __PM_H_ */
+#endif /* __PM_H */
 /** @} */

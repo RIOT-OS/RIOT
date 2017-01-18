@@ -18,8 +18,8 @@
  * @author          Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-#ifndef CPUCONF_H_
-#define CPUCONF_H_
+#ifndef CPUCONF_H
+#define CPUCONF_H
 
 #include "cpu_conf_common.h"
 

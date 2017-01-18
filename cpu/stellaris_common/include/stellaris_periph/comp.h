@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef STELLARIS_COMP_H_
-#define STELLARIS_COMP_H_
+#ifndef STELLARIS_COMP_H
+#define STELLARIS_COMP_H
 
 //*****************************************************************************
 //
@@ -142,4 +142,4 @@ extern void ComparatorIntClear(unsigned long ulBase, unsigned long ulComp);
 }
 #endif
 
-#endif /* STELLARIS_COMP_H_ */
+#endif /* STELLARIS_COMP_H */

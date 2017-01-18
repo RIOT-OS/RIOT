@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef BOARD_CONF_H_
-#define BOARD_CONF_H_
+#ifndef BOARD_CONF_H
+#define BOARD_CONF_H
 
 /**
  * @ingroup     boards_z1

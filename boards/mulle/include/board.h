@@ -18,8 +18,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -182,5 +182,5 @@ void board_init(void);
 
 /** @} */
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

@@ -32,8 +32,8 @@
  *
  * $Id: TextOutputter.h,v 1.2 2003/09/06 13:28:27 arms22 Exp $
  */
-#ifndef EMBUNIT_TEXTOUTPUTTER_H_
-#define EMBUNIT_TEXTOUTPUTTER_H_
+#ifndef EMBUNIT_TEXTOUTPUTTER_H
+#define EMBUNIT_TEXTOUTPUTTER_H
 
 #include "Outputter.h"
 
@@ -47,4 +47,4 @@ OutputterRef TextOutputter_outputter(void);
 }
 #endif
 
-#endif/* EMBUNIT_TEXTOUTPUTTER_H_ */
+#endif/* EMBUNIT_TEXTOUTPUTTER_H */

@@ -18,8 +18,8 @@
  * @author      Martin Landsmann
  */
 
-#ifndef UNIVERSAL_ADDRESS_H_
-#define UNIVERSAL_ADDRESS_H_
+#ifndef UNIVERSAL_ADDRESS_H
+#define UNIVERSAL_ADDRESS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -171,5 +171,5 @@ void universal_address_print_table(void);
 }
 #endif
 
-#endif /* UNIVERSAL_ADDRESS_H_ */
+#endif /* UNIVERSAL_ADDRESS_H */
 /** @} */

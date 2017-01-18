@@ -32,8 +32,8 @@
  *
  * $Id: HelperMacro.h,v 1.3 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef EMBUNIT_HELPERMACRO_H_
-#define EMBUNIT_HELPERMACRO_H_
+#ifndef EMBUNIT_HELPERMACRO_H
+#define EMBUNIT_HELPERMACRO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,4 +64,4 @@ extern "C" {
 }
 #endif
 
-#endif/* EMBUNIT_HELPERMACRO_H_ */
+#endif/* EMBUNIT_HELPERMACRO_H */

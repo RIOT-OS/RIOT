@@ -26,8 +26,8 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU_X86_CPU_H_
-#define CPU_X86_CPU_H_
+#ifndef CPU_X86_CPU_H
+#define CPU_X86_CPU_H
 
 #include "kernel_defines.h"
 #include "irq.h"

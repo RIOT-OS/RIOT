@@ -18,8 +18,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_NETTEST_H_
-#define GNRC_NETTEST_H_
+#ifndef GNRC_NETTEST_H
+#define GNRC_NETTEST_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -264,5 +264,5 @@ void gnrc_nettest_reset(void);
 }
 #endif
 
-#endif /* GNRC_NETTEST_H_ */
+#endif /* GNRC_NETTEST_H */
 /** @} */

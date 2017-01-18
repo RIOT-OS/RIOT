@@ -42,8 +42,8 @@
  * \author
  *         Wojciech Bober <wojciech.bober@nordicsemi.no>
  */
-#ifndef DEV_BLE_H_
-#define DEV_BLE_H_
+#ifndef DEV_BLE_H
+#define DEV_BLE_H
 
 #include <stdint.h>
 
@@ -52,7 +52,7 @@ void ble_advertising_init(const char *name);
 void ble_advertising_start(void);
 void ble_get_mac(uint8_t addr[8]);
 
-#endif /* DEV_BLE_H_ */
+#endif /* DEV_BLE_H */
 
 /**
  * @}

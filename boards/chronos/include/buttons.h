@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef BUTTONS_H_
-#define BUTTONS_H_
+#ifndef BUTTONS_H
+#define BUTTONS_H
 
 #ifdef __cplusplus
 extern "C" {

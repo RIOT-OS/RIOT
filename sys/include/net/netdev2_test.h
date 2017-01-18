@@ -76,8 +76,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NETDEV2_TEST_H_
-#define NETDEV2_TEST_H_
+#ifndef NETDEV2_TEST_H
+#define NETDEV2_TEST_H
 
 #include "mutex.h"
 
@@ -302,5 +302,5 @@ void netdev2_test_reset(netdev2_test_t *dev);
 }
 #endif
 
-#endif /* NETDEV2_TEST_H_ */
+#endif /* NETDEV2_TEST_H */
 /** @} */

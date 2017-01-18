@@ -15,8 +15,8 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef TESTS_NETOPT_H_
-#define TESTS_NETOPT_H_
+#ifndef TESTS_NETOPT_H
+#define TESTS_NETOPT_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_netopt(void);
 }
 #endif
 
-#endif /* TESTS_NETOPT_H_ */
+#endif /* TESTS_NETOPT_H */
 /** @} */

@@ -20,8 +20,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef DRIVERS_NVRAM_SPI_H_
-#define DRIVERS_NVRAM_SPI_H_
+#ifndef DRIVERS_NVRAM_SPI_H
+#define DRIVERS_NVRAM_SPI_H
 
 #include <stdint.h>
 #include "nvram.h"
@@ -62,5 +62,5 @@ int nvram_spi_init(nvram_t *dev, nvram_spi_params_t *spi_params, size_t size);
 }
 #endif
 
-#endif /* DRIVERS_NVRAM_SPI_H_ */
+#endif /* DRIVERS_NVRAM_SPI_H */
 /** @} */

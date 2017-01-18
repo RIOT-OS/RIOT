@@ -18,8 +18,8 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
-#ifndef NHDP_H_
-#define NHDP_H_
+#ifndef NHDP_H
+#define NHDP_H
 
 #include "timex.h"
 #include "xtimer.h"
@@ -204,5 +204,5 @@ int nhdp_add_address(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
 }
 #endif
 
-#endif /* NHDP_H_ */
+#endif /* NHDP_H */
 /** @} */

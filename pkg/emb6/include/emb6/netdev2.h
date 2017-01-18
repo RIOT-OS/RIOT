@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef EMB6_NETDEV2_H_
-#define EMB6_NETDEV2_H_
+#ifndef EMB6_NETDEV2_H
+#define EMB6_NETDEV2_H
 
 #include "net/netdev2.h"
 
@@ -52,5 +52,5 @@ int emb6_netdev2_setup(netdev2_t *dev);
 }
 #endif
 
-#endif /* EMB6_NETDEV2_H_ */
+#endif /* EMB6_NETDEV2_H */
 /** @} */

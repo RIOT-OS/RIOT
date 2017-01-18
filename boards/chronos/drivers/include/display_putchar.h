@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef DISPLAY_PUTCHAR_H_
-#define DISPLAY_PUTCHAR_H_
+#ifndef DISPLAY_PUTCHAR_H
+#define DISPLAY_PUTCHAR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,4 +19,4 @@ void init_display_putchar(void);
 }
 #endif
 
-#endif /* DISPLAY_PUTCHAR_H_ */
+#endif /* DISPLAY_PUTCHAR_H */

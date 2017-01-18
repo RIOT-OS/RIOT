@@ -24,8 +24,8 @@
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  */
 
-#ifndef LM75A_H_
-#define LM75A_H_
+#ifndef LM75A_H
+#define LM75A_H
 
 #include <stdint.h>
 #include <math.h>
@@ -275,4 +275,4 @@ void lm75A_set_in_alarm(bool b);
 #endif
 
 /** @} */
-#endif /* LM75A_H_ */
+#endif /* LM75A_H */

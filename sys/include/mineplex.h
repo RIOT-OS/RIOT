@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef MINEPLEX_H_
-#define MINEPLEX_H_
+#ifndef MINEPLEX_H
+#define MINEPLEX_H
 
 #include <stdint.h>
 
@@ -55,5 +55,5 @@ const uint8_t *mineplex_char(char c);
 }
 #endif
 
-#endif /* MINEPLEX_H_ */
+#endif /* MINEPLEX_H */
 /** @} */

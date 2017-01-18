@@ -18,8 +18,8 @@
  * @author  José Ignacio Alamos
  */
 
-#ifndef PPP_HDR_H_
-#define PPP_HDR_H_
+#ifndef PPP_HDR_H
+#define PPP_HDR_H
 
 #include <inttypes.h>
 
@@ -63,5 +63,5 @@ typedef struct __attribute__((packed)){
 }
 #endif
 
-#endif /* PPP_HDR_H_ */
+#endif /* PPP_HDR_H */
 /** @} */

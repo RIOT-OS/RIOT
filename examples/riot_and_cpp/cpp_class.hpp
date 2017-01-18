@@ -20,8 +20,8 @@
  * @author      DangNhat Pham-Huu <51002279@stu.hcmut.edu.vn>
  */
 
-#ifndef CPP_CLASS_H_
-#define CPP_CLASS_H_
+#ifndef CPP_CLASS_H
+#define CPP_CLASS_H
 
 #include <cstdio>
 

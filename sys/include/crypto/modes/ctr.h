@@ -17,8 +17,8 @@
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
 
-#ifndef CRYPTO_MODES_CTR_H_
-#define CRYPTO_MODES_CTR_H_
+#ifndef CRYPTO_MODES_CTR_H
+#define CRYPTO_MODES_CTR_H
 
 #include "crypto/ciphers.h"
 

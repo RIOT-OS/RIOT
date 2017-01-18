@@ -6,8 +6,8 @@
  * more details.
  */
 
-#ifndef ARM7_COMMON_H_
-#define ARM7_COMMON_H_
+#ifndef ARM7_COMMON_H
+#define ARM7_COMMON_H
 
 /**
  * @defgroup    cpu_arm7_common ARM7 CPU common
@@ -100,4 +100,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* ARM7_COMMON_H_ */
+#endif /* ARM7_COMMON_H */

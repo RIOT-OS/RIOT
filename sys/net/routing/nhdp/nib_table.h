@@ -16,8 +16,8 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
-#ifndef NIB_TABLE_H_
-#define NIB_TABLE_H_
+#ifndef NIB_TABLE_H
+#define NIB_TABLE_H
 
 #include "timex.h"
 
@@ -102,5 +102,5 @@ void nib_reset_nb_entry_sym(nib_entry_t *nib_entry, timex_t *now);
 }
 #endif
 
-#endif /* NIB_TABLE_H_ */
+#endif /* NIB_TABLE_H */
 /** @} */

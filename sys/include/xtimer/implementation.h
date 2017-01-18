@@ -16,8 +16,8 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-#ifndef XTIMER_IMPLEMENTATION_H_
-#define XTIMER_IMPLEMENTATION_H_
+#ifndef XTIMER_IMPLEMENTATION_H
+#define XTIMER_IMPLEMENTATION_H
 
 #ifndef XTIMER_H
 #error "Do not include this file directly! Use xtimer.h instead"

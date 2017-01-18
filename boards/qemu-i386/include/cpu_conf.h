@@ -16,8 +16,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef QEMU_I386_CPU_CONF_H_
-#define QEMU_I386_CPU_CONF_H_
+#ifndef QEMU_I386_CPU_CONF_H
+#define QEMU_I386_CPU_CONF_H
 
 #ifdef __cplusplus
 extern "C" {

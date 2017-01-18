@@ -18,8 +18,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef GNRC_NDP_H_
-#define GNRC_NDP_H_
+#ifndef GNRC_NDP_H
+#define GNRC_NDP_H
 
 #include <inttypes.h>
 #include <stdlib.h>
@@ -557,7 +557,7 @@ gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next);
 }
 #endif
 
-#endif /* GNRC_NDP_H_ */
+#endif /* GNRC_NDP_H */
 /**
  * @}
  */

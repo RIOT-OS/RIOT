@@ -29,8 +29,8 @@
  * @brief       Architecture specific definitions for multiboot enabled kernels
  */
 
-#ifndef MULTIBOOT_H_
-#define MULTIBOOT_H_
+#ifndef MULTIBOOT_H
+#define MULTIBOOT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -234,5 +234,5 @@ typedef struct multiboot_mod_list multiboot_module_t;
 }
 #endif
 
-#endif  /** ! MULTIBOOT_H_ */
+#endif  /** ! MULTIBOOT_H */
 /** @} */

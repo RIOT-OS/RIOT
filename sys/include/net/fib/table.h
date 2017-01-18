@@ -16,8 +16,8 @@
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
 
-#ifndef FIB_TABLE_H_
-#define FIB_TABLE_H_
+#ifndef FIB_TABLE_H
+#define FIB_TABLE_H
 
 #include <stdint.h>
 
@@ -139,5 +139,5 @@ typedef struct {
 }
 #endif
 
-#endif /* FIB_TABLE_H_ */
+#endif /* FIB_TABLE_H */
 /** @} */

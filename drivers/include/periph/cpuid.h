@@ -20,8 +20,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef PERIPH_CPUID_H_
-#define PERIPH_CPUID_H_
+#ifndef PERIPH_CPUID_H
+#define PERIPH_CPUID_H
 
 #include "periph_cpu.h"
 
@@ -51,7 +51,7 @@ void cpuid_get(void *id);
 }
 #endif
 
-#endif /* PERIPH_CPUID_H_ */
+#endif /* PERIPH_CPUID_H */
 /**
  * @}
  */

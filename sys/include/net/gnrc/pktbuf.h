@@ -27,8 +27,8 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-#ifndef GNRC_PKTBUF_H_
-#define GNRC_PKTBUF_H_
+#ifndef GNRC_PKTBUF_H
+#define GNRC_PKTBUF_H
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -310,5 +310,5 @@ bool gnrc_pktbuf_is_sane(void);
 }
 #endif
 
-#endif /* GNRC_PKTBUF_H_ */
+#endif /* GNRC_PKTBUF_H */
 /** @} */

@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef SYS_TYPES_H_
-#define SYS_TYPES_H_
+#ifndef SYS_TYPES_H
+#define SYS_TYPES_H
 
 #include "msp430_types.h"
 
@@ -19,4 +19,4 @@ extern "C" {
 }
 #endif
 
-#endif /* SYS_TYPES_H_ */
+#endif /* SYS_TYPES_H */

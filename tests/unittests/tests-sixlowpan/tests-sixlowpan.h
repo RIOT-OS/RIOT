@@ -15,8 +15,8 @@
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
-#ifndef TESTS_SIXLOWPAN_H_
-#define TESTS_SIXLOWPAN_H_
+#ifndef TESTS_SIXLOWPAN_H
+#define TESTS_SIXLOWPAN_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_sixlowpan(void);
 }
 #endif
 
-#endif /* TESTS_SIXLOWPAN_H_ */
+#endif /* TESTS_SIXLOWPAN_H */
 /** @} */

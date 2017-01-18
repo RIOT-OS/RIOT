@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef GNRC_UDP_H_
-#define GNRC_UDP_H_
+#ifndef GNRC_UDP_H
+#define GNRC_UDP_H
 
 #include <stdint.h>
 
@@ -92,5 +92,5 @@ int gnrc_udp_init(void);
 }
 #endif
 
-#endif /* GNRC_UDP_H_ */
+#endif /* GNRC_UDP_H */
 /** @} */

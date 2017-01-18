@@ -95,7 +95,7 @@ index c2418fa..ba61ab7 100644
 -
  _END_STD_C
 
- #endif /* _STDIO_H_ */
+ #endif /* _STDIO_H */
 diff --git a/newlib/libc/stdio/putc.c b/newlib/libc/stdio/putc.c
 index 2b1fd1b..f64925e 100644
 --- a/newlib/libc/stdio/putc.c

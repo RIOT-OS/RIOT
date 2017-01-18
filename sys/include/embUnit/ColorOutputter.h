@@ -13,8 +13,8 @@
  *
  * @author Janos Kutscherauer <noshky@gmail.com>
  */
-#ifndef EMBUNIT_COLOROUTPUTTER_H_
-#define EMBUNIT_COLOROUTPUTTER_H_
+#ifndef EMBUNIT_COLOROUTPUTTER_H
+#define EMBUNIT_COLOROUTPUTTER_H
 
 #include "Outputter.h"
 
@@ -41,5 +41,5 @@ void ColorOutputter_printStatistics(OutputterRef self, TestResultRef result);
 }
 #endif
 
-#endif/* EMBUNIT_COLOROUTPUTTER_H_ */
+#endif/* EMBUNIT_COLOROUTPUTTER_H */
 /** @} */

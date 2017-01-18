@@ -7,8 +7,8 @@
  */
 
 
-#ifndef CPUCONF_H_
-#define CPUCONF_H_
+#ifndef CPUCONF_H
+#define CPUCONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,4 +70,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* CPUCONF_H_ */
+#endif /* CPUCONF_H */

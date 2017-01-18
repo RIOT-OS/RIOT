@@ -26,8 +26,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#ifndef CBCMODE_H_
-#define CBCMODE_H_
+#ifndef CBCMODE_H
+#define CBCMODE_H
 
 #include "crypto/ciphers.h"
 
@@ -214,4 +214,4 @@ int block_cipher_mode_decrypt(CipherModeContext *context,
 #endif
 
 /** @} */
-#endif /* CBCMODE_H_ */
+#endif /* CBCMODE_H */

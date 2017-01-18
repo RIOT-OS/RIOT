@@ -22,8 +22,8 @@
 extern "C" {
 #endif
 
-#ifndef KW2XRF_PARAMS_H_
-#define KW2XRF_PARAMS_H_
+#ifndef KW2XRF_PARAMS_H
+#define KW2XRF_PARAMS_H
 
 /**
  * @name KW2XRF configuration

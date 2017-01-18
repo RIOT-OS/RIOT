@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef STELLARIS_PWM_H_
-#define STELLARIS_PWM_H_
+#ifndef STELLARIS_PWM_H
+#define STELLARIS_PWM_H
 
 //*****************************************************************************
 //
@@ -295,4 +295,4 @@ extern void PWMGenFaultClear(unsigned long ulBase, unsigned long ulGen,
 }
 #endif
 
-#endif /* STELLARIS_PWM_H_ */
+#endif /* STELLARIS_PWM_H */

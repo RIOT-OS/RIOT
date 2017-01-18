@@ -20,8 +20,8 @@
  *
  * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
-#ifndef ICMP_H_
-#define ICMP_H_
+#ifndef ICMP_H
+#define ICMP_H
 
 #include "byteorder.h"
 
@@ -50,5 +50,5 @@ typedef struct __attribute__((packed)){
 }
 #endif
 
-#endif /* ICMP_H_ */
+#endif /* ICMP_H */
 /** @} */

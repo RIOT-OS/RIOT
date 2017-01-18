@@ -87,5 +87,5 @@ void gpio_init_af(gpio_t pin, gpio_af_t af);
 }
 #endif
 
-#endif /* PERIPH_CPU_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */

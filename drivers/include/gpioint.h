@@ -21,8 +21,8 @@
  * @author      Michael Baar <michael.baar@fu-berlin.de>
  */
 
-#ifndef GPIOINT_H_
-#define GPIOINT_H_
+#ifndef GPIOINT_H
+#define GPIOINT_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -74,4 +74,4 @@ void gpioint_init(void);
 #endif
 
 /** @} */
-#endif /* GPIOINT_H_ */
+#endif /* GPIOINT_H */

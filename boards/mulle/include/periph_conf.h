@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef MULLE_PERIPH_CONF_H_
-#define MULLE_PERIPH_CONF_H_
+#ifndef MULLE_PERIPH_CONF_H
+#define MULLE_PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -456,5 +456,5 @@ static const pwm_conf_t pwm_config[] = {
 }
 #endif
 
-#endif /* MULLE_PERIPH_CONF_H_ */
+#endif /* MULLE_PERIPH_CONF_H */
 /** @} */

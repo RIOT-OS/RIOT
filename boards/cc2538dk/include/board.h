@@ -17,8 +17,8 @@
  * @author      Ian Martin <ian@locicontrols.com>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -95,5 +95,5 @@ void board_init(void);
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

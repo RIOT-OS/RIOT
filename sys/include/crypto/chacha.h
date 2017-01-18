@@ -31,8 +31,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CRYPTO_CHACHA_H_
-#define CRYPTO_CHACHA_H_
+#ifndef CRYPTO_CHACHA_H
+#define CRYPTO_CHACHA_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -137,7 +137,7 @@ uint32_t chacha_prng_next(void);
 }
 #endif
 
-#endif /* ifndef CRYPTO_CHACHA_H_ */
+#endif /* ifndef CRYPTO_CHACHA_H */
 
 /**
  * @}

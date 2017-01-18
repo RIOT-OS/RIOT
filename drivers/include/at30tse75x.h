@@ -22,8 +22,8 @@
  * @author      Daniel Krebs <github@daniel-krebs.net>
  */
 
-#ifndef AT30TSE75X_H_
-#define AT30TSE75X_H_
+#ifndef AT30TSE75X_H
+#define AT30TSE75X_H
 
 #include <stdint.h>
 #include "periph/i2c.h"
@@ -309,4 +309,4 @@ int at30tse75x_get_temperature(at30tse75x_t* dev, float* temperature);
 #endif
 
 /** @} */
-#endif /* AT30TSE75X_H_ */
+#endif /* AT30TSE75X_H */

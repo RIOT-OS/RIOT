@@ -16,8 +16,8 @@
  * @author      Ian Martin <ian@locicontrols.com>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "cpu.h"
 #include "periph_cpu.h"
@@ -141,5 +141,5 @@ static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

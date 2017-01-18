@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef SHT11_H_
-#define SHT11_H_
+#ifndef SHT11_H
+#define SHT11_H
 
 /**
  * @defgroup    drivers_sht11   SHT11

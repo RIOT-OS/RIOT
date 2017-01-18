@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef HDC1000_REGS_H_
-#define HDC1000_REGS_H_
+#ifndef HDC1000_REGS_H
+#define HDC1000_REGS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -69,5 +69,5 @@ extern "C"
 }
 #endif
 
-#endif /* HDC1000_REGS_H_ */
+#endif /* HDC1000_REGS_H */
 /** @} */

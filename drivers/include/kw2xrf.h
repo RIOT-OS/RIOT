@@ -19,8 +19,8 @@
  * @author      Jonas Remmert <j.remmert@phytec.de>
  */
 
-#ifndef MKW2XDRF_H_
-#define MKW2XDRF_H_
+#ifndef MKW2XDRF_H
+#define MKW2XDRF_H
 
 #include <stdint.h>
 

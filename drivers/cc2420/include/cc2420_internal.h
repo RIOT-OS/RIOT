@@ -122,5 +122,5 @@ void cc2420_en_xosc(cc2420_t *dev);
 }
 #endif
 
-#endif /* CC2420_INTERNAL_H_ */
+#endif /* CC2420_INTERNAL_H */
 /** @} */

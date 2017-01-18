@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef IAP_H_
-#define IAP_H_
+#ifndef IAP_H
+#define IAP_H
 
 #include <stdint.h>
 

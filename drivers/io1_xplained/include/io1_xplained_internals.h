@@ -18,8 +18,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef IO1_XPLAINED_INTERNALS_H_
-#define IO1_XPLAINED_INTERNALS_H_
+#ifndef IO1_XPLAINED_INTERNALS_H
+#define IO1_XPLAINED_INTERNALS_H
 
 #include "cpu.h"
 #include "periph_cpu.h"
@@ -56,5 +56,5 @@ extern "C" {
 }
 #endif
 
-#endif /* IO1_XPLAINED_INTERNALS_H_ */
+#endif /* IO1_XPLAINED_INTERNALS_H */
 /** @} */

@@ -19,8 +19,8 @@
 
 #include <stdio.h>
 
-#ifndef C_FUNCTIONS_H_
-#define C_FUNCTIONS_H_
+#ifndef C_FUNCTIONS_H
+#define C_FUNCTIONS_H
 
 #ifdef __cplusplus
 extern "C" {

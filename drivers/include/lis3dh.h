@@ -19,8 +19,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef LIS3DH_H_
-#define LIS3DH_H_
+#ifndef LIS3DH_H
+#define LIS3DH_H
 
 #include <stdint.h>
 
@@ -859,5 +859,5 @@ int lis3dh_get_fifo_level(lis3dh_t *dev);
 }
 #endif
 
-#endif /* LIS3DH_H_ */
+#endif /* LIS3DH_H */
 /** @} */

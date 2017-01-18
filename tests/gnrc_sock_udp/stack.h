@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef STACK_H_
-#define STACK_H_
+#ifndef STACK_H
+#define STACK_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -91,5 +91,5 @@ bool _check_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
 }
 #endif
 
-#endif /* STACK_H_ */
+#endif /* STACK_H */
 /** @} */

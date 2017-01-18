@@ -17,8 +17,8 @@
  *          Use irq_disable() and irq_restore() for shortterm locks instead.
  */
 
-#ifndef SYS_POSIX_PTHREAD_SPIN_H_
-#define SYS_POSIX_PTHREAD_SPIN_H_
+#ifndef SYS_POSIX_PTHREAD_SPIN_H
+#define SYS_POSIX_PTHREAD_SPIN_H
 
 #include <errno.h>
 

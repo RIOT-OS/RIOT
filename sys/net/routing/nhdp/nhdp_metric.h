@@ -21,8 +21,8 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
-#ifndef NHDP_METRIC_H_
-#define NHDP_METRIC_H_
+#ifndef NHDP_METRIC_H
+#define NHDP_METRIC_H
 
 #include "rfc5444/rfc5444.h"
 
@@ -90,4 +90,4 @@ extern "C" {
 }
 #endif
 
-#endif /* NHDP_METRIC_H_ */
+#endif /* NHDP_METRIC_H */
