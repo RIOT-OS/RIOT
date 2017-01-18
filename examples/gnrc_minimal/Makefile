@@ -13,7 +13,7 @@ BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h
 #USEMODULE += xbee
 
 ## set default UART to use in case none was defined
-#XBEE_UART ?= "UART_NUMOF-1"
+#XBEE_UART ?= "1"
 
 ## export UART to params file
 #CFLAGS += -DXBEE_UART=$(XBEE_UART)
