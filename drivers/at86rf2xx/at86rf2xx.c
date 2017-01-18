@@ -144,30 +144,6 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     DEBUG("at86rf2xx_reset(): reset complete.\n");
 }
 
-bool at86rf2xx_cca(at86rf2xx_t *dev)
-{
-    uint8_t tmp;
-    uint8_t status;
-
-    at86rf2xx_assert_awake(dev);
-
-    /* trigger CCA measurment */
-    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
-    tmp &= AT86RF2XX_PHY_CC_CCA_MASK__CCA_REQUEST;
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_CC_CCA, tmp);
-    /* wait for result to be ready */
-    do {
-        status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS);
-    } while (!(status & AT86RF2XX_TRX_STATUS_MASK__CCA_DONE));
-    /* return according to measurement */
-    if (status & AT86RF2XX_TRX_STATUS_MASK__CCA_STATUS) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
 size_t at86rf2xx_send(at86rf2xx_t *dev, uint8_t *data, size_t len)
 {
     /* check data length */

@@ -340,16 +340,6 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
             }
             break;
 
-        case NETOPT_IS_CHANNEL_CLR:
-            if (at86rf2xx_cca(dev)) {
-                *((netopt_enable_t *)val) = NETOPT_ENABLE;
-            }
-            else {
-                *((netopt_enable_t *)val) = NETOPT_DISABLE;
-            }
-            res = sizeof(netopt_enable_t);
-            break;
-
         case NETOPT_CSMA_RETRIES:
             if (max_len < sizeof(uint8_t)) {
                 res = -EOVERFLOW;
