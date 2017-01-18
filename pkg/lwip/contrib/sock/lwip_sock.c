@@ -19,6 +19,7 @@
 #include "net/ipv4/addr.h"
 #include "net/ipv6/addr.h"
 #include "net/sock.h"
+#include "timex.h"
 
 #include "lwip/err.h"
 #include "lwip/ip.h"
