@@ -49,23 +49,6 @@ extern const saul_driver_t si70xx_temperature_saul_driver;
 extern const saul_driver_t si70xx_relative_humidity_saul_driver;
 /** @} */
 
-/**
- * @brief   Allocate and configure entries to the SAUL registry
- */
-saul_reg_t si70xx_saul_reg_info[][2] =
-{
-    {
-        {
-            .name = "si70xx-temp",
-            .driver = &si70xx_temperature_saul_driver
-        },
-        {
-            .name = "si70xx-hum",
-            .driver = &si70xx_relative_humidity_saul_driver
-        }
-    }
-};
-
 void auto_init_si70xx(void)
 {
     for (unsigned i = 0; i < SI70XX_NUMOF; i++) {
@@ -73,7 +56,7 @@ void auto_init_si70xx(void)
                               si70xx_params[i].i2c_dev,
                               si70xx_params[i].address);
         if (res < 0) {
-            LOG_ERROR("Unable to initialize BMP180 sensor #%i\n", i);
+            LOG_ERROR("Unable to initialize SI70xx sensor #%i\n", i);
             return;
         }
 
