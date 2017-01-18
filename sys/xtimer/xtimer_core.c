@@ -128,7 +128,8 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
 
 void _xtimer_set(xtimer_t *timer, uint32_t offset)
 {
-    DEBUG("timer_set(): offset=%" PRIu32 " now=%" PRIu32 " (%" PRIu32 ")\n", offset, xtimer_now(), _xtimer_lltimer_now());
+    DEBUG("timer_set(): offset=%" PRIu32 " now=%" PRIu32 " (%" PRIu32 ")\n",
+          offset, xtimer_now().ticks32, _xtimer_lltimer_now());
     if (!timer->callback) {
         DEBUG("timer_set(): timer has no callback.\n");
         return;
@@ -434,8 +435,9 @@ static void _timer_callback(void)
 
     _in_handler = 1;
 
-    DEBUG("_timer_callback() now=%" PRIu32 " (%" PRIu32 ")pleft=%" PRIu32 "\n", xtimer_now(),
-            _xtimer_lltimer_mask(xtimer_now()), _xtimer_lltimer_mask(0xffffffff - xtimer_now()));
+    DEBUG("_timer_callback() now=%" PRIu32 " (%" PRIu32 ")pleft=%" PRIu32 "\n",
+          xtimer_now().ticks32, _xtimer_lltimer_mask(xtimer_now().ticks32),
+          _xtimer_lltimer_mask(0xffffffff - xtimer_now().ticks32));
 
     if (!timer_list_head) {
         DEBUG("_timer_callback(): tick\n");
