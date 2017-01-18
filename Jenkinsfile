@@ -14,14 +14,12 @@ githubNotify context: 'Jenkins', description: 'Build started', status: 'PENDING'
 /* stop running jobs */
 abortPreviousBuilds()
 
-node ('master') {
-    stage('setup') {
+stage('setup') {
+    node ('master') {
         deleteDir()
-        checkout scm
-        /* also fetch master branch - necessary for static tests */
-        sh "git fetch origin master:master"
-        /* stash workspace for slaves */
-        stash 'sources'
+
+        fetchPR(env.CHANGE_ID, "--depth=1", "")
+
         /* get all boards */
         boards = sh(returnStdout: true,
                     script: 'find $(pwd)/boards/* -maxdepth 0 -type d \\! -name "*-common" -exec basename {} \\;'
@@ -53,9 +51,16 @@ node ('master') {
                 other_tests << tests[i]
             }
         }
+        deleteDir()
     }
+}
 
-    stage('static-tests') {
+stage('static-tests') {
+    node('linux && boards') {
+        deleteDir()
+
+        fetchPR(env.CHANGE_ID, "", "master:master")
+
         def ret = sh(returnStatus: true,
                      script: """#!/bin/bash +x
                                 declare -i RESULT=0
@@ -68,9 +73,8 @@ node ('master') {
             currentBuild.result = 'UNSTABLE'
         }
         step([$class: 'ArtifactArchiver', artifacts: "*_static-tests.log", fingerprint: true, allowEmptyArchive: true])
+        deleteDir()
     }
-
-    deleteDir()
 }
 
 stage("unittests") {
@@ -163,7 +167,7 @@ def make_build(label, board, desc, arg)
         node(label) {
             try {
                 deleteDir()
-                unstash 'sources'
+                fetchPR(env.CHANGE_ID, "--depth=1", "")
                 def build_dir = pwd()
                 timestamps {
                     def apps = arg.join(' ')
@@ -221,4 +225,11 @@ def abortOnError(msg)
         githubNotify context: 'Jenkins', description: msg, status: 'FAILURE', targetUrl: "${env.BUILD_URL}artifact"
         error msg
     }
+}
+
+def fetchPR(prNum, fetchArgs, extraRefSpec)
+{
+    sh """git init; git remote add origin https://github.com/RIOT-OS/RIOT;
+    git fetch -u -n ${fetchArgs} origin ${extraRefSpec} pull/${prNum}/merge:pull_${prNum}
+    git checkout pull_${prNum}"""
 }
