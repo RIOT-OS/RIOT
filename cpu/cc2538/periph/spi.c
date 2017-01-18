@@ -139,12 +139,12 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
             while (!(dev(bus)->SR & SSI_SR_TNF)) {}
             dev(bus)->DR = out_buf[i];
         }
-        /* flush RX FIFO */
-        while (dev(bus)->SR & SSI_SR_RNE) {
+        /* flush RX FIFO while busy*/
+        while ((dev(bus)->SR & SSI_SR_BSY)) {
             dev(bus)->DR;
         }
     }
-    if (!out_buf) {
+    else if (!out_buf) { /*TODO this case is currently untested */
         size_t in_cnt = 0;
         for (size_t i = 0; i < len; i++) {
             while (!(dev(bus)->SR & SSI_SR_TNF)) {}
@@ -159,18 +159,14 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         }
     }
     else {
-        size_t in_cnt = 0;
         for (size_t i = 0; i < len; i++) {
             while (!(dev(bus)->SR & SSI_SR_TNF)) {}
             dev(bus)->DR = out_buf[i];
-            if (dev(bus)->SR & SSI_SR_RNE) {
-                in_buf[in_cnt++] = dev(bus)->DR;
-            }
+            while (!(dev(bus)->SR & SSI_SR_RNE)){}
+            in_buf[i] = dev(bus)->DR;
         }
-        /* get remaining bytes */
-        while (dev(bus)->SR & SSI_SR_RNE) {
-            in_buf[in_cnt++] = dev(bus)->DR;
-        }
+    /* wait until no more busy */
+    while ((dev(bus)->SR & SSI_SR_BSY)) {}
     }
 
     if ((!cont) && (cs != SPI_CS_UNDEF)) {
