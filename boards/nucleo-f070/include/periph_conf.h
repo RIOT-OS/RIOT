@@ -131,21 +131,21 @@ static const pwm_conf_t pwm_config[] = {
     {
         .dev      = TIM3,
         .rcc_mask = RCC_APB1ENR_TIM3EN,
-        .pins     = { GPIO_PIN(PORT_B, 4), /* D5 */
-                      GPIO_PIN(PORT_B, 5), /* D4 */
-                      GPIO_UNDEF, GPIO_UNDEF },
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 4) /* D5 */, .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_B, 5) /* D4 */, .cc_chan = 1 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 } },
         .af       = GPIO_AF1,
-        .chan     = 2,
         .bus      = APB1
     },
     {
         .dev      = TIM15,
         .rcc_mask = RCC_APB2ENR_TIM15EN,
-        .pins     = { GPIO_PIN(PORT_B, 14),
-                      GPIO_PIN(PORT_B, 15),
-                      GPIO_UNDEF, GPIO_UNDEF },
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 14), .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_B, 15), .cc_chan = 1 },
+                      { .pin = GPIO_UNDEF,           .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,           .cc_chan = 0 } },
         .af       = GPIO_AF1,
-        .chan     = 2,
         .bus      = APB2
     }
 };
