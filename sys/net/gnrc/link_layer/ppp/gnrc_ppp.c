@@ -34,6 +34,7 @@
 #include "net/ppp/hdr.h"
 #include <errno.h>
 #include <string.h>
+#include "byteorder.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -46,14 +47,14 @@
 
 void send_ppp_event(msg_t *msg, ppp_msg_t ppp_msg)
 {
-    msg->type = GNRC_PPPDEV_MSG_TYPE_EVENT;
+    msg->type = GNRC_PPP_MSG_TYPE_EVENT;
     msg->content.value = ppp_msg;
     msg_send(msg, thread_getpid());
 }
 
 void send_ppp_event_xtimer(msg_t *msg, xtimer_t *xtimer, ppp_msg_t ppp_msg, int timeout)
 {
-    msg->type = GNRC_PPPDEV_MSG_TYPE_EVENT;
+    msg->type = GNRC_PPP_MSG_TYPE_EVENT;
     msg->content.value = ppp_msg;
     xtimer_remove(xtimer);
     xtimer_set_msg(xtimer, timeout, msg, thread_getpid());
@@ -64,11 +65,11 @@ gnrc_pktsnip_t *pkt_build(gnrc_nettype_t pkt_type, uint8_t code, uint8_t id, gnr
 {
     ppp_hdr_t ppp_hdr;
 
-    ppp_hdr_set_code(&ppp_hdr, code);
-    ppp_hdr_set_id(&ppp_hdr, id);
+    ppp_hdr.code = code;
+    ppp_hdr.id = id;
 
     int payload_length = payload ? payload->size : 0;
-    ppp_hdr_set_length(&ppp_hdr, payload_length + sizeof(ppp_hdr_t));
+    ppp_hdr.length = byteorder_htons(payload_length + sizeof(ppp_hdr_t));
 
     gnrc_pktsnip_t *ppp_pkt = gnrc_pktbuf_add(payload, (void *) &ppp_hdr, sizeof(ppp_hdr_t), pkt_type);
     return ppp_pkt;
@@ -92,7 +93,7 @@ ppp_target_t _get_target_from_protocol(uint16_t protocol)
     }
     return PROT_UNDEF;
 }
-gnrc_pktsnip_t *retrieve_pkt(pppdev_t *dev)
+gnrc_pktsnip_t *retrieve_pkt(netdev2_t *dev)
 {
     int nbytes;
 
@@ -102,40 +103,37 @@ gnrc_pktsnip_t *retrieve_pkt(pppdev_t *dev)
     return pkt;
 }
 
-int gnrc_ppp_setup(gnrc_pppdev_t *dev, pppdev_t *netdev)
+int gnrc_ppp_setup(gnrc_netdev2_t *dev, netdev2_t *netdev)
 {
-    dev->netdev = netdev;
-    dev->state = PPP_LINK_DEAD;
+    dev->dev = (netdev2_t*) netdev;
 
-    dev->protocol[PROT_DCP] = dcp_get_static_pointer();
-    dev->protocol[PROT_LCP] = lcp_get_static_pointer();
-    dev->protocol[PROT_IPCP] = ipcp_get_static_pointer();
-    dev->protocol[PROT_AUTH] = pap_get_static_pointer();
-    dev->protocol[PROT_IPV4] = ipv4_get_static_pointer();
+	netdev2_ppp_t *pppdev = (netdev2_ppp_t*) netdev;
 
-    dcp_init(dev, dev->protocol[PROT_DCP]);
-    lcp_init(dev, dev->protocol[PROT_LCP]);
-    ipcp_init(dev, dev->protocol[PROT_IPCP]);
-    ppp_ipv4_init(dev, dev->protocol[PROT_IPV4], (ipcp_t *) dev->protocol[PROT_IPCP]);
-    pap_init(dev, dev->protocol[PROT_AUTH]);
+    dcp_init(dev);
+    lcp_init(dev);
+    ipcp_init(dev);
+    ppp_ipv4_init(dev);
+    pap_init(dev);
 
-    trigger_fsm_event((ppp_fsm_t *) dev->protocol[PROT_LCP], E_OPEN, NULL);
-    trigger_fsm_event((ppp_fsm_t *) dev->protocol[PROT_IPCP], E_OPEN, NULL);
+    trigger_fsm_event((ppp_fsm_t *) &pppdev->lcp, E_OPEN, NULL);
+    trigger_fsm_event((ppp_fsm_t *) &pppdev->ipcp, E_OPEN, NULL);
     return 0;
 }
 
 
-int gnrc_ppp_send(gnrc_pppdev_t *dev, gnrc_pktsnip_t *pkt)
+int gnrc_ppp_send(gnrc_netdev2_t *dev, gnrc_pktsnip_t *pkt)
 {
     hdlc_hdr_t hdlc_hdr;
+    netdev2_t *netdev = (netdev2_t*) dev->dev;
+	netdev2_ppp_t *pppdev = (netdev2_ppp_t*) netdev;
 
-    hdlc_hdr_set_address(&hdlc_hdr, PPP_HDLC_ADDRESS);
-    hdlc_hdr_set_control(&hdlc_hdr, PPP_HDLC_CONTROL);
-    hdlc_hdr_set_protocol(&hdlc_hdr, gnrc_nettype_to_ppp_protnum(pkt->type));
+    hdlc_hdr.address = PPP_HDLC_ADDRESS;
+    hdlc_hdr.control =PPP_HDLC_CONTROL;
+    hdlc_hdr.protocol = byteorder_htons(gnrc_nettype_to_ppp_protnum(pkt->type));
 
     gnrc_pktsnip_t *hdr = gnrc_pktbuf_add(pkt, (void *) &hdlc_hdr, sizeof(hdlc_hdr_t), GNRC_NETTYPE_HDLC);
 
-    if (gnrc_pkt_len(hdr) > ((lcp_t *) dev->protocol[PROT_LCP])->peer_mru) {
+    if (gnrc_pkt_len(hdr) > pppdev->lcp.peer_mru) {
         DEBUG("gnrc_ppp: Sending exceeds peer MRU. Dropping packet.\n");
         gnrc_pktbuf_release(hdr);
         return -EBADMSG;
@@ -146,7 +144,7 @@ int gnrc_ppp_send(gnrc_pppdev_t *dev, gnrc_pktsnip_t *pkt)
     hdr = gnrc_pktbuf_get_iovec(hdr, &n);
     if (hdr != NULL) {
         struct iovec *vector = (struct iovec *) hdr->data;
-        res = dev->netdev->driver->send(dev->netdev, vector, n);
+        res = netdev->driver->send(netdev, vector, n);
     }
     gnrc_pktbuf_release(hdr);
     return res;
@@ -161,260 +159,156 @@ static int _ppp_pkt_is_valid(gnrc_pktsnip_t *pkt)
 {
     ppp_hdr_t *hdr = pkt->data;
 
-    return ppp_hdr_get_length(hdr) < pkt->size;
+    return byteorder_ntohs(hdr->length) < pkt->size;
 }
 
-int _prot_is_allowed(ppp_protocol_t **protocols, uint16_t protocol)
+int _prot_is_allowed(gnrc_netdev2_t *dev, uint16_t protocol)
 {
+	netdev2_ppp_t *pppdev = (netdev2_ppp_t*) dev->dev;
     switch (protocol) {
         case PPPTYPE_LCP:
-            return protocols[PROT_LCP]->state == PROTOCOL_STARTING || protocols[PROT_LCP]->state == PROTOCOL_UP;
+            return ((ppp_protocol_t*) &pppdev->lcp)->state == PROTOCOL_STARTING || ((ppp_protocol_t*) &pppdev->lcp)->state == PROTOCOL_UP;
         case PPPTYPE_NCP_IPV4:
-            return protocols[PROT_IPCP]->state == PROTOCOL_STARTING || protocols[PROT_IPCP]->state == PROTOCOL_UP;
+            return ((ppp_protocol_t*) &pppdev->ipcp)->state == PROTOCOL_STARTING || ((ppp_protocol_t*) &pppdev->ipcp)->state == PROTOCOL_UP;
         case PPPTYPE_PAP:
-            return protocols[PROT_AUTH]->state == PROTOCOL_STARTING;
+            return ((ppp_protocol_t*) &pppdev->pap)->state == PROTOCOL_STARTING;
         case PPPTYPE_IPV4:
-            return protocols[PROT_IPV4]->state == PROTOCOL_UP;
+            return ((ppp_protocol_t*) &pppdev->ipv4)->state == PROTOCOL_UP;
     }
     return 0;
 }
-int dispatch_ppp_msg(gnrc_pppdev_t *dev, ppp_msg_t ppp_msg)
+
+ppp_protocol_t *_get_prot_by_target(netdev2_ppp_t *pppdev, ppp_target_t target)
 {
-    ppp_target_t target = ppp_msg_get_target(ppp_msg);
-    ppp_event_t event = ppp_msg_get_event(ppp_msg);
-    gnrc_pktsnip_t *pkt = NULL;
-
-    if (event == PPP_RECV) {
-        pkt = retrieve_pkt(dev->netdev);
-        gnrc_pktsnip_t *result = gnrc_pktbuf_mark(pkt, sizeof(hdlc_hdr_t), GNRC_NETTYPE_HDLC);
-        if (!result) {
-            DEBUG("gnrc_ppp: no space left in packet buffer\n");
-            return -ENOBUFS;
-        }
-
-        /*Drop packet if exceeds MRU*/
-        if (gnrc_pkt_len(pkt) > ((lcp_t *) dev->protocol[PROT_LCP])->mru) {
-            DEBUG("gnrc_ppp: Exceeded MRU of device. Dropping packet.\n");
-            gnrc_pktbuf_release(pkt);
-            return -EBADMSG;
-        }
-
-        hdlc_hdr_t *hdlc_hdr = (hdlc_hdr_t *) result->data;
-        target = _get_target_from_protocol(hdlc_hdr_get_protocol(hdlc_hdr));
-
-        if (!target) {
-            /* Remove hdlc header */
-            network_uint16_t protocol = byteorder_htons(hdlc_hdr_get_protocol(pkt->next->data));
-            gnrc_pktbuf_remove_snip(pkt, pkt->next);
-            gnrc_pktsnip_t *rp = gnrc_pktbuf_add(pkt, &protocol, 2, GNRC_NETTYPE_UNDEF);
-            send_protocol_reject(dev, ((lcp_t *) dev->protocol[PROT_LCP])->pr_id++, rp);
-            return -EBADMSG;
-        }
-
-        if (!_prot_is_allowed(dev->protocol, hdlc_hdr_get_protocol(hdlc_hdr))) {
-            DEBUG("gnrc_ppp: Received a ppp packet that's not allowed in current ppp state. Discard packet\n");
-            gnrc_pktbuf_release(pkt);
-            return -1;
-        }
-
-        if (_pkt_is_ppp(pkt) && !_ppp_pkt_is_valid(pkt)) {
-            gnrc_pktbuf_release(pkt);
-            DEBUG("gnrc_ppp: Invalid ppp packet. Discard.\n");
-        }
-
-    }
-
-
     ppp_protocol_t *target_prot;
     switch (target) {
         case PROT_LCP:
-            target_prot = (ppp_protocol_t *) dev->protocol[PROT_LCP];
+            target_prot = (ppp_protocol_t *) &pppdev->lcp;
             break;
         case PROT_IPCP:
         case BROADCAST_NCP:
-            target_prot = (ppp_protocol_t *) dev->protocol[PROT_IPCP];
+            target_prot = (ppp_protocol_t *) &pppdev->ipcp;
             break;
         case PROT_IPV4:
-            target_prot = (ppp_protocol_t *) dev->protocol[PROT_IPV4];
+            target_prot = (ppp_protocol_t *) &pppdev->ipv4;
             break;
         case PROT_DCP:
         case BROADCAST_LCP:
-            target_prot = (ppp_protocol_t *) dev->protocol[PROT_DCP];
+            target_prot = (ppp_protocol_t *) &pppdev->dcp;
             break;
         case PROT_AUTH:
-            target_prot = (ppp_protocol_t *) dev->protocol[PROT_AUTH];
+            target_prot = (ppp_protocol_t *) &pppdev->pap;
+            break;
+        default:
+            target_prot = NULL;
+    }
+    return target_prot;
+}
+
+gnrc_pktsnip_t *ppp_recv(gnrc_netdev2_t *gnrc_netdev)
+{
+    gnrc_pktsnip_t *pkt = NULL;
+    netdev2_t *netdev = (netdev2_t*) gnrc_netdev->dev;
+	netdev2_ppp_t *pppdev = (netdev2_ppp_t*) netdev;
+
+    ppp_target_t target;
+
+    pkt = retrieve_pkt(netdev);
+    gnrc_pktsnip_t *result = gnrc_pktbuf_mark(pkt, sizeof(hdlc_hdr_t), GNRC_NETTYPE_HDLC);
+    if (!result) {
+        DEBUG("gnrc_ppp: no space left in packet buffer\n");
+        return NULL;
+    }
+
+    /*Drop packet if exceeds MRU*/
+    if (gnrc_pkt_len(pkt) > pppdev->lcp.mru) {
+        DEBUG("gnrc_ppp: Exceeded MRU of device. Dropping packet.\n");
+        goto safe_out;
+    }
+
+    hdlc_hdr_t *hdlc_hdr = (hdlc_hdr_t *) result->data;
+    target = _get_target_from_protocol(byteorder_ntohs(hdlc_hdr->protocol));
+
+    if (!target) {
+        /* Remove hdlc header */
+        network_uint16_t protocol = ((hdlc_hdr_t*) pkt->next->data)->protocol;
+        gnrc_pktbuf_remove_snip(pkt, pkt->next);
+        gnrc_pktsnip_t *rp = gnrc_pktbuf_add(pkt, &protocol, 2, GNRC_NETTYPE_UNDEF);
+        send_protocol_reject(gnrc_netdev, pppdev->lcp.pr_id++, rp);
+        return NULL;
+    }
+
+    if (!_prot_is_allowed(gnrc_netdev, byteorder_ntohs(hdlc_hdr->protocol))) {
+        DEBUG("gnrc_ppp: Received a ppp packet that's not allowed in current ppp state. Discard packet\n");
+        goto safe_out;
+    }
+
+    if (_pkt_is_ppp(pkt) && !_ppp_pkt_is_valid(pkt)) {
+        DEBUG("gnrc_ppp: Invalid ppp packet. Discard.\n");
+        goto safe_out;
+    }
+
+    gnrc_pktsnip_t *ret_pkt = NULL;
+    switch(target)
+    {
+        case PROT_LCP:
+            fsm_handle_ppp_msg((ppp_protocol_t*) &pppdev->lcp, PPP_RECV, pkt);
+            break;
+        case PROT_IPCP:
+            fsm_handle_ppp_msg((ppp_protocol_t*) &pppdev->ipcp, PPP_RECV, pkt);
+            break;
+        case PROT_IPV4:
+            ret_pkt = ppp_ipv4_recv(gnrc_netdev, pkt);
+            break;
+        case PROT_AUTH:
+            pap_recv((ppp_protocol_t*) &pppdev->pap, pkt);
             break;
         default:
             DEBUG("Unrecognized target\n");
-            return -1;
-            break;
-    }
-
-    return target_prot->handler(target_prot, event, pkt);
-}
-
-
-int gnrc_ppp_get_opt(gnrc_pppdev_t *dev, netopt_t opt, void *value, size_t value_len)
-{
-    int res;
-
-    switch (opt) {
-        case NETOPT_PPP_LCP_STATE:
-            *((uint8_t *) value) = dev->protocol[PROT_LCP]->state;
-            res = 0;
-            break;
-        case NETOPT_PPP_AUTH_STATE:
-            *((uint8_t *) value) = dev->protocol[PROT_AUTH]->state;
-            res = 0;
-            break;
-        case NETOPT_PPP_IPCP_STATE:
-            *((uint8_t *) value) = dev->protocol[PROT_IPCP]->state;
-            res = 0;
-            break;
-        case NETOPT_PPP_IS_IPV6_READY:
-            res = dev->protocol[PROT_IPV4]->state == PROTOCOL_UP;
-            *((uint8_t *) value) = res;
-            break;
-        case NETOPT_IS_PPP_IF:
-            res = 1;
-            break;
-        default:
-            res = dev->netdev->driver->get(dev->netdev, opt, value, value_len);
-            break;
-    }
-    return res;
-}
-
-int gnrc_ppp_set_opt(gnrc_pppdev_t *dev, netopt_t opt, void *value, size_t value_len)
-{
-    int res;
-
-    switch (opt) {
-        case NETOPT_TUNNEL_IPV4_ADDRESS:
-            ((ppp_ipv4_t *) dev->protocol[PROT_IPV4])->tunnel_addr = *((ipv4_addr_t *) value);
-            res = 0;
-            break;
-        case NETOPT_TUNNEL_UDP_PORT:
-            ((ppp_ipv4_t *) dev->protocol[PROT_IPV4])->tunnel_port = *((uint16_t *) value);
-            res = 0;
-            break;
-        case NETOPT_APN_USER:
-            memcpy(((pap_t *) dev->protocol[PROT_AUTH])->username, value, value_len);
-            ((pap_t *) dev->protocol[PROT_AUTH])->user_size = value_len;
-            res = 0;
-            break;
-        case NETOPT_APN_PASS:
-            memcpy(((pap_t *) dev->protocol[PROT_AUTH])->password, value, value_len);
-            ((pap_t *) dev->protocol[PROT_AUTH])->pass_size = value_len;
-            res = 0;
-            break;
-        default:
-            res = dev->netdev->driver->set(dev->netdev, opt, value, value_len);
-            break;
-    }
-    return res;
-}
-
-
-void *_gnrc_ppp_thread(void *args)
-{
-    DEBUG("gnrc_ppp_trhead started\n");
-    gnrc_pppdev_t *pppdev = (gnrc_pppdev_t *) args;
-    gnrc_netif_add(thread_getpid());
-    pppdev_t *d = pppdev->netdev;
-    d->driver->init(d);
-
-    msg_t msg_queue[GNRC_PPP_MSG_QUEUE];;
-    msg_init_queue(msg_queue, GNRC_PPP_MSG_QUEUE);
-    msg_t msg, reply;
-    int event, res;
-    gnrc_netapi_opt_t *opt;
-    while (1) {
-        DEBUG("gnrc_ppp: waiting for msg\n");
-        msg_receive(&msg);
-        event = msg.content.value;
-        switch (msg.type) {
-            case GNRC_PPPDEV_MSG_TYPE_EVENT:
-                dispatch_ppp_msg(pppdev, event);
-                break;
-            case PPPDEV_MSG_TYPE_EVENT:
-                d->driver->driver_ev((pppdev_t *) d, event);
-                break;
-            case GNRC_NETAPI_MSG_TYPE_SET:
-                opt = (gnrc_netapi_opt_t *) msg.content.ptr;
-                res = gnrc_ppp_set_opt(pppdev, opt->opt, opt->data, opt->data_len);
-                reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
-                reply.content.value = (uint32_t) res;
-                msg_reply(&msg, &reply);
-                break;
-            case GNRC_NETAPI_MSG_TYPE_GET:
-                opt = (gnrc_netapi_opt_t *) msg.content.ptr;
-                res = gnrc_ppp_get_opt(pppdev, opt->opt, opt->data, opt->data_len);
-                reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
-                reply.content.value = (uint32_t) res;
-                msg_reply(&msg, &reply);
-                break;
-            case GNRC_NETAPI_MSG_TYPE_SND:
-                ppp_ipv4_send(pppdev, (gnrc_pktsnip_t *) msg.content.ptr);
-                break;
-            default:
-                DEBUG("Received an unknown thread msg: %i\n", msg.type);
         }
+
+    return ret_pkt;
+safe_out:
+    gnrc_pktbuf_release(pkt);
+    return NULL;
+}
+int dispatch_ppp_msg(gnrc_netdev2_t *dev, ppp_msg_t ppp_msg)
+{
+    ppp_target_t target = ppp_msg_get_target(ppp_msg);
+    ppp_event_t event = ppp_msg_get_event(ppp_msg);
+    netdev2_t *netdev = (netdev2_t*) dev->dev;
+	netdev2_ppp_t *pppdev = (netdev2_ppp_t*) netdev;
+
+    ppp_protocol_t *target_prot;
+
+    if (event == PPP_RECV) {
+        assert(false);
+        return 0;
     }
+    else
+    {
+        target_prot = _get_prot_by_target(pppdev, target);
+
+        if(!target_prot)
+        {
+            DEBUG("Unrecognized target\n");
+            return -1;
+        }
+
+        return target_prot->handler(target_prot, event, NULL);
+    }
+
+
 }
 
 void gnrc_ppp_trigger_event(msg_t *msg, kernel_pid_t pid, uint8_t target, uint8_t event)
 {
-    msg->type = GNRC_PPPDEV_MSG_TYPE_EVENT;
+    msg->type = GNRC_PPP_MSG_TYPE_EVENT;
     msg->content.value = (target << 8) | (event & 0xffff);
     msg_send(msg, pid);
 }
 
-void gnrc_ppp_link_up(msg_t *msg, kernel_pid_t pid)
-{
-    gnrc_ppp_trigger_event(msg, pid, 0xFF, PPP_LINKUP);
-}
-
-void gnrc_ppp_link_down(msg_t *msg, kernel_pid_t pid)
-{
-    gnrc_ppp_trigger_event(msg, pid, 0xFF, PPP_LINKDOWN);
-}
-
-void gnrc_ppp_dispatch_pkt(msg_t *msg, kernel_pid_t pid)
-{
-    gnrc_ppp_trigger_event(msg, pid, 0xFF, PPP_RECV);
-}
-
-void gnrc_ppp_dial_up(msg_t *msg, kernel_pid_t pid)
-{
-    gnrc_ppp_trigger_event(msg, pid, PROT_DCP, PPP_DIALUP);
-}
-
-void gnrc_ppp_disconnect(msg_t *msg, kernel_pid_t pid)
-{
-    gnrc_ppp_trigger_event(msg, pid, PROT_DCP, PPP_LINKDOWN);
-}
-
-kernel_pid_t gnrc_pppdev_init(char *stack, int stacksize, char priority,
-                              const char *name, gnrc_pppdev_t *gnrc_pppdev)
-{
-    kernel_pid_t res;
-
-    /* check if given netdev device is defined and the driver is set */
-    if (gnrc_pppdev == NULL || gnrc_pppdev->netdev == NULL) {
-        return -ENODEV;
-    }
-
-    /* create new gnrc_pppdev thread */
-    res = thread_create(stack, stacksize, priority, THREAD_CREATE_STACKTEST,
-                        _gnrc_ppp_thread, (void *)gnrc_pppdev, name);
-    if (res <= 0) {
-        return -EINVAL;
-    }
-
-    return res;
-}
-void ppp_protocol_init(ppp_protocol_t *protocol, struct gnrc_pppdev_t *pppdev, int (*handler)(struct ppp_protocol_t *, uint8_t, void *), uint8_t id)
+void ppp_protocol_init(ppp_protocol_t *protocol, gnrc_netdev2_t *pppdev, int (*handler)(struct ppp_protocol_t *, uint8_t, void *), uint8_t id)
 {
     protocol->handler = handler;
     protocol->id = id;

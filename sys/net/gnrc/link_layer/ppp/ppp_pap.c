@@ -26,7 +26,6 @@
 #define DEFAULT_APN_USER_SIZE (0)   /**< default APN user size (no user) */
 #define DEFAULT_APN_PASS_SIZE (0)   /**< default APN password size (no password) */
 
-static pap_t static_pap;
 gnrc_pktsnip_t *_pap_payload(pap_t *pap)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, 2 + pap->user_size + pap->pass_size, GNRC_NETTYPE_UNDEF);
@@ -39,16 +38,32 @@ gnrc_pktsnip_t *_pap_payload(pap_t *pap)
     return pkt;
 }
 
+void pap_recv(struct ppp_protocol_t *protocol, gnrc_pktsnip_t *pkt)
+{
+    msg_t *msg = &protocol->msg;
+    pap_t *pap = (pap_t *) protocol;
+    ppp_hdr_t *hdr = (ppp_hdr_t *) pkt->data;
+    xtimer_t *xtimer = &pap->xtimer;
+    xtimer_remove(xtimer);
+    if (hdr->code != PPP_CONF_ACK) {
+        DEBUG("gnrc_ppp: pap: Wrong APN auth. Closing link.\n");
+        send_ppp_event(msg, ppp_msg_set(PROT_LCP, PPP_LINKDOWN));
+    }
+    else {
+        protocol->state = PROTOCOL_UP;
+        send_ppp_event(msg, ppp_msg_set(BROADCAST_NCP, PPP_LINKUP));
+    }
+}
 int pap_handler(struct ppp_protocol_t *protocol, uint8_t ppp_event, void *args)
 {
     pap_t *pap = (pap_t *) protocol;
     msg_t *msg = &protocol->msg;
     gnrc_pktsnip_t *pkt;
-    gnrc_pktsnip_t *recv_pkt = (gnrc_pktsnip_t *) args;
-    ppp_hdr_t *hdr = (ppp_hdr_t *) recv_pkt->data;
     xtimer_t *xtimer = &pap->xtimer;
     msg_t *timer_msg = &pap->timer_msg;
-    lcp_t *lcp = (lcp_t *) protocol->pppdev->protocol[PROT_LCP];
+    gnrc_netdev2_t *gnrc_pppdev = protocol->pppdev;
+    netdev2_ppp_t *pppdev = (netdev2_ppp_t*) gnrc_pppdev->dev;
+    lcp_t *lcp = (lcp_t *) &pppdev->lcp;
     uint8_t local_auth = lcp->local_auth;
 
     switch (ppp_event) {
@@ -68,17 +83,6 @@ int pap_handler(struct ppp_protocol_t *protocol, uint8_t ppp_event, void *args)
             protocol->state = PROTOCOL_DOWN;
             send_ppp_event(msg, ppp_msg_set(BROADCAST_NCP, PPP_LINKDOWN));
             break;
-        case PPP_RECV:
-            xtimer_remove(xtimer);
-            if (ppp_hdr_get_code(hdr) != PPP_CONF_ACK) {
-                DEBUG("gnrc_ppp: pap: Wrong APN auth. Closing link.\n");
-                send_ppp_event(msg, ppp_msg_set(PROT_LCP, PPP_LINKDOWN));
-            }
-            else {
-                protocol->state = PROTOCOL_UP;
-                send_ppp_event(msg, ppp_msg_set(BROADCAST_NCP, PPP_LINKUP));
-            }
-            break;
         case PPP_TIMEOUT:
             pkt = _pap_payload(pap);
             send_pap_request(protocol->pppdev, ++pap->id, pkt);
@@ -90,18 +94,14 @@ int pap_handler(struct ppp_protocol_t *protocol, uint8_t ppp_event, void *args)
     return 0;
 }
 
-int pap_init(struct gnrc_pppdev_t *ppp_dev, ppp_protocol_t *protocol)
+int pap_init(gnrc_netdev2_t *ppp_dev)
 {
-    pap_t *pap = (pap_t *) protocol;
+    netdev2_ppp_t *pppdev = (netdev2_ppp_t*) ppp_dev->dev;
+    pap_t *pap = (pap_t *) &pppdev->pap;
 
     pap->user_size = DEFAULT_APN_USER_SIZE;
     pap->pass_size = DEFAULT_APN_PASS_SIZE;
-    ppp_protocol_init((ppp_protocol_t *) pap, ppp_dev, pap_handler, PROT_AUTH);
+    ppp_protocol_init((ppp_protocol_t*) pap, ppp_dev, pap_handler, PROT_AUTH);
     pap->counter = DEFAULT_PAP_COUNTER;
     return 0;
-}
-
-ppp_protocol_t *pap_get_static_pointer(void)
-{
-    return (ppp_protocol_t *) &static_pap;
 }

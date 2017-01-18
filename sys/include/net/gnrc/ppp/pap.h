@@ -51,8 +51,9 @@ typedef struct pap_t {
  *
  * @return 0
  */
-int pap_init(struct gnrc_pppdev_t *ppp_dev, ppp_protocol_t *pap);
+int pap_init(gnrc_netdev2_t *ppp_dev);
 ppp_protocol_t *pap_get_static_pointer(void);
+void pap_recv(struct ppp_protocol_t *protocol, gnrc_pktsnip_t *pkt);
 
 #ifdef __cplusplus
 }

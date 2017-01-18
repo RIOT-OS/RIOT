@@ -291,12 +291,14 @@ typedef enum {
      * option is the same as the pointer.
      */
     NETOPT_PPP_IS_IPV6_READY,
+
     /**
-     * @brief check if an interface type is PPP.
+     * @brief triggers a device driver dial up or hang up.
      *
-     * Returns 1 if the interface type is PPP.
+     * Triggers dial up if enabled. Hang up if not. 
      */
-    NETOPT_IS_PPP_IF,
+    NETOPT_DIAL_UP,
+
     /**
      * @brief en/disable encryption.
      */

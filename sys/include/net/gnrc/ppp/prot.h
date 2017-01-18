@@ -19,6 +19,7 @@
 #ifndef PPP_PROTOCOL_H
 #define PPP_PROTOCOL_H
 
+#include "net/gnrc/netdev2.h"
 #include "net/gnrc.h"
 #include "xtimer.h"
 #include <inttypes.h>
@@ -73,7 +74,7 @@ typedef struct ppp_protocol_t {
     int (*handler)(struct ppp_protocol_t *protocol, uint8_t ppp_event, void *args);
     uint8_t id;                     /**< unique id of this protocol */
     msg_t msg;                      /**< msg structure for sending messages between protocols */
-    struct gnrc_pppdev_t *pppdev;   /**< pointer to GNRC pppdev interface */
+    gnrc_netdev2_t *pppdev;   /**< pointer to GNRC pppdev interface */
     ppp_protocol_state_t state;     /**< state of current protocol */
     ppp_target_t upper_layer;       /**< target of the upper layer of this protocol */
     ppp_target_t lower_layer;       /**< target of the lower layer of this protocol */
@@ -142,7 +143,7 @@ void send_ppp_event_xtimer(msg_t *msg, xtimer_t *xtimer, ppp_msg_t ppp_msg, int 
  * @param handler pointer to handler callback
  * @param id unique id of this protocol
  */
-void ppp_protocol_init(ppp_protocol_t *protocol, struct gnrc_pppdev_t *pppdev, int (*handler)(struct ppp_protocol_t *, uint8_t, void *), uint8_t id);
+void ppp_protocol_init(ppp_protocol_t *protocol, gnrc_netdev2_t *pppdev, int (*handler)(struct ppp_protocol_t *, uint8_t, void *), uint8_t id);
 
 
 #ifdef __cplusplus

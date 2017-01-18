@@ -63,7 +63,6 @@ typedef struct lcp_t {
     uint8_t monitor_id;                 /**< last monitor packet id*/
 } lcp_t;
 
-struct gnrc_pppdev_t;
 struct ppp_fsm_t;
 
 /**
@@ -74,7 +73,7 @@ struct ppp_fsm_t;
  *
  * @return 0
  */
-int lcp_init(struct gnrc_pppdev_t *ppp_dev, struct ppp_protocol_t *lcp);
+int lcp_init(gnrc_netdev2_t *ppp_dev);
 ppp_protocol_t *lcp_get_static_pointer(void);
 
 #ifdef __cplusplus

@@ -234,7 +234,7 @@ typedef struct fsm_conf_t {
  *
  * @return 0 for now.
  */
-int fsm_init(struct gnrc_pppdev_t *ppp_dev, ppp_fsm_t *cp);
+int fsm_init(gnrc_netdev2_t *ppp_dev, ppp_fsm_t *cp);
 /**
  * @brief triggers an event in the FSM
  *

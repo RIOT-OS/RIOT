@@ -39,7 +39,6 @@
 #define OPT_SIZE_AUTH_PAP (2)   /**< size of PAP option */
 #define OPT_SIZE_ACCM (4)       /**< size of ACCM option */
 
-static lcp_t static_lcp;
 static fsm_conf_t *lcp_get_conf_by_code(ppp_fsm_t *cp, uint8_t code)
 {
     switch (code) {
@@ -109,15 +108,16 @@ uint8_t lcp_accm_build_nak_opts(uint8_t *buf)
 
 void lcp_accm_set(ppp_fsm_t *lcp, ppp_option_t *opt, uint8_t peer)
 {
-    gnrc_pppdev_t *dev = ((ppp_protocol_t *) lcp)->pppdev;
+    gnrc_netdev2_t *dev = ((ppp_protocol_t *) lcp)->pppdev;
+    netdev2_t *netdev = (netdev2_t*) dev->dev;
     uint8_t *payload;
 
     ppp_opt_get_payload(opt, (void **) &payload);
     if (peer) {
-        dev->netdev->driver->set(dev->netdev, NETOPT_PPP_ACCM_RX, (void *) payload, sizeof(uint32_t));
+        netdev->driver->set(netdev, NETOPT_PPP_ACCM_RX, (void *) payload, sizeof(uint32_t));
     }
     else {
-        dev->netdev->driver->set(dev->netdev, NETOPT_PPP_ACCM_TX, (void *) payload, sizeof(uint32_t));
+        netdev->driver->set(netdev, NETOPT_PPP_ACCM_TX, (void *) payload, sizeof(uint32_t));
     }
 }
 
@@ -215,11 +215,12 @@ int lcp_handler(struct ppp_protocol_t *protocol, uint8_t ppp_event, void *args)
     }
 }
 
-int lcp_init(gnrc_pppdev_t *ppp_dev, ppp_protocol_t *protocol)
+int lcp_init(gnrc_netdev2_t *ppp_dev)
 {
-    ppp_fsm_t *lcp = (ppp_fsm_t *) protocol;
+    netdev2_ppp_t *pppdev = (netdev2_ppp_t*) ppp_dev->dev;
+    ppp_fsm_t *lcp = (ppp_fsm_t *) &pppdev->lcp;
 
-    ppp_protocol_init((ppp_protocol_t *) lcp, ppp_dev, lcp_handler, PROT_LCP);
+    ppp_protocol_init((ppp_protocol_t*) lcp, ppp_dev, lcp_handler, PROT_LCP);
     fsm_init(ppp_dev, lcp);
     lcp_config_init(lcp);
 
@@ -236,9 +237,4 @@ int lcp_init(gnrc_pppdev_t *ppp_dev, ppp_protocol_t *protocol)
     ((lcp_t *) lcp)->local_auth = 0;
     ((lcp_t *) lcp)->monitor_id = 0;
     return 0;
-}
-
-ppp_protocol_t *lcp_get_static_pointer(void)
-{
-    return (ppp_protocol_t *) &static_lcp;
 }

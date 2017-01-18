@@ -81,6 +81,14 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
                 dev->stats.tx_success++;
                 break;
 #endif
+#ifdef MODULE_GNRC_PPP
+            case NETDEV2_EVENT_LINK_UP:
+                gnrc_netdev2->link_up(gnrc_netdev2);
+                break;
+            case NETDEV2_EVENT_LINK_DOWN:
+                gnrc_netdev2->link_down(gnrc_netdev2);
+                break;
+#endif
             default:
                 DEBUG("gnrc_netdev2: warning: unhandled event %u.\n", event);
         }
@@ -172,7 +180,10 @@ static void *_gnrc_netdev2_thread(void *args)
                 msg_reply(&msg, &reply);
                 break;
             default:
-                DEBUG("gnrc_netdev2: Unknown command %" PRIu16 "\n", msg.type);
+                if(gnrc_netdev2->msg_handler)
+                    gnrc_netdev2->msg_handler(gnrc_netdev2, &msg);
+                else
+                    DEBUG("gnrc_netdev2: Unknown command %" PRIu16 "\n", msg.type);
                 break;
         }
     }

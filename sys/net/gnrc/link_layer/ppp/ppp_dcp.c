@@ -23,15 +23,15 @@
 
 #define MONITOR_TIMEOUT (5000000) /**< timeout of PPP monitor */
 
-static dcp_t static_dcp;
 int dcp_handler(struct ppp_protocol_t *protocol, uint8_t ppp_event, void *args)
 {
     msg_t *msg = &protocol->msg;
     msg_t *timer_msg = &((dcp_t *) protocol)->timer_msg;
     xtimer_t *xtimer = &((dcp_t *) protocol)->xtimer;
     dcp_t *dcp = (dcp_t *) protocol;
-    pppdev_t *pppdev = protocol->pppdev->netdev;
+    netdev2_t *pppdev = (netdev2_t*) protocol->pppdev->dev;
 
+    netopt_enable_t en;
     switch (ppp_event) {
         case PPP_UL_STARTED:
             break;
@@ -40,7 +40,8 @@ int dcp_handler(struct ppp_protocol_t *protocol, uint8_t ppp_event, void *args)
             /*Remove timer*/
             xtimer_remove(xtimer);
             dcp->dead_counter = DCP_DEAD_COUNTER;
-            pppdev->driver->link_down(pppdev);
+            en = NETOPT_DISABLE;
+            pppdev->driver->set(pppdev, NETOPT_DIAL_UP, &en, sizeof(netopt_enable_t));
             break;
 
         case PPP_LINKUP:
@@ -51,11 +52,6 @@ int dcp_handler(struct ppp_protocol_t *protocol, uint8_t ppp_event, void *args)
             /*Start monitor*/
             send_ppp_event_xtimer(timer_msg, xtimer, ppp_msg_set(PROT_DCP, PPP_MONITOR), MONITOR_TIMEOUT);
 #endif
-            break;
-
-        case PPP_LINKDOWN:
-            protocol->state = PROTOCOL_DOWN;
-            send_ppp_event(msg, ppp_msg_set(PROT_LCP, PPP_LINKDOWN));
             break;
 
         case PPP_MONITOR:
@@ -76,23 +72,16 @@ int dcp_handler(struct ppp_protocol_t *protocol, uint8_t ppp_event, void *args)
             dcp->dead_counter = DCP_DEAD_COUNTER;
             break;
 
-        case PPP_DIALUP:
-            pppdev->driver->dial_up(pppdev);
-            break;
         default:
             DEBUG("gnrc_ppp: dcp: Receive unknown message\n");
             break;
     }
     return 0;
 }
-int dcp_init(gnrc_pppdev_t *ppp_dev, ppp_protocol_t *dcp)
+int dcp_init(gnrc_netdev2_t *ppp_dev)
 {
-    ppp_protocol_init(dcp, ppp_dev, dcp_handler, PROT_DCP);
-    ((dcp_t *) dcp)->dead_counter = DCP_DEAD_COUNTER;
+    netdev2_ppp_t *pppdev = (netdev2_ppp_t*) ppp_dev->dev;
+    ppp_protocol_init((ppp_protocol_t*) &pppdev->dcp, ppp_dev, dcp_handler, PROT_DCP);
+    pppdev->dcp.dead_counter = DCP_DEAD_COUNTER;
     return 0;
-}
-
-ppp_protocol_t *dcp_get_static_pointer(void)
-{
-    return (ppp_protocol_t *) &static_dcp;
 }

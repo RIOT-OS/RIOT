@@ -23,11 +23,14 @@
 #include <inttypes.h>
 
 #include "net/gnrc.h"
+#include "net/gnrc/netdev2.h"
 #include "net/ppp/hdr.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/pktbuf.h"
 #include "xtimer.h"
 #include "thread.h"
+#include "net/netdev2.h"
+#include "net/netdev2/ppp.h"
 #include "net/gnrc/ppp/opt.h"
 #include "net/gnrc/ppp/prot.h"
 #include "net/gnrc/ppp/lcp.h"
@@ -68,8 +71,7 @@ extern "C" {
 
 #define GNRC_PPP_MSG_QUEUE_SIZE (20)
 
-#define PPPDEV_MSG_TYPE_EVENT (100)         /**< Messages for PPP device drive */
-#define GNRC_PPPDEV_MSG_TYPE_EVENT (101)    /**< Messages for GNRC PPP layer */
+#define GNRC_PPP_MSG_TYPE_EVENT (101)    /**< Messages for GNRC PPP layer */
 
 #define DCP_MONITOR_INIT_DELAY (15000000)   /**< Time that the monitor should wait after the LCP initiation before monitoring */
 #define DCP_MONITOR_TIMEOUT (10000000)      /**< time between LCP Echo request monitoriin */
@@ -88,77 +90,18 @@ typedef enum {
     PPP_UL_FINISHED,    /**< upper layer of a protocol finished */
     PPP_MONITOR,        /**< Message for the monitor */
     PPP_LINK_ALIVE,     /**< Message from LCP to DCP indicating the link is alive */
-    PPP_DIALUP          /**< Event for starting dialup process */
 } ppp_dev_event_t;
-
-/*Deprecated. Not used in gnrc_ppp*/
-typedef enum {
-    PPP_LINK_DEAD,
-    PPP_LINK_ESTABLISHED,
-    PPP_AUTHENTICATION,
-    PPP_NETWORK,
-    PPP_TERMINATION
-} ppp_state_t;
-
-typedef struct pppdev_t pppdev_t;
-
-/**
- * @brief data type for handling driver representation of ppp device
- */
-typedef struct pppdev_driver_t {
-    int (*send)(pppdev_t *dev, const struct iovec *vector, int count);
-    int (*recv)(pppdev_t *dev, char *buf, int len, void *info);
-    void (*driver_ev)(pppdev_t *dev, uint8_t event);
-    int (*init)(pppdev_t *dev);
-    int (*set)(pppdev_t *dev, netopt_t opt, void *value, size_t value_len);
-    int (*get)(pppdev_t *dev, netopt_t opt, void *value, size_t max_len);
-    int (*dial_up)(pppdev_t *dev);
-    int (*link_down)(pppdev_t *dev);
-} pppdev_driver_t;
-
-
-/**
- * @brief base class of a ppp device
- */
-typedef struct pppdev_t {
-    const pppdev_driver_t *driver; /**< pointer to driver representation */
-} pppdev_t;
-
-
-/**
- * @brief class of custom driver control protocol
- * @extends ppp_protocol_t
- *
- * @details the DCP is in charge of monitoring the link and exchanging messages with the ppp device
- */
-typedef struct dcp_t {
-    ppp_protocol_t prot;    /**< base ppp_protocol_t object */
-    msg_t timer_msg;        /**< msg struct for handling timeouts messages */
-    xtimer_t xtimer;        /**< xtimer struct for sending timeout messages */
-    uint8_t dead_counter;   /**< when reaches zero, the link is assumed to be dead */
-} dcp_t;
-
-
-/**
- * @brief GNRC PPP main struct
- */
-typedef struct gnrc_pppdev_t {
-    ppp_protocol_t *protocol[NUM_OF_PROTS]; /**< array of PPP sub protocols */
-    pppdev_t *netdev;                       /**< pointer to ppp device */
-    uint8_t state;                          /**< State of gnrc_ppp. Unused and will be removed */
-} gnrc_pppdev_t;
-
 
 
 /**
  * @brief setup function for GNRC PPP
  *
  * @param dev pointer to gnrc ppp interface
- * @param pppdev pointer to pppdev interface
+ * @param pppdev pointer to netdev2 interface
  *
  * @return 0 for the moment
  */
-int gnrc_ppp_setup(gnrc_pppdev_t *dev, pppdev_t *pppdev);
+int gnrc_ppp_setup(gnrc_netdev2_t *dev, netdev2_t *netdev);
 
 gnrc_pktsnip_t *pkt_build(gnrc_nettype_t pkt_type, uint8_t code, uint8_t id, gnrc_pktsnip_t *payload);
 
@@ -172,7 +115,7 @@ gnrc_pktsnip_t *pkt_build(gnrc_nettype_t pkt_type, uint8_t code, uint8_t id, gnr
  * @return -EBADMSG if the packet is not valid
  * @return 0 otherwise
  */
-int gnrc_ppp_send(gnrc_pppdev_t *dev, gnrc_pktsnip_t *pkt);
+int gnrc_ppp_send(gnrc_netdev2_t *dev, gnrc_pktsnip_t *pkt);
 
 
 /**
@@ -191,7 +134,7 @@ void *_gnrc_ppp_thread(void *args);
  *
  * @return 0
  */
-int dcp_init(gnrc_pppdev_t *ppp_dev, ppp_protocol_t *dcp);
+int dcp_init(gnrc_netdev2_t *ppp_dev);
 ppp_protocol_t *dcp_get_static_pointer(void);
 
 
@@ -240,19 +183,6 @@ void gnrc_ppp_disconnect(msg_t *msg, kernel_pid_t pid);
 
 
 /**
- * @brief set a net option for GNRC PPP or ppp device
- *
- * @param dev pointer to gnrc ppp interface
- * @param opt option to be set
- * @param value value of the option
- * @param value_len size of the option
- *
- * @return positive number with option result
- * @return negative number if there was an error
- */
-int gnrc_ppp_set_opt(gnrc_pppdev_t *dev, netopt_t opt, void *value, size_t value_len);
-
-/**
  * @brief init the GNRC PPP thread
  *
  * @param stack stack for GNRC PPP thread
@@ -264,7 +194,7 @@ int gnrc_ppp_set_opt(gnrc_pppdev_t *dev, netopt_t opt, void *value, size_t value
  * @return pid of GNRC PPP
  */
 kernel_pid_t gnrc_pppdev_init(char *stack, int stacksize, char priority,
-                              const char *name, gnrc_pppdev_t *gnrc_pppdev);
+                              const char *name, gnrc_netdev2_t *gnrc_pppdev);
 
 
 /**
@@ -275,7 +205,7 @@ kernel_pid_t gnrc_pppdev_init(char *stack, int stacksize, char priority,
  * @param id id of packet
  * @param payload payload of configure request packet
  */
-void send_configure_request(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *payload);
+void send_configure_request(gnrc_netdev2_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *payload);
 
 /**
  * @brief send a configure ack packet
@@ -285,7 +215,7 @@ void send_configure_request(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t
  * @param id id of packet
  * @param opts ACK'd options
  */
-void send_configure_ack(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *opts);
+void send_configure_ack(gnrc_netdev2_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *opts);
 
 /**
  * @brief send a configure nak packet
@@ -295,7 +225,7 @@ void send_configure_ack(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id,
  * @param id id of packet
  * @param opts NAK'd options
  */
-void send_configure_nak(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *opts);
+void send_configure_nak(gnrc_netdev2_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *opts);
 
 /**
  * @brief send configure reject
@@ -305,7 +235,7 @@ void send_configure_nak(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id,
  * @param id id of packet
  * @param opts rejected options
  */
-void send_configure_rej(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *opts);
+void send_configure_rej(gnrc_netdev2_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *opts);
 
 /**
  * @brief
@@ -314,7 +244,7 @@ void send_configure_rej(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id,
  * @param protocol nettype of packet
  * @param id id of packet
  */
-void send_terminate_req(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id);
+void send_terminate_req(gnrc_netdev2_t *dev, gnrc_nettype_t protocol, uint8_t id);
 
 /**
  * @brief send terminate ack
@@ -324,7 +254,7 @@ void send_terminate_req(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id)
  * @param id id of packet
  * @param response response of terminate request
  */
-void send_terminate_ack(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *response);
+void send_terminate_ack(gnrc_netdev2_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *response);
 
 /**
  * @brief send code reject packet
@@ -334,7 +264,7 @@ void send_terminate_ack(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id,
  * @param id id of packet
  * @param rejected rejected packet including ppp header
  */
-void send_code_rej(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *rejected);
+void send_code_rej(gnrc_netdev2_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *rejected);
 
 /**
  * @brief send echo reply
@@ -344,7 +274,7 @@ void send_code_rej(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc
  * @param id id of packet
  * @param data data of the echo reply
  */
-void send_echo_reply(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *data);
+void send_echo_reply(gnrc_netdev2_t *dev, gnrc_nettype_t protocol, uint8_t id, gnrc_pktsnip_t *data);
 
 /**
  * @brief send protocol reject packet
@@ -354,7 +284,7 @@ void send_echo_reply(gnrc_pppdev_t *dev, gnrc_nettype_t protocol, uint8_t id, gn
  * @param id id of packet
  * @param pkt rejected packet
  */
-void send_protocol_reject(gnrc_pppdev_t *dev, uint8_t id, gnrc_pktsnip_t *pkt);
+void send_protocol_reject(gnrc_netdev2_t *dev, uint8_t id, gnrc_pktsnip_t *pkt);
 
 /**
  * @brief send PAP auth request
@@ -364,7 +294,23 @@ void send_protocol_reject(gnrc_pppdev_t *dev, uint8_t id, gnrc_pktsnip_t *pkt);
  * @param id id of packet
  * @param credentials credentials of the PAP request
  */
-void send_pap_request(gnrc_pppdev_t *dev, uint8_t id, gnrc_pktsnip_t *credentials);
+void send_pap_request(gnrc_netdev2_t *dev, uint8_t id, gnrc_pktsnip_t *credentials);
+
+/**
+ * @brief Handle reception of PPP packet
+ *
+ * @param gnrc_netdev pointer to gnrc ppp interface
+ */
+gnrc_pktsnip_t *ppp_recv(gnrc_netdev2_t *gnrc_netdev);
+
+/**
+ * @brief Dispatch ppp message (target and event)
+ *
+ * @param gnrc_netdev pointer to gnrc ppp interface
+ * @param ppp_msg PPP message being sent (encodes target and event)
+ */
+int dispatch_ppp_msg(gnrc_netdev2_t *dev, ppp_msg_t ppp_msg);
+
 #ifdef __cplusplus
 }
 #endif

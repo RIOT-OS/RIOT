@@ -62,7 +62,6 @@ typedef struct ppp_ipv4_t {
     uint16_t tunnel_port;       /**< UDP port of tunnel */
 } ppp_ipv4_t;
 
-struct gnrc_pppdev_t;
 struct ppp_fsm_t;
 
 /**
@@ -73,7 +72,7 @@ struct ppp_fsm_t;
  *
  * @return 0
  */
-int ipcp_init(struct gnrc_pppdev_t *ppp_dev, ppp_protocol_t *ipcp);
+int ipcp_init(gnrc_netdev2_t *ppp_dev);
 
 
 /**
@@ -85,7 +84,7 @@ int ipcp_init(struct gnrc_pppdev_t *ppp_dev, ppp_protocol_t *ipcp);
  *
  * @return 0
  */
-int ppp_ipv4_init(struct gnrc_pppdev_t *ppp_dev, ppp_protocol_t *ipv4, ipcp_t *ipcp);
+int ppp_ipv4_init(gnrc_netdev2_t *ppp_dev);
 
 /**
  * @brief send an encapsulated pkt
@@ -96,7 +95,7 @@ int ppp_ipv4_init(struct gnrc_pppdev_t *ppp_dev, ppp_protocol_t *ipv4, ipcp_t *i
  * @return negative value if there was an error
  * @return 0 otherwise
  */
-int ppp_ipv4_send(struct gnrc_pppdev_t *ppp_dev, gnrc_pktsnip_t *pkt);
+int ppp_ipv4_send(gnrc_netdev2_t *ppp_dev, gnrc_pktsnip_t *pkt);
 
 
 /**
@@ -107,7 +106,7 @@ int ppp_ipv4_send(struct gnrc_pppdev_t *ppp_dev, gnrc_pktsnip_t *pkt);
  *
  * @return
  */
-int ppp_ipv4_recv(struct gnrc_pppdev_t *ppp_dev, gnrc_pktsnip_t *pkt);
+gnrc_pktsnip_t *ppp_ipv4_recv(gnrc_netdev2_t *ppp_dev, gnrc_pktsnip_t *pkt);
 
 
 /**
