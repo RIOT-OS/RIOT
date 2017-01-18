@@ -83,9 +83,11 @@ static const pwm_conf_t pwm_config[] = {
     {
         .dev      = TIM11,
         .rcc_mask = RCC_APB2ENR_TIM11EN,
-        .pins     = { GPIO_PIN(PORT_B, 9), GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF },
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 9), .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF, .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF, .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF, .cc_chan = 0 } },
         .af       = GPIO_AF3,
-        .chan     = 1,
         .bus      = APB2
     }
 };
