@@ -39,8 +39,6 @@
 #include "dtls.h"
 #include "global.h"
 
-
-
 /* TODO: Remove the UNUSED_PARAM from TinyDTLS' stack? */
 #ifdef __GNUC__
 #define UNUSED_PARAM __attribute__((unused))
@@ -69,7 +67,7 @@
 static dtls_context_t *dtls_context = NULL;
 static char *client_payload;
 static size_t buflen = 0;
-
+static int dtls_connected = 0; /* This one is handled by the Tinydtls' callbacks */
 
 #ifdef DTLS_ECC
 static const unsigned char ecdsa_priv_key[] = {
@@ -93,6 +91,38 @@ static const unsigned char ecdsa_pub_key_y[] = {
     0x4F, 0xAB, 0xC3, 0x6F, 0xC7, 0x72, 0xF8, 0x29
 };
 #endif
+
+
+/**
+ * @brief TinyDTLS callback for detecting the state of the DTLS channel.
+ *
+ * Ecxlsuive of the TinyDTLS Client (For now).
+ *
+ * @note Once renegotiation is included this is also affected.
+ */
+static int client_events(struct dtls_context_t *ctx, session_t *session,
+                     dtls_alert_level_t level, unsigned short code) {
+
+  (void) ctx;
+  (void) session;
+  (void) level;
+
+  /* dtls_connect has concluded in a DTLS session established? */
+  if (code == DTLS_EVENT_CONNECTED) {
+    dtls_connected = 1;
+    DEBUG("\nCLIENT: DTLS Channel established!\n");
+  }
+#if ENABLE_DEBUG == 1
+  else if (code == DTLS_EVENT_CONNECT){
+    DEBUG("\nCLIENT: DTLS Channel started\n");
+
+  }
+#endif
+  /*TODO: DTLS_EVENT_RENEGOTIATE */
+
+  return 0;
+}
+
 
 /**
  * @brief Handles the reception of the DTLS flights.
@@ -244,7 +274,6 @@ static int gnrc_sending(char *addr_str, char *data, size_t data_len )
 
     /*  allocate payload */
     payload = gnrc_pktbuf_add(NULL, data, data_len, GNRC_NETTYPE_UNDEF);
-
     if (payload == NULL) {
         puts("Error: unable to copy data to packet buffer");
         return -1;
@@ -273,7 +302,7 @@ static int gnrc_sending(char *addr_str, char *data, size_t data_len )
         return -1;
     }
 
-    return 1;
+  return 0;
 }
 
 /**
@@ -282,10 +311,12 @@ static int gnrc_sending(char *addr_str, char *data, size_t data_len )
 static int read_from_peer(struct dtls_context_t *ctx,
                session_t *session, uint8 *data, size_t len)
 {
-    /* Linux and Contiki version are exactly the same. */
-    (void) session;
-    (void) ctx;
-    size_t i;
+
+  (void) ctx;
+  (void) session;
+  (void) data;
+  (void) len;
+  size_t i;
 
 #if ENABLE_DEBUG == 1
     DEBUG("\nClient: DTLS Data received -- ");
@@ -293,10 +324,13 @@ static int read_from_peer(struct dtls_context_t *ctx,
         DEBUG("%c", data[i]);
     DEBUG(" --\n");
 #endif
+
+    /*
+     * NOTE: To answer the other peer use:
+     * return dtls_write(ctx, session, data, len);
+     */
+
     return 0;
-
-  /*  TODO: The connected variable could de modified here. */
-
 }
 
 /**
@@ -317,7 +351,7 @@ static void try_send(struct dtls_context_t *ctx, session_t *dst)
         memmove(client_payload, client_payload + res, buflen - res);
         buflen -= res;
     }
-    else {
+    else if (res < 0){
         dtls_crit("Client: dtls_write returned error!\n" );
     }
 }
@@ -330,6 +364,7 @@ static int send_to_peer(struct dtls_context_t *ctx,
 {
 
     (void) session;
+
     /*
      * For this testing with GNR we are to extract the peer's addresses and
      * making the connection from zero.
@@ -343,7 +378,7 @@ static int send_to_peer(struct dtls_context_t *ctx,
      */
     gnrc_sending(addr_str, (char *)buf, len);
 
-    return len;
+    return 0;
 }
 
 
@@ -359,7 +394,7 @@ static void init_dtls(session_t *dst, char *addr_str)
     static dtls_handler_t cb = {
         .write = send_to_peer,
         .read  = read_from_peer,
-        .event = NULL,
+        .event = client_events,
 #ifdef DTLS_PSK
         .get_psk_info = peer_get_psk_info,
 #endif  /* DTLS_PSK */
@@ -375,6 +410,8 @@ static void init_dtls(session_t *dst, char *addr_str)
 #ifdef DTLS_ECC
     DEBUG("Client support ECC");
 #endif
+
+    dtls_connected = 0;
 
     /*
      *  NOTE:
@@ -398,7 +435,7 @@ static void init_dtls(session_t *dst, char *addr_str)
     ipv6_addr_t addr_dbg;
     ipv6_addr_from_str(&addr_dbg, addr_str);
 
-    /*akin to syslog: EMERG, ALERT, CRITC, NOTICE, INFO, DEBUG */
+    /*akin to syslog: EMERG, ALERT, CRITC, NOTICE, INFO, DEBUG, WARN */
     dtls_set_log_level(DTLS_LOG_NOTICE);
 
     dtls_context = dtls_new_context(addr_str);
@@ -417,12 +454,12 @@ static void client_send(char *addr_str, char *data, unsigned int delay)
 {
     static int8_t iWatch;
     static session_t dst;
-    static int connected = 0;
+
     msg_t msg;
 
    gnrc_netreg_entry_t entry = GNRC_NETREG_ENTRY_INIT_PID(CLIENT_PORT,
                                                            sched_active_pid);
-    dtls_init();
+
 
     if (gnrc_netreg_register(GNRC_NETTYPE_UDP, &entry)) {
         puts("ERROR: Unable to register ports");
@@ -435,7 +472,8 @@ static void client_send(char *addr_str, char *data, unsigned int delay)
         return;
     }
 
-    init_dtls(&dst, addr_str);
+    dtls_init(); /*TinyDTLS mandatory settings*/
+    init_dtls(&dst, addr_str); /*RIOT GNRC settings for the TinyDTLS client */
     if (!dtls_context) {
         puts("ERROR: Client unable to load context!");
         return;
@@ -450,7 +488,10 @@ static void client_send(char *addr_str, char *data, unsigned int delay)
      * NOTE:  dtls_connect is the one who begin all the process.
      * But the first message it will not be sent until try_send() is called.
      */
-    connected = dtls_connect(dtls_context, &dst);
+    if (dtls_connect(dtls_context, &dst) < 0) {
+        puts("ERROR: Client unable to start a DTLS channel!\n");
+        exit(-1);
+    }
 
     /*
      * This loop has as objective to transmit all the DTLS records involved
@@ -459,12 +500,10 @@ static void client_send(char *addr_str, char *data, unsigned int delay)
      */
     while ((buflen > 0) && (iWatch > 0)) {
 
-      if (connected < 0) {
-        DEBUG("Client DTLS was unable to establish a channel!\n");
-        iWatch = 0;
-      }
-      else {
+      /*  DTLS Session must be established before sending our data */
+      if (dtls_connected == 1) {
         try_send(dtls_context, &dst);
+        iWatch = 0; /* This client only transmit data one time.  */
       }
 
       /*
@@ -487,7 +526,7 @@ static void client_send(char *addr_str, char *data, unsigned int delay)
     dtls_free_context(dtls_context);
     /* unregister our UDP listener on this thread */
     gnrc_netreg_unregister(GNRC_NETTYPE_UDP, &entry);
-    connected = 0; /*Probably this should be removed or global */
+    dtls_connected = 0;
 
     DEBUG("Client DTLS session finished\n");
 }

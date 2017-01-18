@@ -139,9 +139,9 @@ static int read_from_peer(struct dtls_context_t *ctx,
         DEBUG("%c", data[i]);
     DEBUG("--- \t Sending echo..\n");
 #endif
+
     /* echo back the application data rcvd. */
-    dtls_write(ctx, session, data, len);
-    return 0;
+    return dtls_write(ctx, session, data, len);
 }
 
 /**
@@ -192,7 +192,7 @@ static int gnrc_sending(char *addr_str, char *data, size_t data_len, unsigned sh
         return -1;
     }
 
-    return 1;
+    return 0;
 }
 
 /**
