@@ -36,6 +36,6 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* QEMU_I386_CPU_CONF_H */
 
 /** @} */

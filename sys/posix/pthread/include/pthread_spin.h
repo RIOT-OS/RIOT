@@ -91,7 +91,7 @@ int pthread_spin_unlock(pthread_spinlock_t *lock);
 }
 #endif
 
-#endif
+#endif /* SYS_POSIX_PTHREAD_SPIN_H */
 
 /**
  * @}

@@ -463,4 +463,4 @@ void display_all_off(void);
 }
 #endif
 
-#endif /* DISPLAY_ */
+#endif /* DISPLAY_H */

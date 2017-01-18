@@ -37,7 +37,7 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* QEMU_I386_BOARD_H */
 
 /**
  * @}

@@ -64,4 +64,4 @@ uint8_t iap_get_sector(uint32_t addr);
 #endif
 
 
-#endif /*IAP_H_*/
+#endif /* IAP_H */

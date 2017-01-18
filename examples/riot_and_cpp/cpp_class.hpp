@@ -60,4 +60,4 @@ private:
 };
 
 /** @} */
-#endif //__CPP_CLASS__
+#endif /* CPP_CLASS_H */

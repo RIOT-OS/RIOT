@@ -34,4 +34,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* BOARD-CONF_H */
+#endif /* BOARD_CONF_H */

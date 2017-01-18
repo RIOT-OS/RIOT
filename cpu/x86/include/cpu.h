@@ -131,6 +131,6 @@ static inline void cpu_print_last_instruction(void)
 }
 #endif
 
-#endif
+#endif /* CPU_X86_CPU_H */
 
 /** @} */

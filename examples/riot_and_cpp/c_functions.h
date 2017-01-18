@@ -47,4 +47,4 @@ int day_of_week(int day, int month, int year);
 #endif
 
 /** @} */
-#endif // _C_FUNCTIONS_H
+#endif /* C_FUNCTIONS_H */

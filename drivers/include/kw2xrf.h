@@ -159,5 +159,5 @@ extern const gnrc_netdev_driver_t kw2xrf_driver;
 }
 #endif
 
-#endif
+#endif /* MKW2XDRF_H */
 /** @} */

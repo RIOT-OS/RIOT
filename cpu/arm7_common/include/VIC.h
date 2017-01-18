@@ -89,4 +89,4 @@ bool cpu_install_irq(int IntNumber, void *HandlerAddr, int Priority);
 #endif
 
 /** @} */
-#endif /* VIC_H_*/
+#endif /* VIC_H */

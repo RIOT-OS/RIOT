@@ -61,5 +61,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD-CONF_H */
+#endif /* BOARD_COMMON_H */
 /** @} */

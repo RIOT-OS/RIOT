@@ -24,4 +24,4 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* BUTTONS_H */
