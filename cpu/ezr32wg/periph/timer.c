@@ -36,14 +36,12 @@
 static timer_isr_ctx_t isr_ctx[TIMER_NUMOF];
 
 
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     TIMER_TypeDef *pre, *tim;
 
     /* test if given timer device is valid */
-    if (dev >= TIMER_NUMOF) {
-        return -1;
-    }
+    assert(dev < TIMER_NUMOF);
 
     /* save callback */
     isr_ctx[dev].cb = cb;
@@ -79,7 +77,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     /* start both timers */
     tim->CMD = TIMER_CMD_START;
     pre->CMD = TIMER_CMD_START;
-    return 0;
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)

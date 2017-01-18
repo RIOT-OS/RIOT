@@ -74,12 +74,10 @@ static inline Tc *dev(tim_t tim)
  * For each timer, channel 1 is used to implement a prescaler. Channel 1 is
  * driven by the MCK / 2 (42MHz) (TIMER_CLOCK1).
  */
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* check if device is valid */
-    if (tim >= TIMER_NUMOF) {
-        return -1;
-    }
+    assert(tim < TIMER_NUMOF);
 
     /* enable the device clock */
     clk_en(tim);
@@ -117,8 +115,6 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 
     /* enable global interrupts for given timer */
     timer_irq_enable(tim);
-
-    return 0;
 }
 
 int timer_set(tim_t tim, int channel, unsigned int timeout)

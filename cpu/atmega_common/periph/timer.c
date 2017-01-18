@@ -87,15 +87,13 @@ static ctx_t *ctx[] = {{ NULL }};
 /**
  * @brief Setup the given timer
  */
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
     DEBUG("timer.c: freq = %ld\n", freq);
     uint8_t pre = 0;
 
     /* make sure given device is valid */
-    if (tim >= TIMER_NUMOF) {
-        return -1;
-    }
+    assert(tim < TIMER_NUMOF);
 
     /* figure out if freq is applicable */
     for (; pre < PRESCALE_NUMOF; pre++) {
@@ -103,10 +101,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
             break;
         }
     }
-    if (pre == PRESCALE_NUMOF) {
-        DEBUG("timer.c: prescaling failed!\n");
-        return -1;
-    }
+    assert(pre != PRESCALE_NUMOF);
 
     /* stop and reset timer */
     ctx[tim].dev->CRA = 0;
@@ -122,8 +117,6 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     /* enable timer with calculated prescaler */
     ctx[tim].dev->CRB = (pre + 1);
     DEBUG("timer.c: prescaler set at %d\n", pre + 1);
-
-    return 0;
 }
 
 int timer_set(tim_t tim, int channel, unsigned int timeout)

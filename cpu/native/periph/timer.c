@@ -77,16 +77,12 @@ void native_isr_timer(void)
     _callback(_cb_arg, 0);
 }
 
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     (void)freq;
     DEBUG("%s\n", __func__);
-    if (dev >= TIMER_NUMOF) {
-        return -1;
-    }
-    if (freq != NATIVE_TIMER_SPEED) {
-        return -1;
-    }
+    assert(dev < TIMER_NUMOF);
+    assert(freq < NATIVE_TIMER_SPEED);
 
     /* initialize time delta */
     time_null = 0;
@@ -96,8 +92,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     _callback = cb;
     _cb_arg = arg;
     timer_irq_enable(dev);
-
-    return 0;
 }
 
 static void do_timer_set(unsigned int offset)

@@ -135,7 +135,7 @@ static inline tim_t _lptmr_tim_t(uint8_t dev) {
 /* ****** PIT module functions ****** */
 
 /* Forward declarations */
-inline static int pit_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg);
+inline static void pit_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg);
 inline static int pit_set(uint8_t dev, uint32_t timeout);
 inline static int pit_set_absolute(uint8_t dev, uint32_t target);
 inline static int pit_clear(uint8_t dev);
@@ -172,7 +172,7 @@ inline static void _pit_set_counter(uint8_t dev)
     PIT->CHANNEL[ch].TCTRL = pit[dev].tctrl;
 }
 
-inline static int pit_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg)
+inline static void pit_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
     PIT_CLOCKGATE = 1;
     /* Completely disable the module before messing with the settings */
@@ -203,7 +203,6 @@ inline static int pit_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     _pit_set_counter(dev);
 
     irq_restore(mask);
-    return 0;
 }
 
 inline static int pit_set(uint8_t dev, uint32_t timeout)
@@ -328,7 +327,7 @@ inline static void pit_irq_handler(tim_t dev)
 /* ****** LPTMR module functions ****** */
 
 /* Forward declarations */
-inline static int lptmr_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg);
+inline static void lptmr_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg);
 inline static int lptmr_set(uint8_t dev, uint16_t timeout);
 inline static int lptmr_set_absolute(uint8_t dev, uint16_t target);
 inline static int lptmr_clear(uint8_t dev);
@@ -430,9 +429,7 @@ inline static void _lptmr_set_counter(uint8_t dev)
 inline static int lptmr_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
     int32_t prescale = _lptmr_compute_prescaler(freq);
-    if (prescale < 0) {
-        return -1;
-    }
+    assert(prescale >= 0);
     LPTMR_Type *hw = lptmr_config[dev].dev;
     /* Disable IRQs to avoid race with ISR */
     unsigned int mask = irq_disable();
@@ -459,8 +456,6 @@ inline static int lptmr_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *ar
     lptmr_clear(dev);
 
     irq_restore(mask);
-
-    return 0;
 }
 
 inline static uint16_t lptmr_read(uint8_t dev)
@@ -573,20 +568,22 @@ inline static void lptmr_irq_handler(tim_t tim)
 
 /* ****** Common timer API functions ****** */
 
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
-    if ((unsigned int)dev >= TIMER_NUMOF) {
-        /* invalid timer */
-        return -1;
-    }
+    assert(dev < TIMER_NUMOF);
+
     /* demultiplex to handle two types of hardware timers */
     switch (_timer_variant(dev)) {
         case TIMER_PIT:
-            return pit_init(_pit_index(dev), freq, cb, arg);
+            pit_init(_pit_index(dev), freq, cb, arg);
+            break;
         case TIMER_LPTMR:
-            return lptmr_init(_lptmr_index(dev), freq, cb, arg);
+            lptmr_init(_lptmr_index(dev), freq, cb, arg);
+            break;
         default:
-            return -1;
+            /* assert that the timer variant is valid */
+            assert(0);
+            break;
     }
 }
 

@@ -41,28 +41,26 @@
  */
 static timer_isr_ctx_t config[TIMER_NUMOF];
 
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+void timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
-    if (dev == TIMER_0) {
-        /* save callback */
-        config[TIMER_0].cb = cb;
-        config[TIMER_0].arg = arg;
-        /* enable power for timer */
-        TIMER_0_CLKEN();
-        /* let timer run with full frequency */
-        TIMER_0_PLKSEL();
-        /* set to timer mode */
-        TIMER_0_DEV->CTCR = 0;
-        /* configure prescaler */
-        TIMER_0_DEV->PR = (TIMER_0_FREQ / freq) - 1;
-        /* configure and enable timer interrupts */
-        NVIC_SetPriority(TIMER_0_IRQ, TIMER_IRQ_PRIO);
-        NVIC_EnableIRQ(TIMER_0_IRQ);
-        /* enable timer */
-        TIMER_0_DEV->TCR |= 1;
-        return 0;
-    }
-    return -1;
+    assert(dev == TIMER_0);
+    /* save callback */
+    config[TIMER_0].cb = cb;
+    config[TIMER_0].arg = arg;
+    /* enable power for timer */
+    TIMER_0_CLKEN();
+    /* let timer run with full frequency */
+    TIMER_0_PLKSEL();
+    /* set to timer mode */
+    TIMER_0_DEV->CTCR = 0;
+    /* configure prescaler */
+    TIMER_0_DEV->PR = (TIMER_0_FREQ / freq) - 1;
+    /* configure and enable timer interrupts */
+    NVIC_SetPriority(TIMER_0_IRQ, TIMER_IRQ_PRIO);
+    NVIC_EnableIRQ(TIMER_0_IRQ);
+    /* enable timer */
+    TIMER_0_DEV->TCR |= 1;
+    return 0;
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)
