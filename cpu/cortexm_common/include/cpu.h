@@ -91,6 +91,25 @@ static inline void cpu_sleep_until_event(void)
 }
 
 /**
+ * @brief   Put the CPU into (deep) sleep mode, using the `WFI` instruction
+ *
+ * @param[in] deep      !=0 for deep sleep, 0 for light sleep
+ */
+static inline void cortexm_sleep(int deep)
+{
+    if (deep) {
+        SCB->SCR |=  (SCB_SCR_SLEEPDEEP_Msk);
+    }
+    else {
+        SCB->SCR &= ~(SCB_SCR_SLEEPDEEP_Msk);
+    }
+
+    /* ensure that all memory accesses have completed and trigger sleeping */
+    __DSB();
+    __WFI();
+}
+
+/**
  * @brief   Trigger a conditional context scheduler run / context switch
  *
  * This function is supposed to be called in the end of each ISR.
