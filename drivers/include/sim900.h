@@ -9,6 +9,7 @@
 #include "net/gnrc/ppp/ppp.h"
 #include "net/hdlc/fcs.h"
 #include "periph/uart.h"
+#include "net/netdev2.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,10 +41,10 @@ typedef enum {
 
 /**
  * @brief sim900 pppdev device
- * @extends pppdev_t
+ * @extends netdev2_t
  */
 typedef struct sim900_t {
-    pppdev_t netdev;                            /**< extended pppdev structure */
+    netdev2_ppp_t netdev;                            /**< extended pppdev structure */
     uart_t uart;                                /**< UART port of device */
     uint8_t *rx_buf;                            /**< rx buffer */
     size_t rx_len;                              /**< len of rx buffer */
@@ -67,6 +68,7 @@ typedef struct sim900_t {
     uint8_t apn[SIM900_APN_SIZE];               /**< stores APN name */
     uint8_t apn_len;                            /**< stores APN name */
     uint8_t mac_addr[DUMMY_ADDR_LEN];           /**< Dummy MAC holder*/
+    uint8_t isr_flags;                          /**< ISR flags */
 } sim900_t;
 
 /**

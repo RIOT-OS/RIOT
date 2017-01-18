@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) Fundación Inria Chile 2017
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @file
  * @brief       Implementation of SIM900 driver
  *
- * @author      José Ignacio Alamos <jialamos@uc.cl>
+ * @author      José Ignacio Alamos <jose.alamos@inria.cl>
  *
  * @}
  */
@@ -24,6 +24,7 @@
 #include "sim900.h"
 #include "net/eui64.h"
 #include "periph/cpuid.h"
+#include "net/gnrc/netdev2.h"
 
 #define PPPINITFCS16    0xffff
 #define PPPGOODFCS16    0xf0b8
@@ -42,8 +43,7 @@
 
 #define MSG_AT_FINISHED (1)
 #define MSG_AT_TIMEOUT (2)
-#define PDP_UP (3)
-#define RX_FINISHED (4)
+#define RX_FINISHED (3)
 
 #define HDLC_FLAG_CHAR (0x7e)
 #define HDLC_ESCAPE_CHAR (0x7d)
@@ -56,6 +56,7 @@
 
 #define DUMMY_ADDR_LEN (6)
 #define DEFAULT_ACCM (0xffffffff)
+
 void pdp_netattach_timeout(sim900_t *dev);
 void pdp_netattach(sim900_t *dev);
 void pdp_check_netattach(sim900_t *dev);
@@ -68,7 +69,7 @@ static inline void _reset_at_status(sim900_t *dev)
 
 static inline void _isr_at_command(sim900_t *dev, char data)
 {
-    msg_t msg;
+    netdev2_t *netdev = (netdev2_t*) dev;
 
     /* Detect stream of characters and add flag to at_status*/
     dev->_stream |= data;
@@ -80,9 +81,8 @@ static inline void _isr_at_command(sim900_t *dev, char data)
     /* if the AT command finished, send msg to driver */
     if (!dev->_num_esc) {
         _reset_at_status(dev);
-        msg.type = PPPDEV_MSG_TYPE_EVENT;
-        msg.content.value = MSG_AT_FINISHED;
-        msg_send_int(&msg, dev->mac_pid);
+        dev->isr_flags = MSG_AT_FINISHED;
+        netdev->event_callback(netdev, NETDEV2_EVENT_ISR);
     }
 
     dev->_stream = (dev->_stream << 8);
@@ -90,10 +90,7 @@ static inline void _isr_at_command(sim900_t *dev, char data)
 
 static inline void _rx_ready(sim900_t *dev)
 {
-    msg_t msg;
-
-    msg.type = PPPDEV_MSG_TYPE_EVENT;
-    msg.content.value = RX_FINISHED;
+    netdev2_t *netdev = (netdev2_t*) dev;
 
     dev->ppp_rx_state = PPP_RX_IDLE;
     dev->rx_count = dev->int_count;
@@ -102,7 +99,8 @@ static inline void _rx_ready(sim900_t *dev)
 
     /* if PPP pkt is sane, send to thread */
     if (dev->int_fcs == PPPGOODFCS16 && dev->escape == 0 && dev->rx_count >= 4) {
-        msg_send_int(&msg, dev->mac_pid);
+		dev->isr_flags = RX_FINISHED;
+        netdev->event_callback(netdev, NETDEV2_EVENT_ISR);
     }
 
     dev->int_fcs = PPPINITFCS16;
@@ -164,11 +162,11 @@ static void rx_cb(void *arg, uint8_t data)
     }
 }
 
-void _send_driver_event(msg_t *msg, uint8_t driver_event)
+void _send_driver_event(msg_t *msg, uint8_t driver_event, sim900_t* dev)
 {
-    msg->type = PPPDEV_MSG_TYPE_EVENT;
-    msg->content.value = driver_event;
-    msg_send(msg, thread_getpid());
+    netdev2_t *netdev = (netdev2_t*) dev;
+    dev->isr_flags = driver_event;
+    netdev->event_callback(netdev, NETDEV2_EVENT_ISR);
 }
 
 int send_at_command(sim900_t *dev, char *cmd, size_t size, uint8_t ne, void (*cb)(sim900_t *dev))
@@ -203,9 +201,9 @@ void sim900_putchar(uart_t uart, uint8_t c)
     uart_write(uart, p, 1);
 }
 
-int sim900_recv(pppdev_t *ppp_dev, char *buf, int len, void *info)
+int sim900_recv(netdev2_t *netdev, void *buf, size_t len, void *info)
 {
-    sim900_t *dev = (sim900_t *) ppp_dev;
+    sim900_t *dev = (sim900_t *) netdev;
     int payload_length = dev->rx_count - 2;
 
     /* if buf given, copy rx buf to buf */
@@ -215,9 +213,9 @@ int sim900_recv(pppdev_t *ppp_dev, char *buf, int len, void *info)
     return payload_length;
 }
 
-int sim900_send(pppdev_t *ppp_dev, const struct iovec *vector, int count)
+int sim900_send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
 {
-    sim900_t *dev = (sim900_t *) ppp_dev;
+    sim900_t *dev = (sim900_t *) netdev;
     uint16_t fcs = PPPINITFCS16;
 
     /* Lock thread in order to prevent multiple writes */
@@ -256,8 +254,9 @@ int sim900_send(pppdev_t *ppp_dev, const struct iovec *vector, int count)
 
 void at_timeout(sim900_t *dev, uint32_t ms, void (*cb)(sim900_t *dev))
 {
-    dev->msg.type = PPPDEV_MSG_TYPE_EVENT;
-    dev->msg.content.value = MSG_AT_TIMEOUT;
+    dev->msg.type = NETDEV2_MSG_TYPE_EVENT;
+    dev->isr_flags = MSG_AT_TIMEOUT;
+    dev->msg.content.ptr = (void*) dev;
     dev->_timer_cb = cb;
     xtimer_set_msg(&dev->xtimer, ms, &dev->msg, dev->mac_pid);
 }
@@ -269,11 +268,12 @@ void pdp_netattach(sim900_t *dev)
 
 void check_data_mode(sim900_t *dev)
 {
+    netdev2_t* netdev = (netdev2_t*) dev;
     if (dev->at_status & HAS_CONN) {
         puts("Successfully entered data mode");
         dev->state = AT_STATE_RX;
         dev->ppp_rx_state = PPP_RX_IDLE;
-        _send_driver_event(&dev->msg, PDP_UP);
+        netdev->event_callback(netdev, NETDEV2_EVENT_LINK_UP);
     }
     else {
         puts("Failed to enter data mode");
@@ -333,7 +333,7 @@ void dial_up(sim900_t *dev)
     at_timeout(dev, SIM900_DATAMODE_DELAY, &check_device_status);
 }
 
-int sim900_set(pppdev_t *dev, netopt_t opt, void *value, size_t value_len)
+int sim900_set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
 {
     sim900_t *d = (sim900_t *) dev;
     network_uint32_t *nu32;
@@ -353,13 +353,24 @@ int sim900_set(pppdev_t *dev, netopt_t opt, void *value, size_t value_len)
             memcpy(d->apn, value, value_len);
             d->apn_len = value_len;
             break;
+        case NETOPT_DIAL_UP:
+            if(*((netopt_enable_t*) value))
+            {
+                dial_up(d);
+            }
+            else
+            {
+                dev->event_callback(dev, NETDEV2_EVENT_LINK_DOWN);
+                _reset_at_status(d);
+                at_timeout(d, SIM900_LINKDOWN_DELAY, &dial_up);
+            }
         default:
-            return -ENOTSUP;
+            return netdev2_ppp_set((netdev2_ppp_t*) dev, opt, value, value_len);
     }
     return 0;
 }
 
-int sim900_init(pppdev_t *d)
+int sim900_init(netdev2_t *d)
 {
     sim900_t *dev = (sim900_t *) d;
 
@@ -386,10 +397,11 @@ int sim900_init(pppdev_t *d)
     return 0;
 }
 
-void driver_events(pppdev_t *d, uint8_t event)
+void sim900_isr(netdev2_t *d)
 {
     sim900_t *dev = (sim900_t *) d;
 
+    int event = dev->isr_flags;
     /*Driver event*/
     switch (event) {
         case MSG_AT_FINISHED:
@@ -398,12 +410,8 @@ void driver_events(pppdev_t *d, uint8_t event)
         case MSG_AT_TIMEOUT:
             dev->_timer_cb(dev);
             break;
-        case PDP_UP:
-            gnrc_ppp_link_down(&dev->msg, dev->mac_pid);
-            gnrc_ppp_link_up(&dev->msg, dev->mac_pid);
-            break;
         case RX_FINISHED:
-            gnrc_ppp_dispatch_pkt(&dev->msg, dev->mac_pid);
+            d->event_callback(d, NETDEV2_EVENT_RX_COMPLETE);
             break;
         default:
             DEBUG("Unrecognized driver msg\n");
@@ -411,7 +419,7 @@ void driver_events(pppdev_t *d, uint8_t event)
     }
 }
 
-static int _get_iid(pppdev_t *pppdev, eui64_t *value, size_t max_len)
+static int _get_iid(netdev2_t *pppdev, eui64_t *value, size_t max_len)
 {
     if (max_len < sizeof(eui64_t)) {
         return -EOVERFLOW;
@@ -459,7 +467,7 @@ static void _set_mac_address(sim900_t *dev)
     dev->mac_addr[0] |= 0x02;
 }
 
-int sim900_get(pppdev_t *dev, netopt_t opt, void *value, size_t max_lem)
+int sim900_get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
 {
     /*Fake values*/
     switch (opt) {
@@ -469,40 +477,23 @@ int sim900_get(pppdev_t *dev, netopt_t opt, void *value, size_t max_lem)
         case NETOPT_IPV6_IID:
             return _get_iid(dev, value, DUMMY_ADDR_LEN);
         default:
-            return -ENOTSUP;
+            return netdev2_ppp_get((netdev2_ppp_t*) dev, opt, value, max_len);
     }
 }
 
-int sim900_dialup(pppdev_t *dev)
-{
-    dial_up((sim900_t *) dev);
-    return 0;
-}
-
-int link_down(pppdev_t *dev)
-{
-    sim900_t *d = (sim900_t *) dev;
-
-    _reset_at_status(d);
-    at_timeout(d, SIM900_LINKDOWN_DELAY, &dial_up);
-    return 0;
-}
-
-const static pppdev_driver_t pppdev_driver_sim900 =
+const  netdev2_driver_t sim900_driver =
 {
     .send = sim900_send,
     .recv = sim900_recv,
-    .driver_ev = driver_events,
+    .isr = sim900_isr,
     .init = sim900_init,
     .set = sim900_set,
     .get = sim900_get,
-    .dial_up = sim900_dialup,
-    .link_down = link_down
 };
 
 void sim900_setup(sim900_t *dev, const sim900_params_t *params)
 {
-    dev->netdev.driver = &pppdev_driver_sim900;
+    ((netdev2_t*) dev)->driver = &sim900_driver;
     dev->uart = (uart_t) params->uart;
     dev->rx_buf = (uint8_t *) params->buf;
     dev->rx_len = (uint16_t) params->buf_len;
