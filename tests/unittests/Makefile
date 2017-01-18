@@ -12,7 +12,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk chronos ek-lm4f120xl \
                           nucleo-f030 nucleo-f070 nucleo-f091 pba-d-01-kw2x \
                           saml21-xpro microbit calliope-mini limifrog-v1 \
                           slwstk6220a ek-lm4f120xl stm32f3discovery \
-                          slwstk6220a nucleo-f042
+                          slwstk6220a nucleo32-f042
 
 USEMODULE += embunit
 
