@@ -21,12 +21,10 @@
 
 #ifdef MODULE_LIS3DH
 
+#include "log.h"
 #include "saul_reg.h"
 #include "lis3dh.h"
 #include "lis3dh_params.h"
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 
 /**
  * @brief   Define the number of configured sensors
@@ -55,15 +53,16 @@ void auto_init_lis3dh(void)
         const lis3dh_params_t *p = &lis3dh_params[i];
         int res;
 
-        DEBUG("[auto_init_saul] initializing lis3dh accelerometer\n");
+        LOG_DEBUG("[auto_init_saul] initializing lis3dh #%u\n", i);
+
         res = lis3dh_init(&lis3dh_devs[i], p->spi, p->cs, p->scale);
         if (res < 0) {
-            DEBUG("[auto_init_saul] error during lis3dh_init\n");
+            LOG_ERROR("[auto_init_saul] error initializing lis3dh #%u\n", i);
             continue;
         }
         res = lis3dh_set_odr(&lis3dh_devs[i], p->odr);
         if (res < 0) {
-            DEBUG("[auto_init_saul] error during lis3dh_set_odr\n");
+            LOG_ERROR("[auto_init_saul] error setting ODR for lis3dh #%u\n", i);
             continue;
         }
 

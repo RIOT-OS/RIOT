@@ -19,9 +19,8 @@
 
 #ifdef MODULE_ENCX24J600
 
-#define ENABLE_DEBUG (0)
+#include "log.h"
 #include "debug.h"
-
 #include "encx24j600.h"
 #include "net/gnrc/netdev2.h"
 #include "net/gnrc/netdev2/eth.h"
@@ -45,7 +44,8 @@ static gnrc_netdev2_t _gnrc_encx24j600;
 
 void auto_init_encx24j600(void)
 {
-    DEBUG("auto_init_encx24j600(): initializing device...\n");
+    LOG_DEBUG("[auto_init_netif] initializing encx24j600 #0\n");
+
     /* setup netdev2 device */
     encx24j600_params_t p;
     p.spi       = ENCX24J600_SPI;

@@ -21,13 +21,11 @@
 
 #ifdef MODULE_SAUL_ADC
 
+#include "log.h"
 #include "saul_reg.h"
 #include "saul/periph.h"
 #include "adc_params.h"
 #include "periph/gpio.h"
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 
 /**
  * @brief   Define the number of configured sensors
@@ -54,12 +52,12 @@ extern saul_driver_t adc_saul_driver;
 
 void auto_init_adc(void)
 {
-    DEBUG("auto init SAUL ADC\n");
-    for (unsigned int i = 0; i < SAUL_ADC_NUMOF; i++) {
+    for (unsigned i = 0; i < SAUL_ADC_NUMOF; i++) {
         const saul_adc_params_t *p = &saul_adc_params[i];
         saul_adcs[i] = p;
 
-        DEBUG("[auto_init_saul] initializing direct ADC\n");
+        LOG_DEBUG("[auto_init_saul] initializing direct ADC #%u\n", i);
+
         saul_reg_entries[i].dev = &saul_adcs[i];
         saul_reg_entries[i].name = p->name;
         saul_reg_entries[i].driver = &adc_saul_driver;

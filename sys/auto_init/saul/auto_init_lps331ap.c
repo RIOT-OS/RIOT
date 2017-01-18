@@ -21,12 +21,10 @@
 
 #ifdef MODULE_LPS331AP
 
+#include "log.h"
 #include "saul_reg.h"
 #include "lps331ap.h"
 #include "lps331ap_params.h"
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 
 /**
  * @brief   Define the number of configured sensors
@@ -54,11 +52,11 @@ void auto_init_lps331ap(void)
     for (unsigned int i = 0; i < LPS331AP_NUM; i++) {
         const lps331ap_params_t *p = &lps331ap_params[i];
 
-        DEBUG("[auto_init_saul] initializing lps331ap pressure sensor\n");
+        LOG_DEBUG("[auto_init_saul] initializing lps331ap #%u\n", i);
+
         int res = lps331ap_init(&lps331ap_devs[i], p->i2c, p->addr, p->rate);
-        DEBUG("not done\n");
         if (res < 0) {
-            DEBUG("[auto_init_saul] error during initialization\n");
+            LOG_ERROR("[auto_init_saul] error initializing lps331ap #%u\n", i);
         }
         else {
             saul_entries[i].dev = &(lps331ap_devs[i]);

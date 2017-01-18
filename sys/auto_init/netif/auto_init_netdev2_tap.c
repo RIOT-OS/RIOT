@@ -19,9 +19,8 @@
 
 #ifdef MODULE_NETDEV2_TAP
 
-#define ENABLE_DEBUG (0)
+#include "log.h"
 #include "debug.h"
-
 #include "netdev2_tap_params.h"
 #include "net/gnrc/netdev2/eth.h"
 
@@ -34,9 +33,12 @@ static gnrc_netdev2_t _gnrc_netdev2_tap[NETDEV2_TAP_MAX];
 
 void auto_init_netdev2_tap(void)
 {
-    for (int i = 0; i < NETDEV2_TAP_MAX; i++) {
+    for (unsigned i = 0; i < NETDEV2_TAP_MAX; i++) {
         const netdev2_tap_params_t *p = &netdev2_tap_params[i];
-        DEBUG("Initializing netdev2_tap on TAP %s\n", *(p->tap_name));
+
+        LOG_DEBUG("[auto_init_netif] initializing netdev2_tap #%u on TAP %s\n",
+                  i, *(p->tap_name));
+
         netdev2_tap_setup(&netdev2_tap[i], p);
         gnrc_netdev2_eth_init(&_gnrc_netdev2_tap[i], (netdev2_t*)&netdev2_tap[i]);
 

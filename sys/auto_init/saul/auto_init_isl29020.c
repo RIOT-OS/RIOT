@@ -21,12 +21,10 @@
 
 #ifdef MODULE_ISL29020
 
+#include "log.h"
 #include "saul_reg.h"
 #include "isl29020.h"
 #include "isl29020_params.h"
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 
 /**
  * @brief   Define the number of configured sensors
@@ -54,11 +52,12 @@ void auto_init_isl29020(void)
     for (unsigned int i = 0; i < ISL29020_NUM; i++) {
         const isl29020_params_t *p = &isl29020_params[i];
 
-        DEBUG("[auto_init_saul] initializing isl29020 light sensor\n");
+        LOG_DEBUG("[auto_init_saul] initializing isl29020 #%u\n", i);
+
         int res = isl29020_init(&isl29020_devs[i], p->i2c, p->addr,
                                 p->range, p->mode);
         if (res < 0) {
-            DEBUG("[auto_init_saul] error during initialization\n");
+            LOG_ERROR("[auto_init_saul] error initializing isl29020 #%u\n", i);
         }
         else {
             saul_entries[i].dev = &(isl29020_devs[i]);

@@ -21,12 +21,10 @@
 
 #ifdef MODULE_L3G4200D
 
+#include "log.h"
 #include "saul_reg.h"
 #include "l3g4200d.h"
 #include "l3g4200d_params.h"
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 
 /**
  * @brief   Define the number of configured sensors
@@ -54,11 +52,12 @@ void auto_init_l3g4200d(void)
     for (unsigned int i = 0; i < L3G4200D_NUM; i++) {
         const l3g4200d_params_t *p = &l3g4200d_params[i];
 
-        DEBUG("[auto_init_saul] initializing l3g4200d gyroscope\n");
+        LOG_DEBUG("[auto_init_saul] initializing l3g4200d #%u\n", i);
+
         int res = l3g4200d_init(&l3g4200d_devs[i], p->i2c, p->addr,
                                 p->int1_pin, p->int2_pin, p->mode, p->scale);
         if (res < 0) {
-            DEBUG("[auto_init_saul] error during initialization\n");
+            LOG_ERROR("[auto_init_saul] error initializing l3g4200d #%u\n", i);
         }
         else {
             saul_entries[i].dev = &(l3g4200d_devs[i]);

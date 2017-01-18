@@ -52,11 +52,13 @@ extern const saul_driver_t si70xx_relative_humidity_saul_driver;
 void auto_init_si70xx(void)
 {
     for (unsigned i = 0; i < SI70XX_NUMOF; i++) {
+        LOG_DEBUG("[auto_init_saul] initializing SI70xx #%u\n", i);
+
         int res = si70xx_init(&si70xx_devs[i],
                               si70xx_params[i].i2c_dev,
                               si70xx_params[i].address);
         if (res < 0) {
-            LOG_ERROR("Unable to initialize SI70xx sensor #%i\n", i);
+            LOG_ERROR("[auto_init_saul] error initializing SI70xx #%i\n", i);
             return;
         }
 

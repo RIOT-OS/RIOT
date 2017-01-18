@@ -27,9 +27,6 @@
 #include "hdc1000.h"
 #include "hdc1000_params.h"
 
-#define ENABLE_DEBUG (1)
-#include "debug.h"
-
 /**
  * @brief   Define the number of configured sensors
  */
@@ -56,11 +53,12 @@ extern saul_driver_t hdc1000_saul_hum_driver;
 
 void auto_init_hdc1000(void)
 {
-    for (int i = 0; i < HDC1000_NUM; i++) {
-        DEBUG("[auto_init_saul] initializing hdc1000 light sensor\n");
+    for (unsigned i = 0; i < HDC1000_NUM; i++) {
+        LOG_DEBUG("[auto_init_saul] initializing hdc1000 #%u\n", i);
+
         int res = hdc1000_init(&hdc1000_devs[i], &hdc1000_params[i]);
         if (res < 0) {
-            DEBUG("[auto_init_saul] error during initialization\n");
+            LOG_ERROR("[auto_init_saul] error initializing hdc1000 #%u\n", i);
         }
         else {
             saul_entries[(i * 2)].dev = &(hdc1000_devs[i]);

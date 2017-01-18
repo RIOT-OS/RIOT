@@ -21,12 +21,10 @@
 
 #ifdef MODULE_XBEE
 
+#include "log.h"
 #include "board.h"
 #include "net/gnrc/netdev2/xbee_adpt.h"
 #include "xbee_params.h"
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 
 /**
  * @brief   Calculate the number of configured XBee devices
@@ -50,8 +48,8 @@ static char stacks[XBEE_NUM][XBEE_MAC_STACKSIZE];
 
 void auto_init_xbee(void)
 {
-    for (size_t i = 0; i < XBEE_NUM; i++) {
-        DEBUG("Initializing XBee radio #%u\n", i);
+    for (unsigned i = 0; i < XBEE_NUM; i++) {
+        LOG_DEBUG("[auto_init_netif] initializing xbee #%u\n", i);
 
         xbee_setup(&xbee_devs[i], &xbee_params[i]);
         gnrc_netdev2_xbee_init(&gnrc_adpt[i], &xbee_devs[i]);
