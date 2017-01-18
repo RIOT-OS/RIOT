@@ -1,12 +1,10 @@
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
-
 export NATIVEINCLUDES += -DNATIVE_INCLUDES
 export NATIVEINCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/
 export NATIVEINCLUDES += -I$(RIOTBASE)/core/include/
 export NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 
 export CPU = native
-export ELF = $(BINDIR)$(APPLICATION).elf
+export ELF = $(BINDIR)/$(APPLICATION).elf
 
 USEMODULE += native-drivers
 
@@ -14,7 +12,11 @@ USEMODULE += native-drivers
 export PREFIX =
 export CC ?= $(PREFIX)gcc
 export CXX ?= $(PREFIX)g++
-export AR ?= $(PREFIX)ar
+ifeq ($(LTO),1)
+export AR = $(PREFIX)gcc-ar
+else
+export AR = $(PREFIX)ar
+endif
 export AS ?= $(PREFIX)as
 export LINK ?= $(PREFIX)gcc
 export SIZE ?= $(PREFIX)size
@@ -32,7 +34,11 @@ export OFLAGS =
 endif
 endif
 
-export DEBUGGER = gdb
+ifeq ($(shell uname -s),Darwin)
+export DEBUGGER ?= lldb
+else
+export DEBUGGER ?= gdb
+endif
 export TERMPROG ?= $(ELF)
 export FLASHER = true
 export VALGRIND ?= valgrind
@@ -40,8 +46,7 @@ export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
 # basic cflags:
-export CFLAGS += -Wall -Wextra -pedantic
-export CFLAGS += -ffunction-sections -fdata-sections
+export CFLAGS += -Wall -Wextra -pedantic -std=gnu99
 ifeq ($(shell uname -m),x86_64)
 export CFLAGS += -m32
 endif
@@ -73,8 +78,17 @@ else
 export LINKFLAGS += -ldl
 endif
 
+# clean up unused functions
+export CFLAGS += -ffunction-sections -fdata-sections
+ifeq ($(shell uname -s),Darwin)
+export LINKFLAGS += -Wl,-dead_strip
+else
+export LINKFLAGS += -Wl,--gc-sections
+endif
+export LINKFLAGS += -ffunction-sections
+
 # set the tap interface for term/valgrind
-ifneq (,$(filter netdev2_tap,$(USEMODULE)))
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
 	export PORT ?= tap0
 else
 	export PORT =
@@ -83,8 +97,13 @@ endif
 export TERMFLAGS := $(PORT) $(TERMFLAGS)
 
 export ASFLAGS =
-export DEBUGGER_FLAGS = --args $(ELF) $(TERMFLAGS)
+ifeq ($(shell basename $(DEBUGGER)),lldb)
+export DEBUGGER_FLAGS = -- $(ELF) $(TERMFLAGS)
+else
+export DEBUGGER_FLAGS = -q --args $(ELF) $(TERMFLAGS)
+endif
 term-valgrind: export VALGRIND_FLAGS ?= \
+	--leak-check=full \
 	--track-origins=yes \
 	--fullpath-after=$(RIOTBASE)/ \
 	--read-var-info=yes
@@ -104,6 +123,8 @@ all-asan: export CFLAGS += -DNATIVE_IN_CALLOC
 all-asan: export LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g
 
 export INCLUDES += $(NATIVEINCLUDES)
+
+export CFLAGS += -DDEBUG_ASSERT_VERBOSE
 
 # workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52624
 ifneq ($(shell gcc --version | head -1 | grep -E ' (4.6|4.7)'),)
@@ -161,4 +182,4 @@ eval-gprof:
 eval-cachegrind:
 	$(CGANNOTATE) $(shell ls -rt cachegrind.out* | tail -1)
 
-export UNDEF += $(BINDIR)cpu/startup.o
+export UNDEF += $(BINDIR)/cpu/startup.o

@@ -1,0 +1,18 @@
+# define the used CPU
+export CPU = lpc1768
+
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# this board uses openocd
+include $(RIOTBOARD)/Makefile.include.openocd
+
+# generate image checksum from hex file
+export PRE_FLASH_CHECK_SCRIPT = lpc_checksum --format hex
+
+# remap flash to address 0x0, otherwise it verifies the rom bootloader
+export OPENOCD_PRE_VERIFY_CMDS += '-c reset init'

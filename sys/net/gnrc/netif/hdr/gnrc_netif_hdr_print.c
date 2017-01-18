@@ -22,9 +22,25 @@ void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr)
 {
     char addr_str[GNRC_NETIF_HDR_L2ADDR_PRINT_LEN];
 
-    printf("if_pid: %" PRIkernel_pid "  ", hdr->if_pid);
-    printf("rssi: %" PRIu8 "  ", hdr->rssi);
-    printf("lqi: %" PRIu8 "\n", hdr->lqi);
+    printf("if_pid: %u  ", (unsigned) hdr->if_pid);
+    printf("rssi: %u  ", (unsigned) hdr->rssi);
+    printf("lqi: %u\n", (unsigned) hdr->lqi);
+    printf("flags: ");
+
+    if (hdr->flags) {
+        if (hdr->flags & GNRC_NETIF_HDR_FLAGS_BROADCAST) {
+            printf("BROADCAST ");
+        }
+
+        if (hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST) {
+            printf("MULTICAST ");
+        }
+        puts("");
+    }
+    else {
+        puts("0x0");
+    }
+
 
     if (hdr->src_l2addr_len > 0) {
         printf("src_l2addr: %s\n",

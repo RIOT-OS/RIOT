@@ -6,7 +6,7 @@ TERMPROG ?= $(RIOTBASE)/dist/tools/pyterm/pyterm
 
 export CFLAGS_CPU   = -mcpu=arm7tdmi-s
 export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
-export CFLAGS_DBG   = -ggdb -g3
+export CFLAGS_DBG  ?= -ggdb -g3
 export CFLAGS_OPT  ?= -Os
 
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
@@ -23,12 +23,11 @@ ifeq ($(PORT),)
 endif
 export FFLAGS = $(PORT) $(HEXFILE)
 export TERMFLAGS += -tg -p "$(PORT)"
-include $(RIOTBOARD)/msba2-common/Makefile.dep
 
 export INCLUDES += -I$(RIOTBOARD)/msba2-common/include -I$(RIOTBOARD)/msba2-common/drivers/include
 
 export OFLAGS = -O ihex
 
-export UNDEF += $(BINDIR)cpu/startup.o
+export UNDEF += $(BINDIR)/cpu/startup.o
 
 USEMODULE += msba2-common-drivers

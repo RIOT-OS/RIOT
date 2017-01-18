@@ -14,11 +14,12 @@ ifeq ($(PROGRAMMER),jlink)
   export JLINK_DEVICE := cc2538sf53
   export JLINK_FLASH_ADDR := 200000
   export JLINK_IF := JTAG
+  export TUI := 1
   include $(RIOTBOARD)/Makefile.include.jlink
 else
   export OFLAGS = -O binary
   export HEXFILE = $(ELFFILE:.elf=.bin)
-  export FLASHER = python $(RIOTBASE)/dist/tools/cc2538-bsl/cc2538-bsl.py
+  export FLASHER = $(RIOTBASE)/dist/tools/cc2538-bsl/cc2538-bsl.py
   export FFLAGS  = -p "$(PORT)" -e -w -v -b 460800 $(HEXFILE)
 endif
 

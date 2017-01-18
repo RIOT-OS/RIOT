@@ -165,6 +165,7 @@ static void _send(gnrc_pktsnip_t *pkt)
 {
     udp_hdr_t *hdr;
     gnrc_pktsnip_t *udp_snip, *tmp;
+    gnrc_nettype_t target_type = pkt->type;
 
     /* write protect first header */
     tmp = gnrc_pktbuf_start_write(pkt);
@@ -198,12 +199,19 @@ static void _send(gnrc_pktsnip_t *pkt)
         gnrc_pktbuf_release(pkt);
         return;
     }
+    tmp->next = udp_snip;
     hdr = (udp_hdr_t *)udp_snip->data;
     /* fill in size field */
     hdr->length = byteorder_htons(gnrc_pkt_len(udp_snip));
 
+    /* set to IPv6, if first header is netif header */
+    if (target_type == GNRC_NETTYPE_NETIF) {
+        target_type = pkt->next->type;
+    }
+
     /* and forward packet to the network layer */
-    if (!gnrc_netapi_dispatch_send(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
+    if (!gnrc_netapi_dispatch_send(target_type, GNRC_NETREG_DEMUX_CTX_ALL,
+                                   pkt)) {
         DEBUG("udp: cannot send packet: network layer not found\n");
         gnrc_pktbuf_release(pkt);
     }
@@ -214,16 +222,14 @@ static void *_event_loop(void *arg)
     (void)arg;
     msg_t msg, reply;
     msg_t msg_queue[GNRC_UDP_MSG_QUEUE_SIZE];
-    gnrc_netreg_entry_t netreg;
-
+    gnrc_netreg_entry_t netreg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                            sched_active_pid);
     /* preset reply message */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
     reply.content.value = (uint32_t)-ENOTSUP;
     /* initialize message queue */
     msg_init_queue(msg_queue, GNRC_UDP_MSG_QUEUE_SIZE);
     /* register UPD at netreg */
-    netreg.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
-    netreg.pid = thread_getpid();
     gnrc_netreg_register(GNRC_NETTYPE_UDP, &netreg);
 
     /* dispatch NETAPI messages */
@@ -232,11 +238,11 @@ static void *_event_loop(void *arg)
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 DEBUG("udp: GNRC_NETAPI_MSG_TYPE_RCV\n");
-                _receive((gnrc_pktsnip_t *)msg.content.ptr);
+                _receive(msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("udp: GNRC_NETAPI_MSG_TYPE_SND\n");
-                _send((gnrc_pktsnip_t *)msg.content.ptr);
+                _send(msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
             case GNRC_NETAPI_MSG_TYPE_GET:

@@ -73,7 +73,7 @@ static bool _is_iface(kernel_pid_t dev)
     return false;
 }
 
-#if defined(MODULE_NETSTATS)
+#ifdef MODULE_NETSTATS
 const char *_netstats_module_to_str(uint8_t module)
 {
     switch (module) {
@@ -129,7 +129,7 @@ static int _netif_stats(kernel_pid_t dev, unsigned module, bool reset)
     }
     return res;
 }
-#endif
+#endif // MODULE_NETSTATS
 
 static void _set_usage(char *cmd_name)
 {
@@ -160,14 +160,16 @@ static void _mtu_usage(char *cmd_name)
     printf("usage: %s <if_id> mtu <n>\n", cmd_name);
 }
 
+#ifdef MODULE_GNRC_IPV6_NETIF
 static void _hl_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> hl <n>\n", cmd_name);
 }
+#endif
 
 static void _flag_usage(char *cmd_name)
 {
-    printf("usage: %s <if_id> [-]{promisc|autoack|csma|autocca|cca_threshold|preload|iphc|rtr_adv}\n", cmd_name);
+    printf("usage: %s <if_id> [-]{promisc|autoack|ack_req|csma|autocca|cca_threshold|preload|iphc|rtr_adv}\n", cmd_name);
 }
 
 static void _add_usage(char *cmd_name)
@@ -182,11 +184,13 @@ static void _del_usage(char *cmd_name)
            cmd_name);
 }
 
+#ifdef MODULE_NETSTATS
 static void _stats_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> stats [l2|ipv6] [reset]\n", cmd_name);
     puts("       reset can be only used if the module is specified.");
 }
+#endif
 
 static void _print_netopt(netopt_t opt)
 {
@@ -377,6 +381,13 @@ static void _netif_list(kernel_pid_t dev)
 
     if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("AUTOACK  ");
+        linebreak = true;
+    }
+
+    res = gnrc_netapi_get(dev, NETOPT_ACK_REQ, 0, &enable, sizeof(enable));
+
+    if ((res >= 0) && (enable == NETOPT_ENABLE)) {
+        printf("ACK_REQ  ");
         linebreak = true;
     }
 
@@ -825,6 +836,9 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
     else if (strcmp(flag, "autoack") == 0) {
         return _netif_set_flag(dev, NETOPT_AUTOACK, set);
     }
+    else if (strcmp(flag, "ack_req") == 0) {
+        return _netif_set_flag(dev, NETOPT_ACK_REQ, set);
+    }
     else if (strcmp(flag, "raw") == 0) {
         return _netif_set_flag(dev, NETOPT_RAWMODE, set);
     }
@@ -1210,10 +1224,14 @@ int _netif_config(int argc, char **argv)
     printf("usage: %s [<if_id>]\n", argv[0]);
     _set_usage(argv[0]);
     _mtu_usage(argv[0]);
+#ifdef MODULE_GNRC_IPV6_NETIF
     _hl_usage(argv[0]);
+#endif
     _flag_usage(argv[0]);
     _add_usage(argv[0]);
     _del_usage(argv[0]);
+#ifdef MODULE_NETSTATS
     _stats_usage(argv[0]);
+#endif
     return 1;
 }

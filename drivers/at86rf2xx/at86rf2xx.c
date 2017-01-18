@@ -77,7 +77,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     cpuid_get(cpuid);
 
 #if CPUID_LEN > IEEE802154_LONG_ADDRESS_LEN
-    for (int i = IEEE802154_LONG_ADDRESS_LEN; i < CPUID_LEN; i++) {
+    for (unsigned int i = IEEE802154_LONG_ADDRESS_LEN; i < CPUID_LEN; i++) {
         cpuid[i & 0x07] ^= cpuid[i];
     }
 #endif
@@ -100,7 +100,6 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* set default TX power */
     at86rf2xx_set_txpower(dev, AT86RF2XX_DEFAULT_TXPOWER);
     /* set default options */
-    at86rf2xx_set_option(dev, NETDEV2_IEEE802154_PAN_COMP, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_START, false);
@@ -218,6 +217,6 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev)
                         AT86RF2XX_TRX_STATE__TX_START);
     if (netdev->event_callback &&
         (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_START)) {
-        netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED, NULL);
+        netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED);
     }
 }

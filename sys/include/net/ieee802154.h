@@ -78,12 +78,61 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Flag for @ref ieee802154_set_frame_hdr to indicate to ignore @p dst
- *          and @p dst_len and send broadcast.
- * @note    This flag is RIOT internal and shall not be used in the FCF of
- *          packets send over the air
+ * @brief   Channel ranges
+ * @{
  */
-#define IEEE802154_BCAST                    (0x80)
+/**
+ * @brief   Minimum channel for sub-GHz band
+ */
+#define IEEE802154_CHANNEL_MIN_SUBGHZ   (0U)
+#define IEEE802154_CHANNEL_MAX_SUBGHZ   (10U)   /**< Maximum channel for sub-GHz band */
+#define IEEE802154_CHANNEL_MIN          (11U)   /**< Minimum channel for 2.4 GHz band */
+#define IEEE802154_CHANNEL_MAX          (26U)   /**< Maximum channel for 2.4 GHz band */
+/** @} */
+
+#define IEEE802154_FRAME_LEN_MAX        (127U)  /**< maximum frame length */
+
+/**
+ * @brief   Special address defintions
+ * @{
+ */
+/**
+ * @brief   Static initializer for broadcast address
+ */
+#define IEEE802154_ADDR_BCAST               { 0xff, 0xff }
+
+/**
+ * @brief   Length in byte of @ref IEEE802154_ADDR_BCAST
+ */
+#define IEEE802154_ADDR_BCAST_LEN           (IEEE802154_SHORT_ADDRESS_LEN)
+
+/**
+ * @brief   Broadcast address
+ */
+extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
+/** @} */
+
+/**
+ * @{
+ * @name    Default values
+ * @brief   Default values for devices to choose
+ */
+#ifndef IEEE802154_DEFAULT_SUBGHZ_CHANNEL
+#define IEEE802154_DEFAULT_SUBGHZ_CHANNEL   (5U)
+#endif
+
+#ifndef IEEE802154_DEFAULT_CHANNEL
+#define IEEE802154_DEFAULT_CHANNEL          (26U)
+#endif
+
+#ifndef IEEE802154_DEFAULT_PANID
+#define IEEE802154_DEFAULT_PANID            (0x0023U)
+#endif
+
+#ifndef IEEE802154_DEFAULT_TXPOWER
+#define IEEE802154_DEFAULT_TXPOWER          (0) /* in dBm */
+#endif
+/** @} */
 
 /**
  * @brief   Initializes an IEEE 802.15.4 MAC frame header in @p buf.
@@ -119,12 +168,8 @@ extern "C" {
  *                      first byte of the IEEE 802.15.4 FCF. This means that
  *                      it encompasses the type values,
  *                      @ref IEEE802154_FCF_SECURITY_EN,
- *                      @ref IEEE802154_FCF_FRAME_PEND,
- *                      @ref IEEE802154_FCF_ACK_REQ, and
- *                      @ref IEEE802154_FCF_PAN_COMP.
- *                      Additionally the @ref IEEE802154_BCAST flag can be set
- *                      do ignore @p dst and @p dst_len and just set `ff:ff`
- *                      (broadcast) as destination address
+ *                      @ref IEEE802154_FCF_FRAME_PEND, and
+ *                      @ref IEEE802154_FCF_ACK_REQ.
  * @param[in] seq       Sequence number for frame.
  *
  * The version field in the FCF will be set implicitly to version 1.

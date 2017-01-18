@@ -35,12 +35,14 @@
  * @{
  */
 #define CC110X_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
-#define CC110X_MAC_PRIO          (THREAD_PRIORITY_MAIN - 3)
+#ifndef CC110X_MAC_PRIO
+#define CC110X_MAC_PRIO          (GNRC_NETDEV2_MAC_PRIO)
+#endif
 
 #define CC110X_NUM (sizeof(cc110x_params)/sizeof(cc110x_params[0]))
 
 static netdev2_cc110x_t cc110x_devs[CC110X_NUM];
-static char _stacks[CC110X_MAC_STACKSIZE][CC110X_NUM];
+static char _stacks[CC110X_NUM][CC110X_MAC_STACKSIZE];
 
 static gnrc_netdev2_t _gnrc_netdev2_devs[CC110X_NUM];
 
@@ -51,14 +53,14 @@ void auto_init_cc110x(void)
         DEBUG("Initializing CC110X radio at SPI_%i\n", p->spi);
         int res = netdev2_cc110x_setup(&cc110x_devs[i], p);
         if (res < 0) {
-            DEBUG("Error initializing CC110X radio device!");
+            DEBUG("Error initializing CC110X radio device!\n");
         }
         else {
             gnrc_netdev2_cc110x_init(&_gnrc_netdev2_devs[i], &cc110x_devs[i]);
             res = gnrc_netdev2_init(_stacks[i], CC110X_MAC_STACKSIZE,
                     CC110X_MAC_PRIO, "cc110x", &_gnrc_netdev2_devs[i]);
             if (res < 0) {
-                DEBUG("Error starting gnrc_cc110x thread for CC110X!");
+                DEBUG("Error starting gnrc_cc110x thread for CC110X!\n");
             }
         }
     }

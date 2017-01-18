@@ -53,7 +53,7 @@ extern saul_driver_t lsm303dlhc_saul_mag_driver;
 
 void auto_init_lsm303dlhc(void)
 {
-    for (int i = 0; i < LSM303DLHC_NUM; i++) {
+    for (unsigned int i = 0; i < LSM303DLHC_NUM; i++) {
         const lsm303dlhc_params_t *p = &lsm303dlhc_params[i];
 
         DEBUG("[auto_init_saul] initializing lsm303dlhc acc/mag sensor\n");

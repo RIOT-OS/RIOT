@@ -19,8 +19,8 @@
  * @author      Mark Essien <markessien@gmail.com>
  */
 
-#ifndef __CIPHERS_H_
-#define __CIPHERS_H_
+#ifndef CRYPTO_CIPHERS_H_
+#define CRYPTO_CIPHERS_H_
 
 #include <stdint.h>
 
@@ -35,7 +35,6 @@ extern "C" {
  */
 // #define CRYPTO_THREEDES
 // #define CRYPTO_AES
-// #define CRYPTO_TWOFISH
 
 /** @brief the length of keys in bytes */
 #define CIPHERS_MAX_KEY_SIZE 20
@@ -48,26 +47,26 @@ extern "C" {
  *
  * threedes     needs 24  bytes                           <br>
  * aes          needs CIPHERS_MAX_KEY_SIZE bytes          <br>
- * twofish      needs CIPHERS_MAX_KEY_SIZE bytes          <br>
  */
 #if defined(CRYPTO_THREEDES)
     #define CIPHER_MAX_CONTEXT_SIZE 24
 #elif defined(CRYPTO_AES)
-    #define CIPHER_MAX_CONTEXT_SIZE CIPHERS_MAX_KEY_SIZE
-#elif defined(CRYPTO_TWOFISH)
     #define CIPHER_MAX_CONTEXT_SIZE CIPHERS_MAX_KEY_SIZE
 #else
     // 0 is not a possibility because 0-sized arrays are not allowed in ISO C
     #define CIPHER_MAX_CONTEXT_SIZE 1
 #endif
 
-/**
- * error codes
- */
+/* return codes */
+
 #define CIPHER_ERR_INVALID_KEY_SIZE   -3
 #define CIPHER_ERR_INVALID_LENGTH     -4
 #define CIPHER_ERR_ENC_FAILED         -5
 #define CIPHER_ERR_DEC_FAILED         -6
+/** Is returned by the cipher_init functions, if the coresponding alogirithm has not been included in the build */
+#define CIPHER_ERR_BAD_CONTEXT_SIZE    0
+/**  Returned by cipher_init upon succesful initialization of a cipher. */
+#define CIPHER_INIT_SUCCESS            1
 
 /**
  * @brief   the context for cipher-operations
@@ -104,7 +103,6 @@ typedef const cipher_interface_t *cipher_id_t;
 
 extern const cipher_id_t CIPHER_3DES;
 extern const cipher_id_t CIPHER_AES_128;
-extern const cipher_id_t CIPHER_TWOFISH;
 
 
 /**
@@ -126,6 +124,10 @@ typedef struct {
  * @param cipher_id  cipher algorithm id
  * @param key        encryption key to use
  * @param key_size   length of the encryption key
+ *
+ * @return  CIPHER_INIT_SUCCESS if the initialization was successful.
+ *          The command may be unsuccessful if the key size is not valid.
+ *          CIPHER_ERR_BAD_CONTEXT_SIZE if CIPHER_MAX_CONTEXT_SIZE has not been defined (which means that the cipher has not been included in the build)
  */
 int cipher_init(cipher_t* cipher, cipher_id_t cipher_id, const uint8_t* key,
                 uint8_t key_size);
@@ -169,4 +171,4 @@ int cipher_get_block_size(const cipher_t* cipher);
 #endif
 
 /** @} */
-#endif /* __CIPHERS_H_ */
+#endif /* CRYPTO_CIPHERS_H_ */

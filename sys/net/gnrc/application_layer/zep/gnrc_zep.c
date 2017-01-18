@@ -198,18 +198,18 @@ static inline uint16_t *_get_uint16_ptr(void *ptr)
 
 static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
 {
+    if ((netdev == NULL) || (netdev->driver != &_zep_driver)) {
+        DEBUG("zep: wrong device on sending\n");
+        gnrc_pktbuf_release(pkt);
+        return -ENODEV;
+    }
+
     gnrc_zep_t *dev = (gnrc_zep_t *)netdev;
     gnrc_pktsnip_t *ptr, *new_pkt, *hdr;
     gnrc_zep_hdr_t *zep;
     size_t payload_len = gnrc_pkt_len(pkt->next), hdr_len, mhr_offset;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN], *data;
     uint16_t fcs = 0;
-
-    if ((netdev == NULL) || (netdev->driver != &_zep_driver)) {
-        DEBUG("zep: wrong device on sending\n");
-        gnrc_pktbuf_release(pkt);
-        return -ENODEV;
-    }
 
     /* create 802.15.4 header */
     hdr_len = _make_data_frame_hdr(dev, mhr, (gnrc_netif_hdr_t *)pkt->data);
@@ -557,13 +557,10 @@ void *_event_loop(void *args)
     msg_t msg, ack, msg_q[GNRC_ZEP_MSG_QUEUE_SIZE];
     gnrc_netdev_t *dev = (gnrc_netdev_t *)args;
     gnrc_netapi_opt_t *opt;
-    gnrc_netreg_entry_t my_reg = { NULL, ((gnrc_zep_t *)args)->src_port,
-                                   KERNEL_PID_UNDEF
-                                 };
+    gnrc_netreg_entry_t my_reg = GNRC_NETREG_ENTRY_INIT_PID(((gnrc_zep_t *)args)->src_port,
+                                                            sched_active_pid);
 
     msg_init_queue(msg_q, GNRC_ZEP_MSG_QUEUE_SIZE);
-
-    my_reg.pid = thread_getpid();
 
     gnrc_netreg_register(GNRC_NETTYPE_UDP, &my_reg);
 
@@ -573,7 +570,7 @@ void *_event_loop(void *args)
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 DEBUG("zep: GNRC_NETAPI_MSG_TYPE_RCV\n");
-                ringbuffer_add(&_rx_buf, (char *)(&msg.content.ptr),
+                ringbuffer_add(&_rx_buf, (void*)&msg.content.ptr,
                                sizeof(gnrc_pktsnip_t *));
                 ack.type = GNRC_NETDEV_MSG_TYPE_EVENT;
                 ack.content.value = _EVENT_RX_STARTED;
@@ -582,12 +579,12 @@ void *_event_loop(void *args)
 
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("zep: GNRC_NETAPI_MSG_TYPE_SND\n");
-                _send(dev, (gnrc_pktsnip_t *)msg.content.ptr);
+                _send(dev, msg.content.ptr);
                 break;
 
             case GNRC_NETAPI_MSG_TYPE_GET:
                 DEBUG("zep: GNRC_NETAPI_MSG_TYPE_GET\n");
-                opt = (gnrc_netapi_opt_t *)msg.content.ptr;
+                opt = msg.content.ptr;
                 ack.type = GNRC_NETAPI_MSG_TYPE_ACK;
                 ack.content.value = _get(dev, opt->opt, opt->data, opt->data_len);
                 msg_reply(&msg, &ack);
@@ -595,7 +592,7 @@ void *_event_loop(void *args)
 
             case GNRC_NETAPI_MSG_TYPE_SET:
                 DEBUG("zep: GNRC_NETAPI_MSG_TYPE_SET\n");
-                opt = (gnrc_netapi_opt_t *)msg.content.ptr;
+                opt = msg.content.ptr;
                 ack.type = GNRC_NETAPI_MSG_TYPE_ACK;
                 ack.content.value = _set(dev, opt->opt, opt->data, opt->data_len);
                 msg_reply(&msg, &ack);

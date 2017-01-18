@@ -27,9 +27,10 @@
 #include <stdio.h>
 
 #include "xtimer.h"
+#include "timex.h"
 #include "periph/pwm.h"
 
-#define INTERVAL    (10000U)
+#define INTERVAL    (10LU * MS_IN_USEC) /* 10 ms */
 #define STEP        (10)
 
 #define MODE        PWM_LEFT
@@ -41,7 +42,7 @@ int main(void)
 {
     int state = 0;
     int step = STEP;
-    uint32_t last_wakeup = xtimer_now();
+    xtimer_ticks32_t last_wakeup = xtimer_now();
 
     puts("\nRIOT PWM test");
     puts("Connect an LED or scope to PWM pins to see something\n");
@@ -71,7 +72,7 @@ int main(void)
             step = -step;
         }
 
-        xtimer_usleep_until(&last_wakeup, INTERVAL);
+        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
     }
 
     return 0;

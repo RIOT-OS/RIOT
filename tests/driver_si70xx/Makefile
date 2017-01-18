@@ -1,9 +1,6 @@
 APPLICATION = driver_si70xx
 include ../Makefile.tests_common
 
-FEATURES_REQUIRED += periph_gpio
-FEATURES_REQUIRED += periph_i2c
-
 USEMODULE += si70xx
 USEMODULE += xtimer
 

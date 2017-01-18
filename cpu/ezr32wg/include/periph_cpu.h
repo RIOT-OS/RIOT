@@ -88,6 +88,7 @@ enum {
     PF = 5                  /**< port F */
 };
 
+#ifndef DOXYGEN
 /**
  * @brief   Override GPIO modes
  * @{
@@ -114,6 +115,7 @@ typedef enum {
     GPIO_BOTH = 3           /**< emit interrupt on both flanks */
 } gpio_flank_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   UART device configuration

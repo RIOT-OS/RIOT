@@ -58,7 +58,7 @@ Iface  5   HWaddr: 96:3c:18:1e:26:f7
 Waiting for incoming UDP packet...
 ```
 
-The link-layer address in this case is "fe80::f8bf:2bff:fe01:9ea3", the only
+The link-layer address in this case is "fe80::e42a:1aff:feca:10ec", the only
 "scope: local" address set.
 
 Testing
@@ -68,10 +68,10 @@ There are multiple external CoAP clients you can use to test the server on nativ
 libcoap CLI
 -----------
 
-(replace "fe80::f8bf:2bff:fe01:9ea3" with your link-layer address)
+(replace "fe80::e42a:1aff:feca:10ec" with your link-layer address)
 
 ```
-# coap-client "coap://[fe80::f8bf:2bff:fe01:9ea3%tap0]/riot/board"
+# coap-client "coap://[fe80::e42a:1aff:feca:10ec%tap0]/riot/board"
 ```
 
 Copper (Firefox Plugin)

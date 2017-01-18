@@ -32,8 +32,8 @@
    ---------------------------------------------------------------------------*/
 
 
-#ifndef __CMSIS_ARMCC_H
-#define __CMSIS_ARMCC_H
+#ifndef CMSIS_ARMCC_H
+#define CMSIS_ARMCC_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -737,4 +737,4 @@ __attribute__((section(".rrx_text"))) __STATIC_INLINE __ASM uint32_t __RRX(uint3
 }
 #endif
 
-#endif /* __CMSIS_ARMCC_H */
+#endif /* CMSIS_ARMCC_H */

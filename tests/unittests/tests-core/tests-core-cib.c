@@ -36,6 +36,20 @@ static void test_cib_get(void)
     TEST_ASSERT_EQUAL_INT(-1, cib_get(&cib));
 }
 
+static void test_cib_peek(void)
+{
+    cib_init(&cib, TEST_CIB_SIZE);
+    TEST_ASSERT_EQUAL_INT(-1, cib_peek(&cib));
+    TEST_ASSERT_EQUAL_INT(0, cib_put(&cib));
+    TEST_ASSERT_EQUAL_INT(0, cib_peek(&cib));
+    TEST_ASSERT_EQUAL_INT(1, cib_put(&cib));
+    TEST_ASSERT_EQUAL_INT(0, cib_peek(&cib));
+    TEST_ASSERT_EQUAL_INT(0, cib_get(&cib));
+    TEST_ASSERT_EQUAL_INT(1, cib_peek(&cib));
+    TEST_ASSERT_EQUAL_INT(1, cib_get(&cib));
+    TEST_ASSERT_EQUAL_INT(-1, cib_peek(&cib));
+}
+
 static void test_cib_avail(void)
 {
     TEST_ASSERT_EQUAL_INT(0, cib_avail(&cib));
@@ -83,6 +97,7 @@ Test *tests_core_cib_tests(void)
         new_TestFixture(test_cib_put_and_get),
         new_TestFixture(test_empty_cib),
         new_TestFixture(test_singleton_cib),
+        new_TestFixture(test_cib_peek),
     };
 
     EMB_UNIT_TESTCALLER(core_cib_tests, set_up, NULL, fixtures);

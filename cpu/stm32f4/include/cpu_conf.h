@@ -18,8 +18,8 @@
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef __CPU_CONF_H
-#define __CPU_CONF_H
+#ifndef STM32F4_CPU_CONF_H
+#define STM32F4_CPU_CONF_H
 
 #include "cpu_conf_common.h"
 
@@ -29,6 +29,8 @@
 #include "stm32f407xx.h"
 #elif defined(CPU_MODEL_STM32F415RG)
 #include "stm32f415xx.h"
+#elif defined(CPU_MODEL_STM32F446RE)
+#include "stm32f446xx.h"
 #endif
 
 #ifdef __cplusplus
@@ -48,5 +50,5 @@ extern "C" {
 }
 #endif
 
-#endif /* __CPU_CONF_H */
+#endif /* STM32F4_CPU_CONF_H */
 /** @} */

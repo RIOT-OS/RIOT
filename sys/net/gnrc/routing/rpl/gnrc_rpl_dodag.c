@@ -225,7 +225,7 @@ bool gnrc_rpl_parent_remove(gnrc_rpl_parent_t *parent)
 
         /* set the default route to the next parent for now */
         if (parent->next) {
-            uint32_t now = xtimer_now() / SEC_IN_USEC;
+            uint32_t now = xtimer_now_usec() / SEC_IN_USEC;
             fib_add_entry(&gnrc_ipv6_fib_table,
                           dodag->iface,
                           (uint8_t *) ipv6_addr_unspecified.u8,
@@ -266,7 +266,7 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
 {
     /* update Parent lifetime */
     if (parent != NULL) {
-        uint32_t now = xtimer_now();
+        uint32_t now = xtimer_now_usec();
         parent->lifetime = (now / SEC_IN_USEC) + (dodag->default_lifetime * dodag->lifetime_unit);
 #ifdef MODULE_GNRC_RPL_P2P
         if (dodag->instance->mop != GNRC_RPL_P2P_MOP) {
@@ -401,16 +401,16 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
         inst->max_rank_inc = GNRC_RPL_DEFAULT_MAX_RANK_INCREASE;
     }
     else if (inst == NULL) {
-        DEBUG("RPL: could not allocate memory for a new instance with id %d", instance_id);
+        DEBUG("RPL: could not allocate memory for a new instance with id %d\n", instance_id);
         return NULL;
     }
     else {
-        DEBUG("RPL: instance (%d) exists", instance_id);
+        DEBUG("RPL: instance (%d) exists\n", instance_id);
         return NULL;
     }
 
     if (!gnrc_rpl_dodag_init(inst, dodag_id, iface, netif_addr)) {
-        DEBUG("RPL: could not initialize DODAG");
+        DEBUG("RPL: could not initialize DODAG\n");
         gnrc_rpl_instance_remove(inst);
         return NULL;
     }

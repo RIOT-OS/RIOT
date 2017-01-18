@@ -52,9 +52,9 @@ extern "C" {
 
 #ifdef MODULE_LWIP_ETHERNET
 #define LWIP_ETHERNET           (1)
-#else  /* MODULE_LWIP_IPV4 */
+#else  /* MODULE_LWIP_ETHERNET */
 #define LWIP_ETHERNET           (0)
-#endif /* MODULE_LWIP_IPV4 */
+#endif /* MODULE_LWIP_ETHERNET */
 
 #ifdef MODULE_LWIP_IGMP
 #define LWIP_IGMP               (1)
@@ -73,6 +73,12 @@ extern "C" {
 #else  /* MODULE_LWIP_IPV6_AUTOCONFIG */
 #define LWIP_IPV6_AUTOCONFIG    (0)
 #endif /* MODULE_LWIP_IPV6_AUTOCONFIG */
+
+#ifdef MODULE_LWIP_IPV6_MLD
+#define LWIP_IPV6_MLD           (1)
+#else  /* MODULE_LWIP_IPV6 */
+#define LWIP_IPV6_MLD           (0)
+#endif /* MODULE_LWIP_IPV6 */
 
 #ifdef MODULE_LWIP_IPV6
 #define LWIP_IPV6               (1)
@@ -123,7 +129,7 @@ extern "C" {
 #define LWIP_UDPLITE            (0)
 #endif /* MODULE_LWIP_UDPLITE */
 
-#ifdef MODULE_LWIP_CONN
+#if defined(MODULE_LWIP_CONN) || defined(MODULE_LWIP_SOCK)
 #define LWIP_NETCONN            (1)
 #else
 #define LWIP_NETCONN            (0)

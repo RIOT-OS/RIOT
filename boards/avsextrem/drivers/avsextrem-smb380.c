@@ -29,7 +29,6 @@
 
 #include "lpc23xx.h"   /* LPC23XX/24xx Peripheral Registers */
 #include "cpu.h"
-#include "lpm.h"
 #include "VIC.h"
 #include "ssp0-board.h"
 #include "smb380-board.h"
@@ -66,7 +65,7 @@ uint8_t counter_Decreasing = 0;
 volatile uint16_t interruptTicksSMB380;
 
 typedef struct {
-    u_int writePointerPos;  //Writepointer position
+    unsigned writePointerPos;  //Writepointer position
     /*
      * check value for updated range settings (only needed for multiplication
      * in Float-mode
@@ -142,8 +141,6 @@ uint8_t SMB380_HystereseFunctionSample(int16_t *value)
 
 static void SMB380_simple_interrupthandler(void)
 {
-    lpm_awake();
-
     SMB380_getAcceleration(SMB380_X_AXIS, NULL, &simple_buffer[0]);
     SMB380_getAcceleration(SMB380_Y_AXIS, NULL, &simple_buffer[1]);
     SMB380_getAcceleration(SMB380_Z_AXIS, NULL, &simple_buffer[2]);
@@ -248,8 +245,6 @@ uint8_t SMB380_init(uint8_t (*func)(int16_t *))
 static void SMB380_extIntHandler(void)
 {
     int16_t accInt[4];
-
-    lpm_awake(); //initializes clock
 
     SMB380_getAcceleration(SMB380_X_AXIS, NULL, &accInt[0]);
     SMB380_getAcceleration(SMB380_Y_AXIS, NULL, &accInt[1]);
@@ -401,7 +396,7 @@ uint8_t writeRingBuff(int16_t *value)
 
         /* measuring temperature dependent internal sample rate of SMB380 */
         if (smb380_mode == SMB380_CONTINOUS) {
-            tickLastSample = xtimer_now();
+            tickLastSample = xtimer_now_usec();
             tickCurrentSamples++;
         }
 
@@ -1021,7 +1016,6 @@ void SMB380_enableNewDataInt(void)
      * prevent deep sleep, reason: 400 µs wake-up time is to long for 3kHz
      * interrupts
      */
-    SETBIT(lpm_prevent_sleep, LPM_PREVENT_SLEEP_ACCSENSOR);
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL4, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
@@ -1030,7 +1024,7 @@ void SMB380_enableNewDataInt(void)
     SMB380_ssp_read();
     SMB380_Unprepare();
     // measuring temperature dependent internal sample rate of SMB380
-    tickStart = xtimer_now();
+    tickStart = xtimer_now_usec();
     tickCurrentSamples = 0;
     irq_restore(cpsr);
 }
@@ -1050,7 +1044,6 @@ void SMB380_disableNewDataInt(void)
      * enable deep sleep, reason: 400 µs wake-up time was to long for 3kHz
      * interrupts
      */
-    CLRBIT(lpm_prevent_sleep, LPM_PREVENT_SLEEP_ACCSENSOR);
     irq_restore(cpsr);
 }
 

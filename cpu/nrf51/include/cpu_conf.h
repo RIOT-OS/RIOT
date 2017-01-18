@@ -16,8 +16,8 @@
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef __CPU_CONF_H
-#define __CPU_CONF_H
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #include "cpu_conf_common.h"
 #include "nrf51.h"
@@ -31,13 +31,37 @@ extern "C" {
  * @brief   ARM Cortex-M specific CPU configuration
  * @{
  */
-#define CPU_DEFAULT_IRQ_PRIO            (1U)
-#define CPU_IRQ_NUMOF                   (26U)
+#define CPU_DEFAULT_IRQ_PRIO    (1U)
+#define CPU_IRQ_NUMOF           (26U)
+#define CPU_FLASH_BASE          (0x00000000)
+/** @} */
+
+/**
+ * @brief   Flash page configuration
+ * @{
+ */
+#define FLASHPAGE_SIZE          (1024U)
+
+#if defined(CPU_MODEL_NRF51X22XXAA)
+#define FLASHPAGE_NUMOF         (256U)
+#elif defined(CPU_MODEL_NRF51X22XXAB)
+#define FLASHPAGE_NUMOF         (128U)
+#endif
+/** @} */
+
+/**
+ * @brief   Due to RAM restrictions, we need to limit the default GNRC packet
+ *          buffer size on these CPUs
+ * @{
+ */
+#ifndef GNRC_PKTBUF_SIZE
+#define GNRC_PKTBUF_SIZE                (2048)
+#endif
 /** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __CPU_CONF_H */
+#endif /* CPU_CONF_H */
 /** @} */

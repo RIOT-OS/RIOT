@@ -66,7 +66,6 @@ void gnrc_icmpv6_echo_req_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6_hdr,
 {
     uint8_t *payload = ((uint8_t *)echo) + sizeof(icmpv6_echo_t);
     gnrc_pktsnip_t *hdr, *pkt;
-    gnrc_netreg_entry_t *sendto = NULL;
 
     if ((echo == NULL) || (len < sizeof(icmpv6_echo_t))) {
         DEBUG("icmpv6_echo: echo was NULL or len (%" PRIu16
@@ -103,23 +102,10 @@ void gnrc_icmpv6_echo_req_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6_hdr,
 
     LL_PREPEND(pkt, hdr);
 
-    sendto = gnrc_netreg_lookup(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL);
-
-    if (sendto == NULL) {
+    if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL,
+                                   pkt)) {
         DEBUG("icmpv6_echo: no receivers for IPv6 packets\n");
         gnrc_pktbuf_release(pkt);
-        return;
-    }
-
-    /* ICMPv6 is not interested anymore so `- 1` */
-    gnrc_pktbuf_hold(pkt, gnrc_netreg_num(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL) - 1);
-
-    while (sendto != NULL) {
-        if (gnrc_netapi_send(sendto->pid, pkt) < 1) {
-            DEBUG("icmpv6_echo: unable to send packet\n");
-            gnrc_pktbuf_release(pkt);
-        }
-        sendto = gnrc_netreg_getnext(sendto);
     }
 }
 

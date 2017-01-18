@@ -10,7 +10,7 @@
  * @defgroup    sys_hashes Hashes
  * @ingroup     sys
  *
- * @brief       RIOT provides a collection of hash algorithms.
+ * @brief       A collection of hash algorithms.
  *
  * RIOT supports the following hash functions:
  *

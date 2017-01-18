@@ -77,7 +77,7 @@ int pir_register_thread(pir_t *dev)
 static void pir_send_msg(pir_t *dev, pir_event_t event)
 {
     DEBUG("pir_send_msg\n");
-    msg_t m = { .type = event, .content.ptr = (char*) dev, };
+    msg_t m = { .type = event, .content.ptr = dev, };
 
     int ret = msg_send_int(&m, dev->msg_thread_pid);
     DEBUG("pir_send_msg: msg_send_int: %i\n", ret);
@@ -93,6 +93,7 @@ static void pir_send_msg(pir_t *dev, pir_event_t event)
             dev->msg_thread_pid = KERNEL_PID_UNDEF;
             break;
     }
+    DEBUG("\n");
 }
 
 static void pir_callback(void *arg)

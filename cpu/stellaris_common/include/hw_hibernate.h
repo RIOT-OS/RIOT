@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_HIBERNATE_H__
-#define __HW_HIBERNATE_H__
+#ifndef STELLARIS_HW_HIBERNATE_H_
+#define STELLARIS_HW_HIBERNATE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -291,4 +291,4 @@ extern "C" {
 }
 #endif
 
-#endif // __HW_HIBERNATE_H__
+#endif /* STELLARIS_HW_HIBERNATE_H_ */

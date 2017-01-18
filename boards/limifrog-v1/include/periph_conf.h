@@ -42,6 +42,11 @@ extern "C" {
 #define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV1     /* APB1 clock -> 32MHz */
 /* configuration of flash access cycles */
 #define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY
+
+/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
+#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)
 /** @} */
 
 /**
@@ -56,47 +61,51 @@ extern "C" {
  * @{
  */
 static const timer_conf_t timer_config[] = {
-    /* device, RCC bit, IRQ bit */
-    {TIM5, 3, TIM5_IRQn},
+    {
+        .dev      = TIM5,
+        .max      = 0x0000ffff,
+        .rcc_mask = RCC_APB1ENR_TIM5EN,
+        .bus      = APB1,
+        .irqn     = TIM5_IRQn
+    }
 };
-/* interrupt routines */
+
 #define TIMER_0_ISR         (isr_tim5)
-/* number of defined timers */
+
 #define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**
- * @brief UART configuration
+ * @brief   UART configuration
  * @{
  */
-#define UART_NUMOF          (2U)
-#define UART_0_EN           1
-#define UART_1_EN           1
-#define UART_IRQ_PRIO       1
+static const uart_conf_t uart_config[] = {
+    {
+        .dev        = USART3,
+        .rcc_mask   = RCC_APB1ENR_USART3EN,
+        .rx_pin     = GPIO_PIN(PORT_C, 11),
+        .tx_pin     = GPIO_PIN(PORT_C, 10),
+        .rx_af      = GPIO_AF7,
+        .tx_af      = GPIO_AF7,
+        .bus        = APB1,
+        .irqn       = USART3_IRQn
+    },
+    {
+        .dev        = USART1,
+        .rcc_mask   = RCC_APB2ENR_USART1EN,
+        .rx_pin     = GPIO_PIN(PORT_A, 10),
+        .tx_pin     = GPIO_PIN(PORT_A,  9),
+        .rx_af      = GPIO_AF7,
+        .tx_af      = GPIO_AF7,
+        .bus        = APB2,
+        .irqn       = USART1_IRQn
+    }
+};
 
-/* UART 0 device configuration */
-#define UART_0_DEV          USART3
-#define UART_0_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART3EN)
-#define UART_0_CLK          (CLOCK_CORECLOCK)
-#define UART_0_IRQ          USART3_IRQn
-#define UART_0_ISR          isr_usart3
-#define UART_0_BUS_FREQ     32000000
-/* UART 0 pin configuration */
-#define UART_0_RX_PIN       GPIO_PIN(PORT_C, 11)
-#define UART_0_TX_PIN       GPIO_PIN(PORT_C, 10)
-#define UART_0_AF           GPIO_AF7
+#define UART_0_ISR          (isr_usart3)
+#define UART_1_ISR          (isr_usart1)
 
-/* UART 1 device configuration */
-#define UART_1_DEV          USART1        /* Panasonic PAN1740 BLE module */
-#define UART_1_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_USART1EN)
-#define UART_1_CLK          (CLOCK_CORECLOCK)
-#define UART_1_IRQ          USART1_IRQn
-#define UART_1_ISR          isr_usart1
-#define UART_0_BUS_FREQ     32000000
-/* UART 1 pin configuration */
-#define UART_1_RX_PIN       GPIO_PIN(PORT_A, 10)
-#define UART_1_TX_PIN       GPIO_PIN(PORT_A, 9)
-#define UART_1_AF           GPIO_AF7
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**
@@ -109,12 +118,12 @@ static const timer_conf_t timer_config[] = {
 
 /* SPI 0 device configuration */
 #define SPI_0_DEV           SPI1  /* Densitron DD-160128FC-1a OLED display; external pins */
-#define SPI_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
-#define SPI_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_SPI1EN))
+#define SPI_0_CLKEN()       (periph_clk_en(APB2, RCC_APB2ENR_SPI1EN))
+#define SPI_0_CLKDIS()      (periph_clk_dis(APB2, RCC_APB2ENR_SPI1EN))
 #define SPI_0_IRQ           SPI1_IRQn
 #define SPI_0_ISR           isr_spi1
 /* SPI 0 pin configuration */
-#define SPI_0_PORT_CLKEN()  (RCC->AHBENR |= RCC_AHBENR_GPIOAEN)
+#define SPI_0_PORT_CLKEN()  (periph_clk_en(AHB, RCC_AHBENR_GPIOAEN))
 #define SPI_0_PORT          GPIOA
 #define SPI_0_PIN_SCK       5
 #define SPI_0_PIN_MOSI      7
@@ -123,12 +132,12 @@ static const timer_conf_t timer_config[] = {
 
 /* SPI 1 device configuration */
 #define SPI_1_DEV           SPI3          /*  Adesto AT45DB641E data flash */
-#define SPI_1_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_SPI3EN)
-#define SPI_1_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_SPI3EN))
+#define SPI_1_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_SPI3EN))
+#define SPI_1_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_SPI3EN))
 #define SPI_1_IRQ           SPI3_IRQn
 #define SPI_1_ISR           isr_spi3
 /* SPI 1 pin configuration */
-#define SPI_1_PORT_CLKEN()  (RCC->AHBENR |= RCC_AHBENR_GPIOBEN)
+#define SPI_1_PORT_CLKEN()  (periph_clk_en(AHB, RCC_AHBENR_GPIOBEN))
 #define SPI_1_PORT          GPIOB
 #define SPI_1_PIN_SCK       3
 #define SPI_1_PIN_MOSI      5

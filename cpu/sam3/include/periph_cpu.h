@@ -80,6 +80,7 @@ typedef uint32_t gpio_t;
  */
 #define GPIO_MODE(io, pu, od)   (io | (pu << 1) | (od << 2))
 
+#ifndef DOXYGEN
 /**
  * @brief   Override GPIO modes
  * @{
@@ -106,6 +107,7 @@ typedef enum {
     GPIO_BOTH = 3           /**< emit interrupt on both flanks */
 } gpio_flank_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief Available ports on the SAM3X8E
@@ -146,6 +148,22 @@ typedef struct {
     uint8_t pmc_id;         /**< bit in the PMC register of the device*/
     uint8_t irqn;           /**< interrupt number of the device */
 } uart_conf_t;
+
+/**
+ * @brief   PWM channel configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< GPIO pin connected to the channel */
+    uint8_t hwchan;         /**< the HW channel used for a logical channel */
+} pwm_chan_conf_t;
+
+/**
+ * @brief   Configure the given GPIO pin to be used with the given MUX setting
+ *
+ * @param[in] pin           GPIO pin to configure
+ * @param[in] mux           MUX setting to use
+ */
+void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
 
 #ifdef __cplusplus
 }

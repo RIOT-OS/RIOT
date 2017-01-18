@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Device driver implementation for the LSM303DLHC light sensor
+ * @brief       Device driver implementation for the LSM303DLHC 3D accelerometer/magnetometer.
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
@@ -34,7 +34,7 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, i2c_t i2c, gpio_t acc_pin, gpio_t mag_pin
                     lsm303dlhc_mag_gain_t mag_gain)
 {
     int res;
-    char tmp;
+    uint8_t tmp;
 
     dev->i2c = i2c;
     dev->acc_address = acc_address;
@@ -48,12 +48,12 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, i2c_t i2c, gpio_t acc_pin, gpio_t mag_pin
     i2c_acquire(dev->i2c);
     i2c_init_master(i2c, I2C_SPEED_NORMAL);
 
-    DEBUG("lsm303dlhc reboot ");
+    DEBUG("lsm303dlhc reboot...");
     res = i2c_write_reg(dev->i2c, dev->acc_address,
                         LSM303DLHC_REG_CTRL5_A, LSM303DLHC_REG_CTRL5_A_BOOT);
     /* Release the bus for other threads. */
     i2c_release(dev->i2c);
-    DEBUG("[OK]");
+    DEBUG("[OK]\n");
 
     /* configure accelerometer */
     /* enable all three axis and set sample rate */
@@ -95,7 +95,7 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, i2c_t i2c, gpio_t acc_pin, gpio_t mag_pin
 int lsm303dlhc_read_acc(lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data)
 {
     int res;
-    char tmp;
+    uint8_t tmp;
 
     i2c_acquire(dev->i2c);
     i2c_read_reg(dev->i2c, dev->acc_address, LSM303DLHC_REG_STATUS_A, &tmp);
@@ -147,7 +147,7 @@ int lsm303dlhc_read_mag(lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data)
 
     i2c_acquire(dev->i2c);
     res = i2c_read_regs(dev->i2c, dev->mag_address,
-                        LSM303DLHC_REG_OUT_X_H_M, (char*)data, 6);
+                        LSM303DLHC_REG_OUT_X_H_M, data, 6);
     i2c_release(dev->i2c);
 
     if (res < 6) {
@@ -174,7 +174,7 @@ int lsm303dlhc_read_temp(lsm303dlhc_t *dev, int16_t *value)
     int res;
 
     i2c_acquire(dev->i2c);
-    res = i2c_read_regs(dev->i2c, dev->mag_address, LSM303DLHC_REG_TEMP_OUT_H, (char*)value, 2);
+    res = i2c_read_regs(dev->i2c, dev->mag_address, LSM303DLHC_REG_TEMP_OUT_H, value, 2);
     i2c_release(dev->i2c);
 
     if (res < 2) {
@@ -207,10 +207,10 @@ int lsm303dlhc_disable(lsm303dlhc_t *dev)
 int lsm303dlhc_enable(lsm303dlhc_t *dev)
 {
     int res;
-    char tmp = (LSM303DLHC_CTRL1_A_XEN
-                | LSM303DLHC_CTRL1_A_YEN
-                | LSM303DLHC_CTRL1_A_ZEN
-                | LSM303DLHC_CTRL1_A_N1344HZ_L5376HZ);
+    uint8_t tmp = (LSM303DLHC_CTRL1_A_XEN
+                  | LSM303DLHC_CTRL1_A_YEN
+                  | LSM303DLHC_CTRL1_A_ZEN
+                  | LSM303DLHC_CTRL1_A_N1344HZ_L5376HZ);
     i2c_acquire(dev->i2c);
     res = i2c_write_reg(dev->i2c, dev->acc_address, LSM303DLHC_REG_CTRL1_A, tmp);
 

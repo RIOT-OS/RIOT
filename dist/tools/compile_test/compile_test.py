@@ -1,8 +1,9 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2014  René Kijewski  <rene.kijewski@fu-berlin.de>
 # Copyright (C) 2015  Philipp Rosenkranz  <philipp.rosenkranz@fu-berlin.de>
+# Copyright (C) 2016  Eistec AB
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -26,7 +27,12 @@ from os import devnull, environ, listdir
 from os.path import abspath, dirname, isfile, join
 from subprocess import CalledProcessError, check_call, check_output, PIPE, Popen
 from sys import exit, stdout, argv, exc_info
-from StringIO import StringIO
+try:
+    # Python 2.x
+    from StringIO import StringIO
+except ImportError:
+    # Python 3.x
+    from io import StringIO
 from itertools import tee
 
 class Termcolor:
@@ -56,7 +62,7 @@ def get_results_and_output_from(fd):
     result = ['']
     output = StringIO()
     while 1:
-        line = fd.readline()
+        line = fd.readline().decode('utf-8', errors='replace')
         if not line:
             if prev_results:
                 yield (' .. '.join(result[:-1]), result[-1], output)
@@ -100,22 +106,24 @@ def build_all():
                                    env=subprocess_env)
 
                 results, results_with_output = tee(get_results_and_output_from(subprocess.stdout))
-                results = groupby(sorted(results), lambda (outcome, board, output): outcome)
-                results_with_output = filter(lambda (outcome, board, output): output.getvalue(), results_with_output)
-                failed_with_output = filter(lambda (outcome, board, output): 'failed' in outcome, results_with_output)
-                success_with_output = filter(lambda (outcome, board, output): 'success' in outcome, results_with_output)
+                results = groupby(sorted(results), lambda res: res[0])
+                results_with_output = list(filter(lambda res: res[2].getvalue(), results_with_output))
+                failed_with_output = list(filter(lambda res: 'failed' in res[0], results_with_output))
+                success_with_output = list(filter(lambda res: 'success' in res[0], results_with_output))
                 print()
-                for group, results in results:
-                    print('\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board, output in results))))
+                for group, result in results:
+                    print('\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board, output in result))))
                 returncode = subprocess.wait()
                 if success_with_output:
                     warnings.append((application, success_with_output))
                 if returncode == 0:
                     success.append(application)
                 else:
+                    if not failed_with_output:
+                        print(colorize_str('\t\tmake buildtest error!', Termcolor.red))
                     failed.append(application)
                     errors.append((application, failed_with_output))
-            except Exception, e:
+            except Exception as e:
                 print('\n\t\tException: {}'.format(e))
                 exceptions.append(application)
             finally:
@@ -166,7 +174,7 @@ if __name__ == '__main__':
     exceptions = []
     warnings = []
     errors = []
-    null = open(devnull, 'w', 0)
+    null = open(devnull, 'wb', 0)
 
     if len(argv) > 1:
         base_branch = argv[1]

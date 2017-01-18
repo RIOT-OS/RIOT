@@ -35,6 +35,7 @@ extern "C" {
  */
 #define GPIO_MODE(io, pr, ot)   ((io << 0) | (pr << 2) | (ot << 4))
 
+#ifndef DOXYGEN
 /**
  * @brief   Override GPIO mode options
  * @{
@@ -61,9 +62,10 @@ typedef enum {
     GPIO_BOTH = 3           /**< emit interrupt on both flanks */
 } gpio_flank_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
- * @brief   Available ports on the STM32F4 family
+ * @brief   Available ports on the STM32F0 family
  */
 enum {
     PORT_A = 0,             /**< port A */
@@ -73,16 +75,7 @@ enum {
     PORT_F = 5,             /**< port F */
 };
 
-/**
- * @brief   Available MUX values for configuring a pin's alternate function
- */
-typedef enum {
-    GPIO_AF0 = 0,           /**< use alternate function 0 */
-    GPIO_AF1,               /**< use alternate function 1 */
-    GPIO_AF2,               /**< use alternate function 2 */
-    GPIO_AF3,               /**< use alternate function 3 */
-} gpio_af_t;
-
+#ifndef DOXYGEN
 /**
  * @brief   Override ADC resolution values
  * @{
@@ -97,6 +90,7 @@ typedef enum {
     ADC_RES_16BIT = (0xff)          /**< not applicable */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   ADC line configuration values
@@ -113,16 +107,6 @@ typedef struct {
     gpio_t pin;             /**< pin connected to the line */
     uint8_t chan;           /**< DAC device used for this line */
 } dac_conf_t;
-
-/**
- * @brief   Configure the alternate function for the given pin
- *
- * @note    This is meant for internal use in STM32F4 peripheral drivers only
- *
- * @param[in] pin       pin to configure
- * @param[in] af        alternate function to use
- */
-void gpio_init_af(gpio_t pin, gpio_af_t af);
 
 #ifdef __cplusplus
 }

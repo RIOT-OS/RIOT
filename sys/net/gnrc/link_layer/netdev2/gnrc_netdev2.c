@@ -45,18 +45,16 @@ static void _pass_on_packet(gnrc_pktsnip_t *pkt);
  * @brief   Function called by the device driver on device events
  *
  * @param[in] event     type of event
- * @param[in] data      optional parameter
  */
-static void _event_cb(netdev2_t *dev, netdev2_event_t event, void *data)
+static void _event_cb(netdev2_t *dev, netdev2_event_t event)
 {
-    (void) data;
-    gnrc_netdev2_t *gnrc_netdev2 = (gnrc_netdev2_t*) dev->isr_arg;
+    gnrc_netdev2_t *gnrc_netdev2 = (gnrc_netdev2_t*) dev->context;
 
     if (event == NETDEV2_EVENT_ISR) {
         msg_t msg;
 
         msg.type = NETDEV2_MSG_TYPE_EVENT;
-        msg.content.ptr = (void*) gnrc_netdev2;
+        msg.content.ptr = gnrc_netdev2;
 
         if (msg_send(&msg, gnrc_netdev2->pid) <= 0) {
             puts("gnrc_netdev2: possibly lost interrupt.");
@@ -124,7 +122,7 @@ static void *_gnrc_netdev2_thread(void *args)
 
     /* register the event callback with the device driver */
     dev->event_callback = _event_cb;
-    dev->isr_arg = (void*) gnrc_netdev2;
+    dev->context = (void*) gnrc_netdev2;
 
     /* register the device to the network stack*/
     gnrc_netif_add(thread_getpid());
@@ -144,12 +142,12 @@ static void *_gnrc_netdev2_thread(void *args)
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("gnrc_netdev2: GNRC_NETAPI_MSG_TYPE_SND received\n");
-                gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)msg.content.ptr;
+                gnrc_pktsnip_t *pkt = msg.content.ptr;
                 gnrc_netdev2->send(gnrc_netdev2, pkt);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
                 /* read incoming options */
-                opt = (gnrc_netapi_opt_t *)msg.content.ptr;
+                opt = msg.content.ptr;
                 DEBUG("gnrc_netdev2: GNRC_NETAPI_MSG_TYPE_SET received. opt=%s\n",
                         netopt2str(opt->opt));
                 /* set option for device driver */
@@ -162,7 +160,7 @@ static void *_gnrc_netdev2_thread(void *args)
                 break;
             case GNRC_NETAPI_MSG_TYPE_GET:
                 /* read incoming options */
-                opt = (gnrc_netapi_opt_t *)msg.content.ptr;
+                opt = msg.content.ptr;
                 DEBUG("gnrc_netdev2: GNRC_NETAPI_MSG_TYPE_GET received. opt=%s\n",
                         netopt2str(opt->opt));
                 /* get option from device driver */

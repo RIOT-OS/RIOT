@@ -304,6 +304,11 @@ void auto_init(void)
     auto_init_jc42();
 #endif
 
+#ifdef MODULE_HDC1000
+    extern void auto_init_hdc1000(void);
+    auto_init_hdc1000();
+#endif
+
 #endif /* MODULE_AUTO_INIT_SAUL */
 
 #ifdef MODULE_AUTO_INIT_GNRC_RPL

@@ -38,9 +38,9 @@
  * TEST_MSG_RX_USLEEP is a tiny sleep inside the message reception thread to
  * cause extra context switches.
  */
-#define TEST_HZ (64)
-#define TEST_INTERVAL (1000000 / TEST_HZ)
-#define TEST_MSG_RX_USLEEP (200)
+#define TEST_HZ (64LU)
+#define TEST_INTERVAL (1000000LU / TEST_HZ)
+#define TEST_MSG_RX_USLEEP (200LU)
 
 char slacker_stack1[THREAD_STACKSIZE_DEFAULT];
 char slacker_stack2[THREAD_STACKSIZE_DEFAULT];
@@ -73,12 +73,12 @@ void *slacker_thread(void *arg)
     while (1) {
         msg_t m;
         msg_receive(&m);
-        struct timer_msg *tmsg = (struct timer_msg *) m.content.ptr;
+        struct timer_msg *tmsg = m.content.ptr;
         xtimer_now_timex(&now);
         xtimer_usleep(TEST_MSG_RX_USLEEP);
 
         tmsg->msg.type = 12345;
-        tmsg->msg.content.ptr = (void*)tmsg;
+        tmsg->msg.content.ptr = tmsg;
         xtimer_set_msg(&tmsg->timer, tmsg->interval, &tmsg->msg, thread_getpid());
     }
 }
@@ -96,7 +96,8 @@ void *worker_thread(void *arg)
     while (1) {
         msg_t m;
         msg_receive(&m);
-        uint32_t now = xtimer_now();
+        xtimer_ticks32_t ticks = xtimer_now();
+        uint32_t now = xtimer_usec_from_ticks(ticks);
         if (start == 0) {
             start = now;
             last = start;
@@ -105,18 +106,15 @@ void *worker_thread(void *arg)
         }
 
         uint32_t us, sec;
-        uint32_t min, hr;
         us = now % SEC_IN_USEC;
         sec = now / SEC_IN_USEC;
-        min = (sec / 60) % 60;
-        hr = sec / 3600;
         if ((loop_counter % TEST_HZ) == 0) {
             uint32_t expected = start + loop_counter * TEST_INTERVAL;
             int32_t drift = now - expected;
             expected = last + TEST_HZ * TEST_INTERVAL;
             int32_t jitter = now - expected;
-            printf("now=%" PRIu32 ".%06" PRIu32 " (%" PRIu32 " hours %" PRIu32 " min), ",
-                sec, us, hr, min);
+            printf("now=%" PRIu32 ".%06" PRIu32 " (0x%08" PRIx32 " ticks), ",
+                sec, us, ticks.ticks32);
             printf("drift=%" PRId32 " us, jitter=%" PRId32 " us\n", drift, jitter);
             last = now;
         }
@@ -157,11 +155,11 @@ int main(void)
         "slacker1");
 
     puts("sending 1st msg");
-    m.content.ptr = (char *) &msg_a;
+    m.content.ptr = &msg_a;
     msg_try_send(&m, pid1);
 
     puts("sending 2nd msg");
-    m.content.ptr = (char *) &msg_b;
+    m.content.ptr = &msg_b;
     msg_try_send(&m, pid1);
 
     kernel_pid_t pid2 = thread_create(
@@ -174,11 +172,11 @@ int main(void)
         "slacker2");
 
     puts("sending 3rd msg");
-    m.content.ptr = (char *) &msg_c;
+    m.content.ptr = &msg_c;
     msg_try_send(&m, pid2);
 
     puts("sending 4th msg");
-    m.content.ptr = (char *) &msg_d;
+    m.content.ptr = &msg_d;
     msg_try_send(&m, pid2);
 
     kernel_pid_t pid3 = thread_create(
@@ -190,9 +188,9 @@ int main(void)
                    NULL,
                    "worker");
 
-    uint32_t last_wakeup = xtimer_now();
+    xtimer_ticks32_t last_wakeup = xtimer_now();
     while (1) {
-        xtimer_usleep_until(&last_wakeup, TEST_INTERVAL);
+        xtimer_periodic_wakeup(&last_wakeup, TEST_INTERVAL);
         msg_try_send(&m, pid3);
     }
 }

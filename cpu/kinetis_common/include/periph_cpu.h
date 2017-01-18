@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -62,6 +62,12 @@ typedef uint16_t gpio_t;
 #define GPIO_MODE(pu, pe, od, out)   (pu | (pe << 1) | (od << 5) | (out << 7))
 
 /**
+ * @brief   Define the maximum number of PWM channels that can be configured
+ */
+#define PWM_CHAN_MAX        (4U)
+
+#ifndef DOXYGEN
+/**
  * @brief   Override GPIO modes
  * @{
  */
@@ -75,6 +81,7 @@ typedef enum {
     GPIO_OD_PU = GPIO_MODE(1, 1, 1, 1),     /**< OD with pull-up */
 } gpio_mode_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Define a condensed set of PORT PCR values
@@ -95,6 +102,7 @@ enum {
     GPIO_PCR_PU    = (PORT_PCR_PE_MASK | PORT_PCR_PS_MASK)  /**< enable PU */
 };
 
+#ifndef DOXYGEN
 /**
  * @brief   Override flank configuration values
  * @{
@@ -106,6 +114,7 @@ typedef enum {
     GPIO_BOTH    = PORT_PCR_IRQC(0xb),  /**< emit interrupt on both flanks */
 } gpio_flank_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Available ports on the Kinetis family
@@ -123,6 +132,7 @@ enum {
     GPIO_PORTS_NUMOF        /**< overall number of available ports */
 };
 
+#ifndef DOXYGEN
 /**
  * @brief   Override default ADC resolution values
  * @{
@@ -137,6 +147,19 @@ typedef enum {
     ADC_RES_16BIT = ADC_CFG1_MODE(3)    /**< ADC resolution: 16 bit */
 } adc_res_t;
 /** @} */
+
+/**
+ * @brief   Override default PWM mode configuration
+ * @{
+ */
+#define HAVE_PWM_MODE_T
+typedef enum {
+    PWM_LEFT   = (FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK),  /**< left aligned */
+    PWM_RIGHT  = (FTM_CnSC_MSB_MASK | FTM_CnSC_ELSA_MASK),  /**< right aligned */
+    PWM_CENTER = (FTM_CnSC_MSB_MASK)                        /**< center aligned */
+} pwm_mode_t;
+/** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   CPU specific ADC configuration
@@ -159,12 +182,67 @@ typedef struct {
 } dac_conf_t;
 
 /**
+ * @brief   CPU specific timer PIT module configuration
+ */
+typedef struct {
+    /** Prescaler channel */
+    uint8_t prescaler_ch;
+    /** Counting channel, will be linked to the prescaler channel */
+    uint8_t count_ch;
+} pit_conf_t;
+
+/**
+ * @brief   CPU specific timer LPTMR module configuration
+ */
+typedef struct {
+    /** LPTMR device base pointer */
+    LPTMR_Type *dev;
+    /** Pointer to module clock gate bit in bitband region, use BITBAND_REGADDR() */
+    uint32_t volatile *clk_gate;
+    /** LPTMR device index */
+    uint8_t index;
+} lptmr_conf_t;
+
+/**
+ * @brief   PWM configuration structure
+ */
+typedef struct {
+    FTM_Type* ftm;          /**< used FTM */
+    struct {                /**< logical channel configuration */
+        gpio_t pin;         /**< GPIO pin used, set to GPIO_UNDEF */
+        uint8_t af;         /**< alternate function mapping */
+        uint8_t ftm_chan;   /**< the actual FTM channel used */
+    } chan[PWM_CHAN_MAX];
+    uint8_t chan_numof;     /**< number of actually configured channels */
+    uint8_t ftm_num;        /**< FTM number used */
+} pwm_conf_t;
+
+/**
+ * @brief   Possible timer module types
+ */
+enum {
+    TIMER_PIT,              /**< PIT */
+    TIMER_LPTMR,            /**< LPTMR */
+};
+
+/**
+ * @brief   Hardware timer type-specific device macros
+ */
+#define TIMER_PIT_DEV(x)   (TIMER_DEV(0 + (x)))
+#define TIMER_LPTMR_DEV(x) (TIMER_DEV(PIT_NUMOF + (x)))
+
+/**
  * @brief   CPU internal function for initializing PORTs
  *
  * @param[in] pin       pin to initialize
  * @param[in] pcr       value for the PORT's PCR register
  */
 void gpio_init_port(gpio_t pin, uint32_t pcr);
+
+/**
+ * @brief   define number of usable power modes
+ */
+#define PM_NUM_MODES    (1U)
 
 #ifdef __cplusplus
 }

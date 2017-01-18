@@ -168,7 +168,6 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *current, gnrc_pktsnip_t
         case PROTNUM_ICMPV6:
             DEBUG("ipv6: handle ICMPv6 packet (nh = %u)\n", nh);
             gnrc_icmpv6_demux(iface, pkt);
-            gnrc_pktbuf_release(pkt);
             return;
 #endif
 #ifdef MODULE_GNRC_IPV6_EXT
@@ -195,6 +194,17 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *current, gnrc_pktsnip_t
     }
 
     assert(false);
+}
+
+ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt)
+{
+    ipv6_hdr_t *hdr = NULL;
+    gnrc_pktsnip_t *tmp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
+    if ((tmp) && ipv6_hdr_is(tmp->data)) {
+        hdr = ((ipv6_hdr_t*) tmp->data);
+    }
+
+    return hdr;
 }
 
 /* internal functions */
@@ -241,13 +251,11 @@ static void _dispatch_next_header(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt,
 static void *_event_loop(void *args)
 {
     msg_t msg, reply, msg_q[GNRC_IPV6_MSG_QUEUE_SIZE];
-    gnrc_netreg_entry_t me_reg;
+    gnrc_netreg_entry_t me_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                            sched_active_pid);
 
     (void)args;
     msg_init_queue(msg_q, GNRC_IPV6_MSG_QUEUE_SIZE);
-
-    me_reg.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
-    me_reg.pid = thread_getpid();
 
     /* register interest in all IPv6 packets */
     gnrc_netreg_register(GNRC_NETTYPE_IPV6, &me_reg);
@@ -263,12 +271,12 @@ static void *_event_loop(void *args)
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 DEBUG("ipv6: GNRC_NETAPI_MSG_TYPE_RCV received\n");
-                _receive((gnrc_pktsnip_t *)msg.content.ptr);
+                _receive(msg.content.ptr);
                 break;
 
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("ipv6: GNRC_NETAPI_MSG_TYPE_SND received\n");
-                _send((gnrc_pktsnip_t *)msg.content.ptr, true);
+                _send(msg.content.ptr, true);
                 break;
 
             case GNRC_NETAPI_MSG_TYPE_GET:
@@ -289,43 +297,43 @@ static void *_event_loop(void *args)
             /* case GNRC_NDP_MSG_ADDR_TIMEOUT: */
             /*     DEBUG("ipv6: Router advertisement timer event received\n"); */
             /*     gnrc_ipv6_netif_remove_addr(KERNEL_PID_UNDEF, */
-            /*                                 (ipv6_addr_t *)msg.content.ptr); */
+            /*                                 msg.content.ptr); */
             /*     break; */
 
             case GNRC_NDP_MSG_NBR_SOL_RETRANS:
                 DEBUG("ipv6: Neigbor solicitation retransmission timer event received\n");
-                gnrc_ndp_retrans_nbr_sol((gnrc_ipv6_nc_t *)msg.content.ptr);
+                gnrc_ndp_retrans_nbr_sol(msg.content.ptr);
                 break;
 
             case GNRC_NDP_MSG_NC_STATE_TIMEOUT:
                 DEBUG("ipv6: Neigbor cache state timeout received\n");
-                gnrc_ndp_state_timeout((gnrc_ipv6_nc_t *)msg.content.ptr);
+                gnrc_ndp_state_timeout(msg.content.ptr);
                 break;
 #endif
 #ifdef MODULE_GNRC_NDP_ROUTER
             case GNRC_NDP_MSG_RTR_ADV_RETRANS:
                 DEBUG("ipv6: Router advertisement retransmission event received\n");
-                gnrc_ndp_router_retrans_rtr_adv((gnrc_ipv6_netif_t *)msg.content.ptr);
+                gnrc_ndp_router_retrans_rtr_adv(msg.content.ptr);
                 break;
             case GNRC_NDP_MSG_RTR_ADV_DELAY:
                 DEBUG("ipv6: Delayed router advertisement event received\n");
-                gnrc_ndp_router_send_rtr_adv((gnrc_ipv6_nc_t *)msg.content.ptr);
+                gnrc_ndp_router_send_rtr_adv(msg.content.ptr);
                 break;
 #endif
 #ifdef MODULE_GNRC_NDP_HOST
             case GNRC_NDP_MSG_RTR_SOL_RETRANS:
                 DEBUG("ipv6: Router solicitation retransmission event received\n");
-                gnrc_ndp_host_retrans_rtr_sol((gnrc_ipv6_netif_t *)msg.content.ptr);
+                gnrc_ndp_host_retrans_rtr_sol(msg.content.ptr);
                 break;
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
             case GNRC_SIXLOWPAN_ND_MSG_MC_RTR_SOL:
                 DEBUG("ipv6: Multicast router solicitation event received\n");
-                gnrc_sixlowpan_nd_mc_rtr_sol((gnrc_ipv6_netif_t *)msg.content.ptr);
+                gnrc_sixlowpan_nd_mc_rtr_sol(msg.content.ptr);
                 break;
             case GNRC_SIXLOWPAN_ND_MSG_UC_RTR_SOL:
                 DEBUG("ipv6: Unicast router solicitation event received\n");
-                gnrc_sixlowpan_nd_uc_rtr_sol((gnrc_ipv6_nc_t *)msg.content.ptr);
+                gnrc_sixlowpan_nd_uc_rtr_sol(msg.content.ptr);
                 break;
 #   ifdef MODULE_GNRC_SIXLOWPAN_CTX
             case GNRC_SIXLOWPAN_ND_MSG_DELETE_CTX:
@@ -338,18 +346,17 @@ static void *_event_loop(void *args)
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
             case GNRC_SIXLOWPAN_ND_MSG_ABR_TIMEOUT:
                 DEBUG("ipv6: border router timeout event received\n");
-                gnrc_sixlowpan_nd_router_abr_remove(
-                        (gnrc_sixlowpan_nd_router_abr_t *)msg.content.ptr);
+                gnrc_sixlowpan_nd_router_abr_remove(msg.content.ptr);
                 break;
             /* XXX reactivate when https://github.com/RIOT-OS/RIOT/issues/5122 is
              * solved properly */
             /* case GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT: */
             /*     DEBUG("ipv6: address registration timeout received\n"); */
-            /*     gnrc_sixlowpan_nd_router_gc_nc((gnrc_ipv6_nc_t *)msg.content.ptr); */
+            /*     gnrc_sixlowpan_nd_router_gc_nc(msg.content.ptr); */
             /*     break; */
             case GNRC_NDP_MSG_RTR_ADV_SIXLOWPAN_DELAY:
                 DEBUG("ipv6: Delayed router advertisement event received\n");
-                gnrc_ipv6_nc_t *nc_entry = (gnrc_ipv6_nc_t *)msg.content.ptr;
+                gnrc_ipv6_nc_t *nc_entry = msg.content.ptr;
                 gnrc_ndp_internal_send_rtr_adv(nc_entry->iface, NULL,
                                                &(nc_entry->ipv6_addr), false);
                 break;
@@ -382,7 +389,7 @@ static void _send_to_iface(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
     if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
         DEBUG("ipv6: send to 6LoWPAN instead\n");
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_SIXLOWPAN, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
-            DEBUG("ipv6: no 6LoWPAN thread found");
+            DEBUG("ipv6: no 6LoWPAN thread found\n");
             gnrc_pktbuf_release(pkt);
         }
         return;
@@ -394,34 +401,47 @@ static void _send_to_iface(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
     }
 }
 
-/* functions for sending */
-static void _send_unicast(kernel_pid_t iface, uint8_t *dst_l2addr,
-                          uint16_t dst_l2addr_len, gnrc_pktsnip_t *pkt)
+static gnrc_pktsnip_t *_create_netif_hdr(uint8_t *dst_l2addr,
+                                         uint16_t dst_l2addr_len,
+                                         gnrc_pktsnip_t *pkt)
 {
-    gnrc_pktsnip_t *netif;
-
-    if (pkt->type == GNRC_NETTYPE_NETIF) {
-        /* great: someone already added a netif_hdr_t we assume it's wrong
-         * to keep it simple
-         * XXX: alternative would be to check if gnrc_netif_hdr_t::dst_l2addr_len
-         * is long enough and only then to throw away the header. This causes
-         * to much overhead IMHO */
-        DEBUG("ipv6: removed old interface header\n");
-        pkt = gnrc_pktbuf_remove_snip(pkt, pkt);
-    }
-
-    DEBUG("ipv6: add interface header to packet\n");
-    netif = gnrc_netif_hdr_build(NULL, 0, dst_l2addr, dst_l2addr_len);
+    gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst_l2addr, dst_l2addr_len);
 
     if (netif == NULL) {
         DEBUG("ipv6: error on interface header allocation, dropping packet\n");
         gnrc_pktbuf_release(pkt);
-        return;
+        return NULL;
+    }
+
+    if (pkt->type == GNRC_NETTYPE_NETIF) {
+        /* remove old netif header, since checking it for correctness would
+         * cause to much overhead.
+         * netif header might have been allocated by some higher layer either
+         * to set a sending interface or some flags. Interface was already
+         * copied using iface parameter, so we only need to copy the flags
+         * (minus the broadcast/multicast flags) */
+        DEBUG("ipv6: copy old interface header flags\n");
+        gnrc_netif_hdr_t *netif_new = netif->data, *netif_old = pkt->data;
+        netif_new->flags = netif_old->flags & \
+                           ~(GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST);
+        DEBUG("ipv6: removed old interface header\n");
+        pkt = gnrc_pktbuf_remove_snip(pkt, pkt);
     }
 
     /* add netif to front of the pkt list */
     LL_PREPEND(pkt, netif);
 
+    return pkt;
+}
+
+/* functions for sending */
+static void _send_unicast(kernel_pid_t iface, uint8_t *dst_l2addr,
+                          uint16_t dst_l2addr_len, gnrc_pktsnip_t *pkt)
+{
+    DEBUG("ipv6: add interface header to packet\n");
+    if ((pkt = _create_netif_hdr(dst_l2addr, dst_l2addr_len, pkt)) == NULL) {
+        return;
+    }
     DEBUG("ipv6: send unicast over interface %" PRIkernel_pid "\n", iface);
     /* and send to interface */
 #ifdef MODULE_NETSTATS_IPV6
@@ -522,14 +542,12 @@ static void _send_multicast(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 
 
 #if GNRC_NETIF_NUMOF > 1
-    /* netif header not present: send over all interfaces */
+    /* interface not given: send over all interfaces */
     if (iface == KERNEL_PID_UNDEF) {
-        assert(pkt == ipv6);
         /* send packet to link layer */
         gnrc_pktbuf_hold(pkt, ifnum - 1);
 
         for (size_t i = 0; i < ifnum; i++) {
-            gnrc_pktsnip_t *netif;
             if (prep_hdr) {
                 /* need to get second write access (duplication) to fill IPv6
                  * header interface-local */
@@ -565,24 +583,14 @@ static void _send_multicast(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                 }
             }
 
-            /* allocate interface header */
-            netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-
-            if (netif == NULL) {
-                DEBUG("ipv6: error on interface header allocation, "
-                      "dropping packet\n");
-                gnrc_pktbuf_release(ipv6);
+            if ((ipv6 = _create_netif_hdr(NULL, 0, ipv6)) == NULL) {
                 return;
             }
-
-            LL_PREPEND(ipv6, netif);
 
             _send_multicast_over_iface(ifs[i], ipv6);
         }
     }
     else {
-        /* iface != KERNEL_PID_UNDEF implies that netif header is present */
-        assert(pkt != ipv6);
         if (prep_hdr) {
             if (_fill_ipv6_hdr(iface, ipv6, payload) < 0) {
                 /* error on filling up header */
@@ -596,20 +604,12 @@ static void _send_multicast(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 #else   /* GNRC_NETIF_NUMOF */
     (void)ifnum; /* not used in this build branch */
     if (iface == KERNEL_PID_UNDEF) {
-        gnrc_pktsnip_t *netif;
         iface = ifs[0];
 
         /* allocate interface header */
-        netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-
-        if (netif == NULL) {
-            DEBUG("ipv6: error on interface header allocation, "
-                  "dropping packet\n");
-            gnrc_pktbuf_release(pkt);
+        if ((pkt = _create_netif_hdr(NULL, 0, pkt)) == NULL) {
             return;
         }
-
-        LL_PREPEND(pkt, netif);
     }
 
     if (prep_hdr) {
@@ -853,6 +853,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
         ipv6 = gnrc_pktbuf_mark(pkt, sizeof(ipv6_hdr_t), GNRC_NETTYPE_IPV6);
 
         first_ext = pkt;
+        pkt->type = GNRC_NETTYPE_UNDEF; /* snip is no longer IPv6 */
 
         if (ipv6 == NULL) {
             DEBUG("ipv6: error marking IPv6 header, dropping packet\n");
@@ -884,6 +885,14 @@ static void _receive(gnrc_pktsnip_t *pkt)
      * to fulfill their minimum size requirements (e.g. ethernet) */
     if (byteorder_ntohs(hdr->len) < pkt->size) {
         gnrc_pktbuf_realloc_data(pkt, byteorder_ntohs(hdr->len));
+    }
+    else if (byteorder_ntohs(hdr->len) >
+             (gnrc_pkt_len_upto(pkt, GNRC_NETTYPE_IPV6) - sizeof(ipv6_hdr_t))) {
+        DEBUG("ipv6: invalid payload length: %d, actual: %d, dropping packet\n",
+              (int) byteorder_ntohs(hdr->len),
+              (int) (gnrc_pkt_len_upto(pkt, GNRC_NETTYPE_IPV6) - sizeof(ipv6_hdr_t)));
+        gnrc_pktbuf_release(pkt);
+        return;
     }
 
     DEBUG("ipv6: Received (src = %s, ",

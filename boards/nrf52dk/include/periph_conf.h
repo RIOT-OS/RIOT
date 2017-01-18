@@ -44,10 +44,10 @@ extern "C" {
  */
 static const timer_conf_t timer_config[] = {
     /* dev, channels, width, IRQn */
-    { NRF_TIMER0, 3, TIMER_BITMODE_BITMODE_32Bit, TIMER0_IRQn }
+    { NRF_TIMER1, 3, TIMER_BITMODE_BITMODE_32Bit, TIMER1_IRQn }
 };
 
-#define TIMER_0_ISR         isr_timer0
+#define TIMER_0_ISR         isr_timer1
 
 #define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
@@ -57,9 +57,9 @@ static const timer_conf_t timer_config[] = {
  * @{
  */
 #define RTT_NUMOF           (1U)
-#define RTT_DEV             NRF_RTC0
-#define RTT_IRQ             RTC0_IRQn
-#define RTT_ISR             isr_rtc0
+#define RTT_DEV             NRF_RTC1
+#define RTT_IRQ             RTC1_IRQn
+#define RTT_ISR             isr_rtc1
 #define RTT_MAX_VALUE       (0xffffff)
 #define RTT_FREQUENCY       (10)            /* in Hz */
 #define RTT_PRESCALER       (3275U)         /* run with 10 Hz */

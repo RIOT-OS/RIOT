@@ -19,7 +19,6 @@
  * @}
  */
 
-#include <malloc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -33,6 +32,10 @@
 #include "sched.h"
 
 #include "pthread.h"
+
+#ifdef HAVE_MALLOC_H
+#include <malloc.h>
+#endif
 
 #define ENABLE_DEBUG (0)
 
@@ -108,7 +111,7 @@ static void *pthread_reaper(void *arg)
     while (1) {
         msg_t m;
         msg_receive(&m);
-        DEBUG("pthread_reaper(): free(%p)\n", (void *)m.content.ptr);
+        DEBUG("pthread_reaper(): free(%p)\n", m.content.ptr);
         free(m.content.ptr);
     }
 

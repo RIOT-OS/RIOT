@@ -22,6 +22,7 @@
 #ifdef MODULE_KW2XRF
 
 #include "board.h"
+#include "net/gnrc/netdev2.h"
 #include "net/gnrc/nomac.h"
 #include "net/gnrc.h"
 
@@ -36,12 +37,14 @@
  * @{
  */
 #define KW2XRF_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
-#define KW2XRF_MAC_PRIO          (THREAD_PRIORITY_MAIN - 4)
+#ifndef KW2XRF_MAC_PRIO
+#define KW2XRF_MAC_PRIO          (GNRC_NETDEV2_MAC_PRIO)
+#endif
 
 #define KW2XRF_NUM (sizeof(kw2xrf_params)/sizeof(kw2xrf_params[0]))
 
 static kw2xrf_t kw2xrf_devs[KW2XRF_NUM];
-static char _nomac_stacks[KW2XRF_MAC_STACKSIZE][KW2XRF_NUM];
+static char _nomac_stacks[KW2XRF_NUM][KW2XRF_MAC_STACKSIZE];
 
 void auto_init_kw2xrf(void)
 {
@@ -56,7 +59,7 @@ void auto_init_kw2xrf(void)
                 p->int_pin);
 
         if (res < 0) {
-            DEBUG("Error initializing KW2xrf radio device!");
+            DEBUG("Error initializing KW2xrf radio device!\n");
         }
         else {
             gnrc_nomac_init(_nomac_stacks[i],

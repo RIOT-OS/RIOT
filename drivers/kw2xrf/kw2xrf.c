@@ -91,14 +91,6 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state);
 
 int kw2xrf_set_tx_power(kw2xrf_t *dev, int8_t *val, size_t len)
 {
-    if (val[0] > MKW2XDRF_OUTPUT_POWER_MAX) {
-        val[0] = MKW2XDRF_OUTPUT_POWER_MAX;
-    }
-
-    if (val[0] < MKW2XDRF_OUTPUT_POWER_MIN) {
-        val[0] = MKW2XDRF_OUTPUT_POWER_MIN;
-    }
-
     uint8_t level = pow_lt[val[0] - MKW2XDRF_OUTPUT_POWER_MIN];
     kw2xrf_write_dreg(MKW2XDM_PA_PWR, MKW2XDM_PA_PWR(level));
     return 2;
@@ -404,6 +396,7 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
 #   else
     uint8_t cpuid[CPUID_LEN];
 #endif
+    uint16_t addr_short = 0;
     eui64_t addr_long;
 #endif
 
@@ -435,11 +428,16 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
 
     cpuid_get(cpuid);
 
+    /* generate short hardware address if CPUID_LEN > 0 */
+    for (int i = 0; i < CPUID_LEN; i++) {
+        /* XOR each even byte of the CPUID with LSB of short address
+           and each odd byte with MSB */
+        addr_short ^= (uint16_t)(cpuid[i] << ((i & 0x01) * 8));
+    }
 #if CPUID_LEN > IEEE802154_LONG_ADDRESS_LEN
     for (int i = IEEE802154_LONG_ADDRESS_LEN; i < CPUID_LEN; i++) {
         cpuid[i & 0x07] ^= cpuid[i];
     }
-
 #endif
     /* make sure we mark the address as non-multicast and not globally unique */
     cpuid[0] &= ~(0x01);
@@ -447,7 +445,7 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     /* copy and set long address */
     memcpy(&addr_long, cpuid, IEEE802154_LONG_ADDRESS_LEN);
     kw2xrf_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
-    kw2xrf_set_addr(dev, NTOHS(addr_long.uint16[0].u16));
+    kw2xrf_set_addr(dev, addr_short);
 #else
     kw2xrf_set_addr_long(dev, KW2XRF_DEFAULT_SHORT_ADDR);
     kw2xrf_set_addr(dev, KW2XRF_DEFAULT_ADDR_LONG);
@@ -811,8 +809,15 @@ int kw2xrf_set(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t value_le
             if (value_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
-
+            /* correct value if out of valid range */
+            if (*(int16_t *)value > MKW2XDRF_OUTPUT_POWER_MAX) {
+                *(int16_t *)value = MKW2XDRF_OUTPUT_POWER_MAX;
+            }
+            else if (*(int16_t *)value < MKW2XDRF_OUTPUT_POWER_MIN) {
+                *(int16_t *)value = MKW2XDRF_OUTPUT_POWER_MIN;
+            }
             kw2xrf_set_tx_power(dev, (int8_t *)value, value_len);
+            dev->tx_power = *((uint16_t *)value);
             return sizeof(uint16_t);
 
         case NETOPT_CCA_THRESHOLD:

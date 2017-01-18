@@ -1,0 +1,2345 @@
+From 33b946ce29ea8d20c196df41918ee3d68b8f93fb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADctor=20Ari=C3=B1o?= <victor.arino@zii.aero>
+Date: Wed, 11 Jan 2017 11:46:55 +0100
+Subject: [PATCH] isolate oonf list implementation of riot's implementation
+
+---
+ docs/common/list.txt                           |  20 ++---
+ src-api/common/avl.c                           |  26 +++---
+ src-api/common/avl.h                           |   4 +-
+ src-api/common/list.h                          | 112 ++++++++++++-------------
+ src-api/core/oonf_logging.c                    |  10 +--
+ src-api/core/oonf_logging_cfg.c                |  18 ++--
+ src-api/rfc5444/rfc5444_msg_generator.c        |  36 ++++----
+ src-api/rfc5444/rfc5444_pkt_generator.c        |   4 +-
+ src-api/rfc5444/rfc5444_reader.c               |  30 +++----
+ src-api/rfc5444/rfc5444_writer.c               |  48 +++++------
+ src-api/rfc5444/rfc5444_writer.h               |   4 +-
+ src-api/subsystems/oonf_class.c                |  26 +++---
+ src-api/subsystems/oonf_class.h                |   2 +-
+ src-api/subsystems/oonf_interface.c            |  14 ++--
+ src-api/subsystems/oonf_layer2.c               |   6 +-
+ src-api/subsystems/oonf_packet_socket.c        |  18 ++--
+ src-api/subsystems/oonf_packet_socket.h        |   2 +-
+ src-api/subsystems/oonf_rfc5444.c              |   8 +-
+ src-api/subsystems/oonf_socket.c               |  14 ++--
+ src-api/subsystems/oonf_stream_socket.c        |  26 +++---
+ src-api/subsystems/oonf_telnet.c               |   4 +-
+ src-api/subsystems/oonf_telnet.h               |   4 +-
+ src-api/subsystems/oonf_timer.c                |   8 +-
+ src-api/subsystems/os_linux/os_routing_linux.c |  20 ++---
+ src-api/subsystems/os_linux/os_system_linux.c  |  28 +++----
+ src-plugins/remotecontrol/remotecontrol.c      |  12 +--
+ tests/common/test_common_avl.c                 |   4 +-
+ tests/common/test_common_list.c                | 110 ++++++++++++------------
+ tests/config/test_config_list.c                |  12 +--
+ 29 files changed, 315 insertions(+), 315 deletions(-)
+
+diff --git a/docs/common/list.txt b/docs/common/list.txt
+index 8567e6d..f5b7689 100644
+--- a/docs/common/list.txt
++++ b/docs/common/list.txt
+@@ -43,25 +43,25 @@ macros. Because of this there is no list.c file.
+ 1) list lifecycle
+ *****************
+ 
+-Each list head must be initialized with the list_init() function, which
++Each list head must be initialized with the oonf_list_init() function, which
+ needs a pointer to the list_entity for the head of the list.
+ 
+ The list API does not allocate memory at all, all list_entity structs
+ have to be allocated by the user. Because of this the API does NOT
+-contain a list_free() operation.
++contain a oonf_list_free() operation.
+ 
+ 
+ 
+ 2) adding/removing elements to a list
+ *************************************
+ 
+-list_add_head() adds a new list element to the beginning of a list,
+-list_add_tail() adds it to the end of a list.
++oonf_list_add_head() adds a new list element to the beginning of a list,
++oonf_list_add_tail() adds it to the end of a list.
+ 
+-list_add_before() adds a new element right before an existing one,
+-list_add_after() adds it after the existing element.
++oonf_list_add_before() adds a new element right before an existing one,
++oonf_list_add_after() adds it after the existing element.
+ 
+-list_remove() removes an object from an list. Do not call this function
++oonf_list_remove() removes an object from an list. Do not call this function
+ for nodes NOT added to a list.
+ 
+ 
+@@ -87,13 +87,13 @@ void iterate(struct list_entity *head)
+ {
+     struct my_node *my, *safe;
+     
+-    list_for_each_element(head, my, node) {
++    oonf_list_for_each_element(head, my, node) {
+         ....
+     }
+     
+-    list_for_each_element_safe(head, my, node, safe) {
++    oonf_list_for_each_element_safe(head, my, node, safe) {
+         if ( ... ) {
+-            list_remove(tree, my);
++            oonf_list_remove(tree, my);
+         }
+     }
+ }
+diff --git a/src-api/common/avl.c b/src-api/common/avl.c
+index ff8e245..d59bbdb 100644
+--- a/src-api/common/avl.c
++++ b/src-api/common/avl.c
+@@ -71,7 +71,7 @@ static struct avl_node *_avl_local_min(struct avl_node *node);
+ void
+ avl_init(struct avl_tree *tree, avl_tree_comp comp, bool allow_dups)
+ {
+-  list_init_head(&tree->list_head);
++  oonf_list_init_head(&tree->list_head);
+   tree->root = NULL;
+   tree->count = 0;
+   tree->comp = comp;
+@@ -119,7 +119,7 @@ avl_find_lessequal(const struct avl_tree *tree, const void *key) {
+ 
+   /* go left as long as key<node.key */
+   while (diff < 0) {
+-    if (list_is_first(&tree->list_head, &node->list)) {
++    if (oonf_list_is_first(&tree->list_head, &node->list)) {
+       return NULL;
+     }
+ 
+@@ -131,7 +131,7 @@ avl_find_lessequal(const struct avl_tree *tree, const void *key) {
+   next = node;
+   while (diff >= 0) {
+     node = next;
+-    if (list_is_last(&tree->list_head, &node->list)) {
++    if (oonf_list_is_last(&tree->list_head, &node->list)) {
+       break;
+     }
+ 
+@@ -161,7 +161,7 @@ avl_find_greaterequal(const struct avl_tree *tree, const void *key) {
+ 
+   /* go right as long as key>node.key */
+   while (diff > 0) {
+-    if (list_is_last(&tree->list_head, &node->list)) {
++    if (oonf_list_is_last(&tree->list_head, &node->list)) {
+       return NULL;
+     }
+ 
+@@ -173,7 +173,7 @@ avl_find_greaterequal(const struct avl_tree *tree, const void *key) {
+   next = node;
+   while (diff <= 0) {
+     node = next;
+-    if (list_is_first(&tree->list_head, &node->list)) {
++    if (oonf_list_is_first(&tree->list_head, &node->list)) {
+       break;
+     }
+ 
+@@ -205,7 +205,7 @@ avl_insert(struct avl_tree *tree, struct avl_node *new)
+   new->follower = false;
+ 
+   if (tree->root == NULL) {
+-    list_add_head(&tree->list_head, &new->list);
++    oonf_list_add_head(&tree->list_head, &new->list);
+     tree->root = new;
+     tree->count = 1;
+     return 0;
+@@ -215,8 +215,8 @@ avl_insert(struct avl_tree *tree, struct avl_node *new)
+ 
+   last = node;
+ 
+-  while (!list_is_last(&tree->list_head, &last->list)) {
+-    next = list_next_element(last, list);
++  while (!oonf_list_is_last(&tree->list_head, &last->list)) {
++    next = oonf_list_next_element(last, list);
+     if (!next->follower) {
+       break;
+     }
+@@ -284,8 +284,8 @@ avl_remove(struct avl_tree *tree, struct avl_node *node)
+   struct avl_node *right;
+   if (!node->follower) {
+     if (tree->allow_dups
+-        && !list_is_last(&tree->list_head, &node->list)
+-        && (next = list_next_element(node, list))->follower) {
++        && !oonf_list_is_last(&tree->list_head, &node->list)
++        && (next = oonf_list_next_element(node, list))->follower) {
+       next->follower = false;
+       next->balance = node->balance;
+ 
+@@ -511,7 +511,7 @@ _post_insert(struct avl_tree *tree, struct avl_node *node)
+ static void
+ _avl_insert_before(struct avl_tree *tree, struct avl_node *pos_node, struct avl_node *node)
+ {
+-  list_add_before(&pos_node->list, &node->list);
++  oonf_list_add_before(&pos_node->list, &node->list);
+   tree->count++;
+ }
+ 
+@@ -525,7 +525,7 @@ _avl_insert_before(struct avl_tree *tree, struct avl_node *pos_node, struct avl_
+ static void
+ _avl_insert_after(struct avl_tree *tree, struct avl_node *pos_node, struct avl_node *node)
+ {
+-  list_add_after(&pos_node->list, &node->list);
++  oonf_list_add_after(&pos_node->list, &node->list);
+   tree->count++;
+ }
+ 
+@@ -538,7 +538,7 @@ _avl_insert_after(struct avl_tree *tree, struct avl_node *pos_node, struct avl_n
+ static void
+ _avl_remove(struct avl_tree *tree, struct avl_node *node)
+ {
+-  list_remove(&node->list);
++  oonf_list_remove(&node->list);
+   tree->count--;
+ }
+ 
+diff --git a/src-api/common/avl.h b/src-api/common/avl.h
+index de75d28..6623224 100644
+--- a/src-api/common/avl.h
++++ b/src-api/common/avl.h
+@@ -181,7 +181,7 @@ avl_is_empty(struct avl_tree *tree) {
+  */
+ static INLINE bool
+ avl_is_node_added(struct avl_node *node) {
+-  return list_is_node_added(&node->list);
++  return oonf_list_is_node_added(&node->list);
+ }
+ 
+ /**
+@@ -591,7 +591,7 @@ avl_delete(struct avl_tree *tree, struct avl_node *node) {
+ #define avl_remove_all_elements(tree, element, node_member, ptr) \
+   for (element = avl_first_element(tree, element, node_member), \
+        ptr = avl_next_element(element, node_member), \
+-       list_init_head(&(tree)->list_head), \
++       oonf_list_init_head(&(tree)->list_head), \
+        (tree)->root = NULL; \
+        (tree)->count > 0; \
+        element = ptr, ptr = avl_next_element(ptr, node_member), (tree)->count--)
+diff --git a/src-api/common/list.h b/src-api/common/list.h
+index 80da6ac..b545d53 100644
+--- a/src-api/common/list.h
++++ b/src-api/common/list.h
+@@ -70,7 +70,7 @@ struct list_entity {
+  * @param pointer to list-head
+  */
+ static INLINE void
+-list_init_head(struct list_entity *head) {
++oonf_list_init_head(struct list_entity *head) {
+   head->next = head->prev = head;
+ }
+ 
+@@ -79,7 +79,7 @@ list_init_head(struct list_entity *head) {
+  * @param pointer to list-node
+  */
+ static INLINE void
+-list_init_node(struct list_entity *entity) {
++oonf_list_init_node(struct list_entity *entity) {
+   entity->next = entity->prev = NULL;
+ }
+ 
+@@ -90,7 +90,7 @@ list_init_node(struct list_entity *entity) {
+  * @param new node which will be added to the list between 'prev' and 'next'
+  */
+ static INLINE void
+-__list_add(struct list_entity *prev, struct list_entity *next, struct list_entity *new) {
++__oonf_list_add(struct list_entity *prev, struct list_entity *next, struct list_entity *new) {
+   new->next = next;
+   new->prev = prev;
+   next->prev = new;
+@@ -103,8 +103,8 @@ __list_add(struct list_entity *prev, struct list_entity *next, struct list_entit
+  * @param new node which will be added to the list
+  */
+ static INLINE void
+-list_add_head(struct list_entity *head, struct list_entity *new) {
+-  __list_add(head, head->next, new);
++oonf_list_add_head(struct list_entity *head, struct list_entity *new) {
++  __oonf_list_add(head, head->next, new);
+ }
+ 
+ /**
+@@ -113,8 +113,8 @@ list_add_head(struct list_entity *head, struct list_entity *new) {
+  * @param new node which will be added to the list
+  */
+ static INLINE void
+-list_add_tail(struct list_entity *head, struct list_entity *new) {
+-  __list_add(head->prev, head, new);
++oonf_list_add_tail(struct list_entity *head, struct list_entity *new) {
++  __oonf_list_add(head->prev, head, new);
+ }
+ 
+ /**
+@@ -123,8 +123,8 @@ list_add_tail(struct list_entity *head, struct list_entity *new) {
+  * @param new node which will be added to the list
+  */
+ static INLINE void
+-list_add_before(struct list_entity *before, struct list_entity *new) {
+-  __list_add(before->prev, before, new);
++oonf_list_add_before(struct list_entity *before, struct list_entity *new) {
++  __oonf_list_add(before->prev, before, new);
+ }
+ 
+ /**
+@@ -133,8 +133,8 @@ list_add_before(struct list_entity *before, struct list_entity *new) {
+  * @param new node which will be added to the list
+  */
+ static INLINE void
+-list_add_after(struct list_entity *after, struct list_entity *new) {
+-  __list_add(after, after->next, new);
++oonf_list_add_after(struct list_entity *after, struct list_entity *new) {
++  __oonf_list_add(after, after->next, new);
+ }
+ 
+ /**
+@@ -143,7 +143,7 @@ list_add_after(struct list_entity *after, struct list_entity *new) {
+  * @param next node after the removed part of the list
+  */
+ static INLINE void
+-__list_remove(struct list_entity *prev, struct list_entity *next) {
++__oonf_list_remove(struct list_entity *prev, struct list_entity *next) {
+   prev->next = next;
+   next->prev = prev;
+ }
+@@ -153,9 +153,9 @@ __list_remove(struct list_entity *prev, struct list_entity *next) {
+  * @param entity node to remove from the list
+  */
+ static INLINE void
+-list_remove(struct list_entity *entity) {
+-  __list_remove(entity->prev, entity->next);
+-  list_init_node(entity);
++oonf_list_remove(struct list_entity *entity) {
++  __oonf_list_remove(entity->prev, entity->next);
++  oonf_list_init_node(entity);
+ }
+ 
+ /**
+@@ -164,7 +164,7 @@ list_remove(struct list_entity *entity) {
+  * @return true if list is empty, false otherwise
+  */
+ static INLINE bool
+-list_is_empty(struct list_entity *head) {
++oonf_list_is_empty(struct list_entity *head) {
+   return head->next == head && head->prev == head;
+ }
+ 
+@@ -175,7 +175,7 @@ list_is_empty(struct list_entity *head) {
+  *   false otherwise
+  */
+ static INLINE bool
+-list_is_node_added(struct list_entity *node) {
++oonf_list_is_node_added(struct list_entity *node) {
+   return node->next != NULL && node->prev != NULL;
+ }
+ 
+@@ -186,7 +186,7 @@ list_is_node_added(struct list_entity *node) {
+  * @return true if node is first element of list, false otherwise
+  */
+ static INLINE bool
+-list_is_first(const struct list_entity *head, const struct list_entity *entity) {
++oonf_list_is_first(const struct list_entity *head, const struct list_entity *entity) {
+   return head->next == entity;
+ }
+ 
+@@ -197,7 +197,7 @@ list_is_first(const struct list_entity *head, const struct list_entity *entity)
+  * @return true if node is last element of list, false otherwise
+  */
+ static INLINE bool
+-list_is_last(const struct list_entity *head, const struct list_entity *entity) {
++oonf_list_is_last(const struct list_entity *head, const struct list_entity *entity) {
+   return head->prev == entity;
+ }
+ 
+@@ -208,8 +208,8 @@ list_is_last(const struct list_entity *head, const struct list_entity *entity) {
+  *   of the first one
+  */
+ static INLINE void
+-list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+-  if (list_is_empty(remove_from)) {
++oonf_list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
++  if (oonf_list_is_empty(remove_from)) {
+     return;
+   }
+ 
+@@ -218,7 +218,7 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+   add_to->next = remove_from->next;
+   remove_from->next->prev = add_to;
+ 
+-  list_init_head(remove_from);
++  oonf_list_init_head(remove_from);
+ }
+ 
+ /**
+@@ -230,7 +230,7 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @return pointer to the first element of the list
+  *    (automatically converted to type 'element')
+  */
+-#define list_first_element(head, element, list_member) \
++#define oonf_list_first_element(head, element, list_member) \
+     container_of((head)->next, typeof(*(element)), list_member)
+ 
+ /**
+@@ -242,7 +242,7 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @return pointer to the last element of the list
+  *    (automatically converted to type 'element')
+  */
+-#define list_last_element(head, element, list_member) \
++#define oonf_list_last_element(head, element, list_member) \
+     container_of((head)->prev, typeof(*(element)), list_member)
+ 
+ /**
+@@ -255,7 +255,7 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @return pointer to the node after 'element'
+  *    (automatically converted to type 'element')
+  */
+-#define list_next_element(element, list_member) \
++#define oonf_list_next_element(element, list_member) \
+   container_of((&(element)->list_member)->next, typeof(*(element)), list_member)
+ 
+ /**
+@@ -268,7 +268,7 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @return pointer to the node before 'element'
+  *    (automatically converted to type 'element')
+  */
+-#define list_prev_element(element, list_member) \
++#define oonf_list_prev_element(element, list_member) \
+   container_of((&(element)->list_member)->prev, typeof(*(element)), list_member)
+ 
+ /**
+@@ -281,10 +281,10 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @param element iterator pointer to list element struct
+  * @param list_member name of list_entity within list element struct
+  */
+-#define list_for_element_range(first_element, last_element, element, list_member) \
++#define oonf_list_for_element_range(first_element, last_element, element, list_member) \
+   for (element = (first_element); \
+        element->list_member.prev != &(last_element)->list_member; \
+-       element = list_next_element(element, list_member))
++       element = oonf_list_next_element(element, list_member))
+ 
+ /**
+  * Loop over a block of elements of a list backwards, used similar to a for() command.
+@@ -296,10 +296,10 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @param element iterator pointer to list element struct
+  * @param list_member name of list_entity within list element struct
+  */
+-#define list_for_element_range_reverse(first_element, last_element, element, list_member) \
++#define oonf_list_for_element_range_reverse(first_element, last_element, element, list_member) \
+   for (element = (last_element); \
+        element->list_member.next != &(first_element)->list_member; \
+-       element = list_prev_element(element, list_member))
++       element = oonf_list_prev_element(element, list_member))
+ 
+ /**
+  * Loop over all elements of a list, used similar to a for() command.
+@@ -312,9 +312,9 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @param list_member name of the list_entity element inside the
+  *    larger struct
+  */
+-#define list_for_each_element(head, element, list_member) \
+-  list_for_element_range(list_first_element(head, element, list_member), \
+-                         list_last_element(head, element, list_member), \
++#define oonf_list_for_each_element(head, element, list_member) \
++  oonf_list_for_element_range(oonf_list_first_element(head, element, list_member), \
++                         oonf_list_last_element(head, element, list_member), \
+                          element, list_member)
+ 
+ /**
+@@ -328,9 +328,9 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @param list_member name of the list_entity element inside the
+  *    larger struct
+  */
+-#define list_for_each_element_reverse(head, element, list_member) \
+-  list_for_element_range_reverse(list_first_element(head, element, list_member), \
+-                                 list_last_element(head, element, list_member), \
++#define oonf_list_for_each_element_reverse(head, element, list_member) \
++  oonf_list_for_element_range_reverse(oonf_list_first_element(head, element, list_member), \
++                                 oonf_list_last_element(head, element, list_member), \
+                                  element, list_member)
+ 
+ /**
+@@ -346,8 +346,8 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @param list_member name of the list_entity element inside the
+  *    larger struct
+  */
+-#define list_for_element_to_last(head, first, element, list_member) \
+-  list_for_element_range(first, list_last_element(head, element, list_member), element, list_member)
++#define oonf_list_for_element_to_last(head, first, element, list_member) \
++  oonf_list_for_element_range(first, oonf_list_last_element(head, element, list_member), element, list_member)
+ 
+ /**
+  * Loop over a block of elements of a list backwards, used similar to a for() command.
+@@ -362,8 +362,8 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @param list_member name of the list_entity element inside the
+  *    larger struct
+  */
+-#define list_for_element_to_last_reverse(head, first, element, list_member) \
+-  list_for_element_range_reverse(first, list_last_element(head, element, list_member), element, list_member)
++#define oonf_list_for_element_to_last_reverse(head, first, element, list_member) \
++  oonf_list_for_element_range_reverse(first, oonf_list_last_element(head, element, list_member), element, list_member)
+ 
+ /**
+  * Loop over a block of elements of a list, used similar to a for() command.
+@@ -378,8 +378,8 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @param list_member name of the list_entity element inside the
+  *    larger struct
+  */
+-#define list_for_first_to_element(head, last, element, list_member) \
+-  list_for_element_range(list_first_element(head, element, list_member), last, element, list_member)
++#define oonf_list_for_first_to_element(head, last, element, list_member) \
++  oonf_list_for_element_range(oonf_list_first_element(head, element, list_member), last, element, list_member)
+ 
+ /**
+  * Loop over a block of elements of a list backwards, used similar to a for() command.
+@@ -394,8 +394,8 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @param list_member name of the list_entity element inside the
+  *    larger struct
+  */
+-#define list_for_first_to_element_reverse(head, last, element, list_member) \
+-  list_for_element_range_reverse(list_first_element(head, element, list_member), last, element, list_member)
++#define oonf_list_for_first_to_element_reverse(head, last, element, list_member) \
++  oonf_list_for_element_range_reverse(oonf_list_first_element(head, element, list_member), last, element, list_member)
+ 
+ /**
+  * Loop over a block of elements of a list, used similar to a for() command.
+@@ -410,10 +410,10 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @param ptr pointer to list element struct which is used to store
+  *    the next node during the loop
+  */
+-#define list_for_element_range_safe(first_element, last_element, element, list_member, ptr) \
+-  for (element = (first_element), ptr = list_next_element(element, list_member); \
++#define oonf_list_for_element_range_safe(first_element, last_element, element, list_member, ptr) \
++  for (element = (first_element), ptr = oonf_list_next_element(element, list_member); \
+        element->list_member.prev != &(last_element)->list_member; \
+-       element = ptr, ptr = list_next_element(ptr, list_member))
++       element = ptr, ptr = oonf_list_next_element(ptr, list_member))
+ 
+ /**
+  * Loop over a block of elements of a list backwards, used similar to a for() command.
+@@ -428,10 +428,10 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @param ptr pointer to list element struct which is used to store
+  *    the previous node during the loop
+  */
+-#define list_for_element_range_reverse_safe(first_element, last_element, element, list_member, ptr) \
+-  for (element = (last_element), ptr = list_prev_element(element, list_member); \
++#define oonf_list_for_element_range_reverse_safe(first_element, last_element, element, list_member, ptr) \
++  for (element = (last_element), ptr = oonf_list_prev_element(element, list_member); \
+        element->list_member.next != &(first_element)->list_member; \
+-       element = ptr, ptr = list_prev_element(ptr, list_member))
++       element = ptr, ptr = oonf_list_prev_element(ptr, list_member))
+ 
+ /**
+  * Loop over all elements of a list, used similar to a for() command.
+@@ -447,9 +447,9 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @param ptr pointer to an list element struct which is used to store
+  *    the next node during the loop
+  */
+-#define list_for_each_element_safe(head, element, list_member, ptr) \
+-  list_for_element_range_safe(list_first_element(head, element, list_member), \
+-                              list_last_element(head, element, list_member), \
++#define oonf_list_for_each_element_safe(head, element, list_member, ptr) \
++  oonf_list_for_element_range_safe(oonf_list_first_element(head, element, list_member), \
++                              oonf_list_last_element(head, element, list_member), \
+                               element, list_member, ptr)
+ 
+ /**
+@@ -466,9 +466,9 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
+  * @param ptr pointer to an list element struct which is used to store
+  *    the next node during the loop
+  */
+-#define list_for_each_element_reverse_safe(head, element, list_member, ptr) \
+-  list_for_element_range_reverse_safe(list_first_element(head, element, list_member), \
+-                                      list_last_element(head, element, list_member), \
++#define oonf_list_for_each_element_reverse_safe(head, element, list_member, ptr) \
++  oonf_list_for_element_range_reverse_safe(oonf_list_first_element(head, element, list_member), \
++                                      oonf_list_last_element(head, element, list_member), \
+                                       element, list_member, ptr)
+ 
+ #endif /* LIST_H_ */
+diff --git a/src-api/core/oonf_logging.c b/src-api/core/oonf_logging.c
+index 33db5f4..81d32d3 100644
+--- a/src-api/core/oonf_logging.c
++++ b/src-api/core/oonf_logging.c
+@@ -53,7 +53,7 @@
+ #include "core/oonf_logging.h"
+ #include "core/os_core.h"
+ 
+-#define FOR_ALL_LOGHANDLERS(handler, iterator) list_for_each_element_safe(&_handler_list, handler, node, iterator)
++#define FOR_ALL_LOGHANDLERS(handler, iterator) oonf_list_for_each_element_safe(&_handler_list, handler, node, iterator)
+ 
+ uint8_t log_global_mask[LOG_MAXIMUM_SOURCES];
+ 
+@@ -102,7 +102,7 @@ oonf_log_init(const struct oonf_appdata *data, enum oonf_log_severity def_severi
+   _libdata = oonf_libdata_get();
+   _source_count = LOG_CORESOURCE_COUNT;
+ 
+-  list_init_head(&_handler_list);
++  oonf_list_init_head(&_handler_list);
+ 
+   if (abuf_init(&_logbuffer)) {
+     fputs("Not enough memory for logging buffer\n", stderr);
+@@ -171,7 +171,7 @@ oonf_log_cleanup(void)
+ void
+ oonf_log_addhandler(struct oonf_log_handler_entry *h)
+ {
+-  list_add_tail(&_handler_list, &h->node);
++  oonf_list_add_tail(&_handler_list, &h->node);
+   oonf_log_updatemask();
+ }
+ 
+@@ -182,7 +182,7 @@ oonf_log_addhandler(struct oonf_log_handler_entry *h)
+ void
+ oonf_log_removehandler(struct oonf_log_handler_entry *h)
+ {
+-  list_remove(&h->node);
++  oonf_list_remove(&h->node);
+   oonf_log_updatemask();
+ }
+ 
+@@ -390,7 +390,7 @@ oonf_log(enum oonf_log_severity severity, enum oonf_log_source source, bool no_h
+   param.prefixLength = p2;
+ 
+   /* use stderr logger if nothing has been configured */
+-  if (list_is_empty(&_handler_list)) {
++  if (oonf_list_is_empty(&_handler_list)) {
+     oonf_log_stderr(NULL, &param);
+     return;
+   }
+diff --git a/src-api/core/oonf_logging_cfg.c b/src-api/core/oonf_logging_cfg.c
+index 683bc52..4635fee 100644
+--- a/src-api/core/oonf_logging_cfg.c
++++ b/src-api/core/oonf_logging_cfg.c
+@@ -114,13 +114,13 @@ oonf_logcfg_init(void) {
+ void
+ oonf_logcfg_cleanup(void) {
+   /* clean up former handlers */
+-  if (list_is_node_added(&_stderr_handler.node)) {
++  if (oonf_list_is_node_added(&_stderr_handler.node)) {
+     oonf_log_removehandler(&_stderr_handler);
+   }
+-  if (list_is_node_added(&_syslog_handler.node)) {
++  if (oonf_list_is_node_added(&_syslog_handler.node)) {
+     oonf_log_removehandler(&_syslog_handler);
+   }
+-  if (list_is_node_added(&_file_handler.node)) {
++  if (oonf_list_is_node_added(&_file_handler.node)) {
+     FILE *f;
+ 
+     f = _file_handler.custom;
+@@ -169,7 +169,7 @@ oonf_logcfg_apply(struct cfg_db *db) {
+ 
+   /* and finally modify the logging handlers */
+   /* log.file */
+-  if (activate_file && !list_is_node_added(&_file_handler.node)) {
++  if (activate_file && !oonf_list_is_node_added(&_file_handler.node)) {
+     FILE *f;
+ 
+     f = fopen(file_name, "w");
+@@ -182,7 +182,7 @@ oonf_logcfg_apply(struct cfg_db *db) {
+       activate_file = false;
+     }
+   }
+-  else if (!activate_file && list_is_node_added(&_file_handler.node)) {
++  else if (!activate_file && oonf_list_is_node_added(&_file_handler.node)) {
+     FILE *f = _file_handler.custom;
+     oonf_log_removehandler(&_file_handler);
+ 
+@@ -195,10 +195,10 @@ oonf_logcfg_apply(struct cfg_db *db) {
+     activate_stderr |= !(activate_syslog || activate_file);
+   }
+ 
+-  if (activate_stderr && !list_is_node_added(&_stderr_handler.node)) {
++  if (activate_stderr && !oonf_list_is_node_added(&_stderr_handler.node)) {
+     oonf_log_addhandler(&_stderr_handler);
+   }
+-  else if (!activate_stderr && list_is_node_added(&_stderr_handler.node)) {
++  else if (!activate_stderr && oonf_list_is_node_added(&_stderr_handler.node)) {
+     oonf_log_removehandler(&_stderr_handler);
+   }
+ 
+@@ -207,10 +207,10 @@ oonf_logcfg_apply(struct cfg_db *db) {
+     activate_syslog |= !(activate_stderr || activate_file);
+   }
+ 
+-  if (activate_syslog && !list_is_node_added(&_syslog_handler.node)) {
++  if (activate_syslog && !oonf_list_is_node_added(&_syslog_handler.node)) {
+     oonf_log_addhandler(&_syslog_handler);
+   }
+-  else if (!activate_syslog && list_is_node_added(&_syslog_handler.node)) {
++  else if (!activate_syslog && oonf_list_is_node_added(&_syslog_handler.node)) {
+     oonf_log_removehandler(&_syslog_handler);
+   }
+ 
+diff --git a/src-api/rfc5444/rfc5444_msg_generator.c b/src-api/rfc5444/rfc5444_msg_generator.c
+index 7ee7f5d..f7ad14e 100644
+--- a/src-api/rfc5444/rfc5444_msg_generator.c
++++ b/src-api/rfc5444/rfc5444_msg_generator.c
+@@ -101,7 +101,7 @@ rfc5444_writer_create_message(struct rfc5444_writer *writer, uint8_t msgid,
+ #endif
+ 
+   /* do nothing if no interface is defined */
+-  if (list_is_empty(&writer->_targets)) {
++  if (oonf_list_is_empty(&writer->_targets)) {
+     return RFC5444_OKAY;
+   }
+ 
+@@ -128,7 +128,7 @@ rfc5444_writer_create_message(struct rfc5444_writer *writer, uint8_t msgid,
+     /* interface specific, but generic selector is used */
+     enum rfc5444_result result;
+ 
+-    list_for_each_element(&writer->_targets, interface, _target_node) {
++    oonf_list_for_each_element(&writer->_targets, interface, _target_node) {
+       /* check if we should send over this interface */
+       if (!useIf(writer, interface, param)) {
+         continue;
+@@ -148,7 +148,7 @@ rfc5444_writer_create_message(struct rfc5444_writer *writer, uint8_t msgid,
+    * and calculate message MTU
+    */
+   max_msg_size = writer->msg_size;
+-  list_for_each_element(&writer->_targets, interface, _target_node) {
++  oonf_list_for_each_element(&writer->_targets, interface, _target_node) {
+     size_t interface_msg_mtu;
+ 
+     /* check if we should send over this interface */
+@@ -204,7 +204,7 @@ rfc5444_writer_create_message(struct rfc5444_writer *writer, uint8_t msgid,
+   not_fragmented = true;
+ 
+   /* no addresses ? */
+-  if (list_is_empty(&msg->_addr_head)) {
++  if (oonf_list_is_empty(&msg->_addr_head)) {
+     _finalize_message_fragment(writer, msg, NULL, NULL, true, useIf, param);
+ #if WRITER_STATE_MACHINE == true
+     writer->_state = RFC5444_WRITER_NONE;
+@@ -215,7 +215,7 @@ rfc5444_writer_create_message(struct rfc5444_writer *writer, uint8_t msgid,
+ 
+   /* start address compression */
+   first = true;
+-  addr = first_addr = list_first_element(&msg->_addr_head, addr, _addr_node);
++  addr = first_addr = oonf_list_first_element(&msg->_addr_head, addr, _addr_node);
+ 
+   /* loop through addresses */
+   idx = 0;
+@@ -230,13 +230,13 @@ rfc5444_writer_create_message(struct rfc5444_writer *writer, uint8_t msgid,
+ 
+     if (first) {
+       /* clear message specific tlvtype information for address compression */
+-      list_for_each_element(&msg->_msgspecific_tlvtype_head, tlvtype, _tlvtype_node) {
++      oonf_list_for_each_element(&msg->_msgspecific_tlvtype_head, tlvtype, _tlvtype_node) {
+         memset(tlvtype->_tlvblock_count, 0, sizeof(tlvtype->_tlvblock_count));
+         memset(tlvtype->_tlvblock_multi, 0, sizeof(tlvtype->_tlvblock_multi));
+       }
+ 
+       /* clear generic tlvtype information for address compression */
+-      list_for_each_element(&writer->_addr_tlvtype_head, tlvtype, _tlvtype_node) {
++      oonf_list_for_each_element(&writer->_addr_tlvtype_head, tlvtype, _tlvtype_node) {
+         memset(tlvtype->_tlvblock_count, 0, sizeof(tlvtype->_tlvblock_count));
+         memset(tlvtype->_tlvblock_multi, 0, sizeof(tlvtype->_tlvblock_multi));
+       }
+@@ -335,7 +335,7 @@ rfc5444_writer_create_message(struct rfc5444_writer *writer, uint8_t msgid,
+   }
+ 
+   /* get last address */
+-  addr = list_last_element(&msg->_addr_head, addr, _addr_node);
++  addr = oonf_list_last_element(&msg->_addr_head, addr, _addr_node);
+ 
+   /* close all address blocks */
+   _close_addrblock(acs, msg, addr, 0);
+@@ -420,7 +420,7 @@ rfc5444_writer_forward_msg(struct rfc5444_writer *writer, uint8_t *msg, size_t l
+ 
+   /* check if message is small enough to be forwarded */
+   max_msg_size = 0;
+-  list_for_each_element(&writer->_targets, target, _target_node) {
++  oonf_list_for_each_element(&writer->_targets, target, _target_node) {
+     size_t max;
+ 
+     if (!rfc5444_msg->forward_target_selector(target)) {
+@@ -477,7 +477,7 @@ rfc5444_writer_forward_msg(struct rfc5444_writer *writer, uint8_t *msg, size_t l
+   }
+ 
+   /* forward message */
+-  list_for_each_element(&writer->_targets, target, _target_node) {
++  oonf_list_for_each_element(&writer->_targets, target, _target_node) {
+     if (!rfc5444_msg->forward_target_selector(target)) {
+       continue;
+     }
+@@ -832,7 +832,7 @@ _compress_address(struct _rfc5444_internal_addr_compress_session *acs,
+   /* add size for address part (and header if necessary) */
+   if (!first) {
+     /* get previous address */
+-    last_addr = list_prev_element(addr, _addr_node);
++    last_addr = oonf_list_prev_element(addr, _addr_node);
+ 
+     /* remember how many entries with the same prefixlength we had */
+     if (netaddr_get_prefix_length(&last_addr->address)
+@@ -1089,7 +1089,7 @@ _write_addresses(struct rfc5444_writer *writer, struct rfc5444_writer_message *m
+       tail_len = msg->addr_len - head_len - 1;
+ 
+       /* calculate tail length and netmask length */
+-      list_for_element_range(addr_start, addr_end, addr, _addr_node) {
++      oonf_list_for_element_range(addr_start, addr_end, addr, _addr_node) {
+         addr_ptr = netaddr_get_binptr(&addr->address);
+ 
+         /* stop if no tail is left */
+@@ -1144,7 +1144,7 @@ _write_addresses(struct rfc5444_writer *writer, struct rfc5444_writer_message *m
+     }
+ #endif
+     /* loop through addresses in block for MID part */
+-    list_for_element_range(addr_start, addr_end, addr, _addr_node) {
++    oonf_list_for_element_range(addr_start, addr_end, addr, _addr_node) {
+       addr_ptr = netaddr_get_binptr(&addr->address);
+       memcpy(ptr, &addr_ptr[head_len], mid_len);
+       ptr += mid_len;
+@@ -1154,7 +1154,7 @@ _write_addresses(struct rfc5444_writer *writer, struct rfc5444_writer_message *m
+     if (addr_start->_block_multiple_prefixlen) {
+       /* multiple prefixlen */
+       *flag |= RFC5444_ADDR_FLAG_MULTIPLEN;
+-      list_for_element_range(addr_start, addr_end, addr, _addr_node) {
++      oonf_list_for_element_range(addr_start, addr_end, addr, _addr_node) {
+         *ptr++ = netaddr_get_prefix_length(&addr->address);
+       }
+     } else if (netaddr_get_prefix_length(&addr_start->address)!= msg->addr_len * 8) {
+@@ -1168,18 +1168,18 @@ _write_addresses(struct rfc5444_writer *writer, struct rfc5444_writer_message *m
+     ptr += 2;
+ 
+     /* loop through all message specific address-tlv types */
+-    list_for_each_element(&msg->_msgspecific_tlvtype_head, tlvtype, _tlvtype_node) {
++    oonf_list_for_each_element(&msg->_msgspecific_tlvtype_head, tlvtype, _tlvtype_node) {
+       ptr = _write_tlvtype(addr_start, addr_end, tlvtype, ptr);
+     }
+ 
+     /* look through  all generic address-tlv types */
+-    list_for_each_element(&writer->_addr_tlvtype_head, tlvtype, _tlvtype_node) {
++    oonf_list_for_each_element(&writer->_addr_tlvtype_head, tlvtype, _tlvtype_node) {
+       ptr = _write_tlvtype(addr_start, addr_end, tlvtype, ptr);
+     }
+ 
+     tlvblock_length[0] = (ptr - tlvblock_length - 2) >> 8;
+     tlvblock_length[1] = (ptr - tlvblock_length - 2) & 255;
+-    addr_start = list_next_element(addr_end, _addr_node);
++    addr_start = oonf_list_next_element(addr_end, _addr_node);
+   } while (addr_end != last_addr);
+ 
+   /* store size of address(tlv) data */
+@@ -1290,7 +1290,7 @@ _finalize_message_fragment(struct rfc5444_writer *writer, struct rfc5444_writer_
+   /* precalculate number of fixed bytes of message header */
+   len = writer->_msg.header + writer->_msg.added;
+ 
+-  list_for_each_element(&writer->_targets, interface, _target_node) {
++  oonf_list_for_each_element(&writer->_targets, interface, _target_node) {
+     /* do we need to handle this interface ? */
+     if (!useIf(writer, interface, param)) {
+       continue;
+diff --git a/src-api/rfc5444/rfc5444_pkt_generator.c b/src-api/rfc5444/rfc5444_pkt_generator.c
+index cd86881..c470bdb 100644
+--- a/src-api/rfc5444/rfc5444_pkt_generator.c
++++ b/src-api/rfc5444/rfc5444_pkt_generator.c
+@@ -78,7 +78,7 @@ _rfc5444_writer_begin_packet(struct rfc5444_writer *writer,
+   writer->_state = RFC5444_WRITER_ADD_PKTTLV;
+ #endif
+   /* add packet tlvs */
+-  list_for_each_element(&writer->_pkthandlers, handler, _pkthandle_node) {
++  oonf_list_for_each_element(&writer->_pkthandlers, handler, _pkthandle_node) {
+     handler->addPacketTLVs(writer, target);
+   }
+ 
+@@ -121,7 +121,7 @@ rfc5444_writer_flush(struct rfc5444_writer *writer,
+ #endif
+ 
+   /* finalize packet tlvs */
+-  list_for_each_element_reverse(&writer->_pkthandlers, handler, _pkthandle_node) {
++  oonf_list_for_each_element_reverse(&writer->_pkthandlers, handler, _pkthandle_node) {
+     handler->finishPacketTLVs(writer, target);
+   }
+ 
+diff --git a/src-api/rfc5444/rfc5444_reader.c b/src-api/rfc5444/rfc5444_reader.c
+index 1ad344a..e2c9e1d 100644
+--- a/src-api/rfc5444/rfc5444_reader.c
++++ b/src-api/rfc5444/rfc5444_reader.c
+@@ -620,11 +620,11 @@ _schedule_tlvblock(struct rfc5444_reader_tlvblock_consumer *consumer, struct rfc
+   }
+ 
+   /* initialize consumer pointer */
+-  if (list_is_empty(&consumer->_consumer_list)) {
++  if (oonf_list_is_empty(&consumer->_consumer_list)) {
+     cons_entry = NULL;
+   }
+   else {
+-    cons_entry = list_first_element(&consumer->_consumer_list, cons_entry, _node);
++    cons_entry = oonf_list_first_element(&consumer->_consumer_list, cons_entry, _node);
+     cons_entry->tlv = NULL;
+   }
+ 
+@@ -726,11 +726,11 @@ _schedule_tlvblock(struct rfc5444_reader_tlvblock_consumer *consumer, struct rfc
+       constraints_failed |= cons_entry->mandatory && !match;
+ 
+       /* advance consumer pointer */
+-      if (list_is_last(&consumer->_consumer_list, &cons_entry->_node)) {
++      if (oonf_list_is_last(&consumer->_consumer_list, &cons_entry->_node)) {
+         cons_entry = NULL;
+       }
+       else {
+-        cons_entry = list_next_element(cons_entry, _node);
++        cons_entry = oonf_list_next_element(cons_entry, _node);
+         cons_entry->tlv = NULL;
+       }
+     }
+@@ -753,7 +753,7 @@ _schedule_tlvblock(struct rfc5444_reader_tlvblock_consumer *consumer, struct rfc
+   }
+ #if DISALLOW_CONSUMER_CONTEXT_DROP == false
+   if (result == RFC5444_DROP_TLV) {
+-    list_for_each_element(&consumer->_consumer_list, cons_entry, _node) {
++    oonf_list_for_each_element(&consumer->_consumer_list, cons_entry, _node) {
+       if (cons_entry->tlv != NULL && cons_entry->drop) {
+         _set_addr_bitarray(&cons_entry->tlv->int_drop_tlv, idx);
+         cons_entry->drop = false;
+@@ -768,7 +768,7 @@ _schedule_tlvblock(struct rfc5444_reader_tlvblock_consumer *consumer, struct rfc
+ cleanup_handle_tlvblock:
+ #endif
+ #if  DEBUG_CLEANUP == true
+-  list_for_each_element(&consumer->_consumer_list, cons_entry, _node) {
++  oonf_list_for_each_element(&consumer->_consumer_list, cons_entry, _node) {
+     cons_entry->tlv = NULL;
+     cons_entry->drop = false;
+   }
+@@ -924,7 +924,7 @@ schedule_msgaddr_consumer(struct rfc5444_reader_tlvblock_consumer *consumer,
+ 
+   /* consume address tlv block(s) */
+   /* iterate over all address blocks */
+-  list_for_each_element(addr_head, addr, list_node) {
++  oonf_list_for_each_element(addr_head, addr, list_node) {
+     uint8_t i, plen;
+ 
+     /* iterate over all addresses in block */
+@@ -1047,7 +1047,7 @@ _handle_message(struct rfc5444_reader *parser,
+   result = RFC5444_OKAY;
+   same_order[0] = same_order[1] = NULL;
+   avl_init(&tlv_entries, avl_comp_uint16, true);
+-  list_init_head(&addr_head);
++  oonf_list_init_head(&addr_head);
+   tlv_context->_do_not_forward = false;
+ 
+   /* remember start of message */
+@@ -1133,7 +1133,7 @@ _handle_message(struct rfc5444_reader *parser,
+       goto cleanup_parse_message;
+     }
+ 
+-    list_add_tail(&addr_head, &addr->list_node);
++    oonf_list_add_tail(&addr_head, &addr->list_node);
+   }
+ 
+   /* loop through list of message/address consumers */
+@@ -1213,7 +1213,7 @@ cleanup_parse_message:
+   }
+ 
+   /* free address tlvblocks */
+-  list_for_each_element_safe(&addr_head, addr, list_node, safe) {
++  oonf_list_for_each_element_safe(&addr_head, addr, list_node, safe) {
+     _free_tlvblock(parser, &addr->tlvblock);
+     parser->free_addrblock_entry(addr);
+   }
+@@ -1248,26 +1248,26 @@ _add_consumer(struct rfc5444_reader_tlvblock_consumer *consumer, struct avl_tree
+   int i, o;
+   bool set;
+ 
+-  list_init_head(&consumer->_consumer_list);
++  oonf_list_init_head(&consumer->_consumer_list);
+ 
+   /* generate sorted list of entries */
+   for (i=0; i<entrycount; i++) {
+     o = _calc_tlvconsumer_intorder(&entries[i]);
+ 
+     if (i == 0) {
+-      list_add_tail(&consumer->_consumer_list, &entries[i]._node);
++      oonf_list_add_tail(&consumer->_consumer_list, &entries[i]._node);
+     }
+     else {
+       set = false;
+-      list_for_each_element_reverse(&consumer->_consumer_list, e, _node) {
++      oonf_list_for_each_element_reverse(&consumer->_consumer_list, e, _node) {
+         if (_calc_tlvconsumer_intorder(e) <= o) {
+-          list_add_after(&e->_node, &entries[i]._node);
++          oonf_list_add_after(&e->_node, &entries[i]._node);
+           set = true;
+           break;
+         }
+       }
+       if (!set) {
+-        list_add_head(&consumer->_consumer_list, &entries[i]._node);
++        oonf_list_add_head(&consumer->_consumer_list, &entries[i]._node);
+       }
+     }
+ 
+diff --git a/src-api/rfc5444/rfc5444_writer.c b/src-api/rfc5444/rfc5444_writer.c
+index a37fe89..5bd1165 100644
+--- a/src-api/rfc5444/rfc5444_writer.c
++++ b/src-api/rfc5444/rfc5444_writer.c
+@@ -91,15 +91,15 @@ rfc5444_writer_init(struct rfc5444_writer *writer) {
+   if (!writer->free_addrtlv_entry)
+     writer->free_addrtlv_entry = free;
+ 
+-  list_init_head(&writer->_targets);
++  oonf_list_init_head(&writer->_targets);
+ 
+   /* initialize packet buffer */
+   writer->_msg.buffer = writer->msg_buffer;
+   _rfc5444_tlv_writer_init(&writer->_msg, 0, writer->msg_size);
+ 
+-  list_init_head(&writer->_pkthandlers);
+-  list_init_head(&writer->_targets);
+-  list_init_head(&writer->_addr_tlvtype_head);
++  oonf_list_init_head(&writer->_pkthandlers);
++  oonf_list_init_head(&writer->_targets);
++  oonf_list_init_head(&writer->_addr_tlvtype_head);
+ 
+   avl_init(&writer->_msgcreators, avl_comp_uint8, false);
+ 
+@@ -128,17 +128,17 @@ rfc5444_writer_cleanup(struct rfc5444_writer *writer) {
+ #endif
+ 
+   /* remove all packet handlers */
+-  list_for_each_element_safe(&writer->_pkthandlers, pkt, _pkthandle_node, safe_pkt) {
++  oonf_list_for_each_element_safe(&writer->_pkthandlers, pkt, _pkthandle_node, safe_pkt) {
+     rfc5444_writer_unregister_pkthandler(writer, pkt);
+   }
+ 
+   /* remove all _targets */
+-  list_for_each_element_safe(&writer->_targets, interf, _target_node, safe_interf) {
++  oonf_list_for_each_element_safe(&writer->_targets, interf, _target_node, safe_interf) {
+     rfc5444_writer_unregister_target(writer, interf);
+   }
+ 
+   /* remove all generic address tlvtypes */
+-  list_for_each_element_safe(&writer->_addr_tlvtype_head, tlvtype, _tlvtype_node, safe_tt) {
++  oonf_list_for_each_element_safe(&writer->_addr_tlvtype_head, tlvtype, _tlvtype_node, safe_tt) {
+     rfc5444_writer_unregister_addrtlvtype(writer, tlvtype);
+   }
+ 
+@@ -153,7 +153,7 @@ rfc5444_writer_cleanup(struct rfc5444_writer *writer) {
+     }
+ 
+     /* remove all registered address tlvs */
+-    list_for_each_element_safe(&msg->_msgspecific_tlvtype_head, tlvtype, _tlvtype_node, safe_tt) {
++    oonf_list_for_each_element_safe(&msg->_msgspecific_tlvtype_head, tlvtype, _tlvtype_node, safe_tt) {
+       rfc5444_writer_unregister_addrtlvtype(writer, tlvtype);
+     }
+ 
+@@ -247,7 +247,7 @@ rfc5444_writer_add_address(struct rfc5444_writer *writer __attribute__ ((unused)
+     address->_orig_index = msg->_addr_tree.count;
+ 
+     /* add address to address list */
+-    list_add_tail(&msg->_addr_head, &address->_addr_node);
++    oonf_list_add_tail(&msg->_addr_head, &address->_addr_node);
+ 
+     /* add address into message address tree */
+     address->_addr_tree_node.key = &address->address;
+@@ -302,12 +302,12 @@ rfc5444_writer_unregister_addrtlvtype(struct rfc5444_writer *writer, struct rfc5
+ #if WRITER_STATE_MACHINE == true
+   assert(writer->_state == RFC5444_WRITER_NONE);
+ #endif
+-  if (!list_is_node_added(&tlvtype->_tlvtype_node)) {
++  if (!oonf_list_is_node_added(&tlvtype->_tlvtype_node)) {
+     return;
+   }
+ 
+   _free_tlvtype_tlvs(writer, tlvtype);
+-  list_remove(&tlvtype->_tlvtype_node);
++  oonf_list_remove(&tlvtype->_tlvtype_node);
+ 
+   if (tlvtype->_creator) {
+     /* message specific address tlv, see if we need to remove the message itself */
+@@ -460,7 +460,7 @@ rfc5444_writer_register_pkthandler(struct rfc5444_writer *writer,
+   assert(writer->_state == RFC5444_WRITER_NONE);
+ #endif
+ 
+-  list_add_tail(&writer->_pkthandlers, &pkt->_pkthandle_node);
++  oonf_list_add_tail(&writer->_pkthandlers, &pkt->_pkthandle_node);
+ }
+ 
+ /**
+@@ -477,8 +477,8 @@ rfc5444_writer_unregister_pkthandler(
+ #if WRITER_STATE_MACHINE == true
+   assert(writer->_state == RFC5444_WRITER_NONE);
+ #endif
+-  if (list_is_node_added(&pkt->_pkthandle_node)) {
+-    list_remove(&pkt->_pkthandle_node);
++  if (oonf_list_is_node_added(&pkt->_pkthandle_node)) {
++    oonf_list_remove(&pkt->_pkthandle_node);
+   }
+ }
+ 
+@@ -501,7 +501,7 @@ rfc5444_writer_register_target(struct rfc5444_writer *writer,
+ 
+   interf->_is_flushed = true;
+ 
+-  list_add_tail(&writer->_targets, &interf->_target_node);
++  oonf_list_add_tail(&writer->_targets, &interf->_target_node);
+ }
+ 
+ /**
+@@ -519,8 +519,8 @@ rfc5444_writer_unregister_target(
+ #endif
+ 
+   /* remove interface from writer */
+-  if (list_is_node_added(&interf->_target_node)) {
+-    list_remove(&interf->_target_node);
++  if (oonf_list_is_node_added(&interf->_target_node)) {
++    oonf_list_remove(&interf->_target_node);
+   }
+ }
+ 
+@@ -557,10 +557,10 @@ _get_message(struct rfc5444_writer *writer, uint8_t msgid) {
+   /* initialize list/tree heads */
+   avl_init(&msg->_provider_tree, avl_comp_uint32, true);
+ 
+-  list_init_head(&msg->_msgspecific_tlvtype_head);
++  oonf_list_init_head(&msg->_msgspecific_tlvtype_head);
+ 
+   avl_init(&msg->_addr_tree, avl_comp_netaddr, false);
+-  list_init_head(&msg->_addr_head);
++  oonf_list_init_head(&msg->_addr_head);
+   return msg;
+ }
+ 
+@@ -586,11 +586,11 @@ _register_addrtlvtype(struct rfc5444_writer *writer,
+ 
+   if (msg) {
+     /* add to message creator list */
+-    list_add_tail(&msg->_msgspecific_tlvtype_head, &tlvtype->_tlvtype_node);
++    oonf_list_add_tail(&msg->_msgspecific_tlvtype_head, &tlvtype->_tlvtype_node);
+   }
+   else {
+     /* add to generic address tlvtype list */
+-    list_add_tail(&writer->_addr_tlvtype_head, &tlvtype->_tlvtype_node);
++    oonf_list_add_tail(&writer->_addr_tlvtype_head, &tlvtype->_tlvtype_node);
+   }
+ }
+ 
+@@ -643,7 +643,7 @@ _rfc5444_writer_free_addresses(struct rfc5444_writer *writer, struct rfc5444_wri
+ 
+   avl_remove_all_elements(&msg->_addr_tree, addr, _addr_tree_node, safe_addr) {
+     /* remove from list too */
+-    list_remove(&addr->_addr_node);
++    oonf_list_remove(&addr->_addr_node);
+ 
+     avl_remove_all_elements(&addr->_addrtlv_tree, addrtlv, addrtlv_node, safe_addrtlv) {
+       /* remove from tlvtype too */
+@@ -665,8 +665,8 @@ _rfc5444_writer_free_addresses(struct rfc5444_writer *writer, struct rfc5444_wri
+ static void
+ _lazy_free_message(struct rfc5444_writer *writer, struct rfc5444_writer_message *msg) {
+   if (!msg->_registered
+-      && list_is_empty(&msg->_addr_head)
+-      && list_is_empty(&msg->_msgspecific_tlvtype_head)
++      && oonf_list_is_empty(&msg->_addr_head)
++      && oonf_list_is_empty(&msg->_msgspecific_tlvtype_head)
+       && avl_is_empty(&msg->_provider_tree)) {
+     avl_remove(&writer->_msgcreators, &msg->_msgcreator_node);
+     free(msg);
+diff --git a/src-api/rfc5444/rfc5444_writer.h b/src-api/rfc5444/rfc5444_writer.h
+index 43631c3..9f367d2 100644
+--- a/src-api/rfc5444/rfc5444_writer.h
++++ b/src-api/rfc5444/rfc5444_writer.h
+@@ -57,8 +57,8 @@ struct rfc5444_writer_message;
+  * during message generation (finishMessageHeader/finishMessageTLVs
+  * callbacks)
+  */
+-#define for_each_fragment_address(first, last, address, loop) list_for_element_range(first, last, address, addr_node, loop)
+-#define for_each_message_address(message, address, loop) list_for_each_element(&message->addr_head, address, addr_node, loop)
++#define for_each_fragment_address(first, last, address, loop) oonf_list_for_element_range(first, last, address, addr_node, loop)
++#define for_each_message_address(message, address, loop) oonf_list_for_each_element(&message->addr_head, address, addr_node, loop)
+ 
+ /**
+  * state machine values for the writer.
+diff --git a/src-api/subsystems/oonf_class.c b/src-api/subsystems/oonf_class.c
+index 9625e6a..600b979 100644
+--- a/src-api/subsystems/oonf_class.c
++++ b/src-api/subsystems/oonf_class.c
+@@ -122,8 +122,8 @@ oonf_class_add(struct oonf_class *ci)
+   }
+ 
+   /* Init list heads */
+-  list_init_head(&ci->_free_list);
+-  list_init_head(&ci->_extensions);
++  oonf_list_init_head(&ci->_free_list);
++  oonf_list_init_head(&ci->_extensions);
+ 
+   OONF_DEBUG(LOG_CLASS, "Class %s added: %" PRINTF_SIZE_T_SPECIFIER " bytes\n",
+              ci->name, ci->total_size);
+@@ -145,7 +145,7 @@ oonf_class_remove(struct oonf_class *ci)
+   _free_freelist(ci);
+ 
+   /* remove all listeners */
+-  list_for_each_element_safe(&ci->_extensions, ext, _node, iterator) {
++  oonf_list_for_each_element_safe(&ci->_extensions, ext, _node, iterator) {
+     oonf_class_extension_remove(ext);
+   }
+ 
+@@ -170,7 +170,7 @@ oonf_class_resize(struct oonf_class *ci) {
+   _free_freelist(ci);
+ 
+   /* recalculate offsets */
+-  list_for_each_element(&ci->_extensions, ext, _node) {
++  oonf_list_for_each_element(&ci->_extensions, ext, _node) {
+     ext->_offset = ci->total_size;
+     OONF_DEBUG(LOG_CLASS, "Class %s resized: "
+         " '%s' has offset %" PRINTF_SIZE_T_SPECIFIER " and size %" PRINTF_SIZE_T_SPECIFIER "\n",
+@@ -203,7 +203,7 @@ oonf_class_malloc(struct oonf_class *ci)
+   /*
+    * Check first if we have reusable memory.
+    */
+-  if (list_is_empty(&ci->_free_list)) {
++  if (oonf_list_is_empty(&ci->_free_list)) {
+     /*
+      * No reusable memory block on the free_list.
+      * Allocate a fresh one.
+@@ -220,7 +220,7 @@ oonf_class_malloc(struct oonf_class *ci)
+      * Carve it out of the list, and clean.
+      */
+     entity = ci->_free_list.next;
+-    list_remove(entity);
++    oonf_list_remove(entity);
+ 
+     memset(entity, 0, ci->total_size);
+     ptr = entity;
+@@ -262,7 +262,7 @@ oonf_class_free(struct oonf_class *ci, void *ptr)
+       || (ci->_free_list_size < ci->_current_usage / OONF_CLASS_FREE_THRESHOLD)) {
+     item = ptr;
+ 
+-    list_add_tail(&ci->_free_list, item);
++    oonf_list_add_tail(&ci->_free_list, item);
+ 
+     ci->_free_list_size++;
+ #ifdef OONF_LOG_DEBUG_INFO
+@@ -310,7 +310,7 @@ oonf_class_extension_add(struct oonf_class_extension *ext) {
+   }
+ 
+   /* add to class extension list */
+-  list_add_tail(&c->_extensions, &ext->_node);
++  oonf_list_add_tail(&c->_extensions, &ext->_node);
+ 
+   if (ext->size > 0) {
+     /* make sure freelist is empty */
+@@ -336,8 +336,8 @@ oonf_class_extension_add(struct oonf_class_extension *ext) {
+  */
+ void
+ oonf_class_extension_remove(struct oonf_class_extension *ext) {
+-  if (list_is_node_added(&ext->_node)) {
+-    list_remove(&ext->_node);
++  if (oonf_list_is_node_added(&ext->_node)) {
++    oonf_list_remove(&ext->_node);
+     ext->_offset = 0;
+   }
+ }
+@@ -357,7 +357,7 @@ oonf_class_event(struct oonf_class *c, void *ptr, enum oonf_class_event evt) {
+ 
+   OONF_DEBUG(LOG_CLASS, "Fire '%s' event for %s",
+       OONF_CLASS_EVENT_NAME[evt], c->to_keystring(&buf, c, ptr));
+-  list_for_each_element(&c->_extensions, ext, _node) {
++  oonf_list_for_each_element(&c->_extensions, ext, _node) {
+     if (evt == OONF_OBJECT_ADDED && ext->cb_add != NULL) {
+       OONF_DEBUG(LOG_CLASS, "Fire listener %s", ext->ext_name);
+       ext->cb_add(ptr);
+@@ -392,11 +392,11 @@ _roundup(size_t size) {
+  */
+ static void
+ _free_freelist(struct oonf_class *ci) {
+-  while (!list_is_empty(&ci->_free_list)) {
++  while (!oonf_list_is_empty(&ci->_free_list)) {
+     struct list_entity *item;
+     item = ci->_free_list.next;
+ 
+-    list_remove(item);
++    oonf_list_remove(item);
+     free(item);
+   }
+   ci->_free_list_size = 0;
+diff --git a/src-api/subsystems/oonf_class.h b/src-api/subsystems/oonf_class.h
+index b738761..fadf50f 100644
+--- a/src-api/subsystems/oonf_class.h
++++ b/src-api/subsystems/oonf_class.h
+@@ -209,7 +209,7 @@ oonf_class_get_extension(struct oonf_class_extension *ext, void *ptr) {
+  */
+ static INLINE bool
+ oonf_class_is_extension_registered(struct oonf_class_extension *ext) {
+-  return list_is_node_added(&ext->_node);
++  return oonf_list_is_node_added(&ext->_node);
+ }
+ 
+ #endif /* _OONF_CLASS_H */
+diff --git a/src-api/subsystems/oonf_interface.c b/src-api/subsystems/oonf_interface.c
+index a87c410..bec6f5c 100644
+--- a/src-api/subsystems/oonf_interface.c
++++ b/src-api/subsystems/oonf_interface.c
+@@ -103,7 +103,7 @@ _init(void) {
+   oonf_class_add(&_if_class);
+ 
+   avl_init(&oonf_interface_tree, avl_comp_strcasecmp, false);
+-  list_init_head(&_interface_listener);
++  oonf_list_init_head(&_interface_listener);
+ 
+   os_system_iflistener_add(&_iflistener);
+   return 0;
+@@ -116,7 +116,7 @@ static void
+ _cleanup(void) {
+   struct oonf_interface_listener *listener, *l_it;
+ 
+-  list_for_each_element_safe(&_interface_listener, listener, _node, l_it) {
++  oonf_list_for_each_element_safe(&_interface_listener, listener, _node, l_it) {
+     oonf_interface_remove_listener(listener);
+   }
+ 
+@@ -133,7 +133,7 @@ _cleanup(void) {
+ int
+ oonf_interface_add_listener(
+     struct oonf_interface_listener *listener) {
+-  if (list_is_node_added(&listener->_node)) {
++  if (oonf_list_is_node_added(&listener->_node)) {
+     return 0;
+   }
+ 
+@@ -144,7 +144,7 @@ oonf_interface_add_listener(
+     }
+   }
+ 
+-  list_add_tail(&_interface_listener, &listener->_node);
++  oonf_list_add_tail(&_interface_listener, &listener->_node);
+   return 0;
+ }
+ 
+@@ -155,7 +155,7 @@ oonf_interface_add_listener(
+ void
+ oonf_interface_remove_listener(
+     struct oonf_interface_listener *listener) {
+-  if (!list_is_node_added(&listener->_node)) {
++  if (!oonf_list_is_node_added(&listener->_node)) {
+     return;
+   }
+ 
+@@ -163,7 +163,7 @@ oonf_interface_remove_listener(
+     _interface_remove(listener->interface, listener->mesh);
+   }
+ 
+-  list_remove(&listener->_node);
++  oonf_list_remove(&listener->_node);
+ }
+ 
+ /**
+@@ -345,7 +345,7 @@ _cb_change_handler(void *ptr) {
+   memcpy(&interf->data, &new_data, sizeof(interf->data));
+ 
+   /* call listeners */
+-  list_for_each_element_safe(&_interface_listener, listener, _node, l_it) {
++  oonf_list_for_each_element_safe(&_interface_listener, listener, _node, l_it) {
+     if (listener->process != NULL
+         && (listener->name == NULL
+             || strcasecmp(listener->name, interf->data.name) == 0)) {
+diff --git a/src-api/subsystems/oonf_layer2.c b/src-api/subsystems/oonf_layer2.c
+index 6e50087..059ad4d 100644
+--- a/src-api/subsystems/oonf_layer2.c
++++ b/src-api/subsystems/oonf_layer2.c
+@@ -246,7 +246,7 @@ oonf_layer2_neigh_add(struct oonf_layer2_net *l2net,
+   if (netaddr_get_address_family(neigh) == AF_MAC48
+       || netaddr_get_address_family(neigh) == AF_EUI64) {
+     /* initialize ring for IP addresses of neighbor */
+-    list_init_head(&l2neigh->_neigh_ring);
++    oonf_list_init_head(&l2neigh->_neigh_ring);
+   }
+ 
+   oonf_class_event(&_l2neighbor_class, l2neigh, OONF_OBJECT_ADDED);
+@@ -391,8 +391,8 @@ _neigh_remove(struct oonf_layer2_neigh *l2neigh) {
+   oonf_class_event(&_l2neighbor_class, l2neigh, OONF_OBJECT_REMOVED);
+ 
+   /* remove all connected IP defaults */
+-  list_for_each_element_safe(&l2neigh->_neigh_ring, neigh, _neigh_ring, n_it) {
+-    list_remove(&neigh->_neigh_ring);
++  oonf_list_for_each_element_safe(&l2neigh->_neigh_ring, neigh, _neigh_ring, n_it) {
++    oonf_list_remove(&neigh->_neigh_ring);
+   }
+ 
+   /* free resources for mac entry */
+diff --git a/src-api/subsystems/oonf_packet_socket.c b/src-api/subsystems/oonf_packet_socket.c
+index 8797175..f3bb073 100644
+--- a/src-api/subsystems/oonf_packet_socket.c
++++ b/src-api/subsystems/oonf_packet_socket.c
+@@ -90,7 +90,7 @@ static char _input_buffer[65536];
+  */
+ static int
+ _init(void) {
+-  list_init_head(&_packet_sockets);
++  oonf_list_init_head(&_packet_sockets);
+   return 0;
+ }
+ 
+@@ -101,8 +101,8 @@ static void
+ _cleanup(void) {
+   struct oonf_packet_socket *skt;
+ 
+-  while (!list_is_empty(&_packet_sockets)) {
+-    skt = list_first_element(&_packet_sockets, skt, node);
++  while (!oonf_list_is_empty(&_packet_sockets)) {
++    skt = oonf_list_first_element(&_packet_sockets, skt, node);
+ 
+     oonf_packet_remove(skt, true);
+   }
+@@ -137,7 +137,7 @@ oonf_packet_add(struct oonf_packet_socket *pktsocket,
+   oonf_socket_add(&pktsocket->scheduler_entry);
+ 
+   abuf_init(&pktsocket->out);
+-  list_add_tail(&_packet_sockets, &pktsocket->node);
++  oonf_list_add_tail(&_packet_sockets, &pktsocket->node);
+   memcpy(&pktsocket->local_socket, local, sizeof(pktsocket->local_socket));
+ 
+   if (pktsocket->config.input_buffer_length == 0) {
+@@ -157,12 +157,12 @@ void
+ oonf_packet_remove(struct oonf_packet_socket *pktsocket,
+     bool force __attribute__((unused))) {
+   // TODO: implement non-force behavior for UDP sockets
+-  if (list_is_node_added(&pktsocket->node)) {
++  if (oonf_list_is_node_added(&pktsocket->node)) {
+     oonf_socket_remove(&pktsocket->scheduler_entry);
+     os_net_close(pktsocket->scheduler_entry.fd);
+     abuf_free(&pktsocket->out);
+ 
+-    list_remove(&pktsocket->node);
++    oonf_list_remove(&pktsocket->node);
+ 
+     pktsocket->scheduler_entry.fd = -1;
+   }
+@@ -307,11 +307,11 @@ oonf_packet_send_managed(struct oonf_packet_managed *managed,
+     return 0;
+   }
+ 
+-  if (list_is_node_added(&managed->socket_v4.scheduler_entry._node)
++  if (oonf_list_is_node_added(&managed->socket_v4.scheduler_entry._node)
+       && netaddr_socket_get_addressfamily(remote) == AF_INET) {
+     return oonf_packet_send(&managed->socket_v4, remote, data, length);
+   }
+-  if (list_is_node_added(&managed->socket_v6.scheduler_entry._node)
++  if (oonf_list_is_node_added(&managed->socket_v6.scheduler_entry._node)
+       && netaddr_socket_get_addressfamily(remote) == AF_INET6) {
+     return oonf_packet_send(&managed->socket_v6, remote, data, length);
+   }
+@@ -572,7 +572,7 @@ _apply_managed_socket(struct oonf_packet_managed *managed,
+     return -1;
+   }
+ 
+-  if (list_is_node_added(&packet->node)) {
++  if (oonf_list_is_node_added(&packet->node)) {
+     if (data == packet->interface
+         && memcmp(&sock, &packet->local_socket, sizeof(sock)) == 0) {
+       /* nothing changed */
+diff --git a/src-api/subsystems/oonf_packet_socket.h b/src-api/subsystems/oonf_packet_socket.h
+index e8fb218..edaa031 100644
+--- a/src-api/subsystems/oonf_packet_socket.h
++++ b/src-api/subsystems/oonf_packet_socket.h
+@@ -131,7 +131,7 @@ EXPORT bool oonf_packet_managed_is_active(
+  */
+ static INLINE bool
+ oonf_packet_is_active(struct oonf_packet_socket *sock) {
+-  return list_is_node_added(&sock->node);
++  return oonf_list_is_node_added(&sock->node);
+ }
+ 
+ #endif /* OONF_PACKET_SOCKET_H_ */
+diff --git a/src-api/subsystems/oonf_rfc5444.c b/src-api/subsystems/oonf_rfc5444.c
+index 013ccac..94764df 100644
+--- a/src-api/subsystems/oonf_rfc5444.c
++++ b/src-api/subsystems/oonf_rfc5444.c
+@@ -526,7 +526,7 @@ oonf_rfc5444_add_interface(struct oonf_rfc5444_protocol *protocol,
+     protocol->_msg_seqno = os_core_random() & 0xffff;
+ 
+     /* initialize listener list */
+-    list_init_head(&interf->_listener);
++    oonf_list_init_head(&interf->_listener);
+ 
+     /* increase protocol refcount */
+     protocol->_refcount++;
+@@ -537,7 +537,7 @@ oonf_rfc5444_add_interface(struct oonf_rfc5444_protocol *protocol,
+ 
+   if (listener) {
+     /* hookup listener */
+-    list_add_tail(&interf->_listener, &listener->_node);
++    oonf_list_add_tail(&interf->_listener, &listener->_node);
+     listener->interface = interf;
+   }
+   return interf;
+@@ -554,7 +554,7 @@ oonf_rfc5444_remove_interface(struct oonf_rfc5444_interface *interf,
+   struct oonf_rfc5444_target *target, *t_it;
+ 
+   if (listener != NULL && listener->interface != NULL) {
+-    list_remove(&listener->_node);
++    oonf_list_remove(&listener->_node);
+     listener->interface = NULL;
+   }
+ 
+@@ -1230,7 +1230,7 @@ _cb_interface_changed(struct oonf_packet_managed *managed, bool changed) {
+     oonf_rfc5444_reconfigure_interface(interf, NULL);
+   }
+ 
+-  list_for_each_element(&interf->_listener, l, _node) {
++  oonf_list_for_each_element(&interf->_listener, l, _node) {
+     l->cb_interface_changed(l, changed);
+   }
+ }
+diff --git a/src-api/subsystems/oonf_socket.c b/src-api/subsystems/oonf_socket.c
+index 8837bb7..3fc16d8 100644
+--- a/src-api/subsystems/oonf_socket.c
++++ b/src-api/subsystems/oonf_socket.c
+@@ -74,7 +74,7 @@ struct oonf_subsystem oonf_socket_subsystem = {
+  */
+ static int
+ _init(void) {
+-  list_init_head(&oonf_socket_head);
++  oonf_list_init_head(&oonf_socket_head);
+   return 0;
+ }
+ 
+@@ -87,8 +87,8 @@ _cleanup(void)
+ {
+   struct oonf_socket_entry *entry, *iterator;
+ 
+-  list_for_each_element_safe(&oonf_socket_head, entry, _node, iterator) {
+-    list_remove(&entry->_node);
++  oonf_list_for_each_element_safe(&oonf_socket_head, entry, _node, iterator) {
++    oonf_list_remove(&entry->_node);
+     os_net_close(entry->fd);
+   }
+ }
+@@ -107,7 +107,7 @@ oonf_socket_add(struct oonf_socket_entry *entry)
+ 
+   OONF_DEBUG(LOG_SOCKET, "Adding socket entry %d to scheduler\n", entry->fd);
+ 
+-  list_add_before(&oonf_socket_head, &entry->_node);
++  oonf_list_add_before(&oonf_socket_head, &entry->_node);
+ }
+ 
+ /**
+@@ -119,7 +119,7 @@ oonf_socket_remove(struct oonf_socket_entry *entry)
+ {
+   OONF_DEBUG(LOG_SOCKET, "Removing socket entry %d\n", entry->fd);
+ 
+-  list_remove(&entry->_node);
++  oonf_list_remove(&entry->_node);
+ }
+ 
+ /**
+@@ -171,7 +171,7 @@ oonf_socket_handle(bool (*stop_scheduler)(void), uint64_t stop_time)
+     FD_ZERO(&obits);
+ 
+     /* Adding file-descriptors to FD set */
+-    list_for_each_element_safe(&oonf_socket_head, entry, _node, iterator) {
++    oonf_list_for_each_element_safe(&oonf_socket_head, entry, _node, iterator) {
+       if (entry->process == NULL) {
+         continue;
+       }
+@@ -229,7 +229,7 @@ oonf_socket_handle(bool (*stop_scheduler)(void), uint64_t stop_time)
+     if (oonf_clock_update()) {
+       return -1;
+     }
+-    list_for_each_element_safe(&oonf_socket_head, entry, _node, iterator) {
++    oonf_list_for_each_element_safe(&oonf_socket_head, entry, _node, iterator) {
+       if (entry->process == NULL) {
+         continue;
+       }
+diff --git a/src-api/subsystems/oonf_stream_socket.c b/src-api/subsystems/oonf_stream_socket.c
+index 9c9a33a..342435b 100644
+--- a/src-api/subsystems/oonf_stream_socket.c
++++ b/src-api/subsystems/oonf_stream_socket.c
+@@ -96,7 +96,7 @@ static int
+ _init(void) {
+   oonf_class_add(&_connection_cookie);
+   oonf_timer_add(&_connection_timeout);
+-  list_init_head(&oonf_stream_head);
++  oonf_list_init_head(&oonf_stream_head);
+   return 0;
+ }
+ 
+@@ -107,8 +107,8 @@ static void
+ _cleanup(void) {
+   struct oonf_stream_socket *comport;
+ 
+-  while (!list_is_empty(&oonf_stream_head)) {
+-    comport = list_first_element(&oonf_stream_head, comport, node);
++  while (!oonf_list_is_empty(&oonf_stream_head)) {
++    comport = oonf_list_first_element(&oonf_stream_head, comport, node);
+ 
+     oonf_stream_remove(comport, true);
+   }
+@@ -175,8 +175,8 @@ oonf_stream_add(struct oonf_stream_socket *stream_socket,
+     stream_socket->config.maximum_input_buffer = 65536;
+   }
+ 
+-  list_init_head(&stream_socket->session);
+-  list_add_tail(&oonf_stream_head, &stream_socket->node);
++  oonf_list_init_head(&stream_socket->session);
++  oonf_list_add_tail(&oonf_stream_head, &stream_socket->node);
+ 
+   return 0;
+ 
+@@ -205,22 +205,22 @@ oonf_stream_remove(struct oonf_stream_socket *stream_socket, bool force) {
+     return;
+   }
+ 
+-  if (!list_is_node_added(&stream_socket->node)) {
++  if (!oonf_list_is_node_added(&stream_socket->node)) {
+     return;
+   }
+ 
+-  list_for_each_element_safe(&stream_socket->session, session, node, ptr) {
++  oonf_list_for_each_element_safe(&stream_socket->session, session, node, ptr) {
+     if (force || (abuf_getlen(&session->out) == 0 && !session->busy)) {
+       /* close everything that doesn't need to send data anymore */
+       oonf_stream_close(session, force);
+     }
+   }
+ 
+-  if (!list_is_empty(&stream_socket->session)) {
++  if (!oonf_list_is_empty(&stream_socket->session)) {
+     return;
+   }
+ 
+-  list_remove(&stream_socket->node);
++  oonf_list_remove(&stream_socket->node);
+ 
+   if (stream_socket->scheduler_entry.fd) {
+     /* only for server sockets */
+@@ -298,7 +298,7 @@ oonf_stream_close(struct oonf_stream_session *session, bool force) {
+     return;
+   }
+ 
+-  if (!list_is_node_added(&session->node)) {
++  if (!oonf_list_is_node_added(&session->node)) {
+     return;
+   }
+ 
+@@ -309,7 +309,7 @@ oonf_stream_close(struct oonf_stream_session *session, bool force) {
+   oonf_timer_stop(&session->timeout);
+ 
+   session->comport->config.allowed_sessions++;
+-  list_remove(&session->node);
++  oonf_list_remove(&session->node);
+ 
+   os_net_close(session->scheduler_entry.fd);
+   oonf_socket_remove(&session->scheduler_entry);
+@@ -400,7 +400,7 @@ _apply_managed_socket(struct oonf_stream_managed *managed,
+     return -1;
+   }
+ 
+-  if (list_is_node_added(&stream->scheduler_entry._node)) {
++  if (oonf_list_is_node_added(&stream->scheduler_entry._node)) {
+     if (memcmp(&sock, &stream->local_socket, sizeof(sock)) == 0) {
+       /* nothing changed */
+       return 0;
+@@ -540,7 +540,7 @@ _create_session(struct oonf_stream_socket *stream_socket,
+   OONF_DEBUG(LOG_STREAM, "Got connection through socket %d with %s.\n",
+       sock, netaddr_to_string(&buf, remote_addr));
+ 
+-  list_add_tail(&stream_socket->session, &session->node);
++  oonf_list_add_tail(&stream_socket->session, &session->node);
+   return session;
+ 
+ parse_request_error:
+diff --git a/src-api/subsystems/oonf_telnet.c b/src-api/subsystems/oonf_telnet.c
+index 5f1dd6a..7d1a86a 100644
+--- a/src-api/subsystems/oonf_telnet.c
++++ b/src-api/subsystems/oonf_telnet.c
+@@ -284,7 +284,7 @@ _cb_telnet_init(struct oonf_stream_session *session) {
+   telnet_session->data.out = &telnet_session->session.out;
+   telnet_session->data.remote = &telnet_session->session.remote_address;
+ 
+-  list_init_head(&telnet_session->data.cleanup_list);
++  oonf_list_init_head(&telnet_session->data.cleanup_list);
+ 
+   return 0;
+ }
+@@ -305,7 +305,7 @@ _cb_telnet_cleanup(struct oonf_stream_session *session) {
+   oonf_telnet_stop(&telnet_session->data);
+ 
+   /* call all cleanup handlers */
+-  list_for_each_element_safe(&telnet_session->data.cleanup_list, handler, node, it) {
++  oonf_list_for_each_element_safe(&telnet_session->data.cleanup_list, handler, node, it) {
+     /* remove from list first */
+     oonf_telnet_remove_cleanup(handler);
+ 
+diff --git a/src-api/subsystems/oonf_telnet.h b/src-api/subsystems/oonf_telnet.h
+index 490a389..ddc84a5 100644
+--- a/src-api/subsystems/oonf_telnet.h
++++ b/src-api/subsystems/oonf_telnet.h
+@@ -168,7 +168,7 @@ static INLINE void
+ oonf_telnet_add_cleanup(struct oonf_telnet_data *data,
+     struct oonf_telnet_cleanup *cleanup) {
+   cleanup->data = data;
+-  list_add_tail(&data->cleanup_list, &cleanup->node);
++  oonf_list_add_tail(&data->cleanup_list, &cleanup->node);
+ }
+ 
+ /**
+@@ -177,7 +177,7 @@ oonf_telnet_add_cleanup(struct oonf_telnet_data *data,
+  */
+ static INLINE void
+ oonf_telnet_remove_cleanup(struct oonf_telnet_cleanup *cleanup) {
+-  list_remove(&cleanup->node);
++  oonf_list_remove(&cleanup->node);
+ }
+ 
+ /**
+diff --git a/src-api/subsystems/oonf_timer.c b/src-api/subsystems/oonf_timer.c
+index 5fe0e82..812bd21 100644
+--- a/src-api/subsystems/oonf_timer.c
++++ b/src-api/subsystems/oonf_timer.c
+@@ -90,7 +90,7 @@ _init(void)
+   avl_init(&_timer_tree, _avlcomp_timer, true);
+   _scheduling_now = false;
+ 
+-  list_init_head(&oonf_timer_info_list);
++  oonf_list_init_head(&oonf_timer_info_list);
+   return 0;
+ }
+ 
+@@ -103,7 +103,7 @@ _cleanup(void)
+   struct oonf_timer_info *ti, *iterator;
+ 
+   /* free all timerinfos */
+-  list_for_each_element_safe(&oonf_timer_info_list, ti, _node, iterator) {
++  oonf_list_for_each_element_safe(&oonf_timer_info_list, ti, _node, iterator) {
+     oonf_timer_remove(ti);
+   }
+ }
+@@ -116,7 +116,7 @@ void
+ oonf_timer_add(struct oonf_timer_info *ti) {
+   assert (ti->callback);
+   assert (ti->name);
+-  list_add_tail(&oonf_timer_info_list, &ti->_node);
++  oonf_list_add_tail(&oonf_timer_info_list, &ti->_node);
+ }
+ 
+ /**
+@@ -134,7 +134,7 @@ oonf_timer_remove(struct oonf_timer_info *info) {
+     }
+   }
+ 
+-  list_remove(&info->_node);
++  oonf_list_remove(&info->_node);
+ }
+ 
+ /**
+diff --git a/src-api/subsystems/os_linux/os_routing_linux.c b/src-api/subsystems/os_linux/os_routing_linux.c
+index 86f98d7..702ad4a 100644
+--- a/src-api/subsystems/os_linux/os_routing_linux.c
++++ b/src-api/subsystems/os_linux/os_routing_linux.c
+@@ -101,7 +101,7 @@ _init(void) {
+   if (os_system_netlink_add(&_rtnetlink_socket, NETLINK_ROUTE)) {
+     return -1;
+   }
+-  list_init_head(&_rtnetlink_feedback);
++  oonf_list_init_head(&_rtnetlink_feedback);
+   return 0;
+ }
+ 
+@@ -112,7 +112,7 @@ static void
+ _cleanup(void) {
+   struct os_route *rt, *rt_it;
+ 
+-  list_for_each_element_safe(&_rtnetlink_feedback, rt, _internal._node, rt_it) {
++  oonf_list_for_each_element_safe(&_rtnetlink_feedback, rt, _internal._node, rt_it) {
+     _routing_finished(rt, 1);
+   }
+ 
+@@ -191,7 +191,7 @@ os_routing_set(struct os_route *route, bool set, bool del_similar) {
+   seq = os_system_netlink_send(&_rtnetlink_socket, msg);
+ 
+   if (route->cb_finished) {
+-    list_add_tail(&_rtnetlink_feedback, &route->_internal._node);
++    oonf_list_add_tail(&_rtnetlink_feedback, &route->_internal._node);
+     route->_internal.nl_seq = seq;
+   }
+   return 0;
+@@ -229,7 +229,7 @@ os_routing_query(struct os_route *route) {
+     return -1;
+   }
+ 
+-  list_add_tail(&_rtnetlink_feedback, &route->_internal._node);
++  oonf_list_add_tail(&_rtnetlink_feedback, &route->_internal._node);
+   route->_internal.nl_seq = seq;
+   return 0;
+ }
+@@ -251,9 +251,9 @@ os_routing_interrupt(struct os_route *route) {
+  */
+ static void
+ _routing_finished(struct os_route *route, int error) {
+-  if (list_is_node_added(&route->_internal._node)) {
++  if (oonf_list_is_node_added(&route->_internal._node)) {
+     /* remove first to prevent any kind of recursive cleanup */
+-    list_remove(&route->_internal._node);
++    oonf_list_remove(&route->_internal._node);
+ 
+     if (route->cb_finished) {
+       route->cb_finished(route, error);
+@@ -462,7 +462,7 @@ _cb_rtnetlink_message(struct nlmsghdr *msg) {
+     return;
+   }
+ 
+-  list_for_each_element(&_rtnetlink_feedback, filter, _internal._node) {
++  oonf_list_for_each_element(&_rtnetlink_feedback, filter, _internal._node) {
+     OONF_DEBUG_NH(LOG_OS_ROUTING, "  Compare with seq: %d", filter->_internal.nl_seq);
+     if (msg->nlmsg_seq == filter->_internal.nl_seq) {
+       if (filter->cb_get != NULL && _match_routes(filter, &rt)) {
+@@ -487,7 +487,7 @@ _cb_rtnetlink_error(uint32_t seq, int error) {
+   /* transform into errno number */
+   error = -error;
+ 
+-  list_for_each_element(&_rtnetlink_feedback, route, _internal._node) {
++  oonf_list_for_each_element(&_rtnetlink_feedback, route, _internal._node) {
+     if (seq == route->_internal.nl_seq) {
+       _routing_finished(route, error);
+       break;
+@@ -504,7 +504,7 @@ _cb_rtnetlink_timeout(void) {
+ 
+   OONF_DEBUG(LOG_OS_ROUTING, "Got timeout");
+ 
+-  list_for_each_element_safe(&_rtnetlink_feedback, route, _internal._node, rt_it) {
++  oonf_list_for_each_element_safe(&_rtnetlink_feedback, route, _internal._node, rt_it) {
+     _routing_finished(route, -1);
+   }
+ }
+@@ -519,7 +519,7 @@ _cb_rtnetlink_done(uint32_t seq) {
+ 
+   OONF_DEBUG(LOG_OS_ROUTING, "Got done: %u", seq);
+ 
+-  list_for_each_element(&_rtnetlink_feedback, route, _internal._node) {
++  oonf_list_for_each_element(&_rtnetlink_feedback, route, _internal._node) {
+     if (seq == route->_internal.nl_seq) {
+       _routing_finished(route, 0);
+       break;
+diff --git a/src-api/subsystems/os_linux/os_system_linux.c b/src-api/subsystems/os_linux/os_system_linux.c
+index 37daf7c..d7bc4b3 100644
+--- a/src-api/subsystems/os_linux/os_system_linux.c
++++ b/src-api/subsystems/os_linux/os_system_linux.c
+@@ -179,8 +179,8 @@ _init(void) {
+   }
+ 
+   oonf_timer_add(&_netlink_timer);
+-  list_init_head(&_ifchange_listener);
+-  list_init_head(&_rtnetlink_feedback);
++  oonf_list_init_head(&_ifchange_listener);
++  oonf_list_init_head(&_rtnetlink_feedback);
+   return 0;
+ }
+ 
+@@ -239,12 +239,12 @@ os_system_set_interface_state(const char *dev, bool up) {
+ 
+ void
+ os_system_iflistener_add(struct os_system_if_listener *listener) {
+-  list_add_tail(&_ifchange_listener, &listener->_node);
++  oonf_list_add_tail(&_ifchange_listener, &listener->_node);
+ }
+ 
+ void
+ os_system_iflistener_remove(struct os_system_if_listener *listener) {
+-  list_remove(&listener->_node);
++  oonf_list_remove(&listener->_node);
+ }
+ 
+ /**
+@@ -469,7 +469,7 @@ os_system_ifaddr_set(struct os_system_address *addr) {
+   seq = os_system_netlink_send(&_rtnetlink_receiver, msg);
+ 
+   if (addr->cb_finished) {
+-    list_add_tail(&_rtnetlink_feedback, &addr->_internal._node);
++    oonf_list_add_tail(&_rtnetlink_feedback, &addr->_internal._node);
+     addr->_internal.nl_seq = seq;
+   }
+   return 0;
+@@ -477,9 +477,9 @@ os_system_ifaddr_set(struct os_system_address *addr) {
+ 
+ void
+ os_system_ifaddr_interrupt(struct os_system_address *addr) {
+-  if (list_is_node_added(&addr->_internal._node)) {
++  if (oonf_list_is_node_added(&addr->_internal._node)) {
+     /* remove first to prevent any kind of recursive cleanup */
+-    list_remove(&addr->_internal._node);
++    oonf_list_remove(&addr->_internal._node);
+ 
+     if (addr->cb_finished) {
+       addr->cb_finished(addr, -1);
+@@ -669,7 +669,7 @@ _cb_rtnetlink_message(struct nlmsghdr *hdr) {
+     }
+ 
+     OONF_DEBUG(LOG_OS_SYSTEM, "Linkstatus of interface '%s' changed", if_name);
+-    list_for_each_element(&_ifchange_listener, listener, _node) {
++    oonf_list_for_each_element(&_ifchange_listener, listener, _node) {
+       listener->if_changed(if_name, (ifi->ifi_flags & IFF_UP) == 0);
+     }
+   }
+@@ -684,7 +684,7 @@ _cb_rtnetlink_message(struct nlmsghdr *hdr) {
+     }
+ 
+     OONF_DEBUG(LOG_OS_SYSTEM, "Address of interface '%s' changed", if_name);
+-    list_for_each_element(&_ifchange_listener, listener, _node) {
++    oonf_list_for_each_element(&_ifchange_listener, listener, _node) {
+       listener->if_changed(if_name, false);
+     }
+   }
+@@ -704,7 +704,7 @@ _cb_rtnetlink_error(uint32_t seq, int error) {
+   /* transform into errno number */
+   error = -error;
+ 
+-  list_for_each_element(&_rtnetlink_feedback, addr, _internal._node) {
++  oonf_list_for_each_element(&_rtnetlink_feedback, addr, _internal._node) {
+     if (seq == addr->_internal.nl_seq) {
+       _address_finished(addr, error);
+       break;
+@@ -721,7 +721,7 @@ _cb_rtnetlink_timeout(void) {
+ 
+   OONF_DEBUG(LOG_OS_SYSTEM, "Got timeout");
+ 
+-  list_for_each_element(&_rtnetlink_feedback, addr, _internal._node) {
++  oonf_list_for_each_element(&_rtnetlink_feedback, addr, _internal._node) {
+     _address_finished(addr, -1);
+   }
+ }
+@@ -736,7 +736,7 @@ _cb_rtnetlink_done(uint32_t seq) {
+ 
+   OONF_DEBUG(LOG_OS_SYSTEM, "Got done: %u", seq);
+ 
+-  list_for_each_element(&_rtnetlink_feedback, addr, _internal._node) {
++  oonf_list_for_each_element(&_rtnetlink_feedback, addr, _internal._node) {
+     if (seq == addr->_internal.nl_seq) {
+       _address_finished(addr, 0);
+       break;
+@@ -752,9 +752,9 @@ _cb_rtnetlink_done(uint32_t seq) {
+  */
+ static void
+ _address_finished(struct os_system_address *addr, int error) {
+-  if (list_is_node_added(&addr->_internal._node)) {
++  if (oonf_list_is_node_added(&addr->_internal._node)) {
+     /* remove first to prevent any kind of recursive cleanup */
+-    list_remove(&addr->_internal._node);
++    oonf_list_remove(&addr->_internal._node);
+ 
+     if (addr->cb_finished) {
+       addr->cb_finished(addr, error);
+diff --git a/src-plugins/remotecontrol/remotecontrol.c b/src-plugins/remotecontrol/remotecontrol.c
+index c37c88f..574e28c 100644
+--- a/src-plugins/remotecontrol/remotecontrol.c
++++ b/src-plugins/remotecontrol/remotecontrol.c
+@@ -196,7 +196,7 @@ _init(void)
+   size_t i;
+ 
+   netaddr_acl_add(&_remotecontrol_config.acl);
+-  list_init_head(&_remote_sessions);
++  oonf_list_init_head(&_remote_sessions);
+ 
+   for (i=0; i<ARRAYSIZE(_telnet_cmds); i++) {
+     oonf_telnet_add(&_telnet_cmds[i]);
+@@ -215,7 +215,7 @@ _cleanup(void)
+   size_t i;
+ 
+   /* shutdown all running logging streams */
+-  list_for_each_element_safe(&_remote_sessions, session, node, it) {
++  oonf_list_for_each_element_safe(&_remote_sessions, session, node, it) {
+     oonf_telnet_stop(session->cleanup.data);
+   }
+ 
+@@ -253,7 +253,7 @@ static void
+ _print_timer(struct autobuf *buf) {
+   struct oonf_timer_info *t;
+ 
+-  list_for_each_element(&oonf_timer_info_list, t, _node) {
++  oonf_list_for_each_element(&oonf_timer_info_list, t, _node) {
+     abuf_appendf(buf, "%-25s (TIMER) usage: %u changes: %u\n",
+         t->name, t->usage, t->changes);
+   }
+@@ -739,7 +739,7 @@ static struct _remotecontrol_session *
+ _get_remotecontrol_session(struct oonf_telnet_data *data) {
+   struct _remotecontrol_session *cl;
+ 
+-  list_for_each_element(&_remote_sessions, cl, node) {
++  oonf_list_for_each_element(&_remote_sessions, cl, node) {
+     if (cl->cleanup.data == data) {
+       return cl;
+     }
+@@ -760,7 +760,7 @@ _get_remotecontrol_session(struct oonf_telnet_data *data) {
+   oonf_log_mask_copy(cl->mask, log_global_mask);
+ 
+   /* add to remote telnet list */
+-  list_add_tail(&_remote_sessions, &cl->node);
++  oonf_list_add_tail(&_remote_sessions, &cl->node);
+ 
+   return cl;
+ }
+@@ -774,6 +774,6 @@ _cb_handle_session_cleanup(struct oonf_telnet_cleanup *cleanup) {
+   struct _remotecontrol_session *session;
+ 
+   session = cleanup->custom;
+-  list_remove(&session->node);
++  oonf_list_remove(&session->node);
+   free(session);
+ }
+diff --git a/tests/common/test_common_avl.c b/tests/common/test_common_avl.c
+index e4e5b26..e7d0a29 100644
+--- a/tests/common/test_common_avl.c
++++ b/tests/common/test_common_avl.c
+@@ -197,9 +197,9 @@ static void check_tree(const char *name, int line) {
+   CHECK_NAMED_TRUE((head.root != NULL) == (head.count > 0), name, line, "No root pointer, but tree not empty");
+   CHECK_NAMED_TRUE(head.list_head.next != NULL, name, line, "bad next-iterator");
+   CHECK_NAMED_TRUE(head.list_head.prev != NULL, name, line, "bad prev-iterator");
+-  CHECK_NAMED_TRUE((head.root == NULL) == list_is_empty(&head.list_head), name, line, "iterator list empty, but tree not empty");
++  CHECK_NAMED_TRUE((head.root == NULL) == oonf_list_is_empty(&head.list_head), name, line, "iterator list empty, but tree not empty");
+   if (head.count == 0 || head.root == NULL
+-      || head.list_head.next == NULL || head.list_head.prev == NULL || list_is_empty(&head.list_head)) {
++      || head.list_head.next == NULL || head.list_head.prev == NULL || oonf_list_is_empty(&head.list_head)) {
+     return;
+   }
+ 
+diff --git a/tests/common/test_common_list.c b/tests/common/test_common_list.c
+index 95af584..dd043e7 100644
+--- a/tests/common/test_common_list.c
++++ b/tests/common/test_common_list.c
+@@ -74,13 +74,13 @@ static void clear_elements(void) {
+ static void add_elements(struct list_element *elements, bool add_head) {
+   int i;
+   for (i=0; i<COUNT; i++) {
+-    list_init_node(&elements[i].node);
++    oonf_list_init_node(&elements[i].node);
+ 
+     if (add_head) {
+-      list_add_head(&head, &elements[i].node);
++      oonf_list_add_head(&head, &elements[i].node);
+     }
+     else {
+-      list_add_tail(&head, &elements[i].node);
++      oonf_list_add_tail(&head, &elements[i].node);
+     }
+   }
+ }
+@@ -88,7 +88,7 @@ static void test_add_tail(void) {
+   int i;
+ 
+   START_TEST();
+-  list_init_head(&head);
++  oonf_list_init_head(&head);
+   add_elements(elements1, false);
+ 
+   CHECK_TRUE(head.next == &elements1[0].node, "head->next");
+@@ -109,7 +109,7 @@ static void test_add_head(void) {
+   int i;
+ 
+   START_TEST();
+-  list_init_head(&head);
++  oonf_list_init_head(&head);
+   add_elements(elements1, true);
+ 
+   CHECK_TRUE(head.next == &elements1[COUNT-1].node, "head->next");
+@@ -128,10 +128,10 @@ static void test_add_head(void) {
+ 
+ static void test_add_before(void) {
+   START_TEST();
+-  list_init_head(&head);
++  oonf_list_init_head(&head);
+   add_elements(elements1, false);
+ 
+-  list_add_before(&elements1[3].node, &elements2[0].node);
++  oonf_list_add_before(&elements1[3].node, &elements2[0].node);
+ 
+   CHECK_TRUE(elements1[2].node.next == &elements2[0].node, "elements1[2]->next");
+   CHECK_TRUE(elements1[3].node.prev == &elements2[0].node, "elements1[3]->prev");
+@@ -142,10 +142,10 @@ static void test_add_before(void) {
+ 
+ static void test_add_after(void) {
+   START_TEST();
+-  list_init_head(&head);
++  oonf_list_init_head(&head);
+   add_elements(elements1, false);
+ 
+-  list_add_after(&elements1[2].node, &elements2[0].node);
++  oonf_list_add_after(&elements1[2].node, &elements2[0].node);
+ 
+   CHECK_TRUE(elements1[2].node.next == &elements2[0].node, "elements1[2]->next");
+   CHECK_TRUE(elements1[3].node.prev == &elements2[0].node, "elements1[3]->prev");
+@@ -156,10 +156,10 @@ static void test_add_after(void) {
+ 
+ static void test_remove(void) {
+   START_TEST();
+-  list_init_head(&head);
++  oonf_list_init_head(&head);
+   add_elements(elements1, false);
+ 
+-  list_remove(&elements1[2].node);
++  oonf_list_remove(&elements1[2].node);
+ 
+   CHECK_TRUE(elements1[1].node.next == &elements1[3].node, "elements1[1]->next");
+   CHECK_TRUE(elements1[3].node.prev == &elements1[1].node, "elements1[3]->prev");
+@@ -170,20 +170,20 @@ static void test_remove(void) {
+ 
+ static void test_conditions(void) {
+   START_TEST();
+-  list_init_head(&head);
++  oonf_list_init_head(&head);
+ 
+-  CHECK_TRUE(list_is_empty(&head), "list_is_empty (1)");
+-  CHECK_TRUE(!list_is_node_added(&elements1[0].node), "list_node_added (1)");
++  CHECK_TRUE(oonf_list_is_empty(&head), "list_is_empty (1)");
++  CHECK_TRUE(!oonf_list_is_node_added(&elements1[0].node), "list_node_added (1)");
+ 
+   add_elements(elements1, false);
+ 
+-  CHECK_TRUE(!list_is_empty(&head), "list_is_empty (1)");
+-  CHECK_TRUE(list_is_node_added(&elements1[0].node), "list_node_added (1)");
++  CHECK_TRUE(!oonf_list_is_empty(&head), "list_is_empty (1)");
++  CHECK_TRUE(oonf_list_is_node_added(&elements1[0].node), "list_node_added (1)");
+ 
+-  CHECK_TRUE(list_is_first(&head, &elements1[0].node), "list_is_first (1)");
+-  CHECK_TRUE(list_is_last(&head, &elements1[COUNT-1].node), "list_is_last (1)");
+-  CHECK_TRUE(!list_is_first(&head, &elements1[1].node), "list_is_first (2)");
+-  CHECK_TRUE(!list_is_last(&head, &elements1[1].node), "list_is_last (2)");
++  CHECK_TRUE(oonf_list_is_first(&head, &elements1[0].node), "list_is_first (1)");
++  CHECK_TRUE(oonf_list_is_last(&head, &elements1[COUNT-1].node), "list_is_last (1)");
++  CHECK_TRUE(!oonf_list_is_first(&head, &elements1[1].node), "list_is_first (2)");
++  CHECK_TRUE(!oonf_list_is_last(&head, &elements1[1].node), "list_is_last (2)");
+   END_TEST();
+ }
+ 
+@@ -193,36 +193,36 @@ static void test_merge(void) {
+   struct list_element *e;
+ 
+   START_TEST();
+-  list_init_head(&head);
+-  list_init_head(&head2);
++  oonf_list_init_head(&head);
++  oonf_list_init_head(&head2);
+ 
+-  CHECK_TRUE(list_is_empty(&head), "list_is_empty (1)");
+-  CHECK_TRUE(!list_is_node_added(&elements1[0].node), "list_node_added (1)");
+-  CHECK_TRUE(!list_is_node_added(&elements2[0].node), "list_node_added (1)");
++  CHECK_TRUE(oonf_list_is_empty(&head), "list_is_empty (1)");
++  CHECK_TRUE(!oonf_list_is_node_added(&elements1[0].node), "list_node_added (1)");
++  CHECK_TRUE(!oonf_list_is_node_added(&elements2[0].node), "list_node_added (1)");
+ 
+   add_elements(elements1, false);
+ 
+   for (i=0; i<COUNT; i++) {
+-    list_init_node(&elements2[i].node);
+-    list_add_tail(&head2, &elements2[i].node);
++    oonf_list_init_node(&elements2[i].node);
++    oonf_list_add_tail(&head2, &elements2[i].node);
+   }
+ 
+   i = 0;
+-  list_for_each_element(&head, e, node) {
++  oonf_list_for_each_element(&head, e, node) {
+     CHECK_TRUE(e == &elements1[i], "for_each iteration %d failed", i);
+     i++;
+   }
+   i = 0;
+-  list_for_each_element(&head2, e, node) {
++  oonf_list_for_each_element(&head2, e, node) {
+     CHECK_TRUE(e == &elements2[i], "for_each iteration %d failed", i);
+     i++;
+   }
+ 
+-  list_merge(&head, &head2);
+-  CHECK_TRUE(list_is_empty(&head2), "list_is_empty (1)");
++  oonf_list_merge(&head, &head2);
++  CHECK_TRUE(oonf_list_is_empty(&head2), "list_is_empty (1)");
+ 
+   i = 0;
+-  list_for_each_element(&head2, e, node) {
++  oonf_list_for_each_element(&head2, e, node) {
+     if (i < COUNT) {
+       CHECK_TRUE(e == &elements1[i], "for_each iteration %d failed", i);
+     }
+@@ -238,14 +238,14 @@ static void test_element_macros(void) {
+   struct list_element *e;
+ 
+   START_TEST();
+-  list_init_head(&head);
++  oonf_list_init_head(&head);
+   add_elements(elements1, false);
+ 
+-  CHECK_TRUE(list_first_element(&head, e, node) == &elements1[0], "list_first_element");
+-  CHECK_TRUE(list_last_element(&head, e, node) == &elements1[COUNT-1], "list_first_element");
++  CHECK_TRUE(oonf_list_first_element(&head, e, node) == &elements1[0], "list_first_element");
++  CHECK_TRUE(oonf_list_last_element(&head, e, node) == &elements1[COUNT-1], "list_first_element");
+ 
+-  CHECK_TRUE(list_next_element(&elements1[0], node) == &elements1[1], "list_next_element(elements1[0])");
+-  CHECK_TRUE(list_prev_element(&elements1[1], node) == &elements1[0], "list_prev_element(elements1[1])");
++  CHECK_TRUE(oonf_list_next_element(&elements1[0], node) == &elements1[1], "oonf_list_next_element(elements1[0])");
++  CHECK_TRUE(oonf_list_prev_element(&elements1[1], node) == &elements1[0], "oonf_list_prev_element(elements1[1])");
+   END_TEST();
+ }
+ 
+@@ -254,32 +254,32 @@ static void test_for_each_macros(void) {
+   int i;
+ 
+   START_TEST();
+-  list_init_head(&head);
++  oonf_list_init_head(&head);
+   add_elements(elements1, false);
+ 
+   i = 0;
+-  list_for_each_element(&head, e, node) {
++  oonf_list_for_each_element(&head, e, node) {
+     CHECK_TRUE(e == &elements1[i], "for_each iteration %d failed", i);
+     i++;
+   }
+   CHECK_TRUE(i == COUNT, "for_each only had %d of %d iterations", i, COUNT);
+ 
+   i = 1;
+-  list_for_element_range(&elements1[1], &elements1[4], e, node) {
++  oonf_list_for_element_range(&elements1[1], &elements1[4], e, node) {
+     CHECK_TRUE(e == &elements1[i], "for_element_range iteration %d failed", i);
+     i++;
+   }
+   CHECK_TRUE(i == 5, "for_element_range only had %d of %d iterations", i-1, 4);
+ 
+   i = 1;
+-  list_for_element_to_last(&head, &elements1[1], e, node) {
++  oonf_list_for_element_to_last(&head, &elements1[1], e, node) {
+     CHECK_TRUE(e == &elements1[i], "element_to_last iteration %d failed", i);
+     i++;
+   }
+   CHECK_TRUE(i == COUNT, "element_to_last only had %d of %d iterations", i-1, 5);
+ 
+   i = 0;
+-  list_for_first_to_element(&head, &elements1[4], e, node) {
++  oonf_list_for_first_to_element(&head, &elements1[4], e, node) {
+     CHECK_TRUE(e == &elements1[i], "first_to_element iteration %d failed", i);
+     i++;
+   }
+@@ -293,12 +293,12 @@ static void test_for_each_reverse_macros(void) {
+   int i,j;
+ 
+   START_TEST();
+-  list_init_head(&head);
++  oonf_list_init_head(&head);
+   add_elements(elements1, false);
+ 
+   i = 0;
+   j = COUNT - 1;
+-  list_for_each_element_reverse(&head, e, node) {
++  oonf_list_for_each_element_reverse(&head, e, node) {
+     CHECK_TRUE(e == &elements1[j], "for_each iteration %d failed", i);
+     i++;
+     j--;
+@@ -307,7 +307,7 @@ static void test_for_each_reverse_macros(void) {
+ 
+   i = 1;
+   j = 4;
+-  list_for_element_range_reverse(&elements1[1], &elements1[4], e, node) {
++  oonf_list_for_element_range_reverse(&elements1[1], &elements1[4], e, node) {
+     CHECK_TRUE(e == &elements1[j], "for_element_range iteration %d failed", i);
+     i++;
+     j--;
+@@ -316,7 +316,7 @@ static void test_for_each_reverse_macros(void) {
+ 
+   i = 1;
+   j = COUNT - 1;
+-  list_for_element_to_last_reverse(&head, &elements1[1], e, node) {
++  oonf_list_for_element_to_last_reverse(&head, &elements1[1], e, node) {
+     CHECK_TRUE(e == &elements1[j], "element_to_last iteration %d failed", i);
+     i++;
+     j--;
+@@ -325,7 +325,7 @@ static void test_for_each_reverse_macros(void) {
+ 
+   i = 0;
+   j = 4;
+-  list_for_first_to_element_reverse(&head, &elements1[4], e, node) {
++  oonf_list_for_first_to_element_reverse(&head, &elements1[4], e, node) {
+     CHECK_TRUE(e == &elements1[j], "first_to_element iteration %d failed", i);
+     i++;
+     j--;
+@@ -340,18 +340,18 @@ static void test_for_each_save_macro(void) {
+   int i;
+ 
+   START_TEST();
+-  list_init_head(&head);
++  oonf_list_init_head(&head);
+   add_elements(elements1, false);
+ 
+   i = 0;
+ 
+-  list_for_each_element_safe(&head, e, node, ptr) {
++  oonf_list_for_each_element_safe(&head, e, node, ptr) {
+     CHECK_TRUE(e == &elements1[i], "for_each_save iteration %d failed", i);
+-    list_remove(&e->node);
++    oonf_list_remove(&e->node);
+     i++;
+   }
+   CHECK_TRUE(i == COUNT, "for_each_save only had %d of %d iterations", i, COUNT);
+-  CHECK_TRUE(list_is_empty(&head), "for_each_save list not empty after loop with remove");
++  CHECK_TRUE(oonf_list_is_empty(&head), "for_each_save list not empty after loop with remove");
+   END_TEST();
+ }
+ 
+@@ -360,19 +360,19 @@ static void test_for_each_reverse_save_macro(void) {
+   int i,j;
+ 
+   START_TEST();
+-  list_init_head(&head);
++  oonf_list_init_head(&head);
+   add_elements(elements1, false);
+ 
+   i = 0;
+   j = COUNT - 1;
+-  list_for_each_element_reverse_safe(&head, e, node, ptr) {
++  oonf_list_for_each_element_reverse_safe(&head, e, node, ptr) {
+     CHECK_TRUE(e == &elements1[j], "for_each_save iteration %d failed", i);
+-    list_remove(&e->node);
++    oonf_list_remove(&e->node);
+     i++;
+     j--;
+   }
+   CHECK_TRUE(i == COUNT, "for_each_save only had %d of %d iterations", i, COUNT);
+-  CHECK_TRUE(list_is_empty(&head), "for_each_save list not empty after loop with remove");
++  CHECK_TRUE(oonf_list_is_empty(&head), "for_each_save list not empty after loop with remove");
+   END_TEST();
+ }
+ 
+diff --git a/tests/config/test_config_list.c b/tests/config/test_config_list.c
+index de22ea2..41ac6e6 100644
+--- a/tests/config/test_config_list.c
++++ b/tests/config/test_config_list.c
+@@ -61,7 +61,7 @@ static struct cfg_schema_section section =
+ 
+ 
+ static void
+-test_list_1(void) {
++test_oonf_list_1(void) {
+   struct cfg_db *db;
+   struct cfg_entry *entry1, *entry2, *entry3;
+   char *ptr;
+@@ -127,7 +127,7 @@ test_list_1(void) {
+ }
+ 
+ static void
+-test_list_2(void) {
++test_oonf_list_2(void) {
+   struct cfg_db *db;
+   struct cfg_entry *entry1, *entry2, *entry3;
+   char *ptr;
+@@ -193,7 +193,7 @@ test_list_2(void) {
+ }
+ 
+ static void
+-test_list_3(void) {
++test_oonf_list_3(void) {
+   struct cfg_db *db;
+   struct cfg_entry *entry1, *entry2, *entry3;
+   char *ptr;
+@@ -265,9 +265,9 @@ main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))) {
+ 
+   BEGIN_TESTING(NULL);
+ 
+-  test_list_1();
+-  test_list_2();
+-  test_list_3();
++  test_oonf_list_1();
++  test_oonf_list_2();
++  test_oonf_list_3();
+ 
+   cfg_schema_remove_section(&schema, &section);
+ 
+-- 
+1.9.1
+

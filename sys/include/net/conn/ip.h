@@ -9,6 +9,7 @@
 /**
  * @defgroup    net_conn_ip     Raw IPv4/IPv6 connections
  * @ingroup     net_conn
+ * @deprecated  Please use @ref net_sock_ip instead
  * @brief       Connection submodule for raw IPv4/IPv6 connections
  * @{
  *

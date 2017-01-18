@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2016 Freie Universität Berlin
+ *               2016 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -16,10 +17,11 @@
  * @brief           Implementation specific CPU configuration options
  *
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
- */
+ * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
+*/
 
-#ifndef __CPU_CONF_H
-#define __CPU_CONF_H
+#ifndef STM32F0_CPU_CONF_H
+#define STM32F0_CPU_CONF_H
 
 #include "cpu_conf_common.h"
 
@@ -32,7 +34,15 @@
 #ifdef CPU_MODEL_STM32F072RB
 #include "stm32f072xb.h"
 #endif
-
+#ifdef CPU_MODEL_STM32F070RB
+#include "stm32f070xb.h"
+#endif
+#ifdef CPU_MODEL_STM32F030R8
+#include "stm32f030x8.h"
+#endif
+#ifdef CPU_MODEL_STM32F042K6
+#include "stm32f042x6.h"
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -49,5 +59,5 @@ extern "C" {
 }
 #endif
 
-#endif /* __CPU_CONF_H */
+#endif /* STM32F0_CPU_CONF_H */
 /** @} */

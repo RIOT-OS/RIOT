@@ -50,6 +50,21 @@ typedef struct {
 #define MUTEX_INIT { { NULL } }
 
 /**
+ * @brief Static initializer for mutex_t with a locked mutex
+ */
+#define MUTEX_INIT_LOCKED { { MUTEX_LOCKED } }
+
+/**
+ * @cond INTERNAL
+ * @brief This is the value of the mutex when locked and no threads are waiting
+ *        for it
+ */
+#define MUTEX_LOCKED ((void *)-1)
+/**
+ * @endcond
+ */
+
+/**
  * @brief Initializes a mutex object.
  * @details For initialization of variables use MUTEX_INIT instead.
  *          Only use the function call for dynamically allocated mutexes.

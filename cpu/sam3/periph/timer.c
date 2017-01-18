@@ -23,8 +23,6 @@
 
 #include "board.h"
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/timer.h"
 #include "periph_conf.h"
 
@@ -187,9 +185,7 @@ static inline void isr_handler(tim_t tim)
         }
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef TIMER_0_ISR

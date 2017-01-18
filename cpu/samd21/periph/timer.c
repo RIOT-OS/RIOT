@@ -27,8 +27,6 @@
 #include "periph/timer.h"
 #include "periph_conf.h"
 
-#include "sched.h"
-#include "thread.h"
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
@@ -344,9 +342,7 @@ void TIMER_0_ISR(void)
         }
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif /* TIMER_0_EN */
 
@@ -367,11 +363,8 @@ void TIMER_1_ISR(void)
             TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
             config[TIMER_1].cb(config[TIMER_1].arg, 1);
         }
-
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif /* TIMER_1_EN */

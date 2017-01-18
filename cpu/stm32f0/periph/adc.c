@@ -22,6 +22,8 @@
 #include "mutex.h"
 #include "periph/adc.h"
 
+#ifdef ADC_CONFIG
+
 /**
  * @brief   Maximum allowed ADC clock speed
  */
@@ -29,13 +31,8 @@
 
 /**
  * @brief   Load the ADC configuration
- * @{
  */
-#ifdef ADC_CONFIG
 static const adc_conf_t adc_config[] = ADC_CONFIG;
-#else
-static const adc_conf_t adc_config[] = {};
-#endif
 
 /**
  * @brief   Allocate locks for all three available ADC device
@@ -47,12 +44,12 @@ static mutex_t lock = MUTEX_INIT;
 static inline void prep(void)
 {
     mutex_lock(&lock);
-    RCC->APB2ENR |= RCC_APB2ENR_ADCEN;
+    periph_clk_en(APB2, RCC_APB2ENR_ADCEN);
 }
 
 static inline void done(void)
 {
-    RCC->APB2ENR &= ~(RCC_APB2ENR_ADCEN);
+    periph_clk_dis(APB2, RCC_APB2ENR_ADCEN);
     mutex_unlock(&lock);
 }
 
@@ -105,3 +102,7 @@ int adc_sample(adc_t line,  adc_res_t res)
 
     return sample;
 }
+
+#else
+typedef int dont_be_pedantic;
+#endif /* ADC_CONFIG */

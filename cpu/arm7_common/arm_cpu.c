@@ -28,6 +28,25 @@ void thread_yield_higher(void)
     __asm__("svc 0\n");
 }
 
+/* This function calculates the ISR_usage */
+int thread_arch_isr_stack_usage(void)
+{
+    /* TODO */
+    return -1;
+}
+
+void *thread_arch_isr_stack_pointer(void)
+{
+    /* TODO */
+    return (void *)-1;
+}
+
+void *thread_arch_isr_stack_start(void)
+{
+    /* TODO */
+    return (void *)-1;
+}
+
 /*----------------------------------------------------------------------------
  * Processor specific routine - here for ARM7
  * sizeof(void*) = sizeof(int)
@@ -88,7 +107,7 @@ void thread_print_stack(void)
     printf("STACK (%d)= %X \n", i, *s);
 }
 
-void reboot(void)
+void pm_reboot(void)
 {
     while (1) {
         arm_reset();

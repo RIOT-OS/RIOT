@@ -499,7 +499,12 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
         switch (iphc_hdr[payload_offset] & NHC_ID_MASK) {
             case NHC_UDP_ID:
                 payload_offset = iphc_nhc_udp_decode(pkt, dec_hdr, datagram_size,
-                                                     payload_offset + offset) - offset;
+                                                     payload_offset + offset);
+
+                if (payload_offset != 0) {
+                    payload_offset -= offset;
+                }
+
                 *nh_len += sizeof(udp_hdr_t);
                 break;
 
@@ -563,20 +568,14 @@ inline static size_t iphc_nhc_udp_encode(gnrc_pktsnip_t *udp, ipv6_hdr_t *ipv6_h
     /* Set UDP header ID (rfc6282#section-5). */
     ipv6_hdr->nh |= NHC_UDP_ID;
 
-    if (udp->type == GNRC_NETTYPE_IPV6) {
-        /* forwarded ipv6 packet */
-        size_t diff = sizeof(udp_hdr_t) - nhc_len;
-        for (size_t i = nhc_len; i < (udp->size - diff); i++) {
-            udp_data[i] = udp_data[i + diff];
-        }
-        /* NOTE: gnrc_pktbuf_realloc_data overflow if (udp->size - diff) < 4 */
-        gnrc_pktbuf_realloc_data(udp, (udp->size - diff));
+    /* In case payload is in this snip (e.g. a forwarded packet):
+     * move data to right place */
+    size_t diff = sizeof(udp_hdr_t) - nhc_len;
+    for (size_t i = nhc_len; i < (udp->size - diff); i++) {
+      udp_data[i] = udp_data[i + diff];
     }
-    else {
-        /* shrink udp allocation to final size */
-        gnrc_pktbuf_realloc_data(udp, nhc_len);
-        DEBUG("6lo iphc nhc: set udp len to %d\n", nhc_len);
-    }
+    /* NOTE: gnrc_pktbuf_realloc_data overflow if (udp->size - diff) < 4 */
+    gnrc_pktbuf_realloc_data(udp, (udp->size - diff));
 
     return nhc_len;
 }
@@ -607,20 +606,28 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
     /* check for available contexts */
     if (!ipv6_addr_is_unspecified(&(ipv6_hdr->src))) {
         src_ctx = gnrc_sixlowpan_ctx_lookup_addr(&(ipv6_hdr->src));
+        /* do not use source context for compression if */
+        /* GNRC_SIXLOWPAN_CTX_FLAGS_COMP is not set */
+        if (src_ctx && !(src_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) {
+            src_ctx = NULL;
+        }
     }
 
     if (!ipv6_addr_is_multicast(&ipv6_hdr->dst)) {
         dst_ctx = gnrc_sixlowpan_ctx_lookup_addr(&(ipv6_hdr->dst));
+        /* do not use destination context for compression if */
+        /* GNRC_SIXLOWPAN_CTX_FLAGS_COMP is not set */
+        if (dst_ctx && !(dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) {
+            dst_ctx = NULL;
+        }
     }
 
     /* if contexts available and both != 0 */
     /* since this moves inline_pos we have to do this ahead*/
     if (((src_ctx != NULL) &&
-         ((src_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0) &&
-         (src_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) ||
+            ((src_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0)) ||
         ((dst_ctx != NULL) &&
-         ((dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0) &&
-         (dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP))) {
+            ((dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0))) {
         /* add context identifier extension */
         iphc_hdr[IPHC2_IDX] |= SIXLOWPAN_IPHC2_CID_EXT;
         iphc_hdr[CID_EXT_IDX] = 0;
@@ -699,7 +706,7 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
         iphc_hdr[IPHC2_IDX] |= IPHC_SAC_SAM_UNSPEC;
     }
     else {
-        if ((src_ctx != NULL) && (src_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) {
+        if (src_ctx != NULL) {
             /* stateful source address compression */
             iphc_hdr[IPHC2_IDX] |= SIXLOWPAN_IPHC2_SAC;
 
@@ -824,7 +831,7 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
             }
         }
     }
-    else if ((((dst_ctx != NULL) && (dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) ||
+    else if (((dst_ctx != NULL) ||
               ipv6_addr_is_link_local(&ipv6_hdr->dst)) && (netif_hdr->dst_l2addr_len > 0)) {
         eui64_t iid;
 

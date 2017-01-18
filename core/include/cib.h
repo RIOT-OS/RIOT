@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,7 +16,7 @@
  * @details     This structure provides an organizational interface
  *              and combined with an memory array forms a circular buffer.
  *
- * @author      unknown, probably Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #ifndef CIB_H
@@ -65,9 +66,21 @@ static inline void cib_init(cib_t *__restrict cib, unsigned int size)
  *                      Must not be NULL.
  * @return How often cib_get() can be called before @p cib is empty.
  */
-static inline unsigned int cib_avail(cib_t *__restrict cib)
+static inline unsigned int cib_avail(const cib_t *cib)
 {
     return cib->write_count - cib->read_count;
+}
+
+/**
+ * @brief Check if cib is full.
+ *
+ * @param[in] cib       the cib_t to check.
+ *                      Must not be NULL.
+ * @return      1 if cib_put() would return "-1", 0 otherwise
+ */
+static inline unsigned int cib_full(const cib_t *cib)
+{
+    return ((int) cib_avail(cib)) > ((int) cib->mask);
 }
 
 /**
@@ -87,6 +100,36 @@ static inline int cib_get(cib_t *__restrict cib)
 }
 
 /**
+ * @brief Get the index of the next item in buffer without removing it.
+ *
+ * @param[in,out] cib   corresponding *cib* to buffer.
+ *                      Must not be NULL.
+ * @return index of next item, -1 if the buffer is empty
+ */
+static inline int cib_peek(cib_t *__restrict cib)
+{
+    if (cib->write_count > cib->read_count) {
+        return (int) (cib->read_count & cib->mask);
+    }
+
+    return -1;
+}
+
+/**
+ * @brief Get the index of the next item in buffer.
+ *
+ * Unsafe version, *must not* be called if buffer is empty!
+ *
+ * @param[in,out] cib   corresponding *cib* to buffer.
+ *                      Must not be NULL.
+ * @return index of next item
+ */
+static inline int cib_get_unsafe(cib_t *cib)
+{
+        return (int) (cib->read_count++ & cib->mask);
+}
+
+/**
  * @brief Get index for item in buffer to put to.
  *
  * @param[in,out] cib   corresponding *cib* to buffer.
@@ -103,6 +146,20 @@ static inline int cib_put(cib_t *__restrict cib)
     }
 
     return -1;
+}
+
+/**
+ * @brief Get index for item in buffer to put to.
+ *
+ * Unsafe version, *must not* be called if buffer is full!
+ *
+ * @param[in,out] cib   corresponding *cib* to buffer.
+ *                      Must not be NULL.
+ * @return index of item to put to
+ */
+static inline int cib_put_unsafe(cib_t *cib)
+{
+    return (int) (cib->write_count++ & cib->mask);
 }
 
 #ifdef __cplusplus

@@ -32,8 +32,10 @@
 
 #include <stdio.h>
 
-#include "cpu_conf.h"
 #include "irq.h"
+#include "sched.h"
+#include "thread.h"
+#include "cpu_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,6 +49,15 @@ extern "C" {
     defined(CPU_ARCH_CORTEX_M4F)
 #define ARCH_HAS_ATOMIC_COMPARE_AND_SWAP 1
 #endif
+
+/**
+ * @brief Interrupt stack canary value
+ *
+ * @note 0xe7fe is the ARM Thumb machine code equivalent of asm("bl #-2\n") or
+ * 'while (1);', i.e. an infinite loop.
+ * @internal
+ */
+#define STACK_CANARY_WORD   (0xE7FEE7FEu)
 
 /**
  * @brief   Initialization of the CPU
@@ -63,7 +74,7 @@ void cortexm_init(void);
  */
 static inline void cpu_print_last_instruction(void)
 {
-    register uint32_t *lr_ptr;
+    uint32_t *lr_ptr;
     __asm__ __volatile__("mov %0, lr" : "=r"(lr_ptr));
     printf("%p\n", (void*) lr_ptr);
 }
@@ -77,6 +88,37 @@ static inline void cpu_print_last_instruction(void)
 static inline void cpu_sleep_until_event(void)
 {
     __WFE();
+}
+
+/**
+ * @brief   Put the CPU into (deep) sleep mode, using the `WFI` instruction
+ *
+ * @param[in] deep      !=0 for deep sleep, 0 for light sleep
+ */
+static inline void cortexm_sleep(int deep)
+{
+    if (deep) {
+        SCB->SCR |=  (SCB_SCR_SLEEPDEEP_Msk);
+    }
+    else {
+        SCB->SCR &= ~(SCB_SCR_SLEEPDEEP_Msk);
+    }
+
+    /* ensure that all memory accesses have completed and trigger sleeping */
+    __DSB();
+    __WFI();
+}
+
+/**
+ * @brief   Trigger a conditional context scheduler run / context switch
+ *
+ * This function is supposed to be called in the end of each ISR.
+ */
+static inline void cortexm_isr_end(void)
+{
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
 }
 
 #ifdef __cplusplus

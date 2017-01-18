@@ -21,16 +21,17 @@
 #include <stdio.h>
 
 #include "xtimer.h"
+#include "timex.h"
 #include "periph/adc.h"
 
 
 #define RES             ADC_RES_10BIT
-#define DELAY           (100 * 1000U)
+#define DELAY           (100LU * MS_IN_USEC) /* 100 ms */
 
 
 int main(void)
 {
-    uint32_t last = xtimer_now();
+    xtimer_ticks32_t last = xtimer_now();
     int sample = 0;
 
     puts("\nRIOT ADC peripheral driver test\n");
@@ -56,7 +57,7 @@ int main(void)
                 printf("ADC_LINE(%i): %i\n", i, sample);
             }
         }
-        xtimer_usleep_until(&last, DELAY);
+        xtimer_periodic_wakeup(&last, DELAY);
     }
 
     return 0;

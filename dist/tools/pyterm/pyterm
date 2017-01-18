@@ -80,7 +80,7 @@ class SerCmd(cmd.Cmd):
 
     def __init__(self, port=None, baudrate=None, toggle=None, tcp_serial=None,
                  confdir=None, conffile=None, host=None, run_name=None,
-                 log_dir_name=None, newline=None):
+                 log_dir_name=None, newline=None, formatter=None):
         """Constructor.
 
         Args:
@@ -106,6 +106,8 @@ class SerCmd(cmd.Cmd):
         self.run_name = run_name
         self.log_dir_name = log_dir_name
         self.newline = newline
+        if not formatter is None:
+            self.fmt_str = formatter
 
         if not self.host:
             self.host = defaulthostname
@@ -126,9 +128,10 @@ class SerCmd(cmd.Cmd):
         self.json_regs = dict()
         self.init_cmd = []
         self.load_config()
-        self.fmt_str = None
-        if not self.fmt_str:
+        if not hasattr(self, "fmt_str") or self.fmt_str is None:
             self.fmt_str = default_fmt_str
+        else:
+            self.fmt_str = str(self.fmt_str.replace('"', '')) + "%(message)s"
 
         # check for a history file
         try:
@@ -148,7 +151,7 @@ class SerCmd(cmd.Cmd):
             os.makedirs(directory)
         logging.basicConfig(filename=directory + os.path.sep + self.run_name +
                             '.log', level=logging.DEBUG, format=self.fmt_str)
-        ch = logging.StreamHandler()
+        ch = logging.StreamHandler(sys.stdout)
         ch.setLevel(logging.DEBUG)
 
         # create logger
@@ -459,7 +462,9 @@ class SerCmd(cmd.Cmd):
         """Internal function to laod configuration from file.
         """
         self.config = configparser.SafeConfigParser()
-        self.config.read([self.configdir + os.path.sep + self.configfile])
+        cf = os.path.join(self.configdir, self.configfile)
+        self.config.read(cf)
+        logging.getLogger("").info("Reading file: %s" %  cf)
 
         for sec in self.config.sections():
             if sec == "filters":
@@ -487,8 +492,8 @@ class SerCmd(cmd.Cmd):
                     self.init_cmd.append(self.config.get(sec, opt))
             else:
                 for opt in self.config.options(sec):
-                    if opt not in self.__dict__:
-                        self.__dict__[opt] = self.config.get(sec, opt)
+                    if not hasattr(self, opt):
+                        setattr(self, opt, self.config.get(sec, opt))
 
     def timer_handler(self, line):
         """Handles a scheduled timer event.
@@ -596,7 +601,11 @@ class SerCmd(cmd.Cmd):
                 if os.path.exists(self.port):
                     self.logger.warn("Try to reconnect to %s again..."
                                      % (self.port))
-                    self.serial_connect()
+                    try:
+                        self.serial_connect()
+                        self.logger.info("Reconnected to serial port %s" % self.port)
+                    except serial.SerialException as se:
+                        pass
                 continue
             if c == '\r':
                 if (self.newline == "LFCR" and nlreceived) or (self.newline == "CR"):
@@ -702,6 +711,13 @@ if __name__ == "__main__":
                         help="Specify the config filename, default is %s"
                         % defaultfile,
                         default=defaultfile)
+    parser.add_argument("-f", "--format",
+                        help="The format prefix for output and log entries, "
+                        "default is %s"
+                        % str.replace(default_fmt_str, '%', '%%'))
+    parser.add_argument("-np", "--noprefix",
+                        action="store_true",
+                        help="Disable format prefix, raw output")
     parser.add_argument("-s", "--server",
                         help="Connect via TCP to this server to send output "
                         "as JSON")
@@ -721,9 +737,11 @@ if __name__ == "__main__":
                         default=defaultnewline)
     args = parser.parse_args()
 
+    if (args.noprefix):
+        args.format = ""
     myshell = SerCmd(args.port, args.baudrate, args.toggle, args.tcp_serial,
                      args.directory, args.config, args.host, args.run_name,
-                     args.log_dir_name, args.newline)
+                     args.log_dir_name, args.newline, args.format)
     myshell.prompt = ''
 
     if args.server and args.tcp_port:

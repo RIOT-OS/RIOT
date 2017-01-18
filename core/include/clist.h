@@ -14,13 +14,66 @@
  * @file
  * @brief       Circular linked list
  *
- * This file contains a circularly linked list implementation.
+ * This file contains a circularly and singly linked list implementation.
  *
- * clist_insert(), clist_remove_head() and clist_advance() take constant time.
+ * Its operations are:
  *
- * Each list is represented as a "clist_node_t". It's only member, the "next"
+ * operation            | runtime | description
+ * ---------------------|---------|---------------
+ * clist_lpush()        | O(1)    | insert as head (leftmost node)
+ * clist_lpop()         | O(1)    | remove and return head (leftmost node)
+ * clist_rpush()        | O(1)    | append as tail (rightmost node)
+ * clist_rpop()         | O(n)    | remove and return tail (rightmost node)
+ * clist_find()         | O(n)    | find and return node
+ * clist_find_before()  | O(n)    | find node return node pointing to node
+ * clist_remove()       | O(n)    | remove and return node
+ *
+ * clist can be used as a traditional list, a queue (FIFO) and a stack (LIFO) using
+ * fast O(1) operations.
+ *
+ * When used as traditional list, in order to traverse, make sure every element
+ * is only visited once.
+ *
+ * Example:
+ *
+ *     void clist_traverse(clist_node_t *list) {
+ *         clist_node_t *node = list->next;
+ *         if (! node) {
+ *             puts("list empty");
+ *             return;
+ *         }
+ *
+ *         do {
+ *             node = node->next;
+ *             // do something with node
+ *         } while (node != list->next);
+ *     }
+ *
+ * Or use the clist_foreach() helper function, e.g.,:
+ *
+ *    static int _print_node(clist_node_t *node)
+ *    {
+ *        printf("0x%08x ", (unsigned)node);
+ *        return 0;
+ *    }
+ *
+ *    [...]
+ *    clist_foreach(&list, _print_node);
+ *
+ * To use clist as a queue, use clist_rpush() for adding elements and clist_lpop()
+ * for removal. Using clist_lpush() and clist_rpop() is inefficient due to
+ * clist_rpop()'s O(n) runtime.
+ *
+ * To use clist as stack, use clist_lpush()/clist_lpop().
+ *
+ * Implementation details:
+ *
+ * Each list is represented as a "clist_node_t". Its only member, the "next"
  * pointer, points to the last entry in the list, whose "next" pointer points to
  * the first entry.
+ * Actual list objects should have a @c clist_node_t as member and then use
+ * the container_of() macro in list operations.
+ * See @ref thread_add_to_list() as example.
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
@@ -28,7 +81,7 @@
 #ifndef CLIST_H
 #define CLIST_H
 
-#include "kernel_defines.h"
+#include <stddef.h>
 #include "list.h"
 
 #ifdef __cplusplus
@@ -40,23 +93,19 @@
  *
  * Used as is as reference to a list.
  *
- * clist stores a pointer to the last element of a list.  That way, both
- * appending to end of list and removing head can be done in constant time.
- *
- * Actual list objects should have a @c clist_node_t as member and then use
- * the container_of() macro in list operations.
- * See @ref thread_add_to_list() as example.
  */
 typedef list_node_t clist_node_t;
 
 /**
- * @brief inserts *new_node* into *list*
+ * @brief Appends *new_node* at the end of *list
  *
- * @param[in,out]   list        Ptr to clist
+ * @note Complexity: O(1)
+ *
+ * @param[in,out]   list        Pointer to clist
  * @param[in,out]   new_node    Node which gets inserted.
  *                              Must not be NULL.
  */
-static inline void clist_insert(clist_node_t *list, clist_node_t *new_node)
+static inline void clist_rpush(clist_node_t *list, clist_node_t *new_node)
 {
     if (list->next) {
         new_node->next = list->next->next;
@@ -68,13 +117,37 @@ static inline void clist_insert(clist_node_t *list, clist_node_t *new_node)
     list->next = new_node;
 }
 
+
+/**
+ * @brief Inserts *new_node* at the beginning of *list
+ *
+ * @note Complexity: O(1)
+ *
+ * @param[in,out]   list        Pointer to clist
+ * @param[in,out]   new_node    Node which gets inserted.
+ *                              Must not be NULL.
+ */
+static inline void clist_lpush(clist_node_t *list, clist_node_t *new_node)
+{
+    if (list->next) {
+        new_node->next = list->next->next;
+        list->next->next = new_node;
+    }
+    else {
+        new_node->next = new_node;
+        list->next = new_node;
+    }
+}
+
 /**
  * @brief Removes and returns first element from list
+ *
+ * @note Complexity: O(1)
  *
  * @param[in,out]   list        Pointer to the *list* to remove first element
  *                              from.
  */
-static inline clist_node_t *clist_remove_head(clist_node_t *list)
+static inline clist_node_t *clist_lpop(clist_node_t *list)
 {
     if (list->next) {
         clist_node_t *first = list->next->next;
@@ -98,23 +171,176 @@ static inline clist_node_t *clist_remove_head(clist_node_t *list)
  * nodes shifted by one. So second list entry will be
  * first, first is last.
  *
+ * [ A, B, C ] becomes [ B, C, A ]
+ *
+ * @note Complexity: O(1)
+ *
  * @param[in,out]   list        The list to work upon.
  */
-static inline void clist_advance(clist_node_t *list)
+static inline void clist_lpoprpush(clist_node_t *list)
 {
     if (list->next) {
         list->next = list->next->next;
     }
 }
 
-#if ENABLE_DEBUG
 /**
- * @brief Prints list to stdout.
+ * @brief Returns first element in list
  *
- * @param[in]       clist       The list to get printed out.
+ * @note: Complexity: O(1)
+ *
+ * @param[in]   list        The list to work upon.
+ * @returns     first (leftmost) list element, or NULL if list is empty
  */
-void clist_print(clist_node_t *clist);
-#endif
+static inline clist_node_t *clist_lpeek(const clist_node_t *list)
+{
+    if (list->next) {
+        return list->next->next;
+    }
+    return NULL;
+}
+
+/**
+ * @brief Returns last element in list
+ *
+ * @note: Complexity: O(1)
+ *
+ * @param[in]   list        The list to work upon.
+ * @returns     last (rightmost) list element, or NULL if list is empty
+ */
+static inline clist_node_t *clist_rpeek(const clist_node_t *list)
+{
+    return list->next;
+}
+
+/**
+ * @brief Removes and returns last element from list
+ *
+ * @note Complexity: O(n) with n being the number of elements in the list.
+ *
+ * @param[in,out]   list        Pointer to the *list* to remove last element
+ *                              from.
+ */
+static inline clist_node_t *clist_rpop(clist_node_t *list)
+{
+    if (list->next) {
+        list_node_t *last = list->next;
+        while (list->next->next != last) {
+            clist_lpoprpush(list);
+        }
+        return clist_lpop(list);
+    }
+    else {
+        return NULL;
+    }
+}
+
+/**
+ * @brief Finds node and returns its predecessor
+ *
+ * @note Complexity: O(n)
+ *
+ * @param[in]       list    pointer to clist
+ * @param[in,out]   node    Node to look for
+ *                          Must not be NULL.
+ *
+ * @returns         predecessor of node if found
+ * @returns         NULL if node is not a list member
+ */
+static inline clist_node_t *clist_find_before(const clist_node_t *list, const clist_node_t *node)
+{
+    clist_node_t *pos = list->next;
+    if (!pos) {
+        return NULL;
+    }
+    do {
+        pos = pos->next;
+        if (pos->next == node) {
+            return pos;
+        }
+    } while (pos != list->next);
+
+    return NULL;
+}
+
+/**
+ * @brief Finds and returns node
+ *
+ * @note Complexity: O(n)
+ *
+ * @param[in]       list    pointer to clist
+ * @param[in,out]   node    Node to look for
+ *                          Must not be NULL.
+ *
+ * @returns         node if found
+ * @returns         NULL if node is not a list member
+ */
+static inline clist_node_t *clist_find(const clist_node_t *list, const clist_node_t *node)
+{
+    clist_node_t *tmp = clist_find_before(list, node);
+    if (tmp) {
+        return tmp->next;
+    }
+    else {
+        return NULL;
+    }
+}
+
+/**
+ * @brief Finds and removes node
+ *
+ * @note Complexity: O(n)
+ *
+ * @param[in]       list    pointer to clist
+ * @param[in,out]   node    Node to remove for
+ *                          Must not be NULL.
+ *
+ * @returns         node if found and removed
+ * @returns         NULL if node is not a list member
+ */
+static inline clist_node_t *clist_remove(clist_node_t *list, clist_node_t *node)
+{
+    if (list->next) {
+        if (list->next->next == node) {
+            return clist_lpop(list);
+        }
+        else {
+            clist_node_t *tmp = clist_find_before(list, node);
+            if (tmp) {
+                tmp->next = tmp->next->next;
+                if (node == list->next) {
+                    list->next = tmp;
+                }
+                return node;
+            }
+        }
+    }
+
+    return NULL;
+}
+
+/**
+ * @brief Traverse clist, call function for each member
+ *
+ * If @p func returns non-zero, traversal will be aborted like when calling
+ * break within a for loop.
+ *
+ * @param[in]       list        List to traverse.
+ * @param[in]       func        Function to call for each member.
+ */
+static inline void clist_foreach(clist_node_t *list, int(*func)(clist_node_t *))
+{
+    clist_node_t *node = list->next;
+    if (! node) {
+        return;
+    }
+    do {
+        node = node->next;
+        if (func(node)) {
+            return;
+        }
+    } while (node != list->next);
+}
 
 #ifdef __cplusplus
 }

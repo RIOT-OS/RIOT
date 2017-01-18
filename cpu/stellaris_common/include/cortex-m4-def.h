@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __CORTEX_M4_DEF_H__
-#define __CORTEX_M4_DEF_H__
+#ifndef STELLARIS_CORTEX_M4_DEF_H_
+#define STELLARIS_CORTEX_M4_DEF_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -10062,4 +10062,4 @@ extern "C" {
 }
 #endif
 
-#endif // __LM4F120H5QR_H__
+#endif /* STELLARIS_CORTEX_M4_DEF_H_ */

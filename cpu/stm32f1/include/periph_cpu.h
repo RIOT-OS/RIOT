@@ -31,14 +31,11 @@ extern "C" {
 #define ADC_DEVS            (2U)
 
 /**
- * @brief   All timers for the STM32F1 have 4 CC channels
+ * @brief declare needed generic SPI functions
+ * @{
  */
-#define TIMER_CHANNELS      (4U)
-
-/**
- * @brief   All timers have a width of 16-bit
- */
-#define TIMER_MAXVAL        (0xffff)
+#undef PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
 
 /**
  * @brief   Generate GPIO mode bitfields
@@ -51,6 +48,7 @@ extern "C" {
  */
 #define GPIO_MODE(mode, cnf, odr)       (mode | (cnf << 2) | (odr << 4))
 
+#ifndef DOXYGEN
 /**
  * @brief   Override GPIO mode options
  *
@@ -67,6 +65,7 @@ typedef enum {
     GPIO_OD_PU = (0xff)                 /**< not supported by HW */
 } gpio_mode_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Override values for pull register configuration
@@ -80,6 +79,7 @@ typedef enum {
 } gpio_pp_t;
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override flank configuration values
  * @{
@@ -91,6 +91,7 @@ typedef enum {
     GPIO_BOTH = 3           /**< emit interrupt on both flanks */
 } gpio_flank_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Available ports on the STM32F1 family
@@ -106,17 +107,6 @@ enum {
 };
 
 /**
- * @brief   Define alternate function modes
- *
- * On this CPU, only the output pins have alternate function modes. The input
- * pins have to be configured using the default gpio_init() function.
- */
-typedef enum {
-    GPIO_AF_OUT_PP = 0xb,   /**< alternate function output - push-pull */
-    GPIO_AF_OUT_OD = 0xf,   /**< alternate function output - open-drain */
-} gpio_af_out_t;
-
-/**
  * @brief   ADC channel configuration data
  */
 typedef struct {
@@ -126,28 +116,6 @@ typedef struct {
 } adc_conf_t;
 
 /**
- * @brief   Timer configuration
- */
-typedef struct {
-    TIM_TypeDef *dev;       /**< timer device */
-    uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
-    uint8_t bus;            /**< APBx bus the timer is clock from */
-    uint8_t irqn;           /**< global IRQ channel */
-} timer_conf_t;
-
-/**
- * @brief   UART configuration options
- */
-typedef struct {
-    USART_TypeDef *dev;     /**< UART device */
-    gpio_t rx_pin;          /**< TX pin */
-    gpio_t tx_pin;          /**< RX pin */
-    uint32_t rcc_pin;       /**< bit in the RCC register */
-    uint8_t bus;            /**< peripheral bus */
-    uint8_t irqn;           /**< interrupt number */
-} uart_conf_t;
-
-/**
  * @brief   DAC line configuration data
  */
 typedef struct {
@@ -155,15 +123,7 @@ typedef struct {
     uint8_t chan;           /**< DAC device used for this line */
 } dac_conf_t;
 
-/**
- * @brief   Configure the alternate function for the given pin
- *
- * @note    This is meant for internal use in STM32F1 peripheral drivers only
- *
- * @param[in] pin       pin to configure
- * @param[in] af        alternate function to use
- */
-void gpio_init_af(gpio_t pin, gpio_af_out_t af);
+#define PM_NUM_MODES    (2U)
 
 #ifdef __cplusplus
 }

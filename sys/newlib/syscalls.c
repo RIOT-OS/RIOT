@@ -36,9 +36,9 @@
 #include "board.h"
 #include "sched.h"
 #include "thread.h"
-#include "reboot.h"
 #include "irq.h"
 #include "log.h"
+#include "periph/pm.h"
 
 #include "uart_stdio.h"
 
@@ -66,7 +66,8 @@ void _init(void)
 /**
  * @brief Free resources on NewLib de-initialization, not used for RIOT
  */
-void _fini(void)
+/* __attribute__((used)) fixes linker errors when building with LTO, but without nano.specs */
+__attribute__((used)) void _fini(void)
 {
     /* nothing to do here */
 }
@@ -81,8 +82,8 @@ void _fini(void)
  */
 void _exit(int n)
 {
-    LOG_INFO("#! exit %i: resetting\n", n);
-    reboot();
+    LOG_INFO("#! exit %i: powering off\n", n);
+    pm_off();
     while(1);
 }
 
@@ -339,7 +340,7 @@ int _gettimeofday_r(struct _reent *r, struct timeval *restrict tp, void *restric
 {
     (void)tzp;
     (void) r;
-    uint64_t now = xtimer_now64();
+    uint64_t now = xtimer_now_usec64();
     tp->tv_sec = div_u64_by_1000000(now);
     tp->tv_usec = now - (tp->tv_sec * SEC_IN_USEC);
     return 0;

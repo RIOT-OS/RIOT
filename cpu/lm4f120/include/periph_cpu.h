@@ -40,6 +40,7 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(x,y) ((gpio_t)((x<<4) | y))
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override GPIO modes
  * @{
@@ -54,6 +55,7 @@ typedef enum {
     GPIO_OD_PU = (GPIO_DIR_MODE_OUT | (GPIO_PIN_TYPE_OD_WPU << 4)), /**< OD with pull-up */
 } gpio_mode_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Override values for pull register configuration
@@ -78,6 +80,7 @@ typedef enum {
 } gpio_dir_t;
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override active flank configuration values
  * @{
@@ -89,6 +92,7 @@ typedef enum {
     GPIO_BOTH = GPIO_BOTH_EDGES          /**< emit interrupt on both flanks */
 } gpio_flank_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Available ports on the LM4F120
@@ -105,6 +109,7 @@ enum {
 /**
  * @brief   Override resolution options
  */
+#ifndef DOXYGEN
 #define HAVE_ADC_RES_T
 typedef enum {
     ADC_RES_6BIT  = 0xa00,            /**< not supported by hardware */
@@ -114,6 +119,7 @@ typedef enum {
     ADC_RES_14BIT = 0xc00,            /**< not supported by hardware */
     ADC_RES_16BIT = 0xd00,            /**< not supported by hardware */
 } adc_res_t;
+#endif /* ndef DOXYGEN */
 
 #ifdef __cplusplus
 }

@@ -303,12 +303,16 @@ static void _print_date(const void *data, size_t offset, char *format, uint8_t l
             break;
 
         case 8:
+#ifndef MODULE_NEWLIB
             if (flags & OD_FLAGS_BYTES_INT) {
                 printf(format, ((int64_t *)data)[offset]);
             }
             else {
                 printf(format, ((uint64_t *)data)[offset]);
             }
+#else
+            printf("%s", format);
+#endif
 
             break;
 
@@ -332,6 +336,10 @@ void od(const void *data, size_t data_len, uint8_t width, uint16_t flags)
     char address_format[5];
     uint8_t date_length = _length(flags);
     char bytes_format[_log10(date_length) + 7];
+
+    if (data_len == 0) {
+        return;
+    }
 
     _address_format(address_format, flags);
     _bytes_format(bytes_format, flags);

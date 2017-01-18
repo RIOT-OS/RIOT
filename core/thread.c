@@ -98,7 +98,7 @@ void thread_yield(void)
     unsigned old_state = irq_disable();
     thread_t *me = (thread_t *)sched_active_thread;
     if (me->status >= STATUS_ON_RUNQUEUE) {
-        clist_advance(&sched_runqueues[me->priority]);
+        clist_lpoprpush(&sched_runqueues[me->priority]);
     }
     irq_restore(old_state);
 
@@ -211,7 +211,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     cb->pid = pid;
     cb->sp = thread_stack_init(function, arg, stack, stacksize);
 
-#if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
+#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || defined(MODULE_MPU_STACK_GUARD)
     cb->stack_start = stack;
 #endif
 

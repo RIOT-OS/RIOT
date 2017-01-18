@@ -23,6 +23,8 @@
 #include "periph/adc.h"
 #include "periph_conf.h"
 
+#ifdef ADC_CONFIG
+
 /**
  * @brief   Maximum allowed ADC clock speed
  */
@@ -30,13 +32,8 @@
 
 /**
  * @brief   Load the ADC configuration
- * @{
  */
-#ifdef ADC_CONFIG
 static const adc_conf_t adc_config[] = ADC_CONFIG;
-#else
-static const adc_conf_t adc_config[] = {};
-#endif
 
 /**
  * @brief   Allocate locks for all three available ADC devices
@@ -59,12 +56,12 @@ static inline ADC_TypeDef *dev(adc_t line)
 static inline void prep(adc_t line)
 {
     mutex_lock(&locks[adc_config[line].dev]);
-    RCC->APB2ENR |= (RCC_APB2ENR_ADC1EN << adc_config[line].dev);
+    periph_clk_en(APB2, (RCC_APB2ENR_ADC1EN << adc_config[line].dev));
 }
 
 static inline void done(adc_t line)
 {
-    RCC->APB2ENR &= ~(RCC_APB2ENR_ADC1EN << adc_config[line].dev);
+    periph_clk_dis(APB2, (RCC_APB2ENR_ADC1EN << adc_config[line].dev));
     mutex_unlock(&locks[adc_config[line].dev]);
 }
 
@@ -124,3 +121,7 @@ int adc_sample(adc_t line, adc_res_t res)
 
     return sample;
 }
+
+#else
+typedef int dont_be_pedantic;
+#endif /* ADC_CONFIG */

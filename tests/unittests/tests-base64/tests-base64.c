@@ -301,6 +301,85 @@ static void test_base64_07_stream_decode(void)
 #endif
 }
 
+static void test_base64_08_encode_16_bytes(void)
+{
+    const int buffer_size = 16;
+    unsigned char buffer[buffer_size];
+    for (int i = 0; i < buffer_size; ++i) {
+        buffer[i] = 'a';
+    }
+
+    const size_t expected_out_size = 24;
+    size_t element_base64_out_size = expected_out_size;
+    unsigned char element_base64_out[expected_out_size];
+
+    size_t required_out_size = 0;
+    int ret = base64_encode(buffer, buffer_size, \
+                            element_base64_out, &required_out_size);
+
+    TEST_ASSERT_EQUAL_INT(BASE64_ERROR_BUFFER_OUT_SIZE, ret);
+    TEST_ASSERT_EQUAL_INT(required_out_size, expected_out_size);
+
+    ret = base64_encode(buffer, buffer_size, \
+                            element_base64_out, &element_base64_out_size);
+
+    TEST_ASSERT_EQUAL_INT(BASE64_SUCCESS, ret);
+    TEST_ASSERT_EQUAL_INT(expected_out_size, element_base64_out_size);
+}
+
+static void test_base64_09_encode_size_determination(void)
+{
+    int buffer_size = 20;
+    unsigned char buffer[buffer_size];
+    for (int i = 0; i < buffer_size; ++i) {
+        buffer[i] = 'a';
+    }
+
+    size_t expected_out_size = 28;
+    size_t element_base64_out_size = expected_out_size;
+    unsigned char element_base64_out[expected_out_size];
+
+    // test 20 bytes input, expected 28 bytes output
+    size_t required_out_size = 0;
+    int ret = base64_encode(buffer, buffer_size, \
+                            element_base64_out, &required_out_size);
+
+    TEST_ASSERT_EQUAL_INT(BASE64_ERROR_BUFFER_OUT_SIZE, ret);
+    TEST_ASSERT_EQUAL_INT(required_out_size, expected_out_size);
+
+    ret = base64_encode(buffer, buffer_size, \
+                            element_base64_out, &element_base64_out_size);
+
+    TEST_ASSERT_EQUAL_INT(BASE64_SUCCESS, ret);
+    TEST_ASSERT_EQUAL_INT(expected_out_size, element_base64_out_size);
+
+    // test 19 bytes input, expected 28 bytes output
+    required_out_size = 0;
+    ret = base64_encode(buffer, 19, \
+                            element_base64_out, &required_out_size);
+
+    TEST_ASSERT_EQUAL_INT(BASE64_ERROR_BUFFER_OUT_SIZE, ret);
+    TEST_ASSERT_EQUAL_INT(required_out_size, expected_out_size);
+
+    // test 18 bytes input, expected 24 bytes output
+    expected_out_size = 24;
+    required_out_size = 0;
+    ret = base64_encode(buffer, 18, \
+                            element_base64_out, &required_out_size);
+
+    TEST_ASSERT_EQUAL_INT(BASE64_ERROR_BUFFER_OUT_SIZE, ret);
+    TEST_ASSERT_EQUAL_INT(required_out_size, expected_out_size);
+
+    // test 17 bytes input, expected 24 bytes output
+    expected_out_size = 24;
+    required_out_size = 0;
+    ret = base64_encode(buffer, 17, \
+                            element_base64_out, &required_out_size);
+
+    TEST_ASSERT_EQUAL_INT(BASE64_ERROR_BUFFER_OUT_SIZE, ret);
+    TEST_ASSERT_EQUAL_INT(required_out_size, expected_out_size);
+}
+
 Test *tests_base64_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -311,6 +390,8 @@ Test *tests_base64_tests(void)
         new_TestFixture(test_base64_05_decode_larger),
         new_TestFixture(test_base64_06_stream_encode),
         new_TestFixture(test_base64_07_stream_decode),
+        new_TestFixture(test_base64_08_encode_16_bytes),
+        new_TestFixture(test_base64_09_encode_size_determination),
     };
 
     EMB_UNIT_TESTCALLER(base64_tests, NULL, NULL, fixtures);

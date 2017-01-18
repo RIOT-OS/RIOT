@@ -25,7 +25,7 @@
 #include "periph_conf.h"
 
 /* only compile this, if the CPU has a DAC */
-#if defined(DAC) || defined(DAC1)
+#if (defined(DAC) || defined(DAC1)) && defined(DAC_CONFIG)
 
 #ifdef DAC2
 #define _DAC(line)          (dac_config[line].dac ? DAC2 : DAC1)
@@ -34,15 +34,9 @@
 #endif
 
 /**
- * @brief   Get the DAC configuration from the board (if configured)
- * @{
+ * @brief   Get the DAC configuration from the board config
  */
-#ifdef DAC_CONFIG
 static const dac_conf_t dac_config[] = DAC_CONFIG;
-#else
-static const dac_conf_t dac_config[] = {};
-#endif
-/** @} */
 
 int8_t dac_init(dac_t line)
 {
@@ -54,15 +48,13 @@ int8_t dac_init(dac_t line)
     gpio_init_analog(dac_config[line].pin);
     /* enable the DAC's clock */
 #if defined(DAC2)
-    RCC->APB1ENR |= dac_config[line].dac
-            ? RCC_APB1ENR_DAC2EN
-            : RCC_APB1ENR_DAC1EN;
+    periph_clk_en(APB1, dac_config[line].dac ?
+                  RCC_APB1ENR_DAC2EN : RCC_APB1ENR_DAC1EN);
 #elif defined(DAC1)
-    RCC->APB1ENR |= RCC_APB1ENR_DAC1EN;
+    periph_clk_en(APB1, RCC_APB1ENR_DAC1EN);
 #else
-    RCC->APB1ENR |= RCC_APB1ENR_DACEN;
+    periph_clk_en(APB1, RCC_APB1ENR_DACEN);
 #endif
-
     /* reset output and enable the line's channel */
     dac_set(line, 0);
     dac_poweron(line);
@@ -96,4 +88,6 @@ void dac_poweroff(dac_t line)
     DAC->CR &= ~(1 << (16 * dac_config[line].chan));
 }
 
+#else
+typedef int dont_be_pedantic;
 #endif /* DAC */

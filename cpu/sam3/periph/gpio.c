@@ -22,8 +22,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
@@ -242,6 +240,17 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
+void gpio_init_mux(gpio_t pin, gpio_mux_t mux)
+{
+    /* power on the corresponding port */
+    PMC->PMC_PCER0 = (1 << (_port_num(pin) + 11));
+    /* give peripheral control over the pin */
+    _port(pin)->PIO_PDR = (1 << _pin_num(pin));
+    /* and configure the MUX */
+    _port(pin)->PIO_ABSR &= ~(1 << _pin_num(pin));
+    _port(pin)->PIO_ABSR |=  (mux << _pin_num(pin));
+}
+
 void gpio_irq_enable(gpio_t pin)
 {
     NVIC_EnableIRQ((1 << (_port_num(pin) + PIOA_IRQn)));
@@ -304,9 +313,7 @@ static inline void isr_handler(Pio *port, int port_num)
             exti_ctx[ctx].cb(exti_ctx[ctx].arg);
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 void isr_pioa(void)

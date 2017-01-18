@@ -2,9 +2,6 @@ MODULE = shell_commands
 
 SRC = shell_commands.c sc_sys.c
 
-ifneq (,$(filter config,$(USEMODULE)))
-  SRC += sc_id.c
-endif
 ifneq (,$(filter mci,$(USEMODULE)))
   SRC += sc_disk.c
 endif
@@ -68,6 +65,9 @@ ifneq (,$(filter saul_reg,$(USEMODULE)))
 endif
 ifneq (,$(filter ccn-lite-utils,$(USEMODULE)))
   SRC += sc_ccnl.c
+endif
+ifneq (,$(filter sntp,$(USEMODULE)))
+  SRC += sc_sntp.c
 endif
 
 # TODO

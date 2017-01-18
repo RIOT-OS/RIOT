@@ -250,7 +250,7 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
 
 static void _rbuf_gc(void)
 {
-    uint32_t now_usec = xtimer_now();
+    uint32_t now_usec = xtimer_now_usec();
     unsigned int i;
 
     for (i = 0; i < RBUF_SIZE; i++) {
@@ -275,7 +275,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
                          size_t size, uint16_t tag)
 {
     rbuf_t *res = NULL, *oldest = NULL;
-    uint32_t now_usec = xtimer_now();
+    uint32_t now_usec = xtimer_now_usec();
 
     for (unsigned int i = 0; i < RBUF_SIZE; i++) {
         /* check first if entry already available */

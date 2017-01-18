@@ -32,8 +32,8 @@
  *
  * $Id: RepeatedTest.h,v 1.7 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef __REPEATEDTEST_H__
-#define __REPEATEDTEST_H__
+#ifndef EMBUNIT_REPEATEDTEST_H_
+#define EMBUNIT_REPEATEDTEST_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,4 +61,4 @@ extern const TestImplement RepeatedTestImplement;
 }
 #endif
 
-#endif/*__REPEATEDTEST_H__*/
+#endif/* EMBUNIT_REPEATEDTEST_H_ */

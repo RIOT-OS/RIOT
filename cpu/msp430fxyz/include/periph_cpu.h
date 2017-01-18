@@ -45,6 +45,7 @@ typedef uint16_t gpio_t;
  */
 #define GPIO_PIN(x, y)      ((gpio_t)(((x & 0xff) << 8) | (1 << (y & 0xff))))
 
+#ifndef DOXYGEN
 /**
  * @brief   Override flank selection values
  * @{
@@ -56,6 +57,7 @@ typedef enum {
     GPIO_BOTH    = 0xab         /**< not supported -> random value*/
 } gpio_flank_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Available ports on MSP430 platforms
@@ -81,7 +83,7 @@ void gpio_periph_mode(gpio_t pin, bool enable);
  * @brief declare needed generic SPI functions
  * @{
  */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */

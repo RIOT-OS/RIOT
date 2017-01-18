@@ -8,14 +8,6 @@ use only one packet format, `ndn2013`, and only relay over the link-layer
 ## The shell commands
 
 RIOT provides three shell to interact with the CCN-Lite stack:
-* `ccnl_open` - opens and configures a network device to be used for CCN-Lite.
-                It expects one parameter specifying the PID of the network
-                device. (You can figure out the PID of your network device(s)
-                by calling `ifconfig`.) In this example, this should always be
-                3, hence, calling `ccnl_open 3` should work. (If you specify an
-                incorrect ID, you should get an error message.) You have to
-                call this command, before you can actually send or receive
-                anything.
 * `ccnl_int`  - generates and sends out an Interest. The command expects one
                 mandatory and one optional parameter. The first parameter
                 specifies the exact name (or a prefix) to request, the second
@@ -51,13 +43,12 @@ An example usage of this application could be setup like this:
    windows.
 3. Call `make -B clean all term` in the first terminal and `PORT=tap1 make
    term` in the second one.
-4. Enter `ccnl_open 3` in both terminals.
-5. Enter `ccnl_cont /riot/peter/schmerzl Hello World! Hello RIOT!` on the first
+4. Enter `ccnl_cont /riot/peter/schmerzl Hello World! Hello RIOT!` on the first
    terminal.
-6. Add a FIB entry for this prefix on the second node, e.g. using the broadcast
+5. Add a FIB entry for this prefix on the second node, e.g. using the broadcast
    address: `ccnl_fib add /riot/peter/schmerzl ff:ff:ff:ff:ff:ff`
-7. Enter `ccnl_int /riot/peter/schmerzl` in the second terminal.
-8. See the content being displayed. Be happy!
+6. Enter `ccnl_int /riot/peter/schmerzl` in the second terminal.
+7. See the content being displayed. Be happy!
 
 ## Makefile configuration
 
@@ -90,5 +81,5 @@ CCN-Lite upstream configuration - a different Ethertype (`0x0801` instead of
 
 The simplest way to get this working is to copy the `ndn.lua` file into your
 local Wireshark plugin directory (e.g. `$HOME/.wireshark/plugins`) and update
-https://github.com/named-data/ndn-tools/blob/master/tools/dissect-wireshark/ndn.lua#L408
+https://github.com/named-data/ndn-tools/blob/master/tools/dissect-wireshark/ndn.lua#L424
 to `0x0801).

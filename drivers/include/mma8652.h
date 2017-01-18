@@ -57,6 +57,15 @@ extern "C"
 #define MMA8652_FS_RANGE_8G           2 /**< +/- 8 g Full Scale Range */
 #define MMA8652_FS_RANGE_DEFAULT      MMA8652_FS_RANGE_2G /**< Full-Scale Range for testing */
 
+enum {
+    MMA8x5x_TYPE_MMA8652 = 0,
+    MMA8x5x_TYPE_MMA8653,
+    MMA8x5x_TYPE_MMA8451,
+    MMA8x5x_TYPE_MMA8452,
+    MMA8x5x_TYPE_MMA8453,
+    MMA8x5x_TYPE_MAX,
+};
+
 /**
  * @brief Device descriptor for MMA8652 accelerometer.
  */
@@ -65,6 +74,7 @@ typedef struct {
     uint8_t addr;           /**< the accelerometer's slave address on the I2C bus */
     bool initialized;       /**< accelerometer status, true if accelerometer is initialized */
     int16_t scale;          /**< each count corresponds to (1/scale) g */
+    uint8_t type;           /**< mma8x5x type */
 } mma8652_t;
 
 /**
@@ -75,6 +85,7 @@ typedef struct {
     uint8_t addr;           /**< accelerometer's I2C address */
     uint8_t rate;           /**< accelerometer's sampling rate */
     uint8_t scale;          /**< accelerometer's scale factor */
+    uint8_t type;           /**< mma8x5x type */
 } mma8652_params_t;
 
 /**
@@ -96,6 +107,7 @@ int mma8652_test(mma8652_t *dev);
  * @param[in]  address      accelerometer's I2C slave address
  * @param[in]  dr           output data rate selection in WAKE mode
  * @param[in]  range        full scale range
+ * @param[in]  type         mma8x5x type
  *
  * @return                  0 on success
  * @return                  -1 if parameters are wrong
@@ -104,7 +116,7 @@ int mma8652_test(mma8652_t *dev);
  * @return                  -4 if setting to STANDBY mode failed
  * @return                  -5 if accelerometer configuration failed
  */
-int mma8652_init(mma8652_t *dev, i2c_t i2c, uint8_t address, uint8_t dr, uint8_t range);
+int mma8652_init(mma8652_t *dev, i2c_t i2c, uint8_t address, uint8_t dr, uint8_t range, uint8_t type);
 
 /**
  * @brief Set user offset correction.

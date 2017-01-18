@@ -22,7 +22,14 @@ You then can run the tests by calling
 make term
 ```
 
-or flash them to your board as you would flash any RIOT application to the board (see [[board documentation|RIOT-Platforms]]).
+or flash them to your board as you would flash any RIOT application to the board (see [board documentation|RIOT-Platforms](https://github.com/RIOT-OS/RIOT/wiki/RIOT-Platforms)).
+
+You can debug your tests by running
+
+```bash
+make debug
+```
+and using GDB as usual.
 
 ### Other output formats
 Other output formats using [*embUnit*](http://embunit.sourceforge.net/)'s ``textui`` library are available by setting the environment variable ``OUTPUT``:
@@ -92,7 +99,7 @@ make term
 ## Writing unit tests
 ### File struture
 RIOT uses [*embUnit*](http://embunit.sourceforge.net/) for unit testing.
-All unit tests are organized in ``tests/unittests`` and can be build module-wise, if needed.
+All unit tests are organized in ``tests/unittests`` and can be built module-wise, if needed.
 For each module there exists a ``tests-<modulename>/tests-<modulename>.h`` file, at least one C file in ``tests-<modulename>/`` and a ``tests-<modulename>/Makefile``.
 It is recommended to add a C file named ``tests-<modulename>/tests-<modulename>-<headername>.c`` for every header file that defines functions (or macros) implemented in the module.
 If there is only one such header file ``tests-<modulename>/tests-<modulename>.c`` should suffice.

@@ -31,8 +31,6 @@
 #include "periph/timer.h"
 #include "periph_conf.h"
 
-#include "sched.h"
-#include "thread.h"
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
@@ -61,12 +59,9 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
         /* reset timer */
         TIMER_0_DEV.CTRLA.bit.SWRST = 1;
         while (TIMER_0_DEV.SYNCBUSY.bit.SWRST) {}
-        /* choosing 32 bit mode */
-        TIMER_0_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT32_Val;
-        /* sourced by 4MHz with Presc 4 results in 1MHz*/
-        TIMER_0_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV16_Val;
-        /* initial prescaler resync */
-        TIMER_0_DEV.CTRLA.bit.PRESCSYNC = TC_CTRLA_PRESCSYNC_RESYNC_Val;
+        TIMER_0_DEV.CTRLA.reg |= TC_CTRLA_MODE_COUNT32 |    /* choosing 32 bit mode */
+                                 TC_CTRLA_PRESCALER(4) |    /* sourced by 4MHz with Presc 4 results in 1MHz*/
+                                 TC_CTRLA_PRESCSYNC_RESYNC; /* initial prescaler resync */
         break;
 #endif
     case TIMER_UNDEFINED:
@@ -102,12 +97,12 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
         /* set timeout value */
         switch (channel) {
         case 0:
-            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
             TIMER_0_DEV.CC[0].reg = value;
             TIMER_0_DEV.INTENSET.bit.MC0 = 1;
             break;
         case 1:
-            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
             TIMER_0_DEV.CC[1].reg = value;
             TIMER_0_DEV.INTENSET.bit.MC1 = 1;
             break;
@@ -132,11 +127,11 @@ int timer_clear(tim_t dev, int channel)
     case TIMER_0:
         switch (channel) {
         case 0:
-            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
             TIMER_0_DEV.INTENCLR.bit.MC0 = 1;
             break;
         case 1:
-            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
             TIMER_0_DEV.INTENCLR.bit.MC1 = 1;
             break;
         default:
@@ -226,21 +221,18 @@ void TIMER_0_ISR(void)
 {
     if (TIMER_0_DEV.INTFLAG.bit.MC0 && TIMER_0_DEV.INTENSET.bit.MC0) {
         if(config[TIMER_0].cb) {
-            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
             config[TIMER_0].cb(config[TIMER_0].arg, 0);
         }
     }
     else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
         if(config[TIMER_0].cb) {
-            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
             config[TIMER_0].cb(config[TIMER_0].arg, 1);
         }
     }
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif /* TIMER_0_EN */

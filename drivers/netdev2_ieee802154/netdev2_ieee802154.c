@@ -84,7 +84,7 @@ int netdev2_ieee802154_get(netdev2_ieee802154_t *dev, netopt_t opt, void *value,
             *((uint16_t *)value) = (uint16_t)dev->chan;
             res = sizeof(dev->chan);
             break;
-        case NETOPT_AUTOACK:
+        case NETOPT_ACK_REQ:
             assert(max_len == sizeof(netopt_enable_t));
             if (dev->flags & NETDEV2_IEEE802154_ACK_REQ) {
                 *((netopt_enable_t *)value) = NETOPT_ENABLE;
@@ -183,7 +183,7 @@ int netdev2_ieee802154_set(netdev2_ieee802154_t *dev, netopt_t opt, void *value,
             dev->pan = *((uint16_t *)value);
             res = sizeof(dev->pan);
             break;
-        case NETOPT_AUTOACK:
+        case NETOPT_ACK_REQ:
             if ((*(bool *)value)) {
                 dev->flags |= NETDEV2_IEEE802154_ACK_REQ;
             }

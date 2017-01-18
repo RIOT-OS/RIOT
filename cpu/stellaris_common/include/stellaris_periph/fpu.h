@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __FPU_H__
-#define __FPU_H__
+#ifndef STELLARIS_FPU_H_
+#define STELLARIS_FPU_H_
 
 //*****************************************************************************
 //
@@ -109,4 +109,4 @@ extern void FPURoundingModeSet(unsigned long ulMode);
 }
 #endif
 
-#endif // __FPU_H__
+#endif /* STELLARIS_FPU_H_ */

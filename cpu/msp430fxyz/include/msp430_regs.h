@@ -261,16 +261,26 @@ typedef struct {
  * @brief   USCI control register 0 bitmap SPI mode
  * @{
  */
-#define USCI_SPI_CTL0_UCSYNC           (0x01)
-#define USCI_SPI_CTL0_MODE_3           (0x06)
-#define USCI_SPI_CTL0_MODE_0           (0x00)
-#define USCI_SPI_CTL0_MODE_1           (0x02)
-#define USCI_SPI_CTL0_MODE_2           (0x04)
-#define USCI_SPI_CTL0_MST              (0x08)
-#define USCI_SPI_CTL0_7BIT             (0x10)
-#define USCI_SPI_CTL0_MSB              (0x20)
-#define USCI_SPI_CTL0_CKPL             (0x40)
-#define USCI_SPI_CTL0_CKPH             (0x80)
+#define USCI_SPI_CTL0_UCSYNC        (0x01)
+#define USCI_SPI_CTL0_MODE_3        (0x06)
+#define USCI_SPI_CTL0_MODE_0        (0x00)
+#define USCI_SPI_CTL0_MODE_1        (0x02)
+#define USCI_SPI_CTL0_MODE_2        (0x04)
+#define USCI_SPI_CTL0_MST           (0x08)
+#define USCI_SPI_CTL0_7BIT          (0x10)
+#define USCI_SPI_CTL0_MSB           (0x20)
+#define USCI_SPI_CTL0_CKPL          (0x40)
+#define USCI_SPI_CTL0_CKPH          (0x80)
+/** @} */
+
+/**
+ * @brief   USCI status register bitmap SPI mode
+ * @{
+ */
+#define USCI_SPI_STAT_UCBUSY        (0x01)
+#define USCI_SPI_STAT_UCOE          (0x20)
+#define USCI_SPI_STAT_UCFE          (0x40)
+#define USCI_SPI_STAT_UCLISTEN      (0x80)
 /** @} */
 
 /**

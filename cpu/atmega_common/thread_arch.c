@@ -25,11 +25,37 @@
 #include "sched.h"
 #include "irq.h"
 #include "cpu.h"
+#include "board.h"
+
+
+/**
+ * @brief AVR_CONTEXT_SWAP_INIT intialize the context swap trigger
+ * Called when threading is first started.
+ */
+#ifndef AVR_CONTEXT_SWAP_INIT
+#error AVR_CONTEXT_SWAP_INIT must be defined in board.h
+#endif
+
+/**
+ * @brief AVR_CONTEXT_SWAP_INTERRUPT_VECT Name of the ISR to use for context swapping
+ */
+#ifndef AVR_CONTEXT_SWAP_INTERRUPT_VECT
+#error AVR_CONTEXT_SWAP_INTERRUPT_VECT must be defined in board.h
+#endif
+
+/**
+ * @brief AVR_CONTEXT_SWAP_TRIGGER executed to start the context swap
+ * When executed, this should result in the interrupt named in
+ * AVR_CONTEXT_SWAP_INTERRUPT_VECT being called
+ */
+#ifndef AVR_CONTEXT_SWAP_TRIGGER
+#error ARV_CONTEXT_SWAP_TRIGGER must be defined in board.h
+#endif
+
 
 /*
  * local function declarations  (prefixed with __)
  */
-
 static void __context_save(void);
 static void __context_restore(void);
 static void __enter_thread_mode(void);
@@ -44,18 +70,18 @@ static void __enter_thread_mode(void);
  * a marker (AFFE) - for debugging purposes (helps finding the stack
  * -----------------------------------------------------------------------
  * a 16 Bit pointer to sched_task_exit
- * (Optional 17 bit (bit is set to zero) for ATmega2560
+ * (Optional 17 bit (bit is set to zero) for devices with > 128kb FLASH)
  * -----------------------------------------------------------------------
  * a 16 Bit pointer to task_func
  * this is placed exactly at the place where the program counter would be
  * stored normally and thus can be returned to when __context_restore()
  * has been run
- * (Optional 17 bit (bit is set to zero) for ATmega2560
+ * (Optional 17 bit (bit is set to zero) for devices with > 128kb FLASH)
  * -----------------------------------------------------------------------
  * saved registers from context:
  * r0
  * status register
- * (Optional EIND and RAMPZ registers for ATmega2560)
+ * (Optional EIND and RAMPZ registers)
  * r1 - r23
  * pointer to arg in r24 and r25
  * r26 - r31
@@ -89,8 +115,8 @@ char *thread_arch_stack_init(thread_task_func_t task_func, void *arg,
     tmp_adress >>= 8;
     *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
 
-#if defined(__AVR_ATmega2560__)
-    /* The ATMega2560 uses a 17 bit PC, we set whole the top byte forcibly to 0 */
+#if FLASHEND > 0x1ffff
+    /* Devices with more than 128kb FLASH use a 17 bit PC, we set whole the top byte forcibly to 0 */
     stk--;
     *stk = (uint8_t) 0x00;
 #endif
@@ -103,8 +129,8 @@ char *thread_arch_stack_init(thread_task_func_t task_func, void *arg,
     tmp_adress >>= 8;
     *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
 
-#if defined(__AVR_ATmega2560__)
-    /* The ATMega2560 uses a 17 byte PC, we set the top byte forcibly to 0 */
+#if FLASHEND > 0x1ffff
+    /* Devices with more than 128kb FLASH use a 17 bit PC, we set whole the top byte forcibly to 0 */
     stk--;
     *stk = (uint8_t) 0x00;
 #endif
@@ -118,12 +144,11 @@ char *thread_arch_stack_init(thread_task_func_t task_func, void *arg,
     stk--;
     *stk = (uint8_t) 0x80;
 
-#if defined(__AVR_ATmega2560__)
-    /* EIND */
+#if defined(EIND)
     stk--;
     *stk = (uint8_t) 0x00;
-
-    /* RAMPZ */
+#endif
+#if defined(RAMPZ)
     stk--;
     *stk = (uint8_t) 0x00;
 #endif
@@ -198,10 +223,30 @@ void thread_arch_stack_print(void)
     printf("stack size: %u bytes\n", size);
 }
 
+/* This function calculates the ISR_usage */
+int thread_arch_isr_stack_usage(void)
+{
+    /* TODO */
+    return -1;
+}
+
+void *thread_arch_isr_stack_pointer(void)
+{
+    /* TODO */
+    return (void *)-1;
+}
+
+void *thread_arch_isr_stack_start(void)
+{
+    /* TODO */
+    return (void *)-1;
+}
+
 void thread_arch_start_threading(void) __attribute__((naked));
 void thread_arch_start_threading(void)
 {
     sched_run();
+    AVR_CONTEXT_SWAP_INIT;
     __enter_thread_mode();
 }
 
@@ -219,17 +264,17 @@ void NORETURN __enter_thread_mode(void)
     UNREACHABLE();
 }
 
-void thread_arch_yield(void) __attribute__((naked));
-void thread_arch_yield(void)
-{
+void thread_arch_yield(void) {
+    AVR_CONTEXT_SWAP_TRIGGER;
+}
+
+
+// Use this interrupt to perform all context switches
+ISR(AVR_CONTEXT_SWAP_INTERRUPT_VECT, ISR_NAKED) {
     __context_save();
-
-    /* irq_disable(); */ /* gets already disabled during __context_save() */
     sched_run();
-    irq_enable();
-
     __context_restore();
-    __asm__ volatile("ret");
+    __asm__ volatile("reti");
 }
 
 
@@ -240,10 +285,11 @@ __attribute__((always_inline)) static inline void __context_save(void)
         "in   r0, __SREG__                   \n\t"
         "cli                                 \n\t"
         "push r0                             \n\t"
-#if defined(__AVR_ATmega2560__)
-        /* EIND and RAMPZ */
-        "in     r0, 0x3b                     \n\t"
+#if defined(RAMPZ)
+        "in     r0, __RAMPZ__                \n\t"
         "push   r0                           \n\t"
+#endif
+#if defined(EIND)
         "in     r0, 0x3c                     \n\t"
         "push   r0                           \n\t"
 #endif
@@ -329,12 +375,13 @@ __attribute__((always_inline)) static inline void __context_restore(void)
         "pop  r3                             \n\t"
         "pop  r2                             \n\t"
         "pop  r1                             \n\t"
-#if defined(__AVR_ATmega2560__)
-        /* EIND and RAMPZ */
+#if defined(EIND)
         "pop    r0                           \n\t"
         "out    0x3c, r0                     \n\t"
+#endif
+#if defined(RAMPZ)
         "pop    r0                           \n\t"
-        "out    0x3b, r0                     \n\t"
+        "out    __RAMPZ__, r0                \n\t"
 #endif
         "pop  r0                             \n\t"
         "out  __SREG__, r0                   \n\t"

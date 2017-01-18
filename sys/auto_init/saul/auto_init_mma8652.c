@@ -52,12 +52,12 @@ extern saul_driver_t mma8652_saul_driver;
 
 void auto_init_mma8652(void)
 {
-    for (int i = 0; i < MMA8652_NUM; i++) {
+    for (unsigned int i = 0; i < MMA8652_NUM; i++) {
         const mma8652_params_t *p = &mma8652_params[i];
 
         DEBUG("[auto_init_saul] initializing mma8652 acc sensor\n");
 
-        if (mma8652_init(&mma8652_devs[i], p->i2c, p->addr, p->rate, p->scale) < 0) {
+        if (mma8652_init(&mma8652_devs[i], p->i2c, p->addr, p->rate, p->scale, p->type) < 0) {
             DEBUG("[auto_init_saul] error during initialization\n");
             return;
         }

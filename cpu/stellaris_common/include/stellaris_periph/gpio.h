@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __GPIO_H__
-#define __GPIO_H__
+#ifndef STELLARIS_GPIO_H_
+#define STELLARIS_GPIO_H_
 
 //*****************************************************************************
 //
@@ -196,4 +196,4 @@ extern void GPIOADCTriggerDisable(unsigned long ulPort, unsigned char ucPins);
 }
 #endif
 
-#endif //  __GPIO_H__
+#endif /* STELLARIS_GPIO_H_ */

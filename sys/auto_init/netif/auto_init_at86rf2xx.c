@@ -35,13 +35,15 @@
  * @{
  */
 #define AT86RF2XX_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
-#define AT86RF2XX_MAC_PRIO          (THREAD_PRIORITY_MAIN - 4)
+#ifndef AT86RF2XX_MAC_PRIO
+#define AT86RF2XX_MAC_PRIO          (GNRC_NETDEV2_MAC_PRIO)
+#endif
 
 #define AT86RF2XX_NUM (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
 
 static at86rf2xx_t at86rf2xx_devs[AT86RF2XX_NUM];
 static gnrc_netdev2_t gnrc_adpt[AT86RF2XX_NUM];
-static char _at86rf2xx_stacks[AT86RF2XX_MAC_STACKSIZE][AT86RF2XX_NUM];
+static char _at86rf2xx_stacks[AT86RF2XX_NUM][AT86RF2XX_MAC_STACKSIZE];
 
 void auto_init_at86rf2xx(void)
 {

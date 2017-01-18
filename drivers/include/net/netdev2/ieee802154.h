@@ -38,25 +38,39 @@ extern "C" {
  * @{
  */
 
-#define NETDEV2_IEEE802154_SEND_MASK        (0x0068)    /**< flags to take for send packets */
-#define NETDEV2_IEEE802154_RESV1            (0x0001)    /**< reserved flag */
+#define NETDEV2_IEEE802154_SEND_MASK        (0x0028)    /**< flags to take for send packets */
 #define NETDEV2_IEEE802154_RAW              (0x0002)    /**< pass raw frame to upper layer */
 /**
  * @brief   use long source addres (set) or short source address (unset)
  */
 #define NETDEV2_IEEE802154_SRC_MODE_LONG    (0x0004)
-#define NETDEV2_IEEE802154_SECURITY_EN      (0x0008)    /**< enable security */
-#define NETDEV2_IEEE802154_RESV2            (0x0010)    /**< reserved flag */
+/**
+ * @brief enable security
+ */
+#define NETDEV2_IEEE802154_SECURITY_EN      (IEEE802154_FCF_SECURITY_EN)
 
 /**
  * @brief   request ACK from receiver
  */
-#define NETDEV2_IEEE802154_ACK_REQ          (0x0020)
-#define NETDEV2_IEEE802154_PAN_COMP         (0x0040)    /**< compress source PAN ID */
-#define NETDEV2_IEEE802154_RESV3            (0x0080)    /**< reserved flag */
+#define NETDEV2_IEEE802154_ACK_REQ          (IEEE802154_FCF_ACK_REQ)
 /**
  * @}
  */
+
+/**
+ * @brief   Option parameter to be used with @ref NETOPT_CCA_MODE to set
+ *          the mode of the clear channel assessment (CCA) defined
+ *          in Std 802.15.4.
+ */
+typedef enum {
+    NETDEV2_IEEE802154_CCA_MODE_1 = 1,  /**< Energy above threshold */
+    NETDEV2_IEEE802154_CCA_MODE_2,      /**< Carrier sense only */
+    NETDEV2_IEEE802154_CCA_MODE_3,      /**< Carrier sense with energy above threshold */
+    NETDEV2_IEEE802154_CCA_MODE_4,      /**< ALOHA */
+    NETDEV2_IEEE802154_CCA_MODE_5,      /**< UWB preamble sense based on the SHR of a frame */
+    NETDEV2_IEEE802154_CCA_MODE_6,      /**< UWB preamble sense based on the packet
+                                         *   with the multiplexed preamble */
+} netdev2_ieee802154_cca_mode_t;
 
 /**
  * @brief Extended structure to hold IEEE 802.15.4 driver state

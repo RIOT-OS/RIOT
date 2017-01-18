@@ -28,7 +28,8 @@
 #include "timex.h"
 #include "xtimer.h"
 
-static gnrc_netreg_entry_t server = { NULL, GNRC_NETREG_DEMUX_CTX_ALL, KERNEL_PID_UNDEF };
+static gnrc_netreg_entry_t server = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                               KERNEL_PID_UNDEF);
 
 
 static void send(char *addr_str, char *port_str, char *data, unsigned int num,
@@ -51,12 +52,15 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
 
     for (unsigned int i = 0; i < num; i++) {
         gnrc_pktsnip_t *payload, *udp, *ip;
+        unsigned payload_size;
         /* allocate payload */
         payload = gnrc_pktbuf_add(NULL, data, strlen(data), GNRC_NETTYPE_UNDEF);
         if (payload == NULL) {
             puts("Error: unable to copy data to packet buffer");
             return;
         }
+        /* store size for output */
+        payload_size = (unsigned)payload->size;
         /* allocate UDP header, set source port := destination port */
         udp = gnrc_udp_hdr_build(payload, port, port);
         if (udp == NULL) {
@@ -77,8 +81,10 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
             gnrc_pktbuf_release(ip);
             return;
         }
-        printf("Success: send %u byte to [%s]:%u\n", (unsigned)payload->size,
-               addr_str, port);
+        /* access to `payload` was implicitly given up with the send operation above
+         * => use temporary variable for output */
+        printf("Success: sent %u byte(s) to [%s]:%u\n", payload_size, addr_str,
+               port);
         xtimer_usleep(delay);
     }
 }
@@ -88,7 +94,7 @@ static void start_server(char *port_str)
     uint16_t port;
 
     /* check if server is already running */
-    if (server.pid != KERNEL_PID_UNDEF) {
+    if (server.target.pid != KERNEL_PID_UNDEF) {
         printf("Error: server already running on port %" PRIu32 "\n",
                server.demux_ctx);
         return;
@@ -100,7 +106,7 @@ static void start_server(char *port_str)
         return;
     }
     /* start server (which means registering pktdump for the chosen port) */
-    server.pid = gnrc_pktdump_pid;
+    server.target.pid = gnrc_pktdump_pid;
     server.demux_ctx = (uint32_t)port;
     gnrc_netreg_register(GNRC_NETTYPE_UDP, &server);
     printf("Success: started UDP server on port %" PRIu16 "\n", port);
@@ -109,13 +115,13 @@ static void start_server(char *port_str)
 static void stop_server(void)
 {
     /* check if server is running at all */
-    if (server.pid == KERNEL_PID_UNDEF) {
+    if (server.target.pid == KERNEL_PID_UNDEF) {
         printf("Error: server was not running\n");
         return;
     }
     /* stop server */
     gnrc_netreg_unregister(GNRC_NETTYPE_UDP, &server);
-    server.pid = KERNEL_PID_UNDEF;
+    server.target.pid = KERNEL_PID_UNDEF;
     puts("Success: stopped UDP server");
 }
 

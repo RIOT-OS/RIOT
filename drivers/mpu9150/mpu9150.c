@@ -55,7 +55,7 @@ static void conf_lpf(mpu9150_t *dev, uint16_t rate);
 int mpu9150_init(mpu9150_t *dev, i2c_t i2c, mpu9150_hw_addr_t hw_addr,
         mpu9150_comp_addr_t comp_addr)
 {
-    char temp;
+    uint8_t temp;
 
     dev->i2c_dev = i2c;
     dev->hw_addr = hw_addr;
@@ -110,7 +110,7 @@ int mpu9150_init(mpu9150_t *dev, i2c_t i2c, mpu9150_hw_addr_t hw_addr,
 
 int mpu9150_set_accel_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf)
 {
-    char pwr_1_setting, pwr_2_setting;
+    uint8_t pwr_1_setting, pwr_2_setting;
 
     if (dev->conf.accel_pwr == pwr_conf) {
         return 0;
@@ -151,7 +151,7 @@ int mpu9150_set_accel_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf)
 
 int mpu9150_set_gyro_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf)
 {
-    char pwr_2_setting;
+    uint8_t pwr_2_setting;
 
     if (dev->conf.gyro_pwr == pwr_conf) {
         return 0;
@@ -199,7 +199,7 @@ int mpu9150_set_gyro_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf)
 
 int mpu9150_set_compass_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf)
 {
-    char pwr_1_setting, usr_ctrl_setting, s1_do_setting;
+    uint8_t pwr_1_setting, usr_ctrl_setting, s1_do_setting;
 
     if (dev->conf.compass_pwr == pwr_conf) {
         return 0;
@@ -244,7 +244,7 @@ int mpu9150_set_compass_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf)
 
 int mpu9150_read_gyro(mpu9150_t *dev, mpu9150_results_t *output)
 {
-    char data[6];
+    uint8_t data[6];
     int16_t temp;
     float fsr;
 
@@ -287,7 +287,7 @@ int mpu9150_read_gyro(mpu9150_t *dev, mpu9150_results_t *output)
 
 int mpu9150_read_accel(mpu9150_t *dev, mpu9150_results_t *output)
 {
-    char data[6];
+    uint8_t data[6];
     int16_t temp;
     float fsr;
 
@@ -330,7 +330,7 @@ int mpu9150_read_accel(mpu9150_t *dev, mpu9150_results_t *output)
 
 int mpu9150_read_compass(mpu9150_t *dev, mpu9150_results_t *output)
 {
-    char data[6];
+    uint8_t data[6];
 
     /* Acquire exclusive access */
     if (i2c_acquire(dev->i2c_dev)) {
@@ -363,7 +363,7 @@ int mpu9150_read_compass(mpu9150_t *dev, mpu9150_results_t *output)
 
 int mpu9150_read_temperature(mpu9150_t *dev, int32_t *output)
 {
-    char data[2];
+    uint8_t data[2];
     int16_t temp;
 
     /* Acquire exclusive access */
@@ -396,7 +396,7 @@ int mpu9150_set_gyro_fsr(mpu9150_t *dev, mpu9150_gyro_ranges_t fsr)
                 return -1;
             }
             i2c_write_reg(dev->i2c_dev, dev->hw_addr,
-                    MPU9150_GYRO_CFG_REG, (char)(fsr << 3));
+                    MPU9150_GYRO_CFG_REG, (fsr << 3));
             i2c_release(dev->i2c_dev);
             dev->conf.gyro_fsr = fsr;
             break;
@@ -422,7 +422,7 @@ int mpu9150_set_accel_fsr(mpu9150_t *dev, mpu9150_accel_ranges_t fsr)
                 return -1;
             }
             i2c_write_reg(dev->i2c_dev, dev->hw_addr,
-                    MPU9150_ACCEL_CFG_REG, (char)(fsr << 3));
+                    MPU9150_ACCEL_CFG_REG, (fsr << 3));
             i2c_release(dev->i2c_dev);
             dev->conf.accel_fsr = fsr;
             break;
@@ -450,7 +450,7 @@ int mpu9150_set_sample_rate(mpu9150_t *dev, uint16_t rate)
     if (i2c_acquire(dev->i2c_dev)) {
         return -1;
     }
-    i2c_write_reg(dev->i2c_dev, dev->hw_addr, MPU9150_RATE_DIV_REG, (char) divider);
+    i2c_write_reg(dev->i2c_dev, dev->hw_addr, MPU9150_RATE_DIV_REG, divider);
 
     /* Store configured sample rate */
     dev->conf.sample_rate = 1000 / (((uint16_t) divider) + 1);
@@ -480,7 +480,7 @@ int mpu9150_set_compass_sample_rate(mpu9150_t *dev, uint8_t rate)
     if (i2c_acquire(dev->i2c_dev)) {
         return -1;
     }
-    i2c_write_reg(dev->i2c_dev, dev->hw_addr, MPU9150_SLAVE4_CTRL_REG, (char) divider);
+    i2c_write_reg(dev->i2c_dev, dev->hw_addr, MPU9150_SLAVE4_CTRL_REG, divider);
     i2c_release(dev->i2c_dev);
 
     /* Store configured sample rate */
@@ -500,7 +500,7 @@ int mpu9150_set_compass_sample_rate(mpu9150_t *dev, uint8_t rate)
  */
 static int compass_init(mpu9150_t *dev)
 {
-    char data[3];
+    uint8_t data[3];
 
     /* Enable Bypass Mode to speak to compass directly */
     conf_bypass(dev, 1);
@@ -569,7 +569,7 @@ static int compass_init(mpu9150_t *dev)
  */
 static void conf_bypass(mpu9150_t *dev, uint8_t bypass_enable)
 {
-   char data;
+   uint8_t data;
    i2c_read_reg(dev->i2c_dev, dev->hw_addr, MPU9150_USER_CTRL_REG, &data);
 
    if (bypass_enable) {
@@ -616,5 +616,5 @@ static void conf_lpf(mpu9150_t *dev, uint16_t half_rate)
     }
 
     /* Write LPF setting to configuration register */
-    i2c_write_reg(dev->i2c_dev, dev->hw_addr, MPU9150_LPF_REG, (char)lpf_setting);
+    i2c_write_reg(dev->i2c_dev, dev->hw_addr, MPU9150_LPF_REG, lpf_setting);
 }

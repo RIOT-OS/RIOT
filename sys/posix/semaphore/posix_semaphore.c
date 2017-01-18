@@ -33,16 +33,15 @@
 
 int sem_timedwait(sem_t *sem, const struct timespec *abstime)
 {
-    uint64_t now, timeout = (((uint64_t)abstime->tv_sec) * SEC_IN_USEC) +
+    uint64_t timeout = (((uint64_t)abstime->tv_sec) * SEC_IN_USEC) +
                             (abstime->tv_nsec / USEC_IN_NS);
-    int res;
-    now = xtimer_now64();
+    uint64_t now = xtimer_now_usec64();
     if (now > timeout) {
         errno = ETIMEDOUT;
         return -1;
     }
     timeout = timeout - now;
-    res = sema_wait_timed((sema_t *)sem, timeout);
+    int res = sema_wait_timed((sema_t *)sem, timeout);
     if (res < 0) {
         errno = -res;
         return -1;

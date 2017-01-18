@@ -28,13 +28,11 @@
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
-#include "periph_conf.h"
-#include "board.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-#if SPI_0_EN  || SPI_1_EN
 
-#include "saml21_periph.h"
+#if SPI_0_EN  || SPI_1_EN
 
 /**
  * @brief Array holding one pre-initialized mutex for each SPI device

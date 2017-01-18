@@ -29,6 +29,10 @@
 #include "irq.h"
 #include "log.h"
 
+#ifdef MODULE_MPU_STACK_GUARD
+#include "mpu.h"
+#endif
+
 #ifdef MODULE_SCHEDSTATISTICS
 #include "xtimer.h"
 #endif
@@ -58,7 +62,7 @@ static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
 schedstat sched_pidlist[KERNEL_PID_LAST + 1];
 #endif
 
-int sched_run(void)
+int __attribute__((used)) sched_run(void)
 {
     sched_context_switch_request = 0;
 
@@ -80,7 +84,7 @@ int sched_run(void)
     }
 
 #ifdef MODULE_SCHEDSTATISTICS
-    unsigned long time = xtimer_now();
+    unsigned long time = _xtimer_now();
 #endif
 
     if (active_thread) {
@@ -115,6 +119,16 @@ int sched_run(void)
     sched_active_pid = next_thread->pid;
     sched_active_thread = (volatile thread_t *) next_thread;
 
+#ifdef MODULE_MPU_STACK_GUARD
+    mpu_configure(
+        1,                                                /* MPU region 1 */
+        (uintptr_t)sched_active_thread->stack_start + 31, /* Base Address (rounded up) */
+        MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B)   /* Attributes and Size */
+    );
+
+    mpu_enable();
+#endif
+
     DEBUG("sched_run: done, changed sched_active_thread.\n");
 
     return 1;
@@ -133,7 +147,7 @@ void sched_set_status(thread_t *process, unsigned int status)
         if (!(process->status >= STATUS_ON_RUNQUEUE)) {
             DEBUG("sched_set_status: adding thread %" PRIkernel_pid " to runqueue %" PRIu16 ".\n",
                   process->pid, process->priority);
-            clist_insert(&sched_runqueues[process->priority], &(process->rq_entry));
+            clist_rpush(&sched_runqueues[process->priority], &(process->rq_entry));
             runqueue_bitcache |= 1 << process->priority;
         }
     }
@@ -141,7 +155,7 @@ void sched_set_status(thread_t *process, unsigned int status)
         if (process->status >= STATUS_ON_RUNQUEUE) {
             DEBUG("sched_set_status: removing thread %" PRIkernel_pid " to runqueue %" PRIu16 ".\n",
                   process->pid, process->priority);
-            clist_remove_head(&sched_runqueues[process->priority]);
+            clist_lpop(&sched_runqueues[process->priority]);
 
             if (!sched_runqueues[process->priority].next) {
                 runqueue_bitcache &= ~(1 << process->priority);

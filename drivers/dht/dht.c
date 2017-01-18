@@ -46,17 +46,17 @@ dht_t dht_devs[DHT_NUMOF];
 
 static uint16_t read(gpio_t pin, int bits)
 {
-    uint32_t start, end;
     uint16_t res = 0;
 
     for (int i = 0; i < bits; i++) {
+        uint32_t start, end;
         res <<= 1;
         /* measure the length between the next rising and falling flanks (the
          * time the pin is high - smoke up :-) */
         while (!gpio_read(pin));
-        start = xtimer_now();
+        start = xtimer_now_usec();
         while (gpio_read(pin));
-        end = xtimer_now();
+        end = xtimer_now_usec();
         /* if the high phase was more than 40us, we got a 1 */
         if ((end - start) > PULSE_WIDTH_THRESHOLD) {
             res |= 0x0001;
@@ -152,6 +152,7 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
             else {
                 *temp = (int16_t)raw_temp;
             }
+            break;
         default:
             return -2;
     }

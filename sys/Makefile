@@ -1,3 +1,6 @@
+ifneq (,$(filter csma_sender,$(USEMODULE)))
+    DIRS += net/link_layer/csma_sender
+endif
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
     DIRS += posix/semaphore
 endif
@@ -84,6 +87,10 @@ endif
 
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
     DIRS += net/gnrc/application_layer/uhcpc
+endif
+
+ifneq (,$(filter sntp,$(USEMODULE)))
+    DIRS += net/application_layer/sntp
 endif
 
 ifneq (,$(filter netopt,$(USEMODULE)))

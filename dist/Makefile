@@ -27,7 +27,7 @@ RIOTBASE ?= $(CURDIR)/../../RIOT
 # development process:
 #CFLAGS += -DDEVELHELP
 
-# Change this to 0 show compiler invocation lines by default:
+# Change this to 0 to show compiler invocation lines by default:
 QUIET ?= 1
 
 # Modules to include:

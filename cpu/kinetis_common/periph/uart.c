@@ -24,8 +24,6 @@
 #include <math.h>
 
 #include "cpu.h"
-#include "thread.h"
-#include "sched.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
 
@@ -59,8 +57,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* do basic initialization */
     int res = init_base(uart, baudrate);
-
-    if (res < 0) {
+    if (res != UART_OK) {
         return res;
     }
 
@@ -88,11 +85,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 #endif
 
         default:
-            return -2;
-            break;
+            return UART_NODEV;
     }
 
-    return 0;
+    return UART_OK;
 }
 
 static int init_base(uart_t uart, uint32_t baudrate)
@@ -134,7 +130,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
 #endif
 
         default:
-            return -1;
+            return UART_NODEV;
     }
 
     /* configure RX and TX pins, set pin to use alternative function mode */
@@ -179,7 +175,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
 
     /* enable transmitter and receiver */
     dev->C2 |= UART_C2_TE_MASK | UART_C2_RE_MASK;
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
@@ -234,9 +230,7 @@ static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
     }
 #endif
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 
 }
 

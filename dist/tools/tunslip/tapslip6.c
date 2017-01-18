@@ -32,6 +32,10 @@
  *
  */
 
+/* for cfmakeraw on Linux */
+#define _BSD_SOURCE 1
+#define _DEFAULT_SOURCE 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -141,7 +145,7 @@ serial_to_tun(FILE *inslip, int outfd)
     int ret;
     unsigned char c;
 
-#ifdef linux
+#ifdef __linux__
     ret = fread(&c, 1, 1, inslip);
 
     if (ret == -1 || ret == 0) {
@@ -158,7 +162,7 @@ read_more:
     }
 
     ret = fread(&c, 1, 1, inslip);
-#ifdef linux
+#ifdef __linux__
 after_fread:
 #endif
 
@@ -299,7 +303,7 @@ void
 write_to_serial(int outfd, void *inbuf, int len)
 {
     u_int8_t *p = inbuf;
-    int i, ecode;
+    int i;
 
     /*  printf("Got packet of length %d - write SLIP\n", len);*/
     /*  print_packet(p, len);*/
@@ -422,7 +426,7 @@ devopen(const char *dev, int flags)
     return open(t, flags);
 }
 
-#ifdef linux
+#ifdef __linux__
 #include <linux/if.h>
 #include <linux/if_tun.h>
 
@@ -472,7 +476,7 @@ void
 cleanup(void)
 {
     ssystem("ifconfig %s down", tundev);
-#ifndef linux
+#ifndef __linux__
     ssystem("sysctl -w net.ipv6.conf.all.forwarding=1");
 #endif
     /* ssystem("arp -d %s", ipaddr); */
@@ -502,7 +506,7 @@ sigalarm(int signo)
 void
 sigalarm_reset()
 {
-#ifdef linux
+#ifdef __linux__
 #define TIMEOUT (997*1000)
 #else
 #define TIMEOUT (2451*1000)
@@ -517,7 +521,7 @@ ifconf(const char *tundev, const char *ipaddr, const char *netmask)
     struct in_addr netname;
     netname.s_addr = inet_addr(ipaddr) & inet_addr(netmask);
 
-#ifdef linux
+#ifdef __linux__
     ssystem("ifconfig %s inet `hostname` up", tundev);
 
     if (strcmp(ipaddr, "0.0.0.0") != 0) {
@@ -543,8 +547,7 @@ int
 main(int argc, char **argv)
 {
     int c;
-    int tunfd, slipfd, maxfd;
-    int ret;
+    int tunfd, slipfd;
     fd_set rset, wset;
     FILE *inslip;
     const char *siodev = NULL;
@@ -681,7 +684,7 @@ main(int argc, char **argv)
     ifconf(tundev, ipaddr, netmask);
 
     while (1) {
-        maxfd = 0;
+        int maxfd = 0;
         FD_ZERO(&rset);
         FD_ZERO(&wset);
 
@@ -723,7 +726,7 @@ main(int argc, char **argv)
             }
         }
 
-        ret = select(maxfd + 1, &rset, &wset, NULL, NULL);
+        int ret = select(maxfd + 1, &rset, &wset, NULL, NULL);
 
         if (ret == -1 && errno != EINTR) {
             err(1, "select");

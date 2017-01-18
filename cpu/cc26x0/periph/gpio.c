@@ -19,8 +19,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/gpio.h"
 
 #define GPIO_ISR_CHAN_NUMOF     (32)
@@ -34,7 +32,7 @@ static gpio_isr_ctx_t gpio_chan[GPIO_ISR_CHAN_NUMOF];
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    if ((pin < 0) || (pin > 31))
+    if ((unsigned int)pin > 31)
         return -1;
 
     /* enable GPIO clock */
@@ -128,7 +126,5 @@ void isr_edge(void)
             gpio_chan[pin].cb(gpio_chan[pin].arg);
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

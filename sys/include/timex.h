@@ -18,8 +18,8 @@
  * @brief       Utility library for comparing and computing timestamps
  */
 
-#ifndef __TIMEX_H
-#define __TIMEX_H
+#ifndef TIMEX_H
+#define TIMEX_H
 
 #include <stdint.h>
 #include <inttypes.h>
@@ -32,6 +32,16 @@ extern "C" {
  * @brief The number of microseconds per second
  */
 #define SEC_IN_USEC (1000000U)
+
+/**
+ * @brief The number of seconds per minute
+ */
+#define MIN_IN_SEC  (60U)
+
+/**
+ * @brief The number of centiseconds per second
+ */
+#define SEC_IN_CS   (100U)
 
 /**
  * @brief The number of milliseconds per second
@@ -184,4 +194,4 @@ const char *timex_to_str(timex_t t, char *timestamp);
 #endif
 
 /** @} */
-#endif /* __TIMEX_H */
+#endif /* TIMEX_H */

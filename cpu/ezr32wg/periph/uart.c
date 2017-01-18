@@ -19,8 +19,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 
 #include "periph/uart.h"
 #include "periph/gpio.h"
@@ -48,7 +46,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* check if device is valid and get base register address */
     if (dev >= UART_NUMOF) {
-        return -1;
+        return UART_NODEV;
     }
     uart = _uart(dev);
 
@@ -77,7 +75,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     uart->IEN |= USART_IEN_RXDATAV;
     /* enable receiver and transmitter */
     uart->CMD = USART_CMD_TXEN | USART_CMD_RXEN;
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t dev, const uint8_t *data, size_t len)
@@ -104,9 +102,7 @@ static inline void rx_irq(int dev)
         uint8_t data = (uint8_t)_uart(dev)->RXDATA;
         isr_ctx[dev].rx_cb(isr_ctx[dev].arg, data);
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef UART_0_ISR_RX

@@ -93,7 +93,7 @@ void conn_udp_close(conn_udp_t *conn)
         if (conn->waiting_thread != KERNEL_PID_UNDEF) {
             msg_t msg;
             msg.type = _MSG_TYPE_CLOSE;
-            msg.content.ptr = (char *)conn;
+            msg.content.ptr = conn;
             mutex_unlock(&conn->mutex);
             msg_send(&msg, conn->waiting_thread);
             mutex_lock(&conn->mutex);
@@ -139,7 +139,7 @@ int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len, void *addr,
     }
     else if (msg.type == _MSG_TYPE_RCV) {
         mutex_lock(&conn->mutex);
-        if (msg.content.ptr == (char *)conn) {
+        if (msg.content.ptr == conn) {
             if (max_len < conn->recv_info.datalen) {
                 conn->waiting_thread = KERNEL_PID_UNDEF;
                 mutex_unlock(&conn->mutex);
@@ -219,7 +219,7 @@ static void _input_callback(struct udp_socket *c, void *ptr,
         conn->recv_info.data = data;
         conn->recv_info.datalen = datalen - sizeof(ipv6_hdr_t);
         msg.type = _MSG_TYPE_RCV;
-        msg.content.ptr = (char *)conn;
+        msg.content.ptr = conn;
         mutex_unlock(&conn->mutex);
         msg_send(&msg, conn->waiting_thread);
     }
@@ -230,11 +230,12 @@ static void _input_callback(struct udp_socket *c, void *ptr,
 
 static void _output_callback(c_event_t c_event, p_data_t p_data)
 {
-    _send_cmd_t *send_cmd = (_send_cmd_t *)p_data;
-
     if ((c_event != EVENT_TYPE_CONN_SEND) || (p_data == NULL)) {
         return;
     }
+
+    _send_cmd_t *send_cmd = (_send_cmd_t *)p_data;
+
     if ((send_cmd->res = udp_socket_send(&send_cmd->sock, send_cmd->data, send_cmd->data_len)) < 0) {
         send_cmd->res = -EHOSTUNREACH;
     }

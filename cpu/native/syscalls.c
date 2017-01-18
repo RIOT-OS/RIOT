@@ -120,16 +120,15 @@ void _native_syscall_leave(void)
        )
     {
         _native_in_isr = 1;
-        unsigned int mask = irq_disable();
         _native_cur_ctx = (ucontext_t *)sched_active_thread->sp;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
         native_isr_context.uc_stack.ss_flags = 0;
+        native_interrupts_enabled = 0;
         makecontext(&native_isr_context, native_irq_handler, 0);
         if (swapcontext(_native_cur_ctx, &native_isr_context) == -1) {
             err(EXIT_FAILURE, "_native_syscall_leave: swapcontext");
         }
-        irq_restore(mask);
     }
 }
 
@@ -289,15 +288,10 @@ int printf(const char *format, ...)
 {
     int r;
     va_list argp;
-    char *m;
 
     va_start(argp, format);
-    if ((m = make_message(format, argp)) == NULL) {
-        err(EXIT_FAILURE, "malloc");
-    }
-    r = _native_write(STDOUT_FILENO, m, strlen(m));
+    r = vfprintf(stdout, format, argp);
     va_end(argp);
-    free(m);
 
     return r;
 }
@@ -305,13 +299,30 @@ int printf(const char *format, ...)
 
 int vprintf(const char *format, va_list argp)
 {
+    return vfprintf(stdout, format, argp);
+}
+
+int fprintf(FILE *fp, const char *format, ...)
+{
+    int r;
+    va_list argp;
+
+    va_start(argp, format);
+    r = vfprintf(fp, format, argp);
+    va_end(argp);
+
+    return r;
+}
+
+int vfprintf(FILE *fp, const char *format, va_list argp)
+{
     int r;
     char *m;
 
     if ((m = make_message(format, argp)) == NULL) {
         err(EXIT_FAILURE, "malloc");
     }
-    r = _native_write(STDOUT_FILENO, m, strlen(m));
+    r = _native_write(fileno(fp), m, strlen(m));
     free(m);
 
     return r;

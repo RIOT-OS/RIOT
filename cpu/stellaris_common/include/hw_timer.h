@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_TIMER_H__
-#define __HW_TIMER_H__
+#ifndef STELLARIS_HW_TIMER_H_
+#define STELLARIS_HW_TIMER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -764,4 +764,4 @@ extern "C" {
 }
 #endif
 
-#endif // __HW_TIMER_H__
+#endif /* STELLARIS_HW_TIMER_H_ */

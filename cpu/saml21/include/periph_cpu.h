@@ -43,6 +43,7 @@ enum {
  */
 #define GPIO_MODE(pr, ie, pe)   (pr | (ie << 1) | (pe << 2))
 
+#ifndef DOXYGEN
 /**
  * @brief   Override GPIO modes
  * @{
@@ -57,6 +58,9 @@ typedef enum {
     GPIO_OD_PU = 0xff                   /**< not supported by HW */
 } gpio_mode_t;
 /** @} */
+#endif /* ndef DOXYGEN */
+
+#define PM_NUM_MODES    (3)
 
 #ifdef __cplusplus
 }

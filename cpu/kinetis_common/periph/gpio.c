@@ -24,8 +24,8 @@
  * @}
  */
 
-#include "sched.h"
-#include "thread.h"
+#include <stddef.h>
+#include <stdint.h>
 #include "cpu.h"
 #include "periph/gpio.h"
 
@@ -145,7 +145,7 @@ static inline int get_ctx(int port, int pin)
  */
 static int get_free_ctx(void)
 {
-    for (int i = 0; i < CTX_NUMOF; i++) {
+    for (unsigned int i = 0; i < CTX_NUMOF; i++) {
         if (isr_ctx[i].cb == NULL) {
             return i;
         }
@@ -295,9 +295,7 @@ static inline void irq_handler(PORT_Type *port, int port_num)
             isr_ctx[ctx].cb(isr_ctx[ctx].arg);
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef PORTA_BASE

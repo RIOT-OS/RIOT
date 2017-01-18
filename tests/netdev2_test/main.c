@@ -133,8 +133,8 @@ static int test_receive(void)
     ethernet_hdr_t *rcv_mac = (ethernet_hdr_t *)_tmp;
     uint8_t *rcv_payload = _tmp + sizeof(ethernet_hdr_t);
     gnrc_pktsnip_t *pkt, *hdr;
-    gnrc_netreg_entry_t me = { NULL, GNRC_NETREG_DEMUX_CTX_ALL,
-                               thread_getpid() };
+    gnrc_netreg_entry_t me = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                        sched_active_pid);
     msg_t msg;
 
     if (_dev.netdev.event_callback == NULL) {
@@ -153,8 +153,7 @@ static int test_receive(void)
     /* register for GNRC_NETTYPE_UNDEF */
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &me);
     /* fire ISR event */
-    _dev.netdev.event_callback((netdev2_t *)&_dev.netdev, NETDEV2_EVENT_ISR,
-                               &_dev.netdev.isr_arg);
+    _dev.netdev.event_callback((netdev2_t *)&_dev.netdev, NETDEV2_EVENT_ISR);
     /* wait for packet from MAC layer*/
     msg_receive(&msg);
     /* check message */
@@ -166,7 +165,7 @@ static int test_receive(void)
         puts("Expected netapi receive message");
         return 0;
     }
-    pkt = (gnrc_pktsnip_t *)msg.content.ptr;
+    pkt = msg.content.ptr;
     /* check payload */
     if (pkt->size != _tmp_len - sizeof(ethernet_hdr_t)) {
         puts("Payload of unexpected size");
@@ -289,7 +288,7 @@ static void _dev_isr(netdev2_t *dev)
 {
     (void)dev;
     if (dev->event_callback) {
-        dev->event_callback(dev, NETDEV2_EVENT_RX_COMPLETE, dev->isr_arg);
+        dev->event_callback(dev, NETDEV2_EVENT_RX_COMPLETE);
     }
 }
 

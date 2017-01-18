@@ -26,7 +26,9 @@
 #include "netif/etharp.h"
 #include "netif/lowpan6.h"
 
+#include "net/eui64.h"
 #include "net/ieee802154.h"
+#include "net/ipv6/addr.h"
 #include "net/netdev2.h"
 #include "net/netopt.h"
 #include "utlist.h"
@@ -44,8 +46,6 @@
 #define ETHERNET_IFNAME1 'E'
 #define ETHERNET_IFNAME2 'T'
 
-/* running number for different interfaces */
-static uint8_t _num = 0;
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static char _stack[LWIP_NETDEV2_STACKSIZE];
 static msg_t _queue[LWIP_NETDEV2_QUEUE_LEN];
@@ -57,7 +57,7 @@ static err_t _eth_link_output(struct netif *netif, struct pbuf *p);
 #ifdef MODULE_LWIP_SIXLOWPAN
 static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p);
 #endif
-static void _event_cb(netdev2_t *dev, netdev2_event_t event, void *arg);
+static void _event_cb(netdev2_t *dev, netdev2_event_t event);
 static void *_event_loop(void *arg);
 
 err_t lwip_netdev2_init(struct netif *netif)
@@ -86,13 +86,11 @@ err_t lwip_netdev2_init(struct netif *netif)
                             sizeof(dev_type)) < 0) {
         return ERR_IF;
     }
-    netif->num = _num++;
 #if LWIP_NETIF_HOSTNAME
     netif->hostname = "riot";
 #endif /* LWIP_NETIF_HOSTNAME */
 
     /* XXX: for now assume its Ethernet, since netdev2 is implemented only by ethernet drivers */
-    netif->flags = 0;
     switch (dev_type) {
 #ifdef MODULE_NETDEV2_ETH
         case NETDEV2_TYPE_ETHERNET:
@@ -121,12 +119,13 @@ err_t lwip_netdev2_init(struct netif *netif)
 #ifdef MODULE_LWIP_SIXLOWPAN
         case NETDEV2_TYPE_IEEE802154:
         {
-            u16_t pan_id;
-            if (netdev->driver->get(netdev, NETOPT_NID, &pan_id,
-                                    sizeof(pan_id)) < 0) {
+            u16_t val;
+            ipv6_addr_t *addr;
+            if (netdev->driver->get(netdev, NETOPT_NID, &val,
+                                    sizeof(val)) < 0) {
                 return ERR_IF;
             }
-            lowpan6_set_pan_id(pan_id);
+            lowpan6_set_pan_id(val);
             netif->hwaddr_len = (u8_t)netdev->driver->get(netdev, NETOPT_ADDRESS_LONG,
                                                           netif->hwaddr, sizeof(netif->hwaddr));
             if (netif->hwaddr_len > sizeof(netif->hwaddr)) {
@@ -137,7 +136,26 @@ err_t lwip_netdev2_init(struct netif *netif)
             if (res != ERR_OK) {
                 return res;
             }
-            netif_create_ip6_linklocal_address(netif, 0);   /* 0: hwaddr is assumed to be 64-bit */
+            /* assure usage of long address as source address */
+            val = netif->hwaddr_len;
+            if (netdev->driver->set(netdev, NETOPT_SRC_LEN, &val, sizeof(val)) < 0) {
+                return ERR_IF;
+            }
+            /* netif_create_ip6_linklocal_address() does weird byte-swapping
+             * with full IIDs, so let's do it ourselves */
+            addr = (ipv6_addr_t *)&(netif->ip6_addr[0]);
+            if (netdev->driver->get(netdev, NETOPT_IPV6_IID, &addr->u8[8], sizeof(eui64_t)) < 0) {
+                return ERR_IF;
+            }
+            ipv6_addr_set_link_local_prefix(addr);
+            /* Set address state. */
+#if LWIP_IPV6_DUP_DETECT_ATTEMPTS
+            /* Will perform duplicate address detection (DAD). */
+            netif->ip6_addr_state[0] = IP6_ADDR_TENTATIVE;
+#else
+            /* Consider address valid. */
+            netif->ip6_addr_state[0] = IP6_ADDR_PREFERRED;
+#endif /* LWIP_IPV6_AUTOCONFIG */
             break;
         }
 #endif
@@ -148,8 +166,7 @@ err_t lwip_netdev2_init(struct netif *netif)
     netif->flags |= NETIF_FLAG_LINK_UP;
     netif->flags |= NETIF_FLAG_IGMP;
     netif->flags |= NETIF_FLAG_MLD6;
-    netdev->isr_arg = netif;
-    netdev->event_callback = _event_cb;
+    netdev->context = netif;
 #if LWIP_IPV6_AUTOCONFIG
     netif->ip6_autoconfig_enabled = 1;
 #endif
@@ -209,22 +226,21 @@ static struct pbuf *_get_recv_pkt(netdev2_t *dev)
     return p;
 }
 
-static void _event_cb(netdev2_t *dev, netdev2_event_t event, void *arg)
+static void _event_cb(netdev2_t *dev, netdev2_event_t event)
 {
-    (void)arg;
     if (event == NETDEV2_EVENT_ISR) {
         assert(_pid != KERNEL_PID_UNDEF);
         msg_t msg;
 
         msg.type = LWIP_NETDEV2_MSG_TYPE_EVENT;
-        msg.content.ptr = (char *)dev;
+        msg.content.ptr = dev;
 
         if (msg_send(&msg, _pid) <= 0) {
             DEBUG("lwip_netdev2: possibly lost interrupt.\n");
         }
     }
     else {
-        struct netif *netif = dev->isr_arg;
+        struct netif *netif = dev->context;
         switch (event) {
             case NETDEV2_EVENT_RX_COMPLETE: {
                 struct pbuf *p = _get_recv_pkt(dev);
@@ -252,7 +268,7 @@ static void *_event_loop(void *arg)
         msg_t msg;
         msg_receive(&msg);
         if (msg.type == LWIP_NETDEV2_MSG_TYPE_EVENT) {
-            netdev2_t *dev = (netdev2_t *)msg.content.ptr;
+            netdev2_t *dev = msg.content.ptr;
             dev->driver->isr(dev);
         }
     }

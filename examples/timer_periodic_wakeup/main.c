@@ -20,17 +20,18 @@
 
 #include <stdio.h>
 #include "xtimer.h"
+#include "timex.h"
 
 /* set interval to 1 second */
-#define INTERVAL (1000000U)
+#define INTERVAL (1U * SEC_IN_USEC)
 
 int main(void)
 {
-    uint32_t last_wakeup = xtimer_now();
+    xtimer_ticks32_t last_wakeup = xtimer_now();
 
     while(1) {
-        xtimer_usleep_until(&last_wakeup, INTERVAL);
-        printf("slept until %"PRIu32"\n", xtimer_now());
+        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
+        printf("slept until %" PRIu32 "\n", xtimer_usec_from_ticks(xtimer_now()));
     }
 
     return 0;

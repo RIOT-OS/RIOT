@@ -24,23 +24,28 @@
 #include "bh1750fvi.h"
 #include "bh1750fvi_params.h"
 
-#define RATE        (200 * MS_IN_USEC)      /* 200ms */
+#define RATE        (200LU * MS_IN_USEC)      /* 200ms */
 
 int main(void)
 {
+    int res;
     bh1750fvi_t dev;
-    uint32_t last = xtimer_now();
+    xtimer_ticks32_t last = xtimer_now();
 
     puts("BH1750FVI ambient light sensor test\n");
 
     /* initialize the device */
-    bh1750fvi_init(&dev, (bh1750fvi_params_t *)(&bh1750fvi_params));
+    res = bh1750fvi_init(&dev, (bh1750fvi_params_t *)(&bh1750fvi_params));
+    if (res != BH1750FVI_OK) {
+        puts("error: unable to initialize sensor [I2C initialization error]");
+        return 1;
+    }
 
     /* periodically sample the sensor */
     while(1) {
         uint16_t val = bh1750fvi_sample(&dev);
         printf("value: %5i lux\n", (int)val);
-        xtimer_usleep_until(&last, RATE);
+        xtimer_periodic_wakeup(&last, RATE);
     }
 
     return 0;

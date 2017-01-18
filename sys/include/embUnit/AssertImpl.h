@@ -32,8 +32,8 @@
  *
  * $Id: AssertImpl.h,v 1.6 2003/09/16 11:09:53 arms22 Exp $
  */
-#ifndef __ASSERTIMPL_H__
-#define __ASSERTIMPL_H__
+#ifndef EMBUNIT_ASSERTIMPL_H_
+#define EMBUNIT_ASSERTIMPL_H_
 
 #ifdef  __cplusplus
 extern "C" {
@@ -100,4 +100,4 @@ void assertImplementationCStr(const char *expected,const char *actual, long line
 }
 #endif
 
-#endif/*__ASSERTIMPL_H__*/
+#endif/* EMBUNIT_ASSERTIMPL_H_ */

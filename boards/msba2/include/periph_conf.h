@@ -42,25 +42,30 @@ extern "C" {
 /** @} */
 
 /**
- * @brief PWM device and pinout configuration
+ * @brief   PWM device and pinout configuration
+ *
+ * Currently, we only support a single device and 3 channels, the implementation
+ * is fixed on PWM1.
+ *
+ * @{
  */
 #define PWM_NUMOF           (1U)
-#define PWM_0_EN            (1)
 
 /* PWM_0 device configuration */
-#define PWM_0_CHANNELS      (3)
-#define PWM_0_CH0           (3)
-#define PWM_0_CH0_MR        PWM1MR3
-#define PWM_0_CH1           (4)
-#define PWM_0_CH1_MR        PWM1MR4
-#define PWM_0_CH2           (5)
-#define PWM_0_CH2_MR        PWM1MR5
+#define PWM_CHANNELS      (3)
+#define PWM_CH0           (3)
+#define PWM_CH0_MR        PWM1MR3
+#define PWM_CH1           (4)
+#define PWM_CH1_MR        PWM1MR4
+#define PWM_CH2           (5)
+#define PWM_CH2_MR        PWM1MR5
 /* PWM_0 pin configuration */
-#define PWM_0_PORT          PINSEL4
-#define PWM_0_CH0_PIN       (2)
-#define PWM_0_CH1_PIN       (3)
-#define PWM_0_CH2_PIN       (4)
-#define PWM_0_FUNC          (1)
+#define PWM_PORT          PINSEL4
+#define PWM_CH0_PIN       (2)
+#define PWM_CH1_PIN       (3)
+#define PWM_CH2_PIN       (4)
+#define PWM_FUNC          (1)
+/** @} */
 
 /**
  * @brief Real Time Clock configuration

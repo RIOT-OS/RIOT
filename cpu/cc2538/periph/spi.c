@@ -27,8 +27,6 @@
 #include "mutex.h"
 #include "periph/spi.h"
 #include "periph_conf.h"
-#include "thread.h"
-#include "sched.h"
 
 /* guard file in case no SPI device is defined */
 #if SPI_NUMOF
@@ -55,7 +53,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
     cc2538_ssi_t* ssi = spi_config[dev].dev;
 
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
 
@@ -160,7 +158,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
 
 int spi_conf_pins(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
 
@@ -197,7 +195,7 @@ int spi_conf_pins(spi_t dev)
 
 int spi_acquire(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
     mutex_lock(&locks[dev]);
@@ -206,7 +204,7 @@ int spi_acquire(spi_t dev)
 
 int spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
     mutex_unlock(&locks[dev]);
@@ -249,9 +247,9 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
     cc2538_ssi_t* ssi = spi_config[dev].dev;
-    typeof(length) tx_n = 0, rx_n = 0;
+    unsigned int tx_n = 0, rx_n = 0;
 
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
 

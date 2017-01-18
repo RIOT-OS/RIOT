@@ -163,6 +163,24 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
  */
 void at86rf2xx_configure_phy(at86rf2xx_t *dev);
 
+#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231) || defined(DOXYGEN)
+/**
+ * @brief   Read random data from the RNG
+ *
+ * @note    According to the data sheet this function only works properly in
+ *          Basic Operation Mode. However, sporadic testing has shown that even
+ *          in Extended Operation Mode this returns random enough data to be
+ *          used as a seed for @ref sys_random if no cryptographically secure
+ *          randomness is required.
+ *          Any further use-case needs to be evaluated, especially if
+ *          crypto-relevant randomness is required.
+ *
+ * @param[in] dev       device to configure
+ * @param[out] data     buffer to copy the random data to
+ * @param[in]  len      number of random bytes to store in data
+ */
+void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, const size_t len);
+#endif
 
 #ifdef __cplusplus
 }

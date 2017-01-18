@@ -199,6 +199,37 @@ gnrc_pktsnip_t *gnrc_netif_hdr_build(uint8_t *src, uint8_t src_len, uint8_t *dst
  */
 void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr);
 
+/* @brief   Fetch the netif header flags of a gnrc packet
+ *
+ * @param[in]   pkt     gnrc packet from whom to fetch
+ *
+ * @return              netif header flags of @p pkt
+ * @return              0, if no header is present
+ */
+uint8_t gnrc_netif_hdr_get_flag(gnrc_pktsnip_t* pkt);
+
+/* @brief   Extract the destination address out of a gnrc packet
+ *
+ * @param[in]   pkt                 gnrc packet from whom to extract
+ * @param[out]  pointer_to_addr     pointer to address will be stored here
+ *
+ * @return                          length of destination address
+ * @return                          -ENOENT, if no netif header is presented in @p pkt or if no
+ *                                           destination address field presented in netif header.
+ */
+int gnrc_netif_hdr_get_dstaddr(gnrc_pktsnip_t* pkt, uint8_t** pointer_to_addr);
+
+/* @brief   Extract the source address out of a gnrc packet
+ *
+ * @param[in]   pkt                 gnrc packet from whom to extract
+ * @param[out]  pointer_to_addr     pointer to address will be stored here
+ *
+ * @return                          length of source address
+ * @return                          -ENOENT, if no netif header is presented in @p pkt or if no
+ *                                           source address field presented in netif header.
+ */
+int gnrc_netif_hdr_get_srcaddr(gnrc_pktsnip_t* pkt, uint8_t** pointer_to_addr);
+
 #ifdef __cplusplus
 }
 #endif

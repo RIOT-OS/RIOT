@@ -19,8 +19,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/timer.h"
 #include "periph_conf.h"
 
@@ -156,8 +154,6 @@ void TIMER_0_ISR(void)
             isr_ctx[0].cb(isr_ctx[0].arg, i);
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif /* TIMER_0_EN */

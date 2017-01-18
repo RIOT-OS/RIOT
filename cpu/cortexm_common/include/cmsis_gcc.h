@@ -32,8 +32,8 @@
    ---------------------------------------------------------------------------*/
 
 
-#ifndef __CMSIS_GCC_H
-#define __CMSIS_GCC_H
+#ifndef CMSIS_GCC_H
+#define CMSIS_GCC_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -151,7 +151,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_xPSR(void)
  */
 __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_PSP(void)
 {
-  register uint32_t result;
+  uint32_t result;
 
   __ASM volatile ("MRS %0, psp\n"  : "=r" (result) );
   return(result);
@@ -176,7 +176,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_PSP(uint32_t topOf
  */
 __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_MSP(void)
 {
-  register uint32_t result;
+  uint32_t result;
 
   __ASM volatile ("MRS %0, msp\n" : "=r" (result) );
   return(result);
@@ -1378,4 +1378,4 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __SMMLA (int32_t op1
 }
 #endif
 
-#endif /* __CMSIS_GCC_H */
+#endif /* CMSIS_GCC_H */

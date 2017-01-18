@@ -53,7 +53,7 @@ extern saul_driver_t gpio_saul_driver;
 void auto_init_gpio(void)
 {
     DEBUG("auto init gpio SAUL\n");
-    for (int i = 0; i < SAUL_GPIO_NUMOF; i++) {
+    for (unsigned int i = 0; i < SAUL_GPIO_NUMOF; i++) {
         const saul_gpio_params_t *p = &saul_gpio_params[i];
 
         DEBUG("[auto_init_saul] initializing direct GPIO\n");

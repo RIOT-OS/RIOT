@@ -24,8 +24,8 @@
 #include <stdint.h>
 
 #include "mutex.h"
+#include "cpu.h"
 #include "periph/i2c.h"
-#include "sched.h"
 #include "thread.h"
 #ifdef MODULE_XTIMER
 #include "xtimer.h"
@@ -210,9 +210,7 @@ void isr_i2c(void)
     /* Unlock the wait mutex */
     mutex_unlock(&i2c_wait_mutex);
 
-        if (sched_context_switch_request) {
-            thread_yield();
-        }
+    cortexm_isr_end();
 }
 
 void cc2538_i2c_init_master(uint32_t speed_hz)
@@ -348,12 +346,12 @@ static bool i2c_busy(void) {
     return false;
 }
 
-int i2c_read_byte(i2c_t dev, uint8_t address, char *data)
+int i2c_read_byte(i2c_t dev, uint8_t address, void *data)
 {
     return i2c_read_bytes(dev, address, data, 1);
 }
 
-static int i2c_read_bytes_dumb(uint8_t address, char *data, int length)
+static int i2c_read_bytes_dumb(uint8_t address, uint8_t *data, int length)
 {
     int n = 0;
     uint_fast8_t stat;
@@ -416,7 +414,7 @@ static int i2c_read_bytes_dumb(uint8_t address, char *data, int length)
     return n;
 }
 
-int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 {
     switch (dev) {
 #if I2C_0_EN
@@ -447,12 +445,12 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
     return i2c_read_bytes_dumb(address, data, length);
 }
 
-int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, char *data)
+int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data)
 {
     return i2c_read_regs(dev, address, reg, data, 1);
 }
 
-int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
+int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int length)
 {
     uint_fast8_t stat;
 
@@ -492,14 +490,15 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int lengt
     }
 }
 
-int i2c_write_byte(i2c_t dev, uint8_t address, char data)
+int i2c_write_byte(i2c_t dev, uint8_t address, uint8_t data)
 {
     return i2c_write_bytes(dev, address, &data, 1);
 }
 
-int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
 {
     int n = 0;
+    const uint8_t *my_data = data;
 
     if (dev != I2C_0) {
         return -1;
@@ -521,7 +520,7 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
     for (n = 0; n < length; n++) {
         if (n >= length - 1) flags |= STOP;
         WARN_IF(I2CM_STAT & BUSY);
-        I2CM_DR = data[n];
+        I2CM_DR = my_data[n];
         i2c_ctrl_blocking(flags);
 
         WARN_IF(I2CM_STAT & ARBLST);
@@ -542,20 +541,21 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
 
         if (n < length) {
             DEBUG("%s(%u, %p, %u): %u/%u bytes delivered.\n",
-                  __FUNCTION__, address, (void *)data, length, n, length);
+                  __FUNCTION__, address, (void *)my_data, length, n, length);
         }
 
     return n;
 }
 
-int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, char data)
+int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data)
 {
     return i2c_write_regs(dev, address, reg, &data, 1);
 }
 
-int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
+int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, int length)
 {
     uint_fast8_t stat;
+    const uint8_t *my_data = data;
 
     if (dev != I2C_0) {
         return -1;
@@ -598,7 +598,7 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
         for (n = 0; n < length; n++) {
             if (n >= length - 1) flags |= STOP;
             WARN_IF(I2CM_STAT & BUSY);
-            I2CM_DR = data[n];
+            I2CM_DR = my_data[n];
 
             i2c_ctrl_blocking(flags);
 
@@ -623,7 +623,7 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
                 dev,
                 address,
                 reg,
-                (void *)data,
+                data,
                 length,
                 n,
                 length

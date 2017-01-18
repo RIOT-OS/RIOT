@@ -37,7 +37,7 @@ int l3g4200d_init(l3g4200d_t *dev, i2c_t i2c, uint8_t address,
                   gpio_t int1_pin, gpio_t int2_pin,
                   l3g4200d_mode_t mode, l3g4200d_scale_t scale)
 {
-    char tmp;
+    uint8_t tmp;
 
     /* write device descriptor */
     dev->i2c = i2c;
@@ -86,7 +86,7 @@ int l3g4200d_init(l3g4200d_t *dev, i2c_t i2c, uint8_t address,
 
 int l3g4200d_read(l3g4200d_t *dev, l3g4200d_data_t *data)
 {
-    char tmp[6];
+    uint8_t tmp[6];
     int16_t res;
 
     i2c_acquire(dev->i2c);
@@ -106,7 +106,7 @@ int l3g4200d_read(l3g4200d_t *dev, l3g4200d_data_t *data)
 
 int l3g4200d_enable(l3g4200d_t *dev)
 {
-    char tmp;
+    uint8_t tmp;
     int res;
 
     i2c_acquire(dev->i2c);
@@ -126,7 +126,7 @@ int l3g4200d_enable(l3g4200d_t *dev)
 
 int l3g4200d_disable(l3g4200d_t *dev)
 {
-    char tmp;
+    uint8_t tmp;
     int res;
 
     i2c_acquire(dev->i2c);

@@ -28,14 +28,9 @@ extern "C" {
 #endif
 
 /**
- * @brief Use the 2nd UART for STDIO on this board
- */
-#define UART_STDIO_DEV      UART_DEV(1)
-
-/**
  * @name xtimer configuration
  */
-#define XTIMER_MASK         (0xffff0000)
+#define XTIMER_WIDTH        (16)
 #define XTIMER_BACKOFF      5
 /** @} */
 

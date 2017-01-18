@@ -454,8 +454,8 @@ int _tftp_server(tftp_context_t *ctxt)
 {
     msg_t msg;
     bool active = true;
-    gnrc_netreg_entry_t entry = { NULL, GNRC_TFTP_DEFAULT_DST_PORT,
-                                  thread_getpid() };
+    gnrc_netreg_entry_t entry = GNRC_NETREG_ENTRY_INIT_PID(GNRC_TFTP_DEFAULT_DST_PORT,
+                                                           sched_active_pid);
 
     while (active) {
         int ret = TS_BUSY;
@@ -463,7 +463,7 @@ int _tftp_server(tftp_context_t *ctxt)
 
         /* register the servers main listening port */
         if (gnrc_netreg_register(GNRC_NETTYPE_UDP, &entry)) {
-            DEBUG("tftp: error starting server.");
+            DEBUG("tftp: error starting server.\n");
             return TS_FAILED;
         }
 
@@ -485,7 +485,7 @@ int _tftp_server(tftp_context_t *ctxt)
 
                 /* release packet if we received one */
                 if (msg.type == GNRC_NETAPI_MSG_TYPE_RCV) {
-                    gnrc_pktbuf_release((gnrc_pktsnip_t *) msg.content.ptr);
+                    gnrc_pktbuf_release(msg.content.ptr);
                 }
             }
 
@@ -520,10 +520,11 @@ int _tftp_do_client_transfer(tftp_context_t *ctxt)
     tftp_state ret = TS_BUSY;
 
     /* register our DNS response listener */
-    gnrc_netreg_entry_t entry = { NULL, ctxt->src_port, thread_getpid() };
+    gnrc_netreg_entry_t entry = GNRC_NETREG_ENTRY_INIT_PID(ctxt->src_port,
+                                                           sched_active_pid);
 
     if (gnrc_netreg_register(GNRC_NETTYPE_UDP, &entry)) {
-        DEBUG("tftp: error starting server.");
+        DEBUG("tftp: error starting server.\n");
         return TS_FAILED;
     }
 
@@ -544,7 +545,7 @@ int _tftp_do_client_transfer(tftp_context_t *ctxt)
 
         /* release packet if we received one */
         if (msg.type == GNRC_NETAPI_MSG_TYPE_RCV) {
-            gnrc_pktbuf_release((gnrc_pktsnip_t *) msg.content.ptr);
+            gnrc_pktbuf_release(msg.content.ptr);
         }
     }
 
@@ -590,12 +591,12 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
         }
     }
     else if (m->type != GNRC_NETAPI_MSG_TYPE_RCV) {
-        DEBUG("tftp: unknown message");
+        DEBUG("tftp: unknown message\n");
         gnrc_pktbuf_release(outbuf);
         return TS_BUSY;
     }
 
-    gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)(m->content.ptr);
+    gnrc_pktsnip_t *pkt = m->content.ptr;
 
     gnrc_pktsnip_t *tmp;
     tmp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UDP);
@@ -636,9 +637,8 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
             }
 
             /* register a listener for the UDP port */
-            ctxt->entry.next = NULL;
-            ctxt->entry.demux_ctx = ctxt->src_port;
-            ctxt->entry.pid = thread_getpid();
+            gnrc_netreg_entry_init_pid(&(ctxt->entry), ctxt->src_port,
+                                       sched_active_pid);
             gnrc_netreg_register(GNRC_NETTYPE_UDP, &(ctxt->entry));
 
             /* try to decode the options */
@@ -680,7 +680,7 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
 
             /* check if the client negotiation was successful */
             if (state != TS_BUSY) {
-                DEBUG("tftp: not able to send ACK");
+                DEBUG("tftp: not able to send ACK\n");
             }
             return state;
         } break;
@@ -932,7 +932,7 @@ tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len)
 
     /* down-size the packet to it's used size */
     if (len > TFTP_DEFAULT_DATA_SIZE) {
-        DEBUG("tftp: can't reallocate to bigger packet, buffer overflowed");
+        DEBUG("tftp: can't reallocate to bigger packet, buffer overflowed\n");
         gnrc_pktbuf_release(buf);
 
         if (ctxt->stop_cb) {
@@ -944,7 +944,7 @@ tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len)
     else if (gnrc_pktbuf_realloc_data(buf, len) != 0) {
         assert(false);
 
-        DEBUG("tftp: failed to reallocate data snippet");
+        DEBUG("tftp: failed to reallocate data snippet\n");
         gnrc_pktbuf_release(buf);
 
         /* inform the user that we can't reallocate */
@@ -960,7 +960,7 @@ tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len)
     dst_port.u16 = ctxt->dst_port;
     udp = gnrc_udp_hdr_build(buf, src_port.u16, dst_port.u16);
     if (udp == NULL) {
-        DEBUG("tftp: error unable to allocate UDP header");
+        DEBUG("tftp: error unable to allocate UDP header\n");
         gnrc_pktbuf_release(buf);
 
         if (ctxt->stop_cb) {
@@ -973,7 +973,7 @@ tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len)
     /* allocate IPv6 header */
     ip = gnrc_ipv6_hdr_build(udp, NULL, &(ctxt->peer));
     if (ip == NULL) {
-        DEBUG("tftp: error unable to allocate IPv6 header");
+        DEBUG("tftp: error unable to allocate IPv6 header\n");
         gnrc_pktbuf_release(udp);
 
         if (ctxt->stop_cb) {
@@ -987,7 +987,7 @@ tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len)
     if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL,
                                   ip) == 0) {
         /* if send failed inform the user */
-        DEBUG("tftp: error unable to locate UDP thread");
+        DEBUG("tftp: error unable to locate UDP thread\n");
         gnrc_pktbuf_release(ip);
 
         if (ctxt->stop_cb) {

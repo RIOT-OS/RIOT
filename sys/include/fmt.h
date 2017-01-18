@@ -102,6 +102,21 @@ size_t fmt_u64_hex(char *out, uint64_t val);
 size_t fmt_u32_dec(char *out, uint32_t val);
 
 /**
+ * @brief Convert a uint64 value to decimal string.
+ *
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @note This adds ~400b of code when used.
+ *
+ * @param[out]  out  Pointer to output buffer, or NULL
+ * @param[in]   val  Value to convert
+ *
+ * @return      nr of digits written to (or needed in) @p out
+ */
+size_t fmt_u64_dec(char *out, uint64_t val);
+
+/**
  * @brief Convert a uint16 value to decimal string.
  *
  * If @p out is NULL, will only return the number of bytes that would have
@@ -199,10 +214,10 @@ size_t fmt_str(char *out, const char *str);
  *
  * Will convert up to @p n digits. Stops at any non-digit or '\0' character.
  *
- * @param[out]  str  Pointer to string to read from
+ * @param[in]   str  Pointer to string to read from
  * @param[in]   n    Maximum nr of characters to consider
  *
- * @return      nr of digits read
+ * @return      converted uint32_t value
  */
 uint32_t scn_u32_dec(const char *str, size_t n);
 
@@ -243,6 +258,15 @@ void print_u32_hex(uint32_t val);
  * @param[in]   val  Value to print
  */
 void print_u64_hex(uint64_t val);
+
+/**
+ * @brief Print uint64 value as decimal to stdout
+ *
+ * @note This used fmt_u64_dec(), which uses ~400b of code.
+ *
+ * @param[in]   val  Value to print
+ */
+void print_u64_dec(uint64_t val);
 
 /**
  * @brief Print null-terminated string to stdout

@@ -17,10 +17,10 @@
  * @author      Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
  */
 
-#ifndef _BASE64_ENCODER_DECODER_H
-#define _BASE64_ENCODER_DECODER_H
+#ifndef BASE64_ENCODER_DECODER_H_
+#define BASE64_ENCODER_DECODER_H_
 
-#include <stdlib.h>
+#include <stddef.h> /* for size_t */
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +30,7 @@ extern "C" {
 #define BASE64_ERROR_BUFFER_OUT       (-1) /**< error value for invalid output buffer pointer  */
 #define BASE64_ERROR_BUFFER_OUT_SIZE  (-2) /**< error value for invalid output buffer size     */
 #define BASE64_ERROR_DATA_IN          (-3) /**< error value for invalid input buffer           */
-#define BASE64_ERROR_DATA_IN_SIZE     (-4) /**< error value for invalid output buffer size     */
+#define BASE64_ERROR_DATA_IN_SIZE     (-4) /**< error value for invalid input buffer size      */
 
 /**
  * @brief           Encodes a given datum to base64 and save the result to the given destination.
@@ -79,4 +79,4 @@ int base64_decode(unsigned char *base64_in, size_t base64_in_size, \
 #endif
 
 /** @} */
-#endif /* _BASE64_ENCODER_DECODER_H */
+#endif /* BASE64_ENCODER_DECODER_H_ */
