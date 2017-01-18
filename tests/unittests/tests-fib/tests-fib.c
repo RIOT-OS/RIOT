@@ -709,7 +709,8 @@ static void test_fib_16_prefix_match(void)
 */
 static void test_fib_17_get_entry_set(void)
 {
-    static const size_t addr_buf_size = 16;
+    /* FIXME: init as enum to fix folding-constant compiler error on OS X */
+    enum { addr_buf_size = 16 };
     char addr_dst[addr_buf_size];
     char addr_nxt[addr_buf_size];
 

@@ -303,13 +303,16 @@ static void test_base64_07_stream_decode(void)
 
 static void test_base64_08_encode_16_bytes(void)
 {
-    const int buffer_size = 16;
+    /* FIXME: init as enum here and below required,
+     * to fix folding-constant compiler error on OS X
+     */
+    enum { buffer_size = 16 };
     unsigned char buffer[buffer_size];
     for (int i = 0; i < buffer_size; ++i) {
         buffer[i] = 'a';
     }
 
-    const size_t expected_out_size = 24;
+    enum { expected_out_size = 24 };
     size_t element_base64_out_size = expected_out_size;
     unsigned char element_base64_out[expected_out_size];
 
@@ -329,7 +332,7 @@ static void test_base64_08_encode_16_bytes(void)
 
 static void test_base64_09_encode_size_determination(void)
 {
-    int buffer_size = 20;
+    enum { buffer_size = 20 };
     unsigned char buffer[buffer_size];
     for (int i = 0; i < buffer_size; ++i) {
         buffer[i] = 'a';
