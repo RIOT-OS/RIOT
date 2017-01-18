@@ -66,7 +66,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     dev(tim)->EGR = TIM_EGR_UG;
 
     /* enable the timer's interrupt */
-    timer_irq_enable(tim);
+    NVIC_EnableIRQ(timer_config[tim].irqn);
     /* reset the counter and start the timer */
     timer_start(tim);
 
@@ -115,16 +115,6 @@ void timer_start(tim_t tim)
 void timer_stop(tim_t tim)
 {
     dev(tim)->CR1 &= ~(TIM_CR1_CEN);
-}
-
-void timer_irq_enable(tim_t tim)
-{
-    NVIC_EnableIRQ(timer_config[tim].irqn);
-}
-
-void timer_irq_disable(tim_t tim)
-{
-    NVIC_DisableIRQ(timer_config[tim].irqn);
 }
 
 static inline void irq_handler(tim_t tim)
