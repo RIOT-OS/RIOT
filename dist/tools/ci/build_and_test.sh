@@ -78,6 +78,8 @@ then
             exit $RESULT
         fi
 
+        run ./dist/tools/ci/print_toolchain_versions.sh
+
         run ./dist/tools/whitespacecheck/check.sh ${CI_BASE_BRANCH}
         run ./dist/tools/licenses/check.sh ${CI_BASE_BRANCH} --diff-filter=MR --error-exitcode=0
         run ./dist/tools/licenses/check.sh ${CI_BASE_BRANCH} --diff-filter=AC
