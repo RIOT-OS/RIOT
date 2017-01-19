@@ -40,10 +40,11 @@ function run {
     set_result $NEW_RESULT
 
     # Indent command output so that its easily discernable from the rest
-    OUT_LENGTH="$(echo -n $OUT | wc -c)"
-    if (( "$OUT_LENGTH" > 0 )); then
-        echo -e "Command output:\n"
-        (echo "$OUT" | while IFS= read -r line; do printf "\t%s\n" "$line"; done)
+    if [ -n "$OUT" ]; then
+        echo "Command output:"
+        echo ""
+        # Using printf to avoid problems if the command output begins with a -
+        (printf "%s\n" "$OUT" | while IFS= read -r line; do printf "\t%s\n" "$line"; done)
         echo ""
     fi
 }
