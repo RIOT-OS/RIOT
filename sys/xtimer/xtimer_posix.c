@@ -19,7 +19,7 @@
 
 unsigned int sleep(unsigned int seconds)
 {
-    xtimer_usleep64(seconds * SEC_IN_USEC);
+    xtimer_usleep64(seconds * US_PER_SEC);
     return 0;
 }
 

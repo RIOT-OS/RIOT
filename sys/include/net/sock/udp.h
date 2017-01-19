@@ -168,7 +168,7 @@
  *             sock_udp_close(&sock);
  *             return 1;
  *         }
- *         if ((res = sock_udp_recv(&sock, buf, sizeof(buf), 1 * SEC_IN_USEC,
+ *         if ((res = sock_udp_recv(&sock, buf, sizeof(buf), 1 * US_PER_SEC,
  *                                 NULL)) < 0) {
  *             if (res == -ETIMEDOUT) {
  *                 puts("Timed out");
@@ -232,7 +232,7 @@
  * We then wait a second for a reply and print it when it is received.
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
- *         if ((res = sock_udp_recv(&sock, buf, sizeof(buf), 1 * SEC_IN_USEC,
+ *         if ((res = sock_udp_recv(&sock, buf, sizeof(buf), 1 * US_PER_SEC,
  *                                 NULL)) < 0) {
  *             if (res == -ETIMEDOUT) {
  *                 puts("Timed out");

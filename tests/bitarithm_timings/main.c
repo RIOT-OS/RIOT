@@ -35,7 +35,7 @@
 #include "xtimer.h"
 
 #define TIMEOUT_S (5ul)
-#define TIMEOUT (TIMEOUT_S * SEC_IN_USEC)
+#define TIMEOUT (TIMEOUT_S * US_PER_SEC)
 #define PER_ITERATION (4)
 
 static void callback(void *done_)

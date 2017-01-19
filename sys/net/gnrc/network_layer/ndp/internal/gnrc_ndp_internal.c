@@ -91,7 +91,7 @@ ipv6_addr_t *gnrc_ndp_internal_default_router(void)
 void gnrc_ndp_internal_set_state(gnrc_ipv6_nc_t *nc_entry, uint8_t state)
 {
     gnrc_ipv6_netif_t *ipv6_iface;
-    uint32_t t = GNRC_NDP_FIRST_PROBE_DELAY * SEC_IN_USEC;
+    uint32_t t = GNRC_NDP_FIRST_PROBE_DELAY * US_PER_SEC;
 
     nc_entry->flags &= ~GNRC_IPV6_NC_STATE_MASK;
     nc_entry->flags |= state;
@@ -209,10 +209,10 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
     if (gnrc_ipv6_netif_addr_is_non_unicast(tgt)) {
         /* avoid collision for anycast addresses
          * (see https://tools.ietf.org/html/rfc4861#section-7.2.7) */
-        uint32_t delay = random_uint32_range(0, GNRC_NDP_MAX_AC_TGT_DELAY * SEC_IN_USEC);
+        uint32_t delay = random_uint32_range(0, GNRC_NDP_MAX_AC_TGT_DELAY * US_PER_SEC);
         gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, dst);
         DEBUG("ndp internal: delay neighbor advertisement for %" PRIu32 " sec.",
-              (delay / SEC_IN_USEC));
+              (delay / US_PER_SEC));
 
         /* nc_entry must be set so no need to check it */
         assert(nc_entry);
@@ -554,15 +554,15 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
     }
     if (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ADV_REACH_TIME) {
 
-        if (ipv6_iface->reach_time > (3600 * SEC_IN_USEC)) { /* reach_time > 1 hour */
-            reach_time = (3600 * SEC_IN_MS);
+        if (ipv6_iface->reach_time > (3600 * US_PER_SEC)) { /* reach_time > 1 hour */
+            reach_time = (3600 * MS_PER_SEC);
         }
         else {
-            reach_time = ipv6_iface->reach_time / MS_IN_USEC;
+            reach_time = ipv6_iface->reach_time / US_PER_MS;
         }
     }
     if (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ADV_RETRANS_TIMER) {
-        retrans_timer = ipv6_iface->retrans_timer / MS_IN_USEC;
+        retrans_timer = ipv6_iface->retrans_timer / US_PER_MS;
     }
     if (!fin) {
         adv_ltime = ipv6_iface->adv_ltime;
@@ -792,7 +792,7 @@ bool gnrc_ndp_internal_pi_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
     netif_addr->preferred = byteorder_ntohl(pi_opt->pref_ltime);
     if (netif_addr->valid != UINT32_MAX) {
         xtimer_set_msg(&netif_addr->valid_timeout,
-                       (byteorder_ntohl(pi_opt->valid_ltime) * SEC_IN_USEC),
+                       (byteorder_ntohl(pi_opt->valid_ltime) * US_PER_SEC),
                        &netif_addr->valid_timeout_msg, thread_getpid());
     }
     /* TODO: preferred lifetime for address auto configuration */

@@ -35,8 +35,8 @@
 
 int sem_timedwait(sem_t *sem, const struct timespec *abstime)
 {
-    uint64_t timeout = (((uint64_t)abstime->tv_sec) * SEC_IN_USEC) +
-                       (abstime->tv_nsec / USEC_IN_NS);
+    uint64_t timeout = (((uint64_t)abstime->tv_sec) * US_PER_SEC) +
+                       (abstime->tv_nsec / NS_PER_US);
     uint64_t now = xtimer_now_usec64();
 
     if (now > timeout) {

@@ -57,7 +57,7 @@ int main(void)
             printf("temp: %i.%i°C, ", int_temp, dec_temp);
             printf("relative humidity: %i.%i%%\n", int_hum, dec_hum);
 
-            xtimer_usleep(2000 * MS_IN_USEC);
+            xtimer_usleep(2000 * US_PER_MS);
         }
     }
 

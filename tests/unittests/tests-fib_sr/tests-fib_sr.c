@@ -106,7 +106,7 @@ static void test_fib_sr_01_create_empty_sr(void)
      * Uncomment the following two lines if you want to test the temporal behaviour
      * @note this may fail since unittests are currently not thread-friendly
      */
-    //xtimer_usleep(5 * MS_IN_USEC);
+    //xtimer_usleep(5 * US_PER_MS);
     //TEST_ASSERT(sr_lifetime<10000);
 
     fib_deinit(&test_fib_sr_table);
@@ -144,7 +144,7 @@ static void test_fib_sr_02_change_sr_parameters(void)
      * Uncomment the following three lines if you want to test the temporal behaviour
      * @note this may fail since unittests are currently not thread-friendly
      */
-    //xtimer_usleep(5 * MS_IN_USEC);
+    //xtimer_usleep(5 * US_PER_MS);
     //TEST_ASSERT(sr_lifetime>10000);
     //TEST_ASSERT(sr_lifetime<20000);
 
@@ -184,7 +184,7 @@ static void test_fib_sr_03_read_sr_parameters(void)
      * @note this may fail since unittests are currently not thread-friendly
      */
     /*
-       xtimer_usleep(1 * MS_IN_USEC);
+       xtimer_usleep(1 * US_PER_MS);
        TEST_ASSERT_EQUAL_INT(-ENOENT, fib_sr_read_head(&test_fib_sr_table, local_sourceroutes[0],
                                                     &sr_iface_id, &sr_flags,
                                                     &sr_lifetime)

@@ -80,12 +80,12 @@ u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t count)
     if (count != 0) {
         uint64_t stop, start;
         start = xtimer_now_usec64();
-        int res = sema_wait_timed((sema_t *)sem, count * MS_IN_USEC);
+        int res = sema_wait_timed((sema_t *)sem, count * US_PER_MS);
         stop = xtimer_now_usec64() - start;
         if (res == -ETIMEDOUT) {
             return SYS_ARCH_TIMEOUT;
         }
-        return (u32_t)(stop / MS_IN_USEC);
+        return (u32_t)(stop / US_PER_MS);
     }
     else {
         sema_wait_timed((sema_t *)sem, 0);
@@ -140,7 +140,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
 
     start = xtimer_now_usec64();
     if (timeout > 0) {
-        uint64_t u_timeout = (timeout * MS_IN_USEC);
+        uint64_t u_timeout = (timeout * US_PER_MS);
         _xtimer_set64(&timer, (uint32_t)u_timeout, (uint32_t)(u_timeout >> 32));
     }
     mbox_get(&mbox->mbox, &m);
@@ -149,7 +149,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
     switch (m.type) {
         case _MSG_SUCCESS:
             *msg = m.content.ptr;
-            return (u32_t)((stop - start) / MS_IN_USEC);
+            return (u32_t)((stop - start) / US_PER_MS);
         case _MSG_TIMEOUT:
             break;
         default:    /* should not happen */

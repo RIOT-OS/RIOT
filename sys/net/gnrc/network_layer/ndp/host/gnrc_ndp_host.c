@@ -34,7 +34,7 @@ static inline void _reschedule_rtr_sol(gnrc_ipv6_netif_t *iface, uint32_t delay)
 
 void gnrc_ndp_host_init(gnrc_ipv6_netif_t *iface)
 {
-    uint32_t interval = random_uint32_range(0, GNRC_NDP_MAX_RTR_SOL_DELAY * SEC_IN_USEC);
+    uint32_t interval = random_uint32_range(0, GNRC_NDP_MAX_RTR_SOL_DELAY * US_PER_SEC);
     mutex_lock(&iface->mutex);
     iface->rtr_sol_count = GNRC_NDP_MAX_RTR_SOL_NUMOF;
     DEBUG("ndp host: delayed initial router solicitation by %" PRIu32 " usec.\n", interval);
@@ -48,7 +48,7 @@ void gnrc_ndp_host_retrans_rtr_sol(gnrc_ipv6_netif_t *iface)
     if (iface->rtr_sol_count > 1) { /* regard off-by-one error */
         DEBUG("ndp hst: retransmit rtr sol in %d sec\n", GNRC_NDP_MAX_RTR_SOL_INT);
         iface->rtr_sol_count--;
-        _reschedule_rtr_sol(iface, GNRC_NDP_MAX_RTR_SOL_INT * SEC_IN_USEC);
+        _reschedule_rtr_sol(iface, GNRC_NDP_MAX_RTR_SOL_INT * US_PER_SEC);
     }
     mutex_unlock(&iface->mutex);
     gnrc_ndp_internal_send_rtr_sol(iface->pid, NULL);
