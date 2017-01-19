@@ -79,7 +79,7 @@ extern "C"
  * @name Define the interface for the HDC1000 humidity sensor
  * @{
  */
-#define HDC1000_I2C         (I2C_0)
+#define HDC1000_I2C         (I2C_DEV(0))
 #define HDC1000_ADDR        (0x43)
 /** @} */
 
@@ -87,7 +87,7 @@ extern "C"
  * @name Define the interface for the MAG3110 magnetometer sensor
  * @{
  */
-#define MAG3110_I2C         (I2C_0)
+#define MAG3110_I2C         (I2C_DEV(0))
 #define MAG3110_ADDR        (0x0E)
 /** @} */
 
@@ -95,7 +95,7 @@ extern "C"
  * @name Define the interface for the MMA8652 tri-axis accelerometer sensor
  * @{
  */
-#define MMA8652_I2C         (I2C_0)
+#define MMA8652_I2C         (I2C_DEV(0))
 #define MMA8652_ADDR        (0x1D)
 /** @} */
 
@@ -103,7 +103,7 @@ extern "C"
  * @name Define the interface for the MPL3115A2 pressure sensor
  * @{
  */
-#define MPL3115A2_I2C       (I2C_0)
+#define MPL3115A2_I2C       (I2C_DEV(0))
 #define MPL3115A2_ADDR      (0x60)
 /** @} */
 
@@ -111,7 +111,7 @@ extern "C"
  * @name Define the interface for the TCS3772 light sensor
  * @{
  */
-#define TCS37727_I2C        (I2C_0)
+#define TCS37727_I2C        (I2C_DEV(0))
 #define TCS37727_ADDR       (0x29)
 /** @} */
 
@@ -119,7 +119,7 @@ extern "C"
  * @name Define the interface for the TMP006 IR-Termopile sensor
  * @{
  */
-#define TMP006_I2C          (I2C_0)
+#define TMP006_I2C          (I2C_DEV(0))
 #define TMP006_ADDR         (0x41)
 /** @} */
 

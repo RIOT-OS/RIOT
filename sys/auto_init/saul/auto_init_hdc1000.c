@@ -21,7 +21,9 @@
 
 #ifdef MODULE_HDC1000
 
+#include "log.h"
 #include "saul_reg.h"
+
 #include "hdc1000.h"
 #include "hdc1000_params.h"
 
