@@ -49,14 +49,6 @@ extern "C" {
 #define AT86RF2XX_MAX_PKT_LENGTH        (IEEE802154_FRAME_LEN_MAX)
 
 /**
- * @brief   Default addresses used if the CPUID module is not present
- * @{
- */
-#define AT86RF2XX_DEFAULT_ADDR_SHORT    (0x0230)
-#define AT86RF2XX_DEFAULT_ADDR_LONG     (0x1222334455667788)
-/** @} */
-
-/**
  * @brief   Channel configuration
  * @{
  */

@@ -39,14 +39,6 @@ extern "C" {
 #define CC2420_PKT_MAXLEN       (IEEE802154_FRAME_LEN_MAX)
 
 /**
- * @brief   Default addresses used if the CPUID module is not present
- *
- * In case this address is used, that short address will be created by using the
- * last two bytes of the long address.
- */
-#define CC2420_ADDR_FALLBACK    {0x12, 0x22, 0x33, 0x44, 0x55, 0x66, 0x08, 0x15}
-
-/**
  * @brief   PAN ID configuration
  */
 #define CC2420_PANID_DEFAULT    (IEEE802154_DEFAULT_PANID)

@@ -29,7 +29,6 @@
 #include "cc110x-interface.h"
 #include "net/eui64.h"
 
-#include "periph/cpuid.h"
 #include "periph/gpio.h"
 #include "net/netdev2.h"
 #include "net/gnrc/nettype.h"

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
+ * Copyright (C) 2016-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,8 +22,8 @@
 #include <string.h>
 
 #include "log.h"
+#include "uuid.h"
 #include "assert.h"
-#include "periph/cpuid.h"
 
 #include "net/ethernet.h"
 #include "net/netdev2/eth.h"
@@ -37,7 +37,6 @@
 
 #define SPI_CONF            SPI_CONF_FIRST_RISING
 #define RMSR_DEFAULT_VALUE  (0x55)
-#define MAC_SEED            (0x23)
 
 #define S0_MEMSIZE          (0x2000)
 #define S0_MASK             (S0_MEMSIZE - 1)
@@ -143,9 +142,6 @@ static int init(netdev2_t *netdev)
     w5100_t *dev = (w5100_t *)netdev;
     uint8_t tmp;
     uint8_t hwaddr[ETHERNET_ADDR_LEN];
-#if CPUID_LEN
-    uint8_t cpuid[CPUID_LEN];
-#endif
 
     /* test the SPI connection by reading the value of the RMSR register */
     tmp = rreg(dev, REG_TMSR);
@@ -159,13 +155,7 @@ static int init(netdev2_t *netdev)
     while (rreg(dev, REG_MODE) & MODE_RESET) {};
 
     /* initialize the device, start with writing the MAC address */
-    memset(hwaddr, MAC_SEED, ETHERNET_ADDR_LEN);
-#if CPUID_LEN
-    cpuid_get(cpuid);
-    for (int i = 0; i < CPUID_LEN; i++) {
-        hwaddr[i % ETHERNET_ADDR_LEN] ^= cpuid[i];
-    }
-#endif
+    uuid_get(hwaddr, ETHERNET_ADDR_LEN);
     hwaddr[0] &= ~0x03;         /* no group address and not globally unique */
     wchunk(dev, REG_SHAR0, hwaddr, ETHERNET_ADDR_LEN);
 
