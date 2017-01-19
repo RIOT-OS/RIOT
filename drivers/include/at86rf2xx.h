@@ -87,7 +87,17 @@ extern "C" {
 /**
  * @brief   Base (minimal) RSSI value in dBm
  */
-#define RSSI_BASE_VAL                   (-91)
+#if MODULE_AT86RF233
+#   define RSSI_BASE_VAL                   (-94)
+#elif MODULE_AT86RF212B
+/**
+ * @note for the default settings in RIOT for the at86rf212b,
+ *       for other seetings this value may change.
+ */
+#   define RSSI_BASE_VAL                   (-98)
+#else
+#   define RSSI_BASE_VAL                   (-91)
+#endif
 
 /**
  * @brief   Flags for device internal states (see datasheet)
