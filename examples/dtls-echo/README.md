@@ -75,3 +75,10 @@ https://github.com/RIOT-OS/RIOT/pull/5974
 The code has been tested in the FIT-LAB with M3 motes.
 However, erros can occurrs. Enabling the line `CFLAGS += -DNDEBUG` in
 the `Makefile` reduces the risk.
+
+## Disabling IEEE 802.15.4 ACK Request Flag
+
+If you are noticing too many retransmissions by each UDP datagram sent.
+This flag should de unset. The command is:
+
+    ifconfig <ID> -ack_req
