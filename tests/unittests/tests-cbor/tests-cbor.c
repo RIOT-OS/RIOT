@@ -279,6 +279,39 @@ static void test_byte_string(void)
     }
 }
 
+static void test_byte_string_no_copy(void)
+{
+    char buffer[128];
+
+    {
+        const char *input = "";
+        unsigned char data[] = {0x40};
+        unsigned char *out;
+        size_t size;
+        TEST_ASSERT(cbor_serialize_byte_string(&stream, input));
+        CBOR_CHECK_SERIALIZED(stream, data, sizeof(data));
+        TEST_ASSERT(cbor_deserialize_byte_string_no_copy(&stream, 0, &out, &size));
+        memcpy(buffer, out, size);
+        buffer[size] = '\0';
+        CBOR_CHECK_DESERIALIZED(input, buffer, EQUAL_STRING);
+    }
+
+    cbor_clear(&stream);
+
+    {
+        const char *input = "a";
+        unsigned char data[] = {0x41, 0x61};
+        unsigned char *out;
+        size_t size;
+        TEST_ASSERT(cbor_serialize_byte_string(&stream, input));
+        CBOR_CHECK_SERIALIZED(stream, data, sizeof(data));
+        TEST_ASSERT(cbor_deserialize_byte_string_no_copy(&stream, 0, &out, &size));
+        memcpy(buffer, out, size);
+        buffer[size] = '\0';
+        CBOR_CHECK_DESERIALIZED(input, buffer, EQUAL_STRING);
+    }
+}
+
 static void test_byte_string_invalid(void)
 {
     {
@@ -314,6 +347,39 @@ static void test_unicode_string(void)
         TEST_ASSERT(cbor_serialize_unicode_string(&stream, input));
         CBOR_CHECK_SERIALIZED(stream, data, sizeof(data));
         TEST_ASSERT(cbor_deserialize_unicode_string(&stream, 0, buffer, sizeof(buffer)));
+        CBOR_CHECK_DESERIALIZED(input, buffer, EQUAL_STRING);
+    }
+}
+
+static void test_unicode_string_no_copy(void)
+{
+    char buffer[128];
+
+    {
+        const char *input = "";
+        unsigned char data[] = {0x60};
+        unsigned char *out;
+        size_t size;
+        TEST_ASSERT(cbor_serialize_unicode_string(&stream, input));
+        CBOR_CHECK_SERIALIZED(stream, data, sizeof(data));
+        TEST_ASSERT(cbor_deserialize_unicode_string_no_copy(&stream, 0, &out, &size));
+        memcpy(buffer, out, size);
+        buffer[size] = '\0';
+        CBOR_CHECK_DESERIALIZED(input, buffer, EQUAL_STRING);
+    }
+
+    cbor_clear(&stream);
+
+    {
+        const char *input = "a";
+        unsigned char data[] = {0x61, 0x61};
+        unsigned char *out;
+        size_t size;
+        TEST_ASSERT(cbor_serialize_unicode_string(&stream, input));
+        CBOR_CHECK_SERIALIZED(stream, data, sizeof(data));
+        TEST_ASSERT(cbor_deserialize_unicode_string_no_copy(&stream, 0, &out, &size));
+        memcpy(buffer, out, size);
+        buffer[size] = '\0';
         CBOR_CHECK_DESERIALIZED(input, buffer, EQUAL_STRING);
     }
 }
@@ -761,8 +827,10 @@ TestRef tests_cbor_all(void)
                         new_TestFixture(test_int64_t),
                         new_TestFixture(test_int64_t_invalid),
                         new_TestFixture(test_byte_string),
+                        new_TestFixture(test_byte_string_no_copy),
                         new_TestFixture(test_byte_string_invalid),
                         new_TestFixture(test_unicode_string),
+                        new_TestFixture(test_unicode_string_no_copy),
                         new_TestFixture(test_unicode_string_invalid),
                         new_TestFixture(test_array),
                         new_TestFixture(test_array_indefinite),
