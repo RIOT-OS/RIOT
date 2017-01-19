@@ -218,7 +218,11 @@ def abortOnError(msg)
 
 def fetchPR(prNum, fetchArgs, extraRefSpec)
 {
-    sh """git init; git remote add origin https://github.com/RIOT-OS/RIOT;
-    git fetch -u -n ${fetchArgs} origin ${extraRefSpec} pull/${prNum}/merge:pull_${prNum}
-    git checkout pull_${prNum}"""
+    retry(3) {
+        timeout(time: 60, unit: 'SECONDS') {
+            sh """git init; git remote add origin https://github.com/RIOT-OS/RIOT;
+            git fetch -u -n ${fetchArgs} origin ${extraRefSpec} pull/${prNum}/merge:pull_${prNum}
+            git checkout pull_${prNum}"""
+        }
+    }
 }
