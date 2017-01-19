@@ -13,7 +13,7 @@
  * @file
  * @brief           Common CPU specific definitions for all SAMx21 based CPUs
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef CPU_PERIPH_COMMON_H

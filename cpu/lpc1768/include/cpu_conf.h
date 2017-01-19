@@ -15,7 +15,7 @@
  * @file
  * @brief           CPU specific configuration options
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef CPU_CONF_H
