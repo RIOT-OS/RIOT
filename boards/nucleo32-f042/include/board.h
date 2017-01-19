@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f042 Nucleo-F042
+ * @defgroup    boards_nucleo32-f042 Nucleo-F042
  * @ingroup     boards
- * @brief       Board specific files for the nucleo-f042 board
+ * @brief       Board specific files for the nucleo32-f042 board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the nucleo-f042 board
+ * @brief       Board specific definitions for the nucleo32-f042 board
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */

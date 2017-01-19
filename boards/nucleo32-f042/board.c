@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_nucleo-f042
+ * @ingroup     boards_nucleo32-f042
  * @{
  *
  * @file
- * @brief       Board specific implementations for the nucleo-f042 board
+ * @brief       Board specific implementations for the nucleo32-f042 board
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  *
