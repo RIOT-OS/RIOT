@@ -22,6 +22,7 @@
 #define BOARD_H_
 
 #include "cpu.h"
+#include "dev_random_src.h"
 #include "periph_conf.h"
 
 #ifdef __cplusplus
@@ -37,6 +38,13 @@ extern "C" {
 #define CC110X_GDO0         GPIO_PIN(PORT_C, 4)
 #define CC110X_GDO1         GPIO_PIN(PORT_A, 6)
 #define CC110X_GDO2         GPIO_PIN(PORT_C, 5)
+/** @} */
+
+/**
+ * @brief   @ref sys_dev_random configuration
+ * @{
+ */
+#define DEV_RANDOM_SRC              DEV_RANDOM_SRC_PERIPH_HWRNG
 /** @} */
 
 /**

@@ -23,6 +23,7 @@
 #define BOARD_H_
 
 #include "cpu.h"
+#include "dev_random_src.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
 #include "board_common.h"
@@ -30,6 +31,13 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
+
+/**
+ * @brief   @ref sys_dev_random configuration
+ * @{
+ */
+#define DEV_RANDOM_SRC              DEV_RANDOM_SRC_PERIPH_HWRNG
+/** @} */
 
 /**
  * @name LED pin definitions

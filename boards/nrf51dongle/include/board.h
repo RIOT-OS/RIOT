@@ -22,6 +22,7 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "dev_random_src.h"
 #include "periph_conf.h"
 
 #ifdef __cplusplus
@@ -36,6 +37,13 @@ extern "C" {
 #define XTIMER_CHAN                 (0)
 #define XTIMER_WIDTH                (24)
 #define XTIMER_BACKOFF              (40)
+/** @} */
+
+/**
+ * @brief   @ref sys_dev_random configuration
+ * @{
+ */
+#define DEV_RANDOM_SRC              DEV_RANDOM_SRC_PERIPH_HWRNG
 /** @} */
 
 /**

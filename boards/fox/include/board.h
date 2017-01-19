@@ -27,6 +27,7 @@
 #include <stdint.h>
 
 #include "cpu.h"
+#include "dev_random_src.h"
 #include "periph_conf.h"
 
 #ifdef __cplusplus
@@ -49,6 +50,15 @@ extern "C" {
                                      .int_pin = GPIO_PIN(PORT_C, 2), \
                                      .sleep_pin = GPIO_PIN(PORT_A, 0), \
                                      .reset_pin = GPIO_PIN(PORT_C, 1)}
+
+/**
+ * @brief   @ref sys_dev_random configuration
+ * @{
+ */
+#ifdef MODULE_AT86RF231
+#define DEV_RANDOM_SRC              DEV_RANDOM_SRC_AT86RF2XX
+#endif
+/** @} */
 
 /**
  * @name Define the interface to the LPS331AP pressure sensor

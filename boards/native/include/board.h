@@ -26,6 +26,8 @@
 
 #include <stdint.h>
 
+#include "dev_random_src.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,6 +42,13 @@ void _native_LED_GREEN_TOGGLE(void);
 void _native_LED_RED_OFF(void);
 void _native_LED_RED_ON(void);
 void _native_LED_RED_TOGGLE(void);
+
+/**
+ * @brief   @ref sys_dev_random configuration
+ * @{
+ */
+#define DEV_RANDOM_SRC              DEV_RANDOM_SRC_PERIPH_HWRNG
+/** @} */
 
 #define LED0_ON             (_native_LED_RED_ON())
 #define LED0_OFF            (_native_LED_RED_OFF())
