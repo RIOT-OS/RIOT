@@ -47,7 +47,8 @@ avr_libc_version() {
     printf "%s (%s)" "$(get_define "$cc" avr/version.h __AVR_LIBC_VERSION_STRING__)" "$(get_define "$cc" avr/version.h __AVR_LIBC_DATE_STRING__)"
 }
 
-printf "Installed toolchain versions:\n"
+printf "%s\n" "Installed toolchain versions"
+printf "%s\n" "----------------------------"
 VER=$(gcc --version | head -n 1)
 if [ -n "$VER" ]; then
     printf "%20s: %s\n" "native gcc" "$VER"
