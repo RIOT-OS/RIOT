@@ -1,4 +1,4 @@
-APPLICATION = test_pkg_oonf_api
+APPLICATION = pkg_oonf_api
 include ../Makefile.tests_common
 
 BOARD_WHITELIST := native

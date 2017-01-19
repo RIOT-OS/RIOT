@@ -1,4 +1,4 @@
-export APPLICATION = driver_enc28j60
+APPLICATION = driver_enc28j60
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_spi periph_gpio

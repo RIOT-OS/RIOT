@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = test_malloc
+APPLICATION = malloc
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native

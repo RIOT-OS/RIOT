@@ -1,4 +1,4 @@
-export APPLICATION = periph_flashpage
+APPLICATION = periph_flashpage
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_flashpage
