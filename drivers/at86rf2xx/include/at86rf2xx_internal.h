@@ -126,13 +126,6 @@ void at86rf2xx_fb_read(const at86rf2xx_t *dev,
 void at86rf2xx_fb_stop(const at86rf2xx_t *dev);
 
 /**
- * @brief   Cancel ongoing transactions and switch to TRX_OFF state
- *
- * @param[in] dev       device to manipulate
- */
-void at86rf2xx_force_trx_off(const at86rf2xx_t *dev);
-
-/**
  * @brief   Convenience function for reading the status of the given device
  *
  * @param[in] dev       device to read the status from
