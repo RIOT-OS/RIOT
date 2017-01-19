@@ -32,7 +32,7 @@ extern "C" {
 
 #define RBUF_L2ADDR_MAX_LEN (8U)               /**< maximum length for link-layer addresses */
 #define RBUF_SIZE           (4U)               /**< size of the reassembly buffer */
-#define RBUF_TIMEOUT        (3U * SEC_IN_USEC) /**< timeout for reassembly in microseconds */
+#define RBUF_TIMEOUT        (3U * US_PER_SEC) /**< timeout for reassembly in microseconds */
 
 /**
  * @brief   Fragment intervals to identify limits of fragments.

@@ -120,13 +120,13 @@ extern "C" {
  * @brief   Base value in mircoseconds for computing randomised
  *          reachable time.
  */
-#define GNRC_NDP_REACH_TIME             (30U * SEC_IN_USEC)
+#define GNRC_NDP_REACH_TIME             (30U * US_PER_SEC)
 
 /**
  * @brief   Time in mircoseconds between retransmissions of neighbor
  *          solicitations to a neighbor.
  */
-#define GNRC_NDP_RETRANS_TIMER          (1U * SEC_IN_USEC)
+#define GNRC_NDP_RETRANS_TIMER          (1U * US_PER_SEC)
 
 /**
  * @brief   Delay in seconds for neighbor cache entry between entering
@@ -179,7 +179,7 @@ extern "C" {
  *          solicitation reception and responding router advertisement
  *          transmission.
  */
-#define GNRC_NDP_MAX_RTR_ADV_DELAY      (500U * MS_IN_USEC)
+#define GNRC_NDP_MAX_RTR_ADV_DELAY      (500U * US_PER_MS)
 /** @} */
 
 /**

@@ -26,7 +26,7 @@
 /**
  * @brief   Read th sensors every second
  */
-#define INTERVAL            (1LU * SEC_IN_USEC)
+#define INTERVAL            (1LU * US_PER_SEC)
 
 
 int main(void)

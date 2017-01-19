@@ -62,7 +62,7 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
  */
 static void fib_lifetime_to_absolute(uint32_t ms, uint64_t *target)
 {
-    *target = xtimer_now_usec64() + (ms * MS_IN_USEC);
+    *target = xtimer_now_usec64() + (ms * US_PER_MS);
 }
 
 /**

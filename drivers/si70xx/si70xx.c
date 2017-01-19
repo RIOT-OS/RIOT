@@ -82,7 +82,7 @@ int si70xx_init(si70xx_t *dev, i2c_t i2c_dev, uint8_t address)
     i2c_release(dev->i2c_dev);
 
     /* sensor is ready after at most 25 ms */
-    xtimer_usleep(25 * MS_IN_USEC);
+    xtimer_usleep(25 * US_PER_MS);
 
     return 0;
 }
