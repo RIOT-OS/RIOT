@@ -1,6 +1,6 @@
 APPLICATION = lwip
 
-BOARD ?= iotlab-m3
+BOARD ?= native
 
 RIOTBASE ?= $(CURDIR)/../..
 
@@ -38,7 +38,11 @@ ifneq (,$(filter native,$(BOARD)))
 endif
 
 ifneq (,$(filter at86rf2%,$(DRIVER)))
-  FEATURES_REQUIRED = periph_spi periph_gpio
+  FEATURES_REQUIRED += periph_gpio periph_spi
+endif
+
+ifeq (,$(filter native,$(BOARD)))
+  FEATURES_REQUIRED += periph_spi
 endif
 
 USEMODULE += $(DRIVER)
