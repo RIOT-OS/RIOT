@@ -5,7 +5,22 @@ PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/$(PKG_NAME)
 
 .PHONY: all
 
+$(info $(CPP))
+$(info $(CC))
+$(info $(CXX))
+$(info $(OBJC))
+$(info $(OBJCXX))
+$(info $(AR))
+$(info $(RANLIB))
+$(info $(NM))
+$(info $(STRIP))
+$(info $(CPPFLAGS))
+$(info $(CFLAGS))
+$(info $(CXXFLAGS))
+$(info $(LDFLAGS))
+
 all: git-download
-		$(MAKE) -C $(PKG_BUILDDIR)
+	    cd $(PKG_BUILDDIR) && PREFIX="/" ./bootstrap && ./configure CPP="$(CPP)" CC="$(CC)" CXX="$(CXX)" OBJC="$(OBJC)" OBJCXX="$(OBJCXX)" AR="$(AR)" RANLIB="$(RANLIB)" NM="$(NM)" STRIP="$(STRIP)" CPPFLAGS="$(CPPFLAGS)" CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)"
+		$(make)
 
 include $(RIOTBASE)/pkg/pkg.mk
