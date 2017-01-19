@@ -69,11 +69,12 @@ void native_async_read_setup(void) {
 void native_async_read_cleanup(void) {
     unregister_interrupt(SIGIO);
 
-#ifdef __MACH__
     for (int i = 0; i < _next_index; i++) {
+#ifdef __MACH__
         kill(_sigio_child_pids[i], SIGKILL);
-    }
 #endif
+        real_close(_fds[i]);
+    }
 }
 
 void native_async_read_continue(int fd) {
