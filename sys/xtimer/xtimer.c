@@ -233,8 +233,12 @@ static void _mutex_timeout(void *arg)
     mutex_thread_t *mt = (mutex_thread_t *)arg;
 
     mt->timeout = 1;
+    list_node_t *node = list_remove(&mt->mutex->queue,
+                                    (list_node_t *)&mt->thread->rq_entry);
+    if ((node != NULL) && (mt->mutex->queue.next == NULL)) {
+        mt->mutex->queue.next = MUTEX_LOCKED;
+    }
     sched_set_status(mt->thread, STATUS_PENDING);
-    list_remove(&mt->mutex->queue, (list_node_t *)&mt->thread->rq_entry);
     thread_yield_higher();
 }
 
