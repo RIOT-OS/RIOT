@@ -59,9 +59,7 @@ void sys_mutex_free(sys_mutex_t *mutex)
 
 err_t sys_sem_new(sys_sem_t *sem, u8_t count)
 {
-    if (sema_create((sema_t *)sem, (unsigned int)count) < 0) {
-        return ERR_VAL;
-    }
+    sema_create((sema_t *)sem, (unsigned int)count);
     return ERR_OK;
 }
 
