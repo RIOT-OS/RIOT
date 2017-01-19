@@ -43,7 +43,7 @@ function run {
     OUT_LENGTH="$(echo -n $OUT | wc -c)"
     if (( "$OUT_LENGTH" > 0 )); then
         echo -e "Command output:\n"
-        (printf "%s" "$OUT" | while IFS= read -r line; do printf "\t%s\n" "$line"; done)
+        (echo "$OUT" | while IFS= read -r line; do printf "\t%s\n" "$line"; done)
         echo ""
     fi
 }
