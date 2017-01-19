@@ -28,6 +28,7 @@
 #include "thread.h"
 #include "shell.h"
 #include "shell_commands.h"
+#include "msg.h"
 
 #if FEATURE_PERIPH_RTC
 #include "periph/rtc.h"
@@ -42,6 +43,36 @@
 #include "net/gnrc.h"
 #endif
 
+/* set up a timer to send packages */
+#include "xtimer.h"
+#include "timex.h"
+#include "board.h"
+
+/* set interval to 1 second */
+//#define INTERVAL (500U * MS_IN_USEC)
+#define INTERVAL (2U * SEC_IN_USEC)
+
+
+void *second_thread(void *arg)
+{
+    (void) arg;
+
+    uint32_t last_wakeup = xtimer_now();
+    while(1) {
+        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
+        // printf("slept until %" PRIu32 "\n", xtimer_now());
+        // Toggle red led
+        //LED_PORT |= BLUE|GREEN|RED;
+        LED_PORT ^= BLUE;
+
+        //txtsnd <if> [<L2 addr>|bcast] <data>
+        // handle_input_line(NULL, "txtsnd 4 bcast HelloWolrd\n \n");
+    }
+    return NULL;
+}
+
+char second_thread_stack[THREAD_STACKSIZE_MAIN];
+
 int main(void)
 {
 #ifdef MODULE_LTC4150
@@ -53,12 +84,19 @@ int main(void)
 #endif
 
 #ifdef MODULE_NETIF
+    (void) puts("GNRC NETIF");
     gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                           gnrc_pktdump_pid);
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 #endif
 
     (void) puts("Welcome to RIOT!");
+
+    //kernel_pid_t pid =
+    		thread_create(second_thread_stack, sizeof(second_thread_stack),
+                            THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                            second_thread, NULL, "SEND_DATA");
+
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);

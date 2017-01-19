@@ -36,7 +36,7 @@
 #include "include/at86rfr2_netdev.h"
 #include "include/at86rfr2_registers.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #define _MAX_MHR_OVERHEAD   (25)
@@ -75,11 +75,18 @@ static int _init(netdev2_t *netdev)
     at86rf2xx_assert_awake(dev);
 
     /* test if the SPI is set up correctly and the device is responding */
-    if (at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM) !=
-        AT86RF2XX_PARTNUM) {
-        DEBUG("[at86rfr2] error: unable to read correct part number\n");
+    uint16_t partnum = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM);
+    if ( partnum != AT86RF2XX_PARTNUM) {
+        DEBUG("[at86rfr2] error: unable to read correct part number = %x, read = %x\n",AT86RF2XX_PARTNUM ,partnum );
         return -1;
     }
+
+#ifdef DEBUG
+    uint16_t version = at86rf2xx_reg_read(dev, AT86RF2XX_REG__VERSION_NUM);
+    uint16_t man_id0 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__MAN_ID_0);
+    uint16_t man_id1 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__MAN_ID_1);
+    DEBUG("[at86rfr2] Part Number:%02x, version:%02x, Atmel JEDEC manufacturer ID:00 00 %02x %02x\n",partnum ,version, man_id1, man_id0);
+#endif
 
 #ifdef MODULE_NETSTATS_L2
     memset(&netdev->stats, 0, sizeof(netstats_t));
@@ -131,10 +138,18 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     at86rf2xx_fb_start(dev);
 
     /* get the size of the received packet */
-    at86rf2xx_fb_read(dev, &phr, 1);
+    phr =  TST_RX_LENGTH;
+    //at86rf2xx_fb_read(dev, &phr, 1);
+
+
+    DEBUG("[at86rfr2] RX Packet length: %d\n", phr);
+
 
     /* ignore MSB (refer p.80) and substract length of FCS field */
-    pkt_len = (phr & 0x7f) - 2;
+    //pkt_len = (phr & 0x7f) - 2;
+    pkt_len = phr-2;
+
+    DEBUG("[at86rfr2] RX Payload length: %d\n", pkt_len);
 
     /* just return length when buf == NULL */
     if (buf == NULL) {
@@ -144,6 +159,7 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     /* not enough space in buf */
     if (pkt_len > len) {
         at86rf2xx_fb_stop(dev);
+        DEBUG("[at86rfr2] not enough space in buf %d > %d\n", pkt_len, len);
         return -ENOBUFS;
     }
     #ifdef MODULE_NETSTATS_L2
@@ -154,17 +170,26 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     at86rf2xx_fb_read(dev, (uint8_t *)buf, pkt_len);
 
     /* Ignore FCS but advance fb read */
-    at86rf2xx_fb_read(dev, NULL, 2);
+    // at86rf2xx_fb_read(dev, NULL, 2);
+
+    DEBUG("[at86rfr2] All %d bytes read\n", pkt_len);
 
     if (info != NULL) {
-        netdev2_ieee802154_rx_info_t *radio_info = info;
-        at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
-#ifndef MODULE_AT86RF231
-        at86rf2xx_fb_read(dev, &(radio_info->rssi), 1);
-        at86rf2xx_fb_stop(dev);
+    	netdev2_ieee802154_rx_info_t *radio_info = info;
+#if defined(MODULE_AT86RFR2)
+    	radio_info->lqi = *(AT86RF2XX_REG__TRXFBST + phr);
+    	radio_info->rssi = (PHY_RSSI & 0x1f); // MASK highest 3 bits
+
+    	DEBUG("[at86rfr2] LQI:%d high value is good, RSSI:%d high value can be good or interferer.\n", radio_info->lqi, radio_info->rssi);
+
+#elif !defined(MODULE_AT86RF231)
+		at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
+		at86rf2xx_fb_read(dev, &(radio_info->rssi), 1);
+		at86rf2xx_fb_stop(dev);
 #else
-        at86rf2xx_fb_stop(dev);
-        radio_info->rssi = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
+		at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
+		at86rf2xx_fb_stop(dev);
+		radio_info->rssi = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
 #endif
     }
     else {
@@ -603,7 +628,7 @@ static void _isr(netdev2_t *netdev)
         DEBUG("[at86rf2xx] EVT - RX_START\n");
     }
 
-    if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__TRX_END) {
+    if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__TX_END) {
         if (state == AT86RF2XX_STATE_RX_AACK_ON ||
             state == AT86RF2XX_STATE_BUSY_RX_AACK) {
             DEBUG("[at86rf2xx] EVT - RX_END\n");

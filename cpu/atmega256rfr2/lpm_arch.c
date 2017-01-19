@@ -19,6 +19,8 @@
  */
 
 #include "arch/lpm_arch.h"
+#include "board.h"
+
 
 void lpm_arch_init(void)
 {

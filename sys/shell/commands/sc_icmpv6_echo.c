@@ -146,7 +146,8 @@ static void _print_stats(char *addr_str, int success, int count, uint64_t total_
 
 int _icmpv6_ping(int argc, char **argv)
 {
-    int count = 3, success = 0, remaining, stat_interval = 0, stat_counter = 0;
+
+	int count = 3, success = 0, remaining, stat_interval = 0, stat_counter = 0;
     size_t payload_len = 4;
     uint32_t delay = 1 * SEC_IN_MS;
     char *addr_str;
@@ -155,6 +156,7 @@ int _icmpv6_ping(int argc, char **argv)
     msg_t msg;
     gnrc_netreg_entry_t my_entry = GNRC_NETREG_ENTRY_INIT_PID(ICMPV6_ECHO_REP,
                                                               sched_active_pid);
+
     uint32_t min_rtt = UINT32_MAX, max_rtt = 0;
     uint64_t sum_rtt = 0;
     uint64_t ping_start;
@@ -226,12 +228,15 @@ int _icmpv6_ping(int argc, char **argv)
         }
     }
 
+    puts("_icmpv6_ping 1");
     if (gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &my_entry) < 0) {
         puts("error: network registry is full");
         return 1;
     }
 
     remaining = count;
+
+    puts("_icmpv6_ping 2");
 
     ping_start = xtimer_now64();
 

@@ -18,7 +18,6 @@
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @}
  */
-
 #include <stdio.h>
 
 #include "xtimer.h"

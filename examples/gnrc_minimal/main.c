@@ -44,6 +44,7 @@ int main(void)
         }
     }
 
-    /* main thread exits */
+
+
     return 0;
 }

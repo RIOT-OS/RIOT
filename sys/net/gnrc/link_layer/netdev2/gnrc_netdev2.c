@@ -82,7 +82,7 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
                 break;
 #endif
             default:
-                DEBUG("gnrc_netdev2: warning: unhandled event %u.\n", event);
+                DEBUG("gnrc_netdev2: warning: unprocessed event %u.\n", event);
         }
     }
 }

@@ -24,12 +24,16 @@
 
 #include "cpu.h"
 
+#include "debug.h"
+
 void reboot(void)
 {
     /*
      * Since the AVR doesn't support a real software reset, we set the Watchdog
      * Timer on a 250ms timeout. Consider this a kludge.
      */
+
+	DEBUG("Reboot error\n" );
     wdt_enable(WDTO_250MS);
     while(1);
 }

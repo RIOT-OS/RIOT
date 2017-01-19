@@ -30,14 +30,14 @@
 
 
 
-	#define ENABLE_DEBUG (1)
+	#define ENABLE_DEBUG (0)
 	#include "debug.h"
 
 	/**
 	 * @brief   Define stack parameters for the MAC layer thread
 	 * @{
 	 */
-	#define AT86RF2XX_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
+	#define AT86RF2XX_MAC_STACKSIZE     (512) // (THREAD_STACKSIZE_DEFAULT)
 	#ifndef AT86RF2XX_MAC_PRIO
 		#define AT86RF2XX_MAC_PRIO          (GNRC_NETDEV2_MAC_PRIO)
 	#endif
@@ -54,10 +54,10 @@
 	        const at86rf2xx_params_t *p = &at86rfr2_params[i];
 	        int res;
 
-	        DEBUG("Initializing AT86RFR2 radio at SPI_%i\n", p->spi);
+	        DEBUG("Initializing AT86RFR2 with SOC radio no SPI needed.\n");
 	        at86rf2xx_setup(&at86rfr2_devs[i], (at86rf2xx_params_t*) p);
 			res = gnrc_netdev2_ieee802154_init(&gnrc_adpt[i],
-											   (netdev2_ieee802154_t *)&at86rfr2_devs[i]);
+											   (netdev2_ieee802154_t *)&at86rfr2_devs[i] );
 
 			if (res < 0) {
 				DEBUG("Error initializing AT86RFR2 radio device!");

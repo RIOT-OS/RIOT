@@ -199,7 +199,7 @@ int16_t at86rf2xx_get_txpower(at86rf2xx_t *dev)
     DEBUG("txpower value: %x\n", txpower);
     return _tx_pow_to_dbm_212b(dev->netdev.chan, dev->page, txpower);
 #elif defined(MODULE_AT86RFR2)
-    uint8_t txpower = AT86RF2XX_REG__PHY_TX_PWR & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
+    uint8_t txpower = *AT86RF2XX_REG__PHY_TX_PWR & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
     return tx_pow_to_dbm[txpower];
 #else
     uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR)
@@ -437,13 +437,17 @@ static inline void _set_state(at86rf2xx_t *dev, uint8_t state)
 {
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, state);
 
+    /* If TRX_STATUS = 0x1F (STATE_TRANSITION_IN_PROGRESS)  the radio transceiver  is on a state transition.
+     * Do not try to initiate a  further state change while the radio  transceiver is in STATE_TRANSITION_IN_PROGRESS.
+     * */
+
     /* To prevent a possible race condition when changing to
      * RX_AACK_ON state the state doesn't get read back in that
      * case. See discussion
      * in https://github.com/RIOT-OS/RIOT/pull/5244
      */
     if (state != AT86RF2XX_STATE_RX_AACK_ON) {
-        while (at86rf2xx_get_status(dev) != state);
+        while ( at86rf2xx_get_status(dev) != state);
     }
 
     dev->state = state;
@@ -451,7 +455,8 @@ static inline void _set_state(at86rf2xx_t *dev, uint8_t state)
 
 void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
 {
-    uint8_t old_state = at86rf2xx_get_status(dev);
+	DEBUG("at86rf2xx_set_state()\n");
+	uint8_t old_state = at86rf2xx_get_status(dev);
 
     /* make sure there is no ongoing transmission, or state transition already
      * in progress */
@@ -459,9 +464,11 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
            old_state == AT86RF2XX_STATE_BUSY_TX_ARET ||
            old_state == AT86RF2XX_STATE_IN_PROGRESS) {
         old_state = at86rf2xx_get_status(dev);
+    	DEBUG("wait to be ready to set state: 0x%x\n", old_state);
     }
 
     if (state == old_state) {
+    	DEBUG("state was already: 0x%x\n", old_state);
         return;
     }
 
@@ -470,8 +477,10 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
              state == AT86RF2XX_STATE_TX_ARET_ON) ||
         (old_state == AT86RF2XX_STATE_TX_ARET_ON &&
              state == AT86RF2XX_STATE_RX_AACK_ON)) {
+    	DEBUG("set AT86RF2XX_STATE_PLL_ON\n");
         _set_state(dev, AT86RF2XX_STATE_PLL_ON);
     }
+
     /* check if we need to wake up from sleep mode */
     else if (old_state == AT86RF2XX_STATE_SLEEP) {
         DEBUG("at86rfr2: waking up from sleep mode\n");
@@ -479,18 +488,20 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
     }
 
     if (state == AT86RF2XX_STATE_SLEEP) {
+    	DEBUG("set AT86RF2XX_STATE_SLEEP\n");
         /* First go to TRX_OFF */
         at86rf2xx_force_trx_off(dev);
         /* Discard all IRQ flags, framebuffer is lost anyway */
         at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
         /* Go to SLEEP mode from TRX_OFF */
 #if defined MODULE_AT86RFR2
-        *(&AT86RF2XX_REG__TRXPR) |= AT86RF2XX_TRXPR_SLPTR;
+        *(AT86RF2XX_REG__TRXPR) |= AT86RF2XX_TRXPR_SLPTR;
 #else
         gpio_set(dev->params.sleep_pin);
 #endif
         dev->state = state;
     } else {
+    	DEBUG("set state: 0x%x\n", state);
         _set_state(dev, state);
     }
 }

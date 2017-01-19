@@ -12,6 +12,8 @@ ifeq ($(OS),Linux)
   FLASHER = avrdude
   export FLASHER_PATH ="/etc/avrdude.conf"
   export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex:i -C $(FLASHER_PATH) 
+  #export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -n -v -U lfuse:r:-:h -U hfuse:r:-:h -U efuse:r:-:h  -C $(FLASHER_PATH) 
+#-U lfuse:r:-:i -U hfuse:r:-:i -U efuse:r:-:i 
 else ifeq ($(OS),Darwin)
   PORT ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
   FLASHER = avrdude
@@ -50,9 +52,15 @@ export CFLAGS_DBG   = -ggdb -g3
 export CFLAGS_OPT  ?= -Os
 
 # -Wl,--relax  -mrelax 
-export CFLAGS += -mrelax -Wl,--relax -Wl,-V $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) 
-export ASFLAGS += --linkrelax $(CFLAGS_CPU) $(CFLAGS_DBG)
-export LINKFLAGS += -Wl,-t -mrelax -Wl,--relax $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -e reset_handler
+#export CFLAGS += -mrelax -Wl,--relax -Wl,-V $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) 
+#export ASFLAGS += --linkrelax $(CFLAGS_CPU) $(CFLAGS_DBG)
+#export LINKFLAGS += -Wl,-t -mrelax -Wl,--relax $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -e reset_handler
+
+export SIZEFLAGS = --format avr --mcu=atmega256rfr2 --radix=10
+
+export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
+export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
+export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -e reset_handler
 
 #export OFLAGS += -j .text -j .data -O ihex
 #export FFLAGS += -p m2560 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex
@@ -66,3 +74,11 @@ ifeq ($(LTO),1)
   # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59396
   export LINKFLAGS += -Wno-error
 endif
+
+# lfuse 0xde
+# hfuse 0xd0
+# efuse 0xfe
+
+# 256k Flash
+# 8k EEPROM
+# BOOTLOADER 1,5625% of 256k (4096 words/byte, App Section 0x00000 - 0x1EFFF, Boot section 0x1F000-0x1FFFF) 

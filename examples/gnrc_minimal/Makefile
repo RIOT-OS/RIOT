@@ -27,7 +27,8 @@ BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
-USEMODULE += auto_init_gnrc_netif
+USEMODULE += auto_init_gnrc_netif 
+
 # Specify the minimum networking modules for IPv6
 USEMODULE += gnrc_ipv6
 USEMODULE += gnrc_ndp
@@ -36,10 +37,17 @@ USEMODULE += gnrc_icmpv6_echo
 # Use minimal standard PRNG
 USEMODULE += prng_minstd
 
+# Use ieee822154
+USEMODULE += ieee802154
+USEMODULE += netdev2_ieee802154
+
+# This application dumps received packets to STDIO using the pktdump module
+USEMODULE += gnrc_pktdump
+
 CFLAGS += -DGNRC_PKTBUF_SIZE=512 -DGNRC_IPV6_NETIF_ADDR_NUMOF=4 -DGNRC_IPV6_NC_SIZE=1
 
 # Change this to 0 show compiler invocation lines by default:
-QUIET ?= 1
+QUIET ?= 0
 
 include $(RIOTBASE)/Makefile.include
 

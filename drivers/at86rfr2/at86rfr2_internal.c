@@ -31,16 +31,24 @@
 
 #include <string.h>
 
+#define ENABLE_DEBUG (1)
+#include "debug.h"
+
+// #define at86rf2xx_reg_write(dev, addr, data)
+//		addr = *((uint8_t*)(&data))
+typedef uint8_t intptr8_t;
 void at86rf2xx_reg_write(const at86rf2xx_t *dev,
-                         const uint8_t addr,
+		volatile uint8_t* addr,
                          const uint8_t value)
 {
-	(*(volatile uint8_t *)(intptr_t)(addr)) = (value);
+	// allready castet *(volatile uint8_t *) in iom256rfr2, _SFR_MEM8(), _MMIO_BYTE
+	*(addr) = value;
 }
 
-uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr)
+uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev,  volatile uint8_t* addr)
 {
-	return (uint8_t)(*(volatile uint8_t*)(intptr_t)(addr));
+	// already casted *(volatile uint8_t *) in iom256rfr2
+	return *addr;
 }
 
 void at86rf2xx_sram_read(const at86rf2xx_t *dev,
@@ -48,7 +56,7 @@ void at86rf2xx_sram_read(const at86rf2xx_t *dev,
                          uint8_t *data,
                          const size_t len)
 {
-	memcpy( data, (void *)(&AT86RF2XX_REG__TRXFBST)+offset, len);
+	memcpy( data, (void *)(AT86RF2XX_REG__TRXFBST +offset ), len);
 }
 
 void at86rf2xx_sram_write(const at86rf2xx_t *dev,
@@ -56,7 +64,7 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev,
                           const uint8_t *data,
                           const size_t len)
 {
-	memcpy( (void *)(&AT86RF2XX_REG__TRXFBST)+offset, data, len);
+	memcpy( (void *)(AT86RF2XX_REG__TRXFBST+offset), data, len);
 }
 
 void at86rf2xx_fb_start(const at86rf2xx_t *dev)
@@ -68,7 +76,11 @@ void at86rf2xx_fb_read(const at86rf2xx_t *dev,
                        uint8_t *data,
                        const size_t len)
 {
-	memcpy( data, (void *)(&AT86RF2XX_REG__TRXFBST), len);
+	size_t lenght = len;
+	while(lenght--){
+		*(data+lenght)  = *( (volatile uint8_t *)(AT86RF2XX_REG__TRXFBST+lenght)) ;
+	}
+	//memcpy( data, AT86RF2XX_REG__TRXFBST, len);
 }
 
 void at86rf2xx_fb_stop(const at86rf2xx_t *dev)
@@ -93,7 +105,7 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev)
         /* wake up and wait for transition to TRX_OFF */
 #if defined MODULE_AT86RFR2
     	//Setting SLPTR = 0x0  returns the radio transceiver to the TRX_OFF state
-        AT86RF2XX_REG__TRXPR &= ~AT86RF2XX_TRXPR_SLPTR ; //  set slptr to default
+        *AT86RF2XX_REG__TRXPR &= ~AT86RF2XX_TRXPR_SLPTR ; //  set slptr to default
  #else
         gpio_clear(dev->params.sleep_pin);
 #endif
@@ -112,13 +124,15 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
 
     /* trigger hardware reset */
 #if defined MODULE_AT86RFR2
-    	*(&AT86RF2XX_REG__TRXPR) |= AT86RF2XX_TRXPR_TRXRST; // set reset bit
+    	*(AT86RF2XX_REG__TRXPR) |= AT86RF2XX_TRXPR_TRXRST; // set reset bit
+
 #else
         gpio_clear(dev->params.reset_pin);
         xtimer_usleep(AT86RF2XX_RESET_PULSE_WIDTH);
         gpio_set(dev->params.reset_pin);
 #endif
-    xtimer_usleep(AT86RF2XX_RESET_DELAY);
+
+         xtimer_usleep(AT86RF2XX_RESET_DELAY);
 }
 
 void at86rf2xx_configure_phy(at86rf2xx_t *dev)

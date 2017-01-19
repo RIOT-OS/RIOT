@@ -9,6 +9,8 @@ OS = $(shell uname)
 ifeq ($(OS),Linux)
   PORT ?= /dev/ttyACM0
   FLASHER = avrdude
+  export FLASHER_PATH ="/etc/avrdude.conf"
+  export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex:i -C $(FLASHER_PATH)
 else ifeq ($(OS),Darwin)
   PORT ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
   FLASHER = avrdude
@@ -17,10 +19,12 @@ else ifeq ($(OS),MINGW32_NT-6.2)
 	PORT ?= COM5
 	FLASHER = avrdude
 	export FLASHER_PATH ="C:/avrdude/avrdude.conf"
+	export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex:i -C $(FLASHER_PATH)
 else
   $(info CAUTION: No flash tool for your host system found!)
   # TODO: fix for building under windows
 endif
+
 export FLASHER
 export PORT
 export DIST_PATH = $(RIOTBOARD)/$(BOARD)/dist
@@ -39,7 +43,7 @@ ifeq ($(PROGRAMMER),wiring)
 endif
 
 # define build specific options
-export CFLAGS_CPU   = -mmcu=atmega2560  $(CFLAGS_FPU)
+export CFLAGS_CPU   = -mmcu=atmega256rfr2  $(CFLAGS_FPU)
 export CFLAGS_LINK  = -fno-builtin -fshort-enums
 export CFLAGS_DBG   = -ggdb -g3
 export CFLAGS_OPT  ?= -Os
@@ -51,7 +55,7 @@ export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -e reset_handler
 #export FFLAGS += -p m2560 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex
 
 export OFLAGS += -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures
-export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex:i -C $(FLASHER_PATH)
+#export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex:i -C $(FLASHER_PATH)
 
 
 ifeq ($(LTO),1)

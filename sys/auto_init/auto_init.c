@@ -183,7 +183,6 @@ void auto_init(void)
 #endif
 
 #ifdef MODULE_AT86RFR2
-    DEBUG("Auto init at86rfr2.\n");
     extern void auto_init_at86rfr2(void);
     auto_init_at86rfr2();
 #endif

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#/usr/bin/python python
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2014  Oliver Hahm <oliver.hahm@inria.fr>
@@ -19,8 +19,7 @@
 # 02110-1301 USA
 
 
-try:
-    import configparser
+try: import configparser
 except ImportError:
     import ConfigParser as configparser
 
