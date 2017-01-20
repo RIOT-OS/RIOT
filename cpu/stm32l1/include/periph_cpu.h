@@ -14,7 +14,7 @@
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Katja Kirstein <katja.kirstein@haw-hamburg.de>
  */
 

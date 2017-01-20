@@ -13,7 +13,7 @@
  * @file
  * @brief           Shared CPU specific definitions for the STM32 family
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef PERIPH_CPU_COMMON_H
