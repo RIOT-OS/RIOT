@@ -15,8 +15,8 @@
  * @author      Lucas Jenß <lucas@x3ro.de>
  */
 
-#ifndef _HAMMING256_H
-#define _HAMMING256_H
+#ifndef HAMMING256_H
+#define HAMMING256_H
 
 #include <stdint.h>
 

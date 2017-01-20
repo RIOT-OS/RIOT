@@ -16,8 +16,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NETDEV2_TAP_PARAMS_H_
-#define NETDEV2_TAP_PARAMS_H_
+#ifndef NETDEV2_TAP_PARAMS_H
+#define NETDEV2_TAP_PARAMS_H
 
 #include "netdev2_tap.h"
 
@@ -46,5 +46,5 @@ extern netdev2_tap_params_t netdev2_tap_params[NETDEV2_TAP_MAX];
 }
 #endif
 
-#endif /* NETDEV2_TAP_PARAMS_H_ */
+#endif /* NETDEV2_TAP_PARAMS_H */
 /** @} */

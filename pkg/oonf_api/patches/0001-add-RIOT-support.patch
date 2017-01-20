@@ -238,8 +238,8 @@ index 0000000..9bf6622
 + *
 + */
 +
-+#ifndef RFC5444_API_CONFIG_H_
-+#define RFC5444_API_CONFIG_H_
++#ifndef RFC5444_API_CONFIG_H
++#define RFC5444_API_CONFIG_H
 +
 +#define DISALLOW_CONSUMER_CONTEXT_DROP false
 +#define WRITER_STATE_MACHINE true

@@ -63,8 +63,8 @@ index 0000000..2d8bb4d
 --- /dev/null
 +++ tlsf-malloc.h
 @@ -0,0 +1,26 @@
-+#ifndef __TLSF_MALLOC_H
-+#define __TLSF_MALLOC_H
++#ifndef TLSF_MALLOC_H
++#define TLSF_MALLOC_H
 +
 +#include <stdbool.h>
 +#include <stddef.h>
