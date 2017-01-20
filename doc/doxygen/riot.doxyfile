@@ -841,6 +841,9 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */sys/random/tinymt32/* \
                          */cpu/stm32f2/include/stm32f2*.h \
                          */cpu/stm32f4/include/stm32f4*.h \
+                         */cpu/stellaris_common/include/stellaris_periph \
+                         */cpu/native/osx-libc-extra \
+                         */toolchain/* \
 
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
