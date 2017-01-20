@@ -15,8 +15,8 @@
  *
  * @author      Cenk Gündoğan <mail@cgundogan.de>
  */
-#ifndef TESTS_RPL_SRH_H_
-#define TESTS_RPL_SRH_H_
+#ifndef TESTS_RPL_SRH_H
+#define TESTS_RPL_SRH_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_rpl_srh(void);
 }
 #endif
 
-#endif /* TESTS_RPL_SRH_H_ */
+#endif /* TESTS_RPL_SRH_H */
 /** @} */

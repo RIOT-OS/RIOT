@@ -27,8 +27,8 @@
  * @todo        remove include irq.h once core was adjusted
  */
 
-#ifndef CPU_H_
-#define CPU_H_
+#ifndef CPU_H
+#define CPU_H
 
 #include <stdio.h>
 
@@ -125,5 +125,5 @@ static inline void cortexm_isr_end(void)
 }
 #endif
 
-#endif /* CPU_H_ */
+#endif /* CPU_H */
 /** @} */

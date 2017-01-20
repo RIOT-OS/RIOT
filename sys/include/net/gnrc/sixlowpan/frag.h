@@ -22,8 +22,8 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_H_
-#define GNRC_SIXLOWPAN_FRAG_H_
+#ifndef GNRC_SIXLOWPAN_FRAG_H
+#define GNRC_SIXLOWPAN_FRAG_H
 
 #include <inttypes.h>
 #include <stdbool.h>
@@ -72,5 +72,5 @@ void gnrc_sixlowpan_frag_handle_pkt(gnrc_pktsnip_t *pkt);
 }
 #endif
 
-#endif /* GNRC_SIXLOWPAN_FRAG_H_ */
+#endif /* GNRC_SIXLOWPAN_FRAG_H */
 /** @} */

@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NETDEV2_H_
-#define NETDEV2_H_
+#ifndef LWIP_NETDEV2_H
+#define LWIP_NETDEV2_H
 
 #include "net/ethernet.h"
 #include "net/netdev2.h"
@@ -58,5 +58,5 @@ err_t lwip_netdev2_init(struct netif *netif);
 }
 #endif
 
-#endif /* NETDEV2_H_ */
+#endif /* LWIP_NETDEV2_H */
 /** @} */

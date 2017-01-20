@@ -20,8 +20,8 @@
  *
  * @author  Cenk Gündoğan <mail@cgundogan.de>
  */
-#ifndef GNRC_RPL_P2P_H_
-#define GNRC_RPL_P2P_H_
+#ifndef GNRC_RPL_P2P_H
+#define GNRC_RPL_P2P_H
 
 #include "net/ipv6/addr.h"
 #include "net/gnrc.h"
@@ -176,5 +176,5 @@ void gnrc_rpl_p2p_update(void);
 }
 #endif
 
-#endif /* GNRC_RPL_P2P_H_ */
+#endif /* GNRC_RPL_P2P_H */
 /** @} */

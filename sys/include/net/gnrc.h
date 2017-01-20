@@ -280,8 +280,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef GNRC_NETBASE_H_
-#define GNRC_NETBASE_H_
+#ifndef GNRC_NETBASE_H
+#define GNRC_NETBASE_H
 
 #include "net/netopt.h"
 #include "net/gnrc/netdev.h"
@@ -303,5 +303,5 @@ extern "C" {
 }
 #endif
 
-#endif /* GNRC_NETBASE_H_ */
+#endif /* GNRC_NETBASE_H */
 /** @} */

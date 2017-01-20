@@ -162,8 +162,8 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
-#ifndef MSG_H_
-#define MSG_H_
+#ifndef MSG_H
+#define MSG_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -383,5 +383,5 @@ void msg_queue_print(void);
 }
 #endif
 
-#endif /* MSG_H_ */
+#endif /* MSG_H */
 /** @} */

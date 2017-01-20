@@ -22,8 +22,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef EMB6_CONN_UDP_H_
-#define EMB6_CONN_UDP_H_
+#ifndef EMB6_CONN_UDP_H
+#define EMB6_CONN_UDP_H
 
 #include <stdint.h>
 
@@ -58,5 +58,5 @@ struct conn_udp {
 }
 #endif
 
-#endif /* EMB6_CONN_UDP_H_ */
+#endif /* EMB6_CONN_UDP_H */
 /** @} */

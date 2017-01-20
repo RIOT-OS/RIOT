@@ -17,8 +17,8 @@
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
 
-#ifndef CRYPTO_MODES_CCM_H_
-#define CRYPTO_MODES_CCM_H_
+#ifndef CRYPTO_MODES_CCM_H
+#define CRYPTO_MODES_CCM_H
 
 #include "crypto/ciphers.h"
 
@@ -85,4 +85,4 @@ int cipher_decrypt_ccm(cipher_t* cipher, uint8_t* auth_data,
 }
 #endif
 
-#endif /* CRYPTO_MODES_CCM_H_ */
+#endif /* CRYPTO_MODES_CCM_H */

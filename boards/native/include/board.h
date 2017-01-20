@@ -21,8 +21,8 @@
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <stdint.h>
 
@@ -54,4 +54,4 @@ void _native_LED_RED_TOGGLE(void);
 #endif
 
 /** @} */
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */

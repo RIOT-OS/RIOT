@@ -27,8 +27,8 @@
  */
 
 
-#ifndef GNRC_ZEP_H_
-#define GNRC_ZEP_H_
+#ifndef GNRC_ZEP_H
+#define GNRC_ZEP_H
 
 #include <inttypes.h>
 
@@ -236,7 +236,7 @@ kernel_pid_t gnrc_zep_init(gnrc_zep_t *dev, uint16_t src_port, ipv6_addr_t *dst,
 }
 #endif
 
-#endif /* GNRC_ZEP_H_ */
+#endif /* GNRC_ZEP_H */
 /**
  * @}
  */

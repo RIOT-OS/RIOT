@@ -17,8 +17,8 @@
  * @author      Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
  */
 
-#ifndef BASE64_ENCODER_DECODER_H_
-#define BASE64_ENCODER_DECODER_H_
+#ifndef BASE64_ENCODER_DECODER_H
+#define BASE64_ENCODER_DECODER_H
 
 #include <stddef.h> /* for size_t */
 
@@ -79,4 +79,4 @@ int base64_decode(unsigned char *base64_in, size_t base64_in_size, \
 #endif
 
 /** @} */
-#endif /* BASE64_ENCODER_DECODER_H_ */
+#endif /* BASE64_ENCODER_DECODER_H */

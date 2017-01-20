@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef CC2420_NETDEV_H_
-#define CC2420_NETDEV_H_
+#ifndef CC2420_NETDEV_H
+#define CC2420_NETDEV_H
 
 #include "net/netdev2.h"
 
@@ -37,5 +37,5 @@ extern const netdev2_driver_t cc2420_driver;
 }
 #endif
 
-#endif /* CC2420_NETDEV_H_ */
+#endif /* CC2420_NETDEV_H */
 /** @} */

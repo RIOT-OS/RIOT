@@ -20,8 +20,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef XBEE_H_
-#define XBEE_H_
+#ifndef XBEE_H
+#define XBEE_H
 
 #include <stdint.h>
 
@@ -222,5 +222,5 @@ int xbee_parse_hdr(xbee_t *dev, const uint8_t *xhdr, xbee_l2hdr_t *l2hdr);
 }
 #endif
 
-#endif /* XBEE_H_ */
+#endif /* XBEE_H */
 /** @} */

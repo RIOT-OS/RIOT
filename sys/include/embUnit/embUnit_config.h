@@ -32,8 +32,8 @@
  *
  * $Id: config.h,v 1.7 2004/02/10 16:17:07 arms22 Exp $
  */
-#ifndef EMBUNIT_CONFIG_H_
-#define EMBUNIT_CONFIG_H_
+#ifndef EMBUNIT_CONFIG_H
+#define EMBUNIT_CONFIG_H
 
 #ifdef  __cplusplus
 extern "C" {
@@ -53,4 +53,4 @@ extern "C" {
 }
 #endif
 
-#endif/* EMBUNIT_CONFIG_H_ */
+#endif/* EMBUNIT_CONFIG_H */

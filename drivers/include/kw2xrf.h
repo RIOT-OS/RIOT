@@ -19,8 +19,8 @@
  * @author      Jonas Remmert <j.remmert@phytec.de>
  */
 
-#ifndef MKW2XDRF_H_
-#define MKW2XDRF_H_
+#ifndef MKW2XDRF_H
+#define MKW2XDRF_H
 
 #include <stdint.h>
 
@@ -159,5 +159,5 @@ extern const gnrc_netdev_driver_t kw2xrf_driver;
 }
 #endif
 
-#endif
+#endif /* MKW2XDRF_H */
 /** @} */

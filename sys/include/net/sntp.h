@@ -19,8 +19,8 @@
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
 
-#ifndef SNTP_H_
-#define SNTP_H_
+#ifndef SNTP_H
+#define SNTP_H
 
 #include <stdint.h>
 #include "net/sock/udp.h"
@@ -51,5 +51,5 @@ int64_t sntp_get_offset(void);
 }
 #endif
 
-#endif /* SNTP_H_ */
+#endif /* SNTP_H */
 /** @} */

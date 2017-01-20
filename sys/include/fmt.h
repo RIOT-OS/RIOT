@@ -19,8 +19,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef FMT_H_
-#define FMT_H_
+#ifndef FMT_H
+#define FMT_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -280,4 +280,4 @@ void print_str(const char* str);
 #endif
 
 /** @} */
-#endif /* FMT_H_ */
+#endif /* FMT_H */

@@ -20,8 +20,8 @@
  * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
  */
 
-#ifndef GNRC_RPL_DODAG_H_
-#define GNRC_RPL_DODAG_H_
+#ifndef GNRC_RPL_DODAG_H
+#define GNRC_RPL_DODAG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -173,7 +173,7 @@ void gnrc_rpl_router_operation(gnrc_rpl_dodag_t *dodag);
 }
 #endif
 
-#endif /* GNRC_RPL_DODAG_H_ */
+#endif /* GNRC_RPL_DODAG_H */
 /**
  * @}
  */

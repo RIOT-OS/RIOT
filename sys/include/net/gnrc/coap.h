@@ -132,8 +132,8 @@
  * @author      Ken Bannister <kb2ma@runbox.com>
  */
 
-#ifndef GCOAP_H_
-#define GCOAP_H_
+#ifndef GCOAP_H
+#define GCOAP_H
 
 #include "net/gnrc.h"
 #include "net/gnrc/ipv6.h"
@@ -384,5 +384,5 @@ void gcoap_op_state(uint8_t *open_reqs);
 }
 #endif
 
-#endif /* GCOAP_H_ */
+#endif /* GCOAP_H */
 /** @} */

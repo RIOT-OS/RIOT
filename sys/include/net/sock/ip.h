@@ -265,8 +265,8 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef NET_SOCK_IP_H_
-#define NET_SOCK_IP_H_
+#ifndef NET_SOCK_IP_H
+#define NET_SOCK_IP_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -454,5 +454,5 @@ ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
 }
 #endif
 
-#endif /* NET_SOCK_IP_H_ */
+#endif /* NET_SOCK_IP_H */
 /** @} */

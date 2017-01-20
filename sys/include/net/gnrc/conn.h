@@ -19,8 +19,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_CONN_H_
-#define GNRC_CONN_H_
+#ifndef GNRC_CONN_H
+#define GNRC_CONN_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -127,5 +127,5 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
 }
 #endif
 
-#endif /* GNRC_CONN_H_ */
+#endif /* GNRC_CONN_H */
 /** @} */

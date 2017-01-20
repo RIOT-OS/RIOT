@@ -18,8 +18,8 @@
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef CPU_CONF_H_
-#define CPU_CONF_H_
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #include "cpu_conf_common.h"
 
@@ -291,5 +291,5 @@ typedef enum llwu_wakeup_pin {
 }
 #endif
 
-#endif /* CPU_CONF_H_ */
+#endif /* CPU_CONF_H */
 /** @} */

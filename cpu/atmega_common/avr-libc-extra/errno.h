@@ -29,7 +29,7 @@
   POSSIBILITY OF SUCH DAMAGE. */
 
 
-#ifndef ERRNO_H_
+#ifndef ERRNO_H
 #define ERRNO_H_ 1
 
 /**
@@ -150,4 +150,4 @@ extern int errno;
 
 /** @} */
 
-#endif /* ERRNO_H_ */
+#endif /* ERRNO_H */

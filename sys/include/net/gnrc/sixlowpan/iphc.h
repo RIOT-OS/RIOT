@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_SIXLOWPAN_IPHC_H_
-#define GNRC_SIXLOWPAN_IPHC_H_
+#ifndef GNRC_SIXLOWPAN_IPHC_H
+#define GNRC_SIXLOWPAN_IPHC_H
 
 #include <stdbool.h>
 
@@ -64,5 +64,5 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt);
 }
 #endif
 
-#endif /* GNRC_SIXLOWPAN_IPHC_H_ */
+#endif /* GNRC_SIXLOWPAN_IPHC_H */
 /** @} */

@@ -69,8 +69,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NRFMIN_H_
-#define NRFMIN_H_
+#ifndef NRFMIN_H
+#define NRFMIN_H
 
 #include "net/netdev2.h"
 
@@ -233,5 +233,5 @@ void nrfmin_set_txpower(int16_t power);
 }
 #endif
 
-#endif /* NRFMIN_H_ */
+#endif /* NRFMIN_H */
 /** @} */

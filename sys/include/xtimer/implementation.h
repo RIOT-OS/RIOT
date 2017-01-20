@@ -16,8 +16,8 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-#ifndef XTIMER_IMPLEMENTATION_H_
-#define XTIMER_IMPLEMENTATION_H_
+#ifndef XTIMER_IMPLEMENTATION_H
+#define XTIMER_IMPLEMENTATION_H
 
 #ifndef XTIMER_H
 #error "Do not include this file directly! Use xtimer.h instead"
@@ -302,4 +302,4 @@ static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b)
 }
 #endif
 
-#endif
+#endif /* XTIMER_IMPLEMENTATION_H */

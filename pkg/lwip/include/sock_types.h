@@ -15,8 +15,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef SOCK_TYPES_H_
-#define SOCK_TYPES_H_
+#ifndef SOCK_TYPES_H
+#define SOCK_TYPES_H
 
 #include "net/af.h"
 #include "lwip/api.h"
@@ -37,5 +37,5 @@ struct sock_ip {
 }
 #endif
 
-#endif /* SOCK_TYPES_H_ */
+#endif /* SOCK_TYPES_H */
 /** @} */

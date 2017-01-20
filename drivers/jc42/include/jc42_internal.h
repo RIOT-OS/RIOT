@@ -16,8 +16,8 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef JC42_INTERNAL_H_
-#define JC42_INTERNAL_H_
+#ifndef JC42_INTERNAL_H
+#define JC42_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,4 +47,4 @@ extern "C" {
 /** @} */
 
 
-#endif /* JC42_INTERNAL_H_ */
+#endif /* JC42_INTERNAL_H */

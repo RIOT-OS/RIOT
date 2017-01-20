@@ -19,8 +19,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_SOCK_INTERNAL_H_
-#define GNRC_SOCK_INTERNAL_H_
+#ifndef GNRC_SOCK_INTERNAL_H
+#define GNRC_SOCK_INTERNAL_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -112,5 +112,5 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
 }
 #endif
 
-#endif /* GNRC_SOCK_INTERNAL_H_ */
+#endif /* GNRC_SOCK_INTERNAL_H */
 /** @} */

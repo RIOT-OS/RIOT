@@ -18,8 +18,8 @@
  * @}
  */
 
-#ifndef MPU_H_
-#define MPU_H_
+#ifndef MPU_H
+#define MPU_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -160,4 +160,4 @@ int mpu_configure(uint_fast8_t region, uintptr_t base, uint_fast32_t attr);
 }
 #endif
 
-#endif /* MPU_H_ */
+#endif /* MPU_H */

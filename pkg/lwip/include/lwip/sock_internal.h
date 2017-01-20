@@ -18,8 +18,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef SOCK_INTERNAL_H_
-#define SOCK_INTERNAL_H_
+#ifndef SOCK_INTERNAL_H
+#define SOCK_INTERNAL_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -55,5 +55,5 @@ ssize_t lwip_sock_send(struct netconn **conn, const void *data, size_t len,
 }
 #endif
 
-#endif /* SOCK_INTERNAL_H_ */
+#endif /* SOCK_INTERNAL_H */
 /** @} */

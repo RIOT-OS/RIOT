@@ -18,8 +18,8 @@
  * @author      Andreas "Paul" Pauli <andreas.pauli@haw-hamburg.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -130,5 +130,5 @@ static const pwm_chan_conf_t pwm_chan[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

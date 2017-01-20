@@ -28,31 +28,59 @@
  *
  */
 /**
- * \addtogroup cpu
+ * @addtogroup cpu
  * @{
  *
- * \addtogroup nrf52832
+ * @addtogroup nrf52832
  * @{
  *
- * \addtogroup nrf52832-ble Bluetooth Low Energy drivers
+ * @addtogroup nrf52832-ble Bluetooth Low Energy drivers
  * @{
  *
- * \file
- *         Basic BLE functions.
- * \author
- *         Wojciech Bober <wojciech.bober@nordicsemi.no>
+ * @file
+ *
+ * @brief   Basic BLE functions.
+ *
+ * @author  Wojciech Bober <wojciech.bober@nordicsemi.no>
  */
-#ifndef DEV_BLE_H_
-#define DEV_BLE_H_
+#ifndef DEV_BLE_H
+#define DEV_BLE_H
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief Initialize and enable the BLE stack.
+ */
 void ble_stack_init(void);
+
+/**
+ * @brief Initialize BLE advertising data.
+ *
+ * @param name Human readable device name that will be advertised
+ */
 void ble_advertising_init(const char *name);
+
+/**
+ * @brief Start BLE advertising.
+ */
 void ble_advertising_start(void);
+
+/**
+ * @brief Return device EUI64 MAC address
+ *
+ * @param addr pointer to a buffer to store the address
+ */
 void ble_get_mac(uint8_t addr[8]);
 
-#endif /* DEV_BLE_H_ */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* DEV_BLE_H */
 
 /**
  * @}

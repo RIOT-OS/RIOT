@@ -18,8 +18,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef NETIF_HDR_H_
-#define NETIF_HDR_H_
+#ifndef NETIF_HDR_H
+#define NETIF_HDR_H
 
 #include <string.h>
 #include <stdint.h>
@@ -234,5 +234,5 @@ int gnrc_netif_hdr_get_srcaddr(gnrc_pktsnip_t* pkt, uint8_t** pointer_to_addr);
 }
 #endif
 
-#endif /* NETIF_HDR_H_ */
+#endif /* NETIF_HDR_H */
 /** @} */

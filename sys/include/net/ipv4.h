@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef IPV4_H_
-#define IPV4_H_
+#ifndef IPV4_H
+#define IPV4_H
 
 #include "net/ipv4/addr.h"
 
@@ -31,5 +31,5 @@ extern "C" {
 }
 #endif
 
-#endif /* IPV4_H_ */
+#endif /* IPV4_H */
 /** @} */

@@ -15,8 +15,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef COMMON_H_
-#define COMMON_H_
+#ifndef COMMON_H
+#define COMMON_H
 
 #include <stdint.h>
 
@@ -49,5 +49,5 @@ void print_addr(uint8_t *addr, size_t addr_len);
 }
 #endif
 
-#endif /* COMMON_H_ */
+#endif /* COMMON_H */
 /** @} */

@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef UNITTESTS_CONSTANTS_H_
-#define UNITTESTS_CONSTANTS_H_
+#ifndef UNITTESTS_CONSTANTS_H
+#define UNITTESTS_CONSTANTS_H
 #include "embUnit/embUnit.h"
 
 #ifdef __cplusplus
@@ -65,5 +65,5 @@ extern "C" {
 }
 #endif
 
-#endif /* UNITTESTS_CONSTANTS_H_ */
+#endif /* UNITTESTS_CONSTANTS_H */
 /** @} */

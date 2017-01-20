@@ -18,8 +18,8 @@
  * @author      Leon M. George <leon@georgemail.eu>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "periph/gpio.h"
 
@@ -67,5 +67,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

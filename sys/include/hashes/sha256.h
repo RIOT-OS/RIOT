@@ -41,8 +41,8 @@
  * @author      Rene Kijewski
  */
 
-#ifndef _SHA256_H_
-#define _SHA256_H_
+#ifndef _SHA256_H
+#define _SHA256_H
 
 #include <inttypes.h>
 
@@ -203,4 +203,4 @@ int sha256_chain_verify_element(void *element,
 #endif
 
 /** @} */
-#endif /* _SHA256_H_ */
+#endif /* _SHA256_H */

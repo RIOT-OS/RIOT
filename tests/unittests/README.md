@@ -149,8 +149,8 @@ The test header ``tests-<modulename>/tests-<module>.h`` of a module you add to `
  *
  * @author      <author>
  */
-#ifndef TESTS_<MODULE>_H_
-#define TESTS_<MODULE>_H_
+#ifndef TESTS_<MODULE>_H
+#define TESTS_<MODULE>_H
 #include "embUnit/embUnit.h"
 
 #ifdef __cplusplus
@@ -177,7 +177,7 @@ Test *tests_<module>_<header2>_tests(void);
 }
 #endif
 
-#endif /* TESTS_<MODULE>_H_ */
+#endif /* TESTS_<MODULE>_H */
 /** @} */
 ```
 

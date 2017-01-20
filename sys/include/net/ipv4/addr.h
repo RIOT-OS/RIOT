@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef IPV4_ADDR_H_
-#define IPV4_ADDR_H_
+#ifndef IPV4_ADDR_H
+#define IPV4_ADDR_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -87,5 +87,5 @@ ipv4_addr_t *ipv4_addr_from_str(ipv4_addr_t *result, const char *addr);
 }
 #endif
 
-#endif /* IPV4_ADDR_H_ */
+#endif /* IPV4_ADDR_H */
 /** @} */

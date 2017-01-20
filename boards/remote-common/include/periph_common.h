@@ -18,8 +18,8 @@
  *              Antonio Lignan <alinan@zolertia.com>
  */
 
-#ifndef PERIPH_COMMON_H_
-#define PERIPH_COMMON_H_
+#ifndef PERIPH_COMMON_H
+#define PERIPH_COMMON_H
 
 #include "cc2538_gpio.h"
 #include "periph_cpu.h"
@@ -78,5 +78,5 @@ static const timer_conf_t timer_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_COMMON_H_ */
+#endif /* PERIPH_COMMON_H */
 /** @} */

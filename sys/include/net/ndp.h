@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NDP_H_
-#define NDP_H_
+#ifndef NDP_H
+#define NDP_H
 
 #include <stdint.h>
 
@@ -291,5 +291,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
-#endif /* NDP_H_ */
+#endif /* NDP_H */
 /** @} */

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CC2538_IOC_H_
-#define CC2538_IOC_H_
+#ifndef CC2538_IOC_H
+#define CC2538_IOC_H
 
 #include <stdint.h>
 
@@ -82,5 +82,5 @@ enum {
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_IOC_H_ */
+#endif /* CC2538_IOC_H */
 /** @} */

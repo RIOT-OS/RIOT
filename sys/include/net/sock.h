@@ -98,8 +98,8 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef NET_SOCK_H_
-#define NET_SOCK_H_
+#ifndef NET_SOCK_H
+#define NET_SOCK_H
 
 #include <stdint.h>
 
@@ -231,5 +231,5 @@ struct _sock_tl_ep {
 }
 #endif
 
-#endif /* NET_SOCK_H_ */
+#endif /* NET_SOCK_H */
 /** @} */

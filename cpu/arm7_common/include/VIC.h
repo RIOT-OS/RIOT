@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef VIC_H_
-#define VIC_H_
+#ifndef VIC_H
+#define VIC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -89,4 +89,4 @@ bool cpu_install_irq(int IntNumber, void *HandlerAddr, int Priority);
 #endif
 
 /** @} */
-#endif /* VIC_H_*/
+#endif /* VIC_H */

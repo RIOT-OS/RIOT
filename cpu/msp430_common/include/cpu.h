@@ -7,8 +7,8 @@
  * directory for more details.
  */
 
-#ifndef CPU_H_
-#define CPU_H_
+#ifndef CPU_H
+#define CPU_H
 
 /**
  * @defgroup    cpu_msp430_common TI MSP430
@@ -164,4 +164,4 @@ static inline void cpu_print_last_instruction(void)
 #endif
 
 /** @} */
-#endif /* CPU_H_ */
+#endif /* CPU_H */
