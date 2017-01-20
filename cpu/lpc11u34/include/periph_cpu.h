@@ -21,7 +21,7 @@
 #define PERIPH_CPU_H
 
 #include <stdint.h>
-#include "periph/dev_enums.h"
+#include "cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,6 +62,11 @@ typedef uint16_t gpio_t;
 #define GPIO_PIN(port, pin)     (gpio_t)((port << 16) | pin)
 
 /**
+ * @brief   Number of PWM channels per PWM peripheral
+ */
+#define PWM_CHAN_NUMOF      (3U)
+
+/**
  * @brief   Override the default GPIO mode values
  * @{
  */
@@ -98,6 +103,21 @@ typedef enum {
 } adc_res_t;
 /** @} */
 #endif /* ndef DOXYGEN */
+
+/**
+ * @brief   PWM channel configuration
+ */
+
+
+/**
+ * @brief   PWM configuration
+ */
+typedef struct {
+    LPC_CTxxBx_Type *dev;
+    __IO uint32_t *pins[PWM_CHAN_NUMOF];     /**< set to NULL if channel is not used */
+    uint16_t clk_bit;
+    uint8_t af;
+} pwm_conf_t;
 
 #ifdef __cplusplus
 }
