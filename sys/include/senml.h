@@ -7,7 +7,6 @@
  * directory for more details.
  */
 
-
 /**
  * @ingroup     senml
  * @{
@@ -27,23 +26,18 @@
  * @author      Lennart Dührsen <lennart.duehrsen@fu-berlin.de>
  */
 
-
 #ifndef SENML_H
 #define SENML_H
-
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif  /* __cplusplus */
 
-
 #define SENML_SUPPORTED_VERSION (5)   /**< The highest SenML version this implementation supports */
-
 
 #define SJ_VERSION       "bver" /**< Key for the version attribute in JSON documents       */
 #define SJ_BASE_NAME     "bn"   /**< Key for the base name attribute in JSON documents     */
@@ -62,7 +56,6 @@ extern "C" {
 #define SJ_DATA_VALUE    "vd"   /**< Key for the data value attribute in JSON documents    */
 #define SJ_LINK          "l"    /**< Key for the link attribute in JSON documents          */
 
-
 #define SC_VERSION       (-1)   /**< Key for the version attribute in CBOR documents       */
 #define SC_BASE_NAME     (-2)   /**< Key for the base name attribute in CBOR documents     */
 #define SC_BASE_TIME     (-3)   /**< Key for the base time attribute in CBOR documents     */
@@ -80,7 +73,6 @@ extern "C" {
 #define SC_DATA_VALUE    (8)    /**< Key for the data value attribute in CBOR documents    */
 #define SC_LINK          (9)    /**< Key for the link attribute in CBOR documents          */
 
-
 /**
  * @brief The different data types SenML supports
  */
@@ -91,7 +83,6 @@ typedef enum {
     SENML_TYPE_BOOL   = 3,  /**< Indicates a boolean value                 */
     SENML_TYPE_BINARY = 4   /**< Indicates a binary (data) value           */
 } senml_value_type_t;
-
 
 /**
  * @brief struct that contains base information which applies to all subsequent entries 
@@ -104,7 +95,6 @@ typedef struct {
     double              base_value;      /**< If not zero, add this to (float) value in each record */
     double              base_sum;        /**< If not zero, add this to sum in each record           */
 } senml_base_info_t;
-
 
 /**
  * @brief struct that contains the values of a SenML record
@@ -125,7 +115,6 @@ typedef struct {
     } value;
 } senml_record_t;
 
-
 /**
  * @brief struct that holds a SenML pack (optional base info and 1..n records)
  */
@@ -134,7 +123,6 @@ typedef struct {
     senml_record_t     *records;    /**< Pointer to the beginning of an array of records */
     size_t              num;        /**< Number of records in the array                  */
 } senml_pack_t;
-
 
 /**
  * @brief Decodes a SenML document in JSON format
@@ -149,7 +137,6 @@ typedef struct {
  */
 int senml_decode_json_s(char *input, senml_pack_t *pack);
 
-
 /**
  * @brief Creates a SenML document in JSON format from a SenML pack
  *
@@ -160,7 +147,6 @@ int senml_decode_json_s(char *input, senml_pack_t *pack);
  * @return 0 on success, or -1 when @p output is not big enough
  */
 int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len);
-
 
 #ifdef __cplusplus
 }

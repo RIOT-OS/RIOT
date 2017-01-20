@@ -11,7 +11,6 @@
 #define ENABLE_DEBUG  (0)
 #include "debug.h"
 
-
 int senml_decode_json_s(char *input, senml_pack_t *pack)
 {
     jsmn_parser parser;
@@ -157,7 +156,6 @@ int senml_decode_json_s(char *input, senml_pack_t *pack)
 
     return 0;
 }
-
 
 int senml_encode_json_s(const senml_pack_t *pack, char *output, size_t len)
 {
