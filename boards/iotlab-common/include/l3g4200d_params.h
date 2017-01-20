@@ -32,12 +32,14 @@ extern "C" {
 static const  l3g4200d_params_t l3g4200d_params[] =
 {
     {
-        .i2c = L3G4200D_I2C,
-        .addr = L3G4200D_ADDR,
-        .int1_pin = L3G4200D_INT,
-        .int2_pin = L3G4200D_DRDY,
+        .dev = {
+            .i2c = L3G4200D_I2C,
+            .addr = L3G4200D_ADDR,
+            .int1 = L3G4200D_INT,
+            .int2 = L3G4200D_DRDY,
+            .scale = L3G4200D_SCALE_500DPS,
+        },
         .mode = L3G4200D_MODE_200_25,
-        .scale = L3G4200D_SCALE_500DPS,
     },
 };
 

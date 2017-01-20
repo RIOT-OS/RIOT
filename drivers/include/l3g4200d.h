@@ -90,31 +90,20 @@ typedef struct {
  * @brief Data structure holding the device parameters needed for initialization
  */
 typedef struct {
-    i2c_t i2c;              /**< I2C bus the device is connected to */
-    uint8_t addr;           /**< the address on that bus */
-    gpio_t int1_pin;        /**< GPIO pin connected to the INT1 line */
-    gpio_t int2_pin;        /**< GPIO pin connected to the INT2 line */
+    l3g4200d_t dev;         /**< the corresponding device descriptor */
     l3g4200d_mode_t mode;   /**< sampling mode to use */
-    l3g4200d_scale_t scale; /**< scaling to use */
 } l3g4200d_params_t;
 
 /**
  * @brief Initialize a gyro
  *
  * @param[out] dev          device descriptor of sensor to initialize
- * @param[in]  i2c          I2C bus the gyro is connected to
- * @param[in]  address      gyro's I2C slave address
- * @param[in]  int1_pin     INT pin the gyro is connected to
- * @param[in]  int2_pin     DRDY pin the gyro is connected to
- * @param[in]  mode         bandwidth and sampling rate settings
- * @param[in]  scale        scaling of results
+ * @param[in]  params       configuration parameters
  *
  * @return                  0 on success
  * @return                  -1 on error
  */
-int l3g4200d_init(l3g4200d_t *dev, i2c_t i2c, uint8_t address,
-                  gpio_t int1_pin, gpio_t int2_pin,
-                  l3g4200d_mode_t mode, l3g4200d_scale_t scale);
+int l3g4200d_init(l3g4200d_t *dev, const l3g4200d_params_t *params);
 
 /**
  * @brief Read angular speed value in degree per second from gyro

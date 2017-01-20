@@ -55,8 +55,7 @@ void auto_init_l3g4200d(void)
         const l3g4200d_params_t *p = &l3g4200d_params[i];
 
         DEBUG("[auto_init_saul] initializing l3g4200d gyroscope\n");
-        int res = l3g4200d_init(&l3g4200d_devs[i], p->i2c, p->addr,
-                                p->int1_pin, p->int2_pin, p->mode, p->scale);
+        int res = l3g4200d_init(&l3g4200d_devs[i], p);
         if (res < 0) {
             DEBUG("[auto_init_saul] error during initialization\n");
         }
