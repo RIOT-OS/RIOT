@@ -90,6 +90,7 @@ void _exit(int n)
     while(1);
 }
 
+#ifndef DISABLE_HEAP_ALLOC
 /**
  * @brief Allocate memory from the heap.
  *
@@ -115,6 +116,7 @@ void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
     irq_restore(state);
     return res;
 }
+#endif
 
 /**
  * @brief Get the process-ID of the current thread

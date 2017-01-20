@@ -40,6 +40,9 @@ endif
 
 ifeq (1,$(MSP430_USE_NEWLIB))
 
+# Temporarily disabled memory allocation from heap
+export CFLAGS += -DDISABLE_HEAP_ALLOC
+
 # use newlib as libc
 export USEMODULE += newlib
 
