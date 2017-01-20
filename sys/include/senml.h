@@ -86,7 +86,7 @@ typedef enum {
 } senml_value_type_t;
 
 /**
- * @brief struct that contains base information which applies to all subsequent entries 
+ * @brief struct that contains base information which applies to all subsequent entries
  */
 typedef struct {
     uint8_t             version;         /**< SenML version of this pack                            */
