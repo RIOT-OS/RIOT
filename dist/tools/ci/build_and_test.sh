@@ -86,6 +86,7 @@ then
         run ./dist/tools/licenses/check.sh ${CI_BASE_BRANCH} --diff-filter=AC
         run ./dist/tools/doccheck/check.sh ${CI_BASE_BRANCH}
         run ./dist/tools/externc/check.sh ${CI_BASE_BRANCH}
+        run ./dist/tools/headerguards/check.sh
 
         # TODO:
         #   Remove all but `${CI_BASE_BRANCH}` parameters to cppcheck (and remove second
