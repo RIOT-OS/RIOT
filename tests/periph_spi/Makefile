@@ -1,4 +1,4 @@
-export APPLICATION = periph_spi
+APPLICATION = periph_spi
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_spi

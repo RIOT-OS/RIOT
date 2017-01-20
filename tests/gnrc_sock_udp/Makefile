@@ -1,4 +1,5 @@
 APPLICATION = gnrc_sock_udp
+include ../Makefile.tests_common
 
 BOARD ?= native
 

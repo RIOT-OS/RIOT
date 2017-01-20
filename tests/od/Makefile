@@ -1,5 +1,6 @@
 # name of your application
 APPLICATION = od
+include ../Makefile.tests_common
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native

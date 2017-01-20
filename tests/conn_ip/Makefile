@@ -1,4 +1,5 @@
 APPLICATION = conn_ip
+include ../Makefile.tests_common
 
 BOARD ?= native
 

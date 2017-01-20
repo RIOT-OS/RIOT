@@ -1,4 +1,4 @@
-export APPLICATION = periph_rtt
+APPLICATION = periph_rtt
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_rtt

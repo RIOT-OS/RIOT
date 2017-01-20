@@ -1,6 +1,7 @@
 APPLICATION = lwip
-
+# overwrite board, do not set native as default
 BOARD ?= iotlab-m3
+include ../Makefile.tests_common
 
 RIOTBASE ?= $(CURDIR)/../..
 
