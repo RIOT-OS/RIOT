@@ -4,6 +4,12 @@ APPLICATION = senml-json-example
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
+# the remote-* boards are blacklisted because RAM is insufficient for the unittests;
+# all other boards are in this list because atof, atoi, etc. are not supported
+BOARD_BLACKLIST := remote-pa remote-reva remote-revb chronos \
+		   msb-430 msb-430h seeeduino_arch-pro telosb \
+		   wsn430-v1_3b wsn430-v1_4 z1
+
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
