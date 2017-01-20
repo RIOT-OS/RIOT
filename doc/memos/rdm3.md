@@ -1,11 +1,9 @@
-- RIOT Maintainers Community
+Network API guide
+=========
+
 - Developer Memo: 3
 - Author(s): Martine Lenders
 - Date: January 2017
-
----
-
-# Network API guide
 
 ## Abstract
 This memo describes and justifies the usage and existence of RIOT's various
