@@ -36,7 +36,11 @@
 typedef struct {
     mutex_t *mutex;
     thread_t *thread;
-    int timeout;
+    enum {
+       NO_TIMEOUT,
+       TIMEDOUT_MUTEX_LOCKED,
+       TIMEDOUT_OTHER,
+    } timeout;
 } mutex_thread_t;
 
 static void _callback_unlock_mutex(void* arg)
@@ -232,28 +236,50 @@ static void _mutex_timeout(void *arg)
 {
     mutex_thread_t *mt = (mutex_thread_t *)arg;
 
-    mt->timeout = 1;
-    list_node_t *node = list_remove(&mt->mutex->queue,
-                                    (list_node_t *)&mt->thread->rq_entry);
-    if ((node != NULL) && (mt->mutex->queue.next == NULL)) {
-        mt->mutex->queue.next = MUTEX_LOCKED;
+    if (mt->mutex->queue.next != MUTEX_LOCKED) {
+        list_node_t *node = list_remove(&mt->mutex->queue,
+                                        (list_node_t *)&mt->thread->rq_entry);
+        if ((node != NULL) && (mt->mutex->queue.next == NULL)) {
+            mt->mutex->queue.next = MUTEX_LOCKED;
+        }
     }
-    sched_set_status(mt->thread, STATUS_PENDING);
-    thread_yield_higher();
+
+    /* In case the mutex is unlocked successfully but there are other processes
+     * with higher priority running the timeout can occur while the mutex is
+     * successfully owned. */
+    if (mt->thread->status == STATUS_MUTEX_BLOCKED) {
+        mt->timeout = TIMEDOUT_MUTEX_LOCKED;
+        sched_set_status(mt->thread, STATUS_PENDING);
+        sched_context_switch_request = 1;
+    }
+    else {
+        mt->timeout = TIMEDOUT_OTHER;
+    }
 }
 
 int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
 {
     xtimer_t t;
-    mutex_thread_t mt = { mutex, (thread_t *)sched_active_thread, 0 };
+    mutex_thread_t mt = { mutex, (thread_t *)sched_active_thread, NO_TIMEOUT };
+    int locked = mutex_trylock(mutex);
 
-    if (timeout != 0) {
-        t.callback = _mutex_timeout;
-        t.arg = (void *)((mutex_thread_t *)&mt);
-        _xtimer_set64(&t, timeout, timeout >> 32);
+    if (locked) {
+        return 0;
     }
 
-    mutex_lock(mutex);
+    t.callback = _mutex_timeout;
+    t.arg = (void *)((mutex_thread_t *)&mt);
+    _xtimer_set64(&t, timeout, timeout >> 32);
+
+    /* a timeout lower than XTIMER_BACKOFF causes the xtimer to spin rather
+     * than to set a timer for interrupt. Hence, we shall make the mutex_lock
+     * call blocking only when the interrupt didn't occur yet. */
+    locked = _mutex_lock(mutex, (mt.timeout == NO_TIMEOUT));
     xtimer_remove(&t);
-    return -mt.timeout;
+
+    if (mt.timeout == TIMEDOUT_MUTEX_LOCKED) {
+        return -1;
+    }
+
+    return (locked - 1);
 }

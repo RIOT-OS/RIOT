@@ -427,17 +427,22 @@ static inline bool xtimer_less(xtimer_ticks32_t a, xtimer_ticks32_t b);
 static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b);
 
 /**
- * @brief lock a mutex but with timeout
+ * @brief try to lock a mutex but with timeout
  *
- * @note this requires core_thread_flags to be enabled
+ * This will try to lock a mutex. If the mutex is not available immediately or
+ * until a certain amount of time (@p timeout) the method will return -1
+ * indicating that the locking was not possible within this time.
  *
- * @param[in]    mutex  mutex to lock
- * @param[in]    us     timeout in microseconds relative
+ * @note if the timeout is lower than XTIMER_BACKOFF and the mutex is not
+ * immediately available, this method blocks for the given amount of time
  *
- * @return       0, when returned after mutex was locked
- * @return       -1, when the timeout occcured
+ * @param[in]    mutex    mutex to lock
+ * @param[in]    timeout  timeout in microseconds
+ *
+ * @return       0, mutex was successfully locked
+ * @return       -1, mutex couldn't be locked within the time given
  */
-int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
+int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout);
 
 /**
  * @brief xtimer backoff value
