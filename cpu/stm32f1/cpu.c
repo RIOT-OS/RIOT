@@ -27,6 +27,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph/init.h"
 
 /* Configuration of flash access cycles */
 #if CLOCK_CORECLOCK <= 24000000
@@ -103,6 +104,8 @@ void cpu_init(void)
     cortexm_init();
     /* initialize system clocks */
     clk_init();
+    /* trigger static peripheral initialization */
+    periph_init();
 }
 
 /**

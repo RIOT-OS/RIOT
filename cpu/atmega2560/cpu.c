@@ -18,12 +18,13 @@
  */
 
 #include "cpu.h"
+#include "periph/init.h"
 
 /**
  * @brief Initialize the CPU, set IRQ priorities
  */
 void cpu_init(void)
 {
-    /* Right now we need to do nothing here */
-    ;
+    /* trigger static peripheral initialization */
+    periph_init();
 }

@@ -20,6 +20,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph/init.h"
 
 /**
  * @brief   Configure clock sources and the cpu frequency

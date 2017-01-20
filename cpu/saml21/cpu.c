@@ -19,6 +19,7 @@
  */
 
 #include "cpu.h"
+#include "periph/init.h"
 
 static void _gclk_setup(int gclk, uint32_t reg)
 {
@@ -77,4 +78,7 @@ void cpu_init(void)
      */
     SUPC->BOD33.bit.ENABLE=0;
 #endif
+
+    /* trigger static peripheral initialization */
+    periph_init();
 }
