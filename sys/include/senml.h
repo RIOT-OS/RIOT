@@ -8,7 +8,8 @@
  */
 
 /**
- * @ingroup     senml
+ * @defgroup sys_senml SenML
+ * @ingroup  sys
  * @{
  *
  * @file
