@@ -21,12 +21,10 @@
 
 #ifdef MODULE_LSM303DLHC
 
+#include "log.h"
 #include "saul_reg.h"
 #include "lsm303dlhc.h"
 #include "lsm303dlhc_params.h"
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 
 /**
  * @brief   Define the number of configured sensors
@@ -56,13 +54,14 @@ void auto_init_lsm303dlhc(void)
     for (unsigned int i = 0; i < LSM303DLHC_NUM; i++) {
         const lsm303dlhc_params_t *p = &lsm303dlhc_params[i];
 
-        DEBUG("[auto_init_saul] initializing lsm303dlhc acc/mag sensor\n");
+        LOG_DEBUG("[auto_init_saul] initializing lsm303dlhc #%u\n", i);
+
         int res = lsm303dlhc_init(&lsm303dlhc_devs[i], p->i2c,
                                   p->acc_pin, p->mag_pin,
                                   p->acc_addr, p->acc_rate, p->acc_scale,
                                   p->mag_addr, p->mag_rate, p->mag_gain);
         if (res < 0) {
-            DEBUG("[auto_init_saul] error during initialization\n");
+            LOG_ERROR("[auto_init_saul] error initializing lsm303dlhc #%u\n", i);
         }
         else {
             saul_entries[(i * 2)].dev = &(lsm303dlhc_devs[i]);

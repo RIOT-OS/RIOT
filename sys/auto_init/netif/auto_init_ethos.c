@@ -19,13 +19,12 @@
 
 #ifdef MODULE_ETHOS
 
+#include "log.h"
+#include "debug.h"
 #include "ethos.h"
 #include "periph/uart.h"
 #include "net/gnrc/netdev2.h"
 #include "net/gnrc/netdev2/eth.h"
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 
 /**
  * @brief global ethos object, used by uart_stdio
@@ -51,7 +50,7 @@ static uint8_t _inbuf[2048];
 
 void auto_init_ethos(void)
 {
-    DEBUG("auto_init_ethos(): initializing device...\n");
+    LOG_DEBUG("[auto_init_netif] initializing ethos #0\n");
 
     /* setup netdev2 device */
     ethos_params_t p;

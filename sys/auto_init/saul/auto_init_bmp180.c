@@ -51,10 +51,12 @@ extern const saul_driver_t bmp180_pressure_saul_driver;
 void auto_init_bmp180(void)
 {
     for (unsigned i = 0; i < BMP180_NUMOF; i++) {
+        LOG_DEBUG("[auto_init_saul] initializing bmp180 #%u\n", i);
+
         if (bmp180_init(&bmp180_devs[i],
                         bmp180_params[i].i2c_dev,
                         bmp180_params[i].mode) < 0) {
-            LOG_ERROR("Unable to initialize BMP180 sensor #%i\n", i);
+            LOG_ERROR("[auto_init_saul] error initializing bmp180 #%u\n", i);
             return;
         }
 

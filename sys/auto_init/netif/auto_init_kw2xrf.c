@@ -21,6 +21,7 @@
 
 #ifdef MODULE_KW2XRF
 
+#include "log.h"
 #include "board.h"
 #include "net/gnrc/netdev2.h"
 #include "net/gnrc/nomac.h"
@@ -28,9 +29,6 @@
 
 #include "kw2xrf.h"
 #include "kw2xrf_params.h"
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
@@ -48,10 +46,11 @@ static char _nomac_stacks[KW2XRF_NUM][KW2XRF_MAC_STACKSIZE];
 
 void auto_init_kw2xrf(void)
 {
-    for (int i = 0; i < KW2XRF_NUM; i++) {
+    for (unsigned i = 0; i < KW2XRF_NUM; i++) {
         const kw2xrf_params_t *p = &kw2xrf_params[i];
 
-        DEBUG("Initializing KW2xrf radio at SPI_%i\n", p->spi);
+        LOG_DEBUG("[auto_init_netif] initializing kw2xrf #%u\n", i);
+
         int res = kw2xrf_init(&kw2xrf_devs[i],
                 p->spi,
                 p->spi_speed,
@@ -59,7 +58,7 @@ void auto_init_kw2xrf(void)
                 p->int_pin);
 
         if (res < 0) {
-            DEBUG("Error initializing KW2xrf radio device!\n");
+            LOG_ERROR("[auto_init_netif] initializing kw2xrf #%u\n", i);
         }
         else {
             gnrc_nomac_init(_nomac_stacks[i],
