@@ -3,9 +3,9 @@
 - Author(s): Martine Lenders
 - Date: January 2017
 
-***
+---
 
-# Network programming guide
+# Network API guide
 
 ## Abstract
 This memo describes and justifies the usage and existence of RIOT's various
@@ -24,14 +24,15 @@ This memo uses the following terminology and acronyms:
 - network stack: the architecture to implement networking
 - GNRC: RIOT's default network stack
 - netapi: GNRC's inter-modular communication API
+- netdev: RIOT's API to a network device on the MAC layer
 - IPC: Inter-process communication
 - sock: RIOT's primary API for network applications
 - POSIX: IEEE-standardized interface for operating systems compatibility
 - socket: POSIX' primary API for network applications
 
 ## 1. Introduction
-At the moment of writing this document there are three APIs of note to have a
-node communicate over the network. From lowest level to highest these are:
+There are three APIs of note to have a node communicate over the network.
+From lowest level to highest these are:
 
 - GNRC's netapi
 - sock APIs
@@ -42,18 +43,18 @@ Additionally to communicate with a network device driver directly there is
 is not covered in detail by this document.
 
 Choosing the right API and understanding why the others exist is crucial to
-implement a memory efficient application or networking module in RIOT. As such
-gives this document a recommendation on which API to use based on their
+implement a memory-efficient application or networking module in RIOT. As such
+this document gives a recommendation on which API to use based on their
 respective design objectives.
 
 ## 2. GNRC's netapi
-On the lowest level RIOT uses `netapi`. It uses RIOT's IPC to communicate
-packet-wise with the network stack's individual modules. Among other things it
-provides a send and a receive operation. Send is supposed to hand packets down
-the network stack, receive is supposed to hand them up. Both require all headers
-required by the addressed module to be present, however, their order is
-different for both sending and receiving due to [GNRC's internal
-structure](http://doc.riot-os.org/group__net__gnrc__pkt.html).
+On the lowest level RIOT uses `netapi` to communicate with the GNRC stack. It
+uses RIOT's IPC to communicate packet-wise with the network stack's individual
+modules. Among other things it provides a send and a receive operation. Send is
+supposed to hand packets down the network stack, receive is supposed to hand
+them up. Both require all headers required by the receiving module to be
+present, however, their order is different for both sending and receiving due to
+[GNRC's internal structure](http://doc.riot-os.org/group__net__gnrc__pkt.html).
 
 ## 3. sock APIs
 Though POSIX sockets are a very well-known API to communicate with the network
