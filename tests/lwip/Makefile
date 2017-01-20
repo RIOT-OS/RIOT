@@ -44,8 +44,6 @@ endif
 
 USEMODULE += $(DRIVER)
 
-QUIET ?= 1
-
 include $(RIOTBASE)/Makefile.include
 
 test:

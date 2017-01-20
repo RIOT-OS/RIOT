@@ -2,9 +2,6 @@
 APPLICATION = cpp11_thread
 include ../Makefile.tests_common
 
-# If no BOARD is found in the environment, use this default:
-BOARD ?= native
-
 # ROM is overflowing for these boards when using
 # gcc-arm-none-eabi-4.9.3.2015q2-1trusty1 from ppa:terry.guo/gcc-arm-embedded
 # (Travis is using this PPA currently, 2015-06-23)
@@ -20,9 +17,6 @@ RIOTBASE ?= $(CURDIR)/../..
 # which is not needed in a production environment but helps in the
 # development process:
 CFLAGS += -DDEVELHELP
-
-# Change this to 0 show compiler invocation lines by default:
-QUIET ?= 1
 
 # If you want to add some extra flags when compile c++ files, add these flags
 # to CXXEXFLAGS variable

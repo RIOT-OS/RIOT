@@ -1,8 +1,6 @@
 APPLICATION = conn_ip
 include ../Makefile.tests_common
 
-BOARD ?= native
-
 RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo-f334 stm32f0discovery telosb \
@@ -18,8 +16,6 @@ USEMODULE += od
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-
-QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
 

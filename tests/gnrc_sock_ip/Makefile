@@ -1,8 +1,6 @@
 APPLICATION = gnrc_sock_ip
 include ../Makefile.tests_common
 
-BOARD ?= native
-
 RIOTBASE ?= $(CURDIR)/../..
 
 USEMODULE += gnrc_sock_ip
@@ -12,8 +10,6 @@ USEMODULE += ps
 CFLAGS += -DDEVELHELP
 CFLAGS += -DGNRC_PKTBUF_SIZE=200
 CFLAGS += -DTEST_SUITES
-
-QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
 
