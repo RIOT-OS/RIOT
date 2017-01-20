@@ -1,14 +1,12 @@
-RIOT Maintainers Community
-Developer Memo: 4
-Author(s): Martine Lenders
-Date: January 2017
-
 Writing tests
-=============
+=========
+
+- Developer Memo: 4
+- Author(s): Martine Lenders
+- Date: January 2017
 
 ## Abstract
 This memo describes how to write tests for RIOT.
-
 
 ## Status
 This document is a product of the community of RIOT maintainers, and aims to 
@@ -19,17 +17,21 @@ license.
 ## Terminology
 This memo uses the following terminology and acronyms:
 
-- embUnit: a unittest framework for C that is used by RIOT to write unittests.
+- embUnit: a unit test framework for C that is used by RIOT to write unit tests.
 - pexpect: a python library to interact with the stdio of command-line
   application.
 - CI system: CI = Continuous Intergration, platform for automated building and
   testing of provided changes.
 
 ## 1. Introduction
-At the moment of writing there are two strategies for testing: providing a
-unittest suite in [`tests/unittests/`][unittests] or a stand-alone test
-application in `tests/` directly. This document provides some recommendations
-on where to put a test and what the minimum requirements for those are.
+In RIOT's workflow there are two strategies for testing: providing a unit test
+suite in [`tests/unittests/`][unittests] or a stand-alone test application in
+`tests/` directly. This document provides some recommendations on where to put a
+test and what the minimum requirements for those are.
+
+On a different note, it is always beneficial to have tests. So if a new feature
+or a new subroutine to an existing feature is added, the contributor must always
+provide a test for this.
 
 ## 2. Unittests
 Unittests in RIOT are provided using a customized fork of the [embUnit]
@@ -37,11 +39,11 @@ framework. While it is possible to provide a stand-alone application using this
 framework it is recommended to add or extend a test suite in the [unittests]
 application (see [unittests README] for how to do that).
 
-The advantage of that is that all unittests in one application reduces the
+The advantage of that is that all unit tests in one application reduces the
 number of required builds and lesser applications need to be executed on the
 CI system (resulting in lower build and testing times).
 
-For this reason it is always preferred to provide unittests with a sufficient
+For this reason it is always preferred to provide unit tests with a sufficient
 coverage except for reasons discussed in the following section.
 
 ## 2. Stand-alone test application
@@ -56,7 +58,7 @@ application:
   after the reset).
 
 If one of these reasons apply it is valid to provide a stand-alone test
-application. If one part of the tested component is applicable for unittests,
+application. If one part of the tested component is applicable for unit tests,
 while others are not, it is also possible to provide tests [unittests] for the
 applicable components and one or multiple stand-alone tests for the others.
 
@@ -67,7 +69,7 @@ comprehensive [pexpect] script that may utilize the [testrunner] library.
 
 ## 3. Examples
 In the RIOT source tree there is also an `examples/` directory. This contains
-applications that exemplify features of RIOT. These applications are supposed to
+applications that showcase features of RIOT. These applications are supposed to
 be well documented and should show-case features ideally very concentrated (i.e.
 as few features as possible - ideally one - are show-cased in the application).
 If an example is extensive enough to provide an acceptable level of coverage,
