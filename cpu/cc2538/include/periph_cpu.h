@@ -21,9 +21,7 @@
 
 #include <stdint.h>
 
-#include "cc2538_gptimer.h"
-#include "cc2538_ssi.h"
-#include "cc2538_gpio.h"
+#include "cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,6 +47,8 @@ typedef uint32_t gpio_t;
  * actual pin number.
  */
 #define GPIO_PIN(port, pin) (gpio_t)(((uint32_t)GPIO_A + (port << 12)) | pin)
+
+#define GPIO_UNDEF 99
 
 /**
  * @brief   I2C configuration options

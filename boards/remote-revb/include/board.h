@@ -23,9 +23,6 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "periph/gpio.h"
-#include "periph/spi.h"
-#include "board_common.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -122,6 +119,11 @@
 #define SDCARD_SPI_PARAM_POWER     GPIO_PIN(0,6)
 #define SDCARD_SPI_PARAM_POWER_AH  false
 /** @} */
+
+/**
+ * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ */
+void board_init(void);
 
 #ifdef __cplusplus
 } /* end extern "C" */

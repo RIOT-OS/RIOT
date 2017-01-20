@@ -21,8 +21,6 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "cc2538_gpio.h"
-#include "periph_cpu.h"
 #include "periph_common.h"
 
 #ifdef __cplusplus
