@@ -7,13 +7,13 @@
 # directory for more details.
 
 # customizable
-DIRS="core drivers sys"
+DIRS="core drivers pkg sys"
 
 # prepare
 EXIT_CODE=0
 
 # check files
-if FILES=$(git grep -lE 'ifndef\ +(_.*|.*_H_$)' ${DIRS})
+if FILES=$(git grep -lE 'ifndef\ +(_.*_H$|.*_H_$)' ${DIRS})
 then
     EXIT_CODE=1
     for LINE in ${FILES}
