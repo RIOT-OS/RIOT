@@ -1,6 +1,5 @@
 APPLICATION = conn_ip
-
-BOARD ?= native
+include ../Makefile.tests_common
 
 RIOTBASE ?= $(CURDIR)/../..
 
@@ -17,8 +16,6 @@ USEMODULE += od
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-
-QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
 

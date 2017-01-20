@@ -1,6 +1,5 @@
 APPLICATION = gnrc_sock_udp
-
-BOARD ?= native
+include ../Makefile.tests_common
 
 RIOTBASE ?= $(CURDIR)/../..
 
@@ -14,8 +13,6 @@ USEMODULE += ps
 CFLAGS += -DDEVELHELP
 CFLAGS += -DGNRC_PKTBUF_SIZE=400
 CFLAGS += -DTEST_SUITES
-
-QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
 

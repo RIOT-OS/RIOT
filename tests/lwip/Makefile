@@ -1,6 +1,7 @@
 APPLICATION = lwip
-
+# overwrite board, do not set native as default
 BOARD ?= iotlab-m3
+include ../Makefile.tests_common
 
 RIOTBASE ?= $(CURDIR)/../..
 
@@ -42,8 +43,6 @@ ifneq (,$(filter at86rf2%,$(DRIVER)))
 endif
 
 USEMODULE += $(DRIVER)
-
-QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
 

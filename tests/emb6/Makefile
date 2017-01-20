@@ -1,8 +1,9 @@
 APPLICATION = emb6
+# overwrite board, do not set native as default
+BOARD ?= samr21-xpro
+include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_gpio periph_spi  # for at86rf231
-
-BOARD ?= samr21-xpro
 
 RIOTBASE ?= $(CURDIR)/../..
 
@@ -34,7 +35,5 @@ DRIVER ?= at86rf231
 
 # include the selected driver
 USEMODULE += $(DRIVER)
-
-QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
