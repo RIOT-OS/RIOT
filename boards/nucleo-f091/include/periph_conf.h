@@ -139,9 +139,17 @@ static const pwm_conf_t pwm_config[] = {
  * @brief   ADC configuration
  * @{
  */
-#define ADC_NUMOF          (0)
-/** @} */
+#define ADC_CONFIG {            \
+    { GPIO_PIN(PORT_A, 0), 0 },\
+    { GPIO_PIN(PORT_A, 1), 1 },\
+    { GPIO_PIN(PORT_A, 4), 4 },\
+    { GPIO_PIN(PORT_B, 0), 8 },\
+    { GPIO_PIN(PORT_C, 1), 11 },\
+    { GPIO_PIN(PORT_C, 0), 10 } \
+}
 
+#define ADC_NUMOF           (6)
+/** @} */
 /**
  * @brief   DAC configuration
  * @{
