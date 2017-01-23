@@ -48,15 +48,31 @@ extern "C" {
  */
 static const timer_conf_t timer_config[] = {
     {
-        .dev      = TIM2,
-        .max      = 0xffffffff,
-        .rcc_mask = RCC_APB1ENR_TIM2EN,
+        .dev      = TIM14,
+        .max      = 0x0000ffff,
+        .rcc_mask = RCC_APB1ENR_TIM14EN,
         .bus      = APB1,
-        .irqn     = TIM2_IRQn
+        .irqn     = TIM14_IRQn
+    },
+    {
+        .dev      = TIM16,
+        .max      = 0x0000ffff,
+        .rcc_mask = RCC_APB2ENR_TIM16EN,
+        .bus      = APB2,
+        .irqn     = TIM16_IRQn
+    },
+    {
+        .dev      = TIM17,
+        .max      = 0x0000ffff,
+        .rcc_mask = RCC_APB2ENR_TIM17EN,
+        .bus      = APB2,
+        .irqn     = TIM17_IRQn
     }
 };
 
-#define TIMER_0_ISR         isr_tim2
+#define TIMER_0_ISR         isr_tim14
+#define TIMER_1_ISR         isr_tim16
+#define TIMER_2_ISR         isr_tim17
 
 #define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
@@ -92,6 +108,46 @@ static const uart_conf_t uart_config[] = {
 #define UART_1_ISR          (isr_usart1)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+/** @} */
+
+/**
+ * @brief   PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM2,
+        .rcc_mask = RCC_APB1ENR_TIM2EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 3)  /* D3 */, .cc_chan = 1 },
+                      { .pin = GPIO_PIN(PORT_B, 10) /* D6 */, .cc_chan = 2 },
+                      { .pin = GPIO_PIN(PORT_B, 11)         , .cc_chan = 3 },
+                      { .pin = GPIO_UNDEF,                    .cc_chan = 0 } },
+        .af       = GPIO_AF2,
+        .bus      = APB1
+    },
+    {
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 4) /* D5 */, .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_B, 5) /* D4 */, .cc_chan = 1 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 } },
+        .af       = GPIO_AF1,
+        .bus      = APB1
+    },
+    {
+        .dev      = TIM15,
+        .rcc_mask = RCC_APB2ENR_TIM15EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 14), .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_B, 15), .cc_chan = 1 },
+                      { .pin = GPIO_UNDEF,           .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,           .cc_chan = 0 } },
+        .af       = GPIO_AF1,
+        .bus      = APB2
+    }
+};
+
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
 /** @} */
 
 /**
