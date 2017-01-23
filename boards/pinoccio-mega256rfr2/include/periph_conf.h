@@ -63,7 +63,16 @@ extern "C" {
 #define TIMER_1_ISRA        TIMER5_COMPA_vect
 #define TIMER_1_ISRB        TIMER5_COMPB_vect
 #define TIMER_1_ISRC        TIMER5_COMPC_vect
+
 /** @} */
+
+/**
+ * @name PWM configuration
+ * @{
+ */
+#define PWM_0_EN            1
+#define PWM_MAX_CHANNELS    1
+#define PWM_NUMOF			(1U)
 
 /**
  * @brief   UART configuration

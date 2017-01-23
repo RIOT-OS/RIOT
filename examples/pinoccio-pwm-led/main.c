@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 RWTH Aachen, Josua Arndt
+ * Copyright (C) 2016 RWTH Aachen, Steffen Robertz
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,35 +13,35 @@
  * @file
  * @brief       Hello World application
  *
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
- * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
+ * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @}
  */
 #include <stdio.h>
 
-#include "xtimer.h"
-#include "timex.h"
-
 #include "board.h"
-
-/* set interval to 1 second */
-#define INTERVAL (1U * SEC_IN_USEC)
+#include "rgbled.h"
 
 int main(void)
 {
-    puts("Pinoccio Hello World!");
+    puts("Pinoccio PWM LED!");
 
     printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
     printf("This board features a(n) %s MCU.\n", RIOT_MCU);
 
-    uint32_t last_wakeup = xtimer_now();
+  /*  tim_t mytimer = TIMER_2;
+    timer_init(mytimer,500,&pwmRed, NULL);
+    while(1)
+    {
+    }*/
 
-    while(1) {
-        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
-        printf("slept until %" PRIu32 "\n", xtimer_now());
-        // Toggle red led
-        LED_PORT ^= RED;
-    }
+
+    rgbled_t my_rgbled;
+    pwm_t my_pwm = PWM_0_EN;
+    rgbled_init(&my_rgbled, my_pwm, RED, GREEN, BLUE);
+    color_rgb_t white = {255,255,255};
+    rgbled_set(&my_rgbled, &white);
+
+
+
     return 0;
 }

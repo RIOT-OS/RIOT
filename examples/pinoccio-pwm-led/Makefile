@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = pinoccio-hello-world
+APPLICATION = pinoccio-pwm-led
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -15,8 +15,7 @@ CFLAGS += -DDEVELHELP
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 0
 
-USEMODULE += xtimer
-FEATURES_REQUIRED += periph_timer
-
+USEMODULE += rgbled
+FEATURES_REQUIRED += pwm
 include $(RIOTBASE)/Makefile.include
 
