@@ -59,7 +59,7 @@ typedef uint16_t gpio_t;
 /**
  * @brief   Define a custom GPIO_PIN macro for the lpc11u34
  */
-#define GPIO_PIN(port, pin)     (gpio_t)((port << 16) | pin)
+#define GPIO_PIN(port, pin)     (gpio_t)((port << 8) | pin)
 
 /**
  * @brief   Number of PWM channels per PWM peripheral
