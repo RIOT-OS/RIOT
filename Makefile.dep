@@ -331,6 +331,12 @@ ifneq (,$(filter gnrc_udp,$(USEMODULE)))
   USEMODULE += udp
 endif
 
+ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
+  USEMODULE += inet_csum
+  USEMODULE += random
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
   USEMODULE += gnrc_netapi
   USEMODULE += gnrc_netreg

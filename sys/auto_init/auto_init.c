@@ -76,6 +76,10 @@
 #include "net/gnrc/udp.h"
 #endif
 
+#ifdef MODULE_GNRC_TCP
+#include "net/gnrc/tcp.h"
+#endif
+
 #ifdef MODULE_LWIP
 #include "lwip.h"
 #endif
@@ -151,6 +155,10 @@ void auto_init(void)
 #ifdef MODULE_GNRC_UDP
     DEBUG("Auto init UDP module.\n");
     gnrc_udp_init();
+#endif
+#ifdef MODULE_GNRC_TCP
+    DEBUG("Auto init TCP module\n");
+    gnrc_tcp_init();
 #endif
 #ifdef MODULE_DHT
     DEBUG("Auto init DHT devices.\n");
