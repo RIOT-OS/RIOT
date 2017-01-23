@@ -16,8 +16,8 @@
  *
  * @author  José Ignacio Alamos
  */
-#ifndef NETDEV2_PPP_H_
-#define NETDEV2_PPP_H_
+#ifndef NETDEV2_PPP_H
+#define NETDEV2_PPP_H
 
 #include "net/gnrc/ppp/prot.h"
 #include "net/gnrc/ppp/prot.h"
@@ -32,18 +32,20 @@
 extern "C" {
 #endif
 
+#if defined(MODULE_GNRC_PPP) || doxygen
 /**
  * @brief class of custom driver control protocol
  * @extends ppp_protocol_t
  *
  * @details the DCP is in charge of monitoring the link and exchanging messages with the ppp device
  */
-typedef struct dcp_t {
-    ppp_protocol_t prot;    /**< base ppp_protocol_t object */
+typedef struct gnrc_ppp_dcp {
+    gnrc_ppp_protocol_t prot;    /**< base ppp_protocol_t object */
     msg_t timer_msg;        /**< msg struct for handling timeouts messages */
     xtimer_t xtimer;        /**< xtimer struct for sending timeout messages */
     uint8_t dead_counter;   /**< when reaches zero, the link is assumed to be dead */
-} dcp_t;
+} gnrc_ppp_dcp_t;
+#endif
 
 
 /**
@@ -56,15 +58,17 @@ typedef struct dcp_t {
  */
 typedef struct {
     netdev2_t netdev;                       /**< @ref netdev2_t base class */
+#if defined(MODULE_GNRC_PPP) || doxygen
     /**
      * @brief PPP specific fields
      * @{
      */
-	dcp_t dcp;                             /**< Control protocol for driver */
-	lcp_t lcp;                             /**< Link Control Protocol */
-	pap_t pap;                             /**< Password Authentication Protocol */
-	ipcp_t ipcp;                           /**< IPv4 Network Control Protocol */
-	ppp_ipv4_t ipv4;                       /**< Handler for IPv4 packets */
+    gnrc_ppp_dcp_t dcp;                             /**< Control protocol for driver */
+    gnrc_ppp_lcp_t lcp;                             /**< Link Control Protocol */
+    gnrc_ppp_pap_t pap;                             /**< Password Authentication Protocol */
+    gnrc_ppp_ipcp_t ipcp;                  /**< IPv4 Network Control Protocol */
+    gnrc_ppp_ipv4_t ipv4;                  /**< Handler for IPv4 packets */
+#endif
 } netdev2_ppp_t;
 
 
@@ -82,7 +86,7 @@ typedef struct {
  * @return              <0 on error
  */
 int netdev2_ppp_get(netdev2_ppp_t *dev, netopt_t opt, void *value,
-                           size_t max_len);
+                    size_t max_len);
 
 /**
  * @brief   Fallback function for netdev2 PPP devices' _set function
@@ -97,11 +101,11 @@ int netdev2_ppp_get(netdev2_ppp_t *dev, netopt_t opt, void *value,
  * @return              <0 on error
  */
 int netdev2_ppp_set(netdev2_ppp_t *dev, netopt_t opt, void *value,
-                           size_t value_len);
+                    size_t value_len);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NETDEV2_PPP_H_ */
+#endif /* NETDEV2_PPP_H */
 /** @} */

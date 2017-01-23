@@ -16,8 +16,8 @@
  *
  * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
-#ifndef PPP_IPCP_H_
-#define PPP_IPCP_H_
+#ifndef GNRC_PPP_IPCP_H
+#define GNRC_PPP_IPCP_H
 
 #include "net/gnrc/ppp/fsm.h"
 #include "net/ipv4/addr.h"
@@ -26,8 +26,8 @@
 extern "C" {
 #endif
 
-#define IPCP_OPT_IP_ADDRESS (3)         /**< code of IP Address option */
-#define IPCP_RESTART_TIMER (3000000U)   /**< restart time value for IPCP */
+#define GNRC_PPP_IPCP_OPT_IP_ADDRESS (3)         /**< code of IP Address option */
+#define GNRC_PPP_IPCP_RESTART_TIMER (3000000U)   /**< restart time value for IPCP */
 
 
 /**
@@ -36,19 +36,19 @@ extern "C" {
 typedef enum {
     IPCP_IPADDRESS, /**< IP address option */
     IPCP_NUMOPTS
-} ipcp_options_t;
+} gnrc_ppp_ipcp_options_t;
 
 /**
  * @brief definition of IPCP protocol
  * @extends ppp_fsm_t
  */
-typedef struct ipcp_t {
-    ppp_fsm_t fsm;                      /**< base fsm class */
+typedef struct gnrc_ppp_ipcp {
+    gnrc_ppp_fsm_t fsm;                      /**< base fsm class */
     ipv4_addr_t local_ip;               /**< local ip address obtained from ppp device */
     ipv4_addr_t ip;                     /**< ip address of ppp device */
-    fsm_conf_t ipcp_opts[IPCP_NUMOPTS]; /**< configuration options for IPCP */
+    gnrc_ppp_fsm_conf_t ipcp_opts[IPCP_NUMOPTS]; /**< configuration options for IPCP */
     int ip_id;                          /**< id of ip packet */
-} ipcp_t;
+} gnrc_ppp_ipcp_t;
 
 /**
  * @brief definition of the PPP IPv4 encapsulator
@@ -56,13 +56,13 @@ typedef struct ipcp_t {
  *
  * @details since most mobile operators don't support IPv6, it's necessary to use a tunnel for transmitting data
  */
-typedef struct ppp_ipv4_t {
-    ppp_protocol_t prot;        /**< base ppp_protocol class */
+typedef struct gnrc_ppp_ipv4 {
+    gnrc_ppp_protocol_t prot;        /**< base ppp_protocol class */
     ipv4_addr_t tunnel_addr;    /**< IPv4 address of tunnel */
     uint16_t tunnel_port;       /**< UDP port of tunnel */
-} ppp_ipv4_t;
+} gnrc_ppp_ipv4_t;
 
-struct ppp_fsm_t;
+struct gnrc_ppp_fsm_t;
 
 /**
  * @brief init function of IPCP
@@ -114,7 +114,7 @@ gnrc_pktsnip_t *ppp_ipv4_recv(gnrc_netdev2_t *ppp_dev, gnrc_pktsnip_t *pkt);
  *
  * @return pointer to IPCP protocol
  */
-ppp_protocol_t *ipcp_get_static_pointer(void);
+gnrc_ppp_protocol_t *ipcp_get_static_pointer(void);
 
 
 
@@ -123,11 +123,11 @@ ppp_protocol_t *ipcp_get_static_pointer(void);
  *
  * @return pointer to PPP IPv4 protocol
  */
-ppp_protocol_t *ipv4_get_static_pointer(void);
+gnrc_ppp_protocol_t *ipv4_get_static_pointer(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PPP_IPCP_H_ */
+#endif /* GNRC_PPP_IPCP_H */
 /** @} */

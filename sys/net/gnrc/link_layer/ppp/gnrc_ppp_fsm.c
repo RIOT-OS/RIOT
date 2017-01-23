@@ -43,10 +43,10 @@
 #endif
 
 #define FOR_EACH_OPTION(opt, buf, size) \
-    for (ppp_option_t *opt = (ppp_option_t *) buf; opt != NULL; opt = ppp_opt_get_next(opt, (ppp_option_t *) buf, size))
+    for (gnrc_ppp_option_t *opt = (gnrc_ppp_option_t *) buf; opt != NULL; opt = ppp_opt_get_next(opt, (gnrc_ppp_option_t *) buf, size))
 
 #define FOR_EACH_CONF(conf, head) \
-    for (fsm_conf_t *conf = head; conf != NULL; conf = conf->next)
+    for (gnrc_ppp_fsm_conf_t *conf = head; conf != NULL; conf = conf->next)
 
 ppp_hdr_t *_get_ppp_hdr(gnrc_pktsnip_t *pkt)
 {
@@ -58,43 +58,43 @@ int _pkt_has_payload(ppp_hdr_t *hdr)
     return byteorder_ntohs(hdr->length) > sizeof(ppp_hdr_t);
 }
 
-void set_timeout(ppp_fsm_t *cp, uint32_t time)
+void set_timeout(gnrc_ppp_fsm_t *cp, uint32_t time)
 {
-    ppp_target_t self = ((ppp_protocol_t *)cp)->id;
+    gnrc_ppp_target_t self = ((gnrc_ppp_protocol_t *)cp)->id;
 
-    send_ppp_event_xtimer(&((ppp_protocol_t *) cp)->msg, &cp->xtimer, ppp_msg_set(self, PPP_TIMEOUT), cp->restart_timer);
+    send_ppp_event_xtimer(&((gnrc_ppp_protocol_t *) cp)->msg, &cp->xtimer, ppp_msg_set(self, PPP_TIMEOUT), cp->restart_timer);
 }
 
-void _reset_cp_conf(fsm_conf_t *conf)
+void _reset_cp_conf(gnrc_ppp_fsm_conf_t *conf)
 {
     FOR_EACH_CONF(c, conf){
         conf->value = conf->default_value;
     }
 }
-size_t _opts_size(fsm_conf_t *head_conf)
+size_t _opts_size(gnrc_ppp_fsm_conf_t *head_conf)
 {
     size_t size = 0;
 
     FOR_EACH_CONF(conf, head_conf){
-        if (conf->flags & OPT_ENABLED) {
+        if (conf->flags & GNRC_PPP_OPT_ENABLED) {
             size += 2 + conf->size;
         }
     }
     return size;
 }
 
-void _write_opts(fsm_conf_t *head_conf, uint8_t *buf)
+void _write_opts(gnrc_ppp_fsm_conf_t *head_conf, uint8_t *buf)
 {
     int cursor = 0;
 
     FOR_EACH_CONF(conf, head_conf){
-        if (conf->flags & OPT_ENABLED) {
+        if (conf->flags & GNRC_PPP_OPT_ENABLED) {
             cursor += ppp_opt_fill(buf + cursor, conf->type, (&conf->value) + sizeof(uint32_t) - conf->size, conf->size);
         }
     }
 }
 
-gnrc_pktsnip_t *_build_conf_req_options(ppp_fsm_t *cp)
+gnrc_pktsnip_t *_build_conf_req_options(gnrc_ppp_fsm_t *cp)
 {
     /* Get size of outgoing options */
     size_t size = _opts_size(cp->conf);
@@ -109,13 +109,13 @@ gnrc_pktsnip_t *_build_conf_req_options(ppp_fsm_t *cp)
     return opts;
 }
 
-static uint8_t get_scnpkt_data(ppp_fsm_t *cp, gnrc_pktsnip_t *pkt, uint16_t *n)
+static uint8_t get_scnpkt_data(gnrc_ppp_fsm_t *cp, gnrc_pktsnip_t *pkt, uint16_t *n)
 {
     uint8_t rej_size = 0;
     uint8_t nak_size = 0;
     uint8_t curr_type;
 
-    fsm_conf_t *curr_conf;
+    gnrc_ppp_fsm_conf_t *curr_conf;
     uint8_t curr_size;
 
     FOR_EACH_OPTION(opt, pkt->data, pkt->size){
@@ -132,18 +132,18 @@ static uint8_t get_scnpkt_data(ppp_fsm_t *cp, gnrc_pktsnip_t *pkt, uint16_t *n)
 
     /* Append required options */
     FOR_EACH_CONF(conf, cp->conf){
-        if (conf->flags & OPT_REQUIRED) {
+        if (conf->flags & GNRC_PPP_OPT_REQUIRED) {
             nak_size += conf->size;
         }
     }
 
     *n = rej_size ? rej_size : nak_size;
-    return rej_size ? PPP_CONF_REJ : PPP_CONF_NAK;
+    return rej_size ? GNRC_PPP_CONF_REJ : GNRC_PPP_CONF_NAK;
 }
 
-static void build_nak_pkt(ppp_fsm_t *cp, gnrc_pktsnip_t *pkt, uint8_t *buf)
+static void build_nak_pkt(gnrc_ppp_fsm_t *cp, gnrc_pktsnip_t *pkt, uint8_t *buf)
 {
-    fsm_conf_t *curr_conf;
+    gnrc_ppp_fsm_conf_t *curr_conf;
     uint8_t curr_type;
     uint8_t cursor = 0;
 
@@ -157,9 +157,9 @@ static void build_nak_pkt(ppp_fsm_t *cp, gnrc_pktsnip_t *pkt, uint8_t *buf)
     }
 }
 
-static void build_rej_pkt(ppp_fsm_t *cp, gnrc_pktsnip_t *pkt, uint8_t *buf)
+static void build_rej_pkt(gnrc_ppp_fsm_t *cp, gnrc_pktsnip_t *pkt, uint8_t *buf)
 {
-    fsm_conf_t *curr_conf;
+    gnrc_ppp_fsm_conf_t *curr_conf;
 
     uint8_t curr_type;
     uint16_t curr_size;
@@ -182,37 +182,37 @@ static void build_rej_pkt(ppp_fsm_t *cp, gnrc_pktsnip_t *pkt, uint8_t *buf)
 static void print_state(int state)
 {
     switch (state) {
-        case S_UNDEF:
+        case PPP_S_UNDEF:
             DEBUG("UNDEF");
             break;
-        case S_INITIAL:
+        case PPP_S_INITIAL:
             DEBUG("INITIAL");
             break;
-        case S_STARTING:
+        case PPP_S_STARTING:
             DEBUG("STARTING");
             break;
-        case S_CLOSED:
+        case PPP_S_CLOSED:
             DEBUG("CLOSED");
             break;
-        case S_STOPPED:
+        case PPP_S_STOPPED:
             DEBUG("STOPPED");
             break;
-        case S_CLOSING:
+        case PPP_S_CLOSING:
             DEBUG("CLOSING");
             break;
-        case S_STOPPING:
+        case PPP_S_STOPPING:
             DEBUG("STOPPING");
             break;
-        case S_REQ_SENT:
+        case PPP_S_REQ_SENT:
             DEBUG("REQ_SENT");
             break;
-        case S_ACK_RCVD:
+        case PPP_S_ACK_RCVD:
             DEBUG("ACK_RECV");
             break;
-        case S_ACK_SENT:
+        case PPP_S_ACK_SENT:
             DEBUG("ACK_SENT");
             break;
-        case S_OPENED:
+        case PPP_S_OPENED:
             DEBUG("OPENED");
             break;
     }
@@ -220,52 +220,52 @@ static void print_state(int state)
 static void print_event(uint8_t event)
 {
     switch (event) {
-        case E_UP:
+        case PPP_E_UP:
             DEBUG("UP");
             break;
-        case E_DOWN:
+        case PPP_E_DOWN:
             DEBUG("DOWN");
             break;
-        case E_OPEN:
+        case PPP_E_OPEN:
             DEBUG("OPEN");
             break;
-        case E_CLOSE:
+        case PPP_E_CLOSE:
             DEBUG("CLOSE");
             break;
-        case E_TOp:
+        case PPP_E_TOp:
             DEBUG("TO+");
             break;
-        case E_TOm:
+        case PPP_E_TOm:
             DEBUG("TO-");
             break;
-        case E_RCRp:
+        case PPP_E_RCRp:
             DEBUG("RCR+");
             break;
-        case E_RCRm:
+        case PPP_E_RCRm:
             DEBUG("RCR-");
             break;
-        case E_RCA:
+        case PPP_E_RCA:
             DEBUG("RCA");
             break;
-        case E_RCN:
+        case PPP_E_RCN:
             DEBUG("RCN");
             break;
-        case E_RTR:
+        case PPP_E_RTR:
             DEBUG("RTR");
             break;
-        case E_RTA:
+        case PPP_E_RTA:
             DEBUG("RTA");
             break;
-        case E_RUC:
+        case PPP_E_RUC:
             DEBUG("RUC");
             break;
-        case E_RXJp:
+        case PPP_E_RXJp:
             DEBUG("RXJ+");
             break;
-        case E_RXJm:
+        case PPP_E_RXJm:
             DEBUG("RXJ-");
             break;
-        case E_RXR:
+        case PPP_E_RXR:
             DEBUG("RXR");
             break;
     }
@@ -282,66 +282,66 @@ static void print_transition(int state, uint8_t event, int next_state)
 }
 #endif
 
-ppp_target_t _fsm_upper_layer(ppp_fsm_t *cp)
+gnrc_ppp_target_t _fsm_upper_layer(gnrc_ppp_fsm_t *cp)
 {
-    return ((ppp_protocol_t *) cp)->upper_layer;
+    return ((gnrc_ppp_protocol_t *) cp)->upper_layer;
 }
 
-ppp_target_t _fsm_lower_layer(ppp_fsm_t *cp)
+gnrc_ppp_target_t _fsm_lower_layer(gnrc_ppp_fsm_t *cp)
 {
-    return ((ppp_protocol_t *) cp)->lower_layer;
+    return ((gnrc_ppp_protocol_t *) cp)->lower_layer;
 }
-void tlu(ppp_fsm_t *cp, void *args)
+void tlu(gnrc_ppp_fsm_t *cp, void *args)
 {
     _reset_cp_conf(cp->conf);
-    ((ppp_protocol_t *) cp)->state = PROTOCOL_UP;
+    ((gnrc_ppp_protocol_t *) cp)->state = PROTOCOL_UP;
     if (cp->on_layer_up) {
         cp->on_layer_up(cp);
     }
-    send_ppp_event(&((ppp_protocol_t *)cp)->msg, ppp_msg_set(_fsm_upper_layer(cp), PPP_LINKUP));
+    send_ppp_event(&((gnrc_ppp_protocol_t *)cp)->msg, ppp_msg_set(_fsm_upper_layer(cp), PPP_LINKUP));
     (void) cp;
 }
 
-void tld(ppp_fsm_t *cp, void *args)
+void tld(gnrc_ppp_fsm_t *cp, void *args)
 {
     _reset_cp_conf(cp->conf);
-    ((ppp_protocol_t *) cp)->state = PROTOCOL_DOWN;
+    ((gnrc_ppp_protocol_t *) cp)->state = PROTOCOL_DOWN;
     if (cp->on_layer_down) {
         cp->on_layer_down(cp);
     }
-    send_ppp_event(&((ppp_protocol_t *) cp)->msg, ppp_msg_set(_fsm_upper_layer(cp), PPP_LINKDOWN));
+    send_ppp_event(&((gnrc_ppp_protocol_t *) cp)->msg, ppp_msg_set(_fsm_upper_layer(cp), PPP_LINKDOWN));
     (void) cp;
 }
 
-void tls(ppp_fsm_t *cp, void *args)
+void tls(gnrc_ppp_fsm_t *cp, void *args)
 {
     _reset_cp_conf(cp->conf);
-    send_ppp_event(&((ppp_protocol_t *) cp)->msg, ppp_msg_set(_fsm_lower_layer(cp), PPP_UL_STARTED));
+    send_ppp_event(&((gnrc_ppp_protocol_t *) cp)->msg, ppp_msg_set(_fsm_lower_layer(cp), PPP_UL_STARTED));
     (void) cp;
 }
 
-void tlf(ppp_fsm_t *cp, void *args)
+void tlf(gnrc_ppp_fsm_t *cp, void *args)
 {
-    send_ppp_event(&((ppp_protocol_t *) cp)->msg, ppp_msg_set(_fsm_lower_layer(cp), PPP_UL_FINISHED));
+    send_ppp_event(&((gnrc_ppp_protocol_t *) cp)->msg, ppp_msg_set(_fsm_lower_layer(cp), PPP_UL_FINISHED));
     (void) cp;
 }
 
-void irc(ppp_fsm_t *cp, void *args)
+void irc(gnrc_ppp_fsm_t *cp, void *args)
 {
 
-    uint8_t cr = *((int *) args) & F_SCR;
+    uint8_t cr = *((int *) args) & PPP_F_SCR;
 
-    cp->restart_counter = cr ? PPP_MAX_CONFIG : PPP_MAX_TERMINATE;
+    cp->restart_counter = cr ? GNRC_PPP_MAX_CONFIG : GNRC_PPP_MAX_TERMINATE;
 }
 
-void zrc(ppp_fsm_t *cp, void *args)
+void zrc(gnrc_ppp_fsm_t *cp, void *args)
 {
     cp->restart_counter = 0;
     set_timeout(cp, cp->restart_timer);
 }
 
 
-void scr(ppp_fsm_t *cp, void *args)
+void scr(gnrc_ppp_fsm_t *cp, void *args)
 {
 
     /* Decrement configure counter */
@@ -357,11 +357,11 @@ void scr(ppp_fsm_t *cp, void *args)
     }
 
     /*Send configure request*/
-    send_configure_request(((ppp_protocol_t *) cp)->pppdev, cp->prottype, ++cp->cr_sent_identifier, opts);
+    send_configure_request(((gnrc_ppp_protocol_t *) cp)->pppdev, cp->prottype, ++cp->cr_sent_identifier, opts);
     set_timeout(cp, cp->restart_timer);
 }
 
-void sca(ppp_fsm_t *cp, void *args)
+void sca(gnrc_ppp_fsm_t *cp, void *args)
 {
     gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *) args;
 
@@ -375,10 +375,10 @@ void sca(ppp_fsm_t *cp, void *args)
         opts = gnrc_pktbuf_add(NULL, pkt->data, pkt->size, GNRC_NETTYPE_UNDEF);
     }
 
-    send_configure_ack(((ppp_protocol_t *) cp)->pppdev, cp->prottype, recv_ppp_hdr->id, opts);
+    send_configure_ack(((gnrc_ppp_protocol_t *) cp)->pppdev, cp->prottype, recv_ppp_hdr->id, opts);
 }
 
-void scn(ppp_fsm_t *cp, void *args)
+void scn(gnrc_ppp_fsm_t *cp, void *args)
 {
     gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *) args;
 
@@ -390,13 +390,13 @@ void scn(ppp_fsm_t *cp, void *args)
     opts = gnrc_pktbuf_add(NULL, NULL, scn_len, GNRC_NETTYPE_UNDEF);
 
     switch (type) {
-        case PPP_CONF_NAK:
+        case GNRC_PPP_CONF_NAK:
             build_nak_pkt(cp, pkt, (uint8_t *)opts->data);
-            send_configure_nak(((ppp_protocol_t *) cp)->pppdev, cp->prottype,((ppp_hdr_t *) pkt->next->data)->id, opts);
+            send_configure_nak(((gnrc_ppp_protocol_t *) cp)->pppdev, cp->prottype,((ppp_hdr_t *) pkt->next->data)->id, opts);
             break;
-        case PPP_CONF_REJ:
+        case GNRC_PPP_CONF_REJ:
             build_rej_pkt(cp, pkt, (uint8_t *) opts->data);
-            send_configure_rej(((ppp_protocol_t *) cp)->pppdev, cp->prottype,((ppp_hdr_t *) pkt->next->data)->id, opts);
+            send_configure_rej(((gnrc_ppp_protocol_t *) cp)->pppdev, cp->prottype,((ppp_hdr_t *) pkt->next->data)->id, opts);
             break;
         default:
             DEBUG("gnrc_ppp: shouldn't be here...\n");
@@ -404,13 +404,13 @@ void scn(ppp_fsm_t *cp, void *args)
     }
 }
 
-void str(ppp_fsm_t *cp, void *args)
+void str(gnrc_ppp_fsm_t *cp, void *args)
 {
 
-    send_terminate_req(((ppp_protocol_t *) cp)->pppdev, cp->prottype, cp->tr_sent_identifier++);
+    send_terminate_req(((gnrc_ppp_protocol_t *) cp)->pppdev, cp->prottype, cp->tr_sent_identifier++);
 }
 
-void sta(ppp_fsm_t *cp, void *args)
+void sta(gnrc_ppp_fsm_t *cp, void *args)
 {
     gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *) args;
     gnrc_pktsnip_t *recv_pkt = NULL;
@@ -420,17 +420,17 @@ void sta(ppp_fsm_t *cp, void *args)
     if (_pkt_has_payload(recv_ppp_hdr)) {
         recv_pkt = gnrc_pktbuf_add(NULL, pkt->data, pkt->size, GNRC_NETTYPE_UNDEF);
     }
-    send_terminate_ack(((ppp_protocol_t *) cp)->pppdev, cp->prottype, recv_ppp_hdr->id, recv_pkt);
+    send_terminate_ack(((gnrc_ppp_protocol_t *) cp)->pppdev, cp->prottype, recv_ppp_hdr->id, recv_pkt);
 }
-void scj(ppp_fsm_t *cp, void *args)
+void scj(gnrc_ppp_fsm_t *cp, void *args)
 {
     gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *) args;
 
     gnrc_pktsnip_t *payload = gnrc_pktbuf_add(NULL, pkt->data, pkt->size, cp->prottype);
 
-    send_code_rej(((ppp_protocol_t *) cp)->pppdev, cp->prottype, cp->cr_sent_identifier++, payload);
+    send_code_rej(((gnrc_ppp_protocol_t *) cp)->pppdev, cp->prottype, cp->cr_sent_identifier++, payload);
 }
-void ser(ppp_fsm_t *cp, void *args)
+void ser(gnrc_ppp_fsm_t *cp, void *args)
 {
     gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *) args;
     gnrc_pktsnip_t *ppp_hdr = gnrc_pktbuf_mark(pkt, sizeof(ppp_hdr_t), cp->prottype);
@@ -445,68 +445,68 @@ void ser(ppp_fsm_t *cp, void *args)
     }
 
     switch (code) {
-        case PPP_ECHO_REQ:
-            send_echo_reply(((ppp_protocol_t *) cp)->pppdev, cp->prottype, id, data);
+        case GNRC_PPP_ECHO_REQ:
+            send_echo_reply(((gnrc_ppp_protocol_t *) cp)->pppdev, cp->prottype, id, data);
             break;
-        case PPP_ECHO_REP:
+        case GNRC_PPP_ECHO_REP:
             break;
-        case PPP_DISC_REQ:
+        case GNRC_PPP_DISC_REQ:
             break;
     }
 
     /*Send PPP_LINK_ALIVE to lower layer*/
-    send_ppp_event(&((ppp_protocol_t *) cp)->msg, ppp_msg_set(_fsm_lower_layer(cp), PPP_LINK_ALIVE));
+    send_ppp_event(&((gnrc_ppp_protocol_t *) cp)->msg, ppp_msg_set(_fsm_lower_layer(cp), PPP_LINK_ALIVE));
 }
 
 /* Call functions depending on function flag*/
-static void _event_action(ppp_fsm_t *cp, uint8_t event, gnrc_pktsnip_t *pkt)
+static void _event_action(gnrc_ppp_fsm_t *cp, uint8_t event, gnrc_pktsnip_t *pkt)
 {
     int flags;
 
     flags = actions[event][cp->state];
 
-    if (flags & F_TLU) {
+    if (flags & PPP_F_TLU) {
         tlu(cp, NULL);
     }
-    if (flags & F_TLD) {
+    if (flags & PPP_F_TLD) {
         tld(cp, NULL);
     }
-    if (flags & F_TLS) {
+    if (flags & PPP_F_TLS) {
         tls(cp, NULL);
     }
-    if (flags & F_TLF) {
+    if (flags & PPP_F_TLF) {
         tlf(cp, NULL);
     }
-    if (flags & F_IRC) {
+    if (flags & PPP_F_IRC) {
         irc(cp, (void *) &flags);
     }
-    if (flags & F_ZRC) {
+    if (flags & PPP_F_ZRC) {
         zrc(cp, NULL);
     }
-    if (flags & F_SCR) {
+    if (flags & PPP_F_SCR) {
         scr(cp, (void *) pkt);
     }
-    if (flags & F_SCA) {
+    if (flags & PPP_F_SCA) {
         sca(cp, (void *) pkt);
     }
-    if (flags & F_SCN) {
+    if (flags & PPP_F_SCN) {
         scn(cp, (void *) pkt);
     }
-    if (flags & F_STR) {
+    if (flags & PPP_F_STR) {
         str(cp, NULL);
     }
-    if (flags & F_STA) {
+    if (flags & PPP_F_STA) {
         sta(cp, (void *) pkt);
     }
-    if (flags & F_SCJ) {
+    if (flags & PPP_F_SCJ) {
         scj(cp, (void *) pkt);
     }
-    if (flags & F_SER) {
+    if (flags & PPP_F_SER) {
         ser(cp, (void *) pkt);
     }
 }
 
-int trigger_fsm_event(ppp_fsm_t *cp, int event, gnrc_pktsnip_t *pkt)
+int trigger_fsm_event(gnrc_ppp_fsm_t *cp, int event, gnrc_pktsnip_t *pkt)
 {
     if (event < 0) {
         return -EBADMSG;
@@ -514,12 +514,12 @@ int trigger_fsm_event(ppp_fsm_t *cp, int event, gnrc_pktsnip_t *pkt)
     int next_state;
     next_state = state_trans[event][cp->state];
 #if ENABLE_DEBUG
-    DEBUG("%i> ", ((ppp_protocol_t *)cp)->id);
+    DEBUG("%i> ", ((gnrc_ppp_protocol_t *)cp)->id);
     print_transition(cp->state, event, next_state);
 #endif
 
     /* Keep in same state if there's something wrong (RFC 1661) */
-    if (next_state != S_UNDEF) {
+    if (next_state != PPP_S_UNDEF) {
         _event_action(cp, event, pkt);
         cp->state = next_state;
     }
@@ -527,32 +527,32 @@ int trigger_fsm_event(ppp_fsm_t *cp, int event, gnrc_pktsnip_t *pkt)
         DEBUG("gnrc_ppp: fsm received illegal transition. \n");
     }
     /*Check if next state doesn't have a running timer*/
-    if (cp->state < S_CLOSING || cp->state == S_OPENED) {
+    if (cp->state < PPP_S_CLOSING || cp->state == PPP_S_OPENED) {
         xtimer_remove(&cp->xtimer);
     }
     return 0;
 }
 
-int fsm_init(gnrc_netdev2_t *ppp_dev, ppp_fsm_t *cp)
+int fsm_init(gnrc_netdev2_t *ppp_dev, gnrc_ppp_fsm_t *cp)
 {
-    cp->state = S_INITIAL;
+    cp->state = PPP_S_INITIAL;
     cp->cr_sent_identifier = 0;
     return 0;
 }
 
-static int _opt_is_ack(ppp_fsm_t *cp, ppp_option_t *opt)
+static int _opt_is_ack(gnrc_ppp_fsm_t *cp, gnrc_ppp_option_t *opt)
 {
-    fsm_conf_t *curr_conf = NULL;
+    gnrc_ppp_fsm_conf_t *curr_conf = NULL;
 
     curr_conf = cp->get_conf_by_code(cp, ppp_opt_get_type(opt));
     return curr_conf && curr_conf->is_valid(opt);
 }
 
-int handle_rcr(ppp_fsm_t *cp, gnrc_pktsnip_t *pkt)
+int handle_rcr(gnrc_ppp_fsm_t *cp, gnrc_pktsnip_t *pkt)
 {
     /* If the packet doesn't have options, it's considered as valid. */
     if (!pkt) {
-        return E_RCRp;
+        return PPP_E_RCRp;
     }
 
     /* Check if options are valid */
@@ -562,14 +562,14 @@ int handle_rcr(ppp_fsm_t *cp, gnrc_pktsnip_t *pkt)
 
     FOR_EACH_OPTION(opt, pkt->data, pkt->size){
         if (!_opt_is_ack(cp, opt)) {
-            return E_RCRm;
+            return PPP_E_RCRm;
         }
     }
 
     /*Check if there's an option that is required but not sent */
     uint8_t found;
     FOR_EACH_CONF(conf, cp->conf){
-        if (!(conf->flags & OPT_REQUIRED)) {
+        if (!(conf->flags & GNRC_PPP_OPT_REQUIRED)) {
             continue;
         }
         found = false;
@@ -581,12 +581,12 @@ int handle_rcr(ppp_fsm_t *cp, gnrc_pktsnip_t *pkt)
         }
 
         if (!found) {
-            return E_RCRm;
+            return PPP_E_RCRm;
         }
     }
 
     /* Valid options... set them before SCA */
-    fsm_conf_t *curr_conf;
+    gnrc_ppp_fsm_conf_t *curr_conf;
     FOR_EACH_OPTION(opt, pkt->data, pkt->size){
         curr_conf = cp->get_conf_by_code(cp, ppp_opt_get_type(opt));
         if (curr_conf) {
@@ -597,10 +597,10 @@ int handle_rcr(ppp_fsm_t *cp, gnrc_pktsnip_t *pkt)
         }
     }
 
-    return E_RCRp;
+    return PPP_E_RCRp;
 }
 
-int handle_rca(ppp_fsm_t *cp, ppp_hdr_t *hdr, gnrc_pktsnip_t *pkt)
+int handle_rca(gnrc_ppp_fsm_t *cp, ppp_hdr_t *hdr, gnrc_pktsnip_t *pkt)
 {
     uint8_t pkt_id = hdr->id;
     uint8_t pkt_length = byteorder_ntohs(hdr->length);
@@ -620,7 +620,7 @@ int handle_rca(ppp_fsm_t *cp, ppp_hdr_t *hdr, gnrc_pktsnip_t *pkt)
 
     /*Write options in corresponding devices*/
     if (pkt) {
-        fsm_conf_t *conf;
+        gnrc_ppp_fsm_conf_t *conf;
         FOR_EACH_OPTION(opt, opts, pkt->size){
             conf = cp->get_conf_by_code(cp, ppp_opt_get_type(opt));
             if (!conf) {
@@ -631,10 +631,10 @@ int handle_rca(ppp_fsm_t *cp, ppp_hdr_t *hdr, gnrc_pktsnip_t *pkt)
             conf->set(cp, opt, false);
         }
     }
-    return E_RCA;
+    return PPP_E_RCA;
 }
 
-int handle_rcn_nak(ppp_fsm_t *cp, ppp_hdr_t *hdr, gnrc_pktsnip_t *pkt)
+int handle_rcn_nak(gnrc_ppp_fsm_t *cp, ppp_hdr_t *hdr, gnrc_pktsnip_t *pkt)
 {
     if (!pkt) {
         /* If the packet doesn't have options, it's considered as invalid. */
@@ -655,15 +655,15 @@ int handle_rcn_nak(ppp_fsm_t *cp, ppp_hdr_t *hdr, gnrc_pktsnip_t *pkt)
     }
 
     /*Handle nak for each option*/
-    fsm_conf_t *curr_conf;
+    gnrc_ppp_fsm_conf_t *curr_conf;
     network_uint32_t value;
     uint8_t *payload;
 
     FOR_EACH_OPTION(opt, pkt->data, pkt->size){
         curr_conf = cp->get_conf_by_code(cp, ppp_opt_get_type(opt));
         if (curr_conf != NULL) {
-            if (!(curr_conf->flags & OPT_ENABLED)) {
-                curr_conf->flags |= OPT_ENABLED;
+            if (!(curr_conf->flags & GNRC_PPP_OPT_ENABLED)) {
+                curr_conf->flags |= GNRC_PPP_OPT_ENABLED;
             }
             else if (curr_conf->is_valid(opt)) {
                 value = byteorder_htonl(0);
@@ -672,14 +672,14 @@ int handle_rcn_nak(ppp_fsm_t *cp, ppp_hdr_t *hdr, gnrc_pktsnip_t *pkt)
                 curr_conf->value = value;
             }
             else {
-                curr_conf->flags &= ~OPT_ENABLED;
+                curr_conf->flags &= ~GNRC_PPP_OPT_ENABLED;
             }
         }
     }
-    return E_RCN;
+    return PPP_E_RCN;
 }
 
-int handle_rcn_rej(ppp_fsm_t *cp, ppp_hdr_t *hdr, gnrc_pktsnip_t *pkt)
+int handle_rcn_rej(gnrc_ppp_fsm_t *cp, ppp_hdr_t *hdr, gnrc_pktsnip_t *pkt)
 {
     if (!pkt || hdr->id != cp->cr_sent_identifier || ppp_conf_opts_valid(pkt, pkt->size) <= 0 || byteorder_ntohs(hdr->length) - sizeof(ppp_hdr_t) != cp->cr_sent_size) {
         return -EBADMSG;
@@ -695,16 +695,16 @@ int handle_rcn_rej(ppp_fsm_t *cp, ppp_hdr_t *hdr, gnrc_pktsnip_t *pkt)
     }
 
     /* Disable every REJ option */
-    fsm_conf_t *curr_conf;
+    gnrc_ppp_fsm_conf_t *curr_conf;
     FOR_EACH_OPTION(opt, pkt->data, pkt->size){
         curr_conf = cp->get_conf_by_code(cp, ppp_opt_get_type(opt));
         if (curr_conf == NULL) {
             DEBUG("gnrc_ppp: Shouldn't be here\n");
             return -EBADMSG;
         }
-        curr_conf->flags &= ~OPT_ENABLED;
+        curr_conf->flags &= ~GNRC_PPP_OPT_ENABLED;
     }
-    return E_RCN;
+    return PPP_E_RCN;
 }
 
 int handle_coderej(ppp_hdr_t *hdr, gnrc_pktsnip_t *pkt)
@@ -713,30 +713,30 @@ int handle_coderej(ppp_hdr_t *hdr, gnrc_pktsnip_t *pkt)
 
     uint8_t code = rej_hdr->code;
 
-    if (code >= PPP_CONF_REQ && code <= PPP_TERM_ACK) {
-        return E_RXJm;
+    if (code >= GNRC_PPP_CONF_REQ && code <= GNRC_PPP_TERM_ACK) {
+        return PPP_E_RXJm;
     }
     else {
-        return E_RXJp;
+        return PPP_E_RXJp;
     }
 
 }
 
 
-int handle_term_ack(ppp_fsm_t *cp, gnrc_pktsnip_t *pkt)
+int handle_term_ack(gnrc_ppp_fsm_t *cp, gnrc_pktsnip_t *pkt)
 {
     ppp_hdr_t *ppp_hdr = pkt->data;
 
     int id = ppp_hdr->id;
 
     if (id == cp->tr_sent_identifier) {
-        return E_RTA;
+        return PPP_E_RTA;
     }
     return -EBADMSG;
 }
 
 
-static int handle_conf_pkt(ppp_fsm_t *cp, int type, gnrc_pktsnip_t *pkt)
+static int handle_conf_pkt(gnrc_ppp_fsm_t *cp, int type, gnrc_pktsnip_t *pkt)
 {
     gnrc_pktsnip_t *ppp_hdr = gnrc_pktbuf_mark(pkt, sizeof(ppp_hdr_t), cp->prottype);
     gnrc_pktsnip_t *payload = pkt->size == 0 ? NULL : pkt;
@@ -745,16 +745,16 @@ static int handle_conf_pkt(ppp_fsm_t *cp, int type, gnrc_pktsnip_t *pkt)
     int event;
 
     switch (type) {
-        case PPP_CONF_REQ:
+        case GNRC_PPP_CONF_REQ:
             event = handle_rcr(cp, payload);
             break;
-        case PPP_CONF_ACK:
+        case GNRC_PPP_CONF_ACK:
             event = handle_rca(cp, hdr, payload);
             break;
-        case PPP_CONF_NAK:
+        case GNRC_PPP_CONF_NAK:
             event = handle_rcn_nak(cp, hdr, payload);
             break;
-        case PPP_CONF_REJ:
+        case GNRC_PPP_CONF_REJ:
             event = handle_rcn_rej(cp, hdr, payload);
             break;
         default:
@@ -765,48 +765,48 @@ static int handle_conf_pkt(ppp_fsm_t *cp, int type, gnrc_pktsnip_t *pkt)
     return event;
 }
 
-int fsm_event_from_pkt(ppp_fsm_t *cp, gnrc_pktsnip_t *pkt)
+int fsm_event_from_pkt(gnrc_ppp_fsm_t *cp, gnrc_pktsnip_t *pkt)
 {
     ppp_hdr_t *hdr = (ppp_hdr_t *) pkt->data;
 
     int code = hdr->code;
     int supported = cp->supported_codes & (1 << (code - 1));
-    int type = supported ? code : PPP_UNKNOWN_CODE;
+    int type = supported ? code : GNRC_PPP_UNKNOWN_CODE;
 
     int event;
 
     switch (type) {
-        case PPP_CONF_REQ:
-        case PPP_CONF_ACK:
-        case PPP_CONF_NAK:
-        case PPP_CONF_REJ:
+        case GNRC_PPP_CONF_REQ:
+        case GNRC_PPP_CONF_ACK:
+        case GNRC_PPP_CONF_NAK:
+        case GNRC_PPP_CONF_REJ:
             event = handle_conf_pkt(cp, type, pkt);
             break;
-        case PPP_TERM_REQ:
-            event = E_RTR;
+        case GNRC_PPP_TERM_REQ:
+            event = PPP_E_RTR;
             break;
-        case PPP_TERM_ACK:
+        case GNRC_PPP_TERM_ACK:
             event = handle_term_ack(cp, pkt);
             break;
-        case PPP_CODE_REJ:
+        case GNRC_PPP_CODE_REJ:
             event = handle_coderej(hdr, pkt);
             break;
-        case PPP_ECHO_REQ:
-        case PPP_ECHO_REP:
-        case PPP_DISC_REQ:
-            event = E_RXR;
+        case GNRC_PPP_ECHO_REQ:
+        case GNRC_PPP_ECHO_REP:
+        case GNRC_PPP_DISC_REQ:
+            event = PPP_E_RXR;
             break;
         default:
-            event = E_RUC;
+            event = PPP_E_RUC;
             break;
     }
 
     return event;
 }
 
-int fsm_handle_ppp_msg(struct ppp_protocol_t *protocol, uint8_t ppp_event, void *args)
+int fsm_handle_ppp_msg(gnrc_ppp_protocol_t *protocol, uint8_t ppp_event, void *args)
 {
-    ppp_fsm_t *target = (ppp_fsm_t *) protocol;
+    gnrc_ppp_fsm_t *target = (gnrc_ppp_fsm_t *) protocol;
     int event;
     gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *) args;
 
@@ -821,22 +821,22 @@ int fsm_handle_ppp_msg(struct ppp_protocol_t *protocol, uint8_t ppp_event, void 
             break;
         case PPP_LINKUP:
             protocol->state = PROTOCOL_STARTING;
-            trigger_fsm_event(target, E_UP, NULL);
+            trigger_fsm_event(target, PPP_E_UP, NULL);
             break;
         case PPP_LINKDOWN:
-            trigger_fsm_event(target, E_DOWN, NULL);
+            trigger_fsm_event(target, PPP_E_DOWN, NULL);
             break;
         case PPP_UL_STARTED:
-            if (target->state == S_OPENED) {
+            if (target->state == PPP_S_OPENED) {
                 send_ppp_event(&protocol->msg, ppp_msg_set(_fsm_upper_layer(target), PPP_LINKUP));
             }
             break;
         case PPP_TIMEOUT:
             if (target->restart_counter) {
-                trigger_fsm_event(target, E_TOp, NULL);
+                trigger_fsm_event(target, PPP_E_TOp, NULL);
             }
             else {
-                trigger_fsm_event(target, E_TOm, NULL);
+                trigger_fsm_event(target, PPP_E_TOm, NULL);
             }
             break;
     }

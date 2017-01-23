@@ -16,8 +16,8 @@
  *
  * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
-#ifndef PPP_OPT_H
-#define PPP_OPT_H
+#ifndef GNRC_PPP_OPT_H
+#define GNRC_PPP_OPT_H
 
 #include <errno.h>
 #include <string.h>
@@ -33,8 +33,8 @@
 extern "C" {
 #endif
 
-#define OPT_HDR_SIZE (2) /**< size of OPT hdr */
-typedef uint8_t ppp_option_t;
+#define GNRC_PPP_OPT_HDR_SIZE (2) /**< size of OPT hdr */
+typedef uint8_t gnrc_ppp_option_t;
 
 
 /**
@@ -44,12 +44,12 @@ typedef uint8_t ppp_option_t;
  *
  * @return value of type field of current option
  */
-static inline uint8_t ppp_opt_get_type(ppp_option_t *opt)
+static inline uint8_t ppp_opt_get_type(gnrc_ppp_option_t *opt)
 {
     return (uint8_t) *((uint8_t *) opt);
 }
 
-static inline void ppp_opt_set_type(ppp_option_t *opt, uint8_t type)
+static inline void ppp_opt_set_type(gnrc_ppp_option_t *opt, uint8_t type)
 {
     *((uint8_t *) opt) = type;
 }
@@ -61,12 +61,12 @@ static inline void ppp_opt_set_type(ppp_option_t *opt, uint8_t type)
  *
  * @return value of length field of current option
  */
-static inline uint8_t ppp_opt_get_length(ppp_option_t *opt)
+static inline uint8_t ppp_opt_get_length(gnrc_ppp_option_t *opt)
 {
     return (uint8_t) *(((uint8_t *) opt) + 1);
 }
 
-static inline void ppp_opt_set_length(ppp_option_t *opt, uint8_t length)
+static inline void ppp_opt_set_length(gnrc_ppp_option_t *opt, uint8_t length)
 {
     *(((uint8_t *) opt) + 1) = length;
 }
@@ -80,7 +80,7 @@ static inline void ppp_opt_set_length(ppp_option_t *opt, uint8_t length)
  * @return size of current option
  * @return payload of current option
  */
-static inline uint8_t ppp_opt_get_payload(ppp_option_t *opt, void **payload)
+static inline uint8_t ppp_opt_get_payload(gnrc_ppp_option_t *opt, void **payload)
 {
     *payload = ((uint8_t *) opt) + 2;
     return (uint8_t) *(((uint8_t *) opt) + 1);
@@ -93,7 +93,7 @@ static inline uint8_t ppp_opt_get_payload(ppp_option_t *opt, void **payload)
  * @param data pointer to payload
  * @param size size of payload
  */
-static inline void ppp_opt_set_payload(ppp_option_t *opt, void *data, size_t size)
+static inline void ppp_opt_set_payload(gnrc_ppp_option_t *opt, void *data, size_t size)
 {
     memcpy(((uint8_t *) opt) + 2, data, size);
 }
@@ -107,11 +107,11 @@ static inline void ppp_opt_set_payload(ppp_option_t *opt, void *data, size_t siz
  *
  * @return pointer to next option
  */
-static inline ppp_option_t *ppp_opt_get_next(ppp_option_t *curr_opt, ppp_option_t *head, size_t opt_size)
+static inline gnrc_ppp_option_t *ppp_opt_get_next(gnrc_ppp_option_t *curr_opt, gnrc_ppp_option_t *head, size_t opt_size)
 {
-    ppp_option_t *ret = NULL;
+    gnrc_ppp_option_t *ret = NULL;
 
-    ret = (ppp_option_t *)(((uint8_t *) curr_opt) + ppp_opt_get_length(curr_opt));
+    ret = (gnrc_ppp_option_t *)(((uint8_t *) curr_opt) + ppp_opt_get_length(curr_opt));
     if (ret - head >= opt_size) {
         return NULL;
     }
@@ -166,7 +166,7 @@ static inline int ppp_conf_opts_valid(gnrc_pktsnip_t *opts_snip, uint8_t expecte
  * @return true if the option is present in option set
  * @return false otherwise
  */
-static inline int ppp_opt_is_subset(ppp_option_t *opt, ppp_option_t *optset, size_t size)
+static inline int ppp_opt_is_subset(gnrc_ppp_option_t *opt, gnrc_ppp_option_t *optset, size_t size)
 {
     uint8_t opt_type = (uint8_t) *((uint8_t *) opt);
     uint8_t *curr_opt = (uint8_t *) optset;
@@ -194,7 +194,7 @@ static inline int ppp_opt_is_subset(ppp_option_t *opt, ppp_option_t *optset, siz
  */
 static inline int ppp_opt_fill(void *opt_buf, uint8_t type, void *payload, size_t pay_size)
 {
-    ppp_option_t *opt = opt_buf;
+    gnrc_ppp_option_t *opt = opt_buf;
 
     ppp_opt_set_type(opt, type);
     ppp_opt_set_length(opt, 2 + pay_size);
@@ -205,7 +205,7 @@ static inline int ppp_opt_fill(void *opt_buf, uint8_t type, void *payload, size_
 #ifdef __cplusplus
 }
 #endif
-#endif /* PPP_OPT_H */
+#endif /* GNRC_PPP_OPT_H */
 /**
  * @}
  */

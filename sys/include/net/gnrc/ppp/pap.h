@@ -16,8 +16,8 @@
  *
  * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
-#ifndef PPP_PAP_H
-#define PPP_PAP_H
+#ifndef GNRC_PPP_PAP_H
+#define GNRC_PPP_PAP_H
 
 #include "net/gnrc/ppp/prot.h"
 #include "xtimer.h"
@@ -31,8 +31,8 @@ extern "C" {
  * @brief definition of PAP protocol
  * @extends ppp_protocol_t
  */
-typedef struct pap_t {
-    ppp_protocol_t prot;    /**< base ppp_protocol class */
+typedef struct gnrc_ppp_pap {
+    gnrc_ppp_protocol_t prot;    /**< base ppp_protocol class */
     char username[20];      /**< user name of PAP */
     size_t user_size;       /**< user size */
     char password[20];      /**< password of PAP */
@@ -41,7 +41,7 @@ typedef struct pap_t {
     uint8_t id;             /**< last configure request id of PAP packet */
     xtimer_t xtimer;        /**< xtimer structure for timeouts */
     msg_t timer_msg;        /**< msg structure for timeout messages */
-} pap_t;
+} gnrc_ppp_pap_t;
 
 /**
  * @brief init PAP procotol
@@ -52,11 +52,13 @@ typedef struct pap_t {
  * @return 0
  */
 int pap_init(gnrc_netdev2_t *ppp_dev);
-ppp_protocol_t *pap_get_static_pointer(void);
-void pap_recv(struct ppp_protocol_t *protocol, gnrc_pktsnip_t *pkt);
+gnrc_ppp_protocol_t *pap_get_static_pointer(void);
+void pap_recv(gnrc_ppp_protocol_t *protocol, gnrc_pktsnip_t *pkt);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif
+#endif /* GNRC_PPP_PAP_H */
+/**
+ * @}
+ */

@@ -52,7 +52,7 @@ static int _link_up(gnrc_netdev2_t *dev)
 static int _link_down(gnrc_netdev2_t *dev)
 {
     netdev2_ppp_t *pppdev = (netdev2_ppp_t*) dev->dev;
-    ppp_protocol_t *dcp = (ppp_protocol_t*) &pppdev->dcp;
+    gnrc_ppp_protocol_t *dcp = (gnrc_ppp_protocol_t*) &pppdev->dcp;
     dcp->state = PROTOCOL_DOWN;
     dispatch_ppp_msg(dev, ((PROT_LCP<<8)&0xFF00) | (PPP_LINKDOWN & 0xFF));
     return 0;

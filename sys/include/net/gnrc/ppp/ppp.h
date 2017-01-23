@@ -17,8 +17,8 @@
  * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
 
-#ifndef GNRC_PPP_H_
-#define GNRC_PPP_H_
+#ifndef GNRC_PPP_H
+#define GNRC_PPP_H
 
 #include <inttypes.h>
 
@@ -44,38 +44,38 @@ extern "C" {
 
 #define GNRC_PPP_MSG_QUEUE 64
 
-#define PPP_HDLC_ADDRESS (0xFF) /**< HDLC address field for PPP */
-#define PPP_HDLC_CONTROL (0x03) /**< HDLC control field for PPP */
+#define GNRC_PPP_HDLC_ADDRESS (0xFF) /**< HDLC address field for PPP */
+#define GNRC_PPP_HDLC_CONTROL (0x03) /**< HDLC control field for PPP */
 
 
-#define AUTH_PAP (1)            /**< Label of PAP authentication */
+#define GNRC_PPP_AUTH_PAP (1)            /**< Label of PAP authentication */
 
-#define PPP_CONF_REQ (1)        /**< Code of Configure Request packet */
-#define PPP_CONF_ACK (2)        /**< Code of Configure Ack packet */
-#define PPP_CONF_NAK (3)        /**< Code of Configure NAK packet */
-#define PPP_CONF_REJ (4)        /**< Code of Configure Reject packet */
-#define PPP_TERM_REQ (5)        /**< Code of Temrminate Request packet */
-#define PPP_TERM_ACK (6)        /**< Code of Terminate ACK packet */
-#define PPP_CODE_REJ (7)        /**< Code of Code Reject packet */
-#define PPP_PROT_REJ (8)        /**< Code of Protocol Reject packet */
-#define PPP_ECHO_REQ (9)        /**< Code of Echo Request packet */
-#define PPP_ECHO_REP (10)       /**< Code of Echo Reply packet */
-#define PPP_DISC_REQ (11)       /**< Code of Discard Request packet */
-#define PPP_IDENT (12)          /**< Code of Identification (not used yet) */
-#define PPP_TIME_REM (13)       /**< Code of Time Remaining /not used yet) */
-#define PPP_UNKNOWN_CODE (0)    /**< Code for Unknown Code packet (internal use)*/
+#define GNRC_PPP_CONF_REQ (1)        /**< Code of Configure Request packet */
+#define GNRC_PPP_CONF_ACK (2)        /**< Code of Configure Ack packet */
+#define GNRC_PPP_CONF_NAK (3)        /**< Code of Configure NAK packet */
+#define GNRC_PPP_CONF_REJ (4)        /**< Code of Configure Reject packet */
+#define GNRC_PPP_TERM_REQ (5)        /**< Code of Temrminate Request packet */
+#define GNRC_PPP_TERM_ACK (6)        /**< Code of Terminate ACK packet */
+#define GNRC_PPP_CODE_REJ (7)        /**< Code of Code Reject packet */
+#define GNRC_PPP_PROT_REJ (8)        /**< Code of Protocol Reject packet */
+#define GNRC_PPP_ECHO_REQ (9)        /**< Code of Echo Request packet */
+#define GNRC_PPP_ECHO_REP (10)       /**< Code of Echo Reply packet */
+#define GNRC_PPP_DISC_REQ (11)       /**< Code of Discard Request packet */
+#define GNRC_PPP_IDENT (12)          /**< Code of Identification (not used yet) */
+#define GNRC_PPP_TIME_REM (13)       /**< Code of Time Remaining /not used yet) */
+#define GNRC_PPP_UNKNOWN_CODE (0)    /**< Code for Unknown Code packet (internal use)*/
 
-#define BROADCAST_LCP (0xff)    /**< Shortcut to LCP message */
-#define BROADCAST_NCP (0xfe)    /**< Broadcast message to al NCP available */
+#define GNRC_PPP_BROADCAST_LCP (0xff)    /**< Shortcut to LCP message */
+#define GNRC_PPP_BROADCAST_NCP (0xfe)    /**< Broadcast message to al NCP available */
 
 
 #define GNRC_PPP_MSG_QUEUE_SIZE (20)
 
 #define GNRC_PPP_MSG_TYPE_EVENT (101)    /**< Messages for GNRC PPP layer */
 
-#define DCP_MONITOR_INIT_DELAY (15000000)   /**< Time that the monitor should wait after the LCP initiation before monitoring */
-#define DCP_MONITOR_TIMEOUT (10000000)      /**< time between LCP Echo request monitoriin */
-#define DCP_DEAD_COUNTER (5)                /**< Number of failed LCP Echo Request responses before assuming the ppp device is dead */
+#define GNRC_PPP_DCP_MONITOR_INIT_DELAY (15000000)   /**< Time that the monitor should wait after the LCP initiation before monitoring */
+#define GNRC_PPP_DCP_MONITOR_TIMEOUT (10000000)      /**< time between LCP Echo request monitoriin */
+#define GNRC_PPP_DCP_DEAD_COUNTER (5)                /**< Number of failed LCP Echo Request responses before assuming the ppp device is dead */
 
 
 /**
@@ -90,7 +90,7 @@ typedef enum {
     PPP_UL_FINISHED,    /**< upper layer of a protocol finished */
     PPP_MONITOR,        /**< Message for the monitor */
     PPP_LINK_ALIVE,     /**< Message from LCP to DCP indicating the link is alive */
-} ppp_dev_event_t;
+} gnrc_ppp_dev_event_t;
 
 
 /**
@@ -135,7 +135,7 @@ void *_gnrc_ppp_thread(void *args);
  * @return 0
  */
 int dcp_init(gnrc_netdev2_t *ppp_dev);
-ppp_protocol_t *dcp_get_static_pointer(void);
+gnrc_ppp_protocol_t *dcp_get_static_pointer(void);
 
 
 /**
@@ -309,11 +309,11 @@ gnrc_pktsnip_t *ppp_recv(gnrc_netdev2_t *gnrc_netdev);
  * @param gnrc_netdev pointer to gnrc ppp interface
  * @param ppp_msg PPP message being sent (encodes target and event)
  */
-int dispatch_ppp_msg(gnrc_netdev2_t *dev, ppp_msg_t ppp_msg);
+int dispatch_ppp_msg(gnrc_netdev2_t *dev, gnrc_ppp_msg_t ppp_msg);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GNRC_PPP_H_ */
+#endif /* GNRC_PPP_H */
 /** @} */

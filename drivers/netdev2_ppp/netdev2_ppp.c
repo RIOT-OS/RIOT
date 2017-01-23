@@ -32,19 +32,19 @@ int netdev2_ppp_get(netdev2_ppp_t *dev, netopt_t opt, void *value, size_t max_le
     int res;
     switch (opt) {
         case NETOPT_PPP_LCP_STATE:
-            *((uint8_t *) value) = ((ppp_protocol_t*) &dev->lcp)->state;
+            *((uint8_t *) value) = ((gnrc_ppp_protocol_t*) &dev->lcp)->state;
             res = 0;
             break;
         case NETOPT_PPP_AUTH_STATE:
-            *((uint8_t *) value) = ((ppp_protocol_t*) &dev->pap)->state;
+            *((uint8_t *) value) = ((gnrc_ppp_protocol_t*) &dev->pap)->state;
             res = 0;
             break;
         case NETOPT_PPP_IPCP_STATE:
-            *((uint8_t *) value) = ((ppp_protocol_t*) &dev->ipcp)->state;
+            *((uint8_t *) value) = ((gnrc_ppp_protocol_t*) &dev->ipcp)->state;
             res = 0;
             break;
         case NETOPT_PPP_IS_IPV6_READY:
-            res = ((ppp_protocol_t*) &dev->ipv4)->state == PROTOCOL_UP;
+            res = ((gnrc_ppp_protocol_t*) &dev->ipv4)->state == PROTOCOL_UP;
             *((uint8_t *) value) = res;
             break;
         case NETOPT_DEVICE_TYPE:

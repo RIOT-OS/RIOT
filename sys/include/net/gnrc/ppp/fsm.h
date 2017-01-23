@@ -16,8 +16,8 @@
  *
  * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
-#ifndef PPP_FSM_H_
-#define PPP_FSM_H_
+#ifndef GNRC_PPP_FSM_H
+#define GNRC_PPP_FSM_H
 
 #include "net/gnrc/ppp/opt.h"
 #include "net/gnrc/ppp/prot.h"
@@ -28,19 +28,19 @@ extern "C" {
 
 
 /*Function flags*/
-#define F_TLU (1U << 0)
-#define F_TLD (1U << 1)
-#define F_TLS (1U << 2)
-#define F_TLF (1U << 3)
-#define F_IRC (1U << 4)
-#define F_ZRC (1U << 5)
-#define F_SCR (1U << 6)
-#define F_SCA (1U << 7)
-#define F_SCN (1U << 8)
-#define F_STR (1U << 9)
-#define F_STA (1U << 10)
-#define F_SCJ (1U << 11)
-#define F_SER (1U << 12)
+#define PPP_F_TLU (1U << 0)
+#define PPP_F_TLD (1U << 1)
+#define PPP_F_TLS (1U << 2)
+#define PPP_F_TLF (1U << 3)
+#define PPP_F_IRC (1U << 4)
+#define PPP_F_ZRC (1U << 5)
+#define PPP_F_SCR (1U << 6)
+#define PPP_F_SCA (1U << 7)
+#define PPP_F_SCN (1U << 8)
+#define PPP_F_STR (1U << 9)
+#define PPP_F_STA (1U << 10)
+#define PPP_F_SCJ (1U << 11)
+#define PPP_F_SER (1U << 12)
 
 /* flags for setting FSM codes */
 #define FLAG_CONF_REQ (1 << 0)
@@ -58,37 +58,37 @@ extern "C" {
 #define FLAG_TIME_REM (1 << 12)
 
 
-#define PPP_MAX_TERMINATE (3)       /**< Maximum number of Terminate Request retransmission*/
-#define PPP_MAX_CONFIG (10)         /**< Maximum number of Configure Request retransmission */
+#define GNRC_PPP_MAX_TERMINATE (3)       /**< Maximum number of Terminate Request retransmission*/
+#define GNRC_PPP_MAX_CONFIG (10)         /**< Maximum number of Configure Request retransmission */
 
-#define OPT_PAYLOAD_BUF_SIZE (100)  /**< Size of PPP packet payload (only for Auth, LCP, and NCP packets) */
+#define GNRC_PPP_OPT_PAYLOAD_BUF_SIZE (100)  /**< Size of PPP packet payload (only for Auth, LCP, and NCP packets) */
 
-#define OPT_ENABLED (1)             /**< FSM option enabled */
-#define OPT_REQUIRED (2)            /**< FSM option is required */
+#define GNRC_PPP_OPT_ENABLED (1)             /**< FSM option enabled */
+#define GNRC_PPP_OPT_REQUIRED (2)            /**< FSM option is required */
 /**
  * @brief Option Negotiation Automaton FSM events
  *
  * @see https://tools.ietf.org/html/rfc1661#section-4.3
  */
 typedef enum {
-    E_UP,
-    E_DOWN,
-    E_OPEN,
-    E_CLOSE,
-    E_TOp,
-    E_TOm,
-    E_RCRp,
-    E_RCRm,
-    E_RCA,
-    E_RCN,
-    E_RTR,
-    E_RTA,
-    E_RUC,
-    E_RXJp,
-    E_RXJm,
-    E_RXR,
+    PPP_E_UP,
+    PPP_E_DOWN,
+    PPP_E_OPEN,
+    PPP_E_CLOSE,
+    PPP_E_TOp,
+    PPP_E_TOm,
+    PPP_E_RCRp,
+    PPP_E_RCRm,
+    PPP_E_RCA,
+    PPP_E_RCN,
+    PPP_E_RTR,
+    PPP_E_RTA,
+    PPP_E_RUC,
+    PPP_E_RXJp,
+    PPP_E_RXJm,
+    PPP_E_RXR,
     PPP_NUM_EVENTS
-} fsm_event_t;
+} gnrc_ppp_fsm_event_t;
 
 
 /**
@@ -97,19 +97,19 @@ typedef enum {
  * @see https://tools.ietf.org/html/rfc1661#section-4.2
  */
 typedef enum {
-    S_UNDEF = -1,
-    S_INITIAL = 0,
-    S_STARTING,
-    S_CLOSED,
-    S_STOPPED,
-    S_CLOSING,
-    S_STOPPING,
-    S_REQ_SENT,
-    S_ACK_RCVD,
-    S_ACK_SENT,
-    S_OPENED,
+    PPP_S_UNDEF = -1,
+    PPP_S_INITIAL = 0,
+    PPP_S_STARTING,
+    PPP_S_CLOSED,
+    PPP_S_STOPPED,
+    PPP_S_CLOSING,
+    PPP_S_STOPPING,
+    PPP_S_REQ_SENT,
+    PPP_S_ACK_RCVD,
+    PPP_S_ACK_SENT,
+    PPP_S_OPENED,
     PPP_NUM_STATES
-} fsm_state_t;
+} gnrc_ppp_fsm_state_t;
 
 
 /**
@@ -118,28 +118,44 @@ typedef enum {
  * @see https://tools.ietf.org/html/rfc1661#section-4.1
  */
 static const int8_t state_trans[PPP_NUM_EVENTS][PPP_NUM_STATES] = {
-    { S_CLOSED, S_REQ_SENT, S_UNDEF, S_UNDEF, S_UNDEF, S_UNDEF, S_UNDEF, S_UNDEF, S_UNDEF, S_UNDEF },
-    { S_UNDEF, S_UNDEF, S_INITIAL, S_STARTING, S_INITIAL, S_STARTING, S_STARTING, S_STARTING, S_STARTING, S_STARTING },
-    { S_STARTING, S_STARTING, S_REQ_SENT, S_STOPPED, S_STOPPING, S_STOPPING, S_REQ_SENT, S_ACK_RCVD, S_ACK_SENT, S_OPENED },
-    { S_INITIAL, S_INITIAL, S_CLOSED, S_CLOSED, S_CLOSING, S_CLOSING, S_CLOSING, S_CLOSING, S_CLOSING, S_CLOSING },
-    { S_UNDEF, S_UNDEF, S_UNDEF, S_UNDEF, S_CLOSING, S_STOPPING, S_REQ_SENT, S_REQ_SENT, S_ACK_SENT, S_UNDEF },
-    { S_UNDEF, S_UNDEF, S_UNDEF, S_UNDEF, S_CLOSED, S_STOPPED, S_STOPPED, S_STOPPED, S_STOPPED, S_UNDEF },
-    { S_UNDEF, S_UNDEF, S_CLOSED, S_ACK_SENT, S_CLOSING, S_STOPPING, S_ACK_SENT, S_OPENED, S_ACK_SENT, S_ACK_SENT },
-    { S_UNDEF, S_UNDEF, S_CLOSED, S_REQ_SENT, S_CLOSING, S_STOPPING, S_REQ_SENT, S_ACK_RCVD, S_REQ_SENT, S_REQ_SENT },
-    { S_UNDEF, S_UNDEF, S_CLOSED, S_STOPPED, S_CLOSING, S_STOPPING, S_ACK_RCVD, S_UNDEF, S_OPENED, S_UNDEF },
-    { S_UNDEF, S_UNDEF, S_CLOSED, S_STOPPED, S_CLOSING, S_STOPPING, S_REQ_SENT, S_UNDEF, S_ACK_SENT, S_UNDEF },
-    { S_UNDEF, S_UNDEF, S_CLOSED, S_STOPPED, S_CLOSING, S_STOPPING, S_REQ_SENT, S_REQ_SENT, S_REQ_SENT, S_STOPPING },
-    { S_UNDEF, S_UNDEF, S_CLOSED, S_STOPPED, S_CLOSED, S_STOPPED, S_REQ_SENT, S_REQ_SENT, S_ACK_SENT, S_REQ_SENT },
-    { S_UNDEF, S_UNDEF, S_CLOSED, S_STOPPED, S_CLOSING, S_STOPPING, S_REQ_SENT, S_ACK_RCVD, S_ACK_SENT, S_OPENED },
-    { S_UNDEF, S_UNDEF, S_CLOSED, S_STOPPED, S_CLOSING, S_STOPPING, S_REQ_SENT, S_REQ_SENT, S_ACK_SENT, S_OPENED },
-    { S_UNDEF, S_UNDEF, S_CLOSED, S_STOPPED, S_CLOSED, S_STOPPED, S_STOPPED, S_STOPPED, S_STOPPED, S_STOPPING },
-    { S_UNDEF, S_UNDEF, S_CLOSED, S_STOPPED, S_CLOSING, S_STOPPING, S_REQ_SENT, S_ACK_RCVD, S_ACK_SENT, S_OPENED }
+    { PPP_S_CLOSED, PPP_S_REQ_SENT, PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_UNDEF, 
+        PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_UNDEF },
+    { PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_INITIAL, PPP_S_STARTING, PPP_S_INITIAL,
+        PPP_S_STARTING, PPP_S_STARTING, PPP_S_STARTING, PPP_S_STARTING, PPP_S_STARTING },
+    { PPP_S_STARTING, PPP_S_STARTING, PPP_S_REQ_SENT, PPP_S_STOPPED, PPP_S_STOPPING,
+        PPP_S_STOPPING, PPP_S_REQ_SENT, PPP_S_ACK_RCVD, PPP_S_ACK_SENT, PPP_S_OPENED },
+    { PPP_S_INITIAL, PPP_S_INITIAL, PPP_S_CLOSED, PPP_S_CLOSED, PPP_S_CLOSING, 
+        PPP_S_CLOSING, PPP_S_CLOSING, PPP_S_CLOSING, PPP_S_CLOSING, PPP_S_CLOSING },
+    { PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_CLOSING, 
+        PPP_S_STOPPING, PPP_S_REQ_SENT, PPP_S_REQ_SENT, PPP_S_ACK_SENT, PPP_S_UNDEF },
+    { PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_CLOSED, 
+        PPP_S_STOPPED, PPP_S_STOPPED, PPP_S_STOPPED, PPP_S_STOPPED, PPP_S_UNDEF },
+    { PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_CLOSED, PPP_S_ACK_SENT, PPP_S_CLOSING,
+        PPP_S_STOPPING, PPP_S_ACK_SENT, PPP_S_OPENED, PPP_S_ACK_SENT, PPP_S_ACK_SENT },
+    { PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_CLOSED, PPP_S_REQ_SENT, PPP_S_CLOSING, 
+        PPP_S_STOPPING, PPP_S_REQ_SENT, PPP_S_ACK_RCVD, PPP_S_REQ_SENT, PPP_S_REQ_SENT },
+    { PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_CLOSED, PPP_S_STOPPED, PPP_S_CLOSING, 
+        PPP_S_STOPPING, PPP_S_ACK_RCVD, PPP_S_UNDEF, PPP_S_OPENED, PPP_S_UNDEF },
+    { PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_CLOSED, PPP_S_STOPPED, PPP_S_CLOSING, 
+        PPP_S_STOPPING, PPP_S_REQ_SENT, PPP_S_UNDEF, PPP_S_ACK_SENT, PPP_S_UNDEF },
+    { PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_CLOSED, PPP_S_STOPPED, PPP_S_CLOSING, 
+        PPP_S_STOPPING, PPP_S_REQ_SENT, PPP_S_REQ_SENT, PPP_S_REQ_SENT, PPP_S_STOPPING },
+    { PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_CLOSED, PPP_S_STOPPED, PPP_S_CLOSED, 
+        PPP_S_STOPPED, PPP_S_REQ_SENT, PPP_S_REQ_SENT, PPP_S_ACK_SENT, PPP_S_REQ_SENT },
+    { PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_CLOSED, PPP_S_STOPPED, PPP_S_CLOSING, 
+        PPP_S_STOPPING, PPP_S_REQ_SENT, PPP_S_ACK_RCVD, PPP_S_ACK_SENT, PPP_S_OPENED },
+    { PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_CLOSED, PPP_S_STOPPED, PPP_S_CLOSING, 
+        PPP_S_STOPPING, PPP_S_REQ_SENT, PPP_S_REQ_SENT, PPP_S_ACK_SENT, PPP_S_OPENED },
+    { PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_CLOSED, PPP_S_STOPPED, PPP_S_CLOSED, 
+        PPP_S_STOPPED, PPP_S_STOPPED, PPP_S_STOPPED, PPP_S_STOPPED, PPP_S_STOPPING },
+    { PPP_S_UNDEF, PPP_S_UNDEF, PPP_S_CLOSED, PPP_S_STOPPED, PPP_S_CLOSING, 
+        PPP_S_STOPPING, PPP_S_REQ_SENT, PPP_S_ACK_RCVD, PPP_S_ACK_SENT, PPP_S_OPENED }
 };
 
 
 
-typedef struct ppp_fsm_t ppp_fsm_t;
-typedef struct fsm_conf_t fsm_conf_t;
+typedef struct gnrc_ppp_fsm gnrc_ppp_fsm_t;
+typedef struct gnrc_ppp_fsm_conf gnrc_ppp_fsm_conf_t;
 
 
 /**
@@ -148,22 +164,30 @@ typedef struct fsm_conf_t fsm_conf_t;
  * @see https://tools.ietf.org/html/rfc1661#section-4.4
  */
 static const uint16_t actions[PPP_NUM_EVENTS][PPP_NUM_STATES] = {
-    { 0, F_IRC | F_SCR, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, F_TLS, 0, 0, 0, 0, 0, F_TLD },
-    { F_TLS, 0, F_IRC | F_SCR, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, F_TLF, 0, 0, 0, 0, F_IRC | F_STR, F_IRC | F_STR, F_IRC | F_STR, F_TLD | F_IRC | F_STR },
-    { 0, 0, 0, 0, F_STR, F_STR, F_SCR, F_SCR, F_SCR, 0 },
-    { 0, 0, 0, 0, F_TLF, F_TLF, F_TLF, F_TLF, F_TLF, 0 },
-    { 0, 0, F_STA, F_IRC | F_SCR | F_SCA, 0, 0, F_SCA, F_SCA | F_TLU, F_SCA, F_TLD | F_SCR | F_SCA },
-    { 0, 0, F_STA, F_IRC | F_SCR | F_SCN, 0, 0, F_SCN, F_SCN, F_SCN, F_TLD | F_SCR | F_SCN },
-    { 0, 0, F_STA, F_STA, 0, 0, F_IRC, F_SCR, F_IRC | F_TLU, F_TLD | F_SCR },
-    { 0, 0, F_STA, F_STA, 0, 0, F_IRC | F_SCR, F_SCR, F_IRC | F_SCR, F_TLD | F_SCR },
-    { 0, 0, F_STA, F_STA, F_STA, F_STA, F_STA, F_STA, F_STA, F_TLD | F_ZRC | F_STA },
-    { 0, 0, 0, 0, F_TLF, F_TLF, 0, 0, 0, F_TLD | F_SCR },
-    { 0, 0, F_SCJ, F_SCJ, F_SCJ, F_SCJ, F_SCJ, F_SCJ, F_SCJ, F_SCJ },
+    { 0, PPP_F_IRC | PPP_F_SCR, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, PPP_F_TLS, 0, 0, 0, 0, 0, PPP_F_TLD },
+    { PPP_F_TLS, 0, PPP_F_IRC | PPP_F_SCR, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, PPP_F_TLF, 0, 0, 0, 0, PPP_F_IRC | PPP_F_STR, PPP_F_IRC |
+        PPP_F_STR, PPP_F_IRC | PPP_F_STR, PPP_F_TLD | PPP_F_IRC | PPP_F_STR },
+    { 0, 0, 0, 0, PPP_F_STR, PPP_F_STR, PPP_F_SCR, PPP_F_SCR, PPP_F_SCR, 0 },
+    { 0, 0, 0, 0, PPP_F_TLF, PPP_F_TLF, PPP_F_TLF, PPP_F_TLF, PPP_F_TLF, 0 },
+    { 0, 0, PPP_F_STA, PPP_F_IRC | PPP_F_SCR | PPP_F_SCA, 0, 0, PPP_F_SCA,
+        PPP_F_SCA | PPP_F_TLU, PPP_F_SCA, PPP_F_TLD | PPP_F_SCR | PPP_F_SCA },
+    { 0, 0, PPP_F_STA, PPP_F_IRC | PPP_F_SCR | PPP_F_SCN, 0, 0, PPP_F_SCN,
+        PPP_F_SCN, PPP_F_SCN, PPP_F_TLD | PPP_F_SCR | PPP_F_SCN },
+    { 0, 0, PPP_F_STA, PPP_F_STA, 0, 0, PPP_F_IRC, PPP_F_SCR, PPP_F_IRC |
+        PPP_F_TLU, PPP_F_TLD | PPP_F_SCR },
+    { 0, 0, PPP_F_STA, PPP_F_STA, 0, 0, PPP_F_IRC | PPP_F_SCR, PPP_F_SCR,
+        PPP_F_IRC | PPP_F_SCR, PPP_F_TLD | PPP_F_SCR },
+    { 0, 0, PPP_F_STA, PPP_F_STA, PPP_F_STA, PPP_F_STA, PPP_F_STA, PPP_F_STA,
+        PPP_F_STA, PPP_F_TLD | PPP_F_ZRC | PPP_F_STA },
+    { 0, 0, 0, 0, PPP_F_TLF, PPP_F_TLF, 0, 0, 0, PPP_F_TLD | PPP_F_SCR },
+    { 0, 0, PPP_F_SCJ, PPP_F_SCJ, PPP_F_SCJ, PPP_F_SCJ, PPP_F_SCJ, PPP_F_SCJ,
+        PPP_F_SCJ, PPP_F_SCJ },
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, F_TLF, F_TLF, F_TLF, F_TLF, F_TLF, F_TLF, F_TLF, F_TLD | F_IRC | F_STR },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, F_SER }
+    { 0, 0, PPP_F_TLF, PPP_F_TLF, PPP_F_TLF, PPP_F_TLF, PPP_F_TLF, PPP_F_TLF,
+        PPP_F_TLF, PPP_F_TLD | PPP_F_IRC | PPP_F_STR },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, PPP_F_SER }
 };
 
 /**
@@ -172,8 +196,8 @@ static const uint16_t actions[PPP_NUM_EVENTS][PPP_NUM_STATES] = {
  * @extends ppp_protocol_t
  *
  */
-typedef struct ppp_fsm_t {
-    ppp_protocol_t prot;                                            /**< base class of FSM */
+typedef struct gnrc_ppp_fsm {
+    gnrc_ppp_protocol_t prot;                                            /**< base class of FSM */
     gnrc_nettype_t prottype;                                        /**< GNRC NETTYPE of FSM */
     uint16_t supported_codes;                                       /**< supported codes of current FSM */
     uint8_t state;                                                  /**< current state of FSM */
@@ -181,19 +205,19 @@ typedef struct ppp_fsm_t {
     uint32_t restart_timer;                                         /**< restart time value of FSM */
     xtimer_t xtimer;                                                /**< xtimer structure for timeout handling */
     uint8_t cr_sent_identifier;                                     /**< last configure request id sent */
-    uint8_t cr_sent_opts[OPT_PAYLOAD_BUF_SIZE];                     /**< string of last options sent */
+    uint8_t cr_sent_opts[GNRC_PPP_OPT_PAYLOAD_BUF_SIZE];                     /**< string of last options sent */
     uint16_t cr_sent_size;                                          /**< size of last options sent */
     uint8_t tr_sent_identifier;                                     /**< last terminate request id sent */
-    fsm_conf_t * (*get_conf_by_code)(ppp_fsm_t * cp, uint8_t code); /**< pointer to fsm's get_conf_by_code function. */
-    fsm_conf_t *conf;                                               /**< configuration array of current FSM */
-    void (*on_layer_up)(ppp_fsm_t *cp);                             /**< Optional callback when current FSM is ready. */
-    void (*on_layer_down)(ppp_fsm_t *cp);                           /**< Optional callback when current FSM is down */
-} ppp_fsm_t;
+    gnrc_ppp_fsm_conf_t * (*get_conf_by_code)(gnrc_ppp_fsm_t * cp, uint8_t code); /**< pointer to fsm's get_conf_by_code function. */
+    gnrc_ppp_fsm_conf_t *conf;                                               /**< configuration array of current FSM */
+    void (*on_layer_up)(gnrc_ppp_fsm_t *cp);                             /**< Optional callback when current FSM is ready. */
+    void (*on_layer_down)(gnrc_ppp_fsm_t *cp);                           /**< Optional callback when current FSM is down */
+} gnrc_ppp_fsm_t;
 
 /**
  * @brief Data type or representing a PPP option
  */
-typedef struct fsm_conf_t {
+typedef struct gnrc_ppp_fsm_conf {
     uint8_t type;                   /**< Option type */
     network_uint32_t value;         /**< Current option value */
     network_uint32_t default_value; /**< Default value of option (for resetting purposes). */
@@ -209,7 +233,7 @@ typedef struct fsm_conf_t {
                                      *
                                      * @details This hook should return true if the option is valid. False otherwise
                                      */
-    uint8_t (*is_valid)(ppp_option_t *opt);
+    uint8_t (*is_valid)(gnrc_ppp_option_t *opt);
                                     /**
                                      * @brief hook for build_nak_options function for a NAK'd option in a Configure Request
                                      *
@@ -222,9 +246,9 @@ typedef struct fsm_conf_t {
                                      *
                                      * @details This hook should do whatever is necessary after ACK'd an option.
                                      */
-    void (*set)(ppp_fsm_t *t, ppp_option_t *opt, uint8_t peer);
-    struct fsm_conf_t *next;        /**< pointer to next configuration */
-} fsm_conf_t;
+    void (*set)(gnrc_ppp_fsm_t *t, gnrc_ppp_option_t *opt, uint8_t peer);
+    gnrc_ppp_fsm_conf_t *next;        /**< pointer to next configuration */
+} gnrc_ppp_fsm_conf_t;
 
 /**
  * @brief init the Option Negotiation Automaton FSM
@@ -234,7 +258,7 @@ typedef struct fsm_conf_t {
  *
  * @return 0 for now.
  */
-int fsm_init(gnrc_netdev2_t *ppp_dev, ppp_fsm_t *cp);
+int fsm_init(gnrc_netdev2_t *ppp_dev, gnrc_ppp_fsm_t *cp);
 /**
  * @brief triggers an event in the FSM
  *
@@ -245,7 +269,7 @@ int fsm_init(gnrc_netdev2_t *ppp_dev, ppp_fsm_t *cp);
  * @return -EBADMSG if there was an error in the packet
  * @return 0
  */
-int trigger_fsm_event(ppp_fsm_t *cp, int event, gnrc_pktsnip_t *pkt);
+int trigger_fsm_event(gnrc_ppp_fsm_t *cp, int event, gnrc_pktsnip_t *pkt);
 /**
  * @brief Protocol handler for an FSM.
  *
@@ -256,12 +280,12 @@ int trigger_fsm_event(ppp_fsm_t *cp, int event, gnrc_pktsnip_t *pkt);
  * @return 0
  * @return Error code if something went wrong
  */
-int fsm_handle_ppp_msg(struct ppp_protocol_t *protocol, uint8_t ppp_event, void *args);
+int fsm_handle_ppp_msg(gnrc_ppp_protocol_t *protocol, uint8_t ppp_event, void *args);
 
 #ifdef __cplusplus
 }
 #endif
-#endif
+#endif /*GNRC_PPP_FSM_H*/
 /**
  * @}
  */
