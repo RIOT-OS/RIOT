@@ -62,6 +62,7 @@ void kw2xrf_set_out_clk(kw2xrf_t *dev)
 
 void kw2xrf_set_power_mode(kw2xrf_t *dev, kw2xrf_powermode_t pm)
 {
+    DEBUG("[kw2xrf]: kw2xrf_set_power_mode\n");
     uint8_t reg = 0;
     switch (pm) {
         case KW2XRF_HIBERNATE:
@@ -87,7 +88,6 @@ void kw2xrf_set_power_mode(kw2xrf_t *dev, kw2xrf_powermode_t pm)
             dev->state = NETOPT_STATE_IDLE;
             break;
     }
-
     kw2xrf_write_dreg(dev, MKW2XDM_PWR_MODES, reg);
 }
 

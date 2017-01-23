@@ -34,6 +34,10 @@
 #ifndef OVERWRITES_H_
 #define OVERWRITES_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct overwrites_tag {
     char address;
     char data;
@@ -304,5 +308,7 @@ overwrites_t const overwrites_indirect[] ={
 
 end of deprecated versions */
 
-
+#ifdef __cplusplus
+}
+#endif
 #endif  //OVERWRITES_H_

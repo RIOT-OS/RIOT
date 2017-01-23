@@ -85,6 +85,7 @@ static void kw2xrf_set_address(kw2xrf_t *dev)
 
 void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)
 {
+    DEBUG("[kw2xrf]: kw2xrf_setup\n");
     netdev2_t *netdev = (netdev2_t *)dev;
 
     netdev->driver = &kw2xrf_driver;
@@ -93,7 +94,6 @@ void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)
     dev->idle_state = XCVSEQ_RECEIVE;
     dev->state = 0;
     dev->pending_tx = 0;
-
     kw2xrf_spi_init(dev);
     kw2xrf_set_power_mode(dev, KW2XRF_IDLE);
     DEBUG("[kw2xrf]: setup finished\n");

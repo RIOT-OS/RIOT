@@ -17,6 +17,7 @@
  *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @author  Jonas Remmert <j.remmert@phytec.de>
+ * @author  Sebastian Meiling <s@mlng.net>
  */
 
 #ifdef MODULE_KW2XRF
@@ -51,24 +52,18 @@ void auto_init_kw2xrf(void)
         const kw2xrf_params_t *p = &kw2xrf_params[i];
 
         LOG_DEBUG("[auto_init_netif] initializing kw2xrf #%u\n", i);
-
         kw2xrf_setup(&kw2xrf_devs[i], (kw2xrf_params_t*) p);
-        int res = gnrc_netdev2_ieee802154_init(&gnrc_adpt[i],
-                                               (netdev2_ieee802154_t *)&kw2xrf_devs[i]);
-        if (res < 0) {
-            LOG_ERROR("[auto_init_netif] initializing kw2xrf #%u\n", i);
+        if (gnrc_netdev2_ieee802154_init(&gnrc_adpt[i], (netdev2_ieee802154_t *)&kw2xrf_devs[i]) < 0) {
+            LOG_ERROR("[auto_init_netif] error, initializing kw2xrf #%u\n", i);
         }
         else {
-            gnrc_netdev2_init(_nomac_stacks[i],
-                              KW2XRF_MAC_STACKSIZE,
-                              KW2XRF_MAC_PRIO,
-                              "kw2xrf",
-                              &gnrc_adpt[i]);
+            gnrc_netdev2_init(_nomac_stacks[i], KW2XRF_MAC_STACKSIZE,
+                              KW2XRF_MAC_PRIO, "kw2xrf", &gnrc_adpt[i]);
         }
     }
 }
 #else
 typedef int dont_be_pedantic;
-#endif /* MODULE_GNRC_KW2XRF */
+#endif /* MODULE_KW2XRF */
 
 /** @} */

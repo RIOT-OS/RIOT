@@ -32,7 +32,7 @@ static const kw2xrf_params_t kw2xrf_params[] =
     {
         {
             .spi = KW2XRF_SPI,
-            .spi_speed = KW2XRF_SPI_SPEED,
+            .spi_clk = KW2XRF_SPI_CLK,
             .cs_pin = KW2XRF_CS,
             .int_pin = KW2XRF_INT,
         },

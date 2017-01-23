@@ -14,6 +14,7 @@
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
+
 #ifndef KW2XRF_SPI_H
 #define KW2XRF_SPI_H
 
@@ -62,7 +63,7 @@ uint8_t kw2xrf_read_dreg(kw2xrf_t *dev, uint8_t addr);
  * @param[in] buf Value that shall be written.
  * @param[in] length Length of the register.
  */
-size_t kw2xrf_write_dregs(kw2xrf_t *dev, uint8_t addr, uint8_t *buf, uint8_t length);
+void kw2xrf_write_dregs(kw2xrf_t *dev, uint8_t addr, uint8_t *buf, uint8_t length);
 
 /**
  * @brief Reads a byte from the kw2xrf indirect register.
@@ -72,7 +73,7 @@ size_t kw2xrf_write_dregs(kw2xrf_t *dev, uint8_t addr, uint8_t *buf, uint8_t len
  * @param[in] buf Buffer, where the content of the reg shall be written to.
  * @param[in] length Length of the register.
  */
-size_t kw2xrf_read_dregs(kw2xrf_t *dev, uint8_t addr, uint8_t *buf, uint8_t length);
+void kw2xrf_read_dregs(kw2xrf_t *dev, uint8_t addr, uint8_t *buf, uint8_t length);
 
 /**
  * @brief Writes to  a byte from the kw2xrf indirect register.
@@ -139,5 +140,5 @@ void kw2xrf_read_fifo(kw2xrf_t *dev, uint8_t *data, uint8_t data_length);
 }
 #endif
 
-#endif
+#endif /* KW2XRF_SPI_H */
 /** @} */

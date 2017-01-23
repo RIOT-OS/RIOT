@@ -57,6 +57,8 @@ extern "C" {
 
 /**
  * @brief   Default channel used after initialization
+ *
+ * @{
  */
 #ifdef DEFAULT_CHANNEL
 #define KW2XRF_DEFAULT_CHANNEL (DEFAULT_CHANNEL)
@@ -64,8 +66,16 @@ extern "C" {
 #ifndef KW2XRF_DEFAULT_CHANNEL
 #define KW2XRF_DEFAULT_CHANNEL        (IEEE802154_DEFAULT_CHANNEL)
 #endif
+/** @} */
+
+/**
+ * @brief   Allowed range of channels
+ *
+ * @{
+ */
 #define KW2XRF_MIN_CHANNEL              (11U)
 #define KW2XRF_MAX_CHANNEL              (26U)
+/** @} */
 
 /**
  * @brief   Default TX_POWER in dbm used after initialization
@@ -115,7 +125,7 @@ extern "C" {
  */
 typedef struct kw2xrf_params {
     spi_t spi;                          /**< SPI bus the device is connected to */
-    spi_speed_t spi_speed;              /**< SPI speed to use */
+    spi_clk_t spi_clk;                  /**< SPI clock speed to use */
     gpio_t cs_pin;                      /**< GPIO pin connected to chip select */
     gpio_t int_pin;                     /**< GPIO pin connected to the interrupt pin */
 } kw2xrf_params_t;
@@ -167,7 +177,6 @@ int kw2xrf_init(kw2xrf_t *dev, gpio_cb_t cb);
  * @param[in] dev           device to reset
  */
 void kw2xrf_reset_phy(kw2xrf_t *dev);
-
 
 #ifdef __cplusplus
 }
