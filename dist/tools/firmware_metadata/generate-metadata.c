@@ -44,7 +44,6 @@
 #include <sys/resource.h>
 
 #include "fw_slots.h"
-#include "tweetnacl/tweetnacl.h"
 #include "hashes/sha256.h"
 
 /* Input firmware .bin file */
@@ -52,20 +51,6 @@ FILE *firmware_bin;
 
 /* Output metadata .bin file */
 FILE *metadata_bin;
-
-/* Pointer to firmware's public key */
-FILE *firmware_pk;
-
-/* Pointer to server's secret key */
-FILE *server_sk;
-
-/* Keys buffers */
-static unsigned char firmware_pkey[crypto_box_PUBLICKEYBYTES];
-static unsigned char server_skey[crypto_box_SECRETKEYBYTES];
-
-/* Crypto helpers */
-static const unsigned char n[crypto_box_NONCEBYTES];
-static unsigned char m[NACL_SIGN];
 
 uint32_t firmware_size = 0;
 
@@ -110,34 +95,12 @@ int main(int argc, char *argv[])
     /* Close the .bin file. */
     fclose(firmware_bin);
 
-    printf("Encrypting using firmware_pkey.pub ...\n");
-    printf("Reading firmware public key...\n");
-    firmware_pk = fopen("firmware_pkey.pub", "r");
-    if (firmware_pk != NULL) {
-        size_t size = fread(firmware_pkey, 1, sizeof(firmware_pkey), firmware_pk);
-        printf("Read %zu bytes from firmware_pkey.pub\n", size);
-        fclose(firmware_pk);
-    } else {
-        printf("ERROR! Cannot open firmware public key\n");
-        return -1;
+    /*
+     * TODO Sign hash
+     */
+    for (unsigned long i = 0; i < sizeof(metadata.shash); i++) {
+        metadata.shash[i] = 0;
     }
-
-    printf("Reading server secret key \"server_skey\"...\n");
-    server_sk = fopen("server_skey", "r");
-    if (server_sk != NULL) {
-        size_t size = fread(server_skey, 1, sizeof(server_skey), server_sk);
-        printf("Read %zu bytes from server_skey\n", size);
-        fclose(server_sk);
-    } else {
-        printf("ERROR! Cannot open server secret key\n");
-        return -1;
-    }
-
-    memset(metadata.shash, 0, NACL_SIGN);
-    memset(m, 0, crypto_box_ZEROBYTES);
-    memcpy(m + crypto_box_ZEROBYTES, metadata.hash, NACL_SIGN - crypto_box_ZEROBYTES);
-
-    crypto_box(metadata.shash, m, NACL_SIGN, n, firmware_pkey, server_skey);
 
     /* Generate FW image metadata */
 

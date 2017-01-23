@@ -5,7 +5,7 @@ follows:
 ```c
 typedef struct FW_metadata {
     uint8_t hash[SHA256_DIGEST_LENGTH]; /* SHA256 Hash of firmware image */
-    uint8_t shash[NACL_SIGN];           /* Signed SHA256 */
+    uint8_t shash[SIGN_LEN];            /* Signed SHA256 */
     uint32_t size;                      /* Size of firmware image */
     uint32_t uuid;                      /* Integer representing unique firmware ID */
     uint16_t version;                   /* Integer representing firmware version */
