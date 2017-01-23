@@ -39,7 +39,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <tweetnacl.h>
 #include "fw_slots.h"
 #include "cpu_conf.h"
 #include "irq.h"
@@ -72,40 +71,9 @@ static void int_flash_read(uint8_t *data_buffer, uint32_t address, uint32_t coun
 
 int validate_int_fw_slot(uint8_t fw_slot)
 {
-    FW_metadata_t metadata;
-    int res;
-    unsigned char n[crypto_box_NONCEBYTES];
-    unsigned char hash[NACL_SIGN];
-
-    if (verify_int_fw_slot(fw_slot) != 0) {
-        printf("[fw_slots] ERROR verification for slot %i failed!\n", fw_slot);
-        return -1;
-    }
-
-    if (get_int_fw_slot_metadata(fw_slot, &metadata) != 0) {
-        printf("[fw_slots] ERROR cannot get metadata from slot %i!\n", fw_slot);
-        return -1;
-    }
-
-    memset(hash, 0, sizeof(hash));
-
-    printf("Decrypting metadata.shash...\n");
-
-    res = crypto_box_open(hash, metadata.shash, NACL_SIGN, n, server_pkey, firmware_skey);
-    if (res) {
-        printf("Decryption failed.\n");
-        return -1;
-    } else {
-        printf("Decryption successful! verifying...");
-        for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
-            if (metadata.hash[i] != (hash[i + crypto_box_ZEROBYTES])) {
-                printf("[fw_slots] ERROR incorrect decrypted hash!\n");
-                return -1;
-            }
-        }
-    }
-
-    printf("[fw_slots] FW slot %i successfully validated!\n", fw_slot);
+    /*
+     * TODO
+     */
 
     return 0;
 }
@@ -499,8 +467,6 @@ void jump_to_image(uint32_t destination_address)
 
     /* Move to the second pointer on VTOR (reset_handler_default) */
     destination_address += VTOR_RESET_HANDLER;
-
-    printf("Addr: 0x%lx\n", destination_address);
 
     /* Load the destination address */
     __asm("LDR R0, [%[dest]]"::[dest]"r"(destination_address));

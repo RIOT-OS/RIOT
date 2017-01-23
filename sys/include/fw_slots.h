@@ -30,7 +30,7 @@
  */
 
 /**
- * @defgroup    sys_fw_slots Firmware Slots
+ * @defgroup    sys_fw_slots Firmware slots management
  * @ingroup     sys
  *
  * @file
@@ -44,7 +44,6 @@
 #define FW_SLOTS_H
 
 #include "hashes/sha256.h"
-#include "tweetnacl.h"
 
 /*
  *  FW_METADATA_LENGTH:
@@ -53,18 +52,19 @@
  */
 #define FW_METADATA_LENGTH  sizeof(FW_metadata_t)
 
-#define NACL_SIGN            (SHA256_DIGEST_LENGTH + crypto_box_ZEROBYTES)
+/*
+ *  SIGN_LEN:
+ *    Provisional length for signed hash
+ */
+#define SIGN_LEN            (SHA256_DIGEST_LENGTH)
 
 typedef struct FW_metadata {
     uint8_t hash[SHA256_DIGEST_LENGTH]; /* SHA256 Hash of firmware image */
-    uint8_t shash[NACL_SIGN];           /* Signed SHA256 */
+    uint8_t shash[SIGN_LEN];            /* Signed SHA256 */
     uint32_t size;                      /* Size of firmware image */
     uint32_t uuid;                      /* Integer representing unique firmware ID */
     uint16_t version;                   /* Integer representing firmware version */
 } FW_metadata_t;
-
-extern const unsigned char server_pkey[];
-extern const unsigned char firmware_skey[];
 
 /**
  * @brief  Print formatted FW image metadata to STDIO.
