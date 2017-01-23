@@ -14,6 +14,8 @@ abortPreviousBuilds()
 
 stage('setup') {
     node ('master') {
+        sh '(( "\${RIOT_MIRROR}" )) && git -C "\${RIOT_MIRROR_DIR}" fetch --all'
+
         deleteDir()
 
         fetchPR(env.CHANGE_ID, "--depth=1", "")
@@ -220,7 +222,10 @@ def fetchPR(prNum, fetchArgs, extraRefSpec)
 {
     retry(3) {
         timeout(time: 60, unit: 'SECONDS') {
-            sh """git init; git remote add origin https://github.com/RIOT-OS/RIOT;
+            deleteDir()
+            sh """git init
+            if (( "\${RIOT_MIRROR}" )); then RIOT_URL="\${RIOT_MIRROR_URL}"; else RIOT_URL="https://github.com/RIOT-OS/RIOT"; fi
+            git remote add origin "\${RIOT_URL}"
             git fetch -u -n ${fetchArgs} origin ${extraRefSpec} pull/${prNum}/merge:pull_${prNum}
             git checkout pull_${prNum}"""
         }
