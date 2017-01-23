@@ -83,28 +83,7 @@ static int cmd_verify(int argc, char **argv)
     slot = atoi(argv[1]);
 
     if (verify_int_fw_slot(slot) == 0) {
-        printf("Verified slot %d\n", slot);
-        return 0;
-    } else {
-        return -1;
-    }
-
-    return 0;
-}
-
-static int cmd_validate(int argc, char **argv)
-{
-    uint8_t slot;
-
-    if (argc < 2) {
-        printf("usage: %s <slot>\n", argv[0]);
-        return -1;
-    }
-
-    slot = atoi(argv[1]);
-
-    if (validate_int_fw_slot(slot) == 0) {
-        printf("Validated slot %d\n", slot);
+        printf("Slot %d successfully verified\n", slot);
         return 0;
     } else {
         return -1;
@@ -140,14 +119,16 @@ static int cmd_jump(int argc, char **argv)
 
     slot = atoi(argv[1]);
 
-    /*if (validate_int_fw_slot(slot) == 0) {
-        printf("Validated slot %d\n", slot);
+    if (verify_int_fw_slot(slot) == 0) {
+        printf("Slot %d verified!\n", slot);
     } else {
-        printf("Slot %u not valid!\n", slot);
+        printf("Slot %u inconsistent!\n", slot);
         return -1;
-    }*/
+    }
 
     address = get_slot_fw_address(slot);
+
+    printf("Booting slot %d at 0x%lx...\n", slot, address);
 
     jump_to_image(address);
 
@@ -158,7 +139,6 @@ static const shell_command_t shell_commands[] = {
     { "lsimg", "List the available firmwares on ROM", cmd_lsimg },
     { "get_metadata", "Get metadata from slot", cmd_get_metadata },
     { "verify", "Verify consistency (sha256) of slot", cmd_verify },
-    { "validate", "Validates authenticity of slot", cmd_validate },
     { "erase", "Erase slot *WARNING use with caution*", cmd_erase_slot },
     { "jump", "Jump to specific FW slot (cause reset)", cmd_jump },
     { NULL, NULL, NULL }

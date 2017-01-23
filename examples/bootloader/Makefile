@@ -21,7 +21,4 @@ QUIET ?= 1
 # Use fw_slots module to manage images on ROM
 USEMODULE += fw_slots
 
-# TweetNaCl needs a lot of stack
-CFLAGS += '-DTHREAD_STACKSIZE_MAIN=(THREAD_STACKSIZE_DEFAULT + 2048)'
-
 include $(RIOTBASE)/Makefile.include
