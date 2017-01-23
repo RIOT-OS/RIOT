@@ -1,6 +1,1 @@
 *.hex
-/firmware_pkey.pub
-/firmware_skey
-/keys.c
-/server_pkey.pub
-/server_skey
