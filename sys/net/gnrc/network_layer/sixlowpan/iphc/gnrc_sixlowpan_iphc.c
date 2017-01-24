@@ -29,6 +29,7 @@
 #include "net/gnrc/udp.h"
 
 #ifdef MODULE_GNRC_SIXLOENC
+#include "net/ethernet.h"
 #include "net/ethernet/hdr.h"
 #endif
 #include "net/gnrc/sixlowpan/iphc.h"
