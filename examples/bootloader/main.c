@@ -36,9 +36,9 @@ static int cmd_lsimg(int argc, char **argv)
     FW_metadata_t fw_metadata;
 
     for (uint8_t i = 1; i <= MAX_FW_SLOTS; i++) {
-        if (get_int_fw_slot_metadata(i, &fw_metadata) == 0) {
+        if (fw_slots_get_int_slot_metadata(i, &fw_metadata) == 0) {
             printf("Metadata slot %d:\n", i);
-            print_metadata(&fw_metadata);
+            fw_slots_print_metadata(&fw_metadata);
         } else {
             printf("ERROR: Cannot retrieve metadata.\n");
         }
@@ -59,9 +59,9 @@ static int cmd_get_metadata(int argc, char **argv)
 
     slot = atoi(argv[1]);
 
-    if (get_int_fw_slot_metadata(slot, &fw_metadata) == 0) {
+    if (fw_slots_get_int_slot_metadata(slot, &fw_metadata) == 0) {
         printf("Metadata slot %d\n", slot);
-        print_metadata(&fw_metadata);
+        fw_slots_print_metadata(&fw_metadata);
         return 0;
     } else {
         printf("ERROR: Cannot retrieve metadata from slot %d.\n", slot);
@@ -82,7 +82,7 @@ static int cmd_verify(int argc, char **argv)
 
     slot = atoi(argv[1]);
 
-    if (verify_int_fw_slot(slot) == 0) {
+    if (fw_slots_verify_int_slot(slot) == 0) {
         printf("Slot %d successfully verified\n", slot);
         return 0;
     } else {
@@ -103,7 +103,7 @@ static int cmd_erase_slot(int argc, char**argv)
 
     slot = atoi(argv[1]);
 
-    return erase_int_fw_image(slot);
+    return fw_slots_erase_int_image(slot);
 }
 
 static int cmd_jump(int argc, char **argv)
@@ -119,18 +119,18 @@ static int cmd_jump(int argc, char **argv)
 
     slot = atoi(argv[1]);
 
-    if (verify_int_fw_slot(slot) == 0) {
+    if (fw_slots_verify_int_slot(slot) == 0) {
         printf("Slot %d verified!\n", slot);
     } else {
         printf("Slot %u inconsistent!\n", slot);
         return -1;
     }
 
-    address = get_slot_fw_address(slot);
+    address = fw_slots_get_slot_address(slot);
 
     printf("Booting slot %d at 0x%lx...\n", slot, address);
 
-    jump_to_image(address);
+    fw_slots_jump_to_image(address);
 
     return 0;
 }
