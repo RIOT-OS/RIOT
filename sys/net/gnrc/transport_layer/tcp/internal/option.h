@@ -60,21 +60,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Extract kind field value from 4-byte option field
- */
-#define OPT_GET_KIND( x )   (((x) & 0xFF000000) >> 24)
-
-/**
- * @brief Extract length field value from 4-byte option field
- */
-#define OPT_GET_LENGTH( x ) (((x) & 0x00FF0000) >> 16)
-
-/**
- * @brief Extract two byte option value from 4-byte option field
- */
-#define OPT_GET_VAL_2B( x ) (((x) & 0x0000FFFF))
-
-/**
  * @brief Helper Function to build the MSS Option
  *
  * @param[in]  mss   tcp header to be checked
@@ -102,7 +87,7 @@ uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl);
  * @return   Zero on success
  * @return   A negative value on error
  */
-int _option_parse(gnrc_tcp_tcb_t* tcb, tcp_hdr_t *hdr);
+int _option_parse(gnrc_tcp_tcb_t* tcb, gnrc_tcp_hdr_t *hdr);
 
 #ifdef __cplusplus
 }

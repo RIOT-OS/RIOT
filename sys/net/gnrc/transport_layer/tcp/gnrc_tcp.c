@@ -587,30 +587,30 @@ int gnrc_tcp_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_h
     if (csum == 0) {
         return -ENOENT;
     }
-    ((tcp_hdr_t *)hdr->data)->checksum = byteorder_htons(csum);
+    ((gnrc_tcp_hdr_t *)hdr->data)->checksum = byteorder_htons(csum);
     return 0;
 }
 
 gnrc_pktsnip_t *gnrc_tcp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src, uint16_t dst)
 {
     gnrc_pktsnip_t *res;
-    tcp_hdr_t *hdr;
+    gnrc_tcp_hdr_t *hdr;
 
     /* allocate header */
-    res = gnrc_pktbuf_add(payload, NULL, sizeof(tcp_hdr_t), GNRC_NETTYPE_TCP);
+    res = gnrc_pktbuf_add(payload, NULL, sizeof(gnrc_tcp_hdr_t), GNRC_NETTYPE_TCP);
     if (res == NULL) {
         DEBUG("tcp: No space left in packet buffer\n");
         return NULL;
     }
-    hdr = (tcp_hdr_t *) res->data;
+    hdr = (gnrc_tcp_hdr_t *) res->data;
 
     /* Clear Header */
-    memset(hdr, 0, sizeof(tcp_hdr_t));
+    memset(hdr, 0, sizeof(gnrc_tcp_hdr_t));
 
     /* Initialize Header with sane Defaults */
     hdr->src_port = byteorder_htons(src);
     hdr->dst_port = byteorder_htons(dst);
     hdr->checksum = byteorder_htons(0);
-    hdr->off_ctl = byteorder_htons(OPTION_OFFSET_MAX);
+    hdr->off_ctl = byteorder_htons(OPTION_OFFSET_BASE);
     return res;
 }

@@ -33,58 +33,52 @@ uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl)
     return (nopts << 12) | ctl;
 }
 
-int _option_parse(gnrc_tcp_tcb_t* tcb, tcp_hdr_t *hdr)
+int _option_parse(gnrc_tcp_tcb_t* tcb, gnrc_tcp_hdr_t *hdr)
 {
-    uint8_t word_idx = 0;
-    uint8_t byte_idx = 0;
-    uint8_t word_end = 0;
-    uint16_t off_ctl = byteorder_ntohs(hdr->off_ctl);
+    /* Extract Offset value. Return if no options are set */
+    uint8_t offset = GET_OFFSET(byteorder_ntohs(hdr->off_ctl));
+    if (offset <= OPTION_OFFSET_BASE) {
+        return 0;
+    }
 
-    word_end = GET_OFFSET(off_ctl) - OPTION_OFFSET_BASE;
+    /* Get Pointer to option field and field-size */
+    uint8_t* opt_ptr = (uint8_t *) hdr + sizeof(gnrc_tcp_hdr_t);
+    uint8_t opt_left = (offset - OPTION_OFFSET_BASE) * sizeof(network_uint32_t);
 
-    while (word_idx < word_end) {
-        uint32_t word = byteorder_ntohl(hdr->options[word_idx]);
+    /* Parse Options Byte by Byte */
+    while (opt_left > 0) {
+        uint8_t kind = *opt_ptr;
+        uint8_t len = 0;
 
-        /* If byte index is not aligned to word index. Fill word with bytes from next word. */
-        if (byte_idx) {
-            word >>= (byte_idx * 8);
-            word |= (byteorder_ntohl(hdr->options[word_idx + 1]) << ((sizeof(word) - byte_idx) * 8));
-        }
-
-        /* Option handling */
-        switch (OPT_GET_KIND(word)) {
+        /* Examine current option */
+        switch (kind) {
             case OPT_KIND_EOL:
-                DEBUG("gnrc_tcp_option.c : _option_parse() : Option eol\n");
+                DEBUG("gnrc_tcp_option.c : _option_parse() : Option eol received\n");
                 return 0;
 
             case OPT_KIND_NOP:
-                byte_idx += 1;
-                DEBUG("gnrc_tcp_option.c : _option_parse() : Option nop\n");
+                DEBUG("gnrc_tcp_option.c : _option_parse() : Option nop received\n");
+                len = 1;
                 break;
 
             case OPT_KIND_MSS:
-                DEBUG("gnrc_tcp_option.c : _option_parse() : Option mss\n");
-                if (OPT_GET_LENGTH(word) == OPT_LENGTH_MSS) {
-                    tcb->mss = OPT_GET_VAL_2B(word);
-                    byte_idx += 4;
-                }
-                else {
+                DEBUG("gnrc_tcp_option.c : _option_parse() : Option mss received\n");
+                len = *(opt_ptr + 1);
+                if (len != OPT_LENGTH_MSS)
+                {
                     DEBUG("gnrc_tcp_option.c : _option_parse() : invalid MSS Option length.\n");
                     return -1;
                 }
+                /* Add MSS to tcb */
+                tcb->mss = (*(opt_ptr + 2) << 8) | *(opt_ptr + 3);
                 break;
 
-            /* Add options support HERE */
             default:
                 DEBUG("gnrc_tcp_option.c : _option_parse() : Unsupported option received\n");
-                byte_idx += 1;
+                len = *(opt_ptr + 1);
         }
-
-        /* Update index */
-        if (byte_idx >= 4) {
-            word_idx += 1;
-            byte_idx -= 4;
-        }
+        opt_ptr += len;
+        opt_left -= len;
     }
     return 0;
 }

@@ -49,12 +49,12 @@ static inline uint32_t _max(const uint32_t x, const uint32_t y)
 
 int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
 {
-    tcp_hdr_t tcp_hdr_out;
+    gnrc_tcp_hdr_t tcp_hdr_out;
 
     /* Extract headers */
     gnrc_pktsnip_t *tcp_snp;
     LL_SEARCH_SCALAR(in_pkt, tcp_snp, type, GNRC_NETTYPE_TCP);
-    tcp_hdr_t *tcp_hdr_in = (tcp_hdr_t *)tcp_snp->data;
+    gnrc_tcp_hdr_t *tcp_hdr_in = (gnrc_tcp_hdr_t *)tcp_snp->data;
 #ifdef MODULE_GNRC_IPV6
     gnrc_pktsnip_t *ip6_snp;
     LL_SEARCH_SCALAR(in_pkt, ip6_snp, type, GNRC_NETTYPE_IPV6);
@@ -120,8 +120,8 @@ int _pkt_build(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
 {
     gnrc_pktsnip_t *pay_snp = NULL;
     gnrc_pktsnip_t *tcp_snp = NULL;
-    tcp_hdr_t tcp_hdr;
-    uint8_t nopts = 0;
+    gnrc_tcp_hdr_t tcp_hdr;
+    uint8_t offset = OPTION_OFFSET_BASE; /* Offset Value in Header. Offset = size in 32-bit words */
 
     /* Add payload, if supplied */
     if (payload != NULL && payload_len > 0) {
@@ -142,18 +142,16 @@ int _pkt_build(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
     tcp_hdr.window = byteorder_htons(tcb->rcv_wnd);
     tcp_hdr.urgent_ptr = byteorder_htons(0);
 
-    /* tcp option handling */
-    /* If this is a syn-message, send mss option */
+    /* If this is a syn-message, add mss option later. MSS Consumes 4 bytes in option field */
     if (ctl & MSK_SYN) {
-        /* NOTE: MSS usually based on lower layers MTU */
-        tcp_hdr.options[nopts] = byteorder_htonl(_option_build_mss(GNRC_TCP_MSS));
-        nopts += 1;
+        offset += 1;
     }
     /* Set offset and control bit accordingly */
-    tcp_hdr.off_ctl = byteorder_htons(_option_build_offset_control(OPTION_OFFSET_BASE + nopts, ctl));
+    tcp_hdr.off_ctl = byteorder_htons(_option_build_offset_control(offset , ctl));
 
-    /* allocate tcp header */
-    tcp_snp = gnrc_pktbuf_add(pay_snp, &tcp_hdr, (OPTION_OFFSET_BASE + nopts) * 4, GNRC_NETTYPE_TCP);
+    /* Allocate tcp header, including needed Option Field (to be filled later) */
+    tcp_snp = gnrc_pktbuf_add(pay_snp, &tcp_hdr, offset * sizeof(network_uint32_t),
+                              GNRC_NETTYPE_TCP);
     if (tcp_snp == NULL) {
         DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Can't allocate buffer for TCP Header\n.");
         gnrc_pktbuf_release(pay_snp);
@@ -161,6 +159,22 @@ int _pkt_build(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
         return -ENOMEM;
     }
     else {
+        /* Add Options if existing */
+        if (OPTION_OFFSET_BASE < offset) {
+            uint8_t* opt_ptr = (uint8_t *) tcp_snp->data + sizeof(tcp_hdr);
+            uint8_t opt_left = (offset - OPTION_OFFSET_BASE) * sizeof(network_uint32_t);
+
+            /* Init Options Field with 'End Of Option List' (0) */
+            memset(opt_ptr, OPT_KIND_EOL, opt_left);
+
+            /* If SYN Flag is Set: Add MSS Option */
+            if (ctl & MSK_SYN) {
+                network_uint32_t mss_option = byteorder_htonl(_option_build_mss(GNRC_TCP_MSS));
+                memcpy(opt_ptr, &mss_option, sizeof(mss_option));
+            }
+            /* Increase opt_ptr and decrease opt_ptr, if other options are added */
+            /* NOTE: Add Additional Options here */
+        }
         *(out_pkt) = tcp_snp;
     }
 
@@ -257,7 +271,7 @@ uint32_t _pkt_get_seg_len(gnrc_pktsnip_t *pkt)
     gnrc_pktsnip_t *snp = NULL;
 
     LL_SEARCH_SCALAR(pkt, snp, type, GNRC_NETTYPE_TCP);
-    tcp_hdr_t *hdr = (tcp_hdr_t *) snp->data;
+    gnrc_tcp_hdr_t *hdr = (gnrc_tcp_hdr_t *) snp->data;
     ctl = byteorder_ntohs(hdr->off_ctl);
     seq = _pkt_get_pay_len(pkt);
     if (ctl & MSK_SYN) {
@@ -302,7 +316,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *pkt, const bool r
 
     /* Extract control bits and segment length */
     LL_SEARCH_SCALAR(pkt, snp, type, GNRC_NETTYPE_TCP);
-    ctl = byteorder_ntohs(((tcp_hdr_t *) snp->data)->off_ctl);
+    ctl = byteorder_ntohs(((gnrc_tcp_hdr_t *) snp->data)->off_ctl);
     len = _pkt_get_pay_len(pkt);
 
     /* Check if pkt contains reset or is a pure ACK, return */
@@ -355,7 +369,7 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t* tcb, const uint32_t ack)
 {
     uint32_t seg = 0;
     gnrc_pktsnip_t *snp = NULL;
-    tcp_hdr_t *hdr;
+    gnrc_tcp_hdr_t *hdr;
 
     /* Retransmission Queue is empty. Nothing to ACK there */
     if (tcb->pkt_retransmit == NULL) {
@@ -364,7 +378,7 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t* tcb, const uint32_t ack)
     }
 
     LL_SEARCH_SCALAR(tcb->pkt_retransmit, snp, type, GNRC_NETTYPE_TCP);
-    hdr = (tcp_hdr_t *) snp->data;
+    hdr = (gnrc_tcp_hdr_t *) snp->data;
 
     /* There must be a packet, waiting to be acknowledged. */
     seg = byteorder_ntohl(hdr->seq_num) + _pkt_get_seg_len(tcb->pkt_retransmit) - 1;

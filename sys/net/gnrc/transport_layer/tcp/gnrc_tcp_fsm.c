@@ -424,7 +424,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *in_pkt, bool *noti
     DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt()\n");
     /* Search TCP header. */
     LL_SEARCH_SCALAR(in_pkt, snp, type, GNRC_NETTYPE_TCP);
-    tcp_hdr_t *tcp_hdr = (tcp_hdr_t *) snp->data;
+    gnrc_tcp_hdr_t *tcp_hdr = (gnrc_tcp_hdr_t *) snp->data;
 
     /* Verify packet options, return if they were faulty */
     if (_option_parse(tcb, tcp_hdr) < 0) {

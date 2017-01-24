@@ -90,7 +90,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
     gnrc_pktsnip_t *ip = NULL;
     gnrc_pktsnip_t *reset = NULL;
     gnrc_tcp_tcb_t *tcb = NULL;
-    tcp_hdr_t *hdr;
+    gnrc_tcp_hdr_t *hdr;
 
     /* Get write access to the TCP Header */
     gnrc_pktsnip_t *tcp = gnrc_pktbuf_start_write(pkt);
@@ -120,7 +120,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
     }
 
     /* Extract control bits, src and dst ports and check if SYN is set (not SYN+ACK) */
-    hdr = (tcp_hdr_t *)tcp->data;
+    hdr = (gnrc_tcp_hdr_t *)tcp->data;
     ctl = byteorder_ntohs(hdr->off_ctl);
     src = byteorder_ntohs(hdr->src_port);
     dst = byteorder_ntohs(hdr->dst_port);
