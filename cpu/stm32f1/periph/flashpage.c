@@ -81,7 +81,7 @@ void flashpage_write(int page, void *data)
     FLASH->CR |= FLASH_CR_LOCK;
 
     /* restore the HSI state */
-    if (hsi_state) {
+    if (!hsi_state) {
         RCC->CR &= ~(RCC_CR_HSION);
         while (RCC->CR & RCC_CR_HSIRDY) {}
     }
