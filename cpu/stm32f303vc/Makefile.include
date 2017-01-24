@@ -1,0 +1,20 @@
+
+# define the ST standard periphial library and the specific mcu
+export STM_LIB_BASE = $(RIOTBASE)/pkg/stm32f3_stdperiph_lib/
+
+# add the type of MCU used to the compiler flags 
+# (see stmlib/Libraries/CMSIS/Device/ST/STM32F30x/Include/stm32f30x.h for available types)
+export CFLAGS += -DUSE_STDPERIPH_DRIVER -DSTM32F30X
+
+# include cpu specific includes
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+
+# add the cpu specific system calls implementations for the linker
+export UNDEF += $(BINDIR)syscalls.o
+
+# export the periphial drivers to be linked into the final binary
+export USEMODULE += periph
+
+# the stm32f303vc depends on the STM32F3 std periph library, so include it
+# this will download the STM stdperiphial lib if needed and build it afterwards
+include $(STM_LIB_BASE)Makefile.include
