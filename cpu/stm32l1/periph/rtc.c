@@ -63,7 +63,8 @@ void rtc_init(void)
     while ( (RTC->ISR & RTC_ISR_INITF) == 0 );
 
     /* Set 24-h clock */
-    RTC->CR |= RTC_CR_FMT;
+    RTC->CR &= ~RTC_CR_FMT;
+  
     /* Timestamps enabled */
     RTC->CR |= RTC_CR_TSE;
 
