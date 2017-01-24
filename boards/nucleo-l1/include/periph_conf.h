@@ -80,6 +80,7 @@ static const timer_conf_t timer_config[] = {
  * @{
  */
 #define RTC_NUMOF           (1U)
+/** @} */
 
 /**
  * @brief   UART configuration
