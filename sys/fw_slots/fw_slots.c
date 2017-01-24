@@ -69,7 +69,7 @@ static void int_flash_read(uint8_t *data_buffer, uint32_t address, uint32_t coun
     }
 }
 
-int validate_int_fw_slot(uint8_t fw_slot)
+int fw_slots_validate_int_slot(uint8_t fw_slot)
 {
     /*
      * TODO
@@ -78,17 +78,17 @@ int validate_int_fw_slot(uint8_t fw_slot)
     return 0;
 }
 
-uint32_t get_slot_fw_address(uint8_t fw_slot)
+uint32_t fw_slots_get_slot_address(uint8_t fw_slot)
 {
     return get_slot_address(fw_slot);
 }
 
-uint32_t get_slot_fw_page(uint8_t fw_slot)
+uint32_t fw_slots_get_slot_page(uint8_t fw_slot)
 {
     return get_slot_page(fw_slot);
 }
 
-void print_metadata(FW_metadata_t *metadata)
+void fw_slots_print_metadata(FW_metadata_t *metadata)
 {
     printf("Firmware Size: %ld\n", metadata->size);
     printf("Firmware Version: %#x\n", metadata->version);
@@ -105,7 +105,7 @@ void print_metadata(FW_metadata_t *metadata)
     printf("\n");
 }
 
-int get_int_metadata(uint8_t fw_slot_page, FW_metadata_t *fw_metadata)
+int fw_slots_get_int_metadata(uint8_t fw_slot_page, FW_metadata_t *fw_metadata)
 {
     uint32_t fw_address;
 
@@ -118,7 +118,7 @@ int get_int_metadata(uint8_t fw_slot_page, FW_metadata_t *fw_metadata)
     return 0;
 }
 
-int get_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata)
+int fw_slots_get_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata)
 {
     /*
      * TODO
@@ -127,7 +127,7 @@ int get_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata)
     return 0;
 }
 
-int get_int_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata)
+int fw_slots_get_int_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata)
 {
     uint32_t page;
 
@@ -138,12 +138,12 @@ int get_int_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata)
         return -1;
     }
 
-    page = get_slot_fw_page(fw_slot);
+    page = fw_slots_get_slot_page(fw_slot);
 
-    return get_int_metadata(page, fw_slot_metadata);
+    return fw_slots_get_int_metadata(page, fw_slot_metadata);
 }
 
-int overwrite_int_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata)
+int fw_slots_overwrite_int_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata)
 {
     /*
      * TODO
@@ -153,7 +153,7 @@ int overwrite_int_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metad
 
 
 
-int overwrite_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata)
+int fw_slots_overwrite_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata)
 {
     /*
      * TODO
@@ -161,7 +161,7 @@ int overwrite_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata)
     return 0;
 }
 
-int backup_golden_image(void)
+int fw_slots_backup_golden_image(void)
 {
     /*
      * TODO
@@ -169,7 +169,7 @@ int backup_golden_image(void)
     return 0;
 }
 
-int verify_int_fw_slot(uint8_t fw_slot)
+int fw_slots_verify_int_slot(uint8_t fw_slot)
 {
     FW_metadata_t fw_metadata;
     uint32_t fw_image_address;
@@ -187,10 +187,10 @@ int verify_int_fw_slot(uint8_t fw_slot)
     }
 
     /* Read the metadata of the corresponding FW slot */
-    fw_image_address = get_slot_fw_address(fw_slot);
+    fw_image_address = fw_slots_get_slot_address(fw_slot);
 
-    if (get_int_fw_slot_metadata(fw_slot, &fw_metadata) == 0) {
-        print_metadata(&fw_metadata);
+    if (fw_slots_get_int_slot_metadata(fw_slot, &fw_metadata) == 0) {
+        fw_slots_print_metadata(&fw_metadata);
     } else {
         printf("[fw_slots] ERROR cannot get slot metadata.\n");
     }
@@ -225,7 +225,7 @@ int verify_int_fw_slot(uint8_t fw_slot)
     return 0;
 }
 
-int validate_fw_metadata(FW_metadata_t *metadata)
+int fw_slots_validate_metadata(FW_metadata_t *metadata)
 {
     /* Is the FW slot erased?
      * First, we check to see if every byte in the metadata is 0xFF.
@@ -248,14 +248,14 @@ int validate_fw_metadata(FW_metadata_t *metadata)
 
     /* If the FW slot is erased, it's not valid!  No more work to do here. */
     if (erased) {
-        return 0;
+        return -1;
     }
 
     /* If we get this far, all metadata bytes were cleared (0xff) */
     return 0;
 }
 
-int find_matching_int_fw_slot(uint16_t version)
+int fw_slots_find_matching_int_slot(uint16_t version)
 {
     int matching_slot = -1; /* Assume there is no matching FW slot. */
 
@@ -264,14 +264,14 @@ int find_matching_int_fw_slot(uint16_t version)
 
         /* Get the metadata of the current FW slot. */
         FW_metadata_t fw_slot_metadata;
-        if(get_int_fw_slot_metadata(slot, &fw_slot_metadata) == 0) {
-            print_metadata(&fw_slot_metadata);
+        if(fw_slots_get_int_slot_metadata(slot, &fw_slot_metadata) == 0) {
+            fw_slots_print_metadata(&fw_slot_metadata);
         } else {
             printf("[fw_slots] ERROR cannot get slot metadata.\n");
         }
 
         /* Is this slot empty? If yes, skip. */
-        if (validate_fw_metadata(&fw_slot_metadata) == false) {
+        if (fw_slots_validate_metadata(&fw_slot_metadata) == false) {
             continue;
         }
 
@@ -292,7 +292,7 @@ int find_matching_int_fw_slot(uint16_t version)
     return matching_slot;
 }
 
-int find_empty_int_fw_slot(void)
+int fw_slots_find_empty_int_slot(void)
 {
     /* Iterate through each of the MAX_FW_SLOTS internal slots. */
     for (int slot = 1; slot <= MAX_FW_SLOTS; slot++) {
@@ -300,14 +300,14 @@ int find_empty_int_fw_slot(void)
         /* Get the metadata of the current FW slot. */
         FW_metadata_t fw_slot_metadata;
 
-        if(get_int_fw_slot_metadata(slot, &fw_slot_metadata) == 0) {
-            print_metadata(&fw_slot_metadata);
+        if(fw_slots_get_int_slot_metadata(slot, &fw_slot_metadata) == 0) {
+            fw_slots_print_metadata(&fw_slot_metadata);
         } else {
             printf("[fw_slots] ERROR cannot get slot metadata.\n");
         }
 
         /* Is this slot invalid? If yes, let's treat it as empty. */
-        if (validate_fw_metadata(&fw_slot_metadata) == false) {
+        if (fw_slots_validate_metadata(&fw_slot_metadata) == false) {
             return slot;
         }
     }
@@ -318,10 +318,10 @@ int find_empty_int_fw_slot(void)
      * If execution goes this far, no empty slot was found. Now, we look for
      * the oldest FW slot instead.
      */
-    return find_oldest_int_fw_image();
+    return fw_slots_find_oldest_int_image();
 }
 
-int find_oldest_int_fw_image(void)
+int fw_slots_find_oldest_int_image(void)
 {
     /* The oldest firmware should be the v0 */
     int oldest_fw_slot = 1;
@@ -332,14 +332,14 @@ int find_oldest_int_fw_image(void)
         /* Get the metadata of the current FW slot. */
         FW_metadata_t fw_slot_metadata;
 
-        if(get_int_fw_slot_metadata(slot, &fw_slot_metadata) == 0) {
-            print_metadata(&fw_slot_metadata);
+        if(fw_slots_get_int_slot_metadata(slot, &fw_slot_metadata) == 0) {
+            fw_slots_print_metadata(&fw_slot_metadata);
         } else {
             printf("[fw_slots] ERROR cannot get slot metadata.\n");
         }
 
         /* Is this slot populated? If not, skip. */
-        if (validate_fw_metadata(&fw_slot_metadata) == false) {
+        if (fw_slots_validate_metadata(&fw_slot_metadata) == false) {
             continue;
         }
 
@@ -361,7 +361,7 @@ int find_oldest_int_fw_image(void)
     return oldest_fw_slot;
 }
 
-int find_newest_int_fw_image(void)
+int fw_slots_find_newest_int_image(void)
 {
     /* At first, we only assume knowledge of version v0 */
     int newest_fw_slot = 0;
@@ -372,14 +372,14 @@ int find_newest_int_fw_image(void)
         /* Get the metadata of the current FW slot. */
         FW_metadata_t fw_slot_metadata;
 
-        if(get_int_fw_slot_metadata(slot, &fw_slot_metadata) == 0) {
-            print_metadata(&fw_slot_metadata);
+        if(fw_slots_get_int_slot_metadata(slot, &fw_slot_metadata) == 0) {
+            fw_slots_print_metadata(&fw_slot_metadata);
         } else {
             printf("[fw_slots] ERROR cannot get slot metadata.\n");
         }
 
         /* Is this slot populated? If not, skip. */
-        if (validate_fw_metadata( &fw_slot_metadata) == false) {
+        if (fw_slots_validate_metadata( &fw_slot_metadata) == false) {
             continue;
         }
 
@@ -396,7 +396,7 @@ int find_newest_int_fw_image(void)
     return newest_fw_slot;
 }
 
-int erase_int_fw_image(uint8_t fw_slot)
+int fw_slots_erase_int_image(uint8_t fw_slot)
 {
     /* Get page address of the fw_slot in internal flash */
     uint32_t fw_image_base_address;
@@ -409,13 +409,13 @@ int erase_int_fw_image(uint8_t fw_slot)
         return -1;
     }
 
-    fw_image_base_address = get_slot_fw_address(fw_slot);
+    fw_image_base_address = fw_slots_get_slot_address(fw_slot);
 
     printf("[fw_slots] Erasing FW slot %u [%#lx, %#lx]...\n", fw_slot,
             fw_image_base_address,
             fw_image_base_address + (FW_SLOT_PAGES * FLASHPAGE_SIZE) - 1);
 
-    slot_page = get_slot_fw_page(fw_slot);
+    slot_page = fw_slots_get_slot_page(fw_slot);
 
     /* Erase each page in the FW internal slot! */
     for (int page = slot_page; page < slot_page + FW_SLOT_PAGES; page++) {
@@ -428,7 +428,7 @@ int erase_int_fw_image(uint8_t fw_slot)
     return 0;
 }
 
-int update_firmware(uint8_t fw_slot)
+int fw_slots_update_firmware(uint8_t fw_slot)
 {
     /*
      * TODO
@@ -436,7 +436,7 @@ int update_firmware(uint8_t fw_slot)
     return 0;
 }
 
-int store_firmware_data( uint32_t ext_address, uint8_t *data, size_t data_length )
+int fw_slots_store_fw_data( uint32_t ext_address, uint8_t *data, size_t data_length )
 {
     /*
      * TODO
@@ -449,7 +449,7 @@ int store_firmware_data( uint32_t ext_address, uint8_t *data, size_t data_length
  */
 extern uint32_t _estack;
 
-void jump_to_image(uint32_t destination_address)
+void fw_slots_jump_to_image(uint32_t destination_address)
 {
     if (destination_address) {
         /*

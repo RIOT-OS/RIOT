@@ -48,7 +48,7 @@
 /*
  *  FW_METADATA_LENGTH:
  *    This is just the size of the FW_metadata_t struct, which is 4-byte
- *    aligned. We use 104 bytes currently, so this struct will be 104 bytes.
+ *    aligned. We use 76 bytes currently, so this struct will be 76 bytes.
  */
 #define FW_METADATA_LENGTH  sizeof(FW_metadata_t)
 
@@ -69,10 +69,10 @@ typedef struct FW_metadata {
 /**
  * @brief  Print formatted FW image metadata to STDIO.
  *
- * @param[in] metadata          Metadata struct to fill with firmware metadata
+ * @param[in] metadata         Metadata struct to fill with firmware metadata
  *
  */
-void print_metadata(FW_metadata_t *metadata);
+void fw_slots_print_metadata(FW_metadata_t *metadata);
 
 /**
  * @brief   Validate internal FW slot as a secure firmware
@@ -81,7 +81,7 @@ void print_metadata(FW_metadata_t *metadata);
  *
  * @return  0 on success or error code
  */
-int validate_int_fw_slot(uint8_t fw_slot);
+int fw_slots_validate_int_slot(uint8_t fw_slot);
 
 /**
  * @brief   Get the internal metadata belonging to an FW slot in internal
@@ -90,11 +90,12 @@ int validate_int_fw_slot(uint8_t fw_slot);
  * @param[in] fw_slot             The FW slot to be read for metadata.
  *
  * @param[in] *fw_slot_metadata   Pointer to the FW_metadata_t struct where
- *                                 the metadata is to be written.
+ *                                the metadata is to be written.
  *
  * @return  0 on success or error code
  */
-int get_int_metadata(uint8_t fw_slot_page, FW_metadata_t *fw_metadata);
+int fw_slots_get_int_metadata(uint8_t fw_slot_page,
+                              FW_metadata_t *fw_metadata);
 
 /**
  * @brief   Get the metadata belonging to an FW slot in external flash.
@@ -106,7 +107,7 @@ int get_int_metadata(uint8_t fw_slot_page, FW_metadata_t *fw_metadata);
  *
  * @return  0 on success or error code
  */
-int get_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata);
+int fw_slots_get_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata);
 
 /**
  * @brief   Get the metadata belonging to an FW slot in internal flash.
@@ -118,7 +119,8 @@ int get_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata);
  *
  * @return  0 on success or error code
  */
-int get_int_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata);
+int fw_slots_get_int_slot_metadata(uint8_t fw_slot,
+                                   FW_metadata_t *fw_slot_metadata);
 
 /**
  * @brief   Get the address corresponding to a given slot
@@ -128,7 +130,7 @@ int get_int_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata);
  *
  * @return  0 on success or error code
  */
-uint32_t get_slot_fw_address(uint8_t fw_slot);
+uint32_t fw_slots_get_slot_address(uint8_t fw_slot);
 
 /**
  * @brief   Get the page corresponding to a given slot
@@ -138,7 +140,7 @@ uint32_t get_slot_fw_address(uint8_t fw_slot);
  *
  * @return  0 on success or error code
  */
-uint32_t get_slot_fw_page(uint8_t fw_slot);
+uint32_t fw_slots_get_slot_page(uint8_t fw_slot);
 
 /**
  * @brief   Write new metadata to a specific FW slot in internal flash.
@@ -149,7 +151,8 @@ uint32_t get_slot_fw_page(uint8_t fw_slot);
  *
  * @return  0 on success or error code
  */
-int overwrite_int_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata);
+int fw_slots_overwrite_int_slot_metadata(uint8_t fw_slot,
+                                         FW_metadata_t *fw_slot_metadata);
 
 /**
  * @brief   Write new metadata to a specific FW slot in external flash.
@@ -160,81 +163,80 @@ int overwrite_int_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metad
  *
  * @return  0 on success or error code
  */
-int overwrite_fw_slot_metadata(uint8_t fw_slot, FW_metadata_t *fw_slot_metadata);
+int fw_slots_overwrite_slot_metadata(uint8_t fw_slot,
+                                     FW_metadata_t *fw_slot_metadata);
 
 /**
  * @brief   Copy the current firmware into FW slot 0 as the "Golden Image"
  *
  * @return  0 for success or error code
  */
-int backup_golden_image(void);
+int fw_slots_backup_golden_image(void);
 
 /**
  * @brief   Given an FW slot, verify the firmware content against the metadata.
- *          If everything is fine, update the metadata to indicate this FW slot
- *          is valid.
  *
- * @param[in]  fw_slot  - FW slot index to verify. (1-3)
+ * @param[in]  fw_slot    FW slot index to verify. (1-N)
  *
  * @return  0 for success or error code
  */
-int verify_int_fw_slot(uint8_t fw_slot);
+int fw_slots_verify_int_slot(uint8_t fw_slot);
 
 /**
  * @brief   Returns true only if the metadata provided indicates the FW slot
  *          is populated and valid.
  *
- * @param[in] *metadata          FW metadata to be validated
+ * @param[in] *metadata   FW metadata to be validated
  *
- * @return  True if the FW slot is populated and valid. Otherwise, false.
+ * @return  0 if the FW slot is populated and valid. Otherwise, -1.
  */
-int validate_fw_metadata(FW_metadata_t *metadata);
+int fw_slots_validate_metadata(FW_metadata_t *metadata);
 
 /**
  * @brief   Find a FW slot containing firmware matching the supplied
  *          firmware version number. Will only find the first matching
  *          slot.
  *
- * @param[in] version            FW slot version.
+ * @param[in] version     FW slot version.
  *
  * @return  The FW slot index of the matching FW slot. Return -1 in the event
  *          of no match.
  */
-int find_matching_int_fw_slot(uint16_t version);
+int fw_slots_find_matching_int_slot(uint16_t version);
 
 /**
- * @brief   Find the first empty FW download slot.  Failing this, find the slot
- *          with the most out-of-date firmware version.
+ * @brief   Find the first empty FW slot. Failing this, find the slot with the
+ *          most out-of-date firmware version.
  *
- * @return  The FW slot index of the empty/oldest FW slot.  This will never be
+ * @return  The FW slot index of the empty/oldest FW slot. This will never be
  *          0 because the Golden Image should never be erased.
  */
-int find_empty_int_fw_slot(void);
+int fw_slots_find_empty_int_slot(void);
 
 /**
  * @brief   Find the FW slot containing the most out-of-date firmware version.
- *          FW slots are in external flash.
+ *          FW slots are in internal flash.
  *
  * @return  The FW slot index of the oldest firmware version.
  */
-int find_oldest_int_fw_image(void);
+int fw_slots_find_oldest_int_image(void);
 
 /**
  * @brief   Find the FW slot containing the most recent firmware version.
- *          FW slots are in external flash.
+ *          FW slots are in internal flash.
  *
  * @return  The FW slot index of the newest firmware version.
  */
-int find_newest_int_fw_image(void);
+int fw_slots_find_newest_int_image(void);
 
 /**
- * @brief   Clear an FW slot in external flash.
+ * @brief   Clear an FW slot in internal flash.
  *
- * @param[in] fw_slot   The FW slot index of the firmware image to be copied.
+ * @param[in] fw_slot   The FW slot index of the firmware image to be erased.
  *
- * @return  0 or error code
+ * @return  -1 or error code
  */
-int erase_int_fw_image(uint8_t fw_slot);
+int fw_slots_erase_int_image(uint8_t fw_slot);
 
 /**
  * @brief   Overwrite firmware located in internal flash with the firmware
@@ -242,11 +244,11 @@ int erase_int_fw_image(uint8_t fw_slot);
  *
  * @param[in] fw_slot   The FW slot index of the firmware image to be copied.
  *                       0 = "Golden Image" backup, aka factory restore
- *                       1, 2, 3 = FW Download slots
+ *                       1, 2, 3, n = FW Download slots
  *
- * @return  0 or error code
+ * @return  -1 or error code
  */
-int update_firmware(uint8_t fw_slot);
+int fw_slots_update_firmware(uint8_t fw_slot);
 
 /**
  * @brief   Store firmware data in external flash at the specified
@@ -255,12 +257,10 @@ int update_firmware(uint8_t fw_slot);
  * @param[in] ext_address   External flash address to begin writing data.
  *
  * @param[in] data          Pointer to the data buffer to be written.
- *                          Note: page_data can be larger than 4096 bytes, but
- *                          only the first 4096 bytes will be written!
  *
- * @return  0 or error code
+ * @return  -1 or error code
  */
-int store_firmware_data(uint32_t ext_address, uint8_t *data, size_t data_length);
+int fw_slots_store_fw_data(uint32_t ext_address, uint8_t *data, size_t data_length);
 
 /**
  * @brief   Begin executing another firmware binary located in internal flash.
@@ -273,6 +273,6 @@ int store_firmware_data(uint32_t ext_address, uint8_t *data, size_t data_length)
  *                                address.
  *
  */
-void jump_to_image(uint32_t destination_address);
+void fw_slots_jump_to_image(uint32_t destination_address);
 
 #endif /* FW_SLOTS_H */
