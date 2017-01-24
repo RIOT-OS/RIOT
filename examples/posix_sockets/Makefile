@@ -19,7 +19,7 @@ USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for socket communication via UDP
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_udp
-USEMODULE += gnrc_conn_udp
+USEMODULE += gnrc_sock_udp
 USEMODULE += posix_sockets
 # Add also the shell, some shell commands
 USEMODULE += shell

@@ -9,7 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo-f334 nucleo-f030 \
                              nucleo-f070 nucleo32-f042
 
 USEMODULE += gnrc_ipv6
-USEMODULE += gnrc_conn_udp
+USEMODULE += gnrc_sock_udp
 USEPKG += libcoap
 
 include $(RIOTBASE)/Makefile.include
