@@ -91,3 +91,6 @@ endif
 ifneq (,$(filter lis3dh,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lis3dh/include
 endif
+ifneq (,$(filter sdcard_spi,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/sdcard_spi/include
+endif

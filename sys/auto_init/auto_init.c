@@ -325,4 +325,15 @@ void auto_init(void)
 #endif
 
 #endif /* MODULE_AUTO_INIT_GNRC_RPL */
+
+/* initialize storage devices */
+#ifdef MODULE_AUTO_INIT_STORAGE
+    DEBUG("auto_init STORAGE\n");
+
+#ifdef MODULE_SDCARD_SPI
+    extern void auto_init_sdcard_spi(void);
+    auto_init_sdcard_spi();
+#endif
+
+#endif /* MODULE_AUTO_INIT_STORAGE */
 }
