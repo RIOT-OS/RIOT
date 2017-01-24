@@ -47,6 +47,21 @@ typedef uint16_t gpio_t;
 
 #ifndef DOXYGEN
 /**
+ * @brief   Override pin selection modes
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN     = 0x00,         /**< pin as input without pull resistor */
+    GPIO_IN_PD  = 0xff,         /**< pin as input with pullup resistor */
+    GPIO_IN_PU  = 0xff,         /**< pin as input with pulldown resistor */
+    GPIO_OUT    = 0x00,         /**< pin as output without pull resistor */
+    GPIO_OD     = 0x00,         /**< not supported */
+    GPIO_OD_PU  = 0xff          /**< pin as open-drain with pull up resistor */
+}gpio_mode_t;
+/** @} */
+
+/**
  * @brief   Override flank selection values
  * @{
  */
