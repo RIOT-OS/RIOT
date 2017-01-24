@@ -161,6 +161,7 @@ def make_build(label, board, desc, arg)
                 deleteDir()
                 fetchPR(env.CHANGE_ID, "--depth=1", "")
                 def build_dir = pwd()
+                sh "./dist/tools/git/git-cache init"
                 timestamps {
                     def apps = arg.join(' ')
                     echo "building ${apps} for ${board} on nodes with ${label}"
