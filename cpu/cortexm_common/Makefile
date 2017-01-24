@@ -2,4 +2,6 @@
 # optimization. see #5774.
 SRC_NOLTO += thread_arch.c
 
+DIRS = periph
+
 include $(RIOTBASE)/Makefile.base

@@ -23,10 +23,6 @@
 #include "cpu.h"
 #include "log.h"
 
-#ifdef FEATURE_PERIPH_PM
-#include "periph/pm.h"
-#endif
-
 #ifdef DEVELHELP
 static void print_ipsr(void)
 {

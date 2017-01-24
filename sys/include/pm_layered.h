@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup     drivers_periph_pm
+ * @defgroup    sys_pm_layered Layered PM Infrastructure
+ * @ingroup     sys
  * @{
  *
  * This module provides a base infrastructure that MCU's may use to implement

@@ -1,4 +1,6 @@
 # Target architecture for the build. Use arm-none-eabi if you are unsure.
 export TARGET_ARCH ?= arm-none-eabi
 
+USEMODULE += arm7_common_periph
+
 INCLUDES += -I$(RIOTBASE)/cpu/arm7_common/include/
