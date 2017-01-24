@@ -43,7 +43,7 @@ int SerialPort::available(void)
     return (int)rx_buf.avail;
 }
 
-void SerialPort::begin(int baudrate)
+void SerialPort::begin(long baudrate)
 {
     /* this clears the contents of the ringbuffer... */
     ringbuffer_init(&rx_buf, rx_mem, SERIAL_RX_BUFSIZE);
@@ -92,7 +92,7 @@ size_t SerialPort::print(float val)
 size_t SerialPort::print(float val, int format)
 {
     char buf[64];
-    size_t len = sprintf(buf, "%.*f", format, val);
+    size_t len = sprintf(buf, "%.*f", format, (double)val);
     write(buf, len);
     return len;
 }
