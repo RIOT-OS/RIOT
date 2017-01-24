@@ -80,6 +80,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         case SPI_SPEED_1MHZ:
             spi->CR0 |= (11 << 8);
             break;
+        case SPI_SPEED_4MHZ:
         case SPI_SPEED_5MHZ:
             spi->CR0 |= (2 << 8); /* Actual : 4MHz */
             break;

@@ -127,6 +127,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         case SPI_SPEED_10MHZ:           /* 8 MHz for this device */
             spi[dev]->FREQUENCY = SPI_FREQUENCY_FREQUENCY_M8;
             break;
+        default:
+            return -1;
     }
 
     /* finally enable the device */

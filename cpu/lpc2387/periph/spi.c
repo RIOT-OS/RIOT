@@ -73,6 +73,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     case SPI_SPEED_10MHZ:
         f_baud = 10000;
         break;
+    default:
+        return -1;
     }
 
 #if 0

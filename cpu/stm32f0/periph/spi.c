@@ -95,6 +95,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             break;
         case SPI_SPEED_10MHZ:
             spi->CR1 |= (1 << 3);       /* actual clock 12MHz */
+        default:
+            return -1;
     }
 
     /* select clock polarity and clock phase */
