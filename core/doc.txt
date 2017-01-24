@@ -10,14 +10,14 @@
  * @defgroup core Kernel
  * @brief The RIOT micro-kernel containing the core functionality
  *
- * The kernel module contains only the basic OS functionality such as the sheduler, threading, synchronization
- * and IRQ-handling. The only exception is the integration of the hardware timer into this module.
+ * The kernel module contains the basic OS functionality such as the scheduler,
+ * threading, synchronization and IRQ-handling.
  */
 
 /**
  * @defgroup    core_util Kernel utilities
  * @ingroup     core
- * @brief       Utilies and data structures used by the kernel
+ * @brief       Utilities and data structures used by the kernel
  */
 
 /**
