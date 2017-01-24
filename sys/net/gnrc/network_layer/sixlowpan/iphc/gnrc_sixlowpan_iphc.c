@@ -19,7 +19,6 @@
 #include <stdbool.h>
 
 #include "byteorder.h"
-#include "net/ethernet/hdr.h"
 #include "net/ieee802154.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc.h"
@@ -29,6 +28,9 @@
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/udp.h"
 
+#ifdef MODULE_GNRC_SIXLOENC
+#include "net/ethernet/hdr.h"
+#endif
 #include "net/gnrc/sixlowpan/iphc.h"
 
 #define ENABLE_DEBUG    (0)
@@ -214,14 +216,7 @@ static inline void _get_iid(eui64_t *eui64, const uint8_t *addr,
 {
 #ifdef MODULE_GNRC_SIXLOENC
     if (addr_len == ETHERNET_ADDR_LEN) {
-        eui64->uint8[0] = addr[0] ^ 0x02;
-        eui64->uint8[1] = addr[1];
-        eui64->uint8[2] = addr[2];
-        eui64->uint8[3] = 0xff;
-        eui64->uint8[4] = 0xfe;
-        eui64->uint8[5] = addr[3];
-        eui64->uint8[6] = addr[4];
-        eui64->uint8[7] = addr[5];
+        ethernet_get_iid(eui64, addr);
         return;
     }
 #endif
