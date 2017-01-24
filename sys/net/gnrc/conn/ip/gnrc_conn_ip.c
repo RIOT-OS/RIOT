@@ -52,7 +52,7 @@ int conn_ip_create(conn_ip_t *conn, const void *addr, size_t addr_len, int famil
 void conn_ip_close(conn_ip_t *conn)
 {
     assert(conn->l4_type == GNRC_NETTYPE_UNDEF);
-    if (conn->netreg_entry.pid != KERNEL_PID_UNDEF) {
+    if (conn->netreg_entry.target.pid != KERNEL_PID_UNDEF) {
         gnrc_netreg_unregister(conn->l3_type, &conn->netreg_entry);
     }
 }
@@ -99,7 +99,7 @@ int conn_ip_sendto(const void *data, size_t len, const void *src, size_t src_len
                 return -EINVAL;
             }
             /* addr will only be copied */
-            hdr = gnrc_ipv6_hdr_build(pkt, (uint8_t *)src, src_len, (uint8_t *)dst, dst_len);
+            hdr = gnrc_ipv6_hdr_build(pkt, src, dst);
             if (hdr == NULL) {
                 gnrc_pktbuf_release(pkt);
                 return -ENOMEM;

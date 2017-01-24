@@ -27,8 +27,8 @@
  */
 
 
-#ifndef GNRC_ZEP_H_
-#define GNRC_ZEP_H_
+#ifndef GNRC_ZEP_H
+#define GNRC_ZEP_H
 
 #include <inttypes.h>
 
@@ -82,9 +82,9 @@ extern "C" {
  * @brief   Channel configuration
  * @{
  */
-#define GNRC_ZEP_MIN_CHANNEL        (11U)
-#define GNRC_ZEP_MAX_CHANNEL        (26U)
-#define GNRC_ZEP_DEFAULT_CHANNEL    (26U)
+#define GNRC_ZEP_MIN_CHANNEL        (IEEE802154_CHANNEL_MIN)
+#define GNRC_ZEP_MAX_CHANNEL        (IEEE802154_CHANNEL_MAX)
+#define GNRC_ZEP_DEFAULT_CHANNEL    (IEEE802154_DEFAULT_CHANNEL)
 /**
  * @}
  */
@@ -94,7 +94,7 @@ extern "C" {
  *
  * @todo Read some global network stack specific configuration value
  */
-#define GNRC_ZEP_DEFAULT_PANID  (0x0023)
+#define GNRC_ZEP_DEFAULT_PANID  (IEEE802154_DEFAULT_PANID)
 
 /**
  * @brief   Option flags for the ZEP device
@@ -236,7 +236,7 @@ kernel_pid_t gnrc_zep_init(gnrc_zep_t *dev, uint16_t src_port, ipv6_addr_t *dst,
 }
 #endif
 
-#endif /* GNRC_ZEP_H_ */
+#endif /* GNRC_ZEP_H */
 /**
  * @}
  */

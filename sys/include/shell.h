@@ -17,12 +17,12 @@
  * @brief       Shell interface definition
  */
 
-#ifndef __SHELL_H
-#define __SHELL_H
+#ifndef SHELL_H
+#define SHELL_H
 
 #include <stdint.h>
 
-#include "attributes.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,5 +78,5 @@ void shell_run(const shell_command_t *commands, char *line_buf, int len) NORETUR
 }
 #endif
 
-#endif /* __SHELL_H */
+#endif /* SHELL_H */
 /** @} */

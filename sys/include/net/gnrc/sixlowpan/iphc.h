@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_SIXLOWPAN_IPHC_H_
-#define GNRC_SIXLOWPAN_IPHC_H_
+#ifndef GNRC_SIXLOWPAN_IPHC_H
+#define GNRC_SIXLOWPAN_IPHC_H
 
 #include <stdbool.h>
 
@@ -46,7 +46,8 @@ extern "C" {
  * @return  0 on error.
  */
 size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
-                                  size_t datagram_size, size_t offset);
+                                  size_t datagram_size, size_t offset,
+                                  size_t *nh_len);
 
 /**
  * @brief   Compresses a 6LoWPAN for IPHC.
@@ -63,5 +64,5 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt);
 }
 #endif
 
-#endif /* GNRC_SIXLOWPAN_IPHC_H_ */
+#endif /* GNRC_SIXLOWPAN_IPHC_H */
 /** @} */

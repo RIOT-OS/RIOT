@@ -20,8 +20,8 @@
  *          If you insert a value twice the LIFO will break.
  */
 
-#ifndef LIFO_H_
-#define LIFO_H_
+#ifndef LIFO_H
+#define LIFO_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -70,5 +70,5 @@ int lifo_get(int *array);
 }
 #endif
 
-#endif /* LIFO_H_ */
+#endif /* LIFO_H */
 /** @} */

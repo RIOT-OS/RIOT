@@ -418,7 +418,7 @@ static void test_ipv6_netif_find_best_src_addr__no_unicast(void)
     TEST_ASSERT_NOT_NULL(gnrc_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &mc_addr2,
                                                   DEFAULT_TEST_PREFIX_LEN, 0));
 
-    TEST_ASSERT_NULL(gnrc_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &ll_dst_addr));
+    TEST_ASSERT_NULL(gnrc_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &ll_dst_addr, false));
 }
 
 static void test_ipv6_netif_find_best_src_addr__success(void)
@@ -441,7 +441,7 @@ static void test_ipv6_netif_find_best_src_addr__success(void)
     TEST_ASSERT_NOT_NULL(gnrc_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &ll_addr1,
                                                   DEFAULT_TEST_PREFIX_LEN, 0));
 
-    TEST_ASSERT_NOT_NULL((out = gnrc_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &ll_addr2)));
+    TEST_ASSERT_NOT_NULL((out = gnrc_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &ll_addr2, false)));
     TEST_ASSERT(out != &ll_addr1);
     TEST_ASSERT(out != &ll_addr2);
     TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(out, &ll_addr1));
@@ -455,7 +455,7 @@ static void test_ipv6_netif_find_best_src_addr__multicast_input(void)
     /* Adds DEFAULT_TEST_NETIF as interface and to it fe80::1, fe80::2 and ff02::1 */
     test_ipv6_netif_find_best_src_addr__success();
 
-    TEST_ASSERT_NOT_NULL((out = gnrc_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &mc_addr)));
+    TEST_ASSERT_NOT_NULL((out = gnrc_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &mc_addr, false)));
     TEST_ASSERT_EQUAL_INT(false, ipv6_addr_equal(&mc_addr, out));
     TEST_ASSERT_EQUAL_INT(false, ipv6_addr_is_unspecified(out));
 }
@@ -471,7 +471,7 @@ static void test_ipv6_netif_find_best_src_addr__other_subnet(void)
     TEST_ASSERT_NOT_NULL(gnrc_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &addr1, DEFAULT_TEST_PREFIX_LEN,
                          0));
 
-    TEST_ASSERT_NOT_NULL((out = gnrc_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &addr2)));
+    TEST_ASSERT_NOT_NULL((out = gnrc_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &addr2, false)));
     TEST_ASSERT(out != &addr1);
     TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(out, &addr1));
 }

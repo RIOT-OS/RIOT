@@ -13,11 +13,11 @@
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef CPU_PERIPH_H_
-#define CPU_PERIPH_H_
+#ifndef CPU_PERIPH_H
+#define CPU_PERIPH_H
 
 #include "cpu.h"
 #include "cc430_regs.h"
@@ -32,5 +32,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_PERIPH_H_ */
+#endif /* CPU_PERIPH_H */
 /** @} */

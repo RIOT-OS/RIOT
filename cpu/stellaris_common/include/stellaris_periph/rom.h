@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __ROM_H__
-#define __ROM_H__
+#ifndef STELLARIS_ROM_H
+#define STELLARIS_ROM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -6749,4 +6749,4 @@ extern "C" {
 }
 #endif
 
-#endif // __ROM_H__
+#endif /* STELLARIS_ROM_H */

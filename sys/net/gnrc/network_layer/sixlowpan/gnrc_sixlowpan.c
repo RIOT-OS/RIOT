@@ -129,12 +129,13 @@ static void _receive(gnrc_pktsnip_t *pkt)
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
     else if (sixlowpan_iphc_is(dispatch)) {
-        size_t dispatch_size;
-        gnrc_pktsnip_t *sixlowpan, *tmp;
+        size_t dispatch_size, nh_len;
+        gnrc_pktsnip_t *sixlowpan;
         gnrc_pktsnip_t *dec_hdr = gnrc_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
                                                   GNRC_NETTYPE_IPV6);
         if ((dec_hdr == NULL) ||
-            (dispatch_size = gnrc_sixlowpan_iphc_decode(&dec_hdr, pkt, 0, 0)) == 0) {
+            (dispatch_size = gnrc_sixlowpan_iphc_decode(&dec_hdr, pkt, 0, 0,
+                                                        &nh_len)) == 0) {
             DEBUG("6lo: error on IPHC decoding\n");
             if (dec_hdr != NULL) {
                 gnrc_pktbuf_release(dec_hdr);
@@ -151,11 +152,8 @@ static void _receive(gnrc_pktsnip_t *pkt)
         }
 
         /* Remove IPHC dispatches */
-        pkt = gnrc_pktbuf_remove_snip(pkt, sixlowpan);
         /* Insert decoded header instead */
-        LL_SEARCH_SCALAR(dec_hdr, tmp, next, NULL); /* search last decoded header */
-        tmp->next = pkt->next;
-        pkt->next = dec_hdr;
+        pkt = gnrc_pktbuf_replace_snip(pkt, sixlowpan, dec_hdr);
         payload->type = GNRC_NETTYPE_UNDEF;
     }
 #endif
@@ -292,7 +290,7 @@ static void _send(gnrc_pktsnip_t *pkt)
 
         /* set the outgoing message's fields */
         msg.type = GNRC_SIXLOWPAN_MSG_FRAG_SND;
-        msg.content.ptr = (void *)&fragment_msg;
+        msg.content.ptr = &fragment_msg;
         /* send message to self */
         msg_send_to_self(&msg);
     }
@@ -312,13 +310,11 @@ static void _send(gnrc_pktsnip_t *pkt)
 static void *_event_loop(void *args)
 {
     msg_t msg, reply, msg_q[GNRC_SIXLOWPAN_MSG_QUEUE_SIZE];
-    gnrc_netreg_entry_t me_reg;
+    gnrc_netreg_entry_t me_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                            sched_active_pid);
 
     (void)args;
     msg_init_queue(msg_q, GNRC_SIXLOWPAN_MSG_QUEUE_SIZE);
-
-    me_reg.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
-    me_reg.pid = thread_getpid();
 
     /* register interest in all 6LoWPAN packets */
     gnrc_netreg_register(GNRC_NETTYPE_SIXLOWPAN, &me_reg);
@@ -334,12 +330,12 @@ static void *_event_loop(void *args)
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 DEBUG("6lo: GNRC_NETDEV_MSG_TYPE_RCV received\n");
-                _receive((gnrc_pktsnip_t *)msg.content.ptr);
+                _receive(msg.content.ptr);
                 break;
 
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("6lo: GNRC_NETDEV_MSG_TYPE_SND received\n");
-                _send((gnrc_pktsnip_t *)msg.content.ptr);
+                _send(msg.content.ptr);
                 break;
 
             case GNRC_NETAPI_MSG_TYPE_GET:
@@ -351,7 +347,7 @@ static void *_event_loop(void *args)
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
             case GNRC_SIXLOWPAN_MSG_FRAG_SND:
                 DEBUG("6lo: send fragmented event received\n");
-                gnrc_sixlowpan_frag_send((gnrc_sixlowpan_msg_frag_t *)msg.content.ptr);
+                gnrc_sixlowpan_frag_send(msg.content.ptr);
                 break;
 #endif
 

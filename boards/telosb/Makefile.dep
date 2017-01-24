@@ -1,0 +1,3 @@
+ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
+  USEMODULE += cc2420
+endif

@@ -19,8 +19,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/rtt.h"
 #include "periph_conf.h"
 
@@ -96,7 +94,7 @@ void rtt_clear_overflow_cb(void)
 uint32_t rtt_get_counter(void)
 {
     /* wait for syncronization */
-    while (!(RTT_DEV->CRL & RTT_FLAG_RSF));
+    while (!(RTT_DEV->CRL & RTT_FLAG_RSF)) {}
 
     return (((uint32_t)RTT_DEV->CNTH << 16 ) | (uint32_t)(RTT_DEV->CNTL));
 }
@@ -116,7 +114,7 @@ void rtt_set_counter(uint32_t counter)
 uint32_t rtt_get_alarm(void)
 {
     /* wait for syncronization */
-    while (!(RTT_DEV->CRL & RTT_FLAG_RSF));
+    while (!(RTT_DEV->CRL & RTT_FLAG_RSF)) {}
 
     return (((uint32_t)RTT_DEV->ALRH << 16 ) | (uint32_t)(RTT_DEV->ALRL));
 }
@@ -155,11 +153,11 @@ void rtt_clear_alarm(void)
 
 void rtt_poweron(void)
 {
-    RCC->APB1ENR |= (RCC_APB1ENR_BKPEN|RCC_APB1ENR_PWREN); /* enable BKP and PWR, Clock */
+    periph_clk_en(APB1, (RCC_APB1ENR_BKPEN|RCC_APB1ENR_PWREN)); /* enable BKP and PWR, Clock */
     /* RTC clock source configuration */
-    PWR->CR |= PWR_CR_DBP;                  /* Allow access to BKP Domain */
-    RCC->BDCR |= RCC_BDCR_LSEON;            /* Enable LSE OSC */
-    while(!(RCC->BDCR & RCC_BDCR_LSERDY));   /* Wait till LSE is ready */
+    PWR->CR |= PWR_CR_DBP;                   /* Allow access to BKP Domain */
+    RCC->BDCR |= RCC_BDCR_LSEON;             /* Enable LSE OSC */
+    while(!(RCC->BDCR & RCC_BDCR_LSERDY)) {} /* Wait till LSE is ready */
     RCC->BDCR |= RCC_BDCR_RTCSEL_LSE;        /* Select the RTC Clock Source */
     RCC->BDCR |= RCC_BDCR_RTCEN;             /* enable RTC */
 }
@@ -168,13 +166,13 @@ void rtt_poweroff(void)
 {
     PWR->CR |= PWR_CR_DBP;                   /* Allow access to BKP Domain */
     RCC->BDCR &= ~RCC_BDCR_RTCEN;            /* disable RTC */
-    RCC->APB1ENR &= ~(RCC_APB1ENR_BKPEN|RCC_APB1ENR_PWREN); /* disable BKP and PWR, Clock */
+    periph_clk_dis(APB1, (RCC_APB1ENR_BKPEN|RCC_APB1ENR_PWREN)); /* disable BKP and PWR, Clock */
 }
 
 inline void _rtt_enter_config_mode(void)
 {
     /* Loop until RTOFF flag is set */
-    while (!(RTT_DEV->CRL & RTT_FLAG_RTOFF));
+    while (!(RTT_DEV->CRL & RTT_FLAG_RTOFF)) {}
     /* enter configuration mode */
     RTT_DEV->CRL |= RTC_CRL_CNF;
 }
@@ -184,7 +182,7 @@ inline void _rtt_leave_config_mode(void)
     /* leave configuration mode */
     RTT_DEV->CRL &= ~RTC_CRL_CNF;
     /* Loop until RTOFF flag is set */
-    while (!(RTT_DEV->CRL & RTT_FLAG_RTOFF));
+    while (!(RTT_DEV->CRL & RTT_FLAG_RTOFF)) {}
 }
 
 void RTT_ISR(void)
@@ -197,9 +195,7 @@ void RTT_ISR(void)
         RTT_DEV->CRL &= ~(RTC_CRL_OWF);
         overflow_cb(overflow_arg);
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #endif /* RTT_NUMOF */

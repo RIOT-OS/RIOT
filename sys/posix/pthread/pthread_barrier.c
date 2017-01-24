@@ -99,7 +99,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
             ++count;
             next->cont = 1;
 
-            tcb_t *other = (tcb_t *) sched_threads[next->pid];
+            thread_t *other = (thread_t *) sched_threads[next->pid];
             switch_prio = priority_min(switch_prio, other->priority);
             sched_set_status(other, STATUS_PENDING);
         }

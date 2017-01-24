@@ -19,8 +19,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_NDP_INTERNAL_H_
-#define GNRC_NDP_INTERNAL_H_
+#ifndef GNRC_NDP_INTERNAL_H
+#define GNRC_NDP_INTERNAL_H
 
 #include "kernel_types.h"
 #include "net/gnrc/ipv6/nc.h"
@@ -123,7 +123,7 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src,
  * This macro is primarily an optimization to not go into the function defined
  * above.
  */
-#define gnrc_ndp_internal_send_rtr_adv(iface, dst, fin)
+#define gnrc_ndp_internal_send_rtr_adv(iface, src, dst, fin)
 #endif
 
 /**
@@ -211,5 +211,5 @@ static inline void gnrc_ndp_internal_reset_nbr_sol_timer(gnrc_ipv6_nc_t *nc_entr
 }
 #endif
 
-#endif /* GNRC_NDP_INTERNAL_H_ */
+#endif /* GNRC_NDP_INTERNAL_H */
 /** @} */

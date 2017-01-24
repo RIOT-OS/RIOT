@@ -15,7 +15,7 @@
 #include <errno.h>
 #include <string.h>
 
-#include "clist.h"
+#include "assert.h"
 #include "utlist.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/nettype.h"
@@ -23,6 +23,7 @@
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/udp.h"
+#include "net/gnrc/tcp.h"
 
 #define _INVALID_TYPE(type) (((type) < GNRC_NETTYPE_UNDEF) || ((type) >= GNRC_NETTYPE_NUMOF))
 
@@ -37,8 +38,16 @@ void gnrc_netreg_init(void)
 
 int gnrc_netreg_register(gnrc_nettype_t type, gnrc_netreg_entry_t *entry)
 {
+#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
+#ifdef DEVELHELP
     /* only threads with a message queue are allowed to register at gnrc */
-    assert(sched_threads[entry->pid]->msg_array);
+    assert((entry->type != GNRC_NETREG_TYPE_DEFAULT) ||
+           sched_threads[entry->target.pid]->msg_array);
+#endif
+#else
+    /* only threads with a message queue are allowed to register at gnrc */
+    assert(sched_threads[entry->target.pid]->msg_array);
+#endif
 
     if (_INVALID_TYPE(type)) {
         return -EINVAL;
@@ -132,37 +141,6 @@ int gnrc_netreg_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr)
 #endif
         default:
             return -ENOENT;
-    }
-}
-
-gnrc_pktsnip_t *gnrc_netreg_hdr_build(gnrc_nettype_t type, gnrc_pktsnip_t *payload,
-                                      uint8_t *src, uint8_t src_len,
-                                      uint8_t *dst, uint8_t dst_len)
-{
-    switch (type) {
-#ifdef MODULE_GNRC_IPV6
-
-        case GNRC_NETTYPE_IPV6:
-            return gnrc_ipv6_hdr_build(payload, src, src_len, dst, dst_len);
-#endif
-#ifdef MODULE_GNRC_TCP
-
-        case GNRC_NETTYPE_TCP:
-            return gnrc_tcp_hdr_build(payload, src, src_len, dst, dst_len);
-#endif
-#ifdef MODULE_GNRC_UDP
-
-        case GNRC_NETTYPE_UDP:
-            return gnrc_udp_hdr_build(payload, src, src_len, dst, dst_len);
-#endif
-
-        default:
-            (void)payload;
-            (void)src;
-            (void)src_len;
-            (void)dst;
-            (void)dst_len;
-            return NULL;
     }
 }
 

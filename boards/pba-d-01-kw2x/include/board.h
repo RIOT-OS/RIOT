@@ -19,8 +19,8 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -31,44 +31,28 @@ extern "C"
 #endif
 
 /**
- * @name LED pin definitions
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_R_PORT_CLKEN()    (SIM->SCGC5 |= (SIM_SCGC5_PORTD_MASK)) /**< Clock Enable for PORTD*/
-#define LED_G_PORT_CLKEN()    (SIM->SCGC5 |= (SIM_SCGC5_PORTD_MASK)) /**< Clock Enable for PORTD*/
-#define LED_B_PORT_CLKEN()    (SIM->SCGC5 |= (SIM_SCGC5_PORTA_MASK)) /**< Clock Enable for PORTA*/
-#define LED_R_PORT            PORTD /**< PORT for Red LED*/
-#define LED_R_GPIO            GPIOD /**< GPIO-Device for Red LED*/
-#define LED_G_PORT            PORTD /**< PORT for Green LED*/
-#define LED_G_GPIO            GPIOD /**< GPIO-Device for Green LED*/
-#define LED_B_PORT            PORTA /**< PORT for Blue LED*/
-#define LED_B_GPIO            GPIOA /**< GPIO-Device for Blue LED*/
-#define LED_R_PIN             6     /**< Red LED connected to PINx*/
-#define LED_G_PIN             4     /**< Green LED connected to PINx*/
-#define LED_B_PIN             4     /**< Blue LED connected to PINx*/
-/** @} */
+#define LED2_PIN            GPIO_PIN(PORT_D, 6)
+#define LED1_PIN            GPIO_PIN(PORT_D, 4)
+#define LED0_PIN            GPIO_PIN(PORT_A, 4)
 
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_B_ON            (LED_B_GPIO->PCOR = (1 << LED_B_PIN))
-#define LED_B_OFF           (LED_B_GPIO->PSOR = (1 << LED_B_PIN))
-#define LED_B_TOGGLE        (LED_B_GPIO->PTOR = (1 << LED_B_PIN))
-#define LED_G_ON            (LED_G_GPIO->PCOR = (1 << LED_G_PIN))
-#define LED_G_OFF           (LED_G_GPIO->PSOR = (1 << LED_G_PIN))
-#define LED_G_TOGGLE        (LED_G_GPIO->PTOR = (1 << LED_G_PIN))
-#define LED_R_ON            (LED_R_GPIO->PCOR = (1 << LED_R_PIN))
-#define LED_R_OFF           (LED_R_GPIO->PSOR = (1 << LED_R_PIN))
-#define LED_R_TOGGLE        (LED_R_GPIO->PTOR = (1 << LED_R_PIN))
+#define LED0_MASK           (1 << 6)
+#define LED1_MASK           (1 << 4)
+#define LED2_MASK           (1 << 4)
 
-/* for compatability to other boards */
-#define LED_GREEN_ON        LED_G_ON
-#define LED_GREEN_OFF       LED_G_OFF
-#define LED_GREEN_TOGGLE    LED_G_TOGGLE
-#define LED_RED_ON          LED_R_ON
-#define LED_RED_OFF         LED_R_OFF
-#define LED_RED_TOGGLE      LED_R_TOGGLE
+#define LED0_ON            (GPIOD->PCOR = LED0_MASK)
+#define LED0_OFF           (GPIOD->PSOR = LED0_MASK)
+#define LED0_TOGGLE        (GPIOD->PTOR = LED0_MASK)
+
+#define LED1_ON            (GPIOD->PCOR = LED1_MASK)
+#define LED1_OFF           (GPIOD->PSOR = LED1_MASK)
+#define LED1_TOGGLE        (GPIOD->PTOR = LED1_MASK)
+
+#define LED2_ON            (GPIOA->PCOR = LED2_MASK)
+#define LED2_OFF           (GPIOA->PSOR = LED2_MASK)
+#define LED2_TOGGLE        (GPIOA->PTOR = LED2_MASK)
 /** @} */
 
 /**
@@ -95,7 +79,7 @@ extern "C"
  * @name Define the interface for the HDC1000 humidity sensor
  * @{
  */
-#define HDC1000_I2C         (I2C_0)
+#define HDC1000_I2C         (I2C_DEV(0))
 #define HDC1000_ADDR        (0x43)
 /** @} */
 
@@ -103,7 +87,7 @@ extern "C"
  * @name Define the interface for the MAG3110 magnetometer sensor
  * @{
  */
-#define MAG3110_I2C         (I2C_0)
+#define MAG3110_I2C         (I2C_DEV(0))
 #define MAG3110_ADDR        (0x0E)
 /** @} */
 
@@ -111,7 +95,7 @@ extern "C"
  * @name Define the interface for the MMA8652 tri-axis accelerometer sensor
  * @{
  */
-#define MMA8652_I2C         (I2C_0)
+#define MMA8652_I2C         (I2C_DEV(0))
 #define MMA8652_ADDR        (0x1D)
 /** @} */
 
@@ -119,7 +103,7 @@ extern "C"
  * @name Define the interface for the MPL3115A2 pressure sensor
  * @{
  */
-#define MPL3115A2_I2C       (I2C_0)
+#define MPL3115A2_I2C       (I2C_DEV(0))
 #define MPL3115A2_ADDR      (0x60)
 /** @} */
 
@@ -127,7 +111,7 @@ extern "C"
  * @name Define the interface for the TCS3772 light sensor
  * @{
  */
-#define TCS37727_I2C        (I2C_0)
+#define TCS37727_I2C        (I2C_DEV(0))
 #define TCS37727_ADDR       (0x29)
 /** @} */
 
@@ -135,7 +119,7 @@ extern "C"
  * @name Define the interface for the TMP006 IR-Termopile sensor
  * @{
  */
-#define TMP006_I2C          (I2C_0)
+#define TMP006_I2C          (I2C_DEV(0))
 #define TMP006_ADDR         (0x41)
 /** @} */
 
@@ -148,5 +132,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* __BOARD_H */
+#endif /* BOARD_H */
 /** @} */

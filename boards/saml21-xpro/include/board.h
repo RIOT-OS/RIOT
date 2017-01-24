@@ -28,32 +28,23 @@ extern "C" {
 #endif
 
 /**
- * @name LED pin definitions
+ * @brief   LED pin definitions and handlers
  * @{
  */
+#define LED0_PIN            GPIO_PIN(1, 10)
+
 #define LED_PORT            PORT->Group[1]
-#define LED_PIN             (10)
+#define LED0_MASK           (1 << 10)
+
+#define LED0_ON             (LED_PORT.OUTCLR.reg = LED0_MASK)
+#define LED0_OFF            (LED_PORT.OUTSET.reg = LED0_MASK)
+#define LED0_TOGGLE         (LED_PORT.OUTTGL.reg = LED0_MASK)
 /** @} */
 
 /**
- * @name Macros for controlling the on-board LEDs.
- * @{
+ * @brief User button pin
  */
-#define LED_ON              (LED_PORT.OUTCLR.reg = 1<<LED_PIN)
-#define LED_OFF             (LED_PORT.OUTSET.reg = 1<<LED_PIN)
-#define LED_TOGGLE          (LED_PORT.OUTTGL.reg = 1<<LED_PIN)
-
-/* for compatability to other boards */
-#define LED_GREEN_ON        /* not available */
-#define LED_GREEN_OFF       /* not available */
-#define LED_GREEN_TOGGLE    /* not available */
-#define LED_ORANGE_ON       LED_ON
-#define LED_ORANGE_OFF      LED_OFF
-#define LED_ORANGE_TOGGLE   LED_TOGGLE
-#define LED_RED_ON          /* not available */
-#define LED_RED_OFF         /* not available */
-#define LED_RED_TOGGLE      /* not available */
-/** @} */
+#define SW0_PIN             GPIO_PIN(PA, 2)
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

@@ -20,7 +20,7 @@
 
 #include "mutex.h"
 #include "timex.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "utlist.h"
 #include "kernel_types.h"
 
@@ -118,7 +118,7 @@ iib_link_set_entry_t *iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt
     }
 
     if (base_elt) {
-        vtimer_now(&now);
+        xtimer_now_timex(&now);
 
         /* Create a new link tuple for the neighbor that originated the hello */
         ls_entry = update_link_set(base_elt, nb_elt, &now, validity_time, is_sym_nb, is_lost);
@@ -143,7 +143,7 @@ void iib_fill_wr_addresses(kernel_pid_t if_pid, struct rfc5444_writer *wr)
 
     mutex_lock(&mtx_iib_access);
 
-    vtimer_now(&now);
+    xtimer_now_timex(&now);
 
     /* Before adding addresses first update the status of all link tuples */
     iib_update_lt_status(&now);
@@ -251,8 +251,8 @@ void iib_process_metric_msg(iib_link_set_entry_t *ls_entry, uint64_t int_time)
     ls_entry->hello_interval = rfc5444_timetlv_encode(int_time);
     if (ls_entry->last_seq_no == 0) {
         timex_t now, i_time;
-        vtimer_now(&now);
-        i_time = timex_from_uint64(int_time * MS_IN_USEC * DAT_HELLO_TIMEOUT_FACTOR);
+        xtimer_now_timex(&now);
+        i_time = timex_from_uint64(int_time * US_PER_MS * DAT_HELLO_TIMEOUT_FACTOR);
         ls_entry->dat_received[0]++;
         ls_entry->dat_total[0]++;
         ls_entry->dat_time = timex_add(now, i_time);
@@ -297,9 +297,9 @@ void iib_process_metric_pckt(iib_link_set_entry_t *ls_entry, uint32_t metric_out
 
     if (ls_entry->hello_interval != 0) {
         timex_t now, i_time;
-        vtimer_now(&now);
+        xtimer_now_timex(&now);
         i_time = timex_from_uint64(rfc5444_timetlv_decode(ls_entry->hello_interval)
-                * MS_IN_USEC * DAT_HELLO_TIMEOUT_FACTOR);
+                * US_PER_MS * DAT_HELLO_TIMEOUT_FACTOR);
         ls_entry->dat_time = timex_add(now, i_time);
     }
 
@@ -455,8 +455,8 @@ static iib_link_set_entry_t *update_link_set(iib_base_entry_t *base_entry, nib_e
         }
     }
 
-    v_time = timex_from_uint64(val_time * MS_IN_USEC);
-    l_hold = timex_from_uint64(((uint64_t)NHDP_L_HOLD_TIME_MS) * MS_IN_USEC);
+    v_time = timex_from_uint64(val_time * US_PER_MS);
+    l_hold = timex_from_uint64(((uint64_t)NHDP_L_HOLD_TIME_MS) * US_PER_MS);
 
     /* Set Sending Address List as this tuples address list */
     matching_lt->address_list_head = nhdp_generate_addr_list_from_tmp(NHDP_ADDR_TMP_SEND_LIST);
@@ -583,7 +583,7 @@ static iib_link_set_entry_t *add_default_link_set_entry(iib_base_entry_t *base_e
  */
 static void reset_link_set_entry(iib_link_set_entry_t *ls_entry, timex_t *now, uint64_t val_time)
 {
-    timex_t v_time = timex_from_uint64(val_time * MS_IN_USEC);
+    timex_t v_time = timex_from_uint64(val_time * US_PER_MS);
 
     release_link_tuple_addresses(ls_entry);
     ls_entry->sym_time.microseconds = 0;
@@ -679,7 +679,7 @@ static int add_two_hop_entry(iib_base_entry_t *base_entry, iib_link_set_entry_t 
                              nhdp_addr_t *th_addr, timex_t *now, uint64_t val_time)
 {
     iib_two_hop_set_entry_t *new_entry;
-    timex_t v_time = timex_from_uint64(val_time * MS_IN_USEC);
+    timex_t v_time = timex_from_uint64(val_time * US_PER_MS);
 
     new_entry = (iib_two_hop_set_entry_t *) malloc(sizeof(iib_two_hop_set_entry_t));
 

@@ -20,8 +20,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_SIXLOWPAN_ND_H_
-#define GNRC_SIXLOWPAN_ND_H_
+#ifndef GNRC_SIXLOWPAN_ND_H
+#define GNRC_SIXLOWPAN_ND_H
 
 #include <stdint.h>
 
@@ -113,7 +113,7 @@ extern "C" {
 /**
  * @brief   replacement value (in microseconds) for @ref GNRC_NDP_MAX_RTR_ADV_DELAY
  */
-#define GNRC_SIXLOWPAN_ND_MAX_RTR_ADV_DELAY (2U * SEC_IN_USEC)
+#define GNRC_SIXLOWPAN_ND_MAX_RTR_ADV_DELAY (2U * US_PER_SEC)
 /**
  * @brief   Lifetime of a tentative address entry in seconds
  */
@@ -282,5 +282,5 @@ gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_abr_build(uint32_t version, uint16_t ltime
 }
 #endif
 
-#endif /* GNRC_SIXLOWPAN_ND_H_ */
+#endif /* GNRC_SIXLOWPAN_ND_H */
 /** @} */

@@ -19,6 +19,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Víctor Ariño <victor.arino@triagnosys.com>
  *
  * @}
  */
@@ -36,15 +37,15 @@
 #include "debug.h"
 
 /* guard file in case no I2C device is defined */
-#if I2C_0_EN
+#if I2C_0_EN || I2C_1_EN
 
 /* static function definitions */
 static void _i2c_init(I2C_TypeDef *i2c, int ccr);
 static void _pin_config(gpio_t pin_scl, gpio_t pin_sda);
-static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag);
+static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, uint8_t *err);
 static inline void _clear_addr(I2C_TypeDef *dev);
-static inline void _write(I2C_TypeDef *dev, char *data, int length);
-static inline void _stop(I2C_TypeDef *dev);
+static inline void _write(I2C_TypeDef *dev, const uint8_t *data, int length, uint8_t *err);
+static inline void _stop(I2C_TypeDef *dev, uint8_t *err);
 
 /**
  * @brief Array holding one pre-initialized mutex for each I2C device
@@ -61,6 +62,21 @@ static mutex_t locks[] =  {
 #endif
 #if I2C_3_EN
     [I2C_3] = MUTEX_INIT
+#endif
+};
+
+static uint8_t err_flag[] = {
+#if I2C_0_EN
+    [I2C_0] = 0x00,
+#endif
+#if I2C_1_EN
+    [I2C_1] = 0x00,
+#endif
+#if I2C_2_EN
+    [I2C_2] = 0x00
+#endif
+#if I2C_3_EN
+    [I2C_3] = 0x00
 #endif
 };
 
@@ -92,6 +108,16 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
             I2C_0_CLKEN();
             NVIC_SetPriority(I2C_0_ERR_IRQ, I2C_IRQ_PRIO);
             NVIC_EnableIRQ(I2C_0_ERR_IRQ);
+            break;
+#endif
+#if I2C_1_EN
+        case I2C_1:
+            i2c = I2C_1_DEV;
+            pin_scl = I2C_1_SCL_PIN;
+            pin_sda = I2C_1_SDA_PIN;
+            I2C_1_CLKEN();
+            NVIC_SetPriority(I2C_1_ERR_IRQ, I2C_IRQ_PRIO);
+            NVIC_EnableIRQ(I2C_1_ERR_IRQ);
             break;
 #endif
         default:
@@ -141,8 +167,8 @@ static void _pin_config(gpio_t scl, gpio_t sda)
 {
     /* toggle pins to reset analog filter -> see datasheet */
     /* set as output */
-    gpio_init(scl, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(sda, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(scl, GPIO_OUT);
+    gpio_init(sda, GPIO_OUT);
     /* run through toggling sequence */
     gpio_set(scl);
     gpio_set(sda);
@@ -173,15 +199,105 @@ int i2c_release(i2c_t dev)
     return 0;
 }
 
-int i2c_read_byte(i2c_t dev, uint8_t address, char *data)
+int i2c_read_byte(i2c_t dev, uint8_t address, void *data)
 {
     return i2c_read_bytes(dev, address, data, 1);
 }
 
-int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 {
-    unsigned int state;
     int i = 0;
+    I2C_TypeDef *i2c;
+    uint8_t *my_data = data;
+
+    switch (dev) {
+#if I2C_0_EN
+        case I2C_0:
+            i2c = I2C_0_DEV;
+            break;
+#endif
+#if I2C_1_EN
+        case I2C_1:
+            i2c = I2C_1_DEV;
+            break;
+#endif
+        default:
+            return -1;
+    }
+
+    DEBUG("Send Slave address and wait for ADDR == 1\n");
+    _start(i2c, address, I2C_FLAG_READ, &err_flag[dev]);
+
+    if (err_flag[dev]) {
+        return -2;
+    }
+
+    DEBUG("Clear ADDR\n");
+    _clear_addr(i2c);
+
+    switch (length) {
+        case 1:
+            break;
+
+        case 2:
+            DEBUG("Set POS and ACK bit\n");
+            i2c->CR1 |= (I2C_CR1_POS | I2C_CR1_ACK);
+            DEBUG("Crit block: clear ACK flag\n");
+            i2c->CR1 &= ~(I2C_CR1_ACK);
+            DEBUG("Wait for transfer to be completed\n");
+            while (!(i2c->SR1 & I2C_SR1_BTF)) {}
+
+            break;
+
+        default:
+            i2c->CR1 |= (I2C_CR1_ACK);
+
+            while (i < (length - 3)) {
+                DEBUG("Wait until byte was received\n");
+                while (!(i2c->SR1 & I2C_SR1_RXNE)) {}
+                DEBUG("Copy byte from DR\n");
+                my_data[i++] = i2c->DR;
+            }
+
+            DEBUG("Reading the last 3 bytes, waiting for BTF flag\n");
+            while (!(i2c->SR1 & I2C_SR1_BTF)) {}
+
+            DEBUG("Read N-3 byte\n");
+            my_data[i++] = i2c->DR;
+    }
+
+    DEBUG("Clear ACK\n");
+    i2c->CR1 &= ~(I2C_CR1_ACK);
+
+    DEBUG("Setting STOP=1\n");
+    i2c->CR1 |= (I2C_CR1_STOP);
+
+    while (i < length) {
+        DEBUG("Wait for RXNE == 1\n");
+        while (!(i2c->SR1 & I2C_SR1_RXNE)) {}
+
+        DEBUG("Read byte\n");
+        my_data[i++] = i2c->DR;
+    }
+
+    DEBUG("wait for STOP bit to be cleared again\n");
+    while (i2c->CR1 & I2C_CR1_STOP) {}
+
+    DEBUG("reset POS = 0 and ACK = 1\n");
+    i2c->CR1 &= ~(I2C_CR1_POS);
+    i2c->CR1 |= (I2C_CR1_ACK);
+
+    return length;
+}
+
+int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data)
+{
+    return i2c_read_regs(dev, address, reg, data, 1);
+
+}
+
+int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int length)
+{
     I2C_TypeDef *i2c;
 
     switch (dev) {
@@ -190,119 +306,9 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
             i2c = I2C_0_DEV;
             break;
 #endif
-        default:
-            return -1;
-    }
-
-    switch (length) {
-        case 1:
-            DEBUG("Send Slave address and wait for ADDR == 1\n");
-            _start(i2c, address, I2C_FLAG_READ);
-
-            DEBUG("Set ACK = 0\n");
-            i2c->CR1 &= ~(I2C_CR1_ACK);
-
-            DEBUG("Clear ADDR and set STOP = 1\n");
-            state = disableIRQ();
-            _clear_addr(i2c);
-            i2c->CR1 |= (I2C_CR1_STOP);
-            restoreIRQ(state);
-
-            DEBUG("Wait for RXNE == 1\n");
-            while (!(i2c->SR1 & I2C_SR1_RXNE));
-
-            DEBUG("Read received data\n");
-            *data = (char)i2c->DR;
-            /* wait until STOP is cleared by hardware */
-            while (i2c->CR1 & I2C_CR1_STOP);
-            /* reset ACK to be able to receive new data */
-            i2c->CR1 |= (I2C_CR1_ACK);
-            break;
-        case 2:
-            DEBUG("Send Slave address and wait for ADDR == 1\n");
-            _start(i2c, address, I2C_FLAG_READ);
-            DEBUG("Set POS bit\n");
-            i2c->CR1 |= (I2C_CR1_POS | I2C_CR1_ACK);
-            DEBUG("Crit block: Clear ADDR bit and clear ACK flag\n");
-            state = disableIRQ();
-            _clear_addr(i2c);
-            i2c->CR1 &= ~(I2C_CR1_ACK);
-            restoreIRQ(state);
-
-            DEBUG("Wait for transfer to be completed\n");
-            while (!(i2c->SR1 & I2C_SR1_BTF));
-
-            DEBUG("Crit block: set STOP and read first byte\n");
-            state = disableIRQ();
-            i2c->CR1 |= (I2C_CR1_STOP);
-            data[0] = (char)i2c->DR;
-            restoreIRQ(state);
-
-            DEBUG("read second byte\n");
-            data[1] = (char)i2c->DR;
-
-            DEBUG("wait for STOP bit to be cleared again\n");
-            while (i2c->CR1 & I2C_CR1_STOP);
-
-            DEBUG("reset POS = 0 and ACK = 1\n");
-            i2c->CR1 &= ~(I2C_CR1_POS);
-            i2c->CR1 |= (I2C_CR1_ACK);
-            break;
-        default:
-            DEBUG("Send Slave address and wait for ADDR == 1\n");
-            _start(i2c, address, I2C_FLAG_READ);
-            _clear_addr(i2c);
-
-            while (i < (length - 3)) {
-                DEBUG("Wait until byte was received\n");
-                while (!(i2c->SR1 & I2C_SR1_RXNE));
-                DEBUG("Copy byte from DR\n");
-                data[i++] = (char)i2c->DR;
-            }
-
-            DEBUG("Reading the last 3 bytes, waiting for BTF flag\n");
-            while (!(i2c->SR1 & I2C_SR1_BTF));
-
-            DEBUG("Disable ACK\n");
-            i2c->CR1 &= ~(I2C_CR1_ACK);
-
-            DEBUG("Crit block: set STOP and read N-2 byte\n");
-            state = disableIRQ();
-            data[i++] = (char)i2c->DR;
-            i2c->CR1 |= (I2C_CR1_STOP);
-            restoreIRQ(state);
-
-            DEBUG("Read N-1 byte\n");
-            data[i++] = (char)i2c->DR;
-
-            while (!(i2c->SR1 & I2C_SR1_RXNE));
-            DEBUG("Read last byte\n");
-            data[i++] = (char)i2c->DR;
-
-            DEBUG("wait for STOP bit to be cleared again\n");
-            while (i2c->CR1 & I2C_CR1_STOP);
-
-            DEBUG("reset POS = 0 and ACK = 1\n");
-            i2c->CR1 &= ~(I2C_CR1_POS);
-            i2c->CR1 |= (I2C_CR1_ACK);
-    }
-    return length;
-}
-
-int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, char *data)
-{
-    return i2c_read_regs(dev, address, reg, data, 1);
-
-}
-
-int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
-{
-    I2C_TypeDef *i2c;
-
-    switch (dev) {
-#if I2C_0_EN
-        case I2C_0:
-            i2c = I2C_0_DEV;
+#if I2C_1_EN
+        case I2C_1:
+            i2c = I2C_1_DEV;
             break;
 #endif
         default:
@@ -311,21 +317,26 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int lengt
 
     /* send start condition and slave address */
     DEBUG("Send slave address and clear ADDR flag\n");
-    _start(i2c, address, I2C_FLAG_WRITE);
+    _start(i2c, address, I2C_FLAG_WRITE, &err_flag[dev]);
     _clear_addr(i2c);
     DEBUG("Write reg into DR\n");
     i2c->DR = reg;
-    _stop(i2c);
+    _stop(i2c, &err_flag[dev]);
+
+    if (err_flag[dev]) {
+        return -2;
+    }
+
     DEBUG("Now start a read transaction\n");
     return i2c_read_bytes(dev, address, data, length);
 }
 
-int i2c_write_byte(i2c_t dev, uint8_t address, char data)
+int i2c_write_byte(i2c_t dev, uint8_t address, uint8_t data)
 {
     return i2c_write_bytes(dev, address, &data, 1);
 }
 
-int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
 {
     I2C_TypeDef *i2c;
 
@@ -333,6 +344,11 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
 #if I2C_0_EN
         case I2C_0:
             i2c = I2C_0_DEV;
+            break;
+#endif
+#if I2C_1_EN
+        case I2C_1:
+            i2c = I2C_1_DEV;
             break;
 #endif
         default:
@@ -341,23 +357,29 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
 
     /* start transmission and send slave address */
     DEBUG("sending start sequence\n");
-    _start(i2c, address, I2C_FLAG_WRITE);
+    _start(i2c, address, I2C_FLAG_WRITE, &err_flag[dev]);
     _clear_addr(i2c);
     /* send out data bytes */
-    _write(i2c, data, length);
+    _write(i2c, data, length, &err_flag[dev]);
     /* end transmission */
     DEBUG("Ending transmission\n");
-    _stop(i2c);
+    _stop(i2c, &err_flag[dev]);
     DEBUG("STOP condition was send out\n");
-    return length;
+
+    if (err_flag[dev]) {
+        return -2;
+    }
+    else {
+        return length;
+    }
 }
 
-int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, char data)
+int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data)
 {
     return i2c_write_regs(dev, address, reg, &data, 1);
 }
 
-int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
+int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, int length)
 {
     I2C_TypeDef *i2c;
 
@@ -367,21 +389,32 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
             i2c = I2C_0_DEV;
             break;
 #endif
+#if I2C_1_EN
+        case I2C_1:
+            i2c = I2C_1_DEV;
+            break;
+#endif
         default:
             return -1;
     }
 
     /* start transmission and send slave address */
-    _start(i2c, address, I2C_FLAG_WRITE);
+    _start(i2c, address, I2C_FLAG_WRITE, &err_flag[dev]);
     _clear_addr(i2c);
     /* send register address and wait for complete transfer to be finished*/
-    _write(i2c, (char *)(&reg), 1);
+    _write(i2c, &reg, 1, &err_flag[dev]);
     /* write data to register */
-    _write(i2c, data, length);
+    _write(i2c, data, length, &err_flag[dev]);
     /* finish transfer */
-    _stop(i2c);
-    /* return number of bytes send */
-    return length;
+    _stop(i2c, &err_flag[dev]);
+
+    if (err_flag[dev]) {
+        return -2;
+    }
+    else {
+        /* return number of bytes send */
+        return length;
+    }
 }
 
 void i2c_poweron(i2c_t dev)
@@ -392,6 +425,11 @@ void i2c_poweron(i2c_t dev)
             I2C_0_CLKEN();
             break;
 #endif
+#if I2C_1_EN
+        case I2C_1:
+            I2C_1_CLKEN();
+            break;
+#endif
     }
 }
 
@@ -400,29 +438,37 @@ void i2c_poweroff(i2c_t dev)
     switch (dev) {
 #if I2C_0_EN
         case I2C_0:
-            while (I2C_0_DEV->SR2 & I2C_SR2_BUSY);
+            while (I2C_0_DEV->SR2 & I2C_SR2_BUSY) {}
             I2C_0_CLKDIS();
+            break;
+#endif
+#if I2C_1_EN
+        case I2C_1:
+            while (I2C_1_DEV->SR2 & I2C_SR2_BUSY) {}
+            I2C_1_CLKDIS();
             break;
 #endif
     }
 }
 
-static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag)
+static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, uint8_t *err)
 {
+    /* flag that there's no error (yet) */
+    *err = 0x00;
     /* wait for device to be ready */
     DEBUG("Wait for device to be ready\n");
-    while (dev->SR2 & I2C_SR2_BUSY);
+    while (dev->SR2 & I2C_SR2_BUSY) {}
     /* generate start condition */
     DEBUG("Generate start condition\n");
     dev->CR1 |= I2C_CR1_START;
     DEBUG("Wait for SB flag to be set\n");
-    while (!(dev->SR1 & I2C_SR1_SB));
+    while (!(dev->SR1 & I2C_SR1_SB)) {}
     /* send address and read/write flag */
     DEBUG("Send address\n");
     dev->DR = (address << 1) | rw_flag;
     /* clear ADDR flag by reading first SR1 and then SR2 */
     DEBUG("Wait for ADDR flag to be set\n");
-    while (!(dev->SR1 & I2C_SR1_ADDR));
+    while (!(dev->SR1 & I2C_SR1_ADDR) && !(*err)) {}
 }
 
 static inline void _clear_addr(I2C_TypeDef *dev)
@@ -431,35 +477,39 @@ static inline void _clear_addr(I2C_TypeDef *dev)
     dev->SR2;
 }
 
-static inline void _write(I2C_TypeDef *dev, char *data, int length)
+static inline void _write(I2C_TypeDef *dev, const uint8_t *data, int length, uint8_t *err)
 {
     DEBUG("Looping through bytes\n");
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length && !(*err); i++) {
         /* write data to data register */
-        dev->DR = (uint8_t)data[i];
+        dev->DR = data[i];
         DEBUG("Written %i byte to data reg, now waiting for DR to be empty again\n", i);
         /* wait for transfer to finish */
-        while (!(dev->SR1 & I2C_SR1_TXE));
+        while (!(dev->SR1 & I2C_SR1_TXE) && !(*err)) {}
         DEBUG("DR is now empty again\n");
     }
 
 }
 
-static inline void _stop(I2C_TypeDef *dev)
+static inline void _stop(I2C_TypeDef *dev, uint8_t *err)
 {
     /* make sure last byte was send */
-    while (!(dev->SR1 & I2C_SR1_BTF));
+    while (!(dev->SR1 & I2C_SR1_BTF) && !(*err)) {}
     /* send STOP condition */
     dev->CR1 |= I2C_CR1_STOP;
     /* wait until transmission is complete */
-    while (dev->SR2 & I2C_SR2_BUSY);
+    while (dev->SR2 & I2C_SR2_BUSY) {}
 }
 
-#if I2C_0_EN
-void I2C_0_ERR_ISR(void)
+static inline void i2c_irq_handler(i2c_t i2c_dev, I2C_TypeDef *dev)
 {
-    unsigned state = I2C_0_DEV->SR1;
-    DEBUG("\n\n### I2C ERROR OCCURED ###\n");
+    unsigned volatile state = dev->SR1;
+
+    /* record and clear errors */
+    err_flag[i2c_dev] = (state >> 8);
+    dev->SR1 &= 0x00ff;
+
+    DEBUG("\n\n### I2C %d ERROR OCCURED ###\n", i2c_dev);
     DEBUG("status: %08x\n", state);
     if (state & I2C_SR1_OVR) {
         DEBUG("OVR\n");
@@ -482,8 +532,20 @@ void I2C_0_ERR_ISR(void)
     if (state & I2C_SR1_SMBALERT) {
         DEBUG("SMBALERT\n");
     }
-    while (1);
+}
+
+#if I2C_0_EN
+void I2C_0_ERR_ISR(void)
+{
+    i2c_irq_handler(I2C_0, I2C_0_DEV);
 }
 #endif
 
-#endif /* I2C_0_EN */
+#if I2C_1_EN
+void I2C_1_ERR_ISR(void)
+{
+    i2c_irq_handler(I2C_1, I2C_1_DEV);
+}
+#endif
+
+#endif /* I2C_0_EN || I2C_1_EN */

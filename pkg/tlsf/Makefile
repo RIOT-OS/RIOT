@@ -2,29 +2,30 @@ PKG_NAME = tlsf
 PKG_VERSION = 3.0
 PKG_FILE = tlsf-$(PKG_VERSION).zip
 PKG_URL = http://download.riot-os.org/$(PKG_FILE)
-PKG_DIR=$(CURDIR)/$(PKG_NAME)
+PKG_LICENSE = PD
+PKG_DIR=$(CURDIR)
+PKG_BUILDDIR=$(BINDIRBASE)/pkg/$(BOARD)/$(PKG_NAME)
+PKG_SRCDIR=$(PKG_BUILDDIR)/src
 
 .PHONY: all clean distclean
 
-all: $(PKG_DIR)/$(PKG_NAME).a
+all: $(PKG_SRCDIR)/$(PKG_NAME).a
 
-$(PKG_DIR)/$(PKG_NAME).a: $(PKG_DIR)/Makefile
-	$(AD)make -C $(<D)
+$(PKG_SRCDIR)/$(PKG_NAME).a: $(PKG_SRCDIR)/Makefile
+	$(Q)make -C $(<D)
 
-$(PKG_DIR)/Makefile: $(CURDIR)/$(PKG_FILE) $(CURDIR)/patch.txt
-	@rm -rf $(@D)
+$(PKG_SRCDIR)/Makefile: $(PKG_BUILDDIR)/$(PKG_FILE) $(CURDIR)/patch.txt
+	rm -rf $(@D)
+	mkdir -p $(@D)
+	$(Q)cd $(@D) && $(UNZIP_HERE) $(PKG_BUILDDIR)/$(PKG_FILE)
+	$(Q)cd $(@D) && patch --binary -p0 -N -i $(CURDIR)/patch.txt
+
+$(PKG_BUILDDIR)/$(PKG_FILE):
 	@mkdir -p $(@D)
-	$(AD)cd $(@D) && $(UNZIP_HERE) $(CURDIR)/$(PKG_FILE)
-	$(AD)cd $(@D) && patch --binary -p0 -N -i $(CURDIR)/patch.txt
-
-$(CURDIR)/$(PKG_FILE):
-	$(AD)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)
+	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)
 
 clean::
-	rm -rf $(PKG_DIR)/
+	rm -rf $(PKG_SRCDIR)/
 
-distclean:: clean
-	rm -f $(CURDIR)/$(PKG_FILE)
-
-Makefile.include:
-	@true
+distclean::
+	rm -rf $(PKG_BUILDDIR)/

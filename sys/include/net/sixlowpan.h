@@ -17,10 +17,14 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef SIXLOWPAN_H_
-#define SIXLOWPAN_H_
+#ifndef SIXLOWPAN_H
+#define SIXLOWPAN_H
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
+
+#include "byteorder.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,7 +71,7 @@ extern "C" {
  */
 static inline bool sixlowpan_nalp(uint8_t disp)
 {
-    return (disp & 0x3f);
+    return ((disp & 0xc0) == 0);
 }
 /** @} */
 
@@ -257,5 +261,5 @@ void sixlowpan_print(uint8_t *data, size_t size);
 }
 #endif
 
-#endif /* SIXLOWPAN_H_ */
+#endif /* SIXLOWPAN_H */
 /** @} */

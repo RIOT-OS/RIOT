@@ -57,7 +57,7 @@ static gnrc_nettest_res_t _pkt_test(uint16_t cmd_type, kernel_pid_t pid,
     gnrc_nettest_res_t res = GNRC_NETTEST_SUCCESS;
 
     msg.type = cmd_type;
-    msg.content.ptr = (char *)in;
+    msg.content.ptr = in;
 
     msg_send(&msg, pid);
 
@@ -81,7 +81,7 @@ static gnrc_nettest_res_t _pkt_test(uint16_t cmd_type, kernel_pid_t pid,
             return GNRC_NETTEST_WRONG_SENDER;
         }
 
-        out = (gnrc_pktsnip_t *)msg.content.ptr;
+        out = msg.content.ptr;
 
         if (out == NULL) {
             return GNRC_NETTEST_FAIL;
@@ -99,7 +99,7 @@ static gnrc_nettest_res_t _pkt_test(uint16_t cmd_type, kernel_pid_t pid,
             exp = exp->next;
         }
 
-        gnrc_pktbuf_release((gnrc_pktsnip_t *)msg.content.ptr);
+        gnrc_pktbuf_release(msg.content.ptr);
     }
 
     return res;
@@ -111,7 +111,8 @@ gnrc_nettest_res_t gnrc_nettest_send(kernel_pid_t pid, gnrc_pktsnip_t *in,
                                      const gnrc_pktsnip_t **exp_out,
                                      gnrc_nettype_t exp_type, uint32_t exp_demux_ctx)
 {
-    gnrc_netreg_entry_t reg_entry = { NULL, exp_demux_ctx, thread_getpid() };
+    gnrc_netreg_entry_t reg_entry = GNRC_NETREG_ENTRY_INIT_PID(exp_demux_ctx,
+                                                               sched_active_pid);
     gnrc_nettest_res_t res;
 
     gnrc_netreg_register(exp_type, &reg_entry);
@@ -147,7 +148,8 @@ gnrc_nettest_res_t gnrc_nettest_receive(kernel_pid_t pid, gnrc_pktsnip_t *in,
                                         const gnrc_pktsnip_t **exp_out,
                                         gnrc_nettype_t exp_type, uint32_t exp_demux_ctx)
 {
-    gnrc_netreg_entry_t reg_entry = { NULL, exp_demux_ctx, thread_getpid() };
+    gnrc_netreg_entry_t reg_entry = GNRC_NETREG_ENTRY_INIT_PID(exp_demux_ctx,
+                                                               sched_active_pid);
     gnrc_nettest_res_t res;
 
     gnrc_netreg_register(exp_type, &reg_entry);
@@ -234,14 +236,14 @@ static void *_event_loop(void *arg)
 
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_GET:
-                opt = (gnrc_netapi_opt_t *)msg.content.ptr;
+                opt = msg.content.ptr;
                 reply.content.value = _get_set_opt(_opt_cbs[opt->opt].get,
                                                    opt->context, opt->data,
                                                    opt->data_len);
                 break;
 
             case GNRC_NETAPI_MSG_TYPE_SET:
-                opt = (gnrc_netapi_opt_t *)msg.content.ptr;
+                opt = msg.content.ptr;
                 reply.content.value = _get_set_opt(_opt_cbs[opt->opt].set,
                                                    opt->context, opt->data,
                                                    opt->data_len);

@@ -27,10 +27,10 @@ extern "C" {
 
 #include "serialport.hpp"
 
-void rx_cb(void *arg, char c)
+void rx_cb(void *arg, uint8_t c)
 {
     ringbuffer_t *buf = (ringbuffer_t *)arg;
-    ringbuffer_add_one(buf, c);
+    ringbuffer_add_one(buf, (char)c);
 }
 
 SerialPort::SerialPort(uart_t dev)
@@ -43,7 +43,7 @@ int SerialPort::available(void)
     return (int)rx_buf.avail;
 }
 
-void SerialPort::begin(int baudrate)
+void SerialPort::begin(long baudrate)
 {
     /* this clears the contents of the ringbuffer... */
     ringbuffer_init(&rx_buf, rx_mem, SERIAL_RX_BUFSIZE);
@@ -92,7 +92,7 @@ size_t SerialPort::print(float val)
 size_t SerialPort::print(float val, int format)
 {
     char buf[64];
-    size_t len = sprintf(buf, "%.*f", format, val);
+    size_t len = sprintf(buf, "%.*f", format, (double)val);
     write(buf, len);
     return len;
 }
@@ -153,11 +153,11 @@ int SerialPort::read(void)
 {
     int res = -1;
 
-    disableIRQ();
+    irq_disable();
     if (rx_buf.avail > 0) {
         res = ringbuffer_get_one(&rx_buf);
     }
-    enableIRQ();
+    irq_enable();
 
     return res;
 }

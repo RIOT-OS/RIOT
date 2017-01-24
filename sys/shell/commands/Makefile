@@ -2,9 +2,6 @@ MODULE = shell_commands
 
 SRC = shell_commands.c sc_sys.c
 
-ifneq (,$(filter config,$(USEMODULE)))
-  SRC += sc_id.c
-endif
 ifneq (,$(filter mci,$(USEMODULE)))
   SRC += sc_disk.c
 endif
@@ -44,7 +41,10 @@ endif
 ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
   SRC += sc_blacklist.c
 endif
-ifneq (,$(filter gnrc_icmpv6_echo xtimer,$(USEMODULE)))
+# The ping command in sc_icmpv6_echo requires xtimer, too. However, this is
+# implicitly pulled in by gnrc_ipv6_netif (which is a dependency of gnrc_ipv6)
+# already.
+ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
   SRC += sc_icmpv6_echo.c
 endif
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
@@ -65,6 +65,9 @@ ifneq (,$(filter saul_reg,$(USEMODULE)))
 endif
 ifneq (,$(filter ccn-lite-utils,$(USEMODULE)))
   SRC += sc_ccnl.c
+endif
+ifneq (,$(filter sntp,$(USEMODULE)))
+  SRC += sc_sntp.c
 endif
 
 # TODO

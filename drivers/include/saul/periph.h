@@ -19,21 +19,39 @@
 #ifndef SAUL_PERIPH_H
 #define SAUL_PERIPH_H
 
+#ifdef MODULE_SAUL_GPIO
 #include "periph/gpio.h"
+#endif /* MODULE_SAUL_GPIO */
+
+#ifdef MODULE_SAUL_ADC
+#include "periph/adc.h"
+#endif /* MODULE_SAUL_ADC */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#ifdef MODULE_SAUL_GPIO
 /**
  * @brief   Direct mapped GPIO configuration values
  */
 typedef struct {
     const char *name;       /**< name of the device connected to this pin */
     gpio_t pin;             /**< GPIO pin to initialize and expose */
-    gpio_dir_t dir;         /**< use GPIO as input or output */
-    gpio_pp_t pull;         /**< define the pull-up/pull-down mode */
+    gpio_mode_t mode;       /**< pin mode to use */
 } saul_gpio_params_t;
+#endif /* MODULE_SAUL_GPIO */
+
+#ifdef MODULE_SAUL_ADC
+/**
+ * @brief   Direct mapped ADC configuration values
+ */
+typedef struct {
+    const char *name;       /**< name of the device connected to this pin */
+    adc_t line;             /**< ADC line to initialize and expose */
+    adc_res_t res;          /**< ADC resolution */
+} saul_adc_params_t;
+#endif /* MODULE_SAUL_ADC */
 
 #ifdef __cplusplus
 }

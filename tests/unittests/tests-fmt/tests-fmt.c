@@ -120,6 +120,131 @@ static void test_fmt_s32_dec(void)
     TEST_ASSERT_EQUAL_STRING("-9876", (char *) out);
 }
 
+static void test_fmt_u64_dec_a(void)
+{
+    char out[21] = "------------------";
+    uint64_t val = 0;
+    uint8_t chars = 0;
+
+    chars = fmt_u64_dec(out, val);
+    TEST_ASSERT_EQUAL_INT(1, chars);
+    out[chars] = '\0';
+    TEST_ASSERT_EQUAL_STRING("0", (char *) out);
+}
+
+static void test_fmt_u64_dec_b(void)
+{
+    char out[21] = "--------------------";
+    uint64_t val = 18446744073709551615LLU;
+    uint8_t chars = 0;
+
+    chars = fmt_u64_dec(out, val);
+    TEST_ASSERT_EQUAL_INT(20, chars);
+    out[chars] = '\0';
+    TEST_ASSERT_EQUAL_STRING("18446744073709551615", (char *) out);
+}
+
+static void test_fmt_u64_dec_c(void)
+{
+    char out[21] = "--------------------";
+    uint64_t val = 1234567890123456789LLU;
+    uint8_t chars = 0;
+
+    chars = fmt_u64_dec(out, val);
+    TEST_ASSERT_EQUAL_INT(19, chars);
+    out[chars] = '\0';
+    TEST_ASSERT_EQUAL_STRING("1234567890123456789", (char *) out);
+}
+
+static void test_rmt_s16_dec(void)
+{
+    char out[7] = "-------";
+    int16_t val;
+    size_t len;
+
+    val = 0;
+    len = fmt_s16_dec(out, val);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(1, len);
+    TEST_ASSERT_EQUAL_STRING("0", (char *)out);
+
+    val = -32000;
+    len = fmt_s16_dec(out, val);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(6, len);
+    TEST_ASSERT_EQUAL_STRING("-32000", (char *)out);
+
+    val = 12345;
+    len = fmt_s16_dec(out, val);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(5, len);
+    TEST_ASSERT_EQUAL_STRING("12345", (char *)out);
+}
+
+static void test_rmt_s16_dfp(void)
+{
+    char out[8] = "--------";
+    int16_t val;
+    unsigned fpp;
+    size_t len;
+
+    val = 0;
+    fpp = 3;
+    len = fmt_s16_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(5, len);
+    TEST_ASSERT_EQUAL_STRING("0.000", (char *)out);
+
+    val = 12345;
+    fpp = 4;
+    len = fmt_s16_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(6, len);
+    TEST_ASSERT_EQUAL_STRING("1.2345", (char *)out);
+
+    val = 12030;
+    fpp = 3;
+    len = fmt_s16_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(6, len);
+    TEST_ASSERT_EQUAL_STRING("12.030", (char *)out);
+
+    val = -3548;
+    fpp = 2;
+    len = fmt_s16_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(6, len);
+    TEST_ASSERT_EQUAL_STRING("-35.48", (char *)out);
+
+    val = -23;
+    fpp = 4;
+    len = fmt_s16_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(7, len);
+    TEST_ASSERT_EQUAL_STRING("-0.0023", (char *)out);
+
+    val = 50;
+    fpp = 3;
+    len = fmt_s16_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(5, len);
+    TEST_ASSERT_EQUAL_STRING("0.050", (char *)out);
+
+    val = -12345;
+    fpp = 0;
+    len = fmt_s16_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(6, len);
+    TEST_ASSERT_EQUAL_STRING("-12345", (char *)out);
+
+    val = 31987;
+    fpp = 5;
+    len = fmt_s16_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(0, len);
+    TEST_ASSERT_EQUAL_STRING("", (char *)out);
+}
+
 static void test_fmt_strlen(void)
 {
     const char *empty_str = "";
@@ -158,8 +283,13 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_u32_hex),
         new_TestFixture(test_fmt_u64_hex),
         new_TestFixture(test_fmt_u32_dec),
+        new_TestFixture(test_fmt_u64_dec_a),
+        new_TestFixture(test_fmt_u64_dec_b),
+        new_TestFixture(test_fmt_u64_dec_c),
         new_TestFixture(test_fmt_u16_dec),
         new_TestFixture(test_fmt_s32_dec),
+        new_TestFixture(test_rmt_s16_dec),
+        new_TestFixture(test_rmt_s16_dfp),
         new_TestFixture(test_fmt_strlen),
         new_TestFixture(test_fmt_str),
         new_TestFixture(test_scn_u32_dec),

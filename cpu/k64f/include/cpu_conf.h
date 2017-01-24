@@ -17,20 +17,20 @@
  * @file
  * @brief           Implementation specific CPU configuration options
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Johann Fischer <j.fischer@phytec.de>
  */
 
-#ifndef __CPU_CONF_H
-#define __CPU_CONF_H
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
+
+#include "cpu_conf_common.h"
 
 #ifdef CPU_MODEL_MK64FN1M0VLL12
 #include "MK64F12.h"
 #else
 #error "undefined CPU_MODEL"
 #endif
-
-#include "mcg.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -84,5 +84,5 @@ extern "C"
 }
 #endif
 
-#endif /* __CPU_CONF_H */
+#endif /* CPU_CONF_H */
 /** @} */

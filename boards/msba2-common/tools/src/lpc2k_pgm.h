@@ -16,7 +16,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef LPC2K_PGM_H_
+#ifndef LPC2K_PGM_H
 #define LPC2K_PGM_H
 
 /* gets a name like "115200", sets baudrate accordingly. */
@@ -27,4 +27,4 @@ void change_baud(const char *baud_name);
 */
 void signal_terminal(void);
 
-#endif /*  LPC2K_PGM_H_ */
+#endif /*  LPC2K_PGM_H */

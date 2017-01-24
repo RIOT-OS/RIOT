@@ -57,7 +57,7 @@ void *timer_thread(void *arg)
     while (1) {
         msg_t m;
         msg_receive(&m);
-        struct timer_msg *tmsg = (struct timer_msg *) m.content.ptr;
+        struct timer_msg *tmsg = m.content.ptr;
         xtimer_now_timex(&now);
         printf("now=%" PRIu32 ":%" PRIu32 " -> every %" PRIu32 ".%" PRIu32 "s: %s\n",
                now.seconds,
@@ -67,7 +67,7 @@ void *timer_thread(void *arg)
                tmsg->text);
 
         tmsg->msg.type = 12345;
-        tmsg->msg.content.ptr = (void*)tmsg;
+        tmsg->msg.content.ptr = tmsg;
         xtimer_set_msg(&tmsg->timer, tmsg->interval, &tmsg->msg, thread_getpid());
     }
 }
@@ -82,11 +82,10 @@ void *timer_thread_local(void *arg)
         msg_t m;
         msg_receive(&m);
 
-        uint32_t now = xtimer_now();
-        int sec, min, hr;
-        sec = now/1000000;
-        min = sec/60;
-        hr = sec/3600;
+        uint32_t now = xtimer_now_usec();
+        int sec = now / 1000000;
+        int min = sec / 60;
+        int hr  = sec / 3600;
         printf("sec=%d min=%d hour=%d\n", sec, min, hr);
     }
 }
@@ -104,11 +103,11 @@ int main(void)
                   "timer");
 
     puts("sending 1st msg");
-    m.content.ptr = (char *) &msg_a;
+    m.content.ptr = &msg_a;
     msg_try_send(&m, pid);
 
     puts("sending 2nd msg");
-    m.content.ptr = (char *) &msg_b;
+    m.content.ptr = &msg_b;
     msg_try_send(&m, pid);
 
     kernel_pid_t pid2 = thread_create(

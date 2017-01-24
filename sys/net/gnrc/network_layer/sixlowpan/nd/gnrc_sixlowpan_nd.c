@@ -30,14 +30,14 @@ static inline void _rtr_sol_reschedule(gnrc_ipv6_netif_t *iface, uint32_t sec_de
 {
     xtimer_remove(&iface->rtr_sol_timer);
     iface->rtr_sol_msg.type = GNRC_SIXLOWPAN_ND_MSG_MC_RTR_SOL;
-    iface->rtr_sol_msg.content.ptr = (char *) iface;
-    xtimer_set_msg(&iface->rtr_sol_timer, sec_delay * SEC_IN_USEC, &iface->rtr_sol_msg,
+    iface->rtr_sol_msg.content.ptr = iface;
+    xtimer_set_msg(&iface->rtr_sol_timer, sec_delay * US_PER_SEC, &iface->rtr_sol_msg,
                    gnrc_ipv6_pid);
 }
 
 static inline uint32_t _binary_exp_backoff(uint32_t base_sec, unsigned int exp)
 {
-    return genrand_uint32_range(0, (1 << exp)) * base_sec;
+    return random_uint32_range(0, (1 << exp)) * base_sec;
 }
 
 static inline void _revert_iid(uint8_t *iid)
@@ -124,14 +124,6 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
     ipv6_addr_t *next_hop = NULL;
     gnrc_ipv6_nc_t *nc_entry = NULL;
 
-#ifdef MODULE_GNRC_IPV6_EXT_RH
-    ipv6_hdr_t *hdr;
-    gnrc_pktsnip_t *ipv6;
-    ipv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
-    assert(ipv6);
-    hdr = ipv6->data;
-    next_hop = ipv6_ext_rh_next_hop(hdr);
-#endif
 #ifdef MODULE_FIB
     kernel_pid_t fib_iface;
     ipv6_addr_t next_hop_actual;    /* FIB copies address into this variable */
@@ -236,8 +228,8 @@ void gnrc_sixlowpan_nd_rtr_sol_reschedule(gnrc_ipv6_nc_t *nce, uint32_t sec_dela
     gnrc_ipv6_netif_t *iface = gnrc_ipv6_netif_get(nce->iface);
     xtimer_remove(&iface->rtr_sol_timer);
     iface->rtr_sol_msg.type = GNRC_SIXLOWPAN_ND_MSG_MC_RTR_SOL;
-    iface->rtr_sol_msg.content.ptr = (char *) iface;
-    xtimer_set_msg(&iface->rtr_sol_timer, sec_delay * SEC_IN_USEC, &iface->rtr_sol_msg,
+    iface->rtr_sol_msg.content.ptr = iface;
+    xtimer_set_msg(&iface->rtr_sol_timer, sec_delay * US_PER_SEC, &iface->rtr_sol_msg,
                    gnrc_ipv6_pid);
 }
 
@@ -300,7 +292,7 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6,
                     DEBUG("6lo nd: address registration successful\n");
                     mutex_lock(&ipv6_iface->mutex);
                     /* reschedule 1 minute before lifetime expires */
-                    gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, SEC_IN_USEC * 60 *
+                    gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, US_PER_SEC * 60 *
                                                           (uint32_t)(byteorder_ntohs(ar_opt->ltime)
                                                           -1),
                                                           GNRC_NDP_MSG_NBR_SOL_RETRANS,
@@ -365,7 +357,7 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6,
                 nc_entry->flags |= GNRC_IPV6_NC_TYPE_REGISTERED;
                 reg_ltime = byteorder_ntohs(ar_opt->ltime);
                 /* TODO: notify routing protocol */
-                xtimer_set_msg(&nc_entry->type_timeout, (reg_ltime * 60 * SEC_IN_USEC),
+                xtimer_set_msg(&nc_entry->type_timeout, (reg_ltime * 60 * US_PER_SEC),
                                &nc_entry->type_timeout_msg, gnrc_ipv6_pid);
             }
             break;

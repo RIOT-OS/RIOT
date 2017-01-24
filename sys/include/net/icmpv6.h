@@ -20,8 +20,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef ICMPV6_H_
-#define ICMPV6_H_
+#ifndef ICMPV6_H
+#define ICMPV6_H
 
 #include <stdint.h>
 
@@ -221,5 +221,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
-#endif /* ICMPV6_H_ */
+#endif /* ICMPV6_H */
 /** @} */

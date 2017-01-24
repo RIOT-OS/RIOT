@@ -19,10 +19,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef GNRC_NOMAC_H_
-#define GNRC_NOMAC_H_
+#ifndef GNRC_NOMAC_H
+#define GNRC_NOMAC_H
 
-#include "kernel.h"
 #include "net/gnrc/netdev.h"
 
 #ifdef __cplusplus
@@ -59,5 +58,5 @@ kernel_pid_t gnrc_nomac_init(char *stack, int stacksize, char priority,
 }
 #endif
 
-#endif /* __NOMAC_H_ */
+#endif /* __NOMAC_H */
 /** @} */

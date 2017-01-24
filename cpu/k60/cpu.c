@@ -64,7 +64,7 @@ static void check_running_cpu_revision(void)
          * between silicon revision 1.x and 2.x (LSB of CPUID) */
         /* If you unexpectedly end up on this line when debugging:
          * Rebuild the code using the correct value for K60_CPU_REV */
-        __ASM volatile ("bkpt #99\n");
+        __asm__ volatile ("bkpt #99\n");
 
         while (1);
     }

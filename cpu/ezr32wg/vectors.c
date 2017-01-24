@@ -27,7 +27,7 @@ extern uint32_t _estack;
 /* define a local dummy handler as it needs to be in the same compilation unit
  * as the alias definition */
 void dummy_handler(void) {
-    asm("b     dummy_handler_default");
+    __asm__("b     dummy_handler_default");
 }
 
 /* Cortex-M common interrupt vectors */

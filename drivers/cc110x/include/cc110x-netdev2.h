@@ -43,6 +43,10 @@ typedef struct netdev2_cc110x {
     cc110x_t cc110x;        /**< documentation here */
 } netdev2_cc110x_t;
 
+/**
+ * @brief   Received packet status information for cc110x radios
+ */
+typedef struct netdev2_radio_rx_info netdev2_cc110x_rx_info_t;
 
 /**
  * @brief netdev2 <-> cc110x glue code initialization function

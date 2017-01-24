@@ -43,6 +43,8 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
         uint8_t id_hi, uint8_t id_lo)
 {
     char *rsp = (char *)response;
+    /* resetting the content of response message */
+    memset(response, 0, sizeof(response));
     int len = sizeof(response);
     const coap_endpoint_t *ep = endpoints;
     int i;

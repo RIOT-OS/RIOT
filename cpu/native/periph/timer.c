@@ -27,6 +27,8 @@
 #include <mach/mach_init.h>
 #include <mach/mach_port.h>
 #include <mach/mach_host.h>
+/* Both OS X and RIOT typedef thread_t. timer.c does not use either thread_t. */
+#define thread_t riot_thread_t
 #endif
 
 #include <time.h>
@@ -49,7 +51,8 @@
 
 static unsigned long time_null;
 
-static void (*_callback)(int);
+static timer_cb_t _callback;
+static void *_cb_arg;
 
 static struct itimerval itv;
 
@@ -71,10 +74,10 @@ void native_isr_timer(void)
 {
     DEBUG("%s\n", __func__);
 
-    _callback(0);
+    _callback(_cb_arg, 0);
 }
 
-int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     (void)freq;
     DEBUG("%s\n", __func__);
@@ -89,9 +92,11 @@ int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
     time_null = 0;
     time_null = timer_read(0);
 
-    timer_irq_disable(dev);
-    _callback = callback;
-    timer_irq_enable(dev);
+    _callback = cb;
+    _cb_arg = arg;
+    if (register_interrupt(SIGALRM, native_isr_timer) != 0) {
+        DEBUG("darn!\n\n");
+    }
 
     return 0;
 }
@@ -149,30 +154,6 @@ int timer_clear(tim_t dev, int channel)
     do_timer_set(0);
 
     return 1;
-}
-
-void timer_irq_enable(tim_t dev)
-{
-    (void)dev;
-    DEBUG("%s\n", __func__);
-
-    if (register_interrupt(SIGALRM, native_isr_timer) != 0) {
-        DEBUG("darn!\n\n");
-    }
-
-    return;
-}
-
-void timer_irq_disable(tim_t dev)
-{
-    (void)dev;
-    DEBUG("%s\n", __func__);
-
-    if (unregister_interrupt(SIGALRM) != 0) {
-        DEBUG("darn!\n\n");
-    }
-
-    return;
 }
 
 void timer_start(tim_t dev)

@@ -19,8 +19,8 @@
  *
  * @note        $Id:  avsextrem-ssp0.c  3854 2010-01-18 15:27:01Z zkasmi $
  */
-#ifndef SSP_H_
-#define SSP_H_
+#ifndef SSP_H
+#define SSP_H
 
 #include "stdint.h"
 
@@ -122,4 +122,4 @@ void SSP0Handler(void);
 }
 #endif
 
-#endif  /* SSP_H_ */
+#endif  /* SSP_H */

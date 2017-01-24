@@ -61,6 +61,7 @@ extern "C" {
 typedef void (*_native_callback_t)(void);
 
 /**
+ * @cond INTERNAL
  * internal functions
  */
 void native_cpu_init(void);
@@ -68,6 +69,7 @@ void native_interrupt_init(void);
 
 void native_irq_handler(void);
 extern void _native_sig_leave_tramp(void);
+extern void _native_sig_leave_handler(void);
 
 void _native_syscall_leave(void);
 void _native_syscall_enter(void);
@@ -159,6 +161,10 @@ ssize_t _native_write(int fd, const void *buf, size_t count);
 ssize_t _native_writev(int fildes, const struct iovec *iov, int iovcnt);
 
 /**
+ * @endcond
+ */
+
+/**
  * register interrupt handler handler for interrupt sig
  */
 int register_interrupt(int sig, _native_callback_t handler);
@@ -174,9 +180,7 @@ int unregister_interrupt(int sig);
 }
 #endif
 
-#include "kernel_internal.h"
 #include "sched.h"
-
 
 /** @} */
 #endif /* _NATIVE_INTERNAL_H */

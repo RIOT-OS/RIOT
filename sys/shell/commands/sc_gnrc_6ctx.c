@@ -12,6 +12,8 @@
  * @file
  */
 
+/* Required for strtok_r in string.h, when building with -std=c99 */
+#define _DEFAULT_SOURCE 1
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -136,7 +138,7 @@ int _gnrc_6ctx_del(char *cmd_str, char *ctx_str)
             ctx->ltime = 0;
             del_timer[cid].callback = _del_cb;
             del_timer[cid].arg = ctx;
-            xtimer_set(&del_timer[cid], GNRC_SIXLOWPAN_ND_RTR_MIN_CTX_DELAY * SEC_IN_USEC);
+            xtimer_set(&del_timer[cid], GNRC_SIXLOWPAN_ND_RTR_MIN_CTX_DELAY * US_PER_SEC);
         }
     }
     else {

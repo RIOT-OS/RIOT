@@ -29,27 +29,38 @@ extern "C" {
 #endif
 
 /**
- * @name    LED pin definitions
+ * @brief   Xtimer configuration
  * @{
  */
-#define LED_RED_PIN         (1 << 21)
-#define LED_GREEN_PIN       (1 << 22)
-#define LED_BLUE_PIN        (1 << 23)
+#define XTIMER_DEV                  (0)
+#define XTIMER_CHAN                 (0)
+#define XTIMER_WIDTH                (24)
+#define XTIMER_BACKOFF              (40)
 /** @} */
 
 /**
- * @name    Macros for controlling the on-board LEDs
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_RED_ON          (NRF_GPIO->OUTCLR = LED_RED_PIN)
-#define LED_RED_OFF         (NRF_GPIO->OUTSET = LED_RED_PIN)
-#define LED_RED_TOGGLE      (NRF_GPIO->OUT ^= LED_RED_PIN)
-#define LED_GREEN_ON        (NRF_GPIO->OUTCLR = LED_GREEN_PIN)
-#define LED_GREEN_OFF       (NRF_GPIO->OUTSET = LED_GREEN_PIN)
-#define LED_GREEN_TOGGLE    (NRF_GPIO->OUT ^= LED_GREEN_PIN)
-#define LED_BLUE_ON         (NRF_GPIO->OUTCLR = LED_BLUE_PIN)
-#define LED_BLUE_OFF        (NRF_GPIO->OUTSET = LED_BLUE_PIN)
-#define LED_BLUE_TOGGLE     (NRF_GPIO->OUT ^= LED_BLUE_PIN)
+#define LED0_PIN            GPIO_PIN(0, 21)
+#define LED1_PIN            GPIO_PIN(0, 22)
+#define LED2_PIN            GPIO_PIN(0, 23)
+
+#define LED0_MASK           (1 << 21)
+#define LED1_MASK           (1 << 22)
+#define LED2_MASK           (1 << 23)
+
+#define LED0_ON             (NRF_GPIO->OUTCLR = LED0_MASK)
+#define LED0_OFF            (NRF_GPIO->OUTSET = LED0_MASK)
+#define LED0_TOGGLE         (NRF_GPIO->OUT   ^= LED0_MASK)
+
+#define LED1_ON             (NRF_GPIO->OUTCLR = LED1_MASK)
+#define LED1_OFF            (NRF_GPIO->OUTSET = LED1_MASK)
+#define LED1_TOGGLE         (NRF_GPIO->OUT   ^= LED1_MASK)
+
+#define LED2_ON             (NRF_GPIO->OUTCLR = LED2_MASK)
+#define LED2_OFF            (NRF_GPIO->OUTSET = LED2_MASK)
+#define LED2_TOGGLE         (NRF_GPIO->OUT   ^= LED2_MASK)
 /** @} */
 
 /**

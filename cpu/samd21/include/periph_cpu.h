@@ -13,7 +13,7 @@
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef CPU_PERIPH_H
@@ -35,6 +35,33 @@ enum {
 };
 
 /**
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use 3 bit to determine the pin functions:
+ * - bit 0: PD(0) or PU(1)
+ * - bit 1: input enable
+ * - bit 2: pull enable
+ */
+#define GPIO_MODE(pr, ie, pe)   (pr | (ie << 1) | (pe << 2))
+
+#ifndef DOXYGEN
+/**
+ * @brief   Override GPIO modes
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN    = GPIO_MODE(0, 1, 0),    /**< IN */
+    GPIO_IN_PD = GPIO_MODE(0, 1, 1),    /**< IN with pull-down */
+    GPIO_IN_PU = GPIO_MODE(1, 1, 1),    /**< IN with pull-up */
+    GPIO_OUT   = GPIO_MODE(0, 0, 0),    /**< OUT (push-pull) */
+    GPIO_OD    = 0xfe,                  /**< not supported by HW */
+    GPIO_OD_PU = 0xff                   /**< not supported by HW */
+} gpio_mode_t;
+/** @} */
+#endif /* ndef DOXYGEN */
+
+/**
  * @brief   PWM channel configuration data structure
  */
 typedef struct {
@@ -48,7 +75,7 @@ typedef struct {
  */
 typedef struct {
     Tcc *dev;                   /**< TCC device to use */
-    pwm_conf_chan_t chan[2];    /**< channel configuration */
+    pwm_conf_chan_t chan[3];    /**< channel configuration */
 } pwm_conf_t;
 
 /**
@@ -59,6 +86,8 @@ typedef struct {
     gpio_t rx_pin;          /**< pin used for RX */
     gpio_t tx_pin;          /**< pin used for TX */
     gpio_mux_t mux;         /**< alternative function for pins */
+    uart_rxpad_t rx_pad;    /**< pad selection for RX line */
+    uart_txpad_t tx_pad;    /**< pad selection for TX line */
 } uart_conf_t;
 
 /**
@@ -72,6 +101,8 @@ static inline int _sercom_id(SercomUsart *sercom)
 {
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
 }
+
+#define PM_NUM_MODES    (3)
 
 #ifdef __cplusplus
 }

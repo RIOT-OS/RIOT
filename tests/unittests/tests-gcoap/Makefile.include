@@ -1,0 +1,8 @@
+USEPKG += nanocoap
+
+# Specify the mandatory networking modules
+USEMODULE += gcoap
+USEMODULE += gnrc_sock_udp
+USEMODULE += gnrc_ipv6
+
+USEMODULE += random

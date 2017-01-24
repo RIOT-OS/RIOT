@@ -10,6 +10,10 @@
 /**
  * @defgroup    net_gnrc_netdev   Network device driver interface
  * @ingroup     net_gnrc
+ * @deprecated  Use @ref drivers_netdev_netdev2 "netdev2" instead for new
+ *              devices. This module only allows for interaction with
+ *              @ref net_gnrc "GNRC", while @ref drivers_netdev_netdev2
+ *              "netdev2" is independent from the stack.
  * @brief       Common network device interface
  * @{
  *
@@ -20,14 +24,13 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef GNRC_NETDEV_H_
-#define GNRC_NETDEV_H_
+#ifndef GNRC_NETDEV_H
+#define GNRC_NETDEV_H
 
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "kernel.h"
 #include "net/gnrc/pkt.h"
 #include "net/netopt.h"
 
@@ -186,5 +189,5 @@ struct gnrc_netdev {
 }
 #endif
 
-#endif /* GNRC_NETDEV_H_ */
+#endif /* GNRC_NETDEV_H */
 /** @} */

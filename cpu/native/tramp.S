@@ -21,13 +21,20 @@ __native_sig_leave_tramp:
     call _swapcontext
     addl $8, %esp
 
-    call _enableIRQ
+    call _irq_enable
 
     movl $0x0, __native_in_isr
     popal
     popfl
 
     ret
+
+.globl __native_sig_leave_handler
+__native_sig_leave_handler:
+    pushl __native_saved_eip
+    movl $0x0, __native_in_isr
+    ret
+
 #elif __arm__
 
 .globl _native_sig_leave_tramp
@@ -53,7 +60,7 @@ _native_sig_leave_tramp:
     bl      swapcontext
 
     /* reeanble interrupts */
-    bl      enableIRQ
+    bl      irq_enable
 
     /* _native_in_isr = 0 */
     eor     r0, r0, r0
@@ -64,6 +71,26 @@ _native_sig_leave_tramp:
     ldmia   sp!, {lr}
     ldmia   sp!, {r0-r12}
     ldmia   sp!, {pc}
+
+.globl _native_sig_leave_handler
+_native_sig_leave_handler:
+    stmdb sp!, {r0}
+    ldr r0, =_native_saved_eip
+    ldr r0, [r0]
+    stmdb sp!, {r0-r12}
+    stmdb sp!, {lr}
+    /* exchange r0 and _native_saved_eip */
+    ldr     r0, [sp,#56]
+    ldr     r1, [sp,#4 ]
+    str     r0, [sp,#4 ]
+    str     r1, [sp,#56]
+    /* _native_in_isr = 0 */
+    eor     r0, r0, r0
+    ldr     r1, =_native_in_isr
+    str     r0, [r1]
+    ldmia sp!, {lr}
+    ldmia sp!, {r0-r12}
+    ldmia sp!, {pc}
 
 #else
 .globl _native_sig_leave_tramp
@@ -78,11 +105,17 @@ _native_sig_leave_tramp:
     call swapcontext
     addl $8, %esp
 
-    call enableIRQ
+    call irq_enable
 
     movl $0x0, _native_in_isr
     popal
     popfl
 
+    ret
+
+.globl _native_sig_leave_handler
+_native_sig_leave_handler:
+    pushl _native_saved_eip
+    movl $0x0, _native_in_isr
     ret
 #endif

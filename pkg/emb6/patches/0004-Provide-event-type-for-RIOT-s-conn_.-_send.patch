@@ -1,0 +1,38 @@
+From 6b0721c0d546652238c139f0d41790cb77996442 Mon Sep 17 00:00:00 2001
+From: Martine Lenders <mail@martine-lenders.eu>
+Date: Fri, 26 Feb 2016 12:35:52 +0100
+Subject: [PATCH 4/4] Provide event type for RIOT's conn_.*_send
+
+---
+ utils/inc/evproc.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/utils/inc/evproc.h b/utils/inc/evproc.h
+index 5316a67..78153be 100644
+--- a/utils/inc/evproc.h
++++ b/utils/inc/evproc.h
+@@ -79,6 +79,7 @@
+                             EVENT_TYPE_ICMP6, \
+                             EVENT_TYPE_TCPIP, \
+                             EVENT_TYPE_SLIP_POLL, \
++                            EVENT_TYPE_CONN_SEND, \
+                             EVENT_TYPE_PCK_LL }
+
+ #define EVENT_TYPE_NONE             0x00    ///< No event
+@@ -89,11 +90,12 @@
+ #define EVENT_TYPE_ICMP6            0x05    ///< New icmp6 packet event
+ #define EVENT_TYPE_TCPIP            0x06    ///< New tcpip event
+ #define EVENT_TYPE_SLIP_POLL        0x07    ///< Process slip handler
++#define EVENT_TYPE_CONN_SEND        0x08    ///< Send command from conn layer
+ #define OBLIG_EVENT_PRIOR           0x0a
+ #define EVENT_TYPE_PCK_LL           0x0a    ///< New low level packet received
+
+
+-#define EVENT_TYPES_COUNT           8       ///< Counter of events in /ref EVENT_TYPES macro
++#define EVENT_TYPES_COUNT           9       ///< Counter of events in /ref EVENT_TYPES macro
+ #define MAX_CALLBACK_COUNT          7       ///< Maximal amount of callbacks in /ref st_funcRegList_t list
+ #define EVPROC_QUEUE_SIZE           20      ///< Maximal amount of events in /ref pst_evList queue
+ /*=============================================================================
+--
+1.9.1
+

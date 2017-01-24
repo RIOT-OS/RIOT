@@ -48,8 +48,8 @@ void board_init(void)
 static void leds_init(void)
 {
     /* configure LED pins as output */
-    LED_PORT->FIODIR |= (LED1_PIN | LED2_PIN | LED3_PIN | LED4_PIN);
+    LED_PORT->FIODIR |= (LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK);
 
     /* clear all LEDs */
-    LED_PORT->FIOCLR = (LED1_PIN | LED2_PIN | LED3_PIN | LED4_PIN);
+    LED_PORT->FIOCLR = (LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK);
 }

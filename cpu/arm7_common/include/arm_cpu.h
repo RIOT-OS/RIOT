@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef ARM_CPU_H_
-#define ARM_CPU_H_
+#ifndef ARM_CPU_H
+#define ARM_CPU_H
 
 #include <stdint.h>
 #include "VIC.h"
@@ -29,4 +29,4 @@ void arm_reset(void);
 }
 #endif
 
-#endif /* ARM_CPU_H_ */
+#endif /* ARM_CPU_H */

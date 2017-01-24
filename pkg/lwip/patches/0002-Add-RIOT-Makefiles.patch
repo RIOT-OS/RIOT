@@ -1,0 +1,119 @@
+From 4f1f9c53db7ffeece81253d9b39d78296e5b68a8 Mon Sep 17 00:00:00 2001
+From: Martine Lenders <mail@martine-lenders.eu>
+Date: Thu, 12 Nov 2015 15:43:31 +0100
+Subject: [PATCH 2/2] Add RIOT Makefiles
+
+---
+ Makefile                        | 23 +++++++++++++++++++++++
+ src/api/Makefile                |  3 +++
+ src/core/Makefile               |  3 +++
+ src/core/ipv4/Makefile          |  3 +++
+ src/core/ipv6/Makefile          |  3 +++
+ src/netif/Makefile              |  3 +++
+ src/netif/ppp/Makefile          |  3 +++
+ src/netif/ppp/polarssl/Makefile |  3 +++
+ 8 files changed, 44 insertions(+)
+ create mode 100644 Makefile
+ create mode 100644 src/api/Makefile
+ create mode 100644 src/core/Makefile
+ create mode 100644 src/core/ipv4/Makefile
+ create mode 100644 src/core/ipv6/Makefile
+ create mode 100644 src/netif/Makefile
+ create mode 100644 src/netif/ppp/Makefile
+ create mode 100644 src/netif/ppp/polarssl/Makefile
+
+diff --git a/Makefile b/Makefile
+new file mode 100644
+index 0000000..dbfb087
+--- /dev/null
++++ b/Makefile
+@@ -0,0 +1,23 @@
++ifneq (,$(filter lwip_api,$(USEMODULE)))
++    DIRS += src/api
++endif
++ifneq (,$(filter lwip_core,$(USEMODULE)))
++    DIRS += src/core
++endif
++ifneq (,$(filter lwip_ipv4,$(USEMODULE)))
++    DIRS += src/core/ipv4
++endif
++ifneq (,$(filter lwip_ipv6,$(USEMODULE)))
++    DIRS += src/core/ipv6
++endif
++ifneq (,$(filter lwip_netif,$(USEMODULE)))
++    DIRS += src/netif
++endif
++ifneq (,$(filter lwip_netif_ppp,$(USEMODULE)))
++    DIRS += src/netif/ppp
++endif
++ifneq (,$(filter lwip_polarssl,$(USEMODULE)))
++    DIRS += src/netif/ppp/polarssl
++endif
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/src/api/Makefile b/src/api/Makefile
+new file mode 100644
+index 0000000..84b4323
+--- /dev/null
++++ b/src/api/Makefile
+@@ -0,0 +1,3 @@
++MODULE := lwip_api
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/src/core/Makefile b/src/core/Makefile
+new file mode 100644
+index 0000000..2943234
+--- /dev/null
++++ b/src/core/Makefile
+@@ -0,0 +1,3 @@
++MODULE := lwip_core
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/src/core/ipv4/Makefile b/src/core/ipv4/Makefile
+new file mode 100644
+index 0000000..b3a7a5e
+--- /dev/null
++++ b/src/core/ipv4/Makefile
+@@ -0,0 +1,3 @@
++MODULE := lwip_ipv4
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/src/core/ipv6/Makefile b/src/core/ipv6/Makefile
+new file mode 100644
+index 0000000..e26e51f
+--- /dev/null
++++ b/src/core/ipv6/Makefile
+@@ -0,0 +1,3 @@
++MODULE := lwip_ipv6
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/src/netif/Makefile b/src/netif/Makefile
+new file mode 100644
+index 0000000..bb86d8f
+--- /dev/null
++++ b/src/netif/Makefile
+@@ -0,0 +1,3 @@
++MODULE := lwip_netif
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/src/netif/ppp/Makefile b/src/netif/ppp/Makefile
+new file mode 100644
+index 0000000..bd21288
+--- /dev/null
++++ b/src/netif/ppp/Makefile
+@@ -0,0 +1,3 @@
++MODULE := lwip_netif_ppp
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/src/netif/ppp/polarssl/Makefile b/src/netif/ppp/polarssl/Makefile
+new file mode 100644
+index 0000000..6030171
+--- /dev/null
++++ b/src/netif/ppp/polarssl/Makefile
+@@ -0,0 +1,3 @@
++MODULE := lwip_polarssl
++
++include $(RIOTBASE)/Makefile.base
+-- 
+1.9.1
+

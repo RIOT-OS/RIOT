@@ -46,8 +46,8 @@ static void _pin_config(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda,
                         int pin_scl, int pin_sda);
 static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t length,
                    uint8_t rw_flag);
-static inline void _read(I2C_TypeDef *dev, char *data, int length);
-static inline void _write(I2C_TypeDef *dev, char *data, int length);
+static inline void _read(I2C_TypeDef *dev, uint8_t *data, int length);
+static inline void _write(I2C_TypeDef *dev, const uint8_t *data, int length);
 static inline void _stop(I2C_TypeDef *dev);
 
 /**
@@ -245,12 +245,12 @@ int i2c_release(i2c_t dev)
     return 0;
 }
 
-int i2c_read_byte(i2c_t dev, uint8_t address, char *data)
+int i2c_read_byte(i2c_t dev, uint8_t address, void *data)
 {
     return i2c_read_bytes(dev, address, data, 1);
 }
 
-int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 {
     I2C_TypeDef *i2c;
 
@@ -282,12 +282,12 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
     return length;
 }
 
-int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, char *data)
+int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data)
 {
     return i2c_read_regs(dev, address, reg, data, 1);
 }
 
-int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
+int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int length)
 {
     I2C_TypeDef *i2c;
 
@@ -312,7 +312,7 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int lengt
 
     /* wait for ack */
     DEBUG("Waiting for ACK\n");
-    while (!(i2c->ISR & I2C_ISR_TXIS));
+    while (!(i2c->ISR & I2C_ISR_TXIS)) {}
 
     /* send register number */
     DEBUG("ACK received, write reg into DR\n");
@@ -323,12 +323,12 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int lengt
     return i2c_read_bytes(dev, address, data, length);
 }
 
-int i2c_write_byte(i2c_t dev, uint8_t address, char data)
+int i2c_write_byte(i2c_t dev, uint8_t address, uint8_t data)
 {
     return i2c_write_bytes(dev, address, &data, 1);
 }
 
-int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
 {
     I2C_TypeDef *i2c;
 
@@ -360,12 +360,12 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
     return length;
 }
 
-int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, char data)
+int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data)
 {
     return i2c_write_regs(dev, address, reg, &data, 1);
 }
 
-int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
+int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, int length)
 {
     I2C_TypeDef *i2c;
 
@@ -391,7 +391,7 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
 
     /* wait for ack */
     DEBUG("Waiting for ACK\n");
-    while (!(i2c->ISR & I2C_ISR_TXIS));
+    while (!(i2c->ISR & I2C_ISR_TXIS)) {}
 
     /* send register number */
     DEBUG("ACK received, write reg into DR\n");
@@ -427,14 +427,14 @@ void i2c_poweroff(i2c_t dev)
     switch (dev) {
 #if I2C_0_EN
         case I2C_0:
-            while (I2C_0_DEV->ISR & I2C_ISR_BUSY);
+            while (I2C_0_DEV->ISR & I2C_ISR_BUSY) {}
 
             I2C_0_CLKDIS();
             break;
 #endif
 #if I2C_1_EN
         case I2C_1:
-            while (I2C_1_DEV->ISR & I2C_ISR_BUSY);
+            while (I2C_1_DEV->ISR & I2C_ISR_BUSY) {}
 
             I2C_0_CLKDIS();
             break;
@@ -467,30 +467,30 @@ static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t length, uint8_t rw
     dev->CR2 |= I2C_CR2_START;
 }
 
-static inline void _read(I2C_TypeDef *dev, char *data, int length)
+static inline void _read(I2C_TypeDef *dev, uint8_t *data, int length)
 {
     for (int i = 0; i < length; i++) {
         /* wait for transfer to finish */
         DEBUG("Waiting for DR to be full\n");
-        while (!(dev->ISR & I2C_ISR_RXNE));
+        while (!(dev->ISR & I2C_ISR_RXNE)) {}
         DEBUG("DR is now full\n");
 
         /* read data from data register */
-        data[i] = (uint8_t)dev->RXDR;
+        data[i] = dev->RXDR;
         DEBUG("Read byte %i from DR\n", i);
     }
 }
 
-static inline void _write(I2C_TypeDef *dev, char *data, int length)
+static inline void _write(I2C_TypeDef *dev, const uint8_t *data, int length)
 {
     for (int i = 0; i < length; i++) {
         /* wait for ack */
         DEBUG("Waiting for ACK\n");
-        while (!(dev->ISR & I2C_ISR_TXIS));
+        while (!(dev->ISR & I2C_ISR_TXIS)) {}
 
         /* write data to data register */
         DEBUG("Write byte %i to DR\n", i);
-        dev->TXDR = (uint8_t)data[i];
+        dev->TXDR = data[i];
         DEBUG("Sending data\n");
     }
 }
@@ -499,7 +499,7 @@ static inline void _stop(I2C_TypeDef *dev)
 {
     /* make sure transfer is complete */
     DEBUG("Wait for transfer to be complete\n");
-    while (!(dev->ISR & I2C_ISR_TC));
+    while (!(dev->ISR & I2C_ISR_TC)) {}
 
     /* send STOP condition */
     DEBUG("Generate stop condition\n");

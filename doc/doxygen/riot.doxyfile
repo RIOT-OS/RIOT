@@ -107,7 +107,7 @@ BRIEF_MEMBER_DESC      = YES
 # brief descriptions will be completely suppressed.
 # The default value is: YES.
 
-REPEAT_BRIEF           = YES
+REPEAT_BRIEF           = NO
 
 # This tag implements a quasi-intelligent brief description abbreviator that is
 # used to form the text in various listings. Each string in this list, if found
@@ -161,7 +161,7 @@ STRIP_FROM_PATH        =
 # specify the list of include paths that are normally passed to the compiler
 # using the -I flag.
 
-STRIP_FROM_INC_PATH    =
+STRIP_FROM_INC_PATH    = $(STRIP_FROM_INC_PATH_LIST) # Exported from Makefile.
 
 # If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter (but
 # less readable) file names. This can be useful is your file systems doesn't
@@ -672,7 +672,7 @@ FILE_VERSION_FILTER    =
 # DoxygenLayout.xml, doxygen will parse it automatically even if the LAYOUT_FILE
 # tag is left empty.
 
-LAYOUT_FILE            =
+LAYOUT_FILE            = RIOTDoxygenLayout.xml
 
 # The CITE_BIB_FILES tag can be used to specify one or more bib files containing
 # the reference definitions. This must be a list of .bib files. The .bib
@@ -693,7 +693,7 @@ CITE_BIB_FILES         =
 # messages are off.
 # The default value is: NO.
 
-QUIET                  = NO
+QUIET                  = YES
 
 # The WARNINGS tag can be used to turn on/off the warning messages that are
 # generated to standard error ( stderr) by doxygen. If WARNINGS is set to YES
@@ -818,13 +818,10 @@ EXCLUDE_SYMLINKS       = NO
 # exclude all test directories for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = */board/*/tools/* \
-                         */cpu/*/include/component/* \
-                         */cpu/*/include/instance/* \
-                         */cpu/*/include/pio/* \
                          */cpu/*/include/atmel/* \
                          */cpu/sam3/include/sam3* \
                          */cpu/sam3/include/system_sam*.h \
-                         */cpu/samd21/include/samd21.h \
+                         */cpu/sam0_common/include/cmsis/* \
                          */cpu/lpc*/include/core_cm*.h \
                          */cpu/cortexm_common/include/core_cm*.h \
                          */cpu/stm32f*/include/stm32f* \
@@ -832,7 +829,6 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/nrf5*/include/nrf5*.h \
                          */cpu/lpc1768/include/LPC17xx.h \
                          */cpu/lpc11u34/include/LPC11Uxx.h \
-                         */boards/*/include/periph_conf.h \
                          */cpu/x86/include/x86_pci.h \
                          */cpu/stm32l1/include/stm32l1xx.h \
                          */cpu/k60/include/MK60D10.h \
@@ -842,6 +838,12 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/ezr32wg/include/ezr* \
                          */pkg/*/*/* \
                          */pkg/tlsf/patch.txt \
+                         */sys/random/tinymt32/* \
+                         */cpu/stm32f2/include/stm32f2*.h \
+                         */cpu/stm32f4/include/stm32f4*.h \
+                         */cpu/stellaris_common/include/stellaris_periph \
+                         */cpu/native/osx-libc-extra \
+                         */toolchain/* \
 
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
@@ -2017,7 +2019,8 @@ PREDEFINED             = DOXYGEN \
                          MODULE_GNRC_SIXLOWPAN \
                          MODULE_GNRC_SIXLOWPAN_ND_ROUTER \
                          MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER \
-                         MODULE_GNRC_UDP
+                         MODULE_GNRC_UDP \
+                         RIOT_FILE_RELATIVE
 
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this

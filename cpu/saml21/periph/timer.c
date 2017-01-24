@@ -31,28 +31,25 @@
 #include "periph/timer.h"
 #include "periph_conf.h"
 
-#include "sched.h"
-#include "thread.h"
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
-
-typedef struct {
-    void (*cb)(int);
-} timer_conf_t;
 
 /**
  * @brief Timer state memory
  */
-timer_conf_t config[TIMER_NUMOF];
+static timer_isr_ctx_t config[TIMER_NUMOF];
+
+/* enable timer interrupts */
+static inline void _irq_enable(tim_t dev);
 
 /**
  * @brief Setup the given timer
  */
-int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* configure GCLK0 to feed TC0 & TC1*/;
     GCLK->PCHCTRL[TC0_GCLK_ID].reg |= GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;
-    while (!(GCLK->PCHCTRL[TC0_GCLK_ID].reg & GCLK_PCHCTRL_CHEN));
+    while (!(GCLK->PCHCTRL[TC0_GCLK_ID].reg & GCLK_PCHCTRL_CHEN)) {}
 
     /* select the timer and enable the timer specific peripheral clocks */
     switch (dev) {
@@ -64,13 +61,10 @@ int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
         MCLK->APBCMASK.reg |= MCLK_APBCMASK_TC0;
         /* reset timer */
         TIMER_0_DEV.CTRLA.bit.SWRST = 1;
-        while (TIMER_0_DEV.SYNCBUSY.bit.SWRST);
-        /* choosing 32 bit mode */
-        TIMER_0_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT32_Val;
-        /* sourced by 4MHz with Presc 4 results in 1MHz*/
-        TIMER_0_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV16_Val;
-        /* initial prescaler resync */
-        TIMER_0_DEV.CTRLA.bit.PRESCSYNC = TC_CTRLA_PRESCSYNC_RESYNC_Val;
+        while (TIMER_0_DEV.SYNCBUSY.bit.SWRST) {}
+        TIMER_0_DEV.CTRLA.reg |= TC_CTRLA_MODE_COUNT32 |    /* choosing 32 bit mode */
+                                 TC_CTRLA_PRESCALER(4) |    /* sourced by 4MHz with Presc 4 results in 1MHz*/
+                                 TC_CTRLA_PRESCSYNC_RESYNC; /* initial prescaler resync */
         break;
 #endif
     case TIMER_UNDEFINED:
@@ -79,10 +73,11 @@ int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
     }
 
     /* save callback */
-    config[dev].cb = callback;
+    config[dev].cb = cb;
+    config[dev].arg = arg;
 
     /* enable interrupts for given timer */
-    timer_irq_enable(dev);
+    _irq_enable(dev);
 
     timer_start(dev);
 
@@ -105,12 +100,12 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
         /* set timeout value */
         switch (channel) {
         case 0:
-            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
             TIMER_0_DEV.CC[0].reg = value;
             TIMER_0_DEV.INTENSET.bit.MC0 = 1;
             break;
         case 1:
-            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
             TIMER_0_DEV.CC[1].reg = value;
             TIMER_0_DEV.INTENSET.bit.MC1 = 1;
             break;
@@ -135,11 +130,11 @@ int timer_clear(tim_t dev, int channel)
     case TIMER_0:
         switch (channel) {
         case 0:
-            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
             TIMER_0_DEV.INTENCLR.bit.MC0 = 1;
             break;
         case 1:
-            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
             TIMER_0_DEV.INTENCLR.bit.MC1 = 1;
             break;
         default:
@@ -162,9 +157,8 @@ unsigned int timer_read(tim_t dev)
     case TIMER_0:
         /* request syncronisation */
         TIMER_0_DEV.CTRLBSET.bit.CMD = TC_CTRLBSET_CMD_READSYNC_Val;
-        while (TIMER_0_DEV.SYNCBUSY.bit.STATUS);
+        while (TIMER_0_DEV.SYNCBUSY.bit.STATUS) {}
         return TIMER_0_DEV.COUNT.reg;
-        break;
 #endif
     default:
         return 0;
@@ -199,7 +193,7 @@ void timer_start(tim_t dev)
     }
 }
 
-void timer_irq_enable(tim_t dev)
+static inline void _irq_enable(tim_t dev)
 {
     switch (dev) {
 #if TIMER_0_EN
@@ -212,39 +206,23 @@ void timer_irq_enable(tim_t dev)
     }
 }
 
-void timer_irq_disable(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            NVIC_DisableIRQ(TC0_IRQn);
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
 #if TIMER_0_EN
 void TIMER_0_ISR(void)
 {
     if (TIMER_0_DEV.INTFLAG.bit.MC0 && TIMER_0_DEV.INTENSET.bit.MC0) {
         if(config[TIMER_0].cb) {
-            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
-            config[TIMER_0].cb(0);
+            config[TIMER_0].cb(config[TIMER_0].arg, 0);
         }
     }
     else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
         if(config[TIMER_0].cb) {
-            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
-            config[TIMER_0].cb(1);
+            config[TIMER_0].cb(config[TIMER_0].arg, 1);
         }
     }
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif /* TIMER_0_EN */

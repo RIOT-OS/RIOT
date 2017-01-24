@@ -45,7 +45,7 @@ void board_init(void)
 static void leds_init(void)
 {
     /* enable clock for port GPIOB */
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+    periph_clk_en(AHB1, RCC_AHB1ENR_GPIOBEN);
 
     /* set output speed to 50MHz */
     LED_PORT->OSPEEDR &= ~(0xF0030000);

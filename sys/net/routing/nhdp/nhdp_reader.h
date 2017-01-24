@@ -16,8 +16,8 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
-#ifndef NHDP_READER_H_
-#define NHDP_READER_H_
+#ifndef NHDP_READER_H
+#define NHDP_READER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,5 +54,5 @@ int nhdp_reader_handle_packet(kernel_pid_t rcvg_if_pid, void *buffer, size_t len
 }
 #endif
 
-#endif /* NHDP_READER_H_ */
+#endif /* NHDP_READER_H */
 /** @} */

@@ -26,8 +26,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/gpio.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -38,16 +36,24 @@
 static gpio_isr_ctx_t exti_chan;
 
 
-int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
+int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    /* configure pin direction, input buffer and pull resistor state */
-    GPIO_BASE->PIN_CNF[pin] = ((dir << GPIO_PIN_CNF_DIR_Pos) |
-                               (dir << GPIO_PIN_CNF_INPUT_Pos) |
-                               (pullup << GPIO_PIN_CNF_PULL_Pos));
+    switch (mode) {
+        case GPIO_IN:
+        case GPIO_IN_PD:
+        case GPIO_IN_PU:
+        case GPIO_OUT:
+            /* configure pin direction, input buffer and pull resistor state */
+            GPIO_BASE->PIN_CNF[pin] = mode;
+            break;
+        default:
+            return -1;
+    }
+
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
     /* disable external interrupt in case one is active */
@@ -56,7 +62,7 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
     exti_chan.cb = cb;
     exti_chan.arg = arg;
     /* configure pin as input */
-    gpio_init(pin, GPIO_DIR_IN, pullup);
+    gpio_init(pin, mode);
     /* set interrupt priority and enable global GPIOTE interrupt */
     NVIC_EnableIRQ(GPIOTE_IRQn);
     /* configure the GPIOTE channel: set even mode, pin and active flank */
@@ -120,7 +126,5 @@ void isr_gpiote(void)
         NRF_GPIOTE->EVENTS_IN[0] = 0;
         exti_chan.cb(exti_chan.arg);
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

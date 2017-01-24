@@ -7,6 +7,7 @@
  */
 
 /**
+ * @ingroup         cpu_atmega2560
  * @{
  *
  * @file
@@ -16,9 +17,10 @@
  * @author          Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  */
 
-#ifndef __CPU_CONF_H
-#define __CPU_CONF_H
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
+#include "atmega_regs_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,11 +40,12 @@ extern "C" {
 #endif
 
 #define THREAD_STACKSIZE_IDLE      (128)
+#define ISR_STACKSIZE              (0)
 /** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __CPU_CONF_H */
+#endif /* CPU_CONF_H */
 /** @} */

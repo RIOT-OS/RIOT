@@ -47,8 +47,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef ADT7310_H_
-#define ADT7310_H_
+#ifndef ADT7310_H
+#define ADT7310_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -165,5 +165,5 @@ float adt7310_read_float(adt7310_t *dev);
 }
 #endif
 
-#endif /* ADT7310_H_ */
+#endif /* ADT7310_H */
 /** @} */

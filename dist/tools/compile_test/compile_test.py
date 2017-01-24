@@ -1,8 +1,9 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2014  René Kijewski  <rene.kijewski@fu-berlin.de>
 # Copyright (C) 2015  Philipp Rosenkranz  <philipp.rosenkranz@fu-berlin.de>
+# Copyright (C) 2016  Eistec AB
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -26,7 +27,12 @@ from os import devnull, environ, listdir
 from os.path import abspath, dirname, isfile, join
 from subprocess import CalledProcessError, check_call, check_output, PIPE, Popen
 from sys import exit, stdout, argv, exc_info
-from StringIO import StringIO
+try:
+    # Python 2.x
+    from StringIO import StringIO
+except ImportError:
+    # Python 3.x
+    from io import StringIO
 from itertools import tee
 
 class Termcolor:
@@ -49,13 +55,14 @@ def is_tracked(application_folder):
         return True
 
 def get_results_and_output_from(fd):
+    read_more_output = True
     results_prefix = 'Building for '
     output_prefix = 'Building application '
     prev_results = False
     result = ['']
     output = StringIO()
     while 1:
-        line = fd.readline()
+        line = fd.readline().decode('utf-8', errors='replace')
         if not line:
             if prev_results:
                 yield (' .. '.join(result[:-1]), result[-1], output)
@@ -76,81 +83,6 @@ def get_results_and_output_from(fd):
         elif read_more_output:
             output.write(line)
 
-def _get_common_user(common):
-    return [f for f in check_output(r'grep -l "{}" cpu/*/Makefile* boards/*/Makefile*'.format(common),
-            shell=True).split() if 'common' not in f]
-
-def _get_boards_from_files(files):
-    boards = set()
-    if any('boards/' in s for s in files):
-        for f in files:
-            if 'boards/' not in f:
-                continue
-            board = re.sub(r'^boards/([^/]+)/.*$', r'\1', f)
-
-            if 'common' in board:
-                boards |= _get_boards_from_files(_get_common_user(board))
-            else:
-                boards |= { board }
-
-    return boards
-
-def _get_cpus_from_files(files):
-    cpus = set()
-
-    if any('cpu/' in s for s in files):
-        for f in files:
-            if 'cpu/' not in f:
-                continue
-
-            cpu = re.sub(r'^cpu/([^/]+)/.*', r'\1', f)
-
-            if 'common' in cpu:
-                cpus |= _get_cpus_from_files(_get_common_user(cpu))
-            else:
-                cpus |= { cpu }
-
-    return cpus
-
-def is_updated(application_folder, subprocess_env):
-    try:
-        if base_branch == '':
-            return True
-
-        if '.travis.yml' in diff_files or \
-           any('dist/' in s for s in diff_files):
-            return True
-
-        boards_changes = set()
-
-        boards_changes |= _get_boards_from_files(diff_files)
-
-        for cpu in _get_cpus_from_files(diff_files):
-            board_files = check_output(r'grep -l "^\(export \)*CPU[ :?=]\+{}" boards/*/Makefile.include'.format(cpu),
-                                       shell=True).split()
-            boards_changes |= _get_boards_from_files(board_files)
-
-        if len(boards_changes) > 0:
-            app_files = set()
-
-            for board in boards_changes:
-                env = { 'BOARD': board }
-                env.update(subprocess_env)
-                tmp = check_output(('make', 'info-files'), stderr=null,
-                                         cwd=application_folder, env=env)
-                app_files |= set(tmp.split())
-
-                if (len(diff_files & app_files) > 0):
-                    return True
-        else:
-            app_files = check_output(('make', 'info-files'), stderr=null,
-                                     cwd=application_folder, env=subprocess_env)
-            app_files = set(app_files.split())
-
-        return (len(diff_files & app_files) > 0)
-    except CalledProcessError as e:
-        return True
-
 def build_all():
     riotbase = environ.get('RIOTBASE') or abspath(join(dirname(abspath(__file__)), '../' * 3))
     for folder in ('examples', 'tests'):
@@ -168,32 +100,30 @@ def build_all():
             stdout.write('\tBuilding application: {} ({}/{}) '.format(colorize_str(application, Termcolor.blue), nth, len(applications)))
             stdout.flush()
             try:
-                if not is_updated(join(riotbase, folder, application), subprocess_env):
-                    print(colorize_str('(skipped)', Termcolor.yellow))
-                    skipped.append(application)
-                    continue
                 subprocess = Popen(('make', 'buildtest'),
                                    bufsize=1, stdin=null, stdout=PIPE, stderr=null,
                                    cwd=join(riotbase, folder, application),
                                    env=subprocess_env)
 
                 results, results_with_output = tee(get_results_and_output_from(subprocess.stdout))
-                results = groupby(sorted(results), lambda (outcome, board, output): outcome)
-                results_with_output = filter(lambda (outcome, board, output): output.getvalue(), results_with_output)
-                failed_with_output = filter(lambda (outcome, board, output): 'failed' in outcome, results_with_output)
-                success_with_output = filter(lambda (outcome, board, output): 'success' in outcome, results_with_output)
+                results = groupby(sorted(results), lambda res: res[0])
+                results_with_output = list(filter(lambda res: res[2].getvalue(), results_with_output))
+                failed_with_output = list(filter(lambda res: 'failed' in res[0], results_with_output))
+                success_with_output = list(filter(lambda res: 'success' in res[0], results_with_output))
                 print()
-                for group, results in results:
-                    print('\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board, output in results))))
+                for group, result in results:
+                    print('\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board, output in result))))
                 returncode = subprocess.wait()
                 if success_with_output:
                     warnings.append((application, success_with_output))
                 if returncode == 0:
                     success.append(application)
                 else:
+                    if not failed_with_output:
+                        print(colorize_str('\t\tmake buildtest error!', Termcolor.red))
                     failed.append(application)
                     errors.append((application, failed_with_output))
-            except Exception, e:
+            except Exception as e:
                 print('\n\t\tException: {}'.format(e))
                 exceptions.append(application)
             finally:
@@ -241,11 +171,10 @@ def print_num_of_errors_and_warnings():
 if __name__ == '__main__':
     success = []
     failed = []
-    skipped = []
     exceptions = []
     warnings = []
     errors = []
-    null = open(devnull, 'w', 0)
+    null = open(devnull, 'wb', 0)
 
     if len(argv) > 1:
         base_branch = argv[1]
@@ -259,8 +188,9 @@ if __name__ == '__main__':
     print_output_for(warnings, 'Warnings', Termcolor.yellow)
     print_output_for(errors, 'Errors', Termcolor.red)
 
-    outputListDescription = [(Termcolor.yellow, skipped, 'skipped'), (Termcolor.green, success, 'success'),
-                             (Termcolor.red, failed, 'failed'), (Termcolor.blue, exceptions, 'exceptions')]
+    outputListDescription = [(Termcolor.green, success, 'success'),
+                             (Termcolor.red, failed, 'failed'),
+                             (Termcolor.blue, exceptions, 'exceptions')]
     print_outcome(outputListDescription)
 
     print_num_of_errors_and_warnings()

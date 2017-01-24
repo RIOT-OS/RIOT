@@ -16,8 +16,10 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
+
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,35 +42,14 @@ extern "C" {
  * @name Timer configuration
  * @{
  */
-#define TIMER_NUMOF         (1U)
-#define TIMER_0_EN          1
-#define TIMER_1_EN          0
-#define TIMER_2_EN          0
-#define TIMER_IRQ_PRIO      1
+static const timer_conf_t timer_config[] = {
+    /* dev, channels, width */
+    { NRF_TIMER0, 3, TIMER_BITMODE_BITMODE_24Bit, TIMER0_IRQn }
+};
 
-/* Timer 0 configuration */
-#define TIMER_0_DEV         NRF_TIMER0
-#define TIMER_0_CHANNELS    3
-#define TIMER_0_MAX_VALUE   (0xffffff)
-#define TIMER_0_BITMODE     TIMER_BITMODE_BITMODE_24Bit     /* only possible value for TIMER0 */
 #define TIMER_0_ISR         isr_timer0
-#define TIMER_0_IRQ         TIMER0_IRQn
 
-/* Timer 1 configuration */
-#define TIMER_1_DEV         NRF_TIMER1
-#define TIMER_1_CHANNELS    3
-#define TIMER_1_MAX_VALUE   (0xffff)
-#define TIMER_1_BITMODE     TIMER_BITMODE_BITMODE_16Bit
-#define TIMER_1_ISR         isr_timer1
-#define TIMER_1_IRQ         TIMER1_IRQn
-
-/* Timer 2 configuration */
-#define TIMER_2_DEV         NRF_TIMER2
-#define TIMER_2_CHANNELS    3
-#define TIMER_2_MAX_VALUE   (0xffff)
-#define TIMER_2_BITMODE     TIMER_BITMODE_BITMODE_16Bit
-#define TIMER_2_ISR         isr_timer2
-#define TIMER_2_IRQ         TIMER2_IRQn
+#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**
@@ -119,19 +100,29 @@ extern "C" {
 /** @} */
 
 /**
- * @name ADC configuration
+ * @brief   I2C (TWI) configuration
  * @{
  */
-#define ADC_NUMOF           (1U)
-#define ADC_0_EN            1
-#define ADC_MAX_CHANNELS    4
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev     = NRF_TWI0,
+        .pin_scl = 23,
+        .pin_sda = 24,
+        .ppi     = 0
+    }
+};
 
-/* ADC 0 device configuration */
-#define ADC_0_CHANNELS      4
-#define ADC_0_CH0           ADC_CONFIG_PSEL_AnalogInput4
-#define ADC_0_CH1           ADC_CONFIG_PSEL_AnalogInput5
-#define ADC_0_CH2           ADC_CONFIG_PSEL_AnalogInput6
-#define ADC_0_CH3           ADC_CONFIG_PSEL_AnalogInput7
+#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+/** @} */
+
+/**
+ * @brief   ADC configuration
+ *
+ * The configuration consists simply of a list of channels that should be used
+ * @{
+ */
+#define ADC_CONFIG          {4, 5, 6, 7}
+#define ADC_NUMOF           (4)
 /** @} */
 
 /**
@@ -148,4 +139,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */

@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef IPV6_HDR_H_
-#define IPV6_HDR_H_
+#ifndef IPV6_HDR_H
+#define IPV6_HDR_H
 
 #include <stdint.h>
 
@@ -308,5 +308,5 @@ void ipv6_hdr_print(ipv6_hdr_t *hdr);
 }
 #endif
 
-#endif /* IPV6_HDR_H_ */
+#endif /* IPV6_HDR_H */
 /** @} */

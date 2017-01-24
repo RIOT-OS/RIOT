@@ -30,8 +30,6 @@
 #include "mutex.h"
 #include "periph/spi.h"
 #include "periph_conf.h"
-#include "thread.h"
-#include "sched.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -290,7 +288,7 @@ int spi_conf_pins(spi_t dev)
 
 int spi_acquire(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
     mutex_lock(&locks[dev]);
@@ -299,7 +297,7 @@ int spi_acquire(spi_t dev)
 
 int spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
     mutex_unlock(&locks[dev]);
@@ -314,13 +312,13 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     volatile uint8_t *DR = (volatile uint8_t*) &spi[dev]->DR;
 
     /* wait for an eventually previous byte to be readily transferred */
-    while(!(spi[dev]->SR & SPI_SR_TXE));
+    while(!(spi[dev]->SR & SPI_SR_TXE)) {}
 
     /* put next byte into the output register */
     *DR = out;
 
     /* wait until the current byte was successfully transferred */
-    while(!(spi[dev]->SR & SPI_SR_RXNE) );
+    while(!(spi[dev]->SR & SPI_SR_RXNE)) {}
 
     /* read response byte to reset flags */
     tmp = *DR;
@@ -335,7 +333,7 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 
 void spi_transmission_begin(spi_t dev, char reset_val)
 {
-    if (dev < SPI_NUMOF) {
+    if ((unsigned int)dev < SPI_NUMOF) {
         spi[dev]->DR = reset_val;
     }
 }
@@ -366,19 +364,19 @@ void spi_poweroff(spi_t dev)
     switch (dev) {
 #if SPI_0_EN
         case SPI_0:
-            while (SPI_0_DEV->SR & SPI_SR_BSY);
+            while (SPI_0_DEV->SR & SPI_SR_BSY) {}
             SPI_0_CLKDIS();
             break;
 #endif
 #if SPI_1_EN
         case SPI_1:
-            while (SPI_1_DEV->SR & SPI_SR_BSY);
+            while (SPI_1_DEV->SR & SPI_SR_BSY) {}
             SPI_1_CLKDIS();
             break;
 #endif
 #if SPI_2_EN
         case SPI_2:
-            while (SPI_2_DEV->SR & SPI_SR_BSY);
+            while (SPI_2_DEV->SR & SPI_SR_BSY) {}
             SPI_2_CLKDIS();
             break;
 #endif
@@ -395,9 +393,7 @@ static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev)
         spi->DR = data;
     }
     /* see if a thread with higher priority wants to run now */
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #if SPI_0_EN

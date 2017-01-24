@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef IAP_H_
-#define IAP_H_
+#ifndef IAP_H
+#define IAP_H
 
 #include <stdint.h>
 
@@ -64,4 +64,4 @@ uint8_t iap_get_sector(uint32_t addr);
 #endif
 
 
-#endif /*IAP_H_*/
+#endif /* IAP_H */

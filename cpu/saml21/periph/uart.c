@@ -22,8 +22,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/uart.h"
 
 /**
@@ -39,8 +37,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* initialize basic functionality */
     int res = init_base(uart, baudrate);
-    if (res != 0) {
-        return res;
+    if (res != UART_OK) {
+        return UART_NODEV;
     }
 
     /* register callbacks */
@@ -55,7 +53,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
             UART_0_DEV.INTENSET.bit.RXC = 1;
         break;
     }
-    return 0;
+    return UART_OK;
 }
 
 static int init_base(uart_t uart, uint32_t baudrate)
@@ -88,8 +86,8 @@ static int init_base(uart_t uart, uint32_t baudrate)
                                         | PORT_WRCONFIG_PMUXEN \
                                         | UART_0_PINS;
 
-            UART_0_DEV.CTRLA.bit.ENABLE = 0; //Disable to write, need to sync tho
-            while(UART_0_DEV.SYNCBUSY.bit.ENABLE);
+            UART_0_DEV.CTRLA.bit.ENABLE = 0; /* Disable to write, need to sync tho */
+            while(UART_0_DEV.SYNCBUSY.bit.ENABLE) {}
 
             /* set to LSB, asynchronous mode without parity, PAD0 Tx, PAD1 Rx,
              * 16x over-sampling, internal clk */
@@ -107,27 +105,27 @@ static int init_base(uart_t uart, uint32_t baudrate)
 
             /* enable receiver and transmitter, one stop bit*/
             UART_0_DEV.CTRLB.reg = (SERCOM_USART_CTRLB_RXEN | SERCOM_USART_CTRLB_TXEN);
-            while(UART_0_DEV.SYNCBUSY.bit.CTRLB);
+            while(UART_0_DEV.SYNCBUSY.bit.CTRLB) {}
 
             break;
 #endif
         default:
             (void)baud_calculated;
-            return -1;
+            return UART_NODEV;
     }
 
     uart_poweron(uart);
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     if (uart == UART_0) {
         for (size_t i = 0; i < len; i++) {
-            while (UART_0_DEV.INTFLAG.bit.DRE == 0);
-            while(UART_0_DEV.SYNCBUSY.bit.ENABLE);
+            while (UART_0_DEV.INTFLAG.bit.DRE == 0) {}
+            while(UART_0_DEV.SYNCBUSY.bit.ENABLE) {}
             UART_0_DEV.DATA.reg = data[i];
-            while (UART_0_DEV.INTFLAG.reg & SERCOM_USART_INTFLAG_TXC);
+            while (UART_0_DEV.INTFLAG.reg & SERCOM_USART_INTFLAG_TXC) {}
         }
     }
 }
@@ -136,28 +134,25 @@ static inline void irq_handler(uint8_t uartnum, SercomUsart *dev)
 {
     if (dev->INTFLAG.bit.RXC) {
         /* cleared by reading DATA regiser */
-        char data = (char)dev->DATA.reg;
+        uint8_t data = (uint8_t)dev->DATA.reg;
         uart_config[uartnum].rx_cb(uart_config[uartnum].arg, data);
     }
     else if (dev->INTFLAG.bit.ERROR) {
         /* clear error flag */
-        dev->INTFLAG.bit.ERROR = 1;
+        dev->INTFLAG.reg |= SERCOM_USART_INTFLAG_ERROR;
     }
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 void uart_poweron(uart_t uart)
 {
-    while (UART_0_DEV.SYNCBUSY.reg);
+    while (UART_0_DEV.SYNCBUSY.reg) {}
     UART_0_DEV.CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
 }
 
 void uart_poweroff(uart_t uart)
 {
-    while (UART_0_DEV.SYNCBUSY.reg);
+    while (UART_0_DEV.SYNCBUSY.reg) {}
     UART_0_DEV.CTRLA.reg &= ~SERCOM_USART_CTRLA_ENABLE;
 }
 

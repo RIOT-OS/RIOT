@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef UNISTD_H_
-#define UNISTD_H_
+#ifndef UNISTD_H
+#define UNISTD_H
 
 #include <stdint.h>
 
@@ -29,4 +29,4 @@ unsigned int sleep(unsigned int seconds);
 }
 #endif
 
-#endif /* UNISTD_H_ */
+#endif /* UNISTD_H */

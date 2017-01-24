@@ -33,8 +33,7 @@ extern "C" {
  * @brief device descriptor for a MQ-3 sensor
  */
 typedef struct {
-    adc_t adc_dev;          /**< the used ADC device */
-    int adc_chan;           /**< used channel of the ADC */
+    adc_t adc_line;         /**< the used ADC line */
 } mq3_t;
 
 /**
@@ -47,12 +46,11 @@ typedef struct {
  *
  * @param[out] dev      device descriptor of an MQ-3 sensor
  * @param[in] adc       the ADC device the sensor is connected to
- * @param[in] channel   the channel of the ADC device used
  *
  * @return              0 on success
  * @return              -1 on error
  */
-int mq3_init(mq3_t *dev, adc_t adc, int channel);
+int mq3_init(mq3_t *dev, adc_t adc_line);
 
 /**
  * @brief Read the RAW sensor value, can be between 0 and MQ3_MAX_RAW_VALUE

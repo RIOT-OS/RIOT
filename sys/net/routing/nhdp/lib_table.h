@@ -16,8 +16,8 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
-#ifndef LIB_TABLE_H_
-#define LIB_TABLE_H_
+#ifndef LIB_TABLE_H
+#define LIB_TABLE_H
 
 #include "kernel_types.h"
 
@@ -32,10 +32,10 @@ extern "C" {
 /**
  * @brief   Local Interface Set entry (local interface tuple)
  */
-typedef struct lib_entry_t {
+typedef struct lib_entry {
     kernel_pid_t if_pid;                    /**< PID of the interface's handling thread */
     nhdp_addr_entry_t *if_addr_list_head;   /**< Pointer to head of this interface's addr list */
-    struct lib_entry_t *next;               /**< Pointer to next list entry */
+    struct lib_entry *next;                 /**< Pointer to next list entry */
 } lib_entry_t;
 
 /**
@@ -85,5 +85,5 @@ uint8_t lib_is_reg_addr(kernel_pid_t if_pid, nhdp_addr_t *addr);
 }
 #endif
 
-#endif /* LIB_TABLE_H_ */
+#endif /* LIB_TABLE_H */
 /** @} */

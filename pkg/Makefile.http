@@ -25,11 +25,11 @@ $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/Makefile: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSI
 $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
 	# Here you unpack the file.
 	# This example assumes the common pattern that the archive contains its data in a subfolder with the same name as itself.
-	$(AD)$(UNZIP_HERE) $<
+	$(Q)$(UNZIP_HERE) $<
 
 $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT):
 	# Get PKG_VERSION of package from PKG_URL
-	$(AD)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
+	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
 
 clean::
 	# Reset package to checkout state.

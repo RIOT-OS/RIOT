@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_NDP_NODE_H_
-#define GNRC_NDP_NODE_H_
+#ifndef GNRC_NDP_NODE_H
+#define GNRC_NDP_NODE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,5 +49,5 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
 }
 #endif
 
-#endif /* GNRC_NDP_NODE_H_ */
+#endif /* GNRC_NDP_NODE_H */
 /** @} */

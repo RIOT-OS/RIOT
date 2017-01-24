@@ -26,7 +26,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "kernel.h"
 #include "thread.h"
 
 void FIQ_Routine(void)   __attribute__((interrupt("FIQ")));
@@ -63,9 +62,9 @@ void DEBUG_Routine(void)
 /*-----------------------------------------------------------------------------------*/
 volatile int arm_abortflag = 0;
 
-void abtorigin(const char *vector, u_long *lnk_ptr1)
+void abtorigin(const char *vector, unsigned long *lnk_ptr1)
 {
-    register u_long    *lnk_ptr2;
+    register unsigned long *lnk_ptr2;
     register unsigned long *sp;
     register unsigned int   cpsr, spsr;
 
@@ -86,7 +85,7 @@ void abtorigin(const char *vector, u_long *lnk_ptr1)
 void UNDEF_Routine(void)
 {
     /* cppcheck-suppress variableScope */
-    register u_long    *lnk_ptr;
+    register unsigned long *lnk_ptr;
     __asm__ __volatile__("sub %0, lr, #8" : "=r"(lnk_ptr));     // get aborting instruction
 
     if (arm_abortflag == 0) {
@@ -100,7 +99,7 @@ void UNDEF_Routine(void)
 void PABT_Routine(void)
 {
     /* cppcheck-suppress variableScope */
-    register u_long    *lnk_ptr;
+    register unsigned long *lnk_ptr;
     __asm__ __volatile__("sub %0, lr, #8" : "=r"(lnk_ptr));     // get aborting instruction
 
     if (arm_abortflag == 0) {
@@ -114,7 +113,7 @@ void PABT_Routine(void)
 void DABT_Routine(void)
 {
     /* cppcheck-suppress variableScope */
-    register u_long    *lnk_ptr;
+    register unsigned long *lnk_ptr;
     __asm__ __volatile__("sub %0, lr, #8" : "=r"(lnk_ptr));     // get aborting instruction
 
     if (arm_abortflag == 0) {

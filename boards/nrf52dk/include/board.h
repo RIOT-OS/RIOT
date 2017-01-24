@@ -31,29 +31,31 @@ extern "C" {
  * @brief   LED pin configuration
  * @{
  */
-#define LED1_PIN            (GPIO_PIN(0, 17))
-#define LED2_PIN            (GPIO_PIN(0, 18))
-#define LED3_PIN            (GPIO_PIN(0, 19))
-#define LED4_PIN            (GPIO_PIN(0, 20))
-#define LED1_MASK           (1 << 17)
-#define LED2_MASK           (1 << 18)
-#define LED3_MASK           (1 << 19)
-#define LED4_MASK           (1 << 20)
-/** @} */
+#define LED0_PIN            GPIO_PIN(0, 17)
+#define LED1_PIN            GPIO_PIN(0, 18)
+#define LED2_PIN            GPIO_PIN(0, 19)
+#define LED3_PIN            GPIO_PIN(0, 20)
 
-/**
- * @brief   RIOT LED macros for backwards compatibility
- * @{
- */
-#define LED_RED_ON          (NRF_P0->OUTSET = LED1_PIN)
-#define LED_RED_OFF         (NRF_P0->OUTCLR = LED2_PIN)
-#define LED_RED_TOGGLE      (NRF_P0->OUT   ^= LED3_PIN)
-#define LED_GREEN_ON        (NRF_P0->OUTSET = LED1_PIN)
-#define LED_GREEN_OFF       (NRF_P0->OUTCLR = LED2_PIN)
-#define LED_GREEN_TOGGLE    (NRF_P0->OUT   ^= LED3_PIN)
-#define LED_ORANGE_ON       (NRF_P0->OUTSET = LED1_PIN)
-#define LED_ORANGE_OFF      (NRF_P0->OUTCLR = LED2_PIN)
-#define LED_ORANGE_TOGGLE   (NRF_P0->OUT   ^= LED3_PIN)
+#define LED0_MASK           (1 << 17)
+#define LED1_MASK           (1 << 18)
+#define LED2_MASK           (1 << 19)
+#define LED3_MASK           (1 << 20)
+
+#define LED0_ON             (NRF_P0->OUTCLR = LED0_MASK)
+#define LED0_OFF            (NRF_P0->OUTSET = LED0_MASK)
+#define LED0_TOGGLE         (NRF_P0->OUT   ^= LED0_MASK)
+
+#define LED1_ON             (NRF_P0->OUTCLR = LED1_MASK)
+#define LED1_OFF            (NRF_P0->OUTSET = LED1_MASK)
+#define LED1_TOGGLE         (NRF_P0->OUT   ^= LED1_MASK)
+
+#define LED2_ON             (NRF_P0->OUTCLR = LED2_MASK)
+#define LED2_OFF            (NRF_P0->OUTSET = LED2_MASK)
+#define LED2_TOGGLE         (NRF_P0->OUT   ^= LED2_MASK)
+
+#define LED3_ON             (NRF_P0->OUTCLR = LED3_MASK)
+#define LED3_OFF            (NRF_P0->OUTSET = LED3_MASK)
+#define LED3_TOGGLE         (NRF_P0->OUT   ^= LED3_MASK)
 /** @} */
 
 /**

@@ -13,11 +13,11 @@
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef CPU_PERIPH_H_
-#define CPU_PERIPH_H_
+#ifndef CPU_PERIPH_H
+#define CPU_PERIPH_H
 
 #include "cpu.h"
 #include "msp430_regs.h"
@@ -45,17 +45,7 @@ typedef uint16_t gpio_t;
  */
 #define GPIO_PIN(x, y)      ((gpio_t)(((x & 0xff) << 8) | (1 << (y & 0xff))))
 
-/**
- * @brief   Override direction values
- * @{
- */
-#define HAVE_GPIO_DIR_T
-typedef enum {
-    GPIO_DIR_IN =  0x00,    /**< configure pin as input */
-    GPIO_DIR_OUT = 0xff,    /**< configure pin as output */
-} gpio_dir_t;
-/** @} */
-
+#ifndef DOXYGEN
 /**
  * @brief   Override flank selection values
  * @{
@@ -67,6 +57,7 @@ typedef enum {
     GPIO_BOTH    = 0xab         /**< not supported -> random value*/
 } gpio_flank_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Available ports on MSP430 platforms
@@ -92,7 +83,7 @@ void gpio_periph_mode(gpio_t pin, bool enable);
  * @brief declare needed generic SPI functions
  * @{
  */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
@@ -101,5 +92,5 @@ void gpio_periph_mode(gpio_t pin, bool enable);
 }
 #endif
 
-#endif /* CPU_PERIPH_H_ */
+#endif /* CPU_PERIPH_H */
 /** @} */

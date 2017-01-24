@@ -27,14 +27,19 @@ RIOTBASE ?= $(CURDIR)/../../RIOT
 # development process:
 #CFLAGS += -DDEVELHELP
 
-# Change this to 0 show compiler invocation lines by default:
+# Change this to 0 to show compiler invocation lines by default:
 QUIET ?= 1
 
 # Modules to include:
 
 #USEMODULE += shell
 #USEMODULE += posix
-#USEMODULE += vtimer
+#USEMODULE += xtimer
+
+# If your application is very simple and doesn't use modules that use
+# messaging, it can be disabled to save some memory:
+
+#DISABLE_MODULE += core_msg
 
 #export INCLUDES += -Iapplication_include
 

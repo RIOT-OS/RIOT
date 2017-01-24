@@ -14,8 +14,8 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef __SYS__POSIX__PTHREAD_THREADING_ATTR__H
-#define __SYS__POSIX__PTHREAD_THREADING_ATTR__H
+#ifndef SYS__POSIX__PTHREAD_THREADING_ATTR__H
+#define SYS__POSIX__PTHREAD_THREADING_ATTR__H
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +26,7 @@ extern "C" {
  * @details   A zeroed out datum is default initiliazed.
  * @see       pthread_create() for further information
  */
-typedef struct pthread_attr
+typedef struct
 {
     uint8_t detached; /**< Start in detached state. */
     char *ss_sp; /**< Stack to use for new thread. */
@@ -206,7 +206,7 @@ int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);
 }
 #endif
 
-#endif
+#endif /* SYS__POSIX__PTHREAD_THREADING_ATTR__H */
 
 /**
  * @}

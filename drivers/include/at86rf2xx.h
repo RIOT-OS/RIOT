@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_at86rf2xx AT86RF2xx based drivers
- * @ingroup     drivers_netdev
+ * @ingroup     drivers_netdev_netdev2
  *
  * This module contains drivers for radio devices in Atmel's AT86RF2xx series.
  * The driver is aimed to work with all devices of this series.
@@ -26,15 +26,18 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef AT86RF2XX_H_
-#define AT86RF2XX_H_
+#ifndef AT86RF2XX_H
+#define AT86RF2XX_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "board.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "net/gnrc/netdev.h"
+#include "net/netdev2.h"
+#include "net/netdev2/ieee802154.h"
+#include "net/gnrc/nettype.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,29 +46,21 @@ extern "C" {
 /**
  * @brief   Maximum possible packet size in byte
  */
-#define AT86RF2XX_MAX_PKT_LENGTH        (127)
+#define AT86RF2XX_MAX_PKT_LENGTH        (IEEE802154_FRAME_LEN_MAX)
 
 /**
- * @brief   Default addresses used if the CPUID module is not present
+ * @brief   Channel configuration
  * @{
  */
-#define AT86RF2XX_DEFAULT_ADDR_SHORT    (0x0230)
-#define AT86RF2XX_DEFAULT_ADDR_LONG     (0x1222334455667788)
-/** @} */
-
-/**
-  * @brief   Channel configuration
-  * @{
-  */
 #ifdef MODULE_AT86RF212B
 /* the AT86RF212B has a sub-1GHz radio */
-#define AT86RF2XX_MIN_CHANNEL           (0)
-#define AT86RF2XX_MAX_CHANNEL           (10)
-#define AT86RF2XX_DEFAULT_CHANNEL       (5)
+#define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN_SUBGHZ)
+#define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX_SUBGHZ)
+#define AT86RF2XX_DEFAULT_CHANNEL       (IEEE802154_DEFAULT_SUBGHZ_CHANNEL)
 #else
-#define AT86RF2XX_MIN_CHANNEL           (11U)
-#define AT86RF2XX_MAX_CHANNEL           (26U)
-#define AT86RF2XX_DEFAULT_CHANNEL       (26U)
+#define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN)
+#define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX)
+#define AT86RF2XX_DEFAULT_CHANNEL       (IEEE802154_DEFAULT_CHANNEL)
 #endif
 /** @} */
 
@@ -74,86 +69,68 @@ extern "C" {
  *
  * @todo    Read some global network stack specific configuration value
  */
-#define AT86RF2XX_DEFAULT_PANID         (0x0023)
+#define AT86RF2XX_DEFAULT_PANID         (IEEE802154_DEFAULT_PANID)
 
 /**
  * @brief   Default TX power (0dBm)
  */
-#define AT86RF2XX_DEFAULT_TXPOWER       (0U)
+#define AT86RF2XX_DEFAULT_TXPOWER       (IEEE802154_DEFAULT_TXPOWER)
 
 /**
  * @brief   Base (minimal) RSSI value in dBm
  */
-#define RSSI_BASE_VAL                   (-91)
+#if MODULE_AT86RF233
+#   define RSSI_BASE_VAL                   (-94)
+#elif MODULE_AT86RF212B
+/**
+ * @note for the default settings in RIOT for the at86rf212b,
+ *       for other seetings this value may change.
+ */
+#   define RSSI_BASE_VAL                   (-98)
+#else
+#   define RSSI_BASE_VAL                   (-91)
+#endif
 
 /**
  * @brief   Flags for device internal states (see datasheet)
  * @{
  */
-#define AT86RF2XX_STATE_TRX_OFF      (0x08)     /**< idle */
-#define AT86RF2XX_STATE_PLL_ON       (0x09)     /**< ready to transmit */
-#define AT86RF2XX_STATE_SLEEP        (0x0f)     /**< sleep mode */
-#define AT86RF2XX_STATE_BUSY_RX_AACK (0x11)     /**< busy receiving data */
-#define AT86RF2XX_STATE_BUSY_TX_ARET (0x12)     /**< busy transmitting data */
-#define AT86RF2XX_STATE_RX_AACK_ON   (0x16)     /**< wait for incoming data */
-#define AT86RF2XX_STATE_TX_ARET_ON   (0x19)     /**< ready for sending data */
-#define AT86RF2XX_STATE_IN_PROGRESS  (0x1f)     /**< ongoing state conversion */
+#define AT86RF2XX_STATE_FORCE_TRX_OFF  (0x03)     /**< force transition to idle */
+#define AT86RF2XX_STATE_TRX_OFF        (0x08)     /**< idle */
+#define AT86RF2XX_STATE_PLL_ON         (0x09)     /**< ready to transmit */
+#define AT86RF2XX_STATE_SLEEP          (0x0f)     /**< sleep mode */
+#define AT86RF2XX_STATE_BUSY_RX_AACK   (0x11)     /**< busy receiving data */
+#define AT86RF2XX_STATE_BUSY_TX_ARET   (0x12)     /**< busy transmitting data */
+#define AT86RF2XX_STATE_RX_AACK_ON     (0x16)     /**< wait for incoming data */
+#define AT86RF2XX_STATE_TX_ARET_ON     (0x19)     /**< ready for sending data */
+#define AT86RF2XX_STATE_IN_PROGRESS    (0x1f)     /**< ongoing state conversion */
 /** @} */
 
 /**
  * @brief   Internal device option flags
+ *
+ * `0x00ff` is reserved for general IEEE 802.15.4 flags
+ * (see @ref netdev2_ieee802154_t)
+ *
  * @{
  */
-#define AT86RF2XX_OPT_AUTOACK        (0x0001)       /**< auto ACKs active */
-#define AT86RF2XX_OPT_CSMA           (0x0002)       /**< CSMA active */
-#define AT86RF2XX_OPT_PROMISCUOUS    (0x0004)       /**< promiscuous mode
-                                                     *   active */
-#define AT86RF2XX_OPT_PRELOADING     (0x0008)       /**< preloading enabled */
-#define AT86RF2XX_OPT_TELL_TX_START  (0x0010)       /**< notify MAC layer on TX
-                                                     *   start */
-#define AT86RF2XX_OPT_TELL_TX_END    (0x0020)       /**< notify MAC layer on TX
-                                                     *   finished */
-#define AT86RF2XX_OPT_TELL_RX_START  (0x0040)       /**< notify MAC layer on RX
-                                                     *   start */
-#define AT86RF2XX_OPT_TELL_RX_END    (0x0080)       /**< notify MAC layer on RX
-                                                     *   finished */
-#define AT86RF2XX_OPT_RAWDUMP        (0x0100)       /**< pass RAW frame data to
-                                                     *   upper layer */
-#define AT86RF2XX_OPT_SRC_ADDR_LONG  (0x0200)       /**< send data using long
-                                                     *   source address */
-#define AT86RF2XX_OPT_USE_SRC_PAN    (0x0400)       /**< do not compress source
-                                                     *   PAN ID */
-/** @} */
+#define AT86RF2XX_OPT_SRC_ADDR_LONG  (NETDEV2_IEEE802154_SRC_MODE_LONG) /**< legacy define */
+#define AT86RF2XX_OPT_RAWDUMP        (NETDEV2_IEEE802154_RAW)           /**< legacy define */
+#define AT86RF2XX_OPT_AUTOACK        (NETDEV2_IEEE802154_ACK_REQ)       /**< legacy define */
 
-/**
- * @brief   Device descriptor for AT86RF2XX radio devices
- */
-typedef struct {
-    /* netdev fields */
-    const gnrc_netdev_driver_t *driver; /**< pointer to the devices interface */
-    gnrc_netdev_event_cb_t event_cb;    /**< netdev event callback */
-    kernel_pid_t mac_pid;               /**< the driver's thread's PID */
-    /* device specific fields */
-    spi_t spi;                          /**< used SPI device */
-    gpio_t cs_pin;                      /**< chip select pin */
-    gpio_t sleep_pin;                   /**< sleep pin */
-    gpio_t reset_pin;                   /**< reset pin */
-    gpio_t int_pin;                     /**< external interrupt pin */
-    gnrc_nettype_t proto;               /**< protocol the radio expects */
-    uint8_t state;                      /**< current state of the radio */
-    uint8_t seq_nr;                     /**< sequence number to use next */
-    uint8_t frame_len;                  /**< length of the current TX frame */
-    uint16_t pan;                       /**< currently used PAN ID */
-    uint8_t chan;                       /**< currently used channel number */
-#ifdef MODULE_AT86RF212B
-    /* Only AT86RF212B supports multiple pages (PHY modes) */
-    uint8_t page;                       /**< currently used channel page */
-#endif
-    uint8_t addr_short[2];              /**< the radio's short address */
-    uint8_t addr_long[8];               /**< the radio's long address */
-    uint16_t options;                   /**< state of used options */
-    uint8_t idle_state;                 /**< state to return to after sending */
-} at86rf2xx_t;
+#define AT86RF2XX_OPT_CSMA           (0x0100)       /**< CSMA active */
+#define AT86RF2XX_OPT_PROMISCUOUS    (0x0200)       /**< promiscuous mode
+                                                     *   active */
+#define AT86RF2XX_OPT_PRELOADING     (0x0400)       /**< preloading enabled */
+#define AT86RF2XX_OPT_TELL_TX_START  (0x0800)       /**< notify MAC layer on TX
+                                                     *   start */
+#define AT86RF2XX_OPT_TELL_TX_END    (0x1000)       /**< notify MAC layer on TX
+                                                     *   finished */
+#define AT86RF2XX_OPT_TELL_RX_START  (0x2000)       /**< notify MAC layer on RX
+                                                     *   start */
+#define AT86RF2XX_OPT_TELL_RX_END    (0x4000)       /**< notify MAC layer on RX
+                                                     *   finished */
+/** @} */
 
 /**
  * @brief struct holding all params needed for device initialization
@@ -168,22 +145,37 @@ typedef struct at86rf2xx_params {
 } at86rf2xx_params_t;
 
 /**
- * @brief   Initialize a given AT86RF2xx device
+ * @brief   Device descriptor for AT86RF2XX radio devices
+ *
+ * @extends netdev2_ieee802154_t
+ */
+typedef struct {
+    netdev2_ieee802154_t netdev;            /**< netdev2 parent struct */
+    /**
+     * @brief   device specific fields
+     * @{
+     */
+    at86rf2xx_params_t params;              /**< parameters for initialization */
+    uint8_t state;                          /**< current state of the radio */
+    uint8_t tx_frame_len;                   /**< length of the current TX frame */
+#ifdef MODULE_AT86RF212B
+    /* Only AT86RF212B supports multiple pages (PHY modes) */
+    uint8_t page;                       /**< currently used channel page */
+#endif
+    uint8_t idle_state;                 /**< state to return to after sending */
+    uint8_t pending_tx;                 /**< keep track of pending TX calls
+                                             this is required to know when to
+                                             return to @ref at86rf2xx_t::idle_state */
+    /** @} */
+} at86rf2xx_t;
+
+/**
+ * @brief   Setup an AT86RF2xx based device state
  *
  * @param[out] dev          device descriptor
- * @param[in] spi           SPI bus the device is connected to
- * @param[in] spi_speed     SPI speed to use
- * @param[in] cs_pin        GPIO pin connected to chip select
- * @param[in] int_pin       GPIO pin connected to the interrupt pin
- * @param[in] sleep_pin     GPIO pin connected to the sleep pin
- * @param[in] reset_pin     GPIO pin connected to the reset pin
- *
- * @return                  0 on success
- * @return                  <0 on error
+ * @param[in]  params       parameters for device initialization
  */
-int at86rf2xx_init(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
-                   gpio_t cs_pin, gpio_t int_pin,
-                   gpio_t sleep_pin, gpio_t reset_pin);
+void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params);
 
 /**
  * @brief   Trigger a hardware reset and configure radio with default values
@@ -191,16 +183,6 @@ int at86rf2xx_init(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
  * @param[in] dev           device to reset
  */
 void at86rf2xx_reset(at86rf2xx_t *dev);
-
-/**
- * @brief   Trigger a clear channel assessment
- *
- * @param[in] dev           device to use
- *
- * @return                  true if channel is clear
- * @return                  false if channel is busy
- */
-bool at86rf2xx_cca(at86rf2xx_t *dev);
 
 /**
  * @brief   Get the short address of the given device
@@ -461,29 +443,9 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, uint8_t *data, size_t len,
  */
 void at86rf2xx_tx_exec(at86rf2xx_t *dev);
 
-/**
- * @brief   Read the length of a received packet
- *
- * @param dev               device to read from
- *
- * @return                  overall length of a received packet in byte
- */
-size_t at86rf2xx_rx_len(at86rf2xx_t *dev);
-
-/**
- * @brief   Read a chunk of data from the receive buffer of the given device
- *
- * @param[in]  dev          device to read from
- * @param[out] data         buffer to write data to
- * @param[in]  len          number of bytes to read from device
- * @param[in]  offset       offset in the receive buffer
- */
-void at86rf2xx_rx_read(at86rf2xx_t *dev, uint8_t *data, size_t len,
-                       size_t offset);
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* AT86RF2XX_H_ */
+#endif /* AT86RF2XX_H */
 /** @} */

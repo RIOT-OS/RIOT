@@ -24,8 +24,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef DRIVERS_NVRAM_H_
-#define DRIVERS_NVRAM_H_
+#ifndef DRIVERS_NVRAM_H
+#define DRIVERS_NVRAM_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -70,7 +70,7 @@ typedef struct nvram {
      * @return           Number of bytes written on success
      * @return           <0 on errors
      */
-    int (*write)(struct nvram *dev, uint8_t *src, uint32_t dst, size_t size);
+    int (*write)(struct nvram *dev, const uint8_t *src, uint32_t dst, size_t size);
 
     /** @brief Device capacity */
     size_t size;
@@ -83,5 +83,5 @@ typedef struct nvram {
 }
 #endif
 
-#endif /* DRIVERS_NVRAM_H_ */
+#endif /* DRIVERS_NVRAM_H */
 /** @} */

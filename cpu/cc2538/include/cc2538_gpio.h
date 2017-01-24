@@ -123,6 +123,13 @@ enum {
 #define gpio_dir_input(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DIR &= ~GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
 
 /**
+ * @brief Read the value of the given pin
+ *
+ * @param[in] gpio_num GPIO number (0-31)
+ */
+#define cc2538_gpio_read(gpio_num) ( (GPIO_NUM_TO_DEV(gpio_num)->DATA >> GPIO_BIT_NUM(gpio_num)) & 1 )
+
+/**
  * @brief Set a specific GPIO output pin high
  *
  * @param[in] gpio_num GPIO number (0-31)
@@ -216,14 +223,8 @@ typedef struct {
  * @brief IOC port component registers
  */
 typedef struct {
-    cc2538_reg_t PA_SEL[8];         /**< Port A SEL register */
-    cc2538_reg_t PB_SEL[8];         /**< Port B SEL register */
-    cc2538_reg_t PC_SEL[8];         /**< Port C SEL register */
-    cc2538_reg_t PD_SEL[8];         /**< Port D SEL register */
-    cc2538_reg_t PA_OVER[8];        /**< Port A OVER register */
-    cc2538_reg_t PB_OVER[8];        /**< Port B OVER register */
-    cc2538_reg_t PC_OVER[8];        /**< Port C OVER register */
-    cc2538_reg_t PD_OVER[8];        /**< Port D OVER register */
+    cc2538_reg_t SEL[32];               /**< Port A to D SEL registers */
+    cc2538_reg_t OVER[32];              /**< Port A OVER register */
 } cc2538_ioc_t;
 
 /**

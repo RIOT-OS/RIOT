@@ -89,8 +89,8 @@ hex file in the `bin` folder of your application directory.
 Learn more about the build system in the
 [Wiki](https://github.com/RIOT-OS/RIOT/wiki/The-Make-Build-System)
 
-Building and executing an examples        {#building-and-executing-and-example}
-----------------------------------
+Building and executing an example           {#building-and-executing-an-example}
+---------------------------------
 RIOT provides a number of examples in the `examples/` directory. Every example
 has a README that documents its usage and its purpose. You can build them by
 typing

@@ -16,8 +16,8 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
-#ifndef NHDP_WRITER_H_
-#define NHDP_WRITER_H_
+#ifndef NHDP_WRITER_H
+#define NHDP_WRITER_H
 
 #include "rfc5444/rfc5444_iana.h"
 #include "rfc5444/rfc5444_writer.h"
@@ -76,5 +76,5 @@ void nhdp_writer_add_addr(struct rfc5444_writer *wr, nhdp_addr_t *addr,
 }
 #endif
 
-#endif /* NHDP_WRITER_H_ */
+#endif /* NHDP_WRITER_H */
 /** @} */

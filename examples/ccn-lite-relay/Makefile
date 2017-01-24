@@ -11,12 +11,11 @@ RIOTBASE ?= $(CURDIR)/../..
 
 CFLAGS += -DDEVELHELP
 CFLAGS += -DUSE_LINKLAYER
-CFLAGS += -DUSE_IPV6
+CFLAGS += -DUSE_RONR
 CFLAGS += -DCCNL_UAPI_H_
 CFLAGS += -DUSE_SUITE_NDNTLV
 CFLAGS += -DNEEDS_PREFIX_MATCHING
 CFLAGS += -DNEEDS_PACKET_CRAFTING
-CFLAGS += -DUSE_HMAC256
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
@@ -26,7 +25,7 @@ USEMODULE += shell
 USEMODULE += shell_commands
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += gnrc_netif_default
+USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += timex
 USEMODULE += xtimer

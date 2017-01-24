@@ -20,7 +20,6 @@
 #include <stdint.h>
 #include <errno.h>
 
-#include "kernel.h"
 #include "byteorder.h"
 #include "msg.h"
 #include "thread.h"
@@ -87,7 +86,16 @@ static uint16_t _calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr,
             return 0;
     }
     /* return inverted results */
-    return ~csum;
+    if (csum == 0xFFFF) {
+        /* https://tools.ietf.org/html/rfc2460#section-8.1
+         * bullet 4
+         * "if that computation yields a result of zero, it must be changed
+         * to hex FFFF for placement in the UDP header."
+         */
+        return 0xFFFF;
+    } else {
+        return ~csum;
+    }
 }
 
 static void _receive(gnrc_pktsnip_t *pkt)
@@ -128,7 +136,16 @@ static void _receive(gnrc_pktsnip_t *pkt)
     hdr = (udp_hdr_t *)udp->data;
 
     /* validate checksum */
-    if (_calc_csum(udp, ipv6, pkt)) {
+    if (byteorder_ntohs(hdr->checksum) == 0) {
+        /* RFC 2460 Section 8.1
+         * "IPv6 receivers must discard UDP packets containing a zero checksum,
+         * and should log the error."
+         */
+        DEBUG("udp: received packet with zero checksum, dropping it\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
+    if (_calc_csum(udp, ipv6, pkt) != 0xFFFF) {
         DEBUG("udp: received packet with invalid checksum, dropping it\n");
         gnrc_pktbuf_release(pkt);
         return;
@@ -148,6 +165,7 @@ static void _send(gnrc_pktsnip_t *pkt)
 {
     udp_hdr_t *hdr;
     gnrc_pktsnip_t *udp_snip, *tmp;
+    gnrc_nettype_t target_type = pkt->type;
 
     /* write protect first header */
     tmp = gnrc_pktbuf_start_write(pkt);
@@ -181,12 +199,19 @@ static void _send(gnrc_pktsnip_t *pkt)
         gnrc_pktbuf_release(pkt);
         return;
     }
+    tmp->next = udp_snip;
     hdr = (udp_hdr_t *)udp_snip->data;
     /* fill in size field */
     hdr->length = byteorder_htons(gnrc_pkt_len(udp_snip));
 
+    /* set to IPv6, if first header is netif header */
+    if (target_type == GNRC_NETTYPE_NETIF) {
+        target_type = pkt->next->type;
+    }
+
     /* and forward packet to the network layer */
-    if (!gnrc_netapi_dispatch_send(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
+    if (!gnrc_netapi_dispatch_send(target_type, GNRC_NETREG_DEMUX_CTX_ALL,
+                                   pkt)) {
         DEBUG("udp: cannot send packet: network layer not found\n");
         gnrc_pktbuf_release(pkt);
     }
@@ -197,16 +222,14 @@ static void *_event_loop(void *arg)
     (void)arg;
     msg_t msg, reply;
     msg_t msg_queue[GNRC_UDP_MSG_QUEUE_SIZE];
-    gnrc_netreg_entry_t netreg;
-
+    gnrc_netreg_entry_t netreg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                            sched_active_pid);
     /* preset reply message */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
     reply.content.value = (uint32_t)-ENOTSUP;
     /* initialize message queue */
     msg_init_queue(msg_queue, GNRC_UDP_MSG_QUEUE_SIZE);
     /* register UPD at netreg */
-    netreg.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
-    netreg.pid = thread_getpid();
     gnrc_netreg_register(GNRC_NETTYPE_UDP, &netreg);
 
     /* dispatch NETAPI messages */
@@ -215,11 +238,11 @@ static void *_event_loop(void *arg)
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 DEBUG("udp: GNRC_NETAPI_MSG_TYPE_RCV\n");
-                _receive((gnrc_pktsnip_t *)msg.content.ptr);
+                _receive(msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("udp: GNRC_NETAPI_MSG_TYPE_SND\n");
-                _send((gnrc_pktsnip_t *)msg.content.ptr);
+                _send(msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
             case GNRC_NETAPI_MSG_TYPE_GET:
@@ -254,18 +277,12 @@ int gnrc_udp_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr)
     return 0;
 }
 
-gnrc_pktsnip_t *gnrc_udp_hdr_build(gnrc_pktsnip_t *payload,
-                                   uint8_t *src, size_t src_len,
-                                   uint8_t *dst, size_t dst_len)
+gnrc_pktsnip_t *gnrc_udp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src,
+                                   uint16_t dst)
 {
     gnrc_pktsnip_t *res;
     udp_hdr_t *hdr;
 
-    /* check parameters */
-    if (src == NULL || dst == NULL ||
-        src_len != sizeof(uint16_t) || dst_len != sizeof(uint16_t)) {
-        return NULL;
-    }
     /* allocate header */
     res = gnrc_pktbuf_add(payload, NULL, sizeof(udp_hdr_t), GNRC_NETTYPE_UDP);
     if (res == NULL) {
@@ -273,8 +290,8 @@ gnrc_pktsnip_t *gnrc_udp_hdr_build(gnrc_pktsnip_t *payload,
     }
     /* initialize header */
     hdr = (udp_hdr_t *)res->data;
-    hdr->src_port = byteorder_htons(*((uint16_t *)src));
-    hdr->dst_port = byteorder_htons(*((uint16_t *)dst));
+    hdr->src_port = byteorder_htons(src);
+    hdr->dst_port = byteorder_htons(dst);
     hdr->checksum = byteorder_htons(0);
     return res;
 }

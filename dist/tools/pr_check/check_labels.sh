@@ -22,7 +22,11 @@ else
     exit 2
 fi
 
-LABELS_JSON=$(${GET} "${GITHUB_API_HOST}/repos/${GITHUB_REPO}/issues/${TRAVIS_PULL_REQUEST}/labels" 2> /dev/null)
+if [ -n "$TRAVIS_PULL_REQUEST" ]; then
+    LABELS_JSON=$(${GET} "${GITHUB_API_HOST}/repos/${GITHUB_REPO}/issues/${TRAVIS_PULL_REQUEST}/labels" 2> /dev/null)
+elif [ -n "$CI_PULL_LABELS" ]; then
+    LABELS_JSON="$CI_PULL_LABELS"
+fi
 
 check_gh_label() {
     LABEL="${1}"

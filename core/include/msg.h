@@ -98,11 +98,11 @@
  * Asynchronous IPC
  * ----------------
  * To use asynchronous IPC one needs to initialize a message queue using
- * @ref msg_init_queue(). Messages sent to a thread with a message queue that
- * isn't full are never dropped and the sending never blocks, even when using
- * @ref msg_send(). If the queue is full and the sending thread has a higher
- * priority than the receiving thread the send-behavior is equivalent to
- * synchronous mode.
+ * @ref msg_init_queue() (note that it **must** be of a size equal to a power of
+ * two). Messages sent to a thread with a message queue that isn't full are
+ * never dropped and the sending never blocks, even when using @ref msg_send().
+ * If the queue is full and the sending thread has a higher priority than the
+ * receiving thread the send-behavior is equivalent to synchronous mode.
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * #include <inttypes.h>
@@ -162,8 +162,8 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
-#ifndef MSG_H_
-#define MSG_H_
+#ifndef MSG_H
+#define MSG_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -181,12 +181,12 @@ extern "C" {
  * the corresponding fields are never read by the kernel.
  *
  */
-typedef struct msg {
+typedef struct {
     kernel_pid_t sender_pid;    /**< PID of sending thread. Will be filled in
                                      by msg_send. */
     uint16_t type;              /**< Type field. */
     union {
-        char *ptr;              /**< Pointer content field. */
+        void *ptr;              /**< Pointer content field. */
         uint32_t value;         /**< Value content field. */
     } content;                  /**< Content of the message. */
 } msg_t;
@@ -365,19 +365,23 @@ int msg_avail(void);
 /**
  * @brief Initialize the current thread's message queue.
  *
+ * @pre @p num **MUST BE A POWER OF TWO!**
+ *
  * @param[in] array Pointer to preallocated array of ``msg_t`` structures, must
  *                  not be NULL.
  * @param[in] num   Number of ``msg_t`` structures in array.
  *                  **MUST BE POWER OF TWO!**
- *
- * @return 0, if successful
- * @return -1, on error
  */
-int msg_init_queue(msg_t *array, int num);
+void msg_init_queue(msg_t *array, int num);
+
+/**
+ * @brief   Prints the message queue of the current thread.
+ */
+void msg_queue_print(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* MSG_H_ */
+#endif /* MSG_H */
 /** @} */

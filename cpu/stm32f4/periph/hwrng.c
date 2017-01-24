@@ -19,6 +19,7 @@
  */
 
 #include "cpu.h"
+#include "periph_conf.h"
 #include "periph/hwrng.h"
 
 /* only build if the CPU actually provides a RNG peripheral */
@@ -34,13 +35,13 @@ void hwrng_read(uint8_t *buf, unsigned int num)
     unsigned int count = 0;
 
     /* power on and enable the device */
-    RCC->AHB2ENR |= RCC_AHB2ENR_RNGEN;
+    periph_clk_en(AHB2, RCC_AHB2ENR_RNGEN);
     RNG->CR = RNG_CR_RNGEN;
 
     /* get random data */
     while (count < num) {
         /* wait for random data to be ready to read */
-        while (!(RNG->SR & RNG_SR_DRDY));
+        while (!(RNG->SR & RNG_SR_DRDY)) {}
         /* read next 4 bytes */
         uint32_t tmp = RNG->DR;
         /* copy data into result vector */
@@ -52,7 +53,7 @@ void hwrng_read(uint8_t *buf, unsigned int num)
 
     /* finally disable the device again */
     RNG->CR = 0;
-    RCC->AHB2ENR &= ~RCC_AHB2ENR_RNGEN;
+    periph_clk_dis(AHB2, RCC_AHB2ENR_RNGEN);
 }
 
-#endif /* CPUID_LEN */
+#endif /* RNG */

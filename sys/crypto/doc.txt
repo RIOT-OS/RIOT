@@ -18,12 +18,17 @@
  * Riot supports the following block ciphers:
  *  * AES-128
  *  * 3DES
- *  * Twofish
  *  * NULL
  *
  * You can use them directly by adding "crypto" to your USEMODULE-List.
  * While you can use the ciphers functions directly, you should resort to
  * the generic API for block ciphers whenever possible.
+ *
+ * Additionally you need to set a CFLAG for each cipher you want to use in your Makefile:
+ *  * AES-128: CFLAGS += -DCRYPTO_AES
+ *  * 3DES:    CFLAGS += -DCRYPTO_THREEDES
+ * Setting the CFLAGS initializes a sufficient large buffer size of the cipher_context_t,
+ * used by the ciphers for en-/de-cryption operations.
  *
  * Example:
  * @code

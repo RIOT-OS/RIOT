@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef SHT11_H_
-#define SHT11_H_
+#ifndef SHT11_H
+#define SHT11_H
 
 /**
  * @defgroup    drivers_sht11   SHT11
@@ -105,4 +105,4 @@ uint8_t sht11_read_status(uint8_t *p_value, uint8_t *p_checksum);
 #endif
 
 /** @} */
-#endif /*SHT11_H_*/
+#endif /* SHT11_H */

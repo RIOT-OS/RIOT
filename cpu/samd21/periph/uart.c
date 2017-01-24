@@ -21,8 +21,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 
 #include "periph/uart.h"
 #include "periph/gpio.h"
@@ -50,7 +48,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* initialize basic functionality */
     int res = init_base(uart, baudrate);
-    if (res != 0) {
+    if (res != UART_OK) {
         return res;
     }
 
@@ -60,7 +58,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* configure interrupts and enable RX interrupt */
     _uart(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
     NVIC_EnableIRQ(SERCOM0_IRQn + _sercom_id(_uart(uart)));
-    return 0;
+    return UART_OK;
 }
 
 static int init_base(uart_t uart, uint32_t baudrate)
@@ -68,8 +66,8 @@ static int init_base(uart_t uart, uint32_t baudrate)
     uint32_t baud;
     SercomUsart *dev;
 
-    if (uart < 0 || uart >= UART_NUMOF) {
-        return -1;
+    if ((unsigned int)uart >= UART_NUMOF) {
+        return UART_NODEV;
     }
 
     /* get the devices base register */
@@ -79,34 +77,35 @@ static int init_base(uart_t uart, uint32_t baudrate)
     /* enable sync and async clocks */
     uart_poweron(uart);
     /* configure pins */
-    gpio_init(uart_config[uart].rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init(uart_config[uart].rx_pin, GPIO_IN);
     gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
-    gpio_init(uart_config[uart].tx_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
     gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
     /* reset the UART device */
     dev->CTRLA.reg = SERCOM_USART_CTRLA_SWRST;
-    while (dev->SYNCBUSY.reg & SERCOM_USART_SYNCBUSY_SWRST);
-    /* set asynchronous mode w/o parity, LSB first, PAD0 to TX, PAD1 to RX and
-     * use internal clock */
+    while (dev->SYNCBUSY.reg & SERCOM_USART_SYNCBUSY_SWRST) {}
+    /* set asynchronous mode w/o parity, LSB first, TX and RX pad as specified
+     * by the board in the periph_conf.h, x16 sampling and use internal clock */
     dev->CTRLA.reg = (SERCOM_USART_CTRLA_DORD |
-                      SERCOM_USART_CTRLA_RXPO(0x1) |
                       SERCOM_USART_CTRLA_SAMPR(0x1) |
+                      SERCOM_USART_CTRLA_TXPO(uart_config[uart].tx_pad) |
+                      SERCOM_USART_CTRLA_RXPO(uart_config[uart].rx_pad) |
                       SERCOM_USART_CTRLA_MODE_USART_INT_CLK);
     /* set baudrate */
     dev->BAUD.FRAC.FP = (baud % 10);
     dev->BAUD.FRAC.BAUD = (baud / 10);
     /* enable receiver and transmitter, use 1 stop bit */
     dev->CTRLB.reg = (SERCOM_USART_CTRLB_RXEN | SERCOM_USART_CTRLB_TXEN);
-    while (dev->SYNCBUSY.reg & SERCOM_USART_SYNCBUSY_CTRLB);
+    while (dev->SYNCBUSY.reg & SERCOM_USART_SYNCBUSY_CTRLB) {}
     /* finally, enable the device */
     dev->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     for (size_t i = 0; i < len; i++) {
-        while (!(_uart(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_DRE));
+        while (!(_uart(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_DRE)) {}
         _uart(uart)->DATA.reg = data[i];
     }
 }
@@ -118,7 +117,7 @@ void uart_poweron(uart_t uart)
                          GCLK_CLKCTRL_GEN_GCLK0 |
                          (SERCOM0_GCLK_ID_CORE + _sercom_id(_uart(uart))) <<
                           GCLK_CLKCTRL_ID_Pos);
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 }
 
 void uart_poweroff(uart_t uart)
@@ -126,7 +125,7 @@ void uart_poweroff(uart_t uart)
     PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << _sercom_id(_uart(uart)));
     GCLK->CLKCTRL.reg = ((SERCOM0_GCLK_ID_CORE + _sercom_id(_uart(uart))) <<
                           GCLK_CLKCTRL_ID_Pos);
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 }
 
 static inline void irq_handler(int dev)
@@ -135,15 +134,13 @@ static inline void irq_handler(int dev)
 
     if (uart->INTFLAG.reg & SERCOM_USART_INTFLAG_RXC) {
         /* interrupt flag is cleared by reading the data register */
-        uart_ctx[dev].rx_cb(uart_ctx[dev].arg, (char)(uart->DATA.reg));
+        uart_ctx[dev].rx_cb(uart_ctx[dev].arg, (uint8_t)(uart->DATA.reg));
     }
     else if (uart->INTFLAG.reg & SERCOM_USART_INTFLAG_ERROR) {
         /* clear error flag */
         uart->INTFLAG.reg = SERCOM_USART_INTFLAG_ERROR;
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef UART_0_ISR

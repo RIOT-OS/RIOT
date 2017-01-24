@@ -9,6 +9,7 @@
 /**
  * @defgroup    net_conn_udp    UDP connections
  * @ingroup     net_conn
+ * @deprecated  Please use @ref net_sock_udp instead
  * @brief       Connection submodule for UDP connections
  * @{
  *
@@ -17,14 +18,22 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_CONN_UDP_H_
-#define NET_CONN_UDP_H_
+#ifndef NET_CONN_UDP_H
+#define NET_CONN_UDP_H
 
 #include <stdint.h>
 #include <stdlib.h>
 
 #ifdef MODULE_GNRC_CONN_UDP
 #include "net/gnrc/conn.h"
+#endif
+
+#ifdef MODULE_LWIP_CONN_UDP
+#include "lwip/conn.h"
+#endif
+
+#ifdef MODULE_EMB6_CONN_UDP
+#include "emb6/conn/udp.h"
 #endif
 
 #ifdef __cplusplus
@@ -50,6 +59,10 @@ typedef struct conn_udp conn_udp_t;
  * @param[in] addr_len  The length of @p addr. Must be fitting for the @p family.
  * @param[in] family    The family of @p addr (see @ref net_af).
  * @param[in] port      The local UDP port for @p conn.
+ *
+ * @todo    With @ref net_gnrc @ref conn_udp_recvfrom needs to be called from the
+ *          same thread as for this function. This is undesired behavior and
+ *          will be fixed in upcoming versions of RIOT.
  *
  * @return  0 on success.
  * @return  any other negative number in case of an error. For portability implementations should
@@ -93,6 +106,10 @@ int conn_udp_getlocaladdr(conn_udp_t *conn, void *addr, uint16_t *port);
  *
  * @note    Function may block.
  *
+ * @todo    With @ref net_gnrc this function needs to be called from the same
+ *          thread as @ref conn_udp_create. This is undesired behavior and will
+ *          be fixed in upcoming versions of RIOT.
+ *
  * @return  The number of bytes received on success.
  * @return  0, if no received data is available, but everything is in order.
  * @return  any other negative number in case of an error. For portability, implementations should
@@ -130,5 +147,5 @@ int conn_udp_sendto(const void *data, size_t len, const void *src, size_t src_le
 }
 #endif
 
-#endif /* NET_CONN_UDP4_H_ */
+#endif /* NET_CONN_UDP4_H */
 /** @} */

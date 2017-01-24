@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * Copyright (C) 2013 - 2016 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -27,13 +27,14 @@ extern "C" {
 #endif
 
 /**
- * @brief   Prints the last instruction's address
+ * @brief   Prints the address the callee will return to
  */
-static inline void cpu_print_last_instruction(void)
+__attribute__((always_inline)) static inline void cpu_print_last_instruction(void)
 {
-    void *p;
-    __asm__("1: mov 1b, %0" : "=r" (p));
-    printf("%p\n", p);
+    /* __builtin_return_address will return the address the calling function
+     * will return to - since cpu_print_last_instruction is forced inline,
+     * it is the return address of the user of this function */
+    printf("%p\n", __builtin_return_address(0));
 }
 
 #ifdef __cplusplus

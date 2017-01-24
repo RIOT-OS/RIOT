@@ -18,11 +18,10 @@
  * @author      Lari Lehtomäki <lari@lehtomaki.fi>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
-#include "cpu.h"
-#include "periph_conf.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,47 +31,15 @@ extern "C" {
  * @name xtimer configuration
  * @{
  */
-#define XTIMER              TIMER_0
+#define XTIMER_DEV          TIMER_DEV(0)
 #define XTIMER_CHAN         (0)
 #define XTIMER_OVERHEAD     (6)
 #define XTIMER_BACKOFF      (5)
 /** @} */
 
-/**
- * @name LED pin definitions
- * @{
- */
-#define LED_GREEN_PORT      (GPIOA)
-#define LED_GREEN_PIN       (5)
-#define LED_GREEN_GPIO      GPIO_PIN(PORT_A,5)
-/** @} */
-
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_RED_ON
-#define LED_RED_OFF
-#define LED_RED_TOGGLE
-
-#define LED_GREEN_ON        (LED_GREEN_PORT->BSRRL = (1<<LED_GREEN_PIN))
-#define LED_GREEN_OFF       (LED_GREEN_PORT->BSRRH = (1<<LED_GREEN_PIN))
-#define LED_GREEN_TOGGLE    (LED_GREEN_PORT->ODR ^= (1<<LED_GREEN_PIN))
-
-#define LED_ORANGE_ON
-#define LED_ORANGE_OFF
-#define LED_ORANGE_TOGGLE
-/** @} */
-
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

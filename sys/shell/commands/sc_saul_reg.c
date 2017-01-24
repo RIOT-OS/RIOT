@@ -7,7 +7,7 @@
  *
  */
 
-/*
+/**
  * @ingroup     sys_shell_commands
  * @{
  *
@@ -44,7 +44,7 @@ static void probe(int num, saul_reg_t *dev)
 
 static void probe_all(void)
 {
-    saul_reg_t *dev = saul_reg_get();
+    saul_reg_t *dev = saul_reg;
     int i = 0;
 
     while (dev) {
@@ -56,7 +56,7 @@ static void probe_all(void)
 
 static void list(void)
 {
-    saul_reg_t *dev = saul_reg_get();
+    saul_reg_t *dev = saul_reg;
     int i = 0;
 
     if (dev) {
@@ -140,7 +140,7 @@ int _saul(int argc, char **argv)
     if (argc < 2) {
         list();
     }
-    else if (argc >= 2) {
+    else {
         if (strcmp(argv[1], "read") == 0) {
             read(argc, argv);
         }

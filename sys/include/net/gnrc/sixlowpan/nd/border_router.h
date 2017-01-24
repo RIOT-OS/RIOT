@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_SIXLOWPAN_BORDER_ROUTER_H_
-#define GNRC_SIXLOWPAN_BORDER_ROUTER_H_
+#ifndef GNRC_SIXLOWPAN_BORDER_ROUTER_H
+#define GNRC_SIXLOWPAN_BORDER_ROUTER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,5 +39,5 @@ extern "C" {
 }
 #endif
 
-#endif /* GNRC_SIXLOWPAN_BORDER_ROUTER_H_ */
+#endif /* GNRC_SIXLOWPAN_BORDER_ROUTER_H */
 /** @} */

@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __CORTEX_M4_DEF_H__
-#define __CORTEX_M4_DEF_H__
+#ifndef STELLARIS_CORTEX_M4_DEF_H
+#define STELLARIS_CORTEX_M4_DEF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,6 +72,37 @@ extern "C" {
 #define WATCHDOG1_MIS_R         (*((volatile unsigned long *)0x40001014))
 #define WATCHDOG1_TEST_R        (*((volatile unsigned long *)0x40001418))
 #define WATCHDOG1_LOCK_R        (*((volatile unsigned long *)0x40001C00))
+
+//*****************************************************************************
+//
+// GPIO registers offset
+//
+//*****************************************************************************
+#define GPIO_DATA_R_OFF       (0x3FCUL)
+#define GPIO_DIR_R_OFF        (0x400UL)
+#define GPIO_IS_R_OFF         (0x404UL)
+#define GPIO_IBE_R_OFF        (0x408UL)
+#define GPIO_IEV_R_OFF        (0x40CUL)
+#define GPIO_IM_R_OFF         (0x410UL)
+#define GPIO_RIS_R_OFF        (0x414UL)
+#define GPIO_MIS_R_OFF        (0x418UL)
+#define GPIO_ICR_R_OFF        (0x41CUL)
+#define GPIO_AFSEL_R_OFF      (0x420UL)
+#define GPIO_DR2R_R_OFF       (0x500UL)
+#define GPIO_DR4R_R_OFF       (0x504UL)
+#define GPIO_DR8R_R_OFF       (0x508UL)
+#define GPIO_ODR_R_OFF        (0x50CUL)
+#define GPIO_PUR_R_OFF        (0x510UL)
+#define GPIO_PDR_R_OFF        (0x514UL)
+#define GPIO_SLR_R_OFF        (0x518UL)
+#define GPIO_DEN_R_OFF        (0x51CUL)
+#define GPIO_LOCK_R_OFF       (0x520UL)
+#define GPIO_CR_R_OFF         (0x524UL)
+#define GPIO_AMSEL_R_OFF      (0x528UL)
+#define GPIO_PCTL_R_OFF       (0x52CUL)
+#define GPIO_ADCCTL_R_OFF     (0x530UL)
+#define GPIO_DMACTL_R_OFF     (0x534UL)
+#define GPIO_SI_R_OFF         (0x538UL)
 
 //*****************************************************************************
 //
@@ -10031,4 +10062,4 @@ extern "C" {
 }
 #endif
 
-#endif // __LM4F120H5QR_H__
+#endif /* STELLARIS_CORTEX_M4_DEF_H */

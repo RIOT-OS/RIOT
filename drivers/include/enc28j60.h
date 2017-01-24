@@ -33,15 +33,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Fallback MAC address in case CPUID is not available
- *
- * The enc28j60 does not provide a globally unique, pre-set MAC address, so we
- * need to create one. For this the CPUID module is used to create a locally
- * administered MAC. If this is not available, we use the MAC address below.
- */
-#define ENC28J60_FALLBACK_MAC       {0x02, 0x22, 0x33, 0x44, 0x55, 0x66}
-
-/**
  * @brief   Struct containing the needed peripheral configuration
  */
 typedef struct {

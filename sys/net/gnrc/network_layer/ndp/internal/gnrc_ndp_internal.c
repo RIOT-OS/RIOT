@@ -51,7 +51,7 @@ static inline void _send_delayed(xtimer_t *t, msg_t *msg, uint32_t interval, gnr
 {
     xtimer_remove(t);
     msg->type = GNRC_NETAPI_MSG_TYPE_SND;
-    msg->content.ptr = (char *) pkt;
+    msg->content.ptr = pkt;
     xtimer_set_msg(t, interval, msg, gnrc_ipv6_pid);
 }
 
@@ -91,7 +91,7 @@ ipv6_addr_t *gnrc_ndp_internal_default_router(void)
 void gnrc_ndp_internal_set_state(gnrc_ipv6_nc_t *nc_entry, uint8_t state)
 {
     gnrc_ipv6_netif_t *ipv6_iface;
-    uint32_t t = GNRC_NDP_FIRST_PROBE_DELAY * SEC_IN_USEC;
+    uint32_t t = GNRC_NDP_FIRST_PROBE_DELAY * US_PER_SEC;
 
     nc_entry->flags &= ~GNRC_IPV6_NC_STATE_MASK;
     nc_entry->flags |= state;
@@ -209,10 +209,10 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
     if (gnrc_ipv6_netif_addr_is_non_unicast(tgt)) {
         /* avoid collision for anycast addresses
          * (see https://tools.ietf.org/html/rfc4861#section-7.2.7) */
-        uint32_t delay = genrand_uint32_range(0, GNRC_NDP_MAX_AC_TGT_DELAY * SEC_IN_USEC);
+        uint32_t delay = random_uint32_range(0, GNRC_NDP_MAX_AC_TGT_DELAY * US_PER_SEC);
         gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, dst);
         DEBUG("ndp internal: delay neighbor advertisement for %" PRIu32 " sec.",
-              (delay / SEC_IN_USEC));
+              (delay / US_PER_SEC));
 
         /* nc_entry must be set so no need to check it */
         assert(nc_entry);
@@ -240,13 +240,13 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
     size_t l2src_len = 0;
 
     DEBUG("ndp internal: send neighbor solicitation (iface: %" PRIkernel_pid ", src: %s, ",
-          iface, ipv6_addr_to_str(addr_str, src, sizeof(addr_str)));
+          iface, ipv6_addr_to_str(addr_str, src ? src : &ipv6_addr_unspecified, sizeof(addr_str)));
     DEBUG(" tgt: %s, ", ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
     DEBUG("dst: %s)\n", ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
 
     /* check if there is a fitting source address to target */
     if (src == NULL) {
-        src = gnrc_ipv6_netif_find_best_src_addr(iface, tgt);
+        src = gnrc_ipv6_netif_find_best_src_addr(iface, tgt, false);
     }
     if (src != NULL) {
         l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
@@ -307,14 +307,15 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
 void gnrc_ndp_internal_send_rtr_sol(kernel_pid_t iface, ipv6_addr_t *dst)
 {
     gnrc_pktsnip_t *hdr, *pkt = NULL;
-    ipv6_addr_t *src = NULL, all_routers = IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
+    ipv6_addr_t *src = NULL;
     DEBUG("ndp internal: send router solicitation (iface: %" PRIkernel_pid ", dst: ff02::2)\n",
           iface);
     if (dst == NULL) {
-        dst = &all_routers;
+        /* isn't changed afterwards so discarding const should be alright */
+        dst = (ipv6_addr_t *)&ipv6_addr_all_routers_link_local;
     }
     /* check if there is a fitting source address to target */
-    if ((src = gnrc_ipv6_netif_find_best_src_addr(iface, dst)) != NULL) {
+    if ((src = gnrc_ipv6_netif_find_best_src_addr(iface, dst, false)) != NULL) {
         uint8_t l2src[8];
         size_t l2src_len;
         l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
@@ -422,14 +423,14 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
                                     bool fin)
 {
     gnrc_pktsnip_t *hdr = NULL, *pkt = NULL;
-    ipv6_addr_t all_nodes = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
     gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(iface);
     uint32_t reach_time = 0, retrans_timer = 0;
     uint16_t adv_ltime = 0;
     uint8_t cur_hl = 0;
 
     if (dst == NULL) {
-        dst = &all_nodes;
+        /* isn't changed afterwards so discarding const should be fine */
+        dst = (ipv6_addr_t *)&ipv6_addr_all_nodes_link_local;
     }
     DEBUG("ndp internal: send router advertisement (iface: %" PRIkernel_pid ", dst: %s%s\n",
           iface, ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)), fin ? ", final" : "");
@@ -521,8 +522,9 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
     }
     if (src == NULL) {
         mutex_unlock(&ipv6_iface->mutex);
-        /* get address from source selection algorithm */
-        src = gnrc_ipv6_netif_find_best_src_addr(iface, dst);
+        /* get address from source selection algorithm.
+         * Only link local addresses may be used (RFC 4861 section 4.1) */
+        src = gnrc_ipv6_netif_find_best_src_addr(iface, dst, true);
         mutex_lock(&ipv6_iface->mutex);
     }
     /* add SL2A for source address */
@@ -552,15 +554,15 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
     }
     if (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ADV_REACH_TIME) {
 
-        if (ipv6_iface->reach_time > (3600 * SEC_IN_USEC)) { /* reach_time > 1 hour */
-            reach_time = (3600 * SEC_IN_MS);
+        if (ipv6_iface->reach_time > (3600 * US_PER_SEC)) { /* reach_time > 1 hour */
+            reach_time = (3600 * MS_PER_SEC);
         }
         else {
-            reach_time = ipv6_iface->reach_time / MS_IN_USEC;
+            reach_time = ipv6_iface->reach_time / US_PER_MS;
         }
     }
     if (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ADV_RETRANS_TIMER) {
-        retrans_timer = ipv6_iface->retrans_timer / MS_IN_USEC;
+        retrans_timer = ipv6_iface->retrans_timer / US_PER_MS;
     }
     if (!fin) {
         adv_ltime = ipv6_iface->adv_ltime;
@@ -790,7 +792,7 @@ bool gnrc_ndp_internal_pi_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
     netif_addr->preferred = byteorder_ntohl(pi_opt->pref_ltime);
     if (netif_addr->valid != UINT32_MAX) {
         xtimer_set_msg(&netif_addr->valid_timeout,
-                       (byteorder_ntohl(pi_opt->valid_ltime) * SEC_IN_USEC),
+                       (byteorder_ntohl(pi_opt->valid_ltime) * US_PER_SEC),
                        &netif_addr->valid_timeout_msg, thread_getpid());
     }
     /* TODO: preferred lifetime for address auto configuration */
@@ -835,8 +837,7 @@ static gnrc_pktsnip_t *_build_headers(kernel_pid_t iface, gnrc_pktsnip_t *payloa
                                       ipv6_addr_t *dst, ipv6_addr_t *src)
 {
     gnrc_pktsnip_t *l2hdr;
-    gnrc_pktsnip_t *iphdr = gnrc_ipv6_hdr_build(payload, (uint8_t *)src, sizeof(ipv6_addr_t),
-                                                (uint8_t *)dst, sizeof(ipv6_addr_t));
+    gnrc_pktsnip_t *iphdr = gnrc_ipv6_hdr_build(payload, src, dst);
     if (iphdr == NULL) {
         DEBUG("ndp internal: error allocating IPv6 header.\n");
         return NULL;

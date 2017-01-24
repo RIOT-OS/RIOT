@@ -13,13 +13,14 @@
  * @file
  * @brief       nRF52 specific CPU configuration
  *
- * @author      Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  */
 
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include "cpu_conf_common.h"
 #include "nrf52.h"
 #include "nrf52_bitfields.h"
 
@@ -31,9 +32,33 @@ extern "C" {
  * @brief   ARM Cortex-M specific CPU configuration
  * @{
  */
-#define CPU_DEFAULT_IRQ_PRIO            (1U)
-#define CPU_IRQ_NUMOF                   (38)
+#define CPU_DEFAULT_IRQ_PRIO            (2U)
+#define CPU_IRQ_NUMOF                   (38U)
 #define CPU_FLASH_BASE                  (0x00000000)
+/** @} */
+
+/**
+ * @brief   Flash page configuration
+ * @{
+ */
+#define FLASHPAGE_SIZE                  (4096U)
+
+#if defined(CPU_MODEL_NRF52XXAA)
+#define FLASHPAGE_NUMOF                 (128U)
+#endif
+/** @} */
+
+/**
+ * @brief   SoftDevice settings
+ * @{
+ */
+#ifdef SOFTDEVICE_PRESENT
+#ifndef DONT_OVERRIDE_NVIC
+#include "nrf_soc.h"
+#undef NVIC_SetPriority
+#define NVIC_SetPriority    sd_nvic_SetPriority
+#endif /* DONT_OVERRIDE_NVIC */
+#endif /* SOFTDEVICE_PRESENT */
 /** @} */
 
 #ifdef __cplusplus

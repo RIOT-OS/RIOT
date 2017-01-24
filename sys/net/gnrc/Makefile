@@ -55,9 +55,6 @@ endif
 ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
     DIRS += netapi
 endif
-ifneq (,$(filter gnrc_netdev_eth,$(USEMODULE)))
-    DIRS += link_layer/netdev_eth
-endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
     DIRS += netif
 endif
@@ -73,11 +70,17 @@ endif
 ifneq (,$(filter gnrc_nomac,$(USEMODULE)))
     DIRS += link_layer/nomac
 endif
+ifneq (,$(filter gnrc_mac,$(USEMODULE)))
+    DIRS += link_layer/gnrc_mac
+endif
 ifneq (,$(filter gnrc_pkt,$(USEMODULE)))
     DIRS += pkt
 endif
 ifneq (,$(filter gnrc_pktbuf_static,$(USEMODULE)))
     DIRS += pktbuf_static
+endif
+ifneq (,$(filter gnrc_priority_pktqueue,$(USEMODULE)))
+    DIRS += priority_pktqueue
 endif
 ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
     DIRS += pktdump
@@ -87,6 +90,9 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_rpl_srh,$(USEMODULE)))
     DIRS += routing/rpl/srh
+endif
+ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
+    DIRS += routing/rpl/p2p
 endif
 ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
     DIRS += network_layer/sixlowpan
@@ -112,8 +118,20 @@ endif
 ifneq (,$(filter gnrc_slip,$(USEMODULE)))
     DIRS += link_layer/slip
 endif
+ifneq (,$(filter gnrc_sock,$(USEMODULE)))
+    DIRS += sock
+endif
+ifneq (,$(filter gnrc_sock_ip,$(USEMODULE)))
+    DIRS += sock/ip
+endif
+ifneq (,$(filter gnrc_sock_udp,$(USEMODULE)))
+    DIRS += sock/udp
+endif
 ifneq (,$(filter gnrc_udp,$(USEMODULE)))
     DIRS += transport_layer/udp
+endif
+ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
+    DIRS += transport_layer/tcp
 endif
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
     DIRS += application_layer/zep

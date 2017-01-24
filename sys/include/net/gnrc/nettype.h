@@ -22,8 +22,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_NETTYPE_H_
-#define GNRC_NETTYPE_H_
+#ifndef GNRC_NETTYPE_H
+#define GNRC_NETTYPE_H
 
 #include <inttypes.h>
 
@@ -63,6 +63,9 @@ typedef enum {
 #ifdef MODULE_GNRC_IPV6
     GNRC_NETTYPE_IPV6,          /**< Protocol is IPv6 */
 #endif
+#ifdef MODULE_GNRC_IPV6_EXT
+    GNRC_NETTYPE_IPV6_EXT,      /**< Protocol is IPv6 extension header */
+#endif
 #ifdef MODULE_GNRC_ICMPV6
     GNRC_NETTYPE_ICMPV6,        /**< Protocol is ICMPv6 */
 #endif
@@ -97,6 +100,9 @@ typedef enum {
 #ifdef TEST_SUITES
     GNRC_NETTYPE_TEST,
 #endif
+    /**
+     * @}
+     */
 
     GNRC_NETTYPE_NUMOF,         /**< maximum number of available protocols */
 } gnrc_nettype_t;
@@ -185,6 +191,16 @@ static inline gnrc_nettype_t gnrc_nettype_from_protnum(uint8_t num)
         case PROTNUM_UDP:
             return GNRC_NETTYPE_UDP;
 #endif
+#ifdef MODULE_GNRC_IPV6_EXT
+        case PROTNUM_IPV6_EXT_HOPOPT:
+        case PROTNUM_IPV6_EXT_DST:
+        case PROTNUM_IPV6_EXT_RH:
+        case PROTNUM_IPV6_EXT_FRAG:
+        case PROTNUM_IPV6_EXT_AH:
+        case PROTNUM_IPV6_EXT_ESP:
+        case PROTNUM_IPV6_EXT_MOB:
+            return GNRC_NETTYPE_IPV6_EXT;
+#endif
         default:
             return GNRC_NETTYPE_UNDEF;
     }
@@ -229,5 +245,5 @@ static inline uint8_t gnrc_nettype_to_protnum(gnrc_nettype_t type)
 }
 #endif
 
-#endif /* GNRC_NETTYPE_H_ */
+#endif /* GNRC_NETTYPE_H */
 /** @} */

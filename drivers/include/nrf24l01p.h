@@ -130,7 +130,7 @@ typedef enum {
 * @param[in] reg    Register address to read from.
 * @param[in] answer Byte to read.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer);
@@ -142,7 +142,7 @@ int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer);
 * @param[in] reg    Register address to write to.
 * @param[in] write  Byte to write.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write);
@@ -159,7 +159,7 @@ int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write);
 * @param[in] csn    GPIO pin to use for chip select.
 * @param[in] irq    GPIO pin to use for interrupt request.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t csn, gpio_t irq);
@@ -169,7 +169,7 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t csn, gpio_t ir
 *
 * @param[in] dev    Transceiver device to use.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_on(nrf24l01p_t *dev);
@@ -179,7 +179,7 @@ int nrf24l01p_on(nrf24l01p_t *dev);
 *
 * @param[in] dev    Transceiver device to use.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_off(nrf24l01p_t *dev);
@@ -249,7 +249,7 @@ int nrf24l01p_unregister(nrf24l01p_t *dev, unsigned int pid);
 * @brief Get ID from the nrf24l01p transceiver.
 *
 * @param[in] dev    Transceiver device to use.
-* @param[in] pid    T.ransceiver ID
+* @param[in] pid    Transceiver ID.
 *
 */
 void nrf24l01p_get_id(nrf24l01p_t *dev, unsigned int *pid);
@@ -277,7 +277,7 @@ void nrf24l01p_stop(nrf24l01p_t *dev);
 * @param[in] data   Buffer to preload.
 * @param[in] size   Number of bytes in buffer. For nrf24l01+ e.g. 32
 *
-* @return           0 on success.
+* @return           Number of bytes that were transfered.
 * @return           -1 on error.
 */
 int nrf24l01p_preload(nrf24l01p_t *dev, char *data, unsigned int size);
@@ -292,7 +292,7 @@ int nrf24l01p_preload(nrf24l01p_t *dev, char *data, unsigned int size);
 * @param[in] dev    Transceiver device to use.
 * @param[in] chan   Buffer to preload.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_set_channel(nrf24l01p_t *dev, uint8_t chan);
@@ -303,7 +303,7 @@ int nrf24l01p_set_channel(nrf24l01p_t *dev, uint8_t chan);
 * @param[in] dev    Transceiver device to use.
 * @param[in] aw     Address width (type nrf24l01p_aw_t).
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_set_address_width(nrf24l01p_t *dev, nrf24l01p_aw_t aw);
@@ -319,7 +319,7 @@ int nrf24l01p_set_address_width(nrf24l01p_t *dev, nrf24l01p_aw_t aw);
 * @param[in] pipe   RX pipe to set the payload width.
 * @param[in] width  Numer of bytes per packet in RX payload.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char width);
@@ -336,7 +336,7 @@ int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char
 * @param[in] saddr  Byte array which holds the TX address.
 * @param[in] length Number of bytes in address array.
 *
-* @return           1 on success.
+* @return           Address length on success.
 * @return           -1 on error.
 */
 int nrf24l01p_set_tx_address(nrf24l01p_t *dev, char *saddr, unsigned int length);
@@ -348,7 +348,7 @@ int nrf24l01p_set_tx_address(nrf24l01p_t *dev, char *saddr, unsigned int length)
 * @param[in] saddr  Long integer which holds the TX address in LSBs.
 * @param[in] length Number of relevant bytes in uint64_t.
 *
-* @return           1 on success.
+* @return           Address length on success.
 * @return           -1 on error.
 */
 int nrf24l01p_set_tx_address_long(nrf24l01p_t *dev, uint64_t saddr, unsigned int length);
@@ -366,7 +366,7 @@ int nrf24l01p_set_tx_address_long(nrf24l01p_t *dev, uint64_t saddr, unsigned int
 * @param[in] saddr  Byte array which holds the RX address.
 * @param[in] length Number of bytes in address array.
 *
-* @return           1 on success.
+* @return           Address length on success.
 * @return           -1 on error.
 */
 int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *saddr, unsigned int length);
@@ -379,7 +379,7 @@ int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *s
 * @param[in] saddr  Long integer which holds the RX address in LSBs.
 * @param[in] length Number of relevant bytes in uint64_t.
 *
-* @return           1 on success.
+* @return           Address length on success.
 * @return           -1 on error.
 */
 int nrf24l01p_set_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint64_t saddr, unsigned int length);
@@ -390,6 +390,7 @@ int nrf24l01p_set_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, ui
 * @param[in] dev    Transceiver device to use.
 *
 * @return           TX address of the nrf24l01+ transceiver.
+* @return           -1 on error.
 */
 uint64_t nrf24l01p_get_tx_address_long(nrf24l01p_t *dev);
 
@@ -400,6 +401,7 @@ uint64_t nrf24l01p_get_tx_address_long(nrf24l01p_t *dev);
 * @param[in] pipe   RX pipe to get the address from.
 *
 * @return           RX address of the nrf24l01+ transceiver.
+* @return           -1 on error.
 */
 uint64_t nrf24l01p_get_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
 
@@ -454,7 +456,7 @@ int nrf24l01p_get_power(nrf24l01p_t *dev);
 *
 * @param[in] dev    Transceiver device to use.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_set_txmode(nrf24l01p_t *dev);
@@ -464,7 +466,7 @@ int nrf24l01p_set_txmode(nrf24l01p_t *dev);
 *
 * @param[in] dev    Transceiver device to use.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_set_rxmode(nrf24l01p_t *dev);
@@ -501,7 +503,7 @@ int nrf24l01p_reset_interrupts(nrf24l01p_t *dev, char intrs);
 * @param[in] dev    Transceiver device to use.
 * @param[in] intr   Transceiver device to use.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_mask_interrupt(nrf24l01p_t *dev, char intr);
@@ -517,7 +519,7 @@ int nrf24l01p_mask_interrupt(nrf24l01p_t *dev, char intr);
 * @param[in] dev    Transceiver device to use.
 * @param[in] intr   Transceiver device to use.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_unmask_interrupt(nrf24l01p_t *dev, char intr);
@@ -528,7 +530,7 @@ int nrf24l01p_unmask_interrupt(nrf24l01p_t *dev, char intr);
 * @param[in] dev    Transceiver device to use.
 * @param[in] pipe   RX pipe to enable.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_enable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
@@ -539,7 +541,7 @@ int nrf24l01p_enable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
 * @param[in] dev    Transceiver device to use.
 * @param[in] pipe   RX pipe to disable.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_disable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
@@ -550,7 +552,7 @@ int nrf24l01p_disable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
 * @param[in] dev    Transceiver device to use.
 * @param[in] crc    Length of cyclic redundancy check (type nrf24l01p_crc_t).
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_enable_crc(nrf24l01p_t *dev, nrf24l01p_crc_t crc);
@@ -568,7 +570,7 @@ int nrf24l01p_enable_crc(nrf24l01p_t *dev, nrf24l01p_crc_t crc);
                               (type nrf24l01p_retransmit_delay_t)
 * @param[in] count_retrans    Auto retransmit count.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_setup_auto_ack(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l01p_retransmit_delay_t delay_retrans, char count_retrans);
@@ -578,7 +580,7 @@ int nrf24l01p_setup_auto_ack(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l0
 *
 * @param[in] dev    Transceiver device to use.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_disable_all_auto_ack(nrf24l01p_t *dev);
@@ -588,7 +590,7 @@ int nrf24l01p_disable_all_auto_ack(nrf24l01p_t *dev);
 *
 * @param[in] dev    Transceiver device to use.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_flush_tx_fifo(nrf24l01p_t *dev);
@@ -598,7 +600,7 @@ int nrf24l01p_flush_tx_fifo(nrf24l01p_t *dev);
 *
 * @param[in] dev    Transceiver device to use.
 *
-* @return           1 on success.
+* @return           0 on success.
 * @return           -1 on error.
 */
 int nrf24l01p_flush_rx_fifo(nrf24l01p_t *dev);

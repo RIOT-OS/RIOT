@@ -26,8 +26,8 @@
 
 #include "crypto/ciphers.h"
 
-#ifndef THREEDES_H_
-#define THREEDES_H_
+#ifndef THREEDES_H
+#define THREEDES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -85,8 +85,9 @@ static const uint32_t bigbyte[24] = {
  * @param   keySize     the size of the key
 
  *
- * @return  Whether initialization was successful. The command may be
- *          unsuccessful if the key size is not valid.
+ * @return  CIPHER_INIT_SUCCESS if the initialization was successful.
+ *          The command may be unsuccessful if the key size is not valid.
+ *          CIPHER_ERR_BAD_CONTEXT_SIZE if CIPHER_MAX_CONTEXT_SIZE has not been defined (which means that the cipher has not been included in the build)
  */
 int tripledes_init(cipher_context_t *context, const uint8_t* key, uint8_t keySize);
 
@@ -133,4 +134,4 @@ int tripledes_decrypt(const cipher_context_t *context, const uint8_t *crypt, uin
 #endif
 
 /** @} */
-#endif /* THREEDES_H_ */
+#endif /* THREEDES_H */

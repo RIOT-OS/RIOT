@@ -26,10 +26,10 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU_X86_CPU_H_
-#define CPU_X86_CPU_H_
+#ifndef CPU_X86_CPU_H
+#define CPU_X86_CPU_H
 
-#include "attributes.h"
+#include "kernel_defines.h"
 #include "irq.h"
 #include "ucontext.h"
 #include "cpu_conf.h"
@@ -59,8 +59,8 @@ extern "C" {
 static inline void __attribute__((always_inline, noreturn)) x86_hlt(void)
 {
     while (1) {
-        asm volatile ("cli");
-        asm volatile ("hlt");
+        __asm__ volatile ("cli");
+        __asm__ volatile ("hlt");
     }
 }
 
@@ -131,6 +131,6 @@ static inline void cpu_print_last_instruction(void)
 }
 #endif
 
-#endif
+#endif /* CPU_X86_CPU_H */
 
 /** @} */

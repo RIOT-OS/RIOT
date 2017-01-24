@@ -61,7 +61,8 @@ gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_lookup_addr(const ipv6_addr_t *addr)
 
 #if ENABLE_DEBUG
     if (res != NULL) {
-        DEBUG("6lo ctx: found context (%u, %s/%" PRIu8 ") ", res->id,
+        DEBUG("6lo ctx: found context (%u, %s/%" PRIu8 ") ",
+              (res->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK),
               ipv6_addr_to_str(ipv6str, &res->prefix, sizeof(ipv6str)),
               res->prefix_len);
         DEBUG("for address %s\n", ipv6_addr_to_str(ipv6str, addr, sizeof(ipv6str)));
@@ -132,7 +133,7 @@ gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_update(uint8_t id, const ipv6_addr_t *p
 
 static uint32_t _current_minute(void)
 {
-    return xtimer_now() / (SEC_IN_USEC * 60);
+    return xtimer_now_usec() / (US_PER_SEC * 60);
 }
 
 static void _update_lifetime(uint8_t id)

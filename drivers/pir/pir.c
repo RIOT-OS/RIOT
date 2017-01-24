@@ -41,7 +41,7 @@ int pir_init(pir_t *dev, gpio_t gpio)
 {
     dev->gpio_dev = gpio;
     dev->msg_thread_pid = KERNEL_PID_UNDEF;
-    return gpio_init(dev->gpio_dev, GPIO_DIR_IN, GPIO_NOPULL);
+    return gpio_init(dev->gpio_dev, GPIO_IN);
 }
 
 pir_event_t pir_get_status(pir_t *dev)
@@ -58,7 +58,7 @@ int pir_register_thread(pir_t *dev)
         }
     }
     else {
-        DEBUG("pir_register_thread: activating interrupt for %p..\n", dev);
+        DEBUG("pir_register_thread: activating interrupt for %p..\n", (void *)dev);
         if (pir_activate_int(dev) != 0) {
             DEBUG("\tfailed\n");
             return -1;
@@ -77,7 +77,7 @@ int pir_register_thread(pir_t *dev)
 static void pir_send_msg(pir_t *dev, pir_event_t event)
 {
     DEBUG("pir_send_msg\n");
-    msg_t m = { .type = event, .content.ptr = (char*) dev, };
+    msg_t m = { .type = event, .content.ptr = dev, };
 
     int ret = msg_send_int(&m, dev->msg_thread_pid);
     DEBUG("pir_send_msg: msg_send_int: %i\n", ret);
@@ -93,6 +93,7 @@ static void pir_send_msg(pir_t *dev, pir_event_t event)
             dev->msg_thread_pid = KERNEL_PID_UNDEF;
             break;
     }
+    DEBUG("\n");
 }
 
 static void pir_callback(void *arg)
@@ -106,5 +107,5 @@ static void pir_callback(void *arg)
 
 static int pir_activate_int(pir_t *dev)
 {
-    return gpio_init_int(dev->gpio_dev, GPIO_NOPULL, GPIO_BOTH, pir_callback, dev);
+    return gpio_init_int(dev->gpio_dev, GPIO_IN, GPIO_BOTH, pir_callback, dev);
 }

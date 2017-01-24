@@ -14,8 +14,8 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef __SYS__POSIX__PTHREAD_BARRIER__H
-#define __SYS__POSIX__PTHREAD_BARRIER__H
+#ifndef SYS__POSIX__PTHREAD_BARRIER__H
+#define SYS__POSIX__PTHREAD_BARRIER__H
 
 #include "mutex.h"
 
@@ -54,7 +54,7 @@ typedef struct pthread_barrier_waiting_node
  *            For a zeroed out datum you do not need to call the initializer,
  *            it is enough to set pthread_barrier_t::count.
  */
-typedef struct pthread_barrier
+typedef struct
 {
     struct pthread_barrier_waiting_node *next; /**< The first waiting thread. */
     mutex_t mutex; /**< Mutex to unlock to wake the thread up. */
@@ -66,7 +66,7 @@ typedef struct pthread_barrier
  * @details   RIOT does not need this structure, because it is a single process OS.
  *            This is only here to POSIX compatibility.
  */
-typedef struct pthread_barrierattr
+typedef struct
 {
     int pshared; /**< See pthread_barrierattr_setpshared() and pthread_barrierattr_getpshared(). */
 } pthread_barrierattr_t;
@@ -136,7 +136,7 @@ int pthread_barrierattr_setpshared(pthread_barrierattr_t *attr, int pshared);
 }
 #endif
 
-#endif
+#endif /* SYS__POSIX__PTHREAD_BARRIER__H */
 
 /**
  * @}

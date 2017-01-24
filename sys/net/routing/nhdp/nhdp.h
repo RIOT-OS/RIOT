@@ -18,11 +18,11 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
-#ifndef NHDP_H_
-#define NHDP_H_
+#ifndef NHDP_H
+#define NHDP_H
 
 #include "timex.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "kernel_types.h"
 
 #include "nhdp_metric.h"
@@ -88,9 +88,9 @@ extern "C" {
 /**
  * @brief   MANET interface representation
  */
-typedef struct nhdp_if_entry_t {
+typedef struct {
     kernel_pid_t if_pid;                        /**< PID of the interface's handling thread */
-    vtimer_t if_timer;                          /**< Vtimer used for the periodic signaling */
+    xtimer_t if_timer;                          /**< xtimer used for the periodic signaling */
     timex_t hello_interval;                     /**< Interval time for periodic HELLOs */
     timex_t validity_time;                      /**< Validity time for propagated information */
     uint16_t seq_no;                            /**< Sequence number of last send RFC5444 packet */
@@ -204,5 +204,5 @@ int nhdp_add_address(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
 }
 #endif
 
-#endif /* NHDP_H_ */
+#endif /* NHDP_H */
 /** @} */

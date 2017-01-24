@@ -21,8 +21,8 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
-#ifndef AT86RF2XX_REGISTERS_H_
-#define AT86RF2XX_REGISTERS_H_
+#ifndef AT86RF2XX_REGISTERS_H
+#define AT86RF2XX_REGISTERS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -348,5 +348,5 @@ extern "C" {
 }
 #endif
 
-#endif /* AT86RF2XX_REGISTERS_H_ */
+#endif /* AT86RF2XX_REGISTERS_H */
 /** @} */

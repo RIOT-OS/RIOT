@@ -23,14 +23,14 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 
-#ifdef __MACH__
-#define _XOPEN_SOURCE
-#endif
+#define __USE_GNU
+#include <signal.h>
+#undef __USE_GNU
+
+
 #include <ucontext.h>
-#ifdef __MACH__
-#undef _XOPEN_SOURCE
-#endif
 #include <err.h>
 
 #ifdef HAVE_VALGRIND_H
@@ -46,8 +46,6 @@
 
 #include <stdlib.h>
 
-#include "kernel_internal.h"
-#include "kernel.h"
 #include "irq.h"
 #include "sched.h"
 
@@ -68,6 +66,28 @@ ucontext_t end_context;
 char __end_stack[SIGSTKSZ];
 
 /**
+ * make the new context assign `_native_in_isr = 0` before resuming
+ */
+static void _native_mod_ctx_leave_sigh(ucontext_t *ctx)
+{
+#ifdef __MACH__
+    _native_saved_eip = ((ucontext_t *)ctx)->uc_mcontext->__ss.__eip;
+    ((ucontext_t *)ctx)->uc_mcontext->__ss.__eip = (unsigned int)&_native_sig_leave_handler;
+#elif defined(__FreeBSD__)
+    _native_saved_eip = ((struct sigcontext *)ctx)->sc_eip;
+    ((struct sigcontext *)ctx)->sc_eip = (unsigned int)&_native_sig_leave_handler;
+#else /* Linux */
+#if defined(__arm__)
+    _native_saved_eip = ((ucontext_t *)ctx)->uc_mcontext.arm_pc;
+    ((ucontext_t *)ctx)->uc_mcontext.arm_pc = (unsigned int)&_native_sig_leave_handler;
+#else /* Linux/x86 */
+    _native_saved_eip = ctx->uc_mcontext.gregs[REG_EIP];
+    ctx->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_handler;
+#endif
+#endif
+}
+
+/**
  * TODO: implement
  */
 void thread_print_stack(void)
@@ -76,19 +96,27 @@ void thread_print_stack(void)
     return;
 }
 
+/* This function calculates the ISR_usage */
+int thread_arch_isr_stack_usage(void)
+{
+    /* TODO */
+    return -1;
+}
+
 char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stacksize)
 {
     char *stk;
     ucontext_t *p;
 
     VALGRIND_STACK_REGISTER(stack_start, (char *) stack_start + stacksize);
-    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", stack_start, (void*)((int)stack_start + stacksize));
+    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
+                   stack_start, (void*)((int)stack_start + stacksize));
 
     DEBUG("thread_stack_init\n");
 
     stk = stack_start;
 
-    p = (ucontext_t *)(stk + ((stacksize - sizeof(ucontext_t)) / sizeof(void *)));
+    p = (ucontext_t *)(stk + (stacksize - sizeof(ucontext_t)));
     stacksize -= sizeof(ucontext_t);
 
     if (getcontext(p) == -1) {
@@ -121,10 +149,8 @@ void isr_cpu_switch_context_exit(void)
     DEBUG("isr_cpu_switch_context_exit: calling setcontext(%" PRIkernel_pid ")\n\n", sched_active_pid);
     ctx = (ucontext_t *)(sched_active_thread->sp);
 
-    /* the next context will have interrupts enabled due to ucontext */
-    DEBUG("isr_cpu_switch_context_exit: native_interrupts_enabled = 1;\n");
     native_interrupts_enabled = 1;
-    _native_in_isr = 0;
+    _native_mod_ctx_leave_sigh(ctx);
 
     if (setcontext(ctx) == -1) {
         err(EXIT_FAILURE, "isr_cpu_switch_context_exit: setcontext");
@@ -142,14 +168,14 @@ void cpu_switch_context_exit(void)
 #endif
 
     if (_native_in_isr == 0) {
-        disableIRQ();
+        irq_disable();
         _native_in_isr = 1;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
-        native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+        native_isr_context.uc_stack.ss_size = sizeof(__isr_stack);
         native_isr_context.uc_stack.ss_flags = 0;
         makecontext(&native_isr_context, isr_cpu_switch_context_exit, 0);
         if (setcontext(&native_isr_context) == -1) {
-            err(EXIT_FAILURE, "cpu_switch_context_exit: swapcontext");
+            err(EXIT_FAILURE, "cpu_switch_context_exit: setcontext");
         }
         errx(EXIT_FAILURE, "1 this should have never been reached!!");
     }
@@ -163,12 +189,18 @@ void isr_thread_yield(void)
 {
     DEBUG("isr_thread_yield\n");
 
+    if (_native_sigpend > 0) {
+        DEBUG("isr_thread_yield(): handling signals\n\n");
+        native_irq_handler();
+    }
+
     sched_run();
     ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
     DEBUG("isr_thread_yield: switching to(%" PRIkernel_pid ")\n\n", sched_active_pid);
 
     native_interrupts_enabled = 1;
-    _native_in_isr = 0;
+    _native_mod_ctx_leave_sigh(ctx);
+
     if (setcontext(ctx) == -1) {
         err(EXIT_FAILURE, "isr_thread_yield: setcontext");
     }
@@ -176,10 +208,13 @@ void isr_thread_yield(void)
 
 void thread_yield_higher(void)
 {
-    ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
     if (_native_in_isr == 0) {
+        ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
         _native_in_isr = 1;
-        disableIRQ();
+        if (!native_interrupts_enabled) {
+            warnx("thread_yield_higher: interrupts are disabled - this should not be");
+        }
+        irq_disable();
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
         native_isr_context.uc_stack.ss_flags = 0;
@@ -187,7 +222,7 @@ void thread_yield_higher(void)
         if (swapcontext(ctx, &native_isr_context) == -1) {
             err(EXIT_FAILURE, "thread_yield_higher: swapcontext");
         }
-        enableIRQ();
+        irq_enable();
     }
     else {
         isr_thread_yield();
@@ -205,7 +240,8 @@ void native_cpu_init(void)
     end_context.uc_stack.ss_flags = 0;
     makecontext(&end_context, sched_task_exit, 0);
     VALGRIND_STACK_REGISTER(__end_stack, __end_stack + sizeof(__end_stack));
-    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", __end_stack, (void*)((int)__end_stack + sizeof(__end_stack)));
+    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
+                   (void*)__end_stack, (void*)((int)__end_stack + sizeof(__end_stack)));
 
     DEBUG("RIOT native cpu initialized.\n");
 }

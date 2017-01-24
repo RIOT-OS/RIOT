@@ -1,0 +1,28 @@
+# define the used CPU
+export CPU = nrf51
+export CPU_MODEL = nrf51x22xxab
+
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# we support flashing through plain fscopy or using JLink
+FLASHTOOL ?= fscopy
+ifeq (fscopy,$(FLASHTOOL))
+  export OFLAGS = -O ihex
+  export HEXFILE = $(ELFFILE:.elf=.hex)
+  export FFLAGS =
+  export DEBUGGER_FLAGS =
+
+  export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+  export DEBUGGER =
+  export DEBUGSERVER =
+else ifeq (jlink,$(FLASHTOOL))
+  export JLINK_DEVICE := nrf51822
+  include $(RIOTBOARD)/Makefile.include.jlink
+else
+  $(info ERROR: invalid flash tool specified)
+endif

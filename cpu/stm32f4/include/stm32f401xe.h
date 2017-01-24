@@ -49,8 +49,8 @@
   * @{
   */
 
-#ifndef __STM32F401xE_H
-#define __STM32F401xE_H
+#ifndef STM32F401xE_H
+#define STM32F401xE_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -498,10 +498,7 @@ typedef struct
   __IO uint32_t PSC;         /*!< TIM prescaler,                       Address offset: 0x28 */
   __IO uint32_t ARR;         /*!< TIM auto-reload register,            Address offset: 0x2C */
   __IO uint32_t RCR;         /*!< TIM repetition counter register,     Address offset: 0x30 */
-  __IO uint32_t CCR1;        /*!< TIM capture/compare register 1,      Address offset: 0x34 */
-  __IO uint32_t CCR2;        /*!< TIM capture/compare register 2,      Address offset: 0x38 */
-  __IO uint32_t CCR3;        /*!< TIM capture/compare register 3,      Address offset: 0x3C */
-  __IO uint32_t CCR4;        /*!< TIM capture/compare register 4,      Address offset: 0x40 */
+  __IO uint32_t CCR[4];      /*!< TIM capture/compare register 1-4,    Address offset: 0x34 */
   __IO uint32_t BDTR;        /*!< TIM break and dead-time register,    Address offset: 0x44 */
   __IO uint32_t DCR;         /*!< TIM DMA control register,            Address offset: 0x48 */
   __IO uint32_t DMAR;        /*!< TIM DMA address for full transfer,   Address offset: 0x4C */
@@ -4764,7 +4761,7 @@ USB_OTG_HostChannelTypeDef;
 }
 #endif /* __cplusplus */
 
-#endif /* __STM32F401xE_H */
+#endif /* STM32F401xE_H */
 
 
 

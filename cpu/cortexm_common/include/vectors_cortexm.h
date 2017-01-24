@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef VECTORS_DEFAULT_H_
-#define VECTORS_DEFAULT_H_
+#ifndef VECTORS_DEFAULT_H
+#define VECTORS_DEFAULT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -114,5 +114,5 @@ void dummy_handler_default(void);
 }
 #endif
 
-#endif /* VECTORS_DEFAULT_H_ */
+#endif /* VECTORS_DEFAULT_H */
 /** @} */

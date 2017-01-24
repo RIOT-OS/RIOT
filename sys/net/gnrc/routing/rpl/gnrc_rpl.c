@@ -21,13 +21,18 @@
 #include "mutex.h"
 
 #include "net/gnrc/rpl.h"
+#ifdef MODULE_GNRC_RPL_P2P
+#include "net/gnrc/rpl/p2p.h"
+#include "net/gnrc/rpl/p2p_dodag.h"
+#endif
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 static char _stack[GNRC_RPL_STACK_SIZE];
 kernel_pid_t gnrc_rpl_pid = KERNEL_PID_UNDEF;
-static uint32_t _lt_time = GNRC_RPL_LIFETIME_UPDATE_STEP * SEC_IN_USEC;
+const ipv6_addr_t ipv6_addr_all_rpl_nodes = GNRC_RPL_ALL_NODES_ADDR;
+static uint32_t _lt_time = GNRC_RPL_LIFETIME_UPDATE_STEP * US_PER_SEC;
 static xtimer_t _lt_timer;
 static msg_t _lt_msg = { .type = GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE };
 static msg_t _msg_q[GNRC_RPL_MSG_QUEUE_SIZE];
@@ -37,6 +42,10 @@ static uint8_t _instance_id;
 
 gnrc_rpl_instance_t gnrc_rpl_instances[GNRC_RPL_INSTANCES_NUMOF];
 gnrc_rpl_parent_t gnrc_rpl_parents[GNRC_RPL_PARENTS_NUMOF];
+
+#ifdef MODULE_NETSTATS_RPL
+netstats_rpl_t gnrc_rpl_netstats;
+#endif
 
 static void _update_lifetime(void);
 static void _dao_handle_send(gnrc_rpl_dodag_t *dodag);
@@ -59,19 +68,22 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
         }
 
         _me_reg.demux_ctx = ICMPV6_RPL_CTRL;
-        _me_reg.pid = gnrc_rpl_pid;
+        _me_reg.target.pid = gnrc_rpl_pid;
         /* register interest in all ICMPv6 packets */
         gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &_me_reg);
 
         gnrc_rpl_of_manager_init();
         xtimer_set_msg(&_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
+
+#ifdef MODULE_NETSTATS_RPL
+        memset(&gnrc_rpl_netstats, 0, sizeof(gnrc_rpl_netstats));
+#endif
     }
 
     /* register all_RPL_nodes multicast address */
-    ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
-    gnrc_ipv6_netif_add_addr(if_pid, &all_RPL_nodes, IPV6_ADDR_BIT_LEN, 0);
+    gnrc_ipv6_netif_add_addr(if_pid, &ipv6_addr_all_rpl_nodes, IPV6_ADDR_BIT_LEN, 0);
 
-    gnrc_rpl_send_DIS(NULL, &all_RPL_nodes);
+    gnrc_rpl_send_DIS(NULL, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes);
     return gnrc_rpl_pid;
 }
 
@@ -84,7 +96,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
 
     gnrc_rpl_dodag_t *dodag = NULL;
     gnrc_rpl_instance_t *inst = gnrc_rpl_root_instance_init(instance_id, dodag_id,
-                                                         GNRC_RPL_DEFAULT_MOP);
+                                                            GNRC_RPL_DEFAULT_MOP);
 
     if (!inst) {
         return NULL;
@@ -103,9 +115,9 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
     dodag->grounded = GNRC_RPL_GROUNDED;
     dodag->node_status = GNRC_RPL_ROOT_NODE;
     dodag->my_rank = GNRC_RPL_ROOT_RANK;
-    dodag->req_opts |= GNRC_RPL_REQ_OPT_DODAG_CONF;
+    dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_DODAG_CONF;
 #ifndef GNRC_RPL_WITHOUT_PIO
-    dodag->req_opts |= GNRC_RPL_REQ_OPT_PREFIX_INFO;
+    dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO;
 #endif
 
     trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL,
@@ -117,13 +129,21 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
 
 static void _receive(gnrc_pktsnip_t *icmpv6)
 {
-    gnrc_pktsnip_t *ipv6 = NULL;
-    ipv6_hdr_t *ipv6_hdr = NULL;
-    icmpv6_hdr_t *icmpv6_hdr = NULL;
+    gnrc_pktsnip_t *ipv6, *netif;
+    ipv6_hdr_t *ipv6_hdr;
+    icmpv6_hdr_t *icmpv6_hdr;
+    kernel_pid_t iface = KERNEL_PID_UNDEF;
+
+    assert(icmpv6 != NULL);
 
     ipv6 = gnrc_pktsnip_search_type(icmpv6, GNRC_NETTYPE_IPV6);
+    netif = gnrc_pktsnip_search_type(icmpv6, GNRC_NETTYPE_NETIF);
 
     assert(ipv6 != NULL);
+
+    if (netif) {
+        iface = ((gnrc_netif_hdr_t *)netif->data)->if_pid;
+    }
 
     ipv6_hdr = (ipv6_hdr_t *)ipv6->data;
 
@@ -131,24 +151,42 @@ static void _receive(gnrc_pktsnip_t *icmpv6)
     switch (icmpv6_hdr->code) {
         case GNRC_RPL_ICMPV6_CODE_DIS:
             DEBUG("RPL: DIS received\n");
-            gnrc_rpl_recv_DIS((gnrc_rpl_dis_t *)(icmpv6_hdr + 1), &ipv6_hdr->src, &ipv6_hdr->dst,
-                    byteorder_ntohs(ipv6_hdr->len));
+            gnrc_rpl_recv_DIS((gnrc_rpl_dis_t *)(icmpv6_hdr + 1), iface, &ipv6_hdr->src,
+                              &ipv6_hdr->dst, byteorder_ntohs(ipv6_hdr->len));
             break;
         case GNRC_RPL_ICMPV6_CODE_DIO:
             DEBUG("RPL: DIO received\n");
-            gnrc_rpl_recv_DIO((gnrc_rpl_dio_t *)(icmpv6_hdr + 1), &ipv6_hdr->src,
-                    byteorder_ntohs(ipv6_hdr->len));
+            gnrc_rpl_recv_DIO((gnrc_rpl_dio_t *)(icmpv6_hdr + 1), iface, &ipv6_hdr->src,
+                              &ipv6_hdr->dst, byteorder_ntohs(ipv6_hdr->len));
             break;
         case GNRC_RPL_ICMPV6_CODE_DAO:
             DEBUG("RPL: DAO received\n");
-            gnrc_rpl_recv_DAO((gnrc_rpl_dao_t *)(icmpv6_hdr + 1), &ipv6_hdr->src,
-                    byteorder_ntohs(ipv6_hdr->len));
+            gnrc_rpl_recv_DAO((gnrc_rpl_dao_t *)(icmpv6_hdr + 1), iface, &ipv6_hdr->src,
+                              &ipv6_hdr->dst, byteorder_ntohs(ipv6_hdr->len));
             break;
         case GNRC_RPL_ICMPV6_CODE_DAO_ACK:
             DEBUG("RPL: DAO-ACK received\n");
-            gnrc_rpl_recv_DAO_ACK((gnrc_rpl_dao_ack_t *)(icmpv6_hdr + 1),
-                    byteorder_ntohs(ipv6_hdr->len));
+            gnrc_rpl_recv_DAO_ACK((gnrc_rpl_dao_ack_t *)(icmpv6_hdr + 1), iface, &ipv6_hdr->src,
+                                  &ipv6_hdr->dst, byteorder_ntohs(ipv6_hdr->len));
             break;
+#ifdef MODULE_GNRC_RPL_P2P
+        case GNRC_RPL_P2P_ICMPV6_CODE_DRO:
+            DEBUG("RPL: P2P DRO received\n");
+            gnrc_pktsnip_t *icmpv6_snip = gnrc_pktbuf_add(NULL, NULL, icmpv6->size,
+                                                          GNRC_NETTYPE_ICMPV6);
+            if (icmpv6_snip == NULL) {
+                DEBUG("RPL-P2P: cannot copy ICMPv6 packet\n");
+                break;
+            }
+
+            memcpy(icmpv6_snip->data, icmpv6->data, icmpv6->size);
+
+            gnrc_rpl_p2p_recv_DRO(icmpv6_snip, &ipv6_hdr->src);
+            break;
+        case GNRC_RPL_P2P_ICMPV6_CODE_DRO_ACK:
+            DEBUG("RPL: P2P DRO-ACK received\n");
+            break;
+#endif
         default:
             DEBUG("RPL: Unknown ICMPV6 code received\n");
             break;
@@ -180,21 +218,21 @@ static void *_event_loop(void *args)
                 break;
             case GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL:
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL received\n");
-                trickle = (trickle_t *) msg.content.ptr;
+                trickle = msg.content.ptr;
                 if (trickle && (trickle->callback.func != NULL)) {
                     trickle_interval(trickle);
                 }
                 break;
             case GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK:
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK received\n");
-                trickle = (trickle_t *) msg.content.ptr;
+                trickle = msg.content.ptr;
                 if (trickle && (trickle->callback.func != NULL)) {
                     trickle_callback(trickle);
                 }
                 break;
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 DEBUG("RPL: GNRC_NETAPI_MSG_TYPE_RCV received\n");
-                _receive((gnrc_pktsnip_t *)msg.content.ptr);
+                _receive(msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 break;
@@ -214,8 +252,8 @@ static void *_event_loop(void *args)
 
 void _update_lifetime(void)
 {
-    uint32_t now = xtimer_now();
-    uint16_t now_sec = now / SEC_IN_USEC;
+    uint32_t now = xtimer_now_usec();
+    uint16_t now_sec = now / US_PER_SEC;
 
     gnrc_rpl_parent_t *parent;
     gnrc_rpl_instance_t *inst;
@@ -257,6 +295,10 @@ void _update_lifetime(void)
         }
     }
 
+#ifdef MODULE_GNRC_RPL_P2P
+    gnrc_rpl_p2p_update();
+#endif
+
     xtimer_set_msg(&_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
 }
 
@@ -276,6 +318,11 @@ void gnrc_rpl_long_delay_dao(gnrc_rpl_dodag_t *dodag)
 
 void _dao_handle_send(gnrc_rpl_dodag_t *dodag)
 {
+#ifdef MODULE_GNRC_RPL_P2P
+    if (dodag->instance->mop == GNRC_RPL_P2P_MOP) {
+        return;
+    }
+#endif
     if ((dodag->dao_ack_received == false) && (dodag->dao_counter < GNRC_RPL_DAO_SEND_RETRIES)) {
         dodag->dao_counter++;
         gnrc_rpl_send_DAO(dodag->instance, NULL, dodag->default_lifetime);

@@ -97,8 +97,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_SIXLOWPAN_H_
-#define GNRC_SIXLOWPAN_H_
+#ifndef GNRC_SIXLOWPAN_H
+#define GNRC_SIXLOWPAN_H
 
 #include <stdbool.h>
 
@@ -150,5 +150,5 @@ kernel_pid_t gnrc_sixlowpan_init(void);
 }
 #endif
 
-#endif /* GNRC_SIXLOWPAN_H_ */
+#endif /* GNRC_SIXLOWPAN_H */
 /** @} */

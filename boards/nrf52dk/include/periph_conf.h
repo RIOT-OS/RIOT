@@ -20,6 +20,8 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,16 +42,14 @@ extern "C" {
  * @brief Timer configuration
  * @{
  */
-#define TIMER_NUMOF         (1U)
-#define TIMER_0_EN          1
+static const timer_conf_t timer_config[] = {
+    /* dev, channels, width, IRQn */
+    { NRF_TIMER1, 3, TIMER_BITMODE_BITMODE_32Bit, TIMER1_IRQn }
+};
 
-/* Timer 0 configuration */
-#define TIMER_0_DEV         NRF_TIMER0
-#define TIMER_0_CHANNELS    3
-#define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_BITMODE     TIMER_BITMODE_BITMODE_32Bit
-#define TIMER_0_ISR         isr_timer0
-#define TIMER_0_IRQ         TIMER0_IRQn
+#define TIMER_0_ISR         isr_timer1
+
+#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**
@@ -57,9 +57,9 @@ extern "C" {
  * @{
  */
 #define RTT_NUMOF           (1U)
-#define RTT_DEV             NRF_RTC0
-#define RTT_IRQ             RTC0_IRQn
-#define RTT_ISR             isr_rtc0
+#define RTT_DEV             NRF_RTC1
+#define RTT_IRQ             RTC1_IRQn
+#define RTT_ISR             isr_rtc1
 #define RTT_MAX_VALUE       (0xffffff)
 #define RTT_FREQUENCY       (10)            /* in Hz */
 #define RTT_PRESCALER       (3275U)         /* run with 10 Hz */

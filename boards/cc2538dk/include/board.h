@@ -17,8 +17,8 @@
  * @author      Ian Martin <ian@locicontrols.com>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -28,34 +28,35 @@ extern "C" {
 #endif
 
 /**
- * @name Macros for controlling the on-board LEDs.
+ * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_RED_GPIO        GPIO_PC0 /**< Red LED GPIO pin */
-#define LED_YELLOW_GPIO     GPIO_PC1 /**< Yellow LED GPIO pin */
-#define LED_GREEN_GPIO      GPIO_PC2 /**< Green LED GPIO pin */
-#define LED_ORANGE_GPIO     GPIO_PC3 /**< Orange LED GPIO pin */
+#define LED0_PIN            GPIO_PIN(2, 0)
+#define LED1_PIN            GPIO_PIN(2, 1)
+#define LED2_PIN            GPIO_PIN(2, 2)
+#define LED3_PIN            GPIO_PIN(2, 3)
 
-#define LED_RED_ON          cc2538_gpio_set(LED_GREEN_GPIO)
-#define LED_RED_OFF         cc2538_gpio_clear(LED_GREEN_GPIO)
-#define LED_RED_TOGGLE      cc2538_gpio_toggle(LED_GREEN_GPIO)
+#define LED_PORT            GPIO_C
+#define LED0_BIT            (1 << 0)        /**< red LED */
+#define LED1_BIT            (1 << 1)        /**< yellow LED */
+#define LED2_BIT            (1 << 2)        /**< green LED */
+#define LED3_BIT            (1 << 3)        /**< orange LED */
 
-#define LED_YELLOW_ON       cc2538_gpio_set(LED_YELLOW_GPIO)
-#define LED_YELLOW_OFF      cc2538_gpio_clear(LED_YELLOW_GPIO)
-#define LED_YELLOW_TOGGLE   cc2538_gpio_toggle(LED_YELLOW_GPIO)
+#define LED0_ON             (LED_PORT->DATA |=  LED0_BIT)
+#define LED0_OFF            (LED_PORT->DATA &= ~LED0_BIT)
+#define LED0_TOGGLE         (LED_PORT->DATA ^=  LED0_BIT)
 
-#define LED_GREEN_ON        cc2538_gpio_set(LED_GREEN_GPIO)
-#define LED_GREEN_OFF       cc2538_gpio_clear(LED_GREEN_GPIO)
-#define LED_GREEN_TOGGLE    cc2538_gpio_toggle(LED_GREEN_GPIO)
+#define LED1_ON             (LED_PORT->DATA |=  LED1_BIT)
+#define LED1_OFF            (LED_PORT->DATA &= ~LED1_BIT)
+#define LED1_TOGGLE         (LED_PORT->DATA ^=  LED1_BIT)
 
-#define LED_ORANGE_ON       cc2538_gpio_set(LED_ORANGE_GPIO)
-#define LED_ORANGE_OFF      cc2538_gpio_clear(LED_ORANGE_GPIO)
-#define LED_ORANGE_TOGGLE   cc2538_gpio_toggle(LED_ORANGE_GPIO)
+#define LED2_ON             (LED_PORT->DATA |=  LED2_BIT)
+#define LED2_OFF            (LED_PORT->DATA &= ~LED2_BIT)
+#define LED2_TOGGLE         (LED_PORT->DATA ^=  LED2_BIT)
 
-/* Default to red if the color is not specified: */
-#define LED_ON              LED_RED_ON
-#define LED_OFF             LED_RED_OFF
-#define LED_TOGGLE          LED_RED_TOGGLE
+#define LED3_ON             (LED_PORT->DATA |=  LED3_BIT)
+#define LED3_OFF            (LED_PORT->DATA &= ~LED3_BIT)
+#define LED3_TOGGLE         (LED_PORT->DATA ^=  LED3_BIT)
 /** @} */
 
 /**
@@ -73,6 +74,19 @@ extern "C" {
 /** @} */
 
 /**
+ * @name xtimer configuration
+ * @{
+ */
+#define XTIMER_DEV          (0)
+#define XTIMER_CHAN         (0)
+#define XTIMER_WIDTH        (16)
+#define XTIMER_SHIFT        (4)
+#define XTIMER_HZ           (16000000UL)
+#define XTIMER_BACKOFF      (50)
+#define XTIMER_ISR_BACKOFF  (40)
+/** @} */
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
@@ -81,5 +95,5 @@ void board_init(void);
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

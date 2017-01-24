@@ -68,18 +68,18 @@ static void clk_init(void)
     RCC->CR |= CLOCK_CR_SOURCE;
     /* Wait till the high speed clock source is ready
      * NOTE: the MCU will stay here forever if you use an external clock source and it's not connected */
-    while (!(RCC->CR & CLOCK_CR_SOURCE_RDY));
+    while (!(RCC->CR & CLOCK_CR_SOURCE_RDY)) {}
     FLASH->ACR |= FLASH_ACR_ACC64;
     /* Enable Prefetch Buffer */
     FLASH->ACR |= FLASH_ACR_PRFTEN;
     /* Flash 1 wait state */
     FLASH->ACR |= CLOCK_FLASH_LATENCY;
     /* Power enable */
-    RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
     /* Select the Voltage Range 1 (1.8 V) */
     PWR->CR = PWR_CR_VOS_0;
     /* Wait Until the Voltage Regulator is ready */
-    while((PWR->CSR & PWR_CSR_VOSF) != 0);
+    while((PWR->CSR & PWR_CSR_VOSF) != 0) {}
     /* HCLK = SYSCLK */
     RCC->CFGR |= (uint32_t)CLOCK_AHB_DIV;
     /* PCLK2 = HCLK */
@@ -92,10 +92,10 @@ static void clk_init(void)
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
     /* Wait till PLL is ready */
-    while ((RCC->CR & RCC_CR_PLLRDY) == 0);
+    while ((RCC->CR & RCC_CR_PLLRDY) == 0) {}
     /* Select PLL as system clock source */
     RCC->CFGR &= ~((uint32_t)(RCC_CFGR_SW));
     RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
     /* Wait till PLL is used as system clock source */
-    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
+    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
 }

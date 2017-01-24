@@ -22,8 +22,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef NETOPT_H_
-#define NETOPT_H_
+#ifndef NETOPT_H
+#define NETOPT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,6 +90,8 @@ typedef enum {
                                  *   the current state */
     NETOPT_AUTOACK,             /**< en/disable link layer auto ACKs or read
                                  *   the current state */
+    NETOPT_ACK_REQ,             /**< en/disable acknowledgement requests or
+                                 *   read the current state */
     NETOPT_RETRANS,             /**< get/set the maximum number of
                                  *   retransmissions. */
     NETOPT_PROTO,               /**< get/set the protocol for the layer
@@ -168,7 +170,7 @@ typedef enum {
      * If the interface is wireless this function will return -ENOTSUP, a
      * positive value otherwise.
      *
-     * @note Setting this option will always return -EONOTSUP.
+     * @note Setting this option will always return -ENOTSUP.
      */
     NETOPT_IS_WIRED,
 
@@ -198,6 +200,45 @@ typedef enum {
      * to network environment can improve QoS, especially in WSN.
      */
     NETOPT_CCA_THRESHOLD,
+
+    /**
+     * @brief CCA mode for the radio transceiver
+     *
+     * Get/set the CCA mode as uint8_t
+     * corresponding to the respective PHY standard.
+     * - IEEE 802.15.4: @ref netdev2_ieee802154_cca_mode_t
+     */
+    NETOPT_CCA_MODE,
+
+    /**
+     * @brief get statistics about sent and received packets and data of the device or protocol
+     *
+     * Expects a pointer to a @ref netstats_t struct that will be pointed to
+     * the corresponding @ref netstats_t of the module.
+     */
+    NETOPT_STATS,
+
+    /**
+     * @brief en/disable encryption.
+     */
+    NETOPT_ENCRYPTION,        /**< en/disable encryption */
+    NETOPT_ENCRYPTION_KEY,    /**< set encryption key */
+
+    /**
+     * @brief Test mode for the radio, e.g. for CE or FCC certification
+     *
+     * Get/set the test mode as type @ref netopt_rf_testmode_t or as uint8_t
+     * if the radio supports other vendor specific test modes.
+     *
+     * @note Setting this option should always return -ENOTSUP,
+     * unless it was explicitly allowed at build time,
+     * therefore it should be secured with an additional macro in the device driver.
+     * For development and certification purposes only, this test modes can disturb
+     * normal radio communications and exceed the limits, established by
+     * the regulatory authority.
+     *
+     */
+    NETOPT_RF_TESTMODE,
 
     /* add more options if needed */
 
@@ -240,6 +281,16 @@ typedef enum {
 } netopt_state_t;
 
 /**
+ * @brief   Option parameter to be used with @ref NETOPT_RF_TESTMODE
+ */
+typedef enum {
+    NETOPT_RF_TESTMODE_IDLE = 0,    /**< idle mode, radio off */
+    NETOPT_RF_TESTMODE_CRX,         /**< continuous rx mode */
+    NETOPT_RF_TESTMODE_CTX_CW,      /**< carrier wave continuous tx mode */
+    NETOPT_RF_TESTMODE_CTX_PRBS9,   /**< PRBS9 continuous tx mode */
+} netopt_rf_testmode_t;
+
+/**
  * @brief   Get a string ptr corresponding to opt, for debugging
  *
  * @param[in] opt   The option to get a string representation for
@@ -252,5 +303,5 @@ const char *netopt2str(netopt_t opt);
 }
 #endif
 
-#endif /* NETOPT_H_ */
+#endif /* NETOPT_H */
 /** @} */

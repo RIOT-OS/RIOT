@@ -22,6 +22,8 @@
  * @}
  */
 
+#include <unistd.h>
+#include <reent.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,10 +34,11 @@
 
 #include "cpu.h"
 #include "board.h"
+#include "sched.h"
 #include "thread.h"
-#include "reboot.h"
 #include "irq.h"
 #include "log.h"
+#include "periph/pm.h"
 
 #include "uart_stdio.h"
 
@@ -63,7 +66,8 @@ void _init(void)
 /**
  * @brief Free resources on NewLib de-initialization, not used for RIOT
  */
-void _fini(void)
+/* __attribute__((used)) fixes linker errors when building with LTO, but without nano.specs */
+__attribute__((used)) void _fini(void)
 {
     /* nothing to do here */
 }
@@ -78,8 +82,8 @@ void _fini(void)
  */
 void _exit(int n)
 {
-    LOG_INFO("#! exit %i: resetting\n", n);
-    reboot();
+    LOG_INFO("#! exit %i: powering off\n", n);
+    pm_off();
     while(1);
 }
 
@@ -94,7 +98,7 @@ void _exit(int n)
  */
 void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
 {
-    unsigned int state = disableIRQ();
+    unsigned int state = irq_disable();
     void *res = heap_top;
 
     if ((heap_top + incr > &_eheap) || (heap_top + incr < &_sheap)) {
@@ -105,7 +109,7 @@ void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
         heap_top += incr;
     }
 
-    restoreIRQ(state);
+    irq_restore(state);
     return res;
 }
 
@@ -157,9 +161,10 @@ int _kill_r(struct _reent *r, pid_t pid, int sig)
  *
  * @return      TODO
  */
-int _open_r(struct _reent *r, const char *name, int mode)
+int _open_r(struct _reent *r, const char *name, int flags, int mode)
 {
     (void) name;
+    (void) flags;
     (void) mode;
     r->_errno = ENODEV;                     /* not implemented yet */
     return -1;
@@ -182,7 +187,7 @@ int _open_r(struct _reent *r, const char *name, int mode)
  *
  * @return      TODO
  */
-int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
+_ssize_t _read_r(struct _reent *r, int fd, void *buffer, size_t count)
 {
     (void)r;
     (void)fd;
@@ -204,7 +209,7 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
  *
  * @return      TODO
  */
-int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
+_ssize_t _write_r(struct _reent *r, int fd, const void *data, size_t count)
 {
     (void) r;
     (void) fd;
@@ -271,7 +276,7 @@ int _fstat_r(struct _reent *r, int fd, struct stat *st)
  *
  * @return      TODO
  */
-int _stat_r(struct _reent *r, char *name, struct stat *st)
+int _stat_r(struct _reent *r, const char *name, struct stat *st)
 {
     (void) name;
     (void) st;
@@ -306,7 +311,7 @@ int _isatty_r(struct _reent *r, int fd)
  *
  * @return      TODO
  */
-int _unlink_r(struct _reent *r, char *path)
+int _unlink_r(struct _reent *r, const char *path)
 {
     (void) path;
     r->_errno = ENODEV;                     /* not implemented yet */
@@ -335,9 +340,9 @@ int _gettimeofday_r(struct _reent *r, struct timeval *restrict tp, void *restric
 {
     (void)tzp;
     (void) r;
-    uint64_t now = xtimer_now64();
+    uint64_t now = xtimer_now_usec64();
     tp->tv_sec = div_u64_by_1000000(now);
-    tp->tv_usec = now - (tp->tv_sec * SEC_IN_USEC);
+    tp->tv_usec = now - (tp->tv_sec * US_PER_SEC);
     return 0;
 }
 #endif

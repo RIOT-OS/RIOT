@@ -33,6 +33,7 @@
 #include "x86_interrupts.h"
 #include "x86_ports.h"
 #include "x86_reboot.h"
+#include "periph/pm.h"
 
 #define KBC_DATA    (0x60)
 #define KBC_STATUS  (0x64)
@@ -50,7 +51,7 @@ static const struct idtr_t EMPTY_IDT = {
 
 void x86_load_empty_idt(void)
 {
-    asm volatile ("lidt %0" :: "m"(EMPTY_IDT));
+    __asm__ volatile ("lidt %0" :: "m"(EMPTY_IDT));
 }
 
 static bool fail_violently;
@@ -62,7 +63,7 @@ void NORETURN x86_kbc_reboot(void)
 
     while (1) {
         if (fail_violently) {
-            asm volatile ("int3"); /* Cause a tripple fault. Won't return. */
+            __asm__ volatile ("int3"); /* Cause a tripple fault. Won't return. */
         }
         fail_violently = true;
 
@@ -79,16 +80,16 @@ void NORETURN x86_kbc_reboot(void)
             }
         }
 
-        asm volatile ("int3"); /* Cause a tripple fault. Won't return. */
+        __asm__ volatile ("int3"); /* Cause a tripple fault. Won't return. */
     }
 }
 
 static x86_reboot_t reboot_fun;
 static bool reboot_twice;
 
-void reboot(void)
+void pm_reboot(void)
 {
-    asm volatile ("cli");
+    __asm__ volatile ("cli");
     if (!reboot_twice) {
         reboot_twice = true;
         if (reboot_fun) {
@@ -96,6 +97,11 @@ void reboot(void)
         }
     }
     x86_kbc_reboot();
+}
+
+void pm_off(void)
+{
+    x86_shutdown();
 }
 
 void x86_set_reboot_fun(x86_reboot_t fun)

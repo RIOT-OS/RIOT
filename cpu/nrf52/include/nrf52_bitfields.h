@@ -27,8 +27,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef __NRF52_BITS_H
-#define __NRF52_BITS_H
+#ifndef NRF52_BITS_H
+#define NRF52_BITS_H
 
 /*lint ++flb "Enter library region" */
 
@@ -12142,4 +12142,4 @@ extern "C" {
 #endif
 
 /*lint --flb "Leave library region" */
-#endif
+#endif /* NRF52_BITS_H */

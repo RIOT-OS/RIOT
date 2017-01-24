@@ -152,7 +152,7 @@ do_flash() {
             ${OPENOCD_PRE_VERIFY_CMDS} \
             -c 'verify_image \"${HEXFILE}\"' \
             -c 'reset run' \
-            -c 'shutdown'"
+            -c 'shutdown'" &&
     echo 'Done flashing'
 }
 
@@ -182,7 +182,7 @@ do_flash_elf() {
             ${OPENOCD_PRE_VERIFY_CMDS} \
             -c 'verify_image \"${ELFFILE}\"' \
             -c 'reset run' \
-            -c 'shutdown'"
+            -c 'shutdown'" &&
     echo 'Done flashing'
 }
 
@@ -211,7 +211,7 @@ do_debug() {
             -l /dev/null & \
             echo \$! > $OCD_PIDFILE" &
     # connect to the GDB server
-    ${DBG} ${TUI} -ex "tar ext :${GDB_PORT}" ${ELFFILE}
+    ${DBG} -q ${TUI} -ex "tar ext :${GDB_PORT}" ${ELFFILE}
     # will be called by trap
     cleanup() {
         OCD_PID="$(cat $OCD_PIDFILE)"

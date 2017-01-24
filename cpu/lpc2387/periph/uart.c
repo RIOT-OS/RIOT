@@ -26,7 +26,6 @@
 
 #include "lpc23xx.h"
 #include "VIC.h"
-#include "kernel.h"
 #include "periph/uart.h"
 
 /* for now, we only support one UART device... */
@@ -40,7 +39,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     (void) baudrate;
     /* for now, we only support one UART device and only the RX interrupt */
     if (dev != 0) {
-        return -1;
+        return UART_NODEV;
     }
 
     /* save interrupt context */
@@ -67,14 +66,14 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* install and enable the IRQ handler */
     install_irq(UART0_INT, UART0_IRQHandler, 6);
     U0IER |= BIT0;       /* enable only RX irq */
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     (void) uart;
     for (size_t i = 0; i < len; i++) {
-        while (!(U0LSR & BIT5));
+        while (!(U0LSR & BIT5)) {}
         U0THR = data[i];
     }
 }
@@ -85,10 +84,9 @@ void UART0_IRQHandler(void)
         case UIIR_CTI_INT:              /* Character Timeout Indicator */
         case UIIR_RDA_INT:              /* Receive Data Available */
                 do {
-                    char c = (char)U0RBR;
+                    uint8_t c = (uint8_t)U0RBR;
                     _rx_cb(_cb_arg, c);
-                }
-                while (U0LSR & ULSR_RDR);
+                } while (U0LSR & ULSR_RDR);
             break;
 
         default:

@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef AT86RF2XX_INTERNAL_H_
-#define AT86RF2XX_INTERNAL_H_
+#ifndef AT86RF2XX_INTERNAL_H
+#define AT86RF2XX_INTERNAL_H
 
 #include <stdint.h>
 
@@ -126,13 +126,6 @@ void at86rf2xx_fb_read(const at86rf2xx_t *dev,
 void at86rf2xx_fb_stop(const at86rf2xx_t *dev);
 
 /**
- * @brief   Cancel ongoing transactions and switch to TRX_OFF state
- *
- * @param[in] dev       device to manipulate
- */
-void at86rf2xx_force_trx_off(const at86rf2xx_t *dev);
-
-/**
  * @brief   Convenience function for reading the status of the given device
  *
  * @param[in] dev       device to read the status from
@@ -163,10 +156,28 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
  */
 void at86rf2xx_configure_phy(at86rf2xx_t *dev);
 
+#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231) || defined(DOXYGEN)
+/**
+ * @brief   Read random data from the RNG
+ *
+ * @note    According to the data sheet this function only works properly in
+ *          Basic Operation Mode. However, sporadic testing has shown that even
+ *          in Extended Operation Mode this returns random enough data to be
+ *          used as a seed for @ref sys_random if no cryptographically secure
+ *          randomness is required.
+ *          Any further use-case needs to be evaluated, especially if
+ *          crypto-relevant randomness is required.
+ *
+ * @param[in] dev       device to configure
+ * @param[out] data     buffer to copy the random data to
+ * @param[in]  len      number of random bytes to store in data
+ */
+void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, const size_t len);
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* AT86RF2XX_INTERNAL_H_ */
+#endif /* AT86RF2XX_INTERNAL_H */
 /** @} */

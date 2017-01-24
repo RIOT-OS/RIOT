@@ -21,8 +21,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-extern unsigned long xtimer_now(void);
-
 /* --- MCI configurations --- */
 #define N_BUF       4           /* Block transfer FIFO depth (>= 2) */
 #define USE_4BIT    1           /* Use wide bus mode if SDC is detected */
@@ -80,7 +78,7 @@ extern unsigned long xtimer_now(void);
 
 ---------------------------------------------------------------------------*/
 
-static volatile DSTATUS Stat = STA_NOINIT;  /* Disk status */
+static volatile diskio_sta_t Stat = DISKIO_STA_NOINIT;  /* Disk status */
 
 static unsigned short CardRCA;          /* Assigned RCA */
 static unsigned char CardType,          /* Card type flag */
@@ -363,7 +361,7 @@ static void power_off(void)
     PINSEL4 &= ~((BIT22 | BIT23) | (BIT24 | BIT25) | (BIT26 | BIT27));
     //  Pins should be now configured as standard input (see board_init.c if you accidentally reconfigured them)
 
-    Stat |= STA_NOINIT;
+    Stat |= DISKIO_STA_NOINIT;
 }
 
 
@@ -415,12 +413,12 @@ static int send_cmd(unsigned int idx, unsigned long arg, unsigned int rt, unsign
     MCI_COMMAND = mc;               /* Initiate command transaction */
 
     //Timer[1] = 100;
-    uint32_t timerstart = xtimer_now();
+    uint32_t timerstart = xtimer_now_usec();
 
     while (1) {                     /* Wait for end of the cmd/resp transaction */
 
         //if (!Timer[1]) return 0;
-        if (xtimer_now() - timerstart > 10000) {
+        if ((xtimer_now_usec() - timerstart) > 10000) {
             return 0;
         }
 
@@ -477,10 +475,10 @@ static int wait_ready(unsigned short tmr)
 {
     unsigned long rc;
 
-    uint32_t stoppoll = xtimer_now() + tmr * 100;
+    uint32_t stoppoll = xtimer_now_usec() + tmr * US_PER_MS;
     bool bBreak = false;
 
-    while (xtimer_now() < stoppoll/*Timer[0]*/) {
+    while (xtimer_now_usec() < stoppoll/*Timer[0]*/) {
         if (send_cmd(CMD13, (unsigned long) CardRCA << 16, 1, &rc) && ((rc & 0x01E00) == 0x00800)) {
             bBreak = true;
             break;
@@ -491,9 +489,6 @@ static int wait_ready(unsigned short tmr)
 
     return bBreak;//Timer[0] ? 1 : 0;
 }
-
-
-
 
 /*-----------------------------------------------------------------------*/
 /* Swap byte order                                                       */
@@ -510,26 +505,22 @@ static void bswap_cp(unsigned char *dst, const unsigned long *src)
     *dst++ = (unsigned char)(d >> 0);
 }
 
-
-
-
 /*--------------------------------------------------------------------------
 
    Public Functions
 
 ---------------------------------------------------------------------------*/
 
-
 /*-----------------------------------------------------------------------*/
 /* Initialize Disk Drive                                                 */
 /*-----------------------------------------------------------------------*/
-DSTATUS MCI_initialize(void)
+diskio_sta_t mci_initialize(void)
 {
     unsigned int cmd, n;
     unsigned long resp[4];
     unsigned char ty;
 
-    if (Stat & STA_NODISK) {
+    if (Stat & DISKIO_STA_NODISK) {
         return Stat;    /* No card in the socket */
     }
 
@@ -548,16 +539,17 @@ DSTATUS MCI_initialize(void)
     /*---- Card is 'idle' state ----*/
 
     /* Initialization timeout of 1000 msec */
-    uint32_t start = xtimer_now();
+    uint32_t start = xtimer_now_usec();
 
     /* SDC Ver2 */
     if (send_cmd(CMD8, 0x1AA, 1, resp) && (resp[0] & 0xFFF) == 0x1AA) {
         /* The card can work at vdd range of 2.7-3.6V */
         DEBUG("SDC Ver. 2\n");
 
-        do {                                    /* Wait while card is busy state (use ACMD41 with HCS bit) */
+        do {
+            /* Wait while card is busy state (use ACMD41 with HCS bit) */
             /* This loop will take a time. Insert wai_tsk(1) here for multitask envilonment. */
-            if (xtimer_now() > start + 1000000/*!Timer[0]*/) {
+            if (xtimer_now_usec() > (start + 1000000/* !Timer[0] */)) {
                 DEBUG("%s, %d: Timeout #1\n", RIOT_FILE_RELATIVE, __LINE__);
                 goto di_fail;
             }
@@ -578,12 +570,13 @@ DSTATUS MCI_initialize(void)
             cmd = CMD1;         /* ACMD41 is rejected -> MMC */
         }
 
-        do {                                    /* Wait while card is busy state (use ACMD41 or CMD1) */
+        do {
+            /* Wait while card is busy state (use ACMD41 or CMD1) */
             DEBUG("%s, %d: %lX\n", RIOT_FILE_RELATIVE, __LINE__, resp[0]);
 
             /* This loop will take a time. Insert wai_tsk(1) here for multitask envilonment. */
-            if (xtimer_now() > start + 1000000/*!Timer[0]*/) {
-                DEBUG("now: %lu, started at: %lu\n", xtimer_now(), start);
+            if (xtimer_now_usec() > (start + 1000000/* !Timer[0] */)) {
+                DEBUG("now: %lu, started at: %lu\n", xtimer_now_usec(), start);
                 DEBUG("%s, %d: Timeout #2\n", RIOT_FILE_RELATIVE, __LINE__);
                 goto di_fail;
             }
@@ -664,12 +657,12 @@ DSTATUS MCI_initialize(void)
 
     MCI_CLOCK = (MCI_CLOCK & 0xF00) | 0x200 | (PCLK / MCLK_RW / 2 - 1);     /* Set MCICLK = MCLK_RW, power-save mode */
 
-    Stat &= ~STA_NOINIT;    /* Clear STA_NOINIT */
+    Stat &= ~DISKIO_STA_NOINIT;    /* Clear DISKIO_STA_NOINIT */
     return Stat;
 
 di_fail:
     power_off();
-    Stat |= STA_NOINIT;     /* Set STA_NOINIT */
+    Stat |= DISKIO_STA_NOINIT;     /* Set DISKIO_STA_NOINIT */
     return Stat;
 }
 
@@ -680,7 +673,7 @@ di_fail:
 /* Get Disk Status                                                       */
 /*-----------------------------------------------------------------------*/
 
-DSTATUS MCI_status(void)
+diskio_sta_t mci_status(void)
 {
     return Stat;
 }
@@ -697,17 +690,17 @@ DSTATUS MCI_status(void)
  * @param sector    Start sector number (LBA)
  * @param count     Sector count (1..127)
  */
-DRESULT MCI_read(unsigned char *buff, unsigned long sector, unsigned char count)
+diskio_result_t mci_read(unsigned char *buff, unsigned long sector, unsigned char count)
 {
     unsigned long resp;
     unsigned int cmd;
 
     if (count < 1 || count > 127) {
-        return RES_PARERR;    /* Check parameter */
+        return DISKIO_RES_PARERR;    /* Check parameter */
     }
 
-    if (Stat & STA_NOINIT) {
-        return RES_NOTRDY;    /* Check drive status */
+    if (Stat & DISKIO_STA_NOINIT) {
+        return DISKIO_RES_NOTRDY;    /* Check drive status */
     }
 
     if (!(CardType & CT_BLOCK)) {
@@ -715,7 +708,7 @@ DRESULT MCI_read(unsigned char *buff, unsigned long sector, unsigned char count)
     }
 
     if (!wait_ready(500)) {
-        return RES_ERROR;    /* Make sure that card is tran state */
+        return DISKIO_RES_ERROR;    /* Make sure that card is tran state */
     }
 
     ready_reception(count, 512);            /* Ready to receive data blocks */
@@ -736,7 +729,7 @@ DRESULT MCI_read(unsigned char *buff, unsigned long sector, unsigned char count)
                 break; /* Abort if any error has occured */
             }
 
-            Copy_al2un(buff, DmaBuff[rp], 512); /* Pop an block */
+            copy_al2un(buff, DmaBuff[rp], 512); /* Pop an block */
 
             XferRp = rp = (rp + 1) % N_BUF; /* Next DMA buffer */
 
@@ -745,8 +738,7 @@ DRESULT MCI_read(unsigned char *buff, unsigned long sector, unsigned char count)
             }
 
             buff += 512; /* Next user buffer address */
-        }
-        while (--count);
+        } while (--count);
 
         if (cmd == CMD18) { /* Terminate to read (MB) */
             send_cmd(CMD12, 0, 1, &resp);
@@ -755,7 +747,7 @@ DRESULT MCI_read(unsigned char *buff, unsigned long sector, unsigned char count)
 
     stop_transfer(); /* Close data path */
 
-    return count ? RES_ERROR : RES_OK;
+    return count ? DISKIO_RES_ERROR : DISKIO_RES_OK;
 }
 
 
@@ -770,22 +762,22 @@ DRESULT MCI_read(unsigned char *buff, unsigned long sector, unsigned char count)
  * @param sector   Start sector number (LBA)
  * @param count    Sector count (1..127)
  * */
-DRESULT MCI_write(const unsigned char *buff, unsigned long sector, unsigned char count)
+diskio_result_t mci_write(const unsigned char *buff, unsigned long sector, unsigned char count)
 {
     unsigned long rc;
     unsigned int cmd;
     unsigned char wp, xc;
 
     if (count < 1 || count > 127) {
-        return RES_PARERR;    /* Check parameter */
+        return DISKIO_RES_PARERR;    /* Check parameter */
     }
 
-    if (Stat & STA_NOINIT) {
-        return RES_NOTRDY;    /* Check drive status */
+    if (Stat & DISKIO_STA_NOINIT) {
+        return DISKIO_RES_NOTRDY;    /* Check drive status */
     }
 
-    if (Stat & STA_PROTECT) {
-        return RES_WRPRT;    /* Check write protection */
+    if (Stat & DISKIO_STA_PROTECT) {
+        return DISKIO_RES_WRPRT;    /* Check write protection */
     }
 
     if (!(CardType & CT_BLOCK)) {
@@ -793,7 +785,7 @@ DRESULT MCI_write(const unsigned char *buff, unsigned long sector, unsigned char
     }
 
     if (!wait_ready(500)) {
-        return RES_ERROR;    /* Make sure that card is tran state */
+        return DISKIO_RES_ERROR;    /* Make sure that card is tran state */
     }
 
     if (count == 1) {   /* Single block write */
@@ -804,7 +796,7 @@ DRESULT MCI_write(const unsigned char *buff, unsigned long sector, unsigned char
 
         if (!send_cmd(cmd, count, 1, &rc)       /* Preset number of blocks to write */
            || (rc & 0xC0580000)) {
-            return RES_ERROR;
+            return DISKIO_RES_ERROR;
         }
 
         cmd = CMD25;
@@ -812,14 +804,14 @@ DRESULT MCI_write(const unsigned char *buff, unsigned long sector, unsigned char
 
     if (!send_cmd(cmd, sector, 1, &rc)          /* Send a write command */
        || (rc & 0xC0580000)) {
-        return RES_ERROR;
+        return DISKIO_RES_ERROR;
     }
 
     wp = 0;
     xc = count;
 
     do {                                        /* Fill block FIFO */
-        Copy_un2al(DmaBuff[wp], (unsigned char *)(unsigned int)buff, 512);  /* Push a block */
+        copy_un2al(DmaBuff[wp], (unsigned char *)(unsigned int)buff, 512);  /* Push a block */
         wp++;                                       /* Next DMA buffer */
         count--;
         buff += 512;                        /* Next user buffer address */
@@ -838,7 +830,7 @@ DRESULT MCI_write(const unsigned char *buff, unsigned long sector, unsigned char
             break;    /* Abort if block underrun or any MCI error has occured */
         }
 
-        Copy_un2al(DmaBuff[wp], (unsigned char *)(unsigned int)buff, 512);  /* Push a block */
+        copy_un2al(DmaBuff[wp], (unsigned char *)(unsigned int)buff, 512);  /* Push a block */
         XferWp = wp = (wp + 1) % N_BUF;             /* Next DMA buffer */
 
         if (XferStat & 0xC) {
@@ -846,10 +838,10 @@ DRESULT MCI_write(const unsigned char *buff, unsigned long sector, unsigned char
         }
 
         count--;
-        buff += 512;                        /* Next user buffer address */
+        buff += 512;             /* Next user buffer address */
     }
 
-    while (!(XferStat & 0xC));                  /* Wait for all blocks sent (block underrun) */
+    while (!(XferStat & 0xC)) {} /* Wait for all blocks sent (block underrun) */
 
     if (XferStat & 0x8) {
         count = 1;    /* Abort if any MCI error has occured */
@@ -861,7 +853,7 @@ DRESULT MCI_write(const unsigned char *buff, unsigned long sector, unsigned char
         send_cmd(CMD12, 0, 1, &rc);
     }
 
-    return count ? RES_ERROR : RES_OK;
+    return count ? DISKIO_RES_ERROR : DISKIO_RES_OK;
 }
 #endif /* _READONLY */
 
@@ -872,26 +864,26 @@ DRESULT MCI_write(const unsigned char *buff, unsigned long sector, unsigned char
 /* Miscellaneous Functions                                               */
 /*-----------------------------------------------------------------------*/
 
-DRESULT MCI_ioctl(
+diskio_result_t mci_ioctl(
     unsigned char ctrl,     /* Control code */
     void *buff      /* Buffer to send/receive data block */
 )
 {
-    DRESULT res;
+    diskio_result_t res;
     unsigned char *ptr = (unsigned char *)buff;
     unsigned long resp[4], d, *dp, st, ed;
 
 
-    if (Stat & STA_NOINIT) {
-        return RES_NOTRDY;
+    if (Stat & DISKIO_STA_NOINIT) {
+        return DISKIO_RES_NOTRDY;
     }
 
-    res = RES_ERROR;
+    res = DISKIO_RES_ERROR;
 
     switch(ctrl) {
         case CTRL_SYNC :    /* Make sure that all data has been written on the media */
             if (wait_ready(500)) {  /* Wait for card enters tarn state */
-                res = RES_OK;
+                res = DISKIO_RES_OK;
             }
 
             break;
@@ -907,12 +899,12 @@ DRESULT MCI_ioctl(
                 *(unsigned long *)buff = d << (b - 9);
             }
 
-            res = RES_OK;
+            res = DISKIO_RES_OK;
             break;
 
         case GET_SECTOR_SIZE :  /* Get sectors on the disk (unsigned short) */
             *(unsigned short *)buff = 512;
-            res = RES_OK;
+            res = DISKIO_RES_OK;
             break;
 
         case GET_BLOCK_SIZE :   /* Get erase block size in unit of sectors (unsigned long) */
@@ -928,7 +920,7 @@ DRESULT MCI_ioctl(
                 }
             }
 
-            res = RES_OK;
+            res = DISKIO_RES_OK;
             break;
 
         case CTRL_ERASE_SECTOR :    /* Erase a block of sectors */
@@ -946,7 +938,7 @@ DRESULT MCI_ioctl(
             }
 
             if (send_cmd(CMD32, st, 1, resp) && send_cmd(CMD33, ed, 1, resp) && send_cmd(CMD38, 0, 1, resp) && wait_ready(30000)) {
-                res = RES_OK;
+                res = DISKIO_RES_OK;
             }
 
             break;
@@ -955,38 +947,38 @@ DRESULT MCI_ioctl(
             switch(ptr[0]) {
                 case 0:     /* Sub control code == 0 (POWER_OFF) */
                     power_off();        /* Power off */
-                    res = RES_OK;
+                    res = DISKIO_RES_OK;
                     break;
 
                 case 1:     /* Sub control code == 1 (POWER_GET) */
                     ptr[1] = (unsigned char)power_status();
-                    res = RES_OK;
+                    res = DISKIO_RES_OK;
                     break;
 
                 default :
-                    res = RES_PARERR;
+                    res = DISKIO_RES_PARERR;
             }
 
             break;
 
         case MMC_GET_TYPE :     /* Get card type flags (1 byte) */
             *ptr = CardType;
-            res = RES_OK;
+            res = DISKIO_RES_OK;
             break;
 
         case MMC_GET_CSD :      /* Get CSD (16 bytes) */
             memcpy(buff, &CardInfo[0], 16);
-            res = RES_OK;
+            res = DISKIO_RES_OK;
             break;
 
         case MMC_GET_CID :      /* Get CID (16 bytes) */
             memcpy(buff, &CardInfo[16], 16);
-            res = RES_OK;
+            res = DISKIO_RES_OK;
             break;
 
         case MMC_GET_OCR :      /* Get OCR (4 bytes) */
             memcpy(buff, &CardInfo[32], 4);
-            res = RES_OK;
+            res = DISKIO_RES_OK;
             break;
 
         case MMC_GET_SDSTAT :   /* Receive SD status as a data block (64 bytes) */
@@ -996,11 +988,11 @@ DRESULT MCI_ioctl(
 
                     if (send_cmd(ACMD13, 0, 1, resp)    /* Start to read */
                        && !(resp[0] & 0xC0580000)) {
-                        while ((XferWp == 0) && !(XferStat & 0xC));
+                        while ((XferWp == 0) && !(XferStat & 0xC)) {}
 
                         if (!(XferStat & 0xC)) {
-                            Copy_al2un((unsigned char *)buff, DmaBuff[0], 64);
-                            res = RES_OK;
+                            copy_al2un((unsigned char *)buff, DmaBuff[0], 64);
+                            res = DISKIO_RES_OK;
                         }
                     }
                 }
@@ -1011,7 +1003,7 @@ DRESULT MCI_ioctl(
             break;
 
         default:
-            res = RES_PARERR;
+            res = DISKIO_RES_PARERR;
     }
 
     return res;

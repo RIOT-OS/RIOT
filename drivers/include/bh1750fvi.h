@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_bh1750fvi BH1750FVI Light Sensor
- * @ingroup     drivers_periph
+ * @ingroup     drivers_sensors
  * @brief       Driver for the Rohm BH1750FVI ambient light sensor
  *
  * @{
@@ -47,6 +47,14 @@ extern "C" {
  * @brief   Maximum I2C bus speed to use with the device
  */
 #define BH1750FVI_I2C_MAX_CLK           I2C_SPEED_FAST
+
+/**
+ * @brief   Status and error return codes
+ */
+enum {
+    BH1750FVI_OK      =  0,     /**< everything was fine */
+    BH1750FVI_ERR_I2C = -1      /**< error initializing the I2C bus */
+};
 
 /**
  * @brief   Device descriptor for BH1570FVI devices

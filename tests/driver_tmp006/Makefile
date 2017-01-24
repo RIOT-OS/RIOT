@@ -7,7 +7,7 @@ USEMODULE += tmp006
 USEMODULE += xtimer
 
 # set default device parameters in case they are undefined
-TEST_TMP006_I2C       ?= I2C_0
+TEST_TMP006_I2C       ?= I2C_DEV\(0\)
 TEST_TMP006_ADDR      ?= 0x41
 TEST_TMP006_CONFIG_CR ?= TMP006_CONFIG_CR_DEF
 

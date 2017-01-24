@@ -32,6 +32,7 @@
 #include "shell.h"
 #include "shell_commands.h"
 
+#ifndef SHELL_NO_ECHO
 #ifdef MODULE_NEWLIB
 /* use local copy of putchar, as it seems to be inlined,
  * enlarging code by 50% */
@@ -40,6 +41,7 @@ static void _putchar(int c) {
 }
 #else
 #define _putchar putchar
+#endif
 #endif
 
 static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
@@ -234,8 +236,10 @@ static int readline(char *buf, size_t size)
         /* DOS newlines are handled like hitting enter twice, but empty lines are ignored. */
         if (c == '\r' || c == '\n') {
             *line_buf_ptr = '\0';
+#ifndef SHELL_NO_ECHO
             _putchar('\r');
             _putchar('\n');
+#endif
 
             /* return 1 if line is empty, 0 otherwise */
             return line_buf_ptr == buf;
@@ -249,21 +253,27 @@ static int readline(char *buf, size_t size)
 
             *--line_buf_ptr = '\0';
             /* white-tape the character */
+#ifndef SHELL_NO_ECHO
             _putchar('\b');
             _putchar(' ');
             _putchar('\b');
+#endif
         }
         else {
             *line_buf_ptr++ = c;
+#ifndef SHELL_NO_ECHO
             _putchar(c);
+#endif
         }
     }
 }
 
 static inline void print_prompt(void)
 {
+#ifndef SHELL_NO_PROMPT
     _putchar('>');
     _putchar(' ');
+#endif
 
 #ifdef MODULE_NEWLIB
     fflush(stdout);

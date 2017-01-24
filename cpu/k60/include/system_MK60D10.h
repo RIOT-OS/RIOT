@@ -6,8 +6,8 @@
  * details.
  */
 
-#ifndef SYSTEM_MK60D10_H_
-#define SYSTEM_MK60D10_H_
+#ifndef SYSTEM_MK60D10_H
+#define SYSTEM_MK60D10_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,4 +77,4 @@ void SystemCoreClockUpdate(void);
 }
 #endif
 
-#endif  /* #if !defined(SYSTEM_MK60D10_H_) */
+#endif  /* #if !defined(SYSTEM_MK60D10_H) */

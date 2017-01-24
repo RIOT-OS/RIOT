@@ -57,7 +57,6 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
 {
     gnrc_pktsnip_t *icmpv6, *ipv6;
     icmpv6_hdr_t *hdr;
-    gnrc_netreg_entry_t *sendto;
 
     icmpv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_ICMPV6);
 
@@ -68,6 +67,14 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
     ipv6 = gnrc_pktsnip_search_type(icmpv6, GNRC_NETTYPE_IPV6);
 
     assert(ipv6 != NULL);
+
+    if (icmpv6->size < sizeof(icmpv6_hdr_t)) {
+        DEBUG("icmpv6: packet too short.\n");
+        return;
+    }
+
+    /* Note: size will be checked again in gnrc_icmpv6_echo_req_handle,
+             gnrc_ndp_rtr_sol_handle, and others */
 
     hdr = (icmpv6_hdr_t *)icmpv6->data;
 
@@ -121,30 +128,15 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
             break;
 
         default:
-            DEBUG("icmpv6: unknown type field %" PRIu8 "\n", hdr->type);
+            DEBUG("icmpv6: unknown type field %u\n", hdr->type);
             break;
     }
 
     /* ICMPv6-all will be send in gnrc_ipv6.c so only dispatch of subtypes is
      * needed */
-
-    sendto = gnrc_netreg_lookup(GNRC_NETTYPE_ICMPV6, hdr->type);
-
-    if (sendto == NULL) {
-        DEBUG("icmpv6: no receivers for ICMPv6 type %" PRIu8 "\n", hdr->type);
-        /* don't release: IPv6 does this */
-        return;
-    }
-
-    /* IPv6 might still do stuff to the packet, so no `- 1` */
-    gnrc_pktbuf_hold(pkt, gnrc_netreg_num(GNRC_NETTYPE_ICMPV6, hdr->type));
-
-    while (sendto != NULL) {
-        if (gnrc_netapi_receive(sendto->pid, pkt) < 1) {
-            DEBUG("icmpv6: unable to deliver packet\n");
-            gnrc_pktbuf_release(pkt);
-        }
-        sendto = gnrc_netreg_getnext(sendto);
+    if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_ICMPV6, hdr->type, pkt)) {
+        DEBUG("icmpv6: no one interested in type %d\n", hdr->type);
+        gnrc_pktbuf_release(pkt);
     }
 }
 
@@ -161,7 +153,7 @@ gnrc_pktsnip_t *gnrc_icmpv6_build(gnrc_pktsnip_t *next, uint8_t type, uint8_t co
         return NULL;
     }
 
-    DEBUG("icmpv6: Building ICMPv6 message with type=%" PRIu8 ", code=%" PRIu8 "\n",
+    DEBUG("icmpv6: Building ICMPv6 message with type=%u, code=%u\n",
           type, code);
     icmpv6 = (icmpv6_hdr_t *)pkt->data;
     icmpv6->type = type;

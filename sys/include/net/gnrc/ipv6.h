@@ -26,8 +26,8 @@
  */
 
 
-#ifndef GNRC_IPV6_H_
-#define GNRC_IPV6_H_
+#ifndef GNRC_IPV6_H
+#define GNRC_IPV6_H
 
 #include "kernel_types.h"
 #include "net/gnrc.h"
@@ -117,17 +117,41 @@ kernel_pid_t gnrc_ipv6_init(void);
  * **Do not use outside this module or its submodules!!!**
  * Public access needed for Extension Headers.
  *
+ * About `current` and `pkt`:
+ *
+ *                     current     pkt
+ *                     |           |
+ *                     v           v
+ * IPv6 <- IPv6_EXT <- IPv6_EXT <- UNDEF
+ *
+ * This situation may happen when the packet has a source routing extension
+ * header (RFC 6554), and the packet is forwarded from an interface to another.
+ *
  * @param[in] iface     The receiving interface.
+ * @param[in] current   A snip to process.
  * @param[in] pkt       A packet.
- * @param[in] nh        A protocol number (see @ref net_protnum).
+ * @param[in] nh        A protocol number (see @ref net_protnum) of the current snip.
  */
-void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh);
+void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt, uint8_t nh);
+
+/**
+ * @brief   Get the IPv6 header from a given list of @ref gnrc_pktsnip_t
+ *
+ *          This function may be used with e.g. a pointer to a (full) UDP datagram.
+ *
+ * @param[in] pkt    The pointer to the first @ref gnrc_pktsnip_t of the
+ *                   packet.
+ *
+ * @return A pointer to the @ref ipv6_hdr_t of the packet.
+ * @return NULL if the packet does not contain an IPv6 header.
+ */
+ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GNRC_IPV6_H_ */
+#endif /* GNRC_IPV6_H */
 /**
  * @}
  */

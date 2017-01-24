@@ -14,11 +14,11 @@
  * @note    Do not include this header file directly, but pthread.h.
  * @warning Spinlocks should be avoided.
  *          They will burn away the battery needlessly, and may not work because RIOT is tickless.
- *          Use disableIRQ() and restoreIRQ() for shortterm locks instead.
+ *          Use irq_disable() and irq_restore() for shortterm locks instead.
  */
 
-#ifndef SYS_POSIX_PTHREAD_SPIN_H_
-#define SYS_POSIX_PTHREAD_SPIN_H_
+#ifndef SYS_POSIX_PTHREAD_SPIN_H
+#define SYS_POSIX_PTHREAD_SPIN_H
 
 #include <errno.h>
 
@@ -30,7 +30,7 @@ extern "C" {
  * @brief           A spinlock.
  * @warning         Spinlocks should be avoided.
  *                  They will burn away the battery needlessly, and may not work because RIOT is tickless.
- *                  Use disableIRQ() and restoreIRQ() for shortterm locks instead.
+ *                  Use irq_disable() and irq_restore() for shortterm locks instead.
  */
 typedef struct {
     atomic_int_t value;
@@ -91,7 +91,7 @@ int pthread_spin_unlock(pthread_spinlock_t *lock);
 }
 #endif
 
-#endif
+#endif /* SYS_POSIX_PTHREAD_SPIN_H */
 
 /**
  * @}

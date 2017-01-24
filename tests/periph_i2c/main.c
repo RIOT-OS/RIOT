@@ -74,7 +74,7 @@ int cmd_write(int argc, char **argv)
     int res;
     uint8_t addr;
     int length = argc - 2;
-    char data[BUFSIZE];
+    uint8_t data[BUFSIZE];
 
     if (i2c_dev < 0) {
         puts("Error: no I2C device was initialized");
@@ -86,19 +86,19 @@ int cmd_write(int argc, char **argv)
         return 1;
     }
 
-    addr = (uint8_t)atoi(argv[1]);
+    addr = atoi(argv[1]);
     for (int i = 0; i < length; i++) {
-        data[i] = (char)atoi(argv[i + 2]);
+        data[i] = atoi(argv[i + 2]);
     }
 
     if (length == 1) {
-        printf("i2c_write_byte(I2C_%i, 0x%02x, 0x%02x)\n", i2c_dev, addr, (unsigned int)data[0]);
+        printf("i2c_write_byte(I2C_%i, 0x%02x, 0x%02x)\n", i2c_dev, addr, data[0]);
         res = i2c_write_byte(i2c_dev, addr, data[0]);
     }
     else {
         printf("i2c_write_bytes(I2C_%i, 0x%02x, [", i2c_dev, addr);
         for (int i = 0; i < length; i++) {
-            printf(", 0x%02x", (unsigned int)data[i]);
+            printf(", 0x%02x", data[i]);
         }
         puts("])");
         res = i2c_write_bytes(i2c_dev, addr, data, length);
@@ -119,7 +119,7 @@ int cmd_write_reg(int argc, char **argv)
     int res;
     uint8_t addr, reg;
     int length = argc - 3;
-    char data[BUFSIZE];
+    uint8_t data[BUFSIZE];
 
     if (i2c_dev < 0) {
         puts("Error: no I2C device initialized");
@@ -131,21 +131,21 @@ int cmd_write_reg(int argc, char **argv)
         return 1;
     }
 
-    addr = (uint8_t)atoi(argv[1]);
-    reg = (uint8_t)atoi(argv[2]);
+    addr = atoi(argv[1]);
+    reg = atoi(argv[2]);
     for (int i = 0; i < length; i++) {
-        data[i] = (char)atoi(argv[i + 3]);
+        data[i] = atoi(argv[i + 3]);
     }
 
     if (length == 1) {
         printf("i2c_write_reg(I2C_%i, 0x%02x, 0x%02x, 0x%02x)\n",
-               i2c_dev, addr, reg, (unsigned int)data[0]);
+               i2c_dev, addr, reg, data[0]);
         res = i2c_write_reg(i2c_dev, addr, reg, data[0]);
     }
     else {
         printf("i2c_write_regs(I2C_%i, 0x%02x, 0x%02x, [", i2c_dev, addr, reg);
         for (int i = 0; i < length; i++) {
-            printf("0x%02x, ", (unsigned int)data[i]);
+            printf("0x%02x, ", data[i]);
         }
         puts("])");
         res = i2c_write_regs(i2c_dev, addr, reg, data, length);
@@ -166,7 +166,7 @@ int cmd_read(int argc, char **argv)
     int res;
     uint8_t addr;
     int length;
-    char data[BUFSIZE];
+    uint8_t data[BUFSIZE];
 
     if (i2c_dev < 0) {
         puts("Error: no I2C device initialized");
@@ -178,7 +178,7 @@ int cmd_read(int argc, char **argv)
         return 1;
     }
 
-    addr = (uint8_t)atoi(argv[1]);
+    addr = atoi(argv[1]);
     length = atoi(argv[2]);
 
     if (length < 1 || length > BUFSIZE) {
@@ -186,11 +186,11 @@ int cmd_read(int argc, char **argv)
         return 1;
     }
     else if (length == 1) {
-        printf("i2c_read_byte(I2C_%i, 0x%02x, char *res)\n", i2c_dev, addr);
+        printf("i2c_read_byte(I2C_%i, 0x%02x, uint8_t *res)\n", i2c_dev, addr);
         res = i2c_read_byte(i2c_dev, addr, data);
     }
     else {
-        printf("i2c_read_bytes(I2C_%i, 0x%02x, char *res, %i)\n", i2c_dev, addr, length);
+        printf("i2c_read_bytes(I2C_%i, 0x%02x, uint8_t *res, %i)\n", i2c_dev, addr, length);
         res = i2c_read_bytes(i2c_dev, addr, data, length);
     }
 
@@ -201,7 +201,7 @@ int cmd_read(int argc, char **argv)
     else {
         printf("I2C_%i: successfully read %i bytes:\n  [", i2c_dev, res);
         for (int i = 0; i < res; i++) {
-            printf("0x%02x, ", (unsigned int)data[i]);
+            printf("0x%02x, ", data[i]);
         }
         puts("])");
         return 0;
@@ -213,7 +213,7 @@ int cmd_read_reg(int argc, char **argv)
     int res;
     uint8_t addr, reg;
     int length;
-    char data[BUFSIZE];
+    uint8_t data[BUFSIZE];
 
     if (i2c_dev < 0) {
         puts("Error: no I2C device initialized");
@@ -225,8 +225,8 @@ int cmd_read_reg(int argc, char **argv)
         return 1;
     }
 
-    addr = (uint8_t)atoi(argv[1]);
-    reg = (uint8_t)atoi(argv[2]);
+    addr = atoi(argv[1]);
+    reg = atoi(argv[2]);
     length = atoi(argv[3]);
 
     if (length < 1 || length > BUFSIZE) {
@@ -234,11 +234,11 @@ int cmd_read_reg(int argc, char **argv)
         return 1;
     }
     else if (length == 1) {
-        printf("i2c_read_reg(I2C_%i, 0x%02x, 0x%02x, char *res)\n", i2c_dev, addr, reg);
+        printf("i2c_read_reg(I2C_%i, 0x%02x, 0x%02x, uint8_t *res)\n", i2c_dev, addr, reg);
         res = i2c_read_reg(i2c_dev, addr, reg, data);
     }
     else {
-        printf("i2c_read_regs(I2C_%i, 0x%02x, 0x%02x, char *res, %i)\n", i2c_dev, addr, reg, length);
+        printf("i2c_read_regs(I2C_%i, 0x%02x, 0x%02x, uint8_t *res, %i)\n", i2c_dev, addr, reg, length);
         res = i2c_read_regs(i2c_dev, addr, reg, data, length);
     }
 
@@ -249,7 +249,7 @@ int cmd_read_reg(int argc, char **argv)
     else {
         printf("I2C_%i: successfully read %i bytes from reg 0x%02x:\n  [", i2c_dev, res, reg);
         for (int i = 0; i < res; i++) {
-            printf("0x%02x, ", (unsigned int)data[i]);
+            printf("0x%02x, ", data[i]);
         }
         puts("])");
         return 0;

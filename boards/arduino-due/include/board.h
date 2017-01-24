@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "arduino_pinmap.h"
@@ -32,25 +32,11 @@ extern "C" {
  * @name LED pin definitions
  * @{
  */
-#define LED_PORT            PIOB
-#define LED_PIN             PIO_PB27
-/** @} */
+#define LED0_PIN            GPIO_PIN(PB, 27)
 
-/**
- * @name Macros for controlling the on-board LEDs.
- * @{
- */
-#define LED_ON              (LED_PORT->PIO_ODSR |= LED_PIN)
-#define LED_OFF             (LED_PORT->PIO_ODSR &= ~LED_PIN)
-#define LED_TOGGLE          (LED_PORT->PIO_ODSR ^= LED_PIN)
-
-/* for compatability to other boards */
-#define LED_GREEN_ON        /* not available */
-#define LED_GREEN_OFF       /* not available */
-#define LED_GREEN_TOGGLE    /* not available */
-#define LED_RED_ON          LED_ON
-#define LED_RED_OFF         LED_OFF
-#define LED_RED_TOGGLE      LED_TOGGLE
+#define LED0_ON             (PIOB->PIO_SODR  = PIO_PB27)
+#define LED0_OFF            (PIOB->PIO_CODR  = PIO_PB27)
+#define LED0_TOGGLE         (PIOB->PIO_ODSR ^= PIO_PB27)
 /** @} */
 
 /**
@@ -62,5 +48,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

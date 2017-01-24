@@ -23,6 +23,8 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include "cpu_conf_common.h"
+
 #if defined(CPU_MODEL_STM32F103CB) || defined(CPU_MODEL_STM32F103RB)
 #include "stm32f103xb.h"
 #elif defined(CPU_MODEL_STM32F103RE)
@@ -40,6 +42,21 @@ extern "C" {
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
 #define CPU_IRQ_NUMOF                   (60U)
 #define CPU_FLASH_BASE                  FLASH_BASE
+/** @} */
+
+/**
+ * @brief   Flash page configuration
+ * @{
+ */
+#define FLASHPAGE_SIZE      (2048U)
+
+#if defined(CPU_MODEL_STM32F103C8)
+#define FLASHPAGE_NUMOF     (32U)
+#elif defined(CPU_MODEL_STM32F103CB) || defined(CPU_MODEL_STM32F103RB)
+#define FLASHPAGE_NUMOF     (64U)
+#elif defined(CPU_MODEL_STM32F103RE)
+#define FLASHPAGE_NUMOF     (256U)
+#endif
 /** @} */
 
 /**

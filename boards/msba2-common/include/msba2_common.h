@@ -17,8 +17,8 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef MSBA2_COMMON_H_
-#define MSBA2_COMMON_H_
+#ifndef MSBA2_COMMON_H
+#define MSBA2_COMMON_H
 
 
 #include <stdint.h>
@@ -41,4 +41,4 @@ static inline void pllfeed(void)
 #endif
 
 /** @} */
-#endif /*  MSBA2_COMMON_H_ */
+#endif /*  MSBA2_COMMON_H */
