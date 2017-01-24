@@ -82,6 +82,22 @@ static inline void *flashpage_addr(int page)
 }
 
 /**
+ * @brief   Translate the given address into the corresponding page number
+ *
+ * The given address can be any address inside a page.
+ *
+ * @note    The given address MUST be a valid flash address!
+ *
+ * @param[in] addr      address inside the targeted page
+ *
+ * @return              page containing the given address
+ */
+static inline int flashpage_page(void *addr)
+{
+    return (int)(((int)addr - CPU_FLASH_BASE) / FLASHPAGE_SIZE);
+}
+
+/**
  * @brief   Write the given page with the given data
  *
  * @param[in] page      page to write
