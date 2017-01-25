@@ -144,6 +144,15 @@ typedef struct {
 #define MODCLKEN0_TDC_EN            0x00000020  /* enable clock for AUX_TDC */
 #define MODCLKEN0_AUX_DDI0_OSC_EN   0x00000040  /* enable clock for AUX_DDI0_OSC */
 #define MODCLKEN0_AUX_ADI4_EN       0x00000080  /* enable clock for AUX_ADI4 */
+
+#define MODCLKEN1_SMPH_EN           0x00000001  /* request clock for AUX_SMPH */
+#define MODCLKEN1_AIODIO0_EN        0x00000002  /* request clock for AUX_AIODIO0 */
+#define MODCLKEN1_AIODIO1_EN        0x00000004  /* request clock for AUX_AIODIO1 */
+#define MODCLKEN1_TIMER_EN          0x00000008  /* request clock for AUX_TIMER */
+#define MODCLKEN1_ANAIF_EN          0x00000010  /* request clock for AUX_ANAIF */
+#define MODCLKEN1_TDC_EN            0x00000020  /* request clock for AUX_TDC */
+#define MODCLKEN1_AUX_DDI0_OSC_EN   0x00000040  /* request clock for AUX_DDI0_OSC */
+#define MODCLKEN1_AUX_ADI4_EN       0x00000080  /* request clock for AUX_ADI4 */
 /** @} */
 
 /** @ingroup cpu_specific_peripheral_memory_map

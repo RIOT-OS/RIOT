@@ -64,6 +64,7 @@ typedef struct {
     reg32_t SHDW_ANA_TRIM; /**< shadow of JTAG_TAP::EFUSE::ANA_TIM.* */
     reg32_t __reserved5[9]; /**< meh */
     reg32_t FLASH_NUMBER; /**< number of manufactoring lot that produced this unit */
+    reg32_t __reserved6; /**< meh */
     reg32_t FLASH_COORDINATE; /**< X and Y coordinates of this unit on the wafer */
     reg32_t FLASH_E_P; /**< flash erase and program setup time */
     reg32_t FLASH_C_E_P_R; /**< flash compaction, execute, program, and read */
@@ -76,35 +77,35 @@ typedef struct {
     reg32_t FLASH_VHV; /**< flash VHV */
     reg32_t FLASH_VHV_PV; /**< flash VHV program verify */
     reg32_t FLASH_V; /**< flash voltages */
-    reg32_t __reserved6[0x3E]; /**< meh */
+    reg32_t __reserved7[0x3E]; /**< meh */
     reg32_t USER_ID; /**< user identification */
-    reg32_t __reserved7[6]; /**< meh */
+    reg32_t __reserved8[6]; /**< meh */
     reg32_t FLASH_OTP_DATA3; /**< flash OTP data 3 */
     reg32_t ANA2_TRIM; /**< misc analog trim */
     reg32_t LDO_TRIM; /**< LDO trim */
-    reg32_t __reserved8[0xB]; /**< meh */
+    reg32_t __reserved9[0xB]; /**< meh */
     reg32_t MAC_BLE_0; /**< MAC BLE address 0 */
     reg32_t MAC_BLE_1; /**< MAC BLE address 1 */
     reg32_t MAC_15_4_0; /**< MAC IEEE 820.15.4 address 0 */
     reg32_t MAC_15_4_1; /**< MAC IEEE 820.15.4 address 1 */
-    reg32_t __reserved9[4]; /**< meh */
+    reg32_t __reserved10[4]; /**< meh */
     reg32_t FLASH_OTP_DATA4; /**< flash OTP data 4 */
     reg32_t MISC_TRIM; /**< misc trim parameters */
     reg32_t RCOSC_HF_TEMPCOMP; /**< RFOSC HF temperature compensation */
-    reg32_t __reserved10; /**< meh */
+    reg32_t __reserved11; /**< meh */
     reg32_t ICEPICK_DEVICE_ID; /**< IcePick device identification */
     reg32_t FCFG1_REVISION; /**< FCFG1 revision */
     reg32_t MISC_OTP_DATA; /**< misc OTP data */
-    reg32_t __reserved11[8]; /**< meh */
+    reg32_t __reserved12[8]; /**< meh */
     reg32_t IOCONF; /**< IO config */
-    reg32_t __reserved12; /**< meh */
+    reg32_t __reserved13; /**< meh */
     reg32_t CONFIG_IF_ADC; /**< config of IF_ADC */
     reg32_t CONFIG_OSC_TOP; /**< config of OSC */
     reg32_t CONFIG_RF_FRONTEND; /**< config of RF frontend in dividy-by-2-mode */
     reg32_t CONFIG_SYNTH; /**< config of synthesizer in dividy-by-2-mode */
     reg32_t SOC_ADC_ABS_GAIN; /**< AUX_ADC gain in absolute reference mode */
     reg32_t SOC_ADC_REL_GAIN; /**< AUX_ADC gain in relative reference mode */
-    reg32_t __reserved13; /**< meh */
+    reg32_t __reserved14; /**< meh */
     reg32_t SOC_ADC_OFFSET_INT; /**< AUX_ADC temperature offsets in absolute reference mode */
     reg32_t SOC_ADC_REF_TRIM_AND_OFFSET_EXT; /**< AUX_ADC reference trim and offset of external reference mode */
     reg32_t AMPCOMP_TH1; /**< amplitude compensation threshold 1 */
@@ -112,10 +113,10 @@ typedef struct {
     reg32_t AMPCOMP_CTRL1; /**< amplitude compensation control */
     reg32_t ANABYPASS_VALUE2; /**< analog bypass value for OSC */
     reg32_t CONFIG_MISC_ADC; /**< config of IFADC in divide-by-2-mode */
-    reg32_t __reserved14; /**< meh */
+    reg32_t __reserved15; /**< meh */
     reg32_t VOLT_TRIM; /**< voltage trim */
     reg32_t OSC_CONF; /**< OSC configuration */
-    reg32_t __reserved15; /**< meh */
+    reg32_t __reserved16; /**< meh */
     reg32_t CAP_TRIM; /**< capacitor trim (it says 'capasitor' in the manual - if you know what that is ;-) */
     reg32_t MISC_OTP_DATA_1; /**< misc OSC control */
     reg32_t PWD_CURR_20C; /**< power down current control 20C */
@@ -129,6 +130,34 @@ typedef struct {
 } fcfg_regs_t;
 
 #define FCFG ((fcfg_regs_t *) (FCFG_BASE)) /**< FCFG register bank */
+
+
+/**
+ * @brief   FCFG register values
+ * @{
+ */
+#define FCFG_MODE_CONF_1_DEVICE_MINOR_REV_MASK              (0x000000FF)
+
+#define FCFG_AMPCOMP_TH1_HPMRAMP1_TH_MASK                   (0x0000003F)
+#define FCFG_AMPCOMP_TH1_IBIASCAP_LPTOHP_OL_CNT_MASK        (0x000003C0)
+#define FCFG_AMPCOMP_TH1_HPMRAMP3_HTH_MASK                  (0x0000FC00)
+#define FCFG_AMPCOMP_TH1_HPMRAMP3_LTH_MASK                  (0x00FC0000)
+
+#define FCFG_AMPCOMP_TH2_ADC_COMP_AMPTH_HPM_MASK            (0x000000FC)
+#define FCFG_AMPCOMP_TH2_ADC_COMP_AMPTH_LPM_MASK            (0x0000FC00)
+#define FCFG_AMPCOMP_TH2_LPMUPDATE_HTM_MASK                 (0x00FC0000)
+#define FCFG_AMPCOMP_TH2_LPMUPDATE_LTH_MASK                 (0xFC000000)
+
+#define FCFG_AMPCOMP_CTRL1_IBIASCAP_HPTOLP_OL_CNT_MASK      (0x0000000F)
+#define FCFG_AMPCOMP_CTRL1_CAP_STEP_MASK                    (0x000000F0)
+#define FCFG_AMPCOMP_CTRL1_LPM_IBIAS_WAIT_CNT_FINAL_MASK    (0x0000FF00)
+#define FCFG_AMPCOMP_CTRL1_IBIAS_INIT_MASK                  (0x000F0000)
+#define FCFG_AMPCOMP_CTRL1_IBIAS_OFFSET_MASK                (0x00F00000)
+#define FCFG_AMPCOMP_CTRL1_AMPCOMP_REQ_MODE                 (0x40000000)
+
+#define FCFG_ANABYPASS_VALUE2_XOSC_HF_IBIASTHERM_MASK       (0x00003FFF)
+/** @} */
+
 
 #ifdef __cplusplus
 } /* end extern "C" */
