@@ -208,13 +208,20 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 
 int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
 {
+    (void)dev;
+    (void)conf;
+    (void)cb;
     /* TODO */
+    assert(false);
     return -1;
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)
 {
-    /* TODO*/
+    (void)dev;
+    (void)reset_val;
+    /* TODO */
+    assert(false);
 }
 
 int spi_acquire(spi_t dev)

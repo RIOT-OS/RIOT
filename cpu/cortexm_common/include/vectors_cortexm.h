@@ -35,6 +35,14 @@ extern "C" {
 #define ISR_VECTORS     __attribute__((used,section(".vectors")))
 
 /**
+ * @brief   Number of Cortex-M non-ISR exceptions
+ *
+ * This means those that are no hardware interrupts, or the ones with a
+ * negative interrupt number.
+ */
+#define CPU_NONISR_EXCEPTIONS   (15)
+
+/**
  * @brief   This function is the default entry point after a system reset
  *
  * After a system reset, the following steps are necessary and carried out:
