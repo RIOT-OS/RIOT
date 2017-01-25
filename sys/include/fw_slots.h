@@ -32,6 +32,8 @@
 /**
  * @defgroup    sys_fw_slots Firmware slots management
  * @ingroup     sys
+ * @brief       Slots management for several FW in ROM and ext Flash
+ * @{
  *
  * @file
  * @brief       FW Image R/W and Verification
@@ -45,26 +47,35 @@
 
 #include "hashes/sha256.h"
 
-/*
- *  FW_METADATA_LENGTH:
- *    This is just the size of the FW_metadata_t struct, which is 4-byte
- *    aligned. We use 76 bytes currently, so this struct will be 76 bytes.
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ *  @brief FW_METADATA_LENGTH:
+ *         This is just the size of the FW_metadata_t struct, which is 4-byte
+ *         aligned. We use 76 bytes currently, so this struct will be 76 bytes.
  */
 #define FW_METADATA_LENGTH  sizeof(FW_metadata_t)
 
-/*
- *  SIGN_LEN:
- *    Provisional length for signed hash
+/**
+ *  @brief SIGN_LEN:
+ *         Provisional length for signed hash
  */
 #define SIGN_LEN            (SHA256_DIGEST_LENGTH)
 
+/**
+ * @brief Structure to store firmware metadata
+ * @{
+ */
 typedef struct FW_metadata {
-    uint8_t hash[SHA256_DIGEST_LENGTH]; /* SHA256 Hash of firmware image */
-    uint8_t shash[SIGN_LEN];            /* Signed SHA256 */
-    uint32_t size;                      /* Size of firmware image */
-    uint32_t uuid;                      /* Integer representing unique firmware ID */
-    uint16_t version;                   /* Integer representing firmware version */
+    uint8_t hash[SHA256_DIGEST_LENGTH]; /**< SHA256 Hash of firmware image */
+    uint8_t shash[SIGN_LEN];            /**< Signed SHA256 */
+    uint32_t size;                      /**< Size of firmware image */
+    uint32_t uuid;                      /**< Integer representing unique firmware ID */
+    uint16_t version;                   /**< Integer representing firmware version */
 } FW_metadata_t;
+/** @} */
 
 /**
  * @brief  Print formatted FW image metadata to STDIO.
@@ -85,12 +96,12 @@ int fw_slots_validate_int_slot(uint8_t fw_slot);
 
 /**
  * @brief   Get the internal metadata belonging to an FW slot in internal
- *          flash.
+ *          flash, using the flash page.
  *
- * @param[in] fw_slot             The FW slot to be read for metadata.
+ * @param[in] fw_slot_page       The FW slot page to be read for metadata.
  *
- * @param[in] *fw_slot_metadata   Pointer to the FW_metadata_t struct where
- *                                the metadata is to be written.
+ * @param[in] *fw_metadata       Pointer to the FW_metadata_t struct where
+ *                               the metadata is to be written.
  *
  * @return  0 on success or error code
  */
@@ -258,6 +269,8 @@ int fw_slots_update_firmware(uint8_t fw_slot);
  *
  * @param[in] data          Pointer to the data buffer to be written.
  *
+ * @param[in] data_length   Length of the buffer
+ *
  * @return  -1 or error code
  */
 int fw_slots_store_fw_data(uint32_t ext_address, uint8_t *data, size_t data_length);
@@ -276,3 +289,4 @@ int fw_slots_store_fw_data(uint32_t ext_address, uint8_t *data, size_t data_leng
 void fw_slots_jump_to_image(uint32_t destination_address);
 
 #endif /* FW_SLOTS_H */
+/** @} */
