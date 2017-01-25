@@ -288,5 +288,9 @@ int fw_slots_store_fw_data(uint32_t ext_address, uint8_t *data, size_t data_leng
  */
 void fw_slots_jump_to_image(uint32_t destination_address);
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* FW_SLOTS_H */
 /** @} */
