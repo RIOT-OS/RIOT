@@ -355,7 +355,7 @@ int fw_slots_find_oldest_int_image(void)
         }
     }
 
-    printf("[fw_slots] Oldest FW slot: #%u; Firmware v%u\n", oldest_fw_slot,
+    printf("[fw_slots] Oldest FW slot: #%d; Firmware v%d\n", oldest_fw_slot,
             oldest_firmware_version);
 
     return oldest_fw_slot;
@@ -390,7 +390,7 @@ int fw_slots_find_newest_int_image(void)
         }
     }
 
-    printf("Newest FW slot: #%u; Firmware v%u\n", newest_fw_slot,
+    printf("Newest FW slot: #%d; Firmware v%d\n", newest_fw_slot,
             newest_firmware_version);
 
     return newest_fw_slot;
