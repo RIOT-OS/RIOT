@@ -185,13 +185,14 @@ typedef struct {
  * @brief   Device descriptor for sdcard_spi
  */
 struct {
-    sdcard_spi_params_t params;  /**< parameters for pin and spi config */
-    bool use_block_addr;         /**< true if block adressing (vs. byte adressing) is used */
-    bool init_done;              /**< set to true once the init procedure completed sucessfully */
-    sd_version_t card_type;      /**< version of SD-card */
-    int csd_structure;           /**< version of the CSD register structure */
-    cid_t cid;                   /**< CID register */
-    csd_t csd;                   /**< CSD register */
+    sdcard_spi_params_t params;     /**< parameters for pin and spi config */
+    spi_clk_t spi_clk;              /**< active SPI clock speed */
+    bool use_block_addr;            /**< true if block adressing (vs. byte adressing) is used */
+    bool init_done;                 /**< set to true once the init procedure completed sucessfully */
+    sd_version_t card_type;         /**< version of SD-card */
+    int csd_structure;              /**< version of the CSD register structure */
+    cid_t cid;                      /**< CID register */
+    csd_t csd;                      /**< CSD register */
 } typedef sdcard_spi_t;
 
 /**

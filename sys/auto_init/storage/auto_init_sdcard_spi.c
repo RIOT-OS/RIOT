@@ -18,6 +18,7 @@
 
 #ifdef MODULE_SDCARD_SPI
 
+#include "log.h"
 #include "sdcard_spi.h"
 #include "sdcard_spi_params.h"
 
@@ -40,11 +41,12 @@ sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
 
 void auto_init_sdcard_spi(void)
 {
-    for (int i = 0; i < SDCARD_SPI_NUM; i++) {
-        DEBUG("sdcard_spi_auto_init(): initializing device [%i]...\n", i);
-        int resu = sdcard_spi_init(&sdcard_spi_devs[i], &sdcard_spi_params[i]);
-        if(resu != 0){
-            DEBUG("error initializing device [%i]\n", i);
+    for (unsigned i = 0; i < SDCARD_SPI_NUM; i++) {
+        LOG_DEBUG("[auto_init_storage] initializing sdcard_spi #%u\n", i);
+
+        if (sdcard_spi_init(&sdcard_spi_devs[i], &sdcard_spi_params[i]) !=
+            SDCARD_SPI_OK) {
+            LOG_ERROR("[auto_init_storage] error initializing sdcard_spi #%u\n", i);
         }
     }
 }
