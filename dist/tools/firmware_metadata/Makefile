@@ -11,7 +11,7 @@ all: bin bin/generate-metadata
 
 bin:
 	mkdir bin
-	
+
 bin/generate-metadata:
 	$(CC) $(CFLAGS) -I$(RIOT_INCLUDE) $(METADATA_SRC) -o $@
 
