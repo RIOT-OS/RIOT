@@ -135,13 +135,6 @@ static const uart_conf_t uart_config[] = {
 #define I2C_NUMOF           (0)
 /** @} */
 
-/**
- * @name SPI configuration
- * @{
- */
-#define SPI_NUMOF           (0)
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
