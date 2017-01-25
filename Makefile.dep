@@ -613,6 +613,7 @@ endif
 
 ifneq (,$(filter fw_slots,$(USEMODULE)))
   FEATURES_REQUIRED += periph_flashpage
+  FEATURES_REQUIRED += periph_slots
   USEMODULE += hashes
 endif
 
