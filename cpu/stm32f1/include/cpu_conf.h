@@ -49,10 +49,12 @@ extern "C" {
 #endif
 /** @} */
 
-/*
+/**
  * @brief   Offset to reset handler on VTOR
+ * @{
  */
-#define VTOR_RESET_HANDLER     0x4
+#define VTOR_RESET_HANDLER     0x4 /** One pointer after the beginning */
+/** @} */
 
 #if defined(CPU_MODEL_STM32F103RE)
 /*
