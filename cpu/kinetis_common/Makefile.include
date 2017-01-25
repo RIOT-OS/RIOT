@@ -9,6 +9,7 @@ export UNDEF += $(BINDIR)/kinetis_common/fcfield.o
 
 # include kinetis common periph drivers
 export USEMODULE += kinetis_common_periph
+export USEMODULE += periph_common
 
 #include layered power mode module
 USEMODULE += pm_layered

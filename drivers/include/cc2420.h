@@ -74,7 +74,7 @@ enum {
  */
 typedef struct cc2420_params {
     spi_t spi;              /**< SPI bus the device is connected to */
-    spi_speed_t spi_clk;    /**< SPI speed to use */
+    spi_clk_t spi_clk;      /**< SPI speed to use */
     gpio_t pin_cs;          /**< pin connected to chip select */
     gpio_t pin_fifo;        /**< pin connected to the FIFO interrupt pin */
     gpio_t pin_fifop;       /**< pin connected to the FIFOP interrupt pin */

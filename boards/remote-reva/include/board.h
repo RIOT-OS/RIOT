@@ -23,9 +23,6 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "periph/gpio.h"
-#include "periph/spi.h"
-#include "board_common.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -110,6 +107,11 @@
 #define CC1200_GPD0_GPIO    GPIO_PB4
 #define CC1200_GPD2_GPIO    GPIO_PB0
 /** @} */
+
+/**
+ * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ */
+void board_init(void);
 
 #ifdef __cplusplus
 } /* end extern "C" */

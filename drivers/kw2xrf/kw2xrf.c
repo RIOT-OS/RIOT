@@ -383,7 +383,7 @@ int kw2xrf_set_addr_long(kw2xrf_t *dev, uint64_t addr)
     return sizeof(uint64_t);
 }
 
-int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
+int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_clk_t spi_clk,
                 gpio_t cs_pin, gpio_t int_pin)
 {
     uint8_t reg = 0;
@@ -405,7 +405,7 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
         return -ENODEV;
     }
 
-    kw2xrf_spi_init(spi, spi_speed, cs_pin);
+    kw2xrf_spi_init(spi, spi_clk, cs_pin);
 
     if (kw2xrf_on(dev) != 0) {
         core_panic(PANIC_GENERAL_ERROR, "Could not start MKW2XD radio transceiver");

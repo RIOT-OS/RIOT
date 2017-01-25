@@ -30,14 +30,13 @@ extern "C" {
 /**
  * @brief SPI interface initialization
  * @param[in] spi           SPI bus the device is connected to
- * @param[in] spi_speed     SPI speed to use
+ * @param[in] spi_clk     SPI clock speed to use
  * @param[in] cs_pin        GPIO pin connected to chip select
  *
  * @return 0 on success
  * @return -1 on error
  */
-int kw2xrf_spi_init(spi_t spi, spi_speed_t spi_speed,
-                    gpio_t cs_pin);
+int kw2xrf_spi_init(spi_t spi, spi_clk_t spi_clk, spi_cs_t cs_pin);
 
 /**
  * @brief Writes a byte to the kw2xrf register.

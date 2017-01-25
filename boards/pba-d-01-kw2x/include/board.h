@@ -68,10 +68,10 @@ extern "C"
 @name KW2XRF configuration
 @{
 */
-#define KW2XRF_SPI        (SPI_1)
+#define KW2XRF_SPI        (SPI_DEV(1))
 #define KW2XRF_CS         (GPIO_PIN(KW2XDRF_PORT, KW2XDRF_PCS0_PIN))
 #define KW2XRF_INT        (GPIO_PIN(KW2XDRF_PORT, KW2XDRF_IRQ_PIN))
-#define KW2XRF_SPI_SPEED  (SPI_SPEED_10MHZ)
+#define KW2XRF_SPI_SPEED  (SPI_CLK_10MHZ)
 #define KW2XRF_SHARED_SPI 0
 /** @}*/
 

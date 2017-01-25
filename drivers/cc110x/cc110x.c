@@ -55,16 +55,10 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
     dev->params = *params;
 
     /* Configure chip-select */
-    gpio_init(dev->params.cs, GPIO_OUT);
-    gpio_set(dev->params.cs);
+    spi_init_cs(dev->params.spi, dev->params.cs);
 
     /* Configure GDO1 */
     gpio_init(dev->params.gdo1, GPIO_IN);
-
-    /* Configure SPI */
-    spi_acquire(dev->params.spi);
-    spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING, SPI_SPEED_5MHZ);
-    spi_release(dev->params.spi);
 
 #ifndef CC110X_DONT_RESET
     /* reset device*/

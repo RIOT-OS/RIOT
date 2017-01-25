@@ -109,40 +109,53 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief SPI configuration
+ * @brief   SPI configuration
+ *
+ * @note    The spi_divtable is auto-generated from
+ *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-#define SPI_NUMOF           (2U)
-#define SPI_0_EN            1
-#define SPI_1_EN            1
+static const uint8_t spi_divtable[2][5] = {
+    {       /* for APB1 @ 32000000Hz */
+        7,  /* -> 125000Hz */
+        5,  /* -> 500000Hz */
+        4,  /* -> 1000000Hz */
+        2,  /* -> 4000000Hz */
+        1   /* -> 8000000Hz */
+    },
+    {       /* for APB2 @ 32000000Hz */
+        7,  /* -> 125000Hz */
+        5,  /* -> 500000Hz */
+        4,  /* -> 1000000Hz */
+        2,  /* -> 4000000Hz */
+        1   /* -> 8000000Hz */
+    }
+};
 
-/* SPI 0 device configuration */
-#define SPI_0_DEV           SPI1  /* Densitron DD-160128FC-1a OLED display; external pins */
-#define SPI_0_CLKEN()       (periph_clk_en(APB2, RCC_APB2ENR_SPI1EN))
-#define SPI_0_CLKDIS()      (periph_clk_dis(APB2, RCC_APB2ENR_SPI1EN))
-#define SPI_0_IRQ           SPI1_IRQn
-#define SPI_0_ISR           isr_spi1
-/* SPI 0 pin configuration */
-#define SPI_0_PORT_CLKEN()  (periph_clk_en(AHB, RCC_AHBENR_GPIOAEN))
-#define SPI_0_PORT          GPIOA
-#define SPI_0_PIN_SCK       5
-#define SPI_0_PIN_MOSI      7
-#define SPI_0_PIN_MISO      6
-#define SPI_0_PIN_AF        5
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_A, 7),
+        .miso_pin = GPIO_PIN(PORT_A, 6),
+        .sclk_pin = GPIO_PIN(PORT_A, 5),
+        .cs_pin   = GPIO_UNDEF,
+        .af       = GPIO_AF5,
+        .rccmask  = RCC_APB2ENR_SPI1EN,
+        .apbbus   = APB2
+    },
+    {
+        .dev      = SPI3,
+        .mosi_pin = GPIO_PIN(PORT_B, 5),
+        .miso_pin = GPIO_PIN(PORT_B, 4),
+        .sclk_pin = GPIO_PIN(PORT_B, 3),
+        .cs_pin   = GPIO_UNDEF,
+        .af       = GPIO_AF6,
+        .rccmask  = RCC_APB1ENR_SPI3EN,
+        .apbbus   = APB1
+    }
+};
 
-/* SPI 1 device configuration */
-#define SPI_1_DEV           SPI3          /*  Adesto AT45DB641E data flash */
-#define SPI_1_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_SPI3EN))
-#define SPI_1_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_SPI3EN))
-#define SPI_1_IRQ           SPI3_IRQn
-#define SPI_1_ISR           isr_spi3
-/* SPI 1 pin configuration */
-#define SPI_1_PORT_CLKEN()  (periph_clk_en(AHB, RCC_AHBENR_GPIOBEN))
-#define SPI_1_PORT          GPIOB
-#define SPI_1_PIN_SCK       3
-#define SPI_1_PIN_MOSI      5
-#define SPI_1_PIN_MISO      4
-#define SPI_1_PIN_AF        6
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**

@@ -31,18 +31,19 @@ extern "C" {
  * @brief SPI configuration
  * @{
  */
-#define SPI_NUMOF           (1U)
-#define SPI_0_EN            1
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI2,
+        .mosi_pin = GPIO_PIN(PORT_B, 15),
+        .miso_pin = GPIO_PIN(PORT_B, 14),
+        .sclk_pin = GPIO_PIN(PORT_B, 13),
+        .cs_pin   = GPIO_UNDEF,
+        .rccmask  = RCC_APB1ENR_SPI2EN,
+        .apbbus   = APB1
+    }
+};
 
-/* SPI 0 device configuration */
-#define SPI_0_DEV           SPI2
-#define SPI_0_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_SPI2EN))
-#define SPI_0_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_SPI2EN))
-#define SPI_0_BUS_DIV       1   /* 1 -> SPI runs with full CPU clock, 0 -> half CPU clock */
-/* SPI 0 pin configuration */
-#define SPI_0_CLK_PIN       GPIO_PIN(PORT_B,13)
-#define SPI_0_MISO_PIN      GPIO_PIN(PORT_B,14)
-#define SPI_0_MOSI_PIN      GPIO_PIN(PORT_B,15)
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 #ifdef __cplusplus

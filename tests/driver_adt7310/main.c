@@ -36,7 +36,7 @@
 #endif
 
 #define SPI_CONF    (SPI_CONF_SECOND_FALLING)
-#define SPI_SPEED   (SPI_SPEED_10MHZ)
+#define SPI_CLK     (SPI_CLK_10MHZ)
 
 #define SLEEP_CONT  (100 * 1000U)
 #define SLEEP_1SPS  (1000 * 1000U)
@@ -89,17 +89,9 @@ int main(void)
     adt7310_t dev;
 
     puts("ADT7310 temperature driver test application\n");
-    printf("Initializing SPI_%i... ", TEST_ADT7310_SPI);
-    if (spi_init_master(TEST_ADT7310_SPI, SPI_CONF, SPI_SPEED) == 0) {
-        puts("[OK]");
-    }
-    else {
-        puts("[Failed]\n");
-        return 1;
-    }
 
     puts("Initializing ADT7310 sensor... ");
-    if (adt7310_init(&dev, TEST_ADT7310_SPI, TEST_ADT7310_CS) == 0) {
+    if (adt7310_init(&dev, TEST_ADT7310_SPI, SPI_CLK, TEST_ADT7310_CS) == 0) {
         puts("[OK]");
     }
     else {

@@ -19,6 +19,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph/init.h"
 
 /* Check the source to be used for the PLL */
 #if defined(CLOCK_HSI) && defined(CLOCK_HSE)
@@ -54,6 +55,8 @@ void cpu_init(void)
     cortexm_init();
     /* initialize the clock system */
     clock_init();
+    /* trigger static peripheral initialization */
+    periph_init();
 }
 
 /**

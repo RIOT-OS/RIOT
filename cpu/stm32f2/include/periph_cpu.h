@@ -105,13 +105,6 @@ typedef struct {
 } dac_conf_t;
 
 /**
- * @brief   Configure the given pin to be used as ADC input
- *
- * @param[in] pin       pin to configure
- */
-void gpio_init_analog(gpio_t pin);
-
-/**
  * @brief   Power on the DMA device the given stream belongs to
  *
  * @param[in] stream    logical DMA stream
@@ -185,6 +178,11 @@ static inline uint32_t dma_ifc(int stream)
     }
 }
 
+/**
+ * @brief   Enable DMA interrupts
+ *
+ * @param[in] stream    logical DMA stream
+ */
 static inline void dma_isr_enable(int stream)
 {
     if (stream < 7) {

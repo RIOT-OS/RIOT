@@ -19,6 +19,8 @@
 #ifndef CPU_PERIPH_H
 #define CPU_PERIPH_H
 
+#include <limits.h>
+
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus
@@ -43,6 +45,13 @@ enum {
  * - bit 2: pull enable
  */
 #define GPIO_MODE(pr, ie, pe)   (pr | (ie << 1) | (pe << 2))
+
+/**
+ * @brief   Override SPI hardware chip select macro
+ *
+ * As of now, we do not support HW CS, so we always set it to a fixed value
+ */
+#define SPI_HWCS(x)     (UINT_MAX - 1)
 
 #ifndef DOXYGEN
 /**

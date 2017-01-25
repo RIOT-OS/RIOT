@@ -89,6 +89,16 @@ typedef struct {
     uint8_t ev_irqn;        /**< event IRQ */
 } i2c_conf_t;
 
+/**
+ * @brief   Configure the alternate function for the given pin
+ *
+ * @note    This is meant for internal use in STM32L1 peripheral drivers only
+ *
+ * @param[in] pin       pin to configure
+ * @param[in] af        alternate function to use
+ */
+void gpio_init_af(gpio_t pin, gpio_af_t af);
+
 #ifdef __cplusplus
 }
 #endif

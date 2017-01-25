@@ -39,7 +39,7 @@ extern "C" {
  * @brief   Use the shared SPI functions
  * @{
  */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
@@ -88,6 +88,22 @@ typedef uint32_t gpio_t;
  * @brief   Define a CPU specific GPIO pin generator macro
  */
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
+
+/**
+ * @brief   Define a magic number that tells us to use hardware chip select
+ *
+ * We use a random value here, that does clearly differentiate from any possible
+ * GPIO_PIN(x) value.
+ */
+#define SPI_HWCS_MASK       (0xffffff00)
+
+/**
+ * @brief   Override the default SPI hardware chip select access macro
+ *
+ * Since the CPU does only support one single hardware chip select line, we can
+ * detect the usage of non-valid lines by comparing to SPI_HWCS_VALID.
+ */
+#define SPI_HWCS(x)         (SPI_HWCS_MASK | x)
 
 /**
  * @brief   Available MUX values for configuring a pin's alternate function
@@ -168,6 +184,22 @@ typedef struct {
     uint8_t dma_chan;       /**< DMA channel used for TX */
 #endif
 } uart_conf_t;
+
+/**
+ * @brief   Structure for SPI configuration data
+ */
+typedef struct {
+    SPI_TypeDef *dev;       /**< SPI device base register address */
+    gpio_t mosi_pin;        /**< MOSI pin */
+    gpio_t miso_pin;        /**< MISO pin */
+    gpio_t sclk_pin;        /**< SCLK pin */
+    gpio_t cs_pin;          /**< HWCS pin, set to GPIO_UNDEF if not mapped */
+#ifndef CPU_FAM_STM32F1
+    gpio_af_t af;           /**< pin alternate function */
+#endif
+    uint32_t rccmask;       /**< bit in the RCC peripheral enable register */
+    uint8_t apbbus;         /**< APBx bus the device is connected to */
+} spi_conf_t;
 
 /**
  * @brief   Get the actual bus clock frequency for the APB buses

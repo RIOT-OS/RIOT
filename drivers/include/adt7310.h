@@ -65,6 +65,7 @@ extern "C"
  */
 typedef struct {
     spi_t spi;              /**< SPI bus the sensor is connected to */
+    spi_clk_t clk;          /**< SPI bus clock speed */
     gpio_t cs;              /**< CS pin GPIO handle */
     bool initialized;       /**< sensor status, true if sensor is initialized */
     bool high_res;          /**< Sensor resolution, true if configured to 16 bit resolution */
@@ -119,12 +120,13 @@ int adt7310_set_config(adt7310_t *dev, uint8_t config);
  *
  * @param[in]  dev          pointer to sensor device descriptor
  * @param[in]  spi          SPI bus the sensor is connected to
+ * @param[in]  clk          SPI bus speed
  * @param[in]  cs           GPIO pin the chip select signal is connected to
  *
  * @return                  0 on success
  * @return                  <0 on error
  */
-int adt7310_init(adt7310_t *dev, spi_t spi, gpio_t cs);
+int adt7310_init(adt7310_t *dev, spi_t spi, spi_clk_t clk, gpio_t cs);
 
 /**
  * @brief Read raw temperature register value

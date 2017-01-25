@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +15,7 @@
  * @brief       common SPI function fallback implementations
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -22,76 +24,49 @@
 #include "board.h"
 #include "cpu.h"
 #include "periph/spi.h"
-#include "periph_cpu.h"
 
-#if SPI_NUMOF
+#ifdef SPI_NUMOF
 
-#ifdef PERIPH_SPI_NEEDS_TRANSFER_BYTES
-int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
+#ifdef PERIPH_SPI_NEEDS_INIT_CS
+int spi_init_cs(spi_t bus, spi_cs_t cs)
 {
-    int trans_ret;
-    unsigned trans_bytes = 0;
-    char in_temp;
-
-    for (trans_bytes = 0; trans_bytes < length; trans_bytes++) {
-        if (out != NULL) {
-            trans_ret = spi_transfer_byte(dev, out[trans_bytes], &in_temp);
-        }
-        else {
-            trans_ret = spi_transfer_byte(dev, 0, &in_temp);
-        }
-        if (trans_ret < 0) {
-            return -1;
-        }
-        if (in != NULL) {
-            in[trans_bytes] = in_temp;
-        }
+    if (bus >= SPI_NUMOF) {
+        return SPI_NODEV;
+    }
+    if ((cs == SPI_CS_UNDEF) || (cs == GPIO_UNDEF)) {
+        return SPI_NOCS;
     }
 
-    return trans_bytes;
+    gpio_init((gpio_t)cs, GPIO_OUT);
+    gpio_set((gpio_t)cs);
+
+    return SPI_OK;
 }
 #endif
 
 #ifdef PERIPH_SPI_NEEDS_TRANSFER_BYTE
-int spi_transfer_byte(spi_t dev, char out, char *in)
+uint8_t spi_transfer_byte(spi_t bus, spi_cs_t cs, bool cont, uint8_t out)
 {
-    return spi_transfer_bytes(dev, &out, in, 1);
+    uint8_t in;
+    spi_transfer_bytes(bus, cs, cont, &out, &in, 1);
+    return in;
 }
 #endif
 
 #ifdef PERIPH_SPI_NEEDS_TRANSFER_REG
-int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
+uint8_t spi_transfer_reg(spi_t bus, spi_cs_t cs, uint8_t reg, uint8_t out)
 {
-    int trans_ret;
-
-    trans_ret = spi_transfer_byte(dev, reg, in);
-    if (trans_ret < 0) {
-        return -1;
-    }
-    trans_ret = spi_transfer_byte(dev, out, in);
-    if (trans_ret < 0) {
-        return -1;
-    }
-
-    return 1;
+    spi_transfer_bytes(bus, cs, true, &reg, NULL, 1);
+    return spi_transfer_byte(bus, cs, false, out);
 }
 #endif
 
 #ifdef PERIPH_SPI_NEEDS_TRANSFER_REGS
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length)
+void spi_transfer_regs(spi_t bus, spi_cs_t cs,
+                       uint8_t reg, const void *out, void *in, size_t len)
 {
-    int trans_ret;
-
-    trans_ret = spi_transfer_byte(dev, reg, in);
-    if (trans_ret < 0) {
-        return -1;
-    }
-    trans_ret = spi_transfer_bytes(dev, out, in, length);
-    if (trans_ret < 0) {
-        return -1;
-    }
-
-    return trans_ret;
+    spi_transfer_bytes(bus, cs, true, &reg, NULL, 1);
+    spi_transfer_bytes(bus, cs, false, out, in, len);
 }
 #endif
 

@@ -61,7 +61,7 @@
 #define ODR         LIS3DH_ODR_100Hz
 #define SLEEP       (100 * 1000U)
 #define SPI_CONF    (SPI_CONF_SECOND_FALLING)
-#define SPI_SPEED   (SPI_SPEED_10MHZ)
+#define SPI_CLK     (SPI_CLK_10MHZ)
 
 #define WATERMARK_LEVEL 16
 
@@ -79,17 +79,9 @@ int main(void)
     lis3dh_data_t acc_data;
 
     puts("LIS3DH accelerometer driver test application\n");
-    printf("Initializing SPI_%i... ", TEST_LIS3DH_SPI);
-    if (spi_init_master(TEST_LIS3DH_SPI, SPI_CONF, SPI_SPEED) == 0) {
-        puts("[OK]");
-    }
-    else {
-        puts("[Failed]\n");
-        return 1;
-    }
 
     puts("Initializing LIS3DH sensor... ");
-    if (lis3dh_init(&dev, TEST_LIS3DH_SPI, TEST_LIS3DH_CS, SCALE) == 0) {
+    if (lis3dh_init(&dev, TEST_LIS3DH_SPI, SPI_CLK, TEST_LIS3DH_CS, SCALE) == 0) {
         puts("[OK]");
     }
     else {

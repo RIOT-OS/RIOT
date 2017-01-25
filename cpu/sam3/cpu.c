@@ -19,6 +19,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph/init.h"
 
 /**
  * @brief   Keys needed for editing certain PMC registers
@@ -88,4 +89,7 @@ void cpu_init(void)
     PMC->PMC_MCKR = PMC_MCKR_CSS_PLLA_CLK;
     /* wait for master clock to be ready */
     while (!(PMC->PMC_SR & PMC_SR_MCKRDY));
+
+    /* trigger static peripheral initialization */
+    periph_init();
 }

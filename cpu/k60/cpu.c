@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include "cpu.h"
 #include "board.h"
+#include "periph/init.h"
 
 /**
  * @ingroup     cpu_k60
@@ -48,6 +49,8 @@ void cpu_init(void)
     cortexm_init();
     /* Check that we are running on the CPU that this code was built for */
     check_running_cpu_revision();
+    /* trigger static peripheral initialization */
+    periph_init();
 }
 
 static void check_running_cpu_revision(void)

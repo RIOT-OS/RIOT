@@ -137,8 +137,8 @@ extern "C" {
  */
 typedef struct at86rf2xx_params {
     spi_t spi;              /**< SPI bus the device is connected to */
-    spi_speed_t spi_speed;  /**< SPI speed to use */
-    gpio_t cs_pin;          /**< GPIO pin connected to chip select */
+    spi_clk_t spi_clk;      /**< SPI clock speed to use */
+    spi_cs_t cs_pin;        /**< GPIO pin connected to chip select */
     gpio_t int_pin;         /**< GPIO pin connected to the interrupt pin */
     gpio_t sleep_pin;       /**< GPIO pin connected to the sleep pin */
     gpio_t reset_pin;       /**< GPIO pin connected to the reset pin */

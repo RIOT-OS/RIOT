@@ -30,7 +30,7 @@ extern "C" {
  * @{
  */
 #ifndef SDCARD_SPI_PARAM_SPI
-#define SDCARD_SPI_PARAM_SPI         (SPI_0)
+#define SDCARD_SPI_PARAM_SPI         (SPI_DEV(0))
 #endif
 #ifndef SDCARD_SPI_PARAM_CS
 #define SDCARD_SPI_PARAM_CS          (GPIO_PIN(2,4))

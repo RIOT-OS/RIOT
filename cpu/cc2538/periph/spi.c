@@ -1,327 +1,175 @@
 /*
  * Copyright (C) 2015 Loci Controls Inc.
+ *               2016 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
- * @addtogroup  driver_periph
+ * @addtogroup  cpu_cc2538
  * @{
  *
  * @file
  * @brief       Low-level SPI driver implementation
  *
  * @author      Ian Martin <ian@locicontrols.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
-#include <assert.h>
-#include <stdio.h>
-
-#include "cc2538_ssi.h"
-
 #include "cpu.h"
 #include "mutex.h"
+#include "assert.h"
 #include "periph/spi.h"
-#include "periph_conf.h"
-
-/* guard file in case no SPI device is defined */
-#if SPI_NUMOF
-
-/* clock sources for the SSI_CC register */
-#define CS_SYS_DIV            0
-#define CS_IO_DIV             1
-
-#define SSI0_MASK             (1 << 0)
-#define SSI1_MASK             (1 << 1)
-
-#ifndef SPI_DATA_BITS_NUMOF
-#define SPI_DATA_BITS_NUMOF   8
-#endif
-
-#define spin_until(condition) while (!(condition)) thread_yield()
 
 /**
- * @brief Array holding one pre-initialized mutex for each SPI device
+ * @brief   Array holding one pre-initialized mutex for each SPI device
  */
-static mutex_t locks[SPI_NUMOF] = {MUTEX_INIT};
+static mutex_t locks[SPI_NUMOF];
 
-int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
+static inline cc2538_ssi_t *dev(spi_t bus)
 {
-    cc2538_ssi_t* ssi = spi_config[dev].dev;
-
-    if ((unsigned int)dev >= SPI_NUMOF) {
-        return -1;
-    }
-
-    /* power on the SPI device */
-    spi_poweron(dev);
-
-    /* configure SCK, MISO and MOSI pin */
-    spi_conf_pins(dev);
-
-    /* Disable the SSI and configure it for SPI master mode */
-    ssi->CR1 = 0;
-
-    /* 3. Configure the SSI clock source */
-    ssi->CC = CS_SYS_DIV;
-
-    /* 4. Configure the clock prescale divisor by writing the SSI_CPSR register.
-     * frequency of the SSIClk is defined by: SSIClk = SysClk / (CPSDVSR x (1 + SCR))
-     */
-
-    const int32_t speed_lut[] = {
-        [SPI_SPEED_100KHZ] =   100000 /* Hz */,
-        [SPI_SPEED_400KHZ] =   400000 /* Hz */,
-        [SPI_SPEED_1MHZ  ] =  1000000 /* Hz */,
-        [SPI_SPEED_5MHZ  ] =  5000000 /* Hz */,
-        [SPI_SPEED_10MHZ ] = 10000000 /* Hz */,
-    };
-
-    int32_t SysClk = sys_clock_freq();
-    int32_t f_desired = speed_lut[speed];
-    int32_t f_actual;
-    int32_t err;
-    int32_t best_err = INT32_MAX;
-    int32_t div1;
-    int32_t div2;
-    int32_t best_div1 = 2;
-    int32_t best_div2 = 1;
-
-    /* System clock is first divided by CPSDVSR, then by SCR */
-    for (div1 = 2; div1 <= 254; div1++) {
-        div2 = SysClk;
-        int32_t denom = div1 * f_desired;
-        div2 += denom / 2;
-        div2 /= denom;
-
-        if (div2 < 1) {
-            div2 = 1;
-        }
-        else if (div2 > 256) {
-            div2 = 256;
-        }
-
-        f_actual = SysClk / (div1 * div2);
-        err = f_actual - f_desired;
-        if (err < 0) {
-            err = -err;
-        }
-        if (err <= best_err) {
-            best_div1 = div1;
-            best_div2 = div2;
-            best_err = err;
-        }
-    }
-
-    ssi->CPSR        = best_div1;     /* CPSDVSR */
-    ssi->CR0bits.SCR = best_div2 - 1; /* Serial clock rate (SCR) */
-
-    switch (conf) {
-        case SPI_CONF_FIRST_RISING:
-            ssi->CR0bits.SPO = 0;
-            ssi->CR0bits.SPH = 0;
-            break;
-
-        case SPI_CONF_SECOND_RISING:
-            ssi->CR0bits.SPO = 0;
-            ssi->CR0bits.SPH = 1;
-            break;
-
-        case SPI_CONF_FIRST_FALLING:
-            ssi->CR0bits.SPO = 1;
-            ssi->CR0bits.SPH = 0;
-            break;
-
-        case SPI_CONF_SECOND_FALLING:
-            ssi->CR0bits.SPO = 1;
-            ssi->CR0bits.SPH = 1;
-            break;
-    }
-
-    ssi->CR0bits.FRF = 0;                       /* SPI protocol mode */
-    ssi->CR0bits.DSS = SPI_DATA_BITS_NUMOF - 1; /* The data size */
-
-    ssi->CR1bits.SSE = 1;
-
-    return 0;
+    return spi_config[bus].dev;
 }
 
-int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
+static inline void poweron(spi_t bus)
 {
-    /* slave mode is not (yet) supported */
-    return -1;
+    SYS_CTRL_RCGCSSI |= (1 << bus);
+    SYS_CTRL_SCGCSSI |= (1 << bus);
+    SYS_CTRL_DCGCSSI |= (1 << bus);
 }
 
-int spi_conf_pins(spi_t dev)
+static inline void poweroff(spi_t bus)
 {
-    if ((unsigned int)dev >= SPI_NUMOF) {
-        return -1;
-    }
+    SYS_CTRL_RCGCSSI &= ~(1 << bus);
+    SYS_CTRL_SCGCSSI &= ~(1 << bus);
+    SYS_CTRL_DCGCSSI &= ~(1 << bus);
+}
 
-    switch ((uintptr_t)spi_config[dev].dev) {
+void spi_init(spi_t bus)
+{
+    assert(bus <= SPI_NUMOF);
+
+    /* temporarily power on the device */
+    poweron(bus);
+    /* configure device to be a master and disable SSI operation mode */
+    dev(bus)->CR1 = 0;
+    /* configure system clock as SSI clock source */
+    dev(bus)->CC = SSI_SS_IODIV;
+    /* and power off the bus again */
+    poweroff(bus);
+
+    /* trigger SPI pin configuration */
+    spi_init_pins(bus);
+}
+
+void spi_init_pins(spi_t bus)
+{
+    switch ((uintptr_t)spi_config[bus].dev) {
         case (uintptr_t)SSI0:
-            IOC_PXX_SEL[spi_config[dev].mosi_pin] = SSI0_TXD;
-            IOC_PXX_SEL[spi_config[dev].sck_pin ] = SSI0_CLKOUT;
-            IOC_PXX_SEL[spi_config[dev].cs_pin  ] = SSI0_FSSOUT;
+            IOC_PXX_SEL[spi_config[bus].mosi_pin] = SSI0_TXD;
+            IOC_PXX_SEL[spi_config[bus].sck_pin ] = SSI0_CLKOUT;
+            IOC_PXX_SEL[spi_config[bus].cs_pin  ] = SSI0_FSSOUT;
 
-            IOC_SSIRXD_SSI0 = spi_config[dev].miso_pin;
+            IOC_SSIRXD_SSI0 = spi_config[bus].miso_pin;
             break;
 
         case (uintptr_t)SSI1:
-            IOC_PXX_SEL[spi_config[dev].mosi_pin] = SSI1_TXD;
-            IOC_PXX_SEL[spi_config[dev].sck_pin ] = SSI1_CLKOUT;
-            IOC_PXX_SEL[spi_config[dev].cs_pin  ] = SSI1_FSSOUT;
+            IOC_PXX_SEL[spi_config[bus].mosi_pin] = SSI1_TXD;
+            IOC_PXX_SEL[spi_config[bus].sck_pin ] = SSI1_CLKOUT;
+            IOC_PXX_SEL[spi_config[bus].cs_pin  ] = SSI1_FSSOUT;
 
-            IOC_SSIRXD_SSI1 = spi_config[dev].miso_pin;
+            IOC_SSIRXD_SSI1 = spi_config[bus].miso_pin;
             break;
     }
 
-    IOC_PXX_OVER[spi_config[dev].mosi_pin] = IOC_OVERRIDE_OE;
-    IOC_PXX_OVER[spi_config[dev].sck_pin ] = IOC_OVERRIDE_OE;
-    IOC_PXX_OVER[spi_config[dev].cs_pin  ] = IOC_OVERRIDE_OE;
-    IOC_PXX_OVER[spi_config[dev].miso_pin] = IOC_OVERRIDE_DIS;
+    IOC_PXX_OVER[spi_config[bus].mosi_pin] = IOC_OVERRIDE_OE;
+    IOC_PXX_OVER[spi_config[bus].miso_pin] = IOC_OVERRIDE_DIS;
+    IOC_PXX_OVER[spi_config[bus].sck_pin ] = IOC_OVERRIDE_OE;
+    IOC_PXX_OVER[spi_config[bus].cs_pin  ] = IOC_OVERRIDE_OE;
 
-    gpio_hardware_control(spi_config[dev].mosi_pin);
-    gpio_hardware_control(spi_config[dev].miso_pin);
-    gpio_hardware_control(spi_config[dev].sck_pin);
-    gpio_hardware_control(spi_config[dev].cs_pin);
-
-    return 0;
+    gpio_hardware_control(spi_config[bus].mosi_pin);
+    gpio_hardware_control(spi_config[bus].miso_pin);
+    gpio_hardware_control(spi_config[bus].sck_pin);
+    gpio_hardware_control(spi_config[bus].cs_pin);
 }
 
-int spi_acquire(spi_t dev)
+int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    if ((unsigned int)dev >= SPI_NUMOF) {
-        return -1;
-    }
-    mutex_lock(&locks[dev]);
-    return 0;
+    /* lock the bus */
+    mutex_lock(&locks[bus]);
+    /* power on device */
+    poweron(bus);
+    /* configure SCR clock field, data-width and mode */
+    dev(bus)->CR0 = 0;
+    dev(bus)->CPSR = (spi_clk_config[clk].cpsr);
+    dev(bus)->CR0 = ((spi_clk_config[clk].scr << 8) | mode | SSI_CR0_DSS(8));
+    /* enable SSI device */
+    dev(bus)->CR1 = SSI_CR1_SSE;
+
+    return SPI_OK;
 }
 
-int spi_release(spi_t dev)
+void spi_release(spi_t bus)
 {
-    if ((unsigned int)dev >= SPI_NUMOF) {
-        return -1;
-    }
-    mutex_unlock(&locks[dev]);
-    return 0;
+    /* disable and power off device */
+    dev(bus)->CR1 = 0;
+    poweroff(bus);
+    /* and release lock... */
+    mutex_unlock(&locks[bus]);
 }
 
-static char ssi_flush_input(cc2538_ssi_t *ssi)
+void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
+                        const void *out, void *in, size_t len)
 {
-    char tmp = 0;
+    uint8_t *out_buf = (uint8_t *)out;
+    uint8_t *in_buf = (uint8_t *)in;
 
-    while (ssi->SRbits.RNE) {
-        tmp = ssi->DR;
+    assert(out_buf || in_buf);
+
+    if (cs != SPI_CS_UNDEF) {
+        gpio_clear((gpio_t)cs);
     }
 
-    return tmp;
-}
-
-int spi_transfer_byte(spi_t dev, char out, char *in)
-{
-    cc2538_ssi_t* ssi = spi_config[dev].dev;
-    char tmp;
-
-    ssi_flush_input(ssi);
-
-    /* transmit byte */
-    spin_until(ssi->SRbits.TNF);
-    ssi->DR = out;
-
-    /* receive byte */
-    spin_until(ssi->SRbits.RNE);
-    tmp = ssi->DR;
-
-    if (in) {
-        *in = tmp;
-    }
-
-    return 1;
-}
-
-int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
-{
-    cc2538_ssi_t* ssi = spi_config[dev].dev;
-    unsigned int tx_n = 0, rx_n = 0;
-
-    if ((unsigned int)dev >= SPI_NUMOF) {
-        return -1;
-    }
-
-    ssi_flush_input(ssi);
-
-    /* transmit and receive bytes */
-    while (tx_n < length) {
-        spin_until(ssi->SRbits.TNF || ssi->SRbits.RNE);
-
-        if (ssi->SRbits.TNF) {
-            ssi->DR = out[tx_n];
-            tx_n++;
+    if (!in_buf) {
+        for (size_t i = 0; i < len; i++) {
+            while (!(dev(bus)->SR & SSI_SR_TNF)) {}
+            dev(bus)->DR = out_buf[i];
         }
-        else if (ssi->SRbits.RNE) {
-            assert(rx_n < length);
-            in[rx_n] = ssi->DR;
-            rx_n++;
+        /* flush RX FIFO while busy*/
+        while ((dev(bus)->SR & SSI_SR_BSY)) {
+            dev(bus)->DR;
         }
     }
-
-    /* receive remaining bytes */
-    while (rx_n < length) {
-        spin_until(ssi->SRbits.RNE);
-        assert(rx_n < length);
-        in[rx_n] = ssi->DR;
-        rx_n++;
+    else if (!out_buf) { /*TODO this case is currently untested */
+        size_t in_cnt = 0;
+        for (size_t i = 0; i < len; i++) {
+            while (!(dev(bus)->SR & SSI_SR_TNF)) {}
+            dev(bus)->DR = 0;
+            if (dev(bus)->SR & SSI_SR_RNE) {
+                in_buf[in_cnt++] = dev(bus)->DR;
+            }
+        }
+        /* get remaining bytes */
+        while (dev(bus)->SR & SSI_SR_RNE) {
+            in_buf[in_cnt++] = dev(bus)->DR;
+        }
+    }
+    else {
+        for (size_t i = 0; i < len; i++) {
+            while (!(dev(bus)->SR & SSI_SR_TNF)) {}
+            dev(bus)->DR = out_buf[i];
+            while (!(dev(bus)->SR & SSI_SR_RNE)){}
+            in_buf[i] = dev(bus)->DR;
+        }
+    /* wait until no more busy */
+    while ((dev(bus)->SR & SSI_SR_BSY)) {}
     }
 
-    return rx_n;
-}
-
-void spi_transmission_begin(spi_t dev, char reset_val)
-{
-    /* slave mode is not (yet) supported */
-}
-
-void spi_poweron(spi_t dev)
-{
-    switch ((uintptr_t)spi_config[dev].dev) {
-        case (uintptr_t)SSI0:
-            /* enable SSI0 in all three power modes */
-            SYS_CTRL_RCGCSSI |= SSI0_MASK;
-            SYS_CTRL_SCGCSSI |= SSI0_MASK;
-            SYS_CTRL_DCGCSSI |= SSI0_MASK;
-            break;
-
-        case (uintptr_t)SSI1:
-            /* enable SSI1 in all three power modes */
-            SYS_CTRL_RCGCSSI |= SSI1_MASK;
-            SYS_CTRL_SCGCSSI |= SSI1_MASK;
-            SYS_CTRL_DCGCSSI |= SSI1_MASK;
-            break;
+    if ((!cont) && (cs != SPI_CS_UNDEF)) {
+        gpio_set((gpio_t)cs);
     }
 }
-
-void spi_poweroff(spi_t dev)
-{
-    switch ((uintptr_t)spi_config[dev].dev) {
-        case (uintptr_t)SSI0:
-            /* disable SSI0 in all three power modes */
-            SYS_CTRL_RCGCSSI &= ~SSI0_MASK;
-            SYS_CTRL_SCGCSSI &= ~SSI0_MASK;
-            SYS_CTRL_DCGCSSI &= ~SSI0_MASK;
-            break;
-
-        case (uintptr_t)SSI1:
-            /* disable SSI1 in all three power modes */
-            SYS_CTRL_RCGCSSI &= ~SSI1_MASK;
-            SYS_CTRL_SCGCSSI &= ~SSI1_MASK;
-            SYS_CTRL_DCGCSSI &= ~SSI1_MASK;
-            break;
-    }
-}
-
-#endif /* SPI_NUMOF */

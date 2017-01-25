@@ -139,13 +139,13 @@ extern "C" {
 /* memory capacity in bytes = (C_SIZE+1) * SD_CSD_V2_C_SIZE_BLOCK_MULT * BLOCK_LEN */
 #define SD_CSD_V2_C_SIZE_BLOCK_MULT 1024
 
-#define SD_CARD_SPI_MODE SPI_CONF_FIRST_RISING
+#define SD_CARD_SPI_MODE SPI_MODE_0
 
 /* this speed setting is only used while the init procedure is performed */
-#define SD_CARD_SPI_SPEED_PREINIT SPI_SPEED_400KHZ
+#define SD_CARD_SPI_SPEED_PREINIT SPI_CLK_400KHZ
 
 /* after init procedure is finished the driver auto sets the card to this speed */
-#define SD_CARD_SPI_SPEED_POSTINIT SPI_SPEED_10MHZ
+#define SD_CARD_SPI_SPEED_POSTINIT SPI_CLK_10MHZ
 
 #define SD_CARD_DUMMY_BYTE 0xFF
 

@@ -57,7 +57,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     uart_ctx[uart].arg = arg;
     /* configure interrupts and enable RX interrupt */
     _uart(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
-    NVIC_EnableIRQ(SERCOM0_IRQn + _sercom_id(_uart(uart)));
+    NVIC_EnableIRQ(SERCOM0_IRQn + sercom_id(_uart(uart)));
     return UART_OK;
 }
 
@@ -112,18 +112,18 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
 void uart_poweron(uart_t uart)
 {
-    PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << _sercom_id(_uart(uart)));
+    PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << sercom_id(_uart(uart)));
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
                          GCLK_CLKCTRL_GEN_GCLK0 |
-                         (SERCOM0_GCLK_ID_CORE + _sercom_id(_uart(uart))) <<
+                         (SERCOM0_GCLK_ID_CORE + sercom_id(_uart(uart))) <<
                           GCLK_CLKCTRL_ID_Pos);
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 }
 
 void uart_poweroff(uart_t uart)
 {
-    PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << _sercom_id(_uart(uart)));
-    GCLK->CLKCTRL.reg = ((SERCOM0_GCLK_ID_CORE + _sercom_id(_uart(uart))) <<
+    PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << sercom_id(_uart(uart)));
+    GCLK->CLKCTRL.reg = ((SERCOM0_GCLK_ID_CORE + sercom_id(_uart(uart))) <<
                           GCLK_CLKCTRL_ID_Pos);
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 }

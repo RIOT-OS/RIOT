@@ -26,8 +26,8 @@ ifneq (true,$(USE_BOARD_PARAMETERS))
   # set default device parameters in case they are undefined
   DRIVER            ?= kw2xrf
   KW2XRF_SHARED_SPI ?= 1
-  KWRF_SPI          ?= SPI_0
-  KWRF_SPI_SPEED    ?= SPI_SPEED_5MHZ
+  KWRF_SPI          ?= SPI_DEV\(0\)
+  KWRF_SPI_SPEED    ?= SPI_CLK_5MHZ
   KWRF_CS           ?= GPIO_PIN\(0,0\)
   KWRF_INT          ?= GPIO_PIN\(0,1\)
 

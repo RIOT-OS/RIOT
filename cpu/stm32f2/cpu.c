@@ -19,6 +19,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph/init.h"
 
 #ifdef HSI_VALUE
 # define RCC_CR_SOURCE          RCC_CR_HSION
@@ -38,6 +39,8 @@ void cpu_init(void)
     cortexm_init();
     /* initialize system clocks */
     clk_init();
+    /* trigger static peripheral initialization */
+    periph_init();
 }
 
 /**

@@ -160,38 +160,51 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name SPI configuration
+ * @brief   SPI configuration
+ *
+ * @note    The spi_divtable is auto-generated from
+ *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-#define SPI_NUMOF           (2U)
-#define SPI_0_EN            1
-#define SPI_1_EN            0
-#define SPI_IRQ_PRIO        1
+static const uint8_t spi_divtable[2][5] = {
+    {       /* for APB1 @ 36000000Hz */
+        7,  /* -> 140625Hz */
+        6,  /* -> 281250Hz */
+        4,  /* -> 1125000Hz */
+        2,  /* -> 4500000Hz */
+        1   /* -> 9000000Hz */
+    },
+    {       /* for APB2 @ 72000000Hz */
+        7,  /* -> 281250Hz */
+        7,  /* -> 281250Hz */
+        5,  /* -> 1125000Hz */
+        3,  /* -> 4500000Hz */
+        2   /* -> 9000000Hz */
+    }
+};
 
-/* SPI 0 device config */
-#define SPI_0_DEV               SPI1
-#define SPI_0_CLKEN()           (periph_clk_en(APB2, RCC_APB2ENR_SPI1EN))
-#define SPI_0_CLKDIS()          (periph_clk_dis(APB2, RCC_APB2ENR_SPI1EN))
-#define SPI_0_IRQ               SPI1_IRQn
-#define SPI_0_IRQ_HANDLER       isr_spi1
-#define SPI_0_BUS_DIV           1
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_A, 7),
+        .miso_pin = GPIO_PIN(PORT_A, 6),
+        .sclk_pin = GPIO_PIN(PORT_A, 5),
+        .cs_pin   = GPIO_UNDEF,
+        .rccmask  = RCC_APB2ENR_SPI1EN,
+        .apbbus   = APB2
+    },
+    {
+        .dev      = SPI2,
+        .mosi_pin = GPIO_PIN(PORT_B, 15),
+        .miso_pin = GPIO_PIN(PORT_B, 14),
+        .sclk_pin = GPIO_PIN(PORT_B, 13),
+        .cs_pin   = GPIO_UNDEF,
+        .rccmask  = RCC_APB1ENR_SPI2EN,
+        .apbbus   = APB1
+    }
+};
 
-/* SPI 0 pin configuration */
-#define SPI_0_CLK_PIN           GPIO_PIN(PORT_A, 5)
-#define SPI_0_MISO_PIN          GPIO_PIN(PORT_A, 6)
-#define SPI_0_MOSI_PIN          GPIO_PIN(PORT_A, 7)
-
-/* SPI 1 device config */
-#define SPI_1_DEV               SPI2
-#define SPI_1_CLKEN()           (periph_clk_en(APB1, RCC_APB1ENR_SPI2EN))
-#define SPI_1_CLKDIS()          (periph_clk_dis(APB1, RCC_APB1ENR_SPI2EN))
-#define SPI_1_IRQ               SPI2_IRQn
-#define SPI_1_IRQ_HANDLER       isr_spi2
-#define SPI_1_BUS_DIV           1
-/* SPI 1 pin configuration */
-#define SPI_1_CLK_PIN           GPIO_PIN(PORT_B, 13)
-#define SPI_1_MISO_PIN          GPIO_PIN(PORT_B, 14)
-#define SPI_1_MOSI_PIN          GPIO_PIN(PORT_B, 15)
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 #ifdef __cplusplus
