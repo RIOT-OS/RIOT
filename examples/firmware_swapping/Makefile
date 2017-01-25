@@ -37,7 +37,7 @@ gcoap-slot1:
 	FW_IMAGE_END=$(FW_IMAGE1_END) VERSION=$(VERSION_IMG1) UUID=$(UUID_IMG1) \
 	make clean all; \
 	cp bin/$(BOARD)/slot-image-$(UUID_IMG1)-$(VERSION_IMG1).bin ../firmware_swapping
-	
+
 default-slot2:
 	@cd ../default; \
 	CFLAGS="-DFW_SLOT=2 -DVERSION=$(VERSION_IMG2) -DUUID=$(UUID_IMG2) \
@@ -47,7 +47,7 @@ default-slot2:
 	FW_IMAGE_END=$(FW_IMAGE2_END) VERSION=$(VERSION_IMG2) UUID=$(UUID_IMG2) \
 	make clean all; \
 	cp bin/$(BOARD)/slot-image-$(UUID_IMG2)-$(VERSION_IMG2).bin ../firmware_swapping
-	
+
 merge-binary:
 	srec_cat bootloader.hex -intel -crop 0x08000000 $(FW_IMAGE1_OFFSET) \
 	slot-image-$(UUID_IMG1)-$(VERSION_IMG1).bin -binary -offset $(FW_IMAGE1_OFFSET) \
@@ -58,6 +58,6 @@ merge-binary:
 
 master-hex: bootloader gcoap-slot1 default-slot2 merge-binary
 	@true
-	
+
 clean:
 	@rm *.hex *.bin
