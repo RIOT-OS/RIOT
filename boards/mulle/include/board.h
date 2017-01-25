@@ -120,7 +120,6 @@ void board_init(void);
  * @name LIS3DH configuration
  * @{
  */
-
 #define LIS3DH_INT1                 GPIO_PIN(PORT_C, 18)
 #define LIS3DH_INT2                 GPIO_PIN(PORT_C, 17)
 #define LIS3DH_CS                   GPIO_PIN(PORT_D, 0)

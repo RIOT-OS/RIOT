@@ -50,17 +50,16 @@ extern saul_driver_t lis3dh_saul_driver;
 void auto_init_lis3dh(void)
 {
     for (unsigned int i = 0; i < LIS3DH_NUM; i++) {
-        const lis3dh_params_t *p = &lis3dh_params[i];
         int res;
 
         LOG_DEBUG("[auto_init_saul] initializing lis3dh #%u\n", i);
 
-        res = lis3dh_init(&lis3dh_devs[i], p->spi, p->clk, p->cs, p->scale);
+        res = lis3dh_init(&lis3dh_devs[i], &lis3dh_params[i]);
         if (res < 0) {
             LOG_ERROR("[auto_init_saul] error initializing lis3dh #%u\n", i);
             continue;
         }
-        res = lis3dh_set_odr(&lis3dh_devs[i], p->odr);
+        res = lis3dh_set_odr(&lis3dh_devs[i], lis3dh_params[i].odr);
         if (res < 0) {
             LOG_ERROR("[auto_init_saul] error setting ODR for lis3dh #%u\n", i);
             continue;
