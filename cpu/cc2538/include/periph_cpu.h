@@ -48,6 +48,9 @@ typedef uint32_t gpio_t;
  */
 #define GPIO_PIN(port, pin) (gpio_t)(((uint32_t)GPIO_A + (port << 12)) | pin)
 
+/**
+ * @brief   Define a custom GPIO_UNDEF value
+ */
 #define GPIO_UNDEF 99
 
 /**

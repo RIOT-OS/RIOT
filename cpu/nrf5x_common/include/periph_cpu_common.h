@@ -123,6 +123,7 @@ typedef struct {
 
 /**
  * @brief   Override SPI mode values
+ * @{
  */
 #define HAVE_SPI_MODE_T
 typedef enum {
@@ -131,9 +132,11 @@ typedef enum {
     SPI_MODE_2 = SPI_CONFIG_CPOL_Msk,                           /**< CPOL=1, CPHA=0 */
     SPI_MODE_3 = (SPI_CONFIG_CPOL_Msk | SPI_CONFIG_CPHA_Msk)    /**< CPOL=1, CPHA=1 */
 } spi_mode_t;
+/** @} */
 
 /**
  * @brief   Override SPI clock values
+ * @{
  */
 #define HAVE_SPI_CLK_T
 typedef enum {
@@ -143,6 +146,7 @@ typedef enum {
     SPI_CLK_5MHZ   = SPI_FREQUENCY_FREQUENCY_M4,    /**< 5MHz */
     SPI_CLK_10MHZ  = SPI_FREQUENCY_FREQUENCY_M8     /**< 10MHz */
 } spi_clk_t;
+/** @} */
 
 /**
  * @brief  SPI configuration values

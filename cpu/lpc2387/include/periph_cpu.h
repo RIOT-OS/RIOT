@@ -82,6 +82,7 @@ typedef enum {
 
 /**
  * @brief   Override SPI clock speed values
+ * @{
  */
 #define HAVE_SPI_CLK_T
 typedef enum {
@@ -91,6 +92,7 @@ typedef enum {
     SPI_CLK_5MHZ   = 5000,  /**< drive the SPI bus with 5MHz */
     SPI_CLK_10MHZ  = 10000  /**< drive the SPI bus with 10MHz */
 } spi_clk_t;
+/** @} */
 
 /* @} */
 #ifdef __cplusplus

@@ -120,6 +120,7 @@ int adt7310_set_config(adt7310_t *dev, uint8_t config);
  *
  * @param[in]  dev          pointer to sensor device descriptor
  * @param[in]  spi          SPI bus the sensor is connected to
+ * @param[in]  clk          SPI bus speed
  * @param[in]  cs           GPIO pin the chip select signal is connected to
  *
  * @return                  0 on success

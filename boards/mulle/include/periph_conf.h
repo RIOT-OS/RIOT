@@ -293,16 +293,6 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
-
-/**
- * @name I2C configuration
- * @{
- */
-#define I2C_NUMOF               (1U)
-#define I2C_CLK                 SystemBusClock
-#define I2C_0_EN                1
-#define I2C_1_EN                0
-#define I2C_IRQ_PRIO            CPU_DEFAULT_IRQ_PRIO
 /**
  * @name I2C baud rate configuration
  * @{
@@ -321,6 +311,16 @@ static const spi_conf_t spi_config[] = {
 #define KINETIS_I2C_F_MULT_FAST_PLUS (0)
 /** @} */
 
+/**
+ * @name I2C configuration
+ * @{
+ */
+#define I2C_NUMOF               (1U)
+#define I2C_CLK                 SystemBusClock
+#define I2C_0_EN                1
+#define I2C_1_EN                0
+#define I2C_IRQ_PRIO            CPU_DEFAULT_IRQ_PRIO
+
 /* I2C 0 device configuration */
 #define I2C_0_DEV               I2C0
 #define I2C_0_CLKEN()           (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_I2C0_SHIFT) = 1)
@@ -335,7 +335,6 @@ static const spi_conf_t spi_config[] = {
 #define I2C_0_SCL_PIN           2
 #define I2C_0_PORT_CFG          (PORT_PCR_MUX(I2C_0_PIN_AF) | PORT_PCR_ODE_MASK)
 /** @} */
-
 
 /**
  * @name GPIO configuration

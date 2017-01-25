@@ -178,6 +178,11 @@ static inline uint32_t dma_ifc(int stream)
     }
 }
 
+/**
+ * @brief   Enable DMA interrupts
+ *
+ * @param[in] stream    logical DMA stream
+ */
 static inline void dma_isr_enable(int stream)
 {
     if (stream < 7) {

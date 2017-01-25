@@ -127,6 +127,10 @@ typedef enum {
     GPIO_MUX_B = 1,         /**< alternate function B */
 } gpio_mux_t;
 
+/**
+ * @brief   Override default SPI modes
+ * @{
+ */
 #define HAVE_SPI_MODE_T
 typedef enum {
     SPI_MODE_0 = (SPI_CSR_NCPHA),                   /**< CPOL=0, CPHA=0 */
@@ -134,7 +138,12 @@ typedef enum {
     SPI_MODE_2 = (SPI_CSR_CPOL | SPI_CSR_NCPHA),    /**< CPOL=1, CPHA=0 */
     SPI_MODE_3 = (SPI_CSR_CPOL)                     /**< CPOL=1, CPHA=1 */
 } spi_mode_t;
+/** @} */
 
+/**
+ * @brief   Override default SPI clock values
+ * @{
+ */
 #define HAVE_SPI_CLK_T
 typedef enum {
     SPI_CLK_100KHZ = (100000),                      /**< 100KHz */
@@ -143,6 +152,7 @@ typedef enum {
     SPI_CLK_5MHZ   = (5000000),                     /**< 5MHz */
     SPI_CLK_10MHZ  = (10000000)                     /**< 10MHz */
 } spi_clk_t;
+/** @} */
 
 /**
  * @brief   Timer configuration data

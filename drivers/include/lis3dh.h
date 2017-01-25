@@ -715,6 +715,7 @@ typedef struct __attribute__((packed))
  *
  * @param[in]  dev          Device descriptor of sensor to initialize
  * @param[in]  spi          SPI bus the accelerometer is connected to
+ * @param[in]  clk          SPI bus speed
  * @param[in]  cs_pin       GPIO connected to the chip select pin of the accelerometer
  * @param[in]  scale        Initial scale setting of the sensor
  *

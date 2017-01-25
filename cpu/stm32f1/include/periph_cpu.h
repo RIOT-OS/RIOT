@@ -51,6 +51,11 @@ extern "C" {
  */
 #define GPIO_MODE(mode, cnf, odr)       (mode | (cnf << 2) | (odr << 4))
 
+/**
+ * @brief   Define the number of available PM modes
+ */
+#define PM_NUM_MODES    (2U)
+
 #ifndef DOXYGEN
 /**
  * @brief   Override GPIO mode options
@@ -125,8 +130,6 @@ typedef struct {
     gpio_t pin;             /**< pin connected to the line */
     uint8_t chan;           /**< DAC device used for this line */
 } dac_conf_t;
-
-#define PM_NUM_MODES    (2U)
 
 #ifdef __cplusplus
 }

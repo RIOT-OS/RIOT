@@ -245,11 +245,11 @@ typedef struct {
  */
 typedef struct {
     FTM_Type* ftm;          /**< used FTM */
-    struct {                /**< logical channel configuration */
+    struct {
         gpio_t pin;         /**< GPIO pin used, set to GPIO_UNDEF */
         uint8_t af;         /**< alternate function mapping */
         uint8_t ftm_chan;   /**< the actual FTM channel used */
-    } chan[PWM_CHAN_MAX];
+    } chan[PWM_CHAN_MAX];   /**< logical channel configuration */
     uint8_t chan_numof;     /**< number of actually configured channels */
     uint8_t ftm_num;        /**< FTM number used */
 } pwm_conf_t;
@@ -277,9 +277,11 @@ enum {
 
 /**
  * @brief   Hardware timer type-specific device macros
+ * @{
  */
 #define TIMER_PIT_DEV(x)   (TIMER_DEV(0 + (x)))
 #define TIMER_LPTMR_DEV(x) (TIMER_DEV(PIT_NUMOF + (x)))
+/** @} */
 
 /**
  * @brief   CPU internal function for initializing PORTs
