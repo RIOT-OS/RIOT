@@ -52,10 +52,21 @@ get_compile_jobs() {
         | xargs '-d\n' -n 1 echo $0 compile
 }
 
+check_workdir() {
+    [ -d examples/gnrc_tcp_cli -a -d tests/pkg_libcoap ] || {
+        echo "workdir check failed! pwd=$(pwd)"
+        echo "--- ls:"
+        ls -la
+        exit 1
+    }
+}
+
 # compile one app for one board. delete intermediates.
 compile() {
     local appdir=$1
     local board=$2
+
+    check_workdir
 
     CCACHE_BASEDIR="$(pwd)" BOARD=$board RIOT_CI_BUILD=1 \
         make -C${appdir} clean all -j${JOBS:-4}
@@ -69,6 +80,8 @@ compile() {
     fi
 
     BOARD=$board make --no-print-directory -C${appdir} clean clean-intermediates
+
+    check_workdir
 
     return $RES
 }
