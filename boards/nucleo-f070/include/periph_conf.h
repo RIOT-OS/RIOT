@@ -44,7 +44,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer configuration
+ * @name   Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -80,7 +80,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name   UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -154,7 +154,7 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  * @{
  */
 #define ADC_CONFIG {            \
@@ -170,7 +170,7 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
- * @brief   DAC configuration
+ * @name   DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)

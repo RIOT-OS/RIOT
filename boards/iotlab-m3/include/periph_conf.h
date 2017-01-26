@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief SPI configuration
+ * @name   SPI configuration
  * @{
  */
 static const spi_conf_t spi_config[] = {

@@ -49,7 +49,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer configuration
+ * @name   Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -68,7 +68,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name   UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -141,7 +141,7 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
- * @brief   SPI configuration
+ * @name   SPI configuration
  *
  * @note    The spi_divtable is auto-generated from
  *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
@@ -210,14 +210,14 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  * @{
  */
 #define ADC_NUMOF          (0)
 /** @} */
 
 /**
- * @brief   DAC configuration
+ * @name   DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)

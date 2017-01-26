@@ -36,7 +36,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer configuration
+ * @name   Timer configuration
  * @{
  */
 #define TIMER_NUMOF         (1U)
@@ -47,7 +47,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name   UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)

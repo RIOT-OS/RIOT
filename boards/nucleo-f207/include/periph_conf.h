@@ -71,7 +71,7 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
- * @brief   Timer configuration
+ * @name   Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -106,7 +106,7 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 /**
- * @brief   UART configuration
+ * @name   UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -167,7 +167,7 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief   SPI configuration
+ * @name   SPI configuration
  *
  * @note    The spi_divtable is auto-generated from
  *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
@@ -247,7 +247,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  *
  * We need to define the following fields:
  * PIN, device (ADCx), channel
@@ -262,7 +262,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @brief   DAC configuration
+ * @name   DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)

@@ -35,7 +35,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer configuration, select a number from 1 to 4
+ * @name   Timer configuration, select a number from 1 to 4
  * @{
  */
 #define TIMER_NUMOF         (1U)
@@ -81,7 +81,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief SPI configuration
+ * @name   SPI configuration
  *
  * The SPI implementation is very much fixed, so we don't need to configure
  * anything besides the mandatory SPI_NUMOF.
