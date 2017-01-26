@@ -248,7 +248,7 @@ typedef struct {
     gpio_t mosi_pin;        /**< MOSI pin */
     gpio_t miso_pin;        /**< MISO pin */
     gpio_t sclk_pin;        /**< SCLK pin */
-    gpio_t cs_pin;          /**< HWCS pin, set to GPIO_UNDEF if not mapped */
+    spi_cs_t cs_pin;        /**< HWCS pin, set to GPIO_UNDEF if not mapped */
 #ifndef CPU_FAM_STM32F1
     gpio_af_t af;           /**< pin alternate function */
 #endif
