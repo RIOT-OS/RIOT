@@ -339,7 +339,7 @@ static inline bool _wait_for_token(sdcard_spi_t *card, char token, int32_t max_r
 
     do {
         char read_byte = 0;
-        read_byte = spi_transfer_byte(card->params.spi_dev, GPIO_UNDEF, true,
+        read_byte = spi_transfer_byte(card->params.spi_dev, SPI_CS_UNDEF, true,
                                       SD_CARD_DUMMY_BYTE);
         if (read_byte == token) {
             DEBUG("_wait_for_token: [MATCH]\n");
@@ -542,7 +542,7 @@ static inline char _wait_for_r1(sdcard_spi_t *card, int32_t max_retries)
 
 void _select_card_spi(sdcard_spi_t *card)
 {
-    spi_acquire(card->params.spi_dev, GPIO_UNDEF,
+    spi_acquire(card->params.spi_dev, SPI_CS_UNDEF,
                 SD_CARD_SPI_MODE, card->spi_clk);
     gpio_clear(card->params.cs);
 }
@@ -573,7 +573,7 @@ static inline int _sw_spi_rxtx_byte(sdcard_spi_t *card, char out, char *in){
 }
 
 static inline int _hw_spi_rxtx_byte(sdcard_spi_t *card, char out, char *in){
-    *in = spi_transfer_byte(card->params.spi_dev, GPIO_UNDEF, true, out);
+    *in = spi_transfer_byte(card->params.spi_dev, SPI_CS_UNDEF, true, out);
     return 1;
 }
 
@@ -707,7 +707,7 @@ int sdcard_spi_read_blocks(sdcard_spi_t *card, int blockaddr, char *data, int bl
 static sd_rw_response_t _write_data_packet(sdcard_spi_t *card, char token, char *data, int size)
 {
 
-    spi_transfer_byte(card->params.spi_dev, GPIO_UNDEF, true, token);
+    spi_transfer_byte(card->params.spi_dev, SPI_CS_UNDEF, true, token);
 
     if (_transfer_bytes(card, data, 0, size) == size) {
 
@@ -718,7 +718,7 @@ static sd_rw_response_t _write_data_packet(sdcard_spi_t *card, char token, char 
 
             char data_response;
 
-            data_response = (char)spi_transfer_byte(card->params.spi_dev, GPIO_UNDEF,
+            data_response = (char)spi_transfer_byte(card->params.spi_dev, SPI_CS_UNDEF,
                                                     true, SD_CARD_DUMMY_BYTE);
 
             DEBUG("_write_data_packet: DATA_RESPONSE: 0x%02x\n", data_response);
@@ -798,7 +798,7 @@ static inline int _write_blocks(sdcard_spi_t *card, char cmd_idx, int bladdr, ch
 
         /* if this is a multi-block write it is needed to issue a stop command*/
         if (cmd_idx == SD_CMD_25) {
-            spi_transfer_byte(card->params.spi_dev, GPIO_UNDEF, true,
+            spi_transfer_byte(card->params.spi_dev, SPI_CS_UNDEF, true,
                               SD_DATA_TOKEN_CMD_25_STOP);
             DEBUG("_write_blocks: write multi (%d) blocks: [OK]\n", nbl);
 
