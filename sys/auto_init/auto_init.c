@@ -340,6 +340,10 @@ void auto_init(void)
     extern void auto_init_dht(void);
     auto_init_dht();
 #endif
+#ifdef MODULE_DS18
+    extern void auto_init_ds18(void);
+    auto_init_ds18();
+#endif
 #ifdef MODULE_FXOS8700
     extern void auto_init_fxos8700(void);
     auto_init_fxos8700();
