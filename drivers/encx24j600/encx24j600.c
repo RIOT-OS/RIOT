@@ -22,6 +22,10 @@
 #include <assert.h>
 #include <errno.h>
 
+#ifdef MODULE_NETSTATS_L2
+#include <string.h>
+#endif
+
 #include "mutex.h"
 #include "encx24j600.h"
 #include "encx24j600_internal.h"
@@ -282,7 +286,7 @@ static int _init(netdev2_t *encdev)
     unlock(dev);
 
 #ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
+    memset(&encdev->stats, 0, sizeof(netstats_t));
 #endif
     return 0;
 }
@@ -359,7 +363,7 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     if (buf) {
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.rx_count++;
-        netdev2->stats.rx_bytes += len;
+        netdev->stats.rx_bytes += len;
 #endif
         /* read packet (without 4 bytes checksum) */
         sram_op(dev, ENC_RRXDATA, 0xFFFF, buf, payload_len);
