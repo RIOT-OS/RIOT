@@ -6,21 +6,29 @@ PKG_LICENSE=LGPL-2.1
 .PHONY: all
 
 all: $(PKG_BUILDDIR)/Makefile
-	"$(MAKE)" -C $(PKG_BUILDDIR) && \
-	cp $(PKG_BUILDDIR)/lib/librelic_s.a $(BINDIR)/$(PKG_NAME).a
+	$(QQ) . $(RIOTBASE)/dist/tools/functions.sh ; \
+		quiet "$(MAKE)" -C $(PKG_BUILDDIR)
+	$(Q)cp $(PKG_BUILDDIR)/lib/librelic_s.a $(BINDIR)/$(PKG_NAME).a
 
 $(PKG_BUILDDIR)/comp-options.cmake: fix_source
-	cd "$(PKG_BUILDDIR)" && perl $(PKG_DIR)/generate-cmake-xcompile.perl > comp-options.cmake
+	$(Q)cd "$(PKG_BUILDDIR)" && perl $(PKG_DIR)/generate-cmake-xcompile.perl > comp-options.cmake
 
 $(PKG_BUILDDIR)/Makefile: $(PKG_BUILDDIR)/comp-options.cmake
-	cd "$(PKG_BUILDDIR)" && COMP="$(filter-out -Werror=old-style-definition -Werror=strict-prototypes, $(CFLAGS) ) " cmake -DCMAKE_TOOLCHAIN_FILE=comp-options.cmake -DCHECK=off -DTESTS=0 -DBENCH=0 -DSHLIB=off -Wno-dev $(RELIC_CONFIG_FLAGS) .
+	$(Q) . $(RIOTBASE)/dist/tools/functions.sh ; \
+		cd "$(PKG_BUILDDIR)" && \
+		COMP="$(filter-out -Werror=old-style-definition -Werror=strict-prototypes, $(CFLAGS))" \
+			quiet cmake \
+				-DCMAKE_TOOLCHAIN_FILE=comp-options.cmake \
+				-DCHECK=off -DTESTS=0 -DBENCH=0 -DSHLIB=off \
+				-Wno-dev $(RELIC_CONFIG_FLAGS) .
 
 CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function -Wno-newline-eof
 
 fix_source: git-download
-	./fix-util_print_wo_args.sh $(PKG_BUILDDIR)
-	./fix-old-style-definitions.sh $(PKG_BUILDDIR)
+	$(Q)./fix-util_print_wo_args.sh $(PKG_BUILDDIR)
+	$(Q)./fix-old-style-definitions.sh $(PKG_BUILDDIR)
 
 clean::
 	@rm -rf $(BINDIR)/$(PKG_NAME).a
+
 include $(RIOTBASE)/pkg/pkg.mk
