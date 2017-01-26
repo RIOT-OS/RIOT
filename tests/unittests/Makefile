@@ -32,7 +32,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon arduino-due cc2538dk ek-lm4f120xl f4vi1 fox 
                        pba-d-01-kw2x pca10000 pca10005 remote saml21-xpro samr21-xpro slwstk6220a \
                        spark-core stm32f0discovery stm32f3discovery stm32f4discovery udoo weio \
                        yunjia-nrf51822 sodaq-autonomo arduino-zero nucleo-f030 nucleo-f070 \
-                       nucleo32-f303 opencm9-04
+                       nucleo32-f303 opencm9-04 nucleo-f411
 
 DISABLE_TEST_FOR_ARM_CORTEX_M := tests-relic
 
