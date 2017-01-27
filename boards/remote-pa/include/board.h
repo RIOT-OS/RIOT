@@ -24,6 +24,7 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
  extern "C" {
