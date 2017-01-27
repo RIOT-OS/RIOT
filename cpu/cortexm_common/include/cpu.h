@@ -105,8 +105,10 @@ static inline void cortexm_sleep(int deep)
     }
 
     /* ensure that all memory accesses have completed and trigger sleeping */
+    __disable_irq();
     __DSB();
     __WFI();
+    __enable_irq();
 }
 
 /**
