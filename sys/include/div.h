@@ -34,17 +34,42 @@ extern "C" {
 /**
  * @brief Approximation of (2**l)/d for d=15625, l=12, 32 bits
  */
-#define DIV_H_INV_15625_32    0x431bde83ul
+#define DIV_H_INV_15625_32     0x431bde83ul
 
 /**
  * @brief Approximation of (2**l)/d for d=15625, l=12, 64 bits
  */
-#define DIV_H_INV_15625_64    0x431bde82d7b634dbull
+#define DIV_H_INV_15625_64     0x431bde82d7b634dbull
+
+/**
+ * @brief Approximation of (2**l)/d for d=625, l=8, 32 bits
+ */
+#define DIV_H_INV_625_32       0x68db8badul
+
+/**
+ * @brief Approximation of (2**l)/d for d=625, l=8, 64 bits
+ */
+#define DIV_H_INV_625_64       0x68db8bac710cb296ull
+
+/**
+ * @brief Approximation of (2**l)/d for d=576, l=0, 32 bits
+ */
+#define DIV_H_INV_576_32       0x71c71dul
+
+/**
+ * @brief Approximation of (2**l)/d for d=576, l=0, 64 bits
+ */
+#define DIV_H_INV_576_64       0x71c71bff8e38e5ull
 
 /**
  * @brief Required shifts for division by 15625, l above
  */
-#define DIV_H_INV_15625_SHIFT 12
+#define DIV_H_INV_15625_SHIFT  12
+
+/**
+ * @brief Required shifts for division by 625, l above
+ */
+#define DIV_H_INV_625_SHIFT    8
 
 /**
  * @internal
@@ -133,6 +158,25 @@ static inline uint32_t div_u32_by_15625div512(uint32_t val)
 }
 
 /**
+ * @brief Divide val by (625/576)
+ *
+ * This is used to quantize a 1MHz value to the closest 921600Hz value,
+ * e.g., for timers.
+ *
+ * The algorithm uses the modular multiplicative inverse of 625 to use only
+ * multiplication and bit shifts to perform the division.
+ *
+ * The result will be equal to the mathematical expression: floor((val * 576) / 625)
+ *
+ * @param[in]   val     dividend
+ * @return      (val / (625/576))
+ */
+static inline uint32_t div_u32_by_625div576(uint32_t val)
+{
+    return ((uint64_t)(val) * DIV_H_INV_625_32 * 576) >> (DIV_H_INV_625_SHIFT + 32);
+}
+
+/**
  * @brief Divide val by (15625/512)
  *
  * This is used to quantize a 1MHz value to the closest 32768Hz value,
@@ -153,6 +197,77 @@ static inline uint64_t div_u64_by_15625div512(uint64_t val)
         return (_div_mulhi64(DIV_H_INV_15625_64, val) >> (DIV_H_INV_15625_SHIFT - 9));
     }
     return (val * DIV_H_INV_15625_32) >> (DIV_H_INV_15625_SHIFT + 32 - 9);
+}
+
+/**
+ * @brief Divide val by (625/576)
+ *
+ * This is used to quantize a 1MHz value to the closest 921600Hz value,
+ * e.g., for timers.
+ *
+ * @param[in]   val     dividend
+ * @return      (val / (625/576))
+ */
+static inline uint64_t div_u64_by_625div576(uint64_t val)
+{
+    /*
+     * Optimisation to handle overflow of functions and the linking of
+     * __aeabi_uldivmod. The number is the maximum value that can be obtained
+     * by the second function.
+     */
+    if (val > 10485759996ull) {
+        /* this would overflow 2^64 in the multiplication that follows, need to
+         * use the long version
+         */
+        return (_div_mulhi64(DIV_H_INV_625_64, val) * 576 >> (DIV_H_INV_625_SHIFT));
+    }
+
+    return (val * DIV_H_INV_625_32) * 576 >> (DIV_H_INV_625_SHIFT + 32);
+}
+
+/**
+ * @brief Divide val by (576/625)
+ *
+ * This is used to quantize a ticks value to the closest 921600 value,
+ * e.g., for timers.
+ *
+ * @param[in]   val     dividend
+ * @return      (val / (576/625))
+ */
+static inline uint64_t div_u64_by_576div625(uint64_t val)
+{
+    /*
+     * Optimisation to handle overflow of functions and the linking of
+     * __aeabi_uldivmod. The number is the maximum value that can be obtained
+     * by the second function.
+     */
+    if (val > 2473900978176ull) {
+        /* this would overflow 2^64 in the multiplication that follows, need to
+         * use the long version
+         */
+        return (_div_mulhi64(DIV_H_INV_576_64, val) * 625);
+    }
+
+    return ((uint64_t)(val) * DIV_H_INV_576_32 * 625) >> 32;
+}
+
+/**
+ * @brief Divide val by (576/625)
+ *
+ * This is used to quantize a ticks value to the closest 921600 value,
+ * e.g., for timers.
+ *
+ * The algorithm uses the modular multiplicative inverse of 576 to use only
+ * multiplication and bit shifts to perform the division.
+ *
+ * The result will be equal to the mathematical expression: floor((val * 625) / 576)
+ *
+ * @param[in]   val     dividend
+ * @return      (val / (576/625))
+ */
+static inline uint32_t div_u32_by_576div625(uint32_t val)
+{
+    return ((uint64_t)(val) * DIV_H_INV_576_32 * 625) >> 32;
 }
 
 /**
