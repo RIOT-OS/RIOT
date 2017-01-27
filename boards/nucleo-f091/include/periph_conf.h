@@ -47,15 +47,15 @@ extern "C" {
  */
 static const timer_conf_t timer_config[] = {
     {
-        .dev      = TIM14,
+        .dev      = TIM1,
         .max      = 0x0000ffff,
-        .rcc_mask = RCC_APB1ENR_TIM2EN,
-        .bus      = APB1,
-        .irqn     = TIM14_IRQn
+        .rcc_mask = RCC_APB2ENR_TIM1EN,
+        .bus      = APB2,
+        .irqn     = TIM1_CC_IRQn
     }
 };
 
-#define TIMER_0_ISR         isr_tim14
+#define TIMER_0_ISR         isr_tim1_cc
 
 #define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
