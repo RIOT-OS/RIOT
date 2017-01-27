@@ -32,6 +32,7 @@ extern "C" {
  **/
 #define CLOCK_HSI           (16000000U)             /* frequency of internal oscillator */
 #define CLOCK_CORECLOCK     (32000000U)             /* targeted core clock frequency */
+#define CLOCK_HAS_LSE       (0)                     /* no external low-speed oscillator available */
 /* configuration of PLL prescaler and multiply values */
 /* CORECLOCK := HSI / CLOCK_PLL_DIV * CLOCK_PLL_MUL */
 #define CLOCK_PLL_DIV       RCC_CFGR_PLLDIV2
