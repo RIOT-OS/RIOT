@@ -233,6 +233,7 @@ void rtc_clear_alarm(void)
     rtc_callback.arg = NULL;
 }
 
+
 void rtc_poweron(void)
 {
 #if defined(CPU_FAM_STM32L1)
@@ -240,15 +241,21 @@ void rtc_poweron(void)
     RCC->CSR |= RCC_CSR_RTCRST;
     RCC->CSR &= ~(RCC_CSR_RTCRST);
 
+#if CLOCK_HAS_LSE
     /* Enable the LSE clock (external 32.768 kHz oscillator) */
     RCC->CSR &= ~(RCC_CSR_LSEON);
     RCC->CSR &= ~(RCC_CSR_LSEBYP);
     RCC->CSR |= RCC_CSR_LSEON;
     while ( (RCC->CSR & RCC_CSR_LSERDY) == 0 ) {}
-
     /* Switch RTC to LSE clock source */
     RCC->CSR &= ~(RCC_CSR_RTCSEL);
     RCC->CSR |= RCC_CSR_RTCSEL_LSE;
+#else
+    /* Enable the LSI clock */
+    RCC->CSR = RCC_CSR_LSION;
+    while (!(RCC->CSR & RCC_CSR_LSIRDY)) {}
+    RCC->CSR |= RCC_CSR_RTCSEL_LSI;
+#endif
 
     /* Enable the RTC */
     RCC->CSR |= RCC_CSR_RTCEN;
