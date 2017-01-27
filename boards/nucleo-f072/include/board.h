@@ -23,21 +23,18 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include <stdint.h>
 #include "board_common.h"
-
-#include "cpu.h"
-#include "periph_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 /**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @brief   Xtimer configuration
+ * @{
  */
-void board_init(void);
+#define XTIMER_WIDTH                (16)
+/** @} */
 
 #ifdef __cplusplus
 }
