@@ -31,45 +31,49 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define PN532_I2C_ADDRESS             (0x24)
+#define PN532_I2C_ADDRESS           (0x24)
 
 /* Commands */
-#define CMD_FIRMWARE_VERSION          (0x02)
-#define CMD_READ_REG                  (0x06)
-#define CMD_WRITE_REG                 (0x08)
-#define CMD_READ_GPIO                 (0x0c)
-#define CMD_WRITE_GPIO                (0x0E)
-#define CMD_SAM_CONFIG                (0x14)
-#define CMD_RF_CONFIG                 (0x32)
-#define CMD_DATA_EXCHANGE             (0x40)
-#define CMD_DESELECT                  (0x44)
-#define CMD_LIST_PASSIVE              (0x4a)
-#define CMD_RELEASE                   (0x52)
+#define CMD_FIRMWARE_VERSION        (0x02)
+#define CMD_READ_REG                (0x06)
+#define CMD_WRITE_REG               (0x08)
+#define CMD_READ_GPIO               (0x0c)
+#define CMD_WRITE_GPIO              (0x0E)
+#define CMD_SAM_CONFIG              (0x14)
+#define CMD_RF_CONFIG               (0x32)
+#define CMD_DATA_EXCHANGE           (0x40)
+#define CMD_DESELECT                (0x44)
+#define CMD_LIST_PASSIVE            (0x4a)
+#define CMD_RELEASE                 (0x52)
 
 /* Mifare specific commands */
-#define MIFARE_CMD_READ               (0x30)
-#define MIFARE_CMD_WRITE              (0xA0)
+#define MIFARE_CMD_READ             (0x30)
+#define MIFARE_CMD_WRITE            (0xA0)
 
 /* RF register settings */
-#define RF_CONFIG_MAX_RETRIES         (0x05)
+#define RF_CONFIG_MAX_RETRIES       (0x05)
 
 /* Buffer operations */
-#define BUFF_CMD_START                (6)
-#define BUFF_DATA_START               (BUFF_CMD_START + 1)
-#define RAPDU_DATA_BEGIN              (1)
-#define RAPDU_MAX_DATA_LEN            (PN532_BUFFER_LEN - BUFF_DATA_START - 5)
-#define CAPDU_MAX_DATA_LEN            (PN532_BUFFER_LEN - BUFF_DATA_START - 1)
+#define BUFF_CMD_START              (6)
+#define BUFF_DATA_START             (BUFF_CMD_START + 1)
+#define RAPDU_DATA_BEGIN            (1)
+#define RAPDU_MAX_DATA_LEN          (PN532_BUFFER_LEN - BUFF_DATA_START - 5)
+#define CAPDU_MAX_DATA_LEN          (PN532_BUFFER_LEN - BUFF_DATA_START - 1)
 
 /* Constants and magic numbers */
-#define MIFARE_CLASSIC_BLOCK_SIZE     (16)
-#define RESET_TOGGLE_SLEEP            (400000)
-#define RESET_BACKOFF                 (10000)
-#define HOST_TO_PN532                 (0xD4)
-#define PN532_TO_HOST                 (0xD5)
-#define SPI_DATA_WRITE                (0x80)
-#define SPI_STATUS_READING            (0x40)
-#define SPI_DATA_READ                 (0xC0)
-#define SPI_WRITE_DELAY_US            (2000)
+#define MIFARE_CLASSIC_BLOCK_SIZE   (16)
+#define RESET_TOGGLE_SLEEP          (400000)
+#define RESET_BACKOFF               (10000)
+#define HOST_TO_PN532               (0xD4)
+#define PN532_TO_HOST               (0xD5)
+#define SPI_DATA_WRITE              (0x80)
+#define SPI_STATUS_READING          (0x40)
+#define SPI_DATA_READ               (0xC0)
+#define SPI_WRITE_DELAY_US          (2000)
+
+/* SPI bus parameters */
+#define SPI_MODE                    (SPI_MODE_0)
+#define SPI_CLK                     (SPI_CLK_1MHZ)
 
 /* Length for passive listings */
 #define LIST_PASSIVE_LEN_14443(num)   (num * 20)
@@ -108,8 +112,6 @@ int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode)
 {
     assert(dev != NULL);
 
-    int ret = -1;
-
     dev->conf = params;
 
     gpio_init_int(dev->conf->irq, GPIO_IN_PU, GPIO_FALLING,
@@ -120,28 +122,26 @@ int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode)
     dev->mode = mode;
     if (mode == PN532_I2C) {
 #ifdef PN532_SUPPORT_I2C
-        ret = i2c_init_master(dev->conf->i2c, I2C_SPEED_FAST);
+        if (i2c_init_master(dev->conf->i2c, I2C_SPEED_FAST) != 0) {
+            DEBUG("pn532: initialization of I2C bus failed\n");
+            return -1;
+        }
 #endif
     }
     else {
 #ifdef PN532_SUPPORT_SPI
-        ret = spi_init_master(dev->conf->spi, SPI_CONF_FIRST_RISING,
-                              SPI_SPEED_1MHZ);
+        /* we handle the CS line manually... */
         gpio_init(dev->conf->nss, GPIO_OUT);
         gpio_set(dev->conf->nss);
 #endif
     }
 
-    /* cppcheck-suppress knownConditionTrueFalse
-     * (reason: variable set when PN532_SUPPORT_{I2C,SPI} defined) */
-    if (ret == 0) {
-        pn532_reset(dev);
-    }
+    pn532_reset(dev);
 
     mutex_init(&dev->trap);
     mutex_lock(&dev->trap);
 
-    return ret;
+    return 0;
 }
 
 static unsigned char chksum(char *b, unsigned len)
@@ -181,14 +181,15 @@ static int _write(pn532_t *dev, char *buff, unsigned len)
     }
     else {
 #ifdef PN532_SUPPORT_SPI
-        spi_acquire(dev->conf->spi);
+        spi_acquire(dev->conf->spi, SPI_CS_UNDEF, SPI_MODE, SPI_CLK);
         gpio_clear(dev->conf->nss);
         xtimer_usleep(SPI_WRITE_DELAY_US);
         reverse(buff, len);
-        spi_transfer_byte(dev->conf->spi, SPI_DATA_WRITE, NULL);
-        ret = spi_transfer_bytes(dev->conf->spi, buff, NULL, len);
+        spi_transfer_byte(dev->conf->spi, SPI_CS_UNDEF, true, SPI_DATA_WRITE);
+        spi_transfer_bytes(dev->conf->spi, SPI_CS_UNDEF, true, buff, NULL, len);
         gpio_set(dev->conf->nss);
         spi_release(dev->conf->spi);
+        ret = (int)len;
 #endif
     }
     DEBUG("pn532: -> ");
@@ -213,17 +214,16 @@ static int _read(pn532_t *dev, char *buff, unsigned len)
     }
     else {
 #ifdef PN532_SUPPORT_SPI
-        spi_acquire(dev->conf->spi);
+        spi_acquire(dev->conf->spi, SPI_CS_UNDEF, SPI_MODE, SPI_CLK);
         gpio_clear(dev->conf->nss);
-        spi_transfer_byte(dev->conf->spi, SPI_DATA_READ, NULL);
-        ret = spi_transfer_bytes(dev->conf->spi, 0x00, &buff[1], len);
+        spi_transfer_byte(dev->conf->spi, SPI_CS_UNDEF, true, SPI_DATA_READ);
+        spi_transfer_bytes(dev->conf->spi, SPI_CS_UNDEF, true, NULL, &buff[1], len);
         gpio_set(dev->conf->nss);
         spi_release(dev->conf->spi);
-        if (ret >= 0) {
-            buff[0] = 0x80;
-            reverse(buff, ret);
-            ret += 1;
-        }
+
+        buff[0] = 0x80;
+        reverse(buff, len);
+        ret = (int)len + 1;
 #endif
     }
     DEBUG("pn532: <- ");

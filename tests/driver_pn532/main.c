@@ -44,8 +44,13 @@ int main(void)
     static nfc_iso14443a_t card;
     static pn532_t pn532;
     unsigned len;
+    int ret;
 
-    int ret = pn532_init_i2c(&pn532, &pn532_conf[0]);
+#if defined(PN532_SUPPORT_I2C)
+    ret = pn532_init_i2c(&pn532, &pn532_conf[0]);
+#elif defined(PN532_SUPPORT_SPI)
+    ret = pn532_init_spi(&pn532, &pn532_conf[0]);
+#endif
 
     if (ret != 0) {
         LOG_INFO("init error %d\n", ret);

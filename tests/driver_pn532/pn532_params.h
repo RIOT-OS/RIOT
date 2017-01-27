@@ -25,9 +25,16 @@ extern "C" {
 
 static const pn532_params_t pn532_conf[] = {
     {
+#if defined(PN532_SUPPORT_I2C)
         .i2c = TEST_PN532_I2C,
+#elif defined(PN532_SUPPORT_SPI)
+        .spi = TEST_PN532_SPI,
+#endif
         .reset = TEST_PN532_RESET,
         .irq = TEST_PN532_IRQ,
+#if defined(PN532_SUPPORT_SPI)
+        .nss   = TEST_PN532_NSS
+#endif
     },
 };
 
