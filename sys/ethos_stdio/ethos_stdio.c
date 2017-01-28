@@ -15,7 +15,7 @@
  * @file
  * @brief UART stdio implementation
  *
- * This file implements a UART callback and read/write functions.
+ * This file implements ETHOS stdio read/write functions.
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
@@ -30,27 +30,29 @@
 #include "riot_stdio.h"
 
 #include "board.h"
-#include "periph/uart.h"
 #include "isrpipe.h"
+
+#include "ethos.h"
+extern ethos_t ethos;
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static char _rx_buf_mem[UART_STDIO_RX_BUFSIZE];
-isrpipe_t uart_stdio_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
+static char _rx_buf_mem[ETHOS_RX_BUFSIZE];
+isrpipe_t ethos_stdio_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
 
 void stdio_init(void)
 {
-    uart_init(UART_STDIO_DEV, UART_STDIO_BAUDRATE, (uart_rx_cb_t) isrpipe_write_one, &uart_stdio_isrpipe);
+    uart_init(ETHOS_UART, ETHOS_BAUDRATE, (uart_rx_cb_t) isrpipe_write_one, &ethos_stdio_isrpipe);
 }
 
 int stdio_read(char* buffer, int count)
 {
-    return isrpipe_read(&uart_stdio_isrpipe, buffer, count);
+    return isrpipe_read(&ethos_stdio_isrpipe, buffer, count);
 }
 
 int stdio_write(const char* buffer, int len)
 {
-    uart_write(UART_STDIO_DEV, (uint8_t *)buffer, (size_t)len);
+    ethos_send_frame(&ethos, (uint8_t*)buffer, len, ETHOS_FRAME_TYPE_TEXT);
     return len;
 }

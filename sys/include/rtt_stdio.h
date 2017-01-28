@@ -8,15 +8,15 @@
 
 /**
  * @defgroup    sys_rtt_stdio SEGGER RTT stdio
- * @ingroup     sys
+ * @ingroup     sys_stdio
  *
- * @brief       stdio init/read/write functions for SEGGER RTT. This is
- *              designed to shadow the functions in uart_stdio
+ * @brief       stdio init/read/write functions for SEGGER RTT.
  *
  * @{
  * @file
  *
  * @author      Michael Andersen <m.andersen@cs.berkeley.edu>
+ *
  */
 #ifndef RTT_STDIO_H
 #define RTT_STDIO_H
@@ -24,33 +24,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief initialize the module. This is a noop.
- */
-void uart_stdio_init(void);
-
-/**
- * @brief read @p len bytes from stdio uart into @p buffer
- *
- * @param[out]  buffer  buffer to read into
- * @param[in]   len     nr of bytes to read
- *
- * @return nr of bytes read
- * @return <0 on error
- */
-int uart_stdio_read(char* buffer, int len);
-
-/**
- * @brief write @p len bytes from @p buffer into uart
- *
- * @param[in]   buffer  buffer to read from
- * @param[in]   len     nr of bytes to write
- *
- * @return nr of bytes written
- * @return <0 on error
- */
-int uart_stdio_write(const char* buffer, int len);
 
 /**
  * @brief enable stdin polling, at a power consumption cost. This is enabled

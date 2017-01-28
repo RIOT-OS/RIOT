@@ -27,7 +27,7 @@
 #include "net/gnrc/netdev2/eth.h"
 
 /**
- * @brief global ethos object, used by uart_stdio
+ * @brief global ethos object, used by ethos_stdio
  */
 ethos_t ethos;
 

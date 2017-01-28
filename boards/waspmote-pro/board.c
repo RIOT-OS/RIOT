@@ -27,7 +27,7 @@
 
 #include "board.h"
 #include "cpu.h"
-#include "uart_stdio.h"
+#include "riot_stdio.h"
 
 void led_init(void);
 void SystemInit(void);
@@ -89,7 +89,7 @@ void led_init(void)
 void SystemInit(void)
 {
     /* initialize UART_0 for use as stdout */
-    uart_stdio_init();
+    stdio_init();
 
     stdout = &uart_stdout;
     stdin = &uart_stdin;
@@ -101,7 +101,7 @@ void SystemInit(void)
 static int uart_putchar(char c, FILE *stream)
 {
     (void) stream;
-    uart_stdio_write(&c, 1);
+    stdio_write(&c, 1);
     return 0;
 }
 
@@ -109,6 +109,6 @@ int uart_getchar(FILE *stream)
 {
     (void) stream;
     char c;
-    uart_stdio_read(&c, 1);
+    stdio_read(&c, 1);
     return (int)c;
 }

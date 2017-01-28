@@ -18,11 +18,11 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk maple-mini msb-430 msb-430h 
 # UART, but not on native, as native has a tap interface towards the host.
 ifeq (,$(filter native,$(BOARD)))
 GNRC_NETIF_NUMOF := 2
-USEMODULE += ethos gnrc_netdev2
+USEMODULE += ethos ethos_stdio gnrc_netdev2
 
 # ethos baudrate can be configured from make command
 ETHOS_BAUDRATE ?= 115200
-CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE) -DUSE_ETHOS_FOR_STDIO
+CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)
 FEATURES_REQUIRED += periph_uart
 endif
 

@@ -7,10 +7,10 @@
  */
 
 /**
- * @defgroup    sys_uart_stdio UART stdio
+ * @defgroup    sys_ethos_stdio ETHOS stdio
  * @ingroup     sys_stdio
  *
- * @brief       stdio over UART defines
+ * @brief       stdio over ETHOS defines
  *
  * @{
  * @file
@@ -18,40 +18,44 @@
  * @author      Anthony Merlino  <anthony@vergeaero.com>
  */
 
-#ifndef UART_STDIO_H
-#define UART_STDIO_H
+#ifndef ETHOS_STDIO_H
+#define ETHOS_STDIO_H
 
 /* Boards may override the default STDIO UART device */
 #include <stdint.h>
 #include "board.h"
 
+/* ETHOS defaults to use UART defines if not overridden */
+#include "uart_stdio.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef UART_STDIO_DEV
+#ifndef ETHOS_UART
 /**
  * @brief UART device to use for STDIO
  */
-#define UART_STDIO_DEV           UART_DEV(0)
+#define ETHOS_UART          UART_STDIO_DEV
 #endif
 
-#ifndef UART_STDIO_BAUDRATE
+#ifndef ETHOS_BAUDRATE
 /**
  * @brief Baudrate for STDIO
  */
-#define UART_STDIO_BAUDRATE      (115200)
+#define ETHOS_BAUDRATE      UART_STDIO_BAUDRATE
 #endif
 
-#ifndef UART_STDIO_RX_BUFSIZE
+#ifndef ETHOS_RX_BUFSIZE
 /**
  * @brief Buffer size for STDIO
  */
-#define UART_STDIO_RX_BUFSIZE    (64)
+#define ETHOS_RX_BUFSIZE    UART_STDIO_RX_BUFSIZE
 #endif
 
 #ifdef __cplusplus
 }
 #endif
+
 /** @} */
-#endif /* UART_STDIO_H */
+#endif /* ETHOS_STDIO_H */

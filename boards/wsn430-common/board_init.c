@@ -12,7 +12,7 @@
 #include "board.h"
 #include "msp430.h"
 #include "debug.h"
-#include "uart_stdio.h"
+#include "riot_stdio.h"
 
 volatile static uint32_t __msp430_cpu_speed = MSP430_INITIAL_CPU_SPEED;
 
@@ -110,5 +110,5 @@ void board_init(void)
     msp430_set_cpu_speed(MCLK_8MHZ_SCLK_8MHZ);
 
     /* initialize STDIO over UART */
-    uart_stdio_init();
+    stdio_init();
 }
