@@ -51,7 +51,7 @@ typedef struct __attribute__((packed)) {
     uint8_t kind;     /**< kind field */
     uint8_t length;   /**< options Length in Byte */
     uint8_t *data;    /**< options value */
-} tcp_opt_t;
+} tcp_hdr_opt_t;
 
 #ifdef __cplusplus
 }

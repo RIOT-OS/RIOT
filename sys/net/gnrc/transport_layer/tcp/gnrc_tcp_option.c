@@ -45,40 +45,38 @@ int _option_parse(gnrc_tcp_tcb_t* tcb, tcp_hdr_t *hdr)
     uint8_t* opt_ptr = (uint8_t *) hdr + sizeof(tcp_hdr_t);
     uint8_t opt_left = (offset - OPTION_OFFSET_BASE) * sizeof(network_uint32_t);
 
-    /* Parse Options Byte by Byte */
+    /* Parse Options via tcp_opt_t */
     while (opt_left > 0) {
-        uint8_t kind = *opt_ptr;
-        uint8_t len = 0;
+        tcp_hdr_opt_t* opt = (tcp_hdr_opt_t*) opt_ptr;
 
         /* Examine current option */
-        switch (kind) {
+        switch (opt->kind) {
             case OPT_KIND_EOL:
                 DEBUG("gnrc_tcp_option.c : _option_parse() : Option eol received\n");
                 return 0;
 
             case OPT_KIND_NOP:
                 DEBUG("gnrc_tcp_option.c : _option_parse() : Option nop received\n");
-                len = 1;
-                break;
+                opt_ptr += 1;
+                opt_left -= 1;
+                continue;
 
             case OPT_KIND_MSS:
                 DEBUG("gnrc_tcp_option.c : _option_parse() : Option mss received\n");
-                len = *(opt_ptr + 1);
-                if (len != OPT_LENGTH_MSS)
+                if (opt->length != OPT_LENGTH_MSS)
                 {
                     DEBUG("gnrc_tcp_option.c : _option_parse() : invalid MSS Option length.\n");
                     return -1;
                 }
-                /* Add MSS to tcb */
-                tcb->mss = (*(opt_ptr + 2) << 8) | *(opt_ptr + 3);
+                opt->data = (opt_ptr + 2);
+                tcb->mss = (opt->data[0] << 8) | opt->data[1];
                 break;
 
             default:
                 DEBUG("gnrc_tcp_option.c : _option_parse() : Unsupported option received\n");
-                len = *(opt_ptr + 1);
         }
-        opt_ptr += len;
-        opt_left -= len;
+        opt_ptr += opt->length;
+        opt_left -= opt->length;
     }
     return 0;
 }
