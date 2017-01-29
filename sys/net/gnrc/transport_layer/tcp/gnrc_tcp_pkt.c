@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,26 +13,21 @@
  * @file
  * @brief       GNRC's TCP paket related functions
  *
- * @author      Simon Brummer <brummer.simon@googlemail.com>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  * @}
  */
-#include <stdlib.h>
-#include <utlist.h>
 #include <errno.h>
-#include "msg.h"
+#include "byteorder.h"
 #include "net/inet_csum.h"
+#include "net/gnrc/netapi.h"
 #include "net/gnrc/pktbuf.h"
-#include "net/gnrc/tcp.h"
-#include "internal/pkt.h"
-#include "internal/helper.h"
+#include "net/gnrc/tcp/config.h"
+#include "internal/common.h"
 #include "internal/option.h"
-#include "internal/eventloop.h"
+#include "internal/pkt.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-
-/* Check if a sequence number, falls into the receive window */
-#define INSIDE_WND(l_ed, seq_num, r_ed) (LEQ_32_BIT(l_ed, seq_num) && LSS_32_BIT(seq_num, r_ed))
 
 /**
  * @brief Calculates the maximum of two unsigned numbers
@@ -49,12 +44,12 @@ static inline uint32_t _max(const uint32_t x, const uint32_t y)
 
 int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
 {
-    gnrc_tcp_hdr_t tcp_hdr_out;
+    tcp_hdr_t tcp_hdr_out;
 
     /* Extract headers */
     gnrc_pktsnip_t *tcp_snp;
     LL_SEARCH_SCALAR(in_pkt, tcp_snp, type, GNRC_NETTYPE_TCP);
-    gnrc_tcp_hdr_t *tcp_hdr_in = (gnrc_tcp_hdr_t *)tcp_snp->data;
+    tcp_hdr_t *tcp_hdr_in = (tcp_hdr_t *)tcp_snp->data;
 #ifdef MODULE_GNRC_IPV6
     gnrc_pktsnip_t *ip6_snp;
     LL_SEARCH_SCALAR(in_pkt, ip6_snp, type, GNRC_NETTYPE_IPV6);
@@ -120,7 +115,7 @@ int _pkt_build(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
 {
     gnrc_pktsnip_t *pay_snp = NULL;
     gnrc_pktsnip_t *tcp_snp = NULL;
-    gnrc_tcp_hdr_t tcp_hdr;
+    tcp_hdr_t tcp_hdr;
     uint8_t offset = OPTION_OFFSET_BASE; /* Offset Value in Header. Offset = size in 32-bit words */
 
     /* Add payload, if supplied */
@@ -227,7 +222,7 @@ int _pkt_send(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_c
     }
 
     /* Pass packet down the network stack */
-    gnrc_netapi_send(_gnrc_tcp_pid, out_pkt);
+    gnrc_netapi_send(gnrc_tcp_pid, out_pkt);
     return 0;
 }
 
@@ -271,7 +266,7 @@ uint32_t _pkt_get_seg_len(gnrc_pktsnip_t *pkt)
     gnrc_pktsnip_t *snp = NULL;
 
     LL_SEARCH_SCALAR(pkt, snp, type, GNRC_NETTYPE_TCP);
-    gnrc_tcp_hdr_t *hdr = (gnrc_tcp_hdr_t *) snp->data;
+    tcp_hdr_t *hdr = (tcp_hdr_t *) snp->data;
     ctl = byteorder_ntohs(hdr->off_ctl);
     seq = _pkt_get_pay_len(pkt);
     if (ctl & MSK_SYN) {
@@ -316,7 +311,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *pkt, const bool r
 
     /* Extract control bits and segment length */
     LL_SEARCH_SCALAR(pkt, snp, type, GNRC_NETTYPE_TCP);
-    ctl = byteorder_ntohs(((gnrc_tcp_hdr_t *) snp->data)->off_ctl);
+    ctl = byteorder_ntohs(((tcp_hdr_t *) snp->data)->off_ctl);
     len = _pkt_get_pay_len(pkt);
 
     /* Check if pkt contains reset or is a pure ACK, return */
@@ -331,7 +326,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *pkt, const bool r
     /* RTO Adjustment */
     if (!retransmit) {
         /* If this is the first transmission: rto is 1 sec (Lower Bound) */
-        if (tcb->srtt == GNRC_TCP_RTO_UNINITIALIZED || tcb->rtt_var == GNRC_TCP_RTO_UNINITIALIZED) {
+        if (tcb->srtt == RTO_UNINITIALIZED || tcb->rtt_var == RTO_UNINITIALIZED) {
             tcb->rto = GNRC_TCP_RTO_LOWER_BOUND;
         }
         else {
@@ -345,8 +340,8 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *pkt, const bool r
         /* If the transmission has been tried five times, we assume srtt and rtt_var are bogus */
         /* New measurements must be taken */
         if (tcb->retries >= 5) {
-            tcb->srtt = GNRC_TCP_RTO_UNINITIALIZED;
-            tcb->rtt_var = GNRC_TCP_RTO_UNINITIALIZED;
+            tcb->srtt = RTO_UNINITIALIZED;
+            tcb->rtt_var = RTO_UNINITIALIZED;
         }
     }
 
@@ -361,7 +356,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *pkt, const bool r
     /* Setup retransmission timer, msg to TCP thread with ptr to tcb */
     tcb->msg_tout.type = MSG_TYPE_RETRANSMISSION;
     tcb->msg_tout.content.ptr = (void *)tcb;
-    xtimer_set_msg(&tcb->tim_tout, tcb->rto, &tcb->msg_tout, _gnrc_tcp_pid);
+    xtimer_set_msg(&tcb->tim_tout, tcb->rto, &tcb->msg_tout, gnrc_tcp_pid);
     return 0;
 }
 
@@ -369,7 +364,7 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t* tcb, const uint32_t ack)
 {
     uint32_t seg = 0;
     gnrc_pktsnip_t *snp = NULL;
-    gnrc_tcp_hdr_t *hdr;
+    tcp_hdr_t *hdr;
 
     /* Retransmission Queue is empty. Nothing to ACK there */
     if (tcb->pkt_retransmit == NULL) {
@@ -378,7 +373,7 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t* tcb, const uint32_t ack)
     }
 
     LL_SEARCH_SCALAR(tcb->pkt_retransmit, snp, type, GNRC_NETTYPE_TCP);
-    hdr = (gnrc_tcp_hdr_t *) snp->data;
+    hdr = (tcp_hdr_t *) snp->data;
 
     /* There must be a packet, waiting to be acknowledged. */
     seg = byteorder_ntohl(hdr->seq_num) + _pkt_get_seg_len(tcb->pkt_retransmit) - 1;
@@ -395,8 +390,8 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t* tcb, const uint32_t ack)
         /* Use sample only if ther was no timeroverflow and no retransmission (Karns Alogrithm) */
         if (tcb->retries == 0 && rtt > 0) {
             /* If this is the first sample taken */
-            if (tcb->srtt == GNRC_TCP_RTO_UNINITIALIZED
-            && tcb->rtt_var == GNRC_TCP_RTO_UNINITIALIZED
+            if (tcb->srtt == RTO_UNINITIALIZED
+            && tcb->rtt_var == RTO_UNINITIALIZED
             ) {
                 tcb->srtt = rtt;
                 tcb->rtt_var = (rtt >> 1);
@@ -448,6 +443,3 @@ uint16_t _pkt_calc_csum(const gnrc_pktsnip_t *hdr,
     }
     return ~csum;
 }
-
-/* Cleanup, defines */
-#undef INSIDE_WND

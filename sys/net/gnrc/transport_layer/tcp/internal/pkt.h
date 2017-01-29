@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,13 +16,15 @@
  * @file
  * @brief      Functions for TCP's paket handling
  *
- * @author     Simon Brummer <brummer.simon@googlemail.com>
+ * @author     Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_INTERNAL_PKT_H_
-#define GNRC_TCP_INTERNAL_PKT_H_
+#ifndef GNRC_TCP_INTERNAL_PKT_H
+#define GNRC_TCP_INTERNAL_PKT_H
 
-#include "net/conn/tcp.h"
+#include <stdint.h>
+#include "net/gnrc/pkt.h"
+#include "net/gnrc/tcp/tcb.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -146,5 +148,5 @@ uint16_t _pkt_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_
 }
 #endif
 
-#endif /* GNRC_TCP_INTERNAL_PKT_H_ */
+#endif /* GNRC_TCP_INTERNAL_PKT_H */
 /** @} */

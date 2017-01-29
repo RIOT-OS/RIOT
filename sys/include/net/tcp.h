@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,20 +7,22 @@
  */
 
 /**
- * @defgroup    net_gnrc_tcp TCP
- * @ingroup     net_gnrc
- * @brief       RIOT's tcp implementation for the gnrc stack
- *
+ * @defgroup    net_tcp TCP
+ * @ingroup     net
+ * @brief       Provides TCP Header and helper functions
+ * @see         <a href="https://tools.ietf.org/html/rfc793">
+ *                  RFC 793
+ *              </a>
  * @{
  *
  * @file
  * @brief      TCP Header
  *
- * @author     Simon Brummer <brummer.simon@googlemail.com>
+ * @author     Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_HDR_H_
-#define GNRC_TCP_HDR_H_
+#ifndef TCP_H
+#define TCP_H
 
 #include "byteorder.h"
 
@@ -40,11 +42,20 @@ typedef struct __attribute__((packed)) {
     network_uint16_t window;      /**< window, in network byte order */
     network_uint16_t checksum;    /**< checksum, in network byte order */
     network_uint16_t urgent_ptr;  /**< urgent pointer, in network byte order */
-} gnrc_tcp_hdr_t;
+} tcp_hdr_t;
+
+/**
+ * @brief TCP Option definition
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t kind;     /**< kind field */
+    uint8_t length;   /**< options Length in Byte */
+    uint8_t *data;    /**< options value */
+} tcp_opt_t;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GNRC_TCP_TCB_H_ */
+#endif /* TCP_H */
 /** @} */

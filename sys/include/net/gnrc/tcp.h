@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,41 +16,19 @@
  * @file
  * @brief       TCP interface definition
  *
- * @author      Simon Brummer <simon.brummer@haw-hamburg.de>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_H_
-#define GNRC_TCP_H_
+#ifndef GNRC_TCP_H
+#define GNRC_TCP_H
 
-#include "net/gnrc/netapi.h"
-#include "net/gnrc/nettype.h"
-#include "net/gnrc/tcp/hdr.h"
+#include <stdint.h>
+#include "net/gnrc/pkt.h"
 #include "net/gnrc/tcp/tcb.h"
-
-#ifdef MODULE_GNRC_IPV6
-#include "net/gnrc/ipv6.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief Port unspecified.
- *
- * @note PORT 0 is reserved, according to rfc 1700(https://www.ietf.org/rfc/rfc1700.txt)
- */
-#define GNRC_TCP_PORT_UNSPEC 0
-
-/**
- * @brief Head of conn linked list.
- */
-extern gnrc_tcp_tcb_t *_list_gnrc_tcp_tcb_head;
-
-/**
- * @brief Mutex to protect linked list.
- */
-extern mutex_t _list_gnrc_tcp_tcb_lock;
 
 /**
  * @brief Initialize and start TCP
@@ -84,7 +62,7 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t* tcb);
   * @param[in] address_family   Address Family of @p target_addr.
   * @param[in] target_addr      Pointer to target address.
   * @param[in] target_port      Targets port number.
-  * @param[in] local_port       If zero or GNRC_TCP_PORT_UNSPEC, the connections
+  * @param[in] local_port       If zero or PORT_UNSPEC, the connections
   *                             source port is randomly choosen. If local_port is non-zero
   *                             the local_port is used as source port.
   *
@@ -227,5 +205,5 @@ gnrc_pktsnip_t *gnrc_tcp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src, uint16
 }
 #endif
 
-#endif /* GNRC_TCP_H_ */
+#endif /* GNRC_TCP_H */
 /** @} */

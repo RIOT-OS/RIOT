@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,34 +13,31 @@
  * @file
  * @brief       GNRC's TCP implementation
  *
- * @author      Simon Brummer <brummer.simon@googlemail.com>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  * @}
  */
 
-#include <stdint.h>
 #include <errno.h>
-#include <utlist.h>
+#include <string.h>
+#include "kernel_types.h"
 #include "msg.h"
 #include "assert.h"
 #include "thread.h"
 #include "byteorder.h"
-#include "random.h"
 #include "xtimer.h"
 #include "mutex.h"
-#include "ringbuffer.h"
 #include "net/af.h"
+#include "net/tcp.h"
+#include "net/gnrc/tcp/config.h"
 #include "net/gnrc/nettype.h"
-#include "net/gnrc/netapi.h"
-#include "net/gnrc/netreg.h"
 #include "net/gnrc/pktbuf.h"
-#include "net/gnrc/tcp.h"
-
+#include "internal/common.h"
 #include "internal/fsm.h"
 #include "internal/pkt.h"
 #include "internal/option.h"
-#include "internal/helper.h"
 #include "internal/eventloop.h"
 #include "internal/rcvbuf.h"
+#include "net/gnrc/tcp.h"
 
 #ifdef MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
@@ -53,23 +50,23 @@
  * @brief Allocate memory for TCP thread's stack
  */
 #if ENABLE_DEBUG
-static char _stack[GNRC_TCP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
+static char _stack[TCP_EVENTLOOP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
 #else
-static char _stack[GNRC_TCP_STACK_SIZE];
+static char _stack[TCP_EVENTLOOP_STACK_SIZE];
 #endif
 
 /**
- * @brief TCPs eventloop pid, declared externally
+ * @brief TCPs eventloop pid, declared in internal/eventloop.h
  */
-kernel_pid_t _gnrc_tcp_pid = KERNEL_PID_UNDEF;
+kernel_pid_t gnrc_tcp_pid = KERNEL_PID_UNDEF;
 
 /**
- * @brief Head of liked list of active connections
+ * @brief Head of liked list of active connections, declared in net/gnrc/tcp/tcb.h
  */
-gnrc_tcp_tcb_t *_list_gnrc_tcp_tcb_head;
+gnrc_tcp_tcb_t *_list_gnrc_tcp_tcb_head = NULL;
 
 /**
- * @brief Mutex to protect the connection list
+ * @brief Mutex to protect the connection list, declared in net/gnrc/tcp/tcb.h
  */
 mutex_t _list_gnrc_tcp_tcb_lock;
 
@@ -109,15 +106,15 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
     }
 
     /* Setup connection (common parts) */
-    msg_init_queue(tcb->msg_queue, GNRC_TCP_MSG_QUEUE_SIZE);
+    msg_init_queue(tcb->msg_queue, GNRC_TCP_TCB_MSG_QUEUE_SIZE);
     tcb->owner = thread_getpid();
 
     /* Setup passive connection */
     if (passive){
         /* Set Status Flags */
-        tcb->status |= GNRC_TCP_STATUS_PASSIVE;
+        tcb->status |= STATUS_PASSIVE;
         if (local_addr == NULL) {
-            tcb->status |= GNRC_TCP_STATUS_ALLOW_ANY_ADDR;
+            tcb->status |= ALLOW_ANY_ADDR;
         }
         /* If local address is specified: Copy it into tcb: only connections to this addr are ok */
         else {
@@ -199,21 +196,18 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
 int gnrc_tcp_init(void)
 {
     /* Guard: Check if thread is already running */
-    if (_gnrc_tcp_pid != KERNEL_PID_UNDEF) {
+    if (gnrc_tcp_pid != KERNEL_PID_UNDEF) {
         return -1;
     }
 
     /* Initialize Mutex for linked-list synchronization */
     mutex_init(&(_list_gnrc_tcp_tcb_lock));
 
-    /* Initialize Linked-List for connection storage */
-    _list_gnrc_tcp_tcb_head = NULL;
-
     /* Initialize receive buffers */
     _rcvbuf_init();
 
     /* Start TCP processing loop */
-    return thread_create(_stack, sizeof(_stack), GNRC_TCP_PRIO, 0, _event_loop, NULL, "gnrc_tcp");
+    return thread_create(_stack, sizeof(_stack), TCP_EVENTLOOP_PRIO, 0, _event_loop, NULL, "gnrc_tcp");
 }
 
 void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t* tcb)
@@ -226,8 +220,8 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t* tcb)
     tcb->address_family = AF_UNSPEC;
     DEBUG("gnrc_tcp.c : gnrc_tcp_tcb_init() : Address unspec, add netlayer module to makefile\n");
 #endif
-    tcb->local_port = GNRC_TCP_PORT_UNSPEC;
-    tcb->peer_port = GNRC_TCP_PORT_UNSPEC;
+    tcb->local_port = PORT_UNSPEC;
+    tcb->peer_port = PORT_UNSPEC;
     tcb->state = GNRC_TCP_FSM_STATE_CLOSED;
     tcb->status = 0;
     tcb->snd_una = 0;
@@ -241,9 +235,9 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t* tcb)
     tcb->irs = 0;
     tcb->mss = 0;
     tcb->rtt_start = 0;
-    tcb->rtt_var = GNRC_TCP_RTO_UNINITIALIZED;
-    tcb->srtt = GNRC_TCP_RTO_UNINITIALIZED;
-    tcb->rto = GNRC_TCP_RTO_UNINITIALIZED;
+    tcb->rtt_var = RTO_UNINITIALIZED;
+    tcb->srtt = RTO_UNINITIALIZED;
+    tcb->rto = RTO_UNINITIALIZED;
     tcb->retries = 0;
     tcb->pkt_retransmit = NULL;
     tcb->owner = KERNEL_PID_UNDEF;
@@ -259,7 +253,7 @@ int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
 {
     assert(tcb != NULL);
     assert(target_addr != NULL);
-    assert(target_port != GNRC_TCP_PORT_UNSPEC);
+    assert(target_port != PORT_UNSPEC);
 
     /* Check AF-Family Support from target_addr */
     switch (address_family) {
@@ -281,7 +275,7 @@ int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
                           const uint8_t *local_addr, const uint16_t local_port)
 {
     assert(tcb != NULL);
-    assert(local_port != GNRC_TCP_PORT_UNSPEC);
+    assert(local_port != PORT_UNSPEC);
 
     /* Check AF-Family support if local address was supplied */
     if (local_addr != NULL) {
@@ -330,7 +324,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     }
 
     /* Re-init message queue, take ownership. FSM can send Messages to this thread now */
-    msg_init_queue(tcb->msg_queue, GNRC_TCP_MSG_QUEUE_SIZE);
+    msg_init_queue(tcb->msg_queue, GNRC_TCP_TCB_MSG_QUEUE_SIZE);
     tcb->owner = thread_getpid();
 
     /* Setup Connection Timeout */
@@ -464,7 +458,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     }
 
     /* If this call is blocking, setup messages and timers */
-    msg_init_queue(tcb->msg_queue, GNRC_TCP_MSG_QUEUE_SIZE);
+    msg_init_queue(tcb->msg_queue, GNRC_TCP_TCB_MSG_QUEUE_SIZE);
     tcb->owner = thread_getpid();
 
     /* Setup Connection Timeout */
@@ -535,7 +529,7 @@ int gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
     /* Start connection teardown if the connection was not closed before */
     if (tcb->state != GNRC_TCP_FSM_STATE_CLOSED) {
         /* Take ownership */
-        msg_init_queue(tcb->msg_queue, GNRC_TCP_MSG_QUEUE_SIZE);
+        msg_init_queue(tcb->msg_queue, GNRC_TCP_TCB_MSG_QUEUE_SIZE);
         tcb->owner = thread_getpid();
 
         /* Setup Connection Timeout */
@@ -587,25 +581,25 @@ int gnrc_tcp_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_h
     if (csum == 0) {
         return -ENOENT;
     }
-    ((gnrc_tcp_hdr_t *)hdr->data)->checksum = byteorder_htons(csum);
+    ((tcp_hdr_t *)hdr->data)->checksum = byteorder_htons(csum);
     return 0;
 }
 
 gnrc_pktsnip_t *gnrc_tcp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src, uint16_t dst)
 {
     gnrc_pktsnip_t *res;
-    gnrc_tcp_hdr_t *hdr;
+    tcp_hdr_t *hdr;
 
     /* allocate header */
-    res = gnrc_pktbuf_add(payload, NULL, sizeof(gnrc_tcp_hdr_t), GNRC_NETTYPE_TCP);
+    res = gnrc_pktbuf_add(payload, NULL, sizeof(tcp_hdr_t), GNRC_NETTYPE_TCP);
     if (res == NULL) {
         DEBUG("tcp: No space left in packet buffer\n");
         return NULL;
     }
-    hdr = (gnrc_tcp_hdr_t *) res->data;
+    hdr = (tcp_hdr_t *) res->data;
 
     /* Clear Header */
-    memset(hdr, 0, sizeof(gnrc_tcp_hdr_t));
+    memset(hdr, 0, sizeof(tcp_hdr_t));
 
     /* Initialize Header with sane Defaults */
     hdr->src_port = byteorder_htons(src);

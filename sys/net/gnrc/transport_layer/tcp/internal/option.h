@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,15 +16,15 @@
  * @file
  * @brief      Defines and Macros for TCP option handling
  *
- * @author     Simon Brummer <brummer.simon@googlemail.com>
+ * @author     Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_INTERNAL_OPTION_H_
-#define GNRC_TCP_INTERNAL_OPTION_H_
+#ifndef GNRC_TCP_INTERNAL_OPTION_H
+#define GNRC_TCP_INTERNAL_OPTION_H
 
-#include "helper.h"
-#include "net/gnrc/tcp.h"
-#include "net/gnrc/tcp/hdr.h"
+#include <stdint.h>
+#include "net/tcp.h"
+#include "net/gnrc/tcp/tcb.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,24 +39,19 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Extract offset value from offet and ctl bit field.
- */
-#define GET_OFFSET( x ) (((x) & MSK_OFFSET) >> 12)
-
-/**
  * @brief TCP Option Kind Field Values
  * @{
  */
-#define OPT_KIND_EOL     (00)  /**< End of List */
-#define OPT_KIND_NOP     (01)  /**< No Operatrion */
-#define OPT_KIND_MSS     (02)  /**< Maximum Segment Size */
+#define OPT_KIND_EOL (00)  /**< End of List */
+#define OPT_KIND_NOP (01)  /**< No Operatrion */
+#define OPT_KIND_MSS (02)  /**< Maximum Segment Size */
 /** @} */
 
 /**
  * @brief TCP Option Length Field Values
  * @{
  */
-#define OPT_LENGTH_MSS   (04)  /**< MSS Option Size is 4 byte */
+#define OPT_LENGTH_MSS (04)  /**< MSS Option Size is 4 byte */
 /** @} */
 
 /**
@@ -87,11 +82,11 @@ uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl);
  * @return   Zero on success
  * @return   A negative value on error
  */
-int _option_parse(gnrc_tcp_tcb_t* tcb, gnrc_tcp_hdr_t *hdr);
+int _option_parse(gnrc_tcp_tcb_t* tcb, tcp_hdr_t *hdr);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GNRC_TCP_INTERNAL_OPTION_H_*/
+#endif /* GNRC_TCP_INTERNAL_OPTION_H*/
 /** @} */
