@@ -56,17 +56,17 @@ static char _stack[TCP_EVENTLOOP_STACK_SIZE];
 #endif
 
 /**
- * @brief TCPs eventloop pid, declared in internal/eventloop.h
+ * @brief TCPs eventloop pid, declared in internal/common.h
  */
 kernel_pid_t gnrc_tcp_pid = KERNEL_PID_UNDEF;
 
 /**
- * @brief Head of liked list of active connections, declared in net/gnrc/tcp/tcb.h
+ * @brief Head of liked list of active connections, declared in internal/common.h
  */
 gnrc_tcp_tcb_t *_list_gnrc_tcp_tcb_head = NULL;
 
 /**
- * @brief Mutex to protect the connection list, declared in net/gnrc/tcp/tcb.h
+ * @brief Mutex to protect the connection list, declared in internal/common.h
  */
 mutex_t _list_gnrc_tcp_tcb_lock;
 

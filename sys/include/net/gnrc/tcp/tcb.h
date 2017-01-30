@@ -78,7 +78,7 @@ typedef struct _transmission_control_block {
     msg_t msg_tout;                                /**< Message, sent on timeouts */
     gnrc_pktsnip_t *pkt_retransmit;                /**< Pointer to Packet in "retransmit queue" */
     kernel_pid_t owner;                            /**< PID of this connection handling thread */
-    msg_t msg_queue[GNRC_TCP_TCB_MSG_QUEUE_SIZE];  /**< Tcbs Message queue */
+    msg_t msg_queue[GNRC_TCP_TCB_MSG_QUEUE_SIZE];  /**< Message queue of tcb */
     uint8_t *rcv_buf_raw;                          /**< Pointer to the receive buffer */
     ringbuffer_t rcv_buf;                          /**< Receive Buffer data structure */
     mutex_t fsm_lock;                              /**< Mutex for FSM access synchronization */
