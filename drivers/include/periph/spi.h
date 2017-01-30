@@ -192,7 +192,7 @@ void spi_init(spi_t bus);
  *
  *
  * After calling spi_init, the pins must be initialized (i.e. spi_init is
- * calling) this function internally. In normal cases, this function will not be
+ * calling this function internally). In normal cases, this function will not be
  * used. But there are some devices (e.g. CC110x), that use SPI bus lines also
  * for other purposes and need the option to dynamically re-configure one or
  * more of the used pins. So they can take control over certain pins and return
@@ -208,7 +208,7 @@ void spi_init_pins(spi_t bus);
  * @brief   Initialize the given chip select pin
  *
  * The chip select can be any generic GPIO pin (e.g. GPIO_PIN(x,y)), or it can
- * be a hardware chip select line. The existence and number of of hardware chip
+ * be a hardware chip select line. The existence and number of hardware chip
  * select lines depends on the underlying platform and the actual pins used for
  * hardware chip select lines are defined in the board's `periph_conf.h`.
  *
