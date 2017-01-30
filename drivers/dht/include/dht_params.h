@@ -67,17 +67,11 @@ static const dht_params_t dht_params[] =
 /**
  * @brief   Allocate and configure entries to the SAUL registry
  */
-saul_reg_t dht_saul_reg[][2] =
+static const saul_reg_info_t dht_saul_info[][2] =
 {
     {
-        {
-            .name = "dht-temp",
-            .driver = &dht_temp_saul_driver
-        },
-        {
-            .name = "dht-hum",
-            .driver = &dht_hum_saul_driver
-        }
+        { .name = "dht-temp" },
+        { .name = "dht-hum" }
     }
 };
 #endif
