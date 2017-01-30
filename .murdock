@@ -4,6 +4,11 @@ export RIOT_CI_BUILD=1
 export STATIC_TESTS=${STATIC_TESTS:-1}
 export CFLAGS_DBG=""
 
+error() {
+    echo "$@"
+    exit 1
+}
+
 _greplist() {
     if [ $# -eq 0 ]; then
         echo cat
@@ -66,7 +71,15 @@ compile() {
     local appdir=$1
     local board=$2
 
+    [ -n "$DWQ_WORKER" ] && \
+        echo "$0: compile: running on worker $DWQ_WORKER, build number $DWQ_WORKER_BUILDNUM."
+
     check_workdir
+
+    # sanity checks
+    [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board)"
+    [ ! -d "$appdir" ] && error "$0: compile: error: application directory \"$appdir\" doesn't exist"
+    [ ! -d "boards/$board" ] && error "$0: compile: error: board directory \"boards/$board\" doesn't exist"
 
     CCACHE_BASEDIR="$(pwd)" BOARD=$board RIOT_CI_BUILD=1 \
         make -C${appdir} clean all -j${JOBS:-4}
@@ -79,7 +92,8 @@ compile() {
         fi
     fi
 
-    BOARD=$board make --no-print-directory -C${appdir} clean clean-intermediates
+    # cleanup
+    rm -Rf "${appdir}/bin/${board}" "${appdir}/bin/pkg/${board}"
 
     check_workdir
 
