@@ -34,8 +34,22 @@
 
 #define RTC_WRITE_PROTECTION_KEY1   (0xCA)
 #define RTC_WRITE_PROTECTION_KEY2   (0x53)
+
+#if CLOCK_HAS_LSE
 #define RTC_SYNC_PRESCALER          (0xff)  /**< prescaler for 32.768 kHz oscillator */
 #define RTC_ASYNC_PRESCALER         (0x7f)  /**< prescaler for 32.768 kHz oscillator */
+#else
+#if defined(CPU_FAM_STM32F0)
+#define RTC_SYNC_PRESCALER          (319)  /**< prescaler for 40 kHz oscillator */
+#define RTC_ASYNC_PRESCALER         (124)  /**< prescaler for 40 kHz oscillator */
+#elif defined(CPU_FAM_STM32L1)
+#define RTC_SYNC_PRESCALER          (295)  /**< prescaler for 37 kHz oscillator */
+#define RTC_ASYNC_PRESCALER         (124)  /**< prescaler for 37 kHz oscillator */
+#else
+#define RTC_SYNC_PRESCALER          (249)  /**< prescaler for 32 kHz oscillator */
+#define RTC_ASYNC_PRESCALER         (127)  /**< prescaler for 32 kHz oscillator */
+#endif
+#endif /* CLOCK_HAS_LSE */
 
 #define MCU_YEAR_OFFSET              (100)  /**< struct tm counts years since 1900
                                                 but RTC has only two-digit year
@@ -65,6 +79,7 @@ void rtc_init(void)
     PWR->CR |= PWR_CR_DBP;
 #endif
 
+#if CLOCK_HAS_LSE
 #if defined(CPU_FAM_STM32L1)
     if (!(RCC->CSR & RCC_CSR_RTCEN)) {
 #else
@@ -72,6 +87,9 @@ void rtc_init(void)
 #endif
         rtc_poweron();
     }
+#else
+    rtc_poweron();
+#endif
 
     /* Unlock RTC write protection */
     RTC->WPR = RTC_WRITE_PROTECTION_KEY1;
@@ -264,6 +282,7 @@ void rtc_poweron(void)
     RCC->BDCR |= RCC_BDCR_BDRST;
     RCC->BDCR &= ~(RCC_BDCR_BDRST);
 
+#if CLOCK_HAS_LSE
     /* Enable the LSE clock (external 32.768 kHz oscillator) */
     RCC->BDCR &= ~(RCC_BDCR_LSEON);
     RCC->BDCR &= ~(RCC_BDCR_LSEBYP);
@@ -273,7 +292,12 @@ void rtc_poweron(void)
     /* Switch RTC to LSE clock source */
     RCC->BDCR &= ~(RCC_BDCR_RTCSEL);
     RCC->BDCR |= RCC_BDCR_RTCSEL_0;
-
+#else
+    /* Enable the LSI clock */
+    RCC->CSR = RCC_CSR_LSION;
+    while (!(RCC->CSR & RCC_CSR_LSIRDY)) {}
+    RCC->BDCR |= RCC_BDCR_RTCSEL_1;
+#endif
     /* Enable the RTC */
     RCC->BDCR |= RCC_BDCR_RTCEN;
 #endif
@@ -287,16 +311,26 @@ void rtc_poweroff(void)
     RCC->CSR &= ~(RCC_CSR_RTCRST);
     /* Disable the RTC */
     RCC->CSR &= ~RCC_CSR_RTCEN;
+#if CLOCK_HAS_LSE
     /* Disable LSE clock */
     RCC->CSR &= ~(RCC_CSR_LSEON);
+#else
+    /* Disable LSI clock */
+    RCC->CSR &= ~(RCC_CSR_LSION);
+#endif
 #else
     /* Reset RTC domain */
     RCC->BDCR |= RCC_BDCR_BDRST;
     RCC->BDCR &= ~(RCC_BDCR_BDRST);
     /* Disable the RTC */
     RCC->BDCR &= ~RCC_BDCR_RTCEN;
+#if CLOCK_HAS_LSE
     /* Disable LSE clock */
     RCC->BDCR &= ~(RCC_BDCR_LSEON);
+#else
+    /* Disable LSI clock */
+    RCC->CSR &= ~(RCC_CSR_LSION);
+#endif
 #endif
 }
 
