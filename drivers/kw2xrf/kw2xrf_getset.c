@@ -15,23 +15,27 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Jonas Remmert <j.remmert@phytec.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Sebastian Meiling <s@mlng.net>
  * @}
  */
 
+#include "log.h"
 #include "kw2xrf.h"
 #include "kw2xrf_spi.h"
 #include "kw2xrf_reg.h"
 #include "kw2xrf_getset.h"
 #include "kw2xrf_intern.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #define KW2XRF_LQI_HW_MAX           230      /**< LQI Saturation Level */
 
 /* Modem_PA_PWR Register (PA Power Control) has a valid range from 3-31 */
-#define MKW2XDRF_PA_RANGE_MAX      31       /**< Maximum value of PA Power Control Register */
-#define MKW2XDRF_PA_RANGE_MIN      3        /**< Minimum value of PA Power Control Register */
+#define KW2XRF_PA_RANGE_MAX      31       /**< Maximum value of PA Power Control Register */
+#define KW2XRF_PA_RANGE_MIN      3        /**< Minimum value of PA Power Control Register */
+
+#define KW2XRF_NUM_CHANNEL      (KW2XRF_MAX_CHANNEL - KW2XRF_MIN_CHANNEL + 1)
 
 /* PLL integer and fractional lookup tables
  *
@@ -71,16 +75,17 @@ static const uint8_t pow_lt[44] = {
 
 void kw2xrf_set_tx_power(kw2xrf_t *dev, int16_t txpower)
 {
-    if (txpower > MKW2XDRF_OUTPUT_POWER_MAX) {
-        txpower = MKW2XDRF_OUTPUT_POWER_MAX;
+    if (txpower > KW2XDRF_OUTPUT_POWER_MAX) {
+        txpower = KW2XDRF_OUTPUT_POWER_MAX;
     }
 
-    if (txpower < MKW2XDRF_OUTPUT_POWER_MIN) {
-        txpower = MKW2XDRF_OUTPUT_POWER_MIN;
+    if (txpower < KW2XDRF_OUTPUT_POWER_MIN) {
+        txpower = KW2XDRF_OUTPUT_POWER_MIN;
     }
 
-    uint8_t level = pow_lt[txpower - MKW2XDRF_OUTPUT_POWER_MIN];
+    uint8_t level = pow_lt[txpower - KW2XDRF_OUTPUT_POWER_MIN];
     kw2xrf_write_dreg(dev, MKW2XDM_PA_PWR, MKW2XDM_PA_PWR(level));
+    LOG_DEBUG("[kw2xrf] set txpower to: %d\n", txpower);
     dev->tx_power = txpower;
 }
 
@@ -95,7 +100,7 @@ uint8_t kw2xrf_get_channel(kw2xrf_t *dev)
     uint16_t pll_frac = kw2xrf_read_dreg(dev, MKW2XDM_PLL_FRAC0_LSB);
     pll_frac |= ((uint16_t)kw2xrf_read_dreg(dev, MKW2XDM_PLL_FRAC0_MSB) << 8);
 
-    for (int i = 0; i < 16; i++) {
+    for (unsigned i = 0; i < KW2XRF_NUM_CHANNEL; i++) {
         if ((pll_frac_lt[i] == pll_frac) && (pll_int_lt[i] == pll_int)) {
             return i + 11;
         }
@@ -117,7 +122,7 @@ int kw2xrf_set_channel(kw2xrf_t *dev, uint8_t channel)
     uint8_t old_seq = kw2xrf_get_sequence(dev);
 
     if (channel < KW2XRF_MIN_CHANNEL || channel > KW2XRF_MAX_CHANNEL) {
-        DEBUG("[kw2xrf]: Invalid channel %i set\n", channel);
+        LOG_ERROR("[kw2xrf] Invalid channel %u\n", channel);
         return -1;
     }
 
@@ -136,7 +141,7 @@ int kw2xrf_set_channel(kw2xrf_t *dev, uint8_t channel)
         kw2xrf_set_sequence(dev, old_seq);
     }
 
-    DEBUG("[kw2xrf]: set channel to %u\n", channel);
+    LOG_DEBUG("[kw2xrf] set channel to %u\n", channel);
     return 0;
 }
 
@@ -156,7 +161,7 @@ void kw2xrf_abort_sequence(kw2xrf_t *dev)
     uint8_t state;
     do {
         state = kw2xrf_read_dreg(dev, MKW2XDM_SEQ_STATE);
-        DEBUG("[kw2xrf]: abort SEQ_STATE: %x\n", state);
+        DEBUG("[kw2xrf] abort SEQ_STATE: %x\n", state);
     } while ((state & 0x1F) != 0);
 
     /* clear all IRQ bits */
@@ -182,7 +187,7 @@ void kw2xrf_set_idle_sequence(kw2xrf_t *dev)
     kw2xrf_write_dreg(dev, MKW2XDM_PHY_CTRL1, reg);
 
     if (dev->pending_tx) {
-        DEBUG("[kw2xrf]: pending tx, cannot set idle sequenz\n");
+        DEBUG("[kw2xrf] pending tx, cannot set idle sequenz\n");
         return;
     }
 
@@ -210,7 +215,6 @@ void kw2xrf_set_idle_sequence(kw2xrf_t *dev)
         default:
             dev->state = NETOPT_STATE_IDLE;
     }
-
     kw2xrf_enable_irq_b(dev);
 }
 
@@ -238,11 +242,11 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
             break;
 
         default:
-            DEBUG("[kw2xrf]: undefined state assigned to phy\n");
+            DEBUG("[kw2xrf] undefined state assigned to phy\n");
             dev->state = NETOPT_STATE_IDLE;
     }
 
-    DEBUG("[kw2xrf]: set sequence to %i\n", seq);
+    DEBUG("[kw2xrf] set sequence to %i\n", seq);
     reg = kw2xrf_read_dreg(dev, MKW2XDM_PHY_CTRL1);
     reg &= ~(MKW2XDM_PHY_CTRL1_XCVSEQ_MASK);
     reg |= MKW2XDM_PHY_CTRL1_XCVSEQ(seq);
@@ -257,6 +261,7 @@ void kw2xrf_set_pan(kw2xrf_t *dev, uint16_t pan)
     val_ar[1] = (pan >> 8);
     val_ar[0] = (uint8_t)pan;
     kw2xrf_write_iregs(dev, MKW2XDMI_MACPANID0_LSB, val_ar, 2);
+    LOG_DEBUG("[kw2xrf] set pan to: 0x%x\n", pan);
     dev->netdev.pan = pan;
 }
 
@@ -281,7 +286,7 @@ void kw2xrf_set_addr_long(kw2xrf_t *dev, uint64_t addr)
     uint64_t tmp;
     uint8_t *ap = (uint8_t *)(&tmp);
 
-    for (int i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
+    for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
         dev->netdev.long_addr[i] = (uint8_t)(addr >> (i * 8));
         ap[i] = (addr >> ((IEEE802154_LONG_ADDRESS_LEN - 1 - i) * 8));
     }
@@ -361,7 +366,7 @@ uint32_t kw2xrf_get_rssi(uint32_t value)
 
 void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
 {
-    DEBUG("[kw2xrf]: set option %i to %i\n", option, state);
+    DEBUG("[kw2xrf] set option %i to %i\n", option, state);
 
     /* set option field */
     if (state) {
@@ -370,13 +375,13 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
         /* trigger option specific actions */
         switch (option) {
             case KW2XRF_OPT_AUTOCCA:
-                DEBUG("[kw2xrf] opt: enabling CCA before TX mode\n");
+                LOG_DEBUG("[kw2xrf] opt: enabling CCA before TX mode\n");
                 kw2xrf_set_dreg_bit(dev, MKW2XDM_PHY_CTRL1,
                     MKW2XDM_PHY_CTRL1_CCABFRTX);
                 break;
 
             case KW2XRF_OPT_PROMISCUOUS:
-                DEBUG("[kw2xrf] opt: enabling PROMISCUOUS mode\n");
+                LOG_DEBUG("[kw2xrf] opt: enabling PROMISCUOUS mode\n");
                 /* disable auto ACKs in promiscuous mode */
                 kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL1,
                     MKW2XDM_PHY_CTRL1_AUTOACK | MKW2XDM_PHY_CTRL1_RXACKRQD);

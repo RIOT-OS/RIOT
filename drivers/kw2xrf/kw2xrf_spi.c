@@ -17,6 +17,8 @@
  * @author      Sebastian Meiling <s@mlng.net>
  * @}
  */
+
+#include "log.h"
 #include "kw2xrf.h"
 #include "kw2xrf_reg.h"
 #include "kw2xrf_spi.h"
@@ -68,28 +70,28 @@ int kw2xrf_spi_init(kw2xrf_t *dev)
 #endif
 
     if (res != SPI_OK) {
-        DEBUG("[kw2xrf_spi] error: initializing SPI_%i device (code %i)\n",
-              SPIDEV, res);
+        LOG_ERROR("[kw2xrf_spi] failed to init SPI_%i device (code %i)\n",
+                  SPIDEV, res);
         return 1;
     }
     /* verify SPI params */
     res = spi_acquire(SPIDEV, CSPIN, SPIMODE, SPICLK);
     if (res == SPI_NOMODE) {
-        puts("[kw2xrf_spi] error: given SPI mode is not supported");
+        LOG_ERROR("[kw2xrf_spi] given SPI mode is not supported");
         return 1;
     }
     else if (res == SPI_NOCLK) {
-        puts("[kw2xrf_spi] error: targeted clock speed is not supported");
+        LOG_ERROR("[kw2xrf_spi] targeted clock speed is not supported");
         return 1;
     }
     else if (res != SPI_OK) {
-        puts("[kw2xrf_spi] error: unable to acquire bus with given parameters");
+        LOG_ERROR("[kw2xrf_spi] unable to acquire bus with given parameters");
         return 1;
     }
     spi_release(SPIDEV);
 
     DEBUG("[kw2xrf_spi] SPI_DEV(%i) initialized: mode: %i, clk: %i, cs_pin: %i\n",
-           SPIDEV, SPIMODE, SPICLK, CSPIN);
+          SPIDEV, SPIMODE, SPICLK, CSPIN);
     return 0;
 }
 

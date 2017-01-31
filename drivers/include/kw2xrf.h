@@ -17,10 +17,11 @@
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Jonas Remmert <j.remmert@phytec.de>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
-#ifndef MKW2XDRF_H
-#define MKW2XDRF_H
+#ifndef KW2XDRF_H
+#define KW2XDRF_H
 
 #include <stdint.h>
 
@@ -38,33 +39,20 @@ extern "C" {
 /**
  * @brief   Maximum packet length
  */
-#define KW2XRF_MAX_PKT_LENGTH         (IEEE802154_FRAME_LEN_MAX)
-
-/**
- * @brief   Default short address used after initialization
- */
-#define KW2XRF_DEFAULT_SHORT_ADDR       (0x0042)
-
-/**
- * @brief   Default short address used after initialization
- */
-#define KW2XRF_DEFAULT_ADDR_LONG        (0x0000000DEADCAB1E)
+#define KW2XRF_MAX_PKT_LENGTH           (IEEE802154_FRAME_LEN_MAX)
 
 /**
  * @brief   Default PAN ID used after initialization
  */
-#define KW2XRF_DEFAULT_PANID          (IEEE802154_DEFAULT_PANID)
+#define KW2XRF_DEFAULT_PANID            (IEEE802154_DEFAULT_PANID)
 
 /**
  * @brief   Default channel used after initialization
  *
  * @{
  */
-#ifdef DEFAULT_CHANNEL
-#define KW2XRF_DEFAULT_CHANNEL (DEFAULT_CHANNEL)
-#endif
 #ifndef KW2XRF_DEFAULT_CHANNEL
-#define KW2XRF_DEFAULT_CHANNEL        (IEEE802154_DEFAULT_CHANNEL)
+#define KW2XRF_DEFAULT_CHANNEL          (IEEE802154_DEFAULT_CHANNEL)
 #endif
 /** @} */
 
@@ -80,17 +68,17 @@ extern "C" {
 /**
  * @brief   Default TX_POWER in dbm used after initialization
  */
-#define KW2XRF_DEFAULT_TX_POWER       (IEEE802154_DEFAULT_TXPOWER)
+#define KW2XRF_DEFAULT_TX_POWER         (IEEE802154_DEFAULT_TXPOWER)
 
 /**
  * @brief   Maximum output power of the kw2x device in dBm
  */
-#define MKW2XDRF_OUTPUT_POWER_MAX       (8)
+#define KW2XDRF_OUTPUT_POWER_MAX       (8)
 
 /**
  * @brief   Minimum output power of the kw2x device in dBm
  */
-#define MKW2XDRF_OUTPUT_POWER_MIN       (-35)
+#define KW2XDRF_OUTPUT_POWER_MIN       (-35)
 
 /**
  * @brief   Internal device option flags
@@ -182,5 +170,5 @@ void kw2xrf_reset_phy(kw2xrf_t *dev);
 }
 #endif
 
-#endif /* MKW2XDRF_H */
+#endif /* KW2XDRF_H */
 /** @} */

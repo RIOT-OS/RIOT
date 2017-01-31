@@ -20,6 +20,7 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "log.h"
 #include "net/eui64.h"
 #include "net/ieee802154.h"
 #include "net/netdev2.h"
@@ -33,7 +34,7 @@
 #include "kw2xrf_tm.h"
 #include "kw2xrf_intern.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #define _MAX_MHR_OVERHEAD           (25)
@@ -57,7 +58,7 @@ static int _init(netdev2_t *netdev)
 
     /* initialise SPI and GPIOs */
     if (kw2xrf_init(dev, &_irq_handler)) {
-        DEBUG("[kw2xrf]: error: unable to initialize device\n");
+        LOG_ERROR("[kw2xrf] unable to initialize device\n");
         return -1;
     }
 
@@ -73,7 +74,7 @@ static int _init(netdev2_t *netdev)
 
 static size_t kw2xrf_tx_load(uint8_t *pkt_buf, uint8_t *buf, size_t len, size_t offset)
 {
-    for (int i = 0; i < len; i++) {
+    for (unsigned i = 0; i < len; i++) {
         pkt_buf[i + offset] = buf[i];
     }
     return offset + len;
@@ -101,7 +102,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
     for (unsigned i = 0; i < count; i++, ptr++) {
         /* current packet data + FCS too long */
         if ((len + ptr->iov_len + IEEE802154_FCS_LEN) > KW2XRF_MAX_PKT_LENGTH) {
-            DEBUG("[kw2xrf]: error: packet too large (%u byte) to be send\n",
+            LOG_ERROR("[kw2xrf] packet too large (%u byte) to be send\n",
                   (unsigned)len + IEEE802154_FCS_LEN);
             return -EOVERFLOW;
         }
@@ -518,13 +519,13 @@ static void _isr_event_seq_r(netdev2_t *netdev, uint8_t *dregs)
     uint8_t irqsts1 = 0;
 
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_RXWTRMRKIRQ) {
-        DEBUG("[kw2xrf]: got RXWTRMRKIRQ\n");
+        DEBUG("[kw2xrf] got RXWTRMRKIRQ\n");
         irqsts1 |= MKW2XDM_IRQSTS1_RXWTRMRKIRQ;
         netdev->event_callback(netdev, NETDEV2_EVENT_RX_STARTED);
     }
 
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_RXIRQ) {
-        DEBUG("[kw2xrf]: finished RXSEQ\n");
+        DEBUG("[kw2xrf] finished RXSEQ\n");
         dev->state = NETOPT_STATE_RX;
         irqsts1 |= MKW2XDM_IRQSTS1_RXIRQ;
         netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
@@ -534,12 +535,12 @@ static void _isr_event_seq_r(netdev2_t *netdev, uint8_t *dregs)
     }
 
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_TXIRQ) {
-        DEBUG("[kw2xrf]: finished (ACK) TXSEQ\n");
+        DEBUG("[kw2xrf] finished (ACK) TXSEQ\n");
         irqsts1 |= MKW2XDM_IRQSTS1_TXIRQ;
     }
 
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_SEQIRQ) {
-        DEBUG("[kw2xrf]: SEQIRQ\n");
+        DEBUG("[kw2xrf] SEQIRQ\n");
         irqsts1 |= MKW2XDM_IRQSTS1_SEQIRQ;
         kw2xrf_set_idle_sequence(dev);
     }
@@ -554,18 +555,18 @@ static void _isr_event_seq_t(netdev2_t *netdev, uint8_t *dregs)
     uint8_t irqsts1 = 0;
 
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_TXIRQ) {
-        DEBUG("[kw2xrf]: finished TXSEQ\n");
+        DEBUG("[kw2xrf] finished TXSEQ\n");
         irqsts1 |= MKW2XDM_IRQSTS1_TXIRQ;
     }
 
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_SEQIRQ) {
-        DEBUG("[kw2xrf]: SEQIRQ\n");
+        DEBUG("[kw2xrf] SEQIRQ\n");
         irqsts1 |= MKW2XDM_IRQSTS1_SEQIRQ;
 
         if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_CCAIRQ) {
             irqsts1 |= MKW2XDM_IRQSTS1_CCAIRQ;
             if (dregs[MKW2XDM_IRQSTS2] & MKW2XDM_IRQSTS2_CCA) {
-                DEBUG("[kw2xrf]: CCA CH busy\n");
+                DEBUG("[kw2xrf] CCA CH busy\n");
                 netdev->event_callback(netdev, NETDEV2_EVENT_TX_MEDIUM_BUSY);
             }
             else {
@@ -592,10 +593,10 @@ static void _isr_event_seq_cca(netdev2_t *netdev, uint8_t *dregs)
         (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_SEQIRQ)) {
         irqsts1 |= MKW2XDM_IRQSTS1_CCAIRQ | MKW2XDM_IRQSTS1_SEQIRQ;
         if (dregs[MKW2XDM_IRQSTS2] & MKW2XDM_IRQSTS2_CCA) {
-            DEBUG("[kw2xrf]: SEQIRQ, CCA CH busy\n");
+            DEBUG("[kw2xrf] SEQIRQ, CCA CH busy\n");
         }
         else {
-            DEBUG("[kw2xrf]: SEQIRQ, CCA CH idle\n");
+            DEBUG("[kw2xrf] SEQIRQ, CCA CH idle\n");
         }
         kw2xrf_set_idle_sequence(dev);
     }
@@ -609,26 +610,26 @@ static void _isr_event_seq_tr(netdev2_t *netdev, uint8_t *dregs)
     uint8_t irqsts1 = 0;
 
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_TXIRQ) {
-        DEBUG("[kw2xrf]: finished TXSEQ\n");
+        DEBUG("[kw2xrf] finished TXSEQ\n");
         irqsts1 |= MKW2XDM_IRQSTS1_TXIRQ;
         if (dregs[MKW2XDM_PHY_CTRL1] & MKW2XDM_PHY_CTRL1_RXACKRQD) {
-            DEBUG("[kw2xrf]: wait for RX ACK\n");
+            DEBUG("[kw2xrf] wait for RX ACK\n");
             kw2xrf_seq_timeout_on(dev, _MACACKWAITDURATION);
         }
     }
 
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_RXWTRMRKIRQ) {
-        DEBUG("[kw2xrf]: got RXWTRMRKIRQ\n");
+        DEBUG("[kw2xrf] got RXWTRMRKIRQ\n");
         irqsts1 |= MKW2XDM_IRQSTS1_RXWTRMRKIRQ;
     }
 
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_FILTERFAIL_IRQ) {
-        DEBUG("[kw2xrf]: got FILTERFAILIRQ\n");
+        DEBUG("[kw2xrf] got FILTERFAILIRQ\n");
         irqsts1 |= MKW2XDM_IRQSTS1_FILTERFAIL_IRQ;
     }
 
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_RXIRQ) {
-        DEBUG("[kw2xrf]: got RX ACK\n");
+        DEBUG("[kw2xrf] got RX ACK\n");
         irqsts1 |= MKW2XDM_IRQSTS1_RXIRQ;
     }
 
@@ -636,12 +637,12 @@ static void _isr_event_seq_tr(netdev2_t *netdev, uint8_t *dregs)
         if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_CCAIRQ) {
             irqsts1 |= MKW2XDM_IRQSTS1_CCAIRQ;
             if (dregs[MKW2XDM_IRQSTS2] & MKW2XDM_IRQSTS2_CCA) {
-                DEBUG("[kw2xrf]: CCA CH busy\n");
+                DEBUG("[kw2xrf] CCA CH busy\n");
                 netdev->event_callback(netdev, NETDEV2_EVENT_TX_MEDIUM_BUSY);
             }
         }
 
-        DEBUG("[kw2xrf]: SEQIRQ\n");
+        DEBUG("[kw2xrf] SEQIRQ\n");
         irqsts1 |= MKW2XDM_IRQSTS1_SEQIRQ;
         assert(dev->pending_tx != 0);
         dev->pending_tx--;
@@ -650,7 +651,7 @@ static void _isr_event_seq_tr(netdev2_t *netdev, uint8_t *dregs)
         kw2xrf_set_idle_sequence(dev);
     }
     else if (dregs[MKW2XDM_IRQSTS3] & MKW2XDM_IRQSTS3_TMR4IRQ) {
-        DEBUG("[kw2xrf]: TC4TMOUT, no SEQIRQ, TX failed\n");
+        DEBUG("[kw2xrf] TC4TMOUT, no SEQIRQ, TX failed\n");
         assert(dev->pending_tx != 0);
         dev->pending_tx--;
         netdev->event_callback(netdev, NETDEV2_EVENT_TX_NOACK);
@@ -670,13 +671,13 @@ static void _isr_event_seq_ccca(netdev2_t *netdev, uint8_t *dregs)
     if ((dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_CCAIRQ) &&
         (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_SEQIRQ)) {
         irqsts1 |= MKW2XDM_IRQSTS1_CCAIRQ | MKW2XDM_IRQSTS1_SEQIRQ;
-        DEBUG("[kw2xrf]: CCCA CH idle\n");
+        DEBUG("[kw2xrf] CCCA CH idle\n");
         kw2xrf_seq_timeout_off(dev);
         kw2xrf_set_sequence(dev, dev->idle_state);
     }
     else if (dregs[MKW2XDM_IRQSTS3] & MKW2XDM_IRQSTS3_TMR4IRQ) {
         irqsts1 |= MKW2XDM_IRQSTS1_CCAIRQ | MKW2XDM_IRQSTS1_SEQIRQ;
-        DEBUG("[kw2xrf]: CCCA timeout\n");
+        DEBUG("[kw2xrf] CCCA timeout\n");
         kw2xrf_seq_timeout_off(dev);
         kw2xrf_set_sequence(dev, dev->idle_state);
     }
@@ -692,7 +693,7 @@ static void _isr(netdev2_t *netdev)
     kw2xrf_read_dregs(dev, MKW2XDM_IRQSTS1, dregs, MKW2XDM_PHY_CTRL4 + 1);
     kw2xrf_mask_irq_b(dev);
 
-    DEBUG("[kw2xrf]: CTRL1 %0x, IRQSTS1 %0x, IRQSTS2 %0x\n",
+    DEBUG("[kw2xrf] CTRL1 %0x, IRQSTS1 %0x, IRQSTS2 %0x\n",
           dregs[MKW2XDM_PHY_CTRL1], dregs[MKW2XDM_IRQSTS1], dregs[MKW2XDM_IRQSTS2]);
 
     switch (dregs[MKW2XDM_PHY_CTRL1] & MKW2XDM_PHY_CTRL1_XCVSEQ_MASK) {
@@ -718,17 +719,17 @@ static void _isr(netdev2_t *netdev)
 
         case XCVSEQ_IDLE:
         default:
-            DEBUG("[kw2xrf]: undefined seq state in isr\n");
+            DEBUG("[kw2xrf] undefined seq state in isr\n");
             break;
     }
 
     uint8_t irqsts2 = 0;
     if (dregs[MKW2XDM_IRQSTS2] & MKW2XDM_IRQSTS2_PB_ERR_IRQ) {
-        DEBUG("[kw2xrf]: untreated PB_ERR_IRQ\n");
+        DEBUG("[kw2xrf] untreated PB_ERR_IRQ\n");
         irqsts2 |= MKW2XDM_IRQSTS2_PB_ERR_IRQ;
     }
     if (dregs[MKW2XDM_IRQSTS2] & MKW2XDM_IRQSTS2_WAKE_IRQ) {
-        DEBUG("[kw2xrf]: untreated WAKE_IRQ\n");
+        DEBUG("[kw2xrf] untreated WAKE_IRQ\n");
         irqsts2 |= MKW2XDM_IRQSTS2_WAKE_IRQ;
     }
     kw2xrf_write_dreg(dev, MKW2XDM_IRQSTS2, irqsts2);
@@ -737,15 +738,15 @@ static void _isr(netdev2_t *netdev)
         /* for debugging only */
         kw2xrf_read_dregs(dev, MKW2XDM_IRQSTS1, dregs, MKW2XDM_IRQSTS1 + 3);
         if (dregs[MKW2XDM_IRQSTS1] & 0x7f) {
-            DEBUG("[kw2xrf]: IRQSTS1 contains untreated IRQs: 0x%02x\n",
+            DEBUG("[kw2xrf] IRQSTS1 contains untreated IRQs: 0x%02x\n",
                 dregs[MKW2XDM_IRQSTS1]);
         }
         if (dregs[MKW2XDM_IRQSTS2] & 0x02) {
-            DEBUG("[kw2xrf]: IRQSTS2 contains untreated IRQs: 0x%02x\n",
+            DEBUG("[kw2xrf] IRQSTS2 contains untreated IRQs: 0x%02x\n",
                 dregs[MKW2XDM_IRQSTS2]);
         }
         if (dregs[MKW2XDM_IRQSTS3] & 0x0f) {
-            DEBUG("[kw2xrf]: IRQSTS3 contains untreated IRQs: 0x%02x\n",
+            DEBUG("[kw2xrf] IRQSTS3 contains untreated IRQs: 0x%02x\n",
                 dregs[MKW2XDM_IRQSTS3]);
         }
     }
