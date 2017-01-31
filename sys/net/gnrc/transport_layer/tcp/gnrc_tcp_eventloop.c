@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,19 +13,24 @@
  * @file
  * @brief       GNRC's TCP event processing loop
  *
- * @author      Simon Brummer <brummer.simon@googlemail.com>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  * @}
  */
-
+#include <stdint.h>
 #include <utlist.h>
 #include <errno.h>
+#include "mutex.h"
+#include "byteorder.h"
 #include "net/af.h"
+#include "net/tcp.h"
+#include "net/gnrc/netapi.h"
+#include "net/gnrc/netreg.h"
 #include "net/gnrc/pkt.h"
-#include "net/gnrc/tcp.h"
-#include "net/gnrc/tcp/hdr.h"
+#include "net/gnrc/pktbuf.h"
+#include "net/gnrc/tcp/tcb.h"
+#include "internal/common.h"
 #include "internal/pkt.h"
 #include "internal/fsm.h"
-#include "internal/helper.h"
 #include "internal/option.h"
 #include "internal/eventloop.h"
 
@@ -201,7 +206,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
         DEBUG("gnrc_tcp_eventloop.c : _receive() : Can't find fitting connection\n");
         if ((ctl & MSK_RST) != MSK_RST) {
             _pkt_build_reset_from_pkt(&reset, pkt);
-            gnrc_netapi_send(_gnrc_tcp_pid, reset);
+            gnrc_netapi_send(gnrc_tcp_pid, reset);
         }
         return -ENOTCONN;
     }
@@ -213,21 +218,21 @@ void *_event_loop(__attribute__((unused)) void *arg)
 {
     msg_t msg;
     msg_t reply;
-    msg_t msg_queue[GNRC_TCP_MSG_QUEUE_SIZE];
+    msg_t msg_queue[TCP_EVENTLOOP_MSG_QUEUE_SIZE];
 
     /* Store pid */
-    _gnrc_tcp_pid = thread_getpid();
+    gnrc_tcp_pid = thread_getpid();
 
     /* Setup reply message */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
     reply.content.value = (uint32_t)-ENOTSUP;
 
     /* Init message queue*/
-    msg_init_queue(msg_queue, GNRC_TCP_MSG_QUEUE_SIZE);
+    msg_init_queue(msg_queue, TCP_EVENTLOOP_MSG_QUEUE_SIZE);
 
     /* Register GNRC_tcp in netreg */
     gnrc_netreg_entry_t entry;
-    gnrc_netreg_entry_init_pid(&entry, GNRC_NETREG_DEMUX_CTX_ALL, _gnrc_tcp_pid);
+    gnrc_netreg_entry_init_pid(&entry, GNRC_NETREG_DEMUX_CTX_ALL, gnrc_tcp_pid);
     gnrc_netreg_register(GNRC_NETTYPE_TCP, &entry);
 
     /* dispatch NETAPI Messages */

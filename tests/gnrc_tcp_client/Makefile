@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = gnrc_tcp_cli
+APPLICATION = gnrc_tcp_client
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native

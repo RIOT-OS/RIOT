@@ -11,6 +11,7 @@
 #include "net/af.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/tcp.h"
+#include "net/gnrc/tcp/config.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"

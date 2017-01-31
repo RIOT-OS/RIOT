@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,13 +14,13 @@
  * @{
  *
  * @file
- * @brief      Definies states and events for TCP finite state maschine
+ * @brief       Definies states and events for TCP finite state maschine
  *
- * @author     Simon Brummer <brummer.simon@googlemail.com>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_FSM_H_
-#define GNRC_TCP_FSM_H_
+#ifndef GNRC_TCP_FSM_H
+#define GNRC_TCP_FSM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,5 +64,5 @@ typedef enum {
 }
 #endif
 
-#endif /* GNRC_TCP_FSM_H_ */
+#endif /* GNRC_TCP_FSM_H */
 /** @} */

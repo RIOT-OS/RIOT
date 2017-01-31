@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,20 +13,24 @@
  * @file
  * @brief       GNRC's TCP finite state maschine
  *
- * @author      Simon Brummer <brummer.simon@googlemail.com>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  * @}
  */
-
-#include "msg.h"
+#include <utlist.h>
+#include <errno.h>
+#include "byteorder.h"
 #include "random.h"
 #include "ringbuffer.h"
+#include "xtimer.h"
 #include "net/af.h"
-
-#include "internal/fsm.h"
+#include "net/tcp.h"
+#include "net/gnrc/pktbuf.h"
+#include "net/gnrc/tcp/config.h"
+#include "internal/common.h"
 #include "internal/pkt.h"
 #include "internal/option.h"
-#include "internal/helper.h"
 #include "internal/rcvbuf.h"
+#include "internal/fsm.h"
 
 #ifdef MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
@@ -102,7 +106,7 @@ static int _restart_timewait_timer(gnrc_tcp_tcb_t* tcb)
     xtimer_remove(&tcb->tim_tout);
     tcb->msg_tout.type = MSG_TYPE_TIMEWAIT;
     tcb->msg_tout.content.ptr = (void *)tcb;
-    xtimer_set_msg(&tcb->tim_tout, 2 * GNRC_TCP_MSL, &tcb->msg_tout, _gnrc_tcp_pid);
+    xtimer_set_msg(&tcb->tim_tout, 2 * GNRC_TCP_MSL, &tcb->msg_tout, gnrc_tcp_pid);
     return 0;
 }
 
@@ -147,7 +151,7 @@ static int _transition_to(gnrc_tcp_tcb_t* tcb, gnrc_tcp_fsm_state_t state, bool 
             switch (tcb->address_family) {
 #ifdef MODULE_GNRC_IPV6
               case AF_INET6:
-                  if (tcb->status & GNRC_TCP_STATUS_ALLOW_ANY_ADDR) {
+                  if (tcb->status & ALLOW_ANY_ADDR) {
                       ipv6_addr_set_unspecified((ipv6_addr_t *) tcb->local_addr);
                   }
                   ipv6_addr_set_unspecified((ipv6_addr_t *) tcb->peer_addr);
@@ -157,7 +161,7 @@ static int _transition_to(gnrc_tcp_tcb_t* tcb, gnrc_tcp_fsm_state_t state, bool 
                   DEBUG("gnrc_tcp_fsm.c : _transition_to() : Undefined Addresses\n");
                   break;
             }
-            tcb->peer_port = GNRC_TCP_PORT_UNSPEC;
+            tcb->peer_port = PORT_UNSPEC;
 
             /* Allocate rcv Buffer */
             if (_rcvbuf_get_buffer(tcb) == -ENOMEM) {
@@ -193,7 +197,7 @@ static int _transition_to(gnrc_tcp_tcb_t* tcb, gnrc_tcp_fsm_state_t state, bool 
             /* If not already active: Apped tcb but check portnumber first */
             if (!found) {
                 /* Check if Port Number is not in use */
-                if (tcb->local_port != GNRC_TCP_PORT_UNSPEC ) {
+                if (tcb->local_port != PORT_UNSPEC ) {
 
                     /* If Portnumber is used: return error and release buffer */
                     if (_is_local_port_in_use(tcb->local_port)) {
@@ -249,7 +253,7 @@ static int _fsm_call_open(gnrc_tcp_tcb_t* tcb, bool *notify_owner)
     DEBUG("gnrc_tcp_fsm.c : _fsm_call_open()\n");
     tcb->rcv_wnd = GNRC_TCP_DEFAULT_WINDOW;
 
-    if (tcb->status & GNRC_TCP_STATUS_PASSIVE) {
+    if (tcb->status & STATUS_PASSIVE) {
         /* Passive Open, T: CLOSED -> LISTEN */
         if (_transition_to(tcb, GNRC_TCP_FSM_STATE_LISTEN, notify_owner) == -ENOMEM){
             _transition_to(tcb, GNRC_TCP_FSM_STATE_CLOSED, notify_owner);
@@ -600,7 +604,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *in_pkt, bool *noti
         if (ctl & MSK_RST) {
             /* .. and State is SYN_RCVD and passive Open: SYN_RCVD -> LISTEN */
             if (tcb->state == GNRC_TCP_FSM_STATE_SYN_RCVD
-            && (tcb->status & GNRC_TCP_STATUS_PASSIVE)
+            && (tcb->status & STATUS_PASSIVE)
             ) {
                 if (_transition_to(tcb, GNRC_TCP_FSM_STATE_LISTEN, notify_owner) == -ENOMEM) {
                     _transition_to(tcb, GNRC_TCP_FSM_STATE_CLOSED, notify_owner);

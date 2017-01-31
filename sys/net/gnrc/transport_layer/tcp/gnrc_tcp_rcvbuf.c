@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Simon Brummer <brummer.simon@googlemail.com>
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -12,9 +12,11 @@
  * @file
  * @brief       Implementation of tcp_internal/rcvbuf.h
  *
- * @author  Brummer Simon <brummer.simon@googlemail.com>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  */
+
 #include <errno.h>
+#include "ringbuffer.h"
 #include "internal/rcvbuf.h"
 
 #define ENABLE_DEBUG (0)
@@ -26,7 +28,7 @@ void _rcvbuf_init(void)
 {
     DEBUG("gnrc_tcp_rcvbuf.c : _rcvbuf_init() : Entry\n");
     mutex_init(&(_static_buf.lock));
-    for (int i=0; i<GNRC_TCP_RCV_BUFFERS; i++) {
+    for (size_t i=0; i<GNRC_TCP_RCV_BUFFERS; i++) {
         _static_buf.entries[i].used = 0;
     }
 }
@@ -36,7 +38,7 @@ static void* _rcvbuf_alloc(void)
     void *result = NULL;
     DEBUG("gnrc_tcp_rcvbuf.c : _rcvbuf_alloc() : Entry\n");
     mutex_lock(&(_static_buf.lock));
-    for (int i=0; i<GNRC_TCP_RCV_BUFFERS; i++) {
+    for (size_t i=0; i<GNRC_TCP_RCV_BUFFERS; i++) {
         if (_static_buf.entries[i].used == 0) {
             _static_buf.entries[i].used = 1;
             result = (void *)(_static_buf.entries[i].buffer);
@@ -51,7 +53,7 @@ static void _rcvbuf_free(void * const buf)
 {
     DEBUG("gnrc_tcp_rcvbuf.c : _rcvbuf_free() : Entry\n");
     mutex_lock(&(_static_buf.lock));
-    for (int i=0; i<GNRC_TCP_RCV_BUFFERS; i++) {
+    for (size_t i=0; i<GNRC_TCP_RCV_BUFFERS; i++) {
         if (_static_buf.entries[i].used == 1 && buf == _static_buf.entries[i].buffer) {
             _static_buf.entries[i].used = 0;
         }

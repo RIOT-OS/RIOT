@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,26 +16,19 @@
  * @file
  * @brief      Definies function to manipulate a connections state
  *
- * @author     Simon Brummer <brummer.simon@googlemail.com>
+ * @author     Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_INTERNAL_FSM_H_
-#define GNRC_TCP_INTERNAL_FSM_H_
+#ifndef GNRC_TCP_INTERNAL_FSM_H
+#define GNRC_TCP_INTERNAL_FSM_H
 
-#include <errno.h>
-#include "net/gnrc/pktbuf.h"
 #include "net/gnrc/pkt.h"
+#include "net/gnrc/tcp/tcb.h"
 #include "net/gnrc/tcp/fsm.h"
-#include "net/gnrc/tcp.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief PID of tcp event handling thread
- */
-extern kernel_pid_t _gnrc_tcp_pid;
 
 /**
  * @brief TCP finite state maschine
@@ -57,5 +50,5 @@ int _fsm(gnrc_tcp_tcb_t* tcb, gnrc_tcp_fsm_event_t event, gnrc_pktsnip_t *in_pkt
 }
 #endif
 
-#endif /* GNRC_TCP_INTERNAL_FSM_H_ */
+#endif /* GNRC_TCP_INTERNAL_FSM_H */
 /** @} */
