@@ -217,6 +217,13 @@ typedef struct __attribute__((packed)) {
     network_uint16_t seq;   /**< Sequence number */
 } icmpv6_echo_t;
 
+/**
+ * @brief   Print the given ICMPv6 header to STDOUT
+ *
+ * @param[in] hdr           ICMPv6 header to print
+ */
+void icmpv6_hdr_print(icmpv6_hdr_t *hdr);
+
 #ifdef __cplusplus
 }
 #endif

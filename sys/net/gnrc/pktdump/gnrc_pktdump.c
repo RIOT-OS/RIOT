@@ -27,6 +27,7 @@
 #include "msg.h"
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc.h"
+#include "net/icmpv6.h"
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
 #include "net/udp.h"
@@ -71,6 +72,7 @@ static void _dump_snip(gnrc_pktsnip_t *pkt)
 #ifdef MODULE_GNRC_ICMPV6
         case GNRC_NETTYPE_ICMPV6:
             printf("NETTYPE_ICMPV6 (%i)\n", pkt->type);
+            icmpv6_hdr_print(pkt->data);
             break;
 #endif
 #ifdef MODULE_GNRC_TCP
