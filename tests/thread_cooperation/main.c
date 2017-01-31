@@ -28,7 +28,7 @@
 
 mutex_t mtx = MUTEX_INIT;
 
-volatile int storage = 1;
+volatile uint32_t storage = 1;
 kernel_pid_t main_id = KERNEL_PID_UNDEF;
 kernel_pid_t ths[PROBLEM];
 char stacks[PROBLEM][THREAD_STACKSIZE_MAIN];
@@ -93,9 +93,9 @@ int main(void)
         printf("Reveiced message %d from thread %" PRIu32 "\n", i, msg.content.value);
     }
 
-    printf("Factorial: %d\n", storage);
+    printf("Factorial: %"PRIu32"\n", storage);
 
-    if (storage != 479001600) {
+    if (storage != 479001600LU) {
         puts("[!!!] Error, expected: 12!= 479001600.");
     }
 
