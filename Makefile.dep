@@ -350,6 +350,10 @@ ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   USEMODULE += od
 endif
 
+ifneq (,$(filter od,$(USEMODULE)))
+  USEMODULE += fmt
+endif
+
 ifneq (,$(filter newlib_nano,$(USEMODULE)))
   USEMODULE += newlib
 endif
