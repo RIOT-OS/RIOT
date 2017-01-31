@@ -43,17 +43,19 @@ ERRORS=$(comm -1 -2 ${TMP_ERR} ${TMP_DOC})
 
 rm ${TMP_ERR} ${TMP_WARN} ${TMP_DOC}
 
+RESULT=0
 if [ -n "${WARNINGS}" ]
 then
-echo "WARNING: The following modified files generate doxygen warnings:"
-echo "${WARNINGS}"
+    echo "WARNING: The following modified files generate doxygen warnings:"
+    echo "${WARNINGS}"
+    RESULT=1
 fi
 
 if [ -n "${ERRORS}" ]
 then
     echo "ERROR: The following new files generate doxygen warnings:"
     echo "${ERRORS}"
-    exit 2
-else
-    exit 0
+    RESULT=2
 fi
+
+exit $RESULT
