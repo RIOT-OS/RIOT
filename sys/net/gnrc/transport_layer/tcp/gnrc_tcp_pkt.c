@@ -71,13 +71,13 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
     /* Seq/Ackno and control flags depend on inputs ACK-Flag */
     uint16_t ctl = byteorder_ntohs(tcp_hdr_in->off_ctl);
     if (ctl & MSK_ACK) {
-        tcp_hdr_out.off_ctl = byteorder_htons((OPTION_OFFSET_BASE << 12) | MSK_RST);
+        tcp_hdr_out.off_ctl = byteorder_htons((TCP_HDR_OFFSET_MIN << 12) | MSK_RST);
         tcp_hdr_out.seq_num = tcp_hdr_in->ack_num;
         tcp_hdr_out.ack_num = byteorder_htonl(0);
     }
     else {
         uint8_t seq_no = 0;
-        tcp_hdr_out.off_ctl = byteorder_htons((OPTION_OFFSET_BASE << 12) | MSK_RST_ACK);
+        tcp_hdr_out.off_ctl = byteorder_htons((TCP_HDR_OFFSET_MIN << 12) | MSK_RST_ACK);
         tcp_hdr_out.seq_num = byteorder_htonl(0);
         if (ctl & MSK_SYN) {
             seq_no += 1;
@@ -90,7 +90,7 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
     }
 
     /* Allocate new tcp header */
-    tcp_snp = gnrc_pktbuf_add(NULL, &tcp_hdr_out, OPTION_OFFSET_BASE * 4, GNRC_NETTYPE_TCP);
+    tcp_snp = gnrc_pktbuf_add(NULL, &tcp_hdr_out, TCP_HDR_OFFSET_MIN * 4, GNRC_NETTYPE_TCP);
     if (tcp_snp == NULL) {
         DEBUG("gnrc_tcp_pkt.c : _pkt_build_reset_from_pkt() : Can't alloc buffer for TCP Header\n.");
         *(out_pkt) = NULL;
@@ -121,7 +121,7 @@ int _pkt_build(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
     gnrc_pktsnip_t *pay_snp = NULL;
     gnrc_pktsnip_t *tcp_snp = NULL;
     tcp_hdr_t tcp_hdr;
-    uint8_t nopts = 0;
+    uint8_t offset = TCP_HDR_OFFSET_MIN;
 
     /* Add payload, if supplied */
     if (payload != NULL && payload_len > 0) {
@@ -142,18 +142,16 @@ int _pkt_build(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
     tcp_hdr.window = byteorder_htons(tcb->rcv_wnd);
     tcp_hdr.urgent_ptr = byteorder_htons(0);
 
-    /* tcp option handling */
-    /* If this is a syn-message, send mss option */
+    /* Calculate option field size. */
+    /* Add MSS option if SYN is sent */
     if (ctl & MSK_SYN) {
-        /* NOTE: MSS usually based on lower layers MTU */
-        tcp_hdr.options[nopts] = byteorder_htonl(_option_build_mss(GNRC_TCP_MSS));
-        nopts += 1;
+        offset += 1;
     }
     /* Set offset and control bit accordingly */
-    tcp_hdr.off_ctl = byteorder_htons(_option_build_offset_control(OPTION_OFFSET_BASE + nopts, ctl));
+    tcp_hdr.off_ctl = byteorder_htons(_option_build_offset_control(offset, ctl));
 
-    /* allocate tcp header */
-    tcp_snp = gnrc_pktbuf_add(pay_snp, &tcp_hdr, (OPTION_OFFSET_BASE + nopts) * 4, GNRC_NETTYPE_TCP);
+    /* allocate tcp header: size = offset * 4 bytes */
+    tcp_snp = gnrc_pktbuf_add(pay_snp, &tcp_hdr, offset * 4, GNRC_NETTYPE_TCP);
     if (tcp_snp == NULL) {
         DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Can't allocate buffer for TCP Header\n.");
         gnrc_pktbuf_release(pay_snp);
@@ -161,6 +159,22 @@ int _pkt_build(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
         return -ENOMEM;
     }
     else {
+        /* Add options if existing */
+        if (TCP_HDR_OFFSET_MIN < offset) {
+            uint8_t* opt_ptr = (uint8_t *) tcp_snp->data + sizeof(tcp_hdr);
+            uint8_t opt_left = (offset - TCP_HDR_OFFSET_MIN) * sizeof(network_uint32_t);
+
+            /* Init options field with 'End Of List' - option (0) */
+            memset(opt_ptr, TCP_OPTION_KIND_EOL, opt_left);
+
+            /* If SYN flag is set: Add MSS option */
+            if (ctl & MSK_SYN) {
+                network_uint32_t mss_option = byteorder_htonl(_option_build_mss(GNRC_TCP_MSS));
+                memcpy(opt_ptr, &mss_option, sizeof(mss_option));
+            }
+            /* Increase opt_ptr and decrease opt_ptr, if other options are added */
+            /* NOTE: Add Additional Options here */
+        }
         *(out_pkt) = tcp_snp;
     }
 

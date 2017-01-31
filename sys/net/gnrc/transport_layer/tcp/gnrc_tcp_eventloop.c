@@ -127,7 +127,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
     syn = ((ctl & MSK_SYN_ACK) == MSK_SYN);
 
     /* Validate Offset */
-    if (GET_OFFSET(ctl) < OPTION_OFFSET_BASE) {
+    if (GET_OFFSET(ctl) < TCP_HDR_OFFSET_MIN) {
         DEBUG("gnrc_tcp_eventloop.c : _receive() : unexpected Offset Value\n");
         gnrc_pktbuf_release(pkt);
         return -ERANGE;
