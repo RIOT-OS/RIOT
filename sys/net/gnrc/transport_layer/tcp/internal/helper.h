@@ -22,8 +22,8 @@
 #ifndef GNRC_TCP_INTERNAL_HELPER_H_
 #define GNRC_TCP_INTERNAL_HELPER_H_
 
+#include "net/tcp.h"
 #include "net/gnrc/netapi.h"
-#include "net/gnrc/tcp/hdr.h"
 
 #ifdef __cplusplus
 extern "C" {

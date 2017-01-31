@@ -23,8 +23,8 @@
 #define GNRC_TCP_INTERNAL_OPTION_H_
 
 #include "helper.h"
+#include "net/tcp.h"
 #include "net/gnrc/tcp.h"
-#include "net/gnrc/tcp/hdr.h"
 
 #ifdef __cplusplus
 extern "C" {

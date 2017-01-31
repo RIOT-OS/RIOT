@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,20 +7,20 @@
  */
 
 /**
- * @defgroup    net_gnrc_tcp TCP
- * @ingroup     net_gnrc
- * @brief       RIOT's tcp implementation for the gnrc stack
+ * @defgroup    net_tcp TCP
+ * @ingroup     net
+ * @brief       Provides TCP header and helper functions
  *
  * @{
  *
  * @file
- * @brief      TCP Header
+ * @brief      TCP header and helper functions
  *
  * @author     Simon Brummer <brummer.simon@googlemail.com>
  */
 
-#ifndef GNRC_TCP_HDR_H_
-#define GNRC_TCP_HDR_H_
+#ifndef TCP_H
+#define TCP_H
 
 #include "byteorder.h"
 
@@ -52,5 +52,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
-#endif /* GNRC_TCP_TCB_H_ */
+#endif /* TCP_H */
 /** @} */
