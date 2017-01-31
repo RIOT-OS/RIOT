@@ -60,7 +60,6 @@ extern "C" {
  * @{
  */
 #define SPI_NUMOF           (1U)
-#define SPI_0_EN            (1)
 /** @} */
 
 #ifdef __cplusplus

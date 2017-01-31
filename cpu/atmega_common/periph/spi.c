@@ -41,7 +41,7 @@ void spi_init(spi_t bus)
     /* power off the SPI peripheral */
     MEGA_PRR |= (1 << PRSPI);
     /* trigger the pin configuration */
-    spi_init_pins(bus);;
+    spi_init_pins(bus);
 }
 
 void spi_init_pins(spi_t bus)
