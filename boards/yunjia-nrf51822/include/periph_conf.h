@@ -100,7 +100,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @brief   I2C (TWI) configuration
+ * @name   I2C (TWI) configuration
  * @{
  */
 static const i2c_conf_t i2c_config[] = {
@@ -116,7 +116,7 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  *
  * The configuration consists simply of a list of channels that should be used
  * @{

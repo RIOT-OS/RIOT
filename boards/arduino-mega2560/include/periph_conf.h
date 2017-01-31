@@ -33,7 +33,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer configuration
+ * @name   Timer configuration
  *
  * The timer driver only supports the four 16-bit timers (Timer1, Timer3,
  * Timer4, Timer5), so those are the only onces we can use here.
@@ -58,7 +58,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name   UART configuration
  *
  * The UART devices have fixed pin mappings, so all we need to do, is to specify
  * which devices we would like to use and their corresponding RX interrupts. See
@@ -82,7 +82,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief SPI configuration
+ * @name   SPI configuration
  *
  * The atmega2560 has only one hardware SPI with fixed pin configuration, so all
  * we can do here, is to enable or disable it...

@@ -34,7 +34,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer configuration
+ * @name   Timer configuration
  *
  * The timer driver only supports the 16-bit timer (Timer1)
  * so this is the only one we can use here.
@@ -51,7 +51,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name   UART configuration
  *
  * Uno has only one UART, look in atmega_common
  * This is where magic happens
@@ -65,7 +65,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief SPI configuration
+ * @name   SPI configuration
  *
  * The atmega2560 has only one hardware SPI with fixed pin configuration, so all
  * we can do here, is to enable or disable it...
