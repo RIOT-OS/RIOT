@@ -24,6 +24,9 @@
 #include "periph/spi.h"
 #include "lis3dh.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 #define SPI_MODE            SPI_MODE_0
 
 static inline int lis3dh_write_bits(const lis3dh_t *dev, const lis3dh_reg_t reg,
@@ -33,27 +36,26 @@ static int lis3dh_write_reg(const lis3dh_t *dev, const lis3dh_reg_t reg,
 static int lis3dh_read_regs(const lis3dh_t *dev, const lis3dh_reg_t reg,
                             const uint8_t len, uint8_t *buf);
 
-int lis3dh_init(lis3dh_t *dev, spi_t spi, spi_clk_t clk,
-                gpio_t cs_pin, uint8_t scale)
+int lis3dh_init(lis3dh_t *dev, const lis3dh_params_t *params)
 {
     uint8_t test;
 
-    dev->spi = spi;
-    dev->clk = clk;
-    dev->cs = cs_pin;
-    dev->scale = 0;
+    dev->spi   = params->spi;
+    dev->clk   = params->clk;
+    dev->cs    = params->cs;
+    dev->scale = params->scale;
 
     /* initialize the chip select line */
     if (spi_init_cs(dev->spi, dev->cs) != SPI_OK) {
+        DEBUG("[lis3dh] error while initializing CS pin\n");
         return -1;
     }
 
     /* test connection to the device */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, dev->clk);
-    test = spi_transfer_reg(dev->spi, dev->cs, LIS3DH_REG_WHO_AM_I, 0);
-    spi_release(dev->spi);
+    lis3dh_read_regs(dev, LIS3DH_REG_WHO_AM_I, 1, &test);
     if (test != LIS3DH_WHO_AM_I_RESPONSE) {
         /* chip is not responding correctly */
+        DEBUG("[lis3dh] error reading the who am i reg [0x%02x]\n", (int)test);
         return -1;
     }
 
@@ -74,7 +76,7 @@ int lis3dh_init(lis3dh_t *dev, spi_t spi, spi_clk_t clk,
     lis3dh_write_reg(dev, LIS3DH_REG_CTRL_REG6, 0);
 
     /* Configure scale */
-    lis3dh_set_scale(dev, scale);
+    lis3dh_set_scale(dev, dev->scale);
 
     return 0;
 }

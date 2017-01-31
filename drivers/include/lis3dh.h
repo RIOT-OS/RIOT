@@ -714,16 +714,12 @@ typedef struct __attribute__((packed))
  * @brief Initialize a LIS3DH sensor instance
  *
  * @param[in]  dev          Device descriptor of sensor to initialize
- * @param[in]  spi          SPI bus the accelerometer is connected to
- * @param[in]  clk          SPI bus speed
- * @param[in]  cs_pin       GPIO connected to the chip select pin of the accelerometer
- * @param[in]  scale        Initial scale setting of the sensor
+ * @param[in]  params       Configuration parameters
  *
  * @return                  0 on success
  * @return                  -1 on error
  */
-int lis3dh_init(lis3dh_t *dev, spi_t spi, spi_clk_t clk,
-                gpio_t cs_pin, uint8_t scale);
+int lis3dh_init(lis3dh_t *dev, const lis3dh_params_t *params);
 
 /**
  * @brief Read 3D acceleration data from the accelerometer
