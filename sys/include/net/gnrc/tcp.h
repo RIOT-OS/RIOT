@@ -19,8 +19,8 @@
  * @author      Simon Brummer <simon.brummer@haw-hamburg.de>
  */
 
-#ifndef GNRC_TCP_H_
-#define GNRC_TCP_H_
+#ifndef GNRC_TCP_H
+#define GNRC_TCP_H
 
 #include "net/tcp.h"
 #include "net/gnrc/netapi.h"
@@ -210,5 +210,5 @@ gnrc_pktsnip_t *gnrc_tcp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src, uint16
 }
 #endif
 
-#endif /* GNRC_TCP_H_ */
+#endif /* GNRC_TCP_H */
 /** @} */

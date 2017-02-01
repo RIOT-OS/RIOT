@@ -19,8 +19,8 @@
  * @author     Simon Brummer <brummer.simon@googlemail.com>
  */
 
-#ifndef GNRC_TCP_INTERNAL_PKT_H_
-#define GNRC_TCP_INTERNAL_PKT_H_
+#ifndef GNRC_TCP_INTERNAL_PKT_H
+#define GNRC_TCP_INTERNAL_PKT_H
 
 #include "net/conn/tcp.h"
 
@@ -146,5 +146,5 @@ uint16_t _pkt_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_
 }
 #endif
 
-#endif /* GNRC_TCP_INTERNAL_PKT_H_ */
+#endif /* GNRC_TCP_INTERNAL_PKT_H */
 /** @} */

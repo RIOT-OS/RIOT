@@ -19,8 +19,8 @@
  * @author     Simon Brummer <brummer.simon@googlemail.com>
  */
 
-#ifndef GNRC_TCP_INTERNAL_EVENTLOOP_H_
-#define GNRC_TCP_INTERNAL_EVENTLOOP_H_
+#ifndef GNRC_TCP_INTERNAL_EVENTLOOP_H
+#define GNRC_TCP_INTERNAL_EVENTLOOP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,5 +39,5 @@ void *_event_loop(__attribute__((unused)) void *arg);
 }
 #endif
 
-#endif /* GNRC_TCP_INTERNAL_EVENTLOOP_H_ */
+#endif /* GNRC_TCP_INTERNAL_EVENTLOOP_H */
 /** @} */

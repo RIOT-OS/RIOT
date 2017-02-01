@@ -19,8 +19,8 @@
  * @author      Simon Brummer <simon.brummer@haw-hamburg.de>
  */
 
-#ifndef GNRC_TCP_CONFIG_H_
-#define GNRC_TCP_CONFIG_H_
+#ifndef GNRC_TCP_CONFIG_H
+#define GNRC_TCP_CONFIG_H
 
 #include "timex.h"
 
@@ -141,5 +141,5 @@ extern "C" {
 }
 #endif
 
-#endif /* GNRC_TCP_CONFIG_H_ */
+#endif /* GNRC_TCP_CONFIG_H */
 /** @} */

@@ -19,8 +19,8 @@
  * @author     Simon Brummer <brummer.simon@googlemail.com>
  */
 
-#ifndef GNRC_TCP_INTERNAL_COMMON_H_
-#define GNRC_TCP_INTERNAL_COMMON_H_
+#ifndef GNRC_TCP_INTERNAL_COMMON_H
+#define GNRC_TCP_INTERNAL_COMMON_H
 
 #include <stdint.h>
 #include "kernel_types.h"
@@ -133,5 +133,5 @@ extern mutex_t _list_tcb_lock;
 }
 #endif
 
-#endif /* GNRC_TCP_INTERNAL_COMMON_H_ */
+#endif /* GNRC_TCP_INTERNAL_COMMON_H */
 /** @} */

@@ -19,8 +19,8 @@
  * @author      Simon Brummer <simon.brummer@haw-hamburg.de>
  */
 
-#ifndef GNRC_TCP_TCB_H_
-#define GNRC_TCP_TCB_H_
+#ifndef GNRC_TCP_TCB_H
+#define GNRC_TCP_TCB_H
 
 #include <stdint.h>
 #include <ringbuffer.h>
@@ -86,5 +86,5 @@ typedef struct _transmission_control_block {
 #ifdef __cplusplus
 }
 #endif
-#endif /* GNRC_TCP_TCB_H_ */
+#endif /* GNRC_TCP_TCB_H */
 /** @} */

@@ -19,8 +19,8 @@
  * @author     Simon Brummer <brummer.simon@googlemail.com>
  */
 
-#ifndef GNRC_TCP_INTERNAL_OPTION_H_
-#define GNRC_TCP_INTERNAL_OPTION_H_
+#ifndef GNRC_TCP_INTERNAL_OPTION_H
+#define GNRC_TCP_INTERNAL_OPTION_H
 
 #include "net/tcp.h"
 #include "net/gnrc/tcp.h"
@@ -63,5 +63,5 @@ int _option_parse(gnrc_tcp_tcb_t* tcb, tcp_hdr_t *hdr);
 }
 #endif
 
-#endif /* GNRC_TCP_INTERNAL_OPTION_H_*/
+#endif /* GNRC_TCP_INTERNAL_OPTION_H*/
 /** @} */
