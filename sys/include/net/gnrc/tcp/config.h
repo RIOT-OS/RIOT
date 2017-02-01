@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,9 +14,9 @@
  * @{
  *
  * @file
- * @brief       TCP configuration, includes buffersizes, timeout durations
+ * @brief       Gnrc tcp's configuration
  *
- * @author      Simon Brummer <simon.brummer@haw-hamburg.de>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
 #ifndef GNRC_TCP_CONFIG_H

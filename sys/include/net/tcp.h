@@ -14,9 +14,9 @@
  * @{
  *
  * @file
- * @brief      TCP header and helper functions
+ * @brief       TCP header and helper functions
  *
- * @author     Simon Brummer <brummer.simon@googlemail.com>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
 #ifndef TCP_H

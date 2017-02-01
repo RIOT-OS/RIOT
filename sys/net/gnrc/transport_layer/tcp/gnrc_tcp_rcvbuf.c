@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Simon Brummer <brummer.simon@googlemail.com>
+ * Copyright (C) 2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,12 +7,13 @@
  */
 
 /**
+ * @ingroup     net_gnrc
  * @{
  *
  * @file
- * @brief       Implementation of tcp_internal/rcvbuf.h
+ * @brief       Implementation of internal/rcvbuf.h
  *
- * @author  Brummer Simon <brummer.simon@googlemail.com>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 #include <errno.h>
 #include "internal/rcvbuf.h"
