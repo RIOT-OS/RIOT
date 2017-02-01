@@ -611,6 +611,6 @@ gnrc_pktsnip_t *gnrc_tcp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src, uint16
     hdr->src_port = byteorder_htons(src);
     hdr->dst_port = byteorder_htons(dst);
     hdr->checksum = byteorder_htons(0);
-    hdr->off_ctl = byteorder_htons(OPTION_OFFSET_MAX);
+    hdr->off_ctl = byteorder_htons(TCP_HDR_OFFSET_MIN);
     return res;
 }

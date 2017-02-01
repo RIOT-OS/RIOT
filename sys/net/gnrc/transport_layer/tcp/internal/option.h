@@ -31,48 +31,9 @@ extern "C" {
 #endif
 
 /**
- * @brief TCP Option field boundries
- * @{
- */
-#define OPTION_OFFSET_BASE (0x5)
-#define OPTION_OFFSET_MAX  (0xF)
-/** @} */
-
-/**
  * @brief Extract offset value from offet and ctl bit field.
  */
 #define GET_OFFSET( x ) (((x) & MSK_OFFSET) >> 12)
-
-/**
- * @brief TCP Option Kind Field Values
- * @{
- */
-#define OPT_KIND_EOL     (00)  /**< End of List */
-#define OPT_KIND_NOP     (01)  /**< No Operatrion */
-#define OPT_KIND_MSS     (02)  /**< Maximum Segment Size */
-/** @} */
-
-/**
- * @brief TCP Option Length Field Values
- * @{
- */
-#define OPT_LENGTH_MSS   (04)  /**< MSS Option Size is 4 byte */
-/** @} */
-
-/**
- * @brief Extract kind field value from 4-byte option field
- */
-#define OPT_GET_KIND( x )   (((x) & 0xFF000000) >> 24)
-
-/**
- * @brief Extract length field value from 4-byte option field
- */
-#define OPT_GET_LENGTH( x ) (((x) & 0x00FF0000) >> 16)
-
-/**
- * @brief Extract two byte option value from 4-byte option field
- */
-#define OPT_GET_VAL_2B( x ) (((x) & 0x0000FFFF))
 
 /**
  * @brief Helper Function to build the MSS Option
