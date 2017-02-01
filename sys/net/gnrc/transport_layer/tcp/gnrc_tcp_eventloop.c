@@ -23,9 +23,9 @@
 #include "net/tcp.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/tcp.h"
+#include "internal/common.h"
 #include "internal/pkt.h"
 #include "internal/fsm.h"
-#include "internal/helper.h"
 #include "internal/option.h"
 #include "internal/eventloop.h"
 
@@ -155,8 +155,8 @@ static int _receive(gnrc_pktsnip_t *pkt)
     }
 
     /* Find tcb to de-multiplex this packet to */
-    mutex_lock(&_list_gnrc_tcp_tcb_lock);
-    tcb = _list_gnrc_tcp_tcb_head;
+    mutex_lock(&_list_tcb_lock);
+    tcb = _list_tcb_head;
     while (tcb) {
 #ifdef MODULE_GNRC_IPV6
         /* Check if current tcb is fitting for the incomming packet */
@@ -190,7 +190,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
 #endif
         tcb = tcb->next;
     }
-    mutex_unlock(&_list_gnrc_tcp_tcb_lock);
+    mutex_unlock(&_list_tcb_lock);
 
     /* Call FSM with event RCVD_PKT if a fitting connection was found */
     if (tcb != NULL) {
@@ -201,7 +201,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
         DEBUG("gnrc_tcp_eventloop.c : _receive() : Can't find fitting connection\n");
         if ((ctl & MSK_RST) != MSK_RST) {
             _pkt_build_reset_from_pkt(&reset, pkt);
-            gnrc_netapi_send(_gnrc_tcp_pid, reset);
+            gnrc_netapi_send(gnrc_tcp_pid, reset);
         }
         return -ENOTCONN;
     }
@@ -213,21 +213,21 @@ void *_event_loop(__attribute__((unused)) void *arg)
 {
     msg_t msg;
     msg_t reply;
-    msg_t msg_queue[GNRC_TCP_MSG_QUEUE_SIZE];
+    msg_t msg_queue[TCP_EVENTLOOP_MSG_QUEUE_SIZE];
 
     /* Store pid */
-    _gnrc_tcp_pid = thread_getpid();
+    gnrc_tcp_pid = thread_getpid();
 
     /* Setup reply message */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
     reply.content.value = (uint32_t)-ENOTSUP;
 
     /* Init message queue*/
-    msg_init_queue(msg_queue, GNRC_TCP_MSG_QUEUE_SIZE);
+    msg_init_queue(msg_queue, TCP_EVENTLOOP_MSG_QUEUE_SIZE);
 
     /* Register GNRC_tcp in netreg */
     gnrc_netreg_entry_t entry;
-    gnrc_netreg_entry_init_pid(&entry, GNRC_NETREG_DEMUX_CTX_ALL, _gnrc_tcp_pid);
+    gnrc_netreg_entry_init_pid(&entry, GNRC_NETREG_DEMUX_CTX_ALL, gnrc_tcp_pid);
     gnrc_netreg_register(GNRC_NETTYPE_TCP, &entry);
 
     /* dispatch NETAPI Messages */

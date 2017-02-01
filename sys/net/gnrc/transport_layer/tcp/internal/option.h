@@ -22,18 +22,12 @@
 #ifndef GNRC_TCP_INTERNAL_OPTION_H_
 #define GNRC_TCP_INTERNAL_OPTION_H_
 
-#include "helper.h"
 #include "net/tcp.h"
 #include "net/gnrc/tcp.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief Extract offset value from offet and ctl bit field.
- */
-#define GET_OFFSET( x ) (((x) & MSK_OFFSET) >> 12)
 
 /**
  * @brief Helper Function to build the MSS Option

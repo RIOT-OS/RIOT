@@ -33,11 +33,6 @@ extern "C" {
 #endif
 
 /**
- * @brief PID of tcp event handling thread
- */
-extern kernel_pid_t _gnrc_tcp_pid;
-
-/**
  * @brief TCP finite state maschine
  *
  * @param[in,out] tcb      specifies connection to use fsm on.

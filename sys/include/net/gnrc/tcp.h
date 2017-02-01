@@ -36,23 +36,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Port unspecified.
- *
- * @note PORT 0 is reserved, according to rfc 1700(https://www.ietf.org/rfc/rfc1700.txt)
- */
-#define GNRC_TCP_PORT_UNSPEC 0
-
-/**
- * @brief Head of conn linked list.
- */
-extern gnrc_tcp_tcb_t *_list_gnrc_tcp_tcb_head;
-
-/**
- * @brief Mutex to protect linked list.
- */
-extern mutex_t _list_gnrc_tcp_tcb_lock;
-
-/**
  * @brief Initialize and start TCP
  *
  * @return   PID of TCP thread on success

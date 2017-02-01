@@ -23,16 +23,13 @@
 #include "net/inet_csum.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/tcp.h"
+#include "internal/common.h"
 #include "internal/pkt.h"
-#include "internal/helper.h"
 #include "internal/option.h"
 #include "internal/eventloop.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-
-/* Check if a sequence number, falls into the receive window */
-#define INSIDE_WND(l_ed, seq_num, r_ed) (LEQ_32_BIT(l_ed, seq_num) && LSS_32_BIT(seq_num, r_ed))
 
 /**
  * @brief Calculates the maximum of two unsigned numbers
@@ -227,7 +224,7 @@ int _pkt_send(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_c
     }
 
     /* Pass packet down the network stack */
-    gnrc_netapi_send(_gnrc_tcp_pid, out_pkt);
+    gnrc_netapi_send(gnrc_tcp_pid, out_pkt);
     return 0;
 }
 
@@ -331,7 +328,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *pkt, const bool r
     /* RTO Adjustment */
     if (!retransmit) {
         /* If this is the first transmission: rto is 1 sec (Lower Bound) */
-        if (tcb->srtt == GNRC_TCP_RTO_UNINITIALIZED || tcb->rtt_var == GNRC_TCP_RTO_UNINITIALIZED) {
+        if (tcb->srtt == RTO_UNINITIALIZED || tcb->rtt_var == RTO_UNINITIALIZED) {
             tcb->rto = GNRC_TCP_RTO_LOWER_BOUND;
         }
         else {
@@ -345,8 +342,8 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *pkt, const bool r
         /* If the transmission has been tried five times, we assume srtt and rtt_var are bogus */
         /* New measurements must be taken */
         if (tcb->retries >= 5) {
-            tcb->srtt = GNRC_TCP_RTO_UNINITIALIZED;
-            tcb->rtt_var = GNRC_TCP_RTO_UNINITIALIZED;
+            tcb->srtt = RTO_UNINITIALIZED;
+            tcb->rtt_var = RTO_UNINITIALIZED;
         }
     }
 
@@ -361,7 +358,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *pkt, const bool r
     /* Setup retransmission timer, msg to TCP thread with ptr to tcb */
     tcb->msg_tout.type = MSG_TYPE_RETRANSMISSION;
     tcb->msg_tout.content.ptr = (void *)tcb;
-    xtimer_set_msg(&tcb->tim_tout, tcb->rto, &tcb->msg_tout, _gnrc_tcp_pid);
+    xtimer_set_msg(&tcb->tim_tout, tcb->rto, &tcb->msg_tout, gnrc_tcp_pid);
     return 0;
 }
 
@@ -395,8 +392,8 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t* tcb, const uint32_t ack)
         /* Use sample only if ther was no timeroverflow and no retransmission (Karns Alogrithm) */
         if (tcb->retries == 0 && rtt > 0) {
             /* If this is the first sample taken */
-            if (tcb->srtt == GNRC_TCP_RTO_UNINITIALIZED
-            && tcb->rtt_var == GNRC_TCP_RTO_UNINITIALIZED
+            if (tcb->srtt == RTO_UNINITIALIZED
+            && tcb->rtt_var == RTO_UNINITIALIZED
             ) {
                 tcb->srtt = rtt;
                 tcb->rtt_var = (rtt >> 1);
@@ -448,6 +445,3 @@ uint16_t _pkt_calc_csum(const gnrc_pktsnip_t *hdr,
     }
     return ~csum;
 }
-
-/* Cleanup, defines */
-#undef INSIDE_WND

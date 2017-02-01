@@ -22,10 +22,10 @@
 #include "ringbuffer.h"
 #include "net/af.h"
 
+#include "internal/common.h"
 #include "internal/fsm.h"
 #include "internal/pkt.h"
 #include "internal/option.h"
-#include "internal/helper.h"
 #include "internal/rcvbuf.h"
 
 #ifdef MODULE_GNRC_IPV6
@@ -48,7 +48,7 @@
 static int _is_local_port_in_use(const uint16_t portnumber)
 {
     gnrc_tcp_tcb_t *iter = NULL;
-    LL_FOREACH(_list_gnrc_tcp_tcb_head, iter) {
+    LL_FOREACH(_list_tcb_head, iter) {
         if (iter->local_port == portnumber) {
             return 1;
         }
@@ -102,7 +102,7 @@ static int _restart_timewait_timer(gnrc_tcp_tcb_t* tcb)
     xtimer_remove(&tcb->tim_tout);
     tcb->msg_tout.type = MSG_TYPE_TIMEWAIT;
     tcb->msg_tout.content.ptr = (void *)tcb;
-    xtimer_set_msg(&tcb->tim_tout, 2 * GNRC_TCP_MSL, &tcb->msg_tout, _gnrc_tcp_pid);
+    xtimer_set_msg(&tcb->tim_tout, 2 * GNRC_TCP_MSL, &tcb->msg_tout, gnrc_tcp_pid);
     return 0;
 }
 
@@ -126,16 +126,16 @@ static int _transition_to(gnrc_tcp_tcb_t* tcb, gnrc_tcp_fsm_state_t state, bool 
             _clear_retransmit(tcb);
 
             /* Remove from Connection from active connections */
-            mutex_lock(&_list_gnrc_tcp_tcb_lock);
-            LL_FOREACH(_list_gnrc_tcp_tcb_head, iter) {
+            mutex_lock(&_list_tcb_lock);
+            LL_FOREACH(_list_tcb_head, iter) {
                 if (iter == tcb) {
                     found = 1;
                 }
             }
             if (found) {
-                LL_DELETE(_list_gnrc_tcp_tcb_head, iter);
+                LL_DELETE(_list_tcb_head, iter);
             }
-            mutex_unlock(&_list_gnrc_tcp_tcb_lock);
+            mutex_unlock(&_list_tcb_lock);
 
             /* Free potencially allocated Receive Buffer */
             _rcvbuf_release_buffer(tcb);
@@ -147,7 +147,7 @@ static int _transition_to(gnrc_tcp_tcb_t* tcb, gnrc_tcp_fsm_state_t state, bool 
             switch (tcb->address_family) {
 #ifdef MODULE_GNRC_IPV6
               case AF_INET6:
-                  if (tcb->status & GNRC_TCP_STATUS_ALLOW_ANY_ADDR) {
+                  if (tcb->status & STATUS_ALLOW_ANY_ADDR) {
                       ipv6_addr_set_unspecified((ipv6_addr_t *) tcb->local_addr);
                   }
                   ipv6_addr_set_unspecified((ipv6_addr_t *) tcb->peer_addr);
@@ -157,7 +157,7 @@ static int _transition_to(gnrc_tcp_tcb_t* tcb, gnrc_tcp_fsm_state_t state, bool 
                   DEBUG("gnrc_tcp_fsm.c : _transition_to() : Undefined Addresses\n");
                   break;
             }
-            tcb->peer_port = GNRC_TCP_PORT_UNSPEC;
+            tcb->peer_port = PORT_UNSPEC;
 
             /* Allocate rcv Buffer */
             if (_rcvbuf_get_buffer(tcb) == -ENOMEM) {
@@ -165,16 +165,16 @@ static int _transition_to(gnrc_tcp_tcb_t* tcb, gnrc_tcp_fsm_state_t state, bool 
             }
 
             /* Add to Connection to active connections (if not already active) */
-            mutex_lock(&_list_gnrc_tcp_tcb_lock);
-            LL_FOREACH(_list_gnrc_tcp_tcb_head, iter) {
+            mutex_lock(&_list_tcb_lock);
+            LL_FOREACH(_list_tcb_head, iter) {
                 if (iter == tcb) {
                     found = 1;
                 }
             }
             if (!found) {
-                LL_APPEND(_list_gnrc_tcp_tcb_head, tcb);
+                LL_APPEND(_list_tcb_head, tcb);
             }
-            mutex_unlock(&_list_gnrc_tcp_tcb_lock);
+            mutex_unlock(&_list_tcb_lock);
             break;
 
         case GNRC_TCP_FSM_STATE_SYN_SENT:
@@ -184,8 +184,8 @@ static int _transition_to(gnrc_tcp_tcb_t* tcb, gnrc_tcp_fsm_state_t state, bool 
             }
 
             /* Add to Connections to active connection (if not already active) */
-            mutex_lock(&_list_gnrc_tcp_tcb_lock);
-            LL_FOREACH(_list_gnrc_tcp_tcb_head, iter) {
+            mutex_lock(&_list_tcb_lock);
+            LL_FOREACH(_list_tcb_head, iter) {
                 if (iter == tcb) {
                     found = 1;
                 }
@@ -193,11 +193,11 @@ static int _transition_to(gnrc_tcp_tcb_t* tcb, gnrc_tcp_fsm_state_t state, bool 
             /* If not already active: Apped tcb but check portnumber first */
             if (!found) {
                 /* Check if Port Number is not in use */
-                if (tcb->local_port != GNRC_TCP_PORT_UNSPEC ) {
+                if (tcb->local_port != PORT_UNSPEC ) {
 
                     /* If Portnumber is used: return error and release buffer */
                     if (_is_local_port_in_use(tcb->local_port)) {
-                        mutex_unlock(&_list_gnrc_tcp_tcb_lock);
+                        mutex_unlock(&_list_tcb_lock);
                         _rcvbuf_release_buffer(tcb);
                         return -EADDRINUSE;
                     }
@@ -206,9 +206,9 @@ static int _transition_to(gnrc_tcp_tcb_t* tcb, gnrc_tcp_fsm_state_t state, bool 
                 else {
                     tcb->local_port = _get_random_local_port();
                 }
-                LL_APPEND(_list_gnrc_tcp_tcb_head, tcb);
+                LL_APPEND(_list_tcb_head, tcb);
             }
-            mutex_unlock(&_list_gnrc_tcp_tcb_lock);
+            mutex_unlock(&_list_tcb_lock);
             break;
 
         case GNRC_TCP_FSM_STATE_ESTABLISHED:
@@ -249,7 +249,7 @@ static int _fsm_call_open(gnrc_tcp_tcb_t* tcb, bool *notify_owner)
     DEBUG("gnrc_tcp_fsm.c : _fsm_call_open()\n");
     tcb->rcv_wnd = GNRC_TCP_DEFAULT_WINDOW;
 
-    if (tcb->status & GNRC_TCP_STATUS_PASSIVE) {
+    if (tcb->status & STATUS_PASSIVE) {
         /* Passive Open, T: CLOSED -> LISTEN */
         if (_transition_to(tcb, GNRC_TCP_FSM_STATE_LISTEN, notify_owner) == -ENOMEM){
             _transition_to(tcb, GNRC_TCP_FSM_STATE_CLOSED, notify_owner);
@@ -465,7 +465,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *in_pkt, bool *noti
             uint16_t dst = byteorder_ntohs(tcp_hdr->dst_port);
 
             /* Check if SYN Request is handled by another connection */
-            lst = _list_gnrc_tcp_tcb_head;
+            lst = _list_tcb_head;
             while (lst) {
                 /* Compare Portnumbers and Network Layer Adresses */
                 /* Note: Packets without ip-header were discarded earlier */
@@ -600,7 +600,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *in_pkt, bool *noti
         if (ctl & MSK_RST) {
             /* .. and State is SYN_RCVD and passive Open: SYN_RCVD -> LISTEN */
             if (tcb->state == GNRC_TCP_FSM_STATE_SYN_RCVD
-            && (tcb->status & GNRC_TCP_STATUS_PASSIVE)
+            && (tcb->status & STATUS_PASSIVE)
             ) {
                 if (_transition_to(tcb, GNRC_TCP_FSM_STATE_LISTEN, notify_owner) == -ENOMEM) {
                     _transition_to(tcb, GNRC_TCP_FSM_STATE_CLOSED, notify_owner);

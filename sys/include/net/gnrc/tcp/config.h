@@ -29,15 +29,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Status Flags for TCP
- * @{
- */
-#define GNRC_TCP_STATUS_PASSIVE (1 << 0)
-#define GNRC_TCP_STATUS_ACCEPTED (1 << 1)
-#define GNRC_TCP_STATUS_ALLOW_ANY_ADDR (1 << 2)
-/** @} */
-
-/**
  * @brief Timeout Duration for user calls. Default 2 minutes
  */
 #ifndef GNRC_TCP_CONNECTION_TIMEOUT_DURATION
@@ -49,27 +40,6 @@ extern "C" {
  */
 #ifndef GNRC_TCP_MSL
 #define GNRC_TCP_MSL (30 * US_PER_SEC)
-#endif
-
-/**
- * @brief Message queue size for the TCP handling thread
- */
-#ifndef GNRC_TCP_MSG_QUEUE_SIZE
-#define GNRC_TCP_MSG_QUEUE_SIZE (8U)
-#endif
-
-/**
- * @brief Priority of the tcp handling thread, must be lower than the applications prio.
- */
-#ifndef GNRC_TCP_PRIO
-#define GNRC_TCP_PRIO (THREAD_PRIORITY_MAIN - 2U)
-#endif
-
-/**
- * @brief Default stack size for the TCP handling thread
- */
-#ifndef GNRC_TCP_STACK_SIZE
-#define GNRC_TCP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 /**
@@ -151,13 +121,6 @@ extern "C" {
  */
 #ifndef GNRC_TCP_RTO_K
 #define GNRC_TCP_RTO_K (4U)
-#endif
-
-/**
- * @brief Macro to mark is the time measurement is uninitialized
- */
-#ifndef GNRC_TCP_RTO_UNINITIALIZED
-#define GNRC_TCP_RTO_UNINITIALIZED (-1)
 #endif
 
 /**

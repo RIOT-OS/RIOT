@@ -27,11 +27,6 @@ extern "C" {
 #endif
 
 /**
- * @brief PID of tcp event handling thread
- */
-extern kernel_pid_t _gnrc_tcp_pid;
-
-/**
  * @brief TCP's mein processing thread.
  *
  * @param[in] arg   arguments, unused
