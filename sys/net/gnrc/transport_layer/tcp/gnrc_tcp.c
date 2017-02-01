@@ -103,7 +103,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
     mutex_lock(&(tcb->function_lock));
 
     /* Connection is already connected: Return -EISCONN */
-    if (tcb->state != GNRC_TCP_FSM_STATE_CLOSED) {
+    if (tcb->state != FSM_STATE_CLOSED) {
         mutex_unlock(&(tcb->function_lock));
         return -EISCONN;
     }
@@ -156,7 +156,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
     }
 
     /* Call FSM with Event: CALL_OPEN */
-    ret = _fsm(tcb, GNRC_TCP_FSM_EVENT_CALL_OPEN, NULL, NULL, 0);
+    ret = _fsm(tcb, FSM_EVENT_CALL_OPEN, NULL, NULL, 0);
     if (ret == -ENOMEM) {
         DEBUG("gnrc_tcp.c : gnrc_tcp_connect() : Out of receive buffers.\n");
     } else if(ret == -EADDRINUSE) {
@@ -164,15 +164,15 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
     }
 
     /* Wait until a connection was established or closed */
-    while (ret >= 0 && tcb->state != GNRC_TCP_FSM_STATE_CLOSED
-    && tcb->state != GNRC_TCP_FSM_STATE_ESTABLISHED
-    && tcb->state != GNRC_TCP_FSM_STATE_CLOSE_WAIT
+    while (ret >= 0 && tcb->state != FSM_STATE_CLOSED
+    && tcb->state != FSM_STATE_ESTABLISHED
+    && tcb->state != FSM_STATE_CLOSE_WAIT
     ) {
         msg_receive(&msg);
         switch (msg.type) {
             case MSG_TYPE_CONNECTION_TIMEOUT:
                 DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : CONNECTION_TIMEOUT\n");
-                _fsm(tcb, GNRC_TCP_FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
                 ret = -ETIMEDOUT;
                 break;
 
@@ -187,7 +187,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
 
     /* Cleanup */
     xtimer_remove(&connection_timeout_timer);
-    if (tcb->state == GNRC_TCP_FSM_STATE_CLOSED && ret == 0) {
+    if (tcb->state == FSM_STATE_CLOSED && ret == 0) {
         ret = -ECONNREFUSED;
     }
     tcb->owner = KERNEL_PID_UNDEF;
@@ -229,7 +229,7 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t* tcb)
 #endif
     tcb->local_port = PORT_UNSPEC;
     tcb->peer_port = PORT_UNSPEC;
-    tcb->state = GNRC_TCP_FSM_STATE_CLOSED;
+    tcb->state = FSM_STATE_CLOSED;
     tcb->status = 0;
     tcb->snd_una = 0;
     tcb->snd_nxt = 0;
@@ -323,8 +323,8 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     mutex_lock(&(tcb->function_lock));
 
     /* Check if connection is in a valid state */
-    if (tcb->state != GNRC_TCP_FSM_STATE_ESTABLISHED
-    && tcb->state != GNRC_TCP_FSM_STATE_CLOSE_WAIT
+    if (tcb->state != FSM_STATE_ESTABLISHED
+    && tcb->state != FSM_STATE_CLOSE_WAIT
     ) {
       mutex_unlock(&(tcb->function_lock));
       return -ENOTCONN;
@@ -348,7 +348,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     /* Loop until something was sent and acked */
     while (ret == 0 || tcb->pkt_retransmit != NULL) {
         /* Check if the connections state is closed. If so, a reset was received */
-        if (tcb->state == GNRC_TCP_FSM_STATE_CLOSED) {
+        if (tcb->state == FSM_STATE_CLOSED) {
            ret = -ECONNRESET;
            break;
         }
@@ -368,7 +368,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
 
         /* Try to send data in case there nothing has been sent and we are not probing */
         if (ret == 0 && !probing) {
-            ret = _fsm(tcb, GNRC_TCP_FSM_EVENT_CALL_SEND, NULL, (void *) data, len);
+            ret = _fsm(tcb, FSM_EVENT_CALL_SEND, NULL, (void *) data, len);
         }
 
         /* Wait for responses */
@@ -376,20 +376,20 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
         switch (msg.type) {
             case MSG_TYPE_CONNECTION_TIMEOUT:
                 DEBUG("gnrc_tcp.c : gnrc_tcp_send() : CONNECTION_TIMEOUT\n");
-                _fsm(tcb, GNRC_TCP_FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
                 ret = -ECONNABORTED;
                 break;
 
             case MSG_TYPE_USER_SPEC_TIMEOUT:
                 DEBUG("gnrc_tcp.c : gnrc_tcp_send() : USER_SPEC_TIMEOUT\n");
-                _fsm(tcb, GNRC_TCP_FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
+                _fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
                 ret = -ETIMEDOUT;
                 break;
 
             case MSG_TYPE_PROBE_TIMEOUT:
                 DEBUG("gnrc_tcp.c : gnrc_tcp_send() : PROBE_TIMEOUT\n");
                 /* Send Probe */
-                _fsm(tcb, GNRC_TCP_FSM_EVENT_SEND_PROBE, NULL, NULL, 0);
+                _fsm(tcb, FSM_EVENT_SEND_PROBE, NULL, NULL, 0);
                 probe_timeout_duration_us += probe_timeout_duration_us;
 
                 /* Boundry check for time interval between probes */
@@ -445,10 +445,10 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     mutex_lock(&(tcb->function_lock));
 
     /* Check if connection is in a valid state */
-    if (tcb->state != GNRC_TCP_FSM_STATE_ESTABLISHED
-    && tcb->state != GNRC_TCP_FSM_STATE_FIN_WAIT_1
-    && tcb->state != GNRC_TCP_FSM_STATE_FIN_WAIT_2
-    && tcb->state != GNRC_TCP_FSM_STATE_CLOSE_WAIT
+    if (tcb->state != FSM_STATE_ESTABLISHED
+    && tcb->state != FSM_STATE_FIN_WAIT_1
+    && tcb->state != FSM_STATE_FIN_WAIT_2
+    && tcb->state != FSM_STATE_CLOSE_WAIT
     ) {
          mutex_unlock(&(tcb->function_lock));
          return -ENOTCONN;
@@ -456,7 +456,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
 
     /* If this call is non-blocking (timeout_duration_us == 0): Try to read data and return */
     if (timeout_duration_us == 0) {
-        ret = _fsm(tcb, GNRC_TCP_FSM_EVENT_CALL_RECV, NULL, data, max_len);
+        ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
         if(ret == 0) {
             ret = -EAGAIN;
         }
@@ -480,13 +480,13 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     /* Processing Loop */
     while (ret == 0) {
         /* Check if the connections state is closed. If so, a reset was received */
-        if (tcb->state == GNRC_TCP_FSM_STATE_CLOSED) {
+        if (tcb->state == FSM_STATE_CLOSED) {
            ret = -ECONNRESET;
            break;
         }
 
         /* Try to read available data */
-        ret = _fsm(tcb, GNRC_TCP_FSM_EVENT_CALL_RECV, NULL, data, max_len);
+        ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
 
         /* If there was no data: Wait for next packet or until the timeout fires */
         if (ret <= 0) {
@@ -494,13 +494,13 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
             switch (msg.type) {
                case MSG_TYPE_CONNECTION_TIMEOUT:
                    DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : CONNECTION_TIMEOUT\n");
-                   _fsm(tcb, GNRC_TCP_FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                   _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
                    ret = -ECONNABORTED;
                    break;
 
                case MSG_TYPE_USER_SPEC_TIMEOUT:
                    DEBUG("gnrc_tcp.c : gnrc_tcp_send() : USER_SPEC_TIMEOUT\n");
-                   _fsm(tcb, GNRC_TCP_FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
+                   _fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
                    ret = -ETIMEDOUT;
                    break;
 
@@ -534,7 +534,7 @@ int gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
     mutex_lock(&(tcb->function_lock));
 
     /* Start connection teardown if the connection was not closed before */
-    if (tcb->state != GNRC_TCP_FSM_STATE_CLOSED) {
+    if (tcb->state != FSM_STATE_CLOSED) {
         /* Take ownership */
         msg_init_queue(tcb->msg_queue, GNRC_TCP_TCB_MSG_QUEUE_SIZE);
         tcb->owner = thread_getpid();
@@ -545,15 +545,15 @@ int gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
                        &connection_timeout_msg, tcb->owner);
 
         /* Start connection teardown sequence */
-        _fsm(tcb, GNRC_TCP_FSM_EVENT_CALL_CLOSE, NULL, NULL, 0);
+        _fsm(tcb, FSM_EVENT_CALL_CLOSE, NULL, NULL, 0);
 
         /* Loop until the connection has been closed */
-        while (tcb->state != GNRC_TCP_FSM_STATE_CLOSED) {
+        while (tcb->state != FSM_STATE_CLOSED) {
             msg_receive(&msg);
             switch (msg.type) {
                 case MSG_TYPE_CONNECTION_TIMEOUT:
                     DEBUG("gnrc_tcp.c : gnrc_tcp_close() : CONNECTION_TIMEOUT\n");
-                    _fsm(tcb, GNRC_TCP_FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                    _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
                     break;
 
                 case MSG_TYPE_NOTIFY_USER:

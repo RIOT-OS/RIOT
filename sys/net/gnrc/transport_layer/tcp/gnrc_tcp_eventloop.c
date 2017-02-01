@@ -163,7 +163,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
         if (ip->type == GNRC_NETTYPE_IPV6 && tcb->address_family == AF_INET6) {
             /* If SYN is set, a connection is listening on that port ... */
             ipv6_addr_t * tmp_addr = NULL;
-            if (syn && tcb->local_port == dst && tcb->state == GNRC_TCP_FSM_STATE_LISTEN) {
+            if (syn && tcb->local_port == dst && tcb->state == FSM_STATE_LISTEN) {
                 /* ... and local addr is unspec or preconfigured */
                 tmp_addr = &((ipv6_hdr_t * )ip->data)->dst;
                 if (ipv6_addr_equal((ipv6_addr_t *) tcb->local_addr, (ipv6_addr_t *) tmp_addr)
@@ -194,7 +194,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
 
     /* Call FSM with event RCVD_PKT if a fitting connection was found */
     if (tcb != NULL) {
-        _fsm(tcb, GNRC_TCP_FSM_EVENT_RCVD_PKT, pkt, NULL, 0);
+        _fsm(tcb, FSM_EVENT_RCVD_PKT, pkt, NULL, 0);
     }
     /* No fitting connection has been found. Respond with reset */
     else {
@@ -255,14 +255,14 @@ void *_event_loop(__attribute__((unused)) void *arg)
             /* Retransmission Timer expired -> Call FSM with retransmission event */
             case MSG_TYPE_RETRANSMISSION:
                 DEBUG("gnrc_tcp_eventloop.c : _event_loop() : MSG_TYPE_RETRANSMISSION\n");
-                _fsm((gnrc_tcp_tcb_t *)msg.content.ptr, GNRC_TCP_FSM_EVENT_TIMEOUT_RETRANSMIT,
+                _fsm((gnrc_tcp_tcb_t *)msg.content.ptr, FSM_EVENT_TIMEOUT_RETRANSMIT,
                      NULL, NULL, 0);
                 break;
 
             /* Time Wait Timer expired -> Call FSM with timewait event */
             case MSG_TYPE_TIMEWAIT:
                 DEBUG("gnrc_tcp_eventloop.c : _event_loop() : MSG_TYPE_TIMEWAIT\n");
-                _fsm((gnrc_tcp_tcb_t *)msg.content.ptr, GNRC_TCP_FSM_EVENT_TIMEOUT_TIMEWAIT,
+                _fsm((gnrc_tcp_tcb_t *)msg.content.ptr, FSM_EVENT_TIMEOUT_TIMEWAIT,
                      NULL, NULL, 0);
                 break;
 

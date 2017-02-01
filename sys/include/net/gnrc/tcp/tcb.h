@@ -28,7 +28,6 @@
 #include <mutex.h>
 #include <msg.h>
 #include "net/gnrc.h"
-#include "fsm.h"
 #include "config.h"
 
 #ifdef MODULE_GNRC_IPV6
@@ -55,7 +54,7 @@ typedef struct _transmission_control_block {
 #endif
     uint16_t local_port;                           /**< local connections port number */
     uint16_t peer_port;                            /**< port connections port number */
-    gnrc_tcp_fsm_state_t state;                    /**< Connections state */
+    uint8_t state;                                 /**< Connections state */
     uint8_t status;                                /**< A connections status flags */
     uint32_t snd_una;                              /**< Send Unacknowledged */
     uint32_t snd_nxt;                              /**< Send Next */

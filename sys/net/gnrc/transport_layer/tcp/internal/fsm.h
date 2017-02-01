@@ -25,12 +25,45 @@
 #include <errno.h>
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/pkt.h"
-#include "net/gnrc/tcp/fsm.h"
 #include "net/gnrc/tcp.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ *  @brief The TCP FSM States.
+ */
+typedef enum {
+    FSM_STATE_CLOSED,
+    FSM_STATE_LISTEN,
+    FSM_STATE_SYN_SENT,
+    FSM_STATE_SYN_RCVD,
+    FSM_STATE_ESTABLISHED,
+    FSM_STATE_CLOSE_WAIT,
+    FSM_STATE_LAST_ACK,
+    FSM_STATE_FIN_WAIT_1,
+    FSM_STATE_FIN_WAIT_2,
+    FSM_STATE_CLOSING,
+    FSM_STATE_TIME_WAIT
+} fsm_state_t;
+
+/**
+ *  @brief Events that trigger translations in TCP FSM.
+ */
+typedef enum {
+    FSM_EVENT_CALL_OPEN,          /* User function call: open */
+    FSM_EVENT_CALL_SEND,          /* User function call: send */
+    FSM_EVENT_CALL_RECV,          /* User function call: recv */
+    FSM_EVENT_CALL_CLOSE,         /* User function call: close */
+    FSM_EVENT_CALL_ABORT,         /* User function call: abort */
+    FSM_EVENT_RCVD_PKT,           /* Paket received from peer */
+    FSM_EVENT_TIMEOUT_TIMEWAIT,   /* Timeout: Timewait */
+    FSM_EVENT_TIMEOUT_RETRANSMIT, /* Timeout: Retransmit */
+    FSM_EVENT_TIMEOUT_CONNECTION, /* Timeout: Connection */
+    FSM_EVENT_SEND_PROBE,         /* Send a Zero Window Probe */
+    FSM_EVENT_CLEAR_RETRANSMIT    /* Clear Retransmission Mechanism */
+} fsm_event_t;
 
 /**
  * @brief TCP finite state maschine
@@ -45,7 +78,7 @@ extern "C" {
  * @return  Positive Number, number of bytes sent from or copied into buf.
  * @return  -ENOSYS if event is not implemented
  */
-int _fsm(gnrc_tcp_tcb_t* tcb, gnrc_tcp_fsm_event_t event, gnrc_pktsnip_t *in_pkt, void *buf,
+int _fsm(gnrc_tcp_tcb_t* tcb, fsm_event_t event, gnrc_pktsnip_t *in_pkt, void *buf,
          size_t nByte);
 
 #ifdef __cplusplus
