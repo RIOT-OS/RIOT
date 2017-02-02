@@ -1,14 +1,14 @@
 # Target architecture for the build. Use avr if you are unsure.
 export TARGET_ARCH ?= avr
 
-# define build specific options
-CFLAGS_LINK  = -ffunction-sections -fdata-sections
+export CFLAGS_CPU = -mmcu=$(CPU) $(CFLAGS_FPU)
+export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
+export CFLAGS_DBG  ?= -ggdb -g3
+export CFLAGS_OPT  ?= -Os
 
-# export compiler flags
-export CFLAGS += $(CFLAGS_LINK)
-
-# export linker flags
-export LINKFLAGS += -Wl,--gc-sections -static -lgcc
+export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
+export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
+export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -e reset_handler -Wl,--gc-sections
 
 # export the peripheral drivers to be linked into the final binary
 export USEMODULE += periph
@@ -19,3 +19,10 @@ export USEMODULE += uart_stdio
 
 # include module specific includes
 export INCLUDES += -I$(RIOTCPU)/atmega_common/include -isystem$(RIOTCPU)/atmega_common/avr-libc-extra
+
+ifeq ($(LTO),1)
+  # avr-gcc <4.8.3 has a bug when using LTO which causes a warning to be printed always:
+  # '_vector_25' appears to be a misspelled signal handler [enabled by default]
+  # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59396
+  export LINKFLAGS += -Wno-error
+endif
