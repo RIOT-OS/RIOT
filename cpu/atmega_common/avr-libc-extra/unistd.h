@@ -21,6 +21,7 @@ extern "C" {
 
 int close(int fildes);
 
+typedef long ssize_t;
 typedef uint32_t useconds_t;
 int usleep(useconds_t usec);
 unsigned int sleep(unsigned int seconds);
