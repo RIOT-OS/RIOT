@@ -20,29 +20,25 @@
 
 #include "board.h"
 #include "rgbled.h"
+#include "shell.h"
+
+extern int rgb_cmd(int argc, char **argv);
+
+static const shell_command_t shell_commands[] = {
+    { "rgbled", "set RGB LED to different colors", rgb_cmd },
+    { NULL, NULL, NULL }
+};
 
 int main(void)
 {
-    puts("Pinoccio PWM LED!");
+    puts("Pinoccio PWM LED Shell!");
 
-    printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
-    printf("This board features a(n) %s MCU.\n", RIOT_MCU);
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
 
-  /*  tim_t mytimer = TIMER_2;
-    timer_init(mytimer,500,&pwmRed, NULL);
-    while(1)
-    {
-    }*/
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
-    printf("creating led \n");
-    rgbled_t my_rgbled;
-    pwm_t my_pwm = PWM_0;
-    printf("starting rgb init \n");
-    rgbled_init(&my_rgbled, my_pwm, 0, 1, 2);
-    color_rgb_t white = {255,255,0};
-    printf("setting duty cycles \n");
-    rgbled_set(&my_rgbled, &white);
-
+    puts("Error: END of main().");
+    /* should be never reached */
 
 
     return 0;

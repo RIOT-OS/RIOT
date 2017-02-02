@@ -16,5 +16,6 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 0
 
 USEMODULE += rgbled
+USEMODULE += shell
 include $(RIOTBASE)/Makefile.include
 

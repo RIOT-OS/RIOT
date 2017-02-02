@@ -88,7 +88,7 @@ static const pwm_conf_t pwm_config[] = {
 				.power_reg_bit = PRTIM1,
 				.chan     = { { .pin = GPIO_PIN(PORT_B, 5), .cc_chan = 0 },
 							{ .pin = GPIO_PIN(PORT_B, 6), .cc_chan = 1 },
-							{ .pin = GPIO_UNDEF, .cc_chan = 2 } }
+							{ .pin = GPIO_PIN(PORT_B, 7), .cc_chan = 2 } }
 		}
 };
 

@@ -93,15 +93,15 @@ extern "C" {
  *	ON port E0 is RX USB UART do NOT use as Context swap
  */////////////////////////////////////////////////////////////
 // TODO Check if the not implemented I/O pin interrupt could be used to not waste pin,
-// use PCINT8 until then.
+// use PCINT4 until then.
 // Note that the I/O ports corresponding to PCINT23:16 are not implemented. Therefore PCIE2 has no function in this device
 #define AVR_CONTEXT_SWAP_INIT do { \
-    DDRB |= (1 << PB7); \
+    DDRB |= (1 << PB4); \
     PCICR |= (1 << PCIE0); \
-    PCMSK0 |= (1 << PCINT7); \
+    PCMSK0 |= (1 << PCINT4); \
 } while (0)
 #define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT0_vect
-#define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB7)
+#define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB4)
 
 /**
  * @brief xtimer configuration values
