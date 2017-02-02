@@ -43,14 +43,5 @@ ifeq ($(PROGRAMMER), stk500v1)
     export PROGRAMMER_FLAGS = -P $(PORT) -b 115200
 endif
 
-# define build specific options
-export CFLAGS_CPU   = -mmcu=atmega1281  $(CFLAGS_FPU)
-export CFLAGS_LINK  = -fno-builtin -fshort-enums
-export CFLAGS_DBG  ?= -ggdb -g3
-export CFLAGS_OPT  ?= -Os
-
-export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
-export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
-export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -e reset_handler
 export OFLAGS += -j .text -j .data -O ihex
 export FFLAGS += -p m1281 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex
