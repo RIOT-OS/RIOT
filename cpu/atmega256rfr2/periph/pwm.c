@@ -1,192 +1,158 @@
 /*
- * Copyright (C) 2014 Hamburg University of Applied Sciences
- *               2015 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
+ *               2015 Engineering-Spirit
+ *               2016 OTA keys S.A.
+ *               2017 RWTH Aachen
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
- * @ingroup     cpu_atmega256rfr2
+ * @ingroup     cpu_stm32_common
  * @{
  *
  * @file
  * @brief       Low-level PWM driver implementation
  *
- * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
+ * @author      Fabian Nack <nack@inf.fu-berlin.de>
+ * @author      Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
+ * @author      Aurelien Gonce <aurelien.gonce@altran.fr>
+ * @author 		Steffen Robertz <steffen.robertz@rwth-aachen.de>
  *
  * @}
  */
+#define ENABLE_DEBUG    (1)
 
-#include <stdint.h>
-#include <string.h>
-
-#include "log.h"
 #include "cpu.h"
-#include "board.h"
+#include "assert.h"
 #include "periph/pwm.h"
-#include <avr/io.h>
+#include "periph/gpio.h"
+#include "debug.h"
 
-/*
-static inline int _num(pwm_t dev)
+/**
+ * @brief   We have 5 possible prescaler values
+ */
+#define PRESCALE_NUMOF          (5U)
+
+/**
+ * @brief   Possible prescaler values
+ */
+static const uint16_t prescalers[] = { 1, 8, 64, 256, 1024 };
+
+
+uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
-    return ((int)(pwm_config[dev].dev) & 0xc00) >> 10;
+	/* verify data */
+	assert(pwm < PWM_NUMOF);
+
+	/* stop and reset timer */
+	pwm_config[pwm].dev->CRA = 0;
+	pwm_config[pwm].dev->CRB = 0;
+	pwm_config[pwm].dev->CRC = 0;
+	pwm_config[pwm].dev->CNT = 0;
+
+	/* poweron timer */
+	pwm_poweron(pwm);
+
+
+	 /* configure the used pins */
+	 unsigned i = 0;
+	 while ((i < TIMER_CHAN) && (pwm_config[pwm].chan[i].pin != GPIO_UNDEF)) {
+	      gpio_init(pwm_config[pwm].chan[i].pin, GPIO_OUT);
+	      i++;
+	 }
+
+	 /* set PWM mode */
+	 switch (mode) {
+	 	 case PWM_LEFT:
+	 		 /* fast PWM Mode */
+	 		 if(pwm_config[pwm].chan[0].pin != GPIO_UNDEF)
+	 				pwm_config[pwm].dev->CRA |= (1<<COM1A0) | (1<<COM1A1); /* Clear OCnA on compare */
+	 		if(pwm_config[pwm].chan[0].pin != GPIO_UNDEF)
+	 				pwm_config[pwm].dev->CRA |= (1<<COM1B0) | (1<<COM1B1); /* Clear OCnB on compare */
+	 		if(pwm_config[pwm].chan[0].pin != GPIO_UNDEF)
+	 				pwm_config[pwm].dev->CRA |= (1<<COM1C0) | (1<<COM1C1); /* Clear OCnA on compare */
+	 		/* Fast PWM ICRn as TOP */
+	 		 pwm_config[pwm].dev->CRA |= (1<<WGM11);
+	 		 pwm_config[pwm].dev->CRB |= (1<<WGM12) | (1<<WGM13);
+	 		 pwm_config[pwm].dev->ICR = res;
+	         break;
+	     case PWM_RIGHT:
+	    	 return 0; /* not yet supported */
+	         break;
+	     case PWM_CENTER:
+	    	 /* Phase correct PWM */
+	         break;
+	 }
+
+	 /* Calculate Prescaler*/
+	 i = 0;
+	 uint32_t clock_res = CLOCK_CORECLOCK / res;
+	 uint32_t opt_prescaler = clock_res / (freq); /*best prescaler, might not be possible */
+	 if(opt_prescaler >1) {
+		 for(; i < (PRESCALE_NUMOF-1); i++) {
+		 	 if(opt_prescaler >= prescalers[i] && opt_prescaler < prescalers[i+1]) {
+		 	 	 /*chose bigger prescaler thus decreasing frequency */
+		 	 	 i++;
+			 	 break;
+	 	 	 }
+	 	 }
+	 }
+	 /*Set prescaler */
+	 pwm_config[pwm].dev->CRB |= (i+1);
+	 /* return actual frequency */
+	 DEBUG_PRINT("Opt prescaler %u \n", (unsigned int)opt_prescaler);
+	 DEBUG_PRINT("Prescaler set to %u \n", (unsigned int)prescalers[i]);
+	 return (clock_res/prescalers[i]);
+
 }
 
-static inline Tcc *_tcc(pwm_t dev)
+uint8_t pwm_channels(pwm_t pwm)
 {
-    return pwm_config[dev].dev;
+    assert(pwm < PWM_NUMOF);
+
+    unsigned i = 0;
+    while ((i < TIMER_CHAN) && (pwm_config[pwm].chan[i].pin != GPIO_UNDEF)) {
+        i++;
+    }
+    return (uint8_t)i;
 }
 
-static inline uint8_t _chan(pwm_t dev, int chan)
+void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
 {
-    return pwm_config[dev].chan[chan].chan;
+    assert((pwm < PWM_NUMOF) &&
+           (channel < TIMER_CHAN) &&
+           (pwm_config[pwm].chan[channel].pin != GPIO_UNDEF));
+    /* norm value to maximum possible value */
+    if (value > pwm_config[pwm].dev->ICR) {
+        value = (uint16_t)pwm_config[pwm].dev->ICR;
+    }
+    pwm_config[pwm].dev->OCR[channel] = value;
 }
 
-static int _clk_id(pwm_t dev)
+void pwm_start(pwm_t pwm)
 {
-    if (_num(dev) == 2) {
-        return TCC2_GCLK_ID;
-    }
-    return TCC0_GCLK_ID;
-}
-*/
-static uint8_t get_prescaler(unsigned int target, int *scale)
-{
-    if (target == 0) {
-        return 0xff;
-    }
+	/*Not yet implemented */
 
-    if (target >= 512) {
-        *scale = 1024;
-        return 0x05;
-    }
-    if (target >= 128) {
-        *scale = 256;
-        return 0x04;
-    }
-    if (target >= 32) {
-        *scale = 64;
-        return 0x03;
-    }
-    if (target >= 6) {
-        *scale = 8;
-        return 0x02;
-    }
-    *scale = target;
-    return target - 1;
 }
 
-uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
+void pwm_stop(pwm_t pwm)
 {
-    uint8_t prescaler;
-    int scale = 1;
-    uint32_t f_real;
+	/* Not yet implemented */
 
-    if ((unsigned int)dev >= PWM_NUMOF) {
-        return 0;
-    }
-    /* For now report error if res doesnt fit 8bit Timer */
-    if (res > 255){
-    	return 0;
-    }
-    /* calculate the closest possible clock presacler */
-    prescaler = get_prescaler(CLOCK_CORECLOCK / (freq * res), &scale);
-    if (prescaler == 0xff) {
-        return 0;
-    }
-    f_real = (CLOCK_CORECLOCK / (scale * res));
-
-    /* configure the used pins */
-  /*  for (int i = 0; i < PWM_MAX_CHANNELS; i++) {
-        if (pwm_config[dev].chan[i].pin != GPIO_UNDEF) {
-            gpio_init(pwm_config[dev].chan[i].pin, GPIO_OUT);
-            gpio_init_mux(pwm_config[dev].chan[i].pin, pwm_config[dev].chan[i].mux);
-        }
-    }
-*/
-    /* power on the device */
-    // Not needed?
-    // pwm_poweron(dev);
-
-    /* reset TCC module */
-   TCNT1 = 0x00;
-   OCR0A = 0x00;
-    /* set PWM mode */
-    switch (mode) {
-        case PWM_LEFT:
-            TCCR0A |=(1<<WGM01)|(1<<WGM00);     /* count up using fast pwm TOP=0xFF */
-            TCCR0A &= ~(1<<WGM02);
-            break;
-        case PWM_RIGHT:
-        	/*not supported so far */
-        case PWM_CENTER:        /* currently not supported */
-        default:
-            return 0;
-    }
-    /* configure the TCC device */
-    TCCR0A |= (0b01000000); /* Output Compare A connected */
-    /* set the selected period */
-   OCR0A = res-1;
-    /* start PWM operation */
-   /*starts once clock is connected */
-   //pwm_start(dev); not needed
-   TCCR0B |= prescaler;
-    /* return the actual frequency the PWM is running at */
-    return f_real;
 }
 
-uint8_t pwm_channels(pwm_t dev)
+void pwm_poweron(pwm_t pwm)
 {
-    //return sizeof(pwm_config[dev].chan) / sizeof(pwm_config[dev].chan[0]);
-	return 5;
+	/* 0 in Powerregister enables timer */
+	*(pwm_config[pwm].power_reg) &= ~(1<<pwm_config[pwm].power_reg_bit);
 }
 
-void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
+void pwm_poweroff(pwm_t pwm)
 {
-   /* if ((channel >= PWM_MAX_CHANNELS) ||
-        (pwm_config[dev].chan[channel].pin == GPIO_UNDEF)) {
-        return;
-    }
-    _tcc(dev)->CC[_chan(dev, channel)].reg = value;
-    while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CC0 << _chan(dev, channel))) {}
-    */
-}
-
-void pwm_start(pwm_t dev)
-{
-  //  _tcc(dev)->CTRLA.reg |= (TCC_CTRLA_ENABLE);
-}
-
-void pwm_stop(pwm_t dev)
-{
-   // _tcc(dev)->CTRLA.reg &= ~(TCC_CTRLA_ENABLE);
-}
-
-void pwm_poweron(pwm_t dev)
-{
-  /*  int num = _num(dev);
-    if (num < 0) {
-        return;
-    }
-    PM->APBCMASK.reg |= (PM_APBCMASK_TCC0 << num);
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
-                         GCLK_CLKCTRL_GEN_GCLK0 |
-                         GCLK_CLKCTRL_ID(_clk_id(dev)));
-    while (GCLK->STATUS.bit.SYNCBUSY) {} */
-}
-
-void pwm_poweroff(pwm_t dev)
-{
-  /*  int num = _num(dev);
-    if (num < 0) {
-        return;
-    }
-    PM->APBCMASK.reg &= ~(PM_APBCMASK_TCC0 << num);
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_GEN_GCLK7 |
-                         GCLK_CLKCTRL_ID(_clk_id(dev)));
-    while (GCLK->STATUS.bit.SYNCBUSY) {} */
+	/* 1 in Powerregister disables timer */
+	*(pwm_config[pwm].power_reg) |= (1<<pwm_config[pwm].power_reg_bit);
 }

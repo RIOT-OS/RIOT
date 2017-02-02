@@ -22,11 +22,14 @@
 #ifndef PERIPH_CPU_H_
 #define PERIPH_CPU_H_
 
-#include "periph_cpu_common.h"
+//#include "periph_cpu_common.h"
+//#include "periph/timer.h"
+#include "atmega_regs_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /**
  * @brief   Available ports on the ATmega256rfr family
@@ -40,6 +43,39 @@ enum {
     PORT_F = 5,       /**< port F */
     PORT_G = 6,       /**< port G */
 };
+
+/**
+ * @brief   Atmega256rfr2 timers have 3 capture-compare channels (TIMER 1/3) -> best suitable for
+ * 			PWM and especially RGB Leds
+ */
+#define TIMER_CHAN          (3U)
+
+typedef unsigned int gpio_t;
+#ifndef GPIO_UNDEF
+/**
+ * @brief   GPIO pin not defined
+ */
+#define GPIO_UNDEF          (0xFFFF)
+#endif
+/**
+ * @brief   PWM channel
+ */
+typedef struct {
+    gpio_t pin;             /**< GPIO pin mapped to this channel */
+    uint8_t cc_chan;        /**< capture compare channel used */
+} pwm_chan_t;
+
+
+/**
+ * @brief   PWM configuration
+ */
+
+typedef struct {
+	mega_timer_t *dev;               /**< Timer used */
+    pwm_chan_t chan[TIMER_CHAN];    /**< channel mapping, set to {GPIO_UNDEF, 0} */
+    REG8 *power_reg;			/**< Save Powerregister for poweron and off */
+    uint8_t power_reg_bit;		/**< Save which bit needs to be set in powerregister */
+} pwm_conf_t;
 
 #ifdef __cplusplus
 }

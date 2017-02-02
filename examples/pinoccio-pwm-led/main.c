@@ -34,11 +34,13 @@ int main(void)
     {
     }*/
 
-
+    printf("creating led \n");
     rgbled_t my_rgbled;
-    pwm_t my_pwm = PWM_0_EN;
-    rgbled_init(&my_rgbled, my_pwm, RED, GREEN, BLUE);
-    color_rgb_t white = {255,255,255};
+    pwm_t my_pwm = PWM_0;
+    printf("starting rgb init \n");
+    rgbled_init(&my_rgbled, my_pwm, 0, 1, 2);
+    color_rgb_t white = {255,255,0};
+    printf("setting duty cycles \n");
     rgbled_set(&my_rgbled, &white);
 
 

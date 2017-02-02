@@ -19,3 +19,4 @@ export USEMODULE += uart_stdio
 # include module specific includes
 #export INCLUDES += -I$(RIOTCPU)/atmega_common/include -isystem$(RIOTCPU)/atmega_common/avr-libc-extra
 export INCLUDES += -I$(RIOTCPU)/atmega_common/include -I$(RIOTCPU)/atmega_common/avr-libc-extra
+export INCLUDES += -I /usr/avr/include

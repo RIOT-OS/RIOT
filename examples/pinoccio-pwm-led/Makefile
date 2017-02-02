@@ -16,6 +16,5 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 0
 
 USEMODULE += rgbled
-FEATURES_REQUIRED += pwm
 include $(RIOTBASE)/Makefile.include
 

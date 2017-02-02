@@ -27,6 +27,11 @@
 extern "C" {
 #endif
 
+#include "periph_cpu.h"
+#include "atmega_regs_common.h"
+#include "periph_cpu_common.h"
+#include <stdint.h>
+#include <avr/io.h>
 /**
  * @brief   Clock configuration
  * @{
@@ -67,12 +72,25 @@ extern "C" {
 /** @} */
 
 /**
- * @name PWM configuration
+ * @brief   PWM configuration
  * @{
  */
-#define PWM_0_EN            1
-#define PWM_MAX_CHANNELS    1
+
 #define PWM_NUMOF			(1U)
+
+#define PWM_0				(0U)
+
+
+static const pwm_conf_t pwm_config[] = {
+		{
+				.dev = MEGA_TIMER1,
+				.power_reg = &PRR0,
+				.power_reg_bit = PRTIM1,
+				.chan     = { { .pin = GPIO_PIN(PORT_B, 5), .cc_chan = 0 },
+							{ .pin = GPIO_PIN(PORT_B, 6), .cc_chan = 1 },
+							{ .pin = GPIO_UNDEF, .cc_chan = 2 } }
+		}
+};
 
 /**
  * @brief   UART configuration
