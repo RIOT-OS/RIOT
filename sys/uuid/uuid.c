@@ -39,7 +39,7 @@ void uuid_custom(void *buf, size_t len, int gen)
 {
     uuid_base(buf, len);
 
-    for (int i = 0; i < sizeof(gen); i++) {
+    for (size_t i = 0; i < sizeof(gen); i++) {
         ((uint8_t *)buf)[i % len] ^= ((gen >> (i * 8)) & 0xff);
     }
 }
