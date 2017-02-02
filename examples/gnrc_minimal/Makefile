@@ -7,7 +7,7 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h
+BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo32-f031
 
 ## Uncomment to support the XBee module
 #USEMODULE += xbee
