@@ -23,9 +23,8 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <string.h>
-
-#ifdef __WITH_AVRLIBC__
-#include <stdio.h>  /* for fwrite() */
+#if defined(MODULE_NEWLIB) || defined(__WITH_AVRLIBC__)
+#include <stdio.h>
 #else
 /* work around broken sys/posix/unistd.h */
 ssize_t write(int fildes, const void *buf, size_t nbyte);
@@ -261,6 +260,10 @@ uint32_t scn_u32_dec(const char *str, size_t n)
 
 void print(const char *s, size_t n)
 {
+#ifdef MODULE_NEWLIB
+    fflush(stdout);
+#endif
+
 #ifdef __WITH_AVRLIBC__
     /* AVR's libc doesn't offer write(), so use fwrite() instead */
     fwrite(s, n, 1, stdout);
