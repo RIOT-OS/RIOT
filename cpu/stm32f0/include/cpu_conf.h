@@ -43,6 +43,9 @@
 #ifdef CPU_MODEL_STM32F042K6
 #include "stm32f042x6.h"
 #endif
+#ifdef CPU_MODEL_STM32F031K6
+#include "stm32f031x6.h"
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
