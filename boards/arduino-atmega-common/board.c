@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup     boards_arduino-common
+ * @ingroup     boards_arduino-atmega-common
  * @{
  *
  * @file
@@ -29,6 +29,7 @@
 #include "board.h"
 #include "cpu.h"
 #include "uart_stdio.h"
+#include "periph/gpio.h"
 
 void led_init(void);
 void SystemInit(void);
@@ -46,9 +47,9 @@ void board_init(void)
     /* initialize the CPU */
     cpu_init();
 
-    /* initialize the board LED (connected to pin PB5) */
-    DDRB |= (1 << DDB5);
-    PORTB &= ~(1 << 5);
+    /* initialize the board LED */
+    gpio_init(LED0_PIN, GPIO_OUT);
+    LED0_OFF;
 
     irq_enable();
 }
