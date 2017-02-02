@@ -1,5 +1,5 @@
 MODULE = board
 
-DIRS = $(RIOTBOARD)/arduino-common
+DIRS = $(RIOTBOARD)/arduino-atmega-common
 
 include $(RIOTBASE)/Makefile.base
