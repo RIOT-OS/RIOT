@@ -4,9 +4,9 @@ include $(RIOTBOARD)/arduino-atmega-common/Makefile.dep
 # define port used to flash the board
 OS = $(shell uname)
 ifeq ($(OS),Linux)
-		PORT = $(LINUX_PORT)
+  PORT = $(PORT_LINUX)
 else ifeq ($(OS),Darwin)
-  PORT ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+  PORT ?= $(PORT_DARWIN)
 else
   $(info CAUTION: No flash tool for your host system found!)
   # TODO: fix for building under windows

@@ -7,7 +7,8 @@ USEMODULE += arduino-atmega-common
 INCLUDES += -I$(RIOTBOARD)/arduino-atmega-common/include
 
 # export needed for flash rule
-export LINUX_PORT ?= /dev/ttyACM0
+export PORT_LINUX ?= /dev/ttyACM0
+export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 export PROGRAMMER_SPEED ?= 115200
 
 export FFLAGS += -p m328p
