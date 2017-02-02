@@ -89,7 +89,8 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
     /* Allocate new tcp header */
     tcp_snp = gnrc_pktbuf_add(NULL, &tcp_hdr_out, TCP_HDR_OFFSET_MIN * 4, GNRC_NETTYPE_TCP);
     if (tcp_snp == NULL) {
-        DEBUG("gnrc_tcp_pkt.c : _pkt_build_reset_from_pkt() : Can't alloc buffer for TCP Header\n.");
+        DEBUG("gnrc_tcp_pkt.c : _pkt_build_reset_from_pkt() :\
+               Can't alloc buffer for TCP Header\n.");
         *(out_pkt) = NULL;
         return -ENOMEM;
     }
@@ -99,7 +100,8 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
 #ifdef MODULE_GNRC_IPV6
     ip6_snp = gnrc_ipv6_hdr_build(tcp_snp, &(ip6_hdr->dst), &(ip6_hdr->src));
     if (ip6_snp == NULL) {
-        DEBUG("gnrc_tcp_pkt.c : _pkt_build_reset_from_pkt() : Can't alloc buffer for IPv6 Header.\n");
+        DEBUG("gnrc_tcp_pkt.c : _pkt_build_reset_from_pkt() :\
+               Can't alloc buffer for IPv6 Header.\n");
         gnrc_pktbuf_release(tcp_snp);
         *(out_pkt) = NULL;
         return -ENOMEM;

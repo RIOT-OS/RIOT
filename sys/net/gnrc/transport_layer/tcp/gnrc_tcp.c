@@ -119,7 +119,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
         if (local_addr == NULL) {
             tcb->status |= STATUS_ALLOW_ANY_ADDR;
         }
-        /* If local address is specified: Copy it into tcb: only connections to this addr are ok */
+        /* If local address is specified: Copy it into tcb */
         else {
             switch (tcb->address_family) {
 #ifdef MODULE_GNRC_IPV6

@@ -25,7 +25,7 @@
 
 uint32_t _option_build_mss(uint16_t mss)
 {
-    return (((uint32_t )TCP_OPTION_KIND_MSS) << 24) | (((uint32_t) TCP_OPTION_LENGTH_MSS) << 16) | mss;
+    return (uint32_t) ((TCP_OPTION_KIND_MSS << 24) | (TCP_OPTION_LENGTH_MSS << 16) | mss);
 }
 
 uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl)

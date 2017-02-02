@@ -99,7 +99,7 @@ int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
  * @param[in,out] tcb          This connections Transmission control block.
  * @param[in] address_family   Address Family of @p local_addr.
  *                             If local_addr == NULL, address_family is ignored.
- * @param[in] local_addr       If not NULL the connection is bound to the address in @p local_addr.
+ * @param[in] local_addr       If not NULL the connection is bound to the address @p local_addr.
  *                             If NULL a connection request to every local ip address is valid.
  * @param[in] local_port       Portnumber that should used for incomming connection requests.
  *
