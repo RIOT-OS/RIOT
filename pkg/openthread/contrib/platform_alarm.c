@@ -28,7 +28,7 @@ static xtimer_t ot_timer;
 static msg_t ot_alarm_msg;
 
 /* OpenThread will call this for starting an aDt millisecs alarm when current time is aT0 millisecs */
-void otPlatAlarmStartAt(uint32_t aT0, uint32_t aDt)
+void otPlatAlarmStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
 {
     DEBUG("openthread: otPlatAlarmStartAt: aT0: %i, aDT: %i\n", (int) aT0, (int) aDt);
     ot_alarm_msg.type = OPENTHREAD_XTIMER_MSG_TYPE_EVENT;
@@ -43,7 +43,7 @@ void otPlatAlarmStartAt(uint32_t aT0, uint32_t aDt)
 }
 
 /* OpenThread will call this to stop alarms */
-void otPlatAlarmStop(void)
+void otPlatAlarmStop(otInstance *aInstance)
 {
     DEBUG("openthread: otPlatAlarmStop\n");
     xtimer_remove(&ot_timer);
