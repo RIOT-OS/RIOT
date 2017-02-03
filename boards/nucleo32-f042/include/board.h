@@ -25,6 +25,10 @@
 extern "C" {
 #endif
 
+/**
+ * @name Macros for controlling the on-board LED.
+ * @{
+ */
 #define LED0_PIN            GPIO_PIN(PORT_B, 3)
 
 #define LED0_MASK           (1 << 3)
@@ -32,6 +36,7 @@ extern "C" {
 #define LED0_ON             (GPIOB->BSRR     = LED0_MASK)
 #define LED0_OFF            (GPIOB->BRR      = LED0_MASK)
 #define LED0_TOGGLE         (GPIOB->ODR     ^= LED0_MASK)
+/** }@ */
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
