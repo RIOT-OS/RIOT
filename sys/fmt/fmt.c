@@ -290,6 +290,13 @@ void print_s32_dec(int32_t val)
     print(buf, len);
 }
 
+void print_byte_hex(uint8_t byte)
+{
+    char buf[2];
+    fmt_byte_hex(buf, byte);
+    print(buf, sizeof(buf));
+}
+
 void print_u32_hex(uint32_t val)
 {
     char buf[8];
