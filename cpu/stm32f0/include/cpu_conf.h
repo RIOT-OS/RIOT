@@ -55,6 +55,31 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (31U)
 /** @} */
 
+/**
+ * @brief   Flash page configuration
+ *
+ * STM32F03x, STM32F04x, STM32F05x: up to 64 pages of 1K
+ * STM32F07x, STM32F09x: up to 128 pages of 2K
+ *
+ * @{
+ */
+#if defined(CPU_MODEL_STM32F091RC) || defined(CPU_MODEL_STM32F072RB)
+#define FLASHPAGE_SIZE      (2048U)
+#elif defined(CPU_MODEL_STM32F051R8) || defined(CPU_MODEL_STM32F042K6) \
+   || defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F030R8)
+#define FLASHPAGE_SIZE      (1024U)
+#endif
+
+#if defined(CPU_MODEL_STM32F091RC)
+#define FLASHPAGE_NUMOF     (128U)
+#elif defined(CPU_MODEL_STM32F051R8) || defined(CPU_MODEL_STM32F072RB) \
+   || defined(CPU_MODEL_STM32F030R8) || defined(CPU_MODEL_STM32F070RB)
+#define FLASHPAGE_NUMOF     (64U)
+#elif defined(CPU_MODEL_STM32F042K6)
+#define FLASHPAGE_NUMOF     (32U)
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
