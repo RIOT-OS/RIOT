@@ -28,6 +28,13 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Xtimer configuration
+ * @{
+ */
+#define XTIMER_WIDTH                (16)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
