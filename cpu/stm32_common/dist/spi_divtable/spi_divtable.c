@@ -97,7 +97,7 @@ int main(int argc, char **argv)
             printf("        %i%c  /* -> %iHz */\n",
                    br, ((t < (tnum - 1)) ? ',' : ' '), real_clk(apb[bus], br));
         }
-        printf("    }%c\n", ((bus == 0) ? ',' : ' '));
+        printf("    }%s\n", ((bus == 0) ? "," : ""));
     }
     puts("};");
 
