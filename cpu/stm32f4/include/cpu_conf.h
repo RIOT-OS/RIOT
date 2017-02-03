@@ -35,7 +35,7 @@
 #include "vendor/stm32f413xx.h"
 #elif defined(CPU_MODEL_STM32F415RG)
 #include "vendor/stm32f415xx.h"
-#elif defined(CPU_MODEL_STM32F446RE)
+#elif defined(CPU_MODEL_STM32F446RE) || defined(CPU_MODEL_STM32F446ZE)
 #include "vendor/stm32f446xx.h"
 #endif
 
