@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup  net_gnrc
+ * @ingroup net_gnrc_netdev2
  * @{
  *
  * @file
