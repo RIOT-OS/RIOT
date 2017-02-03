@@ -1,0 +1,27 @@
+From efb1eacf0f2cc4880550a32007acb02099757ce2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jos=C3=A9=20Alamos?= <jialamos@uc.cl>
+Date: Fri, 3 Feb 2017 16:03:59 -0300
+Subject: [PATCH] changed name in macro
+
+---
+ include/openthread-types.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/openthread-types.h b/include/openthread-types.h
+index 4d811b5..825b3d7 100644
+--- a/include/openthread-types.h
++++ b/include/openthread-types.h
+@@ -61,8 +61,8 @@ extern "C" {
+ #define CONTAINING_RECORD(address, type, field) \
+     ((type *)((uint8_t*)(address) - offsetof(type, field)))
+ #pragma GCC diagnostic pop*/
+-#define BASE 0x1
+-#define myoffsetof(s,m) (((size_t)&(((s*)BASE)->m))-BASE)
++#define _BASE 0x1
++#define myoffsetof(s,m) (((size_t)&(((s*)_BASE)->m))-_BASE)
+ #define CONTAINING_RECORD(address, type, field) \
+     ((type *)((uint8_t*)(address) - myoffsetof(type, field)))
+ #endif /* CONTAINING_RECORD */
+-- 
+1.9.1
+
