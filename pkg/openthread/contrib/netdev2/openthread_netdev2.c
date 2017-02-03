@@ -35,6 +35,7 @@
 static msg_t _queue[OPENTHREAD_QUEUE_LEN];
 
 static kernel_pid_t _pid;
+static otInstance *sInstance;
 
 
 /* OpenThread will call this when switching state from empty tasklet to non-empty tasklet. */
@@ -51,31 +52,27 @@ void *_openthread_event_loop(void *arg)
     otPlatUartEnable();
 
     /* init OpenThread */
-    otInit();
+    sInstance = otInstanceInit();
 
     msg_init_queue(_queue, OPENTHREAD_QUEUE_LEN);
     netdev2_t *dev;
     msg_t msg;
 
 #ifdef MODULE_OPENTHREAD_CLI
-    otCliUartInit();
+    otCliUartInit(sInstance);
 #else
-    /* equivalent to "start" command of OpenThread CLI */
-    otEnable();
 
-#ifdef MODULE_OPENTHREAD_NCP
+#   ifdef MODULE_OPENTHREAD_NCP
     otNcpInit();
-#endif
-    /* It's necessary to call this after otEnable. Otherwise will freeze */
-    otProcessNextTasklet();
+#   endif
+
 #endif
 
+#if OPENTHREAD_ENABLE_DIAG
+    diagInit(sInstance);
+#endif
     while (1) {
-        /* Process OpenThread tasklets */
-        begin_mutex();
-        otProcessNextTasklet();
-        end_mutex();
-
+        otProcessQueuedTasklets(sInstance);
         msg_receive(&msg);
         switch (msg.type) {
             case OPENTHREAD_XTIMER_MSG_TYPE_EVENT:
@@ -121,7 +118,7 @@ void _event_cb(netdev2_t *dev, netdev2_event_t event)
         switch (event) {
             case NETDEV2_EVENT_RX_COMPLETE:
                 DEBUG("openthread_netdev2: Reception of a pcket\n");
-                recv_pkt(dev);
+                recv_pkt(sInstance, dev);
                 break;
             case NETDEV2_EVENT_TX_COMPLETE:
             case NETDEV2_EVENT_TX_NOACK:

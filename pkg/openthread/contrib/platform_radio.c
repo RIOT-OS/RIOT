@@ -25,12 +25,14 @@
 #include "net/ethernet/hdr.h"
 #include "net/ethertype.h"
 #include "byteorder.h"
+#include "net/netdev2/ieee802154.h"
 #include <string.h>
 
-
+static bool sDisabled;
 
 static RadioPacket sTransmitFrame;
 static RadioPacket sReceiveFrame;
+static int8_t Rssi;
 
 static netdev2_t *_dev;
 
@@ -175,10 +177,12 @@ void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb)
 }
 
 /* Called upon NETDEV2_EVENT_RX_COMPLETE event */
-void recv_pkt(netdev2_t *dev)
+void recv_pkt(otInstance *aInstance, netdev2_t *dev)
 {
+    netdev2_ieee802154_rx_info_t rx_info;
     /* Read frame length from driver */
-    int len = dev->driver->recv(dev, NULL, 0, NULL);
+    int len = dev->driver->recv(dev, NULL, 0, &rx_info);
+    Rssi = rx_info.rssi;
 
     /* Since OpenThread does the synchronization of rx/tx, it's necessary to turn off the receiver now */
     ot_idle();
@@ -186,7 +190,7 @@ void recv_pkt(netdev2_t *dev)
 
     /* very unlikely */
     if ((len > (unsigned) UINT16_MAX)) {
-        otPlatRadioReceiveDone(NULL, kThreadError_Abort);
+        otPlatRadioReceiveDone(aInstance, NULL, kThreadError_Abort);
         return;
     }
 
@@ -199,29 +203,29 @@ void recv_pkt(netdev2_t *dev)
     int res = dev->driver->recv(dev, (char *) sReceiveFrame.mPsdu, len, NULL);
 
     /* Tell OpenThread that receive has finished */
-    otPlatRadioReceiveDone(res > 0 ? &sReceiveFrame : NULL, res > 0 ? kThreadError_None : kThreadError_Abort);
+    otPlatRadioReceiveDone(aInstance, res > 0 ? &sReceiveFrame : NULL, res > 0 ? kThreadError_None : kThreadError_Abort);
 }
 
 /* Called upon TX event */
-void send_pkt(netdev2_t *dev, netdev2_event_t event)
+void send_pkt(otInstance *aInstance, netdev2_t *dev, netdev2_event_t event)
 {
     /* Tell OpenThread transmission is done depending on the NETDEV2 event */
     switch (event) {
         case NETDEV2_EVENT_TX_COMPLETE:
             DEBUG("openthread: NETDEV2_EVENT_TX_COMPLETE\n");
-            otPlatRadioTransmitDone(false, kThreadError_None);
+            otPlatRadioTransmitDone(aInstance, NULL, false, kThreadError_None);
             break;
         case NETDEV2_EVENT_TX_COMPLETE_DATA_PENDING:
             DEBUG("openthread: NETDEV2_EVENT_TX_COMPLETE_DATA_PENDING\n");
-            otPlatRadioTransmitDone(true, kThreadError_None);
+            otPlatRadioTransmitDone(aInstance, NULL, true, kThreadError_None);
             break;
         case NETDEV2_EVENT_TX_NOACK:
             DEBUG("openthread: NETDEV2_EVENT_TX_NOACK\n");
-            otPlatRadioTransmitDone(false, kThreadError_NoAck);
+            otPlatRadioTransmitDone(aInstance, NULL, false, kThreadError_NoAck);
             break;
         case NETDEV2_EVENT_TX_MEDIUM_BUSY:
             DEBUG("openthread: NETDEV2_EVENT_TX_MEDIUM_BUSY\n");
-            otPlatRadioTransmitDone(false, kThreadError_ChannelAccessFailure);
+            otPlatRadioTransmitDone(aInstance, NULL, false, kThreadError_ChannelAccessFailure);
             break;
         default:
             break;
@@ -234,15 +238,14 @@ void send_pkt(netdev2_t *dev, netdev2_event_t event)
 }
 
 /* OpenThread will call this for setting PAN ID */
-ThreadError otPlatRadioSetPanId(uint16_t panid)
+void otPlatRadioSetPanId(otInstance *aInstance, uint16_t panid)
 {
     DEBUG("openthread: otPlatRadioSetPanId: setting PAN ID to %04x\n", panid);
     set_panid(((panid & 0xff) << 8) | ((panid >> 8) & 0xff));
-    return kThreadError_None;
 }
 
 /* OpenThread will call this for setting extended address */
-ThreadError otPlatRadioSetExtendedAddress(uint8_t *aExtendedAddress)
+void otPlatRadioSetExtendedAddress(otInstance *aInstance, uint8_t *aExtendedAddress)
 {
     DEBUG("openthread: otPlatRadioSetExtendedAddress\n");
     uint8_t reversed_addr[IEEE802154_LONG_ADDRESS_LEN];
@@ -250,53 +253,74 @@ ThreadError otPlatRadioSetExtendedAddress(uint8_t *aExtendedAddress)
         reversed_addr[i] = aExtendedAddress[IEEE802154_LONG_ADDRESS_LEN - 1 - i];
     }
     set_long_addr(reversed_addr);
-    return kThreadError_None;
 }
 
 /* OpenThread will call this for setting short address */
-ThreadError otPlatRadioSetShortAddress(uint16_t aShortAddress)
+void otPlatRadioSetShortAddress(otInstance *aInstance, uint16_t aShortAddress)
 {
     DEBUG("openthread: otPlatRadioSetShortAddress: setting address to %04x\n", aShortAddress);
     set_addr(((aShortAddress & 0xff) << 8) | ((aShortAddress >> 8) & 0xff));
-    return kThreadError_None;
 }
 
 /* OpenThread will call this for enabling the radio */
-ThreadError otPlatRadioEnable(void)
+ThreadError otPlatRadioEnable(otInstance *aInstance)
 {
-    DEBUG("openthread: otPlatRadioEnable\n");
-    if (!is_off()) {
-        DEBUG("openthread: otPlatRadioEnable: Radio was enabled\n");
-        return kThreadError_Busy;
+    (void) aInstance;
+
+    ThreadError error;
+
+    if (sDisabled)
+    {
+        sDisabled = false;
+        error = kThreadError_None;
+    }
+    else
+    {
+        error = kThreadError_InvalidState;
     }
 
-    ot_sleep();
-    return kThreadError_None;
+return error;
 }
 
 /* OpenThread will call this for disabling the radio */
-ThreadError otPlatRadioDisable(void)
+ThreadError otPlatRadioDisable(otInstance *aInstance)
 {
-    DEBUG("openthread: otPlatRadioDisable\n");
-    ot_off();
-    return kThreadError_None;
+    (void) aInstance;
+
+    ThreadError error;
+
+    if (!sDisabled)
+    {
+        sDisabled = true;
+        error = kThreadError_None;
+    }
+    else
+    {
+        error = kThreadError_InvalidState;
+    }
+
+    return error;
+}
+
+bool otPlatRadioIsEnabled(otInstance *aInstance)
+{
+    (void) aInstance;
+
+    return !sDisabled;
 }
 
 /* OpenThread will call this for setting device state to SLEEP */
-ThreadError otPlatRadioSleep(void)
+ThreadError otPlatRadioSleep(otInstance *aInstance)
 {
-    DEBUG("openthread: otPlatRadioSleep\n");
-    if (!is_idle()) {
-        DEBUG("openthread: otPlatRadioSleep: Couldn't sleep\n");
-        return kThreadError_Busy;
-    }
+   (void) aInstance;
 
     ot_sleep();
     return kThreadError_None;
 }
 
+#if 0
 /* OpenThread will call this for setting the device state to IDLE */
-ThreadError otPlatRadioIdle(void)
+ThreadError otPlatRadioIdle(otInstance *aInstance)
 {
     DEBUG("openthread: otPlatRadioIdle\n");
 
@@ -312,76 +336,48 @@ ThreadError otPlatRadioIdle(void)
 
     return kThreadError_None;
 }
+#endif
 
 /*OpenThread will call this for waiting the reception of a packet */
-ThreadError otPlatRadioReceive(uint8_t aChannel)
+
+ThreadError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
 {
-    DEBUG("openthread: otPlatRadioReceive\n");
-    if (!is_idle()) {
-        DEBUG("openthread: otPlatRadioReceive: Device not ready\n");
-        return kThreadError_Busy;
-    }
+    (void) aInstance;
 
     set_channel(aChannel);
-    sReceiveFrame.mChannel = aChannel;
-
-    /* enable the reception of packets */
-    enable_rx();
-
     return kThreadError_None;
 }
 
 
 /* OpenThread will call this function to get the transmit buffer */
-RadioPacket *otPlatRadioGetTransmitBuffer(void)
+RadioPacket *otPlatRadioGetTransmitBuffer(otInstance *aInstance)
 {
     DEBUG("openthread: otPlatRadioGetTransmitBuffer\n");
     return &sTransmitFrame;
 }
 
 /* OpenThread will call this for transmitting a packet*/
-ThreadError otPlatRadioTransmit(void)
+ThreadError otPlatRadioTransmit(otInstance *aInstance, RadioPacket *aPacket)
 {
-    DEBUG("openthread: otPlatRadioTransmit\n");
-
-    if (!is_idle()) {
-        DEBUG("openthread: otPlatRadioTransmit: Device not ready.\n");
-
-        /* OpenThread will assert(false) if this function returns kThreadError_None.
-         * These asserts don't throw core_panic, so it's better to assert here.*/
-        assert(false);
-        return kThreadError_Busy;
-    }
-
+    (void) aInstance;
     struct iovec pkt;
 
     /* Populate iovec with transmit data */
-    pkt.iov_base = sTransmitFrame.mPsdu;
-    pkt.iov_len = sTransmitFrame.mLength;
+    pkt.iov_base = aPacket->mPsdu;
+    pkt.iov_len = aPacket->mLength;
 
     /*Set channel and power based on transmit frame */
-    set_channel(sTransmitFrame.mChannel);
-    set_power(sTransmitFrame.mPower);
+    set_channel(aPacket->mChannel);
+    set_power(aPacket->mPower);
 
     /* send packet though netdev2 */
     _dev->driver->send(_dev, &pkt, 1);
 
-    /* need for waiting ACK */
-    enable_rx();
-
     return kThreadError_None;
 }
 
-
-/* OpenThread will call this for getting the Noise Floor */
-int8_t otPlatRadioGetNoiseFloor(void)
-{
-    DEBUG("openthread: otPlatRadioGetNoiseFloor\n");
-    return 0;
-}
-
 /* OpenThread will call this for getting the radio caps */
-otRadioCaps otPlatRadioGetCaps(void)
+otRadioCaps otPlatRadioGetCaps(otInstance *aInstance)
 {
     DEBUG("openthread: otPlatRadioGetCaps\n");
     /* all drivers should handle ACK, including call of NETDEV2_EVENT_TX_NOACK */
@@ -389,17 +385,75 @@ otRadioCaps otPlatRadioGetCaps(void)
 }
 
 /* OpenThread will call this for getting the state of promiscuous mode */
-bool otPlatRadioGetPromiscuous(void)
+bool otPlatRadioGetPromiscuous(otInstance *aInstance)
 {
     DEBUG("openthread: otPlatRadioGetPromiscuous\n");
     return is_promiscuous();
 }
 
 /* OpenThread will call this for setting the state of promiscuous mode */
-void otPlatRadioSetPromiscuous(bool aEnable)
+void otPlatRadioSetPromiscuous(otInstance *aInstance, bool aEnable)
 {
     DEBUG("openthread: otPlatRadioSetPromiscuous\n");
     set_promiscuous((aEnable) ? NETOPT_ENABLE : NETOPT_DISABLE);
+}
+
+int8_t otPlatRadioGetRssi(otInstance *aInstance)
+{
+    (void) aInstance;
+    return Rssi;
+}
+
+void otPlatRadioEnableSrcMatch(otInstance *aInstance, bool aEnable)
+{
+    (void)aInstance;
+    (void)aEnable;
+}
+
+ThreadError otPlatRadioAddSrcMatchShortEntry(otInstance *aInstance, const uint16_t aShortAddress)
+{
+    (void)aInstance;
+    (void)aShortAddress;
+    return kThreadError_None;
+}
+
+ThreadError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const uint8_t *aExtAddress)
+{
+    (void)aInstance;
+    (void)aExtAddress;
+    return kThreadError_None;
+}
+
+ThreadError otPlatRadioClearSrcMatchShortEntry(otInstance *aInstance, const uint16_t aShortAddress)
+{
+    (void)aInstance;
+    (void)aShortAddress;
+    return kThreadError_None;
+}
+
+ThreadError otPlatRadioClearSrcMatchExtEntry(otInstance *aInstance, const uint8_t *aExtAddress)
+{
+    (void)aInstance;
+    (void)aExtAddress;
+    return kThreadError_None;
+}
+
+void otPlatRadioClearSrcMatchShortEntries(otInstance *aInstance)
+{
+    (void)aInstance;
+}
+
+void otPlatRadioClearSrcMatchExtEntries(otInstance *aInstance)
+{
+    (void)aInstance;
+}
+
+ThreadError otPlatRadioEnergyScan(otInstance *aInstance, uint8_t aScanChannel, uint16_t aScanDuration)
+{
+    (void)aInstance;
+    (void)aScanChannel;
+    (void)aScanDuration;
+    return kThreadError_NotImplemented;
 }
 
 /** @} */

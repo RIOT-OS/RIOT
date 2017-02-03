@@ -85,6 +85,8 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat
         case kLogRegionMem:
             fprintf(stderr, "MEM  ");
             break;
+        default:
+            break;
     }
 
     va_start(args, aFormat);
