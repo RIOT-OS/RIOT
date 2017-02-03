@@ -1,9 +1,8 @@
 INCLUDES += -I$(RIOTBASE)/pkg/openthread/include \
-			-I$(BINDIRBASE)/pkg/$(BOARD)/openthread/output/include \
+			-I$(BINDIRBASE)/pkg/$(BOARD)/openthread/include \
 
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
  DIRS += $(RIOTBASE)/pkg/openthread/contrib
  DIRS += $(RIOTBASE)/pkg/openthread/contrib/netdev2
- DIRS += $(RIOTBASE)/pkg/openthread/contrib/conn
 endif

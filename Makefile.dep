@@ -570,8 +570,10 @@ ifneq (,$(filter random,$(USEMODULE)))
 endif
 
 ifneq (,$(filter openthread,$(USEMODULE)))
-  USEMODULE += openthread_core
   USEMODULE += openthread_contrib
+  USEMODULE += libopenthread
+  USEMODULE += libopenthread-cli
+  USEMODULE += libmbedcrypto
   USEPKG += openthread
   USEMODULE+=xtimer
 
@@ -581,16 +583,5 @@ endif
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
   USEMODULE+=openthread_contrib_netdev2
-  USEMODULE+=openthread_contrib_conn
 endif
 
-ifneq (,$(filter openthread_core,$(USEMODULE)))
-  USEMODULE+=openthread_core_common
-  USEMODULE+=openthread_core_coap
-  USEMODULE+=openthread_core_thread
-  USEMODULE+=openthread_core_net
-  USEMODULE+=openthread_core_crypto
-  USEMODULE+=openthread_core_mac
-  USEMODULE+=mbedtls
-  USEMODULE+=mbedtls_lib
-endif

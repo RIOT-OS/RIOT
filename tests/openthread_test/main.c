@@ -3,7 +3,6 @@
 #include "shell.h"
 #include "shell_commands.h"
 
-
 int main(void)
 {
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)

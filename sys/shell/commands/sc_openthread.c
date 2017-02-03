@@ -21,6 +21,7 @@
 #include "byteorder.h"
 #include "net/ipv6/addr.h"
 
+#if 0
 int _openthread_state(int argc, char **argv)
 {
     switch (otGetDeviceRole()) {
@@ -51,3 +52,4 @@ int _openthread_ipaddr(int argc, char **argv)
     }
     return 0;
 }
+#endif

@@ -26,6 +26,7 @@
 #include "net/ethertype.h"
 #include "byteorder.h"
 #include "net/netdev2/ieee802154.h"
+#include "net/ieee802154.h"
 #include <string.h>
 
 static bool sDisabled;
@@ -456,4 +457,8 @@ ThreadError otPlatRadioEnergyScan(otInstance *aInstance, uint8_t aScanChannel, u
     return kThreadError_NotImplemented;
 }
 
+void otPlatRadioGetIeeeEui64(otInstance *aInstance, uint8_t *aIeee64Eui64)
+{
+    _dev->driver->get(_dev, NETOPT_IPV6_IID, aIeee64Eui64, sizeof(eui64_t));
+}
 /** @} */
