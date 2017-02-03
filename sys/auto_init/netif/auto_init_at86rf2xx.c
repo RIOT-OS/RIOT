@@ -46,12 +46,11 @@ static char _at86rf2xx_stacks[AT86RF2XX_NUM][AT86RF2XX_MAC_STACKSIZE];
 void auto_init_at86rf2xx(void)
 {
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
-        const at86rf2xx_params_t *p = &at86rf2xx_params[i];
         int res;
 
         LOG_DEBUG("[auto_init_netif] initializing at86rf2xx #%u\n", i);
 
-        at86rf2xx_setup(&at86rf2xx_devs[i], (at86rf2xx_params_t*) p);
+        at86rf2xx_setup(&at86rf2xx_devs[i], &at86rf2xx_params[i]);
         res = gnrc_netdev2_ieee802154_init(&gnrc_adpt[i],
                                            (netdev2_ieee802154_t *)&at86rf2xx_devs[i]);
 
