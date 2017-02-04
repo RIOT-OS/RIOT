@@ -1,0 +1,33 @@
+# Target triple for the build.
+export TARGET_ARCH ?= mips-mti-elf
+
+export ABI=32
+export MEMORY_BASE=0x80000000
+export MEMORY_SIZE=1M
+export APP_START=0x80000000
+
+include $(MIPS_ELF_ROOT)/share/mips/rules/mipshal.mk
+
+# define build specific options
+export CFLAGS_CPU   = -EL -march=mips32r2 -msoft-float
+export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
+export CFLAGS_DBG = -O0 -g2
+export CFLAGS_OPT = -Os
+
+export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG)
+#$(CFLAGS_OPT)
+
+export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
+
+export LINKFLAGS += $(MIPS_HAL_LDFLAGS) -mabi=$(ABI)
+export LINKFLAGS += -Tuhi32.ld
+export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT)
+export LINKFLAGS += -Wl,--gc-sections
+
+# This CPU implementation is using the new core/CPU interface:
+export CFLAGS += -DCOREIF_NG=1
+
+# use newlib as libc, Actually use toolchains newlib.
+#export USEMODULE += newlib
+
+export USEMODULE += periph
