@@ -17,7 +17,7 @@
 
 /* Number of possible parallel connections */
 #ifndef CONNS
-#define CONNS 1
+#define CONNS (1)
 #endif
 
 /* Amount of data to transmit */
@@ -54,15 +54,15 @@ int main(void)
 
     /* Start Threads to handle each connection */
     for (int i = 0; i < CONNS; i += 1) {
-        thread_create((char *)stacks[i], sizeof(stacks[i]), THREAD_PRIORITY_MAIN, 0, srv_thread,
-                      (void *)i, NULL);
+        thread_create((char *) stacks[i], sizeof(stacks[i]), THREAD_PRIORITY_MAIN, 0, srv_thread,
+                      (void *) i, NULL);
     }
     return 0;
 }
 
 void *srv_thread(void *arg)
 {
-    int tid = (int)arg;
+    int tid = (int) arg;
     uint32_t cycles = 0;
     uint32_t cycles_ok = 0;
     uint32_t failed_payload_verifications = 0;
@@ -106,7 +106,7 @@ void *srv_thread(void *arg)
 
         /* Receive Data, stop if errors were found */
         for (size_t rcvd = 0; rcvd < sizeof(bufs[tid]) && ret >= 0; rcvd += ret) {
-            ret = gnrc_tcp_recv(&tcb, (void *)(bufs[tid] + rcvd), sizeof(bufs[tid]) - rcvd,
+            ret = gnrc_tcp_recv(&tcb, (void *) (bufs[tid] + rcvd), sizeof(bufs[tid]) - rcvd,
                                 GNRC_TCP_CONNECTION_TIMEOUT_DURATION);
             switch (ret) {
                 case -ENOTCONN:
@@ -143,7 +143,7 @@ void *srv_thread(void *arg)
         }
 
         /* Check received pattern */
-       for (size_t i=0; i < sizeof(bufs[tid]); ++i) {
+       for (size_t i = 0; i < sizeof(bufs[tid]); ++i) {
              if (bufs[tid][i] != TEST_PATERN_CLI) {
                 printf("TID=%d : Payload verfication failed\n", tid);
                 failed_payload_verifications += 1;
@@ -152,7 +152,7 @@ void *srv_thread(void *arg)
         }
 
         /* Fill Buffer with a test pattern */
-        for (size_t i=0; i < sizeof(bufs[tid]); ++i) {
+        for (size_t i = 0; i < sizeof(bufs[tid]); ++i) {
             bufs[tid][i] = TEST_PATERN_SRV;
         }
 
@@ -192,7 +192,7 @@ void *srv_thread(void *arg)
 
         /* Gather Data */
         cycles += 1;
-        if(ret >= 0) {
+        if (ret >= 0) {
             cycles_ok += 1;
         }
         printf("TID=%d : %"PRIi32" test cycles completed. %"PRIi32" ok, %"PRIi32" faulty",

@@ -51,7 +51,7 @@ int gnrc_tcp_init(void);
  *
  * @param[in,out] tcb          Transmission that should be initialized.
  */
-void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t* tcb);
+void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
 
  /**
   * @brief Opens a connection actively.

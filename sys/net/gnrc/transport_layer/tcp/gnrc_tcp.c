@@ -113,7 +113,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
     tcb->owner = thread_getpid();
 
     /* Setup passive connection */
-    if (passive){
+    if (passive) {
         /* Set Status Flags */
         tcb->status |= STATUS_PASSIVE;
         if (local_addr == NULL) {
@@ -133,14 +133,14 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
         tcb->local_port = local_port;
     }
     /* Setup active connection */
-    else{
+    else {
         /* Copy Target Address and Port into tcb structure */
         if (target_addr != NULL) {
             switch (tcb->address_family) {
  #ifdef MODULE_GNRC_IPV6
-              case AF_INET6:
-                  memcpy(tcb->peer_addr, target_addr, sizeof(ipv6_addr_t));
-                  break;
+                case AF_INET6:
+                    memcpy(tcb->peer_addr, target_addr, sizeof(ipv6_addr_t));
+                    break;
  #endif
             }
         }
@@ -159,15 +159,14 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
     ret = _fsm(tcb, FSM_EVENT_CALL_OPEN, NULL, NULL, 0);
     if (ret == -ENOMEM) {
         DEBUG("gnrc_tcp.c : gnrc_tcp_connect() : Out of receive buffers.\n");
-    } else if(ret == -EADDRINUSE) {
+    }
+    else if(ret == -EADDRINUSE) {
         DEBUG("gnrc_tcp.c : gnrc_tcp_connect() : local_port is already in use.\n");
     }
 
     /* Wait until a connection was established or closed */
-    while (ret >= 0 && tcb->state != FSM_STATE_CLOSED
-    && tcb->state != FSM_STATE_ESTABLISHED
-    && tcb->state != FSM_STATE_CLOSE_WAIT
-    ) {
+    while (ret >= 0 && tcb->state != FSM_STATE_CLOSED && tcb->state != FSM_STATE_ESTABLISHED &&
+           tcb->state != FSM_STATE_CLOSE_WAIT) {
         msg_receive(&msg);
         switch (msg.type) {
             case MSG_TYPE_CONNECTION_TIMEOUT:
@@ -217,7 +216,7 @@ int gnrc_tcp_init(void)
                          "gnrc_tcp");
 }
 
-void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t* tcb)
+void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb)
 {
 #ifdef MODULE_GNRC_IPV6
     tcb->address_family = AF_INET6;
@@ -323,11 +322,9 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     mutex_lock(&(tcb->function_lock));
 
     /* Check if connection is in a valid state */
-    if (tcb->state != FSM_STATE_ESTABLISHED
-    && tcb->state != FSM_STATE_CLOSE_WAIT
-    ) {
-      mutex_unlock(&(tcb->function_lock));
-      return -ENOTCONN;
+    if (tcb->state != FSM_STATE_ESTABLISHED && tcb->state != FSM_STATE_CLOSE_WAIT) {
+        mutex_unlock(&(tcb->function_lock));
+        return -ENOTCONN;
     }
 
     /* Re-init message queue, take ownership. FSM can send Messages to this thread now */
@@ -349,8 +346,8 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     while (ret == 0 || tcb->pkt_retransmit != NULL) {
         /* Check if the connections state is closed. If so, a reset was received */
         if (tcb->state == FSM_STATE_CLOSED) {
-           ret = -ECONNRESET;
-           break;
+            ret = -ECONNRESET;
+            break;
         }
 
         /* If the send window is closed: Setup Probing */
@@ -445,19 +442,16 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     mutex_lock(&(tcb->function_lock));
 
     /* Check if connection is in a valid state */
-    if (tcb->state != FSM_STATE_ESTABLISHED
-    && tcb->state != FSM_STATE_FIN_WAIT_1
-    && tcb->state != FSM_STATE_FIN_WAIT_2
-    && tcb->state != FSM_STATE_CLOSE_WAIT
-    ) {
-         mutex_unlock(&(tcb->function_lock));
-         return -ENOTCONN;
+    if (tcb->state != FSM_STATE_ESTABLISHED && tcb->state != FSM_STATE_FIN_WAIT_1 &&
+        tcb->state != FSM_STATE_FIN_WAIT_2 && tcb->state != FSM_STATE_CLOSE_WAIT) {
+        mutex_unlock(&(tcb->function_lock));
+        return -ENOTCONN;
     }
 
     /* If this call is non-blocking (timeout_duration_us == 0): Try to read data and return */
     if (timeout_duration_us == 0) {
         ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
-        if(ret == 0) {
+        if (ret == 0) {
             ret = -EAGAIN;
         }
         mutex_unlock(&(tcb->function_lock));
@@ -481,8 +475,8 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     while (ret == 0) {
         /* Check if the connections state is closed. If so, a reset was received */
         if (tcb->state == FSM_STATE_CLOSED) {
-           ret = -ECONNRESET;
-           break;
+            ret = -ECONNRESET;
+            break;
         }
 
         /* Try to read available data */
@@ -492,24 +486,24 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         if (ret <= 0) {
             msg_receive(&msg);
             switch (msg.type) {
-               case MSG_TYPE_CONNECTION_TIMEOUT:
-                   DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : CONNECTION_TIMEOUT\n");
-                   _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
-                   ret = -ECONNABORTED;
-                   break;
+                case MSG_TYPE_CONNECTION_TIMEOUT:
+                    DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : CONNECTION_TIMEOUT\n");
+                    _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                    ret = -ECONNABORTED;
+                    break;
 
-               case MSG_TYPE_USER_SPEC_TIMEOUT:
-                   DEBUG("gnrc_tcp.c : gnrc_tcp_send() : USER_SPEC_TIMEOUT\n");
-                   _fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
-                   ret = -ETIMEDOUT;
-                   break;
+                case MSG_TYPE_USER_SPEC_TIMEOUT:
+                    DEBUG("gnrc_tcp.c : gnrc_tcp_send() : USER_SPEC_TIMEOUT\n");
+                    _fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
+                    ret = -ETIMEDOUT;
+                    break;
 
-               case MSG_TYPE_NOTIFY_USER:
-                   DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : NOTIFY_USER\n");
-                   break;
+                case MSG_TYPE_NOTIFY_USER:
+                    DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : NOTIFY_USER\n");
+                    break;
 
-               default:
-                   DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : other message type\n");
+                default:
+                    DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : other message type\n");
             }
         }
     }

@@ -57,7 +57,7 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt);
  * @return   Zero on success.
  * @return   -ENOMEM if pktbuf is full.
  */
-int _pkt_build(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
+int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
                const uint16_t ctl, const uint32_t seq_num, const uint32_t ack_num,
                void *payload, const size_t payload_len);
 
@@ -72,7 +72,7 @@ int _pkt_build(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
  * @return   Zero on success.
  * @return   -EINVAL if out_pkt was NULL
  */
-int _pkt_send(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_con,
+int _pkt_send(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_con,
               const bool retransmit);
 
 /**
@@ -85,7 +85,7 @@ int _pkt_send(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_c
  * @return    Zero if the sequence number is invalid
  * @return    Non-zero if the sequence number is acceptable
  */
-int _pkt_chk_seq_num(const gnrc_tcp_tcb_t* tcb, const uint32_t seq_num, const uint32_t seg_len);
+int _pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num, const uint32_t seg_len);
 
 /**
  * @brief Extracts the length of a segment
@@ -116,7 +116,7 @@ uint32_t _pkt_get_pay_len(gnrc_pktsnip_t *pkt);
  * @return   -ENOMEM if the retransmission queue is full
  * @return   -EINVAL if pkt is null
  */
-int _pkt_setup_retransmit(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *pkt, const bool retransmit);
+int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool retransmit);
 
 /**
  * @brief Acknowledges and removes packet from the retransmission mechanism
@@ -127,7 +127,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *pkt, const bool r
  * @return   Zero on success
  * @return   -ENODATA if there is nothing to acknowledge
  */
-int _pkt_acknowledge(gnrc_tcp_tcb_t* tcb, const uint32_t ack);
+int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack);
 
 /**
  * @brief Calculates checksum over payload, tcp-header and network layer header

@@ -114,9 +114,9 @@ static int _receive(gnrc_pktsnip_t *pkt)
     /* Get TCP Header */
     LL_SEARCH_SCALAR(pkt, tcp, type, GNRC_NETTYPE_TCP);
     if (tcp == NULL) {
-      DEBUG("gnrc_tcp_eventloop.c : _receive() : pkt contains no TCP Header\n");
-      gnrc_pktbuf_release(pkt);
-      return 0;
+        DEBUG("gnrc_tcp_eventloop.c : _receive() : pkt contains no TCP Header\n");
+        gnrc_pktbuf_release(pkt);
+        return 0;
     }
 
     /* Extract control bits, src and dst ports and check if SYN is set (not SYN+ACK) */
@@ -162,14 +162,13 @@ static int _receive(gnrc_pktsnip_t *pkt)
         /* Check if current tcb is fitting for the incomming packet */
         if (ip->type == GNRC_NETTYPE_IPV6 && tcb->address_family == AF_INET6) {
             /* If SYN is set, a connection is listening on that port ... */
-            ipv6_addr_t * tmp_addr = NULL;
+            ipv6_addr_t *tmp_addr = NULL;
             if (syn && tcb->local_port == dst && tcb->state == FSM_STATE_LISTEN) {
                 /* ... and local addr is unspec or preconfigured */
-                tmp_addr = &((ipv6_hdr_t * )ip->data)->dst;
-                if (ipv6_addr_equal((ipv6_addr_t *) tcb->local_addr, (ipv6_addr_t *) tmp_addr)
-                || ipv6_addr_is_unspecified((ipv6_addr_t *) tcb->local_addr)
-                ) {
-                      break;
+                tmp_addr = &((ipv6_hdr_t *)ip->data)->dst;
+                if (ipv6_addr_equal((ipv6_addr_t *) tcb->local_addr, (ipv6_addr_t *) tmp_addr) ||
+                    ipv6_addr_is_unspecified((ipv6_addr_t *) tcb->local_addr)) {
+                    break;
                 }
             }
 

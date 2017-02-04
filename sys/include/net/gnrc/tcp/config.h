@@ -32,14 +32,14 @@ extern "C" {
  * @brief Timeout Duration for user calls. Default 2 minutes
  */
 #ifndef GNRC_TCP_CONNECTION_TIMEOUT_DURATION
-#define GNRC_TCP_CONNECTION_TIMEOUT_DURATION (120 * US_PER_SEC)
+#define GNRC_TCP_CONNECTION_TIMEOUT_DURATION (120U * US_PER_SEC)
 #endif
 
 /**
  * @brief Maximum Segment Lifetime. Default 30 secounds
  */
 #ifndef GNRC_TCP_MSL
-#define GNRC_TCP_MSL (30 * US_PER_SEC)
+#define GNRC_TCP_MSL (30U * US_PER_SEC)
 #endif
 
 /**
@@ -71,7 +71,7 @@ extern "C" {
  * @brief Number of preallocated receive buffers
  */
 #ifndef GNRC_TCP_RCV_BUFFERS
-#define GNRC_TCP_RCV_BUFFERS 1
+#define GNRC_TCP_RCV_BUFFERS (1U)
 #endif
 
 /**
@@ -85,21 +85,21 @@ extern "C" {
  * @brief Lower Bound for RTO = 1 sec (see RFC 6298)
  */
 #ifndef GNRC_TCP_RTO_LOWER_BOUND
-#define GNRC_TCP_RTO_LOWER_BOUND (1 * US_PER_SEC)
+#define GNRC_TCP_RTO_LOWER_BOUND (1U * US_PER_SEC)
 #endif
 
 /**
  * @brief Upper Bound for RTO = 60 sec (see RFC 6298)
  */
 #ifndef GNRC_TCP_RTO_UPPER_BOUND
-#define GNRC_TCP_RTO_UPPER_BOUND (60 * US_PER_SEC)
+#define GNRC_TCP_RTO_UPPER_BOUND (60U * US_PER_SEC)
 #endif
 
 /**
  * @brief Assumes clock granularity for TCP of 10 ms (see RFC 6298)
  */
 #ifndef GNRC_TCP_RTO_GRANULARITY
-#define GNRC_TCP_RTO_GRANULARITY (10 * MS_PER_SEC)
+#define GNRC_TCP_RTO_GRANULARITY (10U * MS_PER_SEC)
 #endif
 
 /**
@@ -127,14 +127,14 @@ extern "C" {
  * @brief Lower Bound for the duration between probes
  */
 #ifndef GNRC_TCP_PROBE_LOWER_BOUND
-#define GNRC_TCP_PROBE_LOWER_BOUND (1 * US_PER_SEC)
+#define GNRC_TCP_PROBE_LOWER_BOUND (1U * US_PER_SEC)
 #endif
 
 /**
  * @brief Upper Bound for the duration between probes
  */
 #ifndef GNRC_TCP_PROBE_UPPER_BOUND
-#define GNRC_TCP_PROBE_UPPER_BOUND (60 * US_PER_SEC)
+#define GNRC_TCP_PROBE_UPPER_BOUND (60U * US_PER_SEC)
 #endif
 
 #ifdef __cplusplus

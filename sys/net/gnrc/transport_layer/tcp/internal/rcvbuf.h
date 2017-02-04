@@ -64,14 +64,14 @@ void _rcvbuf_init(void);
  * @return  zero  on success
  * @return  -ENOMEM If receive buffer is out of memory.
  */
-int _rcvbuf_get_buffer(gnrc_tcp_tcb_t* tcb);
+int _rcvbuf_get_buffer(gnrc_tcp_tcb_t *tcb);
 
 /**
  * @brief Free allocated receive buffer
  *
  * @param[in] tcb   Transmission control block that buffer should be freed.
  */
-void _rcvbuf_release_buffer(gnrc_tcp_tcb_t* tcb);
+void _rcvbuf_release_buffer(gnrc_tcp_tcb_t *tcb);
 
 #ifdef __cplusplus
 }

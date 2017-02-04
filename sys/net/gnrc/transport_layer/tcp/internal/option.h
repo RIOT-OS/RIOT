@@ -22,6 +22,7 @@
 #ifndef GNRC_TCP_INTERNAL_OPTION_H
 #define GNRC_TCP_INTERNAL_OPTION_H
 
+#include "assert.h"
 #include "net/tcp.h"
 #include "net/gnrc/tcp.h"
 
@@ -36,7 +37,11 @@ extern "C" {
  *
  * @return   Valid MSS Option.
  */
-uint32_t _option_build_mss(uint16_t mss);
+inline static uint32_t _option_build_mss(uint16_t mss)
+{
+    return (((uint32_t) TCP_OPTION_KIND_MSS << 24) |
+            ((uint32_t) TCP_OPTION_LENGTH_MSS << 16) | mss);
+}
 
 /**
  * @brief Helper Function to build the combined option and control flag field
@@ -46,7 +51,11 @@ uint32_t _option_build_mss(uint16_t mss);
  *
  * @return   Valid option size and control field.
  */
-uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl);
+inline static uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl)
+{
+    assert(TCP_HDR_OFFSET_MIN <= nopts && nopts <= TCP_HDR_OFFSET_MAX);
+    return (nopts << 12) | ctl;
+}
 
 /**
  * @brief Parses options of a given tcp-header pktsnip.
@@ -57,7 +66,7 @@ uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl);
  * @return   Zero on success
  * @return   A negative value on error
  */
-int _option_parse(gnrc_tcp_tcb_t* tcb, tcp_hdr_t *hdr);
+int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr);
 
 #ifdef __cplusplus
 }
