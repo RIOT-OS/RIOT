@@ -58,10 +58,12 @@ get_compile_jobs() {
 }
 
 check_workdir() {
-    [ -d examples/gnrc_tcp_cli -a -d tests/pkg_libcoap ] || {
+    [ -d tests/pkg_libcoap ] || {
         echo "workdir check failed! pwd=$(pwd)"
-        echo "--- ls:"
+        echo "-- ls:"
         ls -la
+        echo "-- ls tests:"
+        ls -la tests
         exit 1
     }
 }
@@ -72,7 +74,7 @@ compile() {
     local board=$2
 
     [ -n "$DWQ_WORKER" ] && \
-        echo "$0: compile: running on worker $DWQ_WORKER, build number $DWQ_WORKER_BUILDNUM."
+        echo "-- running on worker ${DWQ_WORKER} thread ${DWQ_WORKER_THREAD}, build number $DWQ_WORKER_BUILDNUM."
 
     check_workdir
 
