@@ -18,7 +18,7 @@
 #include <platform/radio.h>
 #include "ot.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #include "errno.h"
@@ -151,22 +151,6 @@ bool is_rx(void)
     return get_state() == NETOPT_STATE_RX;
 }
 
-/* turn on packet reception */
-void enable_rx(void)
-{
-    netopt_enable_t enable = true;
-
-    _dev->driver->set(_dev, NETOPT_RX_LISTENING, &enable, sizeof(enable));
-}
-
-/* turn off packet reception */
-void disable_rx(void)
-{
-    netopt_enable_t enable = true;
-
-    _dev->driver->set(_dev, NETOPT_RX_LISTENING, &enable, sizeof(enable));
-}
-
 /* init framebuffers and initial state */
 void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb)
 {
@@ -180,6 +164,7 @@ void openthread_radio_init(netdev2_t *dev, uint8_t *tb, uint8_t *rb)
 /* Called upon NETDEV2_EVENT_RX_COMPLETE event */
 void recv_pkt(otInstance *aInstance, netdev2_t *dev)
 {
+    DEBUG("Openthread: Received pkt");
     netdev2_ieee802154_rx_info_t rx_info;
     /* Read frame length from driver */
     int len = dev->driver->recv(dev, NULL, 0, &rx_info);
@@ -187,7 +172,6 @@ void recv_pkt(otInstance *aInstance, netdev2_t *dev)
 
     /* Since OpenThread does the synchronization of rx/tx, it's necessary to turn off the receiver now */
     ot_idle();
-    disable_rx();
 
     /* very unlikely */
     if ((len > (unsigned) UINT16_MAX)) {
@@ -214,28 +198,23 @@ void send_pkt(otInstance *aInstance, netdev2_t *dev, netdev2_event_t event)
     switch (event) {
         case NETDEV2_EVENT_TX_COMPLETE:
             DEBUG("openthread: NETDEV2_EVENT_TX_COMPLETE\n");
-            otPlatRadioTransmitDone(aInstance, NULL, false, kThreadError_None);
+            otPlatRadioTransmitDone(aInstance, &sTransmitFrame, false, kThreadError_None);
             break;
         case NETDEV2_EVENT_TX_COMPLETE_DATA_PENDING:
             DEBUG("openthread: NETDEV2_EVENT_TX_COMPLETE_DATA_PENDING\n");
-            otPlatRadioTransmitDone(aInstance, NULL, true, kThreadError_None);
+            otPlatRadioTransmitDone(aInstance, &sTransmitFrame, true, kThreadError_None);
             break;
         case NETDEV2_EVENT_TX_NOACK:
             DEBUG("openthread: NETDEV2_EVENT_TX_NOACK\n");
-            otPlatRadioTransmitDone(aInstance, NULL, false, kThreadError_NoAck);
+            otPlatRadioTransmitDone(aInstance, &sTransmitFrame, false, kThreadError_NoAck);
             break;
         case NETDEV2_EVENT_TX_MEDIUM_BUSY:
             DEBUG("openthread: NETDEV2_EVENT_TX_MEDIUM_BUSY\n");
-            otPlatRadioTransmitDone(aInstance, NULL, false, kThreadError_ChannelAccessFailure);
+            otPlatRadioTransmitDone(aInstance, &sTransmitFrame, false, kThreadError_ChannelAccessFailure);
             break;
         default:
             break;
     }
-
-    /* Since the transmission is finished, turn off reception */
-    disable_rx();
-    ot_idle();
-
 }
 
 /* OpenThread will call this for setting PAN ID */
@@ -266,6 +245,7 @@ void otPlatRadioSetShortAddress(otInstance *aInstance, uint16_t aShortAddress)
 /* OpenThread will call this for enabling the radio */
 ThreadError otPlatRadioEnable(otInstance *aInstance)
 {
+    DEBUG("openthread: otPlatRadioEnable");
     (void) aInstance;
 
     ThreadError error;
@@ -286,6 +266,7 @@ return error;
 /* OpenThread will call this for disabling the radio */
 ThreadError otPlatRadioDisable(otInstance *aInstance)
 {
+    DEBUG("openthread: otPlatRadioDisable");
     (void) aInstance;
 
     ThreadError error;
@@ -343,6 +324,7 @@ ThreadError otPlatRadioIdle(otInstance *aInstance)
 
 ThreadError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
 {
+    DEBUG("openthread: otPlatRadioReceive");
     (void) aInstance;
 
     set_channel(aChannel);
@@ -382,7 +364,7 @@ otRadioCaps otPlatRadioGetCaps(otInstance *aInstance)
 {
     DEBUG("openthread: otPlatRadioGetCaps\n");
     /* all drivers should handle ACK, including call of NETDEV2_EVENT_TX_NOACK */
-    return kRadioCapsAckTimeout;
+    return kRadioCapsNone;
 }
 
 /* OpenThread will call this for getting the state of promiscuous mode */

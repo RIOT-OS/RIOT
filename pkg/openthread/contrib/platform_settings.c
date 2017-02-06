@@ -19,6 +19,9 @@
 #include "openthread.h"
 #include "assert.h"
 
+#define ENABLE_DEBUG (1)
+#include "debug.h"
+
 // settings API
 void otPlatSettingsInit(otInstance *aInstance)
 {
@@ -32,6 +35,7 @@ ThreadError otPlatSettingsBeginChange(otInstance *aInstance)
 
 ThreadError otPlatSettingsCommitChange(otInstance *aInstance)
 {
+    DEBUG("openthread: otPlatSettingsCommitChange");
     (void)aInstance;
     return kThreadError_None;
 }
@@ -44,6 +48,8 @@ ThreadError otPlatSettingsAbandonChange(otInstance *aInstance)
 
 ThreadError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex, uint8_t *aValue, uint16_t *aValueLength)
 {
+    DEBUG("openthread: otPlatSettingsGet");
+    *aValueLength = 0;
     return kThreadError_None;
 }
 

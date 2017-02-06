@@ -21,7 +21,7 @@
 #include <platform/alarm.h>
 #include "ot.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 static xtimer_t ot_timer;
