@@ -21,6 +21,7 @@
 extern "C" {
 #include "xtimer.h"
 #include "periph/gpio.h"
+#include "periph/adc.h"
 }
 
 #include "arduino.hpp"
@@ -57,4 +58,10 @@ int digitalRead(int pin)
 void delay(unsigned long msec)
 {
     xtimer_usleep(1000 * msec);
+}
+
+int analogRead(int pin)
+{
+    adc_init((adc_t)pin);
+    return adc_sample((adc_t)pin, (adc_res_t)0);
 }

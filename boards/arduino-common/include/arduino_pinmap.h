@@ -64,6 +64,13 @@ extern "C" {
 #define ARDUINO_PIN_A3          ARDUINO_PIN_17
 #define ARDUINO_PIN_A4          ARDUINO_PIN_18
 #define ARDUINO_PIN_A5          ARDUINO_PIN_19
+/* arduino notation compatibility */
+#define A0			0
+#define A1			1
+#define A2			2
+#define A3			3
+#define A4			4
+#define A5			5
 /** @ */
 
 #ifdef __cplusplus
