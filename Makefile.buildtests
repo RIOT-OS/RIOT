@@ -29,7 +29,8 @@ endif
 
 .PHONY: buildtest info-objsize info-buildsize info-buildsizes \
         info-buildsizes-diff info-build info-boards-supported \
-        info-features-missing info-boards-features-missing
+        info-features-missing info-boards-features-missing \
+        info-board info-boards
 
 ifeq ($(BUILD_IN_DOCKER),1)
 buildtest: ..in-docker-container
@@ -172,9 +173,6 @@ info-buildsizes-diff:
 info-build:
 	@echo 'APPLICATION: $(APPLICATION)'
 	@echo ''
-	@echo 'supported boards:'
-	@$(foreach board,$(BOARDS),echo ' * $(board)';)
-	@echo ''
 	@echo 'BOARD:   $(BOARD)'
 	@echo 'CPU:     $(CPU)'
 	@echo 'MCU:     $(MCU)'
@@ -240,50 +238,54 @@ info-build:
 	@echo ''
 	@echo -e 'MAKEFILE_LIST:$(patsubst %, \n\t%, $(abspath $(MAKEFILE_LIST)))'
 
+info-board:
+	@echo $(BOARD)
+
+info-boards:
+	@ \
+	BOARD_WHITELIST=" $(BOARD_WHITELIST) " && \
+	BOARD_BLACKLIST=" $(BOARD_BLACKLIST) " && \
+	BOARDS="$(BOARDS)" && \
+	\
+	if [ -z "$${BOARDS}" ]; then \
+	  find "$(RIOTBOARD)" -mindepth 1 -maxdepth 1 -type d '!' -name "*-common" -exec basename '{}' ';'; \
+	else \
+	  echo "$${BOARDS}" | tr ' ' '\n'; \
+	fi | \
+	sort | \
+	if [ "$${BOARD_WHITELIST}" = "  " ]; then \
+	  cat; \
+	else \
+	  while read B; do \
+	    [ "$${BOARD_WHITELIST%$${B}*}" != "$${BOARD_WHITELIST}" ] && echo "$${B}"; \
+	  done \
+	fi | \
+	if [ "$${BOARD_BLACKLIST}" = "  " ]; then \
+	  cat; \
+	else \
+	  while read B; do \
+	    [ "$${BOARD_BLACKLIST%$${B}*}" != "$${BOARD_BLACKLIST}" ] || echo "$${B}"; \
+	  done \
+	fi
+
+info-boards-features-missing:
+	@${MAKE} -s -j8 ..noop \
+	    $(addprefix ..info-features-missing.,$(shell ${MAKE} -s info-boards))
+
+..info-features-missing.%:
+	@ \
+	MISSING="$$(${MAKE} -s BOARD=${*} info-features-missing 2> /dev/null)" && \
+	if [ $(or ${INFO_FEATURES_MISSING_COND},-n) "$${MISSING}" ]; then \
+	  echo ${*} $${MISSING}; \
+	fi
+
 info-boards-supported:
-	@echo $(BOARDS)
+	@${MAKE} -s INFO_FEATURES_MISSING_COND=-z info-boards-features-missing
 
 info-features-missing:
 	@echo $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))
 
-info-boards-features-missing:
-	@for f in $(BOARDS_FEATURES_MISSING); do echo $${f}; done | column -t
-
 FEATURES_REQUIRED += $(FEATURES_OPTIONAL)
-
-ifneq (, $(filter info-boards-supported info-boards-features-missing info-build, $(MAKECMDGOALS)))
-  FEATURES_PROVIDED_BAK := $(FEATURES_PROVIDED)
-
-  define board_missing_features
-    FEATURES_PROVIDED := $(FEATURES_PROVIDED_BAK)
-    -include $${RIOTBOARD}/${1}/Makefile.features
-    ifdef BUILDTEST_MCU_GROUP
-      ifneq ($(BUILDTEST_MCU_GROUP), $$(FEATURES_MCU_GROUP))
-        BOARDS_FEATURES_MISSING += "${1} $${BUILDTEST_MCU_GROUP}"
-        BOARDS_WITH_MISSING_FEATURES += ${1}
-      endif
-    endif
-
-    FEATURES_MISSING := $$(filter-out $$(FEATURES_PROVIDED), $$(FEATURES_REQUIRED))
-    ifneq (, $${FEATURES_MISSING})
-      BOARDS_FEATURES_MISSING += "${1} $${FEATURES_MISSING}"
-      ifneq (, $$(filter-out $$(FEATURES_OPTIONAL), $$(FEATURES_MISSING)))
-        BOARDS_WITH_MISSING_FEATURES += ${1}
-      endif
-    endif
-  endef
-
-  BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name "*-common" -exec basename {} \;)
-  BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
-  BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
-
-  BOARDS_WITH_MISSING_FEATURES :=
-  BOARDS_FEATURES_MISSING :=
-  $(foreach BOARD, $(BOARDS), $(eval $(call board_missing_features,$(BOARD))))
-  BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES), $(BOARDS))
-
-  FEATURES_PROVIDED := $(FEATURES_PROVIDED_BAK)
-endif
 
 info-concurrency:
 	@echo "$(NPROC)"

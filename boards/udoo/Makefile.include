@@ -11,7 +11,7 @@ else ifeq ($(OS),Darwin)
   PORT = /dev/tty.SLAB_USBtoUART
   FLASHER = $(RIOTBOARD)/$(BOARD)/dist/bossac_udoo_osx
 else
-  $(info CAUTION: No flash tool for your host system found!)
+  $(warning CAUTION: No flash tool for your host system found!)
   # TODO: add support for windows as host platform
 endif
 export FLASHER

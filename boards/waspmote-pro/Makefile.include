@@ -22,7 +22,7 @@ else ifeq ($(OS),Darwin)
   PORT ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
   FLASHER = avrdude
 else
-  $(info CAUTION: No flash tool for your host system found!)
+  $(warning CAUTION: No flash tool for your host system found!)
   # TODO: fix for building under windows
 endif
 
