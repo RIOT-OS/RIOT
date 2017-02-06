@@ -1,3 +1,3 @@
-MODULE = arduino-common
+MODULE = arduino-atmega-common
 
 include $(RIOTBASE)/Makefile.base

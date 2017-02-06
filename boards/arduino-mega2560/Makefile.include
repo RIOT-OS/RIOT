@@ -1,53 +1,20 @@
 # define the cpu used by the arduino mega2560 board
 export CPU = atmega2560
 
-export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
-export TERMFLAGS = -b 9600 -p $(PORT)
+USEMODULE += arduino-atmega-common
 
-#define the flash-tool and default port depending on the host operating system
-OS = $(shell uname)
-ifeq ($(OS),Linux)
-  PORT ?= /dev/ttyACM0
-  FLASHER = avrdude
-else ifeq ($(OS),Darwin)
-  PORT ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-  FLASHER = avrdude
-else
-  $(info CAUTION: No flash tool for your host system found!)
-  # TODO: fix for building under windows
-endif
-export FLASHER
-export PORT
-export DIST_PATH = $(RIOTBOARD)/$(BOARD)/dist
-export DEBUGSERVER_PORT = 4242
-export DEBUGSERVER = $(DIST_PATH)/debug_srv.sh
-export DEBUGSERVER_FLAGS = "-g -j usb :$(DEBUGSERVER_PORT)"
-export DEBUGGER_FLAGS = "-x $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(ELFFILE)"
-export DEBUGGER = $(DIST_PATH)/debug.sh $(DEBUGSERVER_FLAGS) $(DIST_PATH) $(DEBUGSERVER_PORT)
+# add arduino-atmega-common include path
+INCLUDES += -I$(RIOTBOARD)/arduino-atmega-common/include
+
+#export needed for flash rule
+export PORT_LINUX ?= /dev/ttyACM0
+export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+export PROGRAMMER_SPEED ?= 115200
+
+export FFLAGS += -p m2560
 
 # PROGRAMMER defaults to stk500v2 which is the internal flasher via USB. Can be
 # overridden for debugging (which requires changes that require to use an ISP)
 export PROGRAMMER ?= stk500v2
 
-ifeq ($(PROGRAMMER), stk500v2)
-    export PROGRAMMER_FLAGS = -P $(PORT) -b 115200
-endif
-
-# define build specific options
-export CFLAGS_CPU   = -mmcu=atmega2560  $(CFLAGS_FPU)
-export CFLAGS_LINK  = -fno-builtin -fshort-enums
-export CFLAGS_DBG  ?= -ggdb -g3
-export CFLAGS_OPT  ?= -Os
-
-export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
-export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
-export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -e reset_handler
-export OFLAGS += -j .text -j .data -O ihex
-export FFLAGS += -p m2560 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex
-
-ifeq ($(LTO),1)
-  # avr-gcc <4.8.3 has a bug when using LTO which causes a warning to be printed always:
-  # '_vector_25' appears to be a misspelled signal handler [enabled by default]
-  # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59396
-  export LINKFLAGS += -Wno-error
-endif
+include $(RIOTBOARD)/arduino-atmega-common/Makefile.include

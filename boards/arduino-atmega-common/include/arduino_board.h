@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_arduino-common
+ * @ingroup     boards_arduino-atmega-common
  * @{
  *
  * @file
@@ -54,7 +54,59 @@ static const gpio_t arduino_pinmap[] = {
     ARDUINO_PIN_16,
     ARDUINO_PIN_17,
     ARDUINO_PIN_18,
-    ARDUINO_PIN_19
+    ARDUINO_PIN_19,
+#ifdef CPU_ATMEGA2560
+    ARDUINO_PIN_20,
+    ARDUINO_PIN_21,
+    ARDUINO_PIN_22,
+    ARDUINO_PIN_23,
+    ARDUINO_PIN_24,
+    ARDUINO_PIN_25,
+    ARDUINO_PIN_26,
+    ARDUINO_PIN_27,
+    ARDUINO_PIN_28,
+    ARDUINO_PIN_29,
+    ARDUINO_PIN_30,
+    ARDUINO_PIN_31,
+    ARDUINO_PIN_32,
+    ARDUINO_PIN_33,
+    ARDUINO_PIN_34,
+    ARDUINO_PIN_35,
+    ARDUINO_PIN_36,
+    ARDUINO_PIN_37,
+    ARDUINO_PIN_38,
+    ARDUINO_PIN_39,
+    ARDUINO_PIN_40,
+    ARDUINO_PIN_41,
+    ARDUINO_PIN_42,
+    ARDUINO_PIN_43,
+    ARDUINO_PIN_44,
+    ARDUINO_PIN_45,
+    ARDUINO_PIN_46,
+    ARDUINO_PIN_47,
+    ARDUINO_PIN_48,
+    ARDUINO_PIN_49,
+    ARDUINO_PIN_50,
+    ARDUINO_PIN_51,
+    ARDUINO_PIN_52,
+    ARDUINO_PIN_53,
+    ARDUINO_PIN_54,
+    ARDUINO_PIN_55,
+    ARDUINO_PIN_56,
+    ARDUINO_PIN_57,
+    ARDUINO_PIN_58,
+    ARDUINO_PIN_59,
+    ARDUINO_PIN_60,
+    ARDUINO_PIN_61,
+    ARDUINO_PIN_62,
+    ARDUINO_PIN_63,
+    ARDUINO_PIN_64,
+    ARDUINO_PIN_65,
+    ARDUINO_PIN_66,
+    ARDUINO_PIN_67,
+    ARDUINO_PIN_68,
+    ARDUINO_PIN_69
+#endif
 };
 
 #ifdef __cplusplus
