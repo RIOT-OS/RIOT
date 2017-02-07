@@ -30,6 +30,7 @@
 #include "net/icmpv6.h"
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
+#include "net/tcp.h"
 #include "net/udp.h"
 #include "net/sixlowpan.h"
 #include "od.h"
@@ -78,6 +79,7 @@ static void _dump_snip(gnrc_pktsnip_t *pkt)
 #ifdef MODULE_GNRC_TCP
         case GNRC_NETTYPE_TCP:
             printf("NETTYPE_TCP (%i)\n", pkt->type);
+            tcp_hdr_print(pkt->data);
             break;
 #endif
 #ifdef MODULE_GNRC_UDP
