@@ -65,7 +65,7 @@ static int test_timer(unsigned num)
     else {
         printf("TIMER_%u: initialization successful\n", num);
     }
-    timer_stop(TIMER_DEV(num));
+    timer_poweroff(TIMER_DEV(num));
     printf("TIMER_%u: stopped\n", num);
     /* set each available channel */
     for (unsigned i = 0; i < MAX_CHANNELS; i++) {
@@ -84,7 +84,7 @@ static int test_timer(unsigned num)
     }
     /* start the timer */
     printf("TIMER_%u: starting\n", num);
-    timer_start(TIMER_DEV(num));
+    timer_poweron(TIMER_DEV(num));
     /* wait for all channels to fire */
     do {
         ++sw_count;

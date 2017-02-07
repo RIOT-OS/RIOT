@@ -149,22 +149,27 @@ int timer_clear(tim_t dev, int channel);
 unsigned int timer_read(tim_t dev);
 
 /**
- * @brief Start the given timer
+ * @brief Power on and start the given timer
  *
- * This function is only needed if the timer was stopped manually before.
+ * When this function is called, the given timer is powered on and resumes its
+ * previously configured operation.
+ *
+ * Calling this function without initializing the timer first leads to
+ * indeterministic behavior.
  *
  * @param[in] dev           the timer device to start
  */
-void timer_start(tim_t dev);
+void timer_poweron(tim_t dev);
 
 /**
- * @brief Stop the given timer
+ * @brief Stop and power off the given timer
  *
- * This will effect all of the timer's channels.
+ * The given timer will be stopped and powered down. This effects all the
+ * timer's configured channels.
  *
  * @param[in] dev           the timer to stop
  */
-void timer_stop(tim_t dev);
+void timer_poweroff(tim_t dev);
 
 #ifdef __cplusplus
 }

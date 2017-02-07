@@ -107,12 +107,12 @@ unsigned int timer_read(tim_t tim)
     return dev(tim)->TAV & 0xFFFF;
 }
 
-void timer_stop(tim_t tim)
+void timer_poweroff(tim_t tim)
 {
     dev(tim)->CTL = 0;
 }
 
-void timer_start(tim_t tim)
+void timer_poweron(tim_t tim)
 {
     dev(tim)->CTL = GPT_CTL_TAEN;
 }
