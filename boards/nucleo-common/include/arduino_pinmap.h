@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_arduino-zero
+ * @ingroup     boards_nucleo-common
  * @{
  *
  * @file
