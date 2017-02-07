@@ -341,6 +341,7 @@ endif
 ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
   USEMODULE += inet_csum
   USEMODULE += random
+  USEMODULE += tcp
   USEMODULE += xtimer
 endif
 
