@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    boards_nucleo_common STM Nucleo Common
- * @ingroup     drivers_periph
+ * @ingroup     boards
  * @brief       Common files for STM Nucleo boards
  * @{
  *

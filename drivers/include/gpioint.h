@@ -8,10 +8,12 @@
 
 /**
  * @defgroup    drivers_gpioint GPIO IRQ Multiplexer
- * @ingroup     drivers
+ * @ingroup     drivers_periph
  * @brief       Provides an API to implement interrupt handlers on IO pins.
  *
  * Multiplexer and interrupt handling must be implemented platform specific.
+ *
+ * @note        This interface is deprecated, use `periph/gpio.h` instead
  *
  * @{
  *

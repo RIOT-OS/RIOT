@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    drivers_diskio Disk IO Driver
- * @ingroup     drivers
+ * @ingroup     drivers_storage
  * @brief       Low level disk interface
  *
  * The connection between the MCU and the SRF08 is based on the i2c-interface.

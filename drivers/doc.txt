@@ -37,3 +37,9 @@
  * The group of actuators includes all kind of devices that can actively
  * interact with the physical world, as e.g. motors, lights, sound devices, etc.
  */
+
+/**
+ * @defgroup    drivers_storage Storage Device Drivers
+ * @ingroup     drivers
+ * @brief       Drivers for storage devices
+ */
