@@ -1,7 +1,7 @@
 /*
  * Copyright 2015 Ludwig Knüpfer,
  *           2015 Christian Mehlis
- *           2016 Freie Universität Berlin
+ *           2016-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -36,6 +36,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief possible return codes
+ */
+enum {
+    DHT_OK      =  0,       /**< all good */
+    DHT_NOCSUM  = -1,       /**< checksum error */
+    DHT_NODEV   = -2        /**< device type not defined */
+};
 
 /**
  * @brief data type for storing DHT sensor readings

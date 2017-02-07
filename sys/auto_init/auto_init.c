@@ -160,11 +160,6 @@ void auto_init(void)
     DEBUG("Auto init TCP module\n");
     gnrc_tcp_init();
 #endif
-#ifdef MODULE_DHT
-    DEBUG("Auto init DHT devices.\n");
-    extern void dht_auto_init(void);
-    dht_auto_init();
-#endif
 #ifdef MODULE_LWIP
     DEBUG("Bootstraping lwIP.\n");
     lwip_bootstrap();
@@ -318,6 +313,10 @@ void auto_init(void)
 #ifdef MODULE_HDC1000
     extern void auto_init_hdc1000(void);
     auto_init_hdc1000();
+#endif
+#ifdef MODULE_DHT
+    extern void auto_init_dht(void);
+    auto_init_dht();
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
