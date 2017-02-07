@@ -75,6 +75,13 @@ typedef struct __attribute__((packed)) {
     uint8_t value[];  /**< Pointer to TCP options Value field */
 } tcp_hdr_opt_t;
 
+/**
+ * @brief   Print the given TCP header to STDOUT
+ *
+ * @param[in] hdr           TCP header to print
+ */
+void tcp_hdr_print(tcp_hdr_t *hdr);
+
 #ifdef __cplusplus
 }
 #endif
