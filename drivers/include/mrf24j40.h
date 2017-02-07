@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    drivers_mrf24j40 MRF24J40 based drivers
- * @ingroup     drivers_netdev_netdev2
+ * @ingroup     drivers_netdev
  *
  * This module contains drivers for radio devices in Microchip MRF24J40 series.
  * The driver is aimed to work with all devices of this series.

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    drivers_ethos ethos
+ * @defgroup    drivers_ethos Ethernet-over-serial driver
  * @ingroup     drivers_netdev
  * @brief       Driver for the ethernet-over-serial module
  * @{

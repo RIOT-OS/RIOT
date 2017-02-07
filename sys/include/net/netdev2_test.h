@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    sys_netdev2_test    Netdev2 dummy test driver
- * @ingroup     drivers_netdev_netdev2
+ * @defgroup    sys_netdev2_test    netdev2 dummy test driver
+ * @ingroup     drivers_netdev
  * @brief       Provides a test dummy for the netdev2 interface.
  *
  * See the following simple packet traversal timer for an example. Note that

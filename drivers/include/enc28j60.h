@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    driver_enc28j60 ENC28J60
+ * @defgroup    drivers_enc28j60 ENC28J60
  * @ingroup     drivers_netdev
  * @brief       Driver for the ENC28J60 Ethernet Adapter
  * @{
