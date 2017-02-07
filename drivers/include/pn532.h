@@ -7,13 +7,15 @@
  */
 
 /**
- * @defgroup  drivers_pn532 PN532 NFC Reader
- * @ingroup drivers
+ * @defgroup    drivers_pn532 PN532 NFC Reader
+ * @ingroup     drivers_netdev
+ * @brief       PN532 NFC radio device driver
  *
  * @{
  * @file
- * @brief   PN532 driver
- * @author  Víctor Ariño <victor.arino@triagnosys.com>
+ * @brief       PN532 driver
+ *
+ * @author      Víctor Ariño <victor.arino@triagnosys.com>
  */
 
 #ifndef NFC_READER_INCLUDE_PN532_H

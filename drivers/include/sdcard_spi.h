@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_sdcard_spi SPI SD-Card driver
- * @ingroup     drivers
+ * @ingroup     drivers_storage
  * @brief       Driver for reading and writing sd-cards via spi interface.
  * @{
  *

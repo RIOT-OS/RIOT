@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_nvram Non-volatile RAM
- * @ingroup     drivers
+ * @ingroup     drivers_storage
  * @brief       Non-volatile RAM interface
  *
  * This API is designed around non-volatile memories which do not need blockwise

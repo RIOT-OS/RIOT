@@ -8,14 +8,19 @@
 
 /**
  * @defgroup    drivers_flashrom Flash memory driver
- * @ingroup     drivers
+ * @ingroup     drivers_periph
  * @brief       Generic flash memory driver
+ *
+ * @note        This interface is deprecated, use `periph/flaspage` instead
+ *
  * @{
  *
  * @file
  *
+ *
  * @brief       Generic flash memory driver
  * @author      unknown
+ *
  */
 
 #ifndef FLASHROM_H
