@@ -44,7 +44,7 @@
 
 static kw2xrf_t kw2xrf_devs[KW2XRF_NUM];
 static gnrc_netdev2_t gnrc_adpt[KW2XRF_NUM];
-static char _nomac_stacks[KW2XRF_MAC_STACKSIZE][KW2XRF_NUM];
+static char _kw2xrf_stacks[KW2XRF_NUM][KW2XRF_MAC_STACKSIZE];
 
 void auto_init_kw2xrf(void)
 {
@@ -57,7 +57,7 @@ void auto_init_kw2xrf(void)
             LOG_ERROR("[auto_init_netif] error, initializing kw2xrf #%u\n", i);
         }
         else {
-            gnrc_netdev2_init(_nomac_stacks[i], KW2XRF_MAC_STACKSIZE,
+            gnrc_netdev2_init(_kw2xrf_stacks[i], KW2XRF_MAC_STACKSIZE,
                               KW2XRF_MAC_PRIO, "kw2xrf", &gnrc_adpt[i]);
         }
     }
