@@ -94,14 +94,6 @@ ifneq (,$(filter netdev2_tap,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter gnrc_zep,$(USEMODULE)))
-  USEMODULE += hashes
-  USEMODULE += ieee802154
-  USEMODULE += gnrc_udp
-  USEMODULE += random
-  USEMODULE += xtimer
-endif
-
 ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
   USEMODULE += gnrc_udp
   USEMODULE += xtimer

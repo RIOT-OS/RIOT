@@ -47,11 +47,6 @@ endif
 ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
   SRC += sc_icmpv6_echo.c
 endif
-ifneq (,$(filter gnrc_zep,$(USEMODULE)))
-  ifneq (,$(filter ipv6_addr,$(USEMODULE)))
-    SRC += sc_zep.c
-  endif
-endif
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
     SRC += sc_gnrc_rpl.c
 endif
