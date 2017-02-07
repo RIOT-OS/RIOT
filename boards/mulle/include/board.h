@@ -110,7 +110,7 @@ void board_init(void);
  */
 #define AT86RF2XX_PARAMS_BOARD      {.spi = SPI_DEV(0), \
                                      .spi_clk = SPI_CLK_5MHZ, \
-                                     .cs_pin = GPIO_PIN(PORT_D, 4), \
+                                     .cs_pin = SPI_HWCS(1), \
                                      .int_pin = GPIO_PIN(PORT_B, 9), \
                                      .sleep_pin = GPIO_PIN(PORT_E, 6), \
                                      .reset_pin = GPIO_PIN(PORT_C, 12)}
@@ -142,7 +142,7 @@ void board_init(void);
 /** @{ */
 #define MULLE_NVRAM_SPI_DEV             SPI_DEV(0)
 #define MULLE_NVRAM_SPI_CLK             SPI_CLK_5MHZ
-#define MULLE_NVRAM_SPI_CS              GPIO_PIN(PORT_D, 6) /**< FRAM CS pin */
+#define MULLE_NVRAM_SPI_CS              SPI_HWCS(3) /**< FRAM CS pin */
 #define MULLE_NVRAM_CAPACITY            512     /**< FRAM size, in bytes */
 #define MULLE_NVRAM_SPI_ADDRESS_COUNT   1       /**< FRAM addressing size, in bytes */
 /** @} */
