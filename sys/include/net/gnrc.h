@@ -30,7 +30,7 @@
  * =====================
  *
  * From the application layer the @ref net_gnrc can be accessed through the
- * @ref net_conn, while the interface to the @ref drivers_netdev_netdev2 is
+ * @ref net_sock, while the interface to the @ref drivers_netdev_netdev2 is
  * defined by the @ref net_gnrc_netdev2.
  *
  * Architecture
@@ -258,9 +258,9 @@
  *   USEMODULE += gnrc_udp
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * - To use @ref net_conn_udp with GNRC include
+ * - To use @ref net_sock_udp with GNRC include
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   USEMODULE += gnrc_conn_udp
+ *   USEMODULE += gnrc_sock_udp
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - To include the @ref net_gnrc_rpl module
