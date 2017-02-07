@@ -29,9 +29,10 @@ void hwrng_init(void)
     /* nothing to do here */
 }
 
-void hwrng_read(uint8_t *buf, unsigned int num)
+void hwrng_read(void *buf, unsigned int num)
 {
     unsigned int count = 0;
+    uint8_t *b = (uint8_t *)buf;
 
     /* power on RNG */
 #ifdef CPU_FAM_NRF51
@@ -46,7 +47,7 @@ void hwrng_read(uint8_t *buf, unsigned int num)
             cpu_sleep_until_event();
         }
 
-        buf[count++] = (uint8_t)NRF_RNG->VALUE;
+        b[count++] = (uint8_t)NRF_RNG->VALUE;
         /* NRF51 PAN #21 -> read value before clearing VALRDY */
         NRF_RNG->EVENTS_VALRDY = 0;
     }

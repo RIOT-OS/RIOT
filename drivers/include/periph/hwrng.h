@@ -57,7 +57,7 @@ void hwrng_init(void);
  * @param[in] buf   destination buffer to write the bytes to
  * @param[in] num   number of bytes to get from device
  */
-void hwrng_read(uint8_t *buf, unsigned int num);
+void hwrng_read(void *buf, unsigned int num);
 
 #ifdef __cplusplus
 }
