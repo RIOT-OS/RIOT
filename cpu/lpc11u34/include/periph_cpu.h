@@ -68,27 +68,32 @@ typedef uint16_t gpio_t;
 #define PWM_CHAN_NUMOF      (3U)
 
 /**
- * @brief   Override the default GPIO mode values
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use the following bits to encode the pin mode:
+ * - bit  0: 0 for input or 1 for output
+ * - bit  3: Pull-down resistor enable
+ * - bit  4: Pull-up resistor enable
+ * - bit 10: Open drain enable
+ */
+#define GPIO_MODE_BITS(pu, pd, od, out)   ((pu << 4) | (pd << 3) | (od << 10) | out)
+
+#ifndef DOXYGEN
+/**
+ * @brief   Override GPIO modes
  * @{
  */
-#define IN                  (0x0000)
-#define OUT                 (0x0001)
-#define PD                  (0x1 << 3)
-#define PU                  (0x2 << 3)
-#define OD                  (0x1 << 10)
-
 #define HAVE_GPIO_MODE_T
 typedef enum {
-    GPIO_IN    = (IN),              /**< in without pull resistor */
-    GPIO_IN_PD = (IN | PD),         /**< in with pull-down */
-    GPIO_IN_PU = (IN | PU),         /**< in with pull-up */
-    GPIO_OUT   = (OUT),             /**< push-pull output */
-    GPIO_OD    = (OUT | OD),        /**< open-drain output */
-    GPIO_OD_PU = (OUT | OD | PU)    /**< open-drain output with pull-up */
+    GPIO_IN    = GPIO_MODE_BITS(0, 0, 0, 0),  /**< in without pull resistor */
+    GPIO_IN_PD = GPIO_MODE_BITS(0, 1, 0, 0),  /**< in with pull-down */
+    GPIO_IN_PU = GPIO_MODE_BITS(1, 0, 0, 0),  /**< in with pull-up */
+    GPIO_OUT   = GPIO_MODE_BITS(0, 0, 0, 1),  /**< push-pull output */
+    GPIO_OD    = GPIO_MODE_BITS(0, 0, 1, 1),  /**< open-drain output */
+    GPIO_OD_PU = GPIO_MODE_BITS(1, 0, 1, 1),  /**< open-drain output with pull-up */
 } gpio_mode_t;
 /** @} */
 
-#ifndef DOXYGEN
 /**
  * @brief   Override the ADC resolution settings
  * @{
