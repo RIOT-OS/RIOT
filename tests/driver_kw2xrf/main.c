@@ -23,10 +23,11 @@
 #include "kw2xrf.h"
 #include "shell_commands.h"
 #include "net/gnrc.h"
-#include "net/gnrc/pktdump.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netapi.h"
 #include "net/netopt.h"
+
+#define KW2XRF_TESTMODE     (1)
 
 #ifdef KW2XRF_TESTMODE
 #include "kw2xrf_tm.h"
@@ -159,14 +160,8 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
-                                                          gnrc_pktdump_pid);
 
     puts("KW2XRF device driver test");
-
-    /* register the pktdump thread */
-    puts("Register the packet dump thread for GNRC_NETTYPE_UNDEF packets");
-    gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
     /* start the shell */
     puts("Initialization successful - starting the shell now");
