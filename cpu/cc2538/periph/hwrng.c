@@ -69,16 +69,18 @@ void hwrng_init(void)
     RFCORE_SFR_RFST = ISRFOFF;
 }
 
-void hwrng_read(uint8_t *buf, unsigned int num)
+void hwrng_read(void *buf, unsigned int num)
 {
     unsigned count;
+    uint8_t *b = (uint8_t *)buf;
+
     for (count = 0; count < num; ) {
         /* Clock the RNG LSFR once: */
         SOC_ADC->cc2538_adc_adccon1.ADCCON1bits.RCTRL = 1;
 
         /* Read up to 2 bytes of hwrng data: */
-        buf[count++] = SOC_ADC_RNDL;
+        b[count++] = SOC_ADC_RNDL;
         if (count >= num) break;
-        buf[count++] = SOC_ADC_RNDH;
+        b[count++] = SOC_ADC_RNDH;
     }
 }
