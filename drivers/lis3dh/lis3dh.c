@@ -27,7 +27,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define SPI_MODE            SPI_MODE_0
+#define SPI_MODE            SPI_MODE_3
 
 static inline int lis3dh_write_bits(const lis3dh_t *dev, const lis3dh_reg_t reg,
                                     const uint8_t mask,  const uint8_t values);
