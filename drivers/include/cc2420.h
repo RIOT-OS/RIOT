@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_cc2420 CC2420 driver
- * @ingroup     drivers_netdev_netdev2
+ * @ingroup     drivers_netdev
  * @{
  *
  * @file

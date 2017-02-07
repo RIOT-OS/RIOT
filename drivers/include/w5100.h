@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_w5100 W5100
- * @ingroup     drivers_netdev_netdev2
+ * @ingroup     drivers_netdev
  * @brief       Driver for W5100 ethernet devices
  *
  * This device driver only exposes the MACRAW mode of W5100 devices, so it does
