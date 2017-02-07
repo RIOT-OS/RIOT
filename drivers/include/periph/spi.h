@@ -39,7 +39,7 @@
  * 2. `spi_init_cs()` should be called during device driver initialization, as
  *    each chip select pin/line is used uniquely by a specific device, i.e. chip
  *    select lines are no shared resource.
- * 3. `spi_aquire()` needs to be called for each new transaction. This function
+ * 3. `spi_acquire()` needs to be called for each new transaction. This function
  *    configures the bus with specific parameters (clock, mode) for the duration
  *    of that transaction.
  *
