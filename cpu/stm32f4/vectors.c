@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014-2015 Freie Universität Berlin
+ *               2017 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +15,7 @@
  * @brief       Interrupt vector definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Vincent Dupont <vincent@otakeys.com>
  *
  * @}
  */
@@ -103,11 +105,20 @@ WEAK_DEFAULT void isr_dma2_stream7(void);
 WEAK_DEFAULT void isr_usart6(void);
 WEAK_DEFAULT void isr_i2c3_ev(void);
 WEAK_DEFAULT void isr_i2c3_er(void);
+#if defined(CPU_MODEL_STM32F413ZH)
+/* STM32F413 specific interrupt vectors (CAN3)
+ * See RM0430, part 10.2 */
+WEAK_DEFAULT void isr_can3_tx(void);
+WEAK_DEFAULT void isr_can3_rx0(void);
+WEAK_DEFAULT void isr_can3_rx1(void);
+WEAK_DEFAULT void isr_can3_sce(void);
+#else
 WEAK_DEFAULT void isr_otg_hs_ep1_out(void);
 WEAK_DEFAULT void isr_otg_hs_ep1_in(void);
 WEAK_DEFAULT void isr_otg_hs_wkup(void);
 WEAK_DEFAULT void isr_otg_hs(void);
 WEAK_DEFAULT void isr_dcmi(void);
+#endif
 WEAK_DEFAULT void isr_cryp(void);
 WEAK_DEFAULT void isr_hash_rng(void);
 WEAK_DEFAULT void isr_fpu(void);
@@ -209,11 +220,19 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_usart6,             /* USART6 */
     (void*) isr_i2c3_ev,            /* I2C3 event */
     (void*) isr_i2c3_er,            /* I2C3 error */
+#if defined(CPU_MODEL_STM32F413ZH)
+    (void*) isr_can3_tx,            /* CAN3 TX */
+    (void*) isr_can3_rx0,           /* CAN3 RX0 */
+    (void*) isr_can3_rx1,           /* CAN3 RX1 */
+    (void*) isr_can3_sce,           /* CAN3 SCE */
+    (void*) (0UL),                  /* Reserved */
+#else
     (void*) isr_otg_hs_ep1_out,     /* USB OTG HS End Point 1 Out */
     (void*) isr_otg_hs_ep1_in,      /* USB OTG HS End Point 1 In */
     (void*) isr_otg_hs_wkup,        /* USB OTG HS Wakeup through EXTI */
     (void*) isr_otg_hs,             /* USB OTG HS */
     (void*) isr_dcmi,               /* DCMI */
+#endif
     (void*) isr_cryp,               /* CRYP crypto */
     (void*) isr_hash_rng,           /* Hash and Rng */
     (void*) isr_fpu,                /* FPU */
