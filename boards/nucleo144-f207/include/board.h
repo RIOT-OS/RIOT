@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  OTA keys S.A.
+ * Copyright (C) 2016-2017  OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f207 Nucleo-F207
+ * @defgroup    boards_nucleo144-f207 Nucleo144-F207
  * @ingroup     boards
- * @brief       Board specific files for the nucleo-f207 board
+ * @brief       Board specific files for the nucleo144-f207 board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the nucleo-f207 board
+ * @brief       Board specific definitions for the nucleo144-f207 board
  *
  * @author      Vincent Dupont <vincent@otakeys.com
  * @author      Toon Stegen <toon.stegen@altran.com>
