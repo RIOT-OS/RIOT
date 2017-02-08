@@ -436,6 +436,10 @@ ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
   USEMODULE += lwip_raw
 endif
 
+ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
+  USEMODULE += lwip_udp
+endif
+
 ifneq (,$(filter lwip_%,$(USEMODULE)))
   USEMODULE += lwip
 endif

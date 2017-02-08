@@ -33,6 +33,14 @@ struct sock_ip {
     struct netconn *conn;
 };
 
+/**
+ * @brief   UDP sock type
+ * @internal
+ */
+struct sock_udp {
+    struct netconn *conn;
+};
+
 #ifdef __cplusplus
 }
 #endif
