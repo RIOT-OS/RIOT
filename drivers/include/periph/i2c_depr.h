@@ -45,7 +45,11 @@
  * http://www.nxp.com/documents/user_manual/UM10204.pdf
  *
  * @note        The current version of this interface only supports the
-                7-bit addressing mode.
+ *              7-bit addressing mode.
+ *
+ * @deprecated
+ * @note        This interface is DEPRECATED, do not use it for any new
+ *              features. Use the updated `periph/i2c.h` interface instead.
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
@@ -130,7 +134,7 @@ typedef enum {
  * @return                  -1 on undefined device given
  * @return                  -2 on unsupported speed value
  */
-int i2c_init_master(i2c_t dev, i2c_speed_t speed);
+int i2c_depr_init_master(i2c_t dev, i2c_speed_t speed);
 
 /**
  * @brief   Get mutually exclusive access to the given I2C bus
@@ -143,7 +147,7 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed);
  * @return              0 on success
  * @return              -1 on error
  */
-int i2c_acquire(i2c_t dev);
+int i2c_depr_acquire(i2c_t dev);
 
 /**
  * @brief   Release the given I2C device to be used by others
@@ -153,7 +157,7 @@ int i2c_acquire(i2c_t dev);
  * @return              0 on success
  * @return              -1 on error
  */
-int i2c_release(i2c_t dev);
+int i2c_depr_release(i2c_t dev);
 
 /**
  * @brief   Read one byte from an I2C device with the given address
@@ -166,7 +170,7 @@ int i2c_release(i2c_t dev);
  * @return                  -1 on undefined device given
  * @return                  -2 on invalid address
  */
-int i2c_read_byte(i2c_t dev, uint8_t address, void *data);
+int i2c_depr_read_byte(i2c_t dev, uint8_t address, void *data);
 
 /**
  * @brief   Read multiple bytes from an I2C device with the given address
@@ -179,7 +183,7 @@ int i2c_read_byte(i2c_t dev, uint8_t address, void *data);
  * @return                  the number of bytes that were read
  * @return                  -1 on undefined device given
  */
-int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length);
+int i2c_depr_read_bytes(i2c_t dev, uint8_t address, void *data, int length);
 
 /**
  * @brief   Read one byte from a register at the I2C slave with the given
@@ -193,7 +197,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length);
  * @return                  the number of bytes that were read
  * @return                  -1 on undefined device given
  */
-int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data);
+int i2c_depr_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data);
 
 /**
  * @brief   Read multiple bytes from a register at the I2C slave with the given
@@ -208,7 +212,7 @@ int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data);
  * @return                  the number of bytes that were read
  * @return                  -1 on undefined device given
  */
-int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg,
+int i2c_depr_read_regs(i2c_t dev, uint8_t address, uint8_t reg,
                   void *data, int length);
 
 /**
@@ -221,7 +225,7 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg,
  * @return                  the number of bytes that were written
  * @return                  -1 on undefined device given
  */
-int i2c_write_byte(i2c_t dev, uint8_t address, uint8_t data);
+int i2c_depr_write_byte(i2c_t dev, uint8_t address, uint8_t data);
 
 /**
  * @brief   Write multiple bytes to an I2C device with the given address
@@ -234,7 +238,7 @@ int i2c_write_byte(i2c_t dev, uint8_t address, uint8_t data);
  * @return                  the number of bytes that were written
  * @return                  -1 on undefined device given
  */
-int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length);
+int i2c_depr_write_bytes(i2c_t dev, uint8_t address, const void *data, int length);
 
 /**
  * @brief   Write one byte to a register at the I2C slave with the given address
@@ -247,7 +251,7 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length);
  * @return                  the number of bytes that were written
  * @return                  -1 on undefined device given
  */
-int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data);
+int i2c_depr_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data);
 
 /**
  * @brief   Write multiple bytes to a register at the I2C slave with the given
@@ -262,7 +266,7 @@ int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data);
  * @return                  the number of bytes that were written
  * @return                  -1 on undefined device given
  */
-int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg,
+int i2c_depr_write_regs(i2c_t dev, uint8_t address, uint8_t reg,
                    const void *data, int length);
 
 /**
@@ -270,14 +274,14 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg,
  *
  * @param[in] dev           the I2C device to power on
  */
-void i2c_poweron(i2c_t dev);
+void i2c_depr_poweron(i2c_t dev);
 
 /**
  * @brief   Power off the given I2C peripheral
  *
  * @param[in] dev           the I2C device to power off
  */
-void i2c_poweroff(i2c_t dev);
+void i2c_depr_poweroff(i2c_t dev);
 
 #ifdef __cplusplus
 }
