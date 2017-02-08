@@ -819,6 +819,9 @@ EXCLUDE_SYMLINKS       = NO
 
 EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/*/include/atmel/* \
+                         */cpu/e*32*/include/*e*32*.h \
+                         */cpu/e*32*/include/em_device.h \
+                         */cpu/efm32_common/emlib/* \
                          */cpu/sam3/include/sam3* \
                          */cpu/sam3/include/system_sam*.h \
                          */cpu/sam0_common/include/cmsis/* \
