@@ -22,8 +22,6 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "board_common.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,12 +30,6 @@ extern "C" {
  * @brief   LED pin definitions and handlers
  * @{
  */
-#undef LED0_PIN
-#undef LED0_MASK
-#undef LED0_ON
-#undef LED0_OFF
-#undef LED0_TOGGLE
-
 #define LED0_PIN            GPIO_PIN(PORT_B, 0)
 #define LED0_MASK           (1 << 0)
 #define LED0_ON             (GPIOB->BSRR = LED0_MASK)
@@ -56,6 +48,11 @@ extern "C" {
 #define LED2_OFF            (GPIOB->BSRR = (LED2_MASK << 16))
 #define LED2_TOGGLE         (GPIOB->ODR  ^= LED2_MASK)
 /** @} */
+
+/**
+ * @brief   User button
+ */
+#define BTN_B1_PIN          GPIO_PIN(PORT_C, 13)
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
