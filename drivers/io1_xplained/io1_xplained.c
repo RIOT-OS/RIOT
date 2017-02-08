@@ -25,7 +25,7 @@
 #include "io1_xplained_internals.h"
 #include "io1_xplained_params.h"
 #include "at30tse75x.h"
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 #include "periph/gpio.h"
 #include "xtimer.h"
 

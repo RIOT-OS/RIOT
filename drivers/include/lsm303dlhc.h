@@ -22,7 +22,7 @@
 #define LSM303DLHC_H
 
 #include <stdint.h>
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 #include "periph/gpio.h"
 
 #ifdef __cplusplus

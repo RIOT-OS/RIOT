@@ -35,7 +35,7 @@
 
 #include "xtimer.h"
 #include "srf08.h"
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 
  #define SLEEP       (1000 * 1000U)
 

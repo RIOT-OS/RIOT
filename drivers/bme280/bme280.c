@@ -26,7 +26,7 @@
 #include "bme280.h"
 #include "bme280_internals.h"
 #include "bme280_params.h"
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 #include "xtimer.h"
 
 #define ENABLE_DEBUG        (0)
@@ -72,7 +72,7 @@ int bme280_init(bme280_t* dev, const bme280_params_t* params)
     dev->params = *params;
 
     /* Initialize I2C interface */
-    if (i2c_init_master(dev->params.i2c_dev, I2C_SPEED_NORMAL)) {
+    if (i2c_depr_init_master(dev->params.i2c_dev, I2C_SPEED_NORMAL)) {
         DEBUG("[Error] I2C device not enabled\n");
         return BME280_ERR_I2C;
     }
@@ -219,7 +219,7 @@ static int read_calibration_data(bme280_t* dev)
     uint8_t offset = 0x88;
 
     memset(buffer, 0, sizeof(buffer));
-    nr_bytes = i2c_read_regs(dev->params.i2c_dev, dev->params.i2c_addr, offset,
+    nr_bytes = i2c_depr_read_regs(dev->params.i2c_dev, dev->params.i2c_addr, offset,
                              buffer, nr_bytes_to_read);
     if (nr_bytes != nr_bytes_to_read) {
         LOG_ERROR("Unable to read calibration data\n");
@@ -254,7 +254,7 @@ static int read_calibration_data(bme280_t* dev)
     DEBUG("[INFO] Chip ID = 0x%02X\n", buffer[BME280_CHIP_ID_REG - offset]);
 
     /* Config is only be writable in sleep mode */
-    (void)i2c_write_reg(dev->params.i2c_dev, dev->params.i2c_addr,
+    (void)i2c_depr_write_reg(dev->params.i2c_dev, dev->params.i2c_addr,
                         BME280_CTRL_MEAS_REG, 0);
 
     uint8_t b;
@@ -309,7 +309,7 @@ static int do_measurement(bme280_t* dev)
     int nr_bytes_to_read = sizeof(measurement_regs);
     uint8_t offset = BME280_PRESSURE_MSB_REG;
 
-    nr_bytes = i2c_read_regs(dev->params.i2c_dev, dev->params.i2c_addr,
+    nr_bytes = i2c_depr_read_regs(dev->params.i2c_dev, dev->params.i2c_addr,
                              offset, measurement_regs, nr_bytes_to_read);
     if (nr_bytes != nr_bytes_to_read) {
         LOG_ERROR("Unable to read temperature data\n");
@@ -334,14 +334,14 @@ static uint8_t read_u8_reg(bme280_t* dev, uint8_t reg)
 {
     uint8_t b;
     /* Assuming device is correct, it should return 1 (nr bytes) */
-    (void)i2c_read_reg(dev->params.i2c_dev, dev->params.i2c_addr, reg, &b);
+    (void)i2c_depr_read_reg(dev->params.i2c_dev, dev->params.i2c_addr, reg, &b);
     return b;
 }
 
 static void write_u8_reg(bme280_t* dev, uint8_t reg, uint8_t b)
 {
     /* Assuming device is correct, it should return 1 (nr bytes) */
-    (void)i2c_write_reg(dev->params.i2c_dev, dev->params.i2c_addr, reg, b);
+    (void)i2c_depr_write_reg(dev->params.i2c_dev, dev->params.i2c_addr, reg, b);
 }
 
 static uint16_t get_uint16_le(const uint8_t *buffer, size_t offset)

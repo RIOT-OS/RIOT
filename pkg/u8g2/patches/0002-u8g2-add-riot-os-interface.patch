@@ -35,7 +35,7 @@ index 0000000..e0c042c
 +#include "xtimer.h"
 +
 +#include "periph/spi.h"
-+#include "periph/i2c.h"
++#include "periph/i2c_depr.h"
 +#include "periph/gpio.h"
 +
 +#include <stdio.h>

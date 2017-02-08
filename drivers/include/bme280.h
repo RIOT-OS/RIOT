@@ -31,7 +31,7 @@
 #define BME280_H
 
 #include "saul.h"
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 
 #ifdef __cplusplus
 extern "C" {

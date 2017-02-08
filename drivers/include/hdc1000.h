@@ -40,7 +40,7 @@
 
 #include <stdint.h>
 
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 #include "hdc1000_regs.h"
 
 #ifdef __cplusplus

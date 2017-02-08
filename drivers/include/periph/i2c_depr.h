@@ -49,7 +49,7 @@
  *
  * @deprecated
  * @note        This interface is DEPRECATED, do not use it for any new
- *              features. Use the updated `periph/i2c.h` interface instead.
+ *              features. Use the updated `periph/i2c_depr.h` interface instead.
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

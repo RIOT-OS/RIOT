@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 
  /**
   * @brief The sensors default I2C address

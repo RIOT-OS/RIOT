@@ -19,7 +19,7 @@
  */
 
 
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 #include "byteorder.h"
 
 #include "jc42.h"
@@ -30,25 +30,25 @@
 
 static int jc42_get_register(jc42_t* dev, uint8_t reg, uint16_t* data)
 {
-    i2c_acquire(dev->i2c);
-    if (i2c_read_regs(dev->i2c, dev->addr, reg, data, 2) <= 0) {
+    i2c_depr_acquire(dev->i2c);
+    if (i2c_depr_read_regs(dev->i2c, dev->addr, reg, data, 2) <= 0) {
         DEBUG("[jc42] Problem reading register 0x%x\n", reg);
-        i2c_release(dev->i2c);
+        i2c_depr_release(dev->i2c);
         return JC42_NODEV;
     }
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
     return JC42_OK;
 }
 
 static int jc42_set_register(jc42_t* dev, uint8_t reg, uint16_t* data)
 {
-    i2c_acquire(dev->i2c);
-    if (i2c_write_regs(dev->i2c, dev->addr, reg, data, 2) <= 0) {
+    i2c_depr_acquire(dev->i2c);
+    if (i2c_depr_write_regs(dev->i2c, dev->addr, reg, data, 2) <= 0) {
         DEBUG("[jc42] Problem writing to register 0x%x\n", reg);
-        i2c_release(dev->i2c);
+        i2c_depr_release(dev->i2c);
         return JC42_NODEV;
     }
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     return JC42_OK;
 }
@@ -83,13 +83,13 @@ int jc42_init(jc42_t* dev, jc42_params_t* params)
     uint16_t config;
     dev->i2c = params->i2c;
     dev->addr = params->addr;
-    i2c_acquire(dev->i2c);
-    if (i2c_init_master(dev->i2c, params->speed) != 0) {
+    i2c_depr_acquire(dev->i2c);
+    if (i2c_depr_init_master(dev->i2c, params->speed) != 0) {
         DEBUG("[jc42] Problem initializing I2C master\n");
-        i2c_release(dev->i2c);
+        i2c_depr_release(dev->i2c);
         return JC42_NOI2C;
     }
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     /* Poll the device, fail if unavailable */
     if (jc42_get_config(dev, &config) != 0) {

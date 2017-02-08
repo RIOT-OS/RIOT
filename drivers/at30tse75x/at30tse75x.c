@@ -14,7 +14,7 @@
  */
 
 
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 #include "xtimer.h"
 
 #include "at30tse75x.h"
@@ -37,41 +37,41 @@ static inline float temperature_to_float(uint16_t temp)
 
 static int at30tse75x_get_register(at30tse75x_t* dev, uint8_t reg, uint16_t* data)
 {
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
-    if (i2c_read_regs(dev->i2c, dev->addr, reg, data, 2) <= 0) {
+    if (i2c_depr_read_regs(dev->i2c, dev->addr, reg, data, 2) <= 0) {
         DEBUG("[at30tse75x] Can't read register 0x%x\n", reg);
-        i2c_release(dev->i2c);
+        i2c_depr_release(dev->i2c);
         return -1;
     }
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     return 0;
 }
 
 static int at30tse75x_set_register(at30tse75x_t* dev, uint8_t reg, uint16_t* data)
 {
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
-    if (i2c_write_regs(dev->i2c, dev->addr, reg, data, 2) <= 0) {
+    if (i2c_depr_write_regs(dev->i2c, dev->addr, reg, data, 2) <= 0) {
         DEBUG("[at30tse75x] Can't write to register 0x%x\n", reg);
-        i2c_release(dev->i2c);
+        i2c_depr_release(dev->i2c);
         return -1;
     }
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     return 0;
 }
 
 static int at30tse75x_reset(at30tse75x_t* dev)
 {
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
-    if (i2c_write_byte(dev->i2c, 0x00, AT30TSE75X_CMD__GENERAL_CALL_RESET) != 1) {
-        i2c_release(dev->i2c);
+    if (i2c_depr_write_byte(dev->i2c, 0x00, AT30TSE75X_CMD__GENERAL_CALL_RESET) != 1) {
+        i2c_depr_release(dev->i2c);
         return -1;
     }
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
     /* Wait for reset to complete */
     xtimer_usleep(500);
     return 0;
@@ -79,28 +79,28 @@ static int at30tse75x_reset(at30tse75x_t* dev)
 
 int at30tse75x_get_config(at30tse75x_t* dev, uint8_t* data)
 {
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
-    if (i2c_read_reg(dev->i2c, dev->addr, AT30TSE75X_REG__CONFIG, data) <= 0) {
+    if (i2c_depr_read_reg(dev->i2c, dev->addr, AT30TSE75X_REG__CONFIG, data) <= 0) {
         DEBUG("[at30tse75x] Can't read CONFIG register\n");
-        i2c_release(dev->i2c);
+        i2c_depr_release(dev->i2c);
         return -1;
     }
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     return 0;
 }
 
 int at30tse75x_set_config(at30tse75x_t* dev, uint8_t data)
 {
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
-    if (i2c_write_reg(dev->i2c, dev->addr, AT30TSE75X_REG__CONFIG, data) <= 0) {
+    if (i2c_depr_write_reg(dev->i2c, dev->addr, AT30TSE75X_REG__CONFIG, data) <= 0) {
         DEBUG("[at30tse75x] Can't write to CONFIG register\n");
-        i2c_release(dev->i2c);
+        i2c_depr_release(dev->i2c);
         return -1;
     }
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     return 0;
 }
@@ -220,13 +220,13 @@ int at30tse75x_set_limit_high(at30tse75x_t* dev, int8_t t_high)
 
 int at30tse75x_save_config(at30tse75x_t* dev)
 {
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
-    if(i2c_write_byte(dev->i2c, dev->addr, AT30TSE75X_CMD__SAVE_TO_NVRAM) != 1) {
-        i2c_release(dev->i2c);
+    if(i2c_depr_write_byte(dev->i2c, dev->addr, AT30TSE75X_CMD__SAVE_TO_NVRAM) != 1) {
+        i2c_depr_release(dev->i2c);
         return -1;
     }
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
     /* Wait for copy to complete */
     xtimer_usleep(5000);
     return 0;
@@ -234,13 +234,13 @@ int at30tse75x_save_config(at30tse75x_t* dev)
 
 int at30tse75x_restore_config(at30tse75x_t* dev)
 {
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
-    if(i2c_write_byte(dev->i2c, dev->addr, AT30TSE75X_CMD__RESTORE_FROM_NVRAM) != 1) {
-        i2c_release(dev->i2c);
+    if(i2c_depr_write_byte(dev->i2c, dev->addr, AT30TSE75X_CMD__RESTORE_FROM_NVRAM) != 1) {
+        i2c_depr_release(dev->i2c);
         return -1;
     }
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
     /* Wait for copy to complete */
     xtimer_usleep(200);
     return 0;
@@ -294,13 +294,13 @@ int at30tse75x_init(at30tse75x_t* dev, i2c_t i2c, i2c_speed_t speed, uint8_t add
     }
     dev->addr = addr;
 
-    i2c_acquire(dev->i2c);
-    if(i2c_init_master(dev->i2c, speed) != 0) {
+    i2c_depr_acquire(dev->i2c);
+    if(i2c_depr_init_master(dev->i2c, speed) != 0) {
         DEBUG("[at30tse75x] Can't initialize I2C master\n");
-        i2c_release(dev->i2c);
+        i2c_depr_release(dev->i2c);
         return -1;
     }
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     /* Reset the device */
     if(at30tse75x_reset(dev) != 0) {

@@ -26,7 +26,7 @@
 #define AT30TSE75X_H
 
 #include <stdint.h>
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 
 #ifdef __cplusplus
 extern "C" {

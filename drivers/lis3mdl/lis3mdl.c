@@ -64,14 +64,14 @@ int lis3mdl_init(lis3mdl_t *dev,
     dev->i2c = i2c;
     dev->addr = address;
 
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
 
-    if (i2c_init_master(i2c, I2C_SPEED_NORMAL) < 0) {
+    if (i2c_depr_init_master(i2c, I2C_SPEED_NORMAL) < 0) {
         DEBUG("LIS3MDL: Master initialization failed\n");
         return -1;
     }
 
-    i2c_read_reg(dev->i2c, dev->addr, LIS3DML_WHO_AM_I_REG, &tmp);
+    i2c_depr_read_reg(dev->i2c, dev->addr, LIS3DML_WHO_AM_I_REG, &tmp);
     if (tmp != LIS3MDL_CHIP_ID) {
         DEBUG("LIS3MDL: Identification failed\n");
         return -1;
@@ -80,18 +80,18 @@ int lis3mdl_init(lis3mdl_t *dev,
     tmp = ( LIS3MDL_MASK_REG1_TEMP_EN   /* enable temperature sensor */
           | xy_mode                     /* set x-, y-axis operative mode */
           | odr);                       /* set output data rate */
-    i2c_write_reg(dev->i2c, dev->addr, LIS3MDL_CTRL_REG1, tmp);
+    i2c_depr_write_reg(dev->i2c, dev->addr, LIS3MDL_CTRL_REG1, tmp);
 
     /* set Full-scale configuration */
-    i2c_write_reg(dev->i2c, dev->addr, LIS3MDL_CTRL_REG2, scale);
+    i2c_depr_write_reg(dev->i2c, dev->addr, LIS3MDL_CTRL_REG2, scale);
 
     /* set continuous-conversion mode */
-    i2c_write_reg(dev->i2c, dev->addr, LIS3MDL_CTRL_REG3, op_mode);
+    i2c_depr_write_reg(dev->i2c, dev->addr, LIS3MDL_CTRL_REG3, op_mode);
 
     /* set z-axis operative mode */
-    i2c_write_reg(dev->i2c, dev->addr, LIS3MDL_CTRL_REG4, z_mode);
+    i2c_depr_write_reg(dev->i2c, dev->addr, LIS3MDL_CTRL_REG4, z_mode);
 
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     return 0;
 }
@@ -100,15 +100,15 @@ void lis3mdl_read_mag(lis3mdl_t *dev, lis3mdl_3d_data_t *data)
 {
     uint8_t tmp[2] = {0, 0};
 
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
 
-    i2c_read_regs(dev->i2c, dev->addr, LIS3MDL_OUT_X_L_REG, &tmp[0], 2);
+    i2c_depr_read_regs(dev->i2c, dev->addr, LIS3MDL_OUT_X_L_REG, &tmp[0], 2);
     data->x_axis = (tmp[1] << 8) | tmp[0];
 
-    i2c_read_regs(dev->i2c, dev->addr, LIS3MDL_OUT_Y_L_REG, &tmp[0], 2);
+    i2c_depr_read_regs(dev->i2c, dev->addr, LIS3MDL_OUT_Y_L_REG, &tmp[0], 2);
     data->y_axis = (tmp[1] << 8) | tmp[0];
 
-    i2c_read_regs(dev->i2c, dev->addr, LIS3MDL_OUT_Z_L_REG, &tmp[0], 2);
+    i2c_depr_read_regs(dev->i2c, dev->addr, LIS3MDL_OUT_Z_L_REG, &tmp[0], 2);
     data->z_axis = (tmp[1] << 8) | tmp[0];
 
     data->x_axis = _twos_complement(data->x_axis);
@@ -120,14 +120,14 @@ void lis3mdl_read_mag(lis3mdl_t *dev, lis3mdl_3d_data_t *data)
     data->y_axis /= GAUSS_DIVIDER;
     data->z_axis /= GAUSS_DIVIDER;
 
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 }
 
 void lis3mdl_read_temp(lis3mdl_t *dev, int16_t *value)
 {
-    i2c_acquire(dev->i2c);
-    i2c_read_regs(dev->i2c, dev->addr, LIS3MDL_TEMP_OUT_L_REG, (uint8_t*)value, 2);
-    i2c_release(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
+    i2c_depr_read_regs(dev->i2c, dev->addr, LIS3MDL_TEMP_OUT_L_REG, (uint8_t*)value, 2);
+    i2c_depr_release(dev->i2c);
 
     *value = _twos_complement(*value);
 
@@ -136,11 +136,11 @@ void lis3mdl_read_temp(lis3mdl_t *dev, int16_t *value)
 
 void lis3mdl_enable(lis3mdl_t *dev)
 {
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
     /* Z-axis medium-power mode */
-    i2c_write_reg(dev->i2c, dev->addr,
+    i2c_depr_write_reg(dev->i2c, dev->addr,
                   LIS3MDL_CTRL_REG3, LIS3MDL_MASK_REG3_Z_MEDIUM_POWER);
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 }
 
 void lis3mdl_disable(lis3mdl_t *dev)
@@ -148,7 +148,7 @@ void lis3mdl_disable(lis3mdl_t *dev)
     uint8_t tmp = ( LIS3MDL_MASK_REG3_LOW_POWER_EN   /**< enable power-down mode */
                   | LIS3MDL_MASK_REG3_Z_LOW_POWER);  /**< Z-axis low-power mode */
 
-    i2c_acquire(dev->i2c);
-    i2c_write_reg(dev->i2c, dev->addr, LIS3MDL_CTRL_REG3, tmp);
-    i2c_release(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
+    i2c_depr_write_reg(dev->i2c, dev->addr, LIS3MDL_CTRL_REG3, tmp);
+    i2c_depr_release(dev->i2c);
 }

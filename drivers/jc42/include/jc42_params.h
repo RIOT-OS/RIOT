@@ -22,7 +22,7 @@
 #define JC42_PARAMS_H
 
 #include "jc42.h"
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 
 #ifdef __cplusplus
 extern "C" {
