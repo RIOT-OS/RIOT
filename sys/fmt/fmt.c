@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#ifdef __WITH_AVRLIBC__
+#if defined(__WITH_AVRLIBC__) || defined(__mips__)
 #include <stdio.h>  /* for fwrite() */
 #else
 /* work around broken sys/posix/unistd.h */
