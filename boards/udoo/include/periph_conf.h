@@ -66,11 +66,38 @@ static const timer_conf_t timer_config[] = {
  * @{
  */
 static const uart_conf_t uart_config[] = {
-    /* device, rx port, tx port, rx pin, tx pin, mux, PMC bit, IRGn line */
-    {(Uart *)UART,   PIOA, PIOA,  8,  9, GPIO_MUX_A, ID_UART,   UART_IRQn},
-    {(Uart *)USART0, PIOA, PIOA, 10, 11, GPIO_MUX_A, ID_USART0, USART0_IRQn},
-    {(Uart *)USART1, PIOA, PIOA, 12, 13, GPIO_MUX_A, ID_USART1, USART1_IRQn},
-    {(Uart *)USART3, PIOD, PIOD,  4,  5, GPIO_MUX_B, ID_USART3, USART3_IRQn}
+    {
+        .dev    = (Uart *)UART,
+        .rx_pin = GPIO_PIN(PA, 8),
+        .tx_pin = GPIO_PIN(PA, 9),
+        .mux    = GPIO_MUX_A,
+        .pmc_id = ID_UART,
+        .irqn   = UART_IRQn
+    },
+    {
+        .dev    = (Uart *)USART0,
+        .rx_pin = GPIO_PIN(PA, 10),
+        .tx_pin = GPIO_PIN(PA, 11),
+        .mux    = GPIO_MUX_A,
+        .pmc_id = ID_USART0,
+        .irqn   = USART0_IRQn
+    },
+    {
+        .dev    = (Uart *)USART1,
+        .rx_pin = GPIO_PIN(PA, 12),
+        .tx_pin = GPIO_PIN(PA, 13),
+        .mux    = GPIO_MUX_A,
+        .pmc_id = ID_USART1,
+        .irqn   = USART1_IRQn
+    },
+    {
+        .dev    = (Uart *)USART3,
+        .rx_pin = GPIO_PIN(PD, 5),
+        .tx_pin = GPIO_PIN(PD, 4),
+        .mux    = GPIO_MUX_B,
+        .pmc_id = ID_USART3,
+        .irqn   = USART3_IRQn
+    }
 };
 
 /* define interrupt vectors */
