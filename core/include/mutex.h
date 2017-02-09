@@ -25,7 +25,6 @@
 #include <stddef.h>
 
 #include "list.h"
-#include "atomic.h"
 
 #ifdef __cplusplus
  extern "C" {

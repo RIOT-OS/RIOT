@@ -27,11 +27,11 @@
 
 #include_next <stdio.h>
 
-int getchar(void);
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+int getchar(void);
 
 #ifdef __cplusplus
 }

@@ -44,13 +44,6 @@ extern "C" {
 #endif
 
 /**
- * @brief x86 has architecture specific atomic_cas in x86_atomic.c
- * @{
- */
-#define ARCH_HAS_ATOMIC_COMPARE_AND_SWAP 1
-/** @} */
-
-/**
  * @brief   Disable interrupts and halt forever.
  *
  * This function is the last resort in case of an unrecoverable error.

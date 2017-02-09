@@ -20,7 +20,7 @@
 #ifndef SYS_POSIX_PTHREAD_SPIN_H
 #define SYS_POSIX_PTHREAD_SPIN_H
 
-#include <errno.h>
+#include <stdatomic.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +33,7 @@ extern "C" {
  *                  Use irq_disable() and irq_restore() for shortterm locks instead.
  */
 typedef struct {
-    atomic_int_t value;
+    atomic_flag flag; /**< Current lock state */
 } pthread_spinlock_t;
 
 /**
