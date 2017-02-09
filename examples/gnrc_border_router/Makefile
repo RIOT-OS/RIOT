@@ -14,6 +14,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk maple-mini msb-430 msb-430h 
                              nucleo-f030 nucleo-f070 microbit calliope-mini \
                              nucleo32-f042 nucleo32-f303 opencm9-04
 
+BOARD_BLACKLIST += mips-malta # No UART available.
+
 # use ethos (ethernet over serial) for network communication and stdio over
 # UART, but not on native, as native has a tap interface towards the host.
 ifeq (,$(filter native,$(BOARD)))
