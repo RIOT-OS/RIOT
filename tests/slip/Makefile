@@ -4,6 +4,8 @@ include ../Makefile.tests_common
 BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h nucleo-f334 stm32f0discovery weio \
                           nucleo-f030 nucleo32-f042
 
+BOARD_BLACKLIST += mips-malta
+
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc
 USEMODULE += gnrc_pktdump
