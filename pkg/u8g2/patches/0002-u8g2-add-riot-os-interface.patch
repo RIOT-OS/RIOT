@@ -1,7 +1,7 @@
-From 5acedd785fd31b43171c6855ecd5323bfd31c9e2 Mon Sep 17 00:00:00 2001
+From bc8b22f935be89eb7f30e6eb4af783c1dc298690 Mon Sep 17 00:00:00 2001
 From: Bas Stottelaar <basstottelaar@gmail.com>
 Date: Wed, 22 Jun 2016 18:04:31 +0200
-Subject: [PATCH 2/3] u8g2: add riot-os interface.
+Subject: [PATCH 2/4] u8g2: add riot-os interface.
 
 ---
  csrc/u8g2.h        |   3 +
@@ -35,7 +35,7 @@ index 0000000..e0c042c
 +#include "xtimer.h"
 +
 +#include "periph/spi.h"
-+#include "periph/i2c_depr.h"
++#include "periph/i2c.h"
 +#include "periph/gpio.h"
 +
 +#include <stdio.h>
@@ -252,5 +252,4 @@ index b396344..7dcd659 100644
  }
 -- 
 1.9.1
-
 
