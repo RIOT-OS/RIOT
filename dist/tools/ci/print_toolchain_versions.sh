@@ -53,7 +53,7 @@ VER=$(gcc --version | head -n 1)
 if [ -n "$VER" ]; then
     printf "%20s: %s\n" "native gcc" "$VER"
 fi
-for p in msp430 avr arm-none-eabi; do
+for p in msp430 avr arm-none-eabi mips-mti-elf; do
     printf "%20s: %s\n" "$p-gcc" "$(gcc_version "$p")"
 done
 VER=$(clang --version | head -n 1)
@@ -61,7 +61,7 @@ if [ -n "$VER" ]; then
     printf "%20s: %s\n" "clang" "$VER"
 fi
 
-for p in arm-none-eabi; do
+for p in arm-none-eabi mips-mti-elf; do
     printf "%20s: %s\n" "$p-newlib" "$(newlib_version "$p")"
 done
 for p in avr; do
