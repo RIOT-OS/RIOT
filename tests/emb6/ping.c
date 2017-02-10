@@ -90,7 +90,7 @@ static void handle_reply(uip_ipaddr_t *source, uint8_t ttl, uint8_t *data,
 
     ipv6_addr_to_str(addr_str, (ipv6_addr_t *)source, sizeof(addr_str));
 
-    (void)atomic_fetch_add(&received, 1); /* Ignore return value, we only want to increment the counter */
+    atomic_fetch_add(&received, 1);
     printf("%" PRIu16 " bytes from %s: icmp_seq=%" PRIu16 " ttl=%u quota=%i/%i\n",
            datalen, addr_str, byteorder_ntohs(ping->seq), (unsigned)ttl,
            atomic_load(&received), atomic_load(&num));
