@@ -57,17 +57,6 @@ get_compile_jobs() {
         | xargs '-d\n' -n 1 echo $0 compile
 }
 
-check_workdir() {
-    [ -d tests/pkg_libcoap ] || {
-        echo "workdir check failed! pwd=$(pwd)"
-        echo "-- ls:"
-        ls -la
-        echo "-- ls tests:"
-        ls -la tests
-        exit 1
-    }
-}
-
 # compile one app for one board. delete intermediates.
 compile() {
     local appdir=$1
@@ -75,8 +64,6 @@ compile() {
 
     [ -n "$DWQ_WORKER" ] && \
         echo "-- running on worker ${DWQ_WORKER} thread ${DWQ_WORKER_THREAD}, build number $DWQ_WORKER_BUILDNUM."
-
-    check_workdir
 
     # sanity checks
     [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board)"
@@ -96,8 +83,6 @@ compile() {
 
     # cleanup
     rm -Rf "${appdir}/bin/${board}" "${appdir}/bin/pkg/${board}"
-
-    check_workdir
 
     return $RES
 }
