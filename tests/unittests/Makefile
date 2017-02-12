@@ -14,7 +14,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk chronos ek-lm4f120xl \
                           slwstk6220a ek-lm4f120xl stm32f3discovery \
                           slwstk6220a nucleo32-f042 nucleo32-f303 opencm9-04 \
                           seeeduino_arch-pro remote-pa remote-revb remote-reva \
-                          nucleo32-f031
+                          nucleo32-f031 nucleo-l073
 
 USEMODULE += embunit
 
@@ -33,7 +33,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon arduino-due cc2538dk ek-lm4f120xl f4vi1 fox 
                        pba-d-01-kw2x pca10000 pca10005 remote saml21-xpro samr21-xpro slwstk6220a \
                        spark-core stm32f0discovery stm32f3discovery stm32f4discovery udoo weio \
                        yunjia-nrf51822 sodaq-autonomo arduino-zero nucleo-f030 nucleo-f070 \
-                       nucleo32-f303 opencm9-04 nucleo-f411 nucleo32-f031
+                       nucleo32-f303 opencm9-04 nucleo-f411 nucleo32-f031 nucleo-l073
 
 DISABLE_TEST_FOR_ARM_CORTEX_M := tests-relic
 
