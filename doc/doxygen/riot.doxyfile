@@ -839,7 +839,8 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/stm32f2/include/stm32f2*.h \
                          */cpu/stm32f4/include/stm32f4*.h \
                          */cpu/stm32f*/include/stm32f* \
-                         */cpu/stm32l1/include/stm32l1xx.h \
+                         */cpu/stm32l1/include/stm32l*.h \
+                         */cpu/stm32l0/include/stm32l* \
                          */cpu/x86/include/x86_pci.h \
                          */drivers/kw2xrf/include/overwrites.h \
                          */drivers/nrf24l01p/include/nrf24l01p_settings.h \
