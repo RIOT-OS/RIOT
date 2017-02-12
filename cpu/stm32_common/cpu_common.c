@@ -43,7 +43,14 @@ void periph_clk_en(bus_t bus, uint32_t mask)
         case APB2:
             RCC->APB2ENR |= mask;
             break;
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) \
+#if defined(CPU_FAM_STM32L0)
+        case AHB:
+            RCC->AHBENR |= mask;
+            break;
+        case IOP:
+            RCC->IOPENR |= mask;
+            break;
+#elif defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) \
             || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
         case AHB:
             RCC->AHBENR |= mask;
@@ -76,7 +83,14 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
         case APB2:
             RCC->APB2ENR &= ~(mask);
             break;
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) \
+#if defined(CPU_FAM_STM32L0)
+        case AHB:
+            RCC->AHBENR &= ~(mask);
+            break;
+        case IOP:
+            RCC->IOPENR &= ~(mask);
+            break;
+#elif defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) \
             || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
         case AHB:
             RCC->AHBENR &= ~(mask);
