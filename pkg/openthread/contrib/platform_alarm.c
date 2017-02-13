@@ -21,7 +21,7 @@
 #include <platform/alarm.h>
 #include "ot.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 static xtimer_t ot_timer;
@@ -52,7 +52,7 @@ void otPlatAlarmStop(otInstance *aInstance)
 /* OpenThread will call this for getting running time in millisecs */
 uint32_t otPlatAlarmGetNow(void)
 {
-    uint32_t now = xtimer_now() / 1000;
+    uint32_t now = xtimer_now_usec() / 1000;
 
     DEBUG("openthread: otPlatAlarmGetNow: %i\n", (int) now);
     return now;
