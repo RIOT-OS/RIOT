@@ -84,6 +84,7 @@ extern "C" {
 #define UART_1_ISR          USART1_RX_vect
 /** @} */
 
+
 /**
  * @brief SPI configuration
  *
