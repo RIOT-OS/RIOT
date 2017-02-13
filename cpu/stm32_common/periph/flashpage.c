@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_stm32f0
+ * @ingroup     cpu_stm32_common
  * @{
  *
  * @file
@@ -20,10 +20,12 @@
 
 #include "cpu.h"
 #include "assert.h"
-#include "periph/flashpage.h"
 
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
+
+#if defined(FLASHPAGE_SIZE) && defined(FLASHPAGE_NUMOF)
+#include "periph/flashpage.h"
 
 void flashpage_write(int page, void *data)
 {
@@ -86,3 +88,5 @@ void flashpage_write(int page, void *data)
         while (RCC->CR & RCC_CR_HSIRDY) {}
     }
 }
+
+#endif /* defined(FLASHPAGE_SIZE) && defined(FLASHPAGE_NUMOF) */
