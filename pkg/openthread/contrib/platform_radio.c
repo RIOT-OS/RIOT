@@ -324,7 +324,7 @@ ThreadError otPlatRadioIdle(otInstance *aInstance)
 
 ThreadError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
 {
-    DEBUG("openthread: otPlatRadioReceive");
+    DEBUG("openthread: otPlatRadioReceive\n");
     (void) aInstance;
 
     set_channel(aChannel);
