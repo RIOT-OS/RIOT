@@ -26,7 +26,7 @@
 #include <ncp/ncp.h>
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #include <errno.h>
@@ -118,13 +118,13 @@ void _event_cb(netdev2_t *dev, netdev2_event_t event)
     else {
         switch (event) {
             case NETDEV2_EVENT_RX_COMPLETE:
-                DEBUG("openthread_netdev2: Reception of a pcket\n");
+                DEBUG("openthread_netdev2: Reception of a packet\n");
                 recv_pkt(sInstance, dev);
                 break;
             case NETDEV2_EVENT_TX_COMPLETE:
             case NETDEV2_EVENT_TX_NOACK:
             case NETDEV2_EVENT_TX_MEDIUM_BUSY:
-                DEBUG("openthread_netdev2: Transmission of a pcket\n");
+                DEBUG("openthread_netdev2: Transmission of a packet\n");
                 send_pkt(sInstance, dev, event);
                 break;
             default:

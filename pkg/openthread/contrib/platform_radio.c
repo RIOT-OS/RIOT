@@ -286,6 +286,7 @@ ThreadError otPlatRadioDisable(otInstance *aInstance)
 
 bool otPlatRadioIsEnabled(otInstance *aInstance)
 {
+    DEBUG("otPlatRadioIsEnabled\n");
     (void) aInstance;
 
     return !sDisabled;
@@ -294,6 +295,7 @@ bool otPlatRadioIsEnabled(otInstance *aInstance)
 /* OpenThread will call this for setting device state to SLEEP */
 ThreadError otPlatRadioSleep(otInstance *aInstance)
 {
+    DEBUG("otPlatRadioSleep\n");
    (void) aInstance;
 
     ot_sleep();
@@ -324,9 +326,10 @@ ThreadError otPlatRadioIdle(otInstance *aInstance)
 
 ThreadError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
 {
-    DEBUG("openthread: otPlatRadioReceive\n");
+    DEBUG("openthread: otPlatRadioReceive. Channel: %i\n", aChannel);
     (void) aInstance;
 
+    ot_idle();
     set_channel(aChannel);
     return kThreadError_None;
 }
@@ -350,6 +353,7 @@ ThreadError otPlatRadioTransmit(otInstance *aInstance, RadioPacket *aPacket)
     pkt.iov_len = aPacket->mLength;
 
     /*Set channel and power based on transmit frame */
+    DEBUG("otPlatRadioTransmit->channel: %i\n", (int) aPacket->mChannel);
     set_channel(aPacket->mChannel);
     set_power(aPacket->mPower);
 
@@ -383,18 +387,21 @@ void otPlatRadioSetPromiscuous(otInstance *aInstance, bool aEnable)
 
 int8_t otPlatRadioGetRssi(otInstance *aInstance)
 {
+    DEBUG("otPlatRadioGetRssi\n");
     (void) aInstance;
     return Rssi;
 }
 
 void otPlatRadioEnableSrcMatch(otInstance *aInstance, bool aEnable)
 {
+    DEBUG("otPlatRadioEnableSrcMatch\n");
     (void)aInstance;
     (void)aEnable;
 }
 
 ThreadError otPlatRadioAddSrcMatchShortEntry(otInstance *aInstance, const uint16_t aShortAddress)
 {
+    DEBUG("otPlatRadioAddSrcMatchShortEntry\n");
     (void)aInstance;
     (void)aShortAddress;
     return kThreadError_None;
@@ -402,6 +409,7 @@ ThreadError otPlatRadioAddSrcMatchShortEntry(otInstance *aInstance, const uint16
 
 ThreadError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const uint8_t *aExtAddress)
 {
+    DEBUG("otPlatRadioAddSrcMatchExtEntry\n");
     (void)aInstance;
     (void)aExtAddress;
     return kThreadError_None;
@@ -409,6 +417,7 @@ ThreadError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const uint8_t 
 
 ThreadError otPlatRadioClearSrcMatchShortEntry(otInstance *aInstance, const uint16_t aShortAddress)
 {
+    DEBUG("otPlatRadioClearSrcMatchShortEntry\n");
     (void)aInstance;
     (void)aShortAddress;
     return kThreadError_None;
@@ -416,6 +425,7 @@ ThreadError otPlatRadioClearSrcMatchShortEntry(otInstance *aInstance, const uint
 
 ThreadError otPlatRadioClearSrcMatchExtEntry(otInstance *aInstance, const uint8_t *aExtAddress)
 {
+    DEBUG("otPlatRadioClearSrcMatchExtEntry\n");
     (void)aInstance;
     (void)aExtAddress;
     return kThreadError_None;
@@ -423,16 +433,19 @@ ThreadError otPlatRadioClearSrcMatchExtEntry(otInstance *aInstance, const uint8_
 
 void otPlatRadioClearSrcMatchShortEntries(otInstance *aInstance)
 {
+    DEBUG("otPlatRadioClearSrcMatchShortEntries\n");
     (void)aInstance;
 }
 
 void otPlatRadioClearSrcMatchExtEntries(otInstance *aInstance)
 {
+    DEBUG("otPlatRadioClearSrcMatchExtEntries\n");
     (void)aInstance;
 }
 
 ThreadError otPlatRadioEnergyScan(otInstance *aInstance, uint8_t aScanChannel, uint16_t aScanDuration)
 {
+    DEBUG("otPlatRadioEnergyScan\n");
     (void)aInstance;
     (void)aScanChannel;
     (void)aScanDuration;
