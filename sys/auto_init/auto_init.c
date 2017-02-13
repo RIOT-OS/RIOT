@@ -32,10 +32,6 @@
 #include "gpioint.h"
 #endif
 
-#ifdef MODULE_LTC4150
-#include "ltc4150.h"
-#endif
-
 #ifdef MODULE_MCI
 #include "diskio.h"
 #endif
@@ -123,10 +119,6 @@ void auto_init(void)
 #ifdef MODULE_GPIOINT
     DEBUG("Auto init gpioint module.\n");
     gpioint_init();
-#endif
-#ifdef MODULE_LTC4150
-    DEBUG("Auto init ltc4150 module.\n");
-    ltc4150_init();
 #endif
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");

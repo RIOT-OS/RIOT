@@ -5,9 +5,6 @@ SRC = shell_commands.c sc_sys.c
 ifneq (,$(filter mci,$(USEMODULE)))
   SRC += sc_disk.c
 endif
-ifneq (,$(filter ltc4150,$(USEMODULE)))
-  SRC += sc_ltc4150.c
-endif
 ifneq (,$(filter ps,$(USEMODULE)))
   SRC += sc_ps.c
 endif

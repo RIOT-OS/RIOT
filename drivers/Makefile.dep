@@ -139,10 +139,6 @@ ifneq (,$(filter lpd8808,$(USEMODULE)))
     FEATURES_REQUIRED += periph_gpio
 endif
 
-ifneq (,$(filter ltc4150,$(USEMODULE)))
-    USEMODULE += xtimer
-endif
-
 ifneq (,$(filter mpu9150,$(USEMODULE)))
     USEMODULE += xtimer
 endif
