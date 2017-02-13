@@ -183,12 +183,14 @@ ble_advertising_start(void)
 void
 ble_gap_addr_print(const ble_gap_addr_t *addr)
 {
-  unsigned int i;
-  for(i = 0; i < sizeof(addr->addr); i++) {
-    if(i > 0) {
-      DEBUG(":");
-    }DEBUG("%02x", addr->addr[i]);
-  }DEBUG(" (%d)", addr->addr_type);
+    unsigned int i;
+    for(i = 0; i < sizeof(addr->addr); i++) {
+        if (i > 0) {
+            DEBUG(":");
+        }
+        DEBUG("%02x", addr->addr[i]);
+    }
+    DEBUG(" (%d)\n", addr->addr_type);
 }
 /*---------------------------------------------------------------------------*/
 /**

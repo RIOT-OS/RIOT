@@ -29,8 +29,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef LED_H_
-#define LED_H_
+#ifndef LED_H
+#define LED_H
 
 #include "board.h"
 
@@ -104,5 +104,5 @@ extern "C" {
 }
 #endif
 
-#endif /* LED_H_ */
+#endif /* LED_H */
 /** @} */

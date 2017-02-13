@@ -29,6 +29,10 @@
 #include "irq.h"
 #include "log.h"
 
+#ifdef MODULE_MPU_STACK_GUARD
+#include "mpu.h"
+#endif
+
 #ifdef MODULE_SCHEDSTATISTICS
 #include "xtimer.h"
 #endif
@@ -53,12 +57,29 @@ volatile kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
 clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;
 
+/* Needed by OpenOCD to read sched_threads */
+#if defined(__APPLE__) && defined(__MACH__)
+ #define FORCE_USED_SECTION __attribute__((used)) __attribute__((section ("__OPENOCD,__openocd")))
+#else
+ #define FORCE_USED_SECTION __attribute__((used)) __attribute__((section (".openocd")))
+#endif
+
+FORCE_USED_SECTION
+uint8_t max_threads = sizeof(sched_threads) / sizeof(thread_t*);
+
+#ifdef DEVELHELP
+/* OpenOCD can't determine struct offsets and additionally this member is only
+ * available if compiled with DEVELHELP */
+FORCE_USED_SECTION
+uint8_t _tcb_name_offset = offsetof(thread_t, name);
+#endif
+
 #ifdef MODULE_SCHEDSTATISTICS
 static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
 schedstat sched_pidlist[KERNEL_PID_LAST + 1];
 #endif
 
-int sched_run(void)
+int __attribute__((used)) sched_run(void)
 {
     sched_context_switch_request = 0;
 
@@ -80,7 +101,7 @@ int sched_run(void)
     }
 
 #ifdef MODULE_SCHEDSTATISTICS
-    unsigned long time = xtimer_now();
+    unsigned long time = _xtimer_now();
 #endif
 
     if (active_thread) {
@@ -114,6 +135,16 @@ int sched_run(void)
     next_thread->status = STATUS_RUNNING;
     sched_active_pid = next_thread->pid;
     sched_active_thread = (volatile thread_t *) next_thread;
+
+#ifdef MODULE_MPU_STACK_GUARD
+    mpu_configure(
+        1,                                                /* MPU region 1 */
+        (uintptr_t)sched_active_thread->stack_start + 31, /* Base Address (rounded up) */
+        MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B)   /* Attributes and Size */
+    );
+
+    mpu_enable();
+#endif
 
     DEBUG("sched_run: done, changed sched_active_thread.\n");
 

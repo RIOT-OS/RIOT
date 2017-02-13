@@ -230,11 +230,12 @@ static void _input_callback(struct udp_socket *c, void *ptr,
 
 static void _output_callback(c_event_t c_event, p_data_t p_data)
 {
-    _send_cmd_t *send_cmd = (_send_cmd_t *)p_data;
-
     if ((c_event != EVENT_TYPE_CONN_SEND) || (p_data == NULL)) {
         return;
     }
+
+    _send_cmd_t *send_cmd = (_send_cmd_t *)p_data;
+
     if ((send_cmd->res = udp_socket_send(&send_cmd->sock, send_cmd->data, send_cmd->data_len)) < 0) {
         send_cmd->res = -EHOSTUNREACH;
     }

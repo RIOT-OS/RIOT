@@ -16,7 +16,7 @@
  *              can be determined by magnetometer initialization.
  *              The measured values of magnetic field strength and
  *              die temperature have uncalibrated offsets.
- *              To get correct measuremend values, the individual
+ *              To get correct measurement values, the individual
  *              offsets must be measured and set accordingly.
  *
  * @{

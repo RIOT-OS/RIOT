@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
- * Copyright (C) 2015 Zolertia SL
+ * Copyright (C) 2014-2016 Freie Universität Berlin
+ *               2015 Zolertia SL
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -15,14 +15,12 @@
  * @brief       Peripheral MCU configuration for the RE-Mote board revision A
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- *              Antonio Lignan <alinan@zolertia.com>
+ * @author      Antonio Lignan <alinan@zolertia.com>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
-#include "cc2538_gpio.h"
-#include "periph_cpu.h"
 #include "periph_common.h"
 
 #ifdef __cplusplus
@@ -71,142 +69,47 @@ static const i2c_conf_t i2c_config[I2C_NUMOF] = {
 /** @} */
 
 /**
+ * @brief   Pre-calculated clock divider values based on a CLOCK_CORECLOCK (32MHz)
+ *
+ * Calculated with (CPSR * (SCR + 1)) = (CLOCK_CORECLOCK / bus_freq), where
+ * 1 < CPSR < 255 and
+ * 0 < SCR  < 256
+ */
+static const spi_clk_conf_t spi_clk_config[] = {
+    { .cpsr = 10, .scr = 31 },  /* 100khz */
+    { .cpsr =  2, .scr = 39 },  /* 400khz */
+    { .cpsr =  2, .scr = 15 },  /* 1MHz */
+    { .cpsr =  2, .scr =  2 },  /* ~4.5MHz */
+    { .cpsr =  2, .scr =  1 }   /* ~10.7MHz */
+};
+
+/**
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF           2
-#define SPI_0_EN            1
-#define SPI_1_EN            1
-
-#ifdef HAVE_PERIPH_SPI_CONF_T
-static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
+static const spi_conf_t spi_config[] = {
     {
         .dev      = SSI0,
         .mosi_pin = GPIO_PB1,
         .miso_pin = GPIO_PB3,
         .sck_pin  = GPIO_PB2,
-        .cs_pin   = GPIO_PB5,
+        .cs_pin   = GPIO_PB5
     },
     {
         .dev      = SSI1,
         .mosi_pin = GPIO_PC5,
         .miso_pin = GPIO_PC6,
         .sck_pin  = GPIO_PC4,
-        .cs_pin   = GPIO_PA7,
-    },
+        .cs_pin   = GPIO_PA7
+    }
 };
-#endif
-/** @} */
 
-/**
- * @name GPIO configuration
- * @{
- */
-#define GPIO_IRQ_PRIO       1
-
-/* Enable only up to PD5 as PD6-PD7 are used with the 32KHz XOSC */
-#define GPIO_0_EN           1
-#define GPIO_1_EN           1
-#define GPIO_2_EN           1
-#define GPIO_3_EN           1
-#define GPIO_4_EN           1
-#define GPIO_5_EN           1
-#define GPIO_6_EN           1
-#define GPIO_7_EN           1
-#define GPIO_8_EN           1
-#define GPIO_9_EN           1
-#define GPIO_10_EN          1
-#define GPIO_11_EN          1
-#define GPIO_12_EN          1
-#define GPIO_13_EN          1
-#define GPIO_14_EN          1
-#define GPIO_15_EN          1
-#define GPIO_16_EN          1
-#define GPIO_17_EN          1
-#define GPIO_18_EN          1
-#define GPIO_19_EN          1
-#define GPIO_20_EN          1
-#define GPIO_21_EN          1
-#define GPIO_22_EN          1
-#define GPIO_23_EN          1
-#define GPIO_24_EN          1
-#define GPIO_25_EN          1
-#define GPIO_26_EN          1
-#define GPIO_27_EN          1
-#define GPIO_28_EN          1
-#define GPIO_29_EN          1
-
-/**
- * @brief Port config
- *
- * These defines configures the port settings
- */
-/* UART0 RX */
-#define GPIO_0_PIN          GPIO_PA0
-/* UART0 TX */
-#define GPIO_1_PIN          GPIO_PA1
-/* ADC3 */
-#define GPIO_2_PIN          GPIO_PA2
-/* User button/Bootloader */
-#define GPIO_3_PIN          GPIO_PA3
-/* ADC2 */
-#define GPIO_4_PIN          GPIO_PA4
-/* ADC1 */
-#define GPIO_5_PIN          GPIO_PA5
-/* SEL MicroSD */
-#define GPIO_6_PIN          GPIO_PA6
-/* CSn MicroSD (shared with ADC extRef) */
-#define GPIO_7_PIN          GPIO_PA7
-/* CC1200 GDO2 */
-#define GPIO_8_PIN          GPIO_PB0
-/* SSI0 CC1200 MOSI */
-#define GPIO_9_PIN          GPIO_PB1
-/* SSI0 CC1200 CLK */
-#define GPIO_10_PIN         GPIO_PB2
-/* SSI0 CC1200 MISO */
-#define GPIO_11_PIN         GPIO_PB3
-/* CC1200 GDO0 */
-#define GPIO_12_PIN         GPIO_PB4
-/* CC1200 CSn */
-#define GPIO_13_PIN         GPIO_PB5
-/* JTAG TDI */
-#define GPIO_14_PIN         GPIO_PB6
-/* JTAG TDO */
-#define GPIO_15_PIN         GPIO_PB7
-/* UART1 TX */
-#define GPIO_16_PIN         GPIO_PC0
-/* UART1 RX */
-#define GPIO_17_PIN         GPIO_PC1
-/* I2C SDA */
-#define GPIO_18_PIN         GPIO_PC2
-/* I2C SCL */
-#define GPIO_19_PIN         GPIO_PC3
-/* SSI1 MicroSD CLK */
-#define GPIO_20_PIN         GPIO_PC4
-/* SSI1 MicroSD MOSI */
-#define GPIO_21_PIN         GPIO_PC5
-/* SSI1 MicroSD MISO */
-#define GPIO_22_PIN         GPIO_PC6
-/* CC1200 Reset */
-#define GPIO_23_PIN         GPIO_PC7
-/* Power Management (shutdown) */
-#define GPIO_24_PIN         GPIO_PD0
-/* Power Management (done) */
-#define GPIO_25_PIN         GPIO_PD1
-/* RF SWITCH */
-#define GPIO_26_PIN         GPIO_PD2
-/* LED2 Blue/UART1 RTS */
-#define GPIO_27_PIN         GPIO_PD3
-/* LED1 Green/UART1 CTS */
-#define GPIO_28_PIN         GPIO_PD4
-/* LED3 Red */
-#define GPIO_29_PIN         GPIO_PD5
-
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

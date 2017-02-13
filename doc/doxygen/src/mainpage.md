@@ -43,7 +43,7 @@ RIOT is developed by an open community that anyone is welcome to join:
  - Follow us on [Twitter](https://twitter.com/RIOT_OS) for news from the RIOT
    community.
  - Contact us on IRC for live support and discussions:
-   [irc.freenode.org #riot-os](irc://irc.freenode.org/riot-os)
+   [irc.freenode.org \#riot-os](irc://irc.freenode.org/riot-os)
 
 
 The quickest start                                        {#the-quickest-start}
@@ -187,7 +187,7 @@ See @ref net for more details on networking code.
 pkg
 ---
 RIOT comes with support for a number of external libraries (e.g.
-[OpenWSN](http://www.openwsn.org/),
+[ccn-lite](https://github.com/cn-uofbasel/ccn-lite),
 [microcoap](https://github.com/1248/microcoap)). The way they are included is
 that RIOT ships with a custom Makefile for each supported library that
 downloads the library and optionally applies a number of patches to make it

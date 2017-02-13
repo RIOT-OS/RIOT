@@ -32,7 +32,7 @@ extern "C" {
 /**
  * @brief   asynchronus read callback type
  */
-typedef void (*native_async_read_callback_t)(int fd);
+typedef void (*native_async_read_callback_t)(int fd, void *arg);
 
 /**
  * @brief   initialize asynchronus read system
@@ -61,10 +61,11 @@ void native_async_read_continue(int fd);
  * @brief   start monitoring of file descriptor
  *
  * @param[in] fd       The file descriptor to monitor
+ * @param[in] arg      Pointer to be passed as arguments to the callback
  * @param[in] handler  The callback function to be called when the file
  *                     descriptor is ready to read.
  */
-void native_async_read_add_handler(int fd, native_async_read_callback_t handler);
+void native_async_read_add_handler(int fd, void *arg, native_async_read_callback_t handler);
 
 #ifdef __cplusplus
 }

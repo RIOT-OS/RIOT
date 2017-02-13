@@ -7,9 +7,6 @@ endif
 ifneq (,$(filter gnrc_conn_udp,$(USEMODULE)))
     DIRS += conn/udp
 endif
-ifneq (,$(filter gnrc_csma_sender,$(USEMODULE)))
-    DIRS += link_layer/csma_sender
-endif
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
     DIRS += network_layer/icmpv6
 endif
@@ -73,11 +70,17 @@ endif
 ifneq (,$(filter gnrc_nomac,$(USEMODULE)))
     DIRS += link_layer/nomac
 endif
+ifneq (,$(filter gnrc_mac,$(USEMODULE)))
+    DIRS += link_layer/gnrc_mac
+endif
 ifneq (,$(filter gnrc_pkt,$(USEMODULE)))
     DIRS += pkt
 endif
 ifneq (,$(filter gnrc_pktbuf_static,$(USEMODULE)))
     DIRS += pktbuf_static
+endif
+ifneq (,$(filter gnrc_priority_pktqueue,$(USEMODULE)))
+    DIRS += priority_pktqueue
 endif
 ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
     DIRS += pktdump
@@ -115,8 +118,20 @@ endif
 ifneq (,$(filter gnrc_slip,$(USEMODULE)))
     DIRS += link_layer/slip
 endif
+ifneq (,$(filter gnrc_sock,$(USEMODULE)))
+    DIRS += sock
+endif
+ifneq (,$(filter gnrc_sock_ip,$(USEMODULE)))
+    DIRS += sock/ip
+endif
+ifneq (,$(filter gnrc_sock_udp,$(USEMODULE)))
+    DIRS += sock/udp
+endif
 ifneq (,$(filter gnrc_udp,$(USEMODULE)))
     DIRS += transport_layer/udp
+endif
+ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
+    DIRS += transport_layer/tcp
 endif
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
     DIRS += application_layer/zep

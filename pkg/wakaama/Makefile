@@ -1,6 +1,7 @@
 PKG_NAME=wakaama
-PKG_URL=git://github.com/eclipse/wakaama.git
+PKG_URL=https://github.com/eclipse/wakaama.git
 PKG_VERSION=69a32cfae39f66fe4eec4cc8d1cd48ced7ad447c
+PKG_LICENSE=EDL-1.0,EPL-1.0
 
 .PHONY: all
 

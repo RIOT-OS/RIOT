@@ -46,7 +46,7 @@ uint32_t bitmap = (
 u8g2_Setup_ssd1306_128x64_noname_1(&u8g2, U8G2_R0, u8x8_byte_riotos_hw_spi, u8x8_gpio_and_delay_riotos);
 
 u8g2_SetPins(&u8g2, pins, bitmap);
-u8g2_SetDevice(&u8g2, SPI_0);
+u8g2_SetDevice(&u8g2, SPI_DEV(0));
 ```
 
 ## Virtual displays

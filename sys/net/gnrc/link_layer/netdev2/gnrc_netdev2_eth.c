@@ -35,7 +35,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
     gnrc_pktsnip_t *pkt = NULL;
 
-    if (bytes_expected) {
+    if (bytes_expected > 0) {
         pkt = gnrc_pktbuf_add(NULL, NULL,
                 bytes_expected,
                 GNRC_NETTYPE_UNDEF);
@@ -145,7 +145,7 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
     netdev2_t *dev = gnrc_netdev2->dev;
 
     if (pkt == NULL) {
-        DEBUG("gnrc_netdev2_eth: pkt was NULL");
+        DEBUG("gnrc_netdev2_eth: pkt was NULL\n");
         return -EINVAL;
     }
 

@@ -114,10 +114,11 @@ static void sha1_update_byte(sha1_context *ctx, uint8_t data)
     sha1_add_uncounted(ctx, data);
 }
 
-void sha1_update(sha1_context *ctx, const uint8_t *data, size_t len)
+void sha1_update(sha1_context *ctx, const void *data, size_t len)
 {
+    const uint8_t *d = data;
     while (len--) {
-        sha1_update_byte(ctx, *(data++));
+        sha1_update_byte(ctx, *(d++));
     }
 }
 
@@ -142,7 +143,7 @@ static void sha1_pad(sha1_context *s)
     sha1_add_uncounted(s, s->byte_count << 3);
 }
 
-void sha1_final(sha1_context *ctx, uint8_t *dst)
+void sha1_final(sha1_context *ctx, void *digest)
 {
     /* Pad to complete the last block */
     sha1_pad(ctx);
@@ -157,31 +158,32 @@ void sha1_final(sha1_context *ctx, uint8_t *dst)
     }
 
     /* Copy the content of the hash (20 characters) */
-    memcpy(dst, ctx->state, 20);
+    memcpy(digest, ctx->state, 20);
 }
 
-void sha1(uint8_t *dst, const uint8_t *src, size_t len)
+void sha1(void *digest, const void *data, size_t len)
 {
     sha1_context ctx;
 
     sha1_init(&ctx);
-    sha1_update(&ctx, (unsigned char *) src, len);
-    sha1_final(&ctx, dst);
+    sha1_update(&ctx, (unsigned char *) data, len);
+    sha1_final(&ctx, digest);
 }
 
 #define HMAC_IPAD 0x36
 #define HMAC_OPAD 0x5c
 
-void sha1_init_hmac(sha1_context *ctx, const uint8_t *key, size_t key_length)
+void sha1_init_hmac(sha1_context *ctx, const void *key, size_t key_length)
 {
     uint8_t i;
+    const uint8_t *k = key;
 
     memset(ctx->key_buffer, 0, SHA1_BLOCK_LENGTH);
     if (key_length > SHA1_BLOCK_LENGTH) {
         /* Hash long keys */
         sha1_init(ctx);
         while (key_length--) {
-            sha1_update_byte(ctx, *key++);
+            sha1_update_byte(ctx, *k++);
         }
         sha1_final(ctx, ctx->key_buffer);
     }
@@ -196,7 +198,7 @@ void sha1_init_hmac(sha1_context *ctx, const uint8_t *key, size_t key_length)
     }
 }
 
-void sha1_final_hmac(sha1_context *ctx, uint8_t *dst)
+void sha1_final_hmac(sha1_context *ctx, void *digest)
 {
     uint8_t i;
 
@@ -211,5 +213,5 @@ void sha1_final_hmac(sha1_context *ctx, uint8_t *dst)
         sha1_update_byte(ctx, ctx->inner_hash[i]);
     }
 
-    sha1_final(ctx, dst);
+    sha1_final(ctx, digest);
 }

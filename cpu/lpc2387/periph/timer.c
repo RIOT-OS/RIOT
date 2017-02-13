@@ -175,18 +175,6 @@ void timer_stop(tim_t tim)
     get_dev(tim)->TCR = 0;
 }
 
-void timer_irq_enable(tim_t tim)
-{
-    (void) tim;
-    /* TODO */
-}
-
-void timer_irq_disable(tim_t tim)
-{
-    (void) tim;
-    /* TODO */
-}
-
 static inline void isr_handler(lpc23xx_timer_t *dev, int tim_num)
 {
     for (unsigned i = 0; i < TIMER_CHAN_NUMOF; i++) {

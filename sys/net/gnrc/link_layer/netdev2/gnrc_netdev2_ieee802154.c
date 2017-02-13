@@ -144,9 +144,9 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
     netdev2_ieee802154_t *state = (netdev2_ieee802154_t *)gnrc_netdev2->dev;
     gnrc_netif_hdr_t *netif_hdr;
     gnrc_pktsnip_t *vec_snip;
-    uint8_t *src, *dst = NULL;
+    const uint8_t *src, *dst = NULL;
     int res = 0;
-    size_t n, src_len;
+    size_t n, src_len, dst_len;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
     uint8_t flags = (uint8_t)(state->flags & NETDEV2_IEEE802154_SEND_MASK);
     le_uint16_t dev_pan = byteorder_btols(byteorder_htons(state->pan));
@@ -164,10 +164,12 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
     /* prepare destination address */
     if (netif_hdr->flags & /* If any of these flags is set so this is correct */
         (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-        flags |= IEEE802154_BCAST;
+        dst = ieee802154_addr_bcast;
+        dst_len = IEEE802154_ADDR_BCAST_LEN;
     }
     else {
         dst = gnrc_netif_hdr_get_dst_addr(netif_hdr);
+        dst_len = netif_hdr->dst_l2addr_len;
     }
     src_len = netif_hdr->src_l2addr_len;
     if (src_len > 0) {
@@ -183,9 +185,8 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
     }
     /* fill MAC header, seq should be set by device */
     if ((res = ieee802154_set_frame_hdr(mhr, src, src_len,
-                                        dst, netif_hdr->dst_l2addr_len,
-                                        dev_pan, dev_pan, flags,
-                                        state->seq++)) == 0) {
+                                        dst, dst_len, dev_pan,
+                                        dev_pan, flags, state->seq++)) == 0) {
         DEBUG("_send_ieee802154: Error preperaring frame\n");
         return -EINVAL;
     }
@@ -199,7 +200,8 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
         vector[0].iov_base = mhr;
         vector[0].iov_len = (size_t)res;
 #ifdef MODULE_NETSTATS_L2
-        if (flags & IEEE802154_BCAST) {
+    if (netif_hdr->flags &
+        (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
             gnrc_netdev2->dev->stats.tx_mcast_count++;
         }
         else {

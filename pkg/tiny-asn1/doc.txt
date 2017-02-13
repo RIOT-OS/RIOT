@@ -1,0 +1,6 @@
+/**
+ * @defgroup tiny-asn1 tiny-asn1
+ * @ingroup pkg
+ * @brief   Lightweight ASN.1 decoding/encoding library
+ * @see     https://gitlab.com/matthegap/tiny-asn1
+ */

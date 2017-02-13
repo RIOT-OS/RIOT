@@ -1,2 +1,3 @@
 #!/bin/sh
-find ${1} -name "*.[ch]" | xargs sed -i 's/util_print("\(.*\)")/util_print("\1", NULL)/g'
+. ${RIOTBASE}/pkg/relic/os_util.sh
+find ${1} -type f -name "*.[ch]" -exec ${SEDBIN} 's/util_print("\(.*\)")/util_print("\1", NULL)/g' {} +

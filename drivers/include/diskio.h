@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    drivers_diskio Disk IO Driver
- * @ingroup     drivers
+ * @ingroup     drivers_storage
  * @brief       Low level disk interface
  *
  * The connection between the MCU and the SRF08 is based on the i2c-interface.
@@ -21,8 +21,8 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef DISKIO_H_
-#define DISKIO_H_
+#ifndef DISKIO_H
+#define DISKIO_H
 
 #include <stdint.h>
 
@@ -165,4 +165,4 @@ diskio_result_t mci_ioctl(unsigned char ctrl, void *buff);
 #endif
 
 /** @} */
-#endif /* DISKIO_H_ */
+#endif /* DISKIO_H */

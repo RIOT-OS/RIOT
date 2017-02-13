@@ -20,7 +20,7 @@
  * @}
  */
 
-#include "periph/cpuid.h"
+#include "uuid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/gnrc.h"
@@ -32,36 +32,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/**
- * @todo    Move this function to a global module
- */
-#if CPUID_ID_LEN
-static void addr_from_cpuid(uint8_t *addr)
-{
-    /* option 1: generate addresses from CPUID */
-    uint8_t cpuid[CPUID_ID_LEN];
-
-    cpuid_get(cpuid);
-    memcpy(addr, cpuid, 8);
-
-#if CPUID_ID_LEN < 8
-    /* in case CPUID_ID_LEN < 8, fill missing bytes with zeros */
-    for (int i = CPUID_ID_LEN; i < 8; i++) {
-        addr_long[i] = 0;
-    }
-#else
-    /* in case CPUID_ID_LEN > 8, XOR those bytes on top of the first 8 */
-    for (int i = 8; i < CPUID_ID_LEN; i++) {
-        addr_long[i & 0x07] ^= cpuid[i];
-    }
-#endif
-
-    /* make sure we mark the address as non-multicast and not globally unique */
-    addr_long[0] &= ~(0x01);
-    addr_long[0] |= 0x02;
-}
-#endif
-
 
 void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params)
 {
@@ -72,28 +42,27 @@ void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params)
     dev->state = CC2420_STATE_IDLE;
     /* reset device descriptor fields */
     dev->options = 0;
-    spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING, dev->params.spi_clk);
 }
 
 int cc2420_init(cc2420_t *dev)
 {
     uint16_t reg;
-    uint8_t addr[8] = CC2420_ADDR_FALLBACK;
+    uint8_t addr[8];
 
     /* reset options and sequence number */
     dev->netdev.seq = 0;
     dev->netdev.flags = 0;
 
     /* set default address, channel, PAN ID, and TX power */
-#if CPUID_ID_LEN
-    addr_from_cpuid(addr);
-#endif
+    uuid_get(addr, sizeof(addr));
+    /* make sure we mark the address as non-multicast and not globally unique */
+    addr[0] &= ~(0x01);
+    addr[0] |= 0x02;
     cc2420_set_addr_short(dev, &addr[6]);
     cc2420_set_addr_long(dev, addr);
     cc2420_set_pan(dev, CC2420_PANID_DEFAULT);
     cc2420_set_chan(dev, CC2420_CHAN_DEFAULT);
     cc2420_set_txpower(dev, CC2420_TXPOWER_DEFAULT);
-
 
     /* set default options */
     cc2420_set_option(dev, CC2420_OPT_AUTOACK, true);
@@ -124,14 +93,16 @@ int cc2420_init(cc2420_t *dev)
     reg &= ~CC2420_SECCTRL0_RXFIFO_PROT;
     cc2420_reg_write(dev, CC2420_REG_SECCTRL0, reg);
 
-    /* go into RX state */
-    cc2420_set_state(dev, CC2420_GOTO_RX);
-
     /* set preamble length to 3 leading zero byte */
+    /* and turn on hardware CRC generation */
     reg = cc2420_reg_read(dev, CC2420_REG_MDMCTRL0);
     reg &= ~(CC2420_MDMCTRL0_PREAMBLE_M);
     reg |= CC2420_MDMCTRL0_PREAMBLE_3B;
+    reg |= CC2420_MDMCTRL0_AUTOCRC;
     cc2420_reg_write(dev, CC2420_REG_MDMCTRL0, reg);
+
+    /* go into RX state */
+    cc2420_set_state(dev, CC2420_GOTO_RX);
 
     return 0;
 }
@@ -143,7 +114,7 @@ bool cc2420_cca(cc2420_t *dev)
     return gpio_read(dev->params.pin_cca);
 }
 
-size_t cc2420_send(cc2420_t *dev, const struct iovec *data, int count)
+size_t cc2420_send(cc2420_t *dev, const struct iovec *data, unsigned count)
 {
     size_t n = cc2420_tx_prepare(dev, data, count);
 
@@ -154,15 +125,16 @@ size_t cc2420_send(cc2420_t *dev, const struct iovec *data, int count)
     return n;
 }
 
-size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, int count)
+size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, unsigned count)
 {
     size_t pkt_len = 2;     /* include the FCS (frame check sequence) */
 
     /* wait for any ongoing transmissions to be finished */
+    DEBUG("cc2420: tx_exec: waiting for any ongoing transmission\n");
     while (cc2420_get_state(dev) & NETOPT_STATE_TX) {}
 
     /* get and check the length of the packet */
-    for (int i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
         pkt_len += data[i].iov_len;
     }
     if (pkt_len >= CC2420_PKT_MAXLEN) {
@@ -185,9 +157,6 @@ size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, int count)
 
 void cc2420_tx_exec(cc2420_t *dev)
 {
-    /* make sure, any ongoing transmission is finished */
-    DEBUG("cc2420: tx_exec: waiting for any ongoing transmission\n");
-    while (cc2420_get_state(dev) & NETOPT_STATE_TX) {}
     /* trigger the transmission */
     if (dev->options & CC2420_OPT_TELL_TX_START) {
         dev->netdev.netdev.event_callback(&dev->netdev.netdev,
@@ -202,35 +171,28 @@ void cc2420_tx_exec(cc2420_t *dev)
         DEBUG("cc2420: tx_exec: triggering TX without CCA\n");
         cc2420_strobe(dev, CC2420_STROBE_TXON);
     }
-
-    while (gpio_read(dev->params.pin_sfd)) {
-        puts("\t...ongoing}");
-    }
-    if (dev->options & CC2420_OPT_TELL_TX_END) {
-        dev->netdev.netdev.event_callback(&dev->netdev.netdev,
-                                          NETDEV2_EVENT_TX_COMPLETE);
-    }
-    DEBUG("cc2420: tx_exec: TX_DONE\n");
 }
 
 int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
 {
     uint8_t len;
+    uint8_t crc_corr;
 
-    /* get the packet length (without dropping it) (first byte in RX FIFO */
-    cc2420_ram_read(dev, CC2420_RAM_RXFIFO, &len, 1);
-    len -= 2;   /* subtract RSSI and FCF */
-
-    if (!buf) {
+    /* without a provided buffer, only readout the length and return it */
+    if (buf == NULL) {
+        /* get the packet length (without dropping it) (first byte in RX FIFO) */
+        cc2420_ram_read(dev, CC2420_RAM_RXFIFO, &len, 1);
+        len -= 2;   /* subtract RSSI and FCF */
         DEBUG("cc2420: recv: packet of length %i in RX FIFO\n", (int)len);
     }
+    else {
+        /* read length byte */
+        cc2420_fifo_read(dev, &len, 1);
+        len -= 2;   /* subtract RSSI and FCF */
 
-    /* if a buffer is given, read (and drop) the packet */
-    if (buf) {
+        /* if a buffer is given, read (and drop) the packet */
         len = (len > max_len) ? max_len : len;
 
-        /* drop length byte */
-        cc2420_fifo_read(dev, NULL, 1);
         /* read fifo contents */
         DEBUG("cc2420: recv: reading %i byte of the packet\n", (int)len);
         cc2420_fifo_read(dev, buf, len);
@@ -238,6 +200,15 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
         uint8_t rssi;
         cc2420_fifo_read(dev, &rssi, 1);
         DEBUG("cc2420: recv: RSSI is %i\n", (int)rssi);
+
+        /* fetch and check if CRC_OK bit (MSB) is set */
+        cc2420_fifo_read(dev, &crc_corr, 1);
+        if (!(crc_corr & 0x80)) {
+            DEBUG("cc2420: recv: CRC_OK bit not set, dropping packet\n");
+            /* drop the corrupted frame from the RXFIFO */
+            len = 0;
+        }
+
         /* finally flush the FIFO */
         cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
         cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);

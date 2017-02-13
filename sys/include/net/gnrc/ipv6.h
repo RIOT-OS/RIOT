@@ -26,8 +26,8 @@
  */
 
 
-#ifndef GNRC_IPV6_H_
-#define GNRC_IPV6_H_
+#ifndef GNRC_IPV6_H
+#define GNRC_IPV6_H
 
 #include "kernel_types.h"
 #include "net/gnrc.h"
@@ -134,11 +134,24 @@ kernel_pid_t gnrc_ipv6_init(void);
  */
 void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt, uint8_t nh);
 
+/**
+ * @brief   Get the IPv6 header from a given list of @ref gnrc_pktsnip_t
+ *
+ *          This function may be used with e.g. a pointer to a (full) UDP datagram.
+ *
+ * @param[in] pkt    The pointer to the first @ref gnrc_pktsnip_t of the
+ *                   packet.
+ *
+ * @return A pointer to the @ref ipv6_hdr_t of the packet.
+ * @return NULL if the packet does not contain an IPv6 header.
+ */
+ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GNRC_IPV6_H_ */
+#endif /* GNRC_IPV6_H */
 /**
  * @}
  */

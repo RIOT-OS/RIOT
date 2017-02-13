@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef STELLARIS_HW_TYPES_H_
-#define STELLARIS_HW_TYPES_H_
+#ifndef STELLARIS_HW_TYPES_H
+#define STELLARIS_HW_TYPES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -223,4 +223,4 @@ typedef unsigned char tBoolean;
 }
 #endif
 
-#endif /* STELLARIS_HW_TYPES_H_ */
+#endif /* STELLARIS_HW_TYPES_H */

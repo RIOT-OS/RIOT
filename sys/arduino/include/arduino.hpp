@@ -80,7 +80,7 @@ int digitalRead(int pin);
  *
  * @param[in] msec      number of milliseconds to sleep
  */
-void delay(int msec);
+void delay(unsigned long msec);
 
 #endif /* ARDUINO_H */
 /** @} */

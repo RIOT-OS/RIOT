@@ -133,8 +133,8 @@ static int test_receive(void)
     ethernet_hdr_t *rcv_mac = (ethernet_hdr_t *)_tmp;
     uint8_t *rcv_payload = _tmp + sizeof(ethernet_hdr_t);
     gnrc_pktsnip_t *pkt, *hdr;
-    gnrc_netreg_entry_t me = { NULL, GNRC_NETREG_DEMUX_CTX_ALL,
-                               thread_getpid() };
+    gnrc_netreg_entry_t me = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                        sched_active_pid);
     msg_t msg;
 
     if (_dev.netdev.event_callback == NULL) {

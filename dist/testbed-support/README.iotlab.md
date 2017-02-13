@@ -33,6 +33,7 @@ brackets):
  * IOTLAB_EXP_ID (taken from first experiment in running state)
  * IOTLAB_EXP_NAME (RIOT_EXP)
  * IOTLAB_PHY_NODES
+ * IOTLAB_PROFILE
  * IOTLAB_EXCLUDE_NODES
  * IOTLAB_LOGGING
 
@@ -57,9 +58,9 @@ if `IOTLAB_EXP_ID` is not set.
 
 This schedules a new experiment on the FIT IoT-LAB and waits until it enters
 "Running" state. It will request `IOTLAB_NODES` nodes of type `IOTLAB_TYPE`
-for `IOTLAB_DURATION` minutes at site `IOTLAB_SITE`. With `IOTLAB_PHY_NODES`
-it is possible to choose specific nodes for this experiment by using the resource id
-string format as described above.
+for `IOTLAB_DURATION` minutes at site `IOTLAB_SITE` using `IOTLAB_PROFILE`
+(if provided). With `IOTLAB_PHY_NODES` it is possible to choose specific nodes
+for this experiment by using the resource id string format as described above.
 Note that the usage of `IOTLAB_PHY_NODES` ignores `IOTLAB_NODES`. It will also flash the
 binary of the current application to all registered nodes. The name of the
 experiment is set to "RIOT_EXP" or "RIOT_EXP_$(IOTLAB_EXP_NAME)"

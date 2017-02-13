@@ -26,13 +26,6 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 
-#include "periph_conf.h"
-#include "saml21_periph.h"
-
-#include "sched.h"
-#include "thread.h"
-#include "panic.h"
-
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -221,8 +214,5 @@ void isr_eic(void)
             gpio_config[i].cb(gpio_config[i].arg);
         }
     }
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

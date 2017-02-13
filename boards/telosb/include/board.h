@@ -25,8 +25,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef TELOSB_BOARD_H_
-#define TELOSB_BOARD_H_
+#ifndef TELOSB_BOARD_H
+#define TELOSB_BOARD_H
 
 #include "cpu.h"
 
@@ -99,9 +99,22 @@ extern "C" {
 #define LED2_TOGGLE                 (LED_OUT_REG ^= LED2_MASK)
 /** @} */
 
+/**
+ * @brief   Definition of the interface to the CC2420 radio
+ */
+#define CC2420_PARAMS_BOARD   {.spi        = SPI_DEV(0), \
+                               .spi_clk    = SPI_CLK_1MHZ , \
+                               .pin_cs     = GPIO_PIN(P4, 2), \
+                               .pin_fifo   = GPIO_PIN(P1, 3), \
+                               .pin_fifop  = GPIO_PIN(P1, 0), \
+                               .pin_cca    = GPIO_PIN(P1, 4), \
+                               .pin_sfd    = GPIO_PIN(P4, 1), \
+                               .pin_vrefen = GPIO_PIN(P4, 5), \
+                               .pin_reset  = GPIO_PIN(P4, 6)}
+
 #ifdef __cplusplus
 }
 #endif
 
 /** @} */
-#endif /*  TELOSB_BOARD_H_ */
+#endif /*  TELOSB_BOARD_H */

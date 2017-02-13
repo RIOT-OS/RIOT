@@ -21,6 +21,7 @@
  */
 
 #include <string.h>
+#include <errno.h>
 
 #include "cc2420.h"
 #include "cc2420_internal.h"

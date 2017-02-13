@@ -26,7 +26,6 @@
 #include "msba2_common.h"
 #include "lpc23xx.h"
 #include "cpu.h"
-#include "config.h"
 
 #define CL_CPU_DIV      4
 

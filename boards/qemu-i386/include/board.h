@@ -18,8 +18,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef QEMU_I386_BOARD_H_
-#define QEMU_I386_BOARD_H_
+#ifndef QEMU_I386_BOARD_H
+#define QEMU_I386_BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +37,7 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* QEMU_I386_BOARD_H */
 
 /**
  * @}

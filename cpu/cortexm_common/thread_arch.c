@@ -296,17 +296,12 @@ void thread_arch_yield(void)
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
-__attribute__((naked)) void arch_context_switch(void)
-{
+void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     __asm__ volatile (
     /* PendSV handler entry point */
-    ".global isr_pendsv               \n"
-    ".thumb_func                      \n"
-    "isr_pendsv:                      \n"
     /* save context by pushing unsaved registers to the stack */
     /* {r0-r3,r12,LR,PC,xPSR} are saved automatically on exception entry */
     ".thumb_func                      \n"
-    "context_save:"
     "mrs    r0, psp                   \n" /* get stack pointer from user mode */
 #if defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS)
     "mov    r12, sp                   \n" /* remember the exception SP */
@@ -332,11 +327,15 @@ __attribute__((naked)) void arch_context_switch(void)
     "ldr    r1, =sched_active_thread  \n" /* load address of current tcb */
     "ldr    r1, [r1]                  \n" /* dereference pdc */
     "str    r0, [r1]                  \n" /* write r0 to pdc->sp */
+    "bl     isr_svc                   \n" /* continue with svc */
+    );
+}
+
+void __attribute__((naked)) __attribute__((used)) isr_svc(void) {
+    __asm__ volatile (
     /* SVC handler entry point */
-    /* PendSV will continue from above and through this part as well */
-    ".global isr_svc                  \n"
+    /* PendSV will continue here as well (via jump) */
     ".thumb_func                      \n"
-    "isr_svc:                         \n"
     /* perform scheduling */
     "bl     sched_run                 \n"
     /* restore context and return from exception */

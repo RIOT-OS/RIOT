@@ -1,5 +1,6 @@
 export CPU       = cc26x0
 export CPU_MODEL = cc26x0f128
+export XDEBUGGER  = XDS110
 
 # set default port depending on operating system
 PORT_LINUX  ?= /dev/ttyACM0
@@ -11,4 +12,16 @@ include $(RIOTBOARD)/Makefile.include.serial
 # configure the flash tool
 export UNIFLASH_PATH ?= "UNIFLASH_PATH unconfigured"
 export FLASHER = $(UNIFLASH_PATH)/uniflash.sh
-export FFLAGS  = -ccxml $(RIOTBOARD)/$(BOARD)/dist/cc26x0stk.ccxml -program $(ELFFILE)
+export FFLAGS  = -ccxml $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml -program $(ELFFILE)
+
+# configure the debug server
+export DEBUGSERVER = $(UNIFLASH_PATH)/ccs_base/common/uscif/gdb_agent_console
+export DEBUGSERVER_FLAGS = -p 3333 $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).dat
+
+# configure the debugging tool
+export DEBUGGER = $(PREFIX)gdb
+export DEBUGGER_FLAGS = -x $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_gdb.conf $(ELFFILE)
+
+# configure uniflash for resetting target
+export RESET = $(UNIFLASH_PATH)/uniflash.sh
+export RESET_FLAGS = -ccxml $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml -reset

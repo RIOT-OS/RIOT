@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2017 TriaGnoSys GmbH
+ *               2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,10 +19,11 @@
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  René Kijewski <kijewski@inf.fu-berlin.de>
+ * @author  Víctor Ariño <victor.arino@zii.aero>
  */
 
-#ifndef POSIX_SEMAPHORE_H_
-#define POSIX_SEMAPHORE_H_
+#ifndef POSIX_SEMAPHORE_H
+#define POSIX_SEMAPHORE_H
 
 #include <errno.h>
 #include <time.h>
@@ -62,12 +64,8 @@ typedef sema_t sem_t;
  */
 static inline int sem_init(sem_t *sem, int pshared, unsigned value)
 {
-    int res = sema_create((sema_t *)sem, value);
+    sema_create((sema_t *)sem, value);
     (void)pshared;
-    if (res < 0) {
-        errno = -res;
-        return -1;
-    }
     return 0;
 }
 
@@ -94,11 +92,7 @@ static inline int sem_init(sem_t *sem, int pshared, unsigned value)
  */
 static inline int sem_destroy(sem_t *sem)
 {
-    int res = sema_destroy((sema_t *)sem);
-    if (res < 0) {
-        errno = -res;
-        return -1;
-    }
+    sema_destroy((sema_t *)sem);
     return 0;
 }
 
@@ -127,6 +121,7 @@ static inline int sem_destroy(sem_t *sem)
 static inline int sem_post(sem_t *sem)
 {
     int res = sema_post((sema_t *)sem);
+
     if (res < 0) {
         errno = -res;
         return -1;
@@ -154,6 +149,7 @@ static inline int sem_post(sem_t *sem)
 static inline int sem_wait(sem_t *sem)
 {
     int res = sema_wait((sema_t *)sem);
+
     if (res < 0) {
         errno = -res;
         return -1;
@@ -257,7 +253,16 @@ int sem_timedwait(sem_t *sem, const struct timespec *abstime);
  * @return  0 on success.
  * @return  -1, on error and errno set to indicate the error.
  */
-int sem_trywait(sem_t *sem);
+static inline int sem_trywait(sem_t *sem)
+{
+    int res = sema_try_wait((sema_t *)sem);
+
+    if (res < 0) {
+        errno = -res;
+        return -1;
+    }
+    return 0;
+}
 
 /**
  * @brief Get current value of @p sem and store it in @p sval.
@@ -286,5 +291,5 @@ static inline int sem_getvalue(sem_t *sem, int *sval)
 }
 #endif
 
-#endif  /* POSIX_SEMAPHORE_H_ */
+#endif  /* POSIX_SEMAPHORE_H */
 /** @} */

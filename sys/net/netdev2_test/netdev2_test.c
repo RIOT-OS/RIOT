@@ -19,8 +19,8 @@
 
 #include "net/netdev2_test.h"
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, int count);
-static int _recv(netdev2_t *netdev, char *buf, int len, void *info);
+static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count);
+static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev2_t *dev);
 static void _isr(netdev2_t *dev);
 static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len);
@@ -57,10 +57,10 @@ void netdev2_test_reset(netdev2_test_t *dev)
     mutex_unlock(&dev->mutex);
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
+static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
 {
     netdev2_test_t *dev = (netdev2_test_t *)netdev;
-    int res = count;    /* assume everything would be fine */
+    int res = (int)count;   /* assume everything would be fine */
 
     mutex_lock(&dev->mutex);
     if (dev->send_cb != NULL) {
@@ -70,7 +70,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
     return res;
 }
 
-static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
+static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
 {
     netdev2_test_t *dev = (netdev2_test_t *)netdev;
     int res = (buf == NULL) ? 0 : len;  /* assume everything would be fine */

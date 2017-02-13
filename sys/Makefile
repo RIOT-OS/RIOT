@@ -1,3 +1,6 @@
+ifneq (,$(filter csma_sender,$(USEMODULE)))
+    DIRS += net/link_layer/csma_sender
+endif
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
     DIRS += posix/semaphore
 endif
@@ -24,6 +27,9 @@ ifneq (,$(filter ieee802154,$(USEMODULE)))
 endif
 ifneq (,$(filter netdev2_test,$(USEMODULE)))
     DIRS += net/netdev2_test
+endif
+ifneq (,$(filter icmpv6,$(USEMODULE)))
+    DIRS += net/network_layer/icmpv6
 endif
 ifneq (,$(filter ipv4_addr,$(USEMODULE)))
     DIRS += net/network_layer/ipv4/addr
@@ -73,6 +79,9 @@ endif
 ifneq (,$(filter udp,$(USEMODULE)))
     DIRS += net/transport_layer/udp
 endif
+ifneq (,$(filter tcp,$(USEMODULE)))
+    DIRS += net/transport_layer/tcp
+endif
 
 ifneq (,$(filter hamming256,$(USEMODULE)))
     DIRS += ecc/hamming256
@@ -86,11 +95,18 @@ ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
     DIRS += net/gnrc/application_layer/uhcpc
 endif
 
+ifneq (,$(filter sntp,$(USEMODULE)))
+    DIRS += net/application_layer/sntp
+endif
+
 ifneq (,$(filter netopt,$(USEMODULE)))
     DIRS += net/crosslayer/netopt
 endif
 ifneq (,$(filter sema,$(USEMODULE)))
     DIRS += sema
+endif
+ifneq (,$(filter gcoap,$(USEMODULE)))
+    DIRS += net/application_layer/coap
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))

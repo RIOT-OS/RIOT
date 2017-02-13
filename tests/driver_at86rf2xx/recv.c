@@ -34,7 +34,7 @@ void recv(netdev2_t *dev)
     le_uint16_t src_pan, dst_pan;
 
     putchar('\n');
-    data_len = dev->driver->recv(dev, (char *)buffer, sizeof(buffer), &rx_info);
+    data_len = dev->driver->recv(dev, buffer, sizeof(buffer), &rx_info);
     mhr_len = ieee802154_get_frame_hdr_len(buffer);
     if (mhr_len == 0) {
         puts("Unexpected MHR for incoming packet");
@@ -87,7 +87,7 @@ void recv(netdev2_t *dev)
         printf("0, ");
     }
     printf("PAN comp.: ");
-    if (buffer[0] & IEEE802154_FCF_ACK_REQ) {
+    if (buffer[0] & IEEE802154_FCF_PAN_COMP) {
         puts("1");
     }
     else {

@@ -19,6 +19,7 @@
  */
 
 #include <stdio.h>
+#include <stdint.h>
 
 #include "board.h"
 #include "periph_conf.h"

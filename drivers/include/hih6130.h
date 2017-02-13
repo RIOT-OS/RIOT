@@ -20,8 +20,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef HIH6130_H_
-#define HIH6130_H_
+#ifndef HIH6130_H
+#define HIH6130_H
 
 #include <stdint.h>
 
@@ -66,5 +66,5 @@ int hih6130_get_humidity_temperature_float(hih6130_t *dev,
 }
 #endif
 
-#endif /* HIH6130_H_ */
+#endif /* HIH6130_H */
 /** @} */

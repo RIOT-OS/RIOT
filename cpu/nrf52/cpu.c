@@ -24,6 +24,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph/init.h"
 
 /* FTPAN helper functions */
 static bool ftpan_32(void);
@@ -82,6 +83,9 @@ void cpu_init(void)
     NVIC_EnableIRQ(SWI0_EGU0_IRQn);
     NVIC_SetPriority(SWI0_EGU0_IRQn, 6);
 #endif
+
+    /* trigger static peripheral initialization */
+    periph_init();
 }
 
 /**

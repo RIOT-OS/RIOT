@@ -211,9 +211,9 @@ static void _nhdp_add_message_tlvs_cb(struct rfc5444_writer *wr)
 {
     uint8_t validity_time, interval_time;
     /* Convert validity time and interval time to milliseconds */
-    uint64_t val_tmp = (uint64_t) nhdp_wr_curr_if_entry->validity_time.seconds * SEC_IN_MS
+    uint64_t val_tmp = (uint64_t) nhdp_wr_curr_if_entry->validity_time.seconds * MS_PER_SEC
                        + (nhdp_wr_curr_if_entry->validity_time.microseconds / 1000ULL);
-    uint64_t int_tmp = (uint64_t) nhdp_wr_curr_if_entry->hello_interval.seconds * SEC_IN_MS
+    uint64_t int_tmp = (uint64_t) nhdp_wr_curr_if_entry->hello_interval.seconds * MS_PER_SEC
                        + (nhdp_wr_curr_if_entry->hello_interval.microseconds / 1000ULL);
 
     /* Add validity time (mandatory) and interval time to msg */

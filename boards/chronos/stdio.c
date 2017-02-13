@@ -25,6 +25,7 @@
 
 static void _dummy(int c)
 {
+    (void)c;
 }
 
 void (*_putchar)(int c) = _dummy;
@@ -43,5 +44,8 @@ int getchar(void)
 
 ssize_t write(int fildes, const void *buf, size_t nbyte)
 {
+    (void)fildes;
+    (void)buf;
+    (void)nbyte;
     return -1;
 }

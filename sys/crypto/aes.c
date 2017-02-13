@@ -727,7 +727,7 @@ int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize)
     // Make sure that context is large enough. If this is not the case,
     // you should build with -DAES
     if(CIPHER_MAX_CONTEXT_SIZE < AES_KEY_SIZE) {
-        return 0;
+        return CIPHER_ERR_BAD_CONTEXT_SIZE;
     }
 
     //key must be at least CIPHERS_MAX_KEY_SIZE Bytes long
@@ -743,7 +743,7 @@ int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize)
         }
     }
 
-    return 1;
+    return CIPHER_INIT_SUCCESS;
 }
 
 /**

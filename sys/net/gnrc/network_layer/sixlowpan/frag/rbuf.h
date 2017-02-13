@@ -16,8 +16,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_H_
-#define GNRC_SIXLOWPAN_FRAG_RBUF_H_
+#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_H
+#define GNRC_SIXLOWPAN_FRAG_RBUF_H
 
 #include <inttypes.h>
 
@@ -32,7 +32,7 @@ extern "C" {
 
 #define RBUF_L2ADDR_MAX_LEN (8U)               /**< maximum length for link-layer addresses */
 #define RBUF_SIZE           (4U)               /**< size of the reassembly buffer */
-#define RBUF_TIMEOUT        (3U * SEC_IN_USEC) /**< timeout for reassembly in microseconds */
+#define RBUF_TIMEOUT        (3U * US_PER_SEC) /**< timeout for reassembly in microseconds */
 
 /**
  * @brief   Fragment intervals to identify limits of fragments.
@@ -104,5 +104,5 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *frag,
 }
 #endif
 
-#endif /* GNRC_SIXLOWPAN_FRAG_RBUF_H_ */
+#endif /* GNRC_SIXLOWPAN_FRAG_RBUF_H */
 /** @} */

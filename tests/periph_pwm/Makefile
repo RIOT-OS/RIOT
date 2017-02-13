@@ -1,4 +1,4 @@
-export APPLICATION = periph_pwm
+APPLICATION = periph_pwm
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_pwm

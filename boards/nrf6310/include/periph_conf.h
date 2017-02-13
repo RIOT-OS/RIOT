@@ -100,26 +100,26 @@ static const timer_conf_t timer_config[] = {
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF           (2U)
-#define SPI_0_EN            1
-#define SPI_1_EN            1
-#define SPI_IRQ_PRIO        1
+static const spi_conf_t spi_config[] = {
+    {
+        .dev  = NRF_SPI0,
+        .sclk = 23,
+        .mosi = 22,
+        .miso = 20
+    },
+    {
+        .dev  = NRF_SPI1,
+        .sclk = 16,
+        .mosi = 17,
+        .miso = 18
+    }
+};
 
-/* SPI Master 0 pin configuration */
-#define SPI_0_DEV           NRF_SPI0
-#define SPI_0_PIN_SCK       23
-#define SPI_0_PIN_MISO      22
-#define SPI_0_PIN_MOSI      20
-
-/* SPI Master 1 pin configuration */
-#define SPI_1_DEV           NRF_SPI1
-#define SPI_1_PIN_SCK       16
-#define SPI_1_PIN_MISO      17
-#define SPI_1_PIN_MOSI      18
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  *
  * The configuration consists simply of a list of channels that should be used
  * @{

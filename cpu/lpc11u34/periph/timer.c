@@ -20,8 +20,6 @@
 #include <stdint.h>
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph_conf.h"
 #include "periph/timer.h"
 
@@ -130,20 +128,6 @@ void timer_stop(tim_t dev)
     }
 }
 
-void timer_irq_enable(tim_t dev)
-{
-    if (dev == TIMER_0) {
-        NVIC_EnableIRQ(TIMER_0_IRQ);
-    }
-}
-
-void timer_irq_disable(tim_t dev)
-{
-    if (dev == TIMER_0) {
-        NVIC_DisableIRQ(TIMER_0_IRQ);
-    }
-}
-
 void TIMER_0_ISR(void)
 {
     if (TIMER_0_DEV->IR & MR0_FLAG) {
@@ -166,9 +150,7 @@ void TIMER_0_ISR(void)
         TIMER_0_DEV->MCR &= ~(1 << 9);
         config[TIMER_0].cb(config[TIMER_0].arg, 3);
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #endif /* TIMER_0_EN */

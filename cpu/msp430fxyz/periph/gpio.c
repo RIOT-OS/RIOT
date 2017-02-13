@@ -88,11 +88,13 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     }
 
     /* reset pin and output value */
-    port->DIR &= ~(_pin(pin));
-    port->OD &= ~(_pin(pin));
     if (mode == GPIO_OUT) {
         port->DIR |= _pin(pin);
     }
+    else {
+        port->DIR &= ~(_pin(pin));
+    }
+    port->OD &= ~(_pin(pin));
 
     return 0;
 }

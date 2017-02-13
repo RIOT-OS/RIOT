@@ -25,6 +25,7 @@
 
 #include "cib.h"
 #include "kernel_types.h"
+#include "mbox.h"
 #include "mutex.h"
 #include "random.h"
 #include "sema.h"
@@ -38,12 +39,8 @@ extern "C" {
 #define SYS_MBOX_SIZE       (8)
 
 typedef struct {
-    cib_t cib;
-    void *msgs[SYS_MBOX_SIZE];
-    mutex_t mutex;
-    sema_t not_empty;
-    sema_t not_full;
-    volatile int waiting;
+    mbox_t mbox;
+    msg_t msgs[SYS_MBOX_SIZE];
 } sys_mbox_t;
 
 typedef mutex_t sys_mutex_t;
@@ -62,13 +59,13 @@ static inline bool sys_sem_valid(sys_sem_t *sem)
 
 static inline bool sys_mbox_valid(sys_mbox_t *mbox)
 {
-    return (mbox != NULL) && (mbox->cib.mask != 0);
+    return (mbox != NULL) && (mbox->mbox.cib.mask != 0);
 }
 
 static inline void sys_mbox_set_invalid(sys_mbox_t *mbox)
 {
     if (mbox != NULL) {
-        mbox->cib.mask = 0;
+        mbox->mbox.cib.mask = 0;
     }
 }
 

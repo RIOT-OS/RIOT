@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef LPC2387ADC_H_
-#define LPC2387ADC_H_
+#ifndef LPC2387ADC_H
+#define LPC2387ADC_H
 
 /**
  * @defgroup    lpc2387_adc     LPC2387 ADC
@@ -51,4 +51,4 @@ void adc_init_2(void);
 #endif
 
 /** @} */
-#endif /* LPC2387ADC_H_ */
+#endif /* LPC2387ADC_H */

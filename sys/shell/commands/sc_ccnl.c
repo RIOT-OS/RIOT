@@ -39,9 +39,6 @@ static unsigned char _cont_buf[BUF_SIZE];
 static const char *_default_content = "Start the RIOT!";
 static unsigned char _out[CCNL_MAX_PACKET_SIZE];
 
-/* check for one-time initialization */
-static bool started = false;
-
 /* usage for open command */
 static void _open_usage(void)
 {
@@ -51,8 +48,8 @@ static void _open_usage(void)
 int _ccnl_open(int argc, char **argv)
 {
     /* check if already running */
-    if (started) {
-        puts("Already opened an interface for CCN!");
+    if (ccnl_relay.ifcount >= CCNL_MAX_INTERFACES) {
+        puts("Already opened max. number of interfaces for CCN!");
         return -1;
     }
 
@@ -77,8 +74,6 @@ int _ccnl_open(int argc, char **argv)
         puts("Error registering at network interface!");
         return -1;
     }
-
-    started = true;
 
     return 0;
 }
@@ -148,11 +143,10 @@ int _ccnl_content(int argc, char **argv)
 static struct ccnl_face_s *_intern_face_get(char *addr_str)
 {
     /* initialize address with 0xFF for broadcast */
-    size_t addr_len = MAX_ADDR_LEN;
     uint8_t relay_addr[MAX_ADDR_LEN];
     memset(relay_addr, UINT8_MAX, MAX_ADDR_LEN);
+    size_t addr_len = gnrc_netif_addr_from_str(relay_addr, sizeof(relay_addr), addr_str);
 
-    addr_len = gnrc_netif_addr_from_str(relay_addr, sizeof(relay_addr), addr_str);
     if (addr_len == 0) {
         printf("Error: %s is not a valid link layer address\n", addr_str);
         return NULL;
@@ -217,18 +211,20 @@ int _ccnl_interest(int argc, char **argv)
     memset(_int_buf, '\0', BUF_SIZE);
     memset(_cont_buf, '\0', BUF_SIZE);
     for (int cnt = 0; cnt < CCNL_INTEREST_RETRIES; cnt++) {
-        gnrc_netreg_entry_t _ne;
+        gnrc_netreg_entry_t _ne =
+            GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                       sched_active_pid);
         /* register for content chunks */
-        _ne.demux_ctx =  GNRC_NETREG_DEMUX_CTX_ALL;
-        _ne.pid = sched_active_pid;
         gnrc_netreg_register(GNRC_NETTYPE_CCN_CHUNK, &_ne);
 
-        ccnl_send_interest(CCNL_SUITE_NDNTLV, argv[1], NULL, _int_buf, BUF_SIZE);
+        struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL, 0);
+        ccnl_send_interest(prefix, _int_buf, BUF_SIZE);
         if (ccnl_wait_for_chunk(_cont_buf, BUF_SIZE, 0) > 0) {
             gnrc_netreg_unregister(GNRC_NETTYPE_CCN_CHUNK, &_ne);
             printf("Content received: %s\n", _cont_buf);
             return 0;
         }
+        ccnl_free(prefix);
         gnrc_netreg_unregister(GNRC_NETTYPE_CCN_CHUNK, &_ne);
     }
     printf("Timeout! No content received in response to the Interest for %s.\n", argv[1]);

@@ -23,13 +23,15 @@
 
 #include "thread.h"
 
-#define P(NAME) printf("\t%-*s%4zu%4zu\n", 11, #NAME, sizeof(((thread_t *) 0)->NAME), offsetof(thread_t, NAME));
+#define P(NAME) printf("\t%-*s%4u%4u\n", 11, #NAME, \
+                       (unsigned)sizeof(((thread_t *) 0)->NAME), \
+                       (unsigned)offsetof(thread_t, NAME));
 
 int main(void)
 {
     puts("\tmember, sizeof, offsetof");
 
-    printf("sizeof(thread_t): %zu\n", sizeof(thread_t));
+    printf("sizeof(thread_t): %u\n", (unsigned)sizeof(thread_t));
 
     P(sp);
     P(status);
@@ -48,7 +50,7 @@ int main(void)
 #ifdef DEVELHELP
     P(name);
 #endif
-#if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
+#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || defined(MODULE_MPU_STACK_GUARD)
     P(stack_start);
 #endif
 

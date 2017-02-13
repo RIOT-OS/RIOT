@@ -13,7 +13,7 @@
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef PERIPH_CPU_H
@@ -50,6 +50,11 @@ extern "C" {
  * - bit 2: OD enable
  */
 #define GPIO_MODE(mode, cnf, odr)       (mode | (cnf << 2) | (odr << 4))
+
+/**
+ * @brief   Define the number of available PM modes
+ */
+#define PM_NUM_MODES    (2U)
 
 #ifndef DOXYGEN
 /**
@@ -110,17 +115,6 @@ enum {
 };
 
 /**
- * @brief   Define alternate function modes
- *
- * On this CPU, only the output pins have alternate function modes. The input
- * pins have to be configured using the default gpio_init() function.
- */
-typedef enum {
-    GPIO_AF_OUT_PP = 0xb,   /**< alternate function output - push-pull */
-    GPIO_AF_OUT_OD = 0xf,   /**< alternate function output - open-drain */
-} gpio_af_out_t;
-
-/**
  * @brief   ADC channel configuration data
  */
 typedef struct {
@@ -130,28 +124,6 @@ typedef struct {
 } adc_conf_t;
 
 /**
- * @brief   Timer configuration
- */
-typedef struct {
-    TIM_TypeDef *dev;       /**< timer device */
-    uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
-    uint8_t bus;            /**< APBx bus the timer is clock from */
-    uint8_t irqn;           /**< global IRQ channel */
-} timer_conf_t;
-
-/**
- * @brief   UART configuration options
- */
-typedef struct {
-    USART_TypeDef *dev;     /**< UART device */
-    gpio_t rx_pin;          /**< TX pin */
-    gpio_t tx_pin;          /**< RX pin */
-    uint32_t rcc_pin;       /**< bit in the RCC register */
-    uint8_t bus;            /**< peripheral bus */
-    uint8_t irqn;           /**< interrupt number */
-} uart_conf_t;
-
-/**
  * @brief   DAC line configuration data
  */
 typedef struct {
@@ -159,19 +131,9 @@ typedef struct {
     uint8_t chan;           /**< DAC device used for this line */
 } dac_conf_t;
 
-/**
- * @brief   Configure the alternate function for the given pin
- *
- * @note    This is meant for internal use in STM32F1 peripheral drivers only
- *
- * @param[in] pin       pin to configure
- * @param[in] af        alternate function to use
- */
-void gpio_init_af(gpio_t pin, gpio_af_out_t af);
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CPU_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */

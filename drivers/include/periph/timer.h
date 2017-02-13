@@ -153,7 +153,7 @@ unsigned int timer_read(tim_t dev);
  *
  * This function is only needed if the timer was stopped manually before.
  *
- * @param[in] dev           the timer device to stop
+ * @param[in] dev           the timer device to start
  */
 void timer_start(tim_t dev);
 
@@ -165,20 +165,6 @@ void timer_start(tim_t dev);
  * @param[in] dev           the timer to stop
  */
 void timer_stop(tim_t dev);
-
-/**
- * @brief Enable the interrupts for the given timer
- *
- * @param[in] dev           timer to enable interrupts for
- */
-void timer_irq_enable(tim_t dev);
-
-/**
- * @brief Disable interrupts for the given timer
- *
- * @param[in] dev           the timer to disable interrupts for
- */
-void timer_irq_disable(tim_t dev);
 
 #ifdef __cplusplus
 }

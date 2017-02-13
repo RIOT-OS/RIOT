@@ -25,7 +25,6 @@
 
 #include "mutex.h"
 #include "thread.h"
-#include "atomic.h"
 #include "sched.h"
 #include "thread.h"
 #include "irq.h"
@@ -34,8 +33,6 @@
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
-
-#define MUTEX_LOCKED ((void*)-1)
 
 int _mutex_lock(mutex_t *mutex, int blocking)
 {

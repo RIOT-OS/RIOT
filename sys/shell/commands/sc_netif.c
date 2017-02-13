@@ -73,7 +73,7 @@ static bool _is_iface(kernel_pid_t dev)
     return false;
 }
 
-#if defined(MODULE_NETSTATS)
+#ifdef MODULE_NETSTATS
 const char *_netstats_module_to_str(uint8_t module)
 {
     switch (module) {
@@ -129,7 +129,7 @@ static int _netif_stats(kernel_pid_t dev, unsigned module, bool reset)
     }
     return res;
 }
-#endif
+#endif // MODULE_NETSTATS
 
 static void _set_usage(char *cmd_name)
 {
@@ -160,10 +160,12 @@ static void _mtu_usage(char *cmd_name)
     printf("usage: %s <if_id> mtu <n>\n", cmd_name);
 }
 
+#ifdef MODULE_GNRC_IPV6_NETIF
 static void _hl_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> hl <n>\n", cmd_name);
 }
+#endif
 
 static void _flag_usage(char *cmd_name)
 {
@@ -182,11 +184,13 @@ static void _del_usage(char *cmd_name)
            cmd_name);
 }
 
+#ifdef MODULE_NETSTATS
 static void _stats_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> stats [l2|ipv6] [reset]\n", cmd_name);
     puts("       reset can be only used if the module is specified.");
 }
+#endif
 
 static void _print_netopt(netopt_t opt)
 {
@@ -1041,7 +1045,7 @@ int _netif_send(int argc, char **argv)
 {
     kernel_pid_t dev;
     uint8_t addr[MAX_ADDR_LEN];
-    size_t addr_len, data_len;
+    size_t addr_len;
     gnrc_pktsnip_t *pkt, *hdr;
     gnrc_netif_hdr_t *nethdr;
     uint8_t flags = 0x00;
@@ -1073,16 +1077,10 @@ int _netif_send(int argc, char **argv)
     }
 
     /* put packet together */
-    data_len = strlen(argv[3]);
-    if (data_len == 0) {
-        pkt = NULL;
-    }
-    else {
-        pkt = gnrc_pktbuf_add(NULL, argv[3], data_len, GNRC_NETTYPE_UNDEF);
-        if (pkt == NULL) {
-            puts("error: packet buffer full");
-            return 1;
-        }
+    pkt = gnrc_pktbuf_add(NULL, argv[3], strlen(argv[3]), GNRC_NETTYPE_UNDEF);
+    if (pkt == NULL) {
+        puts("error: packet buffer full");
+        return 1;
     }
     hdr = gnrc_netif_hdr_build(NULL, 0, addr, addr_len);
     if (hdr == NULL) {
@@ -1226,10 +1224,14 @@ int _netif_config(int argc, char **argv)
     printf("usage: %s [<if_id>]\n", argv[0]);
     _set_usage(argv[0]);
     _mtu_usage(argv[0]);
+#ifdef MODULE_GNRC_IPV6_NETIF
     _hl_usage(argv[0]);
+#endif
     _flag_usage(argv[0]);
     _add_usage(argv[0]);
     _del_usage(argv[0]);
+#ifdef MODULE_NETSTATS
     _stats_usage(argv[0]);
+#endif
     return 1;
 }

@@ -16,8 +16,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef CPU_CONF_COMMON_H_
-#define CPU_CONF_COMMON_H_
+#ifndef CPU_CONF_COMMON_H
+#define CPU_CONF_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,5 +61,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_COMMON_H_ */
+#endif /* CPU_CONF_COMMON_H */
 /** @} */

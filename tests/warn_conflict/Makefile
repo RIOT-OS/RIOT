@@ -5,8 +5,9 @@ include ../Makefile.tests_common
 # so using this compile test on other boards will not provide the expected warning.
 BOARD_WHITELIST := stm32f4discovery
 
-# These features have a chance to use/access the shared `SPI_0` on stm32f4discovery,
-# which would probably produce an unexpected behaviour in the user application.
+# These features have a chance to use/access the shared `SPI_DEV(0)` on
+# stm32f4discovery, which would probably produce an unexpected behavior in the
+# user application.
 FEATURES_REQUIRED = periph_dac periph_spi
 
 include $(RIOTBASE)/Makefile.include

@@ -1,0 +1,2 @@
+SRC := heatshrink_decoder.c heatshrink_encoder.c
+include $(RIOTBASE)/Makefile.base

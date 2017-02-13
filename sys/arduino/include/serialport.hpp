@@ -84,7 +84,7 @@ public:
      *
      * @param[in] speed     speed in bits per second (baud)
      */
-    void begin(int speed);
+    void begin(long speed);
 
     /**
      * @brief   Disables serial communication, allowing the RX and TX pins to be

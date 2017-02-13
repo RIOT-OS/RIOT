@@ -23,8 +23,6 @@
 
 #include "board.h"
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/timer.h"
 #include "periph_conf.h"
 
@@ -118,7 +116,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     dev(tim)->TC_CHANNEL[1].TC_CCR = (TC_CCR_CLKEN | TC_CCR_SWTRG);
 
     /* enable global interrupts for given timer */
-    timer_irq_enable(tim);
+    NVIC_EnableIRQ(timer_config[tim].id_ch0);
 
     return 0;
 }
@@ -166,16 +164,6 @@ void timer_stop(tim_t tim)
     dev(tim)->TC_CHANNEL[1].TC_CCR = TC_CCR_CLKDIS;
 }
 
-void timer_irq_enable(tim_t tim)
-{
-    NVIC_EnableIRQ(timer_config[tim].id_ch0);
-}
-
-void timer_irq_disable(tim_t tim)
-{
-    NVIC_DisableIRQ(timer_config[tim].id_ch0);
-}
-
 static inline void isr_handler(tim_t tim)
 {
     uint32_t status = dev(tim)->TC_CHANNEL[0].TC_SR;
@@ -187,9 +175,7 @@ static inline void isr_handler(tim_t tim)
         }
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef TIMER_0_ISR

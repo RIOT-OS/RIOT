@@ -140,7 +140,7 @@ int _saul(int argc, char **argv)
     if (argc < 2) {
         list();
     }
-    else if (argc >= 2) {
+    else {
         if (strcmp(argv[1], "read") == 0) {
             read(argc, argv);
         }

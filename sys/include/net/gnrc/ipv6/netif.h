@@ -18,8 +18,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef GNRC_IPV6_NETIF_H_
-#define GNRC_IPV6_NETIF_H_
+#ifndef GNRC_IPV6_NETIF_H
+#define GNRC_IPV6_NETIF_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -607,7 +607,7 @@ netstats_t *gnrc_ipv6_netif_get_stats(kernel_pid_t pid);
 }
 #endif
 
-#endif /* NETIF_H_ */
+#endif /* NETIF_H */
 /**
  * @}
  */

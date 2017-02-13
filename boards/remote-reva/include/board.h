@@ -19,12 +19,10 @@
  *              Antonio Lignan <alinan@zolertia.com>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
-#include "periph/gpio.h"
-#include "periph/spi.h"
 #include "board_common.h"
 
 #ifdef __cplusplus
@@ -54,6 +52,13 @@
 #define LED2_ON         (GPIO_D->DATA |=  LED2_MASK)
 #define LED2_OFF        (GPIO_D->DATA &= ~LED2_MASK)
 #define LED2_TOGGLE     (GPIO_D->DATA ^=  LED2_MASK)
+/** @} */
+
+/**
+ * @name User button pin definition
+ * @{
+ */
+#define BTN0_PIN        GPIO_PIN(0, 3)
 /** @} */
 
 /**
@@ -104,8 +109,13 @@
 #define CC1200_GPD2_GPIO    GPIO_PB0
 /** @} */
 
+/**
+ * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ */
+void board_init(void);
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

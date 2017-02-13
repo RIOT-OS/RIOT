@@ -27,7 +27,7 @@
 #include "thread.h"
 
 #define TEST_SECONDS        (10LU)
-#define TEST_TIME           (TEST_SECONDS * SEC_IN_USEC)
+#define TEST_TIME           (TEST_SECONDS * US_PER_SEC)
 #define STACKSIZE_TIMER     (THREAD_STACKSIZE_DEFAULT)
 
 char stack_timer1[STACKSIZE_TIMER];
@@ -76,8 +76,9 @@ int main(void)
                   NULL,
                   "timer2");
 
-    uint32_t end = xtimer_now() + TEST_TIME;
-    while(xtimer_now() < end)
+    xtimer_ticks32_t end = xtimer_now();
+    end.ticks32 += _xtimer_ticks_from_usec(TEST_TIME);
+    while(_xtimer_now() < end.ticks32)
     {
         count++;
         xtimer_usleep(100LU * 1000);

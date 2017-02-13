@@ -19,8 +19,8 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -65,21 +65,22 @@ extern "C"
 /** @} */
 
 /**
-@name KW2XRF configuration
-@{
-*/
-#define KW2XRF_SPI        (SPI_1)
-#define KW2XRF_CS         (GPIO_PIN(KW2XDRF_PORT, KW2XDRF_PCS0_PIN))
-#define KW2XRF_INT        (GPIO_PIN(KW2XDRF_PORT, KW2XDRF_IRQ_PIN))
-#define KW2XRF_SPI_SPEED  (SPI_SPEED_10MHZ)
-#define KW2XRF_SHARED_SPI 0
+ * @name KW2XRF configuration
+ *
+ * {spi bus, cs pin, int pin, spi speed,}
+ */
+#define KW2XRF_PARAMS_BOARD  {.spi = SPI_DEV(1), \
+                              .spi_clk = SPI_CLK_10MHZ, \
+                              .cs_pin = GPIO_PIN(KW2XDRF_PORT, KW2XDRF_PCS0_PIN), \
+                              .int_pin = GPIO_PIN(KW2XDRF_PORT, KW2XDRF_IRQ_PIN) }
+#define KW2XRF_SHARED_SPI   0
 /** @}*/
 
 /**
  * @name Define the interface for the HDC1000 humidity sensor
  * @{
  */
-#define HDC1000_I2C         (I2C_0)
+#define HDC1000_I2C         (I2C_DEV(0))
 #define HDC1000_ADDR        (0x43)
 /** @} */
 
@@ -87,7 +88,7 @@ extern "C"
  * @name Define the interface for the MAG3110 magnetometer sensor
  * @{
  */
-#define MAG3110_I2C         (I2C_0)
+#define MAG3110_I2C         (I2C_DEV(0))
 #define MAG3110_ADDR        (0x0E)
 /** @} */
 
@@ -95,7 +96,7 @@ extern "C"
  * @name Define the interface for the MMA8652 tri-axis accelerometer sensor
  * @{
  */
-#define MMA8652_I2C         (I2C_0)
+#define MMA8652_I2C         (I2C_DEV(0))
 #define MMA8652_ADDR        (0x1D)
 /** @} */
 
@@ -103,7 +104,7 @@ extern "C"
  * @name Define the interface for the MPL3115A2 pressure sensor
  * @{
  */
-#define MPL3115A2_I2C       (I2C_0)
+#define MPL3115A2_I2C       (I2C_DEV(0))
 #define MPL3115A2_ADDR      (0x60)
 /** @} */
 
@@ -111,7 +112,7 @@ extern "C"
  * @name Define the interface for the TCS3772 light sensor
  * @{
  */
-#define TCS37727_I2C        (I2C_0)
+#define TCS37727_I2C        (I2C_DEV(0))
 #define TCS37727_ADDR       (0x29)
 /** @} */
 
@@ -119,7 +120,7 @@ extern "C"
  * @name Define the interface for the TMP006 IR-Termopile sensor
  * @{
  */
-#define TMP006_I2C          (I2C_0)
+#define TMP006_I2C          (I2C_DEV(0))
 #define TMP006_ADDR         (0x41)
 /** @} */
 
@@ -132,5 +133,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* __BOARD_H */
+#endif /* BOARD_H */
 /** @} */

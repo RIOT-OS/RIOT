@@ -73,47 +73,46 @@ void sha1_init(sha1_context *ctx);
 /**
  * @brief Update the SHA-1 context with a portion of the message being hashed
  *
- * @param[in] ctx       Pointer to the SHA-1 context to update
- * @param[in] data      Input data
- * @param[in] len       Length of @p data
+ * @param[in] ctx  Pointer to the SHA-1 context to update
+ * @param[in] data Input data
+ * @param[in] len  Length of @p data
  */
-void sha1_update(sha1_context *ctx, const uint8_t *data, size_t len);
+void sha1_update(sha1_context *ctx, const void *data, size_t len);
 
 /**
  * @brief Finalizes the SHA-1 message digest
  *
  * @param[in] ctx     Pointer to the SHA-1 context
- * @param[out] dst    Result location, must be 20 byte
+ * @param[out] digest Result location, must be 20 byte
  *
  */
-void sha1_final(sha1_context *ctx, uint8_t *dst);
+void sha1_final(sha1_context *ctx, void *digest);
 
 /**
  * @brief   Calculate a SHA1 hash from the given data
  *
- * @param[out] dst      Result location, must be 20 byte
- * @param[in] src       Input data
- * @param[in] len       Length of @p buf
+ * @param[out] digest Result location, must be 20 byte
+ * @param[in] data    Input data
+ * @param[in] len     Length of @p buf
  */
-void sha1(uint8_t *dst, const uint8_t *src, size_t len);
+void sha1(void *digest, const void *data, size_t len);
 
 /**
  * @brief Initialize SHA-1 message digest context with MAC
  *
- * @param[in] ctx           Pointer to the SHA-1 context to initialize
- * @param[in] key           Key used in the HMAC-SHA1 computation
- * @param[in] key_length    The size in bytes of @p key
+ * @param[in] ctx        Pointer to the SHA-1 context to initialize
+ * @param[in] key        Key used in the HMAC-SHA1 computation
+ * @param[in] key_length The size in bytes of @p key
  */
-void sha1_init_hmac(sha1_context *ctx, const uint8_t *key, size_t key_length);
+void sha1_init_hmac(sha1_context *ctx, const void *key, size_t key_length);
 
 /**
  * @brief Finalizes the SHA-1 message digest with MAC
  *
- * @param[in] s     Pointer to the SHA-1 context
- * @param[out] dst      Result location, must be 20 byte
- * @return Calculated digest
+ * @param[in] ctx     Pointer to the SHA-1 context
+ * @param[out] digest Result location, must be 20 byte
  */
-void sha1_final_hmac(sha1_context *ctx, uint8_t *dst);
+void sha1_final_hmac(sha1_context *ctx, void *digest);
 
 #ifdef __cplusplus
 }

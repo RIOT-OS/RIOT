@@ -9,12 +9,14 @@
 /**
  * @defgroup    net_conn    Application connection API
  * @ingroup     net
+ * @deprecated  Please use @ref net_sock instead
  * @brief       Provides a minimal common API for applications to connect to the
  *              different network stacks.
  *
  * About
  * =====
  *
+ * ~~~~~~~~~~~~~~~~~~~~~
  *    +---------------+
  *    |  Application  |
  *    +---------------+
@@ -28,6 +30,7 @@
  *    +---------------+
  *    | Network Stack |
  *    +---------------+
+ * ~~~~~~~~~~~~~~~~~~~~~
  *
  * This module provides a minimal set of functions to establish a connection using
  * different types of connections. Together, they serve as a common API
@@ -70,8 +73,8 @@
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef NET_CONN_H_
-#define NET_CONN_H_
+#ifndef NET_CONN_H
+#define NET_CONN_H
 
 #include "net/conn/ip.h"
 #include "net/conn/tcp.h"
@@ -98,5 +101,5 @@ ipv6_addr_t *conn_find_best_source(const ipv6_addr_t *dst);
 }
 #endif
 
-#endif /* NET_CONN_H_ */
+#endif /* NET_CONN_H */
 /** @} */

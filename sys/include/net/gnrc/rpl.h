@@ -95,8 +95,8 @@
  * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
  */
 
-#ifndef GNRC_RPL_H_
-#define GNRC_RPL_H_
+#ifndef GNRC_RPL_H
+#define GNRC_RPL_H
 
 #include <string.h>
 #include <stdint.h>
@@ -110,6 +110,10 @@
 #include "net/fib.h"
 #include "xtimer.h"
 #include "trickle.h"
+
+#ifdef MODULE_NETSTATS_RPL
+#include "net/rpl/rpl_netstats.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -180,12 +184,16 @@ extern "C" {
  *          RFC 6550, section 17
  *      </a>
  */
+#ifndef GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE
 #define GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE (256)
+#endif
 
 /**
  * @brief   Maximum rank increase
  */
+#ifndef GNRC_RPL_DEFAULT_MAX_RANK_INCREASE
 #define GNRC_RPL_DEFAULT_MAX_RANK_INCREASE (0)
+#endif
 
 /**
  * @brief   Number of implemented Objective Functions
@@ -200,7 +208,9 @@ extern "C" {
 /**
  * @brief   Default Instance ID
  */
+#ifndef GNRC_RPL_DEFAULT_INSTANCE
 #define GNRC_RPL_DEFAULT_INSTANCE (0)
+#endif
 
 /**
  * @name RPL Mode of Operations
@@ -210,9 +220,10 @@ extern "C" {
 #define GNRC_RPL_MOP_NON_STORING_MODE    (0x01)
 #define GNRC_RPL_MOP_STORING_MODE_NO_MC  (0x02)
 #define GNRC_RPL_MOP_STORING_MODE_MC     (0x03)
+
 /** default MOP set on compile time */
 #ifndef GNRC_RPL_DEFAULT_MOP
-#   define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_STORING_MODE_NO_MC
+#define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_STORING_MODE_NO_MC
 #endif
 /** @} */
 
@@ -277,16 +288,18 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /**
  * @name Default parent and route entry lifetime
  * default lifetime will be multiplied by the lifetime unit to obtain the resulting lifetime
+ * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7.6">
+            DODAG Configuration
+        </a>
  * @{
  */
-#define GNRC_RPL_DEFAULT_LIFETIME (60)
-#define GNRC_RPL_LIFETIME_UNIT (2)
+#ifndef GNRC_RPL_DEFAULT_LIFETIME
+#define GNRC_RPL_DEFAULT_LIFETIME (5)
+#endif
+#ifndef GNRC_RPL_LIFETIME_UNIT
+#define GNRC_RPL_LIFETIME_UNIT (60)
+#endif
 /** @} */
-
-/**
- * @brief Interval of the void _update_lifetime() function
- */
-#define GNRC_RPL_LIFETIME_STEP (2)
 
 /**
  * @brief Default prefix length for the DODAG id
@@ -295,6 +308,10 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 
 /**
  * @brief Default prefix valid and preferred time for the DODAG id
+ * @note Currently not used, but needed for RIOs
+ * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7.5">
+ *          Route Information
+ *      </a>
  */
 #define GNRC_RPL_DEFAULT_PREFIX_LIFETIME  (0xFFFFFFFF)
 
@@ -308,12 +325,23 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 
 /**
  * @name Parameters used for DAO handling
+ * @see <a href="https://tools.ietf.org/html/rfc6550#section-17">
+            RPL Constants and Variables
+        </a>
  * @{
  */
+#ifndef GNRC_RPL_DAO_SEND_RETRIES
 #define GNRC_RPL_DAO_SEND_RETRIES (4)
+#endif
+#ifndef GNRC_RPL_DEFAULT_WAIT_FOR_DAO_ACK
 #define GNRC_RPL_DEFAULT_WAIT_FOR_DAO_ACK (3)
+#endif
+#ifndef GNRC_RPL_REGULAR_DAO_INTERVAL
 #define GNRC_RPL_REGULAR_DAO_INTERVAL (60)
-#define GNRC_RPL_DEFAULT_DAO_DELAY (5)
+#endif
+#ifndef GNRC_RPL_DEFAULT_DAO_DELAY
+#define GNRC_RPL_DEFAULT_DAO_DELAY (1)
+#endif
 /** @} */
 
 /**
@@ -353,7 +381,7 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /**
  * @brief Rank of the root node
  */
-#define GNRC_RPL_ROOT_RANK (256)
+#define GNRC_RPL_ROOT_RANK (GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE)
 
 /**
  *  @brief  DIS ICMPv6 code
@@ -422,6 +450,13 @@ extern kernel_pid_t gnrc_rpl_pid;
  * @brief @see @ref GNRC_RPL_ALL_NODES_ADDR
  */
 extern const ipv6_addr_t ipv6_addr_all_rpl_nodes;
+
+#ifdef MODULE_NETSTATS_RPL
+/**
+ * @brief Statistics for RPL control messages
+ */
+extern netstats_rpl_t gnrc_rpl_netstats;
+#endif
 
 /**
  * @brief Initialization of the RPL thread.
@@ -501,9 +536,11 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
  * @param[in] dio       Pointer to the DIO message.
  * @param[in] iface     Interface PID of the incoming DIO.
  * @param[in] src       Pointer to the source address of the IPv6 packet.
+ * @param[in] dst       Pointer to the destination address of the IPv6 packet.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src, uint16_t len);
+void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
+                       uint16_t len);
 
 /**
  * @brief   Parse a DAO.
@@ -511,18 +548,23 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
  * @param[in] dao       Pointer to the DAO message.
  * @param[in] iface     Interface PID of the incoming DIO.
  * @param[in] src       Pointer to the source address of the IPv6 packet.
+ * @param[in] dst       Pointer to the destination address of the IPv6 packet.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src, uint16_t len);
+void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
+                       uint16_t len);
 
 /**
  * @brief   Parse a DAO-ACK.
  *
  * @param[in] dao_ack   Pointer to the DAO-ACK message.
  * @param[in] iface     Interface PID of the incoming DIO.
+ * @param[in] src       Pointer to the source address of the IPv6 packet.
+ * @param[in] dst       Pointer to the destination address of the IPv6 packet.
  * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, uint16_t len);
+void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, ipv6_addr_t *src,
+                           ipv6_addr_t *dst, uint16_t len);
 
 /**
  * @brief   Delay the DAO sending interval
@@ -592,5 +634,5 @@ static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
 }
 #endif
 
-#endif /* GNRC_RPL_H_ */
+#endif /* GNRC_RPL_H */
 /** @} */

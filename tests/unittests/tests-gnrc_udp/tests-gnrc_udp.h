@@ -15,8 +15,8 @@
  *
  * @author      Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
  */
-#ifndef TESTS_GNRC_UDP_H_
-#define TESTS_GNRC_UDP_H_
+#ifndef TESTS_GNRC_UDP_H
+#define TESTS_GNRC_UDP_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_gnrc_udp(void);
 }
 #endif
 
-#endif /* TESTS_GNRC_UDP_H_ */
+#endif /* TESTS_GNRC_UDP_H */
 /** @} */

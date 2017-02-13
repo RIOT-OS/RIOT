@@ -9,8 +9,9 @@
 
 import os, signal, sys, subprocess
 from pexpect import spawnu, TIMEOUT, EOF
+from traceback import print_tb
 
-def run(testfunc, timeout=10, echo=True):
+def run(testfunc, timeout=10, echo=True, traceback=False):
     env = os.environ.copy()
     child = spawnu("make term", env=env, timeout=timeout)
     if echo:
@@ -26,6 +27,8 @@ def run(testfunc, timeout=10, echo=True):
         testfunc(child)
     except TIMEOUT:
         print("Timeout in expect script")
+        if traceback:
+            print_tb(sys.exc_info()[2])
         return 1
     finally:
         print("")

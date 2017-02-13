@@ -25,11 +25,37 @@
 #include "sched.h"
 #include "irq.h"
 #include "cpu.h"
+#include "board.h"
+
+
+/**
+ * @brief AVR_CONTEXT_SWAP_INIT intialize the context swap trigger
+ * Called when threading is first started.
+ */
+#ifndef AVR_CONTEXT_SWAP_INIT
+#error AVR_CONTEXT_SWAP_INIT must be defined in board.h
+#endif
+
+/**
+ * @brief AVR_CONTEXT_SWAP_INTERRUPT_VECT Name of the ISR to use for context swapping
+ */
+#ifndef AVR_CONTEXT_SWAP_INTERRUPT_VECT
+#error AVR_CONTEXT_SWAP_INTERRUPT_VECT must be defined in board.h
+#endif
+
+/**
+ * @brief AVR_CONTEXT_SWAP_TRIGGER executed to start the context swap
+ * When executed, this should result in the interrupt named in
+ * AVR_CONTEXT_SWAP_INTERRUPT_VECT being called
+ */
+#ifndef AVR_CONTEXT_SWAP_TRIGGER
+#error ARV_CONTEXT_SWAP_TRIGGER must be defined in board.h
+#endif
+
 
 /*
  * local function declarations  (prefixed with __)
  */
-
 static void __context_save(void);
 static void __context_restore(void);
 static void __enter_thread_mode(void);
@@ -122,7 +148,6 @@ char *thread_arch_stack_init(thread_task_func_t task_func, void *arg,
     stk--;
     *stk = (uint8_t) 0x00;
 #endif
-
 #if defined(RAMPZ)
     stk--;
     *stk = (uint8_t) 0x00;
@@ -221,6 +246,7 @@ void thread_arch_start_threading(void) __attribute__((naked));
 void thread_arch_start_threading(void)
 {
     sched_run();
+    AVR_CONTEXT_SWAP_INIT;
     __enter_thread_mode();
 }
 
@@ -238,17 +264,17 @@ void NORETURN __enter_thread_mode(void)
     UNREACHABLE();
 }
 
-void thread_arch_yield(void) __attribute__((naked));
-void thread_arch_yield(void)
-{
+void thread_arch_yield(void) {
+    AVR_CONTEXT_SWAP_TRIGGER;
+}
+
+
+// Use this interrupt to perform all context switches
+ISR(AVR_CONTEXT_SWAP_INTERRUPT_VECT, ISR_NAKED) {
     __context_save();
-
-    /* irq_disable(); */ /* gets already disabled during __context_save() */
     sched_run();
-    irq_enable();
-
     __context_restore();
-    __asm__ volatile("ret");
+    __asm__ volatile("reti");
 }
 
 

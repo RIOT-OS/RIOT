@@ -141,7 +141,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     *ctx[tim].flag &= ~(1 << (channel + OCF1A));
     *ctx[tim].mask |=  (1 << (channel + OCIE1A));
 
-    return 0;
+    return 1;
 }
 
 int timer_clear(tim_t tim, int channel)
@@ -168,17 +168,6 @@ void timer_stop(tim_t tim)
 void timer_start(tim_t tim)
 {
     ctx[tim].dev->CRB = ctx[tim].mode;
-}
-
-void timer_irq_enable(tim_t tim)
-{
-    *ctx[tim].mask = ctx[tim].isrs;
-}
-
-void timer_irq_disable(tim_t tim)
-{
-    ctx[tim].isrs = *(ctx[tim].mask);
-    *ctx[tim].mask = 0;
 }
 
 #ifdef TIMER_NUMOF
@@ -208,10 +197,12 @@ ISR(TIMER_0_ISRB, ISR_BLOCK)
     _isr(0, 1);
 }
 
+#ifdef TIMER_0_ISRC
 ISR(TIMER_0_ISRC, ISR_BLOCK)
 {
     _isr(0, 2);
 }
+#endif /* TIMER_0_ISRC */
 #endif /* TIMER_0 */
 
 #ifdef TIMER_1

@@ -21,12 +21,42 @@
  * @file
  * @brief       Generic interface to communicate with GNRC modules
  *
+ * @defgroup    net_gnrc_netapi_mbox   Mailbox IPC extension
+ * @ingroup     net_gnrc_netapi
+ * @brief       @ref core_mbox "Mailbox IPC" extension for @ref net_gnrc_netapi
+ * @{
+ *
+ * @details The submodule `gnrc_netapi_mbox` provides an extension for
+ *          @ref core_mbox "Mailbox IPC".
+ *
+ * To use, add the module `gnrc_netapi_mbox` to the `USEMODULE` macro in your
+ * application's Makefile:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ * USEMODULE += gnrc_netapi_mbox
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * @}
+ *
+ * @defgroup    net_gnrc_netapi_callbacks   Callback extension
+ * @ingroup     net_gnrc_netapi
+ * @brief       Callback extension for @ref net_gnrc_netapi
+ * @{
+ * @details The submodule `gnrc_netapi_callbacks` provides an extension for
+ *          callbacks to run GNRC thread-less.
+ *
+ * To use, add the module `gnrc_netapi_callbacks` to the `USEMODULE` macro in
+ * your application's Makefile:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ * USEMODULE += gnrc_netapi_callbacks
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * @}
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef GNRC_NETAPI_H_
-#define GNRC_NETAPI_H_
+#ifndef GNRC_NETAPI_H
+#define GNRC_NETAPI_H
 
 #include "thread.h"
 #include "net/netopt.h"
@@ -180,7 +210,7 @@ int gnrc_netapi_set(kernel_pid_t pid, netopt_t opt, uint16_t context,
 }
 #endif
 
-#endif /* GNRC_NETAPI_H_ */
+#endif /* GNRC_NETAPI_H */
 /**
  * @}^
  */

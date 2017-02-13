@@ -49,6 +49,14 @@ extern "C" {
 #define BH1750FVI_I2C_MAX_CLK           I2C_SPEED_FAST
 
 /**
+ * @brief   Status and error return codes
+ */
+enum {
+    BH1750FVI_OK      =  0,     /**< everything was fine */
+    BH1750FVI_ERR_I2C = -1      /**< error initializing the I2C bus */
+};
+
+/**
  * @brief   Device descriptor for BH1570FVI devices
  */
 typedef struct {

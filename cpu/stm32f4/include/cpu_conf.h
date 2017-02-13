@@ -15,7 +15,7 @@
  * @file
  * @brief           Implementation specific CPU configuration options
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef STM32F4_CPU_CONF_H
@@ -29,6 +29,8 @@
 #include "stm32f407xx.h"
 #elif defined(CPU_MODEL_STM32F415RG)
 #include "stm32f415xx.h"
+#elif defined(CPU_MODEL_STM32F446RE)
+#include "stm32f446xx.h"
 #endif
 
 #ifdef __cplusplus

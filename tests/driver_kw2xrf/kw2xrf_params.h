@@ -39,23 +39,22 @@ extern "C" {
 #ifndef KWRF_INT
 #error "Interrupt pin not defined"
 #endif
-#ifndef KWRF_SPI_SPEED
-#define KWRF_SPI_SPEED          (SPI_SPEED_10MHZ)
+#ifndef KWRF_SPI_CLK
+#define KWRF_SPI_CLK        (SPI_CLK_10MHZ)
 #endif
 /**@}*/
 
 /**
  * @name KW2XRF configuration
  */
-static const  kw2xrf_params_t kw2xrf_params[] =
+static const  kw2xrf_params_t kw2xrf_params[] = {
     {
-        {
-            .spi = KWRF_SPI,
-            .spi_speed = KWRF_SPI_SPEED,
-            .cs_pin = KWRF_CS,
-            .int_pin = KWRF_INT,
-        },
-    };
+        .spi = KWRF_SPI,
+        .spi_clk = KWRF_SPI_CLK,
+        .cs_pin = KWRF_CS,
+        .int_pin = KWRF_INT,
+    },
+};
 /** @} */
 
 #ifdef __cplusplus

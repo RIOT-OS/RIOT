@@ -70,7 +70,7 @@ WEAK_DEFAULT void isr_qei(void);
 WEAK_DEFAULT void isr_pll1(void);
 
 /* interrupt vector table */
-__attribute__ ((section(".vectors")))
+__attribute__ ((used,section(".vectors")))
 const void *interrupt_vector[] = {
     /* Exception stack pointer */
     (void*) (&_estack),             /* pointer to the top of the stack */

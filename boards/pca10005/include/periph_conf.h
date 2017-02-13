@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -83,26 +83,26 @@ static const timer_conf_t timer_config[] = {
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF           (2U)
-#define SPI_0_EN            1
-#define SPI_1_EN            1
-#define SPI_IRQ_PRIO        1
+static const spi_conf_t spi_config[] = {
+    {
+        .dev  = NRF_SPI0,
+        .sclk = 19,
+        .mosi = 17,
+        .miso = 18
+    },
+    {
+        .dev  = NRF_SPI1,
+        .sclk = 22,
+        .mosi = 20,
+        .miso = 21
+    }
+};
 
-/* SPI_0 device configuration */
-#define SPI_0_DEV           NRF_SPI0
-#define SPI_0_PIN_MOSI      17
-#define SPI_0_PIN_MISO      18
-#define SPI_0_PIN_SCK       19
-
-/* SPI_1 device configuration */
-#define SPI_1_DEV           NRF_SPI1
-#define SPI_1_PIN_MOSI      20
-#define SPI_1_PIN_MISO      21
-#define SPI_1_PIN_SCK       22
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  *
  * The configuration consists simply of a list of channels that should be used
  * @{
@@ -125,4 +125,4 @@ static const timer_conf_t timer_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */

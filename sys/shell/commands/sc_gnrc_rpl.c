@@ -182,6 +182,38 @@ int _gnrc_rpl_send_dis(void)
     return 0;
 }
 
+#ifdef MODULE_NETSTATS_RPL
+int _stats(void)
+{
+    puts(  "Statistics        (ucast) RX / TX                  RX / TX (mcast)");
+    printf("DIO     #packets: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
+           gnrc_rpl_netstats.dio_rx_ucast_count, gnrc_rpl_netstats.dio_tx_ucast_count,
+           gnrc_rpl_netstats.dio_rx_mcast_count, gnrc_rpl_netstats.dio_tx_mcast_count);
+    printf("DIO       #bytes: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
+           gnrc_rpl_netstats.dio_rx_ucast_bytes, gnrc_rpl_netstats.dio_tx_ucast_bytes,
+           gnrc_rpl_netstats.dio_rx_mcast_bytes, gnrc_rpl_netstats.dio_tx_mcast_bytes);
+    printf("DIS     #packets: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
+           gnrc_rpl_netstats.dis_rx_ucast_count, gnrc_rpl_netstats.dis_tx_ucast_count,
+           gnrc_rpl_netstats.dis_rx_mcast_count, gnrc_rpl_netstats.dis_tx_mcast_count);
+    printf("DIS       #bytes: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
+           gnrc_rpl_netstats.dis_rx_ucast_bytes, gnrc_rpl_netstats.dis_tx_ucast_bytes,
+           gnrc_rpl_netstats.dis_rx_mcast_bytes, gnrc_rpl_netstats.dis_tx_mcast_bytes);
+    printf("DAO     #packets: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
+           gnrc_rpl_netstats.dao_rx_ucast_count, gnrc_rpl_netstats.dao_tx_ucast_count,
+           gnrc_rpl_netstats.dao_rx_mcast_count, gnrc_rpl_netstats.dao_tx_mcast_count);
+    printf("DAO       #bytes: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
+           gnrc_rpl_netstats.dao_rx_ucast_bytes, gnrc_rpl_netstats.dao_tx_ucast_bytes,
+           gnrc_rpl_netstats.dao_rx_mcast_bytes, gnrc_rpl_netstats.dao_tx_mcast_bytes);
+    printf("DAO-ACK #packets: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
+           gnrc_rpl_netstats.dao_ack_rx_ucast_count, gnrc_rpl_netstats.dao_ack_tx_ucast_count,
+           gnrc_rpl_netstats.dao_ack_rx_mcast_count, gnrc_rpl_netstats.dao_ack_tx_mcast_count);
+    printf("DAO-ACK   #bytes: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
+           gnrc_rpl_netstats.dao_ack_rx_ucast_bytes, gnrc_rpl_netstats.dao_ack_tx_ucast_bytes,
+           gnrc_rpl_netstats.dao_ack_rx_mcast_bytes, gnrc_rpl_netstats.dao_ack_tx_mcast_bytes);
+    return 0;
+}
+#endif
+
 int _gnrc_rpl_dodag_show(void)
 {
     printf("instance table:\t");
@@ -228,7 +260,7 @@ int _gnrc_rpl_dodag_show(void)
     gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
     int8_t cleanup;
-    uint64_t tc, ti, xnow = xtimer_now64();
+    uint64_t tc, ti, xnow = xtimer_now_usec64();
 
     for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
         if (gnrc_rpl_instances[i].state == 0) {
@@ -244,11 +276,11 @@ int _gnrc_rpl_dodag_show(void)
 
         tc = (((uint64_t) dodag->trickle.msg_callback_timer.long_target << 32)
                 | dodag->trickle.msg_callback_timer.target) - xnow;
-        tc = (int64_t) tc < 0 ? 0 : tc / SEC_IN_USEC;
+        tc = (int64_t) tc < 0 ? 0 : tc / US_PER_SEC;
 
         ti = (((uint64_t) dodag->trickle.msg_interval_timer.long_target << 32)
                 | dodag->trickle.msg_interval_timer.target) - xnow;
-        ti = (int64_t) ti < 0 ? 0 : ti / SEC_IN_USEC;
+        ti = (int64_t) ti < 0 ? 0 : ti / US_PER_SEC;
 
         cleanup = dodag->instance->cleanup < 0 ? 0 : dodag->instance->cleanup;
 
@@ -274,8 +306,8 @@ int _gnrc_rpl_dodag_show(void)
         LL_FOREACH(gnrc_rpl_instances[i].dodag.parents, parent) {
             printf("\t\tparent [addr: %s | rank: %d | lifetime: %" PRIu32 "s]\n",
                     ipv6_addr_to_str(addr_str, &parent->addr, sizeof(addr_str)),
-                    parent->rank, ((int32_t) (parent->lifetime - (((uint32_t) xnow / SEC_IN_USEC))))
-                    < 0 ? 0 : (parent->lifetime - ((uint32_t) xnow / SEC_IN_USEC)));
+                    parent->rank, ((int32_t) (parent->lifetime - (((uint32_t) xnow / US_PER_SEC))))
+                    < 0 ? 0 : (parent->lifetime - ((uint32_t) xnow / US_PER_SEC)));
         }
     }
     return 0;
@@ -381,6 +413,11 @@ int _gnrc_rpl(int argc, char **argv)
         if (argc == 4) {
             return _gnrc_rpl_find(argv[2], argv[3]);
         }
+    }
+#endif
+#ifdef MODULE_NETSTATS_RPL
+    else if (strcmp(argv[1], "stats") == 0) {
+        return _stats();
     }
 #endif
 

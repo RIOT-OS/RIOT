@@ -1,1 +1,5 @@
 INCLUDES += -I$(BINDIRBASE)/pkg/$(BOARD)/oonf_api/src-api
+
+ifeq ($(shell uname -s),Darwin)
+	CFLAGS += -Wno-reserved-id-macro -Wno-keyword-macro
+endif

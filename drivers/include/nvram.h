@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_nvram Non-volatile RAM
- * @ingroup     drivers
+ * @ingroup     drivers_storage
  * @brief       Non-volatile RAM interface
  *
  * This API is designed around non-volatile memories which do not need blockwise
@@ -24,8 +24,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef DRIVERS_NVRAM_H_
-#define DRIVERS_NVRAM_H_
+#ifndef DRIVERS_NVRAM_H
+#define DRIVERS_NVRAM_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -83,5 +83,5 @@ typedef struct nvram {
 }
 #endif
 
-#endif /* DRIVERS_NVRAM_H_ */
+#endif /* DRIVERS_NVRAM_H */
 /** @} */

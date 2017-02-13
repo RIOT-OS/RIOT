@@ -9,6 +9,7 @@
 /**
  * @defgroup    net_conn_udp    UDP connections
  * @ingroup     net_conn
+ * @deprecated  Please use @ref net_sock_udp instead
  * @brief       Connection submodule for UDP connections
  * @{
  *
@@ -17,8 +18,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_CONN_UDP_H_
-#define NET_CONN_UDP_H_
+#ifndef NET_CONN_UDP_H
+#define NET_CONN_UDP_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -150,5 +151,5 @@ int conn_udp_sendto(const void *data, size_t len, const void *src, size_t src_le
 }
 #endif
 
-#endif /* NET_CONN_UDP4_H_ */
+#endif /* NET_CONN_UDP4_H */
 /** @} */

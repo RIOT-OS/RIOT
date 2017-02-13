@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef IPV6_EXT_H_
-#define IPV6_EXT_H_
+#ifndef IPV6_EXT_H
+#define IPV6_EXT_H
 
 #include <stdint.h>
 
@@ -60,5 +60,5 @@ static inline ipv6_ext_t *ipv6_ext_get_next(ipv6_ext_t *ext)
 }
 #endif
 
-#endif /* IPV6_EXT_H_ */
+#endif /* IPV6_EXT_H */
 /** @} */

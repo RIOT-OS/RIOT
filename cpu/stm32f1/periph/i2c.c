@@ -42,10 +42,10 @@
 /* static function definitions */
 static void _i2c_init(I2C_TypeDef *i2c, int ccr);
 static void _pin_config(gpio_t pin_scl, gpio_t pin_sda);
-static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, char *err);
+static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, uint8_t *err);
 static inline void _clear_addr(I2C_TypeDef *dev);
-static inline void _write(I2C_TypeDef *dev, char *data, int length, char *err);
-static inline void _stop(I2C_TypeDef *dev, char *err);
+static inline void _write(I2C_TypeDef *dev, const uint8_t *data, int length, uint8_t *err);
+static inline void _stop(I2C_TypeDef *dev, uint8_t *err);
 
 /**
  * @brief Array holding one pre-initialized mutex for each I2C device
@@ -65,7 +65,7 @@ static mutex_t locks[] =  {
 #endif
 };
 
-static char err_flag[] = {
+static uint8_t err_flag[] = {
 #if I2C_0_EN
     [I2C_0] = 0x00,
 #endif
@@ -199,15 +199,16 @@ int i2c_release(i2c_t dev)
     return 0;
 }
 
-int i2c_read_byte(i2c_t dev, uint8_t address, char *data)
+int i2c_read_byte(i2c_t dev, uint8_t address, void *data)
 {
     return i2c_read_bytes(dev, address, data, 1);
 }
 
-int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 {
     int i = 0;
     I2C_TypeDef *i2c;
+    uint8_t *my_data = data;
 
     switch (dev) {
 #if I2C_0_EN
@@ -255,14 +256,14 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
                 DEBUG("Wait until byte was received\n");
                 while (!(i2c->SR1 & I2C_SR1_RXNE)) {}
                 DEBUG("Copy byte from DR\n");
-                data[i++] = (char)i2c->DR;
+                my_data[i++] = i2c->DR;
             }
 
             DEBUG("Reading the last 3 bytes, waiting for BTF flag\n");
             while (!(i2c->SR1 & I2C_SR1_BTF)) {}
 
             DEBUG("Read N-3 byte\n");
-            data[i++] = (char)i2c->DR;
+            my_data[i++] = i2c->DR;
     }
 
     DEBUG("Clear ACK\n");
@@ -276,7 +277,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
         while (!(i2c->SR1 & I2C_SR1_RXNE)) {}
 
         DEBUG("Read byte\n");
-        data[i++] = (char)i2c->DR;
+        my_data[i++] = i2c->DR;
     }
 
     DEBUG("wait for STOP bit to be cleared again\n");
@@ -289,13 +290,13 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
     return length;
 }
 
-int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, char *data)
+int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data)
 {
     return i2c_read_regs(dev, address, reg, data, 1);
 
 }
 
-int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
+int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int length)
 {
     I2C_TypeDef *i2c;
 
@@ -330,12 +331,12 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int lengt
     return i2c_read_bytes(dev, address, data, length);
 }
 
-int i2c_write_byte(i2c_t dev, uint8_t address, char data)
+int i2c_write_byte(i2c_t dev, uint8_t address, uint8_t data)
 {
     return i2c_write_bytes(dev, address, &data, 1);
 }
 
-int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
+int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
 {
     I2C_TypeDef *i2c;
 
@@ -373,12 +374,12 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
     }
 }
 
-int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, char data)
+int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data)
 {
     return i2c_write_regs(dev, address, reg, &data, 1);
 }
 
-int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
+int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, int length)
 {
     I2C_TypeDef *i2c;
 
@@ -401,7 +402,7 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
     _start(i2c, address, I2C_FLAG_WRITE, &err_flag[dev]);
     _clear_addr(i2c);
     /* send register address and wait for complete transfer to be finished*/
-    _write(i2c, (char *)(&reg), 1, &err_flag[dev]);
+    _write(i2c, &reg, 1, &err_flag[dev]);
     /* write data to register */
     _write(i2c, data, length, &err_flag[dev]);
     /* finish transfer */
@@ -450,7 +451,7 @@ void i2c_poweroff(i2c_t dev)
     }
 }
 
-static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, char *err)
+static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, uint8_t *err)
 {
     /* flag that there's no error (yet) */
     *err = 0x00;
@@ -476,12 +477,12 @@ static inline void _clear_addr(I2C_TypeDef *dev)
     dev->SR2;
 }
 
-static inline void _write(I2C_TypeDef *dev, char *data, int length, char *err)
+static inline void _write(I2C_TypeDef *dev, const uint8_t *data, int length, uint8_t *err)
 {
     DEBUG("Looping through bytes\n");
     for (int i = 0; i < length && !(*err); i++) {
         /* write data to data register */
-        dev->DR = (uint8_t)data[i];
+        dev->DR = data[i];
         DEBUG("Written %i byte to data reg, now waiting for DR to be empty again\n", i);
         /* wait for transfer to finish */
         while (!(dev->SR1 & I2C_SR1_TXE) && !(*err)) {}
@@ -490,7 +491,7 @@ static inline void _write(I2C_TypeDef *dev, char *data, int length, char *err)
 
 }
 
-static inline void _stop(I2C_TypeDef *dev, char *err)
+static inline void _stop(I2C_TypeDef *dev, uint8_t *err)
 {
     /* make sure last byte was send */
     while (!(dev->SR1 & I2C_SR1_BTF) && !(*err)) {}

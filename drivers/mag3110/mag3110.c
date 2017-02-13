@@ -33,7 +33,7 @@
 
 int mag3110_test(mag3110_t *dev)
 {
-    char reg;
+    uint8_t reg;
 
     /* Acquire exclusive access to the bus. */
     i2c_acquire(dev->i2c);
@@ -53,7 +53,7 @@ int mag3110_test(mag3110_t *dev)
 
 int mag3110_init(mag3110_t *dev, i2c_t i2c, uint8_t address, uint8_t dros)
 {
-    char reg;
+    uint8_t reg;
 
     /* write device descriptor */
     dev->i2c = i2c;
@@ -100,14 +100,14 @@ int mag3110_init(mag3110_t *dev, i2c_t i2c, uint8_t address, uint8_t dros)
 
 int mag3110_set_user_offset(mag3110_t *dev, int16_t x, int16_t y, int16_t z)
 {
-    char buf[6];
+    uint8_t buf[6];
 
-    buf[0] = (char)(x >> 8);
-    buf[1] = (char)x;
-    buf[2] = (char)(y >> 8);
-    buf[3] = (char)y;
-    buf[4] = (char)(z >> 8);
-    buf[5] = (char)z;
+    buf[0] = (x >> 8);
+    buf[1] = x;
+    buf[2] = (y >> 8);
+    buf[3] = y;
+    buf[4] = (z >> 8);
+    buf[5] = z;
 
     i2c_acquire(dev->i2c);
     if (i2c_write_regs(dev->i2c, dev->addr, MAG3110_OFF_X_MSB, buf, 6) != 6) {
@@ -121,7 +121,7 @@ int mag3110_set_user_offset(mag3110_t *dev, int16_t x, int16_t y, int16_t z)
 
 int mag3110_set_active(mag3110_t *dev)
 {
-    char reg;
+    uint8_t reg;
 
     if (dev->initialized == false) {
         return -1;
@@ -146,7 +146,7 @@ int mag3110_set_active(mag3110_t *dev)
 
 int mag3110_set_standby(mag3110_t *dev)
 {
-    char reg;
+    uint8_t reg;
 
     i2c_acquire(dev->i2c);
     if (i2c_read_regs(dev->i2c, dev->addr, MAG3110_CTRL_REG1, &reg, 1) != 1) {
@@ -167,7 +167,7 @@ int mag3110_set_standby(mag3110_t *dev)
 
 int mag3110_is_ready(mag3110_t *dev)
 {
-    char reg;
+    uint8_t reg;
 
     if (dev->initialized == false) {
         return -1;
@@ -185,7 +185,7 @@ int mag3110_is_ready(mag3110_t *dev)
 
 int mag3110_read(mag3110_t *dev, int16_t *x, int16_t *y, int16_t *z, uint8_t *status)
 {
-    char buf[7];
+    uint8_t buf[7];
 
     if (dev->initialized == false) {
         return -1;
@@ -213,7 +213,7 @@ int mag3110_read_dtemp(mag3110_t *dev, int8_t *dtemp)
     }
 
     i2c_acquire(dev->i2c);
-    if (i2c_read_regs(dev->i2c, dev->addr, MAG3110_DIE_TEMP, (char *)dtemp, 1) != 1) {
+    if (i2c_read_regs(dev->i2c, dev->addr, MAG3110_DIE_TEMP, dtemp, 1) != 1) {
         i2c_release(dev->i2c);
         return -1;
     }

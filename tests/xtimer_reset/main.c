@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <stdint.h>
+#include <inttypes.h>
 #include <stdio.h>
 
 #include "thread.h"
@@ -46,11 +48,11 @@ int main(void)
     xtimer_set_wakeup(&xtimer, 200000, me);
     xtimer_set_wakeup(&xtimer2, 100000, me);
 
-    printf("now=%u\n", (unsigned)xtimer_now());
+    printf("now=%" PRIu32 "\n", xtimer_now_usec());
     thread_sleep();
-    printf("now=%u\n", (unsigned)xtimer_now());
+    printf("now=%" PRIu32 "\n", xtimer_now_usec());
     thread_sleep();
-    printf("now=%u\n", (unsigned)xtimer_now());
+    printf("now=%" PRIu32 "\n", xtimer_now_usec());
 
     printf("Test completed!\n");
 

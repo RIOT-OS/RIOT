@@ -42,39 +42,39 @@ iotlab-exp: $(IOTLAB_AUTH) all
 	    $(eval NODES_PARAM := "-l$(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(BINARY),$(IOTLAB_PROFILE)")
     endif
 
-    ifeq (,$(AD))
+    ifeq (,$(Q))
 	    @echo "experiment-cli submit -d $(IOTLAB_DURATION) $(NODES_PARAM) -n $(IOTLAB_EXP_NAME)"
     endif
 	$(eval NEW_ID := $(shell experiment-cli submit -d $(IOTLAB_DURATION) $(NODES_PARAM) -n $(IOTLAB_EXP_NAME) | grep -Eo '[[:digit:]]+'))
-	$(AD)experiment-cli wait -i $(NEW_ID)
+	$(Q)experiment-cli wait -i $(NEW_ID)
 
     ifdef IOTLAB_LOGGING
-	    $(AD)ssh -t $(IOTLAB_AUTHORITY) "tmux new -d -s riot-$(NEW_ID)\
+	    $(Q)ssh -t $(IOTLAB_AUTHORITY) "tmux new -d -s riot-$(NEW_ID)\
 	    'script -fac "'"'"serial_aggregator -i $(NEW_ID)"'"'"\
 	     RIOT_LOG-$(IOTLAB_EXP_NAME)-$(NEW_ID)'"
     endif
 
 iotlab-flash: $(IOTLAB_AUTH) iotlab-check-exp all
-	$(AD)node-cli --update $(BINARY) -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE) $(EXCLUDE_PARAM)
+	$(Q)node-cli --update $(BINARY) -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE) $(EXCLUDE_PARAM)
 
 iotlab-reset: $(IOTLAB_AUTH) iotlab-check-exp
-	$(AD)node-cli --reset -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE) $(EXCLUDE_PARAM)
+	$(Q)node-cli --reset -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE) $(EXCLUDE_PARAM)
 
 iotlab-debug-server: $(IOTLAB_AUTH) iotlab-check-exp
 	$(eval DEBUG_TYPE := $(shell echo $(IOTLAB_TYPE) | cut -d: -f1))
 	$(eval DEBUG_NODE := $(shell echo $(IOTLAB_DEBUG_NODE) | sed 's/$(DEBUG_TYPE)-\([0-9]*\)/\1/'))
 
-	$(AD)node-cli --debug-start -i $(IOTLAB_EXP_ID) -l $(IOTLAB_SITE),$(DEBUG_TYPE),$(DEBUG_NODE)
+	$(Q)node-cli --debug-start -i $(IOTLAB_EXP_ID) -l $(IOTLAB_SITE),$(DEBUG_TYPE),$(DEBUG_NODE)
 	@echo "Debug on node $(IOTLAB_DEBUG_NODE)"
-	$(AD)ssh -N -L $(IOTLAB_DEBUG_PORT):$(IOTLAB_DEBUG_NODE):3333 $(IOTLAB_AUTHORITY)
+	$(Q)ssh -N -L $(IOTLAB_DEBUG_PORT):$(IOTLAB_DEBUG_NODE):3333 $(IOTLAB_AUTHORITY)
 
 iotlab-stop: $(IOTLAB_AUTH) iotlab-check-exp
-	$(AD)experiment-cli stop -i $(IOTLAB_EXP_ID)
+	$(Q)experiment-cli stop -i $(IOTLAB_EXP_ID)
 
 iotlab-term: iotlab-check-exp
-	$(AD)ssh -t $(IOTLAB_AUTHORITY) "test -f ~/.iotlabrc || auth-cli -u $(IOTLAB_USER)"
+	$(Q)ssh -t $(IOTLAB_AUTHORITY) "test -f ~/.iotlabrc || auth-cli -u $(IOTLAB_USER)"
 
-	$(AD)ssh -t $(IOTLAB_AUTHORITY) \
+	$(Q)ssh -t $(IOTLAB_AUTHORITY) \
 	"tmux attach -t riot-$(IOTLAB_EXP_ID) || tmux new -s riot-$(IOTLAB_EXP_ID) \
 	'$(if $(IOTLAB_LOGGING), \
 	script -fac "'"'"serial_aggregator -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE)"'"'" \

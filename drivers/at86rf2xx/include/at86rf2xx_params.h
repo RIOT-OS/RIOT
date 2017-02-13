@@ -32,10 +32,10 @@ extern "C" {
  * @{
  */
 #ifndef AT86RF2XX_PARAM_SPI
-#define AT86RF2XX_PARAM_SPI         (SPI_0)
+#define AT86RF2XX_PARAM_SPI         (SPI_DEV(0))
 #endif
-#ifndef AT86RF2XX_PARAM_SPI_SPEED
-#define AT86RF2XX_PARAM_SPI_SPEED   (SPI_SPEED_5MHZ)
+#ifndef AT86RF2XX_PARAM_SPI_CLK
+#define AT86RF2XX_PARAM_SPI_CLK     (SPI_CLK_5MHZ)
 #endif
 #ifndef AT86RF2XX_PARAM_CS
 #define AT86RF2XX_PARAM_CS          (GPIO_PIN(0, 0))
@@ -51,7 +51,7 @@ extern "C" {
 #endif
 
 #define AT86RF2XX_PARAMS_DEFAULT    {.spi = AT86RF2XX_PARAM_SPI, \
-                                     .spi_speed = AT86RF2XX_PARAM_SPI_SPEED, \
+                                     .spi_clk = AT86RF2XX_PARAM_SPI_CLK, \
                                      .cs_pin = AT86RF2XX_PARAM_CS, \
                                      .int_pin = AT86RF2XX_PARAM_INT, \
                                      .sleep_pin = AT86RF2XX_PARAM_SLEEP, \

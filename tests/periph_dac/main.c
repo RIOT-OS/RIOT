@@ -30,7 +30,7 @@
 
 int main(void)
 {
-    uint32_t last = xtimer_now();
+    xtimer_ticks32_t last = xtimer_now();
     uint16_t val = 0;
     uint16_t step = 0xffff / STEPS;
 
@@ -56,7 +56,7 @@ int main(void)
             dac_set(DAC_LINE(i), val);
         }
         val += step;
-        xtimer_usleep_until(&last, DELAY);
+        xtimer_periodic_wakeup(&last, DELAY);
     }
 
     return 0;

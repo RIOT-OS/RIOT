@@ -9,7 +9,8 @@ RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos msb-430 msb-430h nrf51dongle nrf6310 \
                              nucleo-f334 pca10000 pca10005 stm32f0discovery telosb weio \
-                             wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1 nucleo-f072
+                             wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1 nucleo-f072 \
+                             nucleo-f030 nucleo-f070 nucleo32-f042
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
@@ -18,7 +19,7 @@ USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for socket communication via UDP
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_udp
-USEMODULE += gnrc_conn_udp
+USEMODULE += gnrc_sock_udp
 USEMODULE += posix_sockets
 # Add also the shell, some shell commands
 USEMODULE += shell

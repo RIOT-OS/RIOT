@@ -21,10 +21,8 @@
 
 #include "mutex.h"
 #include "thread.h"
-#include "xtimer.h"
 
 #define THREAD_NUMOF            (5U)
-#define DELAY                   (10 * 1000U)        /* 10ms */
 
 extern volatile thread_t *sched_active_thread;
 
@@ -39,14 +37,14 @@ static void *lockme(void *arg)
     (void)arg;
     volatile thread_t *t = sched_active_thread;
 
-    printf("T%i (prio %i): locking mutex now\n",
+    printf("T%i (prio %i): trying to lock mutex now\n",
            (int)t->pid, (int)t->priority);
     mutex_lock(&testlock);
-
-    xtimer_usleep(DELAY);
-
-    printf("T%i (prio %i): unlocking mutex now\n",
+    printf("T%i (prio %i): locked mutex now\n",
            (int)t->pid, (int)t->priority);
+
+    thread_yield();
+
     mutex_unlock(&testlock);
 
     return NULL;
@@ -59,11 +57,15 @@ int main(void)
 
     mutex_init(&testlock);
 
+    /* lock mutex, so that spawned threads have to wait */
+    mutex_lock(&testlock);
     /* create threads */
     for (unsigned i = 0; i < THREAD_NUMOF; i++) {
         thread_create(stacks[i], sizeof(stacks[i]), prios[i], 0,
                       lockme, NULL, "t");
     }
+    /* allow threads to lock the mutex */
+    mutex_unlock(&testlock);
 
     mutex_lock(&testlock);
     puts("\nTest END, check the order of priorities above.");

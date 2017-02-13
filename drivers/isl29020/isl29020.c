@@ -30,7 +30,7 @@ int isl29020_init(isl29020_t *dev, i2c_t i2c, uint8_t address,
                   isl29020_range_t range, isl29020_mode_t mode)
 {
     int res;
-    char tmp;
+    uint8_t tmp;
 
     /* initialize device descriptor */
     dev->i2c = i2c;
@@ -55,7 +55,7 @@ int isl29020_init(isl29020_t *dev, i2c_t i2c, uint8_t address,
 
 int isl29020_read(isl29020_t *dev)
 {
-    char low, high;
+    uint8_t low, high;
     uint16_t res;
     int ret;
 
@@ -76,7 +76,7 @@ int isl29020_read(isl29020_t *dev)
 int isl29020_enable(isl29020_t *dev)
 {
     int res;
-    char tmp;
+    uint8_t tmp;
 
     i2c_acquire(dev->i2c);
     res = i2c_read_reg(dev->i2c, dev->address, ISL29020_REG_CMD, &tmp);
@@ -97,7 +97,7 @@ int isl29020_enable(isl29020_t *dev)
 int isl29020_disable(isl29020_t *dev)
 {
     int res;
-    char tmp;
+    uint8_t tmp;
 
     i2c_acquire(dev->i2c);
     res = i2c_read_reg(dev->i2c, dev->address, ISL29020_REG_CMD, &tmp);

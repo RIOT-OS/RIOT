@@ -24,8 +24,6 @@
 
 #include "cpu.h"
 #include "board.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph_conf.h"
 #include "periph/rtt.h"
 
@@ -125,7 +123,5 @@ void RTT_ISR(void)
         overflow_cb(overflow_arg);
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

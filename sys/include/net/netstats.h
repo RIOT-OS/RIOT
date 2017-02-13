@@ -33,6 +33,7 @@ extern "C" {
  */
 #define NETSTATS_LAYER2     (0x01)
 #define NETSTATS_IPV6       (0x02)
+#define NETSTATS_RPL        (0x03)
 #define NETSTATS_ALL        (0xFF)
 /** @} */
 

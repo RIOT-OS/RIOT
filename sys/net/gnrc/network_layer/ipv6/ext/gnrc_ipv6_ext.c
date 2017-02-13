@@ -100,11 +100,12 @@ static enum gnrc_ipv6_ext_demux_status _handle_rh(gnrc_pktsnip_t *current, gnrc_
 static gnrc_pktsnip_t *_mark_extension_header(gnrc_pktsnip_t *current,
                                               gnrc_pktsnip_t **pkt)
 {
-    gnrc_pktsnip_t *ext_snip, *tmp, *next;
+    gnrc_pktsnip_t *tmp, *next;
     ipv6_ext_t *ext = (ipv6_ext_t *) current->data;
     size_t offset = ((ext->len * IPV6_EXT_LEN_UNIT) + IPV6_EXT_LEN_UNIT);
 
     if (current == *pkt) {
+        gnrc_pktsnip_t *ext_snip;
         if ((tmp = gnrc_pktbuf_start_write(*pkt)) == NULL) {
             DEBUG("ipv6: could not get a copy of pkt\n");
             gnrc_pktbuf_release(*pkt);

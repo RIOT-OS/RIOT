@@ -15,8 +15,8 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef TESTS_CORE_H_
-#define TESTS_CORE_H_
+#ifndef TESTS_CORE_H
+#define TESTS_CORE_H
 
 #include "embUnit.h"
 
@@ -65,6 +65,13 @@ Test *tests_core_clist_tests(void);
 Test *tests_core_lifo_tests(void);
 
 /**
+ * @brief   Generates tests for list.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_core_list_tests(void);
+
+/**
  * @brief   Generates tests for priority_queue.h
  *
  * @return  embUnit tests if successful, NULL if not.
@@ -89,5 +96,5 @@ Test *tests_core_ringbuffer_tests(void);
 }
 #endif
 
-#endif /* TESTS_CORE_H_ */
+#endif /* TESTS_CORE_H */
 /** @} */

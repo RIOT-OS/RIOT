@@ -33,7 +33,7 @@
 
 int mpl3115a2_test(mpl3115a2_t *dev)
 {
-    char reg;
+    uint8_t reg;
 
     /* Acquire exclusive access to the bus. */
     i2c_acquire(dev->i2c);
@@ -53,7 +53,7 @@ int mpl3115a2_test(mpl3115a2_t *dev)
 
 int mpl3115a2_init(mpl3115a2_t *dev, i2c_t i2c, uint8_t address, uint8_t os_ratio)
 {
-    char reg;
+    uint8_t reg;
 
     /* write device descriptor */
     dev->i2c = i2c;
@@ -103,7 +103,7 @@ int mpl3115a2_init(mpl3115a2_t *dev, i2c_t i2c, uint8_t address, uint8_t os_rati
 
 int mpl3115a2_reset(mpl3115a2_t *dev)
 {
-    char reg;
+    uint8_t reg;
 
     dev->initialized = false;
     reg = MPL3115A2_CTRL_REG1_RST;
@@ -120,7 +120,7 @@ int mpl3115a2_reset(mpl3115a2_t *dev)
 
 int mpl3115a2_set_active(mpl3115a2_t *dev)
 {
-    char reg;
+    uint8_t reg;
 
     if (dev->initialized == false) {
         return -1;
@@ -145,7 +145,7 @@ int mpl3115a2_set_active(mpl3115a2_t *dev)
 
 int mpl3115a2_set_standby(mpl3115a2_t *dev)
 {
-    char reg;
+    uint8_t reg;
 
     i2c_acquire(dev->i2c);
     if (i2c_read_regs(dev->i2c, dev->addr, MPL3115A2_CTRL_REG1, &reg, 1) != 1) {
@@ -166,7 +166,7 @@ int mpl3115a2_set_standby(mpl3115a2_t *dev)
 
 int mpl3115a2_is_ready(mpl3115a2_t *dev)
 {
-    char reg;
+    uint8_t reg;
 
     if (dev->initialized == false) {
         return -1;
@@ -184,7 +184,7 @@ int mpl3115a2_is_ready(mpl3115a2_t *dev)
 
 int mpl3115a2_read_pressure(mpl3115a2_t *dev, uint32_t *pres, uint8_t *status)
 {
-    char buf[4];
+    uint8_t buf[4];
 
     if (dev->initialized == false) {
         return -1;
@@ -207,7 +207,7 @@ int mpl3115a2_read_pressure(mpl3115a2_t *dev, uint32_t *pres, uint8_t *status)
 
 int mpl3115a2_read_temp(mpl3115a2_t *dev, int16_t *temp)
 {
-    char buf[2];
+    uint8_t buf[2];
 
     if (dev->initialized == false) {
         return -1;

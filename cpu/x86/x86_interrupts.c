@@ -169,7 +169,7 @@ static void continue_after_intr(void)
 }
 
 static unsigned in_intr_handler = 0, old_intr;
-void x86_int_handler(void)
+__attribute__((used)) void x86_int_handler(void)
 {
     switch (in_intr_handler++) {
         case 0:
@@ -213,7 +213,7 @@ void x86_int_handler(void)
     __builtin_unreachable();
 }
 
-void ASM_FUN_ATTRIBUTES NORETURN x86_int_entry(void)
+__attribute__((used)) void ASM_FUN_ATTRIBUTES NORETURN x86_int_entry(void)
 {
     __asm__ volatile ("mov %eax, (4*0 + x86_interrupted_ctx)");
     __asm__ volatile ("mov %ecx, (4*1 + x86_interrupted_ctx)");
@@ -239,7 +239,7 @@ void ASM_FUN_ATTRIBUTES NORETURN x86_int_entry(void)
     __builtin_unreachable();
 }
 
-void ASM_FUN_ATTRIBUTES NORETURN x86_int_exit(void)
+__attribute__((used)) void ASM_FUN_ATTRIBUTES NORETURN x86_int_exit(void)
 {
     __asm__ volatile ("mov (4*0 + x86_interrupted_ctx), %eax");
     __asm__ volatile ("mov (4*1 + x86_interrupted_ctx), %ecx");

@@ -19,8 +19,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
@@ -67,7 +65,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     int pin_num = _pin_num(pin);
 
     /* enable clock */
-    RCC->AHBENR |= (RCC_AHBENR_GPIOAEN << _port_num(pin));
+    periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
 
     /* set mode */
     port->MODER &= ~(0x3 << (2 * pin_num));
@@ -96,7 +94,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     isr_ctx[pin_num].arg = arg;
 
     /* enable clock of the SYSCFG module for EXTI configuration */
-    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGCOMPEN;
+    periph_clk_en(APB2, RCC_APB2ENR_SYSCFGCOMPEN);
 
     /* initialize pin as input */
     gpio_init(pin, mode);
@@ -145,7 +143,7 @@ void gpio_init_analog(gpio_t pin)
 {
     /* enable clock, needed as this function can be used without calling
      * gpio_init first */
-    RCC->AHBENR |= (RCC_AHBENR_GPIOAEN << _port_num(pin));
+    periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
     /* set to analog mode */
     _port(pin)->MODER |= (0x3 << (2 * _pin_num(pin)));
 }
@@ -208,7 +206,5 @@ void isr_exti(void)
             isr_ctx[i].cb(isr_ctx[i].arg);
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

@@ -17,6 +17,7 @@
  *
  * @author      René Herthel <rene-herthel@outlook.de>
  * @author      Francisco Acosta <francisco.acosta@inria.fr>
+ * @author      Laurent Navet <laurent.navet@gmail.com>
  *
  * @}
  */
@@ -84,10 +85,11 @@ static inline uint16_t _port_addr(gpio_t pin)
     port_addr += GPIO_BASE_PORT_A;
     port_addr += GPIO_OFFSET_PIN_PORT;
 
+#if defined (PORTG)
     if (port_num > PORT_G) {
         port_addr += GPIO_OFFSET_PORT_H;
     }
-
+#endif
     return port_addr;
 }
 
@@ -133,7 +135,9 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     uint8_t pin_num = _pin_num(pin);
 
     if ((_port_num(pin) == PORT_D && pin_num > 3)
+#if defined (PORTE)
          || (_port_num(pin) == PORT_E && pin_num < 4)
+#endif
          || ((mode != GPIO_IN) && (mode != GPIO_IN_PU))) {
         return -1;
     }
@@ -151,25 +155,31 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
             if (pin_num < 4) {
                 EICRA |= (3 << pin_num * 2);
             }
+#if defined(EICRB)
             else {
                 EICRB |= (3 << (pin_num * 2) % 4);
             }
+#endif
             break;
         case GPIO_FALLING:
             if (pin_num < 4) {
                 EICRA |= (2 << pin_num * 2);
             }
+#if defined(EICRB)
             else {
                 EICRB |= (2 << (pin_num * 2) % 4);
             }
+#endif
             break;
         case GPIO_BOTH:
             if (pin_num < 4) {
                 EICRA |= (1 << pin_num * 2);
             }
+#if defined(EICRB)
             else {
                 EICRB |= (1 << (pin_num * 2) % 4);
             }
+#endif
             break;
         default:
             return -1;

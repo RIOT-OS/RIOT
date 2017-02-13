@@ -19,8 +19,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/uart.h"
 
 /**
@@ -49,7 +47,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* make sure the uart device is valid */
     if (uart != 0) {
-        return -1;
+        return UART_NODEV;
     }
 
     /* enable clocks: serial power domain and UART */
@@ -89,7 +87,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* start the UART */
     UART->CTL = ENABLE_MASK;
 
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
@@ -131,7 +129,5 @@ void isr_uart(void)
         ctx[0].rx_cb(ctx[0].arg, (uint8_t)UART->DR);
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

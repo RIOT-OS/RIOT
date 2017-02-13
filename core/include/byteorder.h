@@ -16,8 +16,8 @@
  * @author         René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef BYTEORDER_H_
-#define BYTEORDER_H_
+#ifndef BYTEORDER_H
+#define BYTEORDER_H
 
 #include <stdint.h>
 
@@ -422,5 +422,5 @@ static inline uint64_t NTOHLL(uint64_t v)
 }
 #endif
 
-#endif /* BYTEORDER_H_ */
+#endif /* BYTEORDER_H */
 /** @} */

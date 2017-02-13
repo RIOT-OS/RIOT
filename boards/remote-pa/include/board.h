@@ -20,11 +20,10 @@
  *              Antonio Lignan <alinan@zolertia.com>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
-#include "periph/gpio.h"
 #include "board_common.h"
 
 #ifdef __cplusplus
@@ -57,6 +56,13 @@
 /** @} */
 
 /**
+ * @name User button pin definition
+ * @{
+ */
+#define BTN0_PIN            GPIO_PIN(0, 3)
+/** @} */
+
+/**
  * @name 2.4GHz RF switch controlled by SW
  * @{
  */
@@ -67,8 +73,13 @@
 #define RF_SWITCH_TOGGLE    (RF_SWITCH_PORT->DATA ^= (1 << RF_SWITCH_PIN))
 /** @} */
 
+/**
+ * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ */
+void board_init(void);
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

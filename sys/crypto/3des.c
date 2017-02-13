@@ -259,7 +259,7 @@ int tripledes_init(cipher_context_t *context, const uint8_t *key,
     // Make sure that context is large enough. If this is not the case,
     // you should build with -DTHREEDES
     if(CIPHER_MAX_CONTEXT_SIZE < THREEDES_MAX_KEY_SIZE) {
-        return 0;
+        return CIPHER_ERR_BAD_CONTEXT_SIZE;
     }
 
     //key must be at least 24 Bytes long
@@ -275,7 +275,7 @@ int tripledes_init(cipher_context_t *context, const uint8_t *key,
         }
     }
 
-    return 1;
+    return CIPHER_INIT_SUCCESS;
 }
 
 int tripledes_encrypt(const cipher_context_t *context, const uint8_t *plain, uint8_t *crypt)

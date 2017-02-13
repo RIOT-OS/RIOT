@@ -33,6 +33,7 @@ static const  lis3dh_params_t lis3dh_params[] =
 {
     {
         .spi   = LIS3DH_SPI,
+        .clk   = LIS3DH_CLK,
         .cs    = LIS3DH_CS,
         .int1  = LIS3DH_INT1,
         .int2  = LIS3DH_INT2,

@@ -59,8 +59,7 @@ static char getsymbol(unsigned char code)
 int base64_encode(unsigned char *data_in, size_t data_in_size, \
                   unsigned char *base64_out, size_t *base64_out_size)
 {
-    size_t padding_bytes = ((data_in_size % 3) ? (3 - (data_in_size % 3)) : 0);
-    size_t required_size = (4 * (data_in_size + 2 - ((data_in_size + 2) % 3)) / 3) + padding_bytes;
+    size_t required_size = 4 * ((data_in_size + 2) / 3);
 
     if (data_in == NULL) {
         return BASE64_ERROR_DATA_IN;
@@ -83,9 +82,9 @@ int base64_encode(unsigned char *data_in, size_t data_in_size, \
     unsigned char nNum = 0;
     int nLst = 0;
     int njump = 0;
-    unsigned char tmpval;
 
     for (int i = 0; i < (int)(data_in_size); ++i) {
+        unsigned char tmpval;
         njump++;
         tmpval = *(data_in + i);
 

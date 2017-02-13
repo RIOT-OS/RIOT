@@ -152,7 +152,7 @@ do_flash() {
             ${OPENOCD_PRE_VERIFY_CMDS} \
             -c 'verify_image \"${HEXFILE}\"' \
             -c 'reset run' \
-            -c 'shutdown'"
+            -c 'shutdown'" &&
     echo 'Done flashing'
 }
 
@@ -182,7 +182,7 @@ do_flash_elf() {
             ${OPENOCD_PRE_VERIFY_CMDS} \
             -c 'verify_image \"${ELFFILE}\"' \
             -c 'reset run' \
-            -c 'shutdown'"
+            -c 'shutdown'" &&
     echo 'Done flashing'
 }
 

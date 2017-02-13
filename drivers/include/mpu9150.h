@@ -18,8 +18,8 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
-#ifndef MPU9150_H_
-#define MPU9150_H_
+#ifndef MPU9150_H
+#define MPU9150_H
 
 #include "periph/i2c.h"
 
@@ -336,5 +336,5 @@ int mpu9150_set_compass_sample_rate(mpu9150_t *dev, uint8_t rate);
 }
 #endif
 
-#endif /* MPU9150_H_ */
+#endif /* MPU9150_H */
 /** @} */

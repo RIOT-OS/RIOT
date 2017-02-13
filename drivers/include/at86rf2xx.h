@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_at86rf2xx AT86RF2xx based drivers
- * @ingroup     drivers_netdev_netdev2
+ * @ingroup     drivers_netdev
  *
  * This module contains drivers for radio devices in Atmel's AT86RF2xx series.
  * The driver is aimed to work with all devices of this series.
@@ -26,10 +26,11 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef AT86RF2XX_H_
-#define AT86RF2XX_H_
+#ifndef AT86RF2XX_H
+#define AT86RF2XX_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "board.h"
 #include "periph/spi.h"
@@ -45,15 +46,7 @@ extern "C" {
 /**
  * @brief   Maximum possible packet size in byte
  */
-#define AT86RF2XX_MAX_PKT_LENGTH        (127)
-
-/**
- * @brief   Default addresses used if the CPUID module is not present
- * @{
- */
-#define AT86RF2XX_DEFAULT_ADDR_SHORT    (0x0230)
-#define AT86RF2XX_DEFAULT_ADDR_LONG     (0x1222334455667788)
-/** @} */
+#define AT86RF2XX_MAX_PKT_LENGTH        (IEEE802154_FRAME_LEN_MAX)
 
 /**
  * @brief   Channel configuration
@@ -61,23 +54,13 @@ extern "C" {
  */
 #ifdef MODULE_AT86RF212B
 /* the AT86RF212B has a sub-1GHz radio */
-#define AT86RF2XX_MIN_CHANNEL           (0)
-#define AT86RF2XX_MAX_CHANNEL           (10)
-#ifdef DEFAULT_CHANNEL
-#define AT86RF2XX_DEFAULT_CHANNEL (DEFAULT_CHANNEL)
-#endif
-#ifndef AT86RF2XX_DEFAULT_CHANNEL
-#define AT86RF2XX_DEFAULT_CHANNEL       (5)
-#endif
+#define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN_SUBGHZ)
+#define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX_SUBGHZ)
+#define AT86RF2XX_DEFAULT_CHANNEL       (IEEE802154_DEFAULT_SUBGHZ_CHANNEL)
 #else
-#define AT86RF2XX_MIN_CHANNEL           (11U)
-#define AT86RF2XX_MAX_CHANNEL           (26U)
-#ifdef DEFAULT_CHANNEL
-#define AT86RF2XX_DEFAULT_CHANNEL (DEFAULT_CHANNEL)
-#endif
-#ifndef AT86RF2XX_DEFAULT_CHANNEL
-#define AT86RF2XX_DEFAULT_CHANNEL       (26U)
-#endif
+#define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN)
+#define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX)
+#define AT86RF2XX_DEFAULT_CHANNEL       (IEEE802154_DEFAULT_CHANNEL)
 #endif
 /** @} */
 
@@ -86,30 +69,41 @@ extern "C" {
  *
  * @todo    Read some global network stack specific configuration value
  */
-#define AT86RF2XX_DEFAULT_PANID         (0x0023)
+#define AT86RF2XX_DEFAULT_PANID         (IEEE802154_DEFAULT_PANID)
 
 /**
  * @brief   Default TX power (0dBm)
  */
-#define AT86RF2XX_DEFAULT_TXPOWER       (0U)
+#define AT86RF2XX_DEFAULT_TXPOWER       (IEEE802154_DEFAULT_TXPOWER)
 
 /**
  * @brief   Base (minimal) RSSI value in dBm
  */
-#define RSSI_BASE_VAL                   (-91)
+#if MODULE_AT86RF233
+#   define RSSI_BASE_VAL                   (-94)
+#elif MODULE_AT86RF212B
+/**
+ * @note for the default settings in RIOT for the at86rf212b,
+ *       for other seetings this value may change.
+ */
+#   define RSSI_BASE_VAL                   (-98)
+#else
+#   define RSSI_BASE_VAL                   (-91)
+#endif
 
 /**
  * @brief   Flags for device internal states (see datasheet)
  * @{
  */
-#define AT86RF2XX_STATE_TRX_OFF      (0x08)     /**< idle */
-#define AT86RF2XX_STATE_PLL_ON       (0x09)     /**< ready to transmit */
-#define AT86RF2XX_STATE_SLEEP        (0x0f)     /**< sleep mode */
-#define AT86RF2XX_STATE_BUSY_RX_AACK (0x11)     /**< busy receiving data */
-#define AT86RF2XX_STATE_BUSY_TX_ARET (0x12)     /**< busy transmitting data */
-#define AT86RF2XX_STATE_RX_AACK_ON   (0x16)     /**< wait for incoming data */
-#define AT86RF2XX_STATE_TX_ARET_ON   (0x19)     /**< ready for sending data */
-#define AT86RF2XX_STATE_IN_PROGRESS  (0x1f)     /**< ongoing state conversion */
+#define AT86RF2XX_STATE_FORCE_TRX_OFF  (0x03)     /**< force transition to idle */
+#define AT86RF2XX_STATE_TRX_OFF        (0x08)     /**< idle */
+#define AT86RF2XX_STATE_PLL_ON         (0x09)     /**< ready to transmit */
+#define AT86RF2XX_STATE_SLEEP          (0x0f)     /**< sleep mode */
+#define AT86RF2XX_STATE_BUSY_RX_AACK   (0x11)     /**< busy receiving data */
+#define AT86RF2XX_STATE_BUSY_TX_ARET   (0x12)     /**< busy transmitting data */
+#define AT86RF2XX_STATE_RX_AACK_ON     (0x16)     /**< wait for incoming data */
+#define AT86RF2XX_STATE_TX_ARET_ON     (0x19)     /**< ready for sending data */
+#define AT86RF2XX_STATE_IN_PROGRESS    (0x1f)     /**< ongoing state conversion */
 /** @} */
 
 /**
@@ -146,8 +140,8 @@ extern "C" {
  */
 typedef struct at86rf2xx_params {
     spi_t spi;              /**< SPI bus the device is connected to */
-    spi_speed_t spi_speed;  /**< SPI speed to use */
-    gpio_t cs_pin;          /**< GPIO pin connected to chip select */
+    spi_clk_t spi_clk;      /**< SPI clock speed to use */
+    spi_cs_t cs_pin;        /**< GPIO pin connected to chip select */
     gpio_t int_pin;         /**< GPIO pin connected to the interrupt pin */
     gpio_t sleep_pin;       /**< GPIO pin connected to the sleep pin */
     gpio_t reset_pin;       /**< GPIO pin connected to the reset pin */
@@ -192,16 +186,6 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params);
  * @param[in] dev           device to reset
  */
 void at86rf2xx_reset(at86rf2xx_t *dev);
-
-/**
- * @brief   Trigger a clear channel assessment
- *
- * @param[in] dev           device to use
- *
- * @return                  true if channel is clear
- * @return                  false if channel is busy
- */
-bool at86rf2xx_cca(at86rf2xx_t *dev);
 
 /**
  * @brief   Get the short address of the given device
@@ -475,5 +459,5 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev);
 }
 #endif
 
-#endif /* AT86RF2XX_H_ */
+#endif /* AT86RF2XX_H */
 /** @} */

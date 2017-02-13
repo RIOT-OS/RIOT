@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef SMB380_H_
-#define SMB380_H_
+#ifndef SMB380_H
+#define SMB380_H
 #include <stdint.h>
 #include "bitarithm.h"
 
@@ -255,4 +255,4 @@ void SMB380_Selftest_1(void);
 }
 #endif
 
-#endif   /* SMB380_H_ */
+#endif   /* SMB380_H */

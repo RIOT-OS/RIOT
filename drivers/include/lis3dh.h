@@ -19,8 +19,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef LIS3DH_H_
-#define LIS3DH_H_
+#ifndef LIS3DH_H
+#define LIS3DH_H
 
 #include <stdint.h>
 
@@ -677,10 +677,11 @@ typedef enum {
 /** @} */
 
 /**
- * @brief Device descriptor for LIS3DH sensors
+ * @brief Configuration parameters for LIS3DH devices
  */
 typedef struct {
     spi_t spi;              /**< SPI device the sensor is connected to */
+    spi_clk_t clk;          /**< designated clock speed of the SPI bus */
     gpio_t cs;              /**< Chip select pin */
     gpio_t int1;            /**< INT1 pin */
     gpio_t int2;            /**< INT2 (DRDY) pin */
@@ -688,8 +689,12 @@ typedef struct {
     uint8_t odr;            /**< Default sensor ODR setting: LIS3DH_ODR_xxxHz */
 } lis3dh_params_t;
 
+/**
+ * @brief Device descriptor for LIS3DH sensors
+ */
 typedef struct {
     spi_t spi;              /**< SPI device the sensor is connected to */
+    spi_clk_t clk;          /**< clock speed of the SPI bus */
     gpio_t cs;              /**< Chip select pin */
     int16_t scale;          /**< Current scale setting of the sensor */
 } lis3dh_t;
@@ -709,14 +714,12 @@ typedef struct __attribute__((packed))
  * @brief Initialize a LIS3DH sensor instance
  *
  * @param[in]  dev          Device descriptor of sensor to initialize
- * @param[in]  spi          SPI bus the accelerometer is connected to
- * @param[in]  cs_pin       GPIO connected to the chip select pin of the accelerometer
- * @param[in]  scale        Initial scale setting of the sensor
+ * @param[in]  params       Configuration parameters
  *
  * @return                  0 on success
  * @return                  -1 on error
  */
-int lis3dh_init(lis3dh_t *dev, spi_t spi, gpio_t cs_pin, uint8_t scale);
+int lis3dh_init(lis3dh_t *dev, const lis3dh_params_t *params);
 
 /**
  * @brief Read 3D acceleration data from the accelerometer
@@ -859,5 +862,5 @@ int lis3dh_get_fifo_level(lis3dh_t *dev);
 }
 #endif
 
-#endif /* LIS3DH_H_ */
+#endif /* LIS3DH_H */
 /** @} */

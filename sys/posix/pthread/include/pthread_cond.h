@@ -14,8 +14,8 @@
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
 
-#ifndef __SYS__POSIX__PTHREAD_COND__H
-#define __SYS__POSIX__PTHREAD_COND__H
+#ifndef SYS__POSIX__PTHREAD_COND__H
+#define SYS__POSIX__PTHREAD_COND__H
 
 #include <time.h>
 #include "mutex.h"
@@ -25,7 +25,7 @@
 #   include "msp430_types.h"
 #endif
 
-#if defined(__MACH__)
+#if defined(__MACH__) || defined(__WITH_AVRLIBC__)
 typedef int clockid_t;
 #endif
 
@@ -150,5 +150,8 @@ int pthread_cond_broadcast(pthread_cond_t *cond);
 }
 #endif
 
-/** @} */
-#endif /* _CONDITION_VARIABLE_H */
+#endif /* SYS__POSIX__PTHREAD_COND__H */
+
+/**
+ * @}
+ */

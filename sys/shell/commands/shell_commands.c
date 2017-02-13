@@ -134,6 +134,10 @@ extern int _openthread_state(int argc, char **argv);
 extern int _openthread_ipaddr(int argc, char **argv);
 #endif
 
+#ifdef MODULE_SNTP
+extern int _ntpdate(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -182,7 +186,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_GNRC_NETIF
     {"ifconfig", "Configure network interfaces", _netif_config},
+#ifdef MODULE_GNRC_TXTSND
     {"txtsnd", "Sends a custom string as is over the link layer", _netif_send },
+#endif
 #endif
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
@@ -214,10 +220,13 @@ const shell_command_t _shell_command_list[] = {
     {"saul", "interact with sensors and actuators using SAUL", _saul },
 #endif
 #ifdef MODULE_CCN_LITE_UTILS
-    { "ccnl_open", "opens an interface or socket", _ccnl_open},
-    { "ccnl_int", "sends an interest", _ccnl_interest},
-    { "ccnl_cont", "create content and populated it", _ccnl_content},
-    { "ccnl_fib", "shows or modifies the CCN-Lite FIB", _ccnl_fib},
+    { "ccnl_open", "opens an interface or socket", _ccnl_open },
+    { "ccnl_int", "sends an interest", _ccnl_interest },
+    { "ccnl_cont", "create content and populated it", _ccnl_content },
+    { "ccnl_fib", "shows or modifies the CCN-Lite FIB", _ccnl_fib },
+#endif
+#ifdef MODULE_SNTP
+    { "ntpdate", "synchronizes with a remote time server", _ntpdate },
 #endif
 #if defined(MODULE_OPENTHREAD) && 0
     { "ot_ipaddr", "shows OpenThread IP addresses", _openthread_ipaddr },

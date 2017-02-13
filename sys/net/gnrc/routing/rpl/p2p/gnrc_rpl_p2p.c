@@ -351,7 +351,7 @@ void gnrc_rpl_p2p_recv_DRO(gnrc_pktsnip_t *pkt, ipv6_addr_t *src)
                       sizeof(ipv6_addr_t), 0x0, src->u8,
                       sizeof(ipv6_addr_t), FIB_FLAG_RPL_ROUTE,
                       p2p_ext->dodag->default_lifetime *
-                      p2p_ext->dodag->lifetime_unit * SEC_IN_MS);
+                      p2p_ext->dodag->lifetime_unit * MS_PER_SEC);
 
         if (p2p_ext->dodag->node_status != GNRC_RPL_ROOT_NODE) {
             if ((rdo_snip = gnrc_pktbuf_start_write(rdo_snip)) == NULL) {

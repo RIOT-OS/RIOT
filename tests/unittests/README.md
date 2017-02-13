@@ -22,7 +22,14 @@ You then can run the tests by calling
 make term
 ```
 
-or flash them to your board as you would flash any RIOT application to the board (see [[board documentation|RIOT-Platforms]]).
+or flash them to your board as you would flash any RIOT application to the board (see [board documentation|RIOT-Platforms](https://github.com/RIOT-OS/RIOT/wiki/RIOT-Platforms)).
+
+You can debug your tests by running
+
+```bash
+make debug
+```
+and using GDB as usual.
 
 ### Other output formats
 Other output formats using [*embUnit*](http://embunit.sourceforge.net/)'s ``textui`` library are available by setting the environment variable ``OUTPUT``:
@@ -142,8 +149,8 @@ The test header ``tests-<modulename>/tests-<module>.h`` of a module you add to `
  *
  * @author      <author>
  */
-#ifndef TESTS_<MODULE>_H_
-#define TESTS_<MODULE>_H_
+#ifndef TESTS_<MODULE>_H
+#define TESTS_<MODULE>_H
 #include "embUnit/embUnit.h"
 
 #ifdef __cplusplus
@@ -170,7 +177,7 @@ Test *tests_<module>_<header2>_tests(void);
 }
 #endif
 
-#endif /* TESTS_<MODULE>_H_ */
+#endif /* TESTS_<MODULE>_H */
 /** @} */
 ```
 

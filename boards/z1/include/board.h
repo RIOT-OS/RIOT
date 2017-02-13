@@ -7,8 +7,8 @@
  * directory for more details.
  */
 
-#ifndef Z1_BOARD_H_
-#define Z1_BOARD_H_
+#ifndef Z1_BOARD_H
+#define Z1_BOARD_H
 
 /**
  * @defgroup    boards_z1 Zolertia Z1
@@ -52,15 +52,6 @@ extern "C" {
 #define XTIMER_CHAN                 (0)
 #define XTIMER_WIDTH                (16)
 #define XTIMER_BACKOFF              (40)
-/** @} */
-
-/**
- * @brief   Standard input/output device configuration
- * @{
- */
-#define UART_STDIO_DEV              (UART_DEV(0))
-#define UART_STDIO_BAUDRATE         (115200U)
-#define UART_STDIO_RX_BUFSIZE       (64U)
 /** @} */
 
 /**
@@ -119,8 +110,8 @@ extern "C" {
 /**
  * @brief   Definition of the interface to the CC2420 radio
  */
-#define CC2420_PARAMS_BOARD         {.spi        = SPI_0, \
-                                     .spi_clk    = SPI_SPEED_1MHZ, \
+#define CC2420_PARAMS_BOARD         {.spi        = SPI_DEV(0), \
+                                     .spi_clk    = SPI_CLK_5MHZ, \
                                      .pin_cs     = GPIO_PIN(P3, 0), \
                                      .pin_fifo   = GPIO_PIN(P1, 3), \
                                      .pin_fifop  = GPIO_PIN(P1, 2), \
@@ -134,4 +125,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /*  Z1_BOARD_H_ */
+#endif /*  Z1_BOARD_H */
