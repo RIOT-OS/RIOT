@@ -18,7 +18,7 @@
  * The characteristics of a PWM signal can be defined by three basic parameters,
  * namely the frequency, the duty cycle, and the operational mode. This
  * interface supports basic PWM generation in left-aligned, right-aligned, and
- * center mode. Additionally the interface support the definition of the used
+ * center mode. Additionally the interface supports the definition of the used
  * resolution, defining the granularity with which one can specify the duty
  * cycle. This brings more flexibility to the configuration of the frequency,
  * especially on systems with low system clocks.
@@ -28,14 +28,14 @@
  * for each channel individually, the frequency and resolution are shared for
  * all channels.
  *
- * The mapping/configuration of PWM devices (timers) and the used pins is to be
+ * The mapping/configuration of PWM devices (timers) and the used pins has to be
  * done in the board configuration (the board's `periph_conf.h).
  *
- * When using the PWM interface, fist thing you have to do is initialize the PWM
- * device with the targeted mode, frequency, and resolution settings. Once the
- * device is initialized, it will start the generation of PWM signals on all
+ * When using the PWM interface, first thing you have to do is initialize the
+ * PWM device with the targeted mode, frequency, and resolution settings. Once
+ * the device is initialized, it will start the generation of PWM signals on all
  * configured pins immediately, with an initial duty cycle of `0`. Use the
- * pwm_set() function for changing the duty cycle for a given channel. If you
+ * pwm_set() function to change the duty cycle for a given channel. If you
  * want to disable the PWM generation again, simply call pwm_poweroff().
  *
  * @section     sec_pm (Low-) power implications
@@ -159,8 +159,8 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value);
  * @brief   Resume PWM generation on the given device
  *
  * When this function is called, the given PWM device is powered on and
- * continues its previously configured operation for each channel, where each
- * will continue with the value that was last set.
+ * continues its previously configured operation. The duty cycle of each channel
+ * will be the value that was last set.
  *
  * This function must not be called before the PWM device was initialized.
  *
@@ -171,8 +171,8 @@ void pwm_poweron(pwm_t dev);
 /**
  * @brief   Stop PWM generation on the given device
  *
- * This function stops the PWM generation on all channels configured for the
- * given device and powers powers down the given PWM peripheral.
+ * This function stops the PWM generation on all configured channels for the
+ * given device and powers down the given PWM peripheral.
  *
  * @param[in] dev           device to stop
  */
