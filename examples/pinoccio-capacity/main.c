@@ -27,6 +27,7 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 volatile uint8_t count=0;
+volatile uint16_t values[10];
 
 int main(void)
 {
@@ -41,21 +42,20 @@ int main(void)
 	TCCR1A = 0x00;
 	TCCR1B =0x00;
 	TCCR1C = 0x00;
-	TCCR1B |= (1<<ICNC1)|(1<<ICES1);
+	TCCR1B |= (1<<ICES1);
 
 	TIMSK1 |= (1<<ICIE1)|(1<<TOIE0); //enable Input capture in timer
 
 	PRR0 |=(1<<PRADC); //power on analog comperator
 	ACSR &= ~((1<<ACIS1)|(1<<ACIS0)); //make sure AC is turned on
 
-
-	sei();
 	puts("starting measurement");
-	TCCR1B |= (1<<CS12)|(1<<CS10); //set clock
+	TCCR1B |= (1<<CS10); //set clock
 	ACSR &= ~(1<<ACD);
 	ACSR |=(1<<ACIC)|(1<<ACIE);
 	PORTF |= (1<<PF1);
 	PORTF |= (1<<PF0);
+	sei();
 	/*while(1) {
 		_delay_ms(100);
 		uint8_t measure = ACSR & (1<<ACO);
@@ -65,6 +65,16 @@ int main(void)
 		else
 			PORTF |= (1<<PF0);
 	} */
+	while(count<10)
+	{
+		//printf("%u",TCNT1);
+		//_delay_ms(100);
+	}
+	uint8_t i;
+	for(i=0; i<10; i++)
+	{
+		printf(" %u", values[i]);
+	}
 	while(1) {
 
 	}
@@ -78,24 +88,30 @@ ISR (TIMER1_OVF_vect)
 }
 ISR(ANALOG_COMP_vect)
 {
-	//puts("comp hit");
 	PORTF ^= (1<<PF0);
 }
 
 ISR(TIMER1_CAPT_vect)
 {
-	count++;
-	printf("%u",count);
-	if(count>=10) {
+	//TCCR1B ^= (1<<ICES1);
+	//count++;
+	//printf("%u",count);
+	/*if(count>=10) {
 		PORTF &= ~(1<<PF1);
 		TCCR1B &=~((1<<CS10)|(1<<CS11)|(1<<CS12));
 		cli();
-	}else{
-	uint16_t timestamp = ICR1L;
-	timestamp = timestamp & (ICR1H<<8);
+	}else{ */
+
+
+	values[count] = ICR1L;
+	values[count] |= (ICR1H<<8);
 	//printf("count %u",count);
-	printf("Timer %u \n", timestamp);
-	TCNT1H = 0;
-	TCNT1L = 0;
-	}
+	//printf("Timer %u \n", timestamp);
+	//TCNT1H = 0;
+	//TCNT1L = 0;
+	count++;
+	if(count >=10)
+		cli();
+		TCCR1B &= ~((1<<CS12)|(1<<CS11)|(1<<CS10)); //set clock
+	//}
 }
