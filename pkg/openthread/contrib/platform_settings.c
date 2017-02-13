@@ -50,7 +50,7 @@ ThreadError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex, 
 {
     DEBUG("openthread: otPlatSettingsGet");
     *aValueLength = 0;
-    return kThreadError_None;
+    return kThreadError_NotFound;
 }
 
 ThreadError otPlatSettingsSet(otInstance *aInstance, uint16_t aKey, const uint8_t *aValue, uint16_t aValueLength)
