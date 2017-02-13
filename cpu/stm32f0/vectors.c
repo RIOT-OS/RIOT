@@ -63,7 +63,9 @@ WEAK_DEFAULT void isr_spi2(void);
 WEAK_DEFAULT void isr_usart1(void);
 WEAK_DEFAULT void isr_usart2(void);
 WEAK_DEFAULT void isr_usart3_8(void);
+WEAK_DEFAULT void isr_usart3_4(void);
 WEAK_DEFAULT void isr_cec(void);
+WEAK_DEFAULT void isr_usb(void);
 
 /* interrupt vector table */
 ISR_VECTORS const void *interrupt_vector[] = {
@@ -89,7 +91,11 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
     /* STM specific peripheral handlers */
     (void*) isr_wwdg,               /* windowed watchdog */
+    #if defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F030R8)
+    (void*) (0UL),                  /* reserved */
+    #else
     (void*) isr_pvd,                /* power control */
+    #endif
     (void*) isr_rtc,                /* real time clock */
     (void*) isr_flash,              /* flash memory controller */
     (void*) isr_rcc,                /* reset and clock control */
@@ -103,21 +109,55 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_adc1_comp,          /* analog digital converter */
     (void*) isr_tim1_brk_up_trg_com, /* timer 1 break, update, trigger and communication */
     (void*) isr_tim1_cc,            /* timer 1 capture compare */
+    #if defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F030R8)
+    (void*) (0UL),                  /* reserved */
+    #else
     (void*) isr_tim2,               /* timer 2 */
+    #endif
     (void*) isr_tim3,               /* timer 3 */
+    #if defined(CPU_MODEL_STM32F042K6)
+    (void*) (0UL),                  /* reserved */
+    #else
     (void*) isr_tim6_dac,           /* timer 6 and digital to analog converter */
+    #endif
+    #if defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F042K6)
+    (void*) (0UL),                  /* reserved */
+    #else
     (void*) isr_tim7,               /* timer 7 */
+    #endif
     (void*) isr_tim14,              /* timer 14 */
+    #if defined(CPU_MODEL_STM32F042K6)
+    (void*) (0UL),                  /* reserved */
+    #else
     (void*) isr_tim15,              /* timer 15 */
+    #endif
     (void*) isr_tim16,              /* timer 16 */
     (void*) isr_tim17,              /* timer 17 */
     (void*) isr_i2c1,               /* I2C 1 */
+    #if defined(CPU_MODEL_STM32F042K6)
+    (void*) (0UL),                  /* reserved */
+    #else
     (void*) isr_i2c2,               /* I2C 2 */
+    #endif
     (void*) isr_spi1,               /* SPI 1 */
     (void*) isr_spi2,               /* SPI 2 */
     (void*) isr_usart1,             /* USART 1 */
     (void*) isr_usart2,             /* USART 2 */
+    #if  defined(CPU_MODEL_STM32F030R8) || defined(CPU_MODEL_STM32F042K6) || defined(CPU_MODEL_STM32F051R8)
+    (void*) (0UL),                  /* reserved */
+    #elif defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F072RB)
+    (void*) isr_usart3_4,           /* USART 3 and 4 */
+    #else
     (void*) isr_usart3_8,           /* USART 3 to 8 */
+    #endif
+    #if defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F030R8)
+    (void*) (0UL),                  /* reserved */
+    #else
     (void*) isr_cec,                /* consumer electronics control */
+    #endif
+    #if defined(CPU_MODEL_STM32F072RB) || defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F051R8)
+    (void*) isr_usb                 /* USB */
+    #else
     (void*) (0UL)                   /* reserved */
+    #endif
 };
