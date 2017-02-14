@@ -29,6 +29,7 @@
 #include <string.h>
 #include "irq.h"
 
+#if !defined(__llvm__) && !defined(__clang__)
 /* GCC documentation refers to the types as I1, I2, I4, I8, I16 */
 typedef uint8_t  I1;
 typedef uint16_t I2;
@@ -222,5 +223,5 @@ TEMPLATE_SYNC_OP_AND_FETCH_N(nand, &, 1, ~) /* __sync_nand_and_fetch_1 */
 TEMPLATE_SYNC_OP_AND_FETCH_N(nand, &, 2, ~) /* __sync_nand_and_fetch_2 */
 TEMPLATE_SYNC_OP_AND_FETCH_N(nand, &, 4, ~) /* __sync_nand_and_fetch_4 */
 TEMPLATE_SYNC_OP_AND_FETCH_N(nand, &, 8, ~) /* __sync_nand_and_fetch_8 */
-
+#endif
 /** @} */
