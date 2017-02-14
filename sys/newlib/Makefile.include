@@ -68,5 +68,9 @@ ifeq (1,$(USE_NEWLIB_NANO))
   INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(INCLUDES)
 endif
 
-# Newlib includes should go after GCC includes.
-export INCLUDES += $(NEWLIB_INCLUDES)
+# Newlib includes should go before GCC includes. This is especially important
+# when using Clang, because Clang will yield compilation errors on some GCC-
+# bundled headers. Clang compatible versions of those headers are already
+# provided by Newlib, so placing this directory first will eliminate those problems.
+# The above problem was observed with LLVM 3.9.1 when building against GCC 6.3.0 headers.
+export INCLUDES := $(NEWLIB_INCLUDES) $(INCLUDES)
