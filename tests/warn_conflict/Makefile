@@ -1,4 +1,5 @@
 APPLICATION = warn_conflict
+BOARD ?= stm32f4discovery
 include ../Makefile.tests_common
 
 # The stm32f4discovery is the only board that provides known conflicting features,
