@@ -86,6 +86,9 @@ stage("unittests") {
         boardName = boards[i]
         builds['linux_unittests_' + boardName] = make_build("linux && boards && native", boardName, "linux_unittests", unittests)
     }
+/* build all unittests on native using LLVM toolchain */
+    boardName = "native"
+    builds['llvm_unittests_' + boardName] = make_build("linux && llvm && native", boardName, "llvm_unittests", unittests)
     /* distribute all builds to the slaves */
     parallel (builds)
 
@@ -104,7 +107,12 @@ stage("tests") {
         builds['linux_periph_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_periph_tests", periph_tests)
         builds['linux_other_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_other_tests", other_tests)
     }
-
+/* build all tests on native using LLVM toolchain */
+    boardName = "native"
+    builds['llvm_driver_tests_' + boardName] = make_build("linux && llvm && native", boardName, "llvm_driver_tests", driver_tests)
+    builds['llvm_pkg_tests_' + boardName] = make_build("linux && llvm && native", boardName, "llvm_pkg_tests", pkg_tests)
+    builds['llvm_periph_tests_' + boardName] = make_build("linux && llvm && native", boardName, "llvm_periph_tests", periph_tests)
+    builds['llvm_other_tests_' + boardName] = make_build("linux && llvm && native", boardName, "llvm_other_tests", other_tests)
 
 /*  ignore macOS builds for now - macOS is currently broken for native
     builds['macOS_driver_tests_native'] = make_build("macOS && native", "native", "macOS_driver_tests", driver_tests)
@@ -134,6 +142,9 @@ stage("examples") {
         boardName = boards[i]
         builds['linux_examples_' + boardName] = make_build("linux && boards && native", boardName, "linux_examples", examples)
     }
+/* build all examples on native using LLVM toolchain */
+    boardName = "native"
+    builds['llvm_examples_' + boardName] = make_build("linux && llvm && native", boardName, "llvm_examples", examples)
 
 /*  ignore macOS builds for now - macOS is currently broken for native
     builds['macOS_examples_native'] = make_build("macOS && native", "native", "macOS_examples", examples)
@@ -162,11 +173,16 @@ def make_build(label, board, desc, arg)
                 fetchPR(env.CHANGE_ID, "--depth=1", "")
                 def build_dir = pwd()
                 sh "./dist/tools/git/git-cache init"
+                def toolchain = 'TOOLCHAIN=gcc'
+                if (label.contains('llvm')) {
+                    toolchain = 'TOOLCHAIN=llvm'
+                }
                 timestamps {
                     def apps = arg.join(' ')
                     echo "building ${apps} for ${board} on nodes with ${label}"
                     withEnv([
                       "BOARD=${board}",
+                      "${toolchain}",
                       "CCACHE_BASEDIR=${build_dir}",
                       "RIOT_CI_BUILD=1"]) {
                         def ret = sh(returnStatus: true,
