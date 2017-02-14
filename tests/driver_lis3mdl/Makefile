@@ -1,4 +1,5 @@
 APPLICATION = driver_lis3mdl
+BOARD ?= limifrog-v1
 include ../Makefile.tests_common
 
 # only this board is known (yet) to provide the sensor LIS3MDL
