@@ -348,7 +348,7 @@ bool __atomic_compare_exchange_c(size_t len, void *ptr, void *expected,
     irq_restore(mask);
     return ret;
 }
-
+#if !defined(__llvm__) && !defined(__clang__)
 /* Memory barrier helper function, for platforms without barrier instructions */
 void __sync_synchronize(void) __attribute__((__weak__));
 void __sync_synchronize(void) {
@@ -359,5 +359,5 @@ void __sync_synchronize(void) {
      */
     __asm__ volatile ("" : : : "memory");
 }
-
+#endif
 /** @} */
