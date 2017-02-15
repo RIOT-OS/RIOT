@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2016 Laurent Navet <laurent.navet@gmail.com>
+ *               2017 HAW Hamburg, Dimitri Nahm
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,6 +18,7 @@
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Laurent Navet <laurent.navet@gmail.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Dimitri Nahm <dimitri.nahm@haw-hamburg.de>
  */
 
 #ifndef PERIPH_CONF_H
@@ -136,9 +138,29 @@ extern "C" {
 /** @} */
 
 /**
- * @brief    I2C configuration
+ * @name    I2C configuration
+ * @{
  */
 #define I2C_NUMOF           1
+/** @} */
+
+/**
+ * @name    ADC configuration
+ *
+ * The number of ADC channels of the atmega328p depends on the package:
+ *  - 6-channel 10-bit ADC in PDIP package
+ *  - 8-channel 10-bit ADC in TQFP and QFN/MLF package
+ * Arduino UNO / Duemilanove has thereby 6 channels. But only 5 channels can be
+ * used for ADC, because the pin of ADC5 emulate a software triggered interrupt.
+ *  -> boards -> arduino-atmega-common -> include -> board_common.h
+ * @{
+ */
+#if defined (CPU_ATMEGA328P) || defined (CPU_ATMEGA1281)
+#define ADC_NUMOF       (8U)
+#elif defined (CPU_ATMEGA2560)
+#define ADC_NUMOF       (16U)
+#endif
+/** @} */
 
 #ifdef __cplusplus
 }
