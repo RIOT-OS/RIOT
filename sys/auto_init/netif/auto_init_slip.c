@@ -22,7 +22,6 @@
 #include "log.h"
 #include "board.h"
 #include "net/gnrc/netdev2.h"
-#include "net/gnrc/nomac.h"
 #include "net/gnrc.h"
 
 #include "net/gnrc/slip.h"
