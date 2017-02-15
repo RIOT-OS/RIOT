@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -27,6 +28,7 @@
  * See "sys/log/log_printfnoformat" for an example.
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef LOG_H
@@ -71,19 +73,53 @@ enum {
 #endif
 
 /**
- * @brief Log message if level <= LOG_LEVEL
+ * @brief Dummy function to discard log messages
  */
-#define LOG(level, ...) if (level <= LOG_LEVEL) log_write(level, __VA_ARGS__)
+#define LOG_VOID                (void)(0)
 
 /**
  * @brief logging convenience defines
  * @{
  */
-#define LOG_ERROR(...) LOG(LOG_ERROR, __VA_ARGS__)
-#define LOG_WARNING(...) LOG(LOG_WARNING, __VA_ARGS__)
-#define LOG_INFO(...) LOG(LOG_INFO, __VA_ARGS__)
-#define LOG_DEBUG(...) LOG(LOG_DEBUG, __VA_ARGS__)
+#if LOG_LEVEL >= LOG_ERROR
+    #define LOG_ERROR(...)      log_write(LOG_ERROR, __VA_ARGS__)
+#endif
+#ifndef LOG_ERROR
+    #define LOG_ERROR(...)      LOG_VOID
+#endif
+
+#if LOG_LEVEL >= LOG_WARNING
+    #define LOG_WARNING(...)    log_write(LOG_WARNING, __VA_ARGS__)
+#endif
+
+#ifndef LOG_WARNING
+    #define LOG_WARNING(...)    LOG_VOID
+#endif
+
+#if LOG_LEVEL >= LOG_INFO
+    #define LOG_INFO(...)       log_write(LOG_INFO, __VA_ARGS__)
+#endif
+#ifndef LOG_INFO
+    #define LOG_INFO(...)       LOG_VOID
+#endif
+
+#if LOG_LEVEL >= LOG_DEBUG
+    #define LOG_DEBUG(...)      log_write(LOG_DEBUG, __VA_ARGS__)
+#endif
+#ifndef LOG_DEBUG
+    #define LOG_DEBUG(...)      LOG_VOID
+#endif
 /** @} */
+
+/**
+ * @brief Log message if level <= LOG_LEVEL
+ */
+#define LOG(level, ...) switch(level) {         \
+    case LOG_ERROR: LOG_ERROR(__VA_ARGS__); break;      \
+    case LOG_WARNING: LOG_WARNING(__VA_ARGS__); break;  \
+    case LOG_INFO: LOG_INFO(__VA_ARGS__); break;        \
+    case LOG_DEBUG: LOG_DEBUG(__VA_ARGS__); break;      \
+    default: LOG_VOID;}
 
 #ifdef MODULE_LOG
 #include "log_module.h"
