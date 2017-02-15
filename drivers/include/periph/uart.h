@@ -58,15 +58,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Make sure the number of available UART devices is defined
- * @{
- */
-#ifndef UART_NUMOF
-#error "UART_NUMOF undefined for the target platform"
-#endif
-/** @} */
-
-/**
  * @brief   Define default UART type identifier
  * @{
  */
