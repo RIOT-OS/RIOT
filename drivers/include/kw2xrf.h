@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    drivers_kw2xrf kw2x radio-driver
- * @ingroup     drivers_netdev_netdev2
+ * @defgroup    drivers_kw2xrf KW2x radio-driver
+ * @ingroup     drivers_netdev
  * @brief       Device driver for the NXP CR20A and KW2xD radios
  * @{
  *
