@@ -142,6 +142,41 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @brief ADC configuration
+ *
+ * @{
+ */
+#ifdef CPU_ATMEGA328P
+#define ADC_NUMOF       (6)
+#endif
+#ifdef CPU_ATMEGA2560
+#define ADC_NUMOF       (16)
+#endif
+
+/* ADC Channels */
+#define ADC_PIN_0           0
+#define ADC_PIN_1           1
+#define ADC_PIN_2           2
+#define ADC_PIN_3           3
+#define ADC_PIN_4           4
+#define ADC_PIN_5           5
+#ifdef CPU_ATMEGA2560
+#define ADC_PIN_6           6
+#define ADC_PIN_7           7
+#define ADC_PIN_8           8
+#define ADC_PIN_9           9
+#define ADC_PIN_10          10
+#define ADC_PIN_11          11
+#define ADC_PIN_12          12
+#define ADC_PIN_13          13
+#define ADC_PIN_14          14
+#define ADC_PIN_15          15
+#endif
+/** @} */
+
+
+
 #ifdef __cplusplus
 }
 #endif
