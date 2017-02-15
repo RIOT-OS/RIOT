@@ -22,7 +22,7 @@
 #include <errno.h>
 
 #include "net/gnrc.h"
-#include "net/netdev2.h"
+#include "net/netdev.h"
 
 #include "cc2538_rf.h"
 #include "cc2538_rf_netdev.h"
@@ -33,14 +33,14 @@
 
 #define _MAX_MHR_OVERHEAD   (25)
 
-static int  _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len);
-static int  _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len);
-static int  _send(netdev2_t *netdev, const struct iovec *vector, unsigned count);
-static int  _recv(netdev2_t *netdev, void *buf, size_t len, void *info);
-static void _isr(netdev2_t *netdev);
-static int  _init(netdev2_t *dev);
+static int  _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
+static int  _set(netdev_t *dev, netopt_t opt, void *value, size_t value_len);
+static int  _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
+static int  _recv(netdev_t *netdev, void *buf, size_t len, void *info);
+static void _isr(netdev_t *netdev);
+static int  _init(netdev_t *dev);
 
-const netdev2_driver_t cc2538_rf_driver = {
+const netdev_driver_t cc2538_rf_driver = {
     .get  = _get,
     .set  = _set,
     .send = _send,
@@ -50,16 +50,16 @@ const netdev2_driver_t cc2538_rf_driver = {
 };
 
 /* Reference pointer for the IRQ handler */
-static netdev2_t *_dev;
+static netdev_t *_dev;
 
 void _irq_handler(void)
 {
     if (_dev->event_callback) {
-        _dev->event_callback(_dev, NETDEV2_EVENT_ISR);
+        _dev->event_callback(_dev, NETDEV_EVENT_ISR);
     }
 }
 
-static int _get(netdev2_t *netdev, netopt_t opt, void *value, size_t max_len)
+static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
     cc2538_rf_t *dev = (cc2538_rf_t *)netdev;
 
@@ -89,7 +89,7 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *value, size_t max_len)
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
-            *((uint16_t *) value) = NETDEV2_TYPE_IEEE802154;
+            *((uint16_t *) value) = NETDEV_TYPE_IEEE802154;
             return sizeof(uint16_t);
 
         case NETOPT_IS_CHANNEL_CLR:
@@ -140,15 +140,15 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *value, size_t max_len)
 
     int res;
 
-    if (((res = netdev2_ieee802154_get((netdev2_ieee802154_t *)netdev, opt, value,
-                                       max_len)) >= 0) || (res != -ENOTSUP)) {
+    if (((res = netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, value,
+                                      max_len)) >= 0) || (res != -ENOTSUP)) {
         return res;
     }
 
     return -ENOTSUP;
 }
 
-static int _set(netdev2_t *netdev, netopt_t opt, void *value, size_t value_len)
+static int _set(netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
 {
     cc2538_rf_t *dev = (cc2538_rf_t *)netdev;
     int res = -ENOTSUP;
@@ -246,14 +246,14 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *value, size_t value_len)
     }
 
     if (res == -ENOTSUP) {
-        res = netdev2_ieee802154_set((netdev2_ieee802154_t *)netdev, opt,
-                                     value, value_len);
+        res = netdev_ieee802154_set((netdev_ieee802154_t *)netdev, opt,
+                                    value, value_len);
     }
 
     return res;
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
+static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
 {
     int pkt_len = 0;
 
@@ -293,7 +293,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
     return pkt_len;
 }
 
-static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
+static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     size_t pkt_len;
 
@@ -335,7 +335,7 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     if (info != NULL && RFCORE->XREG_RSSISTATbits.RSSI_VALID) {
         uint8_t corr_val;
         int8_t rssi_val;
-        netdev2_ieee802154_rx_info_t *radio_info = info;
+        netdev_ieee802154_rx_info_t *radio_info = info;
         rssi_val = rfcore_read_byte() + CC2538_RSSI_OFFSET;
 
         RFCORE_ASSERT(rssi_val > CC2538_RF_SENSITIVITY);
@@ -364,12 +364,12 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     return pkt_len;
 }
 
-static void _isr(netdev2_t *netdev)
+static void _isr(netdev_t *netdev)
 {
-    netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
+    netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
 
-static int _init(netdev2_t *netdev)
+static int _init(netdev_t *netdev)
 {
     cc2538_rf_t *dev = (cc2538_rf_t *) netdev;
     _dev = netdev;
@@ -379,15 +379,15 @@ static int _init(netdev2_t *netdev)
     uint16_t addr_short = cc2538_get_addr_short();
     uint64_t addr_long = cc2538_get_addr_long();
 
-    /* Initialise netdev2_ieee802154_t struct */
-    netdev2_ieee802154_set((netdev2_ieee802154_t *)netdev, NETOPT_NID,
-                                     &pan, sizeof(pan));
-    netdev2_ieee802154_set((netdev2_ieee802154_t *)netdev, NETOPT_CHANNEL,
-                                     &chan, sizeof(chan));
-    netdev2_ieee802154_set((netdev2_ieee802154_t *)netdev, NETOPT_ADDRESS,
-                                     &addr_short, sizeof(addr_short));
-    netdev2_ieee802154_set((netdev2_ieee802154_t *)netdev, NETOPT_ADDRESS_LONG,
-                                     &addr_long, sizeof(addr_long));
+    /* Initialise netdev_ieee802154_t struct */
+    netdev_ieee802154_set((netdev_ieee802154_t *)netdev, NETOPT_NID, &pan,
+                          sizeof(pan));
+    netdev_ieee802154_set((netdev_ieee802154_t *)netdev, NETOPT_CHANNEL, &chan,
+                          sizeof(chan));
+    netdev_ieee802154_set((netdev_ieee802154_t *)netdev, NETOPT_ADDRESS,
+                          &addr_short, sizeof(addr_short));
+    netdev_ieee802154_set((netdev_ieee802154_t *)netdev, NETOPT_ADDRESS_LONG,
+                          &addr_long, sizeof(addr_long));
 
     cc2538_set_state(dev, NETOPT_STATE_IDLE);
 

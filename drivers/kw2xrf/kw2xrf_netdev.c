@@ -23,8 +23,8 @@
 #include "log.h"
 #include "net/eui64.h"
 #include "net/ieee802154.h"
-#include "net/netdev2.h"
-#include "net/netdev2/ieee802154.h"
+#include "net/netdev.h"
+#include "net/netdev/ieee802154.h"
 
 #include "kw2xrf.h"
 #include "kw2xrf_spi.h"
@@ -45,14 +45,14 @@ static uint8_t _send_last_fcf;
 
 static void _irq_handler(void *arg)
 {
-    netdev2_t *dev = (netdev2_t *) arg;
+    netdev_t *dev = (netdev_t *) arg;
 
     if (dev->event_callback) {
-        dev->event_callback(dev, NETDEV2_EVENT_ISR);
+        dev->event_callback(dev, NETDEV_EVENT_ISR);
     }
 }
 
-static int _init(netdev2_t *netdev)
+static int _init(netdev_t *netdev)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
 
@@ -91,7 +91,7 @@ static void kw2xrf_tx_exec(kw2xrf_t *dev)
     }
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
+static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
     const struct iovec *ptr = vector;
@@ -141,7 +141,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
     return (int)len;
 }
 
-static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
+static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
     size_t pkt_len = 0;
@@ -167,7 +167,7 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     kw2xrf_read_fifo(dev, (uint8_t *)buf, pkt_len + 1);
 
     if (info != NULL) {
-        netdev2_ieee802154_rx_info_t *radio_info = info;
+        netdev_ieee802154_rx_info_t *radio_info = info;
         radio_info->lqi = ((uint8_t*)buf)[pkt_len];
         radio_info->rssi = (uint8_t)kw2xrf_get_rssi(radio_info->lqi);
     }
@@ -208,7 +208,7 @@ static netopt_state_t _get_state(kw2xrf_t *dev)
     return dev->state;
 }
 
-int _get(netdev2_t *netdev, netopt_t opt, void *value, size_t len)
+int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
 
@@ -307,9 +307,9 @@ int _get(netdev2_t *netdev, netopt_t opt, void *value, size_t len)
             else {
                 *(uint8_t *)value = kw2xrf_get_cca_mode(dev);
                 switch (*((int8_t *)value)) {
-                    case NETDEV2_IEEE802154_CCA_MODE_1:
-                    case NETDEV2_IEEE802154_CCA_MODE_2:
-                    case NETDEV2_IEEE802154_CCA_MODE_3:
+                    case NETDEV_IEEE802154_CCA_MODE_1:
+                    case NETDEV_IEEE802154_CCA_MODE_2:
+                    case NETDEV_IEEE802154_CCA_MODE_3:
                         return sizeof(uint8_t);
                     default:
                         break;
@@ -323,10 +323,10 @@ int _get(netdev2_t *netdev, netopt_t opt, void *value, size_t len)
             break;
     }
 
-    return netdev2_ieee802154_get((netdev2_ieee802154_t *)netdev, opt, value, len);
+    return netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, value, len);
 }
 
-static int _set(netdev2_t *netdev, netopt_t opt, void *value, size_t len)
+static int _set(netdev_t *netdev, netopt_t opt, void *value, size_t len)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
     int res = -ENOTSUP;
@@ -342,7 +342,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *value, size_t len)
             }
             else {
                 kw2xrf_set_addr_short(dev, *((uint16_t *)value));
-                /* don't set res to set netdev2_ieee802154_t::short_addr */
+                /* don't set res to set netdev_ieee802154_t::short_addr */
             }
             break;
 
@@ -352,7 +352,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *value, size_t len)
             }
             else {
                 kw2xrf_set_addr_long(dev, *((uint64_t *)value));
-                /* don't set res to set netdev2_ieee802154_t::short_addr */
+                /* don't set res to set netdev_ieee802154_t::short_addr */
             }
             break;
 
@@ -363,7 +363,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *value, size_t len)
 
             else {
                 kw2xrf_set_pan(dev, *((uint16_t *)value));
-                /* don't set res to set netdev2_ieee802154_t::pan */
+                /* don't set res to set netdev_ieee802154_t::pan */
             }
             break;
 
@@ -378,7 +378,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *value, size_t len)
                     break;
                 }
                 dev->netdev.chan = chan;
-                /* don't set res to set netdev2_ieee802154_t::chan */
+                /* don't set res to set netdev_ieee802154_t::chan */
             }
             break;
 
@@ -474,15 +474,15 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *value, size_t len)
             }
             else {
                 switch (*((int8_t*)value)) {
-                    case NETDEV2_IEEE802154_CCA_MODE_1:
-                    case NETDEV2_IEEE802154_CCA_MODE_2:
-                    case NETDEV2_IEEE802154_CCA_MODE_3:
+                    case NETDEV_IEEE802154_CCA_MODE_1:
+                    case NETDEV_IEEE802154_CCA_MODE_2:
+                    case NETDEV_IEEE802154_CCA_MODE_3:
                         kw2xrf_set_cca_mode(dev, *((int8_t*)value));
                         res = sizeof(uint8_t);
                         break;
-                    case NETDEV2_IEEE802154_CCA_MODE_4:
-                    case NETDEV2_IEEE802154_CCA_MODE_5:
-                    case NETDEV2_IEEE802154_CCA_MODE_6:
+                    case NETDEV_IEEE802154_CCA_MODE_4:
+                    case NETDEV_IEEE802154_CCA_MODE_5:
+                    case NETDEV_IEEE802154_CCA_MODE_6:
                     default:
                         break;
                 }
@@ -506,14 +506,14 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *value, size_t len)
     }
 
     if (res == -ENOTSUP) {
-        res = netdev2_ieee802154_set((netdev2_ieee802154_t *)netdev, opt,
+        res = netdev_ieee802154_set((netdev_ieee802154_t *)netdev, opt,
                                      value, len);
     }
 
     return res;
 }
 
-static void _isr_event_seq_r(netdev2_t *netdev, uint8_t *dregs)
+static void _isr_event_seq_r(netdev_t *netdev, uint8_t *dregs)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
     uint8_t irqsts1 = 0;
@@ -521,14 +521,14 @@ static void _isr_event_seq_r(netdev2_t *netdev, uint8_t *dregs)
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_RXWTRMRKIRQ) {
         DEBUG("[kw2xrf] got RXWTRMRKIRQ\n");
         irqsts1 |= MKW2XDM_IRQSTS1_RXWTRMRKIRQ;
-        netdev->event_callback(netdev, NETDEV2_EVENT_RX_STARTED);
+        netdev->event_callback(netdev, NETDEV_EVENT_RX_STARTED);
     }
 
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_RXIRQ) {
         DEBUG("[kw2xrf] finished RXSEQ\n");
         dev->state = NETOPT_STATE_RX;
         irqsts1 |= MKW2XDM_IRQSTS1_RXIRQ;
-        netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
+        netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
         if (dregs[MKW2XDM_PHY_CTRL1] & MKW2XDM_PHY_CTRL1_AUTOACK) {
             DEBUG("[kw2xrf]: perform TX ACK\n");
         }
@@ -549,7 +549,7 @@ static void _isr_event_seq_r(netdev2_t *netdev, uint8_t *dregs)
     dregs[MKW2XDM_IRQSTS1] &= ~irqsts1;
 }
 
-static void _isr_event_seq_t(netdev2_t *netdev, uint8_t *dregs)
+static void _isr_event_seq_t(netdev_t *netdev, uint8_t *dregs)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
     uint8_t irqsts1 = 0;
@@ -567,10 +567,10 @@ static void _isr_event_seq_t(netdev2_t *netdev, uint8_t *dregs)
             irqsts1 |= MKW2XDM_IRQSTS1_CCAIRQ;
             if (dregs[MKW2XDM_IRQSTS2] & MKW2XDM_IRQSTS2_CCA) {
                 DEBUG("[kw2xrf] CCA CH busy\n");
-                netdev->event_callback(netdev, NETDEV2_EVENT_TX_MEDIUM_BUSY);
+                netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
             }
             else {
-                netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE);
+                netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
             }
         }
 
@@ -584,7 +584,7 @@ static void _isr_event_seq_t(netdev2_t *netdev, uint8_t *dregs)
 }
 
 /* Standalone CCA */
-static void _isr_event_seq_cca(netdev2_t *netdev, uint8_t *dregs)
+static void _isr_event_seq_cca(netdev_t *netdev, uint8_t *dregs)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
     uint8_t irqsts1 = 0;
@@ -604,7 +604,7 @@ static void _isr_event_seq_cca(netdev2_t *netdev, uint8_t *dregs)
     dregs[MKW2XDM_IRQSTS1] &= ~irqsts1;
 }
 
-static void _isr_event_seq_tr(netdev2_t *netdev, uint8_t *dregs)
+static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
     uint8_t irqsts1 = 0;
@@ -638,7 +638,7 @@ static void _isr_event_seq_tr(netdev2_t *netdev, uint8_t *dregs)
             irqsts1 |= MKW2XDM_IRQSTS1_CCAIRQ;
             if (dregs[MKW2XDM_IRQSTS2] & MKW2XDM_IRQSTS2_CCA) {
                 DEBUG("[kw2xrf] CCA CH busy\n");
-                netdev->event_callback(netdev, NETDEV2_EVENT_TX_MEDIUM_BUSY);
+                netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
             }
         }
 
@@ -646,7 +646,7 @@ static void _isr_event_seq_tr(netdev2_t *netdev, uint8_t *dregs)
         irqsts1 |= MKW2XDM_IRQSTS1_SEQIRQ;
         assert(dev->pending_tx != 0);
         dev->pending_tx--;
-        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE);
+        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
         kw2xrf_seq_timeout_off(dev);
         kw2xrf_set_idle_sequence(dev);
     }
@@ -654,7 +654,7 @@ static void _isr_event_seq_tr(netdev2_t *netdev, uint8_t *dregs)
         DEBUG("[kw2xrf] TC4TMOUT, no SEQIRQ, TX failed\n");
         assert(dev->pending_tx != 0);
         dev->pending_tx--;
-        netdev->event_callback(netdev, NETDEV2_EVENT_TX_NOACK);
+        netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
         kw2xrf_seq_timeout_off(dev);
         kw2xrf_set_sequence(dev, dev->idle_state);
     }
@@ -663,7 +663,7 @@ static void _isr_event_seq_tr(netdev2_t *netdev, uint8_t *dregs)
     dregs[MKW2XDM_IRQSTS1] &= ~irqsts1;
 }
 
-static void _isr_event_seq_ccca(netdev2_t *netdev, uint8_t *dregs)
+static void _isr_event_seq_ccca(netdev_t *netdev, uint8_t *dregs)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
     uint8_t irqsts1 = 0;
@@ -685,7 +685,7 @@ static void _isr_event_seq_ccca(netdev2_t *netdev, uint8_t *dregs)
     dregs[MKW2XDM_IRQSTS1] &= ~irqsts1;
 }
 
-static void _isr(netdev2_t *netdev)
+static void _isr(netdev_t *netdev)
 {
     uint8_t dregs[MKW2XDM_PHY_CTRL4 + 1];
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
@@ -754,7 +754,7 @@ static void _isr(netdev2_t *netdev)
     kw2xrf_enable_irq_b(dev);
 }
 
-const netdev2_driver_t kw2xrf_driver = {
+const netdev_driver_t kw2xrf_driver = {
     .init = _init,
     .send = _send,
     .recv = _recv,

@@ -71,7 +71,7 @@ terminal tools for the specified platform. These targets use the variable
 the targets `flash` and `term` are mandatory for the native port.
 
 For the native port, `PORT` has a special meaning: it is used to identify the
-tap interface if the `netdev2_tap` module is used. The target `debug` can be
+tap interface if the `netdev_tap` module is used. The target `debug` can be
 used to invoke a debugger on some platforms. For the native port the additional
 targets such as `all-valgrind` and `valgrind` exist. Refer to
 `cpu/native/README.md` for additional information

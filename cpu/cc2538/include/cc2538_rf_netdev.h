@@ -20,7 +20,7 @@
 #ifndef CC2538_RF_NETDEV_H
 #define CC2538_RF_NETDEV_H
 
-#include "net/netdev2.h"
+#include "net/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,7 +29,7 @@ extern "C" {
 /**
  * @brief   Reference to the netdev device driver struct
  */
-extern const netdev2_driver_t cc2538_rf_driver;
+extern const netdev_driver_t cc2538_rf_driver;
 
 #ifdef __cplusplus
 }

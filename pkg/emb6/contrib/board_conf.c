@@ -13,7 +13,7 @@
  * @author Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#include "emb6/netdev2.h"
+#include "emb6/netdev.h"
 
 #include "etimer.h"
 #include "board_conf.h"
@@ -24,7 +24,7 @@
 uint8_t board_conf(s_ns_t *ps_nStack)
 {
     if (ps_nStack != NULL) {
-        ps_nStack->inif = &emb6_netdev2_driver;
+        ps_nStack->inif = &emb6_netdev_driver;
         etimer_init();
         return ps_nStack->inif->init(ps_nStack);
     }

@@ -14,7 +14,7 @@
  * This device driver only exposes the MACRAW mode of W5100 devices, so it does
  * not offer any support for the on-chip IPv4, UDP, and TCP capabilities of
  * these chips. In connection with RIOT we are only interested in the RAW
- * Ethernet packets, which we can use through netdev2 with any software network
+ * Ethernet packets, which we can use through netdev with any software network
  * stack provided by RIOT (e.g. GNRC). This enables W5100 devices to communicate
  * via IPv6, enables unlimited connections, and more...
  *
@@ -38,7 +38,7 @@
 
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "net/netdev2.h"
+#include "net/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,14 +65,14 @@ typedef struct {
  * @brief   Device descriptor for W5100 devices
  */
 typedef struct {
-    netdev2_t nd;           /**< extends the netdev2 structure */
+    netdev_t nd;            /**< extends the netdev structure */
     w5100_params_t p;       /**< device configuration parameters */
 } w5100_t;
 
 /**
  * @brief   So the initial device setup
  *
- * This function pre-initializes the netdev2 structure, saves the configuration
+ * This function pre-initializes the netdev structure, saves the configuration
  * parameters and finally initializes the SPI bus and the used GPIO pins.
  */
 void w5100_setup(w5100_t *dev, const w5100_params_t *params);

@@ -22,7 +22,7 @@
 #ifndef CC2420_NETDEV_H
 #define CC2420_NETDEV_H
 
-#include "net/netdev2.h"
+#include "net/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,7 +31,7 @@ extern "C" {
 /**
  * @brief   Reference to the netdev device driver struct
  */
-extern const netdev2_driver_t cc2420_driver;
+extern const netdev_driver_t cc2420_driver;
 
 #ifdef __cplusplus
 }

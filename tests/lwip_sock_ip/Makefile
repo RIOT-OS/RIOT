@@ -27,10 +27,10 @@ ifneq (0, $(LWIP_IPV6))
 endif
 
 USEMODULE += inet_csum
-USEMODULE += lwip_ethernet lwip_netdev2
+USEMODULE += lwip_ethernet lwip_netdev
 USEMODULE += lwip_sock_ip
-USEMODULE += netdev2_eth
-USEMODULE += netdev2_test
+USEMODULE += netdev_eth
+USEMODULE += netdev_test
 USEMODULE += ps
 
 DISABLE_MODULE += auto_init

@@ -59,10 +59,10 @@ unsigned _native_rng_seed = 0;
 int _native_rng_mode = 0;
 const char *_native_unix_socket_path = NULL;
 
-#ifdef MODULE_NETDEV2_TAP
-#include "netdev2_tap_params.h"
+#ifdef MODULE_NETDEV_TAP
+#include "netdev_tap_params.h"
 
-netdev2_tap_params_t netdev2_tap_params[NETDEV2_TAP_MAX];
+netdev_tap_params_t netdev_tap_params[NETDEV_TAP_MAX];
 #endif
 
 static const char short_opts[] = ":hi:s:deEoc:";
@@ -199,8 +199,8 @@ void usage_exit(int status)
 {
     real_printf("usage: %s", _progname);
 
-#if defined(MODULE_NETDEV2_TAP)
-    for (int i = 0; i < NETDEV2_TAP_MAX; i++) {
+#if defined(MODULE_NETDEV_TAP)
+    for (int i = 0; i < NETDEV_TAP_MAX; i++) {
         real_printf(" <tap interface %d>", i + 1);
     }
 #endif
@@ -289,8 +289,8 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
                 usage_exit(EXIT_FAILURE);
         }
     }
-#ifdef MODULE_NETDEV2_TAP
-    for (int i = 0; i < NETDEV2_TAP_MAX; i++) {
+#ifdef MODULE_NETDEV_TAP
+    for (int i = 0; i < NETDEV_TAP_MAX; i++) {
         if (argv[optind + i] == NULL) {
             /* no tap parameter left */
             usage_exit(EXIT_FAILURE);
@@ -321,9 +321,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 
     native_cpu_init();
     native_interrupt_init();
-#ifdef MODULE_NETDEV2_TAP
-    for (int i = 0; i < NETDEV2_TAP_MAX; i++) {
-        netdev2_tap_params[i].tap_name = &argv[optind + i];
+#ifdef MODULE_NETDEV_TAP
+    for (int i = 0; i < NETDEV_TAP_MAX; i++) {
+        netdev_tap_params[i].tap_name = &argv[optind + i];
     }
 #endif
 

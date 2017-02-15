@@ -13,8 +13,8 @@ endif
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib
 endif
-ifneq (,$(filter lwip_netdev2,$(USEMODULE)))
-  DIRS += $(RIOTBASE)/pkg/lwip/contrib/netdev2
+ifneq (,$(filter lwip_netdev,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib/netdev
 endif
 ifneq (,$(filter lwip_sock,$(USEMODULE)))
   ifneq (,$(filter lwip_ipv6,$(USEMODULE)))

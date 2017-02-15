@@ -24,7 +24,7 @@
 
 #include "xtimer.h"
 #include "random.h"
-#include "net/netdev2.h"
+#include "net/netdev.h"
 #include "net/netopt.h"
 
 #include "net/csma_sender.h"
@@ -82,13 +82,13 @@ static inline uint32_t choose_backoff_period(int be,
  * @param[in] count     number of elements in @p vector
  *
  * @return              the return value of device driver's
- *                      netdev2_driver_t::send() function if medium was
+ *                      netdev_driver_t::send() function if medium was
  *                      available
  * @return              -ECANCELED if an internal driver error occurred
  * @return              -EBUSY if radio medium was not available
  *                      to send the given data
  */
-static int send_if_cca(netdev2_t *device, struct iovec *vector, unsigned count)
+static int send_if_cca(netdev_t *device, struct iovec *vector, unsigned count)
 {
     netopt_enable_t hwfeat;
 
@@ -117,7 +117,7 @@ static int send_if_cca(netdev2_t *device, struct iovec *vector, unsigned count)
 
 /*------------------------- "EXPORTED" FUNCTIONS -------------------------*/
 
-int csma_sender_csma_ca_send(netdev2_t *dev, struct iovec *vector,
+int csma_sender_csma_ca_send(netdev_t *dev, struct iovec *vector,
                              unsigned count, const csma_sender_conf_t *conf)
 {
     netopt_enable_t hwfeat;
@@ -195,7 +195,7 @@ int csma_sender_csma_ca_send(netdev2_t *dev, struct iovec *vector,
 }
 
 
-int csma_sender_cca_send(netdev2_t *dev, struct iovec *vector, unsigned count)
+int csma_sender_cca_send(netdev_t *dev, struct iovec *vector, unsigned count)
 {
     netopt_enable_t hwfeat;
 

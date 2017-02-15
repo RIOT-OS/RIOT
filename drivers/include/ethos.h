@@ -23,7 +23,7 @@
 
 #include "kernel_types.h"
 #include "periph/uart.h"
-#include "net/netdev2.h"
+#include "net/netdev.h"
 #include "tsrb.h"
 #include "mutex.h"
 
@@ -64,11 +64,11 @@ typedef enum {
 } line_state_t;
 
 /**
- * @brief ethos netdev2 device
- * @extends netdev2_t
+ * @brief ethos netdev device
+ * @extends netdev_t
  */
 typedef struct {
-    netdev2_t netdev;       /**< extended netdev2 structure */
+    netdev_t netdev;        /**< extended netdev structure */
     uart_t uart;            /**< UART device the to use */
     uint8_t mac_addr[6];    /**< this device's MAC address */
     uint8_t remote_mac_addr[6]; /**< this device's MAC address */

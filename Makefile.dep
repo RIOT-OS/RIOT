@@ -26,11 +26,11 @@ endif
 
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += gnrc_netif
-  USEMODULE += gnrc_netdev2
+  USEMODULE += gnrc_netdev
   USEMODULE += netdev_default
 endif
 
-ifneq (,$(filter netdev2_ieee802154,$(USEMODULE)))
+ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
   USEMODULE += ieee802154
 endif
 
@@ -47,7 +47,7 @@ ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
     USEMODULE += gnrc_sixlowpan
     USEMODULE += gnrc_sixlowpan_iphc
     USEMODULE += gnrc_ipv6_default
-    USEMODULE += gnrc_netdev2
+    USEMODULE += gnrc_netdev
     USEMODULE += gnrc_ipv6_netif
 endif
 
@@ -86,11 +86,11 @@ ifneq (,$(filter gnrc_netapi_mbox,$(USEMODULE)))
   USEMODULE += core_mbox
 endif
 
-ifneq (,$(filter netdev2_tap,$(USEMODULE)))
+ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += netif
-  USEMODULE += netdev2_eth
+  USEMODULE += netdev_eth
   ifneq (,$(filter gnrc_%,$(USEMODULE)))
-    USEMODULE += gnrc_netdev2
+    USEMODULE += gnrc_netdev
   endif
 endif
 
@@ -534,7 +534,7 @@ ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
   USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
 endif
 
-ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
+ifneq (,$(filter gnrc_netdev,$(USEMODULE)))
   USEMODULE += netopt
 endif
 

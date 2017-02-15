@@ -35,8 +35,8 @@
 #include "board.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "net/netdev2.h"
-#include "net/netdev2/ieee802154.h"
+#include "net/netdev.h"
+#include "net/netdev/ieee802154.h"
 #include "net/gnrc/nettype.h"
 
 #ifdef __cplusplus
@@ -110,13 +110,13 @@ extern "C" {
  * @brief   Internal device option flags
  *
  * `0x00ff` is reserved for general IEEE 802.15.4 flags
- * (see @ref netdev2_ieee802154_t)
+ * (see @ref netdev_ieee802154_t)
  *
  * @{
  */
-#define AT86RF2XX_OPT_SRC_ADDR_LONG  (NETDEV2_IEEE802154_SRC_MODE_LONG) /**< legacy define */
-#define AT86RF2XX_OPT_RAWDUMP        (NETDEV2_IEEE802154_RAW)           /**< legacy define */
-#define AT86RF2XX_OPT_AUTOACK        (NETDEV2_IEEE802154_ACK_REQ)       /**< legacy define */
+#define AT86RF2XX_OPT_SRC_ADDR_LONG  (NETDEV_IEEE802154_SRC_MODE_LONG)  /**< legacy define */
+#define AT86RF2XX_OPT_RAWDUMP        (NETDEV_IEEE802154_RAW)            /**< legacy define */
+#define AT86RF2XX_OPT_AUTOACK        (NETDEV_IEEE802154_ACK_REQ)        /**< legacy define */
 
 #define AT86RF2XX_OPT_CSMA           (0x0100)       /**< CSMA active */
 #define AT86RF2XX_OPT_PROMISCUOUS    (0x0200)       /**< promiscuous mode
@@ -147,10 +147,10 @@ typedef struct at86rf2xx_params {
 /**
  * @brief   Device descriptor for AT86RF2XX radio devices
  *
- * @extends netdev2_ieee802154_t
+ * @extends netdev_ieee802154_t
  */
 typedef struct {
-    netdev2_ieee802154_t netdev;            /**< netdev2 parent struct */
+    netdev_ieee802154_t netdev;             /**< netdev parent struct */
     /**
      * @brief   device specific fields
      * @{

@@ -13,7 +13,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-mega2560 msb-430h nrf6310 \
                              yunjia-nrf51822 z1
 
 # including lwip_ipv6_mld would currently break this test on at86rf2xx radios
-USEMODULE += lwip lwip_ipv6_autoconfig lwip_conn_ip lwip_netdev2
+USEMODULE += lwip lwip_ipv6_autoconfig lwip_conn_ip lwip_netdev
 USEMODULE += lwip_udp lwip_conn_udp
 USEMODULE += ipv6_addr
 USEMODULE += shell
@@ -35,7 +35,7 @@ ifneq (,$(filter mulle,$(BOARD)))
   DRIVER := at86rf212b
 endif
 ifneq (,$(filter native,$(BOARD)))
-  DRIVER := netdev2_tap
+  DRIVER := netdev_tap
   USEMODULE += lwip_ethernet
 endif
 
