@@ -42,7 +42,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   PWM device and pinout configuration
+ * @name    PWM device and pinout configuration
  *
  * Currently, we only support a single device and 3 channels, the implementation
  * is fixed on PWM1.
