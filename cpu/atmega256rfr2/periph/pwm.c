@@ -24,13 +24,15 @@
  *
  * @}
  */
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 
 #include "cpu.h"
 #include "assert.h"
 #include "periph/pwm.h"
 #include "periph/gpio.h"
 #include "debug.h"
+#include "stdlib.h"
+#include "math.h"
 
 /**
  * @brief   We have 5 possible prescaler values
@@ -89,24 +91,49 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 	 }
 
 	 /* Calculate Prescaler*/
-	 i = 0;
-	 uint32_t clock_res = CLOCK_CORECLOCK / res;
-	 uint32_t opt_prescaler = clock_res / (freq); /*best prescaler, might not be possible */
-	 if(opt_prescaler >1) {
-		 for(; i < (PRESCALE_NUMOF-1); i++) {
-		 	 if(opt_prescaler >= prescalers[i] && opt_prescaler < prescalers[i+1]) {
-		 	 	 /*chose bigger prescaler thus decreasing frequency */
-		 	 	 i++;
-			 	 break;
+	 uint32_t current_best_frequency = 0;
+	 uint16_t current_best_scale = 1;
+	 uint16_t current_best_prescaler = 0;
+	 uint16_t max_value;
+	 if(pwm_config[pwm].bits == 16) {
+		 max_value = 65535;
+	 }else{
+		 max_value = 255;
+	 }
+	 for(uint32_t a = 1; (a*res) <= max_value; a++) {
+		 uint32_t clock_res = CLOCK_CORECLOCK / (a*res);
+		 uint32_t opt_prescaler = clock_res / (freq); /*best prescaler, might not be possible */
+		 i = 0;
+		 if(opt_prescaler >1) {
+		 	 for(; i < (PRESCALE_NUMOF-1); i++) {
+		 	 	 if(opt_prescaler >= prescalers[i] && opt_prescaler < prescalers[i+1]) {
+		 	 	 	 /*chose bigger prescaler thus decreasing frequency */
+		 	 	 	 i++;
+		 	 	 	 /*save current best prescaler if it matches frequency better */
+		 	 	 	 uint32_t current_frequency = clock_res/prescalers[i];
+		 	 	 	 if(abs(current_best_frequency - freq) > abs(current_frequency-freq)){
+		 	 	 		 current_best_frequency = current_frequency;
+		 	 	 		 current_best_scale = a;
+		 	 	 		 current_best_prescaler = i;
+		 	 	 	 }
+			 	 	 break;
+	 	 	 	 }
 	 	 	 }
+	 	 }else{
+	 		 //stop from searching with opt_prescaler 0
+	 		 max_value =0;
 	 	 }
 	 }
 	 /*Set prescaler */
-	 pwm_config[pwm].dev->CRB |= (i+1);
+	 pwm_config[pwm].dev->CRB |= (current_best_prescaler+1);
+	 *(pwm_config[pwm].prescaler_pointer) = current_best_prescaler+1;
+	 /*Save prescaler*/
+	 *(pwm_config[pwm].scale_pointer) = current_best_scale;
 	 /* return actual frequency */
-	 DEBUG_PRINT("Opt prescaler %u \n", (unsigned int)opt_prescaler);
-	 DEBUG_PRINT("Prescaler set to %u \n", (unsigned int)prescalers[i]);
-	 return (clock_res/prescalers[i]);
+	 DEBUG("Best Frequency %u \n",(unsigned int) current_best_frequency);
+	 DEBUG("Best Scale %u \n", (unsigned int)current_best_scale);
+	 DEBUG("Prescaler set to %u \n", (unsigned int)prescalers[current_best_prescaler]);
+	 return (current_best_frequency);
 
 }
 
@@ -130,18 +157,20 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
     if (value > pwm_config[pwm].dev->ICR) {
         value = (uint16_t)pwm_config[pwm].dev->ICR;
     }
-    pwm_config[pwm].dev->OCR[channel] = value;
+    pwm_config[pwm].dev->OCR[channel] = value*(*(pwm_config[pwm].scale_pointer));
+    DEBUG("OCR%d %u\n",channel, (unsigned int)value*(*(pwm_config[pwm].scale_pointer)));
 }
 
 void pwm_start(pwm_t pwm)
 {
-	/*Not yet implemented */
+	assert(*(pwm_config[pwm].prescaler_pointer));
+	pwm_config[pwm].dev->CRB |= (*(pwm_config[pwm].prescaler_pointer));
 
 }
 
 void pwm_stop(pwm_t pwm)
 {
-	/* Not yet implemented */
+	pwm_config[pwm].dev->CRB &= ~(0b00000111);
 
 }
 

@@ -75,6 +75,9 @@ typedef struct {
     pwm_chan_t chan[TIMER_CHAN];    /**< channel mapping, set to {GPIO_UNDEF, 0} */
     REG8 *power_reg;			/**< Save Powerregister for poweron and off */
     uint8_t power_reg_bit;		/**< Save which bit needs to be set in powerregister */
+    uint8_t *scale_pointer;
+    uint8_t *prescaler_pointer;
+    uint8_t bits;
 } pwm_conf_t;
 
 #ifdef __cplusplus
