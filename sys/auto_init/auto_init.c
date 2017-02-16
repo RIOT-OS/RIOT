@@ -318,6 +318,10 @@ void auto_init(void)
     extern void auto_init_dht(void);
     auto_init_dht();
 #endif
+#ifdef MODULE_TCS37727
+    extern void auto_init_tcs37727(void);
+    auto_init_tcs37727();
+#endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 
