@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  OTA keys S.A.
+ * Copyright (C) 2016-2017  OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_nucleo-f207
+ * @ingroup     boards_nucleo144-f207
  * @{
  *
  * @file
- * @name        Peripheral MCU configuration for the nucleo-f207 board
+ * @name        Peripheral MCU configuration for the nucleo144-f207 board
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Aurelien Gonce <aurelien.gonce@altran.fr>
@@ -254,7 +254,7 @@ static const spi_conf_t spi_config[] = {
  * @{
  */
 #define ADC_CONFIG {              \
-    {GPIO_PIN(PORT_A, 4), 0, 0},  \
+    {GPIO_PIN(PORT_A, 3), 0, 3},  \
     {GPIO_PIN(PORT_C, 0), 1, 0}  \
 }
 #define ADC_NUMOF          (2)

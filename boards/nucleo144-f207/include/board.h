@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  OTA keys S.A.
+ * Copyright (C) 2016-2017  OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f207 Nucleo-F207
+ * @defgroup    boards_nucleo144-f207 Nucleo144-F207
  * @ingroup     boards
- * @brief       Board specific files for the nucleo-f207 board
+ * @brief       Board specific files for the nucleo144-f207 board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the nucleo-f207 board
+ * @brief       Board specific definitions for the nucleo144-f207 board
  *
  * @author      Vincent Dupont <vincent@otakeys.com
  * @author      Toon Stegen <toon.stegen@altran.com>
@@ -21,8 +21,6 @@
 
 #ifndef BOARD_H
 #define BOARD_H
-
-#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,12 +30,6 @@ extern "C" {
  * @brief   LED pin definitions and handlers
  * @{
  */
-#undef LED0_PIN
-#undef LED0_MASK
-#undef LED0_ON
-#undef LED0_OFF
-#undef LED0_TOGGLE
-
 #define LED0_PIN            GPIO_PIN(PORT_B, 0)
 #define LED0_MASK           (1 << 0)
 #define LED0_ON             (GPIOB->BSRR = LED0_MASK)
@@ -56,6 +48,11 @@ extern "C" {
 #define LED2_OFF            (GPIOB->BSRR = (LED2_MASK << 16))
 #define LED2_TOGGLE         (GPIOB->ODR  ^= LED2_MASK)
 /** @} */
+
+/**
+ * @brief   User button
+ */
+#define BTN_B1_PIN          GPIO_PIN(PORT_C, 13)
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
