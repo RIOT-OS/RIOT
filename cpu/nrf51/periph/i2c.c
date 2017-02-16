@@ -21,7 +21,7 @@
 #include "cpu.h"
 #include "mutex.h"
 #include "assert.h"
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 #include "periph_conf.h"
 
 #define ENABLE_DEBUG        (0)
@@ -88,7 +88,7 @@ static int write(i2c_t bus, uint8_t addr, const void *data, int len, int stop)
     return len;
 }
 
-int i2c_init_master(i2c_t bus, i2c_speed_t speed)
+int i2c_depr_init_master(i2c_t bus, i2c_speed_t speed)
 {
     if (bus >= I2C_NUMOF) {
         return -1;
@@ -118,26 +118,26 @@ int i2c_init_master(i2c_t bus, i2c_speed_t speed)
     return 0;
 }
 
-int i2c_acquire(i2c_t bus)
+int i2c_depr_acquire(i2c_t bus)
 {
     assert(bus <= I2C_NUMOF);
     mutex_lock(&locks[bus]);
     return 0;
 }
 
-int i2c_release(i2c_t bus)
+int i2c_depr_release(i2c_t bus)
 {
     assert(bus <= I2C_NUMOF);
     mutex_unlock(&locks[bus]);
     return 0;
 }
 
-int i2c_read_byte(i2c_t bus, uint8_t address, void *data)
+int i2c_depr_read_byte(i2c_t bus, uint8_t address, void *data)
 {
-    return i2c_read_bytes(bus, address, data, 1);
+    return i2c_depr_read_bytes(bus, address, data, 1);
 }
 
-int i2c_read_bytes(i2c_t bus, uint8_t address, void *data, int length)
+int i2c_depr_read_bytes(i2c_t bus, uint8_t address, void *data, int length)
 {
     uint8_t *in_buf = (uint8_t *)data;
 
@@ -185,36 +185,36 @@ int i2c_read_bytes(i2c_t bus, uint8_t address, void *data, int length)
     return length;
 }
 
-int i2c_read_reg(i2c_t bus, uint8_t address, uint8_t reg, void *data)
+int i2c_depr_read_reg(i2c_t bus, uint8_t address, uint8_t reg, void *data)
 {
     write(bus, address, &reg, 1, 0);
-    return i2c_read_bytes(bus, address, data, 1);
+    return i2c_depr_read_bytes(bus, address, data, 1);
 }
 
-int i2c_read_regs(i2c_t bus, uint8_t address, uint8_t reg,
+int i2c_depr_read_regs(i2c_t bus, uint8_t address, uint8_t reg,
                   void *data, int length)
 {
     write(bus, address, &reg, 1, 0);
-    return i2c_read_bytes(bus, address, data, length);
+    return i2c_depr_read_bytes(bus, address, data, length);
 }
 
-int i2c_write_byte(i2c_t bus, uint8_t address, uint8_t data)
+int i2c_depr_write_byte(i2c_t bus, uint8_t address, uint8_t data)
 {
     return write(bus, address, &data, 1, 1);
 }
 
-int i2c_write_bytes(i2c_t bus, uint8_t address, const void *data, int length)
+int i2c_depr_write_bytes(i2c_t bus, uint8_t address, const void *data, int length)
 {
     return write(bus, address, data, length, 1);
 }
 
-int i2c_write_reg(i2c_t bus, uint8_t address, uint8_t reg, uint8_t data)
+int i2c_depr_write_reg(i2c_t bus, uint8_t address, uint8_t reg, uint8_t data)
 {
     write(bus, address, &reg, 1, 0);
     return write(bus, address, &data, 1, 1);
 }
 
-int i2c_write_regs(i2c_t bus, uint8_t address, uint8_t reg,
+int i2c_depr_write_regs(i2c_t bus, uint8_t address, uint8_t reg,
                    const void *data, int length)
 {
     write(bus, address, &reg, 1, 0);

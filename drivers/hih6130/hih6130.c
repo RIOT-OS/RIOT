@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #include "hih6130.h"
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 #include "xtimer.h"
 
 #define ENABLE_DEBUG    (0)
@@ -57,15 +57,15 @@ enum {
 /** @brief Trigger a new measurement on the sensor */
 static inline int hih6130_measurement_request(hih6130_t *dev)
 {
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
 
     /* An empty write request triggers a new measurement */
-    if (i2c_write_bytes(dev->i2c, dev->addr, NULL, 0) < 0) {
-        i2c_release(dev->i2c);
+    if (i2c_depr_write_bytes(dev->i2c, dev->addr, NULL, 0) < 0) {
+        i2c_depr_release(dev->i2c);
         return -1;
     }
 
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     return 0;
 }
@@ -82,14 +82,14 @@ static inline int hih6130_get_humidity_temperature_raw(hih6130_t *dev, uint16_t 
     int status;
     uint8_t buf[HIH6130_FULL_DATA_LENGTH];
 
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
 
-    if (i2c_read_bytes(dev->i2c, dev->addr, &buf[0], sizeof(buf)) != sizeof(buf)) {
-        i2c_release(dev->i2c);
+    if (i2c_depr_read_bytes(dev->i2c, dev->addr, &buf[0], sizeof(buf)) != sizeof(buf)) {
+        i2c_depr_release(dev->i2c);
         return -1;
     }
 
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     /* data is in big-endian format, with status bits in the first byte. */
     switch (buf[0] & HIH6130_STATUS_MASK) {

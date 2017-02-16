@@ -28,7 +28,7 @@
 #include "irq.h"
 #include "mutex.h"
 #include "periph_conf.h"
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -63,7 +63,7 @@ static mutex_t locks[] =  {
 #endif
 };
 
-int i2c_init_master(i2c_t dev, i2c_speed_t speed)
+int i2c_depr_init_master(i2c_t dev, i2c_speed_t speed)
 {
     I2C_TypeDef *i2c;
     GPIO_TypeDef *port_scl;
@@ -221,7 +221,7 @@ static void _toggle_pins(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin
     port_sda->ODR |= (1 << pin_sda);
 }
 
-int i2c_acquire(i2c_t dev)
+int i2c_depr_acquire(i2c_t dev)
 {
     if (dev >= I2C_NUMOF) {
         return -1;
@@ -230,7 +230,7 @@ int i2c_acquire(i2c_t dev)
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+int i2c_depr_release(i2c_t dev)
 {
     if (dev >= I2C_NUMOF) {
         return -1;
@@ -239,12 +239,12 @@ int i2c_release(i2c_t dev)
     return 0;
 }
 
-int i2c_read_byte(i2c_t dev, uint8_t address, void *data)
+int i2c_depr_read_byte(i2c_t dev, uint8_t address, void *data)
 {
-    return i2c_read_bytes(dev, address, data, 1);
+    return i2c_depr_read_bytes(dev, address, data, 1);
 }
 
-int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
+int i2c_depr_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 {
     unsigned int state;
     int i = 0;
@@ -371,12 +371,12 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
     return length;
 }
 
-int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data)
+int i2c_depr_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data)
 {
-    return i2c_read_regs(dev, address, reg, data, 1);
+    return i2c_depr_read_regs(dev, address, reg, data, 1);
 }
 
-int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int length)
+int i2c_depr_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int length)
 {
     I2C_TypeDef *i2c;
 
@@ -399,15 +399,15 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int lengt
     i2c->DR = reg;
     _stop(i2c);
     DEBUG("Now start a read transaction\n");
-    return i2c_read_bytes(dev, address, data, length);
+    return i2c_depr_read_bytes(dev, address, data, length);
 }
 
-int i2c_write_byte(i2c_t dev, uint8_t address, uint8_t data)
+int i2c_depr_write_byte(i2c_t dev, uint8_t address, uint8_t data)
 {
-    return i2c_write_bytes(dev, address, &data, 1);
+    return i2c_depr_write_bytes(dev, address, &data, 1);
 }
 
-int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
+int i2c_depr_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
 {
     I2C_TypeDef *i2c;
 
@@ -435,12 +435,12 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
     return length;
 }
 
-int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data)
+int i2c_depr_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data)
 {
-    return i2c_write_regs(dev, address, reg, &data, 1);
+    return i2c_depr_write_regs(dev, address, reg, &data, 1);
 }
 
-int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, int length)
+int i2c_depr_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, int length)
 {
     I2C_TypeDef *i2c;
 
@@ -468,7 +468,7 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, in
     return length;
 }
 
-void i2c_poweron(i2c_t dev)
+void i2c_depr_poweron(i2c_t dev)
 {
     switch (dev) {
 #if I2C_0_EN
@@ -479,7 +479,7 @@ void i2c_poweron(i2c_t dev)
     }
 }
 
-void i2c_poweroff(i2c_t dev)
+void i2c_depr_poweroff(i2c_t dev)
 {
     switch (dev) {
 #if I2C_0_EN

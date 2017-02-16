@@ -1,7 +1,7 @@
-From 51897f66e18e291c3f3d528a0678eb195341d18d Mon Sep 17 00:00:00 2001
+From 54ffc084a379688043cab2ca2d779d6f83aa8ebd Mon Sep 17 00:00:00 2001
 From: Hauke Petersen <hauke.petersen@fu-berlin.de>
 Date: Wed, 25 Jan 2017 12:29:36 +0100
-Subject: [PATCH 3/3] u8g2: adapted RIOT interface to SPI changes
+Subject: [PATCH 3/4] u8g2: adapted RIOT interface to SPI changes
 
 ---
  csrc/u8g2_riotos.c | 33 +++++++++++++++++----------------

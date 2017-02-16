@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 #include "tcs37727.h"
 #include "tcs37727-internal.h"
 
@@ -35,14 +35,14 @@ static int tcs37727_test(tcs37727_t *dev)
 {
     uint8_t id;
 
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
 
-    if (i2c_read_reg(dev->i2c, dev->addr, TCS37727_ID, &id) != 1) {
-        i2c_release(dev->i2c);
+    if (i2c_depr_read_reg(dev->i2c, dev->addr, TCS37727_ID, &id) != 1) {
+        i2c_depr_release(dev->i2c);
         return -1;
     }
 
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     if (id != TCS37727_ID_VALUE) {
         return -1;
@@ -58,39 +58,39 @@ int tcs37727_init(tcs37727_t *dev, i2c_t i2c, uint8_t address, int atime_us)
     dev->addr = address;
     dev->initialized = false;
 
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
 
     /* initialize the I2C bus */
-    if (i2c_init_master(i2c, I2C_SPEED) < 0) {
-        i2c_release(dev->i2c);
+    if (i2c_depr_init_master(i2c, I2C_SPEED) < 0) {
+        i2c_depr_release(dev->i2c);
         return -1;
     }
 
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     if (tcs37727_test(dev)) {
         return -2;
     }
 
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
 
-    if (i2c_write_reg(dev->i2c, dev->addr, TCS37727_CONTROL,
+    if (i2c_depr_write_reg(dev->i2c, dev->addr, TCS37727_CONTROL,
                       TCS37727_CONTROL_AGAIN_4) != 1) {
-        i2c_release(dev->i2c);
+        i2c_depr_release(dev->i2c);
         return -3;
     }
     dev->again = 4;
 
-    if (i2c_write_reg(dev->i2c, dev->addr, TCS37727_ATIME,
+    if (i2c_depr_write_reg(dev->i2c, dev->addr, TCS37727_ATIME,
                       TCS37727_ATIME_TO_REG(atime_us)) != 1) {
-        i2c_release(dev->i2c);
+        i2c_depr_release(dev->i2c);
         return -3;
     }
     dev->atime_us = atime_us;
 
     dev->initialized = true;
 
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
     return 0;
 }
 
@@ -102,20 +102,20 @@ int tcs37727_set_rgbc_active(tcs37727_t *dev)
         return -1;
     }
 
-    i2c_acquire(dev->i2c);
-    if (i2c_read_regs(dev->i2c, dev->addr, TCS37727_ENABLE, &reg, 1) != 1) {
-        i2c_release(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
+    if (i2c_depr_read_regs(dev->i2c, dev->addr, TCS37727_ENABLE, &reg, 1) != 1) {
+        i2c_depr_release(dev->i2c);
         return -1;
     }
 
     reg |= (TCS37727_ENABLE_AEN | TCS37727_ENABLE_PON);
 
-    if (i2c_write_reg(dev->i2c, dev->addr, TCS37727_ENABLE, reg) != 1) {
-        i2c_release(dev->i2c);
+    if (i2c_depr_write_reg(dev->i2c, dev->addr, TCS37727_ENABLE, reg) != 1) {
+        i2c_depr_release(dev->i2c);
         return -1;
     }
 
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
     return 0;
 }
 
@@ -127,9 +127,9 @@ int tcs37727_set_rgbc_standby(tcs37727_t *dev)
         return -1;
     }
 
-    i2c_acquire(dev->i2c);
-    if (i2c_read_regs(dev->i2c, dev->addr, TCS37727_ENABLE, &reg, 1) != 1) {
-        i2c_release(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
+    if (i2c_depr_read_regs(dev->i2c, dev->addr, TCS37727_ENABLE, &reg, 1) != 1) {
+        i2c_depr_release(dev->i2c);
         return -1;
     }
 
@@ -138,12 +138,12 @@ int tcs37727_set_rgbc_standby(tcs37727_t *dev)
         reg &= ~TCS37727_ENABLE_PON;
     }
 
-    if (i2c_write_reg(dev->i2c, dev->addr, TCS37727_ENABLE, reg) != 1) {
-        i2c_release(dev->i2c);
+    if (i2c_depr_write_reg(dev->i2c, dev->addr, TCS37727_ENABLE, reg) != 1) {
+        i2c_depr_release(dev->i2c);
         return -1;
     }
 
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
     return 0;
 }
 
@@ -204,19 +204,19 @@ static uint8_t tcs37727_trim_gain(tcs37727_t *dev, int rawc)
         return 0;
     }
 
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
     uint8_t reg = 0;
-    if (i2c_read_reg(dev->i2c, dev->addr, TCS37727_CONTROL, &reg) != 1) {
-        i2c_release(dev->i2c);
+    if (i2c_depr_read_reg(dev->i2c, dev->addr, TCS37727_CONTROL, &reg) != 1) {
+        i2c_depr_release(dev->i2c);
         return -2;
     }
     reg &= ~TCS37727_CONTROL_AGAIN_MASK;
     reg |= reg_again;
-    if (i2c_write_reg(dev->i2c, dev->addr, TCS37727_CONTROL, reg) != 1) {
-        i2c_release(dev->i2c);
+    if (i2c_depr_write_reg(dev->i2c, dev->addr, TCS37727_CONTROL, reg) != 1) {
+        i2c_depr_release(dev->i2c);
         return -2;
     }
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
     dev->again = val_again;
 
     return 0;
@@ -230,15 +230,15 @@ int tcs37727_read(tcs37727_t *dev, tcs37727_data_t *data)
         return -1;
     }
 
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
 
-    if (i2c_read_regs(dev->i2c, dev->addr,
+    if (i2c_depr_read_regs(dev->i2c, dev->addr,
                       (TCS37727_INC_TRANS | TCS37727_CDATA), buf, 8) != 8) {
-        i2c_release(dev->i2c);
+        i2c_depr_release(dev->i2c);
         return -1;
     }
 
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     int32_t tmpc = ((uint16_t)buf[1] << 8) | buf[0];
     int32_t tmpr = ((uint16_t)buf[3] << 8) | buf[2];

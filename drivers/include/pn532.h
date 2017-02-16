@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 #include "mutex.h"
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include <stdint.h>

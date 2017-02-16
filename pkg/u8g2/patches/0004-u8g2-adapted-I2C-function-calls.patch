@@ -1,0 +1,47 @@
+From cd6c70801b9698261f23cfbe851d1a3b2bcc9060 Mon Sep 17 00:00:00 2001
+From: Hauke Petersen <hauke.petersen@fu-berlin.de>
+Date: Thu, 9 Feb 2017 12:07:11 +0100
+Subject: [PATCH 4/4] u8g2: adapted I2C function calls
+
+---
+ csrc/u8g2_riotos.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/csrc/u8g2_riotos.c b/csrc/u8g2_riotos.c
+index bd06ccb..c78894d 100644
+--- a/csrc/u8g2_riotos.c
++++ b/csrc/u8g2_riotos.c
+@@ -3,7 +3,7 @@
+ #include "xtimer.h"
+ 
+ #include "periph/spi.h"
+-#include "periph/i2c.h"
++#include "periph/i2c_depr.h"
+ #include "periph/gpio.h"
+ 
+ #include <stdio.h>
+@@ -143,17 +143,17 @@ uint8_t u8x8_byte_riotos_hw_i2c(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void
+             }
+             break;
+         case U8X8_MSG_BYTE_INIT:
+-            i2c_init_master(dev, I2C_SPEED_FAST);
++            i2c_depr_init_master(dev, I2C_SPEED_FAST);
+             break;
+         case U8X8_MSG_BYTE_SET_DC:
+             break;
+         case U8X8_MSG_BYTE_START_TRANSFER:
+-            i2c_acquire(dev);
++            i2c_depr_acquire(dev);
+             index = 0;
+             break;
+         case U8X8_MSG_BYTE_END_TRANSFER:
+-            i2c_write_bytes(dev, u8x8_GetI2CAddress(u8g2), buffer, index);
+-            i2c_release(dev);
++            i2c_depr_write_bytes(dev, u8x8_GetI2CAddress(u8g2), buffer, index);
++            i2c_depr_release(dev);
+             break;
+         default:
+             return 0;
+-- 
+1.9.1
+

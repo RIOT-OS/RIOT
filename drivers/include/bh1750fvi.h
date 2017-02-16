@@ -21,7 +21,7 @@
 #ifndef BH1750FVI_H
 #define BH1750FVI_H
 
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -34,7 +34,7 @@
 
 #include "xtimer.h"
 
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 
 #include "jc42.h"
 

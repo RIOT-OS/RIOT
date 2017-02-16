@@ -22,7 +22,7 @@
 #include <stdlib.h>
 
 #include "periph_conf.h"
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 #include "shell.h"
 
 #define BUFSIZE        (128U)
@@ -52,7 +52,7 @@ int cmd_init_master(int argc, char **argv)
     dev = atoi(argv[1]);
     speed = atoi(argv[2]);
 
-    res = i2c_init_master(dev, speed);
+    res = i2c_depr_init_master(dev, speed);
     if (res == -1) {
         puts("Error: Init: Given device not available");
         return 1;
@@ -92,16 +92,16 @@ int cmd_write(int argc, char **argv)
     }
 
     if (length == 1) {
-        printf("i2c_write_byte(I2C_%i, 0x%02x, 0x%02x)\n", i2c_dev, addr, data[0]);
-        res = i2c_write_byte(i2c_dev, addr, data[0]);
+        printf("i2c_depr_write_byte(I2C_%i, 0x%02x, 0x%02x)\n", i2c_dev, addr, data[0]);
+        res = i2c_depr_write_byte(i2c_dev, addr, data[0]);
     }
     else {
-        printf("i2c_write_bytes(I2C_%i, 0x%02x, [", i2c_dev, addr);
+        printf("i2c_depr_write_bytes(I2C_%i, 0x%02x, [", i2c_dev, addr);
         for (int i = 0; i < length; i++) {
             printf(", 0x%02x", data[i]);
         }
         puts("])");
-        res = i2c_write_bytes(i2c_dev, addr, data, length);
+        res = i2c_depr_write_bytes(i2c_dev, addr, data, length);
     }
 
     if (res < 0) {
@@ -138,17 +138,17 @@ int cmd_write_reg(int argc, char **argv)
     }
 
     if (length == 1) {
-        printf("i2c_write_reg(I2C_%i, 0x%02x, 0x%02x, 0x%02x)\n",
+        printf("i2c_depr_write_reg(I2C_%i, 0x%02x, 0x%02x, 0x%02x)\n",
                i2c_dev, addr, reg, data[0]);
-        res = i2c_write_reg(i2c_dev, addr, reg, data[0]);
+        res = i2c_depr_write_reg(i2c_dev, addr, reg, data[0]);
     }
     else {
-        printf("i2c_write_regs(I2C_%i, 0x%02x, 0x%02x, [", i2c_dev, addr, reg);
+        printf("i2c_depr_write_regs(I2C_%i, 0x%02x, 0x%02x, [", i2c_dev, addr, reg);
         for (int i = 0; i < length; i++) {
             printf("0x%02x, ", data[i]);
         }
         puts("])");
-        res = i2c_write_regs(i2c_dev, addr, reg, data, length);
+        res = i2c_depr_write_regs(i2c_dev, addr, reg, data, length);
     }
 
     if (res < 1) {
@@ -186,12 +186,12 @@ int cmd_read(int argc, char **argv)
         return 1;
     }
     else if (length == 1) {
-        printf("i2c_read_byte(I2C_%i, 0x%02x, uint8_t *res)\n", i2c_dev, addr);
-        res = i2c_read_byte(i2c_dev, addr, data);
+        printf("i2c_depr_read_byte(I2C_%i, 0x%02x, uint8_t *res)\n", i2c_dev, addr);
+        res = i2c_depr_read_byte(i2c_dev, addr, data);
     }
     else {
-        printf("i2c_read_bytes(I2C_%i, 0x%02x, uint8_t *res, %i)\n", i2c_dev, addr, length);
-        res = i2c_read_bytes(i2c_dev, addr, data, length);
+        printf("i2c_depr_read_bytes(I2C_%i, 0x%02x, uint8_t *res, %i)\n", i2c_dev, addr, length);
+        res = i2c_depr_read_bytes(i2c_dev, addr, data, length);
     }
 
     if (res < 1) {
@@ -234,12 +234,12 @@ int cmd_read_reg(int argc, char **argv)
         return 1;
     }
     else if (length == 1) {
-        printf("i2c_read_reg(I2C_%i, 0x%02x, 0x%02x, uint8_t *res)\n", i2c_dev, addr, reg);
-        res = i2c_read_reg(i2c_dev, addr, reg, data);
+        printf("i2c_depr_read_reg(I2C_%i, 0x%02x, 0x%02x, uint8_t *res)\n", i2c_dev, addr, reg);
+        res = i2c_depr_read_reg(i2c_dev, addr, reg, data);
     }
     else {
-        printf("i2c_read_regs(I2C_%i, 0x%02x, 0x%02x, uint8_t *res, %i)\n", i2c_dev, addr, reg, length);
-        res = i2c_read_regs(i2c_dev, addr, reg, data, length);
+        printf("i2c_depr_read_regs(I2C_%i, 0x%02x, 0x%02x, uint8_t *res, %i)\n", i2c_dev, addr, reg, length);
+        res = i2c_depr_read_regs(i2c_dev, addr, reg, data, length);
     }
 
     if (res < 1) {

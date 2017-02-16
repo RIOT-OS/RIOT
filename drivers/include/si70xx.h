@@ -21,7 +21,7 @@
 #ifndef SI70XX_H
 #define SI70XX_H
 
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 
 #ifdef __cplusplus
 extern "C" {

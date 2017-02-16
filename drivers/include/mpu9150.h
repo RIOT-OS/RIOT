@@ -21,7 +21,7 @@
 #ifndef MPU9150_H
 #define MPU9150_H
 
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 
 #ifdef __cplusplus
 extern "C" {

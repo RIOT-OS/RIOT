@@ -40,7 +40,7 @@ int main(void)
 
     puts("HIH6130 sensor driver test application\n");
     printf("Initializing I2C_%i... ", TEST_HIH6130_I2C);
-    if (i2c_init_master(TEST_HIH6130_I2C, I2C_SPEED_FAST) < 0) {
+    if (i2c_depr_init_master(TEST_HIH6130_I2C, I2C_SPEED_FAST) < 0) {
         puts("[Failed]");
         return -1;
     }

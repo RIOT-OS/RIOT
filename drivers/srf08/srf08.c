@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include "xtimer.h"
 #include "srf08.h"
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -39,11 +39,11 @@ int srf08_init(srf08_t *dev, i2c_t i2c, uint8_t addr, i2c_speed_t speed)
     dev->addr = addr;
 
     /* Acquire exclusive access to the bus. */
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
     /* initialize i2c interface */
-    status = i2c_init_master(dev->i2c, speed);
+    status = i2c_depr_init_master(dev->i2c, speed);
     /* Release the bus for other threads. */
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     if(status < 0) {
         return -1;
@@ -68,10 +68,10 @@ int srf08_set_max_range(srf08_t *dev, uint8_t max_range)
     int status;
 
     /* Acquire exclusive access to the bus. */
-    i2c_acquire(dev->i2c);
-    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_RANGE_REG, max_range);
+    i2c_depr_acquire(dev->i2c);
+    status = i2c_depr_write_reg(dev->i2c, dev->addr, SRF08_RANGE_REG, max_range);
     /* Release the bus for other threads. */
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     return status;
 }
@@ -82,10 +82,10 @@ int srf08_set_max_gain(srf08_t *dev, uint8_t gain)
     int status;
 
     /* Acquire exclusive access to the bus. */
-    i2c_acquire(dev->i2c);
-    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_GAIN_REG, gain);
+    i2c_depr_acquire(dev->i2c);
+    status = i2c_depr_write_reg(dev->i2c, dev->addr, SRF08_GAIN_REG, gain);
     /* Release the bus for other threads. */
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     return status;
 }
@@ -100,11 +100,11 @@ int srf08_get_distances(srf08_t *dev, uint16_t *range_array, int num_echos, srf0
     char max_reg_no_read = (num_echos * sizeof(range_bytes)) +1;
 
     /* Acquire exclusive access to the bus. */
-    i2c_acquire(dev->i2c);
+    i2c_depr_acquire(dev->i2c);
     /* set ranging mode */
-    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_COMMAND_REG, ranging_mode);
+    status = i2c_depr_write_reg(dev->i2c, dev->addr, SRF08_COMMAND_REG, ranging_mode);
     /* Release the bus for other threads. */
-    i2c_release(dev->i2c);
+    i2c_depr_release(dev->i2c);
 
     if (!status) {
         DEBUG("Write the ranging command to the i2c-interface is failed\n");
@@ -123,11 +123,11 @@ int srf08_get_distances(srf08_t *dev, uint16_t *range_array, int num_echos, srf0
          register_location += sizeof(range_bytes)) {
 
         /* Acquire exclusive access to the bus. */
-        i2c_acquire(dev->i2c);
+        i2c_depr_acquire(dev->i2c);
         /* read the echo bytes */
-        status = i2c_read_regs(dev->i2c, dev->addr, register_location, range_bytes, sizeof(range_bytes));
+        status = i2c_depr_read_regs(dev->i2c, dev->addr, register_location, range_bytes, sizeof(range_bytes));
         /* Release the bus for other threads. */
-        i2c_release(dev->i2c);
+        i2c_depr_release(dev->i2c);
 
         if (!status) {
             DEBUG("Read the echo bytes from the i2c-interface is failed\n");

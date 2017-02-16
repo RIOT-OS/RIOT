@@ -49,7 +49,7 @@ int main(void)
 
     puts("INA220 sensor driver test application\n");
     printf("Initializing I2C_%i... ", TEST_INA220_I2C);
-    if (i2c_init_master(TEST_INA220_I2C, I2C_SPEED_FAST) < 0) {
+    if (i2c_depr_init_master(TEST_INA220_I2C, I2C_SPEED_FAST) < 0) {
         return -1;
     }
 

@@ -24,7 +24,7 @@
 
 #include "ina220.h"
 #include "ina220-regs.h"
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 #include "byteorder.h"
 
 #define ENABLE_DEBUG    (0)
@@ -39,7 +39,7 @@ static int ina220_read_reg(ina220_t *dev, uint8_t reg, uint16_t *out)
     } tmp = { .u16 = 0 };
     int status = 0;
 
-    status = i2c_read_regs(dev->i2c, dev->addr, reg, &tmp.c[0], 2);
+    status = i2c_depr_read_regs(dev->i2c, dev->addr, reg, &tmp.c[0], 2);
 
     if (status != 2) {
         return -1;
@@ -60,7 +60,7 @@ static int ina220_write_reg(ina220_t *dev, uint8_t reg, uint16_t in)
 
     tmp.u16 = HTONS(in);
 
-    status = i2c_write_regs(dev->i2c, dev->addr, reg, &tmp.c[0], 2);
+    status = i2c_depr_write_regs(dev->i2c, dev->addr, reg, &tmp.c[0], 2);
 
     if (status != 2) {
         return -1;

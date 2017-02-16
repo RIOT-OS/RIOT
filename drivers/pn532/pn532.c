@@ -25,7 +25,7 @@
 #include "mutex.h"
 #include "pn532.h"
 #include "periph/gpio.h"
-#include "periph/i2c.h"
+#include "periph/i2c_depr.h"
 #include "periph/spi.h"
 
 #define ENABLE_DEBUG    (0)
@@ -122,7 +122,7 @@ int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode)
     dev->mode = mode;
     if (mode == PN532_I2C) {
 #ifdef PN532_SUPPORT_I2C
-        if (i2c_init_master(dev->conf->i2c, I2C_SPEED_FAST) != 0) {
+        if (i2c_depr_init_master(dev->conf->i2c, I2C_SPEED_FAST) != 0) {
             DEBUG("pn532: initialization of I2C bus failed\n");
             return -1;
         }
@@ -174,9 +174,9 @@ static int _write(pn532_t *dev, char *buff, unsigned len)
 
     if (dev->mode == PN532_I2C) {
 #ifdef PN532_SUPPORT_I2C
-        i2c_acquire(dev->conf->i2c);
-        ret = i2c_write_bytes(dev->conf->i2c, PN532_I2C_ADDRESS, buff, len);
-        i2c_release(dev->conf->i2c);
+        i2c_depr_acquire(dev->conf->i2c);
+        ret = i2c_depr_write_bytes(dev->conf->i2c, PN532_I2C_ADDRESS, buff, len);
+        i2c_depr_release(dev->conf->i2c);
 #endif
     }
     else {
@@ -206,10 +206,10 @@ static int _read(pn532_t *dev, char *buff, unsigned len)
 
     if (dev->mode == PN532_I2C) {
 #ifdef PN532_SUPPORT_I2C
-        i2c_acquire(dev->conf->i2c);
+        i2c_depr_acquire(dev->conf->i2c);
         /* len+1 for RDY after read is accepted */
-        ret = i2c_read_bytes(dev->conf->i2c, PN532_I2C_ADDRESS, buff, len + 1);
-        i2c_release(dev->conf->i2c);
+        ret = i2c_depr_read_bytes(dev->conf->i2c, PN532_I2C_ADDRESS, buff, len + 1);
+        i2c_depr_release(dev->conf->i2c);
 #endif
     }
     else {
