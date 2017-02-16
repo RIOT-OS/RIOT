@@ -76,7 +76,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   PWM configuration
+ * @name    PWM configuration
  * @{
  */
 static const pwm_conf_t pwm_config[] = {
