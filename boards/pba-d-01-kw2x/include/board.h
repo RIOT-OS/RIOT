@@ -112,8 +112,9 @@ extern "C"
  * @name Define the interface for the TCS3772 light sensor
  * @{
  */
-#define TCS37727_I2C        (I2C_DEV(0))
-#define TCS37727_ADDR       (0x29)
+#define TCS37727_PARAMS     { .i2c   = I2C_DEV(0), \
+                              .addr  = 0x29, \
+                              .atime = TCS37727_PARAM_ATIME }
 /** @} */
 
 /**
