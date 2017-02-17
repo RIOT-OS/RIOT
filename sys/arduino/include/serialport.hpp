@@ -55,7 +55,7 @@ public:
      *
      * @param[in] dev       RIOT UART device
      */
-    SerialPort(uart_t dev);
+    explicit SerialPort(uart_t dev);
 
     /**
      * @brief   Get the number of bytes (characters) available for reading from
