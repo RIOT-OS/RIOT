@@ -108,6 +108,9 @@ endif
 ifneq (,$(filter gcoap,$(USEMODULE)))
     DIRS += net/application_layer/coap
 endif
+ifneq (,$(filter emcute,$(USEMODULE)))
+    DIRS += net/application_layer/emcute
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
