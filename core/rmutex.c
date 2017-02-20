@@ -32,7 +32,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-void rmutex_lock(rmutex_t *rmutex)
+static int _lock(rmutex_t *rmutex, int trylock)
 {
     kernel_pid_t owner;
 
@@ -70,7 +70,7 @@ void rmutex_lock(rmutex_t *rmutex)
          *     Condition 2: holds
          *     rmutex->owner == thread_getpid()
          *
-         * Note for Case 1:
+         * Note for Case 2:
          *
          *     Because the mutex rmutex->owner is only written be the
          *     owner (me), rmutex->owner stays constant througout the
@@ -87,7 +87,12 @@ void rmutex_lock(rmutex_t *rmutex)
             /* wait for the mutex */
             DEBUG("rmutex %" PRIi16" : locking mutex\n", thread_getpid());
 
-            mutex_lock(&rmutex->mutex);
+            if (trylock) {
+                return 0;
+            }
+            else {
+                mutex_lock(&rmutex->mutex);
+            }
         }
         /* Case 2: Mutex is held be me (relock) */
         /* Note: There is nothing to do for Case 2; refcount is incremented below */
@@ -105,34 +110,18 @@ void rmutex_lock(rmutex_t *rmutex)
 
     /* increase the refcount */
     rmutex->refcount++;
+
+    return 1;
+}
+
+void rmutex_lock(rmutex_t *rmutex)
+{
+    _lock(rmutex, 0);
 }
 
 int rmutex_trylock(rmutex_t *rmutex)
 {
-    kernel_pid_t owner;
-
-    /* try to lock the mutex */
-    if (mutex_trylock(&rmutex->mutex) == 0) {
-        /* ensure that owner is read atomically, since I need a consistent value */
-        owner = atomic_load_explicit( &rmutex->owner, memory_order_relaxed);
-
-        /* Case 1: Mutex is not held by me */
-        if ( owner != thread_getpid() ) {
-            /* wait for the mutex */
-            return 0;
-        }
-        /* Case 2: Mutex is held be me (relock) */
-        /* Note: There is nothing to do for Case 2; refcount is incremented below */
-    }
-
-    /* I am are holding the recursive mutex */
-
-    /* ensure that owner is written atomically, since others need a consistent value */
-    atomic_store_explicit(&rmutex->owner, thread_getpid(), memory_order_relaxed);
-
-    /* increase the refcount */
-    rmutex->refcount++;
-    return 1;
+    return _lock(rmutex, 1);
 }
 
 void rmutex_unlock(rmutex_t *rmutex)
