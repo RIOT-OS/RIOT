@@ -8,6 +8,7 @@ PSEUDOMODULES += conn_can_isotp_multi
 PSEUDOMODULES += cord_ep_standalone
 PSEUDOMODULES += cord_epsim_standalone
 PSEUDOMODULES += core_%
+PSEUDOMODULES += cortexm_fpu
 PSEUDOMODULES += ecc_%
 PSEUDOMODULES += emb6_router
 PSEUDOMODULES += event_%
