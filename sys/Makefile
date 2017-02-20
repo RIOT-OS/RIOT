@@ -94,6 +94,9 @@ endif
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
     DIRS += net/gnrc/application_layer/uhcpc
 endif
+ifneq (,$(findstring profiling,$(USEMODULE)))
+    DIRS += profiling
+endif
 
 ifneq (,$(filter sntp,$(USEMODULE)))
     DIRS += net/application_layer/sntp
