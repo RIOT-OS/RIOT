@@ -2,7 +2,7 @@ APPLICATION = driver_slip
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h nucleo-f334 stm32f0discovery weio \
-                          nucleo-f030 nucleo32-f042 nucleo32-f031
+                          nucleo-f030 nucleo32-f042 nucleo32-f031 nucleo-l053
 
 BOARD_BLACKLIST += mips-malta
 
