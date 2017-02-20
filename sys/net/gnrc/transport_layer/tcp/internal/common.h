@@ -120,7 +120,7 @@ extern "C" {
 extern kernel_pid_t gnrc_tcp_pid;
 
 /**
- * @brief Head of conn linked list.
+ * @brief Head of linked tcb list.
  */
 extern gnrc_tcp_tcb_t *_list_tcb_head;
 

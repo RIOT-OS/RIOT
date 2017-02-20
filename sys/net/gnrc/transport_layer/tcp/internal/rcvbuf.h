@@ -17,10 +17,10 @@
  * @brief       Functions for allocating and freeing the receive buffer
  *
  * @author      Simon Brummer <simon.brummer@posteo.de>
- * @}
  */
- #ifndef GNRC_TCP_INTERNAL_RCVBUF_H
- #define GNRC_TCP_INTERNAL_RCVBUF_H
+
+#ifndef GNRC_TCP_INTERNAL_RCVBUF_H
+#define GNRC_TCP_INTERNAL_RCVBUF_H
 
 #include <stdint.h>
 #include "mutex.h"

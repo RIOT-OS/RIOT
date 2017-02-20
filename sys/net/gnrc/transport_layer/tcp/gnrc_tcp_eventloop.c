@@ -37,7 +37,7 @@
 #include "debug.h"
 
 /**
- * @brief send function, used to pass paket down the network stack
+ * @brief send function, pass paket down the network stack
  *
  * @param[in] pkt   paket to pass down the network stack
  *
@@ -67,7 +67,7 @@ static int _send(gnrc_pktsnip_t *pkt)
 }
 
 /**
- * @brief recv function, used to call fsm on packet reception
+ * @brief recv function, receive packet from network layer.
  *
  * @param[in] pkt   incomming paket to process
  *

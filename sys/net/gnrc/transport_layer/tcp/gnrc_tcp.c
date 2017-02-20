@@ -83,7 +83,7 @@ mutex_t _list_tcb_lock;
  * @param[in] local_port    Local Port to bind on, if this is a passive connection.
  * @param[in] passive       Flag to indicate if this is a active or passive open.
  *
- * @return  0 on success.
+ * @return   0 on success.
  * @return   -EISCONN if transmission control block is already in use.
  * @return   -ENOMEM if the receive buffer for the tcb could not be allocated.
  *           Increase "GNRC_TCP_RCV_BUFFERS".

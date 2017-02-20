@@ -43,14 +43,14 @@ extern "C" {
 int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt);
 
 /**
- * @brief Build and allocate a tcp paket in paketbuffer, conn stores pointer to new paket.
+ * @brief Build and allocate a tcp paket, tcb stores pointer to new paket.
  *
- * @param[in,out] tcb        This connections Transmission control block.
+ * @param[in,out] tcb        This connections transmission control block.
  * @param[out] out_pkt       Pointer to paket to build
- * @param[out] seq_con       Number of Bytes, the packet will consume in sequence number spce
- * @param[in]  ctl           control bits to set in pkt
- * @param[in]  seq_num       sequence number to use in new paket
- * @param[in]  ack_num       acknowledgment number to use in new paket
+ * @param[out] seq_con       Number of Bytes, the packet will consume in sequence number space
+ * @param[in]  ctl           control bits to set in out_pkt
+ * @param[in]  seq_num       sequence number of the new paket
+ * @param[in]  ack_num       acknowledgment number of the new paket
  * @param[in]  payload       pointer to payload buffer
  * @param[in]  payload_len   payload size
  *
@@ -110,7 +110,7 @@ uint32_t _pkt_get_pay_len(gnrc_pktsnip_t *pkt);
  *
  * @param[in,out] tcb      This connections Transmission control block.
  * @param[in] pkt          paket to add to the retransmission mechanism
- * @param[in] retransmit   is this a retransmission ?
+ * @param[in] retransmit   Flag used to indicate that pkt is a retransmit.
  *
  * @return   Zero on success
  * @return   -ENOMEM if the retransmission queue is full

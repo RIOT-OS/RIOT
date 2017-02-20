@@ -57,7 +57,7 @@ static int _is_local_port_in_use(const uint16_t portnumber)
 }
 
 /**
- * @brief Generate random, currently unused local port above the well-known ports (> 1024)
+ * @brief Generate random unused local port above the well-known ports (> 1024)
  *
  * @return The generated port number
  */
@@ -76,7 +76,7 @@ static uint16_t _get_random_local_port(void)
 /**
  * @brief clears retransmit queue
  *
- * @param[in/out] conn   TCP Connection, where the retransmit should be cleared
+ * @param[in/out] tcb   tcb containing the retransmit queue.
  *
  * @return zero on success
  */
@@ -93,7 +93,7 @@ static int _clear_retransmit(gnrc_tcp_tcb_t *tcb)
 /**
  * @brief restarts time wait timer
  *
- * @param[in/out] conn TCP Connection, where the timewait_timer should be restarted
+ * @param[in/out] tcb   tcb containing the timer structure to use.
  *
  * @return Zero on success
  */
@@ -802,7 +802,7 @@ static int _fsm_timeout_connection(gnrc_tcp_tcb_t *tcb, bool *notify_owner)
 /**
  * @brief FSM Handling Function for probe sending
  *
- * @param[in/out] tcb Specifies tcb to use fsm on.
+ * @param[in/out] tcb    tcb of this connection
  *
  * @return zero on success.
  */
@@ -822,7 +822,7 @@ static int _fsm_send_probe(gnrc_tcp_tcb_t *tcb)
 /**
  * @brief FSM Handling Function for clearing the retransmit queue.
  *
- * @param[in/out] tcb Specifies tcb to use fsm on.
+ * @param[in/out] tcb   tcb of this connection.
  *
  * @return zero on success.
  */
