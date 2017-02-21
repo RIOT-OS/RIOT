@@ -31,7 +31,7 @@ extern "C"
 #endif
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED2_PIN            GPIO_PIN(PORT_D, 6)
