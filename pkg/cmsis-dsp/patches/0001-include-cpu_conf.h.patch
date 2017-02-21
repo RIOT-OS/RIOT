@@ -1,0 +1,25 @@
+From 53e086efc203ad8e1646524c732588d27aabfc53 Mon Sep 17 00:00:00 2001
+From: Vincent Dupont <vincent@otakeys.com>
+Date: Mon, 20 Feb 2017 19:00:08 +0100
+Subject: [PATCH] include cpu_conf.h
+
+---
+ include/arm_math.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/arm_math.h b/include/arm_math.h
+index e4b2f62..cde16bf 100644
+--- a/include/arm_math.h
++++ b/include/arm_math.h
+@@ -288,6 +288,8 @@
+ #ifndef _ARM_MATH_H
+ #define _ARM_MATH_H
+ 
++#include "cpu_conf.h"
++
+ #define __CMSIS_GENERIC         /* disable NVIC and Systick functions */
+ 
+ #if defined(ARM_MATH_CM7)
+-- 
+2.9.3
+
