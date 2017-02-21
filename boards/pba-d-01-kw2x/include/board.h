@@ -31,12 +31,12 @@ extern "C"
 #endif
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
-#define LED2_PIN            GPIO_PIN(PORT_D, 6)
+#define LED0_PIN            GPIO_PIN(PORT_D, 6)
 #define LED1_PIN            GPIO_PIN(PORT_D, 4)
-#define LED0_PIN            GPIO_PIN(PORT_A, 4)
+#define LED2_PIN            GPIO_PIN(PORT_A, 4)
 
 #define LED0_MASK           (1 << 6)
 #define LED1_MASK           (1 << 4)
