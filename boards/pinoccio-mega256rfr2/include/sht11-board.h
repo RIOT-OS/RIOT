@@ -35,7 +35,7 @@ extern "C" {
 /*  serial clock line high */
 #define SHT11_SCK_HIGH  PORTD |= (1<<PD0);
 /*  read serial I/O */
-#define SHT11_DATA      ((PIND & (1<<PD1)) == 0)
+#define SHT11_DATA      ((PIND & (1<<PD1)) != 0)
 /*  serial I/O line low */
 #define SHT11_DATA_LOW  (PORTD &= ~(1<<PD1));
 /*  serial I/O line high */
