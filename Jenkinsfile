@@ -191,12 +191,12 @@ def abortOnError(msg)
 
 def fetchPR(prNum, fetchArgs, extraRefSpec)
 {
-    sh """git init
-    if (( "\${RIOT_MIRROR}" )); then RIOT_URL="\${RIOT_MIRROR_URL}"; else RIOT_URL="https://github.com/RIOT-OS/RIOT"; fi
-    git remote add origin "\${RIOT_URL}"
-    for RETRIES in {1..3}; do
-        timeout 30 git fetch -u -n ${fetchArgs} origin ${extraRefSpec} pull/${prNum}/merge:pull_${prNum} && break
-    done
-    [[ "\$RETRIES" -eq 3 ]] && exit 1
+    sh """git init ; \
+    if (( "\${RIOT_MIRROR}" )); then RIOT_URL="\${RIOT_MIRROR_URL}"; else RIOT_URL="https://github.com/RIOT-OS/RIOT"; fi ; \
+    git remote add origin "\${RIOT_URL}" ; \
+    for RETRIES in {1..3}; do \
+        timeout 30 git fetch -u -n ${fetchArgs} origin ${extraRefSpec} pull/${prNum}/merge:pull_${prNum} && break ; \
+    done ; \
+    [[ "\$RETRIES" -eq 3 ]] && { exit 1 ; } ; \
     git checkout pull_${prNum}"""
 }
