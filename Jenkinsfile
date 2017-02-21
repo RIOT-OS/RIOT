@@ -84,7 +84,7 @@ stage("unittests") {
     def boardName = ""
     for (int i=0; i < boards.size(); i++) {
         boardName = boards[i]
-        builds['linux_unittests_' + boardName] = make_build("linux && boards && native", boardName, "linux_unittests", unittests)
+        builds['linux_unittests_' + boardName] = make_build("linux && boards && native", boardName, "linux_unittests", unittests.join(' '))
     }
     /* distribute all builds to the slaves */
     parallel (builds)
@@ -99,26 +99,11 @@ stage("tests") {
     def boardName = ""
     for (int i=0; i < boards.size(); i++) {
         boardName = boards[i]
-        builds['linux_driver_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_driver_tests", driver_tests)
-        builds['linux_pkg_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_pkg_tests", pkg_tests)
-        builds['linux_periph_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_periph_tests", periph_tests)
-        builds['linux_other_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_other_tests", other_tests)
+        builds['linux_other_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_other_tests", other_tests.join(' '))
+        builds['linux_driver_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_driver_tests", driver_tests.join(' '))
+        builds['linux_periph_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_periph_tests", periph_tests.join(' '))
+        builds['linux_pkg_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_pkg_tests", pkg_tests.join(' '))
     }
-
-
-/*  ignore macOS builds for now - macOS is currently broken for native
-    builds['macOS_driver_tests_native'] = make_build("macOS && native", "native", "macOS_driver_tests", driver_tests)
-    builds['macOS_pkg_tests_native'] = make_build("macOS && native", "native", "macOS_pkg_tests", pkg_tests)
-    builds['macOS_periph_tests_native'] = make_build("macOS && native", "native", "macOS_periph_tests", periph_tests)
-    builds['macOS_other_tests_native'] = make_build("macOS && native", "native", "macOS_other_tests", other_tests)
-*/
-/*  ignore raspi builds for now - slows down the build (needs investigation)
-    builds['raspi_driver_tests_native'] = make_build("raspi && native", "native", "raspi_driver_tests", driver_tests)
-    builds['raspi_pkg_tests_native'] = make_build("raspi && native", "native", "raspi_pkg_tests", pkg_tests)
-    builds['raspi_periph_tests_native'] = make_build("raspi && native", "native", "raspi_periph_tests", periph_tests)
-    builds['raspi_other_tests_native'] = make_build("raspi && native", "native", "raspi_other_tests", other_tests)
-*/
-
     /* distribute all builds to the slaves */
     parallel (builds)
 
@@ -132,16 +117,8 @@ stage("examples") {
     def boardName = ""
     for (int i=0; i < boards.size(); i++) {
         boardName = boards[i]
-        builds['linux_examples_' + boardName] = make_build("linux && boards && native", boardName, "linux_examples", examples)
+        builds['linux_examples_' + boardName] = make_build("linux && boards && native", boardName, "linux_examples", examples.join(' '))
     }
-
-/*  ignore macOS builds for now - macOS is currently broken for native
-    builds['macOS_examples_native'] = make_build("macOS && native", "native", "macOS_examples", examples)
-*/
-/*  ignore raspi builds for now - slows down the build (needs investigation)
-    builds['raspi_examples_native'] = make_build("raspi && native", "native", "raspi_examples", examples)
-*/
-
     /* distribute all builds to the slaves */
     parallel (builds)
 
@@ -153,42 +130,35 @@ if (currentBuild.result == null) {
 }
 
 /* create a job */
-def make_build(label, board, desc, arg)
+def make_build(label, board, desc, apps)
 {
     return {
         node(label) {
             try {
                 deleteDir()
                 fetchPR(env.CHANGE_ID, "--depth=1", "")
-                def build_dir = pwd()
-                sh "./dist/tools/git/git-cache init"
-                timestamps {
-                    def apps = arg.join(' ')
-                    echo "building ${apps} for ${board} on nodes with ${label}"
-                    withEnv([
-                      "BOARD=${board}",
-                      "CCACHE_BASEDIR=${build_dir}",
-                      "RIOT_CI_BUILD=1"]) {
-                        def ret = sh(returnStatus: true,
-                                     script: """#!/bin/bash +ex
-                                                declare -i RESULT=0
-                                                for app in ${apps}; do
-                                                    if [[ \$(make -sC \$app info-boards-supported | tr ' ' '\n' | sed -n '/^${board}\$/p') ]]; then
-                                                        echo \"\n\nBuilding \$app for ${board}\" >> success_${board}_${desc}.log
-                                                        rm -rf jenkins_bin; mkdir jenkins_bin
-                                                        CFLAGS_DBG=\"\" BINDIR=\$(pwd)/jenkins_bin make -j\${NPROC} -C \$app all >> success_${board}_${desc}.log 2>&1 || RESULT=1
-                                                    fi;
-                                                done;
-                                                if ((\$RESULT)); then
-                                                    mv success_${board}_${desc}.log error_${board}_${desc}.log
-                                                fi;
-                                                exit \$RESULT""")
-                        if (ret) {
-                            currentBuild.result = 'FAILURE'
-                        }
-                        step([$class: 'ArtifactArchiver', artifacts: "*_${board}_${desc}.log", fingerprint: true, allowEmptyArchive: true])
-                    }
+                def ret = sh(returnStatus: true,
+                             script: """#!/bin/bash +ex
+                                        declare -i RESULT=0
+                                        export CCACHE_BASEDIR=\$(pwd)
+                                        export RIOT_CI_BUILD=1
+                                        export BOARD=${board}
+                                        ./dist/tools/git/git-cache init
+                                        for app in ${apps}; do
+                                            if [[ \$(make -sC \$app info-boards-supported | tr ' ' '\n' | sed -n '/^${board}\$/p') ]]; then
+                                                echo \"\n\nBuilding \$app for ${board}\" >> success_${board}_${desc}.log
+                                                rm -rf jenkins_bin; mkdir jenkins_bin
+                                                CFLAGS_DBG=\"\" BINDIR=\$(pwd)/jenkins_bin make -j\${NPROC} -C \$app all >> success_${board}_${desc}.log 2>&1 || RESULT=1
+                                            fi;
+                                        done;
+                                        if ((\$RESULT)); then
+                                            mv success_${board}_${desc}.log error_${board}_${desc}.log
+                                        fi;
+                                        exit \$RESULT""")
+                if (ret) {
+                    currentBuild.result = 'FAILURE'
                 }
+                step([$class: 'ArtifactArchiver', artifacts: "*_${board}_${desc}.log", fingerprint: true, allowEmptyArchive: true])
             }  catch(e) {
                 echo "${e.toString()}"
                 currentBuild.result = 'FAILURE'
