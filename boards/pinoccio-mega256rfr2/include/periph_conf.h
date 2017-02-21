@@ -80,8 +80,8 @@ extern "C" {
 
 #define PWM_0				(0U)
 
-static uint16_t scale[] = {1}; /** used to archieve better pwm frequency */
-static uint16_t prescaler[] = {1}; /** used to start and stop timer by setting clock */
+static uint8_t scale[] = {1}; /** used to archieve better pwm frequency */
+static uint8_t prescaler[] = {1}; /** used to start and stop timer by setting clock */
 
 static const pwm_conf_t pwm_config[] = {
 		{
@@ -91,8 +91,8 @@ static const pwm_conf_t pwm_config[] = {
 				.chan     = { { .pin = GPIO_PIN(PORT_B, 5), .cc_chan = 0 },
 							{ .pin = GPIO_PIN(PORT_B, 6), .cc_chan = 1 },
 							{ .pin = GPIO_PIN(PORT_B, 7), .cc_chan = 2 } },
-				.scale_pointer = &scale[0],
-				.prescaler_pointer = &prescaler[0],
+				.scale_pointer = &(scale[0]),
+				.prescaler_pointer = &(prescaler[0]),
 				.bits = 16
 		}
 };
