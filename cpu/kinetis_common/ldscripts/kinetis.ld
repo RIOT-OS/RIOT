@@ -25,7 +25,7 @@ SECTIONS
     /* Interrupt vectors 0x00-0x3ff. */
     .vector_table :
     {
-        _vector_rom = .;
+        _isr_vectors = .;
         KEEP(*(.vector_table))
     } > vectors
     ASSERT (SIZEOF(.vector_table) == 0x400, "Interrupt vector table of invalid size.")
