@@ -7,6 +7,7 @@ def driver_tests = []
 def pkg_tests = []
 def periph_tests = []
 def other_tests = []
+def thread_tests = []
 def unittests = []
 
 /* stop running jobs */
@@ -38,7 +39,7 @@ stage('setup') {
             if (tests[i].startsWith("tests/driver_")) {
                 driver_tests << tests[i]
             }
-            else if (tests[i].startsWith("tests/pkg_")) {
+            else if (tests[i].startsWith("tests/lwip") || tests[i].startsWith("tests/pkg_")) {
                 pkg_tests << tests[i]
             }
             else if (tests[i].startsWith("tests/periph_")) {
@@ -46,6 +47,9 @@ stage('setup') {
             }
             else if (tests[i].startsWith("tests/unittests")) {
                 unittests << tests[i]
+            }
+            else if (tests[i].startsWith("tests/pthread") || tests[i].startsWith("tests/thread")) {
+                thread_tests << tests[i]
             }
             else {
                 other_tests << tests[i]
@@ -92,17 +96,17 @@ stage("unittests") {
     abortOnError("unittests failed")
 }
 
-stage("tests") {
+stage("core tests") {
     def builds = [:]
 
     /* setup all concurrent builds */
     def boardName = ""
     for (int i=0; i < boards.size(); i++) {
         boardName = boards[i]
-        builds['linux_other_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_other_tests", other_tests.join(' '))
         builds['linux_driver_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_driver_tests", driver_tests.join(' '))
+        builds['linux_thread_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_thread_tests", thread_tests.join(' '))
         builds['linux_periph_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_periph_tests", periph_tests.join(' '))
-        builds['linux_pkg_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_pkg_tests", pkg_tests.join(' '))
+        builds['linux_other_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_other_tests", other_tests.join(' '))
     }
     /* distribute all builds to the slaves */
     parallel (builds)
@@ -110,7 +114,7 @@ stage("tests") {
     abortOnError("tests failed")
 }
 
-stage("examples") {
+stage("extended tests") {
     def builds = [:]
 
     /* setup all concurrent builds */
@@ -118,6 +122,7 @@ stage("examples") {
     for (int i=0; i < boards.size(); i++) {
         boardName = boards[i]
         builds['linux_examples_' + boardName] = make_build("linux && boards && native", boardName, "linux_examples", examples.join(' '))
+        builds['linux_pkg_tests_' + boardName] = make_build("linux && boards && native", boardName, "linux_pkg_tests", pkg_tests.join(' '))
     }
     /* distribute all builds to the slaves */
     parallel (builds)
