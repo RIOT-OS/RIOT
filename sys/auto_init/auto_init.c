@@ -28,10 +28,6 @@
 #include "sht11.h"
 #endif
 
-#ifdef MODULE_GPIOINT
-#include "gpioint.h"
-#endif
-
 #ifdef MODULE_MCI
 #include "diskio.h"
 #endif
@@ -115,10 +111,6 @@ void auto_init(void)
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");
     sht11_init();
-#endif
-#ifdef MODULE_GPIOINT
-    DEBUG("Auto init gpioint module.\n");
-    gpioint_init();
 #endif
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");
