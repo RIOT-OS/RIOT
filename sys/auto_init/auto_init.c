@@ -156,6 +156,11 @@ void auto_init(void)
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
 
+#ifdef MODULE_SX1276
+    extern void auto_init_sx1276(void);
+    auto_init_sx1276();
+#endif
+
 #ifdef MODULE_AT86RF2XX
     extern void auto_init_at86rf2xx(void);
     auto_init_at86rf2xx();

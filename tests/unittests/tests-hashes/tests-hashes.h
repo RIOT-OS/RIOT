@@ -35,6 +35,13 @@ void tests_hashes(void);
  *
  * @return  embUnit tests if successful, NULL if not.
  */
+Test *tests_hashes_cmac_tests(void);
+
+/**
+ * @brief   Generates tests for hashes/cmac.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
 Test *tests_hashes_md5_tests(void);
 
 /**

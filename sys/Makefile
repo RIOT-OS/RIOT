@@ -105,6 +105,9 @@ endif
 ifneq (,$(filter sema,$(USEMODULE)))
     DIRS += sema
 endif
+ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
+    DIRS += net/gnrc/link_layer/gnrc_lorawan
+endif
 ifneq (,$(filter gcoap,$(USEMODULE)))
     DIRS += net/application_layer/coap
 endif
