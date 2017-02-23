@@ -35,6 +35,22 @@ static inline FTM_Type *ftm(pwm_t pwm)
     return pwm_config[pwm].ftm;
 }
 
+static void poweron(pwm_t pwm)
+{
+    int ftm = pwm_config[pwm].ftm_num;
+
+#ifdef SIM_SCGC6_FTM2_SHIFT
+    BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT + ftm) = 1;
+#else
+    if (ftm < 2) {
+        BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT + ftm) = 1;
+    }
+    else if (ftm == 2) {
+        BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_FTM2_SHIFT) = 1;
+    }
+#endif
+}
+
 uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     uint8_t pre = 0;
@@ -60,7 +76,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     }
 
     /* configure the used timer */
-    pwm_poweron(pwm);
+    poweron(pwm);
     /* disable write protect for changing settings */
     ftm(pwm)->MODE = FTM_MODE_WPDIS_MASK;
     /* clear any existing configuration */
@@ -88,7 +104,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     }
 
     /* and now we start the actual waveform generation */
-    pwm_start(pwm);
+    ftm(pwm)->SC |= FTM_SC_CLKS(1);
 
     /* finally we need to return the actual applied PWM frequency */
     return (CLOCK_BUSCLOCK >> pre) / res;
@@ -106,47 +122,29 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
     ftm(pwm)->CONTROLS[pwm_config[pwm].chan[channel].ftm_chan].CnV = value;
 }
 
-void pwm_start(pwm_t pwm)
-{
-    assert(pwm < PWM_NUMOF);
-    ftm(pwm)->SC |= FTM_SC_CLKS(1);
-}
-
-void pwm_stop(pwm_t pwm)
-{
-    assert(pwm < PWM_NUMOF);
-    ftm(pwm)->SC &= ~(FTM_SC_CLKS_MASK);
-}
-
 void pwm_poweron(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
-    int ftm = pwm_config[pwm].ftm_num;
-
-#ifdef SIM_SCGC6_FTM2_SHIFT
-    BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT + ftm) = 1;
-#else
-    if (ftm < 2) {
-        BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT + ftm) = 1;
-    }
-    else if (ftm == 2) {
-        BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_FTM2_SHIFT) = 1;
-    }
-#endif
+    poweron(pwm);
+    ftm(pwm)->SC |= FTM_SC_CLKS(1);
 }
 
 void pwm_poweroff(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
-    int ftm = pwm_config[pwm].ftm_num;
+    int ftm_num = pwm_config[pwm].ftm_num;
 
+    /* disable PWM generation */
+    ftm(pwm)->SC &= ~(FTM_SC_CLKS_MASK);
+
+    /* and power of the peripheral */
 #ifdef SIM_SCGC6_FTM2_SHIFT
-    BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT + ftm) = 0;
+    BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT + ftm_num) = 0;
 #else
-    if (ftm < 2) {
-        BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT + ftm) = 0;
+    if (ftm_num < 2) {
+        BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_FTM0_SHIFT + ftm_num) = 0;
     }
-    else if (ftm == 2) {
+    else if (ftm_num == 2) {
         BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_FTM2_SHIFT) = 0;
     }
 #endif

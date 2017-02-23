@@ -87,6 +87,15 @@ static uint8_t get_prescaler(unsigned int target, int *scale)
     return target - 1;
 }
 
+static void poweron(pwm_t dev)
+{
+    PM->APBCMASK.reg |= (PM_APBCMASK_TCC0 << _num(dev));
+    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
+                         GCLK_CLKCTRL_GEN_GCLK0 |
+                         GCLK_CLKCTRL_ID(_clk_id(dev)));
+    while (GCLK->STATUS.bit.SYNCBUSY) {}
+}
+
 uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     uint8_t prescaler;
@@ -113,7 +122,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     }
 
     /* power on the device */
-    pwm_poweron(dev);
+    poweron(dev);
 
     /* reset TCC module */
     _tcc(dev)->CTRLA.reg = TCC_CTRLA_SWRST;
@@ -142,7 +151,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     _tcc(dev)->PER.reg = (res - 1);
     while (_tcc(dev)->SYNCBUSY.reg & TCC_SYNCBUSY_PER) {}
     /* start PWM operation */
-    pwm_start(dev);
+    _tcc(dev)->CTRLA.reg |= (TCC_CTRLA_ENABLE);
     /* return the actual frequency the PWM is running at */
     return f_real;
 }
@@ -162,36 +171,17 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
     while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CC0 << _chan(dev, channel))) {}
 }
 
-void pwm_start(pwm_t dev)
-{
-    _tcc(dev)->CTRLA.reg |= (TCC_CTRLA_ENABLE);
-}
-
-void pwm_stop(pwm_t dev)
-{
-    _tcc(dev)->CTRLA.reg &= ~(TCC_CTRLA_ENABLE);
-}
-
 void pwm_poweron(pwm_t dev)
 {
-    int num = _num(dev);
-    if (num < 0) {
-        return;
-    }
-    PM->APBCMASK.reg |= (PM_APBCMASK_TCC0 << num);
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
-                         GCLK_CLKCTRL_GEN_GCLK0 |
-                         GCLK_CLKCTRL_ID(_clk_id(dev)));
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
+    poweron(dev);
+    _tcc(dev)->CTRLA.reg |= (TCC_CTRLA_ENABLE);
 }
 
 void pwm_poweroff(pwm_t dev)
 {
-    int num = _num(dev);
-    if (num < 0) {
-        return;
-    }
-    PM->APBCMASK.reg &= ~(PM_APBCMASK_TCC0 << num);
+    _tcc(dev)->CTRLA.reg &= ~(TCC_CTRLA_ENABLE);
+
+    PM->APBCMASK.reg &= ~(PM_APBCMASK_TCC0 << _num(dev));
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_GEN_GCLK7 |
                          GCLK_CLKCTRL_ID(_clk_id(dev)));
     while (GCLK->STATUS.bit.SYNCBUSY) {}
