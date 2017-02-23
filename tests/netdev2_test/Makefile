@@ -1,6 +1,8 @@
 APPLICATION = netdev2_test
 include ../Makefile.tests_common
 
+BOARD_INSUFFICIENT_MEMORY := nucleo32-f031
+
 DISABLE_MODULE = auto_init
 
 FEATURES_REQUIRED += periph_timer # xtimer required for this application
