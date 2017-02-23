@@ -2,6 +2,7 @@ PKG_NAME = tlsf
 PKG_VERSION = 3.0
 PKG_FILE = tlsf-$(PKG_VERSION).zip
 PKG_URL = http://download.riot-os.org/$(PKG_FILE)
+PKG_MD5 = 176965d58af525347e582e1630ea9604
 PKG_LICENSE = PD
 PKG_DIR=$(CURDIR)
 PKG_BUILDDIR=$(PKGDIRBASE)/$(PKG_NAME)
@@ -22,7 +23,7 @@ $(PKG_SRCDIR)/Makefile: $(PKG_BUILDDIR)/$(PKG_FILE) $(CURDIR)/patch.txt
 
 $(PKG_BUILDDIR)/$(PKG_FILE):
 	@mkdir -p $(@D)
-	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)
+	$(Q)$(DLCACHE) $(PKG_URL) $(PKG_MD5) $@
 
 clean::
 	rm -rf $(PKG_SRCDIR)/
