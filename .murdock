@@ -62,6 +62,10 @@ compile() {
     local appdir=$1
     local board=$2
 
+    export BINDIR=murdock_bin
+    rm -Rf $BINDIR
+    mkdir $BINDIR
+
     [ -n "$DWQ_WORKER" ] && \
         echo "-- running on worker ${DWQ_WORKER} thread ${DWQ_WORKER_THREAD}, build number $DWQ_WORKER_BUILDNUM."
 
@@ -82,7 +86,8 @@ compile() {
     fi
 
     # cleanup
-    rm -Rf "${appdir}/bin/${board}" "${appdir}/bin/pkg/${board}"
+    rm -Rf $BINDIR
+    rm -Rf $appdir/bin
 
     return $RES
 }
