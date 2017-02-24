@@ -22,7 +22,7 @@
 #include <string.h>
 
 #include "log.h"
-#include "uuid.h"
+#include "luid.h"
 #include "assert.h"
 
 #include "net/ethernet.h"
@@ -148,7 +148,7 @@ static int init(netdev2_t *netdev)
     while (rreg(dev, REG_MODE) & MODE_RESET) {};
 
     /* initialize the device, start with writing the MAC address */
-    uuid_get(hwaddr, ETHERNET_ADDR_LEN);
+    luid_get(hwaddr, ETHERNET_ADDR_LEN);
     hwaddr[0] &= ~0x03;         /* no group address and not globally unique */
     wchunk(dev, REG_SHAR0, hwaddr, ETHERNET_ADDR_LEN);
 

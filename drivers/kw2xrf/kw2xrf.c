@@ -28,7 +28,7 @@
 #include "periph/cpuid.h"
 #include "net/gnrc.h"
 #include "net/ieee802154.h"
-#include "uuid.h"
+#include "luid.h"
 
 #include "kw2xrf.h"
 #include "kw2xrf_spi.h"
@@ -45,7 +45,7 @@ static void kw2xrf_set_address(kw2xrf_t *dev)
     DEBUG("[kw2xrf] set MAC addresses\n");
     eui64_t addr_long;
     /* get an 8-byte unique ID to use as hardware address */
-    uuid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
+    luid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
     /* make sure we mark the address as non-multicast and not globally unique */
     addr_long.uint8[0] &= ~(0x01);
     addr_long.uint8[0] |=  (0x02);

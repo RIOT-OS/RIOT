@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     sys_uuid
+ * @ingroup     sys_luid
  * @{
  *
  * @file
- * @brief       UUID module implementation
+ * @brief       LUID module implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -24,31 +24,31 @@
 #include "assert.h"
 #include "periph/cpuid.h"
 
-#include "uuid.h"
+#include "luid.h"
 
 static uint8_t lastused = 1;
 
-void uuid_get(void *buf, size_t len)
+void luid_get(void *buf, size_t len)
 {
-    uuid_base(buf, len);
+    luid_base(buf, len);
 
     ((uint8_t *)buf)[0] ^= lastused++;
 }
 
-void uuid_custom(void *buf, size_t len, int gen)
+void luid_custom(void *buf, size_t len, int gen)
 {
-    uuid_base(buf, len);
+    luid_base(buf, len);
 
     for (size_t i = 0; i < sizeof(gen); i++) {
         ((uint8_t *)buf)[i % len] ^= ((gen >> (i * 8)) & 0xff);
     }
 }
 
-void uuid_base(void *buf, size_t len)
+void luid_base(void *buf, size_t len)
 {
     assert(buf && (len > 0));
 
-    memset(buf, UUID_BACKUP_SEED, len);
+    memset(buf, LUID_BACKUP_SEED, len);
 
 #if CPUID_LEN
     uint8_t *out = (uint8_t *)buf;

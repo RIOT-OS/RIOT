@@ -24,7 +24,7 @@
  */
 
 
-#include "uuid.h"
+#include "luid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/gnrc.h"
@@ -62,7 +62,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     dev->netdev.flags = 0;
 
     /* get an 8-byte unique ID to use as hardware address */
-    uuid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
+    luid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
     /* make sure we mark the address as non-multicast and not globally unique */
     addr_long.uint8[0] &= ~(0x01);
     addr_long.uint8[0] |=  (0x02);
