@@ -93,6 +93,16 @@ typedef struct gnrc_netdev2 {
     gnrc_pktsnip_t * (*recv)(struct gnrc_netdev2 *dev);
 
     /**
+     * @brief Set the state of this device
+     */
+    int (*_set_netdev_state)(struct gnrc_netdev2 *dev, netopt_state_t devstate);
+
+    /**
+     * @brief Get the state of this device
+     */
+    netopt_state_t (*_get_netdev_state)(struct gnrc_netdev2 *dev);
+
+    /**
      * @brief netdev2 handle this adapter is working with
      */
     netdev2_t *dev;
