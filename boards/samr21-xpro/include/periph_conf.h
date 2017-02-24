@@ -219,6 +219,15 @@ static const spi_conf_t spi_config[] = {
 #define I2C_0_MUX           GPIO_MUX_D
 
 /**
+ * @brief   ADC configuration
+ *
+ * The configuration consists simply of a list of channels that should be used
+ * @{
+ */
+#define ADC_NUMOF          (0)
+/** @} */
+
+/**
  * @name RTC configuration
  * @{
  */
@@ -238,6 +247,20 @@ static const spi_conf_t spi_config[] = {
 #define RTT_MAX_VALUE       (0xffffffff)
 #define RTT_FREQUENCY       (32768U)    /* in Hz. For changes see `rtt.c` */
 #define RTT_RUNSTDBY        (1)         /* Keep RTT running in sleep states */
+/** @} */
+
+/**
+ * @name ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (0)
+/** @} */
+
+/**
+ * @brief   DAC configuration
+ * @{
+ */
+#define DAC_NUMOF           (0)
 /** @} */
 
 #ifdef __cplusplus
