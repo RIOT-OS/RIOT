@@ -102,7 +102,8 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
-    gpio_init(spi_config[bus].miso_pin, GPIO_IN);
+    /* MISO must always have PD/PU, see #5968. This is a ~65uA difference */
+    gpio_init(spi_config[bus].miso_pin, GPIO_IN_PD);
     gpio_init(spi_config[bus].mosi_pin, GPIO_OUT);
     gpio_init(spi_config[bus].clk_pin, GPIO_OUT);
     gpio_init_mux(spi_config[bus].miso_pin, spi_config[bus].miso_mux);
@@ -116,6 +117,10 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     mutex_lock(&locks[bus]);
     /* power on the device */
     poweron(bus);
+
+    /* disable the device */
+    dev(bus)->CTRLA.reg &= ~(SERCOM_SPI_CTRLA_ENABLE);
+    while (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_ENABLE) {}
 
     /* configure bus clock, in synchronous mode its calculated from
      * BAUD.reg = (f_ref / (2 * f_bus) - 1)
@@ -142,10 +147,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
 void spi_release(spi_t bus)
 {
-    /* disable device and put it back to sleep */
-    dev(bus)->CTRLA.reg &= ~(SERCOM_SPI_CTRLA_ENABLE);
-    while (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_ENABLE) {}
-    poweroff(bus);
     /* release access to the device */
     mutex_unlock(&locks[bus]);
 }
