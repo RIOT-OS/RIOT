@@ -1,4 +1,4 @@
-NORDIC_SRCS := $(BINDIRBASE)/pkg/$(BOARD)/nordic_softdevice_ble/src
+NORDIC_SRCS := $(PKGDIRBASE)/nordic_softdevice_ble/src
 
 INCLUDES += \
 			-I$(RIOTBASE)/pkg/nordic_softdevice_ble/src \

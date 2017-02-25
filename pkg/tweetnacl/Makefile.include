@@ -1,1 +1,1 @@
-INCLUDES += -I$(BINDIRBASE)/pkg/$(BOARD)/tweetnacl/
+INCLUDES += -I$(PKGDIRBASE)/tweetnacl/
