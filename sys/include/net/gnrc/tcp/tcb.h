@@ -27,6 +27,7 @@
 #include <xtimer.h>
 #include <mutex.h>
 #include <msg.h>
+#include <mbox.h>
 #include "net/gnrc.h"
 #include "config.h"
 
@@ -74,8 +75,8 @@ typedef struct _transmission_control_block {
     xtimer_t tim_tout;     /**< Timer struct for timeouts */
     msg_t msg_tout;        /**< Message, sent on timeouts */
     gnrc_pktsnip_t *pkt_retransmit;   /**< Pointer to Packet in "retransmit queue" */
-    kernel_pid_t owner;               /**< PID of this connection handling thread */
-    msg_t msg_queue[GNRC_TCP_TCB_MSG_QUEUE_SIZE];   /**< Tcb's message queue */
+    msg_t mbox_raw[GNRC_TCP_TCB_MSG_QUEUE_SIZE];   /**< mbox message queue */
+    mbox_t mbox;             /**< Tcb's Mbox for synchronization */
     uint8_t *rcv_buf_raw;    /**< Pointer to the receive buffer */
     ringbuffer_t rcv_buf;    /**< Receive Buffer data structure */
     mutex_t fsm_lock;        /**< Mutex for FSM access synchronization */

@@ -903,10 +903,10 @@ int _fsm(gnrc_tcp_tcb_t *tcb, fsm_event_t event, gnrc_pktsnip_t *in_pkt, void *b
     notify_owner = false;
     result = _fsm_unprotected(tcb, event, in_pkt, buf, len, &notify_owner);
 
-    /* Notify owner if something interesting happend */
-    if (notify_owner && tcb->owner != KERNEL_PID_UNDEF) {
+    /* Put a message into the tcb message box, if the owner must be notified */
+    if (notify_owner) {
         msg.type = MSG_TYPE_NOTIFY_USER;
-        msg_send(&msg, tcb->owner);
+        mbox_try_put(&(tcb->mbox), &msg);
     }
     /* Unlock FSM */
     mutex_unlock(&(tcb->fsm_lock));

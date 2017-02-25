@@ -74,6 +74,42 @@ gnrc_tcp_tcb_t *_list_tcb_head;
 mutex_t _list_tcb_lock;
 
 /**
+ * @brief Helper struct, holding all argument data for_cb_mbox_put_msg.
+ */
+typedef struct _cb_arg {
+    uint32_t msg_type;   /**< Message Type to Put into mbox behind mbox_ptr */
+    mbox_t *mbox_ptr;    /**< Pointer to mbox */
+} cb_arg_t;
+
+/**
+ * @brief Callback for xtimer, puts a message in a mbox.
+ *
+ * @param[in] arg   Ptr to cb_arg_t. Must not be NULL or anything else.
+ */
+static void _cb_mbox_put_msg(void *arg)
+{
+    msg_t msg;
+    msg.type = ((cb_arg_t *) arg)->msg_type;
+    mbox_try_put(((cb_arg_t *) arg)->mbox_ptr, &msg);
+}
+
+/**
+ * @brief Setup timer with a callback function.
+ *
+ * @param[in/out] timer   Ptr to timer, which should be set.
+ * @param[in] duration    Duration after @p timer expires.
+ * @param[in] cb          Function to be called after @p duration.
+ * @param[in] arg         Arguments for @p cb.
+ */
+static void _setup_timeout(xtimer_t *timer, const uint32_t duration, const xtimer_callback_t cb,
+                           cb_arg_t *arg)
+{
+    timer->callback = cb;
+    timer->arg = arg;
+    xtimer_set(timer, duration);
+}
+
+/**
  * @brief   Establishes a new TCP connection
  *
  * @param[in/out] tcb       This connections Transmission control block.
@@ -94,10 +130,10 @@ mutex_t _list_tcb_lock;
 static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint16_t target_port,
                           const uint8_t *local_addr, uint16_t local_port, uint8_t passive)
 {
-    msg_t msg;                           /* Message for incomming Messages */
-    msg_t connection_timeout_msg;        /* Connection Timeout Message */
-    xtimer_t connection_timeout_timer;   /* Connection Timeout Timer */
-    int8_t ret = 0;                      /* Return Value */
+    msg_t msg;
+    xtimer_t connection_timeout;
+    cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &(tcb->mbox)};
+    int8_t ret = 0;
 
     /* Lock the tcb for this function call */
     mutex_lock(&(tcb->function_lock));
@@ -108,9 +144,9 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
         return -EISCONN;
     }
 
-    /* Setup connection (common parts) */
-    msg_init_queue(tcb->msg_queue, GNRC_TCP_TCB_MSG_QUEUE_SIZE);
-    tcb->owner = thread_getpid();
+    /* 'Flush' mbox */
+    while (mbox_try_get(&(tcb->mbox), &msg) != 0) {
+    }
 
     /* Setup passive connection */
     if (passive) {
@@ -148,11 +184,9 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
         tcb->local_port = local_port;
         tcb->peer_port = target_port;
 
-        /* Setup Timeout: If connection could not be established before */
-        /* the timer expired, the connection attempt failed */
-        connection_timeout_msg.type = MSG_TYPE_CONNECTION_TIMEOUT;
-        xtimer_set_msg(&connection_timeout_timer, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
-                       &connection_timeout_msg, tcb->owner);
+        /* Setup connection timeout: Put timeout message in tcb's mbox on expiration */
+        _setup_timeout(&connection_timeout, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+                       _cb_mbox_put_msg, &connection_timeout_arg);
     }
 
     /* Call FSM with Event: CALL_OPEN */
@@ -167,7 +201,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
     /* Wait until a connection was established or closed */
     while (ret >= 0 && tcb->state != FSM_STATE_CLOSED && tcb->state != FSM_STATE_ESTABLISHED &&
            tcb->state != FSM_STATE_CLOSE_WAIT) {
-        msg_receive(&msg);
+        mbox_get(&(tcb->mbox), &msg);
         switch (msg.type) {
             case MSG_TYPE_CONNECTION_TIMEOUT:
                 DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : CONNECTION_TIMEOUT\n");
@@ -185,11 +219,10 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
     }
 
     /* Cleanup */
-    xtimer_remove(&connection_timeout_timer);
+    xtimer_remove(&connection_timeout);
     if (tcb->state == FSM_STATE_CLOSED && ret == 0) {
         ret = -ECONNREFUSED;
     }
-    tcb->owner = KERNEL_PID_UNDEF;
     mutex_unlock(&(tcb->function_lock));
     return ret;
 }
@@ -202,16 +235,11 @@ int gnrc_tcp_init(void)
         return -1;
     }
 
-    /* Initialize Mutex for linked-list synchronization */
+    /* Iniialize TCP and start eventloop */
     mutex_init(&(_list_tcb_lock));
-
-    /* Initialize Linked-List for connection storage */
     _list_tcb_head = NULL;
-
-    /* Initialize receive buffers */
     _rcvbuf_init();
 
-    /* Start TCP processing loop */
     return thread_create(_stack, sizeof(_stack), TCP_EVENTLOOP_PRIO, 0, _event_loop, NULL,
                          "gnrc_tcp");
 }
@@ -246,8 +274,8 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb)
     tcb->rto = RTO_UNINITIALIZED;
     tcb->retries = 0;
     tcb->pkt_retransmit = NULL;
-    tcb->owner = KERNEL_PID_UNDEF;
     tcb->rcv_buf_raw = NULL;
+    mbox_init(&(tcb->mbox), tcb->mbox_raw, GNRC_TCP_TCB_MSG_QUEUE_SIZE);
     mutex_init(&(tcb->fsm_lock));
     mutex_init(&(tcb->function_lock));
     tcb->next = NULL;
@@ -307,16 +335,16 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     assert(tcb != NULL);
     assert(data != NULL);
 
-    msg_t msg;                                /* Message for incomming Messages */
-    msg_t connection_timeout_msg;             /* Connection Timeout Message */
-    msg_t probe_timeout_msg;                  /* Probe Timeout Message */
-    msg_t user_timeout_msg;                   /* User Specified Timeout Message */
-    xtimer_t connection_timeout_timer;        /* Connection Timeout Timer */
-    xtimer_t probe_timeout_timer;             /* Probe Timeout Timer */
-    xtimer_t user_timeout_timer;              /* User Specified Timeout Timer */
-    uint32_t probe_timeout_duration_us = 0;   /* Probe Timeout Duration in microseconds */
-    ssize_t ret = 0;                          /* Return Value */
-    bool probing = false;                     /* True if this connection is probing */
+    msg_t msg;
+    xtimer_t connection_timeout;
+    cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &(tcb->mbox)};
+    xtimer_t user_timeout;
+    cb_arg_t user_timeout_arg = {MSG_TYPE_USER_SPEC_TIMEOUT, &(tcb->mbox)};
+    xtimer_t probe_timeout;
+    cb_arg_t probe_timeout_arg = {MSG_TYPE_PROBE_TIMEOUT, &(tcb->mbox)};
+    uint32_t probe_timeout_duration_us = 0;
+    ssize_t ret = 0;
+    bool probing_mode = false;
 
     /* Lock the tcb for this function call */
     mutex_lock(&(tcb->function_lock));
@@ -327,19 +355,17 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
         return -ENOTCONN;
     }
 
-    /* Re-init message queue, take ownership. FSM can send Messages to this thread now */
-    msg_init_queue(tcb->msg_queue, GNRC_TCP_TCB_MSG_QUEUE_SIZE);
-    tcb->owner = thread_getpid();
+    /* 'Flush' mbox */
+    while (mbox_try_get(&(tcb->mbox), &msg) != 0) {
+    }
 
-    /* Setup Connection Timeout */
-    connection_timeout_msg.type = MSG_TYPE_CONNECTION_TIMEOUT;
-    xtimer_set_msg(&connection_timeout_timer, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
-                   &connection_timeout_msg, tcb->owner);
+    /* Setup connection timeout: Put timeout message in tcb's mbox on expiration */
+    _setup_timeout(&connection_timeout, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+                   _cb_mbox_put_msg, &connection_timeout_arg);
 
-    /* Setup User specified timeout if timeout_us is greater than zero */
+    /* Setup user specified timeout if timeout_us is greater than zero */
     if (timeout_duration_us > 0) {
-        user_timeout_msg.type = MSG_TYPE_USER_SPEC_TIMEOUT;
-        xtimer_set_msg(&user_timeout_timer, timeout_duration_us, &user_timeout_msg, tcb->owner);
+        _setup_timeout(&user_timeout, timeout_duration_us, _cb_mbox_put_msg, &user_timeout_arg);
     }
 
     /* Loop until something was sent and acked */
@@ -353,23 +379,22 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
         /* If the send window is closed: Setup Probing */
         if (tcb->snd_wnd <= 0) {
             /* If this is the first probe: Setup probing duration */
-            if (!probing) {
-                probing = true;
+            if (!probing_mode) {
+                probing_mode = true;
                 probe_timeout_duration_us = tcb->rto;
             }
-            /* Initialize Probe Timer */
-            probe_timeout_msg.type = MSG_TYPE_PROBE_TIMEOUT;
-            xtimer_set_msg(&probe_timeout_timer, probe_timeout_duration_us, &probe_timeout_msg,
-                           tcb->owner);
+            /* Setup probe timeout */
+            _setup_timeout(&probe_timeout, timeout_duration_us, _cb_mbox_put_msg,
+                           &probe_timeout_arg);
         }
 
         /* Try to send data in case there nothing has been sent and we are not probing */
-        if (ret == 0 && !probing) {
+        if (ret == 0 && !probing_mode) {
             ret = _fsm(tcb, FSM_EVENT_CALL_SEND, NULL, (void *) data, len);
         }
 
         /* Wait for responses */
-        msg_receive(&msg);
+        mbox_get(&(tcb->mbox), &msg);
         switch (msg.type) {
             case MSG_TYPE_CONNECTION_TIMEOUT:
                 DEBUG("gnrc_tcp.c : gnrc_tcp_send() : CONNECTION_TIMEOUT\n");
@@ -401,13 +426,13 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
             case MSG_TYPE_NOTIFY_USER:
                 DEBUG("gnrc_tcp.c : gnrc_tcp_send() : NOTIFY_USER\n");
                 /* Connection is alive: Reset Connection Timeout */
-                xtimer_set_msg(&connection_timeout_timer, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
-                               &connection_timeout_msg, tcb->owner);
+                _setup_timeout(&connection_timeout, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+                               _cb_mbox_put_msg, &connection_timeout_arg);
 
                 /* If the window re-opened and we are probing: Stop it */
-                if (tcb->snd_wnd > 0 && probing) {
-                    probing = false;
-                    xtimer_remove(&probe_timeout_timer);
+                if (tcb->snd_wnd > 0 && probing_mode) {
+                    probing_mode = false;
+                    xtimer_remove(&probe_timeout);
                 }
                 break;
 
@@ -417,10 +442,9 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     }
 
     /* Cleanup */
-    xtimer_remove(&probe_timeout_timer);
-    xtimer_remove(&connection_timeout_timer);
-    xtimer_remove(&user_timeout_timer);
-    tcb->owner = KERNEL_PID_UNDEF;
+    xtimer_remove(&probe_timeout);
+    xtimer_remove(&connection_timeout);
+    xtimer_remove(&user_timeout);
     mutex_unlock(&(tcb->function_lock));
     return ret;
 }
@@ -431,12 +455,12 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     assert(tcb != NULL);
     assert(data != NULL);
 
-    msg_t msg;                           /* Message for incomming Messages */
-    msg_t connection_timeout_msg;        /* Connection Timeout Message */
-    msg_t user_timeout_msg;              /* User Specified Timeout Message */
-    xtimer_t connection_timeout_timer;   /* Connection Timeout Timer */
-    xtimer_t user_timeout_timer;         /* User Specified Timeout Timer */
-    ssize_t ret = 0;                     /* Return Value */
+    msg_t msg;
+    xtimer_t connection_timeout;
+    cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &(tcb->mbox)};
+    xtimer_t user_timeout;
+    cb_arg_t user_timeout_arg = {MSG_TYPE_USER_SPEC_TIMEOUT, &(tcb->mbox)};
+    ssize_t ret = 0;
 
     /* Lock the tcb for this function call */
     mutex_lock(&(tcb->function_lock));
@@ -458,18 +482,16 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         return ret;
     }
 
-    /* If this call is blocking, setup messages and timers */
-    msg_init_queue(tcb->msg_queue, GNRC_TCP_TCB_MSG_QUEUE_SIZE);
-    tcb->owner = thread_getpid();
+    /* 'Flush' mbox */
+    while (mbox_try_get(&(tcb->mbox), &msg) != 0) {
+    }
 
-    /* Setup Connection Timeout */
-    connection_timeout_msg.type = MSG_TYPE_CONNECTION_TIMEOUT;
-    xtimer_set_msg(&connection_timeout_timer, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
-                   &connection_timeout_msg, tcb->owner);
+    /* Setup connection timeout: Put timeout message in tcb's mbox on expiration */
+    _setup_timeout(&connection_timeout, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+                   _cb_mbox_put_msg, &connection_timeout_arg);
 
-    /* Setup User Specified Timeout */
-    user_timeout_msg.type = MSG_TYPE_USER_SPEC_TIMEOUT;
-    xtimer_set_msg(&user_timeout_timer, timeout_duration_us, &user_timeout_msg, tcb->owner);
+    /* Setup user specified timeout */
+    _setup_timeout(&user_timeout, timeout_duration_us, _cb_mbox_put_msg, &user_timeout_arg);
 
     /* Processing Loop */
     while (ret == 0) {
@@ -484,7 +506,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
 
         /* If there was no data: Wait for next packet or until the timeout fires */
         if (ret <= 0) {
-            msg_receive(&msg);
+            mbox_get(&(tcb->mbox), &msg);
             switch (msg.type) {
                 case MSG_TYPE_CONNECTION_TIMEOUT:
                     DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : CONNECTION_TIMEOUT\n");
@@ -509,9 +531,8 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     }
 
     /* Cleanup */
-    xtimer_remove(&connection_timeout_timer);
-    xtimer_remove(&user_timeout_timer);
-    tcb->owner = KERNEL_PID_UNDEF;
+    xtimer_remove(&connection_timeout);
+    xtimer_remove(&user_timeout);
     mutex_unlock(&(tcb->function_lock));
     return ret;
 }
@@ -520,49 +541,50 @@ int gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
 {
     assert(tcb != NULL);
 
-    msg_t msg;                           /* Message for incomming Messages */
-    msg_t connection_timeout_msg;        /* Connection Timeout Message */
-    xtimer_t connection_timeout_timer;   /* Connection Timeout Timer */
+    msg_t msg;
+    xtimer_t connection_timeout;
+    cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &(tcb->mbox)};
 
     /* Lock the tcb for this function call */
     mutex_lock(&(tcb->function_lock));
 
-    /* Start connection teardown if the connection was not closed before */
-    if (tcb->state != FSM_STATE_CLOSED) {
-        /* Take ownership */
-        msg_init_queue(tcb->msg_queue, GNRC_TCP_TCB_MSG_QUEUE_SIZE);
-        tcb->owner = thread_getpid();
+    /* Return if connection is closed */
+    if (tcb->state == FSM_STATE_CLOSED) {
+        mutex_unlock(&(tcb->function_lock));
+        return 0;
+    }
 
-        /* Setup Connection Timeout */
-        connection_timeout_msg.type = MSG_TYPE_CONNECTION_TIMEOUT;
-        xtimer_set_msg(&connection_timeout_timer, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
-                       &connection_timeout_msg, tcb->owner);
+    /* 'Flush' mbox */
+    while (mbox_try_get(&(tcb->mbox), &msg) != 0) {
+    }
 
-        /* Start connection teardown sequence */
-        _fsm(tcb, FSM_EVENT_CALL_CLOSE, NULL, NULL, 0);
+    /* Setup connection timeout: Put timeout message in tcb's mbox on expiration */
+    _setup_timeout(&connection_timeout, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+                   _cb_mbox_put_msg, &connection_timeout_arg);
 
-        /* Loop until the connection has been closed */
-        while (tcb->state != FSM_STATE_CLOSED) {
-            msg_receive(&msg);
-            switch (msg.type) {
-                case MSG_TYPE_CONNECTION_TIMEOUT:
-                    DEBUG("gnrc_tcp.c : gnrc_tcp_close() : CONNECTION_TIMEOUT\n");
-                    _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
-                    break;
+    /* Start connection teardown sequence */
+    _fsm(tcb, FSM_EVENT_CALL_CLOSE, NULL, NULL, 0);
 
-                case MSG_TYPE_NOTIFY_USER:
-                    DEBUG("gnrc_tcp.c : gnrc_tcp_close() : NOTIFY_USER\n");
-                    break;
+    /* Loop until the connection has been closed */
+    while (tcb->state != FSM_STATE_CLOSED) {
+        mbox_get(&(tcb->mbox), &msg);
+        switch (msg.type) {
+            case MSG_TYPE_CONNECTION_TIMEOUT:
+                DEBUG("gnrc_tcp.c : gnrc_tcp_close() : CONNECTION_TIMEOUT\n");
+                _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                break;
 
-                default:
-                    DEBUG("gnrc_tcp.c : gnrc_tcp_close() : other message type\n");
-            }
+            case MSG_TYPE_NOTIFY_USER:
+                DEBUG("gnrc_tcp.c : gnrc_tcp_close() : NOTIFY_USER\n");
+                break;
+
+            default:
+                DEBUG("gnrc_tcp.c : gnrc_tcp_close() : other message type\n");
         }
     }
 
     /* Cleanup */
-    xtimer_remove(&connection_timeout_timer);
-    tcb->owner = KERNEL_PID_UNDEF;
+    xtimer_remove(&connection_timeout);
     mutex_unlock(&(tcb->function_lock));
     return 0;
 }

@@ -342,6 +342,7 @@ ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
   USEMODULE += inet_csum
   USEMODULE += random
   USEMODULE += xtimer
+  USEMODULE += core_mbox
 endif
 
 ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
