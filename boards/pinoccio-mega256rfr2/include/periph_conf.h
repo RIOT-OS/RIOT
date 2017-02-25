@@ -77,8 +77,9 @@ extern "C" {
  */
 
 #define PWM_NUMOF			(1U)
-
-#define PWM_0				(0U)
+/* To reduce confusion by steadily renaming hardware modules with different numbered drivers
+ * namingconvention is not to start with 0 but to name driver with the number fitting the underlying hardware module*/
+#define PWM_1				(0U)
 
 static uint8_t scale[] = {1}; /** used to archieve better pwm frequency */
 static uint8_t prescaler[] = {1}; /** used to start and stop timer by setting clock */
