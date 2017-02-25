@@ -50,6 +50,12 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (0)
+
+/**
  * @brief   DAC configuration
  * @{
  */
