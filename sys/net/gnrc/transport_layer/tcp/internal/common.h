@@ -48,6 +48,7 @@ extern "C" {
 #define STATUS_PASSIVE        (1 << 0)
 #define STATUS_ALLOW_ANY_ADDR (1 << 1)
 #define STATUS_NOTIFY_USER    (1 << 2)
+#define STATUS_WAIT_FOR_MSG   (1 << 3)
 /** @} */
 
 /**

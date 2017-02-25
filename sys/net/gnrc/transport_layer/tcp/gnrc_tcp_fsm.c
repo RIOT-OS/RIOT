@@ -857,14 +857,14 @@ int _fsm(gnrc_tcp_tcb_t *tcb, fsm_event_t event, gnrc_pktsnip_t *in_pkt, void *b
     mutex_lock(&(tcb->fsm_lock));
 
     /* Call FSM */
-    tcb->status &= ~(STATUS_NOTIFY_USER);
+    tcb->status &= ~STATUS_NOTIFY_USER;
     int32_t result = _fsm_unprotected(tcb, event, in_pkt, buf, len);
 
     /* Notify blocked thread if something interesting happend */
-    if ((tcb->status &  STATUS_NOTIFY_USER) && (tcb->owner != KERNEL_PID_UNDEF)) {
+    if ((tcb->status & STATUS_NOTIFY_USER) && (tcb->status & STATUS_WAIT_FOR_MSG)) {
         msg_t msg;
         msg.type = MSG_TYPE_NOTIFY_USER;
-        msg_send(&msg, tcb->owner);
+        mbox_try_put(&(tcb->mbox), &msg);
     }
     /* Unlock FSM */
     mutex_unlock(&(tcb->fsm_lock));
