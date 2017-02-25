@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef MINI_H_
-#define MINI_H_
+#ifndef MINI_H
+#define MINI_H
 
 #include <stdint.h>
 
@@ -86,5 +86,5 @@ void mini_matrix_shift_str(const char *str, uint32_t delay);
 }
 #endif
 
-#endif /* MINI_H_ */
+#endif /* MINI_H */
 /** @} */

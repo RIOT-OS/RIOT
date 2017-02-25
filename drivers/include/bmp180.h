@@ -18,8 +18,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef BMP180_H_
-#define BMP180_H_
+#ifndef BMP180_H
+#define BMP180_H
 
 #include "saul.h"
 #include "periph/i2c.h"
@@ -143,5 +143,5 @@ int bmp180_sealevel_pressure(bmp180_t *dev, int32_t altitude, int32_t *pressure_
 }
 #endif
 
-#endif /* BMP180_H_ */
+#endif /* BMP180_H */
 /** @} */

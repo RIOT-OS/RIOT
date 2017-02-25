@@ -20,7 +20,7 @@
  * @}
  */
 
-#include "periph/cpuid.h"
+#include "uuid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/gnrc.h"
@@ -32,36 +32,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/**
- * @todo    Move this function to a global module
- */
-#if CPUID_ID_LEN
-static void addr_from_cpuid(uint8_t *addr)
-{
-    /* option 1: generate addresses from CPUID */
-    uint8_t cpuid[CPUID_ID_LEN];
-
-    cpuid_get(cpuid);
-    memcpy(addr, cpuid, 8);
-
-#if CPUID_ID_LEN < 8
-    /* in case CPUID_ID_LEN < 8, fill missing bytes with zeros */
-    for (int i = CPUID_ID_LEN; i < 8; i++) {
-        addr_long[i] = 0;
-    }
-#else
-    /* in case CPUID_ID_LEN > 8, XOR those bytes on top of the first 8 */
-    for (int i = 8; i < CPUID_ID_LEN; i++) {
-        addr_long[i & 0x07] ^= cpuid[i];
-    }
-#endif
-
-    /* make sure we mark the address as non-multicast and not globally unique */
-    addr_long[0] &= ~(0x01);
-    addr_long[0] |= 0x02;
-}
-#endif
-
 
 void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params)
 {
@@ -72,22 +42,22 @@ void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params)
     dev->state = CC2420_STATE_IDLE;
     /* reset device descriptor fields */
     dev->options = 0;
-    spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING, dev->params.spi_clk);
 }
 
 int cc2420_init(cc2420_t *dev)
 {
     uint16_t reg;
-    uint8_t addr[8] = CC2420_ADDR_FALLBACK;
+    uint8_t addr[8];
 
     /* reset options and sequence number */
     dev->netdev.seq = 0;
     dev->netdev.flags = 0;
 
     /* set default address, channel, PAN ID, and TX power */
-#if CPUID_ID_LEN
-    addr_from_cpuid(addr);
-#endif
+    uuid_get(addr, sizeof(addr));
+    /* make sure we mark the address as non-multicast and not globally unique */
+    addr[0] &= ~(0x01);
+    addr[0] |= 0x02;
     cc2420_set_addr_short(dev, &addr[6]);
     cc2420_set_addr_long(dev, addr);
     cc2420_set_pan(dev, CC2420_PANID_DEFAULT);

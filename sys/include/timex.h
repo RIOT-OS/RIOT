@@ -31,32 +31,32 @@ extern "C" {
 /**
  * @brief The number of microseconds per second
  */
-#define SEC_IN_USEC (1000000U)
+#define US_PER_SEC (1000000U)
 
 /**
  * @brief The number of seconds per minute
  */
-#define MIN_IN_SEC  (60U)
+#define SEC_PER_MIN  (60U)
 
 /**
  * @brief The number of centiseconds per second
  */
-#define SEC_IN_CS   (100U)
+#define CS_PER_SEC   (100U)
 
 /**
  * @brief The number of milliseconds per second
  */
-#define SEC_IN_MS   (1000U)
+#define MS_PER_SEC   (1000U)
 
 /**
  * @brief The number of microseconds per millisecond
  */
-#define MS_IN_USEC  (1000U)
+#define US_PER_MS  (1000U)
 
 /**
  * @brief The number of nanoseconds per microsecond
  */
-#define USEC_IN_NS  (1000)
+#define NS_PER_US  (1000)
 
 /**
  * @brief The maximum length of the string representation of a timex timestamp
@@ -133,8 +133,8 @@ int timex_cmp(const timex_t a, const timex_t b);
  */
 static inline void timex_normalize(timex_t *time)
 {
-    time->seconds += (time->microseconds / SEC_IN_USEC);
-    time->microseconds %= SEC_IN_USEC;
+    time->seconds += (time->microseconds / US_PER_SEC);
+    time->microseconds %= US_PER_SEC;
 }
 
 /**
@@ -147,7 +147,7 @@ static inline void timex_normalize(timex_t *time)
  */
 static inline int timex_isnormalized(const timex_t *time)
 {
-    return (time->microseconds < SEC_IN_USEC);
+    return (time->microseconds < US_PER_SEC);
 }
 
 /**
@@ -160,7 +160,7 @@ static inline int timex_isnormalized(const timex_t *time)
 /* cppcheck-suppress passedByValue */
 static inline uint64_t timex_uint64(const timex_t a)
 {
-    return (uint64_t) a.seconds * SEC_IN_USEC + a.microseconds;
+    return (uint64_t) a.seconds * US_PER_SEC + a.microseconds;
 }
 
 /**
@@ -172,7 +172,7 @@ static inline uint64_t timex_uint64(const timex_t a)
  */
 static inline timex_t timex_from_uint64(const uint64_t timestamp)
 {
-    return timex_set(timestamp / SEC_IN_USEC, timestamp % SEC_IN_USEC);
+    return timex_set(timestamp / US_PER_SEC, timestamp % US_PER_SEC);
 }
 
 /**

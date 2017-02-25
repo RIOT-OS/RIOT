@@ -73,8 +73,8 @@
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef NET_CONN_H_
-#define NET_CONN_H_
+#ifndef NET_CONN_H
+#define NET_CONN_H
 
 #include "net/conn/ip.h"
 #include "net/conn/tcp.h"
@@ -101,5 +101,5 @@ ipv6_addr_t *conn_find_best_source(const ipv6_addr_t *dst);
 }
 #endif
 
-#endif /* NET_CONN_H_ */
+#endif /* NET_CONN_H */
 /** @} */

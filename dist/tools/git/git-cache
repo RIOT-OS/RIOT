@@ -4,10 +4,14 @@ git_cache() {
     git -C "${GIT_CACHE_DIR}" $*
 }
 
+git_cache_initialized() {
+    local _git_dir="$(git_cache rev-parse --git-dir 2>/dev/null)"
+    test "$_git_dir" = "." -o "$_git_dir" = ".git"
+}
+
 init() {
     set -e
-    local _git_dir="$(git_cache rev-parse --git-dir 2>/dev/null)"
-    [ "$_git_dir" = "." -o "$_git_dir" = ".git" ] || {
+    git_cache_initialized || {
         mkdir -p "${GIT_CACHE_DIR}"
 
         git_cache init --bare
@@ -17,22 +21,65 @@ init() {
 }
 
 add() {
+    local repo="$1"
+
+    _locked "$GIT_CACHE_DIR/$name.addlock" _add "$repo"
+}
+
+_add() {
     set -e
     local repo="$1"
     local name="$(_remote_name $repo)"
 
     if ! is_cached "$repo"; then
         git_cache remote add "$name" "$repo"
+        git_cache config --add remote.${name}.fetch "+refs/tags/*:refs/tags/${name}/*"
     else
         echo "git-cache: $url already in cache"
     fi
     set +e
 }
 
+if [ "$(uname)" = Darwin ]; then
+    _locked() {
+        local lockfile="$1"
+        shift
+
+        while ! shlock -p $$ -f $lockfile; do
+            sleep 0.2
+        done
+
+        $*
+
+        rm $lockfile
+    }
+else
+    _locked() {
+        local lockfile="$1"
+        shift
+
+        (
+        flock -w 600 9 || exit 1
+        $*
+        ) 9>"$lockfile"
+    }
+fi
+
 update() {
     set -e
-    local REMOTE=${1:---all}
-    git_cache fetch $REMOTE
+
+    local REMOTE=${1}
+    if [ -n "$REMOTE" ]; then
+        local REMOTES=$(_remote_name $REMOTE)
+    else
+        local REMOTES="$(git_cache remote show)"
+    fi
+
+    for remote in $REMOTES; do
+        echo "git-cache: updating remote $remote"
+        _locked "$GIT_CACHE_DIR/$remote.lock" git_cache --namespace $remote fetch -n $remote
+    done
+
     set +e
 }
 
@@ -72,15 +119,28 @@ drop() {
 }
 
 _check_commit() {
-    if [ -d "${GIT_CACHE_DIR}" ]; then
-        git_cache cat-file -e ${1}^{commit}
-    else
-        false
-    fi
+    git_cache cat-file -e ${1}^{commit} 2>/dev/null
 }
 
 _remote_name() {
-    echo "$*" | md5sum | cut -d\  -f1
+    echo "$*" | git hash-object --stdin
+}
+
+_tag_to_sha1() {
+    local out="$(git_cache log -n 1 --pretty=oneline $1 -- 2>/dev/null)"
+    [ -n "$out" ] && echo $out | cut -f 1 -d" "
+}
+
+_check_tag_or_commit() {
+    local SHA1=$1
+    local REMOTE_NAME=$2
+
+    if _check_commit $SHA1 ; then
+        git_cache tag commit$SHA1 $SHA1 2> /dev/null || true # ignore possibly already existing tag
+        echo "commit$SHA1"
+    elif _tag_to_sha1 ${REMOTE_NAME}/$SHA1 > /dev/null; then
+        echo "${REMOTE_NAME}/$SHA1"
+    fi
 }
 
 clone() {
@@ -88,22 +148,38 @@ clone() {
     local REMOTE="${1}"
     local SHA1="${2}"
     local REMOTE_NAME="$(_remote_name $REMOTE)"
-    local TARGET_PATH="${3:-${REMOTE_NAME}}"
+    local TARGET_PATH="${3}"
 
-    if [ "$GIT_CACHE_AUTOADD" = "1" ]; then
+    [ -z "$TARGET_PATH" ] && TARGET_PATH="$(basename $REMOTE)"
+
+    # make sure git won't ask for credentials
+    export GIT_TERMINAL_PROMPT=0
+
+    if git_cache_initialized; then
         if ! is_cached "$REMOTE"; then
             echo "git cache: auto-adding $REMOTE"
             add "$REMOTE"
-            update "$(_remote_name $REMOTE)"
         fi
-    fi
 
-    if _check_commit $2 2>&1; then
-        git_cache tag commit$SHA1 $SHA1 || true # ignore possibly already existing tag
-        git clone --reference "${GIT_CACHE_DIR}" "${GIT_CACHE_DIR}" "${TARGET_PATH}" --branch commit$SHA1
+        local tag="$(_check_tag_or_commit $SHA1 $REMOTE_NAME)"
+        if [ -z "$tag" ]; then
+            # commit / tag not in cache, try updating repo
+            update "$REMOTE" || true
+            tag="$(_check_tag_or_commit $SHA1 $REMOTE_NAME)"
+        fi
+
+        if [ -n "$tag" ]; then
+            echo "git-cache: cloning from cache."
+            git -c advice.detachedHead=false clone --reference "${GIT_CACHE_DIR}" --shared "${GIT_CACHE_DIR}" "${TARGET_PATH}" --branch $tag
+            git -C "${TARGET_PATH}" fetch origin "refs/tags/${REMOTE_NAME}/*:refs/tags/*" > /dev/null
+        else
+            echo "git-cache: trying checkout from source"
+            git clone --reference "${GIT_CACHE_DIR}" --shared "${REMOTE}" "${TARGET_PATH}"
+            git -c advice.detachedHead=false -C "${TARGET_PATH}" checkout $SHA1
+        fi
     else
-        git clone "${REMOTE}" "${TARGET_PATH}"
-        git -C "${TARGET_PATH}" checkout $SHA1
+            git clone "${REMOTE}" "${TARGET_PATH}"
+            git -c advice.detachedHead=false -C "${TARGET_PATH}" checkout $SHA1
     fi
     set +e
 }

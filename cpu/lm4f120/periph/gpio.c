@@ -98,7 +98,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     const uint32_t port_addr = _port_base[port_num];
     const uint8_t pin_num = _pin_num(pin);
     const uint32_t sysctl_port_base = _sysctl_port_base[port_num];
-    const unsigned long pin_bit = 1 << pin_num;
+    const unsigned long pin_bit = 1ul << pin_num;
 
     DEBUG("Init GPIO: port %c, %d\n", 'A' + port_num, pin_num);
     DEBUG("Sysctl %" PRIx32 "\n", sysctl_port_base);

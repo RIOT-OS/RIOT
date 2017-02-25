@@ -13,7 +13,7 @@
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef PERIPH_CPU_H
@@ -31,11 +31,14 @@ extern "C" {
 #define ADC_DEVS            (2U)
 
 /**
- * @brief declare needed generic SPI functions
- * @{
+ * @brief   All timers for the STM32F1 have 4 CC channels
  */
-#undef PERIPH_SPI_NEEDS_TRANSFER_BYTES
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+#define TIMER_CHANNELS      (4U)
+
+/**
+ * @brief   All timers have a width of 16-bit
+ */
+#define TIMER_MAXVAL        (0xffff)
 
 /**
  * @brief   Generate GPIO mode bitfields
@@ -47,6 +50,11 @@ extern "C" {
  * - bit 2: OD enable
  */
 #define GPIO_MODE(mode, cnf, odr)       (mode | (cnf << 2) | (odr << 4))
+
+/**
+ * @brief   Define the number of available PM modes
+ */
+#define PM_NUM_MODES    (2U)
 
 #ifndef DOXYGEN
 /**
@@ -127,5 +135,5 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */

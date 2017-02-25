@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 PHYTEC Messtechnik GmbH
+ *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,145 +17,99 @@
  *
  * @author      Felix Siebel <f.siebel@phytec.de>
  * @author      Johann Fischer <j.fischer@phytec.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "periph/i2c.h"
+#include <string.h>
+
+#include "log.h"
+#include "assert.h"
+
 #include "tcs37727.h"
 #include "tcs37727-internal.h"
 
-#define ENABLE_DEBUG   (0)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define I2C_SPEED      I2C_SPEED_FAST
+#define I2C_SPEED       I2C_SPEED_FAST
+#define BUS             (dev->p.i2c)
+#define ADR             (dev->p.addr)
 
-static int tcs37727_test(tcs37727_t *dev)
+int tcs37727_init(tcs37727_t *dev, const tcs37727_params_t *params)
 {
-    uint8_t id;
+    uint8_t tmp;
 
-    i2c_acquire(dev->i2c);
+    /* check parameters */
+    assert(dev && params);
 
-    if (i2c_read_reg(dev->i2c, dev->addr, TCS37727_ID, &id) != 1) {
-        i2c_release(dev->i2c);
-        return -1;
+    /* initialize the device descriptor */
+    memcpy(&dev->p, params, sizeof(tcs37727_params_t));
+
+    /* setup the I2C bus */
+    i2c_acquire(BUS);
+    if (i2c_init_master(BUS, I2C_SPEED) < 0) {
+        i2c_release(BUS);
+        LOG_ERROR("[tcs37727] init: error initializing I2C bus\n");
+        return TCS37727_NOBUS;
     }
 
-    i2c_release(dev->i2c);
-
-    if (id != TCS37727_ID_VALUE) {
-        return -1;
+    /* check if we can communicate with the device */
+    i2c_read_reg(BUS, ADR, TCS37727_ID, &tmp);
+    if (tmp != TCS37727_ID_VALUE) {
+        i2c_release(BUS);
+        LOG_ERROR("[tcs37727] init: error while reading ID register\n");
+        return TCS37727_NODEV;
     }
 
-    return 0;
-}
-
-int tcs37727_init(tcs37727_t *dev, i2c_t i2c, uint8_t address, int atime_us)
-{
-    /* write device descriptor */
-    dev->i2c = i2c;
-    dev->addr = address;
-    dev->initialized = false;
-
-    i2c_acquire(dev->i2c);
-
-    /* initialize the I2C bus */
-    if (i2c_init_master(i2c, I2C_SPEED) < 0) {
-        i2c_release(dev->i2c);
-        return -1;
-    }
-
-    i2c_release(dev->i2c);
-
-    if (tcs37727_test(dev)) {
-        return -2;
-    }
-
-    i2c_acquire(dev->i2c);
-
-    if (i2c_write_reg(dev->i2c, dev->addr, TCS37727_CONTROL,
-                      TCS37727_CONTROL_AGAIN_4) != 1) {
-        i2c_release(dev->i2c);
-        return -3;
-    }
+    /* configure gain and conversion time */
+    i2c_write_reg(BUS, ADR, TCS37727_ATIME, TCS37727_ATIME_TO_REG(dev->p.atime));
+    i2c_write_reg(BUS, ADR, TCS37727_CONTROL, TCS37727_CONTROL_AGAIN_4);
     dev->again = 4;
 
-    if (i2c_write_reg(dev->i2c, dev->addr, TCS37727_ATIME,
-                      TCS37727_ATIME_TO_REG(atime_us)) != 1) {
-        i2c_release(dev->i2c);
-        return -3;
-    }
-    dev->atime_us = atime_us;
+    /* enable the device */
+    tmp = (TCS37727_ENABLE_AEN | TCS37727_ENABLE_PON);
+    i2c_write_reg(BUS, ADR, TCS37727_ENABLE, tmp);
 
-    dev->initialized = true;
+    i2c_release(BUS);
 
-    i2c_release(dev->i2c);
-    return 0;
+    return TCS37727_OK;
 }
 
-int tcs37727_set_rgbc_active(tcs37727_t *dev)
+void tcs37727_set_rgbc_active(tcs37727_t *dev)
 {
     uint8_t reg;
 
-    if (dev->initialized == false) {
-        return -1;
-    }
+    assert(dev);
 
-    i2c_acquire(dev->i2c);
-    if (i2c_read_regs(dev->i2c, dev->addr, TCS37727_ENABLE, &reg, 1) != 1) {
-        i2c_release(dev->i2c);
-        return -1;
-    }
-
+    i2c_acquire(BUS);
+    i2c_read_reg(BUS, ADR, TCS37727_ENABLE, &reg);
     reg |= (TCS37727_ENABLE_AEN | TCS37727_ENABLE_PON);
-
-    if (i2c_write_reg(dev->i2c, dev->addr, TCS37727_ENABLE, reg) != 1) {
-        i2c_release(dev->i2c);
-        return -1;
-    }
-
-    i2c_release(dev->i2c);
-    return 0;
+    i2c_write_reg(BUS, ADR, TCS37727_ENABLE, reg);
+    i2c_release(BUS);
 }
 
-int tcs37727_set_rgbc_standby(tcs37727_t *dev)
+void tcs37727_set_rgbc_standby(tcs37727_t *dev)
 {
     uint8_t reg;
 
-    if (dev->initialized == false) {
-        return -1;
-    }
+    assert(dev);
 
-    i2c_acquire(dev->i2c);
-    if (i2c_read_regs(dev->i2c, dev->addr, TCS37727_ENABLE, &reg, 1) != 1) {
-        i2c_release(dev->i2c);
-        return -1;
-    }
-
+    i2c_acquire(BUS);
+    i2c_read_reg(BUS, ADR, TCS37727_ENABLE, &reg);
     reg &= ~TCS37727_ENABLE_AEN;
     if (!(reg & TCS37727_ENABLE_PEN)) {
         reg &= ~TCS37727_ENABLE_PON;
     }
-
-    if (i2c_write_reg(dev->i2c, dev->addr, TCS37727_ENABLE, reg) != 1) {
-        i2c_release(dev->i2c);
-        return -1;
-    }
-
-    i2c_release(dev->i2c);
-    return 0;
+    i2c_write_reg(BUS, ADR, TCS37727_ENABLE, reg);
+    i2c_release(BUS);
 }
 
 static uint8_t tcs37727_trim_gain(tcs37727_t *dev, int rawc)
 {
     uint8_t reg_again = 0;
     int val_again = dev->again;
-
-    if (dev->initialized == false) {
-        return -1;
-    }
 
     if (rawc < TCS37727_AG_THRESHOLD_LOW) {
         switch (val_again) {
@@ -204,41 +159,33 @@ static uint8_t tcs37727_trim_gain(tcs37727_t *dev, int rawc)
         return 0;
     }
 
-    i2c_acquire(dev->i2c);
+    i2c_acquire(BUS);
     uint8_t reg = 0;
-    if (i2c_read_reg(dev->i2c, dev->addr, TCS37727_CONTROL, &reg) != 1) {
-        i2c_release(dev->i2c);
+    if (i2c_read_reg(BUS, ADR, TCS37727_CONTROL, &reg) != 1) {
+        i2c_release(BUS);
         return -2;
     }
     reg &= ~TCS37727_CONTROL_AGAIN_MASK;
     reg |= reg_again;
-    if (i2c_write_reg(dev->i2c, dev->addr, TCS37727_CONTROL, reg) != 1) {
-        i2c_release(dev->i2c);
+    if (i2c_write_reg(BUS, ADR, TCS37727_CONTROL, reg) != 1) {
+        i2c_release(BUS);
         return -2;
     }
-    i2c_release(dev->i2c);
+    i2c_release(BUS);
     dev->again = val_again;
 
     return 0;
 }
 
-int tcs37727_read(tcs37727_t *dev, tcs37727_data_t *data)
+void tcs37727_read(tcs37727_t *dev, tcs37727_data_t *data)
 {
     uint8_t buf[8];
 
-    if (dev->initialized == false) {
-        return -1;
-    }
+    assert(dev && data);
 
-    i2c_acquire(dev->i2c);
-
-    if (i2c_read_regs(dev->i2c, dev->addr,
-                      (TCS37727_INC_TRANS | TCS37727_CDATA), buf, 8) != 8) {
-        i2c_release(dev->i2c);
-        return -1;
-    }
-
-    i2c_release(dev->i2c);
+    i2c_acquire(BUS);
+    i2c_read_regs(BUS, ADR, (TCS37727_INC_TRANS | TCS37727_CDATA), buf, 8);
+    i2c_release(BUS);
 
     int32_t tmpc = ((uint16_t)buf[1] << 8) | buf[0];
     int32_t tmpr = ((uint16_t)buf[3] << 8) | buf[2];
@@ -259,7 +206,7 @@ int tcs37727_read(tcs37727_t *dev, tcs37727_data_t *data)
     /* Lux calculation as described in the DN40.  */
     int32_t gi = R_COEF_IF * tmpr + G_COEF_IF * tmpg + B_COEF_IF * tmpb;
     /* TODO: add Glass Attenuation Factor GA compensation */
-    int32_t cpl = (dev->atime_us * dev->again) / DGF_IF;
+    int32_t cpl = (dev->p.atime * dev->again) / DGF_IF;
     int32_t lux = gi / cpl;
 
     /* Autogain */
@@ -271,6 +218,4 @@ int tcs37727_read(tcs37727_t *dev, tcs37727_data_t *data)
     data->clear = (tmpb < 0) ? 0 : (tmpc * 1000) / cpl;
     data->lux = (lux < 0) ? 0 : lux;
     data->ct = (ct < 0) ? 0 : ct;
-
-    return 0;
 }

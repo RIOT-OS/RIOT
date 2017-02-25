@@ -81,7 +81,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  *
  * The configuration consists simply of a list of channels that should be used
  * @{

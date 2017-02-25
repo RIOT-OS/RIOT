@@ -19,13 +19,12 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef MUTEX_H_
-#define MUTEX_H_
+#ifndef MUTEX_H
+#define MUTEX_H
 
 #include <stddef.h>
 
 #include "list.h"
-#include "atomic.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -55,11 +54,14 @@ typedef struct {
 #define MUTEX_INIT_LOCKED { { MUTEX_LOCKED } }
 
 /**
- * @internal
+ * @cond INTERNAL
  * @brief This is the value of the mutex when locked and no threads are waiting
  *        for it
  */
 #define MUTEX_LOCKED ((void *)-1)
+/**
+ * @endcond
+ */
 
 /**
  * @brief Initializes a mutex object.
@@ -129,5 +131,5 @@ void mutex_unlock_and_sleep(mutex_t *mutex);
 }
 #endif
 
-#endif /* MUTEX_H_ */
+#endif /* MUTEX_H */
 /** @} */

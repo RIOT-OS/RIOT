@@ -19,6 +19,7 @@
 
 #ifdef MODULE_AT86RF2XX
 
+#include "log.h"
 #include "board.h"
 #include "net/gnrc/netdev2.h"
 #include "net/gnrc/netdev2/ieee802154.h"
@@ -26,9 +27,6 @@
 
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
@@ -43,21 +41,21 @@
 
 static at86rf2xx_t at86rf2xx_devs[AT86RF2XX_NUM];
 static gnrc_netdev2_t gnrc_adpt[AT86RF2XX_NUM];
-static char _at86rf2xx_stacks[AT86RF2XX_MAC_STACKSIZE][AT86RF2XX_NUM];
+static char _at86rf2xx_stacks[AT86RF2XX_NUM][AT86RF2XX_MAC_STACKSIZE];
 
 void auto_init_at86rf2xx(void)
 {
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
-        const at86rf2xx_params_t *p = &at86rf2xx_params[i];
         int res;
 
-        DEBUG("Initializing AT86RF2xx radio at SPI_%i\n", p->spi);
-        at86rf2xx_setup(&at86rf2xx_devs[i], (at86rf2xx_params_t*) p);
+        LOG_DEBUG("[auto_init_netif] initializing at86rf2xx #%u\n", i);
+
+        at86rf2xx_setup(&at86rf2xx_devs[i], &at86rf2xx_params[i]);
         res = gnrc_netdev2_ieee802154_init(&gnrc_adpt[i],
                                            (netdev2_ieee802154_t *)&at86rf2xx_devs[i]);
 
         if (res < 0) {
-            DEBUG("Error initializing AT86RF2xx radio device!\n");
+            LOG_ERROR("[auto_init_netif] error initializing at86rf2xx radio #%u\n", i);
         }
         else {
             gnrc_netdev2_init(_at86rf2xx_stacks[i],

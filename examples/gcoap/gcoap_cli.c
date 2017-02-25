@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "net/gnrc/coap.h"
+#include "net/gcoap.h"
 #include "od.h"
 #include "fmt.h"
 
@@ -96,22 +96,27 @@ static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
 static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
 {
     ipv6_addr_t addr;
-    uint16_t port;
     size_t bytes_sent;
+    sock_udp_ep_t remote;
+
+    remote.family = AF_INET6;
+    remote.netif  = SOCK_ADDR_ANY_NETIF;
 
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
         puts("gcoap_cli: unable to parse destination address");
         return 0;
     }
+    memcpy(&remote.addr.ipv6[0], &addr.u8[0], sizeof(addr.u8));
+
     /* parse port */
-    port = (uint16_t)atoi(port_str);
-    if (port == 0) {
+    remote.port = (uint16_t)atoi(port_str);
+    if (remote.port == 0) {
         puts("gcoap_cli: unable to parse destination port");
         return 0;
     }
 
-    bytes_sent = gcoap_req_send(buf, len, &addr, port, _resp_handler);
+    bytes_sent = gcoap_req_send2(buf, len, &remote, _resp_handler);
     if (bytes_sent > 0) {
         req_count++;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Freie Universität Berlin
+ * Copyright (C) 2015-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,11 +13,11 @@
  * @file
  * @brief           nRF5x common definitions for handling peripherals
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_CPU_COMMON_H_
-#define PERIPH_CPU_COMMON_H_
+#ifndef PERIPH_CPU_COMMON_H
+#define PERIPH_CPU_COMMON_H
 
 #include "cpu.h"
 
@@ -46,6 +46,21 @@ extern "C" {
  * - bit 2+3: pull resistor configuration
  */
 #define GPIO_MODE(oe, ic, pr)   (oe | (ic << 1) | (pr << 2))
+
+/**
+ * @brief   No support for HW chip select...
+ */
+#define SPI_HWCS(x)         (SPI_CS_UNDEF)
+
+/**
+ * @brief   Declare needed shared SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_INIT_CS
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
 
 #ifndef DOXYGEN
 /**
@@ -106,9 +121,46 @@ typedef struct {
     uint8_t irqn;           /**< IRQ number of the timer device */
 } timer_conf_t;
 
+/**
+ * @brief   Override SPI mode values
+ * @{
+ */
+#define HAVE_SPI_MODE_T
+typedef enum {
+    SPI_MODE_0 = 0,                                             /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1 = SPI_CONFIG_CPHA_Msk,                           /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2 = SPI_CONFIG_CPOL_Msk,                           /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3 = (SPI_CONFIG_CPOL_Msk | SPI_CONFIG_CPHA_Msk)    /**< CPOL=1, CPHA=1 */
+} spi_mode_t;
+/** @} */
+
+/**
+ * @brief   Override SPI clock values
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef enum {
+    SPI_CLK_100KHZ = SPI_FREQUENCY_FREQUENCY_K125,  /**< 100KHz */
+    SPI_CLK_400KHZ = SPI_FREQUENCY_FREQUENCY_K500,  /**< 400KHz */
+    SPI_CLK_1MHZ   = SPI_FREQUENCY_FREQUENCY_M1,    /**< 1MHz */
+    SPI_CLK_5MHZ   = SPI_FREQUENCY_FREQUENCY_M4,    /**< 5MHz */
+    SPI_CLK_10MHZ  = SPI_FREQUENCY_FREQUENCY_M8     /**< 10MHz */
+} spi_clk_t;
+/** @} */
+
+/**
+ * @brief  SPI configuration values
+ */
+typedef struct {
+    NRF_SPI_Type *dev;  /**< SPI device used */
+    uint8_t sclk;       /**< CLK pin */
+    uint8_t mosi;       /**< MOSI pin */
+    uint8_t miso;       /**< MISO pin */
+} spi_conf_t;
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CPU_COMMON_H_ */
+#endif /* PERIPH_CPU_COMMON_H */
 /** @} */

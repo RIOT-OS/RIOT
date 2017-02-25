@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef AT86RF2XX_INTERNAL_H_
-#define AT86RF2XX_INTERNAL_H_
+#ifndef AT86RF2XX_INTERNAL_H
+#define AT86RF2XX_INTERNAL_H
 
 #include <stdint.h>
 
@@ -126,13 +126,6 @@ void at86rf2xx_fb_read(const at86rf2xx_t *dev,
 void at86rf2xx_fb_stop(const at86rf2xx_t *dev);
 
 /**
- * @brief   Cancel ongoing transactions and switch to TRX_OFF state
- *
- * @param[in] dev       device to manipulate
- */
-void at86rf2xx_force_trx_off(const at86rf2xx_t *dev);
-
-/**
  * @brief   Convenience function for reading the status of the given device
  *
  * @param[in] dev       device to read the status from
@@ -186,5 +179,5 @@ void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, const size_t len);
 }
 #endif
 
-#endif /* AT86RF2XX_INTERNAL_H_ */
+#endif /* AT86RF2XX_INTERNAL_H */
 /** @} */

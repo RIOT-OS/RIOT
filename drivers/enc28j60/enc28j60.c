@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include "uuid.h"
 #include "mutex.h"
 #include "xtimer.h"
 #include "assert.h"
@@ -29,10 +30,6 @@
 
 #include "enc28j60.h"
 #include "enc28j60_regs.h"
-
-#if CPUID_LEN
-#include "periph/cpuid.h"
-#endif
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -54,7 +51,7 @@
  * The SPI speed is set to a fixed value, as it must be > 8MHz (see the devices
  * errata sheet).
  */
-#define SPI_SPEED                   SPI_SPEED_10MHZ
+#define SPI_CLK                     SPI_CLK_10MHZ
 
 /**
  * @brief   The devices build-in buffer size
@@ -85,61 +82,79 @@ static void switch_bank(enc28j60_t *dev, int8_t bank)
         return;
     }
     /* clear old value */
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi, CMD_BFC | REG_ECON1, 0x03, 0);
-    gpio_set(dev->cs_pin);
+    spi_transfer_reg(dev->spi, dev->cs_pin, (CMD_BFC | REG_ECON1), 0x03);
     /* set new value */
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi, CMD_BFS | REG_ECON1, bank, 0);
-    gpio_set(dev->cs_pin);
+    spi_transfer_reg(dev->spi, dev->cs_pin, (CMD_BFS | REG_ECON1), bank);
     /* remember active bank */
     dev->bank = bank;
 }
 
 static uint8_t cmd_rcr(enc28j60_t *dev, uint8_t reg, int8_t bank)
 {
-    char res;
+    uint8_t res;
+
+    /* start transaction */
+    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
 
     switch_bank(dev, bank);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi, CMD_RCR | reg, 0, &res);
-    gpio_set(dev->cs_pin);
-    return (uint8_t)res;
+    res = spi_transfer_reg(dev->spi, dev->cs_pin, (CMD_RCR | reg), 0);
+
+    /* finish SPI transaction */
+    spi_release(dev->spi);
+
+    return res;
 }
 
 static uint8_t cmd_rcr_miimac(enc28j60_t *dev, uint8_t reg, int8_t bank)
 {
     char res[2];
 
+    /* start transaction */
+    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
+
     switch_bank(dev, bank);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_regs(dev->spi, CMD_RCR | reg, NULL, res, 2);
-    gpio_set(dev->cs_pin);
+    spi_transfer_regs(dev->spi, dev->cs_pin, (CMD_RCR | reg), NULL, res, 2);
+
+    /* finish SPI transaction */
+    spi_release(dev->spi);
+
     return (uint8_t)res[1];
 }
 
 static void cmd_wcr(enc28j60_t *dev, uint8_t reg, int8_t bank, uint8_t value)
 {
+    /* start transaction */
+    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
+
     switch_bank(dev, bank);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi, CMD_WCR | reg, (char)value, 0);
-    gpio_set(dev->cs_pin);
+    spi_transfer_reg(dev->spi, dev->cs_pin, (CMD_WCR | reg), value);
+
+    /* finish SPI transaction */
+    spi_release(dev->spi);
 }
 
 static void cmd_bfs(enc28j60_t *dev, uint8_t reg, int8_t bank, uint8_t mask)
 {
+    /* start transaction */
+    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
+
     switch_bank(dev, bank);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi, CMD_BFS | reg, mask, 0);
-    gpio_set(dev->cs_pin);
+    spi_transfer_reg(dev->spi, dev->cs_pin, (CMD_BFS | reg), mask);
+
+    /* finish SPI transaction */
+    spi_release(dev->spi);
 }
 
 static void cmd_bfc(enc28j60_t *dev, uint8_t reg, int8_t bank, uint8_t mask)
 {
+    /* start transaction */
+    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
+
     switch_bank(dev, bank);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi, CMD_BFC | reg, mask, 0);
-    gpio_set(dev->cs_pin);
+    spi_transfer_reg(dev->spi, dev->cs_pin, (CMD_BFC | reg), mask);
+
+    /* finish SPI transaction */
+    spi_release(dev->spi);
 }
 
 static uint16_t cmd_r_addr(enc28j60_t *dev, uint8_t addr)
@@ -181,16 +196,22 @@ static void cmd_w_phy(enc28j60_t *dev, uint8_t reg, uint16_t val)
 
 static void cmd_rbm(enc28j60_t *dev, uint8_t *data, size_t len)
 {
-    gpio_clear(dev->cs_pin);
-    spi_transfer_regs(dev->spi, CMD_RBM, NULL, (char *)data, len);
-    gpio_set(dev->cs_pin);
+    /* start transaction */
+    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
+    /* transfer data */
+    spi_transfer_regs(dev->spi, dev->cs_pin, CMD_RBM, NULL, data, len);
+    /* finish SPI transaction */
+    spi_release(dev->spi);
 }
 
 static void cmd_wbm(enc28j60_t *dev, uint8_t *data, size_t len)
 {
-    gpio_clear(dev->cs_pin);
-    spi_transfer_regs(dev->spi, CMD_WBM, (char *)data, NULL, len);
-    gpio_set(dev->cs_pin);
+    /* start transaction */
+    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
+    /* transfer data */
+    spi_transfer_regs(dev->spi, dev->cs_pin, CMD_WBM, data, NULL, len);
+    /* finish SPI transaction */
+    spi_release(dev->spi);
 }
 
 static void mac_get(enc28j60_t *dev, uint8_t *mac)
@@ -269,7 +290,7 @@ static int nd_recv(netdev2_t *netdev, void *buf, size_t max_len, void *info)
     if (buf != NULL) {
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.rx_count++;
-        netdev2->stats.rx_bytes += size;
+        netdev->stats.rx_bytes += size;
 #endif
         /* read packet content into the supplied buffer */
         if (size <= max_len) {
@@ -299,14 +320,11 @@ static int nd_init(netdev2_t *netdev)
     /* setup the low-level interfaces */
     gpio_init(dev->reset_pin, GPIO_OUT);
     gpio_clear(dev->reset_pin);     /* this puts the device into reset state */
-    gpio_init(dev->cs_pin, GPIO_OUT);
-    gpio_set(dev->cs_pin);
-    gpio_init_int(dev->int_pin, GPIO_IN, GPIO_FALLING, on_int, (void *)dev);
-    res = spi_init_master(dev->spi, SPI_CONF_FIRST_RISING, SPI_SPEED);
-    if (res < 0) {
-        DEBUG("[enc28j60] init: error initializing SPI bus [%i]\n", res);
+    if (spi_init_cs(dev->spi, dev->cs_pin) != SPI_OK) {
+        DEBUG("[enc28j60] init: error initializing the CS pin [%i]\n", res);
         return -1;
     }
+    gpio_init_int(dev->int_pin, GPIO_IN, GPIO_FALLING, on_int, (void *)dev);
 
     /* wait at least 1ms and then release device from reset state */
     xtimer_usleep(DELAY_RESET);
@@ -354,14 +372,10 @@ static int nd_init(netdev2_t *netdev)
     /* set non-back-to-back inter packet gap -> 0x12 is default */
     cmd_wcr(dev, REG_B2_MAIPGL, 2, MAIPGL_FD);
     /* set default MAC address */
-#if CPUID_LEN
-    uint8_t macbuf[CPUID_LEN];
-    cpuid_get(&macbuf);     /* we get the full ID but use only parts of it */
+    uint8_t macbuf[ETHERNET_ADDR_LEN];
+    uuid_get(macbuf, ETHERNET_ADDR_LEN);
     macbuf[0] |= 0x02;      /* locally administered address */
     macbuf[0] &= ~0x01;     /* unicast address */
-#else
-    uint8_t macbuf[] = ENC28J60_FALLBACK_MAC;
-#endif
     mac_set(dev, macbuf);
 
     /* PHY configuration */

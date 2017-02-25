@@ -201,13 +201,13 @@ clock_time_t hal_getTick(void)
 
 clock_time_t hal_getSec(void)
 {
-    return (clock_time_t)xtimer_now_usec() / SEC_IN_USEC;
+    return (clock_time_t)xtimer_now_usec() / US_PER_SEC;
 }
 
 
 clock_time_t hal_getTRes(void)
 {
-    return SEC_IN_USEC;
+    return US_PER_SEC;
 }
 
 /** @} */

@@ -53,15 +53,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Make sure the number of available ADC lines is defined
- * @{
- */
-#ifndef ADC_NUMOF
-#error "ADC_NUMOF undefined"
-#endif
-/** @} */
-
-/**
  * @brief   Define default ADC type identifier
  * @{
  */

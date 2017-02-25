@@ -27,14 +27,13 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-#ifndef GNRC_PKTBUF_H_
-#define GNRC_PKTBUF_H_
+#ifndef GNRC_PKTBUF_H
+#define GNRC_PKTBUF_H
 
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "atomic.h"
 #include "cpu_conf.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/neterr.h"
@@ -310,5 +309,5 @@ bool gnrc_pktbuf_is_sane(void);
 }
 #endif
 
-#endif /* GNRC_PKTBUF_H_ */
+#endif /* GNRC_PKTBUF_H */
 /** @} */

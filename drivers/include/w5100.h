@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_w5100 W5100
- * @ingroup     drivers_netdev_netdev2
+ * @ingroup     drivers_netdev
  * @brief       Driver for W5100 ethernet devices
  *
  * This device driver only exposes the MACRAW mode of W5100 devices, so it does
@@ -56,7 +56,7 @@ enum {
  */
 typedef struct {
     spi_t spi;              /**< SPI bus used */
-    spi_speed_t spi_speed;  /**< clock speed used on the selected SPI bus */
+    spi_clk_t clk;          /**< clock speed used on the selected SPI bus */
     gpio_t cs;              /**< pin connected to the chip select line */
     gpio_t evt;             /**< pin connected to the INT line */
 } w5100_params_t;

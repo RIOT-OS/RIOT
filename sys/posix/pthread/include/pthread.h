@@ -22,6 +22,10 @@
 
 #include <time.h>
 
+#ifndef __WITH_AVRLIBC__
+#define HAVE_MALLOC_H 1
+#endif
+
 #include "mutex.h"
 #include "sched.h"
 

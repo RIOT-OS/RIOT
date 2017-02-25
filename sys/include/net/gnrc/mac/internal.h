@@ -18,8 +18,8 @@
  * @author      Shuguo Zhuo  <shuguo.zhuo@inria.fr>
  */
 
-#ifndef GNRC_MAC_INTERNAL_H_
-#define GNRC_MAC_INTERNAL_H_
+#ifndef GNRC_MAC_INTERNAL_H
+#define GNRC_MAC_INTERNAL_H
 
 #include <stdint.h>
 #include <net/ieee802154.h>
@@ -76,5 +76,5 @@ void gnrc_mac_dispatch(gnrc_mac_rx_t* rx);
 }
 #endif
 
-#endif /* GNRC_MAC_INTERNAL_H_ */
+#endif /* GNRC_MAC_INTERNAL_H */
 /** @} */

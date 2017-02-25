@@ -20,8 +20,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef XBEE_H_
-#define XBEE_H_
+#ifndef XBEE_H
+#define XBEE_H
 
 #include <stdint.h>
 
@@ -194,6 +194,7 @@ void xbee_setup(xbee_t *dev, const xbee_params_t *params);
 /**
  * @brief   Put together the internal proprietary XBee header
  *
+ * @param[in] dev           Xbee device to initialize
  * @param[out] xhdr         buffer to write the header into, MUST be at least of
  *                          length XBEE_MAX_TXHDR_LENGTH
  * @param[in]  payload_len  actual payload length (without the XBee header)
@@ -210,6 +211,7 @@ int xbee_build_hdr(xbee_t *dev, uint8_t *xhdr, size_t payload_len,
 /**
  * @brief   Extract IEEE802.15.4 L2 header information from the XBee header
  *
+ * @param[in] dev           Xbee device to initialize
  * @param[in]  xhdr         XBee header, starting with the API identifier
  * @param[out] l2hdr        the L2 header information is written here
  *
@@ -222,5 +224,5 @@ int xbee_parse_hdr(xbee_t *dev, const uint8_t *xhdr, xbee_l2hdr_t *l2hdr);
 }
 #endif
 
-#endif /* XBEE_H_ */
+#endif /* XBEE_H */
 /** @} */

@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef TESTS_SAUL_REG_H_
-#define TESTS_SAUL_REG_H_
+#ifndef TESTS_SAUL_REG_H
+#define TESTS_SAUL_REG_H
 
 #include "embUnit.h"
 
@@ -34,5 +34,5 @@ void tests_saul_reg(void);
 }
 #endif
 
-#endif /* TESTS_SAUL_REG_H_ */
+#endif /* TESTS_SAUL_REG_H */
 /** @} */

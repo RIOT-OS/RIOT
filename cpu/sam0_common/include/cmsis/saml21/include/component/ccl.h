@@ -3,7 +3,7 @@
  *
  * \brief Component description for CCL
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAML21_CCL_COMPONENT_
@@ -97,7 +94,7 @@ typedef union {
 
 #define CCL_SEQCTRL_SEQSEL_Pos      0            /**< \brief (CCL_SEQCTRL) Sequential Selection */
 #define CCL_SEQCTRL_SEQSEL_Msk      (0xFul << CCL_SEQCTRL_SEQSEL_Pos)
-#define CCL_SEQCTRL_SEQSEL(value)   ((CCL_SEQCTRL_SEQSEL_Msk & ((value) << CCL_SEQCTRL_SEQSEL_Pos)))
+#define CCL_SEQCTRL_SEQSEL(value)   (CCL_SEQCTRL_SEQSEL_Msk & ((value) << CCL_SEQCTRL_SEQSEL_Pos))
 #define   CCL_SEQCTRL_SEQSEL_DISABLE_Val  0x0ul  /**< \brief (CCL_SEQCTRL) Sequential logic is disabled */
 #define   CCL_SEQCTRL_SEQSEL_DFF_Val      0x1ul  /**< \brief (CCL_SEQCTRL) D flip flop */
 #define   CCL_SEQCTRL_SEQSEL_JK_Val       0x2ul  /**< \brief (CCL_SEQCTRL) JK flip flop */
@@ -140,7 +137,7 @@ typedef union {
 #define CCL_LUTCTRL_ENABLE          (0x1ul << CCL_LUTCTRL_ENABLE_Pos)
 #define CCL_LUTCTRL_FILTSEL_Pos     4            /**< \brief (CCL_LUTCTRL) Filter Selection */
 #define CCL_LUTCTRL_FILTSEL_Msk     (0x3ul << CCL_LUTCTRL_FILTSEL_Pos)
-#define CCL_LUTCTRL_FILTSEL(value)  ((CCL_LUTCTRL_FILTSEL_Msk & ((value) << CCL_LUTCTRL_FILTSEL_Pos)))
+#define CCL_LUTCTRL_FILTSEL(value)  (CCL_LUTCTRL_FILTSEL_Msk & ((value) << CCL_LUTCTRL_FILTSEL_Pos))
 #define   CCL_LUTCTRL_FILTSEL_DISABLE_Val 0x0ul  /**< \brief (CCL_LUTCTRL) Filter disabled */
 #define   CCL_LUTCTRL_FILTSEL_SYNCH_Val   0x1ul  /**< \brief (CCL_LUTCTRL) Synchronizer enabled */
 #define   CCL_LUTCTRL_FILTSEL_FILTER_Val  0x2ul  /**< \brief (CCL_LUTCTRL) Filter enabled */
@@ -151,7 +148,7 @@ typedef union {
 #define CCL_LUTCTRL_EDGESEL         (0x1ul << CCL_LUTCTRL_EDGESEL_Pos)
 #define CCL_LUTCTRL_INSEL0_Pos      8            /**< \brief (CCL_LUTCTRL) Input Selection 0 */
 #define CCL_LUTCTRL_INSEL0_Msk      (0xFul << CCL_LUTCTRL_INSEL0_Pos)
-#define CCL_LUTCTRL_INSEL0(value)   ((CCL_LUTCTRL_INSEL0_Msk & ((value) << CCL_LUTCTRL_INSEL0_Pos)))
+#define CCL_LUTCTRL_INSEL0(value)   (CCL_LUTCTRL_INSEL0_Msk & ((value) << CCL_LUTCTRL_INSEL0_Pos))
 #define   CCL_LUTCTRL_INSEL0_MASK_Val     0x0ul  /**< \brief (CCL_LUTCTRL) Masked input */
 #define   CCL_LUTCTRL_INSEL0_FEEDBACK_Val 0x1ul  /**< \brief (CCL_LUTCTRL) Feedback input source */
 #define   CCL_LUTCTRL_INSEL0_LINK_Val     0x2ul  /**< \brief (CCL_LUTCTRL) Linked LUT input source */
@@ -174,10 +171,10 @@ typedef union {
 #define CCL_LUTCTRL_INSEL0_SERCOM   (CCL_LUTCTRL_INSEL0_SERCOM_Val << CCL_LUTCTRL_INSEL0_Pos)
 #define CCL_LUTCTRL_INSEL1_Pos      12           /**< \brief (CCL_LUTCTRL) Input Selection 1 */
 #define CCL_LUTCTRL_INSEL1_Msk      (0xFul << CCL_LUTCTRL_INSEL1_Pos)
-#define CCL_LUTCTRL_INSEL1(value)   ((CCL_LUTCTRL_INSEL1_Msk & ((value) << CCL_LUTCTRL_INSEL1_Pos)))
+#define CCL_LUTCTRL_INSEL1(value)   (CCL_LUTCTRL_INSEL1_Msk & ((value) << CCL_LUTCTRL_INSEL1_Pos))
 #define CCL_LUTCTRL_INSEL2_Pos      16           /**< \brief (CCL_LUTCTRL) Input Selection 2 */
 #define CCL_LUTCTRL_INSEL2_Msk      (0xFul << CCL_LUTCTRL_INSEL2_Pos)
-#define CCL_LUTCTRL_INSEL2(value)   ((CCL_LUTCTRL_INSEL2_Msk & ((value) << CCL_LUTCTRL_INSEL2_Pos)))
+#define CCL_LUTCTRL_INSEL2(value)   (CCL_LUTCTRL_INSEL2_Msk & ((value) << CCL_LUTCTRL_INSEL2_Pos))
 #define CCL_LUTCTRL_INVEI_Pos       20           /**< \brief (CCL_LUTCTRL) Input Event Invert */
 #define CCL_LUTCTRL_INVEI           (0x1ul << CCL_LUTCTRL_INVEI_Pos)
 #define CCL_LUTCTRL_LUTEI_Pos       21           /**< \brief (CCL_LUTCTRL) Event Input Enable */
@@ -186,7 +183,7 @@ typedef union {
 #define CCL_LUTCTRL_LUTEO           (0x1ul << CCL_LUTCTRL_LUTEO_Pos)
 #define CCL_LUTCTRL_TRUTH_Pos       24           /**< \brief (CCL_LUTCTRL) Truth Value */
 #define CCL_LUTCTRL_TRUTH_Msk       (0xFFul << CCL_LUTCTRL_TRUTH_Pos)
-#define CCL_LUTCTRL_TRUTH(value)    ((CCL_LUTCTRL_TRUTH_Msk & ((value) << CCL_LUTCTRL_TRUTH_Pos)))
+#define CCL_LUTCTRL_TRUTH(value)    (CCL_LUTCTRL_TRUTH_Msk & ((value) << CCL_LUTCTRL_TRUTH_Pos))
 #define CCL_LUTCTRL_MASK            0xFF7FFFB2ul /**< \brief (CCL_LUTCTRL) MASK Register */
 
 /** \brief CCL hardware registers */

@@ -17,10 +17,10 @@ all: $(BINDIR)/$(MODULE).a ..nothing
 clean:: ${DIRS:%=CLEAN--%}
 
 ${DIRS:%=ALL--%}:
-	"$(MAKE)" -C ${@:ALL--%=%}
+	$(QQ)"$(MAKE)" -C ${@:ALL--%=%}
 
 ${DIRS:%=CLEAN--%}:
-	"$(MAKE)" -C ${@:CLEAN--%=%} clean
+	$(QQ)"$(MAKE)" -C ${@:CLEAN--%=%} clean
 
 ifeq ($(strip $(SRC)),)
     SRC := $(filter-out $(SRC_NOLTO), $(wildcard *.c))
@@ -46,12 +46,12 @@ OBJ := $(OBJC) $(OBJCXX) $(ASMOBJ) $(ASSMOBJ)
 DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
 
 $(BINDIR)/$(MODULE)/:
-	$(AD)mkdir -p $@
+	$(Q)mkdir -p $@
 
 $(BINDIR)/$(MODULE).a $(OBJ): | $(BINDIR)/$(MODULE)/
 
 $(BINDIR)/$(MODULE).a: $(OBJ) | ${DIRS:%=ALL--%}
-	$(AD)$(AR) $(ARFLAGS) $@ $?
+	$(Q)$(AR) $(ARFLAGS) $@ $?
 
 
 CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
@@ -61,22 +61,22 @@ CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 $(OBJC_LTO): CFLAGS+=$(LTOFLAGS)
 
 $(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(RIOTBUILD_CONFIG_HEADER_C)
-	$(AD)$(CCACHE) $(CC) \
+	$(Q)$(CCACHE) $(CC) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 $(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.cpp $(RIOTBUILD_CONFIG_HEADER_C)
-	$(AD)$(CCACHE) $(CXX) \
+	$(Q)$(CCACHE) $(CXX) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CXXFLAGS) $(CXXINCLUDES) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
-	$(AD)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
+	$(Q)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
 $(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
+	$(Q)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 # pull in dependency info for *existing* .o files
 # deleted header files will be silently ignored

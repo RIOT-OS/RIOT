@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Freie Universität Berlin
+ * Copyright (C) 2014-2017 Freie Universität Berlin
  * Copyright (C) 2016 OTA keys
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     cpu_stm32f2
+ * @ingroup     cpu_stm32_common
  * @{
  *
  * @file
@@ -56,8 +56,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     isr_ctx[uart].rx_cb = rx_cb;
     isr_ctx[uart].arg   = arg;
 
-    /* configure RX and TX pin */
-    gpio_init(uart_config[uart].rx_pin, GPIO_IN);
+    /* configure TX pin */
     gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
     /* set TX pin high to avoid garbage during further initialization */
     gpio_set(uart_config[uart].tx_pin);
@@ -65,8 +64,14 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     gpio_init_af(uart_config[uart].tx_pin, GPIO_AF_OUT_PP);
 #else
     gpio_init_af(uart_config[uart].tx_pin, uart_config[uart].tx_af);
-    gpio_init_af(uart_config[uart].rx_pin, uart_config[uart].rx_af);
 #endif
+    /* configure RX pin */
+    if (rx_cb) {
+        gpio_init(uart_config[uart].rx_pin, GPIO_IN);
+#ifndef CPU_FAM_STM32F1
+        gpio_init_af(uart_config[uart].rx_pin, uart_config[uart].rx_af);
+#endif
+    }
 
     /* enable the clock */
     periph_clk_en(uart_config[uart].bus, uart_config[uart].rcc_mask);

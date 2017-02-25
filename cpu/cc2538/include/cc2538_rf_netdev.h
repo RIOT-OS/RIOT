@@ -17,8 +17,8 @@
  * @author      Aaron Sowry <aaron@mutex.nz>
  */
 
-#ifndef CC2538_RF_NETDEV_H_
-#define CC2538_RF_NETDEV_H_
+#ifndef CC2538_RF_NETDEV_H
+#define CC2538_RF_NETDEV_H
 
 #include "net/netdev2.h"
 
@@ -35,5 +35,5 @@ extern const netdev2_driver_t cc2538_rf_driver;
 }
 #endif
 
-#endif /* CC2538_RF_NETDEV_H_ */
+#endif /* CC2538_RF_NETDEV_H */
 /** @} */

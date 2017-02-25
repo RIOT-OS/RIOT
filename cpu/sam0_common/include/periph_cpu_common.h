@@ -13,7 +13,7 @@
  * @file
  * @brief           Common CPU specific definitions for all SAMx21 based CPUs
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef CPU_PERIPH_COMMON_H
@@ -34,7 +34,8 @@ extern "C" {
  * @brief   Use shared SPI functions
  * @{
  */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_INIT_CS
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
@@ -127,15 +128,46 @@ typedef enum {
 } spi_mosipad_t;
 
 /**
- * @brief   Possible selections for SERCOM SPI clock mode (inspired by Arduino)
+ * @brief   Override SPI modes
+ * @{
  */
-typedef enum
-{
-    SERCOM_SPI_MODE_0 = 0,      // CPOL : 0  | CPHA : 0
-    SERCOM_SPI_MODE_1 = 1,      // CPOL : 0  | CPHA : 1
-    SERCOM_SPI_MODE_2 = 2,      // CPOL : 1  | CPHA : 0
-    SERCOM_SPI_MODE_3 = 3,      // CPOL : 1  | CPHA : 1
-} sercom_spi_clockmode_t;
+#define HAVE_SPI_MODE_T
+typedef enum {
+    SPI_MODE_0 = 0x0,       /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1 = 0x1,       /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2 = 0x2,       /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3 = 0x3        /**< CPOL=1, CPHA=1 */
+} spi_mode_t;
+/** @} */
+
+/**
+ * @brief   Override SPI clock speed values
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef enum {
+    SPI_CLK_100KHZ =   100000U, /**< drive the SPI bus with 100KHz */
+    SPI_CLK_400KHZ =   400000U, /**< drive the SPI bus with 400KHz */
+    SPI_CLK_1MHZ   =  1000000U, /**< drive the SPI bus with 1MHz */
+    SPI_CLK_5MHZ   =  5000000U, /**< drive the SPI bus with 5MHz */
+    SPI_CLK_10MHZ  = 10000000U  /**< drive the SPI bus with 10MHz */
+} spi_clk_t;
+/** @} */
+
+/**
+ * @brief   SPI device configuration
+ */
+typedef struct {
+    SercomSpi *dev;         /**< pointer to the used SPI device */
+    gpio_t miso_pin;        /**< used MISO pin */
+    gpio_t mosi_pin;        /**< used MOSI pin */
+    gpio_t clk_pin;         /**< used CLK pin */
+    gpio_mux_t miso_mux;    /**< alternate function for MISO pin (mux) */
+    gpio_mux_t mosi_mux;    /**< alternate function for MOSI pin (mux) */
+    gpio_mux_t clk_mux;     /**< alternate function for CLK pin (mux) */
+    spi_misopad_t miso_pad; /**< pad to use for MISO line */
+    spi_mosipad_t mosi_pad; /**< pad to use for MOSI and CLK line */
+} spi_conf_t;
 
 /**
  * @brief   Set up alternate function (PMUX setting) for a PORT pin
@@ -144,6 +176,18 @@ typedef enum
  * @param[in] mux   Mux value
  */
 void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
+
+/**
+ * @brief   Return the numeric id of a SERCOM device derived from its address
+ *
+ * @param[in] sercom    SERCOM device
+ *
+ * @return              numeric id of the given SERCOM device
+ */
+static inline int sercom_id(void *sercom)
+{
+    return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
+}
 
 #ifdef __cplusplus
 }

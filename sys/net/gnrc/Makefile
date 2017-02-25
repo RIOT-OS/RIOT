@@ -67,9 +67,6 @@ endif
 ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
     DIRS += nettest
 endif
-ifneq (,$(filter gnrc_nomac,$(USEMODULE)))
-    DIRS += link_layer/nomac
-endif
 ifneq (,$(filter gnrc_mac,$(USEMODULE)))
     DIRS += link_layer/gnrc_mac
 endif
@@ -130,14 +127,11 @@ endif
 ifneq (,$(filter gnrc_udp,$(USEMODULE)))
     DIRS += transport_layer/udp
 endif
-ifneq (,$(filter gnrc_zep,$(USEMODULE)))
-    DIRS += application_layer/zep
+ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
+    DIRS += transport_layer/tcp
 endif
 ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
     DIRS += application_layer/tftp
-endif
-ifneq (,$(filter gcoap,$(USEMODULE)))
-    DIRS += application_layer/coap
 endif
 
 include $(RIOTBASE)/Makefile.base

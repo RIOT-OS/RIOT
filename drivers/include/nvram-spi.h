@@ -20,8 +20,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef DRIVERS_NVRAM_SPI_H_
-#define DRIVERS_NVRAM_SPI_H_
+#ifndef DRIVERS_NVRAM_SPI_H
+#define DRIVERS_NVRAM_SPI_H
 
 #include <stdint.h>
 #include "nvram.h"
@@ -38,6 +38,8 @@ extern "C" {
 typedef struct nvram_spi_params {
     /** @brief RIOT SPI device */
     spi_t spi;
+    /** @brief SPI clock speed */
+    spi_clk_t clk;
     /** @brief Chip select pin */
     gpio_t cs;
     /** @brief Number of address bytes following each read/write command. */
@@ -62,5 +64,5 @@ int nvram_spi_init(nvram_t *dev, nvram_spi_params_t *spi_params, size_t size);
 }
 #endif
 
-#endif /* DRIVERS_NVRAM_SPI_H_ */
+#endif /* DRIVERS_NVRAM_SPI_H */
 /** @} */

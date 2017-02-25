@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2014 Christian Mehlis <mehlis@inf.fu-berlin.de>
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -17,8 +17,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -83,19 +83,20 @@ static const timer_conf_t timer_config[] = {
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF           (1U)
-#define SPI_0_EN            1
-#define SPI_IRQ_PRIO        1
+static const spi_conf_t spi_config[] = {
+    {
+        .dev  = NRF_SPI0,
+        .sclk = 15,
+        .mosi = 13,
+        .miso = 14
+    }
+};
 
-/* SPI_0 device configuration */
-#define SPI_0_DEV           NRF_SPI0
-#define SPI_0_PIN_MOSI      13
-#define SPI_0_PIN_MISO      14
-#define SPI_0_PIN_SCK       15
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**
- * @brief   I2C (TWI) configuration
+ * @name   I2C (TWI) configuration
  * @{
  */
 static const i2c_conf_t i2c_config[] = {
@@ -117,7 +118,7 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  *
  * The configuration consists simply of a list of channels that should be used
  * @{
@@ -140,4 +141,4 @@ static const i2c_conf_t i2c_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */

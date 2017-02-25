@@ -243,8 +243,8 @@ void test4(void)
     uint64_t now, start, stop;
     const uint64_t exp = 1000000;
     now = xtimer_now_usec64();
-    abs.tv_sec = (time_t)((now / SEC_IN_USEC) + 1);
-    abs.tv_nsec = (long)((now % SEC_IN_USEC) * 1000);
+    abs.tv_sec = (time_t)((now / US_PER_SEC) + 1);
+    abs.tv_nsec = (long)((now % US_PER_SEC) * 1000);
     puts("first: sem_init s1");
     if (sem_init(&s1, 0, 0) < 0) {
         puts("first: sem_init FAILED");

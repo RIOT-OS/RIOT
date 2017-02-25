@@ -15,8 +15,8 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef TESTS_IPV6_NETIF_H_
-#define TESTS_IPV6_NETIF_H_
+#ifndef TESTS_IPV6_NETIF_H
+#define TESTS_IPV6_NETIF_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_ipv6_netif(void);
 }
 #endif
 
-#endif /* TESTS_IPV6_NETIF_H_ */
+#endif /* TESTS_IPV6_NETIF_H */
 /** @} */

@@ -168,7 +168,7 @@ void gpio_clear(gpio_t pin)
 
 void gpio_toggle(gpio_t pin)
 {
-    LPC_GPIO->CLR[port(pin)] = mask(pin);
+    LPC_GPIO->NOT[port(pin)] = mask(pin);
 }
 
 void gpio_write(gpio_t pin, int value)

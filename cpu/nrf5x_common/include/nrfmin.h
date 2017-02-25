@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    drivers_nrf5x_nrfmin NRF Minimal Radio Driver
- * @ingroup     drivers_netdev_netdev2
+ * @defgroup    drivers_nrf5x_nrfmin NRF minimal radio driver
+ * @ingroup     drivers_netdev
  * @brief       Minimal driver for the NRF51 radio
  *
  * This driver uses the nRF5x radio in a proprietary/custom way, defining our
@@ -69,8 +69,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NRFMIN_H_
-#define NRFMIN_H_
+#ifndef NRFMIN_H
+#define NRFMIN_H
 
 #include "net/netdev2.h"
 
@@ -233,5 +233,5 @@ void nrfmin_set_txpower(int16_t power);
 }
 #endif
 
-#endif /* NRFMIN_H_ */
+#endif /* NRFMIN_H */
 /** @} */

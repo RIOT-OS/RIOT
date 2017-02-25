@@ -43,7 +43,7 @@ void uhcp_client(uhcp_iface_t iface)
     while(1) {
         puts("uhcp_client(): sending REQ...");
         sock_udp_send(&sock, &req, sizeof(uhcp_req_t), &req_target);
-        res = sock_udp_recv(&sock, buf, sizeof(buf), 10U*SEC_IN_USEC, &remote);
+        res = sock_udp_recv(&sock, buf, sizeof(buf), 10U*US_PER_SEC, &remote);
         if (res > 0) {
             uhcp_handle_udp(buf, res, remote.addr.ipv6, remote.port, iface);
             xtimer_sleep(60);

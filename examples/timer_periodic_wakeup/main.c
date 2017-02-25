@@ -23,7 +23,7 @@
 #include "timex.h"
 
 /* set interval to 1 second */
-#define INTERVAL (1U * SEC_IN_USEC)
+#define INTERVAL (1U * US_PER_SEC)
 
 int main(void)
 {

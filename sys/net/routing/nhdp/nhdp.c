@@ -102,7 +102,7 @@ kernel_pid_t nhdp_start(void)
 #if (NHDP_METRIC_NEEDS_TIMER)
         /* Configure periodic timer message to refresh metric values */
         if (nhdp_pid != KERNEL_PID_UNDEF) {
-            metric_interval = timex_from_uint64(DAT_REFRESH_INTERVAL * SEC_IN_USEC);
+            metric_interval = timex_from_uint64(DAT_REFRESH_INTERVAL * US_PER_SEC);
             metric_msg.type = NHDP_METRIC_TIMER;
             metric_msg.content.ptr = NULL;
             xtimer_set_msg64(&metric_timer, timex_uint64(metric_interval),
@@ -184,9 +184,9 @@ int nhdp_register_if(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
     if_entry->if_pid = if_pid;
     /* Set HELLO_INTERVAL and H_HOLD_TIME (validity time) */
     if_entry->hello_interval.seconds = 0;
-    if_entry->hello_interval.microseconds = MS_IN_USEC * hello_int_ms;
+    if_entry->hello_interval.microseconds = US_PER_MS * hello_int_ms;
     if_entry->validity_time.seconds = 0;
-    if_entry->validity_time.microseconds = MS_IN_USEC * val_time_ms;
+    if_entry->validity_time.microseconds = US_PER_MS * val_time_ms;
     timex_normalize(&if_entry->hello_interval);
     timex_normalize(&if_entry->validity_time);
     /* Reset sequence number */

@@ -17,8 +17,8 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -50,7 +50,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer configuration
+ * @name   Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -77,7 +77,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name   UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -120,7 +120,7 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  *
  * We need to define the following fields:
  * PIN, device (ADCx), channel
@@ -137,7 +137,7 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief   DAC configuration
+ * @name   DAC configuration
  *
  * We need to define the following fields:
  * PIN, DAC channel
@@ -152,26 +152,28 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief   PWM configuration
+ * @name    PWM configuration
  * @{
  */
 static const pwm_conf_t pwm_config[] = {
     {
         .dev      = TIM1,
         .rcc_mask = RCC_APB2ENR_TIM1EN,
-        .pins     = { GPIO_PIN(PORT_E,  9), GPIO_PIN(PORT_E, 11),
-                      GPIO_PIN(PORT_E, 11), GPIO_PIN(PORT_E, 14) },
+        .chan     = { { .pin = GPIO_PIN(PORT_E,  9), .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_E, 11), .cc_chan = 1 },
+                      { .pin = GPIO_PIN(PORT_E, 11), .cc_chan = 2 },
+                      { .pin = GPIO_PIN(PORT_E, 14), .cc_chan = 3 } },
         .af       = GPIO_AF1,
-        .chan     = 4,
         .bus      = APB2
     },
     {
         .dev      = TIM3,
         .rcc_mask = RCC_APB1ENR_TIM3EN,
-        .pins     = { GPIO_PIN(PORT_B, 4), GPIO_PIN(PORT_B, 5),
-                      GPIO_PIN(PORT_B, 0), GPIO_PIN(PORT_B, 1) },
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 4), .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_B, 5), .cc_chan = 1 },
+                      { .pin = GPIO_PIN(PORT_B, 0), .cc_chan = 2 },
+                      { .pin = GPIO_PIN(PORT_B, 1), .cc_chan = 3 } },
         .af       = GPIO_AF2,
-        .chan     = 4,
         .bus      = APB1
     }
 };
@@ -180,55 +182,53 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
- * @name SPI configuration
+ * @name   SPI configuration
+ *
+ * @note    The spi_divtable is auto-generated from
+ *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-#define SPI_NUMOF           (2U)
-#define SPI_0_EN            1
-#define SPI_1_EN            1
-#define SPI_IRQ_PRIO        1
+static const uint8_t spi_divtable[2][5] = {
+    {       /* for APB1 @ 42000000Hz */
+        7,  /* -> 164062Hz */
+        6,  /* -> 328125Hz */
+        4,  /* -> 1312500Hz */
+        2,  /* -> 5250000Hz */
+        1   /* -> 10500000Hz */
+    },
+    {       /* for APB2 @ 84000000Hz */
+        7,  /* -> 328125Hz */
+        7,  /* -> 328125Hz */
+        5,  /* -> 1312500Hz */
+        3,  /* -> 5250000Hz */
+        2   /* -> 10500000Hz */
+    }
+};
 
-/* SPI 0 device config */
-#define SPI_0_DEV               SPI1
-#define SPI_0_CLKEN()           (periph_clk_en(APB2, RCC_APB2ENR_SPI1EN))
-#define SPI_0_CLKDIS()          (periph_clk_dis(APB2, RCC_APB2ENR_SPI1EN))
-#define SPI_0_BUS_DIV           1   /* 1 -> SPI runs with half CPU clock, 0 -> quarter CPU clock */
-#define SPI_0_IRQ               SPI1_IRQn
-#define SPI_0_IRQ_HANDLER       isr_spi1
-/* SPI 0 pin configuration */
-#define SPI_0_SCK_PORT          GPIOA
-#define SPI_0_SCK_PIN           5
-#define SPI_0_SCK_AF            5
-#define SPI_0_SCK_PORT_CLKEN()  (periph_clk_en(AHB1, RCC_AHB1ENR_GPIOAEN))
-#define SPI_0_MISO_PORT         GPIOA
-#define SPI_0_MISO_PIN          6
-#define SPI_0_MISO_AF           5
-#define SPI_0_MISO_PORT_CLKEN() (periph_clk_en(AHB1, RCC_AHB1ENR_GPIOAEN))
-#define SPI_0_MOSI_PORT         GPIOA
-#define SPI_0_MOSI_PIN          7
-#define SPI_0_MOSI_AF           5
-#define SPI_0_MOSI_PORT_CLKEN() (periph_clk_en(AHB1, RCC_AHB1ENR_GPIOAEN))
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_A, 7),
+        .miso_pin = GPIO_PIN(PORT_A, 6),
+        .sclk_pin = GPIO_PIN(PORT_A, 5),
+        .cs_pin   = GPIO_PIN(PORT_A, 4),
+        .af       = GPIO_AF5,
+        .rccmask  = RCC_APB2ENR_SPI1EN,
+        .apbbus   = APB2
+    },
+    {
+        .dev      = SPI2,
+        .mosi_pin = GPIO_PIN(PORT_B, 15),
+        .miso_pin = GPIO_PIN(PORT_B, 14),
+        .sclk_pin = GPIO_PIN(PORT_B, 13),
+        .cs_pin   = GPIO_PIN(PORT_B, 12),
+        .af       = GPIO_AF5,
+        .rccmask  = RCC_APB1ENR_SPI2EN,
+        .apbbus   = APB1
+    }
+};
 
-/* SPI 1 device config */
-#define SPI_1_DEV               SPI2
-#define SPI_1_CLKEN()           (periph_clk_en(APB1, RCC_APB1ENR_SPI2EN))
-#define SPI_1_CLKDIS()          (periph_clk_dis(APB1, RCC_APB1ENR_SPI2EN))
-#define SPI_1_BUS_DIV           0   /* 1 -> SPI runs with half CPU clock, 0 -> quarter CPU clock */
-#define SPI_1_IRQ               SPI2_IRQn
-#define SPI_1_IRQ_HANDLER       isr_spi2
-/* SPI 1 pin configuration */
-#define SPI_1_SCK_PORT          GPIOB
-#define SPI_1_SCK_PIN           13
-#define SPI_1_SCK_AF            5
-#define SPI_1_SCK_PORT_CLKEN()  (periph_clk_en(AHB1, RCC_AHB1ENR_GPIOBEN))
-#define SPI_1_MISO_PORT         GPIOB
-#define SPI_1_MISO_PIN          14
-#define SPI_1_MISO_AF           5
-#define SPI_1_MISO_PORT_CLKEN() (periph_clk_en(AHB1, RCC_AHB1ENR_GPIOBEN))
-#define SPI_1_MOSI_PORT         GPIOB
-#define SPI_1_MOSI_PIN          15
-#define SPI_1_MOSI_AF           5
-#define SPI_1_MOSI_PORT_CLKEN() (periph_clk_en(AHB1, RCC_AHB1ENR_GPIOBEN))
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**
@@ -263,5 +263,5 @@ static const pwm_conf_t pwm_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

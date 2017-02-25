@@ -19,8 +19,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_SOCK_INTERNAL_H_
-#define GNRC_SOCK_INTERNAL_H_
+#ifndef GNRC_SOCK_INTERNAL_H
+#define GNRC_SOCK_INTERNAL_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -28,6 +28,7 @@
 #include "net/af.h"
 #include "net/gnrc.h"
 #include "net/gnrc/netreg.h"
+#include "net/iana/portrange.h"
 #include "net/sock/ip.h"
 
 #include "sock_types.h"
@@ -35,6 +36,22 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Default port range for dynamic source port allocation
+ */
+#define GNRC_SOCK_DYN_PORTRANGE_MIN (IANA_DYNAMIC_PORTRANGE_MIN)
+#define GNRC_SOCK_DYN_PORTRANGE_MAX (IANA_DYNAMIC_PORTRANGE_MAX)
+#define GNRC_SOCK_DYN_PORTRANGE_NUM (GNRC_SOCK_DYN_PORTRANGE_MAX - GNRC_SOCK_DYN_PORTRANGE_MIN + 1)
+#define GNRC_SOCK_DYN_PORTRANGE_ERR (0)
+
+/**
+ * @brief   Offset for next dynamic port
+ *
+ * Currently set to a static (prime) offset, but could be random, too
+ * see https://tools.ietf.org/html/rfc6056#section-3.3.3
+ */
+#define GNRC_SOCK_DYN_PORTRANGE_OFF (17U)
 
 /**
  * @brief   Internal helper functions for GNRC
@@ -95,5 +112,5 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
 }
 #endif
 
-#endif /* GNRC_SOCK_INTERNAL_H_ */
+#endif /* GNRC_SOCK_INTERNAL_H */
 /** @} */

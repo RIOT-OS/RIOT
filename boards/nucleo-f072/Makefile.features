@@ -1,9 +1,13 @@
 # Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_spi
 
 # load the common Makefile.features for Nucleo boards
 include $(RIOTBOARD)/nucleo-common/Makefile.features

@@ -408,7 +408,7 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                               sizeof(ipv6_addr_t), fib_dst_flags, src->u8,
                               sizeof(ipv6_addr_t), FIB_FLAG_RPL_ROUTE,
                               (dodag->default_lifetime * dodag->lifetime_unit) *
-                              SEC_IN_MS);
+                              MS_PER_SEC);
                 break;
 
             case (GNRC_RPL_OPT_TRANSIT):
@@ -433,7 +433,7 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                                      ((transit->e_flags & GNRC_RPL_OPT_TRANSIT_E_FLAG) ?
                                       0x0 : FIB_FLAG_RPL_ROUTE),
                                      (transit->path_lifetime *
-                                      dodag->lifetime_unit * SEC_IN_MS));
+                                      dodag->lifetime_unit * MS_PER_SEC));
                     first_target = (gnrc_rpl_opt_target_t *) (((uint8_t *) (first_target)) +
                                    sizeof(gnrc_rpl_opt_t) + first_target->length);
                 }

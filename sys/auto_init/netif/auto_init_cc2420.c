@@ -21,6 +21,7 @@
 
 #ifdef MODULE_CC2420
 
+#include "log.h"
 #include "board.h"
 #include "net/gnrc/netdev2.h"
 #include "net/gnrc/netdev2/ieee802154.h"
@@ -28,9 +29,6 @@
 
 #include "cc2420.h"
 #include "cc2420_params.h"
-
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
 
 /**
  * @brief   MAC layer stack parameters
@@ -59,14 +57,14 @@ static char _cc2420_stacks[CC2420_NUMOF][CC2420_MAC_STACKSIZE];
 void auto_init_cc2420(void)
 {
     for (unsigned i = 0; i < CC2420_NUMOF; i++) {
-        DEBUG("Initializing CC2420 radios #%u\n", i);
+        LOG_DEBUG("[auto_init_netif] initializing cc2420 #%u\n", i);
 
         cc2420_setup(&cc2420_devs[i], &cc2420_params[i]);
         int res = gnrc_netdev2_ieee802154_init(&gnrc_adpt[i],
                                                (netdev2_ieee802154_t *)&cc2420_devs[i]);
 
         if (res < 0) {
-            DEBUG("Error initializing CC2420 radio device!\n");
+            LOG_ERROR("[auto_init_netif] error initializing cc2420 #%u\n", i);
         }
         else {
             gnrc_netdev2_init(_cc2420_stacks[i],

@@ -27,6 +27,16 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph/init.h"
+
+/* Configuration of flash access cycles */
+#if CLOCK_CORECLOCK <= 24000000
+#define FLASH_LATENCY (0) /* Zero wait state, if 0 < SYSCLK≤ 24 MHz */
+#elif CLOCK_CORECLOCK <= 48000000
+#define FLASH_LATENCY (1) /* One wait states, if 24 MHz < SYSCLK ≤ 48 MHz */
+#elif CLOCK_CORECLOCK <= 72000000
+#define FLASH_LATENCY (2) /* Two wait states, if 48 MHz < SYSCLK ≤ 72 MHz */
+#endif
 
 /* See if we want to use the PLL */
 #if defined(CLOCK_PLL_DIV) || defined(CLOCK_PLL_MUL)
@@ -94,6 +104,8 @@ void cpu_init(void)
     cortexm_init();
     /* initialize system clocks */
     clk_init();
+    /* trigger static peripheral initialization */
+    periph_init();
 }
 
 /**
@@ -121,11 +133,8 @@ static void clk_init(void)
     /* Wait till the high speed clock source is ready
      * NOTE: the MCU will stay here forever if you use an external clock source and it's not connected */
     while ((RCC->CR & CLOCK_CR_SOURCE_RDY) == 0) {}
-    /* Enable Prefetch Buffer */
-    FLASH->ACR |= FLASH_ACR_PRFTBE;
-    /* Set the flash wait state */
-    FLASH->ACR &= ~((uint32_t)FLASH_ACR_LATENCY);
-    FLASH->ACR |= (uint32_t)CLOCK_FLASH_LATENCY;
+    /* Enable prefetch buffer and set flash wait state */
+    FLASH->ACR = (uint32_t)(FLASH_ACR_PRFTBE | FLASH_LATENCY);
     /* HCLK = SYSCLK */
     RCC->CFGR |= (uint32_t)CLOCK_AHB_DIV;
     /* PCLK2 = HCLK */

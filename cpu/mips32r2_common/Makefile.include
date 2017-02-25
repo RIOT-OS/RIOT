@@ -1,0 +1,48 @@
+ifndef MIPS_ELF_ROOT
+    $(error "Please set $$(MIPS_ELF_ROOT) and ensure $$(MIPS_ELF_ROOT)/bin is on your PATH")
+endif
+
+# Target triple for the build.
+export TARGET_ARCH ?= mips-mti-elf
+
+export ABI=32
+export MEMORY_BASE=0x80000000
+export MEMORY_SIZE=1M
+export APP_START=0x80000000
+
+include $(MIPS_ELF_ROOT)/share/mips/rules/mipshal.mk
+
+# define build specific options
+export CFLAGS_CPU   = -EL -march=mips32r2 -std=gnu99
+export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
+export CFLAGS_DBG = -O0 -g2
+export CFLAGS_OPT = -Os -g2
+
+export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_OPT)
+#$(CFLAGS_DBG)
+
+ifeq ($(USE_HARD_FLOAT),1)
+    export CFLAGS += -mhard-float
+else
+    export CFLAGS += -msoft-float #hard-float is the default so we must set soft-float
+    export LINKFLAGS += -msoft-float
+endif
+
+ifeq ($(USE_DSP),1)
+    export CFLAGS += -mdsp
+endif
+
+export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_OPT) #$(CFLAGS_DBG)
+
+export LINKFLAGS += $(MIPS_HAL_LDFLAGS) -mabi=$(ABI)
+export LINKFLAGS += -Tuhi32.ld
+export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT)
+export LINKFLAGS += -Wl,--gc-sections
+
+# This CPU implementation is using the new core/CPU interface:
+export CFLAGS += -DCOREIF_NG=1
+
+# use newlib as libc, Actually use toolchains newlib.
+#export USEMODULE += newlib
+
+export USEMODULE += periph

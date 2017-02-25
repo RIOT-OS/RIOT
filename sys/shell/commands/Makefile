@@ -5,9 +5,6 @@ SRC = shell_commands.c sc_sys.c
 ifneq (,$(filter mci,$(USEMODULE)))
   SRC += sc_disk.c
 endif
-ifneq (,$(filter ltc4150,$(USEMODULE)))
-  SRC += sc_ltc4150.c
-endif
 ifneq (,$(filter ps,$(USEMODULE)))
   SRC += sc_ps.c
 endif
@@ -46,11 +43,6 @@ endif
 # already.
 ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
   SRC += sc_icmpv6_echo.c
-endif
-ifneq (,$(filter gnrc_zep,$(USEMODULE)))
-  ifneq (,$(filter ipv6_addr,$(USEMODULE)))
-    SRC += sc_zep.c
-  endif
 endif
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
     SRC += sc_gnrc_rpl.c

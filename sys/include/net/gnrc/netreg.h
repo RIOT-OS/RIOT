@@ -18,8 +18,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NETREG_H_
-#define NETREG_H_
+#ifndef NETREG_H
+#define NETREG_H
 
 #include <inttypes.h>
 
@@ -340,5 +340,5 @@ int gnrc_netreg_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr);
 }
 #endif
 
-#endif /* NETREG_H_ */
+#endif /* NETREG_H */
 /** @} */

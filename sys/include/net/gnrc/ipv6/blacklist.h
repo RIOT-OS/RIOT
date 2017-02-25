@@ -19,8 +19,8 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
-#ifndef GNRC_IPV6_BLACKLIST_H_
-#define GNRC_IPV6_BLACKLIST_H_
+#ifndef GNRC_IPV6_BLACKLIST_H
+#define GNRC_IPV6_BLACKLIST_H
 
 #include <stdbool.h>
 
@@ -75,5 +75,5 @@ void gnrc_ipv6_blacklist_print(void);
 }
 #endif
 
-#endif /* GNRC_IPV6_BLACKLIST_H_ */
+#endif /* GNRC_IPV6_BLACKLIST_H */
 /** @} */

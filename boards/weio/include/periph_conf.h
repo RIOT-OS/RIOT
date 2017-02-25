@@ -17,8 +17,10 @@
  * @author      Paul RATHGEB <paul.rathgeb@skynet.be>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
+
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,7 +34,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Timer configuration
+ * @name   Timer configuration
  * @{
  */
 #define TIMER_NUMOF         (1U)
@@ -51,7 +53,7 @@ extern "C" {
 /* @} */
 
 /**
- * @brief UART configuration
+ * @name   UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)
@@ -76,61 +78,58 @@ extern "C" {
 /* @} */
 
 /**
- * @brief SPI configuration
+ * @name   SPI configuration
  * @{
  */
-#define SPI_NUMOF           (2U)
-#define SPI_0_EN            1
-#define SPI_1_EN            1
+static const spi_conf_t spi_config[] = {
+    {
+        .dev        = LPC_SSP0,
+        .preset_bit = (1 << 0),
+        .ahb_bit    = (1 << 11)
+    },
+    {
+        .dev        = LPC_SSP1,
+        .preset_bit = (1 << 2),
+        .ahb_bit    = (1 << 18)
+    }
+};
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /* @} */
 
 /**
  * @brief PWM configuration
  * @{
  */
-#define PWM_0_EN            1
-#define PWM_0_CHANNELS      3
-#define PWM_1_EN            1
-#define PWM_1_CHANNELS      3
-#define PWM_NUMOF           (2U)
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev     = LPC_CT16B0,
+        .pins    = {
+            &LPC_IOCON->PIO1_13,
+            &LPC_IOCON->PIO1_14,
+            &LPC_IOCON->PIO1_15
+        },
+        .clk_bit = BIT7,
+        .af      = 0x02
+    },
+    {
+        .dev     = LPC_CT32B0,
+        .pins    = {
+            &LPC_IOCON->PIO1_24,
+            &LPC_IOCON->PIO1_25,
+            &LPC_IOCON->PIO1_26
+        },
+        .clk_bit = BIT9,
+        .af      = 0x01
+    }
+};
 
-/* PWM0 common configuration */
-#define PWM_0_DEV           LPC_CT16B0
-#define PWM_0_CLK           BIT7
-/* PWM_0 channel configuration */
-#define PWM_0_CH0_EN        1
-#define PWM_0_CH0_IOCON     LPC_IOCON->PIO1_13
-#define PWM_0_CH0_AF        0x82
-
-#define PWM_0_CH1_EN        1
-#define PWM_0_CH1_IOCON     LPC_IOCON->PIO1_14
-#define PWM_0_CH1_AF        0x82
-
-#define PWM_0_CH2_EN        1
-#define PWM_0_CH2_IOCON     LPC_IOCON->PIO1_15
-#define PWM_0_CH2_AF        0x82
-
-/* PWM1 common configuration */
-#define PWM_1_DEV           LPC_CT32B0
-#define PWM_1_CLK           BIT9
-/* PWM_1 channel configuration */
-
-#define PWM_1_CH0_EN        1
-#define PWM_1_CH0_IOCON     LPC_IOCON->PIO1_24
-#define PWM_1_CH0_AF        0x81
-
-#define PWM_1_CH1_EN        1
-#define PWM_1_CH1_IOCON     LPC_IOCON->PIO1_25
-#define PWM_1_CH1_AF        0x81
-
-#define PWM_1_CH2_EN        1
-#define PWM_1_CH2_IOCON     LPC_IOCON->PIO1_26
-#define PWM_1_CH2_AF        0x81
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
 /* @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

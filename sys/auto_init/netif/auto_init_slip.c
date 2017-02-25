@@ -19,16 +19,13 @@
 
 #ifdef MODULE_GNRC_SLIP
 
+#include "log.h"
 #include "board.h"
 #include "net/gnrc/netdev2.h"
-#include "net/gnrc/nomac.h"
 #include "net/gnrc.h"
 
 #include "net/gnrc/slip.h"
 #include "slip_params.h"
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 
 #define SLIP_NUM (sizeof(gnrc_slip_params)/sizeof(gnrc_slip_params_t))
 
@@ -46,19 +43,21 @@ static gnrc_slip_dev_t slip_devs[SLIP_NUM];
 /**
  * @brief   Stacks for the MAC layer threads
  */
-static char _slip_stacks[SLIP_STACKSIZE][SLIP_NUM];
+static char _slip_stacks[SLIP_NUM][SLIP_STACKSIZE];
 
 void auto_init_slip(void)
 {
-    for (unsigned int i = 0; i < SLIP_NUM; i++) {
+    for (unsigned i = 0; i < SLIP_NUM; i++) {
         const gnrc_slip_params_t *p = &gnrc_slip_params[i];
-        DEBUG("Initializing SLIP radio at UART_%d\n", p->uart);
+
+        LOG_DEBUG("[auto_init_netif] initializing slip #%u\n", i);
+
         kernel_pid_t res = gnrc_slip_init(&slip_devs[i], p->uart, p->baudrate,
                                           _slip_stacks[i], SLIP_STACKSIZE,
                                           SLIP_PRIO);
 
         if (res <= KERNEL_PID_UNDEF) {
-            DEBUG("Error initializing SLIP radio device!\n");
+            LOG_ERROR("[auto_init_netif] error initializing slip #%u\n", i);
         }
     }
 }

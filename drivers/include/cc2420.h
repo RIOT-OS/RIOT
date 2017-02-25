@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_cc2420 CC2420 driver
- * @ingroup     drivers_netdev_netdev2
+ * @ingroup     drivers_netdev
  * @{
  *
  * @file
@@ -37,14 +37,6 @@ extern "C" {
  * @brief   Maximum possible packet size in byte
  */
 #define CC2420_PKT_MAXLEN       (IEEE802154_FRAME_LEN_MAX)
-
-/**
- * @brief   Default addresses used if the CPUID module is not present
- *
- * In case this address is used, that short address will be created by using the
- * last two bytes of the long address.
- */
-#define CC2420_ADDR_FALLBACK    {0x12, 0x22, 0x33, 0x44, 0x55, 0x66, 0x08, 0x15}
 
 /**
  * @brief   PAN ID configuration
@@ -82,7 +74,7 @@ enum {
  */
 typedef struct cc2420_params {
     spi_t spi;              /**< SPI bus the device is connected to */
-    spi_speed_t spi_clk;    /**< SPI speed to use */
+    spi_clk_t spi_clk;      /**< SPI speed to use */
     gpio_t pin_cs;          /**< pin connected to chip select */
     gpio_t pin_fifo;        /**< pin connected to the FIFO interrupt pin */
     gpio_t pin_fifop;       /**< pin connected to the FIFOP interrupt pin */

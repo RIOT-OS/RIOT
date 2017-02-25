@@ -67,13 +67,19 @@ ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
   USEMODULE += gnrc_sock
 endif
 
+ifneq (,$(filter gnrc_sock_ip,$(USEMODULE)))
+  USEMODULE += sock_ip
+endif
+
 ifneq (,$(filter gnrc_sock_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
   USEMODULE += random     # to generate random ports
+  USEMODULE += sock_udp
 endif
 
 ifneq (,$(filter gnrc_sock,$(USEMODULE)))
   USEMODULE += gnrc_netapi_mbox
+  USEMODULE += sock
 endif
 
 ifneq (,$(filter gnrc_netapi_mbox,$(USEMODULE)))
@@ -86,18 +92,6 @@ ifneq (,$(filter netdev2_tap,$(USEMODULE)))
   ifneq (,$(filter gnrc_%,$(USEMODULE)))
     USEMODULE += gnrc_netdev2
   endif
-endif
-
-ifneq (,$(filter gnrc_zep,$(USEMODULE)))
-  USEMODULE += hashes
-  USEMODULE += ieee802154
-  USEMODULE += gnrc_udp
-  USEMODULE += random
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter gcoap,$(USEMODULE)))
-  USEMODULE += gnrc_udp
 endif
 
 ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
@@ -271,6 +265,7 @@ endif
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
   USEMODULE += inet_csum
   USEMODULE += gnrc_ipv6
+  USEMODULE += icmpv6
 endif
 
 ifneq (,$(filter gnrc_rpl_srh,$(USEMODULE)))
@@ -335,6 +330,13 @@ ifneq (,$(filter gnrc_udp,$(USEMODULE)))
   USEMODULE += udp
 endif
 
+ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
+  USEMODULE += inet_csum
+  USEMODULE += random
+  USEMODULE += tcp
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
   USEMODULE += gnrc_netapi
   USEMODULE += gnrc_netreg
@@ -364,6 +366,7 @@ ifneq (,$(filter newlib,$(USEMODULE)))
 endif
 
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
+  USEMODULE += bitfield
   USEMODULE += posix
   USEMODULE += random
 endif
@@ -417,6 +420,22 @@ ifneq (,$(filter lwip_conn_udp,$(USEMODULE)))
   USEMODULE += lwip_udp
 endif
 
+ifneq (,$(filter lwip_sock_%,$(USEMODULE)))
+  USEMODULE += lwip_sock
+endif
+
+ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
+  USEMODULE += lwip_raw
+endif
+
+ifneq (,$(filter lwip_sock_tcp,$(USEMODULE)))
+  USEMODULE += lwip_tcp
+endif
+
+ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
+  USEMODULE += lwip_udp
+endif
+
 ifneq (,$(filter lwip_%,$(USEMODULE)))
   USEMODULE += lwip
 endif
@@ -442,6 +461,7 @@ endif
 
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   USEMODULE += sema
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter sema,$(USEMODULE)))
@@ -548,6 +568,8 @@ endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul
+  USEMODULE += saul_reg
+  USEMODULE += auto_init_saul
 endif
 
 ifneq (,$(filter saul,$(USEMODULE)))

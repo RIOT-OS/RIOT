@@ -13,7 +13,7 @@
  * @file
  * @brief       nRF52 specific CPU configuration
  *
- * @author      Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  */
 

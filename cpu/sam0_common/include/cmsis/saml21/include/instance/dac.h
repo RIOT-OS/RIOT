@@ -3,7 +3,7 @@
  *
  * \brief Instance description for DAC
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -40,9 +40,6 @@
  * \asf_license_stop
  *
  */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
- */
 
 #ifndef _SAML21_DAC_INSTANCE_
 #define _SAML21_DAC_INSTANCE_
@@ -57,12 +54,12 @@
 #define REG_DAC_INTFLAG            (0x42003006U) /**< \brief (DAC) Interrupt Flag Status and Clear */
 #define REG_DAC_STATUS             (0x42003007U) /**< \brief (DAC) Status */
 #define REG_DAC_SYNCBUSY           (0x42003008U) /**< \brief (DAC) Synchronization Busy */
-#define REG_DAC_DACCTRL0           (0x4200300CU) /**< \brief (DAC) DAC 0 Control */
-#define REG_DAC_DACCTRL1           (0x4200300EU) /**< \brief (DAC) DAC 1 Control */
-#define REG_DAC_DATA0              (0x42003010U) /**< \brief (DAC) DAC 0 Data */
-#define REG_DAC_DATA1              (0x42003012U) /**< \brief (DAC) DAC 1 Data */
-#define REG_DAC_DATABUF0           (0x42003014U) /**< \brief (DAC) DAC 0 Data Buffer */
-#define REG_DAC_DATABUF1           (0x42003016U) /**< \brief (DAC) DAC 1 Data Buffer */
+#define REG_DAC_DACCTRL0           (0x4200300CU) /**< \brief (DAC) DACx Control 0 */
+#define REG_DAC_DACCTRL1           (0x4200300EU) /**< \brief (DAC) DACx Control 1 */
+#define REG_DAC_DATA0              (0x42003010U) /**< \brief (DAC) Data DAC0 0 */
+#define REG_DAC_DATA1              (0x42003012U) /**< \brief (DAC) Data DAC0 1 */
+#define REG_DAC_DATABUF0           (0x42003014U) /**< \brief (DAC) Data Buffer DAC0 0 */
+#define REG_DAC_DATABUF1           (0x42003016U) /**< \brief (DAC) Data Buffer DAC0 1 */
 #define REG_DAC_DBGCTRL            (0x42003018U) /**< \brief (DAC) Debug Control */
 #else
 #define REG_DAC_CTRLA              (*(RwReg8 *)0x42003000U) /**< \brief (DAC) Control A */
@@ -73,12 +70,12 @@
 #define REG_DAC_INTFLAG            (*(RwReg8 *)0x42003006U) /**< \brief (DAC) Interrupt Flag Status and Clear */
 #define REG_DAC_STATUS             (*(RoReg8 *)0x42003007U) /**< \brief (DAC) Status */
 #define REG_DAC_SYNCBUSY           (*(RoReg  *)0x42003008U) /**< \brief (DAC) Synchronization Busy */
-#define REG_DAC_DACCTRL0           (*(RwReg16*)0x4200300CU) /**< \brief (DAC) DAC 0 Control */
-#define REG_DAC_DACCTRL1           (*(RwReg16*)0x4200300EU) /**< \brief (DAC) DAC 1 Control */
-#define REG_DAC_DATA0              (*(WoReg16*)0x42003010U) /**< \brief (DAC) DAC 0 Data */
-#define REG_DAC_DATA1              (*(WoReg16*)0x42003012U) /**< \brief (DAC) DAC 1 Data */
-#define REG_DAC_DATABUF0           (*(WoReg16*)0x42003014U) /**< \brief (DAC) DAC 0 Data Buffer */
-#define REG_DAC_DATABUF1           (*(WoReg16*)0x42003016U) /**< \brief (DAC) DAC 1 Data Buffer */
+#define REG_DAC_DACCTRL0           (*(RwReg16*)0x4200300CU) /**< \brief (DAC) DACx Control 0 */
+#define REG_DAC_DACCTRL1           (*(RwReg16*)0x4200300EU) /**< \brief (DAC) DACx Control 1 */
+#define REG_DAC_DATA0              (*(WoReg16*)0x42003010U) /**< \brief (DAC) Data DAC0 0 */
+#define REG_DAC_DATA1              (*(WoReg16*)0x42003012U) /**< \brief (DAC) Data DAC0 1 */
+#define REG_DAC_DATABUF0           (*(WoReg16*)0x42003014U) /**< \brief (DAC) Data Buffer DAC0 0 */
+#define REG_DAC_DATABUF1           (*(WoReg16*)0x42003016U) /**< \brief (DAC) Data Buffer DAC0 1 */
 #define REG_DAC_DBGCTRL            (*(RwReg8 *)0x42003018U) /**< \brief (DAC) Debug Control */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 

@@ -32,6 +32,7 @@
 #include <stdint.h>
 #include "timex.h"
 #include "msg.h"
+#include "mutex.h"
 
 #include "board.h"
 #include "periph_conf.h"
@@ -424,6 +425,19 @@ static inline bool xtimer_less(xtimer_ticks32_t a, xtimer_ticks32_t b);
  * @return @p a < @p b
  */
 static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b);
+
+/**
+ * @brief lock a mutex but with timeout
+ *
+ * @note this requires core_thread_flags to be enabled
+ *
+ * @param[in]    mutex  mutex to lock
+ * @param[in]    us     timeout in microseconds relative
+ *
+ * @return       0, when returned after mutex was locked
+ * @return       -1, when the timeout occcured
+ */
+int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
 
 /**
  * @brief xtimer backoff value

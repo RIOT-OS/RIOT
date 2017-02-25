@@ -1,7 +1,7 @@
 /*
  * Copyright 2015 Ludwig Knüpfer
  *           2015 Christian Mehlis
- *           2016 Freie Universität Berlin
+ *           2016-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include "log.h"
+#include "assert.h"
 #include "xtimer.h"
 #include "timex.h"
 #include "periph/gpio.h"
@@ -38,11 +39,6 @@
 #include "debug.h"
 
 #define PULSE_WIDTH_THRESHOLD       (40U)
-
-/**
- * @brief   Allocation of memory for device descriptors
- */
-dht_t dht_devs[DHT_NUMOF];
 
 static uint16_t read(gpio_t pin, int bits)
 {
@@ -65,36 +61,23 @@ static uint16_t read(gpio_t pin, int bits)
     return res;
 }
 
-void dht_auto_init(void)
-{
-    for (unsigned i = 0; i < DHT_NUMOF; i++) {
-        if (dht_init(&dht_devs[i], &dht_params[i]) < 0) {
-            LOG_ERROR("Unable to initialize DHT sensor #%i\n", i);
-        }
-#ifdef MODULE_SAUL_REG
-        for (int j = 0; j < 2; j++) {
-            dht_saul_reg[i][j].dev = &dht_devs[i];
-            saul_reg_add(&dht_saul_reg[i][j]);
-        }
-#endif
-    }
-}
-
 int dht_init(dht_t *dev, const dht_params_t *params)
 {
     DEBUG("dht_init\n");
 
+    /* check parameters and configuration */
+    assert(dev && params &&
+           ((dev->type == DHT11) || (dev->type == DHT22) || (dev->type == DHT21)));
+
     memcpy(dev, params, sizeof(dht_t));
 
-    if (gpio_init(dev->pin, GPIO_OUT) == -1) {
-        return -1;
-    }
+    gpio_init(dev->pin, GPIO_OUT);
     gpio_set(dev->pin);
 
-    xtimer_usleep(2000 * MS_IN_USEC);
+    xtimer_usleep(2000 * US_PER_MS);
 
     DEBUG("dht_init: success\n");
-    return 0;
+    return DHT_OK;
 }
 
 int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
@@ -102,9 +85,11 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
     uint8_t csum, sum;
     uint16_t raw_hum, raw_temp;
 
+    assert(dev && temp && hum);
+
     /* send init signal to device */
     gpio_clear(dev->pin);
-    xtimer_usleep(20 * MS_IN_USEC);
+    xtimer_usleep(20 * US_PER_MS);
     gpio_set(dev->pin);
     xtimer_usleep(40);
 
@@ -133,7 +118,7 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
     sum = (raw_temp >> 8) + (raw_temp & 0xff) + (raw_hum >> 8) + (raw_hum & 0xff);
     if ((sum != csum) || (csum == 0)) {
         DEBUG("error: checksum invalid\n");
-        return -1;
+        return DHT_NOCSUM;
     }
 
     /* parse the RAW values */
@@ -154,8 +139,8 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
             }
             break;
         default:
-            return -2;
+            return DHT_NODEV;      /* this should never be reached */
     }
 
-    return 0;
+    return DHT_OK;
 }

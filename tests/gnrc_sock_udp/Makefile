@@ -1,10 +1,9 @@
 APPLICATION = gnrc_sock_udp
-
-BOARD ?= native
+include ../Makefile.tests_common
 
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := nucleo-f042
+BOARD_INSUFFICIENT_MEMORY := nucleo32-f042 nucleo32-f031
 
 USEMODULE += gnrc_sock_check_reuse
 USEMODULE += gnrc_sock_udp
@@ -14,8 +13,6 @@ USEMODULE += ps
 CFLAGS += -DDEVELHELP
 CFLAGS += -DGNRC_PKTBUF_SIZE=400
 CFLAGS += -DTEST_SUITES
-
-QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
 

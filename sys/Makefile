@@ -28,6 +28,9 @@ endif
 ifneq (,$(filter netdev2_test,$(USEMODULE)))
     DIRS += net/netdev2_test
 endif
+ifneq (,$(filter icmpv6,$(USEMODULE)))
+    DIRS += net/network_layer/icmpv6
+endif
 ifneq (,$(filter ipv4_addr,$(USEMODULE)))
     DIRS += net/network_layer/ipv4/addr
 endif
@@ -76,6 +79,9 @@ endif
 ifneq (,$(filter udp,$(USEMODULE)))
     DIRS += net/transport_layer/udp
 endif
+ifneq (,$(filter tcp,$(USEMODULE)))
+    DIRS += net/transport_layer/tcp
+endif
 
 ifneq (,$(filter hamming256,$(USEMODULE)))
     DIRS += ecc/hamming256
@@ -98,6 +104,9 @@ ifneq (,$(filter netopt,$(USEMODULE)))
 endif
 ifneq (,$(filter sema,$(USEMODULE)))
     DIRS += sema
+endif
+ifneq (,$(filter gcoap,$(USEMODULE)))
+    DIRS += net/application_layer/coap
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))

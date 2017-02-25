@@ -380,6 +380,8 @@ static int send_cmd(unsigned int idx, unsigned long arg, unsigned int rt, unsign
 {
     unsigned int s, mc;
 
+    assert(buff != NULL);
+
     if (idx & 0x80) {               /* Send a CMD55 prior to the specified command if it is ACMD class */
         if (!send_cmd(CMD55, (unsigned long)CardRCA << 16, 1, buff) /* When CMD55 is faild, */
            || !(buff[0] & 0x00000020)) {
@@ -475,7 +477,7 @@ static int wait_ready(unsigned short tmr)
 {
     unsigned long rc;
 
-    uint32_t stoppoll = xtimer_now_usec() + tmr * MS_IN_USEC;
+    uint32_t stoppoll = xtimer_now_usec() + tmr * US_PER_MS;
     bool bBreak = false;
 
     while (xtimer_now_usec() < stoppoll/*Timer[0]*/) {

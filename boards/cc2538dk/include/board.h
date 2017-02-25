@@ -17,8 +17,8 @@
  * @author      Ian Martin <ian@locicontrols.com>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -36,26 +36,27 @@ extern "C" {
 #define LED2_PIN            GPIO_PIN(2, 2)
 #define LED3_PIN            GPIO_PIN(2, 3)
 
-#define LED0_GPIO           GPIO_PC0        /**< red LED */
-#define LED1_GPIO           GPIO_PC1        /**< yellow LED */
-#define LED2_GPIO           GPIO_PC2        /**< green LED */
-#define LED3_GPIO           GPIO_PC3        /**< orange LED */
+#define LED_PORT            GPIO_C
+#define LED0_BIT            (1 << 0)        /**< red LED */
+#define LED1_BIT            (1 << 1)        /**< yellow LED */
+#define LED2_BIT            (1 << 2)        /**< green LED */
+#define LED3_BIT            (1 << 3)        /**< orange LED */
 
-#define LED0_ON             cc2538_gpio_set(LED0_GPIO)
-#define LED0_OFF            cc2538_gpio_clear(LED0_GPIO)
-#define LED0_TOGGLE         cc2538_gpio_toggle(LED0_GPIO)
+#define LED0_ON             (LED_PORT->DATA |=  LED0_BIT)
+#define LED0_OFF            (LED_PORT->DATA &= ~LED0_BIT)
+#define LED0_TOGGLE         (LED_PORT->DATA ^=  LED0_BIT)
 
-#define LED1_ON             cc2538_gpio_set(LED1_GPIO)
-#define LED1_OFF            cc2538_gpio_clear(LED1_GPIO)
-#define LED1_TOGGLE         cc2538_gpio_toggle(LED1_GPIO)
+#define LED1_ON             (LED_PORT->DATA |=  LED1_BIT)
+#define LED1_OFF            (LED_PORT->DATA &= ~LED1_BIT)
+#define LED1_TOGGLE         (LED_PORT->DATA ^=  LED1_BIT)
 
-#define LED2_ON             cc2538_gpio_set(LED2_GPIO)
-#define LED2_OFF            cc2538_gpio_clear(LED2_GPIO)
-#define LED2_TOGGLE         cc2538_gpio_toggle(LED2_GPIO)
+#define LED2_ON             (LED_PORT->DATA |=  LED2_BIT)
+#define LED2_OFF            (LED_PORT->DATA &= ~LED2_BIT)
+#define LED2_TOGGLE         (LED_PORT->DATA ^=  LED2_BIT)
 
-#define LED3_ON             cc2538_gpio_set(LED3_GPIO)
-#define LED3_OFF            cc2538_gpio_clear(LED3_GPIO)
-#define LED3_TOGGLE         cc2538_gpio_toggle(LED3_GPIO)
+#define LED3_ON             (LED_PORT->DATA |=  LED3_BIT)
+#define LED3_OFF            (LED_PORT->DATA &= ~LED3_BIT)
+#define LED3_TOGGLE         (LED_PORT->DATA ^=  LED3_BIT)
 /** @} */
 
 /**
@@ -94,5 +95,5 @@ void board_init(void);
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

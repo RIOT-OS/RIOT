@@ -128,20 +128,6 @@ void timer_stop(tim_t dev)
     }
 }
 
-void timer_irq_enable(tim_t dev)
-{
-    if (dev == TIMER_0) {
-        NVIC_EnableIRQ(TIMER_0_IRQ);
-    }
-}
-
-void timer_irq_disable(tim_t dev)
-{
-    if (dev == TIMER_0) {
-        NVIC_DisableIRQ(TIMER_0_IRQ);
-    }
-}
-
 void TIMER_0_ISR(void)
 {
     if (TIMER_0_DEV->IR & MR0_FLAG) {

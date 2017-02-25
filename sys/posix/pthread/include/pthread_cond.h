@@ -25,7 +25,7 @@
 #   include "msp430_types.h"
 #endif
 
-#if defined(__MACH__)
+#if defined(__MACH__) || defined(__WITH_AVRLIBC__)
 typedef int clockid_t;
 #endif
 

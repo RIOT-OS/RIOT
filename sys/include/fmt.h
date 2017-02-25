@@ -19,8 +19,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef FMT_H_
-#define FMT_H_
+#ifndef FMT_H
+#define FMT_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -246,6 +246,13 @@ void print_u32_dec(uint32_t val);
 void print_s32_dec(int32_t val);
 
 /**
+ * @brief Print byte value as hex to stdout
+ *
+ * @param[in]  byte Byte value to print
+ */
+void print_byte_hex(uint8_t byte);
+
+/**
  * @brief Print uint32 value as hex to stdout
  *
  * @param[in]   val  Value to print
@@ -280,4 +287,4 @@ void print_str(const char* str);
 #endif
 
 /** @} */
-#endif /* FMT_H_ */
+#endif /* FMT_H */

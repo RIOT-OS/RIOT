@@ -7,12 +7,14 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk msb-430 msb-430h pca10000 pca10005 \
-                             nrf51dongle nrf6310 nucleo-f103 nucleo-f334 \
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk maple-mini msb-430 msb-430h pca10000 \
+                             pca10005 nrf51dongle nrf6310 nucleo-f103 nucleo-f334 \
                              spark-core stm32f0discovery telosb \
                              weio wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1 nucleo-f072 \
                              nucleo-f030 nucleo-f070 microbit calliope-mini \
-                             nucleo-f042
+                             nucleo32-f042 nucleo32-f303 opencm9-04 nucleo32-f031
+
+BOARD_BLACKLIST += mips-malta # No UART available.
 
 # use ethos (ethernet over serial) for network communication and stdio over
 # UART, but not on native, as native has a tap interface towards the host.
@@ -59,10 +61,10 @@ include $(RIOTBASE)/Makefile.include
 .PHONY: host-tools
 
 term: host-tools
-	$(AD)sudo sh $(RIOTBASE)/dist/tools/ethos/start_network.sh $(PORT) $(TAP) $(IPV6_PREFIX)
+	$(Q)sudo sh $(RIOTBASE)/dist/tools/ethos/start_network.sh $(PORT) $(TAP) $(IPV6_PREFIX)
 
 host-tools:
-	$(AD)env -u CC -u CFLAGS make -C $(RIOTBASE)/dist/tools
+	$(Q)env -u CC -u CFLAGS make -C $(RIOTBASE)/dist/tools
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz

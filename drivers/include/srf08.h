@@ -24,8 +24,8 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
-#ifndef SRF08_H_
-#define SRF08_H_
+#ifndef SRF08_H
+#define SRF08_H
 
 #include <stdint.h>
 #include "periph/i2c.h"
@@ -161,4 +161,4 @@ int srf08_get_distances(srf08_t *dev, uint16_t *range_array, int num_echos, srf0
 #endif
 
 /** @} */
-#endif /* SRF08_H_ */
+#endif /* SRF08_H */

@@ -43,6 +43,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Default priority for adaption layer's threads
+ */
 #ifndef GNRC_NETDEV2_MAC_PRIO
 #define GNRC_NETDEV2_MAC_PRIO   (THREAD_PRIORITY_MAIN - 5)
 #endif
@@ -193,7 +196,7 @@ static inline void gnrc_netdev2_set_tx_feedback(gnrc_netdev2_t *dev,
 {
     /* check if gnrc_mac_tx_feedback does not collide with
      * GNRC_NETDEV2_MAC_INFO_RX_STARTED */
-    assert(txf & GNRC_NETDEV2_MAC_INFO_RX_STARTED);
+    assert(!(txf & GNRC_NETDEV2_MAC_INFO_RX_STARTED));
     /* unset previous value */
     dev->mac_info &= ~GNRC_NETDEV2_MAC_INFO_TX_FEEDBACK_MASK;
     dev->mac_info |= (uint16_t)(txf & GNRC_NETDEV2_MAC_INFO_TX_FEEDBACK_MASK);

@@ -24,7 +24,7 @@ $(BINDIR)/softdevice.hex: $(PKG_SRCDIR)/.extracted
 $(PKG_SRCDIR)/.extracted: $(PKG_BUILDDIR)/$(PKG_FILE)
 	rm -rf $(@D)
 	mkdir -p $(@D)
-	$(AD)cd $(@D) && $(UNZIP_HERE) $(PKG_BUILDDIR)/$(PKG_FILE)
+	$(Q)cd $(@D) && $(UNZIP_HERE) $(PKG_BUILDDIR)/$(PKG_FILE)
 
 # this file doesn't compile with RIOT, but is not needed either
 	rm $(PKG_BUILDDIR)/src/components/ble/common/ble_conn_params.c
@@ -41,7 +41,7 @@ $(PKG_SRCDIR)/.extracted: $(PKG_BUILDDIR)/$(PKG_FILE)
 
 $(PKG_BUILDDIR)/$(PKG_FILE):
 	@mkdir -p $(@D)
-	$(AD)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)
+	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)
 
 clean::
 	rm -rf $(PKG_SRCDIR)/

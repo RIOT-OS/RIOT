@@ -23,7 +23,8 @@
  * @}
  */
 
-#include "periph/cpuid.h"
+
+#include "uuid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/gnrc.h"
@@ -45,21 +46,11 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
     dev->state = AT86RF2XX_STATE_SLEEP;
     dev->pending_tx = 0;
-    /* initialise SPI */
-    spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING, params->spi_speed);
 }
 
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
-#if CPUID_LEN
-/* make sure that the buffer is always big enough to store a 64bit value */
-#   if CPUID_LEN < IEEE802154_LONG_ADDRESS_LEN
-    uint8_t cpuid[IEEE802154_LONG_ADDRESS_LEN];
-#   else
-    uint8_t cpuid[CPUID_LEN];
-#endif
     eui64_t addr_long;
-#endif
 
     at86rf2xx_hardware_reset(dev);
 
@@ -69,30 +60,16 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* reset options and sequence number */
     dev->netdev.seq = 0;
     dev->netdev.flags = 0;
-    /* set short and long address */
-#if CPUID_LEN
-    /* in case CPUID_LEN < 8, fill missing bytes with zeros */
-    memset(cpuid, 0, CPUID_LEN);
 
-    cpuid_get(cpuid);
-
-#if CPUID_LEN > IEEE802154_LONG_ADDRESS_LEN
-    for (int i = IEEE802154_LONG_ADDRESS_LEN; i < CPUID_LEN; i++) {
-        cpuid[i & 0x07] ^= cpuid[i];
-    }
-#endif
-
+    /* get an 8-byte unique ID to use as hardware address */
+    uuid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
     /* make sure we mark the address as non-multicast and not globally unique */
-    cpuid[0] &= ~(0x01);
-    cpuid[0] |= 0x02;
-    /* copy and set long address */
-    memcpy(&addr_long, cpuid, IEEE802154_LONG_ADDRESS_LEN);
+    addr_long.uint8[0] &= ~(0x01);
+    addr_long.uint8[0] |=  (0x02);
+    /* set short and long address */
     at86rf2xx_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
     at86rf2xx_set_addr_short(dev, NTOHS(addr_long.uint16[0].u16));
-#else
-    at86rf2xx_set_addr_long(dev, AT86RF2XX_DEFAULT_ADDR_LONG);
-    at86rf2xx_set_addr_short(dev, AT86RF2XX_DEFAULT_ADDR_SHORT);
-#endif
+
     /* set default PAN id */
     at86rf2xx_set_pan(dev, AT86RF2XX_DEFAULT_PANID);
     /* set default channel */
@@ -142,30 +119,6 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
 
     DEBUG("at86rf2xx_reset(): reset complete.\n");
-}
-
-bool at86rf2xx_cca(at86rf2xx_t *dev)
-{
-    uint8_t tmp;
-    uint8_t status;
-
-    at86rf2xx_assert_awake(dev);
-
-    /* trigger CCA measurment */
-    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
-    tmp &= AT86RF2XX_PHY_CC_CCA_MASK__CCA_REQUEST;
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_CC_CCA, tmp);
-    /* wait for result to be ready */
-    do {
-        status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS);
-    } while (!(status & AT86RF2XX_TRX_STATUS_MASK__CCA_DONE));
-    /* return according to measurement */
-    if (status & AT86RF2XX_TRX_STATUS_MASK__CCA_STATUS) {
-        return true;
-    }
-    else {
-        return false;
-    }
 }
 
 size_t at86rf2xx_send(at86rf2xx_t *dev, uint8_t *data, size_t len)

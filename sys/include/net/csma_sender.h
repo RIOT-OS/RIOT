@@ -22,8 +22,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef CSMA_SENDER_H_
-#define CSMA_SENDER_H_
+#ifndef CSMA_SENDER_H
+#define CSMA_SENDER_H
 
 #include <stdint.h>
 
@@ -140,6 +140,6 @@ int csma_sender_cca_send(netdev2_t *dev, struct iovec *vector, unsigned count);
 }
 #endif
 
-#endif /* CSMA_SENDER_H_ */
+#endif /* CSMA_SENDER_H */
 
 /** @} */

@@ -18,10 +18,10 @@
  * =====
  *
  * This module is currently the default network stack for RIOT and includes
- * many components ranging from a @ref net_gnrc_nomac "simple MAC protocol"
- * through a fully-featured @ref net_gnrc_ipv6 implementation with @ref
- * net_gnrc_sixlowpan "6LowPAN" extensions to an @ref net_gnrc_udp "UDP"
- * implementation and @ref net_gnrc_rpl.
+ * many components ranging from a @ref net_gnrc_netdev2 through a fully-featured
+ * @ref net_gnrc_ipv6 implementation with @ref net_gnrc_sixlowpan "6LowPAN"
+ * extensions to an @ref net_gnrc_udp "UDP" implementation and
+ * @ref net_gnrc_rpl.
  *
  * A list of all features contained in the @ref net_gnrc is available in the
  * `Modules` section above.
@@ -30,7 +30,7 @@
  * =====================
  *
  * From the application layer the @ref net_gnrc can be accessed through the
- * @ref net_conn, while the interface to the @ref drivers_netdev_netdev2 is
+ * @ref net_sock, while the interface to the @ref drivers_netdev_netdev2 is
  * defined by the @ref net_gnrc_netdev2.
  *
  * Architecture
@@ -258,9 +258,9 @@
  *   USEMODULE += gnrc_udp
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * - To use @ref net_conn_udp with GNRC include
+ * - To use @ref net_sock_udp with GNRC include
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   USEMODULE += gnrc_conn_udp
+ *   USEMODULE += gnrc_sock_udp
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - To include the @ref net_gnrc_rpl module
@@ -280,8 +280,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef GNRC_NETBASE_H_
-#define GNRC_NETBASE_H_
+#ifndef GNRC_NETBASE_H
+#define GNRC_NETBASE_H
 
 #include "net/netopt.h"
 #include "net/gnrc/netdev.h"
@@ -303,5 +303,5 @@ extern "C" {
 }
 #endif
 
-#endif /* GNRC_NETBASE_H_ */
+#endif /* GNRC_NETBASE_H */
 /** @} */

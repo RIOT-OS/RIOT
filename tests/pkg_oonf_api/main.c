@@ -18,6 +18,6 @@
 
 int main(void)
 {
-    printf("oonf_api package compiled!");
+    puts("oonf_api package compiled!");
     return 0;
 }

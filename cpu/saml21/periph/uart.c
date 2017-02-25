@@ -139,7 +139,7 @@ static inline void irq_handler(uint8_t uartnum, SercomUsart *dev)
     }
     else if (dev->INTFLAG.bit.ERROR) {
         /* clear error flag */
-        dev->INTFLAG.bit.ERROR = 1;
+        dev->INTFLAG.reg |= SERCOM_USART_INTFLAG_ERROR;
     }
     cortexm_isr_end();
 }

@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef BOARD_COMMON_H_
-#define BOARD_COMMON_H_
+#ifndef BOARD_COMMON_H
+#define BOARD_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,5 +73,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_COMMON_H_ */
+#endif /* BOARD_COMMON_H */
 /** @} */

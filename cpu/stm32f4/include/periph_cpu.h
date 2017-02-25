@@ -13,7 +13,7 @@
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef PERIPH_CPU_H
@@ -28,20 +28,11 @@ extern "C" {
 /**
  * @brief   Available number of ADC devices
  */
-#if defined(CPU_MODEL_STM32F401RE)
+#if defined(CPU_MODEL_STM32F401RE) || defined(CPU_MODEL_STM32F411RE)|| defined(CPU_MODEL_STM32F413ZH)
 #define ADC_DEVS            (1U)
 #elif defined(CPU_MODEL_STM32F407VG) || defined(CPU_MODEL_STM32F415RG) || defined(CPU_MODEL_STM32F446RE)
 #define ADC_DEVS            (3U)
 #endif
-
-/**
- * @brief declare needed generic SPI functions
- * @{
- */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
-/** @} */
 
 #ifndef DOXYGEN
 /**

@@ -21,8 +21,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <stdint.h>
 
@@ -43,8 +43,8 @@ extern "C" {
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
  */
-#define AT86RF2XX_PARAMS_BOARD      {.spi = SPI_0, \
-                                     .spi_speed = SPI_SPEED_5MHZ, \
+#define AT86RF2XX_PARAMS_BOARD      {.spi = SPI_DEV(0), \
+                                     .spi_clk = SPI_CLK_5MHZ, \
                                      .cs_pin = GPIO_PIN(PORT_A, 1), \
                                      .int_pin = GPIO_PIN(PORT_C, 2), \
                                      .sleep_pin = GPIO_PIN(PORT_A, 0), \
@@ -108,5 +108,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

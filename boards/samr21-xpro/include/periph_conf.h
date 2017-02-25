@@ -19,8 +19,8 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include <stdint.h>
 
@@ -168,37 +168,32 @@ static const pwm_conf_t pwm_config[] = {
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF          (2)
-#define SPI_0_EN           1
-#define SPI_1_EN           1
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = &SERCOM4->SPI,
+        .miso_pin = GPIO_PIN(PC, 19),
+        .mosi_pin = GPIO_PIN(PB, 30),
+        .clk_pin  = GPIO_PIN(PC, 18),
+        .miso_mux = GPIO_MUX_F,
+        .mosi_mux = GPIO_MUX_F,
+        .clk_mux  = GPIO_MUX_F,
+        .miso_pad = SPI_PAD_MISO_0,
+        .mosi_pad = SPI_PAD_MOSI_2_SCK_3
+    },
+    {
+        .dev      = &SERCOM5->SPI,
+        .miso_pin = GPIO_PIN(PB, 2),
+        .mosi_pin = GPIO_PIN(PB, 22),
+        .clk_pin  = GPIO_PIN(PB, 23),
+        .miso_mux = GPIO_MUX_D,
+        .mosi_mux = GPIO_MUX_D,
+        .clk_mux  = GPIO_MUX_D,
+        .miso_pad = SPI_PAD_MISO_0,
+        .mosi_pad = SPI_PAD_MOSI_2_SCK_3
+    }
+};
 
-/*      SPI0             */
-#define SPI_0_DEV           SERCOM4->SPI
-#define SPI_IRQ_0           SERCOM4_IRQn
-#define SPI_0_GCLK_ID       SERCOM4_GCLK_ID_CORE
-/* SPI 0 pin configuration */
-#define SPI_0_SCLK          GPIO_PIN(PC, 18)
-#define SPI_0_SCLK_MUX      GPIO_MUX_F
-#define SPI_0_MISO          GPIO_PIN(PC, 19)
-#define SPI_0_MISO_MUX      GPIO_MUX_F
-#define SPI_0_MISO_PAD      SPI_PAD_MISO_0
-#define SPI_0_MOSI          GPIO_PIN(PB, 30)
-#define SPI_0_MOSI_MUX      GPIO_MUX_F
-#define SPI_0_MOSI_PAD      SPI_PAD_MOSI_2_SCK_3
-
-/*      SPI1             */
-#define SPI_1_DEV           SERCOM5->SPI
-#define SPI_IRQ_1           SERCOM5_IRQn
-#define SPI_1_GCLK_ID       SERCOM5_GCLK_ID_CORE
-/* SPI 1 pin configuration */
-#define SPI_1_SCLK          GPIO_PIN(PB, 23)
-#define SPI_1_SCLK_MUX      GPIO_MUX_D
-#define SPI_1_MISO          GPIO_PIN(PB, 02)
-#define SPI_1_MISO_MUX      GPIO_MUX_D
-#define SPI_1_MISO_PAD      SPI_PAD_MISO_0
-#define SPI_1_MOSI          GPIO_PIN(PB, 22)
-#define SPI_1_MOSI_MUX      GPIO_MUX_D
-#define SPI_1_MOSI_PAD      SPI_PAD_MOSI_2_SCK_3
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**
@@ -249,5 +244,5 @@ static const pwm_conf_t pwm_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

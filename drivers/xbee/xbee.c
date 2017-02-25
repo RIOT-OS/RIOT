@@ -41,16 +41,16 @@
 /**
  * @brief   Delay when entering command mode, must be > 1s
  */
-#define ENTER_CMD_MODE_DELAY        (1100U * 1000U)
+#define ENTER_CMD_MODE_DELAY        (1100UL * US_PER_MS)
 /**
  * @brief   Delay when resetting the device, 10ms
  */
-#define RESET_DELAY                 (10U * 1000U)
+#define RESET_DELAY                 (10UL * US_PER_MS)
 
 /**
  * @brief   Timeout for receiving AT command response
  */
-#define RESP_TIMEOUT_USEC           (SEC_IN_USEC)
+#define RESP_TIMEOUT_USEC           (US_PER_SEC)
 
 /**
  * @brief   Start delimiter in API frame mode

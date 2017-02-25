@@ -18,8 +18,8 @@
  * @author      Antonio Lignan <alinan@zolertia.com>
  */
 
-#ifndef FANCY_LEDS_H_
-#define FANCY_LEDS_H_
+#ifndef FANCY_LEDS_H
+#define FANCY_LEDS_H
 
 #include "board_common.h"
 
@@ -63,5 +63,5 @@
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-#endif /* FANCY_LEDS_H_ */
+#endif /* FANCY_LEDS_H */
 /** @} */

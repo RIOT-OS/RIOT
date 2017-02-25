@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef STELLARIS_WATCHDOG_H_
-#define STELLARIS_WATCHDOG_H_
+#ifndef STELLARIS_WATCHDOG_H
+#define STELLARIS_WATCHDOG_H
 
 //*****************************************************************************
 //
@@ -92,4 +92,4 @@ extern void WatchdogStallDisable(unsigned long ulBase);
 }
 #endif
 
-#endif /* STELLARIS_WATCHDOG_H_ */
+#endif /* STELLARIS_WATCHDOG_H */

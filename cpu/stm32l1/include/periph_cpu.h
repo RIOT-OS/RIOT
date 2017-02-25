@@ -14,7 +14,7 @@
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Katja Kirstein <katja.kirstein@haw-hamburg.de>
  * @author          Francisco Molina <francisco.molina@inria.cl>
  */
@@ -133,6 +133,16 @@ typedef struct {
     uint8_t er_irqn;        /**< error IRQ */
     uint8_t ev_irqn;        /**< event IRQ */
 } i2c_conf_t;
+
+/**
+ * @brief   Configure the alternate function for the given pin
+ *
+ * @note    This is meant for internal use in STM32L1 peripheral drivers only
+ *
+ * @param[in] pin       pin to configure
+ * @param[in] af        alternate function to use
+ */
+void gpio_init_af(gpio_t pin, gpio_af_t af);
 
 #ifdef __cplusplus
 }

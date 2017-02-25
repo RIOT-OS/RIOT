@@ -22,8 +22,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef LWIP_H_
-#define LWIP_H_
+#ifndef LWIP_H
+#define LWIP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,5 +41,5 @@ void lwip_bootstrap(void);
 }
 #endif
 
-#endif /* LWIP_H_ */
+#endif /* LWIP_H */
 /** @} */

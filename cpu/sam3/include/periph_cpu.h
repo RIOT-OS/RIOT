@@ -14,7 +14,7 @@
  * @file
  * @brief       CPU specific definitions for internal peripheral handling
  *
- * @author      Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Tobias Fredersdorf <tobias.fredersdorf@haw-hamburg.de>
  *
  */
@@ -23,7 +23,6 @@
 #define PERIPH_CPU_H
 
 #include "cpu.h"
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,7 +49,8 @@ typedef uint32_t gpio_t;
  * @brief Declare needed generic SPI functions
  * @{
  */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_INIT_CS
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
@@ -128,6 +128,33 @@ typedef enum {
 } gpio_mux_t;
 
 /**
+ * @brief   Override default SPI modes
+ * @{
+ */
+#define HAVE_SPI_MODE_T
+typedef enum {
+    SPI_MODE_0 = (SPI_CSR_NCPHA),                   /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1 = (0),                               /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2 = (SPI_CSR_CPOL | SPI_CSR_NCPHA),    /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3 = (SPI_CSR_CPOL)                     /**< CPOL=1, CPHA=1 */
+} spi_mode_t;
+/** @} */
+
+/**
+ * @brief   Override default SPI clock values
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef enum {
+    SPI_CLK_100KHZ = (100000),                      /**< 100KHz */
+    SPI_CLK_400KHZ = (400000),                      /**< 400KHz */
+    SPI_CLK_1MHZ   = (1000000),                     /**< 1MHz */
+    SPI_CLK_5MHZ   = (5000000),                     /**< 5MHz */
+    SPI_CLK_10MHZ  = (10000000)                     /**< 10MHz */
+} spi_clk_t;
+/** @} */
+
+/**
  * @brief   Timer configuration data
  */
 typedef struct {
@@ -156,6 +183,18 @@ typedef struct {
     gpio_t pin;             /**< GPIO pin connected to the channel */
     uint8_t hwchan;         /**< the HW channel used for a logical channel */
 } pwm_chan_conf_t;
+
+/**
+ * @brief   SPI configuration data
+ */
+typedef struct {
+    Spi *dev;               /**< SPI module to use */
+    uint8_t id;             /**< corresponding ID of that module */
+    gpio_t clk;             /**< pin mapped to the CLK line */
+    gpio_t mosi;            /**< pin mapped to the MOSI line */
+    gpio_t miso;            /**< pin mapped to the MISO line */
+    gpio_mux_t mux;         /**< pin MUX setting */
+} spi_conf_t;
 
 /**
  * @brief   Configure the given GPIO pin to be used with the given MUX setting

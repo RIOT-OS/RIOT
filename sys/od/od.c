@@ -93,7 +93,7 @@ static inline void _bytes_format(char *format, uint16_t flags)
             strncpy(format, " %024" PRIo64, sizeof(" %024" PRIo64));
             break;
 
-#if !defined(__MACH__)
+#if !defined(__MACH__) && !defined(__mips__)
         case OD_FLAGS_BYTES_OCTAL | OD_FLAGS_LENGTH_SHORT:
             sprintf(format, " %%0%do", sizeof(short) * _OCTAL_BYTE_LENGTH);
             break;
@@ -101,7 +101,7 @@ static inline void _bytes_format(char *format, uint16_t flags)
         case OD_FLAGS_BYTES_OCTAL | OD_FLAGS_LENGTH_LONG:
             sprintf(format, " %%0%dlo", sizeof(long) * _OCTAL_BYTE_LENGTH);
             break;
-#else   /* !defined(__MACH__) */
+#else   /* !defined(__MACH__) && !defined(__mips__) */
         case OD_FLAGS_BYTES_OCTAL | OD_FLAGS_LENGTH_SHORT:
             sprintf(format, " %lu", sizeof(short) * _OCTAL_BYTE_LENGTH);
             break;
@@ -109,7 +109,7 @@ static inline void _bytes_format(char *format, uint16_t flags)
         case OD_FLAGS_BYTES_OCTAL | OD_FLAGS_LENGTH_LONG:
             sprintf(format, " %lu", sizeof(long) * _OCTAL_BYTE_LENGTH);
             break;
-#endif  /* !defined(__MACH__) */
+#endif  /* !defined(__MACH__) && !defined(__mips__) */
 
         case OD_FLAGS_BYTES_INT | OD_FLAGS_LENGTH_1:
             strncpy(format, " %4d", sizeof(" %4d"));
@@ -127,7 +127,7 @@ static inline void _bytes_format(char *format, uint16_t flags)
             strncpy(format, " %24" PRId64, sizeof(" %24" PRId64));
             break;
 
-#if !defined(__MACH__)
+#if !defined(__MACH__) && !defined(__mips__)
         case OD_FLAGS_BYTES_INT | OD_FLAGS_LENGTH_SHORT:
             sprintf(format, " %%%dd", sizeof(short) * _INT_BYTE_LENGTH);
             break;
@@ -135,7 +135,7 @@ static inline void _bytes_format(char *format, uint16_t flags)
         case OD_FLAGS_BYTES_INT | OD_FLAGS_LENGTH_LONG:
             sprintf(format, " %%%dld", sizeof(long) * _INT_BYTE_LENGTH);
             break;
-#else   /* !defined(__MACH__) */
+#else   /* !defined(__MACH__) && !defined(__mips__) */
         case OD_FLAGS_BYTES_INT | OD_FLAGS_LENGTH_SHORT:
             sprintf(format, " %%%ld", sizeof(short) * _INT_BYTE_LENGTH);
             break;
@@ -143,7 +143,7 @@ static inline void _bytes_format(char *format, uint16_t flags)
         case OD_FLAGS_BYTES_INT | OD_FLAGS_LENGTH_LONG:
             sprintf(format, " %%%ld", sizeof(long) * _INT_BYTE_LENGTH);
             break;
-#endif  /* !defined(__MACH__) */
+#endif  /* !defined(__MACH__)  && !defined(__mips__) */
 
         case OD_FLAGS_BYTES_UINT | OD_FLAGS_LENGTH_1:
             strncpy(format, " %3u", sizeof(" %3u"));
@@ -161,7 +161,7 @@ static inline void _bytes_format(char *format, uint16_t flags)
             strncpy(format, " %24" PRIu64, sizeof(" %24" PRIu64));
             break;
 
-#if !defined(__MACH__)
+#if !defined(__MACH__) && !defined(__mips__)
         case OD_FLAGS_BYTES_UINT | OD_FLAGS_LENGTH_SHORT:
             sprintf(format, " %%%uu", (unsigned)sizeof(short) * _INT_BYTE_LENGTH);
             break;
@@ -169,7 +169,7 @@ static inline void _bytes_format(char *format, uint16_t flags)
         case OD_FLAGS_BYTES_UINT | OD_FLAGS_LENGTH_LONG:
             sprintf(format, " %%%ulu", sizeof(long) * _INT_BYTE_LENGTH);
             break;
-#else   /* !defined(__MACH__) */
+#else   /* !defined(__MACH__) && !defined(__mips__) */
         case OD_FLAGS_BYTES_UINT | OD_FLAGS_LENGTH_SHORT:
             sprintf(format, " %%%lu", sizeof(short) * _INT_BYTE_LENGTH);
             break;
@@ -177,7 +177,7 @@ static inline void _bytes_format(char *format, uint16_t flags)
         case OD_FLAGS_BYTES_UINT | OD_FLAGS_LENGTH_LONG:
             sprintf(format, " %%%lu", sizeof(long) * _INT_BYTE_LENGTH);
             break;
-#endif  /* !defined(__MACH__) */
+#endif  /* !defined(__MACH__)  && !defined(__mips__) */
 
         case OD_FLAGS_BYTES_HEX | OD_FLAGS_LENGTH_1:
             strncpy(format, " %02x", sizeof(" %02x"));
@@ -195,7 +195,7 @@ static inline void _bytes_format(char *format, uint16_t flags)
             strncpy(format, " %016" PRIx64, sizeof(" %016" PRIx64));
             break;
 
-#if !defined(__MACH__)
+#if !defined(__MACH__) && !defined(__mips__)
         case OD_FLAGS_BYTES_HEX | OD_FLAGS_LENGTH_SHORT:
             sprintf(format, " %%0%ux", (unsigned)sizeof(short) * _HEX_BYTE_LENGTH);
             break;
@@ -203,7 +203,7 @@ static inline void _bytes_format(char *format, uint16_t flags)
         case OD_FLAGS_BYTES_HEX | OD_FLAGS_LENGTH_LONG:
             sprintf(format, " %%0%ulx", (unsigned)sizeof(long) * _HEX_BYTE_LENGTH);
             break;
-#else   /* !defined(__MACH__) */
+#else   /* !defined(__MACH__) && !defined(__mips__) */
         case OD_FLAGS_BYTES_HEX | OD_FLAGS_LENGTH_SHORT:
             sprintf(format, " %%0%lx", sizeof(short) * _HEX_BYTE_LENGTH);
             break;
@@ -211,7 +211,7 @@ static inline void _bytes_format(char *format, uint16_t flags)
         case OD_FLAGS_BYTES_HEX | OD_FLAGS_LENGTH_LONG:
             sprintf(format, " %%0%lx", sizeof(long) * _HEX_BYTE_LENGTH);
             break;
-#endif  /* !defined(__MACH__) */
+#endif  /* !defined(__MACH__) && !defined(__mips__) */
 
         default:
             break;

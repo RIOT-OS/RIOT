@@ -24,7 +24,7 @@
 #include "bh1750fvi.h"
 #include "bh1750fvi_params.h"
 
-#define RATE        (200LU * MS_IN_USEC)      /* 200ms */
+#define RATE        (200LU * US_PER_MS)      /* 200ms */
 
 int main(void)
 {

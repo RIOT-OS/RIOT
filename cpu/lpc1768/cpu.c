@@ -18,6 +18,7 @@
  */
 
 #include "cpu.h"
+#include "periph/init.h"
 
 /**
  * @brief Initialize the CPU, set IRQ priorities
@@ -26,4 +27,6 @@ void cpu_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();
+    /* trigger static peripheral initialization */
+    periph_init();
 }

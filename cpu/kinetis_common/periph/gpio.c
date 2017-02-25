@@ -145,7 +145,7 @@ static inline int get_ctx(int port, int pin)
  */
 static int get_free_ctx(void)
 {
-    for (int i = 0; i < CTX_NUMOF; i++) {
+    for (unsigned int i = 0; i < CTX_NUMOF; i++) {
         if (isr_ctx[i].cb == NULL) {
             return i;
         }

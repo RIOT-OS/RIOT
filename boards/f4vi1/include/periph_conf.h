@@ -18,8 +18,8 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -51,7 +51,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer configuration
+ * @name   Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -78,7 +78,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name   UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -105,14 +105,14 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  * @{
  */
 #define ADC_NUMOF           (0)
 /** @} */
 
 /**
- * @brief   DAC configuration
+ * @name   DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)
@@ -122,5 +122,5 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

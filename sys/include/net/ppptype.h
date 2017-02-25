@@ -24,8 +24,8 @@
  */
 
 
-#ifndef PPPTYPE_H_
-#define PPPTYPE_H_
+#ifndef PPPTYPE_H
+#define PPPTYPE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,7 +44,7 @@ extern "C" {
 }
 #endif
 
-#endif /* PPPTYPE_H_ */
+#endif /* PPPTYPE_H */
 /**
  * @}
  */

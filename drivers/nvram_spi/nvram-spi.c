@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Eistec AB
+ *               2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -27,6 +28,7 @@
  * - Cypress/Ramtron FM25L04B.
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 typedef enum {
@@ -114,8 +116,9 @@ int nvram_spi_init(nvram_t *dev, nvram_spi_params_t *spi_params, size_t size)
     }
     dev->extra = spi_params;
 
-    gpio_init(spi_params->cs, GPIO_OUT);
-    gpio_set(spi_params->cs);
+    if (spi_init_cs(spi_params->spi, spi_params->cs) != SPI_OK) {
+        return -1;
+    }
 
     return 0;
 }
@@ -123,54 +126,37 @@ int nvram_spi_init(nvram_t *dev, nvram_spi_params_t *spi_params, size_t size)
 static int nvram_spi_write(nvram_t *dev, const uint8_t *src, uint32_t dst, size_t len)
 {
     nvram_spi_params_t *spi_dev = (nvram_spi_params_t *) dev->extra;
-    int status;
     union {
         uint32_t u32;
         char c[4];
     } addr;
+
     /* Address is expected by the device as big-endian, i.e. network byte order,
      * we utilize the network byte order macros here. */
     addr.u32 = HTONL(dst);
-    /* Acquire exclusive bus access */
-    spi_acquire(spi_dev->spi);
-    /* Assert CS */
-    gpio_clear(spi_dev->cs);
+
+    /* Acquire exclusive bus access while configuring clock and mode */
+    spi_acquire(spi_dev->spi, spi_dev->cs, SPI_MODE_0, spi_dev->clk);
     /* Enable writes */
-    status = spi_transfer_byte(spi_dev->spi, NVRAM_SPI_CMD_WREN, NULL);
-    if (status < 0)
-    {
-        return status;
-    }
-    /* Release CS */
-    gpio_set(spi_dev->cs);
+    spi_transfer_byte(spi_dev->spi, spi_dev->cs, false, NVRAM_SPI_CMD_WREN);
+    /* Make sure we have a minimum gap between transfers */
     xtimer_spin(NVRAM_SPI_CS_TOGGLE_TICKS);
-    /* Re-assert CS */
-    gpio_clear(spi_dev->cs);
     /* Write command and address */
-    status = spi_transfer_regs(spi_dev->spi, NVRAM_SPI_CMD_WRITE,
+    spi_transfer_byte(spi_dev->spi, spi_dev->cs, true, NVRAM_SPI_CMD_WRITE);
+    spi_transfer_bytes(spi_dev->spi, spi_dev->cs, true,
                       &addr.c[sizeof(addr.c) - spi_dev->address_count], NULL,
                       spi_dev->address_count);
-    if (status < 0)
-    {
-        return status;
-    }
-    /* Keep holding CS and write data */
-    status = spi_transfer_bytes(spi_dev->spi, (char *)src, NULL, len);
-    if (status < 0)
-    {
-        return status;
-    }
-    /* Release CS */
-    gpio_set(spi_dev->cs);
+    /* Write data (we still hold the CS line low in between) */
+    spi_transfer_bytes(spi_dev->spi, spi_dev->cs, false, src, NULL, len);
     /* Release exclusive bus access */
     spi_release(spi_dev->spi);
-    return status;
+
+    return (int)len;
 }
 
 static int nvram_spi_read(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len)
 {
     nvram_spi_params_t *spi_dev = (nvram_spi_params_t *) dev->extra;
-    int status;
     union {
         uint32_t u32;
         char c[4];
@@ -178,40 +164,31 @@ static int nvram_spi_read(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len)
     /* Address is expected by the device as big-endian, i.e. network byte order,
      * we utilize the network byte order macros here. */
     addr.u32 = HTONL(src);
-    /* Acquire exclusive bus access */
-    spi_acquire(spi_dev->spi);
-    /* Assert CS */
-    gpio_clear(spi_dev->cs);
+
+    /* Acquire exclusive bus access while configuring clock and mode */
+    spi_acquire(spi_dev->spi, spi_dev->cs, SPI_MODE_0, spi_dev->clk);
     /* Write command and address */
-    status = spi_transfer_regs(spi_dev->spi, NVRAM_SPI_CMD_READ,
+    spi_transfer_byte(spi_dev->spi, spi_dev->cs, true, NVRAM_SPI_CMD_READ);
+    spi_transfer_bytes(spi_dev->spi, spi_dev->cs, true,
                                &addr.c[sizeof(addr.c) - spi_dev->address_count],
                                NULL, spi_dev->address_count);
-    if (status < 0)
-    {
-        return status;
-    }
-    /* Keep holding CS and read data */
-    status = spi_transfer_bytes(spi_dev->spi, NULL, (char *)dst, len);
-    if (status < 0)
-    {
-        return status;
-    }
-    /* Release CS */
-    gpio_set(spi_dev->cs);
+    /* Read data (while still holding the CS line active) */
+    spi_transfer_bytes(spi_dev->spi, spi_dev->cs, false, NULL, dst, len);
     /* Release exclusive bus access */
     spi_release(spi_dev->spi);
+
     /* status contains the number of bytes actually read from the SPI bus. */
-    return status;
+    return (int)len;
 }
 
 
 static int nvram_spi_write_9bit_addr(nvram_t *dev, const uint8_t *src, uint32_t dst, size_t len)
 {
     nvram_spi_params_t *spi_dev = (nvram_spi_params_t *) dev->extra;
-    int status;
     uint8_t cmd;
     uint8_t addr;
     cmd = NVRAM_SPI_CMD_WRITE;
+
     /* The upper address bit is mixed into the command byte on certain devices,
      * probably just to save a byte in the SPI transfer protocol. */
     if (dst > 0xff) {
@@ -219,42 +196,30 @@ static int nvram_spi_write_9bit_addr(nvram_t *dev, const uint8_t *src, uint32_t 
     }
     /* LSB of address */
     addr = (dst & 0xff);
-    spi_acquire(spi_dev->spi);
-    gpio_clear(spi_dev->cs);
+
+    spi_acquire(spi_dev->spi, spi_dev->cs, SPI_MODE_0, spi_dev->clk);
     /* Enable writes */
-    status = spi_transfer_byte(spi_dev->spi, NVRAM_SPI_CMD_WREN, NULL);
-    if (status < 0)
-    {
-        return status;
-    }
-    gpio_set(spi_dev->cs);
+    spi_transfer_byte(spi_dev->spi, spi_dev->cs, false, NVRAM_SPI_CMD_WREN);
+    /* Insert needed delay between transactions */
     xtimer_spin(NVRAM_SPI_CS_TOGGLE_TICKS);
-    gpio_clear(spi_dev->cs);
     /* Write command and address */
-    status = spi_transfer_reg(spi_dev->spi, cmd, addr, NULL);
-    if (status < 0)
-    {
-        return status;
-    }
+    spi_transfer_byte(spi_dev->spi, spi_dev->cs, true, cmd);
+    spi_transfer_byte(spi_dev->spi, spi_dev->cs, true, addr);
     /* Keep holding CS and write data */
-    status = spi_transfer_bytes(spi_dev->spi, (char *)src, NULL, len);
-    if (status < 0)
-    {
-        return status;
-    }
-    gpio_set(spi_dev->cs);
+    spi_transfer_bytes(spi_dev->spi, spi_dev->cs, false, src, NULL, len);
     spi_release(spi_dev->spi);
+
     /* status contains the number of bytes actually written to the SPI bus. */
-    return status;
+    return (int)len;
 }
 
 static int nvram_spi_read_9bit_addr(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len)
 {
     nvram_spi_params_t *spi_dev = (nvram_spi_params_t *) dev->extra;
-    int status;
     uint8_t cmd;
     uint8_t addr;
     cmd = NVRAM_SPI_CMD_READ;
+
     /* The upper address bit is mixed into the command byte on certain devices,
      * probably just to save a byte in the SPI transfer protocol. */
     if (src > 0xff) {
@@ -262,24 +227,17 @@ static int nvram_spi_read_9bit_addr(nvram_t *dev, uint8_t *dst, uint32_t src, si
     }
     /* LSB of address */
     addr = (src & 0xff);
-    spi_acquire(spi_dev->spi);
-    gpio_clear(spi_dev->cs);
+
+    spi_acquire(spi_dev->spi, spi_dev->cs, SPI_MODE_0, spi_dev->clk);
     /* Write command and address */
-    status = spi_transfer_reg(spi_dev->spi, (char)cmd, addr, NULL);
-    if (status < 0)
-    {
-        return status;
-    }
+    spi_transfer_byte(spi_dev->spi, spi_dev->cs, true, cmd);
+    spi_transfer_byte(spi_dev->spi, spi_dev->cs, true, addr);
     /* Keep holding CS and read data */
-    status = spi_transfer_bytes(spi_dev->spi, NULL, (char *)dst, len);
-    if (status < 0)
-    {
-        return status;
-    }
-    gpio_set(spi_dev->cs);
+    spi_transfer_bytes(spi_dev->spi, spi_dev->cs, false, NULL, dst, len);
     spi_release(spi_dev->spi);
+
     /* status contains the number of bytes actually read from the SPI bus. */
-    return status;
+    return (int)len;
 }
 
 /** @} */

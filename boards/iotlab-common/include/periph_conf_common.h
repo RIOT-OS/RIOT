@@ -17,8 +17,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_CONF_COMMON_H_
-#define PERIPH_CONF_COMMON_H_
+#ifndef PERIPH_CONF_COMMON_H
+#define PERIPH_CONF_COMMON_H
 
 #include "periph_cpu.h"
 
@@ -40,8 +40,6 @@ extern "C" {
 #define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1      /* AHB clock -> 72MHz */
 #define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1     /* APB2 clock -> 72MHz */
 #define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV2     /* APB1 clock -> 36MHz */
-/* configuration of flash access cycles */
-#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_2
 
 /* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
 #define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
@@ -161,9 +159,32 @@ static const uart_conf_t uart_config[] = {
 #define I2C_0_SDA_PIN       GPIO_PIN(PORT_B,7)
 /** @} */
 
+/**
+ * @brief   Shared SPI clock div table
+ *
+ * @note    The spi_divtable is auto-generated from
+ *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
+ */
+static const uint8_t spi_divtable[2][5] = {
+    {       /* for APB1 @ 36000000Hz */
+        7,  /* -> 140625Hz */
+        6,  /* -> 281250Hz */
+        4,  /* -> 1125000Hz */
+        2,  /* -> 4500000Hz */
+        1   /* -> 9000000Hz */
+    },
+    {       /* for APB2 @ 72000000Hz */
+        7,  /* -> 281250Hz */
+        7,  /* -> 281250Hz */
+        5,  /* -> 1125000Hz */
+        3,  /* -> 4500000Hz */
+        2   /* -> 9000000Hz */
+    }
+};
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CONF_COMMON_H_ */
+#endif /* PERIPH_CONF_COMMON_H */
 /** @} */

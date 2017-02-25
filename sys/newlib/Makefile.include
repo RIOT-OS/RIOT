@@ -48,7 +48,7 @@ NEWLIB_INCLUDE_DIR ?= $(firstword $(wildcard $(NEWLIB_INCLUDE_PATTERNS)))
 # If nothing was found we will try to fall back to searching for a cross-gcc in
 # the current PATH and use a relative path for the includes
 ifeq (,$(NEWLIB_INCLUDE_DIR))
-  NEWLIB_INCLUDE_DIR := $(abspath $(wildcard $(dir $(shell command -v $(PREFIX)gcc))../$(TARGET_ARCH)/include))
+  NEWLIB_INCLUDE_DIR := $(abspath $(wildcard $(dir $(shell command -v $(PREFIX)gcc;))../$(TARGET_ARCH)/include))
 endif
 
 ifeq ($(TOOLCHAIN),llvm)
@@ -68,5 +68,9 @@ ifeq (1,$(USE_NEWLIB_NANO))
   INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(INCLUDES)
 endif
 
-# Newlib includes should go after GCC includes.
-export INCLUDES += $(NEWLIB_INCLUDES)
+# Newlib includes should go before GCC includes. This is especially important
+# when using Clang, because Clang will yield compilation errors on some GCC-
+# bundled headers. Clang compatible versions of those headers are already
+# provided by Newlib, so placing this directory first will eliminate those problems.
+# The above problem was observed with LLVM 3.9.1 when building against GCC 6.3.0 headers.
+export INCLUDES := $(NEWLIB_INCLUDES) $(INCLUDES)

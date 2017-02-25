@@ -40,10 +40,11 @@ function run {
     set_result $NEW_RESULT
 
     # Indent command output so that its easily discernable from the rest
-    OUT_LENGTH="$(echo -n $OUT | wc -c)"
-    if (( "$OUT_LENGTH" > 0 )); then
-        echo -e "Command output:\n"
-        (echo $OUT | while read -r line; do echo -ne "\t"; echo $line; done)
+    if [ -n "$OUT" ]; then
+        echo "Command output:"
+        echo ""
+        # Using printf to avoid problems if the command output begins with a -
+        (printf "%s\n" "$OUT" | while IFS= read -r line; do printf "\t%s\n" "$line"; done)
         echo ""
     fi
 }
@@ -77,6 +78,8 @@ then
         if [ $RESULT -ne 0 ]; then
             exit $RESULT
         fi
+
+        run ./dist/tools/ci/print_toolchain_versions.sh
 
         run ./dist/tools/whitespacecheck/check.sh ${CI_BASE_BRANCH}
         run ./dist/tools/licenses/check.sh ${CI_BASE_BRANCH} --diff-filter=MR --error-exitcode=0

@@ -1,7 +1,6 @@
 APPLICATION = board_calliope-mini
-include ../Makefile.tests_common
-
 BOARD ?= calliope-mini
+include ../Makefile.tests_common
 
 # This test application is for the Calliope mini only
 BOARD_WHITELIST := calliope-mini

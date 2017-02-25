@@ -16,8 +16,8 @@
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -42,12 +42,10 @@
 /* resulting bus clocks */
 #define CLOCK_APB1          (CLOCK_CORECLOCK / 2)
 #define CLOCK_APB2          (CLOCK_CORECLOCK)
-/* configuration of flash access cycles */
-#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_2
 /** @} */
 
  /**
-  * @brief   DAC configuration
+  * @name   DAC configuration
   * @{
   */
  #define DAC_NUMOF           (0)
@@ -61,7 +59,7 @@
 /** @} */
 
 /**
- * @brief   Timer configuration
+ * @name   Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -88,7 +86,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name   UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -108,26 +106,47 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief SPI configuration
+ * @name   SPI configuration
+ *
+ * @note    The spi_divtable is auto-generated from
+ *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-#define SPI_NUMOF           (1U)
-#define SPI_0_EN            1
+static const uint8_t spi_divtable[2][5] = {
+    {       /* for APB1 @ 36000000Hz */
+        7,  /* -> 140625Hz */
+        6,  /* -> 281250Hz */
+        4,  /* -> 1125000Hz */
+        2,  /* -> 4500000Hz */
+        1   /* -> 9000000Hz */
+    },
+    {       /* for APB2 @ 72000000Hz */
+        7,  /* -> 281250Hz */
+        7,  /* -> 281250Hz */
+        5,  /* -> 1125000Hz */
+        3,  /* -> 4500000Hz */
+        2   /* -> 9000000Hz */
+    }
+};
 
-/* SPI 0 device configuration */
-#define SPI_0_DEV           SPI1
-#define SPI_0_CLKEN()       (periph_clk_en(APB2, RCC_APB2ENR_SPI1EN))
-#define SPI_0_CLKDIS()      (periph_clk_dis(APB2, RCC_APB2ENR_SPI1EN))
-#define SPI_0_BUS_DIV       0   /* 1 -> SPI runs with full CPU clock, 0 -> half CPU clock */
-/* SPI 0 pin configuration */
-#define SPI_0_CLK_PIN       GPIO_PIN(PORT_B,15)
-#define SPI_0_MOSI_PIN      GPIO_PIN(PORT_B,17)
-#define SPI_0_MISO_PIN      GPIO_PIN(PORT_B,16)
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_B, 17),
+        .miso_pin = GPIO_PIN(PORT_B, 16),
+        .sclk_pin = GPIO_PIN(PORT_B, 15),
+        .cs_pin   = GPIO_UNDEF,
+        .rccmask  = RCC_APB2ENR_SPI1EN,
+        .apbbus   = APB2
+    }
+};
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

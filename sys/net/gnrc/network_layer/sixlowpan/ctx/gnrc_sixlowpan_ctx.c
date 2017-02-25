@@ -133,7 +133,7 @@ gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_update(uint8_t id, const ipv6_addr_t *p
 
 static uint32_t _current_minute(void)
 {
-    return xtimer_now_usec() / (SEC_IN_USEC * 60);
+    return xtimer_now_usec() / (US_PER_SEC * 60);
 }
 
 static void _update_lifetime(uint8_t id)

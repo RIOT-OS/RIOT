@@ -15,8 +15,8 @@
  *
  * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
  */
-#ifndef TESTS_SEQ_H_
-#define TESTS_SEQ_H_
+#ifndef TESTS_SEQ_H
+#define TESTS_SEQ_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_seq(void);
 }
 #endif
 
-#endif /* TESTS_SEQ_H_ */
+#endif /* TESTS_SEQ_H */
 /** @} */

@@ -54,7 +54,7 @@ int digitalRead(int pin)
     }
 }
 
-void delay(int msec)
+void delay(unsigned long msec)
 {
     xtimer_usleep(1000 * msec);
 }

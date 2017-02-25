@@ -15,8 +15,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef LWIP_CONN_H_
-#define LWIP_CONN_H_
+#ifndef LWIP_CONN_H
+#define LWIP_CONN_H
 
 #include "lwip/api.h"
 
@@ -89,5 +89,5 @@ int lwip_conn_sendto(struct netconn *netconn, const void *data, size_t len,
 }
 #endif
 
-#endif /* LWIP_CONN_H_ */
+#endif /* LWIP_CONN_H */
 /** @} */

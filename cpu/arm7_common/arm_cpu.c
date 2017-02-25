@@ -106,10 +106,3 @@ void thread_print_stack(void)
 
     printf("STACK (%d)= %X \n", i, *s);
 }
-
-void reboot(void)
-{
-    while (1) {
-        arm_reset();
-    }
-}

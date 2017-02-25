@@ -1,0 +1,6 @@
+# define the cpu used by the nucleo-f411 board
+export CPU = stm32f4
+export CPU_MODEL = stm32f411re
+
+# load the common Makefile.include for Nucleo boards
+include $(RIOTBOARD)/nucleo-common/Makefile.include

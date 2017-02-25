@@ -27,6 +27,6 @@ void udp_hdr_print(udp_hdr_t *hdr)
 {
     printf("   src-port: %5" PRIu16 "  dst-port: %5" PRIu16 "\n",
            byteorder_ntohs(hdr->src_port), byteorder_ntohs(hdr->dst_port));
-    printf("   length: %" PRIu16 "  cksum: 0x4%" PRIx16 "\n",
+    printf("   length: %" PRIu16 "  cksum: 0x%04" PRIx16 "\n",
            byteorder_ntohs(hdr->length), byteorder_ntohs(hdr->checksum));
 }

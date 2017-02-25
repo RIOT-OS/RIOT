@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup  net_gnrc
+ * @ingroup net_gnrc_netdev2
  * @{
  *
  * @file
@@ -25,8 +25,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef GNRC_NETDEV2_XBEE_ADPT_H_
-#define GNRC_NETDEV2_XBEE_ADPT_H_
+#ifndef GNRC_NETDEV2_XBEE_ADPT_H
+#define GNRC_NETDEV2_XBEE_ADPT_H
 
 #include "xbee.h"
 #include "net/gnrc/netdev2.h"
@@ -48,5 +48,5 @@ void gnrc_netdev2_xbee_init(gnrc_netdev2_t *gnrc_netdev2, xbee_t *dev);
 }
 #endif
 
-#endif /* GNRC_NETDEV2_XBEE_ADPT_H_ */
+#endif /* GNRC_NETDEV2_XBEE_ADPT_H */
 /** @} */

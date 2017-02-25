@@ -5,13 +5,6 @@ FEATURES_REQUIRED = periph_i2c
 
 USEMODULE += hdc1000
 USEMODULE += xtimer
-
-# set default device parameters in case they are undefined
-TEST_HDC1000_I2C  ?= I2C_DEV\(0\)
-TEST_HDC1000_ADDR ?= 0x43
-
-# export parameters
-CFLAGS += -DTEST_HDC1000_I2C=$(TEST_HDC1000_I2C)
-CFLAGS += -DTEST_HDC1000_ADDR=$(TEST_HDC1000_ADDR)
+USEMODULE += fmt
 
 include $(RIOTBASE)/Makefile.include

@@ -106,12 +106,6 @@ extern int _whitelist(int argc, char **argv);
 extern int _blacklist(int argc, char **argv);
 #endif
 
-#ifdef MODULE_GNRC_ZEP
-#ifdef MODULE_IPV6_ADDR
-extern int _zep_init(int argc, char **argv);
-#endif
-#endif
-
 #ifdef MODULE_GNRC_RPL
 extern int _gnrc_rpl(int argc, char **argv);
 #endif
@@ -181,7 +175,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_GNRC_NETIF
     {"ifconfig", "Configure network interfaces", _netif_config},
+#ifdef MODULE_GNRC_TXTSND
     {"txtsnd", "Sends a custom string as is over the link layer", _netif_send },
+#endif
 #endif
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
@@ -195,11 +191,6 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_GNRC_IPV6_BLACKLIST
     {"blacklist", "blacklists an address for receival ('blacklist [add|del|help]')", _blacklist },
-#endif
-#ifdef MODULE_GNRC_ZEP
-#ifdef MODULE_IPV6_ADDR
-    {"zep_init", "initializes ZEP (Zigbee Encapsulation Protocol)", _zep_init },
-#endif
 #endif
 #ifdef MODULE_GNRC_RPL
     {"rpl", "rpl configuration tool ('rpl help' for more information)", _gnrc_rpl },

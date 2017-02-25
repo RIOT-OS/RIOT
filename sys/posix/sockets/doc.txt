@@ -8,7 +8,7 @@
 
 /**
  * @defgroup posix_sockets  POSIX sockets
- * @brief   POSIX socket wrapper of RIOT's @ref net_conn
+ * @brief   POSIX socket wrapper of RIOT's @ref net_sock
  * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/">
  *          The Open Group Specifications Issue 7
  *      </a>

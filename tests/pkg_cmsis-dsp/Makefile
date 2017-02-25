@@ -1,4 +1,5 @@
-APPLICATION = test-cmsis-dsp
+APPLICATION = cmsis-dsp
+BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
 USEPKG += cmsis-dsp
@@ -14,6 +15,7 @@ BOARD_WHITELIST := \
   msbiot \
   mulle \
   nucleo-f091 \
+  nucleo-f103 \
   nucleo-f103 \
   nucleo-f303 \
   nucleo-f334 \

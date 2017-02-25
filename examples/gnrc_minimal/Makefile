@@ -7,21 +7,21 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h
+BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo32-f031
 
 ## Uncomment to support the XBee module
 #USEMODULE += xbee
 
 ## set default UART to use in case none was defined
-#XBEE_UART ?= "UART_NUMOF-1"
+#XBEE_UART ?= "1"
 
 ## export UART to params file
 #CFLAGS += -DXBEE_UART=$(XBEE_UART)
 
-## add current directory to the include path. Putting it in CFLAGS will make
-## it go to the beginning, before the standard includes.
-## That way xbee_params.h get's included and auto configuration can pick it up.
-#CFLAGS += -I$(CURDIR)
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+CFLAGS += -DDEVELHELP
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present

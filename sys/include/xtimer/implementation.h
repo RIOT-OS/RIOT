@@ -16,8 +16,8 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-#ifndef XTIMER_IMPLEMENTATION_H_
-#define XTIMER_IMPLEMENTATION_H_
+#ifndef XTIMER_IMPLEMENTATION_H
+#define XTIMER_IMPLEMENTATION_H
 
 #ifndef XTIMER_H
 #error "Do not include this file directly! Use xtimer.h instead"
@@ -168,12 +168,12 @@ static inline void xtimer_usleep64(uint64_t microseconds)
 
 static inline void xtimer_sleep(uint32_t seconds)
 {
-    _xtimer_tsleep64(_xtimer_ticks_from_usec64((uint64_t)seconds * SEC_IN_USEC));
+    _xtimer_tsleep64(_xtimer_ticks_from_usec64((uint64_t)seconds * US_PER_SEC));
 }
 
 static inline void xtimer_nanosleep(uint32_t nanoseconds)
 {
-    _xtimer_tsleep32(_xtimer_ticks_from_usec(nanoseconds / USEC_IN_NS));
+    _xtimer_tsleep32(_xtimer_ticks_from_usec(nanoseconds / NS_PER_US));
 }
 
 static inline void xtimer_tsleep32(xtimer_ticks32_t ticks)
@@ -302,4 +302,4 @@ static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b)
 }
 #endif
 
-#endif
+#endif /* XTIMER_IMPLEMENTATION_H */

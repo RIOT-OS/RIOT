@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NRFMIN_GNRC_H_
-#define NRFMIN_GNRC_H_
+#ifndef NRFMIN_GNRC_H
+#define NRFMIN_GNRC_H
 
 #include "nrfmin.h"
 
@@ -44,5 +44,5 @@ void gnrc_netdev2_nrfmin_init(void);
 }
 #endif
 
-#endif /* NRFMIN_GNRC_H_ */
+#endif /* NRFMIN_GNRC_H */
 /** @} */

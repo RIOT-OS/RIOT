@@ -17,7 +17,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon nrf51dongle nrf6310 nucleo-f103 \
                              nucleo-f334 pca10000 pca10005 spark-core \
                              stm32f0discovery weio yunjia-nrf51822 nucleo-f072 \
                              cc2650stk nucleo-f030 nucleo-f070 microbit \
-                             calliope-mini nucleo-f042
+                             calliope-mini nucleo32-f042 nucleo32-f303 opencm9-04 \
+                             maple-mini nucleo32-f031
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present

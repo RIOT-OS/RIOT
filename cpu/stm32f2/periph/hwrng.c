@@ -36,11 +36,12 @@ void hwrng_init(void)
 }
 
 
-void hwrng_read(uint8_t *buf, unsigned int num)
+void hwrng_read(void *buf, unsigned int num)
 {
     /* cppcheck-suppress variableScope */
     uint32_t tmp;
     unsigned int count = 0;
+    uint8_t *b = (uint8_t *)buf;
 
     /* enable RNG reset state */
     periph_clk_en(AHB2, RCC_AHB2ENR_RNGEN);
@@ -54,7 +55,7 @@ void hwrng_read(uint8_t *buf, unsigned int num)
         tmp = RNG->DR;
         /* copy data into result vector */
         for (int i = 0; i < 4 && count < num; i++) {
-            buf[count++] = (uint8_t)tmp;
+            b[count++] = (uint8_t)tmp;
             tmp = tmp >> 8;
         }
     }

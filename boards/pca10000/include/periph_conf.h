@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -83,7 +83,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  *
  * The configuration consists simply of a list of channels that should be used
  * @{
@@ -105,4 +105,4 @@ static const timer_conf_t timer_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Inria
+ *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -33,14 +34,14 @@ extern "C" {
  * @{
  */
 #ifndef BMP180_PARAM_I2C_DEV
-#define BMP180_PARAM_I2C_DEV         (0)
+#define BMP180_PARAM_I2C_DEV         I2C_DEV(0)
 #endif
 #ifndef BMP180_PARAM_MODE
 #define BMP180_PARAM_MODE            BMP180_ULTRALOWPOWER
 #endif
 
-#define BMP180_PARAMS_DEFAULT        {.i2c_dev = BMP180_PARAM_I2C_DEV,  \
-                                      .mode    = BMP180_PARAM_MODE }
+#define BMP180_PARAMS_DEFAULT        { .i2c_dev = BMP180_PARAM_I2C_DEV,  \
+                                       .mode    = BMP180_PARAM_MODE }
 /**@}*/
 
 /**
@@ -53,6 +54,17 @@ static const bmp180_params_t bmp180_params[] =
 #else
     BMP180_PARAMS_DEFAULT,
 #endif
+};
+
+/**
+ * @brief   Configure SAUL registry entries
+ */
+static const saul_reg_info_t bmp180_saul_reg_info[][2] =
+{
+    {
+        { .name = "bmp180-temp" },
+        { .name = "bmp180-press" }
+    }
 };
 
 #ifdef __cplusplus

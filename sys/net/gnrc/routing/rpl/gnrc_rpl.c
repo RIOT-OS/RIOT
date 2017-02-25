@@ -32,7 +32,7 @@
 static char _stack[GNRC_RPL_STACK_SIZE];
 kernel_pid_t gnrc_rpl_pid = KERNEL_PID_UNDEF;
 const ipv6_addr_t ipv6_addr_all_rpl_nodes = GNRC_RPL_ALL_NODES_ADDR;
-static uint32_t _lt_time = GNRC_RPL_LIFETIME_UPDATE_STEP * SEC_IN_USEC;
+static uint32_t _lt_time = GNRC_RPL_LIFETIME_UPDATE_STEP * US_PER_SEC;
 static xtimer_t _lt_timer;
 static msg_t _lt_msg = { .type = GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE };
 static msg_t _msg_q[GNRC_RPL_MSG_QUEUE_SIZE];
@@ -253,7 +253,7 @@ static void *_event_loop(void *args)
 void _update_lifetime(void)
 {
     uint32_t now = xtimer_now_usec();
-    uint16_t now_sec = now / SEC_IN_USEC;
+    uint16_t now_sec = now / US_PER_SEC;
 
     gnrc_rpl_parent_t *parent;
     gnrc_rpl_instance_t *inst;

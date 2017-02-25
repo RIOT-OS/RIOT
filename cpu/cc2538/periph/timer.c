@@ -65,6 +65,9 @@ static const int IRQn_lut[GPTIMER_NUMOF] = {
     GPTIMER_3A_IRQn
 };
 
+/* enable timer interrupts */
+static inline void _irq_enable(tim_t dev);
+
 /**
  * @brief Setup the given timer
  *
@@ -142,7 +145,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     }
 
     /* Enable interrupts for given timer: */
-    timer_irq_enable(dev);
+    _irq_enable(dev);
 
     return 0;
 }
@@ -274,7 +277,7 @@ void timer_start(tim_t dev)
     }
 }
 
-void timer_irq_enable(tim_t dev)
+static inline void _irq_enable(tim_t dev)
 {
     DEBUG("%s(%u)\n", __FUNCTION__, dev);
 
@@ -288,22 +291,6 @@ void timer_irq_enable(tim_t dev)
             irqn++;
             NVIC_SetPriority(irqn, TIMER_IRQ_PRIO);
             NVIC_EnableIRQ(irqn);
-        }
-    }
-}
-
-void timer_irq_disable(tim_t dev)
-{
-    DEBUG("%s(%u)\n", __FUNCTION__, dev);
-
-    if (dev < TIMER_NUMOF) {
-        IRQn_Type irqn = IRQn_lut[GPTIMER_GET_NUM(timer_config[dev].dev)];
-
-        NVIC_DisableIRQ(irqn);
-
-        if (timer_config[dev].channels == 2) {
-            irqn++;
-            NVIC_DisableIRQ(irqn);
         }
     }
 }

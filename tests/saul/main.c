@@ -26,7 +26,7 @@
 /**
  * @brief   Read th sensors every second
  */
-#define INTERVAL            (1LU * SEC_IN_USEC)
+#define INTERVAL            (1LU * US_PER_SEC)
 
 
 int main(void)
@@ -46,9 +46,12 @@ int main(void)
 
         while (dev) {
             int dim = saul_reg_read(dev, &res);
+            printf("\nDev: %s\tType: %s\n", dev->name,
+                   saul_class_to_str(dev->driver->type));
             phydat_dump(&res, dim);
             dev = dev->next;
         }
+        puts("\n##########################");
 
         xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
     }

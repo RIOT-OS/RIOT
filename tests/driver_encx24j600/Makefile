@@ -1,9 +1,9 @@
-export APPLICATION = driver_encx24j600
+APPLICATION = driver_encx24j600
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_spi periph_gpio
 
-BOARD_INSUFFICIENT_MEMORY := msb-430h stm32f0discovery telosb weio z1
+BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h stm32f0discovery telosb weio z1
 
 USEMODULE += gnrc_netdev2
 USEMODULE += gnrc_netdev_default
@@ -22,13 +22,13 @@ CFLAGS += -DGNRC_PKTBUF_SIZE=2048
 ifneq (,$(filter nucleo-f334,$(BOARD)))
 # these settings are probably valid for PoEll-i on most nucelo boards, but
 # tested only on nucleo-f334
-  ENC_SPI ?= SPI_0
+  ENC_SPI ?= SPI_DEV\(0\)
   ENC_CS  ?= GPIO_PIN\(PORT_C,10\)
   ENC_INT ?= GPIO_PIN\(PORT_D,2\)
 endif
 
 # fallback: set SPI bus and pins to default values
-ENC_SPI ?= SPI_0
+ENC_SPI ?= SPI_DEV\(0\)
 ENC_CS  ?= GPIO_PIN\(0,0\)
 ENC_INT ?= GPIO_PIN\(0,1\)
 # export SPI and pins

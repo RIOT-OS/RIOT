@@ -18,8 +18,8 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "board_common.h"
 
@@ -41,5 +41,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

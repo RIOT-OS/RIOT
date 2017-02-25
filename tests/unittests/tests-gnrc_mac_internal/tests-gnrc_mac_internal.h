@@ -15,8 +15,8 @@
  *
  * @author      Shuguo Zhuo <shuguo.zhuo@inria.fr>
  */
-#ifndef TESTS_PRIORITY_PKTQUEUE_H_
-#define TESTS_PRIORITY_PKTQUEUE_H_
+#ifndef TESTS_PRIORITY_PKTQUEUE_H
+#define TESTS_PRIORITY_PKTQUEUE_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_gnrc_mac_internal(void);
 }
 #endif
 
-#endif /* TESTS_PRIORITY_PKTQUEUE_H_ */
+#endif /* TESTS_PRIORITY_PKTQUEUE_H */
 /** @} */

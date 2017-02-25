@@ -98,13 +98,15 @@ void rtc_init(void)
     while (RTC->MODE2.CTRLA.bit.SWRST);
 
     /* RTC config with RTC_MODE2_CTRL_CLKREP = 0 (24h) */
-    RTC->MODE2.CTRLA.reg = RTC_MODE2_CTRLA_PRESCALER_DIV1024 |   /* CLK_RTC_CNT = 1KHz / 1024 -> 1Hz */
-                           RTC_MODE2_CTRLA_MODE_CLOCK |          /* Mode 2: Clock/Calendar */
-                           RTC_MODE2_CTRLA_SYNCDIS;              /* Clock Read Synchronization Enable */
+    RTC->MODE2.CTRLA.reg = RTC_MODE2_CTRLA_PRESCALER_DIV1024 |  /* CLK_RTC_CNT = 1KHz / 1024 -> 1Hz */
+#if (SAML21XXXB) || (SAMR30)
+                           RTC_MODE2_CTRLA_CLOCKSYNC         |  /* Clock Read Synchronization Enable */
+#endif
+                           RTC_MODE2_CTRLA_MODE_CLOCK;          /* Mode 2: Clock/Calendar */
 
     /* Clear interrupt flags */
-    RTC->MODE2.INTFLAG.bit.OVF = 1;
-    RTC->MODE2.INTFLAG.bit.ALARM0 = 1;
+    RTC->MODE2.INTFLAG.reg |= RTC_MODE2_INTFLAG_OVF;
+    RTC->MODE2.INTFLAG.reg |= RTC_MODE2_INTFLAG_ALARM0;
 
     rtc_poweron();
 }
@@ -169,7 +171,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     /* Enable IRQ */
     rtc_callback.cb = cb;
     rtc_callback.arg = arg;
-    RTC->MODE2.INTFLAG.bit.ALARM0 = 1;
+    RTC->MODE2.INTFLAG.reg |= RTC_MODE2_INTFLAG_ALARM0;
     RTC->MODE2.INTENSET.bit.ALARM0 = 1;
 
     return 0;
@@ -220,11 +222,11 @@ void isr_rtc(void)
     if (RTC->MODE2.INTFLAG.bit.ALARM0) {
         rtc_callback.cb(rtc_callback.arg);
         /* clear flag */
-        RTC->MODE2.INTFLAG.bit.ALARM0 = 1;
+        RTC->MODE2.INTFLAG.reg |= RTC_MODE2_INTFLAG_ALARM0;
     }
     if (RTC->MODE2.INTFLAG.bit.OVF) {
         /* clear flag */
-        RTC->MODE2.INTFLAG.bit.OVF = 1;
+        RTC->MODE2.INTFLAG.reg |= RTC_MODE2_INTFLAG_OVF;
         /* At 1Hz, RTC goes till 63 years (2^5, see 17.8.22 in datasheet)
         * Start RTC again with reference_year 64 years more (Be careful with alarm set) */
         reference_year += 64;

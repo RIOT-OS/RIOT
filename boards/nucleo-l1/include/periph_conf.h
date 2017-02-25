@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2014-2016 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -17,8 +17,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -63,7 +63,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Timer configuration
+ * @name   Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -86,9 +86,10 @@ static const timer_conf_t timer_config[] = {
  * @{
  */
 #define RTC_NUMOF           (1U)
+/** @} */
 
 /**
- * @brief   UART configuration
+ * @name   UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -110,25 +111,43 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief SPI configuration
+ * @name   SPI configuration
+ *
+ * @note    The spi_divtable is auto-generated from
+ *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-#define SPI_NUMOF           (1U)
-#define SPI_0_EN            1
+static const uint8_t spi_divtable[2][5] = {
+    {       /* for APB1 @ 32000000Hz */
+        7,  /* -> 125000Hz */
+        5,  /* -> 500000Hz */
+        4,  /* -> 1000000Hz */
+        2,  /* -> 4000000Hz */
+        1   /* -> 8000000Hz */
+    },
+    {       /* for APB2 @ 32000000Hz */
+        7,  /* -> 125000Hz */
+        5,  /* -> 500000Hz */
+        4,  /* -> 1000000Hz */
+        2,  /* -> 4000000Hz */
+        1   /* -> 8000000Hz */
+    }
+};
 
-/* SPI 0 device configuration */
-#define SPI_0_DEV           SPI1
-#define SPI_0_CLKEN()       (periph_clk_en(APB2, RCC_APB2ENR_SPI1EN))
-#define SPI_0_CLKDIS()      (periph_clk_dis(APB2, RCC_APB2ENR_SPI1EN))
-#define SPI_0_IRQ           SPI1_IRQn
-#define SPI_0_ISR           isr_spi1
-/* SPI 0 pin configuration */
-#define SPI_0_PORT_CLKEN()  (periph_clk_en(AHB, RCC_AHBENR_GPIOAEN))
-#define SPI_0_PORT          GPIOA
-#define SPI_0_PIN_SCK       5
-#define SPI_0_PIN_MOSI      7
-#define SPI_0_PIN_MISO      6
-#define SPI_0_PIN_AF        5
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_A, 7),
+        .miso_pin = GPIO_PIN(PORT_A, 6),
+        .sclk_pin = GPIO_PIN(PORT_A, 5),
+        .cs_pin   = GPIO_UNDEF,
+        .af       = GPIO_AF5,
+        .rccmask  = RCC_APB2ENR_SPI1EN,
+        .apbbus   = APB2
+    }
+};
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**
@@ -163,5 +182,5 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

@@ -2,6 +2,10 @@ PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/tinydtls
 
 INCLUDES += -I$(PKG_BUILDDIR)
 
+ifeq ($(shell uname -s),Darwin)
+    CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function
+endif
+
 ifneq (,$(filter tinydtls_aes,$(USEMODULE)))
   DIRS += $(PKG_BUILDDIR)/aes
 endif

@@ -31,12 +31,12 @@
 #define MSG_TICK                (0xaffe)
 
 /* define sleep and timeout intervals */
-#define MIN_TO_USEC(min)        (60UL * min * SEC_IN_USEC)
+#define MIN_TO_USEC(min)        (60UL * min * US_PER_SEC)
 #define INT_LONG_MSG            (MIN_TO_USEC(14))
 #define INT_LONG_SLEEP          (MIN_TO_USEC(18))
 #define INT_MID_MSG             (MIN_TO_USEC(3))
 #define INT_MID_SLEEP           (MIN_TO_USEC(5))
-#define INT_SHORT               (50UL * MS_IN_USEC)
+#define INT_SHORT               (50UL * US_PER_MS)
 
 /* and some timeout conditions */
 #define SHORT_MIN_REACHED       (60 * 20)    /* 60 * 20 * 50ms = 1min */

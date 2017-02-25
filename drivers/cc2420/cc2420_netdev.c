@@ -116,8 +116,7 @@ static int _init(netdev2_t *netdev)
     gpio_init_int(dev->params.pin_fifop, GPIO_IN, GPIO_RISING, _irq_handler, dev);
 
     /* initialize the chip select line and the SPI bus */
-    gpio_init(dev->params.pin_cs, GPIO_OUT);
-    gpio_set(dev->params.pin_cs);
+    spi_init_cs(dev->params.spi, dev->params.pin_cs);
 
     /* power on and toggle reset */
     gpio_set(dev->params.pin_vrefen);
