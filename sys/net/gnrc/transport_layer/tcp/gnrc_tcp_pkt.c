@@ -16,17 +16,19 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  * @}
  */
-#include <stdlib.h>
+#include <string.h>
 #include <utlist.h>
 #include <errno.h>
-#include "msg.h"
+#include "byteorder.h"
 #include "net/inet_csum.h"
 #include "net/gnrc/pktbuf.h"
-#include "net/gnrc/tcp.h"
 #include "internal/common.h"
-#include "internal/pkt.h"
 #include "internal/option.h"
-#include "internal/eventloop.h"
+#include "internal/pkt.h"
+
+#ifdef MODULE_GNRC_IPV6
+#include "net/gnrc/ipv6.h"
+#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"

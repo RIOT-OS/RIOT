@@ -17,24 +17,10 @@
  * @}
  */
 
-#include <stdint.h>
 #include <errno.h>
 #include <utlist.h>
-#include "msg.h"
-#include "assert.h"
-#include "thread.h"
-#include "byteorder.h"
-#include "random.h"
-#include "xtimer.h"
-#include "mutex.h"
-#include "ringbuffer.h"
 #include "net/af.h"
-#include "net/gnrc/nettype.h"
-#include "net/gnrc/netapi.h"
-#include "net/gnrc/netreg.h"
-#include "net/gnrc/pktbuf.h"
 #include "net/gnrc/tcp.h"
-
 #include "internal/common.h"
 #include "internal/fsm.h"
 #include "internal/pkt.h"

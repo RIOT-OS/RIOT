@@ -8,8 +8,8 @@
 
 #include <stdio.h>
 #include <errno.h>
+#include "thread.h"
 #include "net/af.h"
-#include "random.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/tcp.h"
 

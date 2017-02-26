@@ -23,11 +23,12 @@
 #define GNRC_TCP_TCB_H
 
 #include <stdint.h>
-#include <ringbuffer.h>
-#include <xtimer.h>
-#include <mutex.h>
-#include <msg.h>
-#include "net/gnrc.h"
+#include "kernel_types.h"
+#include "ringbuffer.h"
+#include "xtimer.h"
+#include "mutex.h"
+#include "msg.h"
+#include "net/gnrc/pkt.h"
 #include "config.h"
 
 #ifdef MODULE_GNRC_IPV6

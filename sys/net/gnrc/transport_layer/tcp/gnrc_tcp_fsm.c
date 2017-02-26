@@ -17,16 +17,13 @@
  * @}
  */
 
-#include "msg.h"
 #include "random.h"
-#include "ringbuffer.h"
 #include "net/af.h"
-
 #include "internal/common.h"
-#include "internal/fsm.h"
 #include "internal/pkt.h"
 #include "internal/option.h"
 #include "internal/rcvbuf.h"
+#include "internal/fsm.h"
 
 #ifdef MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"

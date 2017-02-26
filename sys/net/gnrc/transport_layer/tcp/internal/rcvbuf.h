@@ -24,7 +24,6 @@
 
 #include <stdint.h>
 #include "mutex.h"
-#include "ringbuffer.h"
 #include "net/gnrc/tcp/config.h"
 #include "net/gnrc/tcp/tcb.h"
 

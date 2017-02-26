@@ -22,10 +22,9 @@
 #ifndef GNRC_TCP_INTERNAL_FSM_H
 #define GNRC_TCP_INTERNAL_FSM_H
 
-#include <errno.h>
-#include "net/gnrc/pktbuf.h"
+#include <stdint.h>
 #include "net/gnrc/pkt.h"
-#include "net/gnrc/tcp.h"
+#include "net/gnrc/tcp/tcb.h"
 
 #ifdef __cplusplus
 extern "C" {

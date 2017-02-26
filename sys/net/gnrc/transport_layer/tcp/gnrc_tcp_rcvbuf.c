@@ -21,7 +21,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-rcvbuf_t _static_buf; /**< Staticly allocated receive buffers */
+rcvbuf_t _static_buf;   /**< Staticly allocated receive buffers */
 
 void _rcvbuf_init(void)
 {

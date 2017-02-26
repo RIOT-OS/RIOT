@@ -22,9 +22,10 @@
 #ifndef GNRC_TCP_INTERNAL_OPTION_H
 #define GNRC_TCP_INTERNAL_OPTION_H
 
+#include <stdint.h>
 #include "assert.h"
 #include "net/tcp.h"
-#include "net/gnrc/tcp.h"
+#include "net/gnrc/tcp/tcb.h"
 
 #ifdef __cplusplus
 extern "C" {

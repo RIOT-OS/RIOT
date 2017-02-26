@@ -22,7 +22,9 @@
 #ifndef GNRC_TCP_INTERNAL_PKT_H
 #define GNRC_TCP_INTERNAL_PKT_H
 
-#include "net/conn/tcp.h"
+#include <stdint.h>
+#include "net/gnrc/pkt.h"
+#include "net/gnrc/tcp/tcb.h"
 
 #ifdef __cplusplus
 extern "C" {

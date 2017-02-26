@@ -22,9 +22,8 @@
 #ifndef GNRC_TCP_H
 #define GNRC_TCP_H
 
-#include "net/tcp.h"
-#include "net/gnrc/netapi.h"
-#include "net/gnrc/nettype.h"
+#include <stdint.h>
+#include "net/gnrc/pkt.h"
 #include "net/gnrc/tcp/tcb.h"
 
 #ifdef MODULE_GNRC_IPV6

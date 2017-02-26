@@ -21,12 +21,9 @@
 #include <errno.h>
 #include "net/af.h"
 #include "net/tcp.h"
-#include "net/gnrc/pkt.h"
-#include "net/gnrc/tcp.h"
 #include "internal/common.h"
 #include "internal/pkt.h"
 #include "internal/fsm.h"
-#include "internal/option.h"
 #include "internal/eventloop.h"
 
 #ifdef MODULE_GNRC_IPV6
