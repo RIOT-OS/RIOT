@@ -90,6 +90,8 @@ void delay(unsigned long msec);
  * @return a value between 0 to 1023 that is proportionnal
  * to the voltage applied to the pin
  */
+#ifdef ADC_NUMOF
 int analogRead(int pin);
+#endif
 #endif /* ARDUINO_H */
 /** @} */
