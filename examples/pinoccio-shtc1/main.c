@@ -4,13 +4,24 @@
 #include <avr/io.h>
 #include "xtimer.h"
 #include <stdio.h>
+#include "periph/i2c.h"
 
 int main (void)
 {
 	DDRD |= (1<<PD0);
 	DDRE |= (1<<PE4);
 	PORTE &= ~(1<<PE4);
-	xtimer_sleep(1);
+
+	uint8_t data[] = { 0xEF, 0xC8 };
+	uint8_t received[3];
+	i2c_init_master(I2C_0, I2C_SPEED_NORMAL);
+	i2c_write_bytes(I2C_0, 0x70, data, 2);
+	i2c_read_bytes(I2C_0, 0x70, received, 3);
+
+	printf("%u \n", received[0]);
+	printf("%u \n", received[1]);
+	printf("%u \n", received[2]);
+/*	xtimer_sleep(1);
 	TWSR = 0x00;
 	TWBR = 32;
 	TWCR = (1<<TWINT)|(1<<TWSTA)|(1<<TWEN);
@@ -55,7 +66,7 @@ int main (void)
 	TWCR = (1<<TWINT)|(1<<TWEN)|(1<<TWEA);
 	while ((TWCR & (1<<TWINT)) == 0);
 	printf("CRC: %u \n", TWDR);
-
+*/
 	//sht11_val_t sht11;
 	//sht11_init();
 	/*uint8_t value;

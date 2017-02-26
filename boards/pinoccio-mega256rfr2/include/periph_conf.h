@@ -19,6 +19,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
+#include "mutex.h"
+#include "periph_cpu.h"
+#include <util/twi.h>
 
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
@@ -84,6 +87,23 @@ extern "C" {
 #define UART_1_ISR          USART1_RX_vect
 /** @} */
 
+
+/**
+ * @brief I2C configuartion
+ */
+#define I2C_NUMOF		(1U)
+#define I2C_0			(0)
+
+static uint8_t mask_value = 0x00;
+static mutex_t my_mutex = MUTEX_INIT;
+static const i2c_conf_t i2c_config[] = {
+		{
+				.scl_pin = GPIO_PIN(PORT_D, 0),
+				.sda_pin = GPIO_PIN(PORT_D, 1),
+				.mask = &mask_value,
+				.used = &my_mutex
+		}
+};
 
 /**
  * @brief SPI configuration

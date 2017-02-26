@@ -23,6 +23,7 @@
 #define PERIPH_CPU_H_
 
 #include "periph_cpu_common.h"
+#include "mutex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,6 +41,19 @@ enum {
     PORT_F = 5,       /**< port F */
     PORT_G = 6,       /**< port G */
 };
+
+/**
+ * Struct definition for I2C
+ */
+typedef unsigned int gpio_t;
+
+typedef struct{
+	gpio_t scl_pin;
+	gpio_t sda_pin;
+	uint8_t *mask;
+	mutex_t *used;
+} i2c_conf_t;
+
 
 #ifdef __cplusplus
 }
