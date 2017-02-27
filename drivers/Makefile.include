@@ -100,3 +100,6 @@ endif
 ifneq (,$(filter sdcard_spi,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/sdcard_spi/include
 endif
+ifneq (,$(filter veml6070,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/veml6070/include
+endif
