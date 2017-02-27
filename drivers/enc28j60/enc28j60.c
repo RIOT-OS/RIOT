@@ -21,7 +21,7 @@
 #include <errno.h>
 #include <string.h>
 
-#include "uuid.h"
+#include "luid.h"
 #include "mutex.h"
 #include "xtimer.h"
 #include "assert.h"
@@ -373,7 +373,7 @@ static int nd_init(netdev2_t *netdev)
     cmd_wcr(dev, REG_B2_MAIPGL, 2, MAIPGL_FD);
     /* set default MAC address */
     uint8_t macbuf[ETHERNET_ADDR_LEN];
-    uuid_get(macbuf, ETHERNET_ADDR_LEN);
+    luid_get(macbuf, ETHERNET_ADDR_LEN);
     macbuf[0] |= 0x02;      /* locally administered address */
     macbuf[0] &= ~0x01;     /* unicast address */
     mac_set(dev, macbuf);

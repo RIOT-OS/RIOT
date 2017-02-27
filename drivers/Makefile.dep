@@ -8,7 +8,7 @@ endif
 ifneq (,$(filter at86rf2%,$(USEMODULE)))
   USEMODULE += at86rf2xx
   USEMODULE += xtimer
-  USEMODULE += uuid
+  USEMODULE += luid
   USEMODULE += netif
   USEMODULE += ieee802154
   USEMODULE += netdev2_ieee802154
@@ -21,7 +21,7 @@ endif
 
 ifneq (,$(filter mrf24j40,$(USEMODULE)))
   USEMODULE += xtimer
-  USEMODULE += uuid
+  USEMODULE += luid
   USEMODULE += netif
   USEMODULE += ieee802154
   USEMODULE += netdev2_ieee802154
@@ -49,7 +49,7 @@ endif
 
 ifneq (,$(filter cc110x,$(USEMODULE)))
   USEMODULE += ieee802154
-  USEMODULE += uuid
+  USEMODULE += luid
   USEMODULE += xtimer
   ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
     USEMODULE += gnrc_cc110x
@@ -61,7 +61,7 @@ endif
 
 ifneq (,$(filter cc2420,$(USEMODULE)))
   USEMODULE += xtimer
-  USEMODULE += uuid
+  USEMODULE += luid
   USEMODULE += netif
   USEMODULE += ieee802154
   USEMODULE += netdev2_ieee802154
@@ -82,7 +82,7 @@ endif
 ifneq (,$(filter enc28j60,$(USEMODULE)))
   USEMODULE += netdev2_eth
   USEMODULE += xtimer
-  USEMODULE += uuid
+  USEMODULE += luid
 endif
 
 ifneq (,$(filter encx24j600,$(USEMODULE)))
@@ -114,7 +114,7 @@ ifneq (,$(filter jc42,$(USEMODULE)))
 endif
 
 ifneq (,$(filter kw2xrf,$(USEMODULE)))
-    USEMODULE += uuid
+    USEMODULE += luid
     USEMODULE += netif
     USEMODULE += ieee802154
     USEMODULE += netdev2_ieee802154
@@ -186,7 +186,7 @@ endif
 
 ifneq (,$(filter w5100,$(USEMODULE)))
   USEMODULE += netdev2_eth
-  USEMODULE += uuid
+  USEMODULE += luid
 endif
 
 ifneq (,$(filter xbee,$(USEMODULE)))

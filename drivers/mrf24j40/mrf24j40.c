@@ -20,7 +20,7 @@
  * @}
  */
 
-#include "uuid.h"
+#include "luid.h"
 #include "byteorder.h"
 #include "net/gnrc.h"
 #include "mrf24j40_registers.h"
@@ -51,7 +51,7 @@ void mrf24j40_reset(mrf24j40_t *dev)
     dev->netdev.flags = 0;
 
     /* get an 8-byte unique ID to use as hardware address */
-    uuid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
+    luid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
     addr_long.uint8[0] &= ~(0x01);
     addr_long.uint8[0] |=  (0x02);
     /* set short and long address */
