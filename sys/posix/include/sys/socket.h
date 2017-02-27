@@ -26,8 +26,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef _SYS_SOCKET_H
-#define _SYS_SOCKET_H
+#ifndef SYS_SOCKET_H
+#define SYS_SOCKET_H
 
 #ifdef CPU_NATIVE
 /* Ignore Linux definitions in native */

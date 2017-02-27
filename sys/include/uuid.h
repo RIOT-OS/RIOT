@@ -50,8 +50,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef UUID_H_
-#define UUID_H_
+#ifndef UUID_H
+#define UUID_H
 
 #include <stddef.h>
 
@@ -115,5 +115,5 @@ void uuid_base(void *buf, size_t len);
 }
 #endif
 
-#endif /* UUID_H_ */
+#endif /* UUID_H */
 /** @} */
