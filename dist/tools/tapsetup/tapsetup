@@ -185,7 +185,7 @@ case "$(uname -s)" in
     Darwin)
         PLATFORM="OSX"
         if echo "$BRNAME" | grep -v -q "^bridge"; then
-            BRNAME=bridge0
+            BRNAME=bridge42
         fi ;;
     FreeBSD)
         PLATFORM="FreeBSD"
