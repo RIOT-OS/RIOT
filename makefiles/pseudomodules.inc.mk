@@ -60,5 +60,9 @@ PSEUDOMODULES += sock_udp
 PSEUDOMODULES += at86rf23%
 PSEUDOMODULES += at86rf21%
 
+# include variants of the BMX280 drivers as pseudo modules
+PSEUDOMODULES += bmp280
+PSEUDOMODULES += bme280
+
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%
