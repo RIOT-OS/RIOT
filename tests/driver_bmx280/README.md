@@ -1,12 +1,12 @@
 ## About
-This is a test application for the BME280 Pressure, Temperature and
-Humidity sensor.
+This is a test application for the BME280 and BMP280 sensors. Both can measure
+pressure and temperature. The BME280 can also measure relative humidity.
 
 ## Usage
-The application will initialize the BME280 device and display its
+The application will initialize the BME280/BMP280 device and display its
 calibration coefficients. More information can be found on the
-[Bosch website][1]
-And in this [BST-BME280_DS001-11 datasheet] [2]
+[Bosch website][1], in the [BST-BME280_DS001-11 datasheet] [2] and in the
+[BST-BMP280-DS001-12  datasheet] [3].
 
 Notice that it is necessary to first read the temperature even if only one
 of the other values (humidity or pressure) is needed. This is described in
@@ -15,7 +15,7 @@ the above mentioned datasheet.
 After initialization, every 2 seconds, the application:
 * reads and displays the temperature (d°C);
 * reads and displays the pressure (Pa);
-* reads and displays the humidity (%rH);
+* reads and displays the humidity (%rH) (only with bme280);
 
 ## Overruling default parameters
 
@@ -25,6 +25,14 @@ can build the test as follows:
     export CFLAGS=-DBME280_PARAM_I2C_ADDR=0x76
     make -C tests/driver_bme280 BOARD=sodaq-autonomo
 
+By default, the test application is built to use the bme280 module, to build it for
+the bmp280, in the Makefile change `USEMODULE += bme280` with:
+
+    USEMODULE += bmp280
+
+
 [1]: http://www.bosch-sensortec.com/en/bst/products/all_products/bme280
 
 [2]: https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME280_DS001-11.pdf
+
+[3]: https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BMP280-DS001-12.pdf

@@ -1,4 +1,4 @@
-APPLICATION = driver_bme280
+APPLICATION = driver_bmx280
 include ../Makefile.tests_common
 
 USEMODULE += bme280
