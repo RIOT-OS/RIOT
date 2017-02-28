@@ -57,7 +57,10 @@ extern "C" {
 typedef enum {
     APB1,           /**< APB1 bus */
     APB2,           /**< APB2 bus */
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1)\
+#if defined(CPU_FAM_STM32L0)
+    AHB,            /**< AHB bus */
+    IOP,            /**< IOP bus */
+#elif defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1)\
     || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
     AHB,            /**< AHB bus */
 #elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)

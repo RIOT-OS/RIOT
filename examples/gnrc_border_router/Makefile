@@ -12,7 +12,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk maple-mini msb-430 msb-430h 
                              spark-core stm32f0discovery telosb \
                              weio wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1 nucleo-f072 \
                              nucleo-f030 nucleo-f070 microbit calliope-mini \
-                             nucleo32-f042 nucleo32-f303 opencm9-04 nucleo32-f031
+                             nucleo32-f042 nucleo32-f303 opencm9-04 nucleo32-f031 \
+                             nucleo-l073
 
 BOARD_BLACKLIST += mips-malta # No UART available.
 
