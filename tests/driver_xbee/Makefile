@@ -19,7 +19,7 @@ USEMODULE += shell_commands
 XBEE_UART ?= "1"
 
 # export UART to params file
-CFLAGS += -DXBEE_UART=$(XBEE_UART)
+CFLAGS += -DXBEE_PARAM_UART=$(XBEE_UART)
 
 # No need of big buffer for this test
 CFLAGS += -DGNRC_PKTBUF_SIZE=512
