@@ -20,10 +20,6 @@
 
 #include "auto_init.h"
 
-#ifdef MODULE_IO1_XPLAINED
-#include "io1_xplained.h"
-#endif
-
 #ifdef MODULE_SHT11
 #include "sht11.h"
 #endif
@@ -103,10 +99,6 @@ void auto_init(void)
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");
     rtc_init();
-#endif
-#ifdef MODULE_IO1_XPLAINED
-    DEBUG("Auto init IO1 Xplained extension module.\n");
-    io1_xplained_auto_init();
 #endif
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");
@@ -318,6 +310,10 @@ void auto_init(void)
 #ifdef MODULE_VEML6070
     extern void auto_init_veml6070(void);
     auto_init_veml6070();
+#endif
+#ifdef MODULE_IO1_XPLAINED
+    extern void auto_init_io1_xplained(void);
+    auto_init_io1_xplained();
 #endif
 #ifdef MODULE_ADXL345
     extern void auto_init_adxl345(void);
