@@ -40,6 +40,12 @@ USEMODULE += netstats_rpl
 # development process:
 CFLAGS += -DDEVELHELP
 
+# Comment the following 2 lines out to specify static link lokal IPv6 address
+# this might be useful for testing, in cases whre you cannot or do not want to
+# run a shell with ifconfig to get the real link lokal address.
+#IPV6_STATIC_LLADDR ?= '"fe80::cafe:cafe:cafe:1"'
+#CFLAGS += -DGNRC_IPV6_STATIC_LLADDR=$(IPV6_STATIC_LLADDR)
+
 # Comment this out to join RPL DODAGs even if DIOs do not contain
 # DODAG Configuration Options (see the doc for more info)
 # CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
