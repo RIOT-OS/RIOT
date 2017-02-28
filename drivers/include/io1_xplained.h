@@ -29,42 +29,46 @@ extern "C" {
 #endif
 
 /**
- * @brief Device descriptor for the IO1 Xplained extension.
+ * @brief IO1 Xplained driver return codes
  */
-typedef struct {
-    at30tse75x_t temp  /**< On-board temperature sensor */;
-} io1_xplained_t;
-
+enum {
+    IO1_XPLAINED_OK = 0,           /**< Initialization successful */
+    IO1_XPLAINED_NOTEMP,           /**< Error during temperature sensor initialization */
+    IO1_XPLAINED_NOLED,            /**< Error during extension LED initialization */
+    IO1_XPLAINED_NOGPIO1,          /**< Error during extension GPIO1 initialization */
+    IO1_XPLAINED_NOGPIO2,          /**< Error during extension GPIO2 initialization */
+    IO1_XPLAINED_READ_OK,          /**< Temperature read successful */
+    IO1_XPLAINED_READ_ERR          /**< Error when reading temperature sensor */
+};
 
 /**
  * @brief Device initialization parameters
  */
 typedef struct {
-    uint8_t addr;      /**< extension custom address */
+    uint8_t addr;                  /**< extension custom address */
 } io1_xplained_params_t;
 
 /**
- * @brief export SAUL endpoints
- * @{
+ * @brief Device descriptor for the IO1 Xplained extension.
  */
-extern const saul_driver_t io1_xplained_temperature_saul_driver;
-/** @} */
-
-/**
- * @brief auto-initialize all configured IO1 Xplained extensions
- */
-void io1_xplained_auto_init(void);
+typedef struct {
+    io1_xplained_params_t params;  /**< Initialization parameters */
+    at30tse75x_t temp;             /**< On-board temperature sensor */
+} io1_xplained_t;
 
 /**
  * @brief Initialize the given IO1 Xplained extension
  *
  * @param[out] dev          Initialized device descriptor of IO1 Xplained extension
- * @param[in]  addr         Custom address of the extension board
+ * @param[in]  params       Device initialization parameters
  *
- * @return                  0 on success
- * @return                  -1 if given I2C is not enabled in board config
+ * @return                  IO1_XPLAINED_OK on success
+ * @return                  -IO1_XPLAINED_NOTEMP if temperature sensor initialization failed
+ * @return                  -IO1_XPLAINED_NOLED if LED initialization failed
+ * @return                  -IO1_XPLAINED_NOGPIO1 if GPIO1 initialization failed
+ * @return                  -IO1_XPLAINED_NOGPIO2 if GPIO2 initialization failed
  */
-int io1_xplained_init(io1_xplained_t *dev, uint8_t addr);
+int io1_xplained_init(io1_xplained_t *dev, const io1_xplained_params_t *params);
 
 /**
  * @brief Read temperature value from the given IO1 Xplained extension, returned in °C
@@ -72,34 +76,25 @@ int io1_xplained_init(io1_xplained_t *dev, uint8_t addr);
  * @param[in] dev           Device descriptor of IO1 Xplained to read from
  * @param[out] temperature  Temperature in °C
  *
- * @return                  0 on success
- * @return                  -1 if device's I2C is not enabled in board config
+ * @return                  IO1_XPLAINED_READ_OK on success
+ * @return                  -IO1_XPLAINED_READ_ERR if temperature sensor read failed
  */
 int io1_xplained_read_temperature(io1_xplained_t *dev, float *temperature);
 
 /**
  * @brief Set the on-board led of the IO1 Xplained extension
- *
- * @return                0 on success
- * @return                -1 if extension GPIO is not enabled in board config
  */
-int io1_xplained_set_led(void);
+void io1_xplained_set_led(void);
 
 /**
  * @brief Clear the on-board led of the IO1 Xplained extension
- *
- * @return                0 on success
- * @return                -1 if extension GPIO is not enabled in board config
  */
-int io1_xplained_clear_led(void);
+void io1_xplained_clear_led(void);
 
 /**
  * @brief Toggle the on-board led of the IO1 Xplained extension
- *
- * @return                0 on success
- * @return                -1 if extension GPIO is not enabled in board config
  */
-int io1_xplained_toggle_led(void);
+void io1_xplained_toggle_led(void);
 
 #ifdef __cplusplus
 }
