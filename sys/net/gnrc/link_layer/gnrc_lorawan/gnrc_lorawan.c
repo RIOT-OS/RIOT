@@ -755,7 +755,7 @@ void on_rx_done(netdev2_lorawan_t *loradev, gnrc_pktsnip_t *recv_pkt,  int16_t r
                     for( uint8_t i = 3, j = 0; i < ( 5 + 3 ); i++, j += 3 )
                     {
                         param.Frequency = ( ( uint32_t ) ((uint8_t*) pkt->data)[13 + j] | ( ( uint32_t ) ((uint8_t*) pkt->data)[14 + j] << 8 ) | ( ( uint32_t ) ((uint8_t*) pkt->data)[15 + j] << 16 ) ) * 100;
-                        channel_add( i, param );
+                        channel_add(loradev, i, param );
                     }
                 }
 #endif
@@ -1178,7 +1178,7 @@ void on_rx1_timeout(netdev2_lorawan_t *loradev)
         bandwidth  = 1;
         symbTimeout = 14;
     }
-    _rx_window_setup(loradev, channels[Channel].Frequency, datarate, bandwidth, symbTimeout, false );
+    _rx_window_setup(loradev, channels[loradev->Channel].Frequency, datarate, bandwidth, symbTimeout, false );
 #elif ( defined( USE_BAND_915 ) || defined( USE_BAND_915_HYBRID ) )
     datarate = datarate_offsets[loradev->LoRaMacParams.ChannelsDatarate][loradev->LoRaMacParams.Rx1DrOffset];
     if( datarate < 0 )
@@ -2196,7 +2196,7 @@ static void _process_mac_commands(netdev2_lorawan_t *loradev, uint8_t *payload, 
                         }
                         else
                         {
-                            if( channel_remove( channelIndex ) != LORAMAC_STATUS_OK )
+                            if( channel_remove(loradev, channelIndex ) != LORAMAC_STATUS_OK )
                             {
                                 status &= 0xFC;
                             }
@@ -2204,7 +2204,7 @@ static void _process_mac_commands(netdev2_lorawan_t *loradev, uint8_t *payload, 
                     }
                     else
                     {
-                        switch( channel_add( channelIndex, chParam ) )
+                        switch( channel_add(loradev, channelIndex, chParam ) )
                         {
                             case LORAMAC_STATUS_OK:
                             {
@@ -2835,10 +2835,10 @@ void _set_channel_mask(netdev2_lorawan_t *loradev, uint16_t *mask)
     }
 #else
     memcpy( ( uint8_t* ) loradev->LoRaMacParams.ChannelsMask,
-             ( uint8_t* ) mibSet->Param.ChannelsMask, 2 );
+             mask, 2 );
 #endif
 }
-LoRaMacStatus_t channel_add( uint8_t id, ChannelParams_t params )
+LoRaMacStatus_t channel_add(netdev2_lorawan_t *loradev, uint8_t id, ChannelParams_t params )
 {
 #if ( defined( USE_BAND_915 ) || defined( USE_BAND_915_HYBRID ) )
     return LORAMAC_STATUS_PARAMETER_INVALID;
@@ -2938,7 +2938,7 @@ LoRaMacStatus_t channel_add( uint8_t id, ChannelParams_t params )
 #endif
 }
 
-LoRaMacStatus_t channel_remove( uint8_t id )
+LoRaMacStatus_t channel_remove(netdev2_lorawan_t *loradev, uint8_t id )
 {
 #if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 )
 

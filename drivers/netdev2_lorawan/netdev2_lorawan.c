@@ -151,7 +151,7 @@ int netdev2_lorawan_set(netdev2_lorawan_t *dev, netopt_t opt, void *value, size_
             return sizeof(int8_t);
         case NETOPT_LORAWAN_CHANNEL:
             cp = (netopt_channel_params_t*) value; 
-            channel_add( cp->id, cp->params );
+            channel_add(dev, cp->id, cp->params );
             return sizeof(netopt_channel_params_t);
         case NETOPT_LORAWAN_TX_RETRIES:
             dev->ack_timeout_retries = *((uint8_t*) value);

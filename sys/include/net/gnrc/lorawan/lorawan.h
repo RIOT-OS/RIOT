@@ -167,7 +167,7 @@ typedef enum eLoRaMacStatus
  *          \ref LORAMAC_STATUS_BUSY,
  *          \ref LORAMAC_STATUS_PARAMETER_INVALID.
  */
-LoRaMacStatus_t channel_add( uint8_t id, ChannelParams_t params );
+LoRaMacStatus_t channel_add(netdev2_lorawan_t *lorawan, uint8_t id, ChannelParams_t params );
 
 /*!
  * \brief   LoRaMAC channel remove service
@@ -181,7 +181,7 @@ LoRaMacStatus_t channel_add( uint8_t id, ChannelParams_t params );
  *          \ref LORAMAC_STATUS_BUSY,
  *          \ref LORAMAC_STATUS_PARAMETER_INVALID.
  */
-LoRaMacStatus_t channel_remove( uint8_t id );
+LoRaMacStatus_t channel_remove(netdev2_lorawan_t *loradev, uint8_t id );
 
 /*!
  * \brief   LoRaMAC multicast channel link service
