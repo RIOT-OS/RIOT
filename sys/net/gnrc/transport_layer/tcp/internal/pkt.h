@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2015-2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,15 +14,17 @@
  * @{
  *
  * @file
- * @brief      Functions for TCP's paket handling
+ * @brief       TCP paket handling declarations
  *
- * @author     Simon Brummer <brummer.simon@googlemail.com>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_INTERNAL_PKT_H_
-#define GNRC_TCP_INTERNAL_PKT_H_
+#ifndef GNRC_TCP_INTERNAL_PKT_H
+#define GNRC_TCP_INTERNAL_PKT_H
 
-#include "net/conn/tcp.h"
+#include <stdint.h>
+#include "net/gnrc/pkt.h"
+#include "net/gnrc/tcp/tcb.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,21 +45,21 @@ extern "C" {
 int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt);
 
 /**
- * @brief Build and allocate a tcp paket in paketbuffer, conn stores pointer to new paket.
+ * @brief Build and allocate a tcp paket, tcb stores pointer to new paket.
  *
- * @param[in,out] tcb        This connections Transmission control block.
+ * @param[in,out] tcb        This connections transmission control block.
  * @param[out] out_pkt       Pointer to paket to build
- * @param[out] seq_con       Number of Bytes, the packet will consume in sequence number spce
- * @param[in]  ctl           control bits to set in pkt
- * @param[in]  seq_num       sequence number to use in new paket
- * @param[in]  ack_num       acknowledgment number to use in new paket
+ * @param[out] seq_con       Number of Bytes, the packet will consume in sequence number space
+ * @param[in]  ctl           control bits to set in out_pkt
+ * @param[in]  seq_num       sequence number of the new paket
+ * @param[in]  ack_num       acknowledgment number of the new paket
  * @param[in]  payload       pointer to payload buffer
  * @param[in]  payload_len   payload size
  *
  * @return   Zero on success.
  * @return   -ENOMEM if pktbuf is full.
  */
-int _pkt_build(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
+int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
                const uint16_t ctl, const uint32_t seq_num, const uint32_t ack_num,
                void *payload, const size_t payload_len);
 
@@ -72,7 +74,7 @@ int _pkt_build(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
  * @return   Zero on success.
  * @return   -EINVAL if out_pkt was NULL
  */
-int _pkt_send(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_con,
+int _pkt_send(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_con,
               const bool retransmit);
 
 /**
@@ -85,7 +87,7 @@ int _pkt_send(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_c
  * @return    Zero if the sequence number is invalid
  * @return    Non-zero if the sequence number is acceptable
  */
-int _pkt_chk_seq_num(const gnrc_tcp_tcb_t* tcb, const uint32_t seq_num, const uint32_t seg_len);
+int _pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num, const uint32_t seg_len);
 
 /**
  * @brief Extracts the length of a segment
@@ -110,13 +112,13 @@ uint32_t _pkt_get_pay_len(gnrc_pktsnip_t *pkt);
  *
  * @param[in,out] tcb      This connections Transmission control block.
  * @param[in] pkt          paket to add to the retransmission mechanism
- * @param[in] retransmit   is this a retransmission ?
+ * @param[in] retransmit   Flag used to indicate that pkt is a retransmit.
  *
  * @return   Zero on success
  * @return   -ENOMEM if the retransmission queue is full
  * @return   -EINVAL if pkt is null
  */
-int _pkt_setup_retransmit(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *pkt, const bool retransmit);
+int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool retransmit);
 
 /**
  * @brief Acknowledges and removes packet from the retransmission mechanism
@@ -127,7 +129,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t* tcb, gnrc_pktsnip_t *pkt, const bool r
  * @return   Zero on success
  * @return   -ENODATA if there is nothing to acknowledge
  */
-int _pkt_acknowledge(gnrc_tcp_tcb_t* tcb, const uint32_t ack);
+int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack);
 
 /**
  * @brief Calculates checksum over payload, tcp-header and network layer header
@@ -146,5 +148,5 @@ uint16_t _pkt_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_
 }
 #endif
 
-#endif /* GNRC_TCP_INTERNAL_PKT_H_ */
+#endif /* GNRC_TCP_INTERNAL_PKT_H */
 /** @} */

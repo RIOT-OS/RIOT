@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2015-2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,17 +14,16 @@
  * @{
  *
  * @file
- * @brief       TCP interface definition
+ * @brief       GNRC TCP API
  *
- * @author      Simon Brummer <simon.brummer@haw-hamburg.de>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_H_
-#define GNRC_TCP_H_
+#ifndef GNRC_TCP_H
+#define GNRC_TCP_H
 
-#include "net/tcp.h"
-#include "net/gnrc/netapi.h"
-#include "net/gnrc/nettype.h"
+#include <stdint.h>
+#include "net/gnrc/pkt.h"
 #include "net/gnrc/tcp/tcb.h"
 
 #ifdef MODULE_GNRC_IPV6
@@ -34,23 +33,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief Port unspecified.
- *
- * @note PORT 0 is reserved, according to rfc 1700(https://www.ietf.org/rfc/rfc1700.txt)
- */
-#define GNRC_TCP_PORT_UNSPEC 0
-
-/**
- * @brief Head of conn linked list.
- */
-extern gnrc_tcp_tcb_t *_list_gnrc_tcp_tcb_head;
-
-/**
- * @brief Mutex to protect linked list.
- */
-extern mutex_t _list_gnrc_tcp_tcb_lock;
 
 /**
  * @brief Initialize and start TCP
@@ -68,7 +50,7 @@ int gnrc_tcp_init(void);
  *
  * @param[in,out] tcb          Transmission that should be initialized.
  */
-void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t* tcb);
+void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
 
  /**
   * @brief Opens a connection actively.
@@ -85,7 +67,7 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t* tcb);
   * @param[in] target_addr      Pointer to target address.
   * @param[in] target_port      Targets port number.
   * @param[in] local_port       If zero or GNRC_TCP_PORT_UNSPEC, the connections
-  *                             source port is randomly choosen. If local_port is non-zero
+  *                             source port is randomly chosen. If local_port is non-zero
   *                             the local_port is used as source port.
   *
   * @return   Zero on success.
@@ -116,7 +98,7 @@ int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
  * @param[in,out] tcb          This connections Transmission control block.
  * @param[in] address_family   Address Family of @p local_addr.
  *                             If local_addr == NULL, address_family is ignored.
- * @param[in] local_addr       If not NULL the connection is bound to the address in @p local_addr.
+ * @param[in] local_addr       If not NULL the connection is bound to the address @p local_addr.
  *                             If NULL a connection request to every local ip address is valid.
  * @param[in] local_port       Portnumber that should used for incomming connection requests.
  *
@@ -200,8 +182,8 @@ int gnrc_tcp_close(gnrc_tcp_tcb_t *tcb);
 /**
  * @brief Set checksum calculated from tcp and network-layer header in tcp-header.
  *
- * @param[in] hdr          ng_pktsnip that contains tcp header.
- * @param[in] pseudo_hdr   ng_pktsnip that contains networklayer header.
+ * @param[in] hdr          gnrc_pktsnip that contains tcp header.
+ * @param[in] pseudo_hdr   gnrc_pktsnip that contains networklayer header.
  *
  * @return   zero on succeed.
  * @return   -EFAULT if hdr or pseudo_hdr were NULL
@@ -227,5 +209,5 @@ gnrc_pktsnip_t *gnrc_tcp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src, uint16
 }
 #endif
 
-#endif /* GNRC_TCP_H_ */
+#endif /* GNRC_TCP_H */
 /** @} */

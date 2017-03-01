@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2015-2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,26 +14,22 @@
  * @{
  *
  * @file
- * @brief      Defines and Macros for TCP option handling
+ * @brief       TCP option handling declarations
  *
- * @author     Simon Brummer <brummer.simon@googlemail.com>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_INTERNAL_OPTION_H_
-#define GNRC_TCP_INTERNAL_OPTION_H_
+#ifndef GNRC_TCP_INTERNAL_OPTION_H
+#define GNRC_TCP_INTERNAL_OPTION_H
 
-#include "helper.h"
+#include <stdint.h>
+#include "assert.h"
 #include "net/tcp.h"
-#include "net/gnrc/tcp.h"
+#include "net/gnrc/tcp/tcb.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief Extract offset value from offet and ctl bit field.
- */
-#define GET_OFFSET( x ) (((x) & MSK_OFFSET) >> 12)
 
 /**
  * @brief Helper Function to build the MSS Option
@@ -42,7 +38,11 @@ extern "C" {
  *
  * @return   Valid MSS Option.
  */
-uint32_t _option_build_mss(uint16_t mss);
+inline static uint32_t _option_build_mss(uint16_t mss)
+{
+    return (((uint32_t) TCP_OPTION_KIND_MSS << 24) |
+            ((uint32_t) TCP_OPTION_LENGTH_MSS << 16) | mss);
+}
 
 /**
  * @brief Helper Function to build the combined option and control flag field
@@ -52,7 +52,11 @@ uint32_t _option_build_mss(uint16_t mss);
  *
  * @return   Valid option size and control field.
  */
-uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl);
+inline static uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl)
+{
+    assert(TCP_HDR_OFFSET_MIN <= nopts && nopts <= TCP_HDR_OFFSET_MAX);
+    return (nopts << 12) | ctl;
+}
 
 /**
  * @brief Parses options of a given tcp-header pktsnip.
@@ -63,11 +67,11 @@ uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl);
  * @return   Zero on success
  * @return   A negative value on error
  */
-int _option_parse(gnrc_tcp_tcb_t* tcb, tcp_hdr_t *hdr);
+int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GNRC_TCP_INTERNAL_OPTION_H_*/
+#endif /* GNRC_TCP_INTERNAL_OPTION_H*/
 /** @} */
