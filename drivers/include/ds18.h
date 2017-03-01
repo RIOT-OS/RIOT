@@ -28,8 +28,6 @@
 #define DS18_TEMP_H
 
 #include "periph/gpio.h"
-#include "saul.h"
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,11 +57,6 @@ typedef struct {
     gpio_t pin;             /**< Pin the sensor is connected to */
     gpio_mode_t in_mode;    /**< Pin output mode */
 } ds18_params_t;
-
-/**
- * @brief export SAUL endpoint
- */
-extern const saul_driver_t ds18_temperature_saul_driver;
 
 /**
  * @brief   Initialize a ds18 device

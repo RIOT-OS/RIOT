@@ -23,7 +23,6 @@
 
 #include "log.h"
 #include "periph/gpio.h"
-#include "timex.h"
 #include "xtimer.h"
 
 #define ENABLE_DEBUG (0)
