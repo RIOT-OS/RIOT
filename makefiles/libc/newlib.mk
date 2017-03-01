@@ -61,9 +61,7 @@ ifeq ($(TOOLCHAIN),llvm)
   # A cross GCC already knows the target libc include path (build-in at compile time)
   # but Clang, when cross-compiling, needs to be told where to find the headers
   # for the system being built.
-  # We also add -nostdinc to avoid including the host system headers by mistake
-  # in case some header is missing from the cross tool chain
-  NEWLIB_INCLUDES := -isystem $(NEWLIB_INCLUDE_DIR) -nostdinc
+  NEWLIB_INCLUDES := -isystem $(NEWLIB_INCLUDE_DIR)
   NEWLIB_INCLUDES += $(addprefix -isystem ,$(abspath $(wildcard $(dir $(NEWLIB_INCLUDE_DIR))/usr/include)))
 endif
 

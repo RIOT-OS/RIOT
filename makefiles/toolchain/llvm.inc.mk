@@ -33,7 +33,8 @@ ifneq (,$(TARGET_ARCH))
   # Clang on Linux uses GCC's C++ headers and libstdc++ (installed with GCC)
   # Ubuntu and Debian use /etc/alternatives/gcc-$(TARGET_ARCH)-include/c++/$(GCC_VERSION)
   # Arch uses /usr/$(TARGET_ARCH)/include/c++/$(GCC_VERSION)
-  # Gentoo uses /usr/lib/gcc/$(TARGET_ARCH)/$(GCC_VERSION)/include/g++-v5
+  # Gentoo uses /usr/lib/gcc/$(TARGET_ARCH)/$(GCC_VERSION)/include/g++-v5 (or
+  # other number depending on GCC version)
   GCC_CXX_INCLUDE_PATTERNS ?= \
   /etc/alternatives/gcc-$(TARGET_ARCH)-include/c++/*/ \
   /usr/$(TARGET_ARCH)/include/c++/*/ \
@@ -49,10 +50,32 @@ ifneq (,$(TARGET_ARCH))
     GCC_MULTI_DIR := $(shell $(PREFIX)gcc $(CFLAGS) -print-multi-directory 2>/dev/null)
   endif
 
+  # Try to find the sysroot of the cross-GCC
+  ifeq ($(GCC_SYSROOT),)
+    GCC_SYSROOT := $(shell $(PREFIX)gcc $(CFLAGS) -print-sysroot 2>/dev/null)
+  endif
+
+  ifeq ($(GCC_SYSROOT),)
+    # Fall back to a sensible default
+    GCC_SYSROOT := /usr/$(TARGET_ARCH)
+  endif
+
+  # Add the sysroot top level include dir to include path (--sysroot only adds
+  # [root]/usr/include, we need [root]/include as well)
+  export INCLUDES += $(addprefix -isystem ,$(abspath $(wildcard $(GCC_SYSROOT)/include)))
+
   # Tell clang to cross compile
-  export CFLAGS     += -target $(TARGET_ARCH)
-  export CXXFLAGS   += -target $(TARGET_ARCH)
-  export LINKFLAGS  += -target $(TARGET_ARCH)
+  # Adding --sysroot removes all default system include directories (/usr/include,
+  # /usr/local/include), just like -nostdinc does, but it leaves the compiler
+  # specific include paths intact (e.g. /usr/lib/clang/3.9.1/include). This gets
+  # rid of the GCC dependency for C code, we only need the GCC path for its C++
+  # headers when building for libstdc++.
+  # Adding a non-existent directory as sysroot is not an error in tested versions
+  # of Clang (3.8.0, 3.9.1), so we always add --sysroot for removing the system
+  # include paths.
+  export CFLAGS     += -target $(TARGET_ARCH) --sysroot $(GCC_SYSROOT)
+  export CXXFLAGS   += -target $(TARGET_ARCH) --sysroot $(GCC_SYSROOT)
+  export LINKFLAGS  += -target $(TARGET_ARCH) --sysroot $(GCC_SYSROOT)
 
   # Use the wildcard Makefile function to search for existing directories matching
   # the patterns above. We use the -isystem gcc/clang argument to add the include
@@ -76,24 +99,4 @@ ifneq (,$(TARGET_ARCH))
 
   # Pass the includes to the C++ compilation rule in Makefile.base
   export CXXINCLUDES += $(GCC_CXX_INCLUDES)
-
-  # Some C headers (e.g. limits.h) are located with the GCC libraries
-  GCC_C_INCLUDE_PATTERNS ?= \
-    /usr/lib/gcc/$(TARGET_TRIPLE)/*/ \
-    #
-
-  GCC_C_INCLUDES ?= \
-      $(addprefix -isystem ,$(wildcard $(addprefix \
-          $(lastword $(sort \
-              $(foreach pat, $(GCC_C_INCLUDE_PATTERNS), $(wildcard $(pat))))), \
-          include include-fixed) \
-      ))
-
-  # If nothing was found we will try to fall back to searching for the libgcc used
-  # by an installed cross-GCC and use its headers.
-  ifeq (,$(GCC_C_INCLUDES))
-    GCC_C_INCLUDES := $(addprefix -isystem ,$(wildcard $(addprefix $(dir $(shell $(PREFIX)gcc -print-libgcc-file-name)), include include-fixed)))
-  endif
-
-  export INCLUDES += $(GCC_C_INCLUDES)
 endif
