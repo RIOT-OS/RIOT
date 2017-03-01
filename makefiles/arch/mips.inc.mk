@@ -23,6 +23,10 @@ comma := ,
 #   If symbol has a value, produce a linker argument for that symbol.
 MIPS_HAL_LDFLAGS = $(foreach a,$(priv_symbols),$(if $($a),-Wl$(comma)--defsym$(comma)__$(call lc,$(a))=$($a)))
 
+ifeq ($(ROMABLE),1)
+MIPS_HAL_LDFLAGS += -T bootcode.ld
+endif
+
 # define build specific options
 # Remove -std=gnu99 once the MIPS toolchain headers are updated to include upstream
 # newlib commit 81c17949f0419d1c4fee421c60987ea1149522ae
