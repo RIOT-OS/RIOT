@@ -2,6 +2,7 @@
  * Copyright 2005 Colin Percival
  * Copyright 2013 Christian Mehlis & René Kijewski
  * Copyright 2016 Martin Landsmann <martin.landsmann@haw-hamburg.de>
+ * Copyright 2016 OTA keys S.A.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,6 +40,7 @@
  * @author      Colin Percival
  * @author      Christian Mehlis
  * @author      Rene Kijewski
+ * @author      Hermann Lelong
  */
 
 #ifndef _SHA256_H
@@ -58,7 +60,7 @@ extern "C" {
 #define SHA256_INTERNAL_BLOCK_SIZE (64)
 
 /**
- * @brief Context for ciper operatins based on sha256
+ * @brief Context for ciper operations based on sha256
  */
 typedef struct {
     /** global state */
@@ -68,6 +70,16 @@ typedef struct {
     /** data buffer */
     unsigned char buf[64];
 } sha256_context_t;
+
+/**
+ * @brief Context for HMAC operations based on sha256
+ */
+typedef struct {
+    /** Context for inner hash calculation */
+    sha256_context_t c_in;
+    /** Context for outer hash calculation */
+    sha256_context_t c_out;
+} hmac_context_t;
 
 /**
  * @brief sha256-chain indexed element
@@ -115,6 +127,31 @@ void sha256_final(sha256_context_t *ctx, void *digest);
  *               if digest == NULL, one static buffer is used
  */
 void *sha256(const void *data, size_t len, void *digest);
+
+/**
+ * @brief hmac_sha256_init HMAC SHA-256 calculation. Initiate calculation of a HMAC
+ * @param ctx hmac_context_t handle to use
+ * @param[in] key key used in the hmac-sha256 computation
+ * @param[in] key_length the size in bytes of the key
+ */
+void hmac_sha256_init(hmac_context_t *ctx, const void *key, size_t key_length);
+
+/**
+ * @brief hmac_sha256_update Add data bytes for HMAC calculation
+ * @param ctx hmac_context_t handle to use
+ * @param data[in] pointer to the buffer to generate hash from
+ * @param len[in] length of the buffer
+ */
+void hmac_sha256_update(hmac_context_t *ctx, const void *data, size_t len);
+
+/**
+ * @brief hmac_sha256_final HMAC SHA-256 finalization. Finish HMAC calculation and export the value
+ * @param ctx hmac_context_t handle to use
+ * @param[out] digest the computed hmac-sha256,
+ *             length MUST be SHA256_DIGEST_LENGTH
+ *             if digest == NULL, a static buffer is used
+ */
+void hmac_sha256_final(hmac_context_t *ctx, void *digest);
 
 /**
  * @brief function to compute a hmac-sha256 from a given message
