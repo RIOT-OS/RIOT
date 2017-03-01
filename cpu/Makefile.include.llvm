@@ -17,7 +17,11 @@ export NM          = $(LLVMPREFIX)nm
 #export LINKER      = $(LLVMPREFIX)ld
 # objcopy does not have a clear substitute in LLVM, use GNU binutils
 #export OBJCOPY     = $(LLVMPREFIX)objcopy
-export OBJCOPY     = $(PREFIX)objcopy
+export OBJCOPY    ?= $(shell command -v $(PREFIX)objcopy gobjcopy objcopy | head -n 1)
+ifeq ($(OBJCOPY),)
+$(warning objcopy not found. Hex file will not be created.)
+export OBJCOPY     = true
+endif
 export OBJDUMP     = $(LLVMPREFIX)objdump
 export SIZE        = $(LLVMPREFIX)size
 export DBG         = $(GDBPREFIX)gdb
