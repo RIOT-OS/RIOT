@@ -49,6 +49,12 @@ ifeq ($(USE_DSP),1)
     export CFLAGS += -mdsp
 endif
 
+ifeq ($(TOOLCHAIN),llvm)
+# The MIPS toolchain headers in assembly mode are not compatible with Clang
+export CCAS = $(PREFIX)gcc
+export CCASUWFLAGS += -target $(TARGET_ARCH)
+endif
+
 export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_OPT) $(CFLAGS_DBG)
 
 export LINKFLAGS += $(MIPS_HAL_LDFLAGS)
