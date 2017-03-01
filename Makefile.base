@@ -53,8 +53,8 @@ $(BINDIR)/$(MODULE).a $(OBJ): | $(BINDIR)/$(MODULE)/
 $(BINDIR)/$(MODULE).a: $(OBJ) | ${DIRS:%=ALL--%}
 	$(Q)$(AR) $(ARFLAGS) $@ $?
 
-
 CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
+CCASFLAGS = $(filter-out $(CCASUWFLAGS), $(CFLAGS)) $(CCASEXFLAGS)
 
 # compile and generate dependency info
 
@@ -76,7 +76,7 @@ $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
 	$(Q)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
 $(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S
-	$(Q)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
+	$(Q)$(CCAS) $(CCASFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 # pull in dependency info for *existing* .o files
 # deleted header files will be silently ignored
