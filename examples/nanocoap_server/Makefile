@@ -8,7 +8,8 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo32-f031 nucleo32-f042 \
-                             nucleo-f030 nucleo-l053 stm32f0discovery telosb weio
+                             nucleo32-l031 nucleo-f030 nucleo-l053 stm32f0discovery \
+                             telosb weio
 
 # blacklist this until #6022 is sorted out
 BOARD_BLACKLIST := nrf52dk
