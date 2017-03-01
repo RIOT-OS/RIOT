@@ -20,12 +20,12 @@ export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
 # reflecting the FW_IMAGE_OFFSET and FW_IMAGE_LENGTH values defined in the
 # target project's Makefile.
 ifeq ($(FW_SLOTS),1)
-FWDEFINES = -DFW_IMAGE_OFFSET=$(FW_IMAGE_OFFSET) -DFW_IMAGE_LENGTH=$(FW_IMAGE_LENGTH) \
-                    -DFW_METADATA_SPACE=$(FW_METADATA_SPACE)
-CFLAGS += $(FWDEFINES)
-GENERATE_LDSCRIPT = $(Q)$(LINK) -P -E $(FWDEFINES) $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)-slots.c \
-                           -o $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)-slots.ld
-LINKER_SCRIPT = $(CPU_MODEL)-slots.ld
+ifeq ($(FW_SLOT),1)
+LINKER_SCRIPT = $(CPU_MODEL)_slot1.ld
+endif
+ifeq ($(FW_SLOT),2)
+LINKER_SCRIPT = $(CPU_MODEL)_slot2.ld
+endif
 endif
 
 # If we compile a bootloader, set the correct linker script
