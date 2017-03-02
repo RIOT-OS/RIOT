@@ -160,8 +160,10 @@ extern "C" {
     PCICR |= (1 << PCIE0); \
     PCMSK0 |= (1 << PCINT5); \
 } while (0)
+/** @cond INTERNAL */
 #define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT0_vect
 #define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB5)
+/** @endcond */
 
 /**
  * @brief xtimer configuration values

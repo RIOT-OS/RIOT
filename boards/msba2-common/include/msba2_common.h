@@ -28,8 +28,10 @@
 extern "C" {
 #endif
 
-#define VICIntEnClear VICIntEnClr
 
+/**
+ * @brief Feed sequence for PLL register
+ */
 static inline void pllfeed(void)
 {
     PLLFEED = 0xAA;
