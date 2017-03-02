@@ -818,6 +818,7 @@ EXCLUDE_SYMLINKS       = NO
 # exclude all test directories for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = */board/*/tools/* \
+                         */boards/x86-multiboot-common/include/multiboot.h \
                          */cpu/atmega_common/include/sys/*.h \
                          */cpu/msp430_common/include/stdatomic.h \
                          */cpu/msp430_common/include/sys/*.h \
@@ -827,6 +828,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */drivers/nrf24l01p/include/nrf24l01p_settings.h \
                          */pkg/*/*/* \
                          */pkg/tlsf/patch.txt \
+                         */sys/include/embUnit/* \
                          */sys/random/tinymt32/* \
                          */toolchain/* \
                          */vendor/* \
