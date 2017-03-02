@@ -379,7 +379,7 @@ int fw_slots_find_newest_int_image(void)
         }
 
         /* Is this slot populated? If not, skip. */
-        if (fw_slots_validate_metadata( &fw_slot_metadata) == false) {
+        if (fw_slots_validate_metadata(&fw_slot_metadata) == -1) {
             continue;
         }
 
