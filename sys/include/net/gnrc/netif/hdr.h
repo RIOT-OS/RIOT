@@ -36,6 +36,11 @@ extern "C" {
  *          in bytes.
  */
 #define GNRC_NETIF_HDR_L2ADDR_MAX_LEN   (8)
+
+/**
+ * @brief   Maximum length of the string representatiom of l2 addresses of the
+ *          generic interface header in bytes.
+ */
 #define GNRC_NETIF_HDR_L2ADDR_PRINT_LEN (GNRC_NETIF_HDR_L2ADDR_MAX_LEN * 3)
 
 /**
@@ -199,7 +204,8 @@ gnrc_pktsnip_t *gnrc_netif_hdr_build(uint8_t *src, uint8_t src_len, uint8_t *dst
  */
 void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr);
 
-/* @brief   Fetch the netif header flags of a gnrc packet
+/**
+ * @brief   Fetch the netif header flags of a gnrc packet
  *
  * @param[in]   pkt     gnrc packet from whom to fetch
  *
@@ -208,7 +214,8 @@ void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr);
  */
 uint8_t gnrc_netif_hdr_get_flag(gnrc_pktsnip_t* pkt);
 
-/* @brief   Extract the destination address out of a gnrc packet
+/**
+ * @brief   Extract the destination address out of a gnrc packet
  *
  * @param[in]   pkt                 gnrc packet from whom to extract
  * @param[out]  pointer_to_addr     pointer to address will be stored here
@@ -219,7 +226,8 @@ uint8_t gnrc_netif_hdr_get_flag(gnrc_pktsnip_t* pkt);
  */
 int gnrc_netif_hdr_get_dstaddr(gnrc_pktsnip_t* pkt, uint8_t** pointer_to_addr);
 
-/* @brief   Extract the source address out of a gnrc packet
+/**
+ * @brief   Extract the source address out of a gnrc packet
  *
  * @param[in]   pkt                 gnrc packet from whom to extract
  * @param[out]  pointer_to_addr     pointer to address will be stored here

@@ -54,7 +54,7 @@ typedef enum {
  *        state machines.
  *        This structure can be extended to contain more needed
  *        states and parameters. Please guard them by appropriate
- *        #ifdef directives when applicable.
+ *        \#ifdef directives when applicable.
  */
 typedef struct {
 #if (GNRC_MAC_RX_QUEUE_SIZE != 0) || defined(DOXYGEN)
@@ -137,7 +137,7 @@ typedef struct {
  *        state machines.
  *        This structure can be extended to contain more needed
  *        states and parameters. Please guard them by appropriate
- *        #ifdef directives when applicable.
+ *        \#ifdef directives when applicable.
  */
 typedef struct {
 #if (GNRC_MAC_NEIGHBOR_COUNT != 0) || defined(DOXYGEN)

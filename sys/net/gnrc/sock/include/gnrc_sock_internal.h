@@ -38,11 +38,23 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default port range for dynamic source port allocation
+ * @brief   Minimum port number in the dynamic portrange
  */
 #define GNRC_SOCK_DYN_PORTRANGE_MIN (IANA_DYNAMIC_PORTRANGE_MIN)
+/**
+ * @brief   Maximum port number in the dynamic portrange
+ */
 #define GNRC_SOCK_DYN_PORTRANGE_MAX (IANA_DYNAMIC_PORTRANGE_MAX)
+
+/**
+ * @brief   Available ports in the range for dynamic source port allocation
+ */
 #define GNRC_SOCK_DYN_PORTRANGE_NUM (GNRC_SOCK_DYN_PORTRANGE_MAX - GNRC_SOCK_DYN_PORTRANGE_MIN + 1)
+
+/**
+ * @brief   Error value indicating that no free port could be found in the
+ *          dynamic port range
+ */
 #define GNRC_SOCK_DYN_PORTRANGE_ERR (0)
 
 /**
