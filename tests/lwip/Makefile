@@ -10,7 +10,7 @@ BOARD_BLACKLIST := arduino-mega2560 msb-430h telosb waspmote-pro z1 arduino-uno 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-mega2560 msb-430h nrf6310 \
                              nucleo-f334 pca10005 stm32f0discovery telosb \
                              weio yunjia-nrf51822 z1 nucleo-f030 nucleo-f072 \
-                             nucleo32-f031
+                             nucleo32-f031 nucleo-l053
 
 # including lwip_ipv6_mld would currently break this test on at86rf2xx radios
 USEMODULE += lwip lwip_ipv6_autoconfig lwip_conn_ip lwip_netdev2

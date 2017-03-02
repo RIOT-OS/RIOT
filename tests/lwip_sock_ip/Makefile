@@ -7,7 +7,7 @@ BOARD_BLACKLIST := arduino-uno arduino-duemilanove arduino-mega2560 chronos \
                    msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b \
                    wsn430-v1_4 z1
 BOARD_INSUFFICIENT_MEMORY = nucleo-f030 nucleo32-f042 nucleo-f334 \
-                            stm32f0discovery weio nucleo32-f031
+                            stm32f0discovery weio nucleo32-f031 nucleo-l053
 
 LWIP_IPV4 ?= 0
 

@@ -7,7 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := cc2650stk chronos maple-mini msb-430 msb-430h \
                           nucleo-f334 nrf51dongle nrf6310 weio nucleo-f072 \
                           nucleo-f030 nucleo-f070 microbit calliope-mini \
                           nucleo32-f042 nucleo32-f303 opencm9-04 nucleo32-f031 \
-                          nucleo-l073
+                          nucleo-l073 nucleo-l053
 
 DISABLE_MODULE += auto_init
 

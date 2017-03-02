@@ -3,7 +3,8 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_spi periph_gpio
 
-BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h stm32f0discovery telosb weio z1
+BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h stm32f0discovery telosb weio z1 \
+                             nucleo-l053
 
 USEMODULE += gnrc_netdev2
 USEMODULE += gnrc_netdev_default
