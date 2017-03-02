@@ -22,136 +22,34 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "thread.h"
-#include "shell.h"
-#include "shell_commands.h"
 #include "fw_slots.h"
-#include "cpu_conf.h"
-
-static int cmd_lsimg(int argc, char **argv)
-{
-    (void)argc;
-    (void)argv;
-
-    FW_metadata_t fw_metadata;
-
-    for (uint8_t i = 1; i <= MAX_FW_SLOTS; i++) {
-        if (fw_slots_get_int_slot_metadata(i, &fw_metadata) == 0) {
-            printf("Metadata slot %d:\n", i);
-            fw_slots_print_metadata(&fw_metadata);
-        } else {
-            printf("ERROR: Cannot retrieve metadata.\n");
-        }
-    }
-
-    return 0;
-}
-
-static int cmd_get_metadata(int argc, char **argv)
-{
-    uint8_t slot;
-    FW_metadata_t fw_metadata;
-
-    if (argc < 2) {
-        printf("usage: %s <slot>\n", argv[0]);
-        return -1;
-    }
-
-    slot = atoi(argv[1]);
-
-    if (fw_slots_get_int_slot_metadata(slot, &fw_metadata) == 0) {
-        printf("Metadata slot %d\n", slot);
-        fw_slots_print_metadata(&fw_metadata);
-        return 0;
-    } else {
-        printf("ERROR: Cannot retrieve metadata from slot %d.\n", slot);
-        return -1;
-    }
-
-    return 0;
-}
-
-static int cmd_verify(int argc, char **argv)
-{
-    uint8_t slot;
-
-    if (argc < 2) {
-        printf("usage: %s <slot>\n", argv[0]);
-        return -1;
-    }
-
-    slot = atoi(argv[1]);
-
-    if (fw_slots_verify_int_slot(slot) == 0) {
-        printf("Slot %d successfully verified\n", slot);
-        return 0;
-    } else {
-        return -1;
-    }
-
-    return 0;
-}
-
-static int cmd_erase_slot(int argc, char**argv)
-{
-    uint8_t slot;
-
-    if (argc < 2) {
-        printf("usage: %s <slot>\n", argv[0]);
-        return -1;
-    }
-
-    slot = atoi(argv[1]);
-
-    return fw_slots_erase_int_image(slot);
-}
-
-static int cmd_jump(int argc, char **argv)
-{
-    uint32_t address;
-
-    uint8_t slot;
-
-    if (argc < 2) {
-        printf("usage: %s <slot>\n", argv[0]);
-        return -1;
-    }
-
-    slot = atoi(argv[1]);
-
-    if (fw_slots_verify_int_slot(slot) == 0) {
-        printf("Slot %d verified!\n", slot);
-    } else {
-        printf("Slot %u inconsistent!\n", slot);
-        return -1;
-    }
-
-    address = fw_slots_get_slot_address(slot);
-
-    printf("Booting slot %d at 0x%lx...\n", slot, address);
-
-    fw_slots_jump_to_image(address);
-
-    return 0;
-}
-
-static const shell_command_t shell_commands[] = {
-    { "lsimg", "List the available firmwares on ROM", cmd_lsimg },
-    { "get_metadata", "Get metadata from slot", cmd_get_metadata },
-    { "verify", "Verify consistency (sha256) of slot", cmd_verify },
-    { "erase", "Erase slot *WARNING use with caution*", cmd_erase_slot },
-    { "jump", "Jump to specific FW slot (cause reset)", cmd_jump },
-    { NULL, NULL, NULL }
-};
 
 int main(void)
 {
-    (void) puts("Welcome to RIOT bootloader!");
+    uint8_t boot_slot = 0;
+    uint32_t address;
 
-    /* run the shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    (void) puts("Welcome to RIOT bootloader!\n");
+    (void) puts("Trying to boot the newest firmware version\n");
 
-    /* Should never happen */
+    boot_slot = fw_slots_find_newest_int_image();
+
+    if (boot_slot > 0) {
+        if (fw_slots_verify_int_slot(boot_slot) == 0) {
+            printf("Image on slot %d verified! Booting...\n", boot_slot);
+            address = fw_slots_get_slot_address(boot_slot);
+            fw_slots_jump_to_image(address);
+        } else {
+            printf("Slot %u inconsistent!\n", boot_slot);
+        }
+    } else {
+        (void) puts("No bootable slot found!\n");
+    }
+
+    /*
+     * TODO Add serial bootloader
+     */
+
+    /* Should not happen */
     return 0;
 }
