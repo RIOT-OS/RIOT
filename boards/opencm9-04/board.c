@@ -34,6 +34,9 @@ void board_init(void)
     /* disable bootloader's USB */
     RCC->APB1ENR &= ~RCC_APB1ENR_USBEN;
 
+    /* disable bootloader's TIMER update interrupt */
+    TIM2->DIER &= ~(TIM_DIER_UIE);
+
     /* configure the RIOT vector table location to internal flash + bootloader offset */
     SCB->VTOR = LOCATION_VTABLE;
 }
