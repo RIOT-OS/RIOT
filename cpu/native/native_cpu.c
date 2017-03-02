@@ -225,7 +225,7 @@ void thread_yield_higher(void)
         irq_enable();
     }
     else {
-        isr_thread_yield();
+        sched_context_switch_request = 1;
     }
 }
 
