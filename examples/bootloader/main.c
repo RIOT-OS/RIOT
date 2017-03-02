@@ -27,7 +27,6 @@
 int main(void)
 {
     uint8_t boot_slot = 0;
-    uint32_t address;
 
     (void) puts("Welcome to RIOT bootloader!\n");
     (void) puts("Trying to boot the newest firmware version\n");
@@ -36,6 +35,7 @@ int main(void)
 
     if (boot_slot > 0) {
         if (fw_slots_verify_int_slot(boot_slot) == 0) {
+            uint32_t address;
             printf("Image on slot %d verified! Booting...\n", boot_slot);
             address = fw_slots_get_slot_address(boot_slot);
             fw_slots_jump_to_image(address);
