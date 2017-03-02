@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup auto_init_ng_netif
+ * @ingroup auto_init_gnrc_netif
  * @{
  *
  * @file

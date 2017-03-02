@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Variables for the cc110x ng_netdev base interface
+ * @brief       Variables for the cc110x netdev2 interface
  *
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
