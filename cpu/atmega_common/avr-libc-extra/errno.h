@@ -55,7 +55,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Export errno value
+ * @brief number of last error
  */
 extern int errno;
 

@@ -50,7 +50,8 @@ typedef union x86_rtc_data {
         uint8_t second, minute, hour;
         uint8_t day, month, year, century;
     };
-    uint64_t timestamp;
+    uint64_t timestamp; /**< The full timestamp as a 64bit integer
+                              representation */
 } x86_rtc_data_t;
 
 #define RTC_REG_SECOND         (0x00)
