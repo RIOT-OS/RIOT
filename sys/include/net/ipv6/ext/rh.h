@@ -61,7 +61,7 @@ typedef struct __attribute__((packed)) {
  * @brief   Process the routing header of an IPv6 packet.
  *
  * @param[in, out] ipv6     An IPv6 packet.
- * @param[in] ext           A routing header of @ipv6.
+ * @param[in] ext           A routing header of @p ipv6.
  *
  * @return  EXT_RH_CODE_ERROR
  * @return  EXT_RH_CODE_FORWARD
