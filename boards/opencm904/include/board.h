@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    boards_opencm9-04 OpenCM9.04
+ * @defgroup    boards_opencm904 OpenCM9.04
  * @ingroup     boards
  * @brief       Board specific files for the OpenCM9.04 board
  * @{

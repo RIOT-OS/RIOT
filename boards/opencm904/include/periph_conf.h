@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_opencm9-04
+ * @ingroup     boards_opencm904
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the opencm9-04 board
+ * @brief       Peripheral MCU configuration for the opencm904 board
  *
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
