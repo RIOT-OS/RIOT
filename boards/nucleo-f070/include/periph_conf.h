@@ -15,7 +15,7 @@
  * @brief       Peripheral MCU configuration for the nucleo-f070 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Alexandre Aabdie <alexandre.abadie@inria.fr>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
 #ifndef PERIPH_CONF_H
