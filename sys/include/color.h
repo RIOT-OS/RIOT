@@ -91,7 +91,7 @@ void color_rgb2hex(const color_rgb_t *rgb, uint32_t *hex);
  *                      Expect unexpected behaviour, otherwise.
  *
  * @param[in] str       Input color encoded as string of the form 'RRGGBB'
- * @param[out] rgb      Output color encoded in RGB space
+ * @param[out] color    Output color encoded in RGB space
  */
 void color_str2rgb(const char *str, color_rgb_t *color);
 
