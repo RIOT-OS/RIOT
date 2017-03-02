@@ -174,7 +174,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
             gptimer->ICR = TBMIM;
 
             /* set timeout value */
-            gptimer->TAMATCHR = (gptimer->CFG == GPTMCFG_32_BIT_TIMER)? (gptimer->TBV + timeout) : (gptimer->TBV - timeout);
+            gptimer->TBMATCHR = (gptimer->CFG == GPTMCFG_32_BIT_TIMER)? (gptimer->TBV + timeout) : (gptimer->TBV - timeout);
             gptimer->cc2538_gptimer_imr.IMR |= TBMIM; /**< Enable the Timer B Match Interrupt */
             break;
     }
