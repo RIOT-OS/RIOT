@@ -17,7 +17,7 @@
  * @brief       Board specific definitions for the nucleo-l073 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Alexandre Aabdie <alexandre.abadie@inria.fr>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
 #ifndef BOARD_H
