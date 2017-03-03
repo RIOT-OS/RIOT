@@ -794,26 +794,36 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
 #ifdef MODULE_SOCK_IP
         case SOCK_RAW:
             /* TODO: apply configured timeout */
-            res = sock_ip_recv(&s->sock->raw, buffer, length, SOCK_NO_TIMEOUT,
-                               (sock_ip_ep_t *)&ep);
+            if ((res = sock_ip_recv(&s->sock->raw, buffer, length, SOCK_NO_TIMEOUT,
+                               (sock_ip_ep_t *)&ep) < 0) {
+                errno = -res;
+                res = -1;
+            }
             break;
 #endif
 #ifdef MODULE_SOCK_TCP
         case SOCK_STREAM:
             /* TODO: apply configured timeout */
-            res = sock_tcp_read(&s->sock->tcp.sock, buffer, length,
-                                SOCK_NO_TIMEOUT);
+            if ((res = sock_tcp_read(&s->sock->tcp.sock, buffer, length,
+                                SOCK_NO_TIMEOUT)) < 0) {
+                errno = -res;
+                res = -1;
+            }
             break;
 #endif
 #ifdef MODULE_SOCK_UDP
         case SOCK_DGRAM:
             /* TODO: apply configured timeout */
-            res = sock_udp_recv(&s->sock->udp, buffer, length, SOCK_NO_TIMEOUT,
-                                &ep);
+            if ((res = sock_udp_recv(&s->sock->udp, buffer, length, 0,
+                                &ep)) < 0) {
+                errno = -res;
+                res = -1;
+            }
             break;
 #endif
         default:
-            res = -EOPNOTSUPP;
+            errno = EOPNOTSUPP;
+            res = -1;
             break;
     }
     if ((res == 0) && (address != NULL) && (address_len != 0)) {
@@ -868,33 +878,45 @@ ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
         }
     }
 #if defined(MODULE_SOCK_IP) || defined(MODULE_SOCK_UDP)
-    _sockaddr_to_ep(address, address_len, &ep);
+    if ((res = _sockaddr_to_ep(address, address_len, &ep)) < 0)
+        return res;
 #endif
     switch (s->type) {
 #ifdef MODULE_SOCK_IP
         case SOCK_RAW:
-            res = sock_ip_send(&s->sock->raw, buffer, length,
-                               s->protocol, (sock_ip_ep_t *)&ep);
+            if ((res = sock_ip_send(&s->sock->raw, buffer, length,
+                               s->protocol, (sock_ip_ep_t *)&ep)) < 0) {
+                errno = -res;
+                res = -1;
+            }
             break;
 #endif
 #ifdef MODULE_SOCK_TCP
         case SOCK_STREAM:
             if (address == NULL) {
                 (void)address_len;
-                res = sock_tcp_write(&s->sock->tcp.sock, buffer, length);
+                if ((res = sock_tcp_write(&s->sock->tcp.sock, buffer, length)) < 0) {
+                    errno = -res;
+                    res = -1;
+                }
             }
             else {
-                res = EISCONN;
+                res = -1;
+                errno = EISCONN;
             }
             break;
 #endif
 #ifdef MODULE_SOCK_UDP
         case SOCK_DGRAM:
-            res = sock_udp_send(&s->sock->udp, buffer, length, &ep);
+            if ((res = sock_udp_send(&s->sock->udp, buffer, length, &ep)) < 0) {
+                errno = -res;
+                res = -1;
+            }
             break;
 #endif
         default:
-            res = -EOPNOTSUPP;
+            res = -1;
+            errno = EOPNOTSUPP;
             break;
     }
     return res;
