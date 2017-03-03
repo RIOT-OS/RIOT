@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_opencm9-04
+ * @ingroup     boards_opencm904
  * @{
  *
  * @file
