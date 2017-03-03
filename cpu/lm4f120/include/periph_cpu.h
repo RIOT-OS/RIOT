@@ -58,18 +58,6 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
- * @brief   Override values for pull register configuration
- * @{
- */
-#define HAVE_GPIO_PP_T
-typedef enum {
-  GPIO_NOPULL = GPIO_PIN_TYPE_STD,          /**< do not use internal pull resistors */
-  GPIO_PULLUP = GPIO_PIN_TYPE_STD_WPU,	    /**< enable internal pull-up resistor */
-  GPIO_PULLDOWN = GPIO_PIN_TYPE_STD_WPD	    /**< enable internal pull-down resistor */
-} gpio_pp_t;
-/** @} */
-
-/**
  * @brief   Override values for pin direction configuration
  * @{
  */
