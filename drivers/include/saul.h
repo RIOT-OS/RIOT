@@ -31,6 +31,8 @@
  *              operations. It probably needs to be extended to handling events,
  *              thresholds, and so on.
  *
+ * @see @ref sys_saul_reg
+ *
  * @{
  *
  * @file
