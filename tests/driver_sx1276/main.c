@@ -26,7 +26,6 @@
 #include "shell_commands.h"
 #include "thread.h"
 #include "xtimer.h"
-#include "lpm.h"
 #include "periph/rtc.h"
 
 #include "common.h"
@@ -197,7 +196,7 @@ int config_channel(int argc, char **argv)
 int rx_test(int argc, char **argv)
 {
     nd->driver->set(nd, NETOPT_LORA_SINGLE_RECEIVE, false, sizeof(uint8_t));
-    sx1276_set_rx(&sx1276, 0);
+    sx1276_set_rx(&sx1276);
 
     return 0;
 }

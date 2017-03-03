@@ -20,7 +20,11 @@
 #include "net/netdev2.h"
 #include "include/sx1276_registers.h"
 #include "include/sx1276_internal.h"
+
+#ifdef MODULE_LORAWAN
 #include "net/netdev2/lorawan.h"
+#endif
+
 #include "sx1276_netdev.h"
 #include "sx1276.h"
 #include <stddef.h>
@@ -385,7 +389,9 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
             *((uint32_t*) val) = sx1276_random(dev);
             break;
         default:
+#ifdef MODULE_LORAWAN
             return netdev2_lorawan_get((netdev2_lorawan_t*) netdev, opt, val, max_len);
+#endif
             break;
     }
     return 0;
@@ -463,7 +469,9 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             dev->settings.time_on_air_pkt_len = *((uint8_t*) val);
             break;
         default:
+#ifdef MODULE_LORAWAN
             return netdev2_lorawan_set((netdev2_lorawan_t*) netdev, opt, val, len);
+#endif
             break;
     }
     return 0;
