@@ -611,6 +611,10 @@ ifneq (,$(filter vfs,$(USEMODULE)))
     endif
 endif
 
+ifneq (,$(filter sock_dns,$(USEMODULE)))
+  USEMODULE += sock_util
+endif
+
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
