@@ -1,108 +1,79 @@
 /*
- * Copyright 2009, Freie Universitaet Berlin (FUB). All rights reserved.
+ * Copyright 2017, RWTH Aachen. All rights reserved.
+ *	@author Steffen Robertz <steffen.robertz@rwth-aachen.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
 
-#ifndef SHT11_H_
-#define SHT11_H_
-
 /**
- * @defgroup    drivers_sht11   SHT11
- * @ingroup     drivers_sensors
- * @brief       Driver for Sensirion SHT11 Humidity and Temperature Sensor
- * @{
+ * @brief driver for shtc1
  *
- * @file
- * @brief       SHT11 Device Driver
- *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
+ * This Driver implements the shtc1 Humidity and Temperature Sensor
+ * using I2C
  */
 
+#include "periph/i2c.h"
+#include "debug.h"
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* I2C Speeds defined in /drivers/include/periph/i2c.h I2C_SPEED_FAST = 400Hz */
+#define SHTC1_SPEED		I2C_SPEED_FAST
+/* If set to 1 checksum checking is enabled otherwise raw values are returned */
+#define CRC_CHECKING		(1U)
 
-#define SHTC1_NO_ACK        (0)
-#define SHTC1_ACK           (1)
-//adr command  r/w
-#define SHTC1_STATUS_REG_W  (0x06)  //000  0011    0
-#define SHTC1_STATUS_REG_R  (0x07)  //000  0011    1
-#define SHTC1_MEASURE_TEMP  (0x03)  //000  0001    1
-#define SHTC1_MEASURE_HUMI  (0x05)  //000  0010    1
-#define SHTC1_RESET         (0x1E)  //000  1111    0
-
-/* time to wait after toggling the data line */
-#define SHTC1_DATA_WAIT     (1)
-/* time to wait after toggling the clock line */
-#define SHTC1_CLK_WAIT      (1)
-
-/* set measurement timeout to 1 second */
-#define SHTC1_MEASURE_TIMEOUT   (1000)
-
-/**
- * @brief   sht11 measureable data
- */
 typedef struct {
-    float   temperature;    /**< temperature value */
-    float   relhum;         /**< linear relative humidity */
-    float   relhum_temp;    /**< temperature compensated relative humidity */
-} sht11_val_t;
+	float temp;
+	float rel_humidity;
+}shtc1_values_t;
+
 
 /**
- * @brief   SHT11 modes that can be measured
+ * @brief initializes the sensor and i2c
+ *
+ * @param[in] dev			i2c device to be used
+ *
+ * @return					0 on a working initialization
+ * @return                  -1 on undefined i2c device given in periph_conf
+ * @return                  -2 on unsupported speed value
  */
-typedef enum {
-    TEMPERATURE = 1,
-    HUMIDITY = 2
-} sht11_mode_t;
+int8_t shtc1_init(i2c_t dev);
 
 /**
- * @brief   Initialize SHT11 ports
+ * @brief reads temperature and humidity values
+ *
+ * @param[in] dev		The I2C Device
+ * @param[out] received_values		the received values are going to be saved here
+ *
+ * @return					0 on a verified and working measurement
+ * @return					-1 on a checksum error
  */
-void shtc1_init(void);
+int8_t shtc1_measure(i2c_t dev, shtc1_values_t* received_values);
 
 /**
- * @brief   Read sensor
+ * @brief reads out id
  *
- * @param value The struct to be filled with measured values
- * @param mode  Specifies type of data to be read
+ *When working correctly id should equal xxxx'xxxx'xx00'0111
+ *Where x is unspecified
  *
- * @return  1 on success, 0 otherwise
+ * @param[in] dev		The I2C Device
+ * @param[out] id		contains the id read from i2c
  *
- * Example:
- * \code sht11_val sht11;
- * sht11_read_sensor(&sht11, HUMIDITY|TEMPERATURE);
- * printf("%-6.2f °C %5.2f %% %5.2f %%\n", sht11.temperature, sht11.relhum, sht11.relhum_temp); \endcode
+ * @return 					0 on everything done
+ * @return					-1 on error occured
  */
-uint8_t shtc1_read_sensor(sht11_val_t *value, sht11_mode_t mode);
+int8_t shtc1_id(i2c_t dev, uint16_t *id);
 
 /**
- * @brief   Write status register
+ * @brief resets sensor
  *
- * @param   p_value The value to write
+ *This will reset all internal state machines and reload calibration data from the memory
  *
- * @return  1 on success, 0 otherwise
+ * @param[in] dev		The I2C Device
+ *
+ * @return 					0 on everything done
+ * @return					-1 on error occured
  */
-uint8_t shtc1_write_status(uint8_t *p_value);
+int8_t shtc1_id(i2c_t dev, uint16_t *id);
 
-/**
- * @brief   Read status register with checksum
- *
- * @param   p_value The read value
- * @param   p_checksum The received checksum
- *
- * return   1 on success, 0 otherwise
- */
-uint8_t shtc1_read_status(uint8_t *p_value, uint8_t *p_checksum);
-
-#ifdef __cplusplus
-}
-#endif
-
-/** @} */
-#endif /*SHT11_H_*/
