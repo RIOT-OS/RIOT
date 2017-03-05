@@ -32,7 +32,7 @@ static const shell_command_t shell_commands[] = {
 int main(void)
 {
     puts("Pinoccio PWM LED Shell!");
-
+    PORTB &= ~BLUE;
     char line_buf[SHELL_DEFAULT_BUFSIZE];
 
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
