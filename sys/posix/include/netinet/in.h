@@ -239,7 +239,7 @@ struct sockaddr_in6 {
     /**
      * Protocol family, always AF_INET6. Member of struct sockaddr_in6
      */
-    int             sin6_family;    /**< Protocol family, always AF_INET6 */
+    sa_family_t     sin6_family;    /**< Protocol family, always AF_INET6 */
     in_port_t       sin6_port;      /**< Port number */
     uint32_t        sin6_flowinfo;  /**< IPv6 traffic class and flow information */
     struct in6_addr sin6_addr;      /**< IPv6 address */
