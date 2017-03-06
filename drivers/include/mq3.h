@@ -27,6 +27,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief maximum unprocessed value fetched form the sensor
+ */
 #define MQ3_MAX_RAW_VALUE           (1023U)
 
 /**
@@ -45,7 +48,7 @@ typedef struct {
  *       can be made.
  *
  * @param[out] dev      device descriptor of an MQ-3 sensor
- * @param[in] adc       the ADC device the sensor is connected to
+ * @param[in] adc_line  the ADC device the sensor is connected to
  *
  * @return              0 on success
  * @return              -1 on error

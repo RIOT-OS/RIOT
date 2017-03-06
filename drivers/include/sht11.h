@@ -27,21 +27,21 @@
 extern "C" {
 #endif
 
-#define SHT11_NO_ACK        (0)
-#define SHT11_ACK           (1)
-//adr command  r/w
-#define SHT11_STATUS_REG_W  (0x06)  //000  0011    0
-#define SHT11_STATUS_REG_R  (0x07)  //000  0011    1
-#define SHT11_MEASURE_TEMP  (0x03)  //000  0001    1
-#define SHT11_MEASURE_HUMI  (0x05)  //000  0010    1
-#define SHT11_RESET         (0x1E)  //000  1111    0
+#define SHT11_NO_ACK        (0)     /**< don't ack read in `read_byte` */
+#define SHT11_ACK           (1)     /**< do acknowledge read in `read_byte` */
+/* adr command  r/w */
+#define SHT11_STATUS_REG_W  (0x06)  /**< will write to status register */
+#define SHT11_STATUS_REG_R  (0x07)  /**< will read from status register */
+#define SHT11_MEASURE_TEMP  (0x03)  /**< tell sensor to measure temperature */
+#define SHT11_MEASURE_HUMI  (0x05)  /**< tell sensor to measure humidity */
+#define SHT11_RESET         (0x1E)  /**< reset the sensor */
 
-/* time to wait after toggling the data line */
+/** time to wait after toggling the data line */
 #define SHT11_DATA_WAIT     (1)
-/* time to wait after toggling the clock line */
+/** time to wait after toggling the clock line */
 #define SHT11_CLK_WAIT      (1)
 
-/* set measurement timeout to 1 second */
+/** set measurement timeout to 1 second */
 #define SHT11_MEASURE_TIMEOUT   (1000)
 
 /**

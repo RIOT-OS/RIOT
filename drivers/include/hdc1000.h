@@ -116,7 +116,7 @@ int hdc1000_init(hdc1000_t *dev, const hdc1000_params_t *params);
  *
  * After the conversion is triggered, one has to wait
  * @ref HDC1000_CONVERSION_TIME us until the results can be read using
- * @ref hdc1000_reg_results().
+ * @ref hdc1000_get_results().
  *
  * @param[in]  dev          device descriptor of sensor
  */
