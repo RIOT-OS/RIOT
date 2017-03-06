@@ -25,16 +25,16 @@
 #include "cpu_conf_common.h"
 
 #ifdef CPU_MODEL_STM32F303VC
-#include "stm32f303xc.h"
+#include "vendor/stm32f303xc.h"
 #endif
 #ifdef CPU_MODEL_STM32F334R8
-#include "stm32f334x8.h"
+#include "vendor/stm32f334x8.h"
 #endif
 #ifdef CPU_MODEL_STM32F303RE
-#include "stm32f303xe.h"
+#include "vendor/stm32f303xe.h"
 #endif
 #ifdef CPU_MODEL_STM32F303K8
-#include "stm32f303x8.h"
+#include "vendor/stm32f303x8.h"
 #endif
 #ifdef __cplusplus
 extern "C" {

@@ -23,7 +23,7 @@
 
 #include "cpu_conf_common.h"
 
-#include "LPC11Uxx.h"
+#include "vendor/LPC11Uxx.h"
 
 #ifdef __cplusplus
 extern "C" {

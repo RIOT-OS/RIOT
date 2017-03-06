@@ -27,97 +27,97 @@ extern "C" {
 #endif
 
 #if   defined(CPU_MODEL_SAML21E18A)
-  #include "cmsis/saml21/include/saml21e18a.h"
+  #include "vendor/saml21/include/saml21e18a.h"
 #elif defined(CPU_MODEL_SAML21G18A)
-  #include "cmsis/saml21/include/saml21g18a.h"
+  #include "vendor/saml21/include/saml21g18a.h"
 #elif defined(CPU_MODEL_SAML21J18A)
-  #include "cmsis/saml21/include/saml21j18a.h"
+  #include "vendor/saml21/include/saml21j18a.h"
 #elif defined(CPU_MODEL_SAML21E15B)
-  #include "cmsis/saml21/include_b/saml21e15b.h"
+  #include "vendor/saml21/include_b/saml21e15b.h"
 #elif defined(CPU_MODEL_SAML21E16B)
-  #include "cmsis/saml21/include_b/saml21e16b.h"
+  #include "vendor/saml21/include_b/saml21e16b.h"
 #elif defined(CPU_MODEL_SAML21E17B)
-  #include "cmsis/saml21/include_b/saml21e17b.h"
+  #include "vendor/saml21/include_b/saml21e17b.h"
 #elif defined(CPU_MODEL_SAML21E18B)
-  #include "cmsis/saml21/include_b/saml21e18b.h"
+  #include "vendor/saml21/include_b/saml21e18b.h"
 #elif defined(CPU_MODEL_SAML21G16B)
-  #include "cmsis/saml21/include_b/saml21g16b.h"
+  #include "vendor/saml21/include_b/saml21g16b.h"
 #elif defined(CPU_MODEL_SAML21G17B)
-  #include "cmsis/saml21/include_b/saml21g17b.h"
+  #include "vendor/saml21/include_b/saml21g17b.h"
 #elif defined(CPU_MODEL_SAML21G18B)
-  #include "cmsis/saml21/include_b/saml21g18b.h"
+  #include "vendor/saml21/include_b/saml21g18b.h"
 #elif defined(CPU_MODEL_SAML21J16B)
-  #include "cmsis/saml21/include_b/saml21j16b.h"
+  #include "vendor/saml21/include_b/saml21j16b.h"
 #elif defined(CPU_MODEL_SAML21J17B)
-  #include "cmsis/saml21/include_b/saml21j17b.h"
+  #include "vendor/saml21/include_b/saml21j17b.h"
 #elif defined(CPU_MODEL_SAML21J18B)
-  #include "cmsis/saml21/include_b/saml21j18b.h"
+  #include "vendor/saml21/include_b/saml21j18b.h"
 
 #elif defined(CPU_MODEL_SAMR21E16A)
-  #include "cmsis/samr21/include/samr21e16a.h"
+  #include "vendor/samr21/include/samr21e16a.h"
 #elif defined(CPU_MODEL_SAMR21E17A)
-  #include "cmsis/samr21/include/samr21e17a.h"
+  #include "vendor/samr21/include/samr21e17a.h"
 #elif defined(CPU_MODEL_SAMR21E18A)
-  #include "cmsis/samr21/include/samr21e18a.h"
+  #include "vendor/samr21/include/samr21e18a.h"
 #elif defined(CPU_MODEL_SAMR21G16A)
-  #include "cmsis/samr21/include/samr21g16a.h"
+  #include "vendor/samr21/include/samr21g16a.h"
 #elif defined(CPU_MODEL_SAMR21G17A)
-  #include "cmsis/samr21/include/samr21g17a.h"
+  #include "vendor/samr21/include/samr21g17a.h"
 #elif defined(CPU_MODEL_SAMR21G18A)
-  #include "cmsis/samr21/include/samr21g18a.h"
+  #include "vendor/samr21/include/samr21g18a.h"
 
 #elif defined(CPU_MODEL_SAMD21E15A)
-  #include "cmsis/samd21/include/samd21e15a.h"
+  #include "vendor/samd21/include/samd21e15a.h"
 #elif defined(CPU_MODEL_SAMD21E16A)
-  #include "cmsis/samd21/include/samd21e16a.h"
+  #include "vendor/samd21/include/samd21e16a.h"
 #elif defined(CPU_MODEL_SAMD21E17A)
-  #include "cmsis/samd21/include/samd21e17a.h"
+  #include "vendor/samd21/include/samd21e17a.h"
 #elif defined(CPU_MODEL_SAMD21E18A)
-  #include "cmsis/samd21/include/samd21e18a.h"
+  #include "vendor/samd21/include/samd21e18a.h"
 #elif defined(CPU_MODEL_SAMD21G15A)
-  #include "cmsis/samd21/include/samd21g15a.h"
+  #include "vendor/samd21/include/samd21g15a.h"
 #elif defined(CPU_MODEL_SAMD21G16A)
-  #include "cmsis/samd21/include/samd21g16a.h"
+  #include "vendor/samd21/include/samd21g16a.h"
 #elif defined(CPU_MODEL_SAMD21G17A)
-  #include "cmsis/samd21/include/samd21g17a.h"
+  #include "vendor/samd21/include/samd21g17a.h"
 #elif defined(CPU_MODEL_SAMD21G17AU)
-  #include "cmsis/samd21/include/samd21g17au.h"
+  #include "vendor/samd21/include/samd21g17au.h"
 #elif defined(CPU_MODEL_SAMD21G18A)
-  #include "cmsis/samd21/include/samd21g18a.h"
+  #include "vendor/samd21/include/samd21g18a.h"
 #elif defined(CPU_MODEL_SAMD21G18AU)
-  #include "cmsis/samd21/include/samd21g18au.h"
+  #include "vendor/samd21/include/samd21g18au.h"
 #elif defined(CPU_MODEL_SAMD21J15A)
-  #include "cmsis/samd21/include/samd21j15a.h"
+  #include "vendor/samd21/include/samd21j15a.h"
 #elif defined(CPU_MODEL_SAMD21J16A)
-  #include "cmsis/samd21/include/samd21j16a.h"
+  #include "vendor/samd21/include/samd21j16a.h"
 #elif defined(CPU_MODEL_SAMD21J17A)
-  #include "cmsis/samd21/include/samd21j17a.h"
+  #include "vendor/samd21/include/samd21j17a.h"
 #elif defined(CPU_MODEL_SAMD21J18A)
-  #include "cmsis/samd21/include/samd21j18a.h"
+  #include "vendor/samd21/include/samd21j18a.h"
 #elif defined(CPU_MODEL_SAMD21E15B)
-  #include "cmsis/samd21/include/samd21e15b.h"
+  #include "vendor/samd21/include/samd21e15b.h"
 #elif defined(CPU_MODEL_SAMD21E15BU)
-  #include "cmsis/samd21/include/samd21e15bu.h"
+  #include "vendor/samd21/include/samd21e15bu.h"
 #elif defined(CPU_MODEL_SAMD21E15L)
-  #include "cmsis/samd21/include/samd21e15l.h"
+  #include "vendor/samd21/include/samd21e15l.h"
 #elif defined(CPU_MODEL_SAMD21E16B)
-  #include "cmsis/samd21/include/samd21e16b.h"
+  #include "vendor/samd21/include/samd21e16b.h"
 #elif defined(CPU_MODEL_SAMD21E16BU)
-  #include "cmsis/samd21/include/samd21e16bu.h"
+  #include "vendor/samd21/include/samd21e16bu.h"
 #elif defined(CPU_MODEL_SAMD21E16L)
-  #include "cmsis/samd21/include/samd21e16l.h"
+  #include "vendor/samd21/include/samd21e16l.h"
 #elif defined(CPU_MODEL_SAMD21G15B)
-  #include "cmsis/samd21/include/samd21g15b.h"
+  #include "vendor/samd21/include/samd21g15b.h"
 #elif defined(CPU_MODEL_SAMD21G15L)
-  #include "cmsis/samd21/include/samd21g15l.h"
+  #include "vendor/samd21/include/samd21g15l.h"
 #elif defined(CPU_MODEL_SAMD21G16B)
-  #include "cmsis/samd21/include/samd21g16b.h"
+  #include "vendor/samd21/include/samd21g16b.h"
 #elif defined(CPU_MODEL_SAMD21G16L)
-  #include "cmsis/samd21/include/samd21g16l.h"
+  #include "vendor/samd21/include/samd21g16l.h"
 #elif defined(CPU_MODEL_SAMD21J15B)
-  #include "cmsis/samd21/include/samd21j15b.h"
+  #include "vendor/samd21/include/samd21j15b.h"
 #elif defined(CPU_MODEL_SAMD21J16B)
-  #include "cmsis/samd21/include/samd21j16b.h"
+  #include "vendor/samd21/include/samd21j16b.h"
 
 #else
   #error "Unsupported SAM0 variant."

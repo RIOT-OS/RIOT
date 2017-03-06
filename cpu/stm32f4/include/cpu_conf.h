@@ -24,17 +24,17 @@
 #include "cpu_conf_common.h"
 
 #if defined(CPU_MODEL_STM32F401RE)
-#include "stm32f401xe.h"
+#include "vendor/stm32f401xe.h"
 #elif defined(CPU_MODEL_STM32F407VG)
-#include "stm32f407xx.h"
+#include "vendor/stm32f407xx.h"
 #elif defined(CPU_MODEL_STM32F411RE)
-#include "stm32f411xe.h"
+#include "vendor/stm32f411xe.h"
 #elif defined(CPU_MODEL_STM32F413ZH)
-#include "stm32f413xx.h"
+#include "vendor/stm32f413xx.h"
 #elif defined(CPU_MODEL_STM32F415RG)
-#include "stm32f415xx.h"
+#include "vendor/stm32f415xx.h"
 #elif defined(CPU_MODEL_STM32F446RE)
-#include "stm32f446xx.h"
+#include "vendor/stm32f446xx.h"
 #endif
 
 #ifdef __cplusplus

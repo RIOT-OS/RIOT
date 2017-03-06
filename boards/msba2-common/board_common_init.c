@@ -24,7 +24,6 @@
 #include <string.h>
 #include "board.h"
 #include "msba2_common.h"
-#include "lpc23xx.h"
 #include "cpu.h"
 
 #define CL_CPU_DIV      4

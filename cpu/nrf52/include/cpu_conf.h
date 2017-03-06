@@ -21,8 +21,8 @@
 #define CPU_CONF_H
 
 #include "cpu_conf_common.h"
-#include "nrf52.h"
-#include "nrf52_bitfields.h"
+#include "vendor/nrf52.h"
+#include "vendor/nrf52_bitfields.h"
 
 #ifdef __cplusplus
 extern "C" {
