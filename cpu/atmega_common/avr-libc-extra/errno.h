@@ -28,9 +28,8 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-
 #ifndef ERRNO_H
-#define ERRNO_H_ 1
+#define ERRNO_H
 
 /**
  *  @addtogroup cpu_atmega_common
@@ -55,6 +54,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Export errno value
+ */
 extern int errno;
 
 #ifdef __cplusplus
