@@ -5,7 +5,7 @@
  */
 
 /**
- * @defgroup        cpu_specific_peripheral_memory_map
+ * @defgroup        cpu_specific_peripheral_memory_map CC26x0 peripheral memory map
  * @ingroup         cpu
  */
 
