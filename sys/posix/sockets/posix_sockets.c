@@ -752,7 +752,7 @@ int listen(int socket, int backlog)
         bf_unset(_sock_pool_used, _get_sock_idx(sock));
         mutex_unlock(&_socket_pool_mutex);
     }
-    return -res;
+    return res;
 #else
     (void)socket;
     (void)backlog;
