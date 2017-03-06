@@ -16,6 +16,7 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 0
 
 USEMODULE += rgbled
-USEMODULE += shell
+USEMODULE += xtimer
+FEATURES_REQUIRED += periph_timer
 include $(RIOTBASE)/Makefile.include
 
