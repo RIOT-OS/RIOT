@@ -14,7 +14,7 @@
  * @brief  C++11 chrono drop in replacement that adds the function now based on
  *         xtimer/timex
  * @see    <a href="http://en.cppreference.com/w/cpp/thread/thread">
- *           std::thread, defined in header <thread>
+ *           std::thread, defined in header thread
  *         </a>
  *
  * @author Raphael Hiesgen <raphael.hiesgen (at) haw-hamburg.de>
@@ -38,30 +38,37 @@ constexpr uint32_t microsecs_in_sec = 1000000;
 } // namespace anaonymous
 
 /**
- * @brief time point to use for timed wait, as stdlib clocks are not available
+ * @brief A time point for timed wait, as clocks from the standard are not
+ *        available on RIOT.
  */
 class time_point {
   using native_handle_type = timex_t;
 
  public:
   /**
-   * @brief create a time point with seconds and microseconds set to 0
+   * @brief Creates a time point with seconds and microseconds set to 0.
    */
   inline time_point() : m_handle{0, 0} {}
   /**
-   * @brief create time point from timex_t struct
+   * @brief Create time point from timex_t struct.
    */
   inline time_point(timex_t&& tp) : m_handle(tp) {}
+  /**
+   * @brief Use default copy constructor.
+   */
   constexpr time_point(const time_point& tp) = default;
+  /**
+   * @brief Use default move constructor.
+   */
   constexpr time_point(time_point&& tp) = default;
 
   /**
-   * @brief get access to the handle used to store the time information
+   * @brief Gives access to the native handle that stores the time information.
    */
   inline native_handle_type native_handle() const { return m_handle; }
 
   /**
-   * @brief add a stdlib chrono::duration to this time point
+   * @brief Add a standard chrono::duration to this time point.
    */
   template <class Rep, class Period>
   inline time_point& operator+=(const std::chrono::duration<Rep, Period>& d) {
@@ -74,12 +81,12 @@ class time_point {
   }
 
   /**
-   * @brief returns seconds member as uint32_t
+   * @brief Returns seconds member as uint32_t.
    */
   inline uint32_t seconds() const { return m_handle.seconds; }
 
   /**
-   * @brief returns microseconds member as uint32_t
+   * @brief Returns microseconds member as uint32_t.
    */
   inline uint32_t microseconds() const { return m_handle.microseconds; }
 
@@ -93,9 +100,9 @@ class time_point {
 };
 
 /**
- * @brief get the current time saved in a time point
+ * @brief Returns the current time saved in a time point.
  *
- * @return time_point containing the current time
+ * @return time_point containing the current time.
  */
 inline time_point now() {
   timex_t tp;
@@ -104,7 +111,7 @@ inline time_point now() {
 }
 
 /**
- * @brief compare two timepoints
+ * @brief Compares two timepoints.
  */
 inline bool operator<(const time_point& lhs, const time_point& rhs) {
   return lhs.seconds() < rhs.seconds()
@@ -113,21 +120,21 @@ inline bool operator<(const time_point& lhs, const time_point& rhs) {
 }
 
 /**
- * @brief compare two timepoints
+ * @brief Compares two timepoints.
  */
 inline bool operator>(const time_point& lhs, const time_point& rhs) {
   return rhs < lhs;
 }
 
 /**
- * @brief compare two timepoints
+ * @brief Compares two timepoints.
  */
 inline bool operator<=(const time_point& lhs, const time_point& rhs) {
   return !(rhs < lhs);
 }
 
 /**
- * @brief compare two timepoints
+ * @brief Compare two timepoints.
  */
 inline bool operator>=(const time_point& lhs, const time_point& rhs) {
   return !(lhs < rhs);
