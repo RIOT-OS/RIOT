@@ -21,17 +21,29 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-rcvbuf_t _static_buf;   /**< Staticly allocated receive buffers */
+/**
+ * @brief Internal struct holding receive buffers.
+ */
+rcvbuf_t _static_buf;
 
+/**
+ * @brief Initializes all receive buffers.
+ */
 void _rcvbuf_init(void)
 {
-    DEBUG("gnrc_tcp_rcvbuf.c : _rcvbuf_init() : Entry\n");
+    DEBUG("gnrc_tcp_rcvbuf.c : _rcvbuf_init() : entry\n");
     mutex_init(&(_static_buf.lock));
     for (size_t i = 0; i < GNRC_TCP_RCV_BUFFERS; ++i) {
         _static_buf.entries[i].used = 0;
     }
 }
 
+/**
+ * @brief Allocate receive buffer.
+ *
+ * @returns   Not NULL if a receive buffer was allocated.
+ *            NULL if allocation failed.
+ */
 static void* _rcvbuf_alloc(void)
 {
     void *result = NULL;
@@ -48,12 +60,17 @@ static void* _rcvbuf_alloc(void)
     return result;
 }
 
+/**
+ * @brief Release allocated receive buffer.
+ *
+ * @param[in] buf   Pointer to buffer that should be released.
+ */
 static void _rcvbuf_free(void * const buf)
 {
     DEBUG("gnrc_tcp_rcvbuf.c : _rcvbuf_free() : Entry\n");
     mutex_lock(&(_static_buf.lock));
     for (size_t i = 0; i < GNRC_TCP_RCV_BUFFERS; ++i) {
-        if (_static_buf.entries[i].used == 1 && buf == _static_buf.entries[i].buffer) {
+        if ((_static_buf.entries[i].used == 1) && (buf == _static_buf.entries[i].buffer)) {
             _static_buf.entries[i].used = 0;
         }
     }
