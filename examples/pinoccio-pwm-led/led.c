@@ -24,7 +24,7 @@ int rgb_cmd(int argc, char **argv)
 			}else
 			{
 				uint16_t value = atoi(argv[2]);
-				if(value >= 255 && value >= 0) {
+				if(value > 255 || value < 0) {
 					puts("color values should be between 0-255");
 					return 1;
 				}
@@ -38,7 +38,7 @@ int rgb_cmd(int argc, char **argv)
 				my_color.g = 0;
 			}else{
 				uint16_t value = atoi(argv[2]);
-				if(value >= 255 && value >= 0) {
+				if(value > 255 || value < 0) {
 					puts("color values should be between 0-255");
 					return 1;
 				}
@@ -52,7 +52,7 @@ int rgb_cmd(int argc, char **argv)
 				my_color.b = 0;
 			}else{
 				uint16_t value = atoi(argv[2]);
-				if(value >= 255 && value >= 0) {
+				if(value > 255 || value < 0) {
 					puts("color values should be between 0-255");
 					return 1;
 				}

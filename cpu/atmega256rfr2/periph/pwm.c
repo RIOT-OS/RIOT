@@ -157,7 +157,13 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
     if (value > pwm_config[pwm].dev->ICR) {
         value = (uint16_t)pwm_config[pwm].dev->ICR;
     }
-    pwm_config[pwm].dev->OCR[channel] = value*(*(pwm_config[pwm].scale_pointer));
+    /* since 0 in ocrn has a special meaning, set pin low on value=0 */
+    if(value == 0) {
+    	gpio_init(pwm_config[pwm].chan[channel].pin, GPIO_IN);
+    }else {
+    	gpio_init(pwm_config[pwm].chan[channel].pin, GPIO_OUT);
+    	pwm_config[pwm].dev->OCR[channel] = value*(*(pwm_config[pwm].scale_pointer));
+    }
     DEBUG("OCR%d %u\n",channel, (unsigned int)value*(*(pwm_config[pwm].scale_pointer)));
 }
 
