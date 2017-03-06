@@ -41,7 +41,6 @@
 #include <stdint.h>
 
 #include "periph/i2c.h"
-#include "hdc1000_regs.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -79,8 +78,8 @@ enum {
  * @brief   Possible resolution values
  */
 typedef enum {
-    HDC1000_11BIT = (HDC1000_TRES11 | HDC1000_HRES11),  /**< 11-bit conversion */
-    HDC1000_14BIT = (HDC1000_TRES14 | HDC1000_HRES14)   /**< 14-bit conversion */
+    HDC1000_11BIT = (0x0500),   /**< 11-bit conversion */
+    HDC1000_14BIT = (0x0000)    /**< 14-bit conversion */
 } hdc1000_res_t;
 
 /**
