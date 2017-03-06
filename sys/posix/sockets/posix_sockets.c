@@ -795,7 +795,7 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
         case SOCK_RAW:
             /* TODO: apply configured timeout */
             if ((res = sock_ip_recv(&s->sock->raw, buffer, length, SOCK_NO_TIMEOUT,
-                               (sock_ip_ep_t *)&ep) < 0) {
+                               (sock_ip_ep_t *)&ep)) < 0) {
                 errno = -res;
                 res = -1;
             }
