@@ -18,7 +18,7 @@ fi
 
 BRANCH=${1}
 FILEREGEX='\.([CcHhSs]|[ch]pp)$'
-EXCLUDE='^(cpu/saml21/include/atmel/)|^(cpu/cortexm_common/include/)'
+EXCLUDE='^(.+/include/vendor/)'
 
 # If no branch but an option is given, unset BRANCH.
 # Otherwise, consume this parameter.
