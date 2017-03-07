@@ -1,9 +1,9 @@
 # export board specific dependencies to the global includes-listing
 
-ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
+ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
 
 # use module at86rfr2 to compile RF Transciefer feature
 # and RFR2 which indicates the SOC feature for the atmega256rfr2
 	$(error CAUTION: AT86RFR2 not implemented jet!)
-	#USEMODULE += AT86RFR2
+	USEMODULE += at86rfr2
 endif

@@ -23,6 +23,8 @@
 #include "shell.h"
 #include "msg.h"
 
+#include "board.h"
+
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
@@ -35,6 +37,9 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
+	LED_PORT |= BLUE|GREEN|RED;
+	LED_PORT ^= RED;
+
     /* we need a message queue for the thread running the shell in order to
      * receive potentially fast incoming networking packets */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
@@ -43,8 +48,10 @@ int main(void)
     /* start shell */
     puts("All up, running the shell now");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
+
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
+    puts("Error: END of main().");
     /* should be never reached */
     return 0;
 }

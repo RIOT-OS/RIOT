@@ -22,6 +22,8 @@
 #include "xtimer.h"
 #include "timex.h"
 
+#include "board.h"
+
 /* set interval to 1 second */
 #define INTERVAL (1U * SEC_IN_USEC)
 
@@ -32,7 +34,8 @@ int main(void)
     while(1) {
         xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
         printf("slept until %" PRIu32 "\n", xtimer_now());
+        // toggle red led
+        LED_PORT ^= RED;
     }
-
     return 0;
 }
