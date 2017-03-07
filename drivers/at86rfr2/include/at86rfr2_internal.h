@@ -46,7 +46,7 @@ extern "C" {
  * @brief   Transition time to TRX_OFF after reset pulse in us, refer
  *          figure 7-8, p. 44.
  */
-#define AT86RF2XX_RESET_DELAY           (37U)
+#define AT86RF2XX_RESET_DELAY           (100U) //37
 
 /**
  * @brief   Read from a register at address `addr` from device `dev`.
@@ -56,7 +56,7 @@ extern "C" {
  *
  * @return              the value of the specified register
  */
-uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr);
+uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, volatile uint8_t* addr);
 
 /**
  * @brief   Write to a register at address `addr` from device `dev`.
@@ -65,7 +65,7 @@ uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr);
  * @param[in] addr      address of the register to write
  * @param[in] value     value to write to the given register
  */
-void at86rf2xx_reg_write(const at86rf2xx_t *dev, const uint8_t addr,
+void at86rf2xx_reg_write(const at86rf2xx_t *dev,  volatile uint8_t* addr,
                          const uint8_t value);
 
 /**
