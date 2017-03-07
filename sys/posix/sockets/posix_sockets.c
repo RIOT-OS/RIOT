@@ -786,8 +786,7 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
 #endif
         /* bind implicitly */
         if ((res = _bind_connect(s, NULL, 0)) < 0) {
-            errno = -res;
-            return -1;
+            return res;
         }
     }
     switch (s->type) {
@@ -873,8 +872,7 @@ ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
 #endif
         /* bind implicitly */
         if ((res = _bind_connect(s, NULL, 0)) < 0) {
-            errno = -res;
-            return -1;
+            return res;
         }
     }
 #if defined(MODULE_SOCK_IP) || defined(MODULE_SOCK_UDP)
