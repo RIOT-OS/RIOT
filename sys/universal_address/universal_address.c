@@ -91,6 +91,10 @@ static universal_address_container_t *universal_address_find_entry(uint8_t *addr
  */
 static universal_address_container_t *universal_address_get_next_unused_entry(void)
 {
+    /* cppcheck-suppress unsignedLessThanZero
+     * (reason: UNIVERSAL_ADDRESS_MAX_ENTRIES may be zero in which case this
+     * code is optimized out)
+     */
     if (universal_address_table_filled < UNIVERSAL_ADDRESS_MAX_ENTRIES) {
         for (size_t i = 0; i < UNIVERSAL_ADDRESS_MAX_ENTRIES; ++i) {
             if (universal_address_table[i].use_count == 0) {
