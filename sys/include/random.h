@@ -39,6 +39,10 @@ extern "C" {
 /**
  * @brief initializes PRNG with a seed
  *
+ * @warning Currently, the random module uses a global state
+ * => multiple calls to @ref random_init will reset the existing
+ * state of the PRNG.
+ *
  * @param s seed for the PRNG
  */
 void random_init(uint32_t s);
