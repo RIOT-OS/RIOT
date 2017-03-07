@@ -826,7 +826,7 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
             res = -1;
             break;
     }
-    if ((res == 0) && (address != NULL) && (address_len != 0)) {
+    if ((res >= 0) && (address != NULL) && (address_len != 0)) {
         switch (s->type) {
 #ifdef MODULE_SOCK_TCP
             case SOCK_STREAM:
