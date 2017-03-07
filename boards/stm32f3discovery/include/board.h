@@ -50,36 +50,36 @@ extern "C" {
 #define LED6_MASK           (1 << 12)
 #define LED7_MASK           (1 << 13)
 
-#define LED0_ON             (LED_PORT->BSRRL = LED0_MASK)
-#define LED0_OFF            (LED_PORT->BSRRH = LED0_MASK)
+#define LED0_ON             (LED_PORT->BSRR = LED0_MASK)
+#define LED0_OFF            (LED_PORT->BSRR = (LED0_MASK << 16))
 #define LED0_TOGGLE         (LED_PORT->ODR  ^= LED0_MASK)
 
-#define LED1_ON             (LED_PORT->BSRRL = LED1_MASK)
-#define LED1_OFF            (LED_PORT->BSRRH = LED1_MASK)
+#define LED1_ON             (LED_PORT->BSRR = LED1_MASK)
+#define LED1_OFF            (LED_PORT->BSRR = (LED1_MASK << 16))
 #define LED1_TOGGLE         (LED_PORT->ODR  ^= LED1_MASK)
 
-#define LED2_ON             (LED_PORT->BSRRL = LED2_MASK)
-#define LED2_OFF            (LED_PORT->BSRRH = LED2_MASK)
+#define LED2_ON             (LED_PORT->BSRR = LED2_MASK)
+#define LED2_OFF            (LED_PORT->BSRR = (LED2_MASK << 16))
 #define LED2_TOGGLE         (LED_PORT->ODR  ^= LED2_MASK)
 
-#define LED3_ON             (LED_PORT->BSRRL = LED3_MASK)
-#define LED3_OFF            (LED_PORT->BSRRH = LED3_MASK)
+#define LED3_ON             (LED_PORT->BSRR = LED3_MASK)
+#define LED3_OFF            (LED_PORT->BSRR = (LED3_MASK << 16))
 #define LED3_TOGGLE         (LED_PORT->ODR  ^= LED3_MASK)
 
-#define LED4_ON             (LED_PORT->BSRRL = LED4_MASK)
-#define LED4_OFF            (LED_PORT->BSRRH = LED4_MASK)
+#define LED4_ON             (LED_PORT->BSRR = LED4_MASK)
+#define LED4_OFF            (LED_PORT->BSRR = (LED4_MASK << 16))
 #define LED4_TOGGLE         (LED_PORT->ODR  ^= LED4_MASK)
 
-#define LED5_ON             (LED_PORT->BSRRL = LED5_MASK)
-#define LED5_OFF            (LED_PORT->BSRRH = LED5_MASK)
+#define LED5_ON             (LED_PORT->BSRR = LED5_MASK)
+#define LED5_OFF            (LED_PORT->BSRR = (LED5_MASK << 16))
 #define LED5_TOGGLE         (LED_PORT->ODR  ^= LED5_MASK)
 
-#define LED6_ON             (LED_PORT->BSRRL = LED6_MASK)
-#define LED6_OFF            (LED_PORT->BSRRH = LED6_MASK)
+#define LED6_ON             (LED_PORT->BSRR = LED6_MASK)
+#define LED6_OFF            (LED_PORT->BSRR = (LED6_MASK << 16))
 #define LED6_TOGGLE         (LED_PORT->ODR  ^= LED6_MASK)
 
-#define LED7_ON             (LED_PORT->BSRRL = LED7_MASK)
-#define LED7_OFF            (LED_PORT->BSRRH = LED7_MASK)
+#define LED7_ON             (LED_PORT->BSRR = LED7_MASK)
+#define LED7_OFF            (LED_PORT->BSRR = (LED7_MASK << 16))
 #define LED7_TOGGLE         (LED_PORT->ODR  ^= LED7_MASK)
 /** @} */
 

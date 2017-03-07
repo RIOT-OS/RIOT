@@ -33,8 +33,8 @@ extern "C" {
 
 #define LED0_MASK           (1 << 3)
 
-#define LED0_ON             (GPIOB->BSRRL    = LED0_MASK)
-#define LED0_OFF            (GPIOB->BSRRH    = LED0_MASK)
+#define LED0_ON             (GPIOB->BSRR    = LED0_MASK)
+#define LED0_OFF            (GPIOB->BSRR    = (LED0_MASK << 16))
 #define LED0_TOGGLE         (GPIOB->ODR     ^= LED0_MASK)
 /** @} */
 
