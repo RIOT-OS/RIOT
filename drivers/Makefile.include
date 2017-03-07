@@ -246,6 +246,10 @@ ifneq (,$(filter uart_half_duplex,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/uart_half_duplex/include
 endif
 
+ifneq (,$(filter vcnl40x0,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/vcnl40x0/include
+endif
+
 ifneq (,$(filter veml6070,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/veml6070/include
 endif
