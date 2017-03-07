@@ -144,9 +144,8 @@ int cipher_encrypt_ccm(cipher_t* cipher, uint8_t* auth_data, uint32_t auth_data_
         return CCM_ERR_INVALID_MAC_LENGTH;
     }
 
-    length_max = 2 << (8 * length_encoding);
-    if (length_encoding < 2 || length_encoding > 8 ||
-            input_len - auth_data_len > length_max) {
+    length_max = 1 << (8 * length_encoding);
+    if (length_encoding < 2 || length_encoding > 8 || input_len >= length_max) {
         return CCM_ERR_INVALID_LENGTH_ENCODING;
     }
 
@@ -206,9 +205,8 @@ int cipher_decrypt_ccm(cipher_t* cipher, uint8_t* auth_data,
         return CCM_ERR_INVALID_MAC_LENGTH;
     }
 
-    length_max = 2 << (8 * length_encoding);
-    if (length_encoding < 2 || length_encoding > 8 ||
-            input_len - auth_data_len > length_max) {
+    length_max = 1 << (8 * length_encoding);
+    if (length_encoding < 2 || length_encoding > 8 || input_len >= length_max) {
         return CCM_ERR_INVALID_LENGTH_ENCODING;
     }
 
