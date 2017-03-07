@@ -814,7 +814,7 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
 #ifdef MODULE_SOCK_UDP
         case SOCK_DGRAM:
             /* TODO: apply configured timeout */
-            if ((res = sock_udp_recv(&s->sock->udp, buffer, length, 0,
+            if ((res = sock_udp_recv(&s->sock->udp, buffer, length, SOCK_NO_TIMEOUT,
                                 &ep)) < 0) {
                 errno = -res;
                 res = -1;
