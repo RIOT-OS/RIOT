@@ -26,10 +26,10 @@
 #include "cpu_conf_common.h"
 
 #ifdef CPU_MODEL_STM32L073RZ
-#include "stm32l073xx.h"
+#include "vendor/stm32l073xx.h"
 #endif
 #ifdef CPU_MODEL_STM32L053R8
-#include "stm32l053xx.h"
+#include "vendor/stm32l053xx.h"
 #endif
 
 #ifdef __cplusplus

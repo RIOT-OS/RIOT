@@ -24,7 +24,7 @@
  * @note        $Id$
  */
 
-#include "lpc23xx.h"
+#include "cpu.h"
 #include "board.h"
 
 #ifdef __cplusplus

@@ -818,36 +818,17 @@ EXCLUDE_SYMLINKS       = NO
 # exclude all test directories for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = */board/*/tools/* \
-                         */cpu/cortexm_common/include/core_cm*.h \
-                         */cpu/ezr32wg/include/ezr* \
-                         */cpu/*/include/atmel/* \
-                         */cpu/k60/include/MK60D10.h \
-                         */cpu/k60/include/MK60DZ10.h \
-                         */cpu/k64f/include/MK64F12.h \
-                         */cpu/kw2x/include/MKW22D5.h \
-                         */cpu/lpc11u34/include/LPC11Uxx.h \
-                         */cpu/lpc1768/include/LPC17xx.h \
-                         */cpu/lpc*/include/core_cm*.h \
                          */cpu/msp430_common/include/stdatomic.h \
                          */cpu/msp430_common/include/sys/*.h \
                          */cpu/native/osx-libc-extra \
-                         */cpu/nrf5*/include/nrf5*.h \
-                         */cpu/sam0_common/include/cmsis/* \
-                         */cpu/sam3/include/sam3* \
-                         */cpu/sam3/include/system_sam*.h \
-                         */cpu/stellaris_common/include/stellaris_periph \
-                         */cpu/stm32f2/include/stm32f2*.h \
-                         */cpu/stm32f4/include/stm32f4*.h \
-                         */cpu/stm32f*/include/stm32f* \
-                         */cpu/stm32l1/include/stm32l*.h \
-                         */cpu/stm32l0/include/stm32l* \
-                         */cpu/x86/include/x86_pci.h \
+                         */cpu/x86/include/* \
                          */drivers/kw2xrf/include/overwrites.h \
                          */drivers/nrf24l01p/include/nrf24l01p_settings.h \
                          */pkg/*/*/* \
                          */pkg/tlsf/patch.txt \
                          */sys/random/tinymt32/* \
                          */toolchain/* \
+                         */vendor/* \
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the

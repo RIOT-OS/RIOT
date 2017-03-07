@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    stm32f215xx.h
+  * @file    stm32f207xx.h
   * @author  MCD Application Team
   * @version V2.1.1
   * @date    20-November-2015
-  * @brief   CMSIS STM32F215xx Device Peripheral Access Layer Header File.
+  * @brief   CMSIS STM32F207xx Device Peripheral Access Layer Header File.
   *          This file contains :
   *           - Data structures and the address mapping for all peripherals
   *           - Peripheral's registers declarations and bits definition
@@ -44,12 +44,12 @@
   * @{
   */
 
-/** @addtogroup stm32f215xx
+/** @addtogroup stm32f207xx
   * @{
   */
 
-#ifndef STM32F215xx_H
-#define STM32F215xx_H
+#ifndef STM32F207xx_H
+#define STM32F207xx_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -153,6 +153,8 @@ typedef enum
   DMA2_Stream2_IRQn           = 58,     /*!< DMA2 Stream 2 global Interrupt                                    */
   DMA2_Stream3_IRQn           = 59,     /*!< DMA2 Stream 3 global Interrupt                                    */
   DMA2_Stream4_IRQn           = 60,     /*!< DMA2 Stream 4 global Interrupt                                    */
+  ETH_IRQn                    = 61,     /*!< Ethernet global Interrupt                                         */
+  ETH_WKUP_IRQn               = 62,     /*!< Ethernet Wakeup through EXTI line Interrupt                       */
   CAN2_TX_IRQn                = 63,     /*!< CAN2 TX Interrupt                                                 */
   CAN2_RX0_IRQn               = 64,     /*!< CAN2 RX0 Interrupt                                                */
   CAN2_RX1_IRQn               = 65,     /*!< CAN2 RX1 Interrupt                                                */
@@ -168,7 +170,7 @@ typedef enum
   OTG_HS_EP1_IN_IRQn          = 75,     /*!< USB OTG HS End Point 1 In global interrupt                        */
   OTG_HS_WKUP_IRQn            = 76,     /*!< USB OTG HS Wakeup through EXTI interrupt                          */
   OTG_HS_IRQn                 = 77,     /*!< USB OTG HS global interrupt                                       */
-  CRYP_IRQn                   = 79,     /*!< CRYP crypto global interrupt                                      */
+  DCMI_IRQn                   = 78,     /*!< DCMI global interrupt                                             */
   HASH_RNG_IRQn               = 80      /*!< Hash and Rng global interrupt                                     */
 } IRQn_Type;
 
@@ -331,6 +333,24 @@ typedef struct
   __IO uint32_t APB2FZ;  /*!< Debug MCU APB2 freeze register,   Address offset: 0x0C */
 }DBGMCU_TypeDef;
 
+/**
+  * @brief DCMI
+  */
+
+typedef struct
+{
+  __IO uint32_t CR;       /*!< DCMI control register 1,                       Address offset: 0x00 */
+  __IO uint32_t SR;       /*!< DCMI status register,                          Address offset: 0x04 */
+  __IO uint32_t RISR;     /*!< DCMI raw interrupt status register,            Address offset: 0x08 */
+  __IO uint32_t IER;      /*!< DCMI interrupt enable register,                Address offset: 0x0C */
+  __IO uint32_t MISR;     /*!< DCMI masked interrupt status register,         Address offset: 0x10 */
+  __IO uint32_t ICR;      /*!< DCMI interrupt clear register,                 Address offset: 0x14 */
+  __IO uint32_t ESCR;     /*!< DCMI embedded synchronization code register,   Address offset: 0x18 */
+  __IO uint32_t ESUR;     /*!< DCMI embedded synchronization unmask register, Address offset: 0x1C */
+  __IO uint32_t CWSTRTR;  /*!< DCMI crop window start,                        Address offset: 0x20 */
+  __IO uint32_t CWSIZER;  /*!< DCMI crop window size,                         Address offset: 0x24 */
+  __IO uint32_t DR;       /*!< DCMI data register,                            Address offset: 0x28 */
+} DCMI_TypeDef;
 
 /**
   * @brief DMA Controller
@@ -354,6 +374,80 @@ typedef struct
   __IO uint32_t HIFCR;  /*!< DMA high interrupt flag clear register, Address offset: 0x0C */
 } DMA_TypeDef;
 
+
+/**
+  * @brief Ethernet MAC
+  */
+
+typedef struct
+{
+  __IO uint32_t MACCR;
+  __IO uint32_t MACFFR;
+  __IO uint32_t MACHTHR;
+  __IO uint32_t MACHTLR;
+  __IO uint32_t MACMIIAR;
+  __IO uint32_t MACMIIDR;
+  __IO uint32_t MACFCR;
+  __IO uint32_t MACVLANTR;             /*    8 */
+  uint32_t      RESERVED0[2];
+  __IO uint32_t MACRWUFFR;             /*   11 */
+  __IO uint32_t MACPMTCSR;
+  uint32_t      RESERVED1[2];
+  __IO uint32_t MACSR;                 /*   15 */
+  __IO uint32_t MACIMR;
+  __IO uint32_t MACA0HR;
+  __IO uint32_t MACA0LR;
+  __IO uint32_t MACA1HR;
+  __IO uint32_t MACA1LR;
+  __IO uint32_t MACA2HR;
+  __IO uint32_t MACA2LR;
+  __IO uint32_t MACA3HR;
+  __IO uint32_t MACA3LR;               /*   24 */
+  uint32_t      RESERVED2[40];
+  __IO uint32_t MMCCR;                 /*   65 */
+  __IO uint32_t MMCRIR;
+  __IO uint32_t MMCTIR;
+  __IO uint32_t MMCRIMR;
+  __IO uint32_t MMCTIMR;               /*   69 */
+  uint32_t      RESERVED3[14];
+  __IO uint32_t MMCTGFSCCR;            /*   84 */
+  __IO uint32_t MMCTGFMSCCR;
+  uint32_t      RESERVED4[5];
+  __IO uint32_t MMCTGFCR;
+  uint32_t      RESERVED5[10];
+  __IO uint32_t MMCRFCECR;
+  __IO uint32_t MMCRFAECR;
+  uint32_t      RESERVED6[10];
+  __IO uint32_t MMCRGUFCR;
+  uint32_t      RESERVED7[334];
+  __IO uint32_t PTPTSCR;
+  __IO uint32_t PTPSSIR;
+  __IO uint32_t PTPTSHR;
+  __IO uint32_t PTPTSLR;
+  __IO uint32_t PTPTSHUR;
+  __IO uint32_t PTPTSLUR;
+  __IO uint32_t PTPTSAR;
+  __IO uint32_t PTPTTHR;
+  __IO uint32_t PTPTTLR;
+  __IO uint32_t RESERVED8;
+  __IO uint32_t PTPTSSR;
+  uint32_t      RESERVED9[565];
+  __IO uint32_t DMABMR;
+  __IO uint32_t DMATPDR;
+  __IO uint32_t DMARPDR;
+  __IO uint32_t DMARDLAR;
+  __IO uint32_t DMATDLAR;
+  __IO uint32_t DMASR;
+  __IO uint32_t DMAOMR;
+  __IO uint32_t DMAIER;
+  __IO uint32_t DMAMFBOCR;
+  __IO uint32_t DMARSWTR;
+  uint32_t      RESERVED10[8];
+  __IO uint32_t DMACHTDR;
+  __IO uint32_t DMACHRDR;
+  __IO uint32_t DMACHTBAR;
+  __IO uint32_t DMACHRBAR;
+} ETH_TypeDef;
 
 /**
   * @brief External Interrupt/Event Controller
@@ -694,50 +788,6 @@ typedef struct
 } WWDG_TypeDef;
 
 /**
-  * @brief Crypto Processor
-  */
-
-typedef struct
-{
-  __IO uint32_t CR;     /*!< CRYP control register,                            Address offset: 0x00 */
-  __IO uint32_t SR;     /*!< CRYP status register,                             Address offset: 0x04 */
-  __IO uint32_t DR;     /*!< CRYP data input register,                         Address offset: 0x08 */
-  __IO uint32_t DOUT;   /*!< CRYP data output register,                        Address offset: 0x0C */
-  __IO uint32_t DMACR;  /*!< CRYP DMA control register,                        Address offset: 0x10 */
-  __IO uint32_t IMSCR;  /*!< CRYP interrupt mask set/clear register,           Address offset: 0x14 */
-  __IO uint32_t RISR;   /*!< CRYP raw interrupt status register,               Address offset: 0x18 */
-  __IO uint32_t MISR;   /*!< CRYP masked interrupt status register,            Address offset: 0x1C */
-  __IO uint32_t K0LR;   /*!< CRYP key left  register 0,                        Address offset: 0x20 */
-  __IO uint32_t K0RR;   /*!< CRYP key right register 0,                        Address offset: 0x24 */
-  __IO uint32_t K1LR;   /*!< CRYP key left  register 1,                        Address offset: 0x28 */
-  __IO uint32_t K1RR;   /*!< CRYP key right register 1,                        Address offset: 0x2C */
-  __IO uint32_t K2LR;   /*!< CRYP key left  register 2,                        Address offset: 0x30 */
-  __IO uint32_t K2RR;   /*!< CRYP key right register 2,                        Address offset: 0x34 */
-  __IO uint32_t K3LR;   /*!< CRYP key left  register 3,                        Address offset: 0x38 */
-  __IO uint32_t K3RR;   /*!< CRYP key right register 3,                        Address offset: 0x3C */
-  __IO uint32_t IV0LR;  /*!< CRYP initialization vector left-word  register 0, Address offset: 0x40 */
-  __IO uint32_t IV0RR;  /*!< CRYP initialization vector right-word register 0, Address offset: 0x44 */
-  __IO uint32_t IV1LR;  /*!< CRYP initialization vector left-word  register 1, Address offset: 0x48 */
-  __IO uint32_t IV1RR;  /*!< CRYP initialization vector right-word register 1, Address offset: 0x4C */
-} CRYP_TypeDef;
-
-/**
-  * @brief HASH
-  */
-
-typedef struct
-{
-  __IO uint32_t CR;        /*!< HASH control register,          Address offset: 0x00        */
-  __IO uint32_t DIN;       /*!< HASH data input register,       Address offset: 0x04        */
-  __IO uint32_t STR;       /*!< HASH start register,            Address offset: 0x08        */
-  __IO uint32_t HR[5];     /*!< HASH digest registers,          Address offset: 0x0C-0x1C   */
-  __IO uint32_t IMR;       /*!< HASH interrupt enable register, Address offset: 0x20        */
-  __IO uint32_t SR;        /*!< HASH status register,           Address offset: 0x24        */
-  uint32_t  RESERVED[52];  /*!< Reserved, 0x28-0xF4                                         */
-  __IO uint32_t CSR[51];   /*!< HASH context swap registers,    Address offset: 0x0F8-0x1C0 */
-} HASH_TypeDef;
-
-/**
   * @brief RNG
   */
 
@@ -887,7 +937,6 @@ USB_OTG_HostChannelTypeDef;
 #define BKPSRAM_BB_BASE       ((uint32_t)0x42480000) /*!< Backup SRAM(4 KB) base address in the bit-band region                      */
 #define FLASH_END             ((uint32_t)0x080FFFFF) /*!< FLASH end address                                                          */
 
-
 /* Legacy defines */
 #define SRAM_BASE             SRAM1_BASE
 #define SRAM_BB_BASE          SRAM1_BB_BASE
@@ -974,11 +1023,14 @@ USB_OTG_HostChannelTypeDef;
 #define DMA2_Stream5_BASE     (DMA2_BASE + 0x088)
 #define DMA2_Stream6_BASE     (DMA2_BASE + 0x0A0)
 #define DMA2_Stream7_BASE     (DMA2_BASE + 0x0B8)
+#define ETH_BASE              (AHB1PERIPH_BASE + 0x8000)
+#define ETH_MAC_BASE          (ETH_BASE)
+#define ETH_MMC_BASE          (ETH_BASE + 0x0100)
+#define ETH_PTP_BASE          (ETH_BASE + 0x0700)
+#define ETH_DMA_BASE          (ETH_BASE + 0x1000)
 
 /*!< AHB2 peripherals */
-#define CRYP_BASE             (AHB2PERIPH_BASE + 0x60000)
-#define HASH_BASE             (AHB2PERIPH_BASE + 0x60400)
-#define HASH_DIGEST_BASE      (AHB2PERIPH_BASE + 0x60710)
+#define DCMI_BASE             (AHB2PERIPH_BASE + 0x50000)
 #define RNG_BASE              (AHB2PERIPH_BASE + 0x60800)
 
 /*!< FSMC Bankx registers base address */
@@ -1084,9 +1136,8 @@ USB_OTG_HostChannelTypeDef;
 #define DMA2_Stream5        ((DMA_Stream_TypeDef *) DMA2_Stream5_BASE)
 #define DMA2_Stream6        ((DMA_Stream_TypeDef *) DMA2_Stream6_BASE)
 #define DMA2_Stream7        ((DMA_Stream_TypeDef *) DMA2_Stream7_BASE)
-#define CRYP                ((CRYP_TypeDef *) CRYP_BASE)
-#define HASH                ((HASH_TypeDef *) HASH_BASE)
-#define HASH_DIGEST         ((HASH_DIGEST_TypeDef *) HASH_DIGEST_BASE)
+#define ETH                 ((ETH_TypeDef *) ETH_BASE)
+#define DCMI                ((DCMI_TypeDef *) DCMI_BASE)
 #define RNG                 ((RNG_TypeDef *) RNG_BASE)
 #define FSMC_Bank1          ((FSMC_Bank1_TypeDef *) FSMC_Bank1_R_BASE)
 #define FSMC_Bank1E         ((FSMC_Bank1E_TypeDef *) FSMC_Bank1E_R_BASE)
@@ -2808,54 +2859,6 @@ USB_OTG_HostChannelTypeDef;
 
 /******************************************************************************/
 /*                                                                            */
-/*                            Crypto Processor                                */
-/*                                                                            */
-/******************************************************************************/
-/******************* Bits definition for CRYP_CR register  ********************/
-#define CRYP_CR_ALGODIR                      ((uint32_t)0x00000004)
-
-#define CRYP_CR_ALGOMODE                     ((uint32_t)0x00000038)
-#define CRYP_CR_ALGOMODE_0                   ((uint32_t)0x00000008)
-#define CRYP_CR_ALGOMODE_1                   ((uint32_t)0x00000010)
-#define CRYP_CR_ALGOMODE_2                   ((uint32_t)0x00000020)
-#define CRYP_CR_ALGOMODE_TDES_ECB            ((uint32_t)0x00000000)
-#define CRYP_CR_ALGOMODE_TDES_CBC            ((uint32_t)0x00000008)
-#define CRYP_CR_ALGOMODE_DES_ECB             ((uint32_t)0x00000010)
-#define CRYP_CR_ALGOMODE_DES_CBC             ((uint32_t)0x00000018)
-#define CRYP_CR_ALGOMODE_AES_ECB             ((uint32_t)0x00000020)
-#define CRYP_CR_ALGOMODE_AES_CBC             ((uint32_t)0x00000028)
-#define CRYP_CR_ALGOMODE_AES_CTR             ((uint32_t)0x00000030)
-#define CRYP_CR_ALGOMODE_AES_KEY             ((uint32_t)0x00000038)
-
-#define CRYP_CR_DATATYPE                     ((uint32_t)0x000000C0)
-#define CRYP_CR_DATATYPE_0                   ((uint32_t)0x00000040)
-#define CRYP_CR_DATATYPE_1                   ((uint32_t)0x00000080)
-#define CRYP_CR_KEYSIZE                      ((uint32_t)0x00000300)
-#define CRYP_CR_KEYSIZE_0                    ((uint32_t)0x00000100)
-#define CRYP_CR_KEYSIZE_1                    ((uint32_t)0x00000200)
-#define CRYP_CR_FFLUSH                       ((uint32_t)0x00004000)
-#define CRYP_CR_CRYPEN                       ((uint32_t)0x00008000)
-/****************** Bits definition for CRYP_SR register  *********************/
-#define CRYP_SR_IFEM                         ((uint32_t)0x00000001)
-#define CRYP_SR_IFNF                         ((uint32_t)0x00000002)
-#define CRYP_SR_OFNE                         ((uint32_t)0x00000004)
-#define CRYP_SR_OFFU                         ((uint32_t)0x00000008)
-#define CRYP_SR_BUSY                         ((uint32_t)0x00000010)
-/****************** Bits definition for CRYP_DMACR register  ******************/
-#define CRYP_DMACR_DIEN                      ((uint32_t)0x00000001)
-#define CRYP_DMACR_DOEN                      ((uint32_t)0x00000002)
-/*****************  Bits definition for CRYP_IMSCR register  ******************/
-#define CRYP_IMSCR_INIM                      ((uint32_t)0x00000001)
-#define CRYP_IMSCR_OUTIM                     ((uint32_t)0x00000002)
-/****************** Bits definition for CRYP_RISR register  *******************/
-#define CRYP_RISR_OUTRIS                     ((uint32_t)0x00000001)
-#define CRYP_RISR_INRIS                      ((uint32_t)0x00000002)
-/****************** Bits definition for CRYP_MISR register  *******************/
-#define CRYP_MISR_INMIS                      ((uint32_t)0x00000001)
-#define CRYP_MISR_OUTMIS                     ((uint32_t)0x00000002)
-
-/******************************************************************************/
-/*                                                                            */
 /*                      Digital to Analog Converter                           */
 /*                                                                            */
 /******************************************************************************/
@@ -2950,6 +2953,60 @@ USB_OTG_HostChannelTypeDef;
 /*                                 Debug MCU                                  */
 /*                                                                            */
 /******************************************************************************/
+
+/******************************************************************************/
+/*                                                                            */
+/*                                    DCMI                                    */
+/*                                                                            */
+/******************************************************************************/
+/********************  Bits definition for DCMI_CR register  ******************/
+#define DCMI_CR_CAPTURE                      ((uint32_t)0x00000001)
+#define DCMI_CR_CM                           ((uint32_t)0x00000002)
+#define DCMI_CR_CROP                         ((uint32_t)0x00000004)
+#define DCMI_CR_JPEG                         ((uint32_t)0x00000008)
+#define DCMI_CR_ESS                          ((uint32_t)0x00000010)
+#define DCMI_CR_PCKPOL                       ((uint32_t)0x00000020)
+#define DCMI_CR_HSPOL                        ((uint32_t)0x00000040)
+#define DCMI_CR_VSPOL                        ((uint32_t)0x00000080)
+#define DCMI_CR_FCRC_0                       ((uint32_t)0x00000100)
+#define DCMI_CR_FCRC_1                       ((uint32_t)0x00000200)
+#define DCMI_CR_EDM_0                        ((uint32_t)0x00000400)
+#define DCMI_CR_EDM_1                        ((uint32_t)0x00000800)
+#define DCMI_CR_CRE                          ((uint32_t)0x00001000)
+#define DCMI_CR_ENABLE                       ((uint32_t)0x00004000)
+
+/********************  Bits definition for DCMI_SR register  ******************/
+#define DCMI_SR_HSYNC                        ((uint32_t)0x00000001)
+#define DCMI_SR_VSYNC                        ((uint32_t)0x00000002)
+#define DCMI_SR_FNE                          ((uint32_t)0x00000004)
+
+/********************  Bits definition for DCMI_RISR register  ****************/
+#define DCMI_RISR_FRAME_RIS                  ((uint32_t)0x00000001)
+#define DCMI_RISR_OVF_RIS                    ((uint32_t)0x00000002)
+#define DCMI_RISR_ERR_RIS                    ((uint32_t)0x00000004)
+#define DCMI_RISR_VSYNC_RIS                  ((uint32_t)0x00000008)
+#define DCMI_RISR_LINE_RIS                   ((uint32_t)0x00000010)
+
+/********************  Bits definition for DCMI_IER register  *****************/
+#define DCMI_IER_FRAME_IE                    ((uint32_t)0x00000001)
+#define DCMI_IER_OVF_IE                      ((uint32_t)0x00000002)
+#define DCMI_IER_ERR_IE                      ((uint32_t)0x00000004)
+#define DCMI_IER_VSYNC_IE                    ((uint32_t)0x00000008)
+#define DCMI_IER_LINE_IE                     ((uint32_t)0x00000010)
+
+/********************  Bits definition for DCMI_MISR register  ****************/
+#define DCMI_MISR_FRAME_MIS                  ((uint32_t)0x00000001)
+#define DCMI_MISR_OVF_MIS                    ((uint32_t)0x00000002)
+#define DCMI_MISR_ERR_MIS                    ((uint32_t)0x00000004)
+#define DCMI_MISR_VSYNC_MIS                  ((uint32_t)0x00000008)
+#define DCMI_MISR_LINE_MIS                   ((uint32_t)0x00000010)
+
+/********************  Bits definition for DCMI_ICR register  *****************/
+#define DCMI_ICR_FRAME_ISC                   ((uint32_t)0x00000001)
+#define DCMI_ICR_OVF_ISC                     ((uint32_t)0x00000002)
+#define DCMI_ICR_ERR_ISC                     ((uint32_t)0x00000004)
+#define DCMI_ICR_VSYNC_ISC                   ((uint32_t)0x00000008)
+#define DCMI_ICR_LINE_ISC                    ((uint32_t)0x00000010)
 
 /******************************************************************************/
 /*                                                                            */
@@ -3266,7 +3323,6 @@ USB_OTG_HostChannelTypeDef;
 #define  EXTI_PR_PR20                        ((uint32_t)0x00100000)        /*!< Pending bit for line 20 */
 #define  EXTI_PR_PR21                        ((uint32_t)0x00200000)        /*!< Pending bit for line 21 */
 #define  EXTI_PR_PR22                        ((uint32_t)0x00400000)        /*!< Pending bit for line 22 */
-
 /******************************************************************************/
 /*                                                                            */
 /*                                    FLASH                                   */
@@ -3434,16 +3490,16 @@ USB_OTG_HostChannelTypeDef;
 #define  FSMC_BCR4_MWID_0                    ((uint32_t)0x00000010)        /*!<Bit 0 */
 #define  FSMC_BCR4_MWID_1                    ((uint32_t)0x00000020)        /*!<Bit 1 */
 
-#define  FSMC_BCR4_FACCEN                    ((uint32_t)0x00000040)        /*!<Flash access enable                    */
-#define  FSMC_BCR4_BURSTEN                   ((uint32_t)0x00000100)        /*!<Burst enable bit                       */
-#define  FSMC_BCR4_WAITPOL                   ((uint32_t)0x00000200)        /*!<Wait signal polarity bit               */
-#define  FSMC_BCR4_WRAPMOD                   ((uint32_t)0x00000400)        /*!<Wrapped burst mode support             */
-#define  FSMC_BCR4_WAITCFG                   ((uint32_t)0x00000800)        /*!<Wait timing configuration              */
-#define  FSMC_BCR4_WREN                      ((uint32_t)0x00001000)        /*!<Write enable bit                       */
-#define  FSMC_BCR4_WAITEN                    ((uint32_t)0x00002000)        /*!<Wait enable bit                        */
-#define  FSMC_BCR4_EXTMOD                    ((uint32_t)0x00004000)        /*!<Extended mode enable                   */
-#define  FSMC_BCR4_ASYNCWAIT                 ((uint32_t)0x00008000)        /*!<Asynchronous wait                      */
-#define  FSMC_BCR4_CBURSTRW                  ((uint32_t)0x00080000)        /*!<Write burst enable                     */
+#define  FSMC_BCR4_FACCEN                    ((uint32_t)0x00000040)        /*!<Flash access enable */
+#define  FSMC_BCR4_BURSTEN                   ((uint32_t)0x00000100)        /*!<Burst enable bit */
+#define  FSMC_BCR4_WAITPOL                   ((uint32_t)0x00000200)        /*!<Wait signal polarity bit */
+#define  FSMC_BCR4_WRAPMOD                   ((uint32_t)0x00000400)        /*!<Wrapped burst mode support */
+#define  FSMC_BCR4_WAITCFG                   ((uint32_t)0x00000800)        /*!<Wait timing configuration */
+#define  FSMC_BCR4_WREN                      ((uint32_t)0x00001000)        /*!<Write enable bit */
+#define  FSMC_BCR4_WAITEN                    ((uint32_t)0x00002000)        /*!<Wait enable bit */
+#define  FSMC_BCR4_EXTMOD                    ((uint32_t)0x00004000)        /*!<Extended mode enable */
+#define  FSMC_BCR4_ASYNCWAIT                 ((uint32_t)0x00008000)        /*!<Asynchronous wait */
+#define  FSMC_BCR4_CBURSTRW                  ((uint32_t)0x00080000)        /*!<Write burst enable */
 
 /******************  Bit definition for FSMC_BTR1 register  ******************/
 #define  FSMC_BTR1_ADDSET                    ((uint32_t)0x0000000F)        /*!<ADDSET[3:0] bits (Address setup phase duration) */
@@ -4504,58 +4560,6 @@ USB_OTG_HostChannelTypeDef;
 
 /******************************************************************************/
 /*                                                                            */
-/*                                    HASH                                    */
-/*                                                                            */
-/******************************************************************************/
-/******************  Bits definition for HASH_CR register  ********************/
-#define HASH_CR_INIT                         ((uint32_t)0x00000004)
-#define HASH_CR_DMAE                         ((uint32_t)0x00000008)
-#define HASH_CR_DATATYPE                     ((uint32_t)0x00000030)
-#define HASH_CR_DATATYPE_0                   ((uint32_t)0x00000010)
-#define HASH_CR_DATATYPE_1                   ((uint32_t)0x00000020)
-#define HASH_CR_MODE                         ((uint32_t)0x00000040)
-#define HASH_CR_ALGO                         ((uint32_t)0x00000080)
-#define HASH_CR_ALGO_0                       ((uint32_t)0x00000080)
-#define HASH_CR_NBW                          ((uint32_t)0x00000F00)
-#define HASH_CR_NBW_0                        ((uint32_t)0x00000100)
-#define HASH_CR_NBW_1                        ((uint32_t)0x00000200)
-#define HASH_CR_NBW_2                        ((uint32_t)0x00000400)
-#define HASH_CR_NBW_3                        ((uint32_t)0x00000800)
-#define HASH_CR_DINNE                        ((uint32_t)0x00001000)
-#define HASH_CR_LKEY                         ((uint32_t)0x00010000)
-
-/******************  Bits definition for HASH_STR register  *******************/
-#define HASH_STR_NBLW                        ((uint32_t)0x0000001F)
-#define HASH_STR_NBLW_0                      ((uint32_t)0x00000001)
-#define HASH_STR_NBLW_1                      ((uint32_t)0x00000002)
-#define HASH_STR_NBLW_2                      ((uint32_t)0x00000004)
-#define HASH_STR_NBLW_3                      ((uint32_t)0x00000008)
-#define HASH_STR_NBLW_4                      ((uint32_t)0x00000010)
-#define HASH_STR_DCAL                        ((uint32_t)0x00000100)
-/* Aliases for HASH_STR register */
-#define HASH_STR_NBW                         HASH_STR_NBLW
-#define HASH_STR_NBW_0                       HASH_STR_NBLW_0
-#define HASH_STR_NBW_1                       HASH_STR_NBLW_1
-#define HASH_STR_NBW_2                       HASH_STR_NBLW_2
-#define HASH_STR_NBW_3                       HASH_STR_NBLW_3
-#define HASH_STR_NBW_4                       HASH_STR_NBLW_4
-
-/******************  Bits definition for HASH_IMR register  *******************/
-#define HASH_IMR_DINIE                       ((uint32_t)0x00000001)
-#define HASH_IMR_DCIE                        ((uint32_t)0x00000002)
-/* Aliases for HASH_IMR register */
-#define HASH_IMR_DINIM                       HASH_IMR_DINIE
-#define HASH_IMR_DCIM                        HASH_IMR_DCIE
-
-
-/******************  Bits definition for HASH_SR register  ********************/
-#define HASH_SR_DINIS                        ((uint32_t)0x00000001)
-#define HASH_SR_DCIS                         ((uint32_t)0x00000002)
-#define HASH_SR_DMAS                         ((uint32_t)0x00000004)
-#define HASH_SR_BUSY                         ((uint32_t)0x00000008)
-
-/******************************************************************************/
-/*                                                                            */
 /*                      Inter-integrated Circuit Interface                    */
 /*                                                                            */
 /******************************************************************************/
@@ -4907,13 +4911,11 @@ USB_OTG_HostChannelTypeDef;
 #define  RCC_AHB1RSTR_CRCRST                 ((uint32_t)0x00001000)
 #define  RCC_AHB1RSTR_DMA1RST                ((uint32_t)0x00200000)
 #define  RCC_AHB1RSTR_DMA2RST                ((uint32_t)0x00400000)
+#define  RCC_AHB1RSTR_ETHMACRST              ((uint32_t)0x02000000)
 #define  RCC_AHB1RSTR_OTGHRST                ((uint32_t)0x20000000)
 
 /********************  Bit definition for RCC_AHB2RSTR register  **************/
-#define  RCC_AHB2RSTR_CRYPRST                ((uint32_t)0x00000010)
-#define  RCC_AHB2RSTR_HASHRST                ((uint32_t)0x00000020)
- /* maintained for legacy purpose */
- #define  RCC_AHB2RSTR_HSAHRST                RCC_AHB2RSTR_HASHRST
+#define  RCC_AHB2RSTR_DCMIRST                ((uint32_t)0x00000001)
 #define  RCC_AHB2RSTR_RNGRST                 ((uint32_t)0x00000040)
 #define  RCC_AHB2RSTR_OTGFSRST               ((uint32_t)0x00000080)
 
@@ -4977,12 +4979,15 @@ USB_OTG_HostChannelTypeDef;
 #define  RCC_AHB1ENR_DMA1EN                  ((uint32_t)0x00200000)
 #define  RCC_AHB1ENR_DMA2EN                  ((uint32_t)0x00400000)
 
+#define  RCC_AHB1ENR_ETHMACEN                ((uint32_t)0x02000000)
+#define  RCC_AHB1ENR_ETHMACTXEN              ((uint32_t)0x04000000)
+#define  RCC_AHB1ENR_ETHMACRXEN              ((uint32_t)0x08000000)
+#define  RCC_AHB1ENR_ETHMACPTPEN             ((uint32_t)0x10000000)
 #define  RCC_AHB1ENR_OTGHSEN                 ((uint32_t)0x20000000)
 #define  RCC_AHB1ENR_OTGHSULPIEN             ((uint32_t)0x40000000)
 
 /********************  Bit definition for RCC_AHB2ENR register  ***************/
-#define  RCC_AHB2ENR_CRYPEN                  ((uint32_t)0x00000010)
-#define  RCC_AHB2ENR_HASHEN                  ((uint32_t)0x00000020)
+#define  RCC_AHB2ENR_DCMIEN                  ((uint32_t)0x00000001)
 #define  RCC_AHB2ENR_RNGEN                   ((uint32_t)0x00000040)
 #define  RCC_AHB2ENR_OTGFSEN                 ((uint32_t)0x00000080)
 
@@ -5047,12 +5052,15 @@ USB_OTG_HostChannelTypeDef;
 #define  RCC_AHB1LPENR_BKPSRAMLPEN           ((uint32_t)0x00040000)
 #define  RCC_AHB1LPENR_DMA1LPEN              ((uint32_t)0x00200000)
 #define  RCC_AHB1LPENR_DMA2LPEN              ((uint32_t)0x00400000)
+#define  RCC_AHB1LPENR_ETHMACLPEN            ((uint32_t)0x02000000)
+#define  RCC_AHB1LPENR_ETHMACTXLPEN          ((uint32_t)0x04000000)
+#define  RCC_AHB1LPENR_ETHMACRXLPEN          ((uint32_t)0x08000000)
+#define  RCC_AHB1LPENR_ETHMACPTPLPEN         ((uint32_t)0x10000000)
 #define  RCC_AHB1LPENR_OTGHSLPEN             ((uint32_t)0x20000000)
 #define  RCC_AHB1LPENR_OTGHSULPILPEN         ((uint32_t)0x40000000)
 
 /********************  Bit definition for RCC_AHB2LPENR register  *************/
-#define  RCC_AHB2LPENR_CRYPLPEN              ((uint32_t)0x00000010)
-#define  RCC_AHB2LPENR_HASHLPEN              ((uint32_t)0x00000020)
+#define  RCC_AHB2LPENR_DCMILPEN              ((uint32_t)0x00000001)
 #define  RCC_AHB2LPENR_RNGLPEN               ((uint32_t)0x00000040)
 #define  RCC_AHB2LPENR_OTGFSLPEN             ((uint32_t)0x00000080)
 
@@ -5737,6 +5745,9 @@ USB_OTG_HostChannelTypeDef;
 #define SYSCFG_MEMRMP_MEM_MODE          ((uint32_t)0x00000003) /*!<SYSCFG_Memory Remap Config */
 #define SYSCFG_MEMRMP_MEM_MODE_0        ((uint32_t)0x00000001)
 #define SYSCFG_MEMRMP_MEM_MODE_1        ((uint32_t)0x00000002)
+
+/******************  Bit definition for SYSCFG_PMC register  ******************/
+#define SYSCFG_PMC_MII_RMII_SEL         ((uint32_t)0x00800000) /*!<Ethernet PHY interface selection */
 
 /*****************  Bit definition for SYSCFG_EXTICR1 register  ***************/
 #define SYSCFG_EXTICR1_EXTI0            ((uint32_t)0x0000000F) /*!<EXTI 0 configuration */
@@ -6424,6 +6435,438 @@ USB_OTG_HostChannelTypeDef;
 
 /******************************************************************************/
 /*                                                                            */
+/*                Ethernet MAC Registers bits definitions                     */
+/*                                                                            */
+/******************************************************************************/
+/* Bit definition for Ethernet MAC Control Register register */
+#define ETH_MACCR_WD      ((uint32_t)0x00800000)  /* Watchdog disable */
+#define ETH_MACCR_JD      ((uint32_t)0x00400000)  /* Jabber disable */
+#define ETH_MACCR_IFG     ((uint32_t)0x000E0000)  /* Inter-frame gap */
+#define ETH_MACCR_IFG_96Bit     ((uint32_t)0x00000000)  /* Minimum IFG between frames during transmission is 96Bit */
+  #define ETH_MACCR_IFG_88Bit     ((uint32_t)0x00020000)  /* Minimum IFG between frames during transmission is 88Bit */
+  #define ETH_MACCR_IFG_80Bit     ((uint32_t)0x00040000)  /* Minimum IFG between frames during transmission is 80Bit */
+  #define ETH_MACCR_IFG_72Bit     ((uint32_t)0x00060000)  /* Minimum IFG between frames during transmission is 72Bit */
+  #define ETH_MACCR_IFG_64Bit     ((uint32_t)0x00080000)  /* Minimum IFG between frames during transmission is 64Bit */
+  #define ETH_MACCR_IFG_56Bit     ((uint32_t)0x000A0000)  /* Minimum IFG between frames during transmission is 56Bit */
+  #define ETH_MACCR_IFG_48Bit     ((uint32_t)0x000C0000)  /* Minimum IFG between frames during transmission is 48Bit */
+  #define ETH_MACCR_IFG_40Bit     ((uint32_t)0x000E0000)  /* Minimum IFG between frames during transmission is 40Bit */
+#define ETH_MACCR_CSD     ((uint32_t)0x00010000)  /* Carrier sense disable (during transmission) */
+#define ETH_MACCR_FES     ((uint32_t)0x00004000)  /* Fast ethernet speed */
+#define ETH_MACCR_ROD     ((uint32_t)0x00002000)  /* Receive own disable */
+#define ETH_MACCR_LM      ((uint32_t)0x00001000)  /* loopback mode */
+#define ETH_MACCR_DM      ((uint32_t)0x00000800)  /* Duplex mode */
+#define ETH_MACCR_IPCO    ((uint32_t)0x00000400)  /* IP Checksum offload */
+#define ETH_MACCR_RD      ((uint32_t)0x00000200)  /* Retry disable */
+#define ETH_MACCR_APCS    ((uint32_t)0x00000080)  /* Automatic Pad/CRC stripping */
+#define ETH_MACCR_BL      ((uint32_t)0x00000060)  /* Back-off limit: random integer number (r) of slot time delays before rescheduling
+                                                       a transmission attempt during retries after a collision: 0 =< r <2^k */
+  #define ETH_MACCR_BL_10    ((uint32_t)0x00000000)  /* k = min (n, 10) */
+  #define ETH_MACCR_BL_8     ((uint32_t)0x00000020)  /* k = min (n, 8) */
+  #define ETH_MACCR_BL_4     ((uint32_t)0x00000040)  /* k = min (n, 4) */
+  #define ETH_MACCR_BL_1     ((uint32_t)0x00000060)  /* k = min (n, 1) */
+#define ETH_MACCR_DC      ((uint32_t)0x00000010)  /* Defferal check */
+#define ETH_MACCR_TE      ((uint32_t)0x00000008)  /* Transmitter enable */
+#define ETH_MACCR_RE      ((uint32_t)0x00000004)  /* Receiver enable */
+
+/* Bit definition for Ethernet MAC Frame Filter Register */
+#define ETH_MACFFR_RA     ((uint32_t)0x80000000)  /* Receive all */
+#define ETH_MACFFR_HPF    ((uint32_t)0x00000400)  /* Hash or perfect filter */
+#define ETH_MACFFR_SAF    ((uint32_t)0x00000200)  /* Source address filter enable */
+#define ETH_MACFFR_SAIF   ((uint32_t)0x00000100)  /* SA inverse filtering */
+#define ETH_MACFFR_PCF    ((uint32_t)0x000000C0)  /* Pass control frames: 3 cases */
+  #define ETH_MACFFR_PCF_BlockAll                ((uint32_t)0x00000040)  /* MAC filters all control frames from reaching the application */
+  #define ETH_MACFFR_PCF_ForwardAll              ((uint32_t)0x00000080)  /* MAC forwards all control frames to application even if they fail the Address Filter */
+  #define ETH_MACFFR_PCF_ForwardPassedAddrFilter ((uint32_t)0x000000C0)  /* MAC forwards control frames that pass the Address Filter. */
+#define ETH_MACFFR_BFD    ((uint32_t)0x00000020)  /* Broadcast frame disable */
+#define ETH_MACFFR_PAM    ((uint32_t)0x00000010)  /* Pass all mutlicast */
+#define ETH_MACFFR_DAIF   ((uint32_t)0x00000008)  /* DA Inverse filtering */
+#define ETH_MACFFR_HM     ((uint32_t)0x00000004)  /* Hash multicast */
+#define ETH_MACFFR_HU     ((uint32_t)0x00000002)  /* Hash unicast */
+#define ETH_MACFFR_PM     ((uint32_t)0x00000001)  /* Promiscuous mode */
+
+/* Bit definition for Ethernet MAC Hash Table High Register */
+#define ETH_MACHTHR_HTH   ((uint32_t)0xFFFFFFFF)  /* Hash table high */
+
+/* Bit definition for Ethernet MAC Hash Table Low Register */
+#define ETH_MACHTLR_HTL   ((uint32_t)0xFFFFFFFF)  /* Hash table low */
+
+/* Bit definition for Ethernet MAC MII Address Register */
+#define ETH_MACMIIAR_PA   ((uint32_t)0x0000F800)  /* Physical layer address */
+#define ETH_MACMIIAR_MR   ((uint32_t)0x000007C0)  /* MII register in the selected PHY */
+#define ETH_MACMIIAR_CR   ((uint32_t)0x0000001C)  /* CR clock range: 6 cases */
+  #define ETH_MACMIIAR_CR_Div42   ((uint32_t)0x00000000)  /* HCLK:60-100 MHz; MDC clock= HCLK/42 */
+  #define ETH_MACMIIAR_CR_Div62   ((uint32_t)0x00000004)  /* HCLK:100-120 MHz; MDC clock= HCLK/62 */
+  #define ETH_MACMIIAR_CR_Div16   ((uint32_t)0x00000008)  /* HCLK:20-35 MHz; MDC clock= HCLK/16 */
+  #define ETH_MACMIIAR_CR_Div26   ((uint32_t)0x0000000C)  /* HCLK:35-60 MHz; MDC clock= HCLK/42 */
+#define ETH_MACMIIAR_MW   ((uint32_t)0x00000002)  /* MII write */
+#define ETH_MACMIIAR_MB   ((uint32_t)0x00000001)  /* MII busy */
+
+/* Bit definition for Ethernet MAC MII Data Register */
+#define ETH_MACMIIDR_MD   ((uint32_t)0x0000FFFF)  /* MII data: read/write data from/to PHY */
+
+/* Bit definition for Ethernet MAC Flow Control Register */
+#define ETH_MACFCR_PT     ((uint32_t)0xFFFF0000)  /* Pause time */
+#define ETH_MACFCR_ZQPD   ((uint32_t)0x00000080)  /* Zero-quanta pause disable */
+#define ETH_MACFCR_PLT    ((uint32_t)0x00000030)  /* Pause low threshold: 4 cases */
+  #define ETH_MACFCR_PLT_Minus4   ((uint32_t)0x00000000)  /* Pause time minus 4 slot times */
+  #define ETH_MACFCR_PLT_Minus28  ((uint32_t)0x00000010)  /* Pause time minus 28 slot times */
+  #define ETH_MACFCR_PLT_Minus144 ((uint32_t)0x00000020)  /* Pause time minus 144 slot times */
+  #define ETH_MACFCR_PLT_Minus256 ((uint32_t)0x00000030)  /* Pause time minus 256 slot times */
+#define ETH_MACFCR_UPFD   ((uint32_t)0x00000008)  /* Unicast pause frame detect */
+#define ETH_MACFCR_RFCE   ((uint32_t)0x00000004)  /* Receive flow control enable */
+#define ETH_MACFCR_TFCE   ((uint32_t)0x00000002)  /* Transmit flow control enable */
+#define ETH_MACFCR_FCBBPA ((uint32_t)0x00000001)  /* Flow control busy/backpressure activate */
+
+/* Bit definition for Ethernet MAC VLAN Tag Register */
+#define ETH_MACVLANTR_VLANTC ((uint32_t)0x00010000)  /* 12-bit VLAN tag comparison */
+#define ETH_MACVLANTR_VLANTI ((uint32_t)0x0000FFFF)  /* VLAN tag identifier (for receive frames) */
+
+/* Bit definition for Ethernet MAC Remote Wake-UpFrame Filter Register */
+#define ETH_MACRWUFFR_D   ((uint32_t)0xFFFFFFFF)  /* Wake-up frame filter register data */
+/* Eight sequential Writes to this address (offset 0x28) will write all Wake-UpFrame Filter Registers.
+   Eight sequential Reads from this address (offset 0x28) will read all Wake-UpFrame Filter Registers. */
+/* Wake-UpFrame Filter Reg0 : Filter 0 Byte Mask
+   Wake-UpFrame Filter Reg1 : Filter 1 Byte Mask
+   Wake-UpFrame Filter Reg2 : Filter 2 Byte Mask
+   Wake-UpFrame Filter Reg3 : Filter 3 Byte Mask
+   Wake-UpFrame Filter Reg4 : RSVD - Filter3 Command - RSVD - Filter2 Command -
+                              RSVD - Filter1 Command - RSVD - Filter0 Command
+   Wake-UpFrame Filter Re5 : Filter3 Offset - Filter2 Offset - Filter1 Offset - Filter0 Offset
+   Wake-UpFrame Filter Re6 : Filter1 CRC16 - Filter0 CRC16
+   Wake-UpFrame Filter Re7 : Filter3 CRC16 - Filter2 CRC16 */
+
+/* Bit definition for Ethernet MAC PMT Control and Status Register */
+#define ETH_MACPMTCSR_WFFRPR ((uint32_t)0x80000000)  /* Wake-Up Frame Filter Register Pointer Reset */
+#define ETH_MACPMTCSR_GU     ((uint32_t)0x00000200)  /* Global Unicast */
+#define ETH_MACPMTCSR_WFR    ((uint32_t)0x00000040)  /* Wake-Up Frame Received */
+#define ETH_MACPMTCSR_MPR    ((uint32_t)0x00000020)  /* Magic Packet Received */
+#define ETH_MACPMTCSR_WFE    ((uint32_t)0x00000004)  /* Wake-Up Frame Enable */
+#define ETH_MACPMTCSR_MPE    ((uint32_t)0x00000002)  /* Magic Packet Enable */
+#define ETH_MACPMTCSR_PD     ((uint32_t)0x00000001)  /* Power Down */
+
+/* Bit definition for Ethernet MAC Status Register */
+#define ETH_MACSR_TSTS      ((uint32_t)0x00000200)  /* Time stamp trigger status */
+#define ETH_MACSR_MMCTS     ((uint32_t)0x00000040)  /* MMC transmit status */
+#define ETH_MACSR_MMMCRS    ((uint32_t)0x00000020)  /* MMC receive status */
+#define ETH_MACSR_MMCS      ((uint32_t)0x00000010)  /* MMC status */
+#define ETH_MACSR_PMTS      ((uint32_t)0x00000008)  /* PMT status */
+
+/* Bit definition for Ethernet MAC Interrupt Mask Register */
+#define ETH_MACIMR_TSTIM     ((uint32_t)0x00000200)  /* Time stamp trigger interrupt mask */
+#define ETH_MACIMR_PMTIM     ((uint32_t)0x00000008)  /* PMT interrupt mask */
+
+/* Bit definition for Ethernet MAC Address0 High Register */
+#define ETH_MACA0HR_MACA0H   ((uint32_t)0x0000FFFF)  /* MAC address0 high */
+
+/* Bit definition for Ethernet MAC Address0 Low Register */
+#define ETH_MACA0LR_MACA0L   ((uint32_t)0xFFFFFFFF)  /* MAC address0 low */
+
+/* Bit definition for Ethernet MAC Address1 High Register */
+#define ETH_MACA1HR_AE       ((uint32_t)0x80000000)  /* Address enable */
+#define ETH_MACA1HR_SA       ((uint32_t)0x40000000)  /* Source address */
+#define ETH_MACA1HR_MBC      ((uint32_t)0x3F000000)  /* Mask byte control: bits to mask for comparison of the MAC Address bytes */
+  #define ETH_MACA1HR_MBC_HBits15_8    ((uint32_t)0x20000000)  /* Mask MAC Address high reg bits [15:8] */
+  #define ETH_MACA1HR_MBC_HBits7_0     ((uint32_t)0x10000000)  /* Mask MAC Address high reg bits [7:0] */
+  #define ETH_MACA1HR_MBC_LBits31_24   ((uint32_t)0x08000000)  /* Mask MAC Address low reg bits [31:24] */
+  #define ETH_MACA1HR_MBC_LBits23_16   ((uint32_t)0x04000000)  /* Mask MAC Address low reg bits [23:16] */
+  #define ETH_MACA1HR_MBC_LBits15_8    ((uint32_t)0x02000000)  /* Mask MAC Address low reg bits [15:8] */
+  #define ETH_MACA1HR_MBC_LBits7_0     ((uint32_t)0x01000000)  /* Mask MAC Address low reg bits [7:0] */
+#define ETH_MACA1HR_MACA1H   ((uint32_t)0x0000FFFF)  /* MAC address1 high */
+
+/* Bit definition for Ethernet MAC Address1 Low Register */
+#define ETH_MACA1LR_MACA1L   ((uint32_t)0xFFFFFFFF)  /* MAC address1 low */
+
+/* Bit definition for Ethernet MAC Address2 High Register */
+#define ETH_MACA2HR_AE       ((uint32_t)0x80000000)  /* Address enable */
+#define ETH_MACA2HR_SA       ((uint32_t)0x40000000)  /* Source address */
+#define ETH_MACA2HR_MBC      ((uint32_t)0x3F000000)  /* Mask byte control */
+  #define ETH_MACA2HR_MBC_HBits15_8    ((uint32_t)0x20000000)  /* Mask MAC Address high reg bits [15:8] */
+  #define ETH_MACA2HR_MBC_HBits7_0     ((uint32_t)0x10000000)  /* Mask MAC Address high reg bits [7:0] */
+  #define ETH_MACA2HR_MBC_LBits31_24   ((uint32_t)0x08000000)  /* Mask MAC Address low reg bits [31:24] */
+  #define ETH_MACA2HR_MBC_LBits23_16   ((uint32_t)0x04000000)  /* Mask MAC Address low reg bits [23:16] */
+  #define ETH_MACA2HR_MBC_LBits15_8    ((uint32_t)0x02000000)  /* Mask MAC Address low reg bits [15:8] */
+  #define ETH_MACA2HR_MBC_LBits7_0     ((uint32_t)0x01000000)  /* Mask MAC Address low reg bits [70] */
+#define ETH_MACA2HR_MACA2H   ((uint32_t)0x0000FFFF)  /* MAC address1 high */
+
+/* Bit definition for Ethernet MAC Address2 Low Register */
+#define ETH_MACA2LR_MACA2L   ((uint32_t)0xFFFFFFFF)  /* MAC address2 low */
+
+/* Bit definition for Ethernet MAC Address3 High Register */
+#define ETH_MACA3HR_AE       ((uint32_t)0x80000000)  /* Address enable */
+#define ETH_MACA3HR_SA       ((uint32_t)0x40000000)  /* Source address */
+#define ETH_MACA3HR_MBC      ((uint32_t)0x3F000000)  /* Mask byte control */
+  #define ETH_MACA3HR_MBC_HBits15_8    ((uint32_t)0x20000000)  /* Mask MAC Address high reg bits [15:8] */
+  #define ETH_MACA3HR_MBC_HBits7_0     ((uint32_t)0x10000000)  /* Mask MAC Address high reg bits [7:0] */
+  #define ETH_MACA3HR_MBC_LBits31_24   ((uint32_t)0x08000000)  /* Mask MAC Address low reg bits [31:24] */
+  #define ETH_MACA3HR_MBC_LBits23_16   ((uint32_t)0x04000000)  /* Mask MAC Address low reg bits [23:16] */
+  #define ETH_MACA3HR_MBC_LBits15_8    ((uint32_t)0x02000000)  /* Mask MAC Address low reg bits [15:8] */
+  #define ETH_MACA3HR_MBC_LBits7_0     ((uint32_t)0x01000000)  /* Mask MAC Address low reg bits [70] */
+#define ETH_MACA3HR_MACA3H   ((uint32_t)0x0000FFFF)  /* MAC address3 high */
+
+/* Bit definition for Ethernet MAC Address3 Low Register */
+#define ETH_MACA3LR_MACA3L   ((uint32_t)0xFFFFFFFF)  /* MAC address3 low */
+
+/******************************************************************************/
+/*                Ethernet MMC Registers bits definition                      */
+/******************************************************************************/
+
+/* Bit definition for Ethernet MMC Control Register */
+#define ETH_MMCCR_MCFHP      ((uint32_t)0x00000020)  /* MMC counter Full-Half preset */
+#define ETH_MMCCR_MCP        ((uint32_t)0x00000010)  /* MMC counter preset */
+#define ETH_MMCCR_MCF        ((uint32_t)0x00000008)  /* MMC Counter Freeze */
+#define ETH_MMCCR_ROR        ((uint32_t)0x00000004)  /* Reset on Read */
+#define ETH_MMCCR_CSR        ((uint32_t)0x00000002)  /* Counter Stop Rollover */
+#define ETH_MMCCR_CR         ((uint32_t)0x00000001)  /* Counters Reset */
+
+/* Bit definition for Ethernet MMC Receive Interrupt Register */
+#define ETH_MMCRIR_RGUFS     ((uint32_t)0x00020000)  /* Set when Rx good unicast frames counter reaches half the maximum value */
+#define ETH_MMCRIR_RFAES     ((uint32_t)0x00000040)  /* Set when Rx alignment error counter reaches half the maximum value */
+#define ETH_MMCRIR_RFCES     ((uint32_t)0x00000020)  /* Set when Rx crc error counter reaches half the maximum value */
+
+/* Bit definition for Ethernet MMC Transmit Interrupt Register */
+#define ETH_MMCTIR_TGFS      ((uint32_t)0x00200000)  /* Set when Tx good frame count counter reaches half the maximum value */
+#define ETH_MMCTIR_TGFMSCS   ((uint32_t)0x00008000)  /* Set when Tx good multi col counter reaches half the maximum value */
+#define ETH_MMCTIR_TGFSCS    ((uint32_t)0x00004000)  /* Set when Tx good single col counter reaches half the maximum value */
+
+/* Bit definition for Ethernet MMC Receive Interrupt Mask Register */
+#define ETH_MMCRIMR_RGUFM    ((uint32_t)0x00020000)  /* Mask the interrupt when Rx good unicast frames counter reaches half the maximum value */
+#define ETH_MMCRIMR_RFAEM    ((uint32_t)0x00000040)  /* Mask the interrupt when Rx alignment error counter reaches half the maximum value */
+#define ETH_MMCRIMR_RFCEM    ((uint32_t)0x00000020)  /* Mask the interrupt when Rx crc error counter reaches half the maximum value */
+
+/* Bit definition for Ethernet MMC Transmit Interrupt Mask Register */
+#define ETH_MMCTIMR_TGFM     ((uint32_t)0x00200000)  /* Mask the interrupt when Tx good frame count counter reaches half the maximum value */
+#define ETH_MMCTIMR_TGFMSCM  ((uint32_t)0x00008000)  /* Mask the interrupt when Tx good multi col counter reaches half the maximum value */
+#define ETH_MMCTIMR_TGFSCM   ((uint32_t)0x00004000)  /* Mask the interrupt when Tx good single col counter reaches half the maximum value */
+
+/* Bit definition for Ethernet MMC Transmitted Good Frames after Single Collision Counter Register */
+#define ETH_MMCTGFSCCR_TGFSCC     ((uint32_t)0xFFFFFFFF)  /* Number of successfully transmitted frames after a single collision in Half-duplex mode. */
+
+/* Bit definition for Ethernet MMC Transmitted Good Frames after More than a Single Collision Counter Register */
+#define ETH_MMCTGFMSCCR_TGFMSCC   ((uint32_t)0xFFFFFFFF)  /* Number of successfully transmitted frames after more than a single collision in Half-duplex mode. */
+
+/* Bit definition for Ethernet MMC Transmitted Good Frames Counter Register */
+#define ETH_MMCTGFCR_TGFC    ((uint32_t)0xFFFFFFFF)  /* Number of good frames transmitted. */
+
+/* Bit definition for Ethernet MMC Received Frames with CRC Error Counter Register */
+#define ETH_MMCRFCECR_RFCEC  ((uint32_t)0xFFFFFFFF)  /* Number of frames received with CRC error. */
+
+/* Bit definition for Ethernet MMC Received Frames with Alignment Error Counter Register */
+#define ETH_MMCRFAECR_RFAEC  ((uint32_t)0xFFFFFFFF)  /* Number of frames received with alignment (dribble) error */
+
+/* Bit definition for Ethernet MMC Received Good Unicast Frames Counter Register */
+#define ETH_MMCRGUFCR_RGUFC  ((uint32_t)0xFFFFFFFF)  /* Number of good unicast frames received. */
+
+/******************************************************************************/
+/*               Ethernet PTP Registers bits definition                       */
+/******************************************************************************/
+
+/* Bit definition for Ethernet PTP Time Stamp Control Register */
+#define ETH_PTPTSCR_TSCNT       ((uint32_t)0x00030000)  /* Time stamp clock node type */
+#define ETH_PTPTSSR_TSSMRME     ((uint32_t)0x00008000)  /* Time stamp snapshot for message relevant to master enable */
+#define ETH_PTPTSSR_TSSEME      ((uint32_t)0x00004000)  /* Time stamp snapshot for event message enable */
+#define ETH_PTPTSSR_TSSIPV4FE   ((uint32_t)0x00002000)  /* Time stamp snapshot for IPv4 frames enable */
+#define ETH_PTPTSSR_TSSIPV6FE   ((uint32_t)0x00001000)  /* Time stamp snapshot for IPv6 frames enable */
+#define ETH_PTPTSSR_TSSPTPOEFE  ((uint32_t)0x00000800)  /* Time stamp snapshot for PTP over ethernet frames enable */
+#define ETH_PTPTSSR_TSPTPPSV2E  ((uint32_t)0x00000400)  /* Time stamp PTP packet snooping for version2 format enable */
+#define ETH_PTPTSSR_TSSSR       ((uint32_t)0x00000200)  /* Time stamp Sub-seconds rollover */
+#define ETH_PTPTSSR_TSSARFE     ((uint32_t)0x00000100)  /* Time stamp snapshot for all received frames enable */
+
+#define ETH_PTPTSCR_TSARU    ((uint32_t)0x00000020)  /* Addend register update */
+#define ETH_PTPTSCR_TSITE    ((uint32_t)0x00000010)  /* Time stamp interrupt trigger enable */
+#define ETH_PTPTSCR_TSSTU    ((uint32_t)0x00000008)  /* Time stamp update */
+#define ETH_PTPTSCR_TSSTI    ((uint32_t)0x00000004)  /* Time stamp initialize */
+#define ETH_PTPTSCR_TSFCU    ((uint32_t)0x00000002)  /* Time stamp fine or coarse update */
+#define ETH_PTPTSCR_TSE      ((uint32_t)0x00000001)  /* Time stamp enable */
+
+/* Bit definition for Ethernet PTP Sub-Second Increment Register */
+#define ETH_PTPSSIR_STSSI    ((uint32_t)0x000000FF)  /* System time Sub-second increment value */
+
+/* Bit definition for Ethernet PTP Time Stamp High Register */
+#define ETH_PTPTSHR_STS      ((uint32_t)0xFFFFFFFF)  /* System Time second */
+
+/* Bit definition for Ethernet PTP Time Stamp Low Register */
+#define ETH_PTPTSLR_STPNS    ((uint32_t)0x80000000)  /* System Time Positive or negative time */
+#define ETH_PTPTSLR_STSS     ((uint32_t)0x7FFFFFFF)  /* System Time sub-seconds */
+
+/* Bit definition for Ethernet PTP Time Stamp High Update Register */
+#define ETH_PTPTSHUR_TSUS    ((uint32_t)0xFFFFFFFF)  /* Time stamp update seconds */
+
+/* Bit definition for Ethernet PTP Time Stamp Low Update Register */
+#define ETH_PTPTSLUR_TSUPNS  ((uint32_t)0x80000000)  /* Time stamp update Positive or negative time */
+#define ETH_PTPTSLUR_TSUSS   ((uint32_t)0x7FFFFFFF)  /* Time stamp update sub-seconds */
+
+/* Bit definition for Ethernet PTP Time Stamp Addend Register */
+#define ETH_PTPTSAR_TSA      ((uint32_t)0xFFFFFFFF)  /* Time stamp addend */
+
+/* Bit definition for Ethernet PTP Target Time High Register */
+#define ETH_PTPTTHR_TTSH     ((uint32_t)0xFFFFFFFF)  /* Target time stamp high */
+
+/* Bit definition for Ethernet PTP Target Time Low Register */
+#define ETH_PTPTTLR_TTSL     ((uint32_t)0xFFFFFFFF)  /* Target time stamp low */
+
+/* Bit definition for Ethernet PTP Time Stamp Status Register */
+#define ETH_PTPTSSR_TSTTR    ((uint32_t)0x00000020)  /* Time stamp target time reached */
+#define ETH_PTPTSSR_TSSO     ((uint32_t)0x00000010)  /* Time stamp seconds overflow */
+
+/******************************************************************************/
+/*                 Ethernet DMA Registers bits definition                     */
+/******************************************************************************/
+
+/* Bit definition for Ethernet DMA Bus Mode Register */
+#define ETH_DMABMR_AAB       ((uint32_t)0x02000000)  /* Address-Aligned beats */
+#define ETH_DMABMR_FPM        ((uint32_t)0x01000000)  /* 4xPBL mode */
+#define ETH_DMABMR_USP       ((uint32_t)0x00800000)  /* Use separate PBL */
+#define ETH_DMABMR_RDP       ((uint32_t)0x007E0000)  /* RxDMA PBL */
+  #define ETH_DMABMR_RDP_1Beat    ((uint32_t)0x00020000)  /* maximum number of beats to be transferred in one RxDMA transaction is 1 */
+  #define ETH_DMABMR_RDP_2Beat    ((uint32_t)0x00040000)  /* maximum number of beats to be transferred in one RxDMA transaction is 2 */
+  #define ETH_DMABMR_RDP_4Beat    ((uint32_t)0x00080000)  /* maximum number of beats to be transferred in one RxDMA transaction is 4 */
+  #define ETH_DMABMR_RDP_8Beat    ((uint32_t)0x00100000)  /* maximum number of beats to be transferred in one RxDMA transaction is 8 */
+  #define ETH_DMABMR_RDP_16Beat   ((uint32_t)0x00200000)  /* maximum number of beats to be transferred in one RxDMA transaction is 16 */
+  #define ETH_DMABMR_RDP_32Beat   ((uint32_t)0x00400000)  /* maximum number of beats to be transferred in one RxDMA transaction is 32 */
+  #define ETH_DMABMR_RDP_4xPBL_4Beat   ((uint32_t)0x01020000)  /* maximum number of beats to be transferred in one RxDMA transaction is 4 */
+  #define ETH_DMABMR_RDP_4xPBL_8Beat   ((uint32_t)0x01040000)  /* maximum number of beats to be transferred in one RxDMA transaction is 8 */
+  #define ETH_DMABMR_RDP_4xPBL_16Beat  ((uint32_t)0x01080000)  /* maximum number of beats to be transferred in one RxDMA transaction is 16 */
+  #define ETH_DMABMR_RDP_4xPBL_32Beat  ((uint32_t)0x01100000)  /* maximum number of beats to be transferred in one RxDMA transaction is 32 */
+  #define ETH_DMABMR_RDP_4xPBL_64Beat  ((uint32_t)0x01200000)  /* maximum number of beats to be transferred in one RxDMA transaction is 64 */
+  #define ETH_DMABMR_RDP_4xPBL_128Beat ((uint32_t)0x01400000)  /* maximum number of beats to be transferred in one RxDMA transaction is 128 */
+#define ETH_DMABMR_FB        ((uint32_t)0x00010000)  /* Fixed Burst */
+#define ETH_DMABMR_RTPR      ((uint32_t)0x0000C000)  /* Rx Tx priority ratio */
+  #define ETH_DMABMR_RTPR_1_1     ((uint32_t)0x00000000)  /* Rx Tx priority ratio */
+  #define ETH_DMABMR_RTPR_2_1     ((uint32_t)0x00004000)  /* Rx Tx priority ratio */
+  #define ETH_DMABMR_RTPR_3_1     ((uint32_t)0x00008000)  /* Rx Tx priority ratio */
+  #define ETH_DMABMR_RTPR_4_1     ((uint32_t)0x0000C000)  /* Rx Tx priority ratio */
+#define ETH_DMABMR_PBL    ((uint32_t)0x00003F00)  /* Programmable burst length */
+  #define ETH_DMABMR_PBL_1Beat    ((uint32_t)0x00000100)  /* maximum number of beats to be transferred in one TxDMA (or both) transaction is 1 */
+  #define ETH_DMABMR_PBL_2Beat    ((uint32_t)0x00000200)  /* maximum number of beats to be transferred in one TxDMA (or both) transaction is 2 */
+  #define ETH_DMABMR_PBL_4Beat    ((uint32_t)0x00000400)  /* maximum number of beats to be transferred in one TxDMA (or both) transaction is 4 */
+  #define ETH_DMABMR_PBL_8Beat    ((uint32_t)0x00000800)  /* maximum number of beats to be transferred in one TxDMA (or both) transaction is 8 */
+  #define ETH_DMABMR_PBL_16Beat   ((uint32_t)0x00001000)  /* maximum number of beats to be transferred in one TxDMA (or both) transaction is 16 */
+  #define ETH_DMABMR_PBL_32Beat   ((uint32_t)0x00002000)  /* maximum number of beats to be transferred in one TxDMA (or both) transaction is 32 */
+  #define ETH_DMABMR_PBL_4xPBL_4Beat   ((uint32_t)0x01000100)  /* maximum number of beats to be transferred in one TxDMA (or both) transaction is 4 */
+  #define ETH_DMABMR_PBL_4xPBL_8Beat   ((uint32_t)0x01000200)  /* maximum number of beats to be transferred in one TxDMA (or both) transaction is 8 */
+  #define ETH_DMABMR_PBL_4xPBL_16Beat  ((uint32_t)0x01000400)  /* maximum number of beats to be transferred in one TxDMA (or both) transaction is 16 */
+  #define ETH_DMABMR_PBL_4xPBL_32Beat  ((uint32_t)0x01000800)  /* maximum number of beats to be transferred in one TxDMA (or both) transaction is 32 */
+  #define ETH_DMABMR_PBL_4xPBL_64Beat  ((uint32_t)0x01001000)  /* maximum number of beats to be transferred in one TxDMA (or both) transaction is 64 */
+  #define ETH_DMABMR_PBL_4xPBL_128Beat ((uint32_t)0x01002000)  /* maximum number of beats to be transferred in one TxDMA (or both) transaction is 128 */
+#define ETH_DMABMR_EDE       ((uint32_t)0x00000080)  /* Enhanced Descriptor Enable */
+#define ETH_DMABMR_DSL       ((uint32_t)0x0000007C)  /* Descriptor Skip Length */
+#define ETH_DMABMR_DA        ((uint32_t)0x00000002)  /* DMA arbitration scheme */
+#define ETH_DMABMR_SR        ((uint32_t)0x00000001)  /* Software reset */
+
+/* Bit definition for Ethernet DMA Transmit Poll Demand Register */
+#define ETH_DMATPDR_TPD      ((uint32_t)0xFFFFFFFF)  /* Transmit poll demand */
+
+/* Bit definition for Ethernet DMA Receive Poll Demand Register */
+#define ETH_DMARPDR_RPD      ((uint32_t)0xFFFFFFFF)  /* Receive poll demand  */
+
+/* Bit definition for Ethernet DMA Receive Descriptor List Address Register */
+#define ETH_DMARDLAR_SRL     ((uint32_t)0xFFFFFFFF)  /* Start of receive list */
+
+/* Bit definition for Ethernet DMA Transmit Descriptor List Address Register */
+#define ETH_DMATDLAR_STL     ((uint32_t)0xFFFFFFFF)  /* Start of transmit list */
+
+/* Bit definition for Ethernet DMA Status Register */
+#define ETH_DMASR_TSTS       ((uint32_t)0x20000000)  /* Time-stamp trigger status */
+#define ETH_DMASR_PMTS       ((uint32_t)0x10000000)  /* PMT status */
+#define ETH_DMASR_MMCS       ((uint32_t)0x08000000)  /* MMC status */
+#define ETH_DMASR_EBS        ((uint32_t)0x03800000)  /* Error bits status */
+  /* combination with EBS[2:0] for GetFlagStatus function */
+  #define ETH_DMASR_EBS_DescAccess      ((uint32_t)0x02000000)  /* Error bits 0-data buffer, 1-desc. access */
+  #define ETH_DMASR_EBS_ReadTransf      ((uint32_t)0x01000000)  /* Error bits 0-write trnsf, 1-read transfr */
+  #define ETH_DMASR_EBS_DataTransfTx    ((uint32_t)0x00800000)  /* Error bits 0-Rx DMA, 1-Tx DMA */
+#define ETH_DMASR_TPS         ((uint32_t)0x00700000)  /* Transmit process state */
+  #define ETH_DMASR_TPS_Stopped         ((uint32_t)0x00000000)  /* Stopped - Reset or Stop Tx Command issued  */
+  #define ETH_DMASR_TPS_Fetching        ((uint32_t)0x00100000)  /* Running - fetching the Tx descriptor */
+  #define ETH_DMASR_TPS_Waiting         ((uint32_t)0x00200000)  /* Running - waiting for status */
+  #define ETH_DMASR_TPS_Reading         ((uint32_t)0x00300000)  /* Running - reading the data from host memory */
+  #define ETH_DMASR_TPS_Suspended       ((uint32_t)0x00600000)  /* Suspended - Tx Descriptor unavailable */
+  #define ETH_DMASR_TPS_Closing         ((uint32_t)0x00700000)  /* Running - closing Rx descriptor */
+#define ETH_DMASR_RPS         ((uint32_t)0x000E0000)  /* Receive process state */
+  #define ETH_DMASR_RPS_Stopped         ((uint32_t)0x00000000)  /* Stopped - Reset or Stop Rx Command issued */
+  #define ETH_DMASR_RPS_Fetching        ((uint32_t)0x00020000)  /* Running - fetching the Rx descriptor */
+  #define ETH_DMASR_RPS_Waiting         ((uint32_t)0x00060000)  /* Running - waiting for packet */
+  #define ETH_DMASR_RPS_Suspended       ((uint32_t)0x00080000)  /* Suspended - Rx Descriptor unavailable */
+  #define ETH_DMASR_RPS_Closing         ((uint32_t)0x000A0000)  /* Running - closing descriptor */
+  #define ETH_DMASR_RPS_Queuing         ((uint32_t)0x000E0000)  /* Running - queuing the receive frame into host memory */
+#define ETH_DMASR_NIS        ((uint32_t)0x00010000)  /* Normal interrupt summary */
+#define ETH_DMASR_AIS        ((uint32_t)0x00008000)  /* Abnormal interrupt summary */
+#define ETH_DMASR_ERS        ((uint32_t)0x00004000)  /* Early receive status */
+#define ETH_DMASR_FBES       ((uint32_t)0x00002000)  /* Fatal bus error status */
+#define ETH_DMASR_ETS        ((uint32_t)0x00000400)  /* Early transmit status */
+#define ETH_DMASR_RWTS       ((uint32_t)0x00000200)  /* Receive watchdog timeout status */
+#define ETH_DMASR_RPSS       ((uint32_t)0x00000100)  /* Receive process stopped status */
+#define ETH_DMASR_RBUS       ((uint32_t)0x00000080)  /* Receive buffer unavailable status */
+#define ETH_DMASR_RS         ((uint32_t)0x00000040)  /* Receive status */
+#define ETH_DMASR_TUS        ((uint32_t)0x00000020)  /* Transmit underflow status */
+#define ETH_DMASR_ROS        ((uint32_t)0x00000010)  /* Receive overflow status */
+#define ETH_DMASR_TJTS       ((uint32_t)0x00000008)  /* Transmit jabber timeout status */
+#define ETH_DMASR_TBUS       ((uint32_t)0x00000004)  /* Transmit buffer unavailable status */
+#define ETH_DMASR_TPSS       ((uint32_t)0x00000002)  /* Transmit process stopped status */
+#define ETH_DMASR_TS         ((uint32_t)0x00000001)  /* Transmit status */
+
+/* Bit definition for Ethernet DMA Operation Mode Register */
+#define ETH_DMAOMR_DTCEFD    ((uint32_t)0x04000000)  /* Disable Dropping of TCP/IP checksum error frames */
+#define ETH_DMAOMR_RSF       ((uint32_t)0x02000000)  /* Receive store and forward */
+#define ETH_DMAOMR_DFRF      ((uint32_t)0x01000000)  /* Disable flushing of received frames */
+#define ETH_DMAOMR_TSF       ((uint32_t)0x00200000)  /* Transmit store and forward */
+#define ETH_DMAOMR_FTF       ((uint32_t)0x00100000)  /* Flush transmit FIFO */
+#define ETH_DMAOMR_TTC       ((uint32_t)0x0001C000)  /* Transmit threshold control */
+  #define ETH_DMAOMR_TTC_64Bytes       ((uint32_t)0x00000000)  /* threshold level of the MTL Transmit FIFO is 64 Bytes */
+  #define ETH_DMAOMR_TTC_128Bytes      ((uint32_t)0x00004000)  /* threshold level of the MTL Transmit FIFO is 128 Bytes */
+  #define ETH_DMAOMR_TTC_192Bytes      ((uint32_t)0x00008000)  /* threshold level of the MTL Transmit FIFO is 192 Bytes */
+  #define ETH_DMAOMR_TTC_256Bytes      ((uint32_t)0x0000C000)  /* threshold level of the MTL Transmit FIFO is 256 Bytes */
+  #define ETH_DMAOMR_TTC_40Bytes       ((uint32_t)0x00010000)  /* threshold level of the MTL Transmit FIFO is 40 Bytes */
+  #define ETH_DMAOMR_TTC_32Bytes       ((uint32_t)0x00014000)  /* threshold level of the MTL Transmit FIFO is 32 Bytes */
+  #define ETH_DMAOMR_TTC_24Bytes       ((uint32_t)0x00018000)  /* threshold level of the MTL Transmit FIFO is 24 Bytes */
+  #define ETH_DMAOMR_TTC_16Bytes       ((uint32_t)0x0001C000)  /* threshold level of the MTL Transmit FIFO is 16 Bytes */
+#define ETH_DMAOMR_ST        ((uint32_t)0x00002000)  /* Start/stop transmission command */
+#define ETH_DMAOMR_FEF       ((uint32_t)0x00000080)  /* Forward error frames */
+#define ETH_DMAOMR_FUGF      ((uint32_t)0x00000040)  /* Forward undersized good frames */
+#define ETH_DMAOMR_RTC       ((uint32_t)0x00000018)  /* receive threshold control */
+  #define ETH_DMAOMR_RTC_64Bytes       ((uint32_t)0x00000000)  /* threshold level of the MTL Receive FIFO is 64 Bytes */
+  #define ETH_DMAOMR_RTC_32Bytes       ((uint32_t)0x00000008)  /* threshold level of the MTL Receive FIFO is 32 Bytes */
+  #define ETH_DMAOMR_RTC_96Bytes       ((uint32_t)0x00000010)  /* threshold level of the MTL Receive FIFO is 96 Bytes */
+  #define ETH_DMAOMR_RTC_128Bytes      ((uint32_t)0x00000018)  /* threshold level of the MTL Receive FIFO is 128 Bytes */
+#define ETH_DMAOMR_OSF       ((uint32_t)0x00000004)  /* operate on second frame */
+#define ETH_DMAOMR_SR        ((uint32_t)0x00000002)  /* Start/stop receive */
+
+/* Bit definition for Ethernet DMA Interrupt Enable Register */
+#define ETH_DMAIER_NISE      ((uint32_t)0x00010000)  /* Normal interrupt summary enable */
+#define ETH_DMAIER_AISE      ((uint32_t)0x00008000)  /* Abnormal interrupt summary enable */
+#define ETH_DMAIER_ERIE      ((uint32_t)0x00004000)  /* Early receive interrupt enable */
+#define ETH_DMAIER_FBEIE     ((uint32_t)0x00002000)  /* Fatal bus error interrupt enable */
+#define ETH_DMAIER_ETIE      ((uint32_t)0x00000400)  /* Early transmit interrupt enable */
+#define ETH_DMAIER_RWTIE     ((uint32_t)0x00000200)  /* Receive watchdog timeout interrupt enable */
+#define ETH_DMAIER_RPSIE     ((uint32_t)0x00000100)  /* Receive process stopped interrupt enable */
+#define ETH_DMAIER_RBUIE     ((uint32_t)0x00000080)  /* Receive buffer unavailable interrupt enable */
+#define ETH_DMAIER_RIE       ((uint32_t)0x00000040)  /* Receive interrupt enable */
+#define ETH_DMAIER_TUIE      ((uint32_t)0x00000020)  /* Transmit Underflow interrupt enable */
+#define ETH_DMAIER_ROIE      ((uint32_t)0x00000010)  /* Receive Overflow interrupt enable */
+#define ETH_DMAIER_TJTIE     ((uint32_t)0x00000008)  /* Transmit jabber timeout interrupt enable */
+#define ETH_DMAIER_TBUIE     ((uint32_t)0x00000004)  /* Transmit buffer unavailable interrupt enable */
+#define ETH_DMAIER_TPSIE     ((uint32_t)0x00000002)  /* Transmit process stopped interrupt enable */
+#define ETH_DMAIER_TIE       ((uint32_t)0x00000001)  /* Transmit interrupt enable */
+
+/* Bit definition for Ethernet DMA Missed Frame and Buffer Overflow Counter Register */
+#define ETH_DMAMFBOCR_OFOC   ((uint32_t)0x10000000)  /* Overflow bit for FIFO overflow counter */
+#define ETH_DMAMFBOCR_MFA    ((uint32_t)0x0FFE0000)  /* Number of frames missed by the application */
+#define ETH_DMAMFBOCR_OMFC   ((uint32_t)0x00010000)  /* Overflow bit for missed frame counter */
+#define ETH_DMAMFBOCR_MFC    ((uint32_t)0x0000FFFF)  /* Number of frames missed by the controller */
+
+/* Bit definition for Ethernet DMA Current Host Transmit Descriptor Register */
+#define ETH_DMACHTDR_HTDAP   ((uint32_t)0xFFFFFFFF)  /* Host transmit descriptor address pointer */
+
+/* Bit definition for Ethernet DMA Current Host Receive Descriptor Register */
+#define ETH_DMACHRDR_HRDAP   ((uint32_t)0xFFFFFFFF)  /* Host receive descriptor address pointer */
+
+/* Bit definition for Ethernet DMA Current Host Transmit Buffer Address Register */
+#define ETH_DMACHTBAR_HTBAP  ((uint32_t)0xFFFFFFFF)  /* Host transmit buffer address pointer */
+
+/* Bit definition for Ethernet DMA Current Host Receive Buffer Address Register */
+#define ETH_DMACHRBAR_HRBAP  ((uint32_t)0xFFFFFFFF)  /* Host receive buffer address pointer */
+
+/******************************************************************************/
+/*                                                                            */
 /*                                       USB_OTG			                        */
 /*                                                                            */
 /******************************************************************************/
@@ -7104,6 +7547,9 @@ USB_OTG_HostChannelTypeDef;
 /******************************* DAC Instances ********************************/
 #define IS_DAC_ALL_INSTANCE(INSTANCE) ((INSTANCE) == DAC)
 
+/******************************* DCMI Instances *******************************/
+#define IS_DCMI_ALL_INSTANCE(INSTANCE) ((INSTANCE) == DCMI)
+
 /******************************** DMA Instances *******************************/
 #define IS_DMA_STREAM_ALL_INSTANCE(INSTANCE) (((INSTANCE) == DMA1_Stream0) || \
                                               ((INSTANCE) == DMA1_Stream1) || \
@@ -7140,7 +7586,7 @@ USB_OTG_HostChannelTypeDef;
 
 /******************************** I2S Instances *******************************/
 #define IS_I2S_ALL_INSTANCE(INSTANCE)  (((INSTANCE) == SPI2) || \
-                                        ((INSTANCE) == SPI3))
+                                    ((INSTANCE) == SPI3))
 
 /*************************** I2S Extended Instances ***************************/
 #define IS_I2S_ALL_INSTANCE_EXT(PERIPH)  (((INSTANCE) == SPI2)    || \
@@ -7443,7 +7889,6 @@ USB_OTG_HostChannelTypeDef;
 }
 #endif /* __cplusplus */
 
-#endif /* STM32F215xx_H */
+#endif /* STM32F207xx_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

@@ -34,7 +34,7 @@ extern "C"
 
 /* Rev. 2.x silicon */
 #define K60_CPU_REV 2
-#include "MK60D10.h"
+#include "vendor/MK60D10.h"
 
 /** The expected CPUID value, can be used to implement a check that we are
  * running on the right hardware */
@@ -47,7 +47,7 @@ extern "C"
 
 /* Rev. 1.x silicon */
 #define K60_CPU_REV 1
-#include "MK60DZ10.h"
+#include "vendor/MK60DZ10.h"
 
 /** The expected CPUID value, can be used to implement a check that we are
  * running on the right hardware */

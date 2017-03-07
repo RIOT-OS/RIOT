@@ -13,7 +13,7 @@
 /---------------------------------------------------------------------------*/
 
 #include <string.h>
-#include "lpc23xx.h"
+#include "cpu.h"
 #include "VIC.h"
 #include "xtimer.h"
 #include "diskio.h"

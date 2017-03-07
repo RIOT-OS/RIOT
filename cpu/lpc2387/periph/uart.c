@@ -24,7 +24,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "lpc23xx.h"
+#include "cpu.h"
 #include "VIC.h"
 #include "periph/uart.h"
 
