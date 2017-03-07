@@ -224,7 +224,7 @@
  *                                           IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
  *         if (sock_udp_send(&sock, "Hello!", sizeof("Hello!"), &remote) < 0) {
  *             puts("Error sending message");
- *             sock_udp_close();
+ *             sock_udp_close(&sock);
  *             return 1;
  *         }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
