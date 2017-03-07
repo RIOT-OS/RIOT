@@ -72,6 +72,9 @@ static mutex_t mtx_access = MUTEX_INIT;
  */
 static universal_address_container_t *universal_address_find_entry(uint8_t *addr, size_t addr_size)
 {
+    /* cppcheck-suppress unsignedLessThanZero
+     * (reason: UNIVERSAL_ADDRESS_MAX_ENTRIES may be zero in which case this
+     * code is optimized out) */
     for (size_t i = 0; i < UNIVERSAL_ADDRESS_MAX_ENTRIES; ++i) {
         if (universal_address_table[i].address_size == addr_size) {
             if (memcmp((universal_address_table[i].address), addr, addr_size) == 0) {
@@ -93,9 +96,9 @@ static universal_address_container_t *universal_address_get_next_unused_entry(vo
 {
     /* cppcheck-suppress unsignedLessThanZero
      * (reason: UNIVERSAL_ADDRESS_MAX_ENTRIES may be zero in which case this
-     * code is optimized out)
-     */
+     * code is optimized out) */
     if (universal_address_table_filled < UNIVERSAL_ADDRESS_MAX_ENTRIES) {
+        /* cppcheck-suppress unsignedLessThanZero */
         for (size_t i = 0; i < UNIVERSAL_ADDRESS_MAX_ENTRIES; ++i) {
             if (universal_address_table[i].use_count == 0) {
                 return &(universal_address_table[i]);
@@ -298,6 +301,9 @@ void universal_address_init(void)
 {
     mutex_lock(&mtx_access);
 
+    /* cppcheck-suppress unsignedLessThanZero
+     * (reason: UNIVERSAL_ADDRESS_MAX_ENTRIES may be zero in which case this
+     * code is optimized out) */
     for (size_t i = 0; i < UNIVERSAL_ADDRESS_MAX_ENTRIES; ++i) {
         universal_address_table[i].use_count = 0;
         universal_address_table[i].address_size = 0;
@@ -311,6 +317,9 @@ void universal_address_reset(void)
 {
     mutex_lock(&mtx_access);
 
+    /* cppcheck-suppress unsignedLessThanZero
+     * (reason: UNIVERSAL_ADDRESS_MAX_ENTRIES may be zero in which case this
+     * code is optimized out) */
     for (size_t i = 0; i < UNIVERSAL_ADDRESS_MAX_ENTRIES; ++i) {
         universal_address_table[i].use_count = 0;
     }
@@ -352,6 +361,9 @@ void universal_address_print_table(void)
     printf("[universal_address_print_table] universal_address_table_filled: %d\n", \
            (int)universal_address_table_filled);
 
+    /* cppcheck-suppress unsignedLessThanZero
+     * (reason: UNIVERSAL_ADDRESS_MAX_ENTRIES may be zero in which case this
+     * code is optimized out) */
     for (size_t i = 0; i < UNIVERSAL_ADDRESS_MAX_ENTRIES; ++i) {
         universal_address_print_entry(&universal_address_table[i]);
     }
