@@ -69,10 +69,9 @@ static bool _dyn_port_used(uint16_t port)
  */
 static uint16_t _get_dyn_port(sock_udp_t *sock)
 {
-    uint16_t port;
     unsigned count = GNRC_SOCK_DYN_PORTRANGE_NUM;
     do {
-        port = GNRC_SOCK_DYN_PORTRANGE_MIN +
+        uint16_t port = GNRC_SOCK_DYN_PORTRANGE_MIN +
                (_dyn_port_next * GNRC_SOCK_DYN_PORTRANGE_OFF) % GNRC_SOCK_DYN_PORTRANGE_NUM;
         _dyn_port_next++;
         if ((sock == NULL) || (sock->flags & SOCK_FLAGS_REUSE_EP) ||
