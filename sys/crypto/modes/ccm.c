@@ -105,21 +105,35 @@ int ccm_compute_adata_mac(cipher_t* cipher, uint8_t* auth_data,
     if (auth_data_len > 0) {
         int len;
 
-        /* 16 octet block size + max. 10 len encoding  */
-        uint8_t auth_data_encoded[26], len_encoding = 0;
+        uint8_t auth_data_encoded[16] = {0}, len_encoding = 0;
 
-        if ( auth_data_len < (((uint32_t) 2) << 16)) {       /* length (0x0001 ... 0xFEFF)  */
+        if (auth_data_len < (((uint32_t) 1) << 16) - (1 << 8)) {
+            /* length (0x0001 ... 0xFEFF)  */
             len_encoding = 2;
 
             auth_data_encoded[1] = auth_data_len & 0xFF;
             auth_data_encoded[0] = (auth_data_len >> 8) & 0xFF;
         } else {
-            DEBUG("UNSUPPORTED Adata length\n");
+            DEBUG("UNSUPPORTED Adata length: %u\n", auth_data_len);
             return -1;
         }
 
-        memcpy(auth_data_encoded + len_encoding, auth_data, auth_data_len);
-        len = ccm_compute_cbc_mac(cipher, X1, auth_data_encoded, auth_data_len + len_encoding, X1);
+        int block_size = cipher_get_block_size(cipher);
+        size_t first_block_adata_len = block_size - len_encoding;
+        if (first_block_adata_len > auth_data_len)
+            first_block_adata_len = auth_data_len;
+        /* Create the first block of encoded auth data */
+        memcpy(auth_data_encoded + len_encoding, auth_data,
+               first_block_adata_len);
+        /* Compute CBC-MAC for the first block */
+        len = ccm_compute_cbc_mac(cipher, X1, auth_data_encoded, block_size, X1);
+        if (len < 0) {
+            return -1;
+        }
+        if (auth_data_len - first_block_adata_len == 0) return 0;
+        /* Compute CBC-MAC for the rest of the auth data */
+        len = ccm_compute_cbc_mac(cipher, X1, auth_data + first_block_adata_len,
+                                  auth_data_len - first_block_adata_len, X1);
         if (len < 0) {
             return -1;
         }
@@ -144,9 +158,8 @@ int cipher_encrypt_ccm(cipher_t* cipher, uint8_t* auth_data, uint32_t auth_data_
         return CCM_ERR_INVALID_MAC_LENGTH;
     }
 
-    length_max = 2 << (8 * length_encoding);
-    if (length_encoding < 2 || length_encoding > 8 ||
-            input_len - auth_data_len > length_max) {
+    length_max = 1 << (8 * length_encoding);
+    if (length_encoding < 2 || length_encoding > 8 || input_len >= length_max) {
         return CCM_ERR_INVALID_LENGTH_ENCODING;
     }
 
@@ -206,9 +219,8 @@ int cipher_decrypt_ccm(cipher_t* cipher, uint8_t* auth_data,
         return CCM_ERR_INVALID_MAC_LENGTH;
     }
 
-    length_max = 2 << (8 * length_encoding);
-    if (length_encoding < 2 || length_encoding > 8 ||
-            input_len - auth_data_len > length_max) {
+    length_max = 1 << (8 * length_encoding);
+    if (length_encoding < 2 || length_encoding > 8 || input_len >= length_max) {
         return CCM_ERR_INVALID_LENGTH_ENCODING;
     }
 
