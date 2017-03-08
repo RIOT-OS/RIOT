@@ -308,7 +308,7 @@ typedef _Atomic(uintmax_t)          atomic_uintmax_t;
 #if __has_builtin(__sync_swap)
 /* Clang provides a full-barrier atomic exchange - use it if available. */
 #define atomic_exchange_explicit(object, desired, order)        \
-    ((void)(order), __sync_swap(&(object)->__val, desired))
+    __sync_swap(&(object)->__val, desired)
 #else
 /*
  * __sync_lock_test_and_set() is only an acquire barrier in theory (although in
@@ -324,20 +324,21 @@ __extension__ ({                            \
     __sync_lock_test_and_set(&(__o)->__val, __d);           \
 })
 #endif
+/* Ignoring the order argument when using __sync builtins */
 #define atomic_fetch_add_explicit(object, operand, order)       \
-    ((void)(order), __sync_fetch_and_add(&(object)->__val,      \
-        __atomic_apply_stride(object, operand)))
+    __sync_fetch_and_add(&(object)->__val,      \
+        __atomic_apply_stride(object, operand))
 #define atomic_fetch_and_explicit(object, operand, order)       \
-    ((void)(order), __sync_fetch_and_and(&(object)->__val, operand))
+    __sync_fetch_and_and(&(object)->__val, operand)
 #define atomic_fetch_or_explicit(object, operand, order)        \
-    ((void)(order), __sync_fetch_and_or(&(object)->__val, operand))
+    __sync_fetch_and_or(&(object)->__val, operand)
 #define atomic_fetch_sub_explicit(object, operand, order)       \
-    ((void)(order), __sync_fetch_and_sub(&(object)->__val,      \
-        __atomic_apply_stride(object, operand)))
+    __sync_fetch_and_sub(&(object)->__val,      \
+        __atomic_apply_stride(object, operand))
 #define atomic_fetch_xor_explicit(object, operand, order)       \
-    ((void)(order), __sync_fetch_and_xor(&(object)->__val, operand))
+    __sync_fetch_and_xor(&(object)->__val, operand)
 #define atomic_load_explicit(object, order)             \
-    ((void)(order), __sync_fetch_and_add(&(object)->__val, 0))
+    __sync_fetch_and_add(&(object)->__val, 0)
 #define atomic_store_explicit(object, desired, order)           \
     ((void)atomic_exchange_explicit(object, desired, order))
 #endif
