@@ -82,6 +82,7 @@
 
 #ifdef MODULE_TINYMT32
 #include "random.h"
+#include "random_seed.h"
 #endif
 
 #ifdef MODULE_GCOAP
@@ -93,12 +94,12 @@
 
 void auto_init(void)
 {
-#ifdef MODULE_TINYMT32
-    random_init(0);
-#endif
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
+#endif
+#ifdef MODULE_TINYMT32
+    random_init(random_prng_seed());
 #endif
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");
