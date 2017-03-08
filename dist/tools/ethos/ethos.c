@@ -11,8 +11,7 @@
 #include <unistd.h>
 
 #include <netinet/in.h>
-#include <linux/if.h>
-#include <linux/if_tun.h>
+#include <net/if.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -150,10 +149,21 @@ typedef struct {
     char remote_l2_addr[6];
 } serial_t;
 
+int devopen(const char *dev, int flags)
+{
+    char t[1024];
+    strcpy(t, "/dev/");
+    strncat(t, dev, sizeof(t) - 5);
+    return open(t, flags);
+}
+
 /**************************************************************************
  * tun_alloc: allocates or reconnects to a tun/tap device. The caller     *
  *            needs to reserve enough space in *dev.                      *
  **************************************************************************/
+#ifdef __linux__
+#include <linux/if.h>
+#include <linux/if_tun.h>
 int tun_alloc(char *dev, int flags) {
 
   struct ifreq ifr;
@@ -182,6 +192,14 @@ int tun_alloc(char *dev, int flags) {
 
   return fd;
 }
+#else
+int
+tun_alloc(char *dev, int flags)
+{
+    (void) flags;
+    return devopen(dev, O_RDWR);
+}
+#endif
 
 static void _handle_char(serial_t *serial, char c)
 {
@@ -298,7 +316,11 @@ static void _send_hello(int serial_fd, serial_t *serial, unsigned type)
 static void _clear_neighbor_cache(const char *ifname)
 {
     char tmp[20 + IFNAMSIZ];
+#ifdef __linux__
     snprintf(tmp, sizeof(tmp), "ip neigh flush dev %s", ifname);
+#else
+    snprintf(tmp, sizeof(tmp), "ndp -an");
+#endif
     if (system(tmp) < 0) {
         fprintf(stderr, "error while flushing device neighbor cache\n");
     }
@@ -479,7 +501,11 @@ int _open_serial_connection(char *name, char *baudrate_arg)
         return 1;
     }
 
+#ifdef __linux__
     int serial_fd = open(name, O_RDWR | O_NOCTTY | O_SYNC);
+#else
+    int serial_fd = devopen(name, O_RDWR | O_NONBLOCK);
+#endif
 
     if (serial_fd < 0) {
         fprintf(stderr, "Error opening serial device %s\n", name);
@@ -505,7 +531,9 @@ int main(int argc, char *argv[])
 {
     char inbuf[MTU];
     char *serial_option = NULL;
-
+#ifdef __APPLE__
+    int tap = 0;
+#endif
     serial_t serial = {0};
 
     if (argc < 3) {
@@ -519,12 +547,15 @@ int main(int argc, char *argv[])
 
     char ifname[IFNAMSIZ];
     strncpy(ifname, argv[1], IFNAMSIZ);
+#ifdef __linux__
     int tap_fd = tun_alloc(ifname, IFF_TAP | IFF_NO_PI);
+#else
+    int tap_fd = tun_alloc(ifname, tap);
+#endif
 
     if (tap_fd < 0) {
         return 1;
     }
-
 
     int serial_fd = _open_connection(argv[2], serial_option);
     if (serial_fd < 0) {
