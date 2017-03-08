@@ -122,16 +122,18 @@ static void _isr_gpio(uint32_t port_num){
     uint32_t isr = ROM_GPIOPinIntStatus(port_addr, true);
     uint8_t i;
 
-    ROM_GPIOPinIntClear(port_addr, isr);
-
     for (i=0; i<8; i++, isr>>=1) {
         if ((isr & 0x1) == 0){
             continue;
         }
+
+        ROM_GPIOPinIntClear(port_addr, 1 << i);
+
         if (gpio_config[port_num][i].cb){
             gpio_config[port_num][i].cb(gpio_config[port_num][i].arg);
         }
     }
+    cortexm_isr_end();
 }
 
 void isr_gpio_porta(void){
