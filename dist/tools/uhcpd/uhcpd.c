@@ -14,6 +14,11 @@
 #include <netdb.h>
 #include <net/if.h>
 #include <arpa/inet.h>
+#ifdef __APPLE__
+#include <ifaddrs.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#endif
 
 #include "net/uhcp.h"
 
@@ -163,6 +168,7 @@ int udp_sendto(uint8_t *buf, size_t len, uint8_t *dst, uint16_t dst_port, uhcp_i
 }
 
 /* Requires to be 'root', I didn't find another solution for the moment */
+#ifdef __linux__
 static void bind_to_device(int sock, const char *interface)
 {
     if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE,
@@ -171,3 +177,41 @@ static void bind_to_device(int sock, const char *interface)
         exit(1);
     }
 }
+#else
+static void bind_to_device(int sock, const char *interface)
+{
+    struct ifaddrs* p_list = NULL;
+    struct ifaddrs* p_adapter = NULL;
+    struct ifaddrs* p_adapter_found = NULL;
+    int family = AF_INET6;
+    int bindresult = -1;
+
+    int result = getifaddrs(&p_list);
+
+    if (result < 0) {
+        perror("getifaddrs(&p_list) failed");
+        exit(1);
+    }
+
+    p_adapter = p_list;
+    while (p_adapter) {
+        if ((p_adapter->ifa_addr != NULL) && (p_adapter->ifa_name != NULL) && (family == p_adapter->ifa_addr->sa_family)) {
+            if (strcmp(p_adapter->ifa_name, interface) == 0) {
+                p_adapter_found = p_adapter;
+                break;
+            }
+        }
+        p_adapter = p_adapter->ifa_next;
+    }
+
+    if (p_adapter_found != NULL) {
+        int addrsize = sizeof(struct sockaddr_in6);
+        bindresult = bind(sock, p_adapter_found->ifa_addr, addrsize);
+    } else {
+        perror("adapter not found");
+        exit(1);
+    }
+
+    freeifaddrs(p_list);
+}
+#endif
