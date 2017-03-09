@@ -112,6 +112,14 @@ ifneq (,$(filter emcute,$(USEMODULE)))
     DIRS += net/application_layer/emcute
 endif
 
+ifneq (,$(filter constfs,$(USEMODULE)))
+    DIRS += fs/constfs
+endif
+
+ifneq (,$(filter devfs,$(USEMODULE)))
+    DIRS += fs/devfs
+endif
+
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
 include $(RIOTBASE)/Makefile.base

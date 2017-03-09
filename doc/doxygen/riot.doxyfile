@@ -818,6 +818,7 @@ EXCLUDE_SYMLINKS       = NO
 # exclude all test directories for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = */board/*/tools/* \
+                         */cpu/atmega_common/include/sys/*.h \
                          */cpu/msp430_common/include/stdatomic.h \
                          */cpu/msp430_common/include/sys/*.h \
                          */cpu/native/osx-libc-extra \

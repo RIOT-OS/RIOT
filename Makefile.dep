@@ -597,6 +597,20 @@ ifneq (,$(filter emcute,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter constfs,$(USEMODULE)))
+  USEMODULE += vfs
+endif
+
+ifneq (,$(filter devfs,$(USEMODULE)))
+  USEMODULE += vfs
+endif
+
+ifneq (,$(filter vfs,$(USEMODULE)))
+    ifeq (native, $(BOARD))
+        USEMODULE += native_vfs
+    endif
+endif
+
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 

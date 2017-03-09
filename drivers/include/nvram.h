@@ -30,6 +30,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#if MODULE_VFS
+#include "vfs.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -78,6 +82,10 @@ typedef struct nvram {
     /** @brief Device-specific parameters, if any. */
     void *extra;
 } nvram_t;
+
+#if MODULE_VFS
+extern const vfs_file_ops_t nvram_vfs_ops;
+#endif
 
 #ifdef __cplusplus
 }

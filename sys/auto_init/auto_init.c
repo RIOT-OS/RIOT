@@ -152,6 +152,11 @@ void auto_init(void)
     DEBUG("Auto init gcoap module.\n");
     gcoap_init();
 #endif
+#ifdef MODULE_DEVFS
+    DEBUG("Mounting /dev\n");
+    extern void auto_init_devfs(void);
+    auto_init_devfs();
+#endif
 
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
