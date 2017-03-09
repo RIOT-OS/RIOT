@@ -33,10 +33,10 @@
 #include "net/eui64.h"
 #include "net/ethernet.h"
 
-#ifdef USE_ETHOS_FOR_STDIO
-#include "uart_stdio.h"
+#ifdef MODULE_ETHOS_STDIO
+#include "riot_stdio.h"
 #include "isrpipe.h"
-extern isrpipe_t uart_stdio_isrpipe;
+extern isrpipe_t ethos_stdio_isrpipe;
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -48,7 +48,6 @@ static const netdev2_driver_t netdev2_driver_ethos;
 
 static const uint8_t _esc_esc[] = {ETHOS_ESC_CHAR, (ETHOS_ESC_CHAR ^ 0x20)};
 static const uint8_t _esc_delim[] = {ETHOS_ESC_CHAR, (ETHOS_FRAME_DELIMITER ^ 0x20)};
-
 
 void ethos_setup(ethos_t *dev, const ethos_params_t *params)
 {
@@ -99,10 +98,10 @@ static void _handle_char(ethos_t *dev, char c)
                 _reset_state(dev);
             }
             break;
-#ifdef USE_ETHOS_FOR_STDIO
+#ifdef MODULE_ETHOS_STDIO
         case ETHOS_FRAME_TYPE_TEXT:
             dev->framesize++;
-            isrpipe_write_one(&uart_stdio_isrpipe, c);
+            isrpipe_write_one(&ethos_stdio_isrpipe, c);
 #endif
     }
 }

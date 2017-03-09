@@ -40,7 +40,7 @@
 #include "log.h"
 #include "periph/pm.h"
 
-#include "uart_stdio.h"
+#include "riot_stdio.h"
 
 #ifdef MODULE_XTIMER
 #include <sys/time.h>
@@ -60,7 +60,7 @@ char *heap_top = &_sheap + 4;
  */
 void _init(void)
 {
-    uart_stdio_init();
+    stdio_init();
 }
 
 /**
@@ -191,7 +191,7 @@ _ssize_t _read_r(struct _reent *r, int fd, void *buffer, size_t count)
 {
     (void)r;
     (void)fd;
-    return uart_stdio_read(buffer, count);
+    return stdio_read(buffer, count);
 }
 
 /**
@@ -213,7 +213,7 @@ _ssize_t _write_r(struct _reent *r, int fd, const void *data, size_t count)
 {
     (void) r;
     (void) fd;
-    return uart_stdio_write(data, count);
+    return stdio_write(data, count);
 }
 
 /**

@@ -67,7 +67,7 @@
  * @file
  * @brief SEGGER RTT stdio implementation
  *
- * This file implements UART read/write functions, but it
+ * This file implements read/write functions, but it
  * is actually a virtual UART backed by a ringbuffer that
  * complies with SEGGER RTT. It is designed to shadow
  * uart_stdio that is used by newlib.
@@ -79,8 +79,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <rtt_stdio.h>
 
+#include "riot_stdio.h"
 #include "thread.h"
 #include "mutex.h"
 #include "xtimer.h"
@@ -277,7 +277,7 @@ int rtt_write(const char* buf_ptr, unsigned num_bytes) {
     return num_bytes_written;
 }
 
-void uart_stdio_init(void) {
+void stdio_init(void) {
     #ifndef RTT_STDIO_DISABLE_STDIN
     stdin_enabled = 1;
     #endif
@@ -305,7 +305,7 @@ void rtt_stdio_enable_blocking_stdout(void) {
    actually have an RTT console (because we are deployed on
    a battery somewhere) then we REALLY don't want to poll
    especially since we are not expecting to EVER get input. */
-int uart_stdio_read(char* buffer, int count) {
+int stdio_read(char* buffer, int count) {
     int res = rtt_read(buffer, count);
     if (res == 0) {
         if (!stdin_enabled) {
@@ -324,7 +324,7 @@ int uart_stdio_read(char* buffer, int count) {
     return res;
 }
 
-int uart_stdio_write(const char* buffer, int len) {
+int stdio_write(const char* buffer, int len) {
     int written = rtt_write(buffer, len);
     xtimer_ticks32_t last_wakeup = xtimer_now();
     while (blocking_stdout && written < len) {
