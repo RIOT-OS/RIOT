@@ -76,6 +76,8 @@ void x86_init_gdt(void)
             .limit_16_19_and_flags = 0,
             .base_24_31            = 0,
         },
+        /* cppcheck-suppress duplicateExpression
+         * it's for consistent look & feel */
         [0x0008 / 8] = {
             .limit_0_15            = 0xFFFF,
             .base_0_15             = 0,
