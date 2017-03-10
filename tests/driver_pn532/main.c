@@ -50,6 +50,8 @@ int main(void)
     ret = pn532_init_i2c(&pn532, &pn532_conf[0]);
 #elif defined(PN532_SUPPORT_SPI)
     ret = pn532_init_spi(&pn532, &pn532_conf[0]);
+#else
+#error None of PN532_SUPPORT_I2C and PN532_SUPPORT_SPI set!
 #endif
 
     if (ret != 0) {
