@@ -99,7 +99,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     }
 
     if (cs == SPI_HWCS_MASK) {
-        if (spi_config[bus].cs_pin == GPIO_UNDEF) {
+        if (spi_config[bus].cs_pin == SPI_CS_UNDEF) {
             return SPI_NOCS;
         }
 #ifdef CPU_FAM_STM32F1

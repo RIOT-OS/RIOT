@@ -125,7 +125,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     }
     else {
         if ((cs >= SPI_HWCS_NUMOF) ||
-            (spi_config[bus].pin_cs[cs] == GPIO_UNDEF)) {
+            (spi_config[bus].pin_cs[cs] == SPI_CS_UNDEF)) {
             return SPI_NOCS;
         }
         gpio_init_port(spi_config[bus].pin_cs[cs], spi_config[bus].pcr);
