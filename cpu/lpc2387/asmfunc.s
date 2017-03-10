@@ -6,9 +6,11 @@
  * directory for more details.
  */
 
+/*
 @-----------------------------------------------------------@
 @ Fast Block Copy (declared in diskio.h)
 @-----------------------------------------------------------@
+*/
 
 .global copy_un2al
 .arm
