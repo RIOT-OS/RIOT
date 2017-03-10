@@ -38,9 +38,7 @@ extern "C" {
 #endif
 
 /**
- * @def GNRC_IPV6_NETIF_ADDR_NUMOF
- *
- * @brief   Number of IPv6 addresses per interface.
+ * @cond INTERNAL
  */
 #ifdef MODULE_GNRC_RPL
 /* RPL needs all-RPL-nodes multicast address */
@@ -54,6 +52,12 @@ extern "C" {
 #else
 #   define GNRC_IPV6_NETIF_RTR_ADDR     (0)
 #endif
+/**
+ * @endcond
+ */
+/**
+ * @brief   Number of IPv6 addresses per interface.
+ */
 #ifndef GNRC_IPV6_NETIF_ADDR_NUMOF
 #define GNRC_IPV6_NETIF_ADDR_NUMOF  (6 + GNRC_IPV6_NETIF_RPL_ADDR + GNRC_IPV6_NETIF_RTR_ADDR)
 #endif

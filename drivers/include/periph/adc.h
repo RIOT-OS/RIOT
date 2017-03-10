@@ -116,7 +116,7 @@ int adc_init(adc_t line);
  * for the first to finish before its conversion starts.
  *
  * @param[in] line          line to sample
- * @param[in] resolution    resolution to use for conversion
+ * @param[in] res           resolution to use for conversion
  *
  * @return                  the sampled value on success
  * @return                  -1 if resolution is not applicable

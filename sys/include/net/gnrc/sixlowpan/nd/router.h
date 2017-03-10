@@ -157,7 +157,7 @@ void gnrc_sixlowpan_nd_router_abr_remove(gnrc_sixlowpan_nd_router_abr_t *abr);
 /**
  * @brief   Makes this node a new border router.
  *
- * @per addr != NULL
+ * @pre addr != NULL
  *
  * @param[in] addr  The local address to use in the ABROs
  * @param[in] ltime The lifetime to advertise in the ABROs. 0 assumes a default value of
@@ -174,7 +174,7 @@ gnrc_sixlowpan_nd_router_abr_t *gnrc_sixlowpan_nd_router_abr_create(ipv6_addr_t 
  *
  * @pre iface != NULL && prefix != NULL
  *
- * @param[in] abr       The local border router
+ * @param[in] abr       The local border router.
  * @param[in] iface     The IPv6 interface the prefix was added to.
  * @param[in] prefix    The prefix.
  *
@@ -188,7 +188,7 @@ int gnrc_sixlowpan_nd_router_abr_add_prf(gnrc_sixlowpan_nd_router_abr_t* abr,
 /**
  * @brief   Removes a prefix from this border router.
  *
- * @param[in] abr       The local border router
+ * @param[in] abr       The local border router.
  * @param[in] iface     The IPv6 interface the prefix was added to.
  * @param[in] prefix    The prefix.
  */
@@ -199,7 +199,7 @@ void gnrc_sixlowpan_nd_router_abr_rem_prf(gnrc_sixlowpan_nd_router_abr_t *abr,
  * @brief   Adds a context for this border router to manage.
  *
  * @param[in] abr       The local border router
- * @param[in] ctx       The context to be add.
+ * @param[in] cid       The context to be add.
  *
  * @return  0, on success
  * @return  -EINVAL, if @p ctx is greater than 15.
@@ -210,8 +210,8 @@ int gnrc_sixlowpan_nd_router_abr_add_ctx(gnrc_sixlowpan_nd_router_abr_t *abr, ui
 /**
  * @brief   Removes a context from this border router.
  *
- * @param[in] abr       The local border router
- * @param[in] ctx       The context to be remove.
+ * @param[in] abr       The local border router.
+ * @param[in] cid       The context to be remove.
  */
 void gnrc_sixlowpan_nd_router_abr_rem_ctx(gnrc_sixlowpan_nd_router_abr_t *abr, uint8_t cid);
 #else

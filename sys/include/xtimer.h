@@ -47,7 +47,7 @@ extern "C" {
  * @note This is a struct in order to make the xtimer API type strict
  */
 typedef struct {
-    uint64_t ticks64;
+    uint64_t ticks64;       /**< Tick count */
 } xtimer_ticks64_t;
 
 /**
@@ -56,7 +56,7 @@ typedef struct {
  * @note This is a struct in order to make the xtimer API type strict
  */
 typedef struct {
-    uint32_t ticks32;
+    uint32_t ticks32;       /**< Tick count */
 } xtimer_ticks32_t;
 
 /**
@@ -68,12 +68,12 @@ typedef void (*xtimer_callback_t)(void*);
  * @brief xtimer timer structure
  */
 typedef struct xtimer {
-    struct xtimer *next;        /**< reference to next timer in timer lists */
-    uint32_t target;            /**< lower 32bit absolute target time */
-    uint32_t long_target;       /**< upper 32bit absolute target time */
+    struct xtimer *next;         /**< reference to next timer in timer lists */
+    uint32_t target;             /**< lower 32bit absolute target time */
+    uint32_t long_target;        /**< upper 32bit absolute target time */
     xtimer_callback_t callback;  /**< callback function to call when timer
                                      expires */
-    void *arg;                  /**< argument to pass to callback function */
+    void *arg;                   /**< argument to pass to callback function */
 } xtimer_t;
 
 /**

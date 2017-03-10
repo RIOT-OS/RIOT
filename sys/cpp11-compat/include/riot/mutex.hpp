@@ -41,31 +41,66 @@ namespace riot {
  *        </a>
  */
 class mutex {
- public:
+public:
+  /**
+   * The native handle type used by the mutex.
+   */
   using native_handle_type = mutex_t*;
 
   inline constexpr mutex() noexcept : m_mtx{{0}} {}
   ~mutex();
 
+  /**
+   * @brief Lock the mutex.
+   */
   void lock();
+  /**
+   * @brief Try to lock the mutex.
+   * @return `true` if the mutex was locked, `false` otherwise.
+   */
   bool try_lock() noexcept;
+  /**
+   * @brief Unlock the mutex.
+   */
   void unlock() noexcept;
 
+  /**
+   * @brief Provides access to the native handle.
+   * @return The native handle of the mutex.
+   */
   inline native_handle_type native_handle() { return &m_mtx; }
 
- private:
+private:
   mutex(const mutex&);
   mutex& operator=(const mutex&);
 
   mutex_t m_mtx;
 };
 
+/**
+ * @brief Tag type for defer lock strategy.
+ */
 struct defer_lock_t {};
+/**
+ * @brief Tag type for try lock strategy.
+ */
 struct try_to_lock_t {};
+/**
+ * @brief Tag type for adopt lock strategy.
+ */
 struct adopt_lock_t {};
 
+/**
+ * @brief Tag constant for defer lock strategy.
+ */
 constexpr defer_lock_t defer_lock = defer_lock_t();
+/**
+ * @brief Tag constant for try lock strategy.
+ */
 constexpr try_to_lock_t try_to_lock = try_to_lock_t();
+/**
+ * @brief Tag constant for adopt lock strategy.
+ */
 constexpr adopt_lock_t adopt_lock = adopt_lock_t();
 
 /**
@@ -76,15 +111,24 @@ constexpr adopt_lock_t adopt_lock = adopt_lock_t();
  */
 template <class Mutex>
 class lock_guard {
-
- public:
+public:
+  /**
+   * The type of Mutex used by the lock_guard.
+   */
   using mutex_type = Mutex;
 
+  /**
+   * @brief Constructs a lock_gurad from a Mutex and locks it.
+   */
   inline explicit lock_guard(mutex_type& mtx) : m_mtx(mtx) { m_mtx.lock(); }
+  /**
+   * @brief Constructs a lock_guard from a Mutex, acquireing ownership without
+   *        locking it.
+   */
   inline lock_guard(mutex_type& mtx, adopt_lock_t) : m_mtx{mtx} {}
   inline ~lock_guard() { m_mtx.unlock(); }
 
- private:
+private:
   mutex_type& m_mtx;
 };
 
@@ -96,18 +140,33 @@ class lock_guard {
  */
 template <class Mutex>
 class unique_lock {
-
- public:
+public:
+  /**
+   * The type of Mutex used by the lock.
+   */
   using mutex_type = Mutex;
 
   inline unique_lock() noexcept : m_mtx{nullptr}, m_owns{false} {}
+  /**
+   * @brief Constructs a unique_lock from a Mutex and locks it.
+   */
   inline explicit unique_lock(mutex_type& mtx) : m_mtx{&mtx}, m_owns{true} {
     m_mtx->lock();
   }
+  /**
+   * @brief Constructs a unique_lock from a Mutex but does not lock it.
+   */
   inline unique_lock(mutex_type& mtx, defer_lock_t) noexcept : m_mtx{&mtx},
                                                                m_owns{false} {}
+  /**
+   * @brief Constructs a unique_lock from a Mutex and tries to lock it.
+   */
   inline unique_lock(mutex_type& mtx, try_to_lock_t)
       : m_mtx{&mtx}, m_owns{mtx.try_lock()} {}
+  /**
+   * @brief Constructs a unique_lock from a Mutex that is already owned by the
+   *        thread.
+   */
   inline unique_lock(mutex_type& mtx, adopt_lock_t)
       : m_mtx{&mtx}, m_owns{true} {}
   inline ~unique_lock() {
@@ -115,11 +174,17 @@ class unique_lock {
       m_mtx->unlock();
     }
   }
+  /**
+   * @brief Move constructor.
+   */
   inline unique_lock(unique_lock&& lock) noexcept : m_mtx{lock.m_mtx},
                                                     m_owns{lock.m_owns} {
     lock.m_mtx = nullptr;
     lock.m_owns = false;
   }
+  /**
+   * @brief Move assignment operator.
+   */
   inline unique_lock& operator=(unique_lock&& lock) noexcept {
     if (m_owns) {
       m_mtx->unlock();
@@ -131,16 +196,34 @@ class unique_lock {
     return *this;
   }
 
+  /**
+   * @brief Locks the associated mutex.
+   */
   void lock();
+  /**
+   * @brief Tries to lock the associated mutex.
+   * @return `true` if the mutex has been locked successfully,
+   *         `false` otherwise.
+   */
   bool try_lock();
-
+  /**
+   * @brief Unlocks the associated mutex.
+   */
   void unlock();
 
+  /**
+   * @brief Swap this unique_lock with another unique_lock.
+   */
   inline void swap(unique_lock& lock) noexcept {
     std::swap(m_mtx, lock.m_mtx);
     std::swap(m_owns, lock.m_owns);
   }
 
+  /**
+   * @brief Disassociate this lock from its mutex. The caller is responsible to
+   *        unlock the mutex if it was locked before.
+   * @return A pointer to the associated mutex or `nullptr` if there was none.
+   */
   inline mutex_type* release() noexcept {
     mutex_type* mtx = m_mtx;
     m_mtx = nullptr;
@@ -148,11 +231,25 @@ class unique_lock {
     return mtx;
   }
 
+  /**
+   * @brief Query ownership of the associate mutex.
+   * @return `true` if an associated mutex exists and the lock owns it,
+   *         `false` otherwise.
+   */
   inline bool owns_lock() const noexcept { return m_owns; }
+  /**
+   * @brief Operator to query the ownership of the associated mutex.
+   * @return `true` if an associated mutex exists and the lock owns it,
+   *         `false` otherwise.
+   */
   inline explicit operator bool() const noexcept { return m_owns; }
+  /**
+   * @brief Provides access to the associated mutex.
+   * @return A pointer to the associated mutex or nullptr it there was none.
+   */
   inline mutex_type* mutex() const noexcept { return m_mtx; }
 
- private:
+private:
   unique_lock(unique_lock const&);
   unique_lock& operator=(unique_lock const&);
 
@@ -203,6 +300,11 @@ void unique_lock<Mutex>::unlock() {
   m_owns = false;
 }
 
+/**
+ * @brief Swaps two mutexes.
+ * @param[inout] lhs    Reference to one mutex.
+ * @param[inout] rhs    Reference to the other mutex.
+ */
 template <class Mutex>
 inline void swap(unique_lock<Mutex>& lhs, unique_lock<Mutex>& rhs) noexcept {
   lhs.swap(rhs);

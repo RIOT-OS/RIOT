@@ -36,10 +36,16 @@ typedef struct {
     kernel_pid_t    msg_thread_pid; /**< thread to msg on irq */
 } pir_t;
 
+/**
+ * @brief value to configure sensitivity of sensore
+ */
 #ifndef PIR_MSG_T_STATUS_START
 #define PIR_MSG_T_STATUS_START 150
 #endif
 
+/**
+ * @brief event type for a PIR sensor
+ */
 typedef enum {
     PIR_STATUS_HI = PIR_MSG_T_STATUS_START,     /**< motion was detected */
     PIR_STATUS_LO,                              /**< no motion is detected */

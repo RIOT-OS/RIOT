@@ -90,7 +90,7 @@ typedef struct {
  *
  * @param[in] dev           the timer to initialize
  * @param[in] freq          requested number of ticks per second
- * @param[in] callback      this callback is called in interrupt context, the
+ * @param[in] cb            this callback is called in interrupt context, the
  *                          emitting channel is passed as argument
  * @param[in] arg           argument to the callback
  *

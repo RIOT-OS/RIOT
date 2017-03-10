@@ -32,6 +32,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Enables support for floating point random number generation
+ */
 #ifndef PRNG_FLOAT
 #  define PRNG_FLOAT (0)
 #endif

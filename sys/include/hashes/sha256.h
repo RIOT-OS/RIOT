@@ -120,17 +120,17 @@ void sha256_final(sha256_context_t *ctx, void *digest);
  * @brief A wrapper function to simplify the generation of a hash, this is
  * usefull for generating sha256 for one buffer
  *
- * @param data   pointer to the buffer to generate hash from
- * @param len    length of the buffer
- * @param digest optional pointer to an array for the result, length must be
- *               SHA256_DIGEST_LENGTH
- *               if digest == NULL, one static buffer is used
+ * @param[in] data   pointer to the buffer to generate hash from
+ * @param[in] len    length of the buffer
+ * @param[out] digest optional pointer to an array for the result, length must
+ *                    be SHA256_DIGEST_LENGTH
+ *                    if digest == NULL, one static buffer is used
  */
 void *sha256(const void *data, size_t len, void *digest);
 
 /**
  * @brief hmac_sha256_init HMAC SHA-256 calculation. Initiate calculation of a HMAC
- * @param ctx hmac_context_t handle to use
+ * @param[in] ctx hmac_context_t handle to use
  * @param[in] key key used in the hmac-sha256 computation
  * @param[in] key_length the size in bytes of the key
  */
@@ -138,15 +138,15 @@ void hmac_sha256_init(hmac_context_t *ctx, const void *key, size_t key_length);
 
 /**
  * @brief hmac_sha256_update Add data bytes for HMAC calculation
- * @param ctx hmac_context_t handle to use
- * @param data[in] pointer to the buffer to generate hash from
- * @param len[in] length of the buffer
+ * @param[in] ctx hmac_context_t handle to use
+ * @param[in] data pointer to the buffer to generate hash from
+ * @param[in] len length of the buffer
  */
 void hmac_sha256_update(hmac_context_t *ctx, const void *data, size_t len);
 
 /**
  * @brief hmac_sha256_final HMAC SHA-256 finalization. Finish HMAC calculation and export the value
- * @param ctx hmac_context_t handle to use
+ * @param[in] ctx hmac_context_t handle to use
  * @param[out] digest the computed hmac-sha256,
  *             length MUST be SHA256_DIGEST_LENGTH
  *             if digest == NULL, a static buffer is used
