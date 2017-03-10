@@ -21,6 +21,22 @@
 #include <stdint.h>
 #include "vectors_cortexm.h"
 
+#if defined(CPU_MODEL_STM32F030R8)
+#include "vectors/stm32f030r8_isr.h"
+#elif defined(CPU_MODEL_STM32F031K6)
+#include "vectors/stm32f031k6_isr.h"
+#elif defined(CPU_MODEL_STM32F042K6)
+#include "vectors/stm32f042k6_isr.h"
+#elif defined(CPU_MODEL_STM32F051R8)
+#include "vectors/stm32f051r8_isr.h"
+#elif defined(CPU_MODEL_STM32F070RB)
+#include "vectors/stm32f070rb_isr.h"
+#elif defined(CPU_MODEL_STM32F072RB)
+#include "vectors/stm32f072rb_isr.h"
+#elif defined(CPU_MODEL_STM32F091RC)
+#include "vectors/stm32f091rc_isr.h"
+#endif
+
 /* get the start of the ISR stack as defined in the linkerscript */
 extern uint32_t _estack;
 
@@ -90,74 +106,19 @@ ISR_VECTORS const void *interrupt_vector[] = {
                                      * context switching is happening here */
     (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
     /* STM specific peripheral handlers */
-    (void*) isr_wwdg,               /* windowed watchdog */
-    #if defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F030R8)
-    (void*) (0UL),                  /* reserved */
-    #else
-    (void*) isr_pvd,                /* power control */
-    #endif
-    (void*) isr_rtc,                /* real time clock */
-    (void*) isr_flash,              /* flash memory controller */
-    (void*) isr_rcc,                /* reset and clock control */
-    (void*) isr_exti,               /* external interrupt lines 0 and 1 */
-    (void*) isr_exti,               /* external interrupt lines 2 and 3 */
-    (void*) isr_exti,               /* external interrupt lines 4 to 15 */
-    (void*) isr_ts,                 /* touch sensing input*/
-    (void*) isr_dma1_ch1,           /* direct memory access controller 1, channel 1*/
-    (void*) isr_dma1_ch2_3,         /* direct memory access controller 1, channel 2 and 3*/
-    (void*) isr_dma1_ch4_5,         /* direct memory access controller 1, channel 4 and 5*/
-    (void*) isr_adc1_comp,          /* analog digital converter */
-    (void*) isr_tim1_brk_up_trg_com, /* timer 1 break, update, trigger and communication */
-    (void*) isr_tim1_cc,            /* timer 1 capture compare */
-    #if defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F030R8)
-    (void*) (0UL),                  /* reserved */
-    #else
-    (void*) isr_tim2,               /* timer 2 */
-    #endif
-    (void*) isr_tim3,               /* timer 3 */
-    #if defined(CPU_MODEL_STM32F042K6)
-    (void*) (0UL),                  /* reserved */
-    #else
-    (void*) isr_tim6_dac,           /* timer 6 and digital to analog converter */
-    #endif
-    #if defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F042K6)
-    (void*) (0UL),                  /* reserved */
-    #else
-    (void*) isr_tim7,               /* timer 7 */
-    #endif
-    (void*) isr_tim14,              /* timer 14 */
-    #if defined(CPU_MODEL_STM32F042K6)
-    (void*) (0UL),                  /* reserved */
-    #else
-    (void*) isr_tim15,              /* timer 15 */
-    #endif
-    (void*) isr_tim16,              /* timer 16 */
-    (void*) isr_tim17,              /* timer 17 */
-    (void*) isr_i2c1,               /* I2C 1 */
-    #if defined(CPU_MODEL_STM32F042K6)
-    (void*) (0UL),                  /* reserved */
-    #else
-    (void*) isr_i2c2,               /* I2C 2 */
-    #endif
-    (void*) isr_spi1,               /* SPI 1 */
-    (void*) isr_spi2,               /* SPI 2 */
-    (void*) isr_usart1,             /* USART 1 */
-    (void*) isr_usart2,             /* USART 2 */
-    #if  defined(CPU_MODEL_STM32F030R8) || defined(CPU_MODEL_STM32F042K6) || defined(CPU_MODEL_STM32F051R8)
-    (void*) (0UL),                  /* reserved */
-    #elif defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F072RB)
-    (void*) isr_usart3_4,           /* USART 3 and 4 */
-    #else
-    (void*) isr_usart3_8,           /* USART 3 to 8 */
-    #endif
-    #if defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F030R8)
-    (void*) (0UL),                  /* reserved */
-    #else
-    (void*) isr_cec,                /* consumer electronics control */
-    #endif
-    #if defined(CPU_MODEL_STM32F072RB) || defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F051R8)
-    (void*) isr_usb                 /* USB */
-    #else
-    (void*) (0UL)                   /* reserved */
-    #endif
+#if defined(CPU_MODEL_STM32F030R8)
+STM32F030R8_VECTORS
+#elif defined(CPU_MODEL_STM32F031K6)
+STM32F031K6_VECTORS
+#elif defined(CPU_MODEL_STM32F042K6)
+STM32F042K6_VECTORS
+#elif defined(CPU_MODEL_STM32F051R8)
+STM32F051R8_VECTORS
+#elif defined(CPU_MODEL_STM32F070RB)
+STM32F070RB_VECTORS
+#elif defined(CPU_MODEL_STM32F072RB)
+STM32F072RB_VECTORS
+#elif defined(CPU_MODEL_STM32F091RC)
+STM32F091RC_VECTORS
+#endif
 };
