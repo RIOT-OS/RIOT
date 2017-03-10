@@ -68,7 +68,7 @@ int main(void) {
     void *res;
     pthread_join(th_id, (void **) &res);
 
-    printf("Result: %u\n", (int) (intptr_t) res);
+    printf("Result: %i\n", (int) (intptr_t) res);
     puts("Done.");
     return 0;
 }
