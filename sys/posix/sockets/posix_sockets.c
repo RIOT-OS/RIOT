@@ -752,7 +752,7 @@ int listen(int socket, int backlog)
         bf_unset(_sock_pool_used, _get_sock_idx(sock));
         mutex_unlock(&_socket_pool_mutex);
     }
-    return -res;
+    return res;
 #else
     (void)socket;
     (void)backlog;
@@ -786,8 +786,7 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
 #endif
         /* bind implicitly */
         if ((res = _bind_connect(s, NULL, 0)) < 0) {
-            errno = -res;
-            return -1;
+            return res;
         }
     }
     switch (s->type) {
@@ -814,7 +813,7 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
 #ifdef MODULE_SOCK_UDP
         case SOCK_DGRAM:
             /* TODO: apply configured timeout */
-            if ((res = sock_udp_recv(&s->sock->udp, buffer, length, 0,
+            if ((res = sock_udp_recv(&s->sock->udp, buffer, length, SOCK_NO_TIMEOUT,
                                 &ep)) < 0) {
                 errno = -res;
                 res = -1;
@@ -826,7 +825,7 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
             res = -1;
             break;
     }
-    if ((res == 0) && (address != NULL) && (address_len != 0)) {
+    if ((res >= 0) && (address != NULL) && (address_len != 0)) {
         switch (s->type) {
 #ifdef MODULE_SOCK_TCP
             case SOCK_STREAM:
@@ -873,8 +872,7 @@ ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
 #endif
         /* bind implicitly */
         if ((res = _bind_connect(s, NULL, 0)) < 0) {
-            errno = -res;
-            return -1;
+            return res;
         }
     }
 #if defined(MODULE_SOCK_IP) || defined(MODULE_SOCK_UDP)
