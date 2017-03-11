@@ -27,6 +27,7 @@
 #include "xtimer.h"
 #include "periph/i2c.h"
 #include "hdc1000.h"
+#include "hdc1000_regs.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"

@@ -178,9 +178,11 @@ export TOOLCHAIN
 export PREFIX ?= $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
 
 # Add standard include directories
-INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
+INCLUDES += -I$(RIOTBASE)/core/include
+INCLUDES += -I$(RIOTBASE)/sys/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
+INCLUDES += -I$(RIOTBASE)/drivers/include
 
 # mandatory includes!
 include $(RIOTBASE)/Makefile.pseudomodules
@@ -298,7 +300,6 @@ endif # BUILD_IN_DOCKER
 export USEMODULE_INCLUDES =
 
 include $(RIOTBASE)/sys/Makefile.include
-include $(RIOTBASE)/drivers/Makefile.include
 
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
