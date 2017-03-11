@@ -39,7 +39,7 @@ extern "C" {
 typedef struct {
     gnrc_nettype_t l3_type;                     /**< Network layer type of the connection */
     gnrc_nettype_t l4_type;                     /**< Transport layer type of the connection */
-    gnrc_netreg_entry_t netreg_entry;           /**< @p net_ng_netreg entry for the connection */
+    gnrc_netreg_entry_t netreg_entry;           /**< @p net_gnrc_netreg entry for the connection */
 } conn_t;
 
 /**
@@ -51,7 +51,7 @@ struct conn_ip {
     gnrc_nettype_t l3_type;                     /**< Network layer type of the connection. */
     gnrc_nettype_t l4_type;                     /**< Transport layer type of the connection.
                                                  *   Always GNRC_NETTYPE_UNDEF */
-    gnrc_netreg_entry_t netreg_entry;           /**< @p net_ng_netreg entry for the connection */
+    gnrc_netreg_entry_t netreg_entry;           /**< @p net_gnrc_netreg entry for the connection */
     uint8_t local_addr[sizeof(ipv6_addr_t)];    /**< local IP address */
     size_t local_addr_len;                      /**< length of struct conn_ip::local_addr */
 };
@@ -66,7 +66,7 @@ struct conn_udp {
                                                  *   Always GNRC_NETTYPE_IPV6 */
     gnrc_nettype_t l4_type;                     /**< Transport layer type of the connection.
                                                  *   Always GNRC_NETTYPE_UDP */
-    gnrc_netreg_entry_t netreg_entry;           /**< @p net_ng_netreg entry for the connection */
+    gnrc_netreg_entry_t netreg_entry;           /**< @p net_gnrc_netreg entry for the connection */
     uint8_t local_addr[sizeof(ipv6_addr_t)];    /**< local IP address */
     size_t local_addr_len;                      /**< length of struct conn_ip::local_addr */
 };
@@ -76,8 +76,8 @@ struct conn_udp {
  *
  * @internal
  *
- * @param[out] entry    @ref net_ng_netreg entry.
- * @param[in] type      @ref net_ng_nettype.
+ * @param[out] entry    @ref net_gnrc_netreg entry.
+ * @param[in] type      @ref net_gnrc_nettype.
  * @param[in] demux_ctx demux context (port or proto) for the connection.
  */
 static inline void gnrc_conn_reg(gnrc_netreg_entry_t *entry, gnrc_nettype_t type,
@@ -117,7 +117,7 @@ bool gnrc_conn6_set_local_addr(uint8_t *conn_addr, const ipv6_addr_t *addr);
  * @return  The number of bytes received on success.
  * @return  0, if no received data is available, but everything is in order.
  * @return  -ENOMEM, if received data was more than max_len.
- * @returne -ETIMEDOUT, if more than 3 IPC messages were not @ref net_ng_netapi receive commands
+ * @returne -ETIMEDOUT, if more than 3 IPC messages were not @ref net_gnrc_netapi receive commands
  *          with the required headers in the packet
  */
 int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
