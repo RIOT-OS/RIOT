@@ -73,6 +73,9 @@ static ble_mac_callback_t _callback;
  */
 static ble_mac_interface_t *ble_mac_interface_lookup(ble_ipsp_handle_t *handle)
 {
+    if (handle == NULL) {
+        return NULL;
+    }
     for (int i = 0; i < BLE_MAC_MAX_INTERFACE_NUM; i++) {
         if (interfaces[i].handle.conn_handle == handle->conn_handle &&
             interfaces[i].handle.cid == handle->cid) {
