@@ -75,5 +75,5 @@ int8_t shtc1_id(i2c_t dev, uint16_t *id);
  * @return 					0 on everything done
  * @return					-1 on error occured
  */
-int8_t shtc1_id(i2c_t dev, uint16_t *id);
+int8_t shtc1_reset(i2c_t dev, uint16_t *id);
 
