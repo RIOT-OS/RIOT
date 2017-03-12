@@ -80,7 +80,11 @@ static void clk_init(void)
     /* Reset SW, HPRE, PPRE1, PPRE2, MCOSEL and MCOPRE bits */
     RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLDIV | RCC_CFGR_PLLMUL);
     /* Reset HSION, HSEON, CSSON and PLLON bits */
+#if defined(CPU_MODEL_STM32L011K4)
+    RCC->CR &= ~(RCC_CR_HSION | RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_PLLON);
+#else
     RCC->CR &= ~(RCC_CR_HSION | RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON);
+#endif
     /* Disable all interrupts */
     RCC->CICR = 0x0;
 

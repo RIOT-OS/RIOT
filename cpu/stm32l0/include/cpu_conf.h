@@ -34,6 +34,9 @@
 #ifdef CPU_MODEL_STM32L031K6
 #include "vendor/stm32l031xx.h"
 #endif
+#ifdef CPU_MODEL_STM32L011K4
+#include "vendor/stm32l011xx.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
