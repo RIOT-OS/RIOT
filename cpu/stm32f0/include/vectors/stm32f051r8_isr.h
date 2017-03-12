@@ -42,7 +42,7 @@
     (void*) isr_tim2,               /* timer 2 */                             \
     (void*) isr_tim3,               /* timer 3 */                             \
     (void*) isr_tim6_dac,           /* timer 6 and digital to analog converter */  \
-    (void*) isr_tim7,               /* timer 7 */                             \
+    (void*) (0UL),                  /* reserved */                            \
     (void*) isr_tim14,              /* timer 14 */                            \
     (void*) isr_tim15,              /* timer 15 */                            \
     (void*) isr_tim16,              /* timer 16 */                            \
@@ -54,9 +54,8 @@
     (void*) isr_usart1,             /* USART 1 */                             \
     (void*) isr_usart2,             /* USART 2 */                             \
     (void*) (0UL),                  /* reserved */                            \
-    (void*) isr_usart3_8,           /* USART 3 to 8 */                        \
     (void*) isr_cec,                /* consumer electronics control */        \
-    (void*) isr_usb                 /* USB */
+    (void*) (0UL),                  /* reserved */
 #endif
 
 #ifdef __cplusplus

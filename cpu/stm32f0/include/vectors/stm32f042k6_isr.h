@@ -55,7 +55,7 @@
     (void*) isr_usart2,             /* USART 2 */                            \
     (void*) (0UL),                  /* reserved */                           \
     (void*) isr_cec,                /* consumer electronics control */       \
-    (void*) (0UL)                   /* reserved */
+    (void*) isr_usb,                /* USB */
 #endif
 
 #ifdef __cplusplus
