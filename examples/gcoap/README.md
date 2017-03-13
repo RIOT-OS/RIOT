@@ -14,13 +14,14 @@ Build with `Makefile.slip`. Follow the setup instructions in README-slip.md, whi
 ## Current Status
 gcoap includes server and client capability. Available features include:
 
+* Message Type: Supports non-confirmable (NON) messaging. Additionally provides a callback on timeout.
+* Observe extension: Provides server-side registration and notifications.
 * Server and Client provide helper functions for writing the response/request. See the CoAP topic in the source documentation for details. See the gcoap example for sample implementations.
 * Server allows an application to register a 'listener', which includes an array of endpoint paths and function callbacks used to write a response.
 * Server listens on a port at startup; defaults to 5683.
-* Client operates asynchronously; sends request and then handles response in a user provided callback. Also executes callback on timeout.
+* Client operates asynchronously; sends request and then handles response in a user provided callback.
 * Client generates token; length defined at compile time.
-* Message Type: Supports non-confirmable (NON) messaging.
-* Options: Supports Content-Format for response payload.
+* Options: Supports Content-Format for payload.
 
 
 ## Example Use
