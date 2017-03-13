@@ -21,22 +21,6 @@
 #include <stdint.h>
 #include "vectors_cortexm.h"
 
-#if defined(CPU_MODEL_STM32F030R8)
-#include "vectors/stm32f030r8_isr.h"
-#elif defined(CPU_MODEL_STM32F031K6)
-#include "vectors/stm32f031k6_isr.h"
-#elif defined(CPU_MODEL_STM32F042K6)
-#include "vectors/stm32f042k6_isr.h"
-#elif defined(CPU_MODEL_STM32F051R8)
-#include "vectors/stm32f051r8_isr.h"
-#elif defined(CPU_MODEL_STM32F070RB)
-#include "vectors/stm32f070rb_isr.h"
-#elif defined(CPU_MODEL_STM32F072RB)
-#include "vectors/stm32f072rb_isr.h"
-#elif defined(CPU_MODEL_STM32F091RC)
-#include "vectors/stm32f091rc_isr.h"
-#endif
-
 /* get the start of the ISR stack as defined in the linkerscript */
 extern uint32_t _estack;
 
@@ -78,8 +62,8 @@ WEAK_DEFAULT void isr_spi1(void);
 WEAK_DEFAULT void isr_spi2(void);
 WEAK_DEFAULT void isr_usart1(void);
 WEAK_DEFAULT void isr_usart2(void);
-WEAK_DEFAULT void isr_usart3_8(void);
 WEAK_DEFAULT void isr_usart3_4(void);
+WEAK_DEFAULT void isr_usart3_8(void);
 WEAK_DEFAULT void isr_cec(void);
 WEAK_DEFAULT void isr_usb(void);
 
@@ -107,18 +91,18 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
     /* STM specific peripheral handlers */
 #if defined(CPU_MODEL_STM32F030R8)
-STM32F030R8_VECTORS
+#include "vectors/stm32f030r8_isr.h"
 #elif defined(CPU_MODEL_STM32F031K6)
-STM32F031K6_VECTORS
+#include "vectors/stm32f031k6_isr.h"
 #elif defined(CPU_MODEL_STM32F042K6)
-STM32F042K6_VECTORS
+#include "vectors/stm32f042k6_isr.h"
 #elif defined(CPU_MODEL_STM32F051R8)
-STM32F051R8_VECTORS
+#include "vectors/stm32f051r8_isr.h"
 #elif defined(CPU_MODEL_STM32F070RB)
-STM32F070RB_VECTORS
+#include "vectors/stm32f070rb_isr.h"
 #elif defined(CPU_MODEL_STM32F072RB)
-STM32F072RB_VECTORS
+#include "vectors/stm32f070rb_isr.h"
 #elif defined(CPU_MODEL_STM32F091RC)
-STM32F091RC_VECTORS
+#include "vectors/stm32f091rc_isr.h"
 #endif
 };
