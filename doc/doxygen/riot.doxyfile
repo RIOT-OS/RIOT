@@ -826,7 +826,6 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/native/osx-libc-extra \
                          */cpu/x86/include/* \
                          */drivers/kw2xrf/include/overwrites.h \
-                         */drivers/nrf24l01p/include/nrf24l01p_settings.h \
                          */pkg/*/*/* \
                          */pkg/tlsf/patch.txt \
                          */sys/include/embUnit/* \
