@@ -573,8 +573,7 @@ typedef struct
   uint16_t RESERVED1;         /*!< Reserved,                                    0x12                      */
   __IO uint16_t ODR;          /*!< GPIO port output data register,              Address offset: 0x14      */
   uint16_t RESERVED2;         /*!< Reserved,                                    0x16                      */
-  __IO uint16_t BSRRL;        /*!< GPIO port bit set/reset low registerBSRR,    Address offset: 0x18      */
-  __IO uint16_t BSRRH;        /*!< GPIO port bit set/reset high registerBSRR,   Address offset: 0x1A      */
+  __IO uint32_t BSRR;         /*!< GPIO port bit set/reset low registerBSRR,    Address offset: 0x18      */
   __IO uint32_t LCKR;         /*!< GPIO port configuration lock register,       Address offset: 0x1C      */
   __IO uint32_t AFR[2];       /*!< GPIO alternate function low register,        Address offset: 0x20-0x24 */
 #if defined (STM32L1XX_HD) || defined (STM32L1XX_XL)

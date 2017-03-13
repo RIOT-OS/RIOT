@@ -41,26 +41,23 @@ extern "C" {
  * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED_CREG            BSRRH
-#define LED_SREG            BSRRL
-
 #define LED0_PIN            GPIO_PIN(PORT_B, 0)
 #define LED0_MASK           (1 << 0)
-#define LED0_ON             (GPIOA->LED_SREG = LED0_MASK)
-#define LED0_OFF            (GPIOA->LED_CREG = LED0_MASK)
-#define LED0_TOGGLE         (GPIOA->ODR     ^= LED0_MASK)
+#define LED0_ON             (GPIOB->BSRR = LED0_MASK)
+#define LED0_OFF            (GPIOB->BSRR = (LED0_MASK << 16))
+#define LED0_TOGGLE         (GPIOB->ODR  ^= LED0_MASK)
 
 #define LED1_PIN            GPIO_PIN(PORT_B, 7)
 #define LED1_MASK           (1 << 7)
-#define LED1_OFF            (GPIOA->LED_CREG = LED1_MASK)
-#define LED1_ON             (GPIOA->LED_SREG = LED1_MASK)
-#define LED1_TOGGLE         (GPIOA->ODR     ^= LED1_MASK)
+#define LED1_ON             (GPIOB->BSRR = LED1_MASK)
+#define LED1_OFF            (GPIOB->BSRR = (LED1_MASK << 16))
+#define LED1_TOGGLE         (GPIOB->ODR  ^= LED1_MASK)
 
 #define LED2_PIN            GPIO_PIN(PORT_B, 14)
 #define LED2_MASK           (1 << 14)
-#define LED2_ON             (GPIOA->LED_SREG = LED2_MASK)
-#define LED2_OFF            (GPIOA->LED_CREG = LED2_MASK)
-#define LED2_TOGGLE         (GPIOA->ODR     ^= LED2_MASK)
+#define LED2_ON             (GPIOB->BSRR = LED2_MASK)
+#define LED2_OFF            (GPIOB->BSRR = (LED2_MASK << 16))
+#define LED2_TOGGLE         (GPIOB->ODR  ^= LED2_MASK)
 /** @} */
 
 /**

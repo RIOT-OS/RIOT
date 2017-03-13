@@ -39,8 +39,8 @@ extern "C" {
 #define LED0_PORT           (GPIOC)
 #define LED0_MASK           (1 << 3)
 
-#define LED0_ON             (LED0_PORT->BSRRL = LED0_MASK)
-#define LED0_OFF            (LED0_PORT->BSRRH = LED0_MASK)
+#define LED0_ON             (LED0_PORT->BSRR = LED0_MASK)
+#define LED0_OFF            (LED0_PORT->BSRR = (LED0_MASK << 16))
 #define LED0_TOGGLE         (LED0_PORT->ODR  ^= LED0_MASK)
  /** @} */
 

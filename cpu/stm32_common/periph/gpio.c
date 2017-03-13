@@ -1,5 +1,8 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
+ *               2015 Hamburg University of Applied Sciences
+ *               2017 Inria
+ *               2017 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -7,30 +10,36 @@
  */
 
 /**
- * @ingroup     cpu_stm32f3
+ * @ingroup     cpu_stm32_common
  * @{
  *
  * @file
  * @brief       Low-level GPIO driver implementation
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hauke Petersen <mail@haukepetersen.de>
+ * @author      Fabian Nack <nack@inf.fu-berlin.de>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Katja Kirstein <katja.kirstein@haw-hamburg.de>
+ * @author      Vincent Dupont <vincent@otakeys.com>
  *
  * @}
  */
+
+#ifndef CPU_FAM_STM32F1
 
 #include "cpu.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
 /**
- * @brief   The STM32F3 has 16 EXTI channels
+ * @brief   The STM32F0 family has 16 external interrupt lines
  */
-#define EXTI_NUMOF      (16U)
+#define EXTI_NUMOF          (16U)
 
 /**
- * @brief   Hold one callback function pointer for each interrupt line
+ * @brief   Allocate memory for one callback and argument per EXTI channel
  */
-static gpio_isr_ctx_t exti_chan[EXTI_NUMOF];
+static gpio_isr_ctx_t isr_ctx[EXTI_NUMOF];
 
 /**
  * @brief   Extract the port base address from the given pin identifier
@@ -65,7 +74,13 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     int pin_num = _pin_num(pin);
 
     /* enable clock */
+#if defined(CPU_FAM_STM32F0) || defined (CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L1)
     periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
+#elif defined (CPU_FAM_STM32L0)
+    periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
+#else
+    periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
+#endif
 
     /* set mode */
     port->MODER &= ~(0x3 << (2 * pin_num));
@@ -76,27 +91,45 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     /* set output mode */
     port->OTYPER &= ~(1 << pin_num);
     port->OTYPER |=  (((mode >> 4) & 0x1) << pin_num);
-    /* reset speed value and clear pin */
+    /* finally set pin speed to maximum and reset output */
     port->OSPEEDR |= (3 << (2 * pin_num));
-    port->BSRRH = (1 << pin_num);
+    port->BSRR = (1 << (pin_num + 16));
 
     return 0;
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                   gpio_cb_t cb, void *arg)
+                  gpio_cb_t cb, void *arg)
 {
     int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
 
-    /* configure and save exti configuration struct */
-    exti_chan[pin_num].cb = cb;
-    exti_chan[pin_num].arg = arg;
-    /* enable the SYSCFG clock */
+    /* set callback */
+    isr_ctx[pin_num].cb = cb;
+    isr_ctx[pin_num].arg = arg;
+
+    /* enable clock of the SYSCFG module for EXTI configuration */
+#ifdef CPU_FAN_STM32F0
+    periph_clk_en(APB2, RCC_APB2ENR_SYSCFGCOMPEN);
+#else
     periph_clk_en(APB2, RCC_APB2ENR_SYSCFGEN);
-    /* configure pin as input */
+#endif
+
+    /* initialize pin as input */
     gpio_init(pin, mode);
+
     /* enable global pin interrupt */
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)
+    if (pin_num < 2) {
+        NVIC_EnableIRQ(EXTI0_1_IRQn);
+    }
+    else if (pin_num < 4) {
+        NVIC_EnableIRQ(EXTI2_3_IRQn);
+    }
+    else {
+        NVIC_EnableIRQ(EXTI4_15_IRQn);
+    }
+#else
     if (pin_num < 5) {
         NVIC_EnableIRQ(EXTI0_IRQn + pin_num);
     }
@@ -106,28 +139,21 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     else {
         NVIC_EnableIRQ(EXTI15_10_IRQn);
     }
-    /* configure the active edge(s) */
-    switch (flank) {
-        case GPIO_RISING:
-            EXTI->RTSR |= (1 << pin_num);
-            EXTI->FTSR &= ~(1 << pin_num);
-            break;
-        case GPIO_FALLING:
-            EXTI->RTSR &= ~(1 << pin_num);
-            EXTI->FTSR |= (1 << pin_num);
-            break;
-        case GPIO_BOTH:
-            EXTI->RTSR |= (1 << pin_num);
-            EXTI->FTSR |= (1 << pin_num);
-            break;
-    }
+#endif
+    /* configure the active flank */
+    EXTI->RTSR &= ~(1 << pin_num);
+    EXTI->RTSR |=  ((flank & 0x1) << pin_num);
+    EXTI->FTSR &= ~(1 << pin_num);
+    EXTI->FTSR |=  ((flank >> 1) << pin_num);
     /* enable specific pin as exti sources */
     SYSCFG->EXTICR[pin_num >> 2] &= ~(0xf << ((pin_num & 0x03) * 4));
     SYSCFG->EXTICR[pin_num >> 2] |= (port_num << ((pin_num & 0x03) * 4));
+
     /* clear any pending requests */
-    EXTI->PR = (1 << pin_num);
-    /* enable interrupt for EXTI line */
-    EXTI->IMR |= (1 << pin_num);
+    EXTI->PR = (1 << pin);
+    /* unmask the pins interrupt channel */
+    EXTI->IMR |= (1 << pin);
+
     return 0;
 }
 
@@ -148,7 +174,13 @@ void gpio_init_analog(gpio_t pin)
 {
     /* enable clock, needed as this function can be used without calling
      * gpio_init first */
+#if defined(CPU_FAM_STM32F0) || defined (CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L1)
     periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
+#elif defined (CPU_FAM_STM32L0)
+    periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
+#else
+    periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
+#endif
     /* set to analog mode */
     _port(pin)->MODER |= (0x3 << (2 * _pin_num(pin)));
 }
@@ -165,24 +197,22 @@ void gpio_irq_disable(gpio_t pin)
 
 int gpio_read(gpio_t pin)
 {
-    GPIO_TypeDef *port = _port(pin);
-    uint32_t pin_num = _pin_num(pin);
-
-    if (port->MODER & (3 << (pin_num * 2))) {   /* if configured as output */
-        return port->ODR & (1 << pin_num);      /* read output data reg */
-    } else {
-        return port->IDR & (1 << pin_num);      /* else read input data reg */
+    if (_port(pin)->MODER & (0x3 << (_pin_num(pin) * 2))) {
+        return _port(pin)->ODR & (1 << _pin_num(pin));
+    }
+    else {
+        return _port(pin)->IDR & (1 << _pin_num(pin));
     }
 }
 
 void gpio_set(gpio_t pin)
 {
-    _port(pin)->BSRRL = (1 << _pin_num(pin));
+    _port(pin)->BSRR = (1 << _pin_num(pin));
 }
 
 void gpio_clear(gpio_t pin)
 {
-    _port(pin)->BSRRH = (1 << _pin_num(pin));
+    _port(pin)->BSRR = (1 << (_pin_num(pin) + 16));
 }
 
 void gpio_toggle(gpio_t pin)
@@ -207,11 +237,15 @@ void isr_exti(void)
 {
     /* only generate interrupts against lines which have their IMR set */
     uint32_t pending_isr = (EXTI->PR & EXTI->IMR);
-    for (int i = 0; i < EXTI_NUMOF; i++) {
+    for (size_t i = 0; i < EXTI_NUMOF; i++) {
         if (pending_isr & (1 << i)) {
-            EXTI->PR = (1 << i);                /* clear by writing a 1 */
-            exti_chan[i].cb(exti_chan[i].arg);
+            EXTI->PR = (1 << i);        /* clear by writing a 1 */
+            isr_ctx[i].cb(isr_ctx[i].arg);
         }
     }
     cortexm_isr_end();
 }
+
+#else
+typedef int dont_be_pedantic;
+#endif
