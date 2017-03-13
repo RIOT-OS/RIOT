@@ -8,9 +8,9 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
-                             chronos msb-430 msb-430h nucleo-f030 nucleo-l053 \
-                             nucleo-f070 nucleo-f072 nucleo-f334 nucleo32-f031 \
-                             nucleo32-f303 nucleo32-f042 stm32f0discovery telosb \
+                             chronos msb-430 msb-430h nucleo32-f031 nucleo32-f042 \
+                             nucleo32-f303 nucleo-f030 nucleo-f070 nucleo-f072 \
+                             nucleo-f334 nucleo-l053 stm32f0discovery telosb \
                              waspmote-pro weio wsn430-v1_3b wsn430-v1_4 z1
 
 # Include packages that pull up and auto-init the link layer.
