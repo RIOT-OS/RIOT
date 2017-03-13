@@ -4,7 +4,7 @@ PKG_FILE = tlsf-$(PKG_VERSION).zip
 PKG_URL = http://download.riot-os.org/$(PKG_FILE)
 PKG_LICENSE = PD
 PKG_DIR=$(CURDIR)
-PKG_BUILDDIR=$(BINDIRBASE)/pkg/$(BOARD)/$(PKG_NAME)
+PKG_BUILDDIR=$(PKGDIRBASE)/$(PKG_NAME)
 PKG_SRCDIR=$(PKG_BUILDDIR)/src
 
 .PHONY: all clean distclean

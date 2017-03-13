@@ -14,8 +14,9 @@ GITCACHE       ?= $(RIOTBASE)/dist/tools/git/git-cache
 APPDIR         ?= $(CURDIR)
 BINDIRBASE     ?= $(APPDIR)/bin
 BINDIR         ?= $(BINDIRBASE)/$(BOARD)
+PKGDIRBASE     ?= $(BINDIRBASE)/pkg/$(BOARD)
 
-__DIRECTORY_VARIABLES := RIOTBASE CCACHE_BASEDIR RIOTCPU RIOTBOARD RIOTPKG GITCACHE RIOTPROJECT APPDIR BINDIRBASE BINDIR
+__DIRECTORY_VARIABLES := RIOTBASE CCACHE_BASEDIR RIOTCPU RIOTBOARD RIOTPKG GITCACHE RIOTPROJECT APPDIR BINDIRBASE BINDIR PKGDIRBASE
 
 # Make all paths absolute.
 override RIOTBASE       := $(abspath $(RIOTBASE))
@@ -28,6 +29,7 @@ override GITCACHE       := $(abspath $(GITCACHE))
 override APPDIR         := $(abspath $(APPDIR))
 override BINDIRBASE     := $(abspath $(BINDIRBASE))
 override BINDIR         := $(abspath $(BINDIR))
+override PKGDIRBASE     := $(abspath $(PKGDIRBASE))
 
 # Ensure that all directories are set and don't contain spaces.
 ifneq (, $(filter-out 1, $(foreach v,${__DIRECTORY_VARIABLES},$(words ${${v}}))))

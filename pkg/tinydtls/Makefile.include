@@ -1,4 +1,4 @@
-PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/tinydtls
+PKG_BUILDDIR ?= $(PKGDIRBASE)/tinydtls
 
 INCLUDES += -I$(PKG_BUILDDIR)
 

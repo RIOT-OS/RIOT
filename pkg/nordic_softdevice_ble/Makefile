@@ -4,7 +4,7 @@ PKG_FILE = nrf5_iot_sdk_$(PKG_VERSION).zip
 PKG_URL = https://developer.nordicsemi.com/nRF5_IoT_SDK/nRF5_IoT_SDK_v0.9.x/$(PKG_FILE)
 PKG_LICENSE = nordic-bsd
 PKG_DIR=$(CURDIR)
-PKG_BUILDDIR=$(BINDIRBASE)/pkg/$(BOARD)/$(PKG_NAME)
+PKG_BUILDDIR=$(PKGDIRBASE)/$(PKG_NAME)
 PKG_SRCDIR=$(PKG_BUILDDIR)/src
 
 SOFTDEVICE := components/softdevice/s1xx_iot/s1xx-iot-prototype3_nrf52_softdevice.hex
