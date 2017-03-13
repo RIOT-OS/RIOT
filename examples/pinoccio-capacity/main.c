@@ -26,15 +26,27 @@
 #include "debug.h"
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <periph/ac.h>
 volatile uint8_t count=0;
 volatile uint16_t values[10];
 
+void accb(void* arg) {
+	PORTF ^= (1<<PF0);
+}
+
 int main(void)
 {
+	ac_isr_ctx_t my_isr = {&accb, NULL};
+	ac_init(AC_0, AC_INPUT_CAPTURE, AC_IRQ_TOGGLE, my_isr);
+	ac_poweron(AC_0);
 
+	while(1){
+		printf("%u \n",ac_read(AC_0));
+		_delay_us(100);
+	}
 	//first test everything based on reigsters
 	//set output pins
-	DDRE &= ~((1<<PE2)|(1<<PE3)); //PE2=AIN0 PE3=AIN1
+	/*DDRE &= ~((1<<PE2)|(1<<PE3)); //PE2=AIN0 PE3=AIN1
 	DDRF |= (1<<PF0)|(1<<PF1); //A0
 	DDRD &= ~(1<<PD4);
 
@@ -56,15 +68,6 @@ int main(void)
 	PORTF |= (1<<PF1);
 	PORTF |= (1<<PF0);
 	sei();
-	/*while(1) {
-		_delay_ms(100);
-		uint8_t measure = ACSR & (1<<ACO);
-		printf("%u",measure);
-		if(measure != 0)
-			PORTF &= ~(1<<PF0);
-		else
-			PORTF |= (1<<PF0);
-	} */
 	while(count<10)
 	{
 		//printf("%u",TCNT1);
@@ -77,12 +80,12 @@ int main(void)
 	}
 	while(1) {
 
-	}
+	}*/
 	return 0;
 
 
 }
-ISR (TIMER1_OVF_vect)
+/*ISR (TIMER1_OVF_vect)
 {
 	puts("OVERFLOW\n");
 }
@@ -96,11 +99,6 @@ ISR(TIMER1_CAPT_vect)
 	//TCCR1B ^= (1<<ICES1);
 	//count++;
 	//printf("%u",count);
-	/*if(count>=10) {
-		PORTF &= ~(1<<PF1);
-		TCCR1B &=~((1<<CS10)|(1<<CS11)|(1<<CS12));
-		cli();
-	}else{ */
 
 
 	values[count] = ICR1L;
@@ -114,4 +112,4 @@ ISR(TIMER1_CAPT_vect)
 		cli();
 		TCCR1B &= ~((1<<CS12)|(1<<CS11)|(1<<CS10)); //set clock
 	//}
-}
+} */

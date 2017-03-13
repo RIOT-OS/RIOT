@@ -117,6 +117,19 @@ static const pwm_conf_t pwm_config[] = {
 };
 
 /**
+ * @brief Analog comparator configuration
+ */
+#define AC_NUMOF  			(1U)
+#define AC_0				(0U)
+
+static const ac_conf_t ac_config[] = {
+		{
+				.acsr = &ACSR,
+				.adcsrb = &ADCSRB
+		}
+};
+
+/**
  * @brief   UART configuration
  *
  * The UART devices have fixed pin mappings, so all we need to do, is to specify
