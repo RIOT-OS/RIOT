@@ -25,6 +25,10 @@
  * port, which supports RFC 6282 compression. Internally, gcoap depends on the
  * nanocoap package for base level structs and functionality.
  *
+ * gcoap also supports the Observe extension (RFC 7641) for a server. gcoap
+ * provides functions to generate and send an observe notification that are
+ * similar to the functions to send a client request.
+ *
  * ## Server Operation ##
  *
  * gcoap listens for requests on GCOAP_PORT, 5683 by default. You can redefine
@@ -75,7 +79,7 @@
  *
  * ### Creating a request ###
  *
- * Here is the expected sequence for preparing and sending a request:
+ * Here is the expected sequence to prepare and send a request:
  *
  * Allocate a buffer and a coap_pkt_t for the request.
  *
@@ -108,6 +112,43 @@
  * -# Test the response payload with the coap_pkt_t _payload_len_ and
  *    _content_type_ attributes.
  * -# Read the payload, if any.
+ *
+ * ## Observe Server Operation
+ *
+ * A CoAP client may register for Observe notifications for any resource that
+ * an application has registered with gcoap. An application does not need to
+ * take any action to support Observe client registration. However, gcoap
+ * limits registration for a given resource to a _single_ observer.
+ *
+ * An Observe notification is considered a response to the original client
+ * registration request. So, the Observe server only needs to create and send
+ * the notification -- no further communication or callbacks are required.
+ *
+ * ### Creating a notification ###
+ *
+ * Here is the expected sequence to prepare and send a notification:
+ *
+ * Allocate a buffer and a coap_pkt_t for the notification, then follow the
+ * steps below.
+ *
+ * -# Call gcoap_obs_init() to initialize the notification for a resource.
+ *    Test the return value, which may indicate there is not an observer for
+ *    the resource. If so, you are done.
+ * -# Write the notification payload, starting at the updated _payload_ pointer
+ *    in the coap_pkt_t.
+ * -# Call gcoap_finish(), which updates the packet for the payload.
+ *
+ * Finally, call gcoap_obs_send() for the resource.
+ *
+ * ### Other considerations ###
+ *
+ * By default, the value for the Observe option in a notification is three
+ * bytes long. For resources that change slowly, this length can be reduced via
+ * GCOAP_OBS_VALUE_WIDTH.
+ *
+ * To cancel a notification, the server expects to receive a GET request with
+ * the Observe option value set to 1. The server does not support cancellation
+ * via a reset (RST) response to a non-confirmable notification.
  *
  * ## Implementation Notes ##
  *
@@ -175,6 +216,13 @@ extern "C" {
  */
 #define GCOAP_RESP_OPTIONS_BUF  (8)
 
+/**
+ * @brief Size of the buffer used to write options in an Observe notification.
+ *
+ * Accommodates Content-Format and Observe.
+ */
+#define GCOAP_OBS_OPTIONS_BUF  (8)
+
 /** @brief Maximum number of requests awaiting a response */
 #define GCOAP_REQ_WAITING_MAX   (2)
 
@@ -225,6 +273,69 @@ extern "C" {
  */
 #define GCOAP_MSG_TYPE_INTR     (0x1502)
 
+/** @brief Maximum number of Observe clients; use 2 if not defined */
+#ifndef GCOAP_OBS_CLIENTS_MAX
+#define GCOAP_OBS_CLIENTS_MAX  (2)
+#endif
+
+/**
+ * @brief Maximum number of registrations for Observable resources; use 2 if
+ *        not defined
+ */
+#ifndef GCOAP_OBS_REGISTRATIONS_MAX
+#define GCOAP_OBS_REGISTRATIONS_MAX  (2)
+#endif
+
+/**
+ * @name States for the memo used to track Observe registrations
+ * @{
+ */
+#define GCOAP_OBS_MEMO_UNUSED   (0)  /**< This memo is unused */
+#define GCOAP_OBS_MEMO_IDLE     (1)  /**< Registration OK; no current activity */
+#define GCOAP_OBS_MEMO_PENDING  (2)  /**< Resource changed; notification pending */
+/** @} */
+
+/**
+ * @brief Width in bytes of the Observe option value for a notification.
+ *
+ * This width is used to determine the length of the 'tick' used to measure
+ * the time between observable changes to a resource. A tick is expressed
+ * internally as GCOAP_OBS_TICK_EXPONENT, which is the base-2 log value of the
+ * tick length in microseconds.
+ *
+ * The canonical setting for the value width is 3 (exponent 5), which results
+ * in a tick length of 32 usec, per sec. 3.4, 4.4 of the RFC. Width 2
+ * (exponent 16) results in a tick length of ~65 msec, and width 1 (exponent
+ * 24) results in a tick length of ~17 sec.
+ *
+ * The tick length must be short enough so that the Observe value strictly
+ * increases for each new notification. The purpose of the value is to allow a
+ * client to detect message reordering within the network latency period (128
+ * sec). For resources that change only slowly, the reduced message length is
+ * useful when packet size is limited.
+ */
+#ifndef GCOAP_OBS_VALUE_WIDTH
+#define GCOAP_OBS_VALUE_WIDTH (3)
+#endif
+
+/** @brief See GCOAP_OBS_VALUE_WIDTH. */
+#if (GCOAP_OBS_VALUE_WIDTH == 3)
+#define GCOAP_OBS_TICK_EXPONENT (5)
+#elif (GCOAP_OBS_VALUE_WIDTH == 2)
+#define GCOAP_OBS_TICK_EXPONENT (16)
+#elif (GCOAP_OBS_VALUE_WIDTH == 1)
+#define GCOAP_OBS_TICK_EXPONENT (24)
+#endif
+
+/**
+ * @name Return values for gcoap_obs_init()
+ * @{
+ */
+#define GCOAP_OBS_INIT_OK       (0)
+#define GCOAP_OBS_INIT_ERR     (-1)
+#define GCOAP_OBS_INIT_UNUSED  (-2)
+/** @} */
+
 /**
  * @brief  A modular collection of resources for a server
  */
@@ -255,16 +366,29 @@ typedef struct {
     msg_t timeout_msg;                  /**< For response timer */
 } gcoap_request_memo_t;
 
+/** @brief  Memo for Observe registration and notifications */
+typedef struct {
+    sock_udp_ep_t *observer;            /**< Client endpoint; unused if null */
+    coap_resource_t *resource;          /**< Entity being observed */
+    uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
+    unsigned token_len;                 /**< Actual length of token attribute */
+} gcoap_observe_memo_t;
+
 /**
  * @brief  Container for the state of gcoap itself
  */
 typedef struct {
-    gcoap_listener_t *listeners;       /**< List of registered listeners */
+    gcoap_listener_t *listeners;        /**< List of registered listeners */
     gcoap_request_memo_t open_reqs[GCOAP_REQ_WAITING_MAX];
-                                       /**< Storage for open requests; if first
-                                            byte of an entry is zero, the entry
-                                            is available */
-    uint16_t last_message_id;          /**< Last message ID used */
+                                        /**< Storage for open requests; if first
+                                             byte of an entry is zero, the entry
+                                             is available */
+    uint16_t last_message_id;           /**< Last message ID used */
+    sock_udp_ep_t observers[GCOAP_OBS_CLIENTS_MAX];
+                                        /**< Observe clients; allows reuse for
+                                             observe memos */
+    gcoap_observe_memo_t observe_memos[GCOAP_OBS_REGISTRATIONS_MAX];
+                                        /**< Observed resource registrations */
 } gcoap_state_t;
 
 /**
@@ -401,6 +525,39 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                 ? gcoap_finish(pdu, 0, COAP_FORMAT_NONE)
                 : -1;
 }
+
+/**
+ * @brief  Initializes a CoAP Observe notification packet on a buffer, for the
+ * observer registered for a resource.
+ *
+ * First verifies that an observer has been registered for the resource.
+ *
+ * @param[in] pdu Notification metadata
+ * @param[in] buf Buffer containing the PDU
+ * @param[in] len Length of the buffer
+ * @param[in] resource Resource for the notification
+ *
+ * @return GCOAP_OBS_INIT_OK     on success
+ * @return GCOAP_OBS_INIT_ERR    on error
+ * @return GCOAP_OBS_INIT_UNUSED if no observer for resource
+ */
+int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                                                  const coap_resource_t *resource);
+
+/**
+ * @brief  Sends a buffer containing a CoAP Observe notification to the
+ * observer registered for a resource.
+ *
+ * Assumes a single observer for a resource.
+ *
+ * @param[in] buf Buffer containing the PDU
+ * @param[in] len Length of the buffer
+ * @param[in] resource Resource to send
+ *
+ * @return length of the packet
+ * @return 0 if cannot send
+ */
+size_t gcoap_obs_send(uint8_t *buf, size_t len, const coap_resource_t *resource);
 
 /**
  * @brief Provides important operational statistics.
