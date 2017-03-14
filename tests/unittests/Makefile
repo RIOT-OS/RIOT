@@ -25,14 +25,15 @@ endif
 ARM7_BOARDS := msba2 avrextrem
 DISABLE_TEST_FOR_ARM7 := tests-relic
 
-ARM_CORTEX_M_BOARDS := airfy-beacon arduino-due cc2538dk ek-lm4f120xl f4vi1 fox frdm-k64f \
-                       iotlab-m3 limifrog-v1 mbed_lpc1768 msbiot mulle nrf51dongle nrf6310 \
-                       nucleo-f091 nucleo-f303 nucleo-f334 nucleo-f401 nucleo-l1 openmote-cc2538 \
-                       pba-d-01-kw2x pca10000 pca10005 remote saml21-xpro samr21-xpro slwstk6220a \
-                       spark-core stm32f0discovery stm32f3discovery stm32f4discovery udoo weio \
-                       yunjia-nrf51822 sodaq-autonomo arduino-zero nucleo-f030 nucleo-f070 \
-                       nucleo32-f303 opencm904 nucleo-f411 nucleo32-f031 nucleo-l073 \
-                       nucleo-l053
+ARM_CORTEX_M_BOARDS := airfy-beacon arduino-due arduino-zero cc2538dk ek-lm4f120xl \
+                       f4vi1 fox frdm-k64f iotlab-m3 limifrog-v1 mbed_lpc1768 msbiot \
+                       mulle nrf51dongle nrf6310 nucleo32-f031 nucleo32-f303 \
+                       nucleo-f030 nucleo-f070 nucleo-f091 nucleo-f303 nucleo-f334 \
+                       nucleo-f401 nucleo-f411 nucleo-l053 nucleo-l073 nucleo-l1 \
+                       opencm904 openmote-cc2538 pba-d-01-kw2x pca10000 pca10005 \
+                       remote saml21-xpro samr21-xpro slwstk6220a sodaq-autonomo \
+                       spark-core stm32f0discovery stm32f3discovery stm32f4discovery \
+                       udoo weio yunjia-nrf51822
 
 DISABLE_TEST_FOR_ARM_CORTEX_M := tests-relic
 
