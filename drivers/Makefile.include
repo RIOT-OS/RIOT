@@ -95,21 +95,3 @@ endif
 ifneq (,$(filter w5100,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/w5100/include
 endif
-ifneq (,$(filter xbee,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/xbee/include
-endif
-ifneq (,$(filter si70xx,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/si70xx/include
-endif
-ifneq (,$(filter hdc1000,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/hdc1000/include
-endif
-ifneq (,$(filter lis3dh,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lis3dh/include
-endif
-ifneq (,$(filter sdcard_spi,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/sdcard_spi/include
-endif
-ifneq (,$(filter veml6070,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/veml6070/include
-endif

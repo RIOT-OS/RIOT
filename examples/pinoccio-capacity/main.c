@@ -26,7 +26,8 @@
 #include "debug.h"
 #include <util/delay.h>
 #include <avr/interrupt.h>
-#include <periph/ac.h>
+#include "periph/ac.h"
+#include "capacity.h"
 volatile uint8_t count=0;
 volatile uint16_t values[10];
 
@@ -36,14 +37,15 @@ void accb(void* arg) {
 
 int main(void)
 {
-	ac_isr_ctx_t my_isr = {&accb, NULL};
+	capacity_init();
+	/*ac_isr_ctx_t my_isr = {&accb, NULL};
 	ac_init(AC_0, AC_INPUT_CAPTURE, AC_IRQ_TOGGLE, my_isr);
 	ac_poweron(AC_0);
 
 	while(1){
 		printf("%u \n",ac_read(AC_0));
 		_delay_us(100);
-	}
+	}*/
 	//first test everything based on reigsters
 	//set output pins
 	/*DDRE &= ~((1<<PE2)|(1<<PE3)); //PE2=AIN0 PE3=AIN1
@@ -96,17 +98,9 @@ ISR(ANALOG_COMP_vect)
 
 ISR(TIMER1_CAPT_vect)
 {
-	//TCCR1B ^= (1<<ICES1);
-	//count++;
-	//printf("%u",count);
-
 
 	values[count] = ICR1L;
 	values[count] |= (ICR1H<<8);
-	//printf("count %u",count);
-	//printf("Timer %u \n", timestamp);
-	//TCNT1H = 0;
-	//TCNT1L = 0;
 	count++;
 	if(count >=10)
 		cli();

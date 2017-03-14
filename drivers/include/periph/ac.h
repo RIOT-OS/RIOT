@@ -53,8 +53,9 @@ typedef enum {
  * @brief   Signature of event callback functions triggered from interrupts
  *
  * @param[in] arg       optional context for the callback
+ * @param[in] dev		the device which received the interrupt
  */
-typedef void (*ac_cb_t)(void *arg);
+typedef void (*ac_cb_t)(void *arg, uint8_t dev);
 
 /**
  * @brief   Default interrupt context entry holding callback and argument
