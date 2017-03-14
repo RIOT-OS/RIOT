@@ -142,9 +142,9 @@ bool gnrc_mac_queue_tx_packet(gnrc_mac_tx_t* tx, uint32_t priority, gnrc_pktsnip
     gnrc_mac_tx_neighbor_t* neighbor;
     int neighbor_id;
 
-    /* Check whether the packet it for broadcast */
-    if (gnrc_netif_hdr_get_flag(pkt)&GNRC_NETIF_HDR_FLAGS_BROADCAST) {
-        /* Broadcast queue is neighbor 0 by definition */
+    /* Check whether the packet it for broadcast or multicast */
+    if (gnrc_netif_hdr_get_flag(pkt) & (GNRC_NETIF_HDR_FLAGS_MULTICAST | GNRC_NETIF_HDR_FLAGS_BROADCAST)) {
+        /* Broadcast/multicast queue is neighbor 0 by definition */
         neighbor_id = 0;
         neighbor = &tx->neighbors[neighbor_id];
 
