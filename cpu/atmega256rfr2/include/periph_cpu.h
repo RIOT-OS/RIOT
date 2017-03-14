@@ -22,14 +22,11 @@
 #ifndef PERIPH_CPU_H_
 #define PERIPH_CPU_H_
 
-//#include "periph_cpu_common.h"
-//#include "periph/timer.h"
-#include "atmega_regs_common.h"
+#include "periph_cpu_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /**
  * @brief   Available ports on the ATmega256rfr family
@@ -66,6 +63,7 @@ typedef struct {
 } pwm_chan_t;
 
 
+
 /**
  * @brief   PWM configuration
  */
@@ -80,6 +78,15 @@ typedef struct {
     uint8_t bits;
 } pwm_conf_t;
 
+/**
+ * Struct definition for I2C
+ */
+typedef struct{
+	gpio_t scl_pin;
+	gpio_t sda_pin;
+	uint8_t *mask;
+	mutex_t *used;
+} i2c_conf_t;
 #ifdef __cplusplus
 }
 #endif
