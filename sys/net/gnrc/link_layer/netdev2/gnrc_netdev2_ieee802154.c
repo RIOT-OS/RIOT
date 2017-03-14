@@ -113,6 +113,18 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
                 return NULL;
             }
             hdr = netif_hdr->data;
+
+            /* XXX: workaround for drivers that hear themselves */
+            uint8_t *tmp_src;
+            tmp_src = gnrc_netif_hdr_get_src_addr(hdr);
+
+            if (memcmp(state->long_addr, tmp_src, IEEE802154_LONG_ADDRESS_LEN) == 0) {
+                DEBUG("_recv_ieee802154: received packet from myself\n");
+                gnrc_pktbuf_release(pkt);
+                return NULL;
+            }
+            /* end of workaround */
+
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
             hdr->if_pid = thread_getpid();
