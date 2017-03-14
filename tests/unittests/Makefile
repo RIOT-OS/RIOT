@@ -1,20 +1,18 @@
 APPLICATION = unittests
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk chronos ek-lm4f120xl \
-                          maple-mini msb-430 msb-430h pca10000 \
-                          pca10005 spark-core stm32f0discovery stm32f3discovery \
-                          telosb wsn430-v1_3b wsn430-v1_4 z1 nucleo-f103 \
-                          nucleo-f334 yunjia-nrf51822 samr21-xpro \
-                          arduino-mega2560 airfy-beacon nrf51dongle nrf6310 \
-                          weio waspmote-pro nucleo-f072 arduino-uno \
-                          arduino-duemilanove sodaq-autonomo arduino-zero \
-                          nucleo-f030 nucleo-f070 nucleo-f091 pba-d-01-kw2x \
-                          saml21-xpro microbit calliope-mini limifrog-v1 \
-                          slwstk6220a ek-lm4f120xl stm32f3discovery \
-                          slwstk6220a nucleo32-f042 nucleo32-f303 opencm904 \
-                          seeeduino_arch-pro remote-pa remote-revb remote-reva \
-                          nucleo32-f031 nucleo-l073 nucleo-l053
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
+                             arduino-uno arduino-zero calliope-mini cc2650stk \
+                             chronos ek-lm4f120xl limifrog-v1 maple-mini microbit \
+                             msb-430 msb-430h nrf51dongle nrf6310 nucleo32-f031 \
+                             nucleo32-f042 nucleo32-f303 nucleo-f030 nucleo-f070 \
+                             nucleo-f072 nucleo-f091 nucleo-f103 nucleo-f334 \
+                             nucleo-l053 nucleo-l073 opencm904 pba-d-01-kw2x \
+                             pca10000 pca10005 remote-pa remote-reva remote-revb \
+                             saml21-xpro samr21-xpro seeeduino_arch-pro slwstk6220a \
+                             sodaq-autonomo spark-core stm32f0discovery \
+                             stm32f3discovery telosb waspmote-pro weio wsn430-v1_3b \
+                             wsn430-v1_4 yunjia-nrf51822 z1
 
 USEMODULE += embunit
 
@@ -27,14 +25,15 @@ endif
 ARM7_BOARDS := msba2 avrextrem
 DISABLE_TEST_FOR_ARM7 := tests-relic
 
-ARM_CORTEX_M_BOARDS := airfy-beacon arduino-due cc2538dk ek-lm4f120xl f4vi1 fox frdm-k64f \
-                       iotlab-m3 limifrog-v1 mbed_lpc1768 msbiot mulle nrf51dongle nrf6310 \
-                       nucleo-f091 nucleo-f303 nucleo-f334 nucleo-f401 nucleo-l1 openmote-cc2538 \
-                       pba-d-01-kw2x pca10000 pca10005 remote saml21-xpro samr21-xpro slwstk6220a \
-                       spark-core stm32f0discovery stm32f3discovery stm32f4discovery udoo weio \
-                       yunjia-nrf51822 sodaq-autonomo arduino-zero nucleo-f030 nucleo-f070 \
-                       nucleo32-f303 opencm904 nucleo-f411 nucleo32-f031 nucleo-l073 \
-                       nucleo-l053
+ARM_CORTEX_M_BOARDS := airfy-beacon arduino-due arduino-zero cc2538dk ek-lm4f120xl \
+                       f4vi1 fox frdm-k64f iotlab-m3 limifrog-v1 mbed_lpc1768 msbiot \
+                       mulle nrf51dongle nrf6310 nucleo32-f031 nucleo32-f303 \
+                       nucleo-f030 nucleo-f070 nucleo-f091 nucleo-f303 nucleo-f334 \
+                       nucleo-f401 nucleo-f411 nucleo-l053 nucleo-l073 nucleo-l1 \
+                       opencm904 openmote-cc2538 pba-d-01-kw2x pca10000 pca10005 \
+                       remote saml21-xpro samr21-xpro slwstk6220a sodaq-autonomo \
+                       spark-core stm32f0discovery stm32f3discovery stm32f4discovery \
+                       udoo weio yunjia-nrf51822
 
 DISABLE_TEST_FOR_ARM_CORTEX_M := tests-relic
 

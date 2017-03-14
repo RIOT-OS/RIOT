@@ -10,14 +10,13 @@ TCP_TARGET_PORT ?= 80
 TCP_TEST_CYCLES ?= 10
 
 # Mark Boards with insufficient memory
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560\
-                             arduino-uno calliope-mini chronos microbit sb-430\
-                             sb-430h nrf51dongle nrf6310 nucleo-f030\
-                             nucleo32-f042 nucleo-f070 nucleo-f072 nucleo32-f303\
-                             nucleo-f334 pca10000 pca10005 stm32f0discovery\
-                             telosb weio wsn430-v1_3b wsn430-v1_4\
-                             yunjia-nrf51822 z1 msb-430 msb-430h nucleo32-f031\
-                             nucleo-l053
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
+                             arduino-uno calliope-mini chronos microbit msb-430 \
+                             msb-430h nrf51dongle nrf6310 nucleo32-f031 \
+                             nucleo32-f042 nucleo32-f303 nucleo-f030 nucleo-f070 \
+                             nucleo-f072 nucleo-f334 nucleo-l053 pca10000 pca10005 \
+                             sb-430 sb-430h stm32f0discovery telosb weio \
+                             wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..

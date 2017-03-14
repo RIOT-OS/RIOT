@@ -1,8 +1,8 @@
 APPLICATION = rmutex
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := stm32f0discovery weio nucleo-f030 nucleo32-f031 \
-                             nucleo32-f042 nucleo-l053
+BOARD_INSUFFICIENT_MEMORY := nucleo32-f031 nucleo32-f042 nucleo-f030 nucleo-l053 \
+                             stm32f0discovery weio
 
 include $(RIOTBASE)/Makefile.include
 
