@@ -23,6 +23,8 @@
 #define PERIPH_CPU_H_
 
 #include "periph_cpu_common.h"
+#include "atmega_regs_common.h"
+#include "mutex.h"
 
 #ifdef __cplusplus
 extern "C" {
