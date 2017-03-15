@@ -37,5 +37,5 @@ static int read_uv(void *dev, phydat_t *res)
 const saul_driver_t veml6070_uv_saul_driver = {
     .read = read_uv,
     .write = saul_notsup,
-    .type = SAUL_SENSE_ANY
+    .type = SAUL_SENSE_UV
 };
