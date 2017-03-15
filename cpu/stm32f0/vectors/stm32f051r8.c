@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Interrupt vector definitions for stm32f072rb
+ * @brief       Interrupt vector definitions for stm32f051r8
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
@@ -21,7 +21,12 @@
 #include <stdint.h>
 #include "vectors_cortexm.h"
 
-#if defined(CPU_MODEL_STM32F072RB)
+/* define a local dummy handler as it needs to be in the same compilation unit
+ * as the alias definition */
+static void dummy_handler(void) {
+    dummy_handler_default();
+}
+
 WEAK_DEFAULT void isr_wwdg(void);
 WEAK_DEFAULT void isr_pvd(void);
 WEAK_DEFAULT void isr_rtc(void);
@@ -38,7 +43,6 @@ WEAK_DEFAULT void isr_tim1_cc(void);
 WEAK_DEFAULT void isr_tim2(void);
 WEAK_DEFAULT void isr_tim3(void);
 WEAK_DEFAULT void isr_tim6_dac(void);
-WEAK_DEFAULT void isr_tim7(void);
 WEAK_DEFAULT void isr_tim14(void);
 WEAK_DEFAULT void isr_tim15(void);
 WEAK_DEFAULT void isr_tim16(void);
@@ -49,9 +53,7 @@ WEAK_DEFAULT void isr_spi1(void);
 WEAK_DEFAULT void isr_spi2(void);
 WEAK_DEFAULT void isr_usart1(void);
 WEAK_DEFAULT void isr_usart2(void);
-WEAK_DEFAULT void isr_usart3_4(void);
 WEAK_DEFAULT void isr_cec(void);
-WEAK_DEFAULT void isr_usb(void);
 
 ISR_VECTORS const void *mcu_interrupt_vector[] = {
     (void*) isr_wwdg,                /**< windowed watchdog */
@@ -72,7 +74,7 @@ ISR_VECTORS const void *mcu_interrupt_vector[] = {
     (void*) isr_tim2,                /**< timer 2 */
     (void*) isr_tim3,                /**< timer 3 */
     (void*) isr_tim6_dac,            /**< timer 6 and digital to analog converter */
-    (void*) isr_tim7,                /**< timer 7 */
+    (void*) (0UL),                   /**< reserved */
     (void*) isr_tim14,               /**< timer 14 */
     (void*) isr_tim15,               /**< timer 15 */
     (void*) isr_tim16,               /**< timer 16 */
@@ -83,8 +85,7 @@ ISR_VECTORS const void *mcu_interrupt_vector[] = {
     (void*) isr_spi2,                /**< SPI 2 */
     (void*) isr_usart1,              /**< USART 1 */
     (void*) isr_usart2,              /**< USART 2 */
-    (void*) isr_usart3_4,            /**< USART 3 and 4 */
+    (void*) (0UL),                   /**< reserved */
     (void*) isr_cec,                 /**< consumer electronics control */
-    (void*) isr_usb                  /**< USB */
+    (void*) (0UL)                    /**< reserved */
 };
-#endif

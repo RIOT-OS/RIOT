@@ -3,3 +3,7 @@ export CPU_FAM  = stm32f0
 
 include $(RIOTCPU)/stm32_common/Makefile.include
 include $(RIOTCPU)/Makefile.include.cortexm_common
+
+# Explicitly tell the linker to link the startup code.
+#   Without this the interrupt vectors will not be linked correctly!
+export UNDEF += $(BINDIR)/vectors/$(CPU_MODEL).o

@@ -21,7 +21,12 @@
 #include <stdint.h>
 #include "vectors_cortexm.h"
 
-#if defined(CPU_MODEL_STM32F031K6)
+/* define a local dummy handler as it needs to be in the same compilation unit
+ * as the alias definition */
+static void dummy_handler(void) {
+    dummy_handler_default();
+}
+
 WEAK_DEFAULT void isr_wwdg(void);
 WEAK_DEFAULT void isr_pvd(void);
 WEAK_DEFAULT void isr_rtc(void);
@@ -77,4 +82,3 @@ ISR_VECTORS const void *mcu_interrupt_vector[] = {
     (void*) (0UL),                   /**< reserved */
     (void*) (0UL)                    /**< reserved */
 };
-#endif

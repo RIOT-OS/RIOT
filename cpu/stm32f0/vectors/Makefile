@@ -1,5 +1,3 @@
-MODULE = vectors
-
-SRCS := vectors_$(CPU_MODEL).c
+SRC := $(CPU_MODEL).c
 
 include $(RIOTBASE)/Makefile.base
