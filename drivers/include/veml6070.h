@@ -73,11 +73,11 @@ typedef struct {
 int veml6070_init(veml6070_t *dev, const veml6070_params_t * params);
 
 /**
- * @brief Read UV indice from the given VEML6070 device
+ * @brief Read UV index from the given VEML6070 device
  *
  * @param[in] dev           Device descriptor of VEML6070 device to read from
  *
- * @return                  UV indice
+ * @return                  UV index
  */
 uint16_t veml6070_read_uv(veml6070_t *dev);
 
