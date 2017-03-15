@@ -26,8 +26,6 @@
 #include "xtimer.h"
 #include "board.h"
 
-#define SLEEP_2S   (2 * 1000 * 1000u) /* 2 seconds delay between printf */
-
 int main(void)
 {
     veml6070_t dev;
@@ -40,17 +38,18 @@ int main(void)
     if (result == VEML6070_ERR_I2C) {
         puts("[Error] The given i2c is not enabled");
         return 1;
-    } else {
-        printf("Initialization successful\n\n");
     }
+
+    puts("Initialization successful");
 
     printf("\n+--------Starting Measurements--------+\n");
     while (1) {
-        printf("UV indive: %d"
+        printf("UV index: %d"
                "\n+-------------------------------------+\n",
                veml6070_read_uv(&dev));
 
-        xtimer_usleep(SLEEP_2S);
+        /* 2s delay before next measure*/
+        xtimer_sleep(2);
     }
 
     return 0;
