@@ -7,10 +7,10 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
                              msb-430 msb-430h nrf51dongle nrf6310 nucleo32-f031 \
                              nucleo32-f042 nucleo32-f303 nucleo-f030 nucleo-f070 \
                              nucleo-f072 nucleo-f091 nucleo-f103 nucleo-f334 \
-                             nucleo-l053 nucleo-l073 opencm904 pba-d-01-kw2x \
-                             pca10000 pca10005 remote-pa remote-reva remote-revb \
-                             saml21-xpro samr21-xpro seeeduino_arch-pro slwstk6220a \
-                             sodaq-autonomo spark-core stm32f0discovery \
+                             nucleo-f410 nucleo-l053 nucleo-l073 opencm904 \
+                             pba-d-01-kw2x pca10000 pca10005 remote-pa remote-reva \
+                             remote-revb saml21-xpro samr21-xpro seeeduino_arch-pro \
+                             slwstk6220a sodaq-autonomo spark-core stm32f0discovery \
                              stm32f3discovery telosb waspmote-pro weio wsn430-v1_3b \
                              wsn430-v1_4 yunjia-nrf51822 z1
 
@@ -29,9 +29,9 @@ ARM_CORTEX_M_BOARDS := airfy-beacon arduino-due arduino-zero cc2538dk ek-lm4f120
                        f4vi1 fox frdm-k64f iotlab-m3 limifrog-v1 mbed_lpc1768 msbiot \
                        mulle nrf51dongle nrf6310 nucleo32-f031 nucleo32-f303 \
                        nucleo-f030 nucleo-f070 nucleo-f091 nucleo-f303 nucleo-f334 \
-                       nucleo-f401 nucleo-f411 nucleo-l053 nucleo-l073 nucleo-l1 \
-                       opencm904 openmote-cc2538 pba-d-01-kw2x pca10000 pca10005 \
-                       remote saml21-xpro samr21-xpro slwstk6220a sodaq-autonomo \
+                       nucleo-f401 nucleo-f410 nucleo-f411 nucleo-l053 nucleo-l073 \
+                       nucleo-l1 opencm904 openmote-cc2538 pba-d-01-kw2x pca10000 \
+                       pca10005 remote saml21-xpro samr21-xpro slwstk6220a sodaq-autonomo \
                        spark-core stm32f0discovery stm32f3discovery stm32f4discovery \
                        udoo weio yunjia-nrf51822
 

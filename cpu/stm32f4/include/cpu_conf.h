@@ -27,6 +27,8 @@
 #include "vendor/stm32f401xe.h"
 #elif defined(CPU_MODEL_STM32F407VG)
 #include "vendor/stm32f407xx.h"
+#elif defined(CPU_MODEL_STM32F410RB)
+#include "vendor/stm32f410rx.h"
 #elif defined(CPU_MODEL_STM32F411RE)
 #include "vendor/stm32f411xe.h"
 #elif defined(CPU_MODEL_STM32F413ZH)

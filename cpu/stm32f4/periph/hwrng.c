@@ -36,7 +36,11 @@ void hwrng_read(void *buf, unsigned int num)
     uint8_t *b = (uint8_t *)buf;
 
     /* power on and enable the device */
+#if defined(CPU_MODEL_STM32F410RB)
+    periph_clk_en(AHB1, RCC_AHB1ENR_RNGEN);
+#else
     periph_clk_en(AHB2, RCC_AHB2ENR_RNGEN);
+#endif
     RNG->CR = RNG_CR_RNGEN;
 
     /* get random data */
@@ -54,7 +58,11 @@ void hwrng_read(void *buf, unsigned int num)
 
     /* finally disable the device again */
     RNG->CR = 0;
+#if defined(CPU_MODEL_STM32F410RB)
+    periph_clk_dis(AHB1, RCC_AHB1ENR_RNGEN);
+#else
     periph_clk_dis(AHB2, RCC_AHB2ENR_RNGEN);
+#endif
 }
 
 #endif /* RNG */
