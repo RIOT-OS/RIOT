@@ -247,6 +247,55 @@ typedef enum {
      *
      * @note    Interfaces are not meant to respond to that.
      */
+    NETOPT_LORA_BANDWIDTH,   /**< bandwidth of LoRa */
+    NETOPT_LORA_SPREADING_FACTOR, /**< spreading factor of LoRa */
+    NETOPT_LORA_CODING_RATE,  /**< coding rate of LoRa */
+    NETOPT_LORA_SINGLE_RECEIVE, /**< when enabled, RX is turned of upon reception of a packet */
+    NETOPT_LORA_RX_TIMEOUT, /**< Reception timeout of LoRa packet */
+    NETOPT_LORA_TX_TIMEOUT, /**< Reception timeout of LoRa packet */
+    NETOPT_LORA_SYMBOL_TIMEOUT,
+    NETOPT_LORA_SYNCWORD,
+    NETOPT_LORA_HOP,
+    NETOPT_LORA_HOP_PERIOD,
+    NETOPT_CRC,
+    NETOPT_LORA_IMPLICIT,
+    NETOPT_LORA_IQ_INVERT,
+    NETOPT_LORA_PAYLOAD_LENGTH,
+    NETOPT_LORA_PREAMBLE_LENGTH,
+    NETOPT_LORA_MODE,
+    NETOPT_LORA_MAX_PAYLOAD,
+    NETOPT_LORA_RANDOM,
+    NETOPT_LORA_TIME_ON_AIR,
+    NETOPT_LORAWAN_DEV_EUI,
+    NETOPT_LORAWAN_APP_EUI,
+    NETOPT_LORAWAN_APP_KEY,
+    NETOPT_LORAWAN_JOIN,
+    NETOPT_LORAWAN_LINK_CHECK,
+    NETOPT_LORAWAN_NWK_SKEY,
+    NETOPT_LORAWAN_APP_SKEY,
+    NETOPT_LORAWAN_NET_ID,
+    NETOPT_LORAWAN_ADR,
+    NETOPT_LORAWAN_NWK_TYPE,
+    NETOPT_LORAWAN_CLASS,
+    NETOPT_LORAWAN_PUBLIC,
+    NETOPT_LORAWAN_DUTY_CYCLE,
+    NETOPT_LORAWAN_RX2_PARAMS,
+    NETOPT_LORAWAN_CHANNEL_MASK,
+    NETOPT_LORAWAN_NB_REP,
+    NETOPT_LORAWAN_MAX_RX_WINDOW,
+    NETOPT_LORAWAN_RX_DELAY_1,
+    NETOPT_LORAWAN_RX_DELAY_2,
+    NETOPT_LORAWAN_JOIN_ACCEPT_DELAY1,
+    NETOPT_LORAWAN_JOIN_ACCEPT_DELAY2,
+    NETOPT_LORAWAN_CHANNELS_DATARATE,
+    NETOPT_LORAWAN_CHANNELS_TX_POWER,
+    NETOPT_LORAWAN_UPLINK_COUNTER,
+    NETOPT_LORAWAN_DOWNLINK_COUNTER,
+    NETOPT_LORAWAN_TEST,
+    NETOPT_LORAWAN_CHANNEL,
+    NETOPT_LORAWAN_TX,
+    NETOPT_LORAWAN_RX,
+    NETOPT_LORAWAN_TX_RETRIES,
     NETOPT_NUMOF,
 } netopt_t;
 
@@ -277,6 +326,8 @@ typedef enum {
                                  *   transmitting a packet */
     NETOPT_STATE_RESET,         /**< triggers a hardware reset. The resulting
                                  *   state of the network device is @ref NETOPT_STATE_IDLE */
+    NETOPT_STATE_STANDBY,         /**< standby mode. The devices is awake but
+                                 *   not listening to packets. */
     /* add other states if needed */
 } netopt_state_t;
 

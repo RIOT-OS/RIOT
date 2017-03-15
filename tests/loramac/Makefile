@@ -1,0 +1,45 @@
+APPLICATION = loramac
+
+FEATURES_REQUIRED = periph_spi periph_gpio periph_adc
+
+BOARD ?= samr21-xpro
+
+CFLAGS += -DCRYPTO_AES
+CFLAGS += -DDEVELHELP
+CFLAGS += -DDEBUG_ASSERT_VERBOSE
+
+# LoRaMAC configuration defines
+CFLAGS += -DOTA
+CFLAGS += -DPUBLIC_NTW
+CFLAGS += -DLORAWAN_DEVICE_EUI={0x06,0x00,0xf9,0xff,0x2c,0xca,0xd3,0x35}
+CFLAGS += -DLORAWAN_APPLICATION_EUI={0x76,0x5e,0x2e,0x5e,0xcf,0x3d,0xd3,0xdb}
+CFLAGS += -DLORAWAN_APPLICATION_KEY={0x2b,0x7e,0x15,0x16,0x28,0xae,0xd2,0xa6,0xab,0xf7,0x15,0x88,0x09,0xcf,0x4f,0x3a}
+CFLAGS += -DLORAWAN_NWKSKEY={0x2B,0x7E,0x15,0x16,0x28,0xAE,0xD2,0xA6,0xAB,0xF7,0x15,0x88,0x09,0xCF,0x4F,0x3A}
+CFLAGS += -DLORAWAN_APPSKEY={0x2B,0x7E,0x15,0x16,0x28,0xAE,0xD2,0xA6,0xAB,0xF7,0x15,0x88,0x09,0xCF,0x4F,0x3A}
+CFLAGS += -DLORAWAN_DEVICE_ADDRESS=0x166fb58e
+CFLAGS += -DLORAWAN_NETWORK_ID=0
+CFLAGS += -DUSE_BAND_868
+CLFAGS += -DLORAMAC_DEFAULT_TX_POWER=TX_POWER_14_DBM
+
+
+RIOTBASE ?= $(CURDIR)/../..
+
+DRIVER ?= sx1276
+
+# include the selected driver
+USEMODULE += $(DRIVER)
+USEMODULE += hashes
+USEMODULE += crypto
+USEMODULE += od
+USEMODULE += shell
+USEMODULE += shell_commands
+USEMODULE += ps
+USEMODULE += xtimer
+USEMODULE += gnrc_lorawan
+USEMODULE += random
+USEMODULE += netdev2_lorawan
+USEMODULE += gnrc_netapi
+USEMODULE += gnrc_pktbuf
+USEMODULE += auto_init_gnrc_netif
+
+include $(RIOTBASE)/Makefile.include

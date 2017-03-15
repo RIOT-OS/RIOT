@@ -5,6 +5,9 @@ endif
 ifneq (,$(filter crypto,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/include/crypto
 endif
+ifneq (,$(filter lorawan,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/link_layer/lorawan
+endif
 
 ifneq (,$(filter fib,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
