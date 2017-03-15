@@ -32,8 +32,8 @@
 #include "encx24j600_defines.h"
 #include "xtimer.h"
 
-#include "net/netdev2.h"
-#include "net/netdev2/eth.h"
+#include "net/netdev.h"
+#include "net/netdev/eth.h"
 #include "net/eui64.h"
 #include "net/ethernet.h"
 #include "net/netstats.h"
@@ -61,22 +61,22 @@ static uint16_t reg_get(encx24j600_t *dev, uint8_t reg);
 static void reg_clear_bits(encx24j600_t *dev, uint8_t reg, uint16_t mask);
 static inline int _packets_available(encx24j600_t *dev);
 
-static void _get_mac_addr(netdev2_t *dev, uint8_t* buf);
+static void _get_mac_addr(netdev_t *dev, uint8_t* buf);
 
-/* netdev2 interface */
-static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count);
-static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info);
-static int _init(netdev2_t *dev);
-static void _isr(netdev2_t *dev);
-static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len);
+/* netdev interface */
+static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
+static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
+static int _init(netdev_t *dev);
+static void _isr(netdev_t *dev);
+static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
 
-const static netdev2_driver_t netdev2_driver_encx24j600 = {
+const static netdev_driver_t netdev_driver_encx24j600 = {
     .send = _send,
     .recv = _recv,
     .init = _init,
     .isr = _isr,
     .get = _get,
-    .set = netdev2_eth_set,
+    .set = netdev_eth_set,
 };
 
 static inline void lock(encx24j600_t *dev) {
@@ -89,7 +89,7 @@ static inline void unlock(encx24j600_t *dev) {
 
 void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params)
 {
-    dev->netdev.driver = &netdev2_driver_encx24j600;
+    dev->netdev.driver = &netdev_driver_encx24j600;
     dev->spi = params->spi;
     dev->cs = params->cs_pin;
     dev->int_pin = params->int_pin;
@@ -103,11 +103,11 @@ static void encx24j600_isr(void *arg)
     /* disable interrupt line */
     gpio_irq_disable(dev->int_pin);
 
-    /* call netdev2 hook */
-    dev->netdev.event_callback((netdev2_t*) dev, NETDEV2_EVENT_ISR);
+    /* call netdev hook */
+    dev->netdev.event_callback((netdev_t*) dev, NETDEV_EVENT_ISR);
 }
 
-static void _isr(netdev2_t *netdev)
+static void _isr(netdev_t *netdev)
 {
     encx24j600_t *dev = (encx24j600_t *) netdev;
 
@@ -122,9 +122,9 @@ static void _isr(netdev2_t *netdev)
     if (eir & ENC_LINKIF) {
         uint16_t estat = reg_get(dev, ENC_ESTAT);
 
-        netdev2_event_t event = (estat & ENC_PHYLNK) ?
-            NETDEV2_EVENT_LINK_DOWN :
-            NETDEV2_EVENT_LINK_UP;
+        netdev_event_t event = (estat & ENC_PHYLNK) ?
+            NETDEV_EVENT_LINK_DOWN :
+            NETDEV_EVENT_LINK_UP;
 
         netdev->event_callback(netdev, event);
     }
@@ -133,7 +133,7 @@ static void _isr(netdev2_t *netdev)
     if (eir & ENC_PKTIF) {
         while (_packets_available(dev)) {
             unlock(dev);
-            netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
+            netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
             lock(dev);
         }
     }
@@ -233,7 +233,7 @@ static void sram_op(encx24j600_t *dev, uint16_t cmd, uint16_t addr, char *ptr, i
     cmdn(dev, cmd, in, out, len);
 }
 
-static int _init(netdev2_t *encdev)
+static int _init(netdev_t *encdev)
 {
     encx24j600_t *dev = (encx24j600_t *) encdev;
 
@@ -291,7 +291,7 @@ static int _init(netdev2_t *encdev)
     return 0;
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count) {
+static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count) {
     encx24j600_t * dev = (encx24j600_t *) netdev;
     lock(dev);
 
@@ -332,7 +332,7 @@ static inline int _packets_available(encx24j600_t *dev)
     return reg_get(dev, ENC_ESTAT) & ~0xFF00;
 }
 
-static void _get_mac_addr(netdev2_t *encdev, uint8_t* buf)
+static void _get_mac_addr(netdev_t *encdev, uint8_t* buf)
 {
     encx24j600_t * dev = (encx24j600_t *) encdev;
     uint16_t *addr = (uint16_t *) buf;
@@ -346,7 +346,7 @@ static void _get_mac_addr(netdev2_t *encdev, uint8_t* buf)
     unlock(dev);
 }
 
-static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
+static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     encx24j600_t * dev = (encx24j600_t *) netdev;
     encx24j600_frame_hdr_t hdr;
@@ -381,7 +381,7 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     return payload_len;
 }
 
-static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
+static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
 {
     int res = 0;
 
@@ -396,7 +396,7 @@ static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
             }
             break;
         default:
-            res = netdev2_eth_get(dev, opt, value, max_len);
+            res = netdev_eth_get(dev, opt, value, max_len);
             break;
     }
 

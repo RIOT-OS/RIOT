@@ -1,8 +1,8 @@
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
     USEMODULE += netif
     USEMODULE += cc2538_rf
-    USEMODULE += gnrc_netdev2
-    USEMODULE += netdev2_ieee802154
+    USEMODULE += gnrc_netdev
+    USEMODULE += netdev_ieee802154
 endif
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio

@@ -27,8 +27,8 @@
 
 #include "net/eui64.h"
 #include "net/ieee802154.h"
-#include "net/netdev2.h"
-#include "net/netdev2/ieee802154.h"
+#include "net/netdev.h"
+#include "net/netdev/ieee802154.h"
 
 #include "at86rf2xx.h"
 #include "at86rf2xx_netdev.h"
@@ -40,14 +40,14 @@
 
 #define _MAX_MHR_OVERHEAD   (25)
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count);
-static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info);
-static int _init(netdev2_t *netdev);
-static void _isr(netdev2_t *netdev);
-static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len);
-static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len);
+static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
+static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
+static int _init(netdev_t *netdev);
+static void _isr(netdev_t *netdev);
+static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len);
+static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len);
 
-const netdev2_driver_t at86rf2xx_driver = {
+const netdev_driver_t at86rf2xx_driver = {
     .send = _send,
     .recv = _recv,
     .init = _init,
@@ -58,14 +58,14 @@ const netdev2_driver_t at86rf2xx_driver = {
 
 static void _irq_handler(void *arg)
 {
-    netdev2_t *dev = (netdev2_t *) arg;
+    netdev_t *dev = (netdev_t *) arg;
 
     if (dev->event_callback) {
-        dev->event_callback(dev, NETDEV2_EVENT_ISR);
+        dev->event_callback(dev, NETDEV_EVENT_ISR);
     }
 }
 
-static int _init(netdev2_t *netdev)
+static int _init(netdev_t *netdev)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
 
@@ -96,7 +96,7 @@ static int _init(netdev2_t *netdev)
     return 0;
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
+static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
     const struct iovec *ptr = vector;
@@ -126,7 +126,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
     return (int)len;
 }
 
-static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
+static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
     uint8_t phr;
@@ -166,7 +166,7 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     (void)tmp;
 
     if (info != NULL) {
-        netdev2_ieee802154_rx_info_t *radio_info = info;
+        netdev_ieee802154_rx_info_t *radio_info = info;
         at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
 #ifndef MODULE_AT86RF231
         at86rf2xx_fb_read(dev, &(radio_info->rssi), 1);
@@ -222,7 +222,7 @@ netopt_state_t _get_state(at86rf2xx_t *dev)
     }
 }
 
-static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
+static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
 
@@ -298,7 +298,7 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     int res;
 
-    if (((res = netdev2_ieee802154_get((netdev2_ieee802154_t *)netdev, opt, val,
+    if (((res = netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, val,
                                        max_len)) >= 0) || (res != -ENOTSUP)) {
         return res;
     }
@@ -349,7 +349,7 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
     return res;
 }
 
-static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
+static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
     uint8_t old_state = at86rf2xx_get_status(dev);
@@ -368,17 +368,17 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
         case NETOPT_ADDRESS:
             assert(len <= sizeof(uint16_t));
             at86rf2xx_set_addr_short(dev, *((uint16_t *)val));
-            /* don't set res to set netdev2_ieee802154_t::short_addr */
+            /* don't set res to set netdev_ieee802154_t::short_addr */
             break;
         case NETOPT_ADDRESS_LONG:
             assert(len <= sizeof(uint64_t));
             at86rf2xx_set_addr_long(dev, *((uint64_t *)val));
-            /* don't set res to set netdev2_ieee802154_t::long_addr */
+            /* don't set res to set netdev_ieee802154_t::long_addr */
             break;
         case NETOPT_NID:
             assert(len <= sizeof(uint16_t));
             at86rf2xx_set_pan(dev, *((uint16_t *)val));
-            /* don't set res to set netdev2_ieee802154_t::pan */
+            /* don't set res to set netdev_ieee802154_t::pan */
             break;
         case NETOPT_CHANNEL:
             assert(len != sizeof(uint8_t));
@@ -389,7 +389,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
                 break;
             }
             at86rf2xx_set_chan(dev, chan);
-            /* don't set res to set netdev2_ieee802154_t::chan */
+            /* don't set res to set netdev_ieee802154_t::chan */
             break;
 
         case NETOPT_CHANNEL_PAGE:
@@ -428,7 +428,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
         case NETOPT_AUTOACK:
             at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK,
                                  ((bool *)val)[0]);
-            /* don't set res to set netdev2_ieee802154_t::flags */
+            /* don't set res to set netdev_ieee802154_t::flags */
             break;
 
         case NETOPT_RETRANS:
@@ -509,14 +509,14 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
     }
 
     if (res == -ENOTSUP) {
-        res = netdev2_ieee802154_set((netdev2_ieee802154_t *)netdev, opt,
+        res = netdev_ieee802154_set((netdev_ieee802154_t *)netdev, opt,
                                      val, len);
     }
 
     return res;
 }
 
-static void _isr(netdev2_t *netdev)
+static void _isr(netdev_t *netdev)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
     uint8_t irq_mask;
@@ -538,7 +538,7 @@ static void _isr(netdev2_t *netdev)
                   AT86RF2XX_TRX_STATE_MASK__TRAC;
 
     if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__RX_START) {
-        netdev->event_callback(netdev, NETDEV2_EVENT_RX_STARTED);
+        netdev->event_callback(netdev, NETDEV_EVENT_RX_STARTED);
         DEBUG("[at86rf2xx] EVT - RX_START\n");
     }
 
@@ -549,7 +549,7 @@ static void _isr(netdev2_t *netdev)
             if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)) {
                 return;
             }
-            netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
+            netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
         }
         else if (state == AT86RF2XX_STATE_TX_ARET_ON ||
                  state == AT86RF2XX_STATE_BUSY_TX_ARET) {
@@ -567,15 +567,15 @@ static void _isr(netdev2_t *netdev)
                 switch (trac_status) {
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
-                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE);
+                        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
                         DEBUG("[at86rf2xx] TX SUCCESS\n");
                         break;
                     case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
-                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_NOACK);
+                        netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
                         DEBUG("[at86rf2xx] TX NO_ACK\n");
                         break;
                     case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
-                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_MEDIUM_BUSY);
+                        netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
                         DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
                         break;
                     default:

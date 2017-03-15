@@ -25,18 +25,18 @@
 #include "kernel_types.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "net/netdev2.h"
+#include "net/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief encx24j600 netdev2 device
- * @extends netdev2_t
+ * @brief encx24j600 netdev device
+ * @extends netdev_t
  */
 typedef struct {
-    netdev2_t netdev;       /**< extended netdev2 structure */
+    netdev_t netdev;        /**< extended netdev structure */
     spi_t spi;              /**< SPI device the enc is connected to*/
     gpio_t cs;              /**< SPI chip select pin */
     gpio_t int_pin;         /**< SPI interrupt pin */

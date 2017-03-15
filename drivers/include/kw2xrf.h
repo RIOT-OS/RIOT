@@ -28,8 +28,8 @@
 #include "board.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "net/netdev2.h"
-#include "net/netdev2/ieee802154.h"
+#include "net/netdev.h"
+#include "net/netdev/ieee802154.h"
 #include "net/gnrc/nettype.h"
 
 #ifdef __cplusplus
@@ -84,13 +84,13 @@ extern "C" {
  * @brief   Internal device option flags
  *
  * `0x00ff` is reserved for general IEEE 802.15.4 flags
- * (see @ref netdev2_ieee802154_t)
+ * (see @ref netdev_ieee802154_t)
  *
  * @{
  */
-#define KW2XRF_OPT_SRC_ADDR_LONG    (NETDEV2_IEEE802154_SRC_MODE_LONG) /**< legacy define */
-#define KW2XRF_OPT_RAWDUMP          (NETDEV2_IEEE802154_RAW)           /**< legacy define */
-#define KW2XRF_OPT_ACK_REQ          (NETDEV2_IEEE802154_ACK_REQ)       /**< legacy define */
+#define KW2XRF_OPT_SRC_ADDR_LONG    (NETDEV_IEEE802154_SRC_MODE_LONG)  /**< legacy define */
+#define KW2XRF_OPT_RAWDUMP          (NETDEV_IEEE802154_RAW)            /**< legacy define */
+#define KW2XRF_OPT_ACK_REQ          (NETDEV_IEEE802154_ACK_REQ)        /**< legacy define */
 
 #define KW2XRF_OPT_AUTOCCA          (0x0100)    /**< CCA befor TX active */
 #define KW2XRF_OPT_PROMISCUOUS      (0x0200)    /**< promiscuous mode
@@ -121,10 +121,10 @@ typedef struct kw2xrf_params {
 /**
  * @brief   Device descriptor for KW2XRF radio devices
  *
- * @extends netdev2_ieee802154_t
+ * @extends netdev_ieee802154_t
  */
 typedef struct {
-    netdev2_ieee802154_t netdev;         /**< netdev2 parent struct */
+    netdev_ieee802154_t netdev;          /**< netdev parent struct */
     /**
      * @brief   device specific fields
      * @{

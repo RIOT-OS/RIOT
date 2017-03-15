@@ -27,7 +27,7 @@
 #include "assert.h"
 #include "xtimer.h"
 #include "net/eui64.h"
-#include "net/netdev2.h"
+#include "net/netdev.h"
 #include "net/ieee802154.h"
 
 #define ENABLE_DEBUG    (0)
@@ -231,7 +231,7 @@ static void _rx_cb(void *arg, uint8_t c)
             if (dev->rx_count == dev->rx_limit) {
                 /* packet is complete */
                 if (dev->event_callback) {
-                    dev->event_callback((netdev2_t *)dev, NETDEV2_EVENT_ISR);
+                    dev->event_callback((netdev_t *)dev, NETDEV_EVENT_ISR);
                 }
                 dev->int_state = XBEE_INT_STATE_IDLE;
             }
@@ -566,7 +566,7 @@ int xbee_parse_hdr(xbee_t *dev, const uint8_t *xhdr, xbee_l2hdr_t *l2hdr)
     return (int)(alen + 3);
 }
 
-int xbee_init(netdev2_t *dev)
+int xbee_init(netdev_t *dev)
 {
     uint8_t tmp[2];
     xbee_t *xbee = (xbee_t *)dev;
@@ -631,7 +631,7 @@ int xbee_init(netdev2_t *dev)
     return 0;
 }
 
-static int xbee_send(netdev2_t *dev, const struct iovec *vector, unsigned count)
+static int xbee_send(netdev_t *dev, const struct iovec *vector, unsigned count)
 {
     xbee_t *xbee = (xbee_t *)dev;
     size_t size;
@@ -668,7 +668,7 @@ static int xbee_send(netdev2_t *dev, const struct iovec *vector, unsigned count)
     return (int)size;
 }
 
-static int xbee_recv(netdev2_t *dev, void *buf, size_t len, void *info)
+static int xbee_recv(netdev_t *dev, void *buf, size_t len, void *info)
 {
     (void)info;
     size_t size;
@@ -703,7 +703,7 @@ static int xbee_recv(netdev2_t *dev, void *buf, size_t len, void *info)
     return (int)size;
 }
 
-static void xbee_isr(netdev2_t *netdev)
+static void xbee_isr(netdev_t *netdev)
 {
     xbee_t *dev = (xbee_t *)netdev;
 
@@ -715,12 +715,12 @@ static void xbee_isr(netdev2_t *netdev)
         }
         else {
             DEBUG("[xbee] isr: data available, waiting for read\n");
-            dev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
+            dev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
         }
     }
 }
 
-static int xbee_get(netdev2_t *ndev, netopt_t opt, void *value, size_t max_len)
+static int xbee_get(netdev_t *ndev, netopt_t opt, void *value, size_t max_len)
 {
     xbee_t *dev = (xbee_t *)ndev;
     assert(dev);
@@ -774,7 +774,7 @@ static int xbee_get(netdev2_t *ndev, netopt_t opt, void *value, size_t max_len)
     }
 }
 
-static int xbee_set(netdev2_t *ndev, netopt_t opt, void *value, size_t len)
+static int xbee_set(netdev_t *ndev, netopt_t opt, void *value, size_t len)
 {
     xbee_t *dev = (xbee_t *)ndev;
     assert(dev);
@@ -803,7 +803,7 @@ static int xbee_set(netdev2_t *ndev, netopt_t opt, void *value, size_t len)
 /*
  * The drivers netdev interface
  */
-const netdev2_driver_t xbee_driver = {
+const netdev_driver_t xbee_driver = {
     .send = xbee_send,
     .recv = xbee_recv,
     .init = xbee_init,

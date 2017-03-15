@@ -29,7 +29,7 @@
 #include "xtimer.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
-#include "net/netdev2.h"
+#include "net/netdev.h"
 #include "net/ieee802154.h"
 #include "net/gnrc/nettype.h"
 
@@ -130,8 +130,8 @@ typedef struct {
  */
 typedef struct {
     /* netdev fields */
-    const struct netdev2_driver *driver;    /**< ptr to that driver's interface. */
-    netdev2_event_cb_t event_callback;      /**< callback for device events */
+    const struct netdev_driver *driver;     /**< ptr to that driver's interface. */
+    netdev_event_cb_t event_callback;       /**< callback for device events */
     void* context;                          /**< ptr to network stack context */
 #ifdef MODULE_NETSTATS_L2
     netstats_t stats;                       /**< transceiver's statistics */
@@ -177,7 +177,7 @@ typedef struct {
 /**
  * @brief   Reference to the XBee driver interface
  */
-extern const netdev2_driver_t xbee_driver;
+extern const netdev_driver_t xbee_driver;
 
 /**
  * @brief   Prepare the given Xbee device

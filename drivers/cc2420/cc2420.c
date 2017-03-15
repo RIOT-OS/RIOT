@@ -160,7 +160,7 @@ void cc2420_tx_exec(cc2420_t *dev)
     /* trigger the transmission */
     if (dev->options & CC2420_OPT_TELL_TX_START) {
         dev->netdev.netdev.event_callback(&dev->netdev.netdev,
-                                          NETDEV2_EVENT_TX_STARTED);
+                                          NETDEV_EVENT_TX_STARTED);
     }
     DEBUG("cc2420: tx_exec: TX_START\n");
     if (dev->options & CC2420_OPT_CSMA) {

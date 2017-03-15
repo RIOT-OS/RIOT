@@ -423,9 +423,9 @@
           stroke-miterlimit: 4;
           stroke-width: 3;
         }
-        #gnrc-detail-netdev2 {
+        #gnrc-detail-netdev {
           fill: none;
-          stroke: url(#outer-gradient-netdev2);
+          stroke: url(#outer-gradient-netdev);
           stroke-linecap: round;
           stroke-linejoin: miter;
           stroke-miterlimit: 4;
@@ -473,7 +473,7 @@
       <stop style="stop-color: #3fa687; stop-opacity: 1;" offset="0.9" />
       <stop style="stop-color: #3fa687; stop-opacity: 1;" offset="1" />
     </linearGradient>
-    <linearGradient id="outer-gradient-netdev2" x1="0%" y1="0%" x2="0%" y2="100%">
+    <linearGradient id="outer-gradient-netdev" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop style="stop-color: #3fa687; stop-opacity: 1;" offset="0" />
       <stop style="stop-color: #3fa687; stop-opacity: 1;" offset="0.1" />
       <stop style="stop-color: #3fa687; stop-opacity: 0;" offset="0.9" />

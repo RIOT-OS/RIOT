@@ -8,7 +8,7 @@ To use, add
 
     #
     GNRC_NETIF_NUMOF := 2
-    USEMODULE += ethos gnrc_netdev2
+    USEMODULE += ethos gnrc_netdev
     CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=115200 -DUSE_ETHOS_FOR_STDIO
 
 to app Makefile, "make clean all flash", then run this tool so follows:

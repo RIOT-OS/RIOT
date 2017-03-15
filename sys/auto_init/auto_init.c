@@ -216,9 +216,9 @@ void auto_init(void)
     auto_init_kw2xrf();
 #endif
 
-#ifdef MODULE_NETDEV2_TAP
-    extern void auto_init_netdev2_tap(void);
-    auto_init_netdev2_tap();
+#ifdef MODULE_NETDEV_TAP
+    extern void auto_init_netdev_tap(void);
+    auto_init_netdev_tap();
 #endif
 
 #ifdef MODULE_NORDIC_SOFTDEVICE_BLE

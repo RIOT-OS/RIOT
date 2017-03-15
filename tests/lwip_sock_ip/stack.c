@@ -17,8 +17,8 @@
 #include "msg.h"
 #include "net/ethernet.h"
 #include "net/ipv6.h"
-#include "net/netdev2/eth.h"
-#include "net/netdev2_test.h"
+#include "net/netdev/eth.h"
+#include "net/netdev_test.h"
 #include "net/sock.h"
 #include "sched.h"
 #include "xtimer.h"
@@ -28,7 +28,7 @@
 #include "lwip/inet_chksum.h"
 #include "lwip/nd6.h"
 #include "lwip/netif.h"
-#include "lwip/netif/netdev2.h"
+#include "lwip/netif/netdev.h"
 #include "lwip/tcpip.h"
 #include "netif/etharp.h"
 
@@ -41,7 +41,7 @@
 
 static msg_t _msg_queue[_MSG_QUEUE_SIZE];
 static uint8_t _netdev_buffer[_NETDEV_BUFFER_SIZE];
-netdev2_test_t netdev;
+netdev_test_t netdev;
 static struct netif netif;
 static kernel_pid_t _check_pid = KERNEL_PID_UNDEF;
 static mutex_t _netdev_buffer_mutex = MUTEX_INIT;
@@ -55,12 +55,12 @@ static inline void _get_iid(uint8_t *iid)
     iid[0] ^= 0x2;
 }
 
-static int _get_max_pkt_size(netdev2_t *dev, void *value, size_t max_len)
+static int _get_max_pkt_size(netdev_t *dev, void *value, size_t max_len)
 {
-    return netdev2_eth_get(dev, NETOPT_MAX_PACKET_SIZE, value, max_len);
+    return netdev_eth_get(dev, NETOPT_MAX_PACKET_SIZE, value, max_len);
 }
 
-static int _get_src_len(netdev2_t *dev, void *value, size_t max_len)
+static int _get_src_len(netdev_t *dev, void *value, size_t max_len)
 {
     uint16_t *v = value;
 
@@ -74,7 +74,7 @@ static int _get_src_len(netdev2_t *dev, void *value, size_t max_len)
     return sizeof(uint16_t);
 }
 
-static int _get_addr(netdev2_t *dev, void *value, size_t max_len)
+static int _get_addr(netdev_t *dev, void *value, size_t max_len)
 {
     uint8_t iid[ETHERNET_ADDR_LEN + 2];
     uint8_t *addr = value;
@@ -96,17 +96,17 @@ static int _get_addr(netdev2_t *dev, void *value, size_t max_len)
     return ETHERNET_ADDR_LEN;
 }
 
-static int _get_addr_len(netdev2_t *dev, void *value, size_t max_len)
+static int _get_addr_len(netdev_t *dev, void *value, size_t max_len)
 {
-    return netdev2_eth_get(dev, NETOPT_ADDR_LEN, value, max_len);
+    return netdev_eth_get(dev, NETOPT_ADDR_LEN, value, max_len);
 }
 
-static int _get_device_type(netdev2_t *dev, void *value, size_t max_len)
+static int _get_device_type(netdev_t *dev, void *value, size_t max_len)
 {
-    return netdev2_eth_get(dev, NETOPT_DEVICE_TYPE, value, max_len);
+    return netdev_eth_get(dev, NETOPT_DEVICE_TYPE, value, max_len);
 }
 
-static int _get_ipv6_iid(netdev2_t *dev, void *value, size_t max_len)
+static int _get_ipv6_iid(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
     if (max_len != sizeof(uint64_t)) {
@@ -116,12 +116,12 @@ static int _get_ipv6_iid(netdev2_t *dev, void *value, size_t max_len)
     return sizeof(uint64_t);
 }
 
-static void _netdev_isr(netdev2_t *dev)
+static void _netdev_isr(netdev_t *dev)
 {
-    dev->event_callback(dev, NETDEV2_EVENT_RX_COMPLETE);
+    dev->event_callback(dev, NETDEV_EVENT_RX_COMPLETE);
 }
 
-static int _netdev_recv(netdev2_t *dev, char *buf, int len, void *info)
+static int _netdev_recv(netdev_t *dev, char *buf, int len, void *info)
 {
     int res;
 
@@ -140,7 +140,7 @@ static int _netdev_recv(netdev2_t *dev, char *buf, int len, void *info)
     return res;
 }
 
-static int _netdev_send(netdev2_t *dev, const struct iovec *vector, int count)
+static int _netdev_send(netdev_t *dev, const struct iovec *vector, int count)
 {
     msg_t done = { .type = _SEND_DONE };
     unsigned offset = 0;
@@ -167,21 +167,21 @@ void _net_init(void)
     msg_init_queue(_msg_queue, _MSG_QUEUE_SIZE);
     _check_pid = sched_active_pid;
 
-    netdev2_test_setup(&netdev, NULL);
-    netdev2_test_set_get_cb(&netdev, NETOPT_SRC_LEN, _get_src_len);
-    netdev2_test_set_get_cb(&netdev, NETOPT_MAX_PACKET_SIZE,
+    netdev_test_setup(&netdev, NULL);
+    netdev_test_set_get_cb(&netdev, NETOPT_SRC_LEN, _get_src_len);
+    netdev_test_set_get_cb(&netdev, NETOPT_MAX_PACKET_SIZE,
                             _get_max_pkt_size);
-    netdev2_test_set_get_cb(&netdev, NETOPT_ADDRESS, _get_addr);
-    netdev2_test_set_get_cb(&netdev, NETOPT_ADDR_LEN,
+    netdev_test_set_get_cb(&netdev, NETOPT_ADDRESS, _get_addr);
+    netdev_test_set_get_cb(&netdev, NETOPT_ADDR_LEN,
                             _get_addr_len);
-    netdev2_test_set_get_cb(&netdev, NETOPT_SRC_LEN,
+    netdev_test_set_get_cb(&netdev, NETOPT_SRC_LEN,
                             _get_addr_len);
-    netdev2_test_set_get_cb(&netdev, NETOPT_DEVICE_TYPE,
+    netdev_test_set_get_cb(&netdev, NETOPT_DEVICE_TYPE,
                             _get_device_type);
-    netdev2_test_set_get_cb(&netdev, NETOPT_IPV6_IID,
+    netdev_test_set_get_cb(&netdev, NETOPT_IPV6_IID,
                             _get_ipv6_iid);
-    netdev2_test_set_recv_cb(&netdev, _netdev_recv);
-    netdev2_test_set_isr_cb(&netdev, _netdev_isr);
+    netdev_test_set_recv_cb(&netdev, _netdev_recv);
+    netdev_test_set_isr_cb(&netdev, _netdev_isr);
     /* netdev needs to be set-up */
     assert(netdev.netdev.driver);
 #if LWIP_IPV4
@@ -189,9 +189,9 @@ void _net_init(void)
     local4.addr = HTONL(_TEST_ADDR4_LOCAL);
     mask4.addr = HTONL(_TEST_ADDR4_MASK);
     gw4.addr = HTONL(_TEST_ADDR4_GW);
-    netif_add(&netif, &local4, &mask4, &gw4, &netdev, lwip_netdev2_init, tcpip_input);
+    netif_add(&netif, &local4, &mask4, &gw4, &netdev, lwip_netdev_init, tcpip_input);
 #else
-    netif_add(&netif, &netdev, lwip_netdev2_init, tcpip_input);
+    netif_add(&netif, &netdev, lwip_netdev_init, tcpip_input);
 #endif
 #if LWIP_IPV6
     static const uint8_t local6[] = _TEST_ADDR6_LOCAL;
@@ -215,7 +215,7 @@ void _prepare_send_checks(void)
     mac[4] = mac[6];
     mac[5] = mac[7];
 
-    netdev2_test_set_send_cb(&netdev, _netdev_send);
+    netdev_test_set_send_cb(&netdev, _netdev_send);
 #if LWIP_ARP
     const ip4_addr_t remote4 = { .addr = HTONL(_TEST_ADDR4_REMOTE) };
     assert(ERR_OK == etharp_add_static_entry(&remote4, (struct eth_addr *)mac));
@@ -249,7 +249,7 @@ bool _inject_4packet(uint32_t src, uint32_t dst, uint8_t proto, void *data,
     uint8_t *payload = (uint8_t *)(ip_hdr + 1);
     (void)netif;
 
-    _get_addr((netdev2_t *)&netdev, &eth_hdr->dst, sizeof(eth_hdr->dst));
+    _get_addr((netdev_t *)&netdev, &eth_hdr->dst, sizeof(eth_hdr->dst));
     eth_hdr->type = byteorder_htons(ETHERTYPE_IPV4);
     IPH_VHL_SET(ip_hdr, 4, 5);
     IPH_TOS_SET(ip_hdr, 0);
@@ -265,7 +265,7 @@ bool _inject_4packet(uint32_t src, uint32_t dst, uint8_t proto, void *data,
     _netdev_buffer_size = sizeof(ethernet_hdr_t) + sizeof(struct ip_hdr) +
                           data_len;
     mutex_unlock(&_netdev_buffer_mutex);
-    ((netdev2_t *)&netdev)->event_callback((netdev2_t *)&netdev, NETDEV2_EVENT_ISR);
+    ((netdev_t *)&netdev)->event_callback((netdev_t *)&netdev, NETDEV_EVENT_ISR);
 
     return true;
 #else
@@ -284,7 +284,7 @@ bool _inject_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     uint8_t *payload = (uint8_t *)(ipv6_hdr + 1);
     (void)netif;
 
-    _get_addr((netdev2_t *)&netdev, &eth_hdr->dst, sizeof(eth_hdr->dst));
+    _get_addr((netdev_t *)&netdev, &eth_hdr->dst, sizeof(eth_hdr->dst));
     eth_hdr->type = byteorder_htons(ETHERTYPE_IPV6);
     ipv6_hdr_set_version(ipv6_hdr);
     ipv6_hdr->len = byteorder_htons(data_len);
@@ -297,7 +297,7 @@ bool _inject_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     _netdev_buffer_size = sizeof(ethernet_hdr_t) + sizeof(ipv6_hdr_t) +
                           data_len;
     mutex_unlock(&_netdev_buffer_mutex);
-    ((netdev2_t *)&netdev)->event_callback((netdev2_t *)&netdev, NETDEV2_EVENT_ISR);
+    ((netdev_t *)&netdev)->event_callback((netdev_t *)&netdev, NETDEV_EVENT_ISR);
 
     return true;
 #else

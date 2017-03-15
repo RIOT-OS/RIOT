@@ -101,7 +101,7 @@ has the following:
 ```make
 ifeq (,$(filter native,$(BOARD)))
 GNRC_NETIF_NUMOF := 2
-USEMODULE += ethos gnrc_netdev2
+USEMODULE += ethos gnrc_netdev
 CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=115200 -DUSE_ETHOS_FOR_STDIO
 FEATURES_REQUIRED += periph_uart
 endif

@@ -25,8 +25,8 @@ endif
 ifneq (,$(filter ieee802154,$(USEMODULE)))
     DIRS += net/link_layer/ieee802154
 endif
-ifneq (,$(filter netdev2_test,$(USEMODULE)))
-    DIRS += net/netdev2_test
+ifneq (,$(filter netdev_test,$(USEMODULE)))
+    DIRS += net/netdev_test
 endif
 ifneq (,$(filter icmpv6,$(USEMODULE)))
     DIRS += net/network_layer/icmpv6
@@ -58,8 +58,8 @@ endif
 ifneq (,$(filter nhdp,$(USEMODULE)))
     DIRS += net/routing/nhdp
 endif
-ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
-    DIRS += net/gnrc/link_layer/netdev2
+ifneq (,$(filter gnrc_netdev,$(USEMODULE)))
+    DIRS += net/gnrc/link_layer/netdev
 endif
 ifneq (,$(filter fib,$(USEMODULE)))
     DIRS += net/network_layer/fib

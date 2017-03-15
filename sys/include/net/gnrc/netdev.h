@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,182 +7,216 @@
  */
 
 /**
- * @defgroup    net_gnrc_netdev   Network device driver interface
- * @ingroup     net_gnrc
- * @deprecated  Use @ref drivers_netdev_netdev2 "netdev2" instead for new
- *              devices. This module only allows for interaction with
- *              @ref net_gnrc "GNRC", while @ref drivers_netdev_netdev2
- *              "netdev2" is independent from the stack.
- * @brief       Common network device interface
+ * @defgroup  net_gnrc_netdev   Adaption layer for GNRC on top of Netdev
+ * @ingroup   net_gnrc
+ * @brief     Provides the glue code for @ref net_gnrc on top of @ref drivers_netdev_api
  * @{
  *
  * @file
- * @brief       Network device driver interface definition.
+ * @brief     netdev-GNRC glue code interface
  *
- * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * This interface is supposed to provide common adaption code between the
+ * low-level network device interface "netdev" and the GNRC network stack.
+ *
+ * GNRC sends around "gnrc_pktsnip_t" structures, but netdev can only handle
+ * "struct iovec" structures when sending, or a flat buffer when receiving.
+ *
+ * The purpose of gnrc_netdev is to bring these two interfaces together.
+ *
+ * @author    Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #ifndef GNRC_NETDEV_H
 #define GNRC_NETDEV_H
 
-#include <errno.h>
+#include <assert.h>
 #include <stdint.h>
-#include <stdlib.h>
 
-#include "net/gnrc/pkt.h"
-#include "net/netopt.h"
+#include "kernel_types.h"
+#include "net/netdev.h"
+#include "net/gnrc.h"
+#include "net/gnrc/mac/types.h"
+#include "net/ieee802154.h"
+#include "net/gnrc/mac/mac.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
+ * @brief   Default priority for adaption layer's threads
+ */
+#ifndef GNRC_NETDEV_MAC_PRIO
+#define GNRC_NETDEV_MAC_PRIO    (THREAD_PRIORITY_MAIN - 5)
+#endif
+
+/**
  * @brief   Type for @ref msg_t if device fired an event
  */
-#define GNRC_NETDEV_MSG_TYPE_EVENT  (0x0100)
+#define NETDEV_MSG_TYPE_EVENT 0x1234
 
 /**
- * @brief   Possible event types that are send from the device driver to the
- *          MAC layer
+ * @brief   Mask for @ref gnrc_mac_tx_feedback_t
  */
-typedef enum {
-    NETDEV_EVENT_RX_STARTED     = 0x0001,   /**< started to receive a packet */
-    NETDEV_EVENT_RX_COMPLETE    = 0x0002,   /**< finished receiving a packet */
-    NETDEV_EVENT_TX_STARTED     = 0x0004,   /**< started to transfer a packet */
-    NETDEV_EVENT_TX_COMPLETE    = 0x0008,   /**< finished transferring packet */
-    NETDEV_EVENT_TX_NOACK       = 0x0010,   /**< ACK requested but not received */
-    NETDEV_EVENT_TX_MEDIUM_BUSY = 0x0020,   /**< couldn't transfer packet */
-    /* expand this list if needed */
-} gnrc_netdev_event_t;
+#define GNRC_NETDEV_MAC_INFO_TX_FEEDBACK_MASK   (0x0003U)
 
 /**
- * @brief   Event callback for signaling event to a MAC layer
- *
- * @param[in] type          type of the event
- * @param[in] arg           event argument, can e.g. contain a pktsnip_t pointer
+ * @brief   Flag to track if a transmission might have corrupted a received
+ *          packet
  */
-typedef void (*gnrc_netdev_event_cb_t)(gnrc_netdev_event_t type, void *arg);
+#define GNRC_NETDEV_MAC_INFO_RX_STARTED         (0x0004U)
 
 /**
- * @brief   Forward declaration of gnrc_netdev_t due to cyclic dependency to
- *          @ref gnrc_netdev_driver_t.
+ * @brief Structure holding GNRC netdev adapter state
  *
- * @see gnrc_netdev
+ * This structure is supposed to hold any state parameters needed
+ * to use a netdev device from GNRC.
+ *
+ * It can be extended
  */
-typedef struct gnrc_netdev gnrc_netdev_t;
+typedef struct gnrc_netdev {
+    /**
+     * @brief Send a pktsnip using this device
+     *
+     * This function should convert the pktsnip into a format
+     * the underlying device understands and send it.
+     */
+    int (*send)(struct gnrc_netdev *dev, gnrc_pktsnip_t *snip);
+
+    /**
+     * @brief Receive a pktsnip from this device
+     *
+     * This function should receive a raw frame from the underlying
+     * device and convert it into a pktsnip while adding a netif header
+     * and possibly marking out higher-layer headers.
+     */
+    gnrc_pktsnip_t * (*recv)(struct gnrc_netdev *dev);
+
+    /**
+     * @brief netdev handle this adapter is working with
+     */
+    netdev_t *dev;
+
+    /**
+     * @brief PID of this adapter for netapi messages
+     */
+    kernel_pid_t pid;
+
+#ifdef MODULE_GNRC_MAC
+    /**
+     * @brief general information for the MAC protocol
+     */
+    uint16_t mac_info;
+
+    /**
+     * @brief device's l2 address
+     */
+    uint8_t  l2_addr[IEEE802154_LONG_ADDRESS_LEN];
+
+    /**
+     * @brief device's l2 address length
+     */
+    uint8_t  l2_addr_len;
+
+#if ((GNRC_MAC_RX_QUEUE_SIZE != 0) || (GNRC_MAC_DISPATCH_BUFFER_SIZE != 0)) || defined(DOXYGEN)
+    /**
+     * @brief MAC internal object which stores reception parameters, queues, and
+     *        state machines.
+     */
+    gnrc_mac_rx_t rx;
+#endif /* ((GNRC_MAC_RX_QUEUE_SIZE != 0) || (GNRC_MAC_DISPATCH_BUFFER_SIZE != 0)) || defined(DOXYGEN) */
+
+#if ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (GNRC_MAC_NEIGHBOR_COUNT != 0)) || defined(DOXYGEN)
+    /**
+     * @brief MAC internal object which stores transmission parameters, queues, and
+     *        state machines.
+     */
+    gnrc_mac_tx_t tx;
+#endif /* ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (GNRC_MAC_NEIGHBOR_COUNT == 0)) || defined(DOXYGEN) */
+#endif /* MODULE_GNRC_MAC */
+} gnrc_netdev_t;
+
+#ifdef MODULE_GNRC_MAC
 
 /**
- * @brief   Network device API definition.
+ * @brief get the 'rx_started' state of the device
  *
- * @details This is a set of functions that must be implemented by any driver
- *           for a network device.
+ * This function checks whether the device has started receiving a packet.
+ *
+ * @param[in] dev  ptr to netdev device
+ *
+ * @return         the rx_started state
  */
-typedef struct {
-    /**
-     * @brief Send data via a given network device
-     *
-     * @param[in] dev       network device descriptor
-     * @param[in] pkt       pointer to the data in the packet buffer
-     *
-     * @return              number of bytes that were actually send out
-     * @return              -ENODEV if @p dev is invalid
-     * @return              -ENOMSG if pkt is invalid
-     * @return              -EOVERFLOW if the payload size of @p pkt exceeds the
-     *                      payload size that can be handled by the device
-     */
-    int (*send_data)(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt);
-
-    /**
-     * @brief   Registers an event callback to a given network device
-     *
-     * @param[in] dev       network device descriptor
-     * @param[in] cb        function that is called on events
-     *
-     * @return              0 on success
-     * @return              -ENODEV if @p dev is invalid
-     * @return              -ENOBUFS if maximum number of callbacks is exceeded
-     */
-    int (*add_event_callback)(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb);
-
-    /**
-     * @brief   Unregisters an event callback from a given network device
-     *
-     * @param[in] dev       network device descriptor
-     * @param[in] cb        callback function
-     *
-     * @return              0 on success
-     * @return              -ENODEV if @p dev is invalid
-     * @return              -ENOENT if callback was not registered
-     */
-    int (*rem_event_callback)(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb);
-
-    /**
-     * @brief   Get an option value from a given network device
-     *
-     * @note    This function does not check for proper alignment of the memory
-     *          region accessed. It is the responsibility of the caller to
-     *          assure aligned memory access.
-     *
-     * @param[in] dev           network device descriptor
-     * @param[in] opt           option type
-     * @param[out] value        pointer to store the option's value in
-     * @param[in] max_len       maximal amount of byte that fit into @p value
-     *
-     * @return              number of bytes written to @p value
-     * @return              -ENODEV if @p dev is invalid
-     * @return              -ENOTSUP if @p opt is not supported
-     * @return              -EOVERFLOW if available space in @p value given in
-     *                      @p max_len is too small to store the option value
-     * @return              -ECANCELED if internal driver error occurred
-     */
-    int (*get)(gnrc_netdev_t *dev, netopt_t opt, void *value, size_t max_len);
-
-    /**
-     * @brief   Set an option value for a given network device
-     *
-     * @note    This function does not check for proper alignment of the memory
-     *          region accessed. It is the responsibility of the caller to
-     *          assure aligned memory access.
-     *
-     * @param[in] dev       network device descriptor
-     * @param[in] opt       option type
-     * @param[in] value     value to set
-     * @param[in] value_len the length of @p value
-     *
-     * @return              number of bytes used from @p value
-     * @return              -ENODEV if @p dev is invalid
-     * @return              -ENOTSUP if @p opt is not supported
-     * @return              -EINVAL if @p value is invalid
-     * @return              -ECANCELED if internal driver error occurred
-     */
-    int (*set)(gnrc_netdev_t *dev, netopt_t opt, void *value, size_t value_len);
-
-    /**
-     * @brief   This function is called by a MAC layer when a message of type
-     *          @ref GNRC_NETDEV_MSG_TYPE_EVENT was received
-     *
-     * @param[in] dev           network device descriptor
-     * @param[in] event_type    event type, given by msg_t::content::value
-     *                          in the received message
-     */
-    void (*isr_event)(gnrc_netdev_t *dev, uint32_t event_type);
-} gnrc_netdev_driver_t;
+static inline bool gnrc_netdev_get_rx_started(gnrc_netdev_t *dev)
+{
+    return (dev->mac_info & GNRC_NETDEV_MAC_INFO_RX_STARTED);
+}
 
 /**
- * @brief   The netdev data-structure holds the minimum information needed for
- *          interaction with MAC layers and can be expanded with device
- *          specific fields
+ * @brief set the rx_started state of the device
  *
- * The netdev structure is the parent for all network device driver descriptors.
+ * This function is intended to be called only in netdev_t::event_callback().
  *
- * @see gnrc_netdev_t
+ * @param[in] dev  ptr to netdev device
+ *
  */
-struct gnrc_netdev {
-    gnrc_netdev_driver_t const *driver; /**< pointer to the devices interface */
-    gnrc_netdev_event_cb_t event_cb;    /**< netdev event callback */
-    kernel_pid_t mac_pid;               /**< the driver's thread's PID */
-};
+static inline void gnrc_netdev_set_rx_started(gnrc_netdev_t *dev, bool rx_started)
+{
+    if (rx_started) {
+        dev->mac_info |= GNRC_NETDEV_MAC_INFO_RX_STARTED;
+    }
+    else {
+        dev->mac_info &= ~GNRC_NETDEV_MAC_INFO_RX_STARTED;
+    }
+}
+
+/**
+ * @brief get the transmission feedback of the device
+ *
+ * @param[in] dev  ptr to netdev device
+ *
+ * @return         the transmission feedback
+ */
+static inline gnrc_mac_tx_feedback_t gnrc_netdev_get_tx_feedback(gnrc_netdev_t *dev)
+{
+    return (gnrc_mac_tx_feedback_t)(dev->mac_info &
+                                    GNRC_NETDEV_MAC_INFO_TX_FEEDBACK_MASK);
+}
+
+/**
+ * @brief set the transmission feedback of the device
+ *
+ * This function is intended to be called only in netdev_t::event_callback().
+ *
+ * @param[in] dev  ptr to netdev device
+ *
+ */
+static inline void gnrc_netdev_set_tx_feedback(gnrc_netdev_t *dev,
+                                  gnrc_mac_tx_feedback_t txf)
+{
+    /* check if gnrc_mac_tx_feedback does not collide with
+     * GNRC_NETDEV_MAC_INFO_RX_STARTED */
+    assert(!(txf & GNRC_NETDEV_MAC_INFO_RX_STARTED));
+    /* unset previous value */
+    dev->mac_info &= ~GNRC_NETDEV_MAC_INFO_TX_FEEDBACK_MASK;
+    dev->mac_info |= (uint16_t)(txf & GNRC_NETDEV_MAC_INFO_TX_FEEDBACK_MASK);
+}
+#endif
+
+/**
+ * @brief Initialize GNRC netdev handler thread
+ *
+ * @param[in] stack         ptr to preallocated stack buffer
+ * @param[in] stacksize     size of stack buffer
+ * @param[in] priority      priority of thread
+ * @param[in] name          name of thread
+ * @param[in] gnrc_netdev  ptr to netdev device to handle in created thread
+ *
+ * @return pid of created thread
+ * @return KERNEL_PID_UNDEF on error
+ */
+kernel_pid_t gnrc_netdev_init(char *stack, int stacksize, char priority,
+                               const char *name, gnrc_netdev_t *gnrc_netdev);
 
 #ifdef __cplusplus
 }

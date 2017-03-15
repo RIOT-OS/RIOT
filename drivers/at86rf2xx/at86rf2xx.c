@@ -38,7 +38,7 @@
 
 void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
 {
-    netdev2_t *netdev = (netdev2_t *)dev;
+    netdev_t *netdev = (netdev_t *)dev;
 
     netdev->driver = &at86rf2xx_driver;
     /* initialize device descriptor */
@@ -161,7 +161,7 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, uint8_t *data,
 
 void at86rf2xx_tx_exec(at86rf2xx_t *dev)
 {
-    netdev2_t *netdev = (netdev2_t *)dev;
+    netdev_t *netdev = (netdev_t *)dev;
 
     /* write frame length field in FIFO */
     at86rf2xx_sram_write(dev, 0, &(dev->tx_frame_len), 1);
@@ -170,6 +170,6 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev)
                         AT86RF2XX_TRX_STATE__TX_START);
     if (netdev->event_callback &&
         (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_START)) {
-        netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED);
+        netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
     }
 }

@@ -11,11 +11,11 @@ ifneq (,$(filter at86rf2%,$(USEMODULE)))
   USEMODULE += luid
   USEMODULE += netif
   USEMODULE += ieee802154
-  USEMODULE += netdev2_ieee802154
+  USEMODULE += netdev_ieee802154
   ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
 	# XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
-	# as all drivers are ported to netdev2
-    USEMODULE += gnrc_netdev2
+	# as all drivers are ported to netdev
+    USEMODULE += gnrc_netdev
   endif
 endif
 
@@ -24,11 +24,11 @@ ifneq (,$(filter mrf24j40,$(USEMODULE)))
   USEMODULE += luid
   USEMODULE += netif
   USEMODULE += ieee802154
-  USEMODULE += netdev2_ieee802154
+  USEMODULE += netdev_ieee802154
   ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
 	# XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
-	# as all drivers are ported to netdev2
-    USEMODULE += gnrc_netdev2
+	# as all drivers are ported to netdev
+    USEMODULE += gnrc_netdev
   endif
 endif
 
@@ -54,8 +54,8 @@ ifneq (,$(filter cc110x,$(USEMODULE)))
   ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
     USEMODULE += gnrc_cc110x
 	# XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
-	# as all drivers are ported to netdev2
-	USEMODULE += gnrc_netdev2
+	# as all drivers are ported to netdev
+	USEMODULE += gnrc_netdev
   endif
 endif
 
@@ -64,11 +64,11 @@ ifneq (,$(filter cc2420,$(USEMODULE)))
   USEMODULE += luid
   USEMODULE += netif
   USEMODULE += ieee802154
-  USEMODULE += netdev2_ieee802154
+  USEMODULE += netdev_ieee802154
   ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
 	# XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
-	# as all drivers are ported to netdev2
-    USEMODULE += gnrc_netdev2
+	# as all drivers are ported to netdev
+    USEMODULE += gnrc_netdev
   endif
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_spi
@@ -80,18 +80,18 @@ ifneq (,$(filter dht,$(USEMODULE)))
 endif
 
 ifneq (,$(filter enc28j60,$(USEMODULE)))
-  USEMODULE += netdev2_eth
+  USEMODULE += netdev_eth
   USEMODULE += xtimer
   USEMODULE += luid
 endif
 
 ifneq (,$(filter encx24j600,$(USEMODULE)))
-  USEMODULE += netdev2_eth
+  USEMODULE += netdev_eth
   USEMODULE += xtimer
 endif
 
 ifneq (,$(filter ethos,$(USEMODULE)))
-    USEMODULE += netdev2_eth
+    USEMODULE += netdev_eth
     USEMODULE += random
     USEMODULE += tsrb
 endif
@@ -117,11 +117,11 @@ ifneq (,$(filter kw2xrf,$(USEMODULE)))
     USEMODULE += luid
     USEMODULE += netif
     USEMODULE += ieee802154
-    USEMODULE += netdev2_ieee802154
+    USEMODULE += netdev_ieee802154
     ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
       # XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
-      # as all drivers are ported to netdev2
-      USEMODULE += gnrc_netdev2
+      # as all drivers are ported to netdev
+      USEMODULE += gnrc_netdev
     endif
 endif
 
@@ -190,7 +190,7 @@ ifneq (,$(filter veml6070,$(USEMODULE)))
 endif
 
 ifneq (,$(filter w5100,$(USEMODULE)))
-  USEMODULE += netdev2_eth
+  USEMODULE += netdev_eth
   USEMODULE += luid
 endif
 
