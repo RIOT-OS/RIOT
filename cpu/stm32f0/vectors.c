@@ -34,41 +34,9 @@ void dummy_handler(void) {
 WEAK_DEFAULT void isr_svc(void);
 WEAK_DEFAULT void isr_pendsv(void);
 WEAK_DEFAULT void isr_systick(void);
-/* STM32F0 specific interrupt vectors */
-WEAK_DEFAULT void isr_wwdg(void);
-WEAK_DEFAULT void isr_pvd(void);
-WEAK_DEFAULT void isr_rtc(void);
-WEAK_DEFAULT void isr_flash(void);
-WEAK_DEFAULT void isr_rcc(void);
-WEAK_DEFAULT void isr_exti(void);
-WEAK_DEFAULT void isr_ts(void);
-WEAK_DEFAULT void isr_dma1_ch1(void);
-WEAK_DEFAULT void isr_dma1_ch2_3(void);
-WEAK_DEFAULT void isr_dma1_ch4_5(void);
-WEAK_DEFAULT void isr_adc1_comp(void);
-WEAK_DEFAULT void isr_tim1_brk_up_trg_com(void);
-WEAK_DEFAULT void isr_tim1_cc(void);
-WEAK_DEFAULT void isr_tim2(void);
-WEAK_DEFAULT void isr_tim3(void);
-WEAK_DEFAULT void isr_tim6_dac(void);
-WEAK_DEFAULT void isr_tim7(void);
-WEAK_DEFAULT void isr_tim14(void);
-WEAK_DEFAULT void isr_tim15(void);
-WEAK_DEFAULT void isr_tim16(void);
-WEAK_DEFAULT void isr_tim17(void);
-WEAK_DEFAULT void isr_i2c1(void);
-WEAK_DEFAULT void isr_i2c2(void);
-WEAK_DEFAULT void isr_spi1(void);
-WEAK_DEFAULT void isr_spi2(void);
-WEAK_DEFAULT void isr_usart1(void);
-WEAK_DEFAULT void isr_usart2(void);
-WEAK_DEFAULT void isr_usart3_4(void);
-WEAK_DEFAULT void isr_usart3_8(void);
-WEAK_DEFAULT void isr_cec(void);
-WEAK_DEFAULT void isr_usb(void);
 
 /* interrupt vector table */
-ISR_VECTORS const void *interrupt_vector[] = {
+ISR_VECTORS const void *cortexm_interrupt_vector[] = {
     /* Exception stack pointer */
     (void*) (&_estack),             /* pointer to the top of the stack */
     /* Cortex-M0 handlers */
@@ -89,20 +57,4 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_pendsv,             /* pendSV interrupt, in RIOT the actual
                                      * context switching is happening here */
     (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
-    /* STM specific peripheral handlers */
-#if defined(CPU_MODEL_STM32F030R8)
-#include "vectors/stm32f030r8_isr.h"
-#elif defined(CPU_MODEL_STM32F031K6)
-#include "vectors/stm32f031k6_isr.h"
-#elif defined(CPU_MODEL_STM32F042K6)
-#include "vectors/stm32f042k6_isr.h"
-#elif defined(CPU_MODEL_STM32F051R8)
-#include "vectors/stm32f051r8_isr.h"
-#elif defined(CPU_MODEL_STM32F070RB)
-#include "vectors/stm32f070rb_isr.h"
-#elif defined(CPU_MODEL_STM32F072RB)
-#include "vectors/stm32f070rb_isr.h"
-#elif defined(CPU_MODEL_STM32F091RC)
-#include "vectors/stm32f091rc_isr.h"
-#endif
 };
