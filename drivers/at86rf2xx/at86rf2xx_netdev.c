@@ -304,7 +304,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     }
 
     uint8_t old_state = at86rf2xx_get_status(dev);
-    res = 0;
 
     /* temporarily wake up if sleeping */
     if (old_state == AT86RF2XX_STATE_SLEEP) {
@@ -339,6 +338,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         default:
             res = -ENOTSUP;
+            break;
     }
 
     /* go back to sleep if were sleeping */
