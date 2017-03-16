@@ -11,6 +11,7 @@ PSEUDOMODULES += gnrc_ipv6_default
 PSEUDOMODULES += gnrc_ipv6_router
 PSEUDOMODULES += gnrc_ipv6_router_default
 PSEUDOMODULES += gnrc_netdev_default
+PSEUDOMODULES += gnrc_netdev_msg_handler
 PSEUDOMODULES += gnrc_neterr
 PSEUDOMODULES += gnrc_netapi_callbacks
 PSEUDOMODULES += gnrc_netapi_mbox

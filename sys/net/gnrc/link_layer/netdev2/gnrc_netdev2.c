@@ -61,6 +61,10 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
         }
     }
     else {
+#ifdef MODULE_GNRC_PPP
+        netopt_enable_t link_state = NETOPT_DISABLE;
+#endif
+
         DEBUG("gnrc_netdev2: event triggered -> %i\n", event);
         switch(event) {
             case NETDEV2_EVENT_RX_COMPLETE:
@@ -83,10 +87,11 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event)
 #endif
 #ifdef MODULE_GNRC_PPP
             case NETDEV2_EVENT_LINK_UP:
-                gnrc_netdev2->link_up(gnrc_netdev2);
-                break;
+                link_state = NETOPT_ENABLE;
+                /* falls through intentionally */
             case NETDEV2_EVENT_LINK_DOWN:
-                gnrc_netdev2->link_down(gnrc_netdev2);
+                dev->driver->set(dev, NETOPT_LINK_STATE, &link_state,
+                                 sizeof(link_state));
                 break;
 #endif
             default:
@@ -180,10 +185,13 @@ static void *_gnrc_netdev2_thread(void *args)
                 msg_reply(&msg, &reply);
                 break;
             default:
-                if(gnrc_netdev2->msg_handler)
+#ifdef MODULE_GNRC_NETDEV_MSG_HANDLER
+                if(gnrc_netdev2->msg_handler) {
                     gnrc_netdev2->msg_handler(gnrc_netdev2, &msg);
-                else
-                    DEBUG("gnrc_netdev2: Unknown command %" PRIu16 "\n", msg.type);
+                    break;
+                }
+#endif
+                DEBUG("gnrc_netdev2: Unknown command %" PRIu16 "\n", msg.type);
                 break;
         }
     }
