@@ -1,0 +1,23 @@
+# the cpu to build for
+export CPU = stm32f1
+export CPU_MODEL = stm32f103cb
+
+# custom linkerscript
+export LINKER_SCRIPT = stm32f103cb_opencm904.ld
+
+# custom flasher to use with the bootloader
+export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/robotis-loader.py
+export DEBUGGER =
+export DEBUGSERVER =
+
+export OFLAGS = -O binary
+export HEXFILE = $(ELFFILE:.elf=.bin)
+export FFLAGS =
+export DEBUGGER_FLAGS =
+
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial

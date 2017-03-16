@@ -15,8 +15,8 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef TESTS_IEEE802154_H_
-#define TESTS_IEEE802154_H_
+#ifndef TESTS_IEEE802154_H
+#define TESTS_IEEE802154_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_ieee802154(void);
 }
 #endif
 
-#endif /* TESTS_IEEE802154_H_ */
+#endif /* TESTS_IEEE802154_H */
 /** @} */

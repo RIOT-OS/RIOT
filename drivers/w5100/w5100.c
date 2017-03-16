@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
+ * Copyright (C) 2016-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,11 +22,11 @@
 #include <string.h>
 
 #include "log.h"
+#include "luid.h"
 #include "assert.h"
-#include "periph/cpuid.h"
 
 #include "net/ethernet.h"
-#include "net/netdev2/eth.h"
+#include "net/netdev/eth.h"
 
 #include "w5100.h"
 #include "w5100_regs.h"
@@ -35,39 +35,39 @@
 #include "debug.h"
 
 
-#define SPI_CONF            SPI_CONF_FIRST_RISING
+#define SPI_CONF            SPI_MODE_0
 #define RMSR_DEFAULT_VALUE  (0x55)
-#define MAC_SEED            (0x23)
 
 #define S0_MEMSIZE          (0x2000)
 #define S0_MASK             (S0_MEMSIZE - 1)
 #define S0_TX_BASE          (0x4000)
 #define S0_RX_BASE          (0x6000)
 
-static const netdev2_driver_t netdev2_driver_w5100;
+static const netdev_driver_t netdev_driver_w5100;
 
 static inline void send_addr(w5100_t *dev, uint16_t addr)
 {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    spi_transfer_byte(dev->p.spi, (addr >> 8), NULL);
-    spi_transfer_byte(dev->p.spi, (addr & 0xff), NULL);
+    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr >> 8));
+    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr & 0xff));
 #else
-    spi_transfer_byte(dev->p.spi, (addr & 0xff), NULL);
-    spi_transfer_byte(dev->p.spi, (addr >> 8), NULL);
+    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr & 0xff));
+    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr >> 8));
 #endif
 }
 
 static uint8_t rreg(w5100_t *dev, uint16_t reg)
 {
-    uint8_t data;
-
-    gpio_clear(dev->p.cs);
-    spi_transfer_byte(dev->p.spi, CMD_READ, NULL);
+    spi_transfer_byte(dev->p.spi, dev->p.cs, true, CMD_READ);
     send_addr(dev, reg++);
-    spi_transfer_byte(dev->p.spi, 0, (char *)&data);
-    gpio_set(dev->p.cs);
+    return spi_transfer_byte(dev->p.spi, dev->p.cs, false, 0);
+}
 
-    return data;
+static void wreg(w5100_t *dev, uint16_t reg, uint8_t data)
+{
+    spi_transfer_byte(dev->p.spi, dev->p.cs, true, CMD_WRITE);
+    send_addr(dev, reg);
+    spi_transfer_byte(dev->p.spi, dev->p.cs, false, data);
 }
 
 static uint16_t raddr(w5100_t *dev, uint16_t addr_high, uint16_t addr_low)
@@ -77,6 +77,13 @@ static uint16_t raddr(w5100_t *dev, uint16_t addr_high, uint16_t addr_low)
     return res;
 }
 
+static void waddr(w5100_t *dev,
+                  uint16_t addr_high, uint16_t addr_low, uint16_t val)
+{
+    wreg(dev, addr_high, (uint8_t)(val >> 8));
+    wreg(dev, addr_low, (uint8_t)(val & 0xff));
+}
+
 static void rchunk(w5100_t *dev, uint16_t addr, uint8_t *data, size_t len)
 {
     /* reading a chunk must be split in multiple single byte reads, as the
@@ -84,22 +91,6 @@ static void rchunk(w5100_t *dev, uint16_t addr, uint8_t *data, size_t len)
     for (int i = 0; i < (int)len; i++) {
         data[i] = rreg(dev, addr++);
     }
-}
-
-static void wreg(w5100_t *dev, uint16_t reg, uint8_t data)
-{
-    gpio_clear(dev->p.cs);
-    spi_transfer_byte(dev->p.spi, CMD_WRITE, NULL);
-    send_addr(dev, reg);
-    spi_transfer_byte(dev->p.spi, data, NULL);
-    gpio_set(dev->p.cs);
-}
-
-static void waddr(w5100_t *dev,
-                  uint16_t addr_high, uint16_t addr_low, uint16_t val)
-{
-    wreg(dev, addr_high, (uint8_t)(val >> 8));
-    wreg(dev, addr_low, (uint8_t)(val & 0xff));
 }
 
 static void wchunk(w5100_t *dev, uint16_t addr, uint8_t *data, size_t len)
@@ -116,40 +107,38 @@ static void extint(void *arg)
     w5100_t *dev = (w5100_t *)arg;
 
     if (dev->nd.event_callback) {
-        dev->nd.event_callback(&dev->nd, NETDEV2_EVENT_ISR);
+        dev->nd.event_callback(&dev->nd, NETDEV_EVENT_ISR);
     }
 }
 
 void w5100_setup(w5100_t *dev, const w5100_params_t *params)
 {
     /* initialize netdev structure */
-    dev->nd.driver = &netdev2_driver_w5100;
+    dev->nd.driver = &netdev_driver_w5100;
     dev->nd.event_callback = NULL;
     dev->nd.context = dev;
 
     /* initialize the device descriptor */
     memcpy(&dev->p, params, sizeof(w5100_params_t));
 
-    /* initialize pins and SPI */
-    gpio_init(dev->p.cs, GPIO_OUT);
-    gpio_set(dev->p.cs);
-    spi_init_master(dev->p.spi, SPI_CONF, dev->p.spi_speed);
-
+    /* initialize the chip select pin and the external interrupt pin */
+    spi_init_cs(dev->p.spi, dev->p.cs);
     gpio_init_int(dev->p.evt, GPIO_IN, GPIO_FALLING, extint, dev);
 }
 
-static int init(netdev2_t *netdev)
+static int init(netdev_t *netdev)
 {
     w5100_t *dev = (w5100_t *)netdev;
     uint8_t tmp;
     uint8_t hwaddr[ETHERNET_ADDR_LEN];
-#if CPUID_LEN
-    uint8_t cpuid[CPUID_LEN];
-#endif
+
+    /* get access to the SPI bus for the duration of this function */
+    spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
 
     /* test the SPI connection by reading the value of the RMSR register */
     tmp = rreg(dev, REG_TMSR);
     if (tmp != RMSR_DEFAULT_VALUE) {
+        spi_release(dev->p.spi);
         LOG_ERROR("[w5100] error: no SPI connection\n");
         return W5100_ERR_BUS;
     }
@@ -159,13 +148,7 @@ static int init(netdev2_t *netdev)
     while (rreg(dev, REG_MODE) & MODE_RESET) {};
 
     /* initialize the device, start with writing the MAC address */
-    memset(hwaddr, MAC_SEED, ETHERNET_ADDR_LEN);
-#if CPUID_LEN
-    cpuid_get(cpuid);
-    for (int i = 0; i < CPUID_LEN; i++) {
-        hwaddr[i % ETHERNET_ADDR_LEN] ^= cpuid[i];
-    }
-#endif
+    luid_get(hwaddr, ETHERNET_ADDR_LEN);
     hwaddr[0] &= ~0x03;         /* no group address and not globally unique */
     wchunk(dev, REG_SHAR0, hwaddr, ETHERNET_ADDR_LEN);
 
@@ -190,6 +173,9 @@ static int init(netdev2_t *netdev)
     /* start receiving packets */
     wreg(dev, S0_CR, CR_RECV);
 
+    /* release the SPI bus again */
+    spi_release(dev->p.spi);
+
     return 0;
 }
 
@@ -208,10 +194,13 @@ static uint16_t tx_upload(w5100_t *dev, uint16_t start, void *data, size_t len)
     }
 }
 
-static int send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
+static int send(netdev_t *netdev, const struct iovec *vector, unsigned count)
 {
     w5100_t *dev = (w5100_t *)netdev;
     int sum = 0;
+
+    /* get access to the SPI bus for the duration of this function */
+    spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
 
     uint16_t pos = raddr(dev, S0_TX_WR0, S0_TX_WR1);
 
@@ -221,7 +210,7 @@ static int send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
         pos = S0_TX_BASE;
     }
 
-    for (int i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
         pos = tx_upload(dev, pos, vector[i].iov_base, vector[i].iov_len);
         sum += vector[i].iov_len;
     }
@@ -235,14 +224,21 @@ static int send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
 
     DEBUG("[w5100] send: transferred %i byte (at 0x%04x)\n", sum, (int)pos);
 
+    /* release the SPI bus again */
+    spi_release(dev->p.spi);
+
     return sum;
 }
 
-static int recv(netdev2_t *netdev, void *buf, size_t len, void *info)
+static int recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
+    (void)info;
     w5100_t *dev = (w5100_t *)netdev;
     uint8_t *in_buf = (uint8_t *)buf;
     int n = 0;
+
+    /* get access to the SPI bus for the duration of this function */
+    spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
 
     uint16_t num = raddr(dev, S0_RX_RSR0, S0_RX_RSR1);
 
@@ -277,22 +273,29 @@ static int recv(netdev2_t *netdev, void *buf, size_t len, void *info)
         }
     }
 
+    /* release the SPI bus again */
+    spi_release(dev->p.spi);
+
     return n;
 }
 
-static void isr(netdev2_t *netdev)
+static void isr(netdev_t *netdev)
 {
+    uint8_t ir;
     w5100_t *dev = (w5100_t *)netdev;
 
     /* we only react on RX events, and if we see one, we read from the RX buffer
      * until it is empty */
-    while (rreg(dev, S0_IR) & IR_RECV) {
-        DEBUG("[w5100] netdev2 RX complete\n");
-        netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
+    spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
+    ir = rreg(dev, S0_IR);
+    spi_release(dev->p.spi);
+    while (ir & IR_RECV) {
+        DEBUG("[w5100] netdev RX complete\n");
+        netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
     }
 }
 
-static int get(netdev2_t *netdev, netopt_t opt, void *value, size_t max_len)
+static int get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
     w5100_t *dev = (w5100_t *)netdev;
     int res = 0;
@@ -300,22 +303,24 @@ static int get(netdev2_t *netdev, netopt_t opt, void *value, size_t max_len)
     switch (opt) {
         case NETOPT_ADDRESS:
             assert(max_len >= ETHERNET_ADDR_LEN);
+            spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
             rchunk(dev, REG_SHAR0, value, ETHERNET_ADDR_LEN);
+            spi_release(dev->p.spi);
             res = ETHERNET_ADDR_LEN;
             break;
         default:
-            res = netdev2_eth_get(netdev, opt, value, max_len);
+            res = netdev_eth_get(netdev, opt, value, max_len);
             break;
     }
 
     return res;
 }
 
-static const netdev2_driver_t netdev2_driver_w5100 = {
+static const netdev_driver_t netdev_driver_w5100 = {
     .send = send,
     .recv = recv,
     .init = init,
     .isr = isr,
     .get = get,
-    .set = netdev2_eth_set,
+    .set = netdev_eth_set,
 };

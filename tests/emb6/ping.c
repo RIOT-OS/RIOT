@@ -19,10 +19,11 @@
  */
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <inttypes.h>
+#include <stdatomic.h>
 #include <stdio.h>
 
-#include "atomic.h"
 #include "byteorder.h"
 #include "net/icmpv6.h"
 #include "net/ipv6.h"
@@ -37,7 +38,8 @@
 
 static struct uip_icmp6_echo_reply_notification recv_ntfy = { NULL, NULL };
 static uint16_t seq = 0;
-static atomic_int_t received, num;
+static atomic_int received = ATOMIC_VAR_INIT(0);
+static atomic_int num = ATOMIC_VAR_INIT(0);
 
 static bool _waiting = true;
 
@@ -88,10 +90,10 @@ static void handle_reply(uip_ipaddr_t *source, uint8_t ttl, uint8_t *data,
 
     ipv6_addr_to_str(addr_str, (ipv6_addr_t *)source, sizeof(addr_str));
 
-    atomic_inc(&received);
+    atomic_fetch_add(&received, 1);
     printf("%" PRIu16 " bytes from %s: icmp_seq=%" PRIu16 " ttl=%u quota=%i/%i\n",
            datalen, addr_str, byteorder_ntohs(ping->seq), (unsigned)ttl,
-           ATOMIC_VALUE(received), ATOMIC_VALUE(num));
+           atomic_load(&received), atomic_load(&num));
 }
 
 void usage(char *cmd)
@@ -114,9 +116,8 @@ int ping_cmd(int argc, char **argv)
     if ((argc < 4) || ((payload_len = atoi(argv[3])) == 0)) {
         payload_len = 16;
     }
-    atomic_set_to_zero(&num);
-    atomic_cas(&num, 0, _num);
-    atomic_set_to_zero(&received);
+    atomic_store(&num, _num);
+    atomic_store(&received, 0);
     seq = 0;
     if (recv_ntfy.callback == NULL) {
         uip_icmp6_echo_reply_callback_add(&recv_ntfy, handle_reply);

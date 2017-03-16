@@ -18,8 +18,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef IO1_XPLAINED_H_
-#define IO1_XPLAINED_H_
+#ifndef IO1_XPLAINED_H
+#define IO1_XPLAINED_H
 
 #include "saul.h"
 #include "at30tse75x.h"
@@ -105,5 +105,5 @@ int io1_xplained_toggle_led(void);
 }
 #endif
 
-#endif /* IO1_XPLAINED_H_ */
+#endif /* IO1_XPLAINED_H */
 /** @} */

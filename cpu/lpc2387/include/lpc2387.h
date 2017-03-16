@@ -11,7 +11,7 @@
 #ifndef LPC2387_H
 #define LPC2387_H
 
-#include "lpc23xx.h"
+#include "vendor/lpc23xx.h"
 #include "arm7_common.h"
 #include "bitarithm.h"
 

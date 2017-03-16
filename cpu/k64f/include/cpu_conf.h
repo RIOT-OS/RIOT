@@ -17,7 +17,7 @@
  * @file
  * @brief           Implementation specific CPU configuration options
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Johann Fischer <j.fischer@phytec.de>
  */
 
@@ -27,7 +27,7 @@
 #include "cpu_conf_common.h"
 
 #ifdef CPU_MODEL_MK64FN1M0VLL12
-#include "MK64F12.h"
+#include "vendor/MK64F12.h"
 #else
 #error "undefined CPU_MODEL"
 #endif

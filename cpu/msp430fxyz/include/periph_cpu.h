@@ -13,11 +13,11 @@
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef CPU_PERIPH_H_
-#define CPU_PERIPH_H_
+#ifndef CPU_PERIPH_H
+#define CPU_PERIPH_H
 
 #include "cpu.h"
 #include "msp430_regs.h"
@@ -45,6 +45,11 @@ typedef uint16_t gpio_t;
  */
 #define GPIO_PIN(x, y)      ((gpio_t)(((x & 0xff) << 8) | (1 << (y & 0xff))))
 
+/**
+ * @brief   No support for HW chip select...
+ */
+#define SPI_HWCS(x)         (SPI_CS_UNDEF)
+
 #ifndef DOXYGEN
 /**
  * @brief   Override flank selection values
@@ -56,6 +61,40 @@ typedef enum {
     GPIO_RISING  = 0x00,        /**< emit interrupt on rising flank */
     GPIO_BOTH    = 0xab         /**< not supported -> random value*/
 } gpio_flank_t;
+/** @} */
+
+/**
+ * @brief   Override SPI mode selection values
+ */
+#define HAVE_SPI_MODE_T
+#ifndef SPI_USE_USCI
+typedef enum {
+    SPI_MODE_0 = (USART_TCTL_CKPH),                         /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1 = 0,                                         /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2 = (USART_TCTL_CKPL | USART_TCTL_CKPH),       /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3 = (USART_TCTL_CKPL)                          /**< CPOL=1, CPHA=1 */
+} spi_mode_t;
+#else
+typedef enum {
+    SPI_MODE_0 = (USCI_SPI_CTL0_CKPH),                      /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1 = 0,                                         /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2 = (USCI_SPI_CTL0_CKPL | USCI_SPI_CTL0_CKPH), /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3 = (USCI_SPI_CTL0_CKPL)                       /**< CPOL=1, CPHA=1 */
+} spi_mode_t;
+#endif
+/** @} */
+
+/**
+ * @brief   Override SPI clock speed selection values
+ */
+#define HAVE_SPI_CLK_T
+typedef enum {
+    SPI_CLK_100KHZ = 100000,    /**< 100KHz */
+    SPI_CLK_400KHZ = 400000,    /**< 400KHz */
+    SPI_CLK_1MHZ   = 1000000,   /**< 1MHz */
+    SPI_CLK_5MHZ   = 5000000,   /**< 5MHz */
+    SPI_CLK_10MHZ  = 0,         /**< not supported */
+} spi_clk_t;
 /** @} */
 #endif /* ndef DOXYGEN */
 
@@ -83,6 +122,7 @@ void gpio_periph_mode(gpio_t pin, bool enable);
  * @brief declare needed generic SPI functions
  * @{
  */
+#define PERIPH_SPI_NEEDS_INIT_CS
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
@@ -92,5 +132,5 @@ void gpio_periph_mode(gpio_t pin, bool enable);
 }
 #endif
 
-#endif /* CPU_PERIPH_H_ */
+#endif /* CPU_PERIPH_H */
 /** @} */

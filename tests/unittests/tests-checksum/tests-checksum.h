@@ -50,6 +50,13 @@ Test *tests_checksum_fletcher16_tests(void);
  */
 Test *tests_checksum_fletcher32_tests(void);
 
+/**
+ * @brief   Generates tests for checksum/ucrc16.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_checksum_ucrc16_tests(void);
+
 #ifdef __cplusplus
 }
 #endif

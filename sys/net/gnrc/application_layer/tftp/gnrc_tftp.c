@@ -824,7 +824,7 @@ size_t _tftp_add_option(uint8_t *dst, tftp_opt_t *opt, uint32_t value)
 uint32_t _tftp_append_options(tftp_context_t *ctxt, tftp_header_t *hdr, uint32_t offset)
 {
     offset += _tftp_add_option(hdr->data + offset, _tftp_options + TOPT_BLKSIZE, ctxt->block_size);
-    offset += _tftp_add_option(hdr->data + offset, _tftp_options + TOPT_TIMEOUT, (ctxt->timeout / SEC_IN_USEC));
+    offset += _tftp_add_option(hdr->data + offset, _tftp_options + TOPT_TIMEOUT, (ctxt->timeout / US_PER_SEC));
 
     /**
      * Only set the transfer option if we are sending.
@@ -1001,7 +1001,7 @@ tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len)
     if (ctxt->block_timeout) {
         ctxt->timer_msg.type = TFTP_TIMEOUT_MSG;
         xtimer_set_msg(&(ctxt->timer), ctxt->block_timeout, &(ctxt->timer_msg), thread_getpid());
-        DEBUG("tftp: set timeout %" PRIu32 " ms\n", ctxt->block_timeout / MS_IN_USEC);
+        DEBUG("tftp: set timeout %" PRIu32 " ms\n", ctxt->block_timeout / US_PER_MS);
     }
 
     return TS_BUSY;
@@ -1084,8 +1084,8 @@ int _tftp_decode_options(tftp_context_t *ctxt, gnrc_pktsnip_t *buf, uint32_t sta
                         break;
 
                     case TOPT_TIMEOUT:
-                        ctxt->timeout = atoi(value) * SEC_IN_USEC;
-                        DEBUG("tftp: option TOPT_TIMEOUT = %" PRIu32 " ms\n", ctxt->timeout / MS_IN_USEC);
+                        ctxt->timeout = atoi(value) * US_PER_SEC;
+                        DEBUG("tftp: option TOPT_TIMEOUT = %" PRIu32 " ms\n", ctxt->timeout / US_PER_MS);
                         break;
                 }
 

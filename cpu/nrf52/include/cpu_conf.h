@@ -13,7 +13,7 @@
  * @file
  * @brief       nRF52 specific CPU configuration
  *
- * @author      Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  */
 
@@ -21,8 +21,8 @@
 #define CPU_CONF_H
 
 #include "cpu_conf_common.h"
-#include "nrf52.h"
-#include "nrf52_bitfields.h"
+#include "vendor/nrf52.h"
+#include "vendor/nrf52_bitfields.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +35,17 @@ extern "C" {
 #define CPU_DEFAULT_IRQ_PRIO            (2U)
 #define CPU_IRQ_NUMOF                   (38U)
 #define CPU_FLASH_BASE                  (0x00000000)
+/** @} */
+
+/**
+ * @brief   Flash page configuration
+ * @{
+ */
+#define FLASHPAGE_SIZE                  (4096U)
+
+#if defined(CPU_MODEL_NRF52XXAA)
+#define FLASHPAGE_NUMOF                 (128U)
+#endif
 /** @} */
 
 /**

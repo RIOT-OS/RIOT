@@ -1,4 +1,4 @@
-export APPLICATION = periph_gpio
+APPLICATION = periph_gpio
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_gpio

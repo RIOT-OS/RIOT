@@ -20,6 +20,7 @@
 #include <assert.h>
 
 #include "cpu.h"
+#include "periph/init.h"
 
 #define BIT(n)          ( 1UL << (n) )
 
@@ -47,8 +48,8 @@ void cpu_init(void)
     SYS_CTRL->I_MAP = 1;
     /* initialize the clock system */
     cpu_clock_init();
-    /* initialize the GPIO controller */
-    cc2538_gpio_init();
+    /* trigger static peripheral initialization */
+    periph_init();
 }
 
 /**

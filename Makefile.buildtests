@@ -39,7 +39,7 @@ buildtest:
 	BUILDTESTOK=true; \
 	APP_RETRY=0; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
-	  RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_MEMORY) | grep $${BOARD} 2>&1 >/dev/null && echo 1); \
+	  RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_MEMORY) | grep "\<$${BOARD}\>" 2>&1 >/dev/null && echo 1); \
 	  ${COLOR_ECHO} -n "Building for $${BOARD} "; \
 	  [ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
 	  for NTH_TRY in 1 2 3; do \
@@ -63,6 +63,7 @@ buildtest:
 	        WERROR=$${WERROR} \
 	        LTO=$${LTO} \
 	        TOOLCHAIN=$${TOOLCHAIN} \
+	        MIPS_ELF_ROOT=$${MIPS_ELF_ROOT} \
 	        $(MAKE) -j$(NPROC) clean all 2>&1) ; \
 	    if [ "$${?}" = "0" ]; then \
 	      ${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
@@ -97,6 +98,7 @@ buildtest:
 	    BINDIRBASE=$${BINDIRBASE} \
 	    RIOTNOLINK=$${RIOTNOLINK} \
 	    RIOT_VERSION=$${RIOT_VERSION} \
+	    MIPS_ELF_ROOT=$${MIPS_ELF_ROOT} \
 	    $(MAKE) clean-intermediates 2>&1 >/dev/null || true; \
 	done; \
 	$${BUILDTESTOK}
@@ -133,6 +135,7 @@ info-buildsizes:
 	    RIOTCPU=$${RIOTCPU} \
 	    RIOTPKG=$${RIOTPKG} \
 	    BINDIRBASE=$${BINDIRBASE} \
+	    MIPS_ELF_ROOT=$${MIPS_ELF_ROOT} \
 	    $(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${BOARD}"; \
 	done;
 
@@ -150,6 +153,7 @@ info-buildsizes-diff:
 	      RIOTCPU=$${RIOTCPU} \
 	      RIOTPKG=$${RIOTPKG} \
 	      BINDIRBASE=$${BINDIRBASE} \
+	      MIPS_ELF_ROOT=$${MIPS_ELF_ROOT} \
 	      $(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4; \
 	  done | \
 	  while read -a OLD && read -a NEW; do \

@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -32,7 +32,7 @@ extern "C" {
  * @name xtimer configuration
  * @{
  */
-#define XTIMER_DEV          TIMER_0
+#define XTIMER_DEV          TIMER_DEV(0)
 #define XTIMER_CHAN         (0)
 #define XTIMER_OVERHEAD     (6)
 #define XTIMER_BACKOFF      (10)
@@ -59,20 +59,20 @@ extern "C" {
 #define LED2_MASK           (1 << 14)
 #define LED3_MASK           (1 << 15)
 
-#define LED0_ON             (LED_PORT->BSRRL = LED0_MASK)
-#define LED0_OFF            (LED_PORT->BSRRH = LED0_MASK)
+#define LED0_ON             (LED_PORT->BSRR = LED0_MASK)
+#define LED0_OFF            (LED_PORT->BSRR = (LED0_MASK << 16))
 #define LED0_TOGGLE         (LED_PORT->ODR  ^= LED0_MASK)
 
-#define LED1_ON             (LED_PORT->BSRRL = LED1_MASK)
-#define LED1_OFF            (LED_PORT->BSRRH = LED1_MASK)
+#define LED1_ON             (LED_PORT->BSRR = LED1_MASK)
+#define LED1_OFF            (LED_PORT->BSRR = (LED1_MASK << 16))
 #define LED1_TOGGLE         (LED_PORT->ODR  ^= LED1_MASK)
 
-#define LED2_ON             (LED_PORT->BSRRL = LED2_MASK)
-#define LED2_OFF            (LED_PORT->BSRRH = LED2_MASK)
+#define LED2_ON             (LED_PORT->BSRR = LED2_MASK)
+#define LED2_OFF            (LED_PORT->BSRR = (LED2_MASK << 16))
 #define LED2_TOGGLE         (LED_PORT->ODR  ^= LED2_MASK)
 
-#define LED3_ON             (LED_PORT->BSRRL = LED3_MASK)
-#define LED3_OFF            (LED_PORT->BSRRH = LED3_MASK)
+#define LED3_ON             (LED_PORT->BSRR = LED3_MASK)
+#define LED3_OFF            (LED_PORT->BSRR = (LED3_MASK << 16))
 #define LED3_TOGGLE         (LED_PORT->ODR  ^= LED3_MASK)
 /** @} */
 
@@ -90,5 +90,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

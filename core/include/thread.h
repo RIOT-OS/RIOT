@@ -87,7 +87,7 @@
  *
  * Reading from the top down, you can see that first, stack memory for our thread
  * `rcv_thread` is preallocated, followed by an implementation of the thread's
- * function. Communication between threads is done using @ref core_msg: in this
+ * function. Communication between threads is done using @ref core_msg. In this
  * case, `rcv_thread` will print the process id of each thread that sent a
  * message to `rcv_thread`.
  *

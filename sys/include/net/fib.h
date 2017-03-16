@@ -22,8 +22,8 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef FIB_H_
-#define FIB_H_
+#ifndef FIB_H
+#define FIB_H
 
 #include <stdint.h>
 
@@ -513,5 +513,5 @@ int fib_devel_get_lifetime(fib_table_t *table, uint64_t *lifetime, uint8_t *dst,
 }
 #endif
 
-#endif /* FIB_H_ */
+#endif /* FIB_H */
 /** @} */

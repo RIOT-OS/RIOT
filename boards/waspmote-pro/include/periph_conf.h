@@ -18,8 +18,8 @@
  * @author      Francisco Acosta <francisco.acosta@inria.fr>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,8 +33,8 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer peripheral configuration
- * @brief   Timer configuration
+ * @name   Timer peripheral configuration
+ *
  * The ATmega1281 has 6 timers. Timer0 and Timer2 are 8 Bit Timers,
  * Timer0 has special uses too and therefore we'll avoid using it.
  *
@@ -62,7 +62,7 @@ extern "C" {
 
 
 /**
- * @brief   UART configuration
+ * @name   UART configuration
  *
  * The UART devices have fixed pin mappings, so all we need to do, is to specify
  * which devices we would like to use and their corresponding RX interrupts. See
@@ -89,7 +89,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief SPI configuration
+ * @name   SPI configuration
  *
  * The atmega1281 has only one hardware SPI with fixed pin configuration, so all
  * we can do here, is to enable or disable it...
@@ -103,12 +103,11 @@ extern "C" {
  * @{
  */
 #define SPI_NUMOF           1           /* set to 0 to disable SPI */
-#define SPI_0_EN            1           /* remove once SPI rework is done */
-#define MEGA_PRR            PRR0        /* Power Reduction Resgister */
+#define MEGA_PRR            PRR0        /* Power Reduction Register */
 /** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */

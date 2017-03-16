@@ -1,2 +1,5 @@
 # include module specific includes
-export INCLUDES += -I$(RIOTCPU)/cortexm_common/include
+INCLUDES += -I$(RIOTCPU)/cortexm_common/include
+INCLUDES += -I$(RIOTCPU)/cortexm_common/include/vendor
+
+USEMODULE += cortexm_common_periph

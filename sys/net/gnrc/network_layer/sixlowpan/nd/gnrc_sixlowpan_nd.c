@@ -31,7 +31,7 @@ static inline void _rtr_sol_reschedule(gnrc_ipv6_netif_t *iface, uint32_t sec_de
     xtimer_remove(&iface->rtr_sol_timer);
     iface->rtr_sol_msg.type = GNRC_SIXLOWPAN_ND_MSG_MC_RTR_SOL;
     iface->rtr_sol_msg.content.ptr = iface;
-    xtimer_set_msg(&iface->rtr_sol_timer, sec_delay * SEC_IN_USEC, &iface->rtr_sol_msg,
+    xtimer_set_msg(&iface->rtr_sol_timer, sec_delay * US_PER_SEC, &iface->rtr_sol_msg,
                    gnrc_ipv6_pid);
 }
 
@@ -229,7 +229,7 @@ void gnrc_sixlowpan_nd_rtr_sol_reschedule(gnrc_ipv6_nc_t *nce, uint32_t sec_dela
     xtimer_remove(&iface->rtr_sol_timer);
     iface->rtr_sol_msg.type = GNRC_SIXLOWPAN_ND_MSG_MC_RTR_SOL;
     iface->rtr_sol_msg.content.ptr = iface;
-    xtimer_set_msg(&iface->rtr_sol_timer, sec_delay * SEC_IN_USEC, &iface->rtr_sol_msg,
+    xtimer_set_msg(&iface->rtr_sol_timer, sec_delay * US_PER_SEC, &iface->rtr_sol_msg,
                    gnrc_ipv6_pid);
 }
 
@@ -292,7 +292,7 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6,
                     DEBUG("6lo nd: address registration successful\n");
                     mutex_lock(&ipv6_iface->mutex);
                     /* reschedule 1 minute before lifetime expires */
-                    gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, SEC_IN_USEC * 60 *
+                    gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, US_PER_SEC * 60 *
                                                           (uint32_t)(byteorder_ntohs(ar_opt->ltime)
                                                           -1),
                                                           GNRC_NDP_MSG_NBR_SOL_RETRANS,
@@ -357,7 +357,7 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6,
                 nc_entry->flags |= GNRC_IPV6_NC_TYPE_REGISTERED;
                 reg_ltime = byteorder_ntohs(ar_opt->ltime);
                 /* TODO: notify routing protocol */
-                xtimer_set_msg(&nc_entry->type_timeout, (reg_ltime * 60 * SEC_IN_USEC),
+                xtimer_set_msg(&nc_entry->type_timeout, (reg_ltime * 60 * US_PER_SEC),
                                &nc_entry->type_timeout_msg, gnrc_ipv6_pid);
             }
             break;

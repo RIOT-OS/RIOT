@@ -18,8 +18,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef GNRC_IPV6_NC_H_
-#define GNRC_IPV6_NC_H_
+#ifndef GNRC_IPV6_NC_H
+#define GNRC_IPV6_NC_H
 
 #include <assert.h>
 #include <stdbool.h>
@@ -313,7 +313,7 @@ kernel_pid_t gnrc_ipv6_nc_get_l2_addr(uint8_t *l2_addr, uint8_t *l2_addr_len,
 }
 #endif
 
-#endif /* GNRC_IPV6_NC_H_ */
+#endif /* GNRC_IPV6_NC_H */
 /**
  * @}
  */

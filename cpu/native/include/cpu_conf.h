@@ -13,8 +13,8 @@
  * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @}
  */
-#ifndef CPUCONF_H_
-#define CPUCONF_H_
+#ifndef CPUCONF_H
+#define CPUCONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,8 +55,13 @@ extern "C" {
  */
 #define NATIVE_ETH_PROTO 0x1234
 
+#if (defined(GNRC_PKTBUF_SIZE)) && (GNRC_PKTBUF_SIZE < 2048)
+#   undef  GNRC_PKTBUF_SIZE
+#   define GNRC_PKTBUF_SIZE     (2048)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* CPUCONF_H_ */
+#endif /* CPUCONF_H */

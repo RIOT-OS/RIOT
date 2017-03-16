@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_ppp Header
- * @ingroup     net_ppp_hdr
+ * @defgroup    net_ppphdr Point-to-Point Protocol Header
+ * @ingroup     net_ppp
  * @brief       PPP header abstraction type and helper functions
  * @{
  *
@@ -18,8 +18,8 @@
  * @author  José Ignacio Alamos
  */
 
-#ifndef PPP_HDR_H_
-#define PPP_HDR_H_
+#ifndef PPP_HDR_H
+#define PPP_HDR_H
 
 #include <inttypes.h>
 
@@ -63,5 +63,5 @@ typedef struct __attribute__((packed)){
 }
 #endif
 
-#endif /* PPP_HDR_H_ */
+#endif /* PPP_HDR_H */
 /** @} */

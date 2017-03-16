@@ -6,3 +6,7 @@ endif
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
+
+ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
+  USEMODULE += nrfmin
+endif

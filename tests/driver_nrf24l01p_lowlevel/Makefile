@@ -10,7 +10,7 @@ USEMODULE += xtimer
 USEMODULE += nrf24l01p
 
 # set default device parameters in case they are undefined
-SPI_PORT ?= SPI_0
+SPI_PORT ?= SPI_DEV\(0\)
 CE_PIN   ?= GPIO_PIN\(0,0\)
 CS_PIN   ?= GPIO_PIN\(0,1\)
 IRQ_PIN  ?= GPIO_PIN\(0,2\)

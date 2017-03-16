@@ -1,0 +1,11 @@
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+
+# Various common features of Nucleo boards
+FEATURES_PROVIDED += cpp
+
+# The board MPU family (used for grouping by the CI system)
+FEATURES_MCU_GROUP = cortex_m3_1

@@ -17,7 +17,7 @@
 
 #include "embUnit.h"
 
-#include "net/gnrc/coap.h"
+#include "net/gcoap.h"
 
 #include "unittests-constants.h"
 #include "tests-gcoap.h"

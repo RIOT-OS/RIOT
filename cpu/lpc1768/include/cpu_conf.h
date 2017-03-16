@@ -15,7 +15,7 @@
  * @file
  * @brief           CPU specific configuration options
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef CPU_CONF_H
@@ -23,7 +23,7 @@
 
 #include "cpu_conf_common.h"
 
-#include "LPC17xx.h"
+#include "vendor/LPC17xx.h"
 
 #ifdef __cplusplus
 extern "C" {

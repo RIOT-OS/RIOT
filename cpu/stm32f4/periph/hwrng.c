@@ -19,6 +19,7 @@
  */
 
 #include "cpu.h"
+#include "periph_conf.h"
 #include "periph/hwrng.h"
 
 /* only build if the CPU actually provides a RNG peripheral */
@@ -29,12 +30,17 @@ void hwrng_init(void)
     /* no need for initialization */
 }
 
-void hwrng_read(uint8_t *buf, unsigned int num)
+void hwrng_read(void *buf, unsigned int num)
 {
     unsigned int count = 0;
+    uint8_t *b = (uint8_t *)buf;
 
     /* power on and enable the device */
-    RCC->AHB2ENR |= RCC_AHB2ENR_RNGEN;
+#if defined(CPU_MODEL_STM32F410RB)
+    periph_clk_en(AHB1, RCC_AHB1ENR_RNGEN);
+#else
+    periph_clk_en(AHB2, RCC_AHB2ENR_RNGEN);
+#endif
     RNG->CR = RNG_CR_RNGEN;
 
     /* get random data */
@@ -45,14 +51,18 @@ void hwrng_read(uint8_t *buf, unsigned int num)
         uint32_t tmp = RNG->DR;
         /* copy data into result vector */
         for (int i = 0; i < 4 && count < num; i++) {
-            buf[count++] = (uint8_t)tmp;
+            b[count++] = (uint8_t)tmp;
             tmp = tmp >> 8;
         }
     }
 
     /* finally disable the device again */
     RNG->CR = 0;
-    RCC->AHB2ENR &= ~RCC_AHB2ENR_RNGEN;
+#if defined(CPU_MODEL_STM32F410RB)
+    periph_clk_dis(AHB1, RCC_AHB1ENR_RNGEN);
+#else
+    periph_clk_dis(AHB2, RCC_AHB2ENR_RNGEN);
+#endif
 }
 
-#endif /* CPUID_LEN */
+#endif /* RNG */

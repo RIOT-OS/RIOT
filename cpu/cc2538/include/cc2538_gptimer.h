@@ -117,6 +117,9 @@ typedef struct {
     cc2538_reg_t SYNC;                      /**< GPTIMER Synchronize */
     cc2538_reg_t RESERVED2;                 /**< Reserved word */
 
+    /**
+     * @brief Interrupt mask control
+     */
     union {
         cc2538_reg_t IMR;                   /**< GPTIMER Interrupt Mask */
         struct {

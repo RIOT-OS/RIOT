@@ -83,7 +83,7 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
         }
         /* access to `payload` was implicitly given up with the send operation above
          * => use temporary variable for output */
-        printf("Success: send %u byte to [%s]:%u\n", payload_size, addr_str,
+        printf("Success: sent %u byte(s) to [%s]:%u\n", payload_size, addr_str,
                port);
         xtimer_usleep(delay);
     }

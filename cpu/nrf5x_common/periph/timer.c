@@ -22,8 +22,6 @@
  * @}
  */
 
-#include "sched.h"
-#include "thread.h"
 #include "periph/timer.h"
 
 #define F_TIMER             (16000000U)     /* the timer is clocked at 16MHz */
@@ -86,7 +84,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     dev(tim)->EVENTS_COMPARE[2] = 0;
 
     /* enable interrupts */
-    timer_irq_enable(tim);
+    NVIC_EnableIRQ(timer_config[tim].irqn);
     /* start the timer */
     dev(tim)->TASKS_START = 1;
 
@@ -142,16 +140,6 @@ void timer_stop(tim_t tim)
     dev(tim)->TASKS_STOP = 1;
 }
 
-void timer_irq_enable(tim_t tim)
-{
-    NVIC_EnableIRQ(timer_config[tim].irqn);
-}
-
-void timer_irq_disable(tim_t tim)
-{
-    NVIC_DisableIRQ(timer_config[tim].irqn);
-}
-
 static inline void irq_handler(int num)
 {
     for (unsigned i = 0; i < timer_config[num].channels; i++) {
@@ -164,9 +152,7 @@ static inline void irq_handler(int num)
             }
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef TIMER_0_ISR

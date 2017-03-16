@@ -34,7 +34,7 @@ server (vgdb).
 Network Support
 ===============
 
-If you compile RIOT for the native cpu and include the `netdev2_tap`
+If you compile RIOT for the native cpu and include the `netdev_tap`
 module, you need to specify a network interface like this:
 
     make term PORT=tap0

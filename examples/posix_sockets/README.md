@@ -44,7 +44,6 @@ Running the `help` command on an iotlab-m3:
 2015-09-22 14:54:54,451 - INFO # mersenne_init        initializes the PRNG
 2015-09-22 14:54:54,453 - INFO # mersenne_get         returns 32 bit of pseudo randomness
 2015-09-22 14:54:54,454 - INFO # ifconfig             Configure network interfaces
-2015-09-22 14:54:54,455 - INFO # txtsnd               Sends a custom string as is over the link layer
 2015-09-22 14:54:54,457 - INFO # ncache               manage neighbor cache by hand
 2015-09-22 14:54:54,459 - INFO # routers              IPv6 default router list
 ```

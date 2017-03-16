@@ -95,8 +95,8 @@
  * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
  */
 
-#ifndef GNRC_RPL_H_
-#define GNRC_RPL_H_
+#ifndef GNRC_RPL_H
+#define GNRC_RPL_H
 
 #include <string.h>
 #include <stdint.h>
@@ -634,5 +634,5 @@ static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
 }
 #endif
 
-#endif /* GNRC_RPL_H_ */
+#endif /* GNRC_RPL_H */
 /** @} */

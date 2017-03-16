@@ -18,8 +18,8 @@
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
 
-#ifndef SI70XX_H_
-#define SI70XX_H_
+#ifndef SI70XX_H
+#define SI70XX_H
 
 #include "periph/i2c.h"
 
@@ -162,5 +162,5 @@ uint8_t si70xx_get_revision(si70xx_t *dev);
 }
 #endif
 
-#endif /* SI70XX_H_ */
+#endif /* SI70XX_H */
 /** @} */

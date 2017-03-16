@@ -49,15 +49,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Make sure the number of available DAC lines is defined
- * @{
- */
-#ifndef DAC_NUMOF
-#define "DAC_NUMOF undefined"
-#endif
-/** @} */
-
-/**
  * @brief   Define default DAC type identifier
  * @{
  */

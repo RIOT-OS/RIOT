@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef IPV6_EXT_RH_H_
-#define IPV6_EXT_RH_H_
+#ifndef IPV6_EXT_RH_H
+#define IPV6_EXT_RH_H
 
 #include <stdint.h>
 
@@ -61,7 +61,7 @@ typedef struct __attribute__((packed)) {
  * @brief   Process the routing header of an IPv6 packet.
  *
  * @param[in, out] ipv6     An IPv6 packet.
- * @param[in] ext           A routing header of @ipv6.
+ * @param[in] ext           A routing header of @p ipv6.
  *
  * @return  EXT_RH_CODE_ERROR
  * @return  EXT_RH_CODE_FORWARD
@@ -73,5 +73,5 @@ int ipv6_ext_rh_process(ipv6_hdr_t *ipv6, ipv6_ext_rh_t *ext);
 }
 #endif
 
-#endif /* IPV6_EXT_RH_H_ */
+#endif /* IPV6_EXT_RH_H */
 /** @} */

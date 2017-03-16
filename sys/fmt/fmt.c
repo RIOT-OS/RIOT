@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#ifdef __WITH_AVRLIBC__
+#if defined(__WITH_AVRLIBC__) || defined(__mips__)
 #include <stdio.h>  /* for fwrite() */
 #else
 /* work around broken sys/posix/unistd.h */
@@ -288,6 +288,13 @@ void print_s32_dec(int32_t val)
     char buf[11];
     size_t len = fmt_s32_dec(buf, val);
     print(buf, len);
+}
+
+void print_byte_hex(uint8_t byte)
+{
+    char buf[2];
+    fmt_byte_hex(buf, byte);
+    print(buf, sizeof(buf));
 }
 
 void print_u32_hex(uint32_t val)

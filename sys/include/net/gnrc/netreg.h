@@ -18,8 +18,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NETREG_H_
-#define NETREG_H_
+#ifndef NETREG_H
+#define NETREG_H
 
 #include <inttypes.h>
 
@@ -37,6 +37,11 @@ extern "C" {
 
 #if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS) || \
     defined(DOXYGEN)
+/**
+ *  @brief  The type of the netreg entry.
+ *
+ *          Different types are availalbe dependent on the used modules.
+ */
 typedef enum {
     GNRC_NETREG_TYPE_DEFAULT = 0,
 #if defined(MODULE_GNRC_NETAPI_MBOX) || defined(DOXYGEN)
@@ -95,7 +100,7 @@ typedef enum {
  *
  * @param[in] demux_ctx The @ref gnrc_netreg_entry_t::demux_ctx "demux context"
  *                      for the netreg entry
- * @param[in] cb        Target callback for the registry entry
+ * @param[in] cbd       Target callback for the registry entry
  *
  * @note    Only available with @ref net_gnrc_netapi_callbacks.
  *
@@ -108,7 +113,7 @@ typedef enum {
 /**
  * @brief   Packet handler callback for netreg entries with callback.
  *
- * @pre `cmd` $\in$ { @ref GNRC_NETAPI_MSG_TYPE_RCV, @ref GNRC_NETAPI_MSG_TYPE_SND }
+ * @pre `cmd` &isin; { @ref GNRC_NETAPI_MSG_TYPE_RCV, @ref GNRC_NETAPI_MSG_TYPE_SND }
  *
  * @note    Only available with @ref net_gnrc_netapi_callbacks.
  *
@@ -237,7 +242,7 @@ static inline void gnrc_netreg_entry_init_mbox(gnrc_netreg_entry_t *entry,
  * @param[out] entry    A netreg entry
  * @param[in] demux_ctx The @ref gnrc_netreg_entry_t::demux_ctx "demux context"
  *                      for the netreg entry
- * @param[in] mbox      Target callback for the registry entry
+ * @param[in] cbd       Target callback for the registry entry
  *
  * @note    Only available with @ref net_gnrc_netapi_callbacks.
  */
@@ -340,5 +345,5 @@ int gnrc_netreg_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr);
 }
 #endif
 
-#endif /* NETREG_H_ */
+#endif /* NETREG_H */
 /** @} */

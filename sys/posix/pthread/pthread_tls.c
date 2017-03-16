@@ -16,9 +16,11 @@
  * @}
  */
 
-#include <malloc.h>
-
 #include "pthread.h"
+
+#ifdef HAVE_MALLOC_H
+#include <malloc.h>
+#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"

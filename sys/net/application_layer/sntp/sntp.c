@@ -71,7 +71,7 @@ int sntp_sync(sock_udp_ep_t *server, uint32_t timeout)
         return result;
     }
     sock_udp_close(&_sntp_sock);
-    _sntp_offset = (byteorder_ntohl(_sntp_packet.transmit.seconds) * SEC_IN_USEC) +
+    _sntp_offset = (byteorder_ntohl(_sntp_packet.transmit.seconds) * US_PER_SEC) +
                    ((byteorder_ntohl(_sntp_packet.transmit.fraction) * 232)
                    / 1000000) - xtimer_now64();
     mutex_unlock(&_sntp_mutex);

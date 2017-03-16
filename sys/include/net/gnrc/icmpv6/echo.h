@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_ICMPV6_ECHO_H_
-#define GNRC_ICMPV6_ECHO_H_
+#ifndef GNRC_ICMPV6_ECHO_H
+#define GNRC_ICMPV6_ECHO_H
 
 #include <inttypes.h>
 
@@ -62,5 +62,5 @@ void gnrc_icmpv6_echo_req_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6_hdr,
 }
 #endif
 
-#endif /* GNRC_ICMPV6_ECHO_H_ */
+#endif /* GNRC_ICMPV6_ECHO_H */
 /** @} */

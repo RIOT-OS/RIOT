@@ -18,7 +18,7 @@
 #include "at86rf2xx.h"
 #include "od.h"
 #include "net/ieee802154.h"
-#include "net/netdev2.h"
+#include "net/netdev.h"
 
 #include "common.h"
 
@@ -26,11 +26,11 @@
 
 static uint8_t buffer[AT86RF2XX_MAX_PKT_LENGTH];
 
-void recv(netdev2_t *dev)
+void recv(netdev_t *dev)
 {
     uint8_t src[IEEE802154_LONG_ADDRESS_LEN], dst[IEEE802154_LONG_ADDRESS_LEN];
     size_t mhr_len, data_len, src_len, dst_len;
-    netdev2_ieee802154_rx_info_t rx_info;
+    netdev_ieee802154_rx_info_t rx_info;
     le_uint16_t src_pan, dst_pan;
 
     putchar('\n');

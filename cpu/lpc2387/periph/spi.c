@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2016 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -13,21 +14,24 @@
  * @file
  * @brief       Low-level SPI driver implementation
  *
+ * This implementation is very basic and only supports a single SPI device with
+ * limited configuration options.
+ *
+ * @todo        This implementation needs a major rework
+ *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
 #include "cpu.h"
 #include "mutex.h"
-#include "periph/gpio.h"
+#include "assert.h"
 #include "periph/spi.h"
-#include "periph_conf.h"
-#include "board.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-
-#if SPI_0_EN
 
 #define SPI_TX_EMPTY                (SSP0SR & SSPSR_TFE)
 #define SPI_BUSY                    (SSP0SR & SSPSR_BSY)
@@ -36,178 +40,94 @@
 /**
  * @brief Array holding one pre-initialized mutex for each SPI device
  */
-static mutex_t locks[] =  {
-#if SPI_0_EN
-    [SPI_0] = MUTEX_INIT,
-#endif
-#if SPI_1_EN
-    [SPI_1] = MUTEX_INIT,
-#endif
-#if SPI_2_EN
-    [SPI_2] = MUTEX_INIT
-#endif
-};
+static mutex_t lock = MUTEX_INIT;
 
-int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
+void spi_init(spi_t bus)
 {
-    (void ) conf;
-    if (dev) {
-        return -1;
-    }
+    assert(bus == SPI_DEV(0));
 
-    uint32_t   f_baud = 0;
-    switch(speed)
-    {
-    case SPI_SPEED_100KHZ:
-        f_baud = 100;
-        break;
-    case SPI_SPEED_400KHZ:
-        f_baud = 400;
-        break;
-    case SPI_SPEED_1MHZ:
-        f_baud = 1000;
-        break;
-    case SPI_SPEED_5MHZ:
-        f_baud = 5000;
-        break;
-    case SPI_SPEED_10MHZ:
-        f_baud = 10000;
-        break;
-    }
-
-#if 0
-    /* TODO */
-    switch(conf)
-    {
-    case SPI_CONF_FIRST_RISING:
-        /**< first data bit is transacted on the first rising SCK edge */
-        cpha = 0;
-        cpol = 0;
-        break;
-    case SPI_CONF_SECOND_RISING:
-        /**< first data bit is transacted on the second rising SCK edge */
-        cpha = 1;
-        cpol = 0;
-        break;
-    case SPI_CONF_FIRST_FALLING:
-        /**< first data bit is transacted on the first falling SCK edge */
-        cpha = 0;
-        cpol = 1;
-        break;
-    case SPI_CONF_SECOND_FALLING:
-        /**< first data bit is transacted on the second falling SCK edge */
-        cpha = 1;
-        cpol = 1;
-        break;
-    }
-#endif
-
-    /* Power*/
-    PCONP |= PCSSP0;                /* Enable power for SSP0 (default is on)*/
-
-    /* PIN Setup*/
-    spi_conf_pins(dev);
-
-    /* Interface Setup*/
+    /* interface setup */
     SSP0CR0 = 7;
+    /* configure pins */
+    spi_init_pins(bus);
+    /*  power off the bus (default is on) */
+    PCONP &= ~(PCSSP0);
+}
 
-    /* Clock Setup*/
+void spi_init_pins(spi_t bus)
+{
+    PINSEL3 |= (BIT8 | BIT9);     /* SCLK */
+    PINSEL3 |= (BIT14 | BIT15);   /* MISO */
+    PINSEL3 |= (BIT16 | BIT17);   /* MOSI */
+}
+
+int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+{
     uint32_t pclksel;
     uint32_t cpsr;
-    lpc2387_pclk_scale(CLOCK_CORECLOCK / 1000, f_baud, &pclksel, &cpsr);
+
+    /* only support for mode 0 at the moment */
+    if (mode != SPI_MODE_0) {
+        return SPI_NOMODE;
+    }
+
+    /* lock bus */
+    mutex_lock(&lock);
+    /*  power on */
+    PCONP |= (PCSSP0);
+
+    /* configure bus clock */
+    lpc2387_pclk_scale(CLOCK_CORECLOCK / 1000, (uint32_t)clk, &pclksel, &cpsr);
     PCLKSEL1 &= ~(BIT10 | BIT11);   /* CCLK to PCLK divider*/
     PCLKSEL1 |= pclksel << 10;
     SSP0CPSR = cpsr;
 
-    /* Enable*/
-    SSP0CR1 |= BIT1;                /* SSP-Enable*/
+    /* enable the bus */
+    SSP0CR1 |= BIT1;
+
+    /* clear RxFIFO */
     int dummy;
+    while (SPI_RX_AVAIL) {         /* while RNE (Receive FIFO Not Empty)...*/
+        dummy = SSP0DR;            /* read data*/
+    }
+    (void) dummy;                  /* to suppress unused-but-set-variable */
 
-    /* Clear RxFIFO:*/
-    while (SPI_RX_AVAIL) {          /* while RNE (Receive FIFO Not Empty)...*/
-        dummy = SSP0DR;             /* read data*/
+    return SPI_OK;
+}
+
+void spi_release(spi_t bus)
+{
+    /* disable, power off, and release the bus */
+    SSP0CR1 &= ~(BIT1);
+    PCONP &= ~(PCSSP0);
+    mutex_unlock(&lock);
+}
+
+void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
+                        const void *out, void *in, size_t len)
+{
+    uint8_t *out_buf = (uint8_t *)out;
+    uint8_t *in_buf = (uint8_t *)in;
+
+    assert(out_buf || in_buf);
+
+    if (cs != SPI_CS_UNDEF) {
+        gpio_clear((gpio_t)cs);
     }
 
-    /* to suppress unused-but-set-variable */
-    (void) dummy;
-    return 0;
-}
-
-int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
-{
-    (void)dev;
-    (void)conf;
-    (void)cb;
-    printf("%s:%s(): stub\n", RIOT_FILE_RELATIVE, __func__);
-    /* TODO */
-    return -1;
-}
-
-void spi_transmission_begin(spi_t dev, char reset_val)
-{
-    (void)dev;
-    (void)reset_val;
-    printf("%s:%s(): stub\n", RIOT_FILE_RELATIVE, __func__);
-    /* TODO*/
-}
-
-int spi_acquire(spi_t dev)
-{
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
-    mutex_lock(&locks[dev]);
-    return 0;
-}
-
-int spi_release(spi_t dev)
-{
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
-    mutex_unlock(&locks[dev]);
-    return 0;
-}
-
-int spi_transfer_byte(spi_t dev, char out, char *in)
-{
-    (void) dev;
-    while (!SPI_TX_EMPTY) {}
-    SSP0DR = out;
-    while (SPI_BUSY) {}
-    while (!SPI_RX_AVAIL) {}
-
-    char tmp = (char)SSP0DR;
-
-    if (in != NULL) {
-        *in = tmp;
+    for (size_t i = 0; i < len; i++) {
+        uint8_t tmp = (out_buf) ? out_buf[i] : 0;
+        while (!SPI_TX_EMPTY) {}
+        SSP0DR = tmp;
+        while (SPI_BUSY) {}
+        while (!SPI_RX_AVAIL) {}
+        tmp = (uint8_t)SSP0DR;
+        if (in_buf) {
+            in_buf[i] = tmp;
+        }
     }
 
-    return 1;
-}
-
-void spi_poweron(spi_t dev)
-{
-    (void) dev;
-}
-
-void spi_poweroff(spi_t dev)
-{
-    (void) dev;
-    (void) dev;
-}
-
-int spi_conf_pins(spi_t dev)
-{
-    switch (dev) {
-        case 0:
-            PINSEL3 |= BIT8 + BIT9;     /* SCLK */
-            PINSEL3 |= BIT14 + BIT15;   /* MISO */
-            PINSEL3 |= BIT16 + BIT17;   /* MOSI */
-            return 0;
-        default:
-            return -1;
+    if ((!cont) && cs != SPI_CS_UNDEF) {
+        gpio_set((gpio_t)cs);
     }
 }
-
-#endif /* SPI_0_EN */

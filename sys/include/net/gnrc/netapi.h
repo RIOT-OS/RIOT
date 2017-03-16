@@ -55,8 +55,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef GNRC_NETAPI_H_
-#define GNRC_NETAPI_H_
+#ifndef GNRC_NETAPI_H
+#define GNRC_NETAPI_H
 
 #include "thread.h"
 #include "net/netopt.h"
@@ -210,7 +210,7 @@ int gnrc_netapi_set(kernel_pid_t pid, netopt_t opt, uint16_t context,
 }
 #endif
 
-#endif /* GNRC_NETAPI_H_ */
+#endif /* GNRC_NETAPI_H */
 /**
  * @}^
  */

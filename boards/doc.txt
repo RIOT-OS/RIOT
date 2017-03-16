@@ -10,7 +10,9 @@
  * @defgroup    boards Boards
  * @brief       Board specific definitions and implementations
  *
- * The boards module contains all definitions and implementations, that are specific to a certain board. Boards
- * generally consist of a fixed configuration of a controller and some external devices as sensors or radios. All
- * aspects concerning pin-configurion, mcu clock and driver configuration should go into this module.
+ * The boards module contains all definitions and implementations, that are
+ * specific to a certain board. Generally, boards consist of a fixed
+ * configuration of a controller and some external devices such as sensors or
+ * radios. All aspects concerning configuration of GPIO pins, MCU clock and
+ * device drivers should go into this module.
  */

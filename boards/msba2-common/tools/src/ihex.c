@@ -120,8 +120,8 @@ int read_intel_hex(const char *filename)
 int
 parse_hex_line(char *line)
 {
-    int addr, code, num;
-    int sum, len, cksum, i;
+    unsigned int addr, code, num;
+    unsigned int sum, len, cksum, i;
     char *ptr;
 
     num = 0;

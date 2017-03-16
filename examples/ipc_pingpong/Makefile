@@ -4,6 +4,8 @@ APPLICATION = ipc_pingpong
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
+BOARD_INSUFFICIENT_MEMORY := nucleo32-f031
+
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 

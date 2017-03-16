@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef LWIP_LWIPOPTS_H_
-#define LWIP_LWIPOPTS_H_
+#ifndef LWIP_LWIPOPTS_H
+#define LWIP_LWIPOPTS_H
 
 #include "thread.h"
 #include "net/gnrc/netif/hdr.h"
@@ -129,7 +129,7 @@ extern "C" {
 #define LWIP_UDPLITE            (0)
 #endif /* MODULE_LWIP_UDPLITE */
 
-#ifdef MODULE_LWIP_CONN
+#if defined(MODULE_LWIP_CONN) || defined(MODULE_LWIP_SOCK)
 #define LWIP_NETCONN            (1)
 #else
 #define LWIP_NETCONN            (0)
@@ -153,5 +153,5 @@ extern "C" {
 }
 #endif
 
-#endif /* LWIP_LWIPOPTS_H_ */
+#endif /* LWIP_LWIPOPTS_H */
 /** @} */

@@ -426,9 +426,9 @@
           stroke-miterlimit: 4;
           stroke-width: 3;
         }
-        #gnrc-detail-netdev2 {
+        #gnrc-detail-netdev {
           fill: none;
-          stroke: url(#outer-gradient-netdev2);
+          stroke: url(#outer-gradient-netdev);
           stroke-linecap: round;
           stroke-linejoin: miter;
           stroke-miterlimit: 4;
@@ -476,7 +476,7 @@
       <stop style="stop-color: #3fa687; stop-opacity: 1;" offset="0.9" />
       <stop style="stop-color: #3fa687; stop-opacity: 1;" offset="1" />
     </linearGradient>
-    <linearGradient id="outer-gradient-netdev2" x1="0%" y1="0%" x2="0%" y2="100%">
+    <linearGradient id="outer-gradient-netdev" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop style="stop-color: #3fa687; stop-opacity: 1;" offset="0" />
       <stop style="stop-color: #3fa687; stop-opacity: 1;" offset="0.1" />
       <stop style="stop-color: #3fa687; stop-opacity: 0;" offset="0.9" />
@@ -494,7 +494,7 @@
   <g id="transformer" transform="scale(0.75)">
     <g id="gnrc-detail" transform="translate(5,0)">
       <rect id="gnrc-detail-conn" x="0" y="0" rx="4" ry="4" width="380" height="30" />
-      <rect id="gnrc-detail-netdev2" x="0" y="360" rx="4" ry="4" width="380" height="30" />
+      <rect id="gnrc-detail-netdev" x="0" y="360" rx="4" ry="4" width="380" height="30" />
       <g id="gnrc-detail-gnrc" transform="translate(0,10)">
         <rect id="sys-net-border" class="outer-stroke" x="0" y="30" rx="4" ry="4"
               width="380" height="310" />
@@ -547,9 +547,9 @@
           <text id="gnrc-ipv6-label" class="modbox-text"
                 x="190" y="192"><tspan>gnrc_ipv6</tspan></text>
         </g>
-        <g id="netapi-ipv6-netdev2">
-          <path id="netapi-ipv6-netdev2-arrow" d="m 97.5,215 0,100" class="outer-stroke-arrow" />
-          <text id="netapi-ipv6-netdev2-label" class="outer-text-netapi"
+        <g id="netapi-ipv6-netdev">
+          <path id="netapi-ipv6-netdev-arrow" d="m 97.5,215 0,100" class="outer-stroke-arrow" />
+          <text id="netapi-ipv6-netdev-label" class="outer-text-netapi"
                 x="104" y="272"><tspan>netapi</tspan></text>
         </g>
         <g id="netapi-ipv6-6lo">
@@ -563,12 +563,12 @@
           <text id="gnrc-6lo-label" class="modbox-text"
                 x="282.5" y="272"><tspan>gnrc_sixlowpan</tspan></text>
         </g>
-        <g id="netapi-6lo-netdev2">
-          <path id="netapi-6lo-netdev2-arrow" d="m 282.5,295 0,20" class="outer-stroke-arrow" />
-          <text id="netapi-6lo-netdev2-label" class="outer-text-netapi"
+        <g id="netapi-6lo-netdev">
+          <path id="netapi-6lo-netdev-arrow" d="m 282.5,295 0,20" class="outer-stroke-arrow" />
+          <text id="netapi-6lo-netdev-label" class="outer-text-netapi"
                 x="289" y="311"><tspan>netapi</tspan></text>
         </g>
-        <g id="gnrc-netdev2-ipv6">
+        <g id="gnrc-netdev-ipv6">
           <rect id="gnrc-udp-box" class="modbox" x="10" y="320" rx="4" ry="4"
                 width="175" height="50" />
           <text id="gnrc-udp-label" class="modbox-text"
@@ -578,7 +578,7 @@
           <rect id="gnrc-6lo-box" class="modbox" x="195" y="320" rx="4" ry="4"
                 width="175" height="50" />
           <text id="gnrc-6lo-label" class="modbox-text"
-                x="282.5" y="352"><tspan>gnrc_netdev2</tspan></text>
+                x="282.5" y="352"><tspan>gnrc_netdev</tspan></text>
         </g>
       </g>
     </g>

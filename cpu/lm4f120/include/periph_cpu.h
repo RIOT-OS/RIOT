@@ -16,8 +16,8 @@
  * @author          Rakendra Thapa <rakendrathapa@gmail.com>
  */
 
-#ifndef PERIPH_CPU_H_
-#define PERIPH_CPU_H_
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include "periph/dev_enums.h"
 #include "cpu_conf.h"
@@ -56,18 +56,6 @@ typedef enum {
 } gpio_mode_t;
 /** @} */
 #endif /* ndef DOXYGEN */
-
-/**
- * @brief   Override values for pull register configuration
- * @{
- */
-#define HAVE_GPIO_PP_T
-typedef enum {
-  GPIO_NOPULL = GPIO_PIN_TYPE_STD,          /**< do not use internal pull resistors */
-  GPIO_PULLUP = GPIO_PIN_TYPE_STD_WPU,	    /**< enable internal pull-up resistor */
-  GPIO_PULLDOWN = GPIO_PIN_TYPE_STD_WPD	    /**< enable internal pull-down resistor */
-} gpio_pp_t;
-/** @} */
 
 /**
  * @brief   Override values for pin direction configuration
@@ -125,5 +113,5 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_CPU_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */

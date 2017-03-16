@@ -17,7 +17,6 @@
 #include "periph/rtc.h"
 #include "VIC.h"
 #include "lpc2387.h"
-#include "lpm.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -164,8 +163,6 @@ void rtc_poweroff(void)
 
 void RTC_IRQHandler(void)
 {
-    lpm_begin_awake();
-
     if (RTC_ILR & ILR_RTSSF) {
         /* sub second interrupt (does not need flag-clearing) */
     }
@@ -179,7 +176,6 @@ void RTC_IRQHandler(void)
             _cb(_cb_arg);
         }
         DEBUG("Ring\n");
-        lpm_end_awake();
     }
 
     VICVectAddr = 0;                        /* Acknowledge Interrupt */

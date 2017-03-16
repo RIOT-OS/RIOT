@@ -25,8 +25,8 @@
 #include <stdbool.h>
 
 #include "net/ieee802154.h"
-#include "net/netdev2.h"
-#include "net/netdev2/ieee802154.h"
+#include "net/netdev.h"
+#include "net/netdev/ieee802154.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -167,10 +167,10 @@ enum {
 /**
  * @brief   Device descriptor for CC2538 transceiver
  *
- * @extends netdev2_ieee802154_t
+ * @extends netdev_ieee802154_t
  */
 typedef struct {
-    netdev2_ieee802154_t netdev;  /**< netdev2 parent struct */
+    netdev_ieee802154_t netdev;   /**< netdev parent struct */
     uint8_t state;                /**< current state of the radio */
 } cc2538_rf_t;
 

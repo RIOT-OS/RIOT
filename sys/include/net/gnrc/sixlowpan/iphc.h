@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_SIXLOWPAN_IPHC_H_
-#define GNRC_SIXLOWPAN_IPHC_H_
+#ifndef GNRC_SIXLOWPAN_IPHC_H
+#define GNRC_SIXLOWPAN_IPHC_H
 
 #include <stdbool.h>
 
@@ -41,6 +41,7 @@ extern "C" {
  * @param[in] datagram_size Size of the full uncompressed IPv6 datagram. May be 0, if @p pkt
  *                          contains the full (unfragmented) IPv6 datagram.
  * @param[in] offset        Offset of the IPHC dispatch in 6LoWPaN frame.
+ * @param[in, out] nh_len   Pointer to next header length
  *
  * @return  length of the HC dispatches + inline values on success.
  * @return  0 on error.
@@ -64,5 +65,5 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt);
 }
 #endif
 
-#endif /* GNRC_SIXLOWPAN_IPHC_H_ */
+#endif /* GNRC_SIXLOWPAN_IPHC_H */
 /** @} */

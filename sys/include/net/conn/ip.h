@@ -18,8 +18,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_CONN_IP_H_
-#define NET_CONN_IP_H_
+#ifndef NET_CONN_IP_H
+#define NET_CONN_IP_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -129,5 +129,5 @@ int conn_ip_sendto(const void *data, size_t len, const void *src, size_t src_len
 }
 #endif
 
-#endif /* NET_CONN_IP_H_ */
+#endif /* NET_CONN_IP_H */
 /** @} */

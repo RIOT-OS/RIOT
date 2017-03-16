@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "net/netdev2.h"
+#include "net/netdev.h"
 #include "shell.h"
 #include "shell_commands.h"
 #include "thread.h"
@@ -37,26 +37,26 @@ static kernel_pid_t _recv_pid;
 at86rf2xx_t devs[AT86RF2XX_NUM];
 
 static const shell_command_t shell_commands[] = {
-    { "ifconfig", "Configure netdev2", ifconfig },
+    { "ifconfig", "Configure netdev", ifconfig },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
     { NULL, NULL, NULL }
 };
 
-static void _event_cb(netdev2_t *dev, netdev2_event_t event)
+static void _event_cb(netdev_t *dev, netdev_event_t event)
 {
-    if (event == NETDEV2_EVENT_ISR) {
+    if (event == NETDEV_EVENT_ISR) {
         msg_t msg;
 
         msg.type = MSG_TYPE_ISR;
         msg.content.ptr = dev;
 
         if (msg_send(&msg, _recv_pid) <= 0) {
-            puts("gnrc_netdev2: possibly lost interrupt.");
+            puts("gnrc_netdev: possibly lost interrupt.");
         }
     }
     else {
         switch (event) {
-            case NETDEV2_EVENT_RX_COMPLETE:
+            case NETDEV_EVENT_RX_COMPLETE:
             {
                 recv(dev);
 
@@ -75,7 +75,7 @@ void *_recv_thread(void *arg)
         msg_t msg;
         msg_receive(&msg);
         if (msg.type == MSG_TYPE_ISR) {
-            netdev2_t *dev = msg.content.ptr;
+            netdev_t *dev = msg.content.ptr;
             dev->driver->isr(dev);
         }
         else {
@@ -91,7 +91,7 @@ int main(void)
 
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
         const at86rf2xx_params_t *p = &at86rf2xx_params[i];
-        netdev2_t *dev = (netdev2_t *)(&devs[i]);
+        netdev_t *dev = (netdev_t *)(&devs[i]);
 
         printf("Initializing AT86RF2xx radio at SPI_%d\n", p->spi);
         at86rf2xx_setup(&devs[i], (at86rf2xx_params_t*) p);

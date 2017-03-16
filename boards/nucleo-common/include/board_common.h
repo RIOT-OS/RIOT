@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    boards_nucleo_common STM Nucleo Common
- * @ingroup     drivers_periph
+ * @ingroup     boards
  * @brief       Common files for STM Nucleo boards
  * @{
  *
@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BOARD_COMMON__H
-#define BOARD_COMMON__H
+#ifndef BOARD_COMMON_H
+#define BOARD_COMMON_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -36,20 +36,9 @@ extern "C" {
 
 #define LED0_MASK           (1 << 5)
 
-#if defined(CPU_FAM_STM32F4)
-#define LED_CREG            BSRRH
-#else
-#define LED_CREG            BRR
-#endif
-#if defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L1)
-#define LED_SREG            BSRRL
-#else
-#define LED_SREG            BSRR
-#endif
-
-#define LED0_ON             (GPIOA->LED_SREG = LED0_MASK)
-#define LED0_OFF            (GPIOA->LED_CREG = LED0_MASK)
-#define LED0_TOGGLE         (GPIOA->ODR     ^= LED0_MASK)
+#define LED0_ON             (GPIOA->BSRR = LED0_MASK)
+#define LED0_OFF            (GPIOA->BSRR = (LED0_MASK << 16))
+#define LED0_TOGGLE         (GPIOA->ODR  ^= LED0_MASK)
 /** @} */
 
 /**
@@ -66,5 +55,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* BOARD_COMMON__H */
+#endif /* BOARD_COMMON_H */
 /** @} */

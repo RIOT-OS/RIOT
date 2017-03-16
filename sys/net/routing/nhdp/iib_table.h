@@ -16,8 +16,8 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
-#ifndef IIB_TABLE_H_
-#define IIB_TABLE_H_
+#ifndef IIB_TABLE_H
+#define IIB_TABLE_H
 
 #include "timex.h"
 #include "kernel_types.h"
@@ -185,5 +185,5 @@ void iib_process_metric_refresh(void);
 }
 #endif
 
-#endif /* IIB_TABLE_H_ */
+#endif /* IIB_TABLE_H */
 /** @} */

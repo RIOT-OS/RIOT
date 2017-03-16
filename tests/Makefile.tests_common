@@ -1,3 +1,7 @@
+ifneq (,$(filter driver_%,$(APPLICATION)))
+    BOARD ?= samr21-xpro
+endif
 BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 QUIET ?= 1
+APPLICATION := tests_$(APPLICATION)

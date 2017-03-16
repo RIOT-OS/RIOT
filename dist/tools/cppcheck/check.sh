@@ -17,8 +17,8 @@ else
 fi
 
 BRANCH=${1}
-FILEREGEX='\.([sScHh]|cpp)$'
-EXCLUDE='^(cpu/saml21/include/atmel/)|^(cpu/cortexm_common/include/)'
+FILEREGEX='\.([CcHhSs]|[ch]pp)$'
+EXCLUDE='^(.+/include/vendor/)'
 
 # If no branch but an option is given, unset BRANCH.
 # Otherwise, consume this parameter.

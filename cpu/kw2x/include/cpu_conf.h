@@ -18,7 +18,7 @@
  * @file
  * @brief           Implementation specific CPU configuration options
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Johann Fischer <j.fischer@phytec.de>
  */
 
@@ -28,11 +28,11 @@
 #include "cpu_conf_common.h"
 
 #ifdef CPU_MODEL_KW21D256
-#include "MKW22D5.h"
+#include "vendor/MKW22D5.h"
 #elif CPU_MODEL_KW21D512
-#include "MKW22D5.h"
+#include "vendor/MKW22D5.h"
 #elif CPU_MODEL_KW22D512
-#include "MKW22D5.h"
+#include "vendor/MKW22D5.h"
 #else
 #error "undefined CPU_MODEL"
 #endif

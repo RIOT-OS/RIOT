@@ -55,7 +55,7 @@ public:
      *
      * @param[in] dev       RIOT UART device
      */
-    SerialPort(uart_t dev);
+    explicit SerialPort(uart_t dev);
 
     /**
      * @brief   Get the number of bytes (characters) available for reading from
@@ -84,7 +84,7 @@ public:
      *
      * @param[in] speed     speed in bits per second (baud)
      */
-    void begin(int speed);
+    void begin(long speed);
 
     /**
      * @brief   Disables serial communication, allowing the RX and TX pins to be

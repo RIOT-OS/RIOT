@@ -15,8 +15,8 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef TESTS_SIXLOWPAN_CTX_H_
-#define TESTS_SIXLOWPAN_CTX_H_
+#ifndef TESTS_SIXLOWPAN_CTX_H
+#define TESTS_SIXLOWPAN_CTX_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_sixlowpan_ctx(void);
 }
 #endif
 
-#endif /* TESTS_SIXLOWPAN_CTX_H_ */
+#endif /* TESTS_SIXLOWPAN_CTX_H */
 /** @} */

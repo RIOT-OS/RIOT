@@ -1,1 +1,1 @@
-INCLUDES += -I$(BINDIRBASE)/pkg/$(BOARD)/relic/include
+INCLUDES += -I$(PKGDIRBASE)/relic/include

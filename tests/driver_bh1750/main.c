@@ -24,13 +24,13 @@
 #include "bh1750fvi.h"
 #include "bh1750fvi_params.h"
 
-#define RATE        (200LU * MS_IN_USEC)      /* 200ms */
+#define RATE        (200LU * US_PER_MS)      /* 200ms */
 
 int main(void)
 {
     int res;
     bh1750fvi_t dev;
-    uint32_t last = xtimer_now();
+    xtimer_ticks32_t last = xtimer_now();
 
     puts("BH1750FVI ambient light sensor test\n");
 

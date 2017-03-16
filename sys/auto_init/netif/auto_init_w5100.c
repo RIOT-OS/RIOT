@@ -19,13 +19,11 @@
 
 #ifdef MODULE_W5100
 
+#include "log.h"
 #include "w5100.h"
 #include "w5100_params.h"
-#include "net/gnrc/netdev2.h"
-#include "net/gnrc/netdev2/eth.h"
-
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
+#include "net/gnrc/netdev.h"
+#include "net/gnrc/netdev/eth.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
@@ -45,26 +43,27 @@
  * @{
  */
 static w5100_t dev[W5100_NUM];
-static gnrc_netdev2_t gnrc_adpt[W5100_NUM];
+static gnrc_netdev_t gnrc_adpt[W5100_NUM];
 /** @} */
 
 /**
  * @brief   Stacks for the MAC layer threads
  */
-static char stack[MAC_STACKSIZE][W5100_NUM];
+static char stack[W5100_NUM][MAC_STACKSIZE];
 
 
 void auto_init_w5100(void)
 {
-    for (int i = 0; i < W5100_NUM; i++) {
-        DEBUG("auto_init_w5100(): initializing device [%i]...\n", i);
-        /* setup netdev2 device */
+    for (unsigned i = 0; i < W5100_NUM; i++) {
+        LOG_DEBUG("[auto_init_netif] initializing w5100 #%u\n", i);
+
+        /* setup netdev device */
         w5100_setup(&dev[i], &w5100_params[i]);
-        /* initialize netdev2 <-> gnrc adapter state */
-        gnrc_netdev2_eth_init(&gnrc_adpt[i], (netdev2_t *)&dev[i]);
-        /* start gnrc netdev2 thread */
-        gnrc_netdev2_init(stack[i], MAC_STACKSIZE, MAC_PRIO,
-                          "gnrc_w5100", &gnrc_adpt[i]);
+        /* initialize netdev <-> gnrc adapter state */
+        gnrc_netdev_eth_init(&gnrc_adpt[i], (netdev_t *)&dev[i]);
+        /* start gnrc netdev thread */
+        gnrc_netdev_init(stack[i], MAC_STACKSIZE, MAC_PRIO,
+                         "gnrc_w5100", &gnrc_adpt[i]);
     }
 }
 

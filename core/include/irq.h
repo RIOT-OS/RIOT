@@ -18,8 +18,8 @@
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  */
 
-#ifndef IRQ_H_
-#define IRQ_H_
+#ifndef IRQ_H
+#define IRQ_H
 
 #include <stdbool.h>
 #include "arch/irq_arch.h"
@@ -71,5 +71,5 @@ int irq_is_in(void);
 }
 #endif
 
-#endif /* IRQ_H_ */
+#endif /* IRQ_H */
 /** @} */

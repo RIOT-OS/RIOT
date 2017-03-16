@@ -16,8 +16,8 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
-#ifndef NHDP_ADDRESS_H_
-#define NHDP_ADDRESS_H_
+#ifndef NHDP_ADDRESS_H
+#define NHDP_ADDRESS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -138,5 +138,5 @@ nhdp_addr_t *nhdp_get_addr_db_head(void);
 }
 #endif
 
-#endif /* NHDP_ADDRESS_H_ */
+#endif /* NHDP_ADDRESS_H */
 /** @} */

@@ -13,8 +13,8 @@
  *
  * @author Janos Kutscherauer <noshky@gmail.com>
  */
-#ifndef EMBUNIT_COLORTEXTCOLORS_H_
-#define EMBUNIT_COLORTEXTCOLORS_H_
+#ifndef EMBUNIT_COLORTEXTCOLORS_H
+#define EMBUNIT_COLORTEXTCOLORS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,5 +53,5 @@ extern "C" {
 }
 #endif
 
-#endif/* EMBUNIT_COLORTEXTCOLORS_H_ */
+#endif/* EMBUNIT_COLORTEXTCOLORS_H */
 /** @} */

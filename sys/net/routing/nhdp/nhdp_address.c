@@ -89,15 +89,13 @@ void nhdp_decrement_addr_usage(nhdp_addr_t *addr)
     /* Decrement usage count and delete address if no longer used */
     if (addr) {
         addr->usg_count--;
-
-        if (addr->usg_count <= 0) {
+        if (addr->usg_count == 0) {
             /* Free address space if address is no longer used */
             LL_DELETE(nhdp_addr_db_head, addr);
             free(addr->addr);
             free(addr);
         }
     }
-
     mutex_unlock(&mtx_addr_access);
 }
 

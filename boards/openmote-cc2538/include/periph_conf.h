@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "cc2538_gpio.h"
 #include "periph_cpu.h"
@@ -30,7 +30,7 @@
  * @name Clock system configuration
  * @{
  */
-#define CLOCK_CORECLOCK     (32000000U)         /* desired core clock frequency, 32MHz */
+#define CLOCK_CORECLOCK     (32000000U)     /* desired core clock frequency, 32MHz */
 /** @} */
 
 /**
@@ -105,13 +105,25 @@ static const i2c_conf_t i2c_config[I2C_NUMOF] = {
 /** @} */
 
 /**
+ * @brief   Pre-calculated clock divider values based on a CLOCK_CORECLOCK (32MHz)
+ *
+ * Calculated with (CPSR * (SCR + 1)) = (CLOCK_CORECLOCK / bus_freq), where
+ * 1 < CPSR < 255 and
+ * 0 < SCR  < 256
+ */
+static const spi_clk_conf_t spi_clk_config[] = {
+    { .cpsr = 10, .scr = 31 },  /* 100khz */
+    { .cpsr =  2, .scr = 39 },  /* 400khz */
+    { .cpsr =  2, .scr = 15 },  /* 1MHz */
+    { .cpsr =  2, .scr =  2 },  /* ~4.5MHz */
+    { .cpsr =  2, .scr =  1 }   /* ~10.7MHz */
+};
+
+/**
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF           1
-#define SPI_0_EN            1
-
-static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
+static const spi_conf_t spi_config[] = {
     {
         .dev      = SSI0,
         .mosi_pin = GPIO_PA5,
@@ -121,80 +133,7 @@ static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
     },
 };
 
-/** @} */
-
-/**
- * @name GPIO configuration
- * @{
- */
-#define GPIO_IRQ_PRIO       1
-
-#define GPIO_0_EN           1
-#define GPIO_1_EN           1
-#define GPIO_2_EN           1
-#define GPIO_3_EN           1
-#define GPIO_4_EN           1
-#define GPIO_5_EN           1
-#define GPIO_6_EN           1
-#define GPIO_7_EN           1
-#define GPIO_8_EN           1
-#define GPIO_9_EN           1
-#define GPIO_10_EN          1
-#define GPIO_11_EN          1
-#define GPIO_12_EN          1
-#define GPIO_13_EN          1
-#define GPIO_14_EN          1
-#define GPIO_15_EN          1
-#define GPIO_16_EN          1
-#define GPIO_17_EN          1
-#define GPIO_18_EN          1
-#define GPIO_19_EN          1
-#define GPIO_20_EN          1
-#define GPIO_21_EN          1
-#define GPIO_22_EN          1
-#define GPIO_23_EN          1
-#define GPIO_24_EN          1
-#define GPIO_25_EN          1
-#define GPIO_26_EN          1
-#define GPIO_27_EN          1
-#define GPIO_28_EN          1
-#define GPIO_29_EN          1
-#define GPIO_30_EN          1
-#define GPIO_31_EN          1
-
-/* GPIO channel configuration */
-#define GPIO_0_PIN          GPIO_PA0
-#define GPIO_1_PIN          GPIO_PA1
-#define GPIO_2_PIN          GPIO_PA2
-#define GPIO_3_PIN          GPIO_PA3
-#define GPIO_4_PIN          GPIO_PA4
-#define GPIO_5_PIN          GPIO_PA5
-#define GPIO_6_PIN          GPIO_PA6
-#define GPIO_7_PIN          GPIO_PA7
-#define GPIO_8_PIN          GPIO_PB0
-#define GPIO_9_PIN          GPIO_PB1
-#define GPIO_10_PIN         GPIO_PB2
-#define GPIO_11_PIN         GPIO_PB3
-#define GPIO_12_PIN         GPIO_PB4
-#define GPIO_13_PIN         GPIO_PB5
-#define GPIO_14_PIN         GPIO_PB6
-#define GPIO_15_PIN         GPIO_PB7
-#define GPIO_16_PIN         GPIO_PC0
-#define GPIO_17_PIN         GPIO_PC1
-#define GPIO_18_PIN         GPIO_PC2
-#define GPIO_19_PIN         GPIO_PC3
-#define GPIO_20_PIN         GPIO_PC4
-#define GPIO_21_PIN         GPIO_PC5
-#define GPIO_22_PIN         GPIO_PC6
-#define GPIO_23_PIN         GPIO_PC7
-#define GPIO_24_PIN         GPIO_PD0
-#define GPIO_25_PIN         GPIO_PD1
-#define GPIO_26_PIN         GPIO_PD2
-#define GPIO_27_PIN         GPIO_PD3
-#define GPIO_28_PIN         GPIO_PD4
-#define GPIO_29_PIN         GPIO_PD5
-#define GPIO_30_PIN         GPIO_PD6
-#define GPIO_31_PIN         GPIO_PD7
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**
@@ -208,5 +147,5 @@ static const periph_spi_conf_t spi_config[SPI_NUMOF] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

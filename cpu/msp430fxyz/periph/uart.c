@@ -38,8 +38,9 @@ static int init_base(uart_t uart, uint32_t baudrate);
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
-    if (init_base(uart, baudrate) < 0) {
-        return -1;
+    int res = init_base(uart, baudrate);
+    if (res != UART_OK) {
+        return res;
     }
 
     /* save interrupt context */
@@ -50,13 +51,13 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     UART_IF &= ~(UART_IE_RX_BIT);
     UART_IF |=  (UART_IE_TX_BIT);
     UART_IE |=  (UART_IE_RX_BIT);
-    return 0;
+    return UART_OK;
 }
 
 static int init_base(uart_t uart, uint32_t baudrate)
 {
     if (uart != 0) {
-        return -1;
+        return UART_NODEV;
     }
 
     /* get the default UART for now -> TODO: enable for multiple devices */
@@ -85,7 +86,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     uart_poweron(uart);
     /* and finally release the software reset bit */
     dev->CTL &= ~(USART_CTL_SWRST);
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)

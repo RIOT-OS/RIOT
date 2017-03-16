@@ -61,6 +61,7 @@ extern "C" {
 typedef void (*_native_callback_t)(void);
 
 /**
+ * @cond INTERNAL
  * internal functions
  */
 void native_cpu_init(void);
@@ -158,6 +159,10 @@ extern const char *_native_unix_socket_path;
 ssize_t _native_read(int fd, void *buf, size_t count);
 ssize_t _native_write(int fd, const void *buf, size_t count);
 ssize_t _native_writev(int fildes, const struct iovec *iov, int iovcnt);
+
+/**
+ * @endcond
+ */
 
 /**
  * register interrupt handler handler for interrupt sig

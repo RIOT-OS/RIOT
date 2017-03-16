@@ -1,9 +1,0 @@
-INCLUDES += -I$(RIOTCPU)/msp430-common/include/
-
-export UNDEF += $(BINDIR)/msp430_common/startup.o
-export USEMODULE += msp430_common
-
-DEFAULT_MODULE += oneway_malloc
-
-# include the msp430 common Makefile
-include $(RIOTCPU)/Makefile.include.msp430_common

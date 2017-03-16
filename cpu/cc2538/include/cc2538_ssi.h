@@ -77,6 +77,46 @@ typedef struct {
 #define SSI0 ( (cc2538_ssi_t*)0x40008000 ) /**< SSI0 Instance */
 #define SSI1 ( (cc2538_ssi_t*)0x40009000 ) /**< SSI1 Instance */
 
+/**
+ * @brief   Define CR0 register bitfields
+ * @{
+ */
+#define SSI_CR0_DSS(x)          ((x - 1) << 0)
+#define SSI_CR0_SPO             (1 << 6)
+#define SSI_CR0_SPH             (1 << 7)
+/** @} */
+
+/**
+ * @brief   Define CR1 register bitfields
+ * @{
+ */
+#define SSI_CR1_LBM             (1 << 0)
+#define SSI_CR1_SSE             (1 << 1)
+#define SSI_CR1_MS              (1 << 2)
+#define SSI_CR1_SOD             (1 << 3)
+/** @} */
+
+/**
+ * @brief   Define SR register bitfields
+ * @{
+ */
+#define SSI_SR_TFE              (1 << 0)
+#define SSI_SR_TNF              (1 << 1)
+#define SSI_SR_RNE              (1 << 2)
+#define SSI_SR_RFF              (1 << 3)
+#define SSI_SR_BSY              (1 << 4)
+/** @} */
+
+/**
+ * @brief   Define CC register bitfields
+ * @{
+ */
+#define SSI_SS_PIOSC            (1 << 0)
+#define SSI_SS_DSEN             (1 << 2)
+#define SSI_SS_SYSDIV           (0)
+#define SSI_SS_IODIV            (SSI_SS_PIOSC)
+/** @} */
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

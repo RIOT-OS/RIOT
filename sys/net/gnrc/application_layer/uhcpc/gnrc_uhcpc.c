@@ -13,7 +13,7 @@
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif.h"
 #include "net/ipv6/addr.h"
-#include "net/netdev2.h"
+#include "net/netdev.h"
 #include "net/netopt.h"
 
 #include "net/uhcp.h"

@@ -27,8 +27,6 @@
 #include "periph/timer.h"
 #include "periph_conf.h"
 
-#include "sched.h"
-#include "thread.h"
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
@@ -37,6 +35,8 @@
  */
 static timer_isr_ctx_t config[TIMER_NUMOF];
 
+/* enable timer interrupts */
+static inline void _irq_enable(tim_t dev);
 
 /**
  * @brief Setup the given timer
@@ -122,7 +122,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     config[dev].arg = arg;
 
     /* enable interrupts for given timer */
-    timer_irq_enable(dev);
+    _irq_enable(dev);
 
     timer_start(dev);
 
@@ -290,7 +290,7 @@ void timer_start(tim_t dev)
     }
 }
 
-void timer_irq_enable(tim_t dev)
+static inline void _irq_enable(tim_t dev)
 {
     switch (dev) {
 #if TIMER_0_EN
@@ -301,24 +301,6 @@ void timer_irq_enable(tim_t dev)
 #if TIMER_1_EN
         case TIMER_1:
             NVIC_EnableIRQ(TC4_IRQn);
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
-void timer_irq_disable(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            NVIC_DisableIRQ(TC3_IRQn);
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            NVIC_DisableIRQ(TC4_IRQn);
             break;
 #endif
         case TIMER_UNDEFINED:
@@ -344,9 +326,7 @@ void TIMER_0_ISR(void)
         }
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif /* TIMER_0_EN */
 
@@ -367,11 +347,8 @@ void TIMER_1_ISR(void)
             TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
             config[TIMER_1].cb(config[TIMER_1].arg, 1);
         }
-
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif /* TIMER_1_EN */

@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_lpd8808 LPD8808 based LED Strip
- * @ingroup     drivers
+ * @ingroup     drivers_actuators
  * @brief       Driver for LPD8808 based LED strips
  *
  * LPD8808 based LED strips consist of a number of LEDs driven by LPD8808 chips.

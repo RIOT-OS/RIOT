@@ -24,8 +24,6 @@
 #include "periph/gpio.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
-#include "thread.h"
-#include "sched.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -85,7 +83,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     }
 
     /* enable the clock for the selected port */
-    RCC->APB2ENR |= (RCC_APB2ENR_IOPAEN << _port_num(pin));
+    periph_clk_en(APB2, (RCC_APB2ENR_IOPAEN << _port_num(pin)));
 
     /* set pin mode */
     port->CR[pin_num >> 3] &= ~(0xf << ((pin_num & 0x7) * 4));
@@ -110,7 +108,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     exti_ctx[pin_num].cb = cb;
     exti_ctx[pin_num].arg = arg;
     /* enable alternate function clock for the GPIO module */
-    RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+    periph_clk_en(APB2, RCC_APB2ENR_AFIOEN);
     /* configure the EXTI channel */
     AFIO->EXTICR[pin_num >> 2] &= ~(0xf << ((pin_num & 0x3) * 4));
     AFIO->EXTICR[pin_num >> 2] |=  (_port_num(pin) << ((pin_num & 0x3) * 4));
@@ -136,13 +134,13 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_init_af(gpio_t pin, gpio_af_out_t af)
+void gpio_init_af(gpio_t pin, gpio_af_t af)
 {
     int pin_num = _pin_num(pin);
     GPIO_TypeDef *port = _port(pin);
 
     /* enable the clock for the selected port */
-    RCC->APB2ENR |= (RCC_APB2ENR_IOPAEN << _port_num(pin));
+    periph_clk_en(APB2, (RCC_APB2ENR_IOPAEN << _port_num(pin)));
     /* configure the pin */
     port->CR[pin_num >> 3] &= ~(0xf << ((pin_num & 0x7) * 4));
     port->CR[pin_num >> 3] |=  (af << ((pin_num & 0x7) * 4));
@@ -151,7 +149,7 @@ void gpio_init_af(gpio_t pin, gpio_af_out_t af)
 void gpio_init_analog(gpio_t pin)
 {
     /* enable the GPIO port RCC */
-    RCC->APB2ENR |= (RCC_APB2ENR_IOPAEN << _port_num(pin));
+    periph_clk_en(APB2, (RCC_APB2ENR_IOPAEN << _port_num(pin)));
 
     /* map the pin as analog input */
     int pin_num = _pin_num(pin);
@@ -223,7 +221,5 @@ void isr_exti(void)
             exti_ctx[i].cb(exti_ctx[i].arg);
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BOARD_COMMON_H_
-#define BOARD_COMMON_H_
+#ifndef BOARD_COMMON_H
+#define BOARD_COMMON_H
 
 #include "cpu.h"
 
@@ -61,5 +61,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD-CONF_H */
+#endif /* BOARD_COMMON_H */
 /** @} */

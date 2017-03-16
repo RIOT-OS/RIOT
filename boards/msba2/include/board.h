@@ -18,8 +18,8 @@
  * @author      unknown
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "msba2_common.h"
 #include "bitarithm.h"
@@ -64,5 +64,5 @@ void init_clks1(void);
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

@@ -18,8 +18,8 @@
  * @author      Antonio Lignan <alinan@zolertia.com>
  */
 
-#ifndef FANCY_LEDS_H_
-#define FANCY_LEDS_H_
+#ifndef FANCY_LEDS_H
+#define FANCY_LEDS_H
 
 #include "board_common.h"
 
@@ -42,11 +42,11 @@
     j = k > 400 ? 800 - k : k;                \
     led##_ON;                                 \
     for(i = 0; i < j; ++i) {                  \
-      asm("nop");                             \
+      __asm__("nop");                             \
     }                                         \
     led##_OFF;                                \
     for(i = 0; i < 400 - j; ++i) {            \
-      asm("nop");                             \
+      __asm__("nop");                             \
     }                                         \
   }
 
@@ -63,5 +63,5 @@
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-#endif /* FANCY_LEDS_H_ */
+#endif /* FANCY_LEDS_H */
 /** @} */

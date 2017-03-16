@@ -65,22 +65,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   MMA8653 accelerometer configuration
- * @{
- */
-#define MMA8653_PARAM_I2C           I2C_0,
-#define MMA8653_PARAM_ADDR          0x1d
-/** @} */
-
-/**
- * @brief   MAG3110 magnetometer configuration
- * @{
- */
-#define MAG3110_PARAM_I2C           I2C_0,
-#define MAG3110_PARAM_ADDR          0x0e
-/** @} */
-
-/**
  * @brief   Initialize the board, also triggers the CPU initialization
  */
 void board_init(void);

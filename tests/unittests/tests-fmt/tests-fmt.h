@@ -15,8 +15,8 @@
  *
  * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
  */
-#ifndef TESTS_FMT_H_
-#define TESTS_FMT_H_
+#ifndef TESTS_FMT_H
+#define TESTS_FMT_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_fmt(void);
 }
 #endif
 
-#endif /* TESTS_FMT_H_ */
+#endif /* TESTS_FMT_H */
 /** @} */

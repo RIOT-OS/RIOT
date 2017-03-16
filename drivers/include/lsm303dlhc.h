@@ -31,9 +31,11 @@ extern "C" {
 
 /**
  * @brief The sensors default I2C address
+ * @{
  */
 #define LSM303DLHC_ACC_DEFAULT_ADDRESS        (0x19)
 #define LSM303DLHC_MAG_DEFAULT_ADDRESS        (0x1e)
+/** @} */
 
 /**
  * @brief Possible accelerometer sample rates
@@ -92,9 +94,9 @@ typedef enum {
  * @brief 3d data container
  */
 typedef struct {
-    int16_t x_axis;
-    int16_t y_axis;
-    int16_t z_axis;
+    int16_t x_axis;     /**< holds the x axis value. WOW! */
+    int16_t y_axis;     /**< holds the y axis value. Not kidding. */
+    int16_t z_axis;     /**< surprise, holds the z axis value */
 } lsm303dlhc_3d_data_t;
 
 /**

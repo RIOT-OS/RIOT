@@ -23,7 +23,7 @@
 #include "timex.h"
 #include "microbit.h"
 
-#define DELAY           (120 * MS_IN_USEC)
+#define DELAY           (120 * US_PER_MS)
 
 int main(void)
 {

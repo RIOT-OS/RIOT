@@ -86,7 +86,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name   UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)
@@ -97,7 +97,23 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   I2C (TWI) configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev     = NRF_TWI0,
+        .pin_scl = 0,
+        .pin_sda = 30,
+        .ppi     = 0
+    }
+};
+
+#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+/** @} */
+
+/**
+ * @name   ADC configuration
  *
  * The configuration consists simply of a list of channels that should be used
  * @{

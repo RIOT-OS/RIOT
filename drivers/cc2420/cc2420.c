@@ -20,7 +20,7 @@
  * @}
  */
 
-#include "periph/cpuid.h"
+#include "luid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/gnrc.h"
@@ -32,36 +32,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/**
- * @todo    Move this function to a global module
- */
-#if CPUID_ID_LEN
-static void addr_from_cpuid(uint8_t *addr)
-{
-    /* option 1: generate addresses from CPUID */
-    uint8_t cpuid[CPUID_ID_LEN];
-
-    cpuid_get(cpuid);
-    memcpy(addr, cpuid, 8);
-
-#if CPUID_ID_LEN < 8
-    /* in case CPUID_ID_LEN < 8, fill missing bytes with zeros */
-    for (int i = CPUID_ID_LEN; i < 8; i++) {
-        addr_long[i] = 0;
-    }
-#else
-    /* in case CPUID_ID_LEN > 8, XOR those bytes on top of the first 8 */
-    for (int i = 8; i < CPUID_ID_LEN; i++) {
-        addr_long[i & 0x07] ^= cpuid[i];
-    }
-#endif
-
-    /* make sure we mark the address as non-multicast and not globally unique */
-    addr_long[0] &= ~(0x01);
-    addr_long[0] |= 0x02;
-}
-#endif
-
 
 void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params)
 {
@@ -72,22 +42,22 @@ void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params)
     dev->state = CC2420_STATE_IDLE;
     /* reset device descriptor fields */
     dev->options = 0;
-    spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING, dev->params.spi_clk);
 }
 
 int cc2420_init(cc2420_t *dev)
 {
     uint16_t reg;
-    uint8_t addr[8] = CC2420_ADDR_FALLBACK;
+    uint8_t addr[8];
 
     /* reset options and sequence number */
     dev->netdev.seq = 0;
     dev->netdev.flags = 0;
 
     /* set default address, channel, PAN ID, and TX power */
-#if CPUID_ID_LEN
-    addr_from_cpuid(addr);
-#endif
+    luid_get(addr, sizeof(addr));
+    /* make sure we mark the address as non-multicast and not globally unique */
+    addr[0] &= ~(0x01);
+    addr[0] |= 0x02;
     cc2420_set_addr_short(dev, &addr[6]);
     cc2420_set_addr_long(dev, addr);
     cc2420_set_pan(dev, CC2420_PANID_DEFAULT);
@@ -160,6 +130,7 @@ size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, unsigned count
     size_t pkt_len = 2;     /* include the FCS (frame check sequence) */
 
     /* wait for any ongoing transmissions to be finished */
+    DEBUG("cc2420: tx_exec: waiting for any ongoing transmission\n");
     while (cc2420_get_state(dev) & NETOPT_STATE_TX) {}
 
     /* get and check the length of the packet */
@@ -186,13 +157,10 @@ size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, unsigned count
 
 void cc2420_tx_exec(cc2420_t *dev)
 {
-    /* make sure, any ongoing transmission is finished */
-    DEBUG("cc2420: tx_exec: waiting for any ongoing transmission\n");
-    while (cc2420_get_state(dev) & NETOPT_STATE_TX) {}
     /* trigger the transmission */
     if (dev->options & CC2420_OPT_TELL_TX_START) {
         dev->netdev.netdev.event_callback(&dev->netdev.netdev,
-                                          NETDEV2_EVENT_TX_STARTED);
+                                          NETDEV_EVENT_TX_STARTED);
     }
     DEBUG("cc2420: tx_exec: TX_START\n");
     if (dev->options & CC2420_OPT_CSMA) {
@@ -203,15 +171,6 @@ void cc2420_tx_exec(cc2420_t *dev)
         DEBUG("cc2420: tx_exec: triggering TX without CCA\n");
         cc2420_strobe(dev, CC2420_STROBE_TXON);
     }
-
-    while (gpio_read(dev->params.pin_sfd)) {
-        puts("\t...ongoing}");
-    }
-    if (dev->options & CC2420_OPT_TELL_TX_END) {
-        dev->netdev.netdev.event_callback(&dev->netdev.netdev,
-                                          NETDEV2_EVENT_TX_COMPLETE);
-    }
-    DEBUG("cc2420: tx_exec: TX_DONE\n");
 }
 
 int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)

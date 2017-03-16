@@ -30,7 +30,7 @@
 #include "timex.h"
 #include "periph/pwm.h"
 
-#define INTERVAL    (10LU * MS_IN_USEC) /* 10 ms */
+#define INTERVAL    (10LU * US_PER_MS) /* 10 ms */
 #define STEP        (10)
 
 #define MODE        PWM_LEFT
@@ -42,7 +42,7 @@ int main(void)
 {
     int state = 0;
     int step = STEP;
-    uint32_t last_wakeup = xtimer_now();
+    xtimer_ticks32_t last_wakeup = xtimer_now();
 
     puts("\nRIOT PWM test");
     puts("Connect an LED or scope to PWM pins to see something\n");

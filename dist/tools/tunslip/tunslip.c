@@ -31,6 +31,10 @@
  *
  */
 
+/* for cfmakeraw on Linux */
+#define _BSD_SOURCE 1
+#define _DEFAULT_SOURCE 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -504,7 +508,7 @@ serial_to_tun(FILE *inslip, int outfd)
     int ret;
     unsigned char c;
 
-#ifdef linux
+#ifdef __linux__
     ret = fread(&c, 1, 1, inslip);
 
     if (ret == -1 || ret == 0) {
@@ -521,7 +525,7 @@ read_more:
     }
 
     ret = fread(&c, 1, 1, inslip);
-#ifdef linux
+#ifdef __linux__
 after_fread:
 #endif
 
@@ -558,7 +562,7 @@ after_fread:
 
                     /* New address. */
                     if (ipa.s_addr != 0) {
-#ifdef linux
+#ifdef __linux__
                         ssystem("route delete -net %s netmask %s dev %s",
                                 inet_ntoa(ipa), "255.255.255.255", tundev);
 #else
@@ -570,7 +574,7 @@ after_fread:
                     memcpy(&ipa, &uip.inbuf[4], sizeof(ipa));
 
                     if (ipa.s_addr != 0) {
-#ifdef linux
+#ifdef __linux__
                         ssystem("route add -net %s netmask %s dev %s",
                                 inet_ntoa(ipa), "255.255.255.255", tundev);
 #else
@@ -849,7 +853,7 @@ devopen(const char *dev, int flags)
     return open(t, flags);
 }
 
-#ifdef linux
+#ifdef __linux__
 #include <linux/if.h>
 #include <linux/if_tun.h>
 
@@ -899,7 +903,7 @@ void
 cleanup(void)
 {
     ssystem("ifconfig %s down", tundev);
-#ifndef linux
+#ifndef __linux__
     ssystem("sysctl -w net.inet.ip.forwarding=0");
 #endif
     /* ssystem("arp -d %s", ipaddr); */
@@ -928,7 +932,7 @@ sigalarm(int signo)
 void
 sigalarm_reset()
 {
-#ifdef linux
+#ifdef __linux__
 #define TIMEOUT (997*1000)
 #else
 #define TIMEOUT (2451*1000)
@@ -943,7 +947,7 @@ ifconf(const char *tundev, const char *ipaddr, const char *netmask)
     struct in_addr netname;
     netname.s_addr = inet_addr(ipaddr) & inet_addr(netmask);
 
-#ifdef linux
+#ifdef __linux__
     ssystem("ifconfig %s inet `hostname` up", tundev);
 
     if (strcmp(ipaddr, "0.0.0.0") != 0) {
@@ -1085,7 +1089,7 @@ main(int argc, char **argv)
             err(1, "illegal dhcp-server address");
         }
 
-#ifndef linux
+#ifndef __linux__
         dhaddr.sin_len = sizeof(dhaddr);
 #endif
         dhaddr.sin_family = AF_INET;
@@ -1099,7 +1103,7 @@ main(int argc, char **argv)
         }
 
         memset(&myaddr, 0x0, sizeof(myaddr));
-#ifndef linux
+#ifndef __linux__
         myaddr.sin_len = sizeof(myaddr);
 #endif
         myaddr.sin_family = AF_INET;

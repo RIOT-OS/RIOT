@@ -52,9 +52,9 @@
 #include "cpu.h"
 #include "cpu_conf.h"
 
-#ifdef MODULE_NETDEV2_TAP
-#include "netdev2_tap.h"
-extern netdev2_tap_t netdev2_tap;
+#ifdef MODULE_NETDEV_TAP
+#include "netdev_tap.h"
+extern netdev_tap_t netdev_tap;
 #endif
 
 #include "native_internal.h"
@@ -225,7 +225,7 @@ void thread_yield_higher(void)
         irq_enable();
     }
     else {
-        isr_thread_yield();
+        sched_context_switch_request = 1;
     }
 }
 
