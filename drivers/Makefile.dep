@@ -4,6 +4,10 @@ ifneq (,$(filter adxl345,$(USEMODULE)))
     FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter apa102,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+endif
+
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_i2c
