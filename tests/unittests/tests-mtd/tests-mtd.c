@@ -19,6 +19,12 @@
 #include "mtd.h"
 #include "board.h"
 
+#if MODULE_VFS
+#include <fcntl.h>
+#include <stdio.h>
+#include "vfs.h"
+#endif
+
 /* Define MTD_0 in board.h to use the board mtd if any */
 #ifdef MTD_0
 #define _dev MTD_0
@@ -237,6 +243,34 @@ static void test_mtd_write_read_flash(void)
     TEST_ASSERT_EQUAL_INT(0, memcmp(buf_empty, buf_read + sizeof(buf_expected), sizeof(buf_empty)));
 }
 
+#if MODULE_VFS
+static void test_mtd_vfs(void)
+{
+    int fd;
+    fd = vfs_bind(VFS_ANY_FD, O_RDWR, &mtd_vfs_ops, &_dev);
+    const char buf[] = "mnopqrst";
+    uint8_t buf_empty[] = {0xff, 0xff, 0xff};
+    char buf_read[sizeof(buf) + sizeof(buf_empty)];
+    memset(buf_read, 0, sizeof(buf_read));
+
+    int ret = vfs_lseek(fd, sizeof(buf_empty), SEEK_SET);
+    TEST_ASSERT_EQUAL_INT(sizeof(buf_empty), ret);
+    ret = vfs_write(fd, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(sizeof(buf), ret);
+    ret = vfs_lseek(fd, 0, SEEK_SET);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+    ret = vfs_read(fd, buf_read, sizeof(buf_read));
+    TEST_ASSERT_EQUAL_INT(sizeof(buf_read), ret);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(buf_empty, buf_read, sizeof(buf_empty)));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(buf, buf_read + sizeof(buf_empty), sizeof(buf)));
+
+    ret = vfs_lseek(fd, 0, SEEK_END);
+    TEST_ASSERT(ret > 0);
+    ret = vfs_write(fd, buf, sizeof(buf));
+    /* Attempted to write past the device memory */
+    TEST_ASSERT(ret < 0);
+}
+#endif
 
 Test *tests_mtd_tests(void)
 {
@@ -246,6 +280,9 @@ Test *tests_mtd_tests(void)
         new_TestFixture(test_mtd_write_erase),
         new_TestFixture(test_mtd_write_read),
         new_TestFixture(test_mtd_write_read_flash),
+#if MODULE_VFS
+        new_TestFixture(test_mtd_vfs),
+#endif
     };
 
     EMB_UNIT_TESTCALLER(mtd_tests, setup_teardown, setup_teardown, fixtures);
