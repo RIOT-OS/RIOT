@@ -52,9 +52,9 @@ extern "C" {
  * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED0_PIN            GPIO_PIN(1, 8)
-#define LED1_PIN            GPIO_PIN(1, 14)
-#define LED2_PIN            GPIO_PIN(1, 15)
+#define LED0_PIN            GPIO_PIN(PORT_B, 8)
+#define LED1_PIN            GPIO_PIN(PORT_B, 14)
+#define LED2_PIN            GPIO_PIN(PORT_B, 15)
 
 #define LED_PORT            GPIOB
 #define LED0_MASK           (1 << 8)
