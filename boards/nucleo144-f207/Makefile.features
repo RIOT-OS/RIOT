@@ -8,8 +8,8 @@ FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 
-# load the common Makefile.features for Nucleo boards
-include $(RIOTBOARD)/nucleo-common/Makefile.features
+# load the common Makefile.features for Nucleo-144 boards
+include $(RIOTBOARD)/nucleo144-common/Makefile.features
 
 # The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = cortex_m3_2

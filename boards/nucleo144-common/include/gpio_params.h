@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2017 Inria
- *               2017 OTA keys
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,14 +7,13 @@
  */
 
 /**
- * @ingroup   boards_nucleo32-l031
+ * @ingroup   boards_nucleo144-common
  * @{
  *
  * @file
  * @brief     Board specific configuration of direct mapped GPIOs
  *
  * @author    Alexandre Abadie <alexandre.abadie@inria.fr>
- * @author    Vincent Dupont <vincent@otakeys.com>
  */
 
 #ifndef GPIO_PARAMS_H
@@ -34,10 +32,25 @@ extern "C" {
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
     {
-        .name = "LED(green)",
+        .name = "LD1(green)",
         .pin = LED0_PIN,
         .mode = GPIO_OUT
     },
+    {
+        .name = "LD2(blue)",
+        .pin = LED1_PIN,
+        .mode = GPIO_OUT
+    },
+    {
+        .name = "LD3(red)",
+        .pin = LED2_PIN,
+        .mode = GPIO_OUT
+    },
+    {
+        .name = "B1(User button)",
+        .pin = BTN_B1_PIN,
+        .mode = GPIO_IN_PD
+    }
 };
 
 #ifdef __cplusplus

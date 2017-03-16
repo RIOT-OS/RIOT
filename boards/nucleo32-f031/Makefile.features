@@ -6,8 +6,8 @@ FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 
-# Various common features of Nucleo boards
-FEATURES_PROVIDED += cpp
+# load the common Makefile.features for Nucleo-32 boards
+include $(RIOTBOARD)/nucleo32-common/Makefile.features
 
 # The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = cortex_m0_1
