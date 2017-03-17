@@ -37,9 +37,6 @@ void board_init(void)
     /* disable bootloader's TIMER update interrupt */
     TIM2->DIER &= ~(TIM_DIER_UIE);
 
-    /* configure the RIOT vector table location to internal flash + bootloader offset */
-    SCB->VTOR = LOCATION_VTABLE;
-
     /* remap USART1 to PB7 and PB6 */
     AFIO->MAPR |= AFIO_MAPR_USART1_REMAP;
 }
