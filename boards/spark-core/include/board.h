@@ -31,11 +31,6 @@
 #endif
 
 /**
- * @name Define the location of the RIOT image in flash
- */
-#define LOCATION_VTABLE     (0x08005000)
-
-/**
  * @name Tell the xtimer that we use a 16-bit peripheral timer
  */
 #define XTIMER_WIDTH        (16)
