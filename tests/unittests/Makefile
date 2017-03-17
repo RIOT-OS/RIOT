@@ -90,6 +90,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        nrf52840dk \
                        nrf6310 \
                        nucleo144-f303 \
+                       nucleo144-f412 \
                        nucleo144-f429 \
                        nucleo144-f446 \
                        nucleo32-f031 \
