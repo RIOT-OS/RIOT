@@ -124,6 +124,10 @@ extern int (*real_unlink)(const char *);
 extern long int (*real_random)(void);
 extern const char* (*real_gai_strerror)(int errcode);
 extern FILE* (*real_fopen)(const char *path, const char *mode);
+extern int (*real_fclose)(FILE *stream);
+extern int (*real_fseek)(FILE *stream, long offset, int whence);
+extern int (*real_fputc)(int c, FILE *stream);
+extern int (*real_fgetc)(FILE *stream);
 extern mode_t (*real_umask)(mode_t cmask);
 extern ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
 

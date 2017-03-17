@@ -30,6 +30,10 @@
 extern "C" {
 #endif
 
+#ifdef MODULE_MTD
+#include "mtd_native.h"
+#endif
+
 /**
  * @brief   LED handlers
  * @{
@@ -48,6 +52,13 @@ void _native_LED_RED_TOGGLE(void);
 #define LED1_OFF            (_native_LED_GREEN_OFF())
 #define LED1_TOGGLE         (_native_LED_GREEN_TOGGLE())
 /** @} */
+
+#ifdef MODULE_MTD
+#define MTD_0 mtd0
+
+/** mtd flash emulation device */
+extern mtd_native_dev_t mtd0;
+#endif
 
 #ifdef __cplusplus
 }
