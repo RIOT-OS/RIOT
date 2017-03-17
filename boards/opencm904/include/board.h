@@ -55,9 +55,18 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   User button
+ * @brief User button
  */
 #define BTN_B1_PIN          GPIO_PIN(PORT_C, 15)
+
+/**
+ * @brief Pin used to switch RX and TX mode for the Dynamixel TTL bus
+ *
+ * set   = TX mode
+ * clear = RX mode
+ *
+ */
+#define DXL_DIR_PIN         GPIO_PIN(PORT_B, 5)
 
 /**
  * @brief Use the USART2 for STDIO on this board
