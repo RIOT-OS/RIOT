@@ -18,7 +18,7 @@
  * ----------
  * First you need to @ref including-modules "include" a module that implements
  * this API in your application's Makefile. For example the implementation for
- * @ref net_gnrc "GNRC" is called `gnrc_sock_udp`.
+ * @ref net_gnrc "GNRC" is called `gnrc_sock_tcp`.
  *
  * ### A Simple TCP Echo Server
  *
