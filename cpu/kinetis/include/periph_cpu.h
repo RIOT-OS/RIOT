@@ -135,7 +135,9 @@ typedef enum {
     GPIO_AF_5      = PORT_PCR_MUX(5),       /**< use alternate function 5 */
     GPIO_AF_6      = PORT_PCR_MUX(6),       /**< use alternate function 6 */
     GPIO_AF_7      = PORT_PCR_MUX(7),       /**< use alternate function 7 */
+#ifdef PORT_PCR_ODE_MASK
     GPIO_PCR_OD    = (PORT_PCR_ODE_MASK),   /**< open-drain mode */
+#endif
     GPIO_PCR_PD    = (PORT_PCR_PE_MASK),    /**< enable pull-down */
     GPIO_PCR_PU    = (PORT_PCR_PE_MASK | PORT_PCR_PS_MASK)  /**< enable PU */
 } gpio_pcr_t;
