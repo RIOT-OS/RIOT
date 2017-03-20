@@ -234,7 +234,7 @@ static int socket_close(int socket)
     socket_t *s;
     int res = 0;
 
-    assert((unsigned)(socket - 1) > (_ACTUAL_SOCKET_POOL_SIZE - 1));
+    assert(((unsigned)socket) < _ACTUAL_SOCKET_POOL_SIZE);
     s = &_socket_pool[socket];
     assert((s->domain == AF_INET) || (s->domain == AF_INET6));
     mutex_lock(&_socket_pool_mutex);
