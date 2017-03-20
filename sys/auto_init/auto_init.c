@@ -319,6 +319,10 @@ void auto_init(void)
     extern void auto_init_veml6070(void);
     auto_init_veml6070();
 #endif
+#ifdef MODULE_ADXL345
+    extern void auto_init_adxl345(void);
+    auto_init_adxl345();
+#endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 
