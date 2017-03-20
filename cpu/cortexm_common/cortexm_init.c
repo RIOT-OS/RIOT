@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <stdint.h>
+
 #include "cpu.h"
 
 /**
@@ -25,6 +27,8 @@
  *         allow full FPU access
  */
 #define FULL_FPU_ACCESS         (0x00f00000)
+
+extern const void *interrupt_vector[];
 
 void cortexm_init(void)
 {
@@ -37,7 +41,7 @@ void cortexm_init(void)
     /* configure the vector table location to internal flash */
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
     defined(CPU_ARCH_CORTEX_M4F)
-    SCB->VTOR = CPU_FLASH_BASE;
+    SCB->VTOR = (uintptr_t)interrupt_vector;
 #endif
 
     /* initialize the interrupt priorities */
