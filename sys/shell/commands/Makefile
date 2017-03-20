@@ -53,7 +53,7 @@ ifneq (,$(filter gnrc_sixlowpan_nd_border_router,$(USEMODULE)))
 endif
 endif
 ifneq (,$(filter saul_reg,$(USEMODULE)))
-  SRC += sc_saul_reg.c
+  SRC_CPP += sc_saul_reg.cpp
 endif
 ifneq (,$(filter ccn-lite-utils,$(USEMODULE)))
   SRC += sc_ccnl.c

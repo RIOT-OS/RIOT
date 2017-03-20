@@ -29,6 +29,8 @@
 #include "shell.h"
 #include "shell_commands.h"
 
+#include "str2text.h"
+
 #if FEATURE_PERIPH_RTC
 #include "periph/rtc.h"
 #endif
