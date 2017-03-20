@@ -25,14 +25,11 @@
 #include "bmp180.h"
 #include "xtimer.h"
 
-static int32_t temperature, pressure;
-
 static int read_temperature(void *dev, phydat_t *res)
 {
     bmp180_t *d = (bmp180_t *)dev;
 
-    bmp180_read_temperature(d, &temperature);
-    res->val[0] = temperature;
+    res->val[0] = bmp180_read_temperature(d);
     res->unit = UNIT_TEMP_C;
     res->scale = -1;
     return 1;
@@ -42,9 +39,7 @@ static int read_pressure(void *dev, phydat_t *res)
 {
     bmp180_t *d = (bmp180_t *)dev;
 
-    bmp180_read_pressure(d, &pressure);
-
-    res->val[0] = pressure/10;
+    res->val[0] = bmp180_read_pressure(d) / 10;
     res->unit = UNIT_PA;
     res->scale = 1;
     return 1;
