@@ -124,6 +124,9 @@ void evtimer_add(evtimer_t *evtimer, evtimer_event_t *event)
     _update_head_offset(evtimer);
     _add_event_to_list(evtimer, event);
 
+    /* XXX: next two lines fix known race condition on Cortex-M0 boards */
+    volatile int i = 1;
+    while (i--);
     if (evtimer->events == event) {
         _set_timer(&evtimer->timer, event->offset);
     }
