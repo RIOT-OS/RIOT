@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     fs_devfs
+ * @ingroup     sys_fs_devfs
  * @{
  *
  * @file
