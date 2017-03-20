@@ -215,6 +215,10 @@ static struct pbuf *_get_recv_pkt(netdev_t *dev)
 {
     int len = dev->driver->recv(dev, _tmp_buf, sizeof(_tmp_buf), NULL);
 
+    if (len < 0) {
+        DEBUG("lwip_netdev: an error occurred while reading the packet\n");
+        return NULL;
+    }
     assert(((unsigned)len) <= UINT16_MAX);
     struct pbuf *p = pbuf_alloc(PBUF_RAW, (u16_t)len, PBUF_POOL);
 
