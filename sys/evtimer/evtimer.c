@@ -33,6 +33,10 @@ static void _add_event_to_list(evtimer_t *evtimer, evtimer_event_t *event)
 {
     uint32_t delta_sum = 0;
 
+    /* we want list->next to point to the first list element. thus we take the
+     * *address* of evtimer->events, then cast it from (evtimer_event_t **) to
+     * (evtimer_event_t*). After that, list->next actually equals
+     * evtimer->events. */
     evtimer_event_t *list = (evtimer_event_t *)&evtimer->events;
 
     while (list->next) {
@@ -188,7 +192,7 @@ void evtimer_init(evtimer_t *evtimer, evtimer_callback_t handler)
 {
     evtimer->callback = handler;
     evtimer->timer.callback = _evtimer_handler;
-    evtimer->timer.arg = (void *) evtimer;
+    evtimer->timer.arg = (void *)evtimer;
     evtimer->events = NULL;
 }
 
