@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2016-17 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,14 +15,18 @@
  * @brief       event timer implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Martine Lenders <m.lenders@fu-berlin.de>
  *
  * @}
  */
-#include "evtimer.h"
+
 #include "div.h"
 #include "irq.h"
 #include "msg.h"
 #include "xtimer.h"
+
+#include "evtimer.h"
+#include "evtimer/msg.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"

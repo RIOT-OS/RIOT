@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2016-17 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -34,6 +35,7 @@
  * @brief       evtimer API definitions
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
 
 #ifndef EVTIMER_H
@@ -66,15 +68,6 @@ typedef struct {
 } evtimer_t;
 
 /**
- * @brief   IPC-message event
- * @extends evtimer_event_t
- */
-typedef struct {
-    evtimer_event_t event;      /**< base class */
-    msg_t msg;                  /**< the IPC message to generate on event */
-} evtimer_msg_event_t;
-
-/**
  * @brief   Initializes an event timer
  *
  * @param[in] evtimer   An event timer
@@ -91,46 +84,12 @@ void evtimer_init(evtimer_t *evtimer, void (*handler)(void *));
 void evtimer_add(evtimer_t *evtimer, evtimer_event_t *event);
 
 /**
- * @brief   Adds event to an event timer that handles events via IPC
- *
- * @param[in] evtimer       An event timer
- * @param[in] event         An event
- * @param[in] target_pid    The PID of the thread that should receive the IPC
- *                          message
- */
-static inline void evtimer_add_msg(evtimer_t *evtimer,
-                                   evtimer_msg_event_t *event,
-                                   kernel_pid_t target_pid)
-{
-    /* use sender_pid field to get target_pid into callback function */
-    event->msg.sender_pid = target_pid;
-    evtimer_add(evtimer, &event->event);
-}
-
-/**
  * @brief   Removes an event from an event timer
  *
  * @param[in] evtimer       An event timer
  * @param[in] event         An event
  */
 void evtimer_del(evtimer_t *evtimer, evtimer_event_t *event);
-
-/**
- * @brief   Event handler for IPC messages
- *
- * @param[in] arg   The argument for the event handler
- */
-void evtimer_msg_handler(void *arg);
-
-/**
- * @brief   Initializes event timer to handle events via IPC
- *
- * @param[in] evtimer   An event timer
- */
-static inline void evtimer_init_msg(evtimer_t *evtimer)
-{
-    evtimer_init(evtimer, evtimer_msg_handler);
-}
 
 /**
  * @brief   Print overview of current state of an event timer
