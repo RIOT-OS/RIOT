@@ -98,7 +98,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     isr_ctx[port_num(pin)][pin_num(pin)].arg = arg;
 
     /* enable power-up interrupts for this GPIO port: */
-    SYS_CTRL->IWE |= port_num(pin);
+    SYS_CTRL->IWE |= (1 << port_num(pin));
 
     /* configure the active flank(s) */
     gpio(pin)->IS &= ~pin_mask(pin);
@@ -111,7 +111,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         case GPIO_RISING:
             gpio(pin)->IBE &= ~pin_mask(pin);
             gpio(pin)->IEV |=  pin_mask(pin);
-            gpio(pin)->P_EDGE_CTRL &= (1 << pp_num(pin));
+            gpio(pin)->P_EDGE_CTRL &= ~(1 << pp_num(pin));
             break;
         case GPIO_BOTH:
             gpio(pin)->IBE |= pin_mask(pin);
@@ -175,7 +175,7 @@ static inline void handle_isr(cc2538_gpio_t *gpio, int port_num)
 {
     uint32_t state       = gpio->MIS;
     gpio->IC             = 0x000000ff;
-    gpio->IRQ_DETECT_ACK = 0x000000ff;
+    gpio->IRQ_DETECT_ACK = (0xff << (port_num * GPIO_BITS_PER_PORT));
 
     for (int i = 0; i < GPIO_BITS_PER_PORT; i++) {
         if (state & (1 << i)) {
