@@ -22,11 +22,9 @@
 
 #include "div.h"
 #include "irq.h"
-#include "msg.h"
 #include "xtimer.h"
 
 #include "evtimer.h"
-#include "evtimer/msg.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -163,18 +161,20 @@ static evtimer_event_t *_get_next(evtimer_t *evtimer)
     }
 }
 
-void evtimer_msg_handler(void *arg)
+static void _evtimer_handler(void *arg)
 {
-    DEBUG("evtimer_msg_handler()\n");
+    DEBUG("_evtimer_handler()\n");
 
-    evtimer_t *evtimer = (evtimer_t *) arg;
+    evtimer_t *evtimer = (evtimer_t *)arg;
 
+    /* this function gets called directly by xtimer if the set xtimer expired.
+     * Thus the offset of the first event is down to zero. */
     evtimer_event_t *event = evtimer->events;
     event->offset = 0;
 
-    evtimer_msg_event_t *mevent;
-    while ((mevent = (evtimer_msg_event_t *)_get_next(evtimer))) {
-        msg_send_int(&mevent->msg, mevent->msg.sender_pid);
+    /* iterate the event list */
+    while ((event = _get_next(evtimer))) {
+        evtimer->callback(event);
     }
 
     _update_timer(evtimer);
@@ -184,9 +184,10 @@ void evtimer_msg_handler(void *arg)
     }
 }
 
-void evtimer_init(evtimer_t *evtimer, void (*handler)(void *))
+void evtimer_init(evtimer_t *evtimer, evtimer_callback_t handler)
 {
-    evtimer->timer.callback = handler;
+    evtimer->callback = handler;
+    evtimer->timer.callback = _evtimer_handler;
     evtimer->timer.arg = (void *) evtimer;
     evtimer->events = NULL;
 }

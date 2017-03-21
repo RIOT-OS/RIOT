@@ -43,7 +43,6 @@
 
 #include <stdint.h>
 
-#include "msg.h"
 #include "xtimer.h"
 
 #ifdef __cplusplus
@@ -58,22 +57,28 @@ typedef struct evtimer_event {
     uint32_t offset;            /**< offset in milliseconds from previous event */
 } evtimer_event_t;
 
+/**
+ * @brief   Event timer callback type
+ */
+typedef void(*evtimer_callback_t)(evtimer_event_t* event);
 
 /**
  * @brief   Event timer
  */
 typedef struct {
-    xtimer_t timer;             /**< Timer */
-    evtimer_event_t *events;    /**< Event queue */
+    xtimer_t timer;                 /**< Timer */
+    evtimer_callback_t callback;    /**< Handler function for this evtimer's
+                                         event type */
+    evtimer_event_t *events;        /**< Event queue */
 } evtimer_t;
 
 /**
  * @brief   Initializes an event timer
  *
  * @param[in] evtimer   An event timer
- * @param[in] handler   An event handler
+ * @param[in] handler   An event handler function
  */
-void evtimer_init(evtimer_t *evtimer, void (*handler)(void *));
+void evtimer_init(evtimer_t *evtimer, evtimer_callback_t handler);
 
 /**
  * @brief   Adds event to an event timer
