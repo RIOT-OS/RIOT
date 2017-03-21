@@ -42,7 +42,22 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief xtimer configuration values
+ * @{
+ */
+#define XTIMER_DEV					TIMER_DEV(0)   			// set TC0 as system counter
+#define XTIMER_CHAN 				(0)				// choose channel 0
+#define XTIMER_WIDTH                (16)			// 16bit timer
+#define XTIMER_SHIFT                (4)				// xtimer prescaler value, If the underlying hardware timer is running at a power of two multiple ofFor a 16 MHz hardware timer, set XTIMER_SHIFT to 4.
+#define XTIMER_HZ                   (16000000UL)	// set Timer frequency TODO think about slowing down timer for power saving
+#define XTIMER_BACKOFF              (40)			// TODO look into this , All timers that are less than XTIMER_BACKOFF microseconds in the future willjust spin. This is supposed to be defined per-device in e.g., periph_conf.h.
+/** @} */
+
+
+/**
  * @brief   Timer configuration
+ *
+ * ATTETION Timer 0 is used for Xtimer which is system Timer
  *
  * The timer driver only supports the four 16-bit timers
  * (Timer1, TST, Timer3, Timer4, Timer5), so those are the Timer we can use here.
@@ -71,11 +86,6 @@ extern "C" {
 #define TIMER_1_ISRB        TIMER5_COMPB_vect
 #define TIMER_1_ISRC        TIMER5_COMPC_vect
 
-/**
- * @brief set timer to be used for xtimer
- */
-#define XTIMER_DEV			0
-#define XTIMER_CHAN 		(0)
 
 /** @} */
 

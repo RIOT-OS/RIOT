@@ -103,15 +103,7 @@ extern "C" {
 #define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT0_vect
 #define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB7)
 
-/**
- * @brief xtimer configuration values
- * @{
- */
-#define XTIMER_WIDTH                (16)
-#define XTIMER_SHIFT                (4)
-#define XTIMER_HZ                   (16000000UL)
-#define XTIMER_BACKOFF              (40)
-/** @} */
+
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
