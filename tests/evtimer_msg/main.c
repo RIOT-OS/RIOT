@@ -1,8 +1,5 @@
 /*
- * Copyright (C) 2017 HAW Hamburg
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- * Copyright (C) 2015 Eistec AB
- *               2013 INRIA
+ * Copyright (C) 2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,20 +11,16 @@
  * @{
  *
  * @file
- * @brief    xtimer_drift test application
+ * @brief    evtimer_msg test application
  *
- * @author   Kaspar Schleiser <kaspar@schleiser.de>
- * @author   Oliver Hahm <oliver.hahm@inria.fr>
- * @author   Christian Mehlis <mehlis@inf.fu-berlin.de>
- * @author   Joakim Nohlgård <joakim.nohlgard@eistec.se>
- * @author   Sebastian Meiling <s@mlng.net>
+ * @author   Martine Lenders <m.lenders@fu-berlin.de>
  *
  * @}
  */
 
 #include <stdio.h>
 
-#include "evtimer.h"
+#include "evtimer/msg.h"
 #include "thread.h"
 #include "msg.h"
 #include "xtimer.h"
@@ -39,8 +32,9 @@ static evtimer_msg_event_t events[] = {
     { .event = { .offset = 1500 }, .msg = { .content = { .ptr = "supposed to be 1500" } } },
     { .event = { .offset = 659 }, .msg = { .content = { .ptr = "supposed to be 659" } } },
     { .event = { .offset = 3954 }, .msg = { .content = { .ptr = "supposed to be 3954" } } },
-    { .msg = { .content = { .ptr = NULL } }  },     /* sentinel */
 };
+
+#define NEVENTS (sizeof(events) / sizeof(evtimer_msg_event_t))
 
 /* This thread will print the drift to stdout once per second */
 void *worker_thread(void *arg)
@@ -63,7 +57,6 @@ void *worker_thread(void *arg)
 int main(void)
 {
     uint32_t now = xtimer_now_usec() / US_PER_MS;
-    int count = 0;
 
     evtimer_init_msg(&evtimer);
 
@@ -73,13 +66,10 @@ int main(void)
                                      THREAD_CREATE_STACKTEST,
                                      worker_thread, NULL, "worker");
     printf("Testing generic evtimer (start time = %" PRIu32 " ms)\n", now);
-    for (evtimer_msg_event_t *event = &events[0];
-         event->msg.content.ptr != NULL;
-         event++) {
-        evtimer_add_msg(&evtimer, event, pid);
-        count++;
+    for (unsigned i = 0; i < NEVENTS; i++) {
+        evtimer_add_msg(&evtimer, &events[i], pid);
     }
-    printf("Are the reception times of all %i msgs near to the supposed values?\n",
-           count);
+    printf("Are the reception times of all %i msgs close to the supposed values?\n",
+           NEVENTS);
     puts("If yes, the tests were successful");
 }

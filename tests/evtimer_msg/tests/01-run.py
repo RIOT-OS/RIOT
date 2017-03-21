@@ -19,7 +19,7 @@ ACCEPTED_ERROR = 20
 def testfunc(child):
     child.expect(r"Testing generic evtimer \(start time = (\d+) ms\)")
     timer_offset = int(child.match.group(1))
-    child.expect(r"Are the reception times of all (\d+) msgs near to the supposed values?")
+    child.expect(r"Are the reception times of all (\d+) msgs close to the supposed values?")
     numof = int(child.match.group(1))
 
     for i in range(numof):
