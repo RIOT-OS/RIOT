@@ -20,12 +20,18 @@
 #ifndef EVTIMER_MSG_H
 #define EVTIMER_MSG_H
 
+#include "msg.h"
 #include "evtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @brief   IPC-message event timer
+ * @extends evtimer_t
+ */
+typedef evtimer_t evtimer_msg_t;
 /**
  * @brief   IPC-message event
  * @extends evtimer_event_t
@@ -43,7 +49,7 @@ typedef struct {
  * @param[in] target_pid    The PID of the thread that should receive the IPC
  *                          message
  */
-static inline void evtimer_add_msg(evtimer_t *evtimer,
+static inline void evtimer_add_msg(evtimer_msg_t *evtimer,
                                    evtimer_msg_event_t *event,
                                    kernel_pid_t target_pid)
 {
@@ -57,7 +63,11 @@ static inline void evtimer_add_msg(evtimer_t *evtimer,
  *
  * @param[in] arg   The argument for the event handler
  */
-void evtimer_msg_handler(void *arg);
+static inline void _evtimer_msg_handler(evtimer_event_t *event)
+{
+    evtimer_msg_event_t *mevent = (evtimer_msg_event_t *)event;
+    msg_send_int(&mevent->msg, mevent->msg.sender_pid);
+}
 
 /**
  * @brief   Initializes event timer to handle events via IPC
@@ -66,7 +76,7 @@ void evtimer_msg_handler(void *arg);
  */
 static inline void evtimer_init_msg(evtimer_t *evtimer)
 {
-    evtimer_init(evtimer, evtimer_msg_handler);
+    evtimer_init(evtimer, _evtimer_msg_handler);
 }
 
 #ifdef __cplusplus
