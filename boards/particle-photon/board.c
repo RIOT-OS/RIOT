@@ -11,6 +11,9 @@ void board_init(void)
     /* Set adress of the vector table */
     SCB->VTOR = (uint32_t) interrupt_vector;
 
+    /* disable bootloader's TIMER update interrupt */
+    TIM2->DIER &= ~(TIM_DIER_UIE);
+
     /* initialize the on-board LEDs */
     gpio_init(LED1_PIN, GPIO_OUT);
     gpio_init(LED2_PIN, GPIO_OUT);

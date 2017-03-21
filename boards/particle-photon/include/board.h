@@ -8,6 +8,18 @@
 #endif
 
 /**
+ * @name AT86RF233 configuration
+ *
+ * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
+ */
+#define AT86RF2XX_PARAMS_BOARD    {.spi = SPI_DEV(0), \
+                                   .spi_clk = SPI_CLK_5MHZ, \
+                                   .cs_pin = GPIO_PIN(PORT_C, 2), \
+                                   .int_pin = GPIO_PIN(PORT_A, 13), \
+                                   .sleep_pin = GPIO_PIN(PORT_A, 15), \
+                                   .reset_pin = GPIO_PIN(PORT_A, 14)}
+
+/**
  * @brief   LED pin definitions and handlers
  * @{
  */

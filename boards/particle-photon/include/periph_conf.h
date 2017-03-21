@@ -27,11 +27,11 @@
 
 /* resulting bus clocks */
 #define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
 #define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
+#define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
 
 /* configuration of flash access cycles */
-#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_0WS
+#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_5WS
 /** @} */
 
 /**
@@ -64,24 +64,28 @@ static const pwm_conf_t pwm_config[] = { };
 static const timer_conf_t timer_config[TIMER_NUMOF] = {
     {
         .dev      = TIM2,
+        .max      = 0xffffffff,
         .rcc_mask = RCC_APB1ENR_TIM2EN,
         .bus      = APB1,
         .irqn     = TIM2_IRQn,
     },
     {
         .dev      = TIM5,
+        .max      = 0xffffffff,
         .rcc_mask = RCC_APB1ENR_TIM5EN,
         .bus      = APB1,
         .irqn     = TIM5_IRQn,
     },
     {
         .dev      = TIM3,
+        .max      = 0xffffffff,
         .rcc_mask = RCC_APB1ENR_TIM3EN,
         .bus      = APB1,
         .irqn     = TIM3_IRQn,
     },
     {
         .dev      = TIM4,
+        .max      = 0xffffffff,
         .rcc_mask = RCC_APB1ENR_TIM4EN,
         .bus      = APB1,
         .irqn     = TIM4_IRQn,
