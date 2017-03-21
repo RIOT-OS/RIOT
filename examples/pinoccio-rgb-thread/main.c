@@ -1,4 +1,6 @@
+#define ENABLE_DEBUG    (1)
 #include "thread.h"
+#include "debug.h"
 #include <stdio.h>
 #include "xtimer.h"
 #include "rgbled.h"
@@ -25,8 +27,11 @@ void *rcv_thread(void *arg)
 			}
 			my_color.r = new_red_value;
 			rgbled_set(&my_rgbled, &my_color);
-			xtimer_usleep(50000);
+			//DEBUG("myColor r: %d \n", my_color.r);
+			xtimer_usleep(500000);
+			//DEBUG("XTIMER done");
 		}
+		DEBUG("Red done");
 		while(my_color.g < 255 && my_color.g >0) {
 			uint16_t new_green_value = my_color.g + scale*2;
 			if(new_green_value >=255){
@@ -36,8 +41,9 @@ void *rcv_thread(void *arg)
 			}
 			my_color.g = new_green_value;
 			rgbled_set(&my_rgbled, &my_color);
-			xtimer_usleep(50000);
+			xtimer_usleep(500000);
 		}
+		DEBUG("Green Done");
 		/*change scale */
 		if(scale == 1) {
 			scale = -1;
@@ -52,6 +58,7 @@ void *rcv_thread(void *arg)
 
 int main(void)
 {
+	/*cycle through rgbled color */
 	thread_create(rcv_thread_stack, sizeof(rcv_thread_stack),
 			THREAD_PRIORITY_MAIN -1, 0,
 			rcv_thread, NULL, "rcv_thread");

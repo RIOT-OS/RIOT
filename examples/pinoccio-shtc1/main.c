@@ -27,12 +27,11 @@ int main (void)
 
 	printf("Temp=%.2f \n Rel_humidity=%.2f \n", my_values.temp, my_values.rel_humidity);
 
-/*	uint8_t data[] = { 0xEF, 0xC8 };
+	/*uint8_t data[] = { 0xEF, 0xC8 };
 	uint8_t received[3];
-	//i2c_init_master(I2C_0, I2C_SPEED_FAST);
+	i2c_init_master(I2C_0, I2C_SPEED_FAST);
 	i2c_write_bytes(I2C_0, 0x70, data, 2);
 	i2c_read_bytes(I2C_0, 0x70, received, 3);
-	printf("Error: %i \n", error);
 	printf("%u \n", received[0]);
 	printf("%u \n", received[1]);
 	printf("%u \n", received[2]); */

@@ -101,7 +101,7 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
 			DEBUG("I2C: Slave didnt ACK BYTE Error:%u  on Byte %u\n",(TWSR & 0xF8), i);
 	}
 	i2c_release(dev);
-	return 0;
+	return length;
 }
 
 int i2c_read_byte(i2c_t dev, uint8_t address, void *data)
@@ -155,6 +155,6 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 		my_data[i] = TWDR;
 	}
 	i2c_release(dev);
-	return 1;
+	return length;
 }
 

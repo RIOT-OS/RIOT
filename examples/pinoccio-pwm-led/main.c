@@ -19,7 +19,6 @@
 #include <stdio.h>
 
 #include "board.h"
-#include "rgbled.h"
 #include "shell.h"
 
 extern int rgb_cmd(int argc, char **argv);
@@ -32,7 +31,6 @@ static const shell_command_t shell_commands[] = {
 int main(void)
 {
     puts("Pinoccio PWM LED Shell!");
-    PORTB &= ~BLUE;
     char line_buf[SHELL_DEFAULT_BUFSIZE];
 
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);

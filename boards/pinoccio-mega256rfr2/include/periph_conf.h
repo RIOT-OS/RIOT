@@ -21,7 +21,6 @@
  */
 #include "mutex.h"
 #include "periph_cpu.h"
-#include <util/twi.h>
 
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
@@ -71,6 +70,12 @@ extern "C" {
 #define TIMER_1_ISRA        TIMER5_COMPA_vect
 #define TIMER_1_ISRB        TIMER5_COMPB_vect
 #define TIMER_1_ISRC        TIMER5_COMPC_vect
+
+/**
+ * @brief set timer to be used for xtimer
+ */
+#define XTIMER_DEV			0
+#define XTIMER_CHAN 		(0)
 
 /** @} */
 

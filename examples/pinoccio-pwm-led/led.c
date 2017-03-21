@@ -1,11 +1,15 @@
+#define ENABLE_DEBUG    (1)
+
 #include "board.h"
 #include "rgbled.h"
+#include "debug.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 int rgb_cmd(int argc, char **argv)
 {
+	DEBUG("rgb_cmd called");
 	if (argc < 2) {
 	        printf("usage: %s [r/g/b] [on/off/value] \n %s [on/off/value value value]", argv[0], argv[0]);
 	        return 1;
@@ -87,5 +91,6 @@ int rgb_cmd(int argc, char **argv)
 		 printf("usage: %s [r/g/b] [on/off/value] \n %s [on/off/value value value]", argv[0], argv[0]);
 	}
 	rgbled_set(&my_rgbled, &my_color);
+	DEBUG("rgb_cmd finished");
 	return 0;
 }

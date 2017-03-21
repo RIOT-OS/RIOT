@@ -17,5 +17,6 @@ QUIET ?= 0
 
 USEMODULE += rgbled
 USEMODULE += shell
+FEATURES_REQUIRED += periph_timer
 include $(RIOTBASE)/Makefile.include
 

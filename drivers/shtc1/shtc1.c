@@ -68,7 +68,7 @@ int8_t shtc1_id(i2c_t dev, uint16_t *id)
 	int8_t check = 0;
 	check = i2c_write_bytes(dev, 0x70, data, 2);
 	uint8_t received[2];
-	check += i2c_read_bytes(I2C_0, 0x70, received, 2);
+	check += i2c_read_bytes(dev, 0x70, received, 2);
 	if(check != 4){
 		/* error occured return -1 */
 		return -1;
@@ -82,7 +82,7 @@ int8_t shtc1_reset(i2c_t dev)
 	uint8_t data[] = { 0x80, 0x5D };
 	int8_t check = 0;
 	check = i2c_write_bytes(dev, 0x70, data, 2);
-	if(check != 4){
+	if(check != 2){
 		/* error occured return -1 */
 		return -1;
 	}

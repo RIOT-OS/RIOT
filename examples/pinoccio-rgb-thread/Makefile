@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = pinoccio-pwm-led
+APPLICATION = pinoccio-rgb-thread
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -18,5 +18,6 @@ QUIET ?= 0
 USEMODULE += rgbled
 USEMODULE += xtimer
 FEATURES_REQUIRED += periph_timer
+FEATURES_REQUIRED += periph_gpio
 include $(RIOTBASE)/Makefile.include
 
