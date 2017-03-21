@@ -26,13 +26,6 @@ extern "C" {
 #endif
 
 /**
- * @name Define the location of the RIOT image in flash
- * @{
- */
-#define LOCATION_VTABLE     (0x08003000)
-/** @} */
-
-/**
  * @name xtimer configuration
  * @{
  */
