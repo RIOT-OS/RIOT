@@ -26,19 +26,27 @@
 #include "periph/gpio.h"
 
 #define GPIO_MASK           (0xfffff000)
-#define PORTNUM_MASK        (0x00007000)
+#define PORTNUM_MASK        (0x00003000)
 #define PORTNUM_SHIFT       (12U)
 #define PIN_MASK            (0x00000007)
 #define MODE_NOTSUP         (0xff)
 
 static inline cc2538_gpio_t *gpio(gpio_t pin)
 {
-    return (cc2538_gpio_t *)(pin & GPIO_MASK);
+    if(((uint32_t)pin &GPIO_MASK) == 0){
+        uint32_t port = (pin & 0x18) >> 3;
+        return (cc2538_gpio_t*)(((uint32_t)GPIO_A)+(port << PORTNUM_SHIFT));
+    }else{
+        return (cc2538_gpio_t *)(pin & GPIO_MASK);
+    }
 }
 
 static inline int port_num(gpio_t pin)
 {
-    return (int)((pin & PORTNUM_MASK) >> PORTNUM_SHIFT) - 1;
+    if(((uint32_t)pin &GPIO_MASK) == 0){
+        return ((pin & 0x18) >> 3);
+    }
+    return (int)(((pin - (uint32_t)GPIO_A) & PORTNUM_MASK) >> PORTNUM_SHIFT);
 }
 
 static inline int pin_num(gpio_t pin)
@@ -97,7 +105,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     isr_ctx[port_num(pin)][pin_num(pin)].arg = arg;
 
     /* enable power-up interrupts for this GPIO port: */
-    SYS_CTRL->IWE |= port_num(pin);
+    SYS_CTRL->IWE |= (1 << port_num(pin));
 
     /* configure the active flank(s) */
     gpio(pin)->IS &= ~pin_mask(pin);
@@ -110,7 +118,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         case GPIO_RISING:
             gpio(pin)->IBE &= ~pin_mask(pin);
             gpio(pin)->IEV |=  pin_mask(pin);
-            gpio(pin)->P_EDGE_CTRL &= (1 << pp_num(pin));
+            gpio(pin)->P_EDGE_CTRL &= ~(1 << pp_num(pin));
             break;
         case GPIO_BOTH:
             gpio(pin)->IBE |= pin_mask(pin);
