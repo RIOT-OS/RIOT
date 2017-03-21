@@ -319,6 +319,10 @@ void auto_init(void)
     extern void auto_init_veml6070(void);
     auto_init_veml6070();
 #endif
+#ifdef MODULE_DS18
+    extern void auto_init_ds18(void);
+    auto_init_ds18();
+#endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 
