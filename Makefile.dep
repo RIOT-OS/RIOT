@@ -367,8 +367,8 @@ endif
 
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += bitfield
-  USEMODULE += posix
   USEMODULE += random
+  USEMODULE += vfs
 endif
 
 ifneq (,$(filter rtt_stdio,$(USEMODULE)))

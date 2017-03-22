@@ -23,11 +23,11 @@
 #include <string.h>
 
 #include "bitfield.h"
-#include "fd.h"
 #include "mutex.h"
 #include "net/ipv4/addr.h"
 #include "net/ipv6/addr.h"
 #include "random.h"
+#include "vfs.h"
 
 #include "sys/socket.h"
 #include "netinet/in.h"
@@ -39,6 +39,7 @@
 /* enough to create sockets both with socket() and accept() */
 #define _ACTUAL_SOCKET_POOL_SIZE   (SOCKET_POOL_SIZE + \
                                     (SOCKET_POOL_SIZE * SOCKET_TCP_QUEUE_SIZE))
+#define SOCKET_BLKSIZE             (512)
 
 /**
  * @brief   Unitfied connection type.
@@ -89,6 +90,14 @@ static mutex_t _socket_pool_mutex = MUTEX_INIT;
 
 const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
 const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
+
+static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
+                               size_t length, int flags,
+                               struct sockaddr *restrict address,
+                               socklen_t *restrict address_len);
+static ssize_t socket_sendto(socket_t *s, const void *buffer, size_t length,
+                             int flags, const struct sockaddr *address,
+                             socklen_t address_len);
 
 static socket_t *_get_free_socket(void)
 {
@@ -232,13 +241,11 @@ static int _sockaddr_to_ep(const struct sockaddr *address, socklen_t address_len
     return 0;
 }
 
-static int socket_close(int socket)
+static int socket_close(vfs_file_t *filp)
 {
-    socket_t *s;
+    socket_t *s = filp->private_data.ptr;
     int res = 0;
 
-    assert(((unsigned)socket) < _ACTUAL_SOCKET_POOL_SIZE);
-    s = &_socket_pool[socket];
     assert((s->domain == AF_INET) || (s->domain == AF_INET6));
     mutex_lock(&_socket_pool_mutex);
     if (s->sock != NULL) {
@@ -279,15 +286,41 @@ static int socket_close(int socket)
     return res;
 }
 
-static ssize_t socket_read(int socket, void *buf, size_t n)
+static inline int socket_fstat(vfs_file_t *filp, struct stat *buf)
 {
-    return recv(socket, buf, n, 0);
+    (void)filp;
+    memset(buf, 0, sizeof(struct stat));
+    buf->st_mode |= (S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO);
+    buf->st_blksize = SOCKET_BLKSIZE;
+    return 0;
 }
 
-static ssize_t socket_write(int socket, const void *buf, size_t n)
+static inline off_t socket_lseek(vfs_file_t *filp, off_t off, int whence)
 {
-    return send(socket, buf, n, 0);
+    (void)filp;
+    (void)off;
+    (void)whence;
+    return -ESPIPE; /* see http://pubs.opengroup.org/onlinepubs/9699919799/functions/lseek.html */
 }
+
+static inline ssize_t socket_read(vfs_file_t *filp, void *buf, size_t n)
+{
+    return socket_recvfrom(filp->private_data.ptr, buf, n, 0, NULL, NULL);
+}
+
+static inline ssize_t socket_write(vfs_file_t *filp, const void *buf, size_t n)
+{
+    return socket_sendto(filp->private_data.ptr, buf, n, 0, NULL, 0);
+}
+
+static const vfs_file_ops_t socket_ops = {
+    .close = socket_close,
+    .fcntl = NULL,          /* TODO: provide when needed */
+    .fstat = socket_fstat,
+    .lseek = socket_lseek,
+    .read = socket_read,
+    .write = socket_write,
+};
 
 int socket(int domain, int type, int protocol)
 {
@@ -307,8 +340,7 @@ int socket(int domain, int type, int protocol)
         case AF_INET6:
 #endif
         {
-            int fd = fd_new(s - _socket_pool, socket_read, socket_write,
-                            socket_close);
+            int fd = vfs_bind(VFS_ANY_FD, 0, &socket_ops, s);
 
             if (fd < 0) {
                 errno = ENFILE;
@@ -593,8 +625,7 @@ static int _getpeername(socket_t *s, struct sockaddr *__restrict address,
     int res = 0;
 
     if (s->sock == NULL) {
-        errno = ENOTCONN;
-        return -1;
+        return -ENOTCONN;
     }
     switch (s->type) {
 #ifdef MODULE_SOCK_IP
@@ -621,11 +652,7 @@ static int _getpeername(socket_t *s, struct sockaddr *__restrict address,
             res = -EOPNOTSUPP;
             break;
     }
-    if (res < 0) {
-        errno = -res;
-        res = -1;
-    }
-    else {
+    if (res >= 0) {
         struct sockaddr_storage sa;
         socklen_t sa_len = _ep_to_sockaddr(&ep, &sa);
         *address_len = _addr_truncate(address, *address_len, &sa,
@@ -638,6 +665,7 @@ int getpeername(int socket, struct sockaddr *__restrict address,
                 socklen_t *__restrict address_len)
 {
     socket_t *s;
+    int res;
 
     mutex_lock(&_socket_pool_mutex);
     s = _get_socket(socket);
@@ -646,7 +674,11 @@ int getpeername(int socket, struct sockaddr *__restrict address,
         errno = ENOTSOCK;
         return -1;
     }
-    return _getpeername(s, address, address_len);
+    if ((res = _getpeername(s, address, address_len)) < 0) {
+        errno = -res;
+        return -1;
+    }
+    return res;
 }
 
 int getsockname(int socket, struct sockaddr *__restrict address,
@@ -773,27 +805,22 @@ int listen(int socket, int backlog)
 #endif
 }
 
-ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
-                 struct sockaddr *restrict address,
-                 socklen_t *restrict address_len)
+static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
+                               size_t length, int flags,
+                               struct sockaddr *restrict address,
+                               socklen_t *restrict address_len)
 {
-    socket_t *s;
     int res = 0;
     struct _sock_tl_ep ep = { .port = 0 };
 
     (void)flags;
-    mutex_lock(&_socket_pool_mutex);
-    s = _get_socket(socket);
-    mutex_unlock(&_socket_pool_mutex);
     if (s == NULL) {
-        errno = ENOTSOCK;
-        return -1;
+        return -ENOTSOCK;
     }
     if (s->sock == NULL) {  /* socket is not connected */
 #ifdef MODULE_SOCK_TCP
         if (s->type == SOCK_STREAM) {
-            errno = ENOTCONN;
-            return -1;
+            return -ENOTCONN;
         }
 #endif
         /* bind implicitly */
@@ -811,34 +838,24 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
     switch (s->type) {
 #ifdef MODULE_SOCK_IP
         case SOCK_RAW:
-            if ((res = sock_ip_recv(&s->sock->raw, buffer, length, recv_timeout
-                               (sock_ip_ep_t *)&ep)) < 0) {
-                errno = -res;
-                res = -1;
-            }
+            res = sock_ip_recv(&s->sock->raw, buffer, length, recv_timeout,
+                               (sock_ip_ep_t *)&ep);
             break;
 #endif
 #ifdef MODULE_SOCK_TCP
         case SOCK_STREAM:
-            if ((res = sock_tcp_read(&s->sock->tcp.sock, buffer, length,
-                                recv_timeout)) < 0) {
-                errno = -res;
-                res = -1;
-            }
+            res = sock_tcp_read(&s->sock->tcp.sock, buffer, length,
+                                recv_timeout);
             break;
 #endif
 #ifdef MODULE_SOCK_UDP
         case SOCK_DGRAM:
-            if ((res = sock_udp_recv(&s->sock->udp, buffer, length, recv_timeout,
-                                &ep)) < 0) {
-                errno = -res;
-                res = -1;
-            }
+            res = sock_udp_recv(&s->sock->udp, buffer, length, recv_timeout,
+                                &ep);
             break;
 #endif
         default:
-            errno = EOPNOTSUPP;
-            res = -1;
+            res = -EOPNOTSUPP;
             break;
     }
     if ((res >= 0) && (address != NULL) && (address_len != 0)) {
@@ -862,19 +879,34 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
     return res;
 }
 
-ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
-               const struct sockaddr *address, socklen_t address_len)
+ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
+                 struct sockaddr *restrict address,
+                 socklen_t *restrict address_len)
 {
     socket_t *s;
+    int res;
+
+    mutex_lock(&_socket_pool_mutex);
+    s = _get_socket(socket);
+    mutex_unlock(&_socket_pool_mutex);
+    res = socket_recvfrom(s, buffer, length, flags, address, address_len);
+    if (res < 0) {
+        errno = -res;
+        return -1;
+    }
+    return res;
+}
+
+static ssize_t socket_sendto(socket_t *s, const void *buffer, size_t length,
+                             int flags, const struct sockaddr *address,
+                             socklen_t address_len)
+{
     int res = 0;
 #if defined(MODULE_SOCK_IP) || defined(MODULE_SOCK_UDP)
     struct _sock_tl_ep ep = { .port = 0 };
 #endif
 
     (void)flags;
-    mutex_lock(&_socket_pool_mutex);
-    s = _get_socket(socket);
-    mutex_unlock(&_socket_pool_mutex);
     if (s == NULL) {
         errno = ENOTSOCK;
         return -1;
@@ -932,6 +964,23 @@ ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
             res = -1;
             errno = EOPNOTSUPP;
             break;
+    }
+    return res;
+}
+
+ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
+               const struct sockaddr *address, socklen_t address_len)
+{
+    socket_t *s;
+    int res;
+
+    mutex_lock(&_socket_pool_mutex);
+    s = _get_socket(socket);
+    mutex_unlock(&_socket_pool_mutex);
+    res = socket_sendto(s, buffer, length, flags, address, address_len);
+    if (res < 0) {
+        errno = -res;
+        return -1;
     }
     return res;
 }
