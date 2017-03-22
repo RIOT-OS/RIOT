@@ -34,8 +34,6 @@
 #include "debug.h"
 #include "thread.h"
 
-#ifdef MODULE_CORE_MSG
-
 static int _msg_receive(msg_t *m, int block);
 static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned state);
 
@@ -409,5 +407,3 @@ void msg_queue_print(void)
 
     irq_restore(state);
 }
-
-#endif /* MODULE_CORE_MSG */
