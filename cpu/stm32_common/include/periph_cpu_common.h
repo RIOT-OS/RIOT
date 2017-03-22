@@ -289,99 +289,56 @@ void gpio_init_af(gpio_t pin, gpio_af_t af);
  */
 void gpio_init_analog(gpio_t pin);
 
-#ifdef CPU_FAM_STM32F2 || CPU_FAM_STM32F4
+#ifndef DOXYGEN
 /**
- * @brief   Power on the DMA device the given stream belongs to
- *
- * @param[in] stream    logical DMA stream
+ * @brief   Overwrite the default dma_t type definition
+ * @{
  */
-static inline void dma_poweron(int stream)
-{
-    if (stream < 8) {
-        periph_clk_en(AHB1, RCC_AHB1ENR_DMA1EN);
-    }
-    else {
-        periph_clk_en(AHB1, RCC_AHB1ENR_DMA2EN);
-    }
-}
+#define HAVE_DMA_T
+typedef unsigned int dma_t;
+/** @} */
+
+/**
+ * @brief   Overwrite the default dma_mode_t
+ */
+#define HAVE_DMA_MODE_T
+typedef enum {
+    PERIPH_TO_MEMORY = 0,      /**< Transfer from the periph to the memory */
+    MEMORY_TO_PERIPH,          /**< Transfer from the memory to the periph */
+    MEMORY_TO_MEMORY,          /**< Transfer from the memory to the memory */
+} dma_mode_t;
+#endif /* DOXYGEN */
+
+/**
+ * @brief   End the call to a DMA isr
+ *
+ * This shall clear the underlying flags
+ *
+ * @param[in] dma       DMA unit which triggered the interrupt
+ */
+static inline void dma_end_isr(dma_t dma);
 
 /**
  * @brief   Get DMA base register
  *
- * For simplifying DMA stream handling, we map the DMA channels transparently to
- * one integer number, such that DMA1 stream0 equals 0, DMA2 stream0 equals 8,
- * DMA2 stream 7 equals 15 and so on.
+ * For simplifying DMA channel handling, we map the DMA channels/streams
+ * transparently to one integer number. For the families using streams DMA1
+ * stream0 equals 0, DMA2 stream0 equals 8, DMA2 stream 7 equals 15 and so on.
+ * For the families using channels DMA1 channel1 equals 0, DMA2 channel1
+ * equals 7, DMA2 channel7 equals 14 and so on.
  *
- * @param[in] stream    logical DMA stream
+ * @param[in] dma    DMA unit
  */
-static inline DMA_TypeDef *dma_base(int stream)
-{
-    return (stream < 8) ? DMA1 : DMA2;
-}
+static inline DMA_TypeDef *dma_base(dma_t dma);
 
-/**
- * @brief   Get the DMA stream base address
- *
- * @param[in] stream    logical DMA stream
- *
- * @return  base address for the selected DMA stream
- */
-static inline DMA_Stream_TypeDef *dma_stream(int stream)
-{
-    uint32_t base = (uint32_t)dma_base(stream);
-
-    return (DMA_Stream_TypeDef *)(base + (0x10 + (0x18 * (stream & 0x7))));
-}
-
-/**
- * @brief   Select high or low DMA interrupt register based on stream number
- *
- * @param[in] stream    logical DMA stream
- *
- * @return  0 for streams 0-3, 1 for streams 3-7
- */
-static inline int dma_hl(int stream)
-{
-    return ((stream & 0x4) >> 2);
-}
-
-/**
- * @brief   Get the interrupt flag clear bit position in the DMA LIFCR register
- *
- * @param[in] stream    logical DMA stream
- */
-static inline uint32_t dma_ifc(int stream)
-{
-    switch (stream & 0x3) {
-        case 0:
-            return (1 << 5);
-        case 1:
-            return (1 << 11);
-        case 2:
-            return (1 << 21);
-        case 3:
-            return (1 << 27);
-        default:
-            return 0;
-    }
-}
-
-static inline void dma_isr_enable(int stream)
-{
-    if (stream < 7) {
-        NVIC_EnableIRQ((IRQn_Type)((int)DMA1_Stream0_IRQn + stream));
-    }
-    else if (stream == 7) {
-        NVIC_EnableIRQ(DMA1_Stream7_IRQn);
-    }
-    else if (stream < 13) {
-        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + (stream - 8)));
-    }
-    else if (stream < 16) {
-        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream - 13)));
-    }
-}
-#endif /*  CPU_FAM_STM32F2 || CPU_FAM_STM32F4 */
+/* There are two flavors of DMA on the stm32 platforms. One uses single
+ * channels and the oder uses streams (and each stream can have up to 8
+ * channels). Depending on the family we include one or the other flavor. */
+#if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
+#include "stm32_dma_stream.h"
+#else
+#include "stm32_dma_channel.h"
+#endif /* defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) */
 
 #ifdef __cplusplus
 }
