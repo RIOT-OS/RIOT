@@ -26,19 +26,11 @@
 #define STM32_DMA_STREAM_H
 
 /**
- * @brief Get the channel number of a DMA unit
- */
-static inline int _dma_chnum(dma_t dma)
-{
-    return (dma >> 16);
-}
-
-/**
  * @brief Get the stream number of a DMA unit
  */
 static inline int _dma_strnum(dma_t dma)
 {
-    return (dma & 0xff);
+    return (dma >> 16);
 }
 
 /**
@@ -50,10 +42,9 @@ static inline int _dma_strnum(dma_t dma)
  */
 static inline DMA_Stream_TypeDef *dma_stream(dma_t dma)
 {
-    int stream = _dma_strnum(dma);
     uint32_t base = (uint32_t)dma_base(dma);
 
-    return (DMA_Stream_TypeDef *)(base + (0x10 + (0x18 * (stream & 0x7))));
+    return (DMA_Stream_TypeDef *)(base + (0x10 + (0x18 * (_dma_strnum(dma) & 0x7))));
 }
 
 /**
@@ -93,8 +84,9 @@ static inline uint32_t dma_ifc(int stream)
 /**
  * @brief   Define specific DMA_UNIT generator macro
  */
-#define DMA_UNIT(channel, stream) ((dma_t)((channel << 16) | stream))
+#define DMA_UNIT(channel, stream) ((dma_t)((stream << 16) | channel))
 
+#define HAVE_DMA_POWERON
 static inline void dma_poweron(dma_t dma)
 {
     if (_dma_strnum(dma) < 8) {
@@ -105,6 +97,7 @@ static inline void dma_poweron(dma_t dma)
     }
 }
 
+#define HAVE_DMA_POWEROFF
 static inline void dma_poweroff(dma_t dma)
 {
     if (_dma_strnum(dma) < 8) {
@@ -126,6 +119,7 @@ static inline void dma_end_isr(dma_t dma)
     dma_base(dma)->IFCR[dma_hl(stream)] = dma_ifc(stream);
 }
 
+#define HAVE_DMA_ISR_ENABLE
 static inline void dma_isr_enable(dma_t dma)
 {
     int stream = _dma_strnum(dma);
@@ -144,6 +138,7 @@ static inline void dma_isr_enable(dma_t dma)
     }
 }
 
+#define HAVE_DMA_TRANSFER
 static inline void dma_transfer(dma_t dma, dma_mode_t mode,
         void *src, void *dst, unsigned len)
 {
