@@ -22,16 +22,16 @@ ${DIRS:%=ALL--%}:
 ${DIRS:%=CLEAN--%}:
 	$(QQ)"$(MAKE)" -C ${@:CLEAN--%=%} clean
 
-ifeq ($(strip $(SRC)),)
+ifeq ($(strip $(SRC))$(NO_AUTO_SRC),)
     SRC := $(filter-out $(SRC_NOLTO), $(wildcard *.c))
 endif
-ifeq ($(strip $(SRCXX)),)
+ifeq ($(strip $(SRCXX))$(NO_AUTO_SRC),)
     SRCXX := $(wildcard *.cpp)
 endif
-ifeq ($(strip $(ASMSRC)),)
+ifeq ($(strip $(ASMSRC))$(NO_AUTO_SRC),)
     ASMSRC := $(wildcard *.s)
 endif
-ifeq ($(strip $(ASSMSRC)),)
+ifeq ($(strip $(ASSMSRC))$(NO_AUTO_SRC),)
     ASSMSRC := $(wildcard *.S)
 endif
 
