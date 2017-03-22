@@ -53,14 +53,15 @@ typedef enum {
 #define DMA_UNIT(unit)       ((dma_t)(unit))
 #endif
 
+#ifndef HAVE_DMA_TRANSFER
 /**
- * @brief  Configure and start a DMA transfer
+ * @brief  Start a DMA transfer
  *
  * This method sets up a DMA transfer between two MCU modules according to the
  * given @p mode.
  *
  * @note in case @p src or @p dst belong to a peripheral the pointer shall not
- * increase.
+ * increase automatically.
  *
  * @param[in] dma   The DMA unit to use
  * @param[in] mode  The transfer mode
@@ -70,14 +71,18 @@ typedef enum {
  */
 void dma_transfer(dma_t dma, dma_mode_t mode, void *src, void *dst,
         unsigned len);
+#endif /* HAVE_DMA_TRANSFER */
 
+#ifndef HAVE_DMA_POWERON
 /**
  * @brief  Power on a DMA unit
  *
  * @param[in] dma  DMA unit to power on
  */
 void dma_poweron(dma_t dma);
+#endif /* HAVE_DMA_POWERON */
 
+#ifndef HAVE_DMA_POWEROFF
 /**
  * @brief  Power off a DMA unit
  *
@@ -87,13 +92,16 @@ void dma_poweron(dma_t dma);
  * @param[in] dma  DMA unit to power off
  */
 void dma_poweroff(dma_t dma);
+#endif /* HAVE_DMA_POWEROFF */
 
+#ifndef HAVE_DMA_ISR_ENABLE
 /**
  * @brief  Enable the ISR for a DMA unit
  *
  * @param[in] dma  DMA unit
  */
 void dma_isr_enable(dma_t dma);
+#endif /* HAVE_DMA_ISR_ENABLE */
 
 #ifdef __cplusplus
 }
