@@ -97,3 +97,7 @@ PSEUDOMODULES += prng_%
 
 # STM32 periph pseudomodules
 PSEUDOMODULES += stm32_periph_%
+
+# declare periph submodules as pseudomodules, but exclude periph_common
+PSEUDOMODULES += periph_%
+NO_PSEUDOMODULES += periph_common
