@@ -68,11 +68,6 @@ typedef uint16_t gpio_t;
 #define GPIO_MODE(pu, pe, od, out)   (pu | (pe << 1) | (od << 5) | (out << 7))
 
 /**
- * @brief   Define the maximum number of PWM channels that can be configured
- */
-#define PWM_CHAN_MAX        (4U)
-
-/**
  * @brief   Define a CPU specific SPI hardware chip select line macro
  *
  * We simply map the 5 hardware channels to the numbers [0-4], this still allows
@@ -188,8 +183,14 @@ typedef enum {
 } adc_res_t;
 /** @} */
 
+#if defined(FTM_CnSC_MSB_MASK)
 /**
- * @name    PWM mode configuration bits
+ * @brief   Define the maximum number of PWM channels that can be configured
+ */
+#define PWM_CHAN_MAX        (4U)
+
+/**
+ * @name   PWM mode configuration
  * @{
  */
 #define HAVE_PWM_MODE_T
@@ -198,7 +199,7 @@ typedef enum {
     PWM_RIGHT  = (FTM_CnSC_MSB_MASK | FTM_CnSC_ELSA_MASK),  /**< right aligned */
     PWM_CENTER = (FTM_CnSC_MSB_MASK)                        /**< center aligned */
 } pwm_mode_t;
-/** @} */
+#endif /* defined(FTM_CnSC_MSB_MASK) */
 #endif /* ndef DOXYGEN */
 
 /**
@@ -281,6 +282,7 @@ typedef struct {
     uint8_t irqn;
 } lptmr_conf_t;
 
+#ifdef FTM_CnSC_MSB_MASK
 /**
  * @brief   PWM configuration structure
  */
@@ -294,6 +296,7 @@ typedef struct {
     uint8_t chan_numof;     /**< number of actually configured channels */
     uint8_t ftm_num;        /**< FTM number used */
 } pwm_conf_t;
+#endif
 
 /**
  * @brief   SPI module configuration options
