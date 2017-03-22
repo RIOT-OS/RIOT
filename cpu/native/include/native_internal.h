@@ -96,6 +96,7 @@ extern int (*real_accept)(int socket, ...);
 extern int (*real_bind)(int socket, ...);
 extern int (*real_chdir)(const char *path);
 extern int (*real_close)(int);
+extern int (*real_fcntl)(int, int, ...);
 /* The ... is a hack to save includes: */
 extern int (*real_creat)(const char *path, ...);
 extern int (*real_dup2)(int, int);

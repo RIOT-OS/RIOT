@@ -68,6 +68,7 @@ int (*real_getifaddrs)(struct ifaddrs **ifap);
 int (*real_getpid)(void);
 int (*real_chdir)(const char *path);
 int (*real_close)(int);
+int (*real_fcntl)(int, int, ...);
 int (*real_creat)(const char *path, ...);
 int (*real_dup2)(int, int);
 int (*real_execve)(const char *, char *const[], char *const[]);
@@ -454,6 +455,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_pipe) = dlsym(RTLD_NEXT, "pipe");
     *(void **)(&real_chdir) = dlsym(RTLD_NEXT, "chdir");
     *(void **)(&real_close) = dlsym(RTLD_NEXT, "close");
+    *(void **)(&real_fcntl) = dlsym(RTLD_NEXT, "fcntl");
     *(void **)(&real_creat) = dlsym(RTLD_NEXT, "creat");
     *(void **)(&real_fork) = dlsym(RTLD_NEXT, "fork");
     *(void **)(&real_dup2) = dlsym(RTLD_NEXT, "dup2");
