@@ -10,7 +10,7 @@ endif
 export CC          = clang
 export CXX         = clang++
 export LINK        = $(CC)
-export AS          = $(LLVMPREFIX)as
+export AS          = clang
 export AR          = $(LLVMPREFIX)ar
 export NM          = $(LLVMPREFIX)nm
 # There is no LLVM linker yet, use GNU binutils.
