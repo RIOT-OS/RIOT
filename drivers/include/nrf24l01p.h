@@ -547,6 +547,15 @@ int nrf24l01p_enable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
 int nrf24l01p_disable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
 
 /**
+* @brief Disable CRC error detection on the nrf24l01+ transceiver.
+*
+* @param[in] dev    Transceiver device to use.
+*
+* @return           0.
+*/
+int nrf24l01p_disable_crc(nrf24l01p_t *dev);
+
+/**
 * @brief Enable CRC error detection on the nrf24l01+ transceiver.
 *
 * @param[in] dev    Transceiver device to use.

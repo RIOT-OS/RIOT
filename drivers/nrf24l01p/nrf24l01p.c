@@ -815,7 +815,13 @@ int nrf24l01p_disable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
     return nrf24l01p_write_reg(dev, REG_EN_RXADDR, pipe_conf);
 }
 
+int nrf24l01p_disable_crc(nrf24l01p_t *dev)
+{
+    char conf;
 
+    nrf24l01p_read_reg(dev, REG_CONFIG, &conf);
+    return nrf24l01p_write_reg(dev, REG_CONFIG, (conf & ~(EN_CRC)));
+}
 
 int nrf24l01p_enable_crc(nrf24l01p_t *dev, nrf24l01p_crc_t crc)
 {
