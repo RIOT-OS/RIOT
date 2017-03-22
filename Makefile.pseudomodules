@@ -58,6 +58,9 @@ PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp
 PSEUDOMODULES += sock_udp
 
+# all peripheral drivers are build into the periph module
+PSEUDOMODULES += periph_driver_%
+
 # include variants of the AT86RF2xx drivers as pseudo modules
 PSEUDOMODULES += at86rf23%
 PSEUDOMODULES += at86rf21%

@@ -6,7 +6,7 @@ OFFER = $(patsubst periph_%,%.c,$(filter periph_%,$(FEATURES_PROVIDED)))
 HAS = $(filter $(wildcard *.c),$(OFFER))
 
 # get a list of peripherals, that are needed by the application
-NEED = $(sort $(patsubst periph_%,%.c,$(filter periph_%,$(FEATURES_REQUIRED))))
+NEED = $(sort $(patsubst periph_driver_%,%.c,$(filter periph_driver_%,$(USEMODULE))))
 # only compile the peripheral drivers, that are present and configured
 SRC += $(filter $(HAS),$(NEED))
 
