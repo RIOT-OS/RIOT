@@ -103,21 +103,21 @@ static inline void dma_isr_enable(dma_t dma)
         /* DMA1_Channel1_IRQn */
     }
     else if(channel < 3) {
-        /* DMA1_Channel2_3_IRQn */
+        /* shared ISR for 2 and 3 */
         channel = 1;
     }
-    else if(channel < 7) {
-        /* DMA1_Channel4_5_IRQn */
-        /* DMA1_Channel4_5_6_7_IRQn */
+    else if(channel < 5) {
+        /* shared ISR for 4 and 5 */
         channel = 2;
     }
 #if defined(CPU_FAM_STM32L0)
     else if (channel < 7) {
-        /* DMA1_Channel4_5_6_7_IRQn */
+        /* shared ISR for 5 to 7 */
         channel = 2;
     }
 #endif /* defined(CPU_FAM_STM32L0) */
     else {
+        /* channel out of range */
         return;
     }
 #endif /* defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32F0) */
@@ -129,7 +129,7 @@ static inline void dma_isr_enable(dma_t dma)
 #if defined(DMA2)
 #ifdef CPU_FAM_STM32F1
         if (channel == 11) {
-            channel = 10; /* STM32F1 shares ISR line for 10 and 11 */
+            channel = 10; /* STM32F1 shared ISR line for 10 and 11 */
         }
 #endif /* CPU_FAM_STM32F1 */
         NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Channel1_IRQn + (channel - 7)));
