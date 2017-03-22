@@ -46,6 +46,7 @@ PSEUDOMODULES += netstats_rpl
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_nano
 PSEUDOMODULES += pktqueue
+PSEUDOMODULES += posix
 PSEUDOMODULES += printf_float
 PSEUDOMODULES += saul_adc
 PSEUDOMODULES += saul_default
