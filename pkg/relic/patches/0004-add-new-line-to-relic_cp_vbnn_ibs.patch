@@ -1,0 +1,24 @@
+From 770c04135121725fa401abf848a8e35f8887f1de Mon Sep 17 00:00:00 2001
+From: smlng <s@mlng.net>
+Date: Wed, 15 Feb 2017 13:22:23 +0100
+Subject: [PATCH] relic: add new line to relic_cp_vbnn_ibs.c
+
+---
+ src/cp/relic_cp_vbnn_ibs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/cp/relic_cp_vbnn_ibs.c b/src/cp/relic_cp_vbnn_ibs.c
+index c8607068d42a..f532b56de687 100644
+--- a/src/cp/relic_cp_vbnn_ibs.c
++++ b/src/cp/relic_cp_vbnn_ibs.c
+@@ -325,4 +325,5 @@ int cp_vbnn_ibs_user_verify(ec_t sig_R, bn_t sig_z, bn_t sig_h, uint8_t *identit
+ 		ec_free(tmp);
+ 	}
+ 	return result;
+-}
+\ No newline at end of file
++}
++
+-- 
+2.11.0
+
