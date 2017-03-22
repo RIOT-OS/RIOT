@@ -31,6 +31,11 @@
 #include "bit.h"
 #include "periph/gpio.h"
 
+#ifndef PORT_PCR_ODE_MASK
+/* For compatibility with Kinetis CPUs without open drain GPIOs (e.g. KW41Z) */
+#define PORT_PCR_ODE_MASK 0
+#endif
+
 /**
  * @brief   Get the OCR reg value from the gpio_mode_t value
  */
