@@ -30,6 +30,14 @@
  */
 static inline int _dma_strnum(dma_t dma)
 {
+    return (dma & 0xff);
+}
+
+/**
+ * @brief Get the channel number of a DMA unit
+ */
+static inline int _dma_chnum(dma_t dma)
+{
     return (dma >> 16);
 }
 
@@ -84,7 +92,7 @@ static inline uint32_t dma_ifc(int stream)
 /**
  * @brief   Define specific DMA_UNIT generator macro
  */
-#define DMA_UNIT(channel, stream) ((dma_t)((stream << 16) | channel))
+#define DMA_UNIT(channel, stream) ((dma_t)((channel << 16) | stream))
 
 #define HAVE_DMA_POWERON
 static inline void dma_poweron(dma_t dma)

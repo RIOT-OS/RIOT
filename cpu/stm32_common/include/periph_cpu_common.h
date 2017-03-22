@@ -332,14 +332,6 @@ static inline void dma_end_isr(dma_t dma);
  */
 static inline DMA_TypeDef *dma_base(dma_t dma);
 
-/**
- * @brief Get the channel number of a DMA unit
- */
-static inline int _dma_chnum(dma_t dma)
-{
-    return (dma & 0xff);
-}
-
 /* There are two flavors of DMA on the stm32 platforms. One uses single
  * channels and the oder uses streams (and each stream can have up to 8
  * channels). Depending on the family we include one or the other flavor. */

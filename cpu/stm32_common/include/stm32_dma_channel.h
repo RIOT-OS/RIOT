@@ -23,6 +23,14 @@
 #define STM32_DMA_CHANNEL_H
 
 /**
+ * @brief Get the channel number of a DMA unit
+ */
+static inline int _dma_chnum(dma_t dma)
+{
+    return (int)dma;
+}
+
+/**
  * @brief   Get the DMA stream base address
  *
  * @param[in] channel   logical DMA stream
@@ -39,31 +47,20 @@ static inline DMA_Channel_TypeDef *dma_channel(dma_t dma)
     return (DMA_Channel_TypeDef *)(base + (0x08 + (0x14 * channel)));
 }
 
-/**
- * @brief   Get the transfer complete flag position for the corresponding channel
- *
- * @param[in] channel   logical DMA channel
- */
-static inline uint32_t dma_ifc(int channel)
-{
-    if (channel >= 7) {
-        channel -= 7;
-    }
-
-    return (0x2 << (channel << 2));
-}
-
 #ifndef DOXYGEN
 /**
  * @brief   Define specific DMA_UNIT generator macro
+ *
+ * @param[in] channel  Channel as given in the stm specification (from 1 to 12)
  */
-#define DMA_UNIT(channel) ((dma_t)(channel))
+#define DMA_UNIT(channel) ((dma_t)(channel - 1))
 
 #define HAVE_DMA_POWERON
 static inline void dma_poweron(dma_t dma)
 {
 #if defined(DMA2)
     if (_dma_chnum(dma) >= 7) {
+        printf("second\n");
         periph_clk_en(AHB, RCC_AHBENR_DMA2EN);
         return;
     }
@@ -100,12 +97,37 @@ static inline DMA_TypeDef *dma_base(dma_t dma)
 static inline void dma_isr_enable(dma_t dma)
 {
     int channel = _dma_chnum(dma);
+
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32F0)
+    if (channel == 0) {
+        /* DMA1_Channel1_IRQn */
+    }
+    else if(channel < 3) {
+        /* DMA1_Channel2_3_IRQn */
+        channel = 1;
+    }
+    else if(channel < 7) {
+        /* DMA1_Channel4_5_IRQn */
+        /* DMA1_Channel4_5_6_7_IRQn */
+        channel = 2;
+    }
+#if defined(CPU_FAM_STM32L0)
+    else if (channel < 7) {
+        /* DMA1_Channel4_5_6_7_IRQn */
+        channel = 2;
+    }
+#endif /* defined(CPU_FAM_STM32L0) */
+    else {
+        return;
+    }
+#endif /* defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32F0) */
+
     if (channel < 7) {
         NVIC_EnableIRQ((IRQn_Type)((int)DMA1_Channel1_IRQn + channel));
     }
     else if (channel < 12) {
 #if defined(DMA2)
-#if CPU_FAM_STM32F1
+#ifdef CPU_FAM_STM32F1
         if (channel == 11) {
             channel = 10; /* STM32F1 shares ISR line for 10 and 11 */
         }
@@ -117,15 +139,21 @@ static inline void dma_isr_enable(dma_t dma)
 
 static inline void dma_end_isr(dma_t dma)
 {
-    dma_base(dma)->IFCR = dma_ifc(_dma_chnum(dma));
+    /* clear global interrupt and tx complete */
+    int channel = _dma_chnum(dma);
+    if (channel >= 7) {
+        channel -= 7;
+    }
+    dma_base(dma)->IFCR = (0x3 << (channel << 2));
 }
 
 #define HAVE_DMA_TRANSFER
 static inline void dma_transfer(dma_t dma, dma_mode_t mode,
         void *src, void *dst, unsigned len)
 {
-    DMA_Channel_TypeDef *channel = dma_channel(_dma_chnum(dma));
-    channel->CCR &= ~(DMA_CCR_EN | DMA_CCR_DIR | DMA_CCR_PINC | DMA_CCR_MEM2MEM);
+    DMA_Channel_TypeDef *channel = dma_channel(dma);
+    channel->CCR &= ~(DMA_CCR_EN | DMA_CCR_DIR | DMA_CCR_PINC | DMA_CCR_MEM2MEM
+            | DMA_CCR_TCIE);
     channel->CCR |= DMA_CCR_TCIE | DMA_CCR_MINC;
 
     if (mode == MEMORY_TO_PERIPH) {
@@ -135,14 +163,14 @@ static inline void dma_transfer(dma_t dma, dma_mode_t mode,
     }
     else {
         if (mode == MEMORY_TO_MEMORY) {
-            channel->CCR |= DMA_CCR_MEM2MEM;
+            channel->CCR |= DMA_CCR_MEM2MEM | DMA_CCR_PINC;
         }
         channel->CPAR = (uint32_t)src;
         channel->CMAR = (uint32_t)dst;
     }
 
     channel->CNDTR = (uint16_t)len;
-    channel->CCR = DMA_CCR_EN;
+    channel->CCR |= DMA_CCR_EN;
 }
 #endif /* DOXYGEN */
 
