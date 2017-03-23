@@ -182,7 +182,7 @@ static inline void handle_isr(cc2538_gpio_t *gpio, int port_num)
 {
     uint32_t state       = gpio->MIS;
     gpio->IC             = 0x000000ff;
-    gpio->IRQ_DETECT_ACK = 0x000000ff;
+    gpio->IRQ_DETECT_ACK = (0xff << (port_num * 8));
 
     for (int i = 0; i < GPIO_BITS_PER_PORT; i++) {
         if (state & (1 << i)) {
