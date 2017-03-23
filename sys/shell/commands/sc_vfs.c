@@ -201,7 +201,7 @@ static int _read_handler(int argc, char **argv)
             }
             printf("%02x", buf[k]);
         }
-        for (int k = res; k < sizeof(buf); ++k) {
+        for (unsigned k = res; k < sizeof(buf); ++k) {
             if ((k % 2) == 0) {
                 putchar(' ');
             }
@@ -269,7 +269,7 @@ static int _cp_handler(int argc, char **argv)
                 eof = 1;
                 break;
             }
-            if (res > bufspace) {
+            if (((unsigned)res) > bufspace) {
                 printf("READ BUFFER OVERRUN! %d > %lu\n", res, (unsigned long)bufspace);
                 vfs_close(fd_in);
                 vfs_close(fd_out);
@@ -290,7 +290,7 @@ static int _cp_handler(int argc, char **argv)
                 vfs_close(fd_out);
                 return 4;
             }
-            if (res > bufspace) {
+            if (((unsigned)res) > bufspace) {
                 printf("WRITE BUFFER OVERRUN! %d > %lu\n", res, (unsigned long)bufspace);
                 vfs_close(fd_in);
                 vfs_close(fd_out);

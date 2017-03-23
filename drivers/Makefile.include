@@ -103,3 +103,6 @@ endif
 ifneq (,$(filter veml6070,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/veml6070/include
 endif
+ifneq (,$(filter adxl345,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/adxl345/include
+endif

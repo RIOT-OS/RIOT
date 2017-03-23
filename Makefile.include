@@ -153,7 +153,12 @@ ifneq (0,$(shell test -d $(RIOTBOARD)/$(BOARD); echo $$?))
 endif
 
 # Use TOOLCHAIN environment variable to select the toolchain to use.
-# Default: gnu
+# Default for macOS: llvm; for other OS: gnu
+ifeq ($(BOARD),native)
+ifeq ($(OS),Darwin)
+TOOLCHAIN ?= llvm
+endif
+endif
 TOOLCHAIN ?= gnu
 
 # TOOLCHAIN = clang is an alias for TOOLCHAIN = llvm
