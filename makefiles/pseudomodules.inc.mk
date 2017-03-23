@@ -93,6 +93,11 @@ PSEUDOMODULES += adc121c
 PSEUDOMODULES += sx1272
 PSEUDOMODULES += sx1276
 
+# include variants of Si114x drivers as pseudo modules
+PSEUDOMODULES += si1145
+PSEUDOMODULES += si1146
+PSEUDOMODULES += si1147
+
 # include variants of Si70xx drivers as pseudo modules
 PSEUDOMODULES += si7006
 PSEUDOMODULES += si7013
