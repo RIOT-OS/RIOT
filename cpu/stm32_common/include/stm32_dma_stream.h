@@ -67,27 +67,6 @@ static inline int dma_hl(int stream)
     return ((stream & 0x4) >> 2);
 }
 
-/**
- * @brief   Get the interrupt flag clear bit position in the DMA LIFCR register
- *
- * @param[in] stream    logical DMA stream
- */
-static inline uint32_t dma_ifc(int stream)
-{
-    switch (stream & 0x3) {
-        case 0:
-            return (1 << 5);
-        case 1:
-            return (1 << 11);
-        case 2:
-            return (1 << 21);
-        case 3:
-            return (1 << 27);
-        default:
-            return 0;
-    }
-}
-
 #ifndef DOXYGEN
 /**
  * @brief   Define specific DMA_UNIT generator macro
@@ -124,7 +103,11 @@ static inline DMA_TypeDef *dma_base(dma_t dma)
 static inline void dma_end_isr(dma_t dma)
 {
     int stream = _dma_strnum(dma);
-    dma_base(dma)->IFCR[dma_hl(stream)] = dma_ifc(stream);
+    unsigned bit = (1 << (5 + (6 * (stream & 0x03))));
+    if ((stream & 0x3) > 1)  {
+        bit <<= 4;
+    }
+    dma_base(dma)->IFCR[dma_hl(stream)] = bit;
 }
 
 #define HAVE_DMA_ISR_ENABLE
@@ -168,7 +151,7 @@ static inline void dma_transfer(dma_t dma, dma_mode_t mode,
     }
 
     stream->NDTR = (uint16_t)len;
-    stream->CR = DMA_SxCR_EN;
+    stream->CR |= DMA_SxCR_EN;
 }
 #endif /* DOXYGEN */
 
