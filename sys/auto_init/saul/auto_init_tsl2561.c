@@ -58,7 +58,7 @@ void auto_init_tsl2561(void)
                          tsl2561_params[i].gain,
                          tsl2561_params[i].integration) != TSL2561_OK) {
             LOG_ERROR("[auto_init_saul] error initializing tsl2561 #%u\n", i);
-            return;
+            continue;
         }
 
         /* illuminance */
