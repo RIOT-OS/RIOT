@@ -16,3 +16,4 @@ export OBJCOPY = true
 endif
 export OBJDUMP = $(PREFIX)objdump
 export DBG = $(GDBPREFIX)gdb
+export STRIP = $(PREFIX)strip

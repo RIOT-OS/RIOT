@@ -120,6 +120,10 @@ ifneq (,$(filter devfs,$(USEMODULE)))
     DIRS += fs/devfs
 endif
 
+ifneq (,$(filter fw_slots,$(USEMODULE)))
+    DIRS += fw_slots
+endif
+
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
 include $(RIOTBASE)/Makefile.base

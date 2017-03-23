@@ -96,14 +96,19 @@
 #endif
 #endif
 
+#ifndef FW_SLOTS
 static void clk_init(void);
+#endif
 
 void cpu_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();
+
     /* initialize system clocks */
+#ifndef FW_SLOTS
     clk_init();
+#endif
     /* trigger static peripheral initialization */
     periph_init();
 }
@@ -111,6 +116,7 @@ void cpu_init(void)
 /**
  * @brief Configure the clock system of the stm32f1
  */
+#ifndef FW_SLOTS
 static void clk_init(void)
 {
     /* Reset the RCC clock configuration to the default reset state(for debug purpose) */
@@ -162,3 +168,4 @@ static void clk_init(void)
     while ((RCC->CR & RCC_CR_HSIRDY) != 0) {}
 #endif
 }
+#endif

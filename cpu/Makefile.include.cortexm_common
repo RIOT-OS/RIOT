@@ -15,6 +15,24 @@ export CFLAGS_OPT  ?= -Os
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 
 export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
+
+# If the FW_SLOTS flag is set, we will generate a linker script at compile-time
+# reflecting the FW_IMAGE_OFFSET and FW_IMAGE_LENGTH values defined in the
+# target project's Makefile.
+ifeq ($(FW_SLOTS),1)
+ifeq ($(FW_SLOT),1)
+LINKER_SCRIPT = $(CPU_MODEL)_slot1.ld
+endif
+ifeq ($(FW_SLOT),2)
+LINKER_SCRIPT = $(CPU_MODEL)_slot2.ld
+endif
+endif
+
+# If we compile a bootloader, set the correct linker script
+ifeq ($(BOOTLOADER),1)
+export LINKER_SCRIPT = $(CPU_MODEL)-bootloader.ld
+endif
+
 export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/cortexm_common/ldscripts
 export LINKER_SCRIPT ?= $(CPU_MODEL).ld
 export LINKFLAGS += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
