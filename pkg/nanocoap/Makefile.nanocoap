@@ -1,5 +1,11 @@
 MODULE=nanocoap
 
-SRC := nanocoap.c nanocoap_sock.c
+
+ifeq (, $(NANOCOAP_UTIL_ONLY))
+    SRC := nanocoap.c nanocoap_sock.c
+else
+    SRC := nanocoap.c
+    CFLAGS += -DNANOCOAP_UTIL_ONLY
+endif
 
 include $(RIOTBASE)/Makefile.base
