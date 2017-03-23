@@ -33,7 +33,7 @@ extern "C" {
  * @{
  */
 #ifndef SI114X_PARAM_I2C_DEV
-#define SI114X_PARAM_I2C_DEV         I2C_DEV(1)
+#define SI114X_PARAM_I2C_DEV         I2C_DEV(0)
 #endif
 
 #ifndef SI114X_PARAMS
