@@ -66,7 +66,7 @@ ifneq (,$(filter log_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter newlib,$(USEMODULE)))
-    include $(RIOTBASE)/sys/Makefile.newlib
+    include $(RIOTMAKE)/libc/newlib.mk
 endif
 
 ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
