@@ -243,6 +243,33 @@ size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits)
     return pos;
 }
 
+size_t fmt_lpad(char *out, size_t in_len, size_t pad_len, char pad_char)
+{
+    if (in_len >= pad_len) {
+        return in_len;
+    }
+
+    size_t n = pad_len - in_len;
+
+    if (FMT_USE_MEMMOVE) {
+        memmove(out + n, out, in_len);
+        memset(out, pad_char, n);
+    }
+    else {
+        char *pos = out + pad_len - 1;
+        out += in_len -1;
+
+        while(in_len--) {
+            *pos-- = *out--;
+        }
+
+        while (n--) {
+            *pos-- = pad_char;
+        }
+    }
+    return pad_len;
+}
+
 uint32_t scn_u32_dec(const char *str, size_t n)
 {
     uint32_t res = 0;
