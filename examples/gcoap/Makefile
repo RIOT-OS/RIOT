@@ -26,6 +26,9 @@ BOARD_BLACKLIST := nrf52dk
 #GCOAP_TOKENLEN = 2
 #CFLAGS += -DGCOAP_TOKENLEN=$(GCOAP_TOKENLEN)
 
+# nanocoap message send/receive functions not used
+export NANOCOAP_UTIL_ONLY := 1
+
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
