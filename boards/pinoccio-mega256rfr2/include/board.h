@@ -96,12 +96,12 @@ extern "C" {
 // use PCINT4 until then.
 // Note that the I/O ports corresponding to PCINT23:16 are not implemented. Therefore PCIE2 has no function in this device
 #define AVR_CONTEXT_SWAP_INIT do { \
-    DDRB |= (1 << PB7); \
+    DDRB |= (1 << PB0); \
     PCICR |= (1 << PCIE0); \
-    PCMSK0 |= (1 << PCINT7); \
+    PCMSK0 |= (1 << PCINT0); \
 } while (0)
 #define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT0_vect
-#define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB7)
+#define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB0)
 
 
 

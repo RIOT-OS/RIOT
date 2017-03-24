@@ -16,6 +16,7 @@ void *rcv_thread(void *arg)
 	pwm_t my_pwm = PWM_1;
 	rgbled_init(&my_rgbled, my_pwm, 0, 1, 2);
 	int8_t scale = 1;
+
 	/*only cycle through red and green since blue isnt woking on pinoccio board yet */
 	while(1){
 		while(my_color.r < 255 && my_color.r >0) {
@@ -27,11 +28,8 @@ void *rcv_thread(void *arg)
 			}
 			my_color.r = new_red_value;
 			rgbled_set(&my_rgbled, &my_color);
-			//DEBUG("myColor r: %d \n", my_color.r);
-			xtimer_usleep(500000);
-			//DEBUG("XTIMER done");
+			xtimer_usleep(50000);
 		}
-		DEBUG("Red done");
 		while(my_color.g < 255 && my_color.g >0) {
 			uint16_t new_green_value = my_color.g + scale*2;
 			if(new_green_value >=255){
@@ -41,9 +39,8 @@ void *rcv_thread(void *arg)
 			}
 			my_color.g = new_green_value;
 			rgbled_set(&my_rgbled, &my_color);
-			xtimer_usleep(500000);
+			xtimer_usleep(50000);
 		}
-		DEBUG("Green Done");
 		/*change scale */
 		if(scale == 1) {
 			scale = -1;

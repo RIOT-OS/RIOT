@@ -22,6 +22,7 @@
 
 #include "xtimer.h"
 #include "timex.h"
+#include "rgbled.h"
 
 #include "board.h"
 
@@ -38,7 +39,7 @@ int main(void)
     xtimer_ticks32_t last_wakeup = xtimer_now();
 
     while(1) {
-        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
+    	xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
         printf("slept until %" PRIu32 "\n", xtimer_usec_from_ticks(xtimer_now()));
         // Toggle red led
         LED_PORT ^= RED;
