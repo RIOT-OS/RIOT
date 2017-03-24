@@ -9,6 +9,7 @@ export LLVMPREFIX :=
 endif
 export CC          = clang
 export CXX         = clang++
+export CCAS       ?= $(CC)
 export LINK        = $(CC)
 export AS          = $(LLVMPREFIX)as
 export AR          = $(LLVMPREFIX)ar
