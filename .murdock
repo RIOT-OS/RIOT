@@ -1,13 +1,40 @@
 #!/bin/sh
 
+export TEST_BOARDS_AVAILABLE=${TEST_BOARDS_AVAILABLE:-"samr21-xpro"}
 export RIOT_CI_BUILD=1
 export STATIC_TESTS=${STATIC_TESTS:-1}
 export CFLAGS_DBG=""
 export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 
+NIGHTLY=${NIGHTLY:-0}
+RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
+
+check_label() {
+    local label="${1}"
+    [ -z "${CI_PULL_LABELS}" ] && return 1
+    echo "${CI_PULL_LABELS}" | grep -q "${label}"
+    return $?
+}
+
+[ "$RUN_TESTS" != "1" ] && {
+    check_label "CI: run tests" && RUN_TESTS=1
+}
+
 error() {
     echo "$@"
     exit 1
+}
+
+# true if word "$1" is in list of words "$2", false otherwise
+# uses grep -w, thus only alphanum and "_" count as word bounderies
+# (word "def" matches "abc-def")
+is_in_list() {
+    [ $# -ne 2 ] && return 1
+
+    local needle="$1"
+    local haystack="$2"
+
+    echo "$haystack" | grep -q -w "$needle"
 }
 
 _greplist() {
@@ -91,14 +118,23 @@ compile() {
     [ ! -d "$appdir" ] && error "$0: compile: error: application directory \"$appdir\" doesn't exist"
     [ ! -d "boards/$board" ] && error "$0: compile: error: board directory \"boards/$board\" doesn't exist"
 
+    # compile
     CCACHE_BASEDIR="$(pwd)" BOARD=$board RIOT_CI_BUILD=1 \
         make -C${appdir} clean all -j${JOBS:-4}
     RES=$?
 
+    # run tests
     if [ $RES -eq 0 ]; then
-        if [ "$board" = "native" -a "$appdir" = "tests/unittests" ]; then
-            make -C${appdir} test
-            RES=$?
+        if [ $RUN_TESTS -eq 1 -o "$board" = "native" ]; then
+            if [ -f "${BINDIR}/.test" ]; then
+                if [ "$board" = "native" ]; then
+                    BOARD=$board make -C${appdir} test
+                    RES=$?
+                elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
+                    BOARD=$board make -C${appdir} test-murdock
+                    RES=$?
+                fi
+            fi
         fi
     fi
 
@@ -111,6 +147,32 @@ compile() {
     fi
 
     return $RES
+}
+
+test_job() {
+    local appdir=$1
+    local board=$2
+    local flashfile="$3"
+
+    [ ! -f "$flashfile" ] && {
+        echo "$0: _test(): flashfile \"$flashfile\" doesn't exist!"
+        return 1
+    }
+
+    dwqc \
+        ${DWQ_JOBID:+--subjob} \
+        --file $flashfile:$appdir/bin/${board}/$(basename $flashfile) \
+        --queue ${TEST_QUEUE:-$board} \
+        --maxfail 1 \
+        "./.murdock run_test $appdir $board"
+}
+
+run_test() {
+    local appdir=$1
+    local board=$2
+    print_worker
+    echo "-- executing tests for $appdir on $board:"
+    BOARD=$board make -C$appdir flash-only test
 }
 
 # execute static tests
