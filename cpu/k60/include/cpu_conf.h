@@ -140,19 +140,6 @@ extern "C"
 /** IRQ channel for hwtimer interrupts */
 #define LPTIMER_IRQ_CHAN          LPTMR0_IRQn
 
-#if K60_CPU_REV == 1
-/*
- * The CNR register latching in LPTMR0 was added in silicon rev 2.x. With
- * rev 1.x we do not need to do anything in order to read the current timer counter
- * value
- */
-#define LPTIMER_CNR_NEEDS_LATCHING 0
-
-#elif K60_CPU_REV == 2
-
-#define LPTIMER_CNR_NEEDS_LATCHING 1
-
-#endif
 /** @} */
 
 /**
