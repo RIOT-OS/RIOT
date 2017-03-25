@@ -22,6 +22,9 @@ endif
 ifneq (,$(filter isl29125,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/isl29125/include
 endif
+ifneq (,$(filter hd44780,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/hd44780/include
+endif
 ifneq (,$(filter lps331ap,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lps331ap/include
 endif
