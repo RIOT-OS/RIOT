@@ -1,0 +1,39 @@
+From 83a5433b23b7c801067ac1dbccb6c1f6d0f78599 Mon Sep 17 00:00:00 2001
+From: Patrick Grosse <patrick.grosse@uni-muenster.de>
+Date: Thu, 30 Mar 2017 13:08:05 +0200
+Subject: [PATCH 6/6] Removed unnecessary library.json
+
+---
+ library.json | 20 --------------------
+ 1 file changed, 20 deletions(-)
+ delete mode 100644 library.json
+
+diff --git a/library.json b/library.json
+deleted file mode 100644
+index 570161c..0000000
+--- a/library.json
++++ /dev/null
+@@ -1,20 +0,0 @@
+-{
+-  "name": "microcoap",
+-  "keywords": "coap, web",
+-  "description": "A small CoAP implementation for microcontrollers",
+-  "repository": {
+-    "type": "git",
+-    "url": "https://github.com/1248/microcoap.git"
+-  },
+-  "authors": {
+-    "name": "Toby Jaffey",
+-    "url": "http://twitter.com/tobyjaffey"
+-  },  
+-  "exclude": [
+-    "main-posix.c",
+-    "microcoap.ino"
+-  ],
+-  "examples": "microcoap.ino",
+-  "frameworks": "arduino",
+-  "platforms": "*"
+-}
+-- 
+2.7.4
+
