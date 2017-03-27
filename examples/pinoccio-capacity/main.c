@@ -28,8 +28,10 @@
 #include <avr/interrupt.h>
 #include "periph/ac.h"
 #include "capacity.h"
-volatile uint8_t count=0;
-volatile uint16_t values[10];
+#include "periph/timer.h"
+#include "capacity_settings.h"
+//volatile uint8_t count=0;
+//volatile uint16_t values[10];
 
 void accb(void* arg) {
 	PORTF ^= (1<<PF0);
@@ -37,7 +39,10 @@ void accb(void* arg) {
 
 int main(void)
 {
-	capacity_init();
+	capacity_init(TIMER_DEV(2), AC_0);
+	capacity_result_t my_result;
+	start_measuring(TIMER_DEV(2), AC_0, 10, &my_result);
+	printf("Timestamp %u", my_result.timestamp);
 	/*ac_isr_ctx_t my_isr = {&accb, NULL};
 	ac_init(AC_0, AC_INPUT_CAPTURE, AC_IRQ_TOGGLE, my_isr);
 	ac_poweron(AC_0);

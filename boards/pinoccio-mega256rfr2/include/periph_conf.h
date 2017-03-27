@@ -70,7 +70,7 @@ extern "C" {
  * TODO Change the timer
  * @{
  */
-#define TIMER_NUMOF         (2U)
+#define TIMER_NUMOF         (3U)
 
 #define TIMER_0             MEGA_TIMER4
 #define TIMER_0_MASK        &TIMSK4
@@ -86,7 +86,12 @@ extern "C" {
 #define TIMER_1_ISRB        TIMER5_COMPB_vect
 #define TIMER_1_ISRC        TIMER5_COMPC_vect
 
-
+#define TIMER_2				MEGA_TIMER1
+#define TIMER_2_MASK        &TIMSK1
+#define TIMER_2_FLAG        &TIFR1
+#define TIMER_2_ISRA        TIMER1_COMPA_vect
+#define TIMER_2_ISRB        TIMER1_COMPB_vect
+#define TIMER_2_ISRC        TIMER1_COMPC_vect
 /** @} */
 
 /**

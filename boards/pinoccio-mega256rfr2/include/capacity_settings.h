@@ -3,7 +3,7 @@
  */
 
 #ifndef CAPACITY_SETTINGS_H_
-#define CAPACITY_H_
+#define CAPACITY_SETTINGS_H_
 
 #include "periph/gpio.h"
 
@@ -25,7 +25,7 @@ typedef struct{
 	gpio_t pxy_pin;
 }capacity_conf_t;
 
-capacity_conf_t capacity_conf = {
+static const capacity_conf_t capacity_conf = {
 		.plus_pin = GPIO_PIN(PORT_E, 2),
 		.minus_pin = GPIO_PIN(PORT_E, 3),
 		.result_pin = GPIO_PIN(PORT_F, 0),

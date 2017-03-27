@@ -23,8 +23,11 @@
 #include "periph/gpio.h"
 #include "cpu.h"
 #include "thread.h"
+#include "debug.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
+
+#define ENABLE_DEBUG		(1)
 
 static ac_isr_ctx_t ctx[AC_NUMOF];
 
@@ -65,6 +68,8 @@ int ac_init(ac_t dev, ac_output_mode_t output_mode, ac_irq_mode_t irq_mode, ac_i
 
 void ac_poweron(ac_t dev)
 {
+	DEBUG("POWERON AC \n");
+	printf("test");
 	uint8_t is_irq_disabled = *(ac_config[dev].acsr) & (1<<ACIE);
 	if(!is_irq_disabled)
 		ac_irq_disable(dev);
@@ -72,6 +77,7 @@ void ac_poweron(ac_t dev)
 	/*turn on interrupts again */
 	if(!is_irq_disabled)
 		ac_irq_enable(dev);
+	DEBUG("POWERON AC DONE \n");
 }
 
 void ac_poweroff(ac_t dev)

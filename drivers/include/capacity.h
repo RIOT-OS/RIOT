@@ -41,7 +41,7 @@ typedef struct{
 /**
  * @brief initializes the ports
  */
-void capacity_init(void);
+void capacity_init(uint8_t timer_dev, uint8_t ac_dev);
 
 /**
  * @brief starts a new measurement
@@ -51,7 +51,7 @@ void capacity_init(void);
  * @return						0 on completed measurement / 1 on failure
  */
 
-uint8_t start_measuring(uint8_t cycle, capacity_result_t *my_result);
+uint8_t start_measuring(uint8_t timer_dev, uint8_t ac_dev, uint8_t cycle, capacity_result_t *my_result);
 
 /**
  * @brief stops the measurement
