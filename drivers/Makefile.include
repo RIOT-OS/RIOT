@@ -106,3 +106,6 @@ endif
 ifneq (,$(filter adxl345,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/adxl345/include
 endif
+ifneq (,$(filter uart_half_duplex,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/uart_half_duplex/include
+endif
