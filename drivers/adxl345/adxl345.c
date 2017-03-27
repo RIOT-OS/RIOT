@@ -31,17 +31,20 @@
 
 #define I2C_SPEED           I2C_SPEED_NORMAL
 
-#define BUS                 (dev->params.i2c)
-#define ADDR                (dev->params.addr)
+#define BUS                 (dev->i2c)
+#define ADDR                (dev->addr)
 
-int adxl345_init(adxl345_t *dev, const adxl345_params_t* params)
+int adxl345_init(adxl345_t *dev, adxl345_params_t* params)
 {
     uint8_t reg;
 
     assert(dev && params);
 
     /* get device descriptor */
-    dev->params= *params;
+    dev->params = (adxl345_params_t*)params;
+
+    /* get scale_factor from full_res and range parameters */
+    dev->scale_factor = (dev->params->full_res ? 3.9 : (dev->params->range * 3.9));
 
     /* Acquire exclusive access */
     i2c_acquire(BUS);
@@ -61,11 +64,11 @@ int adxl345_init(adxl345_t *dev, const adxl345_params_t* params)
         return ADXL345_NODEV;
     }
     /* configure the user offset */
-    i2c_write_regs(BUS, ADDR, ACCEL_ADXL345_OFFSET_X, dev->params.offset, 3);
+    i2c_write_regs(BUS, ADDR, ACCEL_ADXL345_OFFSET_X, dev->params->offset, 3);
     /* Basic device setup */
-    reg = (dev->params.full_res | dev->params.range);
+    reg = (dev->params->full_res | dev->params->range);
     i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_DATA_FORMAT, reg);
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_BW_RATE, dev->params.rate);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_BW_RATE, dev->params->rate);
     /* Put device in measure mode */
     i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_POWER_CTL, MEASURE_BIT);
 
@@ -79,7 +82,7 @@ int adxl345_init(adxl345_t *dev, const adxl345_params_t* params)
 
 void adxl345_read(adxl345_t *dev, adxl345_data_t *data)
 {
-    uint8_t result[6];
+    int8_t result[6];
 
     assert(dev && data);
 
@@ -87,9 +90,9 @@ void adxl345_read(adxl345_t *dev, adxl345_data_t *data)
     i2c_read_regs(BUS, ADDR, ACCEL_ADXL345_DATA_X0, result, 6);
     i2c_release(BUS);
 
-    data->x = (((result[1] << 8)+result[0]) * dev->params.scale_factor);
-    data->y = (((result[3] << 8)+result[2]) * dev->params.scale_factor);
-    data->z = (((result[5] << 8)+result[4]) * dev->params.scale_factor);
+    data->x = (((result[1] << 8)+result[0]) * dev->scale_factor);
+    data->y = (((result[3] << 8)+result[2]) * dev->scale_factor);
+    data->z = (((result[5] << 8)+result[4]) * dev->scale_factor);
 }
 
 void adxl345_set_interrupt(adxl345_t *dev)
@@ -100,33 +103,33 @@ void adxl345_set_interrupt(adxl345_t *dev)
 
     i2c_acquire(BUS);
     /* Set threshold */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_THRESH_TAP, dev->params.interrupt.thres_tap);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_THRESH_TAP, dev->interrupt.thres_tap);
     /* Set Map */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_INT_MAP, dev->params.interrupt.map);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_INT_MAP, dev->interrupt.map);
     /* Set Duration */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_TAP_DUR, dev->params.interrupt.thres_dur);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_TAP_DUR, dev->interrupt.thres_dur);
     /* Enable axes */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_TAP_AXES, dev->params.interrupt.tap_axes);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_TAP_AXES, dev->interrupt.tap_axes);
     /* Set source */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_INT_SOURCE, dev->params.interrupt.source);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_INT_SOURCE, dev->interrupt.source);
     /* Set latent threshold */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_TAP_LAT, dev->params.interrupt.thres_latent);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_TAP_LAT, dev->interrupt.thres_latent);
     /* Set window threshold */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_TAP_WIN, dev->params.interrupt.thres_window);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_TAP_WIN, dev->interrupt.thres_window);
     /* Set activity threshold */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_THRESH_ACT, dev->params.interrupt.thres_act);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_THRESH_ACT, dev->interrupt.thres_act);
     /* Set inactivity threshold */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_THRESH_INACT, dev->params.interrupt.thres_inact);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_THRESH_INACT, dev->interrupt.thres_inact);
     /* Set inactivity time */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_TIME_INACT, dev->params.interrupt.time_inact);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_TIME_INACT, dev->interrupt.time_inact);
     /* Set free-fall threshold */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_THRESH_FF, dev->params.interrupt.thres_ff);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_THRESH_FF, dev->interrupt.thres_ff);
     /* Set free-fall time */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_TIME_FF, dev->params.interrupt.time_ff);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_TIME_FF, dev->interrupt.time_ff);
     /* Set axis control */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_ACT_INACT_CTL, dev->params.interrupt.act_inact);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_ACT_INACT_CTL, dev->interrupt.act_inact);
     /* Enable interrupt */
-    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_INT_ENABLE, dev->params.interrupt.enable);
+    i2c_write_reg(BUS, ADDR, ACCEL_ADXL345_INT_ENABLE, dev->interrupt.enable);
 
     /* Release the bus */
     i2c_release(BUS);
