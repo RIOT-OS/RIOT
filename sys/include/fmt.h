@@ -204,6 +204,24 @@ size_t fmt_s16_dec(char *out, int16_t val);
 size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits);
 
 /**
+ * @brief Format float to string
+ *
+ * Converts float value @p f to string
+ *
+ * @pre -2^32 < f < 2^32
+ *
+ * @note This function is using floating point math. It pulls in about 2.4k
+ *       bytes of code on ARM Cortex-M platforms.
+ *
+ * @param[out]  out         string to write to (or NULL)
+ * @param[in]   f           float value to convert
+ * @param[in]   precision   number of digits after decimal point (<=7)
+ *
+ * @returns     nr of bytes the function did or would write to out
+ */
+size_t fmt_float(char *out, float f, unsigned precision);
+
+/**
  * @brief Count characters until '\0' (exclusive) in @p str
  *
  * @param[in]   str  Pointer to string
@@ -292,7 +310,19 @@ void print_u64_hex(uint64_t val);
 void print_u64_dec(uint64_t val);
 
 /**
+ * @brief Print float value
+ *
+ * @pre -2^32 < f < 2^32
+ *
+ * @param[in]   f           float value to print
+ * @param[in]   precision   number of digits after decimal point (<=7)
+ */
+void print_float(float f, unsigned precision);
+
+/**
  * @brief Print null-terminated string to stdout
+ *
+ * @note See fmt_float for code size warning!
  *
  * @param[in]   str  Pointer to string to print
  */
