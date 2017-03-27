@@ -27,35 +27,10 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
-extern "C" {
-#endif
-
-/**
- * @brief   LED pin definitions and handlers
- * @{
- */
-#define LED0_PIN            GPIO_PIN(PORT_B, 13)
-#define LED0_MASK           (1 << 13)
-
-#define LED0_ON             (GPIOB->BSRR = LED0_MASK)
-#define LED0_OFF            (GPIOB->BSRR = (LED0_MASK << 16))
-#define LED0_TOGGLE         (GPIOB->ODR     ^= LED0_MASK)
-/** @} */
-
-/**
- * @brief   User button
- */
-#define BTN_B1_PIN          GPIO_PIN(PORT_C, 13)
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
-#ifdef __cplusplus
-}
+extern "C" {}
 #endif
 
 #endif /* BOARD_H */
