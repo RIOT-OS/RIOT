@@ -91,7 +91,7 @@ void sema_create(sema_t *sema, unsigned int value);
  *
  * Destroying a semaphore upon which other threads are currently blocked
  * will wake the other threads causing the @ref sema_wait (or
- * @ref sema_wait_timed) to return error (-ECANCELLED).
+ * @ref sema_wait_timed) to return error (-ECANCELED).
  *
  * @param[in] sema  The semaphore to destroy.
  */
