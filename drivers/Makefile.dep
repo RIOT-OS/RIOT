@@ -203,3 +203,13 @@ ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += netif
 endif
+
+ifneq (,$(filter uart_half_duplex,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_gpio
+    FEATURES_REQUIRED += periph_uart
+    USEMODULE += xtimer
+endif
+
+ifneq (,$(filter feetech,$(USEMODULE)))
+    USEMODULE += uart_half_duplex
+endif
