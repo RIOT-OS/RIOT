@@ -57,7 +57,7 @@ void _native_LED_RED_TOGGLE(void);
 #define MTD_0 mtd0
 
 /** mtd flash emulation device */
-extern mtd_native_dev_t mtd0;
+extern mtd_dev_t *mtd0;
 #endif
 
 #ifdef __cplusplus
