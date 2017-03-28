@@ -27,7 +27,7 @@
 #include "net/gnrc/ipv6.h"
 #include "random.h"
 
-#define ENABLE_DEBUG                (1)
+#define ENABLE_DEBUG                (0)
 #include "debug.h"
 
 #if ENABLE_DEBUG
