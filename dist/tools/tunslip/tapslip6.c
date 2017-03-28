@@ -172,7 +172,6 @@ after_fread:
 
     if (ret == 0) {
         clearerr(inslip);
-        return;
         fprintf(stderr, "serial_to_tun: EOF\n");
         exit(1);
     }
