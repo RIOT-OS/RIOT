@@ -30,7 +30,7 @@
 #endif
 
 #ifndef PM_BLOCKER_INITIAL
-#define PM_BLOCKER_INITIAL { .val_u32=0x01010101 }
+#define PM_BLOCKER_INITIAL { .val_u32 = 0 }
 #endif
 
 /**
