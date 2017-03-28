@@ -304,7 +304,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
                 break;
 #ifdef MODULE_MTD_NATIVE
             case 'm':
-                mtd0.fname = strndup(optarg, PATH_MAX - 1);
+                ((mtd_native_dev_t *)mtd0)->fname = strndup(optarg, PATH_MAX - 1);
                 break;
 #endif
             default:

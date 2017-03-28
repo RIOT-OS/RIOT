@@ -47,7 +47,7 @@ void board_init(void)
 #define MTD_NATIVE_FILENAME    "MEMORY.bin"
 #endif
 
-mtd_native_dev_t mtd0 = {
+static mtd_native_dev_t mtd0_dev = {
     .dev = {
         .driver = &native_flash_driver,
         .sector_count = MTD_NATIVE_SECTOR_NUM,
@@ -56,4 +56,6 @@ mtd_native_dev_t mtd0 = {
     },
     .fname = MTD_NATIVE_FILENAME,
 };
+
+mtd_dev_t *mtd0 = (mtd_dev_t *)&mtd0_dev;
 #endif
