@@ -3,8 +3,6 @@ APPLICATION = lwip
 BOARD ?= iotlab-m3
 include ../Makefile.tests_common
 
-RIOTBASE ?= $(CURDIR)/../..
-
 BOARD_BLACKLIST := arduino-mega2560 msb-430h telosb waspmote-pro z1 arduino-uno \
                    arduino-duemilanove msb-430 wsn430-v1_4 wsn430-v1_3b
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-mega2560 msb-430h nrf6310 \
