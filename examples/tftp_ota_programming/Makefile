@@ -1,0 +1,53 @@
+APPLICATION = tftp_ota_programming
+
+# If no BOARD is found in the environment, use this default:
+BOARD ?= iotlab-m3
+
+# Compile this example for FW_SLOT=1
+FW_SLOT ?= 1
+
+# Use VERSION (> 0) and APPID (32bit hex) to build with bootloader
+VERSION ?= 0x1
+APPID   ?= 0xabcd1234
+
+# This has to be the absolute path to the RIOT base directory:
+RIOTBASE ?= $(CURDIR)/../..
+
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon calliope-mini chronos microbit msb-430 \
+                             msb-430h nrf51dongle nrf6310 nucleo32-f031 \
+                             nucleo32-f042 nucleo32-f303 nucleo32-l031 nucleo-f030 \
+                             nucleo-f070 nucleo-f072 nucleo-f103 nucleo-f302 nucleo-f334 \
+                             nucleo-l053 pca10000 pca10005 spark-core stm32f0discovery \
+                             telosb weio wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
+
+# Include packages that pull up and auto-init the link layer.
+# NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
+USEMODULE += gnrc_netdev_default
+USEMODULE += auto_init_gnrc_netif
+# Specify the mandatory networking modules for IPv6 and UDP
+USEMODULE += gnrc_ipv6_router_default
+USEMODULE += gnrc_udp
+# Add a routing protocol
+USEMODULE += gnrc_rpl
+# This application dumps received packets to STDIO using the pktdump module
+USEMODULE += gnrc_pktdump
+# Additional networking modules that can be dropped if not needed
+USEMODULE += gnrc_icmpv6_echo
+# Use gnrc_tftp for TFTP
+USEMODULE += gnrc_tftp
+# Add also the shell, some shell commands
+USEMODULE += shell
+USEMODULE += shell_commands
+USEMODULE += ps
+# Use fw_slots module to manage images on ROM
+USEMODULE += fw_slots
+
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+CFLAGS += -DDEVELHELP
+
+# Change this to 0 show compiler invocation lines by default:
+QUIET ?= 1
+
+include $(RIOTBASE)/Makefile.include
