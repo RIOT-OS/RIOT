@@ -1,5 +1,6 @@
 # name of your application
 APPLICATION = gnrc_tcp_server
+include ../Makefile.tests_common
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
