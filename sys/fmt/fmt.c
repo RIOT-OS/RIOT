@@ -249,24 +249,27 @@ size_t fmt_lpad(char *out, size_t in_len, size_t pad_len, char pad_char)
         return in_len;
     }
 
-    size_t n = pad_len - in_len;
+    if (out) {
+        size_t n = pad_len - in_len;
 
-    if (FMT_USE_MEMMOVE) {
-        memmove(out + n, out, in_len);
-        memset(out, pad_char, n);
-    }
-    else {
-        char *pos = out + pad_len - 1;
-        out += in_len -1;
-
-        while(in_len--) {
-            *pos-- = *out--;
+        if (FMT_USE_MEMMOVE) {
+            memmove(out + n, out, in_len);
+            memset(out, pad_char, n);
         }
+        else {
+            char *pos = out + pad_len - 1;
+            out += in_len -1;
 
-        while (n--) {
-            *pos-- = pad_char;
+            while(in_len--) {
+                *pos-- = *out--;
+            }
+
+            while (n--) {
+                *pos-- = pad_char;
+            }
         }
     }
+
     return pad_len;
 }
 
