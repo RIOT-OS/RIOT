@@ -68,6 +68,9 @@ typedef struct {
     int type;
     int protocol;
     bool bound;
+#ifdef POSIX_SETSOCKOPT
+    uint32_t recv_timeout;
+#endif
     socket_sock_t *sock;
 #ifdef MODULE_SOCK_TCP
     sock_tcp_t *queue_array;
@@ -323,6 +326,9 @@ int socket(int domain, int type, int protocol)
             }
             s->bound = false;
             s->sock = NULL;
+#ifdef POSIX_SETSOCKOPT
+            s->recv_timeout = SOCK_NO_TIMEOUT;
+#endif
 #ifdef MODULE_SOCK_TCP
             if (type == SOCK_STREAM)  {
                 s->queue_array = NULL;
@@ -363,6 +369,13 @@ int accept(int socket, struct sockaddr *restrict address,
         errno = EINVAL;
         return -1;
     }
+
+#ifdef POSIX_SETSOCKOPT
+    const uint32_t recv_timeout = s->recv_timeout;
+#else
+    const uint32_t recv_timeout = SOCK_NO_TIMEOUT;
+#endif
+
     switch (s->type) {
         case SOCK_STREAM:
             new_s = _get_free_socket();
@@ -372,9 +385,8 @@ int accept(int socket, struct sockaddr *restrict address,
                 res = -1;
                 break;
             }
-            /* TODO: apply configured timeout */
             if ((res = sock_tcp_accept(&s->sock->tcp.queue, &sock,
-                                       SOCK_NO_TIMEOUT)) < 0) {
+                                       recv_timeout)) < 0) {
                 errno = -res;
                 res = -1;
                 break;
@@ -789,11 +801,17 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
             return res;
         }
     }
+
+#ifdef POSIX_SETSOCKOPT
+    const uint32_t recv_timeout = s->recv_timeout;
+#else
+    const uint32_t recv_timeout = SOCK_NO_TIMEOUT;
+#endif
+
     switch (s->type) {
 #ifdef MODULE_SOCK_IP
         case SOCK_RAW:
-            /* TODO: apply configured timeout */
-            if ((res = sock_ip_recv(&s->sock->raw, buffer, length, SOCK_NO_TIMEOUT,
+            if ((res = sock_ip_recv(&s->sock->raw, buffer, length, recv_timeout
                                (sock_ip_ep_t *)&ep)) < 0) {
                 errno = -res;
                 res = -1;
@@ -802,9 +820,8 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
 #endif
 #ifdef MODULE_SOCK_TCP
         case SOCK_STREAM:
-            /* TODO: apply configured timeout */
             if ((res = sock_tcp_read(&s->sock->tcp.sock, buffer, length,
-                                SOCK_NO_TIMEOUT)) < 0) {
+                                recv_timeout)) < 0) {
                 errno = -res;
                 res = -1;
             }
@@ -812,8 +829,7 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
 #endif
 #ifdef MODULE_SOCK_UDP
         case SOCK_DGRAM:
-            /* TODO: apply configured timeout */
-            if ((res = sock_udp_recv(&s->sock->udp, buffer, length, SOCK_NO_TIMEOUT,
+            if ((res = sock_udp_recv(&s->sock->udp, buffer, length, recv_timeout,
                                 &ep)) < 0) {
                 errno = -res;
                 res = -1;
@@ -918,6 +934,62 @@ ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
             break;
     }
     return res;
+}
+
+/*
+ * This is a partial implementation of setsockopt for changing the receive
+ * timeout value of a socket.
+ */
+int setsockopt(int socket, int level, int option_name, const void *option_value,
+               socklen_t option_len)
+{
+#ifdef POSIX_SETSOCKOPT
+    socket_t *s;
+    struct timeval *tv;
+    const uint32_t max_timeout_secs = UINT32_MAX / (1000 * 1000);
+
+    if (level != SOL_SOCKET
+    ||  option_name != SO_RCVTIMEO) {
+        errno = ENOTSUP;
+        return -1;
+    }
+    if (option_value == NULL
+    ||  option_len != sizeof(struct timeval)) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    mutex_lock(&_socket_pool_mutex);
+    s = _get_socket(socket);
+    mutex_unlock(&_socket_pool_mutex);
+    if (s == NULL) {
+        errno = ENOTSOCK;
+        return -1;
+    }
+
+    tv = (struct timeval *) option_value;
+
+    if (tv->tv_sec < 0 || tv->tv_usec < 0) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if ((uint32_t)tv->tv_sec > max_timeout_secs
+    || ((uint32_t)tv->tv_sec == max_timeout_secs && (uint32_t)tv->tv_usec > UINT32_MAX - max_timeout_secs * 1000 * 1000)) {
+        errno = EDOM;
+        return -1;
+    }
+
+    s->recv_timeout = tv->tv_sec * 1000 * 1000 + tv->tv_usec;
+    return 0;
+#else
+    (void)socket;
+    (void)level;
+    (void)option_name;
+    (void)option_value;
+    (void)option_len;
+    return -1;
+#endif
 }
 
 /**
