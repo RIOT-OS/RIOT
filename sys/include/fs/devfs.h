@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup  fs_devfs DevFS device file system
- * @ingroup   fs
+ * @defgroup  sys_fs_devfs DevFS device file system
+ * @ingroup   sys_fs
  * @brief     Dynamic device file system
  *
  * This file system implementation allows devices to register file names for

@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup  fs_constfs ConstFS static file system
- * @ingroup   fs
+ * @defgroup  sys_fs_constfs ConstFS static file system
+ * @ingroup   sys_fs
  * @brief     Constant file system resident in arrays
  *
  * This is an example of how to implement a simple file system driver for the

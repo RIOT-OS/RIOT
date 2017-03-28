@@ -7,7 +7,8 @@
  */
 
 /**
- * @defgroup    mtd Memory Technology Device
+ * @defgroup    drivers_mtd Memory Technology Device
+ * @ingroup     drivers_storage
  * @{
  * @brief       Low level Memory Technology Device interface
  *
