@@ -2,9 +2,6 @@
 APPLICATION = gnrc_ipv6_ext
 include ../Makefile.tests_common
 
-# This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../..
-
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos maple-mini msb-430 msb-430h \
                              nrf51dongle nrf6310 nucleo32-f031 nucleo32-f042 \
                              nucleo32-l031 nucleo-f030 nucleo-f103 nucleo-f334 nucleo-l053 \
