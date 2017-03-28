@@ -63,7 +63,7 @@
  * network stack it uses.
  * The network stack used under the bonnet is specified by including the
  * appropriate module (for example `USEMODULE += gnrc_sock_udp` for
- * [GNRC's](net_gnrc) version of this API).
+ * [GNRC's](@ref net_gnrc) version of this API).
  *
  * This allows for network stack agnostic code on the application layer.
  * The application code to establish a connection is always the same, allowing
@@ -98,8 +98,8 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef NET_SOCK_H_
-#define NET_SOCK_H_
+#ifndef NET_SOCK_H
+#define NET_SOCK_H
 
 #include <stdint.h>
 
@@ -172,7 +172,8 @@ typedef struct {
          */
         uint8_t ipv6[16];
 #endif
-        uint32_t ipv4;      /**< IPv4 address mode */
+        uint8_t ipv4[4];        /**< IPv4 address mode */
+        uint32_t ipv4_u32;      /**< IPv4 address *in network byte order* */
     } addr;                 /**< address */
 
     /**
@@ -208,7 +209,8 @@ struct _sock_tl_ep {
          */
         uint8_t ipv6[16];
 #endif
-        uint32_t ipv4;      /**< IPv4 address mode */
+        uint8_t ipv4[4];        /**< IPv4 address mode */
+        uint32_t ipv4_u32;      /**< IPv4 address *in network byte order* */
     } addr;                 /**< address */
 
     /**
@@ -222,12 +224,12 @@ struct _sock_tl_ep {
      * over
      */
     uint16_t netif;
-    uint16_t port;          /**< transport layer port */
+    uint16_t port;          /**< transport layer port (in host byte order) */
 };
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_SOCK_H_ */
+#endif /* NET_SOCK_H */
 /** @} */

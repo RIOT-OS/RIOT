@@ -7,9 +7,21 @@
  */
 
 /**
- * @defgroup    sys_fmt string formatting
+ * @defgroup    sys_fmt String formatting (fmt)
  * @ingroup     sys
  * @brief       Provides simple string formatting functions
+ *
+ * The goal of this API is to provide a string formatting interface which has a
+ * reduced code size footprint compared to the libc provided stdio.h functionality.
+ *
+ * This library provides a set of formatting and printing functions for 64 bit
+ * integers, even when the C library was built without support for 64 bit
+ * formatting (newlib-nano).
+ *
+ * \note The print functions in this library do not buffer any output.
+ * Mixing calls to standard @c printf from stdio.h with the @c print_xxx
+ * functions in fmt, especially on the same output line, may cause garbled
+ * output.
  *
  * @{
  *
@@ -19,14 +31,18 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef FMT_H_
-#define FMT_H_
+#ifndef FMT_H
+#define FMT_H
 
 #include <stdint.h>
 #include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifndef FMT_USE_MEMMOVE
+#define FMT_USE_MEMMOVE (1) /**< use memmove() or internal implementation */
 #endif
 
 /**
@@ -214,10 +230,10 @@ size_t fmt_str(char *out, const char *str);
  *
  * Will convert up to @p n digits. Stops at any non-digit or '\0' character.
  *
- * @param[out]  str  Pointer to string to read from
+ * @param[in]   str  Pointer to string to read from
  * @param[in]   n    Maximum nr of characters to consider
  *
- * @return      nr of digits read
+ * @return      converted uint32_t value
  */
 uint32_t scn_u32_dec(const char *str, size_t n);
 
@@ -246,6 +262,13 @@ void print_u32_dec(uint32_t val);
 void print_s32_dec(int32_t val);
 
 /**
+ * @brief Print byte value as hex to stdout
+ *
+ * @param[in]  byte Byte value to print
+ */
+void print_byte_hex(uint8_t byte);
+
+/**
  * @brief Print uint32 value as hex to stdout
  *
  * @param[in]   val  Value to print
@@ -262,7 +285,7 @@ void print_u64_hex(uint64_t val);
 /**
  * @brief Print uint64 value as decimal to stdout
  *
- * @note This used fmt_u64_dec(), which uses ~400b of code.
+ * @note This uses fmt_u64_dec(), which uses ~400b of code.
  *
  * @param[in]   val  Value to print
  */
@@ -275,9 +298,31 @@ void print_u64_dec(uint64_t val);
  */
 void print_str(const char* str);
 
+/**
+ * @brief Pad string to the left
+ *
+ * This function left-pads a given string @p out with @p pad_char
+ *
+ * For example, calling
+ *
+ *     fmt_lpad("abcd", 4, 7, ' ');
+ *
+ * would result in "   abcd".
+ *
+ * @note Caller must ensure @p str can take pad_len characters!
+ *
+ * @param[inout]    str         string to pad
+ * @param[in]       in_len      length of str
+ * @param[in]       pad_len     total length after padding
+ * @param[in]       pad_char    char to use as pad char
+ *
+ * @returns pad_len
+ */
+size_t fmt_lpad(char *str, size_t in_len, size_t pad_len, char pad_char);
+
 #ifdef __cplusplus
 }
 #endif
 
 /** @} */
-#endif /* FMT_H_ */
+#endif /* FMT_H */

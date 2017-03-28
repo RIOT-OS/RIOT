@@ -18,6 +18,7 @@
  */
 
 #include "cpu.h"
+#include "periph/init.h"
 
 
 #define SYSOSCCTRL_Val    0x00000000 /* Reset: 0x000 */
@@ -111,4 +112,6 @@ void cpu_init(void)
     cortexm_init();
     /* initialize the clock */
     clk_init();
+    /* trigger static peripheral initialization */
+    periph_init();
 }

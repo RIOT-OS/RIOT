@@ -19,12 +19,10 @@
  *              Antonio Lignan <alinan@zolertia.com>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
-#include "periph/gpio.h"
-#include "periph/spi.h"
 #include "board_common.h"
 
 #ifdef __cplusplus
@@ -60,7 +58,7 @@
  * @name User button pin definition
  * @{
  */
-#define BUTTON_GPIO     GPIO_3_PIN
+#define BTN0_PIN        GPIO_PIN(0, 3)
 /** @} */
 
 /**
@@ -110,8 +108,26 @@
 #define CC1200_GPD2_GPIO    GPIO_PB0
 /** @} */
 
+/**
+ * @name Onboard micro-sd slot pin definitions
+ * @{
+ */
+#define SDCARD_SPI_PARAM_SPI       SPI_DEV(1)
+#define SDCARD_SPI_PARAM_CS        GPIO_PIN(0,7)
+#define SDCARD_SPI_PARAM_CLK       GPIO_PIN(2,4)
+#define SDCARD_SPI_PARAM_MOSI      GPIO_PIN(2,5)
+#define SDCARD_SPI_PARAM_MISO      GPIO_PIN(2,6)
+#define SDCARD_SPI_PARAM_POWER     GPIO_PIN(0,6)
+#define SDCARD_SPI_PARAM_POWER_AH  false
+/** @} */
+
+/**
+ * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ */
+void board_init(void);
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 PHYTEC Messtechnik GmbH
+ *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,7 +8,7 @@
  */
 
 /**
- * @defgroup    drivers_tcs37727 TCS37727 Light-To-Digital Converter
+ * @defgroup    drivers_tcs37727 TCS37727 RGB Light Sensor
  * @ingroup     drivers_sensors
  * @brief       Driver for the AMS TCS37727 Color Light-To-Digital Converter
  *
@@ -19,13 +20,15 @@
  *
  * @author      Felix Siebel <f.siebel@phytec.de>
  * @author      Johann Fischer <j.fischer@phytec.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef TCS37727_H
 #define TCS37727_H
 
 #include <stdint.h>
-#include <stdbool.h>
+
+#include "saul.h"
 #include "periph/i2c.h"
 
 #ifdef __cplusplus
@@ -42,7 +45,7 @@ extern "C"
 #endif
 
 /**
- * @brief Struct for storing TCS37727 sensor data
+ * @brief   Struct for storing TCS37727 sensor data
  */
 typedef struct {
     uint32_t red;           /**< IR compensated channels red */
@@ -54,66 +57,83 @@ typedef struct {
 } tcs37727_data_t;
 
 /**
- * @brief Device descriptor for TCS37727 sensors.
+ * @brief   TCS37727 configuration parameters
  */
 typedef struct {
-    i2c_t i2c;              /**< I2C device the sensor is connected to */
-    uint8_t addr;           /**< the sensor's slave address on the I2C bus */
-    bool initialized;       /**< sensor status, true if sensor is initialized */
-    int atime_us;           /**< atime value conveted to microseconds */
+    i2c_t i2c;              /**< I2C bus the sensor is connected to */
+    uint8_t addr;           /**< the sensors address on the I2C bus */
+    uint32_t atime;         /**< conversion time in microseconds */
+} tcs37727_params_t;
+
+/**
+ * @brief   Device descriptor for TCS37727 sensors
+ */
+typedef struct {
+    tcs37727_params_t p;    /**< device configuration */
     int again;              /**< amount of gain */
 } tcs37727_t;
 
 /**
- * @brief Initialise the TCS37727 sensor driver.
- * Settings: Gain 4x, Proximity Detection off
+ * @brief   Possible TCS27737 return values
+ */
+enum {
+    TCS37727_OK     =  0,   /**< everything worked as expected */
+    TCS37727_NOBUS  = -1,   /**< access to the configured I2C bus failed */
+    TCS37727_NODEV  = -2    /**< no TCS37727 device found on the bus */
+};
+
+/**
+ * @brief   Export the sensor's SAUL interface
+ */
+extern const saul_driver_t tcs37727_saul_driver;
+
+/**
+ * @brief   Initialize the given TCS37727 sensor
+ *
+ * The sensor is initialized in RGBC only mode with proximity detection turned
+ * off.
+ *
+ * The gain will be initially set to 4x, but it will be adjusted
+ *
+ * The gain value will be initially set to 4x, but it will be automatically
+ * adjusted during runtime.
  *
  * @param[out] dev          device descriptor of sensor to initialize
- * @param[in]  i2c          I2C bus the sensor is connected to
- * @param[in]  address      sensor's I2C slave address
- * @param[in]  atime_us     rgbc RGBC integration time in microseconds
+ * @param[in]  params       static configuration parameters
  *
- * @return                  0 on success
- * @return                  -1 if initialization of I2C bus failed
- * @return                  -2 if sensor test failed
- * @return                  -3 if sensor configuration failed
+ * @return                  TCS27737_OK on success
+ * @return                  TCS37727_NOBUS if initialization of I2C bus fails
+ * @return                  TCS37727_NODEV if no sensor can be found
  */
-int tcs37727_init(tcs37727_t *dev, i2c_t i2c, uint8_t address, int atime_us);
+int tcs37727_init(tcs37727_t *dev, const tcs37727_params_t *params);
 
 /**
  * @brief Set RGBC enable, this activates periodic RGBC measurements.
  *
  * @param[out] dev          device descriptor of sensor
- *
- * @return                  0 on success
- * @return                  -1 on error
  */
-int tcs37727_set_rgbc_active(tcs37727_t *dev);
+void tcs37727_set_rgbc_active(tcs37727_t *dev);
 
 /**
- * @brief Set RGBC disable, this deactivates periodic RGBC measurements.
+ * @brief Set RGBC disable, this deactivates periodic RGBC measurements
+ *
  * Also turns off the sensor when proximity measurement is disabled.
  *
  * @param[in]  dev          device descriptor of sensor
- *
- * @return                  0 on success
- * @return                  -1 on error
  */
-int tcs37727_set_rgbc_standby(tcs37727_t *dev);
+void tcs37727_set_rgbc_standby(tcs37727_t *dev);
 
 /**
- * @brief Read sensor's data.
+ * @brief Read sensor's data
+ *
  * Besides an Autogain routine is called. If a maximum or minimum threshold
  * value of the channel clear is reached, then the gain will be changed
  * correspond to max or min threshold.
  *
  * @param[in]  dev         device descriptor of sensor
- * @param[out] data        device sensor data
- *
- * @return                  0 on success
- * @return                  -1 on error
+ * @param[out] data        device sensor data, MUST not be NULL
  */
-int tcs37727_read(tcs37727_t *dev, tcs37727_data_t *data);
+void tcs37727_read(tcs37727_t *dev, tcs37727_data_t *data);
 
 #ifdef __cplusplus
 }

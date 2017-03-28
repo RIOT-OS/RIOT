@@ -57,12 +57,12 @@ static inline ADC_TypeDef *dev(adc_t line)
 static inline void prep(adc_t line)
 {
     mutex_lock(&locks[adc_config[line].dev]);
-    RCC->APB2ENR |= (RCC_APB2ENR_ADC1EN << adc_config[line].dev);
+    periph_clk_en(APB2, (RCC_APB2ENR_ADC1EN << adc_config[line].dev));
 }
 
 static inline void done(adc_t line)
 {
-    RCC->APB2ENR &= ~(RCC_APB2ENR_ADC1EN << adc_config[line].dev);
+    periph_clk_dis(APB2, (RCC_APB2ENR_ADC1EN << adc_config[line].dev));
     mutex_unlock(&locks[adc_config[line].dev]);
 }
 

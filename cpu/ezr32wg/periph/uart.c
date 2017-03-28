@@ -19,8 +19,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 
 #include "periph/uart.h"
 #include "periph/gpio.h"
@@ -48,7 +46,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* check if device is valid and get base register address */
     if (dev >= UART_NUMOF) {
-        return -1;
+        return UART_NODEV;
     }
     uart = _uart(dev);
 
@@ -67,17 +65,27 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
      * the division afterwards... */
     uart->CLKDIV = (((CLOCK_HFPERCLK << 5) / (16 * baudrate) - 32) << 3);
     /* configure the pins */
-    gpio_init(uart_config[dev].rx_pin, GPIO_IN);
     gpio_init(uart_config[dev].tx_pin, GPIO_OUT);
-    uart->ROUTE = ((uart_config[dev].loc << _USART_ROUTE_LOCATION_SHIFT) |
-                   USART_ROUTE_RXPEN | USART_ROUTE_TXPEN);
-    /* enable RX interrupt */
-    NVIC_EnableIRQ(uart_config[dev].irq);
-    NVIC_EnableIRQ(uart_config[dev].irq + 1);
-    uart->IEN |= USART_IEN_RXDATAV;
-    /* enable receiver and transmitter */
-    uart->CMD = USART_CMD_TXEN | USART_CMD_RXEN;
-    return 0;
+    if (rx_cb) {
+        gpio_init(uart_config[dev].rx_pin, GPIO_IN);
+        uart->ROUTE = ((uart_config[dev].loc << _USART_ROUTE_LOCATION_SHIFT) |
+                       USART_ROUTE_RXPEN | USART_ROUTE_TXPEN);
+    } else {
+        uart->ROUTE = ((uart_config[dev].loc << _USART_ROUTE_LOCATION_SHIFT) |
+                       USART_ROUTE_TXPEN);
+    }
+    if (rx_cb) {
+        /* enable RX interrupt */
+        NVIC_EnableIRQ(uart_config[dev].irq);
+        NVIC_EnableIRQ(uart_config[dev].irq + 1);
+        uart->IEN |= USART_IEN_RXDATAV;
+        /* enable receiver and transmitter */
+        uart->CMD = USART_CMD_TXEN | USART_CMD_RXEN;
+    }
+    else {
+        uart->CMD = USART_CMD_TXEN;
+    }
+    return UART_OK;
 }
 
 void uart_write(uart_t dev, const uint8_t *data, size_t len)
@@ -104,9 +112,7 @@ static inline void rx_irq(int dev)
         uint8_t data = (uint8_t)_uart(dev)->RXDATA;
         isr_ctx[dev].rx_cb(isr_ctx[dev].arg, data);
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef UART_0_ISR_RX

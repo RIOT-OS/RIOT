@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 FreshTemp, LLC.
- *               2014 Freie Universität Berlin
+ *               2014-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,11 +16,14 @@
  * @brief       Peripheral MCU configuration for the Atmel SAM L21 Xplained Pro board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
- * @autor       Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
+
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,7 +32,7 @@ extern "C" {
 /**
  * @brief GCLK reference speed
  */
-#define GCLK_REF (16000000U)
+#define CLOCK_CORECLOCK     (16000000U)
 
 /**
  * @name Timer peripheral configuration
@@ -71,8 +74,22 @@ extern "C" {
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF          (1)
-#define SPI_0_EN           1
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = &(SERCOM0->SPI),
+        .miso_pin = GPIO_PIN(PA, 4),
+        .mosi_pin = GPIO_PIN(PA, 6),
+        .clk_pin  = GPIO_PIN(PA, 7),
+        .miso_mux = GPIO_MUX_D,
+        .mosi_mux = GPIO_MUX_D,
+        .clk_mux  = GPIO_MUX_D,
+        .miso_pad = SPI_PAD_MISO_0,
+        .mosi_pad = SPI_PAD_MOSI_2_SCK_3
+
+    }
+};
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**

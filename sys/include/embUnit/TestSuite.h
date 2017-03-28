@@ -32,8 +32,8 @@
  *
  * $Id: TestSuite.h,v 1.7 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef EMBUNIT_TESTSUITE_H_
-#define EMBUNIT_TESTSUITE_H_
+#ifndef EMBUNIT_TESTSUITE_H
+#define EMBUNIT_TESTSUITE_H
 
 #ifdef  __cplusplus
 extern "C" {
@@ -63,4 +63,4 @@ extern const TestImplement TestSuiteImplement;
 }
 #endif
 
-#endif/* EMBUNIT_TESTSUITE_H_ */
+#endif/* EMBUNIT_TESTSUITE_H */

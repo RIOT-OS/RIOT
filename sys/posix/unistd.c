@@ -22,7 +22,7 @@ int close(int fildes)
 {
     fd_t *fd_obj = fd_get(fildes);
 
-    if (!fd_obj) {
+    if (!fd_obj || (fd_obj->close == NULL)) {
         errno = EBADF;
         return -1;
     }

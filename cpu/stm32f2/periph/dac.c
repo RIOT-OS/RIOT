@@ -45,7 +45,7 @@ int8_t dac_init(dac_t line)
     /* configure pin */
     gpio_init_analog(dac_config[line].pin);
     /* enable the DAC's clock */
-    RCC->APB1ENR |= RCC_APB1ENR_DACEN;
+    periph_clk_en(APB1, RCC_APB1ENR_DACEN);
     /* reset output and enable the line's channel */
     dac_set(line, 0);
     dac_poweron(line);

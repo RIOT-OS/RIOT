@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    drivers_nrf24l01p NRF24L01+ Driver Interface
+ * @defgroup    drivers_nrf24l01p NRF24L01+ driver interface
  * @ingroup     drivers_netdev
  *
  * @brief       Low-level driver for nrf24l01+ transceiver
@@ -545,6 +545,15 @@ int nrf24l01p_enable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
 * @return           -1 on error.
 */
 int nrf24l01p_disable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
+
+/**
+* @brief Disable CRC error detection on the nrf24l01+ transceiver.
+*
+* @param[in] dev    Transceiver device to use.
+*
+* @return           0.
+*/
+int nrf24l01p_disable_crc(nrf24l01p_t *dev);
 
 /**
 * @brief Enable CRC error detection on the nrf24l01+ transceiver.

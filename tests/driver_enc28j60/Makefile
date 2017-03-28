@@ -1,12 +1,12 @@
-export APPLICATION = driver_enc28j60
+APPLICATION = driver_enc28j60
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_spi periph_gpio
 
-BOARD_INSUFFICIENT_MEMORY := msb-430h nucleo-f334 stm32f0discovery telosb \
-                             weio z1
+BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h nucleo-f334 nucleo-l053 \
+                             stm32f0discovery telosb weio z1
 
-USEMODULE += gnrc_netdev2
+USEMODULE += gnrc_netdev
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += enc28j60
@@ -18,14 +18,14 @@ USEMODULE += ps
 
 # set board specific peripheral configurations
 ifneq (,$(filter stm32f4discovery,$(BOARD)))
-  ENC_SPI ?= SPI_1
+  ENC_SPI ?= SPI_DEV\(1\)
   ENC_CS  ?= GPIO_PIN\(PORT_B,12\)
   ENC_INT ?= GPIO_PIN\(PORT_B,11\)
   ENC_RST ?= GPIO_PIN\(PORT_B,10\)
 endif
 
 # fallback: set SPI bus and pins to default values
-ENC_SPI ?= SPI_0
+ENC_SPI ?= SPI_DEV\(0\)
 ENC_CS  ?= GPIO_PIN\(0,0\)
 ENC_INT ?= GPIO_PIN\(0,1\)
 ENC_RST ?= GPIO_PIN\(0,2\)

@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef SIXLOWPAN_H_
-#define SIXLOWPAN_H_
+#ifndef SIXLOWPAN_H
+#define SIXLOWPAN_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -261,5 +261,5 @@ void sixlowpan_print(uint8_t *data, size_t size);
 }
 #endif
 
-#endif /* SIXLOWPAN_H_ */
+#endif /* SIXLOWPAN_H */
 /** @} */

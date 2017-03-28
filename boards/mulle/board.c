@@ -24,18 +24,27 @@
 #include "cpu.h"
 #include "mcg.h"
 #include "periph/gpio.h"
-#include "periph/uart.h"
 #include "periph/rtt.h"
 #include "periph/spi.h"
 #include "nvram-spi.h"
+#include "nvram.h"
 #include "xtimer.h"
+#include "vfs.h"
+#include "fs/devfs.h"
 
 static nvram_t mulle_nvram_dev;
 nvram_t *mulle_nvram = &mulle_nvram_dev;
 static nvram_spi_params_t nvram_spi_params = {
         .spi = MULLE_NVRAM_SPI_DEV,
+        .clk = MULLE_NVRAM_SPI_CLK,
         .cs = MULLE_NVRAM_SPI_CS,
         .address_count = MULLE_NVRAM_SPI_ADDRESS_COUNT,
+};
+
+static devfs_t mulle_nvram_devfs = {
+    .path = "/mulle-fram",
+    .f_op = &nvram_vfs_ops,
+    .private_data = &mulle_nvram_dev,
 };
 
 /** @brief Initialize the GPIO pins controlling the power switches. */
@@ -184,10 +193,6 @@ static int mulle_nvram_init(void)
     } rec;
     rec.u32 = 0;
 
-    if (spi_init_master(MULLE_NVRAM_SPI_DEV, SPI_CONF_FIRST_RISING, SPI_SPEED_5MHZ) != 0) {
-        return -1;
-    }
-
     if (nvram_spi_init(mulle_nvram, &nvram_spi_params, MULLE_NVRAM_CAPACITY) != 0) {
         return -2;
     }
@@ -213,6 +218,10 @@ static int mulle_nvram_init(void)
             return -5;
         }
     }
+
+    /* Register DevFS node */
+    devfs_register(&mulle_nvram_devfs);
+
     return 0;
 }
 

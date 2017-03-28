@@ -15,7 +15,7 @@ ifneq (,$(filter emb6,$(USEMODULE)))
   USEMODULE += emb6_ipv6_multicast
   USEMODULE += emb6_llsec
   USEMODULE += emb6_mac
-  USEMODULE += emb6_netdev2
+  USEMODULE += emb6_netdev
   USEMODULE += emb6_rpl
   USEMODULE += emb6_sicslowpan
   USEMODULE += emb6_utils

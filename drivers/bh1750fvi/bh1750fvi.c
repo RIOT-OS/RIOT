@@ -25,6 +25,9 @@
 #include "bh1750fvi.h"
 #include "bh1750fvi_internal.h"
 
+#define ENABLE_DEBUG        (0)
+#include "debug.h"
+
 int bh1750fvi_init(bh1750fvi_t *dev, bh1750fvi_params_t *params)
 {
     int res;
@@ -41,9 +44,9 @@ int bh1750fvi_init(bh1750fvi_t *dev, bh1750fvi_params_t *params)
     res = i2c_write_byte(dev->i2c, dev->addr, OP_POWER_DOWN);
     i2c_release(dev->i2c);
     if (res < 0) {
-        return -1;
+        return BH1750FVI_ERR_I2C;
     }
-    return 0;
+    return BH1750FVI_OK;
 }
 
 uint16_t bh1750fvi_sample(bh1750fvi_t *dev)
@@ -52,6 +55,7 @@ uint16_t bh1750fvi_sample(bh1750fvi_t *dev)
     uint8_t raw[2];
 
     /* power on the device and send single H-mode measurement command */
+    DEBUG("[bh1750fvi] sample: triggering a conversion\n");
     i2c_acquire(dev->i2c);
     i2c_write_byte(dev->i2c, dev->addr, OP_POWER_ON);
     i2c_write_byte(dev->i2c, dev->addr, OP_SINGLE_HRES1);
@@ -61,6 +65,7 @@ uint16_t bh1750fvi_sample(bh1750fvi_t *dev)
     xtimer_usleep(DELAY_HMODE);
 
     /* read the results */
+    DEBUG("[bh1750fvi] sample: reading the results\n");
     i2c_acquire(dev->i2c);
     i2c_read_bytes(dev->i2c, dev->addr, raw, 2);
     i2c_release(dev->i2c);

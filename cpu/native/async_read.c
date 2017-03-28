@@ -69,11 +69,12 @@ void native_async_read_setup(void) {
 void native_async_read_cleanup(void) {
     unregister_interrupt(SIGIO);
 
-#ifdef __MACH__
     for (int i = 0; i < _next_index; i++) {
+#ifdef __MACH__
         kill(_sigio_child_pids[i], SIGKILL);
-    }
 #endif
+        real_close(_fds[i]);
+    }
 }
 
 void native_async_read_continue(int fd) {
@@ -102,11 +103,11 @@ void native_async_read_add_handler(int fd, void *arg, native_async_read_callback
     _sigio_child(_next_index);
 #else
     /* configure fds to send signals on io */
-    if (fcntl(fd, F_SETOWN, _native_pid) == -1) {
+    if (real_fcntl(fd, F_SETOWN, _native_pid) == -1) {
         err(EXIT_FAILURE, "native_async_read_add_handler(): fcntl(F_SETOWN)");
     }
     /* set file access mode to non-blocking */
-    if (fcntl(fd, F_SETFL, O_NONBLOCK | O_ASYNC) == -1) {
+    if (real_fcntl(fd, F_SETFL, O_NONBLOCK | O_ASYNC) == -1) {
         err(EXIT_FAILURE, "native_async_read_add_handler(): fcntl(F_SETFL)");
     }
 #endif /* not OSX */

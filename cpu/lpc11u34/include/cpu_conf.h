@@ -23,7 +23,7 @@
 
 #include "cpu_conf_common.h"
 
-#include "LPC11Uxx.h"
+#include "vendor/LPC11Uxx.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +35,7 @@ extern "C" {
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
 #define CPU_IRQ_NUMOF                   (35U)
-#define CPU_FLASH_BASE                  LPC_FLASH_BASE
+#define CPU_FLASH_BASE                  (0)
 /** @} */
 
 #ifdef __cplusplus

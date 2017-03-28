@@ -209,7 +209,7 @@ static int _handle_get(gnrc_netapi_opt_t *_opt)
 #endif
 /*        case NETOPT_DEVICE_TYPE:
             assert(_opt->data_len == sizeof(uint16_t));
-            *((uint16_t *)value) = NETDEV2_TYPE_IEEE802154;
+            *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
             res = sizeof(uint16_t);
             break;*/
         case NETOPT_IPV6_IID:

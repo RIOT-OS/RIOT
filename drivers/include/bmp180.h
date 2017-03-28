@@ -18,8 +18,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef BMP180_H_
-#define BMP180_H_
+#ifndef BMP180_H
+#define BMP180_H
 
 #include "saul.h"
 #include "periph/i2c.h"
@@ -69,8 +69,8 @@ typedef struct {
  * @brief Device initialization parameters
  */
 typedef struct {
-    i2c_t i2c_dev;
-    uint8_t mode;
+    i2c_t i2c_dev;   /**< I2C device which is used */
+    uint8_t mode;    /**< Oversampling mode */
 } bmp180_params_t;
 
 /**
@@ -80,11 +80,6 @@ typedef struct {
 extern const saul_driver_t bmp180_temperature_saul_driver;
 extern const saul_driver_t bmp180_pressure_saul_driver;
 /** @} */
-
-/**
- * @brief auto-initialize all configured BMP180 devices
- */
-void bmp180_auto_init(void);
 
 /**
  * @brief Initialize the given BMP180 device
@@ -148,5 +143,5 @@ int bmp180_sealevel_pressure(bmp180_t *dev, int32_t altitude, int32_t *pressure_
 }
 #endif
 
-#endif /* BMP180_H_ */
+#endif /* BMP180_H */
 /** @} */

@@ -4,6 +4,9 @@ endif
 ifneq (,$(filter at86rf2xx,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at86rf2xx/include
 endif
+ifneq (,$(filter mrf24j40,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mrf24j40/include
+endif
 ifneq (,$(filter cc110x,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x/include
 endif
@@ -18,6 +21,9 @@ ifneq (,$(filter isl29020,$(USEMODULE)))
 endif
 ifneq (,$(filter isl29125,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/isl29125/include
+endif
+ifneq (,$(filter hd44780,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/hd44780/include
 endif
 ifneq (,$(filter lps331ap,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lps331ap/include
@@ -34,8 +40,8 @@ endif
 ifneq (,$(filter mpl3115a2,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mpl3115a2/include
 endif
-ifneq (,$(filter mma8652,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mma8652/include
+ifneq (,$(filter mma8x5x,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mma8x5x/include
 endif
 ifneq (,$(filter mag3110,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mag3110/include
@@ -64,6 +70,15 @@ endif
 ifneq (,$(filter bmp180,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/bmp180/include
 endif
+ifneq (,$(filter jc42,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/jc42/include
+endif
+ifneq (,$(filter bme280,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/bme280/include
+endif
+ifneq (,$(filter tsl2561,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/tsl2561/include
+endif
 ifneq (,$(filter cc2420,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc2420/include
 endif
@@ -72,4 +87,31 @@ ifneq (,$(filter lpd8808,$(USEMODULE)))
 endif
 ifneq (,$(filter w5100,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/w5100/include
+endif
+ifneq (,$(filter xbee,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/xbee/include
+endif
+ifneq (,$(filter si70xx,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/si70xx/include
+endif
+ifneq (,$(filter hdc1000,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/hdc1000/include
+endif
+ifneq (,$(filter lis3dh,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lis3dh/include
+endif
+ifneq (,$(filter sdcard_spi,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/sdcard_spi/include
+endif
+ifneq (,$(filter veml6070,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/veml6070/include
+endif
+ifneq (,$(filter adxl345,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/adxl345/include
+endif
+ifneq (,$(filter uart_half_duplex,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/uart_half_duplex/include
+endif
+ifneq (,$(filter feetech,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/feetech/include
 endif

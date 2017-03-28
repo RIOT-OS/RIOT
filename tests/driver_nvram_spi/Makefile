@@ -7,7 +7,7 @@ USEMODULE += nvram_spi
 USEMODULE += xtimer
 
 # set default device parameters in case they are undefined
-TEST_NVRAM_SPI_DEV           ?= SPI_0
+TEST_NVRAM_SPI_DEV           ?= SPI_DEV\(0\)
 TEST_NVRAM_SPI_CS            ?= GPIO_PIN\(0,0\)
 TEST_NVRAM_SPI_SIZE          ?= 64
 TEST_NVRAM_SPI_ADDRESS_COUNT ?= 1

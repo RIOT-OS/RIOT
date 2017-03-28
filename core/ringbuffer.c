@@ -117,12 +117,12 @@ unsigned ringbuffer_remove(ringbuffer_t *restrict rb, unsigned n)
         rb->start = rb->avail = 0;
     }
     else {
-        rb->start -= n;
+        rb->start += n;
         rb->avail -= n;
 
         /* compensate underflow */
         if (rb->start > rb->size) {
-            rb->start += rb->size;
+            rb->start -= rb->size;
         }
     }
 

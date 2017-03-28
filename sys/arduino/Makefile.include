@@ -6,4 +6,4 @@ SRCDIR = $(RIOTBASE)/sys/arduino
 $(shell $(RIOTBASE)/dist/tools/arduino/pre_build.sh $(SRCDIR) $(APPDIR) $(SKETCHES))
 
 # include the Arduino headers
-export INCLUDES += -I$(RIOTBASE)/sys/arduino/include
+INCLUDES += -I$(RIOTBASE)/sys/arduino/include

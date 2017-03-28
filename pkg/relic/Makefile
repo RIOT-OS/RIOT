@@ -1,11 +1,7 @@
 PKG_NAME=relic
-PKG_URL=http://github.com/relic-toolkit/relic.git
+PKG_URL=https://github.com/relic-toolkit/relic.git
 PKG_VERSION=cdcfaeef101d18c3231c3b46359c519dd72682e8
-
-ifneq ($(RIOTBASE),)
-INCLUDES += -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/sys/net/include \
-			-I$(RIOTBASE)/sys/posix/include -I$(RIOTBASE)/sys/posix/pnet/include
-endif
+PKG_LICENSE=LGPL-2.1
 
 .PHONY: all
 
@@ -18,6 +14,8 @@ $(PKG_BUILDDIR)/comp-options.cmake: fix_source
 
 $(PKG_BUILDDIR)/Makefile: $(PKG_BUILDDIR)/comp-options.cmake
 	cd "$(PKG_BUILDDIR)" && COMP="$(filter-out -Werror=old-style-definition -Werror=strict-prototypes, $(CFLAGS) ) " cmake -DCMAKE_TOOLCHAIN_FILE=comp-options.cmake -DCHECK=off -DTESTS=0 -DBENCH=0 -DSHLIB=off -Wno-dev $(RELIC_CONFIG_FLAGS) .
+
+CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function
 
 fix_source: git-download
 	./fix-util_print_wo_args.sh $(PKG_BUILDDIR)

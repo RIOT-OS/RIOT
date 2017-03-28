@@ -16,8 +16,8 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
-#ifndef MPU9150_REGS_H_
-#define MPU9150_REGS_H_
+#ifndef MPU9150_REGS_H
+#define MPU9150_REGS_H
 
 
 #ifdef __cplusplus
@@ -99,5 +99,5 @@
 }
 #endif
 
-#endif /* MPU9150_REGS_H_ */
+#endif /* MPU9150_REGS_H */
 /** @} */

@@ -70,8 +70,10 @@ void hwrng_init(void)
     initialized = 1;
 }
 
-void hwrng_read(uint8_t *buf, unsigned int num)
+void hwrng_read(void *buf, unsigned int num)
 {
+    uint8_t *b = (uint8_t *)buf;
+
     if (!initialized) {
         warnx("hwrng_read: random device not initialized, failing\n");
         return;
@@ -80,10 +82,10 @@ void hwrng_read(uint8_t *buf, unsigned int num)
     DEBUG("hwrng_read: writing %u bytes\n", num);
     switch (_native_rng_mode) {
         case 0:
-            _native_rng_read_hq(buf, num);
+            _native_rng_read_hq(b, num);
             break;
         case 1:
-            _native_rng_read_det(buf, num);
+            _native_rng_read_det(b, num);
             break;
         default:
             err(EXIT_FAILURE, "hwrng_read: _native_rng_mode is in invalid state %i\n",

@@ -48,7 +48,7 @@ extern "C" {
 #include "periph/uart.h"
 
 #ifdef CPU_MODEL_LM4F120H5QR
-#include "lm4f120h5qr.h"
+#include "vendor/lm4f120h5qr.h"
 #endif
 
 /**

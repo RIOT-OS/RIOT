@@ -21,13 +21,17 @@
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifdef MODULE_MTD
+#include "mtd_native.h"
 #endif
 
 /**
@@ -49,9 +53,16 @@ void _native_LED_RED_TOGGLE(void);
 #define LED1_TOGGLE         (_native_LED_GREEN_TOGGLE())
 /** @} */
 
+#ifdef MODULE_MTD
+#define MTD_0 mtd0
+
+/** mtd flash emulation device */
+extern mtd_native_dev_t mtd0;
+#endif
+
 #ifdef __cplusplus
 }
 #endif
 
 /** @} */
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */

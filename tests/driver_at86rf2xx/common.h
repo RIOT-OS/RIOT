@@ -15,14 +15,14 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef COMMON_H_
-#define COMMON_H_
+#ifndef COMMON_H
+#define COMMON_H
 
 #include <stdint.h>
 
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"
-#include "net/netdev2.h"
+#include "net/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +37,7 @@ extern "C" {
 
 extern at86rf2xx_t devs[AT86RF2XX_NUM];
 
-void recv(netdev2_t *dev);
+void recv(netdev_t *dev);
 int ifconfig(int argc, char **argv);
 int txtsnd(int argc, char **argv);
 void print_addr(uint8_t *addr, size_t addr_len);
@@ -49,5 +49,5 @@ void print_addr(uint8_t *addr, size_t addr_len);
 }
 #endif
 
-#endif /* COMMON_H_ */
+#endif /* COMMON_H */
 /** @} */

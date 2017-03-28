@@ -7,17 +7,21 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon cc2650stk msb-430 msb-430h pca10000 pca10005 \
-                             nrf51dongle nrf6310 nucleo-f103 nucleo-f334 \
-                             spark-core stm32f0discovery telosb \
-                             weio wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1 nucleo-f072 \
-                             nucleo-f030 nucleo-f070
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon calliope-mini cc2650stk maple-mini \
+                             microbit msb-430 msb-430h nrf51dongle nrf6310 \
+                             nucleo32-f031 nucleo32-f042 nucleo32-f303 nucleo32-l031 \
+                             nucleo-f030 nucleo-f070 nucleo-f072 nucleo-f103 nucleo-f302 \
+                             nucleo-f334 nucleo-l053 nucleo-l073 opencm904 pca10000 \
+                             pca10005 spark-core stm32f0discovery telosb weio wsn430-v1_3b \
+                             wsn430-v1_4 yunjia-nrf51822 z1
+
+BOARD_BLACKLIST += mips-malta # No UART available.
 
 # use ethos (ethernet over serial) for network communication and stdio over
 # UART, but not on native, as native has a tap interface towards the host.
 ifeq (,$(filter native,$(BOARD)))
 GNRC_NETIF_NUMOF := 2
-USEMODULE += ethos gnrc_netdev2
+USEMODULE += ethos gnrc_netdev
 
 # ethos baudrate can be configured from make command
 ETHOS_BAUDRATE ?= 115200
@@ -58,20 +62,20 @@ include $(RIOTBASE)/Makefile.include
 .PHONY: host-tools
 
 term: host-tools
-	$(AD)sudo sh $(RIOTBASE)/dist/tools/ethos/start_network.sh $(PORT) $(TAP) $(IPV6_PREFIX)
+	$(Q)sudo sh $(RIOTBASE)/dist/tools/ethos/start_network.sh $(PORT) $(TAP) $(IPV6_PREFIX)
 
 host-tools:
-	$(AD)env -u CC -u CFLAGS make -C $(RIOTBASE)/dist/tools
+	$(Q)env -u CC -u CFLAGS make -C $(RIOTBASE)/dist/tools
 
 # Set a custom channel if needed
-ifeq (,$(filter cc110x,$(USEMODULE)))     # radio is cc110x sub-GHz
+ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz
   DEFAULT_CHANNEL ?= 0
   CFLAGS += -DCC110X_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
 else
-  ifeq (,$(filter at86rf212b,$(USEMODULE)))   # radio is IEEE 802.15.4 sub-GHz
+  ifneq (,$(filter at86rf212b,$(USEMODULE)))    # radio is IEEE 802.15.4 sub-GHz
     DEFAULT_CHANNEL ?= 5
     CFLAGS += -DIEEE802154_DEFAULT_SUBGHZ_CHANNEL=$(DEFAULT_CHANNEL)
-  else                                      # radio is IEEE 802.15.4 2.4 GHz
+  else                                          # radio is IEEE 802.15.4 2.4 GHz
     DEFAULT_CHANNEL ?= 26
     CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
   endif

@@ -18,12 +18,11 @@
  * ----------
  * First you need to @ref including-modules "include" a module that implements
  * this API in your application's Makefile. For example the implementation for
- * @ref net_gnrc "GNRC" is called `gnrc_sock_udp`.
+ * @ref net_gnrc "GNRC" is called `gnrc_sock_tcp`.
  *
  * ### A Simple TCP Echo Server
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
- * #include "net/af.h"
  * #include "net/sock/tcp.h"
  *
  * #define SOCK_QUEUE_LEN  (1U)
@@ -297,8 +296,8 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef NET_SOCK_TCP_H_
-#define NET_SOCK_TCP_H_
+#ifndef NET_SOCK_TCP_H
+#define NET_SOCK_TCP_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -535,5 +534,5 @@ ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len);
 }
 #endif
 
-#endif /* NET_SOCK_TCP_H_ */
+#endif /* NET_SOCK_TCP_H */
 /** @} */

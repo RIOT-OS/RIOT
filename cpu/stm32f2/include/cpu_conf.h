@@ -18,19 +18,19 @@
  * @author          Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl
  */
 
-#ifndef __CPU_CONF_H
-#define __CPU_CONF_H
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #include "cpu_conf_common.h"
 
 #if defined(CPU_MODEL_STM32F205RG)
-#include "stm32f205xx.h"
+#include "vendor/stm32f205xx.h"
 #elif defined(CPU_MODEL_STM32F207ZG)
-#include "stm32f207xx.h"
+#include "vendor/stm32f207xx.h"
 #elif defined(CPU_MODEL_STM32F215RG) || defined(CPU_MODEL_STM32F215VG) || defined(CPU_MODEL_STM32F215VE)
-#include "stm32f215xx.h"
+#include "vendor/stm32f215xx.h"
 #elif defined(CPU_MODEL_STM32F217ZG)
-#include "stm32f217xx.h"
+#include "vendor/stm32f217xx.h"
 #endif
 
 #ifdef __cplusplus
@@ -50,5 +50,5 @@ extern "C" {
 }
 #endif
 
-#endif /* __CPU_CONF_H */
+#endif /* CPU_CONF_H */
 /** @} */

@@ -1,4 +1,5 @@
 APPLICATION = mpu_stack_guard
+BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
 BOARD_WHITELIST += arduino-due      # cortex-m3
@@ -14,6 +15,7 @@ BOARD_WHITELIST += limifrog-v1      # cortex-m3
 BOARD_WHITELIST += mbed_lpc1768     # cortex-m3
 BOARD_WHITELIST += msbiot           # cortex-m4f
 BOARD_WHITELIST += mulle            # cortex-m4
+BOARD_WHITELIST += maple-mini       # cortex-m3
 BOARD_WHITELIST += nrf52dk          # cortex-m4f
 BOARD_WHITELIST += nucleo-f103      # cortex-m3
 BOARD_WHITELIST += nucleo-f207      # cortex-m3

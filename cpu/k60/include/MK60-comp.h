@@ -16,8 +16,8 @@
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef MK60_COMP_H_
-#define MK60_COMP_H_
+#ifndef MK60_COMP_H
+#define MK60_COMP_H
 
 #ifdef __cplusplus
 extern "C"
@@ -65,5 +65,5 @@ extern "C"
 #endif
 
 
-#endif /* MK60_COMP_H_ */
+#endif /* MK60_COMP_H */
 /** @} */

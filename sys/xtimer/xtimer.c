@@ -26,11 +26,18 @@
 #include "thread.h"
 #include "irq.h"
 #include "div.h"
+#include "list.h"
 
 #include "timex.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+typedef struct {
+    mutex_t *mutex;
+    thread_t *thread;
+    int timeout;
+} mutex_thread_t;
 
 static void _callback_unlock_mutex(void* arg)
 {
@@ -38,11 +45,11 @@ static void _callback_unlock_mutex(void* arg)
     mutex_unlock(mutex);
 }
 
-void _xtimer_sleep(uint32_t offset, uint32_t long_offset)
+void _xtimer_tsleep(uint32_t offset, uint32_t long_offset)
 {
     if (irq_is_in()) {
         assert(!long_offset);
-        xtimer_spin(offset);
+        _xtimer_spin(offset);
         return;
     }
 
@@ -58,7 +65,7 @@ void _xtimer_sleep(uint32_t offset, uint32_t long_offset)
     mutex_lock(&mutex);
 }
 
-void xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
+void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
     xtimer_t timer;
     mutex_t mutex = MUTEX_INIT;
 
@@ -66,7 +73,7 @@ void xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
     timer.arg = (void*) &mutex;
 
     uint32_t target = (*last_wakeup) + period;
-    uint32_t now = xtimer_now();
+    uint32_t now = _xtimer_now();
     /* make sure we're not setting a value in the past */
     if (now < (*last_wakeup)) {
         /* base timer overflowed between last_wakeup and now */
@@ -103,7 +110,7 @@ void xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
     uint32_t offset = target - now;
     DEBUG("xps, now: %9" PRIu32 ", tgt: %9" PRIu32 ", off: %9" PRIu32 "\n", now, target, offset);
     if (offset < XTIMER_PERIODIC_SPIN) {
-        xtimer_spin(offset);
+        _xtimer_spin(offset);
     }
     else {
         if (offset < XTIMER_PERIODIC_RELATIVE) {
@@ -112,14 +119,13 @@ void xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
              *
              * Since interrupts are normally enabled inside this function, this time may
              * be undeterministic. */
-            target = xtimer_now() + offset;
+            target = _xtimer_now() + offset;
         }
         mutex_lock(&mutex);
         DEBUG("xps, abs: %" PRIu32 "\n", target);
         _xtimer_set_absolute(&timer, target);
         mutex_lock(&mutex);
     }
-
 out:
     *last_wakeup = target;
 }
@@ -139,13 +145,13 @@ static inline void _setup_msg(xtimer_t *timer, msg_t *msg, kernel_pid_t target_p
     msg->sender_pid = target_pid;
 }
 
-void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid)
+void _xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid)
 {
     _setup_msg(timer, msg, target_pid);
-    xtimer_set(timer, offset);
+    _xtimer_set(timer, offset);
 }
 
-void xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid)
+void _xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid)
 {
     _setup_msg(timer, msg, target_pid);
     _xtimer_set64(timer, offset, offset >> 32);
@@ -156,15 +162,15 @@ static void _callback_wakeup(void* arg)
     thread_wakeup((kernel_pid_t)((intptr_t)arg));
 }
 
-void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid)
+void _xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid)
 {
     timer->callback = _callback_wakeup;
     timer->arg = (void*) ((intptr_t)pid);
 
-    xtimer_set(timer, offset);
+    _xtimer_set(timer, offset);
 }
 
-void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
+void _xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
 {
     timer->callback = _callback_wakeup;
     timer->arg = (void*) ((intptr_t)pid);
@@ -174,10 +180,10 @@ void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
 
 void xtimer_now_timex(timex_t *out)
 {
-    uint64_t now = xtimer_now64();
+    uint64_t now = xtimer_usec_from_ticks64(xtimer_now64());
 
     out->seconds = div_u64_by_1000000(now);
-    out->microseconds = now - (out->seconds * SEC_IN_USEC);
+    out->microseconds = now - (out->seconds * US_PER_SEC);
 }
 
 /* Prepares the message to trigger the timeout.
@@ -205,19 +211,49 @@ static int _msg_wait(msg_t *m, msg_t *tmsg, xtimer_t *t)
     }
 }
 
-int xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout) {
+int _xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout_ticks) {
     msg_t tmsg;
     xtimer_t t;
     _setup_timer_msg(&tmsg, &t);
-    xtimer_set_msg64(&t, timeout, &tmsg, sched_active_pid);
+    _xtimer_set_msg64(&t, timeout_ticks, &tmsg, sched_active_pid);
     return _msg_wait(m, &tmsg, &t);
 }
 
-int xtimer_msg_receive_timeout(msg_t *msg, uint32_t us)
+int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout_ticks)
 {
     msg_t tmsg;
     xtimer_t t;
     _setup_timer_msg(&tmsg, &t);
-    xtimer_set_msg(&t, us, &tmsg, sched_active_pid);
+    _xtimer_set_msg(&t, timeout_ticks, &tmsg, sched_active_pid);
     return _msg_wait(msg, &tmsg, &t);
+}
+
+static void _mutex_timeout(void *arg)
+{
+    mutex_thread_t *mt = (mutex_thread_t *)arg;
+
+    mt->timeout = 1;
+    list_node_t *node = list_remove(&mt->mutex->queue,
+                                    (list_node_t *)&mt->thread->rq_entry);
+    if ((node != NULL) && (mt->mutex->queue.next == NULL)) {
+        mt->mutex->queue.next = MUTEX_LOCKED;
+    }
+    sched_set_status(mt->thread, STATUS_PENDING);
+    thread_yield_higher();
+}
+
+int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
+{
+    xtimer_t t;
+    mutex_thread_t mt = { mutex, (thread_t *)sched_active_thread, 0 };
+
+    if (timeout != 0) {
+        t.callback = _mutex_timeout;
+        t.arg = (void *)((mutex_thread_t *)&mt);
+        _xtimer_set64(&t, timeout, timeout >> 32);
+    }
+
+    mutex_lock(mutex);
+    xtimer_remove(&t);
+    return -mt.timeout;
 }

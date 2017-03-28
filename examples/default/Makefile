@@ -32,14 +32,12 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 # include and auto-initialize all available sensors
-USEMODULE += saul_reg
 USEMODULE += saul_default
-USEMODULE += auto_init_saul
 
 BOARD_PROVIDES_NETIF := airfy-beacon cc2538dk fox iotlab-m3 iotlab-a8-m3 mulle \
-        native nrf51dongle nrf6310 openmote-cc2538 pba-d-01-kw2x pca10000 pca10005 \
-        remote-pa remote-reva saml21-xpro samr21-xpro spark-core telosb \
-        yunjia-nrf51822 z1
+        microbit native nrf51dongle nrf52dk nrf6310 openmote-cc2538 pba-d-01-kw2x \
+        pca10000 pca10005 remote-pa remote-reva saml21-xpro samr21-xpro \
+        spark-core telosb yunjia-nrf51822 z1
 
 ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
   # Use modules for networking
@@ -49,6 +47,8 @@ ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
   USEMODULE += gnrc_netdev_default
   # automatically initialize the network interface
   USEMODULE += auto_init_gnrc_netif
+  # shell command to send L2 packets with a simple string
+  USEMODULE += gnrc_txtsnd
   # the application dumps received packets to stdout
   USEMODULE += gnrc_pktdump
 
@@ -72,14 +72,14 @@ endif
 include $(RIOTBASE)/Makefile.include
 
 # Set a custom channel if needed
-ifeq (,$(filter cc110x,$(USEMODULE)))     # radio is cc110x sub-GHz
+ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz
   DEFAULT_CHANNEL ?= 0
   CFLAGS += -DCC110X_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
 else
-  ifeq (,$(filter at86rf212b,$(USEMODULE)))   # radio is IEEE 802.15.4 sub-GHz
+  ifneq (,$(filter at86rf212b,$(USEMODULE)))    # radio is IEEE 802.15.4 sub-GHz
     DEFAULT_CHANNEL ?= 5
     CFLAGS += -DIEEE802154_DEFAULT_SUBGHZ_CHANNEL=$(DEFAULT_CHANNEL)
-  else                                      # radio is IEEE 802.15.4 2.4 GHz
+  else                                          # radio is IEEE 802.15.4 2.4 GHz
     DEFAULT_CHANNEL ?= 26
     CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
   endif

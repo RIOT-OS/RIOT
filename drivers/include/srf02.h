@@ -21,8 +21,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef SRF02_H_
-#define SRF02_H_
+#ifndef SRF02_H
+#define SRF02_H
 
 #include <stdint.h>
 #include "periph/i2c.h"
@@ -129,5 +129,5 @@ void srf02_set_addr(srf02_t *dev, uint8_t new_addr);
 }
 #endif
 
-#endif /* SRF02_H_ */
+#endif /* SRF02_H */
 /** @} */

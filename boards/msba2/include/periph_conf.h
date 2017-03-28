@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "lpc2387.h"
 
@@ -35,32 +35,37 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer configuration, select a number from 1 to 4
+ * @name   Timer configuration, select a number from 1 to 4
  * @{
  */
 #define TIMER_NUMOF         (1U)
 /** @} */
 
 /**
- * @brief PWM device and pinout configuration
+ * @name    PWM device and pinout configuration
+ *
+ * Currently, we only support a single device and 3 channels, the implementation
+ * is fixed on PWM1.
+ *
+ * @{
  */
 #define PWM_NUMOF           (1U)
-#define PWM_0_EN            (1)
 
 /* PWM_0 device configuration */
-#define PWM_0_CHANNELS      (3)
-#define PWM_0_CH0           (3)
-#define PWM_0_CH0_MR        PWM1MR3
-#define PWM_0_CH1           (4)
-#define PWM_0_CH1_MR        PWM1MR4
-#define PWM_0_CH2           (5)
-#define PWM_0_CH2_MR        PWM1MR5
+#define PWM_CHANNELS      (3)
+#define PWM_CH0           (3)
+#define PWM_CH0_MR        PWM1MR3
+#define PWM_CH1           (4)
+#define PWM_CH1_MR        PWM1MR4
+#define PWM_CH2           (5)
+#define PWM_CH2_MR        PWM1MR5
 /* PWM_0 pin configuration */
-#define PWM_0_PORT          PINSEL4
-#define PWM_0_CH0_PIN       (2)
-#define PWM_0_CH1_PIN       (3)
-#define PWM_0_CH2_PIN       (4)
-#define PWM_0_FUNC          (1)
+#define PWM_PORT          PINSEL4
+#define PWM_CH0_PIN       (2)
+#define PWM_CH1_PIN       (3)
+#define PWM_CH2_PIN       (4)
+#define PWM_FUNC          (1)
+/** @} */
 
 /**
  * @brief Real Time Clock configuration
@@ -76,16 +81,18 @@ extern "C" {
 /** @} */
 
 /**
- * @brief SPI configuration
+ * @name   SPI configuration
+ *
+ * The SPI implementation is very much fixed, so we don't need to configure
+ * anything besides the mandatory SPI_NUMOF.
  * @{
  */
 #define SPI_NUMOF           (1)
-#define SPI_0_EN            (1)
 /** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

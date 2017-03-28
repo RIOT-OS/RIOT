@@ -15,9 +15,7 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  *
- * This test application tests the gnrc_conn_ip module. If you select protocol 58 you can also
- * test if gnrc is able to deal with multiple subscribers to ICMPv6 (gnrc_icmpv6 and this
- * application).
+ * This test application tests the emb6_conn_ip module.
  *
  * @}
  */
@@ -29,7 +27,7 @@
 #include "at86rf2xx_params.h"
 #include "common.h"
 #include "emb6.h"
-#include "emb6/netdev2.h"
+#include "emb6/netdev.h"
 #include "uip-ds6.h"
 #include "net/ipv6/addr.h"
 #include "shell.h"
@@ -92,13 +90,13 @@ char conn_inbuf[CONN_INBUF_SIZE];
 
 int main(void)
 {
-    netdev2_t *netdev = (netdev2_t *)&at86rf2xx;
+    netdev_t *netdev = (netdev_t *)&at86rf2xx;
 
-    puts("RIOT lwip test application");
+    puts("RIOT emb6 test application");
 
     at86rf2xx_setup(&at86rf2xx, at86rf2xx_params);
-    netdev->driver->init((netdev2_t *)&at86rf2xx);
-    emb6_netdev2_setup(netdev);
+    netdev->driver->init((netdev_t *)&at86rf2xx);
+    emb6_netdev_setup(netdev);
     emb6_init(&emb6);
     thread_create(emb6_stack, sizeof(emb6_stack), EMB6_PRIO,
                   THREAD_CREATE_STACKTEST, _emb6_thread, NULL, "emb6");

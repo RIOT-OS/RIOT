@@ -24,7 +24,7 @@
 #include "cpu_conf_common.h"
 
 #if (CPU_MODEL == ezr32wg330f256r60)
-#include "ezr32wg330f256r60.h"
+#include "vendor/ezr32wg330f256r60.h"
 #else
 #error "No CPU headers for the defined CPU_MODEL found"
 #endif

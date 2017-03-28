@@ -19,7 +19,6 @@
  * @}
  */
 
-#include <malloc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -33,6 +32,10 @@
 #include "sched.h"
 
 #include "pthread.h"
+
+#ifdef HAVE_MALLOC_H
+#include <malloc.h>
+#endif
 
 #define ENABLE_DEBUG (0)
 

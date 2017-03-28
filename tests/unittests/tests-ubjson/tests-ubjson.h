@@ -26,8 +26,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef TESTS_UBJSON_H_
-#define TESTS_UBJSON_H_
+#ifndef TESTS_UBJSON_H
+#define TESTS_UBJSON_H
 
 #include "embUnit.h"
 #include "kernel_defines.h"
@@ -50,5 +50,5 @@ void test_ubjson_empty_object(void);
 }
 #endif
 
-#endif /* TESTS_UBJSON_H_ */
+#endif /* TESTS_UBJSON_H */
 /** @} */

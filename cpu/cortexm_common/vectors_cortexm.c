@@ -53,8 +53,6 @@ extern uint32_t _sram;
 extern uint32_t _eram;
 /** @} */
 
-static const uintptr_t stack_base = (uintptr_t)&_sstack;
-
 /**
  * @brief   Allocation of the interrupt stack
  */
@@ -102,10 +100,10 @@ void reset_handler_default(void)
     }
 
 #ifdef MODULE_MPU_STACK_GUARD
-    if (stack_base != SRAM_BASE) {
+    if (((uintptr_t)&_sstack) != SRAM_BASE) {
         mpu_configure(
             0,                                              /* MPU region 0 */
-            stack_base + 31,                                /* Base Address (rounded up) */
+            (uintptr_t)&_sstack + 31,                       /* Base Address (rounded up) */
             MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B) /* Attributes and Size */
         );
 
@@ -214,6 +212,9 @@ __attribute__((naked)) void hard_fault_default(void)
 __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, uint32_t exc_return, uint32_t* r4_to_r11_stack)
 {
 #if CPU_HAS_EXTENDED_FAULT_REGISTERS
+    static const uint32_t BFARVALID_MASK = (0x80 << SCB_CFSR_BUSFAULTSR_Pos);
+    static const uint32_t MMARVALID_MASK = (0x80 << SCB_CFSR_MEMFAULTSR_Pos);
+
     /* Copy status register contents to local stack storage, this must be
      * done before any calls to other functions to avoid corrupting the
      * register contents. */
@@ -276,11 +277,11 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
     printf(" HFSR: 0x%08" PRIx32 "\n", hfsr);
     printf(" DFSR: 0x%08" PRIx32 "\n", dfsr);
     printf(" AFSR: 0x%08" PRIx32 "\n", afsr);
-    if (((cfsr & SCB_CFSR_BUSFAULTSR_Msk) >> SCB_CFSR_BUSFAULTSR_Pos) & 0x80) {
+    if (cfsr & BFARVALID_MASK) {
         /* BFAR valid flag set */
         printf(" BFAR: 0x%08" PRIx32 "\n", bfar);
     }
-    if (((cfsr & SCB_CFSR_MEMFAULTSR_Msk) >> SCB_CFSR_MEMFAULTSR_Pos) & 0x80) {
+    if (cfsr & MMARVALID_MASK) {
         /* MMFAR valid flag set */
         printf("MMFAR: 0x%08" PRIx32 "\n", mmfar);
     }

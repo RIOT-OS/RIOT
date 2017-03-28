@@ -30,10 +30,10 @@ extern "C" {
  * @{
  */
 #ifndef CC2420_PARAM_SPI
-#define CC2420_PARAM_SPI        (SPI_0)
+#define CC2420_PARAM_SPI        (SPI_DEV(0))
 #endif
 #ifndef CC2420_PARAM_SPI_CLK
-#define CC2420_PARAM_SPI_CLK    (SPI_SPEED_5MHZ)
+#define CC2420_PARAM_SPI_CLK    (SPI_CLK_5MHZ)
 #endif
 #ifndef CC2420_PARAM_CS
 #define CC2420_PARAM_CS         (GPIO_PIN(0, 0))

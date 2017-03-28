@@ -16,8 +16,8 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
-#ifndef LIB_TABLE_H_
-#define LIB_TABLE_H_
+#ifndef LIB_TABLE_H
+#define LIB_TABLE_H
 
 #include "kernel_types.h"
 
@@ -85,5 +85,5 @@ uint8_t lib_is_reg_addr(kernel_pid_t if_pid, nhdp_addr_t *addr);
 }
 #endif
 
-#endif /* LIB_TABLE_H_ */
+#endif /* LIB_TABLE_H */
 /** @} */

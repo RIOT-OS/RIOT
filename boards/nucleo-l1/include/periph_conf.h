@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2016 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -14,10 +14,11 @@
  * @brief       Peripheral MCU configuration for the nucleo-l1 board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -41,26 +42,36 @@ extern "C" {
 #define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV1     /* APB1 clock -> 32MHz */
 /* configuration of flash access cycles */
 #define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY
+
+/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
+#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)
 /** @} */
 
 /**
- * @brief   DAC configuration
+ * @name   DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)
 /** @} */
 
 /**
- * @brief Timer configuration
+ * @name   Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
-    /* device, RCC bit, IRQ bit */
-    {TIM5, 3, TIM5_IRQn},
+    {
+        .dev      = TIM5,
+        .max      = 0xffffffff,
+        .rcc_mask = RCC_APB1ENR_TIM5EN,
+        .bus      = APB1,
+        .irqn     = TIM5_IRQn
+    }
 };
-/* interrupt routines */
+
 #define TIMER_0_ISR         (isr_tim5)
-/* number of defined timers */
+
 #define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
@@ -69,46 +80,120 @@ static const timer_conf_t timer_config[] = {
  * @{
  */
 #define RTC_NUMOF           (1U)
+/** @} */
 
 /**
- * @brief UART configuration
- */
-#define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_IRQ_PRIO       1
-
-/* UART 0 device configuration */
-#define UART_0_DEV          USART2
-#define UART_0_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART2EN)
-#define UART_0_CLK          (CLOCK_CORECLOCK)   /* UART clock runs with 32MHz (F_CPU / 1) */
-#define UART_0_IRQ          USART2_IRQn
-#define UART_0_ISR          isr_usart2
-#define UART_0_BUS_FREQ     32000000
-/* UART 0 pin configuration */
-#define UART_0_RX_PIN       GPIO_PIN(PORT_A, 3)
-#define UART_0_TX_PIN       GPIO_PIN(PORT_A, 2)
-#define UART_0_AF           GPIO_AF7
-
-/**
- * @brief SPI configuration
+ * @name   UART configuration
  * @{
  */
-#define SPI_NUMOF           (1U)
-#define SPI_0_EN            1
+static const uart_conf_t uart_config[] = {
+    {
+        .dev      = USART2,
+        .rcc_mask = RCC_APB1ENR_USART2EN,
+        .rx_pin   = GPIO_PIN(PORT_A, 3),
+        .tx_pin   = GPIO_PIN(PORT_A, 2),
+        .rx_af    = GPIO_AF7,
+        .tx_af    = GPIO_AF7,
+        .bus      = APB1,
+        .irqn     = USART2_IRQn
+    },
+    {
+        .dev      = USART3,
+        .rcc_mask = RCC_APB1ENR_USART3EN,
+        .rx_pin   = GPIO_PIN(PORT_C, 11),
+        .tx_pin   = GPIO_PIN(PORT_C, 10),
+        .rx_af    = GPIO_AF7,
+        .tx_af    = GPIO_AF7,
+        .bus      = APB1,
+        .irqn     = USART3_IRQn
+    },
+    {
+        .dev      = USART1,
+        .rcc_mask = RCC_APB2ENR_USART1EN,
+        .rx_pin   = GPIO_PIN(PORT_A, 9),
+        .tx_pin   = GPIO_PIN(PORT_A, 10),
+        .rx_af    = GPIO_AF7,
+        .tx_af    = GPIO_AF7,
+        .bus      = APB2,
+        .irqn     = USART1_IRQn
+    },
+};
 
-/* SPI 0 device configuration */
-#define SPI_0_DEV           SPI1
-#define SPI_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
-#define SPI_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_SPI1EN))
-#define SPI_0_IRQ           SPI1_IRQn
-#define SPI_0_ISR           isr_spi1
-/* SPI 0 pin configuration */
-#define SPI_0_PORT_CLKEN()  (RCC->AHBENR |= RCC_AHBENR_GPIOAEN)
-#define SPI_0_PORT          GPIOA
-#define SPI_0_PIN_SCK       5
-#define SPI_0_PIN_MOSI      7
-#define SPI_0_PIN_MISO      6
-#define SPI_0_PIN_AF        5
+#define UART_0_ISR          (isr_usart2)
+#define UART_1_ISR          (isr_usart3)
+#define UART_2_ISR          (isr_usart1)
+
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+/** @} */
+
+/**
+ * @name   PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM2,
+        .rcc_mask = RCC_APB1ENR_TIM2EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 3) /* D3 */,  .cc_chan = 1 },
+                      { .pin = GPIO_PIN(PORT_B, 10) /* D6 */, .cc_chan = 2 },
+                      { .pin = GPIO_UNDEF,                    .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                    .cc_chan = 0 } },
+        .af       = GPIO_AF1,
+        .bus      = APB1
+    },
+    {
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 4) /* D5 */, .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_C, 7) /* D9 */, .cc_chan = 1 },
+                      { .pin = GPIO_PIN(PORT_C, 8),          .cc_chan = 2 },
+                      { .pin = GPIO_PIN(PORT_C, 9),          .cc_chan = 3 } },
+        .af       = GPIO_AF2,
+        .bus      = APB1
+    }
+};
+
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+/** @} */
+
+/**
+ * @name   SPI configuration
+ *
+ * @note    The spi_divtable is auto-generated from
+ *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
+ * @{
+ */
+static const uint8_t spi_divtable[2][5] = {
+    {       /* for APB1 @ 32000000Hz */
+        7,  /* -> 125000Hz */
+        5,  /* -> 500000Hz */
+        4,  /* -> 1000000Hz */
+        2,  /* -> 4000000Hz */
+        1   /* -> 8000000Hz */
+    },
+    {       /* for APB2 @ 32000000Hz */
+        7,  /* -> 125000Hz */
+        5,  /* -> 500000Hz */
+        4,  /* -> 1000000Hz */
+        2,  /* -> 4000000Hz */
+        1   /* -> 8000000Hz */
+    }
+};
+
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_A, 7),
+        .miso_pin = GPIO_PIN(PORT_A, 6),
+        .sclk_pin = GPIO_PIN(PORT_A, 5),
+        .cs_pin   = GPIO_UNDEF,
+        .af       = GPIO_AF5,
+        .rccmask  = RCC_APB2ENR_SPI1EN,
+        .apbbus   = APB2
+    }
+};
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**
@@ -143,5 +228,5 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

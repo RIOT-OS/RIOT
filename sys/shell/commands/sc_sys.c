@@ -18,14 +18,14 @@
  * @}
  */
 
-#include "reboot.h"
+#include "periph/pm.h"
 
 int _reboot_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
 
-    reboot();
+    pm_reboot();
 
     return 0;
 }

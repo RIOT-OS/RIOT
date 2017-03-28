@@ -17,6 +17,11 @@
  *              crc16_ccitt_update() with the desired start value
  *              instead of crc16_ccitt_calc().
  *
+ *              There is a more generalized version in @ref sys_checksum_ucrc16,
+ *              that does not utilize a look-up table as this implementation
+ *              does (and is thus also for more memory efficient). Its caveat
+ *              however is that it is slower by about factor 8 than this version.
+ *
  * @{
  * @file
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>

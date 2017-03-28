@@ -19,8 +19,8 @@
  * @author      Mohmmad Ayman <mohmmad.khzrag@gmail.com>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "board_common.h"
 
@@ -28,9 +28,16 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Xtimer configuration
+ * @{
+ */
+#define XTIMER_WIDTH                (16)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

@@ -17,8 +17,8 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef MSBA2_COMMON_H_
-#define MSBA2_COMMON_H_
+#ifndef MSBA2_COMMON_H
+#define MSBA2_COMMON_H
 
 
 #include <stdint.h>
@@ -28,8 +28,10 @@
 extern "C" {
 #endif
 
-#define VICIntEnClear VICIntEnClr
 
+/**
+ * @brief Feed sequence for PLL register
+ */
 static inline void pllfeed(void)
 {
     PLLFEED = 0xAA;
@@ -41,4 +43,4 @@ static inline void pllfeed(void)
 #endif
 
 /** @} */
-#endif /*  MSBA2_COMMON_H_ */
+#endif /*  MSBA2_COMMON_H */

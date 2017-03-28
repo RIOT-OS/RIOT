@@ -21,36 +21,25 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
-#include <stdint.h>
 #include "board_common.h"
-
-#include "cpu.h"
-#include "periph_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   xtimer configuration
+ * @brief   Xtimer configuration
  * @{
  */
-#define XTIMER_WIDTH        (16)
+#define XTIMER_WIDTH                (16)
 /** @} */
-
-
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

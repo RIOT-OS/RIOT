@@ -16,10 +16,10 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef AT86RF2XX_NETDEV_H_
-#define AT86RF2XX_NETDEV_H_
+#ifndef AT86RF2XX_NETDEV_H
+#define AT86RF2XX_NETDEV_H
 
-#include "net/netdev2.h"
+#include "net/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,11 +28,11 @@ extern "C" {
 /**
  * @brief   Reference to the netdev device driver struct
  */
-extern const netdev2_driver_t at86rf2xx_driver;
+extern const netdev_driver_t at86rf2xx_driver;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* AT86RF2XX_NETDEV_H_ */
+#endif /* AT86RF2XX_NETDEV_H */
 /** @} */

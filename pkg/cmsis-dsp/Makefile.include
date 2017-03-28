@@ -1,1 +1,1 @@
-INCLUDES += -I$(BINDIRBASE)/pkg/$(BOARD)/cmsis-dsp/include
+INCLUDES += -I$(PKGDIRBASE)/cmsis-dsp/include

@@ -239,7 +239,7 @@ void gnrc_sixlowpan_nd_opt_abr_handle(kernel_pid_t iface, ndp_rtr_adv_t *rtr_adv
     memset(abr->ctxs, 0, sizeof(abr->ctxs));
     abr->prfs = NULL;
 
-    t = abr->ltime * 60 * SEC_IN_USEC;
+    t = abr->ltime * 60 * US_PER_SEC;
 
     xtimer_remove(&abr->ltimer);
     abr->ltimer_msg.type = GNRC_SIXLOWPAN_ND_MSG_ABR_TIMEOUT;

@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -64,9 +64,11 @@
  * @name xtimer configuration
  * @{
  */
-#define XTIMER_DEV          TIMER_0
+#define XTIMER_DEV          (0)
 #define XTIMER_CHAN         (0)
-#define XTIMER_SHIFT        (-4)
+#define XTIMER_WIDTH        (16)
+#define XTIMER_SHIFT        (0)
+#define XTIMER_HZ           (1000000UL)
 #define XTIMER_BACKOFF      (50)
 #define XTIMER_ISR_BACKOFF  (40)
 /** @} */
@@ -93,5 +95,5 @@ void board_init(void);
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

@@ -8,4 +8,8 @@ ifneq (,$(filter auto_init_saul,$(USEMODULE)))
 DIRS += saul
 endif
 
+ifneq (,$(filter auto_init_storage,$(USEMODULE)))
+DIRS += storage
+endif
+
 include $(RIOTBASE)/Makefile.base

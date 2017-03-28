@@ -26,8 +26,8 @@
 
 #include "crypto/ciphers.h"
 
-#ifndef THREEDES_H_
-#define THREEDES_H_
+#ifndef THREEDES_H
+#define THREEDES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -134,4 +134,4 @@ int tripledes_decrypt(const cipher_context_t *context, const uint8_t *crypt, uin
 #endif
 
 /** @} */
-#endif /* THREEDES_H_ */
+#endif /* THREEDES_H */

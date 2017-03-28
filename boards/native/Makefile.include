@@ -34,7 +34,11 @@ export OFLAGS =
 endif
 endif
 
-export DEBUGGER = gdb
+ifeq ($(shell uname -s),Darwin)
+export DEBUGGER ?= lldb
+else
+export DEBUGGER ?= gdb
+endif
 export TERMPROG ?= $(ELF)
 export FLASHER = true
 export VALGRIND ?= valgrind
@@ -42,7 +46,7 @@ export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
 # basic cflags:
-export CFLAGS += -Wall -Wextra -pedantic
+export CFLAGS += -Wall -Wextra -pedantic -std=gnu99
 ifeq ($(shell uname -m),x86_64)
 export CFLAGS += -m32
 endif
@@ -93,7 +97,11 @@ endif
 export TERMFLAGS := $(PORT) $(TERMFLAGS)
 
 export ASFLAGS =
+ifeq ($(shell basename $(DEBUGGER)),lldb)
+export DEBUGGER_FLAGS = -- $(ELF) $(TERMFLAGS)
+else
 export DEBUGGER_FLAGS = -q --args $(ELF) $(TERMFLAGS)
+endif
 term-valgrind: export VALGRIND_FLAGS ?= \
 	--leak-check=full \
 	--track-origins=yes \
@@ -115,6 +123,8 @@ all-asan: export CFLAGS += -DNATIVE_IN_CALLOC
 all-asan: export LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g
 
 export INCLUDES += $(NATIVEINCLUDES)
+
+export CFLAGS += -DDEBUG_ASSERT_VERBOSE
 
 # workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52624
 ifneq ($(shell gcc --version | head -1 | grep -E ' (4.6|4.7)'),)

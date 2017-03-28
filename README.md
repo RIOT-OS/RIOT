@@ -75,7 +75,7 @@ but not limited to:
   `WERROR=0 make`
 
 ### USING THE NATIVE PORT WITH NETWORKING
-If you compile RIOT for the native cpu and include the `netdev2_tap` module,
+If you compile RIOT for the native cpu and include the `netdev_tap` module,
 you can specify a network interface like this: `PORT=tap0 make term`
 
 #### SETTING UP A TAP NETWORK

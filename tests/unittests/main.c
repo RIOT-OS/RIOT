@@ -9,7 +9,6 @@
 #include "map.h"
 
 #include "embUnit.h"
-#include "lpm.h"
 #include "xtimer.h"
 
 #define UNCURRY(FUN, ARGS) FUN(ARGS)

@@ -26,8 +26,8 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU_X86_CPU_H_
-#define CPU_X86_CPU_H_
+#ifndef CPU_X86_CPU_H
+#define CPU_X86_CPU_H
 
 #include "kernel_defines.h"
 #include "irq.h"
@@ -42,13 +42,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief x86 has architecture specific atomic_cas in x86_atomic.c
- * @{
- */
-#define ARCH_HAS_ATOMIC_COMPARE_AND_SWAP 1
-/** @} */
 
 /**
  * @brief   Disable interrupts and halt forever.
@@ -131,6 +124,6 @@ static inline void cpu_print_last_instruction(void)
 }
 #endif
 
-#endif
+#endif /* CPU_X86_CPU_H */
 
 /** @} */

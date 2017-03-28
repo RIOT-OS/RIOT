@@ -16,8 +16,8 @@
  * @author      Kees Bakker <kees@sodaq.com>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include <stdint.h>
 
@@ -133,7 +133,7 @@ static const uart_conf_t uart_config[] = {
         .mux    = GPIO_MUX_C,
         .rx_pad = UART_PAD_RX_1,
         .tx_pad = UART_PAD_TX_2,
-    },
+    }
 };
 
 /* interrupt function name mapping */
@@ -184,27 +184,21 @@ static const pwm_conf_t pwm_config[] = {
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF           (1)
-#define SPI_0_EN            1
-#define SPI_1_EN            0
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = &SERCOM3->SPI,
+        .miso_pin = GPIO_PIN(PA, 22),
+        .mosi_pin = GPIO_PIN(PA, 20),
+        .clk_pin  = GPIO_PIN(PA, 21),
+        .miso_mux = GPIO_MUX_C,
+        .mosi_mux = GPIO_MUX_D,
+        .clk_mux  = GPIO_MUX_D,
+        .miso_pad = SPI_PAD_MISO_0,
+        .mosi_pad = SPI_PAD_MOSI_2_SCK_3,
+    },
+};
 
-/*      SPI0             */
-#define SPI_0_DEV           SERCOM3->SPI
-#define SPI_IRQ_0           SERCOM3_IRQn
-#define SPI_0_GCLK_ID       SERCOM3_GCLK_ID_CORE
-/* SPI 0 pin configuration */
-#define SPI_0_SCLK          GPIO_PIN(PA, 21)
-#define SPI_0_SCLK_MUX      GPIO_MUX_D
-#define SPI_0_MISO          GPIO_PIN(PA, 22)
-#define SPI_0_MISO_MUX      GPIO_MUX_C
-#define SPI_0_MISO_PAD      SPI_PAD_MISO_0
-#define SPI_0_MOSI          GPIO_PIN(PA, 20)
-#define SPI_0_MOSI_MUX      GPIO_MUX_D
-#define SPI_0_MOSI_PAD      SPI_PAD_MOSI_2_SCK_3
-
-// How/where do we define SS?
-#define SPI_0_SS            GPIO_PIN(PA, 23)
-
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**
@@ -255,5 +249,5 @@ static const pwm_conf_t pwm_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

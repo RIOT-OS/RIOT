@@ -19,19 +19,24 @@ ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE += oonf_rfc5444
 endif
 
+ifneq (,$(filter sntp,$(USEMODULE)))
+  USEMODULE += gnrc_sock_udp
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += gnrc_netif
-  USEMODULE += gnrc_netdev2
+  USEMODULE += gnrc_netdev
   USEMODULE += netdev_default
 endif
 
-ifneq (,$(filter netdev2_ieee802154,$(USEMODULE)))
+ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
   USEMODULE += ieee802154
 endif
 
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
     USEMODULE += uhcpc
-    USEMODULE += gnrc_conn_udp
+    USEMODULE += gnrc_sock_udp
     USEMODULE += fmt
 endif
 
@@ -42,7 +47,7 @@ ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
     USEMODULE += gnrc_sixlowpan
     USEMODULE += gnrc_sixlowpan_iphc
     USEMODULE += gnrc_ipv6_default
-    USEMODULE += gnrc_netdev2
+    USEMODULE += gnrc_netdev
     USEMODULE += gnrc_ipv6_netif
 endif
 
@@ -58,24 +63,35 @@ ifneq (,$(filter gnrc_conn_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
 endif
 
+ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
+  USEMODULE += gnrc_sock
+endif
+
+ifneq (,$(filter gnrc_sock_ip,$(USEMODULE)))
+  USEMODULE += sock_ip
+endif
+
+ifneq (,$(filter gnrc_sock_udp,$(USEMODULE)))
+  USEMODULE += gnrc_udp
+  USEMODULE += random     # to generate random ports
+  USEMODULE += sock_udp
+endif
+
+ifneq (,$(filter gnrc_sock,$(USEMODULE)))
+  USEMODULE += gnrc_netapi_mbox
+  USEMODULE += sock
+endif
+
 ifneq (,$(filter gnrc_netapi_mbox,$(USEMODULE)))
   USEMODULE += core_mbox
 endif
 
-ifneq (,$(filter netdev2_tap,$(USEMODULE)))
+ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += netif
-  USEMODULE += netdev2_eth
+  USEMODULE += netdev_eth
   ifneq (,$(filter gnrc_%,$(USEMODULE)))
-    USEMODULE += gnrc_netdev2
+    USEMODULE += gnrc_netdev
   endif
-endif
-
-ifneq (,$(filter gnrc_zep,$(USEMODULE)))
-  USEMODULE += hashes
-  USEMODULE += ieee802154
-  USEMODULE += gnrc_udp
-  USEMODULE += random
-  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
@@ -249,6 +265,7 @@ endif
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
   USEMODULE += inet_csum
   USEMODULE += gnrc_ipv6
+  USEMODULE += icmpv6
 endif
 
 ifneq (,$(filter gnrc_rpl_srh,$(USEMODULE)))
@@ -313,6 +330,13 @@ ifneq (,$(filter gnrc_udp,$(USEMODULE)))
   USEMODULE += udp
 endif
 
+ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
+  USEMODULE += inet_csum
+  USEMODULE += random
+  USEMODULE += tcp
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
   USEMODULE += gnrc_netapi
   USEMODULE += gnrc_netreg
@@ -342,6 +366,7 @@ ifneq (,$(filter newlib,$(USEMODULE)))
 endif
 
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
+  USEMODULE += bitfield
   USEMODULE += posix
   USEMODULE += random
 endif
@@ -351,6 +376,10 @@ ifneq (,$(filter rtt_stdio,$(USEMODULE)))
 endif
 
 ifneq (,$(filter uart_stdio,$(USEMODULE)))
+  USEMODULE += isrpipe
+endif
+
+ifneq (,$(filter isrpipe,$(USEMODULE)))
   USEMODULE += tsrb
 endif
 
@@ -391,6 +420,22 @@ ifneq (,$(filter lwip_conn_udp,$(USEMODULE)))
   USEMODULE += lwip_udp
 endif
 
+ifneq (,$(filter lwip_sock_%,$(USEMODULE)))
+  USEMODULE += lwip_sock
+endif
+
+ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
+  USEMODULE += lwip_raw
+endif
+
+ifneq (,$(filter lwip_sock_tcp,$(USEMODULE)))
+  USEMODULE += lwip_tcp
+endif
+
+ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
+  USEMODULE += lwip_udp
+endif
+
 ifneq (,$(filter lwip_%,$(USEMODULE)))
   USEMODULE += lwip
 endif
@@ -416,6 +461,7 @@ endif
 
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   USEMODULE += sema
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter sema,$(USEMODULE)))
@@ -488,7 +534,7 @@ ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
   USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
 endif
 
-ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
+ifneq (,$(filter gnrc_netdev,$(USEMODULE)))
   USEMODULE += netopt
 endif
 
@@ -513,6 +559,7 @@ endif
 
 ifneq (,$(filter xtimer,$(USEMODULE)))
     FEATURES_REQUIRED += periph_timer
+    USEMODULE += div
 endif
 
 ifneq (,$(filter saul_reg,$(USEMODULE)))
@@ -521,6 +568,8 @@ endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul
+  USEMODULE += saul_reg
+  USEMODULE += auto_init_saul
 endif
 
 ifneq (,$(filter saul,$(USEMODULE)))
@@ -539,6 +588,26 @@ ifneq (,$(filter random,$(USEMODULE)))
 
     ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
         USEMODULE += tinymt32
+    endif
+endif
+
+ifneq (,$(filter emcute,$(USEMODULE)))
+  USEMODULE += core_thread_flags
+  USEMODULE += sock_udp
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter constfs,$(USEMODULE)))
+  USEMODULE += vfs
+endif
+
+ifneq (,$(filter devfs,$(USEMODULE)))
+  USEMODULE += vfs
+endif
+
+ifneq (,$(filter vfs,$(USEMODULE)))
+    ifeq (native, $(BOARD))
+        USEMODULE += native_vfs
     endif
 endif
 

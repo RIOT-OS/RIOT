@@ -1,5 +1,5 @@
 INCLUDES += -I$(RIOTBASE)/pkg/lwip/include \
-            -I$(BINDIRBASE)/pkg/$(BOARD)/lwip/src/include
+            -I$(PKGDIRBASE)/lwip/src/include
 
 ifneq (,$(filter lwip_conn,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib/conn
@@ -13,6 +13,21 @@ endif
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib
 endif
-ifneq (,$(filter lwip_netdev2,$(USEMODULE)))
-  DIRS += $(RIOTBASE)/pkg/lwip/contrib/netdev2
+ifneq (,$(filter lwip_netdev,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib/netdev
+endif
+ifneq (,$(filter lwip_sock,$(USEMODULE)))
+  ifneq (,$(filter lwip_ipv6,$(USEMODULE)))
+    CFLAGS += -DSOCK_HAS_IPV6
+  endif
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib/sock
+endif
+ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib/sock/ip
+endif
+ifneq (,$(filter lwip_sock_tcp,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib/sock/tcp
+endif
+ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib/sock/udp
 endif

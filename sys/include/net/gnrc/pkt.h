@@ -19,8 +19,8 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-#ifndef GNRC_PKT_H_
-#define GNRC_PKT_H_
+#ifndef GNRC_PKT_H
+#define GNRC_PKT_H
 
 #include <inttypes.h>
 #include <stdlib.h>
@@ -196,5 +196,5 @@ gnrc_pktsnip_t *gnrc_pktsnip_search_type(gnrc_pktsnip_t *pkt,
 }
 #endif
 
-#endif /* GNRC_PKT_H_ */
+#endif /* GNRC_PKT_H */
 /** @} */

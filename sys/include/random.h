@@ -32,12 +32,19 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Enables support for floating point random number generation
+ */
 #ifndef PRNG_FLOAT
 #  define PRNG_FLOAT (0)
 #endif
 
 /**
  * @brief initializes PRNG with a seed
+ *
+ * @warning Currently, the random module uses a global state
+ * => multiple calls to @ref random_init will reset the existing
+ * state of the PRNG.
  *
  * @param s seed for the PRNG
  */

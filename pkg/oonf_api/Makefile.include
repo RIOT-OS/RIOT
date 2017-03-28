@@ -1,1 +1,5 @@
-INCLUDES += -I$(BINDIRBASE)/pkg/$(BOARD)/oonf_api/src-api
+INCLUDES += -I$(PKGDIRBASE)/oonf_api/src-api
+
+ifeq ($(TOOLCHAIN), llvm)
+    CFLAGS += -Wno-keyword-macro -Wno-parentheses-equality
+endif

@@ -16,8 +16,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_IPV6_HDR_H_
-#define GNRC_IPV6_HDR_H_
+#ifndef GNRC_IPV6_HDR_H
+#define GNRC_IPV6_HDR_H
 
 #include <stdint.h>
 
@@ -50,5 +50,5 @@ gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload, const ipv6_addr_t *
 }
 #endif
 
-#endif /* GNRC_IPV6_HDR_H_ */
+#endif /* GNRC_IPV6_HDR_H */
 /** @} */

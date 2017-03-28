@@ -20,8 +20,6 @@
 
 #include "cpu.h"
 #include "board.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/uart.h"
 
 #define ENABLE_DEBUG (0)
@@ -38,7 +36,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* make sure given device is valid */
     if (uart >= UART_NUMOF) {
-        return -1;
+        return UART_NODEV;
     }
 
     /* get base register */
@@ -71,7 +69,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     NVIC_EnableIRQ(uart_config[uart].irqn);
     dev->UART_IER = UART_IER_RXRDY;
 
-    return 0;
+    return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
@@ -101,9 +99,7 @@ static inline void isr_handler(int num)
     if (dev->UART_SR & UART_SR_RXRDY) {
         ctx[num].rx_cb(ctx[num].arg, (uint8_t)dev->UART_RHR);
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #ifdef UART_0_ISR

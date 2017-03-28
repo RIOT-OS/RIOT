@@ -1,0 +1,3 @@
+MODULE=tweetnacl
+
+include $(RIOTBASE)/Makefile.base

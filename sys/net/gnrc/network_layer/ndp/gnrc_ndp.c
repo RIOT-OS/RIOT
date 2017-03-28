@@ -54,23 +54,6 @@ static void _stale_nc(kernel_pid_t iface, ipv6_addr_t *ipaddr, uint8_t *l2addr,
     if (l2addr_len != -ENOTSUP) {
         gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, ipaddr);
         if (nc_entry == NULL) {
-#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
-            /* tentative type see https://tools.ietf.org/html/rfc6775#section-6.3 */
-            gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(iface);
-            if ((ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) &&
-                (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER)) {
-                if ((nc_entry = gnrc_ipv6_nc_add(iface, ipaddr, l2addr,
-                                                 (uint16_t)l2addr_len,
-                                                 GNRC_IPV6_NC_STATE_STALE |
-                                                 GNRC_IPV6_NC_TYPE_TENTATIVE)) != NULL) {
-                    xtimer_set_msg(&nc_entry->type_timeout,
-                                   (GNRC_SIXLOWPAN_ND_TENTATIVE_NCE_LIFETIME * SEC_IN_USEC),
-                                   &nc_entry->type_timeout_msg,
-                                   gnrc_ipv6_pid);
-                }
-                return;
-            }
-#endif
             gnrc_ipv6_nc_add(iface, ipaddr, l2addr, (uint16_t)l2addr_len,
                              GNRC_IPV6_NC_STATE_STALE);
         }
@@ -533,7 +516,7 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
         next_rtr_sol = ltime;
 #endif
-        xtimer_set_msg(&nc_entry->rtr_timeout, (ltime * SEC_IN_USEC),
+        xtimer_set_msg(&nc_entry->rtr_timeout, (ltime * US_PER_SEC),
                        &nc_entry->rtr_timeout_msg, thread_getpid());
     }
     /* set current hop limit from message if available */

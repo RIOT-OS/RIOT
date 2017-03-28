@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_cc2420 CC2420 driver
- * @ingroup     drivers_netdev_netdev2
+ * @ingroup     drivers_netdev
  * @{
  *
  * @file
@@ -26,8 +26,8 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 
-#include "net/netdev2.h"
-#include "net/netdev2/ieee802154.h"
+#include "net/netdev.h"
+#include "net/netdev/ieee802154.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,14 +37,6 @@ extern "C" {
  * @brief   Maximum possible packet size in byte
  */
 #define CC2420_PKT_MAXLEN       (IEEE802154_FRAME_LEN_MAX)
-
-/**
- * @brief   Default addresses used if the CPUID module is not present
- *
- * In case this address is used, that short address will be created by using the
- * last two bytes of the long address.
- */
-#define CC2420_ADDR_FALLBACK    {0x12, 0x22, 0x33, 0x44, 0x55, 0x66, 0x08, 0x15}
 
 /**
  * @brief   PAN ID configuration
@@ -82,7 +74,7 @@ enum {
  */
 typedef struct cc2420_params {
     spi_t spi;              /**< SPI bus the device is connected to */
-    spi_speed_t spi_clk;    /**< SPI speed to use */
+    spi_clk_t spi_clk;      /**< SPI speed to use */
     gpio_t pin_cs;          /**< pin connected to chip select */
     gpio_t pin_fifo;        /**< pin connected to the FIFO interrupt pin */
     gpio_t pin_fifop;       /**< pin connected to the FIFOP interrupt pin */
@@ -99,7 +91,7 @@ typedef struct cc2420_params {
  */
 typedef struct {
     /* netdev fields */
-    netdev2_ieee802154_t netdev;  /**< netdev2 parent struct */
+    netdev_ieee802154_t netdev;   /**< netdev parent struct */
     /* device specific fields */
     cc2420_params_t params;       /**< hardware interface configuration */
     /* device state fields */
@@ -304,6 +296,9 @@ void cc2420_tx_exec(cc2420_t *dev);
  * @param[out] buf          buffer to write data to
  * @param[in]  max_len      number of bytes to read from device
  * @param[in]  info         to be removed
+ *
+ * @return                  the number of bytes in the Rx FIFO
+ * @return                  the number of bytes written to @p buf if present
  */
 int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info);
 

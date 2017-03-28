@@ -18,8 +18,8 @@
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <stdint.h>
 
@@ -29,11 +29,6 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-/**
- * @name Define the location of the RIOT image in flash
- */
-#define LOCATION_VTABLE     (0x08005000)
 
 /**
  * @name Tell the xtimer that we use a 16-bit peripheral timer
@@ -81,7 +76,7 @@
  * @name CC3000 pin configuration
  * @{
  */
-#define CC3000_SPI          SPI_0
+#define CC3000_SPI          SPI_DEV(0)
 #define CC3000_CS           GPIO_PIN(PORT_B,12)
 #define CC3000_EN           GPIO_PIN(PORT_B,8)
 #define CC3000_INT          GPIO_PIN(PORT_B,11)
@@ -91,7 +86,7 @@
  * @name EXTFLASH pin configuration
  * @{
  */
-#define EXTFLASH_SPI        SPI_0
+#define EXTFLASH_SPI        SPI_DEV(0)
 #define EXTFLASH            GPIO_PIN(PORT_B,9)
 /** @} */
 
@@ -104,5 +99,5 @@ void board_init(void);
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

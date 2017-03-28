@@ -30,20 +30,21 @@
 void hwrng_init(void)
 {
     /* enable RNG reset state */
-    RCC->AHB2ENR |= RCC_AHB2ENR_RNGEN;
+    periph_clk_en(AHB2, RCC_AHB2ENR_RNGEN);
     /* release RNG from reset state */
-    RCC->AHB2ENR &= ~RCC_AHB2ENR_RNGEN;
+    periph_clk_dis(AHB2, RCC_AHB2ENR_RNGEN);
 }
 
 
-void hwrng_read(uint8_t *buf, unsigned int num)
+void hwrng_read(void *buf, unsigned int num)
 {
     /* cppcheck-suppress variableScope */
     uint32_t tmp;
     unsigned int count = 0;
+    uint8_t *b = (uint8_t *)buf;
 
     /* enable RNG reset state */
-    RCC->AHB2ENR |= RCC_AHB2ENR_RNGEN;
+    periph_clk_en(AHB2, RCC_AHB2ENR_RNGEN);
     /* enable the RNG */
     RNG->CR |= RNG_CR_RNGEN;
 
@@ -54,7 +55,7 @@ void hwrng_read(uint8_t *buf, unsigned int num)
         tmp = RNG->DR;
         /* copy data into result vector */
         for (int i = 0; i < 4 && count < num; i++) {
-            buf[count++] = (uint8_t)tmp;
+            b[count++] = (uint8_t)tmp;
             tmp = tmp >> 8;
         }
     }
@@ -62,7 +63,7 @@ void hwrng_read(uint8_t *buf, unsigned int num)
     /* disable the RNG */
     RNG->CR &= ~RNG_CR_RNGEN;
     /* release RNG from reset state */
-    RCC->AHB2ENR &= ~RCC_AHB2ENR_RNGEN;
+    periph_clk_dis(AHB2, RCC_AHB2ENR_RNGEN);
 }
 
 #endif /* RANDOM_NUMOF */

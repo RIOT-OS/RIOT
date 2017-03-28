@@ -22,8 +22,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef NETOPT_H_
-#define NETOPT_H_
+#ifndef NETOPT_H
+#define NETOPT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -206,7 +206,7 @@ typedef enum {
      *
      * Get/set the CCA mode as uint8_t
      * corresponding to the respective PHY standard.
-     * - IEEE 802.15.4: @ref netdev2_ieee802154_cca_mode_t
+     * - IEEE 802.15.4: @ref netdev_ieee802154_cca_mode_t
      */
     NETOPT_CCA_MODE,
 
@@ -303,5 +303,5 @@ const char *netopt2str(netopt_t opt);
 }
 #endif
 
-#endif /* NETOPT_H_ */
+#endif /* NETOPT_H */
 /** @} */

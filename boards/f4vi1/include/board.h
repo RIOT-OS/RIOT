@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -42,16 +42,16 @@ extern "C" {
 #define LED1_MASK           (1 << 3)
 #define LED2_MASK           (1 << 2)
 
-#define LED0_ON             (LED_PORT->BSRRH = LED0_MASK)
-#define LED0_OFF            (LED_PORT->BSRRL = LED0_MASK)
+#define LED0_ON             (LED_PORT->BSRR = LED0_MASK)
+#define LED0_OFF            (LED_PORT->BSRR = (LED0_MASK << 16))
 #define LED0_TOGGLE         (LED_PORT->ODR  ^= LED0_MASK)
 
-#define LED1_ON             (LED_PORT->BSRRH = LED1_MASK)
-#define LED1_OFF            (LED_PORT->BSRRL = LED1_MASK)
+#define LED1_ON             (LED_PORT->BSRR = LED1_MASK)
+#define LED1_OFF            (LED_PORT->BSRR = (LED1_MASK << 16))
 #define LED1_TOGGLE         (LED_PORT->ODR  ^= LED1_MASK)
 
-#define LED2_ON             (LED_PORT->BSRRH = LED2_MASK)
-#define LED2_OFF            (LED_PORT->BSRRL = LED2_MASK)
+#define LED2_ON             (LED_PORT->BSRR = LED2_MASK)
+#define LED2_OFF            (LED_PORT->BSRR = (LED2_MASK << 16))
 #define LED2_TOGGLE         (LED_PORT->ODR  ^= LED2_MASK)
 /** @} */
 
@@ -64,5 +64,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

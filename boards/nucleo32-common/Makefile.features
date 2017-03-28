@@ -1,0 +1,3 @@
+# Various common features of Nucleo boards
+FEATURES_PROVIDED += cpp
+FEATURES_PROVIDED += arduino

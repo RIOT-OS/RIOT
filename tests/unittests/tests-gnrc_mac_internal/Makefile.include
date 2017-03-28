@@ -1,0 +1,3 @@
+USEMODULE += gnrc_priority_pktqueue
+USEMODULE += gnrc_mac
+CFLAGS += -DGNRC_MAC_TX_QUEUE_SIZE=4 -DGNRC_MAC_NEIGHBOR_COUNT=4

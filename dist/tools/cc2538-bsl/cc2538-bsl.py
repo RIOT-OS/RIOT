@@ -90,7 +90,9 @@ def mdebug(level, message, attr='\n'):
         print(message, end=attr, file=sys.stderr)
 
 # Takes chip IDs (obtained via Get ID command) to human-readable names
-CHIP_ID_STRS = {0xb964: 'CC2538'}
+CHIP_ID_STRS = {0xb964: 'CC2538',
+                0xb965: 'CC2538'
+                }
 
 RETURN_CMD_STRS = {0x40: 'Success',
                    0x41: 'Unknown command',

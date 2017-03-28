@@ -16,8 +16,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -49,87 +49,181 @@ extern "C" {
 /** @} */
 
 /**
- * @name Timer configuration
+ * @name   Timer configuration
  * @{
  */
-#define TIMER_NUMOF         (2U)
-#define TIMER_0_EN          1
-#define TIMER_1_EN          1
-#define TIMER_IRQ_PRIO      1
+static const timer_conf_t timer_config[] = {
+    {
+        .dev      = TIM5,
+        .max      = 0xffffffff,
+        .rcc_mask = RCC_APB1ENR_TIM5EN,
+        .bus      = APB1,
+        .irqn     = TIM5_IRQn
+    }
+};
 
-/* Timer 0 configuration */
-#define TIMER_0_DEV         TIM2
-#define TIMER_0_CHANNELS    4
-#define TIMER_0_FREQ        (CLOCK_CORECLOCK)
-#define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
-#define TIMER_0_ISR         isr_tim2
-#define TIMER_0_IRQ_CHAN    TIM2_IRQn
+#define TIMER_0_ISR         isr_tim5
 
-/* Timer 1 configuration */
-#define TIMER_1_DEV         TIM5
-#define TIMER_1_CHANNELS    4
-#define TIMER_1_FREQ        (CLOCK_CORECLOCK)
-#define TIMER_1_MAX_VALUE   (0xffffffff)
-#define TIMER_1_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM5EN)
-#define TIMER_1_ISR         isr_tim5
-#define TIMER_1_IRQ_CHAN    TIM5_IRQn
+#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name   UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
     {
         .dev        = USART2,
         .rcc_mask   = RCC_APB1ENR_USART2EN,
-        .rx_pin     = GPIO_PIN(PORT_A,3),
-        .tx_pin     = GPIO_PIN(PORT_A,2),
-        .af         = GPIO_AF7,
+        .rx_pin     = GPIO_PIN(PORT_A, 3),
+        .tx_pin     = GPIO_PIN(PORT_A, 2),
+        .rx_af      = GPIO_AF7,
+        .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
+#ifdef UART_USE_DMA
         .dma_stream = 6,
         .dma_chan   = 4
-    }
+#endif
+    },
+    {
+        .dev        = USART3,
+        .rcc_mask   = RCC_APB1ENR_USART3EN,
+        .rx_pin     = GPIO_PIN(PORT_C, 11),
+        .tx_pin     = GPIO_PIN(PORT_C, 10),
+        .rx_af      = GPIO_AF7,
+        .tx_af      = GPIO_AF7,
+        .bus        = APB1,
+        .irqn       = USART3_IRQn,
+#ifdef UART_USE_DMA
+        .dma_stream = 5,
+        .dma_chan   = 4
+#endif
+    },
+    {
+        .dev        = USART1,
+        .rcc_mask   = RCC_APB2ENR_USART1EN,
+        .rx_pin     = GPIO_PIN(PORT_A, 10),
+        .tx_pin     = GPIO_PIN(PORT_A, 9),
+        .rx_af      = GPIO_AF7,
+        .tx_af      = GPIO_AF7,
+        .bus        = APB2,
+        .irqn       = USART1_IRQn,
+#ifdef UART_USE_DMA
+        .dma_stream = 4,
+        .dma_chan   = 4
+#endif
+    },
 };
 
-/* assign ISR vector names */
-#define UART_0_ISR          isr_usart2
-#define UART_0_DMA_ISR      isr_dma1_stream6
+#define UART_0_ISR          (isr_usart2)
+#define UART_0_DMA_ISR      (isr_dma1_stream6)
+#define UART_1_ISR          (isr_usart3)
+#define UART_1_DMA_ISR      (isr_dma1_stream5)
+#define UART_2_ISR          (isr_usart1)
+#define UART_2_DMA_ISR      (isr_dma1_stream4)
 
-/* deduct number of defined UART interfaces */
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**
- * @name SPI configuration
+ * @name    PWM configuration
  * @{
  */
-#define SPI_NUMOF           (1U)
-#define SPI_0_EN            1
-#define SPI_IRQ_PRIO        1
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM2,
+        .rcc_mask = RCC_APB1ENR_TIM2EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_A, 15), .cc_chan = 0},
+                      { .pin = GPIO_PIN(PORT_B,  3), .cc_chan = 1},
+                      { .pin = GPIO_PIN(PORT_B, 10), .cc_chan = 2},
+                      { .pin = GPIO_PIN(PORT_B,  2), .cc_chan = 3} },
+        .af       = GPIO_AF1,
+        .bus      = APB1
+    },
+    {
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 4), .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF, .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF, .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF, .cc_chan = 0 } },
+        .af       = GPIO_AF2,
+        .bus      = APB1
+    },
+    {
+        .dev      = TIM8,
+        .rcc_mask = RCC_APB2ENR_TIM8EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_C, 6), .cc_chan = 0},
+                      { .pin = GPIO_PIN(PORT_C, 7), .cc_chan = 1},
+                      { .pin = GPIO_PIN(PORT_C, 8), .cc_chan = 2},
+                      { .pin = GPIO_PIN(PORT_C, 9), .cc_chan = 3} },
+        .af       = GPIO_AF3,
+        .bus      = APB2
+    },
+};
 
-/* SPI 0 device config */
-#define SPI_0_DEV               SPI1
-#define SPI_0_CLKEN()           (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
-#define SPI_0_CLKDIS()          (RCC->APB2ENR &= ~RCC_APB2ENR_SPI1EN)
-#define SPI_0_BUS_DIV           1   /* 1 -> SPI bus runs with half CPU clock, 0 -> quarter CPU clock */
-#define SPI_0_IRQ               SPI1_IRQn
-#define SPI_0_IRQ_HANDLER       isr_spi1
-/* SPI 0 pin configuration */
-#define SPI_0_SCK_PORT          GPIOA       /* A5 pin is shared with the green LED. */
-#define SPI_0_SCK_PIN           5
-#define SPI_0_SCK_AF            5
-#define SPI_0_SCK_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
-#define SPI_0_MISO_PORT         GPIOA
-#define SPI_0_MISO_PIN          6
-#define SPI_0_MISO_AF           5
-#define SPI_0_MISO_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
-#define SPI_0_MOSI_PORT         GPIOA
-#define SPI_0_MOSI_PIN          7
-#define SPI_0_MOSI_AF           5
-#define SPI_0_MOSI_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+/** @} */
+
+/**
+ * @name   SPI configuration
+ *
+ * @note    The spi_divtable is auto-generated from
+ *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
+ * @{
+ */
+static const uint8_t spi_divtable[2][5] = {
+    {       /* for APB1 @ 90000000Hz */
+        7,  /* -> 351562Hz */
+        7,  /* -> 351562Hz */
+        6,  /* -> 703125Hz */
+        3,  /* -> 5625000Hz */
+        2   /* -> 11250000Hz */
+    },
+    {       /* for APB2 @ 180000000Hz */
+        7,  /* -> 703125Hz */
+        7,  /* -> 703125Hz */
+        7,  /* -> 703125Hz */
+        4,  /* -> 5625000Hz */
+        3   /* -> 11250000Hz */
+    }
+};
+
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_A, 7),
+        .miso_pin = GPIO_PIN(PORT_A, 6),
+        .sclk_pin = GPIO_PIN(PORT_A, 5),
+        .cs_pin   = GPIO_PIN(PORT_A, 4),
+        .af       = GPIO_AF5,
+        .rccmask  = RCC_APB2ENR_SPI1EN,
+        .apbbus   = APB2
+    },
+    {
+        .dev      = SPI2,
+        .mosi_pin = GPIO_PIN(PORT_B, 15),
+        .miso_pin = GPIO_PIN(PORT_B, 14),
+        .sclk_pin = GPIO_PIN(PORT_B, 13),
+        .cs_pin   = GPIO_PIN(PORT_B, 12),
+        .af       = GPIO_AF5,
+        .rccmask  = RCC_APB1ENR_SPI2EN,
+        .apbbus   = APB1
+    },
+    {
+        .dev      = SPI3,
+        .mosi_pin = GPIO_PIN(PORT_C, 12),
+        .miso_pin = GPIO_PIN(PORT_C, 11),
+        .sclk_pin = GPIO_PIN(PORT_C, 10),
+        .cs_pin   = GPIO_UNDEF,
+        .af       = GPIO_AF6,
+        .rccmask  = RCC_APB1ENR_SPI3EN,
+        .apbbus   = APB1
+    }
+};
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 
@@ -144,8 +238,8 @@ static const uart_conf_t uart_config[] = {
 
 /* I2C 0 device configuration */
 #define I2C_0_DEV           I2C1
-#define I2C_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_I2C1EN)
-#define I2C_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN))
+#define I2C_0_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_I2C1EN))
+#define I2C_0_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_I2C1EN))
 #define I2C_0_EVT_IRQ       I2C1_EV_IRQn
 #define I2C_0_EVT_ISR       isr_i2c1_ev
 #define I2C_0_ERR_IRQ       I2C1_ER_IRQn
@@ -154,22 +248,22 @@ static const uart_conf_t uart_config[] = {
 #define I2C_0_SCL_PORT      GPIOB
 #define I2C_0_SCL_PIN       8
 #define I2C_0_SCL_AF        4
-#define I2C_0_SCL_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define I2C_0_SCL_CLKEN()   (periph_clk_en(AHB1, RCC_AHB1ENR_GPIOBEN))
 #define I2C_0_SDA_PORT      GPIOB
 #define I2C_0_SDA_PIN       9
 #define I2C_0_SDA_AF        4
-#define I2C_0_SDA_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define I2C_0_SDA_CLKEN()   (periph_clk_en(AHB1, RCC_AHB1ENR_GPIOBEN))
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  * @{
  */
 #define ADC_NUMOF          (0)
 /** @} */
 
 /**
- * @brief   DAC configuration
+ * @name   DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)
@@ -179,5 +273,5 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

@@ -20,24 +20,12 @@
 
 #include "auto_init.h"
 
-#ifdef MODULE_BMP180
-#include "bmp180.h"
-#endif
-
 #ifdef MODULE_IO1_XPLAINED
 #include "io1_xplained.h"
 #endif
 
 #ifdef MODULE_SHT11
 #include "sht11.h"
-#endif
-
-#ifdef MODULE_GPIOINT
-#include "gpioint.h"
-#endif
-
-#ifdef MODULE_LTC4150
-#include "ltc4150.h"
 #endif
 
 #ifdef MODULE_MCI
@@ -80,6 +68,10 @@
 #include "net/gnrc/udp.h"
 #endif
 
+#ifdef MODULE_GNRC_TCP
+#include "net/gnrc/tcp.h"
+#endif
+
 #ifdef MODULE_LWIP
 #include "lwip.h"
 #endif
@@ -90,6 +82,10 @@
 
 #ifdef MODULE_TINYMT32
 #include "random.h"
+#endif
+
+#ifdef MODULE_GCOAP
+#include "net/gcoap.h"
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -108,10 +104,6 @@ void auto_init(void)
     DEBUG("Auto init rtc module.\n");
     rtc_init();
 #endif
-#ifdef MODULE_BMP180
-    DEBUG("Auto init BMP180 module.\n");
-    bmp180_auto_init();
-#endif
 #ifdef MODULE_IO1_XPLAINED
     DEBUG("Auto init IO1 Xplained extension module.\n");
     io1_xplained_auto_init();
@@ -119,14 +111,6 @@ void auto_init(void)
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");
     sht11_init();
-#endif
-#ifdef MODULE_GPIOINT
-    DEBUG("Auto init gpioint module.\n");
-    gpioint_init();
-#endif
-#ifdef MODULE_LTC4150
-    DEBUG("Auto init ltc4150 module.\n");
-    ltc4150_init();
 #endif
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");
@@ -156,14 +140,22 @@ void auto_init(void)
     DEBUG("Auto init UDP module.\n");
     gnrc_udp_init();
 #endif
-#ifdef MODULE_DHT
-    DEBUG("Auto init DHT devices.\n");
-    extern void dht_auto_init(void);
-    dht_auto_init();
+#ifdef MODULE_GNRC_TCP
+    DEBUG("Auto init TCP module\n");
+    gnrc_tcp_init();
 #endif
 #ifdef MODULE_LWIP
     DEBUG("Bootstraping lwIP.\n");
     lwip_bootstrap();
+#endif
+#ifdef MODULE_GCOAP
+    DEBUG("Auto init gcoap module.\n");
+    gcoap_init();
+#endif
+#ifdef MODULE_DEVFS
+    DEBUG("Mounting /dev\n");
+    extern void auto_init_devfs(void);
+    auto_init_devfs();
 #endif
 
 /* initialize network devices */
@@ -172,6 +164,11 @@ void auto_init(void)
 #ifdef MODULE_AT86RF2XX
     extern void auto_init_at86rf2xx(void);
     auto_init_at86rf2xx();
+#endif
+
+#ifdef MODULE_MRF24J40
+    extern void auto_init_mrf24j40(void);
+    auto_init_mrf24j40();
 #endif
 
 #ifdef MODULE_CC2420
@@ -219,14 +216,19 @@ void auto_init(void)
     auto_init_kw2xrf();
 #endif
 
-#ifdef MODULE_NETDEV2_TAP
-    extern void auto_init_netdev2_tap(void);
-    auto_init_netdev2_tap();
+#ifdef MODULE_NETDEV_TAP
+    extern void auto_init_netdev_tap(void);
+    auto_init_netdev_tap();
 #endif
 
 #ifdef MODULE_NORDIC_SOFTDEVICE_BLE
     extern void gnrc_nordic_ble_6lowpan_init(void);
     gnrc_nordic_ble_6lowpan_init();
+#endif
+
+#ifdef MODULE_NRFMIN
+    extern void gnrc_nrfmin_init(void);
+    gnrc_nrfmin_init();
 #endif
 
 #ifdef MODULE_W5100
@@ -277,13 +279,49 @@ void auto_init(void)
     extern void auto_init_lis3dh(void);
     auto_init_lis3dh();
 #endif
-#ifdef MODULE_MMA8652
-    extern void auto_init_mma8652(void);
-    auto_init_mma8652();
+#ifdef MODULE_MMA8X5X
+    extern void auto_init_mma8x5x(void);
+    auto_init_mma8x5x();
 #endif
 #ifdef MODULE_SI70XX
     extern void auto_init_si70xx(void);
     auto_init_si70xx();
+#endif
+#ifdef MODULE_BMP180
+    extern void auto_init_bmp180(void);
+    auto_init_bmp180();
+#endif
+#ifdef MODULE_BME280
+    extern void auto_init_bme280(void);
+    auto_init_bme280();
+#endif
+#ifdef MODULE_JC42
+    extern void auto_init_jc42(void);
+    auto_init_jc42();
+#endif
+#ifdef MODULE_TSL2561
+    extern void auto_init_tsl2561(void);
+    auto_init_tsl2561();
+#endif
+#ifdef MODULE_HDC1000
+    extern void auto_init_hdc1000(void);
+    auto_init_hdc1000();
+#endif
+#ifdef MODULE_DHT
+    extern void auto_init_dht(void);
+    auto_init_dht();
+#endif
+#ifdef MODULE_TCS37727
+    extern void auto_init_tcs37727(void);
+    auto_init_tcs37727();
+#endif
+#ifdef MODULE_VEML6070
+    extern void auto_init_veml6070(void);
+    auto_init_veml6070();
+#endif
+#ifdef MODULE_ADXL345
+    extern void auto_init_adxl345(void);
+    auto_init_adxl345();
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
@@ -296,4 +334,15 @@ void auto_init(void)
 #endif
 
 #endif /* MODULE_AUTO_INIT_GNRC_RPL */
+
+/* initialize storage devices */
+#ifdef MODULE_AUTO_INIT_STORAGE
+    DEBUG("auto_init STORAGE\n");
+
+#ifdef MODULE_SDCARD_SPI
+    extern void auto_init_sdcard_spi(void);
+    auto_init_sdcard_spi();
+#endif
+
+#endif /* MODULE_AUTO_INIT_STORAGE */
 }

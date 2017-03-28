@@ -32,8 +32,8 @@
  *
  * $Id: TestCaller.h,v 1.7 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef EMBUNIT_TESTCALLER_H_
-#define EMBUNIT_TESTCALLER_H_
+#ifndef EMBUNIT_TESTCALLER_H
+#define EMBUNIT_TESTCALLER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,4 +77,4 @@ extern const TestImplement TestCallerImplement;
 }
 #endif
 
-#endif/* EMBUNIT_TESTCALLER_H_ */
+#endif/* EMBUNIT_TESTCALLER_H */
