@@ -224,56 +224,178 @@ static inline uint32_t byteorder_swapl(uint32_t v);
  */
 static inline uint64_t byteorder_swapll(uint64_t v);
 
-/**
- * @brief          Convert from host byte order to network byte order, 16 bit.
- * @see            byteorder_htons()
- * @param[in]      v   The integer to convert.
- * @returns        Converted integer.
- */
-static inline uint16_t HTONS(uint16_t v);
-
-/**
- * @brief          Convert from host byte order to network byte order, 32 bit.
- * @see            byteorder_htonl()
- * @param[in]      v   The integer to convert.
- * @returns        Converted integer.
- */
-static inline uint32_t HTONL(uint32_t v);
-
-/**
- * @brief          Convert from host byte order to network byte order, 64 bit.
- * @see            byteorder_htonll()
- * @param[in]      v   The integer to convert.
- * @returns        Converted integer.
- */
-static inline uint64_t HTONLL(uint64_t v);
-
-/**
- * @brief          Convert from network byte order to host byte order, 16 bit.
- * @see            byteorder_ntohs()
- * @param[in]      v   The integer to convert.
- * @returns        Converted integer.
- */
-static inline uint16_t NTOHS(uint16_t v);
-
-/**
- * @brief          Convert from network byte order to host byte order, 32 bit.
- * @see            byteorder_ntohl()
- * @param[in]      v   The integer to convert.
- * @returns        Converted integer.
- */
-static inline uint32_t NTOHL(uint32_t v);
-
-/**
- * @brief          Convert from network byte order to host byte order, 64 bit.
- * @see            byteorder_ntohll()
- * @param[in]      v   The integer to convert.
- * @returns        Converted integer.
- */
-static inline uint64_t NTOHLL(uint64_t v);
-
 
 /* **************************** IMPLEMENTATION ***************************** */
+/**
+ * @brief   Compile time byte-order swapping for 16 bit constants
+ */
+#define CONST_BSWAP16(x)     ((uint16_t)(                        \
+                             (((uint16_t)(x) >> 8) & 0x00FF)   | \
+                             (((uint16_t)(x) << 8) & 0xFF00)))
+
+/**
+ * @brief   Compile time byte-order swapping for 32 bit constants
+ */
+#define CONST_BSWAP32(x)     ((uint32_t)(                             \
+                             (((uint32_t)(x) >> 24) & 0x000000FF)   | \
+                             (((uint32_t)(x) >> 8)  & 0x0000FF00)   | \
+                             (((uint32_t)(x) << 8)  & 0x00FF0000)   | \
+                             (((uint32_t)(x) << 24) & 0xFF000000)))
+
+/**
+ * @brief   Compile time byte-order swapping for 64 bit constants
+ */
+#define CONST_BSWAP64(x)     ((uint64_t)(                                   \
+                             (((uint64_t)(x) >> 56) & 0x00000000000000FF) | \
+                             (((uint64_t)(x) >> 40) & 0x000000000000FF00) | \
+                             (((uint64_t)(x) >> 24) & 0x0000000000FF0000) | \
+                             (((uint64_t)(x) >> 8)  & 0x00000000FF000000) | \
+                             (((uint64_t)(x) << 8)  & 0x000000FF00000000) | \
+                             (((uint64_t)(x) << 24) & 0x0000FF0000000000) | \
+                             (((uint64_t)(x) << 40) & 0x00FF000000000000) | \
+                             (((uint64_t)(x) << 56) & 0xFF00000000000000)))
+
+#ifndef __BYTE_ORDER__
+#error "__BYTE_ORDER__ macro not defined by the compiler"
+#endif
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+
+/**
+ * @brief   Convert a constant from host byte order to network byte
+ *          order, 16 bit.
+ */
+#define CONST_HTONS(x)       ((network_uint16_t) CONST_BSWAP16(x))
+
+/**
+ * @brief   Convert a constant from host byte order to network byte
+ *          order, 32 bit.
+ */
+#define CONST_HTONL(x)       ((network_uint32_t) CONST_BSWAP32(x))
+
+/**
+ * @brief   Convert a constant from host byte order to network byte
+ *          order, 64 bit.
+ */
+#define CONST_HTONLL(x)      ((network_uint64_t) CONST_BSWAP64(x))
+
+/**
+ * @brief   Convert a constant from network byte order to host byte
+ *          order, 16 bit.
+ */
+#define CONST_NTOHS(x)       CONST_BSWAP16(x)
+
+/**
+ * @brief   Convert a constant from network byte order to host byte
+ *          order, 32 bit.
+ */
+#define CONST_NTOHL(x)       CONST_BSWAP32(x)
+
+/**
+ * @brief   Convert a constant from network byte order to host byte
+ *          order, 64 bit.
+ */
+#define CONST_NTOHLL(x)      CONST_BSWAP64(x)
+
+/**
+ * @brief          Constant big endian, 16 bit.
+ */
+#define CONST_TOBES(x)       ((be_uint16_t) CONST_BSWAP16(x))
+
+/**
+ * @brief          Constant to big endian, 32 bit.
+ */
+#define CONST_TOBEL(x)       ((be_uint32_t) CONST_BSWAP32(x))
+
+/**
+ * @brief          Constant to big endian, 64 bit.
+ */
+#define CONST_TOBELL(x)      ((be_uint64_t) CONST_BSWAP64(x))
+
+/**
+ * @brief          Constant to little endian, 16 bit.
+ */
+#define CONST_TOLES(x)       ((le_uint16_t) (x))
+
+/**
+ * @brief          Constant to little endian, 32 bit.
+ */
+#define CONST_TOLEL(x)       ((le_uint32_t) (x))
+
+/**
+ * @brief          Constant to little endian, 64 bit.
+ */
+#define CONST_TOLELL(x)      ((le_uint64_t) (x))
+
+#else
+
+/**
+ * @brief   Convert a constant from host byte order to network byte
+ *          order, 16 bit.
+ */
+#define CONST_HTONS(x)       ((network_uint16_t) (x))
+
+/**
+ * @brief   Convert a constant from host byte order to network byte
+ *          order, 32 bit.
+ */
+#define CONST_HTONL(x)       ((network_uint32_t) (x))
+
+/**
+ * @brief   Convert a constant from host byte order to network byte
+ *          order, 64 bit.
+ */
+#define CONST_HTONLL(x)      ((network_uint64_t) (x))
+
+/**
+ * @brief   Convert a constant from network byte order to host byte
+ *          order, 16 bit.
+ */
+#define CONST_NTOHS(x)       (((network_uint16_t) (x)).u16)
+
+/**
+ * @brief   Convert a constant from network byte order to host byte
+ *          order, 32 bit.
+ */
+#define CONST_NTOHL(x)       (((network_uint32_t) (x)).u32)
+
+/**
+ * @brief   Convert a constant from network byte order to host byte
+ *          order, 64 bit.
+ */
+#define CONST_NTOHLL(x)      (((network_uint64_t) (x)).u64)
+
+/**
+ * @brief          Constant big endian, 16 bit.
+ */
+#define CONST_TOBES(x)       ((be_uint16_t) (x))
+
+/**
+ * @brief          Constant to big endian, 32 bit.
+ */
+#define CONST_TOBEL(x)       ((be_uint32_t) (x))
+
+/**
+ * @brief          Constant to big endian, 64 bit.
+ */
+#define CONST_TOBELL(x)      ((be_uint64_t) (x))
+
+/**
+ * @brief          Constant to little endian, 16 bit.
+ */
+#define CONST_TOLES(x)       ((le_uint16_t) CONST_BSWAP16(x))
+
+/**
+ * @brief          Constant to little endian, 32 bit.
+ */
+#define CONST_TOLEL(x)       ((le_uint32_t) CONST_BSWAP32(x))
+
+/**
+ * @brief          Constant to little endian, 64 bit.
+ */
+#define CONST_TOLELL(x)      ((le_uint64_t) CONST_BSWAP64(x))
+
+#endif
 
 #ifdef HAVE_NO_BUILTIN_BSWAP16
 static inline unsigned short __builtin_bswap16(unsigned short a)
@@ -385,38 +507,35 @@ static inline uint64_t byteorder_ntohll(network_uint64_t v)
     return _byteorder_swap(v.u64, ll);
 }
 
-static inline uint16_t HTONS(uint16_t v)
-{
-    return byteorder_htons(v).u16;
-}
+/**
+ * @brief          Convert from host byte order to network byte order, 16 bit.
+ */
+#define HTONS(x)             CONST_HTONS(x)
 
-static inline uint32_t HTONL(uint32_t v)
-{
-    return byteorder_htonl(v).u32;
-}
+/**
+ * @brief          Convert from host byte order to network byte order, 32 bit.
+ */
+#define HTONL(x)             CONST_HTONL(x)
 
-static inline uint64_t HTONLL(uint64_t v)
-{
-    return byteorder_htonll(v).u64;
-}
+/**
+ * @brief          Convert from host byte order to network byte order, 64 bit.
+ */
+#define HTONLL(x)            CONST_HTONLL(x)
 
-static inline uint16_t NTOHS(uint16_t v)
-{
-    network_uint16_t input = { v };
-    return byteorder_ntohs(input);
-}
+/**
+ * @brief          Convert from network byte order to host byte order, 16 bit.
+ */
+#define NTOHS(x)             CONST_NTOHS(x)
 
-static inline uint32_t NTOHL(uint32_t v)
-{
-    network_uint32_t input = { v };
-    return byteorder_ntohl(input);
-}
+/**
+ * @brief          Convert from network byte order to host byte order, 32 bit.
+ */
+#define NTOHL(x)             CONST_NTOHL(x)
 
-static inline uint64_t NTOHLL(uint64_t v)
-{
-    network_uint64_t input = { v };
-    return byteorder_ntohll(input);
-}
+/**
+ * @brief          Convert from network byte order to host byte order, 64 bit.
+ */
+#define NTOHLL(x)            CONST_NTOHLL(x)
 
 #ifdef __cplusplus
 }
