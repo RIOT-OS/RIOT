@@ -60,8 +60,6 @@ typedef enum {
 /** @} */
 #endif /* ndef DOXYGEN */
 
-#define PM_NUM_MODES    (3)
-
 #ifdef __cplusplus
 }
 #endif

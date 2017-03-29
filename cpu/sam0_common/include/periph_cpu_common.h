@@ -59,6 +59,15 @@ typedef uint32_t gpio_t;
  */
 #define GPIO_PIN(x, y)      (((gpio_t)(&PORT->Group[x])) | y)
 
+/**
+ * @name    Power mode configuration
+ * @{
+ */
+#define PM_NUM_MODES        (3)
+/** @todo   we block all modes per default, until PM is cleanly implemented */
+#define PM_BLOCKER_INITIAL  { .val_u32 = 0x01010101 }
+/** @} */
+
 #ifndef DOXYGEN
 /**
  * @brief   Override active flank configuration values
