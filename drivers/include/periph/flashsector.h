@@ -125,10 +125,21 @@ int flashsector_sector(void *addr);
  * @param[in] sector    sector to write
  * @param[in] data      data to write to the sector, MUST be @p size byte.
  *                      Set to NULL for sector erase only.
- * @param[in]  size     size of the data to write (in byte).
+ * @param[in] size      size of the data to write (in byte).
                         Ignored, if sector erase is requested
  */
 void flashsector_write(int sector, void *data, int size);
+
+/**
+ * @brief   Write the given data to flash memory, but do not erase before
+ *
+ * @param[in] target    address to write data to
+ * @param[in] data      data to write to the sector, MUST be @p size byte.
+ *                      Set to NULL for sector erase only.
+ * @param[in] size      size of the data to write (in byte).
+                        Ignored, if sector erase is requested
+ */
+void flashsector_write_only(void *target, void *data, int size);
 
 /**
  * @brief   Read the first part of given sector into the given memory location

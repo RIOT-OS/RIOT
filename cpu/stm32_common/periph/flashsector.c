@@ -35,7 +35,7 @@ void flashsector_write(int sector, void *data, int size)
     uint16_t *data_addr = (uint16_t *)data;
     uint32_t hsi_state = (RCC->CR & RCC_CR_HSION);
 
-    // /* the internal RC oscillator (HSI) must be enabled */
+    /* the internal RC oscillator (HSI) must be enabled */
     RCC->CR |= (RCC_CR_HSION);
     while (!(RCC->CR & RCC_CR_HSIRDY)) {
     }
@@ -78,6 +78,53 @@ void flashsector_write(int sector, void *data, int size)
         for (unsigned i = 0; i < (size / 2); i++) {
             //*(__IO uint16_t*)sector_addr++ = data_addr[i];
             *sector_addr++ = data_addr[i];
+            while (FLASH->SR & FLASH_SR_BSY) {
+            }
+        }
+        /* clear program bit again */
+        FLASH->CR &= (~FLASH_CR_PG);
+        DEBUG("[flashsector] write: done writing data\n");
+    }
+
+    /* finally, lock the flash module again */
+    DEBUG("flashsector] now locking the flash module again\n");
+    FLASH->CR |= FLASH_CR_LOCK;
+
+    /* restore the HSI state */
+    if (!hsi_state) {
+        RCC->CR &= ~(RCC_CR_HSION);
+        while (RCC->CR & RCC_CR_HSIRDY) {
+        }
+    }
+}
+
+void flashsector_write_only(void *target, void *data, int size) {
+    uint16_t *target_addr = (uint16_t *)target;
+    uint16_t *data_addr = (uint16_t *)data;
+    uint32_t hsi_state = (RCC->CR & RCC_CR_HSION);
+
+    /* the internal RC oscillator (HSI) must be enabled */
+    RCC->CR |= (RCC_CR_HSION);
+    while (!(RCC->CR & RCC_CR_HSIRDY)) {
+    }
+
+    /* unlock the flash module */
+    DEBUG("[flashsector] unlocking the flash module\n");
+    if ((FLASH->CR & FLASH_CR_LOCK)) {
+        FLASH->KEYR = FLASH_KEY1;
+        FLASH->KEYR = FLASH_KEY2;
+    }
+
+    /* WRITE sequence */
+    if (data != NULL) {
+        DEBUG("[flashsector] write: now writing the data\n");
+        /* set the PG bit and programming word size, then program data */
+        FLASH->CR &= ~FLASH_CR_PSIZE;       /* clear PSIZE first */
+        FLASH->CR |= FLASH_PSIZE_HALF_WORD; /* 16 bit programming */
+        FLASH->CR |= FLASH_CR_PG;
+        for (unsigned i = 0; i < (size / 2); i++) {
+            //*(__IO uint16_t*)sector_addr++ = data_addr[i];
+            *target_addr++ = data_addr[i];
             while (FLASH->SR & FLASH_SR_BSY) {
             }
         }
