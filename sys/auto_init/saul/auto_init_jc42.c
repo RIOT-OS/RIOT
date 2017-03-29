@@ -57,7 +57,7 @@ void auto_init_jc42(void)
 
         if (jc42_init(&jc42_devs[i], (jc42_params_t*) p) < 0) {
             LOG_ERROR("[auto_init_saul] error initializing jc42 #%u\n", i);
-            return;
+            continue;
         }
 
         /* temperature */
