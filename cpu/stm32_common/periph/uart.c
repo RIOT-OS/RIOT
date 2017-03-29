@@ -123,7 +123,8 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     assert(uart < UART_NUMOF);
 
     for (size_t i = 0; i < len; i++) {
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32F3)
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) \
+    || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4)
         while (!(dev(uart)->ISR & USART_ISR_TXE)) {}
         dev(uart)->TDR = data[i];
 #else
@@ -134,7 +135,8 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
     /* make sure the function is synchronous by waiting for the transfer to
      * finish */
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32F3)
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) \
+    || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4)
     while (!(dev(uart)->ISR & USART_ISR_TC)) {}
 #else
     while (!(dev(uart)->SR & USART_SR_TC)) {}
@@ -155,7 +157,8 @@ void uart_poweroff(uart_t uart)
 
 static inline void irq_handler(uart_t uart)
 {
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32F3)
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) \
+    || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4)
 
     uint32_t status = dev(uart)->ISR;
 
