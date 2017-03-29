@@ -21,8 +21,11 @@
 #include "irq.h"
 #include "timex.h"
 #include "div.h"
-
 #include <sys/time.h>
+
+#ifdef EIC_IRQ
+#include "../include/eic_irq.h"
+#endif
 
 /*
  * setting TIMER_ACCURACY_SHIFT lower will improve accuracy
@@ -40,7 +43,8 @@
 /*
  * The base MIPS count / compare timer is fixed frequency at core clock / 2
  * and is pretty basic This timer is currently only supported in Vectored
- * Interrupt Mode (VI), EIC mode is not supported yet.
+ * Interrupt Mode (VI), EIC mode is partially supported in non-vectored mode
+ * only.
  *
  * RIOT's xtimer expects the timer to operate at 1MHZ or any 2^n multiple or
  * factor of this, thus we maintain a software timer which counts at 1MHz.
@@ -76,7 +80,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     assert(dev == 0);
 
-    (void)freq; /*Cannot adjust Frequency */
+    (void)freq; /* Cannot adjust Frequency */
 
     timer_isr_ctx.cb = cb;
     timer_isr_ctx.arg = arg;
@@ -93,7 +97,11 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     mips32_bc_c0(C0_CAUSE, CR_DC);
 
     /* Enable Timer Interrupts */
+#ifdef EIC_IRQ
+    eic_irq_configure(EIC_IRQ_TIMER);
+#else
     mips32_bs_c0(C0_STATUS, SR_HINT5);
+#endif
 
 
     return 0;
@@ -160,20 +168,52 @@ void timer_stop(tim_t dev)
 
 void timer_irq_enable(tim_t dev)
 {
+#ifdef EIC_IRQ
+    eic_irq_enable(EIC_IRQ_TIMER);
+#else
     mips32_bs_c0(C0_STATUS, SR_HINT5);
+#endif
+
 }
 
 void timer_irq_disable(tim_t dev)
 {
+#ifdef EIC_IRQ
+    eic_irq_disable(EIC_IRQ_TIMER);
+#else
     mips32_bc_c0(C0_STATUS, SR_HINT5);
+#endif
 }
 
-
+/* note Compiler inserts GP context save + restore code (to current stack). */
+#ifdef EIC_IRQ
+/*
+ * This is a hack - currently the toolchain does not support correct placement
+ * of EIC mode vectors (it is coming though) But we can support non-vectored EIC
+ * mode and note the default PIC32 interrupt controller (which uses EIC +
+ * MCU-ASE) defaults to non vectored mode anyway with all interrupts coming via
+ * vector 0 which is equivalent to 'sw0' in 'VI' mode.
+ *
+ * Thus all EIC interrupts should be decoded here (currently only Timer is
+ * used)
+ *
+ * When toolchain support is available we could move to full vector mode but
+ * this does take up significant space (MCU-ASE provides 256 vectors at 32B
+ * spacing (the default) thats 8KB of vector space!), So a single entry point
+ * may be better anyway.
+ *
+ */
+void __attribute__ ((interrupt("vector=sw0"), keep_interrupts_masked)) _mips_isr_sw0(void)
+#else
 void __attribute__ ((interrupt("vector=hw5"))) _mips_isr_hw5(void)
+#endif
 {
     register int cr = mips_getcr();
 
     if (cr & CR_TI) {
+#ifdef EIC_IRQ
+        eic_irq_ack(EIC_IRQ_TIMER);
+#endif
         uint32_t status = irq_arch_disable();
         counter += TIMER_ACCURACY;
         irq_arch_restore(status);

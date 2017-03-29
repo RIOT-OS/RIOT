@@ -13,7 +13,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon calliope-mini cc2650stk maple-mini \
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
                    msb-430 msb-430h qemu-i386 telosb waspmote-pro wsn430-v1_3b \
-                   wsn430-v1_4 z1
+                   wsn430-v1_4 z1 pic32-wifire
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

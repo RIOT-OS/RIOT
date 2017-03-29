@@ -1,0 +1,7 @@
+# depends on mips32r2_common
+USEMODULE += mips32r2_common
+
+export MIPS32R2_COMMON = $(RIOTCPU)/mips32r2_common/
+
+export INCLUDES = $(MIPS32R2_COMMON)include
+include $(MIPS32R2_COMMON)Makefile.include
