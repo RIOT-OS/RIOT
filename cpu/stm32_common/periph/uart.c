@@ -72,6 +72,18 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         gpio_init_af(uart_config[uart].rx_pin, uart_config[uart].rx_af);
 #endif
     }
+#ifdef UART_USE_HW_FC
+    if (uart_config[uart].cts_pin != GPIO_UNDEF) {
+        gpio_init(uart_config[uart].cts_pin, GPIO_IN);
+        gpio_init(uart_config[uart].rts_pin, GPIO_OUT);
+#ifdef CPU_FAM_STM32F1
+        gpio_init_af(uart_config[uart].rts_pin, GPIO_AF_OUT_PP);
+#else
+        gpio_init_af(uart_config[uart].cts_pin, uart_config[uart].cts_af);
+        gpio_init_af(uart_config[uart].rts_pin, uart_config[uart].rts_af);
+#endif
+    }
+#endif
 
     /* enable the clock */
     periph_clk_en(uart_config[uart].bus, uart_config[uart].rcc_mask);
@@ -95,6 +107,13 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     else {
         dev(uart)->CR1 = (USART_CR1_UE | USART_CR1_TE);
     }
+
+#ifdef UART_USE_HW_FC
+    if (uart_config[uart].cts_pin != GPIO_UNDEF) {
+        /* configure hardware flow control */
+        dev(uart)->CR3 = (USART_CR3_RTSE | USART_CR3_CTSE);
+    }
+#endif
 
     return UART_OK;
 }
