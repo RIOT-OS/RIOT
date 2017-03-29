@@ -28,8 +28,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#ifdef MODULE_CORE_MBOX
-
 static void _wake_waiter(thread_t *thread, unsigned irqstate)
 {
     sched_set_status(thread, STATUS_PENDING);
@@ -122,5 +120,3 @@ int _mbox_get(mbox_t *mbox, msg_t *msg, int blocking)
         return 0;
     }
 }
-
-#endif /* MODULE_CORE_MBOX */
