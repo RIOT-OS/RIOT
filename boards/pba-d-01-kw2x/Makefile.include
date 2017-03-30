@@ -40,7 +40,7 @@ ifneq (,$(SERIAL))
 endif
 
 # setup serial terminal
-include $(RIOTMAKE)/tools/serial.mk
+include $(RIOTMAKE)/tools/serial.inc.mk
 
 # this board uses openocd
-include $(RIOTMAKE)/tools/openocd.mk
+include $(RIOTMAKE)/tools/openocd.inc.mk

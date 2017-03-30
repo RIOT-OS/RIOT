@@ -20,4 +20,4 @@ export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 export RESET_FLAGS = $(BINDIR)
 
 # setup serial terminal
-include $(RIOTMAKE)/tools/serial.mk
+include $(RIOTMAKE)/tools/serial.inc.mk

@@ -7,7 +7,7 @@ PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
 # setup serial terminal
-include $(RIOTMAKE)/tools/serial.mk
+include $(RIOTMAKE)/tools/serial.inc.mk
 
 # st-flash
 export FLASHER = st-flash

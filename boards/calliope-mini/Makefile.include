@@ -7,7 +7,7 @@ PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
 # setup serial terminal
-include $(RIOTMAKE)/tools/serial.mk
+include $(RIOTMAKE)/tools/serial.inc.mk
 
 # we support flashing through plain fscopy or using JLink
 FLASHTOOL ?= fscopy
@@ -22,7 +22,7 @@ ifeq (fscopy,$(FLASHTOOL))
   export DEBUGSERVER =
 else ifeq (jlink,$(FLASHTOOL))
   export JLINK_DEVICE := nrf51822
-  include $(RIOTMAKE)/tools/jlink.mk
+  include $(RIOTMAKE)/tools/jlink.inc.mk
 else
   $(info ERROR: invalid flash tool specified)
 endif
