@@ -143,6 +143,9 @@ static void cpu_clock_init(void)
     while (!(RCC->CSR & RCC_CSR_LSIRDY)) {}
 #endif
 
+    /* select the MSI clock for the 48MHz clock tree (USB, RNG) */
+    RCC->CCIPR = (RCC_CCIPR_CLK48SEL_0 | RCC_CCIPR_CLK48SEL_1);
+
     /* if configured: enable the HSE clock */
 #if CLOCK_HSE
     RCC->CR |= RCC_CR_HSEON;
