@@ -31,6 +31,7 @@
 #include "xtimer.h"
 #include "vfs.h"
 #include "fs/devfs.h"
+#include "mtd_spi_nor.h"
 
 static nvram_t mulle_nvram_dev;
 nvram_t *mulle_nvram = &mulle_nvram_dev;
@@ -42,9 +43,32 @@ static nvram_spi_params_t nvram_spi_params = {
 };
 
 static devfs_t mulle_nvram_devfs = {
-    .path = "/mulle-fram",
+    .path = "/fram0",
     .f_op = &nvram_vfs_ops,
     .private_data = &mulle_nvram_dev,
+};
+
+static mtd_spi_nor_t mulle_nor_dev = {
+    .base = {
+        .driver = &mtd_spi_nor_driver,
+        .page_size = 256,
+        .pages_per_sector = 256,
+        .sector_count = 32,
+    },
+    .opcode = &mtd_spi_nor_opcode_default,
+    .spi = MULLE_NOR_SPI_DEV,
+    .cs = MULLE_NOR_SPI_CS,
+    .addr_width = 3,
+    .mode = SPI_MODE_3,
+    .clk = SPI_CLK_10MHZ,
+};
+
+mtd_dev_t *mtd0 = (mtd_dev_t *)&mulle_nor_dev;
+
+static devfs_t mulle_nor_devfs = {
+    .path = "/mtd0",
+    .f_op = &mtd_vfs_ops,
+    .private_data = &mulle_nor_dev,
 };
 
 /** @brief Initialize the GPIO pins controlling the power switches. */
@@ -63,6 +87,8 @@ static inline void set_fll_source(void);
 
 static void increase_boot_count(void);
 static int mulle_nvram_init(void);
+
+int mulle_nor_init(void);
 
 void board_init(void)
 {
@@ -129,6 +155,9 @@ void board_init(void)
         /* Increment boot counter */
         increase_boot_count();
     }
+
+    /* Initialize NOR flash */
+    mulle_nor_init();
 }
 
 static inline void power_pins_init(void)
@@ -237,4 +266,16 @@ static void increase_boot_count(void)
     }
     ++rec.u32;
     mulle_nvram->write(mulle_nvram, &rec.u8[0], MULLE_NVRAM_BOOT_COUNT, sizeof(rec.u32));
+}
+
+int mulle_nor_init(void)
+{
+    int res = mtd_init(mtd0);
+
+    if (res >= 0) {
+        /* Register DevFS node */
+        devfs_register(&mulle_nor_devfs);
+    }
+
+    return res;
 }
