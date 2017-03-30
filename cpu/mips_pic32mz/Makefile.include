@@ -3,7 +3,7 @@ export MEMORY_SIZE=512K
 export APP_START=0x80000000
 export ROMABLE = 1
 
-include $(RIOTCPU)/Makefile.include.mips_common
+include $(RIOTMAKE)/arch/mips.inc.mk
 
 # define build specific options
 export CFLAGS += -march=m5101 -mmicromips -DSKIP_COPY_TO_RAM
