@@ -265,9 +265,9 @@ static const spi_conf_t spi_config[] = {
         .pin_clk  = GPIO_PIN(PORT_D, 1),
         .pin_cs   = {
             GPIO_PIN(PORT_D, 0),
-            GPIO_UNDEF,
-            GPIO_UNDEF,
-            GPIO_UNDEF,
+            GPIO_PIN(PORT_D, 4),
+            GPIO_PIN(PORT_D, 5),
+            GPIO_PIN(PORT_D, 6),
             GPIO_UNDEF
         },
         .pcr      = GPIO_AF_2,
