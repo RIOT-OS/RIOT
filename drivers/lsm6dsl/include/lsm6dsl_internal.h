@@ -8,11 +8,11 @@
  */
 
 /**
- * @addtogroup  drivers_lsm6dsl
+ * @ingroup     drivers_lsm6dsl
  *
  * @{
  * @file
- * @brief       Internal configuration for LSM36DSL devices
+ * @brief       Internal configuration for LSM6DSL devices
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */

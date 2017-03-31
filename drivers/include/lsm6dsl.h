@@ -8,13 +8,13 @@
  */
 
 /**
- * @defgroup    drivers_lsm6dsl LSM36DSL 3D accelerometer/gyroscope
+ * @defgroup    drivers_lsm6dsl LSM6DSL 3D accelerometer/gyroscope
  * @ingroup     drivers_sensors
- * @brief       Device driver for the LSM36DSL 3D accelerometer/gyroscope
+ * @brief       Device driver for the LSM6DSL 3D accelerometer/gyroscope
  *
  * @{
  * @file
- * @brief       Device driver interface for the LSM36DSL 3D accelerometer/gyroscope.
+ * @brief       Device driver interface for the LSM6DSL 3D accelerometer/gyroscope.
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */

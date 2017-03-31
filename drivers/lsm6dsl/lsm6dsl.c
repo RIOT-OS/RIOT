@@ -9,7 +9,7 @@
 
 /**
  * @file
- * @brief       Device driver implementation for the LSM36DSL 3D accelerometer/gyroscope.
+ * @brief       Device driver implementation for the LSM6DSL 3D accelerometer/gyroscope.
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
