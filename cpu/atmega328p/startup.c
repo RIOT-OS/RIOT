@@ -65,6 +65,12 @@ void init8_ovr(void)
  */
 void reset_handler(void)
 {
+    /* reset the watchdog if the reboot was triggered due to it */
+    if (MCUSR & 1 << WDRF) {
+        MCUSR &= ~(1 << WDRF);
+        WDTCSR |= 1 << WDCE;
+        WDTCSR = 0;
+    }
     /* initialize the board and startup the kernel */
     board_init();
     /* startup the kernel */
