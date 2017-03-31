@@ -98,7 +98,7 @@ static int32_t parse_baud(char *arg)
     int32_t baud = (int32_t)atoi(arg);
 
     for (size_t i = 0 ; i < ARRAY_LEN(baudrates) ; i++) {
-        if(baud == baudrates[i]) {
+        if (baud == baudrates[i]) {
             return baud;
         }
     }
@@ -123,14 +123,14 @@ static void parse_reg(char *arg, int *reg8, int *reg16)
     *reg16 = -1;
 
     for (size_t i = 0 ; i < ARRAY_LEN(regs8) ; i++) {
-        if(strcmp(arg, regs8[i].name) == 0) {
+        if (strcmp(arg, regs8[i].name) == 0) {
             *reg8 = regs8[i].addr;
             return;
         }
     }
 
     for (size_t i = 0 ; i < ARRAY_LEN(regs16) ; i++) {
-        if(strcmp(arg, regs16[i].name) == 0) {
+        if (strcmp(arg, regs16[i].name) == 0) {
             *reg16 = regs16[i].addr;
             return;
         }
