@@ -39,12 +39,13 @@ extern "C" {
 /**
  * @brief half-duplex UART direction management method type
  */
-typedef int uart_half_duplex_dir_t;
+typedef struct {
+    void (*init)(uart_t);       /**< function initializing direction management method */
+    void (*enable_tx)(uart_t);  /**< function enabling TX */
+    void (*disable_tx)(uart_t); /**< function disabling TX */
+} uart_half_duplex_dir_t;
 
-#define UART_HALF_DUPLEX_DIR_NONE           (0)  /**< Don't manage direction */
-
-#define UART_HALF_DUPLEX_DIR_PIN_SET(pin)   (((pin + 1) << 1))     /**< pin set enables TX */
-#define UART_HALF_DUPLEX_DIR_PIN_CLEAR(pin) (((pin + 1) << 1) | 1) /**< pin clear enables TX */
+#define UART_HALF_DUPLEX_DIR_NONE { NULL, NULL, NULL }  /**< Don't manage direction */
 
 /**
  * @brief Configuration for half-duplex UART

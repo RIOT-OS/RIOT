@@ -115,3 +115,6 @@ endif
 ifneq (,$(filter feetech,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/feetech/include
 endif
+ifneq (,$(filter dynamixel,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/dynamixel/include
+endif

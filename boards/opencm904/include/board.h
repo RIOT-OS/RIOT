@@ -67,6 +67,15 @@ extern "C" {
 #define UART_STDIO_DEV      UART_DEV(0)
 
 /**
+ * @brief Override with ROBOTIS Bluetooth antenna baudrate for STDIO
+ * @{
+ */
+#ifndef UART_STDIO_BAUDRATE
+#define UART_STDIO_BAUDRATE (921600UL)
+#endif
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
