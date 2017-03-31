@@ -86,11 +86,6 @@ then
         run ./dist/tools/licenses/check.sh ${CI_BASE_BRANCH} --diff-filter=AC
         run ./dist/tools/doccheck/check.sh ${CI_BASE_BRANCH}
         run ./dist/tools/externc/check.sh ${CI_BASE_BRANCH}
-
-        # TODO:
-        #   Remove all but `${CI_BASE_BRANCH}` parameters to cppcheck (and remove second
-        #   invocation) once all warnings of cppcheck have been taken care of
-        #   in ${CI_BASE_BRANCH}.
         run ./dist/tools/cppcheck/check.sh ${CI_BASE_BRANCH}
         run ./dist/tools/pr_check/pr_check.sh ${CI_BASE_BRANCH}
         exit $RESULT
