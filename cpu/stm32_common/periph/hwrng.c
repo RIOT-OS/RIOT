@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014-2016 Freie Universität Berlin
+ * Copyright (C) 2014-2017 Freie Universität Berlin
+ *               2016 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +8,14 @@
  */
 
 /**
- * @ingroup     cpu_stm32f4
+ * @ingroup     cpu_stm32_common
  * @{
  *
  * @file
  * @brief       Low-level random number generator driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Aurelien Gonce <aurelien.gonce@altran.fr>
  *
  * @}
  */
@@ -38,6 +40,8 @@ void hwrng_read(void *buf, unsigned int num)
     /* power on and enable the device */
 #if defined(CPU_MODEL_STM32F410RB)
     periph_clk_en(AHB1, RCC_AHB1ENR_RNGEN);
+#elif defined(CPU_FAM_STM32L0)
+    periph_clk_en(AHB, RCC_AHBENR_RNGEN);
 #else
     periph_clk_en(AHB2, RCC_AHB2ENR_RNGEN);
 #endif
@@ -60,6 +64,8 @@ void hwrng_read(void *buf, unsigned int num)
     RNG->CR = 0;
 #if defined(CPU_MODEL_STM32F410RB)
     periph_clk_dis(AHB1, RCC_AHB1ENR_RNGEN);
+#elif defined(CPU_FAM_STM32L0)
+    periph_clk_dis(AHB, RCC_AHBENR_RNGEN);
 #else
     periph_clk_dis(AHB2, RCC_AHB2ENR_RNGEN);
 #endif
