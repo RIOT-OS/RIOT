@@ -12,7 +12,6 @@
 #include "periph/uart.h"
 #include "bitarithm.h"
 #include "board.h"
-#include "periph_conf.h"
 
 extern void dummy(void);
 
