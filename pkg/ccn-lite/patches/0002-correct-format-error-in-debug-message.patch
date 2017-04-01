@@ -1,0 +1,24 @@
+From d2d53540368bb9aaa93d5104cdcc9e3256a7437d Mon Sep 17 00:00:00 2001
+From: smlng <s@mlng.net>
+Date: Fri, 13 Jan 2017 20:49:48 +0100
+Subject: [PATCH] correct format error in debug message
+
+---
+ src/ccn-lite-riot.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ccn-lite-riot.c b/src/ccn-lite-riot.c
+index f14200e..c6b1b2d 100644
+--- a/src/ccn-lite-riot.c
++++ b/src/ccn-lite-riot.c
+@@ -287,7 +287,7 @@ ccnl_ll_TX(struct ccnl_relay_s *ccnl, struct ccnl_if_s *ifc,
+ {
+     (void) ccnl;
+     int rc;
+-    DEBUGMSG(TRACE, "ccnl_ll_TX %d bytes to %s\n", buf ? buf->datalen : -1, ccnl_addr2ascii(dest));
++    DEBUGMSG(TRACE, "ccnl_ll_TX %d bytes to %s\n", (int)(buf ? buf->datalen : -1), ccnl_addr2ascii(dest));
+     /* reset ageing timer */
+     xtimer_remove(&_ageing_timer);
+     xtimer_set_msg(&_ageing_timer, SEC_IN_USEC, &_ageing_reset, _ccnl_event_loop_pid);
+--
+2.10.1 (Apple Git-78)
