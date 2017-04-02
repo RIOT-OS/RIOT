@@ -367,7 +367,7 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
             dci = iphc_hdr[CID_EXT_IDX] & 0x0f;
         }
 
-        if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_DAM) {
+        if (iphc_hdr[IPHC2_IDX] & (SIXLOWPAN_IPHC2_M | SIXLOWPAN_IPHC2_DAM)) {
             ctx = gnrc_sixlowpan_ctx_lookup_id(dci);
 
             if (ctx == NULL) {
