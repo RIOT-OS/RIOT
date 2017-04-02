@@ -115,6 +115,21 @@ ifneq (,$(filter trickle,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter mstp),$(USEMODULE))
+  ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
+    USEMODULE += gnrc_sixlobac
+  endif
+  ifneq (,$(filter gnrc_ipv6_router, $(USEMODULE)))
+    USEMODULE += gnrc_sixlobac_router
+  endif
+  ifneq (,$(filter gnrc_ipv6_default, $(USEMODULE)))
+    USEMODULE += gnrc_sixlobac_default
+  endif
+  ifneq (,$(filter gnrc_ipv6_router_default, $(USEMODULE)))
+    USEMODULE += gnrc_sixlobac_router_default
+  endif
+endif
+
 ifneq (,$(filter ieee802154,$(USEMODULE)))
   ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
     USEMODULE += gnrc_sixlowpan
@@ -131,6 +146,16 @@ ifneq (,$(filter ieee802154,$(USEMODULE)))
   ifneq (,$(filter lwip%, $(USEMODULE)))
     USEMODULE += lwip_sixlowpan
   endif
+endif
+
+ifneq (,$(filter gnrc_sixlobac_default),$(USEMODULE))
+  USEMODULE += gnrc_ipv6_default
+  USEMODULE += gnrc_sixlobac
+  USEMODULE += gnrc_sixlobac_iphc
+endif
+
+ifneq (,$(filter gnrc_sixlobac),$(USEMODULE))
+  USEMODULE += gnrc_sixlowpan
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_default,$(USEMODULE)))
