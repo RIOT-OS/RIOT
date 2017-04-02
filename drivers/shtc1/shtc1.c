@@ -1,7 +1,8 @@
+#define ENABLE_DEBUG	(0)
+
+
 #include "shtc1.h"
 #include <avr/io.h>
-
-#define ENABLE_DEBUG	1
 
 
 /*
@@ -40,7 +41,7 @@ int8_t shtc1_init(i2c_t dev)
 	}
 }
 
-int8_t shtc1_measure(i2c_t dev, shtc1_values_t* received_values)
+int8_t shtc1_measure(i2c_t dev, crc_type crc, shtc1_values_t* received_values)
 {
 	uint8_t data[] = { 0x7C, 0xA2 };
 	i2c_write_bytes(dev, 0x70, data, 2);
@@ -48,13 +49,13 @@ int8_t shtc1_measure(i2c_t dev, shtc1_values_t* received_values)
 	i2c_read_bytes(I2C_0, 0x70, received, 6);
 	uint16_t temp_f = ((received[0]<<8)|received[1]);
 	uint16_t abs_humidity = ((received[3]<<8)|received[4]);
-	if(CRC_CHECKING){
+	if(crc){
 		if(!((_check_crc(&received[0], received[2]) == 0) && (_check_crc(&received[3], received[5]) == 0))){
 			/* crc check failed */
-			DEBUG_PRINT("CRC Error");
+			DEBUG("CRC Error");
 			return -1;
 		}
-		DEBUG_PRINT("CRC Passed! \n");
+		DEBUG("CRC Passed! \n");
 	}
 	received_values->temp = (175.0*temp_f/65536)-45;
 	received_values->rel_humidity = 100*(abs_humidity/65536.0);

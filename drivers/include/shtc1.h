@@ -20,8 +20,11 @@
 
 /* I2C Speeds defined in /drivers/include/periph/i2c.h I2C_SPEED_FAST = 400Hz */
 #define SHTC1_SPEED		I2C_SPEED_FAST
-/* If set to 1 checksum checking is enabled otherwise raw values are returned */
-#define CRC_CHECKING		(1U)
+
+typedef enum{
+	CRC_DISABLED = 0,
+	CRC_ENABLED
+}crc_type;
 
 typedef struct {
 	float temp;
@@ -49,7 +52,7 @@ int8_t shtc1_init(i2c_t dev);
  * @return					0 on a verified and working measurement
  * @return					-1 on a checksum error
  */
-int8_t shtc1_measure(i2c_t dev, shtc1_values_t* received_values);
+int8_t shtc1_measure(i2c_t dev, crc_type crc, shtc1_values_t* received_values);
 
 /**
  * @brief reads out id
