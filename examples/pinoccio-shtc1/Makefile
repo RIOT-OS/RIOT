@@ -14,8 +14,8 @@ CFLAGS += -DDEVELHELP
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 0
-USEMODULE += xtimer
 USEMODULE += shtc1
+USEMODULE += shell
 
 include $(RIOTBASE)/Makefile.include
 
