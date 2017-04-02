@@ -22,22 +22,32 @@
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
 
+#define ENABLE_DEBUG	(1)
+
+#define F_CPU	16000000
+
 #include "capacity.h"
 #include "capacity_settings.h"
 #include "periph_conf.h"
 #include "periph/ac.h"
 #include "periph/timer.h"
+#include "debug.h"
 #include <stdlib.h>
 #include <avr/interrupt.h>
 #include <stdio.h>
 
-uint16_t *my_saved_values;
-uint8_t count;
+#include <util/delay.h>
+
+volatile uint16_t my_saved_values[10];
+volatile uint8_t count;
+volatile uint8_t global_cycle;
 
 
 void __comparator_hit(void* arg, uint8_t dev) {
-	if(dev == MY_AC)
-		gpio_toggle(capacity_conf.result_pin);
+	//if(dev == MY_AC)
+		//gpio_toggle(capacity_conf.result_pin);
+		//DEBUG("#");
+	PORTF ^= (1<<PF0);
 }
 
 int __input_capture_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
@@ -62,20 +72,18 @@ int __input_capture_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg
 			#ifdef TIMER_2
 					my_timer = TIMER_2;
 					*TIMER_2_MASK |= (1<<ICIE1);
+					TCCR1B |= (1<<ICES1);
 			#endif
 			break;
 	case TIMER_DEV(3):
 			#ifdef TIMER_3
 					my_timer = TIMER_3;
+					*TIMER_3_MASK |= (1<<ICIE1);
 			#endif
 			break;
 	}
 	my_timer->CRB |= (1<<ICES1);
-	/* TODO: Missing TIMSK1 */
-	//my_timer. |= (1<<ICIE1)
-	printf("Timer-device: %u \n", tim);
-	printf("TCCR1A: %u \n", TIMSK1);
-	printf("TCCR1B: %u \n", TCCR1B);
+	DEBUG("Timer Config %u \n", TCCR1B);
 
 	return 0;
 }
@@ -91,40 +99,48 @@ void capacity_init(uint8_t timer_dev, uint8_t ac_dev)
 	ac_isr_ctx_t my_isr = {&__comparator_hit, NULL};
 	ac_init(ac_dev, AC_INPUT_CAPTURE, AC_IRQ_TOGGLE, my_isr);
 
-	/*TODO: setup timer */
 	__input_capture_init(timer_dev, CLOCK_CORECLOCK, NULL, NULL);
 }
 
 uint8_t start_measuring(uint8_t timer_dev, uint8_t ac_dev, uint8_t cycle, capacity_result_t *my_result)
 {
-	my_saved_values = (uint16_t*) malloc(sizeof(uint16_t)*cycle);
+	//my_saved_values = (uint16_t*) malloc(sizeof(uint16_t)*cycle);
 	count=0;
+	global_cycle = cycle + 1;
 
 	/*TODO:start timer and ac */
 	gpio_set(capacity_conf.pxy_pin);
-	gpio_set(capacity_conf.result_pin);
-	printf("starting measurement \n");
-	ac_poweron(ac_dev);
-	printf("ac started \n");
+
+	DEBUG("starting measurement \n");
 	timer_start(timer_dev);
-	printf("timer started \n");
-	while(count<cycle);
-	printf("measurement done\n");
+	ac_poweron(ac_dev);
+	gpio_set(capacity_conf.result_pin);
+	while(count<global_cycle);
+	//_delay_ms(500);
+	DEBUG("measurement done\n");
 	uint32_t average=0;
-	for(uint8_t i=0; i<cycle; i++){
-		average += my_saved_values[i];
+	for(uint8_t i=1; i<global_cycle; i++){
+		average += my_saved_values[i]-my_saved_values[i-1];
+		DEBUG("%u ", my_saved_values[i]-my_saved_values[i-1]);
 	}
-	free(my_saved_values);
-	average = average/cycle;
+	//free(my_saved_values);
+	average = average/(global_cycle-1);
 	my_result->timestamp = average;
 	my_result->frequency = CLOCK_CORECLOCK/(float)average;
-	my_result->capacity = 1000000000/(1.386*100000*my_result->frequency);
+	my_result->capacity = 1/(1.386*100000*my_result->frequency);
 	return 0;
 }
 
 ISR(TIMER1_CAPT_vect)
 {
+	if(count >=global_cycle) {
+			//cli();
+			ACSR |=(1<<ACD);
+			//TCCR1B &= ~((1<<CS12)|(1<<CS11)|(1<<CS10)); //set clock
+	}
 	my_saved_values[count] = ICR1L;
-	my_saved_values[count] |= (ICR1H<<8);
+	my_saved_values[count] |= ((uint16_t)ICR1H<<8);
 	count++;
+
+		//TCCR1B &= ~((1<<CS12)|(1<<CS11)|(1<<CS10)); //set clock
 }

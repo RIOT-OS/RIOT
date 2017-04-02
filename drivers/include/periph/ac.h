@@ -62,8 +62,8 @@ typedef void (*ac_cb_t)(void *arg, uint8_t dev);
  * @{
  */
 typedef struct {
-    ac_cb_t cb;          /**< callback executed from comparator interrupt */
-    void *arg;              /**< optional argument given to that callback */
+    ac_cb_t cb;          /** callback executed from comparator interrupt */
+    void *arg;              /** optional argument given to that callback */
 } ac_isr_ctx_t;
 /** @} */
 

@@ -33,27 +33,28 @@
 //volatile uint8_t count=0;
 //volatile uint16_t values[10];
 
-void accb(void* arg) {
+void accb(void* arg, uint8_t dev) {
 	PORTF ^= (1<<PF0);
+	printf("hit");
 }
 
 int main(void)
 {
-	capacity_init(TIMER_DEV(2), AC_0);
+capacity_init(TIMER_DEV(2), AC_0);
 	capacity_result_t my_result;
 	start_measuring(TIMER_DEV(2), AC_0, 10, &my_result);
 	printf("Timestamp %u", my_result.timestamp);
-	/*ac_isr_ctx_t my_isr = {&accb, NULL};
+
+}
+	//PRR0 |=(1<<PRADC); //power on analog comperator
+/*	ac_isr_ctx_t my_isr = {&accb, NULL};
 	ac_init(AC_0, AC_INPUT_CAPTURE, AC_IRQ_TOGGLE, my_isr);
 	ac_poweron(AC_0);
-
-	while(1){
-		printf("%u \n",ac_read(AC_0));
-		_delay_us(100);
-	}*/
-	//first test everything based on reigsters
+	printf("ACSR %u", ACSR);
+	*/
+/*	//first test everything based on reigsters
 	//set output pins
-	/*DDRE &= ~((1<<PE2)|(1<<PE3)); //PE2=AIN0 PE3=AIN1
+	DDRE &= ~((1<<PE2)|(1<<PE3)); //PE2=AIN0 PE3=AIN1
 	DDRF |= (1<<PF0)|(1<<PF1); //A0
 	DDRD &= ~(1<<PD4);
 
@@ -63,16 +64,21 @@ int main(void)
 	TCCR1C = 0x00;
 	TCCR1B |= (1<<ICES1);
 
-	TIMSK1 |= (1<<ICIE1)|(1<<TOIE0); //enable Input capture in timer
+	TIMSK1 |= (1<<ICIE1); //enable Input capture in timer
 
 	PRR0 |=(1<<PRADC); //power on analog comperator
 	ACSR &= ~((1<<ACIS1)|(1<<ACIS0)); //make sure AC is turned on
 
+
+	PORTF |= (1<<PF1);
 	puts("starting measurement");
 	TCCR1B |= (1<<CS10); //set clock
-	ACSR &= ~(1<<ACD);
-	ACSR |=(1<<ACIC)|(1<<ACIE);
-	PORTF |= (1<<PF1);
+	ACSR |=(1<<ACD)|(1<<ACIC)|(1<<ACIE);
+	ACSR &= ~(1<<ACBG);
+	printf("ACSR1 %u \n", ACSR);
+	ACSR &= ~((1<<ACD)|(1<<ACBG));
+	printf("ACSR2 %u \n", ACSR);
+	printf("Timer Config %u \n", TCCR1B);
 	PORTF |= (1<<PF0);
 	sei();
 	while(count<10)
@@ -81,18 +87,18 @@ int main(void)
 		//_delay_ms(100);
 	}
 	uint8_t i;
-	for(i=0; i<10; i++)
+	for(i=1; i<10; i++)
 	{
-		printf(" %u", values[i]);
+		printf(" %u", values[i]-values[(i-1)]);
 	}
 	while(1) {
 
-	}*/
+	}
 	return 0;
 
 
 }
-/*ISR (TIMER1_OVF_vect)
+ISR (TIMER1_OVF_vect)
 {
 	puts("OVERFLOW\n");
 }
@@ -105,10 +111,13 @@ ISR(TIMER1_CAPT_vect)
 {
 
 	values[count] = ICR1L;
-	values[count] |= (ICR1H<<8);
+	values[count] |= ((uint16_t)ICR1H<<8);
 	count++;
-	if(count >=10)
-		cli();
-		TCCR1B &= ~((1<<CS12)|(1<<CS11)|(1<<CS10)); //set clock
+	if(count >=10) {
+		//cli();
+		ACSR |=(1<<ACD);
+		//TCCR1B &= ~((1<<CS12)|(1<<CS11)|(1<<CS10)); //set clock
+	}
 	//}
-} */
+}*/
+

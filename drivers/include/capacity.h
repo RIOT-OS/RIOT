@@ -35,7 +35,7 @@ extern "C" {
 typedef struct{
 	uint16_t timestamp;
 	uint16_t frequency;
-	uint32_t capacity; /*in nF */
+	float capacity;
 }capacity_result_t;
 
 /**

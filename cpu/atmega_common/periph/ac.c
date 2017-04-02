@@ -18,6 +18,8 @@
  * @}
  */
 
+#define ENABLE_DEBUG		(0)
+
 #include "periph/ac.h"
 #include "periph_conf.h"
 #include "periph/gpio.h"
@@ -26,8 +28,6 @@
 #include "debug.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
-
-#define ENABLE_DEBUG		(1)
 
 static ac_isr_ctx_t ctx[AC_NUMOF];
 
@@ -47,21 +47,19 @@ int ac_init(ac_t dev, ac_output_mode_t output_mode, ac_irq_mode_t irq_mode, ac_i
 	 }
 	 if(irq_mode != AC_IRQ_DISABLED) {
 		 switch(irq_mode){
-	 	 case AC_IRQ_DISABLED:
-		 	 break;
 	 	 case AC_IRQ_TOGGLE:
 		 	 *(ac_config[dev].acsr) &= ~((1<<ACIS0)|(1<<ACIS1));
-		 	 ac_irq_enable(dev);
 		 	 break;
 	 	 case AC_IRQ_FALLING_EDGE:
-		 	 *(ac_config[dev].acsr) |= ((1<<ACIS0));
-		 	 ac_irq_enable(dev);
+		 	 *(ac_config[dev].acsr) |= ((1<<ACIS1));
 		 	 break;
 	 	 case AC_IRQ_RISING_EDGE:
 		 	 *(ac_config[dev].acsr) |= ((1<<ACIS0)|(1<<ACIS1));
-		 	 ac_irq_enable(dev);
 		 	 break;
+	 	 default:
+	 		 break;
 	 	 }
+		 ac_irq_enable(dev);
 	 }
 	 return 0;
 }
@@ -69,25 +67,25 @@ int ac_init(ac_t dev, ac_output_mode_t output_mode, ac_irq_mode_t irq_mode, ac_i
 void ac_poweron(ac_t dev)
 {
 	DEBUG("POWERON AC \n");
-	printf("test");
-	uint8_t is_irq_disabled = *(ac_config[dev].acsr) & (1<<ACIE);
-	if(!is_irq_disabled)
+	uint8_t is_irq_enabled = *(ac_config[dev].acsr) & (1<<ACIE);
+	DEBUG("is_irq_enabled %d \n", is_irq_enabled);
+	if(is_irq_enabled)
 		ac_irq_disable(dev);
 	*(ac_config[dev].acsr) &=  ~(1<<ACD);
 	/*turn on interrupts again */
-	if(!is_irq_disabled)
+	if(is_irq_enabled)
 		ac_irq_enable(dev);
 	DEBUG("POWERON AC DONE \n");
 }
 
 void ac_poweroff(ac_t dev)
 {
-	uint8_t is_irq_disabled = *(ac_config[dev].acsr) & (1<<ACIE);
-	if(!is_irq_disabled)
+	uint8_t is_irq_enabled = *(ac_config[dev].acsr) & (1<<ACIE);
+	if(is_irq_enabled)
 		ac_irq_disable(dev);
 	*(ac_config[dev].acsr) |=  (1<<ACD);
 	/*turn on interrupts again */
-	if(!is_irq_disabled)
+	if(is_irq_enabled)
 		ac_irq_enable(dev);
 }
 
@@ -125,7 +123,9 @@ static inline void _isr(ac_t dev)
 #ifdef AC_0
 ISR(ANALOG_COMP_vect, ISR_BLOCK)
 {
-    _isr(AC_0);
+	//_isr(AC_0);
+	//ctx[0].cb(ctx[0].arg, 0);
+	PORTF ^= (1<<PF0);
 }
 #endif
 
