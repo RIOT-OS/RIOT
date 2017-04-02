@@ -57,7 +57,7 @@ void auto_init_bmp180(void)
                         bmp180_params[i].i2c_dev,
                         bmp180_params[i].mode) < 0) {
             LOG_ERROR("[auto_init_saul] error initializing bmp180 #%u\n", i);
-            return;
+            continue;
         }
 
         /* temperature */

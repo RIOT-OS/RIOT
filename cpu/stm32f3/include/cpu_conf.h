@@ -24,16 +24,13 @@
 
 #include "cpu_conf_common.h"
 
-#ifdef CPU_MODEL_STM32F303VC
+#if defined(CPU_MODEL_STM32F303VC)
 #include "vendor/stm32f303xc.h"
-#endif
-#ifdef CPU_MODEL_STM32F334R8
+#elif defined(CPU_MODEL_STM32F334R8)
 #include "vendor/stm32f334x8.h"
-#endif
-#ifdef CPU_MODEL_STM32F303RE
+#elif defined(CPU_MODEL_STM32F303RE) || defined(CPU_MODEL_STM32F303ZE)
 #include "vendor/stm32f303xe.h"
-#endif
-#ifdef CPU_MODEL_STM32F303K8
+#elif defined(CPU_MODEL_STM32F303K8)
 #include "vendor/stm32f303x8.h"
 #endif
 #ifdef CPU_MODEL_STM32F302R8

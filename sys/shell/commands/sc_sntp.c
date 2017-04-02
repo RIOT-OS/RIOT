@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Luminița Lăzărescu <cluminita.lazarescu@gmail.com>
+ *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,13 +15,17 @@
  * @brief       Prints the real time offset from the system time
  *
  * @author      Luminița Lăzărescu <cluminita.lazarescu@gmail.com>
+ * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <stdio.h>
+#include <time.h>
 
 #include "net/sntp.h"
 #include "net/ntp_packet.h"
 #include "net/af.h"
 #include "net/ipv6/addr.h"
+#include "timex.h"
 
 #define _DEFAULT_TIMEOUT (5000U);
 
@@ -47,6 +52,21 @@ int _ntpdate(int argc, char **argv)
         puts("Error in synchronization");
         return 1;
     }
-    printf("Offset: %i\n", (int)sntp_get_offset());
+#ifdef MODULE_NEWLIB
+    struct tm *tm;
+    time_t time = (time_t)(sntp_get_unix_usec() / US_PER_SEC);
+
+    tm = gmtime(&time);
+    printf("%04i-%02i-%02i %02i:%02i:%02i UTC (%i us)\n",
+           tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+           tm->tm_hour, tm->tm_min, tm->tm_sec,
+           (int)sntp_get_offset());
+#else
+    uint64_t time = sntp_get_unix_usec();
+    printf("%" PRIu32 ".%" PRIu32 " (%i us)\n",
+           (uint32_t)(time / US_PER_SEC),
+           (uint32_t)(time / US_PER_SEC),
+           (int)sntp_get_offset());
+#endif
     return 0;
 }

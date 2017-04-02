@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     fs_constfs
+ * @ingroup     sys_fs_constfs
  * @{
  *
  * @file

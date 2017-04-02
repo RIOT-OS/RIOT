@@ -316,28 +316,33 @@
  *              The register UARTx_BDH to UARTx_C4 look almost the same.
  *              We distinguish the type of the UART
  *              using the BRFA field in the UART C4 register.
- *              Currently, only the base functionality is available.
+ *              Currently, only the base TX/RX functionality is available.
  *
  *              ### UART configuration Example (for periph_conf.h) ###
  *
- *                  #define UART_NUMOF          (1U)
- *                  #define UART_0_EN           1
- *                  #define UART_IRQ_PRIO       1
- *                  #define UART_CLK            (48e6)
- *
- *                  // UART 0 device configuration
- *                  #define KINETIS_UART        UART0_Type
- *                  #define UART_0_DEV          UART0
- *                  #define UART_0_CLKEN()      (SIM->SCGC4 |= (SIM_SCGC4_UART0_MASK))
- *                  #define UART_0_CLK          UART_CLK
- *                  #define UART_0_IRQ_CHAN     UART0_IRQn
- *                  #define UART_0_ISR          isr_uart0
- *                  // UART 0 pin configuration
- *                  #define UART_0_PORT_CLKEN() (SIM->SCGC5 |= (SIM_SCGC5_PORTA_MASK))
- *                  #define UART_0_PORT         PORTA
- *                  #define UART_0_RX_PIN       1
- *                  #define UART_0_TX_PIN       2
- *                  #define UART_0_AF           2
+ *                  static const uart_conf_t uart_config[] = {
+ *                      {
+ *                          .dev    = UART0,
+ *                          .clken  = (volatile uint32_t*)(BITBAND_REGADDR(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT)),
+ *                          .freq   = CLOCK_CORECLOCK,
+ *                          .pin_rx = GPIO_PIN(PORT_A, 14),
+ *                          .pin_tx = GPIO_PIN(PORT_A, 15),
+ *                          .pcr_rx = PORT_PCR_MUX(3),
+ *                          .pcr_tx = PORT_PCR_MUX(3),
+ *                          .irqn   = UART0_RX_TX_IRQn,
+ *                      },
+ *                      {
+ *                          .dev    = UART1,
+ *                          .clken  = (volatile uint32_t*)(BITBAND_REGADDR(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT)),
+ *                          .freq   = CLOCK_CORECLOCK,
+ *                          .pin_rx = GPIO_PIN(PORT_C, 3),
+ *                          .pin_tx = GPIO_PIN(PORT_C, 4),
+ *                          .pcr_rx = PORT_PCR_MUX(3),
+ *                          .pcr_tx = PORT_PCR_MUX(3),
+ *                          .irqn   = UART1_RX_TX_IRQn,
+ *                      },
+ *                  };
+ *                  #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
  *
  *              Optional settings:
  *

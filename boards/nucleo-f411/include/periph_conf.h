@@ -205,7 +205,7 @@ static const spi_conf_t spi_config[] = {
 #define I2C_NUMOF           (1U)
 #define I2C_0_EN            1
 #define I2C_IRQ_PRIO        1
-#define I2C_APBCLK          (42000000U)
+#define I2C_APBCLK          (CLOCK_APB1)
 
 /* I2C 0 device configuration */
 #define I2C_0_DEV           I2C1
@@ -227,14 +227,14 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  * @{
  */
 #define ADC_NUMOF          (0)
 /** @} */
 
 /**
- * @brief   DAC configuration
+ * @name   DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)

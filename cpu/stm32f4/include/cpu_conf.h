@@ -35,8 +35,10 @@
 #include "vendor/stm32f413xx.h"
 #elif defined(CPU_MODEL_STM32F415RG)
 #include "vendor/stm32f415xx.h"
-#elif defined(CPU_MODEL_STM32F446RE)
+#elif defined(CPU_MODEL_STM32F446RE) || defined(CPU_MODEL_STM32F446ZE)
 #include "vendor/stm32f446xx.h"
+#elif defined(CPU_MODEL_STM32F429ZI)
+#include "vendor/stm32f429xx.h"
 #endif
 
 #ifdef __cplusplus

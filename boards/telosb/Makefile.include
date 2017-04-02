@@ -7,7 +7,7 @@ PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial-MXV*)))
 # setup serial terminal
 export BAUD ?= 9600
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.inc.mk
 
 # flash tool configuration
 export OFLAGS = -O ihex

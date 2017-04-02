@@ -1,6 +1,6 @@
 # define the cpu used by the nRF52 DK
 export CPU = nrf52
-export CPU_MODEL = nrf52xxaa
+export CPU_MODEL = nrf52832xxaa
 
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyACM0
@@ -15,7 +15,7 @@ export JLINK_PRE_FLASH := erase\nloadfile $(BINDIR)/softdevice.hex
 export JLINK_FLASH_ADDR := 0x1f000
 export LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
 endif
-include $(RIOTBOARD)/Makefile.include.jlink
+include $(RIOTMAKE)/tools/jlink.inc.mk
 
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.inc.mk

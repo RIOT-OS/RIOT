@@ -18,6 +18,7 @@
  */
 
 #include "cpu.h"
+#include "nrf_clock.h"
 #include "periph_conf.h"
 #include "periph/init.h"
 
@@ -28,18 +29,8 @@ void cpu_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();
-    /* set the correct clock source for HFCLK */
-#if CLOCK_CRYSTAL == 32
-    NRF_CLOCK->XTALFREQ = CLOCK_XTALFREQ_XTALFREQ_32MHz;
-    NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
-    NRF_CLOCK->TASKS_HFCLKSTART = 1;
-    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) {}
-#elif CLOCK_CRYSTAL == 16
-    NRF_CLOCK->XTALFREQ = CLOCK_XTALFREQ_XTALFREQ_16MHz;
-    NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
-    NRF_CLOCK->TASKS_HFCLKSTART = 1;
-    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) {}
-#endif
+    /* setup the HF clock */
+    clock_init_hf();
     /* trigger static peripheral initialization */
     periph_init();
 }

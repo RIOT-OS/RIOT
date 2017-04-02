@@ -2,9 +2,6 @@
 APPLICATION = od
 include ../Makefile.tests_common
 
-# This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../..
-
 USEMODULE += od
 
 # Comment this out to disable code in RIOT that does safety checking

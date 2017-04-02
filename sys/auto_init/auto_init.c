@@ -20,24 +20,8 @@
 
 #include "auto_init.h"
 
-#ifdef MODULE_BMP180
-#include "bmp180.h"
-#endif
-
-#ifdef MODULE_IO1_XPLAINED
-#include "io1_xplained.h"
-#endif
-
 #ifdef MODULE_SHT11
 #include "sht11.h"
-#endif
-
-#ifdef MODULE_GPIOINT
-#include "gpioint.h"
-#endif
-
-#ifdef MODULE_LTC4150
-#include "ltc4150.h"
 #endif
 
 #ifdef MODULE_MCI
@@ -116,25 +100,9 @@ void auto_init(void)
     DEBUG("Auto init rtc module.\n");
     rtc_init();
 #endif
-#ifdef MODULE_BMP180
-    DEBUG("Auto init BMP180 module.\n");
-    bmp180_auto_init();
-#endif
-#ifdef MODULE_IO1_XPLAINED
-    DEBUG("Auto init IO1 Xplained extension module.\n");
-    io1_xplained_auto_init();
-#endif
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");
     sht11_init();
-#endif
-#ifdef MODULE_GPIOINT
-    DEBUG("Auto init gpioint module.\n");
-    gpioint_init();
-#endif
-#ifdef MODULE_LTC4150
-    DEBUG("Auto init ltc4150 module.\n");
-    ltc4150_init();
 #endif
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");
@@ -188,11 +156,6 @@ void auto_init(void)
 #ifdef MODULE_AT86RF2XX
     extern void auto_init_at86rf2xx(void);
     auto_init_at86rf2xx();
-#endif
-
-#ifdef MODULE_AT86RFR2
-    extern void auto_init_at86rfr2(void);
-    auto_init_at86rfr2();
 #endif
 
 #ifdef MODULE_MRF24J40
@@ -347,6 +310,18 @@ void auto_init(void)
 #ifdef MODULE_VEML6070
     extern void auto_init_veml6070(void);
     auto_init_veml6070();
+#endif
+#ifdef MODULE_IO1_XPLAINED
+    extern void auto_init_io1_xplained(void);
+    auto_init_io1_xplained();
+#endif
+#ifdef MODULE_ADXL345
+    extern void auto_init_adxl345(void);
+    auto_init_adxl345();
+#endif
+#ifdef MODULE_LSM6DSL
+    extern void auto_init_lsm6dsl(void);
+    auto_init_lsm6dsl();
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */

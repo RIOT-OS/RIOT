@@ -11,4 +11,4 @@ export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
 export OFLAGS = -O binary
 
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.inc.mk

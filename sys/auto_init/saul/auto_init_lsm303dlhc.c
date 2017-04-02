@@ -62,17 +62,17 @@ void auto_init_lsm303dlhc(void)
                                   p->mag_addr, p->mag_rate, p->mag_gain);
         if (res < 0) {
             LOG_ERROR("[auto_init_saul] error initializing lsm303dlhc #%u\n", i);
+            continue;
         }
-        else {
-            saul_entries[(i * 2)].dev = &(lsm303dlhc_devs[i]);
-            saul_entries[(i * 2)].name = lsm303dlhc_saul_info[i].name;
-            saul_entries[(i * 2)].driver = &lsm303dlhc_saul_acc_driver;
-            saul_entries[(i * 2) + 1].dev = &(lsm303dlhc_devs[i]);
-            saul_entries[(i * 2) + 1].name = lsm303dlhc_saul_info[i].name;
-            saul_entries[(i * 2) + 1].driver = &lsm303dlhc_saul_mag_driver;
-            saul_reg_add(&(saul_entries[(i * 2)]));
-            saul_reg_add(&(saul_entries[(i * 2) + 1]));
-        }
+
+        saul_entries[(i * 2)].dev = &(lsm303dlhc_devs[i]);
+        saul_entries[(i * 2)].name = lsm303dlhc_saul_info[i].name;
+        saul_entries[(i * 2)].driver = &lsm303dlhc_saul_acc_driver;
+        saul_entries[(i * 2) + 1].dev = &(lsm303dlhc_devs[i]);
+        saul_entries[(i * 2) + 1].name = lsm303dlhc_saul_info[i].name;
+        saul_entries[(i * 2) + 1].driver = &lsm303dlhc_saul_mag_driver;
+        saul_reg_add(&(saul_entries[(i * 2)]));
+        saul_reg_add(&(saul_entries[(i * 2) + 1]));
     }
 }
 

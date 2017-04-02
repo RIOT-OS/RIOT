@@ -42,6 +42,9 @@ RIOT is developed by an open community that anyone is welcome to join:
    [RIOT devel Gmane newsgroup](http://news.gmane.org/gmane.os.riot.devel)
  - Follow us on [Twitter](https://twitter.com/RIOT_OS) for news from the RIOT
    community.
+ - Regarding critical vulnerabilities we would appreciate if you give us a
+   90-days head-start by reporting to security@riot-os.org, before making your
+   information publically available
  - Contact us on IRC for live support and discussions:
    [irc.freenode.org \#riot-os](irc://irc.freenode.org/riot-os)
 

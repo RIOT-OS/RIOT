@@ -17,7 +17,7 @@ else
 fi
 
 BRANCH=${1}
-FILEREGEX='\.([CcHhSs]|[ch]pp)$'
+FILEREGEX='\.([CcHh]|[ch]pp)$'
 EXCLUDE='^(.+/include/vendor/)'
 
 # If no branch but an option is given, unset BRANCH.

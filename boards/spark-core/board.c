@@ -40,6 +40,4 @@ void board_init(void)
     SysTick->CTRL = 0;
     /* signal to spark bootloader: do not enable IWDG! set Stop Mode Flag! */
     BKP->DR9 = 0xAFFF;
-    /* configure the RIOT vector table location to internal flash + spark bootloader offset */
-    SCB->VTOR = LOCATION_VTABLE;
 }

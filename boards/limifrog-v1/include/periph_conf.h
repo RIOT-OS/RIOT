@@ -166,7 +166,7 @@ static const spi_conf_t spi_config[] = {
 #define I2C_1_EN            1
 #define I2C_NUMOF           (I2C_0_EN + I2C_1_EN)
 #define I2C_IRQ_PRIO        1
-#define I2C_APBCLK          (36000000U)
+#define I2C_APBCLK          (CLOCK_APB1)
 
 /* I2C 0 device configuration */
 #define I2C_0_EVT_ISR       isr_i2c1_ev

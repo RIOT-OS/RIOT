@@ -9,12 +9,6 @@ export KINETIS_COMMON = $(RIOTCPU)/kinetis_common/
 # CPU depends on the kinetis module, so include it
 include $(KINETIS_COMMON)Makefile.include
 
-#export the CPU model and architecture
-MODEL = $(shell echo $(CPU_MODEL)|tr 'a-z' 'A-Z')
-export CFLAGS += -DCPU_MODEL_$(MODEL)
-ARCH = $(shell echo $(CPU_ARCH) | tr 'a-z-' 'A-Z_')
-export CFLAGS += -DCPU_ARCH_$(ARCH)
-
 # this CPU implementation is using kinetis common startup
 export COMMON_STARTUP = $(KINETIS_COMMON)
 
@@ -22,4 +16,4 @@ export COMMON_STARTUP = $(KINETIS_COMMON)
 export UNDEF += $(BINDIR)/cpu/vectors.o
 export UNDEF += $(BINDIR)/cpu/ssp.o
 
-include $(RIOTCPU)/Makefile.include.cortexm_common
+include $(RIOTMAKE)/arch/cortexm.inc.mk

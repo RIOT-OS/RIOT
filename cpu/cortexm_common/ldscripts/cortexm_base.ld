@@ -41,6 +41,7 @@ SECTIONS
     {
         . = ALIGN(4);
         _sfixed = .;
+        _isr_vectors = DEFINED(_isr_vectors) ? _isr_vectors : . ;
         KEEP(*(.vectors .vectors.*))
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)

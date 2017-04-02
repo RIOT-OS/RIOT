@@ -1,5 +1,9 @@
 # driver dependencies (in alphabetical order)
 
+ifneq (,$(filter adxl345,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_i2c
@@ -139,6 +143,11 @@ ifneq (,$(filter kw2xrf,$(USEMODULE)))
     endif
 endif
 
+ifneq (,$(filter hd44780,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_gpio
+    USEMODULE += xtimer
+endif
+
 ifneq (,$(filter lis3dh,$(USEMODULE)))
     FEATURES_REQUIRED += periph_gpio
     FEATURES_REQUIRED += periph_spi
@@ -212,4 +221,28 @@ ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += xtimer
   USEMODULE += netif
+endif
+
+ifneq (,$(filter uart_half_duplex,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_gpio
+    FEATURES_REQUIRED += periph_uart
+    USEMODULE += xtimer
+endif
+
+ifneq (,$(filter feetech,$(USEMODULE)))
+    USEMODULE += uart_half_duplex
+endif
+
+ifneq (,$(filter dynamixel,$(USEMODULE)))
+    USEMODULE += uart_half_duplex
+endif
+
+ifneq (,$(filter mtd_spi_nor,$(USEMODULE)))
+  USEMODULE += mtd
+  FEATURES_REQUIRED += periph_spi
+endif
+
+ifneq (,$(filter lsm6dsl,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += xtimer
 endif

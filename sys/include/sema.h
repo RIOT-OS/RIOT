@@ -91,11 +91,31 @@ void sema_create(sema_t *sema, unsigned int value);
  *
  * Destroying a semaphore upon which other threads are currently blocked
  * will wake the other threads causing the @ref sema_wait (or
- * @ref sema_wait_timed) to return error (-ECANCELLED).
+ * @ref sema_wait_timed) to return error (-ECANCELED).
  *
  * @param[in] sema  The semaphore to destroy.
  */
 void sema_destroy(sema_t *sema);
+
+/**
+ * @brief Wait for a semaphore, blocking or non-blocking.
+ *
+ * @details For commit purposes you should probably use sema_wait(),
+ *          sema_wait_timed() and sema_try_wait() instead.
+ *
+ * @pre `(sema != NULL)`
+ *
+ * @param[in]  sema       A semaphore.
+ * @param[in]  block      if true, block until semaphore is available.
+ * @param[in]  timeout    if blocking, time in microseconds until the semaphore
+ *                        times out. 0 waits forever.
+ *
+ * @return  0 on success
+ * @return  -ETIMEDOUT, if the semaphore times out.
+ * @return  -ECANCELED, if the semaphore was destroyed.
+ * @return  -EAGAIN,    if the semaphore is not posted (only if block = 0)
+ */
+int _sema_wait(sema_t *sema, int block, uint64_t timeout);
 
 /**
  * @brief   Wait for a semaphore being posted.
@@ -103,13 +123,18 @@ void sema_destroy(sema_t *sema);
  * @pre `(sema != NULL)`
  *
  * @param[in]  sema     A semaphore.
- * @param[in]  timeout  Time in microseconds until the semaphore times out. 0 for no timeout.
+ * @param[in]  timeout  Time in microseconds until the semaphore times out.
+ *                      0 does not wait.
  *
  * @return  0 on success
  * @return  -ETIMEDOUT, if the semaphore times out.
  * @return  -ECANCELED, if the semaphore was destroyed.
+ * @return  -EAGAIN,    if the semaphore is not posted (only if timeout = 0)
  */
-int sema_wait_timed(sema_t *sema, uint64_t timeout);
+static inline int sema_wait_timed(sema_t *sema, uint64_t timeout)
+{
+    return _sema_wait(sema, (timeout != 0), timeout);
+}
 
 /**
  * @brief   Wait for a semaphore being posted (without timeout).
@@ -123,7 +148,7 @@ int sema_wait_timed(sema_t *sema, uint64_t timeout);
  */
 static inline int sema_wait(sema_t *sema)
 {
-    return sema_wait_timed(sema, 0);
+    return _sema_wait(sema, 1, 0);
 }
 
 /**
@@ -137,7 +162,10 @@ static inline int sema_wait(sema_t *sema)
  * @return  -EAGAIN, if the semaphore is not posted.
  * @return  -ECANCELED, if the semaphore was destroyed.
  */
-int sema_try_wait(sema_t *sema);
+static inline int sema_try_wait(sema_t *sema)
+{
+    return _sema_wait(sema, 0, 0);
+}
 
 /**
  * @brief   Signal semaphore.

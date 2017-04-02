@@ -32,4 +32,4 @@ export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 export INCLUDES += -I$(RIOTBOARD)/remote-common/include
 
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.inc.mk

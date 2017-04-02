@@ -21,4 +21,4 @@ export OFLAGS = -O binary
 export FFLAGS = -R -e -w -v -b bin/$(BOARD)/$(APPLICATION).hex
 
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.inc.mk

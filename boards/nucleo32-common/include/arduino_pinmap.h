@@ -39,9 +39,14 @@ extern "C" {
 #define ARDUINO_PIN_4           GPIO_PIN(PORT_B, 7)
 #define ARDUINO_PIN_5           GPIO_PIN(PORT_B, 6)
 #define ARDUINO_PIN_6           GPIO_PIN(PORT_B, 1)
+#if defined(CPU_MODEL_STM32L031K6)
 #define ARDUINO_PIN_7           GPIO_PIN(PORT_C, 14)
-
 #define ARDUINO_PIN_8           GPIO_PIN(PORT_C, 15)
+#else
+#define ARDUINO_PIN_7           GPIO_PIN(PORT_F, 0)
+#define ARDUINO_PIN_8           GPIO_PIN(PORT_F, 1)
+#endif
+
 #define ARDUINO_PIN_9           GPIO_PIN(PORT_A, 8)
 #define ARDUINO_PIN_10          GPIO_PIN(PORT_A, 11)
 #define ARDUINO_PIN_11          GPIO_PIN(PORT_B, 5)

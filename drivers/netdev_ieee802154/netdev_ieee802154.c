@@ -165,6 +165,7 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, void *value,
         case NETOPT_ADDR_LEN:
         case NETOPT_SRC_LEN:
             assert(len == sizeof(uint16_t));
+            res = sizeof(uint16_t);
             switch ((*(uint16_t *)value)) {
                 case IEEE802154_SHORT_ADDRESS_LEN:
                     dev->flags &= ~NETDEV_IEEE802154_SRC_MODE_LONG;
@@ -176,7 +177,6 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, void *value,
                     res = -EAFNOSUPPORT;
                     break;
             }
-            res = sizeof(uint16_t);
             break;
         case NETOPT_NID:
             assert(len == sizeof(dev->pan));

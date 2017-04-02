@@ -1,4 +1,4 @@
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 
 #include "board.h"
 #include "periph_conf.h"
@@ -14,7 +14,7 @@ int shtc1_cmd(int argc, char **argv)
 	if (argc != 2) {
 	        printf("usage: %s  [temp/humidity/all]", argv[0]);
 	        return 1;
-	}
+	}	
 	int8_t error = shtc1_init(I2C_0);
 	shtc1_values_t my_values;
 	if(!error){
@@ -34,7 +34,7 @@ int shtc1_cmd(int argc, char **argv)
 			return 0;
 		}else if (!strcmp(argv[1], "all")) {
 			/*print temp value*/
-			printf("Temperature: %.2f C \nHumidity: %.2f%%", my_values.temp, my_values.rel_humidity);
+			printf("Temperature: %.2f C \n Humidity: %.2f%%", my_values.temp, my_values.rel_humidity);
 			return 0;
 		}else{
 			printf("usage: %s  [temp/humidity/all]", argv[0]);

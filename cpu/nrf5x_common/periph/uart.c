@@ -27,9 +27,19 @@
 
 #include "cpu.h"
 #include "periph/uart.h"
-#include "periph_cpu.h"
-#include "periph_conf.h"
+#include "periph/gpio.h"
 
+#ifdef CPU_MODEL_NRF52840XXAA
+#define PSEL_RXD         NRF_UART0->PSEL.RXD
+#define PSEL_TXD         NRF_UART0->PSEL.TXD
+#define PSEL_RTS         NRF_UART0->PSEL.RTS
+#define PSEL_CTS         NRF_UART0->PSEL.CTS
+#else
+#define PSEL_RXD         NRF_UART0->PSELRXD
+#define PSEL_TXD         NRF_UART0->PSELTXD
+#define PSEL_RTS         NRF_UART0->PSELRTS
+#define PSEL_CTS         NRF_UART0->PSELCTS
+#endif
 
 /**
  * @brief Allocate memory for the interrupt context
@@ -56,26 +66,26 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* configure RX pin */
     if (rx_cb) {
-        GPIO_BASE->DIRCLR = (1 << UART_PIN_RX);
-        NRF_UART0->PSELRXD = UART_PIN_RX;
+        gpio_init(UART_PIN_RX, GPIO_IN);
+        PSEL_RXD = UART_PIN_RX;
     }
 
     /* configure TX pin */
-    GPIO_BASE->DIRSET = (1 << UART_PIN_TX);
-    NRF_UART0->PSELTXD = UART_PIN_TX;
+    gpio_init(UART_PIN_TX, GPIO_OUT);
+    PSEL_TXD = UART_PIN_TX;
 
     /* enable HW-flow control if defined */
 #if UART_HWFLOWCTRL
     /* set pin mode for RTS and CTS pins */
-    GPIO_BASE->DIRSET = (1 << UART_PIN_RTS);
-    GPIO_BASE->DIRCLR = (1 << UART_PIN_CTS);
+    gpio_init(UART_PIN_RTS, GPIO_OUT);
+    gpio_init(UART_PIN_CTS, GPIO_IN);
     /* configure RTS and CTS pins to use */
-    NRF_UART0->PSELRTS = UART_PIN_RTS;
-    NRF_UART0->PSELCTS = UART_PIN_CTS;
+    PSEL_RTS = UART_PIN_RTS;
+    PSEL_CTS = UART_PIN_CTS;
     NRF_UART0->CONFIG |= UART_CONFIG_HWFC_Msk;  /* enable HW flow control */
 #else
-    NRF_UART0->PSELRTS = 0xffffffff;            /* pin disconnected */
-    NRF_UART0->PSELCTS = 0xffffffff;            /* pin disconnected */
+    PSEL_RTS = 0xffffffff;            /* pin disconnected */
+    PSEL_CTS = 0xffffffff;            /* pin disconnected */
 #endif
 
     /* select baudrate */

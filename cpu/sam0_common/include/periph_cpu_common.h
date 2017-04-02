@@ -59,6 +59,15 @@ typedef uint32_t gpio_t;
  */
 #define GPIO_PIN(x, y)      (((gpio_t)(&PORT->Group[x])) | y)
 
+/**
+ * @name    Power mode configuration
+ * @{
+ */
+#define PM_NUM_MODES        (3)
+/** @todo   we block all modes per default, until PM is cleanly implemented */
+#define PM_BLOCKER_INITIAL  { .val_u32 = 0x01010101 }
+/** @} */
+
 #ifndef DOXYGEN
 /**
  * @brief   Override active flank configuration values
@@ -186,7 +195,11 @@ void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
  */
 static inline int sercom_id(void *sercom)
 {
+#if defined(CPU_FAM_SAMD21)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
+#elif defined(CPU_FAM_SAML21)
+    return ((((uint32_t)sercom) >> 10) & 0x7);
+#endif
 }
 
 #ifdef __cplusplus

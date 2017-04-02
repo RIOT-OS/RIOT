@@ -89,6 +89,15 @@ WEAK_DEFAULT void isr_spi2(void);
 WEAK_DEFAULT void isr_rtc2(void);
 WEAK_DEFAULT void isr_i2s(void);
 
+#ifdef CPU_MODEL_NRF52840XXAA
+WEAK_DEFAULT void isr_fpu(void);
+WEAK_DEFAULT void isr_usbd(void);
+WEAK_DEFAULT void isr_uarte1(void);
+WEAK_DEFAULT void isr_qspi(void);
+WEAK_DEFAULT void isr_cryptocell(void);
+WEAK_DEFAULT void isr_spi3(void);
+WEAK_DEFAULT void isr_pwm3(void);
+#endif
 
 #ifdef SOFTDEVICE_PRESENT
 extern void SWI2_EGU2_IRQHandler(void);
@@ -144,9 +153,9 @@ ISR_VECTORS const void *interrupt_vector[] = {
 #else
     (void *) isr_swi2,              /* swi2 */
 #endif
-    (void *) (0UL),              /* swi3 */
-    (void *) (0UL),              /* swi4 */
-    (void *) (0UL),              /* swi5 */
+    (void *) isr_swi3,              /* swi3 */
+    (void *) isr_swi4,              /* swi4 */
+    (void *) isr_swi5,              /* swi5 */
     (void *) isr_timer3,            /* timer 3 */
     (void *) isr_timer4,            /* timer 4 */
     (void *) isr_pwm0,              /* pwm 0 */
@@ -159,4 +168,14 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void *) isr_spi2,              /* spi 2 */
     (void *) isr_rtc2,              /* rtc 2 */
     (void *) isr_i2s,               /* i2s */
+#ifdef CPU_MODEL_NRF52840XXAA
+    (void *) isr_fpu,               /* fpu */
+    (void *) isr_usbd,              /* usbc */
+    (void *) isr_uarte1,            /* uarte1 */
+    (void *) isr_qspi,              /* qspi */
+    (void *) isr_cryptocell,        /* cryptocell */
+    (void *) isr_spi3,              /* spi3 */
+    (void *) (0UL),                 /* reserved */
+    (void *) isr_pwm3,              /* pwm3 */
+#endif
 };

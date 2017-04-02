@@ -44,25 +44,7 @@ void sema_destroy(sema_t *sema)
     mutex_unlock(&sema->mutex);
 }
 
-int sema_try_wait(sema_t *sema)
-{
-    assert(sema != NULL);
-
-    int ret = -ECANCELED;
-    if (sema->state == SEMA_OK) {
-        ret = -EAGAIN;
-        unsigned old = irq_disable();
-        if (sema->value > 0) {
-            --sema->value;
-            ret = 0;
-        }
-        irq_restore(old);
-    }
-
-    return ret;
-}
-
-int sema_wait_timed(sema_t *sema, uint64_t us)
+int _sema_wait(sema_t *sema, int block, uint64_t us)
 {
     assert(sema != NULL);
 
@@ -70,27 +52,44 @@ int sema_wait_timed(sema_t *sema, uint64_t us)
         return -ECANCELED;
     }
 
+    int did_block = block;
     unsigned old = irq_disable();
-    if (sema->value == 0) {
+    while ((sema->value == 0) && block) {
         irq_restore(old);
-        int timeout = xtimer_mutex_lock_timeout(&sema->mutex, us);
+        if (us == 0) {
+            mutex_lock(&sema->mutex);
+        }
+        else {
+            uint64_t start = xtimer_now_usec64();
+            block = !xtimer_mutex_lock_timeout(&sema->mutex, us);
+            uint64_t elapsed = xtimer_now_usec64() - start;
+
+            if (elapsed < us) {
+                us -= elapsed;
+            }
+            else {
+                block = 0;
+            }
+        }
 
         if (sema->state != SEMA_OK) {
             mutex_unlock(&sema->mutex);
             return -ECANCELED;
         }
 
-        if (timeout) {
-            return -ETIMEDOUT;
-        }
-
         old = irq_disable();
+    }
+
+    if (sema->value == 0) {
+        irq_restore(old);
+        return (did_block) ? -ETIMEDOUT : -EAGAIN;
     }
 
     unsigned int value = --sema->value;
     irq_restore(old);
 
-    if (value > 0) {
+    /* only unlock mutex if it was a blocking operation */
+    if (did_block && value > 0) {
         mutex_unlock(&sema->mutex);
     }
 

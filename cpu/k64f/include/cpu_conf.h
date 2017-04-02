@@ -78,7 +78,6 @@ extern "C"
 #define LPTIMER_DEV                      (LPTMR0) /**< LPTIMER hardware module */
 #define LPTIMER_CLKEN()                  (SIM->SCGC5 |= SIM_SCGC5_LPTMR_MASK) /**< Enable LPTMR0 clock gate */
 #define LPTIMER_CLKDIS()                 (SIM->SCGC5 &= ~SIM_SCGC5_PTMR_MASK) /**< Disable LPTMR0 clock gate */
-#define LPTIMER_CNR_NEEDS_LATCHING       1 /**< LPTMR.CNR register do not need latching */
 
 #ifdef __cplusplus
 }

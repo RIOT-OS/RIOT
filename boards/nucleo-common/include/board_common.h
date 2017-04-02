@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "arduino_pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,9 +33,13 @@ extern "C" {
  * @brief   LED pin definitions and handlers
  * @{
  */
+#ifdef CPU_MODEL_STM32F302R8
+#define LED0_PIN            GPIO_PIN(PORT_B, 13)
+#define LED0_MASK           (1 << 13)
+#else
 #define LED0_PIN            GPIO_PIN(PORT_A, 5)
-
 #define LED0_MASK           (1 << 5)
+#endif
 
 #define LED0_ON             (GPIOA->BSRR = LED0_MASK)
 #define LED0_OFF            (GPIOA->BSRR = (LED0_MASK << 16))
