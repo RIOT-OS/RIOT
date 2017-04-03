@@ -30,17 +30,18 @@
 
 #define TICKS_TO_WAIT       (10 * RTT_FREQUENCY)
 
+static volatile uint32_t last;
+
 void cb(void *arg)
 {
     (void)arg;
-    uint32_t now;
 
-    now = rtt_get_counter() + TICKS_TO_WAIT;
-    now = (now > RTT_MAX_VALUE) ? now - RTT_MAX_VALUE : now;
-    rtt_set_alarm(now, cb, 0);
+    last += TICKS_TO_WAIT;
+    last &= RTT_MAX_VALUE;
+    rtt_set_alarm(last, cb, 0);
+
     puts("Hello");
 }
-
 
 int main(void)
 {
@@ -51,6 +52,7 @@ int main(void)
     rtt_init();
 
     puts("Setting initial alarm");
+    last = TICKS_TO_WAIT;
     rtt_set_alarm(TICKS_TO_WAIT, cb, 0);
 
     puts("Done setting up the RTT, wait for many Hellos");
