@@ -6,8 +6,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
                              cc2650stk chronos ek-lm4f120xl limifrog-v1 maple-mini \
                              mbed_lpc1768 microbit msb-430 msb-430h nrf51dongle \
                              nrf6310 nucleo32-f031 nucleo32-f042 nucleo32-f303 \
-                             nucleo32-l031 nucleo-f030 nucleo-f070 nucleo-f072 \
-                             nucleo-f091 nucleo-f103 nucleo-f302 nucleo-f334 \
+                             nucleo32-l031 nucleo32-l432 nucleo-f030 nucleo-f070 \
+                             nucleo-f072 nucleo-f091 nucleo-f103 nucleo-f302 nucleo-f334 \
                              nucleo-f410 nucleo-l053 nucleo-l073 opencm904 openmote \
                              openmote-cc2538 pba-d-01-kw2x pca10000 pca10005 \
                              remote-pa remote-reva remote-revb saml21-xpro \
@@ -32,13 +32,13 @@ DISABLE_TEST_FOR_ARM7 := tests-relic
 ARM_CORTEX_M_BOARDS := airfy-beacon arduino-due arduino-zero cc2538dk ek-lm4f120xl \
                        f4vi1 fox frdm-k64f iotlab-m3 limifrog-v1 mbed_lpc1768 msbiot \
                        mulle nrf51dongle nrf52840dk nrf6310 nucleo144-f303 nucleo144-f429 \
-					   nucleo144-f446 nucleo32-f031 nucleo32-f303 nucleo32-l031 nucleo-f030 \
-					   nucleo-f070 nucleo-f072 nucleo-f091 nucleo-f302 nucleo-f303 nucleo-f334 \
-					   nucleo-f401 nucleo-f410 nucleo-f411 nucleo-l053 nucleo-l073 nucleo-l1 \
-					   nucleo-l476 opencm904 openmote-cc2538 pba-d-01-kw2x \
-                       pca10000 pca10005 remote saml21-xpro samr21-xpro slwstk6220a sodaq-autonomo \
-                       spark-core stm32f0discovery stm32f3discovery stm32f4discovery \
-                       udoo weio yunjia-nrf51822
+                       nucleo144-f446 nucleo32-f031 nucleo32-f303 nucleo32-l031 nucleo32-l432 \
+                       nucleo-f030 nucleo-f070 nucleo-f072 nucleo-f091 nucleo-f302 \
+                       nucleo-f303 nucleo-f334 nucleo-f401 nucleo-f410 nucleo-f411 \
+                       nucleo-l053 nucleo-l073 nucleo-l1 nucleo-l476 opencm904 \
+                       openmote-cc2538 pba-d-01-kw2x pca10000 pca10005 remote saml21-xpro \
+                       samr21-xpro slwstk6220a sodaq-autonomo spark-core stm32f0discovery \
+                       stm32f3discovery stm32f4discovery udoo weio yunjia-nrf51822
 
 DISABLE_TEST_FOR_ARM_CORTEX_M := tests-relic
 
