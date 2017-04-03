@@ -1,5 +1,3 @@
-UNDEF := $(BINDIR)/newlib_syscalls_default/syscalls.o $(UNDEF)
-
 ifneq (,$(filter newlib_nano,$(USEMODULE)))
   # Test if nano.specs is available
   ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
@@ -48,7 +46,7 @@ NEWLIB_INCLUDE_DIR ?= $(firstword $(wildcard $(NEWLIB_INCLUDE_PATTERNS)))
 # If nothing was found we will try to fall back to searching for a cross-gcc in
 # the current PATH and use a relative path for the includes
 ifeq (,$(NEWLIB_INCLUDE_DIR))
-  NEWLIB_INCLUDE_DIR := $(abspath $(wildcard $(dir $(shell command -v $(PREFIX)gcc;))../$(TARGET_ARCH)/include))
+  NEWLIB_INCLUDE_DIR := $(abspath $(wildcard $(dir $(shell command -v $(PREFIX)gcc 2>/dev/null))/../$(TARGET_ARCH)/include))
 endif
 
 ifeq ($(TOOLCHAIN),llvm)
