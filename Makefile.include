@@ -193,6 +193,7 @@ INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
 include $(RIOTBASE)/Makefile.pseudomodules
 include $(RIOTBASE)/Makefile.defaultmodules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
+-include $(RIOTBOARD)/$(BOARD)/Makefile.features
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
 # Import all toolchain settings
@@ -408,9 +409,6 @@ $(CURDIR)/eclipsesym.xml:
 
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests
-
-# process provided features
-include $(RIOTBASE)/Makefile.features
 
 # Export variables used throughout the whole make system:
 include $(RIOTBASE)/Makefile.vars

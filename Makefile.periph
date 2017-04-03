@@ -1,0 +1,20 @@
+MODULE ?= periph
+
+# get a list with the peripherals, that are configured by the board
+OFFER = $(patsubst periph_%,%.c,$(filter periph_%,$(FEATURES_PROVIDED)))
+# conclude a list of existing AND configured peripherals
+HAS = $(filter $(wildcard *.c),$(OFFER))
+
+# get a list of peripherals, that are needed by the application
+NEED = $(sort $(patsubst periph_driver_%,%.c,$(filter periph_driver_%,$(USEMODULE))))
+# only compile the peripheral drivers, that are present and configured
+SRC += $(filter $(HAS),$(NEED))
+
+# HACK: in case no peripheral in this folder is to be build, we build the first
+#       configured driver in the list, so we don't end up with an empty
+#       compilation unit where the linker would be complain
+ifeq (,$(SRC))
+  SRC = $(firstword $(filter $(HAS),$(OFFER)))
+endif
+
+include $(RIOTBASE)/Makefile.base

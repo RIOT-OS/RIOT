@@ -23,7 +23,7 @@
 void periph_init(void)
 {
     /* initialize configured SPI devices */
-#ifdef SPI_NUMOF
+#ifdef MODULE_PERIPH_DRIVER_SPI
     for (unsigned i = 0; i < SPI_NUMOF; i++) {
         spi_init(SPI_DEV(i));
     }

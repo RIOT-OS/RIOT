@@ -385,6 +385,7 @@ endif
 
 ifneq (,$(filter isrpipe,$(USEMODULE)))
   USEMODULE += tsrb
+  USEMODULE += periph_driver_uart
 endif
 
 ifneq (,$(filter posix,$(USEMODULE)))
@@ -562,7 +563,7 @@ ifneq (,$(filter arduino,$(USEMODULE)))
 endif
 
 ifneq (,$(filter xtimer,$(USEMODULE)))
-    FEATURES_REQUIRED += periph_timer
+    USEMODULE += periph_driver_timer
     USEMODULE += div
 endif
 

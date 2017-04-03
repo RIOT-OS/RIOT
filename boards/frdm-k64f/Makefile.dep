@@ -1,0 +1,2 @@
+# The GPIO driver is used for board initialization
+FEATURES_REQUIRED += periph_gpio

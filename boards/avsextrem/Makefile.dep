@@ -1,1 +1,4 @@
 include $(RIOTBOARD)/msba2-common/Makefile.dep
+
+# the board uses the GPIO driver for LED initialization
+FEATURES_REQUIRED += periph_gpio

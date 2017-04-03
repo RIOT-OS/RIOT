@@ -1,3 +1,3 @@
 MODULE = sam0_common_periph
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTBASE)/Makefile.periph
