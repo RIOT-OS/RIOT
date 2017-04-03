@@ -39,6 +39,14 @@
 
 #define NETDEV_NETAPI_MSG_QUEUE_SIZE 8
 
+#ifdef MODULE_NETSTATS_NEIGHBOR
+#include "net/netstats/neighbor.h"
+
+#ifdef MODULE_NETSTATS_NEIGHBOR_EXT
+static void _process_receive_stats(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt);
+#endif
+#endif
+
 static void _pass_on_packet(gnrc_pktsnip_t *pkt);
 
 /**
@@ -68,19 +76,58 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                     gnrc_pktsnip_t *pkt = gnrc_netdev->recv(gnrc_netdev);
 
                     if (pkt) {
+#ifdef MODULE_NETSTATS_NEIGHBOR_EXT
+                        _process_receive_stats(gnrc_netdev, pkt);
+#endif
                         _pass_on_packet(pkt);
                     }
-
                     break;
                 }
-#ifdef MODULE_NETSTATS_L2
             case NETDEV_EVENT_TX_MEDIUM_BUSY:
-                dev->stats.tx_failed++;
-                break;
-            case NETDEV_EVENT_TX_COMPLETE:
-                dev->stats.tx_success++;
-                break;
+                {
+#ifdef MODULE_NETSTATS_NEIGHBOR
+                    uint8_t retries = 0;
+                    if (dev->driver->get(dev, NETOPT_TX_RETRIES_NEEDED,
+                                    &retries, sizeof(uint8_t)) == ENOTSUP) {
+                        retries = 0;
+                    }
+                    netstats_nb_update_tx(dev, NETSTATS_NB_BUSY, retries);
 #endif
+#ifdef MODULE_NETSTATS_L2
+                    dev->stats.tx_failed++;
+#endif
+                    break;
+                }
+            case NETDEV_EVENT_TX_NOACK:
+                {
+#ifdef MODULE_NETSTATS_NEIGHBOR
+                    uint8_t retries = 0;
+                    if (dev->driver->get(dev, NETOPT_TX_RETRIES_NEEDED,
+                                    &retries, sizeof(uint8_t)) == ENOTSUP) {
+                        retries = 0;
+                    }
+                    netstats_nb_update_tx(dev, NETSTATS_NB_NOACK, retries);
+#endif
+#ifdef MODULE_NETSTATS_L2
+                    dev->stats.tx_failed++;
+#endif
+                    break;
+                }
+            case NETDEV_EVENT_TX_COMPLETE:
+                {
+#ifdef MODULE_NETSTATS_NEIGHBOR
+                    uint8_t retries = 0;
+                    if (dev->driver->get(dev, NETOPT_TX_RETRIES_NEEDED,
+                                    &retries, sizeof(uint8_t)) == ENOTSUP) {
+                        retries = 0;
+                    }
+                    netstats_nb_update_tx(dev, NETSTATS_NB_SUCCESS, retries);
+#endif
+#ifdef MODULE_NETSTATS_L2
+                    dev->stats.tx_success++;
+#endif
+                    break;
+                }
             default:
                 DEBUG("gnrc_netdev: warning: unhandled event %u.\n", event);
         }
@@ -96,6 +143,23 @@ static void _pass_on_packet(gnrc_pktsnip_t *pkt)
         return;
     }
 }
+
+#ifdef MODULE_NETSTATS_NEIGHBOR_EXT
+static void _process_receive_stats(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
+{
+    gnrc_netif_hdr_t *hdr;
+    const uint8_t *src = NULL;
+    gnrc_pktsnip_t *netif = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
+
+    if (netif != NULL) {
+        size_t src_len;
+        hdr = netif->data;
+        src = gnrc_netif_hdr_get_src_addr(hdr);
+        src_len = hdr->src_l2addr_len;
+        netstats_nb_update_rx(netdev->dev, src, src_len, hdr->rssi, hdr->lqi);
+    }
+}
+#endif
 
 /**
  * @brief   Startup code and event loop of the gnrc_netdev layer
@@ -126,6 +190,10 @@ static void *_gnrc_netdev_thread(void *args)
 
     /* register the device to the network stack*/
     gnrc_netif_add(thread_getpid());
+
+#ifdef MODULE_NETSTATS_NEIGHBOR
+    netstats_nb_init(dev);
+#endif
 
     /* initialize low-level driver */
     dev->driver->init(dev);
