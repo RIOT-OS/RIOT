@@ -19,7 +19,9 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
 USEMODULE += embunit
 
 ifeq (, $(filter tests-%, $(MAKECMDGOALS)))
-    UNIT_TESTS := $(foreach d,$(wildcard tests-*/Makefile),$(shell dirname $(d)))
+    # the $(dir) Makefile function leaves a trailing slash after the directory
+    # name, therefore we use patsubst instead.
+    UNIT_TESTS := $(patsubst %/Makefile,%,$(wildcard tests-*/Makefile))
 else
     UNIT_TESTS := $(filter tests-%, $(MAKECMDGOALS))
 endif
