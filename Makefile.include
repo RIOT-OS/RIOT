@@ -205,6 +205,9 @@ ifneq ($(GNRC_NETIF_NUMOF),1)
   CFLAGS += -DGNRC_NETIF_NUMOF=$(GNRC_NETIF_NUMOF)
 endif
 
+# process provided features
+include $(RIOTBASE)/Makefile.features
+
 include $(RIOTBASE)/Makefile.dep
 
 USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
@@ -408,9 +411,6 @@ $(CURDIR)/eclipsesym.xml:
 
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests
-
-# process provided features
-include $(RIOTBASE)/Makefile.features
 
 # Export variables used throughout the whole make system:
 include $(RIOTBASE)/Makefile.vars
