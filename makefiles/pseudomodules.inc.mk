@@ -45,6 +45,7 @@ PSEUDOMODULES += netdev_default
 PSEUDOMODULES += netif
 PSEUDOMODULES += netstats
 PSEUDOMODULES += netstats_l2
+PSEUDOMODULES += netstats_neighbor_ext
 PSEUDOMODULES += netstats_ipv6
 PSEUDOMODULES += netstats_rpl
 PSEUDOMODULES += newlib

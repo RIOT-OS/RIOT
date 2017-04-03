@@ -271,14 +271,20 @@ typedef void (*netdev_event_cb_t)(netdev_t *dev, netdev_event_t event);
  * be used by upper layers to store reference information.
  */
 struct netdev {
-    const struct netdev_driver *driver;     /**< ptr to that driver's interface. */
-    netdev_event_cb_t event_callback;       /**< callback for device events */
-    void* context;                          /**< ptr to network stack context */
+    const struct netdev_driver *driver;                     /**< ptr to that driver's interface. */
+    netdev_event_cb_t event_callback;                       /**< callback for device events */
+    void* context;                                          /**< ptr to network stack context */
 #ifdef MODULE_NETSTATS_L2
-    netstats_t stats;                       /**< transceiver's statistics */
+    netstats_t stats;                                       /**< transceiver's statistics */
 #endif
 #ifdef MODULE_L2FILTER
     l2filter_t filter[L2FILTER_LISTSIZE];   /**< link layer address filters */
+#endif
+#ifdef MODULE_NETSTATS_NEIGHBOR
+    uint8_t send_index;                                     /**< send index */
+    uint8_t cb_index;                                       /**< callback index */
+    netstats_nb_t *stats_queue[NETSTATS_NB_QUEUE_SIZE]; /**< send/callback mac association array */
+    netstats_nb_t pstats[NETSTATS_NB_SIZE];
 #endif
 };
 
