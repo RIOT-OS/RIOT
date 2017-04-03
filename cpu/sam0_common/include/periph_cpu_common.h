@@ -195,7 +195,11 @@ void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
  */
 static inline int sercom_id(void *sercom)
 {
+#if defined(CPU_FAM_SAMD21)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
+#elif defined(CPU_FAM_SAML21)
+    return ((((uint32_t)sercom) >> 10) & 0x7);
+#endif
 }
 
 #ifdef __cplusplus
