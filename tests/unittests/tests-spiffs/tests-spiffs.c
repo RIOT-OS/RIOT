@@ -252,6 +252,7 @@ static void tests_spiffs_readdir(void)
 
     vfs_DIR dirp;
     res = vfs_opendir(&dirp, "/test-spiffs");
+    TEST_ASSERT_EQUAL_INT(0, res);
 
     vfs_dirent_t entry;
     int nb_files = 0;
