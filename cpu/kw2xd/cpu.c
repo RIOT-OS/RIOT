@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     cpu_kw2x
+ * @ingroup     cpu_kw2xd
  * @{
  *
  * @file

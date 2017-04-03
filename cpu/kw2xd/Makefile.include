@@ -1,4 +1,4 @@
-# define the CPU architecture for the kw2x
+# define the CPU architecture for the kw2xd
 export CPU_ARCH = cortex-m4
 
 # tell the build system that the CPU depends on the Kinetis common files
