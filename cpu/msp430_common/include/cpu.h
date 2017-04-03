@@ -23,6 +23,13 @@
 
 #include <stdio.h>
 
+#if ((__GNUC__ == 4) && (__GNUC_MINOR__ > 5) && (__GNUC_MINOR__ < 9))
+#include <intrinsics.h>   /* MSP430-gcc compiler instrinsics */
+#define __get_SR_register __read_status_register
+#elif ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ >= 5)
+#include <in430.h>
+#endif
+
 #include <msp430.h>
 #include "board.h"
 

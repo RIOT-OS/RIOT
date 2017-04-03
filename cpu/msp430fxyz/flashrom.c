@@ -18,9 +18,9 @@
  * @}
  */
 
-#include "irq.h"
 #include <stddef.h>
 #include <stdint.h>
+
 #include "cpu.h"
 #include "irq.h"
 
@@ -57,7 +57,7 @@ uint8_t flashrom_write(uint8_t *dst, const uint8_t *src, size_t size)
         *(dst++) = *(src++);                /* program Flash word */
 
         while (!(FCTL3 & WAIT)) {
-            nop();
+            __nop();
         }
     }
 
@@ -105,6 +105,6 @@ static inline void busy_wait(void)
 {
     /* Wait for BUSY = 0, not needed unless run from RAM */
     while (FCTL3 & 0x0001) {
-        nop();
+        __nop();
     }
 }

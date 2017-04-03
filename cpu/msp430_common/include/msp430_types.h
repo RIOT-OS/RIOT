@@ -19,6 +19,8 @@
 extern "C" {
 #endif
 
+#if !(MODULE_NEWLIB)
+
 #ifndef EINVAL
 /**
  * @brief defines EINVAL if MSP430 toolchain is too old to provide it itself
@@ -83,6 +85,8 @@ typedef      int32_t suseconds_t; /**< Used for time in microseconds */
 typedef     uint32_t timer_t;     /**< Used for timer ID returned by timer_create() */
 typedef     uint16_t uid_t;       /**< Used for user IDs */
 typedef     uint32_t useconds_t;  /**< Used for time in microseconds */
+
+#endif
 
 #ifdef __cplusplus
 }

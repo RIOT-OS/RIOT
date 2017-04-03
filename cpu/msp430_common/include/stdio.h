@@ -21,8 +21,8 @@
 #define RIOT_MSP430_STDIO_H
 
 /*
- * The MSP430 toolchain does not provide getchar in stdio.h.
- * As a workaround, we include the system stdio.h here and then add getchar.
+ * msp430-libc does not provide getchar in stdio.h, but newlib does.
+ * As a workaround, we declare getchar separately and include the system stdio.h
  */
 
 #include_next <stdio.h>
@@ -35,7 +35,9 @@ extern "C" {
 #define SEEK_CUR	1	/* Seek from current position.  */
 #define SEEK_END	2	/* Seek from end of file.  */
 
+#if !(MODULE_NEWLIB)
 int getchar(void);
+#endif
 
 #ifdef __cplusplus
 }
