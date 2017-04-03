@@ -37,6 +37,18 @@ extern "C" {
 #define NETSTATS_ALL        (0xFF)
 /** @} */
 
+#ifndef NETSTATS_NB_SIZE
+/**
+ * @brief   The max number of entries in the peer stats table
+ */
+#define NETSTATS_NB_SIZE           (8)
+#endif
+
+/**
+ * @brief   The queue size for tx correlation
+ */
+#define NETSTATS_NB_QUEUE_SIZE     (4)
+
 /**
  * @brief       Global statistics struct
  */
@@ -52,6 +64,27 @@ typedef struct {
     uint32_t rx_count;          /**< received (data) packets */
     uint32_t rx_bytes;          /**< received bytes */
 } netstats_t;
+
+/**
+ * @brief       Stats per peer struct
+ */
+typedef struct netstats_nb {
+    uint8_t l2_addr[8];     /**< Link layer address of the neighbor */
+    uint8_t l2_addr_len;    /**< Length of netstats_nb::l2_addr */
+    uint16_t etx;           /**< ETX of this peer */
+#ifdef MODULE_NETSTATS_NEIGHBOR_EXT
+    uint8_t rssi;           /**< Average RSSI of received frames in abs([dBm]) */
+    uint8_t lqi;            /**< Average LQI of received frames */
+    uint32_t tx_count;      /**< Number of sent frames to this peer */
+    uint32_t tx_failed;     /**< Number of failed transmission tries to this peer */
+    uint32_t rx_count;      /**< Number of received frames */
+    uint32_t tx_bytes;      /**< Bytes sent */
+    uint32_t rx_bytes;      /**< Bytes received */
+#endif
+    uint8_t  freshness;     /**< Freshness counter */
+    uint32_t last_updated;  /**< seconds timestamp of last update */
+    uint32_t last_halved;   /**< seconds timestamp of last halving */
+} netstats_nb_t;
 
 #ifdef __cplusplus
 }

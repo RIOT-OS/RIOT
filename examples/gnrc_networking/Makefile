@@ -32,6 +32,7 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += netstats_l2
+USEMODULE += netstats_neighbor
 USEMODULE += netstats_ipv6
 USEMODULE += netstats_rpl
 
