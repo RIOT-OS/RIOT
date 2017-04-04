@@ -21,4 +21,4 @@ export COMMON_STARTUP = $(KINETIS_COMMON)
 # add the CPU specific system calls implementations for the linker
 export UNDEF += $(BINDIR)/cpu/vectors.o
 
-include $(RIOTCPU)/Makefile.include.cortexm_common
+include $(RIOTMAKE)/arch/cortexm.inc.mk
