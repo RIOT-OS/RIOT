@@ -1,0 +1,3 @@
+USEMODULE += netif
+
+CFLAGS += -DNETIF_NAMED=1

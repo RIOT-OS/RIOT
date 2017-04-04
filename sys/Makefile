@@ -13,6 +13,9 @@ endif
 ifneq (,$(filter shell_commands,$(USEMODULE)))
     DIRS += shell/commands
 endif
+ifneq (,$(filter netif,$(USEMODULE)))
+    DIRS += net/crosslayer/netif
+endif
 ifneq (,$(filter net_help,$(USEMODULE)))
     DIRS += net/crosslayer/net_help
 endif
