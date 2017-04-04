@@ -1121,8 +1121,8 @@ int _tftp_process_data(tftp_context_t *ctxt, gnrc_pktsnip_t *buf)
         return TS_FAILED;
     }
     if (block_nr < (ctxt->block_nr + 1)) {
-        DEBUG("tftp: not the packet we were wating for, expected %d, received %d\n",
-               (uint16_t)(ctxt->block_nr + 1), block_nr);
+        DEBUG("tftp: not the packet we were waiting for, expected %d, received %d\n",
+              (uint16_t)(ctxt->block_nr + 1), block_nr);
         return TS_DUP;
     }
 
