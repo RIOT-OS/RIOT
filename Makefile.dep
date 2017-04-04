@@ -133,6 +133,21 @@ ifneq (,$(filter ieee802154,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter gnrc_sixloenc_default,$(USEMODULE)))
+  USEMODULE += gnrc_sixloenc
+  USEMODULE += gnrc_sixlowpan_default
+endif
+
+ifneq (,$(filter gnrc_sixloenc_router_default,$(USEMODULE)))
+  USEMODULE += gnrc_sixloenc
+  USEMODULE += gnrc_sixlowpan_router_default
+endif
+
+ifneq (,$(filter gnrc_sixloenc_border_router_default,$(USEMODULE)))
+  USEMODULE += gnrc_sixloenc
+  USEMODULE += gnrc_sixlowpan_border_router_default
+endif
+
 ifneq (,$(filter gnrc_sixlowpan_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_default
   USEMODULE += gnrc_sixlowpan

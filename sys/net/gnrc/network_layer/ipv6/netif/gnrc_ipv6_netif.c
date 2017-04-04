@@ -787,6 +787,27 @@ ipv6_addr_t *gnrc_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ipv6_add
     return best_src;
 }
 
+static inline bool _is_6lo_iface(kernel_pid_t iface)
+{
+#ifdef MODULE_GNRC_SIXLOWPAN
+    gnrc_nettype_t if_type = GNRC_NETTYPE_UNDEF;
+
+#if defined(MODULE_GNRC_SIXLOENC) && defined(GNRC_SIXLOENC_IFACE)
+    return ((((gnrc_netapi_get(iface, NETOPT_PROTO, 0, &if_type,
+                               sizeof(if_type)) != -ENOTSUP) &&
+              (if_type == GNRC_NETTYPE_SIXLOWPAN))) ||
+            (iface == GNRC_SIXLOENC_IFACE));
+#else
+    return ((gnrc_netapi_get(iface, NETOPT_PROTO, 0, &if_type,
+                             sizeof(if_type)) != -ENOTSUP) &&
+            (if_type == GNRC_NETTYPE_SIXLOWPAN));
+#endif
+#else
+    (void)iface;
+    return false;
+#endif
+}
+
 void gnrc_ipv6_netif_init_by_dev(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
@@ -808,11 +829,7 @@ void gnrc_ipv6_netif_init_by_dev(void)
         mutex_lock(&ipv6_if->mutex);
 
 #ifdef MODULE_GNRC_SIXLOWPAN
-        gnrc_nettype_t if_type = GNRC_NETTYPE_UNDEF;
-
-        if ((gnrc_netapi_get(ifs[i], NETOPT_PROTO, 0, &if_type,
-                             sizeof(if_type)) != -ENOTSUP) &&
-            (if_type == GNRC_NETTYPE_SIXLOWPAN)) {
+        if (_is_6lo_iface(ifs[i])) {
             uint16_t src_len = 8;
             uint16_t max_frag_size = UINT16_MAX;
 

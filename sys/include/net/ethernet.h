@@ -58,7 +58,7 @@ extern "C" {
  * @param[in] mac       A 48-bit MAC address. Is expected to be at least
  *                      @ref ETHERNET_ADDR_LEN long.
  */
-static inline void ethernet_get_iid(eui64_t *eui64, uint8_t *mac)
+static inline void ethernet_get_iid(eui64_t *eui64, const uint8_t *mac)
 {
     eui64->uint8[0] = mac[0] ^ 0x02;
     eui64->uint8[1] = mac[1];

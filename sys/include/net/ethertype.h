@@ -36,6 +36,13 @@ extern "C" {
 #define ETHERTYPE_ARP           (0x0806)    /**< Address resolution protocol */
 #define ETHERTYPE_NDN           (0x0801)    /**< Parc CCNX */
 #define ETHERTYPE_IPV6          (0x86dd)    /**< Internet protocol version 6 */
+
+/**
+ * @brief   LoWPAN encapsulation
+ *
+ * @see     https://tools.ietf.org/html/rfc7973
+ */
+#define ETHERTYPE_6LOENC        (0xa0ed)
 #define ETHERTYPE_UNKNOWN       (0xffff)    /**< Reserved (no protocol specified) */
 
 #ifdef __cplusplus
