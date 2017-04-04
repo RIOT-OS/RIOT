@@ -16,6 +16,13 @@ BINDIRBASE     ?= $(APPDIR)/bin
 BINDIR         ?= $(BINDIRBASE)/$(BOARD)
 PKGDIRBASE     ?= $(BINDIRBASE)/pkg/$(BOARD)
 
+# to extend size information print out
+SIZEFLAGS      ?=
+
+# to kill serial connection before flashing
+PREFLASHER     ?=
+
+
 __DIRECTORY_VARIABLES := RIOTBASE CCACHE_BASEDIR RIOTCPU RIOTBOARD RIOTPKG GITCACHE RIOTPROJECT APPDIR BINDIRBASE BINDIR PKGDIRBASE
 
 # Make all paths absolute.
@@ -281,7 +288,7 @@ ifeq ($(BUILDOSXNATIVE),1)
 else
 	$(Q)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map $(LINKFLAGPREFIX)--cref $(LINKFLAGS)
 endif
-	$(Q)$(SIZE) $(ELFFILE)
+	$(Q)$(SIZE) $(SIZEFLAGS) $(ELFFILE)
 	$(Q)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
 endif
 endif # BUILD_IN_DOCKER
@@ -345,6 +352,7 @@ flash: all
 		{ $(COLOR_ECHO) \
 		'${COLOR_RED}Flash program $(FLASHER) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
+	$(PREFLASHER)
 	$(FLASHER) $(FFLAGS)
 
 term: $(filter flash, $(MAKECMDGOALS))

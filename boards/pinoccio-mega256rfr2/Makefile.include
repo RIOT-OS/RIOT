@@ -2,13 +2,25 @@
 export CPU = atmega256rfr2
 export CPU_MODEL = atmega256rfr2
 
-export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
+#export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
+export TERMPROG = python /usr/local/bin/pyterm
 export TERMFLAGS = -b 9600 -p $(PORT)
 
+SIZEFLAGS = --format=avr --mcu=$(CPU_MODEL)
+ 
 #define the flash-tool and default port depending on the host operating system
 OS = $(shell uname)
 ifeq ($(OS),Linux)
   PORT ?= /dev/ttyACM0
+  # -@ ignore fail and continue with next make command
+  # find process using ACM0 and kill it
+  # a way to avoid the erros wouls be nice
+  %PREFLASHER = pgrep -f /dev/ttyACM0 2>/dev/null |xargs --no-run-if-empty kill||true
+  %PREFLASHER = -@ pgrep -f /dev/ttyACM0 |xargs -r kill 
+  #PREFLASHER = -@if [ "pgrep -f /dev/ttyACM0" ]; then pgrep -f /dev/ttyACM0 |xargs kill||true ; else pgrep -f /dev/ttyACM0||true ;fi
+  #@pgrep pgrep -f /dev/ttyACM0 ||true |xargs --no-run-if-empty kill 
+  #PREFLASHER = pgrep -f /dev/ttyACM0 >/dev/null 2>&1 
+  
   FLASHER = avrdude
   export FLASHER_PATH ="/etc/avrdude.conf"
   export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex:i -C $(FLASHER_PATH) 
