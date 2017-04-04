@@ -3,6 +3,8 @@ PKG_URL=https://github.com/OLSR/OONF.git
 PKG_VERSION=v0.3.0
 PKG_LICENSE=BSD-3-Clause
 
+CFLAGS += -Wno-reserved-id-macro -Wno-keyword-macro
+
 MODULE:=$(PKG_NAME)
 
 .PHONY: all
