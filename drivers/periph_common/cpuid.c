@@ -1,5 +1,7 @@
 /*
+ * Copyright (C) 2017 Eistec AB
  * Copyright (C) 2014-2016 Freie Universität Berlin
+ * Copyright (C) 2015 James Hollister
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +9,16 @@
  */
 
 /**
- * @addtogroup  cpu_ezr32wg
+ * @addtogroup  drivers
  * @{
  *
  * @file
- * @brief       Low-level CPUID driver implementation
+ * @brief       Generic implementation of the CPUID driver interface
  *
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      James Hollister <jhollisterjr@gmail.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */
@@ -23,13 +28,9 @@
 
 #include "periph/cpuid.h"
 
+#ifdef CPUID_ADDR
 void cpuid_get(void *id)
 {
-    uint32_t tmp;
-    uint8_t *res = (uint8_t *)id;
-
-    tmp = DEVINFO->UNIQUEL;
-    memcpy((res + 4), &tmp, sizeof(uint32_t));
-    tmp = DEVINFO->UNIQUEH;
-    memcpy(res, &tmp, sizeof(uint32_t));
+    memcpy(id, (void *)CPUID_ADDR, CPUID_LEN);
 }
+#endif
