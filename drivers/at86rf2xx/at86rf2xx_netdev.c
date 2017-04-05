@@ -43,32 +43,46 @@
 static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *netdev);
-static void _isr(netdev_t *netdev);
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len);
 static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len);
+
+#ifndef MODULE_AT86RFR2
+static void _isr(netdev_t *netdev);
+#endif
+
 
 const netdev_driver_t at86rf2xx_driver = {
     .send = _send,
     .recv = _recv,
     .init = _init,
-    .isr = _isr,
     .get = _get,
     .set = _set,
+#ifndef MODULE_AT86RFR2
+    .isr = _isr,
+#endif
 };
 
-static void _irq_handler(void *arg)
-{
-    netdev_t *dev = (netdev_t *) arg;
+#ifndef MODULE_AT86RFR2
 
-    if (dev->event_callback) {
-        dev->event_callback(dev, NETDEV_EVENT_ISR);
-    }
-}
+	/* SOC has directly access to interrupt
+	 * this is only needed if a single pin interrupts are used
+	 * for external devices to check which interrupt was triggered.
+	 * */
+	static void _irq_handler(void *arg)
+	{
+		netdev_t *dev = (netdev_t *) arg;
+
+		if (dev->event_callback) {
+			dev->event_callback(dev, NETDEV_EVENT_ISR);
+		}
+	}
+#endif
 
 static int _init(netdev_t *netdev)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
 
+#ifndef MODULE_AT86RFR2 // SOC no SPI
     /* initialise GPIOs */
     spi_init_cs(dev->params.spi, dev->params.cs_pin);
     gpio_init(dev->params.sleep_pin, GPIO_OUT);
@@ -76,6 +90,7 @@ static int _init(netdev_t *netdev)
     gpio_init(dev->params.reset_pin, GPIO_OUT);
     gpio_set(dev->params.reset_pin);
     gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
+#endif
 
     /* make sure device is not sleeping, so we can query part number */
     at86rf2xx_assert_awake(dev);
@@ -86,6 +101,13 @@ static int _init(netdev_t *netdev)
         DEBUG("[at86rf2xx] error: unable to read correct part number\n");
         return -1;
     }
+
+#if ENABLE_DEBUG
+    uint16_t version = at86rf2xx_reg_read(dev, AT86RF2XX_REG__VERSION_NUM);
+    uint16_t man_id0 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__MAN_ID_0);
+    uint16_t man_id1 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__MAN_ID_1);
+    DEBUG("[at86rf2xx] Part Number:%02x, version:%02x, Atmel JEDEC manufacturer ID:00 00 %02x %02x\n",partnum ,version, man_id1, man_id0);
+#endif
 
 #ifdef MODULE_NETSTATS_L2
     memset(&netdev->stats, 0, sizeof(netstats_t));
@@ -137,10 +159,16 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     at86rf2xx_fb_start(dev);
 
     /* get the size of the received packet */
-    at86rf2xx_fb_read(dev, &phr, 1);
+#ifdef MODULE_AT86RFR2
+    phr =  TST_RX_LENGTH;
+#else
+	at86rf2xx_fb_read(dev, &phr, 1);
+#endif
 
-    /* ignore MSB (refer p.80) and substract length of FCS field */
-    pkt_len = (phr & 0x7f) - 2;
+	/* ignore MSB (refer p.80) and substract length of FCS field */
+	pkt_len = (phr & 0x7f) - 2;
+
+	DEBUG("[at86rf2xx] RX Payload length: %d\n", pkt_len);
 
     /* just return length when buf == NULL */
     if (buf == NULL) {
@@ -159,16 +187,22 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     /* copy payload */
     at86rf2xx_fb_read(dev, (uint8_t *)buf, pkt_len);
 
+#ifndef MODULE_AT86RFR2
     /* Ignore FCS but advance fb read - we must give a temporary buffer here,
      * as we are not allowed to issue SPI transfers without any buffer */
     uint8_t tmp[2];
     at86rf2xx_fb_read(dev, tmp, 2);
     (void)tmp;
+#endif
 
     if (info != NULL) {
         netdev_ieee802154_rx_info_t *radio_info = info;
         at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
-#ifndef MODULE_AT86RF231
+#if defined(MODULE_AT86RFR2)
+		radio_info->lqi = *(AT86RF2XX_REG__TRXFBST + phr);
+		radio_info->rssi = (PHY_RSSI & 0x1f); // MASK highest 3 bits
+		DEBUG("[at86rfr2] LQI:%d high value is good, RSSI:%d high value can be good or interferer.\n", radio_info->lqi, radio_info->rssi);
+#elif !defined(MODULE_AT86RF231)
         at86rf2xx_fb_read(dev, &(radio_info->rssi), 1);
         at86rf2xx_fb_stop(dev);
 #else
@@ -516,6 +550,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
     return res;
 }
 
+#ifndef MODULE_AT86RFR2
 static void _isr(netdev_t *netdev)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
@@ -586,3 +621,4 @@ static void _isr(netdev_t *netdev)
         }
     }
 }
+#endif

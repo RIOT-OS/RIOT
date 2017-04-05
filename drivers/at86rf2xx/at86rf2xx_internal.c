@@ -25,28 +25,57 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "xtimer.h"
+
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
 
-#define SPIDEV          (dev->params.spi)
-#define CSPIN           (dev->params.cs_pin)
+#ifdef MODULE_AT86RFR2
+	// SOC uses no SPI
+	// but needs memcpy
+	#include <string.h>
+#else
+	#define SPIDEV          (dev->params.spi)
+	#define CSPIN           (dev->params.cs_pin)
+#endif
 
+// SOC uses no SPI
+#ifndef MODULE_AT86RFR2
 static inline void getbus(const at86rf2xx_t *dev)
 {
     spi_acquire(SPIDEV, CSPIN, SPI_MODE_0, dev->params.spi_clk);
 }
+#endif
 
+
+#ifdef MODULE_AT86RFR2
 void at86rf2xx_reg_write(const at86rf2xx_t *dev,
-                         const uint8_t addr,
-                         const uint8_t value)
+						 volatile uint8_t* addr,
+						 const uint8_t value)
 {
-    uint8_t reg = (AT86RF2XX_ACCESS_REG | AT86RF2XX_ACCESS_WRITE | addr);
+	// allready castet *(volatile uint8_t *) in iom256rfr2, _SFR_MEM8(), _MMIO_BYTE
+		*(addr) = value;
+}
+#else
+void at86rf2xx_reg_write(const at86rf2xx_t *dev,
+						 const uint8_t addr,
+						 const uint8_t value)
+{
+		uint8_t reg = (AT86RF2XX_ACCESS_REG | AT86RF2XX_ACCESS_WRITE | addr);
 
     getbus(dev);
     spi_transfer_reg(SPIDEV, CSPIN, reg, value);
     spi_release(SPIDEV);
 }
+#endif
 
+
+#ifdef MODULE_AT86RFR2
+uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, volatile uint8_t* addr)
+{
+	// already casted *(volatile uint8_t *) in iom256rfr2
+	return *addr;
+}
+#else
 uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr)
 {
     uint8_t reg = (AT86RF2XX_ACCESS_REG | AT86RF2XX_ACCESS_READ | addr);
@@ -55,22 +84,27 @@ uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr)
     getbus(dev);
     value = spi_transfer_reg(SPIDEV, CSPIN, reg, 0);
     spi_release(SPIDEV);
-
     return value;
 }
+#endif
+
 
 void at86rf2xx_sram_read(const at86rf2xx_t *dev,
                          const uint8_t offset,
                          uint8_t *data,
                          const size_t len)
 {
-    uint8_t reg = (AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_READ);
+#ifdef MODULE_AT86RFR2
+	memcpy( data, (void *)(AT86RF2XX_REG__TRXFBST +offset ), len);
+#else
+	uint8_t reg = (AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_READ);
 
     getbus(dev);
     spi_transfer_byte(SPIDEV, CSPIN, true, reg);
     spi_transfer_byte(SPIDEV, CSPIN, true, offset);
     spi_transfer_bytes(SPIDEV, CSPIN, false, NULL, data, len);
     spi_release(SPIDEV);
+#endif
 }
 
 void at86rf2xx_sram_write(const at86rf2xx_t *dev,
@@ -78,6 +112,9 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev,
                           const uint8_t *data,
                           const size_t len)
 {
+#ifdef MODULE_AT86RFR2
+	memcpy( (void *)(AT86RF2XX_REG__TRXFBST+offset), data, len);
+#else
     uint8_t reg = (AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_WRITE);
 
     getbus(dev);
@@ -85,28 +122,41 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev,
     spi_transfer_byte(SPIDEV, CSPIN, true, offset);
     spi_transfer_bytes(SPIDEV, CSPIN, false, data, NULL, len);
     spi_release(SPIDEV);
+#endif
 }
 
 void at86rf2xx_fb_start(const at86rf2xx_t *dev)
 {
+#ifdef MODULE_AT86RFR2
+	// nothing to do here
+#else
     uint8_t reg = AT86RF2XX_ACCESS_FB | AT86RF2XX_ACCESS_READ;
 
     getbus(dev);
     spi_transfer_byte(SPIDEV, CSPIN, true, reg);
+#endif
 }
 
 void at86rf2xx_fb_read(const at86rf2xx_t *dev,
                        uint8_t *data,
                        const size_t len)
 {
+#ifdef MODULE_AT86RFR2
+	memcpy( data, (void *)(AT86RF2XX_REG__TRXFBST), len);
+#else
     spi_transfer_bytes(SPIDEV, CSPIN, true, NULL, data, len);
+#endif
 }
 
 void at86rf2xx_fb_stop(const at86rf2xx_t *dev)
 {
-    /* transfer one byte (which we ignore) to release the chip select */
+#ifdef MODULE_AT86RFR2
+	// nothing to do here
+#else
+	/* transfer one byte (which we ignore) to release the chip select */
     spi_transfer_byte(SPIDEV, CSPIN, false, 1);
     spi_release(SPIDEV);
+#endif
 }
 
 uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
@@ -121,10 +171,15 @@ uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
 
 void at86rf2xx_assert_awake(at86rf2xx_t *dev)
 {
-    if(at86rf2xx_get_status(dev) == AT86RF2XX_STATE_SLEEP) {
+	if(at86rf2xx_get_status(dev) == AT86RF2XX_STATE_SLEEP) {
 
         /* wake up and wait for transition to TRX_OFF */
+#ifdef MODULE_AT86RFR2
+    	//Setting SLPTR = 0x0  returns the radio transceiver to the TRX_OFF state
+        *AT86RF2XX_REG__TRXPR &= ~AT86RF2XX_TRXPR_SLPTR ; //  set slptr to default
+#else
         gpio_clear(dev->params.sleep_pin);
+#endif
         xtimer_usleep(AT86RF2XX_WAKEUP_DELAY);
 
         /* update state */
@@ -139,9 +194,14 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
     at86rf2xx_assert_awake(dev);
 
     /* trigger hardware reset */
+#ifdef MODULE_AT86RFR2
+    *(AT86RF2XX_REG__TRXPR) |= AT86RF2XX_TRXPR_TRXRST; // set reset bit
+#else
     gpio_clear(dev->params.reset_pin);
     xtimer_usleep(AT86RF2XX_RESET_PULSE_WIDTH);
     gpio_set(dev->params.reset_pin);
+#endif
+
     xtimer_usleep(AT86RF2XX_RESET_DELAY);
 }
 
@@ -203,7 +263,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     at86rf2xx_set_state(dev, state);
 }
 
-#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231)
+#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231) || defined(MODULE_AT86RF212B )
 void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, const size_t len)
 {
     for (size_t byteCount = 0; byteCount < len; ++byteCount) {

@@ -190,11 +190,6 @@ void auto_init(void)
     auto_init_at86rf2xx();
 #endif
 
-#ifdef MODULE_AT86RFR2
-    extern void auto_init_at86rfr2(void);
-    auto_init_at86rfr2();
-#endif
-
 #ifdef MODULE_MRF24J40
     extern void auto_init_mrf24j40(void);
     auto_init_mrf24j40();

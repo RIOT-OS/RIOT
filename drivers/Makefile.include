@@ -4,14 +4,9 @@ endif
 ifneq (,$(filter at86rf2xx,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at86rf2xx/include
 endif
-
-ifneq (,$(filter at86rfr2,$(USEMODULE)))
-  #$(error CAUTION: AT86RFR2 not implemented jet!)
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at86rfr2/include
-endif
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
  #$(error CAUTION: gnrc_netdev_default !)
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/netdev2_ieee802154/include
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/netdev_ieee802154/include
 endif
 ifneq (,$(filter mrf24j40,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mrf24j40/include

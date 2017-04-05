@@ -35,6 +35,95 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#ifdef MODULE_AT86RFR2
+
+/*TODO port all functions from at86rf2xx_netdev.c _isr() */
+
+	#include "avr/interrupt.h"
+	// saved device Pointer for Interrupt callback
+	static at86rf2xx_t* static_dev;
+
+	/**
+	 * \brief ISR for transceiver's rx start interrupt
+	 *
+	 * By the time the SFD is detected, the hardware timestamps the
+	 * current frame in the SCTSR register.
+	 */
+	ISR(TRX24_RX_START_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		LED_PORT &= ~GREEN;
+		((netdev_t*)static_dev)->event_callback((netdev_t *)static_dev, NETDEV_EVENT_RX_STARTED);
+		__exit_isr();
+	}
+
+	/**
+	 * \brief ISR for transceiver's receive end interrupt
+	 */
+	ISR(TRX24_RX_END_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		((netdev_t*)static_dev)->event_callback((netdev_t *)static_dev, NETDEV_EVENT_RX_COMPLETE);
+	    LED_PORT |= GREEN;
+		__exit_isr();
+	}
+
+	/**
+	 * \brief ISR for transceiver's TX_START interrupt
+	 */
+	ISR(TRX24_TX_START_vect)
+	{
+		__enter_isr();
+		LED_PORT &= ~RED;
+		((netdev_t*)static_dev)->event_callback((netdev_t *)static_dev, NETDEV_EVENT_TX_STARTED);
+		__exit_isr();
+	}
+
+	/**
+	 * \brief ISR for transceiver's transmit end interrupt
+	 */
+	ISR(TRX24_TX_END_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		((netdev_t*)static_dev)->event_callback((netdev_t *)static_dev, NETDEV_EVENT_TX_COMPLETE);
+		LED_PORT |= RED;
+		__exit_isr();
+
+		/* set transceiver back to receiving state*/
+		at86rf2xx_set_state(static_dev, AT86RF2XX_TRX_STATE__RX_AACK_ON);
+	}
+
+	// TODO use or remove the following ISR's
+	/**
+	 * \brief ISR for transceiver's transmit end interrupt
+	 */
+	ISR(TRX24_PLL_LOCK_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		LED_PORT &= ~GREEN;
+		__exit_isr();
+	}
+
+	/**
+	 * \brief ISR for transceiver's transmit end interrupt
+	 */
+	ISR(TRX24_PLL_UNLOCK_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		LED_PORT |= GREEN;
+		__exit_isr();
+	}
+	/**
+	 * \brief ISR for transceiver's transmit end interrupt
+	 */
+	ISR(TRX24_AWAKE_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		LED_PORT |= RED;
+		__exit_isr();
+	}
+
+#endif
 
 void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
 {
@@ -81,9 +170,11 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_START, false);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_END, true);
+
 #ifdef MODULE_NETSTATS_L2
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_TX_END, true);
 #endif
+
     /* set default protocol */
 #ifdef MODULE_GNRC_SIXLOWPAN
     dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
@@ -97,26 +188,63 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_set_page(dev, 0);
 #endif
 
+#ifdef MODULE_AT86RFR2
+    /* no spi,
+     * no clock out pin
+     *  TODO replace for functionality for RFR2? */
+
+    /* clear interrupt flags by writing corresponding bit */
+	at86rf2xx_reg_write( dev, AT86RF2XX_REG__IRQ_STATUS,  0xff );
+	at86rf2xx_reg_write( dev, AT86RF2XX_REG__IRQ_STATUS1, 0xff );
+
+	/* TODO now only enable necessary interrupts,
+	   maybe other interrupts could be useful */
+
+	/* enable interrupts IRQ_MASK*/
+	at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
+			// AT86RF2XX_IRQ_STATUS_MASK__AWAKE
+			 AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN
+			 //| AT86RF2XX_IRQ_STATUS_MASK__AMI_EN
+			 //| AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE_EN
+			| AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN
+			| AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN
+			//| AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK
+			//| AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK
+						);
+
+	/* enable interrupts IRQ_MASK1*/
+	   at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1,
+			   AT86RF2XX_IRQ_STATUS_MASK1__TX_START_EN
+			   //| AT86RF2XX_IRQ_STATUS_MASK1__MAF_0_AMI_EN
+			   //| AT86RF2XX_IRQ_STATUS_MASK1__MAF_1_AMI_EN
+			   //| AT86RF2XX_IRQ_STATUS_MASK1__MAF_2_AMI_EN
+			   //| AT86RF2XX_IRQ_STATUS_MASK1__MAF_3_AMI_EN
+						);
+   /* set PLL on */
+	   at86rf2xx_set_state(dev, AT86RF2XX_STATE_PLL_ON);
+#else
     /* don't populate masked interrupt flags to IRQ_STATUS register */
-    uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_1);
-    tmp &= ~(AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE);
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_1, tmp);
+	uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_1);
+	tmp &= ~(AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE);
+	at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_1, tmp);
 
-    /* disable clock output to save power */
-    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_0);
-    tmp &= ~(AT86RF2XX_TRX_CTRL_0_MASK__CLKM_CTRL);
-    tmp &= ~(AT86RF2XX_TRX_CTRL_0_MASK__CLKM_SHA_SEL);
-    tmp |= (AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__OFF);
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_0, tmp);
+	/* disable clock output to save power */
+	tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_0);
+	tmp &= ~(AT86RF2XX_TRX_CTRL_0_MASK__CLKM_CTRL);
+	tmp &= ~(AT86RF2XX_TRX_CTRL_0_MASK__CLKM_SHA_SEL);
+	tmp |= (AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__OFF);
+	at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_0, tmp);
 
-    /* enable interrupts */
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
-                        AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
-    /* clear interrupt flags */
-    at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
+	/* enable interrupts */
+	at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
+						AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
 
-    /* go into RX state */
-    at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
+	/* clear interrupt flags */
+	at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
+#endif
+
+	/* go into RX state */
+	at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
 
     DEBUG("at86rf2xx_reset(): reset complete.\n");
 }
@@ -168,6 +296,11 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev)
     /* trigger sending of pre-loaded frame */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE,
                         AT86RF2XX_TRX_STATE__TX_START);
+
+    /* TODO MODULE_AT86RFR2 change to interrupt
+     * or remove complete upper layer does not handle TX_start interrupt
+     */
+
     if (netdev->event_callback &&
         (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_START)) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);

@@ -65,14 +65,10 @@ extern "C" {
 /**
  * @name Define the interface to the AT86RF231 radio
  *
+ *	No SPI and no external pins are used. its an SOC
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
  */
-#define AT86RF2XX_PARAMS_BOARD      {.spi = 0, \
-                                     .spi_speed = 86F2, \
-                                     .cs_pin = 0, \
-                                     .int_pin = 0, \
-                                     .sleep_pin = 0, \
-                                     .reset_pin = 0}
+#define AT86RF2XX_PARAMS_BOARD      {}
 
 /**
  * Context swap defines

@@ -1,0 +1,5 @@
+/* TODO */
+
+/* check usage of registers with different purpose same definition*/
+AT86RF2XX_REG__TRX_CTRL_0
+AT86RF2XX_REG__TRX_CTRL_1

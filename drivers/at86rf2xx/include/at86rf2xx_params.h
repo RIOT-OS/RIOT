@@ -27,6 +27,7 @@
 extern "C" {
 #endif
 
+// initialize SPI
 /**
  * @brief   Set default configuration parameters for the AT86RF2xx driver
  * @{
@@ -51,11 +52,11 @@ extern "C" {
 #endif
 
 #define AT86RF2XX_PARAMS_DEFAULT    {.spi = AT86RF2XX_PARAM_SPI, \
-                                     .spi_clk = AT86RF2XX_PARAM_SPI_CLK, \
-                                     .cs_pin = AT86RF2XX_PARAM_CS, \
-                                     .int_pin = AT86RF2XX_PARAM_INT, \
-                                     .sleep_pin = AT86RF2XX_PARAM_SLEEP, \
-                                     .reset_pin = AT86RF2XX_PARAM_RESET}
+									 .spi_clk = AT86RF2XX_PARAM_SPI_CLK, \
+									 .cs_pin = AT86RF2XX_PARAM_CS, \
+									 .int_pin = AT86RF2XX_PARAM_INT, \
+									 .sleep_pin = AT86RF2XX_PARAM_SLEEP, \
+									 .reset_pin = AT86RF2XX_PARAM_RESET}
 /**@}*/
 
 /**
@@ -64,11 +65,12 @@ extern "C" {
 static const at86rf2xx_params_t at86rf2xx_params[] =
 {
 #ifdef AT86RF2XX_PARAMS_BOARD
-    AT86RF2XX_PARAMS_BOARD,
+	AT86RF2XX_PARAMS_BOARD,
 #else
-    AT86RF2XX_PARAMS_DEFAULT,
+	AT86RF2XX_PARAMS_DEFAULT,
 #endif
 };
+
 
 #ifdef __cplusplus
 }
