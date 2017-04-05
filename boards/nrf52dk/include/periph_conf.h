@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
+ * Copyright (C) 2016-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Clock configuration
+ * @name    Clock configuration
  *
  * @note    The radio will not work with the internal RC oscillator!
  *
@@ -43,8 +43,12 @@ extern "C" {
  * @{
  */
 static const timer_conf_t timer_config[] = {
-    /* dev, channels, width, IRQn */
-    { NRF_TIMER1, 3, TIMER_BITMODE_BITMODE_32Bit, TIMER1_IRQn }
+    {
+        .dev      =  NRF_TIMER1,
+        .channels =  3,
+        .bitmode  = TIMER_BITMODE_BITMODE_32Bit,
+        .irqn     = TIMER1_IRQn
+    }
 };
 
 #define TIMER_0_ISR         isr_timer1
@@ -53,7 +57,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief Real time counter configuration
+ * @name    Real time counter configuration
  * @{
  */
 #define RTT_NUMOF           (1U)
@@ -66,16 +70,16 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @name   UART configuration
+ * @name    UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)
-#define UART_PIN_RX         8
-#define UART_PIN_TX         6
+#define UART_PIN_RX         GPIO_PIN(0,8)
+#define UART_PIN_TX         GPIO_PIN(0,6)
 /** @} */
 
 /**
- * @name SPI configuration
+ * @name    SPI configuration
  * @{
  */
 static const spi_conf_t spi_config[] = {
@@ -83,7 +87,8 @@ static const spi_conf_t spi_config[] = {
         .dev  = NRF_SPI0,
         .sclk = 15,
         .mosi = 13,
-        .miso = 14 }
+        .miso = 14
+    }
 };
 
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
