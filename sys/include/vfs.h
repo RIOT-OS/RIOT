@@ -652,7 +652,8 @@ int vfs_opendir(vfs_DIR *dirp, const char *dirname);
  * @param[in]  dirp     pointer to open directory
  * @param[out] entry    directory entry information
  *
- * @return 0 on success
+ * @return 1 if @p entry was updated
+ * @return 0 if @p dirp has reached the end of the directory index
  * @return <0 on error
  */
 int vfs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry);
