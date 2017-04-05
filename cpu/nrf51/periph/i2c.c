@@ -101,8 +101,8 @@ int i2c_init_master(i2c_t bus, i2c_speed_t speed)
     dev(bus)->POWER = TWI_POWER_POWER_Enabled;
 
     /* pin configuration */
-    GPIO_BASE->PIN_CNF[i2c_config[bus].pin_scl] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
-    GPIO_BASE->PIN_CNF[i2c_config[bus].pin_scl] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
+    NRF_GPIO->PIN_CNF[i2c_config[bus].pin_scl] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
+    NRF_GPIO->PIN_CNF[i2c_config[bus].pin_scl] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
 
     dev(bus)->PSELSCL = i2c_config[bus].pin_scl;
     dev(bus)->PSELSDA = i2c_config[bus].pin_sda;
