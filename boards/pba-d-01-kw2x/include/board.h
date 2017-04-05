@@ -31,6 +31,11 @@ extern "C"
 #endif
 
 /**
+ * @brief Use the UART2 for STDIO on this board
+ */
+#define UART_STDIO_DEV      UART_DEV(2)
+
+/**
  * @name    LED pin definitions and handlers
  * @{
  */
