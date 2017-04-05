@@ -26,6 +26,10 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Starting offset of CPU_ID
+ */
+#define CPUID_ADDR          (&FCFG->MAC_BLE_0)
+/**
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (16U)

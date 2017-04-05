@@ -46,6 +46,10 @@ typedef uint16_t gpio_t;
 #define GPIO_PIN(x, y)      (((x + 1) << 12) | (x << 6) | y)
 
 /**
+ * @brief   Starting offset of CPU_ID
+ */
+#define CPUID_ADDR          (&SIM->UIDH)
+/**
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (16U)

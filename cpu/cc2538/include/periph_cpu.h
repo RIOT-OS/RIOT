@@ -28,6 +28,10 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Starting offset of CPU_ID
+ */
+#define CPUID_ADDR          (&IEEE_ADDR_MSWORD)
+/**
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (8U)

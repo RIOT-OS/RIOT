@@ -39,6 +39,10 @@ typedef uint32_t tim_t;
 /** @} */
 
 /**
+ * @brief   Starting offset of CPU_ID
+ */
+#define CPUID_ADDR          (&DEVINFO->UNIQUEL)
+/**
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (8U)
