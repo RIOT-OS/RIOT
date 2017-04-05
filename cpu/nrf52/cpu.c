@@ -23,6 +23,7 @@
 #define DONT_OVERRIDE_NVIC
 
 #include "cpu.h"
+#include "nrf_clock.h"
 #include "periph_conf.h"
 #include "periph/init.h"
 
@@ -60,15 +61,8 @@ void cpu_init(void)
         NRF_CLOCK->EVENTS_CTTO = 0;
     }
 
-    /* set the correct clock source for HFCLK */
-#if (CLOCK_CRYSTAL == 32)
-    NRF_CLOCK->LFCLKSRC = (CLOCK_LFCLKSRC_SRC_Xtal << CLOCK_LFCLKSRC_SRC_Pos);
-
-    NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
-    NRF_CLOCK->TASKS_HFCLKSTART = 1;
-
-    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
-#endif
+    /* initialize hf clock */
+    clock_init_hf();
 
     /* softdevice needs to be enabled from ISR context */
 #ifdef SOFTDEVICE_PRESENT
