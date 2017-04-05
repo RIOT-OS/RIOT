@@ -3,7 +3,8 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_spi periph_gpio
 
-BOARD_INSUFFICIENT_MEMORY := nucleo-f334 nucleo-l053 stm32f0discovery weio
+BOARD_INSUFFICIENT_MEMORY := nucleo32-f031 nucleo32-f042 nucleo32-l031 \
+                             nucleo-f334 nucleo-l053 stm32f0discovery weio
 
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_netdev_default

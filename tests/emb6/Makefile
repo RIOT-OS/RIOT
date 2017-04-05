@@ -5,7 +5,8 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_gpio periph_spi  # for at86rf231
 
-BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h nucleo-l053 stm32f0discovery telosb \
+BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h nucleo32-l031 nucleo32-f031 \
+                             nucleo32-f042 nucleo-l053 stm32f0discovery telosb \
                              weio wsn430-v1_3b wsn430-v1_4 z1
 
 USEPKG += emb6
