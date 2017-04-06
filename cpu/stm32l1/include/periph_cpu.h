@@ -49,6 +49,30 @@ typedef struct {
     uint8_t chan;           /**< DAC device used for this line */
 } dac_conf_t;
 
+
+/**
+ * @brief   ADC channel configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the channel */
+    uint8_t chan;           /**< CPU ADC channel connected to the pin */
+} adc_conf_t;
+
+/**
+ * @brief   Override the ADC resolution configuration
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = (0x3 << 3),  /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = (0x2 << 3),  /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = (0x1 << 3),  /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = (0x0 << 3),  /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = (0xfe),      /**< not applicable */
+    ADC_RES_16BIT = (0xff)       /**< not applicable */
+} adc_res_t;
+/** @} */
+
 /**
  * @brief   I2C configuration data structure
  */
