@@ -47,6 +47,17 @@ avr_libc_version() {
     printf "%s (%s)" "$(get_define "$cc" avr/version.h __AVR_LIBC_VERSION_STRING__)" "$(get_define "$cc" avr/version.h __AVR_LIBC_DATE_STRING__)"
 }
 
+cppcheck_version() {
+    local cmd="cppcheck"
+    if command -v "$cmd" 2>&1 >/dev/null; then
+        ver=$("$cmd" --version | head -n 1)
+    else
+        ver="missing"
+    fi
+
+    printf "%s" "$ver"
+}
+
 printf "%s\n" "Installed toolchain versions"
 printf "%s\n" "----------------------------"
 VER=$(gcc --version | head -n 1)
@@ -67,4 +78,5 @@ done
 for p in avr; do
     printf "%20s: %s\n" "$p-libc" "$(avr_libc_version "$p")"
 done
+printf "%20s: %s\n" "cppcheck" "$(cppcheck_version)"
 exit 0
