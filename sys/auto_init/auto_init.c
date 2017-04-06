@@ -323,6 +323,10 @@ void auto_init(void)
     extern void auto_init_adxl345(void);
     auto_init_adxl345();
 #endif
+#ifdef MODULE_LSM6DSL
+    extern void auto_init_lsm6dsl(void);
+    auto_init_lsm6dsl();
+#endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 
