@@ -4,61 +4,122 @@ export BOARD ?= iotlab-m3
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
+
+FIRMWARE ?= gnrc_networking
+
+# Define the parameters for the FW slot 1
+VERSION_IMAGE_1 = 0x1
+UUID_IMAGE_1 = 0xabcd1234
+
+# Define the parameters for the FW slot 1
+VERSION_IMAGE_2 = 0x2
+UUID_IMAGE_2 = 0xabcd1234
+
+
+
+# # # # # # # # # # # # #
+# General configuration #
+# # # # # # # # # # # # #
+
 # Activate FW slots
 FW_SLOTS = 1
 
-FW_METADATA_SPACE = 0x100  # 76 bytes meta-data, 256 byte aligned
+FW_METADATA_SPACE       = 0x100  # 76 bytes meta-data, 256 byte aligned
+FIRMWARE_IMAGE_OFFSET_1 = 0x08004000   # Start at page 8
+FIRMWARE_IMAGE_OFFSET_2 = 0x08040000   # Start at page 128
 
-# Define the parameters for the FW slot 1
-FW_IMAGE1_OFFSET = 0x08004000   # Start at page 8
-FW_IMAGE1_LENGTH = 0x3C000  # Reserve 120 pages
-FW_IMAGE1_END = 0x08040000 # FW_IMAGE_OFFSET + FW_IMAGE_LENGTH
-VERSION_IMG1 = 0x1
-UUID_IMG1 = 0xabcd1234
+# OBJCOPY config (specific for M3 nodes should use
+OBJCOPY ?= arm-none-eabi-objcopy
+OBJCOPYFLAGS  = --output-target elf32-littlearm
+OBJCOPYFLAGS += --binary-architecture=arm
 
-# Define the parameters for the FW slot 1
-FW_IMAGE2_OFFSET = 0x08040000   # Start at page 128
-FW_IMAGE2_LENGTH = 0x3C000  # Reserve 120 pages
-FW_IMAGE1_END = 0x0807C000 # FW_IMAGE_OFFSET + FW_IMAGE_LENGTH
-VERSION_IMG2 = 0x2
-UUID_IMG2 = 0xabcd1234
+# Configured output by root Makefile.include
+# $* will be replaced by the slot number
+FIRMWARE_PATH = ../$(FIRMWARE)
+FIRMWARE_BIN_PATH = $(FIRMWARE_PATH)/bin/$(BOARD)
+FIRMWARE_SLOT_BIN=$(FIRMWARE_BIN_PATH)/slot-image-$(UUID_IMAGE_$*)-$(VERSION_IMAGE_$*).bin
 
-bootloader:
-	@cd ../bootloader; \
-	CFLAGS+=-DFW_METADATA_SPACE=$(FW_METADATA_SPACE) make clean all; \
-	cp bin/$(BOARD)/bootloader.hex ../firmware_swapping
 
-gnrc_networking-slot1:
-	@cd ../gnrc_networking; \
-	CFLAGS="-DFW_SLOT=1 -DVERSION=$(VERSION_IMG1) -DUUID=$(UUID_IMG1) \
-	-DFW_SLOTS=$(FW_SLOTS)" FW_SLOTS=$(FW_SLOTS) \
-	FW_METADATA_SPACE=$(FW_METADATA_SPACE) FW_SLOT=1 \
-	VERSION=$(VERSION_IMG1) UUID=$(UUID_IMG1) \
-	make clean all; \
-	cp bin/$(BOARD)/slot-image-$(UUID_IMG1)-$(VERSION_IMG1).bin ../firmware_swapping
+.PHONY: all generate-metadata bootloader-$(FIRMWARE).elf
 
-gnrc_networking-slot2:
-	@cd ../gnrc_networking; \
-	CFLAGS="-DFW_SLOT=2 -DVERSION=$(VERSION_IMG2) -DUUID=$(UUID_IMG2) \
-	-DFW_SLOTS=$(FW_SLOTS)" FW_SLOTS=$(FW_SLOTS) \
-	FW_METADATA_SPACE=$(FW_METADATA_SPACE) FW_SLOT=2 \
-	VERSION=$(VERSION_IMG2) UUID=$(UUID_IMG2) \
-	make clean all; \
-	cp bin/$(BOARD)/slot-image-$(UUID_IMG2)-$(VERSION_IMG2).bin ../firmware_swapping
+all: bootloader-$(FIRMWARE).elf
 
-merge-binary:
-	srec_cat bootloader.hex -intel -crop 0x08000000 $(FW_IMAGE1_OFFSET) \
-	slot-image-$(UUID_IMG1)-$(VERSION_IMG1).bin -binary -offset $(FW_IMAGE1_OFFSET) \
-	-crop $(FW_IMAGE1_OFFSET) $(FW_IMAGE1_END) \
-	slot-image-$(UUID_IMG2)-$(VERSION_IMG2).bin -binary -offset $(FW_IMAGE2_OFFSET) \
-	-crop $(FW_IMAGE2_OFFSET) $(FW_IMAGE2_END) \
-	-o firmware-slots.hex -intel
+SLOTS = $(FIRMWARE)-slot-1.o $(FIRMWARE)-slot-2.o
 
-master-hex: bootloader gnrc_networking-slot1 gnrc_networking-slot2 merge-binary
-	@true
+bootloader-$(FIRMWARE).elf: $(FIRMWARE)-slot-1.o $(FIRMWARE)-slot-2.o
+	CFLAGS+=-DFW_METADATA_SPACE=$(FW_METADATA_SPACE) \
+	BASELIBS+=" $(CURDIR)/$(FIRMWARE)-slot-1.o"  \
+	BASELIBS+=" $(CURDIR)/$(FIRMWARE)-slot-2.o"  \
+	ELFFILE=$(CURDIR)/$@  \
+	make -C ../bootloader clean all
+
+
+$(SLOTS): $(FIRMWARE)-slot-%.o: generate-metadata
+	CFLAGS="-DFW_SLOT=$*                      \
+			-DVERSION=$(VERSION_IMAGE_$*)     \
+			-DUUID=$(UUID_IMAGE_$*)           \
+			-DFW_SLOTS=$(FW_SLOTS)"           \
+	FW_SLOTS=$(FW_SLOTS) FW_SLOT=$*           \
+	FW_METADATA_SPACE=$(FW_METADATA_SPACE)    \
+	VERSION=$(VERSION_IMAGE_$*) UUID=$(UUID_IMAGE_$*) \
+	make -C $(FIRMWARE_PATH) clean all
+	@
+	$(OBJCOPY) $(OBJCOPYFLAGS)                        \
+		--change-section-vma .data=$(FIRMWARE_IMAGE_OFFSET_$*)\
+		--change-section-lma .data=$(FIRMWARE_IMAGE_OFFSET_$*)\
+		--rename-section .data=.slot.$*.text          \
+		--input-target binary $(FIRMWARE_SLOT_BIN) \
+		$@
+
+
+#
+# Version without using the magic with $* to get slot number
+#
+# FIRMWARE_SLOT_1 = slot-image-$(UUID_IMAGE_1)-$(VERSION_IMAGE_1).bin
+# $(FIRMWARE)-slot-1.o:
+# 	CFLAGS="-DFW_SLOT=1 -DVERSION=$(VERSION_IMAGE_1) -DUUID=$(UUID_IMAGE_1) \
+# 	        -DFW_SLOTS=$(FW_SLOTS)"           \
+# 	FW_SLOTS=$(FW_SLOTS) FW_SLOT=1            \
+# 	FW_METADATA_SPACE=$(FW_METADATA_SPACE)    \
+# 	VERSION=$(VERSION_IMAGE_1) UUID=$(UUID_IMAGE_1) \
+# 	make -C $(FIRMWARE_PATH) clean all
+# 	@
+# 	cp $(FIRMWARE_PATH)/bin/$(BOARD)/$(FIRMWARE_SLOT_1) $(FIRMWARE_SLOT_1)
+# 	@
+# 	$(OBJCOPY) $(OBJCOPYFLAGS)                        \
+# 		--change-section-vma .data=$(FIRMWARE_IMAGE_OFFSET_1)\
+# 		--change-section-lma .data=$(FIRMWARE_IMAGE_OFFSET_1)\
+# 		--rename-section .data=.slot.1.text           \
+# 		--input-target binary $(FIRMWARE_SLOT_1)      \
+# 		$@
+#
+# FIRMWARE_SLOT_2 = slot-image-$(UUID_IMAGE_2)-$(VERSION_IMAGE_2).bin
+# $(FIRMWARE)-slot-2.o:
+# 	CFLAGS="-DFW_SLOT=2 -DVERSION=$(VERSION_IMAGE_2) -DUUID=$(UUID_IMAGE_2) \
+# 	        -DFW_SLOTS=$(FW_SLOTS)"           \
+# 	FW_SLOTS=$(FW_SLOTS) FW_SLOT=2            \
+# 	FW_METADATA_SPACE=$(FW_METADATA_SPACE)    \
+# 	VERSION=$(VERSION_IMAGE_2) UUID=$(UUID_IMAGE_2) \
+# 	make -C $(FIRMWARE_PATH) clean all
+# 	@
+# 	cp $(FIRMWARE_PATH)/bin/$(BOARD)/$(FIRMWARE_SLOT_2) $(FIRMWARE_SLOT_2)
+# 	@
+# 	$(OBJCOPY) $(OBJCOPYFLAGS)                        \
+# 		--change-section-vma .data=$(FIRMWARE_IMAGE_OFFSET_2)\
+# 		--change-section-lma .data=$(FIRMWARE_IMAGE_OFFSET_2)\
+# 		--rename-section .data=.slot.2.text           \
+# 		--input-target binary $(FIRMWARE_SLOT_2)      \
+# 		$@
+
+
+GENERATE_METADA_DIR = ../../dist/tools/firmware_metadata
+generate-metadata: $(GENERATE_METADA_DIR)/bin/generate-metadata
+
+$(GENERATE_METADA_DIR)/bin/generate-metadata:
+	make -C $(GENERATE_METADA_DIR)
 
 clean:
-	@rm *.hex *.bin
+	@rm -f *.hex *.bin *.elf *.o
 
 flash:
 	OPENOCD_CONFIG=../../boards/$(BOARD)/dist/openocd.cfg \
