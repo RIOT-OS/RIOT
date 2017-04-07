@@ -34,8 +34,7 @@ endif
 # Otherwise we get an error about a missing declaration of strnlen in some parts.
 export CFLAGS += -std=gnu99
 export CFLAGS_CPU   = -EL -mabi=$(ABI)
-# Why not -fdata-sections?? /JN
-export CFLAGS_LINK  = -ffunction-sections -fno-builtin -fshort-enums #-fdata-sections
+export CFLAGS_LINK  = -ffunction-sections -fno-builtin -fshort-enums -fdata-sections
 export CFLAGS_DBG   = -g3
 export CFLAGS_OPT   = -Os
 
