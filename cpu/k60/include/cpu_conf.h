@@ -31,9 +31,6 @@ extern "C"
 #include <stdint.h>
 
 #if defined(CPU_MODEL_K60DN512VLL10) || defined(CPU_MODEL_K60DN256VLL10)
-
-/* Rev. 2.x silicon */
-#define K60_CPU_REV 2
 #include "vendor/MK60D10.h"
 
 /** The expected CPUID value, can be used to implement a check that we are
@@ -42,26 +39,9 @@ extern "C"
 
 /* K60 rev 2.x replaced the RNG module in 1.x by the RNGA PRNG module */
 #define KINETIS_RNGA            (RNG)
-
-#elif defined(CPU_MODEL_K60DN512ZVLL10) || defined(CPU_MODEL_K60DN256ZVLL10)
-
-/* Rev. 1.x silicon */
-#define K60_CPU_REV 1
-#include "vendor/MK60DZ10.h"
-
-/** The expected CPUID value, can be used to implement a check that we are
- * running on the right hardware */
-#define K60_EXPECTED_CPUID 0x410fc240u
-
-/* K60 rev 1.x has the cryptographically strong RNGB module */
-#define KINETIS_RNGB            (RNG)
-
 #else
 #error Unknown CPU model. Update Makefile.include in the board directory.
 #endif
-
-/* Compatibility definitions between the two different Freescale headers */
-#include "MK60-comp.h"
 
 /**
  * @brief   ARM Cortex-M specific CPU configuration
@@ -146,20 +126,12 @@ extern "C"
  * @name Power mode hardware details
  */
 /** @{ */
-#if K60_CPU_REV == 1
-#define KINETIS_PMCTRL MC->PMCTRL
-#define KINETIS_PMCTRL_SET_MODE(x) (KINETIS_PMCTRL = MC_PMCTRL_LPLLSM(x) | MC_PMCTRL_LPWUI_MASK)
+#define KINETIS_PMCTRL SMC->PMCTRL
+#define KINETIS_PMCTRL_SET_MODE(x) (KINETIS_PMCTRL = SMC_PMCTRL_STOPM(x) | SMC_PMCTRL_LPWUI_MASK)
 /* Clear LLS protection, clear VLPS, VLPW, VLPR protection */
 /* Note: This register can only be written once after each reset, so we must
  * enable all power modes that we wish to use. */
-#define KINETIS_UNLOCK_PMPROT() (MC->PMPROT |= MC_PMPROT_ALLS_MASK | MC_PMPROT_AVLP_MASK)
-#elif K60_CPU_REV == 2
-#define KINETIS_PMCTRL SMC->PMCTRL
-#define KINETIS_PMCTRL_SET_MODE(x) (KINETIS_PMCTRL = SMC_PMCTRL_STOPM(x) | SMC_PMCTRL_LPWUI_MASK)
 #define KINETIS_PMPROT_UNLOCK() (SMC->PMPROT |= SMC_PMPROT_ALLS_MASK | SMC_PMPROT_AVLP_MASK)
-#else
-#error Unknown K60 CPU revision!
-#endif
 
 /**
  * @name STOP mode bitfield values

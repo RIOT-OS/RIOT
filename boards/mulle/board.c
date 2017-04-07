@@ -191,24 +191,10 @@ static inline void set_fll_source(void)
     /* Select FLL as source (as opposed to PLL) */
     SIM->SOPT2 &= ~(SIM_SOPT2_PLLFLLSEL_MASK);
     /* Use external 32kHz RTC clock as source for OSC32K */
-#if K60_CPU_REV == 1
-    SIM->SOPT1 |= SIM_SOPT1_OSC32KSEL_MASK;
-#elif K60_CPU_REV == 2
     SIM->SOPT1 = (SIM->SOPT1 & ~(SIM_SOPT1_OSC32KSEL_MASK)) | SIM_SOPT1_OSC32KSEL(2);
-#else
-#error Unknown K60 CPU revision
-#endif
 
     /* Select RTC 32kHz clock as reference clock for the FLL */
-#if K60_CPU_REV == 1
-    /* Rev 1 parts */
-    SIM->SOPT2 |= SIM_SOPT2_MCGCLKSEL_MASK;
-#elif K60_CPU_REV == 2
-    /* Rev 2 parts */
     MCG->C7 = (MCG_C7_OSCSEL_MASK);
-#else
-#error Unknown K60 CPU revision
-#endif
 }
 
 static int mulle_nvram_init(void)
