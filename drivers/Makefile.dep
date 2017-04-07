@@ -167,6 +167,7 @@ ifneq (,$(filter mpu9150,$(USEMODULE)))
     USEMODULE += xtimer
 endif
 
+
 ifneq (,$(filter mtd_sdcard,$(USEMODULE)))
     USEMODULE += mtd
     USEMODULE += sdcard_spi
@@ -179,6 +180,13 @@ endif
 ifneq (,$(filter my9221,$(USEMODULE)))
     FEATURES_REQUIRED += periph_gpio
     USEMODULE += xtimer
+endif
+
+ifneq (,$(filter nrf802154,$(USEMODULE)))
+  FEATURES_REQUIRED += radio_nrf802154
+  USEMODULE += netif
+  USEMODULE += luid
+  USEMODULE += netdev_ieee802154
 endif
 
 ifneq (,$(filter nrfmin,$(USEMODULE)))

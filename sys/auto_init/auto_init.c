@@ -236,6 +236,11 @@ void auto_init(void)
     auto_init_w5100();
 #endif
 
+#ifdef MODULE_NRF802154
+    extern void auto_init_nrf802154(void);
+    auto_init_nrf802154();
+#endif
+
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
 #ifdef MODULE_GNRC_IPV6_NETIF

@@ -37,8 +37,8 @@ static int _get_iid(netdev_ieee802154_t *dev, eui64_t *value, size_t max_len)
 
     if (dev->flags & NETDEV_IEEE802154_SRC_MODE_LONG) {
         addr_len = IEEE802154_LONG_ADDRESS_LEN;
-        addr = dev->long_addr;
-    }
+        addr = dev->long_addr
+;    }
     else {
         addr_len = IEEE802154_SHORT_ADDRESS_LEN;
         addr = dev->short_addr;
@@ -228,6 +228,32 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
             break;
     }
     return res;
+}
+
+int netdev_ieee802154_dst_filter(netdev_ieee802154_t *dev, const uint8_t *mhr)
+{
+    uint8_t dst_addr[IEEE802154_LONG_ADDRESS_LEN];
+    le_uint16_t dst_pan;
+    uint8_t pan_bcast[] = IEEE802154_PANID_BCAST;
+
+    int addr_len = ieee802154_get_dst(mhr, dst_addr, &dst_pan);
+
+    /* filter PAN ID */
+    if ((memcmp(pan_bcast, dst_pan.u8, 2) != 0) &&
+        (memcmp(&dev->pan, dst_pan.u8, 2) != 0)) {
+        return 0;
+    }
+
+    /* check destination address */
+    if (((addr_len == IEEE802154_SHORT_ADDRESS_LEN) &&
+          (memcmp(dev->short_addr, dst_addr, addr_len) == 0 ||
+           memcmp(ieee802154_addr_bcast, dst_addr, addr_len) == 0)) ||
+        ((addr_len == IEEE802154_LONG_ADDRESS_LEN) &&
+          (memcmp(dev->long_addr, dst_addr, addr_len) == 0))) {
+        return 1;
+    }
+
+    return 0;
 }
 
 /** @} */
