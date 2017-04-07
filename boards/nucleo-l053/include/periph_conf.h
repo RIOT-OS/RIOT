@@ -164,7 +164,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  * @{
  */
 #define ADC_NUMOF           (0)
@@ -172,7 +172,7 @@ static const spi_conf_t spi_config[] = {
 
 
 /**
- * @brief   DAC configuration
+ * @name   DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)

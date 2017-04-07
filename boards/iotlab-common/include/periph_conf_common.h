@@ -116,7 +116,7 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief   DAC configuration
+ * @name   DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)
