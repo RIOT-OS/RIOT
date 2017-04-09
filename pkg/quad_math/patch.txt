@@ -1,0 +1,73 @@
+diff -crBN quad.h quad.h
+*** quad.h
+--- quad.h
+***************
+*** 50,61 ****
+   */
+  
+  #include <sys/types.h>
+- #if !defined(_KERNEL) && !defined(_STANDALONE)
+  #include <limits.h>
+  #else
+! #include <sys/limits.h>
+  #endif
+  
+  /*
+   * Depending on the desired operation, we view a `long long' (aka quad_t) in
+   * one or more of the following formats.
+--- 50,75 ----
+   */
+  
+  #include <sys/types.h>
+  #include <limits.h>
++ 
++ #include <machine/endian.h>
++ typedef long long quad_t;
++ typedef unsigned long long u_quad_t;
++ 
++ #if BYTE_ORDER == LITTLE_ENDIAN
++ #	define _QUAD_LOWWORD (1)
++ #	define _QUAD_HIGHWORD (0)
++ #elif BYTE_ORDER == BIG_ENDIAN
++ #	define _QUAD_LOWWORD (0)
++ #	define _QUAD_HIGHWORD (1)
+  #else
+! #	error "BYTE_ORDER must be either LITTLE_ENDIAN or BIG_ENDIAN!"
+  #endif
+  
++ #define QUAD_MIN (LLONG_MIN)
++ #define QUAD_MAX (LLONG_MAX)
++ #define UQUAD_MAX (ULLONG_MAX)
++ 
+  /*
+   * Depending on the desired operation, we view a `long long' (aka quad_t) in
+   * one or more of the following formats.
+diff -crB qdivrem.c qdivrem.c
+*** qdivrem.c
+--- qdivrem.c
+***************
+*** 51,57 ****
+  typedef u_int digit;
+  #endif
+  
+! static void shl __P((digit *p, int len, int sh));
+  
+  /*
+   * __qdivrem(u, v, rem) returns u/v and, optionally, sets *rem to u%v.
+--- 51,57 ----
+  typedef u_int digit;
+  #endif
+  
+! static void shl(digit *p, int len, int sh);
+  
+  /*
+   * __qdivrem(u, v, rem) returns u/v and, optionally, sets *rem to u%v.
+diff -crBN Makefile Makefile
+*** Makefile
+--- Makefile
+***************
+*** 0 ****
+--- 1,3 ----
++ MODULE = quad_math
++ 
++ include $(RIOTBASE)/Makefile.base
