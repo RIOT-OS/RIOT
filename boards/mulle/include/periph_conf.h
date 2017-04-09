@@ -96,49 +96,29 @@ extern "C"
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (2U)
-#define UART_0_EN           1
-#define UART_1_EN           1
-#define UART_2_EN           0
-#define UART_3_EN           0
-#define UART_4_EN           0
-#define UART_IRQ_PRIO       CPU_DEFAULT_IRQ_PRIO
-
-/* UART 0 device configuration */
-#define UART_0_DEV          UART1
-#define UART_0_CLKEN()      (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT) = 1)
-#define UART_0_CLKDIS()     (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT) = 0)
-#define UART_0_CLK          (CLOCK_CORECLOCK)
-#define UART_0_IRQ_CHAN     UART1_RX_TX_IRQn
-#define UART_0_ISR          isr_uart1_status
-/* UART 0 pin configuration */
-#define UART_0_PORT_CLKEN() (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTC_SHIFT) = 1)
-#define UART_0_PORT         PORTC
-#define UART_0_TX_PIN       4
-#define UART_0_RX_PIN       3
-/* Function number in pin multiplex, see K60 Sub-Family Reference Manual,
- * section 10.3.1 K60 Signal Multiplexing and Pin Assignments */
-#define UART_0_AF           3
-#define UART_0_TX_PCR_MUX   3
-#define UART_0_RX_PCR_MUX   3
-
-/* UART 1 device configuration */
-#define UART_1_DEV          UART0
-#define UART_1_CLKEN()      (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT) = 1)
-#define UART_1_CLKDIS()     (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT) = 0)
-#define UART_1_CLK          (CLOCK_CORECLOCK)
-#define UART_1_IRQ_CHAN     UART0_RX_TX_IRQn
-#define UART_1_ISR          isr_uart0_status
-/* UART 1 pin configuration */
-#define UART_1_PORT_CLKEN() (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTA_SHIFT) = 1)
-#define UART_1_PORT         PORTA
-#define UART_1_TX_PIN       14
-#define UART_1_RX_PIN       15
-/* Function number in pin multiplex, see K60 Sub-Family Reference Manual,
- * section 10.3.1 K60 Signal Multiplexing and Pin Assignments */
-#define UART_1_AF           3
-#define UART_1_TX_PCR_MUX   3
-#define UART_1_RX_PCR_MUX   3
+static const uart_conf_t uart_config[] = {
+    {
+        .dev    = UART0,
+        .clken  = (volatile uint32_t*)(BITBAND_REGADDR(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT)),
+        .freq   = CLOCK_CORECLOCK,
+        .pin_rx = GPIO_PIN(PORT_A, 14),
+        .pin_tx = GPIO_PIN(PORT_A, 15),
+        .pcr_rx = PORT_PCR_MUX(3),
+        .pcr_tx = PORT_PCR_MUX(3),
+        .irqn   = UART0_RX_TX_IRQn,
+    },
+    {
+        .dev    = UART1,
+        .clken  = (volatile uint32_t*)(BITBAND_REGADDR(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT)),
+        .freq   = CLOCK_CORECLOCK,
+        .pin_rx = GPIO_PIN(PORT_C, 3),
+        .pin_tx = GPIO_PIN(PORT_C, 4),
+        .pcr_rx = PORT_PCR_MUX(3),
+        .pcr_tx = PORT_PCR_MUX(3),
+        .irqn   = UART1_RX_TX_IRQn,
+    },
+};
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 
 /** @} */
 

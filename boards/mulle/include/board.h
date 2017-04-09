@@ -35,6 +35,11 @@
 #define DISABLE_WDOG    1
 
 /**
+ * @brief Use the UART1 for STDIO on this board
+ */
+#define UART_STDIO_DEV      UART_DEV(1)
+
+/**
  * @brief   xtimer configuration
  * @{
  */
