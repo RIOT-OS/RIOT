@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     boards_arduino-mkrzero
+ * @ingroup     boards_arduino-mkr-common
  *
  * @file
- * @brief       Board specific implementations for the Arduino MKRZERO board
+ * @brief       Board common implementations for the Arduino MKR boards
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
@@ -25,6 +25,6 @@ void board_init(void)
 {
     /* initialize the CPU */
     cpu_init();
-    /* initialize the on-board Amber "L" LED on pin PA17 */
+    /* initialize the on-board Amber "L" LED */
     gpio_init(LED0_PIN, GPIO_OUT);
 }

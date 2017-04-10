@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup   boards_arduino-mkrzero
+ * @ingroup   boards_arduino-mkr-common
  * @{
  *
  * @file
@@ -32,7 +32,7 @@ extern "C" {
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
     {
-        .name = "LED(orange)",
+        .name = "LED(Green)",
         .pin = LED0_PIN,
         .mode = GPIO_OUT
     },

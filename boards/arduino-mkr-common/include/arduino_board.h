@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_arduino-mkzero
+ * @ingroup     boards_arduino-mkr-common
  * @{
  *
  * @file
@@ -19,16 +19,12 @@
 #ifndef ARDUINO_BOARD_H
 #define ARDUINO_BOARD_H
 
+#include "board.h"
 #include "arduino_pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   The on-board LED is connected to pin 6 on this board
- */
-#define ARDUINO_LED         (6)
 
 /**
  * @brief   Look-up table for the Arduino's digital pins

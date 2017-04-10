@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_arduino-mkrzero
+ * @ingroup     boards_arduino-mkr-common
  * @{
  *
  * @file
@@ -38,7 +38,7 @@ extern "C" {
 #define ARDUINO_PIN_3           GPIO_PIN(PA, 11)
 #define ARDUINO_PIN_4           GPIO_PIN(PB, 10)
 #define ARDUINO_PIN_5           GPIO_PIN(PB, 11)
-#define ARDUINO_PIN_6           GPIO_PIN(PA, 20) /* on-board LED */
+#define ARDUINO_PIN_6           GPIO_PIN(PA, 20) /* on-board LED for MKR1000*/
 #define ARDUINO_PIN_7           GPIO_PIN(PA, 21)
 
 #define ARDUINO_PIN_A0          GPIO_PIN(PA, 2)
