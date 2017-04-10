@@ -135,6 +135,12 @@ static const ac_conf_t ac_config[] = {
 };
 
 /**
+ * since current Analog comparator ISR is to slow, we'll hardcode it into the module
+ * and use the define to not include the line if the capacity_module isn't used
+ */
+#define USES_CAPACITY_MODULE
+
+/**
  * @brief   UART configuration
  *
  * The UART devices have fixed pin mappings, so all we need to do, is to specify

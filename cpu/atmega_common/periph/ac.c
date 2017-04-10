@@ -118,14 +118,14 @@ static inline void _isr(ac_t dev)
 
     __exit_isr();
 }
-#endif
 
-#ifdef AC_0
 ISR(ANALOG_COMP_vect, ISR_BLOCK)
 {
-	//_isr(AC_0);
-	//ctx[0].cb(ctx[0].arg, 0);
-	PORTF ^= (1<<PF0);
+	#ifdef USES_CAPACITY_MODULE
+		PORTF ^= (1<<PF0);
+	#else
+		_isr(AC_0);
+	#endif
 }
 #endif
 

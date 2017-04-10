@@ -24,8 +24,6 @@
 
 #define ENABLE_DEBUG	(1)
 
-#define F_CPU	16000000
-
 #include "capacity.h"
 #include "capacity_settings.h"
 #include "periph_conf.h"
@@ -36,18 +34,22 @@
 #include <avr/interrupt.h>
 #include <stdio.h>
 
-#include <util/delay.h>
-
 volatile uint16_t my_saved_values[10];
 volatile uint8_t count;
 volatile uint8_t global_cycle;
 
+typedef struct{
+	tim_t timer_dev;
+	uint8_t ac_dev;
+}capacity_config;
+
+capacity_config config;
+
 
 void __comparator_hit(void* arg, uint8_t dev) {
-	//if(dev == MY_AC)
+	if(dev == MY_AC)
 		//gpio_toggle(capacity_conf.result_pin);
-		//DEBUG("#");
-	PORTF ^= (1<<PF0);
+		PORTF ^= (1<<PF0);
 }
 
 int __input_capture_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
@@ -72,7 +74,6 @@ int __input_capture_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg
 			#ifdef TIMER_2
 					my_timer = TIMER_2;
 					*TIMER_2_MASK |= (1<<ICIE1);
-					TCCR1B |= (1<<ICES1);
 			#endif
 			break;
 	case TIMER_DEV(3):
@@ -91,6 +92,8 @@ int __input_capture_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg
 
 void capacity_init(uint8_t timer_dev, uint8_t ac_dev)
 {
+	config.timer_dev = timer_dev;
+	config.ac_dev = ac_dev;
 	/* Set Data direction */
 	gpio_init(capacity_conf.result_pin, GPIO_OUT);
 	gpio_init(capacity_conf.pxy_pin, GPIO_OUT);
@@ -102,7 +105,7 @@ void capacity_init(uint8_t timer_dev, uint8_t ac_dev)
 	__input_capture_init(timer_dev, CLOCK_CORECLOCK, NULL, NULL);
 }
 
-uint8_t start_measuring(uint8_t timer_dev, uint8_t ac_dev, uint8_t cycle, capacity_result_t *my_result)
+uint8_t start_measuring(uint8_t cycle, capacity_result_t *my_result)
 {
 	//my_saved_values = (uint16_t*) malloc(sizeof(uint16_t)*cycle);
 	count=0;
@@ -112,12 +115,13 @@ uint8_t start_measuring(uint8_t timer_dev, uint8_t ac_dev, uint8_t cycle, capaci
 	gpio_set(capacity_conf.pxy_pin);
 
 	DEBUG("starting measurement \n");
-	timer_start(timer_dev);
-	ac_poweron(ac_dev);
+	timer_start(config.timer_dev);
+	ac_poweron(config.ac_dev);
 	gpio_set(capacity_conf.result_pin);
 	while(count<global_cycle);
-	//_delay_ms(500);
 	DEBUG("measurement done\n");
+	ac_poweroff(config.ac_dev);
+	timer_stop(config.timer_dev);
 	uint32_t average=0;
 	for(uint8_t i=1; i<global_cycle; i++){
 		average += my_saved_values[i]-my_saved_values[i-1];
@@ -134,13 +138,11 @@ uint8_t start_measuring(uint8_t timer_dev, uint8_t ac_dev, uint8_t cycle, capaci
 ISR(TIMER1_CAPT_vect)
 {
 	if(count >=global_cycle) {
-			//cli();
 			ACSR |=(1<<ACD);
-			//TCCR1B &= ~((1<<CS12)|(1<<CS11)|(1<<CS10)); //set clock
+			//ac_poweroff(config.ac_dev);
+			//timer_stop(config.timer_dev);
 	}
 	my_saved_values[count] = ICR1L;
 	my_saved_values[count] |= ((uint16_t)ICR1H<<8);
 	count++;
-
-		//TCCR1B &= ~((1<<CS12)|(1<<CS11)|(1<<CS10)); //set clock
 }

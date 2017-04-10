@@ -40,10 +40,12 @@ void accb(void* arg, uint8_t dev) {
 
 int main(void)
 {
-capacity_init(TIMER_DEV(2), AC_0);
+	capacity_init(TIMER_DEV(2), AC_0);
 	capacity_result_t my_result;
-	start_measuring(TIMER_DEV(2), AC_0, 10, &my_result);
-	printf("Timestamp %u", my_result.timestamp);
+	start_measuring(10, &my_result);
+	printf("Timestamp %u \n", my_result.timestamp);
+	printf("Frequency %u \n", my_result.frequency);
+	printf("Capacity %.6f \n", my_result.capacity*1000000000000);
 
 }
 	//PRR0 |=(1<<PRADC); //power on analog comperator
