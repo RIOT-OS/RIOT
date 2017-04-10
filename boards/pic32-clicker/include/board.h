@@ -25,8 +25,8 @@
  * @author      Neil Jones <Neil.Jones@imgtec.com>
  */
 
-#ifndef _BOARD_H_
-#define _BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,13 +35,13 @@ extern "C" {
 #include "vendor/p32mx470f512h.h"
 
 /**
- * @brief Set how many increments of the count register per uS
- *        needed by the timer code.
+ * @brief   Set how many increments of the count register per uS
+ *          needed by the timer code.
  */
 #define TICKS_PER_US (48)
 
 /**
- * @brief We are using an External Interrupt Controller (all pic32 devices use this mode)
+ * @brief   We are using an External Interrupt Controller (all pic32 devices use this mode)
  */
 #define EIC_IRQ (1)
 
@@ -55,5 +55,5 @@ void board_init(void);
 #endif
 
 
-#endif /* _BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

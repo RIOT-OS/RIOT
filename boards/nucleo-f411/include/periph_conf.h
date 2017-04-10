@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @name Clock system configuration
+ * @name    Clock system configuration
  * @{
  */
 #define CLOCK_HSE           (8000000U)          /* external oscillator */
@@ -49,7 +49,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name Timer configuration
+ * @name    Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -69,7 +69,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name    UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -129,7 +129,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
-/** @brief   PWM configuration
+/** @name    PWM configuration
  * @{
  */
 static const pwm_conf_t pwm_config[] = {
@@ -159,7 +159,7 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
- * @brief   SPI configuration
+ * @name    SPI configuration
  *
  * @note    The spi_divtable is auto-generated from
  *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
@@ -199,7 +199,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name I2C configuration
+ * @name    I2C configuration
  * @{
  */
 #define I2C_NUMOF           (1U)
@@ -227,14 +227,14 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name   ADC configuration
+ * @name    ADC configuration
  * @{
  */
 #define ADC_NUMOF          (0)
 /** @} */
 
 /**
- * @name   DAC configuration
+ * @name    DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)

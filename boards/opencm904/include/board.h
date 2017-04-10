@@ -67,7 +67,7 @@ extern "C" {
 #define UART_STDIO_DEV      UART_DEV(0)
 
 /**
- * @brief Override with ROBOTIS Bluetooth antenna baudrate for STDIO
+ * @name Override with ROBOTIS Bluetooth antenna baudrate for STDIO
  * @{
  */
 #ifndef UART_STDIO_BAUDRATE

@@ -31,7 +31,7 @@
 #endif
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED0_PIN            GPIO_PIN(3, 2)
@@ -56,14 +56,16 @@
 /** @} */
 
 /**
- * @name User button pin definition
+ * @name    User button pin definition
  * @{
  */
 #define BTN0_PIN            GPIO_PIN(0, 3)
 /** @} */
 
 /**
- * @name 2.4GHz RF switch controlled by SW
+ * @name    Radio configuration
+ *
+ * 2.4GHz RF switch controlled by SW
  * @{
  */
 #define RF_SWITCH_PORT      GPIO_D
@@ -74,7 +76,7 @@
 /** @} */
 
 /**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
 

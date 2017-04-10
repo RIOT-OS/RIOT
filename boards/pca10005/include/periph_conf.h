@@ -44,7 +44,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name Timer configuration
+ * @name    Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -58,7 +58,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @name UART configuration
+ * @name    UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)
@@ -78,7 +78,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @name SPI configuration
+ * @name    SPI configuration
  * @{
  */
 static const spi_conf_t spi_config[] = {
@@ -100,7 +100,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name   ADC configuration
+ * @name    ADC configuration
  *
  * The configuration consists simply of a list of channels that should be used
  * @{
@@ -110,7 +110,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name Radio device configuration
+ * @name    Radio device configuration
  *
  * The radio is not guarded by a NUMOF define, as the radio is selected by its
  * own module in the build system.
