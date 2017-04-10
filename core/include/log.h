@@ -85,7 +85,7 @@ enum {
 #endif /* __clang__ */
 
 /**
- * @brief logging convenience defines
+ * @name Logging convenience defines
  * @{
  */
 #define LOG_ERROR(...) LOG(LOG_ERROR, __VA_ARGS__)
