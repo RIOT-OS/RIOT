@@ -58,6 +58,16 @@ static const mag3110_params_t mag3110_params[] =
     MAG3110_PARAMS
 };
 
+/**
+ * @brief   Additional meta information to keep in the SAUL registry
+ */
+static const saul_reg_info_t mag3110_saul_info[] =
+{
+    {
+        .name = "mag3110"
+    }
+};
+
 #ifdef __cplusplus
 }
 #endif
