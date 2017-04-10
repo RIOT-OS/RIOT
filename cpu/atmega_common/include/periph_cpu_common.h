@@ -90,17 +90,6 @@ typedef enum {
 } spi_clk_t;
 /** @} */
 
-/**
- * @brief setup analog comparator setting struct
- */
-typedef struct {
-	REG8 *acsr;
-	REG8 *adcsrb;
-	gpio_t in1;
-	gpio_t in2;
-}ac_conf_t;
-
-
 #ifdef __cplusplus
 }
 #endif
