@@ -12,7 +12,7 @@
   *
   * @file
   * @brief Newlib system call implementation for use with the mips-mti-elf
-  * toolchain newlib incoporating as sem-hosting interface caled 'UHI'
+  * toolchain newlib incorporating as semi-hosting interface called 'UHI'
   *
   * @author Neil Jones <neil.jones@imgtec.com>
   *
@@ -49,7 +49,7 @@ char *heap_top = &_sheap + 4;
 /**
  * @brief Free resources on NewLib de-initialization, not used for RIOT
  */
- 
+
 /* __attribute__((used)) fixes linker errors when building with LTO, but without nano.specs */
 __attribute__((used)) void _fini(void)
 {
@@ -69,7 +69,6 @@ void _exit(int n)
 {
     exit(n);
     pm_off();
-    while(1);
 }
 
 /**

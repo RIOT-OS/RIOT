@@ -4,7 +4,6 @@ export APP_START=0x80000000
 
 include $(RIOTMAKE)/arch/mips.inc.mk
 
-export LINKFLAGS += -Tuhi32.ld
 export USEMODULE += periph
 export USEMODULE += newlib
 
