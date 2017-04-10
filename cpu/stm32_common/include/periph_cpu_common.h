@@ -296,7 +296,7 @@ void gpio_init_analog(gpio_t pin);
  * @{
  */
 #define HAVE_DMA_T
-typedef unsigned int dma_t;
+typedef uint8_t dma_t;
 /** @} */
 
 /**
@@ -319,26 +319,13 @@ typedef enum {
  */
 static inline void dma_end_isr(dma_t dma);
 
-/**
- * @brief   Get DMA base register
- *
- * For simplifying DMA channel handling, we map the DMA channels/streams
- * transparently to one integer number. For the families using streams DMA1
- * stream0 equals 0, DMA2 stream0 equals 8, DMA2 stream 7 equals 15 and so on.
- * For the families using channels DMA1 channel1 equals 0, DMA2 channel1
- * equals 7, DMA2 channel7 equals 14 and so on.
- *
- * @param[in] dma    DMA unit
- */
-static inline DMA_TypeDef *dma_base(dma_t dma);
-
 /* There are two flavors of DMA on the stm32 platforms. One uses single
  * channels and the oder uses streams (and each stream can have up to 8
  * channels). Depending on the family we include one or the other flavor. */
 #if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
-#include "stm32_dma_stream.h"
+#include "dma_stream.h"
 #else
-#include "stm32_dma_channel.h"
+#include "dma_channel.h"
 #endif /* defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) */
 
 #ifdef __cplusplus

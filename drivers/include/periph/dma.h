@@ -53,7 +53,6 @@ typedef enum {
 #define DMA_UNIT(unit)       ((dma_t)(unit))
 #endif
 
-#ifndef HAVE_DMA_TRANSFER
 /**
  * @brief  Start a DMA transfer
  *
@@ -71,18 +70,14 @@ typedef enum {
  */
 void dma_transfer(dma_t dma, dma_mode_t mode, void *src, void *dst,
         unsigned len);
-#endif /* HAVE_DMA_TRANSFER */
 
-#ifndef HAVE_DMA_POWERON
 /**
  * @brief  Power on a DMA unit
  *
  * @param[in] dma  DMA unit to power on
  */
 void dma_poweron(dma_t dma);
-#endif /* HAVE_DMA_POWERON */
 
-#ifndef HAVE_DMA_POWEROFF
 /**
  * @brief  Power off a DMA unit
  *
@@ -92,16 +87,13 @@ void dma_poweron(dma_t dma);
  * @param[in] dma  DMA unit to power off
  */
 void dma_poweroff(dma_t dma);
-#endif /* HAVE_DMA_POWEROFF */
 
-#ifndef HAVE_DMA_ISR_ENABLE
 /**
  * @brief  Enable the ISR for a DMA unit
  *
  * @param[in] dma  DMA unit
  */
 void dma_isr_enable(dma_t dma);
-#endif /* HAVE_DMA_ISR_ENABLE */
 
 #ifdef __cplusplus
 }

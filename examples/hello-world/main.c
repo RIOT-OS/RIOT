@@ -47,7 +47,7 @@ int main(void)
         dma_transfer(dma, MEMORY_TO_MEMORY, buff, buff3, sizeof(buff));
         mutex_lock(&m);
         printf("%s\n", buff3);
-        dma_transfer(dma, MEMORY_TO_MEMORY, buff2, buff3, sizeof(buff));
+        dma_transfer(dma, MEMORY_TO_MEMORY, buff2, buff3, sizeof(buff2));
         mutex_lock(&m);
         printf("%s\n\n", buff3);
         xtimer_usleep(1000000);
