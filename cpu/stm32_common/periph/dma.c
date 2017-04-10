@@ -26,7 +26,7 @@
 #include "cpu.h"
 #include "periph/dma.h"
 
-#if defined(DMA_STREAM) || defined(CPU_FAM_STM32L4)
+#if defined(STM32_DMA_STREAM) || defined(CPU_FAM_STM32L4)
 #define DMA_BUS AHB1
 #define DMA1_MASK RCC_AHB1ENR_DMA1EN
 #define DMA2_MASK RCC_AHB1ENR_DMA2EN
@@ -36,7 +36,7 @@
 #define DMA2_MASK RCC_AHBENR_DMA2EN
 #endif
 
-#if DMA_STREAM
+#ifdef STM32_DMA_STREAM
 #define DMA1_UNITS 8
 #define DMA2_UNITS 12
 #define DMA1_IRQn_TYPE DMA1_Stream0_IRQn
@@ -87,12 +87,12 @@ void dma_isr_enable(dma_t dma)
     else if(unit < 5) {
         unit = 2; /* shared ISR for 4 and 5 */
     }
-#if defined(CPU_FAM_STM32L0)
+#ifdef CPU_FAM_STM32L0
     else if (unit < 7) {
         /* shared ISR for 5 to 7 */
         unit = 2;
     }
-#endif /* defined(CPU_FAM_STM32L0) */
+#endif /* CPU_FAM_STM32L0 */
     else {
         /* channel out of range */
         return;
@@ -102,11 +102,11 @@ void dma_isr_enable(dma_t dma)
     if (unit < 7) {
         NVIC_EnableIRQ((IRQn_Type)((int)DMA1_IRQn_TYPE + unit));
     }
-#if DMA_STREAM
+#ifdef STM32_DMA_STREAM
     else if (unit == 7) {
         NVIC_EnableIRQ(DMA1_Stream7_IRQn);
     }
-#endif /* DMA_STREAM */
+#endif /* STM32_DMA_STREAM */
 #ifdef DMA2
     else if (unit < DMA2_UNITS) {
 #ifdef CPU_FAM_STM32F1
@@ -116,15 +116,15 @@ void dma_isr_enable(dma_t dma)
 #endif /* CPU_FAM_STM32F1 */
         NVIC_EnableIRQ((IRQn_Type)((int)DMA2_IRQn_TYPE + (unit - DMA1_UNITS)));
     }
-#if DMA_STREAM
+#ifdef STM32_DMA_STREAM
     else if (unit < 16) {
         NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (unit - 13)));
     }
-#endif /* DMA_STREAM */
+#endif /* STM32_DMA_STREAM */
 #endif /* DMA2 */
 }
 
-#ifdef DMA_STREAM
+#ifdef STM32_DMA_STREAM
 
 void dma_transfer(dma_t dma, dma_mode_t mode,
         void *src, void *dst, unsigned len)
@@ -177,4 +177,4 @@ void dma_transfer(dma_t dma, dma_mode_t mode,
     channel->CCR |= DMA_CCR_EN;
 }
 
-#endif /* DMA_STREAM */
+#endif /* STM32_DMA_STREAM */
