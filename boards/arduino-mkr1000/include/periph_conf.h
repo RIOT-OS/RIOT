@@ -28,6 +28,7 @@
 
 #include "cpu.h"
 #include "periph_cpu.h"
+#include "periph_conf_common.h"
 
 #ifdef __cplusplus
 extern "C" {
