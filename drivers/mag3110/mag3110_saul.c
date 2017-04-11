@@ -24,7 +24,7 @@
 #include "saul.h"
 #include "mag3110.h"
 
-static int read_acc(void *dev, phydat_t *res)
+static int read_mag(void *dev, phydat_t *res)
 {
     mag3110_read((mag3110_t *)dev, (mag3110_data_t *)res);
 
@@ -35,7 +35,7 @@ static int read_acc(void *dev, phydat_t *res)
 }
 
 const saul_driver_t mag3110_saul_driver = {
-    .read = read_acc,
+    .read = read_mag,
     .write = saul_notsup,
     .type = SAUL_SENSE_MAG,
 };
