@@ -32,16 +32,42 @@
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_netdev.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #ifdef MODULE_AT86RFR2
 
 /*TODO port all functions from at86rf2xx_netdev.c _isr() */
 
+/* All Interrupts are liste here to test them.*/
+
+/*TODO Remove not needed interupt vector routines */
+
 	#include "avr/interrupt.h"
 	// saved device Pointer for Interrupt callback
-	static at86rf2xx_t* static_dev;
+	static netdev_t* static_dev;
+
+	/**
+	 * \brief ISR for transceiver's transmit end interrupt
+	 */
+	ISR(TRX24_PLL_LOCK_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TRX24_PLL_LOCK_vect\n");
+		LED_PORT &= ~GREEN;
+		__exit_isr();
+	}
+
+	/**
+	 * \brief ISR for transceiver's transmit end interrupt
+	 */
+	ISR(TRX24_PLL_UNLOCK_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TRX24_PLL_UNLOCK_vect\n");
+		LED_PORT |= GREEN;
+		__exit_isr();
+	}
 
 	/**
 	 * \brief ISR for transceiver's rx start interrupt
@@ -53,7 +79,7 @@
 	{
 		__enter_isr();
 		LED_PORT &= ~GREEN;
-		((netdev_t*)static_dev)->event_callback((netdev_t *)static_dev, NETDEV_EVENT_RX_STARTED);
+		static_dev->event_callback(static_dev, NETDEV_EVENT_RX_STARTED);
 		__exit_isr();
 	}
 
@@ -63,19 +89,21 @@
 	ISR(TRX24_RX_END_vect, ISR_BLOCK)
 	{
 		__enter_isr();
-		((netdev_t*)static_dev)->event_callback((netdev_t *)static_dev, NETDEV_EVENT_RX_COMPLETE);
+		static_dev->event_callback(static_dev,NETDEV_EVENT_RX_COMPLETE);
 	    LED_PORT |= GREEN;
 		__exit_isr();
 	}
 
-	/**
-	 * \brief ISR for transceiver's TX_START interrupt
-	 */
-	ISR(TRX24_TX_START_vect)
+	ISR(TRX24_CCA_ED_DONE_vect, ISR_BLOCK)
 	{
 		__enter_isr();
-		LED_PORT &= ~RED;
-		((netdev_t*)static_dev)->event_callback((netdev_t *)static_dev, NETDEV_EVENT_TX_STARTED);
+		DEBUG("TRX24_CCA_ED_DONE \n");
+		__exit_isr();
+	}
+	ISR(TRX24_XAH_AMI_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TRX24_XAH_AMI  \n");
 		__exit_isr();
 	}
 
@@ -85,41 +113,103 @@
 	ISR(TRX24_TX_END_vect, ISR_BLOCK)
 	{
 		__enter_isr();
-		((netdev_t*)static_dev)->event_callback((netdev_t *)static_dev, NETDEV_EVENT_TX_COMPLETE);
+		// DEBUG("TRX24_TX_END_vect\n");
+		static_dev->event_callback(static_dev, NETDEV_EVENT_TX_COMPLETE);
 		LED_PORT |= RED;
 		__exit_isr();
 
 		/* set transceiver back to receiving state*/
-		at86rf2xx_set_state(static_dev, AT86RF2XX_TRX_STATE__RX_AACK_ON);
+		at86rf2xx_set_state((at86rf2xx_t*)static_dev, AT86RF2XX_TRX_STATE__RX_AACK_ON);
 	}
 
-	// TODO use or remove the following ISR's
-	/**
-	 * \brief ISR for transceiver's transmit end interrupt
-	 */
-	ISR(TRX24_PLL_LOCK_vect, ISR_BLOCK)
-	{
-		__enter_isr();
-		LED_PORT &= ~GREEN;
-		__exit_isr();
-	}
-
-	/**
-	 * \brief ISR for transceiver's transmit end interrupt
-	 */
-	ISR(TRX24_PLL_UNLOCK_vect, ISR_BLOCK)
-	{
-		__enter_isr();
-		LED_PORT |= GREEN;
-		__exit_isr();
-	}
 	/**
 	 * \brief ISR for transceiver's transmit end interrupt
 	 */
 	ISR(TRX24_AWAKE_vect, ISR_BLOCK)
 	{
 		__enter_isr();
+		DEBUG("TRX24_AWAKE_vect\n");
 		LED_PORT |= RED;
+		__exit_isr();
+	}
+
+	ISR(SCNT_CMP1_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("SCNT_CMP1   \n");
+		__exit_isr();
+	}
+	ISR(SCNT_CMP2_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("SCNT_CMP 2 \n");
+		__exit_isr();
+	}
+	ISR(SCNT_CMP3_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("SCNT_CMP3   \n");
+		__exit_isr();
+	}
+	ISR(SCNT_OVFL_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("SCNT_OVFL \n");
+		__exit_isr();
+	}
+	ISR(SCNT_BACKOFF_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("SCNT_BACKOFF\n");
+		__exit_isr();
+	}
+	ISR(AES_READY_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("AES_READY \n");
+		__exit_isr();
+	}
+	ISR(BAT_LOW_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("BAT_LOW \n");
+		__exit_isr();
+	}
+
+	/**
+	 * \brief ISR for transceiver's TX_START interrupt
+	 */
+	ISR(TRX24_TX_START_vect)
+	{
+		__enter_isr();
+		// DEBUG("TRX24_TX_START_vect\n");
+		LED_PORT &= ~RED;
+		static_dev->event_callback(static_dev, NETDEV_EVENT_TX_STARTED);
+		__exit_isr();
+	}
+
+	ISR(TRX24_AMI0_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TRX24_AMI0  \n");
+		__exit_isr();
+	}
+	ISR(TRX24_AMI1_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TRX24_AMI1  \n");
+		__exit_isr();
+	}
+	ISR(TRX24_AMI2_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TRX24_AMI2  \n");
+		__exit_isr();
+	}
+	ISR(TRX24_AMI3_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TRX24_AMI3  \n");
 		__exit_isr();
 	}
 
@@ -135,6 +225,11 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
     dev->state = AT86RF2XX_STATE_SLEEP;
     dev->pending_tx = 0;
+
+#ifdef MODULE_AT86RFR2
+    // save device pointer for interrupts
+    static_dev= netdev;
+#endif
 }
 
 void at86rf2xx_reset(at86rf2xx_t *dev)

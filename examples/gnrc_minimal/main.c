@@ -33,8 +33,12 @@ int main(void)
 
     /* get the first IPv6 interface and prints its address */
     size_t numof = gnrc_netif_get(ifs);
+
+    printf("Number of netif %d\n", numof);
+
     if (numof > 0) {
         gnrc_ipv6_netif_t *entry = gnrc_ipv6_netif_get(ifs[0]);
+
         for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {
             if ((ipv6_addr_is_link_local(&entry->addrs[i].addr)) && !(entry->addrs[i].flags & GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST)) {
                 char ipv6_addr[IPV6_ADDR_MAX_STR_LEN];
@@ -42,9 +46,9 @@ int main(void)
                 printf("My address is %s\n", ipv6_addr);
             }
         }
+    }else{
+    	printf("Error no netif!\n");
     }
-
-
 
     return 0;
 }

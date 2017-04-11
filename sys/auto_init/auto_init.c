@@ -100,7 +100,7 @@
 #include "net/gcoap.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 void auto_init(void)
@@ -186,6 +186,7 @@ void auto_init(void)
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
 
 #ifdef MODULE_AT86RF2XX
+    DEBUG("Auto init auto_init_at86rf2xx\n");
     extern void auto_init_at86rf2xx(void);
     auto_init_at86rf2xx();
 #endif
@@ -263,6 +264,7 @@ void auto_init(void)
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
 #ifdef MODULE_GNRC_IPV6_NETIF
+    DEBUG("Auto init gnrc_ipv6_netif.\n");
     gnrc_ipv6_netif_init_by_dev();
 #endif
 

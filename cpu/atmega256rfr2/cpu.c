@@ -56,15 +56,16 @@ void cpu_init(void)
 // EIFR – External Interrupt Flag Register
 // PCIFR – Pin Change Interrupt Flag Register
 
-
-//ISR(BADISR_vect, ISR_NOBLOCK)
 ISR(BADISR_vect)
 {
 
-	printf("FATAL ERROR: BADISR_vect called, unprocessed Interrupt.\nSTOP Execution.\n");
-	// printf("IRQ_STATUS %#02x\nIRQ_STATUS1 %#02x\n", (unsigned int)IRQ_STATUS, (unsigned int)IRQ_STATUS1 );
-	// printf("SCIRQS %#02x\nBATMON %#02x\n", (unsigned int)SCIRQS, (unsigned int)BATMON );
-	// printf("EIFR %#02x\nPCIFR %#02x\n", (unsigned int)EIFR, (unsigned int)PCIFR );
+	printf_P(PSTR("FATAL ERROR: BADISR_vect called, unprocessed Interrupt.\nSTOP Execution.\n"));
+
+	printf("IRQ_STATUS %#02x\nIRQ_STATUS1 %#02x\n", (unsigned int)IRQ_STATUS, (unsigned int)IRQ_STATUS1 );
+	printf("SCIRQS %#02x\nBATMON %#02x\n", (unsigned int)SCIRQS, (unsigned int)BATMON );
+	printf("EIFR %#02x\nPCIFR %#02x\n", (unsigned int)EIFR, (unsigned int)PCIFR );
+
+	//printf("EIFR %#02x\nPCIFR %#02x\n", (unsigned int)EIFR, (unsigned int)PCIFR );
 
 
 	/* White LED light is used to signal ERROR. */
