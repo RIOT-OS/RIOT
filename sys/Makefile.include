@@ -79,4 +79,8 @@ ifneq (,$(filter printf_float,$(USEMODULE)))
     endif
 endif
 
+ifneq (,$(filter shell_sec,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/shell
+endif
+
 INCLUDES += -I$(RIOTBASE)/sys/libc/include

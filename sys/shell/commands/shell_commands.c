@@ -23,6 +23,14 @@
 #include <stdlib.h>
 #include "shell_commands.h"
 
+#ifdef MODULE_SHELL_SEC
+#define CMD(cmd, desc, handler) {cmd, desc, handler, 1}
+#define CMD_NO_SEC(cmd, desc, handler) {cmd, desc, handler, 0}
+#else
+#define CMD(cmd, desc, handler) {cmd, desc, handler}
+#define CMD_NO_SEC(cmd, desc, handler) {cmd, desc, handler}
+#endif
+
 extern int _reboot_handler(int argc, char **argv);
 
 #ifdef MODULE_CONFIG
@@ -132,94 +140,105 @@ extern int _vfs_handler(int argc, char **argv);
 extern int _ls_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_SHELL_SEC
+extern int _login_handler(int argc, char **argv);
+extern int _passwd_handler(int argc, char **argv);
+extern int _logout_handler(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
-    {"reboot", "Reboot the node", _reboot_handler},
+    CMD("reboot", "Reboot the node", _reboot_handler),
 #ifdef MODULE_CONFIG
-    {"id", "Gets or sets the node's id.", _id_handler},
+    CMD("id", "Gets or sets the node's id.", _id_handler),
 #endif
 #ifdef MODULE_LPC_COMMON
-    {"heap", "Shows the heap state for the LPC2387 on the command shell.", _heap_handler},
+    CMD("heap", "Shows the heap state for the LPC2387 on the command shell.", _heap_handler),
 #endif
 #ifdef MODULE_PS
-    {"ps", "Prints information about running threads.", _ps_handler},
+    CMD("ps", "Prints information about running threads.", _ps_handler),
 #endif
 #ifdef MODULE_SHT11
-    {"temp", "Prints measured temperature.", _get_temperature_handler},
-    {"hum", "Prints measured humidity.", _get_humidity_handler},
-    {"weather", "Prints measured humidity and temperature.", _get_weather_handler},
-    {"offset", "Set temperature offset.", _set_offset_handler},
+    CMD("temp", "Prints measured temperature.", _get_temperature_handler),
+    CMD("hum", "Prints measured humidity.", _get_humidity_handler),
+    CMD("weather", "Prints measured humidity and temperature.", _get_weather_handler),
+    CMD("offset", "Set temperature offset.", _set_offset_handler),
 #endif
 #ifdef MODULE_LTC4150
-    {"cur", "Prints current and average power consumption.", _get_current_handler},
-    {"rstcur", "Resets coulomb counter.", _reset_current_handler},
+    CMD("cur", "Prints current and average power consumption.", _get_current_handler),
+    CMD("rstcur", "Resets coulomb counter.", _reset_current_handler),
 #endif
 #ifdef MODULE_AT30TSE75X
-    {"at30tse75x", "Test AT30TSE75X temperature sensor", _at30tse75x_handler},
+    CMD("at30tse75x", "Test AT30TSE75X temperature sensor", _at30tse75x_handler),
 #endif
 #ifdef MODULE_MCI
-    {DISK_READ_SECTOR_CMD, "Reads the specified sector of inserted memory card", _read_sector},
-    {DISK_READ_BYTES_CMD, "Reads the specified bytes from inserted memory card", _read_bytes},
-    {DISK_GET_SECTOR_SIZE, "Get the sector size of inserted memory card", _get_sectorsize},
-    {DISK_GET_SECTOR_COUNT, "Get the sector count of inserted memory card", _get_sectorcount},
-    {DISK_GET_BLOCK_SIZE, "Get the block size of inserted memory card", _get_blocksize},
+    CMD(DISK_READ_SECTOR_CMD, "Reads the specified sector of inserted memory card", _read_sector),
+    CMD(DISK_READ_BYTES_CMD, "Reads the specified bytes from inserted memory card", _read_bytes),
+    CMD(DISK_GET_SECTOR_SIZE, "Get the sector size of inserted memory card", _get_sectorsize),
+    CMD(DISK_GET_SECTOR_COUNT, "Get the sector count of inserted memory card", _get_sectorcount),
+    CMD(DISK_GET_BLOCK_SIZE, "Get the block size of inserted memory card", _get_blocksize),
 #endif
 #ifdef MODULE_GNRC_ICMPV6_ECHO
 #ifdef MODULE_XTIMER
-    { "ping6", "Ping via ICMPv6", _icmpv6_ping },
+    CMD( "ping6", "Ping via ICMPv6", _icmpv6_ping ),
 #endif
 #endif
 #ifdef MODULE_RANDOM
-    { "random_init", "initializes the PRNG", _random_init },
-    { "random_get", "returns 32 bit of pseudo randomness", _random_get },
+    CMD( "random_init", "initializes the PRNG", _random_init ),
+    CMD( "random_get", "returns 32 bit of pseudo randomness", _random_get ),
 #endif
 #if FEATURE_PERIPH_RTC
-    {"rtc", "control RTC peripheral interface",  _rtc_handler},
+    CMD("rtc", "control RTC peripheral interface",  _rtc_handler),
 #endif
 #ifdef CPU_X86
-    {"lspci", "Lists PCI devices", _x86_lspci},
+    CMD("lspci", "Lists PCI devices", _x86_lspci),
 #endif
 #ifdef MODULE_GNRC_NETIF
-    {"ifconfig", "Configure network interfaces", _netif_config},
+    CMD("ifconfig", "Configure network interfaces", _netif_config),
 #ifdef MODULE_GNRC_TXTSND
-    {"txtsnd", "Sends a custom string as is over the link layer", _netif_send },
+    CMD("txtsnd", "Sends a custom string as is over the link layer", _netif_send ),
 #endif
 #endif
 #ifdef MODULE_FIB
-    {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
+    CMD("fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler),
 #endif
 #ifdef MODULE_GNRC_IPV6_NC
-    {"ncache", "manage neighbor cache by hand", _ipv6_nc_manage },
-    {"routers", "IPv6 default router list", _ipv6_nc_routers },
+    CMD("ncache", "manage neighbor cache by hand", _ipv6_nc_manage ),
+    CMD("routers", "IPv6 default router list", _ipv6_nc_routers ),
 #endif
 #ifdef MODULE_GNRC_IPV6_WHITELIST
-    {"whitelist", "whitelists an address for receival ('whitelist [add|del|help]')", _whitelist },
+    CMD("whitelist", "whitelists an address for receival ('whitelist [add|del|help]')", _whitelist ),
 #endif
 #ifdef MODULE_GNRC_IPV6_BLACKLIST
-    {"blacklist", "blacklists an address for receival ('blacklist [add|del|help]')", _blacklist },
+    CMD("blacklist", "blacklists an address for receival ('blacklist [add|del|help]')", _blacklist ),
 #endif
 #ifdef MODULE_GNRC_RPL
-    {"rpl", "rpl configuration tool ('rpl help' for more information)", _gnrc_rpl },
+    CMD("rpl", "rpl configuration tool ('rpl help' for more information)", _gnrc_rpl ),
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
-    {"6ctx", "6LoWPAN context configuration tool", _gnrc_6ctx },
+    CMD("6ctx", "6LoWPAN context configuration tool", _gnrc_6ctx ),
 #endif
 #endif
 #ifdef MODULE_SAUL_REG
-    {"saul", "interact with sensors and actuators using SAUL", _saul },
+    CMD("saul", "interact with sensors and actuators using SAUL", _saul ),
 #endif
 #ifdef MODULE_CCN_LITE_UTILS
-    { "ccnl_open", "opens an interface or socket", _ccnl_open },
-    { "ccnl_int", "sends an interest", _ccnl_interest },
-    { "ccnl_cont", "create content and populated it", _ccnl_content },
-    { "ccnl_fib", "shows or modifies the CCN-Lite FIB", _ccnl_fib },
+    CMD( "ccnl_open", "opens an interface or socket", _ccnl_open ),
+    CMD( "ccnl_int", "sends an interest", _ccnl_interest ),
+    CMD( "ccnl_cont", "create content and populated it", _ccnl_content ),
+    CMD( "ccnl_fib", "shows or modifies the CCN-Lite FIB", _ccnl_fib ),
 #endif
 #ifdef MODULE_SNTP
-    { "ntpdate", "synchronizes with a remote time server", _ntpdate },
+    CMD( "ntpdate", "synchronizes with a remote time server", _ntpdate ),
 #endif
 #ifdef MODULE_VFS
-    {"vfs", "virtual file system operations", _vfs_handler},
-    {"ls", "list files", _ls_handler},
+    CMD("vfs", "virtual file system operations", _vfs_handler),
+    CMD("ls", "list files", _ls_handler),
 #endif
-    {NULL, NULL, NULL}
+#ifdef MODULE_SHELL_SEC
+    CMD_NO_SEC("login", "login", _login_handler),
+    CMD_NO_SEC("passwd", "passwd", _passwd_handler),
+    CMD_NO_SEC("logout", "logout", _logout_handler),
+#endif
+    CMD(NULL, NULL, NULL),
 };

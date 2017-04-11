@@ -626,6 +626,11 @@ ifneq (,$(filter spiffs,$(USEMODULE)))
     USEMODULE += mtd
 endif
 
+ifneq (,$(filter shell_sec,$(USEMODULE)))
+    USEMODULE += shell
+    USEMODULE += shell_commands
+endif
+
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 

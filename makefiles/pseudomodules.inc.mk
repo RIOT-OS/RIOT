@@ -52,6 +52,7 @@ PSEUDOMODULES += saul_adc
 PSEUDOMODULES += saul_default
 PSEUDOMODULES += saul_gpio
 PSEUDOMODULES += schedstatistics
+PSEUDOMODULES += shell_sec
 PSEUDOMODULES += sock
 PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp

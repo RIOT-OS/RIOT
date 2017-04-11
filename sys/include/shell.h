@@ -61,6 +61,9 @@ typedef struct shell_command_t {
     const char *name; /**< Name of the function */
     const char *desc; /**< Description to print in the "help" command. */
     shell_command_handler_t handler; /**< The callback function. */
+#ifdef MODULE_SHELL_SEC
+    int sec_level;
+#endif
 } shell_command_t;
 
 /**

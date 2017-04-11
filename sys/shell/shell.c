@@ -31,6 +31,9 @@
 #include <stdlib.h>
 #include "shell.h"
 #include "shell_commands.h"
+#ifdef MODULE_SHELL_SEC
+#include "shell_sec.h"
+#endif
 
 #ifndef SHELL_NO_ECHO
 #ifdef MODULE_NEWLIB
@@ -44,7 +47,7 @@ static void _putchar(int c) {
 #endif
 #endif
 
-static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
+static const shell_command_t *find_command(const shell_command_t *command_list, char *command)
 {
     const shell_command_t *command_lists[] = {
         command_list,
@@ -61,7 +64,7 @@ static shell_command_handler_t find_handler(const shell_command_t *command_list,
             /* iterating over commands in command_lists entry */
             while (entry->name != NULL) {
                 if (strcmp(entry->name, command) == 0) {
-                    return entry->handler;
+                    return entry;
                 }
                 else {
                     entry++;
@@ -203,9 +206,18 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
     }
 
     /* then we call the appropriate handler */
-    shell_command_handler_t handler = find_handler(command_list, argv[0]);
-    if (handler != NULL) {
-        handler(argc, argv);
+    const shell_command_t *cmd = find_command(command_list, argv[0]);
+    if (cmd != NULL && cmd->handler != NULL) {
+#ifdef MODULE_SHELL_SEC
+        if (shell_sec_get_level() >= cmd->sec_level) {
+            cmd->handler(argc, argv);
+        }
+        else {
+            puts("shell: command not allowed, please login");
+        }
+#else
+        cmd->handler(argc, argv);
+#endif
     }
     else {
         if (strcmp("help", argv[0]) == 0) {
