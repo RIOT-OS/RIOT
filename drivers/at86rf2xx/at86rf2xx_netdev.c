@@ -64,8 +64,8 @@ const netdev_driver_t at86rf2xx_driver = {
 
 #ifndef MODULE_AT86RFR2
 
-	/* SOC has directly access to interrupt
-	 * this is only needed if a single pin interrupts are used
+	/* SOC has directly access to interrupts
+	 * this  is only needed if a single pin interrupts are used
 	 * for external devices to check which interrupt was triggered.
 	 * */
 	static void _irq_handler(void *arg)

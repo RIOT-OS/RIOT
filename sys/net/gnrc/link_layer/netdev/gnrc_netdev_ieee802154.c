@@ -22,7 +22,7 @@
 #include "net/gnrc/netdev/ieee802154.h"
 
 
-#include "net/gnrc/netdev2/ieee802154.h"
+//#include "net/gnrc/netdev2/ieee802154.h"
 
 #define ENABLE_DEBUG    (1)
 #include "debug.h"
@@ -137,7 +137,10 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev_t *gnrc_netdev)
         }
 
         DEBUG("_recv_ieee802154: reallocating.\n");
-        gnrc_pktbuf_realloc_data(pkt, nread);
+        int res = gnrc_pktbuf_realloc_data(pkt, nread);
+
+        DEBUG("_recv_ieee802154: reallocation result %d.\n", res);
+
     }
 
     return pkt;

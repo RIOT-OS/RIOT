@@ -34,10 +34,12 @@ extern "C" {
  * size tested sucessfully even with pretty small stacks.k
  * @{
  */
-#define THREAD_EXTRA_STACKSIZE_PRINTF    (96)//128
+// core/include/debug.h prints if(sched_active_thread->stack_size > THREAD_EXTRA_STACKSIZE_PRINTF)
+// so small THREAD_EXTRA_STACKSIZE_PRINTF prints more than a big one
+#define THREAD_EXTRA_STACKSIZE_PRINTF    (32) //128
 
 #ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT   (384)
+#define THREAD_STACKSIZE_DEFAULT   (512)
 #endif
 
 #define THREAD_STACKSIZE_IDLE      (128)

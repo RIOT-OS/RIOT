@@ -30,7 +30,7 @@
 #include "cpu.h"
 #include "uart_stdio.h"
 
-void SystemInit(void);
+void system_stdio_init(void);
 static int uart_putchar(char c, FILE *stream);
 static int uart_getchar(FILE *stream);
 
@@ -40,7 +40,7 @@ static FILE uart_stdin = FDEV_SETUP_STREAM(NULL, uart_getchar, _FDEV_SETUP_READ)
 void board_init(void)
 {
     /* initialize stdio via USART_0 */
-    SystemInit();
+	system_stdio_init();
 
     /* initialize the CPU */
     cpu_init();
@@ -54,12 +54,14 @@ void board_init(void)
     LED_PORT |= BLUE|RED|GREEN;
 
     irq_enable();
+
+    // puts("Board init");
 }
 
 /**
  * @brief Initialize the System, initialize IO via UART_0
  */
-void SystemInit(void)
+void system_stdio_init(void)
 {
     /* initialize UART_0 for use as stdout */
     uart_stdio_init();
@@ -68,7 +70,8 @@ void SystemInit(void)
     stdin = &uart_stdin;
 
     /* Flush stdout */
-    puts("\f");
+    /* Make a very visible start printout */
+    puts("\n_________________________________\n");
 }
 
 static int uart_putchar(char c, FILE *stream)

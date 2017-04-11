@@ -63,10 +63,13 @@ extern "C" {
 /** @} */
 
 /**
- * @name Define the interface to the AT86RF231 radio
+ * @name Define the interface to the AT86RFR2 radio
  *
  *	No SPI and no external pins are used. its an SOC
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
+ *
+ * But we have to define a AT86RF2XX_PARAMS_BOARD to overwrite
+ * the default parameters in
  */
 #define AT86RF2XX_PARAMS_BOARD      {}
 
@@ -91,13 +94,16 @@ extern "C" {
 // TODO Check if the not implemented I/O pin interrupt could be used to not waste pin,
 // use PCINT4 until then.
 // Note that the I/O ports corresponding to PCINT23:16 are not implemented. Therefore PCIE2 has no function in this device
+// Set Port as output
+// Enable Pin Change Interrupt 0
+// Enable Pin change Interrupt 7 in Mask
 #define AVR_CONTEXT_SWAP_INIT do { \
-    DDRB |= (1 << PB0); \
+    DDRB |= (1 << PB7); \
     PCICR |= (1 << PCIE0); \
-    PCMSK0 |= (1 << PCINT0); \
+    PCMSK0 |= (1 << PCINT7); \
 } while (0)
 #define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT0_vect
-#define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB0)
+#define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB7)
 
 
 
