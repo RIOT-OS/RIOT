@@ -26,8 +26,8 @@
 
 
 #include "embUnit.h"
+#include "periph/pm.h"
 #include "xtimer.h"
-#include "lpm.h"
 #include "storage/flash_sim.h"
 #include "storage/ftl.h"
 
@@ -298,7 +298,7 @@ static void test_ecc_helpers(void) {
 }
 
 static void test_size_helpers(void) {
-    printf("%s\n", __FUNCTION__);
+    printf("%s\n", __func__);
 
 #ifdef BOARD_MSBA2
     TEST_ASSERT_EQUAL_INT(0, ftl_first_subpage_of_block(&device, 0));
@@ -323,7 +323,7 @@ static void test_size_helpers(void) {
 }
 
 static void test_write_read_raw(void) {
-    printf("%s\n", __FUNCTION__);
+    printf("%s\n", __func__);
     int ret;
 
     uint32_t block = 2;
@@ -352,7 +352,7 @@ static void test_write_read_raw(void) {
 }
 
 static void test_read_before_write(void) {
-    printf("%s\n", __FUNCTION__);
+    printf("%s\n", __func__);
     int ret;
 
     uint32_t block = 3;
@@ -367,7 +367,7 @@ static void test_read_before_write(void) {
 }
 
 static void test_write_read(void) {
-    printf("%s\n", __FUNCTION__);
+    printf("%s\n", __func__);
     int ret;
 
     uint32_t block = 0;
@@ -406,7 +406,7 @@ static void test_write_read(void) {
 }
 
 static void test_write_read_ecc(void) {
-    printf("%s\n", __FUNCTION__);
+    printf("%s\n", __func__);
     int ret;
 
     uint32_t block = 0;
@@ -502,7 +502,7 @@ static void test_write_read_ecc(void) {
 }
 
 static void test_out_of_bounds(void) {
-    printf("%s\n", __FUNCTION__);
+    printf("%s\n", __func__);
     int ret;
 
     ret = ftl_read_raw(&index_partition, page_buffer, 999999);
@@ -519,7 +519,7 @@ static void test_out_of_bounds(void) {
 }
 
 static void test_format(void) {
-    printf("%s\n", __FUNCTION__);
+    printf("%s\n", __func__);
     int ret = ftl_format(&index_partition);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
@@ -547,7 +547,7 @@ static void test_format(void) {
 }
 
 static void test_metadata(void) {
-    printf("%s\n", __FUNCTION__);
+    printf("%s\n", __func__);
 
     int ret;
 
@@ -664,6 +664,6 @@ int main(void)
     puts("xtimer_wait()");
     xtimer_usleep(100000);
 
-    lpm_set(LPM_POWERDOWN);
+    pm_off();
     return 0;
 }
