@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    boards_mini Calliope mini
+ * @defgroup    boards_calliope-mini Calliope mini
  * @ingroup     boards
  * @brief       Board specific files for the Calliope mini
  * @{
