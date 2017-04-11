@@ -34,7 +34,7 @@ extern "C" {
  * size tested sucessfully even with pretty small stacks.k
  * @{
  */
-#define THREAD_EXTRA_STACKSIZE_PRINTF    (96)//128
+#define THREAD_EXTRA_STACKSIZE_PRINTF    (8)//128
 
 #ifndef THREAD_STACKSIZE_DEFAULT
 #define THREAD_STACKSIZE_DEFAULT   (384)

@@ -16,23 +16,24 @@
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @}
  */
-#include "capacity.h"
-#include "capacity_settings.h"
-#include "periph/timer.h"
+#include "shell.h"
 #include <stdio.h>
+#include "board.h"
 
-void accb(void* arg, uint8_t dev) {
-	PORTF ^= (1<<PF0);
-	printf("hit");
-}
+extern int capacity_cmd(int argc, char **argv);
+
+static const shell_command_t shell_commands[] = {
+	{ "capacity", "measure capacity of a capacitor", capacity_cmd },
+    { NULL, NULL, NULL }
+};
 
 int main(void)
 {
-	capacity_init(TIMER_DEV(2), AC_0);
-	capacity_result_t my_result;
-	start_measuring(10, &my_result);
-	printf("Timestamp %u \n", my_result.timestamp);
-	printf("Frequency %u \n", my_result.frequency);
-	printf("Capacity %.6f \n", my_result.capacity*1000000000000);
+	LED_PORT &= ~RED;
+	char line_buf[SHELL_DEFAULT_BUFSIZE];
 
+	shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+
+    puts("Error: END of main().");
+	/* should be never reached */
 }

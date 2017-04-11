@@ -16,6 +16,9 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 0
 
 USEMODULE += capacity
+USEMODULE +=shell
+USEMODULE += shell_commands
+USEMODULE += ps
 
 include $(RIOTBASE)/Makefile.include
 
