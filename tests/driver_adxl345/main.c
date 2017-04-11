@@ -31,11 +31,14 @@ int main(void)
     adxl345_t dev;
     adxl345_data_t data;
 
+    dev.i2c = ADXL345_PARAM_I2C;
+    dev.addr = ADXL345_PARAM_ADDR;
+
     puts("ADXL345 test application");
     printf("Initializing ADXL345 accelerometer at I2C_DEV(%i)... ",
-           adxl345_params->i2c);
+           dev.i2c);
 
-    if (adxl345_init(&dev, adxl345_params) == ADXL345_OK) {
+    if (adxl345_init(&dev, (adxl345_params_t*)adxl345_params) == ADXL345_OK) {
         puts("[OK]\n");
     }
     else {
@@ -46,7 +49,7 @@ int main(void)
    while(1) {
         adxl345_read(&dev, &data);
         printf("Acceleration [in mg]: X axis:%d Y axis:%d Z axis:%d\n",
-                data.x, data.y, data.z);
+               (int)data.x, (int)data.y, (int)data.z);
         xtimer_usleep(SLEEP_DELAY);
     }
     return 0;
