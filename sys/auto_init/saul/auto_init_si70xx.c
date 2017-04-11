@@ -22,9 +22,8 @@
 
 #include "log.h"
 #include "saul_reg.h"
-
-#include "si70xx_params.h"
 #include "si70xx.h"
+#include "si70xx_params.h"
 
 /**
  * @brief   Define the number of configured sensors

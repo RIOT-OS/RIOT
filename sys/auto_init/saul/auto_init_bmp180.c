@@ -22,7 +22,7 @@
 
 #include "log.h"
 #include "saul_reg.h"
-
+#include "bmp180.h"
 #include "bmp180_params.h"
 
 /**

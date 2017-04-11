@@ -22,7 +22,6 @@
 
 #include "log.h"
 #include "saul_reg.h"
-
 #include "jc42.h"
 #include "jc42_params.h"
 
