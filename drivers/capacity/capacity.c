@@ -22,7 +22,7 @@
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
 
-#define ENABLE_DEBUG	(0)
+#define ENABLE_DEBUG	(1)
 
 #include "capacity.h"
 #include "capacity_settings.h"
@@ -34,7 +34,7 @@
 #include <avr/interrupt.h>
 #include <stdio.h>
 
-uint16_t my_saved_values[11];
+volatile uint16_t *my_saved_values;
 volatile uint8_t count;
 volatile uint8_t global_cycle;
 
@@ -107,9 +107,22 @@ void capacity_init(uint8_t timer_dev, uint8_t ac_dev)
 
 uint8_t start_measuring(uint8_t cycle, capacity_result_t *my_result)
 {
-	//my_saved_values = (uint16_t*) malloc(sizeof(uint16_t)*cycle);
+	my_saved_values = (uint16_t*) malloc(sizeof(uint16_t)*(cycle+1));
+
+
+	my_saved_values[0] = 1;
+	my_saved_values[1] = 2;
+	my_saved_values[2] = 3;
+	my_saved_values[3] = 4;
+
+	for(uint8_t i=1; i<=cycle; i++){
+		DEBUG("%u ", my_saved_values[i]-my_saved_values[i-1]);
+	}
+
+
+
 	count=0;
-	global_cycle = cycle + 1;
+	global_cycle = cycle;
 
 	/*TODO:start timer and ac */
 	gpio_set(capacity_conf.pxy_pin);
@@ -125,32 +138,35 @@ uint8_t start_measuring(uint8_t cycle, capacity_result_t *my_result)
 	gpio_clear(capacity_conf.result_pin);
 	gpio_clear(capacity_conf.pxy_pin);
 	uint16_t average=0;
-	for(uint8_t i=1; i<global_cycle; i++){
+	for(uint8_t i=1; i<=global_cycle; i++){
 		average += my_saved_values[i]-my_saved_values[i-1];
 		DEBUG("%u ", my_saved_values[i]-my_saved_values[i-1]);
 	}
 	//free(my_saved_values);
-	average = average/(global_cycle-1);
+	average = average/global_cycle;
 	my_result->average = average;
 	my_result->frequency = CLOCK_CORECLOCK/average;
 	my_result->timestamp = ((float)average)/CLOCK_CORECLOCK;
 	my_result->capacity = 1.0/(1.386*100000*my_result->frequency);
 
-	DEBUG("Capacity %.3f \n", my_result->capacity*1000000000000);
-	DEBUG("Frequency %.2f us\n", my_result->frequency);
-	DEBUG("Timestamp %.3f \n", my_result->timestamp*1000000000000);
+	DEBUG("Capacity %.3f pF\n", my_result->capacity*1000000000000);
+	DEBUG("Frequency %.2f Hz\n", my_result->frequency);
+	DEBUG("Timestamp %.3f us\n", my_result->timestamp*1000000);
 	DEBUG("Debug: Average %u \n", my_result->average);
 	return 0;
 }
 
 ISR(TIMER1_CAPT_vect)
 {
-	if(count>=global_cycle) {
+	if(count>global_cycle) {
 			ACSR |=(1<<ACD);
 			//ac_poweroff(config.ac_dev);
 			//timer_stop(config.timer_dev);
+	}else{
+		uint16_t current_value = (ICR1L | ((uint16_t)ICR1H<<8));
+		my_saved_values[count] = current_value;
+		//my_saved_values[count] |= ((uint16_t)ICR1H<<8);
+		count++;
+		//DEBUG("#");
 	}
-	my_saved_values[count] = ICR1L;
-	my_saved_values[count] |= ((uint16_t)ICR1H<<8);
-	count++;
 }
