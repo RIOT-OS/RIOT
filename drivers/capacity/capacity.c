@@ -34,6 +34,7 @@
 #include <avr/interrupt.h>
 #include <stdio.h>
 
+/*static allocation, cause malloc always returned null */
 volatile uint16_t my_saved_values[11];
 volatile uint8_t count;
 volatile uint8_t global_cycle;
@@ -107,7 +108,8 @@ void capacity_init(uint8_t timer_dev, uint8_t ac_dev)
 
 uint8_t start_measuring(uint8_t cycle, capacity_result_t *my_result)
 {
-	//my_saved_values = (uint16_t*) malloc( sizeof(uint16_t)*(cycle+1) );
+	//my_saved_values = (uint16_t*) malloc(sizeof(uint16_t)*(cycle+1));
+
 	count=0;
 	global_cycle = cycle;
 
@@ -128,9 +130,9 @@ uint8_t start_measuring(uint8_t cycle, capacity_result_t *my_result)
 	uint16_t average=0;
 
 	for(uint8_t i=1; i<=global_cycle; i++){
-		DEBUG("Values %u \n", my_saved_values[i-1]);
+		//DEBUG("Values %u \n", my_saved_values[i-1]);
 		average += my_saved_values[i]-my_saved_values[i-1];
-		//DEBUG("%u ", my_saved_values[i]-my_saved_values[i-1]);
+		DEBUG("%u ", my_saved_values[i]-my_saved_values[i-1]);
 	}
 	//free(my_saved_values);
 	average = average/global_cycle;
@@ -140,7 +142,7 @@ uint8_t start_measuring(uint8_t cycle, capacity_result_t *my_result)
 	my_result->capacity = 1.0/(1.386*100000*my_result->frequency);
 
 	DEBUG("Capacity %.3f pF\n", my_result->capacity*1000000000000);
-	DEBUG("Frequency %.2f Hz\n", my_result->frequency);
+	EBUG("Frequency %.2f Hz\n", my_result->frequency);
 	DEBUG("Timestamp %.3f us\n", my_result->timestamp*1000000);
 	DEBUG("Debug: Average %u \n", my_result->average);
 	return 0;

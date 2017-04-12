@@ -30,7 +30,12 @@ int capacity_cmd(int argc, char **argv)
 	uint8_t cycles = 10;
 
 	if(argc == 3 && atoi(argv[2])) {
+		uint8_t recieved_cycles = atoi(argv[2]);
+		if(recieved_cycles >10){
+			cycles = 10;
+		}else{
 		cycles = atoi(argv[2]);
+		}
 	}
 	start_measuring(cycles, &my_result);
 	DEBUG("Cycles %u \n", cycles);

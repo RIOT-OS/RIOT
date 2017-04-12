@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include "board.h"
 
+#include "stdlib.h"
+
 extern int capacity_cmd(int argc, char **argv);
 
 static const shell_command_t shell_commands[] = {
