@@ -34,7 +34,7 @@
 #include <avr/interrupt.h>
 #include <stdio.h>
 
-volatile uint16_t *my_saved_values;
+volatile uint16_t my_saved_values[11];
 volatile uint8_t count;
 volatile uint8_t global_cycle;
 
@@ -107,20 +107,7 @@ void capacity_init(uint8_t timer_dev, uint8_t ac_dev)
 
 uint8_t start_measuring(uint8_t cycle, capacity_result_t *my_result)
 {
-	my_saved_values = (uint16_t*) malloc(sizeof(uint16_t)*(cycle+1));
-
-
-	my_saved_values[0] = 1;
-	my_saved_values[1] = 2;
-	my_saved_values[2] = 3;
-	my_saved_values[3] = 4;
-
-	for(uint8_t i=1; i<=cycle; i++){
-		DEBUG("%u ", my_saved_values[i]-my_saved_values[i-1]);
-	}
-
-
-
+	//my_saved_values = (uint16_t*) malloc( sizeof(uint16_t)*(cycle+1) );
 	count=0;
 	global_cycle = cycle;
 
@@ -130,6 +117,7 @@ uint8_t start_measuring(uint8_t cycle, capacity_result_t *my_result)
 	DEBUG("starting measurement \n");
 	timer_start(config.timer_dev);
 	ac_poweron(config.ac_dev);
+	TCNT1 = 0;
 	gpio_set(capacity_conf.result_pin);
 	while(count<global_cycle);
 	DEBUG("measurement done\n");
@@ -138,9 +126,11 @@ uint8_t start_measuring(uint8_t cycle, capacity_result_t *my_result)
 	gpio_clear(capacity_conf.result_pin);
 	gpio_clear(capacity_conf.pxy_pin);
 	uint16_t average=0;
+
 	for(uint8_t i=1; i<=global_cycle; i++){
+		DEBUG("Values %u \n", my_saved_values[i-1]);
 		average += my_saved_values[i]-my_saved_values[i-1];
-		DEBUG("%u ", my_saved_values[i]-my_saved_values[i-1]);
+		//DEBUG("%u ", my_saved_values[i]-my_saved_values[i-1]);
 	}
 	//free(my_saved_values);
 	average = average/global_cycle;
@@ -163,10 +153,7 @@ ISR(TIMER1_CAPT_vect)
 			//ac_poweroff(config.ac_dev);
 			//timer_stop(config.timer_dev);
 	}else{
-		uint16_t current_value = (ICR1L | ((uint16_t)ICR1H<<8));
-		my_saved_values[count] = current_value;
-		//my_saved_values[count] |= ((uint16_t)ICR1H<<8);
+		my_saved_values[count] = ((uint16_t)ICR1L | ((uint16_t)ICR1H<<8));
 		count++;
-		//DEBUG("#");
 	}
 }
