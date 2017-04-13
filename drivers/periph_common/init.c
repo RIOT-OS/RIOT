@@ -23,6 +23,9 @@
 #ifdef MODULE_PERIPH_SPI
 #include "periph/spi.h"
 #endif
+#ifdef MODULE_PERIPH_RTC
+#include "periph/rtc.h"
+#endif
 
 void periph_init(void)
 {
@@ -31,5 +34,10 @@ void periph_init(void)
     for (unsigned i = 0; i < SPI_NUMOF; i++) {
         spi_init(SPI_DEV(i));
     }
+#endif
+
+    /* Initialize RTC */
+#ifdef MODULE_PERIPH_RTC
+    rtc_init();
 #endif
 }
