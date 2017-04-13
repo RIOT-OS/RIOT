@@ -76,11 +76,6 @@ extern "C" {
  */
 
 /**
- * @brief   Base (minimal) RSSI value in dBm
- */
-#define RSSI_BASE_VAL                   (-91)
-
-/**
  * @brief   Flags for PSEUDO DEVICE INTERNAL STATES
  * @{
  */
