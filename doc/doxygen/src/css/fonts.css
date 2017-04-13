@@ -1,0 +1,17 @@
+/*
+ * fonts.css
+ * Copyright (C) 2017 Freie Universität Berlin
+ *
+ * Distributed under terms of the LGPLv2.1 license (see LICENSE file)
+ */
+
+@font-face {
+  font-family: 'Miso';
+  src: url('miso.eot');
+  src: url('miso.eot?#iefix') format('embedded-opentype'),
+       url('miso.woff') format('woff'),
+       url('miso.ttf') format('truetype'),
+       url('miso.svg#Miso') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
