@@ -23,8 +23,6 @@
 
 #ifdef RIOT_VERSION
 #include "byteorder.h"
-#define ntohs NTOHS
-#define htons HTONS
 #endif
 
 /* min domain name length is 1, so minimum record length is 7 */
