@@ -81,7 +81,7 @@ int feetech_write8(feetech_t *device, feetech_addr_t reg, uint8_t value)
 
 int feetech_write16(feetech_t *device, feetech_addr_t reg, uint16_t value)
 {
-    value = HTONS(value);
+    value = htons(value);
     return feetech_write(device, reg, (uint8_t*)&value, 2);
 }
 
@@ -127,7 +127,7 @@ int feetech_read16(feetech_t *device, feetech_addr_t reg, uint16_t *value)
 {
     const int ret = feetech_read(device, reg, (uint8_t*)value, 2);
     if (ret == FEETECH_OK) {
-        *value = NTOHS(*value);
+        *value = ntohs(*value);
     }
     return ret;
 }

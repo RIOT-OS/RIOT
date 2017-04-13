@@ -55,8 +55,8 @@ void mrf24j40_reset(mrf24j40_t *dev)
     addr_long.uint8[0] &= ~(0x01);
     addr_long.uint8[0] |=  (0x02);
     /* set short and long address */
-    mrf24j40_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
-    mrf24j40_set_addr_short(dev, NTOHS(addr_long.uint16[0].u16));
+    mrf24j40_set_addr_long(dev, ntohll(addr_long.uint64.u64));
+    mrf24j40_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
 
     /* set default PAN id */
     mrf24j40_set_pan(dev, IEEE802154_DEFAULT_PANID);

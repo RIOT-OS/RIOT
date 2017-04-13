@@ -22,7 +22,7 @@
 #else
 #include <dlfcn.h>
 #endif
-
+#include "byteorder.h"
 #include <assert.h>
 #include <getopt.h>
 #include <stdbool.h>

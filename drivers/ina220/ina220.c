@@ -45,7 +45,7 @@ static int ina220_read_reg(ina220_t *dev, uint8_t reg, uint16_t *out)
         return -1;
     }
 
-    *out = NTOHS(tmp.u16);
+    *out = ntohs(tmp.u16);
     return 0;
 }
 
@@ -58,7 +58,7 @@ static int ina220_write_reg(ina220_t *dev, uint8_t reg, uint16_t in)
     } tmp = { .u16 = 0 };
     int status = 0;
 
-    tmp.u16 = HTONS(in);
+    tmp.u16 = htons(in);
 
     status = i2c_write_regs(dev->i2c, dev->addr, reg, &tmp.c[0], 2);
 
