@@ -62,6 +62,42 @@ extern "C" {
 #define LED0_TOGGLE         (PORTB ^=  LED0_MASK)
 /** @} */
 
+
+#define SSN PORTB0
+#define SCK PORTB1
+#define MOSI PORTB2
+#define MISO PORTB3
+#define D2 PORTB0
+
+
+#define SCL PORTD0
+#define SDA PORTD1
+#define RX1 PORTD2
+#define TX1 PORTD3
+#define BKPKVCC_EN PORTD4
+#define D8 PORTD5
+#define BKPK_BUS PORTD6
+#define CHGSTATUS PORTD7
+
+#define RX0 PORTE0
+#define TX0 PORTE1
+#define D6 PORTE2
+#define D3 PORTE3
+#define D4 PORTE4
+#define D5 PORTE5
+#define D7 PORTE6
+#define BATTALRT PORTE7
+
+#define A0 PORTF0
+#define A1 PORTF1
+#define A2 PORTF2
+#define A3 PORTF3
+#define A4 PORTF4
+#define A5 PORTF5
+#define A6 PORTF6
+#define A7 PORTF7
+
+
 /**
  * @name Define the interface to the AT86RFR2 radio
  *
@@ -75,14 +111,18 @@ extern "C" {
 
 /**
  * Context swap defines
- * Setup to use PB7 which is pin change interrupt 7 (PCINT7)
+ * Setup to use PB0 which is pin change interrupt 0 (PCINT7)
  * This is configured by Setting  "Pin Change Interrupt Enable 0"
- * and enable PCINT7 at "Pin Change Mask Register 0"
+ * and enable PCINT0 at "Pin Change Mask Register 0"
  * This emulates a software triggered interrupt
  *
- * Be aware of the alternate Functions OC0A/OC1C/PCINT7 of Pin B7
+ * Be aware of the alternate Functions
+ * SS/PCINT0 (SPI Slave Select input or Pin Change Interrupt 0)
  * and that this can't be used.
+ * Its SSN on the Pinoccio board.
  *
+ *
+ * PB7 =  OC0A/OC1C/PCINT
  * Output Compare and PWM Output A for Timer/Counter0
  * Output Compare and PWM Output C for Timer/Counter1
  * or Pin Change Interrupt 7
@@ -98,12 +138,12 @@ extern "C" {
 // Enable Pin Change Interrupt 0
 // Enable Pin change Interrupt 7 in Mask
 #define AVR_CONTEXT_SWAP_INIT do { \
-    DDRB |= (1 << PB7); \
+    DDRB |= (1 << PB0); \
     PCICR |= (1 << PCIE0); \
-    PCMSK0 |= (1 << PCINT7); \
+    PCMSK0 |= (1 << PCINT0); \
 } while (0)
 #define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT0_vect
-#define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB7)
+#define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB0)
 
 
 

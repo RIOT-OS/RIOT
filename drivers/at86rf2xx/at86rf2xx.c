@@ -39,10 +39,6 @@
 
 /*TODO port all functions from at86rf2xx_netdev.c _isr() */
 
-/* All Interrupts are liste here to test them.*/
-
-/*TODO Remove not needed interupt vector routines */
-
 	#include "avr/interrupt.h"
 	// saved device Pointer for Interrupt callback
 	static netdev_t* static_dev;
@@ -297,23 +293,23 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 
 	/* enable interrupts IRQ_MASK*/
 	at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
-			// AT86RF2XX_IRQ_STATUS_MASK__AWAKE
-			 AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN
-			 //| AT86RF2XX_IRQ_STATUS_MASK__AMI_EN
-			 //| AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE_EN
+			 AT86RF2XX_IRQ_STATUS_MASK__AWAKE
+			| AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN
+			| AT86RF2XX_IRQ_STATUS_MASK__AMI_EN
+			| AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE_EN
 			| AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN
 			| AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN
-			//| AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK
-			//| AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK
+			| AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK_EN
+			| AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN
 						);
 
 	/* enable interrupts IRQ_MASK1*/
 	   at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1,
 			   AT86RF2XX_IRQ_STATUS_MASK1__TX_START_EN
-			   //| AT86RF2XX_IRQ_STATUS_MASK1__MAF_0_AMI_EN
-			   //| AT86RF2XX_IRQ_STATUS_MASK1__MAF_1_AMI_EN
-			   //| AT86RF2XX_IRQ_STATUS_MASK1__MAF_2_AMI_EN
-			   //| AT86RF2XX_IRQ_STATUS_MASK1__MAF_3_AMI_EN
+			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_0_AMI_EN
+			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_1_AMI_EN
+			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_2_AMI_EN
+			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_3_AMI_EN
 						);
    /* set PLL on */
 	   at86rf2xx_set_state(dev, AT86RF2XX_STATE_PLL_ON);

@@ -39,7 +39,13 @@ static FILE uart_stdin = FDEV_SETUP_STREAM(NULL, uart_getchar, _FDEV_SETUP_READ)
 
 void board_init(void)
 {
-    /* initialize stdio via USART_0 */
+    /* disable unwanted Interrupts */
+	/* External Interrupt INT0 is somehow triggered, stop that */
+	DDRD = 1<<DDRD0; // set port D0 as output
+	PORTD &= 1<<DDRD0;    // set D0 low
+
+
+	/* initialize stdio via USART_0 */
 	system_stdio_init();
 
     /* initialize the CPU */

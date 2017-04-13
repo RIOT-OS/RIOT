@@ -24,16 +24,19 @@
 #include "avr/pgmspace.h"
 #include "board.h"
 
+#define ENABLE_DEBUG (1)
+#include "debug.h"
+
 /**
  * @brief Initialize the CPU, set IRQ priorities
  */
 void cpu_init(void)
 {
-	if(MCUSR & (1<<PORF )) printf_P(PSTR("Power-on reset.\n"));
-	if(MCUSR & (1<<EXTRF)) printf_P(PSTR("External reset!\n"));
-	if(MCUSR & (1<<BORF )) printf_P(PSTR("Brownout reset!\n"));
-	if(MCUSR & (1<<WDRF )) printf_P(PSTR("Watchdog reset!\n"));
-	if(MCUSR & (1<<JTRF )) printf_P(PSTR("JTAG reset!\n"));
+	if( MCUSR&(1<<PORF)  ){printf_P(PSTR("Power-on reset.\n"));}
+	if( MCUSR&(1<<EXTRF) ){printf_P(PSTR("External reset!\n"));}
+	if( MCUSR&(1<<BORF)  ){printf_P(PSTR("Brownout reset!\n"));}
+	if( MCUSR&(1<<WDRF)  ){printf_P(PSTR("Watchdog reset!\n"));}
+	if( MCUSR&(1<<JTRF)  ){printf_P(PSTR("JTAG reset!\n"));}
 	MCUSR = 0;
 
 
@@ -73,3 +76,325 @@ ISR(BADISR_vect)
 
 	while(1){};
 }
+
+/* All Interrupts are liste here to test them.*/
+/*TODO Remove not needed interupt vector routines */
+	ISR(INT0_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("INT0_vect \n");
+		__exit_isr();
+	}
+	ISR(INT1_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("INT1_vect \n");
+		__exit_isr();
+	}
+	ISR(INT2_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("INT2_vect \n");
+		__exit_isr();
+	}
+	ISR(INT3_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("INT3_vect \n");
+		__exit_isr();
+	}
+
+	ISR(INT4_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("INT4_vect \n");
+		__exit_isr();
+	}
+	ISR(INT5_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("INT5_vect \n");
+		__exit_isr();
+	}
+	ISR(INT6_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("INT6_vect \n");
+		__exit_isr();
+	}
+	ISR(INT7_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("INT7_vect \n");
+		__exit_isr();
+	}
+
+
+
+//	ISR(PCINT0_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("PCINT0_vect \n");
+//		LED_PORT |= RED;
+//		__exit_isr();
+//	}
+	ISR(PCINT1_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("PCINT1_vect \n");
+		__exit_isr();
+	}
+	ISR(PCINT2_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("PCINT2_vect \n");
+		__exit_isr();
+	}
+	ISR(WDT_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("WDT_vect \n");
+		__exit_isr();
+	}
+
+	ISR(TIMER2_COMPA_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER2_COMPA_vect \n");
+		__exit_isr();
+	}
+	ISR(TIMER2_COMPB_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER2_COMPB_vect \n");
+		__exit_isr();
+	}
+	ISR(TIMER2_OVF_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER2_OVF_vect \n");
+		__exit_isr();
+	}
+
+	ISR(TIMER1_CAPT_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER1_CAPT_vect \n");
+		__exit_isr();
+	}
+	ISR(TIMER1_COMPA_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER1_COMPA_vect \n");
+		LED_PORT |= RED;
+		__exit_isr();
+	}
+	ISR(TIMER1_COMPB_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER1_COMPB_vect \n");
+		__exit_isr();
+	}
+	ISR(TIMER1_COMPC_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER1_COMPC_vect \n");
+		__exit_isr();
+	}
+	ISR(TIMER1_OVF_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER1_OVF_vect \n");
+		__exit_isr();
+	}
+
+
+	ISR(TIMER0_COMPA_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER0_COMPA_vect \n");
+		__exit_isr();
+	}
+	ISR(TIMER0_COMPB_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER0_COMPB_vect \n");
+		__exit_isr();
+	}
+	ISR(TIMER0_OVF_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER0_OVF_vect \n");
+		__exit_isr();
+	}
+
+	ISR(SPI_STC_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("SPI_STC_vect \n");
+		__exit_isr();
+	}
+//	ISR(USART0_RX_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("USART0_RX_vect \n");
+//		__exit_isr();
+//	}
+	ISR(USART0_UDRE_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("USART0_UDRE_vect \n");
+		__exit_isr();
+	}
+	ISR(USART0_TX_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("USART0_TX_vect \n");
+		LED_PORT |= RED;
+		__exit_isr();
+	}
+
+	ISR(ANALOG_COMP_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("ANALOG_COMP_vect \n");
+		__exit_isr();
+	}
+	ISR(ADC_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("ADC_vect \n");
+		__exit_isr();
+	}
+	ISR(EE_READY_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("EE_READY_vect \n");
+		__exit_isr();
+	}
+
+	ISR(TIMER3_CAPT_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER3_CAPT_vect \n");
+		__exit_isr();
+	}
+	ISR(TIMER3_COMPA_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER3_COMPA_vect \n");
+		__exit_isr();
+	}
+	ISR(TIMER3_COMPB_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER3_COMPB_vect \n");
+		__exit_isr();
+	}
+	ISR(TIMER3_COMPC_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER3_COMPC_vect \n");
+		__exit_isr();
+	}
+	ISR(TIMER3_OVF_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER3_OVF_vect \n");
+		__exit_isr();
+	}
+
+//	ISR(USART1_RX_vect , ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("USART1_RX_vect \n");
+//		__exit_isr();
+//	}
+	ISR(USART1_UDRE_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("USART1_UDRE_vect \n");
+		__exit_isr();
+	}
+	ISR(USART1_TX_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("USART1_TX_vect \n");
+		__exit_isr();
+	}
+	ISR(TWI_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TWI_vect \n");
+		__exit_isr();
+	}
+	ISR(SPM_READY_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("SPM_READY_vect \n");
+		__exit_isr();
+	}
+
+
+	ISR(TIMER4_CAPT_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER4_CAPT_vect \n");
+		__exit_isr();
+	}
+//	ISR(TIMER4_COMPA_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("TIMER4_COMPA_vect \n");
+//		__exit_isr();
+//	}
+//	ISR(TIMER4_COMPB_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("TIMER4_COMPB_vect \n");
+//		__exit_isr();
+//	}
+//	ISR(TIMER4_COMPC_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("TIMER4_COMPC_vect \n");
+//		__exit_isr();
+//	}
+	ISR(TIMER4_OVF_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER4_OVF_vect \n");
+		__exit_isr();
+	}
+
+	ISR(TIMER5_CAPT_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER5_CAPT_vect \n");
+		__exit_isr();
+	}
+//	ISR(TIMER5_COMPA_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("TIMER5_COMPA_vect \n");
+//		__exit_isr();
+//	}
+//	ISR(TIMER5_COMPB_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("TIMER5_COMPB_vect \n");
+//		__exit_isr();
+//	}
+//	ISR(TIMER5_COMPC_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("TIMER5_COMPC_vect \n");
+//		__exit_isr();
+//	}
+	ISR(TIMER5_OVF_vect, ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("TIMER5_OVF_vect \n");
+		__exit_isr();
+	}
+

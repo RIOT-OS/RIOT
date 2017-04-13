@@ -356,9 +356,9 @@ extern "C" {
 #define AT86RF2XX_TRX_STATUS__BUSY_RX_AACK                      (0x11)
 #define AT86RF2XX_TRX_STATUS__BUSY_TX_ARET                      (0x12)
 #define AT86RF2XX_TRX_STATUS__RX_AACK_ON                        (0x16)
+#define AT86RF2XX_TRX_STATUS__TX_ARET_ON                        (0x19)
 
-#ifndef MODULE_AT86RFR2  // these are not defined in the SOC datasheet
-	#define AT86RF2XX_TRX_STATUS__TX_ARET_ON                        (0x19)
+#ifndef MODULE_AT86RFR2  // these are not defined in the atmega256rfr2 datasheet
 	#define AT86RF2XX_TRX_STATUS__RX_ON_NOCLK                       (0x1C)
 	#define AT86RF2XX_TRX_STATUS__RX_AACK_ON_NOCLK                  (0x1D)
 	#define AT86RF2XX_TRX_STATUS__BUSY_RX_AACK_NOCLK                (0x1E)
