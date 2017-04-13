@@ -22,9 +22,8 @@
 
 #include "log.h"
 #include "saul_reg.h"
-
-#include "bme280_params.h"
 #include "bme280.h"
+#include "bme280_params.h"
 
 /**
  * @brief   Allocation of memory for device descriptors

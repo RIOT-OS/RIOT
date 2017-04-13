@@ -22,7 +22,6 @@
 
 #include "log.h"
 #include "saul_reg.h"
-
 #include "io1_xplained.h"
 #include "io1_xplained_params.h"
 

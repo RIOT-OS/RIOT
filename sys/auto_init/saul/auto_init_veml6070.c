@@ -22,7 +22,7 @@
 
 #include "log.h"
 #include "saul_reg.h"
-
+#include "veml6070.h"
 #include "veml6070_params.h"
 
 /**

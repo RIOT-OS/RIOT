@@ -25,7 +25,7 @@
 #include "saul_reg.h"
 #include "saul/periph.h"
 #include "adc_params.h"
-#include "periph/gpio.h"
+#include "periph/adc.h"
 
 /**
  * @brief   Define the number of configured sensors
