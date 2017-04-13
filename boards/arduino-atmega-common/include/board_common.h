@@ -22,8 +22,8 @@
  * @author      Laurent Navet <laurent.navet@gmail.com>
  */
 
-#ifndef BOARD_H
-#define BOARD_H
+#ifndef BOARD_COMMON_H
+#define BOARD_COMMON_H
 
 #include "cpu.h"
 #include "arduino_pinmap.h"
@@ -106,5 +106,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* BOARD_H */
+#endif /* BOARD_COMMON_H */
 /** @} */

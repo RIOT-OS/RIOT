@@ -1,6 +1,8 @@
 # include optional dependencies
 include $(RIOTBOARD)/arduino-atmega-common/Makefile.dep
 
+INCLUDES += -I$(RIOTBOARD)/arduino-atmega-common/include
+
 # define port used to flash the board
 OS = $(shell uname)
 ifeq ($(OS),Linux)
