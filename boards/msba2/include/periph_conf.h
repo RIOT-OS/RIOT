@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Clock configuration
+ * @name    Clock configuration
  * @{
  */
 #define CLOCK_CORECLOCK     (72000000U)         /* the msba2 runs with 72MHz */
@@ -35,7 +35,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name   Timer configuration, select a number from 1 to 4
+ * @name    Timer configuration, select a number from 1 to 4
  * @{
  */
 #define TIMER_NUMOF         (1U)
@@ -46,7 +46,6 @@ extern "C" {
  *
  * Currently, we only support a single device and 3 channels, the implementation
  * is fixed on PWM1.
- *
  * @{
  */
 #define PWM_NUMOF           (1U)
@@ -68,12 +67,14 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Real Time Clock configuration
+ * @name    Real Time Clock configuration
+ * @{
  */
 #define RTC_NUMOF           (1)
+/** @} */
 
 /**
- * @brief uart configuration
+ * @name    UART configuration
  * @{
  */
 #define UART_NUMOF          (1)
@@ -81,7 +82,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name   SPI configuration
+ * @name    SPI configuration
  *
  * The SPI implementation is very much fixed, so we don't need to configure
  * anything besides the mandatory SPI_NUMOF.

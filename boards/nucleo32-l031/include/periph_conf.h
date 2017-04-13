@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @name Clock system configuration
+ * @name    Clock system configuration
  * @{
  */
 #define CLOCK_HSI           (16000000U)         /* internal oscillator */
@@ -52,7 +52,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer configuration
+ * @name    Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -71,7 +71,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name    UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -93,7 +93,7 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief   PWM configuration
+ * @name    PWM configuration
  * @{
  */
 static const pwm_conf_t pwm_config[] = {
@@ -113,7 +113,7 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
- * @name   SPI configuration
+ * @name    SPI configuration
  * @{
  */
 static const uint8_t spi_divtable[2][5] = {
@@ -150,22 +150,21 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name   ADC configuration
+ * @name    ADC configuration
  * @{
  */
 #define ADC_NUMOF           (0)
 /** @} */
 
-
 /**
- * @name   DAC configuration
+ * @name    DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)
 /** @} */
 
 /**
- * @name RTC configuration
+ * @name    RTC configuration
  * @{
  */
 #define RTC_NUMOF           (0U)

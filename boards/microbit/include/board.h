@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Xtimer configuration
+ * @name    Xtimer configuration
  * @{
  */
 #define XTIMER_DEV                  (0)
@@ -39,7 +39,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   LED matrix pin configuration
+ * @name    LED matrix pin configuration
  * @{
  */
 #define MICROBIT_LED_COL1           GPIO_PIN(0,  4)
@@ -57,7 +57,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Button configuration
+ * @name    Button configuration
  * @{
  */
 #define BTN0_PIN                    GPIO_PIN(0, 17)
@@ -65,7 +65,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   MMA8653 accelerometer configuration
+ * @name    MMA8653 accelerometer configuration
  * @{
  */
 #define MMA8653_PARAM_I2C           I2C_0,
@@ -73,7 +73,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   MAG3110 magnetometer configuration
+ * @name    MAG3110 magnetometer configuration
  * @{
  */
 #define MAG3110_PARAM_I2C           I2C_0,

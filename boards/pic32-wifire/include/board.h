@@ -35,18 +35,18 @@ extern "C" {
 #include "vendor/p32mz2048efg100.h"
 
 /**
- * @brief       Set how many increments of the count register per uS
- *              needed by the timer code.
+ * @brief   Set how many increments of the count register per uS
+ *          needed by the timer code.
  */
 #define TICKS_PER_US (100)
 
 /**
- * @brief We are using an External Interrupt Controller (all pic32 devices use this mode)
+ * @brief   We are using an External Interrupt Controller (all pic32 devices use this mode)
  */
-#define EIC_IRQ (1)
+#define EIC_IRQ      (1)
 
 /**
- * @brief       Board level initialisation
+ * @brief   Board level initialisation
  */
 void board_init(void);
 

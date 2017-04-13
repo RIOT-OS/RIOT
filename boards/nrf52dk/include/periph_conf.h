@@ -42,7 +42,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name   Timer configuration
+ * @name    Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {

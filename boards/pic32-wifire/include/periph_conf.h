@@ -27,13 +27,13 @@ extern "C" {
 #endif
 
 /**
- * @brief The peripheral clock is required for the UART Baud rate calculation
- *        It is configured by the 'config' registers (see pic32_config_settings.c)
+ * @brief   The peripheral clock is required for the UART Baud rate calculation
+ *          It is configured by the 'config' registers (see pic32_config_settings.c)
  */
 #define PERIPHERAL_CLOCK (100000000)  /* Hz */
 
 /**
- * @brief   Timer definitions
+ * @name    Timer definitions
  * @{
  */
 #define TIMER_NUMOF         (1)
@@ -41,7 +41,7 @@ extern "C" {
 /** @} */
 
 /**
-  * @brief   UART Definitions
+  * @name    UART Definitions
   *          There are 6 UARTS available on this CPU.
   *          We route debug via UART4 on this board,
   *          this is the UART connected to the FTDI USB <-> UART device.

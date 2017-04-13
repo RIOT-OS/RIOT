@@ -17,11 +17,11 @@
  * @file
  * @brief       peripheral configuration for the MikroE PIC32 Clicker
  *
- * @author       Neil Jones <Neil.Jones@imgtec.com>
+ * @author      Neil Jones <Neil.Jones@imgtec.com>
  */
 
-#ifndef _PERIPH_CONF_H_
-#define _PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,14 +29,14 @@ extern "C" {
 
 
 /**
- * @brief The peripheral clock is required for the UART Baud rate calculation
- *        It is configured by the 'config' registers (see pic32_config_settings.c)
- *        Note 120MHz is the max F for this device.
+ * @brief   The peripheral clock is required for the UART Baud rate calculation
+ *          It is configured by the 'config' registers (see pic32_config_settings.c)
+ *          Note 120MHz is the max F for this device.
  */
 #define PERIPHERAL_CLOCK (96000000)  /* Hz */
 
 /**
- * @brief   Timer definitions
+ * @name    Timer definitions
  * @{
  */
 #define TIMER_NUMOF         (1)
@@ -44,7 +44,7 @@ extern "C" {
 /** @} */
 
 /**
-  * @brief   UART Definitions
+  * @name    UART Definitions
   *          There are 4 UARTS available on this CPU.
   *          We route debug via UART3 on this board,
   *          this is the UART connected to the MikroBUS
@@ -61,5 +61,5 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* PERIPH_CONF_H */
 /** @} */

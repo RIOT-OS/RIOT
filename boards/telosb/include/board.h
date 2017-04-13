@@ -42,7 +42,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Override default baudrate for STDIO
+ * @name    Override default baudrate for STDIO
  * @{
  */
 #ifndef UART_STDIO_BAUDRATE
@@ -51,7 +51,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Xtimer configuration
+ * @name    Xtimer configuration
  * @{
  */
 #define XTIMER_DEV                  (0)
@@ -61,11 +61,10 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   CPU core configuration
- *
- * @todo    Move this to the periph_conf.h
+ * @name    CPU core configuration
  * @{
  */
+/** @todo   Move this to the periph_conf.h */
 #define MSP430_INITIAL_CPU_SPEED    2457600uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
 #define F_RC_OSCILLATOR             32768
@@ -74,7 +73,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED0_PIN                    GPIO_PIN(4, 0)
