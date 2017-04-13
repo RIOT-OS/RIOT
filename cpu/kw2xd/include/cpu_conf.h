@@ -8,9 +8,9 @@
  */
 
 /**
- * @defgroup        cpu_kw2x KW2xD SiP
+ * @defgroup        cpu_kw2xd KW2xD SiP
  * @ingroup         cpu
- * @brief           CPU specific implementations for the Freescale KW2xD SiP.
+ * @brief           CPU specific implementations for the NXP/Freescale KW2xD SiP.
  *                  The SiP incorporates a low power 2.4 GHz transceiver and a
  *                  Kinetis Cortex-M4 MCU.
  * @{

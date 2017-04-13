@@ -1,5 +1,5 @@
 # define the cpu used by the phyWAVE-KW22 board
-export CPU = kw2x
+export CPU = kw2xd
 export CPU_MODEL = kw21d256
 #export CPU_MODEL = kw21d512
 #export CPU_MODEL = kw22d512
