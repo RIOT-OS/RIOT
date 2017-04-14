@@ -1122,6 +1122,7 @@ HTML_EXTRA_STYLESHEET  = src/css/riot.css
 HTML_EXTRA_FILES       = src/css/bootstrap.min.css \
                          src/css/fonts.css \
                          src/css/riot.css \
+                         src/favicon.png \
                          src/fonts/glyphicons-halflings-regular.eot \
                          src/fonts/glyphicons-halflings-regular.svg \
                          src/fonts/glyphicons-halflings-regular.ttf \
