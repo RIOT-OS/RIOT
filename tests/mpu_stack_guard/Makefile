@@ -27,6 +27,7 @@ BOARD_WHITELIST += nucleo-l1        # cortex-m3
 BOARD_WHITELIST += openmote-cc2538  # cortex-m3
 BOARD_WHITELIST += pba-d-01-kw2x    # cortex-m4
 BOARD_WHITELIST += remote           # cortex-m3
+BOARD_WHITELIST += samd21-xpro      # cortex-m0plus
 BOARD_WHITELIST += saml21-xpro      # cortex-m0plus
 BOARD_WHITELIST += samr21-xpro      # cortex-m0plus
 BOARD_WHITELIST += slwstk6220a      # cortex-m4f
