@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    board_frdm-k64f Freescale FRDM-K64F Board
+ * @defgroup    boards_frdm-k64f Freescale FRDM-K64F Board
  * @ingroup     boards
  * @brief       Board specific implementations for the FRDM-K64F
  * @{
