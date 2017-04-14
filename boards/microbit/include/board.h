@@ -68,7 +68,7 @@ extern "C" {
  * @name    MMA8653 accelerometer configuration
  * @{
  */
-#define MMA8653_PARAM_I2C           I2C_0,
+#define MMA8653_PARAM_I2C           I2C_DEV(0)
 #define MMA8653_PARAM_ADDR          0x1d
 /** @} */
 
@@ -76,7 +76,7 @@ extern "C" {
  * @name    MAG3110 magnetometer configuration
  * @{
  */
-#define MAG3110_PARAM_I2C           I2C_0,
+#define MAG3110_PARAM_I2C           I2C_DEV(0)
 #define MAG3110_PARAM_ADDR          0x0e
 /** @} */
 
