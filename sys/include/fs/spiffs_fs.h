@@ -7,8 +7,8 @@
  */
 
 /**
- * @ingroup     fs
- * @defgroup    spiffs  SPIFFS integration
+ * @defgroup    sys_spiffs  SPIFFS integration
+ * @ingroup     sys_fs
  * @{
  *
  * @file
