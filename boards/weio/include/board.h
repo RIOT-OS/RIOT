@@ -18,8 +18,8 @@
  * @author      Paul RATHGEB <paul.rathgeb@skynet.be>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <stdint.h>
 
@@ -34,9 +34,9 @@ extern "C" {
  * @brief   LED pin definitions and handlers
  * @{
  */
-#define LED0_PIN            GPIO_PIN(0, 13)
-#define LED1_PIN            GPIO_PIN(0, 14)
-#define LED2_PIN            GPIO_PIN(0, 15)
+#define LED0_PIN            GPIO_PIN(1, 13)
+#define LED1_PIN            GPIO_PIN(1, 14)
+#define LED2_PIN            GPIO_PIN(1, 15)
 
 #define LED_PORT            LPC_GPIO
 #define LED0_MASK           BIT13
@@ -65,5 +65,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

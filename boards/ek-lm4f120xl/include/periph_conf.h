@@ -93,7 +93,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name   ADC configuration
  * @{
  */
 #define ADC_NUMOF           (12)

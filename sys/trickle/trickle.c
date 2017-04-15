@@ -48,11 +48,11 @@ void trickle_interval(trickle_t *trickle)
     trickle->c = 0;
     trickle->t = (trickle->I / 2) + random_uint32_range(0, (trickle->I / 2) + 1);
 
-    trickle->msg_callback_time = trickle->t * SEC_IN_MS;
+    trickle->msg_callback_time = trickle->t * MS_PER_SEC;
     xtimer_set_msg64(&trickle->msg_callback_timer, trickle->msg_callback_time,
                      &trickle->msg_callback, trickle->pid);
 
-    trickle->msg_interval_time = trickle->I * SEC_IN_MS;
+    trickle->msg_interval_time = trickle->I * MS_PER_SEC;
     xtimer_set_msg64(&trickle->msg_interval_timer, trickle->msg_interval_time,
                      &trickle->msg_interval, trickle->pid);
 }

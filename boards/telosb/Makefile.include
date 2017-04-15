@@ -9,9 +9,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial-MXV*)))
 export BAUD ?= 9600
 include $(RIOTBOARD)/Makefile.include.serial
 
-# setup the boards dependencies
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
-
 # flash tool configuration
 export OFLAGS = -O ihex
 export FLASHER = $(RIOTBASE)/dist/tools/goodfet/goodfet.bsl

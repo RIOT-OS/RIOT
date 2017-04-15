@@ -18,7 +18,7 @@ fi
 
 BRANCH=${1}
 FILEREGEX='\.([sScHh]|cpp)$'
-EXCLUDE='^(cpu/saml21/include/atmel/)'
+EXCLUDE='^(cpu/saml21/include/atmel/)|^(cpu/cortexm_common/include/)'
 
 # If no branch but an option is given, unset BRANCH.
 # Otherwise, consume this parameter.

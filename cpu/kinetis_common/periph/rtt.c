@@ -30,8 +30,6 @@
 #include "cpu.h"
 #include "periph/rtt.h"
 #include "periph_conf.h"
-#include "sched.h"
-#include "thread.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -194,9 +192,7 @@ void RTT_ISR(void)
         }
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #endif /* RTC_NUMOF */

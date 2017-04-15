@@ -1,4 +1,4 @@
-export APPLICATION = periph_uart
+APPLICATION = periph_uart
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_uart

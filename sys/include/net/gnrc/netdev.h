@@ -24,8 +24,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef GNRC_NETDEV_H_
-#define GNRC_NETDEV_H_
+#ifndef GNRC_NETDEV_H
+#define GNRC_NETDEV_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -189,5 +189,5 @@ struct gnrc_netdev {
 }
 #endif
 
-#endif /* GNRC_NETDEV_H_ */
+#endif /* GNRC_NETDEV_H */
 /** @} */

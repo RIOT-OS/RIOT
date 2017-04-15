@@ -27,25 +27,18 @@
  * @todo        remove include irq.h once core was adjusted
  */
 
-#ifndef CPU_H_
-#define CPU_H_
+#ifndef CPU_H
+#define CPU_H
 
 #include <stdio.h>
 
-#include "cpu_conf.h"
 #include "irq.h"
+#include "sched.h"
+#include "thread.h"
+#include "cpu_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-/**
- * @brief   Some members of the Cortex-M family have architecture specific
- *          atomic operations in atomic_arch.c
- */
-#if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
-    defined(CPU_ARCH_CORTEX_M4F)
-#define ARCH_HAS_ATOMIC_COMPARE_AND_SWAP 1
 #endif
 
 /**
@@ -88,9 +81,42 @@ static inline void cpu_sleep_until_event(void)
     __WFE();
 }
 
+/**
+ * @brief   Put the CPU into (deep) sleep mode, using the `WFI` instruction
+ *
+ * @param[in] deep      !=0 for deep sleep, 0 for light sleep
+ */
+static inline void cortexm_sleep(int deep)
+{
+    if (deep) {
+        SCB->SCR |=  (SCB_SCR_SLEEPDEEP_Msk);
+    }
+    else {
+        SCB->SCR &= ~(SCB_SCR_SLEEPDEEP_Msk);
+    }
+
+    /* ensure that all memory accesses have completed and trigger sleeping */
+    __disable_irq();
+    __DSB();
+    __WFI();
+    __enable_irq();
+}
+
+/**
+ * @brief   Trigger a conditional context scheduler run / context switch
+ *
+ * This function is supposed to be called in the end of each ISR.
+ */
+static inline void cortexm_isr_end(void)
+{
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
+}
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* CPU_H_ */
+#endif /* CPU_H */
 /** @} */

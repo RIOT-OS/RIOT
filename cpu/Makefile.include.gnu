@@ -9,6 +9,10 @@ endif
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
-export OBJCOPY = $(PREFIX)objcopy
+export OBJCOPY = $(shell command -v $(PREFIX)objcopy gobjcopy objcopy | head -n 1)
+ifeq ($(OBJCOPY),)
+$(warning objcopy not found. Hex file will not be created.)
+export OBJCOPY = true
+endif
 export OBJDUMP = $(PREFIX)objdump
 export DBG = $(GDBPREFIX)gdb

@@ -109,12 +109,12 @@ uint16_t adc_read(uint8_t channel)
     /* switch channel, start A/D convert */
     AD0CR &= 0xFFFFFF00;
 #if ENABLE_DEBUG
-    t1 = xtimer_now();
+    t1 = _xtimer_now();
 #endif
     AD0CR |= (1 << 24) | (1 << channel);
 
 #if ENABLE_DEBUG
-    t2 = xtimer_now();
+    t2 = _xtimer_now();
 #endif
 
     while (1) {

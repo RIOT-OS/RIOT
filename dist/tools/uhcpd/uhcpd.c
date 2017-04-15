@@ -20,6 +20,9 @@
 char _prefix[16];
 unsigned _prefix_len;
 
+static const char *BIND_OPTION = "--bind-to-device";
+static void bind_to_device(int sock, const char *interface);
+
 int ipv6_addr_split(char *addr_str, char seperator, int _default)
 {
     char *sep = addr_str;
@@ -39,9 +42,11 @@ int ipv6_addr_split(char *addr_str, char seperator, int _default)
 int main(int argc, char *argv[])
 {
     static unsigned ifindex;
+    static unsigned _bind_to_device = 0;
 
     if (argc < 3) {
-        fprintf(stderr, "usage: uhcpd <interface> <prefix/prefix_length>\n");
+        fprintf(stderr, "usage: uhcpd <interface> <prefix/prefix_length> [%s]\n",
+                BIND_OPTION);
         exit(1);
     }
 
@@ -55,6 +60,14 @@ int main(int argc, char *argv[])
     if ((!inet_pton(AF_INET6, argv[2], _prefix)) || (_prefix_len > 128)) {
         fprintf(stderr, "error: cannot parse prefix\n");
         exit(1);
+    }
+
+    if (argc == 4) {
+        if (strcmp(BIND_OPTION, argv[3])) {
+            fprintf(stderr, "error: unkwown option\n");
+            exit(1);
+        }
+        _bind_to_device = 1;
     }
 
     char *addr_str = UHCP_MCAST_ADDR;
@@ -79,6 +92,10 @@ int main(int argc, char *argv[])
     if (sock < 0) {
         perror("socket() failed");
         exit(1);
+    }
+
+    if (_bind_to_device) {
+        bind_to_device(sock, argv[1]);
     }
 
     if (bind(sock, mcast_addr->ai_addr, mcast_addr->ai_addrlen) < 0) {
@@ -143,4 +160,14 @@ int udp_sendto(uint8_t *buf, size_t len, uint8_t *dst, uint16_t dst_port, uhcp_i
     close(fd);
 
     return res;
+}
+
+/* Requires to be 'root', I didn't find another solution for the moment */
+static void bind_to_device(int sock, const char *interface)
+{
+    if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE,
+                   interface, IF_NAMESIZE) < 0 ) {
+        perror("setsockopt(SO_BINDTODEVICE) failed");
+        exit(1);
+    }
 }

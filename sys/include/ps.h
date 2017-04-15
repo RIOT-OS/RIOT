@@ -20,8 +20,8 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef __PS_H
-#define __PS_H
+#ifndef PS_H
+#define PS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,5 +36,5 @@ void ps(void);
 }
 #endif
 
-#endif /* __PS_H */
+#endif /* PS_H */
 /** @} */

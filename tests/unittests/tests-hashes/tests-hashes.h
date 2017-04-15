@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef TESTS_HASHES_H_
-#define TESTS_HASHES_H_
+#ifndef TESTS_HASHES_H
+#define TESTS_HASHES_H
 
 #include "embUnit.h"
 
@@ -69,5 +69,5 @@ Test *tests_hashes_sha256_chain_tests(void);
 }
 #endif
 
-#endif /* TESTS_CRYPTO_H_ */
+#endif /* TESTS_CRYPTO_H */
 /** @} */

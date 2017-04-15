@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef IEEE802154_H_
-#define IEEE802154_H_
+#ifndef IEEE802154_H
+#define IEEE802154_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -78,6 +78,21 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Channel ranges
+ * @{
+ */
+/**
+ * @brief   Minimum channel for sub-GHz band
+ */
+#define IEEE802154_CHANNEL_MIN_SUBGHZ   (0U)
+#define IEEE802154_CHANNEL_MAX_SUBGHZ   (10U)   /**< Maximum channel for sub-GHz band */
+#define IEEE802154_CHANNEL_MIN          (11U)   /**< Minimum channel for 2.4 GHz band */
+#define IEEE802154_CHANNEL_MAX          (26U)   /**< Maximum channel for 2.4 GHz band */
+/** @} */
+
+#define IEEE802154_FRAME_LEN_MAX        (127U)  /**< maximum frame length */
+
+/**
  * @brief   Special address defintions
  * @{
  */
@@ -95,6 +110,28 @@ extern "C" {
  * @brief   Broadcast address
  */
 extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
+/** @} */
+
+/**
+ * @{
+ * @name    Default values
+ * @brief   Default values for devices to choose
+ */
+#ifndef IEEE802154_DEFAULT_SUBGHZ_CHANNEL
+#define IEEE802154_DEFAULT_SUBGHZ_CHANNEL   (5U)
+#endif
+
+#ifndef IEEE802154_DEFAULT_CHANNEL
+#define IEEE802154_DEFAULT_CHANNEL          (26U)
+#endif
+
+#ifndef IEEE802154_DEFAULT_PANID
+#define IEEE802154_DEFAULT_PANID            (0x0023U)
+#endif
+
+#ifndef IEEE802154_DEFAULT_TXPOWER
+#define IEEE802154_DEFAULT_TXPOWER          (0) /* in dBm */
+#endif
 /** @} */
 
 /**
@@ -261,5 +298,5 @@ static inline eui64_t *ieee802154_get_iid(eui64_t *eui64, const uint8_t *addr,
 }
 #endif
 
-#endif /* IEEE802154_H_ */
+#endif /* IEEE802154_H */
 /** @} */

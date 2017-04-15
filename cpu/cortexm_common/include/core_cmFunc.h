@@ -38,8 +38,8 @@
   #pragma clang system_header   /* treat file as system include file */
 #endif
 
-#ifndef __CORE_CMFUNC_H
-#define __CORE_CMFUNC_H
+#ifndef CORE_CMFUNC_H
+#define CORE_CMFUNC_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -91,4 +91,4 @@
 }
 #endif
 
-#endif /* __CORE_CMFUNC_H */
+#endif /* CORE_CMFUNC_H */

@@ -13,7 +13,7 @@
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef PERIPH_CPU_H
@@ -59,6 +59,8 @@ typedef enum {
 } gpio_mode_t;
 /** @} */
 #endif /* ndef DOXYGEN */
+
+#define PM_NUM_MODES    (3)
 
 #ifdef __cplusplus
 }

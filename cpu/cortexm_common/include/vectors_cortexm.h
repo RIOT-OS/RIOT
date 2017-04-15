@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef VECTORS_DEFAULT_H_
-#define VECTORS_DEFAULT_H_
+#ifndef VECTORS_DEFAULT_H
+#define VECTORS_DEFAULT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,6 +33,14 @@ extern "C" {
  * @brief   Put this macro in front of the array holding the interrupt vectors
  */
 #define ISR_VECTORS     __attribute__((used,section(".vectors")))
+
+/**
+ * @brief   Number of Cortex-M non-ISR exceptions
+ *
+ * This means those that are no hardware interrupts, or the ones with a
+ * negative interrupt number.
+ */
+#define CPU_NONISR_EXCEPTIONS   (15)
 
 /**
  * @brief   This function is the default entry point after a system reset
@@ -114,5 +122,5 @@ void dummy_handler_default(void);
 }
 #endif
 
-#endif /* VECTORS_DEFAULT_H_ */
+#endif /* VECTORS_DEFAULT_H */
 /** @} */

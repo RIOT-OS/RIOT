@@ -129,9 +129,13 @@ extern int _ccnl_interest(int argc, char **argv);
 extern int _ccnl_fib(int argc, char **argv);
 #endif
 
-#ifdef MODULE_OPENTHREAD
+#if defined(MODULE_OPENTHREAD) && 0
 extern int _openthread_state(int argc, char **argv);
 extern int _openthread_ipaddr(int argc, char **argv);
+#endif
+
+#ifdef MODULE_SNTP
+extern int _ntpdate(int argc, char **argv);
 #endif
 
 const shell_command_t _shell_command_list[] = {
@@ -181,8 +185,10 @@ const shell_command_t _shell_command_list[] = {
     { "lspci", "Lists PCI devices", _x86_lspci },
 #endif
 #ifdef MODULE_GNRC_NETIF
-    { "ifconfig", "Configure network interfaces", _netif_config },
-    { "txtsnd", "Sends a custom string as is over the link layer", _netif_send },
+    {"ifconfig", "Configure network interfaces", _netif_config},
+#ifdef MODULE_GNRC_TXTSND
+    {"txtsnd", "Sends a custom string as is over the link layer", _netif_send },
+#endif
 #endif
 #ifdef MODULE_FIB
     { "fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler },
@@ -219,7 +225,10 @@ const shell_command_t _shell_command_list[] = {
     { "ccnl_cont", "create content and populated it", _ccnl_content },
     { "ccnl_fib", "shows or modifies the CCN-Lite FIB", _ccnl_fib },
 #endif
-#ifdef MODULE_OPENTHREAD
+#ifdef MODULE_SNTP
+    { "ntpdate", "synchronizes with a remote time server", _ntpdate },
+#endif
+#if defined(MODULE_OPENTHREAD) && 0
     { "ot_ipaddr", "shows OpenThread IP addresses", _openthread_ipaddr },
     { "ot_state", "shows state of current Thread node", _openthread_state },
 #endif

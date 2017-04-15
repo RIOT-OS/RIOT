@@ -19,8 +19,8 @@
  * @author      Francisco Acosta <francisco.acosta@inria.fr>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "waspmote_pinmap.h"
@@ -169,8 +169,8 @@ extern "C" {
  */
 #define XTIMER_WIDTH                (16)
 #define XTIMER_SHIFT                (4)
+#define XTIMER_HZ                   (62500UL)
 #define XTIMER_BACKOFF              (40)
-#define XTIMER_TICKS_INIT           (921600ul)
 /** @} */
 
 /**
@@ -182,5 +182,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

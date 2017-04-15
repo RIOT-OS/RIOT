@@ -17,15 +17,15 @@
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief Timer configuration
+ * @name   Timer configuration
  * @{
  */
 #define TIMER_NUMOF         (1U)
@@ -45,7 +45,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief UART configuration
+ * @name   UART configuration
  * @{
  */
 #define UART_NUMOF          (2U)
@@ -90,5 +90,5 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

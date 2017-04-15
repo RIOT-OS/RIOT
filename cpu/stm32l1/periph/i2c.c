@@ -344,7 +344,7 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, in
 void i2c_poweron(i2c_t dev)
 {
     if ((unsigned int)dev < I2C_NUMOF) {
-        RCC->APB1ENR |= (RCC_APB1ENR_I2C1EN << dev);
+        periph_clk_en(APB1, (RCC_APB1ENR_I2C1EN << dev));
     }
 }
 
@@ -352,7 +352,7 @@ void i2c_poweroff(i2c_t dev)
 {
     if ((unsigned int)dev < I2C_NUMOF) {
         while (i2c_config[dev].dev->SR2 & I2C_SR2_BUSY) {}
-        RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN << dev);
+        periph_clk_dis(APB1, (RCC_APB1ENR_I2C1EN << dev));
     }
 }
 

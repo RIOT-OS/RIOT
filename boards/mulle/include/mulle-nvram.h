@@ -6,8 +6,8 @@
  * details.
  */
 
-#ifndef MULLE_NVRAM_H_
-#define MULLE_NVRAM_H_
+#ifndef MULLE_NVRAM_H
+#define MULLE_NVRAM_H
 
 #include "nvram.h"
 
@@ -42,4 +42,4 @@ extern nvram_t *mulle_nvram;
 }
 #endif
 
-#endif /* MULLE_NVRAM_H_ */
+#endif /* MULLE_NVRAM_H */

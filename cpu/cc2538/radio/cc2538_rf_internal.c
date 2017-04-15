@@ -19,9 +19,7 @@
  * @}
  */
 
-#include "sched.h"
-#include "thread.h"
-
+#include "cpu.h"
 #include "cc2538.h"
 #include "cc2538_rf.h"
 #include "cc2538_rf_netdev.h"
@@ -71,9 +69,7 @@ void isr_rfcorerxtx(void)
 
    _irq_handler();
 
-   if (sched_context_switch_request) {
-        thread_yield();
-   }
+    cortexm_isr_end();
 }
 
 uint_fast8_t rfcore_read_byte(void)

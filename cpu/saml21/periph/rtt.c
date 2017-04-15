@@ -22,7 +22,6 @@
 #include <stdint.h>
 #include "periph/rtt.h"
 #include "board.h"
-#include "thread.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -53,7 +52,7 @@ void rtt_init(void)
     while(RTC->MODE0.SYNCBUSY.bit.ENABLE) {}
 
     /* initially clear flag */
-    RTC->MODE0.INTFLAG.bit.CMP0 = 1;
+    RTC->MODE0.INTFLAG.reg |= RTC_MODE1_INTFLAG_CMP(1 << 0);
 
     /* enable RTT IRQ */
     NVIC_EnableIRQ(RTC_IRQn);
@@ -129,22 +128,19 @@ void rtt_poweroff(void)
 void isr_rtc(void)
 {
     if (RTC->MODE0.INTFLAG.bit.OVF) {
-        RTC->MODE0.INTFLAG.bit.OVF = 1;
+        RTC->MODE0.INTFLAG.reg |= RTC_MODE0_INTFLAG_OVF;
         if (_overflow_cb) {
             _overflow_cb(_overflow_arg);
         }
     }
     if (RTC->MODE0.INTFLAG.bit.CMP0) {
         /* clear flag */
-        RTC->MODE0.INTFLAG.bit.CMP0 = 1;
+        RTC->MODE0.INTFLAG.reg |= RTC_MODE1_INTFLAG_CMP(1 << 0);
         /* disable interrupt */
         RTC->MODE0.INTENCLR.bit.CMP0 = 1;
         if (_cmp0_cb) {
             _cmp0_cb(_cmp0_arg);
         }
     }
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }

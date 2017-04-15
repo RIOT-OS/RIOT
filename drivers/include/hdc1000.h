@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
+ *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -9,126 +10,138 @@
 /**
  * @defgroup    drivers_hdc1000 HDC1000 Humidity and Temperature Sensor
  * @ingroup     drivers_sensors
- * @brief       Driver for the Texas Instruments HDC1000
- *              Humidity and Temperature Sensor.
- *              The driver will initialize the sensor for best
- *              resolution (14 bit). Currently the driver doesn't use the heater.
- *              Temperature and humidity are acquired in sequence.
- *              The sensor is always in sleep mode. The measurement must
- *              be started by a write access to the address 0x00
- *              (HDC1000_TEMPERATURE). After completing the measurement
- *              the sensor will return to sleep mode. Typical
- *              Conversion Time by 14 bit resolution is 6.50ms
- *              for humidity and 6.35ms for temperature.
- *              HDC1000_CONVERSION_TIME is twice as large to prevent
- *              the problems with timer resolution.
+ * @brief       Driver for the TI HDC1000 Humidity and Temperature Sensor
+ *
+ * The driver will initialize the sensor for best resolution (14 bit). Currently
+ * the driver doesn't use the heater. Temperature and humidity are acquired in
+ * sequence. The sensor is always in sleep mode.
+ *
+ * The temperature and humidity values can either be acquired using the
+ * simplified `hdc1000_read()` function, or the conversion can be triggered
+ * manually using the `hdc1000_trigger_conversion()` and `hdc1000_get_results()`
+ * functions sequentially. If using the second method, on must wait at least
+ * `HDC1000_CONVERSION_TIME` between triggering the conversion and reading the
+ * results.
+ *
+ * @note        The driver does currently not support using the devices heating
+ *              unit.
  *
  * @{
  *
  * @file
- * @brief       Interface definition for the HDC1000 sensor driver.
+ * @brief       Interface definition for the HDC1000 sensor driver
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef HDC1000_H
 #define HDC1000_H
 
 #include <stdint.h>
-#include <stdbool.h>
+
 #include "periph/i2c.h"
+#include "hdc1000_regs.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+/**
+ * @brief   Default I2C bus address of HDC1000 devices
+ */
 #ifndef HDC1000_I2C_ADDRESS
-#define HDC1000_I2C_ADDRESS           0x43 /**< Default Device Address */
-#endif
-
-#ifndef HDC1000_CONVERSION_TIME
-#define HDC1000_CONVERSION_TIME       26000 /**< Default Conversion Time */
+#define HDC1000_I2C_ADDRESS           (0x43)
 #endif
 
 /**
- * @brief Device descriptor for HDC1000 sensors.
+ * @brief   Typical conversion time needed to acquire new values [in us]
+ *
+ * @note    This time value is chosen twice as large as needed for two 14-bit
+ *          conversions (worst case) to allow for timer imprecision:
+ *          (convert temp + convert hum) * 2 -> (6.5ms + 6.5ms) * 2 := 26ms.
+ */
+#ifndef HDC1000_CONVERSION_TIME
+#define HDC1000_CONVERSION_TIME       (26000)
+#endif
+
+/**
+ * @brief   HDC1000 specific return values
+ */
+enum {
+    HDC1000_OK    = 0,      /**< everything went as expected */
+    HDC1000_NODEV = -1,     /**< no HDC1000 device found on the bus */
+    HDC1000_NOBUS = -2,     /**< errors while initializing the I2C bus */
+};
+
+/**
+ * @brief   Possible resolution values
+ */
+typedef enum {
+    HDC1000_11BIT = (HDC1000_TRES11 | HDC1000_HRES11),  /**< 11-bit conversion */
+    HDC1000_14BIT = (HDC1000_TRES14 | HDC1000_HRES14)   /**< 14-bit conversion */
+} hdc1000_res_t;
+
+/**
+ * @brief   Parameters needed for device initialization
  */
 typedef struct {
-    i2c_t i2c;              /**< I2C device the sensor is connected to */
-    uint8_t addr;           /**< the sensor's slave address on the I2C bus */
-    bool initialized;       /**< sensor status, true if sensor is initialized */
+    i2c_t i2c;              /**< bus the device is connected to */
+    uint8_t addr;           /**< address on that bus */
+    hdc1000_res_t res;      /**< resolution used for sampling temp and hum */
+} hdc1000_params_t;
+
+/**
+ * @brief   Device descriptor for HDC1000 sensors
+ */
+typedef struct {
+    hdc1000_params_t p;     /**< Configuration parameters */
 } hdc1000_t;
 
 /**
- * @brief HDC1000 sensor test.
- * This function looks for Manufacturer ID of the HDC1000 sensor.
- *
- * @param[in]  dev          device descriptor of sensor
- *
- * @return                  0 on success
- * @return                  -1 on error
- */
-int hdc1000_test(hdc1000_t *dev);
-
-/**
- * @brief Initialise the HDC1000 sensor driver.
- * 14 bit resolution, heater off, temperature and humidity
- * are acquired in sequence.
+ * @brief   Initialize the given HDC1000 device
  *
  * @param[out] dev          device descriptor of sensor to initialize
- * @param[in]  i2c          I2C bus the sensor is connected to
- * @param[in]  address      sensor's I2C slave address
+ * @param[in]  params       configuration parameters
  *
- * @return                  0 on success
- * @return                  -1 if initialization of I2C bus failed
- * @return                  -2 if sensor test failed
- * @return                  -3 if sensor configuration failed
+ * @return                  HDC1000_OK on success
+ * @return                  HDC1000_NOBUS if initialization of I2C bus fails
+ * @return                  HDC1000_NODEV if no HDC1000 device found on bus
  */
-int hdc1000_init(hdc1000_t *dev, i2c_t i2c, uint8_t address);
+int hdc1000_init(hdc1000_t *dev, const hdc1000_params_t *params);
 
 /**
- * @brief Reset the HDC1000 sensor. After that sensor should be reinitialized.
+ * @brief   Trigger a new conversion
  *
- * @param[out] dev          device descriptor of sensor to reset
- *
- * @return                  0 on success
- * @return                  -1 on error
- */
-int hdc1000_reset(hdc1000_t *dev);
-
-/**
- * @brief Trigger the measurements.
- * Conversion Time by 14 bit resolution is 6.50ms.
+ * After the conversion is triggered, one has to wait
+ * @ref HDC1000_CONVERSION_TIME us until the results can be read using
+ * @ref hdc1000_reg_results().
  *
  * @param[in]  dev          device descriptor of sensor
- *
- * @return                  0 on success
- * @return                  -1 on error
  */
-int hdc1000_startmeasure(hdc1000_t *dev);
+void hdc1000_trigger_conversion(hdc1000_t *dev);
 
 /**
- * @brief Read sensor's data.
+ * @brief   Read conversion results for temperature and humidity
  *
  * @param[in]  dev          device descriptor of sensor
- * @param[out] rawtemp      raw temperature value
- * @param[out] rawhum       raw humidity value
- *
- * @return                  0 on success
- * @return                  -1 on error
+ * @param[out] temp         temperature [in 100 * degree centigrade]
+ * @param[out] hum          humidity [in 100 * percent relative]
  */
-int hdc1000_read(hdc1000_t *dev, uint16_t *rawtemp, uint16_t *rawhum);
+void hdc1000_get_results(hdc1000_t *dev, int16_t *temp, int16_t *hum);
 
 /**
- * @brief Convert raw sensor values to temperature and humidity.
+ * @brief   Convenience function for reading temperature and humidity
  *
- * @param[in]  rawtemp      raw temperature value
- * @param[in]  rawhum       raw humidity value
- * @param[out] temp         converted temperature*100
- * @param[out] hum          converted humidity*100
+ * This function will trigger a new conversion, wait for the conversion to be
+ * finished and the get the results from the device.
+ *
+ * @param[in]  dev          device descriptor of sensor
+ * @param[out] temp         temperature [in 100 * degree centigrade]
+ * @param[out] hum          humidity [in 100 * percent relative]
  */
-void hdc1000_convert(uint16_t rawtemp, uint16_t rawhum,  int *temp, int *hum);
+void hdc1000_read(hdc1000_t *dev, int16_t *temp, int16_t *hum);
 
 #ifdef __cplusplus
 }

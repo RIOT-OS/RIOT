@@ -14,7 +14,6 @@ USEMODULE += gnrc_pktdump
 USEMODULE += shell
 USEMODULE += shell_commands
 
-
 # set optional default values for ZEP parameters if unset
 ZEP_DST      ?= "\"::1\""
 ZEP_SRC_PORT ?= GNRC_ZEP_DEFAULT_PORT

@@ -19,8 +19,8 @@
  * @author      Mark Essien <markessien@gmail.com>
  */
 
-#ifndef CRYPTO_CIPHERS_H_
-#define CRYPTO_CIPHERS_H_
+#ifndef CRYPTO_CIPHERS_H
+#define CRYPTO_CIPHERS_H
 
 #include <stdint.h>
 
@@ -35,7 +35,6 @@ extern "C" {
  */
 // #define CRYPTO_THREEDES
 // #define CRYPTO_AES
-// #define CRYPTO_TWOFISH
 
 /** @brief the length of keys in bytes */
 #define CIPHERS_MAX_KEY_SIZE 20
@@ -48,13 +47,10 @@ extern "C" {
  *
  * threedes     needs 24  bytes                           <br>
  * aes          needs CIPHERS_MAX_KEY_SIZE bytes          <br>
- * twofish      needs CIPHERS_MAX_KEY_SIZE bytes          <br>
  */
 #if defined(CRYPTO_THREEDES)
     #define CIPHER_MAX_CONTEXT_SIZE 24
 #elif defined(CRYPTO_AES)
-    #define CIPHER_MAX_CONTEXT_SIZE CIPHERS_MAX_KEY_SIZE
-#elif defined(CRYPTO_TWOFISH)
     #define CIPHER_MAX_CONTEXT_SIZE CIPHERS_MAX_KEY_SIZE
 #else
     // 0 is not a possibility because 0-sized arrays are not allowed in ISO C
@@ -107,7 +103,6 @@ typedef const cipher_interface_t *cipher_id_t;
 
 extern const cipher_id_t CIPHER_3DES;
 extern const cipher_id_t CIPHER_AES_128;
-extern const cipher_id_t CIPHER_TWOFISH;
 
 
 /**
@@ -176,4 +171,4 @@ int cipher_get_block_size(const cipher_t* cipher);
 #endif
 
 /** @} */
-#endif /* CRYPTO_CIPHERS_H_ */
+#endif /* CRYPTO_CIPHERS_H */

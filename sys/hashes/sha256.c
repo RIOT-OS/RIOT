@@ -47,7 +47,6 @@
 #include <assert.h>
 
 #include "hashes/sha256.h"
-#include "board.h"
 
 #ifdef __BIG_ENDIAN__
 /* Copy a vector of big-endian uint32_t into a vector of bytes */

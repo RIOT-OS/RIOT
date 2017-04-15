@@ -22,8 +22,8 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
-#ifndef GNRC_NETIF_H_
-#define GNRC_NETIF_H_
+#ifndef GNRC_NETIF_H
+#define GNRC_NETIF_H
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -142,5 +142,5 @@ size_t gnrc_netif_addr_from_str(uint8_t *out, size_t out_len, const char *str);
 }
 #endif
 
-#endif /* GNRC_NETIF_H_ */
+#endif /* GNRC_NETIF_H */
 /** @} */

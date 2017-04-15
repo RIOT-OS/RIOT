@@ -108,23 +108,6 @@ void timer_stop(tim_t dev)
     TIMER_BASE->CTL &= ~(TIMER_CTL_MC_MASK);
 }
 
-void timer_irq_enable(tim_t dev)
-{
-
-    /* TODO: not supported, yet
-     *
-     * Problem here: there is no means, of globally disabling timer interrupts.
-     * We could just enable the interrupts for all CC channels, but this would
-     * mean, that we might enable interrupts for channels, that are not active.
-     * I guess we need to remember the interrupt state of all channels before
-     * disabling and then restore this state when enabling again?! */
-}
-
-void timer_irq_disable(tim_t dev)
-{
-    /* TODO: not supported, yet */
-}
-
 ISR(TIMER_ISR_CC0, isr_timer_a_cc0)
 {
     __enter_isr();

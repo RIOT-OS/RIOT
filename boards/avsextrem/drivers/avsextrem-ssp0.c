@@ -29,7 +29,6 @@
 //#include "mma7455l-board.h"
 #include "gpioint.h"
 #include <stdio.h>
-#include "lpm.h"
 
 //uint16_t sampleRateMMA7455L;
 //uint16_t interruptTicksMMA7455L;

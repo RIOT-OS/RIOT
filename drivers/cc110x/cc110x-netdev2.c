@@ -29,7 +29,6 @@
 #include "cc110x-interface.h"
 #include "net/eui64.h"
 
-#include "periph/cpuid.h"
 #include "periph/gpio.h"
 #include "net/netdev2.h"
 #include "net/gnrc/nettype.h"
@@ -95,10 +94,12 @@ static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
             assert(value_len == 2);
             *((uint16_t *) value) = NETDEV2_TYPE_CC110X;
             return 2;
+#ifdef MODULE_GNRC_NETIF
         case NETOPT_PROTO:
             assert(value_len == sizeof(gnrc_nettype_t));
             *((gnrc_nettype_t *)value) = cc110x->proto;
             return sizeof(gnrc_nettype_t);
+#endif
         case NETOPT_CHANNEL:
             assert(value_len > 1);
             *((uint16_t *)value) = (uint16_t)cc110x->radio_channel;
@@ -145,6 +146,7 @@ static int _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
                 return -EINVAL;
             }
             return 1;
+#ifdef MODULE_GNRC_NETIF
         case NETOPT_PROTO:
             if (value_len != sizeof(gnrc_nettype_t)) {
                 return -EINVAL;
@@ -154,6 +156,7 @@ static int _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
                 return sizeof(gnrc_nettype_t);
             }
             break;
+#endif
         default:
             return -ENOTSUP;
     }

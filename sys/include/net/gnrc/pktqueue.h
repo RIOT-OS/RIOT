@@ -7,19 +7,19 @@
  */
 
 /**
- * @defgroup    net_gnrc_pktqueue Packet Queue
+ * @defgroup    net_gnrc_pktqueue Packet queue
  * @ingroup     net_gnrc
- * @brief       Packet wrapper for the Priority Queue
+ * @brief       @ref gnrc_pktsnip_t queue
  * @{
  *
  * @file
- * @brief       gnrc_pktsnip_t-centric wrapper for @ref priority_queue_t
+ * @brief       Packet queue definitions
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef GNRC_PKTQUEUE_H_
-#define GNRC_PKTQUEUE_H_
+#ifndef GNRC_PKTQUEUE_H
+#define GNRC_PKTQUEUE_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -33,8 +33,6 @@ extern "C" {
 
 /**
  * @brief   data type for packet queue nodes
- *
- * @extends priority_queue_node_t
  */
 typedef struct gnrc_pktqueue {
     struct gnrc_pktqueue *next; /**< next node in queue */
@@ -42,10 +40,7 @@ typedef struct gnrc_pktqueue {
 } gnrc_pktqueue_t;
 
 /**
- * @brief       add @p node into @p queue based on its priority
- *
- * @details     The new node will be appended after objects with the same
- *              priority.
+ * @brief       add @p node into @p queue.
  *
  * @param[in,out]   queue   the queue, may not be NULL
  * @param[in]       node    the node to add.
@@ -89,7 +84,7 @@ static inline gnrc_pktqueue_t *gnrc_pktqueue_remove_head(gnrc_pktqueue_t **queue
 }
 #endif
 
-#endif /* GNRC_PKTQUEUE_H_ */
+#endif /* GNRC_PKTQUEUE_H */
 /**
  * @}
  */

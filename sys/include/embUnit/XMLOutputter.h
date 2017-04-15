@@ -32,8 +32,8 @@
  *
  * $Id: XMLOutputter.h,v 1.3 2003/09/06 13:28:27 arms22 Exp $
  */
-#ifndef EMBUNIT_XMLOUTPUTTER_H_
-#define EMBUNIT_XMLOUTPUTTER_H_
+#ifndef EMBUNIT_XMLOUTPUTTER_H
+#define EMBUNIT_XMLOUTPUTTER_H
 
 #include "Outputter.h"
 
@@ -48,4 +48,4 @@ OutputterRef XMLOutputter_outputter(void);
 }
 #endif
 
-#endif/* EMBUNIT_XMLOUTPUTTER_H_ */
+#endif/* EMBUNIT_XMLOUTPUTTER_H */

@@ -9,7 +9,7 @@ pipeline:
             - printenv
             - git status
             - git remote -v
-            - ./dist/tools/travis-scripts/build_and_test.sh
+            - ./dist/tools/ci/build_and_test.sh
 matrix:
     BUILDTEST_MCU_GROUP:
         - static-tests

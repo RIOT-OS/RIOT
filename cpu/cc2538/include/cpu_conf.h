@@ -26,6 +26,7 @@
 #include "cc2538_gptimer.h"
 #include "cc2538_ioc.h"
 #include "cc2538_soc_adc.h"
+#include "cc2538_ssi.h"
 #include "cc2538_rfcore.h"
 #include "cc2538_sys_ctrl.h"
 

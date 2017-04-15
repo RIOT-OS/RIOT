@@ -16,8 +16,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NETDEV2_IEEE802154_H_
-#define NETDEV2_IEEE802154_H_
+#ifndef NETDEV2_IEEE802154_H
+#define NETDEV2_IEEE802154_H
 
 #include "net/ieee802154.h"
 #include "net/gnrc/nettype.h"
@@ -164,5 +164,5 @@ int netdev2_ieee802154_set(netdev2_ieee802154_t *dev, netopt_t opt, void *value,
 }
 #endif
 
-#endif /* NETDEV2_IEEE802154_H_ */
+#endif /* NETDEV2_IEEE802154_H */
 /** @} */

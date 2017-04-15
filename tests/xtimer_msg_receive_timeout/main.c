@@ -23,6 +23,7 @@
  *
  * @}
  */
+#include <stdio.h>
 
 #include "thread.h"
 #include "msg.h"

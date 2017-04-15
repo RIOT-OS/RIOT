@@ -68,6 +68,11 @@ static char ot_thread_stack[2 * THREAD_STACKSIZE_MAIN];
 static mutex_t mtx = MUTEX_INIT;
 
 
+void otPlatReset(otInstance *aInstance)
+{
+    (void)aInstance;
+}
+
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
 /* init and run OpeanThread's UART simulation (sdtio) */
 void openthread_uart_run(void)
@@ -97,11 +102,6 @@ void end_mutex(void)
     mutex_unlock(&mtx);
 }
 
-void otPlatReset(otInstance *aInstance)
-{
-	/*TODO: Implement*/
-	(void)aInstance;
-}
 void openthread_bootstrap(void)
 {
     /* init random */

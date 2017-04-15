@@ -10,6 +10,7 @@
 #define ATMEGA_TIME_H
 
 #include <sys/types.h>
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -18,8 +18,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_NDP_HOST_H_
-#define GNRC_NDP_HOST_H_
+#ifndef GNRC_NDP_HOST_H
+#define GNRC_NDP_HOST_H
 
 #include "net/gnrc/ipv6/netif.h"
 
@@ -50,5 +50,5 @@ void gnrc_ndp_host_retrans_rtr_sol(gnrc_ipv6_netif_t *iface);
 }
 #endif
 
-#endif /* GNRC_NDP_HOST_H_ */
+#endif /* GNRC_NDP_HOST_H */
 /** @} */

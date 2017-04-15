@@ -13,6 +13,9 @@ sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
 def testfunc(child):
+    # check if running with newlib
+    print("ATTENTION: This script is currently not suitable for non-native platforms")
+
     # test data width vs. output width discrepency
     child.expect_exact(r'od(short_str, sizeof(short_str), OD_WIDTH_DEFAULT, 0)')
     child.expect_exact(r'000000000 000000041101')

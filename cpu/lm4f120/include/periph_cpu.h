@@ -16,8 +16,8 @@
  * @author          Rakendra Thapa <rakendrathapa@gmail.com>
  */
 
-#ifndef PERIPH_CPU_H_
-#define PERIPH_CPU_H_
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include "periph/dev_enums.h"
 #include "cpu_conf.h"
@@ -125,5 +125,5 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_CPU_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */

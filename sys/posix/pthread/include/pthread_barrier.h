@@ -14,8 +14,8 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef __SYS__POSIX__PTHREAD_BARRIER__H
-#define __SYS__POSIX__PTHREAD_BARRIER__H
+#ifndef SYS__POSIX__PTHREAD_BARRIER__H
+#define SYS__POSIX__PTHREAD_BARRIER__H
 
 #include "mutex.h"
 
@@ -136,7 +136,7 @@ int pthread_barrierattr_setpshared(pthread_barrierattr_t *attr, int pshared);
 }
 #endif
 
-#endif
+#endif /* SYS__POSIX__PTHREAD_BARRIER__H */
 
 /**
  * @}

@@ -22,8 +22,6 @@
 
 #include "board.h"
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/uart.h"
 #include "periph_conf.h"
 
@@ -124,9 +122,7 @@ void UART_0_ISR(void)
         reset(UART_0_DEV);
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif /* UART_0_EN */
 
@@ -148,9 +144,7 @@ void UART_1_ISR(void)
         reset(UART_1_DEV);
     }
 
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif /* UART_1_EN */
 
@@ -160,8 +154,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* initialize basic functionality */
     int res = init_base(uart, baudrate);
-
-    if (res != 0) {
+    if (res != UART_OK) {
         return res;
     }
 
@@ -183,9 +176,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
             NVIC_EnableIRQ(UART1_IRQn);
             break;
 #endif
+        default:
+            return UART_NODEV;
     }
 
-    return 0;
+    return UART_OK;
 }
 
 static int init_base(uart_t uart, uint32_t baudrate)
@@ -240,7 +235,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
 
         default:
             (void)u;
-            return -1;
+            return UART_NODEV;
     }
 
 #if UART_0_EN || UART_1_EN
@@ -313,7 +308,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     /* UART Enable */
     u->cc2538_uart_ctl.CTLbits.UARTEN = 1;
 
-    return 0;
+    return UART_OK;
 #endif /* UART_0_EN || UART_1_EN */
 }
 

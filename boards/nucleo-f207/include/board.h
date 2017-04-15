@@ -19,8 +19,8 @@
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "board_common.h"
 
@@ -66,5 +66,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

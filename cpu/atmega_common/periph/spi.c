@@ -22,31 +22,30 @@
 
 #include "cpu.h"
 #include "mutex.h"
+#include "assert.h"
 #include "periph/spi.h"
-
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
-/* guard this file in case no SPI device is defined */
-#if SPI_NUMOF
 
 /**
  * @brief   Extract BR0, BR1 and SPI2X bits from speed value
  * @{
  */
-#define SPEED_MASK          (0x3)
+#define CLK_MASK            (0x3)
 #define S2X_SHIFT           (2)
 /** @} */
 
 static mutex_t lock = MUTEX_INIT;
 
-int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
+void spi_init(spi_t bus)
 {
-    DEBUG("spi.c: conf = %d, speed = %d\n", conf, speed);
-    /* make sure device is valid (there is only one...) */
-    if (dev != 0) {
-        return -1;
-    }
+    assert(bus == 0);
+    /* power off the SPI peripheral */
+    MEGA_PRR |= (1 << PRSPI);
+    /* trigger the pin configuration */
+    spi_init_pins(bus);
+}
+
+void spi_init_pins(spi_t bus)
+{
 
     /* the pin configuration for this CPU is fixed:
      * - PB3: MISO (configure as input - done automatically)
@@ -59,93 +58,59 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
      * select externally for now)
      */
     DDRB |= ((1 << DDB2) | (1 << DDB1) | (1 << DDB0));
+}
 
-    /* make sure the SPI is not powered off */
+int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+{
+    (void)cs;
+
+    /* lock the bus and power on the SPI peripheral */
+    mutex_lock(&lock);
     MEGA_PRR &= ~(1 << PRSPI);
 
     /* configure as master, with given mode and clock */
-    SPSR = (speed >> S2X_SHIFT);
-    SPCR = ((1 << SPE) | (1 << MSTR) | conf | (speed & SPEED_MASK));
+    SPSR = (clk >> S2X_SHIFT);
+    SPCR = ((1 << SPE) | (1 << MSTR) | mode | (clk & CLK_MASK));
+    SPCR |= (1 << SPE);
 
-    /* clear interrupt flag by reading SPSR */
+    /* clear interrupt flag by reading SPSR and data register by reading SPDR */
     (void)SPSR;
-
-    /* clear data register */
     (void)SPDR;
 
-    return 0;
+    return SPI_OK;
 }
 
-int spi_acquire(spi_t dev)
+void spi_release(spi_t bus)
 {
-    mutex_lock(&lock);
-    return 0;
-}
-
-int spi_release(spi_t dev)
-{
+    /* power off and release the bus */
+    SPCR &= ~(1 << SPE);
+    MEGA_PRR |= (1 << PRSPI);
     mutex_unlock(&lock);
-    return 0;
 }
 
-int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
+void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
+                        const void *out, void *in, size_t len)
 {
-    (void) dev;
-    (void) conf;
-    (void) cb;
+    uint8_t *out_buf = (uint8_t *)out;
+    uint8_t *in_buf = (uint8_t *)in;
 
-    /* not implemented */
-    return -1;
-}
+    assert(out_buf || in_buf);
 
-void spi_transmission_begin(spi_t dev, char reset_val)
-{
-    (void)dev;
-    (void)reset_val;
+    if (cs != SPI_CS_UNDEF) {
+        gpio_clear((gpio_t)cs);
+    }
 
-    /* not implemented */
-}
-
-int spi_transfer_byte(spi_t dev, char out, char *in)
-{
-    return spi_transfer_bytes(dev, &out, in, 1);
-}
-
-int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
-{
-    for (unsigned int i = 0; i < length; i++) {
-        char tmp = (out) ? out[i] : 0;
+    for (size_t i = 0; i < len; i++) {
+        uint8_t tmp = (out_buf) ? out_buf[i] : 0;
         SPDR = tmp;
         while (!(SPSR & (1 << SPIF))) {}
         tmp = SPDR;
-        if (in) {
-            in[i] = tmp;
+        if (in_buf) {
+            in_buf[i] = tmp;
         }
     }
 
-    return (int)length;
+    if ((!cont) && (cs != SPI_CS_UNDEF)) {
+        gpio_set((gpio_t)cs);
+    }
 }
-
-int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
-{
-    spi_transfer_bytes(dev, (char *)&reg, NULL, 1);
-    return spi_transfer_bytes(dev, &out, in, 1);
-}
-
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length)
-{
-    spi_transfer_bytes(dev, (char *)&reg, NULL, 1);
-    return spi_transfer_bytes(dev, out, in, length);
-}
-
-void spi_poweron(spi_t dev)
-{
-    SPCR |= (1 << SPE);
-}
-
-void spi_poweroff(spi_t dev)
-{
-    SPCR &= ~(1 << SPE);
-}
-
-#endif /* SPI_NUMOF */

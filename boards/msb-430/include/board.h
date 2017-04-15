@@ -31,8 +31,8 @@
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  */
 
-#ifndef MSB_BOARD_H_
-#define MSB_BOARD_H_
+#ifndef MSB_BOARD_H
+#define MSB_BOARD_H
 
 #include "board_common.h"
 
@@ -65,4 +65,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /*  MSB_BOARD_H_ */
+#endif /*  MSB_BOARD_H */

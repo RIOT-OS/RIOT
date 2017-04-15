@@ -32,8 +32,8 @@
  * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  */
 
-#ifndef GNRC_TFTP_H_
-#define GNRC_TFTP_H_
+#ifndef GNRC_TFTP_H
+#define GNRC_TFTP_H
 
 #include <inttypes.h>
 
@@ -85,7 +85,7 @@ extern "C" {
  * @brief The default timeout of a data packet
  */
 #ifndef GNRC_TFTP_DEFAULT_TIMEOUT
-#define GNRC_TFTP_DEFAULT_TIMEOUT           (1 * SEC_IN_USEC)
+#define GNRC_TFTP_DEFAULT_TIMEOUT           (1 * US_PER_SEC)
 #endif
 
 /**
@@ -199,7 +199,7 @@ int gnrc_tftp_client_write(ipv6_addr_t *addr, const char *file_name, tftp_mode_t
 }
 #endif
 
-#endif /* GNRC_TFTP_H_ */
+#endif /* GNRC_TFTP_H */
 
 /**
  * @}

@@ -9,7 +9,7 @@ RIOTBASE ?= $(CURDIR)/../..
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-CFLAGS += -DDEVELHELP -Wall
+CFLAGS += -DDEVELHELP -Wall -DMODULE_OPENTHREAD_CLI
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
@@ -17,7 +17,7 @@ QUIET ?= 1
 USEMODULE+=openthread
 
 #Comment this line for using RIOT shell with OpenThread
-USEMODULE+=openthread_cli
+#USEMODULE+=openthread_cli
 
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))

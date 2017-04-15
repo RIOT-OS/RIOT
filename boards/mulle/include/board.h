@@ -18,8 +18,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -108,8 +108,8 @@ void board_init(void);
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
  */
-#define AT86RF2XX_PARAMS_BOARD      {.spi = SPI_0, \
-                                     .spi_speed = SPI_SPEED_5MHZ, \
+#define AT86RF2XX_PARAMS_BOARD      {.spi = SPI_DEV(0), \
+                                     .spi_clk = SPI_CLK_5MHZ, \
                                      .cs_pin = GPIO_PIN(PORT_D, 4), \
                                      .int_pin = GPIO_PIN(PORT_B, 9), \
                                      .sleep_pin = GPIO_PIN(PORT_E, 6), \
@@ -120,32 +120,31 @@ void board_init(void);
  * @name LIS3DH configuration
  * @{
  */
-
-#define LIS3DH_INT1   GPIO_PIN(PORT_C, 18)
-#define LIS3DH_INT2   GPIO_PIN(PORT_C, 17)
-#define LIS3DH_CS     GPIO_PIN(PORT_D, 0)
-#define LIS3DH_SPI    SPI_2
-
+#define LIS3DH_INT1                 GPIO_PIN(PORT_C, 18)
+#define LIS3DH_INT2                 GPIO_PIN(PORT_C, 17)
+#define LIS3DH_CS                   GPIO_PIN(PORT_D, 0)
+#define LIS3DH_CLK                  SPI_CLK_5MHZ
+#define LIS3DH_SPI                  SPI_DEV(0)
 /** @} */
 
 /**
  * @name Mulle power control configuration
  */
 /** @{ */
-#define MULLE_POWER_AVDD    GPIO_PIN(PORT_B, 17) /**< AVDD enable pin */
-#define MULLE_POWER_VPERIPH GPIO_PIN(PORT_D,  7) /**< VPERIPH enable pin */
-#define MULLE_POWER_VSEC    GPIO_PIN(PORT_B, 16) /**< VSEC enable pin */
+#define MULLE_POWER_AVDD        GPIO_PIN(PORT_B, 17) /**< AVDD enable pin */
+#define MULLE_POWER_VPERIPH     GPIO_PIN(PORT_D,  7) /**< VPERIPH enable pin */
+#define MULLE_POWER_VSEC        GPIO_PIN(PORT_B, 16) /**< VSEC enable pin */
 /** @} */
 
 /**
  * @name Mulle NVRAM hardware configuration
  */
 /** @{ */
-/** FRAM SPI bus, SPI_2 in RIOT is mapped to hardware bus SPI0, see periph_conf.h */
-#define MULLE_NVRAM_SPI_DEV           SPI_2
-#define MULLE_NVRAM_SPI_CS            GPIO_PIN(PORT_D, 6) /**< FRAM CS pin */
-#define MULLE_NVRAM_CAPACITY          512     /**< FRAM size, in bytes */
-#define MULLE_NVRAM_SPI_ADDRESS_COUNT 1       /**< FRAM addressing size, in bytes */
+#define MULLE_NVRAM_SPI_DEV             SPI_DEV(0)
+#define MULLE_NVRAM_SPI_CLK             SPI_CLK_5MHZ
+#define MULLE_NVRAM_SPI_CS              GPIO_PIN(PORT_D, 6) /**< FRAM CS pin */
+#define MULLE_NVRAM_CAPACITY            512     /**< FRAM size, in bytes */
+#define MULLE_NVRAM_SPI_ADDRESS_COUNT   1       /**< FRAM addressing size, in bytes */
 /** @} */
 
 /**
@@ -182,5 +181,5 @@ void board_init(void);
 
 /** @} */
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

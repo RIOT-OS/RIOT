@@ -19,8 +19,8 @@
  */
 
 
-#ifndef ETHERNET_HDR_H_
-#define ETHERNET_HDR_H_
+#ifndef ETHERNET_HDR_H
+#define ETHERNET_HDR_H
 
 #include <inttypes.h>
 
@@ -51,7 +51,7 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
-#endif /* ETHERNET_HDR_H_ */
+#endif /* ETHERNET_HDR_H */
 /**
  * @}
  */

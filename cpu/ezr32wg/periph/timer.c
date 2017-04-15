@@ -19,8 +19,6 @@
  */
 
 #include "cpu.h"
-#include "sched.h"
-#include "thread.h"
 #include "periph/timer.h"
 #include "periph_conf.h"
 
@@ -130,16 +128,6 @@ void timer_start(tim_t dev)
     timer_config[dev].timer->CMD = TIMER_CMD_START;
 }
 
-void timer_irq_enable(tim_t dev)
-{
-    NVIC_EnableIRQ(timer_config[dev].irqn);
-}
-
-void timer_irq_disable(tim_t dev)
-{
-    NVIC_DisableIRQ(timer_config[dev].irqn);
-}
-
 void timer_reset(tim_t dev)
 {
     timer_config[dev].timer->CNT = 0;
@@ -156,8 +144,6 @@ void TIMER_0_ISR(void)
             isr_ctx[0].cb(isr_ctx[0].arg, i);
         }
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 #endif /* TIMER_0_EN */

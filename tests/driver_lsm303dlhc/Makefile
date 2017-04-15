@@ -13,7 +13,7 @@ ifneq (,$(filter iotlab-m3,$(BOARD)))
 endif
 
 # set default device parameters in case they are undefined
-TEST_LSM303DLHC_I2C      ?= I2C_0
+TEST_LSM303DLHC_I2C      ?= I2C_DEV\(0\)
 TEST_LSM303DLHC_ACC_ADDR ?= 25
 TEST_LSM303DLHC_MAG_ADDR ?= 30
 TEST_LSM303DLHC_ACC_PIN  ?= GPIO_PIN\(0,0\)

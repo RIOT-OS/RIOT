@@ -19,8 +19,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef FMT_H_
-#define FMT_H_
+#ifndef FMT_H
+#define FMT_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -214,10 +214,10 @@ size_t fmt_str(char *out, const char *str);
  *
  * Will convert up to @p n digits. Stops at any non-digit or '\0' character.
  *
- * @param[out]  str  Pointer to string to read from
+ * @param[in]   str  Pointer to string to read from
  * @param[in]   n    Maximum nr of characters to consider
  *
- * @return      nr of digits read
+ * @return      converted uint32_t value
  */
 uint32_t scn_u32_dec(const char *str, size_t n);
 
@@ -244,6 +244,13 @@ void print_u32_dec(uint32_t val);
  * @param[in]   val  Value to print
  */
 void print_s32_dec(int32_t val);
+
+/**
+ * @brief Print byte value as hex to stdout
+ *
+ * @param[in]  byte Byte value to print
+ */
+void print_byte_hex(uint8_t byte);
 
 /**
  * @brief Print uint32 value as hex to stdout
@@ -280,4 +287,4 @@ void print_str(const char* str);
 #endif
 
 /** @} */
-#endif /* FMT_H_ */
+#endif /* FMT_H */

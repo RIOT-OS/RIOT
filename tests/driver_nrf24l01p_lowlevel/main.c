@@ -85,34 +85,26 @@ void print_register(char reg, int num_bytes)
 {
 
     char buf_return[num_bytes];
-    int ret;
 
+    spi_transfer_regs(SPI_PORT, CS_PIN,
+                      (CMD_R_REGISTER | (REGISTER_MASK & reg)),
+                      NULL, (uint8_t *)buf_return, num_bytes);
 
-    gpio_clear(CS_PIN);
-    xtimer_usleep(1);
-    ret = spi_transfer_regs(SPI_PORT, (CMD_R_REGISTER | (REGISTER_MASK & reg)), 0, buf_return, num_bytes);
-    gpio_set(CS_PIN);
+    if (num_bytes < 2) {
+        printf("0x%x returned: ", reg);
 
-    if (ret < 0) {
-        printf("Error in read access\n");
+        for (int i = 0; i < num_bytes; i++) {
+            prtbin(buf_return[i]);
+        }
     }
     else {
-        if (num_bytes < 2) {
-            printf("0x%x returned: ", reg);
+        printf("0x%x returned: ", reg);
 
-            for (int i = 0; i < num_bytes; i++) {
-                prtbin(buf_return[i]);
-            }
+        for (int i = 0; i < num_bytes; i++) {
+            printf("%x ", buf_return[i]);
         }
-        else {
-            printf("0x%x returned: ", reg);
 
-            for (int i = 0; i < num_bytes; i++) {
-                printf("%x ", buf_return[i]);
-            }
-
-            printf("\n\n");
-        }
+        printf("\n\n");
     }
 }
 
@@ -266,6 +258,7 @@ int cmd_print_regs(int argc, char **argv)
 
     printf("################## Print Registers ###################\n");
 
+    spi_acquire(SPI_PORT, CS_PIN, SPI_MODE_0, SPI_CLK_400KHZ);
 
     puts("REG_CONFIG: ");
     print_register(REG_CONFIG, 1);
@@ -314,6 +307,8 @@ int cmd_print_regs(int argc, char **argv)
 
     puts("REG_FEATURE: ");
     print_register(REG_FEATURE, 1);
+
+    spi_release(SPI_PORT);
 
     return 0;
 }

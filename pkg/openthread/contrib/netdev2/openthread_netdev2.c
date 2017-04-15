@@ -20,12 +20,13 @@
 #include "platform/uart.h"
 #include <cli/cli-uart.h>
 #include <assert.h>
+#include "openthread-tasklet.h"
 
 #ifdef MODULE_OPENTHREAD_NCP
 #include <ncp/ncp.h>
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #include <errno.h>
@@ -48,10 +49,11 @@ void *_openthread_event_loop(void *arg)
 {
     _pid = thread_getpid();
 
-	sInstance = otInstanceInit();
-	printf("Buffer length is: \n");
     /* enable OpenThread UART */
     otPlatUartEnable();
+
+    /* init OpenThread */
+    sInstance = otInstanceInit();
 
     msg_init_queue(_queue, OPENTHREAD_QUEUE_LEN);
     netdev2_t *dev;
@@ -61,19 +63,17 @@ void *_openthread_event_loop(void *arg)
     otCliUartInit(sInstance);
 #else
 
-#ifdef MODULE_OPENTHREAD_NCP
+#   ifdef MODULE_OPENTHREAD_NCP
     otNcpInit();
-#endif
-    /* It's necessary to call this after otEnable. Otherwise will freeze */
-    otProcessQueuedTasklets(sInstance);
+#   endif
+
 #endif
 
+#if OPENTHREAD_ENABLE_DIAG
+    diagInit(sInstance);
+#endif
     while (1) {
-        /* Process OpenThread tasklets */
-        begin_mutex();
-		otProcessQueuedTasklets(sInstance);
-        end_mutex();
-
+        otProcessQueuedTasklets(sInstance);
         msg_receive(&msg);
         switch (msg.type) {
             case OPENTHREAD_XTIMER_MSG_TYPE_EVENT:
@@ -118,14 +118,14 @@ void _event_cb(netdev2_t *dev, netdev2_event_t event)
     else {
         switch (event) {
             case NETDEV2_EVENT_RX_COMPLETE:
-                DEBUG("openthread_netdev2: Reception of a pcket\n");
-                recv_pkt(dev, sInstance);
+                DEBUG("openthread_netdev2: Reception of a packet\n");
+                recv_pkt(sInstance, dev);
                 break;
             case NETDEV2_EVENT_TX_COMPLETE:
             case NETDEV2_EVENT_TX_NOACK:
             case NETDEV2_EVENT_TX_MEDIUM_BUSY:
-                DEBUG("openthread_netdev2: Transmission of a pcket\n");
-                send_pkt(dev, event, sInstance);
+                DEBUG("openthread_netdev2: Transmission of a packet\n");
+                send_pkt(sInstance, dev, event);
                 break;
             default:
                 break;
@@ -159,53 +159,5 @@ int openthread_netdev2_init(char *stack, int stacksize, char priority,
     }
 
     return _pid;
-}
-void otPlatRadioEnableSrcMatch(otInstance *aInstance, bool aEnable)
-{
-    (void)aInstance;
-    (void)aEnable;
-}
-
-ThreadError otPlatRadioAddSrcMatchShortEntry(otInstance *aInstance, const uint16_t aShortAddress)
-{
-    (void)aInstance;
-    (void)aShortAddress;
-    return kThreadError_None;
-}
-
-ThreadError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const uint8_t *aExtAddress)
-{
-    (void)aInstance;
-    (void)aExtAddress;
-    return kThreadError_None;
-}
-
-ThreadError otPlatRadioClearSrcMatchShortEntry(otInstance *aInstance, const uint16_t aShortAddress)
-{
-    (void)aInstance;
-    (void)aShortAddress;
-    return kThreadError_None;
-}
-
-ThreadError otPlatRadioClearSrcMatchExtEntry(otInstance *aInstance, const uint8_t *aExtAddress)
-{
-    (void)aInstance;
-    (void)aExtAddress;
-    return kThreadError_None;
-}
-
-void otPlatRadioClearSrcMatchShortEntries(otInstance *aInstance)
-{
-    (void)aInstance;
-}
-
-void otPlatRadioClearSrcMatchExtEntries(otInstance *aInstance)
-{
-    (void)aInstance;
-}
-int8_t otPlatRadioGetRssi(otInstance *aInstance)
-{
-	(void)aInstance;
-	return 0;
 }
 /** @} */

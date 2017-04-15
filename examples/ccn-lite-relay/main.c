@@ -47,10 +47,9 @@ int main(void)
 
     /* get the default interface */
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
-    size_t ifnum = gnrc_netif_get(ifs);
 
     /* set the relay's PID, configure the interface to use CCN nettype */
-    if ((ifnum <= 0) || (ccnl_open_netif(ifs[0], GNRC_NETTYPE_CCN) < 0)) {
+    if ((gnrc_netif_get(ifs) == 0) || (ccnl_open_netif(ifs[0], GNRC_NETTYPE_CCN) < 0)) {
         puts("Error registering at network interface!");
         return -1;
     }

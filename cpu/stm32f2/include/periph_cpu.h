@@ -53,15 +53,6 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   Available peripheral buses
- */
-enum {
-    AHB1,           /**< AHB1 bus */
-    AHB2,           /**< AHB2 bus */
-    AHB3            /**< AHB3 bus */
-};
-
-/**
  * @brief   Available ports on the STM32F2 family
  */
 enum {
@@ -75,82 +66,6 @@ enum {
     PORT_H = 7,             /**< port H */
     PORT_I = 8              /**< port I */
 };
-
-/**
- * @brief   Available MUX values for configuring a pin's alternate function
- */
-typedef enum {
-    GPIO_AF0 = 0,           /**< use alternate function 0 */
-    GPIO_AF1,               /**< use alternate function 1 */
-    GPIO_AF2,               /**< use alternate function 2 */
-    GPIO_AF3,               /**< use alternate function 3 */
-    GPIO_AF4,               /**< use alternate function 4 */
-    GPIO_AF5,               /**< use alternate function 5 */
-    GPIO_AF6,               /**< use alternate function 6 */
-    GPIO_AF7,               /**< use alternate function 7 */
-    GPIO_AF8,               /**< use alternate function 8 */
-    GPIO_AF9,               /**< use alternate function 9 */
-    GPIO_AF10,              /**< use alternate function 10 */
-    GPIO_AF11,              /**< use alternate function 11 */
-    GPIO_AF12,              /**< use alternate function 12 */
-    GPIO_AF13,              /**< use alternate function 13 */
-    GPIO_AF14               /**< use alternate function 14 */
-} gpio_af_t;
-
-/**
- * @name    PWM configuration
- * @{
- */
-typedef struct {
-    uint8_t tim;            /**< timer used */
-    GPIO_TypeDef *port;     /**< pwm device */
-    uint8_t bus;            /**< AHBx bus */
-    uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
-    uint8_t CH0;            /**< channel 0 */
-    uint8_t CH1;            /**< channel 1 */
-    uint8_t CH2;            /**< channel 2 */
-    uint8_t CH3;            /**< channel 3 */
-    uint8_t AF;             /**< alternate function */
-} pwm_conf_t;
-
-
-/**
- * @brief   Timer configuration
- * @{
- */
-typedef struct {
-    TIM_TypeDef *dev;       /**< timer device */
-    uint8_t channels;       /**< number of channel */
-    uint32_t freq;          /**< frequency */
-    uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
-    uint8_t bus;            /**< APBx bus the timer is clock from */
-    uint8_t irqn;           /**< global IRQ channel */
-    uint8_t priority;       /**< priority */
-} timer_conf_t;
-/** @} */
-
-/**
- * @brief   Structure for UART configuration data
- * @{
- */
-typedef struct {
-    USART_TypeDef *dev;     /**< UART device base register address */
-    uint32_t rcc_mask;      /**< bit in clock enable register */
-    gpio_t rx_pin;          /**< RX pin */
-    gpio_t tx_pin;          /**< TX pin */
-    gpio_mode_t rx_mode;    /**< RX pin mode */
-    gpio_mode_t tx_mode;    /**< TX pin mode */
-    gpio_t rts_pin;         /**< RTS pin */
-    gpio_t cts_pin;         /**< CTS pin */
-    gpio_mode_t rts_mode;   /**< RTS pin mode */
-    gpio_mode_t cts_mode;   /**< CTS pin mode */
-    gpio_af_t af;           /**< alternate pin function to use */
-    uint8_t irqn;           /**< IRQ channel */
-    uint8_t dma_stream;     /**< DMA stream used for TX */
-    uint8_t dma_chan;       /**< DMA channel used for TX */
-    uint8_t hw_flow_ctrl;   /**< Support for hardware flow control */
-} uart_conf_t;
-/** @} */
 
 /**
  * @brief   Available number of ADC devices
@@ -190,23 +105,6 @@ typedef struct {
 } dac_conf_t;
 
 /**
- * @brief   Configure the alternate function for the given pin
- *
- * @note    This is meant for internal use in STM32F2 peripheral drivers only
- *
- * @param[in] pin       pin to configure
- * @param[in] af        alternate function to use
- */
-void gpio_init_af(gpio_t pin, gpio_af_t af);
-
-/**
- * @brief   Configure the given pin to be used as ADC input
- *
- * @param[in] pin       pin to configure
- */
-void gpio_init_analog(gpio_t pin);
-
-/**
  * @brief   Power on the DMA device the given stream belongs to
  *
  * @param[in] stream    logical DMA stream
@@ -214,9 +112,9 @@ void gpio_init_analog(gpio_t pin);
 static inline void dma_poweron(int stream)
 {
     if (stream < 8) {
-        RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
+        periph_clk_en(AHB1, RCC_AHB1ENR_DMA1EN);
     } else {
-        RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
+        periph_clk_en(AHB1, RCC_AHB1ENR_DMA2EN);
     }
 }
 
@@ -280,6 +178,11 @@ static inline uint32_t dma_ifc(int stream)
     }
 }
 
+/**
+ * @brief   Enable DMA interrupts
+ *
+ * @param[in] stream    logical DMA stream
+ */
 static inline void dma_isr_enable(int stream)
 {
     if (stream < 7) {

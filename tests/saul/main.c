@@ -26,13 +26,13 @@
 /**
  * @brief   Read th sensors every second
  */
-#define INTERVAL            (1LU * SEC_IN_USEC)
+#define INTERVAL            (1LU * US_PER_SEC)
 
 
 int main(void)
 {
     phydat_t res;
-    uint32_t last = xtimer_now();
+    xtimer_ticks32_t last_wakeup = xtimer_now();
 
     puts("SAUL test application");
 
@@ -50,7 +50,7 @@ int main(void)
             dev = dev->next;
         }
 
-        xtimer_periodic_wakeup(&last, INTERVAL);
+        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
     }
 
     return 0;

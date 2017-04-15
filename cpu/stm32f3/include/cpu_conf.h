@@ -33,7 +33,9 @@
 #ifdef CPU_MODEL_STM32F303RE
 #include "stm32f303xe.h"
 #endif
-
+#ifdef CPU_MODEL_STM32F303K8
+#include "stm32f303x8.h"
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif

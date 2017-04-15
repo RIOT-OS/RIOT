@@ -21,8 +21,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <stdint.h>
 
@@ -38,7 +38,7 @@ extern "C" {
  * @name Define the interface for the connected flash memory
  * @{
  */
-#define EXTFLASH_SPI        SPI_1
+#define EXTFLASH_SPI        SPI_DEV(1)
 #define EXTFLASH_CS         GPIO_PIN(PORT_A,11)
 #define EXTFLASH_WRITE      GPIO_PIN(PORT_C,6)
 #define EXTFLASH_HOLD       GPIO_PIN(PORT_C,9)
@@ -86,5 +86,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

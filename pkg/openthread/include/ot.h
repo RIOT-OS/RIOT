@@ -33,7 +33,7 @@ extern "C" {
 #include "net/ethernet.h"
 #include "net/netdev2.h"
 #include "thread.h"
-#include "openthread.h"
+#include "openthread-types.h"
 
 #define OPENTHREAD_XTIMER_MSG_TYPE_EVENT (0x2235)   /**< xtimer message receiver event*/
 #define OPENTHREAD_NETDEV2_MSG_TYPE_EVENT (0x2236)  /**< message received from driver */
@@ -54,14 +54,14 @@ typedef struct {
  *
  * @internal
  */
-void recv_pkt(netdev2_t *dev, otInstance *aInstance);
+void recv_pkt(otInstance *aInstance, netdev2_t *dev);
 
 /**
  * @brief   Inform OpenThread when tx is finished
  *
  * @internal
  */
-void send_pkt(netdev2_t *dev, netdev2_event_t event, otInstance *aInstance);
+void send_pkt(otInstance *aInstance, netdev2_t *dev, netdev2_event_t event);
 
 /**
  * @brief   bootstrap OpenThread

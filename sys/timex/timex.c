@@ -38,8 +38,8 @@ timex_t timex_add(const timex_t a, const timex_t b)
     result.seconds = a.seconds + b.seconds;
     result.microseconds = a.microseconds + b.microseconds;
 
-    if (result.microseconds > SEC_IN_USEC) {
-        result.microseconds -= SEC_IN_USEC;
+    if (result.microseconds > US_PER_SEC) {
+        result.microseconds -= US_PER_SEC;
         result.seconds++;
     }
 
@@ -77,7 +77,7 @@ timex_t timex_sub(const timex_t a, const timex_t b)
     }
     else {
         result.seconds = a.seconds - b.seconds - 1;
-        result.microseconds = a.microseconds + SEC_IN_USEC - b.microseconds;
+        result.microseconds = a.microseconds + US_PER_SEC - b.microseconds;
     }
 
     return result;

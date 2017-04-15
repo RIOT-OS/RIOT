@@ -1,9 +1,43 @@
 /*
- * Copyright (C) 2015 Phytec Messtechnik GmbH
+ * Copyright (C) 2016 Phytec Messtechnik GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
+ *
+ * The description of the registers was extracted from the
+ * Reference Manual MKW2xDxxxRM.pdf. After the release of MCR20A Device,
+ * it was extended by the undocumented registers from the file MCR20reg.h.
+ *
+ * Portions of this file are derived from material that is
+ * Copyright (c) 2015, Freescale Semiconductor, Inc.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * o Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
+ *
+ * o Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ *   contributors may be used to endorse or promote products derived from this
+ *   software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 /**
@@ -92,6 +126,24 @@ enum mkw2xdrf_dregister {
     MKW2XDM_SEQ_STATE = 0x24,           /**< Sequence Manager State */
     MKW2XDM_LQI_VALUE = 0x25,           /**< Link Quality Indicator */
     MKW2XDM_RSSI_CCA_CNT = 0x26,        /**< RSSI CCA CNT */
+    MKW2XDM_ASM_CTRL1 = 0x28,
+    MKW2XDM_ASM_CTRL2 = 0x29,
+    MKW2XDM_ASM_DATA_0 = 0x2A,
+    MKW2XDM_ASM_DATA_1 = 0x2B,
+    MKW2XDM_ASM_DATA_2 = 0x2C,
+    MKW2XDM_ASM_DATA_3 = 0x2D,
+    MKW2XDM_ASM_DATA_4 = 0x2E,
+    MKW2XDM_ASM_DATA_5 = 0x2F,
+    MKW2XDM_ASM_DATA_6 = 0x30,
+    MKW2XDM_ASM_DATA_7 = 0x31,
+    MKW2XDM_ASM_DATA_8 = 0x32,
+    MKW2XDM_ASM_DATA_9 = 0x33,
+    MKW2XDM_ASM_DATA_A = 0x34,
+    MKW2XDM_ASM_DATA_B = 0x35,
+    MKW2XDM_ASM_DATA_C = 0x36,
+    MKW2XDM_ASM_DATA_D = 0x37,
+    MKW2XDM_ASM_DATA_E = 0x38,
+    MKW2XDM_ASM_DATA_F = 0x39,
     MKW2XDM_OVERWRITE_VER = 0x3b,       /**< Overwrite Version Number */
     MKW2XDM_CLK_OUT_CTRL = 0x3c,        /**< CLK_OUT Control */
     MKW2XDM_PWR_MODES = 0x3d,           /**< Power Modes */
@@ -124,13 +176,16 @@ enum mkw2xdrf_dregister {
 #define MKW2XDM_IRQSTS3_TMR3IRQ                     (1 << 2)
 #define MKW2XDM_IRQSTS3_TMR2IRQ                     (1 << 1)
 #define MKW2XDM_IRQSTS3_TMR1IRQ                     (1 << 0)
+#define MKW2XDM_IRQSTS3_TMR_IRQ_MASK                0xfu
+#define MKW2XDM_IRQSTS3_TMR_IRQ_SHIFT               0x0u
+#define MKW2XDM_IRQSTS3_TMR_IRQ(x)                  (((uint8_t)(((uint8_t)(x))<<MKW2XDM_IRQSTS3_TMR_IRQ_SHIFT))&MKW2XDM_IRQSTS3_TMR_IRQ_MASK)
 
 #define MKW2XDM_PHY_CTRL1_TMRTRIGEN                 (1 << 7)
 #define MKW2XDM_PHY_CTRL1_SLOTTED                   (1 << 6)
 #define MKW2XDM_PHY_CTRL1_CCABFRTX                  (1 << 5)
 #define MKW2XDM_PHY_CTRL1_RXACKRQD                  (1 << 4)
 #define MKW2XDM_PHY_CTRL1_AUTOACK                   (1 << 3)
-#define MKW2XDM_PHY_CTRL1_XCVSEQ_MASK               0x03u
+#define MKW2XDM_PHY_CTRL1_XCVSEQ_MASK               0x07u
 #define MKW2XDM_PHY_CTRL1_XCVSEQ(x)                 (((uint8_t)(((uint8_t)(x))<<0))&MKW2XDM_PHY_CTRL1_XCVSEQ_MASK)
 
 #define MKW2XDM_PHY_CTRL2_CRC_MSK                   (1 << 7)
@@ -227,6 +282,7 @@ enum mkw2xdrf_iregister {
     MKW2XDMI_CCA_CTRL = 0x25,              /**< CCA Control */
     MKW2XDMI_CCA2_CORR_PEAKS = 0x26,       /**< Clear Channel Assessment 2 Threshold Peak Compare */
     MKW2XDMI_CCA2_THRESH = 0x27,           /**< Clear Channel Assessment 2 Threshold */
+    MKW2XDMI_TMR_PRESCALE = 0x28,          /**< Event Timer Time Base */
     MKW2XDMI_GPIO_DATA = 0x2a,             /**< GPIO Data */
     MKW2XDMI_GPIO_DIR = 0x2b,              /**< GPIO Direction Control */
     MKW2XDMI_GPIO_PUL_EN = 0x2c,           /**< GPIO Pullup Enable */
@@ -234,8 +290,110 @@ enum mkw2xdrf_iregister {
     MKW2XDMI_GPIO_DS = 0x2e,               /**< GPIO Drive Strength */
     MKW2XDMI_ANT_PAD_CTRL = 0x30,          /**< Antenna Control */
     MKW2XDMI_MISC_PAD_CTRL = 0x31,         /**< Miscellaneous Pad Control */
+    MKW2XDMI_BSM_CTRL = 0x32,
+    MKW2XDMI__RNG = 0x34,
+    MKW2XDMI_RX_BYTE_COUNT = 0x35,
+    MKW2XDMI_RX_WTR_MARK = 0x36,
+    MKW2XDMI_SOFT_RESET = 0x37,
+    MKW2XDMI_TXDELAY = 0x38,
+    MKW2XDMI_ACKDELAY = 0x39,
+    MKW2XDMI_SEQ_MGR_CTRL = 0x3A,
+    MKW2XDMI_SEQ_MGR_STS = 0x3B,
+    MKW2XDMI_SEQ_T_STS = 0x3C,
+    MKW2XDMI_ABORT_STS = 0x3D,
+    MKW2XDMI_CCCA_BUSY_CNT = 0x3E,
+    MKW2XDMI_SRC_ADDR_CHECKSUM1 = 0x3F,
+    MKW2XDMI_SRC_ADDR_CHECKSUM2 = 0x40,
+    MKW2XDMI_SRC_TBL_VALID1 = 0x41,
+    MKW2XDMI_SRC_TBL_VALID2 = 0x42,
+    MKW2XDMI_FILTERFAIL_CODE1 = 0x43,
+    MKW2XDMI_FILTERFAIL_CODE2 = 0x44,
+    MKW2XDMI_SLOT_PRELOAD = 0x45,
+    MKW2XDMI_CORR_VT = 0x47,
+    MKW2XDMI_SYNC_CTRL = 0x48,
+    MKW2XDMI_PN_LSB_0 = 0x49,
+    MKW2XDMI_PN_LSB_1 = 0x4A,
+    MKW2XDMI_PN_MSB_0 = 0x4B,
+    MKW2XDMI_PN_MSB_1 = 0x4C,
+    MKW2XDMI_CORR_NVAL = 0x4D,
+    MKW2XDMI_TX_MODE_CTRL = 0x4E,
+    MKW2XDMI_SNF_THR = 0x4F,
+    MKW2XDMI_FAD_THR = 0x50,
     MKW2XDMI_ANT_AGC_CTRL = 0x51,          /**< Antenna AGC and FAD Control */
+    MKW2XDMI_AGC_THR1 = 0x52,
+    MKW2XDMI_AGC_THR2 = 0x53,
+    MKW2XDMI_AGC_HYS = 0x54,
+    MKW2XDMI_AFC = 0x55,
     MKW2XDMI_LPPS_CTRL = 0x56,             /**< LPPS_CTRL */
+    MKW2XDMI_PHY_STS = 0x58,
+    MKW2XDMI_RX_MAX_CORR = 0x59,
+    MKW2XDMI_RX_MAX_PREAMBLE = 0x5A,
+    MKW2XDMI_RSSI = 0x5B,
+    MKW2XDMI_PLL_DIG_CTRL = 0x5E,
+    MKW2XDMI_VCO_CAL = 0x5F,
+    MKW2XDMI_VCO_BEST_DIFF = 0x60,
+    MKW2XDMI_VCO_BIAS = 0x61,
+    MKW2XDMI_KMOD_CTRL = 0x62,
+    MKW2XDMI_KMOD_CAL = 0x63,
+    MKW2XDMI_PA_CAL = 0x64,
+    MKW2XDMI_PA_PWRCAL = 0x65,
+    MKW2XDMI_ATT_RSSI1 = 0x66,
+    MKW2XDMI_ATT_RSSI2 = 0x67,
+    MKW2XDMI_RSSI_OFFSET = 0x68,
+    MKW2XDMI_RSSI_SLOPE = 0x69,
+    MKW2XDMI_RSSI_CAL1 = 0x6A,
+    MKW2XDMI_RSSI_CAL2 = 0x6B,
+    MKW2XDMI_XTAL_CTRL = 0x6E,
+    MKW2XDMI_XTAL_COMP_MIN = 0x6F,
+    MKW2XDMI_XTAL_COMP_MAX = 0x70,
+    MKW2XDMI_XTAL_GM = 0x71,
+    MKW2XDMI_LNA_TUNE = 0x74,
+    MKW2XDMI_LNA_AGCGAIN = 0x75,
+    MKW2XDMI_CHF_PMA_GAIN = 0x78,
+    MKW2XDMI_CHF_IBUF = 0x79,
+    MKW2XDMI_CHF_QBUF = 0x7A,
+    MKW2XDMI_CHF_IRIN = 0x7B,
+    MKW2XDMI_CHF_QRIN = 0x7C,
+    MKW2XDMI_CHF_IL = 0x7D,
+    MKW2XDMI_CHF_QL = 0x7E,
+    MKW2XDMI_CHF_CC1 = 0x7F,
+    MKW2XDMI_CHF_CCL = 0x80,
+    MKW2XDMI_CHF_CC2 = 0x81,
+    MKW2XDMI_CHF_IROUT = 0x82,
+    MKW2XDMI_CHF_QROUT = 0x83,
+    MKW2XDMI_RSSI_CTRL = 0x86,
+    MKW2XDMI_PA_BIAS = 0x89,
+    MKW2XDMI_PA_TUNING = 0x8A,
+    MKW2XDMI_PMC_HP_TRIM = 0x8D,
+    MKW2XDMI_VREGA_TRIM = 0x8E,
+    MKW2XDMI_VCO_CTRL1 = 0x91,
+    MKW2XDMI_VCO_CTRL2 = 0x92,
+    MKW2XDMI_ANA_SPARE_OUT1 = 0x95,
+    MKW2XDMI_ANA_SPARE_OUT2 = 0x96,
+    MKW2XDMI_ANA_SPARE_IN = 0x97,
+    MKW2XDMI_MISCELLANEOUS = 0x98,
+    MKW2XDMI_SEQ_MGR_OVRD0 = 0x9A,
+    MKW2XDMI_SEQ_MGR_OVRD1 = 0x9B,
+    MKW2XDMI_SEQ_MGR_OVRD2 = 0x9C,
+    MKW2XDMI_SEQ_MGR_OVRD3 = 0x9D,
+    MKW2XDMI_SEQ_MGR_OVRD4 = 0x9E,
+    MKW2XDMI_SEQ_MGR_OVRD5 = 0x9F,
+    MKW2XDMI_SEQ_MGR_OVRD6 = 0xA0,
+    MKW2XDMI_SEQ_MGR_OVRD7 = 0xA1,
+    MKW2XDMI_TESTMODE_CTRL = 0xA3,
+    MKW2XDMI_DTM_CTRL1= 0xA4,
+    MKW2XDMI_DTM_CTRL2= 0xA5,
+    MKW2XDMI_ATM_CTRL1= 0xA6,
+    MKW2XDMI_ATM_CTRL2= 0xA7,
+    MKW2XDMI_ATM_CTRL3= 0xA8,
+    MKW2XDMI_LIM_FE_TEST_CTRL = 0xAA,
+    MKW2XDMI_CHF_TEST_CTRL = 0xAB,
+    MKW2XDMI_VCO_TEST_CTRL = 0xAC,
+    MKW2XDMI_PLL_TEST_CTRL = 0xAD,
+    MKW2XDMI_PA_TEST_CTRL = 0xAE,
+    MKW2XDMI_PMC_TEST_CTRL = 0xAF,
+    MKW2XDMI_SCAN_DTM_PROTECT_1 = 0xFE,
+    MKW2XDMI_SCAN_DTM_PROTECT_0 = 0xFF,
 };
 
 #define MKW2XDMI_PART_ID_MANUF_ID_MASK                          0x60u
@@ -278,6 +436,10 @@ enum mkw2xdrf_iregister {
 #define MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH_SHIFT    4
 #define MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH(x)       (((uint8_t)(((uint8_t)(x))<<MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH_SHIFT))&MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH_MASK)
 #define MKW2XDMI_CCA2_CORR_PEAKS_CCA2_NUM_CORR_PEAKS_MASK      0x0Fu
+
+#define MKW2XDMI_TMR_PRESCALE_MASK           0x7u
+#define MKW2XDMI_TMR_PRESCALE_SHIFT          0x0u
+#define MKW2XDMI_TMR_PRESCALE_SET(x)         (((uint8_t)(((uint8_t)(x))<<MKW2XDMI_TMR_PRESCALE_SHIFT))&MKW2XDMI_TMR_PRESCALE_MASK)
 
 #define MKW2XDMI_GPIO_DATA8                  (1 << 7)
 #define MKW2XDMI_GPIO_DATA7                  (1 << 6)
@@ -348,9 +510,59 @@ enum mkw2xdrf_iregister {
 
 #define MKW2XDMI_LPPS_CTRL_LPPS_EN           (1 << 0)
 
+#define MKW2XDMI_SOFT_RESET_SOG_RST          (1 << 7)
+#define MKW2XDMI_SOFT_RESET_REGS_RST         (1 << 4)
+#define MKW2XDMI_SOFT_RESET_PLL_RST          (1 << 3)
+#define MKW2XDMI_SOFT_RESET_TX_RST           (1 << 2)
+#define MKW2XDMI_SOFT_RESET_RX_RST           (1 << 1)
+#define MKW2XDMI_SOFT_RESET_SEQ_MGR_RST      (1 << 0)
+
+#define MKW2XDMI_SEQ_MGR_CTRL_SEQ_STATE_CTRL_MASK       0x3
+#define MKW2XDMI_SEQ_MGR_CTRL_SEQ_STATE_CTRL_SHIFT      6
+#define MKW2XDMI_SEQ_MGR_CTRL_NO_RX_RECYCLE             (1 << 5)
+#define MKW2XDMI_SEQ_MGR_CTRL_LATCH_PREAMBLE            (1 << 4)
+#define MKW2XDMI_SEQ_MGR_CTRL_EVENT_TMR_DO_NOT_LATCH    (1 << 3)
+#define MKW2XDMI_SEQ_MGR_CTRL_CLR_NEW_SEQ_INHIBIT       (1 << 2)
+#define MKW2XDMI_SEQ_MGR_CTRL_PSM_LOCK_DIS              (1 << 1)
+#define MKW2XDMI_SEQ_MGR_CTRL_PLL_ABORT_OVRD            (1 << 0)
+
+#define MKW2XDMI_SEQ_MGR_STS_TMR2_SEQ_TRIG_ARMED        (1 << 7)
+#define MKW2XDMI_SEQ_MGR_STS_RX_MODE                    (1 << 6)
+#define MKW2XDMI_SEQ_MGR_STS_RX_TIMEOUT_PENDING         (1 << 5)
+#define MKW2XDMI_SEQ_MGR_STS_NEW_SEQ_INHIBIT            (1 << 4)
+#define MKW2XDMI_SEQ_MGR_STS_SEQ_IDLE                   (1 << 3)
+#define MKW2XDMI_SEQ_MGR_STS_XCVSEQ_ACTUAL_MASK         7
+
+#define MKW2XDMI_ABORT_STS_PLL_ABORTED                  (1 << 2)
+#define MKW2XDMI_ABORT_STS_TC3_ABORTED                  (1 << 1)
+#define MKW2XDMI_ABORT_STS_SW_ABORTED                   (1 << 0)
+
+#define MKW2XDMI_TESTMODE_CTRL_HOT_ANT                  (1 << 4)
+#define MKW2XDMI_TESTMODE_CTRL_IDEAL_RSSI_EN            (1 << 3)
+#define MKW2XDMI_TESTMODE_CTRL_IDEAL_PFC_EN             (1 << 2)
+#define MKW2XDMI_TESTMODE_CTRL_CONTINUOUS_EN            (1 << 1)
+#define MKW2XDMI_TESTMODE_CTRL_FPGA_EN                  (1 << 0)
+
+#define MKW2XDMI_DTM_CTRL1_ATM_LOCKED                   (1 << 7)
+#define MKW2XDMI_DTM_CTRL1_DTM_EN                       (1 << 6)
+#define MKW2XDMI_DTM_CTRL1_PAGE5                        (1 << 5)
+#define MKW2XDMI_DTM_CTRL1_PAGE4                        (1 << 4)
+#define MKW2XDMI_DTM_CTRL1_PAGE3                        (1 << 3)
+#define MKW2XDMI_DTM_CTRL1_PAGE2                        (1 << 2)
+#define MKW2XDMI_DTM_CTRL1_PAGE1                        (1 << 1)
+#define MKW2XDMI_DTM_CTRL1_PAGE0                        (1 << 0)
+
+#define MKW2XDMI_TX_MODE_CTRL_TX_INV                    (1 << 4)
+#define MKW2XDMI_TX_MODE_CTRL_BT_EN                     (1 << 3)
+#define MKW2XDMI_TX_MODE_CTRL_DTS2                      (1 << 2)
+#define MKW2XDMI_TX_MODE_CTRL_DTS1                      (1 << 1)
+#define MKW2XDMI_TX_MODE_CTRL_DTS0                      (1 << 0)
+#define MKW2XDMI_TX_MODE_CTRL_DTS_MASK                  7
+
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* MKW2XD_MODEM_REG_H */
 /** @} */

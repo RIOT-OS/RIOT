@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    sys_netdev2_test    Netdev2 dummy test driver
- * @ingroup     drivers_netdev_netdev2
+ * @defgroup    sys_netdev2_test    netdev2 dummy test driver
+ * @ingroup     drivers_netdev
  * @brief       Provides a test dummy for the netdev2 interface.
  *
  * See the following simple packet traversal timer for an example. Note that
@@ -39,7 +39,7 @@
  *     (void)vector;
  *     (void)count;
  *
- *     sum += (xtimer_now() - last_start);
+ *     sum += (xtimer_now_usec() - last_start);
  *     mutex_unlock(&wait);
  * }
  *
@@ -52,7 +52,7 @@
  *     // ...
  *     mutex_lock(&wait);
  *     for (int i = 0; i < PKT_NUMBER; i++) {
- *         last_start = xtimer_now();
+ *         last_start = xtimer_now_usec();
  *         conn_udp_sendto("abcd", sizeof("abcd"), NULL, 0, &dst, sizeof(dst),
  *                         AF_INET6, 0xcafe, 0xcafe);
  *         mutex_lock(&wait);
@@ -76,8 +76,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NETDEV2_TEST_H_
-#define NETDEV2_TEST_H_
+#ifndef NETDEV2_TEST_H
+#define NETDEV2_TEST_H
 
 #include "mutex.h"
 
@@ -302,5 +302,5 @@ void netdev2_test_reset(netdev2_test_t *dev);
 }
 #endif
 
-#endif /* NETDEV2_TEST_H_ */
+#endif /* NETDEV2_TEST_H */
 /** @} */

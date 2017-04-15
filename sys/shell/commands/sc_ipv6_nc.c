@@ -237,10 +237,10 @@ int _ipv6_nc_manage(int argc, char **argv)
     }
 
     if (argc > 1) {
-        if (strcmp("add", argv[1]) == 0) {
+        if ((argc > 2) && (strcmp("add", argv[1]) == 0)) {
             return _ipv6_nc_add(argc - 2, &argv[2]);
         }
-        if (strcmp("del", argv[1]) == 0) {
+        if ((argc > 2) && (strcmp("del", argv[1]) == 0)) {
             return _ipv6_nc_del(argv[2]);
         }
         if (strcmp("reset", argv[1]) == 0) {

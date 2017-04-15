@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_NETERR_H_
-#define GNRC_NETERR_H_
+#ifndef GNRC_NETERR_H
+#define GNRC_NETERR_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -89,5 +89,5 @@ static inline int gnrc_neterr_reg(gnrc_pktsnip_t *pkt)
 }
 #endif
 
-#endif /* GNRC_NETERR_H_ */
+#endif /* GNRC_NETERR_H */
 /** @} */

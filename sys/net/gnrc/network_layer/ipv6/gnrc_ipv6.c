@@ -251,13 +251,11 @@ static void _dispatch_next_header(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt,
 static void *_event_loop(void *args)
 {
     msg_t msg, reply, msg_q[GNRC_IPV6_MSG_QUEUE_SIZE];
-    gnrc_netreg_entry_t me_reg;
+    gnrc_netreg_entry_t me_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                            sched_active_pid);
 
     (void)args;
     msg_init_queue(msg_q, GNRC_IPV6_MSG_QUEUE_SIZE);
-
-    me_reg.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
-    me_reg.pid = thread_getpid();
 
     /* register interest in all IPv6 packets */
     gnrc_netreg_register(GNRC_NETTYPE_IPV6, &me_reg);

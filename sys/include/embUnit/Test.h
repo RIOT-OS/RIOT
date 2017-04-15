@@ -32,8 +32,8 @@
  *
  * $Id: Test.h,v 1.4 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef EMBUNIT_TEST_H_
-#define EMBUNIT_TEST_H_
+#ifndef EMBUNIT_TEST_H
+#define EMBUNIT_TEST_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,4 +70,4 @@ struct __Test {
 }
 #endif
 
-#endif/* EMBUNIT_TEST_H_ */
+#endif/* EMBUNIT_TEST_H */

@@ -19,6 +19,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph/init.h"
 
 /**
  * @brief Initialize the CPU, set IRQ priorities
@@ -39,4 +40,6 @@ void cpu_init(void)
     NRF_CLOCK->TASKS_HFCLKSTART = 1;
     while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) {}
 #endif
+    /* trigger static peripheral initialization */
+    periph_init();
 }

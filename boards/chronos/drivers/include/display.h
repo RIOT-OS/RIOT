@@ -35,8 +35,8 @@
  * Basic display functions.
  * ************************************************************************************************/
 
-#ifndef DISPLAY_H_
-#define DISPLAY_H_
+#ifndef DISPLAY_H
+#define DISPLAY_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -463,4 +463,4 @@ void display_all_off(void);
 }
 #endif
 
-#endif /* DISPLAY_ */
+#endif /* DISPLAY_H */

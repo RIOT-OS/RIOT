@@ -2,6 +2,7 @@ PKG_NAME = nordic_softdevice_ble
 PKG_VERSION = 3288530
 PKG_FILE = nrf5_iot_sdk_$(PKG_VERSION).zip
 PKG_URL = https://developer.nordicsemi.com/nRF5_IoT_SDK/nRF5_IoT_SDK_v0.9.x/$(PKG_FILE)
+PKG_LICENSE = nordic-bsd
 PKG_DIR=$(CURDIR)
 PKG_BUILDDIR=$(BINDIRBASE)/pkg/$(BOARD)/$(PKG_NAME)
 PKG_SRCDIR=$(PKG_BUILDDIR)/src
@@ -23,7 +24,7 @@ $(BINDIR)/softdevice.hex: $(PKG_SRCDIR)/.extracted
 $(PKG_SRCDIR)/.extracted: $(PKG_BUILDDIR)/$(PKG_FILE)
 	rm -rf $(@D)
 	mkdir -p $(@D)
-	$(AD)cd $(@D) && $(UNZIP_HERE) $(PKG_BUILDDIR)/$(PKG_FILE)
+	$(Q)cd $(@D) && $(UNZIP_HERE) $(PKG_BUILDDIR)/$(PKG_FILE)
 
 # this file doesn't compile with RIOT, but is not needed either
 	rm $(PKG_BUILDDIR)/src/components/ble/common/ble_conn_params.c
@@ -40,7 +41,7 @@ $(PKG_SRCDIR)/.extracted: $(PKG_BUILDDIR)/$(PKG_FILE)
 
 $(PKG_BUILDDIR)/$(PKG_FILE):
 	@mkdir -p $(@D)
-	$(AD)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)
+	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)
 
 clean::
 	rm -rf $(PKG_SRCDIR)/

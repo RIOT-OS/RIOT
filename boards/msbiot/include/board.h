@@ -18,8 +18,8 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -32,7 +32,7 @@ extern "C" {
  * @name Configure connected CC1101 (radio) device
  * @{
  */
-#define CC110X_SPI          SPI_0
+#define CC110X_SPI          SPI_DEV(0)
 #define CC110X_CS           GPIO_PIN(PORT_B, 12)
 #define CC110X_GDO0         GPIO_PIN(PORT_C, 4)
 #define CC110X_GDO1         GPIO_PIN(PORT_A, 6)
@@ -83,5 +83,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

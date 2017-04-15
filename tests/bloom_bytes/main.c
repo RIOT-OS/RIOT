@@ -68,7 +68,7 @@ int main(void)
 
     random_init(myseed);
 
-    unsigned long t1 = xtimer_now();
+    unsigned long t1 = xtimer_now_usec();
 
     for (int i = 0; i < lenB; i++) {
         buf_fill(buf, BUF_SIZE);
@@ -78,14 +78,14 @@ int main(void)
                   BUF_SIZE * sizeof(uint32_t) / sizeof(uint8_t));
     }
 
-    unsigned long t2 = xtimer_now();
+    unsigned long t2 = xtimer_now_usec();
     printf("adding %d elements took %" PRIu32 "ms\n", lenB,
            (uint32_t) (t2 - t1) / 1000);
 
     int in = 0;
     int not_in = 0;
 
-    unsigned long t3 = xtimer_now();
+    unsigned long t3 = xtimer_now_usec();
 
     for (int i = 0; i < lenA; i++) {
         buf_fill(buf, BUF_SIZE);
@@ -101,7 +101,7 @@ int main(void)
         }
     }
 
-    unsigned long t4 = xtimer_now();
+    unsigned long t4 = xtimer_now_usec();
     printf("checking %d elements took %" PRIu32 "ms\n", lenA,
            (uint32_t) (t4 - t3) / 1000);
 

@@ -120,16 +120,15 @@ void _native_syscall_leave(void)
        )
     {
         _native_in_isr = 1;
-        unsigned int mask = irq_disable();
         _native_cur_ctx = (ucontext_t *)sched_active_thread->sp;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
         native_isr_context.uc_stack.ss_flags = 0;
+        native_interrupts_enabled = 0;
         makecontext(&native_isr_context, native_irq_handler, 0);
         if (swapcontext(_native_cur_ctx, &native_isr_context) == -1) {
             err(EXIT_FAILURE, "_native_syscall_leave: swapcontext");
         }
-        irq_restore(mask);
     }
 }
 

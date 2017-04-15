@@ -18,19 +18,14 @@
  * @author      Víctor Ariño <victor.arino@triagnosys.com>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief Use the 2nd UART for STDIO on this board
- */
-#define UART_STDIO_DEV      UART_DEV(1)
 
 /**
  * @name xtimer configuration
@@ -43,5 +38,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

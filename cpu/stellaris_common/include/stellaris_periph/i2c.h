@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef STELLARIS_I2C_H_
-#define STELLARIS_I2C_H_
+#ifndef STELLARIS_I2C_H
+#define STELLARIS_I2C_H
 
 //*****************************************************************************
 //
@@ -221,4 +221,4 @@ extern unsigned long I2CSlaveStatus(unsigned long ulBase);
 }
 #endif
 
-#endif /* STELLARIS_I2C_H_ */
+#endif /* STELLARIS_I2C_H */

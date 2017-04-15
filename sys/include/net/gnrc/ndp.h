@@ -18,8 +18,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef GNRC_NDP_H_
-#define GNRC_NDP_H_
+#ifndef GNRC_NDP_H
+#define GNRC_NDP_H
 
 #include <inttypes.h>
 #include <stdlib.h>
@@ -120,13 +120,13 @@ extern "C" {
  * @brief   Base value in mircoseconds for computing randomised
  *          reachable time.
  */
-#define GNRC_NDP_REACH_TIME             (30U * SEC_IN_USEC)
+#define GNRC_NDP_REACH_TIME             (30U * US_PER_SEC)
 
 /**
  * @brief   Time in mircoseconds between retransmissions of neighbor
  *          solicitations to a neighbor.
  */
-#define GNRC_NDP_RETRANS_TIMER          (1U * SEC_IN_USEC)
+#define GNRC_NDP_RETRANS_TIMER          (1U * US_PER_SEC)
 
 /**
  * @brief   Delay in seconds for neighbor cache entry between entering
@@ -179,7 +179,7 @@ extern "C" {
  *          solicitation reception and responding router advertisement
  *          transmission.
  */
-#define GNRC_NDP_MAX_RTR_ADV_DELAY      (500U * MS_IN_USEC)
+#define GNRC_NDP_MAX_RTR_ADV_DELAY      (500U * US_PER_MS)
 /** @} */
 
 /**
@@ -392,9 +392,9 @@ gnrc_pktsnip_t *gnrc_ndp_rtr_sol_build(gnrc_pktsnip_t *options);
  * @param[in] cur_hl        Default hop limit for outgoing IP packets, 0 if
  *                          unspecified by this router.
  * @param[in] flags         Flags as defined above.
- *                          @ref GNRC_NDP_RTR_ADV_FLAGS_M == 1 indicates, that the
+ *                          @ref NDP_RTR_ADV_FLAGS_M == 1 indicates, that the
  *                          addresses are managed by DHCPv6,
- *                          @ref GNRC_NDP_RTR_ADV_FLAGS_O == 1 indicates that other
+ *                          @ref NDP_RTR_ADV_FLAGS_O == 1 indicates that other
  *                          configuration information is available via DHCPv6.
  * @param[in] ltime         Lifetime of the default router in seconds.
  * @param[in] reach_time    Time in milliseconds a node should assume a neighbor
@@ -557,7 +557,7 @@ gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next);
 }
 #endif
 
-#endif /* GNRC_NDP_H_ */
+#endif /* GNRC_NDP_H */
 /**
  * @}
  */

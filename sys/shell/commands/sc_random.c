@@ -36,7 +36,7 @@ int _random_init(int argc, char **argv)
 
     if (argc == 1) {
 #ifdef MODULE_XTIMER
-        initval = xtimer_now();
+        initval = _xtimer_now();
         printf("PRNG initialized to current time: %d\n", initval);
 #else
         (void)initval;

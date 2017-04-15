@@ -19,8 +19,6 @@
 #include "cpu.h"
 #include "periph/rtc.h"
 #include "periph_conf.h"
-#include "sched.h"
-#include "thread.h"
 
 /* guard file in case no RTC device was specified */
 #if RTC_NUMOF
@@ -195,9 +193,7 @@ void isr_rtc(void)
         reference_year += 64;
         rtcMode2->INTFLAG.reg = RTC_MODE2_INTFLAG_OVF;
     }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    cortexm_isr_end();
 }
 
 #endif /* RTC_NUMOF */

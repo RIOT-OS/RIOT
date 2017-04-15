@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2016 TriaGnoSys GmbH
+ *               2015 Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,13 +19,15 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author  René Kijewski <kijewski@inf.fu-berlin.de>
+ * @author  Víctor Ariño <victor.arino@zii.aero>
  */
-#ifndef SEM_H_
-#define SEM_H_
 
-#include "msg.h"
-#include "priority_queue.h"
-#include "timex.h"
+#ifndef SEMA_H
+#define SEMA_H
+
+#include <stdint.h>
+
+#include "mutex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,22 +36,40 @@ extern "C" {
 /**
  * @brief   Creates semaphore statically.
  *
- * @param[in] value Initial value for the semaphore.
+ * @param[in] value Initial value for the semaphore (can't be 0). For a 0
+ *                  initialized semaphore @see SEMA_CREATE_LOCKED
  *
  * @return  Statically initialized semaphore.
  */
-#define SEMA_CREATE(value)      { (value), PRIORITY_QUEUE_INIT }
+#define SEMA_CREATE(value)         { (value), SEMA_OK, MUTEX_INIT }
+
+/**
+ * @brief   Creates semaphore statically initialized to 0
+ * @return  Statically initialized semaphore.
+ */
+#define SEMA_CREATE_LOCKED()        { (0), SEMA_OK, MUTEX_INIT_LOCKED }
+
+/**
+ * @brief A Semaphore states.
+ */
+typedef enum {
+    SEMA_OK = 0,
+    SEMA_DESTROY,
+} sema_state_t;
 
 /**
  * @brief A Semaphore.
  */
 typedef struct {
-    volatile unsigned int value;    /**< value of the semaphore */
-    priority_queue_t queue;         /**< list of threads waiting for the semaphore */
+    unsigned int value;             /**< value of the semaphore */
+    sema_state_t state;             /**< state of the semaphore */
+    mutex_t mutex;                  /**< mutex of the semaphore */
 } sema_t;
 
 /**
  * @brief   Creates semaphore dynamically.
+ *
+ * @pre `(sema != NULL)`
  *
  * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html">
  *          The Open Group Base Specifications Issue 7, sem_init()
@@ -56,80 +77,48 @@ typedef struct {
  *
  * @param[out] sema The created semaphore.
  * @param[in] value Initial value for the semaphore.
- *
- * @return  0 on success.
- * @return  -EINVAL, if semaphore is invalid.
  */
-int sema_create(sema_t *sema, unsigned int value);
+void sema_create(sema_t *sema, unsigned int value);
 
 /**
  * @brief   Destroys a semaphore.
+ *
+ * @pre `(sema != NULL)`
  *
  * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_destroy.html">
  *          The Open Group Base Specifications Issue 7, sem_destroy()
  *      </a>
  *
- * @param[in] sema  The semaphore to destroy.
+ * Destroying a semaphore upon which other threads are currently blocked
+ * will wake the other threads causing the @ref sema_wait (or
+ * @ref sema_wait_timed) to return error (-ECANCELLED).
  *
- * @return  0 on success.
- * @return  -EINVAL, if semaphore is invalid.
+ * @param[in] sema  The semaphore to destroy.
  */
-int sema_destroy(sema_t *sema);
+void sema_destroy(sema_t *sema);
 
 /**
  * @brief   Wait for a semaphore being posted.
  *
- * @pre Message queue of active thread is initialized (see @ref msg_init_queue()).
- *
- * @param[in]  sema     A semaphore.
- * @param[in]  timeout  Time in microseconds until the semaphore times out. 0 for no timeout.
- * @param[out] msg      Container for a spurious message during the timed wait (result == -EAGAIN).
- *
- * @return  0 on success
- * @return  -EINVAL, if semaphore is invalid.
- * @return  -ETIMEDOUT, if the semaphore times out.
- * @return  -ECANCELED, if the semaphore was destroyed.
- * @return  -EAGAIN, if the thread received a message while waiting for the lock.
- */
-int sema_wait_timed_msg(sema_t *sema, uint64_t timeout, msg_t *msg);
-
-/**
- * @brief   Wait for a semaphore being posted (without timeout).
- *
- * @param[in]  sema A semaphore.
- * @param[out] msg  Container for a spurious message during the timed wait (result == -EAGAIN).
- *
- * @return  0 on success
- * @return  -EINVAL, if semaphore is invalid.
- * @return  -ECANCELED, if the semaphore was destroyed.
- * @return  -EAGAIN, if the thread received a message while waiting for the lock.
- */
-static inline int sema_wait_msg(sema_t *sema, msg_t *msg)
-{
-    return sema_wait_timed_msg(sema, 0, msg);
-}
-
-/**
- * @brief   Wait for a semaphore being posted (dropping spurious messages).
- * @details Any spurious messages received while waiting for the semaphore are silently dropped.
+ * @pre `(sema != NULL)`
  *
  * @param[in]  sema     A semaphore.
  * @param[in]  timeout  Time in microseconds until the semaphore times out. 0 for no timeout.
  *
  * @return  0 on success
- * @return  -EINVAL, if semaphore is invalid.
  * @return  -ETIMEDOUT, if the semaphore times out.
  * @return  -ECANCELED, if the semaphore was destroyed.
  */
 int sema_wait_timed(sema_t *sema, uint64_t timeout);
 
 /**
- * @brief   Wait for a semaphore being posted (without timeout, dropping spurious messages).
+ * @brief   Wait for a semaphore being posted (without timeout).
+ *
+ * @pre `(sema != NULL)`
  *
  * @param[in]  sema A semaphore.
  *
  * @return  0 on success
- * @return  -EINVAL, if semaphore is invalid.
  * @return  -ECANCELED, if the semaphore was destroyed.
  */
 static inline int sema_wait(sema_t *sema)
@@ -138,12 +127,26 @@ static inline int sema_wait(sema_t *sema)
 }
 
 /**
+ * @brief   Test if the semaphore is posted
+ *
+ * @pre `(sema != NULL)`
+ *
+ * This is a non-blocking alternative to @ref sema_wait.
+ *
+ * @return 0 on success
+ * @return  -EAGAIN, if the semaphore is not posted.
+ * @return  -ECANCELED, if the semaphore was destroyed.
+ */
+int sema_try_wait(sema_t *sema);
+
+/**
  * @brief   Signal semaphore.
+ *
+ * @pre `(sema != NULL)`
  *
  * @param[in] sema  A semaphore.
  *
  * @return  0, on success
- * @return  -EINVAL, if semaphore is invalid.
  * @return  -EOVERFLOW, if the semaphore's value would overflow.
  */
 int sema_post(sema_t *sema);
@@ -152,5 +155,5 @@ int sema_post(sema_t *sema);
 }
 #endif
 
-#endif /* SEM_H_ */
+#endif /* SEMA_H */
 /** @} */

@@ -2,6 +2,12 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
 
-ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-  USEPKG += nordic_softdevice_ble
+ifeq (,$(filter nrfmin,$(USEMODULE)))
+  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+    USEPKG += nordic_softdevice_ble
+  endif
+else
+  ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
+    USEMODULE += nrfmin
+  endif
 endif

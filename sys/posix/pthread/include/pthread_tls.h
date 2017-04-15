@@ -15,8 +15,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef __SYS__POSIX__PTHREAD_TLS__H
-#define __SYS__POSIX__PTHREAD_TLS__H
+#ifndef SYS__POSIX__PTHREAD_TLS__H
+#define SYS__POSIX__PTHREAD_TLS__H
 
 #ifdef __cplusplus
 extern "C" {
@@ -87,5 +87,8 @@ struct __pthread_tls_datum **__pthread_get_tls_head(int self_id) PURE;
 }
 #endif
 
-#endif /* __SYS__POSIX__PTHREAD_TLS__H */
-/** @} */
+#endif /* SYS__POSIX__PTHREAD_TLS__H */
+
+/**
+ * @}
+ */

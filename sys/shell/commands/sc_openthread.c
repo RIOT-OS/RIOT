@@ -21,9 +21,10 @@
 #include "byteorder.h"
 #include "net/ipv6/addr.h"
 
+#if 0
 int _openthread_state(int argc, char **argv)
 {
-    /*switch (otGetDeviceRole()) {
+    switch (otGetDeviceRole()) {
         case kDeviceRoleDisabled:
             printf("disabled\n");
             break;
@@ -39,15 +40,16 @@ int _openthread_state(int argc, char **argv)
         case kDeviceRoleLeader:
             printf("leader\n");
             break;
-    }*/
+    }
     return 0;
 }
 
 int _openthread_ipaddr(int argc, char **argv)
 {
-    /*for (const otNetifAddress *addr = otGetUnicastAddresses(); addr; addr = addr->mNext) {
+    for (const otNetifAddress *addr = otGetUnicastAddresses(); addr; addr = addr->mNext) {
         ipv6_addr_print((ipv6_addr_t *) &addr->mAddress.mFields);
         printf("\n");
-    }*/
+    }
     return 0;
 }
+#endif

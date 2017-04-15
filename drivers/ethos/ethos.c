@@ -35,6 +35,8 @@
 
 #ifdef USE_ETHOS_FOR_STDIO
 #include "uart_stdio.h"
+#include "isrpipe.h"
+extern isrpipe_t uart_stdio_isrpipe;
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -100,7 +102,7 @@ static void _handle_char(ethos_t *dev, char c)
 #ifdef USE_ETHOS_FOR_STDIO
         case ETHOS_FRAME_TYPE_TEXT:
             dev->framesize++;
-            uart_stdio_rx_cb(NULL, c);
+            isrpipe_write_one(&uart_stdio_isrpipe, c);
 #endif
     }
 }

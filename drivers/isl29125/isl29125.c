@@ -1,5 +1,6 @@
 /*
  * Copyright 2015 Ludwig Knüpfer
+ * Copyright 2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,8 @@
  * @brief       Device driver implementation for the ISL29125 RGB light sensor
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author      Martin Heusmann <martin.heusmann@haw-hamburg.de>
+ * @author      Cenk Gündoğan <mail-github@cgundogan.de>
  *
  * @}
  */
@@ -54,8 +57,6 @@ int isl29125_init(isl29125_t *dev, i2c_t i2c, gpio_t gpio,
 
     /* TODO: implement configuration 2: infrared compensation configuration */
 
-    /* TODO: implement configuration 3: interrupt mode configuration */
-
     /* acquire exclusive access to the bus */
     DEBUG("isl29125_init: i2c_acquire\n");
     (void) i2c_acquire(dev->i2c);
@@ -89,6 +90,61 @@ int isl29125_init(isl29125_t *dev, i2c_t i2c, gpio_t gpio,
     (void) i2c_release(dev->i2c);
 
     DEBUG("isl29125_init: success\n");
+    return 0;
+}
+
+int isl29125_init_int(isl29125_t *dev, isl29125_interrupt_status_t interrupt_status,
+                      isl29125_interrupt_persist_t interrupt_persist,
+                      isl29125_interrupt_conven_t interrupt_conven,
+                      uint16_t lower_threshold, uint16_t higher_threshold,
+                      gpio_cb_t cb, void *arg)
+{
+    /* configuration 3: interrupt mode configuration */
+    uint8_t conf3 = 0x00;
+    conf3 |= interrupt_status;
+    conf3 |= interrupt_persist;
+    conf3 |= interrupt_conven;
+
+    /* Lower and higher interrupt threshold registers. */
+    uint8_t lthlb = 0x00;
+    uint8_t lthhb = 0x00;
+    uint8_t hthlb = 0x00;
+    uint8_t hthhb = 0x00;
+    uint16_t max_range = 10000;
+
+    if (dev->range == 0x00) {
+        max_range = 375;
+    }
+
+    if ((higher_threshold <= max_range) && (lower_threshold < higher_threshold)) {
+        lower_threshold *= (uint16_t) (65535 / max_range);
+        lthlb = (uint8_t)(lower_threshold & 0xff);
+        lthhb = (uint8_t)(lower_threshold >> 8);
+        higher_threshold *= (uint16_t) (65535 / max_range);
+        hthlb = (uint8_t)(higher_threshold & 0xff);
+        hthhb = (uint8_t)(higher_threshold >> 8);
+    }
+
+    DEBUG("isl29125_init: i2c_write_reg(ISL29125_REG_CONF3)\n");
+    (void) i2c_write_reg(dev->i2c, ISL29125_I2C_ADDRESS, ISL29125_REG_CONF3, conf3);
+
+    DEBUG("isl29125_init: i2c_write_reg(ISL29125_REG_LTHLB)\n");
+    (void) i2c_write_reg(dev->i2c, ISL29125_I2C_ADDRESS, ISL29125_REG_LTHLB, lthlb);
+
+    DEBUG("isl29125_init: i2c_write_reg(ISL29125_REG_LTHHB)\n");
+    (void) i2c_write_reg(dev->i2c, ISL29125_I2C_ADDRESS, ISL29125_REG_LTHHB, lthhb);
+
+    DEBUG("isl29125_init: i2c_write_reg(ISL29125_REG_HTHLB)\n");
+    (void) i2c_write_reg(dev->i2c, ISL29125_I2C_ADDRESS, ISL29125_REG_HTHLB, hthlb);
+
+    DEBUG("isl29125_init: i2c_write_reg(ISL29125_REG_HTHHB)\n");
+    (void) i2c_write_reg(dev->i2c, ISL29125_I2C_ADDRESS, ISL29125_REG_HTHHB, hthhb);
+
+    if (gpio_init_int(dev->gpio, GPIO_IN, GPIO_FALLING, cb, arg) < 0) {
+        DEBUG("error: gpio_init_int failed\n");
+        return -1;
+    }
+
     return 0;
 }
 
@@ -152,4 +208,20 @@ void isl29125_set_mode(isl29125_t *dev, isl29125_mode_t mode)
     (void) i2c_write_reg(dev->i2c, ISL29125_I2C_ADDRESS, ISL29125_REG_CONF1, conf1);
 
     (void) i2c_release(dev->i2c);
+}
+
+int isl29125_read_irq_status(isl29125_t *dev)
+{
+    /* acquire exclusive access to the bus */
+    (void) i2c_acquire(dev->i2c);
+
+    /* read status register */
+    uint8_t irq_status;
+    (void) i2c_read_reg(dev->i2c, ISL29125_I2C_ADDRESS, ISL29125_REG_STATUS, &irq_status);
+
+    /* release the I2C bus */
+    (void) i2c_release(dev->i2c);
+
+    /* return bit 0 (RGBTHF)*/
+    return (irq_status & 0x01);
 }

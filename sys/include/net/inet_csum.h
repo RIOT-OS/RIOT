@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef INET_CSUM_H_
-#define INET_CSUM_H_
+#ifndef INET_CSUM_H
+#define INET_CSUM_H
 
 #include <inttypes.h>
 #include <stddef.h>
@@ -77,5 +77,5 @@ static inline uint16_t inet_csum(uint16_t sum, const uint8_t *buf, uint16_t len)
 }
 #endif
 
-#endif /* INET_CSUM_H_ */
+#endif /* INET_CSUM_H */
 /** @} */

@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph/init.h"
 
 /* Check the source to be used for the PLL */
 #if defined(CLOCK_HSI) && defined(CLOCK_HSE)
@@ -50,6 +51,8 @@ void cpu_init(void)
     cortexm_init();
     /* initialize the clock system */
     cpu_clock_init();
+    /* trigger static peripheral initialization */
+    periph_init();
 }
 
 /**
@@ -89,7 +92,7 @@ static void cpu_clock_init(void)
     /* setup power module */
 
     /* enable the power module */
-    RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
     /* set the voltage scaling to 1 to enable the maximum frequency */
     PWR->CR |= PWR_CR_VOS_1;
 
