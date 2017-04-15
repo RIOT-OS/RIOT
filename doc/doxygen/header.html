@@ -21,6 +21,7 @@
     <link href="$relpath^doxygen.css" rel="stylesheet">
     <link href="$relpath^fonts.css" rel="stylesheet">
     <link href="$relpath^bootstrap.min.css" rel="stylesheet">
+    <link href="$relpath^jquery.smartmenus.bootstrap.css" rel="stylesheet">
     <link href="$relpath^riot.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -49,7 +50,8 @@
             <div class="collapse navbar-collapse" id="navbar-collapse">
               <p class="navbar-text navbar-left"><span id="projectbrief">$projectbrief</span></p>
               <ul id="riot-navlist" class="nav navbar-nav"></ul>
-              <form class="navbar-form navbar-left navbar-right hidden-sm hidden-xs">
+              <!--BEGIN SEARCHENGINE-->
+              <form id="riot-searchform" class="navbar-form navbar-left navbar-right hidden-sm hidden-xs">
                  <div class="form-group">
                    <div id="MSearchBox" class="MSearchBoxActive">
                      <div class="input-group">
@@ -64,6 +66,7 @@
                    </div>
                  </div>
               </form>
+              <!--END SEARCHENGINE-->
             </div><!-- /.navbar-collapse -->
           </div><!-- /.container-fluid -->
         </nav>
