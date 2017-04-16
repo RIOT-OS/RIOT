@@ -25,6 +25,7 @@
             ZZZZZ
 
 The friendly Operating System for IoT!
+[<img align="right" src="https://travis-ci.org/RIOT-OS/RIOT.svg?branch=master" />](https://travis-ci.org/RIOT-OS/RIOT)
 
 RIOT is a real-time multi-threading operating system that supports a range of
 devices that are typically found in the Internet of Things (IoT): 
