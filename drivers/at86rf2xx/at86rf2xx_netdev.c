@@ -568,11 +568,11 @@ static void _isr(netdev_t *netdev)
                 switch (trac_status) {
 #ifdef MODULE_OPENTHREAD
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
-                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE);
+                        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
                         DEBUG("[at86rf2xx] TX SUCCESS\n");
                         break;
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
-                        netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE_DATA_PENDING);
+                        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE_DATA_PENDING);
                         DEBUG("[at86rf2xx] TX SUCCESS DATA PENDING\n");
                         break;
 #else

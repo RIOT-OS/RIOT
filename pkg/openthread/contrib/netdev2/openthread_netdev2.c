@@ -56,7 +56,7 @@ void *_openthread_event_loop(void *arg)
     sInstance = otInstanceInit();
 
     msg_init_queue(_queue, OPENTHREAD_QUEUE_LEN);
-    netdev2_t *dev;
+    netdev_t *dev;
     msg_t msg;
 
 #ifdef MODULE_OPENTHREAD_CLI
@@ -82,9 +82,9 @@ void *_openthread_event_loop(void *arg)
                 otPlatAlarmFired(sInstance);
                 end_mutex();
                 break;
-            case OPENTHREAD_NETDEV2_MSG_TYPE_EVENT:
+            case OPENTHREAD_NETDEV_MSG_TYPE_EVENT:
                 /* Received an event from driver */
-                dev = (netdev2_t *) msg.content.ptr;
+                dev = (netdev_t *) msg.content.ptr;
                 dev->driver->isr(dev);
                 break;
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
@@ -102,29 +102,29 @@ void *_openthread_event_loop(void *arg)
     return NULL;
 }
 
-void _event_cb(netdev2_t *dev, netdev2_event_t event)
+void _event_cb(netdev_t *dev, netdev_event_t event)
 {
-    if (event == NETDEV2_EVENT_ISR) {
+    if (event == NETDEV_EVENT_ISR) {
         assert(_pid != KERNEL_PID_UNDEF);
         msg_t msg;
 
-        msg.type = OPENTHREAD_NETDEV2_MSG_TYPE_EVENT;
+        msg.type = OPENTHREAD_NETDEV_MSG_TYPE_EVENT;
         msg.content.ptr = dev;
 
         if (msg_send(&msg, _pid) <= 0) {
-            DEBUG("openthread_netdev2: possibly lost interrupt.\n");
+            DEBUG("openthread_netdev: possibly lost interrupt.\n");
         }
     }
     else {
         switch (event) {
-            case NETDEV2_EVENT_RX_COMPLETE:
-                DEBUG("openthread_netdev2: Reception of a packet\n");
+            case NETDEV_EVENT_RX_COMPLETE:
+                DEBUG("openthread_netdev: Reception of a packet\n");
                 recv_pkt(sInstance, dev);
                 break;
-            case NETDEV2_EVENT_TX_COMPLETE:
-            case NETDEV2_EVENT_TX_NOACK:
-            case NETDEV2_EVENT_TX_MEDIUM_BUSY:
-                DEBUG("openthread_netdev2: Transmission of a packet\n");
+            case NETDEV_EVENT_TX_COMPLETE:
+            case NETDEV_EVENT_TX_NOACK:
+            case NETDEV_EVENT_TX_MEDIUM_BUSY:
+                DEBUG("openthread_netdev: Transmission of a packet\n");
                 send_pkt(sInstance, dev, event);
                 break;
             default:
@@ -140,8 +140,8 @@ kernel_pid_t openthread_get_pid(void)
 }
 
 /* starts OpenThread thread */
-int openthread_netdev2_init(char *stack, int stacksize, char priority,
-                            const char *name, netdev2_t *netdev)
+int openthread_netdev_init(char *stack, int stacksize, char priority,
+                            const char *name, netdev_t *netdev)
 {
 
     netdev->driver->init(netdev);
