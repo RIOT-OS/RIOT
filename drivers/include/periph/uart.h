@@ -58,15 +58,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Make sure the number of available UART devices is defined
- * @{
- */
-#ifndef UART_NUMOF
-#error "UART_NUMOF undefined for the target platform"
-#endif
-/** @} */
-
-/**
  * @brief   Define default UART type identifier
  * @{
  */
@@ -133,10 +124,14 @@ enum {
  * - 1 stop bit
  * - baudrate as given
  *
+ * If no callback parameter is given (rx_cb := NULL), the UART will be
+ * initialized in TX only mode.
+ *
  * @param[in] uart          UART device to initialize
  * @param[in] baudrate      desired baudrate in baud/s
  * @param[in] rx_cb         receive callback, executed in interrupt context once
- *                          for every byte that is received (RX buffer filled)
+ *                          for every byte that is received (RX buffer filled),
+ *                          set to NULL for TX only mode
  * @param[in] arg           optional context passed to the callback functions
  *
  * @return                  UART_OK on success

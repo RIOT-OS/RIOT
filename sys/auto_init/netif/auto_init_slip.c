@@ -21,8 +21,7 @@
 
 #include "log.h"
 #include "board.h"
-#include "net/gnrc/netdev2.h"
-#include "net/gnrc/nomac.h"
+#include "net/gnrc/netdev.h"
 #include "net/gnrc.h"
 
 #include "net/gnrc/slip.h"
@@ -38,7 +37,7 @@ static gnrc_slip_dev_t slip_devs[SLIP_NUM];
  */
 #define SLIP_STACKSIZE          (THREAD_STACKSIZE_DEFAULT)
 #ifndef SLIP_PRIO
-#define SLIP_PRIO               (GNRC_NETDEV2_MAC_PRIO)
+#define SLIP_PRIO               (GNRC_NETDEV_MAC_PRIO)
 #endif
 
 /**

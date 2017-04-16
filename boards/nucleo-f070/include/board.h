@@ -19,7 +19,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Mohmmad Ayman <mohmmad.khzrag@gmail.com>
  * @author      José Alamos <jialamos@uc.cl>
- * @author      Alexandre Aabdie <alexandre.abadie@inria.fr>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
 #ifndef BOARD_H
@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Xtimer configuration
+ * @name    Xtimer configuration
  * @{
  */
 #define XTIMER_WIDTH                (16)

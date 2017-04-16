@@ -67,9 +67,6 @@ endif
 ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
     DIRS += nettest
 endif
-ifneq (,$(filter gnrc_nomac,$(USEMODULE)))
-    DIRS += link_layer/nomac
-endif
 ifneq (,$(filter gnrc_mac,$(USEMODULE)))
     DIRS += link_layer/gnrc_mac
 endif
@@ -132,9 +129,6 @@ ifneq (,$(filter gnrc_udp,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
     DIRS += transport_layer/tcp
-endif
-ifneq (,$(filter gnrc_zep,$(USEMODULE)))
-    DIRS += application_layer/zep
 endif
 ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
     DIRS += application_layer/tftp

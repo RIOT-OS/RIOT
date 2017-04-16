@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2015-2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,17 +14,16 @@
  * @{
  *
  * @file
- * @brief      Functions for allocating and freeing the receive buffer
+ * @brief       Functions for allocating and freeing the receive buffer
  *
- * @author     Simon Brummer <brummer.simon@googlemail.com>
- * @}
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  */
- #ifndef GNRC_TCP_INTERNAL_RCVBUF_H_
- #define GNRC_TCP_INTERNAL_RCVBUF_H_
+
+#ifndef GNRC_TCP_INTERNAL_RCVBUF_H
+#define GNRC_TCP_INTERNAL_RCVBUF_H
 
 #include <stdint.h>
 #include "mutex.h"
-#include "ringbuffer.h"
 #include "net/gnrc/tcp/config.h"
 #include "net/gnrc/tcp/tcb.h"
 
@@ -64,18 +63,18 @@ void _rcvbuf_init(void);
  * @return  zero  on success
  * @return  -ENOMEM If receive buffer is out of memory.
  */
-int _rcvbuf_get_buffer(gnrc_tcp_tcb_t* tcb);
+int _rcvbuf_get_buffer(gnrc_tcp_tcb_t *tcb);
 
 /**
  * @brief Free allocated receive buffer
  *
  * @param[in] tcb   Transmission control block that buffer should be freed.
  */
-void _rcvbuf_release_buffer(gnrc_tcp_tcb_t* tcb);
+void _rcvbuf_release_buffer(gnrc_tcp_tcb_t *tcb);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GNRC_TCP_INTERNAL_RCVBUF_H_ */
+#endif /* GNRC_TCP_INTERNAL_RCVBUF_H */
 /** @} */

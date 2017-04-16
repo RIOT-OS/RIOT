@@ -1,1 +1,1 @@
-INCLUDES += -I$(BINDIRBASE)/pkg/$(BOARD)/micro-ecc
+INCLUDES += -I$(PKGDIRBASE)/micro-ecc

@@ -1,0 +1,5 @@
+# include nucleo common serial configuration
+include $(RIOTBOARD)/nucleo-common/Makefile.include.serial
+
+# add the common header files to the include path
+INCLUDES += -I$(RIOTBOARD)/nucleo32-common/include

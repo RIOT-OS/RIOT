@@ -22,7 +22,6 @@
 
 #include "saul.h"
 #include "io1_xplained.h"
-#include "xtimer.h"
 
 static float temperature;
 

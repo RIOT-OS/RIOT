@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED0_PIN            GPIO_PIN(2, 0)
@@ -60,10 +60,9 @@ extern "C" {
 /** @} */
 
 /**
- * @name Flash Customer Configuration Area (CCA) parameters
+ * @name    Flash Customer Configuration Area (CCA) parameters
  * @{
  */
-
 #ifndef UPDATE_CCA
 #define UPDATE_CCA                1
 #endif
@@ -74,20 +73,20 @@ extern "C" {
 /** @} */
 
 /**
- * @name xtimer configuration
+ * @name    xtimer configuration
  * @{
  */
 #define XTIMER_DEV          (0)
 #define XTIMER_CHAN         (0)
 #define XTIMER_WIDTH        (16)
-#define XTIMER_SHIFT        (4)
-#define XTIMER_HZ           (16000000UL)
+#define XTIMER_SHIFT        (0)
+#define XTIMER_HZ           (1000000UL)
 #define XTIMER_BACKOFF      (50)
 #define XTIMER_ISR_BACKOFF  (40)
 /** @} */
 
 /**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
 

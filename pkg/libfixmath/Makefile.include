@@ -1,4 +1,4 @@
-PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/libfixmath
+PKG_BUILDDIR ?= $(PKGDIRBASE)/libfixmath
 
 # The static cache is huge, disable it.
 CFLAGS += -DFIXMATH_NO_CACHE

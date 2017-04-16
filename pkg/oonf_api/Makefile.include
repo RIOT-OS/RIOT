@@ -1,5 +1,5 @@
-INCLUDES += -I$(BINDIRBASE)/pkg/$(BOARD)/oonf_api/src-api
+INCLUDES += -I$(PKGDIRBASE)/oonf_api/src-api
 
-ifeq ($(shell uname -s),Darwin)
-	CFLAGS += -Wno-reserved-id-macro -Wno-keyword-macro
+ifeq ($(TOOLCHAIN), llvm)
+    CFLAGS += -Wno-keyword-macro -Wno-parentheses-equality
 endif

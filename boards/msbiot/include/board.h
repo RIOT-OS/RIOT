@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @name Configure connected CC1101 (radio) device
+ * @name    Configure connected CC1101 (radio) device
  * @{
  */
 #define CC110X_SPI          SPI_DEV(0)
@@ -40,7 +40,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name Configure connected MPU-9150 device
+ * @name    Configure connected MPU-9150 device
  * @{
  */
 #define MPU9150_I2C         I2C_0
@@ -49,33 +49,33 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
-#define LED0_PIN            GPIO_PIN(1, 8)
-#define LED1_PIN            GPIO_PIN(1, 14)
-#define LED2_PIN            GPIO_PIN(1, 15)
+#define LED0_PIN            GPIO_PIN(PORT_B, 8)
+#define LED1_PIN            GPIO_PIN(PORT_B, 14)
+#define LED2_PIN            GPIO_PIN(PORT_B, 15)
 
 #define LED_PORT            GPIOB
 #define LED0_MASK           (1 << 8)
 #define LED1_MASK           (1 << 14)
 #define LED2_MASK           (1 << 15)
 
-#define LED0_ON             (LED_PORT->BSRRH = LED0_MASK)
-#define LED0_OFF            (LED_PORT->BSRRL = LED0_MASK)
+#define LED0_ON             (LED_PORT->BSRR = LED0_MASK)
+#define LED0_OFF            (LED_PORT->BSRR = (LED0_MASK << 16))
 #define LED0_TOGGLE         (LED_PORT->ODR  ^= LED0_MASK)
 
-#define LED1_ON             (LED_PORT->BSRRH = LED1_MASK)
-#define LED1_OFF            (LED_PORT->BSRRL = LED1_MASK)
+#define LED1_ON             (LED_PORT->BSRR = LED1_MASK)
+#define LED1_OFF            (LED_PORT->BSRR = (LED1_MASK << 16))
 #define LED1_TOGGLE         (LED_PORT->ODR  ^= LED1_MASK)
 
-#define LED2_ON             (LED_PORT->BSRRH = LED2_MASK)
-#define LED2_OFF            (LED_PORT->BSRRL = LED2_MASK)
+#define LED2_ON             (LED_PORT->BSRR = LED2_MASK)
+#define LED2_OFF            (LED_PORT->BSRR = (LED2_MASK << 16))
 #define LED2_TOGGLE         (LED_PORT->ODR  ^= LED2_MASK)
 /** @} */
 
 /**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
 

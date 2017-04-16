@@ -114,34 +114,17 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
     PWM->PWM_CH_NUM[pwm_chan[channel].hwchan].PWM_CDTYUPD = value;
 }
 
-void pwm_start(pwm_t pwm)
-{
-    assert(pwm == PWM_DEV(0));
-    PWM->PWM_ENA = pwm_chan_mask;
-}
-
-void pwm_stop(pwm_t pwm)
-{
-    assert(pwm == PWM_DEV(0));
-    PWM->PWM_ENA = 0;
-}
-
-/*
- * The device is reactivated by by clocking the device block.
- * Operation continues where it has been stopped by poweroff.
- */
 void pwm_poweron(pwm_t pwm)
 {
     assert(pwm == PWM_DEV(0));
     PMC->PMC_PCER1 = PMC_PCDR1_PID36;
+    PWM->PWM_ENA = pwm_chan_mask;
 }
 
-/*
- * The device is set to power saving mode by disabling the clock.
- */
 void pwm_poweroff(pwm_t pwm)
 {
     assert(pwm == PWM_DEV(0));
+    PWM->PWM_ENA = 0;
     PMC->PMC_PCDR1 = PMC_PCDR1_PID36;
 }
 

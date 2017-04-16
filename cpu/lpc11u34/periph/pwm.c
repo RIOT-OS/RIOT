@@ -50,7 +50,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     }
 
     /* power on and configure the timer */
-    pwm_poweron(pwm);
+    LPC_SYSCON->SYSAHBCLKCTRL |= pwm_config[pwm].clk_bit;
     /* enable the timer and keep it in reset state */
     dev(pwm)->TCR = BIT0 | BIT1;
     /* set prescaler */
@@ -85,27 +85,17 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
     dev(pwm)->MR[channel] = dev(pwm)->MR3 - value;
 }
 
-void pwm_start(pwm_t pwm)
-{
-    assert(pwm < PWM_NUMOF);
-    dev(pwm)->TCR &= ~(BIT1);
-}
-
-void pwm_stop(pwm_t pwm)
-{
-    assert(pwm < PWM_NUMOF);
-    dev(pwm)->TCR |= (BIT1);
-}
-
 void pwm_poweron(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
     LPC_SYSCON->SYSAHBCLKCTRL |= pwm_config[pwm].clk_bit;
+    dev(pwm)->TCR &= ~(BIT1);
 }
 
 void pwm_poweroff(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
+    dev(pwm)->TCR |= (BIT1);
     LPC_SYSCON->SYSAHBCLKCTRL &= ~(pwm_config[pwm].clk_bit);
 }
 

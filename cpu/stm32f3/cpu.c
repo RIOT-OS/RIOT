@@ -140,5 +140,15 @@ static void cpu_clock_init(void)
     /* disable the HSI if we use the HSE */
     RCC->CR &= ~(RCC_CR_HSION);
     while (RCC->CR & RCC_CR_HSIRDY) {}
+
+    /* swith I2Cx clock source to SYSCLK */
+    RCC->CFGR3 &= ~(RCC_CFGR3_I2CSW);
+    RCC->CFGR3 |= RCC_CFGR3_I2C1SW_SYSCLK;
+#ifdef RCC_CFGR3_I2C2SW_SYSCLK
+    RCC->CFGR3 |= RCC_CFGR3_I2C2SW_SYSCLK;
+#endif
+#ifdef RCC_CFGR3_I2C3SW_SYSCLK
+    RCC->CFGR3 |= RCC_CFGR3_I2C3SW_SYSCLK;
+#endif
 #endif
 }

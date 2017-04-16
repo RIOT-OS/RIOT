@@ -2,6 +2,7 @@
  * Copyright 2005 Colin Percival
  * Copyright 2013 Christian Mehlis & René Kijewski
  * Copyright 2016 Martin Landsmann <martin.landsmann@haw-hamburg.de>
+ * Copyright 2016 OTA keys S.A.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,6 +40,7 @@
  * @author      Christian Mehlis
  * @author      Rene Kijewski
  * @author      Martin Landsmann
+ * @author      Hermann Lelong
  *
  * @}
  */
@@ -276,8 +278,8 @@ void *sha256(const void *data, size_t len, void *digest)
     return digest;
 }
 
-const void *hmac_sha256(const void *key, size_t key_length,
-                        const void *data, size_t len, void *digest)
+
+void hmac_sha256_init(hmac_context_t *ctx, const void *key, size_t key_length)
 {
     unsigned char k[SHA256_INTERNAL_BLOCK_SIZE];
 
@@ -304,16 +306,29 @@ const void *hmac_sha256(const void *key, size_t key_length,
     }
 
     /*
-     * Create the inner hash
+     * Initiate calculation of the inner hash
      * tmp = hash(i_key_pad CONCAT message)
      */
-    sha256_context_t c;
-    unsigned char tmp[SHA256_DIGEST_LENGTH];
+    sha256_init(&ctx->c_in);
+    sha256_update(&ctx->c_in, i_key_pad, SHA256_INTERNAL_BLOCK_SIZE);
 
-    sha256_init(&c);
-    sha256_update(&c, i_key_pad, SHA256_INTERNAL_BLOCK_SIZE);
-    sha256_update(&c, data, len);
-    sha256_final(&c, tmp);
+    /*
+     * Initiate calculation of the outer hash
+     * result = hash(o_key_pad CONCAT tmp)
+     */
+    sha256_init(&ctx->c_out);
+    sha256_update(&ctx->c_out, o_key_pad, SHA256_INTERNAL_BLOCK_SIZE);
+
+}
+
+void hmac_sha256_update(hmac_context_t *ctx, const void *data, size_t len)
+{
+    sha256_update(&ctx->c_in, data, len);
+}
+
+void hmac_sha256_final(hmac_context_t *ctx, void *digest)
+{
+    unsigned char tmp[SHA256_DIGEST_LENGTH];
 
     static unsigned char m[SHA256_DIGEST_LENGTH];
 
@@ -321,14 +336,20 @@ const void *hmac_sha256(const void *key, size_t key_length,
         digest = m;
     }
 
-    /*
-     * Create the outer hash
-     * result = hash(o_key_pad CONCAT tmp)
-     */
-    sha256_init(&c);
-    sha256_update(&c, o_key_pad, SHA256_INTERNAL_BLOCK_SIZE);
-    sha256_update(&c, tmp, SHA256_DIGEST_LENGTH);
-    sha256_final(&c, digest);
+    sha256_final(&ctx->c_in, tmp);
+    sha256_update(&ctx->c_out, tmp, SHA256_DIGEST_LENGTH);
+    sha256_final(&ctx->c_out, digest);
+}
+
+const void *hmac_sha256(const void *key, size_t key_length,
+                        const void *data, size_t len, void *digest)
+{
+
+    hmac_context_t ctx;
+
+    hmac_sha256_init(&ctx, key, key_length);
+    hmac_sha256_update(&ctx,data, len);
+    hmac_sha256_final(&ctx, digest);
 
     return digest;
 }

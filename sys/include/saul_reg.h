@@ -11,6 +11,8 @@
  * @ingroup     sys
  * @brief       Global sensor/actuator registry for SAUL devices
  *
+ * @see @ref drivers_saul
+ *
  * @{
  *
  * @file

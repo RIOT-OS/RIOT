@@ -20,7 +20,7 @@
  * @}
  */
 
-#include "uuid.h"
+#include "luid.h"
 #include "byteorder.h"
 #include "net/gnrc.h"
 #include "mrf24j40_registers.h"
@@ -33,7 +33,7 @@
 
 void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params)
 {
-    netdev2_t *netdev = (netdev2_t *)dev;
+    netdev_t *netdev = (netdev_t *)dev;
 
     netdev->driver = &mrf24j40_driver;
     /* initialize device descriptor */
@@ -51,12 +51,12 @@ void mrf24j40_reset(mrf24j40_t *dev)
     dev->netdev.flags = 0;
 
     /* get an 8-byte unique ID to use as hardware address */
-    uuid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
+    luid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
     addr_long.uint8[0] &= ~(0x01);
     addr_long.uint8[0] |=  (0x02);
     /* set short and long address */
-    mrf24j40_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
-    mrf24j40_set_addr_short(dev, NTOHS(addr_long.uint16[0].u16));
+    mrf24j40_set_addr_long(dev, ntohll(addr_long.uint64.u64));
+    mrf24j40_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
 
     /* set default PAN id */
     mrf24j40_set_pan(dev, IEEE802154_DEFAULT_PANID);
@@ -67,8 +67,8 @@ void mrf24j40_reset(mrf24j40_t *dev)
 
     /* set default options */
     mrf24j40_set_option(dev, IEEE802154_FCF_PAN_COMP, true);
-    mrf24j40_set_option(dev, NETDEV2_IEEE802154_SRC_MODE_LONG, true);
-    mrf24j40_set_option(dev, NETDEV2_IEEE802154_ACK_REQ, true);
+    mrf24j40_set_option(dev, NETDEV_IEEE802154_SRC_MODE_LONG, true);
+    mrf24j40_set_option(dev, NETDEV_IEEE802154_ACK_REQ, true);
     mrf24j40_set_option(dev, MRF24J40_OPT_CSMA, true);
     mrf24j40_set_option(dev, MRF24J40_OPT_TELL_RX_START, false);
     mrf24j40_set_option(dev, MRF24J40_OPT_TELL_RX_END, true);
@@ -142,7 +142,7 @@ size_t mrf24j40_tx_load(mrf24j40_t *dev, uint8_t *data, size_t len, size_t offse
 
 void mrf24j40_tx_exec(mrf24j40_t *dev)
 {
-    netdev2_t *netdev = (netdev2_t *)dev;
+    netdev_t *netdev = (netdev_t *)dev;
 
 
     dev->tx_frame_len = dev->tx_frame_len - IEEE802154_FCS_LEN;
@@ -156,13 +156,13 @@ void mrf24j40_tx_exec(mrf24j40_t *dev)
      */
     mrf24j40_reg_write_long(dev, MRF24J40_TX_NORMAL_FIFO, dev->header_len);
 
-    if (dev->netdev.flags & NETDEV2_IEEE802154_ACK_REQ) {
+    if (dev->netdev.flags & NETDEV_IEEE802154_ACK_REQ) {
         mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNACKREQ | MRF24J40_TXNCON_TXNTRIG);
     }
     else {
         mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNTRIG);
     }
     if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_START)) {
-        netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED);
+        netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
     }
 }

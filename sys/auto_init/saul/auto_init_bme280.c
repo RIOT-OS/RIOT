@@ -22,9 +22,8 @@
 
 #include "log.h"
 #include "saul_reg.h"
-
-#include "bme280_params.h"
 #include "bme280.h"
+#include "bme280_params.h"
 
 /**
  * @brief   Allocation of memory for device descriptors
@@ -44,29 +43,29 @@ void auto_init_bme280(void)
         int res = bme280_init(&bme280_devs[i], &bme280_params[i]);
         if (res < 0) {
             LOG_ERROR("[auto_init_saul] error initializing BME280 #%i\n", i);
+            continue;
         }
-        else {
-            /* temperature */
-            saul_entries[se_ix].dev = &bme280_devs[i];
-            saul_entries[se_ix].name = bme280_saul_reg_info[i][0].name;
-            saul_entries[se_ix].driver = &bme280_temperature_saul_driver;
-            saul_reg_add(&saul_entries[se_ix]);
-            se_ix++;
 
-            /* relative humidity */
-            saul_entries[se_ix].dev = &bme280_devs[i];
-            saul_entries[se_ix].name = bme280_saul_reg_info[i][1].name;
-            saul_entries[se_ix].driver = &bme280_relative_humidity_saul_driver;
-            saul_reg_add(&saul_entries[se_ix]);
-            se_ix++;
+        /* temperature */
+        saul_entries[se_ix].dev = &bme280_devs[i];
+        saul_entries[se_ix].name = bme280_saul_reg_info[i][0].name;
+        saul_entries[se_ix].driver = &bme280_temperature_saul_driver;
+        saul_reg_add(&saul_entries[se_ix]);
+        se_ix++;
 
-            /* pressure */
-            saul_entries[se_ix].dev = &bme280_devs[i];
-            saul_entries[se_ix].name = bme280_saul_reg_info[i][2].name;
-            saul_entries[se_ix].driver = &bme280_pressure_saul_driver;
-            saul_reg_add(&saul_entries[se_ix]);
-            se_ix++;
-        }
+        /* relative humidity */
+        saul_entries[se_ix].dev = &bme280_devs[i];
+        saul_entries[se_ix].name = bme280_saul_reg_info[i][1].name;
+        saul_entries[se_ix].driver = &bme280_relative_humidity_saul_driver;
+        saul_reg_add(&saul_entries[se_ix]);
+        se_ix++;
+
+        /* pressure */
+        saul_entries[se_ix].dev = &bme280_devs[i];
+        saul_entries[se_ix].name = bme280_saul_reg_info[i][2].name;
+        saul_entries[se_ix].driver = &bme280_pressure_saul_driver;
+        saul_reg_add(&saul_entries[se_ix]);
+        se_ix++;
     }
 }
 

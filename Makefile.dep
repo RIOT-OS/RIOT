@@ -26,11 +26,11 @@ endif
 
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += gnrc_netif
-  USEMODULE += gnrc_netdev2
+  USEMODULE += gnrc_netdev
   USEMODULE += netdev_default
 endif
 
-ifneq (,$(filter netdev2_ieee802154,$(USEMODULE)))
+ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
   USEMODULE += ieee802154
 endif
 
@@ -47,7 +47,7 @@ ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
     USEMODULE += gnrc_sixlowpan
     USEMODULE += gnrc_sixlowpan_iphc
     USEMODULE += gnrc_ipv6_default
-    USEMODULE += gnrc_netdev2
+    USEMODULE += gnrc_netdev
     USEMODULE += gnrc_ipv6_netif
 endif
 
@@ -86,20 +86,12 @@ ifneq (,$(filter gnrc_netapi_mbox,$(USEMODULE)))
   USEMODULE += core_mbox
 endif
 
-ifneq (,$(filter netdev2_tap,$(USEMODULE)))
+ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += netif
-  USEMODULE += netdev2_eth
+  USEMODULE += netdev_eth
   ifneq (,$(filter gnrc_%,$(USEMODULE)))
-    USEMODULE += gnrc_netdev2
+    USEMODULE += gnrc_netdev
   endif
-endif
-
-ifneq (,$(filter gnrc_zep,$(USEMODULE)))
-  USEMODULE += hashes
-  USEMODULE += ieee802154
-  USEMODULE += gnrc_udp
-  USEMODULE += random
-  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
@@ -358,6 +350,10 @@ ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   USEMODULE += od
 endif
 
+ifneq (,$(filter od,$(USEMODULE)))
+  USEMODULE += fmt
+endif
+
 ifneq (,$(filter newlib_nano,$(USEMODULE)))
   USEMODULE += newlib
 endif
@@ -375,8 +371,8 @@ endif
 
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += bitfield
-  USEMODULE += posix
   USEMODULE += random
+  USEMODULE += vfs
 endif
 
 ifneq (,$(filter rtt_stdio,$(USEMODULE)))
@@ -434,6 +430,10 @@ endif
 
 ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
   USEMODULE += lwip_raw
+endif
+
+ifneq (,$(filter lwip_sock_tcp,$(USEMODULE)))
+  USEMODULE += lwip_tcp
 endif
 
 ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
@@ -538,7 +538,7 @@ ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
   USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
 endif
 
-ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
+ifneq (,$(filter gnrc_netdev,$(USEMODULE)))
   USEMODULE += netopt
 endif
 
@@ -609,6 +609,37 @@ endif
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
   USEMODULE+=openthread_contrib_netdev2
+endif
+
+ifneq (,$(filter emcute,$(USEMODULE)))
+  USEMODULE += core_thread_flags
+  USEMODULE += sock_udp
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter constfs,$(USEMODULE)))
+  USEMODULE += vfs
+endif
+
+ifneq (,$(filter devfs,$(USEMODULE)))
+  USEMODULE += vfs
+endif
+
+ifneq (,$(filter vfs,$(USEMODULE)))
+    ifeq (native, $(BOARD))
+        USEMODULE += native_vfs
+    endif
+endif
+
+ifneq (,$(filter sock_dns,$(USEMODULE)))
+  USEMODULE += sock_util
+endif
+
+ifneq (,$(filter spiffs,$(USEMODULE)))
+    USEPKG += spiffs
+    USEMODULE += vfs
+    USEMODULE += spiffs_fs
+    USEMODULE += mtd
 endif
 
 # include package dependencies

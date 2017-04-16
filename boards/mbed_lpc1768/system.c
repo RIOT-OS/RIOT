@@ -23,7 +23,7 @@
  *
  ******************************************************************************/
 
-#include "LPC17xx.h"
+#include "vendor/LPC17xx.h"
 
 /*--------------------- Clock Configuration ----------------------------------
  *
@@ -405,62 +405,6 @@
 #define CORE_CLK (IRC_OSC         / CCLK_DIV)
 #endif
 #endif
-
-/*
- * Clock Variable definitions
- */
-uint32_t system_clock = CORE_CLK;/*!< System Clock Frequency (Core Clock)*/
-
-
-/*
- * Clock functions
- */
-void SystemCoreClockUpdate(void)            /* Get Core Clock Frequency */
-{
-    /* Determine clock frequency according to clock register values */
-    if (((LPC_SC->PLL0STAT >> 24) & 3) == 3) { /* If PLL0 enabled and connected */
-        switch (LPC_SC->CLKSRCSEL & 0x03) {
-            case 0:                                /* Int. RC oscillator => PLL0 */
-            case 3:                                /* Reserved, default to Int. RC */
-                system_clock = (IRC_OSC *
-                                ((2ULL * ((LPC_SC->PLL0STAT & 0x7FFF) + 1)))  /
-                                (((LPC_SC->PLL0STAT >> 16) & 0xFF) + 1)       /
-                                ((LPC_SC->CCLKCFG & 0xFF) + 1));
-                break;
-
-            case 1:                                /* Main oscillator => PLL0 */
-                system_clock = (OSC_CLK *
-                                ((2ULL * ((LPC_SC->PLL0STAT & 0x7FFF) + 1)))  /
-                                (((LPC_SC->PLL0STAT >> 16) & 0xFF) + 1)       /
-                                ((LPC_SC->CCLKCFG & 0xFF) + 1));
-                break;
-
-            case 2:                                /* RTC oscillator => PLL0 */
-                system_clock = (RTC_CLK *
-                                ((2ULL * ((LPC_SC->PLL0STAT & 0x7FFF) + 1)))  /
-                                (((LPC_SC->PLL0STAT >> 16) & 0xFF) + 1)       /
-                                ((LPC_SC->CCLKCFG & 0xFF) + 1));
-                break;
-        }
-    }
-    else {
-        switch (LPC_SC->CLKSRCSEL & 0x03) {
-            case 0:                                /* Int. RC oscillator => PLL0 */
-            case 3:                                /* Reserved, default to Int. RC */
-                system_clock = IRC_OSC / ((LPC_SC->CCLKCFG & 0xFF) + 1);
-                break;
-
-            case 1:                                /* Main oscillator => PLL0 */
-                system_clock = OSC_CLK / ((LPC_SC->CCLKCFG & 0xFF) + 1);
-                break;
-
-            case 2:                                /* RTC oscillator => PLL0 */
-                system_clock = RTC_CLK / ((LPC_SC->CCLKCFG & 0xFF) + 1);
-                break;
-        }
-    }
-
-}
 
 /**
  * Initialize the system

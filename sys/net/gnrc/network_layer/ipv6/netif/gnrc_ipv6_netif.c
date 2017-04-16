@@ -852,7 +852,19 @@ void gnrc_ipv6_netif_init_by_dev(void)
             _add_addr_to_entry(ipv6_if, &addr, 64, 0);
 
         }
-
+#ifdef GNRC_IPV6_STATIC_LLADDR
+        /* parse addr from string and explicitely set a link lokal prefix
+         * if ifnum > 1 each interface will get its own link local address
+         * with GNRC_IPV6_STATIC_LLADDR + i
+         */
+        char lladdr_str[] = GNRC_IPV6_STATIC_LLADDR;
+        ipv6_addr_t lladdr;
+        if(ipv6_addr_from_str(&lladdr, lladdr_str) != NULL) {
+            lladdr.u8[15] += i;
+            assert(ipv6_addr_is_link_local(&lladdr));
+            _add_addr_to_entry(ipv6_if, &lladdr, 64, 0);
+        }
+#endif
         /* set link MTU */
         if ((gnrc_netapi_get(ifs[i], NETOPT_MAX_PACKET_SIZE, 0, &tmp,
                              sizeof(uint16_t)) >= 0)) {

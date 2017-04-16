@@ -31,8 +31,8 @@
 #include "board.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "net/netdev2.h"
-#include "net/netdev2/ieee802154.h"
+#include "net/netdev.h"
+#include "net/netdev/ieee802154.h"
 #include "net/gnrc/nettype.h"
 
 #ifdef __cplusplus
@@ -93,7 +93,7 @@ extern "C" {
  * @brief   Internal device option flags
  *
  * `0x00ff` is reserved for general IEEE 802.15.4 flags
- * (see @ref netdev2_ieee802154_t)
+ * (see @ref netdev_ieee802154_t)
  *
  * @{
  */
@@ -135,7 +135,7 @@ typedef struct mrf24j40_params {
  * @brief   Device descriptor for MRF24J40 radio devices
  */
 typedef struct {
-    netdev2_ieee802154_t netdev;            /**< netdev2 parent struct */
+    netdev_ieee802154_t netdev;             /**< netdev parent struct */
     /**
      * @brief   device specific fields
      * @{

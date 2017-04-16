@@ -20,8 +20,8 @@
 #define CPU_CONF_H
 
 #include "cpu_conf_common.h"
-#include "nrf51.h"
-#include "nrf51_bitfields.h"
+#include "vendor/nrf51.h"
+#include "vendor/nrf51_bitfields.h"
 
 #ifdef __cplusplus
 extern "C" {

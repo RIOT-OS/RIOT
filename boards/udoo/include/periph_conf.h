@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C) 2014-2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @name Clock configuration
+ * @name    Clock configuration
  * @{
  */
 /* targeted system core clock */
@@ -46,7 +46,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name Timer peripheral configuration
+ * @name    Timer peripheral configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -62,7 +62,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @name UART configuration
+ * @name    UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -83,7 +83,7 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
-* @name SPI configuration
+* @name    SPI configuration
 * @{
 */
 static const spi_conf_t spi_config[] = {

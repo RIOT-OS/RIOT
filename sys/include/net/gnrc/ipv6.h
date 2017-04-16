@@ -68,6 +68,25 @@ extern "C" {
 #define GNRC_IPV6_MSG_QUEUE_SIZE    (8U)
 #endif
 
+#ifdef DOXYGEN
+/**
+ * @brief   Add a static IPv6 link local address to any network interface
+ *
+ * This macro allows to specify a certain link local IPv6 address to be assigned
+ * to a network interface on startup, which might be handy for testing.
+ * Note: a) a interface will keep its auto-generated link local address, too
+ *       b) the address is incremented by 1, if multiple interfaces are present
+ *
+ * To use the macro just add it to `CFLAGS` in the application's Makefile, like:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ * IPV6_STATIC_LLADDR ?= '"fe80::cafe:cafe:cafe:1"'
+ * CFLAGS += -DGNRC_IPV6_STATIC_LLADDR=$(STATIC_IPV6_LLADDR)
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+#define GNRC_IPV6_STATIC_LLADDR
+#endif /* DOXYGEN */
+
 /**
  * @brief   The PID to the IPv6 thread.
  *

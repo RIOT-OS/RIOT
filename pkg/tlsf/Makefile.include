@@ -1,1 +1,1 @@
-INCLUDES += -I$(BINDIRBASE)/pkg/$(BOARD)/tlsf/src
+INCLUDES += -I$(PKGDIRBASE)/tlsf/src

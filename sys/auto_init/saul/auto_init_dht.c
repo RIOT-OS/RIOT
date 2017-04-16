@@ -48,17 +48,17 @@ void auto_init_dht(void)
 
         if (dht_init(&dht_devs[i], &dht_params[i]) != DHT_OK) {
             LOG_ERROR("[auto_init_saul] error initializing dht #%u\n", i);
+            continue;
         }
-        else {
-            saul_entries[(i * 2)].dev = &(dht_devs[i]);
-            saul_entries[(i * 2)].name = dht_saul_info[i][0].name;
-            saul_entries[(i * 2)].driver = &dht_temp_saul_driver;
-            saul_entries[(i * 2) + 1].dev = &(dht_devs[i]);
-            saul_entries[(i * 2) + 1].name = dht_saul_info[i][1].name;
-            saul_entries[(i * 2) + 1].driver = &dht_hum_saul_driver;
-            saul_reg_add(&(saul_entries[(i * 2)]));
-            saul_reg_add(&(saul_entries[(i * 2) + 1]));
-        }
+
+        saul_entries[(i * 2)].dev = &(dht_devs[i]);
+        saul_entries[(i * 2)].name = dht_saul_info[i][0].name;
+        saul_entries[(i * 2)].driver = &dht_temp_saul_driver;
+        saul_entries[(i * 2) + 1].dev = &(dht_devs[i]);
+        saul_entries[(i * 2) + 1].name = dht_saul_info[i][1].name;
+        saul_entries[(i * 2) + 1].driver = &dht_hum_saul_driver;
+        saul_reg_add(&(saul_entries[(i * 2)]));
+        saul_reg_add(&(saul_entries[(i * 2) + 1]));
     }
 }
 

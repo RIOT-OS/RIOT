@@ -32,10 +32,10 @@ extern "C" {
  * @brief Descriptor struct for rgbleds
  */
 typedef struct {
-    pwm_t device;
-    int channel_r;
-    int channel_g;
-    int channel_b;
+    pwm_t device;       /**< PWM device to use to control rgbleds */
+    int channel_r;      /**< set the R value in RGB */
+    int channel_g;      /**< set the G value in RGB */
+    int channel_b;      /**< set the B value in RGB */
 } rgbled_t;
 
 

@@ -21,12 +21,12 @@
 #include <errno.h>
 #include <string.h>
 
-#include "uuid.h"
+#include "luid.h"
 #include "mutex.h"
 #include "xtimer.h"
 #include "assert.h"
 #include "net/ethernet.h"
-#include "net/netdev2/eth.h"
+#include "net/netdev/eth.h"
 
 #include "enc28j60.h"
 #include "enc28j60_regs.h"
@@ -236,11 +236,11 @@ static void mac_set(enc28j60_t *dev, uint8_t *mac)
 
 static void on_int(void *arg)
 {
-    netdev2_t *netdev = (netdev2_t *)arg;
-    netdev->event_callback(arg, NETDEV2_EVENT_ISR);
+    netdev_t *netdev = (netdev_t *)arg;
+    netdev->event_callback(arg, NETDEV_EVENT_ISR);
 }
 
-static int nd_send(netdev2_t *netdev, const struct iovec *data, unsigned count)
+static int nd_send(netdev_t *netdev, const struct iovec *data, unsigned count)
 {
     enc28j60_t *dev = (enc28j60_t *)netdev;
     uint8_t ctrl = 0;
@@ -269,7 +269,7 @@ static int nd_send(netdev2_t *netdev, const struct iovec *data, unsigned count)
     return c;
 }
 
-static int nd_recv(netdev2_t *netdev, void *buf, size_t max_len, void *info)
+static int nd_recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
 {
     enc28j60_t *dev = (enc28j60_t *)netdev;
     uint8_t head[6];
@@ -308,7 +308,7 @@ static int nd_recv(netdev2_t *netdev, void *buf, size_t max_len, void *info)
     return (int)size;
 }
 
-static int nd_init(netdev2_t *netdev)
+static int nd_init(netdev_t *netdev)
 {
     enc28j60_t *dev = (enc28j60_t *)netdev;
     int res;
@@ -373,7 +373,7 @@ static int nd_init(netdev2_t *netdev)
     cmd_wcr(dev, REG_B2_MAIPGL, 2, MAIPGL_FD);
     /* set default MAC address */
     uint8_t macbuf[ETHERNET_ADDR_LEN];
-    uuid_get(macbuf, ETHERNET_ADDR_LEN);
+    luid_get(macbuf, ETHERNET_ADDR_LEN);
     macbuf[0] |= 0x02;      /* locally administered address */
     macbuf[0] &= ~0x01;     /* unicast address */
     mac_set(dev, macbuf);
@@ -402,7 +402,7 @@ static int nd_init(netdev2_t *netdev)
     return 0;
 }
 
-static void nd_isr(netdev2_t *netdev)
+static void nd_isr(netdev_t *netdev)
 {
     enc28j60_t *dev = (enc28j60_t *)netdev;
     uint8_t eir = cmd_rcr(dev, REG_EIR, -1);
@@ -414,17 +414,17 @@ static void nd_isr(netdev2_t *netdev)
             /* go and tell the new link layer state to upper layers */
             if (cmd_r_phy(dev, REG_PHY_PHSTAT2) & PHSTAT2_LSTAT) {
                 DEBUG("[enc28j60] isr: link up!\n");
-                netdev->event_callback(netdev, NETDEV2_EVENT_LINK_UP);
+                netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
             }
             else {
                 DEBUG("[enc28j60] isr: link down!\n");
-                netdev->event_callback(netdev, NETDEV2_EVENT_LINK_DOWN);
+                netdev->event_callback(netdev, NETDEV_EVENT_LINK_DOWN);
             }
         }
         if (eir & EIR_PKTIF) {
             do {
                 DEBUG("[enc28j60] isr: packet received\n");
-                netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
+                netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
             } while (cmd_rcr(dev, REG_B1_EPKTCNT, 1) > 0);
         }
         if (eir & EIR_RXERIF) {
@@ -433,7 +433,7 @@ static void nd_isr(netdev2_t *netdev)
         }
         if (eir & EIR_TXIF) {
             DEBUG("[enc28j60] isr: packet transmitted\n");
-            netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE);
+            netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
             cmd_bfc(dev, REG_EIR, -1, EIR_TXIF);
         }
         if (eir & EIR_TXERIF) {
@@ -444,7 +444,7 @@ static void nd_isr(netdev2_t *netdev)
     }
 }
 
-static int nd_get(netdev2_t *netdev, netopt_t opt, void *value, size_t max_len)
+static int nd_get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
     enc28j60_t *dev = (enc28j60_t *)netdev;
 
@@ -454,11 +454,11 @@ static int nd_get(netdev2_t *netdev, netopt_t opt, void *value, size_t max_len)
             mac_get(dev, (uint8_t *)value);
             return ETHERNET_ADDR_LEN;
         default:
-            return netdev2_eth_get(netdev, opt, value, max_len);
+            return netdev_eth_get(netdev, opt, value, max_len);
     }
 }
 
-static int nd_set(netdev2_t *netdev, netopt_t opt, void *value, size_t value_len)
+static int nd_set(netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
 {
     enc28j60_t *dev = (enc28j60_t *)netdev;
 
@@ -468,11 +468,11 @@ static int nd_set(netdev2_t *netdev, netopt_t opt, void *value, size_t value_len
             mac_set(dev, (uint8_t *)value);
             return ETHERNET_ADDR_LEN;
         default:
-            return netdev2_eth_set(netdev, opt, value, value_len);
+            return netdev_eth_set(netdev, opt, value, value_len);
     }
 }
 
-const static netdev2_driver_t netdev2_driver_enc28j60 = {
+const static netdev_driver_t netdev_driver_enc28j60 = {
     .send = nd_send,
     .recv = nd_recv,
     .init = nd_init,
@@ -483,7 +483,7 @@ const static netdev2_driver_t netdev2_driver_enc28j60 = {
 
 void enc28j60_setup(enc28j60_t *dev, const enc28j60_params_t *params)
 {
-    dev->netdev.driver = &netdev2_driver_enc28j60;
+    dev->netdev.driver = &netdev_driver_enc28j60;
     dev->spi = params->spi;
     dev->cs_pin = params->cs_pin;
     dev->int_pin = params->int_pin;

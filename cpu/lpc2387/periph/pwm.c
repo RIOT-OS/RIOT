@@ -49,7 +49,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
                 (PWM_FUNC << PWM_CH2_PIN * 2);
 
     /* power on PWM1 */
-    pwm_poweron(dev);
+    PCONP |= PCPWM1;
 
     /* select PWM1 clock */
     PCLKSEL0 &= ~(BIT13);
@@ -108,27 +108,17 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
     }
 }
 
-void pwm_start(pwm_t dev)
-{
-    assert(dev == PWM_DEV(0));
-    PWM1TCR |= BIT0;
-}
-
-void pwm_stop(pwm_t dev)
-{
-    assert(dev == PWM_DEV(0));
-    PWM1TCR &= ~(BIT0);
-}
-
 void pwm_poweron(pwm_t dev)
 {
     assert(dev == PWM_DEV(0));
     PCONP |= PCPWM1;
+    PWM1TCR |= BIT0;
 }
 
 void pwm_poweroff(pwm_t dev)
 {
     assert(dev == PWM_DEV(0));
+    PWM1TCR &= ~(BIT0);
     PCONP &= ~(PCPWM1);
 }
 

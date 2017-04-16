@@ -29,7 +29,6 @@ extern "C" {
  * @brief   Redefine some peripheral names to unify them between nRF51 and 52
  * @{
  */
-#define GPIO_BASE           (NRF_P0)
 #define UART_IRQN           (UARTE0_UART0_IRQn)
 #define SPI_SCKSEL          (dev(bus)->PSEL.SCK)
 #define SPI_MOSISEL         (dev(bus)->PSEL.MOSI)

@@ -6,8 +6,8 @@ include ../Makefile.tests_common
 BOARD_BLACKLIST := arduino-uno arduino-duemilanove arduino-mega2560 chronos \
                    msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b \
                    wsn430-v1_4 z1
-BOARD_INSUFFICIENT_MEMORY = nucleo-f030 nucleo32-f042 nucleo-f334 \
-                            stm32f0discovery weio
+BOARD_INSUFFICIENT_MEMORY = nucleo32-f031 nucleo32-f042 nucleo32-l031 nucleo-f030 \
+                            nucleo-f334 nucleo-l053 stm32f0discovery weio
 
 LWIP_IPV4 ?= 0
 
@@ -27,10 +27,10 @@ ifneq (0, $(LWIP_IPV6))
 endif
 
 USEMODULE += inet_csum
-USEMODULE += lwip_ethernet lwip_netdev2
+USEMODULE += lwip_ethernet lwip_netdev
 USEMODULE += lwip_sock_ip
-USEMODULE += netdev2_eth
-USEMODULE += netdev2_test
+USEMODULE += netdev_eth
+USEMODULE += netdev_test
 USEMODULE += ps
 
 DISABLE_MODULE += auto_init

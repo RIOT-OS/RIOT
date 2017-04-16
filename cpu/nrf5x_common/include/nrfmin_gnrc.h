@@ -38,7 +38,7 @@ extern "C" {
  * function can be called from auto_init as is, without the need for external
  * memory allocation.
  */
-void gnrc_netdev2_nrfmin_init(void);
+void gnrc_netdev_nrfmin_init(void);
 
 #ifdef __cplusplus
 }

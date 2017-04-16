@@ -34,6 +34,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief POSIX-specific semaphore type
+ */
 typedef sema_t sem_t;
 
 /**

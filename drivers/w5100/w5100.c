@@ -22,11 +22,11 @@
 #include <string.h>
 
 #include "log.h"
-#include "uuid.h"
+#include "luid.h"
 #include "assert.h"
 
 #include "net/ethernet.h"
-#include "net/netdev2/eth.h"
+#include "net/netdev/eth.h"
 
 #include "w5100.h"
 #include "w5100_regs.h"
@@ -43,7 +43,7 @@
 #define S0_TX_BASE          (0x4000)
 #define S0_RX_BASE          (0x6000)
 
-static const netdev2_driver_t netdev2_driver_w5100;
+static const netdev_driver_t netdev_driver_w5100;
 
 static inline void send_addr(w5100_t *dev, uint16_t addr)
 {
@@ -107,14 +107,14 @@ static void extint(void *arg)
     w5100_t *dev = (w5100_t *)arg;
 
     if (dev->nd.event_callback) {
-        dev->nd.event_callback(&dev->nd, NETDEV2_EVENT_ISR);
+        dev->nd.event_callback(&dev->nd, NETDEV_EVENT_ISR);
     }
 }
 
 void w5100_setup(w5100_t *dev, const w5100_params_t *params)
 {
     /* initialize netdev structure */
-    dev->nd.driver = &netdev2_driver_w5100;
+    dev->nd.driver = &netdev_driver_w5100;
     dev->nd.event_callback = NULL;
     dev->nd.context = dev;
 
@@ -126,7 +126,7 @@ void w5100_setup(w5100_t *dev, const w5100_params_t *params)
     gpio_init_int(dev->p.evt, GPIO_IN, GPIO_FALLING, extint, dev);
 }
 
-static int init(netdev2_t *netdev)
+static int init(netdev_t *netdev)
 {
     w5100_t *dev = (w5100_t *)netdev;
     uint8_t tmp;
@@ -148,7 +148,7 @@ static int init(netdev2_t *netdev)
     while (rreg(dev, REG_MODE) & MODE_RESET) {};
 
     /* initialize the device, start with writing the MAC address */
-    uuid_get(hwaddr, ETHERNET_ADDR_LEN);
+    luid_get(hwaddr, ETHERNET_ADDR_LEN);
     hwaddr[0] &= ~0x03;         /* no group address and not globally unique */
     wchunk(dev, REG_SHAR0, hwaddr, ETHERNET_ADDR_LEN);
 
@@ -194,7 +194,7 @@ static uint16_t tx_upload(w5100_t *dev, uint16_t start, void *data, size_t len)
     }
 }
 
-static int send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
+static int send(netdev_t *netdev, const struct iovec *vector, unsigned count)
 {
     w5100_t *dev = (w5100_t *)netdev;
     int sum = 0;
@@ -230,7 +230,7 @@ static int send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
     return sum;
 }
 
-static int recv(netdev2_t *netdev, void *buf, size_t len, void *info)
+static int recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     (void)info;
     w5100_t *dev = (w5100_t *)netdev;
@@ -279,7 +279,7 @@ static int recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     return n;
 }
 
-static void isr(netdev2_t *netdev)
+static void isr(netdev_t *netdev)
 {
     uint8_t ir;
     w5100_t *dev = (w5100_t *)netdev;
@@ -290,12 +290,12 @@ static void isr(netdev2_t *netdev)
     ir = rreg(dev, S0_IR);
     spi_release(dev->p.spi);
     while (ir & IR_RECV) {
-        DEBUG("[w5100] netdev2 RX complete\n");
-        netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
+        DEBUG("[w5100] netdev RX complete\n");
+        netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
     }
 }
 
-static int get(netdev2_t *netdev, netopt_t opt, void *value, size_t max_len)
+static int get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
     w5100_t *dev = (w5100_t *)netdev;
     int res = 0;
@@ -309,18 +309,18 @@ static int get(netdev2_t *netdev, netopt_t opt, void *value, size_t max_len)
             res = ETHERNET_ADDR_LEN;
             break;
         default:
-            res = netdev2_eth_get(netdev, opt, value, max_len);
+            res = netdev_eth_get(netdev, opt, value, max_len);
             break;
     }
 
     return res;
 }
 
-static const netdev2_driver_t netdev2_driver_w5100 = {
+static const netdev_driver_t netdev_driver_w5100 = {
     .send = send,
     .recv = recv,
     .init = init,
     .isr = isr,
     .get = get,
-    .set = netdev2_eth_set,
+    .set = netdev_eth_set,
 };

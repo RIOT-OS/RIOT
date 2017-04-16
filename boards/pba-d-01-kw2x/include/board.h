@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    board_phywave_eval phyWAVE-KW22 Board
+ * @defgroup    boards_pba-d-01-kw2x phyWAVE-KW22 Board
  * @ingroup     boards
  * @brief       Board specific implementations for the phyWAVE evaluation board
  * @{
@@ -31,12 +31,17 @@ extern "C"
 #endif
 
 /**
- * @brief   LED pin definitions and handlers
+ * @brief Use the UART2 for STDIO on this board
+ */
+#define UART_STDIO_DEV      UART_DEV(2)
+
+/**
+ * @name    LED pin definitions and handlers
  * @{
  */
-#define LED2_PIN            GPIO_PIN(PORT_D, 6)
+#define LED0_PIN            GPIO_PIN(PORT_D, 6)
 #define LED1_PIN            GPIO_PIN(PORT_D, 4)
-#define LED0_PIN            GPIO_PIN(PORT_A, 4)
+#define LED2_PIN            GPIO_PIN(PORT_A, 4)
 
 #define LED0_MASK           (1 << 6)
 #define LED1_MASK           (1 << 4)
@@ -112,8 +117,9 @@ extern "C"
  * @name Define the interface for the TCS3772 light sensor
  * @{
  */
-#define TCS37727_I2C        (I2C_DEV(0))
-#define TCS37727_ADDR       (0x29)
+#define TCS37727_PARAMS     { .i2c   = I2C_DEV(0), \
+                              .addr  = 0x29, \
+                              .atime = TCS37727_PARAM_ATIME }
 /** @} */
 
 /**

@@ -106,12 +106,6 @@ extern int _whitelist(int argc, char **argv);
 extern int _blacklist(int argc, char **argv);
 #endif
 
-#ifdef MODULE_GNRC_ZEP
-#ifdef MODULE_IPV6_ADDR
-extern int _zep_init(int argc, char **argv);
-#endif
-#endif
-
 #ifdef MODULE_GNRC_RPL
 extern int _gnrc_rpl(int argc, char **argv);
 #endif
@@ -136,6 +130,11 @@ extern int _openthread_ipaddr(int argc, char **argv);
 
 #ifdef MODULE_SNTP
 extern int _ntpdate(int argc, char **argv);
+#endif
+
+#ifdef MODULE_VFS
+extern int _vfs_handler(int argc, char **argv);
+extern int _ls_handler(int argc, char **argv);
 #endif
 
 const shell_command_t _shell_command_list[] = {
@@ -203,11 +202,6 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_GNRC_IPV6_BLACKLIST
     { "blacklist", "blacklists an address for receival ('blacklist [add|del|help]')", _blacklist },
 #endif
-#ifdef MODULE_GNRC_ZEP
-#ifdef MODULE_IPV6_ADDR
-    { "zep_init", "initializes ZEP (Zigbee Encapsulation Protocol)", _zep_init },
-#endif
-#endif
 #ifdef MODULE_GNRC_RPL
     { "rpl", "rpl configuration tool ('rpl help' for more information)", _gnrc_rpl },
 #endif
@@ -232,5 +226,9 @@ const shell_command_t _shell_command_list[] = {
     { "ot_ipaddr", "shows OpenThread IP addresses", _openthread_ipaddr },
     { "ot_state", "shows state of current Thread node", _openthread_state },
 #endif
-    { NULL, NULL, NULL }
+#ifdef MODULE_VFS
+    {"vfs", "virtual file system operations", _vfs_handler},
+    {"ls", "list files", _ls_handler},
+#endif
+    {NULL, NULL, NULL}
 };

@@ -72,7 +72,7 @@
 #ifndef NRFMIN_H
 #define NRFMIN_H
 
-#include "net/netdev2.h"
+#include "net/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -134,14 +134,14 @@ typedef union {
 } nrfmin_pkt_t;
 
 /**
- * @brief   Export the netdev2 device descriptor
+ * @brief   Export the netdev device descriptor
  */
-extern netdev2_t nrfmin_dev;
+extern netdev_t nrfmin_dev;
 
 /**
  * @brief   Reference to the netdev driver interface
  */
-extern const netdev2_driver_t nrfmin_netdev;
+extern const netdev_driver_t nrfmin_netdev;
 
 /**
  * @brief   Setup the device driver's data structures

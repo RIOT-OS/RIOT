@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2015-2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,13 +14,13 @@
  * @{
  *
  * @file
- * @brief       TCP configuration, includes buffersizes, timeout durations
+ * @brief       GNRC TCP configuration
  *
- * @author      Simon Brummer <simon.brummer@haw-hamburg.de>
+ * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_CONFIG_H_
-#define GNRC_TCP_CONFIG_H_
+#ifndef GNRC_TCP_CONFIG_H
+#define GNRC_TCP_CONFIG_H
 
 #include "timex.h"
 
@@ -29,47 +29,17 @@ extern "C" {
 #endif
 
 /**
- * @brief Status Flags for TCP
- * @{
- */
-#define GNRC_TCP_STATUS_PASSIVE (1 << 0)
-#define GNRC_TCP_STATUS_ACCEPTED (1 << 1)
-#define GNRC_TCP_STATUS_ALLOW_ANY_ADDR (1 << 2)
-/** @} */
-
-/**
  * @brief Timeout Duration for user calls. Default 2 minutes
  */
 #ifndef GNRC_TCP_CONNECTION_TIMEOUT_DURATION
-#define GNRC_TCP_CONNECTION_TIMEOUT_DURATION (120 * US_PER_SEC)
+#define GNRC_TCP_CONNECTION_TIMEOUT_DURATION (120U * US_PER_SEC)
 #endif
 
 /**
  * @brief Maximum Segment Lifetime. Default 30 secounds
  */
 #ifndef GNRC_TCP_MSL
-#define GNRC_TCP_MSL (30 * US_PER_SEC)
-#endif
-
-/**
- * @brief Message queue size for the TCP handling thread
- */
-#ifndef GNRC_TCP_MSG_QUEUE_SIZE
-#define GNRC_TCP_MSG_QUEUE_SIZE (8U)
-#endif
-
-/**
- * @brief Priority of the tcp handling thread, must be lower than the applications prio.
- */
-#ifndef GNRC_TCP_PRIO
-#define GNRC_TCP_PRIO (THREAD_PRIORITY_MAIN - 2U)
-#endif
-
-/**
- * @brief Default stack size for the TCP handling thread
- */
-#ifndef GNRC_TCP_STACK_SIZE
-#define GNRC_TCP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT)
+#define GNRC_TCP_MSL (30U * US_PER_SEC)
 #endif
 
 /**
@@ -101,7 +71,7 @@ extern "C" {
  * @brief Number of preallocated receive buffers
  */
 #ifndef GNRC_TCP_RCV_BUFFERS
-#define GNRC_TCP_RCV_BUFFERS 1
+#define GNRC_TCP_RCV_BUFFERS (1U)
 #endif
 
 /**
@@ -115,21 +85,21 @@ extern "C" {
  * @brief Lower Bound for RTO = 1 sec (see RFC 6298)
  */
 #ifndef GNRC_TCP_RTO_LOWER_BOUND
-#define GNRC_TCP_RTO_LOWER_BOUND (1 * US_PER_SEC)
+#define GNRC_TCP_RTO_LOWER_BOUND (1U * US_PER_SEC)
 #endif
 
 /**
  * @brief Upper Bound for RTO = 60 sec (see RFC 6298)
  */
 #ifndef GNRC_TCP_RTO_UPPER_BOUND
-#define GNRC_TCP_RTO_UPPER_BOUND (60 * US_PER_SEC)
+#define GNRC_TCP_RTO_UPPER_BOUND (60U * US_PER_SEC)
 #endif
 
 /**
  * @brief Assumes clock granularity for TCP of 10 ms (see RFC 6298)
  */
 #ifndef GNRC_TCP_RTO_GRANULARITY
-#define GNRC_TCP_RTO_GRANULARITY (10 * MS_PER_SEC)
+#define GNRC_TCP_RTO_GRANULARITY (10U * MS_PER_SEC)
 #endif
 
 /**
@@ -154,29 +124,22 @@ extern "C" {
 #endif
 
 /**
- * @brief Macro to mark is the time measurement is uninitialized
- */
-#ifndef GNRC_TCP_RTO_UNINITIALIZED
-#define GNRC_TCP_RTO_UNINITIALIZED (-1)
-#endif
-
-/**
  * @brief Lower Bound for the duration between probes
  */
 #ifndef GNRC_TCP_PROBE_LOWER_BOUND
-#define GNRC_TCP_PROBE_LOWER_BOUND (1 * US_PER_SEC)
+#define GNRC_TCP_PROBE_LOWER_BOUND (1U * US_PER_SEC)
 #endif
 
 /**
  * @brief Upper Bound for the duration between probes
  */
 #ifndef GNRC_TCP_PROBE_UPPER_BOUND
-#define GNRC_TCP_PROBE_UPPER_BOUND (60 * US_PER_SEC)
+#define GNRC_TCP_PROBE_UPPER_BOUND (60U * US_PER_SEC)
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GNRC_TCP_CONFIG_H_ */
+#endif /* GNRC_TCP_CONFIG_H */
 /** @} */

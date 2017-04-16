@@ -19,8 +19,8 @@
  *              Antonio Lignan <alinan@zolertia.com>
  */
 
-#ifndef BOARD_COMMON__H
-#define BOARD_COMMON__H
+#ifndef BOARD_COMMON_H
+#define BOARD_COMMON_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -80,8 +80,8 @@
 #define XTIMER_DEV          (0)
 #define XTIMER_CHAN         (0)
 #define XTIMER_WIDTH        (16)
-#define XTIMER_SHIFT        (4)
-#define XTIMER_HZ           (16000000UL)
+#define XTIMER_SHIFT        (0)
+#define XTIMER_HZ           (1000000UL)
 #define XTIMER_BACKOFF      (50)
 #define XTIMER_ISR_BACKOFF  (40)
 /** @} */
@@ -94,5 +94,5 @@ void board_init(void);
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-#endif /* BOARD_COMMON__H */
+#endif /* BOARD_COMMON_H */
 /** @} */

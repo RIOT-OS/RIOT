@@ -1,6 +1,9 @@
 APPLICATION = driver_at86rf2xx
 include ../Makefile.tests_common
 
+# exclude boards with insufficient memory
+BOARD_INSUFFICIENT_MEMORY := nucleo32-f031
+
 FEATURES_REQUIRED = periph_spi periph_gpio
 
 DISABLE_MODULE += auto_init

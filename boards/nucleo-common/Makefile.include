@@ -1,12 +1,5 @@
-# define the default port depending on the host OS
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-
-# setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
-
-# this board uses openocd
-include $(RIOTBOARD)/Makefile.include.openocd
+# include nucleo common serial configuration
+include $(RIOTBOARD)/nucleo-common/Makefile.include.serial
 
 # add the common header files to the include path
 INCLUDES += -I$(RIOTBOARD)/nucleo-common/include

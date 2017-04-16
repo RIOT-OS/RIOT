@@ -65,16 +65,26 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
      * the division afterwards... */
     uart->CLKDIV = (((CLOCK_HFPERCLK << 5) / (16 * baudrate) - 32) << 3);
     /* configure the pins */
-    gpio_init(uart_config[dev].rx_pin, GPIO_IN);
     gpio_init(uart_config[dev].tx_pin, GPIO_OUT);
-    uart->ROUTE = ((uart_config[dev].loc << _USART_ROUTE_LOCATION_SHIFT) |
-                   USART_ROUTE_RXPEN | USART_ROUTE_TXPEN);
-    /* enable RX interrupt */
-    NVIC_EnableIRQ(uart_config[dev].irq);
-    NVIC_EnableIRQ(uart_config[dev].irq + 1);
-    uart->IEN |= USART_IEN_RXDATAV;
-    /* enable receiver and transmitter */
-    uart->CMD = USART_CMD_TXEN | USART_CMD_RXEN;
+    if (rx_cb) {
+        gpio_init(uart_config[dev].rx_pin, GPIO_IN);
+        uart->ROUTE = ((uart_config[dev].loc << _USART_ROUTE_LOCATION_SHIFT) |
+                       USART_ROUTE_RXPEN | USART_ROUTE_TXPEN);
+    } else {
+        uart->ROUTE = ((uart_config[dev].loc << _USART_ROUTE_LOCATION_SHIFT) |
+                       USART_ROUTE_TXPEN);
+    }
+    if (rx_cb) {
+        /* enable RX interrupt */
+        NVIC_EnableIRQ(uart_config[dev].irq);
+        NVIC_EnableIRQ(uart_config[dev].irq + 1);
+        uart->IEN |= USART_IEN_RXDATAV;
+        /* enable receiver and transmitter */
+        uart->CMD = USART_CMD_TXEN | USART_CMD_RXEN;
+    }
+    else {
+        uart->CMD = USART_CMD_TXEN;
+    }
     return UART_OK;
 }
 

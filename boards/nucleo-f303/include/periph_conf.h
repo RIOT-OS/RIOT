@@ -118,7 +118,7 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief   PWM configuration
+ * @name    PWM configuration
  * @{
  */
 static const pwm_conf_t pwm_config[] = {
@@ -195,7 +195,7 @@ static const spi_conf_t spi_config[] = {
 #define I2C_0_EN            1
 #define I2C_1_EN            1
 #define I2C_IRQ_PRIO        1
-#define I2C_APBCLK          (36000000U)
+#define I2C_APBCLK          (CLOCK_APB1)
 
 /* I2C 0 device configuration */
 #define I2C_0_DEV           I2C1

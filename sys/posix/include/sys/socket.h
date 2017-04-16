@@ -491,16 +491,8 @@ static inline int getsockopt(int socket, int level, int option_name, void *optio
     return -1;
 }
 
-static inline int setsockopt(int socket, int level, int option_name, const void *option_value,
-                             socklen_t option_len)
-{
-    (void)socket;
-    (void)level;
-    (void)option_name;
-    (void)option_value;
-    (void)option_len;
-    return -1;
-}
+int setsockopt(int socket, int level, int option_name, const void *option_value,
+               socklen_t option_len);
 
 /** @} */
 

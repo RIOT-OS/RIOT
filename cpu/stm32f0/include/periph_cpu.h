@@ -26,45 +26,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Generate GPIO mode bitfields
- *
- * We use 5 bit to encode the mode:
- * - bit 0+1: pin mode (input / output)
- * - bit 2+3: pull resistor configuration
- * - bit   4: output type (0: push-pull, 1: open-drain)
- */
-#define GPIO_MODE(io, pr, ot)   ((io << 0) | (pr << 2) | (ot << 4))
-
-#ifndef DOXYGEN
-/**
- * @brief   Override GPIO mode options
- * @{
- */
-#define HAVE_GPIO_MODE_T
-typedef enum {
-    GPIO_IN    = GPIO_MODE(0, 0, 0),    /**< input w/o pull R */
-    GPIO_IN_PD = GPIO_MODE(0, 2, 0),    /**< input with pull-down */
-    GPIO_IN_PU = GPIO_MODE(0, 1, 0),    /**< input with pull-up */
-    GPIO_OUT   = GPIO_MODE(1, 0, 0),    /**< push-pull output */
-    GPIO_OD    = GPIO_MODE(1, 0, 1),    /**< open-drain w/o pull R */
-    GPIO_OD_PU = GPIO_MODE(1, 1, 1)     /**< open-drain with pull-up */
-} gpio_mode_t;
-/** @} */
-
-/**
- * @brief   Override flank configuration values
- * @{
- */
-#define HAVE_GPIO_FLANK_T
-typedef enum {
-    GPIO_RISING = 1,        /**< emit interrupt on rising flank */
-    GPIO_FALLING = 2,       /**< emit interrupt on falling flank */
-    GPIO_BOTH = 3           /**< emit interrupt on both flanks */
-} gpio_flank_t;
-/** @} */
-#endif /* ndef DOXYGEN */
-
-/**
  * @brief   Available ports on the STM32F0 family
  */
 enum {
@@ -72,6 +33,7 @@ enum {
     PORT_B = 1,             /**< port B */
     PORT_C = 2,             /**< port C */
     PORT_D = 3,             /**< port D */
+    PORT_E = 4,             /**< port E */
     PORT_F = 5,             /**< port F */
 };
 

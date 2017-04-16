@@ -19,7 +19,7 @@
  */
 
 #include "thread.h"
-#include "net/gnrc/netdev2.h"
+#include "net/gnrc/netdev.h"
 
 #include "nrfmin_gnrc.h"
 
@@ -31,7 +31,7 @@
  * @{
  */
 #ifndef NRFMIN_GNRC_THREAD_PRIO
-#define NRFMIN_GNRC_THREAD_PRIO     GNRC_NETDEV2_MAC_PRIO
+#define NRFMIN_GNRC_THREAD_PRIO     GNRC_NETDEV_MAC_PRIO
 #endif
 
 #ifndef NRFMIN_GNRC_STACKSIZE
@@ -45,14 +45,14 @@
 #define BCAST   (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)
 
 /**
- * @brief   Allocate the stack for the GNRC netdev2 thread to run in
+ * @brief   Allocate the stack for the GNRC netdev thread to run in
  */
 static char stack[NRFMIN_GNRC_STACKSIZE];
 
 /**
- * @brief   Allocate the GNRC netdev2 data structure.
+ * @brief   Allocate the GNRC netdev data structure.
  */
-static gnrc_netdev2_t plug;
+static gnrc_netdev_t plug;
 
 
 static int hdr_netif_to_nrfmin(nrfmin_hdr_t *nrfmin, gnrc_pktsnip_t *pkt)
@@ -81,7 +81,7 @@ static int hdr_netif_to_nrfmin(nrfmin_hdr_t *nrfmin, gnrc_pktsnip_t *pkt)
     return 0;
 }
 
-static int gnrc_nrfmin_send(gnrc_netdev2_t *dev, gnrc_pktsnip_t *pkt)
+static int gnrc_nrfmin_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
 {
     int res;
     struct iovec *vec;
@@ -124,7 +124,7 @@ static int gnrc_nrfmin_send(gnrc_netdev2_t *dev, gnrc_pktsnip_t *pkt)
     return res;
 }
 
-static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netdev2_t *dev)
+static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netdev_t *dev)
 {
     int pktsize;
     nrfmin_hdr_t *nrfmin;
@@ -195,7 +195,7 @@ void gnrc_nrfmin_init(void)
     plug.recv = gnrc_nrfmin_recv;
     plug.dev = &nrfmin_dev;
 
-    gnrc_netdev2_init(stack, sizeof(stack),
+    gnrc_netdev_init(stack, sizeof(stack),
                       NRFMIN_GNRC_THREAD_PRIO,
                       "nrfmin", &plug);
 }

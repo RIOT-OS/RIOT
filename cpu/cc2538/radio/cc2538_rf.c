@@ -173,7 +173,7 @@ bool cc2538_on(void)
 
 void cc2538_setup(cc2538_rf_t *dev)
 {
-    netdev2_t *netdev = (netdev2_t *)dev;
+    netdev_t *netdev = (netdev_t *)dev;
 
     netdev->driver = &cc2538_rf_driver;
 

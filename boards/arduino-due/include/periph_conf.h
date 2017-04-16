@@ -103,7 +103,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @brief   PWM configuration
+ * @name    PWM configuration
  * @{
  */
 static const pwm_chan_conf_t pwm_chan[] = {

@@ -26,17 +26,17 @@ extern "C" {
 #endif
 
 /**
- * @brief   Clock configuration
- *
- * @todo    Move all clock configuration code here from the board.h
+ * @name    Clock configuration
+ * @{
  */
+/** @todo   Move all clock configuration code here from the board.h */
 #define CLOCK_CORECLOCK     (2457600U)
 
 #define CLOCK_CMCLK         CLOCK_CORECLOCK     /* no divider programmed */
 /** @} */
 
 /**
- * @name   Timer configuration
+ * @name    Timer configuration
  * @{
  */
 #define TIMER_NUMOF         (1U)
@@ -47,7 +47,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name   UART configuration
+ * @name    UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)
@@ -68,7 +68,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name   SPI configuration
+ * @name    SPI configuration
  * @{
  */
 #define SPI_NUMOF           (1U)

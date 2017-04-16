@@ -28,7 +28,7 @@ else
     FILES="$(git diff --diff-filter=${DIFFFILTER} --name-only ${BRANCH} | grep -E '\.h$')"
 fi
 
-FILES=$(echo "${FILES}" | grep -v -E '^(dist/tools|boards/msba2-common/tools/|cpu/saml21/include/atmel/|cpu/sam0_common/include/cmsis/)')
+FILES=$(echo "${FILES}" | grep -v -E '^(dist/tools|boards/msba2-common/tools/|.+/include/vendor/)')
 
 # check files
 for FILE in ${FILES}; do
@@ -36,7 +36,7 @@ for FILE in ${FILES}; do
         | sed -e 's/$/ /' \
         | tr -d '\r\n' \
         | sed -e 's/  */ /g' \
-        | grep -v -q '#ifdef __cplusplus extern "C" { #endif'; \
+        | grep -v -q '#ifdef __cplusplus extern "C" {'; \
     then
         EXIT_CODE=1
         echo "file does not have a C++ compatible header: '${FILE}'"

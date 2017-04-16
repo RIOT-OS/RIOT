@@ -1,7 +1,7 @@
 APPLICATION = gnrc_sock_ip
 include ../Makefile.tests_common
 
-RIOTBASE ?= $(CURDIR)/../..
+BOARD_INSUFFICIENT_MEMORY := nucleo32-f031
 
 USEMODULE += gnrc_sock_ip
 USEMODULE += gnrc_ipv6

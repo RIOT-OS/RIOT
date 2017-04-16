@@ -854,7 +854,7 @@ static void download_main(int event)
                         // bootloader again.  Intead, we need to download a tiny ARM
                         // program that reconfigures the hardware and then jumps to zero.
                         //snprintf(buf, sizeof(buf), "G %d A\r\n", 0);
-                        snprintf(buf, sizeof(buf), "W %u %d\r\n", chip->ram_addr, chip->bootprog[0] * 4);
+                        snprintf(buf, sizeof(buf), "W %u %u\r\n", chip->ram_addr, chip->bootprog[0] * 4);
                         xmit_cmd(buf, 4);
                         return;
 

@@ -20,7 +20,7 @@
  * @}
  */
 
-#include "uuid.h"
+#include "luid.h"
 #include "board.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -82,7 +82,7 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
 
     /* set default node id */
     uint8_t addr;
-    uuid_get(&addr, 1);
+    luid_get(&addr, 1);
     cc110x_set_address(dev, addr);
 
     LOG_INFO("cc110x: initialized with address=%u and channel=%i\n",

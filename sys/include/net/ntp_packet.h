@@ -47,6 +47,12 @@ extern "C" {
 #define NTP_PORT             (123U)     /**< NTP port number */
 
 /**
+ * @brief   Offset in seconds of NTP timestamp (seconds from 1990-01-01 00:00:00 UTC)
+ *          to UNIX timestamp (seconds from 1970-01-01 00:00:00 UTC).
+ */
+#define NTP_UNIX_OFFSET      (2208988800)
+
+/**
  * @brief NTP modes
  */
 typedef enum {

@@ -23,7 +23,7 @@
 
 #include "cpu_conf_common.h"
 
-#include "stm32l1xx.h"
+#include "vendor/stm32l1xx.h"
 
 #ifdef __cplusplus
 extern "C" {

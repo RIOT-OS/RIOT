@@ -1,5 +1,5 @@
 # define the cpu used by the phyWAVE-KW22 board
-export CPU = kw2x
+export CPU = kw2xd
 export CPU_MODEL = kw21d256
 #export CPU_MODEL = kw21d512
 #export CPU_MODEL = kw22d512
@@ -8,6 +8,7 @@ export MCPU = cortex-m4
 
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
 .PHONY: flash
 flash: $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin
@@ -40,7 +41,7 @@ ifneq (,$(SERIAL))
 endif
 
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.inc.mk
 
 # this board uses openocd
-include $(RIOTBOARD)/Makefile.include.openocd
+include $(RIOTMAKE)/tools/openocd.inc.mk

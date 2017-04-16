@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     board_remote
+ * @ingroup     boards_remote-pa
  * @{
  *
  * @file
@@ -28,7 +28,7 @@
 #endif
 
 /**
- * @name UART configuration
+ * @name    UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)
@@ -42,11 +42,10 @@
 /* UART 0 pin configuration */
 #define UART_0_TX_PIN       GPIO_PA1
 #define UART_0_RX_PIN       GPIO_PA0
-
 /** @} */
 
 /**
- * @name I2C configuration
+ * @name    I2C configuration
  * @{
  */
 #define I2C_NUMOF               1
@@ -84,7 +83,7 @@ static const spi_clk_conf_t spi_clk_config[] = {
 };
 
 /**
- * @name SPI configuration
+ * @name    SPI configuration
  * @{
  */
 static const spi_conf_t spi_config[] = {

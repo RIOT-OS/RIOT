@@ -13,7 +13,7 @@
 /---------------------------------------------------------------------------*/
 
 #include <string.h>
-#include "lpc23xx.h"
+#include "cpu.h"
 #include "VIC.h"
 #include "xtimer.h"
 #include "diskio.h"
@@ -379,6 +379,8 @@ static void power_off(void)
 static int send_cmd(unsigned int idx, unsigned long arg, unsigned int rt, unsigned long *buff)
 {
     unsigned int s, mc;
+
+    assert(buff != NULL);
 
     if (idx & 0x80) {               /* Send a CMD55 prior to the specified command if it is ACMD class */
         if (!send_cmd(CMD55, (unsigned long)CardRCA << 16, 1, buff) /* When CMD55 is faild, */

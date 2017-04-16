@@ -22,7 +22,7 @@
 #else
 #include <dlfcn.h>
 #endif
-
+#include "byteorder.h"
 #include <assert.h>
 #include <getopt.h>
 #include <stdbool.h>
@@ -43,6 +43,9 @@
 #include "native_internal.h"
 #include "tty_uart.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 typedef enum {
     _STDIOTYPE_STDIO = 0,   /**< leave intact */
     _STDIOTYPE_NULL,        /**< redirect to "/dev/null" */
@@ -59,13 +62,22 @@ unsigned _native_rng_seed = 0;
 int _native_rng_mode = 0;
 const char *_native_unix_socket_path = NULL;
 
-#ifdef MODULE_NETDEV2_TAP
-#include "netdev2_tap_params.h"
+#ifdef MODULE_NETDEV_TAP
+#include "netdev_tap_params.h"
 
-netdev2_tap_params_t netdev2_tap_params[NETDEV2_TAP_MAX];
+netdev_tap_params_t netdev_tap_params[NETDEV_TAP_MAX];
 #endif
 
-static const char short_opts[] = ":hi:s:deEoc:";
+#ifdef MODULE_MTD_NATIVE
+#include "board.h"
+#include "mtd_native.h"
+#endif
+
+static const char short_opts[] = ":hi:s:deEoc:"
+#ifdef MODULE_MTD_NATIVE
+    "m:"
+#endif
+    "";
 static const struct option long_opts[] = {
     { "help", no_argument, NULL, 'h' },
     { "id", required_argument, NULL, 'i' },
@@ -75,6 +87,9 @@ static const struct option long_opts[] = {
     { "stderr-noredirect", no_argument, NULL, 'E' },
     { "stdout-pipe", no_argument, NULL, 'o' },
     { "uart-tty", required_argument, NULL, 'c' },
+#ifdef MODULE_MTD_NATIVE
+    { "mtd", required_argument, NULL, 'm' },
+#endif
     { NULL, 0, NULL, '\0' },
 };
 
@@ -199,8 +214,8 @@ void usage_exit(int status)
 {
     real_printf("usage: %s", _progname);
 
-#if defined(MODULE_NETDEV2_TAP)
-    for (int i = 0; i < NETDEV2_TAP_MAX; i++) {
+#if defined(MODULE_NETDEV_TAP)
+    for (int i = 0; i < NETDEV_TAP_MAX; i++) {
         real_printf(" <tap interface %d>", i + 1);
     }
 #endif
@@ -230,10 +245,30 @@ void usage_exit(int status)
 "    -c <tty>, --uart-tty=<tty>\n"
 "        specify TTY device for UART. This argument can be used multiple\n"
 "        times (up to UART_NUMOF)\n");
+#ifdef MODULE_MTD_NATIVE
+    real_printf(
+"    -m <mtd>, --mtd=<mtd>\n"
+"       specify the file name of mtd emulated device\n");
+#endif
     real_exit(status);
 }
 
-__attribute__((constructor)) static void startup(int argc, char **argv)
+/** @brief Initialization function pointer type */
+typedef void (*init_func_t)(int argc, char **argv, char **envp);
+#ifdef __APPLE__
+/* Taken from the sources of Apple's dyld launcher
+ * https://github.com/opensource-apple/dyld/blob/3f928f32597888c5eac6003b9199d972d49857b5/src/dyldInitialization.cpp#L85-L104
+ */
+/* Find the extents of the __DATA __mod_init_func section */
+extern init_func_t __init_array_start __asm("section$start$__DATA$__mod_init_func");
+extern init_func_t __init_array_end   __asm("section$end$__DATA$__mod_init_func");
+#else
+/* Linker script provides pointers to the beginning and end of the init array */
+extern init_func_t __init_array_start;
+extern init_func_t __init_array_end;
+#endif
+
+__attribute__((constructor)) static void startup(int argc, char **argv, char **envp)
 {
     _native_init_syscalls();
 
@@ -285,12 +320,17 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
             case 'c':
                 tty_uart_setup(uart++, optarg);
                 break;
+#ifdef MODULE_MTD_NATIVE
+            case 'm':
+                ((mtd_native_dev_t *)mtd0)->fname = strndup(optarg, PATH_MAX - 1);
+                break;
+#endif
             default:
                 usage_exit(EXIT_FAILURE);
         }
     }
-#ifdef MODULE_NETDEV2_TAP
-    for (int i = 0; i < NETDEV2_TAP_MAX; i++) {
+#ifdef MODULE_NETDEV_TAP
+    for (int i = 0; i < NETDEV_TAP_MAX; i++) {
         if (argv[optind + i] == NULL) {
             /* no tap parameter left */
             usage_exit(EXIT_FAILURE);
@@ -319,11 +359,44 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     _native_null_out_file = _native_log_output(stdouttype, STDOUT_FILENO);
     _native_input(stdintype);
 
+    /* startup is a constructor which is being called from the init_array during
+     * C runtime initialization, this is normally used for code which must run
+     * before launching main(), such as C++ global object constructors etc.
+     * However, this function (startup) misbehaves a bit when we call
+     * kernel_init below, which does not return until there is an abort or a
+     * power off command.
+     * We need all C++ global constructors and other initializers to run before
+     * we enter the normal application code, which may depend on global objects
+     * having been initalized properly. Therefore, we iterate through the
+     * remainder of the init_array and call any constructors which have been
+     * placed after startup in the initialization order.
+     */
+    init_func_t *init_array_ptr = &__init_array_start;
+    DEBUG("__init_array_start: %p\n", (void *)init_array_ptr);
+    while (init_array_ptr != &__init_array_end) {
+        /* Skip everything which has already been run */
+        if ((*init_array_ptr) == startup) {
+            /* Found ourselves, move on to calling the rest of the constructors */
+            DEBUG("%18p - myself\n", (void *)init_array_ptr);
+            ++init_array_ptr;
+            break;
+        }
+        DEBUG("%18p - skip\n", (void *)init_array_ptr);
+        ++init_array_ptr;
+    }
+    while (init_array_ptr != &__init_array_end) {
+        /* call all remaining constructors */
+        DEBUG("%18p - call\n", (void *)init_array_ptr);
+        (*init_array_ptr)(argc, argv, envp);
+        ++init_array_ptr;
+    }
+    DEBUG("done, __init_array_end: %p\n", (void *)init_array_ptr);
+
     native_cpu_init();
     native_interrupt_init();
-#ifdef MODULE_NETDEV2_TAP
-    for (int i = 0; i < NETDEV2_TAP_MAX; i++) {
-        netdev2_tap_params[i].tap_name = &argv[optind + i];
+#ifdef MODULE_NETDEV_TAP
+    for (int i = 0; i < NETDEV_TAP_MAX; i++) {
+        netdev_tap_params[i].tap_name = &argv[optind + i];
     }
 #endif
 

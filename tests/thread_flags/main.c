@@ -23,6 +23,8 @@
 
 static char stack[THREAD_STACKSIZE_MAIN];
 
+volatile unsigned done;
+
 static void *_thread(void *arg)
 {
     (void) arg;
@@ -49,6 +51,8 @@ static void *_thread(void *arg)
     puts("thread(): waiting for any flag, one by one");
     flags = thread_flags_wait_one(0xFFFF);
     printf("thread(): received flags: 0x%04x\n", (unsigned)flags & 0xFFFF);
+
+    done = 1;
 
     return NULL;
 }
@@ -79,6 +83,9 @@ int main(void)
     _set(thread, 0x2);
     _set(thread, 0x4);
 
-    while(1) {};
+    while(!done) {};
+
+    puts("test finished.");
+
     return 0;
 }

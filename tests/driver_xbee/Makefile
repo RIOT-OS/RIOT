@@ -3,13 +3,13 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_uart periph_gpio
 
-BOARD_INSUFFICIENT_MEMORY := nucleo-f030 nucleo-f334 stm32f0discovery weio \
-                             nucleo32-f042
+BOARD_INSUFFICIENT_MEMORY := nucleo32-f031 nucleo32-f042 nucleo-f030 nucleo-f334 \
+                             stm32f0discovery weio
 
 USEMODULE += xbee
 USEMODULE += gnrc_netif
 USEMODULE += gnrc_txtsnd
-USEMODULE += gnrc_netdev2
+USEMODULE += gnrc_netdev
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_pktdump
 USEMODULE += shell
@@ -19,7 +19,7 @@ USEMODULE += shell_commands
 XBEE_UART ?= "1"
 
 # export UART to params file
-CFLAGS += -DXBEE_UART=$(XBEE_UART)
+CFLAGS += -DXBEE_PARAM_UART=$(XBEE_UART)
 
 # No need of big buffer for this test
 CFLAGS += -DGNRC_PKTBUF_SIZE=512

@@ -7,11 +7,11 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos msb-430 msb-430h nrf51dongle \
-                          nrf6310 nucleo-f103 nucleo-f334 pca10000 pca10005 spark-core \
-                          stm32f0discovery telosb weio wsn430-v1_3b wsn430-v1_4 \
-                          yunjia-nrf51822 z1 nucleo-f072 nucleo-f030 nucleo-f070 \
-                          microbit calliope-mini nucleo32-f042 nucleo32-f303
+BOARD_INSUFFICIENT_MEMORY := calliope-mini chronos microbit msb-430 msb-430h \
+                             nucleo32-f031 nucleo32-f042 nucleo32-f303 nucleo32-l031 \
+                             nucleo-f030 nucleo-f070 nucleo-f072 nucleo-f103 nucleo-f302 \
+                             nucleo-f334 nucleo-l053 spark-core stm32f0discovery telosb \
+                             weio wsn430-v1_3b wsn430-v1_4 z1
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
@@ -40,7 +40,13 @@ USEMODULE += netstats_rpl
 # development process:
 CFLAGS += -DDEVELHELP
 
-# Comment this out to join RPL DODAGs even if DIOs do not contain
+# Uncomment the following 2 lines to specify static link lokal IPv6 address
+# this might be useful for testing, in cases where you cannot or do not want to
+# run a shell with ifconfig to get the real link lokal address.
+#IPV6_STATIC_LLADDR ?= '"fe80::cafe:cafe:cafe:1"'
+#CFLAGS += -DGNRC_IPV6_STATIC_LLADDR=$(IPV6_STATIC_LLADDR)
+
+# Uncomment this to join RPL DODAGs even if DIOs do not contain
 # DODAG Configuration Options (see the doc for more info)
 # CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
 

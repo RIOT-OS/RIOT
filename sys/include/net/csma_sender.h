@@ -27,7 +27,7 @@
 
 #include <stdint.h>
 
-#include "net/netdev2.h"
+#include "net/netdev.h"
 
 
 #ifdef __cplusplus
@@ -101,7 +101,7 @@ extern const csma_sender_conf_t CSMA_SENDER_CONF_DEFAULT;
  * @return              -EBUSY if radio medium never was available
  *                      to send the given data
  */
-int csma_sender_csma_ca_send(netdev2_t *dev, struct iovec *vector,
+int csma_sender_csma_ca_send(netdev_t *dev, struct iovec *vector,
                              unsigned count, const csma_sender_conf_t *conf);
 
 /**
@@ -133,7 +133,7 @@ int csma_sender_csma_ca_send(netdev2_t *dev, struct iovec *vector,
  * @return              -EBUSY if radio medium was not available
  *                      to send the given data
  */
-int csma_sender_cca_send(netdev2_t *dev, struct iovec *vector, unsigned count);
+int csma_sender_cca_send(netdev_t *dev, struct iovec *vector, unsigned count);
 
 
 #ifdef __cplusplus

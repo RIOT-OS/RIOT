@@ -21,7 +21,6 @@
  *
  * @note        $Id: board_init.c 1071 2013-09-19 16:50:56 kasmi $
  */
-#include "lpc23xx.h"
 #include "cpu.h"
 
 #define CL_CPU_DIV    4

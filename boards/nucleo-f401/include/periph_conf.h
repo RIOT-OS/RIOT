@@ -111,7 +111,7 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief   PWM configuration
+ * @name    PWM configuration
  * @{
  */
 static const pwm_conf_t pwm_config[] = {
@@ -174,6 +174,26 @@ static const spi_conf_t spi_config[] = {
         .af       = GPIO_AF5,
         .rccmask  = RCC_APB2ENR_SPI1EN,
         .apbbus   = APB2
+    },
+    {
+        .dev      = SPI2,
+        .mosi_pin = GPIO_PIN(PORT_B, 15),
+        .miso_pin = GPIO_PIN(PORT_B, 14),
+        .sclk_pin = GPIO_PIN(PORT_B, 13),
+        .cs_pin   = GPIO_PIN(PORT_B, 12),
+        .af       = GPIO_AF5,
+        .rccmask  = RCC_APB1ENR_SPI2EN,
+        .apbbus   = APB1
+    },
+    {
+        .dev      = SPI3,
+        .mosi_pin = GPIO_PIN(PORT_C, 12),
+        .miso_pin = GPIO_PIN(PORT_C, 11),
+        .sclk_pin = GPIO_PIN(PORT_C, 10),
+        .cs_pin   = GPIO_UNDEF,
+        .af       = GPIO_AF6,
+        .rccmask  = RCC_APB1ENR_SPI3EN,
+        .apbbus   = APB1
     }
 };
 
@@ -188,7 +208,7 @@ static const spi_conf_t spi_config[] = {
 #define I2C_NUMOF           (1U)
 #define I2C_0_EN            1
 #define I2C_IRQ_PRIO        1
-#define I2C_APBCLK          (42000000U)
+#define I2C_APBCLK          (CLOCK_APB1)
 
 /* I2C 0 device configuration */
 #define I2C_0_DEV           I2C1
@@ -221,6 +241,13 @@ static const spi_conf_t spi_config[] = {
  * @{
  */
 #define DAC_NUMOF           (0)
+/** @} */
+
+/**
+ * @name   RTC configuration
+ * @{
+ */
+#define RTC_NUMOF           (1)
 /** @} */
 
 #ifdef __cplusplus

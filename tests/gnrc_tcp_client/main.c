@@ -1,14 +1,15 @@
 /*
- * Copyright (C) 2015 Simon Brummer
+ * Copyright (C) 2015-2017 Simon Brummer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
 #include <stdio.h>
 #include <errno.h>
+#include "thread.h"
 #include "net/af.h"
-#include "random.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/tcp.h"
 
@@ -17,7 +18,7 @@
 
 /* Number of possible parallel connections */
 #ifndef CONNS
-#define CONNS 1
+#define CONNS (1)
 #endif
 
 /* Amount of data to transmit */
@@ -47,10 +48,9 @@ int main(void)
 
     /* Start Connection Handling Threads */
     for (int i = 0; i < CONNS; i += 1) {
-        thread_create((char *)stacks[i], sizeof(stacks[i]), THREAD_PRIORITY_MAIN, 0, cli_thread,
-                      (void *)i, NULL);
+        thread_create((char *) stacks[i], sizeof(stacks[i]), THREAD_PRIORITY_MAIN, 0, cli_thread,
+                      (void *) i, NULL);
     }
-
     return 0;
 }
 
@@ -112,8 +112,7 @@ void *cli_thread(void *arg)
                 return 0;
 
             case -ETIMEDOUT:
-                printf("TID=%d : gnrc_tcp_open_active() : -ETIMEDOUT : retry after 10sec\n",
-                       tid);
+                printf("TID=%d : gnrc_tcp_open_active() : -ETIMEDOUT : retry after 10sec\n", tid);
                 xtimer_sleep(10);
                 continue;
 
@@ -123,7 +122,7 @@ void *cli_thread(void *arg)
         }
 
         /* Fill Buffer with a test pattern */
-        for (size_t i=0; i < sizeof(bufs[tid]); ++i){
+        for (size_t i = 0; i < sizeof(bufs[tid]); ++i){
             bufs[tid][i] = TEST_PATERN_CLI;
         }
 
@@ -160,7 +159,7 @@ void *cli_thread(void *arg)
 
         /* Receive Data, stop if errors were found */
         for (size_t rcvd = 0; rcvd < sizeof(bufs[tid]) && ret >= 0; rcvd += ret) {
-            ret = gnrc_tcp_recv(&tcb, (void *)(bufs[tid] + rcvd), sizeof(bufs[tid]) - rcvd,
+            ret = gnrc_tcp_recv(&tcb, (void *) (bufs[tid] + rcvd), sizeof(bufs[tid]) - rcvd,
                                 GNRC_TCP_CONNECTION_TIMEOUT_DURATION);
             switch (ret) {
                 case -ENOTCONN:
@@ -197,7 +196,7 @@ void *cli_thread(void *arg)
         }
 
         /* If there was no error: Check received pattern */
-        for (size_t i=0; i < sizeof(bufs[tid]); ++i) {
+        for (size_t i = 0; i < sizeof(bufs[tid]); ++i) {
             if (bufs[tid][i] != TEST_PATERN_SRV) {
                 printf("TID=%d : Payload verfication failed\n", tid);
                 failed_payload_verifications += 1;
@@ -210,7 +209,7 @@ void *cli_thread(void *arg)
 
         /* Gather Data */
         cycles += 1;
-        if(ret >= 0) {
+        if (ret >= 0) {
             cycles_ok += 1;
         }
         printf("TID=%d : %"PRIi32" test cycles completed. %"PRIi32" ok, %"PRIi32" faulty",

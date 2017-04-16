@@ -50,13 +50,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name   DAC configuration
- * @{
- */
-#define DAC_NUMOF           (0)
-/** @} */
-
-/**
  * @name   Timer configuration
  * @{
  */
@@ -96,12 +89,64 @@ static const uart_conf_t uart_config[] = {
         .tx_af    = GPIO_AF7,
         .bus      = APB1,
         .irqn     = USART2_IRQn
-    }
+    },
+    {
+        .dev      = USART3,
+        .rcc_mask = RCC_APB1ENR_USART3EN,
+        .rx_pin   = GPIO_PIN(PORT_C, 11),
+        .tx_pin   = GPIO_PIN(PORT_C, 10),
+        .rx_af    = GPIO_AF7,
+        .tx_af    = GPIO_AF7,
+        .bus      = APB1,
+        .irqn     = USART3_IRQn
+    },
+    {
+        .dev      = USART1,
+        .rcc_mask = RCC_APB2ENR_USART1EN,
+        .rx_pin   = GPIO_PIN(PORT_A, 9),
+        .tx_pin   = GPIO_PIN(PORT_A, 10),
+        .rx_af    = GPIO_AF7,
+        .tx_af    = GPIO_AF7,
+        .bus      = APB2,
+        .irqn     = USART1_IRQn
+    },
 };
 
 #define UART_0_ISR          (isr_usart2)
+#define UART_1_ISR          (isr_usart3)
+#define UART_2_ISR          (isr_usart1)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+/** @} */
+
+/**
+ * @name   PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM2,
+        .rcc_mask = RCC_APB1ENR_TIM2EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 3) /* D3 */,  .cc_chan = 1 },
+                      { .pin = GPIO_PIN(PORT_B, 10) /* D6 */, .cc_chan = 2 },
+                      { .pin = GPIO_UNDEF,                    .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                    .cc_chan = 0 } },
+        .af       = GPIO_AF1,
+        .bus      = APB1
+    },
+    {
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 4) /* D5 */, .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_C, 7) /* D9 */, .cc_chan = 1 },
+                      { .pin = GPIO_PIN(PORT_C, 8),          .cc_chan = 2 },
+                      { .pin = GPIO_PIN(PORT_C, 9),          .cc_chan = 3 } },
+        .af       = GPIO_AF2,
+        .bus      = APB1
+    }
+};
+
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
 /** @} */
 
 /**
@@ -152,7 +197,7 @@ static const spi_conf_t spi_config[] = {
 #define I2C_1_EN            1
 #define I2C_NUMOF           (I2C_0_EN + I2C_1_EN)
 #define I2C_IRQ_PRIO        1
-#define I2C_APBCLK          (36000000U)
+#define I2C_APBCLK          (CLOCK_APB1)
 
 /* I2C 0 device configuration */
 #define I2C_0_EVT_ISR       isr_i2c1_ev
@@ -169,7 +214,34 @@ static const i2c_conf_t i2c_config[] = {
     {I2C2, GPIO_PIN(PORT_B, 10), GPIO_PIN(PORT_B, 11), GPIO_OD_PU,
      GPIO_AF4, I2C2_ER_IRQn, I2C2_EV_IRQn},
 };
+/** @} */
 
+/**
+ * @name   ADC configuration
+ * @{
+ */
+#define ADC_CONFIG {             \
+    { GPIO_PIN(PORT_A, 0), 0 },  \
+    { GPIO_PIN(PORT_A, 1), 1 },  \
+    { GPIO_PIN(PORT_A, 4), 4 },  \
+    { GPIO_PIN(PORT_B, 0), 8 },  \
+    { GPIO_PIN(PORT_C, 1), 11 }, \
+    { GPIO_PIN(PORT_C, 0), 10 }, \
+}
+
+#define ADC_NUMOF           (6U)
+/** @} */
+
+/**
+ * @name   DAC configuration
+ * @{
+ */
+#define DAC_CONFIG {            \
+    { GPIO_PIN(PORT_A, 4), 1},  \
+    { GPIO_PIN(PORT_A, 5), 2},  \
+}
+
+#define DAC_NUMOF           (2U)
 /** @} */
 
 #ifdef __cplusplus

@@ -34,6 +34,29 @@ struct sock_ip {
 };
 
 /**
+ * @brief   TCP sock type
+ * @internal
+ */
+struct sock_tcp {
+    struct netconn *conn;
+    struct sock_tcp_queue *queue;
+    mutex_t mutex;
+    struct pbuf *last_buf;
+    ssize_t last_offset;
+};
+
+/**
+ * @brief   TCP queue type
+ */
+struct sock_tcp_queue {
+    struct netconn *conn;
+    struct sock_tcp *array;
+    mutex_t mutex;
+    unsigned short len;
+    unsigned short used;
+};
+
+/**
  * @brief   UDP sock type
  * @internal
  */

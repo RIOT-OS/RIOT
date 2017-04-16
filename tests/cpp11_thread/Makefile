@@ -8,10 +8,7 @@ include ../Makefile.tests_common
 # Debian jessie libstdc++-arm-none-eabi-newlib-4.8.3-9+4 works fine, though.
 # Remove this line if Travis is upgraded to a different toolchain which does
 # not pull in all C++ locale code whenever exceptions are used.
-BOARD_INSUFFICIENT_MEMORY := stm32f0discovery spark-core nucleo-f334
-
-# This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../..
+BOARD_INSUFFICIENT_MEMORY := nucleo-f334 spark-core stm32f0discovery
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

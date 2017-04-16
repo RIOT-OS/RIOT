@@ -26,8 +26,8 @@
 
 #include "net/eui64.h"
 #include "net/ieee802154.h"
-#include "net/netdev2.h"
-#include "net/netdev2/ieee802154.h"
+#include "net/netdev.h"
+#include "net/netdev/ieee802154.h"
 
 #include "mrf24j40.h"
 #include "mrf24j40_netdev.h"
@@ -39,14 +39,14 @@
 
 #define _MAX_MHR_OVERHEAD   (25)
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count);
-static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info);
-static int _init(netdev2_t *netdev);
-static void _isr(netdev2_t *netdev);
-static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len);
-static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len);
+static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
+static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
+static int _init(netdev_t *netdev);
+static void _isr(netdev_t *netdev);
+static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len);
+static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len);
 
-const netdev2_driver_t mrf24j40_driver = {
+const netdev_driver_t mrf24j40_driver = {
     .send = _send,
     .recv = _recv,
     .init = _init,
@@ -57,15 +57,15 @@ const netdev2_driver_t mrf24j40_driver = {
 
 static void _irq_handler(void *arg)
 {
-    netdev2_t *dev = (netdev2_t *) arg;
+    netdev_t *dev = (netdev_t *) arg;
 
     if (dev->event_callback) {
-        dev->event_callback(dev, NETDEV2_EVENT_ISR);
+        dev->event_callback(dev, NETDEV_EVENT_ISR);
     }
     ((mrf24j40_t *)arg)->irq_flag = 1;
 }
 
-static int _init(netdev2_t *netdev)
+static int _init(netdev_t *netdev)
 {
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
 
@@ -83,7 +83,7 @@ static int _init(netdev2_t *netdev)
     return 0;
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
+static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
 {
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
     const struct iovec *ptr = vector;
@@ -119,7 +119,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
 
 }
 
-static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
+static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
     uint8_t phr;
@@ -153,7 +153,7 @@ static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
     mrf24j40_rx_fifo_read(dev, 1, (uint8_t *)buf, pkt_len);
 
     if (info != NULL) {
-        netdev2_ieee802154_rx_info_t *radio_info = info;
+        netdev_ieee802154_rx_info_t *radio_info = info;
         /* Read LQI and RSSI values from the RX fifo */
         mrf24j40_rx_fifo_read(dev, phr + 1, &(radio_info->lqi), 1);
         mrf24j40_rx_fifo_read(dev, phr + 2, &(radio_info->rssi), 1);
@@ -179,7 +179,7 @@ static netopt_state_t _get_state(mrf24j40_t *dev)
     return NETOPT_STATE_IDLE;
 }
 
-static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
+static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
     mrf24j40_t *dev = (mrf24j40_t *) netdev;
 
@@ -321,8 +321,8 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
         default:
-            /* try netdev2 settings */
-            res = netdev2_ieee802154_get((netdev2_ieee802154_t *)netdev, opt,
+            /* try netdev settings */
+            res = netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt,
                                          val, max_len);
     }
     return res;
@@ -351,7 +351,7 @@ static int _set_state(mrf24j40_t *dev, netopt_state_t state)
     return sizeof(netopt_state_t);
 }
 
-static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
+static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
 {
     mrf24j40_t *dev = (mrf24j40_t *) netdev;
     int res = -ENOTSUP;
@@ -367,7 +367,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             }
             else {
                 mrf24j40_set_addr_short(dev, *((uint16_t *)val));
-                /* don't set res to set netdev2_ieee802154_t::short_addr */
+                /* don't set res to set netdev_ieee802154_t::short_addr */
             }
             break;
 
@@ -377,7 +377,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             }
             else {
                 mrf24j40_set_addr_long(dev, *((uint64_t *)val));
-                /* don't set res to set netdev2_ieee802154_t::long_addr */
+                /* don't set res to set netdev_ieee802154_t::long_addr */
             }
             break;
 
@@ -387,7 +387,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             }
             else {
                 mrf24j40_set_pan(dev, *((uint16_t *)val));
-                /* don't set res to set netdev2_ieee802154_t::pan */
+                /* don't set res to set netdev_ieee802154_t::pan */
             }
             break;
 
@@ -404,7 +404,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
                     break;
                 }
                 mrf24j40_set_chan(dev, chan);
-                /* don't set res to set netdev2_ieee802154_t::chan */
+                /* don't set res to set netdev_ieee802154_t::chan */
             }
             break;
 
@@ -445,9 +445,9 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             break;
 
         case NETOPT_AUTOACK:
-            mrf24j40_set_option(dev, NETDEV2_IEEE802154_ACK_REQ,
+            mrf24j40_set_option(dev, NETDEV_IEEE802154_ACK_REQ,
                                 ((bool *)val)[0]);
-            /* don't set res to set netdev2_ieee802154_t::flags */
+            /* don't set res to set netdev_ieee802154_t::flags */
             break;
 
         case NETOPT_PRELOADING:
@@ -517,15 +517,15 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
         default:
             break;
     }
-    /* try netdev2 building flags */
+    /* try netdev building flags */
     if (res == -ENOTSUP) {
-        res = netdev2_ieee802154_set((netdev2_ieee802154_t *)netdev, opt,
+        res = netdev_ieee802154_set((netdev_ieee802154_t *)netdev, opt,
                                      val, len);
     }
     return res;
 }
 
-static void _isr(netdev2_t *netdev)
+static void _isr(netdev_t *netdev)
 {
     mrf24j40_t *dev = (mrf24j40_t *) netdev;
     /* update pending bits */
@@ -542,17 +542,17 @@ static void _isr(netdev2_t *netdev)
             if (txstat & MRF24J40_TXSTAT_TXNSTAT) {
                 /* TX_NOACK - CCAFAIL */
                 if (txstat & MRF24J40_TXSTAT_CCAFAIL) {
-                    netdev->event_callback(netdev, NETDEV2_EVENT_TX_MEDIUM_BUSY);
+                    netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
                     DEBUG("[mrf24j40] TX_CHANNEL_ACCESS_FAILURE\n");
                 }
                 /* check max retries */
                 else if (txstat & MRF24J40_TXSTAT_MAX_FRAME_RETRIES) {
-                    netdev->event_callback(netdev, NETDEV2_EVENT_TX_NOACK);
+                    netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
                     DEBUG("[mrf24j40] TX NO_ACK\n");
                 }
             }
             else {
-                netdev->event_callback(netdev, NETDEV2_EVENT_TX_COMPLETE);
+                netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
             }
         }
 #endif
@@ -561,7 +561,7 @@ static void _isr(netdev2_t *netdev)
     if (dev->pending & MRF24J40_TASK_RX_READY) {
         DEBUG("[mrf24j40] EVT - RX_END\n");
         if ((dev->netdev.flags & MRF24J40_OPT_TELL_RX_END)) {
-            netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
+            netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
         }
         dev->pending &= ~(MRF24J40_TASK_RX_READY);
     }

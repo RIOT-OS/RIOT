@@ -98,7 +98,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     const uint32_t port_addr = _port_base[port_num];
     const uint8_t pin_num = _pin_num(pin);
     const uint32_t sysctl_port_base = _sysctl_port_base[port_num];
-    const unsigned long pin_bit = 1 << pin_num;
+    const unsigned long pin_bit = 1ul << pin_num;
 
     DEBUG("Init GPIO: port %c, %d\n", 'A' + port_num, pin_num);
     DEBUG("Sysctl %" PRIx32 "\n", sysctl_port_base);
@@ -122,16 +122,18 @@ static void _isr_gpio(uint32_t port_num){
     uint32_t isr = ROM_GPIOPinIntStatus(port_addr, true);
     uint8_t i;
 
-    ROM_GPIOPinIntClear(port_addr, isr);
-
     for (i=0; i<8; i++, isr>>=1) {
         if ((isr & 0x1) == 0){
             continue;
         }
+
+        ROM_GPIOPinIntClear(port_addr, 1 << i);
+
         if (gpio_config[port_num][i].cb){
             gpio_config[port_num][i].cb(gpio_config[port_num][i].arg);
         }
     }
+    cortexm_isr_end();
 }
 
 void isr_gpio_porta(void){

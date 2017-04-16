@@ -1,4 +1,4 @@
-PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/emb6
+PKG_BUILDDIR ?= $(PKGDIRBASE)/emb6
 EMB6_DIR := $(PKG_BUILDDIR)
 EMB6_CONTRIB := $(RIOTBASE)/pkg/emb6/contrib
 
@@ -46,8 +46,8 @@ ifneq (,$(filter emb6_mac,$(USEMODULE)))
   INCLUDES += -I$(EMB6_DIR)/emb6/inc/mac
 endif
 
-ifneq (,$(filter emb6_netdev2,$(USEMODULE)))
-  DIRS += $(EMB6_CONTRIB)/netdev2
+ifneq (,$(filter emb6_netdev,$(USEMODULE)))
+  DIRS += $(EMB6_CONTRIB)/netdev
 endif
 
 ifneq (,$(filter emb6_rpl,$(USEMODULE)))

@@ -200,13 +200,23 @@ typedef struct __attribute__((packed)) {
     ipv6_addr_t prefix;         /**< prefix used for Stateless Address Autoconfiguration */
 } gnrc_rpl_opt_prefix_info_t;
 
+/**
+ * @brief DODAG representation
+ */
 typedef struct gnrc_rpl_dodag gnrc_rpl_dodag_t;
-typedef struct gnrc_rpl_parent gnrc_rpl_parent_t;
-typedef struct gnrc_rpl_instance gnrc_rpl_instance_t;
 
 /**
  * @brief Parent representation
  */
+typedef struct gnrc_rpl_parent gnrc_rpl_parent_t;
+
+/**
+ * @brief Instance representation
+ */
+typedef struct gnrc_rpl_instance gnrc_rpl_instance_t;
+
+/**
+ * @cond INTERNAL */
 struct gnrc_rpl_parent {
     gnrc_rpl_parent_t *next;        /**< pointer to the next parent */
     uint8_t state;                  /**< 0 for unsued, 1 for used */
@@ -218,6 +228,9 @@ struct gnrc_rpl_parent {
     double  link_metric;            /**< metric of the link */
     uint8_t link_metric_type;       /**< type of the metric */
 };
+/**
+ * @endcond
+ */
 
 /**
  * @brief Objective function representation
@@ -234,7 +247,7 @@ typedef struct {
 } gnrc_rpl_of_t;
 
 /**
- * @brief DODAG representation
+ * @cond INTERNAL
  */
 struct gnrc_rpl_dodag {
     ipv6_addr_t dodag_id;           /**< id of the DODAG */
@@ -262,9 +275,6 @@ struct gnrc_rpl_dodag {
     trickle_t trickle;              /**< trickle representation */
 };
 
-/**
- * @brief Instance representation
- */
 struct gnrc_rpl_instance {
     uint8_t id;                     /**< id of the instance */
     uint8_t state;                  /**< 0 for unused, 1 for used */
@@ -275,6 +285,9 @@ struct gnrc_rpl_instance {
     uint16_t max_rank_inc;          /**< max increase in the rank */
     int8_t cleanup;                 /**< cleanup time in seconds */
 };
+/**
+ * @endcond
+ */
 
 #ifdef __cplusplus
 }

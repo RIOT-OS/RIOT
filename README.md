@@ -50,7 +50,7 @@ but not limited to:
 * a preemptive, tickless scheduler with priorities
 * flexible memory management
 * high resolution, long-term timers
-* support for AVR, MSP430, ARM7, and ARM Cortex-M on over 50 boards
+* support for AVR, MSP430, MIPS, ARM7, and ARM Cortex-M on over 80 boards
 * the native port allows to run RIOT as-is on Linux, BSD, and MacOS. Multiple
   instances of RIOT running on a single machine can also be interconnected via
   a simple virtual Ethernet bridge
@@ -75,7 +75,7 @@ but not limited to:
   `WERROR=0 make`
 
 ### USING THE NATIVE PORT WITH NETWORKING
-If you compile RIOT for the native cpu and include the `netdev2_tap` module,
+If you compile RIOT for the native cpu and include the `netdev_tap` module,
 you can specify a network interface like this: `PORT=tap0 make term`
 
 #### SETTING UP A TAP NETWORK

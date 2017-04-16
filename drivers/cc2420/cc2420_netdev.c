@@ -26,8 +26,8 @@
 
 #include "net/eui64.h"
 #include "net/ieee802154.h"
-#include "net/netdev2.h"
-#include "net/netdev2/ieee802154.h"
+#include "net/netdev.h"
+#include "net/netdev/ieee802154.h"
 #include "xtimer.h"
 
 #include "cc2420.h"
@@ -39,14 +39,14 @@
 #include "debug.h"
 
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count);
-static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info);
-static int _init(netdev2_t *netdev);
-static void _isr(netdev2_t *netdev);
-static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len);
-static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len);
+static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
+static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
+static int _init(netdev_t *netdev);
+static void _isr(netdev_t *netdev);
+static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len);
+static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len);
 
-const netdev2_driver_t cc2420_driver = {
+const netdev_driver_t cc2420_driver = {
     .send = _send,
     .recv = _recv,
     .init = _init,
@@ -57,10 +57,10 @@ const netdev2_driver_t cc2420_driver = {
 
 static void _irq_handler(void *arg)
 {
-    netdev2_t *dev = (netdev2_t *)arg;
+    netdev_t *dev = (netdev_t *)arg;
 
     if(dev->event_callback) {
-        dev->event_callback(dev, NETDEV2_EVENT_ISR);
+        dev->event_callback(dev, NETDEV_EVENT_ISR);
     }
 }
 
@@ -97,7 +97,7 @@ static inline int opt_state(void *buf, bool cond)
     return sizeof(netopt_enable_t);
 }
 
-static int _init(netdev2_t *netdev)
+static int _init(netdev_t *netdev)
 {
     cc2420_t *dev = (cc2420_t *)netdev;
 
@@ -145,24 +145,24 @@ static int _init(netdev2_t *netdev)
     return cc2420_init((cc2420_t *)dev);
 }
 
-static void _isr(netdev2_t *netdev)
+static void _isr(netdev_t *netdev)
 {
-    netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
+    netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
+static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
 {
     cc2420_t *dev = (cc2420_t *)netdev;
     return (int)cc2420_send(dev, vector, count);
 }
 
-static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
+static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     cc2420_t *dev = (cc2420_t *)netdev;
     return (int)cc2420_rx(dev, buf, len, info);
 }
 
-static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
+static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
     if (netdev == NULL) {
         return -ENODEV;
@@ -170,7 +170,7 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     cc2420_t *dev = (cc2420_t *)netdev;
 
-    int ext = netdev2_ieee802154_get(&dev->netdev, opt, val, max_len);
+    int ext = netdev_ieee802154_get(&dev->netdev, opt, val, max_len);
     if (ext > 0) {
         return ext;
     }
@@ -236,7 +236,7 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
     }
 }
 
-static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t val_len)
+static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t val_len)
 {
     if (netdev == NULL) {
         return -ENODEV;
@@ -244,7 +244,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t val_len)
 
     cc2420_t *dev = (cc2420_t *)netdev;
 
-    int ext = netdev2_ieee802154_set(&dev->netdev, opt, val, val_len);
+    int ext = netdev_ieee802154_set(&dev->netdev, opt, val, val_len);
 
     switch (opt) {
         case NETOPT_ADDRESS:

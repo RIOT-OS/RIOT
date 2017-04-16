@@ -16,7 +16,11 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+/**
+ * @brief structure to hold boot partition
+ */
+
 typedef struct {
-    int size;
-    const int *prog;
+    int size;           /**< size of partition */
+    const int *prog;    /**< partition data */
 } boot_t;

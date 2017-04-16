@@ -29,7 +29,7 @@
 #include "periph/cpuid.h"
 
 #include "nrfmin.h"
-#include "net/netdev2.h"
+#include "net/netdev.h"
 
 #define ENABLE_DEBUG            (0)
 #include "debug.h"
@@ -90,7 +90,7 @@ typedef enum {
 /**
  * @brief   Since there can only be 1 nrfmin device, we allocate it right here
  */
-netdev2_t nrfmin_dev;
+netdev_t nrfmin_dev;
 
 /**
  * @brief   For faster lookup we remember our own 16-bit address
@@ -311,7 +311,7 @@ void isr_radio(void)
                 return;
             }
             rx_lock = 0;
-            nrfmin_dev.event_callback(&nrfmin_dev, NETDEV2_EVENT_ISR);
+            nrfmin_dev.event_callback(&nrfmin_dev, NETDEV_EVENT_ISR);
         }
         else if (state == STATE_TX) {
             goto_target_state();
@@ -321,7 +321,7 @@ void isr_radio(void)
     cortexm_isr_end();
 }
 
-static int nrfmin_send(netdev2_t *dev, const struct iovec *vector, unsigned count)
+static int nrfmin_send(netdev_t *dev, const struct iovec *vector, unsigned count)
 {
     (void)dev;
 
@@ -355,7 +355,7 @@ static int nrfmin_send(netdev2_t *dev, const struct iovec *vector, unsigned coun
     return (int)count;
 }
 
-static int nrfmin_recv(netdev2_t *dev, void *buf, size_t len, void *info)
+static int nrfmin_recv(netdev_t *dev, void *buf, size_t len, void *info)
 {
     (void)dev;
     (void)info;
@@ -390,7 +390,7 @@ static int nrfmin_recv(netdev2_t *dev, void *buf, size_t len, void *info)
     return pktlen;
 }
 
-static int nrfmin_init(netdev2_t *dev)
+static int nrfmin_init(netdev_t *dev)
 {
     uint8_t cpuid[CPUID_LEN];
 
@@ -449,14 +449,14 @@ static int nrfmin_init(netdev2_t *dev)
     return 0;
 }
 
-static void nrfmin_isr(netdev2_t *dev)
+static void nrfmin_isr(netdev_t *dev)
 {
     if (nrfmin_dev.event_callback) {
-        nrfmin_dev.event_callback(dev, NETDEV2_EVENT_RX_COMPLETE);
+        nrfmin_dev.event_callback(dev, NETDEV_EVENT_RX_COMPLETE);
     }
 }
 
-static int nrfmin_get(netdev2_t *dev, netopt_t opt, void *val, size_t max_len)
+static int nrfmin_get(netdev_t *dev, netopt_t opt, void *val, size_t max_len)
 {
     (void)dev;
 
@@ -494,7 +494,7 @@ static int nrfmin_get(netdev2_t *dev, netopt_t opt, void *val, size_t max_len)
             return 2;
         case NETOPT_DEVICE_TYPE:
             assert(max_len >= sizeof(uint16_t));
-            *((uint16_t *)val) = NETDEV2_TYPE_NRFMIN;
+            *((uint16_t *)val) = NETDEV_TYPE_NRFMIN;
             return sizeof(uint16_t);
         case NETOPT_IPV6_IID:
             assert(max_len >= sizeof(uint64_t));
@@ -505,7 +505,7 @@ static int nrfmin_get(netdev2_t *dev, netopt_t opt, void *val, size_t max_len)
     }
 }
 
-static int nrfmin_set(netdev2_t *dev, netopt_t opt, void *val, size_t len)
+static int nrfmin_set(netdev_t *dev, netopt_t opt, void *val, size_t len)
 {
     (void)dev;
 
@@ -537,9 +537,9 @@ static int nrfmin_set(netdev2_t *dev, netopt_t opt, void *val, size_t len)
 }
 
 /**
- * @brief   Export of the netdev2 interface
+ * @brief   Export of the netdev interface
  */
-const netdev2_driver_t nrfmin_netdev = {
+const netdev_driver_t nrfmin_netdev = {
     .send = nrfmin_send,
     .recv = nrfmin_recv,
     .init = nrfmin_init,

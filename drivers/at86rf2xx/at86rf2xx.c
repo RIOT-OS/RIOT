@@ -24,7 +24,7 @@
  */
 
 
-#include "uuid.h"
+#include "luid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/gnrc.h"
@@ -38,7 +38,7 @@
 
 void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
 {
-    netdev2_t *netdev = (netdev2_t *)dev;
+    netdev_t *netdev = (netdev_t *)dev;
 
     netdev->driver = &at86rf2xx_driver;
     /* initialize device descriptor */
@@ -62,13 +62,13 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     dev->netdev.flags = 0;
 
     /* get an 8-byte unique ID to use as hardware address */
-    uuid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
+    luid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
     /* make sure we mark the address as non-multicast and not globally unique */
     addr_long.uint8[0] &= ~(0x01);
     addr_long.uint8[0] |=  (0x02);
     /* set short and long address */
-    at86rf2xx_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
-    at86rf2xx_set_addr_short(dev, NTOHS(addr_long.uint16[0].u16));
+    at86rf2xx_set_addr_long(dev, ntohll(addr_long.uint64.u64));
+    at86rf2xx_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
 
     /* set default PAN id */
     at86rf2xx_set_pan(dev, AT86RF2XX_DEFAULT_PANID);
@@ -161,7 +161,7 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, uint8_t *data,
 
 void at86rf2xx_tx_exec(at86rf2xx_t *dev)
 {
-    netdev2_t *netdev = (netdev2_t *)dev;
+    netdev_t *netdev = (netdev_t *)dev;
 
     /* write frame length field in FIFO */
     at86rf2xx_sram_write(dev, 0, &(dev->tx_frame_len), 1);
@@ -170,6 +170,6 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev)
                         AT86RF2XX_TRX_STATE__TX_START);
     if (netdev->event_callback &&
         (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_START)) {
-        netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED);
+        netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
     }
 }

@@ -24,7 +24,6 @@
 
 #include "log.h"
 #include "saul_reg.h"
-
 #include "mma8x5x.h"
 #include "mma8x5x_params.h"
 
@@ -57,7 +56,7 @@ void auto_init_mma8x5x(void)
 
         if (mma8x5x_init(&mma8x5x_devs[i], &mma8x5x_params[i]) != MMA8X5X_OK) {
             LOG_ERROR("[auto_init_saul] error initializing mma8x5x #%u\n", i);
-            return;
+            continue;
         }
 
         saul_entries[i].dev = &(mma8x5x_devs[i]);

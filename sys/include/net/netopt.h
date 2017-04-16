@@ -206,7 +206,7 @@ typedef enum {
      *
      * Get/set the CCA mode as uint8_t
      * corresponding to the respective PHY standard.
-     * - IEEE 802.15.4: @ref netdev2_ieee802154_cca_mode_t
+     * - IEEE 802.15.4: @ref netdev_ieee802154_cca_mode_t
      */
     NETOPT_CCA_MODE,
 

@@ -16,9 +16,13 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Definition of struct timeval for the atmega
+ *
+ */
 struct timeval {
-    time_t         tv_sec;
-    suseconds_t    tv_usec;
+    time_t         tv_sec;      /**< seconds */
+    suseconds_t    tv_usec;     /**< microseconds */
 };
 
 #ifdef __cplusplus

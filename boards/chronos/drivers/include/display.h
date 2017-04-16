@@ -50,27 +50,27 @@ extern "C" {
 /* *************************************************************************************************
  * Global Variable section */
 
-/* Set of display flags */
+/** Set of display flags */
 typedef union {
     struct {
         /* Line1 + Line2 + Icons*/
-        uint16_t full_update            : 1;    /* 1 = Redraw all content */
-        uint16_t partial_update         : 1;    /* 1 = Update changes */
+        uint16_t full_update            : 1;    /**< 1 = Redraw all content */
+        uint16_t partial_update         : 1;    /**< 1 = Update changes */
 
         /* Line only */
-        uint16_t line1_full_update      : 1;    /* 1 = Redraw Line1 content */
-        uint16_t line2_full_update      : 1;    /* 1 = Redraw Line2 content */
+        uint16_t line1_full_update      : 1;    /**< 1 = Redraw Line1 content */
+        uint16_t line2_full_update      : 1;    /**< 1 = Redraw Line2 content */
 
         /* Logic module data update flags */
-        uint16_t update_time            : 1;    /* 1 = Time was updated */
-        uint16_t update_stopwatch       : 1;    /* 1 = Stopwatch was updated */
-        uint16_t update_temperature     : 1;    /* 1 = Temperature was updated */
-        uint16_t update_battery_voltage : 1;    /* 1 = Battery voltage was updated */
-        uint16_t update_date            : 1;    /* 1 = Date was updated */
-        uint16_t update_alarm           : 1;    /* 1 = Alarm time was updated */
-        uint16_t update_acceleration    : 1;    /* 1 = Acceleration data was updated */
-    } flag;
-    uint16_t all_flags;            /* Shortcut to all display flags (for reset) */
+        uint16_t update_time            : 1;    /**< 1 = Time was updated */
+        uint16_t update_stopwatch       : 1;    /**< 1 = Stopwatch was updated */
+        uint16_t update_temperature     : 1;    /**< 1 = Temperature was updated */
+        uint16_t update_battery_voltage : 1;    /**< 1 = Battery voltage was updated */
+        uint16_t update_date            : 1;    /**< 1 = Date was updated */
+        uint16_t update_alarm           : 1;    /**< 1 = Alarm time was updated */
+        uint16_t update_acceleration    : 1;    /**< 1 = Acceleration data was updated */
+    } flag;                        /**< Bitfield for the display flags */
+    uint16_t all_flags;            /**< Shortcut to all display flags (for reset) */
 } s_display_flags_t;
 
 extern volatile s_display_flags_t display;

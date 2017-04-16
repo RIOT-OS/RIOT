@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   xtimer configuration
+ * @name    xtimer configuration
  * @{
  */
 #define XTIMER_DEV          TIMER_1
@@ -39,7 +39,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name AT86RF233 configuration
+ * @name    AT86RF233 configuration
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
  */
@@ -51,7 +51,7 @@ extern "C" {
                                      .reset_pin = GPIO_PIN(PB, 15)}
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED0_PIN            GPIO_PIN(0, 19)
@@ -65,7 +65,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name SW0 (Button) pin definitions
+ * @name    SW0 (Button) pin definitions
  * @{
  */
 #define BUTTON_PORT         PORT->Group[0]
@@ -74,7 +74,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
 

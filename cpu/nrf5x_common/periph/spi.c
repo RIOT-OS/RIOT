@@ -24,6 +24,7 @@
 #include "mutex.h"
 #include "assert.h"
 #include "periph/spi.h"
+#include "periph/gpio.h"
 
 #ifdef SPI_NUMOF
 
@@ -50,9 +51,9 @@ void spi_init(spi_t bus)
 void spi_init_pins(spi_t bus)
 {
     /* set pin direction */
-    GPIO_BASE->DIRSET = ((1 << spi_config[bus].sclk) |
-                        (1 << spi_config[bus].mosi));
-    GPIO_BASE->DIRCLR =  (1 << spi_config[bus].miso);
+    gpio_init(spi_config[bus].sclk, GPIO_OUT);
+    gpio_init(spi_config[bus].mosi, GPIO_OUT);
+    gpio_init(spi_config[bus].miso, GPIO_IN);
     /* select pins for the SPI device */
     SPI_SCKSEL  = spi_config[bus].sclk;
     SPI_MOSISEL = spi_config[bus].mosi;

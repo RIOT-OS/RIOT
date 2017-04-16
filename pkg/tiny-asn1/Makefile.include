@@ -1,1 +1,1 @@
-INCLUDES += -I$(BINDIRBASE)/pkg/$(BOARD)/tiny-asn1/src
+INCLUDES += -I$(PKGDIRBASE)/tiny-asn1/src

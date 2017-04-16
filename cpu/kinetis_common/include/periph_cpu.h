@@ -46,6 +46,10 @@ typedef uint16_t gpio_t;
 #define GPIO_PIN(x, y)      (((x + 1) << 12) | (x << 6) | y)
 
 /**
+ * @brief   Starting offset of CPU_ID
+ */
+#define CPUID_ADDR          (&SIM->UIDH)
+/**
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (16U)
@@ -87,6 +91,17 @@ typedef uint16_t gpio_t;
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
+
+/**
+ * @brief   define number of usable power modes
+ */
+#define PM_NUM_MODES    (1U)
+
+/**
+ * @brief   Override the default initial PM blocker
+ * @todo   we block all modes per default, until PM is cleanly implemented
+ */
+#define PM_BLOCKER_INITIAL  { .val_u32 = 0x01010101 }
 
 #ifndef DOXYGEN
 /**
@@ -284,17 +299,26 @@ enum {
 /** @} */
 
 /**
+ * @brief UART module configuration options
+ */
+typedef struct {
+    UART_Type *dev;            /**< Pointer to module hardware registers */
+    volatile uint32_t *clken;  /**< Clock enable bitband register address */
+    uint32_t freq;             /**< Module clock frequency, usually CLOCK_CORECLOCK or CLOCK_BUSCLOCK */
+    gpio_t pin_rx;             /**< RX pin, GPIO_UNDEF disables RX */
+    gpio_t pin_tx;             /**< TX pin */
+    uint32_t pcr_rx;           /**< Pin configuration register bits for RX */
+    uint32_t pcr_tx;           /**< Pin configuration register bits for TX */
+    IRQn_Type irqn;            /**< IRQ number for this module */
+} uart_conf_t;
+
+/**
  * @brief   CPU internal function for initializing PORTs
  *
  * @param[in] pin       pin to initialize
  * @param[in] pcr       value for the PORT's PCR register
  */
 void gpio_init_port(gpio_t pin, uint32_t pcr);
-
-/**
- * @brief   define number of usable power modes
- */
-#define PM_NUM_MODES    (1U)
 
 #ifdef __cplusplus
 }

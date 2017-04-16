@@ -67,7 +67,7 @@ Networking
 * Provide sock-port for GCOAP
 * Provide sock-port for UHCPC
 * Provide sock_ip wrapper for LWIP
-* Native: allow for multiple netdev2_tap devices
+* Native: allow for multiple netdev_tap devices
 
 Packages
 --------
@@ -100,9 +100,9 @@ Drivers
 * Unified NRF5x low power modes
 + Low power modes for the STM32F1 family
 * Unified Kinetis low power modes
-* Xbee port to netdev2 API
-* W5100 port to netdev2 API
-* NRF5x/'nrfmin' port to netdev2 API (w/o 6LoWPAN support currently)
+* Xbee port to netdev API
+* W5100 port to netdev API
+* NRF5x/'nrfmin' port to netdev API (w/o 6LoWPAN support currently)
 * Refactor synchronous UART by new 'isrpipe' module
 
 Build System
@@ -340,7 +340,7 @@ Core
 API changes
 -----------
 + Socket-like sock API (replacing conn)
-* netdev2: Add Testmodes and CCA modes
+* netdev: Add Testmodes and CCA modes
 * IEEE 802.15.4: clean-up Intra-PAN behavior
 * IEEE 802.15.4: centralize default values
 * gnrc_pktbuf: allow for 0-sized snips
@@ -411,7 +411,7 @@ Fixed Issues from the last release
 ==================================
 #534:  native debugging on osx fails
 #2071: native: *long* overdue fixes
-#3341: netdev2_tap crashes when hammered
+#3341: netdev_tap crashes when hammered
 #5007: gnrc icmpv6: Ping reply goes out the wrong interface
 #5432: native: valgrind fails
 
@@ -863,7 +863,7 @@ Core
 Network Stack
 ---
 + P2P-RPL (RFC6997)
-+ netdev2_test: test framework for users of the netdev2 API
++ netdev_test: test framework for users of the netdev API
 
 Packages
 ---
@@ -905,7 +905,7 @@ Other
 
 API changes
 ---
-* at86rf2xx was moved from gnrc_netdev to the netdev2 API
+* at86rf2xx was moved from gnrc_netdev to the netdev API
 * genrand_* -> random_*
 * xtimer_remove() no longer returns whether a timer was actually removed
 * disableIRQ(), enableIRQ(), restoreIRQ(), inISR() -> irq_disable(), irq_enable(), irq_restore(), irq_is_in()

@@ -38,9 +38,7 @@ extern "C" {
 #endif
 
 /**
- * @def GNRC_IPV6_NETIF_ADDR_NUMOF
- *
- * @brief   Number of IPv6 addresses per interface.
+ * @cond INTERNAL
  */
 #ifdef MODULE_GNRC_RPL
 /* RPL needs all-RPL-nodes multicast address */
@@ -54,6 +52,12 @@ extern "C" {
 #else
 #   define GNRC_IPV6_NETIF_RTR_ADDR     (0)
 #endif
+/**
+ * @endcond
+ */
+/**
+ * @brief   Number of IPv6 addresses per interface.
+ */
 #ifndef GNRC_IPV6_NETIF_ADDR_NUMOF
 #define GNRC_IPV6_NETIF_ADDR_NUMOF  (6 + GNRC_IPV6_NETIF_RPL_ADDR + GNRC_IPV6_NETIF_RTR_ADDR)
 #endif
@@ -193,7 +197,7 @@ extern "C" {
 #define GNRC_IPV6_NETIF_FLAGS_ADV_REACH_TIME    (0x0020)
 
 /**
- * @brief   Flag to indicate that ng_ipv6_netif_t::retrans_timer shall be propagated
+ * @brief   Flag to indicate that gnrc_ipv6_netif_t::retrans_timer shall be propagated
  *          in router advertisements.
  */
 #define GNRC_IPV6_NETIF_FLAGS_ADV_RETRANS_TIMER (0x0040)
@@ -301,7 +305,7 @@ typedef struct {
     /**
      * @brief   Minimum time in seconds between sending unsolicited multicast
      *          router advertisements. Must be between 3 and
-     *          3/4 * ng_ipv6_netif_t::max_adv_int seconds.
+     *          3/4 * gnrc_ipv6_netif_t::max_adv_int seconds.
      *          The default value is @ref GNRC_IPV6_NETIF_DEFAULT_MIN_ADV_INT.
      */
     uint16_t min_adv_int;
@@ -310,7 +314,7 @@ typedef struct {
 #if defined (MODULE_GNRC_NDP_ROUTER) || defined (MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
     /**
      * @brief   The router lifetime to propagate in router advertisements.
-     *          Must be either 0 or between ng_ipv6_netif_t::max_adv_int and
+     *          Must be either 0 or between gnrc_ipv6_netif_t::max_adv_int and
      *          9000 seconds. 0 means this router is not to be used as a default
      *          router. The default value is @ref GNRC_IPV6_NETIF_DEFAULT_ROUTER_LTIME.
      */

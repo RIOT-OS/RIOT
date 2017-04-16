@@ -36,19 +36,20 @@
 
 
 /**
- * @brief  Maximum percentage error in calculated baud before switching to double speed transmission (U2X)
+ * @brief   Maximum percentage error in calculated baud before switching to
+ *          double speed transmission (U2X)
  *
  * Takes whole numbers from 0 to 100, inclusive, with a default of 2.
  */
 #if defined(UART_BAUD_TOL)
-// BAUD_TOL is defined here as it is used by the setbaud.h utility
+/* BAUD_TOL is defined here as it is used by the setbaud.h utility */
 #define BAUD_TOL UART_BAUD_TOL
 #else
 #define BAUD_TOL 2
 #endif
 
 #if defined(UART_STDIO_BAUDRATE)
-// BAUD and F_CPU are required by setbaud.h to calculated BRR
+/* BAUD and F_CPU are required by setbaud.h to calculated BRR */
 #define BAUD UART_STDIO_BAUDRATE
 #define F_CPU CLOCK_CORECLOCK
 #include <util/setbaud.h>
@@ -129,8 +130,15 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev[uart]->CSRC = (1 << UCSZ00) | (1 << UCSZ01);
     /* set clock divider */
     _set_brr(uart, baudrate);
+
     /* enable RX and TX and the RX interrupt */
-    dev[uart]->CSRB = ((1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0));
+    if (rx_cb) {
+        dev[uart]->CSRB = ((1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0));
+    }
+    else {
+        dev[uart]->CSRB = (1 << TXEN0);
+    }
+
 
     return UART_OK;
 }

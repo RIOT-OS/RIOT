@@ -22,7 +22,7 @@
 #define CPU_CONF_H
 
 #include "cpu_conf_common.h"
-#include "sam3x8e.h"
+#include "vendor/sam3x8e.h"
 
 #ifdef __cplusplus
 extern "C" {

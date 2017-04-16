@@ -29,34 +29,49 @@ namespace riot {
 namespace detail {
 
 /**
- * A list of integers (wraps a long... template parameter pack).
+ * @brief A list of integers (wraps a long... template parameter pack).
  */
 template <long... Is>
 struct int_list {};
 
 /**
- * Creates indices for from `Pos` to `Max`.
+ * @brief Creates indices from `Pos` to `Max`.
  */
 template <long Max, long Pos = 0, typename Indices = int_list<>>
 struct il_indices;
 
+/**
+ * @brief End of recursion, `Pos` reached `Max`.
+ */
 template <long Pos, long... Is>
 struct il_indices<Pos, Pos, int_list<Is...>> {
+  /**
+   * @brief Result is the list containing `Is...`.
+   */
   using type = int_list<Is...>;
 };
 
+/**
+ * @brief Recursion step.
+ */
 template <long Max, long Pos, long... Is>
 struct il_indices<Max, Pos, int_list<Is...>> {
+  /**
+   * @brief Append `Pos` to list and increment for the next step.
+   */
   using type = typename il_indices<Max, Pos + 1, int_list<Is..., Pos>>::type;
 };
 
+/**
+ * @brief Function to create a list of indices from `From` to `To`.
+ */
 template <long To, long From = 0>
 typename il_indices<To, From>::type get_indices() {
   return {};
 }
 
 /**
- * apply arguments to function
+ * @brief Apply arguments in a tuple to function.
  */
 template <class F, long... Is, class Tuple>
 inline auto apply_args(F& f, detail::int_list<Is...>, Tuple&& tup)
@@ -64,12 +79,20 @@ inline auto apply_args(F& f, detail::int_list<Is...>, Tuple&& tup)
   return f(std::get<Is>(tup)...);
 }
 
+/**
+ * @brief Prefix the argument tuple with additonal arguments.
+ *        In this case the tuple is empty.
+ */
 template <class F, class Tuple, class... Ts>
 inline auto apply_args_prefixed(F& f, detail::int_list<>, Tuple&, Ts&&... args)
   -> decltype(f(std::forward<Ts>(args)...)) {
   return f(std::forward<Ts>(args)...);
 }
 
+/**
+ * @brief Prefix the argument tuple with additonal arguments.
+ *        In this case the tuple is contains arguments.
+ */
 template <class F, long... Is, class Tuple, class... Ts>
 inline auto apply_args_prefixed(F& f, detail::int_list<Is...>, Tuple& tup,
                                 Ts&&... args)
@@ -77,6 +100,9 @@ inline auto apply_args_prefixed(F& f, detail::int_list<Is...>, Tuple& tup,
   return f(std::forward<Ts>(args)..., std::get<Is>(tup)...);
 }
 
+/**
+ * @brief Suffix the tuple with additonal arguments.
+ */
 template <class F, long... Is, class Tuple, class... Ts>
 inline auto apply_args_suffxied(F& f, detail::int_list<Is...>, Tuple& tup,
                                 Ts&&... args)

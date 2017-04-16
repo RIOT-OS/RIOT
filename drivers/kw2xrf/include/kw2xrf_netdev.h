@@ -26,7 +26,7 @@ extern "C" {
 /**
  * @brief   Reference to the netdev device driver struct
  */
-extern const netdev2_driver_t kw2xrf_driver;
+extern const netdev_driver_t kw2xrf_driver;
 
 #ifdef __cplusplus
 }

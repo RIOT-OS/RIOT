@@ -49,7 +49,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     assert((pwm < PWM_NUMOF) && ((freq * res) < bus_clk));
 
     /* power on the used timer */
-    pwm_poweron(pwm);
+    periph_clk_en(pwm_config[pwm].bus, pwm_config[pwm].rcc_mask);
     /* reset configuration and CC channels */
     dev(pwm)->CR1 = 0;
     dev(pwm)->CR2 = 0;
@@ -124,27 +124,17 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
     dev(pwm)->CCR[pwm_config[pwm].chan[channel].cc_chan] = value;
 }
 
-void pwm_start(pwm_t pwm)
-{
-    assert(pwm < PWM_NUMOF);
-    dev(pwm)->CR1 |= TIM_CR1_CEN;
-}
-
-void pwm_stop(pwm_t pwm)
-{
-    assert(pwm < PWM_NUMOF);
-    dev(pwm)->CR1 &= ~TIM_CR1_CEN;
-}
-
 void pwm_poweron(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
     periph_clk_en(pwm_config[pwm].bus, pwm_config[pwm].rcc_mask);
+    dev(pwm)->CR1 |= TIM_CR1_CEN;
 }
 
 void pwm_poweroff(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
+    dev(pwm)->CR1 &= ~TIM_CR1_CEN;
     periph_clk_dis(pwm_config[pwm].bus, pwm_config[pwm].rcc_mask);
 }
 

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_mulle
+ * @ingroup     boards_mulle
  * @{
  *
  * @file
@@ -24,11 +24,14 @@
 #include "cpu.h"
 #include "mcg.h"
 #include "periph/gpio.h"
-#include "periph/uart.h"
 #include "periph/rtt.h"
 #include "periph/spi.h"
 #include "nvram-spi.h"
+#include "nvram.h"
 #include "xtimer.h"
+#include "vfs.h"
+#include "fs/devfs.h"
+#include "mtd_spi_nor.h"
 
 static nvram_t mulle_nvram_dev;
 nvram_t *mulle_nvram = &mulle_nvram_dev;
@@ -37,6 +40,35 @@ static nvram_spi_params_t nvram_spi_params = {
         .clk = MULLE_NVRAM_SPI_CLK,
         .cs = MULLE_NVRAM_SPI_CS,
         .address_count = MULLE_NVRAM_SPI_ADDRESS_COUNT,
+};
+
+static devfs_t mulle_nvram_devfs = {
+    .path = "/fram0",
+    .f_op = &nvram_vfs_ops,
+    .private_data = &mulle_nvram_dev,
+};
+
+static mtd_spi_nor_t mulle_nor_dev = {
+    .base = {
+        .driver = &mtd_spi_nor_driver,
+        .page_size = 256,
+        .pages_per_sector = 256,
+        .sector_count = 32,
+    },
+    .opcode = &mtd_spi_nor_opcode_default,
+    .spi = MULLE_NOR_SPI_DEV,
+    .cs = MULLE_NOR_SPI_CS,
+    .addr_width = 3,
+    .mode = SPI_MODE_3,
+    .clk = SPI_CLK_10MHZ,
+};
+
+mtd_dev_t *mtd0 = (mtd_dev_t *)&mulle_nor_dev;
+
+static devfs_t mulle_nor_devfs = {
+    .path = "/mtd0",
+    .f_op = &mtd_vfs_ops,
+    .private_data = &mulle_nor_dev,
 };
 
 /** @brief Initialize the GPIO pins controlling the power switches. */
@@ -55,6 +87,8 @@ static inline void set_fll_source(void);
 
 static void increase_boot_count(void);
 static int mulle_nvram_init(void);
+
+int mulle_nor_init(void);
 
 void board_init(void)
 {
@@ -106,9 +140,6 @@ void board_init(void)
         __asm__ volatile("nop\n");
     }
 
-    /* Update SystemCoreClock global var */
-    SystemCoreClockUpdate();
-
     /* initialize the CPU */
     cpu_init();
 
@@ -121,6 +152,9 @@ void board_init(void)
         /* Increment boot counter */
         increase_boot_count();
     }
+
+    /* Initialize NOR flash */
+    mulle_nor_init();
 }
 
 static inline void power_pins_init(void)
@@ -157,24 +191,10 @@ static inline void set_fll_source(void)
     /* Select FLL as source (as opposed to PLL) */
     SIM->SOPT2 &= ~(SIM_SOPT2_PLLFLLSEL_MASK);
     /* Use external 32kHz RTC clock as source for OSC32K */
-#if K60_CPU_REV == 1
-    SIM->SOPT1 |= SIM_SOPT1_OSC32KSEL_MASK;
-#elif K60_CPU_REV == 2
     SIM->SOPT1 = (SIM->SOPT1 & ~(SIM_SOPT1_OSC32KSEL_MASK)) | SIM_SOPT1_OSC32KSEL(2);
-#else
-#error Unknown K60 CPU revision
-#endif
 
     /* Select RTC 32kHz clock as reference clock for the FLL */
-#if K60_CPU_REV == 1
-    /* Rev 1 parts */
-    SIM->SOPT2 |= SIM_SOPT2_MCGCLKSEL_MASK;
-#elif K60_CPU_REV == 2
-    /* Rev 2 parts */
     MCG->C7 = (MCG_C7_OSCSEL_MASK);
-#else
-#error Unknown K60 CPU revision
-#endif
 }
 
 static int mulle_nvram_init(void)
@@ -210,6 +230,10 @@ static int mulle_nvram_init(void)
             return -5;
         }
     }
+
+    /* Register DevFS node */
+    devfs_register(&mulle_nvram_devfs);
+
     return 0;
 }
 
@@ -225,4 +249,16 @@ static void increase_boot_count(void)
     }
     ++rec.u32;
     mulle_nvram->write(mulle_nvram, &rec.u8[0], MULLE_NVRAM_BOOT_COUNT, sizeof(rec.u32));
+}
+
+int mulle_nor_init(void)
+{
+    int res = mtd_init(mtd0);
+
+    if (res >= 0) {
+        /* Register DevFS node */
+        devfs_register(&mulle_nor_devfs);
+    }
+
+    return res;
 }
