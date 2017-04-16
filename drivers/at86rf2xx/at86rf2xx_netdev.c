@@ -35,7 +35,7 @@
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #define _MAX_MHR_OVERHEAD   (25)
@@ -212,12 +212,6 @@ netopt_state_t _get_state(at86rf2xx_t *dev)
         case AT86RF2XX_STATE_SLEEP:
             return NETOPT_STATE_SLEEP;
         case AT86RF2XX_STATE_BUSY_RX_AACK:
-#ifdef MODULE_OPENTHREAD
-            /* Required for OpenThread abstraction */
-            if (at86rf2xx_receiver_listening(dev)) {
-                return NETOPT_STATE_IDLE;
-            }
-#endif
             return NETOPT_STATE_RX;
         case AT86RF2XX_STATE_BUSY_TX_ARET:
         case AT86RF2XX_STATE_TX_ARET_ON:
@@ -343,12 +337,6 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
             res = sizeof(int8_t);
             break;
 
-#ifdef MODULE_OPENTHREAD
-        case NETOPT_RX_LISTENING:
-            *((bool *)val) = at86rf2xx_receiver_listening(dev) ? true : false;
-            res = sizeof(bool);
-            break;
-#endif
         default:
             res = -ENOTSUP;
     }
@@ -510,13 +498,6 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             res = sizeof(int8_t);
             break;
 
-#ifdef MODULE_OPENTHREAD
-        case NETOPT_RX_LISTENING:
-            at86rf2xx_set_option(dev, AT86RF2XX_OPT_RX_LISTENING,
-                                 ((bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-#endif
         default:
             break;
     }
@@ -566,15 +547,9 @@ static void _isr(netdev2_t *netdev)
             state == AT86RF2XX_STATE_BUSY_RX_AACK) {
             DEBUG("[at86rf2xx] EVT - RX_END\n");
 
-#ifdef MODULE_OPENTHREAD
-            if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END) || !at86rf2xx_receiver_listening(dev)) {
-                return;
-            }
-#else
             if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)) {
                 return;
             }
-#endif
 
             netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
         }
