@@ -52,8 +52,12 @@ priority_queue_node_t *priority_queue_remove_head(priority_queue_t *root)
 
 void priority_queue_add(priority_queue_t *root, priority_queue_node_t *new_obj)
 {
-    /* The strict aliasing rules allow this assignment. */
-    priority_queue_node_t *node = (priority_queue_node_t *) root;
+    priority_queue_node_t *node = root->first;
+
+    if (node == NULL) {
+        root->first = node;
+        return;
+    }
 
     while (node->next != NULL) {
         /* not trying to add the same node twice */
