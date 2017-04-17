@@ -75,9 +75,7 @@ typedef enum {
     NETDEV_EVENT_RX_COMPLETE,       /**< finished receiving a packet */
     NETDEV_EVENT_TX_STARTED,        /**< started to transfer a packet */
     NETDEV_EVENT_TX_COMPLETE,       /**< finished transferring packet */
-#ifdef MODULE_OPENTHREAD
-    NETDEV_EVENT_TX_COMPLETE_DATA_PENDING, /**< finished transferring packet and has data pending flag **/
-#endif
+	NETDEV_EVENT_TX_COMPLETE_DATA_PENDING, /**< finished transferring packet and has data pending flag */
     NETDEV_EVENT_TX_NOACK,          /**< ACK requested but not received */
     NETDEV_EVENT_TX_MEDIUM_BUSY,    /**< couldn't transfer packet */
     NETDEV_EVENT_LINK_UP,           /**< link established */

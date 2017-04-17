@@ -28,28 +28,27 @@
 #include "at86rf2xx_registers.h"
 #include "periph/spi.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #ifdef MODULE_AT86RF212B
 /* See: Table 9-15. Recommended Mapping of TX Power, Frequency Band, and
  * PHY_TX_PWR (register 0x05), AT86RF212B data sheet. */
-static const uint8_t dbm_to_tx_pow_868[] = { 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x18,
-                                             0x17, 0x15, 0x14, 0x13, 0x12, 0x11,
-                                             0x10, 0x0f, 0x31, 0x30, 0x2f, 0x94,
-                                             0x93, 0x91, 0x90, 0x29, 0x49, 0x48,
-                                             0x47, 0xad, 0xcd, 0xcc, 0xcb, 0xea,
-                                             0xe9, 0xe8, 0xe7, 0xe6, 0xe4, 0x80,
-                                             0xa0 };
-static const uint8_t dbm_to_tx_pow_915[] = { 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x17,
-                                             0x16, 0x15, 0x14, 0x13, 0x12, 0x11,
-                                             0x10, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b,
-                                             0x09, 0x91, 0x08, 0x07, 0x05, 0x27,
-                                             0x04, 0x03, 0x02, 0x01, 0x00, 0x86,
-                                             0x40, 0x84, 0x83, 0x82, 0x80, 0xc1,
-                                             0xc0 };
-static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg)
-{
+static const uint8_t dbm_to_tx_pow_868[] = {0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x18,
+                                            0x17, 0x15, 0x14, 0x13, 0x12, 0x11,
+                                            0x10, 0x0f, 0x31, 0x30, 0x2f, 0x94,
+                                            0x93, 0x91, 0x90, 0x29, 0x49, 0x48,
+                                            0x47, 0xad, 0xcd, 0xcc, 0xcb, 0xea,
+                                            0xe9, 0xe8, 0xe7, 0xe6, 0xe4, 0x80,
+                                            0xa0};
+static const uint8_t dbm_to_tx_pow_915[] = {0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x17,
+                                            0x16, 0x15, 0x14, 0x13, 0x12, 0x11,
+                                            0x10, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b,
+                                            0x09, 0x91, 0x08, 0x07, 0x05, 0x27,
+                                            0x04, 0x03, 0x02, 0x01, 0x00, 0x86,
+                                            0x40, 0x84, 0x83, 0x82, 0x80, 0xc1,
+                                            0xc0};
+static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg) {
     const uint8_t *dbm_to_tx_pow;
     size_t nelem;
 
@@ -69,7 +68,7 @@ static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg)
         return 0;
     }
 
-    for (size_t i = 0; i < nelem; i++) {
+    for(size_t i = 0; i < nelem; i++){
         if (dbm_to_tx_pow[i] == reg) {
             return i - 25;
         }
@@ -78,19 +77,19 @@ static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg)
 }
 
 #elif MODULE_AT86RF233
-static const int16_t tx_pow_to_dbm[] = { 4, 4, 3, 3, 2, 2, 1,
-                                         0, -1, -2, -3, -4, -6, -8, -12, -17 };
-static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
-                                         0x0e, 0x0d, 0x0d, 0x0d, 0x0c, 0x0c,
-                                         0x0b, 0x0b, 0x0a, 0x09, 0x08, 0x07,
-                                         0x06, 0x05, 0x03, 0x00 };
+static const int16_t tx_pow_to_dbm[] = {4, 4, 3, 3, 2, 2, 1,
+                                        0, -1, -2, -3, -4, -6, -8, -12, -17};
+static const uint8_t dbm_to_tx_pow[] = {0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
+                                        0x0e, 0x0d, 0x0d, 0x0d, 0x0c, 0x0c,
+                                        0x0b, 0x0b, 0x0a, 0x09, 0x08, 0x07,
+                                        0x06, 0x05, 0x03,0x00};
 #else
-static const int16_t tx_pow_to_dbm[] = { 3, 3, 2, 2, 1, 1, 0,
-                                         -1, -2, -3, -4, -5, -7, -9, -12, -17 };
-static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
-                                         0x0e, 0x0d, 0x0d, 0x0c, 0x0c, 0x0b,
-                                         0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06,
-                                         0x05, 0x03, 0x00 };
+static const int16_t tx_pow_to_dbm[] = {3, 3, 2, 2, 1, 1, 0,
+                                        -1, -2, -3, -4, -5, -7, -9, -12, -17};
+static const uint8_t dbm_to_tx_pow[] = {0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
+                                        0x0e, 0x0d, 0x0d, 0x0c, 0x0c, 0x0b,
+                                        0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06,
+                                        0x05, 0x03, 0x00};
 #endif
 
 uint16_t at86rf2xx_get_addr_short(at86rf2xx_t *dev)
@@ -117,7 +116,6 @@ uint64_t at86rf2xx_get_addr_long(at86rf2xx_t *dev)
 {
     uint64_t addr;
     uint8_t *ap = (uint8_t *)(&addr);
-
     for (int i = 0; i < 8; i++) {
         ap[i] = dev->netdev.long_addr[i];
     }
@@ -184,7 +182,6 @@ uint16_t at86rf2xx_get_pan(at86rf2xx_t *dev)
 void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
 {
     le_uint16_t le_pan = byteorder_btols(byteorder_htons(pan));
-
     dev->netdev.pan = pan;
     DEBUG("pan0: %u, pan1: %u\n", le_pan.u8[0], le_pan.u8[1]);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_0, le_pan.u8[0]);
@@ -199,7 +196,7 @@ int16_t at86rf2xx_get_txpower(at86rf2xx_t *dev)
     return _tx_pow_to_dbm_212b(dev->netdev.chan, dev->page, txpower);
 #else
     uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR)
-                      & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
+                & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
     return tx_pow_to_dbm[txpower];
 #endif
 }
@@ -259,7 +256,6 @@ void at86rf2xx_set_max_retries(at86rf2xx_t *dev, uint8_t max)
 uint8_t at86rf2xx_get_csma_max_retries(at86rf2xx_t *dev)
 {
     uint8_t tmp;
-
     tmp  = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_0);
     tmp &= AT86RF2XX_XAH_CTRL_0__MAX_CSMA_RETRIES;
     tmp >>= 1;
@@ -268,8 +264,8 @@ uint8_t at86rf2xx_get_csma_max_retries(at86rf2xx_t *dev)
 
 void at86rf2xx_set_csma_max_retries(at86rf2xx_t *dev, int8_t retries)
 {
-    retries = (retries > 5) ? 5 : retries;  /* valid values: 0-5 */
-    retries = (retries < 0) ? 7 : retries;  /* max < 0 => disable CSMA (set to 7) */
+    retries = (retries > 5) ? 5 : retries; /* valid values: 0-5 */
+    retries = (retries < 0) ? 7 : retries; /* max < 0 => disable CSMA (set to 7) */
     DEBUG("[at86rf2xx] opt: Set CSMA retries to %u\n", retries);
 
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_0);
@@ -285,21 +281,21 @@ void at86rf2xx_set_csma_backoff_exp(at86rf2xx_t *dev, uint8_t min, uint8_t max)
     DEBUG("[at86rf2xx] opt: Set min BE=%u, max BE=%u\n", min, max);
 
     at86rf2xx_reg_write(dev,
-                        AT86RF2XX_REG__CSMA_BE,
-                        (max << 4) | (min));
+            AT86RF2XX_REG__CSMA_BE,
+            (max << 4) | (min));
 }
 
 void at86rf2xx_set_csma_seed(at86rf2xx_t *dev, uint8_t entropy[2])
 {
-    if (entropy == NULL) {
+    if(entropy == NULL) {
         DEBUG("[at86rf2xx] opt: CSMA seed entropy is nullpointer\n");
         return;
     }
     DEBUG("[at86rf2xx] opt: Set CSMA seed to 0x%x 0x%x\n", entropy[0], entropy[1]);
 
     at86rf2xx_reg_write(dev,
-                        AT86RF2XX_REG__CSMA_SEED_0,
-                        entropy[0]);
+                           AT86RF2XX_REG__CSMA_SEED_0,
+                           entropy[0]);
 
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
     tmp &= ~(AT86RF2XX_CSMA_SEED_1__CSMA_SEED_1);
@@ -310,7 +306,6 @@ void at86rf2xx_set_csma_seed(at86rf2xx_t *dev, uint8_t entropy[2])
 int8_t at86rf2xx_get_cca_threshold(at86rf2xx_t *dev)
 {
     int8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CCA_THRES);
-
     tmp &= AT86RF2XX_CCA_THRES_MASK__CCA_ED_THRES;
     tmp <<= 1;
     return (RSSI_BASE_VAL + tmp);
@@ -476,7 +471,7 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
 
     /* we need to go via PLL_ON if we are moving between RX_AACK_ON <-> TX_ARET_ON */
     if ((old_state == AT86RF2XX_STATE_RX_AACK_ON &&
-         state == AT86RF2XX_STATE_TX_ARET_ON) ||
+             state == AT86RF2XX_STATE_TX_ARET_ON) ||
         (old_state == AT86RF2XX_STATE_TX_ARET_ON &&
              state == AT86RF2XX_STATE_RX_AACK_ON)) {
         _set_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
