@@ -1,0 +1,5 @@
+# Target architecture for the build. Use arm-none-eabi if you are unsure.
+
+export MCPU = cortex-a9
+
+INCLUDES += -I$(RIOTBASE)/cpu/armv7a_common/include/
