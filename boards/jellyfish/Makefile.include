@@ -1,0 +1,17 @@
+# define the cpu used by the stm32f0-discovery board
+export CPU = s5p4418
+export CPU_MODEL = S5P4418
+
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+USEMODULE += mrf24j40 gnrc_netdev
+endif
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# this board uses openocd
+include $(RIOTMAKE)/tools/openocd.inc.mk
