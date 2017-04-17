@@ -103,6 +103,8 @@
 
 #include <stdint.h>
 
+#include "net/af.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
