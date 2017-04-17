@@ -10,8 +10,11 @@
  * @defgroup    sys_bitfield Bitfields
  * @ingroup     sys
  * @brief       Bitfields of arbitrary length
- * @file
+ * @note        If the bitfield has always less than 32 entries, bitarithm from
+ *              @ref from core_util is more efficient.
  * @{
+ *
+ * @file
  *
  * @brief       bitfields operations on bitfields of arbitrary length
  *
@@ -97,6 +100,17 @@ static inline bool bf_isset(uint8_t field[], size_t idx)
  * @return      -1 if no bit was unset
  */
 int bf_get_unset(uint8_t field[], int size);
+
+/**
+ * @brief  Get the number of the first set bit
+ *
+ * @param[in,out] field The bitfield
+ * @param[in]     size  The size of the bitfield
+ *
+ * @return      number of the first set bit
+ * @return      -1 if bitfield does not contain a set bit
+ */
+int bf_get_first_set(uint8_t field[], int size);
 
 #ifdef __cplusplus
 }
