@@ -183,7 +183,7 @@ static void kinetis_mcg_enable_osc(void)
         MCG->C2 |= (uint8_t)(MCG_C2_EREFS0_MASK);
 
         /* wait fo OSC initialization */
-        while ((MCG->S & MCG_S_OSCINIT0_MASK) == 0);
+        while ((MCG->S & MCG_S_OSCINIT0_MASK) == 0) {}
     }
 }
 
@@ -204,10 +204,10 @@ static void kinetis_mcg_set_fei(void)
     MCG->C2 = (uint8_t)0;
 
     /* source of the FLL reference clock shall be internal reference clock */
-    while ((MCG->S & MCG_S_IREFST_MASK) == 0);
+    while ((MCG->S & MCG_S_IREFST_MASK) == 0) {}
 
     /* Wait until output of the FLL is selected */
-    while (MCG->S & (MCG_S_CLKST_MASK));
+    while (MCG->S & (MCG_S_CLKST_MASK)) {}
 
     kinetis_mcg_disable_pll();
     current_mode = KINETIS_MCG_FEI;
@@ -229,7 +229,7 @@ static void kinetis_mcg_set_fee(void)
     MCG->C1 = (uint8_t)(MCG_C1_CLKS(0) | MCG_C1_FRDIV(KINETIS_MCG_ERC_FRDIV));
 
     /* Wait until output of FLL is selected */
-    while ((MCG->S & MCG_S_CLKST_MASK) != MCG_S_CLKST(0));
+    while ((MCG->S & MCG_S_CLKST_MASK) != MCG_S_CLKST(0)) {}
 
     kinetis_mcg_disable_pll();
     current_mode = KINETIS_MCG_FEE;
@@ -259,10 +259,10 @@ static void kinetis_mcg_set_fbi(void)
     MCG->C1 = (uint8_t)(MCG_C1_CLKS(1) | MCG_C1_IREFS_MASK);
 
     /* Wait until output of IRC is selected */
-    while ((MCG->S & MCG_S_CLKST_MASK) != MCG_S_CLKST(1));
+    while ((MCG->S & MCG_S_CLKST_MASK) != MCG_S_CLKST(1)) {}
 
     /* source of the FLL reference clock shall be internal reference clock */
-    while ((MCG->S & MCG_S_IREFST_MASK) == 0);
+    while ((MCG->S & MCG_S_IREFST_MASK) == 0) {}
 
     kinetis_mcg_disable_pll();
     current_mode = KINETIS_MCG_FBI;
@@ -288,7 +288,7 @@ static void kinetis_mcg_set_fbe(void)
     MCG->C1 = (uint8_t)(MCG_C1_CLKS(2) | MCG_C1_FRDIV(KINETIS_MCG_ERC_FRDIV));
 
     /* Wait until ERC is selected */
-    while ((MCG->S & MCG_S_CLKST_MASK) != MCG_S_CLKST(2));
+    while ((MCG->S & MCG_S_CLKST_MASK) != MCG_S_CLKST(2)) {}
 
     kinetis_mcg_disable_pll();
     current_mode = KINETIS_MCG_FBE;
@@ -338,7 +338,7 @@ static void kinetis_mcg_set_pbe(void)
     MCG->C1 = (uint8_t)(MCG_C1_CLKS(2) | MCG_C1_FRDIV(KINETIS_MCG_ERC_FRDIV));
 
     /* Wait until ERC is selected */
-    while ((MCG->S & MCG_S_CLKST_MASK) != MCG_S_CLKST(2));
+    while ((MCG->S & MCG_S_CLKST_MASK) != MCG_S_CLKST(2)) {}
 
     /* PLL is not disabled in bypass mode */
     MCG->C2 &= ~(uint8_t)(MCG_C2_LP_MASK);
@@ -353,10 +353,10 @@ static void kinetis_mcg_set_pbe(void)
     MCG->C6 |= (uint8_t)(MCG_C6_PLLS_MASK);
 
     /* Wait until the source of the PLLS clock is PLL */
-    while ((MCG->S & MCG_S_PLLST_MASK) == 0);
+    while ((MCG->S & MCG_S_PLLST_MASK) == 0) {}
 
     /* Wait until PLL locked */
-    while ((MCG->S & MCG_S_LOCK0_MASK) == 0);
+    while ((MCG->S & MCG_S_LOCK0_MASK) == 0) {}
 
     current_mode = KINETIS_MCG_PBE;
 }
@@ -373,7 +373,7 @@ static void kinetis_mcg_set_pee(void)
     MCG->C1 &= ~(uint8_t)(MCG_C1_CLKS_MASK);
 
     /* Wait until output of the PLL is selected */
-    while ((MCG->S & MCG_S_CLKST_MASK) != MCG_S_CLKST(3));
+    while ((MCG->S & MCG_S_CLKST_MASK) != MCG_S_CLKST(3)) {}
 
     current_mode = KINETIS_MCG_PEE;
 }
