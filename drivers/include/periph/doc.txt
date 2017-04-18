@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2013-2015 Freie Universität Berlin
+ * Copyright (C)      2015 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,7 +17,40 @@
  * defines a standardized interface to access MCU peripherals that is not tied
  * to any specific vendor, platform or architecture.
  *
- * @todo        describe concept in detail
+ * Peripheral Device Driver concept
+ * ================================
+ *
+ * Old concept
+ * -----------
+ * The "old" concept of peripheral drivers is based on the idea that driver
+ * implementations are just dependant on the specific CPU and therefore *should*
+ * allow any output pin configuration that is provided by the CPU, whereas the actual
+ * pin configuration for a specific board in RIOT depends on the hardware that is
+ * mostly limited in its available pinout.
+ * Each low-level peripheral driver implementation *must* fulfil the interface
+ * which is specified in this folder. The CPU-specific implementation for each low-level
+ * driver is located in RIOT/cpu/*/periph/*. The board-specific pin mapping is located
+ * in the peripheral configuration file in RIOT/boards/*/include/perif_conf.h. In there,
+ * pins are statically mapped to the available peripheral outputs.
+ *
+ *
+ * New concept
+ * -----------
+ * The above described "old" concept limits pin configuration possibilities. On most 
+ * CPUs each output pin *could* fulfil different peripheral functions which is prohibited
+ * by the above described static pin mapping. Therefore, the idea is to dynamically
+ * map pins to a specific peripheral function by a Port/PIN tupel. To address the regarding
+ * registers and bits on the CPU, some additional CPU-specific enums and helper macros are
+ * needed, which can be found in RIOT/cpu/*/include/cpu_conf.h. The applied configuration is
+ * still located in RIOT/boards/*/include/periph_conf.h.
+ *
+ *
+ * Compatibility
+ * -------------
+ * To ensure compatibility between older and newer implementations, ...
+ *
+ *
+ *
  * @todo        link to driver model
  * @todo        describe/link implementation guide
  * @todo        list best practices
