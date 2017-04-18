@@ -97,7 +97,7 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
     gnrc_netif_ipv6_group_join_internal(gnrc_netif_get_by_pid(if_pid),
                                         &ipv6_addr_all_rpl_nodes);
 
-    gnrc_rpl_send_DIS(NULL, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes);
+    gnrc_rpl_send_DIS(NULL, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes, NULL, 0);
     return gnrc_rpl_pid;
 }
 
@@ -224,7 +224,7 @@ static void _parent_timeout(gnrc_rpl_parent_t *parent)
     if ((parent->state >= GNRC_RPL_PARENT_STALE) &&
         (parent->state < GNRC_RPL_PARENT_TIMEOUT)) {
         parent->state++;
-        gnrc_rpl_send_DIS(parent->dodag->instance, &parent->addr);
+        gnrc_rpl_send_DIS(parent->dodag->instance, &parent->addr, NULL, 0);
     }
     else {
         gnrc_rpl_dodag_t *dodag = parent->dodag;

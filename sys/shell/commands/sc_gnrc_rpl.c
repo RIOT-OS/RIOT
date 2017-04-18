@@ -171,9 +171,31 @@ int _gnrc_rpl_trickle_start(char *arg1)
     return 0;
 }
 
+int _gnrc_rpl_send_dis_w_sol_opt(char* VID, char* version, char* instance, char* dodag)
+{
+    uint8_t VID_flags = atoi(VID);
+    uint8_t version_number = atoi(version);
+    uint8_t instance_id = atoi(instance);
+
+    gnrc_rpl_internal_opt_dis_solicited_t sol;
+    sol.type = GNRC_RPL_OPT_SOLICITED_INFO;
+    sol.length = GNRC_RPL_DIS_SOLICITED_INFO_LENGTH;
+    sol.VID_flags = htons(VID_flags);
+    sol.version_number = version_number;
+    sol.instance_id = instance_id;
+
+    if (ipv6_addr_from_str(&sol.dodag_id, dodag))
+    {
+        gnrc_rpl_internal_opt_t* opt[] = {(gnrc_rpl_internal_opt_t*)&sol};
+        gnrc_rpl_send_DIS(NULL, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes, opt, 1);
+        puts("success: send a DIS with SOL option\n");
+    }
+    return 0;
+}
+
 int _gnrc_rpl_send_dis(void)
 {
-    gnrc_rpl_send_DIS(NULL, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes);
+    gnrc_rpl_send_DIS(NULL, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes, NULL, 0);
 
     puts("success: send a DIS\n");
     return 0;
@@ -372,6 +394,9 @@ int _gnrc_rpl(int argc, char **argv)
         if ((argc == 3) && (strcmp(argv[2], "dis") == 0)) {
             return _gnrc_rpl_send_dis();
         }
+        if ((argc == 7) && (strcmp(argv[2], "dis") == 0)) {
+            return _gnrc_rpl_send_dis_w_sol_opt(argv[3], argv[4], argv[5], argv[6]);
+        }
     }
     else if (strcmp(argv[1], "leaf") == 0) {
         if (argc == 3) {
@@ -423,6 +448,7 @@ int _gnrc_rpl(int argc, char **argv)
     puts("* root <inst_id> <dodag_id>\t\t- add a dodag to a new or existing instance");
     puts("* router <instance_id>\t\t\t- operate as router in the instance");
     puts("* send dis\t\t\t\t- send a multicast DIS");
+    puts("* send dis <VID_flags> <version> <instance_id> <dodag_id> - send a multicast DIS with SOL option");
 #ifndef GNRC_RPL_WITHOUT_PIO
     puts("* set pio <on/off> <instance_id>\t- (de-)activate PIO transmissions in DIOs");
 #endif
