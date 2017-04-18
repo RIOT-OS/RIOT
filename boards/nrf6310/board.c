@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_nrf6310
+ * @ingroup     boards_nrf6310
  * @{
  *
  * @file        board.c

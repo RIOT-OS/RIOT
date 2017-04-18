@@ -27,14 +27,14 @@ extern "C" {
 #endif
 
 /**
- * @brief Clock configuration
+ * @name    Clock configuration
  * @{
  */
 #define CLOCK_CORECLOCK     (48000000U)
 /** @} */
 
 /**
- * @name   Timer configuration
+ * @name    Timer configuration
  * @{
  */
 #define TIMER_NUMOF         (1U)
@@ -53,7 +53,7 @@ extern "C" {
 /* @} */
 
 /**
- * @name   UART configuration
+ * @name    UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)
@@ -78,7 +78,7 @@ extern "C" {
 /* @} */
 
 /**
- * @name   SPI configuration
+ * @name    SPI configuration
  * @{
  */
 static const spi_conf_t spi_config[] = {
@@ -98,7 +98,7 @@ static const spi_conf_t spi_config[] = {
 /* @} */
 
 /**
- * @brief PWM configuration
+ * @name    PWM configuration
  * @{
  */
 static const pwm_conf_t pwm_config[] = {

@@ -67,8 +67,8 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     addr_long.uint8[0] &= ~(0x01);
     addr_long.uint8[0] |=  (0x02);
     /* set short and long address */
-    at86rf2xx_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
-    at86rf2xx_set_addr_short(dev, NTOHS(addr_long.uint16[0].u16));
+    at86rf2xx_set_addr_long(dev, ntohll(addr_long.uint64.u64));
+    at86rf2xx_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
 
     /* set default PAN id */
     at86rf2xx_set_pan(dev, AT86RF2XX_DEFAULT_PANID);

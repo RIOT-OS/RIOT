@@ -15,12 +15,12 @@
 extern "C" {
 #endif
 
-#undef HTONS
-#undef HTONL
-#undef HTONLL
-#undef NTOHS
-#undef NTOHL
-#undef NTOHLL
+#undef htons
+#undef htonl
+#undef htonll
+#undef ntohs
+#undef ntohl
+#undef ntohll
 
 #ifdef __cplusplus
 }

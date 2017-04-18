@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set configuration parameters for the W5100 driver
+ * @name    Configuration parameters for the W5100 driver
  * @{
  */
 #ifndef W5100_PARAM_SPI
@@ -52,7 +52,6 @@ static const  w5100_params_t w5100_params[] = {
         .evt = W5100_PARAM_EVT
     },
 };
-/** @} */
 
 #ifdef __cplusplus
 }

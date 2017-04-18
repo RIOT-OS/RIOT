@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @name xtimer configuration
+ * @name    xtimer configuration
  */
 #define XTIMER_WIDTH        (16)
 #define XTIMER_BACKOFF      5

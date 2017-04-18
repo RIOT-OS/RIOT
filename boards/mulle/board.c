@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_mulle
+ * @ingroup     boards_mulle
  * @{
  *
  * @file

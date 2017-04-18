@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   LED handlers
+ * @name    LED handlers
  * @{
  */
 void _native_LED_GREEN_OFF(void);

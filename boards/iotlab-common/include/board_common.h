@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 /**
- * @name Set the default baudrate to 500K for this board
+ * @name    Set the default baudrate to 500K for this board
  * @{
  */
 #ifndef UART_STDIO_BAUDRATE
@@ -44,12 +44,18 @@ extern "C" {
 /** @} */
 
 /**
- * @name Tell the xtimer that we use a 16-bit peripheral timer
+ * @name    Xtimer configuration
+ *
+ * Tell the xtimer that we use a 16-bit peripheral timer
+ * @{
  */
-#define XTIMER_WIDTH        (16)
+#define XTIMER_WIDTH        (16U)
+#define XTIMER_OVERHEAD     (6U)
+#define XTIMER_SHOOT_EARLY  (3U)
+/** @} */
 
 /**
- * @name Define the interface to the AT86RF231 radio
+ * @brief   Define the interface to the AT86RF231 radio
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
  */
@@ -61,7 +67,7 @@ extern "C" {
                                      .reset_pin = GPIO_PIN(PORT_C, 1)}
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED0_PIN            GPIO_PIN(PORT_D, 2)
@@ -86,15 +92,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name xtimer tuning values
- * @{
- */
-#define XTIMER_OVERHEAD     6
-#define XTIMER_SHOOT_EARLY  3
-/** @} */
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
 

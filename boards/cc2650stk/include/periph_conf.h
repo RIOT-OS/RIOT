@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Clock configuration
+ * @name    Clock configuration
  * @{
  */
 /* the main clock is fixed to 48MHZ */
@@ -34,7 +34,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name   Timer configuration
+ * @name    Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -55,7 +55,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @name   UART configuration
+ * @name    UART configuration
  *
  * The used CC26x0 CPU only supports a single UART device, so all we need to
  * configure are the RX and TX pins.

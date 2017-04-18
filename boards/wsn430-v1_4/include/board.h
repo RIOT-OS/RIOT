@@ -42,11 +42,10 @@ extern "C" {
 #endif
 
 /**
- * @brief   CPU core configuration
- *
- * @todo    Move this to the periph_conf.h
+ * @name    CPU core configuration
  * @{
  */
+/** @todo   Move this to the periph_conf.h */
 #define MSP430_INITIAL_CPU_SPEED    800000uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
 #define F_RC_OSCILLATOR             32768

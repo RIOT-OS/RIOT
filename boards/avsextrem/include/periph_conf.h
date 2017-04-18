@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @name   Clock configuration
+ * @name    Clock configuration
  * @{
  */
 #define CLOCK_CORECLOCK     (72000000U)         /* this board runs with 72MHz */
@@ -35,20 +35,20 @@ extern "C" {
 /** @} */
 
 /**
- * @name   Timer configuration, select a number from 1 to 4
+ * @name    Timer configuration, select a number from 1 to 4
  * @{
  */
 #define TIMER_NUMOF         (1U)
 /** @} */
 
 /**
- * @name Real Time Clock configuration
+ * @name    Real Time Clock configuration
  */
 #define RTC_NUMOF           (1U)
 /** @} */
 
 /**
- * @name UART configuration
+ * @name    UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)
@@ -56,7 +56,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name   SPI configuration
+ * @name    SPI configuration
  * @{
  */
 #define SPI_NUMOF           (1U)

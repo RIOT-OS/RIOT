@@ -24,7 +24,6 @@
 
 #include "log.h"
 #include "saul_reg.h"
-
 #include "mma8x5x.h"
 #include "mma8x5x_params.h"
 

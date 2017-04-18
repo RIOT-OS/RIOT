@@ -111,6 +111,7 @@ WEAK_DEFAULT void isr_lcd(void);
 WEAK_DEFAULT void isr_0(void);
 WEAK_DEFAULT void isr_rng(void);
 WEAK_DEFAULT void isr_fpu(void);
+WEAK_DEFAULT void isr_crs(void);
 
 /* interrupt vector table */
 ISR_VECTORS const void *interrupt_vector[] = {
@@ -216,5 +217,8 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_lcd,
     (void*) (0UL),
     (void*) isr_rng,
-    (void*) isr_fpu
+    (void*) isr_fpu,
+#if defined(STM32L432KC)
+    (void*) isr_crs
+#endif
 };

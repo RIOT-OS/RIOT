@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @name Clock system configuration
+ * @name    Clock system configuration
  * @{
  */
 #define CLOCK_HSE           (8000000U)          /* external oscillator */
@@ -51,7 +51,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer configuration
+ * @name    Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -70,7 +70,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @name   UART configuration
+ * @name    UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -129,7 +129,7 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief   PWM configuration
+ * @name    PWM configuration
  * @{
  */
 static const pwm_conf_t pwm_config[] = {
@@ -169,7 +169,7 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
- * @name   SPI configuration
+ * @name    SPI configuration
  *
  * @note    The spi_divtable is auto-generated from
  *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
@@ -192,8 +192,6 @@ static const uint8_t spi_divtable[2][5] = {
     }
 };
 
-
-
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI1,
@@ -210,9 +208,8 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
-
 /**
- * @name I2C configuration
+ * @name    I2C configuration
  * @{
  */
 #define I2C_NUMOF           (1U)
@@ -240,21 +237,21 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name   ADC configuration
+ * @name    ADC configuration
  * @{
  */
 #define ADC_NUMOF          (0)
 /** @} */
 
 /**
- * @name   DAC configuration
+ * @name    DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)
 /** @} */
 
 /**
- * @name   RTC configuration
+ * @name    RTC configuration
  * @{
  */
 #define RTC_NUMOF           (1)
