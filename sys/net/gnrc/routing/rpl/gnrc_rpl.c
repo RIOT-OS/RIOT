@@ -84,6 +84,11 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
     gnrc_ipv6_netif_add_addr(if_pid, &ipv6_addr_all_rpl_nodes, IPV6_ADDR_BIT_LEN, 0);
 
     gnrc_rpl_send_DIS(NULL, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes);
+
+#ifdef RPL_ATTACKER
+    atk_gnrc_rpl_init();
+#endif
+
     return gnrc_rpl_pid;
 }
 
@@ -348,6 +353,64 @@ uint8_t gnrc_rpl_gen_instance_id(bool local)
     mutex_unlock(&_inst_id_mutex);
     return instance_id;
 }
+
+#ifdef RPL_ATTACKER
+
+atk_gnrc_rpl_opt_t atk_gnrc_rpl_opts;
+
+void atk_gnrc_rpl_init(void)
+{
+    atk_gnrc_rpl_opts.rank_override         = GNRC_RPL_INFINITE_RANK;
+    atk_gnrc_rpl_opts.keep_parents          = false;
+    atk_gnrc_rpl_opts.keep_dodag            = false;
+    atk_gnrc_rpl_opts.rank_atk_activated    = false;
+}
+
+void atk_gnrc_rpl_set_rank(uint16_t faked_rank)
+{
+    atk_gnrc_rpl_opts.rank_override = faked_rank;
+}
+
+void atk_gnrc_rpl_rank_parents(bool keep)
+{
+    atk_gnrc_rpl_opts.keep_parents = keep;
+}
+
+void atk_gnrc_rpl_dodag(bool keep)
+{
+    atk_gnrc_rpl_opts.keep_dodag = keep;
+}
+
+void atk_gnrc_rpl_rank_activate(bool attack)
+{
+    atk_gnrc_rpl_opts.rank_atk_activated = attack;
+}
+
+void atk_gnrc_rpl_version_increment(uint8_t instance_id)
+{
+    for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
+        if ((gnrc_rpl_instances[i].state != 0)
+             && (gnrc_rpl_instances[i].id == instance_id)) {
+                 gnrc_rpl_instances[i].dodag.version = GNRC_RPL_COUNTER_INCREMENT(gnrc_rpl_instances[i].dodag.version);
+                 return;
+        }
+    }
+}
+
+void atk_gnrc_rpl_version_increment_all(void)
+{
+    for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
+        if (gnrc_rpl_instances[i].state != 0) {
+            gnrc_rpl_instances[i].dodag.version = GNRC_RPL_COUNTER_INCREMENT(gnrc_rpl_instances[i].dodag.version);
+        }
+    }
+}
+
+void atk_gnrc_rpl_get_options(atk_gnrc_rpl_opt_t* opt)
+{
+    *opt = atk_gnrc_rpl_opts;
+}
+#endif
 
 /**
  * @}

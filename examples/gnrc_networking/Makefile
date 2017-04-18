@@ -50,6 +50,8 @@ CFLAGS += -DDEVELHELP
 # DODAG Configuration Options (see the doc for more info)
 # CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
 
+CFLAGS += -DRPL_ATTACKER
+
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
