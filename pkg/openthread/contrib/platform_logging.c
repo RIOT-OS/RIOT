@@ -22,7 +22,7 @@
 #include <sys/time.h>
 #include <time.h>
 
-#include <platform/logging.h>
+#include <openthread/platform/logging.h>
 
 /* adapted from OpenThread posix example:
  * See: https://github.com/openthread/openthread/blob/master/examples/platforms/posix/logging.c */

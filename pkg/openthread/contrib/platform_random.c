@@ -15,7 +15,7 @@
 
 #include <stdint.h>
 
-#include <platform/random.h>
+#include <openthread/platform/random.h>
 #include "random.h"
 
 #define ENABLE_DEBUG (0)

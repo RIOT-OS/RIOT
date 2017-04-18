@@ -3,10 +3,7 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include <openthread-config.h>
-#include <openthread.h>
-
-#include <platform/alarm.h>
+#include <openthread/platform/alarm.h>
 
 /**
  * diagnostics mode flag.

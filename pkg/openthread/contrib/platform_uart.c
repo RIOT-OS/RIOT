@@ -16,7 +16,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include <platform/uart.h>
+#include <openthread/platform/uart.h>
 
 /* OpenThread will call this for enabling UART (required for OpenThread's CLI)*/
 ThreadError otPlatUartEnable(void)

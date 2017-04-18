@@ -15,12 +15,12 @@
 
 #include "ot.h"
 #include "msg.h"
-#include "openthread.h"
-#include "platform/alarm.h"
-#include "platform/uart.h"
-#include <cli/cli-uart.h>
+#include "openthread/platform/alarm.h"
+#include "openthread/platform/uart.h"
+#include "openthread/cli.h"
+#include "openthread/instance.h"
+#include "openthread/tasklet.h"
 #include <assert.h>
-#include "openthread-tasklet.h"
 
 #ifdef MODULE_OPENTHREAD_NCP
 #include <ncp/ncp.h>
@@ -73,7 +73,7 @@ void *_openthread_event_loop(void *arg)
     diagInit(sInstance);
 #endif
     while (1) {
-        otProcessQueuedTasklets(sInstance);
+        otTaskletsProcess(sInstance);
         msg_receive(&msg);
         switch (msg.type) {
             case OPENTHREAD_XTIMER_MSG_TYPE_EVENT:

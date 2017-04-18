@@ -29,15 +29,13 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#include "platform/alarm.h"
-#include "platform/uart.h"
+#include "openthread/platform/alarm.h"
+#include "openthread/platform/uart.h"
 
 
-#include <cli/cli-uart.h>
 #include "xtimer.h"
 #include "random.h"
 
-#include "openthread.h"
 #include "mutex.h"
 #include "ot.h"
 
@@ -67,6 +65,11 @@ static char ot_thread_stack[2 * THREAD_STACKSIZE_MAIN];
 
 static mutex_t mtx = MUTEX_INIT;
 
+
+void otTaskletsSignalPending(otInstance *aInstance)
+{
+        (void)aInstance;
+}
 
 void otPlatReset(otInstance *aInstance)
 {

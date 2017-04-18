@@ -1,5 +1,5 @@
 INCLUDES += -I$(RIOTBASE)/pkg/openthread/include \
-			-I$(BINDIRBASE)/pkg/$(BOARD)/openthread/include \
+			-I$(BINDIRBASE)/pkg/$(BOARD)/openthread/output/include \
 
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))

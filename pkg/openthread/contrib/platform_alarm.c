@@ -18,7 +18,7 @@
 #include "msg.h"
 #include "thread.h"
 
-#include <platform/alarm.h>
+#include <openthread/platform/alarm.h>
 #include "ot.h"
 
 #define ENABLE_DEBUG (0)

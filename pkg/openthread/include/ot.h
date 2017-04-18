@@ -33,7 +33,7 @@ extern "C" {
 #include "net/ethernet.h"
 #include "net/gnrc/netdev.h"
 #include "thread.h"
-#include "openthread-types.h"
+#include "openthread/types.h"
 
 #define OPENTHREAD_XTIMER_MSG_TYPE_EVENT (0x2235)   /**< xtimer message receiver event*/
 #define OPENTHREAD_NETDEV_MSG_TYPE_EVENT (0x2236)  /**< message received from driver */

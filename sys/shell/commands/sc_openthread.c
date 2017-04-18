@@ -16,7 +16,7 @@
  * @author      José Ignacio Alamos <jialamos@uc.cl>
  */
 
-#include <openthread.h>
+#include <openthread/openthread.h>
 #include <stdio.h>
 #include "byteorder.h"
 #include "net/ipv6/addr.h"

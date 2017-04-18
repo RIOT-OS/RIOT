@@ -15,7 +15,7 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include <platform/radio.h>
+#include <openthread/platform/radio.h>
 #include "ot.h"
 
 #define ENABLE_DEBUG (1)

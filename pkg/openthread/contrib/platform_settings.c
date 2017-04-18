@@ -16,11 +16,11 @@
  * @author      José Ignacio Alamos <jialamos@uc.cl>
  */
 
-#include "openthread.h"
 #include "assert.h"
 
 #define ENABLE_DEBUG (1)
 #include "debug.h"
+#include "openthread/types.h"
 
 // settings API
 void otPlatSettingsInit(otInstance *aInstance)
