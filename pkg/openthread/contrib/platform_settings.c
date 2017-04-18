@@ -1,5 +1,5 @@
 /*
- * Copyright (C) Fundación Inria Chile 2017
+ * Copyright (C) 2017 Fundación Inria Chile
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,10 @@
  */
 
 /**
- * @ingroup     sys_shell_commands
  * @{
  *
  * @file
- * @brief       Shell commands for interacting with OpenThread
- *
- * @author      José Ignacio Alamos <jialamos@uc.cl>
+ * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
 
 #include "assert.h"
@@ -22,7 +19,6 @@
 #include "debug.h"
 #include "openthread/types.h"
 
-// settings API
 void otPlatSettingsInit(otInstance *aInstance)
 {
 }
