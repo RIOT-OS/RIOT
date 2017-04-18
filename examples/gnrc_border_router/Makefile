@@ -39,6 +39,7 @@ USEMODULE += gnrc_sixlowpan_border_router_default
 USEMODULE += fib
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
+USEMODULE += gnrc_rpl
 # Add also the shell, some shell commands
 USEMODULE += shell
 USEMODULE += shell_commands
