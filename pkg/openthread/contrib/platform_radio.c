@@ -221,7 +221,7 @@ void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event)
 void otPlatRadioSetPanId(otInstance *aInstance, uint16_t panid)
 {
     DEBUG("openthread: otPlatRadioSetPanId: setting PAN ID to %04x\n", panid);
-    set_panid(((panid & 0xff) << 8) | ((panid >> 8) & 0xff));
+    set_panid(panid);
 }
 
 /* OpenThread will call this for setting extended address */
