@@ -128,10 +128,6 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev)
     int len = dev->driver->recv(dev, NULL, 0, &rx_info);
     Rssi = rx_info.rssi;
 
-    /* Since OpenThread does the synchronization of rx/tx, it's necessary to turn off the receiver now */
-    _set_idle();
-
-
     /* very unlikely */
     if ((len > (unsigned) UINT16_MAX)) {
         otPlatRadioReceiveDone(aInstance, NULL, kThreadError_Abort);
