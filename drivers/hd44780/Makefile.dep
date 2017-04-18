@@ -1,0 +1,4 @@
+ifneq (,$(filter hd44780,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_gpio
+    USEMODULE += xtimer
+endif

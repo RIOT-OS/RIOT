@@ -8,6 +8,9 @@ OLD_USEPKG := $(sort $(USEPKG))
 # pull dependencies from drivers
 include $(RIOTBASE)/drivers/Makefile.dep
 
+# pull dependencies from drivers
+-include $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.dep)
+
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += xtimer

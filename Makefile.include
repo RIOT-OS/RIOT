@@ -328,6 +328,13 @@ ifneq (, $(filter clean, $(MAKECMDGOALS)))
 endif
 
 # include Makefile.includes for packages in $(USEPKG)
+$(RIOTBASE)/drivers/%/Makefile.include::
+	$(Q)"$(MAKE)" -C $(RIOTBASE)/drivers/$* Makefile.include
+
+.PHONY: $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.include)
+-include $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.include)
+
+# include Makefile.includes for packages in $(USEPKG)
 $(RIOTPKG)/%/Makefile.include::
 	$(Q)"$(MAKE)" -C $(RIOTPKG)/$* Makefile.include
 

@@ -129,11 +129,6 @@ ifneq (,$(filter kw2xrf,$(USEMODULE)))
     endif
 endif
 
-ifneq (,$(filter hd44780,$(USEMODULE)))
-    FEATURES_REQUIRED += periph_gpio
-    USEMODULE += xtimer
-endif
-
 ifneq (,$(filter lis3dh,$(USEMODULE)))
     FEATURES_REQUIRED += periph_gpio
     FEATURES_REQUIRED += periph_spi
