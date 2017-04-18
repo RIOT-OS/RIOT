@@ -37,15 +37,6 @@ static int8_t Rssi;
 
 static netdev_t *_dev;
 
-/* asks the driver the current 15.4 channel */
-uint16_t get_channel(void)
-{
-    uint16_t channel;
-
-    _dev->driver->get(_dev, NETOPT_CHANNEL, &channel, sizeof(uint16_t));
-    return channel;
-}
-
 /* set 15.4 channel */
 int set_channel(uint16_t channel)
 {
@@ -115,40 +106,16 @@ void set_state(netopt_state_t state)
     _dev->driver->set(_dev, NETOPT_STATE, &state, sizeof(netopt_state_t));
 }
 
-/* checks if the device is off */
-bool is_off(void)
-{
-    return get_state() == NETOPT_STATE_OFF;
-}
-
-/* sets device state to OFF */
-void ot_off(void)
-{
-    set_state(NETOPT_STATE_OFF);
-}
-
 /* sets device state to SLEEP */
 void ot_sleep(void)
 {
     set_state(NETOPT_STATE_SLEEP);
 }
 
-/* check if device state is IDLE */
-bool is_idle(void)
-{
-    return get_state() == NETOPT_STATE_IDLE;
-}
-
 /* set device state to IDLE */
 void ot_idle(void)
 {
     set_state(NETOPT_STATE_IDLE);
-}
-
-/* check if device is receiving a packet */
-bool is_rx(void)
-{
-    return get_state() == NETOPT_STATE_RX;
 }
 
 /* init framebuffers and initial state */
@@ -301,26 +268,6 @@ ThreadError otPlatRadioSleep(otInstance *aInstance)
     ot_sleep();
     return kThreadError_None;
 }
-
-#if 0
-/* OpenThread will call this for setting the device state to IDLE */
-ThreadError otPlatRadioIdle(otInstance *aInstance)
-{
-    DEBUG("openthread: otPlatRadioIdle\n");
-
-    if (is_rx() || is_off()) {
-        DEBUG("openthread: OtPlatRadioIdle: Busy\n");
-        return kThreadError_Busy;
-    }
-
-    /* OpenThread will call this before calling otPlatRadioTransmit.
-     * If a packet is received between this function and otPlatRadioTransmit OpenThread will fail! */
-    disable_rx();
-    ot_idle();
-
-    return kThreadError_None;
-}
-#endif
 
 /*OpenThread will call this for waiting the reception of a packet */
 
