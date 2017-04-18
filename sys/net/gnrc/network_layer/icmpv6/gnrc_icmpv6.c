@@ -140,16 +140,14 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
     }
 }
 
-gnrc_pktsnip_t *gnrc_icmpv6_build(gnrc_pktsnip_t *next, uint8_t type, uint8_t code,
-                                  size_t size)
+gnrc_pktsnip_t *gnrc_icmpv6_build(gnrc_pktsnip_t *next, uint8_t type,
+                                  uint8_t code, size_t size)
 {
     gnrc_pktsnip_t *pkt;
     icmpv6_hdr_t *icmpv6;
 
-    pkt = gnrc_pktbuf_add(next, NULL, size, GNRC_NETTYPE_ICMPV6);
-
-    if (pkt == NULL) {
-        DEBUG("icmpv6_echo: no space left in packet buffer\n");
+    if ((pkt = gnrc_pktbuf_add(next, NULL, size, GNRC_NETTYPE_ICMPV6)) == NULL) {
+        DEBUG("icmpv6: no space left in packet buffer\n");
         return NULL;
     }
 
