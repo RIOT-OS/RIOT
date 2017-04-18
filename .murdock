@@ -106,7 +106,7 @@ static_tests() {
         exit 1
     fi
 
-    BUILDTEST_MCU_GROUP=static-tests ./dist/tools/ci/build_and_test.sh
+    BUILDTEST_MCU_GROUP=static-tests JSON_OUTPUT=1 ./dist/tools/ci/build_and_test.sh
 }
 
 get_jobs() {

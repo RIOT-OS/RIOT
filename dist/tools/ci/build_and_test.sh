@@ -8,16 +8,23 @@
 #
 
 CI_BASE_BRANCH=${CI_BASE_BRANCH:-master}
+if [ -z "${JSON_OUTPUT}" ]; then
+    export JSON_OUTPUT=0
+fi
 
 function print_result {
-    local RED="\033[0;31m"
-    local GREEN="\033[0;32m"
-    local NO_COLOUR="\033[0m"
-
-    if (( "$1" == 0 )); then
-        echo -e "${GREEN}✓$NO_COLOUR"
+    if [ ${JSON_OUTPUT} -ne 0 ]; then
+        echo -en "\"status\":$1,"
     else
-        echo -e "${RED}x$NO_COLOUR"
+        local RED="\033[0;31m"
+        local GREEN="\033[0;32m"
+        local NO_COLOUR="\033[0m"
+
+        if (( "$1" == 0 )); then
+            echo -e "${GREEN}✓$NO_COLOUR"
+        else
+            echo -e "${RED}x$NO_COLOUR"
+        fi
     fi
 }
 
@@ -32,7 +39,11 @@ set_result() {
 }
 
 function run {
-    echo -n "Running '$@' "
+    if [ ${JSON_OUTPUT} -ne 0 ]; then
+        echo -ne "{\"command\":\"$@\","
+    else
+        echo -n "Running '$@' "
+    fi
     OUT=$($@ 2>&1)
     NEW_RESULT=$?
 
@@ -41,11 +52,24 @@ function run {
 
     # Indent command output so that its easily discernable from the rest
     if [ -n "$OUT" ]; then
-        echo "Command output:"
-        echo ""
-        # Using printf to avoid problems if the command output begins with a -
-        (printf "%s\n" "$OUT" | while IFS= read -r line; do printf "\t%s\n" "$line"; done)
-        echo ""
+        if [ ${JSON_OUTPUT} -ne 0 ]; then
+            echo -ne '"output":"'
+            # Using printf to avoid problems if the command output begins with a -
+            (printf "%s\n" "$OUT" | while IFS= read -r line; do printf '%s\\n' "$line" | sed 's/"/\\"/g'; done)
+            echo -ne '"'
+        else
+            echo "Command output:"
+            echo ""
+            # Using printf to avoid problems if the command output begins with a -
+            (printf "%s\n" "$OUT" | while IFS= read -r line; do printf "\t%s\n" "$line"; done)
+            echo ""
+        fi
+    else if [ ${JSON_OUTPUT} -ne 0 ]; then
+        echo -ne '"output":""'
+    fi
+    fi
+    if [ ${JSON_OUTPUT} -ne 0 ]; then
+        echo -ne "}"
     fi
 }
 
@@ -58,9 +82,8 @@ then
         RECALL="$1"
 
         if [ "$RECALL" != "recall" ]; then
-            if git diff ${CI_BASE_BRANCH} HEAD -- "$0" &> /dev/null; then
-                git rebase ${CI_BASE_BRANCH} || git rebase --abort
-
+            if git diff ${CI_BASE_BRANCH} HEAD -- "$0" &> /dev/null 2>&1; then
+                git rebase ${CI_BASE_BRANCH} > /dev/null || git rebase --abort > /dev/null 2>&1
                 "$0" "recall"
                 exit $?
             fi
@@ -68,7 +91,7 @@ then
 
         trap "RESULT=1" ERR
 
-        git rebase ${CI_BASE_BRANCH}
+        git rebase ${CI_BASE_BRANCH} > /dev/null 2>&1
         if (( $? != 0 )); then
             git rebase --abort > /dev/null 2>&1
             echo "Rebase failed, aborting..."
@@ -79,21 +102,31 @@ then
             exit $RESULT
         fi
 
+        [ ${JSON_OUTPUT} -ne 0 ] && echo -ne "["
         run ./dist/tools/ci/print_toolchain_versions.sh
+        [ ${JSON_OUTPUT} -ne 0 ] && echo -ne ","
 
         run ./dist/tools/whitespacecheck/check.sh ${CI_BASE_BRANCH}
+        [ ${JSON_OUTPUT} -ne 0 ] && echo -ne ","
         run ./dist/tools/licenses/check.sh ${CI_BASE_BRANCH} --diff-filter=MR --error-exitcode=0
+        [ ${JSON_OUTPUT} -ne 0 ] && echo -ne ","
         run ./dist/tools/licenses/check.sh ${CI_BASE_BRANCH} --diff-filter=AC
+        [ ${JSON_OUTPUT} -ne 0 ] && echo -ne ","
         run ./dist/tools/doccheck/check.sh ${CI_BASE_BRANCH}
+        [ ${JSON_OUTPUT} -ne 0 ] && echo -ne ","
         run ./dist/tools/externc/check.sh ${CI_BASE_BRANCH}
+        [ ${JSON_OUTPUT} -ne 0 ] && echo -ne ","
 
         # TODO:
         #   Remove all but `${CI_BASE_BRANCH}` parameters to cppcheck (and remove second
         #   invocation) once all warnings of cppcheck have been taken care of
         #   in ${CI_BASE_BRANCH}.
         run ./dist/tools/cppcheck/check.sh ${CI_BASE_BRANCH} --diff-filter=MR --error-exitcode=0
+        [ ${JSON_OUTPUT} -ne 0 ] && echo -ne ","
         run ./dist/tools/cppcheck/check.sh ${CI_BASE_BRANCH} --diff-filter=AC
+        [ ${JSON_OUTPUT} -ne 0 ] && echo -ne ","
         run ./dist/tools/pr_check/pr_check.sh ${CI_BASE_BRANCH}
+        [ ${JSON_OUTPUT} -ne 0 ] && echo "]"
         exit $RESULT
     fi
 
