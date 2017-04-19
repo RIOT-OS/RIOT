@@ -128,7 +128,7 @@ static inline size_t gnrc_pkt_len(gnrc_pktsnip_t *pkt)
 {
     size_t len = 0;
 
-    while (pkt) {
+    while (pkt != NULL) {
         len += pkt->size;
         pkt = pkt->next;
     }
@@ -148,7 +148,7 @@ static inline size_t gnrc_pkt_len_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type)
 {
     size_t len = 0;
 
-    while (pkt) {
+    while (pkt != NULL) {
         len += pkt->size;
 
         if (pkt->type == type) {
@@ -172,7 +172,7 @@ static inline size_t gnrc_pkt_count(const gnrc_pktsnip_t *pkt)
 {
     size_t count = 0;
 
-    while (pkt) {
+    while (pkt != NULL) {
         ++count;
         pkt = pkt->next;
     }
