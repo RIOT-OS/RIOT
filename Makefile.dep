@@ -396,6 +396,10 @@ ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter posix_netdb,$(USEMODULE)))
+  USEMODULE += sock_dns
+endif
+
 ifneq (,$(filter lwip_sixlowpan,$(USEMODULE)))
   USEMODULE += lwip_ipv6_autoconfig
 endif
