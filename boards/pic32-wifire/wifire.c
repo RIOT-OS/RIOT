@@ -23,7 +23,7 @@ void board_init(void)
      * Setup pin mux for UART4 this is the one connected
      * to the ftdi chip (usb<->uart)
      */
-    U4RXREG = 0xb;            /* connect pin RPF2 to UART 4 RX */
+    U4RXR =   0xb;            /* connect pin RPF2 to UART 4 RX */
     RPF8R =   0x2;            /* connect pin RPF8 to UART 4 TX */
 
     /* intialise UART used for debug (printf) */
