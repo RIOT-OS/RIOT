@@ -96,7 +96,7 @@ ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr)
                 continue;
             }
 
-            if (i > sizeof(ipv6_addr_t)) {
+            if ((i + sizeof(uint16_t)) > sizeof(ipv6_addr_t)) {
                 return NULL;
             }
 
@@ -108,7 +108,7 @@ ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr)
         }
 
 #ifdef MODULE_IPV4_ADDR
-        if (ch == '.' && (i <= sizeof(ipv6_addr_t)) &&
+        if (ch == '.' && ((i + sizeof(ipv4_addr_t)) <= sizeof(ipv6_addr_t)) &&
             ipv4_addr_from_str((ipv4_addr_t *)(&(result->u8[i])),
                                curtok) != NULL) {
             i += sizeof(ipv4_addr_t);
