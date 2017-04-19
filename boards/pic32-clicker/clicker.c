@@ -22,7 +22,7 @@ void board_init(void)
      * Setup pin mux for UART3 this is the one connected
      * to the mickroBUS
      */
-    U3RXREG =  0x2;          /*connect pin RPF5 to UART3 RX*/
+    U3RXR =    0x2;          /*connect pin RPF5 to UART3 RX*/
     RPF4R =    0x1;          /*connect pin RPF4 to UART3 TX*/
 
     /* intialise UART used for debug (printf) */
