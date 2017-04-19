@@ -57,6 +57,8 @@ void rtt_init(void)
     RTT_UNLOCK();
     /* Reset RTC */
     rtt->CR = RTC_CR_SWR_MASK;
+    /* cppcheck-suppress redundantAssignment
+     * reset routine */
     rtt->CR = 0;
 
     if (rtt->SR & RTC_SR_TIF_MASK) {

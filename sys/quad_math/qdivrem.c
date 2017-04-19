@@ -78,6 +78,8 @@ __qdivrem(u_quad_t uq, u_quad_t vq, u_quad_t *arq)
         /* divide by zero. */
         static volatile const unsigned int zero = 0;
 
+        /* cppcheck-suppress zerodiv
+         * Divission by zero is on purpose here */
         tmp.ul[H] = tmp.ul[L] = 1 / zero;
 
         if (arq) {

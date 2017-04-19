@@ -118,7 +118,6 @@ stamptime(void)
     long secs, msecs;
     struct timeval tv;
     time_t t;
-    char timec[20];
 
     gettimeofday(&tv, NULL) ;
     msecs = tv.tv_usec / 1000;
@@ -136,6 +135,7 @@ stamptime(void)
         fprintf(stderr, "%04li.%03li ", secs, msecs);
     }
     else {
+        char timec[20];
         startsecs = secs;
         startmsecs = msecs;
         t = time(NULL);
@@ -190,6 +190,8 @@ serial_to_tun(FILE *inslip, int outfd)
         unsigned char inbuf[2000];
     } uip;
     static unsigned int inbufptr = 0;
+    /* cppcheck-suppress variableScope
+     * rationale: cannot be reduced if built on linux */
     int ret;
     unsigned char c;
 
@@ -209,7 +211,7 @@ serial_to_tun(FILE *inslip, int outfd)
                 stamptime();
             }
 
-            fprintf(stderr, "*** dropping large %d byte packet\n", inbufptr);
+            fprintf(stderr, "*** dropping large %u byte packet\n", inbufptr);
             inbufptr = 0;
         }
 
@@ -324,7 +326,7 @@ serial_to_tun(FILE *inslip, int outfd)
                                 stamptime();
                             }
 
-                            printf("Packet from SLIP of length %d - write TUN\n", inbufptr);
+                            printf("Packet from SLIP of length %u - write TUN\n", inbufptr);
 
                             if (verbose > 4) {
 #if WIRESHARK_IMPORT_FORMAT
@@ -648,6 +650,8 @@ devopen(const char *dev, int flags)
 {
     char t[1024];
     strcpy(t, "/dev/");
+    /* cppcheck-suppress bufferAccessOutOfBounds
+     * reason: seems to be a cppcheck bug */
     strncat(t, dev, sizeof(t) - 5);
     return open(t, flags);
 }
@@ -868,10 +872,6 @@ ifconf(const char *tundev, const char *ipaddr)
 
         if (prefix != NULL) {
             *prefix = '\0';
-            prefix++;
-        }
-        else {
-            prefix = "64";
         }
 
         if (timestamp) {

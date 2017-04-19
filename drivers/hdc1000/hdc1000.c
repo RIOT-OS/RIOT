@@ -96,7 +96,6 @@ void hdc1000_get_results(hdc1000_t *dev, int16_t *temp, int16_t *hum)
     assert(dev);
 
     uint8_t buf[4];
-    uint16_t traw, hraw;
 
     /* first we read the RAW results from the device */
     i2c_acquire(dev->p.i2c);
@@ -105,11 +104,11 @@ void hdc1000_get_results(hdc1000_t *dev, int16_t *temp, int16_t *hum)
 
     /* and finally we convert the values to their physical representation */
     if (temp) {
-        traw = ((uint16_t)buf[0] << 8) | buf[1];
+        uint16_t traw = ((uint16_t)buf[0] << 8) | buf[1];
         *temp = (int16_t)((((int32_t)traw * 16500) >> 16) - 4000);
     }
     if (hum) {
-        hraw = ((uint16_t)buf[2] << 8) | buf[3];
+        uint16_t hraw = ((uint16_t)buf[2] << 8) | buf[3];
         *hum  = (int16_t)(((int32_t)hraw * 10000) >> 16);
     }
 }

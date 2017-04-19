@@ -40,7 +40,7 @@ void tests_crypto(void);
  */
 Test *tests_crypto_chacha_tests(void);
 
-static inline int compare(uint8_t a[16], uint8_t b[16], uint8_t len)
+static inline int compare(uint8_t *a, uint8_t *b, uint8_t len)
 {
     int result = 1;
 
