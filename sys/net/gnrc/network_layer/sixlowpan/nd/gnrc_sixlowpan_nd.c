@@ -128,7 +128,7 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
     kernel_pid_t fib_iface;
     ipv6_addr_t next_hop_actual;    /* FIB copies address into this variable */
     /* don't look-up link local addresses in FIB */
-    if ((next_hop == NULL) && !ipv6_addr_is_link_local(dst)) {
+    if (!ipv6_addr_is_link_local(dst)) {
         size_t next_hop_size = sizeof(ipv6_addr_t);
         uint32_t next_hop_flags = 0;
         if ((next_hop == NULL) &&
@@ -142,6 +142,8 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
     /* next hop determination: https://tools.ietf.org/html/rfc6775#section-6.5.4 */
+    /* cppcheck-suppress redundantAssignment
+     * This path is only present for a certain configuration */
     nc_entry = gnrc_ipv6_nc_get(iface, dst);
 #ifdef MODULE_FIB
     if ((next_hop != NULL) && (nc_entry == NULL)) {
@@ -161,6 +163,8 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
     }
 #endif
     /* next hop determination according to: https://tools.ietf.org/html/rfc6775#section-5.6 */
+    /* cppcheck-suppress knownConditionTrueFalse
+     * cppcheck bug: next_hop might be set before */
     if ((next_hop == NULL) && ipv6_addr_is_link_local(dst)) {   /* prefix is "on-link" */
         /* multicast is not handled here anyway so we don't need to check that */
         next_hop = dst;
@@ -175,6 +179,8 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
     }
 
     /* address resolution of next_hop: https://tools.ietf.org/html/rfc6775#section-5.7 */
+    /* cppcheck-suppress knownConditionTrueFalse
+     * cppcheck bug: nc_entry might be set before */
     if ((nc_entry == NULL) || (next_hop != dst)) {
         /* get if not gotten from previous check */
         nc_entry = gnrc_ipv6_nc_get(iface, next_hop);

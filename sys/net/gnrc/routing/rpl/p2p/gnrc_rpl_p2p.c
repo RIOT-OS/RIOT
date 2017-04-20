@@ -48,9 +48,8 @@ const uint8_t gnrc_rpl_p2p_lifetime_lookup[4] = { 1, 4, 16, 64 };
 
 void gnrc_rpl_p2p_update(void)
 {
-    gnrc_rpl_p2p_ext_t *p2p_ext;
     for (uint8_t i = 0; i < GNRC_RPL_P2P_EXTS_NUMOF; ++i) {
-        p2p_ext = &gnrc_rpl_p2p_exts[i];
+        gnrc_rpl_p2p_ext_t *p2p_ext = &gnrc_rpl_p2p_exts[i];
         if ((p2p_ext->state) && (p2p_ext->lifetime_sec > 0)) {
             p2p_ext->lifetime_sec -= GNRC_RPL_LIFETIME_UPDATE_STEP;
             if (p2p_ext->lifetime_sec <= 0) {

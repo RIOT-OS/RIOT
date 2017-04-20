@@ -1,3 +1,9 @@
+/*
+ * NXP Kinetis CPU with the following memory layout:
+ * 512 kB flash @ 0x00000000
+ * 128 kB RAM, split into two banks: 64 kB SRAM_L, 64 kB SRAM_U.
+ * SRAM_L ends at 0x1fffffff, SRAM_U begins at 0x20000000
+ */
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 

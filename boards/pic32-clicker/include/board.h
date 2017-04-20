@@ -28,6 +28,8 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include "periph_conf.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

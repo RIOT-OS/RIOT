@@ -17,7 +17,7 @@ endif
 # The linker script needs to know the flash and RAM sizes of the device.
 
 ifeq ($(CPU_MODEL),)
-  CPU_MODEL = K60DN512VLL10
+  CPU_MODEL = mk60dn512vll10
 endif
 
 export CPU_MODEL
