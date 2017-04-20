@@ -31,6 +31,7 @@
 
 #include <errno.h>
 #include "random.h"
+#include <string.h>
 
 #define OPENTHREAD_QUEUE_LEN      (8)
 static msg_t _queue[OPENTHREAD_QUEUE_LEN];
@@ -72,6 +73,8 @@ void *_openthread_event_loop(void *arg)
 #if OPENTHREAD_ENABLE_DIAG
     diagInit(sInstance);
 #endif
+
+    uint8_t *buf;
     while (1) {
         otTaskletsProcess(sInstance);
         msg_receive(&msg);
@@ -90,8 +93,9 @@ void *_openthread_event_loop(void *arg)
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
             case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
                 /* Tell OpenThread about the receotion of a CLI command */
+                buf = (uint8_t*) msg.content.ptr;
                 begin_mutex();
-                otPlatUartReceived((uint8_t *) msg.content.ptr, 1);
+                otPlatUartReceived(buf, strlen((char*) buf));
                 end_mutex();
                 break;
 #endif

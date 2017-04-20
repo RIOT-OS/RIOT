@@ -80,15 +80,23 @@ void otPlatReset(otInstance *aInstance)
 /* init and run OpeanThread's UART simulation (sdtio) */
 void openthread_uart_run(void)
 {
+    char buf[256];
+    uint8_t index=0;
     char c;
     msg_t msg;
 
     msg.type = OPENTHREAD_SERIAL_MSG_TYPE_EVENT;
-    msg.content.ptr = &c;
+    msg.content.ptr = buf;
 
     while (1) {
-        c = getchar();
-        msg_send(&msg, openthread_get_pid());
+        c=getchar();
+        buf[index++]=c;
+        if(c == 0x0a)
+        {
+            buf[index] = 0;
+            index=0;
+            msg_send(&msg, openthread_get_pid());
+        }
     }
 }
 #endif
