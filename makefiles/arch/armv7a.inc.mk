@@ -55,7 +55,7 @@ endif
 ifneq (,$(filter fib,$(USEMODULE)))
 export CFLAGS += -DFIB_DEVEL_HELPER
 endif
- 
+
 # Explicitly tell the linker to link the startup code.
 #   Without this the interrupt vectors will not be linked correctly!
 ifeq ($(COMMON_STARTUP),)

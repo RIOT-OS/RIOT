@@ -39,8 +39,7 @@ extern "C" {
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
 
-typedef uint8_t gpio_t;
-
+typedef uint8_t gpio_t; /**< GPIO type */
 
 #ifdef __cplusplus
 }
