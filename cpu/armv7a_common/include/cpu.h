@@ -6,27 +6,6 @@
  * directory for more details.
  */
 
-/**
- * @defgroup    cpu_cortexm_common ARM Cortex-M common
- * @ingroup     cpu
- * @brief       Common implementations and headers for Cortex-M family based
- *              micro-controllers
- * @{
- *
- * @file
- * @brief       Basic definitions for the Cortex-M common module
- *
- * When ever you want to do something hardware related, that is accessing MCUs
- * registers, just include this file. It will then make sure that the MCU
- * specific headers are included.
- *
- * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
- *
- * @todo        remove include irq.h once core was adjusted
- */
-
 #ifndef CPU_H
 #define CPU_H
 
@@ -51,18 +30,10 @@ static inline void cpu_print_last_instruction(void)
     printf("%p\n", (void*) lr_ptr);
 }
 
-/**
- * @brief Interrupt stack canary value
- *
- * @note 0xe7fe is the ARM Thumb machine code equivalent of asm("bl #-2\n") or
- * 'while (1);', i.e. an infinite loop.
- * @internal
- */
 #define STACK_CANARY_WORD   (0xE7FEE7FEu)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* CPU_H */
-/** @} */
+#endif

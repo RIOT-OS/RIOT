@@ -1,13 +1,16 @@
-//------------------------------------------------------------------------------
-//
-//  Copyright (C) 2017
-//
-//  Module      : TIMER
-//  File        : s5p4418_timer.c
-//  Description : S5P4418 TIMER FUNCTIONS
-//  Author      : Dang Minh Phuong (kamejoko80@yahoo.com)
-//  History     :
-//------------------------------------------------------------------------------
+/*
+ * Copyright (C) 2017 PDTECTH Co., LTD
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
+ * Module      : TIMER
+ * File        : s5p4418_timer.c
+ * Description : S5P4418 TIMER FUNCTIONS
+ * Author      : Phuong Dang <kamejoko80@yahoo.com>
+ * History     :
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -200,8 +203,8 @@ uint32_t s5p4418_timer_get_tick(uint8_t ch)
     }
 
     /* Stop timer */
-    TIMER->TCON &= ~(1 << start_stop_pos[ch]);	
-    
+    TIMER->TCON &= ~(1 << start_stop_pos[ch]);
+
     switch (ch)
     {
         case 0:
@@ -228,7 +231,7 @@ uint32_t s5p4418_timer_get_tick(uint8_t ch)
     /* Start timer */
     TIMER->TCON |= (1 << start_stop_pos[ch]);
 
-    return ret;	
+    return ret;
 }
 
 /**
@@ -375,5 +378,3 @@ void s5p4418_timer_unregister_irq(uint8_t ch)
     /* Unregister VIC */
     s5p4418_irq_unregister(irq);
 }
-
-

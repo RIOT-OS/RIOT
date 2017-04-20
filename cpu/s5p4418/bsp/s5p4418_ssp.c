@@ -1,13 +1,16 @@
-//------------------------------------------------------------------------------
-//
-//  Copyright (C) 2017
-//
-//  Module      : TIMER
-//  File        : s5p4418_ssp.c
-//  Description : S5P4418 SPI/SSP FUNCTIONS
-//  Author      : Dang Minh Phuong (kamejoko80@yahoo.com)
-//  History     :
-//------------------------------------------------------------------------------
+/*
+ * Copyright (C) 2017 PDTECTH Co., LTD
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
+ *  Module      : SSP
+ *  File        : s5p4418_ssp.c
+ *  Description : S5P4418 SPI/SSP FUNCTIONS
+ *  Author      : Phuong Dang <kamejoko80@yahoo.com>
+ *  History     :
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -58,7 +61,7 @@ void s5p4418_ssp_ncs_out(ssp_channel_t ch, bool val)
 /**
  *  @brief      Configure SSP CS pins function
  *  @param[in]  ssp_channel_t SSP channel
- *              uint8_t       GPIO number 
+ *              uint8_t       GPIO number
  *  @return     None
  */
 void s5p4418_ssp_cs_config(uint8_t gpio)
@@ -117,7 +120,7 @@ void s5p4418_ssp_gpio_config(ssp_channel_t ch)
 bool s5p4418_ssp_set_lock_rate(ssp_channel_t ch, uint32_t clock_freq)
 {
     ssp_typedef *SSPx;
-    char name[10] = {0};
+    char name[64] = {0};
     struct clk *clk = NULL;
     uint32_t CPSDVR, n;
 

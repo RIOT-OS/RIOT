@@ -71,6 +71,9 @@ endif
 ARM7_BOARDS := msba2 avrextrem
 DISABLE_TEST_FOR_ARM7 := tests-relic tests-cpp_%
 
+ARMV7A_BOARDS := jellyfish
+DISABLE_TEST_FOR_ARMV7A := tests-relic tests-cpp_%
+
 ARM_CORTEX_M_BOARDS := airfy-beacon \
                        arduino-due \
                        arduino-zero \
@@ -137,6 +140,10 @@ DISABLE_TEST_FOR_MSP430 := tests-relic tests-spiffs tests-cpp_%
 
 ifneq (, $(filter $(ARM7_BOARDS), $(BOARD)))
 UNIT_TESTS := $(filter-out $(DISABLE_TEST_FOR_ARM7), $(UNIT_TESTS))
+endif
+
+ifneq (, $(filter $(ARMV7A_BOARDS), $(BOARD)))
+UNIT_TESTS := $(filter-out $(DISABLE_TEST_FOR_ARMV7A), $(UNIT_TESTS))
 endif
 
 ifneq (, $(filter $(ARM_CORTEX_M_BOARDS), $(BOARD)))

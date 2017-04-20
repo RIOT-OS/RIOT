@@ -35,7 +35,7 @@ extern void kernel_init(void);
 void board_init(void)
 {
     /* Initialize peripherals */
-    s5p4418_clk_init();	
+    s5p4418_clk_init();
     s5p4418_irq_init();
     s5p4418_timer_init();
     uart_stdio_init();

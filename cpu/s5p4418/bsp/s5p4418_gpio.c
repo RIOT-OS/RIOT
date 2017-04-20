@@ -1,13 +1,16 @@
-//------------------------------------------------------------------------------
-//
-//  Copyright (C) 2017
-//
-//  Module      : IRQ
-//  File        : s5p4418_gpio.c
-//  Description : S5P4418 GPIO
-//  Author      : Dang Minh Phuong (kamejoko80@yahoo.com)
-//  History     :
-//------------------------------------------------------------------------------
+/*
+ * Copyright (C) 2017 PDTECTH Co., LTD
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
+ *  Module      : IRQ
+ *  File        : s5p4418_gpio.c
+ *  Description : S5P4418 GPIO
+ *  Author      : Phuong Dang <kamejoko80@yahoo.com>
+ *  History     :
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -733,4 +736,3 @@ void s5p4418_gpio_irq_disable(uint8_t gpio)
     PORTx->GPIOxINTENB &= ~(1 << pin);
     PORTx->GPIOxDETENB &= ~(1 << pin);
 }
-

@@ -1,7 +1,12 @@
+/*
+ * Copyright (C) 2017 PDTECTH Co., LTD
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /*-----------------------------------------------------------------------------*/
-/*                                                                             */
-/*  Copyright (C) 2017                                                         */
-/*                                                                             */
 /*  Module      : armv7a_common                                                */
 /*  File        : armv7a.ld                                                    */
 /*  Description : armv7a common linker script                                  */
@@ -136,7 +141,7 @@ SECTIONS
         _eheap = .;
         HeapLimit = .;
     } > RAM
- 
+
     .stack (NOLOAD):
     {
         . = ALIGN(8);

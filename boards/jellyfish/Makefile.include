@@ -1,5 +1,7 @@
-# define the cpu used by the stm32f0-discovery board
-export CPU = s5p4418
+# define the cpu used by the jellyfish board
+
+export MCPU      = cortex-a9
+export CPU       = s5p4418
 export CPU_MODEL = S5P4418
 
 # define the default port depending on the host OS

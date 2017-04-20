@@ -30,6 +30,15 @@ extern "C" {
 #define GPIO_PIN(port,pin) ((gpio_t)(32*(port)+(pin)))
 #define GPIO_UNDEF         ((gpio_t)(160))
 
+/**
+ * @brief   Use the shared SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
 typedef uint8_t gpio_t;
 
 

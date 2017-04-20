@@ -1,13 +1,47 @@
 /*
+ * Copyright (C) 2017 PDTECTH Co., LTD
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
+ * (C) Copyright 2002
+ * Gary Jennejohn, DENX Software Engineering, <gj@denx.de>
+ *
+ * See file CREDITS for list of people who contributed to this
+ * project.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ * MA 02111-1307 USA
+ */
+
+/*
  * U-boot - errno.h Error number defines
  *
  * Copyright (c) 2005-2007 Analog Devices Inc.
  *
- * SPDX-License-Identifier:	GPL-2.0+
+ * SPDX-License-Identifier: GPL-2.0+
  */
 
 #ifndef _GENERIC_ERRNO_H
 #define _GENERIC_ERRNO_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 #define EPERM           1   /* Operation not permitted */
 #define ENOENT          2   /* No such file or directory */
@@ -133,5 +167,9 @@
 #define EDQUOT          122 /* Quota exceeded */
 #define ENOMEDIUM       123 /* No medium found */
 #define EMEDIUMTYPE     124 /* Wrong medium type */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -1,13 +1,16 @@
-//------------------------------------------------------------------------------
-//
-//  Copyright (C) 2017
-//
-//  Module      : IRQ
-//  File        : s5p4418_rstcon.c
-//  Description : S5P4418 IP RESET
-//  Author      : Dang Minh Phuong (kamejoko80@yahoo.com)
-//  History     :
-//------------------------------------------------------------------------------
+/*
+ * Copyright (C) 2017 PDTECTH Co., LTD
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
+ *  Module      : IRQ
+ *  File        : s5p4418_rstcon.c
+ *  Description : S5P4418 IP RESET
+ *  Author      : Phuong Dang <kamejoko80@yahoo.com>
+ *  History     :
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -104,4 +107,3 @@ void s5p4418_ip_reset(int id)
         s5p4418_ip_setrst(id, 1);
     }
 }
-

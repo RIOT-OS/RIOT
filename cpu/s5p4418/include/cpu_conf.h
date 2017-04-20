@@ -7,20 +7,13 @@
  * details.
  */
 
-/**
- * @defgroup        cpu_S5P4418 Jellyfish
- * @brief           S5P4418 specific code
- * @ingroup         cpu
- * @{
- *
- * @file
- * @brief           Implementation specific CPU configuration options
- *
- * @author          Dang Minh Phuong <kamejoko80@yahoo.com>
-*/
-
 #ifndef S5P4418_CPU_CONF_H
 #define S5P4418_CPU_CONF_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 #ifndef THREAD_STACKSIZE_DEFAULT
 #define THREAD_STACKSIZE_DEFAULT   (4096)
@@ -34,9 +27,17 @@
 #define THREAD_STACKSIZE_IDLE (4096)
 #endif
 
+/**
+ * @brief   Stack size used for the exception (IRQ) stack
+ * @{
+ */
+#ifndef ISR_STACKSIZE
+#define ISR_STACKSIZE                   (0x1000U)
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* S5P4418_CPU_CONF_H */
-/** @} */
+#endif

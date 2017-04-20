@@ -1,13 +1,16 @@
-//------------------------------------------------------------------------------
-//
-//  Copyright (C) 2017
-//
-//  Module      : IRQ
-//  File        : s5p4418_irq.c
-//  Description : S5P4418 IRQ Handler
-//  Author      : Dang Minh Phuong (kamejoko80@yahoo.com)
-//  History     :
-//------------------------------------------------------------------------------
+/*
+ * Copyright (C) 2017 PDTECTH Co., LTD
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
+ *  Module      : IRQ
+ *  File        : s5p4418_irq.c
+ *  Description : S5P4418 IRQ Handler
+ *  Author      : Phuong Dang <kamejoko80@yahoo.com>
+ *  History     :
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -424,13 +427,11 @@ void s5p4418_irq_handler(void)
     uint32_t vic1_irq_status;
     uint32_t vic0_swi_status;
     uint32_t vic1_swi_status;
-    uint32_t dummy;
     uint8_t  irq;
 
     /* Dummy read VICADDRESS */
-    dummy = VIC0->VICADDRESS;
-    dummy = VIC1->VICADDRESS;
-    dummy = dummy;
+    __asm__ __volatile__("" : : "r" (VIC0->VICADDRESS));
+    __asm__ __volatile__("" : : "r" (VIC1->VICADDRESS));
 
     /* Get IRQ status */
     vic0_irq_status = VIC0->IRQSTATUS;
@@ -548,4 +549,3 @@ void data_abort_handler (void)
     printf("%s lr = %X\r\n", __FUNCTION__, lr);
     while(1);
 }
-

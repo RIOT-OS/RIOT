@@ -1,7 +1,12 @@
+/*
+ * Copyright (C) 2017 2017 PDTECTH Co., LTD
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 //------------------------------------------------------------------------------
-//
-//  Copyright (C) 2017
-//
 //  Module      : STARTUP
 //  File        : start.S
 //  Description : ARMv7a startup code
@@ -30,6 +35,11 @@
 //------------------------------------------------------------------------------
 
 .extern irq_handler
+.extern udefined_instruction_handler
+.extern swi_handler
+.extern prefetch_abort_handler
+.extern data_abort_handler
+.extern board_init
 
 //------------------------------------------------------------------------------
 // MACRO DEFINITION

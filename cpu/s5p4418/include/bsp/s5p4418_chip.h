@@ -1,7 +1,12 @@
+/*
+ * Copyright (C) 2017 PDTECTH Co., LTD
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 //------------------------------------------------------------------------------
-//
-//  Copyright (C) 2017
-//
 //  Module      : S5P4418 CHIP
 //  File        : s5p4418_chip.h
 //  Description : S5P4418 peripheral base address
@@ -258,5 +263,3 @@ extern "C" {
 #endif
 
 #endif // __S5P4418_CHIP_H__
-
-

@@ -1,23 +1,34 @@
 # Target triple for the build. Use arm-none-eabi if you are unsure.
 export TARGET_ARCH ?= arm-none-eabi
 
-export CPU_ARCH = cortex-a9
-export MCPU = cortex-a9
-export CFLAGS_FPU = -mfloat-abi=soft
-export CPU_MODEL ?= $(CPU)
+ifeq ($(MCPU),cortex-a9)
+export CPU_ARCH = armv7-a
+endif
 
 # Define build specific options
-export CFLAGS_CPU   = -mcpu=cortex-a9 -march=armv7-a -mfpu=neon -ffast-math -mfloat-abi=softfp -mno-unaligned-access
-export CFLAGS_DBG   = -g -ggdb -Wall --specs=nosys.specs 
+export CFLAGS_CPU     = -mcpu=$(MCPU) -march=$(CPU_ARCH)
+export CFLAGS_CPU    += -mfpu=neon -ffast-math -mfloat-abi=softfp -mno-unaligned-access
+export CFLAGS_CPU    += -std=gnu99 --specs=nosys.specs
 
-export CFLAGS       = $(CFLAGS_CPU) $(CFLAGS_DBG) -std=gnu99 -O0
-export ASFLAGS      = -mcpu=cortex-a9 -march=armv7-a 
+export CFLAGS_LINK    = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
+export CFLAGS_DBG    ?= -ggdb -g3
 
-export LINKFLAGS = $(CFLAGS_CPU) $(CFLAGS_DBG)
+# Configure for test driver kw2xrf
+ifneq (,$(filter kw2xrf,$(USEMODULE)))
+export CFLAGS_OPT    ?= -Os
+else
+export CFLAGS_OPT    ?= -O0
+endif
+
+export CFLAGS        += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
+export ASFLAGS       += $(CFLAGS_CPU) $(CFLAGS_DBG)
+
+export LINKFLAGS     += -L$(RIOTCPU)/armv7a_common/ldscripts
+export LINKFLAGS     += -L$(RIOTCPU)/$(CPU)/ldscripts
 export LINKER_SCRIPT ?= armv7a.ld
-export LINKFLAGS += -L$(RIOTCPU)/armv7a_common/ldscripts
-export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts
-export LINKFLAGS += -T$(LINKER_SCRIPT) -static -lgcc -nostartfiles -Wl,--fatal-warnings
+export LINKFLAGS     += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
+export LINKFLAGS     += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
+export LINKFLAGS     += -Wl,--gc-sections
 
 # This CPU implementation is using the new core/CPU interface:
 export CFLAGS += -DCOREIF_NG=1
@@ -40,6 +51,11 @@ export CFLAGS += -DARM_MATH_CORTEX_A9
 endif
 endif
 
+# Configure for unit test fib
+ifneq (,$(filter fib,$(USEMODULE)))
+export CFLAGS += -DFIB_DEVEL_HELPER
+endif
+ 
 # Explicitly tell the linker to link the startup code.
 #   Without this the interrupt vectors will not be linked correctly!
 ifeq ($(COMMON_STARTUP),)

@@ -27,8 +27,6 @@
 #include "s5p4418_timer.h"
 #include "s5p4418_irq.h"
 
-#define TIMER_NUMOF 4
-
 /**
  * @brief Struct holding the configuration data
  * @{
@@ -165,7 +163,7 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
     s5p4418_timer_set_cnt((uint8_t)tim, timeout);
 
     /* Start timer */
-    s5p4418_timer_start((uint8_t)tim, false);	
+    s5p4418_timer_start((uint8_t)tim, false);
 
     return 0;
 }
@@ -189,4 +187,3 @@ void timer_stop(tim_t tim)
 {
     s5p4418_timer_stop((uint8_t)tim);
 }
-

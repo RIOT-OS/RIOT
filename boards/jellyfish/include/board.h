@@ -4,8 +4,6 @@
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
  * details.
- *
- * @author Phuong Dang <kamejoko80@yahoo.com>
  */
 
 /**
@@ -29,6 +27,10 @@
 extern "C" {
 #endif
 
+/**
+ * @name MRF24J40 configuration
+ * @{
+ */
 #define PORTA (0)
 #define PORTB (1)
 #define PORTC (2)
@@ -40,7 +42,7 @@ extern "C" {
                                  .cs_pin = GPIO_PIN(PORTC, 30), \
                                  .int_pin = GPIO_PIN(PORTB, 31), \
                                  .reset_pin = GPIO_PIN(PORTB, 30) }
-
+/** @} */
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

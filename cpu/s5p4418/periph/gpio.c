@@ -86,12 +86,12 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
            s5p4418_gpio_set_dir(pin, GPIO_DIR_IN);
            s5p4418_gpio_set_pull(pin, GPIO_PULL_DOWN);
         break;
-        
+
         case GPIO_IN_PU:
            s5p4418_gpio_set_dir(pin, GPIO_DIR_IN);
            s5p4418_gpio_set_pull(pin, GPIO_PULL_UP);
         break;
-        
+
         case GPIO_OUT:
            s5p4418_gpio_set_dir(pin, GPIO_DIR_OUT);
            s5p4418_gpio_set_drv(pin, GPIO_DRV_MEDIUM);
@@ -111,30 +111,30 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                    gpio_cb_t cb, void *arg)
 {
     bool status = false;
- 
+
     /* Init GPIO */
     if(0 != gpio_init(pin, mode))
     {
         return -1;
     }
- 
+
     /* Set pull up */
     s5p4418_gpio_set_pull(pin, GPIO_PULL_UP);
- 
+
     switch(flank)
     {
         case GPIO_FALLING:
             status = s5p4418_gpio_irq_register(pin, GPIO_IRQ_FALLING, &gpio_isr_handler);
         break;
-        
+
         case GPIO_RISING:
             status = s5p4418_gpio_irq_register(pin, GPIO_IRQ_RISING, &gpio_isr_handler);
         break;
-        
+
         case GPIO_BOTH:
             status = s5p4418_gpio_irq_register(pin, GPIO_IRQ_BOTH, &gpio_isr_handler);
         break;
-        
+
         default:
         break;
     }
@@ -184,7 +184,7 @@ void gpio_clear(gpio_t pin)
 void gpio_toggle(gpio_t pin)
 {
     bool ret = s5p4418_gpio_get(pin);
-    
+
     if(ret)
     {
         s5p4418_gpio_set(pin, false);

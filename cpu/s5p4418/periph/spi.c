@@ -117,23 +117,6 @@ void spi_release(spi_t bus)
     mutex_unlock(&locks[bus]);
 }
 
-uint8_t spi_transfer_byte(spi_t bus, spi_cs_t cs, bool cont, uint8_t out)
-{
-    uint8_t rxdata;
-
-    if (cs != SPI_CS_UNDEF) {
-        gpio_clear((gpio_t)cs);
-    }
-
-    s5p4418_ssp_wr_byte((ssp_channel_t)bus, &out, &rxdata);
-
-    if ((!cont) && (cs != SPI_CS_UNDEF)) {
-        gpio_set((gpio_t)cs);
-    }
-
-    return rxdata;
-}
-
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
@@ -153,24 +136,6 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     if ((!cont) && (cs != SPI_CS_UNDEF)) {
         gpio_set((gpio_t)cs);
     }
-}
-
-uint8_t spi_transfer_reg(spi_t bus, spi_cs_t cs, uint8_t reg, uint8_t out)
-{
-    uint8_t rxdata;
-
-    if (cs != SPI_CS_UNDEF) {
-        gpio_clear((gpio_t)cs);
-    }
-
-    s5p4418_ssp_wr_byte((ssp_channel_t)bus, &reg, &rxdata);
-    s5p4418_ssp_wr_byte((ssp_channel_t)bus, &out, &rxdata);
-
-    if (cs != SPI_CS_UNDEF) {
-        gpio_set((gpio_t)cs);
-    }
-
-    return rxdata;
 }
 
 #endif /* SPI_NUMOF */

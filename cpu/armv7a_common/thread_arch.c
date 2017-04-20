@@ -55,7 +55,7 @@
   * @author  Dang Minh Phuong <kamejoko80@yahoo.com>
   *
   * @}
-  */ 
+  */
 
 #include <stdio.h>
 
@@ -64,6 +64,12 @@
 #include "thread.h"
 #include "irq.h"
 #include "cpu.h"
+
+/**
+ * @brief Indicate start/end of IRQ stack
+ */
+extern uint32_t __stack_irq_start;
+extern uint32_t __stack_irq_end;
 
 /**
  * @brief Indicate nested interrupt dept
@@ -119,15 +125,15 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 
     /* R10 */
     *stk = (unsigned int) 0x12121212;
-    stk--; 
+    stk--;
 
     /* R9 */
     *stk = (unsigned int) 0x09090909;
-    stk--; 
+    stk--;
 
     /* R8 */
     *stk = (unsigned int) 0x08080808;
-    stk--; 
+    stk--;
 
     /* R7 */
     *stk = (unsigned int) 0x07070707;
@@ -143,7 +149,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 
     /* R4 */
     *stk = (unsigned int) 0x04040404;
-    stk--; 
+    stk--;
 
     /* R3 */
     *stk = (unsigned int) 0x03030303;
@@ -163,6 +169,61 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     return (char *)stk;
 }
 
+void thread_arch_stack_print(void)
+{
+    int count = 0;
+    uint32_t *sp = (uint32_t *)sched_active_thread->sp;
+
+    printf("printing the current stack of thread %" PRIkernel_pid "\n",
+           thread_getpid());
+    printf("  address:      data:\n");
+
+    do {
+        printf("  0x%08x:   0x%08x\n", (unsigned int)sp, (unsigned int)*sp);
+        sp++;
+        count++;
+    } while (*sp != STACK_MARKER);
+
+    printf("current stack size: %i byte\n", count);
+}
+
+/* This function returns the number of bytes used on the ISR stack */
+int thread_arch_isr_stack_usage(void)
+{
+    uint32_t *ptr = &__stack_irq_start;
+
+    while(((*ptr) == STACK_CANARY_WORD) && (ptr < &__stack_irq_end)) {
+        ++ptr;
+    }
+
+    ptrdiff_t num_used_words = &__stack_irq_end - ptr;
+    return num_used_words * sizeof(*ptr);
+}
+
+static uint32_t __read_sp(void)
+{
+    uint32_t value;
+
+    __asm__ __volatile__(
+        "mov %0, sp"
+        : "=r" (value)
+        :
+        : "memory");
+
+    return value;
+}
+
+void *thread_arch_isr_stack_pointer(void)
+{
+    register uint32_t sp = __read_sp();
+    return (void *)sp;
+}
+
+void *thread_arch_isr_stack_start(void)
+{
+    return (void *)&__stack_irq_start;
+}
+
 /**
  * @brief Start new thread
  */
@@ -171,7 +232,7 @@ __attribute__((naked)) void NORETURN thread_arch_start_threading(void)
     /* Run schedule to get new TCB pointer */
     sched_run();
 
-    /* Load Context */ 
+    /* Load Context */
     __asm__ __volatile__(
 
         ".set SYS_MODE, 0x1f\n"
@@ -184,7 +245,7 @@ __attribute__((naked)) void NORETURN thread_arch_start_threading(void)
         /* Set the SP to point to the stack of the task being restored.    */
         "ldr r0, =sched_active_thread\n" /* r0 = &sched_active_thread      */
         "ldr r0, [r0]\n"                 /* r0 = *r0 = sched_active_thread */
-        "ldr sp, [r0]\n" 
+        "ldr sp, [r0]\n"
         "pop {r0-r12, r14}\n"
         "rfeia sp!\n"
     );
@@ -193,12 +254,12 @@ __attribute__((naked)) void NORETURN thread_arch_start_threading(void)
 /**
  * @brief Call SWI handler to switch context
  */
-__attribute__ ((noinline)) void thread_arch_yield(void) 
+__attribute__ ((noinline)) void thread_arch_yield(void)
 {
     /* Don't enable SWI when IRQ actived */
     if (nesting_level == 0)
     {
-        __asm__("swi 0\n");    
+        __asm__("swi 0\n");
     }
     else /* Context switch pending */
     {
@@ -232,7 +293,7 @@ __attribute__((naked)) void NORETURN swi_handler(void)
         /* RESTORE CONTEXT */
         "ldr r0, =sched_active_thread\n"
         "ldr r0, [r0]\n"
-        "ldr sp, [r0]\n" 
+        "ldr sp, [r0]\n"
         "pop {r0-r12, r14}\n"
         "rfeia sp!\n"
     );
@@ -245,9 +306,9 @@ __attribute__((naked)) void NORETURN irq_handler(void)
 {
     __asm__ __volatile__(
 
-        ".set SYS_MODE,	0x1f\n"
-        ".set SVC_MODE,	0x13\n"
-        ".set IRQ_MODE,	0x12\n"
+        ".set SYS_MODE, 0x1f\n"
+        ".set SVC_MODE, 0x13\n"
+        ".set IRQ_MODE, 0x12\n"
 
         /* Return to the interrupted instruction. */
         "sub lr, lr, #4\n"
@@ -267,8 +328,8 @@ __attribute__((naked)) void NORETURN irq_handler(void)
         "ldr r0, =nesting_level\n"
         "ldr r1, [r0]\n"
         "add r1, r1, #1\n"
-        "str r1, [r0]\n"        
-        
+        "str r1, [r0]\n"
+
         /* Ensure stack is 8-byte aligned */
         "mov r2, sp\n"
         "and r2, r2, #4\n"
@@ -311,7 +372,7 @@ __attribute__((naked)) void NORETURN irq_handler(void)
         "msr spsr_cxsf, lr\n"
         "pop {lr}\n"
         "movs pc, lr\n"
-        
+
 "switch_before_exit:\n"
 
         /* Clear context switch pending flag */
@@ -331,16 +392,16 @@ __attribute__((naked)) void NORETURN irq_handler(void)
         "push {r0-r12, r14}\n"
         "ldr r0, =sched_active_thread\n"
         "ldr r0, [r0]\n"
-        "str sp, [r0]\n"  
-        
+        "str sp, [r0]\n"
+
         /* Call the scheduler to switch TCB */
         "ldr r0, =sched_run\n"
         "blx r0\n"
-        
+
         /* Restore context */
         "ldr r0, =sched_active_thread\n"
         "ldr r0, [r0]\n"
-        "ldr sp, [r0]\n" 
+        "ldr sp, [r0]\n"
         "pop {r0-r12, r14}\n"
         "rfeia sp!\n"
     );

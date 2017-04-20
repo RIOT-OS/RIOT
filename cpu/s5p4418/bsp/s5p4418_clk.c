@@ -1,6 +1,11 @@
 /*
- * (C) Copyright 2009
- * jung hyun kim, Nexell Co, <jhkim@nexell.co.kr>
+ * Copyright (C) 2017 PDTECTH Co., LTD
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
+ * (C) Copyright 2009 jung hyun kim, Nexell Co, <jhkim@nexell.co.kr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -162,11 +167,12 @@ static struct s5p4418_clk_periph clk_periphs[] = {
 
 static struct clklink_dev clk_link[] = {};
 
-#define PERIPH_NUM  ((int)ARRAY_SIZE(clk_periphs))
-#define CLKPLL_NUM  ((int)ARRAY_SIZE(clk_plls))
-#define CLKLINK_NUM ((int)ARRAY_SIZE(clk_link))
-#define DEVICE_NUM  (CLKPLL_NUM + PERIPH_NUM + CLKLINK_NUM)
-#define MAX_DIVIDER ((1<<8) - 1) // 256, align 2
+#define ARRAY_SIZE(array)   (sizeof(array)/sizeof((array)[0]))
+#define PERIPH_NUM          ((int)ARRAY_SIZE(clk_periphs))
+#define CLKPLL_NUM          ((int)ARRAY_SIZE(clk_plls))
+#define CLKLINK_NUM         ((int)ARRAY_SIZE(clk_link))
+#define DEVICE_NUM          (CLKPLL_NUM + PERIPH_NUM + CLKLINK_NUM)
+#define MAX_DIVIDER         ((1<<8) - 1) // 256, align 2
 
 static struct s5p4418_clk_dev (clk_devices[DEVICE_NUM]);
 #define clk_dev_get(n)   ((struct s5p4418_clk_dev *)&clk_devices[n])
@@ -458,10 +464,10 @@ long clk_round_rate(struct clk *clk, unsigned long rate)
     struct s5p4418_clk_dev *pll = NULL, *cdev = clk_container(clk);
     struct s5p4418_clk_periph *peri = cdev->peri;
     unsigned long request = rate, rate_hz = 0;
-#ifdef ENABLE_DEBUG    
+#ifdef ENABLE_DEBUG
     unsigned long clock_hz;
     unsigned long freq_hz;
-#endif    
+#endif
     unsigned int mask;
     int level, div[2] = { 0, };
     int i, n, clk2 = 0;
@@ -472,8 +478,8 @@ long clk_round_rate(struct clk *clk, unsigned long rate)
 
     level = peri->level;
     mask = peri->clk_mask0;
-    DEBUG("clk: %s.%d request = %ld [input=0x%x]\r\n",
-            peri->dev_name, peri->dev_id, rate, mask);
+    //DEBUG("clk: %s.%d request = %ld [input=0x%x]\r\n",
+    //        peri->dev_name, peri->dev_id, rate, mask);
 
     if (!(INPUT_MASK & mask)) {
         if (PLCK_MASK & mask)
@@ -520,9 +526,9 @@ next:
             s2 = _InCLKn_, d2 = div[1];
         }
         rate_hz = rate;
-#ifdef ENABLE_DEBUG           
+#ifdef ENABLE_DEBUG
         freq_hz = clock_hz;
-#endif        
+#endif
     }
 
     /* search 2th clock from input */
@@ -581,9 +587,9 @@ int clk_enable(struct clk *clk)
     if (! peri)
         return 0;
 
-    DEBUG("clk: %s.%d enable (BCLK=%s, PCLK=%s)\r\n",
-        peri->dev_name, peri->dev_id, _GATE_BCLK_ & peri->clk_mask0 ? "ON":"PASS",
-        _GATE_PCLK_ & peri->clk_mask0 ? "ON":"PASS");
+    //DEBUG("clk: %s.%d enable (BCLK=%s, PCLK=%s)\r\n",
+    //    peri->dev_name, peri->dev_id, _GATE_BCLK_ & peri->clk_mask0 ? "ON":"PASS",
+    //    _GATE_PCLK_ & peri->clk_mask0 ? "ON":"PASS");
 
     if (!(INPUT_MASK & peri->clk_mask0)) {
         /*
@@ -733,4 +739,3 @@ void s5p4418_clk_print(void)
     pll = pll_get_dvo (4), support_dvfs = pll == cpu ? 0 : 1;
     DEBUG("PLL%d: MPG BCLK = %10u, PCLK = %9u\r\n", pll, core_hz[13], core_hz[14]);
 }
-
