@@ -30,8 +30,6 @@ static inline void cpu_print_last_instruction(void)
     printf("%p\n", (void*) lr_ptr);
 }
 
-#define STACK_CANARY_WORD   (0xE7FEE7FEu)
-
 #ifdef __cplusplus
 }
 #endif

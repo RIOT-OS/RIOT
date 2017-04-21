@@ -18,17 +18,18 @@
 // CONSTANT DEFINITION
 //------------------------------------------------------------------------------
 
-.equ    USR_MODE,   0x10
-.equ    FIQ_MODE,   0x11
-.equ    IRQ_MODE,   0x12
-.equ    SVC_MODE,   0x13
-.equ    ABT_MODE,   0x17
-.equ    UND_MODE,   0x1b
-.equ    SYS_MODE,   0x1f
-.equ    MODE_MASK,  0x1f
-.equ    NO_INT,     0xc0
+.equ    USR_MODE,          0x10
+.equ    FIQ_MODE,          0x11
+.equ    IRQ_MODE,          0x12
+.equ    SVC_MODE,          0x13
+.equ    ABT_MODE,          0x17
+.equ    UND_MODE,          0x1B
+.equ    SYS_MODE,          0x1F
+.equ    MODE_MASK,         0x1F
+.equ    NO_INT,            0xc0
 
-.equ    GPIOBOUT,   0xC001B000
+.equ    STACK_MARKER,      0xA5A5A5A5
+.equ    GPIOBOUT,          0xC001B000
 
 //------------------------------------------------------------------------------
 // EXTERNAL FUNCTION
@@ -234,6 +235,10 @@ init_stacks:
 
     cps  #IRQ_MODE
     ldr  sp, =__stack_irq_end
+
+    /* Mark ISR stack */
+    ldr  r0, =STACK_MARKER
+    str  r0,[sp]
 
     cps  #FIQ_MODE
     ldr  sp, =__stack_fiq_end

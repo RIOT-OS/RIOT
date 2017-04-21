@@ -169,6 +169,9 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     return (char *)stk;
 }
 
+/**
+ * @brief Print thread stack information
+ */
 void thread_arch_stack_print(void)
 {
     int count = 0;
@@ -187,12 +190,14 @@ void thread_arch_stack_print(void)
     printf("current stack size: %i byte\n", count);
 }
 
-/* This function returns the number of bytes used on the ISR stack */
+/**
+ * @brief This function returns the number of bytes used on the ISR stack
+ */
 int thread_arch_isr_stack_usage(void)
 {
     uint32_t *ptr = &__stack_irq_start;
 
-    while(((*ptr) == STACK_CANARY_WORD) && (ptr < &__stack_irq_end)) {
+    while(((*ptr) != STACK_MARKER) && (ptr < &__stack_irq_end)) {
         ++ptr;
     }
 
@@ -200,25 +205,41 @@ int thread_arch_isr_stack_usage(void)
     return num_used_words * sizeof(*ptr);
 }
 
-static uint32_t __read_sp(void)
+/**
+ * @brief This function returns ISR stack pointer
+ */
+static uint32_t __read_isr_sp(void)
 {
     uint32_t value;
 
-    __asm__ __volatile__(
-        "mov %0, sp"
+    /* Read irq stack pointer */
+    __asm__ __volatile__
+    (
+        "mrs r4, cpsr\n" /* backup operation mode  */
+        "cpsid i\n"      /* disable interrupt      */
+        "cps #0x12\n"    /* change to irq mode     */
+        "mov %0, sp\n"   /* copy sp_irq            */
+        "msr cpsr, r4\n" /* restore operation mode */
         : "=r" (value)
         :
-        : "memory");
+        : "memory"
+    );
 
     return value;
 }
 
+/**
+ * @brief This function returns ISR stack pointer
+ */
 void *thread_arch_isr_stack_pointer(void)
 {
-    register uint32_t sp = __read_sp();
+    register uint32_t sp = __read_isr_sp();
     return (void *)sp;
 }
 
+/**
+ * @brief This function returns ISR stack start
+ */
 void *thread_arch_isr_stack_start(void)
 {
     return (void *)&__stack_irq_start;
