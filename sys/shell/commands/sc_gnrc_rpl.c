@@ -31,9 +31,8 @@
 
 int _gnrc_rpl_init(char *arg)
 {
-    gnrc_ipv6_netif_t *entry = NULL;
     kernel_pid_t iface_pid = (kernel_pid_t) atoi(arg);
-    entry = gnrc_ipv6_netif_get(iface_pid);
+    gnrc_ipv6_netif_t *entry = gnrc_ipv6_netif_get(iface_pid);
 
     if (entry == NULL) {
         puts("unknown interface specified");
@@ -55,8 +54,7 @@ int _gnrc_rpl_dodag_root(char *arg1, char *arg2)
         return 1;
     }
 
-    gnrc_rpl_instance_t *inst = NULL;
-    inst = gnrc_rpl_root_init(instance_id, &dodag_id, false, false);
+    gnrc_rpl_instance_t *inst = gnrc_rpl_root_init(instance_id, &dodag_id, false, false);
     if (inst == NULL) {
         char addr_str[IPV6_ADDR_MAX_STR_LEN];
         printf("error: could not add DODAG (%s) to instance (%d)\n",

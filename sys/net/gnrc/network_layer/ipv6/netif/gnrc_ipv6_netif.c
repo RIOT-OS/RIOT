@@ -792,6 +792,8 @@ void gnrc_ipv6_netif_init_by_dev(void)
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t ifnum = gnrc_netif_get(ifs);
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+    /* cppcheck-suppress unreadVariable
+     * (reason: cppcheck bug. abr_init is read in if below) */
     bool abr_init = false;
 #endif
 
