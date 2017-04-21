@@ -211,6 +211,8 @@ static int _ep_to_sockaddr(const struct _sock_tl_ep *ep,
 static int _sockaddr_to_ep(const struct sockaddr *address, socklen_t address_len,
                            struct _sock_tl_ep *out)
 {
+    assert(address != NULL);
+
     switch (address->sa_family) {
         case AF_INET:
             if (address_len < sizeof(struct sockaddr_in)) {
@@ -411,12 +413,12 @@ int accept(int socket, struct sockaddr *restrict address,
     switch (s->type) {
         case SOCK_STREAM:
             new_s = _get_free_socket();
-            sock = (sock_tcp_t *)new_s->sock;
             if (new_s == NULL) {
                 errno = ENFILE;
                 res = -1;
                 break;
             }
+            sock = (sock_tcp_t *)new_s->sock;
             if ((res = sock_tcp_accept(&s->sock->tcp.queue, &sock,
                                        recv_timeout)) < 0) {
                 errno = -res;
@@ -855,6 +857,9 @@ static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
             break;
 #endif
         default:
+#if !defined(MODULE_SOCK_IP) && !defined(MODULE_SOCK_TCP) && !defined(MODULE_SOCK_UDP)
+            (void) recv_timeout;
+#endif
             res = -EOPNOTSUPP;
             break;
     }
