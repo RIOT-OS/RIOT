@@ -488,6 +488,10 @@ dl.todo > dt {
 }
 .params .paramdir {
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  padding-right: 0.5em;
+}
+.params .paramname {
+  padding-right: 2em;
 }
 .icon {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
