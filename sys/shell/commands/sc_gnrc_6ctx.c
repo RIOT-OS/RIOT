@@ -91,7 +91,7 @@ int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_s
         return 1;
     }
     prefix_len_str = strtok_r(NULL, "/", &save_ptr);
-    if (prefix_len_str == 0) {
+    if (prefix_len_str == NULL) {
         _usage(cmd_str);
         return 1;
     }
