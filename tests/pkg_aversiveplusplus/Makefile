@@ -8,6 +8,6 @@ endif
 
 USEPKG += aversiveplusplus
 FEATURES_REQUIRED += cpp
-CXXEXFLAGS += -std=c++11
+CXXSTD ?= c++11
 
 include $(RIOTBASE)/Makefile.include
