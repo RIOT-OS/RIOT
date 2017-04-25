@@ -83,26 +83,6 @@ extern "C"
  */
 static const uart_conf_t uart_config[] = {
     {
-        .dev    = UART0,
-        .clken  = (volatile uint32_t*)(BITBAND_REGADDR(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT)),
-        .freq   = CLOCK_CORECLOCK,
-        .pin_rx = GPIO_PIN(PORT_D, 6),
-        .pin_tx = GPIO_PIN(PORT_D, 7),
-        .pcr_rx = PORT_PCR_MUX(3),
-        .pcr_tx = PORT_PCR_MUX(3),
-        .irqn   = UART0_RX_TX_IRQn,
-    },
-    {
-        .dev    = UART1,
-        .clken  = (volatile uint32_t*)(BITBAND_REGADDR(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT)),
-        .freq   = CLOCK_CORECLOCK,
-        .pin_rx = GPIO_UNDEF,
-        .pin_tx = GPIO_UNDEF,
-        .pcr_rx = PORT_PCR_MUX(3),
-        .pcr_tx = PORT_PCR_MUX(3),
-        .irqn   = UART1_RX_TX_IRQn,
-    },
-    {
         .dev    = UART2,
         .clken  = (volatile uint32_t*)(BITBAND_REGADDR(SIM->SCGC4, SIM_SCGC4_UART2_SHIFT)),
         .freq   = CLOCK_BUSCLOCK,
@@ -112,7 +92,21 @@ static const uart_conf_t uart_config[] = {
         .pcr_tx = PORT_PCR_MUX(3),
         .irqn   = UART2_RX_TX_IRQn,
     },
+    {
+        .dev    = UART0,
+        .clken  = (volatile uint32_t*)(BITBAND_REGADDR(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT)),
+        .freq   = CLOCK_CORECLOCK,
+        .pin_rx = GPIO_PIN(PORT_D, 6),
+        .pin_tx = GPIO_PIN(PORT_D, 7),
+        .pcr_rx = PORT_PCR_MUX(3),
+        .pcr_tx = PORT_PCR_MUX(3),
+        .irqn   = UART0_RX_TX_IRQn,
+    }
 };
+
+#define UART_0_ISR          (isr_uart2_rx_tx)
+#define UART_1_ISR          (isr_uart0_rx_tx)
+
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
