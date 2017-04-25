@@ -1,6 +1,6 @@
 PKG_NAME=relic
 PKG_URL=https://github.com/relic-toolkit/relic.git
-PKG_VERSION=cdcfaeef101d18c3231c3b46359c519dd72682e8
+PKG_VERSION=0b0442a8218df8d309266923f2dd5b9ae3b318ce
 PKG_LICENSE=LGPL-2.1
 
 .PHONY: all
@@ -15,16 +15,12 @@ all: $(PKG_BUILDDIR)/Makefile
 
 $(PKG_BUILDDIR)/Makefile: $(TOOLCHAIN_FILE)
 	cd $(PKG_BUILDDIR) && \
-	COMP="$(filter-out -Werror=old-style-definition -Werror=strict-prototypes, $(CFLAGS) ) " \
+	COMP="$(filter-out -Werror -Werror=old-style-definition -Werror=strict-prototypes -std=gnu99, $(CFLAGS) ) " \
 	cmake -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
 		  -DCHECK=off -DTESTS=0 -DBENCH=0 -DSHLIB=off -Wno-dev $(RELIC_CONFIG_FLAGS) .
 
-$(TOOLCHAIN_FILE): fix_source
-	$(RIOTTOOLS)/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
-
-fix_source: git-download
-	./fix-util_print_wo_args.sh $(PKG_BUILDDIR)
-	./fix-old-style-definitions.sh $(PKG_BUILDDIR)
+$(TOOLCHAIN_FILE): git-download
+	$(RIOTBASE)/dist/tools/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
 
 clean::
 	@rm -rf $(BINDIR)/$(PKG_NAME).a
