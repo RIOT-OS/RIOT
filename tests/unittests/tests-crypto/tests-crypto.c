@@ -13,7 +13,6 @@ void tests_crypto(void)
 {
     TESTS_RUN(tests_crypto_chacha_tests());
     TESTS_RUN(tests_crypto_aes_tests());
-    TESTS_RUN(tests_crypto_3des_tests());
     TESTS_RUN(tests_crypto_cipher_tests());
     TESTS_RUN(tests_crypto_modes_ccm_tests());
     TESTS_RUN(tests_crypto_modes_ecb_tests());
