@@ -197,7 +197,7 @@ def test_ipv6_send(board_group, application, env=None):
         sender.sendline(u"ip send %s %d 01:23:45:67:89:ab:cd:ef" % (receiver_ip, ipprot))
         sender.expect_exact(u"Success: send 8 byte over IPv6 to %s (next header: %d)" %
                             (receiver_ip, ipprot))
-        receiver.expect(u"000000 01 23 45 67 89 ab cd ef")
+        receiver.expect(u"00000000  01  23  45  67  89  AB  CD  EF")
 
 def test_udpv6_send(board_group, application, env=None):
     env_sender = os.environ.copy()
@@ -221,7 +221,7 @@ def test_udpv6_send(board_group, application, env=None):
         sender.sendline(u"udp send %s %d ab:cd:ef" % (receiver_ip, port))
         sender.expect_exact(u"Success: send 3 byte over UDP to [%s]:%d" %
                             (receiver_ip, port))
-        receiver.expect(u"000000 ab cd ef")
+        receiver.expect(u"00000000  AB  CD  EF")
 
 def test_tcpv6_send(board_group, application, env=None):
     env_client = os.environ.copy()
@@ -247,7 +247,7 @@ def test_tcpv6_send(board_group, application, env=None):
         server.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % client_ip)
         client.sendline(u"tcp send affe:abe")
         client.expect_exact(u"Success: send 4 byte over TCP to server")
-        server.expect(u"000000 af fe ab e0")
+        server.expect(u"00000000  AF  FE  AB  E0")
         client.sendline(u"tcp disconnect")
         client.sendline(u"tcp send affe:abe")
         client.expect_exact(u"could not send")
@@ -279,17 +279,17 @@ def test_triple_send(board_group, application, env=None):
         sender.sendline(u"udp send %s %d 01:23" % (receiver_ip, udp_port))
         sender.expect_exact(u"Success: send 2 byte over UDP to [%s]:%d" %
                             (receiver_ip, udp_port))
-        receiver.expect(u"000000 01 23")
+        receiver.expect(u"00000000  01  23")
 
         sender.sendline(u"ip send %s %d 01:02:03:04" % (receiver_ip, ipprot))
         sender.expect_exact(u"Success: send 4 byte over IPv6 to %s (next header: %d)" %
                             (receiver_ip, ipprot))
-        receiver.expect(u"000000 01 02 03 04")
+        receiver.expect(u"00000000  01  02  03  04")
         sender.sendline(u"tcp connect %s %d" % (receiver_ip, tcp_port))
         receiver.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % sender_ip)
         sender.sendline(u"tcp send dead:beef")
         sender.expect_exact(u"Success: send 4 byte over TCP to server")
-        receiver.expect(u"000000 de ad be ef")
+        receiver.expect(u"00000000  DE  AD  BE  EF")
 
 if __name__ == "__main__":
     del os.environ['TERMFLAGS']
