@@ -24,7 +24,18 @@
 
 #include "cpu.h"
 #include "mutex.h"
+#include "assert.h"
 #include "periph/adc.h"
+
+#define START_CMD           (0x1 << 24)
+#define DONE_BIT            (0x1 << 31)
+#define RES_MASK            (0xf << 17)
+#define SAMPLE_SHIFT        (6)
+#define SAMPLE_MASK         (0x3ff)
+
+/* we chose an ADC clock smaller or equal than but close to 4.5MHz (as proposed
+ * in the reference manual) */
+#define CLK_DIV             (((CLOCK_CORECLOCK / 45000000) & 0xff) << 8)
 
 /**
  * @brief   Mutex to synchronize ADC access from different threads
@@ -57,8 +68,6 @@ int adc_init(adc_t line)
 
     prep();
 
-    /* ADC frequency : 3MHz */
-    LPC_ADC->CR = (15 << 8);
     /* configure the connected pin */
     pincfg = pincfg_reg(line);
     /* Put the pin in its ADC alternate function */
@@ -80,23 +89,22 @@ int adc_sample(adc_t line, adc_res_t res)
 {
     int sample;
 
+    assert(line < ADC_NUMOF);
+
     /* check if resolution is valid */
-    if (res < 0xff) {
+    if (res & ~(RES_MASK)) {
         return -1;
     }
 
     /* prepare the device */
     prep();
 
-    /* set resolution */
-    LPC_ADC->CR &= ~(0x7 << 17);
-    LPC_ADC->CR |= res;
-    /* Start a conversion */
-    LPC_ADC->CR |= (1 << line) | (1 << 24);
+    /* start conversion */
+    LPC_ADC->CR = ((1 << line) | CLK_DIV | res | START_CMD);
     /* Wait for the end of the conversion */
-    while (!(LPC_ADC->DR[line] & (1 << 31))) {}
+    while (!(LPC_ADC->DR[line] & DONE_BIT)) {}
     /* Read and return result */
-    sample = (LPC_ADC->DR[line] >> 6);
+    sample = ((LPC_ADC->DR[line] >> SAMPLE_SHIFT) & SAMPLE_MASK);
 
     done();
 
