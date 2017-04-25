@@ -9,7 +9,7 @@
 /**
  * @defgroup    net_gnrc_tcp TCP
  * @ingroup     net_gnrc
- * @brief       RIOT's tcp implementation for the gnrc stack
+ * @brief       RIOT's TCP implementation for the GNRC network stack.
  *
  * @{
  *
@@ -29,25 +29,25 @@ extern "C" {
 #endif
 
 /**
- * @brief Timeout Duration for user calls. Default 2 minutes
+ * @brief Timeout duration for user calls. Default is 2 minutes.
  */
 #ifndef GNRC_TCP_CONNECTION_TIMEOUT_DURATION
 #define GNRC_TCP_CONNECTION_TIMEOUT_DURATION (120U * US_PER_SEC)
 #endif
 
 /**
- * @brief Maximum Segment Lifetime. Default 30 secounds
+ * @brief Maximum segment lifetime (MSL). Default is 30 seconds.
  */
 #ifndef GNRC_TCP_MSL
 #define GNRC_TCP_MSL (30U * US_PER_SEC)
 #endif
 
 /**
- * @brief Maximum Segement Size
+ * @brief Maximum Segement Size (MSS).
  */
 #ifndef GNRC_TCP_MSS
 #ifdef  MODULE_GNRC_IPV6
-#define GNRC_TCP_MSS (1220U) /**< If IPv6 is used. Get MSS = 1280 - IPv6-Hdr - TCP-Hdr = 1220 */
+#define GNRC_TCP_MSS (1220U) /**< If IPv6 is used. Get MSS = 1280 - IPv6 Hdr - TCP Hdr = 1220 */
 #else
 #define GNRC_TCP_MSS (576U) /**< Default MSS */
 #endif
@@ -61,7 +61,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Default Window Size
+ * @brief Default receive window size
  */
 #ifndef GNRC_TCP_DEFAULT_WINDOW
 #define GNRC_TCP_DEFAULT_WINDOW (GNRC_TCP_MSS * GNRC_TCP_MSS_MULTIPLICATOR)
@@ -75,21 +75,21 @@ extern "C" {
 #endif
 
 /**
- * @brief Default Receive Buffer Size
+ * @brief Default receive buffer size
  */
 #ifndef GNRC_TCP_RCV_BUF_SIZE
 #define GNRC_TCP_RCV_BUF_SIZE (GNRC_TCP_DEFAULT_WINDOW)
 #endif
 
 /**
- * @brief Lower Bound for RTO = 1 sec (see RFC 6298)
+ * @brief Lower bound for RTO = 1 sec (see RFC 6298)
  */
 #ifndef GNRC_TCP_RTO_LOWER_BOUND
 #define GNRC_TCP_RTO_LOWER_BOUND (1U * US_PER_SEC)
 #endif
 
 /**
- * @brief Upper Bound for RTO = 60 sec (see RFC 6298)
+ * @brief Upper bound for RTO = 60 sec (see RFC 6298)
  */
 #ifndef GNRC_TCP_RTO_UPPER_BOUND
 #define GNRC_TCP_RTO_UPPER_BOUND (60U * US_PER_SEC)
@@ -124,14 +124,14 @@ extern "C" {
 #endif
 
 /**
- * @brief Lower Bound for the duration between probes
+ * @brief Lower bound for the duration between probes
  */
 #ifndef GNRC_TCP_PROBE_LOWER_BOUND
 #define GNRC_TCP_PROBE_LOWER_BOUND (1U * US_PER_SEC)
 #endif
 
 /**
- * @brief Upper Bound for the duration between probes
+ * @brief Upper bound for the duration between probes
  */
 #ifndef GNRC_TCP_PROBE_UPPER_BOUND
 #define GNRC_TCP_PROBE_UPPER_BOUND (60U * US_PER_SEC)

@@ -24,17 +24,17 @@
 
 int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)
 {
-    /* Extract Offset value. Return if no options are set */
+    /* Extract offset value. Return if no options are set */
     uint8_t offset = GET_OFFSET(byteorder_ntohs(hdr->off_ctl));
     if (offset <= TCP_HDR_OFFSET_MIN) {
         return 0;
     }
 
-    /* Get Pointer to option field and field-size */
+    /* Get pointer to option field and field size */
     uint8_t *opt_ptr = (uint8_t *) hdr + sizeof(tcp_hdr_t);
     uint8_t opt_left = (offset - TCP_HDR_OFFSET_MIN) * 4;
 
-    /* Parse Options via tcp_hdr_opt_t */
+    /* Parse options via tcp_hdr_opt_t */
     while (opt_left > 0) {
         tcp_hdr_opt_t *option = (tcp_hdr_opt_t *) opt_ptr;
 

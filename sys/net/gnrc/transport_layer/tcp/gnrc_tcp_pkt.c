@@ -34,12 +34,12 @@
 #include "debug.h"
 
 /**
- * @brief Calculates the maximum of two unsigned numbers
+ * @brief Calculates the maximum of two unsigned numbers.
  *
- * @param [in] x   First comparrison value
- * @param [in] y   Second comparrison value
+ * @param[in] x   First comparrison value.
+ * @param[in] y   Second comparrison value.
  *
- * @return   x if x is larger than y, if not y is returned.
+ * @returns   X if x is larger than y, if not y is returned.
  */
 static inline uint32_t _max(const uint32_t x, const uint32_t y)
 {
@@ -60,7 +60,7 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
     ipv6_hdr_t *ip6_hdr = (ipv6_hdr_t *)ip6_snp->data;
 #endif
 
-    /* Setup Header information */
+    /* Setup header information */
     tcp_hdr_out.src_port = tcp_hdr_in->dst_port;
     tcp_hdr_out.dst_port = tcp_hdr_in->src_port;
     tcp_hdr_out.checksum = byteorder_htons(0);
@@ -88,7 +88,7 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
         tcp_hdr_out.ack_num = byteorder_htonl(seq_no + tmp  + _pkt_get_pay_len(in_pkt));
     }
 
-    /* Allocate new tcp header */
+    /* Allocate new TCB header */
     tcp_snp = gnrc_pktbuf_add(NULL, &tcp_hdr_out, TCP_HDR_OFFSET_MIN * 4, GNRC_NETTYPE_TCP);
     if (tcp_snp == NULL) {
         DEBUG("gnrc_tcp_pkt.c : _pkt_build_reset_from_pkt() :\
@@ -134,7 +134,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
         }
     }
 
-    /* fill tcp-header */
+    /* Fill TCP header */
     tcp_hdr.src_port = byteorder_htons(tcb->local_port);
     tcp_hdr.dst_port = byteorder_htons(tcb->peer_port);
     tcp_hdr.checksum = byteorder_htons(0);
@@ -151,7 +151,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
     /* Set offset and control bit accordingly */
     tcp_hdr.off_ctl = byteorder_htons(_option_build_offset_control(offset, ctl));
 
-    /* allocate tcp header: size = offset * 4 bytes */
+    /* Allocate TCP header: size = offset * 4 bytes */
     tcp_snp = gnrc_pktbuf_add(pay_snp, &tcp_hdr, offset * 4, GNRC_NETTYPE_TCP);
     if (tcp_snp == NULL) {
         DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Can't allocate buffer for TCP Header\n.");
@@ -174,7 +174,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
                 memcpy(opt_ptr, &mss_option, sizeof(mss_option));
             }
             /* Increase opt_ptr and decrease opt_ptr, if other options are added */
-            /* NOTE: Add Additional Options here */
+            /* NOTE: Add additional options here */
         }
         *(out_pkt) = tcp_snp;
     }
@@ -195,7 +195,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
         DEBUG("gnrc_tcp_pkt.c : _pkt_build_reset_from_pkt() : Network Layer Module Missing\n");
 #endif
 
-    /* Calculate Sequence Space Number Consumption for this packet */
+    /* Calculate sequence space number consumption for this packet */
     if (seq_con != NULL) {
         *seq_con = 0;
         if (ctl & MSK_SYN) {
@@ -238,30 +238,30 @@ int _pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num, const ui
     uint32_t r_edge = tcb->rcv_nxt + tcb->rcv_wnd;
     uint32_t last_seq = seq_num + seg_len - 1;
 
-    /* Possible case 1 */
-    /* Segment contains no payload and Receive window is closed and */
-    /* Sequence Number is next expected number */
+    /* Possible case 1: */
+    /* Segment contains no payload and receive window is closed and */
+    /* sequence number is next expected number */
     if (seg_len == 0 && tcb->rcv_wnd == 0 && l_edge == seq_num) {
-        return 1;
+        return 0;
     }
 
-    /* Possible case 2 */
-    /* Segment contains no payload and Receive window is open and */
-    /* Sequence number falls inside the receive window */
+    /* Possible case 2: */
+    /* Segment contains no payload and receive window is open and */
+    /* sequence number falls inside the receive window */
     if (seg_len == 0 && tcb->rcv_wnd > 0 && INSIDE_WND(l_edge, seq_num, r_edge)) {
-        return 1;
+        return 0;
     }
 
-    /* Possible case 3 */
-    /* Segment contains Payload and Receive window is open and */
-    /* Sequence Number overlaps with receive window */
+    /* Possible case 3: */
+    /* Segment contains payload and receive window is open and */
+    /* sequence number overlaps with receive window */
     if (seg_len > 0 && tcb->rcv_wnd > 0 && (INSIDE_WND(l_edge, seq_num, r_edge) ||
         INSIDE_WND(l_edge, last_seq, r_edge))) {
-        return 1;
+        return 0;
     }
 
     /* Everthing else is not acceptable */
-    return 0;
+    return -1;
 }
 
 uint32_t _pkt_get_seg_len(gnrc_pktsnip_t *pkt)
@@ -328,7 +328,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
     tcb->pkt_retransmit = pkt;
     gnrc_pktbuf_hold(pkt, 1);
 
-    /* RTO Adjustment */
+    /* RTO adjustment */
     if (!retransmit) {
         /* If this is the first transmission: rto is 1 sec (Lower Bound) */
         if (tcb->srtt == RTO_UNINITIALIZED || tcb->rtt_var == RTO_UNINITIALIZED) {
@@ -343,14 +343,14 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
         tcb->rto *= 2;
 
         /* If the transmission has been tried five times, we assume srtt and rtt_var are bogus */
-        /* New measurements must be taken */
+        /* New measurements must be taken the next time something is sent. */
         if (tcb->retries >= 5) {
             tcb->srtt = RTO_UNINITIALIZED;
             tcb->rtt_var = RTO_UNINITIALIZED;
         }
     }
 
-    /* Perform Boundrychecks on current RTO before usage */
+    /* Perform boundry checks on current RTO before usage */
     if (tcb->rto < (int32_t) GNRC_TCP_RTO_LOWER_BOUND) {
         tcb->rto = GNRC_TCP_RTO_LOWER_BOUND;
     }
@@ -358,7 +358,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
         tcb->rto = GNRC_TCP_RTO_UPPER_BOUND;
     }
 
-    /* Setup retransmission timer, msg to TCP thread with ptr to tcb */
+    /* Setup retransmission timer, msg to TCP thread with ptr to TCB */
     tcb->msg_tout.type = MSG_TYPE_RETRANSMISSION;
     tcb->msg_tout.content.ptr = (void *) tcb;
     xtimer_set_msg(&tcb->tim_tout, tcb->rto, &tcb->msg_tout, gnrc_tcp_pid);
@@ -371,7 +371,7 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
     gnrc_pktsnip_t *snp = NULL;
     tcp_hdr_t *hdr;
 
-    /* Retransmission Queue is empty. Nothing to ACK there */
+    /* Retransmission queue is empty. Nothing to ACK there */
     if (tcb->pkt_retransmit == NULL) {
         DEBUG("gnrc_tcp_pkt.c : _pkt_acknowledge() : There is no packet to ack\n");
         return -ENODATA;
@@ -389,10 +389,10 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
         gnrc_pktbuf_release(tcb->pkt_retransmit);
         tcb->pkt_retransmit = NULL;
 
-        /* Measure Round Trip Time */
+        /* Measure round trip time */
         int32_t rtt = xtimer_now().ticks32 - tcb->rtt_start;
 
-        /* Use sample only if ther was no timeroverflow and no retransmission (Karns Alogrithm) */
+        /* Use time only if ther was no timer overflow and no retransmission (Karns Alogrithm) */
         if (tcb->retries == 0 && rtt > 0) {
             /* If this is the first sample taken */
             if (tcb->srtt == RTO_UNINITIALIZED && tcb->rtt_var == RTO_UNINITIALIZED) {
@@ -428,12 +428,12 @@ uint16_t _pkt_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_
         payload = payload->next;
     }
 
-    /* Process tcp-header, before checksum field(Byte 16 to 18) */
+    /* Process TCP header, before checksum field(Byte 16 to 18) */
     csum = inet_csum(csum, (uint8_t *) hdr->data, 16);
-    /* Process tcp-header, after checksum field */
+    /* Process TCP header, after checksum field */
     csum = inet_csum(csum, ((uint8_t *) hdr->data) + 18, hdr->size - 18);
 
-    /* Process Network layer Header */
+    /* Process network layer header */
     switch (pseudo_hdr->type) {
 #ifdef MODULE_GNRC_IPV6
         case GNRC_NETTYPE_IPV6:

@@ -9,12 +9,12 @@
 /**
  * @defgroup    net_gnrc_tcp TCP
  * @ingroup     net_gnrc
- * @brief       RIOT's tcp implementation for the gnrc stack
+ * @brief       RIOT's TCP implementation for the GNRC network stack.
  *
  * @{
  *
  * @file
- * @brief       TCP finite state maschine declarations
+ * @brief       TCP finite state maschine declarations.
  *
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 /**
- *  @brief The TCP FSM States.
+ *  @brief The TCP FSM states.
  */
 typedef enum {
     FSM_STATE_CLOSED,
@@ -48,7 +48,7 @@ typedef enum {
 } fsm_state_t;
 
 /**
- *  @brief Events that trigger translations in TCP FSM.
+ *  @brief Events that trigger transitions in TCP FSM.
  */
 typedef enum {
     FSM_EVENT_CALL_OPEN,          /* User function call: open */
@@ -57,25 +57,25 @@ typedef enum {
     FSM_EVENT_CALL_CLOSE,         /* User function call: close */
     FSM_EVENT_CALL_ABORT,         /* User function call: abort */
     FSM_EVENT_RCVD_PKT,           /* Paket received from peer */
-    FSM_EVENT_TIMEOUT_TIMEWAIT,   /* Timeout: Timewait */
-    FSM_EVENT_TIMEOUT_RETRANSMIT, /* Timeout: Retransmit */
-    FSM_EVENT_TIMEOUT_CONNECTION, /* Timeout: Connection */
-    FSM_EVENT_SEND_PROBE,         /* Send a Zero Window Probe */
-    FSM_EVENT_CLEAR_RETRANSMIT    /* Clear Retransmission Mechanism */
+    FSM_EVENT_TIMEOUT_TIMEWAIT,   /* Timeout: timewait */
+    FSM_EVENT_TIMEOUT_RETRANSMIT, /* Timeout: retransmit */
+    FSM_EVENT_TIMEOUT_CONNECTION, /* Timeout: connection */
+    FSM_EVENT_SEND_PROBE,         /* Send zero window probe */
+    FSM_EVENT_CLEAR_RETRANSMIT    /* Clear retransmission mechanism */
 } fsm_event_t;
 
 /**
  * @brief TCP finite state maschine
  *
- * @param[in,out] tcb     specifies connection to use fsm on.
- * @param[in]     event   current event that triggers fsm translation
- * @param[in]     in_pkt  packet that triggered fsm event. Only in case of RCVD_PKT
- * @param[in,out] buf     buffer for send and receive functions
- * @param[in]     len     number of bytes to send or receive atmost
+ * @param[in,out] tcb     TCB holding the connection information.
+ * @param[in]     event   Current event that triggers FSM transition.
+ * @param[in]     in_pkt  Incomming packet. Only not NULL in case of event RCVD_PKT.
+ * @param[in,out] buf     Buffer for send and receive functions.
+ * @param[in]     len     Number of bytes to send or receive.
  *
- * @return  Zero on success
- * @return  Positive Number, number of bytes sent from or copied into buf.
- * @return  -ENOSYS if event is not implemented
+ * @returns   Zero on success
+ *            Positive Number, number of bytes sent from or copied into @p buf.
+ *            -ENOSYS if event is not implemented
  */
 int _fsm(gnrc_tcp_tcb_t *tcb, fsm_event_t event, gnrc_pktsnip_t *in_pkt, void *buf, size_t len);
 
