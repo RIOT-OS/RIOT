@@ -38,9 +38,21 @@ void board_init(void)
     s5p4418_clk_init();
     s5p4418_irq_init();
     s5p4418_timer_init();
-    uart_stdio_init();
+
+#ifdef MODULE_NEWLIB
+    extern void __libc_init_array(void);
+
+    /* Disable IRQ */
+    __irq_disable();
+
+    /* Init newlib array */
+    __libc_init_array();
+
+    /* Enable IRQ */
+    __irq_enable();
 
     printf("Board low level init done\r\n");
+#endif
 
     kernel_init();
 }
