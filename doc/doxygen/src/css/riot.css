@@ -48,6 +48,9 @@ dl {
   font-size: 14px;
   z-index: 3;
 }
+#FSearchBox #MSearchField {
+  margin-left: auto;
+}
 #MSearchField {
   background: #000000;
   border: #eeeeee solid 1px;
@@ -89,7 +92,8 @@ a.SelectItem:active {
 #nav-tree {
   background: #f5f5f5;
 }
-#nav-tree img {
+#nav-tree img,
+#nav-tree span {
   -webkit-box-sizing: content-box;
   box-sizing: content-box;
 }
@@ -202,7 +206,7 @@ div.line.glow {
 }
 span.lineno {
   background-color: transparent;
-  border-right: 3px solid #e3e3e3;
+  border-right: 2px solid #e3e3e3;
 }
 span.lineno a {
   background-color: transparent;
