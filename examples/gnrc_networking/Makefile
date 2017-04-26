@@ -13,6 +13,17 @@ BOARD_INSUFFICIENT_MEMORY := calliope-mini chronos microbit msb-430 msb-430h \
                              nucleo-f334 nucleo-l053 spark-core stm32f0discovery telosb \
                              weio wsn430-v1_3b wsn430-v1_4 z1
 
+ifneq (,$(filter xbee,$(USEMODULE)))
+  # Prepend your build command with USEMODULE=xbee in order to
+  # use a XBee radio and apply the following configurations
+
+  # set default UART to use in case none was defined
+  XBEE_UART ?= "1"
+
+  # export UART to params file
+  CFLAGS += -DXBEE_PARAM_UART=$(XBEE_UART)
+endif
+
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
