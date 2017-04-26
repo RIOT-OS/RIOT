@@ -199,16 +199,11 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb)
 #ifdef MODULE_GNRC_IPV6
     tcb->address_family = AF_INET6;
 #else
-    tcb->address_family = AF_UNSPEC;
     DEBUG("gnrc_tcp.c : gnrc_tcp_tcb_init() : Address unspec, add netlayer module to makefile\n");
 #endif
-    tcb->local_port = PORT_UNSPEC;
-    tcb->peer_port = PORT_UNSPEC;
-    tcb->state = FSM_STATE_CLOSED;
     tcb->rtt_var = RTO_UNINITIALIZED;
     tcb->srtt = RTO_UNINITIALIZED;
     tcb->rto = RTO_UNINITIALIZED;
-    tcb->owner = KERNEL_PID_UNDEF;
     mutex_init(&(tcb->fsm_lock));
     mutex_init(&(tcb->function_lock));
 }

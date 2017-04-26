@@ -34,7 +34,7 @@ extern "C" {
  *  @brief The TCP FSM states.
  */
 typedef enum {
-    FSM_STATE_CLOSED,
+    FSM_STATE_CLOSED = 0,
     FSM_STATE_LISTEN,
     FSM_STATE_SYN_SENT,
     FSM_STATE_SYN_RCVD,
