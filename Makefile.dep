@@ -55,14 +55,6 @@ ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pk
   USEMODULE += gnrc
 endif
 
-ifneq (,$(filter gnrc_conn_%,$(USEMODULE)))
-  USEMODULE += gnrc_conn
-endif
-
-ifneq (,$(filter gnrc_conn_udp,$(USEMODULE)))
-  USEMODULE += gnrc_udp
-endif
-
 ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
   USEMODULE += gnrc_sock
 endif
@@ -412,18 +404,6 @@ ifneq (,$(filter lwip_udplite,$(USEMODULE)))
   USEMODULE += lwip_udp
 endif
 
-ifneq (,$(filter lwip_conn_%,$(USEMODULE)))
-  USEMODULE += lwip_conn
-endif
-
-ifneq (,$(filter lwip_conn_ip,$(USEMODULE)))
-  USEMODULE += lwip_raw
-endif
-
-ifneq (,$(filter lwip_conn_udp,$(USEMODULE)))
-  USEMODULE += lwip_udp
-endif
-
 ifneq (,$(filter lwip_sock_%,$(USEMODULE)))
   USEMODULE += lwip_sock
 endif
@@ -493,22 +473,6 @@ endif
 ifneq (,$(filter oonf_common,$(USEMODULE)))
   USEPKG += oonf_api
   USEMODULE += posix_sockets
-endif
-
-ifneq (,$(filter %_conn_ip,$(USEMODULE)))
-  USEMODULE += conn_ip
-endif
-
-ifneq (,$(filter %_conn_tcp,$(USEMODULE)))
-  USEMODULE += conn_tcp
-endif
-
-ifneq (,$(filter %_conn_udp,$(USEMODULE)))
-  USEMODULE += conn_udp
-endif
-
-ifneq (,$(filter conn_%,$(USEMODULE)))
-  USEMODULE += conn
 endif
 
 # if any log_* is used, also use LOG pseudomodule
