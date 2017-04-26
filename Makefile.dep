@@ -14,7 +14,7 @@ ifneq (,$(filter csma_sender,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nhdp,$(USEMODULE)))
-  USEMODULE += conn_udp
+  USEMODULE += sock_udp
   USEMODULE += xtimer
   USEMODULE += oonf_rfc5444
 endif
