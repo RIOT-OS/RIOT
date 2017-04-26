@@ -101,7 +101,6 @@ typedef struct cipher_interface_st {
 
 typedef const cipher_interface_t *cipher_id_t;
 
-extern const cipher_id_t CIPHER_3DES;
 extern const cipher_id_t CIPHER_AES_128;
 
 
