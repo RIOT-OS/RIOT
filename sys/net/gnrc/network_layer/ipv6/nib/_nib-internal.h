@@ -22,10 +22,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "evtimer_msg.h"
 #include "kernel_types.h"
 #include "mutex.h"
 #include "net/eui64.h"
 #include "net/ipv6/addr.h"
+#ifdef MODULE_GNRC_IPV6
+#include "net/gnrc/ipv6.h"
+#endif
 #include "net/gnrc/ipv6/nib/nc.h"
 #include "net/gnrc/ipv6/nib/conf.h"
 #include "net/gnrc/pktqueue.h"
@@ -98,6 +102,16 @@ typedef struct _nib_onl_entry {
      * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ARSM != 0.
      */
     uint8_t l2addr[GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
+    /**
+     * @brief Event for @ref GNRC_IPV6_NIB_REACH_TIMEOUT and
+     *        @ref GNRC_IPV6_NIB_DELAY_TIMEOUT
+     *
+     * @note    Events of these types can't be in the event queue at the same
+     *          time (since they only have one NUD state at a time). Because of
+     *          this we can use one event for both of them (but need the
+     *          different types, since the events are handled differently)
+     */
+    evtimer_msg_event_t nud_timeout;
 #endif
 
     /**
@@ -198,6 +212,11 @@ typedef struct {
  * @brief   Mutex for locking the NIB
  */
 extern mutex_t _nib_mutex;
+
+/**
+ * @brief   Event timer for the NIB.
+ */
+extern evtimer_msg_t _nib_evtimer;
 
 /**
  * @brief   Initializes NIB internally
@@ -311,6 +330,16 @@ _nib_onl_entry_t *_nib_nc_add(const ipv6_addr_t *addr, unsigned iface,
  * @param[in,out] node  A node.
  */
 void _nib_nc_remove(_nib_onl_entry_t *node);
+
+/**
+ * @brief   Gets external neighbor cache entry representation from on-link entry
+ *
+ * @pre `(node != NULL) && (nce != NULL)`
+ *
+ * @param[in] node  On-link entry.
+ * @param[out] nce  External representation of the neighbor cache entry.
+ */
+void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce);
 
 /**
  * @brief   Sets a NUD-managed neighbor cache entry to reachable and sets the
@@ -624,6 +653,41 @@ static inline void _nib_ft_remove(_nib_offl_entry_t *nib_offl)
  * @return  NULL, if no space left for interface.
  */
 _nib_iface_t *_nib_iface_get(unsigned iface);
+
+/**
+ * @brief   Looks up if an event is queued in the event timer
+ *
+ * @param[in] ctx   Context of the event. May be NULL for any event context.
+ * @param[in] type  [Type of the event](@ref net_gnrc_ipv6_nib_msg).
+ *
+ * @return  Milliseconds to the event, if event in queue.
+ * @return  UINT32_MAX, event is not in queue.
+ */
+uint32_t _evtimer_lookup(const void *ctx, uint16_t type);
+
+/**
+ * @brief   Adds an event to the event timer
+ *
+ * @param[in] ctx       The context of the event
+ * @param[in] type      [Type of the event](@ref net_gnrc_ipv6_nib_msg).
+ * @param[in,out] event Representation of the event.
+ * @param[in] offset    Offset in milliseconds to the event.
+ */
+static inline void _evtimer_add(void *ctx, int16_t type,
+                                evtimer_msg_event_t *event, uint32_t offset)
+{
+#ifdef MODULE_GNRC_IPV6
+    kernel_pid_t target_pid = gnrc_ipv6_pid;
+#else
+    kernel_pid_t target_pid = KERNEL_PID_LAST;  /* just for testing */
+#endif
+    evtimer_del((evtimer_t *)(&_nib_evtimer), (evtimer_event_t *)event);
+    event->event.next = NULL;
+    event->event.offset = offset;
+    event->msg.type = type;
+    event->msg.content.ptr = ctx;
+    evtimer_add_msg(&_nib_evtimer, event, target_pid);
+}
 
 #ifdef __cplusplus
 }

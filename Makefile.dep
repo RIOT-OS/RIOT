@@ -316,6 +316,7 @@ ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
+  USEMODULE += evtimer
   USEMODULE += ipv6_addr
   USEMODULE += random
 endif
