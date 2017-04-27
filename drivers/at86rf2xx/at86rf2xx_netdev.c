@@ -35,7 +35,7 @@
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #define _MAX_MHR_OVERHEAD   (25)
@@ -46,9 +46,10 @@ static int _init(netdev_t *netdev);
 
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len);
 static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len);
+static void _isr(netdev_t *netdev);
 
 #ifndef MODULE_AT86RFR2
-static void _isr(netdev_t *netdev);
+
 #endif
 
 
@@ -58,9 +59,7 @@ const netdev_driver_t at86rf2xx_driver = {
     .init = _init,
     .get = _get,
     .set = _set,
-#ifndef MODULE_AT86RFR2
     .isr = _isr,
-#endif
 };
 
 #ifndef MODULE_AT86RFR2
@@ -104,6 +103,7 @@ static int _init(netdev_t *netdev)
     }
 
 #if ENABLE_DEBUG
+    uint16_t partnum = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM);
     uint16_t version = at86rf2xx_reg_read(dev, AT86RF2XX_REG__VERSION_NUM);
     uint16_t man_id0 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__MAN_ID_0);
     uint16_t man_id1 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__MAN_ID_1);
@@ -162,6 +162,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     /* get the size of the received packet */
 #ifdef MODULE_AT86RFR2
     phr =  TST_RX_LENGTH;
+
 #else
 	at86rf2xx_fb_read(dev, &phr, 1);
 #endif
@@ -517,9 +518,9 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
 
         case NETOPT_CSMA_RETRIES:
             assert(len <= sizeof(uint8_t));
-            if( !(dev->netdev.flags & AT86RF2XX_OPT_CSMA ||
-                (*((uint8_t *)val) > 5)) ) {
-                /* If CSMA is disabled, don't allow setting retries */
+            if( !(dev->netdev.flags & AT86RF2XX_OPT_CSMA) ||
+                (*((uint8_t *)val) > 5))  {
+                /* If CSMA is disabled, don't allow setting retries, or when the retries exceed 5 */
                 res = -EINVAL;
             }
             else {
@@ -552,7 +553,81 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
     return res;
 }
 
-#ifndef MODULE_AT86RFR2
+#ifdef MODULE_AT86RFR2
+static void _isr(netdev_t *netdev)
+{
+	at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
+
+	/* If transceiver is sleeping register access is impossible and frames are
+	 * lost anyway, so return immediately.
+	 */
+	uint8_t state = at86rf2xx_get_status(dev);
+	if (state == AT86RF2XX_STATE_SLEEP) {
+		return;
+	}
+
+	uint8_t irq_mask = ((at86rf2xx_t*)netdev)->irq_status ;
+	uint8_t irq_mask1 = ((at86rf2xx_t*)netdev)->irq_status1 ;
+
+	uint8_t trac_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATE) &
+                  AT86RF2XX_TRX_STATE_MASK__TRAC;
+
+	DEBUG("[at86rf2xx]_isr: \nirq_status 0x%x\nirq_status1 0x%x\ntrac_status 0x%x\n", irq_mask, irq_mask1,trac_status );
+
+	if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN) {
+        netdev->event_callback(netdev, NETDEV_EVENT_RX_STARTED);
+        DEBUG("[at86rf2xx] EVT - RX_START\n");
+        ((at86rf2xx_t*)netdev)->irq_status  &=~AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN;
+    }
+
+    if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN) {
+        if (state == AT86RF2XX_STATE_RX_AACK_ON ||
+            state == AT86RF2XX_STATE_BUSY_RX_AACK) {
+            DEBUG("[at86rf2xx] EVT - RX_END\n");
+            if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)) {
+                return;
+            }
+            netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+        }
+        else if (state == AT86RF2XX_STATE_TX_ARET_ON ||
+                 state == AT86RF2XX_STATE_BUSY_TX_ARET) {
+            /* check for more pending TX calls and return to idle state if
+             * there are none */
+            assert(dev->pending_tx != 0);
+            if ((--dev->pending_tx) == 0) {
+                at86rf2xx_set_state(dev, dev->idle_state);
+                DEBUG("[at86rf2xx] return to state 0x%x\n", dev->idle_state);
+            }
+
+            DEBUG("[at86rf2xx] EVT - TX_END\n");
+
+            if (netdev->event_callback && (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END)) {
+                switch (trac_status) {
+                    case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
+                    case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
+                        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+                        DEBUG("[at86rf2xx] TX SUCCESS\n");
+                        break;
+                    case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
+                        netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
+                        DEBUG("[at86rf2xx] TX NO_ACK\n");
+                        break;
+                    case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
+                        netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
+                        DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
+                        break;
+                    default:
+                        DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",
+                              trac_status >> 5);
+                }
+            }
+        }
+    }
+
+	((at86rf2xx_t*)netdev)->irq_status = 0;
+	((at86rf2xx_t*)netdev)->irq_status1 = 0;
+}
+#else
 static void _isr(netdev_t *netdev)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
@@ -571,15 +646,16 @@ static void _isr(netdev_t *netdev)
     /* read (consume) device status */
     irq_mask = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
 
+
     trac_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATE) &
                   AT86RF2XX_TRX_STATE_MASK__TRAC;
 
-    if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__RX_START) {
+    if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN) {
         netdev->event_callback(netdev, NETDEV_EVENT_RX_STARTED);
         DEBUG("[at86rf2xx] EVT - RX_START\n");
     }
 
-    if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__TRX_END) {
+    if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN) {
         if (state == AT86RF2XX_STATE_RX_AACK_ON ||
             state == AT86RF2XX_STATE_BUSY_RX_AACK) {
             DEBUG("[at86rf2xx] EVT - RX_END\n");

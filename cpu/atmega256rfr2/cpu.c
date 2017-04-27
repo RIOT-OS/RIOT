@@ -62,6 +62,12 @@ void cpu_init(void)
 ISR(BADISR_vect)
 {
 
+	if( MCUSR&(1<<PORF)  ){printf_P(PSTR("Power-on reset.\n"));}
+	if( MCUSR&(1<<EXTRF) ){printf_P(PSTR("External reset!\n"));}
+	if( MCUSR&(1<<BORF)  ){printf_P(PSTR("Brownout reset!\n"));}
+	if( MCUSR&(1<<WDRF)  ){printf_P(PSTR("Watchdog reset!\n"));}
+	if( MCUSR&(1<<JTRF)  ){printf_P(PSTR("JTAG reset!\n"));}
+
 	printf_P(PSTR("FATAL ERROR: BADISR_vect called, unprocessed Interrupt.\nSTOP Execution.\n"));
 
 	printf("IRQ_STATUS %#02x\nIRQ_STATUS1 %#02x\n", (unsigned int)IRQ_STATUS, (unsigned int)IRQ_STATUS1 );
@@ -79,55 +85,57 @@ ISR(BADISR_vect)
 
 /* All Interrupts are liste here to test them.*/
 /*TODO Remove not needed interupt vector routines */
-	ISR(INT0_vect, ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("INT0_vect \n");
-		__exit_isr();
-	}
-	ISR(INT1_vect, ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("INT1_vect \n");
-		__exit_isr();
-	}
-	ISR(INT2_vect, ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("INT2_vect \n");
-		__exit_isr();
-	}
-	ISR(INT3_vect , ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("INT3_vect \n");
-		__exit_isr();
-	}
 
-	ISR(INT4_vect, ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("INT4_vect \n");
-		__exit_isr();
-	}
-	ISR(INT5_vect, ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("INT5_vect \n");
-		__exit_isr();
-	}
-	ISR(INT6_vect, ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("INT6_vect \n");
-		__exit_isr();
-	}
-	ISR(INT7_vect , ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("INT7_vect \n");
-		__exit_isr();
-	}
+/*INT0 - 7 defined in gpio.c */
+//	ISR(INT0_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("INT0_vect \n");
+//		__exit_isr();
+//	}
+//	ISR(INT1_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("INT1_vect \n");
+//		__exit_isr();
+//	}
+//	ISR(INT2_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("INT2_vect \n");
+//		__exit_isr();
+//	}
+//	ISR(INT3_vect , ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("INT3_vect \n");
+//		__exit_isr();
+//	}
+//
+//	ISR(INT4_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("INT4_vect \n");
+//		__exit_isr();
+//	}
+//	ISR(INT5_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("INT5_vect \n");
+//		__exit_isr();
+//	}
+//	ISR(INT6_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("INT6_vect \n");
+//		__exit_isr();
+//	}
+//	ISR(INT7_vect , ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		DEBUG("INT7_vect \n");
+//		__exit_isr();
+//	}
 
 
 
@@ -398,3 +406,9 @@ ISR(BADISR_vect)
 		__exit_isr();
 	}
 
+	ISR(BAT_LOW_vect , ISR_BLOCK)
+	{
+		__enter_isr();
+		DEBUG("BAT_LOW \n");
+		__exit_isr();
+	}

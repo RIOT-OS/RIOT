@@ -32,6 +32,8 @@
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_netdev.h"
 
+#include "net/gnrc/netdev.h"
+
 #define ENABLE_DEBUG (1)
 #include "debug.h"
 
@@ -75,7 +77,8 @@
 	{
 		__enter_isr();
 		LED_PORT &= ~GREEN;
-		static_dev->event_callback(static_dev, NETDEV_EVENT_RX_STARTED);
+		((at86rf2xx_t*)static_dev)->irq_status |=  AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN;
+		static_dev->event_callback(static_dev,NETDEV_EVENT_ISR);
 		__exit_isr();
 	}
 
@@ -85,7 +88,9 @@
 	ISR(TRX24_RX_END_vect, ISR_BLOCK)
 	{
 		__enter_isr();
-		static_dev->event_callback(static_dev,NETDEV_EVENT_RX_COMPLETE);
+		//DEBUG("TRX24_RX_END \n");
+		((at86rf2xx_t*)static_dev)->irq_status |=  AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN;
+		static_dev->event_callback(static_dev,NETDEV_EVENT_ISR);
 	    LED_PORT |= GREEN;
 		__exit_isr();
 	}
@@ -96,10 +101,15 @@
 		DEBUG("TRX24_CCA_ED_DONE \n");
 		__exit_isr();
 	}
+	/* Transceiver Frame Address Match
+	 * Indicates address matching
+	 *
+	 * */
 	ISR(TRX24_XAH_AMI_vect , ISR_BLOCK)
 	{
+
 		__enter_isr();
-		DEBUG("TRX24_XAH_AMI  \n");
+		DEBUG("TRX24_XAH_AMI \n");
 		__exit_isr();
 	}
 
@@ -109,8 +119,9 @@
 	ISR(TRX24_TX_END_vect, ISR_BLOCK)
 	{
 		__enter_isr();
-		// DEBUG("TRX24_TX_END_vect\n");
-		static_dev->event_callback(static_dev, NETDEV_EVENT_TX_COMPLETE);
+		DEBUG("TRX24_TX_END_vect\n");
+		((at86rf2xx_t*)static_dev)->irq_status |=  AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN;
+		static_dev->event_callback(static_dev,NETDEV_EVENT_ISR);
 		LED_PORT |= RED;
 		__exit_isr();
 
@@ -165,12 +176,6 @@
 		DEBUG("AES_READY \n");
 		__exit_isr();
 	}
-	ISR(BAT_LOW_vect , ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("BAT_LOW \n");
-		__exit_isr();
-	}
 
 	/**
 	 * \brief ISR for transceiver's TX_START interrupt
@@ -178,34 +183,39 @@
 	ISR(TRX24_TX_START_vect)
 	{
 		__enter_isr();
-		// DEBUG("TRX24_TX_START_vect\n");
+		 DEBUG("TRX24_TX_START_vect\n");
 		LED_PORT &= ~RED;
-		static_dev->event_callback(static_dev, NETDEV_EVENT_TX_STARTED);
+		((at86rf2xx_t*)static_dev)->irq_status1 |= AT86RF2XX_IRQ_STATUS_MASK1__TX_START_EN;
+		static_dev->event_callback(static_dev,NETDEV_EVENT_ISR);
 		__exit_isr();
 	}
 
+	/* address match interrupt from address filter #0,
+	 * enabled bit AMI0 in register IRQ_MASK1 is set.
+	 *
+	 */
 	ISR(TRX24_AMI0_vect , ISR_BLOCK)
 	{
 		__enter_isr();
-		DEBUG("TRX24_AMI0  \n");
+		DEBUG("TRX24_AMI0 \n");
 		__exit_isr();
 	}
 	ISR(TRX24_AMI1_vect , ISR_BLOCK)
 	{
 		__enter_isr();
-		DEBUG("TRX24_AMI1  \n");
+		DEBUG("TRX24_AMI1 \n");
 		__exit_isr();
 	}
 	ISR(TRX24_AMI2_vect , ISR_BLOCK)
 	{
 		__enter_isr();
-		DEBUG("TRX24_AMI2  \n");
+		DEBUG("TRX24_AMI2 \n");
 		__exit_isr();
 	}
 	ISR(TRX24_AMI3_vect , ISR_BLOCK)
 	{
 		__enter_isr();
-		DEBUG("TRX24_AMI3  \n");
+		DEBUG("TRX24_AMI3 \n");
 		__exit_isr();
 	}
 
@@ -224,7 +234,8 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
 
 #ifdef MODULE_AT86RFR2
     // save device pointer for interrupts
-    static_dev= netdev;
+    static_dev= (netdev_t *)dev;
+
 #endif
 }
 
@@ -293,23 +304,23 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 
 	/* enable interrupts IRQ_MASK*/
 	at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
-			 AT86RF2XX_IRQ_STATUS_MASK__AWAKE
-			| AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN
+			// AT86RF2XX_IRQ_STATUS_MASK__AWAKE
+			 AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN
 			| AT86RF2XX_IRQ_STATUS_MASK__AMI_EN
-			| AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE_EN
+			//| AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE_EN
 			| AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN
 			| AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN
-			| AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK_EN
-			| AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN
+			//| AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK_EN
+			//| AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN
 						);
 
 	/* enable interrupts IRQ_MASK1*/
 	   at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1,
 			   AT86RF2XX_IRQ_STATUS_MASK1__TX_START_EN
-			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_0_AMI_EN
-			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_1_AMI_EN
-			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_2_AMI_EN
-			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_3_AMI_EN
+//			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_0_AMI_EN
+//			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_1_AMI_EN
+//			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_2_AMI_EN
+//			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_3_AMI_EN
 						);
    /* set PLL on */
 	   at86rf2xx_set_state(dev, AT86RF2XX_STATE_PLL_ON);
@@ -328,7 +339,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 
 	/* enable interrupts */
 	at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
-						AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
+						AT86RF2XX_IRQ_STATUS_MASK__TRX_END_EN);
 
 	/* clear interrupt flags */
 	at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);

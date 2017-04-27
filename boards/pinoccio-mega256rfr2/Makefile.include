@@ -6,6 +6,17 @@ export CPU_MODEL = atmega256rfr2
 export TERMPROG = python /usr/local/bin/pyterm
 export TERMFLAGS = -b 9600 -p $(PORT)
 
+
+#############################################################################
+# Fuses read out
+# 	lfuse = 0xde		
+#	hfuse = 0xd0
+#	efuse = 0xfe
+#
+# avrdude -p atmega256rfr2 -c wiring -P /dev/ttyACM0 -b 115200 -U lfuse:r:-:h -U hfuse:r:-:h -U efuse:r:-:h -C "/etc/avrdude.conf"
+# avrdude -p atmega256rfr2 -c wiring -P /dev/ttyACM0 -b 115200 -U lfuse:r:-:i -U hfuse:r:-:i -U efuse:r:-:i -C "/etc/avrdude.conf"
+#############################################################################
+
 SIZEFLAGS = --format=avr --mcu=$(CPU_MODEL)
  
 #define the flash-tool and default port depending on the host operating system
@@ -15,17 +26,12 @@ ifeq ($(OS),Linux)
   # -@ ignore fail and continue with next make command
   # find process using ACM0 and kill it
   # a way to avoid the erros wouls be nice
-  %PREFLASHER = pgrep -f /dev/ttyACM0 2>/dev/null |xargs --no-run-if-empty kill||true
-  %PREFLASHER = -@ pgrep -f /dev/ttyACM0 |xargs -r kill 
-  #PREFLASHER = -@if [ "pgrep -f /dev/ttyACM0" ]; then pgrep -f /dev/ttyACM0 |xargs kill||true ; else pgrep -f /dev/ttyACM0||true ;fi
-  #@pgrep pgrep -f /dev/ttyACM0 ||true |xargs --no-run-if-empty kill 
-  #PREFLASHER = pgrep -f /dev/ttyACM0 >/dev/null 2>&1 
+  PREFLASHER = sudo pgrep -f /dev/ttyACM0 2>/dev/null |xargs --no-run-if-empty kill
   
   FLASHER = avrdude
   export FLASHER_PATH ="/etc/avrdude.conf"
   export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex:i -C $(FLASHER_PATH) 
-  #export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -n -v -U lfuse:r:-:h -U hfuse:r:-:h -U efuse:r:-:h  -C $(FLASHER_PATH) 
-#-U lfuse:r:-:i -U hfuse:r:-:i -U efuse:r:-:i 
+
 else ifeq ($(OS),Darwin)
   PORT ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
   FLASHER = avrdude
@@ -35,7 +41,7 @@ else ifeq ($(OS),MINGW32_NT-6.2)
 	FLASHER = avrdude
 	export FLASHER_PATH ="C:/avrdude/avrdude.conf"
 	export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex:i -C $(FLASHER_PATH)
-	
+
 else
   $(info CAUTION: No flash tool for your host system found!)
   # TODO: fix for building under windows

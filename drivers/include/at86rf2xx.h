@@ -182,6 +182,18 @@ typedef struct {
     uint8_t pending_tx;                 /**< keep track of pending TX calls
                                              this is required to know when to
                                              return to @ref at86rf2xx_t::idle_state */
+#ifdef MODULE_AT86RFR2
+    /* ATmega256rfr2 signals transceiver events with different interrupts
+     * they have to be stored to mimic the same flow as external transceiver
+     * Use irq_status to map save interrupts of SOC transceiver,
+     *  so it is not necessary to check them again.
+     *
+     *  irq_status = IRQ_STATUS
+     *  irq_status = IRQ_STATUS1
+     * */
+    uint8_t irq_status;                     /**< save irq status */
+    uint8_t irq_status1;                    /**< save irq status1*/
+#endif
     /** @} */
 } at86rf2xx_t;
 

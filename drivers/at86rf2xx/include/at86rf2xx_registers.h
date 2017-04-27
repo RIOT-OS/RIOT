@@ -328,7 +328,7 @@ extern "C" {
 	#define AT86RF2XX_IRQ_STATUS_MASK__TRX_UR_EN                    (0x40)
 	#define AT86RF2XX_IRQ_STATUS_MASK__AMI_EN                       (0x20)
 	#define AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE_EN               (0x10)
-	#define AT86RF2XX_IRQ_STATUS_MASK__TRX_END_EN                   (0x08)
+	#define AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN                   (0x08)
 	#define AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN                  (0x04)
 	#define AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK_EN                (0x02)
 	#define AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN                  (0x01)
