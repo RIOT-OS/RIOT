@@ -33,9 +33,9 @@ static void clk_init(void)
 
     /* adjust NVM wait states, see table 42.30 (p. 1070) in the datasheet */
 #if (CLOCK_CORECLOCK > 24000000)
-    PM->APBAMASK.reg |= PM_AHBMASK_NVMCTRL;
+    PM->APBBMASK.reg |= PM_APBBMASK_NVMCTRL;
     NVMCTRL->CTRLB.reg |= NVMCTRL_CTRLB_RWS(1);
-    PM->APBAMASK.reg &= ~PM_AHBMASK_NVMCTRL;
+    PM->APBBMASK.reg &= ~PM_APBBMASK_NVMCTRL;
 #endif
 
     /* configure internal 8MHz oscillator to run without prescaler */

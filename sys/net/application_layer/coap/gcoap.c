@@ -390,7 +390,6 @@ void gcoap_register_listener(gcoap_listener_t *listener)
 
 int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code,
                                                               char *path) {
-    uint8_t token[GCOAP_TOKENLEN];
     ssize_t hdrlen;
     (void)len;
 
@@ -398,6 +397,8 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code,
     memset(pdu->url, 0, NANOCOAP_URL_MAX);
 
     /* generate token */
+#if GCOAP_TOKENLEN
+    uint8_t token[GCOAP_TOKENLEN];
     for (size_t i = 0; i < GCOAP_TOKENLEN; i += 4) {
         uint32_t rand = random_uint32();
         memcpy(&token[i],
@@ -405,8 +406,11 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code,
                (GCOAP_TOKENLEN - i >= 4) ? 4 : GCOAP_TOKENLEN - i);
     }
     hdrlen = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &token[0], GCOAP_TOKENLEN,
-                                                     code,
-                                                   ++_coap_state.last_message_id);
+                            code, ++_coap_state.last_message_id);
+#else
+    hdrlen = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, NULL, GCOAP_TOKENLEN,
+                            code, ++_coap_state.last_message_id);
+#endif
 
     if (hdrlen > 0) {
         /* Reserve some space between the header and payload to write options later */

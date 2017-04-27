@@ -25,7 +25,7 @@
 /*
  * Client GET request success case. Test request generation.
  * Request /time resource from libcoap example
- * Includes 2-byte token
+ * Includes token of length GCOAP_TOKENLEN.
  */
 static void test_gcoap__client_get_req(void)
 {
@@ -34,17 +34,27 @@ static void test_gcoap__client_get_req(void)
     size_t len;
     char path[] = "/time";
 
-    uint8_t pdu_data[] = {
-        0x52, 0x01, 0xe6, 0x02, 0x9b, 0xce, 0xb4, 0x74,
-        0x69, 0x6d, 0x65
-    };
+    /* Create expected pdu_data, with token length from GCOAP_TOKENLEN. */
+    size_t hdr_fixed_len = 4;
+    uint8_t hdr_fixed[]  = { 0x52, 0x01, 0xe6, 0x02 };
+    size_t options_len   = 5;
+    uint8_t options[]    = { 0xb4, 0x74, 0x69, 0x6d, 0x65 };
+
+    uint8_t pdu_data[hdr_fixed_len + GCOAP_TOKENLEN + options_len];
+
+    memcpy(&pdu_data[0], &hdr_fixed[0], hdr_fixed_len);
+#if GCOAP_TOKENLEN
+    /* actual value is random */
+    memset(&pdu_data[hdr_fixed_len], 0x9b, GCOAP_TOKENLEN);
+#endif
+    memcpy(&pdu_data[hdr_fixed_len + GCOAP_TOKENLEN], &options[0], options_len);
 
     len = gcoap_request(&pdu, &buf[0], GCOAP_PDU_BUF_SIZE, COAP_METHOD_GET,
                                                            &path[0]);
 
     TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code(&pdu));
     TEST_ASSERT_EQUAL_INT(GCOAP_TOKENLEN, coap_get_token_len(&pdu));
-    TEST_ASSERT_EQUAL_INT(4 + GCOAP_TOKENLEN, coap_get_total_hdr_len(&pdu));
+    TEST_ASSERT_EQUAL_INT(hdr_fixed_len + GCOAP_TOKENLEN, coap_get_total_hdr_len(&pdu));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_NON, coap_get_type(&pdu));
     TEST_ASSERT_EQUAL_STRING(&path[0], (char *)&pdu.url[0]);
     TEST_ASSERT_EQUAL_INT(0, pdu.payload_len);
@@ -54,13 +64,16 @@ static void test_gcoap__client_get_req(void)
 /*
  * Client GET response success case. Test parsing response.
  * Response for /time resource from libcoap example
+ * Includes 2-byte token
  */
 static void test_gcoap__client_get_resp(void)
 {
     uint8_t buf[GCOAP_PDU_BUF_SIZE];
     coap_pkt_t pdu;
     int res;
-    char exp_payload[] = "Oct 22 10:46:48";
+    size_t hdr_fixed_len = 4;
+    char exp_payload[]   = "Oct 22 10:46:48";
+    size_t exp_tokenlen  = 2;
 
     uint8_t pdu_data[] = {
         0x52, 0x45, 0xe6, 0x02, 0x9b, 0xce, 0xc0, 0x21,
@@ -74,8 +87,8 @@ static void test_gcoap__client_get_resp(void)
 
     TEST_ASSERT_EQUAL_INT(0, res);
     TEST_ASSERT_EQUAL_INT(COAP_CLASS_SUCCESS, coap_get_code_class(&pdu));
-    TEST_ASSERT_EQUAL_INT(GCOAP_TOKENLEN, coap_get_token_len(&pdu));
-    TEST_ASSERT_EQUAL_INT(4 + GCOAP_TOKENLEN, coap_get_total_hdr_len(&pdu));
+    TEST_ASSERT_EQUAL_INT(exp_tokenlen, coap_get_token_len(&pdu));
+    TEST_ASSERT_EQUAL_INT(hdr_fixed_len + exp_tokenlen, coap_get_total_hdr_len(&pdu));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_NON, coap_get_type(&pdu));
     TEST_ASSERT_EQUAL_INT(strlen(exp_payload), pdu.payload_len);
 

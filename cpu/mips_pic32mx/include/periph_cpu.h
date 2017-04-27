@@ -8,7 +8,7 @@
  *
  */
 
-/* This file must exist to get timer code to build */
+#include "periph_cpu_common.h"
 
 #ifdef __cplusplus
 extern "C" {

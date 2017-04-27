@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Mapping from MCU pins to Arduino pins
+ * @brief       Mapping from MCU pins to Arduino pins for Arduino Atmega boards
  *
  * You can use the defines in this file for simplified interaction with the
  * Arduino specific pin numbers.

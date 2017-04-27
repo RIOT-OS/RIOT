@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Board specific configuration for the Arduino API
+ * @brief       Configuration of the Arduino API for Arduino Atmega boards
  *
  * @author      Hauke Petersen  <hauke.petersen@fu-berlin.de>
  * @author      Laurent Navet   <laurent.navet@gmail.com>
