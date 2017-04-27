@@ -25,6 +25,12 @@
 
 #if KINETIS_CPU_USE_MCG
 
+#if defined(MCG_C6_PLLS_MASK)
+#define KINETIS_HAVE_PLL 1
+#else
+#define KINETIS_HAVE_PLL 0
+#endif
+
 /* Pathfinding for the clocking modes, this table lists the next mode in the
  * chain when moving from mode <first> to mode <second> */
 static const uint8_t mcg_mode_routing[8][8] = {
@@ -109,6 +115,7 @@ static uint8_t current_mode = KINETIS_MCG_FEI;
 #error "KINETIS_MCG_ERC_RANGE not defined in periph_conf.h"
 #endif
 
+#if KINETIS_HAVE_PLL
 #ifndef KINETIS_MCG_PLL_PRDIV
 #error "KINETIS_MCG_PLL_PRDIV not defined in periph_conf.h"
 #endif
@@ -130,6 +137,9 @@ static inline void kinetis_mcg_disable_pll(void)
     MCG->C5 = (uint8_t)0;
     MCG->C6 = (uint8_t)0;
 }
+#else
+static inline void kinetis_mcg_disable_pll(void) {}
+#endif /* KINETIS_HAVE_PLL */
 
 /**
  * @brief Set Frequency Locked Loop (FLL) factor.
@@ -311,6 +321,7 @@ static void kinetis_mcg_set_blpe(void)
     current_mode = KINETIS_MCG_BLPE;
 }
 
+#if KINETIS_HAVE_PLL
 /**
  * @brief Initialize the PLL Bypassed External Mode.
  *
@@ -366,7 +377,7 @@ static void kinetis_mcg_set_pee(void)
 
     current_mode = KINETIS_MCG_PEE;
 }
-
+#endif /* KINETIS_HAVE_PLL */
 
 int kinetis_mcg_set_mode(kinetis_mcg_mode_t mode)
 {
@@ -375,12 +386,14 @@ int kinetis_mcg_set_mode(kinetis_mcg_mode_t mode)
     }
     while (current_mode != mode) {
         switch(mcg_mode_routing[current_mode][mode]) {
+#if KINETIS_HAVE_PLL
             case KINETIS_MCG_PEE:
                 kinetis_mcg_set_pee();
                 break;
             case KINETIS_MCG_PBE:
                 kinetis_mcg_set_pbe();
                 break;
+#endif /* KINETIS_HAVE_PLL */
             case KINETIS_MCG_BLPE:
                 kinetis_mcg_set_blpe();
                 break;
