@@ -25,17 +25,8 @@
 #include "mcg.h"
 #include "periph/gpio.h"
 
-#define SIM_CLKDIV1_48MHZ      (SIM_CLKDIV1_OUTDIV1(0) | \
-                                SIM_CLKDIV1_OUTDIV2(1) | \
-                                SIM_CLKDIV1_OUTDIV3(1) | \
-                                SIM_CLKDIV1_OUTDIV4(1))
-
-static void cpu_clock_init(void);
-
 void board_init(void)
 {
-    /* initialize the clock system */
-    cpu_clock_init();
     /* initialize the CPU core */
     cpu_init();
 
@@ -46,23 +37,4 @@ void board_init(void)
     gpio_set(LED0_PIN);
     gpio_set(LED1_PIN);
     gpio_set(LED2_PIN);
-}
-
-/**
- * @brief Configure the controllers clock system
- *
- * | Clock name | Run mode frequency (max) | VLPR mode frequency (max) |
- *
- * | Core       | 120 MHz                  |   4 MHz                   |
- * | System     | 120 MHz                  |   4 MHz                   |
- * | Bus        |  60 MHz                  |   4 MHz                   |
- * | FlexBus    |  30 MHz                  | 800 kHz                   |
- * | Flash      |  26.67 MHz               |   4 MHz                   |
- */
-static void cpu_clock_init(void)
-{
-    /* setup system prescalers */
-    SIM->CLKDIV1 = (uint32_t)SIM_CLKDIV1_48MHZ;
-
-    kinetis_mcg_set_mode(KINETIS_MCG_PEE);
 }

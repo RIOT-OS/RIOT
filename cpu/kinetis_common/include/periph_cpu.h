@@ -20,6 +20,7 @@
 #define PERIPH_CPU_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "cpu.h"
 
@@ -322,6 +323,112 @@ typedef struct {
     uint8_t scgc_bit;             /**< Clock enable bit, within the register */
     uint8_t mode;                 /**< UART mode: data bits, parity, stop bits */
 } uart_conf_t;
+
+#if !defined(KINETIS_HAVE_PLL)
+#if defined(MCG_C6_PLLS_MASK) || DOXYGEN
+/**
+ * @brief Defined to 1 if the MCG in this Kinetis CPU has a PLL
+ */
+#define KINETIS_HAVE_PLL 1
+#else
+#define KINETIS_HAVE_PLL 0
+#endif
+#endif /* !defined(KINETIS_HAVE_PLL) */
+
+/**
+ * @brief Kinetis possible MCG modes
+ */
+typedef enum kinetis_mcg_mode {
+    KINETIS_MCG_MODE_FEI  = 0, /**< FLL Engaged Internal Mode */
+    KINETIS_MCG_MODE_FEE  = 1, /**< FLL Engaged External Mode */
+    KINETIS_MCG_MODE_FBI  = 2, /**< FLL Bypassed Internal Mode */
+    KINETIS_MCG_MODE_FBE  = 3, /**< FLL Bypassed External Mode */
+    KINETIS_MCG_MODE_BLPI = 4, /**< FLL Bypassed Low Power Internal Mode */
+    KINETIS_MCG_MODE_BLPE = 5, /**< FLL Bypassed Low Power External Mode */
+#if KINETIS_HAVE_PLL
+    KINETIS_MCG_MODE_PBE  = 6, /**< PLL Bypassed External Mode */
+    KINETIS_MCG_MODE_PEE  = 7, /**< PLL Engaged External Mode */
+#endif
+    KINETIS_MCG_MODE_NUMOF,    /**< Number of possible modes */
+} kinetis_mcg_mode_t;
+
+/**
+ * @brief Kinetis MCG FLL multiplier settings
+ */
+typedef enum {
+    /** FLL multiplier = 640 */
+    KINETIS_MCG_FLL_FACTOR_640  = (MCG_C4_DRST_DRS(0)),
+    /** FLL multiplier = 732 */
+    KINETIS_MCG_FLL_FACTOR_732  = (MCG_C4_DRST_DRS(0) | MCG_C4_DMX32_MASK),
+    /** FLL multiplier = 1280 */
+    KINETIS_MCG_FLL_FACTOR_1280 = (MCG_C4_DRST_DRS(1)),
+    /** FLL multiplier = 1464 */
+    KINETIS_MCG_FLL_FACTOR_1464 = (MCG_C4_DRST_DRS(1) | MCG_C4_DMX32_MASK),
+    /** FLL multiplier = 1920 */
+    KINETIS_MCG_FLL_FACTOR_1920 = (MCG_C4_DRST_DRS(2)),
+    /** FLL multiplier = 2197 */
+    KINETIS_MCG_FLL_FACTOR_2197 = (MCG_C4_DRST_DRS(2) | MCG_C4_DMX32_MASK),
+    /** FLL multiplier = 2560 */
+    KINETIS_MCG_FLL_FACTOR_2560 = (MCG_C4_DRST_DRS(3)),
+    /** FLL multiplier = 2929 */
+    KINETIS_MCG_FLL_FACTOR_2929 = (MCG_C4_DRST_DRS(3) | MCG_C4_DMX32_MASK),
+} kinetis_mcg_fll_t;
+
+/**
+ * @brief Kinetis FLL external reference clock range settings
+ */
+typedef enum {
+    KINETIS_MCG_ERC_RANGE_LOW       = MCG_C2_RANGE0(0), /**< for 31.25-39.0625 kHz crystal */
+    KINETIS_MCG_ERC_RANGE_HIGH      = MCG_C2_RANGE0(1), /**< for 3-8 MHz crystal */
+    KINETIS_MCG_ERC_RANGE_VERY_HIGH = MCG_C2_RANGE0(2), /**< for 8-32 MHz crystal */
+} kinetis_mcg_erc_range_t;
+
+/**
+ * @brief Clock configuration for Kinetis CPUs
+ */
+typedef struct {
+    /** Clock divider bitfield setting, see reference manual for SIM_CLKDIV1 */
+    uint32_t clkdiv1;
+    /** MCG mode used after initialization, see kinetis_mcg_mode_t */
+    kinetis_mcg_mode_t default_mode;
+    /** ERC range setting, see kinetis_mcg_erc_range_t */
+    kinetis_mcg_erc_range_t erc_range;
+    /** Fast internal reference clock divider, see reference manual for MCG_SC[FCRDIV] */
+    uint8_t fcrdiv;
+    /** Oscillator selection, see reference manual for MCG_C7[OSCSEL] */
+    uint8_t oscsel;
+    /** Capacitor Load configuration bits, see reference manual for OSC_CR */
+    uint8_t clc;
+    /** FLL ERC divider setting, see reference manual for MCG_C1[FRDIV] */
+    uint8_t fll_frdiv;
+    /** FLL multiplier when running in FEI mode */
+    kinetis_mcg_fll_t fll_factor_fei;
+    /** FLL multiplier when running in FEE mode */
+    kinetis_mcg_fll_t fll_factor_fee;
+#if KINETIS_HAVE_PLL
+    /** PLL ERC divider setting, see reference manual for MCG_C5[PRDIV] */
+    uint8_t pll_prdiv;
+    /** PLL VCO divider setting, see reference manual for MCG_C6[VDIV0] */
+    uint8_t pll_vdiv;
+#endif /* KINETIS_HAVE_PLL */
+    /**
+     * @brief External reference clock selection
+     *
+     * True: Use oscillator circuit with external crystal.
+     * False: Use external clock signal directly.
+     */
+    bool enable_oscillator;
+    /**
+     * @brief Use fast internal reference clock for MCGIRCLK
+     *
+     * See reference manual for MCG module and MCG_C2[IRCS]
+     */
+    bool select_fast_irc;
+    /**
+     * @brief Enable MCGIRCLK output from MCG for use as alternate clock in some modules
+     */
+    bool enable_mcgirclk;
+} clock_config_t;
 
 /**
  * @brief   CPU internal function for initializing PORTs
