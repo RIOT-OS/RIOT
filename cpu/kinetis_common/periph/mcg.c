@@ -155,6 +155,8 @@ static inline void kinetis_mcg_set_fll_factor(uint8_t factor)
     MCG->C4 |= (uint8_t)(factor);
 }
 
+#ifdef OSC0
+/* Kinetis with OSC module */
 /**
  * @brief Enable Oscillator module
  *
@@ -187,6 +189,35 @@ static void kinetis_mcg_enable_osc(void)
         while ((MCG->S & MCG_S_OSCINIT0_MASK) == 0) {}
     }
 }
+#elif defined(RSIM)
+/**
+ * @brief Enable oscillator from RSIM module
+ *
+ * This is for Kinetis CPUs with a radio system integration module which can
+ * provide an oscillator output.
+ */
+static void kinetis_mcg_enable_osc(void)
+{
+    /* Enable RF oscillator circuit */
+    /* Current setting is that the OSC only runs in RUN and WAIT modes, see ref.man. */
+    *bme_bitfield32(&RSIM->CONTROL, RSIM_CONTROL_RF_OSC_EN_SHIFT, 4) = RSIM_CONTROL_RF_OSC_EN(1);
+    /* Chip errata
+     * e10224: RSIM: XTAL_OUT_EN signal from the pin is enabled by default
+     *
+     * Description: The XTAL_OUT_EN signal from the default XTAL_OUT_EN pin,
+     * PTB0, is enabled out of reset. This will result in the reference
+     * oscillator being enabled when this pin is asserted high regardless of the
+     * port control multiplexor setting.
+     *
+     * Workaround: To prevent the pin from enabling the XTAL out feature
+     * unintentionally, set RSIM_RF_OSC_CTRL[RADIO_EXT_OSC_OVRD_EN]=1.
+     */
+    bit_set32(&RSIM->RF_OSC_CTRL, RSIM_RF_OSC_CTRL_RADIO_EXT_OSC_OVRD_EN_SHIFT);
+
+    /* Wait for oscillator ready signal */
+    while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
+}
+#endif
 
 /**
  * @brief Initialize the FLL Engaged Internal Mode.
