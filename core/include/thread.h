@@ -132,13 +132,13 @@
 #endif
 
 /**
- * @brief Thread status list
+ * @name List of thread states
  * @{
  */
 #define STATUS_NOT_FOUND        (-1)            /**< Describes an illegal thread status */
 
 /**
- * @brief Blocked states.
+ * @name Blocked states
  * @{
  */
 #define STATUS_STOPPED              0   /**< has terminated                     */
@@ -153,7 +153,7 @@
 /** @} */
 
 /**
- * @brief These have to be on a run queue.
+ * @name Queued states
  * @{*/
 #define STATUS_ON_RUNQUEUE      STATUS_RUNNING  /**< to check if on run queue:
                                                  `st >= STATUS_ON_RUNQUEUE`             */

@@ -43,6 +43,7 @@
 static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *netdev);
+
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len);
 static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len);
 
@@ -373,6 +374,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         default:
             res = -ENOTSUP;
+            break;
     }
 
     /* go back to sleep if were sleeping */

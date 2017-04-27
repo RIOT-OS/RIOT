@@ -26,14 +26,14 @@ extern "C" {
 #endif
 
 /**
- * @brief   Clock configuration
+ * @name    Clock configuration
  * @{
  */
 #define CLOCK_CORECLOCK     (14745600L)
 /** @} */
 
 /**
- * @name   Timer peripheral configuration
+ * @name    Timer peripheral configuration
  *
  * The ATmega1281 has 6 timers. Timer0 and Timer2 are 8 Bit Timers,
  * Timer0 has special uses too and therefore we'll avoid using it.
@@ -60,9 +60,8 @@ extern "C" {
 #define TIMER_1_ISRC        TIMER4_COMPC_vect
 /** @} */
 
-
 /**
- * @name   UART configuration
+ * @name    UART configuration
  *
  * The UART devices have fixed pin mappings, so all we need to do, is to specify
  * which devices we would like to use and their corresponding RX interrupts. See
@@ -85,11 +84,10 @@ extern "C" {
 #define UART_4800           (191)
 #define UART_9600           (95)
 #define UART_115200         (7)
-
 /** @} */
 
 /**
- * @name   SPI configuration
+ * @name    SPI configuration
  *
  * The atmega1281 has only one hardware SPI with fixed pin configuration, so all
  * we can do here, is to enable or disable it...

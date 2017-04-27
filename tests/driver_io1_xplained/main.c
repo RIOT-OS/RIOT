@@ -18,14 +18,11 @@
  * @}
  */
 
-#ifndef TEST_ADDR
-#error "TEST_ADDR not defined"
-#endif
-
 #include <stdio.h>
 #include <inttypes.h>
 
 #include "io1_xplained.h"
+#include "io1_xplained_params.h"
 #include "xtimer.h"
 #include "board.h"
 
@@ -35,21 +32,17 @@ int main(void)
 {
     io1_xplained_t dev;
     float temperature;
-    int result;
 
     puts("IO1 Xplained extention test application\n");
+    puts("+-------------Initializing------------+\n");
 
-    printf("+------------Initializing------------+\n");
-    result = io1_xplained_init(&dev, TEST_ADDR);
-    if (result == -1) {
+    if (io1_xplained_init(&dev, &io1_xplained_params[0]) != IO1_XPLAINED_OK) {
         puts("[Error] Cannot initialize the IO1 Xplained extension\n");
         return 1;
     }
-    else {
-        printf("Initialization successful\n\n");
-    }
 
-    printf("\n+--------Starting tests --------+\n");
+    puts("Initialization successful");
+    puts("\n+--------Starting tests --------+");
     while (1) {
         /* Get temperature in degrees celsius */
         io1_xplained_read_temperature(&dev, &temperature);

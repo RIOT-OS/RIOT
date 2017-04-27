@@ -302,7 +302,6 @@ typedef enum IRQn {
 #define __FPU_PRESENT                  0         /**< Defines if an FPU is present or not */
 
 #include "core_cm4.h"                  /* Core Peripheral Access Layer */
-#include "system_MK60D10.h"            /* Device specific configuration file */
 
 /*!
  * @}
@@ -14576,6 +14575,12 @@ typedef struct {
 #define Watchdog_IRQHandler                      WDOG_EWM_IRQHandler
 #define LPTimer_IRQn                             LPTMR0_IRQn
 #define LPTimer_IRQHandler                       LPTMR0_IRQHandler
+
+/* Compatibility defines for compatibility with differing module names between
+ * MK60 and MKW22 headers */
+#define SIM_SCGC5_LPTMR_MASK SIM_SCGC5_LPTIMER_MASK
+#define SIM_SCGC5_LPTMR_SHIFT SIM_SCGC5_LPTIMER_SHIFT
+#define OSC0 OSC
 
 /*!
  * @}

@@ -41,6 +41,10 @@
 extern "C" {
 #endif
 
+#ifndef FMT_USE_MEMMOVE
+#define FMT_USE_MEMMOVE (1) /**< use memmove() or internal implementation */
+#endif
+
 /**
  * @brief Format a byte value as hex
  *
@@ -293,6 +297,31 @@ void print_u64_dec(uint64_t val);
  * @param[in]   str  Pointer to string to print
  */
 void print_str(const char* str);
+
+/**
+ * @brief Pad string to the left
+ *
+ * This function left-pads a given string @p str with @p pad_char.
+ *
+ * For example, calling
+ *
+ *     fmt_lpad("abcd", 4, 7, ' ');
+ *
+ * would result in "   abcd".
+ *
+ * The function only writes to @p str if str is non-NULL and @p pad_len is < @p
+ * in_len.
+ *
+ * @note Caller must ensure @p str can take pad_len characters!
+ *
+ * @param[inout]    str         string to pad (or NULL)
+ * @param[in]       in_len      length of str
+ * @param[in]       pad_len     total length after padding
+ * @param[in]       pad_char    char to use as pad char
+ *
+ * @returns         max(in_len, pad_len)
+ */
+size_t fmt_lpad(char *str, size_t in_len, size_t pad_len, char pad_char);
 
 #ifdef __cplusplus
 }

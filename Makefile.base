@@ -22,16 +22,33 @@ ${DIRS:%=ALL--%}:
 ${DIRS:%=CLEAN--%}:
 	$(QQ)"$(MAKE)" -C ${@:CLEAN--%=%} clean
 
-ifeq ($(strip $(SRC)),)
+## submodules
+ifeq (1, $(SUBMODULES))
+    # don't use *.c as SRC if SRC is empty (e.g., no module selected)
+    NO_AUTO_SRC := 1
+
+    # allow different submodule basename (e.g., MODULE=cpu_periph_common, but match just periph_%)
+    BASE_MODULE ?= $(MODULE)
+
+    # for each $(BASE_MODULE)_<name> in USEMODULE, add <name>.c to SRC
+    SRC += $(patsubst $(BASE_MODULE)_%,%.c,$(filter $(BASE_MODULE)_%,$(USEMODULE)))
+
+    # don't fail if a selected *.c file does not exist
+    ifeq (1, $(SUBMODULES_NOFORCE))
+        SRC := $(filter $(SRC), $(wildcard *.c))
+    endif
+endif
+
+ifeq ($(strip $(SRC))$(NO_AUTO_SRC),)
     SRC := $(filter-out $(SRC_NOLTO), $(wildcard *.c))
 endif
-ifeq ($(strip $(SRCXX)),)
+ifeq ($(strip $(SRCXX))$(NO_AUTO_SRC),)
     SRCXX := $(wildcard *.cpp)
 endif
-ifeq ($(strip $(ASMSRC)),)
+ifeq ($(strip $(ASMSRC))$(NO_AUTO_SRC),)
     ASMSRC := $(wildcard *.s)
 endif
-ifeq ($(strip $(ASSMSRC)),)
+ifeq ($(strip $(ASSMSRC))$(NO_AUTO_SRC),)
     ASSMSRC := $(wildcard *.S)
 endif
 
@@ -53,8 +70,8 @@ $(BINDIR)/$(MODULE).a $(OBJ): | $(BINDIR)/$(MODULE)/
 $(BINDIR)/$(MODULE).a: $(OBJ) | ${DIRS:%=ALL--%}
 	$(Q)$(AR) $(ARFLAGS) $@ $?
 
-
 CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
+CCASFLAGS = $(filter-out $(CCASUWFLAGS), $(CFLAGS)) $(CCASEXFLAGS)
 
 # compile and generate dependency info
 
@@ -76,7 +93,7 @@ $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
 	$(Q)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
 $(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S
-	$(Q)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
+	$(Q)$(CCAS) $(CCASFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 # pull in dependency info for *existing* .o files
 # deleted header files will be silently ignored

@@ -30,12 +30,12 @@ extern "C" {
 #endif
 
 /**
- * @brief GCLK reference speed
+ * @brief   GCLK reference speed
  */
 #define CLOCK_CORECLOCK     (16000000U)
 
 /**
- * @name Timer peripheral configuration
+ * @name    Timer peripheral configuration
  * @{
  */
 #define TIMER_NUMOF        (1U)
@@ -49,7 +49,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name UART configuration
+ * @name    UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)
@@ -71,7 +71,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name SPI configuration
+ * @name    SPI configuration
  * @{
  */
 static const spi_conf_t spi_config[] = {
@@ -93,14 +93,14 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name I2C configuration
+ * @name    I2C configuration
  * @{
  */
 #define I2C_NUMOF          (0)
 /** @} */
 
 /**
- * @name RTC configuration
+ * @name    RTC configuration
  * @{
  */
 #define RTC_NUMOF           (1)
@@ -110,7 +110,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name RTT configuration
+ * @name    RTT configuration
  * @{
  */
 #define RTT_FREQUENCY       (32768U)

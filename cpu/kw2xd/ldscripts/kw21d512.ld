@@ -1,0 +1,1 @@
+../../kinetis_common/ldscripts/kinetis_f512l32u32.ld

@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @name Configure connected CC1101 (radio) device
+ * @name    Configure connected CC1101 (radio) device
  * @{
  */
 #define CC110X_SPI          SPI_DEV(0)
@@ -40,7 +40,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name Configure connected MPU-9150 device
+ * @name    Configure connected MPU-9150 device
  * @{
  */
 #define MPU9150_I2C         I2C_0
@@ -49,7 +49,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED0_PIN            GPIO_PIN(PORT_B, 8)
@@ -75,7 +75,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
 

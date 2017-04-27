@@ -27,14 +27,14 @@
 #endif
 
 /**
- * @name Clock system configuration
+ * @name    Clock system configuration
  * @{
  */
 #define CLOCK_CORECLOCK     (32000000U)     /* desired core clock frequency, 32MHz */
 /** @} */
 
 /**
- * @name Timer configuration
+ * @name    Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -65,7 +65,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @name UART configuration
+ * @name    UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)
@@ -82,7 +82,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @name I2C configuration
+ * @name    I2C configuration
  * @{
  */
 #define I2C_NUMOF               1
@@ -120,7 +120,7 @@ static const spi_clk_conf_t spi_clk_config[] = {
 };
 
 /**
- * @name SPI configuration
+ * @name    SPI configuration
  * @{
  */
 static const spi_conf_t spi_config[] = {
@@ -137,7 +137,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name Radio peripheral configuration
+ * @name    Radio peripheral configuration
  * @{
  */
 #define RADIO_IRQ_PRIO      1

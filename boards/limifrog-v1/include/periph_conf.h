@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @name Clock system configuration
+ * @name    Clock system configuration
  * @{
  **/
 #define CLOCK_HSI           (16000000U)         /* internal oscillator */
@@ -50,14 +50,14 @@ extern "C" {
 /** @} */
 
 /**
- * @name   DAC configuration
+ * @name    DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)
 /** @} */
 
 /**
- * @name   Timer configuration
+ * @name    Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -76,7 +76,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @name   UART configuration
+ * @name    UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -109,7 +109,7 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name   SPI configuration
+ * @name    SPI configuration
  *
  * @note    The spi_divtable is auto-generated from
  *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
@@ -159,14 +159,14 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name I2C configuration
+ * @name    I2C configuration
   * @{
  */
 #define I2C_0_EN            1
 #define I2C_1_EN            1
 #define I2C_NUMOF           (I2C_0_EN + I2C_1_EN)
 #define I2C_IRQ_PRIO        1
-#define I2C_APBCLK          (36000000U)
+#define I2C_APBCLK          (CLOCK_APB1)
 
 /* I2C 0 device configuration */
 #define I2C_0_EVT_ISR       isr_i2c1_ev

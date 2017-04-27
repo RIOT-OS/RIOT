@@ -1,0 +1,31 @@
+BUILD_DIR  ?= $(CURDIR)/riot
+
+JERRYHEAP  ?= 16
+
+ EXT_CFLAGS :=-D__TARGET_RIOT
+
+ EXT_CFLAGS += $(CFLAGS)
+
+.PHONY: libjerry riot-jerry flash clean
+
+# all: libjerry riot-jerry
+
+libjerry:
+	mkdir -p $(BUILD_DIR)
+	cmake -B$(BUILD_DIR) -H./ \
+	 -DENABLE_LTO=OFF \
+	 -DFEATURE_VALGRIND=OFF \
+	 -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain_external.cmake \
+	 -DJERRY_LIBC=OFF \
+	 -DJERRY_CMDLINE=OFF \
+	 -DENABLE_ALL_IN_ONE=OFF \
+	 -DEXTERNAL_CMAKE_SYSTEM_PROCESSOR="$(MCPU)" \
+	 -DEXTERNAL_CMAKE_C_COMPILER=$(CC) \
+	 -DEXTERNAL_CMAKE_C_COMPILER_ID=GNU \
+	 -DEXTERNAL_COMPILE_FLAGS="$(EXT_CFLAGS)" \
+	 -DMEM_HEAP_SIZE_KB=$(JERRYHEAP)
+
+	make -C $(BUILD_DIR) jerry-core
+	cp $(BUILD_DIR)/lib/libjerry-core.a $(BINDIR)/jerryscript.a
+
+include $(RIOTBASE)/Makefile.base

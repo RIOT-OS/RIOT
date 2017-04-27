@@ -5,22 +5,7 @@ export CPU = k60
 export GDBPORT ?= 3333
 
 # MULLE_SERIAL is used to select which specific Mulle board we are compiling for.
-# This was called MULLE_BOARD_SERIAL_NUMBER previously, renamed because
-# MULLE_BOARD_SERIAL_NUMBER is too long to type.
 ifdef MULLE_SERIAL
-  ifeq "200" "$(word 1, $(sort 200 $(MULLE_SERIAL)))"
-    # >= 200
-    ifneq "220" "$(word 1, $(sort 220 $(MULLE_SERIAL)))"
-      # < 220
-      CPU_MODEL = K60DN256ZVLL10
-      # It seems some of the MK60DZ10 devices have problems with JTAG speeds >= around 400 KHz
-      # when programming, we reduce the speed to 300 KHz with this command.
-      CPU_OOCD_FLAGS += -c 'adapter_khz 300'
-    else
-      # >= 220
-      CPU_MODEL = K60DN512VLL10
-    endif
-  endif
   CFLAGS += -DMULLE_SERIAL=$(MULLE_SERIAL)
 endif
 
@@ -32,7 +17,7 @@ endif
 # The linker script needs to know the flash and RAM sizes of the device.
 
 ifeq ($(CPU_MODEL),)
-  CPU_MODEL = K60DN512VLL10
+  CPU_MODEL = mk60dn512vll10
 endif
 
 export CPU_MODEL
@@ -111,7 +96,7 @@ flash: $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin
 .DEFAULT_GOAL :=
 
 # this board uses openocd
-include $(RIOTBOARD)/Makefile.include.openocd
+include $(RIOTMAKE)/tools/openocd.inc.mk
 
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.inc.mk

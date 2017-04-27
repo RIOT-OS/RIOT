@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Xtimer configuration
+ * @name   Xtimer configuration
  * @{
  */
 #define XTIMER_DEV                  (0)

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_sensors
+ * @ingroup     drivers_jc42
  * @{
  *
  * @file
@@ -35,8 +35,13 @@ extern "C" {
 #define JC42_REG_TEMP                   (0x05)
 #define JC42_REG_MANID                  (0x06)
 #define JC42_REG_DEVICEID               (0x07)
+/** @} */
 
-#define jc42_BUS_FREE_TIME_US           (1)
+/**
+ * @name JC42 constants
+ * @{
+ */
+#define JC42_BUS_FREE_TIME_US           (1U)
 /** @} */
 
 

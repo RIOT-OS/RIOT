@@ -37,7 +37,6 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
 static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *dodag);
-static void _rpl_trickle_send_dio(void *args);
 
 static void _rpl_trickle_send_dio(void *args)
 {

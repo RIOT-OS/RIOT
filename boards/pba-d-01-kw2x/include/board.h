@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    board_phywave_eval phyWAVE-KW22 Board
+ * @defgroup    boards_pba-d-01-kw2x phyWAVE-KW22 Board
  * @ingroup     boards
  * @brief       Board specific implementations for the phyWAVE evaluation board
  * @{
@@ -29,6 +29,11 @@
 extern "C"
 {
 #endif
+
+/**
+ * @brief Use the UART2 for STDIO on this board
+ */
+#define UART_STDIO_DEV      UART_DEV(2)
 
 /**
  * @name    LED pin definitions and handlers

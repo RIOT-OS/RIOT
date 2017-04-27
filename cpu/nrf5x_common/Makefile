@@ -1,3 +1,4 @@
+MODULE = cpu_common
 DIRS = periph
 
 # build one of the radio drivers, if enabled

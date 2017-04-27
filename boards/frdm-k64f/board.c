@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     board_frdm-k64f
+ * @ingroup     boards_frdm-k64f
  * @{
  *
  * @file

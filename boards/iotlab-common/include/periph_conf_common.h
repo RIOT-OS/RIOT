@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /**
- * @name Clock system configuration
+ * @name    Clock system configuration
  * @{
  **/
 #define CLOCK_HSE           (16000000U)             /* frequency of external oscillator */
@@ -48,7 +48,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name ADC configuration
+ * @name    ADC configuration
  * @{
  */
 #define ADC_CONFIG          {       \
@@ -60,7 +60,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer configuration
+ * @name    Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -87,7 +87,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name    UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -116,14 +116,14 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @brief   DAC configuration
+ * @name    DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)
 /** @} */
 
 /**
- * @name Real time counter configuration
+ * @name    Real time counter configuration
  * @{
  */
 #define RTT_NUMOF           (1U)
@@ -138,13 +138,13 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name I2C configuration
+ * @name    I2C configuration
   * @{
  */
 #define I2C_NUMOF           (1U)
 #define I2C_0_EN            1
 #define I2C_IRQ_PRIO        1
-#define I2C_APBCLK          (36000000U)
+#define I2C_APBCLK          (CLOCK_APB1)
 
 /* I2C 0 device configuration */
 #define I2C_0_DEV           I2C1

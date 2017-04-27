@@ -57,13 +57,13 @@ void auto_init_lps331ap(void)
         int res = lps331ap_init(&lps331ap_devs[i], p->i2c, p->addr, p->rate);
         if (res < 0) {
             LOG_ERROR("[auto_init_saul] error initializing lps331ap #%u\n", i);
+            continue;
         }
-        else {
-            saul_entries[i].dev = &(lps331ap_devs[i]);
-            saul_entries[i].name = lps331ap_saul_info[i].name;
-            saul_entries[i].driver = &lps331ap_saul_driver;
-            saul_reg_add(&(saul_entries[i]));
-        }
+
+        saul_entries[i].dev = &(lps331ap_devs[i]);
+        saul_entries[i].name = lps331ap_saul_info[i].name;
+        saul_entries[i].driver = &lps331ap_saul_driver;
+        saul_reg_add(&(saul_entries[i]));
     }
 }
 

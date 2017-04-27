@@ -128,6 +128,46 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
+ * @name   SPI configuration
+ *
+ * @note    The spi_divtable is auto-generated from
+ *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
+ * @{
+ */
+static const uint8_t spi_divtable[2][5] = {
+    {       /* for APB1 @ 32000000Hz */
+        7,  /* -> 125000Hz */
+        5,  /* -> 500000Hz */
+        4,  /* -> 1000000Hz */
+        2,  /* -> 4000000Hz */
+        1   /* -> 8000000Hz */
+    },
+    {       /* for APB2 @ 64000000Hz */
+        7,  /* -> 250000Hz */
+        6,  /* -> 500000Hz */
+        5,  /* -> 1000000Hz */
+        3,  /* -> 4000000Hz */
+        2   /* -> 8000000Hz */
+    }
+};
+
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_B, 5),
+        .miso_pin = GPIO_PIN(PORT_B, 4),
+        .sclk_pin = GPIO_PIN(PORT_B, 3),
+        .cs_pin   = GPIO_UNDEF,
+        .af       = GPIO_AF0,
+        .rccmask  = RCC_APB2ENR_SPI1EN,
+        .apbbus   = APB2
+    }
+};
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+/** @} */
+
+/**
  * @name RTC configuration
  * @{
  */

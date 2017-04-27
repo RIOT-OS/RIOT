@@ -64,7 +64,7 @@ extern "C" {
 #endif
 
 /**
- *
+ * @name Debugging defines
  * @{
  */
 #if ENABLE_DEBUG

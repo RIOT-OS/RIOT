@@ -103,15 +103,15 @@ WEAK_DEFAULT void isr_can1_rx_warn(void);
 WEAK_DEFAULT void isr_can1_wake_up(void);
 /* void dummy_handler(void); */
 WEAK_DEFAULT void isr_uart0_lon(void);
-WEAK_DEFAULT void isr_uart0_status(void);
+WEAK_DEFAULT void isr_uart0_rx_tx(void);
 WEAK_DEFAULT void isr_uart0_error(void);
-WEAK_DEFAULT void isr_uart1_status(void);
+WEAK_DEFAULT void isr_uart1_rx_tx(void);
 WEAK_DEFAULT void isr_uart1_error(void);
-WEAK_DEFAULT void isr_uart2_status(void);
+WEAK_DEFAULT void isr_uart2_rx_tx(void);
 WEAK_DEFAULT void isr_uart2_error(void);
-WEAK_DEFAULT void isr_uart3_status(void);
+WEAK_DEFAULT void isr_uart3_rx_tx(void);
 WEAK_DEFAULT void isr_uart3_error(void);
-WEAK_DEFAULT void isr_uart4_status(void);
+WEAK_DEFAULT void isr_uart4_rx_tx(void);
 WEAK_DEFAULT void isr_uart4_error(void);
 /* void dummy_handler(void); */
 /* void dummy_handler(void); */
@@ -157,8 +157,7 @@ WEAK_DEFAULT void isr_software(void);
 /**
  * @brief Interrupt vector definition
  */
-__attribute__((used, section(".vector_table")))
-const void *interrupt_vector[] = {
+ISR_VECTORS const void *interrupt_vector[] = {
     /* Stack pointer */
     (void *)(&_estack),             /* pointer to the top of the empty stack */
     /* Cortex-M4 handlers */
@@ -225,15 +224,15 @@ const void *interrupt_vector[] = {
     (void*) isr_can1_wake_up,
     (void*) dummy_handler,
     (void*) isr_uart0_lon,
-    (void*) isr_uart0_status,
+    (void*) isr_uart0_rx_tx,
     (void*) isr_uart0_error,
-    (void*) isr_uart1_status,
+    (void*) isr_uart1_rx_tx,
     (void*) isr_uart1_error,
-    (void*) isr_uart2_status,
+    (void*) isr_uart2_rx_tx,
     (void*) isr_uart2_error,
-    (void*) isr_uart3_status,
+    (void*) isr_uart3_rx_tx,
     (void*) isr_uart3_error,
-    (void*) isr_uart4_status,
+    (void*) isr_uart4_rx_tx,
     (void*) isr_uart4_error,
     (void*) dummy_handler,
     (void*) dummy_handler,

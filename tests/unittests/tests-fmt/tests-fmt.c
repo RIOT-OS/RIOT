@@ -13,6 +13,7 @@
  */
 #include <errno.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "embUnit/embUnit.h"
 
@@ -275,6 +276,38 @@ static void test_scn_u32_dec(void)
     TEST_ASSERT_EQUAL_INT(val2, scn_u32_dec(string1, 5));
 }
 
+static void test_fmt_lpad(void)
+{
+    const char base[] = "abcd";
+    char string[9] = {0};
+
+    strcpy(string, base);
+
+    fmt_lpad(string, 4, 8, ' ');
+
+    TEST_ASSERT_EQUAL_STRING("    abcd", (char*)string);
+
+    fmt_lpad(string, 0, 0, '1');
+
+    TEST_ASSERT_EQUAL_STRING("    abcd", (char*)string);
+
+    fmt_lpad(string, 4, 0, '2');
+
+    TEST_ASSERT_EQUAL_STRING("    abcd", (char*)string);
+
+    fmt_lpad(string, 0, 4, '3');
+
+    TEST_ASSERT_EQUAL_STRING("3333abcd", (char*)string);
+
+    fmt_lpad(string, 8, 8, '4');
+
+    TEST_ASSERT_EQUAL_STRING("3333abcd", (char*)string);
+
+    fmt_lpad(string, 4, 8, 'x');
+
+    TEST_ASSERT_EQUAL_STRING((char*)string, "xxxx3333");
+}
+
 Test *tests_fmt_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -293,6 +326,7 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_strlen),
         new_TestFixture(test_fmt_str),
         new_TestFixture(test_scn_u32_dec),
+        new_TestFixture(test_fmt_lpad),
     };
 
     EMB_UNIT_TESTCALLER(fmt_tests, NULL, NULL, fixtures);

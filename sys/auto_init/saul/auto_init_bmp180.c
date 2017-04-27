@@ -22,7 +22,7 @@
 
 #include "log.h"
 #include "saul_reg.h"
-
+#include "bmp180.h"
 #include "bmp180_params.h"
 
 /**
@@ -57,7 +57,7 @@ void auto_init_bmp180(void)
                         bmp180_params[i].i2c_dev,
                         bmp180_params[i].mode) < 0) {
             LOG_ERROR("[auto_init_saul] error initializing bmp180 #%u\n", i);
-            return;
+            continue;
         }
 
         /* temperature */

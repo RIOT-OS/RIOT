@@ -22,7 +22,7 @@ export TERMFLAGS = -p $(PORT)
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
 
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.inc.mk
 
 # this board uses openocd
-include $(RIOTBOARD)/Makefile.include.openocd
+include $(RIOTMAKE)/tools/openocd.inc.mk

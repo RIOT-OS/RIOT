@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Serial port configuration
+ * @name    Serial port configuration
  * @{
  */
 #define UART_PORT (COM1_PORT) /* IO port to use for UART */

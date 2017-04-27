@@ -50,8 +50,8 @@ static void kw2xrf_set_address(kw2xrf_t *dev)
     addr_long.uint8[0] &= ~(0x01);
     addr_long.uint8[0] |=  (0x02);
     /* set short and long address */
-    kw2xrf_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
-    kw2xrf_set_addr_short(dev, NTOHS(addr_long.uint16[0].u16));
+    kw2xrf_set_addr_long(dev, ntohll(addr_long.uint64.u64));
+    kw2xrf_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
 }
 
 void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)

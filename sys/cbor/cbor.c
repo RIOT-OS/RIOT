@@ -118,7 +118,7 @@ static uint32_t htonf(float x)
         float f;
         uint32_t i;
     } u = { .f = x };
-    return HTONL(u.i);
+    return htonl(u.i);
 }
 
 /**
@@ -129,7 +129,7 @@ static float ntohf(uint32_t x)
     union u {
         float f;
         uint32_t i;
-    } u = { .i = NTOHL(x) };
+    } u = { .i = ntohl(x) };
     return u.f;
 }
 
@@ -142,7 +142,7 @@ static uint64_t htond(double x)
         double d;
         uint64_t i;
     } u = { .d = x };
-    return HTONLL(u.i);
+    return htonll(u.i);
 }
 
 /**
@@ -153,7 +153,7 @@ static double ntohd(uint64_t x)
     union u {
         double d;
         uint64_t i;
-    } u = { .i = HTONLL(x) };
+    } u = { .i = htonll(x) };
     return u.d;
 }
 
@@ -358,15 +358,15 @@ static size_t decode_int(const cbor_stream_t *s, size_t offset, uint64_t *val)
             break;
 
         case 2:
-            *val = HTONS(((cast_align_u8_t *)in)->u.u16);
+            *val = htons(((cast_align_u8_t *)in)->u.u16);
             break;
 
         case 4:
-            *val = HTONL(((cast_align_u8_t *)in)->u.u32);
+            *val = htonl(((cast_align_u8_t *)in)->u.u32);
             break;
 
         default:
-            *val = HTONLL(((cast_align_u8_t *)in)->u.u64);
+            *val = htonll(((cast_align_u8_t *)in)->u.u64);
             break;
     }
 
@@ -563,7 +563,7 @@ size_t cbor_serialize_float_half(cbor_stream_t *s, float val)
 {
     CBOR_ENSURE_SIZE(s, 3);
     s->data[s->pos++] = CBOR_FLOAT16;
-    uint16_t encoded_val = HTONS(encode_float_half(val));
+    uint16_t encoded_val = htons(encode_float_half(val));
     memcpy(s->data + s->pos, &encoded_val, 2);
     s->pos += 2;
     return 3;

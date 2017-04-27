@@ -133,7 +133,7 @@ static int nvram_spi_write(nvram_t *dev, const uint8_t *src, uint32_t dst, size_
 
     /* Address is expected by the device as big-endian, i.e. network byte order,
      * we utilize the network byte order macros here. */
-    addr.u32 = HTONL(dst);
+    addr.u32 = htonl(dst);
 
     /* Acquire exclusive bus access while configuring clock and mode */
     spi_acquire(spi_dev->spi, spi_dev->cs, SPI_MODE_0, spi_dev->clk);
@@ -163,7 +163,7 @@ static int nvram_spi_read(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len)
     } addr;
     /* Address is expected by the device as big-endian, i.e. network byte order,
      * we utilize the network byte order macros here. */
-    addr.u32 = HTONL(src);
+    addr.u32 = htonl(src);
 
     /* Acquire exclusive bus access while configuring clock and mode */
     spi_acquire(spi_dev->spi, spi_dev->cs, SPI_MODE_0, spi_dev->clk);

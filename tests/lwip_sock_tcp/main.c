@@ -88,7 +88,7 @@ static void tear_down(void)
 #ifdef SO_REUSE
 static void test_tcp_connect4__EADDRINUSE(void)
 {
-    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_REMOTE) },
+    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_REMOTE) },
                                           .family = AF_INET,
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
@@ -107,7 +107,7 @@ static void test_tcp_connect4__EADDRINUSE(void)
 
 static void test_tcp_connect4__EAFNOSUPPORT(void)
 {
-    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_REMOTE) },
+    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_REMOTE) },
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
 
@@ -129,7 +129,7 @@ static void test_tcp_connect4__EINVAL_addr(void)
 
 static void test_tcp_connect4__EINVAL_netif(void)
 {
-    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_REMOTE) },
+    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_REMOTE) },
                                           .family = AF_INET,
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = (_TEST_NETIF + 1) };
@@ -142,7 +142,7 @@ static void test_tcp_connect4__EINVAL_netif(void)
 
 static void test_tcp_connect4__success_without_port(void)
 {
-    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_REMOTE) },
+    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_REMOTE) },
                                           .family = AF_INET,
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = _TEST_NETIF };
@@ -158,13 +158,13 @@ static void test_tcp_connect4__success_without_port(void)
     assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     assert(0 == sock_tcp_get_remote(&_sock, &ep));
     assert(AF_INET == ep.family);
-    assert(HTONL(_TEST_ADDR4_REMOTE) == ep.addr.ipv4_u32);
+    assert(htonl(_TEST_ADDR4_REMOTE) == ep.addr.ipv4_u32);
     assert(SOCK_ADDR_ANY_NETIF == ep.netif);
     assert(_TEST_PORT_REMOTE == ep.port);
 }
 static void test_tcp_connect4__success_local_port(void)
 {
-    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_REMOTE) },
+    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_REMOTE) },
                                           .family = AF_INET,
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
@@ -184,7 +184,7 @@ static void test_tcp_connect4__success_local_port(void)
     assert(_TEST_PORT_LOCAL == ep.port);
     assert(0 == sock_tcp_get_remote(&_sock, &ep));
     assert(AF_INET == ep.family);
-    assert(HTONL(_TEST_ADDR4_REMOTE) == ep.addr.ipv4_u32);
+    assert(htonl(_TEST_ADDR4_REMOTE) == ep.addr.ipv4_u32);
     assert(SOCK_ADDR_ANY_NETIF == ep.netif);
     assert(_TEST_PORT_REMOTE == ep.port);
 }
@@ -192,7 +192,7 @@ static void test_tcp_connect4__success_local_port(void)
 #ifdef SO_REUSE
 static void test_tcp_listen4__EADDRINUSE(void)
 {
-    const sock_tcp_ep_t local = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_LOCAL) },
+    const sock_tcp_ep_t local = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_LOCAL) },
                                          .family = AF_INET,
                                          .port = _TEST_PORT_LOCAL,
                                          .netif = SOCK_ADDR_ANY_NETIF };
@@ -211,7 +211,7 @@ static void test_tcp_listen4__EADDRINUSE(void)
 
 static void test_tcp_listen4__EAFNOSUPPORT(void)
 {
-    const sock_tcp_ep_t local = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_LOCAL) },
+    const sock_tcp_ep_t local = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_LOCAL) },
                                          .port = _TEST_PORT_LOCAL,
                                          .netif = SOCK_ADDR_ANY_NETIF };
 
@@ -221,7 +221,7 @@ static void test_tcp_listen4__EAFNOSUPPORT(void)
 
 static void test_tcp_listen4__EINVAL(void)
 {
-    const sock_tcp_ep_t local = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_LOCAL) },
+    const sock_tcp_ep_t local = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_LOCAL) },
                                          .family = AF_INET,
                                          .port = _TEST_PORT_LOCAL,
                                          .netif = (_TEST_NETIF + 1) };
@@ -232,7 +232,7 @@ static void test_tcp_listen4__EINVAL(void)
 
 static void test_tcp_listen4__success_any_netif(void)
 {
-    const sock_tcp_ep_t local = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_LOCAL) },
+    const sock_tcp_ep_t local = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_LOCAL) },
                                          .family = AF_INET,
                                          .port = _TEST_PORT_LOCAL,
                                          .netif = SOCK_ADDR_ANY_NETIF };
@@ -242,7 +242,7 @@ static void test_tcp_listen4__success_any_netif(void)
                                 _QUEUE_SIZE, 0));
     assert(0 == sock_tcp_queue_get_local(&_queue, &ep));
     assert(AF_INET == ep.family);
-    assert(HTONL(_TEST_ADDR4_LOCAL) == ep.addr.ipv4_u32);
+    assert(htonl(_TEST_ADDR4_LOCAL) == ep.addr.ipv4_u32);
     assert(SOCK_ADDR_ANY_NETIF == ep.netif);
     assert(_TEST_PORT_LOCAL == ep.port);
 }
@@ -304,7 +304,7 @@ static void test_tcp_accept4__success(void)
     sock_tcp_ep_t ep;
     sock_tcp_t *sock;
 
-    _server_addr.addr.ipv4_u32 = HTONL(_TEST_ADDR4_REMOTE);  /* loopback */
+    _server_addr.addr.ipv4_u32 = htonl(_TEST_ADDR4_REMOTE);  /* loopback */
     _server_addr.family = AF_INET;
     _server_addr.port = _TEST_PORT_LOCAL;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
@@ -319,7 +319,7 @@ static void test_tcp_accept4__success(void)
     assert(_TEST_PORT_LOCAL == ep.port);
     assert(0 == sock_tcp_get_remote(sock, &ep));
     assert(AF_INET == ep.family);
-    assert(HTONL(_TEST_ADDR4_REMOTE) == ep.addr.ipv4_u32);
+    assert(htonl(_TEST_ADDR4_REMOTE) == ep.addr.ipv4_u32);
     assert(SOCK_ADDR_ANY_NETIF == ep.netif);
     assert(_TEST_PORT_REMOTE == ep.port);
 }
@@ -328,7 +328,7 @@ static void test_tcp_accept4__success(void)
 
 static void test_tcp_read4__EAGAIN(void)
 {
-    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_REMOTE) },
+    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_REMOTE) },
                                           .family = AF_INET,
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
@@ -348,7 +348,7 @@ static void test_tcp_read4__EAGAIN(void)
 
 static void test_tcp_read4__ECONNRESET(void)
 {
-    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_REMOTE) },
+    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_REMOTE) },
                                           .family = AF_INET,
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
@@ -378,7 +378,7 @@ static void test_tcp_read4__ENOTCONN(void)
 
 static void test_tcp_read4__ETIMEDOUT(void)
 {
-    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_REMOTE) },
+    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_REMOTE) },
                                           .family = AF_INET,
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
@@ -401,7 +401,7 @@ static void test_tcp_read4__ETIMEDOUT(void)
 
 static void test_tcp_read4__success(void)
 {
-    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_REMOTE) },
+    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_REMOTE) },
                                           .family = AF_INET,
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
@@ -429,7 +429,7 @@ static void test_tcp_read4__success(void)
 
 static void test_tcp_read4__success_with_timeout(void)
 {
-    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_REMOTE) },
+    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_REMOTE) },
                                           .family = AF_INET,
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
@@ -457,7 +457,7 @@ static void test_tcp_read4__success_with_timeout(void)
 
 static void test_tcp_read4__success_non_blocking(void)
 {
-    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_REMOTE) },
+    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_REMOTE) },
                                           .family = AF_INET,
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
@@ -492,7 +492,7 @@ static void test_tcp_write4__ENOTCONN(void)
 
 static void test_tcp_write4__success(void)
 {
-    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = HTONL(_TEST_ADDR4_REMOTE) },
+    const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = htonl(_TEST_ADDR4_REMOTE) },
                                           .family = AF_INET,
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };

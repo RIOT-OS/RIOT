@@ -15,7 +15,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon calliope-mini cc2650stk maple-mini \
                              pca10005 spark-core stm32f0discovery telosb weio wsn430-v1_3b \
                              wsn430-v1_4 yunjia-nrf51822 z1
 
-BOARD_BLACKLIST += mips-malta # No UART available.
+BOARD_BLACKLIST += mips-malta pic32-wifire pic32-clicker# No full UART available.
 
 # use ethos (ethernet over serial) for network communication and stdio over
 # UART, but not on native, as native has a tap interface towards the host.
