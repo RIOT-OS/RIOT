@@ -93,7 +93,7 @@ int conn_udp_sendto(const void *data, size_t len, const void *src, size_t src_le
                     const void *dst, size_t dst_len, int family, uint16_t sport,
                     uint16_t dport)
 {
-    gnrc_pktsnip_t *pkt, *hdr = NULL;
+    gnrc_pktsnip_t *pkt, *hdr;
 
     pkt = gnrc_pktbuf_add(NULL, (void *)data, len, GNRC_NETTYPE_UNDEF); /* data will only be copied */
     hdr = gnrc_udp_hdr_build(pkt, sport, dport);

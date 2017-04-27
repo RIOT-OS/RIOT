@@ -168,15 +168,7 @@ static const pwm_conf_t pwm_config[] = {
  * @name ADC configuration
  * @{
  */
-#define ADC_CONFIG {            \
-    { GPIO_PIN(PA, 2), 0, 0  }, \
-    { GPIO_PIN(PB, 8), 0, 2  }, \
-    { GPIO_PIN(PB, 9), 0, 3  }, \
-    { GPIO_PIN(PA, 4), 0, 4  }, \
-    { GPIO_PIN(PA, 5), 0, 5  }, \
-    { GPIO_PIN(PB, 2), 0, 10 }}
-
-#define ADC_NUMOF           (6)
+#define ADC_NUMOF           (0)
 /** @} */
 
 /**

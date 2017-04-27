@@ -4,6 +4,7 @@ export APP_START=0x80000000
 export ROMABLE = 1
 
 include $(RIOTMAKE)/arch/mips.inc.mk
+include $(RIOTCPU)/mips_pic32_common/Makefile.include
 
 # define build specific options
 export CFLAGS += -march=m5101 -mmicromips -DSKIP_COPY_TO_RAM

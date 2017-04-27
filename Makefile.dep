@@ -14,7 +14,7 @@ ifneq (,$(filter csma_sender,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nhdp,$(USEMODULE)))
-  USEMODULE += conn_udp
+  USEMODULE += sock_udp
   USEMODULE += xtimer
   USEMODULE += oonf_rfc5444
 endif
@@ -430,14 +430,17 @@ endif
 
 ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
   USEMODULE += lwip_raw
+  USEMODULE += sock_ip
 endif
 
 ifneq (,$(filter lwip_sock_tcp,$(USEMODULE)))
   USEMODULE += lwip_tcp
+  USEMODULE += sock_tcp
 endif
 
 ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
   USEMODULE += lwip_udp
+  USEMODULE += sock_udp
 endif
 
 ifneq (,$(filter lwip_%,$(USEMODULE)))

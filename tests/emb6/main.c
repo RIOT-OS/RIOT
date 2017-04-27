@@ -78,15 +78,14 @@ static void *_emb6_thread(void *args)
 
 static const shell_command_t shell_commands[] = {
     { "ping6", "Send pings and receive pongs", ping_cmd },
-#ifdef MODULE_CONN_UDP
+#ifdef MODULE_EMB6_SOCK_UDP
     { "udp", "Send UDP messages and listen for messages on UDP port", udp_cmd },
 #endif
     { "ifconfig", "Shows assigned IPv6 addresses", ifconfig },
     { NULL, NULL, NULL }
 };
-static char line_buf[SHELL_DEFAULT_BUFSIZE];
 
-char conn_inbuf[CONN_INBUF_SIZE];
+static char line_buf[SHELL_DEFAULT_BUFSIZE];
 
 int main(void)
 {

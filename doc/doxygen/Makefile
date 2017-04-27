@@ -10,12 +10,22 @@ doc: html
 
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.
 .PHONY: html
-html:
+html: src/css/riot.css
 	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | doxygen -
 
 .PHONY: man
 man:
 	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | doxygen -
+
+ifneq (,$(shell which lessc))
+# use lessc (http://lesscss.org/#using-less) for compiling CSS
+src/css/riot.css: src/css/riot.less src/css/variables.less
+	@lessc $< $@
+
+src/css/variables.less: src/config.json
+	@grep "^\s*\"@" $< | sed -e 's/^\s*"//g' -e 's/":\s*"/: /g' \
+	  -e 's/",\?$$/;/g' -e 's/\\"/"/g' > $@
+endif
 
 .PHONY:
 latex:

@@ -9,7 +9,7 @@
 /**
  * @defgroup    net_gnrc_tcp TCP
  * @ingroup     net_gnrc
- * @brief       RIOT's tcp implementation for the gnrc stack
+ * @brief       RIOT's TCP implementation for the GNRC network stack.
  *
  * @{
  *
@@ -35,20 +35,20 @@ extern "C" {
 #endif
 
 /**
- * @brief Initialize and start TCP
+ * @brief Initialize TCP
  *
- * @return   PID of TCP thread on success
- * @return   -1 if thread is already running.
- * @return   -EINVAL, if priority is greater than or equal SCHED_PRIO_LEVELS
- * @return   -EOVERFLOW, if there are too many threads running.
+ * @returns   PID of TCP thread on success
+ *            -1 if TCB is already running.
+ *            -EINVAL, if priority is greater than or equal SCHED_PRIO_LEVELS
+ *            -EOVERFLOW, if there are too many threads running.
  */
 int gnrc_tcp_init(void);
 
 /**
- * @brief Initialize Transmission Control Block (tcb)
- * @pre tcb must not be NULL.
+ * @brief Initialize Transmission Control Block (TCB)
+ * @pre @p tcb must not be NULL.
  *
- * @param[in,out] tcb          Transmission that should be initialized.
+ * @param[in,out] tcb   TCB that should be initialized.
  */
 void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
 
@@ -56,29 +56,28 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
   * @brief Opens a connection actively.
   *
   * @pre gnrc_tcp_tcb_init() must have been successfully called.
-  * @pre tcb must not be NULL
-  * @pre target_addr must not be NULL.
-  * @pre target_port must not be 0.
+  * @pre @p tcb must not be NULL
+  * @pre @p target_addr must not be NULL.
+  * @pre @p target_port must not be 0.
   *
   * @note Blocks until a connection has been established or an error occured.
   *
-  * @param[in,out] tcb          This connections Transmission control block.
-  * @param[in] address_family   Address Family of @p target_addr.
-  * @param[in] target_addr      Pointer to target address.
-  * @param[in] target_port      Targets port number.
-  * @param[in] local_port       If zero or GNRC_TCP_PORT_UNSPEC, the connections
-  *                             source port is randomly chosen. If local_port is non-zero
-  *                             the local_port is used as source port.
+  * @param[in,out] tcb              TCB holding the connection information.
+  * @param[in]     address_family   Address family of @p target_addr.
+  * @param[in]     target_addr      Pointer to target address.
+  * @param[in]     target_port      Target port number.
+  * @param[in]     local_port       If zero or GNRC_TCP_PORT_UNSPEC, the connections
+  *                                 source port is randomly chosen. If local_port is non-zero
+  *                                 the local_port is used as source port.
   *
-  * @return   Zero on success.
-  * @return   -EAFNOSUPPORT if @p address_family is not supported.
-  * @return   -EINVAL if @p address_family is not the same the address_family use by the tcb.
-  * @return   -EISCONN if transmission control block is already in use.
-  * @return   -ENOMEM if the receive buffer for the tcb could not be allocated.
-  *           Increase "GNRC_TCP_RCV_BUFFERS".
-  * @return   -EADDRINUSE if @p local_port is already used by another connection.
-  * @return   -ETIMEDOUT if the connection could not be opened.
-  * @return   -ECONNREFUSED if the connection was resetted by the peer.
+  * @returns   Zero on success.
+  *            -EAFNOSUPPORT if @p address_family is not supported.
+  *            -EINVAL if @p address_family is not the same the address_family use by the TCB.
+  *            -EISCONN if TCB is already in use.
+  *            -ENOMEM if the receive buffer for the TCB could not be allocated.
+  *            -EADDRINUSE if @p local_port is already used by another connection.
+  *            -ETIMEDOUT if the connection could not be opened.
+  *            -ECONNREFUSED if the connection was resetted by the peer.
   */
 int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
                          const uint8_t *target_addr, const uint16_t target_port,
@@ -88,120 +87,120 @@ int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
  * @brief Opens a connection passively, by waiting for an incomming request.
  *
  * @pre gnrc_tcp_tcb_init() must have been successfully called.
- * @pre tcb must not be NULL.
+ * @pre @p tcb must not be NULL.
  * @pre if local_addr is not NULL, local_addr must be assigned to a network interface.
  * @pre if local_port is not zero.
  *
  * @note Blocks until a connection has been established (incomming connection request
  *       to @p local_port) or an error occured.
  *
- * @param[in,out] tcb          This connections Transmission control block.
- * @param[in] address_family   Address Family of @p local_addr.
- *                             If local_addr == NULL, address_family is ignored.
- * @param[in] local_addr       If not NULL the connection is bound to the address @p local_addr.
- *                             If NULL a connection request to every local ip address is valid.
- * @param[in] local_port       Portnumber that should used for incomming connection requests.
+ * @param[in,out] tcb              TCB holding the connection information.
+ * @param[in]     address_family   Address family of @p local_addr.
+ *                                 If local_addr == NULL, address_family is ignored.
+ * @param[in]     local_addr       If not NULL the connection is bound to @p local_addr.
+ *                                 If NULL a connection request to all local ip
+ *                                 addresses is valied.
+ * @param[in]     local_port       Port number to listen on.
  *
- * @return   Zero on success
- * @return   -EAFNOSUPPORT if local_addr != NULL and @p address_family is not supported.
- * @return   -EINVAL if @p address_family is not the same the address_family use by the tcb.
- * @return   -EISCONN if transmission control block is already in use.
- * @return   -ENOMEM if the receive buffer for the tcb could not be allocated.
- *           Increase "GNRC_TCP_RCV_BUFFERS".
+ * @returns   Zero on success.
+ *            -EAFNOSUPPORT if local_addr != NULL and @p address_family is not supported.
+ *            -EINVAL if @p address_family is not the same the address_family used in TCB.
+ *            -EISCONN if TCB is already in use.
+ *            -ENOMEM if the receive buffer for the TCB could not be allocated.
+ *            Hint: Increase "GNRC_TCP_RCV_BUFFERS".
  */
 int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
                           const uint8_t *local_addr, const uint16_t local_port);
 
 /**
- * @brief Transmit Data to Peer.
+ * @brief Transmit data to connected peer.
  *
  * @pre gnrc_tcp_tcb_init() must have been successfully called.
- * @pre tcb must not be NULL.
- * @pre data must not be NULL.
+ * @pre @p tcb must not be NULL.
+ * @pre @p data must not be NULL.
  *
  * @note Blocks until up to @p len bytes were transmitted or an error occured.
  *
- * @param[in,out] tcb                    This connections Transmission control block.
- * @param[in] data                       Pointer to the data that should be transmitted.
- * @param[in] len                        Number of bytes that should be transmitted.
- * @param[in] user_timeout_duration_us   If not zero and there were not data transmitted
- *                                       successfully, the function call returns after
- *                                       user_timeout_duration_us. If zero not timeout will be
- *                                       triggered.
+ * @param[in,out] tcb                        TCB holding the connection information.
+ * @param[in]     data                       Pointer to the data that should be transmitted.
+ * @param[in]     len                        Number of bytes that should be transmitted.
+ * @param[in]     user_timeout_duration_us   If not zero and there was not data transmitted
+ *                                           the function returns after user_timeout_duration_us.
+ *                                           If zero, no timeout will be triggered.
  *
- * @return   On success, the number of successfully transmitted bytes.
- * @return   -ENOTCONN if connection is not established.
- * @return   -ECONNRESET if connection was resetted by the peer.
- * @return   -ECONNABORTED if the connection was aborted.
- * @return   -ETIMEDOUT if @p user_timeout_duration_us expired.
+ * @returns   The number of successfully transmitted bytes.
+ *            -ENOTCONN if connection is not established.
+ *            -ECONNRESET if connection was resetted by the peer.
+ *            -ECONNABORTED if the connection was aborted.
+ *            -ETIMEDOUT if @p user_timeout_duration_us expired.
  */
 ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
                       const uint32_t user_timeout_duration_us);
 
 /**
- * @brief Receive Data from the Peer.
+ * @brief Receive Data from the peer.
  *
  * @pre gnrc_tcp_tcb_init() must have been successfully called.
- * @pre tcb must not be NULL.
- * @pre data must not be NULL.
+ * @pre @p tcb must not be NULL.
+ * @pre @p data must not be NULL.
  *
  * @note Function blocks if user_timeout_duration_us is not zero.
  *
- * @param[in,out] tcb                    This connections Transmission control block.
- * @param[out] data                      Pointer to the buffer where the received data
- *                                       should be copied into.
- * @param[in] max_len                    Maximum amount to bytes that should be reeived.
- *                                       Should not exceed size of @p data.
- * @param[in] user_timeout_duration_us   Timeout for receive in microseconds. If zero and no data
- *                                       is available, the function returns immediately. If not
- *                                       zero the function block until data is available or
- *                                       user_timeout_duration_us microseconds have passed.
+ * @param[in,out] tcb                        TCB holding the connection information.
+ * @param[out]    data                       Pointer to the buffer where the received data
+ *                                           should be copied into.
+ * @param[in]     max_len                    Maximum amount to bytes that should be read
+ *                                           into @p data.
+ * @param[in]     user_timeout_duration_us   Timeout for receive in microseconds.
+ *                                           If zero and no data is available, the function
+ *                                           returns immediately. If not zero the function
+ *                                           blocks until data is available or
+ *                                           @p user_timeout_duration_us microseconds passed.
  *
- * @return   On success, the number of bytes read into @p data.
- * @return   -ENOTCONN if connection is not established.
- * @return   -EAGAIN if  user_timeout_duration_us is zero and no data is available.
- * @return   -ECONNRESET if connection was resetted by the peer.
- * @return   -ECONNABORTED if the connection was aborted.
- * @return   -ETIMEDOUT if @p user_timeout_duration_us expired.
+ * @returns   The number of bytes read into @p data.
+ *            -ENOTCONN if connection is not established.
+ *            -EAGAIN if  user_timeout_duration_us is zero and no data is available.
+ *            -ECONNRESET if connection was resetted by the peer.
+ *            -ECONNABORTED if the connection was aborted.
+ *            -ETIMEDOUT if @p user_timeout_duration_us expired.
  */
 ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
                       const uint32_t user_timeout_duration_us);
 
 /**
- * @brief Close a tcp connection.
+ * @brief Close a TCP connection.
  *
  * @pre gnrc_tcp_tcb_init() must have been successfully called.
- * @pre tcb must not be NULL.
+ * @pre @p tcb must not be NULL.
  *
- * @param[in,out] tcb   This connections Transmission control block.
+ * @param[in,out] tcb   TCB holding the connection information.
  *
- * @return   Zero on success.
+ * @returns   Zero on success.
  */
 int gnrc_tcp_close(gnrc_tcp_tcb_t *tcb);
 
 /**
- * @brief Set checksum calculated from tcp and network-layer header in tcp-header.
+ * @brief Calculate and set checksum in TCP header.
  *
- * @param[in] hdr          gnrc_pktsnip that contains tcp header.
- * @param[in] pseudo_hdr   gnrc_pktsnip that contains networklayer header.
+ * @param[in] hdr          Gnrc_pktsnip that contains TCP header.
+ * @param[in] pseudo_hdr   Gnrc_pktsnip that contains network layer header.
  *
- * @return   zero on succeed.
- * @return   -EFAULT if hdr or pseudo_hdr were NULL
- * @return   -EBADMSG if hdr is not of type GNRC_NETTYPE_TCP
- * @return   -ENOENT if pseudo_hdr protocol is unsupported.
+ * @returns   Zero on succeed.
+ *            -EFAULT if @p hdr or pseudo_hdr were NULL
+ *            -EBADMSG if @p hdr is not of type GNRC_NETTYPE_TCP
+ *            -ENOENT if @p pseudo_hdr protocol is unsupported.
  */
 int gnrc_tcp_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_hdr);
 
 /**
- * @brief Adds a tcp header to a given payload. Be carefull, leads to huge headers.
- *        Allocates all option bytes
+ * @brief Adds a TCP header to a given payload.
  *
- * @param[in] payload   payload that follows the tcp header
- * @param[in] src       Source port in host byte order
- * @param[in] dst       Destination port in host byte order
+ * @param[in] payload   Payload that follows the TCP header.
+ * @param[in] src       Source port number.
+ * @param[in] dst       Destination port number.
  *
- * @return   NULL, if paket buffer is full
- * @return   Not NULL on success
+ * @returns   Not NULL on success.
+ *            NULL if TCP header was not allocated.
  */
 gnrc_pktsnip_t *gnrc_tcp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src, uint16_t dst);
 

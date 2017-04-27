@@ -52,7 +52,7 @@ class time_point {
   /**
    * @brief Create time point from timex_t struct.
    */
-  inline time_point(timex_t&& tp) : m_handle(tp) {}
+  explicit inline time_point(timex_t&& tp) : m_handle(tp) {}
   /**
    * @brief Use default copy constructor.
    */

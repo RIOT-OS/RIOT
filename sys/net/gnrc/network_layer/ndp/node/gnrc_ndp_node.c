@@ -80,6 +80,8 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
     }
 #endif
 
+    /* cppcheck-suppress knownConditionTrueFalse
+     * cppcheck bug: next_hop_ip might be initialized if a FIB is available */
     if (next_hop_ip == NULL) {            /* no route to host */
         if (!dst_link_local) {
             if (iface == KERNEL_PID_UNDEF) {

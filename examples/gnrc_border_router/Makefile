@@ -29,6 +29,25 @@ CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE) -DUSE_ET
 FEATURES_REQUIRED += periph_uart
 endif
 
+# SLIP legacy compatibility
+# Uncomment the lines below if you want to use SLIP with this example and don't
+# forget to comment the lines above for ethos.
+#ifeq (,$(SLIP_UART))
+# set default (last available UART)
+#SLIP_UART="UART_DEV(UART_NUMOF-1)"
+#endif
+#ifeq (,$(SLIP_BAUDRATE))
+# set default
+#SLIP_BAUDRATE=115200
+#endif
+
+#GNRC_NETIF_NUMOF := 2
+#INCLUDES += -I$(CURDIR)
+#CFLAGS += -DSLIP_UART=$(SLIP_UART)
+#CFLAGS += -DSLIP_BAUDRATE=$(SLIP_BAUDRATE)
+# Include SLIP package for IP over Serial communication
+#USEMODULE += gnrc_slip
+
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default

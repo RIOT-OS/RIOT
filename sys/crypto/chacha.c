@@ -53,6 +53,8 @@ static void _doubleround(void *output_, const uint32_t input[16], uint8_t rounds
 
     rounds *= 4;
     for (unsigned i = 0; i < rounds; ++i) {
+        /* cppcheck-suppress duplicateExpressionTernary
+         * (reason: Externally imported code beautification) */
         uint32_t *a = &output[((i + ((i & 4) ? 0 : 0)) & 3) + (4 * 0)];
         uint32_t *b = &output[((i + ((i & 4) ? 1 : 0)) & 3) + (4 * 1)];
         uint32_t *c = &output[((i + ((i & 4) ? 2 : 0)) & 3) + (4 * 2)];
