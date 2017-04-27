@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2017 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,7 +15,8 @@
  * @brief       Implementation of the Kinetis Multipurpose Clock Generator
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
- * @}
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ *
  */
 
 #include <stdint.h>
@@ -23,8 +25,18 @@
 
 #if KINETIS_CPU_USE_MCG
 
-/* MCG neighbor modes matrix */
-static uint8_t mcg_pm[8] = {0x02, 0x15, 0x12, 0x20, 0xe6, 0xd8, 0xb0, 0xf0};
+/* Pathfinding for the clocking modes, this table lists the next mode in the
+ * chain when moving from mode <first> to mode <second> */
+static const uint8_t mcg_mode_routing[8][8] = {
+    {0, 1, 1, 1, 1, 1, 1, 1}, /* from PEE */
+    {0, 1, 2, 4, 4, 4, 4, 4}, /* from PBE */
+    {1, 1, 2, 4, 4, 4, 4, 4}, /* from BLPE */
+    {5, 5, 5, 3, 5, 5, 5, 5}, /* from BLPI */
+    {1, 1, 2, 5, 4, 5, 6, 7}, /* from FBE */
+    {4, 4, 4, 3, 4, 5, 6, 7}, /* from FBI */
+    {4, 4, 4, 5, 4, 5, 6, 7}, /* from FEE */
+    {4, 4, 4, 5, 4, 5, 6, 7}, /* from FEI */
+};
 
 static uint8_t current_mode = KINETIS_MCG_FEI;
 
@@ -361,124 +373,39 @@ int kinetis_mcg_set_mode(kinetis_mcg_mode_t mode)
     if (mode > KINETIS_MCG_FEI) {
         return -1;
     }
-
-    if (mcg_pm[current_mode] & (1 << mode)) {
-        if (mode == KINETIS_MCG_FEI) {
-            kinetis_mcg_set_fei();
-        }
-
-        if (mode == KINETIS_MCG_FBI) {
-            kinetis_mcg_set_fbi();
-        }
-
-        if (mode == KINETIS_MCG_FEE) {
-            kinetis_mcg_set_fee();
-        }
-
-        if (mode == KINETIS_MCG_FBE) {
-            kinetis_mcg_set_fbe();
-        }
-
-        if (mode == KINETIS_MCG_BLPI) {
-            kinetis_mcg_set_blpi();
-        }
-
-        if (mode == KINETIS_MCG_BLPE) {
-            kinetis_mcg_set_blpe();
-        }
-
-        if (mode == KINETIS_MCG_PBE) {
-            kinetis_mcg_set_pbe();
-        }
-
-        if (mode == KINETIS_MCG_PEE) {
-            kinetis_mcg_set_pee();
-        }
-
-        return 0;
-    }
-
-    switch (mode) {
-        case KINETIS_MCG_PEE:
-            /* cppcheck-suppress duplicateExpression */
-            if (!(KINETIS_MCG_USE_ERC || KINETIS_MCG_USE_PLL)) {
-                return -1;
-            }
-
-            if (current_mode == KINETIS_MCG_FEI) {
-                /* set FBE -> PBE -> PEE */
-                kinetis_mcg_set_fbe();
-                kinetis_mcg_set_pbe();
+    while (current_mode != mode) {
+        switch(mcg_mode_routing[current_mode][mode]) {
+            case KINETIS_MCG_PEE:
                 kinetis_mcg_set_pee();
-                return 0;
-            }
-
-            if (current_mode == KINETIS_MCG_BLPE) {
-                /* set PBE -> PEE */
+                break;
+            case KINETIS_MCG_PBE:
                 kinetis_mcg_set_pbe();
-                kinetis_mcg_set_pee();
-                return 0;
-            }
-
-            break;
-
-        case KINETIS_MCG_BLPE:
-            if (!KINETIS_MCG_USE_ERC) {
-                return -1;
-            }
-
-            if (current_mode == KINETIS_MCG_PEE) {
-                /* set PBE -> BLPE */
-                kinetis_mcg_set_pbe();
+                break;
+            case KINETIS_MCG_BLPE:
                 kinetis_mcg_set_blpe();
-                return 0;
-            }
-
-            if (current_mode == KINETIS_MCG_FEE) {
-                /* set FBE -> BLPE */
-                kinetis_mcg_set_fbe();
-                kinetis_mcg_set_blpe();
-                return 0;
-            }
-
-            break;
-
-        case KINETIS_MCG_BLPI:
-            if (current_mode == KINETIS_MCG_FEE) {
-                /* set FBI -> BLPI */
-                kinetis_mcg_set_fbi();
+                break;
+            case KINETIS_MCG_BLPI:
                 kinetis_mcg_set_blpi();
-                return 0;
-            }
-
-            break;
-
-        case KINETIS_MCG_FEE:
-            if (!KINETIS_MCG_USE_ERC) {
-                return -1;
-            }
-
-            if (current_mode == KINETIS_MCG_BLPE) {
-                /* set FBE -> FEE */
+                break;
+            case KINETIS_MCG_FBE:
                 kinetis_mcg_set_fbe();
-                kinetis_mcg_set_fee();
-                return 0;
-            }
-
-            if (current_mode == KINETIS_MCG_BLPI) {
-                /* set FBI -> FEE */
+                break;
+            case KINETIS_MCG_FBI:
                 kinetis_mcg_set_fbi();
+                break;
+            case KINETIS_MCG_FEE:
                 kinetis_mcg_set_fee();
-                return 0;
-            }
-
-            break;
-
-        default:
-            break;
+                break;
+            case KINETIS_MCG_FEI:
+                kinetis_mcg_set_fei();
+                break;
+            default:
+                return -1;
+        }
     }
 
-    return -1;
+    return 0;
 }
 
 #endif /* KINETIS_CPU_USE_MCG */
+/** @} */
