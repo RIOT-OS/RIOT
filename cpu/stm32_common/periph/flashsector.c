@@ -159,22 +159,22 @@ void *flashsector_addr(int sector)
         offset = FLASHSECTOR_SMALL_SECTOR * 1024U * 8 + (FLASHSECTOR_SMALL_SECTOR * 1024U * 8) * (sector - 5);
     }
 
-    return (void *)(CPU_FLASH_BASE + offset);
+    return (void *)(FLASH_BASE + offset);
 }
 
 /* remember, that the first sector is number 0 */
 int flashsector_sector(void *addr)
 {
-    uint8_t pseudo_sector = ((int)addr - CPU_FLASH_BASE) / FLASHSECTOR_SMALL_SECTOR;
+    uint8_t pseudo_sector = ((uint32_t)addr - FLASH_BASE) / (uint32_t)(FLASHSECTOR_SMALL_SECTOR * 1024U);
 
     if (pseudo_sector < 4) {
         return pseudo_sector;
     }
-    else if (pseudo_sector > 8) {
+    else if (4 <= pseudo_sector && pseudo_sector < 8) {
         return 4;
     }
     else {
-        return ((pseudo_sector / 4) + 4);
+        return ((pseudo_sector / 8) + 4);
     }
 
 }
