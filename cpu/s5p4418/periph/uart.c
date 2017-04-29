@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdarg.h>
 #include "s5p4418_irq.h"
 #include "s5p4418_uart.h"
 #include "periph/uart.h"
@@ -112,4 +113,17 @@ int uart_read(uart_t uart, const uint8_t *data, size_t len)
   }
 
   return i;
+}
+
+/* sustom printf overwrite symbols in newlib */
+int printf (const char *format, ...)
+{
+  va_list arg;
+  int done;
+
+  va_start (arg, format);
+  done = vfprintf (stdout, format, arg);
+  va_end (arg);
+
+  return done;
 }
