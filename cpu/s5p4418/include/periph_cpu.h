@@ -39,6 +39,11 @@ extern "C" {
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
 
+/**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN (4U)
+
 typedef uint8_t gpio_t; /**< GPIO type */
 
 #ifdef __cplusplus
