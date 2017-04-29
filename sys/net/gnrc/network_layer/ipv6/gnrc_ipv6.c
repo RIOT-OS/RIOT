@@ -707,7 +707,7 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
              ((iface != KERNEL_PID_UNDEF) && /* or dst registered to given interface */
               (gnrc_ipv6_netif_find_addr(iface, &hdr->dst) != NULL))) {
         uint8_t *rcv_data;
-        gnrc_pktsnip_t *ptr = ipv6, *rcv_pkt;
+        gnrc_pktsnip_t *ptr = ipv6, *rcv_pkt, *netif;
 
         if (prep_hdr) {
             if (_fill_ipv6_hdr(iface, ipv6, payload) < 0) {
@@ -717,7 +717,15 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
             }
         }
 
-        rcv_pkt = gnrc_pktbuf_add(NULL, NULL, gnrc_pkt_len(ipv6), GNRC_NETTYPE_IPV6);
+        if ((netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0)) == NULL) {
+            DEBUG("ipv6: error allocating netif header\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+
+        netif->next = ipv6;
+
+        rcv_pkt = gnrc_pktbuf_add(NULL, NULL, gnrc_pkt_len(netif), GNRC_NETTYPE_NETIF);
 
         if (rcv_pkt == NULL) {
             DEBUG("ipv6: error on generating loopback packet\n");
