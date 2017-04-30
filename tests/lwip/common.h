@@ -29,7 +29,7 @@ extern "C" {
  * @brief   Application configuration
  * @{
  */
-#define CONN_INBUF_SIZE         (256)
+#define SOCK_INBUF_SIZE         (256)
 #define SERVER_MSG_QUEUE_SIZE   (8)
 #define SERVER_BUFFER_SIZE      (64)
 /**
@@ -47,7 +47,7 @@ extern "C" {
  */
 size_t hex2ints(uint8_t *out, const char *in);
 
-#ifdef MODULE_CONN_IP
+#ifdef MODULE_SOCK_IP
 /**
  * @brief   Raw IP shell command
  *
@@ -60,7 +60,20 @@ size_t hex2ints(uint8_t *out, const char *in);
 int ip_cmd(int argc, char **argv);
 #endif
 
-#ifdef MODULE_CONN_UDP
+#ifdef MODULE_SOCK_TCP
+/**
+ * @brief   TCP IP shell command
+ *
+ * @param[in] argc  number of arguments
+ * @param[in] argv  array of arguments
+ *
+ * @return  0 on success
+ * @return  other on error
+ */
+int tcp_cmd(int argc, char **argv);
+#endif
+
+#ifdef MODULE_SOCK_UDP
 /**
  * @brief   UDP IP shell command
  *

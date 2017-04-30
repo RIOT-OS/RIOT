@@ -252,23 +252,22 @@ static void *_event_loop(void *args)
 
 void _update_lifetime(void)
 {
-    uint32_t now = xtimer_now_usec();
-    uint16_t now_sec = now / US_PER_SEC;
-
     gnrc_rpl_parent_t *parent;
     gnrc_rpl_instance_t *inst;
 
     for (uint8_t i = 0; i < GNRC_RPL_PARENTS_NUMOF; ++i) {
         parent = &gnrc_rpl_parents[i];
         if (parent->state != 0) {
-            if ((int32_t)(parent->lifetime - now_sec) <= GNRC_RPL_LIFETIME_UPDATE_STEP) {
+            if (parent->lifetime > GNRC_RPL_LIFETIME_UPDATE_STEP) {
+                if (parent->lifetime > (2 * GNRC_RPL_LIFETIME_UPDATE_STEP)) {
+                    gnrc_rpl_send_DIS(parent->dodag->instance, &parent->addr);
+                }
+                parent->lifetime -= GNRC_RPL_LIFETIME_UPDATE_STEP;
+            }
+            else {
                 gnrc_rpl_dodag_t *dodag = parent->dodag;
                 gnrc_rpl_parent_remove(parent);
                 gnrc_rpl_parent_update(dodag, NULL);
-                continue;
-            }
-            else if ((int32_t)(parent->lifetime - now_sec) <= (GNRC_RPL_LIFETIME_UPDATE_STEP * 2)) {
-                gnrc_rpl_send_DIS(parent->dodag->instance, &parent->addr);
             }
         }
     }

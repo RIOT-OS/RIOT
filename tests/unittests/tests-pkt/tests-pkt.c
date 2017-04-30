@@ -26,6 +26,9 @@
     { 1, (next), (data), (len), GNRC_NETTYPE_UNDEF }
 #define _INIT_ELEM_STATIC_DATA(data, next) _INIT_ELEM(sizeof(data), data, next)
 
+#define _INIT_ELEM_STATIC_TYPE(type, next) \
+    { 1, (next), NULL, 0, (type) }
+
 static void test_pkt_len__NULL(void)
 {
     TEST_ASSERT_EQUAL_INT(0, gnrc_pkt_len(NULL));
@@ -106,6 +109,26 @@ static void test_pkt_count__null(void)
     TEST_ASSERT_EQUAL_INT(0, gnrc_pkt_count(NULL));
 }
 
+static void test_pktsnip_search_type(void)
+{
+    /* init packet snips */
+    gnrc_pktsnip_t snip1 = _INIT_ELEM_STATIC_TYPE(GNRC_NETTYPE_UNDEF, NULL);
+    gnrc_pktsnip_t snip2 = _INIT_ELEM_STATIC_TYPE(GNRC_NETTYPE_TEST, &snip1);
+    gnrc_pktsnip_t snip3 = _INIT_ELEM_STATIC_TYPE(GNRC_NETTYPE_IPV6, &snip2);
+    /* successfull searches */
+    gnrc_pktsnip_t *res;
+    TEST_ASSERT_NOT_NULL((res = gnrc_pktsnip_search_type(&snip3, GNRC_NETTYPE_UNDEF)));
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_UNDEF, res->type);
+    TEST_ASSERT_NOT_NULL((res = gnrc_pktsnip_search_type(&snip3, GNRC_NETTYPE_TEST)));
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_TEST, res->type);
+    TEST_ASSERT_NOT_NULL((res = gnrc_pktsnip_search_type(&snip3, GNRC_NETTYPE_IPV6)));
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_IPV6, res->type);
+    /* failing searches  */
+    TEST_ASSERT_NULL(gnrc_pktsnip_search_type(&snip1, GNRC_NETTYPE_TEST));
+    TEST_ASSERT_NULL(gnrc_pktsnip_search_type(&snip2, GNRC_NETTYPE_IPV6));
+    TEST_ASSERT_NULL(gnrc_pktsnip_search_type(&snip3, GNRC_NETTYPE_NUMOF));
+}
+
 Test *tests_pkt_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -119,6 +142,7 @@ Test *tests_pkt_tests(void)
         new_TestFixture(test_pkt_count__1_elem),
         new_TestFixture(test_pkt_count__5_elem),
         new_TestFixture(test_pkt_count__null),
+        new_TestFixture(test_pktsnip_search_type),
     };
 
     EMB_UNIT_TESTCALLER(pkt_tests, NULL, NULL, fixtures);

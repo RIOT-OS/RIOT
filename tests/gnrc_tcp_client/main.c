@@ -26,12 +26,12 @@
 #define NBYTE (2048)
 #endif
 
-/* Test Pattern used by Client Application */
+/* Test pattern used by client application */
 #ifndef TEST_PATERN_CLI
 #define TEST_PATERN_CLI (0xF0)
 #endif
 
-/* Test Pattern used by Server Application */
+/* Test pattern used by server application */
 #ifndef TEST_PATERN_SRV
 #define TEST_PATERN_SRV (0xA7)
 #endif
@@ -46,7 +46,7 @@ int main(void)
     printf("\nStarting Client Threads. TARGET_ADDR=%s, TARGET_PORT=%d, ", TARGET_ADDR, TARGET_PORT);
     printf("CONNS=%d, NBYTE=%d, CYCLES=%d\n\n", CONNS, NBYTE, CYCLES );
 
-    /* Start Connection Handling Threads */
+    /* Start connection handling threads */
     for (int i = 0; i < CONNS; i += 1) {
         thread_create((char *) stacks[i], sizeof(stacks[i]), THREAD_PRIORITY_MAIN, 0, cli_thread,
                       (void *) i, NULL);
@@ -56,29 +56,29 @@ int main(void)
 
 void *cli_thread(void *arg)
 {
-    /* Test Program variables */
+    /* Test program variables */
     int tid = (int) arg;
     uint32_t cycles = 0;
     uint32_t cycles_ok = 0;
     uint32_t failed_payload_verifications = 0;
 
-    /* Transmission Control Block */
+    /* Transmission control block */
     gnrc_tcp_tcb_t tcb;
 
-    /* Target Peer Address Information */
+    /* Target peer address information */
     ipv6_addr_t target_addr;
     uint16_t target_port;
 
-    /* Initialize Target Information */
+    /* Initialize target information */
     ipv6_addr_from_str(&target_addr, TARGET_ADDR);
     target_port = TARGET_PORT;
 
     printf("Client running: TID=%d\n", tid);
     while (cycles < CYCLES) {
-        /* Initialize tcb struct */
+        /* Initialize TCB */
         gnrc_tcp_tcb_init(&tcb);
 
-        /* Connect to Peer */
+        /* Connect to peer */
         int ret = gnrc_tcp_open_active(&tcb, AF_INET6, (uint8_t *) &target_addr, target_port, 0);
         switch (ret) {
             case 0:
@@ -121,12 +121,12 @@ void *cli_thread(void *arg)
                 return 0;
         }
 
-        /* Fill Buffer with a test pattern */
+        /* Fill buffer with a test pattern */
         for (size_t i = 0; i < sizeof(bufs[tid]); ++i){
             bufs[tid][i] = TEST_PATERN_CLI;
         }
 
-        /* Send Data, stop if errors were found */
+        /* Send data, stop if errors were found */
         for (size_t sent = 0; sent < sizeof(bufs[tid]) && ret >= 0; sent += ret) {
             ret = gnrc_tcp_send(&tcb, bufs[tid] + sent, sizeof(bufs[tid]) - sent, 0);
             switch (ret) {
@@ -157,7 +157,7 @@ void *cli_thread(void *arg)
               }
         }
 
-        /* Receive Data, stop if errors were found */
+        /* Receive data, stop if errors were found */
         for (size_t rcvd = 0; rcvd < sizeof(bufs[tid]) && ret >= 0; rcvd += ret) {
             ret = gnrc_tcp_recv(&tcb, (void *) (bufs[tid] + rcvd), sizeof(bufs[tid]) - rcvd,
                                 GNRC_TCP_CONNECTION_TIMEOUT_DURATION);
@@ -204,10 +204,10 @@ void *cli_thread(void *arg)
             }
         }
 
-        /* Close Connection */
+        /* Close connection */
         gnrc_tcp_close(&tcb);
 
-        /* Gather Data */
+        /* Gather data */
         cycles += 1;
         if (ret >= 0) {
             cycles_ok += 1;

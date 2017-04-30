@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    driver_hd44780 HD44780 LCD driver
+ * @defgroup    drivers_hd44780 HD44780 LCD driver
  * @ingroup     drivers_actuators
  * @brief       Driver for the Hitachi HD44780 LCD driver
  *

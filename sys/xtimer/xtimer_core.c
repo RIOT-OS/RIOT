@@ -487,7 +487,8 @@ overflow:
      * next timer period and check again for expired
      * timers.*/
     if (reference > _xtimer_lltimer_now()) {
-        DEBUG("_timer_callback: overflowed while executing callbacks. %i\n", timer_list_head != 0);
+        DEBUG("_timer_callback: overflowed while executing callbacks. %i\n",
+              timer_list_head != NULL);
         _next_period();
         reference = 0;
         goto overflow;

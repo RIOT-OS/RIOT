@@ -265,7 +265,7 @@ static int socket_close(vfs_file_t *filp)
 #endif
 #ifdef MODULE_SOCK_TCP
             case SOCK_STREAM:
-                if (s->queue_array == 0) {
+                if (s->queue_array == NULL) {
                     sock_tcp_disconnect(&s->sock->tcp.sock);
                 }
                 else {
@@ -863,7 +863,7 @@ static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
             res = -EOPNOTSUPP;
             break;
     }
-    if ((res >= 0) && (address != NULL) && (address_len != 0)) {
+    if ((res >= 0) && (address != NULL) && (address_len != NULL)) {
         switch (s->type) {
 #ifdef MODULE_SOCK_TCP
             case SOCK_STREAM:
