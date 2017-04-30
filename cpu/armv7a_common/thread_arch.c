@@ -95,76 +95,82 @@ volatile uint32_t nesting_level = 0UL;
  */
 char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size)
 {
-    unsigned int *stk;
+    uint32_t *stk;
 
-    stk = (unsigned int *)((uintptr_t)stack_start + stack_size);
+    stk = (uint32_t *)((uintptr_t)stack_start + stack_size);
 
     /* Stack marker */
     *stk = STACK_MARKER;
     stk--;
 
     /* Initial SPSR */
-    *stk = (unsigned int) INITIAL_CPSR;
+    *stk = (uint32_t) INITIAL_CPSR;
+
+    if(((uint32_t) task_func & THUMB_MODE_ADDRESS) != 0x00UL)
+    {
+        /* The task will start in THUMB mode. */
+        *stk |= THUMB_MODE_BIT;
+    }
     stk--;
 
     /* PC */
-    *stk = ((unsigned int) task_func);
+    *stk = ((uint32_t) task_func);
     stk--;
 
     /* set the return address (LR) */
-    *stk = (unsigned int) sched_task_exit;
+    *stk = (uint32_t) sched_task_exit;
     stk--;
 
     /* R12 */
-    *stk = (unsigned int) 0x12121212;
+    *stk = (uint32_t) 0x12121212;
     stk--;
 
     /* R11 */
-    *stk = (unsigned int) 0x11111111;
+    *stk = (uint32_t) 0x11111111;
     stk--;
 
     /* R10 */
-    *stk = (unsigned int) 0x12121212;
+    *stk = (uint32_t) 0x12121212;
     stk--;
 
     /* R9 */
-    *stk = (unsigned int) 0x09090909;
+    *stk = (uint32_t) 0x09090909;
     stk--;
 
     /* R8 */
-    *stk = (unsigned int) 0x08080808;
+    *stk = (uint32_t) 0x08080808;
     stk--;
 
     /* R7 */
-    *stk = (unsigned int) 0x07070707;
+    *stk = (uint32_t) 0x07070707;
     stk--;
 
     /* R6 */
-    *stk = (unsigned int) 0x06060606;
+    *stk = (uint32_t) 0x06060606;
     stk--;
 
     /* R5 */
-    *stk = (unsigned int) 0x05050505;
+    *stk = (uint32_t) 0x05050505;
     stk--;
 
     /* R4 */
-    *stk = (unsigned int) 0x04040404;
+    *stk = (uint32_t) 0x04040404;
     stk--;
 
     /* R3 */
-    *stk = (unsigned int) 0x03030303;
+    *stk = (uint32_t) 0x03030303;
     stk--;
 
     /* R2 */
-    *stk = (unsigned int) 0x02020202;
+    *stk = (uint32_t) 0x02020202;
     stk--;
 
     /* R1 */
-    *stk = (unsigned int) 0x02020202;
+    *stk = (uint32_t) 0x02020202;
     stk--;
 
     /* R0 */
-    *stk = ((unsigned int) arg);
+    *stk = ((uint32_t) arg);
 
     return (char *)stk;
 }
