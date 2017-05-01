@@ -106,6 +106,7 @@ static const uart_conf_t uart_config[] = {
         .scgc_addr = &SIM->SCGC4,
         .scgc_bit = SIM_SCGC4_UART1_SHIFT,
         .mode   = UART_MODE_8N1,
+        .type   = KINETIS_UART,
     },
 };
 

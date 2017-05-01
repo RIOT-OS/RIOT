@@ -199,16 +199,28 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
- * @name    CPU specific UART modes values
- * @{
+ * @brief    UART transmission modes
  */
-/** @brief 8 data bits, no parity, 1 stop bit */
-#define UART_MODE_8N1       (0)
-/** @brief 8 data bits, even parity, 1 stop bit */
-#define UART_MODE_8E1       (UART_C1_PE_MASK | UART_C1_M_MASK)
-/** @brief 8 data bits, odd parity, 1 stop bit */
-#define UART_MODE_8O1       (UART_C1_PE_MASK | UART_C1_M_MASK | UART_C1_PT_MASK)
-/** @} */
+typedef enum {
+    /** @brief 8 data bits, no parity, 1 stop bit */
+    UART_MODE_8N1 = 0,
+    /** @brief 8 data bits, even parity, 1 stop bit */
+#if defined(UART_C1_M_MASK)
+    /* LPUART and UART mode bits coincide, so the same setting for UART works on
+     * the LPUART as well */
+    UART_MODE_8E1 = (UART_C1_M_MASK | UART_C1_PE_MASK),
+#elif defined(LPUART_CTRL_M_MASK)
+    /* For CPUs which only have the LPUART */
+    UART_MODE_8E1 = (LPUART_CTRL_M_MASK | LPUART_CTRL_PE_MASK),
+#endif
+    /** @brief 8 data bits, odd parity, 1 stop bit */
+#if defined(UART_C1_M_MASK)
+    UART_MODE_8O1 = (UART_C1_M_MASK | UART_C1_PE_MASK | UART_C1_PT_MASK),
+#elif defined(LPUART_CTRL_M_MASK)
+    /* For CPUs which only have the LPUART */
+    UART_MODE_8O1 = (LPUART_CTRL_M_MASK | LPUART_CTRL_PE_MASK | LPUART_CTRL_PT_MASK),
+#endif
+} uart_mode_t;
 
 #ifndef DOXYGEN
 /**
@@ -310,10 +322,18 @@ enum {
 /** @} */
 
 /**
+ * @brief UART hardware module types
+ */
+typedef enum {
+    KINETIS_UART,   /**< Kinetis UART module type */
+    KINETIS_LPUART, /**< Kinetis Low-power UART (LPUART) module type */
+} uart_type_t;
+
+/**
  * @brief UART module configuration options
  */
 typedef struct {
-    UART_Type *dev;               /**< Pointer to module hardware registers */
+    void *dev;                    /**< Pointer to module hardware registers */
     uint32_t freq;                /**< Module clock frequency, usually CLOCK_CORECLOCK or CLOCK_BUSCLOCK */
     gpio_t pin_rx;                /**< RX pin, GPIO_UNDEF disables RX */
     gpio_t pin_tx;                /**< TX pin */
@@ -322,7 +342,8 @@ typedef struct {
     IRQn_Type irqn;               /**< IRQ number for this module */
     volatile uint32_t *scgc_addr; /**< Clock enable register, in SIM module */
     uint8_t scgc_bit;             /**< Clock enable bit, within the register */
-    uint8_t mode;                 /**< UART mode: data bits, parity, stop bits */
+    uart_mode_t mode;             /**< UART mode: data bits, parity, stop bits */
+    uart_type_t type;             /**< Hardware module type (KINETIS_UART or KINETIS_LPUART)*/
 } uart_conf_t;
 
 #if !defined(KINETIS_HAVE_PLL)
