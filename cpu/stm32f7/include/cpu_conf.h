@@ -25,6 +25,8 @@
 
 #if defined(CPU_MODEL_STM32F746ZG)
 #include "vendor/stm32f746xx.h"
+#elif defined(CPU_MODEL_STM32F767ZI)
+#include "vendor/stm32f767xx.h"
 #elif defined(CPU_MODEL_STM32F769NI)
 #include "vendor/stm32f769xx.h"
 #endif
@@ -40,7 +42,7 @@ extern "C" {
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
 #if defined(CPU_MODEL_STM32F746ZG)
 #define CPU_IRQ_NUMOF                   (98U)
-#elif defined(CPU_MODEL_STM32F769NI)
+#elif defined(CPU_MODEL_STM32F769NI) || defined(CPU_MODEL_STM32F767ZI)
 #define CPU_IRQ_NUMOF                   (110U)
 #endif
 /** @} */

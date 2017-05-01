@@ -126,7 +126,7 @@ WEAK_DEFAULT void isr_cec(void);
 WEAK_DEFAULT void isr_i2c4_ev(void);
 WEAK_DEFAULT void isr_i2c4_er(void);
 WEAK_DEFAULT void isr_spdif_rx(void);
-#if defined(CPU_MODEL_STM32F769NI)
+#if defined(CPU_MODEL_STM32F769NI) || defined(CPU_MODEL_STM32F767ZI)
 WEAK_DEFAULT void isr_dsi(void);
 WEAK_DEFAULT void isr_dfsdm1_flt0(void);
 WEAK_DEFAULT void isr_dfsdm1_flt1(void);
@@ -264,6 +264,10 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_spdif_rx,
 #if defined(CPU_MODEL_STM32F769NI)
     (void*) isr_dsi,
+#elif defined(CPU_MODEL_STM32F767ZI)
+    (void*) (0UL),
+#endif
+#if defined(CPU_MODEL_STM32F769NI) || defined(CPU_MODEL_STM32F767ZI)
     (void*) isr_dfsdm1_flt0,
     (void*) isr_dfsdm1_flt1,
     (void*) isr_dfsdm1_flt2,
