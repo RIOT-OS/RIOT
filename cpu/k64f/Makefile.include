@@ -1,5 +1,6 @@
 # define the CPU architecture for the k64f
 export CPU_ARCH = cortex-m4
+export CPU_FAMILY = kx
 
 # map CPU models to generic Kinetis linkerscript
 LD_MK64FN1M0VLL12 = kinetis_f1024l64u192.ld
