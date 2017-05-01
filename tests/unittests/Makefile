@@ -99,6 +99,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        fox \
                        frdm-k22f \
                        frdm-k64f \
+                       frdm-kw41z \
                        iotlab-a8-m3 \
                        iotlab-m3 \
                        limifrog-v1 \
