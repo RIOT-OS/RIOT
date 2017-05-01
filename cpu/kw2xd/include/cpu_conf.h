@@ -52,6 +52,11 @@ extern "C"
 /** @} */
 
 /**
+ * @brief This CPU provides an additional ADC clock divider as CFG1[ADICLK]=1
+ */
+#define KINETIS_HAVE_ADICLK_BUS_DIV_2 1
+
+/**
  * @name GPIO pin mux function numbers
  */
 /** @{ */

@@ -171,7 +171,16 @@ int adc_init(adc_t line)
     /* For the calibration it is important that the ADC clock is <= 4 MHz */
     uint32_t adiv;
     if (CLOCK_BUSCLOCK > (ADC_MAX_CLK << 3)) {
+#if KINETIS_HAVE_ADICLK_BUS_DIV_2
+        /* Some CPUs, e.g. MK60D10, MKW22D5, provide an additional divide by two
+         * divider for the bus clock as CFG1[ADICLK] = 0b01
+         */
         adiv = ADC_CFG1_ADIV(3) | ADC_CFG1_ADICLK(1);
+#else
+        /* Newer CPUs seem to have replaced this with various alternate clock
+         * sources instead */
+        adiv = ADC_CFG1_ADIV(3);
+#endif
     }
     else {
         unsigned int i = 0;
