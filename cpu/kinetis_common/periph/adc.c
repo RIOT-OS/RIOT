@@ -70,10 +70,16 @@ static inline void prep(adc_t line)
         bit_set32(&SIM->SCGC6, SIM_SCGC6_ADC0_SHIFT);
     }
 #ifdef ADC1
-    else {
+    else if (dev(line) == ADC1) {
+#if defined(SIM_SCGC3_ADC1_SHIFT)
         bit_set32(&SIM->SCGC3, SIM_SCGC3_ADC1_SHIFT);
-    }
+#elif defined(SIM_SCGC6_ADC1_SHIFT)
+        bit_set32(&SIM->SCGC6, SIM_SCGC6_ADC1_SHIFT);
+#else
+#error ADC1 clock gate is not known!
 #endif
+    }
+#endif /* ADC1 */
     mutex_lock(&locks[dev_num(line)]);
 }
 
@@ -83,10 +89,14 @@ static inline void done(adc_t line)
         bit_clear32(&SIM->SCGC6, SIM_SCGC6_ADC0_SHIFT);
     }
 #ifdef ADC1
-    else {
+    else if (dev(line) == ADC1) {
+#if defined(SIM_SCGC3_ADC1_SHIFT)
         bit_clear32(&SIM->SCGC3, SIM_SCGC3_ADC1_SHIFT);
-    }
+#elif defined(SIM_SCGC6_ADC1_SHIFT)
+        bit_clear32(&SIM->SCGC6, SIM_SCGC6_ADC1_SHIFT);
 #endif
+    }
+#endif /* ADC1 */
     mutex_unlock(&locks[dev_num(line)]);
 }
 
