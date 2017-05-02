@@ -13,6 +13,7 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <errno.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -245,9 +246,23 @@ void _nib_nc_remove(_nib_onl_entry_t *node)
           ipv6_addr_to_str(addr_str, &node->ipv6, sizeof(addr_str)),
           _nib_onl_get_if(node));
     node->mode &= ~(_NC);
+    evtimer_del((evtimer_t *)&_nib_evtimer, &node->snd_na.event);
 #if GNRC_IPV6_NIB_CONF_ARSM
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->nud_timeout.event);
 #endif
+#if GNRC_IPV6_NIB_CONF_6LR
+    evtimer_del((evtimer_t *)&_nib_evtimer, &node->addr_reg_timeout.event);
+#endif
+#if GNRC_IPV6_NIB_CONF_QUEUE_PKT
+    gnrc_pktqueue_t *tmp;
+    for (gnrc_pktqueue_t *ptr = node->pktqueue;
+         (ptr != NULL) && (tmp = (ptr->next), 1);
+         ptr = tmp) {
+        gnrc_pktqueue_t *entry = gnrc_pktqueue_remove(&node->pktqueue, ptr);
+        gnrc_pktbuf_release_error(entry->pkt, EHOSTUNREACH);
+        entry->pkt = NULL;
+    }
+#endif  /* GNRC_IPV6_NIB_CONF_QUEUE_PKT */
     _nib_onl_clear(node);
 }
 
@@ -772,6 +787,20 @@ _nib_iface_t *_nib_iface_get(unsigned iface)
     return ni;
 }
 
+#if GNRC_IPV6_NIB_CONF_ARSM
+void _nib_iface_recalc_reach_time(_nib_iface_t *iface)
+{
+    uint32_t factor = random_uint32_range(NDP_MIN_RANDOM_FACTOR,
+                                          NDP_MAX_RANDOM_FACTOR);
+
+    /* random factor was times 1000 so we need to divide it again */
+    iface->reach_time = (iface->reach_time_base * factor) / 1000;
+    _evtimer_add(iface, GNRC_IPV6_NIB_RECALC_REACH_TIME,
+                 &iface->recalc_reach_time,
+                 GNRC_IPV6_NIB_CONF_REACH_TIME_RESET);
+}
+#endif
+
 static void _override_node(const ipv6_addr_t *addr, unsigned iface,
                            _nib_onl_entry_t *node)
 {
@@ -799,7 +828,7 @@ uint32_t _evtimer_lookup(const void *ctx, uint16_t type)
     evtimer_msg_event_t *event = (evtimer_msg_event_t *)_nib_evtimer.events;
     uint32_t offset = 0;
 
-    DEBUG("nib: lookup ctx = %p, type = %u\n", (void *)ctx, type);
+    DEBUG("nib: lookup ctx = %p, type = %04x\n", (void *)ctx, type);
     while (event != NULL) {
         offset += event->event.offset;
         if ((event->msg.type == type) &&
