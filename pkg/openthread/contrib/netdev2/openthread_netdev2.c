@@ -75,6 +75,7 @@ void *_openthread_event_loop(void *arg)
 #endif
 
     uint8_t *buf;
+    (void) buf;
     while (1) {
         otTaskletsProcess(sInstance);
         msg_receive(&msg);
