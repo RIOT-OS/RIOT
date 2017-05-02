@@ -637,6 +637,10 @@ static inline void gnrc_ndp_send_rtr_sol(unsigned iface, ipv6_addr_t *dst)
 static inline void gnrc_ndp_send_rtr_adv(unsigned iface, ipv6_addr_t *src,
                                          ipv6_addr_t *dst, bool fin)
 {
+    (void)iface;
+    (void)src;
+    (void)dst;
+    (void)fin;
     gnrc_ndp_internal_send_rtr_adv((kernel_pid_t)iface, src, dst, fin);
 }
 
