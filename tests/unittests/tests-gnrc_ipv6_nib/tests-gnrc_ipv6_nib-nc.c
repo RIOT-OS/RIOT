@@ -31,14 +31,7 @@
 
 static void set_up(void)
 {
-    evtimer_event_t *tmp;
-
-    for (evtimer_event_t *ptr = _nib_evtimer.events;
-         (ptr != NULL) && (tmp = (ptr->next), 1);
-         ptr = tmp) {
-        evtimer_del((evtimer_t *)(&_nib_evtimer), ptr);
-    }
-    _nib_init();
+    gnrc_ipv6_nib_init();
 }
 
 /*
