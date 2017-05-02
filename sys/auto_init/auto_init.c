@@ -256,6 +256,11 @@ void auto_init(void)
     auto_init_kw2xrf();
 #endif
 
+#ifdef MODULE_KW41ZRF
+    extern void auto_init_kw41zrf(void);
+    auto_init_kw41zrf();
+#endif
+
 #ifdef MODULE_NETDEV_TAP
     extern void auto_init_netdev_tap(void);
     auto_init_netdev_tap();

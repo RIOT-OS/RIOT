@@ -122,6 +122,10 @@ ifneq (,$(filter kw2xrf,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/kw2xrf/include
 endif
 
+ifneq (,$(filter kw41zrf,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/kw41zrf/include
+endif
+
 ifneq (,$(filter l3g4200d,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/l3g4200d/include
 endif
