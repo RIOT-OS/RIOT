@@ -352,3 +352,12 @@ void isr_portg(void)
     irq_handler(PORTG, 6);
 }
 #endif /* ISR_PORT_G */
+
+#if defined(PORTB_BASE) && defined(PORTC_BASE)
+/* Combined ISR used in certain KL devices */
+void isr_portb_portc(void)
+{
+    irq_handler(PORTB, 1);
+    irq_handler(PORTC, 2);
+}
+#endif
