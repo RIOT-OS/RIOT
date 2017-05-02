@@ -123,7 +123,7 @@ extern int _ccnl_interest(int argc, char **argv);
 extern int _ccnl_fib(int argc, char **argv);
 #endif
 
-#if defined(MODULE_OPENTHREAD) && 0
+#if defined(MODULE_OPENTHREAD)
 extern int _openthread_state(int argc, char **argv);
 extern int _openthread_ipaddr(int argc, char **argv);
 #endif
@@ -222,7 +222,7 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_SNTP
     { "ntpdate", "synchronizes with a remote time server", _ntpdate },
 #endif
-#if defined(MODULE_OPENTHREAD) && 0
+#if defined(MODULE_OPENTHREAD)
     { "ot_ipaddr", "shows OpenThread IP addresses", _openthread_ipaddr },
     { "ot_state", "shows state of current Thread node", _openthread_state },
 #endif
