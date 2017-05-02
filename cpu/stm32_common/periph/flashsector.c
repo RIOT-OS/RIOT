@@ -76,8 +76,7 @@ void flashsector_write(int sector, void *data, int size)
         FLASH->CR |= FLASH_PSIZE_HALF_WORD; /* 16 bit programming */
         FLASH->CR |= FLASH_CR_PG;
         for (unsigned i = 0; i < (size / 2); i++) {
-            //*(__IO uint16_t*)sector_addr++ = data_addr[i];
-            *sector_addr++ = data_addr[i];
+            *(__IO uint16_t*)sector_addr++ = data_addr[i];
             while (FLASH->SR & FLASH_SR_BSY) {
             }
         }
