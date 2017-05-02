@@ -109,6 +109,11 @@ void gnrc_netif_init_devs(void)
         auto_init_kw2xrf();
     }
 
+    if (IS_USED(MODULE_KW41ZRF)) {
+        extern void auto_init_kw41zrf(void);
+        auto_init_kw41zrf();
+    }
+
     if (IS_USED(MODULE_USBUS_CDC_ECM)) {
         extern void auto_init_netdev_cdcecm(void);
         auto_init_netdev_cdcecm();
