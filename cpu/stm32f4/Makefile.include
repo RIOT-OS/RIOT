@@ -1,5 +1,4 @@
 export CPU_ARCH = cortex-m4f
-export CPU  = stm32f4
 
 USEMODULE += pm_layered
 
