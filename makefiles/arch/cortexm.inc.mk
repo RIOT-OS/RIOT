@@ -91,7 +91,7 @@ export UNDEF += $(BINDIR)/cpu/vectors.o
 endif
 
 # CPU depends on the cortex-m common module, so include it:
-include $(RIOTCPU)/cortexm_common/Makefile.include
+include $(RIOTCPU)/arch_cortexm/Makefile.include
 
 # use the nano-specs of Newlib when available
 USEMODULE += newlib_nano

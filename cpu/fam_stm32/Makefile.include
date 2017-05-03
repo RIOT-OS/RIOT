@@ -5,7 +5,7 @@ export CFLAGS += -DCPU_$(shell echo $(CPU) | tr 'a-z-' 'A-Z_')
 USEMODULE += periph_common
 
 # include stm32 common functions and stm32 common periph drivers
-USEMODULE += stm32_common stm32_common_periph
+USEMODULE += fam_stm32 fam_stm32_periph
 
 # export the common include directory
-export INCLUDES += -I$(RIOTCPU)/stm32_common/include
+export INCLUDES += -I$(RIOTCPU)/fam_stm32/include
