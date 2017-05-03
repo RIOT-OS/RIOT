@@ -58,9 +58,6 @@ endif
 ifneq (,$(filter ccn-lite-utils,$(USEMODULE)))
   SRC += sc_ccnl.c
 endif
-ifneq (,$(filter openthread,$(USEMODULE)))
-  SRC += sc_openthread.c
-endif
 ifneq (,$(filter sntp,$(USEMODULE)))
   SRC += sc_sntp.c
 endif
