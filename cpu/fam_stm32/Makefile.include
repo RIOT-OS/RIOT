@@ -1,5 +1,6 @@
 # export the CPU name so we can differentiate between them in the code
-export CFLAGS += -DCPU_$(shell echo $(CPU) | tr 'a-z-' 'A-Z_')
+FOO = $(shell echo $(CPU) | tr 'a-z-' 'A-Z_')
+# export CFLAGS += -DCPU_$(FOO)
 
 # include common periph module
 USEMODULE += periph_common
@@ -9,3 +10,5 @@ USEMODULE += fam_stm32 fam_stm32_periph
 
 # export the common include directory
 export INCLUDES += -I$(RIOTCPU)/fam_stm32/include
+
+include $(RIOTMAKE)/arch/cortexm.inc.mk

@@ -1,5 +1,4 @@
 export CPU_ARCH = cortex-m4f
 export CPU  = stm32l4
 
-include $(RIOTCPU)/stm32_common/Makefile.include
-include $(RIOTMAKE)/arch/cortexm.inc.mk
+include $(RIOTCPU)/fam_stm32/Makefile.include

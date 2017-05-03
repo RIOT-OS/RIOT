@@ -1,3 +1,3 @@
-MODULE = stm32_common_periph
+MODULE = fam_stm32_periph
 
 include $(RIOTBASE)/Makefile.base

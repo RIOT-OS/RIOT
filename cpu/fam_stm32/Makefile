@@ -1,5 +1,5 @@
-MODULE = stm32_common
+MODULE = fam_stm32
 
-DIRS = periph
+DIRS = periph $(RIOTCPU)/arch_cortexm
 
 include $(RIOTBASE)/Makefile.base
