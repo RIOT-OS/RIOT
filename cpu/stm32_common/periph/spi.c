@@ -74,7 +74,7 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
-#ifdef CPU_FAM_STM32F1
+#ifdef CPU_STM32F1
     gpio_init_af(spi_config[bus].sclk_pin, GPIO_AF_OUT_PP);
     gpio_init_af(spi_config[bus].mosi_pin, GPIO_AF_OUT_PP);
     gpio_init(spi_config[bus].miso_pin, GPIO_IN);
@@ -102,7 +102,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
         if (spi_config[bus].cs_pin == GPIO_UNDEF) {
             return SPI_NOCS;
         }
-#ifdef CPU_FAM_STM32F1
+#ifdef CPU_STM32F1
         gpio_init_af(spi_config[bus].cs_pin, GPIO_AF_OUT_PP);
 #else
         gpio_init(spi_config[bus].cs_pin, GPIO_OUT);

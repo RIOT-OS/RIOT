@@ -38,7 +38,7 @@ void periph_clk_en(bus_t bus, uint32_t mask)
 {
     switch (bus) {
         case APB1:
-#if defined(CPU_FAM_STM32L4)
+#if defined(CPU_STM32L4)
             RCC->APB1ENR1 |= mask;
 #else
             RCC->APB1ENR |= mask;
@@ -47,20 +47,20 @@ void periph_clk_en(bus_t bus, uint32_t mask)
         case APB2:
             RCC->APB2ENR |= mask;
             break;
-#if defined(CPU_FAM_STM32L0)
+#if defined(CPU_STM32L0)
         case AHB:
             RCC->AHBENR |= mask;
             break;
         case IOP:
             RCC->IOPENR |= mask;
             break;
-#elif defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) \
-            || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+#elif defined(CPU_STM32L1) || defined(CPU_STM32F1) \
+            || defined(CPU_STM32F0) || defined(CPU_STM32F3)
         case AHB:
             RCC->AHBENR |= mask;
             break;
-#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) \
-            || defined(CPU_FAM_STM32L4)
+#elif defined(CPU_STM32F2) || defined(CPU_STM32F4) \
+            || defined(CPU_STM32L4)
         case AHB1:
             RCC->AHB1ENR |= mask;
             break;
@@ -86,7 +86,7 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
 {
     switch (bus) {
         case APB1:
-#if defined(CPU_FAM_STM32L4)
+#if defined(CPU_STM32L4)
             RCC->APB1ENR1 &= ~(mask);
 #else
             RCC->APB1ENR &= ~(mask);
@@ -95,20 +95,20 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
         case APB2:
             RCC->APB2ENR &= ~(mask);
             break;
-#if defined(CPU_FAM_STM32L0)
+#if defined(CPU_STM32L0)
         case AHB:
             RCC->AHBENR &= ~(mask);
             break;
         case IOP:
             RCC->IOPENR &= ~(mask);
             break;
-#elif defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) \
-            || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+#elif defined(CPU_STM32L1) || defined(CPU_STM32F1) \
+            || defined(CPU_STM32F0) || defined(CPU_STM32F3)
         case AHB:
             RCC->AHBENR &= ~(mask);
             break;
-#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) \
-            || defined(CPU_FAM_STM32L4)
+#elif defined(CPU_STM32F2) || defined(CPU_STM32F4) \
+            || defined(CPU_STM32L4)
         case AHB1:
             RCC->AHB1ENR &= ~(mask);
             break;

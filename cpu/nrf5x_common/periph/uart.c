@@ -56,7 +56,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     uart_config.rx_cb = rx_cb;
     uart_config.arg = arg;
 
-#ifdef CPU_FAM_NRF51
+#ifdef CPU_NRF51
    /* power on the UART device */
     NRF_UART0->POWER = 1;
 #endif

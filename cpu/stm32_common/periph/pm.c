@@ -32,7 +32,7 @@ void pm_set(unsigned mode)
 {
 /* I just copied it from stm32f1/2/4, but I suppose it would work for the
  * others... /KS */
-#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
+#if defined(CPU_STM32F1) || defined(CPU_STM32F2) || defined(CPU_STM32F4)
     switch (mode) {
         case 0:
             /* Set PDDS to enter standby mode on deepsleep and clear flags */
@@ -62,7 +62,7 @@ void pm_set(unsigned mode)
     __WFI();
 }
 
-#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
+#if defined(CPU_STM32F1) || defined(CPU_STM32F2) || defined(CPU_STM32F4)
 void pm_off(void)
 {
     irq_disable();

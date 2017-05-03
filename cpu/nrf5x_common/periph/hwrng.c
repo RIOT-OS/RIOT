@@ -35,7 +35,7 @@ void hwrng_read(void *buf, unsigned int num)
     uint8_t *b = (uint8_t *)buf;
 
     /* power on RNG */
-#ifdef CPU_FAM_NRF51
+#ifdef CPU_NRF51
     NRF_RNG->POWER = 1;
 #endif
     NRF_RNG->TASKS_START = 1;
@@ -54,7 +54,7 @@ void hwrng_read(void *buf, unsigned int num)
 
     /* power off RNG */
     NRF_RNG->TASKS_STOP = 1;
-#ifdef CPU_FAM_NRF51
+#ifdef CPU_NRF51
     NRF_RNG->POWER = 0;
 #endif
 }

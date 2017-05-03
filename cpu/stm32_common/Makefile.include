@@ -1,6 +1,5 @@
-# export the CPU family so we can differentiate between them in the code
-FAM = $(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
-export CFLAGS += -DCPU_FAM_$(FAM)
+# export the CPU name so we can differentiate between them in the code
+export CFLAGS += -DCPU_$(shell echo $(CPU) | tr 'a-z-' 'A-Z_')
 
 # include common periph module
 USEMODULE += periph_common

@@ -24,7 +24,7 @@
 
 void pm_off(void)
 {
-#ifdef CPU_FAM_NRF51
+#ifdef CPU_NRF51
     NRF_POWER->RAMON = 0;
 #else
     for (int i = 0; i < 8; i++) {

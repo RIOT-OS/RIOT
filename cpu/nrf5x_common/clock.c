@@ -31,7 +31,7 @@
 void clock_init_hf(void)
 {
     /* for the nRF51 we can chose the XTAL frequency */
-#ifdef CPU_FAM_NRF51
+#ifdef CPU_NRF51
 #if (CLOCK_HFCLK == 32)
     NRF_CLOCK->XTALFREQ = CLOCK_XTALFREQ_XTALFREQ_32MHz;
 #elif (CLOCK_HFCLK == 16)

@@ -57,7 +57,7 @@ extern uint32_t _cpuid_address;
 /**
  * @brief   Number of usable low power modes
  */
-#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || defined(DOXYGEN)
+#if defined(CPU_STM32F1) || defined(CPU_STM32F2) || defined(CPU_STM32F4) || defined(DOXYGEN)
 #define PM_NUM_MODES    (2U)
 #endif
 
@@ -67,14 +67,14 @@ extern uint32_t _cpuid_address;
 typedef enum {
     APB1,           /**< APB1 bus */
     APB2,           /**< APB2 bus */
-#if defined(CPU_FAM_STM32L0)
+#if defined(CPU_STM32L0)
     AHB,            /**< AHB bus */
     IOP,            /**< IOP bus */
-#elif defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) \
-    || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+#elif defined(CPU_STM32L1) || defined(CPU_STM32F1) \
+    || defined(CPU_STM32F0) || defined(CPU_STM32F3)
     AHB,            /**< AHB bus */
-#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) \
-    || defined(CPU_FAM_STM32L4)
+#elif defined(CPU_STM32F2) || defined(CPU_STM32F4) \
+    || defined(CPU_STM32L4)
     AHB1,           /**< AHB1 bus */
     AHB2,           /**< AHB2 bus */
     AHB3            /**< AHB3 bus */
@@ -123,7 +123,7 @@ typedef uint32_t gpio_t;
  * @brief   Available MUX values for configuring a pin's alternate function
  */
 typedef enum {
-#ifdef CPU_FAM_STM32F1
+#ifdef CPU_STM32F1
     GPIO_AF_OUT_PP = 0xb,   /**< alternate function output - push-pull */
     GPIO_AF_OUT_OD = 0xf,   /**< alternate function output - open-drain */
 #else
@@ -135,7 +135,7 @@ typedef enum {
     GPIO_AF5,               /**< use alternate function 5 */
     GPIO_AF6,               /**< use alternate function 6 */
     GPIO_AF7,               /**< use alternate function 7 */
-#ifndef CPU_FAM_STM32F0
+#ifndef CPU_STM32F0
     GPIO_AF8,               /**< use alternate function 8 */
     GPIO_AF9,               /**< use alternate function 9 */
     GPIO_AF10,              /**< use alternate function 10 */
@@ -148,7 +148,7 @@ typedef enum {
 #endif
 } gpio_af_t;
 
-#ifndef CPU_FAM_STM32F1
+#ifndef CPU_STM32F1
 /**
  * @brief   Generate GPIO mode bitfields
  *
@@ -187,7 +187,7 @@ typedef enum {
 } gpio_flank_t;
 /** @} */
 #endif /* ndef DOXYGEN */
-#endif /* ndef CPU_FAM_STM32F1 */
+#endif /* ndef CPU_STM32F1 */
 
 /**
  * @brief   Timer configuration
@@ -228,7 +228,7 @@ typedef struct {
     uint32_t rcc_mask;      /**< bit in clock enable register */
     gpio_t rx_pin;          /**< RX pin */
     gpio_t tx_pin;          /**< TX pin */
-#ifndef CPU_FAM_STM32F1
+#ifndef CPU_STM32F1
     gpio_af_t rx_af;        /**< alternate function for RX pin */
     gpio_af_t tx_af;        /**< alternate function for TX pin */
 #endif
@@ -241,7 +241,7 @@ typedef struct {
 #ifdef UART_USE_HW_FC
     gpio_t cts_pin;         /**< CTS pin - set to GPIO_UNDEF when not using HW flow control */
     gpio_t rts_pin;         /**< RTS pin */
-#ifndef CPU_FAM_STM32F1
+#ifndef CPU_STM32F1
     gpio_af_t cts_af;       /**< alternate function for CTS pin */
     gpio_af_t rts_af;       /**< alternate function for RTS pin */
 #endif
@@ -257,7 +257,7 @@ typedef struct {
     gpio_t miso_pin;        /**< MISO pin */
     gpio_t sclk_pin;        /**< SCLK pin */
     gpio_t cs_pin;          /**< HWCS pin, set to GPIO_UNDEF if not mapped */
-#ifndef CPU_FAM_STM32F1
+#ifndef CPU_STM32F1
     gpio_af_t af;           /**< pin alternate function */
 #endif
     uint32_t rccmask;       /**< bit in the RCC peripheral enable register */

@@ -25,7 +25,7 @@
  * @}
  */
 
-#ifndef CPU_FAM_STM32F1
+#ifndef CPU_STM32F1
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -74,11 +74,11 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     int pin_num = _pin_num(pin);
 
     /* enable clock */
-#if defined(CPU_FAM_STM32F0) || defined (CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L1)
+#if defined(CPU_STM32F0) || defined (CPU_STM32F3) || defined(CPU_STM32L1)
     periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
-#elif defined (CPU_FAM_STM32L0)
+#elif defined (CPU_STM32L0)
     periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
-#elif defined (CPU_FAM_STM32L4)
+#elif defined (CPU_STM32L4)
     periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
 #else
     periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
@@ -121,7 +121,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     gpio_init(pin, mode);
 
     /* enable global pin interrupt */
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)
+#if defined(CPU_STM32F0) || defined(CPU_STM32L0)
     if (pin_num < 2) {
         NVIC_EnableIRQ(EXTI0_1_IRQn);
     }
@@ -176,11 +176,11 @@ void gpio_init_analog(gpio_t pin)
 {
     /* enable clock, needed as this function can be used without calling
      * gpio_init first */
-#if defined(CPU_FAM_STM32F0) || defined (CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L1)
+#if defined(CPU_STM32F0) || defined (CPU_STM32F3) || defined(CPU_STM32L1)
     periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
-#elif defined (CPU_FAM_STM32L0)
+#elif defined (CPU_STM32L0)
     periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
-#elif defined (CPU_FAM_STM32L4)
+#elif defined (CPU_STM32L4)
     periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
 #else
     periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));

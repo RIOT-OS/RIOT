@@ -25,9 +25,9 @@
 #include "periph/rtc.h"
 #include "periph_conf.h"
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F4) || \
-    defined(CPU_FAM_STM32L1)
+#if defined(CPU_STM32F0) || defined(CPU_STM32F2) || \
+    defined(CPU_STM32F3) || defined(CPU_STM32F4) || \
+    defined(CPU_STM32L1)
 
 /* guard file in case no RTC device was specified */
 #if RTC_NUMOF
@@ -61,7 +61,7 @@ void rtc_init(void)
     periph_clk_en(APB1, RCC_APB1ENR_PWREN);
     PWR->CR |= PWR_CR_DBP;
 
-#if defined(CPU_FAM_STM32L1)
+#if defined(CPU_STM32L1)
     if (!(RCC->CSR & RCC_CSR_RTCEN)) {
 #else
     if (!(RCC->BDCR & RCC_BDCR_RTCEN)) {
@@ -182,7 +182,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 
     EXTI->IMR  |= EXTI_IMR_MR17;
     EXTI->RTSR |= EXTI_RTSR_TR17;
-#if defined(CPU_FAM_STM32F0)
+#if defined(CPU_STM32F0)
     NVIC_SetPriority(RTC_IRQn, 10);
     NVIC_EnableIRQ(RTC_IRQn);
 #else
@@ -223,7 +223,7 @@ void rtc_clear_alarm(void)
 
 void rtc_poweron(void)
 {
-#if defined(CPU_FAM_STM32L1)
+#if defined(CPU_STM32L1)
     /* Reset RTC domain */
     RCC->CSR |= RCC_CSR_RTCRST;
     RCC->CSR &= ~(RCC_CSR_RTCRST);
@@ -262,7 +262,7 @@ void rtc_poweron(void)
 
 void rtc_poweroff(void)
 {
-#if defined(CPU_FAM_STM32L1)
+#if defined(CPU_STM32L1)
     /* Reset RTC domain */
     RCC->CSR |= RCC_CSR_RTCRST;
     RCC->CSR &= ~(RCC_CSR_RTCRST);
@@ -281,7 +281,7 @@ void rtc_poweroff(void)
 #endif
 }
 
-#if defined(CPU_FAM_STM32F0)
+#if defined(CPU_STM32F0)
 void isr_rtc(void)
 #else
 void isr_rtc_alarm(void)
@@ -317,6 +317,6 @@ static uint8_t byte2bcd(uint8_t value)
 
 #endif /* RTC_NUMOF */
 
-#endif /* defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F2) || \
-          defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F4) || \
-          defined(CPU_FAM_STM32L1) */
+#endif /* defined(CPU_STM32F0) || defined(CPU_STM32F2) || \
+          defined(CPU_STM32F3) || defined(CPU_STM32F4) || \
+          defined(CPU_STM32L1) */

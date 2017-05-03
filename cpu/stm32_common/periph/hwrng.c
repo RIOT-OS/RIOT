@@ -40,7 +40,7 @@ void hwrng_read(void *buf, unsigned int num)
     /* power on and enable the device */
 #if defined(CPU_MODEL_STM32F410RB)
     periph_clk_en(AHB1, RCC_AHB1ENR_RNGEN);
-#elif defined(CPU_FAM_STM32L0)
+#elif defined(CPU_STM32L0)
     periph_clk_en(AHB, RCC_AHBENR_RNGEN);
 #else
     periph_clk_en(AHB2, RCC_AHB2ENR_RNGEN);
@@ -64,7 +64,7 @@ void hwrng_read(void *buf, unsigned int num)
     RNG->CR = 0;
 #if defined(CPU_MODEL_STM32F410RB)
     periph_clk_dis(AHB1, RCC_AHB1ENR_RNGEN);
-#elif defined(CPU_FAM_STM32L0)
+#elif defined(CPU_STM32L0)
     periph_clk_dis(AHB, RCC_AHBENR_RNGEN);
 #else
     periph_clk_dis(AHB2, RCC_AHB2ENR_RNGEN);

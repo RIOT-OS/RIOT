@@ -43,7 +43,7 @@ static gpio_isr_ctx_t exti_chan;
  */
 static inline NRF_GPIO_Type* port(gpio_t pin)
 {
-#if (CPU_FAM_NRF51)
+#if (CPU_NRF51)
     return NRF_GPIO;
 #elif defined(CPU_MODEL_NRF52832XXAA)
     return NRF_P0;

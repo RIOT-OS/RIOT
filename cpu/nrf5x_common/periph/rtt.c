@@ -50,7 +50,7 @@ void rtt_init(void)
     /* enable the low-frequency clock */
     clock_start_lf();
     /* make sure device is powered */
-#ifdef CPU_FAM_NRF51
+#ifdef CPU_NRF51
     DEV->POWER = 1;
 #endif
     /* stop the RTT during configuration */
@@ -106,7 +106,7 @@ void rtt_clear_alarm(void)
 
 void rtt_poweron(void)
 {
-#ifdef CPU_FAM_NRF51
+#ifdef CPU_NRF51
     DEV->POWER = 1;
 #endif
     DEV->TASKS_START = 1;
@@ -115,7 +115,7 @@ void rtt_poweron(void)
 void rtt_poweroff(void)
 {
     DEV->TASKS_STOP = 1;
-#ifdef CPU_FAM_NRF51
+#ifdef CPU_NRF51
     DEV->POWER = 0;
 #endif
 }
