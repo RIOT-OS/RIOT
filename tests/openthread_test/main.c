@@ -7,6 +7,21 @@
 #include "openthread/ip6.h"
 #include "net/ipv6/addr.h"
 
+void _job(void *data)
+{
+    printf("This is a successful job\n");
+}
+int _test(int argc, char **argv)
+{
+    ot_job_t test;    
+    test.function = _job;
+
+    msg_t msg, reply;
+    msg.type = OPENTHREAD_JOB_MSG_TYPE_EVENT;
+    msg.content.ptr=&test;
+    msg_send_receive(&msg, &reply, openthread_get_pid());
+    return 0;
+}
 void _send_cmd(ot_command_t *cmd, int type)
 {
     msg_t msg, reply;
@@ -83,6 +98,7 @@ int _ifconfig(int argc, char **argv)
 #if !defined(MODULE_OPENTHREAD_CLI) && !defined(MODULE_OPENTHREAD_NCP)
 static const shell_command_t shell_commands[] = {
     {"ifconfig", "Get or set panid", _ifconfig},
+    {"test", "Test function ptr", _test},
     {NULL, NULL, NULL}
 };
 #endif

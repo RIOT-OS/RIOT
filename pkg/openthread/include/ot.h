@@ -41,6 +41,7 @@ extern "C" {
 #define OPENTHREAD_CMD_GET_MSG_TYPE_EVENT (0x2238) /**< get command for OpenThread API calls*/
 #define OPENTHREAD_CMD_SET_MSG_TYPE_EVENT (0x2239) /**< set command for OpenThread API calls*/
 #define OPENTHREAD_MSG_TYPE_RECV (0x2238)           /**< event for frame reception */
+#define OPENTHREAD_JOB_MSG_TYPE_EVENT (0x2240)
 
 #define OT_CMD_PANID 0x1
 #define OT_CMD_THREAD 0x2
@@ -71,6 +72,15 @@ typedef struct {
 	const otNetifAddress *ip_addr;
     } content;
 } ot_command_t;
+
+/**
+ *  * @brief   Struct containing an OpenThread job
+ *
+ */
+typedef struct {
+    void (*function)(void*);
+    void *data;
+} ot_job_t;
 
 /**
  * @brief   gets packet from driver and tells OpenThread about the reception.

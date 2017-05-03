@@ -85,6 +85,7 @@ void *_openthread_event_loop(void *arg)
     uint8_t *buf;
     (void) buf;
     ot_command_t *cmd;
+    ot_job_t *job;
     while (1) {
         otTaskletsProcess(sInstance);
         msg_receive(&msg);
@@ -128,12 +129,9 @@ void *_openthread_event_loop(void *arg)
 		break;
 	    case OPENTHREAD_CMD_SET_MSG_TYPE_EVENT:
                 cmd = msg.content.ptr;
-		printf("COMMAND: %i\n", cmd->command);
-		puts("ASD");
 		switch(cmd->command)
 		{
 		    case OT_CMD_PANID:
-			puts("SET");
 			otLinkSetPanId(sInstance, cmd->content.panid);
 			break;
 		    case OT_CMD_THREAD:
@@ -147,8 +145,10 @@ void *_openthread_event_loop(void *arg)
 		}
 		msg_reply(&msg, &reply);
 		break;
-
-
+	    case OPENTHREAD_JOB_MSG_TYPE_EVENT:
+		job = msg.content.ptr;
+		job->function(NULL);
+		break;
         }
     }
 
