@@ -118,6 +118,9 @@ void *_openthread_event_loop(void *arg)
 			break;
 		    case OT_CMD_STATE:
 			cmd->content.state = otThreadGetDeviceRole(sInstance);
+			break;
+		    case OT_CMD_IPADDRESS:
+			cmd->content.ip_addr = otIp6GetUnicastAddresses(sInstance);
 		    default:
 			break;
 		}

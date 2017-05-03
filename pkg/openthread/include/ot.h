@@ -46,6 +46,7 @@ extern "C" {
 #define OT_CMD_THREAD 0x2
 #define OT_CMD_STATE 0x3
 #define OT_CMD_IF 0x4
+#define OT_CMD_IPADDRESS 0x5
 
 
 /**
@@ -66,7 +67,8 @@ typedef struct {
     union {
         uint16_t panid;
 	bool enable;
-	int state;
+	uint8_t state;
+	const otNetifAddress *ip_addr;
     } content;
 } ot_command_t;
 
