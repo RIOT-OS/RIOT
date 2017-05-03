@@ -472,7 +472,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     return ret;
 }
 
-int gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
+void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
 {
     assert(tcb != NULL);
 
@@ -520,7 +520,19 @@ int gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
     xtimer_remove(&connection_timeout_timer);
     tcb->owner = KERNEL_PID_UNDEF;
     mutex_unlock(&(tcb->function_lock));
-    return 0;
+}
+
+void gnrc_tcp_abort(gnrc_tcp_tcb_t *tcb)
+{
+    assert(tcb != NULL);
+
+    /* Lock the TCB for this function call */
+    mutex_lock(&(tcb->function_lock));
+    if (tcb->state != FSM_STATE_CLOSED) {
+        /* Call FSM ABORT event */
+        _fsm(tcb, FSM_EVENT_CALL_ABORT, NULL, NULL, 0);
+    }
+    mutex_unlock(&(tcb->function_lock));
 }
 
 int gnrc_tcp_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_hdr)
