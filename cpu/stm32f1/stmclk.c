@@ -103,7 +103,7 @@
 #elif CLK_HSE
 #define SYSCLK_SRC              RCC_CFGR_SW_HSE
 #define SYSCLK_BSY              RCC_CFGR_SWS_HSE
-#elif
+#else
 #define SYSCLK_SRC              RCC_CFGR_SW_HSI
 #define SYSCLK_BSY              RCC_CFGR_SWS_HSI
 #endif
