@@ -22,7 +22,6 @@
 #include <assert.h>
 
 #include "storage/ftl.h"
-#include "storage/flash_sim.h"
 #include "ecc/hamming256.h"
 
 #define ENABLE_DEBUG (0)

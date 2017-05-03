@@ -13,6 +13,8 @@ ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += flash_sim
 endif
 
+USEMODULE += mtd
+
 USEPKG += libfixmath
 
 INCLUDES += -I$(shell pwd)
