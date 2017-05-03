@@ -7,26 +7,38 @@
 #include "openthread/ip6.h"
 #include "net/ipv6/addr.h"
 
-/*
-static OT_JOB _job(otInstance *ot_instance, void *data)
-{
-    otLinkSetPanId(ot_instance, 0x1234);  
-    otIp6SetEnabled(ot_instance, true);
-    otThreadSetEnabled(ot_instance, true);
-}*/
-
-/*
 static OT_JOB _set_panid(otInstance *ot_instance, void *data)
 {
     uint16_t panid = *((uint16_t*) data);
     otLinkSetPanId(ot_instance, panid);
 }
-*/
 
 static OT_JOB _get_panid(otInstance *ot_instance, void *data)
 {
     *((uint16_t*) data) = otLinkGetPanId(ot_instance);
     printf("PanID: %04x\n", *((uint16_t*) data));
+}
+
+static OT_JOB _thread_start(otInstance *ot_instance, void *data)
+{
+    printf("Starting OpenThread\n");
+    otIp6SetEnabled(ot_instance, true);
+    otThreadSetEnabled(ot_instance, true);
+}
+
+static OT_JOB _read_state(otInstance *ot_instance, void *data)
+{
+    uint8_t state = otThreadGetDeviceRole(ot_instance);
+    printf("State is: %i\n", state);
+}
+
+static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *data)
+{
+    for(const otNetifAddress *addr=otIp6GetUnicastAddresses(ot_instance); addr; addr=addr->mNext)
+    {
+        char addrstr[IPV6_ADDR_MAX_STR_LEN];
+        printf("inet6 %s\n", ipv6_addr_to_str(addrstr, (ipv6_addr_t*) &addr->mAddress.mFields, sizeof(addrstr)));
+    }
 }
 
 int _test(int argc, char **argv)
@@ -36,59 +48,37 @@ int _test(int argc, char **argv)
     return 0;
 }
 
-void _send_cmd(ot_command_t *cmd, int type)
-{
-    msg_t msg, reply;
-    msg.type = type;
-    msg.content.ptr=cmd;
-    msg_send_receive(&msg, &reply, openthread_get_pid());
-}
 int _ifconfig(int argc, char **argv)
 {
-    ot_command_t cmd;
+    uint16_t panid;
     if(argc >= 2)
     {
 	if(strcmp(argv[1], "get") == 0 && argc >= 3)
 	{
             if(strcmp(argv[2], "panid") == 0)
 	    {
-		cmd.command = OT_CMD_PANID;
-		_send_cmd(&cmd, OPENTHREAD_CMD_GET_MSG_TYPE_EVENT);
-		printf("Panid: %04x", cmd.content.panid);
+		ot_exec_job(_get_panid, &panid);
 	    }	    
 	}
 	else if(strcmp(argv[1], "set") == 0 && argc >= 4)
 	{
             if(strcmp(argv[2], "panid") == 0)
 	    {
-		cmd.command = OT_CMD_PANID;
-		cmd.content.panid = strtol(argv[3], NULL, 0);
-		_send_cmd(&cmd, OPENTHREAD_CMD_SET_MSG_TYPE_EVENT);
-		printf("PANID: set to %02x\n", cmd.content.panid);
+		panid = strtol(argv[3], NULL, 0);
+		ot_exec_job(_set_panid, &panid);
 	    }	    
 	
-	}
-	else if(strcmp(argv[1], "up") == 0)
-	{
-	    cmd.command = OT_CMD_IF;
-	    cmd.content.enable = true;
-	    _send_cmd(&cmd, OPENTHREAD_CMD_SET_MSG_TYPE_EVENT);
-	    printf("IPv6 enabled\n");
 	}
 	else if(strcmp(argv[1], "thread") == 0)
 	{
 	    if(strcmp(argv[2], "start") == 0)
 	    {
-		printf("Starting OpenThread\n");
-	        cmd.command = OT_CMD_THREAD;
-	        cmd.content.enable = true;
-	        _send_cmd(&cmd, OPENTHREAD_CMD_SET_MSG_TYPE_EVENT);
+		ot_exec_job(_thread_start, NULL);
 	    }
 	    else if(strcmp(argv[2], "state") == 0)
             {
-	        cmd.command = OT_CMD_STATE;
-	        _send_cmd(&cmd, OPENTHREAD_CMD_GET_MSG_TYPE_EVENT);
-		printf("State is: %i\n", cmd.content.state);
+		uint8_t state;
+		ot_exec_job(_read_state, &state);
 	    }
 	}
 	else
@@ -98,13 +88,7 @@ int _ifconfig(int argc, char **argv)
     }
     else
     {
-        cmd.command = OT_CMD_IPADDRESS;
-	_send_cmd(&cmd, OPENTHREAD_CMD_GET_MSG_TYPE_EVENT);
-	for(const otNetifAddress *addr=cmd.content.ip_addr; addr; addr=addr->mNext)
-	{
-	    char addrstr[IPV6_ADDR_MAX_STR_LEN];
-	    printf("inte6 %s\n", ipv6_addr_to_str(addrstr, (ipv6_addr_t*) &addr->mAddress.mFields, sizeof(addrstr)));
-	}
+	ot_exec_job(_get_ip_addresses, NULL);
     }
     return 0;
 }

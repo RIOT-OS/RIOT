@@ -38,16 +38,8 @@ extern "C" {
 #define OPENTHREAD_XTIMER_MSG_TYPE_EVENT (0x2235)   /**< xtimer message receiver event*/
 #define OPENTHREAD_NETDEV_MSG_TYPE_EVENT (0x2236)  /**< message received from driver */
 #define OPENTHREAD_SERIAL_MSG_TYPE_EVENT (0x2237)   /**< event indicating a serial (UART) message was sent to OpenThread */
-#define OPENTHREAD_CMD_GET_MSG_TYPE_EVENT (0x2238) /**< get command for OpenThread API calls*/
-#define OPENTHREAD_CMD_SET_MSG_TYPE_EVENT (0x2239) /**< set command for OpenThread API calls*/
 #define OPENTHREAD_MSG_TYPE_RECV (0x2238)           /**< event for frame reception */
 #define OPENTHREAD_JOB_MSG_TYPE_EVENT (0x2240)
-
-#define OT_CMD_PANID 0x1
-#define OT_CMD_THREAD 0x2
-#define OT_CMD_STATE 0x3
-#define OT_CMD_IF 0x4
-#define OT_CMD_IPADDRESS 0x5
 
 typedef void OT_JOB;
 
@@ -59,20 +51,6 @@ typedef struct {
     void *buf;  /**< buffer containing the message */
     size_t len; /**< length of the message */
 } serial_msg_t;
-
-/**
- *  * @brief   Struct containing a serial message
- *
- */
-typedef struct {
-    uint8_t command;
-    union {
-        uint16_t panid;
-	bool enable;
-	uint8_t state;
-	const otNetifAddress *ip_addr;
-    } content;
-} ot_command_t;
 
 /**
  *  * @brief   Struct containing an OpenThread job

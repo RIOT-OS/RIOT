@@ -94,7 +94,6 @@ void *_openthread_event_loop(void *arg)
 
     uint8_t *buf;
     (void) buf;
-    ot_command_t *cmd;
     ot_job_t *job;
     while (1) {
         otTaskletsProcess(sInstance);
@@ -120,41 +119,6 @@ void *_openthread_event_loop(void *arg)
                 end_mutex();
                 break;
 #endif
-	    case OPENTHREAD_CMD_GET_MSG_TYPE_EVENT:
-                cmd = msg.content.ptr;
-		switch(cmd->command)
-		{
-		    case OT_CMD_PANID:
-			cmd->content.panid = otLinkGetPanId(sInstance);
-			break;
-		    case OT_CMD_STATE:
-			cmd->content.state = otThreadGetDeviceRole(sInstance);
-			break;
-		    case OT_CMD_IPADDRESS:
-			cmd->content.ip_addr = otIp6GetUnicastAddresses(sInstance);
-		    default:
-			break;
-		}
-		msg_reply(&msg, &reply);
-		break;
-	    case OPENTHREAD_CMD_SET_MSG_TYPE_EVENT:
-                cmd = msg.content.ptr;
-		switch(cmd->command)
-		{
-		    case OT_CMD_PANID:
-			otLinkSetPanId(sInstance, cmd->content.panid);
-			break;
-		    case OT_CMD_THREAD:
-		        otThreadSetEnabled(sInstance, cmd->content.enable);
-		        break;
-		    case OT_CMD_IF:
-		        otIp6SetEnabled(sInstance, cmd->content.enable);
-		        break;
-		    default:
-			break;
-		}
-		msg_reply(&msg, &reply);
-		break;
 	    case OPENTHREAD_JOB_MSG_TYPE_EVENT:
 		job = msg.content.ptr;
 		job->function(sInstance, job->data);
