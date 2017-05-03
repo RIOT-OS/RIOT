@@ -54,7 +54,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     ctx[tim].arg = arg;
 
     /* power on timer */
-#if CPU_NRF51
+#ifdef CPU_NRF51
     dev(tim)->POWER = 1;
 #endif
 

@@ -1,3 +1,3 @@
-MODULE = nrf5x_common_periph
+MODULE = fam_nrf5x_periph
 
 include $(RIOTBASE)/Makefile.base
