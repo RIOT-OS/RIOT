@@ -5,6 +5,7 @@
 #include "shell_commands.h"
 #include "openthread/thread.h"
 #include "openthread/ip6.h"
+#include "net/ipv6/addr.h"
 
 void _send_cmd(ot_command_t *cmd, int type)
 {
@@ -18,10 +19,8 @@ int _ifconfig(int argc, char **argv)
     ot_command_t cmd;
     if(argc >= 2)
     {
-	    printf("here");
 	if(strcmp(argv[1], "get") == 0 && argc >= 3)
 	{
-		printf("and here");
             if(strcmp(argv[2], "panid") == 0)
 	    {
 		cmd.command = OT_CMD_PANID;
@@ -68,13 +67,26 @@ int _ifconfig(int argc, char **argv)
 	    printf("Usage...");
 	}
     }
+    else
+    {
+        cmd.command = OT_CMD_IPADDRESS;
+	_send_cmd(&cmd, OPENTHREAD_CMD_GET_MSG_TYPE_EVENT);
+	for(const otNetifAddress *addr=cmd.content.ip_addr; addr; addr=addr->mNext)
+	{
+	    char addrstr[IPV6_ADDR_MAX_STR_LEN];
+	    printf("inte6 %s\n", ipv6_addr_to_str(addrstr, (ipv6_addr_t*) &addr->mAddress.mFields, sizeof(addrstr)));
+	}
+    }
     return 0;
 }
 
+#if !defined(MODULE_OPENTHREAD_CLI) && !defined(MODULE_OPENTHREAD_NCP)
 static const shell_command_t shell_commands[] = {
     {"ifconfig", "Get or set panid", _ifconfig},
     {NULL, NULL, NULL}
 };
+#endif
+
 int main(void)
 {
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
