@@ -15,7 +15,7 @@ export CFLAGS_OPT  ?= -Os
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 
 export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
-export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/cortexm_common/ldscripts
+export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/arch_cortexm/ldscripts
 export LINKER_SCRIPT ?= $(CPU_MODEL).ld
 export LINKFLAGS += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
 
@@ -26,7 +26,7 @@ export LINKFLAGS += -Wl,--gc-sections
 export CFLAGS += -DCOREIF_NG=1
 
 # Tell the build system that the CPU depends on the Cortex-M common files:
-export USEMODULE += cortexm_common
+export USEMODULE += arch_cortexm
 # Export the peripheral drivers to be linked into the final binary:
 export USEMODULE += periph
 # include common periph code
