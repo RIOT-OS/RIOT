@@ -33,6 +33,9 @@
 #include "random.h"
 #include <string.h>
 
+#include "openthread/thread.h"
+#include "openthread/ip6.h"
+
 #define OPENTHREAD_QUEUE_LEN      (8)
 static msg_t _queue[OPENTHREAD_QUEUE_LEN];
 
@@ -63,7 +66,7 @@ void *_openthread_event_loop(void *arg)
 
     msg_init_queue(_queue, OPENTHREAD_QUEUE_LEN);
     netdev_t *dev;
-    msg_t msg;
+    msg_t msg, reply;
 
 #ifdef MODULE_OPENTHREAD_CLI
     otCliUartInit(sInstance);
@@ -81,6 +84,7 @@ void *_openthread_event_loop(void *arg)
 
     uint8_t *buf;
     (void) buf;
+    ot_command_t *cmd;
     while (1) {
         otTaskletsProcess(sInstance);
         msg_receive(&msg);
@@ -105,6 +109,42 @@ void *_openthread_event_loop(void *arg)
                 end_mutex();
                 break;
 #endif
+	    case OPENTHREAD_CMD_GET_MSG_TYPE_EVENT:
+                cmd = msg.content.ptr;
+		switch(cmd->command)
+		{
+		    case OT_CMD_PANID:
+			cmd->content.panid = otLinkGetPanId(sInstance);
+			break;
+		    case OT_CMD_STATE:
+			cmd->content.state = otThreadGetDeviceRole(sInstance);
+		    default:
+			break;
+		}
+		msg_reply(&msg, &reply);
+		break;
+	    case OPENTHREAD_CMD_SET_MSG_TYPE_EVENT:
+                cmd = msg.content.ptr;
+		printf("COMMAND: %i\n", cmd->command);
+		puts("ASD");
+		switch(cmd->command)
+		{
+		    case OT_CMD_PANID:
+			puts("SET");
+			otLinkSetPanId(sInstance, cmd->content.panid);
+			break;
+		    case OT_CMD_THREAD:
+		        otThreadSetEnabled(sInstance, cmd->content.enable);
+		        break;
+		    case OT_CMD_IF:
+		        otIp6SetEnabled(sInstance, cmd->content.enable);
+		        break;
+		    default:
+			break;
+		}
+		msg_reply(&msg, &reply);
+		break;
+
 
         }
     }
