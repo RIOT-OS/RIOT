@@ -149,7 +149,7 @@ Many CPUs share a certain amount of their code (e.g. all ARM Cortex-M based
 CPUs share the same code for task switching and interrupt handling). This
 shared code is put in its own directories, following a `xxxxx_common` naming
 scheme. Examples for this is code shared across architectures (e.g.
-`cortexm_common`, `msp430_comon`) or code shared among vendors (e.g.
+`arch_cortexm`, `msp430_comon`) or code shared among vendors (e.g.
 `kinetis_common`).
 
 See @ref cpu for more detailed informtation.

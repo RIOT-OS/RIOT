@@ -2,4 +2,4 @@
 INCLUDES += -I$(RIOTCPU)/arch_cortexm/include
 INCLUDES += -I$(RIOTCPU)/arch_cortexm/include/vendor
 
-USEMODULE += arch_cortexm cortexm_common_periph
+USEMODULE += arch_cortexm arch_cortexm_periph

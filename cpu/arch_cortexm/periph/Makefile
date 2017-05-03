@@ -1,3 +1,3 @@
-MODULE = cortexm_common_periph
+MODULE = arch_cortexm_periph
 
 include $(RIOTBASE)/Makefile.base
