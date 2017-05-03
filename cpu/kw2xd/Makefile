@@ -2,7 +2,7 @@
 MODULE = cpu
 
 # add a list of subdirectories, that should also be build
-DIRS = periph $(RIOTCPU)/cortexm_common $(KINETIS_COMMON)
+DIRS = periph $(RIOTCPU)/arch_cortexm $(KINETIS_COMMON)
 
 # (file triggers compiler bug. see #5775)
 SRC_NOLTO += vectors.c

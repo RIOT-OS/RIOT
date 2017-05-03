@@ -2,7 +2,7 @@
 MODULE = cpu
 
 # add a list of subdirectories, that should also be build
-DIRS = periph $(RIOTCPU)/cortexm_common $(RIOTCPU)/nrf5x_common
+DIRS = periph $(RIOTCPU)/fam_nrf5x
 
 # (file triggers compiler bug. see #5775)
 SRC_NOLTO += vectors.c

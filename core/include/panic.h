@@ -36,7 +36,7 @@ typedef enum {
     PANIC_SOFT_REBOOT,
     PANIC_HARD_REBOOT,
     PANIC_ASSERT_FAIL,
-#ifdef MODULE_CORTEXM_COMMON
+#ifdef MODULE_ARCH_CORTEXM
     PANIC_NMI_HANDLER,       /**< non maskable interrupt */
     PANIC_HARD_FAULT,        /**< hard fault */
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \

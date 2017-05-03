@@ -1,0 +1,15 @@
+# export the CPU family so we can differentiate between them in the code
+FAM = $(shell echo $(CPU) | tr 'a-z-' 'A-Z_')
+# export CFLAGS += -DCPU_$(FAM)
+
+# use common periph functions
+USEMODULE += periph_common
+
+# include nrf5x common and common periph modules
+USEMODULE += fam_nrf5x fam_nrf5x_periph
+
+# export the common include directory
+export INCLUDES += -I$(RIOTCPU)/fam_nrf5x/include
+
+# pull in the cortexm code
+include $(RIOTMAKE)/arch/cortexm.inc.mk

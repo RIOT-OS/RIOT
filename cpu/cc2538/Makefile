@@ -2,7 +2,7 @@
 MODULE = cpu
 
 # Add a list of subdirectories, that should also be built:
-DIRS = periph $(RIOTCPU)/cortexm_common
+DIRS = periph $(RIOTCPU)/arch_cortexm
 
 # cc2538_rf radio driver
 ifneq (,$(filter cc2538_rf,$(USEMODULE)))

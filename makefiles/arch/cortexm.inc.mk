@@ -15,7 +15,7 @@ export CFLAGS_OPT  ?= -Os
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 
 export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
-export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/cortexm_common/ldscripts
+export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/arch_cortexm/ldscripts
 export LINKER_SCRIPT ?= $(CPU_MODEL).ld
 export LINKFLAGS += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
 
@@ -26,16 +26,13 @@ export LINKFLAGS += -Wl,--gc-sections
 export CFLAGS += -DCOREIF_NG=1
 
 # Tell the build system that the CPU depends on the Cortex-M common files:
-export USEMODULE += cortexm_common
+export USEMODULE += arch_cortexm
 # Export the peripheral drivers to be linked into the final binary:
 export USEMODULE += periph
 # include common periph code
 export USEMODULE += periph_common
 # all cortex MCU's use newlib as libc
 export USEMODULE += newlib
-
-# set default for CPU_MODEL
-export CPU_MODEL ?= $(CPU)
 
 # Temporary LLVM/Clang Workaround:
 # report cortex-m0 instead of cortex-m0plus if llvm/clang (<= 3.6.2) is used
@@ -91,7 +88,7 @@ export UNDEF += $(BINDIR)/cpu/vectors.o
 endif
 
 # CPU depends on the cortex-m common module, so include it:
-include $(RIOTCPU)/cortexm_common/Makefile.include
+include $(RIOTCPU)/arch_cortexm/Makefile.include
 
 # use the nano-specs of Newlib when available
 USEMODULE += newlib_nano
