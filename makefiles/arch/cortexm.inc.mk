@@ -34,9 +34,6 @@ export USEMODULE += periph_common
 # all cortex MCU's use newlib as libc
 export USEMODULE += newlib
 
-# set default for CPU_MODEL
-export CPU_MODEL ?= $(CPU)
-
 # Temporary LLVM/Clang Workaround:
 # report cortex-m0 instead of cortex-m0plus if llvm/clang (<= 3.6.2) is used
 # llvm/clang version 3.6.2 still does not support the cortex-m0plus mcpu type
