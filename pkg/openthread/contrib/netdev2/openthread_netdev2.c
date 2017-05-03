@@ -40,6 +40,11 @@ static kernel_pid_t _pid;
 static otInstance *sInstance;
 
 
+otInstance *ot_get_instance(void)
+{
+    return sInstance;
+}
+
 /* OpenThread will call this when switching state from empty tasklet to non-empty tasklet. */
 void otSignalTaskletPending(otInstance *aInstance)
 {
