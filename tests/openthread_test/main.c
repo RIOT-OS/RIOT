@@ -7,21 +7,35 @@
 #include "openthread/ip6.h"
 #include "net/ipv6/addr.h"
 
-void _job(void *data)
+/*
+static OT_JOB _job(otInstance *ot_instance, void *data)
 {
-    printf("This is a successful job\n");
+    otLinkSetPanId(ot_instance, 0x1234);  
+    otIp6SetEnabled(ot_instance, true);
+    otThreadSetEnabled(ot_instance, true);
+}*/
+
+/*
+static OT_JOB _set_panid(otInstance *ot_instance, void *data)
+{
+    uint16_t panid = *((uint16_t*) data);
+    otLinkSetPanId(ot_instance, panid);
 }
+*/
+
+static OT_JOB _get_panid(otInstance *ot_instance, void *data)
+{
+    *((uint16_t*) data) = otLinkGetPanId(ot_instance);
+    printf("PanID: %04x\n", *((uint16_t*) data));
+}
+
 int _test(int argc, char **argv)
 {
-    ot_job_t test;    
-    test.function = _job;
-
-    msg_t msg, reply;
-    msg.type = OPENTHREAD_JOB_MSG_TYPE_EVENT;
-    msg.content.ptr=&test;
-    msg_send_receive(&msg, &reply, openthread_get_pid());
+    uint16_t panid;
+    ot_exec_job(_get_panid, &panid);
     return 0;
 }
+
 void _send_cmd(ot_command_t *cmd, int type)
 {
     msg_t msg, reply;

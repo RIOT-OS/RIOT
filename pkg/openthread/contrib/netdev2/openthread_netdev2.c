@@ -43,6 +43,16 @@ static kernel_pid_t _pid;
 static otInstance *sInstance;
 
 
+void ot_exec_job(OT_JOB (*job)(otInstance*, void*), void *data)
+{
+    ot_job_t _job;    
+    _job.function = job;
+
+    msg_t msg, reply;
+    msg.type = OPENTHREAD_JOB_MSG_TYPE_EVENT;
+    msg.content.ptr=&_job;
+    msg_send_receive(&msg, &reply, openthread_get_pid());
+}
 otInstance *ot_get_instance(void)
 {
     return sInstance;
@@ -147,7 +157,8 @@ void *_openthread_event_loop(void *arg)
 		break;
 	    case OPENTHREAD_JOB_MSG_TYPE_EVENT:
 		job = msg.content.ptr;
-		job->function(NULL);
+		job->function(sInstance, job->data);
+		msg_reply(&msg, &reply);
 		break;
         }
     }

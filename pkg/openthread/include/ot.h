@@ -49,6 +49,7 @@ extern "C" {
 #define OT_CMD_IF 0x4
 #define OT_CMD_IPADDRESS 0x5
 
+typedef void OT_JOB;
 
 /**
  *  * @brief   Struct containing a serial message
@@ -78,7 +79,7 @@ typedef struct {
  *
  */
 typedef struct {
-    void (*function)(void*);
+    void (*function)(otInstance*, void*);
     void *data;
 } ot_job_t;
 
@@ -155,8 +156,15 @@ otInstance *ot_get_instance(void);
  *
  */
 void openthread_uart_run(void);
+
 #endif
 
+
+/**
+ * @brief   Execute OpenThread job in same thread as OT core (dute to concurrency).
+ *
+ */
+void ot_exec_job(OT_JOB (*job)(otInstance*, void*), void *data);
 
 #ifdef __cplusplus
 }
