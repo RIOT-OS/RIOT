@@ -32,15 +32,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   xtimer configuration
- * @{
- */
-#define XTIMER              TIMER_0
-#define XTIMER_CHAN         (0)
-/** @} */
-
-/**
- * @brief   LED pin definitions and handlers
+ * @name   LED pin definitions and handlers
  * @{
  */
 #define LED0_PIN            GPIO_PIN(PA, 20)
