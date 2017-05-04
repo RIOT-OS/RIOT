@@ -41,10 +41,12 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 #include <sys/resource.h>
 
 #include "hashes/sha256.h"
 #include "fw_slots.h"
+#include "tweetnacl.h"
 
 /* Input firmware .bin file */
 FILE *firmware_bin;
@@ -54,9 +56,28 @@ FILE *metadata_bin;
 
 int32_t firmware_size = 0;
 
+static void errorf(int code, char message[], char arg[])
+{
+    fprintf(stderr, "Error: ");
+    fprintf(stderr, message, arg);
+    fprintf(stderr, "\n");
+    exit(code);
+}
+
+static void read_key(char filename[], unsigned char key[], size_t key_size)
+{
+    FILE* f = fopen(filename, "rb");
+
+    if (fread(key, 1, key_size, f) != key_size) {
+        errorf(1, "Could not read the key from <%s>", filename);
+    }
+
+    fclose(f);
+}
+
 static void print_metadata(firmware_metadata_t *fw_metadata)
 {
-    printf("Firmware Size: %d\n", fw_metadata->size);
+    printf("Firmware Size: %u\n", fw_metadata->size);
     printf("Firmware Version: %#x\n", fw_metadata->version);
     printf("Firmware APPID: %#x\n", fw_metadata->appid);
     printf("Firmware HASH: ");
@@ -78,17 +99,24 @@ int main(int argc, char *argv[])
     uint8_t output_buffer[sizeof(firmware_metadata_t)];
     int bytes_read = 0;
     uint8_t firmware_buffer[1024];
-    char firmware_metadata_path[128];
+    char firmware_metadata_path[256];
+    unsigned char secret_key[crypto_sign_SECRETKEYBYTES];
+    unsigned char signed_hash[SIGN_LEN];
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    unsigned long long mlen;
+    unsigned long long smlen;
 
-    if (argc < 4) {
-        puts("Usage: generate-metadata <BINFILE> <VERSION> <APPID> [output path]");
+    if (argc < 5) {
+        puts("Usage: generate-metadata <BINFILE> <VERSION> <APPID> <SECKEY> [output path]");
         puts("Options:");
         puts("--with-metadata    The sha256 hash will also include previous metadata");
         return -1;
     }
 
-    if (argv[4]) {
-        strcpy(firmware_metadata_path, argv[4]);
+    read_key(argv[4], secret_key, crypto_sign_SECRETKEYBYTES);
+
+    if (argv[5]) {
+        strcpy(firmware_metadata_path, argv[5]);
     }
     else {
         strcpy(firmware_metadata_path, "firmware-metadata.bin");
@@ -104,7 +132,7 @@ int main(int argc, char *argv[])
      * Firmware might need to be re-hashed to increase security (e.g. avoid
      * non-matching version and/or signature), by also including the metadata.
      */
-    if (argv[5] != NULL && (strcmp(argv[5], "--with-metadata") == 0)) {
+    if (argv[6] != NULL && (strcmp(argv[6], "--with-metadata") == 0)) {
         firmware_metadata_t current_metadata;
         bytes_read = fread(&current_metadata, 1, sizeof(current_metadata), firmware_bin);
         rewind(firmware_bin);
@@ -139,29 +167,38 @@ int main(int argc, char *argv[])
     }
     sha256_final(&firmware_sha256, metadata.hash);
 
-    /* Close the firmware .bin file. */
-    fclose(firmware_bin);
-
     /*
-     * TODO Sign hash
+     * Initialise signed hash to zero, will be filled by the signature
      */
     for (unsigned long i = 0; i < sizeof(metadata.shash); i++) {
         metadata.shash[i] = 0;
     }
 
+    memcpy(hash, metadata.hash, SHA256_DIGEST_LENGTH);
+    memset(signed_hash, 0, SIGN_LEN);
+    mlen = SHA256_DIGEST_LENGTH;
+    smlen = SHA256_DIGEST_LENGTH + crypto_sign_BYTES;
+
+    crypto_sign(signed_hash, &smlen, hash, mlen, secret_key);
+
+    memcpy(metadata.shash, signed_hash, sizeof(metadata.shash));
+
+    /* Close the firmware .bin file. */
+    fclose(firmware_bin);
+
     /* Generate FW image metadata */
     metadata.size = firmware_size;
     sscanf(argv[2], "%xu", (unsigned int *)&(metadata.version));
     sscanf(argv[3], "%xu", &(metadata.appid));
-    memcpy(output_buffer, (uint8_t*)&metadata, sizeof(firmware_metadata_t));
-    print_metadata(&metadata);
 
     /* Open the output firmware .bin file */
     metadata_bin = fopen(firmware_metadata_path, "w");
 
     /* Write the metadata */
     printf("Metadata size: %lu\n", sizeof(firmware_metadata_t));
+    memcpy(output_buffer, (uint8_t*)&metadata, sizeof(firmware_metadata_t));
     fwrite(output_buffer, sizeof(output_buffer), 1, metadata_bin);
+    print_metadata(&metadata);
 
     /* 0xff spacing until firmware binary starts */
     uint8_t blank_buffer[FW_METADATA_SPACE - sizeof(firmware_metadata_t)];
