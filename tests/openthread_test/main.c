@@ -41,13 +41,6 @@ static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *data)
     }
 }
 
-int _test(int argc, char **argv)
-{
-    uint16_t panid;
-    ot_exec_job(_get_panid, &panid);
-    return 0;
-}
-
 int _ifconfig(int argc, char **argv)
 {
     uint16_t panid;
@@ -96,7 +89,6 @@ int _ifconfig(int argc, char **argv)
 #if !defined(MODULE_OPENTHREAD_CLI) && !defined(MODULE_OPENTHREAD_NCP)
 static const shell_command_t shell_commands[] = {
     {"ifconfig", "Get or set panid", _ifconfig},
-    {"test", "Test function ptr", _test},
     {NULL, NULL, NULL}
 };
 #endif
