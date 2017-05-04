@@ -336,12 +336,14 @@ endif # BUILD_IN_DOCKER
 
 
 ifdef FW_SLOT
+SECKEY = $(FW_METADATA)/key_ed25519.sec
+
 firmware-slot: $(FW_OBJFILE)
 $(FW_OBJFILE): all generate-metadata
 	$(Q)$(OBJCOPY) -O binary $(ELFFILE) $(TMPBIN)
-	$(Q)$(FW_METADATA)/bin/generate-metadata $(TMPBIN) $(VERSION) $(APPID) $(METADATA_FILE)
+	$(Q)$(FW_METADATA)/bin/generate-metadata $(TMPBIN) $(VERSION) $(APPID) $(SECKEY) $(METADATA_FILE)
 	$(Q)srec_cat $(TMPBIN) -binary -offset $(FW_METADATA_SPACE) $(METADATA_FILE) -binary -o $(FW_BINFILE) -binary
-	$(Q)$(FW_METADATA)/bin/generate-metadata $(FW_BINFILE) $(VERSION) $(APPID) $(METADATA_FILE) --with-metadata
+	$(Q)$(FW_METADATA)/bin/generate-metadata $(FW_BINFILE) $(VERSION) $(APPID) $(SECKEY) $(METADATA_FILE) --with-metadata
 	$(Q)srec_cat $(TMPBIN) -binary -offset $(FW_METADATA_SPACE) $(METADATA_FILE) -binary -o $(FW_BINFILE) -binary
 	$(Q)$(OBJCOPY) --output-target elf32-littlearm --binary-architecture=arm \
 		--change-section-vma .data=$(OFFSET_SLOT_$(FW_SLOT))\
