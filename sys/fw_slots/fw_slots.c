@@ -44,6 +44,7 @@
 #include "cpu.h"
 #include "periph/flashpage.h"
 #include "hashes/sha256.h"
+#include "crypto/keys/ed25519/key_ed25519_pub.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -68,11 +69,51 @@ static void int_flash_read(uint8_t *data_buffer, uint32_t address, uint32_t coun
     memcpy(data_buffer, read_addres, count);
 }
 
+static int check_slot(uint8_t fw_slot)
+{
+    if (fw_slot > MAX_FW_SLOTS || fw_slot == 0) {
+        DEBUG("[fw_slots] FW slot not valid, should be <= %d and > 0\n",
+                MAX_FW_SLOTS);
+        return -1;
+    }
+    else {
+        return 0;
+    }
+
+    return 0;
+}
+
 int fw_slots_validate_int_slot(uint8_t fw_slot)
 {
-    /*
-     * TODO
-     */
+    firmware_metadata_t fw_metadata;
+    uint8_t hash[SIGN_LEN];
+    unsigned long long mlen;
+    int res, result;
+
+    if (check_slot(fw_slot) == -1) {
+        return -1;
+    }
+
+    res = fw_slots_get_int_metadata(fw_slots_get_slot_page(fw_slot), &fw_metadata);
+
+    if (res == -1) {
+        DEBUG("[fw_slots] Cannot get metadata from slot %d\n", fw_slot);
+        return res;
+    }
+
+    result = crypto_sign_open(hash, &mlen, fw_metadata.shash, SIGN_LEN, key_ed25519_pub);
+
+    if (result == -1) {
+        DEBUG("[fw_slots] Signature check failed!\n");
+        return result;
+    }
+
+    for (int i = 0; i < mlen; i++) {
+        if (hash[i] != fw_metadata.hash[i]) {
+            DEBUG("[fw_slots] signature verification failed!\n");
+            return -1;
+        }
+    }
 
     return 0;
 }
@@ -92,16 +133,6 @@ void fw_slots_print_metadata(firmware_metadata_t *metadata)
     printf("Firmware Size: %ld\n", metadata->size);
     printf("Firmware Version: %#x\n", metadata->version);
     printf("Firmware APPID: %#lx\n", metadata->appid);
-    printf("Firmware HASH: ");
-    for (unsigned long i = 0; i < sizeof(metadata->hash); i++) {
-        printf("%02x ", metadata->hash[i]);
-    }
-    printf("\n");
-    printf("Firmware signed HASH: ");
-    for (unsigned long i = 0; i < sizeof(metadata->shash); i++) {
-        printf("%02x ", metadata->shash[i]);
-    }
-    printf("\n");
 }
 
 int fw_slots_get_int_metadata(uint8_t fw_slot_page, firmware_metadata_t *fw_metadata)
@@ -136,9 +167,8 @@ int fw_slots_get_int_slot_metadata(uint8_t fw_slot, firmware_metadata_t *fw_slot
     uint32_t page;
 
     DEBUG("[fw_slots] Getting internal FW slot %d metadata\n", fw_slot);
-    if (fw_slot > MAX_FW_SLOTS || fw_slot == 0) {
-        DEBUG("[fw_slots] FW slot not valid, should be <= %d and > 0\n",
-                MAX_FW_SLOTS);
+
+    if (check_slot(fw_slot) == -1) {
         return -1;
     }
 
@@ -182,12 +212,9 @@ int fw_slots_verify_int_slot(uint8_t fw_slot)
     sha256_context_t sha256_ctx;
     uint8_t hash[SHA256_DIGEST_LENGTH];
     uint8_t page_cache[FLASHPAGE_SIZE];
-    int parts = 0, i = 0;
+    int parts = 0, i = 0, res = 0;
 
-    /* Determine the external flash address corresponding to the FW slot */
-    if (fw_slot > MAX_FW_SLOTS || fw_slot == 0) {
-        DEBUG("[fw_slots] FW slot not valid, should be <= %d and > 0\n",
-                MAX_FW_SLOTS);
+    if (check_slot(fw_slot) == -1) {
         return -1;
     }
 
@@ -217,7 +244,7 @@ int fw_slots_verify_int_slot(uint8_t fw_slot)
     }
 
     /*
-     * Write new metadata with overriden hashes and signatures
+     * Write new metadata with overridden hashes and signatures
      */
     int_flash_read(page_cache, address, sizeof(page_cache));
     memcpy(page_cache, &fw_metadata, sizeof(fw_metadata));
@@ -249,8 +276,8 @@ int fw_slots_verify_int_slot(uint8_t fw_slot)
 
     for (i = 0; i < sizeof(hash); i++) {
         if (hash[i] != cache_metadata.hash[i]) {
-            DEBUG("[fw_slots] hash verification failed!\n");
-            return -1;
+            DEBUG("[fw_slots] hash verification failed! %#x\n", hash[i]);
+            res = -1;
         }
     }
 
@@ -267,7 +294,7 @@ int fw_slots_verify_int_slot(uint8_t fw_slot)
         return -1;
     }
 
-    return 0;
+    return res;
 }
 
 int fw_slots_validate_metadata(firmware_metadata_t *metadata)
@@ -452,9 +479,7 @@ int fw_slots_erase_int_image(uint8_t fw_slot)
     /* Get the page where the fw_slot is located */
     uint8_t slot_page;
 
-    if (fw_slot > MAX_FW_SLOTS || fw_slot == 0) {
-        DEBUG("[fw_slots] FW slot not valid, should be <= %d and > 0\n",
-                MAX_FW_SLOTS);
+    if (check_slot(fw_slot) == -1) {
         return -1;
     }
 
