@@ -10,13 +10,13 @@ RIOTBASE ?= $(CURDIR)/..
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-CFLAGS += -DDEVELHELP
+#CFLAGS += -DDEVELHELP
 
-# Mark this example as the bootloader
+# Enable the bootloader flag
 BOOTLOADER = 1
 
 # Activate interactive bootloader, if no specified
-INTERACTIVE_BOOTLOADER ?= 1
+INTERACTIVE_BOOTLOADER ?= 0
 CFLAGS += -DINTERACTIVE_BOOTLOADER=$(INTERACTIVE_BOOTLOADER)
 
 # Import metadata space size, otherwise it will be defaulted to 0x100 by
@@ -24,7 +24,7 @@ CFLAGS += -DINTERACTIVE_BOOTLOADER=$(INTERACTIVE_BOOTLOADER)
 CFLAGS += -DFW_METADATA_SPACE=$(FW_METADATA_SPACE)
 
 # Increase stack memory for flashpage requirements
-CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(3*THREAD_STACKSIZE_DEFAULT\)
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(5*THREAD_STACKSIZE_DEFAULT\)
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
