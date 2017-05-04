@@ -46,6 +46,7 @@
 #define FW_SLOTS_H
 
 #include "hashes/sha256.h"
+#include "tweetnacl.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,16 +54,17 @@ extern "C" {
 
 /**
  *  @brief FW_METADATA_LENGTH:
- *         This is just the size of the FW_metadata_t struct, which is 4-byte
- *         aligned. We use 76 bytes currently, so this struct will be 76 bytes.
+ *         This is just the size of the firmware_metadata_t struct, which is
+ *         4-byte aligned. We use 140 bytes currently, so this struct will be
+ *         140 bytes.
  */
 #define FW_METADATA_LENGTH  sizeof(firmware_metadata_t)
 
 /**
  *  @brief SIGN_LEN:
- *         Provisional length for signed hash
+ *         Length for signed hash using ed25519
  */
-#define SIGN_LEN            (SHA256_DIGEST_LENGTH)
+#define SIGN_LEN            (SHA256_DIGEST_LENGTH + crypto_sign_BYTES)
 
 /**
  * @brief Structure to store firmware metadata
