@@ -44,7 +44,7 @@ void hwrng_read(void *buf, unsigned int num)
     while (count < num) {
         /* sleep until number is generated */
         while (NRF_RNG->EVENTS_VALRDY == 0) {
-            cpu_sleep_until_event();
+            cortexm_sleep_until_event();
         }
 
         b[count++] = (uint8_t)NRF_RNG->VALUE;
