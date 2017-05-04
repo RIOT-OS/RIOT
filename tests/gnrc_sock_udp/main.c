@@ -244,6 +244,9 @@ static void test_sock_udp_recv__ETIMEDOUT(void)
 
     assert(0 == sock_udp_create(&_sock, &local, NULL, SOCK_FLAGS_REUSE_EP));
 
+    /* add short delay so expect script can synchronize */
+    xtimer_sleep(1);
+
     puts(" * Calling sock_udp_recv()");
     assert(-ETIMEDOUT == sock_udp_recv(&_sock, _test_buffer,
                                        sizeof(_test_buffer), _TEST_TIMEOUT,
