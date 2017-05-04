@@ -134,6 +134,30 @@ static const shell_command_t shell_commands[] = {
 };
 
 #else
+static int validate_and_boot(uint8_t slot)
+{
+    if (fw_slots_verify_int_slot(slot) == 0) {
+        uint32_t address;
+        printf("[bootloader] Image on slot %d verified! Validating...\n",
+               slot);
+        if (fw_slots_validate_int_slot(slot) == 0) {
+            printf("[bootlaoder] slot %d validated! Booting...\n", slot);
+            address = fw_slots_get_slot_address(slot);
+            fw_slots_jump_to_image(address);
+        }
+        else {
+            puts("[bootloader] no valid signature!");
+            return -1;
+        }
+    }
+    else {
+        printf("Slot %u inconsistent!\n", slot);
+        return -1;
+    }
+
+    /* Should not happen */
+    return -1;
+}
 static int boot_img(void)
 {
     uint8_t boot_slot = 0;
@@ -165,10 +189,8 @@ static int boot_img(void)
         if (appid_slot1 != appid_slot2) {
             puts("[bootloader] Warning! application IDs are different!");
             puts("[bootloader] falling back to slot 1");
-            if (fw_slots_verify_int_slot(1) == 0) {
-                uint32_t address;
-                address = fw_slots_get_slot_address(1);
-                fw_slots_jump_to_image(address);
+            if (validate_and_boot(1) == -1) {
+                puts("[bootloader] Booting failed!");
             }
             else {
                 puts("[bootlaoder] Slot 1 inconsistent, no image to boot...");
@@ -180,22 +202,10 @@ static int boot_img(void)
             boot_slot = fw_slots_find_newest_int_image();
 
             if (boot_slot > 0) {
-                if (fw_slots_verify_int_slot(boot_slot) == 0) {
-                    uint32_t address;
-                    printf("[bootloader] newest image on slot %d found and verified! Validating...\n",
-                           boot_slot);
-                    if (fw_slots_validate_int_slot(boot_slot) == 0) {
-                        printf("[bootlaoder] slot %d validated! Booting...\n", boot_slot);
-                        address = fw_slots_get_slot_address(boot_slot);
-                        fw_slots_jump_to_image(address);
-                    }
-                    else {
-                        puts("[bootloader] no valid signature!");
-                        return -1;
-                    }
-                }
-                else {
-                    printf("Slot %u inconsistent!\n", boot_slot);
+                printf("[bootloader] newest image found on slot %d, checking...\n",
+                       boot_slot);
+                if (validate_and_boot(boot_slot) == -1) {
+                    puts("[bootloader] Booting failed!");
                 }
             }
             else {
