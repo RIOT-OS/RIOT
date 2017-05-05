@@ -43,6 +43,14 @@ enum {
  */
 #define GPIO_MODE(pr, ie, pe)   (pr | (ie << 1) | (pe << 2))
 
+/**
+ * @brief ADC Channel Configuration
+ */
+typedef struct {
+    gpio_t pin;            /**< ADC channel pin */
+    uint32_t muxpos;       /**< ADC channel pin multiplexer value */
+} adc_channel_t;
+
 #ifndef DOXYGEN
 /**
  * @brief   Override GPIO modes
