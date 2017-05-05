@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include "periph/gpio.h"
 #include "periph/uart.h"
 #include "bitarithm.h"
 #include "board.h"
@@ -29,6 +30,16 @@ void board_init(void)
 #ifdef DEBUG_VIA_UART
     uart_init(DEBUG_VIA_UART, DEBUG_UART_BAUD, NULL, 0);
 #endif
+
+    /* Turn off all LED's */
+    gpio_init(LED1_PIN, GPIO_OUT);
+    gpio_init(LED2_PIN, GPIO_OUT);
+    gpio_init(LED3_PIN, GPIO_OUT);
+    gpio_init(LED4_PIN, GPIO_OUT);
+    LED1_OFF;
+    LED2_OFF;
+    LED3_OFF;
+    LED4_OFF;
 
     /* Stop the linker from throwing away the PIC32 config register settings */
     dummy();

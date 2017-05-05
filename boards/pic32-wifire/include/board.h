@@ -48,6 +48,37 @@ extern "C" {
 #define EIC_IRQ      (1)
 
 /**
+ * @brief   LED pin configuration
+ * @{
+ */
+#define LED1_PIN            GPIO_PIN(PORT_G, 6)
+#define LED2_PIN            GPIO_PIN(PORT_D, 4)
+#define LED3_PIN            GPIO_PIN(PORT_B, 11)
+#define LED4_PIN            GPIO_PIN(PORT_G, 15)
+
+#define LED1_MASK           (1 << 6)
+#define LED2_MASK           (1 << 4)
+#define LED3_MASK           (1 << 11)
+#define LED4_MASK           (1 << 15)
+
+#define LED1_ON             (LATGSET = LED1_MASK)
+#define LED1_OFF            (LATGCLR = LED1_MASK)
+#define LED1_TOGGLE         (LATGINV = LED1_MASK)
+
+#define LED2_ON             (LATDSET = LED2_MASK)
+#define LED2_OFF            (LATDCLR = LED2_MASK)
+#define LED2_TOGGLE         (LATDINV = LED2_MASK)
+
+#define LED3_ON             (LATBSET = LED3_MASK)
+#define LED3_OFF            (LATBCLR = LED3_MASK)
+#define LED3_TOGGLE         (LATBINV = LED3_MASK)
+
+#define LED4_ON             (LATGSET = LED4_MASK)
+#define LED4_OFF            (LATGCLR = LED4_MASK)
+#define LED4_TOGGLE         (LATGINV = LED4_MASK)
+/** @} */
+
+/**
  * @brief   Board level initialisation
  */
 void board_init(void);
