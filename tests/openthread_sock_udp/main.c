@@ -1,0 +1,192 @@
+#include "stdio.h"
+#include "ot.h"
+
+#include "shell.h"
+#include "shell_commands.h"
+#include "openthread/thread.h"
+#include "openthread/ip6.h"
+#include "openthread/udp.h"
+#include "net/ipv6/addr.h"
+
+#include "net/sock/udp.h"
+
+uint8_t buf[128];
+
+otUdpSocket mSocket;
+
+static OT_JOB _set_panid(otInstance *ot_instance, void *data)
+{
+    uint16_t panid = *((uint16_t*) data);
+    otLinkSetPanId(ot_instance, panid);
+}
+
+static OT_JOB _get_panid(otInstance *ot_instance, void *data)
+{
+    *((uint16_t*) data) = otLinkGetPanId(ot_instance);
+    printf("PanID: %04x\n", *((uint16_t*) data));
+}
+
+static OT_JOB _thread_start(otInstance *ot_instance, void *data)
+{
+    printf("Starting OpenThread\n");
+    otIp6SetEnabled(ot_instance, true);
+    otThreadSetEnabled(ot_instance, true);
+}
+
+static OT_JOB _read_state(otInstance *ot_instance, void *data)
+{
+    uint8_t state = otThreadGetDeviceRole(ot_instance);
+    printf("State is: %i\n", state);
+}
+
+static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *data)
+{
+    for(const otNetifAddress *addr=otIp6GetUnicastAddresses(ot_instance); addr; addr=addr->mNext)
+    {
+        char addrstr[IPV6_ADDR_MAX_STR_LEN];
+        printf("inet6 %s\n", ipv6_addr_to_str(addrstr, (ipv6_addr_t*) &addr->mAddress.mFields, sizeof(addrstr)));
+    }
+}
+
+void _handle_receive(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
+{
+    size_t payload_len = otMessageGetLength(aMessage)-otMessageGetOffset(aMessage);
+
+    char buf[100];
+    otMessageRead(aMessage, otMessageGetOffset(aMessage), buf, payload_len);
+
+    printf("Message: ");
+    for(int i=0;i<payload_len;i++)
+    {
+        printf("%02x ", buf[i]);
+    }
+    printf("\n");
+}
+
+typedef struct 
+{
+    ipv6_addr_t ip_addr;
+    uint16_t port;
+    void *payload;
+    size_t len;
+} udp_pkt_t;
+
+static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
+{
+    udp_pkt_t *pkt = (udp_pkt_t*) data;
+    otMessage *message;
+    message = otUdpNewMessage(ot_instance, true);
+    otMessageSetLength(message, pkt->len);
+    printf("%s\n", (uint8_t*) pkt->payload);
+    printf("%i\n", pkt->len);
+    otMessageWrite(message, 0, pkt->payload, pkt->len);
+    otUdpSocket socket;
+    otMessageInfo mPeer;
+    
+    //Set dest address
+    memcpy(&mPeer.mPeerAddr.mFields, &(pkt->ip_addr), sizeof(ipv6_addr_t));
+
+    //Set dest port
+    mPeer.mPeerPort = pkt->port;
+    printf("%p\n", message);
+
+    otUdpSend(&socket, message, &mPeer);
+    puts("ASD");
+    printf("Pkt sent\n");
+}
+
+
+int _udp(int argc, char **argv)
+{
+    if (argc < 3)
+    {
+        return 1;
+    }
+    else if (strcmp(argv[1],"server")==0)
+    {
+    	sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
+        sock_udp_t sock;
+        local.port = atoi(argv[2]);
+        if (sock_udp_create(&sock, &local, NULL, 0) < 0) {
+        puts("Error creating UDP sock");
+        return 1;
+    }
+    }
+    else if(argc >= 2 && strcmp(argv[1],"send")==0)
+    {
+        /* send packet */
+	udp_pkt_t pkt;
+	ipv6_addr_from_str(&pkt.ip_addr, argv[2]);
+	pkt.port = atoi(argv[3]);
+	pkt.payload = argv[4];
+	pkt.len = strlen(argv[4]);
+	ot_exec_job(_send_udp_pkt, &pkt);
+    }
+    return 0;
+}
+
+int _ifconfig(int argc, char **argv)
+{
+    uint16_t panid;
+    if(argc >= 2)
+    {
+	if(strcmp(argv[1], "get") == 0 && argc >= 3)
+	{
+            if(strcmp(argv[2], "panid") == 0)
+	    {
+		ot_exec_job(_get_panid, &panid);
+	    }	    
+	}
+	else if(strcmp(argv[1], "set") == 0 && argc >= 4)
+	{
+            if(strcmp(argv[2], "panid") == 0)
+	    {
+		panid = strtol(argv[3], NULL, 0);
+		ot_exec_job(_set_panid, &panid);
+	    }	    
+	
+	}
+	else if(strcmp(argv[1], "thread") == 0)
+	{
+	    if(strcmp(argv[2], "start") == 0)
+	    {
+		ot_exec_job(_thread_start, NULL);
+	    }
+	    else if(strcmp(argv[2], "state") == 0)
+            {
+		uint8_t state;
+		ot_exec_job(_read_state, &state);
+	    }
+	}
+
+	else
+	{
+	    printf("Usage...");
+	}
+    }
+    else
+    {
+	ot_exec_job(_get_ip_addresses, NULL);
+    }
+    return 0;
+}
+
+#if !defined(MODULE_OPENTHREAD_CLI) && !defined(MODULE_OPENTHREAD_NCP)
+static const shell_command_t shell_commands[] = {
+    {"ifconfig", "Get or set panid", _ifconfig},
+    {"udp", "Test udp", _udp},
+    {NULL, NULL, NULL}
+};
+#endif
+
+int main(void)
+{
+#if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
+    openthread_uart_run();
+#else
+    char line_buf[3 * SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+#endif
+
+    return 0;
+}
