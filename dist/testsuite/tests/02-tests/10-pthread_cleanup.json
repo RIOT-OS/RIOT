@@ -1,0 +1,25 @@
+{
+    "test" : "expect",
+    "node_defaults" : {
+        "app" : "tests/pthread_cleanup"
+    },
+    "args" : {
+        "terms" : [
+            "Start.",
+            "<SCOPE 0>",
+            "<SCOPE 1>",
+            "<SCOPE 2>",
+            "<SCOPE 3>",
+            "<SCOPE 4>",
+            "<SCOPE 5 />",
+            "Cleanup: <5>",
+            "</SCOPE 4>",
+            "</SCOPE 3>",
+            "Cleanup: <3>",
+            "Cleanup: <2>",
+            "Cleanup: <1>",
+            "Result: 1234",
+            "Done."
+                ]
+    }
+}

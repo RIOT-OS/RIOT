@@ -1,0 +1,20 @@
+{
+    "include" : [ "../00-base/icmp.json", "../00-nodes/native.json" ],
+    "args" : {
+        "count" : 1000,
+        "delay" : 10,
+        "payload_len" : 0,
+        "target" : "affe::2",
+        "network" :
+        [
+            {
+                "addrs" : "affe::1/64",
+                "routes" : { "dst" : "::", "via" : "%link_local(1)" }
+            },
+            {
+                "addrs" : "affe::2/64",
+                "routes" : { "dst" : "::", "via" : "%link_local(0)" }
+            }
+        ]
+    }
+}

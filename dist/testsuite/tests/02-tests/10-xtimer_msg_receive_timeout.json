@@ -1,0 +1,14 @@
+{
+    "test" : "python",
+    "node_defaults" : {
+        "app" : "tests/xtimer_msg_receive_timeout"
+    },
+    "args" : {
+        "python" : [
+            "child = test.nodes[0].child",
+            "for i in range(5):",
+            "    child.expect(\"Message received: 44\")",
+            "    child.expect(\"Timeout!\")"
+        ]
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "test" : "expect",
+    "node_defaults" : {
+        "app" : "tests/thread_basic"
+    },
+    "args" : {
+        "terms" : [
+            "first thread\r\n",
+            "second thread\r\n"
+                ]
+    }
+}

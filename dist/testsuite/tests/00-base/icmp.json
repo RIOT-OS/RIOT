@@ -1,0 +1,15 @@
+{
+    "ignore" : true,
+    "node_defaults" : {
+        "app" : "examples/gnrc_networking",
+        "tags" : ["ipv6"]
+    },
+    "num_nodes" : 2,
+    "test" : "ping",
+    "args" : {
+        "count" : 10,
+        "delay" : 100,
+        "target" : "link-local"
+    },
+    "check_result" : "loss < 10"
+}

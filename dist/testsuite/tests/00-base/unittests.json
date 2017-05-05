@@ -1,0 +1,15 @@
+{
+    "ignore" : true,
+    "node_defaults" : {
+        "app" : "tests/unittests",
+        "env" : {
+            "BOARD_INSUFFICIENT_MEMORY" : "none"
+        }
+    },
+    "num_nodes" : 1,
+    "test" : "expect",
+    "args" : {
+        "terms" : [ "main(): This is RIOT!", "<OK \\(\\d+ tests\\)" ],
+        "timeout" : 20
+    }
+}

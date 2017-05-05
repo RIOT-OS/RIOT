@@ -1,0 +1,15 @@
+{
+    "murdock_queue" : "samr21-xpro",
+    "node_defaults" : {
+        "tags" : [ "arm", "cortex-m", "cortex-m0", "ipv6", "6lowpan", "board:samr21-xpro" ],
+        "env" : {
+            "BOARD" : "samr21-xpro",
+            "TERMINAL" : "picocom"
+        }
+    },
+
+    "nodes" : [
+        {
+            "name" : "node0"
+        }]
+}

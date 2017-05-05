@@ -1,0 +1,27 @@
+{
+    "test" : "python",
+    "node_defaults" : {
+        "app" : "tests/mutex_order"
+    },
+    "args" : {
+        "python" : [
+            "child = test.nodes[0].child",
+            "thread_prio = {",
+            "    3:  6,",
+            "    4:  4,",
+            "    5:  0,",
+            "    6:  2,",
+            "    7:  1",
+            "    }",
+
+            "for k in thread_prio.keys():",
+            "    child.expect(u\"T%i \\(prio %i\\): trying to lock mutex now\" % (k, thread_prio[k]))",
+
+            "last = -1",
+            "for i in range(len(thread_prio)):",
+            "    child.expect(u\"T\\d+ \\(prio (\\d+)\\): locked mutex now\")",
+            "    assert(int(child.match.group(1)) > last)",
+            "    last = int(child.match.group(1))"
+        ]
+    }
+}

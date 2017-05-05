@@ -1,0 +1,10 @@
+{
+    "include" : [ "../00-base/icmp.json", "../00-nodes/native.json" ],
+    "args" : {
+        "count" : 3600,
+        "delay" : 1000,
+        "payload_len" : 1024,
+        "target" : "link-local"
+    },
+    "check_result" : "loss < 1"
+}

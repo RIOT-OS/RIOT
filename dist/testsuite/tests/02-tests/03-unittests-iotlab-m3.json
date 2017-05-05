@@ -1,0 +1,4 @@
+{
+    "include" : [ "../00-base/unittests.json", "../00-nodes/iotlab-m3.json" ],
+    "description" : "run all unittests at once on iotlab-m3"
+}

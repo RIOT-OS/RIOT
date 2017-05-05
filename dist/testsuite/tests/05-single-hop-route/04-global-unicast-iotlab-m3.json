@@ -1,0 +1,20 @@
+{
+    "include" : [ "../00-base/icmp.json", "../00-nodes/samr21-xpro.json" ],
+    "args" : {
+        "count" : 100,
+        "delay" : 10,
+        "payload_len" : 1024,
+        "target" : "beef::1",
+        "network" :
+        [
+            {
+                "addrs" : "affe::1/120",
+                "routes" : { "dst" : "::", "via" : "%link_local(1)" }
+            },
+            {
+                "addrs" : "beef::1/64",
+                "routes" : { "dst" : "::", "via" : "%link_local(0)" }
+            }
+        ]
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "include" : [ "../00-base/icmp.json", "../00-nodes/native.json" ],
+    "args" : {
+        "target" : "ff02::1",
+        "count" : 1000,
+        "delay" : 10,
+        "payload_len" : 0
+    },
+    "check_result" : "loss < 1"
+}

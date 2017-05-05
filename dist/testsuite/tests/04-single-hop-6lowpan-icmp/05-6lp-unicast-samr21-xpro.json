@@ -1,0 +1,9 @@
+{
+    "include" : [ "../00-base/icmp.json", "../00-nodes/samr21-xpro.json" ],
+    "args" : {
+        "count" : 1000,
+        "delay" : 10,
+        "payload_len" : 0,
+        "target" : "link-local"
+    }
+}
