@@ -442,11 +442,11 @@ int ftl_load_metadata_page_with_version(ftl_device_s *device, uint32_t version, 
         }
 
         //printf("xxx subpage %d error %d\n", i, ret);
-        if(ret != 0) {
+        if(ret < 0) {
             // In case of error reading, return the latest valid version
             ret = ftl_read(metadata_partition, NULL, &subpage_header, i-1);
             //printf("subpage %d error %d\n", i-1, ret);
-            assert(ret == 0);
+            assert(ret >= 0);
             *source_page = i-1;
             return 2;
         }

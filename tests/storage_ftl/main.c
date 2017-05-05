@@ -579,7 +579,6 @@ static void test_format(void) {
 }
 
 static void test_metadata(void) {
-    return;
     printf("\n\n%s\n", __func__);
 
     int ret;
@@ -662,7 +661,7 @@ static void test_metadata(void) {
     TEST_ASSERT_EQUAL_INT(0, memcmp(&index_partition, &save_index, sizeof(ftl_partition_s)));
 
     ret = ftl_write_metadata(&device, test_metadata1, strlen(test_metadata1));
-    TEST_ASSERT_EQUAL_INT(0, ret);
+    TEST_ASSERT_EQUAL_INT(FTL_SUBPAGE_SIZE, ret);
 }
 
 
