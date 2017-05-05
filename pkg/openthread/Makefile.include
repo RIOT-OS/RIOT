@@ -1,8 +1,16 @@
 INCLUDES += -I$(RIOTBASE)/pkg/openthread/include \
+			-I$(RIOTBASE)/pkg/openthread/include/openthread \
 			-I$(BINDIRBASE)/pkg/$(BOARD)/openthread/output/include \
-
+			-I$(BINDIRBASE)/pkg/$(BOARD)/openthread/include/openthread \
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
  DIRS += $(RIOTBASE)/pkg/openthread/contrib
  DIRS += $(RIOTBASE)/pkg/openthread/contrib/netdev2
+endif
+ifneq (,$(filter openthread_sock,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/openthread/contrib/sock
+endif
+ifneq (,$(filter openthread_sock_udp,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/openthread/contrib/sock/udp
+  CFLAGS += -DSOCK_HAS_IPV6
 endif
