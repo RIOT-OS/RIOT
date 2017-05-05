@@ -24,10 +24,10 @@
 #include "storage/ftl.h"
 #include "ecc/hamming256.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 1
 #include "debug.h"
 
-#define MYDEBUG(...) DEBUG("%s: ", __FUNCTION__); \
+#define MYDEBUG(...) DEBUG("%s: ", __func__); \
                      DEBUG(__VA_ARGS__)
 
 #define HEXDUMP_BUFFER(buffer, size)    for(int i=0; i<size; i++) { \
@@ -228,8 +228,13 @@ int ftl_write(ftl_partition_s *partition,
     header.ecc_enabled = 0;
     header.reserved = 0;
 
+
+
     memcpy(partition->device->_subpage_buffer, &header, sizeof(header));
     memcpy(partition->device->_subpage_buffer + sizeof(header), buffer, data_length);
+
+    // MYDEBUG("data_length: %d\n", (int) header.data_length);
+    // HEXDUMP_BUFFER(partition->device->_subpage_buffer, partition->device->subpage_size);
 
 
     int ret = ftl_write_raw(partition, partition->device->_subpage_buffer, partition->next_subpage);
@@ -309,11 +314,13 @@ int ftl_read(const ftl_partition_s *partition,
                      uint32_t subpage) {
 
     int ret = ftl_read_raw(partition, partition->device->_subpage_buffer, subpage);
-    if(ret != 0) {
+    if(ret < 0) {
         return ret;
     }
 
     memcpy(header, partition->device->_subpage_buffer, sizeof(subpageheader_s));
+    MYDEBUG("WTF %d\n", __LINE__);
+    //HEXDUMP_BUFFER(&partition->device->_subpage_buffer, (int)sizeof(partition->device->_subpage_buffer));
 
     bool uninitialized = true;
     for(unsigned int i=0; i < sizeof(subpageheader_s); i++) {
@@ -322,6 +329,7 @@ int ftl_read(const ftl_partition_s *partition,
             break;
         }
     }
+    MYDEBUG("WTF %d\n", __LINE__);
 
     if(uninitialized) {
         return -ENOENT;
@@ -330,9 +338,11 @@ int ftl_read(const ftl_partition_s *partition,
     if(header->data_length > partition->device->subpage_size) {
         return -EBADF;
     }
+    MYDEBUG("WTF %d\n", __LINE__);
 
     unsigned char *data_buffer = partition->device->_subpage_buffer;
     unsigned char *ecc_buffer = partition->device->_ecc_buffer;
+    MYDEBUG("data length: %d\n", header->data_length);
     if(header->ecc_enabled) {
         uint8_t ecc_size = partition->device->ecc_size;
         memcpy(ecc_buffer, data_buffer + sizeof(subpageheader_s), ecc_size);
@@ -341,6 +351,7 @@ int ftl_read(const ftl_partition_s *partition,
                                             partition->device->subpage_size,
                                             (uint8_t*) ecc_buffer);
 
+        MYDEBUG("WTF %d\n", __LINE__);
         if(result != Hamming_ERROR_NONE && result != Hamming_ERROR_SINGLEBIT) {
             return -EBADF;
         } else if(result == Hamming_ERROR_SINGLEBIT) {
@@ -351,13 +362,18 @@ int ftl_read(const ftl_partition_s *partition,
         data_buffer += ecc_size;
     }
 
+    MYDEBUG("WTF %d\n", __LINE__);
+
     data_buffer += sizeof(subpageheader_s);
-
+    MYDEBUG("WTF %d\n", __LINE__);
     if(buffer != 0) {
+        MYDEBUG("data length: %d\n", header->data_length);
         memcpy(buffer, data_buffer, header->data_length);
+        MYDEBUG("WTF %d\n", __LINE__);
     }
+    MYDEBUG("WTF %d\n", __LINE__);
 
-    return 0;
+    return header->data_length;
 }
 
 
