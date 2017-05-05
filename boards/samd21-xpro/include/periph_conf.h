@@ -278,18 +278,11 @@ static const spi_conf_t spi_config[] = {
 #define ADC_0_DEV                          ADC
 #define ADC_0_IRQ                          ADC_IRQn
 #define ADC_0_CHANNELS                     (3U)
-/**
- * @brief ADC Channel Configuration
- */
-typedef struct {
-    gpio_t pin;            /**< ADC channel pin */
-    uint32_t muxpos;       /**< ADC channel pin multiplexer value */
-} adc_channel_t;
 
 /* ADC 0 Default values */
 #define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
 #define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV512
-static const adc_channel_t adc_channels[] = {
+static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
     {GPIO_PIN(PA, 10), ADC_INPUTCTRL_MUXPOS_PIN18},    /* EXT2, pin 3 */
     {GPIO_PIN(PA, 11), ADC_INPUTCTRL_MUXPOS_PIN19},    /* EXT2, pin 4 */
