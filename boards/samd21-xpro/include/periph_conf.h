@@ -271,34 +271,34 @@ static const spi_conf_t spi_config[] = {
  * @name ADC Configuration
  * @{
  */
-#define ADC_NUMOF                          (1U)
 #define ADC_0_EN                           1
 #define ADC_MAX_CHANNELS                   14
 /* ADC 0 device configuration */
 #define ADC_0_DEV                          ADC
 #define ADC_0_IRQ                          ADC_IRQn
-#define ADC_0_CHANNELS                     (3U)
-/**
- * @brief ADC Channel Configuration
- */
-typedef struct {
-    gpio_t pin;            /**< ADC channel pin */
-    uint32_t muxpos;       /**< ADC channel pin multiplexer value */
-} adc_channel_t;
 
 /* ADC 0 Default values */
 #define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
 #define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV512
-static const adc_channel_t adc_channels[] = {
-    /* port, pin, muxpos */
-    {GPIO_PIN(PA, 10), ADC_INPUTCTRL_MUXPOS_PIN18},    /* EXT2, pin 3 */
-    {GPIO_PIN(PA, 11), ADC_INPUTCTRL_MUXPOS_PIN19},    /* EXT2, pin 4 */
-    {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0}       /* EXT3, pin 3 */
-};
 
 #define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_GND
 #define ADC_0_GAIN_FACTOR_DEFAULT          ADC_INPUTCTRL_GAIN_1X
 #define ADC_0_REF_DEFAULT                  ADC_REFCTRL_REFSEL_INT1V
+
+static const adc_conf_chan_t adc_channels[] = {
+    /* port, pin, muxpos */
+    {GPIO_PIN(PB, 0), ADC_INPUTCTRL_MUXPOS_PIN8},      /* EXT1, pin 3 */
+    {GPIO_PIN(PB, 1), ADC_INPUTCTRL_MUXPOS_PIN9},      /* EXT1, pin 4 */
+    {GPIO_PIN(PA, 10), ADC_INPUTCTRL_MUXPOS_PIN18},    /* EXT2, pin 3 */
+    {GPIO_PIN(PA, 11), ADC_INPUTCTRL_MUXPOS_PIN19},    /* EXT2, pin 4 */
+    {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0},      /* EXT3, pin 3 */
+    {GPIO_PIN(PA, 3), ADC_INPUTCTRL_MUXPOS_PIN1}       /* EXT3, pin 4. This is
+                        disconnected by default. PA3 is connected to USB_ID.
+                        Move PA03 SELECT jumper to EXT3 to connect. */
+};
+
+#define ADC_0_CHANNELS                     (6U)
+#define ADC_NUMOF                          ADC_0_CHANNELS
 /** @} */
 
 #ifdef __cplusplus
