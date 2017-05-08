@@ -67,19 +67,14 @@ static int read_mag(void *dev, phydat_t *res)
     return 3;
 }
 
-static int write(void *dev, phydat_t *state)
-{
-    return -ENOTSUP;
-}
-
 const saul_driver_t lsm303dlhc_saul_acc_driver = {
     .read = read_acc,
-    .write = write,
+    .write = saul_notsup,
     .type = SAUL_SENSE_ACCEL,
 };
 
 const saul_driver_t lsm303dlhc_saul_mag_driver = {
     .read = read_mag,
-    .write = write,
+    .write = saul_notsup,
     .type = SAUL_SENSE_MAG,
 };
