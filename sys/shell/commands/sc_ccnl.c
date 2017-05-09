@@ -89,37 +89,35 @@ static void _content_usage(char *argv)
 
 int _ccnl_content(int argc, char **argv)
 {
-    char *body = (char*) _default_content;
-    int arg_len = strlen(_default_content) + 1;
-    int offs = CCNL_MAX_PACKET_SIZE;
     if (argc < 2) {
         _content_usage(argv[0]);
         return -1;
     }
 
+    int arg_len;
+    char *body = (char*) _default_content;
+    char buf[BUF_SIZE+1]; /* add one extra space to fit trailing '\0' */
+
     if (argc > 2) {
-        char buf[BUF_SIZE];
-        char *buf_ptr = buf;
-        for (int i = 2; (i < argc) && (buf_ptr < (buf + BUF_SIZE)); i++) {
-            if (i > 2) {
-                *(buf_ptr++) = ' ';
-            }
+        unsigned pos = 0;
+        for (int i = 2; (i < argc) && (pos < BUF_SIZE); ++i) {
             arg_len = strlen(argv[i]);
-            if ((buf_ptr + arg_len) > (buf + BUF_SIZE)) {
-                arg_len = (buf + BUF_SIZE) - buf_ptr;
+            if ((pos + arg_len) > BUF_SIZE) {
+                arg_len = BUF_SIZE - pos;
             }
-            strncpy(buf_ptr, argv[i], arg_len);
-            buf_ptr += arg_len;
+            strncpy(&buf[pos], argv[i], arg_len);
+            pos += arg_len;
+            /* increment pos _after_ adding ' ' */
+            buf[pos++] = ' ';
         }
-        *buf_ptr = '\0';
+        /* decrement pos _before_ to overwrite last ' ' with '\0' */
+        buf[--pos] = '\0';
         body = buf;
-        arg_len = strlen(body);
     }
+    arg_len = strlen(body);
 
-    int suite = CCNL_SUITE_NDNTLV;
-
-    struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], suite, NULL, NULL);
-
+    struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL, NULL);
+    int offs = CCNL_MAX_PACKET_SIZE;
     arg_len = ccnl_ndntlv_prependContent(prefix, (unsigned char*) body, arg_len, NULL, NULL, &offs, _out);
 
     free_prefix(prefix);
