@@ -99,15 +99,17 @@ int _ccnl_content(int argc, char **argv)
 
     if (argc > 2) {
         char buf[BUF_SIZE];
-        memset(buf, ' ', BUF_SIZE);
         char *buf_ptr = buf;
         for (int i = 2; (i < argc) && (buf_ptr < (buf + BUF_SIZE)); i++) {
+            if (i > 2) {
+                *(buf_ptr++) = ' ';
+            }
             arg_len = strlen(argv[i]);
             if ((buf_ptr + arg_len) > (buf + BUF_SIZE)) {
                 arg_len = (buf + BUF_SIZE) - buf_ptr;
             }
             strncpy(buf_ptr, argv[i], arg_len);
-            buf_ptr += arg_len + 1;
+            buf_ptr += arg_len;
         }
         *buf_ptr = '\0';
         body = buf;
