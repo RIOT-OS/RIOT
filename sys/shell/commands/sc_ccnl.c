@@ -120,6 +120,8 @@ int _ccnl_content(int argc, char **argv)
 
     arg_len = ccnl_ndntlv_prependContent(prefix, (unsigned char*) body, arg_len, NULL, NULL, &offs, _out);
 
+    free_prefix(prefix);
+
     unsigned char *olddata;
     unsigned char *data = olddata = _out + offs;
 
@@ -224,7 +226,7 @@ int _ccnl_interest(int argc, char **argv)
             printf("Content received: %s\n", _cont_buf);
             return 0;
         }
-        ccnl_free(prefix);
+        free_prefix(prefix);
         gnrc_netreg_unregister(GNRC_NETTYPE_CCN_CHUNK, &_ne);
     }
     printf("Timeout! No content received in response to the Interest for %s.\n", argv[1]);
