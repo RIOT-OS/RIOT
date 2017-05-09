@@ -43,9 +43,14 @@ static gpio_t saul_gpios[SAUL_GPIO_NUMOF];
 static saul_reg_t saul_reg_entries[SAUL_GPIO_NUMOF];
 
 /**
- * @brief   Reference the driver struct
+ * @brief   Reference the input mode driver struct
  */
-extern saul_driver_t gpio_saul_driver;
+extern saul_driver_t gpio_in_saul_driver;
+
+/**
+ * @brief   Reference to the output mode driver struct
+ */
+extern saul_driver_t gpio_out_saul_driver;
 
 
 void auto_init_gpio(void)
@@ -58,7 +63,13 @@ void auto_init_gpio(void)
         saul_gpios[i] = p->pin;
         saul_reg_entries[i].dev = &(saul_gpios[i]);
         saul_reg_entries[i].name = p->name;
-        saul_reg_entries[i].driver = &gpio_saul_driver;
+        if ((p->mode == GPIO_IN) || (p->mode == GPIO_IN_PD) ||
+            (p->mode == GPIO_IN_PU)) {
+            saul_reg_entries[i].driver = &gpio_in_saul_driver;
+        }
+        else {
+            saul_reg_entries[i].driver = &gpio_out_saul_driver;
+        }
         /* initialize the GPIO pin */
         gpio_init(p->pin, p->mode);
         /* add to registry */
