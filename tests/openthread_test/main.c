@@ -77,16 +77,23 @@ typedef struct
     size_t len;
 } udp_pkt_t;
 
+
+otUdpSocket socket;
+
 static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
 {
     udp_pkt_t *pkt = (udp_pkt_t*) data;
     otMessage *message;
+
+
+    otUdpOpen(ot_instance, &socket, _handle_receive, NULL);
+
     message = otUdpNewMessage(ot_instance, true);
-    otMessageSetLength(message, pkt->len);
-    printf("%s\n", (uint8_t*) pkt->payload);
-    printf("%i\n", pkt->len);
-    otMessageWrite(message, 0, pkt->payload, pkt->len);
-    otUdpSocket socket;
+    int error;
+    error = otMessageSetLength(message, pkt->len);
+    error = otMessageWrite(message, 0, pkt->payload, pkt->len);
+	(void) error;
+
     otMessageInfo mPeer;
     
     //Set dest address
@@ -94,11 +101,9 @@ static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
 
     //Set dest port
     mPeer.mPeerPort = pkt->port;
-    printf("%p\n", message);
 
-    //otUdpSend(&socket, message, &mPeer);
-    puts("ASD");
-    printf("Pkt sent\n");
+    otUdpSend(&socket, message, &mPeer);
+	otUdpClose(&socket);
 }
 
 
@@ -110,7 +115,7 @@ int _udp(int argc, char **argv)
     }
     else if (strcmp(argv[1],"server")==0)
     {
-	uint16_t port=atoi(argv[2]);
+	    uint16_t port=atoi(argv[2]);
         ot_exec_job(_create_udp_socket, &port);
     }
     else if(argc >= 2 && strcmp(argv[1],"send")==0)
@@ -184,6 +189,9 @@ int main(void)
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
     openthread_uart_run();
 #else
+    uint16_t panid=0x1234;
+    ot_exec_job(_set_panid, &panid);
+    ot_exec_job(_thread_start, NULL);
     char line_buf[3 * SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 #endif
