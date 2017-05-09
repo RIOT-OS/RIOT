@@ -13,6 +13,7 @@
 uint8_t buf[128];
 
 otUdpSocket mSocket;
+sock_udp_t sock;
 
 static OT_JOB _set_panid(otInstance *ot_instance, void *data)
 {
@@ -63,39 +64,6 @@ void _handle_receive(void *aContext, otMessage *aMessage, const otMessageInfo *a
     printf("\n");
 }
 
-typedef struct 
-{
-    ipv6_addr_t ip_addr;
-    uint16_t port;
-    void *payload;
-    size_t len;
-} udp_pkt_t;
-
-static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
-{
-    udp_pkt_t *pkt = (udp_pkt_t*) data;
-    otMessage *message;
-    message = otUdpNewMessage(ot_instance, true);
-    otMessageSetLength(message, pkt->len);
-    printf("%s\n", (uint8_t*) pkt->payload);
-    printf("%i\n", pkt->len);
-    otMessageWrite(message, 0, pkt->payload, pkt->len);
-    otUdpSocket socket;
-    otMessageInfo mPeer;
-    
-    //Set dest address
-    memcpy(&mPeer.mPeerAddr.mFields, &(pkt->ip_addr), sizeof(ipv6_addr_t));
-
-    //Set dest port
-    mPeer.mPeerPort = pkt->port;
-    printf("%p\n", message);
-
-    otUdpSend(&socket, message, &mPeer);
-    puts("ASD");
-    printf("Pkt sent\n");
-}
-
-
 int _udp(int argc, char **argv)
 {
     if (argc < 3)
@@ -105,7 +73,6 @@ int _udp(int argc, char **argv)
     else if (strcmp(argv[1],"server")==0)
     {
     	sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
-        sock_udp_t sock;
         local.port = atoi(argv[2]);
         if (sock_udp_create(&sock, &local, NULL, 0) < 0) {
         puts("Error creating UDP sock");
@@ -114,13 +81,17 @@ int _udp(int argc, char **argv)
     }
     else if(argc >= 2 && strcmp(argv[1],"send")==0)
     {
-        /* send packet */
-	udp_pkt_t pkt;
-	ipv6_addr_from_str(&pkt.ip_addr, argv[2]);
-	pkt.port = atoi(argv[3]);
-	pkt.payload = argv[4];
-	pkt.len = strlen(argv[4]);
-	ot_exec_job(_send_udp_pkt, &pkt);
+    /* send packet multicast*/
+    sock_udp_ep_t remote = { .family = AF_INET6 };
+    //ssize_t res;
+    remote.port = 12345;
+    ipv6_addr_set_all_nodes_multicast((ipv6_addr_t *)&remote.addr.ipv6,
+                                      IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
+    if (sock_udp_send(&sock, "Hello!", sizeof("Hello!"), &remote) < 0) {
+        puts("Error sending message");
+        sock_udp_close(&sock);
+        return 1;
+    }
     }
     return 0;
 }

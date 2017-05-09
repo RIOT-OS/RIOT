@@ -16,16 +16,28 @@
 
 #include "net/ipv6/addr.h"
 #include "net/sock/udp.h"
+#include "net/udp.h"
+#include "net/sock.h"
 #include "timex.h"
 #include "net/af.h"
 #include "ot.h"
 #include "openthread/thread.h"
 #include "openthread/udp.h"
+#include "byteorder.h"
+#include "net/protnum.h"
 
 #define ENABLE_DEBUG (1)
 #include "debug.h"
 
 otUdpSocket socket;
+
+typedef struct 
+{
+    ipv6_addr_t ip_addr;
+    uint16_t port;
+    void *payload;
+    size_t len;
+} udp_pkt_t;
 
 /**
  * @brief   Internal helper functions for OPENTHREAD
@@ -180,7 +192,90 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
 ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
                       const sock_udp_ep_t *remote)
 {
-    return 0;
+    int res;
+    udp_pkt_t pkt;
+    uint16_t src_port = 0, dst_port;
+    sock_ip_ep_t local;
+    sock_ip_ep_t *rem;
+    ipv6_addr_t addr_bug;
+
+
+    /* send packet multicast*/
+    sock_udp_ep_t remote2= { .family = AF_INET6 };
+    //ssize_t res;
+    remote2.port = 12345;
+    pkt.ip_addr = (ipv6_addr_t ) remote2.addr.ipv6;
+
+    assert((sock != NULL) || (remote != NULL));
+    assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
+
+    if (remote != NULL) {
+        if (remote->port == 0) {
+            return -EINVAL;
+        }
+        else if (openthread_ep_addr_any((const sock_ip_ep_t *)remote)) {
+            return -EINVAL;
+        }
+        else if (openthread_af_not_supported(remote->family)) {
+            return -EAFNOSUPPORT;
+        }
+        else if ((sock != NULL) &&
+                 (sock->local.netif != SOCK_ADDR_ANY_NETIF) &&
+                 (remote->netif != SOCK_ADDR_ANY_NETIF) &&
+                 (sock->local.netif != remote->netif)) {
+            return -EINVAL;
+        }
+    }
+    else if (sock->remote.family == AF_UNSPEC) {
+        return -ENOTCONN;
+    }
+    /* compiler evaluates lazily so this isn't a redundundant check and cppcheck
+     * is being weird here anyways */
+    /* cppcheck-suppress nullPointerRedundantCheck */
+    /* cppcheck-suppress nullPointer */
+    if ((sock == NULL) || (sock->local.family == AF_UNSPEC)) {
+        /* no sock or sock currently unbound */
+        if (sock != NULL) {
+            /* bind sock object implicitly */
+            sock->local.port = src_port;
+            if (remote == NULL) {
+                sock->local.family = sock->remote.family;
+            }
+            else {
+                sock->local.family = remote->family;
+            }
+            ot_exec_job(_create_udp_socket, &(src_port));
+        }
+    }
+    else {
+        src_port = sock->local.port;
+        memcpy(&local, &sock->local, sizeof(local));
+    }
+    /* sock can't be NULL at this point */
+    if (remote == NULL) {
+        rem = (sock_ip_ep_t *)&sock->remote;
+        dst_port = sock->remote.port;
+    }
+    else {
+        rem = (sock_ip_ep_t *)remote;
+        dst_port = remote->port;
+    }
+    /* check for matching address families in local and remote */
+    if (local.family == AF_UNSPEC) {
+        local.family = rem->family;
+    }
+    else if (local.family != rem->family) {
+        return -EINVAL;
+    }
+    /* build packet and send */
+    pkt.ip_addr = (ipv6_addr_t ) remote->addr.ipv6;
+    pkt.port = dst_port;
+    pkt.payload = (void*) data;
+    pkt.len = len;
+    ot_exec_job(_send_udp_pkt, &pkt);
+
+
+    return res;
 }
 
 /** @} */
