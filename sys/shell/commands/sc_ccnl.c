@@ -120,6 +120,8 @@ int _ccnl_content(int argc, char **argv)
 
     arg_len = ccnl_ndntlv_prependContent(prefix, (unsigned char*) body, arg_len, NULL, NULL, &offs, _out);
 
+    free_prefix(prefix);
+
     unsigned char *olddata;
     unsigned char *data = olddata = _out + offs;
 
