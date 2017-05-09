@@ -9,8 +9,8 @@ ifneq (,$(filter openthread_contrib,$(USEMODULE)))
 endif
 ifneq (,$(filter openthread_sock,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/openthread/contrib/sock
+  CFLAGS += -DSOCK_HAS_IPV6
 endif
 ifneq (,$(filter openthread_sock_udp,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/openthread/contrib/sock/udp
-  CFLAGS += -DSOCK_HAS_IPV6
 endif

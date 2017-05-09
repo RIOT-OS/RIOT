@@ -192,19 +192,10 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
 ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
                       const sock_udp_ep_t *remote)
 {
-    int res;
     udp_pkt_t pkt;
     uint16_t src_port = 0, dst_port;
     sock_ip_ep_t local;
     sock_ip_ep_t *rem;
-    ipv6_addr_t addr_bug;
-
-
-    /* send packet multicast*/
-    sock_udp_ep_t remote2= { .family = AF_INET6 };
-    //ssize_t res;
-    remote2.port = 12345;
-    pkt.ip_addr = (ipv6_addr_t ) remote2.addr.ipv6;
 
     assert((sock != NULL) || (remote != NULL));
     assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
@@ -267,15 +258,20 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     else if (local.family != rem->family) {
         return -EINVAL;
     }
+
+    remote = (struct _sock_tl_ep *) remote;
+
+    ipv6_addr_t * remote_addr = NULL;
+    memcpy(remote_addr, &remote->addr, sizeof(remote->addr));
+
     /* build packet and send */
-    pkt.ip_addr = (ipv6_addr_t ) remote->addr.ipv6;
+    pkt.ip_addr = *remote_addr;
     pkt.port = dst_port;
     pkt.payload = (void*) data;
     pkt.len = len;
     ot_exec_job(_send_udp_pkt, &pkt);
 
-
-    return res;
+    return 0;
 }
 
 /** @} */
