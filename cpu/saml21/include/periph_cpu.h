@@ -43,14 +43,6 @@ enum {
  */
 #define GPIO_MODE(pr, ie, pe)   (pr | (ie << 1) | (pe << 2))
 
-/**
- * @brief ADC Channel Configuration
- */
-typedef struct {
-    gpio_t pin;            /**< ADC channel pin */
-    uint32_t muxpos;       /**< ADC channel pin multiplexer value */
-} adc_channel_t;
-
 #ifndef DOXYGEN
 /**
  * @brief   Override GPIO modes
@@ -68,6 +60,16 @@ typedef enum {
 /** @} */
 #endif /* ndef DOXYGEN */
 
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0xff,                       /**< not supported */
+    ADC_RES_8BIT  = ADC_CTRLC_RESSEL_8BIT,      /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = ADC_CTRLC_RESSEL_10BIT,     /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = ADC_CTRLC_RESSEL_12BIT,     /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 0xfe,                       /**< not supported */
+    ADC_RES_16BIT = 0xfd                        /**< not supported */
+} adc_res_t;
+/** @} */
 #ifdef __cplusplus
 }
 #endif

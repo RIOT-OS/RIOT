@@ -100,14 +100,6 @@ typedef struct {
 } uart_conf_t;
 
 /**
- * @brief ADC Channel Configuration
- */
-typedef struct {
-    gpio_t pin;            /**< ADC channel pin */
-    uint32_t muxpos;       /**< ADC channel pin multiplexer value */
-} adc_conf_chan_t;
-
-/**
  * @brief   Return the numeric id of a SERCOM device derived from its address
  *
  * @param[in] sercom    SERCOM device
@@ -119,6 +111,20 @@ static inline int _sercom_id(SercomUsart *sercom)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
 }
 
+/**
+ * @brief   Override the ADC resolution configuration
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0xff,                       /**< not supported */
+    ADC_RES_8BIT  = ADC_CTRLB_RESSEL_8BIT,      /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = ADC_CTRLB_RESSEL_10BIT,     /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = ADC_CTRLB_RESSEL_12BIT,     /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 0xfe,                       /**< not supported */
+    ADC_RES_16BIT = 0xfd                        /**< not supported */
+} adc_res_t;
+/** @} */
 #ifdef __cplusplus
 }
 #endif
