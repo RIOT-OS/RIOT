@@ -185,7 +185,7 @@ static const pwm_conf_t pwm_config[] = {
  * @{
  */
 static const spi_conf_t spi_config[] = {
-    {
+    {   /* EXT1 */
         .dev      = &SERCOM0->SPI,
         .miso_pin = GPIO_PIN(PA, 4),
         .mosi_pin = GPIO_PIN(PA, 6),
@@ -196,7 +196,7 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_0,
         .mosi_pad = SPI_PAD_MOSI_2_SCK_3
     },
-    {
+    {   /* EXT2 */
         .dev      = &SERCOM1->SPI,
         .miso_pin = GPIO_PIN(PA, 16),
         .mosi_pin = GPIO_PIN(PA, 18),
@@ -207,14 +207,14 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_0,
         .mosi_pad = SPI_PAD_MOSI_2_SCK_3
     },
-    {
+    {   /* EXT3 */
         .dev      = &SERCOM5->SPI,
         .miso_pin = GPIO_PIN(PB, 16),
         .mosi_pin = GPIO_PIN(PB, 22),
         .clk_pin  = GPIO_PIN(PB, 23),
         .miso_mux = GPIO_MUX_C,
-        .mosi_mux = GPIO_MUX_C,
-        .clk_mux  = GPIO_MUX_C,
+        .mosi_mux = GPIO_MUX_D,
+        .clk_mux  = GPIO_MUX_D,
         .miso_pad = SPI_PAD_MISO_0,
         .mosi_pad = SPI_PAD_MOSI_2_SCK_3
     }
