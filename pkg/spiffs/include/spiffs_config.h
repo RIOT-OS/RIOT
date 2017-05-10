@@ -208,7 +208,7 @@ void spiffs_unlock(struct spiffs_t *fs);
 
 // Enable this if your target needs aligned data for index tables
 #ifndef SPIFFS_ALIGNED_OBJECT_INDEX_TABLES
-#define SPIFFS_ALIGNED_OBJECT_INDEX_TABLES       0
+#define SPIFFS_ALIGNED_OBJECT_INDEX_TABLES       1
 #endif
 
 // Enable this if you want the HAL callbacks to be called with the spiffs struct
