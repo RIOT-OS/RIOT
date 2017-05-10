@@ -26,11 +26,6 @@
 
 #define BUF_SIZE (64)
 
-/**
- * Maximum number of Interest retransmissions
- */
-#define CCNL_INTEREST_RETRIES   (3)
-
 #define MAX_ADDR_LEN            (8U)
 
 static unsigned char _int_buf[BUF_SIZE];
@@ -214,26 +209,27 @@ int _ccnl_interest(int argc, char **argv)
 
     memset(_int_buf, '\0', BUF_SIZE);
     memset(_cont_buf, '\0', BUF_SIZE);
-    for (int cnt = 0; cnt < CCNL_INTEREST_RETRIES; cnt++) {
-        gnrc_netreg_entry_t _ne =
-            GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
-                                       sched_active_pid);
-        /* register for content chunks */
-        gnrc_netreg_register(GNRC_NETTYPE_CCN_CHUNK, &_ne);
 
-        struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL, 0);
-        ccnl_send_interest(prefix, _int_buf, BUF_SIZE);
-        if (ccnl_wait_for_chunk(_cont_buf, BUF_SIZE, 0) > 0) {
-            gnrc_netreg_unregister(GNRC_NETTYPE_CCN_CHUNK, &_ne);
-            printf("Content received: %s\n", _cont_buf);
-            return 0;
-        }
-        free_prefix(prefix);
-        gnrc_netreg_unregister(GNRC_NETTYPE_CCN_CHUNK, &_ne);
+    gnrc_netreg_entry_t _ne =
+        GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                   sched_active_pid);
+    /* register for content chunks */
+    gnrc_netreg_register(GNRC_NETTYPE_CCN_CHUNK, &_ne);
+
+    struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL, 0);
+    ccnl_send_interest(prefix, _int_buf, BUF_SIZE);
+    int res = 0;
+    if (ccnl_wait_for_chunk(_cont_buf, BUF_SIZE, 0) > 0) {
+        printf("Content received: %s\n", _cont_buf);
     }
-    printf("Timeout! No content received in response to the Interest for %s.\n", argv[1]);
+    else {
+        printf("Timeout! No content received in response to the Interest for %s.\n", argv[1]);
+        res = -1;
+    }
+    free_prefix(prefix);
+    gnrc_netreg_unregister(GNRC_NETTYPE_CCN_CHUNK, &_ne);
 
-    return -1;
+    return res;
 }
 
 static void _ccnl_fib_usage(char *argv)
