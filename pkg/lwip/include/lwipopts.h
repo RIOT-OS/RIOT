@@ -136,6 +136,8 @@ extern "C" {
 #endif
 
 #define LWIP_SOCKET             (0)
+
+#define LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS
 #define MEMP_MEM_MALLOC         (1)
 #define NETIF_MAX_HWADDR_LEN    (GNRC_NETIF_HDR_L2ADDR_MAX_LEN)
 

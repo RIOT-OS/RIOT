@@ -27,7 +27,6 @@ static inline void _tcp_sock_init(sock_tcp_t *sock, struct netconn *conn,
 {
     mutex_init(&sock->mutex);
     mutex_lock(&sock->mutex);
-    netconn_set_noautorecved(conn, 1);
     sock->conn = conn;
     sock->queue = queue;
     sock->last_buf = NULL;
@@ -340,8 +339,6 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
         }
     }
     if (offset > 0) {
-        /* inform lwIP how much we receive*/
-        netconn_recved(sock->conn, (u32_t)offset);
         res = offset;   /* we received data so return it */
     }
     /* unset flags */

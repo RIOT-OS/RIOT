@@ -995,10 +995,8 @@ static void test_sock_udp_send6__EHOSTUNREACH(void)
                                           .family = AF_INET6,
                                           .port = _TEST_PORT_REMOTE };
 
-    /* lwIP returns ENOMEM on failed neighbor cache lookup, since it "tries" to
-     * create one so we have to live with this weird behavior */
-    assert(-ENOMEM == sock_udp_send(NULL, "ABCD", sizeof("ABCD"),
-                                    &remote));
+    assert(-EHOSTUNREACH == sock_udp_send(NULL, "ABCD", sizeof("ABCD"),
+                                          &remote));
 }
 
 static void test_sock_udp_send6__EINVAL_port(void)
