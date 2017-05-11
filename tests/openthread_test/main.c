@@ -78,13 +78,15 @@ typedef struct
 } udp_pkt_t;
 
 
-otUdpSocket socket;
 
 static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
 {
     udp_pkt_t *pkt = (udp_pkt_t*) data;
     otMessage *message;
 
+
+    otUdpSocket socket;
+    memset(&socket, 0, sizeof(otUdpSocket));
 
     otUdpOpen(ot_instance, &socket, _handle_receive, NULL);
 
