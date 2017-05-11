@@ -598,7 +598,6 @@ endif
 ifneq (,$(filter openthread,$(USEMODULE)))
   USEMODULE += openthread_contrib
   USEMODULE += libopenthread
-  USEMODULE += libopenthread-cli
   USEMODULE += libmbedcrypto
   USEPKG += openthread
   USEMODULE+=xtimer
