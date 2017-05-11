@@ -41,8 +41,8 @@ int ipv6_addr_split(char *addr_str, char seperator, int _default)
 
 int main(int argc, char *argv[])
 {
-    static unsigned ifindex;
-    static unsigned _bind_to_device = 0;
+    unsigned ifindex;
+    unsigned _bind_to_device = 0;
 
     if (argc < 3) {
         fprintf(stderr, "usage: uhcpd <interface> <prefix/prefix_length> [%s]\n",
