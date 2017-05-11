@@ -410,7 +410,7 @@ static void init_dtls(session_t *dst, char *addr_str)
  */
 static void client_send(char *addr_str, char *data, unsigned int delay)
 {
-    static int8_t iWatch;
+    int8_t iWatch;
     static session_t dst;
     static int connected = 0;
     msg_t msg;
