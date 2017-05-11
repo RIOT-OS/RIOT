@@ -15,9 +15,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
-# Uncomment this to enable scheduler statistics for ps:
-#CFLAGS += -DSCHEDSTATISTICS
-
 # If you want to use native with valgrind, you should recompile native
 # with the target all-valgrind instead of all:
 # make -B clean all-valgrind
@@ -35,6 +32,9 @@ QUIET ?= 1
 #USEMODULE += shell
 #USEMODULE += posix
 #USEMODULE += xtimer
+
+# Uncomment this to enable scheduler statistics for ps:
+#USEMODULE += schedstatistics
 
 # If your application is very simple and doesn't use modules that use
 # messaging, it can be disabled to save some memory:
