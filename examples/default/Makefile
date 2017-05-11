@@ -31,7 +31,7 @@ USEMODULE += ps
 # include and auto-initialize all available sensors
 USEMODULE += saul_default
 # Uncomment this to enable scheduler statistics for ps:
-#USEMODULE += schedstatistics
+USEMODULE += schedstatistics
 
 BOARD_PROVIDES_NETIF := airfy-beacon cc2538dk fox iotlab-m3 iotlab-a8-m3 mulle \
         microbit native nrf51dongle nrf52dk nrf6310 openmote-cc2538 pba-d-01-kw2x \
