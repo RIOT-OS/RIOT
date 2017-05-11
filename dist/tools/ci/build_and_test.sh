@@ -51,6 +51,7 @@ function run {
 
 if [[ $BUILDTEST_MCU_GROUP ]]
 then
+    export BASE_BRANCH="${CI_BASE_BRANCH}"
 
     if [ "$BUILDTEST_MCU_GROUP" == "static-tests" ]
     then
@@ -82,11 +83,11 @@ then
         run ./dist/tools/ci/print_toolchain_versions.sh
 
         run ./dist/tools/whitespacecheck/check.sh ${CI_BASE_BRANCH}
-        run ./dist/tools/licenses/check.sh ${CI_BASE_BRANCH} --diff-filter=MR --error-exitcode=0
-        run ./dist/tools/licenses/check.sh ${CI_BASE_BRANCH} --diff-filter=AC
-        run ./dist/tools/doccheck/check.sh ${CI_BASE_BRANCH}
-        run ./dist/tools/externc/check.sh ${CI_BASE_BRANCH}
-        run ./dist/tools/cppcheck/check.sh ${CI_BASE_BRANCH}
+        DIFFFILTER="MR" ERROR_EXIT_CODE=0 run ./dist/tools/licenses/check.sh
+        DIFFFILTER="AC" run ./dist/tools/licenses/check.sh
+        run ./dist/tools/doccheck/check.sh
+        run ./dist/tools/externc/check.sh
+        run ./dist/tools/cppcheck/check.sh
         run ./dist/tools/pr_check/pr_check.sh ${CI_BASE_BRANCH}
         exit $RESULT
     fi
@@ -106,7 +107,7 @@ then
         #   - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
     fi
 
-    BASE_BRANCH="${CI_BASE_BRANCH}"
+
     ./dist/tools/compile_test/compile_test.py $BASE_BRANCH
     set_result $?
 fi
