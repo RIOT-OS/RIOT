@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the STM32F413ZH
+ * @brief           Memory definitions for the STM32F413VG
  *
  * @author          Vincent Dupont <vincent@otakeys.com>
  *
@@ -20,7 +20,7 @@
 
 MEMORY
 {
-    rom (rx)    : ORIGIN = 0x08000000, LENGTH = 1536K
+    rom (rx)    : ORIGIN = 0x08000000, LENGTH = 1M
     ram (rwx)   : ORIGIN = 0x20000000, LENGTH = 320K
     cpuid (r)   : ORIGIN = 0x1fff7a10, LENGTH = 12
 }
