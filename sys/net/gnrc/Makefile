@@ -52,6 +52,9 @@ endif
 ifneq (,$(filter gnrc_ndp_router,$(USEMODULE)))
     DIRS += network_layer/ndp/router
 endif
+ifneq (,$(filter gnrc_ndp2,$(USEMODULE)))
+    DIRS += network_layer/ndp2
+endif
 ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
     DIRS += netapi
 endif
