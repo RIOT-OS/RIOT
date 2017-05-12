@@ -25,6 +25,9 @@ ifneq (,$(filter at30tse75x,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   SRC += sc_netif.c
+  #ifneq (,$(filter netdev2_ieee802154,$(USEMODULE)))
+    SRC += sc_iwpan.c
+  #endif
 endif
 ifneq (,$(filter fib,$(USEMODULE)))
   SRC += sc_fib.c
