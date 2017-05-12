@@ -277,6 +277,14 @@ RadioPacket *otPlatRadioGetTransmitBuffer(otInstance *aInstance)
     return &sTransmitFrame;
 }
 
+/* OpenThread will call this function to set the transmit power */
+void otPlatRadioSetDefaultTxPower(otInstance *aInstance, int8_t aPower)
+{
+    (void)aInstance;
+
+    _set_power(aPower);
+}
+
 /* OpenThread will call this for transmitting a packet*/
 ThreadError otPlatRadioTransmit(otInstance *aInstance, RadioPacket *aPacket)
 {
