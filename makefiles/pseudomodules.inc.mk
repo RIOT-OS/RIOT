@@ -1,8 +1,4 @@
 PSEUDOMODULES += auto_init_gnrc_rpl
-PSEUDOMODULES += conn
-PSEUDOMODULES += conn_ip
-PSEUDOMODULES += conn_tcp
-PSEUDOMODULES += conn_udp
 PSEUDOMODULES += core_%
 PSEUDOMODULES += emb6_router
 PSEUDOMODULES += gnrc_ipv6_default

@@ -213,7 +213,7 @@ int sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     /* we want the send in the uip thread (which udp_socket_send does not offer)
      * so we need to do it manually */
     if (!send_registered) {
-        if (evproc_regCallback(EVENT_TYPE_CONN_SEND, _output_callback) != E_SUCCESS) {
+        if (evproc_regCallback(EVENT_TYPE_SOCK_SEND, _output_callback) != E_SUCCESS) {
             return -ENOMEM;
         }
         else {
@@ -253,7 +253,7 @@ int sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     }
     mutex_lock(&send_cmd.block);
     /* change to emb6 thread context */
-    if (evproc_putEvent(E_EVPROC_TAIL, EVENT_TYPE_CONN_SEND, &send_cmd) == E_SUCCESS) {
+    if (evproc_putEvent(E_EVPROC_TAIL, EVENT_TYPE_SOCK_SEND, &send_cmd) == E_SUCCESS) {
         /* block thread until data was sent */
         mutex_lock(&send_cmd.block);
     }
@@ -301,7 +301,7 @@ static void _input_callback(struct udp_socket *c, void *ptr,
 static void _output_callback(c_event_t c_event, p_data_t p_data)
 {
 
-    if ((c_event != EVENT_TYPE_CONN_SEND) || (p_data == NULL)) {
+    if ((c_event != EVENT_TYPE_SOCK_SEND) || (p_data == NULL)) {
         return;
     }
 
