@@ -70,9 +70,10 @@ extern "C"
  * @brief   HDC1000 specific return values
  */
 enum {
-    HDC1000_OK    = 0,      /**< everything went as expected */
-    HDC1000_NODEV = -1,     /**< no HDC1000 device found on the bus */
-    HDC1000_NOBUS = -2,     /**< errors while initializing the I2C bus */
+    HDC1000_OK     = 0,     /**< everything went as expected */
+    HDC1000_NODEV  = -1,    /**< no HDC1000 device found on the bus */
+    HDC1000_NOBUS  = -2,    /**< errors while initializing the I2C bus */
+    HDC1000_BUSERR = -3     /**< error during I2C communication */
 };
 
 /**
@@ -119,8 +120,11 @@ int hdc1000_init(hdc1000_t *dev, const hdc1000_params_t *params);
  * @ref hdc1000_get_results().
  *
  * @param[in]  dev          device descriptor of sensor
+ *
+ * @return                  HDC1000_OK on success
+ * @return                  HDC1000_BUSERR on I2C communication failures
  */
-void hdc1000_trigger_conversion(hdc1000_t *dev);
+int hdc1000_trigger_conversion(hdc1000_t *dev);
 
 /**
  * @brief   Read conversion results for temperature and humidity
@@ -128,8 +132,11 @@ void hdc1000_trigger_conversion(hdc1000_t *dev);
  * @param[in]  dev          device descriptor of sensor
  * @param[out] temp         temperature [in 100 * degree centigrade]
  * @param[out] hum          humidity [in 100 * percent relative]
+ *
+ * @return                  HDC1000_OK on success
+ * @return                  HDC1000_BUSERR on I2C communication failures
  */
-void hdc1000_get_results(hdc1000_t *dev, int16_t *temp, int16_t *hum);
+int hdc1000_get_results(hdc1000_t *dev, int16_t *temp, int16_t *hum);
 
 /**
  * @brief   Convenience function for reading temperature and humidity
@@ -140,8 +147,11 @@ void hdc1000_get_results(hdc1000_t *dev, int16_t *temp, int16_t *hum);
  * @param[in]  dev          device descriptor of sensor
  * @param[out] temp         temperature [in 100 * degree centigrade]
  * @param[out] hum          humidity [in 100 * percent relative]
+ *
+ * @return                  HDC1000_OK on success
+ * @return                  HDC1000_BUSERR on I2C communication failures
  */
-void hdc1000_read(hdc1000_t *dev, int16_t *temp, int16_t *hum);
+int hdc1000_read(hdc1000_t *dev, int16_t *temp, int16_t *hum);
 
 #ifdef __cplusplus
 }
