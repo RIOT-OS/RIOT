@@ -23,7 +23,7 @@
 #include <assert.h>
 
 #ifdef MODULE_OPENTHREAD_NCP
-#include <ncp/ncp.h>
+#include <openthread/ncp.h>
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -83,7 +83,7 @@ void *_openthread_event_loop(void *arg)
 #else
 
 #   ifdef MODULE_OPENTHREAD_NCP
-    otNcpInit();
+    otNcpInit(sInstance);
 #   endif
 
 #endif
