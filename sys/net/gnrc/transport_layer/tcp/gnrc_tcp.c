@@ -237,7 +237,7 @@ int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
                           const uint8_t *local_addr, const uint16_t local_port)
 {
     assert(tcb != NULL);
-    assert(local_port != GNRC_TCP_PORT_UNSPEC);
+    assert(local_port != PORT_UNSPEC);
 
     /* Check AF-Family support if local address was supplied */
     if (local_addr != NULL) {

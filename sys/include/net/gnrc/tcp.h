@@ -66,7 +66,7 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
   * @param[in]     address_family   Address family of @p target_addr.
   * @param[in]     target_addr      Pointer to target address.
   * @param[in]     target_port      Target port number.
-  * @param[in]     local_port       If zero or GNRC_TCP_PORT_UNSPEC, the connections
+  * @param[in]     local_port       If zero or PORT_UNSPEC, the connections
   *                                 source port is randomly chosen. If local_port is non-zero
   *                                 the local_port is used as source port.
   *
