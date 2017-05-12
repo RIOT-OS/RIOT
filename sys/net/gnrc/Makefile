@@ -1,3 +1,6 @@
+ifneq (,$(filter aodvv2,$(USEMODULE)))
+    DIRS += routing/aodvv2
+endif
 ifneq (,$(filter gnrc_conn,$(USEMODULE)))
     DIRS += conn
 endif
