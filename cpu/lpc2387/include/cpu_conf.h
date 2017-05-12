@@ -51,8 +51,6 @@ extern "C" {
 #endif
 
 #define THREAD_STACKSIZE_IDLE      (160)
-
-#define ISR_STACKSIZE              (0)
 /** @} */
 
 /**

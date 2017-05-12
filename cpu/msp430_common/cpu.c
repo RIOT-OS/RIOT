@@ -52,6 +52,7 @@ void *thread_arch_isr_stack_start(void)
     return (void *)-1;
 }
 
+
 NORETURN void cpu_switch_context_exit(void)
 {
     sched_active_thread = sched_threads[0];
