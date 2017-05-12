@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
+ *               2017 HAW-Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Common macros and compiler attributes/pragmas configuration
  *
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
+ * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
 
 #ifndef KERNEL_DEFINES_H
@@ -113,6 +115,18 @@
  * @returns     The minimal alignment of T.
  */
 #define ALIGN_OF(T) (offsetof(struct { char c; T t; }, t))
+
+/**
+ * @def         BUILD_BUG_ON(condition)
+ * @brief       Forces a compilation error if condition is true.
+ *              This trick is only needed if the condition can't be evaluated
+ *              before compile time (i.e. sizeof(sometype_t) < 42 )
+ *              For more details on this see for example:
+ *              https://git.kernel.org/pub/scm/linux/kernel/git/stable/
+ *              linux-stable.git/tree/include/linux/bug.h
+ * @param[in]   condition  A condition that will be evaluated at compile time
+ */
+#define BUILD_BUG_ON(condition) ((void)sizeof(char[1 - 2 * !!(condition)]))
 
 #ifdef __cplusplus
 }

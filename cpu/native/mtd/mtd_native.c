@@ -37,7 +37,7 @@ static int _init(mtd_dev_t *dev)
     FILE *f = real_fopen(_dev->fname, "r");
 
     if (!f) {
-        DEBUG("mtd_native: init: creating file %s\n", name);
+        DEBUG("mtd_native: init: creating file %s\n", _dev->fname);
         f = real_fopen(_dev->fname, "w+");
         if (!f) {
             return -EIO;
