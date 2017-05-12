@@ -30,6 +30,8 @@
 
 #include "periph/pm.h"
 
+#include "str2text.h"
+
 #ifdef MODULE_SCHEDSTATISTICS
 #include "sched.h"
 #endif

@@ -22,6 +22,8 @@
 #include "thread.h"
 #include "kernel_types.h"
 
+#include "str2text.h"
+
 #ifdef MODULE_SCHEDSTATISTICS
 #include "xtimer.h"
 #endif
@@ -31,24 +33,12 @@
 #endif
 
 /* list of states copied from tcb.h */
-static const char *state_names[] = {
-    [STATUS_RUNNING] = "running",
-    [STATUS_PENDING] = "pending",
-    [STATUS_STOPPED] = "stopped",
-    [STATUS_SLEEPING] = "sleeping",
-    [STATUS_MUTEX_BLOCKED] = "bl mutex",
-    [STATUS_RECEIVE_BLOCKED] = "bl rx",
-    [STATUS_SEND_BLOCKED] = "bl send",
-    [STATUS_REPLY_BLOCKED] = "bl reply",
-    [STATUS_FLAG_BLOCKED_ANY] = "bl anyfl",
-    [STATUS_FLAG_BLOCKED_ALL] = "bl allfl",
-    [STATUS_MBOX_BLOCKED] = "bl mbox",
-};
+extern "C" const char **state_names;
 
 /**
  * @brief Prints a list of running threads including stack usage to stdout.
  */
-void ps(void)
+extern "C" void ps(void)
 {
     const char queued_name[] = {'_', 'Q'};
 #ifdef DEVELHELP

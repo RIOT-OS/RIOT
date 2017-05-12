@@ -25,6 +25,8 @@
 
 #include "saul_reg.h"
 
+#include "str2text.h"
+
 /* this function does not check, if the given device is valid */
 static void probe(int num, saul_reg_t *dev)
 {
@@ -135,7 +137,7 @@ static void write(int argc, char **argv)
     printf("data successfully written to device #%i\n", num);
 }
 
-int _saul(int argc, char **argv)
+extern "C" int _saul(int argc, char **argv)
 {
     if (argc < 2) {
         list();
