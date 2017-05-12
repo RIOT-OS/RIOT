@@ -595,20 +595,10 @@ ifneq (,$(filter random,$(USEMODULE)))
     endif
 endif
 
-ifneq (,$(filter openthread,$(USEMODULE)))
-  USEMODULE += openthread_contrib
-  USEMODULE += libopenthread
-  USEMODULE += libopenthread-cli
-  USEMODULE += libmbedcrypto
-  USEPKG += openthread
-  USEMODULE+=xtimer
-
-  FEATURES_REQUIRED += cpp
-  FEATURES_REQUIRED += periph_spi periph_gpio
-endif
-
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
   USEMODULE+=openthread_contrib_netdev2
+  FEATURES_REQUIRED += cpp
+  FEATURES_REQUIRED += periph_spi periph_gpio
 endif
 
 ifneq (,$(filter emcute,$(USEMODULE)))

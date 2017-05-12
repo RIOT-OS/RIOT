@@ -71,32 +71,30 @@ void otTaskletsSignalPending(otInstance *aInstance)
         (void)aInstance;
 }
 
-void otPlatReset(otInstance *aInstance)
-{
-    (void)aInstance;
-}
-
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
 /* init and run OpeanThread's UART simulation (sdtio) */
 void openthread_uart_run(void)
 {
     char buf[256];
-    uint8_t index=0;
+    // uint8_t index=0;
     char c;
     msg_t msg;
 
     msg.type = OPENTHREAD_SERIAL_MSG_TYPE_EVENT;
     msg.content.ptr = buf;
 
+    buf[1]=0;
     while (1) {
         c=getchar();
-        buf[index++]=c;
-        if(c == 0x0a)
-        {
-            buf[index] = 0;
-            index=0;
-            msg_send(&msg, openthread_get_pid());
-        }
+        buf[0]=c;
+        msg_send(&msg, openthread_get_pid());
+        // buf[index++]=c;
+        // if(c == 0x0a)
+        // {
+        //     buf[index] = 0;
+        //     index=0;
+        //     msg_send(&msg, openthread_get_pid());
+        // }
     }
 }
 #endif

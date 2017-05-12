@@ -23,10 +23,10 @@
 #include <assert.h>
 
 #ifdef MODULE_OPENTHREAD_NCP
-#include <ncp/ncp.h>
+#include "openthread/ncp.h"
 #endif
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #include <errno.h>
@@ -45,7 +45,7 @@ static otInstance *sInstance;
 
 void ot_exec_job(OT_JOB (*job)(otInstance*, void*), void *data)
 {
-    ot_job_t _job;    
+    ot_job_t _job;
     _job.function = job;
 
     msg_t msg, reply;
@@ -83,7 +83,7 @@ void *_openthread_event_loop(void *arg)
 #else
 
 #   ifdef MODULE_OPENTHREAD_NCP
-    otNcpInit();
+    otNcpInit(sInstance);
 #   endif
 
 #endif

@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <periph/uart.h>
 
 #include <openthread/platform/uart.h>
 
@@ -33,8 +34,13 @@ ThreadError otPlatUartDisable(void)
 /* OpenThread will call this for sending data through UART */
 ThreadError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
 {
+    uart_write(UART_DEV(0), aBuf, aBufLength);
     /* print UART data on screen */
-    printf("%.*s", aBufLength, aBuf);
+    // if (*(aBuf+aBufLength-1) == 0x0A) {
+    //     printf("%.*s", aBufLength, aBuf);
+    // } else {
+    //     printf("%.*s\n", aBufLength, aBuf);
+    // }
 
     /* Tell OpenThread the sending of UART is done */
     otPlatUartSendDone();

@@ -12,8 +12,8 @@ RIOTBASE ?= $(CURDIR)/../..
 
 CFLAGS += -DDEVELHELP -Wall
 
-#Uncomment the following line for running OpenThread CLI
-CFLAGS += -DMODULE_OPENTHREAD_CLI
+#Uncomment the following line for running OpenThread NCP
+CFLAGS += -DMODULE_OPENTHREAD_NCP
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
@@ -21,10 +21,9 @@ QUIET ?= 1
 USEPKG += openthread
 USEMODULE += openthread_contrib
 USEMODULE += libopenthread
-USEMODULE += libopenthread-cli
+USEMODULE += libopenthread-ncp
 USEMODULE += libmbedcrypto
 USEMODULE+=xtimer
-
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))
   DRIVER := at86rf233
