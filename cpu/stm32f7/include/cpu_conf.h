@@ -23,8 +23,10 @@
 
 #include "cpu_conf_common.h"
 
-#ifdef CPU_MODEL_STM32F746ZG
+#if defined(CPU_MODEL_STM32F746ZG)
 #include "vendor/stm32f746xx.h"
+#elif defined(CPU_MODEL_STM32F769NI)
+#include "vendor/stm32f769xx.h"
 #endif
 
 #ifdef __cplusplus
@@ -36,7 +38,11 @@ extern "C" {
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
+#if defined(CPU_MODEL_STM32F746ZG)
 #define CPU_IRQ_NUMOF                   (98U)
+#elif defined(CPU_MODEL_STM32F769NI)
+#define CPU_IRQ_NUMOF                   (110U)
+#endif
 /** @} */
 
 #ifdef __cplusplus
