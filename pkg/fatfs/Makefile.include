@@ -12,6 +12,10 @@ ifneq (,$(filter fatfs_diskio_sdcard_spi,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_diskio/sdcard_spi
 endif
 
+ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
+    DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_vfs
+endif
+
 ifeq ($(shell uname -s),Darwin)
   CFLAGS += -Wno-empty-body
 endif

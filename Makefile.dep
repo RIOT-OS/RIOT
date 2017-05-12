@@ -668,6 +668,20 @@ ifneq (,$(filter ccn-lite,$(USEPKG)))
   USEMODULE += ccn-lite-utils
 endif
 
+ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
+    USEPKG += fatfs
+    USEMODULE += vfs
+
+    ifeq ($(BOARD),native)
+      USEMODULE += fatfs_diskio_native
+      FATFS_DISKIO_NATIVE_DEFAULT_FILE ?= \"riot_fatfs_disk.img\"
+    else
+      USEMODULE += fatfs_diskio_sdcard_spi
+      USEMODULE += auto_init_storage
+    endif
+
+endif
+
 # always select gpio (until explicit dependencies are sorted out)
 FEATURES_OPTIONAL += periph_gpio
 
