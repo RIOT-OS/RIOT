@@ -1,0 +1,6 @@
+/**
+ * @defgroup mbedtls mbedtls
+ * @ingroup pkg
+ * @brief   Feature rich crypto library for embedded devices. Developed by ARM. Formerly known as PolarSSL.
+ * @see     https://tls.mbed.org/
+ */

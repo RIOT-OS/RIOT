@@ -1,0 +1,25 @@
+From 9555f4783b87e82016854510b7c426f367c9c131 Mon Sep 17 00:00:00 2001
+From: Mathias Tausig <mathias.tausig@fh-campuswien.ac.at>
+Date: Mon, 17 Oct 2016 16:01:05 +0200
+Subject: [PATCH 2/3] Fixed old-style function definition
+
+---
+ library/version.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/library/version.c b/library/version.c
+index 6ca80d4..8fbd838 100644
+--- a/library/version.c
++++ b/library/version.c
+@@ -30,7 +30,7 @@
+ #include "mbedtls/version.h"
+ #include <string.h>
+ 
+-unsigned int mbedtls_version_get_number()
++unsigned int mbedtls_version_get_number(void)
+ {
+     return( MBEDTLS_VERSION_NUMBER );
+ }
+-- 
+2.7.4
+
