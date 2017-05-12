@@ -10,10 +10,31 @@
 
 #include "net/sock/udp.h"
 
-uint8_t buf[128];
-
 otUdpSocket mSocket;
 sock_udp_t sock;
+
+typedef struct 
+{
+    ipv6_addr_t ip_addr;
+    uint16_t port;
+    void *payload;
+    size_t len;
+} udp_pkt_t;
+
+void _handle_receive(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
+{
+    size_t payload_len = otMessageGetLength(aMessage)-otMessageGetOffset(aMessage);
+
+    char buf[100];
+    otMessageRead(aMessage, otMessageGetOffset(aMessage), buf, payload_len);
+
+    printf("Message: ");
+    for(int i=0;i<payload_len;i++)
+    {
+        printf("%02x ", buf[i]);
+    }
+    printf("\n");
+}
 
 static OT_JOB _set_panid(otInstance *ot_instance, void *data)
 {
@@ -49,20 +70,45 @@ static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *data)
     }
 }
 
-void _handle_receive(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
+static OT_JOB _create_udp_socket(otInstance *ot_instance, void *data)
 {
-    size_t payload_len = otMessageGetLength(aMessage)-otMessageGetOffset(aMessage);
+    otSockAddr sockaddr;
+    memset(&sockaddr, 0, sizeof(otSockAddr));
+    sockaddr.mPort = *((uint16_t*) data);
 
-    char buf[100];
-    otMessageRead(aMessage, otMessageGetOffset(aMessage), buf, payload_len);
-
-    printf("Message: ");
-    for(int i=0;i<payload_len;i++)
-    {
-        printf("%02x ", buf[i]);
-    }
-    printf("\n");
+    otUdpOpen(ot_instance, &mSocket, _handle_receive, NULL);
+    otUdpBind(&mSocket, &sockaddr);
 }
+
+static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
+{
+    udp_pkt_t *pkt = (udp_pkt_t*) data;
+    otMessage *message;
+
+
+    otUdpSocket socket;
+    memset(&socket, 0, sizeof(otUdpSocket));
+
+    otUdpOpen(ot_instance, &socket, _handle_receive, NULL);
+
+    message = otUdpNewMessage(ot_instance, true);
+    int error;
+    error = otMessageSetLength(message, pkt->len);
+    error = otMessageWrite(message, 0, pkt->payload, pkt->len);
+    (void) error;
+
+    otMessageInfo mPeer;
+    
+    //Set dest address
+    memcpy(&mPeer.mPeerAddr.mFields, &(pkt->ip_addr), sizeof(ipv6_addr_t));
+
+    //Set dest port
+    mPeer.mPeerPort = pkt->port;
+
+    otUdpSend(&socket, message, &mPeer);
+    otUdpClose(&socket);
+}
+
 
 int _udp(int argc, char **argv)
 {
@@ -72,25 +118,48 @@ int _udp(int argc, char **argv)
     }
     else if (strcmp(argv[1],"server")==0)
     {
-    	sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
-        local.port = atoi(argv[2]);
-        if (sock_udp_create(&sock, &local, NULL, 0) < 0) {
-        puts("Error creating UDP sock");
-        return 1;
-    }
+        uint16_t port=atoi(argv[2]);
+        ot_exec_job(_create_udp_socket, &port);
     }
     else if(argc >= 2 && strcmp(argv[1],"send")==0)
     {
-    /* send packet multicast*/
+        /* send packet */
+    udp_pkt_t pkt;
+    ipv6_addr_from_str(&pkt.ip_addr, argv[2]);
+    pkt.port = atoi(argv[3]);
+    pkt.payload = argv[4];
+    pkt.len = strlen(argv[4]);
+    ot_exec_job(_send_udp_pkt, &pkt);
+    }
+    else if (strcmp(argv[1],"server_1")==0)
+    {
+        sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
+        local.port = atoi(argv[2]);
+        if (sock_udp_create(&sock, &local, NULL, 0) < 0) {
+        puts("Error creating UDP sock");
+    }
+    }
+    else if(argc >= 2 && strcmp(argv[1],"send_1")==0)
+    {
     sock_udp_ep_t remote = { .family = AF_INET6 };
-    //ssize_t res;
-    remote.port = 12345;
-    ipv6_addr_set_all_nodes_multicast((ipv6_addr_t *)&remote.addr.ipv6,
-                                      IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
-    if (sock_udp_send(&sock, "Hello!", sizeof("Hello!"), &remote) < 0) {
+    remote.port = atoi(argv[3]);
+    ipv6_addr_from_str((ipv6_addr_t *)&remote.addr.ipv6, argv[2]);
+    if (sock_udp_send(&sock, argv[4], strlen(argv[4]), &remote) < 0) {
         puts("Error sending message");
         sock_udp_close(&sock);
         return 1;
+    }
+    }
+    else if(argc >= 2 && strcmp(argv[1],"echo")==0)
+    {
+    sock_udp_ep_t remote;
+    ssize_t res;
+
+    if ((res = sock_udp_recv(&sock, buf, sizeof(buf), SOCK_NO_TIMEOUT, &remote)) >= 0) {
+        puts("Received a message");
+        if (sock_udp_send(&sock, buf, res, &remote) < 0) {
+            puts("Error sending reply");
+        }
     }
     }
     return 0;
@@ -101,43 +170,42 @@ int _ifconfig(int argc, char **argv)
     uint16_t panid;
     if(argc >= 2)
     {
-	if(strcmp(argv[1], "get") == 0 && argc >= 3)
-	{
+    if(strcmp(argv[1], "get") == 0 && argc >= 3)
+    {
             if(strcmp(argv[2], "panid") == 0)
-	    {
-		ot_exec_job(_get_panid, &panid);
-	    }	    
-	}
-	else if(strcmp(argv[1], "set") == 0 && argc >= 4)
-	{
+        {
+        ot_exec_job(_get_panid, &panid);
+        }       
+    }
+    else if(strcmp(argv[1], "set") == 0 && argc >= 4)
+    {
             if(strcmp(argv[2], "panid") == 0)
-	    {
-		panid = strtol(argv[3], NULL, 0);
-		ot_exec_job(_set_panid, &panid);
-	    }	    
-	
-	}
-	else if(strcmp(argv[1], "thread") == 0)
-	{
-	    if(strcmp(argv[2], "start") == 0)
-	    {
-		ot_exec_job(_thread_start, NULL);
-	    }
-	    else if(strcmp(argv[2], "state") == 0)
+        {
+        panid = strtol(argv[3], NULL, 0);
+        ot_exec_job(_set_panid, &panid);
+        }       
+    
+    }
+    else if(strcmp(argv[1], "thread") == 0)
+    {
+        if(strcmp(argv[2], "start") == 0)
+        {
+        ot_exec_job(_thread_start, NULL);
+        }
+        else if(strcmp(argv[2], "state") == 0)
             {
-		uint8_t state;
-		ot_exec_job(_read_state, &state);
-	    }
-	}
-
-	else
-	{
-	    printf("Usage...");
-	}
+        uint8_t state;
+        ot_exec_job(_read_state, &state);
+        }
     }
     else
     {
-	ot_exec_job(_get_ip_addresses, NULL);
+        printf("Usage...");
+    }
+    }
+    else
+    {
+    ot_exec_job(_get_ip_addresses, NULL);
     }
     return 0;
 }
@@ -155,6 +223,9 @@ int main(void)
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
     openthread_uart_run();
 #else
+    uint16_t panid=0x1234;
+    ot_exec_job(_set_panid, &panid);
+    ot_exec_job(_thread_start, NULL);
     char line_buf[3 * SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 #endif

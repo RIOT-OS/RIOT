@@ -29,7 +29,7 @@
 #define ENABLE_DEBUG (1)
 #include "debug.h"
 
-otUdpSocket socket;
+static otUdpSocket msocket;
 
 typedef struct 
 {
@@ -85,26 +85,67 @@ static void _handle_receive(void *aContext, otMessage *aMessage, const otMessage
     printf("\n");
 }
 
+static OT_JOB _set_panid(otInstance *ot_instance, void *data)
+{
+    uint16_t panid = *((uint16_t*) data);
+    otLinkSetPanId(ot_instance, panid);
+}
+
+static OT_JOB _get_panid(otInstance *ot_instance, void *data)
+{
+    *((uint16_t*) data) = otLinkGetPanId(ot_instance);
+    printf("PanID: %04x\n", *((uint16_t*) data));
+}
+
+static OT_JOB _thread_start(otInstance *ot_instance, void *data)
+{
+    printf("Starting OpenThread\n");
+    otIp6SetEnabled(ot_instance, true);
+    otThreadSetEnabled(ot_instance, true);
+}
+
+static OT_JOB _read_state(otInstance *ot_instance, void *data)
+{
+    uint8_t state = otThreadGetDeviceRole(ot_instance);
+    printf("State is: %i\n", state);
+}
+
+static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *data)
+{
+    for(const otNetifAddress *addr=otIp6GetUnicastAddresses(ot_instance); addr; addr=addr->mNext)
+    {
+        char addrstr[IPV6_ADDR_MAX_STR_LEN];
+        printf("inet6 %s\n", ipv6_addr_to_str(addrstr, (ipv6_addr_t*) &addr->mAddress.mFields, sizeof(addrstr)));
+    }
+}
+
 static OT_JOB _create_udp_socket(otInstance *ot_instance, void *data)
 {
     otSockAddr sockaddr;
     memset(&sockaddr, 0, sizeof(otSockAddr));
     sockaddr.mPort = *((uint16_t*) data);
 
-    otUdpOpen(ot_instance, &socket, _handle_receive, NULL);
-    otUdpBind(&socket, &sockaddr);
+    otUdpOpen(ot_instance, &mSocket, _handle_receive, NULL);
+    otUdpBind(&mSocket, &sockaddr);
 }
 
 static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
 {
     udp_pkt_t *pkt = (udp_pkt_t*) data;
     otMessage *message;
-    message = otUdpNewMessage(ot_instance, true);
-    otMessageSetLength(message, pkt->len);
-    printf("%s\n", (uint8_t*) pkt->payload);
-    printf("%i\n", pkt->len);
-    otMessageWrite(message, 0, pkt->payload, pkt->len);
+
+
     otUdpSocket socket;
+    memset(&socket, 0, sizeof(otUdpSocket));
+
+    otUdpOpen(ot_instance, &socket, _handle_receive, NULL);
+
+    message = otUdpNewMessage(ot_instance, true);
+    int error;
+    error = otMessageSetLength(message, pkt->len);
+    error = otMessageWrite(message, 0, pkt->payload, pkt->len);
+    (void) error;
+
     otMessageInfo mPeer;
     
     //Set dest address
@@ -112,18 +153,14 @@ static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
 
     //Set dest port
     mPeer.mPeerPort = pkt->port;
-    printf("%p\n", message);
 
     otUdpSend(&socket, message, &mPeer);
-    puts("ASD");
-    printf("Pkt sent\n");
+    otUdpClose(&socket);
 }
 
 int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
                     const sock_udp_ep_t *remote, uint16_t flags)
 {
-    DEBUG("openthread: sock_udp_create\n");
-
     uint16_t socket_port;
 
     assert(sock);
@@ -160,10 +197,14 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
     socket_port = local->port;
 
     if (local != NULL) {
+        printf("Socket port %d \n", socket_port);
         ot_exec_job(_create_udp_socket, &(socket_port));
     }
+    else
+    {
+        printf("Null local\n");
+    }
     sock->flags = flags;
-    return 0;
 
     return 0;
 }
@@ -261,14 +302,12 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
 
     remote = (struct _sock_tl_ep *) remote;
 
-    ipv6_addr_t * remote_addr = NULL;
-    memcpy(remote_addr, &remote->addr, sizeof(remote->addr));
-
     /* build packet and send */
-    pkt.ip_addr = *remote_addr;
+    memcpy(&pkt.ip_addr, &remote->addr, sizeof(remote->addr));
     pkt.port = dst_port;
-    pkt.payload = (void*) data;
+    pkt.payload = (void *) data;
     pkt.len = len;
+
     ot_exec_job(_send_udp_pkt, &pkt);
 
     return 0;
