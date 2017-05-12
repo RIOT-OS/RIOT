@@ -29,15 +29,20 @@
 #define ENABLE_DEBUG (1)
 #include "debug.h"
 
-static otUdpSocket msocket;
-
-typedef struct 
+static void _handle_receive(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
 {
-    ipv6_addr_t ip_addr;
-    uint16_t port;
-    void *payload;
-    size_t len;
-} udp_pkt_t;
+    size_t payload_len = otMessageGetLength(aMessage)-otMessageGetOffset(aMessage);
+
+    char buf[100];
+    otMessageRead(aMessage, otMessageGetOffset(aMessage), buf, payload_len);
+
+    printf("Message: ");
+    for(int i=0;i<payload_len;i++)
+    {
+        printf("%02x ", buf[i]);
+    }
+    printf("\n");
+}
 
 /**
  * @brief   Internal helper functions for OPENTHREAD
@@ -69,22 +74,7 @@ static inline bool openthread_ep_addr_any(const sock_ip_ep_t *ep)
     }
     return true;
 }
-
-static void _handle_receive(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
-{
-    size_t payload_len = otMessageGetLength(aMessage)-otMessageGetOffset(aMessage);
-
-    char buf[100];
-    otMessageRead(aMessage, otMessageGetOffset(aMessage), buf, payload_len);
-
-    printf("Message: ");
-    for(int i=0;i<payload_len;i++)
-    {
-        printf("%02x ", buf[i]);
-    }
-    printf("\n");
-}
-
+/*
 static OT_JOB _set_panid(otInstance *ot_instance, void *data)
 {
     uint16_t panid = *((uint16_t*) data);
@@ -118,27 +108,23 @@ static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *data)
         printf("inet6 %s\n", ipv6_addr_to_str(addrstr, (ipv6_addr_t*) &addr->mAddress.mFields, sizeof(addrstr)));
     }
 }
-
+*/
 static OT_JOB _create_udp_socket(otInstance *ot_instance, void *data)
 {
+    sock_udp_t *sock = (sock_udp_t*) data;
     otSockAddr sockaddr;
     memset(&sockaddr, 0, sizeof(otSockAddr));
-    sockaddr.mPort = *((uint16_t*) data);
+    sockaddr.mPort = *((uint16_t*) &(sock->local.port));
 
-    otUdpOpen(ot_instance, &mSocket, _handle_receive, NULL);
-    otUdpBind(&mSocket, &sockaddr);
+    otUdpOpen(ot_instance, &sock->ot_udp_socket, _handle_receive, NULL);
+    otUdpBind(&sock->ot_udp_socket, &sockaddr);
 }
 
 static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
 {
-    udp_pkt_t *pkt = (udp_pkt_t*) data;
+    sock_udp_t *sock = (sock_udp_t*) data;
+    udp_pkt_t *pkt = (udp_pkt_t*) &(sock->pkt);
     otMessage *message;
-
-
-    otUdpSocket socket;
-    memset(&socket, 0, sizeof(otUdpSocket));
-
-    otUdpOpen(ot_instance, &socket, _handle_receive, NULL);
 
     message = otUdpNewMessage(ot_instance, true);
     int error;
@@ -154,8 +140,8 @@ static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
     //Set dest port
     mPeer.mPeerPort = pkt->port;
 
-    otUdpSend(&socket, message, &mPeer);
-    otUdpClose(&socket);
+    otUdpSend(&sock->ot_udp_socket, message, &mPeer);
+    otUdpClose(&sock->ot_udp_socket);
 }
 
 int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
@@ -193,16 +179,18 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         }
         memcpy(&sock->remote, remote, sizeof(sock_udp_ep_t));
     }
-    
+
+    memset(&sock->ot_udp_socket, 0, sizeof(otUdpSocket));
+
     socket_port = local->port;
 
     if (local != NULL) {
-        printf("Socket port %d \n", socket_port);
-        ot_exec_job(_create_udp_socket, &(socket_port));
+        DEBUG("Socket port %d \n", socket_port);
+        ot_exec_job(_create_udp_socket, sock);
     }
     else
     {
-        printf("Null local\n");
+        DEBUG("Null local\n");
     }
     sock->flags = flags;
 
@@ -211,16 +199,30 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
 
 void sock_udp_close(sock_udp_t *sock)
 {
-
+    assert(sock != NULL);
+    if (sock->ot_udp_socket.mTransport != NULL) {
+        otUdpClose(&sock->ot_udp_socket);
+        memset(&sock->ot_udp_socket, 0, sizeof(otUdpSocket));
+    }
 }
 
-int sock_udp_get_local(sock_udp_t *sock, sock_udp_ep_t *ep)
+int sock_udp_get_local(sock_udp_t *sock, sock_udp_ep_t *local)
 {
+    assert(sock && local);
+    if (sock->local.family == AF_UNSPEC) {
+        return -EADDRNOTAVAIL;
+    }
+    memcpy(local, &sock->local, sizeof(sock_udp_ep_t));
     return 0;
 }
 
-int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep)
+int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *remote)
 {
+    assert(sock && remote);
+    if (sock->remote.family == AF_UNSPEC) {
+        return -ENOTCONN;
+    }
+    memcpy(remote, &sock->remote, sizeof(sock_udp_ep_t));
     return 0;
 }
 
@@ -267,7 +269,7 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     /* cppcheck-suppress nullPointer */
     if ((sock == NULL) || (sock->local.family == AF_UNSPEC)) {
         /* no sock or sock currently unbound */
-        if (sock != NULL) {
+        if ((sock != NULL)) {
             /* bind sock object implicitly */
             sock->local.port = src_port;
             if (remote == NULL) {
@@ -276,7 +278,7 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
             else {
                 sock->local.family = remote->family;
             }
-            ot_exec_job(_create_udp_socket, &(src_port));
+            ot_exec_job(_create_udp_socket, sock);
         }
     }
     else {
@@ -300,6 +302,10 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
         return -EINVAL;
     }
 
+    /* openthread socket must have been opened*/
+    if(sock->ot_udp_socket.mTransport == NULL)
+        return -EINVAL;
+
     remote = (struct _sock_tl_ep *) remote;
 
     /* build packet and send */
@@ -308,7 +314,9 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     pkt.payload = (void *) data;
     pkt.len = len;
 
-    ot_exec_job(_send_udp_pkt, &pkt);
+    memcpy(&sock->pkt, &pkt, sizeof(pkt));
+
+    ot_exec_job(_send_udp_pkt, sock);
 
     return 0;
 }

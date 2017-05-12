@@ -13,14 +13,6 @@
 otUdpSocket mSocket;
 sock_udp_t sock;
 
-typedef struct 
-{
-    ipv6_addr_t ip_addr;
-    uint16_t port;
-    void *payload;
-    size_t len;
-} udp_pkt_t;
-
 void _handle_receive(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
 {
     size_t payload_len = otMessageGetLength(aMessage)-otMessageGetOffset(aMessage);
@@ -152,15 +144,6 @@ int _udp(int argc, char **argv)
     }
     else if(argc >= 2 && strcmp(argv[1],"echo")==0)
     {
-    sock_udp_ep_t remote;
-    ssize_t res;
-
-    if ((res = sock_udp_recv(&sock, buf, sizeof(buf), SOCK_NO_TIMEOUT, &remote)) >= 0) {
-        puts("Received a message");
-        if (sock_udp_send(&sock, buf, res, &remote) < 0) {
-            puts("Error sending reply");
-        }
-    }
     }
     return 0;
 }
