@@ -13,8 +13,7 @@
  * @{
  *
  * @file
- * @brief       Board specific implementations for the arduino Uno
- * @brief       and Duemilanove boards.
+ * @brief       Common implementations for Arduino Atmega boards
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

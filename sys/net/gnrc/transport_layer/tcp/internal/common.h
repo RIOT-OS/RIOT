@@ -9,12 +9,12 @@
 /**
  * @defgroup    net_gnrc_tcp TCP
  * @ingroup     net_gnrc
- * @brief       RIOT's tcp implementation for the gnrc stack
+ * @brief       RIOT's TCP implementation for the GNRC network stack.
  *
  * @{
  *
  * @file
- * @brief       Internally used common defines, macros and variable declaration
+ * @brief       Internally used defines, macros and variable declarations.
  *
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
@@ -23,6 +23,7 @@
 #define GNRC_TCP_INTERNAL_COMMON_H
 
 #include <stdint.h>
+#include "assert.h"
 #include "kernel_types.h"
 #include "thread.h"
 #include "mutex.h"
@@ -34,22 +35,23 @@ extern "C" {
 #endif
 
 /**
- * @brief Port unspecified.
+ * @brief Port number unspecified.
  *
- * @note PORT 0 is unspecified (@see https://www.ietf.org/rfc/rfc1700.txt)
+ * @see https://www.ietf.org/rfc/rfc1700.txt
  */
 #define PORT_UNSPEC (0)
 
 /**
- * @brief Status Flags for TCP
+ * @brief TCB status flags
  * @{
  */
 #define STATUS_PASSIVE        (1 << 0)
 #define STATUS_ALLOW_ANY_ADDR (1 << 1)
+#define STATUS_NOTIFY_USER    (1 << 2)
 /** @} */
 
 /**
- * @brief Defines for gnrc tcps "eventloop" thread
+ * @brief Defines for "eventloop" thread settings.
  * @{
  */
 #define TCP_EVENTLOOP_MSG_QUEUE_SIZE (8U)
@@ -58,7 +60,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Bitmasks for control bit handling
+ * @brief Bitmasks for control bit field handling.
  * @{
  */
 #define MSK_FIN         (0x0001)
@@ -77,7 +79,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Type field values for TCP internal Message Passing.
+ * @brief Message types for GNRC TCPs internal message passing.
  * @{
  */
 #define MSG_TYPE_CONNECTION_TIMEOUT (GNRC_NETAPI_MSG_TYPE_ACK + 101)
@@ -89,13 +91,13 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Macro to mark is the time measurement is uninitialized
+ * @brief Define for marking that time measurement is uninitialized.
  */
 #define RTO_UNINITIALIZED (-1)
 
 /**
  * @brief Overflow tolerant comparision operators for sequence and
-          acknowledgement number comparision
+          acknowledgement number comparison.
  * @{
  */
 #define LSS_32_BIT(x, y) (((int32_t) (x)) - ((int32_t) (y)) <  0)
@@ -105,27 +107,27 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Check if a given sequence number, falls into the a receive window
+ * @brief Check if a given sequence number falls into receive window.
  */
 #define INSIDE_WND(l_ed, seq_num, r_ed) (LEQ_32_BIT(l_ed, seq_num) && LSS_32_BIT(seq_num, r_ed))
 
 /**
- * @brief Extract offset value from "offctl"-header field.
+ * @brief Extract offset value from "offctl" field in TCP header.
  */
 #define GET_OFFSET( x ) (((x) & MSK_OFFSET) >> 12)
 
 /**
- * @brief PID of tcp event handling thread
+ * @brief PID of GNRC TCP event handling thread
  */
 extern kernel_pid_t gnrc_tcp_pid;
 
 /**
- * @brief Head of linked tcb list.
+ * @brief Head of linked TCB list.
  */
 extern gnrc_tcp_tcb_t *_list_tcb_head;
 
 /**
- * @brief Mutex to protect linked list.
+ * @brief Mutex to protect TCB list.
  */
 extern mutex_t _list_tcb_lock;
 

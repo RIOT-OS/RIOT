@@ -214,6 +214,7 @@ static void test_mtd_write_read(void)
     TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
 }
 
+#ifdef MTD_0
 static void test_mtd_write_read_flash(void)
 {
     const uint8_t buf1[] = {0xee, 0xdd, 0xcc};
@@ -236,6 +237,7 @@ static void test_mtd_write_read_flash(void)
     TEST_ASSERT_EQUAL_INT(0, memcmp(buf_expected, buf_read, sizeof(buf_expected)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(buf_empty, buf_read + sizeof(buf_expected), sizeof(buf_empty)));
 }
+#endif
 
 #if MODULE_VFS
 static void test_mtd_vfs(void)
@@ -273,7 +275,9 @@ Test *tests_mtd_tests(void)
         new_TestFixture(test_mtd_erase),
         new_TestFixture(test_mtd_write_erase),
         new_TestFixture(test_mtd_write_read),
+#ifdef MTD_0
         new_TestFixture(test_mtd_write_read_flash),
+#endif
 #if MODULE_VFS
         new_TestFixture(test_mtd_vfs),
 #endif

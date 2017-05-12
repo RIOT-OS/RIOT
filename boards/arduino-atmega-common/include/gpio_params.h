@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup   boards_arduino-atmega-common
+ * @ingroup     boards_arduino-atmega-common
  * @{
  *
  * @file
- * @brief     Board specific configuration of direct mapped GPIOs
+ * @brief       Common configuration of mapped GPIOs for Arduino Atmega boards
  *
- * @author    Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef GPIO_PARAMS_H

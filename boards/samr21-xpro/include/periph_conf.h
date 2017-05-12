@@ -240,6 +240,33 @@ static const spi_conf_t spi_config[] = {
 #define RTT_RUNSTDBY        (1)         /* Keep RTT running in sleep states */
 /** @} */
 
+/**
+ * @name ADC Configuration
+ * @{
+ */
+#define ADC_0_EN                           1
+#define ADC_MAX_CHANNELS                   14
+/* ADC 0 device configuration */
+#define ADC_0_DEV                          ADC
+#define ADC_0_IRQ                          ADC_IRQn
+
+/* ADC 0 Default values */
+#define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
+#define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV512
+
+#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_GND
+#define ADC_0_GAIN_FACTOR_DEFAULT          ADC_INPUTCTRL_GAIN_1X
+#define ADC_0_REF_DEFAULT                  ADC_REFCTRL_REFSEL_INT1V
+
+static const adc_conf_chan_t adc_channels[] = {
+    /* port, pin, muxpos */
+    {GPIO_PIN(PA, 6), ADC_INPUTCTRL_MUXPOS_PIN6},      /* EXT1, pin 3 */
+    {GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS_PIN7},      /* EXT1, pin 4 */
+};
+
+#define ADC_0_CHANNELS                     (2U)
+#define ADC_NUMOF                          ADC_0_CHANNELS
+/** @} */
 #ifdef __cplusplus
 }
 #endif

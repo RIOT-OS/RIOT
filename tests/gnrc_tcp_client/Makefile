@@ -6,9 +6,9 @@ include ../Makefile.tests_common
 BOARD ?= native
 PORT ?= tap1
 
-TCP_TARGET_ADDR ?= fe80::5c38:e9ff:fe76:6195
+TCP_TARGET_ADDR ?= fe80::affe
 TCP_TARGET_PORT ?= 80
-TCP_TEST_CYCLES ?= 10
+TCP_TEST_CYCLES ?= 3
 
 # Mark Boards with insufficient memory
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \

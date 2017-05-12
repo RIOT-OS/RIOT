@@ -9,12 +9,12 @@
 /**
  * @defgroup    net_gnrc_tcp TCP
  * @ingroup     net_gnrc
- * @brief       RIOT's tcp implementation for the gnrc stack
+ * @brief       RIOT's TCP implementation for the GNRC network stack.
  *
  * @{
  *
  * @file
- * @brief       TCP event loop delarations
+ * @brief       TCP event loop delarations.
  *
 * @author       Simon Brummer <simon.brummer@posteo.de>
  */
@@ -27,11 +27,11 @@ extern "C" {
 #endif
 
 /**
- * @brief TCP's mein processing thread.
+ * @brief GNRC TCPs main processing thread.
  *
- * @param[in] arg   arguments, unused
+ * @param[in] arg   Thread arguments (unused).
  *
- * @return   Never returns, its an endless loop
+ * @returns   Never, its an endless loop
  */
 void *_event_loop(__attribute__((unused)) void *arg);
 

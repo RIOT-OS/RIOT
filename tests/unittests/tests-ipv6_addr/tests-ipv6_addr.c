@@ -896,6 +896,21 @@ static void test_ipv6_addr_from_str__one_colon_start(void)
     TEST_ASSERT_NULL(ipv6_addr_from_str(&result, ":ff::1"));
 }
 
+#define CANARY_DATA     0xc2, 0x8c, 0x36, 0x26, 0x24, 0x16, 0xd1, 0xd6
+
+static void test_ipv6_addr_from_str__overflow(void)
+{
+    uint8_t result[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                         CANARY_DATA };
+    static const uint8_t canary_exp[] = { CANARY_DATA };
+    ipv6_addr_t *addr = (ipv6_addr_t *)&result[0];
+    uint8_t *canary = &result[sizeof(ipv6_addr_t)];
+
+    TEST_ASSERT_NULL(ipv6_addr_from_str(addr, "::A:A:A:A:A:A:A:A:A:A"));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(canary, canary_exp, sizeof(canary_exp)));
+}
+
 static void test_ipv6_addr_from_str__three_colons(void)
 {
     ipv6_addr_t result;
@@ -1086,6 +1101,7 @@ Test *tests_ipv6_addr_tests(void)
         new_TestFixture(test_ipv6_addr_to_str__success4),
         new_TestFixture(test_ipv6_addr_to_str__success5),
         new_TestFixture(test_ipv6_addr_from_str__one_colon_start),
+        new_TestFixture(test_ipv6_addr_from_str__overflow),
         new_TestFixture(test_ipv6_addr_from_str__three_colons),
         new_TestFixture(test_ipv6_addr_from_str__string_too_long),
         new_TestFixture(test_ipv6_addr_from_str__illegal_chars),

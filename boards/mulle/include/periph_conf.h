@@ -118,8 +118,11 @@ static const uart_conf_t uart_config[] = {
         .irqn   = UART1_RX_TX_IRQn,
     },
 };
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 
+#define UART_0_ISR          (isr_uart0_rx_tx)
+#define UART_1_ISR          (isr_uart1_rx_tx)
+
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**

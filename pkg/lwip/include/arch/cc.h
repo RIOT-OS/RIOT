@@ -44,23 +44,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Generic types for lwIP
- * @{
- */
-typedef uint8_t u8_t;                   /**< unsigned 8-bit type */
-typedef int8_t  s8_t;                   /**< signed 8-bit type */
-typedef uint16_t u16_t;                 /**< unsigned 16-bit type */
-typedef int16_t  s16_t;                 /**< signed 16-bit type */
-typedef uint32_t u32_t;                 /**< unsigned 32-bit type */
-typedef int32_t  s32_t;                 /**< signed 32-bit type */
-
-typedef unsigned long mem_ptr_t;        /**< A generic pointer type. It has to be an integer type
-                                         *   (not void*, due to some pointer arithmetics). */
-/**
- * @}
- */
-
-/**
  * @brief   (sn)printf formatters for the generic lwIP types
  * @{
  */
