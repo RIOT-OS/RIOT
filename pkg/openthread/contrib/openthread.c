@@ -31,6 +31,7 @@
 
 #include "openthread/platform/alarm.h"
 #include "openthread/platform/uart.h"
+#include "openthread/platform/misc.h"
 
 
 #include "xtimer.h"
@@ -74,6 +75,12 @@ void otTaskletsSignalPending(otInstance *aInstance)
 void otPlatReset(otInstance *aInstance)
 {
     (void)aInstance;
+}
+
+otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
+{
+    (void)aInstance;
+    return kPlatResetReason_PowerOn;
 }
 
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
