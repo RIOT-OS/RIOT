@@ -40,6 +40,9 @@
 #ifdef MODULE_IPV6_ADDR
 #include "net/ipv6/addr.h"
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
+#ifdef MODULE_GNRC_IPV6_NC
+#include "net/gnrc/ipv6/nc.h"
+#endif
 #endif
 
 #ifdef MODULE_IPV6_ADDR
@@ -408,6 +411,22 @@ int fib_add_entry(fib_table_t *table,
     else {
         ret = fib_create_entry(table, iface_id, dst, dst_size, dst_flags,
                                next_hop, next_hop_size, next_hop_flags, lifetime);
+
+#ifdef MODULE_GNRC_IPV6_NC
+/**
+ * @brief we add a nc entry if we could add the next-hop to the FIB
+ *        and the next-hop address is a LL IPv6 address
+ */
+        if ((ret == 0) && (next_hop_size == sizeof(ipv6_addr_t))) {
+            ipv6_addr_t *addr_ipv6 = (ipv6_addr_t *)next_hop;
+            if (ipv6_addr_is_link_local(addr_ipv6)
+                && gnrc_ipv6_nc_add(iface_id, addr_ipv6, &addr_ipv6->u8[8],
+                                    GNRC_IPV6_NC_L2_ADDR_MAX, 0) == NULL) {
+                   DEBUG("[FIB add to NC] error: unable to add address to neighbor cache.");
+            }
+        }
+#endif
+
     }
 
     mutex_unlock(&(table->mtx_access));
