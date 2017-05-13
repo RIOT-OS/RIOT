@@ -126,10 +126,10 @@ int udp_cmd(int argc, char **argv)
             return 1;
         }
         if (argc > 5) {
-            num = (uint32_t)atoi(argv[5]);
+            num = atoi(argv[5]);
         }
         if (argc > 6) {
-            delay = (uint32_t)atoi(argv[6]);
+            delay = atoi(argv[6]);
         }
         return udp_send(argv[2], argv[3], argv[4], num, delay);
     }

@@ -183,7 +183,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    modclk = (uint32_t)atoi(argv[1]);
+    modclk = atoi(argv[1]);
     if (modclk == 0) {
         printf("error: invalid input value\n");
         return 1;

@@ -44,7 +44,7 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
         return;
     }
     /* parse port */
-    port = (uint16_t)atoi(port_str);
+    port = atoi(port_str);
     if (port == 0) {
         puts("Error: unable to parse destination port");
         return;
@@ -100,7 +100,7 @@ static void start_server(char *port_str)
         return;
     }
     /* parse port */
-    port = (uint16_t)atoi(port_str);
+    port = atoi(port_str);
     if (port == 0) {
         puts("Error: invalid port specified");
         return;
@@ -141,10 +141,10 @@ int udp_cmd(int argc, char **argv)
             return 1;
         }
         if (argc > 5) {
-            num = (uint32_t)atoi(argv[5]);
+            num = atoi(argv[5]);
         }
         if (argc > 6) {
-            delay = (uint32_t)atoi(argv[6]);
+            delay = atoi(argv[6]);
         }
         send(argv[2], argv[3], argv[4], num, delay);
     }
