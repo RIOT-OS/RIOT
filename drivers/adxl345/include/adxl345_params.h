@@ -57,7 +57,9 @@ extern "C" {
 #define ADXL345_PARAM_SCALE_FACTOR  (3.9)
 #endif
 #ifndef ADXL345_PARAMS
-#define ADXL345_PARAMS              { .offset = ADXL345_PARAM_OFFSET,    \
+#define ADXL345_PARAMS              { .i2c    = ADXL345_PARAM_I2C,       \
+                                      .addr   = ADXL345_PARAM_ADDR,      \
+                                      .offset = ADXL345_PARAM_OFFSET,    \
                                       .range  = ADXL345_PARAM_RANGE,     \
                                       .rate   = ADXL345_PARAM_RATE,      \
                                       .full_res = ADXL345_PARAM_FULL_RES }

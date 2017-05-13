@@ -40,20 +40,20 @@ enum {
  * @brief   List ADXL345 power mode
  */
 enum {
-    ADXL345_MEASURE_MODE,
-    ADXL345_STANDBY_MODE,
-    ADXL345_SLEEP_MODE,
-    ADXL345_AUTOSLEEP_MODE,
+    ADXL345_MEASURE_MODE,       /**< Measure mode */
+    ADXL345_STANDBY_MODE,       /**< Standby mode */
+    ADXL345_SLEEP_MODE,         /**< Sleep mode */
+    ADXL345_AUTOSLEEP_MODE,     /**< Autosleep mode */
 };
 
 /**
  * @brief   Define ADXL345 sensitivity
  */
 enum {
-    ADXL345_RANGE_2G    = 1,     /**< +/- 2 g Full Scale Rang */
-    ADXL345_RANGE_4G    = 2,     /**< +/- 4 g Full Scale Rang */
-    ADXL345_RANGE_8G    = 4,     /**< +/- 8 g Full Scale Rang */
-    ADXL345_RANGE_16G   = 8      /**< +/- 16 g Full Scale Rang */
+    ADXL345_RANGE_2G    = 1,     /**< +/- 2 g Full Scale Range */
+    ADXL345_RANGE_4G    = 2,     /**< +/- 4 g Full Scale Range */
+    ADXL345_RANGE_8G    = 4,     /**< +/- 8 g Full Scale Range */
+    ADXL345_RANGE_16G   = 8      /**< +/- 16 g Full Scale Range */
 };
 
 /**
@@ -140,6 +140,8 @@ typedef struct {
  * @brief   Configuration struct for the ADXL345 sensor
  */
 typedef struct {
+    i2c_t i2c;                /**< I2C device which is used */
+    uint8_t addr;             /**< I2C address */
     gpio_t int1;              /**< accelerometer int1 pin */
     gpio_t int2;              /**< accelerometer int2 pin */
     uint8_t offset[3];        /**< offset axis */
@@ -152,8 +154,6 @@ typedef struct {
  * @brief   Device descriptor for the ADXL345 sensor
  */
 typedef struct {
-    i2c_t i2c;                      /**< I2C device which is used */
-    uint8_t addr;                   /**< I2C address */
     adxl345_params_t *params;       /**< Device configuration */
     adxl345_interrupt_t interrupt;  /**< Interrupts configuration  */
     float scale_factor;             /**< Scale factor for converting value to mg */
