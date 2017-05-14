@@ -102,7 +102,9 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
-    gpio_init(spi_config[bus].miso_pin, GPIO_IN);
+    /* enabling the pull-down for the MISO pin saves (significant) energy -> see
+     * [issue #5868](https://github.com/RIOT-OS/RIOT/pull/5868) */
+    gpio_init(spi_config[bus].miso_pin, GPIO_IN_PD);
     gpio_init(spi_config[bus].mosi_pin, GPIO_OUT);
     gpio_init(spi_config[bus].clk_pin, GPIO_OUT);
     gpio_init_mux(spi_config[bus].miso_pin, spi_config[bus].miso_mux);
