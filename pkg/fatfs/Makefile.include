@@ -1,6 +1,8 @@
 INCLUDES += -I$(PKGDIRBASE)
-INCLUDES += -I$(RIOTPKG)/fatfs/fatfs_diskio/include
+INCLUDES += -I$(RIOTPKG)/fatfs/fatfs_diskio/common/include
 DIRS += $(PKGDIRBASE)/fatfs
+
+DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_diskio/common
 
 ifneq (,$(filter fatfs_diskio_native,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_diskio/native

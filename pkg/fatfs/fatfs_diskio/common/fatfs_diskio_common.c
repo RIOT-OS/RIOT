@@ -21,13 +21,11 @@
 
 #include "fatfs/diskio.h" /* FatFs lower layer API */
 #include "fatfs_diskio_common.h"
+#include "time.h"
+#include "stdint.h"
 
-#ifdef FATFS_RTC_AVAILABLE
-#define FATFS_DISKIO_FATTIME_YEAR_OFFS 25
-#define FATFS_DISKIO_FATTIME_MON_OFFS  21
-#define FATFS_DISKIO_FATTIME_DAY_OFFS  16
-#define FATFS_DISKIO_FATTIME_HH_OFFS   11
-#define FATFS_DISKIO_FATTIME_MM_OFFS   5
+#if FATFS_FFCONF_OPT_FS_NORTC == 0
+#include "periph/rtc.h"
 
 DWORD get_fattime(void)
 {

@@ -24,24 +24,18 @@ extern "C" {
 
 #include "fatfs/diskio.h" /* FatFs lower layer API */
 
-#define CTRL_SYNC        0 /* Complete pending write process
-                              (needed when _FS_READONLY == 0) */
+#define RTC_YEAR_OFFSET   (1900)
+#define FATFS_YEAR_OFFSET (1980)
 
-#define GET_SECTOR_COUNT 1 /* (needed when _USE_MKFS == 1) */
+#define FIXED_BLOCK_SIZE (512)
 
-#define GET_SECTOR_SIZE  2 /* (needed when _MAX_SS > 512 ) */
+#define FATFS_DISKIO_DSTASTUS_OK (0)
 
-#define GET_BLOCK_SIZE   3 /* erase block size (needed when _USE_MKFS == 1) */
-
-#define CTRL_TRIM        4 /* Inform device about no longer needed data blocks
-                              (needed when _USE_TRIM == 1) */
-
-#define RTC_YEAR_OFFSET   1900
-#define FATFS_YEAR_OFFSET 1980
-
-#define FIXED_BLOCK_SIZE 512
-
-#define FATFS_DISKIO_DSTASTUS_OK 0
+#define FATFS_DISKIO_FATTIME_YEAR_OFFS (25)
+#define FATFS_DISKIO_FATTIME_MON_OFFS  (21)
+#define FATFS_DISKIO_FATTIME_DAY_OFFS  (16)
+#define FATFS_DISKIO_FATTIME_HH_OFFS   (11)
+#define FATFS_DISKIO_FATTIME_MM_OFFS   (5)
 
 #ifdef __cplusplus
 }

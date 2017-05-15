@@ -18,9 +18,10 @@
  * @}
  */
 
-#ifdef FATFS_RTC_AVAILABLE
+#if FATFS_FFCONF_OPT_FS_NORTC == 0
 #include "periph/rtc.h"
 #endif
+#include "fatfs_diskio_common.h"
 #include "fatfs/ff.h"
 #include "shell.h"
 #include <string.h>
@@ -29,7 +30,6 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-#define TEST_FATFS_RTC_YEAR_OFFSET   1900
 #define TEST_FATFS_READ_BUFFER_SIZE 64
 #define TEST_FATFS_MAX_LBL_SIZE 64
 #define TEST_FATFS_MAX_VOL_STR_LEN 8
@@ -350,7 +350,7 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    #ifdef FATFS_RTC_AVAILABLE
+    #if FATFS_FFCONF_OPT_FS_NORTC == 0
     /* the rtc is used in diskio.c for timestamps of files */
     puts("Initializing the RTC driver");
     rtc_poweron();
@@ -366,7 +366,7 @@ int main(void)
 
     printf("Setting RTC to %04d-%02d-%02d %02d:%02d:%02d\n",
            time.tm_year + RTC_YEAR_OFFSET,
-           time.tm_mon + RTC_MON_OFFSET,
+           time.tm_mon + TEST_FATFS_RTC_MON_OFFSET,
            time.tm_mday,
            time.tm_hour,
            time.tm_min,
