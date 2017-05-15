@@ -42,7 +42,6 @@ static msg_t _queue[OPENTHREAD_QUEUE_LEN];
 static kernel_pid_t _pid;
 static otInstance *sInstance;
 
-
 void ot_exec_job(OT_JOB (*job)(otInstance*, void*), void *data)
 {
     ot_job_t _job;    
@@ -61,7 +60,7 @@ otInstance *ot_get_instance(void)
 /* OpenThread will call this when switching state from empty tasklet to non-empty tasklet. */
 void otSignalTaskletPending(otInstance *aInstance)
 {
-    //Unused
+    /* Unused */
 }
 
 void *_openthread_event_loop(void *arg)
@@ -132,32 +131,31 @@ void *_openthread_event_loop(void *arg)
 
 void _event_cb(netdev_t *dev, netdev_event_t event)
 {
-    if (event == NETDEV_EVENT_ISR) {
-        assert(_pid != KERNEL_PID_UNDEF);
-        msg_t msg;
+	msg_t msg;
+	switch (event) {
+		case NETDEV_EVENT_ISR:
+			assert(_pid != KERNEL_PID_UNDEF);
 
-        msg.type = OPENTHREAD_NETDEV_MSG_TYPE_EVENT;
-        msg.content.ptr = dev;
+			msg.type = OPENTHREAD_NETDEV_MSG_TYPE_EVENT;
+			msg.content.ptr = dev;
 
-        if (msg_send(&msg, _pid) <= 0) {
-            DEBUG("openthread_netdev: possibly lost interrupt.\n");
-        }
-    }
-    else {
-        switch (event) {
-            case NETDEV_EVENT_RX_COMPLETE:
-                DEBUG("openthread_netdev: Reception of a packet\n");
-                recv_pkt(sInstance, dev);
-                break;
-            case NETDEV_EVENT_TX_COMPLETE:
-            case NETDEV_EVENT_TX_NOACK:
-            case NETDEV_EVENT_TX_MEDIUM_BUSY:
-                DEBUG("openthread_netdev: Transmission of a packet\n");
-                send_pkt(sInstance, dev, event);
-                break;
-            default:
-                break;
-        }
+			if (msg_send(&msg, _pid) <= 0) {
+				DEBUG("openthread_netdev: possibly lost interrupt.\n");
+			}
+			break;
+
+		case NETDEV_EVENT_RX_COMPLETE:
+			DEBUG("openthread_netdev: Reception of a packet\n");
+			recv_pkt(sInstance, dev);
+			break;
+		case NETDEV_EVENT_TX_COMPLETE:
+		case NETDEV_EVENT_TX_NOACK:
+		case NETDEV_EVENT_TX_MEDIUM_BUSY:
+			DEBUG("openthread_netdev: Transmission of a packet\n");
+			send_pkt(sInstance, dev, event);
+			break;
+		default:
+			break;
     }
 }
 

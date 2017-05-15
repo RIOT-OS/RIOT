@@ -20,7 +20,6 @@ QUIET ?= 1
 
 USEMODULE+=openthread
 
-
 ifneq (,$(filter samr21-xpro,$(BOARD)))
   DRIVER := at86rf233
 endif

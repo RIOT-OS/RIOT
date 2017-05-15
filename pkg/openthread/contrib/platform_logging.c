@@ -19,17 +19,15 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-#include <sys/time.h>
 #include <time.h>
 
-#include <openthread/platform/logging.h>
+#include "openthread/platform/logging.h"
 
 /* adapted from OpenThread posix example:
  * See: https://github.com/openthread/openthread/blob/master/examples/platforms/posix/logging.c */
 void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
 {
     va_list args;
-
 
     switch (aLogLevel) {
         case kLogLevelNone:

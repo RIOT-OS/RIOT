@@ -13,21 +13,21 @@
  * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
 
-#include <stdio.h>
 #include <assert.h>
-#include <openthread/platform/radio.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "byteorder.h"
+#include "errno.h"
+#include "net/ethernet/hdr.h"
+#include "net/ethertype.h"
+#include "net/ieee802154.h"
+#include "net/netdev/ieee802154.h"
+#include "openthread/platform/radio.h"
 #include "ot.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-
-#include "errno.h"
-#include "net/ethernet/hdr.h"
-#include "net/ethertype.h"
-#include "byteorder.h"
-#include "net/netdev/ieee802154.h"
-#include "net/ieee802154.h"
-#include <string.h>
 
 static bool sDisabled;
 
@@ -138,7 +138,6 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev)
     sReceiveFrame.mLength = len;
     sReceiveFrame.mPower = _get_power();
 
-
     /* Read received frame */
     int res = dev->driver->recv(dev, (char *) sReceiveFrame.mPsdu, len, NULL);
 
@@ -226,13 +225,11 @@ ThreadError otPlatRadioDisable(otInstance *aInstance)
 
     ThreadError error;
 
-    if (!sDisabled)
-    {
+    if (!sDisabled) {
         sDisabled = true;
         error = kThreadError_None;
     }
-    else
-    {
+    else {
         error = kThreadError_InvalidState;
     }
 
@@ -258,7 +255,6 @@ ThreadError otPlatRadioSleep(otInstance *aInstance)
 }
 
 /*OpenThread will call this for waiting the reception of a packet */
-
 ThreadError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
 {
     DEBUG("openthread: otPlatRadioReceive. Channel: %i\n", aChannel);

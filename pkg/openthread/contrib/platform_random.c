@@ -15,12 +15,12 @@
 
 #include <stdint.h>
 
-#include <openthread/platform/random.h>
+#include "openthread/platform/random.h"
+#include "periph/cpuid.h"
 #include "random.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-#include "periph/cpuid.h"
 
 /* init random */
 void ot_random_init(void)
