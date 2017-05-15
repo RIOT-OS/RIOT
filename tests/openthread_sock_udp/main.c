@@ -1,16 +1,16 @@
-#include "stdio.h"
-#include "ot.h"
+#include <stdio.h>
 
+#include "net/ipv6/addr.h"
+#include "net/sock/udp.h"
+#include "openthread/ip6.h"
+#include "openthread/thread.h"
+#include "openthread/udp.h"
+#include "ot.h"
 #include "shell.h"
 #include "shell_commands.h"
-#include "openthread/thread.h"
-#include "openthread/ip6.h"
-#include "openthread/udp.h"
-#include "net/ipv6/addr.h"
 
-#include "net/sock/udp.h"
-
-sock_udp_t sock;
+static sock_udp_t sock;
+static char _udp_buf[100];
 
 static OT_JOB _set_panid(otInstance *ot_instance, void *data)
 {
@@ -46,7 +46,6 @@ static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *data)
     }
 }
 
-char _udp_buf[100];
 int _listen(int argc, char **argv)
 {
 	int bytes = sock_udp_recv(&sock, (char *)_udp_buf, sizeof(_udp_buf), SOCK_NO_TIMEOUT, NULL);

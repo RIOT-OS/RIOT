@@ -75,7 +75,7 @@ static inline bool openthread_af_not_supported(int af)
  */
 static inline bool openthread_ep_addr_any(const sock_ip_ep_t *ep)
 {
-    assert(ep != NULL);
+    assert(ep);
     const uint8_t *p = (uint8_t *)&ep->addr;
     for (uint8_t i = 0; i < sizeof(ep->addr); i++) {
         if (p[i] != 0) {
@@ -137,17 +137,17 @@ static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
     otMessage *message;
 
     message = otUdpNewMessage(ot_instance, true);
-    int error;
-    error = otMessageSetLength(message, pkt->len);
-    error = otMessageWrite(message, 0, pkt->payload, pkt->len);
-    (void) error;
+
+    /* TODO: Handle errors here */
+    otMessageSetLength(message, pkt->len);
+    otMessageWrite(message, 0, pkt->payload, pkt->len);
 
     otMessageInfo mPeer;
     
-    //Set dest address
+    /* Set dest address */
     memcpy(&mPeer.mPeerAddr.mFields, &(pkt->ip_addr), sizeof(ipv6_addr_t));
 
-    //Set dest port
+    /* Set dest port */
     mPeer.mPeerPort = pkt->port;
 
     otUdpSend(&sock->ot_udp_socket, message, &mPeer);
@@ -161,7 +161,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
     assert(sock);
     assert(local == NULL || local->port != 0);
     assert(remote == NULL || remote->port != 0);
-    if ((local != NULL) && (remote != NULL) &&
+    if ((local) && (remote) &&
         (local->netif != SOCK_ADDR_ANY_NETIF) &&
         (remote->netif != SOCK_ADDR_ANY_NETIF) &&
         (local->netif != remote->netif)) {
@@ -172,7 +172,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
 	sock->data = NULL;
     memset(&sock->local, 0, sizeof(sock_udp_ep_t));
     
-    if (local != NULL) {
+    if (local) {
         if (openthread_af_not_supported(local->family)) {
             return -EAFNOSUPPORT;
         }
@@ -181,7 +181,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
     
     memset(&sock->remote, 0, sizeof(sock_udp_ep_t));
     
-    if (remote != NULL) {
+    if (remote) {
         if (openthread_af_not_supported(remote->family)) {
             return -EAFNOSUPPORT;
         }
@@ -195,7 +195,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
 
     socket_port = local->port;
 
-    if (local != NULL) {
+    if (local) {
         DEBUG("Socket port %d \n", socket_port);
         ot_exec_job(_create_udp_socket, sock);
     }
@@ -210,8 +210,8 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
 
 void sock_udp_close(sock_udp_t *sock)
 {
-    assert(sock != NULL);
-    if (sock->ot_udp_socket.mTransport != NULL) {
+    assert(sock);
+    if (sock->ot_udp_socket.mTransport) {
         otUdpClose(&sock->ot_udp_socket);
         memset(&sock->ot_udp_socket, 0, sizeof(otUdpSocket));
     }
@@ -271,6 +271,7 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     }
 
     switch (msg.type) {
+		/* TODO: Label this */
         case 1:
 			/*
             if (remote != NULL) {
@@ -303,10 +304,10 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     sock_ip_ep_t local;
     sock_ip_ep_t *rem;
 
-    assert((sock != NULL) || (remote != NULL));
-    assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
+    assert((sock) || (remote));
+    assert((len == 0) || data); /* (len != 0) => (data != NULL) */
 
-    if (remote != NULL) {
+    if (remote) {
         if (remote->port == 0) {
             return -EINVAL;
         }
@@ -316,7 +317,7 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
         else if (openthread_af_not_supported(remote->family)) {
             return -EAFNOSUPPORT;
         }
-        else if ((sock != NULL) &&
+        else if ((sock) &&
                  (sock->local.netif != SOCK_ADDR_ANY_NETIF) &&
                  (remote->netif != SOCK_ADDR_ANY_NETIF) &&
                  (sock->local.netif != remote->netif)) {
@@ -332,7 +333,7 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     /* cppcheck-suppress nullPointer */
     if ((sock == NULL) || (sock->local.family == AF_UNSPEC)) {
         /* no sock or sock currently unbound */
-        if ((sock != NULL)) {
+        if ((sock)) {
             /* bind sock object implicitly */
             sock->local.port = src_port;
             if (remote == NULL) {
