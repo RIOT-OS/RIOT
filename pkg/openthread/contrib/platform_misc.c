@@ -26,7 +26,6 @@
 
 #include "openthread/platform/misc.h"
 
-
 void otPlatReset(otInstance *aInstance)
 {
     (void)aInstance;
@@ -37,4 +36,4 @@ otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
     (void)aInstance;
     return kPlatResetReason_PowerOn;
 }
-
+/** @} */

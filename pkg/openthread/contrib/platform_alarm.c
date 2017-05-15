@@ -20,6 +20,7 @@
 #include "ot.h"
 #include "thread.h"
 #include "xtimer.h"
+#include "timex.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -33,11 +34,12 @@ void otPlatAlarmStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
     DEBUG("openthread: otPlatAlarmStartAt: aT0: %i, aDT: %i\n", (int) aT0, (int) aDt);
     ot_alarm_msg.type = OPENTHREAD_XTIMER_MSG_TYPE_EVENT;
 
-    int dt = aDt * 1000U;
-    if (dt == 0) {
+	int dt;
+    if (aDt == 0) {
         msg_send(&ot_alarm_msg, thread_getpid());
     }
     else {
+		dt = aDt * US_PER_MS;
         xtimer_set_msg(&ot_timer, dt, &ot_alarm_msg, thread_getpid());
     }
 }

@@ -53,7 +53,7 @@ void otTaskletsSignalPending(otInstance *aInstance)
 }
 
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
-/* init and run OpeanThread's UART simulation (sdtio) */
+/* init and run OpeanThread's UART simulation (stdio) */
 void openthread_uart_run(void)
 {
     char buf[256];

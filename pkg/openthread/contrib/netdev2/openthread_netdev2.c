@@ -61,9 +61,10 @@ otInstance *ot_get_instance(void)
 void otSignalTaskletPending(otInstance *aInstance)
 {
     /* Unused */
+	(void) aInstance;
 }
 
-void *_openthread_event_loop(void *arg)
+static void *_openthread_event_loop(void *arg)
 {
     _pid = thread_getpid();
 
@@ -106,13 +107,13 @@ void *_openthread_event_loop(void *arg)
                 break;
             case OPENTHREAD_NETDEV_MSG_TYPE_EVENT:
                 /* Received an event from driver */
-                dev = (netdev_t *) msg.content.ptr;
+                dev = msg.content.ptr;
                 dev->driver->isr(dev);
                 break;
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
             case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
                 /* Tell OpenThread about the receotion of a CLI command */
-                buf = (uint8_t*) msg.content.ptr;
+                buf = msg.content.ptr;
                 begin_mutex();
                 otPlatUartReceived(buf, strlen((char*) buf));
                 end_mutex();
@@ -129,7 +130,7 @@ void *_openthread_event_loop(void *arg)
     return NULL;
 }
 
-void _event_cb(netdev_t *dev, netdev_event_t event)
+static void _event_cb(netdev_t *dev, netdev_event_t event)
 {
 	msg_t msg;
 	switch (event) {

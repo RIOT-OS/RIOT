@@ -570,7 +570,8 @@ ifneq (,$(filter openthread,$(USEMODULE)))
   USEMODULE+=xtimer
 
   FEATURES_REQUIRED += cpp
-  FEATURES_REQUIRED += periph_spi periph_gpio
+  FEATURES_REQUIRED += periph_spi
+  FEATURES_REQUIRED += periph_gpio
 endif
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))

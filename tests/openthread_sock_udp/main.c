@@ -150,7 +150,7 @@ int main(void)
     uint16_t panid=0x1234;
     ot_exec_job(_set_panid, &panid);
     ot_exec_job(_thread_start, NULL);
-    char line_buf[3 * SHELL_DEFAULT_BUFSIZE];
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 #endif
 
