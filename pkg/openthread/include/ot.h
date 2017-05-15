@@ -55,8 +55,8 @@ typedef struct {
  * @brief   Struct containing an OpenThread job
  */
 typedef struct {
-    void (*function)(otInstance*, void*);
-    void *data;
+    void (*function)(otInstance*, void*); /**< function to be called when executing job */
+    void *context; /**< context for the job **/
 } ot_job_t;
 
 /**
@@ -142,9 +142,9 @@ void openthread_uart_run(void);
  * issues. All API calls should be made in OT_JOB type functions.
  *
  * @param[in]   job      callback pointer to an OpenThread job function
- * @param[in]   data     context for the job
+ * @param[in]   context     context for the job
  */
-void ot_exec_job(OT_JOB (*job)(otInstance*, void*), void *data);
+void ot_exec_job(OT_JOB (*job)(otInstance*, void*), void *context);
 
 #ifdef __cplusplus
 }

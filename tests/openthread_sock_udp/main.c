@@ -12,32 +12,32 @@
 static sock_udp_t sock;
 static char _udp_buf[100];
 
-static OT_JOB _set_panid(otInstance *ot_instance, void *data)
+static OT_JOB _set_panid(otInstance *ot_instance, void *context)
 {
-    uint16_t panid = *((uint16_t*) data);
+    uint16_t panid = *((uint16_t*) context);
     otLinkSetPanId(ot_instance, panid);
 }
 
-static OT_JOB _get_panid(otInstance *ot_instance, void *data)
+static OT_JOB _get_panid(otInstance *ot_instance, void *context)
 {
-    *((uint16_t*) data) = otLinkGetPanId(ot_instance);
-    printf("PanID: %04x\n", *((uint16_t*) data));
+    *((uint16_t*) context) = otLinkGetPanId(ot_instance);
+    printf("PanID: %04x\n", *((uint16_t*) context));
 }
 
-static OT_JOB _thread_start(otInstance *ot_instance, void *data)
+static OT_JOB _thread_start(otInstance *ot_instance, void *context)
 {
     printf("Starting OpenThread\n");
     otIp6SetEnabled(ot_instance, true);
     otThreadSetEnabled(ot_instance, true);
 }
 
-static OT_JOB _read_state(otInstance *ot_instance, void *data)
+static OT_JOB _read_state(otInstance *ot_instance, void *context)
 {
     uint8_t state = otThreadGetDeviceRole(ot_instance);
     printf("State is: %i\n", state);
 }
 
-static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *data)
+static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *context)
 {
     for(const otNetifAddress *addr=otIp6GetUnicastAddresses(ot_instance); addr; addr=addr->mNext)
     {

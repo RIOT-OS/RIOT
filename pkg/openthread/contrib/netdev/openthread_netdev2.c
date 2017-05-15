@@ -42,16 +42,18 @@ static msg_t _queue[OPENTHREAD_QUEUE_LEN];
 static kernel_pid_t _pid;
 static otInstance *sInstance;
 
-void ot_exec_job(OT_JOB (*job)(otInstance*, void*), void *data)
+void ot_exec_job(OT_JOB (*job)(otInstance*, void*), void *context)
 {
     ot_job_t _job;    
     _job.function = job;
+	_job.context = context;
 
     msg_t msg, reply;
     msg.type = OPENTHREAD_JOB_MSG_TYPE_EVENT;
     msg.content.ptr=&_job;
     msg_send_receive(&msg, &reply, openthread_get_pid());
 }
+
 otInstance *ot_get_instance(void)
 {
     return sInstance;
@@ -117,7 +119,7 @@ static void *_openthread_event_loop(void *arg)
 #endif
 	    case OPENTHREAD_JOB_MSG_TYPE_EVENT:
 		job = msg.content.ptr;
-		job->function(sInstance, job->data);
+		job->function(sInstance, job->context);
 		msg_reply(&msg, &reply);
 		break;
         }

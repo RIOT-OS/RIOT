@@ -10,32 +10,32 @@
 
 otUdpSocket mSocket;
 
-static OT_JOB _set_panid(otInstance *ot_instance, void *data)
+static OT_JOB _set_panid(otInstance *ot_instance, void *context)
 {
-    uint16_t panid = *((uint16_t*) data);
+    uint16_t panid = *((uint16_t*) context);
     otLinkSetPanId(ot_instance, panid);
 }
 
-static OT_JOB _get_panid(otInstance *ot_instance, void *data)
+static OT_JOB _get_panid(otInstance *ot_instance, void *context)
 {
-    *((uint16_t*) data) = otLinkGetPanId(ot_instance);
-    printf("PanID: %04x\n", *((uint16_t*) data));
+    *((uint16_t*) context) = otLinkGetPanId(ot_instance);
+    printf("PanID: %04x\n", *((uint16_t*) context));
 }
 
-static OT_JOB _thread_start(otInstance *ot_instance, void *data)
+static OT_JOB _thread_start(otInstance *ot_instance, void *context)
 {
     printf("Starting OpenThread\n");
     otIp6SetEnabled(ot_instance, true);
     otThreadSetEnabled(ot_instance, true);
 }
 
-static OT_JOB _read_state(otInstance *ot_instance, void *data)
+static OT_JOB _read_state(otInstance *ot_instance, void *context)
 {
     uint8_t state = otThreadGetDeviceRole(ot_instance);
     printf("State is: %i\n", state);
 }
 
-static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *data)
+static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *context)
 {
     for(const otNetifAddress *addr=otIp6GetUnicastAddresses(ot_instance); addr; addr=addr->mNext) {
         char addrstr[IPV6_ADDR_MAX_STR_LEN];
@@ -58,11 +58,11 @@ void _handle_receive(void *aContext, otMessage *aMessage, const otMessageInfo *a
     printf("\n");
 }
 
-static OT_JOB _create_udp_socket(otInstance *ot_instance, void *data)
+static OT_JOB _create_udp_socket(otInstance *ot_instance, void *context)
 {
     otSockAddr sockaddr;
     memset(&sockaddr, 0, sizeof(otSockAddr));
-    sockaddr.mPort = *((uint16_t*) data);
+    sockaddr.mPort = *((uint16_t*) context);
 
     otUdpOpen(ot_instance, &mSocket, _handle_receive, NULL);
     otUdpBind(&mSocket, &sockaddr);
@@ -78,9 +78,9 @@ typedef struct
 
 
 
-static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
+static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *context)
 {
-    udp_pkt_t *pkt = (udp_pkt_t*) data;
+    udp_pkt_t *pkt = (udp_pkt_t*) context;
     otMessage *message;
 
     otUdpSocket socket;
