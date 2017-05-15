@@ -12,9 +12,6 @@ RIOTBASE ?= $(CURDIR)/../..
 #RIOTCPU ?= $(CURDIR)/../../RIOT/thirdparty_cpu
 #RIOTBOARD ?= $(CURDIR)/../../RIOT/thirdparty_boards
 
-# Uncomment this to enable scheduler statistics for ps:
-#CFLAGS += -DSCHEDSTATISTICS
-
 # If you want to use native with valgrind, you should recompile native
 # with the target all-valgrind instead of all:
 # make -B clean all-valgrind
@@ -33,6 +30,8 @@ USEMODULE += shell_commands
 USEMODULE += ps
 # include and auto-initialize all available sensors
 USEMODULE += saul_default
+# Uncomment this to enable scheduler statistics for ps:
+USEMODULE += schedstatistics
 
 BOARD_PROVIDES_NETIF := airfy-beacon cc2538dk fox iotlab-m3 iotlab-a8-m3 mulle \
         microbit native nrf51dongle nrf52dk nrf6310 openmote-cc2538 pba-d-01-kw2x \

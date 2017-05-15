@@ -75,7 +75,7 @@ uint8_t _tcb_name_offset = offsetof(thread_t, name);
 #endif
 
 #ifdef MODULE_SCHEDSTATISTICS
-static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
+static void (*sched_cb) (uint64_t timestamp, uint32_t value) = NULL;
 schedstat sched_pidlist[KERNEL_PID_LAST + 1];
 #endif
 
@@ -101,7 +101,7 @@ int __attribute__((used)) sched_run(void)
     }
 
 #ifdef MODULE_SCHEDSTATISTICS
-    unsigned long time = _xtimer_now();
+    uint64_t now = _xtimer_now64();
 #endif
 
     if (active_thread) {
@@ -118,17 +118,24 @@ int __attribute__((used)) sched_run(void)
 #ifdef MODULE_SCHEDSTATISTICS
         schedstat *active_stat = &sched_pidlist[active_thread->pid];
         if (active_stat->laststart) {
-            active_stat->runtime_ticks += time - active_stat->laststart;
+            /* ensure now > laststart, to avoid flawed sum of runtime ticks
+             * due to timer overflow */
+            if (now > active_stat->laststart) {
+                active_stat->runtime_ticks += now - active_stat->laststart;
+            }
+            else {
+                LOG_WARNING("sched_run: timer overflow detected!\n");
+            }
         }
 #endif
     }
 
 #ifdef MODULE_SCHEDSTATISTICS
     schedstat *next_stat = &sched_pidlist[next_thread->pid];
-    next_stat->laststart = time;
+    next_stat->laststart = now;
     next_stat->schedules++;
     if (sched_cb) {
-        sched_cb(time, next_thread->pid);
+        sched_cb(now, next_thread->pid);
     }
 #endif
 
@@ -152,7 +159,7 @@ int __attribute__((used)) sched_run(void)
 }
 
 #ifdef MODULE_SCHEDSTATISTICS
-void sched_register_cb(void (*callback)(uint32_t, uint32_t))
+void sched_register_cb(void (*callback)(uint64_t, uint32_t))
 {
     sched_cb = callback;
 }
