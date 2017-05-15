@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 JosÃ© Ignacio Alamos
+ * Copyright (C) 2017 Fundación Inria Chile
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,6 @@
  * @see         https://github.com/openthread/openthread
  *
  * Thread if a mesh oriented network stack running for IEEE802.15.4 networks.
- * It can be used with the @ref conn.
  * @{
  *
  * @file
