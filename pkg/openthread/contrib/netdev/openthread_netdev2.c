@@ -101,9 +101,7 @@ static void *_openthread_event_loop(void *arg)
         switch (msg.type) {
             case OPENTHREAD_XTIMER_MSG_TYPE_EVENT:
                 /* Tell OpenThread a time event was received */
-                begin_mutex();
                 otPlatAlarmFired(sInstance);
-                end_mutex();
                 break;
             case OPENTHREAD_NETDEV_MSG_TYPE_EVENT:
                 /* Received an event from driver */
@@ -114,9 +112,7 @@ static void *_openthread_event_loop(void *arg)
             case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
                 /* Tell OpenThread about the receotion of a CLI command */
                 buf = msg.content.ptr;
-                begin_mutex();
                 otPlatUartReceived(buf, strlen((char*) buf));
-                end_mutex();
                 break;
 #endif
 	    case OPENTHREAD_JOB_MSG_TYPE_EVENT:

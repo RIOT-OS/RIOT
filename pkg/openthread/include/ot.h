@@ -118,19 +118,9 @@ int openthread_netdev_init(char *stack, int stacksize, char priority, const char
 kernel_pid_t openthread_get_pid(void);
 
 /**
- * @brief   begin OpenThread mutex. Must be called before calling any OpenThread function.
- *
- * @return  PID of OpenThread thread
- */
-void begin_mutex(void);
-
-void end_mutex(void);
-
-/**
  * @brief   Init OpenThread random
  */
 void ot_random_init(void);
-
 
 /**
  * @brief   Get OpenThread instance pointer
