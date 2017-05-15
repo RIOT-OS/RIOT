@@ -76,8 +76,13 @@ struct sock_udp {
 	openthread_sock_reg_t openthread_sock_reg;
 	udp_pkt_t pkt;
 	otUdpSocket ot_udp_socket;
+	void *data;
+	size_t len;
+	size_t max_len;
     sock_udp_ep_t local;                /**< local end-point */
     sock_udp_ep_t remote;               /**< remote end-point */
+    mbox_t mbox;                        /**< @ref core_mbox target for the sock */
+    msg_t mbox_queue[SOCK_MBOX_SIZE];   /**< queue for gnrc_sock_reg_t::mbox */
     uint16_t flags;                     /**< option flags */
 };
 

@@ -32,16 +32,26 @@
 static void _handle_receive(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
 {
     size_t payload_len = otMessageGetLength(aMessage)-otMessageGetOffset(aMessage);
+    sock_udp_t *sock = aContext;
+	if(sock->data == NULL || payload_len > sock->max_len)
+	{
+		return;
+	}
+	
+    otMessageRead(aMessage, otMessageGetOffset(aMessage), sock->data, payload_len);
+	sock->data = NULL;
+	sock->len = payload_len;
 
-    char buf[100];
-    otMessageRead(aMessage, otMessageGetOffset(aMessage), buf, payload_len);
+	// msg_t msg = { .type = _MSG_TYPE_RCV };
+	msg_t msg = { .type = 1 };
 
-    printf("Message: ");
-    for(int i=0;i<payload_len;i++)
-    {
-        printf("%02x ", buf[i]);
-    }
-    printf("\n");
+    //mutex_lock(&sock->mutex);
+    /*sock->recv_info.src_port = src_port;
+    sock->recv_info.src = (const ipv6_addr_t *)src_addr;
+    sock->recv_info.data = data;
+    sock->recv_info.datalen = datalen - sizeof(ipv6_hdr_t);*/
+    //mutex_unlock(&sock->mutex);
+    mbox_put(&sock->mbox, &msg);
 }
 
 /**
@@ -116,7 +126,7 @@ static OT_JOB _create_udp_socket(otInstance *ot_instance, void *data)
     memset(&sockaddr, 0, sizeof(otSockAddr));
     sockaddr.mPort = *((uint16_t*) &(sock->local.port));
 
-    otUdpOpen(ot_instance, &sock->ot_udp_socket, _handle_receive, NULL);
+    otUdpOpen(ot_instance, &sock->ot_udp_socket, _handle_receive, sock);
     otUdpBind(&sock->ot_udp_socket, &sockaddr);
 }
 
@@ -141,7 +151,6 @@ static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
     mPeer.mPeerPort = pkt->port;
 
     otUdpSend(&sock->ot_udp_socket, message, &mPeer);
-    otUdpClose(&sock->ot_udp_socket);
 }
 
 int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
@@ -159,6 +168,8 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         return -EINVAL;
     }
     
+	mbox_init(&sock->mbox, sock->mbox_queue, SOCK_MBOX_SIZE);
+	sock->data = NULL;
     memset(&sock->local, 0, sizeof(sock_udp_ep_t));
     
     if (local != NULL) {
@@ -229,7 +240,59 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *remote)
 ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
                       uint32_t timeout, sock_udp_ep_t *remote)
 {
-    return 0;
+	// xtimer_t timeout_timer;
+    //int blocking = BLOCKING;
+    int res = -EIO;
+    msg_t msg;
+
+	/*
+    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    if (sock->sock.input_callback == NULL) {
+        return -EADDRNOTAVAIL;
+    }
+    if (timeout == 0) {
+        blocking = NON_BLOCKING;
+    }*/
+	/*
+    else if (timeout != SOCK_NO_TIMEOUT) {
+        timeout_timer.callback = _timeout_callback;
+        timeout_timer.arg = &sock->mbox;
+        xtimer_set(&timeout_timer, timeout);
+    }*/
+
+    //atomic_fetch_add(&sock->receivers, 1);
+	sock->data = data;
+	sock->max_len = max_len;
+	
+    if (_mbox_get(&sock->mbox, &msg, true) == 0) {
+        /* do not need to remove xtimer, since we only get here in non-blocking
+         * mode (timeout > 0) */
+        return -EAGAIN;
+    }
+
+    switch (msg.type) {
+        case 1:
+			/*
+            if (remote != NULL) {
+                remote->family = AF_INET6;
+                remote->netif = SOCK_ADDR_ANY_NETIF;
+                memcpy(&remote->addr, &sock->recv_info.src, sizeof(ipv6_addr_t));
+                remote->port = sock->recv_info.src_port;
+            }
+			*/
+            res = (int) sock->len;
+            break;
+#if 0
+        case _MSG_TYPE_CLOSE:
+            res = -EADDRNOTAVAIL;
+            break;
+        case _MSG_TYPE_TIMEOUT:
+            res = -ETIMEDOUT;
+            break;
+#endif
+    }
+    //atomic_fetch_sub(&sock->receivers, 1);
+    return res;
 }
 
 ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,

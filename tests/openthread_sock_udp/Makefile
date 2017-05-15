@@ -22,6 +22,7 @@ USEMODULE += openthread
 USEMODULE += openthread_contrib
 USEMODULE += openthread_sock_udp
 USEMODULE += openthread_sock
+USEMODULE += core_mbox
 
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))
