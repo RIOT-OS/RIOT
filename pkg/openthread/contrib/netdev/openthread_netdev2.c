@@ -54,11 +54,6 @@ void ot_exec_job(OT_JOB (*job)(otInstance*, void*), void *context)
     msg_send_receive(&msg, &reply, openthread_get_pid());
 }
 
-otInstance *ot_get_instance(void)
-{
-    return sInstance;
-}
-
 /* OpenThread will call this when switching state from empty tasklet to non-empty tasklet. */
 void otSignalTaskletPending(otInstance *aInstance)
 {

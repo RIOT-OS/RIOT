@@ -122,11 +122,6 @@ kernel_pid_t openthread_get_pid(void);
  */
 void ot_random_init(void);
 
-/**
- * @brief   Get OpenThread instance pointer
- */
-otInstance *ot_get_instance(void);
-
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
 /*
  * @brief   Run OpenThread UART simulator (stdio)
