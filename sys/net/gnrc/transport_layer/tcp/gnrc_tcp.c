@@ -189,7 +189,8 @@ int gnrc_tcp_init(void)
     _rcvbuf_init();
 
     /* Start TCP processing thread */
-    return thread_create(_stack, sizeof(_stack), TCP_EVENTLOOP_PRIO, 0, _event_loop, NULL,
+    return thread_create(_stack, sizeof(_stack), TCP_EVENTLOOP_PRIO,
+                         THREAD_CREATE_STACKTEST, _event_loop, NULL,
                          "gnrc_tcp");
 }
 
