@@ -7,7 +7,7 @@ INCLUDES += -I$(OPENTHREAD_DIR)/include \
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
  DIRS += $(OPENTHREAD_DIR)/contrib
- DIRS += $(OPENTHREAD_DIR)/contrib/netdev2
+ DIRS += $(OPENTHREAD_DIR)/contrib/netdev
 endif
 ifneq (,$(filter openthread_sock,$(USEMODULE)))
   DIRS += $(OPENTHREAD_DIR)/contrib/sock
