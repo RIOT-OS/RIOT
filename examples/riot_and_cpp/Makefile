@@ -16,9 +16,6 @@ RIOTBASE ?= $(CURDIR)/../..
 #RIOTCPU ?= $(CURDIR)/../../../thirdparty_cpu
 #RIOTBOARD ?= $(CURDIR)/../../../thirdparty_boards
 
-# Uncomment this to enable scheduler statistics for ps:
-#CFLAGS += -DSCHEDSTATISTICS
-
 # If you want to use native with valgrind, you should recompile native
 # with the target all-valgrind instead of all:
 # make -B clean all-valgrind
@@ -33,6 +30,9 @@ QUIET ?= 1
 
 # Features required
 FEATURES_REQUIRED += cpp
+
+# Uncomment this to enable scheduler statistics for ps:
+#USEMODULE += schedstatistics
 
 # If you want to add some extra flags when compile c++ files, add these flags
 # to CXXEXFLAGS variable
