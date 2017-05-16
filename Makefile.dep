@@ -35,20 +35,20 @@ ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
-    USEMODULE += uhcpc
-    USEMODULE += gnrc_sock_udp
-    USEMODULE += fmt
+  USEMODULE += uhcpc
+  USEMODULE += gnrc_sock_udp
+  USEMODULE += fmt
 endif
 
 ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
-    USEMODULE += softdevice_handler
-    USEMODULE += ble_common
-    USEMODULE += ble_6lowpan
-    USEMODULE += gnrc_sixlowpan
-    USEMODULE += gnrc_sixlowpan_iphc
-    USEMODULE += gnrc_ipv6_default
-    USEMODULE += gnrc_netdev
-    USEMODULE += gnrc_ipv6_netif
+  USEMODULE += softdevice_handler
+  USEMODULE += ble_common
+  USEMODULE += ble_6lowpan
+  USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_iphc
+  USEMODULE += gnrc_ipv6_default
+  USEMODULE += gnrc_netdev
+  USEMODULE += gnrc_ipv6_netif
 endif
 
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pktbuf,$(USEMODULE))))
@@ -514,8 +514,8 @@ ifneq (,$(filter netstats_%, $(USEMODULE)))
 endif
 
 ifneq (,$(filter pthread,$(USEMODULE)))
-    USEMODULE += xtimer
-    USEMODULE += timex
+  USEMODULE += xtimer
+  USEMODULE += timex
 endif
 
 ifneq (,$(filter schedstatistics,$(USEMODULE)))
@@ -523,14 +523,14 @@ ifneq (,$(filter schedstatistics,$(USEMODULE)))
 endif
 
 ifneq (,$(filter arduino,$(USEMODULE)))
-    FEATURES_REQUIRED += arduino
-    FEATURES_REQUIRED += cpp
-    USEMODULE += xtimer
+  FEATURES_REQUIRED += arduino
+  FEATURES_REQUIRED += cpp
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter xtimer,$(USEMODULE)))
-    FEATURES_REQUIRED += periph_timer
-    USEMODULE += div
+  FEATURES_REQUIRED += periph_timer
+  USEMODULE += div
 endif
 
 ifneq (,$(filter saul_reg,$(USEMODULE)))
@@ -552,14 +552,14 @@ ifneq (,$(filter phydat,$(USEMODULE)))
 endif
 
 ifneq (,$(filter random,$(USEMODULE)))
-    # select default prng
-    ifeq (,$(filter prng_%,$(USEMODULE)))
-        USEMODULE += prng_tinymt32
-    endif
+  # select default prng
+  ifeq (,$(filter prng_%,$(USEMODULE)))
+    USEMODULE += prng_tinymt32
+  endif
 
-    ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
-        USEMODULE += tinymt32
-    endif
+  ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
+    USEMODULE += tinymt32
+  endif
 endif
 
 ifneq (,$(filter emcute,$(USEMODULE)))
@@ -577,9 +577,9 @@ ifneq (,$(filter devfs,$(USEMODULE)))
 endif
 
 ifneq (,$(filter vfs,$(USEMODULE)))
-    ifeq (native, $(BOARD))
-        USEMODULE += native_vfs
-    endif
+  ifeq (native, $(BOARD))
+    USEMODULE += native_vfs
+  endif
 endif
 
 ifneq (,$(filter sock_dns,$(USEMODULE)))
@@ -587,10 +587,10 @@ ifneq (,$(filter sock_dns,$(USEMODULE)))
 endif
 
 ifneq (,$(filter spiffs,$(USEMODULE)))
-    USEPKG += spiffs
-    USEMODULE += vfs
-    USEMODULE += spiffs_fs
-    USEMODULE += mtd
+  USEPKG += spiffs
+  USEMODULE += vfs
+  USEMODULE += spiffs_fs
+  USEMODULE += mtd
 endif
 
 # include package dependencies
