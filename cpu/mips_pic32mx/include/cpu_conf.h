@@ -58,8 +58,6 @@ extern "C" {
 #define THREAD_STACKSIZE_IDLE           (512 + THREAD_EXTRA_STACKSIZE_PRINTF)
 #endif
 #endif
-
-#define ISR_STACKSIZE                   (0)
 /** @} */
 
 #ifdef __cplusplus
