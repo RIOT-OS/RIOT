@@ -54,6 +54,7 @@ extern "C" {
 #include <sys/uio.h>
 
 #include "net/netstats.h"
+#include "net/l2filter.h"
 #include "net/netopt.h"
 
 enum {
@@ -119,6 +120,9 @@ struct netdev {
     void* context;                          /**< ptr to network stack context */
 #ifdef MODULE_NETSTATS_L2
     netstats_t stats;                       /**< transceiver's statistics */
+#endif
+#ifdef MODULE_L2FILTER
+    l2filter_t filter[L2FILTER_LISTSIZE];   /**< link layer address filters */
 #endif
 };
 
