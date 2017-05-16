@@ -14,17 +14,16 @@
  */
 
 #include <stdint.h>
-#include "xtimer.h"
-#include "msg.h"
-#include "thread.h"
 
-#include <openthread/platform/alarm.h>
+#include "msg.h"
+#include "openthread/platform/alarm.h"
+#include "openthread/platform/misc.h"
 #include "ot.h"
+#include "thread.h"
+#include "xtimer.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-
-#include "openthread/platform/misc.h"
 
 void otPlatReset(otInstance *aInstance)
 {
