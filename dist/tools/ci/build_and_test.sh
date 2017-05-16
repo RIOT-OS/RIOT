@@ -89,6 +89,7 @@ then
         run ./dist/tools/externc/check.sh
         run ./dist/tools/cppcheck/check.sh
         run ./dist/tools/pr_check/pr_check.sh ${CI_BASE_BRANCH}
+        run ./dist/tools/coccinelle/check.sh
         exit $RESULT
     fi
 

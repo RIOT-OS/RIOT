@@ -37,7 +37,7 @@
 #include "dtls_debug.h"
 #include "tinydtls.h"
 
-#define ENABLE_DEBUG  (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 //#define DEFAULT_PORT 20220    /* DTLS default port  */

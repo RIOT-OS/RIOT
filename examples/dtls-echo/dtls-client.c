@@ -30,7 +30,7 @@
 #include "timex.h"
 #include "xtimer.h"
 
-#define ENABLE_DEBUG  (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /* TinyDTLS */
@@ -509,7 +509,7 @@ int udp_client_cmd(int argc, char **argv)
         return 1;
     }
     else if (argc > 3) {
-        delay = (uint32_t)atoi(argv[3]);
+        delay = atoi(argv[3]);
     }
     client_send(argv[1], argv[2],  delay);
 

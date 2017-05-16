@@ -81,7 +81,7 @@ static uart_half_duplex_t stream;
 
 static int parse_uart(char *arg)
 {
-    unsigned uart = (unsigned)atoi(arg);
+    unsigned uart = atoi(arg);
     if (uart >= UART_NUMOF) {
         printf("Error: Invalid UART_DEV device specified (%u).\n", uart);
         return -1;
@@ -95,7 +95,7 @@ static int parse_uart(char *arg)
 
 static int32_t parse_baud(char *arg)
 {
-    int32_t baud = (int32_t)atoi(arg);
+    int32_t baud = atoi(arg);
 
     for (size_t i = 0 ; i < ARRAY_LEN(baudrates) ; i++) {
         if (baud == baudrates[i]) {
@@ -109,7 +109,7 @@ static int32_t parse_baud(char *arg)
 
 static int parse_dev(char *arg)
 {
-    int dev = (int)atoi(arg);
+    int dev = atoi(arg);
     if (dev < 0 || 254 < dev) {
         printf("Error: Invalid device id (%s)\n", arg);
         return -1;

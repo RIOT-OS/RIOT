@@ -8,7 +8,7 @@
 
 changed_files() {
     : ${FILEREGEX:='\.([CcHh]|[ch]pp)$'}
-    : ${EXCLUDE:='^(.+/include/vendor/)'}
+    : ${EXCLUDE:='^(.+/include/vendor/|dist/tools/coccinelle/include)'}
     : ${DIFFFILTER:='ACMR'}
 
     DIFFFILTER="--diff-filter=${DIFFFILTER}"

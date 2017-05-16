@@ -189,8 +189,8 @@ static int _read(int argc, char **argv)
     bool print_as_char = false;
 
     if ((argc == 3) || (argc == 4)) {
-        blockaddr = (uint32_t)atoi(argv[1]);
-        cnt = (uint32_t)atoi(argv[2]);
+        blockaddr = atoi(argv[1]);
+        cnt = atoi(argv[2]);
         if (argc == 4 && (strcmp("-c", argv[3]) == 0)) {
             print_as_char = true;
         }
@@ -254,7 +254,7 @@ static int _write(int argc, char **argv)
     bool repeat_data = false;
 
     if (argc == 3 || argc == 4) {
-        bladdr = (int)atoi(argv[1]);
+        bladdr = atoi(argv[1]);
         data = argv[2];
         size = strlen(argv[2]);
         printf("will write '%s' (%d chars) at start of block %d\n", data, size, bladdr);
@@ -310,8 +310,8 @@ static int _copy(int argc, char **argv)
         return -1;
     }
 
-    src_block = (uint32_t)atoi(argv[1]);
-    dst_block = (uint32_t)atoi(argv[2]);
+    src_block = atoi(argv[1]);
+    dst_block = atoi(argv[2]);
 
     sd_rw_response_t rd_state;
     sdcard_spi_read_blocks(card, src_block, tmp_copy, SD_HC_BLOCK_SIZE, 1, &rd_state);
