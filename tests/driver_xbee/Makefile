@@ -15,12 +15,6 @@ USEMODULE += gnrc_pktdump
 USEMODULE += shell
 USEMODULE += shell_commands
 
-# set default UART to use in case none was defined
-XBEE_UART ?= "1"
-
-# export UART to params file
-CFLAGS += -DXBEE_PARAM_UART=$(XBEE_UART)
-
 # No need of big buffer for this test
 CFLAGS += -DGNRC_PKTBUF_SIZE=512
 

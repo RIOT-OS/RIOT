@@ -110,7 +110,7 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
     memcpy(&remote.addr.ipv6[0], &addr.u8[0], sizeof(addr.u8));
 
     /* parse port */
-    remote.port = (uint16_t)atoi(port_str);
+    remote.port = atoi(port_str);
     if (remote.port == 0) {
         puts("gcoap_cli: unable to parse destination port");
         return 0;

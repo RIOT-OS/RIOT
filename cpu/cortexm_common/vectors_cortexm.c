@@ -229,6 +229,8 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
     /* Initialize these variables even if they're never used uninitialized.
      * Fixes wrong compiler warning by gcc < 6.0. */
     uint32_t pc = 0;
+    /* cppcheck-suppress variableScope
+     * variable used in assembly-code below */
     uint32_t* orig_sp = NULL;
 
     /* Check if the ISR stack overflowed previously. Not possible to detect
@@ -340,7 +342,7 @@ void hard_fault_default(void)
 #endif /* DEVELHELP */
 
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
-    defined(CPU_ARCH_CORTEX_M4F)
+    defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
 void mem_manage_default(void)
 {
     core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER");

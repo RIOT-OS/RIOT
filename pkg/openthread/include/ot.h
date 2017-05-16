@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 JosÃ© Ignacio Alamos
+ * Copyright (C) 2017 Fundación Inria Chile
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,6 @@
  * @see         https://github.com/openthread/openthread
  *
  * Thread if a mesh oriented network stack running for IEEE802.15.4 networks.
- * It can be used with the @ref conn.
  * @{
  *
  * @file
@@ -44,7 +43,7 @@ extern "C" {
 typedef void OT_JOB;
 
 /**
- *  * @brief   Struct containing a serial message
+ * @brief   Struct containing a serial message
  *
  */
 typedef struct {
@@ -53,37 +52,46 @@ typedef struct {
 } serial_msg_t;
 
 /**
- *  * @brief   Struct containing an OpenThread job
- *
+ * @brief   Struct containing an OpenThread job
  */
 typedef struct {
-    void (*function)(otInstance*, void*);
-    void *data;
+    void (*function)(otInstance*, void*); /**< function to be called when executing job */
+    void *context; /**< context for the job **/
 } ot_job_t;
 
 /**
- * @brief   gets packet from driver and tells OpenThread about the reception.
+ * @brief Gets packet from driver and tells OpenThread about the reception.
  *
- * @internal
+ * @param[in]  aInstance          pointer to an OpenThread instance
  */
 void recv_pkt(otInstance *aInstance, netdev_t *dev);
 
 /**
+ * @brief Gets packet from driver and tells OpenThread about the reception.
+ *
+ * @param[in]  aInstance          pointer to an OpenThread instance
+ */
+
+/**
  * @brief   Inform OpenThread when tx is finished
  *
- * @internal
+ * @param[in]  aInstance          pointer to an OpenThread instance
+ * @param[in]  dev                pointer to a netdev interface
+ * @param[in]  event              just occurred netdev event
  */
 void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event);
 
 /**
- * @brief   bootstrap OpenThread
- *
+ * @brief   Bootstrap OpenThread
  */
 void openthread_bootstrap(void);
 
 /**
- * @brief   init OpenThread radio
+ * @brief   Init OpenThread radio
  *
+ * @param[in]  dev                pointer to a netdev interface
+ * @param[in]  tb                 pointer to the TX buffer designed for OpenThread
+ * @param[in]  event              pointer to the RX buffer designed for Open_Thread
  */
 void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb);
 
@@ -91,58 +99,47 @@ void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb);
 /**
  * @brief   Starts OpenThread thread.
  *
+ * @param[in]  stack              pointer to the stack designed for OpenThread
+ * @param[in]  stacksize          size of the stack
+ * @param[in]  priority           priority of the OpenThread stack
+ * @param[in]  name               name of the OpenThread stack
+ * @param[in]  netdev             pointer to the netdev interface
+ *
+ * @return  PID of OpenThread thread
+ * @return  -EINVAL if there was an error creating the thread
  */
 int openthread_netdev_init(char *stack, int stacksize, char priority, const char *name, netdev_t *netdev);
 
 /**
  * @brief   get PID of OpenThread thread.
  *
+ * @return  PID of OpenThread thread
  */
 kernel_pid_t openthread_get_pid(void);
 
-
-/**
- * @brief   begin OpenThread mutex. Must be called before calling any OpenThread function.
- *
- */
-void begin_mutex(void);
-
-/**
- * @brief   end OpenThread mutex
- *
- */
-void end_mutex(void);
-
-
 /**
  * @brief   Init OpenThread random
- *
  */
 void ot_random_init(void);
 
-
-/**
- * @brief   Get OpenThread instance pointer
- *
- */
-otInstance *ot_get_instance(void);
-
-
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
-/**
+/*
  * @brief   Run OpenThread UART simulator (stdio)
- *
  */
 void openthread_uart_run(void);
 
 #endif
 
-
 /**
  * @brief   Execute OpenThread job in same thread as OT core (dute to concurrency).
  *
+ * @note    An OpenThread job allows direct calls to OpenThread API (otXXX functions) without worrying about concurrency
+ * issues. All API calls should be made in OT_JOB type functions.
+ *
+ * @param[in]   job      callback pointer to an OpenThread job function
+ * @param[in]   context     context for the job
  */
-void ot_exec_job(OT_JOB (*job)(otInstance*, void*), void *data);
+void ot_exec_job(OT_JOB (*job)(otInstance*, void*), void *context);
 
 #ifdef __cplusplus
 }

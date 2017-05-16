@@ -76,7 +76,7 @@ static inline void cpu_print_last_instruction(void)
  * This function is meant to be used for short periods of time, where it is not
  * feasible to switch to the idle thread and back.
  */
-static inline void cpu_sleep_until_event(void)
+static inline void cortexm_sleep_until_event(void)
 {
     __WFE();
 }

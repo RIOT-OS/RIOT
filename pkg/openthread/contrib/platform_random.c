@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 JosÃ© Ignacio Alamos
+ * Copyright (C) 2017 Fundación Inria Chile
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,12 +15,12 @@
 
 #include <stdint.h>
 
-#include <openthread/platform/random.h>
+#include "openthread/platform/random.h"
+#include "periph/cpuid.h"
 #include "random.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-#include "periph/cpuid.h"
 
 /* init random */
 void ot_random_init(void)

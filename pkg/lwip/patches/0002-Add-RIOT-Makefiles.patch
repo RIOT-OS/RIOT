@@ -1,4 +1,4 @@
-From 4f1f9c53db7ffeece81253d9b39d78296e5b68a8 Mon Sep 17 00:00:00 2001
+From 1111daabb54619247649a5d065ce031edd3a968f Mon Sep 17 00:00:00 2001
 From: Martine Lenders <mail@martine-lenders.eu>
 Date: Thu, 12 Nov 2015 15:43:31 +0100
 Subject: [PATCH 2/2] Add RIOT Makefiles
@@ -115,5 +115,5 @@ index 0000000..6030171
 +
 +include $(RIOTBASE)/Makefile.base
 -- 
-1.9.1
+2.7.4
 

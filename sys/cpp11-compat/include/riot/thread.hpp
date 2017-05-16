@@ -27,6 +27,7 @@
 #include "time.h"
 #include "thread.h"
 
+#include <array>
 #include <tuple>
 #include <atomic>
 #include <memory>
@@ -65,7 +66,7 @@ struct thread_data {
   /** @cond INTERNAL */
   std::atomic<unsigned> ref_count;
   kernel_pid_t joining_thread;
-  char stack[stack_size];
+  std::array<char, stack_size> stack;
   /** @endcond */
 };
 
@@ -106,7 +107,7 @@ public:
   /**
    * @brief Create a thread id from a native handle.
    */
-  inline thread_id(kernel_pid_t handle) : m_handle{handle} {}
+  explicit inline thread_id(kernel_pid_t handle) : m_handle{handle} {}
 
   /**
    * @brief Comparison operator for thread ids.
@@ -164,7 +165,7 @@ namespace this_thread {
 /**
  * @brief Access the id of the currently running thread.
  */
-inline thread_id get_id() noexcept { return thread_getpid(); }
+inline thread_id get_id() noexcept { return thread_id{thread_getpid()}; }
 /**
  * @brief Yield the currently running thread.
  */
@@ -286,7 +287,7 @@ public:
   /**
    * @brief Returns the id of a thread.
    */
-  inline id get_id() const noexcept { return m_handle; }
+  inline id get_id() const noexcept { return thread_id{m_handle}; }
   /**
    * @brief Returns the native handle to a thread.
    */
@@ -345,7 +346,7 @@ thread::thread(F&& f, Args&&... args)
   unique_ptr<func_and_args> p(
     new func_and_args(m_data.get(), forward<F>(f), forward<Args>(args)...));
   m_handle = thread_create(
-    m_data->stack, stack_size, THREAD_PRIORITY_MAIN - 1, 0,
+    m_data->stack.data(), stack_size, THREAD_PRIORITY_MAIN - 1, 0,
     &thread_proxy<func_and_args>, p.get(), "riot_cpp_thread");
   if (m_handle >= 0) {
     p.release();

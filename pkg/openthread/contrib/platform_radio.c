@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 José Ignacio Alamos
+ * Copyright (C) 2017 Fundaci�n Inria Chile
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,21 +13,21 @@
  * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
 
-#include <stdio.h>
 #include <assert.h>
-#include <openthread/platform/radio.h>
-#include "ot.h"
+#include <stdio.h>
+#include <string.h>
 
-#define ENABLE_DEBUG (1)
-#include "debug.h"
-
+#include "byteorder.h"
 #include "errno.h"
 #include "net/ethernet/hdr.h"
 #include "net/ethertype.h"
-#include "byteorder.h"
-#include "net/netdev/ieee802154.h"
 #include "net/ieee802154.h"
-#include <string.h>
+#include "net/netdev/ieee802154.h"
+#include "openthread/platform/radio.h"
+#include "ot.h"
+
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
 static bool sDisabled;
 
@@ -38,13 +38,13 @@ static int8_t Rssi;
 static netdev_t *_dev;
 
 /* set 15.4 channel */
-int _set_channel(uint16_t channel)
+static int _set_channel(uint16_t channel)
 {
     return _dev->driver->set(_dev, NETOPT_CHANNEL, &channel, sizeof(uint16_t));
 }
 
 /*get transmission power from driver */
-int16_t _get_power(void)
+static int16_t _get_power(void)
 {
     int16_t power;
 
@@ -53,31 +53,31 @@ int16_t _get_power(void)
 }
 
 /* set transmission power */
-int _set_power(int16_t power)
+static int _set_power(int16_t power)
 {
     return _dev->driver->set(_dev, NETOPT_TX_POWER, &power, sizeof(int16_t));
 }
 
 /* set IEEE802.15.4 PAN ID */
-int _set_panid(uint16_t panid)
+static int _set_panid(uint16_t panid)
 {
     return _dev->driver->set(_dev, NETOPT_NID, &panid, sizeof(uint16_t));
 }
 
 /* set extended HW address */
-int _set_long_addr(uint8_t *ext_addr)
+static int _set_long_addr(uint8_t *ext_addr)
 {
     return _dev->driver->set(_dev, NETOPT_ADDRESS_LONG, ext_addr, IEEE802154_LONG_ADDRESS_LEN);
 }
 
 /* set short address */
-int _set_addr(uint16_t addr)
+static int _set_addr(uint16_t addr)
 {
     return _dev->driver->set(_dev, NETOPT_ADDRESS, &addr, sizeof(uint16_t));
 }
 
 /* check the state of promiscuous mode */
-netopt_enable_t _is_promiscuous(void)
+static netopt_enable_t _is_promiscuous(void)
 {
     netopt_enable_t en;
 
@@ -86,25 +86,25 @@ netopt_enable_t _is_promiscuous(void)
 }
 
 /* set the state of promiscuous mode */
-int _set_promiscuous(netopt_enable_t enable)
+static int _set_promiscuous(netopt_enable_t enable)
 {
     return _dev->driver->set(_dev, NETOPT_PROMISCUOUSMODE, &enable, sizeof(enable));
 }
 
 /* wrapper for setting device state */
-void _set_state(netopt_state_t state)
+static void _set_state(netopt_state_t state)
 {
     _dev->driver->set(_dev, NETOPT_STATE, &state, sizeof(netopt_state_t));
 }
 
 /* sets device state to SLEEP */
-void _set_sleep(void)
+static void _set_sleep(void)
 {
     _set_state(NETOPT_STATE_SLEEP);
 }
 
 /* set device state to IDLE */
-void _set_idle(void)
+static void _set_idle(void)
 {
     _set_state(NETOPT_STATE_IDLE);
 }
@@ -137,7 +137,6 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev)
     /* Fill OpenThread receive frame */
     sReceiveFrame.mLength = len;
     sReceiveFrame.mPower = _get_power();
-
 
     /* Read received frame */
     int res = dev->driver->recv(dev, (char *) sReceiveFrame.mPsdu, len, NULL);
@@ -226,13 +225,11 @@ ThreadError otPlatRadioDisable(otInstance *aInstance)
 
     ThreadError error;
 
-    if (!sDisabled)
-    {
+    if (!sDisabled) {
         sDisabled = true;
         error = kThreadError_None;
     }
-    else
-    {
+    else {
         error = kThreadError_InvalidState;
     }
 
@@ -258,7 +255,6 @@ ThreadError otPlatRadioSleep(otInstance *aInstance)
 }
 
 /*OpenThread will call this for waiting the reception of a packet */
-
 ThreadError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
 {
     DEBUG("openthread: otPlatRadioReceive. Channel: %i\n", aChannel);
@@ -275,6 +271,14 @@ RadioPacket *otPlatRadioGetTransmitBuffer(otInstance *aInstance)
 {
     DEBUG("openthread: otPlatRadioGetTransmitBuffer\n");
     return &sTransmitFrame;
+}
+
+/* OpenThread will call this function to set the transmit power */
+void otPlatRadioSetDefaultTxPower(otInstance *aInstance, int8_t aPower)
+{
+    (void)aInstance;
+
+    _set_power(aPower);
 }
 
 /* OpenThread will call this for transmitting a packet*/
@@ -399,4 +403,9 @@ void otPlatRadioSetDefaultTxPower(otInstance *aInstance, int8_t aPower)
     (void)aPower;
 }
 
+
+int8_t otPlatRadioGetReceiveSensitivity(otInstance *aInstance)
+{
+	return -100;
+}
 /** @} */

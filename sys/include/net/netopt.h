@@ -224,13 +224,6 @@ typedef enum {
     NETOPT_ENCRYPTION,          /**< en/disable encryption */
     NETOPT_ENCRYPTION_KEY,      /**< set encryption key */
 
-#ifdef MODULE_OPENTHREAD
-    /**
-     * @brief enable/disable receiver
-     */
-    NETOPT_RX_LISTENING,
-#endif
-
     /**
      * @brief Test mode for the radio, e.g. for CE or FCC certification
      *

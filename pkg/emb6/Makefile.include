@@ -22,10 +22,6 @@ ifneq (,$(filter emb6_contrib,$(USEMODULE)))
   DIRS += $(EMB6_CONTRIB)
 endif
 
-ifneq (,$(filter emb6_conn_udp,$(USEMODULE)))
-  DIRS += $(EMB6_CONTRIB)/conn/udp
-endif
-
 ifneq (,$(filter emb6_ipv6,$(USEMODULE)))
   DIRS += $(EMB6_DIR)/emb6/src/net/ipv6
   INCLUDES += -I$(EMB6_DIR)/emb6/inc/net/ipv6
@@ -63,6 +59,11 @@ endif
 ifneq (,$(filter emb6_sock,$(USEMODULE)))
   DIRS += $(EMB6_DIR)/emb6/src/tport
   INCLUDES += -I$(EMB6_DIR)/emb6/inc/tport
+endif
+
+ifneq (,$(filter emb6_sock_udp,$(USEMODULE)))
+  DIRS += $(EMB6_CONTRIB)/sock/udp
+  CFLAGS += -DSOCK_HAS_IPV6
 endif
 
 ifneq (,$(filter emb6_utils,$(USEMODULE)))

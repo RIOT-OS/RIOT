@@ -31,9 +31,8 @@
 
 int _gnrc_rpl_init(char *arg)
 {
-    gnrc_ipv6_netif_t *entry = NULL;
-    kernel_pid_t iface_pid = (kernel_pid_t) atoi(arg);
-    entry = gnrc_ipv6_netif_get(iface_pid);
+    kernel_pid_t iface_pid = atoi(arg);
+    gnrc_ipv6_netif_t *entry = gnrc_ipv6_netif_get(iface_pid);
 
     if (entry == NULL) {
         puts("unknown interface specified");
@@ -47,7 +46,7 @@ int _gnrc_rpl_init(char *arg)
 
 int _gnrc_rpl_dodag_root(char *arg1, char *arg2)
 {
-    uint8_t instance_id = (uint8_t) atoi(arg1);
+    uint8_t instance_id = atoi(arg1);
     ipv6_addr_t dodag_id;
 
     if (ipv6_addr_from_str(&dodag_id, arg2) == NULL) {
@@ -55,8 +54,7 @@ int _gnrc_rpl_dodag_root(char *arg1, char *arg2)
         return 1;
     }
 
-    gnrc_rpl_instance_t *inst = NULL;
-    inst = gnrc_rpl_root_init(instance_id, &dodag_id, false, false);
+    gnrc_rpl_instance_t *inst = gnrc_rpl_root_init(instance_id, &dodag_id, false, false);
     if (inst == NULL) {
         char addr_str[IPV6_ADDR_MAX_STR_LEN];
         printf("error: could not add DODAG (%s) to instance (%d)\n",
@@ -71,7 +69,7 @@ int _gnrc_rpl_dodag_root(char *arg1, char *arg2)
 #ifdef MODULE_GNRC_RPL_P2P
 int _gnrc_rpl_find(char *arg1, char *arg2)
 {
-    uint8_t instance_id = (uint8_t) atoi(arg1);
+    uint8_t instance_id = atoi(arg1);
     ipv6_addr_t dodag_id;
     ipv6_addr_t target;
 
@@ -99,7 +97,7 @@ int _gnrc_rpl_find(char *arg1, char *arg2)
 
 int _gnrc_rpl_instance_remove(char *arg1)
 {
-    uint8_t instance_id = (uint8_t) atoi(arg1);
+    uint8_t instance_id = atoi(arg1);
     gnrc_rpl_instance_t *inst;
 
     if ((inst = gnrc_rpl_instance_get(instance_id)) == NULL) {
@@ -118,7 +116,7 @@ int _gnrc_rpl_instance_remove(char *arg1)
 
 int _gnrc_rpl_trickle_reset(char *arg1)
 {
-    uint8_t instance_id = (uint8_t) atoi(arg1);
+    uint8_t instance_id = atoi(arg1);
     gnrc_rpl_instance_t *inst;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
@@ -137,7 +135,7 @@ int _gnrc_rpl_trickle_reset(char *arg1)
 
 int _gnrc_rpl_trickle_stop(char *arg1)
 {
-    uint8_t instance_id = (uint8_t) atoi(arg1);
+    uint8_t instance_id = atoi(arg1);
     gnrc_rpl_instance_t *inst;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
@@ -155,7 +153,7 @@ int _gnrc_rpl_trickle_stop(char *arg1)
 
 int _gnrc_rpl_trickle_start(char *arg1)
 {
-    uint8_t instance_id = (uint8_t) atoi(arg1);
+    uint8_t instance_id = atoi(arg1);
     gnrc_rpl_instance_t *inst;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
@@ -306,8 +304,7 @@ int _gnrc_rpl_dodag_show(void)
         LL_FOREACH(gnrc_rpl_instances[i].dodag.parents, parent) {
             printf("\t\tparent [addr: %s | rank: %d | lifetime: %" PRIu32 "s]\n",
                     ipv6_addr_to_str(addr_str, &parent->addr, sizeof(addr_str)),
-                    parent->rank, ((int32_t) (parent->lifetime - (((uint32_t) xnow / US_PER_SEC))))
-                    < 0 ? 0 : (parent->lifetime - ((uint32_t) xnow / US_PER_SEC)));
+                    parent->rank, parent->lifetime);
         }
     }
     return 0;
@@ -315,7 +312,7 @@ int _gnrc_rpl_dodag_show(void)
 
 int _gnrc_rpl_operation(bool leaf, char *arg1)
 {
-    uint8_t instance_id = (uint8_t) atoi(arg1);
+    uint8_t instance_id = atoi(arg1);
     gnrc_rpl_instance_t *inst;
 
     if ((inst = gnrc_rpl_instance_get(instance_id)) == NULL) {
@@ -337,7 +334,7 @@ int _gnrc_rpl_operation(bool leaf, char *arg1)
 #ifndef GNRC_RPL_WITHOUT_PIO
 int _gnrc_rpl_set_pio(char *inst_id, bool status)
 {
-    uint8_t instance_id = (uint8_t) atoi(inst_id);
+    uint8_t instance_id = atoi(inst_id);
     gnrc_rpl_instance_t *inst;
 
     if ((inst = gnrc_rpl_instance_get(instance_id)) == NULL) {

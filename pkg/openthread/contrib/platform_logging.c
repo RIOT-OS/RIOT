@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 JosÃ© Ignacio Alamos
+ * Copyright (C) 2017 Fundación Inria Chile
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,17 +19,15 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-#include <sys/time.h>
 #include <time.h>
 
-#include <openthread/platform/logging.h>
+#include "openthread/platform/logging.h"
 
 /* adapted from OpenThread posix example:
  * See: https://github.com/openthread/openthread/blob/master/examples/platforms/posix/logging.c */
 void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
 {
     va_list args;
-
 
     switch (aLogLevel) {
         case kLogLevelNone:

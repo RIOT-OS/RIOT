@@ -30,7 +30,7 @@ extern "C"
 
 #include <stdint.h>
 
-#if defined(CPU_MODEL_K60DN512VLL10) || defined(CPU_MODEL_K60DN256VLL10)
+#if defined(CPU_MODEL_MK60DN512VLL10) || defined(CPU_MODEL_MK60DN256VLL10)
 #include "vendor/MK60D10.h"
 
 /** The expected CPUID value, can be used to implement a check that we are

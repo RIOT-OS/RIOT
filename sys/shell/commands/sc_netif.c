@@ -560,7 +560,7 @@ static int _netif_set_u16(kernel_pid_t dev, netopt_t opt, char *u16_str)
 
 static int _netif_set_i16(kernel_pid_t dev, netopt_t opt, char *i16_str)
 {
-    int16_t val = (int16_t)atoi(i16_str);
+    int16_t val = atoi(i16_str);
 
     if (gnrc_netapi_set(dev, opt, 0, (int16_t *)&val, sizeof(int16_t)) < 0) {
         printf("error: unable to set ");
@@ -578,7 +578,7 @@ static int _netif_set_i16(kernel_pid_t dev, netopt_t opt, char *i16_str)
 
 static int _netif_set_u8(kernel_pid_t dev, netopt_t opt, char *u8_str)
 {
-    uint8_t val = (uint8_t)atoi(u8_str);
+    uint8_t val = atoi(u8_str);
 
     if (gnrc_netapi_set(dev, opt, 0, (uint8_t *)&val, sizeof(uint8_t)) < 0) {
         printf("error: unable to set ");
@@ -1056,7 +1056,7 @@ int _netif_send(int argc, char **argv)
     }
 
     /* parse interface */
-    dev = (kernel_pid_t)atoi(argv[1]);
+    dev = atoi(argv[1]);
 
     if (!_is_iface(dev)) {
         puts("error: invalid interface given");
@@ -1114,7 +1114,7 @@ int _netif_config(int argc, char **argv)
         return 0;
     }
     else if (_is_number(argv[1])) {
-        kernel_pid_t dev = (kernel_pid_t)atoi(argv[1]);
+        kernel_pid_t dev = atoi(argv[1]);
 
         if (_is_iface(dev)) {
             if (argc < 3) {

@@ -56,7 +56,7 @@ static int cmd_init(int argc, char **argv)
         return 1;
     }
 
-    uint8_t addr = (uint8_t)atoi(argv[1]);
+    uint8_t addr = atoi(argv[1]);
 
     printf("Initializing SRF02 sensor at I2C_DEV(%i), address is %i\n... ",
            TEST_SRF02_I2C, (int)addr);
@@ -103,7 +103,7 @@ static int cmd_set_addr(int argc, char **argv)
         return 1;
     }
 
-    new_addr = (uint8_t)atoi(argv[1]);
+    new_addr = atoi(argv[1]);
     srf02_set_addr(&dev, new_addr);
     printf("Set address to %i\n", (int)new_addr);
     return 0;

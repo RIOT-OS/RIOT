@@ -21,7 +21,7 @@
 #define CPU_CONF_H
 
 #include "cpu_conf_common.h"
-#include "sam0.h"
+#include "vendor/sam0.h"
 
 #ifdef __cplusplus
 extern "C" {

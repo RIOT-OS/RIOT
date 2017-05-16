@@ -202,6 +202,15 @@ static inline int sercom_id(void *sercom)
 #endif
 }
 
+/**
+ * @brief ADC Channel Configuration
+ */
+typedef struct {
+    gpio_t pin;            /**< ADC channel pin */
+    uint32_t muxpos;       /**< ADC channel pin multiplexer value */
+} adc_conf_chan_t;
+
+
 #ifdef __cplusplus
 }
 #endif

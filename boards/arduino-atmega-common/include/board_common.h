@@ -7,16 +7,12 @@
  * directory for more details.
  */
 
-/**
- * @defgroup    boards_arduino-atmega-common Arduino common
- * @ingroup     boards
- * @brief       Board specific files for the arduino Uno and
- * @brief       Duemilanove boards.
+/*
+ * @ingroup     boards_arduino-atmega-common
  * @{
  *
  * @file
- * @brief       Board specific definitions for the arduino Uno and
- * @brief       Duemilanove boards.
+ * @brief       Common board configuration for Arduino Atmega boards
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Laurent Navet <laurent.navet@gmail.com>

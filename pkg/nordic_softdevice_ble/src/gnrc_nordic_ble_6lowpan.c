@@ -80,9 +80,7 @@ static void _ble_mac_callback(ble_mac_event_enum_t event, void* arg)
 
 static void _handle_raw_sixlowpan(ble_mac_inbuf_t *inbuf)
 {
-    gnrc_pktsnip_t *pkt = NULL;
-
-    pkt = gnrc_pktbuf_add(NULL, inbuf->payload,
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, inbuf->payload,
             inbuf->len,
             GNRC_NETTYPE_SIXLOWPAN);
 

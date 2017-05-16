@@ -31,13 +31,8 @@ static int read_acc(void *dev, phydat_t *res)
     return 3;
 }
 
-static int write(void *dev, phydat_t *state)
-{
-    return -ENOTSUP;
-}
-
 const saul_driver_t adxl345_saul_driver = {
     .read = read_acc,
-    .write = write,
+    .write = saul_notsup,
     .type = SAUL_SENSE_ACCEL,
 };

@@ -80,7 +80,7 @@ int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_s
     char *addr_str, *prefix_len_str, *save_ptr;
     unsigned prefix_len;
     unsigned ltime;
-    unsigned ctx = (unsigned)atoi(ctx_str);
+    unsigned ctx = atoi(ctx_str);
     if (ctx >= GNRC_SIXLOWPAN_CTX_SIZE) {
         _usage(cmd_str);
         return 1;
@@ -91,11 +91,11 @@ int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_s
         return 1;
     }
     prefix_len_str = strtok_r(NULL, "/", &save_ptr);
-    if (addr_str == NULL) {
+    if (prefix_len_str == NULL) {
         _usage(cmd_str);
         return 1;
     }
-    prefix_len = (unsigned)atoi(prefix_len_str);
+    prefix_len = atoi(prefix_len_str);
     if ((prefix_len - 1U) > 128U) {
         puts("ERROR: prefix_len < 1 || prefix_len > 128");
         return 1;
@@ -112,7 +112,7 @@ int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_s
         puts("ERROR: can not add context");
         return 1;
     }
-    ltime = (unsigned)atoi(ltime_str);
+    ltime = atoi(ltime_str);
     if (gnrc_sixlowpan_ctx_update((uint8_t)ctx, &prefix, (uint8_t)prefix_len, ltime,
                                   true) == NULL) {
         puts("ERROR: can not add context");
@@ -126,7 +126,7 @@ int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_s
 int _gnrc_6ctx_del(char *cmd_str, char *ctx_str)
 {
     gnrc_sixlowpan_ctx_t *ctx;
-    unsigned cid = (unsigned)atoi(ctx_str);
+    unsigned cid = atoi(ctx_str);
     if (cid >= GNRC_SIXLOWPAN_CTX_SIZE) {
         _usage(cmd_str);
         return 1;

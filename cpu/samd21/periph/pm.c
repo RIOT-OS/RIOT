@@ -24,7 +24,7 @@
 
 #include "periph/pm.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 enum system_sleepmode {
@@ -52,38 +52,34 @@ enum system_sleepmode {
 
 void pm_set(unsigned mode)
 {
+    int deep = 0;
+
     switch (mode) {
         case 0:
             /* Standby Mode
              * Potential Wake Up sources: asynchronous
              */
-            SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+            deep = 1;
             break;
         case 1:
             /* Sleep mode Idle 2
              * Potential Wake Up sources: asynchronous
              */
-            SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
             PM->SLEEP.reg = SYSTEM_SLEEPMODE_IDLE_2;
             break;
         case 2:
             /* Sleep mode Idle 1
              * Potential Wake Up sources: Synchronous (APB), asynchronous
              */
-            SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
             PM->SLEEP.reg = SYSTEM_SLEEPMODE_IDLE_1;
             break;
         case 3:
             /* Sleep mode Idle 0
              * Potential Wake Up sources: Synchronous (APB, AHB), asynchronous
             */
-            SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
             PM->SLEEP.reg = SYSTEM_SLEEPMODE_IDLE_0;
             break;
     }
 
-    /* Executes a device DSB (Data Synchronization Barrier) */
-    __DSB();
-    /* Enter standby mode */
-    __WFI();
+    cortexm_sleep(deep);
 }

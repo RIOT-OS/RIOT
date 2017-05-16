@@ -23,6 +23,8 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

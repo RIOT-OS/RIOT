@@ -1,6 +1,6 @@
 PKG_NAME=openthread
-PKG_URL=git://github.com/openthread/openthread.git
-PKG_VERSION=0e3b2456f9e472c433cc4f8ce358a1e40be9352e
+PKG_URL=https://github.com/openthread/openthread.git
+PKG_VERSION=fbfd76a990b81f007957e1bd774e51bce742e53e
 PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/$(PKG_NAME)
 
 ifneq (,$(filter libopenthread-ftd,$(USEMODULE)))
@@ -16,7 +16,7 @@ ifneq (,$(filter libopenthread-cli,$(USEMODULE)))
 endif
 ifneq (,$(filter libopenthread-ncp,$(USEMODULE)))
       $(info Compile OpenThread with NCP)
-      OPENTHREAD_ARGS += --enable-ncp
+      OPENTHREAD_ARGS += --enable-ncp --with-ncp-bus=uart
 endif
 $(info $$OPENTHREAD_ARGS is [${OPENTHREAD_ARGS}])
 
@@ -38,6 +38,7 @@ all: git-download
 				--host=$(TARGET_ARCH) \
 				--target=$(TARGET_ARCH) \
 				--prefix=/ \
+				--enable-default-logging \
 				${OPENTHREAD_ARGS} && \
 			make -j99 --no-print-directory DESTDIR=$(PKG_BUILDDIR)/output install PREFIX=/
 		cp $(PKG_BUILDDIR)/output/lib/libmbedcrypto.a ${BINDIR}/libmbedcrypto.a

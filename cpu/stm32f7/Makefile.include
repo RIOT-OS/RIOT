@@ -1,0 +1,5 @@
+export CPU_ARCH = cortex-m7
+export CPU_FAM  = stm32f7
+
+include $(RIOTCPU)/stm32_common/Makefile.include
+include $(RIOTMAKE)/arch/cortexm.inc.mk
