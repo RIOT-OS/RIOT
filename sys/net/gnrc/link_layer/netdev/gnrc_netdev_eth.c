@@ -72,6 +72,13 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev_t *gnrc_netdev)
 
         ethernet_hdr_t *hdr = (ethernet_hdr_t *)eth_hdr->data;
 
+#ifdef MODULE_L2FILTER
+        if (!l2filter_pass(dev->filter, hdr->src, ETHERNET_ADDR_LEN)) {
+            DEBUG("gnrc_netdev_eth: incoming packet filtered by l2filter\n");
+            goto safe_out;
+        }
+#endif
+
         /* set payload type from ethertype */
         pkt->type = gnrc_nettype_from_ethertype(byteorder_ntohs(hdr->type));
 
