@@ -23,11 +23,15 @@ QUIET ?= 1
 # FTD (see openthread_test_ftd): NCP needs Full Thread Device to act as a router in the network
 USEPKG += openthread
 USEMODULE += openthread_contrib
-USEMODULE += libopenthread
-USEMODULE += libopenthread-ftd
-USEMODULE += libopenthread-ncp
 USEMODULE += libmbedcrypto
+USEMODULE += libopenthread-ftd
+USEMODULE += libopenthread-ncp-ftd
 USEMODULE += xtimer
+
+ifneq (,$(filter native,$(BOARD)))
+  USEMODULE += libopenthread-posix
+endif
+
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))
   DRIVER := at86rf233

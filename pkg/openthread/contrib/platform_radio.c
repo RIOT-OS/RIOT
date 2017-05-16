@@ -26,7 +26,7 @@
 #include "openthread/platform/radio.h"
 #include "ot.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 static bool sDisabled;
@@ -288,7 +288,7 @@ ThreadError otPlatRadioTransmit(otInstance *aInstance, RadioPacket *aPacket)
     pkt.iov_len = aPacket->mLength;
 
     /*Set channel and power based on transmit frame */
-    DEBUG("otPlatRadioTransmit->channel: %i\n", (int) aPacket->mChannel);
+    DEBUG("otPlatRadioTransmit->channel: %i, length %d\n", (int) aPacket->mChannel, aPacket->mLength);
     _set_channel(aPacket->mChannel);
     _set_power(aPacket->mPower);
 

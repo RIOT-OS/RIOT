@@ -21,10 +21,14 @@ QUIET ?= 1
 # MTD: A Minimal Thread Device does not have router functionality compiled in. As a result, it is not necessary to configure the routerrole on an MTD. At the same time, an MTD may or may not be sleepy.
 USEPKG += openthread
 USEMODULE += openthread_contrib
-USEMODULE += libopenthread-mtd
-USEMODULE += libopenthread-cli
 USEMODULE += libmbedcrypto
+USEMODULE += libopenthread-mtd
+USEMODULE += libopenthread-cli-mtd
 USEMODULE += xtimer
+
+ifneq (,$(filter native,$(BOARD)))
+  USEMODULE += libopenthread-posix
+endif
 
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))

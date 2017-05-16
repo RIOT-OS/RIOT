@@ -18,16 +18,19 @@ CFLAGS += -DMODULE_OPENTHREAD_CLI
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-TEST_VAR_OP = ftd
-$(info $$TEST_VAR_OP Makefile test is [${TEST_VAR_OP}])
-
 # ftd: A Full Thread Device has router functionality compiled in
 USEPKG += openthread
 USEMODULE += openthread_contrib
-USEMODULE += libopenthread-ftd
-USEMODULE += libopenthread-cli
 USEMODULE += libmbedcrypto
+USEMODULE += libopenthread-ftd
+USEMODULE += libopenthread-cli-ftd
 USEMODULE += xtimer
+
+
+ifneq (,$(filter native,$(BOARD)))
+  USEMODULE += libopenthread-posix
+endif
+
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))
   DRIVER := at86rf233
