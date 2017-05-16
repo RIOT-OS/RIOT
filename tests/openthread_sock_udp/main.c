@@ -34,7 +34,27 @@ static OT_JOB _thread_start(otInstance *ot_instance, void *context)
 static OT_JOB _read_state(otInstance *ot_instance, void *context)
 {
     uint8_t state = otThreadGetDeviceRole(ot_instance);
-    printf("State is: %i\n", state);
+
+	switch(state) {
+		 case kDeviceRoleOffline:
+            puts("offline");
+            break;
+        case kDeviceRoleDisabled:
+            puts("disabled");
+            break;
+        case kDeviceRoleDetached:
+            puts("detached");
+            break;
+        case kDeviceRoleChild:
+            puts("child");
+            break;
+        case kDeviceRoleRouter:
+            puts("router");
+            break;
+        case kDeviceRoleLeader:
+            puts("leader");
+            break;
+	}
 }
 
 static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *context)
@@ -59,76 +79,85 @@ int _listen(int argc, char **argv)
 
 int _udp(int argc, char **argv)
 {
-    if (argc < 3)
+    if (argc < 2)
     {
+		printf("Usage: %s [send|server]\n", argv[0]);
+		puts(" ");
         return 1;
     }
     else if (strcmp(argv[1],"server")==0)
     {
+		if(argc == 2) {
+			printf("Usage: %s server <port>\n", argv[0]);
+			return 1;
+		}
         sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
         local.port = atoi(argv[2]);
         if (sock_udp_create(&sock, &local, NULL, 0) < 0) {
-        puts("Error creating UDP sock");
+			puts("Error creating UDP sock");
+		}
     }
-    }
-    else if(argc >= 2 && strcmp(argv[1],"send")==0)
+    else if(strcmp(argv[1],"send")==0)
     {
-    sock_udp_ep_t remote = { .family = AF_INET6 };
-    remote.port = atoi(argv[3]);
-    ipv6_addr_from_str((ipv6_addr_t *)&remote.addr.ipv6, argv[2]);
-    if (sock_udp_send(&sock, argv[4], strlen(argv[4]), &remote) < 0) {
-        puts("Error sending message");
-        sock_udp_close(&sock);
-        return 1;
-    }
-    }
-    else if(argc >= 2 && strcmp(argv[1],"echo")==0)
-    {
+		if(argc < 5) {
+			printf("Usage: %s send <addr> <port> <data>\n", argv[0]);
+			return 1;
+		}
+		sock_udp_ep_t remote = { .family = AF_INET6 };
+		remote.port = atoi(argv[3]);
+		ipv6_addr_from_str((ipv6_addr_t *)&remote.addr.ipv6, argv[2]);
+		if (sock_udp_send(&sock, argv[4], strlen(argv[4]), &remote) < 0) {
+			puts("Error sending message");
+			sock_udp_close(&sock);
+			return 1;
+		}
     }
     return 0;
+}
+
+static void _usage(char *cmd)
+{
+    printf("Usage: %s \n", cmd);
+    puts("        List Thread IPv6 addresses");
+    printf("    %s <get|set> <panid> \n", cmd);
+    puts("        Get/Set PAN ID");
+    printf("    %s thread start \n", cmd);
+    puts("        Start the thread network");
+    printf("    %s thread state \n", cmd);
+    puts("        Asks for the state of a thread network.");
 }
 
 int _ifconfig(int argc, char **argv)
 {
     uint16_t panid;
-    if(argc >= 2)
-    {
-    if(strcmp(argv[1], "get") == 0 && argc >= 3)
-    {
-            if(strcmp(argv[2], "panid") == 0)
-        {
-        ot_exec_job(_get_panid, &panid);
-        }       
+    if(argc >= 2) {
+		if(strcmp(argv[1], "get") == 0 && argc >= 3) {
+			if(strcmp(argv[2], "panid") == 0) {
+				ot_exec_job(_get_panid, &panid);
+			}	    
+		}
+		else if(strcmp(argv[1], "set") == 0 && argc >= 4) {
+			if(strcmp(argv[2], "panid") == 0) {
+				panid = strtol(argv[3], NULL, 0);
+				ot_exec_job(_set_panid, &panid);
+			}	    
+		}
+		else if(strcmp(argv[1], "thread") == 0)
+		{
+			if(strcmp(argv[2], "start") == 0) {
+				ot_exec_job(_thread_start, NULL);
+			}
+			else if(strcmp(argv[2], "state") == 0) {
+				uint8_t state;
+				ot_exec_job(_read_state, &state);
+			}
+		}
+		else {
+			_usage(argv[0]);
+		}
     }
-    else if(strcmp(argv[1], "set") == 0 && argc >= 4)
-    {
-            if(strcmp(argv[2], "panid") == 0)
-        {
-        panid = strtol(argv[3], NULL, 0);
-        ot_exec_job(_set_panid, &panid);
-        }       
-    
-    }
-    else if(strcmp(argv[1], "thread") == 0)
-    {
-        if(strcmp(argv[2], "start") == 0)
-        {
-        ot_exec_job(_thread_start, NULL);
-        }
-        else if(strcmp(argv[2], "state") == 0)
-            {
-        uint8_t state;
-        ot_exec_job(_read_state, &state);
-        }
-    }
-    else
-    {
-        printf("Usage...");
-    }
-    }
-    else
-    {
-    ot_exec_job(_get_ip_addresses, NULL);
+    else {
+		ot_exec_job(_get_ip_addresses, NULL);
     }
     return 0;
 }
