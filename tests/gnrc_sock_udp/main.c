@@ -23,7 +23,6 @@
 #include <stdio.h>
 
 #include "net/sock/udp.h"
-#include "net/sock.h"
 #include "xtimer.h"
 
 #include "constants.h"
