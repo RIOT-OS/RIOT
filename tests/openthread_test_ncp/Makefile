@@ -1,4 +1,4 @@
-APPLICATION = openthread_test
+APPLICATION = openthread_test_ncp
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= samr21-xpro
@@ -12,19 +12,22 @@ RIOTBASE ?= $(CURDIR)/../..
 
 CFLAGS += -DDEVELHELP -Wall
 
-#Uncomment the following line for running OpenThread CLI
-CFLAGS += -DMODULE_OPENTHREAD_CLI
+#Uncomment the following line for running OpenThread NCP
+CFLAGS += -DMODULE_OPENTHREAD_NCP
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+# NCP: A Network Co-Processor is used with wpantund software. wpantund is a user-space network
+# interface driver/daemon that provides a native IPv6 network interface to a low-power wireless Network Co-Processor
+# FTD (see openthread_test_ftd): NCP needs Full Thread Device to act as a router in the network
 USEPKG += openthread
 USEMODULE += openthread_contrib
 USEMODULE += libopenthread
-USEMODULE += libopenthread-cli
+USEMODULE += libopenthread-ftd
+USEMODULE += libopenthread-ncp
 USEMODULE += libmbedcrypto
 USEMODULE+=xtimer
-
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))
   DRIVER := at86rf233

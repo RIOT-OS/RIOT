@@ -1,4 +1,4 @@
-APPLICATION = openthread_test
+APPLICATION = openthread_test_ftd
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= samr21-xpro
@@ -12,16 +12,20 @@ RIOTBASE ?= $(CURDIR)/../..
 
 CFLAGS += -DDEVELHELP -Wall
 
-#Uncomment the following line for running OpenThread NCP
-CFLAGS += -DMODULE_OPENTHREAD_NCP
+#Uncomment the following line for running OpenThread CLI
+CFLAGS += -DMODULE_OPENTHREAD_CLI
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+TEST_VAR_OP = ftd
+$(info $$TEST_VAR_OP Makefile test is [${TEST_VAR_OP}])
+
+# ftd: A Full Thread Device has router functionality compiled in
 USEPKG += openthread
 USEMODULE += openthread_contrib
-USEMODULE += libopenthread
-USEMODULE += libopenthread-ncp
+USEMODULE += libopenthread-ftd
+USEMODULE += libopenthread-cli
 USEMODULE += libmbedcrypto
 USEMODULE+=xtimer
 

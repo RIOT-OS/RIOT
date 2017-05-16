@@ -122,7 +122,7 @@ void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb)
 /* Called upon NETDEV_EVENT_RX_COMPLETE event */
 void recv_pkt(otInstance *aInstance, netdev_t *dev)
 {
-    DEBUG("Openthread: Received pkt");
+    DEBUG("Openthread: Received pkt\n");
     netdev_ieee802154_rx_info_t rx_info;
     /* Read frame length from driver */
     int len = dev->driver->recv(dev, NULL, 0, &rx_info);
@@ -200,7 +200,7 @@ void otPlatRadioSetShortAddress(otInstance *aInstance, uint16_t aShortAddress)
 /* OpenThread will call this for enabling the radio */
 ThreadError otPlatRadioEnable(otInstance *aInstance)
 {
-    DEBUG("openthread: otPlatRadioEnable");
+    DEBUG("openthread: otPlatRadioEnable\n");
     (void) aInstance;
 
     ThreadError error;
@@ -221,7 +221,7 @@ return error;
 /* OpenThread will call this for disabling the radio */
 ThreadError otPlatRadioDisable(otInstance *aInstance)
 {
-    DEBUG("openthread: otPlatRadioDisable");
+    DEBUG("openthread: otPlatRadioDisable\n");
     (void) aInstance;
 
     ThreadError error;
