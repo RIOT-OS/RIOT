@@ -52,6 +52,9 @@ endif
 ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
   DIRS += netapi
 endif
+ifneq (,$(filter gnrc_netif2,$(USEMODULE)))
+    DIRS += netif2
+endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   DIRS += netif
 endif

@@ -31,7 +31,15 @@ static const char *_netopt_strmap[] = {
     [NETOPT_ADDR_LEN]              = "NETOPT_ADDR_LEN",
     [NETOPT_SRC_LEN]               = "NETOPT_SRC_LEN",
     [NETOPT_NID]                   = "NETOPT_NID",
+    [NETOPT_HOP_LIMIT]             = "NETOPT_HOP_LIMIT",
     [NETOPT_IPV6_IID]              = "NETOPT_IPV6_IID",
+    [NETOPT_IPV6_ADDR]             = "NETOPT_IPV6_ADDR",
+    [NETOPT_IPV6_ADDR_REMOVE]      = "NETOPT_IPV6_ADDR_REMOVE",
+    [NETOPT_IPV6_ADDR_FLAGS]       = "NETOPT_IPV6_ADDR_FLAGS",
+    [NETOPT_IPV6_GROUP]            = "NETOPT_IPV6_GROUP",
+    [NETOPT_IPV6_GROUP_LEAVE]      = "NETOPT_IPV6_GROUP_LEAVE",
+    [NETOPT_IPV6_FORWARDING]       = "NETOPT_IPV6_FORWARDING",
+    [NETOPT_IPV6_SND_RTR_ADV]      = "NETOPT_IPV6_SND_RTR_ADV",
     [NETOPT_TX_POWER]              = "NETOPT_TX_POWER",
     [NETOPT_MAX_PACKET_SIZE]       = "NETOPT_MAX_PACKET_SIZE",
     [NETOPT_PRELOADING]            = "NETOPT_PRELOADING",
@@ -78,6 +86,7 @@ static const char *_netopt_strmap[] = {
     [NETOPT_FIXED_HEADER]          = "NETOPT_FIXED_HEADER",
     [NETOPT_IQ_INVERT]             = "NETOPT_IQ_INVERT",
     [NETOPT_TX_RETRIES_NEEDED]     = "NETOPT_TX_RETRIES_NEEDED",
+    [NETOPT_6LO_IPHC]              = "NETOPT_6LO_IPHC",
     [NETOPT_NUMOF]                 = "NETOPT_NUMOF",
 };
 
