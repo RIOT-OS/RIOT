@@ -32,7 +32,27 @@ static OT_JOB _thread_start(otInstance *ot_instance, void *context)
 static OT_JOB _read_state(otInstance *ot_instance, void *context)
 {
     uint8_t state = otThreadGetDeviceRole(ot_instance);
-    printf("State is: %i\n", state);
+
+	switch(state) {
+		 case kDeviceRoleOffline:
+            puts("offline");
+            break;
+        case kDeviceRoleDisabled:
+            puts("disabled");
+            break;
+        case kDeviceRoleDetached:
+            puts("detached");
+            break;
+        case kDeviceRoleChild:
+            puts("child");
+            break;
+        case kDeviceRoleRouter:
+            puts("router");
+            break;
+        case kDeviceRoleLeader:
+            puts("leader");
+            break;
+	}
 }
 
 static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *context)
@@ -76,8 +96,6 @@ typedef struct
     size_t len;
 } udp_pkt_t;
 
-
-
 static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *context)
 {
     udp_pkt_t *pkt = (udp_pkt_t*) context;
@@ -106,7 +124,6 @@ static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *context)
 	otUdpClose(&socket);
 }
 
-
 int _udp(int argc, char **argv)
 {
     if (argc < 3) {
@@ -126,6 +143,18 @@ int _udp(int argc, char **argv)
 	ot_exec_job(_send_udp_pkt, &pkt);
     }
     return 0;
+}
+
+static void _usage(char *cmd)
+{
+    printf("Usage: %s \n", cmd);
+    puts("        List Thread IPv6 addresses");
+    printf("    %s <get|set> <panid> \n", cmd);
+    puts("        Get/Set PAN ID");
+    printf("    %s thread start \n", cmd);
+    puts("        Start the thread network");
+    printf("    %s thread state \n", cmd);
+    puts("        Asks for the state of a thread network.");
 }
 
 int _ifconfig(int argc, char **argv)
@@ -153,9 +182,8 @@ int _ifconfig(int argc, char **argv)
 				ot_exec_job(_read_state, &state);
 			}
 		}
-		else
-		{
-			printf("Usage...");
+		else {
+			_usage(argv[0]);
 		}
     }
     else {
