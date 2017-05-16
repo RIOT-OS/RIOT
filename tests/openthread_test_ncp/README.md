@@ -15,14 +15,15 @@ To test OpenThread NCP in RIOT, you can do the following:
 
 1. Flash nodes with `make BOARD=<target> clean all flash`
 2. Install wpantund: On Ubuntu 16.04, run
-`sudo apt-get -y install build-essential subversion libncurses5-dev libssl-dev zlib1g-dev gawk gcc-multilib flex git-core gettext gcc binutils bzip2 python perl make unzip libz-dev tftp git shtool autogen automake libtool autotools-dev libdbus-1-dev
+```
+sudo apt-get -y install build-essential subversion libncurses5-dev libssl-dev zlib1g-dev gawk gcc-multilib flex git-core gettext gcc binutils bzip2 python perl make unzip libz-dev tftp git shtool autogen automake libtool autotools-dev libdbus-1-dev
 git clone https://github.com/openthread/wpantund.git
 cd wpantund
 ./bootstrap.sh
 ./configure
 make
 sudo make install
-`
+```
 
 3) Start wpantund on your host.  Be sure to pass flags appropriate to connect wpantund to your NCP connection type.
 You can also name the network interface at this time or let wpantund automatically assign a name (wpan0):
