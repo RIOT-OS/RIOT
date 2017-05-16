@@ -35,6 +35,39 @@ extern "C" {
 #define NETIF_NAMELENMAX    (8U)
 #endif
 
+typedef enum {
+    NETIF_TYPE_UNDEF = 0;
+#ifdef MODULE_GNRC
+    NETIF_TYPE_GNRC_NETIF,
+#endif
+#ifdef MODULE_GNRC_LWMAC
+    NETIF_TYPE_GNRC_NETIF_LWMAC,
+#ifdef MODULE_LWIP
+    NETIF_TYPE_LWIP,
+#endif /* MODULE_LWIP */
+#ifdef MODUE_LWIP_SIXLOWPAN
+    NETIF_TYPE_LWIP_6LO,
+#endif /* MODULE_LWIP */
+#ifdef MODULE_EMB6
+    NETIF_TYPE_EMB6,
+#endif
+#ifdef MODULE_OPENTHREAD
+    NETIF_TYPE_OPENTHREAD,
+#endif
+    /* extend list if needed */
+} netif_type_t;
+
+typedef struct {
+    const void *dev_params;
+    netif_type_t type;
+    const char *name;
+} netif_params_t;
+
+extern const void *netif_netdev_default_params;
+
+netif_params_t *netif_params_get_by_dev(netif_params_t *netif_params,
+                                        const void *dev_pararms);
+
 /**
  * @brief   Network interface enumeration type
  */
