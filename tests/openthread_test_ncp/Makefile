@@ -27,7 +27,7 @@ USEMODULE += libopenthread
 USEMODULE += libopenthread-ftd
 USEMODULE += libopenthread-ncp
 USEMODULE += libmbedcrypto
-USEMODULE+=xtimer
+USEMODULE += xtimer
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))
   DRIVER := at86rf233
@@ -42,10 +42,7 @@ endif
 
 USEMODULE += $(DRIVER)
 
-USEMODULE+=random
-
-USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += random
 USEMODULE += ps
 USEMODULE += ipv6_addr
 

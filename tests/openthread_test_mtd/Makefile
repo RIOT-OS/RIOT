@@ -24,7 +24,7 @@ USEMODULE += openthread_contrib
 USEMODULE += libopenthread-mtd
 USEMODULE += libopenthread-cli
 USEMODULE += libmbedcrypto
-USEMODULE+=xtimer
+USEMODULE += xtimer
 
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))
@@ -40,10 +40,7 @@ endif
 
 USEMODULE += $(DRIVER)
 
-USEMODULE+=random
-
-USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += random
 USEMODULE += ps
 USEMODULE += ipv6_addr
 

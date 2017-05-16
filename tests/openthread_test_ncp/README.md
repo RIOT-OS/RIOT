@@ -5,24 +5,37 @@ RIOT. The [Command Line Interface](https://github.com/openthread/openthread/blob
 OpenThread was ported. Please check the [full
 documentation](https://github.com/openthread/openthread/blob/master/src/cli/README.md) of the CLI for usage information.
 
+This test show how to use a Network Co-Processor (NCP). A Network Co-Processor is used with wpantund software.
+Wpantund is a user-space network interface driver/daemon that provides a native IPv6 network interface to a low-power
+wireless Network Co-Processor. NCP and wpantund communicates by UART (UART(0) is used here)
+
 ## Quick usage
 
-To test OpenThread in RIOT, you can do the following:
+To test OpenThread NCP in RIOT, you can do the following:
 
 1. Flash nodes with `make BOARD=<target> clean all flash`
-2. Write `start` on one node.
-3. Check the state of the node with `state`. In the beggining should be `detached`, but after some seconds it should
-   become `leader`
-4. Write `start` on another node. The second node should become `router` if there's a leader.
-5. Get the mesh IP address of a node with `ipaddr`.
-   `ipaddr`
-   `fdde:ad00:beef::ff:fe00:8000`
-   `fe80::ff:fe00:8000`
-   `fdde:ad00:beef:0:946a:c722:a5d9:8481`
-   `fe80::3984:f4eb:d182:5dae`
-6. Ping from another node with `ping fdde:ad00:beef:0:946a:c722:a5d9:848`.
-7. You cna try IEEE802.15.4 scan with `scan` command
-8. You can also check other commands with `help`
+2. Install wpantund: On Ubuntu 16.04, run
+`sudo apt-get -y install build-essential subversion libncurses5-dev libssl-dev zlib1g-dev gawk gcc-multilib flex git-core gettext gcc binutils bzip2 python perl make unzip libz-dev tftp git shtool autogen automake libtool autotools-dev libdbus-1-dev
+git clone https://github.com/openthread/wpantund.git
+cd wpantund
+./bootstrap.sh
+./configure
+make
+sudo make install
+`
+
+3) Start wpantund on your host.  Be sure to pass flags appropriate to connect wpantund to your NCP connection type.
+You can also name the network interface at this time or let wpantund automatically assign a name (wpan0):
+
+`sudo /usr/local/sbin/wpantund -s /dev/ttyACM0 -I wpan0 -o SyslogMask all`
+
+4) Start wpanctl to access the command line management interface for controlling Thread features on your device.
+This is similar to the Thread cli interface conceptually but with slightly different command syntax:
+
+`sudo /usr/local/bin/wpanctl -I wpan0`
+
+5) Confirm your network interface has started and is operational by running standard IP commands such `ifconfig` and `ping6`.
+
 
 ## OpenThread status
 
@@ -31,6 +44,6 @@ OpenThread is still under development. In case of any bug, please report via Git
 
 ## Known issues
 
-* When the network traffic is really high, sometimes some nodes crash silently. 
+* When the network traffic is really high, sometimes some nodes crash silently.
 * In some cases there are isolated leaders that are not able to recover to the main partition. These won't affect the
   rest of the network, but this node becomes unreachable.
