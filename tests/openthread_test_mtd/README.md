@@ -29,9 +29,9 @@ The second node should become `router` if there's a leader.
 7. You can try IEEE802.15.4 scan with `scan` command
 8. You can also check other commands with `help`
 
-## OpenThread status
+## OpenThread port on RIOT status
 
-OpenThread is still under development. In case of any bug, please report via GitHub issue.
+OpenThread port on RIOT is still under development. In case of any bug, please report via GitHub issue.
 
 
 ## Known issues

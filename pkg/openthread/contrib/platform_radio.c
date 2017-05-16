@@ -204,13 +204,10 @@ ThreadError otPlatRadioEnable(otInstance *aInstance)
 
     ThreadError error;
 
-    if (sDisabled)
-    {
+    if (sDisabled) {
         sDisabled = false;
         error = kThreadError_None;
-    }
-    else
-    {
+    } else {
         error = kThreadError_InvalidState;
     }
 
@@ -228,8 +225,7 @@ ThreadError otPlatRadioDisable(otInstance *aInstance)
     if (!sDisabled) {
         sDisabled = true;
         error = kThreadError_None;
-    }
-    else {
+    } else {
         error = kThreadError_InvalidState;
     }
 

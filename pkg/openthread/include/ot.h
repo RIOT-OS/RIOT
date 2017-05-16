@@ -35,10 +35,10 @@ extern "C" {
 #include "openthread/types.h"
 
 #define OPENTHREAD_XTIMER_MSG_TYPE_EVENT (0x2235)   /**< xtimer message receiver event*/
-#define OPENTHREAD_NETDEV_MSG_TYPE_EVENT (0x2236)  /**< message received from driver */
+#define OPENTHREAD_NETDEV_MSG_TYPE_EVENT (0x2236)   /**< message received from driver */
 #define OPENTHREAD_SERIAL_MSG_TYPE_EVENT (0x2237)   /**< event indicating a serial (UART) message was sent to OpenThread */
 #define OPENTHREAD_MSG_TYPE_RECV (0x2238)           /**< event for frame reception */
-#define OPENTHREAD_JOB_MSG_TYPE_EVENT (0x2240)
+#define OPENTHREAD_JOB_MSG_TYPE_EVENT (0x2240)      /**< event indicating an OT_JOB message */
 
 typedef void OT_JOB;
 
@@ -55,8 +55,8 @@ typedef struct {
  * @brief   Struct containing an OpenThread job
  */
 typedef struct {
-    void (*function)(otInstance*, void*); /**< function to be called when executing job */
-    void *context; /**< context for the job **/
+    void (*function)(otInstance*, void*);   /**< function to be called when executing job */
+    void *context;                          /**< context for the job **/
 } ot_job_t;
 
 /**

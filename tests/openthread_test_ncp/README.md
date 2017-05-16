@@ -37,9 +37,9 @@ This is similar to the Thread cli interface conceptually but with slightly diffe
 5) Confirm your network interface has started and is operational by running standard IP commands such `ifconfig` and `ping6`.
 
 
-## OpenThread status
+## OpenThread port on RIOT status
 
-OpenThread is still under development. In case of any bug, please report via GitHub issue.
+OpenThread port on RIOT is still under development. In case of any bug, please report via GitHub issue.
 
 
 ## Known issues

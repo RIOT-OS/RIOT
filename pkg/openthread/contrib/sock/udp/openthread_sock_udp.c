@@ -10,6 +10,7 @@
  * @{
  *
  * @file
+ * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
 
 #include <errno.h>
@@ -33,17 +34,17 @@ static void _handle_receive(void *aContext, otMessage *aMessage, const otMessage
 {
     size_t payload_len = otMessageGetLength(aMessage)-otMessageGetOffset(aMessage);
     sock_udp_t *sock = aContext;
-	if(sock->data == NULL || payload_len > sock->max_len)
-	{
-		return;
-	}
-	
-    otMessageRead(aMessage, otMessageGetOffset(aMessage), sock->data, payload_len);
-	sock->data = NULL;
-	sock->len = payload_len;
+    if(sock->data == NULL || payload_len > sock->max_len)
+    {
+        return;
+    }
 
-	// msg_t msg = { .type = _MSG_TYPE_RCV };
-	msg_t msg = { .type = 1 };
+    otMessageRead(aMessage, otMessageGetOffset(aMessage), sock->data, payload_len);
+    sock->data = NULL;
+    sock->len = payload_len;
+
+    // msg_t msg = { .type = _MSG_TYPE_RCV };
+    msg_t msg = { .type = 1 };
 
     //mutex_lock(&sock->mutex);
     /*sock->recv_info.src_port = src_port;
@@ -143,7 +144,7 @@ static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
     otMessageWrite(message, 0, pkt->payload, pkt->len);
 
     otMessageInfo mPeer;
-    
+
     /* Set dest address */
     memcpy(&mPeer.mPeerAddr.mFields, &(pkt->ip_addr), sizeof(ipv6_addr_t));
 
@@ -167,20 +168,20 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         (local->netif != remote->netif)) {
         return -EINVAL;
     }
-    
-	mbox_init(&sock->mbox, sock->mbox_queue, SOCK_MBOX_SIZE);
-	sock->data = NULL;
+
+    mbox_init(&sock->mbox, sock->mbox_queue, SOCK_MBOX_SIZE);
+    sock->data = NULL;
     memset(&sock->local, 0, sizeof(sock_udp_ep_t));
-    
+
     if (local) {
         if (openthread_af_not_supported(local->family)) {
             return -EAFNOSUPPORT;
         }
         memcpy(&sock->local, local, sizeof(sock_udp_ep_t));
     }
-    
+
     memset(&sock->remote, 0, sizeof(sock_udp_ep_t));
-    
+
     if (remote) {
         if (openthread_af_not_supported(remote->family)) {
             return -EAFNOSUPPORT;
@@ -198,9 +199,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
     if (local) {
         DEBUG("Socket port %d \n", socket_port);
         ot_exec_job(_create_udp_socket, sock);
-    }
-    else
-    {
+    } else {
         DEBUG("Null local\n");
     }
     sock->flags = flags;
@@ -240,12 +239,12 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *remote)
 ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
                       uint32_t timeout, sock_udp_ep_t *remote)
 {
-	// xtimer_t timeout_timer;
+    // xtimer_t timeout_timer;
     //int blocking = BLOCKING;
     int res = -EIO;
     msg_t msg;
 
-	/*
+    /*
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
     if (sock->sock.input_callback == NULL) {
         return -EADDRNOTAVAIL;
@@ -253,7 +252,7 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     if (timeout == 0) {
         blocking = NON_BLOCKING;
     }*/
-	/*
+    /*
     else if (timeout != SOCK_NO_TIMEOUT) {
         timeout_timer.callback = _timeout_callback;
         timeout_timer.arg = &sock->mbox;
@@ -261,9 +260,9 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     }*/
 
     //atomic_fetch_add(&sock->receivers, 1);
-	sock->data = data;
-	sock->max_len = max_len;
-	
+    sock->data = data;
+    sock->max_len = max_len;
+
     if (_mbox_get(&sock->mbox, &msg, true) == 0) {
         /* do not need to remove xtimer, since we only get here in non-blocking
          * mode (timeout > 0) */
@@ -271,16 +270,16 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     }
 
     switch (msg.type) {
-		/* TODO: Label this */
+        /* TODO: Label this */
         case 1:
-			/*
+            /*
             if (remote != NULL) {
                 remote->family = AF_INET6;
                 remote->netif = SOCK_ADDR_ANY_NETIF;
                 memcpy(&remote->addr, &sock->recv_info.src, sizeof(ipv6_addr_t));
                 remote->port = sock->recv_info.src_port;
             }
-			*/
+            */
             res = (int) sock->len;
             break;
 #if 0
