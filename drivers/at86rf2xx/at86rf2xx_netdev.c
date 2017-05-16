@@ -35,7 +35,7 @@
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #define _MAX_MHR_OVERHEAD   (25)
@@ -574,7 +574,7 @@ static void _isr(netdev_t *netdev)
                         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE_DATA_PENDING);
                         DEBUG("[at86rf2xx] TX SUCCESS DATA PENDING\n");
                         break;
-#else 
+#else
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
                         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
