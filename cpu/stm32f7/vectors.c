@@ -126,6 +126,20 @@ WEAK_DEFAULT void isr_cec(void);
 WEAK_DEFAULT void isr_i2c4_ev(void);
 WEAK_DEFAULT void isr_i2c4_er(void);
 WEAK_DEFAULT void isr_spdif_rx(void);
+#if defined(CPU_MODEL_STM32F769NI)
+WEAK_DEFAULT void isr_dsi(void);
+WEAK_DEFAULT void isr_dfsdm1_flt0(void);
+WEAK_DEFAULT void isr_dfsdm1_flt1(void);
+WEAK_DEFAULT void isr_dfsdm1_flt2(void);
+WEAK_DEFAULT void isr_dfsdm1_flt3(void);
+WEAK_DEFAULT void isr_sdmmc2(void);
+WEAK_DEFAULT void isr_can3_tx(void);
+WEAK_DEFAULT void isr_can3_rx0(void);
+WEAK_DEFAULT void isr_can3_rx1(void);
+WEAK_DEFAULT void isr_can3_sce(void);
+WEAK_DEFAULT void isr_jpeg(void);
+WEAK_DEFAULT void isr_mdios(void);
+#endif
 
 /* interrupt vector table */
 ISR_VECTORS const void *interrupt_vector[] = {
@@ -247,5 +261,19 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_cec,
     (void*) isr_i2c4_ev,
     (void*) isr_i2c4_er,
-    (void*) isr_spdif_rx
+    (void*) isr_spdif_rx,
+#if defined(CPU_MODEL_STM32F769NI)
+    (void*) isr_dsi,
+    (void*) isr_dfsdm1_flt0,
+    (void*) isr_dfsdm1_flt1,
+    (void*) isr_dfsdm1_flt2,
+    (void*) isr_dfsdm1_flt3,
+    (void*) isr_sdmmc2,
+    (void*) isr_can3_tx,
+    (void*) isr_can3_rx0,
+    (void*) isr_can3_rx1,
+    (void*) isr_can3_sce,
+    (void*) isr_jpeg,
+    (void*) isr_mdios,
+#endif
 };
