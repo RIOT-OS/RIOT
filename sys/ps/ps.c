@@ -61,7 +61,7 @@ void ps(void)
 #endif
             "%-9sQ | pri "
 #ifdef DEVELHELP
-           "| stack ( used) | base       | current    "
+           "| stack ( used) | base       | current     "
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
            "| runtime | switches"
@@ -98,7 +98,8 @@ void ps(void)
             overall_used += stacksz;
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
-            double runtime_ticks =  sched_pidlist[i].runtime_ticks / (double) xtimer_now() * 100;
+            double runtime_ticks = sched_pidlist[i].runtime_ticks /
+                                   (double) _xtimer_now64() * 100;
             int switches = sched_pidlist[i].schedules;
 #endif
             printf("\t%3" PRIkernel_pid
