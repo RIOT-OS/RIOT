@@ -598,6 +598,11 @@ ifneq (,$(filter l2filter_%,$(USEMODULE)))
   USEMODULE += l2filter
 endif
 
+ifneq (,$(filter gcoap,$(USEMODULE)))
+USEPKG += nanocoap
+USEMODULE += gnrc_sock_udp
+endif
+
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
