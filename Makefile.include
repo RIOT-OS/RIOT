@@ -360,7 +360,7 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
-flash: all
+flash: all $(FLASHDEPS)
 	@command -v $(FLASHER) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
 		'${COLOR_RED}Flash program $(FLASHER) not found. Aborting.${COLOR_RESET}'; \
