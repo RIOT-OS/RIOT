@@ -525,7 +525,7 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
     /* Return if connection is closed */
     if (tcb->state == FSM_STATE_CLOSED) {
         mutex_unlock(&(tcb->function_lock));
-        return 0;
+        return;
     }
 
     /* Mark TCB as waiting for incomming messages */
