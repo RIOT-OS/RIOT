@@ -26,8 +26,6 @@
 #include <inttypes.h>
 
 #include "thread.h"
-#include "net/netstats.h"
-#include "net/l2filter.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/netif.h"
@@ -37,6 +35,13 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/sixlowpan/netif.h"
+
+#ifdef MODULE_NETSTATS
+#include "net/netstats.h"
+#endif
+#ifdef MODULE_L2FILTER
+#include "net/l2filter.h"
+#endif
 
 /**
  * @brief   The maximal expected link layer address length in byte
