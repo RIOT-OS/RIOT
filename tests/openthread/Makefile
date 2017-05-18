@@ -18,7 +18,7 @@ CFLAGS += -DDEVELHELP -Wall
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-USEMODULE+=openthread
+USEMODULE += openthread
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))
   DRIVER := at86rf233
@@ -33,7 +33,7 @@ endif
 
 USEMODULE += $(DRIVER)
 
-USEMODULE+=random
+USEMODULE += random
 
 USEMODULE += shell
 USEMODULE += shell_commands
