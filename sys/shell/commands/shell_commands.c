@@ -165,12 +165,12 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_GNRC_ICMPV6_ECHO
 #ifdef MODULE_XTIMER
-    {"ping6", "Ping via ICMPv6", _icmpv6_ping},
+    { "ping6", "Ping via ICMPv6", _icmpv6_ping },
 #endif
 #endif
 #ifdef MODULE_RANDOM
-    {"random_init", "initializes the PRNG", _random_init},
-    {"random_get", "returns 32 bit of pseudo randomness", _random_get},
+    { "random_init", "initializes the PRNG", _random_init },
+    { "random_get", "returns 32 bit of pseudo randomness", _random_get },
 #endif
 #if FEATURE_PERIPH_RTC
     {"rtc", "control RTC peripheral interface",  _rtc_handler},
@@ -188,34 +188,34 @@ const shell_command_t _shell_command_list[] = {
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
 #endif
 #ifdef MODULE_GNRC_IPV6_NC
-    {"ncache", "manage neighbor cache by hand", _ipv6_nc_manage},
-    {"routers", "IPv6 default router list", _ipv6_nc_routers},
+    {"ncache", "manage neighbor cache by hand", _ipv6_nc_manage },
+    {"routers", "IPv6 default router list", _ipv6_nc_routers },
 #endif
 #ifdef MODULE_GNRC_IPV6_WHITELIST
-    {"whitelist", "whitelists an address for receival ('whitelist [add|del|help]')", _whitelist},
+    {"whitelist", "whitelists an address for receival ('whitelist [add|del|help]')", _whitelist },
 #endif
 #ifdef MODULE_GNRC_IPV6_BLACKLIST
-    {"blacklist", "blacklists an address for receival ('blacklist [add|del|help]')", _blacklist},
+    {"blacklist", "blacklists an address for receival ('blacklist [add|del|help]')", _blacklist },
 #endif
 #ifdef MODULE_GNRC_RPL
-    {"rpl", "rpl configuration tool ('rpl help' for more information)", _gnrc_rpl},
+    {"rpl", "rpl configuration tool ('rpl help' for more information)", _gnrc_rpl },
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
-    {"6ctx", "6LoWPAN context configuration tool", _gnrc_6ctx},
+    {"6ctx", "6LoWPAN context configuration tool", _gnrc_6ctx },
 #endif
 #endif
 #ifdef MODULE_SAUL_REG
-    {"saul", "interact with sensors and actuators using SAUL", _saul},
+    {"saul", "interact with sensors and actuators using SAUL", _saul },
 #endif
 #ifdef MODULE_CCN_LITE_UTILS
-    {"ccnl_open", "opens an interface or socket", _ccnl_open},
-    {"ccnl_int", "sends an interest", _ccnl_interest},
-    {"ccnl_cont", "create content and populated it", _ccnl_content},
-    {"ccnl_fib", "shows or modifies the CCN-Lite FIB", _ccnl_fib},
+    { "ccnl_open", "opens an interface or socket", _ccnl_open },
+    { "ccnl_int", "sends an interest", _ccnl_interest },
+    { "ccnl_cont", "create content and populated it", _ccnl_content },
+    { "ccnl_fib", "shows or modifies the CCN-Lite FIB", _ccnl_fib },
 #endif
 #ifdef MODULE_SNTP
-    {"ntpdate", "synchronizes with a remote time server", _ntpdate},
+    { "ntpdate", "synchronizes with a remote time server", _ntpdate },
 #endif
 #ifdef MODULE_VFS
     {"vfs", "virtual file system operations", _vfs_handler},
