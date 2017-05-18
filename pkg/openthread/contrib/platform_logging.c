@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Fundación Inria Chile
+ * Copyright (C) 2017 Fundacion Inria Chile
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,7 +10,7 @@
  * @{
  *
  * @file
- * @author  JosÃ© Ignacio Alamos <jialamos@uc.cl>
+ * @author  Jose Ignacio Alamos <jialamos@uc.cl>
  */
 
 #include <ctype.h>
