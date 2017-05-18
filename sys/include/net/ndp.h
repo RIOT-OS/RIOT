@@ -66,7 +66,7 @@ extern "C" {
 
 /**
  * @name    Neighbor advertisement flags
- * @see     [RFC 4861, section 4.2](https://tools.ietf.org/html/rfc4861#section-4.2)
+ * @see     [RFC 4861, section 4.4](https://tools.ietf.org/html/rfc4861#section-4.4)
  * @{
  */
 #define NDP_NBR_ADV_FLAGS_MASK      (0xe0)
