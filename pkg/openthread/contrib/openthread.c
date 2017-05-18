@@ -47,7 +47,7 @@ static char ot_thread_stack[2 * THREAD_STACKSIZE_MAIN];
 
 void otTaskletsSignalPending(otInstance *aInstance)
 {
-        (void)aInstance;
+    (void)aInstance;
 }
 
 #if defined(MODULE_OPENTHREAD_CLI) || defined(MODULE_OPENTHREAD_NCP)
@@ -62,10 +62,10 @@ void openthread_uart_run(void)
     msg.type = OPENTHREAD_SERIAL_MSG_TYPE_EVENT;
     msg.content.ptr = buf;
 
-    buf[1]=0;
+    buf[1] = 0;
     while (1) {
-        c=getchar();
-        buf[0]=c;
+        c = getchar();
+        buf[0] = c;
         msg_send(&msg, openthread_get_pid());
     }
 }

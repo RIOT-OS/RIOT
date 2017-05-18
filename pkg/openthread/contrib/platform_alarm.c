@@ -37,7 +37,8 @@ void otPlatAlarmStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
     int dt;
     if (aDt == 0) {
         msg_send(&ot_alarm_msg, thread_getpid());
-    } else {
+    }
+    else {
         dt = aDt * US_PER_MS;
         xtimer_set_msg(&ot_timer, dt, &ot_alarm_msg, thread_getpid());
     }
@@ -54,6 +55,7 @@ void otPlatAlarmStop(otInstance *aInstance)
 uint32_t otPlatAlarmGetNow(void)
 {
     uint32_t now = xtimer_now_usec() / 1000;
+
     DEBUG("openthread: otPlatAlarmGetNow: %i\n", (int) now);
     return now;
 }

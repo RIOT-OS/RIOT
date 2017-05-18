@@ -40,15 +40,16 @@ static msg_t _queue[OPENTHREAD_QUEUE_LEN];
 static kernel_pid_t _pid;
 static otInstance *sInstance;
 
-void ot_exec_job(OT_JOB (*job)(otInstance*, void*), void *context)
+void ot_exec_job(OT_JOB (*job)(otInstance *, void *), void *context)
 {
     ot_job_t _job;
+
     _job.function = job;
     _job.context = context;
 
     msg_t msg, reply;
     msg.type = OPENTHREAD_JOB_MSG_TYPE_EVENT;
-    msg.content.ptr=&_job;
+    msg.content.ptr = &_job;
     msg_send_receive(&msg, &reply, openthread_get_pid());
 }
 
@@ -107,7 +108,7 @@ static void *_openthread_event_loop(void *arg)
             case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
                 /* Tell OpenThread about the receotion of a CLI command */
                 buf = msg.content.ptr;
-                otPlatUartReceived(buf, strlen((char*) buf));
+                otPlatUartReceived(buf, strlen((char *) buf));
                 break;
 #endif
             case OPENTHREAD_JOB_MSG_TYPE_EVENT:
@@ -124,6 +125,7 @@ static void *_openthread_event_loop(void *arg)
 static void _event_cb(netdev_t *dev, netdev_event_t event)
 {
     msg_t msg;
+
     switch (event) {
         case NETDEV_EVENT_ISR:
             assert(_pid != KERNEL_PID_UNDEF);
@@ -168,8 +170,8 @@ int openthread_netdev_init(char *stack, int stacksize, char priority,
     netdev->driver->set(netdev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
 
     _pid = thread_create(stack, stacksize,
-         priority, THREAD_CREATE_STACKTEST,
-         _openthread_event_loop, NULL, name);
+                         priority, THREAD_CREATE_STACKTEST,
+                         _openthread_event_loop, NULL, name);
 
     if (_pid <= 0) {
         return -EINVAL;

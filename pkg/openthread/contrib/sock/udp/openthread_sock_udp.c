@@ -32,10 +32,10 @@
 
 static void _handle_receive(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
 {
-    size_t payload_len = otMessageGetLength(aMessage)-otMessageGetOffset(aMessage);
+    size_t payload_len = otMessageGetLength(aMessage) - otMessageGetOffset(aMessage);
     sock_udp_t *sock = aContext;
-    if(sock->data == NULL || payload_len > sock->max_len)
-    {
+
+    if (sock->data == NULL || payload_len > sock->max_len) {
         return;
     }
 
@@ -48,9 +48,9 @@ static void _handle_receive(void *aContext, otMessage *aMessage, const otMessage
 
     //mutex_lock(&sock->mutex);
     /*sock->recv_info.src_port = src_port;
-    sock->recv_info.src = (const ipv6_addr_t *)src_addr;
-    sock->recv_info.data = data;
-    sock->recv_info.datalen = datalen - sizeof(ipv6_hdr_t);*/
+       sock->recv_info.src = (const ipv6_addr_t *)src_addr;
+       sock->recv_info.data = data;
+       sock->recv_info.datalen = datalen - sizeof(ipv6_hdr_t);*/
     //mutex_unlock(&sock->mutex);
     mbox_put(&sock->mbox, &msg);
 }
@@ -86,46 +86,47 @@ static inline bool openthread_ep_addr_any(const sock_ip_ep_t *ep)
     return true;
 }
 /*
-static OT_JOB _set_panid(otInstance *ot_instance, void *data)
-{
+   static OT_JOB _set_panid(otInstance *ot_instance, void *data)
+   {
     uint16_t panid = *((uint16_t*) data);
     otLinkSetPanId(ot_instance, panid);
-}
+   }
 
-static OT_JOB _get_panid(otInstance *ot_instance, void *data)
-{
-    *((uint16_t*) data) = otLinkGetPanId(ot_instance);
+   static OT_JOB _get_panid(otInstance *ot_instance, void *data)
+   {
+ *((uint16_t*) data) = otLinkGetPanId(ot_instance);
     printf("PanID: %04x\n", *((uint16_t*) data));
-}
+   }
 
-static OT_JOB _thread_start(otInstance *ot_instance, void *data)
-{
+   static OT_JOB _thread_start(otInstance *ot_instance, void *data)
+   {
     printf("Starting OpenThread\n");
     otIp6SetEnabled(ot_instance, true);
     otThreadSetEnabled(ot_instance, true);
-}
+   }
 
-static OT_JOB _read_state(otInstance *ot_instance, void *data)
-{
+   static OT_JOB _read_state(otInstance *ot_instance, void *data)
+   {
     uint8_t state = otThreadGetDeviceRole(ot_instance);
     printf("State is: %i\n", state);
-}
+   }
 
-static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *data)
-{
+   static OT_JOB _get_ip_addresses(otInstance *ot_instance, void *data)
+   {
     for(const otNetifAddress *addr=otIp6GetUnicastAddresses(ot_instance); addr; addr=addr->mNext)
     {
         char addrstr[IPV6_ADDR_MAX_STR_LEN];
         printf("inet6 %s\n", ipv6_addr_to_str(addrstr, (ipv6_addr_t*) &addr->mAddress.mFields, sizeof(addrstr)));
     }
-}
-*/
+   }
+ */
 static OT_JOB _create_udp_socket(otInstance *ot_instance, void *data)
 {
-    sock_udp_t *sock = (sock_udp_t*) data;
+    sock_udp_t *sock = (sock_udp_t *) data;
     otSockAddr sockaddr;
+
     memset(&sockaddr, 0, sizeof(otSockAddr));
-    sockaddr.mPort = *((uint16_t*) &(sock->local.port));
+    sockaddr.mPort = *((uint16_t *) &(sock->local.port));
 
     otUdpOpen(ot_instance, &sock->ot_udp_socket, _handle_receive, sock);
     otUdpBind(&sock->ot_udp_socket, &sockaddr);
@@ -133,8 +134,8 @@ static OT_JOB _create_udp_socket(otInstance *ot_instance, void *data)
 
 static OT_JOB _send_udp_pkt(otInstance *ot_instance, void *data)
 {
-    sock_udp_t *sock = (sock_udp_t*) data;
-    udp_pkt_t *pkt = (udp_pkt_t*) &(sock->pkt);
+    sock_udp_t *sock = (sock_udp_t *) data;
+    udp_pkt_t *pkt = (udp_pkt_t *) &(sock->pkt);
     otMessage *message;
 
     message = otUdpNewMessage(ot_instance, true);
@@ -199,7 +200,8 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
     if (local) {
         DEBUG("Socket port %d \n", socket_port);
         ot_exec_job(_create_udp_socket, sock);
-    } else {
+    }
+    else {
         DEBUG("Null local\n");
     }
     sock->flags = flags;
@@ -245,19 +247,19 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     msg_t msg;
 
     /*
-    assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    if (sock->sock.input_callback == NULL) {
+       assert((sock != NULL) && (data != NULL) && (max_len > 0));
+       if (sock->sock.input_callback == NULL) {
         return -EADDRNOTAVAIL;
-    }
-    if (timeout == 0) {
+       }
+       if (timeout == 0) {
         blocking = NON_BLOCKING;
-    }*/
+       }*/
     /*
-    else if (timeout != SOCK_NO_TIMEOUT) {
+       else if (timeout != SOCK_NO_TIMEOUT) {
         timeout_timer.callback = _timeout_callback;
         timeout_timer.arg = &sock->mbox;
         xtimer_set(&timeout_timer, timeout);
-    }*/
+       }*/
 
     //atomic_fetch_add(&sock->receivers, 1);
     sock->data = data;
@@ -273,13 +275,13 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
         /* TODO: Label this */
         case 1:
             /*
-            if (remote != NULL) {
+               if (remote != NULL) {
                 remote->family = AF_INET6;
                 remote->netif = SOCK_ADDR_ANY_NETIF;
                 memcpy(&remote->addr, &sock->recv_info.src, sizeof(ipv6_addr_t));
                 remote->port = sock->recv_info.src_port;
-            }
-            */
+               }
+             */
             res = (int) sock->len;
             break;
 #if 0
@@ -366,8 +368,9 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     }
 
     /* openthread socket must have been opened*/
-    if(sock->ot_udp_socket.mTransport == NULL)
+    if (sock->ot_udp_socket.mTransport == NULL) {
         return -EINVAL;
+    }
 
     remote = (struct _sock_tl_ep *) remote;
 
