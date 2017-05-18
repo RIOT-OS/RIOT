@@ -370,7 +370,7 @@ flash: all $(FLASHDEPS)
 preflash: all
 	$(PREFLASHER) $(PREFFLAGS)
 
-term: $(filter flash, $(MAKECMDGOALS))
+term: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
 	@command -v $(TERMPROG) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
 		'${COLOR_RED}Terminal program $(TERMPROG) not found. Aborting.${COLOR_RESET}'; \
