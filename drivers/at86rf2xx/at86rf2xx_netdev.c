@@ -35,7 +35,7 @@
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #define _MAX_MHR_OVERHEAD   (25)
