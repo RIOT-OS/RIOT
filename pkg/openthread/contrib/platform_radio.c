@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Fundación Inria Chile
+ * Copyright (C) 2017 FundaciÃ³n Inria Chile
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -26,7 +26,7 @@
 #include "openthread/platform/radio.h"
 #include "ot.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 static bool sDisabled;
@@ -122,7 +122,7 @@ void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb)
 /* Called upon NETDEV_EVENT_RX_COMPLETE event */
 void recv_pkt(otInstance *aInstance, netdev_t *dev)
 {
-    DEBUG("Openthread: Received pkt");
+    DEBUG("Openthread: Received pkt\n");
     netdev_ieee802154_rx_info_t rx_info;
     /* Read frame length from driver */
     int len = dev->driver->recv(dev, NULL, 0, &rx_info);
@@ -199,18 +199,15 @@ void otPlatRadioSetShortAddress(otInstance *aInstance, uint16_t aShortAddress)
 /* OpenThread will call this for enabling the radio */
 ThreadError otPlatRadioEnable(otInstance *aInstance)
 {
-    DEBUG("openthread: otPlatRadioEnable");
+    DEBUG("openthread: otPlatRadioEnable\n");
     (void) aInstance;
 
     ThreadError error;
 
-    if (sDisabled)
-    {
+    if (sDisabled) {
         sDisabled = false;
         error = kThreadError_None;
-    }
-    else
-    {
+    } else {
         error = kThreadError_InvalidState;
     }
 
@@ -220,7 +217,7 @@ return error;
 /* OpenThread will call this for disabling the radio */
 ThreadError otPlatRadioDisable(otInstance *aInstance)
 {
-    DEBUG("openthread: otPlatRadioDisable");
+    DEBUG("openthread: otPlatRadioDisable\n");
     (void) aInstance;
 
     ThreadError error;
@@ -228,8 +225,7 @@ ThreadError otPlatRadioDisable(otInstance *aInstance)
     if (!sDisabled) {
         sDisabled = true;
         error = kThreadError_None;
-    }
-    else {
+    } else {
         error = kThreadError_InvalidState;
     }
 
@@ -292,7 +288,7 @@ ThreadError otPlatRadioTransmit(otInstance *aInstance, RadioPacket *aPacket)
     pkt.iov_len = aPacket->mLength;
 
     /*Set channel and power based on transmit frame */
-    DEBUG("otPlatRadioTransmit->channel: %i\n", (int) aPacket->mChannel);
+    DEBUG("otPlatRadioTransmit->channel: %i, length %d\n", (int) aPacket->mChannel, aPacket->mLength);
     _set_channel(aPacket->mChannel);
     _set_power(aPacket->mPower);
 
@@ -396,8 +392,10 @@ void otPlatRadioGetIeeeEui64(otInstance *aInstance, uint8_t *aIeee64Eui64)
     _dev->driver->get(_dev, NETOPT_IPV6_IID, aIeee64Eui64, sizeof(eui64_t));
 }
 
+
+
 int8_t otPlatRadioGetReceiveSensitivity(otInstance *aInstance)
 {
-	return -100;
+    return -100;
 }
 /** @} */

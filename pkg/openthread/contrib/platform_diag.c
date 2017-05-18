@@ -20,8 +20,7 @@ static bool sDiagMode = false;
 
 void otPlatDiagProcess(int argc, char *argv[], char *aOutput, size_t aOutputMaxLen)
 {
-    // add more plarform specific diagnostics features here
-
+    /* add more plarform specific diagnostics features here */
     (void)argc;
 }
 

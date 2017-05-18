@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2017 Fundación Inria Chile
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,7 +17,7 @@
  * @file
  * @brief   OPENTHREAD-specific types and function definitions
  *
- * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
 #ifndef OPENTHREAD_SOCK_INTERNAL_H
 #define OPENTHREAD_SOCK_INTERNAL_H
