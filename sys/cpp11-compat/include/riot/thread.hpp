@@ -240,6 +240,10 @@ public:
    */
   template <class F, class... Args>
   explicit thread(F&& f, Args&&... args);
+
+  /**
+   * @brief Disallow copy constructor for constant objects.
+   */
   thread(const thread&) = delete;
   /**
    * @brief Move constructor.
@@ -251,6 +255,9 @@ public:
 
   ~thread();
 
+  /**
+   * @brief Disallow the assignment operator for constant objects.
+   */
   thread& operator=(const thread&) = delete;
   /**
    * @brief Move assignment operator.
