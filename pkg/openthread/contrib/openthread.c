@@ -22,7 +22,6 @@
 #include "thread.h"
 #include "xtimer.h"
 
-
 #ifdef MODULE_AT86RF2XX
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"
