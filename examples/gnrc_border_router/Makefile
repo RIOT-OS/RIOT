@@ -76,12 +76,17 @@ QUIET ?= 1
 TAP ?= tap0
 IPV6_PREFIX ?= 2001:db8::/64
 
+# We override the `make term` command to use ethos
+TERMPROG ?= sudo sh $(RIOTBASE)/dist/tools/ethos/start_network.sh
+TERMFLAGS ?= $(PORT) $(TAP) $(IPV6_PREFIX)
+
+# We depend on the ethos host tools to run the border router, we build them
+# if necessary
+TERMDEPS += host-tools
+
 include $(RIOTBASE)/Makefile.include
 
 .PHONY: host-tools
-
-term: host-tools
-	$(Q)sudo sh $(RIOTBASE)/dist/tools/ethos/start_network.sh $(PORT) $(TAP) $(IPV6_PREFIX)
 
 host-tools:
 	$(Q)env -u CC -u CFLAGS make -C $(RIOTBASE)/dist/tools
