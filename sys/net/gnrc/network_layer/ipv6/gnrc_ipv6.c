@@ -853,7 +853,9 @@ static void _receive(gnrc_pktsnip_t *pkt)
         ipv6 = gnrc_pktbuf_mark(pkt, sizeof(ipv6_hdr_t), GNRC_NETTYPE_IPV6);
 
         first_ext = pkt;
+#ifndef MODULE_GNRC_SIXLOWPAN 
         pkt->type = GNRC_NETTYPE_UNDEF; /* snip is no longer IPv6 */
+#endif
 
         if (ipv6 == NULL) {
             DEBUG("ipv6: error marking IPv6 header, dropping packet\n");
@@ -886,11 +888,19 @@ static void _receive(gnrc_pktsnip_t *pkt)
     if (byteorder_ntohs(hdr->len) < pkt->size) {
         gnrc_pktbuf_realloc_data(pkt, byteorder_ntohs(hdr->len));
     }
+#ifdef MODULE_GNRC_SIXLOWPAN 
+    else if (byteorder_ntohs(hdr->len) >
+             (gnrc_pkt_len_upto(pkt, GNRC_NETTYPE_IPV6))) {
+        DEBUG("ipv6: invalid payload length: %d, actual: %d, dropping packet\n",
+              (int) byteorder_ntohs(hdr->len),
+              (int) (gnrc_pkt_len_upto(pkt, GNRC_NETTYPE_IPV6)));
+#else
     else if (byteorder_ntohs(hdr->len) >
              (gnrc_pkt_len_upto(pkt, GNRC_NETTYPE_IPV6) - sizeof(ipv6_hdr_t))) {
         DEBUG("ipv6: invalid payload length: %d, actual: %d, dropping packet\n",
               (int) byteorder_ntohs(hdr->len),
               (int) (gnrc_pkt_len_upto(pkt, GNRC_NETTYPE_IPV6) - sizeof(ipv6_hdr_t)));
+#endif /* MODULE_GNRC_SIXLOWPAN */
         gnrc_pktbuf_release(pkt);
         return;
     }
