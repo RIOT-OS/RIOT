@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Fundaci�n Inria Chile
+ * Copyright (C) 2017 Fundación Inria Chile
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,7 +10,7 @@
  * @{
  *
  * @file
- * @author  José Ignacio Alamos <jialamos@uc.cl>
+ * @author  JosÃ© Ignacio Alamos <jialamos@uc.cl>
  */
 
 #include <stdint.h>
@@ -54,7 +54,7 @@ void otPlatAlarmStop(otInstance *aInstance)
 /* OpenThread will call this for getting running time in millisecs */
 uint32_t otPlatAlarmGetNow(void)
 {
-    uint32_t now = xtimer_now_usec() / 1000;
+    uint32_t now = xtimer_now_usec() / US_PER_MS;
 
     DEBUG("openthread: otPlatAlarmGetNow: %i\n", (int) now);
     return now;
