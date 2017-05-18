@@ -242,9 +242,10 @@ public:
   explicit thread(F&& f, Args&&... args);
 
   /**
-   * @brief Disallow copy constructor for constant objects.
+   * @brief Disallow copy constructor.
    */
   thread(const thread&) = delete;
+
   /**
    * @brief Move constructor.
    */
@@ -256,9 +257,10 @@ public:
   ~thread();
 
   /**
-   * @brief Disallow the assignment operator for constant objects.
+   * @brief Disallow copy assignment operator.
    */
   thread& operator=(const thread&) = delete;
+
   /**
    * @brief Move assignment operator.
    */
