@@ -125,6 +125,9 @@ endif
 ifneq (,$(filter devfs,$(USEMODULE)))
     DIRS += fs/devfs
 endif
+ifneq (,$(filter l2filter,$(USEMODULE)))
+    DIRS += net/link_layer/l2filter
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 

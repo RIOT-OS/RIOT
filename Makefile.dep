@@ -594,6 +594,10 @@ ifneq (,$(filter spiffs,$(USEMODULE)))
   USEMODULE += mtd
 endif
 
+ifneq (,$(filter l2filter_%,$(USEMODULE)))
+  USEMODULE += l2filter
+endif
+
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
