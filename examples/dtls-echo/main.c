@@ -32,7 +32,7 @@
 #error TinyDTLS is configured for working with Sockets. Yet, this is non-socket
 #endif
 
-#define MAIN_QUEUE_SIZE     (8)
+#define MAIN_QUEUE_SIZE     (16)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 /*
