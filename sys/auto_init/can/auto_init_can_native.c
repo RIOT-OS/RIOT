@@ -40,6 +40,9 @@ void auto_init_can_native(void) {
         candev_linux_init(&candev_linux[i], &candev_linux_conf[i]);
         candev_dev_linux[i].dev = (candev_t *)&candev_linux[i];
         candev_dev_linux[i].name = candev_linux_params[i].name;
+#ifdef MODULE_CAN_TRX
+        candev_dev_linux[i].trx = candev_linux_params[i].trx;
+#endif
 #ifdef MODULE_CAN_PM
         candev_dev_linux[i].rx_inactivity_timeout = candev_linux_params[i].rx_inactivity_timeout;
         candev_dev_linux[i].tx_wakeup_timeout = candev_linux_params[i].tx_wakeup_timeout;

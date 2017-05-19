@@ -469,6 +469,23 @@ int raw_can_set_bitrate(int ifnum, uint32_t bitrate, uint32_t sample_point)
     return res;
 }
 
+#ifdef MODULE_CAN_TRX
+int raw_can_set_trx(int ifnum, can_trx_t *trx)
+{
+    msg_t msg, reply;
+
+    assert(ifnum < candev_nb);
+
+    msg.type = CAN_MSG_SET_TRX;
+    msg.content.ptr = trx;
+    if (msg_send_receive(&msg, &reply, candev_list[ifnum]->pid) != 1) {
+        return -EBUSY;
+    }
+
+    return (int) reply.content.value;
+}
+#endif
+
 int raw_can_get_ifnum_by_name(const char *name)
 {
     for (int i = 0; i < candev_nb; i++) {

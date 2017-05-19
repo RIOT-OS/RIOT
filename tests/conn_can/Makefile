@@ -19,5 +19,6 @@ USEMODULE += conn_can
 USEMODULE += can_isotp
 USEMODULE += conn_can_isotp_multi
 USEMODULE += can_pm
+USEMODULE += can_trx
 
 include $(RIOTBASE)/Makefile.include

@@ -37,6 +37,9 @@ extern "C" {
 #include "mbox.h"
 #endif
 
+#ifdef MODULE_TRX
+#include "can/can_trx.h"
+#endif
 
 /**
  * @brief Default value for undefined interface number
@@ -252,6 +255,21 @@ candev_dev_t *raw_can_get_dev_by_ifnum(int ifnum);
  * @return < 0  on error
  */
 int raw_can_set_bitrate(int ifnum, uint32_t bitrate, uint32_t sample_point);
+
+#if defined(MODULE_CAN_TRX) || defined(DOXYGEN)
+/**
+ * @brief Set a transceiver for a given interface
+ *
+ * The interface must be powered down before changing the transceiver.
+ *
+ * @param[in] ifnum   the interface number
+ * @param[in] trx     the transceiver to set
+ *
+ * @return 0 on success
+ * @return < 0 on error (-EBUSY if device is not powered down)
+ */
+int raw_can_set_trx(int ifnum, can_trx_t *trx);
+#endif
 
 #ifdef __cplusplus
 }

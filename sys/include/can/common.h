@@ -91,6 +91,9 @@ enum can_msg {
     CAN_MSG_REMOVE_FILTER,    /**< remove a filter */
     CAN_MSG_POWER_UP,         /**< power up */
     CAN_MSG_POWER_DOWN,       /**< power down */
+#if defined(MODULE_CAN_TRX) || defined(DOXYGEN)
+    CAN_MSG_SET_TRX,          /**< set a transceiver */
+#endif
     /* candev internal messages */
     CAN_MSG_EVENT = 0x200,    /**< driver event */
     CAN_MSG_WAKE_UP,          /**< driver has been woken up by bus */
