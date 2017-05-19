@@ -1,0 +1,16 @@
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_hwrng
+FEATURES_PROVIDED += periph_rtt
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+
+# Various other features (if any)
+FEATURES_PROVIDED += radio_nrfmin
+FEATURES_PROVIDED += cpp
+
+# The board MPU family (used for grouping by the CI system)
+FEATURES_MCU_GROUP = cortex_m0_2
