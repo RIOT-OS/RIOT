@@ -1,8 +1,8 @@
-PKG_BUILDDIR ?= $(PKGDIRBASE)/tinydtls
+PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/tinydtls
 
 INCLUDES += -I$(PKG_BUILDDIR)
 
-ifeq ($(TOOLCHAIN), llvm)
+ifeq ($(shell uname -s),Darwin)
     CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function
 endif
 
