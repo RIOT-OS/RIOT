@@ -172,9 +172,23 @@ ifneq (,$(filter grove_ledbar,$(USEMODULE)))
   USEMODULE += my9221
 endif
 
+ifneq (,$(filter gps_%,$(USEMODULE)))
+  USEMODULE += gps
+endif
+
+ifneq (,$(filter gps,$(USEMODULE)))
+  USEMODULE += fmt
+  USEPKG += minmea
+endif
+
+ifneq (,$(filter gps_serial,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
+  USEMODULE += isrpipe
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter hd44780,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
-  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter hdc1000,$(USEMODULE)))
