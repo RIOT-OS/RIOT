@@ -243,6 +243,56 @@ size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits)
     return pos;
 }
 
+static const uint32_t _tenmap[] = {
+    0,
+    10LU,
+    100LU,
+    1000LU,
+    10000LU,
+    100000LU,
+    1000000LU,
+    10000000LU,
+};
+
+/* this is very probably not the most efficient implementation, as it at least
+ * pulls in floating point math.  But it works, and it's always nice to have
+ * low hanging fruits when optimizing. (Kaspar)
+ */
+size_t fmt_float(char *out, float f, unsigned precision)
+{
+    assert (precision <= 7);
+
+    unsigned negative = (f < 0);
+    uint32_t integer;
+
+    if (negative) {
+        f *= -1;
+    }
+
+    integer = (uint32_t) f;
+    f -= integer;
+
+    uint32_t fraction = f * _tenmap[precision];
+
+    size_t res = negative;
+    if (negative && out) {
+        *out++ = '-';
+    }
+
+    res += fmt_u32_dec(out, integer);
+    if (precision && fraction) {
+        if (out) {
+            out += res;
+            *out++ = '.';
+            size_t tmp = fmt_u32_dec(out, fraction);
+            fmt_lpad(out, tmp, precision, '0');
+        }
+        res += (1 + precision);
+    }
+
+    return res;
+}
+
 size_t fmt_lpad(char *out, size_t in_len, size_t pad_len, char pad_char)
 {
     if (in_len >= pad_len) {
@@ -344,6 +394,13 @@ void print_u64_dec(uint64_t val)
 {
     char buf[18];
     size_t len = fmt_u64_dec(buf, val);
+    print(buf, len);
+}
+
+void print_float(float f, unsigned precision)
+{
+    char buf[19];
+    size_t len = fmt_float(buf, f, precision);
     print(buf, len);
 }
 
