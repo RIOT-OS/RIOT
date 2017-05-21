@@ -1,0 +1,61 @@
+From 91a3b901c8b6bbf9519b2cf4ff0dd4685c33517a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ren=C3=A9=20Kijewski?= <rene.kijewski@fu-berlin.de>
+Date: Fri, 21 Aug 2015 22:26:27 +0200
+Subject: [PATCH 3/3] Replace defined(RIOT_BUILD) with defined(RIOT_BOARD)
+
+---
+ src/bitlash.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/bitlash.h b/src/bitlash.h
+index da7a6fb..4003560 100644
+--- a/src/bitlash.h
++++ b/src/bitlash.h
+@@ -36,7 +36,7 @@
+ #ifndef _BITLASH_H
+ #define _BITLASH_H
+ 
+-#if not defined(RIOT_BUILD)
++#if not defined(RIOT_BOARD)
+ #if defined(__x86_64__) || defined(__i386__)
+ #define UNIX_BUILD 1
+ #elif defined(__SAM3X8E__)
+@@ -79,7 +79,7 @@
+ #endif
+ 
+ // RIOT OS includes
+-#if defined(RIOT_BUILD)
++#if defined(RIOT_BOARD)
+ #include <stdio.h>
+ #include <stddef.h>
+ #include <stdlib.h>
+@@ -439,7 +439,7 @@ unsigned long millis(void);
+ //
+ //	RIOT OS build options
+ //
+-#ifdef RIOT_BUILD
++#ifdef RIOT_BOARD
+ #define MINIMUM_FREE_RAM 200
+ #define NUMPINS 32
+ #undef HARDWARE_SERIAL_TX
+@@ -462,7 +462,7 @@ unsigned long millis(void);
+ 
+ unsigned long millis(void);
+ 
+-#endif	// defined riot_build
++#endif	// defined RIOT_BOARD
+ 
+ ////////////////////
+ //
+@@ -487,7 +487,7 @@ unsigned long millis(void);
+ 
+ 
+ // numvar is 32 bits on Arduino and 16 bits elsewhere
+-#if (defined(ARDUINO_BUILD) || defined(UNIX_BUILD) || defined(RIOT_BUILD)) && !defined(TINY_BUILD)
++#if (defined(ARDUINO_BUILD) || defined(UNIX_BUILD) || defined(RIOT_BOARD)) && !defined(TINY_BUILD)
+ typedef long int numvar;
+ typedef unsigned long int unumvar;
+ #else
+-- 
+2.5.0
+

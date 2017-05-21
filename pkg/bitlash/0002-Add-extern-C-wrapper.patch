@@ -1,0 +1,38 @@
+From fa1a9a788f9e682aca3075ee416597f7eb2ca3d0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ren=C3=A9=20Kijewski?= <rene.kijewski@fu-berlin.de>
+Date: Fri, 21 Aug 2015 22:18:42 +0200
+Subject: [PATCH 2/3] Add extern "C" wrapper
+
+---
+ src/bitlash.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/bitlash.h b/src/bitlash.h
+index 24b48ed..da7a6fb 100644
+--- a/src/bitlash.h
++++ b/src/bitlash.h
+@@ -101,6 +101,10 @@
+ #define byte uint8_t
+ #endif
+ 
++#ifdef __cplusplus
++extern "C" {
++#endif
++
+ 
+ ////////////////////////////////////////////////////
+ // GLOBAL BUILD OPTIONS
+@@ -904,6 +908,10 @@ extern char idbuf[IDLEN+1];
+ #define s_lcurly		'{'
+ #define s_rcurly		'}'
+ 
++#ifdef __cplusplus
++}
++#endif
++
+ 
+ #endif	// defined _BITLASH_H
+ 
+-- 
+2.5.0
+
