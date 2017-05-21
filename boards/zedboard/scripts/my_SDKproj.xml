@@ -1,0 +1,5 @@
+<project name="SDK Script" default="main">
+  <target name="main">
+    <createAppProject projname="FSBL" hwprojname="zed_hw_platform" processor="ps7_cortexa9_0" bspprojname="BSP" os="standalone" template="Zynq FSBL" language="C" />
+  </target>
+</project>

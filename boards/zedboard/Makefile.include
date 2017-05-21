@@ -1,0 +1,21 @@
+# define the cpu used by the zedboard board
+export CPU = zynq7000
+
+export DEBUGGER = arm-none-eabi-gdb -ex "target remote localhost:1234"
+export DEBUGSERVER = qemu-system-arm -M xilinx-zynq-a9 -m 1024 -nographic -kernel bin/$(BOARD)/$(PROJECT)$(APPLICATION).elf -s -S
+
+export FLASHER = $(RIOTBOARD)/$(BOARD)/scripts/prog_jtag.sh -f bin/$(BOARD)/$(PROJECT)$(APPLICATION).elf
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexa_common
+
+all:
+
+xil-boot-image:
+	$(RIOTBOARD)/$(BOARD)/scripts/create_boot_file.sh -f bin/$(BOARD)/$(PROJECT)$(APPLICATION).elf
+
+zynq-qemu:
+	qemu-system-arm -M xilinx-zynq-a9 -m 1024 -nographic -kernel bin/$(BOARD)/$(PROJECT)$(APPLICATION).elf
+
+zynq-qemu-debug:
+	qemu-system-arm -M xilinx-zynq-a9 -m 1024 -nographic -kernel bin/$(BOARD)/$(PROJECT)$(APPLICATION).elf -s -S
