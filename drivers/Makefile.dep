@@ -30,6 +30,13 @@ ifneq (,$(filter at86rf2%,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
 endif
 
+ifneq (,$(filter ata8520e,$(USEMODULE)))
+  USEMODULE += xtimer
+  USEMODULE += fmt
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_spi
+endif
+
 ifneq (,$(filter bh1750fvi,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_i2c
