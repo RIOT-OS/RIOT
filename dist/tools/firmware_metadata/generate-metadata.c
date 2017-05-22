@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
     sha256_init(&firmware_sha256);
 
-    while((bytes_read = fread(firmware_buffer, 1, sizeof(firmware_buffer), firmware_bin))) {
+    while ((bytes_read = fread(firmware_buffer, 1, sizeof(firmware_buffer), firmware_bin))) {
         sha256_update(&firmware_sha256, firmware_buffer, bytes_read);
         firmware_size += bytes_read;
     }
