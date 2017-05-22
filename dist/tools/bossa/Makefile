@@ -11,4 +11,7 @@ all: git-download
 	@env -u CXX COMMON_CXXFLAGS="-std=c++11" $(MAKE) BINDIR=$(PKG_BUILDDIR) -C $(PKG_BUILDDIR) strip-bossac
 	@mv $(PKG_BUILDDIR)/bossac $(CURDIR)/bossac
 
+distclean::
+	@rm -f $(CURDIR)/bossac
+
 include $(RIOTBASE)/pkg/pkg.mk
