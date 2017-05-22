@@ -51,6 +51,7 @@ PSEUDOMODULES += netstats_rpl
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_nano
 PSEUDOMODULES += openthread
+PSEUDOMODULES += ota_update_tftp
 PSEUDOMODULES += pktqueue
 PSEUDOMODULES += posix
 PSEUDOMODULES += printf_float
