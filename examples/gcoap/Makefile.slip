@@ -42,16 +42,11 @@ INCLUDES += -I$(CURDIR)
 CFLAGS += -DSLIP_UART=$(SLIP_UART)
 CFLAGS += -DSLIP_BAUDRATE=$(SLIP_BAUDRATE)
 
-USEPKG += nanocoap
-# Required by nanocoap, but only due to issue #5959.
-USEMODULE += posix
-
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules
-USEMODULE += gnrc_sock_udp
 USEMODULE += gcoap
 # Add a routing protocol
 USEMODULE += gnrc_rpl
