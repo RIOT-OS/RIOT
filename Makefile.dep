@@ -658,6 +658,16 @@ ifneq (,$(filter fw_slots,$(USEMODULE)))
   FEATURES_REQUIRED += flash_slots
 endif
 
+ifneq (,$(filter ota_update_%,$(USEMODULE)))
+USEMODULE += gcoap
+USEMODULE += ota_update
+USEMODULE += fw_slots
+USEMODULE += sema
+  ifneq (,$(filter ota_update_tftp,$(USEMODULE)))
+    USEMODULE += gnrc_tftp
+  endif
+endif
+
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
