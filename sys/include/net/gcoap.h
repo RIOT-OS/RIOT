@@ -55,7 +55,7 @@
  * If there is a payload, follow the three steps below.
  *
  * -# Call gcoap_resp_init() to initialize the response.
- * -# Write the request payload, starting at the updated _payload_ pointer
+ * -# Write the response payload, starting at the updated _payload_ pointer
  *    in the coap_pkt_t. If some error occurs, return a negative errno
  *    code from the handler, and gcoap will send a server error (5.00).
  * -# Call gcoap_finish() to complete the PDU after writing the payload,
