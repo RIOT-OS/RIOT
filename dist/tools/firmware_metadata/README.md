@@ -25,12 +25,12 @@ Where:
 
 _\<firmware.bin\>\:_ The firmware in binary format
 
-_\<version\>\:_ The firmware version in 16-bit HEX
+_\<version\>\:_ The firmware version in 16-bit HEX format
 
-_\<appid\>_\: ID for the application in 32-bit HEX
+_\<appid\>_\: ID for the application in 32-bit HEX format
 
-_\<output-path\>_\: The path for fimrware_metadata.bin
+_\<output-path/filename.bin\>_\: The path and name of the metadata binary file
 
 If the operation succeeds, the results are printed out and a binary called
-"firmware-metadata.bin" is written, if no _output-path_ option is specified,
-in which case the file is written to the given path with the given name.
+"firmware-metadata.bin" is written, if no _output-path_ option is specified.
+Otherwise, the file is written to the given path with the given name.
