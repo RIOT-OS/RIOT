@@ -88,6 +88,11 @@
 #include "net/gcoap.h"
 #endif
 
+#ifdef MODULE_GNRC_IPV6_NIB
+#include "net/gnrc/ipv6/nib.h"
+#endif
+
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -156,6 +161,10 @@ void auto_init(void)
     DEBUG("Mounting /dev\n");
     extern void auto_init_devfs(void);
     auto_init_devfs();
+#endif
+#ifdef MODULE_GNRC_IPV6_NIB
+    DEBUG("Auto init gnrc_ipv6_nib module.\n");
+    gnrc_ipv6_nib_init();
 #endif
 
 /* initialize network devices */
