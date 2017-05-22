@@ -381,8 +381,9 @@ void gcoap_register_listener(gcoap_listener_t *listener)
 {
     /* Add the listener to the end of the linked list. */
     gcoap_listener_t *_last = _coap_state.listeners;
-    while (_last->next)
+    while (_last->next) {
         _last = _last->next;
+    }
 
     listener->next = NULL;
     _last->next = listener;
