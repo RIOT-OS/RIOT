@@ -109,9 +109,7 @@ static void _listen(sock_udp_t *sock)
     uint8_t buf[GCOAP_PDU_BUF_SIZE];
     sock_udp_ep_t remote;
     gcoap_request_memo_t *memo = NULL;
-    uint8_t open_reqs;
-
-    gcoap_op_state(&open_reqs);
+    uint8_t open_reqs = gcoap_op_state();
 
     ssize_t res = sock_udp_recv(sock, buf, sizeof(buf),
                                 open_reqs > 0 ? GCOAP_RECV_TIMEOUT : SOCK_NO_TIMEOUT,
@@ -381,8 +379,9 @@ void gcoap_register_listener(gcoap_listener_t *listener)
 {
     /* Add the listener to the end of the linked list. */
     gcoap_listener_t *_last = _coap_state.listeners;
-    while (_last->next)
+    while (_last->next) {
         _last = _last->next;
+    }
 
     listener->next = NULL;
     _last->next = listener;
@@ -519,7 +518,7 @@ int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
     return 0;
 }
 
-void gcoap_op_state(uint8_t *open_reqs)
+uint8_t gcoap_op_state(void)
 {
     uint8_t count = 0;
     for (int i = 0; i < GCOAP_REQ_WAITING_MAX; i++) {
@@ -527,7 +526,7 @@ void gcoap_op_state(uint8_t *open_reqs)
             count++;
         }
     }
-    *open_reqs = count;
+    return count;
 }
 
 /** @} */

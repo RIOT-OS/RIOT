@@ -55,7 +55,7 @@
  * If there is a payload, follow the three steps below.
  *
  * -# Call gcoap_resp_init() to initialize the response.
- * -# Write the request payload, starting at the updated _payload_ pointer
+ * -# Write the response payload, starting at the updated _payload_ pointer
  *    in the coap_pkt_t. If some error occurs, return a negative errno
  *    code from the handler, and gcoap will send a server error (5.00).
  * -# Call gcoap_finish() to complete the PDU after writing the payload,
@@ -150,15 +150,15 @@ extern "C" {
 #endif
 
 /** @brief Size for module message queue */
-#define GCOAP_MSG_QUEUE_SIZE (4)
+#define GCOAP_MSG_QUEUE_SIZE    (4)
 
 /** @brief Server port; use RFC 7252 default if not defined */
 #ifndef GCOAP_PORT
-#define GCOAP_PORT  (5683)
+#define GCOAP_PORT              (5683)
 #endif
 
 /** @brief Size of the buffer used to build a CoAP request or response. */
-#define GCOAP_PDU_BUF_SIZE  (128)
+#define GCOAP_PDU_BUF_SIZE      (128)
 
 /**
  * @brief Size of the buffer used to write options, other than Uri-Path, in a
@@ -166,7 +166,7 @@ extern "C" {
  *
  * Accommodates Content-Format.
  */
-#define GCOAP_REQ_OPTIONS_BUF  (8)
+#define GCOAP_REQ_OPTIONS_BUF   (8)
 
 /**
  * @brief Size of the buffer used to write options in a response.
@@ -186,25 +186,25 @@ extern "C" {
 
 /** @brief Length in bytes for a token; use 2 if not defined */
 #ifndef GCOAP_TOKENLEN
-#define GCOAP_TOKENLEN      (2)
+#define GCOAP_TOKENLEN          (2)
 #endif
 
 /** @brief  Marks the boundary between header and payload */
-#define GCOAP_PAYLOAD_MARKER (0xFF)
+#define GCOAP_PAYLOAD_MARKER    (0xFF)
 
 /**
  * @name States for the memo used to track waiting for a response
  * @{
  */
-#define GCOAP_MEMO_UNUSED   (0)  /**< This memo is unused */
-#define GCOAP_MEMO_WAIT     (1)  /**< Request sent; awaiting response */
-#define GCOAP_MEMO_RESP     (2)  /**< Got response */
-#define GCOAP_MEMO_TIMEOUT  (3)  /**< Timeout waiting for response */
-#define GCOAP_MEMO_ERR      (4)  /**< Error processing response packet */
+#define GCOAP_MEMO_UNUSED       (0)  /**< This memo is unused */
+#define GCOAP_MEMO_WAIT         (1)  /**< Request sent; awaiting response */
+#define GCOAP_MEMO_RESP         (2)  /**< Got response */
+#define GCOAP_MEMO_TIMEOUT      (3)  /**< Timeout waiting for response */
+#define GCOAP_MEMO_ERR          (4)  /**< Error processing response packet */
 /** @} */
 
 /** @brief Time in usec that the event loop waits for an incoming CoAP message */
-#define GCOAP_RECV_TIMEOUT   (1 * US_PER_SEC)
+#define GCOAP_RECV_TIMEOUT      (1 * US_PER_SEC)
 
 /**
  *
@@ -212,10 +212,10 @@ extern "C" {
  *
  * Set to 0 to disable timeout.
  */
-#define GCOAP_NON_TIMEOUT    (5000000U)
+#define GCOAP_NON_TIMEOUT       (5000000U)
 
 /** @brief Identifies waiting timed out for a response to a sent message. */
-#define GCOAP_MSG_TYPE_TIMEOUT    (0x1501)
+#define GCOAP_MSG_TYPE_TIMEOUT  (0x1501)
 
 /**
  * @brief Identifies a request to interrupt listening for an incoming message
@@ -223,16 +223,16 @@ extern "C" {
  *
  * Allows the event loop to process IPC messages.
  */
-#define GCOAP_MSG_TYPE_INTR    (0x1502)
+#define GCOAP_MSG_TYPE_INTR     (0x1502)
 
 /**
  * @brief  A modular collection of resources for a server
  */
 typedef struct gcoap_listener {
-    coap_resource_t *resources;   /**< First element in the array of resources;
-                                       must order alphabetically */
-    size_t resources_len;         /**< Length of array */
-    struct gcoap_listener *next;  /**< Next listener in list */
+    coap_resource_t *resources;     /**< First element in the array of
+                                     *   resources; must order alphabetically */
+    size_t resources_len;           /**< Length of array */
+    struct gcoap_listener *next;    /**< Next listener in list */
 } gcoap_listener_t;
 
 /**
@@ -407,9 +407,9 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  *
  * Useful for monitoring.
  *
- * @param[out] open_reqs Count of unanswered requests
+ * @return count of unanswered requests
  */
-void gcoap_op_state(uint8_t *open_reqs);
+uint8_t gcoap_op_state(void);
 
 #ifdef __cplusplus
 }
