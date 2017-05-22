@@ -282,7 +282,6 @@ BASELIBS += $(APPDEPS)
 
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
-BINFILE ?= $(ELFFILE:.elf=.bin)
 
 # variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)
@@ -306,11 +305,12 @@ else
 endif
 	$(Q)$(SIZE) $(ELFFILE)
 	$(Q)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
-	$(Q)$(OBJCOPY) -O binary $(ELFFILE) $(BINFILE)
 endif
 endif # BUILD_IN_DOCKER
 
 firmware-metadata: all generate-metadata
+	BINFILE ?= $(ELFFILE:.elf=.bin)
+	$(Q)$(OBJCOPY) -O binary $(ELFFILE) $(BINFILE)
 	$(Q)$(FW_METADATA)/bin/generate-metadata $(BINFILE) $(VERSION) $(APPID) $(BINDIR)/firmware-metadata.bin
 
 generate-metadata: $(FW_METADATA)/bin/generate-metadata
