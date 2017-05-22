@@ -165,8 +165,7 @@ int gcoap_cli_cmd(int argc, char **argv)
 
     if (strcmp(argv[1], "info") == 0) {
         if (argc == 2) {
-            uint8_t open_reqs;
-            gcoap_op_state(&open_reqs);
+            uint8_t open_reqs = gcoap_op_state();
 
             printf("CoAP server is listening on port %u\n", GCOAP_PORT);
             printf(" CLI requests sent: %u\n", req_count);

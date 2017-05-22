@@ -407,9 +407,9 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  *
  * Useful for monitoring.
  *
- * @param[out] open_reqs Count of unanswered requests
+ * @return count of unanswered requests
  */
-void gcoap_op_state(uint8_t *open_reqs);
+uint8_t gcoap_op_state(void);
 
 #ifdef __cplusplus
 }
