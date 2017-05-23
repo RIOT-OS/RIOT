@@ -302,7 +302,7 @@ static void _find_resource(coap_pkt_t *pdu, coap_resource_t **resource_ptr,
 static ssize_t _finish_pdu(coap_pkt_t *pdu, uint8_t *buf, size_t len)
 {
     ssize_t hdr_len = _write_options(pdu, buf, len);
-    DEBUG("gcoap: header length: %u\n", hdr_len);
+    DEBUG("gcoap: header length: %i\n", (int)hdr_len);
 
     if (hdr_len > 0) {
         /* move payload over unused space after options */
@@ -452,6 +452,7 @@ static ssize_t _write_options(coap_pkt_t *pdu, uint8_t *buf, size_t len)
         size_t url_len = strlen((char *)pdu->url);
         if (url_len) {
             if (pdu->url[0] != '/') {
+                DEBUG("gcoap: _write_options: path does not start with '/'\n");
                 return -EINVAL;
             }
             bufpos += coap_put_option_url(bufpos, last_optnum, (char *)&pdu->url[0]);
