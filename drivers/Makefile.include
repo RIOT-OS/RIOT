@@ -121,3 +121,6 @@ endif
 ifneq (,$(filter lsm6dsl,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lsm6dsl/include
 endif
+ifneq (,$(filter dsp0401,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/dsp0401/include
+endif
