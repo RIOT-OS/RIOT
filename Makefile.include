@@ -360,12 +360,15 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
-flash: all
+flash: all $(FLASHDEPS)
 	@command -v $(FLASHER) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
 		'${COLOR_RED}Flash program $(FLASHER) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(FLASHER) $(FFLAGS)
+
+preflash: all
+	$(PREFLASHER) $(PREFFLAGS)
 
 term: $(filter flash, $(MAKECMDGOALS))
 	@command -v $(TERMPROG) >/dev/null 2>&1 || \
@@ -429,6 +432,10 @@ include $(RIOTMAKE)/features.inc.mk
 
 # Export variables used throughout the whole make system:
 include $(RIOTMAKE)/vars.inc.mk
+
+# Include build targets for selected tools after the default RIOT targets have
+# been defined (-> so the `all` will be always the first target)
+include $(RIOTMAKE)/tools/targets.inc.mk
 
 # Warn if the selected board and drivers don't provide all needed features:
 ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
