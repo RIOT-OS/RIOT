@@ -15,7 +15,7 @@ typedef struct firmware_metadata {
 This structure is filled with the data obtained from the firmware.
 
 ## Usage
-To use, you should call `generate-metadata` with the following arguments:
+To use it, call `generate-metadata` with the following arguments:
 
 ```console
 ./generate-metadata <firmware.bin> <version> <appid> <output-path>
