@@ -1,5 +1,6 @@
 /*
- * Copyright (C)  2017 Inria
+ * Copyright (C)  2016 Freie Universität Berlin
+ *                2016-2017 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,19 +8,19 @@
  */
 
 /**
- * @ingroup     boards_arduino-mkr-common
+ * @ingroup     boards_arduino-mkr1000
  * @{
  *
  * @file
  * @brief       Board specific configuration for the Arduino API
  *
+ * @author      Hauke Petersen  <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie  <alexandre.abadie@inria.fr>
  */
 
 #ifndef ARDUINO_BOARD_H
 #define ARDUINO_BOARD_H
 
-#include "board.h"
 #include "arduino_pinmap.h"
 
 #ifdef __cplusplus
@@ -38,6 +39,13 @@ static const gpio_t arduino_pinmap[] = {
     ARDUINO_PIN_5,
     ARDUINO_PIN_6,
     ARDUINO_PIN_7,
+    ARDUINO_PIN_8,
+    ARDUINO_PIN_9,
+    ARDUINO_PIN_10,
+    ARDUINO_PIN_11,
+    ARDUINO_PIN_12,
+    ARDUINO_PIN_13,
+    ARDUINO_PIN_14,
     ARDUINO_PIN_A0,
     ARDUINO_PIN_A1,
     ARDUINO_PIN_A2,

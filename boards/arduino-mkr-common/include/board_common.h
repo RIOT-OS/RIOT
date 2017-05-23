@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Inria
+ * Copyright (C) 2016-2017 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -24,20 +24,11 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
-#include "periph_conf_common.h"
 #include "arduino_pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    xtimer configuration
- * @{
- */
-#define XTIMER              TIMER_0
-#define XTIMER_CHAN         (0)
-/** @} */
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

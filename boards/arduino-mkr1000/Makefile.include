@@ -1,5 +1,9 @@
 USEMODULE += arduino-mkr-common
 
+ifeq ($(PROGRAMMER),jlink)
+  export MKR_JLINK_DEVICE = atsamw25
+endif
+
 include $(RIOTBOARD)/arduino-mkr-common/Makefile.include
 
 # add arduino-mkr1000 include path
