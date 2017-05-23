@@ -22,6 +22,8 @@
 #ifndef NETIF_H_
 #define NETIF_H_
 
+#include "net/netdev.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,33 +41,32 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Maximum number of network interfaces
+ */
+#ifndef NETIF_NUMOF
+#define NETIF_NUMOF         (1U)
+#endif
+
+/**
  * @brief   Type of the interface
  */
 typedef enum {
-    NETIF_TYPE_UNDEF = 0;       /**< Interface is of no specific type (raw @ref drivers_netdev) */
+    NETIF_TYPE_INVALID = 0;     /**< Interface is of no specific type (should not be used) */
 #if defined(MODULE_GNRC) || DOXYGEN
     /**
      * @brief   Default GNRC network interface (without software MAC)
      *
      * @note only available with @ref net_gnrc "GNRC" module.
      */
-    NETIF_TYPE_GNRC_NETIF,
+    NETIF_TYPE_GNRC_DEFAULT,
 #endif
 #if defined(MODULE_LWIP_ETHERNET) || DOXYGEN
     /**
-     * @brief   lwIP Ethernet network interface
+     * @brief   lwIP network interface
      *
-     * @note only available with `lwip_ethernet` module of the @ref pkg_lwip package.
+     * @note only available with @ref pkg_lwip.
      */
-    NETIF_TYPE_LWIP_ETHERNET,
-#endif /* MODULE_LWIP */
-#if defined(MODUE_LWIP_SIXLOWPAN) || DOXYGEN
-    /**
-     * @brief   lwIP 6LoWPAN network interface
-     *
-     * @note only available with `lwip_sixlowpan` module of the @ref pkg_lwip package.
-     */
-    NETIF_TYPE_LWIP_6LO,
+    NETIF_TYPE_LWIP,
 #endif /* MODULE_LWIP */
 #if defined(MODULE_EMB6) || DOXYGEN
     /**
@@ -112,14 +113,21 @@ netif_params_t *netif_params_get_by_dev(netif_params_t *netif_params,
                                         const void *dev_params);
 
 /**
- * @brief   Initialize interface
+ * @brief   Set-up interface
  *
  * @param[in] params    Initialization parameters of the interface
+ * @param[in] subtype   netif_params_t:: specific sub-type based on the nature
+ *                      of @p netdev (e.g. specifies that the device is an
+ *                      Ethernet or IEEE 802.15.4 device). May be 0 and ignored
+ *                      if not required by network stack.
+ * @param[in] netdev    The set-up'd (but not initialized) network device, based
+ *                      on device specific parameters netif_params_t::dev_params
  *
  * @return  The interface enumerator on success
  * @return  @ref NETIF_INVALID on error.
  */
-netif_t netif_init(const netif_params_t *params);
+netif_t netif_init(const netif_params_t *params, unsigned subtype,
+                   netdev_t *netdev);
 
 /**
  * @brief   Iterator for the interfaces
