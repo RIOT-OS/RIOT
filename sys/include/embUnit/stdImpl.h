@@ -59,4 +59,4 @@ static inline char* stdimpl_itoa(int v,char *string,int r)
 }
 #endif
 
-#endif/* EMBUNIT_STDIMPL_H */
+#endif /* EMBUNIT_STDIMPL_H */

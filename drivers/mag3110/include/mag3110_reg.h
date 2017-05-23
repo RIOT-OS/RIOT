@@ -76,5 +76,5 @@ extern "C"
 }
 #endif
 
-#endif
+#endif /* MAG3110_REG_H */
 /** @} */

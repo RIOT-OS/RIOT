@@ -98,5 +98,5 @@ void dynamixel_writer_read_make(dynamixel_writer_t *writer, uint8_t id, uint16_t
 }
 #endif
 
-#endif
+#endif /* DYNAMIXEL_WRITER_H */
 /** @} */

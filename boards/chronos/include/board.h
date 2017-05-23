@@ -18,8 +18,8 @@
  * @author      unknown
  */
 
-#ifndef CHRONOS_BOARD_H
-#define CHRONOS_BOARD_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <stdint.h>
 
@@ -59,5 +59,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CHRONOS_BOARD_H */
+#endif /* BOARD_H */
 /** @} */

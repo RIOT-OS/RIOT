@@ -25,8 +25,8 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU__X86__UCONTEXT__HPP__
-#define CPU__X86__UCONTEXT__HPP__
+#ifndef UCONTEXT_H
+#define UCONTEXT_H
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -169,6 +169,6 @@ int swapcontext(ucontext_t *oucp, const ucontext_t *ucp);
 }
 #endif
 
-#endif
+#endif /* UCONTEXT_H */
 
 /** @} */

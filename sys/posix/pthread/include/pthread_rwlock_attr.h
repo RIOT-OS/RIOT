@@ -14,8 +14,8 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef SYS__POSIX__PTHREAD_RWLOCK_ATTR__H
-#define SYS__POSIX__PTHREAD_RWLOCK_ATTR__H
+#ifndef PTHREAD_RWLOCK_ATTR_H
+#define PTHREAD_RWLOCK_ATTR_H
 
 #include <errno.h>
 
@@ -80,7 +80,7 @@ int pthread_rwlockattr_setpshared(pthread_rwlockattr_t *attr, int pshared);
 }
 #endif
 
-#endif /* SYS__POSIX__PTHREAD_RWLOCK_ATTR__H */
+#endif /* PTHREAD_RWLOCK_ATTR_H */
 
 /**
  * @}

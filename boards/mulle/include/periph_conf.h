@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef MULLE_PERIPH_CONF_H
-#define MULLE_PERIPH_CONF_H
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -374,5 +374,5 @@ static const spi_conf_t spi_config[] = {
 }
 #endif
 
-#endif /* MULLE_PERIPH_CONF_H */
+#endif /* PERIPH_CONF_H */
 /** @} */

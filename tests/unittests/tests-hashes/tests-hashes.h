@@ -76,5 +76,5 @@ Test *tests_hashes_sha256_chain_tests(void);
 }
 #endif
 
-#endif /* TESTS_CRYPTO_H */
+#endif /* TESTS_HASHES_H */
 /** @} */

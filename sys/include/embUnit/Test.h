@@ -70,4 +70,4 @@ struct __Test {
 }
 #endif
 
-#endif/* EMBUNIT_TEST_H */
+#endif /* EMBUNIT_TEST_H */

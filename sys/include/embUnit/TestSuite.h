@@ -63,4 +63,4 @@ extern const TestImplement TestSuiteImplement;
 }
 #endif
 
-#endif/* EMBUNIT_TESTSUITE_H */
+#endif /* EMBUNIT_TESTSUITE_H */

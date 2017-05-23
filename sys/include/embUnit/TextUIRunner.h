@@ -53,4 +53,4 @@ void TextUIRunner_end(void);
 }
 #endif
 
-#endif/* EMBUNIT_TEXTUIRUNNER_H */
+#endif /* EMBUNIT_TEXTUIRUNNER_H */

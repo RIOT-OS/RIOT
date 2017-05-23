@@ -12,8 +12,8 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef SYS_STAT_H_
-#define SYS_STAT_H_
+#ifndef SYS_STAT_H
+#define SYS_STAT_H
 
 #include <time.h> /* for struct timespec */
 #include <sys/types.h> /* for fsblkcnt_t, fsfilcnt_t */
@@ -115,6 +115,6 @@ int    utimensat(int, const char *, const struct timespec [2], int);
 }
 #endif
 
-#endif /* SYS_STAT_H_ */
+#endif /* SYS_STAT_H */
 
 /** @} */

@@ -19,8 +19,8 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef TCP_H
-#define TCP_H
+#ifndef NET_TCP_H
+#define NET_TCP_H
 
 #include "byteorder.h"
 
@@ -86,5 +86,5 @@ void tcp_hdr_print(tcp_hdr_t *hdr);
 }
 #endif
 
-#endif /* TCP_H */
+#endif /* NET_TCP_H */
 /** @} */

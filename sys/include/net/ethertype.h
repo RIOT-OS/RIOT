@@ -23,8 +23,8 @@
  */
 
 
-#ifndef ETHERTYPE_H
-#define ETHERTYPE_H
+#ifndef NET_ETHERTYPE_H
+#define NET_ETHERTYPE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +42,7 @@ extern "C" {
 }
 #endif
 
-#endif /* ETHERTYPE_H */
+#endif /* NET_ETHERTYPE_H */
 /**
  * @}
  */

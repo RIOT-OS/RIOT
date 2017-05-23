@@ -39,8 +39,8 @@
 
 /* This file was imported into RIOT from newlib 2.3.0 */
 
-#ifndef _SYS_CDEFS_H_
-#define _SYS_CDEFS_H_
+#ifndef SYS_CDEFS_H
+#define SYS_CDEFS_H
 
 #include <sys/features.h>
 #include <stddef.h>
@@ -708,4 +708,4 @@ extern "C" {
 }
 #endif
 
-#endif /* !_SYS_CDEFS_H_ */
+#endif /* SYS_CDEFS_H */

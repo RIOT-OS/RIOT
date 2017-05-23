@@ -24,8 +24,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef DRIVERS_NVRAM_H
-#define DRIVERS_NVRAM_H
+#ifndef NVRAM_H
+#define NVRAM_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -91,5 +91,5 @@ extern const vfs_file_ops_t nvram_vfs_ops;
 }
 #endif
 
-#endif /* DRIVERS_NVRAM_H */
+#endif /* NVRAM_H */
 /** @} */

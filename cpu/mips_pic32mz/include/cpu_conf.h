@@ -19,8 +19,8 @@
  * @author      Neil Jones <neil.jones@imgtec.com>
  */
 
-#ifndef _CPU_CONF_H_
-#define _CPU_CONF_H_
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,5 +65,5 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* CPU_CONF_H */
 /** @} */

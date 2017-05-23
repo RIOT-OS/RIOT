@@ -48,4 +48,4 @@ OutputterRef XMLOutputter_outputter(void);
 }
 #endif
 
-#endif/* EMBUNIT_XMLOUTPUTTER_H */
+#endif /* EMBUNIT_XMLOUTPUTTER_H */

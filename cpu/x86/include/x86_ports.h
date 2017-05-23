@@ -23,8 +23,8 @@
 
 // Copy of Pintos' threads/io.h, license header extracted from Pintos' LICENSE file.
 
-#ifndef CPU__X86__PORTS_H__
-#define CPU__X86__PORTS_H__
+#ifndef X86_PORTS_H
+#define X86_PORTS_H
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -191,4 +191,4 @@ static inline void  __attribute__((always_inline)) io_wait(void)
 }
 #endif
 
-#endif
+#endif /* X86_PORTS_H */

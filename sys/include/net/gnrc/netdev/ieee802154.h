@@ -16,8 +16,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_NETDEV_IEEE802154_H
-#define GNRC_NETDEV_IEEE802154_H
+#ifndef NET_GNRC_NETDEV_IEEE802154_H
+#define NET_GNRC_NETDEV_IEEE802154_H
 
 #include "net/netdev/ieee802154.h"
 #include "net/gnrc/netdev.h"
@@ -42,5 +42,5 @@ int gnrc_netdev_ieee802154_init(gnrc_netdev_t *gnrc_netdev,
 }
 #endif
 
-#endif /* GNRC_IEEE802154_H */
+#endif /* NET_GNRC_NETDEV_IEEE802154_H */
 /** @} */

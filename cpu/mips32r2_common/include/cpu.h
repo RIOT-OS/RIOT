@@ -18,8 +18,8 @@
  * @author      Neil Jones <neil.jones@imgtec.com>
  */
 
-#ifndef CPU_H_
-#define CPU_H_
+#ifndef CPU_H
+#define CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,5 +44,5 @@ static inline void cpu_print_last_instruction(void)
 }
 #endif
 
-#endif
+#endif /* CPU_H */
 /** @} */

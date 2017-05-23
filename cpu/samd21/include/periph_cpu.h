@@ -16,8 +16,8 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef CPU_PERIPH_H
-#define CPU_PERIPH_H
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include <limits.h>
 
@@ -129,5 +129,5 @@ typedef enum {
 }
 #endif
 
-#endif /* CPU_PERIPH_H */
+#endif /* PERIPH_CPU_H */
 /** @} */

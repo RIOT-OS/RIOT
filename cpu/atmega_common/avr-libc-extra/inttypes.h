@@ -15,8 +15,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef RIOT_INTTYPES_H
-#define RIOT_INTTYPES_H
+#ifndef INTTYPES_H
+#define INTTYPES_H
 
 #include_next <inttypes.h>
 
@@ -33,5 +33,5 @@ extern "C" {
 }
 #endif
 
-#endif /* RIOT_INTTYPES_H */
+#endif /* INTTYPES_H */
 /** @} */

@@ -51,8 +51,8 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-#ifndef I2C_H
-#define I2C_H
+#ifndef PERIPH_I2C_H
+#define PERIPH_I2C_H
 
 #include <stdint.h>
 #include <limits.h>
@@ -283,5 +283,5 @@ void i2c_poweroff(i2c_t dev);
 }
 #endif
 
-#endif /* I2C_H */
+#endif /* PERIPH_I2C_H */
 /** @} */

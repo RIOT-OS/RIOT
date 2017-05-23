@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef STACK_H_
-#define STACK_H_
+#ifndef STACK_H
+#define STACK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,5 +33,5 @@ void _net_init(void);
 }
 #endif
 
-#endif /* STACK_H_ */
+#endif /* STACK_H */
 /** @} */

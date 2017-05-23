@@ -16,8 +16,8 @@
  * @author          Leon M. George <leon@georgemail.eu>
  */
 
-#ifndef CC26x0_H
-#define CC26x0_H
+#ifndef CC26X0_H
+#define CC26X0_H
 
 #include <stdint.h>
 
@@ -112,6 +112,6 @@ typedef enum IRQn
 }
 #endif
 
-#endif /* CC26x0_H */
+#endif /* CC26X0_H */
 
 /*@}*/

@@ -50,8 +50,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef GPIO_H
-#define GPIO_H
+#ifndef PERIPH_GPIO_H
+#define PERIPH_GPIO_H
 
 #include <limits.h>
 
@@ -223,5 +223,5 @@ void gpio_write(gpio_t pin, int value);
 }
 #endif
 
-#endif /* GPIO_H */
+#endif /* PERIPH_GPIO_H */
 /** @} */

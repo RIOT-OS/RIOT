@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef LWIP_ARCH_CC_H
-#define LWIP_ARCH_CC_H
+#ifndef ARCH_CC_H
+#define ARCH_CC_H
 
 #include <assert.h>
 #include <inttypes.h>
@@ -111,5 +111,5 @@ extern "C" {
 }
 #endif
 
-#endif /* LWIP_ARCH_CC_H */
+#endif /* ARCH_CC_H */
 /** @} */

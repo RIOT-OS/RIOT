@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef MSB_BOARD_H
-#define MSB_BOARD_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "board_common.h"
 
@@ -52,4 +52,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* MSB_BOARD_H */
+#endif /* BOARD_H */

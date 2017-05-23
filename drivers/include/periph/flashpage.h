@@ -30,8 +30,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef FLASHPAGE_H
-#define FLASHPAGE_H
+#ifndef PERIPH_FLASHPAGE_H
+#define PERIPH_FLASHPAGE_H
 
 #include <stdint.h>
 
@@ -145,5 +145,5 @@ int flashpage_write_and_verify(int page, void *data);
 }
 #endif
 
-#endif /* FLASHPAGE_H */
+#endif /* PERIPH_FLASHPAGE_H */
 /** @} */
