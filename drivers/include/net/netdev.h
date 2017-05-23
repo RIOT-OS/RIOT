@@ -53,9 +53,14 @@ extern "C" {
 #include <stdint.h>
 #include <sys/uio.h>
 
-#include "net/netstats.h"
-#include "net/l2filter.h"
 #include "net/netopt.h"
+
+#ifdef MODULE_NETSTATS_L2
+#include "net/netstats.h"
+#endif
+#ifdef MODULE_L2FILTER
+#include "net/l2filter.h"
+#endif
 
 enum {
     NETDEV_TYPE_UNKNOWN,
