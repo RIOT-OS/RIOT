@@ -8,6 +8,9 @@
  *
  */
 
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
+
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus
@@ -17,3 +20,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PERIPH_CPU_H */
