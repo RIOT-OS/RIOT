@@ -198,6 +198,18 @@ typedef enum {
 /** @} */
 #endif /* ndef DOXYGEN */
 
+/**
+ * @name    CPU specific UART modes values
+ * @{
+ */
+/** @brief 8 data bits, no parity, 1 stop bit */
+#define UART_MODE_8N1       (0)
+/** @brief 8 data bits, even parity, 1 stop bit */
+#define UART_MODE_8E1       (UART_C1_PE_MASK)
+/** @brief 8 data bits, odd parity, 1 stop bit */
+#define UART_MODE_8O1       (UART_C1_PE_MASK | UART_C1_PT_MASK)
+/** @} */
+
 #ifndef DOXYGEN
 /**
  * @brief   Override default ADC resolution values
@@ -302,14 +314,15 @@ enum {
  * @brief UART module configuration options
  */
 typedef struct {
-    UART_Type *dev;            /**< Pointer to module hardware registers */
-    volatile uint32_t *clken;  /**< Clock enable bitband register address */
-    uint32_t freq;             /**< Module clock frequency, usually CLOCK_CORECLOCK or CLOCK_BUSCLOCK */
-    gpio_t pin_rx;             /**< RX pin, GPIO_UNDEF disables RX */
-    gpio_t pin_tx;             /**< TX pin */
-    uint32_t pcr_rx;           /**< Pin configuration register bits for RX */
-    uint32_t pcr_tx;           /**< Pin configuration register bits for TX */
-    IRQn_Type irqn;            /**< IRQ number for this module */
+    UART_Type *dev;             /**< Pointer to module hardware registers */
+    volatile uint32_t *clken;   /**< Clock enable bitband register address */
+    uint32_t freq;              /**< Module clock frequency, usually CLOCK_CORECLOCK or CLOCK_BUSCLOCK */
+    gpio_t pin_rx;              /**< RX pin, GPIO_UNDEF disables RX */
+    gpio_t pin_tx;              /**< TX pin */
+    uint32_t pcr_rx;            /**< Pin configuration register bits for RX */
+    uint32_t pcr_tx;            /**< Pin configuration register bits for TX */
+    IRQn_Type irqn;             /**< IRQ number for this module */
+    uint8_t mode;               /**< UART mode: data bits, parity, stop bits */
 } uart_conf_t;
 
 /**

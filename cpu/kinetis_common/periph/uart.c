@@ -98,7 +98,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     /* disable transmitter and receiver */
     dev->C2 &= ~(UART_C2_TE_MASK | UART_C2_RE_MASK);
     /* set defaults, 8-bit mode, no parity */
-    dev->C1 = 0;
+    dev->C1 = uart_config[uart].mode;
 
     /* calculate baudrate */
     ubd = (uint16_t)(clk / (baudrate * 16));
