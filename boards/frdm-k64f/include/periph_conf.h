@@ -89,6 +89,7 @@ static const uart_conf_t uart_config[] = {
         .pcr_rx = PORT_PCR_MUX(3),
         .pcr_tx = PORT_PCR_MUX(3),
         .irqn   = UART0_RX_TX_IRQn,
+        .mode   = UART_MODE_8N1
     },
 };
 
