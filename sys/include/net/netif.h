@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    Network interfaces
+ * @defgroup    net_netif   Network interfaces
  * @ingroup     net
  * @brief       Common network interface API
  * @{
