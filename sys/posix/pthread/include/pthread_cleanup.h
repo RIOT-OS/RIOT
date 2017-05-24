@@ -14,8 +14,8 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef SYS__POSIX__PTHREAD_CLEANUP__H
-#define SYS__POSIX__PTHREAD_CLEANUP__H
+#ifndef PTHREAD_CLEANUP_H
+#define PTHREAD_CLEANUP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -95,7 +95,7 @@ void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute);
 }
 #endif
 
-#endif /* SYS__POSIX__PTHREAD_CLEANUP__H */
+#endif /* PTHREAD_CLEANUP_H */
 
 /**
  * @}

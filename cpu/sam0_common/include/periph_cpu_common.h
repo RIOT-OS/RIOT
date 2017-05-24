@@ -16,8 +16,8 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef CPU_PERIPH_COMMON_H
-#define CPU_PERIPH_COMMON_H
+#ifndef PERIPH_CPU_COMMON_H
+#define PERIPH_CPU_COMMON_H
 
 #include "cpu.h"
 
@@ -215,5 +215,5 @@ typedef struct {
 }
 #endif
 
-#endif /* CPU_PERIPH_COMMON_H */
+#endif /* PERIPH_CPU_COMMON_H */
 /** @} */

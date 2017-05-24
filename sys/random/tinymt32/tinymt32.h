@@ -230,4 +230,4 @@ inline static double tinymt32_generate_32double(tinymt32_t *random)
 }
 #endif
 
-#endif
+#endif /* TINYMT32_H */

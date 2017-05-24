@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef GNRC_PKTDUMP_H
-#define GNRC_PKTDUMP_H
+#ifndef NET_GNRC_PKTDUMP_H
+#define NET_GNRC_PKTDUMP_H
 
 #include "kernel_types.h"
 
@@ -66,5 +66,5 @@ kernel_pid_t gnrc_pktdump_init(void);
 }
 #endif
 
-#endif /* GNRC_PKTDUMP_H */
+#endif /* NET_GNRC_PKTDUMP_H */
 /** @} */

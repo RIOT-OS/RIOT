@@ -18,8 +18,8 @@
  * @author      Shuguo Zhuo  <shuguo.zhuo@inria.fr>
  */
 
-#ifndef GNRC_MAC_TYPES_H
-#define GNRC_MAC_TYPES_H
+#ifndef NET_GNRC_MAC_TYPES_H
+#define NET_GNRC_MAC_TYPES_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -186,5 +186,5 @@ typedef struct {
 }
 #endif
 
-#endif /* GNRC_MAC_TYPES_H */
+#endif /* NET_GNRC_MAC_TYPES_H */
 /** @} */

@@ -21,8 +21,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef GNRC_SLIP_H
-#define GNRC_SLIP_H
+#ifndef NET_GNRC_SLIP_H
+#define NET_GNRC_SLIP_H
 
 #include <inttypes.h>
 
@@ -88,5 +88,5 @@ kernel_pid_t gnrc_slip_init(gnrc_slip_dev_t *dev, uart_t uart, uint32_t baudrate
 }
 #endif
 
-#endif /* __SLIP_H */
+#endif /* NET_GNRC_SLIP_H */
 /** @} */

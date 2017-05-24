@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef BYTES_H
-#define BYTES_H
+#ifndef SYS_BYTES_H
+#define SYS_BYTES_H
 
 #include "byteorder.h"
 
@@ -32,5 +32,5 @@ typedef size_t socklen_t;           /**< socket address length */
 }
 #endif
 
-#endif /* BYTES_H */
+#endif /* SYS_BYTES_H */
 /** @} */

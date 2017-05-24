@@ -22,8 +22,8 @@
  * @author  Víctor Ariño <victor.arino@zii.aero>
  */
 
-#ifndef POSIX_SEMAPHORE_H
-#define POSIX_SEMAPHORE_H
+#ifndef SEMAPHORE_H
+#define SEMAPHORE_H
 
 #include <errno.h>
 #include <time.h>
@@ -294,5 +294,5 @@ static inline int sem_getvalue(sem_t *sem, int *sval)
 }
 #endif
 
-#endif  /* POSIX_SEMAPHORE_H */
+#endif /* SEMAPHORE_H */
 /** @} */

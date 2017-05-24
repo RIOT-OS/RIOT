@@ -28,8 +28,8 @@
  *      Author: petera
  */
 
-#ifndef SPIFFS_CONFIG_H_
-#define SPIFFS_CONFIG_H_
+#ifndef SPIFFS_CONFIG_H
+#define SPIFFS_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -298,4 +298,4 @@ typedef int16_t s16_t;
 }
 #endif
 
-#endif /* SPIFFS_CONFIG_H_ */
+#endif /* SPIFFS_CONFIG_H */

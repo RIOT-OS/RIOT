@@ -17,8 +17,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef FLETCHER32_H
-#define FLETCHER32_H
+#ifndef CHECKSUM_FLETCHER32_H
+#define CHECKSUM_FLETCHER32_H
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -47,6 +47,6 @@ uint32_t fletcher32(const uint16_t *buf, size_t words);
 }
 #endif
 
-#endif /* FLETCHER32_H */
+#endif /* CHECKSUM_FLETCHER32_H */
 
 /** @} */

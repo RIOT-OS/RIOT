@@ -524,7 +524,7 @@ extern "C" {
 }
 #endif
 
-#endif              /* TIME_H  */
+#endif /* TIME_H */
 
 /**
 \endcond

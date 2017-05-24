@@ -179,8 +179,8 @@
  * @author      Ken Bannister <kb2ma@runbox.com>
  */
 
-#ifndef GCOAP_H
-#define GCOAP_H
+#ifndef NET_GCOAP_H
+#define NET_GCOAP_H
 
 #include "net/sock/udp.h"
 #include "nanocoap.h"
@@ -572,5 +572,5 @@ uint8_t gcoap_op_state(void);
 }
 #endif
 
-#endif /* GCOAP_H */
+#endif /* NET_GCOAP_H */
 /** @} */

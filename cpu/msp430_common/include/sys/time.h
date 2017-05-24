@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef TIME_H
-#define TIME_H
+#ifndef SYS_TIME_H
+#define SYS_TIME_H
 
 #include "msp430_types.h"
 
@@ -19,4 +19,4 @@ extern "C" {
 }
 #endif
 
-#endif /* TIME_H */
+#endif /* SYS_TIME_H */

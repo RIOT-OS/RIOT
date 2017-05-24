@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef LWIP_LWIPOPTS_H
-#define LWIP_LWIPOPTS_H
+#ifndef LWIPOPTS_H
+#define LWIPOPTS_H
 
 #include "thread.h"
 #include "net/gnrc/netif/hdr.h"
@@ -155,5 +155,5 @@ extern "C" {
 }
 #endif
 
-#endif /* LWIP_LWIPOPTS_H */
+#endif /* LWIPOPTS_H */
 /** @} */

@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef _CPU_CONF_H_
-#define _CPU_CONF_H_
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 /**
  * @defgroup    cpu_mips32r2_commom MIPS32R2 Common
@@ -64,5 +64,5 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* CPU_CONF_H */
 /** @} */

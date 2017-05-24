@@ -26,8 +26,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef UCRC16_H
-#define UCRC16_H
+#ifndef CHECKSUM_UCRC16_H
+#define CHECKSUM_UCRC16_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -78,5 +78,5 @@ uint16_t ucrc16_calc_le(const uint8_t *buf, size_t len, uint16_t poly,
 }
 #endif
 
-#endif /* UCRC16_H */
+#endif /* CHECKSUM_UCRC16_H */
 /** @} */

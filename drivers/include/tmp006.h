@@ -205,5 +205,5 @@ void tmp006_convert(int16_t rawv, int16_t rawt,  float *tamb, float *tobj);
 }
 #endif
 
-#endif
+#endif /* TMP006_H */
 /** @} */

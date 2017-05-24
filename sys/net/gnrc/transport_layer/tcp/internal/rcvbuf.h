@@ -19,8 +19,8 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_INTERNAL_RCVBUF_H
-#define GNRC_TCP_INTERNAL_RCVBUF_H
+#ifndef RCVBUF_H
+#define RCVBUF_H
 
 #include <stdint.h>
 #include "mutex.h"
@@ -73,5 +73,5 @@ void _rcvbuf_release_buffer(gnrc_tcp_tcb_t *tcb);
 }
 #endif
 
-#endif /* GNRC_TCP_INTERNAL_RCVBUF_H */
+#endif /* RCVBUF_H */
 /** @} */

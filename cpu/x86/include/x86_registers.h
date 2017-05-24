@@ -25,8 +25,8 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU__X86__REGISTERS__H__
-#define CPU__X86__REGISTERS__H__
+#ifndef X86_REGISTERS_H
+#define X86_REGISTERS_H
 
 #include <stdint.h>
 
@@ -258,6 +258,6 @@ static inline uint64_t X86_CR_ATTR cpuid_caps(void)
 }
 #endif
 
-#endif
+#endif /* X86_REGISTERS_H */
 
 /** @} */

@@ -17,8 +17,8 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef SPIFFS_FS_H
-#define SPIFFS_FS_H
+#ifndef FS_SPIFFS_FS_H
+#define FS_SPIFFS_FS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,6 +81,6 @@ extern const vfs_file_system_t spiffs_file_system;
 }
 #endif
 
-#endif /* SPIFFS_FS_H */
+#endif /* FS_SPIFFS_FS_H */
 
 /** @} */

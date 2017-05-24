@@ -20,8 +20,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_SIXLOWPAN_ND_H
-#define GNRC_SIXLOWPAN_ND_H
+#ifndef NET_GNRC_SIXLOWPAN_ND_H
+#define NET_GNRC_SIXLOWPAN_ND_H
 
 #include <stdint.h>
 
@@ -282,5 +282,5 @@ gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_abr_build(uint32_t version, uint16_t ltime
 }
 #endif
 
-#endif /* GNRC_SIXLOWPAN_ND_H */
+#endif /* NET_GNRC_SIXLOWPAN_ND_H */
 /** @} */

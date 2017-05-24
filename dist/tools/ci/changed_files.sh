@@ -8,7 +8,7 @@
 
 changed_files() {
     : ${FILEREGEX:='\.([CcHh]|[ch]pp)$'}
-    : ${EXCLUDE:='^(.+/include/vendor/|dist/tools/coccinelle/include)'}
+    : ${EXCLUDE:='^(.+/include/vendor/|dist/tools/coccinelle/include|boards/msba2-common/tools/src)'}
     : ${DIFFFILTER:='ACMR'}
 
     DIFFFILTER="--diff-filter=${DIFFFILTER}"

@@ -706,6 +706,6 @@ bool cbor_at_end(const cbor_stream_t *stream, size_t offset);
 }
 #endif
 
-#endif
+#endif /* CBOR_H */
 
 /** @} */

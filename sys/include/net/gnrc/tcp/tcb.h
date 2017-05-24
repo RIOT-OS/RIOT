@@ -19,8 +19,8 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_TCB_H
-#define GNRC_TCP_TCB_H
+#ifndef NET_GNRC_TCP_TCB_H
+#define NET_GNRC_TCP_TCB_H
 
 #include <stdint.h>
 #include "kernel_types.h"
@@ -88,5 +88,5 @@ typedef struct _transmission_control_block {
 #ifdef __cplusplus
 }
 #endif
-#endif /* GNRC_TCP_TCB_H */
+#endif /* NET_GNRC_TCP_TCB_H */
 /** @} */

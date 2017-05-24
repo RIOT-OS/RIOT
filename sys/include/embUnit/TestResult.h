@@ -67,4 +67,4 @@ void TestResult_addFailure(TestResult* self,Test* test,const char* msg,int line,
 }
 #endif
 
-#endif/* EMBUNIT_TESTRESULT_H */
+#endif /* EMBUNIT_TESTRESULT_H */

@@ -97,8 +97,8 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
 
-#ifndef MCG_CPU_H
-#define MCG_CPU_H
+#ifndef MCG_H
+#define MCG_H
 
 #include "periph_conf.h"
 
@@ -133,4 +133,4 @@ int kinetis_mcg_set_mode(kinetis_mcg_mode_t mode);
 #endif /* KINETIS_CPU_USE_MCG */
 /** @} */
 
-#endif /* MCG_CPU_H */
+#endif /* MCG_H */

@@ -47,4 +47,4 @@ OutputterRef CompilerOutputter_outputter(void);
 }
 #endif
 
-#endif/* EMBUNIT_COMPILEROUTPUTTER_H */
+#endif /* EMBUNIT_COMPILEROUTPUTTER_H */

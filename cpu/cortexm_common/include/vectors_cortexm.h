@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef VECTORS_DEFAULT_H
-#define VECTORS_DEFAULT_H
+#ifndef VECTORS_CORTEXM_H
+#define VECTORS_CORTEXM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -122,5 +122,5 @@ void dummy_handler_default(void);
 }
 #endif
 
-#endif /* VECTORS_DEFAULT_H */
+#endif /* VECTORS_CORTEXM_H */
 /** @} */

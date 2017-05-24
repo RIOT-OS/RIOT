@@ -17,8 +17,8 @@
  *
  * @author  smlng <s@mlng.net>,
  */
-#ifndef IANA_H
-#define IANA_H
+#ifndef NET_IANA_PORTRANGE_H
+#define NET_IANA_PORTRANGE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,5 +43,5 @@ extern "C" {
 }
 #endif
 
-#endif /* IANA_H */
+#endif /* NET_IANA_PORTRANGE_H */
 /** @} */

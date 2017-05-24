@@ -26,8 +26,8 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU_X86_CPU_H
-#define CPU_X86_CPU_H
+#ifndef CPU_H
+#define CPU_H
 
 #include "kernel_defines.h"
 #include "irq.h"
@@ -124,6 +124,6 @@ static inline void cpu_print_last_instruction(void)
 }
 #endif
 
-#endif /* CPU_X86_CPU_H */
+#endif /* CPU_H */
 
 /** @} */

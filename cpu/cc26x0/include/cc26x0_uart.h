@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef CC26x0_UART_H
-#define CC26x0_UART_H
+#ifndef CC26X0_UART_H
+#define CC26X0_UART_H
 
 #include "cc26x0.h"
 
@@ -129,5 +129,5 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26x8_UART_H */
+#endif /* CC26X0_UART_H */
 /** @} */

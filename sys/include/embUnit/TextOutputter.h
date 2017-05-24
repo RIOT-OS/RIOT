@@ -47,4 +47,4 @@ OutputterRef TextOutputter_outputter(void);
 }
 #endif
 
-#endif/* EMBUNIT_TEXTOUTPUTTER_H */
+#endif /* EMBUNIT_TEXTOUTPUTTER_H */

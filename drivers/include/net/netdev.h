@@ -43,8 +43,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NETDEV_H
-#define NETDEV_H
+#ifndef NET_NETDEV_H
+#define NET_NETDEV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -239,4 +239,4 @@ typedef struct netdev_driver {
 }
 #endif
 /** @} */
-#endif /* NETDEV_H */
+#endif /* NET_NETDEV_H */

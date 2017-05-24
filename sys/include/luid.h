@@ -50,8 +50,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef LUID_H_
-#define LUID_H_
+#ifndef LUID_H
+#define LUID_H
 
 #include <stddef.h>
 
@@ -115,5 +115,5 @@ void luid_base(void *buf, size_t len);
 }
 #endif
 
-#endif /* LUID_H_ */
+#endif /* LUID_H */
 /** @} */

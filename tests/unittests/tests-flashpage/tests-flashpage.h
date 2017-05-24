@@ -15,8 +15,8 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-#ifndef TESTS_FLASHPAGE_H_
-#define TESTS_FLASHPAGE_H_
+#ifndef TESTS_FLASHPAGE_H
+#define TESTS_FLASHPAGE_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_flashpage(void);
 }
 #endif
 
-#endif /* TESTS_FLASHPAGE_H_ */
+#endif /* TESTS_FLASHPAGE_H */
 /** @} */

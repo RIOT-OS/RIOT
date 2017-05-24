@@ -32,8 +32,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef SECT_DATA_H
-#define SECT_DATA_H
+#ifndef PHYDAT_H
+#define PHYDAT_H
 
 #include <stdint.h>
 #include <errno.h>
@@ -171,5 +171,5 @@ char phydat_scale_to_str(int8_t scale);
 }
 #endif
 
-#endif /* SECT_DATA_H */
+#endif /* PHYDAT_H */
 /** @} */

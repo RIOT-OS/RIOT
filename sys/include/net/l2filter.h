@@ -28,8 +28,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef L2FILTER_H
-#define L2FILTER_H
+#ifndef NET_L2FILTER_H
+#define NET_L2FILTER_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -125,5 +125,5 @@ bool l2filter_pass(const l2filter_t *list, const void *addr, size_t addr_len);
 }
 #endif
 
-#endif /* L2FILTER_H */
+#endif /* NET_L2FILTER_H */
 /** @} */

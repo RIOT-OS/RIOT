@@ -16,8 +16,8 @@
  * @author          Leon George <leon@georgemail.eu>
  */
 
-#ifndef CC26x0_IOC_H
-#define CC26x0_IOC_H
+#ifndef CC26X0_IOC_H
+#define CC26X0_IOC_H
 
 #include "cc26x0.h"
 
@@ -159,6 +159,6 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26x0_IOC_H */
+#endif /* CC26X0_IOC_H */
 
 /*@}*/

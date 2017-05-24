@@ -14,8 +14,8 @@
  * @brief           CC26x0 PRCM register definitions
  */
 
-#ifndef CC26x0_PRCM_H
-#define CC26x0_PRCM_H
+#ifndef CC26X0_PRCM_H
+#define CC26X0_PRCM_H
 
 #include <cc26x0.h>
 
@@ -317,6 +317,6 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26x0_PRCM_H */
+#endif /* CC26X0_PRCM_H */
 
 /*@}*/
