@@ -53,8 +53,11 @@ ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
   USEMODULE += gnrc_pktdump
 
   # We use only the lower layers of the GNRC network stack, hence, we can
-  # reduce the size of the packet buffer a bit
+  # reduce the size of the packet buffer a bit. Only native needs a little
+  # larger pktbuf.
+ifeq (,$(filter native,$(BOARD)))
   CFLAGS += -DGNRC_PKTBUF_SIZE=512
+endif
 endif
 
 FEATURES_OPTIONAL += config
