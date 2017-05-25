@@ -1,0 +1,7 @@
+TODO
+====
+
+   * Make sure new stuff is optional in the build, to be able to keep it small.
+   * Clarify scoring/points/levels, see, e.g., http://tetris.wikia.com/wiki/Scoring
+   * Award more points for clearing multiple lines at the same time.
+
