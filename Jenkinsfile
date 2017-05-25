@@ -86,6 +86,9 @@ stage("unittests") {
         boardName = boards[i]
         builds['linux_unittests_' + boardName] = make_build("linux && boards && native", boardName, "linux_unittests", unittests)
     }
+
+    builds['raspi_unittests_native'] = make_build("raspi && native", "native", "raspi_unittests", unittests)
+
     /* distribute all builds to the slaves */
     parallel (builds)
 
@@ -112,12 +115,10 @@ stage("tests") {
     builds['macOS_periph_tests_native'] = make_build("macOS && native", "native", "macOS_periph_tests", periph_tests)
     builds['macOS_other_tests_native'] = make_build("macOS && native", "native", "macOS_other_tests", other_tests)
 */
-/*  ignore raspi builds for now - slows down the build (needs investigation)
     builds['raspi_driver_tests_native'] = make_build("raspi && native", "native", "raspi_driver_tests", driver_tests)
     builds['raspi_pkg_tests_native'] = make_build("raspi && native", "native", "raspi_pkg_tests", pkg_tests)
     builds['raspi_periph_tests_native'] = make_build("raspi && native", "native", "raspi_periph_tests", periph_tests)
     builds['raspi_other_tests_native'] = make_build("raspi && native", "native", "raspi_other_tests", other_tests)
-*/
 
     /* distribute all builds to the slaves */
     parallel (builds)
@@ -138,9 +139,7 @@ stage("examples") {
 /*  ignore macOS builds for now - macOS is currently broken for native
     builds['macOS_examples_native'] = make_build("macOS && native", "native", "macOS_examples", examples)
 */
-/*  ignore raspi builds for now - slows down the build (needs investigation)
     builds['raspi_examples_native'] = make_build("raspi && native", "native", "raspi_examples", examples)
-*/
 
     /* distribute all builds to the slaves */
     parallel (builds)
