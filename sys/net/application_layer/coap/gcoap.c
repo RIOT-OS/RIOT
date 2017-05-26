@@ -661,8 +661,8 @@ ssize_t gcoap_finish(coap_pkt_t *pdu, size_t payload_len, unsigned format)
     return _finish_pdu(pdu, (uint8_t *)pdu->hdr, len);
 }
 
-size_t gcoap_req_send(uint8_t *buf, size_t len, ipv6_addr_t *addr, uint16_t port,
-                                                 gcoap_resp_handler_t resp_handler)
+size_t gcoap_req_send(const uint8_t *buf, size_t len, const ipv6_addr_t *addr,
+                      uint16_t port, gcoap_resp_handler_t resp_handler)
 {
     sock_udp_ep_t remote;
 
@@ -675,8 +675,9 @@ size_t gcoap_req_send(uint8_t *buf, size_t len, ipv6_addr_t *addr, uint16_t port
     return gcoap_req_send2(buf, len, &remote, resp_handler);
 }
 
-size_t gcoap_req_send2(uint8_t *buf, size_t len, sock_udp_ep_t *remote,
-                                                 gcoap_resp_handler_t resp_handler)
+size_t gcoap_req_send2(const uint8_t *buf, size_t len,
+                       const sock_udp_ep_t *remote,
+                       gcoap_resp_handler_t resp_handler)
 {
     gcoap_request_memo_t *memo = NULL;
     assert(remote != NULL);
@@ -775,7 +776,8 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
 }
 
-size_t gcoap_obs_send(uint8_t *buf, size_t len, const coap_resource_t *resource)
+size_t gcoap_obs_send(const uint8_t *buf, size_t len,
+                      const coap_resource_t *resource)
 {
     gcoap_observe_memo_t *memo = NULL;
 
