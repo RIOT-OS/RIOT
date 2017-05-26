@@ -1,6 +1,10 @@
 # define the CPU architecture for the k60
 export CPU_ARCH = cortex-m4
 
+# map CPU models to generic Kinetis linkerscript
+LD_MK60DN256VLL10 = kinetis_f256l16u16.ld
+LD_MK60DN512VLL10 = kinetis_f512l64u64.ld
+
 # tell the build system that the CPU depends on the Kinetis common files
 export USEMODULE += kinetis_common
 
