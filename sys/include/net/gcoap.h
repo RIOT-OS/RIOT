@@ -472,8 +472,9 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @return length of the packet
  * @return 0 if cannot send
  */
-size_t gcoap_req_send2(uint8_t *buf, size_t len, sock_udp_ep_t *remote,
-                                                 gcoap_resp_handler_t resp_handler);
+size_t gcoap_req_send2(const uint8_t *buf, size_t len,
+                       const sock_udp_ep_t *remote,
+                       gcoap_resp_handler_t resp_handler);
 
 /**
  * @brief  Sends a buffer containing a CoAP request to the provided host/port.
@@ -489,8 +490,8 @@ size_t gcoap_req_send2(uint8_t *buf, size_t len, sock_udp_ep_t *remote,
  * @return length of the packet
  * @return 0 if cannot send
  */
-size_t gcoap_req_send(uint8_t *buf, size_t len, ipv6_addr_t *addr, uint16_t port,
-                                                gcoap_resp_handler_t resp_handler);
+size_t gcoap_req_send(const uint8_t *buf, size_t len, const ipv6_addr_t *addr,
+                      uint16_t port, gcoap_resp_handler_t resp_handler);
 
 /**
  * @brief  Initializes a CoAP response packet on a buffer.
@@ -557,7 +558,8 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @return length of the packet
  * @return 0 if cannot send
  */
-size_t gcoap_obs_send(uint8_t *buf, size_t len, const coap_resource_t *resource);
+size_t gcoap_obs_send(const uint8_t *buf, size_t len,
+                      const coap_resource_t *resource);
 
 /**
  * @brief Provides important operational statistics.
