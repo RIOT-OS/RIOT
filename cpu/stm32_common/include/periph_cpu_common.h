@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
- *               2017 OTA keys S.A.
+ * Copyright (C) 2015 Engineering-Spirit
+ *               2015-2016 Freie Universität Berlin
+ *               2016-2017 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -9,6 +10,7 @@
 
 /**
  * @ingroup         cpu_stm32_common
+ * @ingroup         drivers_periph_dma
  * @{
  *
  * @file
@@ -16,6 +18,7 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Vincent Dupont <vincent@otakeys.com>
+ * @author          Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
  */
 
 #ifndef PERIPH_CPU_COMMON_H
@@ -304,6 +307,44 @@ void gpio_init_af(gpio_t pin, gpio_af_t af);
  * @param[in] pin       pin to configure
  */
 void gpio_init_analog(gpio_t pin);
+
+#ifndef DOXYGEN
+/**
+ * @brief   Overwrite the default dma_t type definition
+ * @{
+ */
+#define HAVE_DMA_T
+typedef uint8_t dma_t;
+/** @} */
+
+/**
+ * @brief   Overwrite the default dma_mode_t
+ */
+#define HAVE_DMA_MODE_T
+typedef enum {
+    PERIPH_TO_MEMORY = 0,      /**< Transfer from the periph to the memory */
+    MEMORY_TO_PERIPH,          /**< Transfer from the memory to the periph */
+    MEMORY_TO_MEMORY,          /**< Transfer from the memory to the memory */
+} dma_mode_t;
+#endif /* DOXYGEN */
+
+/**
+ * @brief   End the call to a DMA isr
+ *
+ * This shall clear the underlying flags
+ *
+ * @param[in] dma       DMA unit which triggered the interrupt
+ */
+static inline void dma_end_isr(dma_t dma);
+
+/* There are two flavors of DMA on the stm32 platforms. One uses single
+ * channels and the oder uses streams (and each stream can have up to 8
+ * channels). Depending on the family we include one or the other flavor. */
+#if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
+#include "dma_stream.h"
+#else
+#include "dma_channel.h"
+#endif /* defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) */
 
 #ifdef __cplusplus
 }

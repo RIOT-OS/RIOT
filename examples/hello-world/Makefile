@@ -12,6 +12,8 @@ RIOTBASE ?= $(CURDIR)/../..
 # development process:
 CFLAGS += -DDEVELHELP
 
+USEMODULE += xtimer
+
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
