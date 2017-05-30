@@ -43,7 +43,7 @@ typedef enum {
  * @param[in] reg       address of register
  * @param[in] bit       set this bit
  */
-inline void kw2xrf_set_dreg_bit(kw2xrf_t *dev, uint8_t reg, uint8_t bit)
+static inline void kw2xrf_set_dreg_bit(kw2xrf_t *dev, uint8_t reg, uint8_t bit)
 {
     uint8_t tmp = kw2xrf_read_dreg(dev, reg);
     tmp |= bit;
@@ -57,7 +57,7 @@ inline void kw2xrf_set_dreg_bit(kw2xrf_t *dev, uint8_t reg, uint8_t bit)
  * @param[in] reg       address of register
  * @param[in] bit       set this bit
  */
-inline void kw2xrf_clear_dreg_bit(kw2xrf_t *dev, uint8_t reg, uint8_t bit)
+static inline void kw2xrf_clear_dreg_bit(kw2xrf_t *dev, uint8_t reg, uint8_t bit)
 {
     uint8_t tmp = kw2xrf_read_dreg(dev, reg);
     tmp &= ~bit;
@@ -69,7 +69,7 @@ inline void kw2xrf_clear_dreg_bit(kw2xrf_t *dev, uint8_t reg, uint8_t bit)
  *
  * @param[in] dev       kw2xrf device descriptor
  */
-inline void kw2xrf_enable_irq_b(kw2xrf_t *dev)
+static inline void kw2xrf_enable_irq_b(kw2xrf_t *dev)
 {
     kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL4, MKW2XDM_PHY_CTRL4_TRCV_MSK);
 }
@@ -79,7 +79,7 @@ inline void kw2xrf_enable_irq_b(kw2xrf_t *dev)
  *
  * @param[in] dev       kw2xrf device descriptor
  */
-inline void kw2xrf_mask_irq_b(kw2xrf_t *dev)
+static inline void kw2xrf_mask_irq_b(kw2xrf_t *dev)
 {
     kw2xrf_set_dreg_bit(dev, MKW2XDM_PHY_CTRL4, MKW2XDM_PHY_CTRL4_TRCV_MSK);
 }
