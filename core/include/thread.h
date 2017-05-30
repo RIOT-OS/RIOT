@@ -63,10 +63,13 @@
  * Usage
  * -----
  * ~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * #include "thread.h"
+ *
  * char rcv_thread_stack[THREAD_STACKSIZE_MAIN];
  *
  * void *rcv_thread(void *arg)
  * {
+ *     (void) arg;
  *     msg_t m;
  *
  *     while (1) {
