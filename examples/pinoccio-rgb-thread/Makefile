@@ -15,6 +15,11 @@ CFLAGS += -DDEVELHELP
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 0
 
+# Add also the shell, some shell commands
+USEMODULE += shell
+USEMODULE += shell_commands
+USEMODULE += ps
+
 USEMODULE += rgbled
 USEMODULE += xtimer
 FEATURES_REQUIRED += periph_timer
