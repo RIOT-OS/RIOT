@@ -34,9 +34,13 @@ extern "C" {
 *        baudrate to 9600 for this board
 */
 /**
- * CPU is fast enough to send 115200 baud but receiving is not working
+ * CPU is fast enough to send 115200 baud
+ * but receiving is not working, irspipe and fetching bytes seems to be to slow
+ * too much data lost when using with terminal
  */
-#define UART_STDIO_BAUDRATE (9600U)
+ #define UART_STDIO_BAUDRATE (9600U)
+
+// #define UART_STDIO_BAUDRATE (19200)
 
 /**
  * @brief   LED pin definitions and handlers
@@ -55,11 +59,11 @@ extern "C" {
 
 // TODO clean up
 // kept for compatibility
-#define LED0_PIN            GPIO_PIN(1, 7)
-#define LED0_MASK           (1 << DDB7)
-#define LED0_ON             (PORTB |=  LED0_MASK)
-#define LED0_OFF            (PORTB &= ~LED0_MASK)
-#define LED0_TOGGLE         (PORTB ^=  LED0_MASK)
+//#define LED0_PIN            GPIO_PIN(1, 7)
+//#define LED0_MASK           (1 << DDB7)
+//#define LED0_ON             (PORTB |=  LED0_MASK)
+//#define LED0_OFF            (PORTB &= ~LED0_MASK)
+//#define LED0_TOGGLE         (PORTB ^=  LED0_MASK)
 /** @} */
 
 

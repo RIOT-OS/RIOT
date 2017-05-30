@@ -45,7 +45,7 @@ extern "C" {
  * @brief xtimer configuration values
  * @{
  */
-#define XTIMER_DEV					TIMER_DEV(0)   			// set TC0 as system counter
+#define XTIMER_DEV					TIMER_DEV(0)   	// set ctx[0] as system counter this is MEGA_TIMER4
 #define XTIMER_CHAN 				(0)				// choose channel 0
 #define XTIMER_WIDTH                (16)			// 16bit timer
 #define XTIMER_SHIFT                (4)				// xtimer prescaler value, If the underlying hardware timer is running at a power of two multiple ofFor a 16 MHz hardware timer, set XTIMER_SHIFT to 4.

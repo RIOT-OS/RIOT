@@ -34,35 +34,186 @@
 
 #include "net/gnrc/netdev.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #ifdef MODULE_AT86RFR2
+
+#include "thread.h"
+#include "msg.h"
+
+
+
+// char at86rfr2_interrupt_thread_stack[256];
+// static msg_t _int_msg_queue[16]; // must be a power of 2
 
 /*TODO port all functions from at86rf2xx_netdev.c _isr() */
 
 	#include "avr/interrupt.h"
 	// saved device Pointer for Interrupt callback
 	static netdev_t* static_dev;
+	// static kernel_pid_t at86rfr2_interrupt_thread_pid;
+
+//	/*
+//	* Send massage to gnrc_netdev containing interrupt reason.
+//	*/
+//	static inline void at86rfr2_isr_handler(uint8_t vect_num)
+//	{
+//		gnrc_netdev_t *gnrc_netdev = (gnrc_netdev_t*) static_dev->context;
+//
+//		msg_t msg;
+//		msg.type = NETDEV_MSG_TYPE_EVENT;
+//		msg.content.ptr = gnrc_netdev;
+//		msg.content.value = (uint32_t) vect_num;
+//
+//		if (msg_send(&msg, gnrc_netdev->pid) <= 0) {
+//			puts("gnrc_netdev: possibly lost interrupt.");
+//		}
+//	}
+//		msg_t m;
+//		m.content.value = vect_num;
+//		msg_send_int(&m, at86rfr2_interrupt_thread_pid);
+//
+//	    if (sched_context_switch_request) {
+//	        thread_yield();
+//	    }
+//	}
+//
+//	void *at86rfr2_interrupt_thread(void *arg)
+//	{
+//		(void) arg;
+//
+//		// DEBUG("at86rfr2_interrupt_thread started, pid: %" PRIkernel_pid "\n", thread_getpid());
+//
+//		/* for the thread running the shell */
+//		msg_init_queue(_int_msg_queue, sizeof(_int_msg_queue));
+//
+//		msg_t m;
+//
+//		while (1)
+//		{
+//
+//			msg_receive(&m);
+//
+//			printf("[at86rf2xx] at86rfr2_interrupt_thread got massage from Interrupt Vector: %u\n", m.content.value);
+//
+//			/*
+//			 * If transceiver is sleeping there should be not interrupts triggered.
+//			 */
+//			at86rf2xx_t *dev = (at86rf2xx_t *) static_dev;
+//			uint8_t state = at86rf2xx_get_status(dev);
+//
+//			if (state == AT86RF2XX_STATE_SLEEP)
+//			{
+//				printf("[at86rf2xx] Error at86rfr2_interrupt_thread: Interrupt triggered while transceiver is in sleep.\n");
+//			}
+//			else if ( !(static_dev->event_callback) )
+//			{
+//				printf("[at86rf2xx] Error at86rfr2_interrupt_thread: No callback available.\n");
+//			}
+//			else
+//			{
+//				/*
+//				 * Check which Interrupt send a massage.
+//				 * Send events to upper layer if configured else don't
+//				 */
+//
+//
+//				switch( vect_num )// m.content.value )
+//				{
+//				case TRX24_PLL_LOCK_vect_num:
+//						printf("[at86rf2xx] at86rfr2_interrupt_thread: PLL Locked.\n");
+//					break;
+//					case TRX24_RX_START_vect_num:
+//							static_dev->event_callback(static_dev, NETDEV_EVENT_RX_STARTED);
+//							DEBUG("[at86rf2xx] EVT - RX_START\n");
+//						break;
+//					case TRX24_RX_END_vect_num:
+//							if (state == AT86RF2XX_STATE_RX_AACK_ON ||
+//								state == AT86RF2XX_STATE_BUSY_RX_AACK)
+//							{
+//								DEBUG("[at86rf2xx] EVT - RX_END\n");
+//								if ( !( ((at86rf2xx_t*)static_dev)->netdev.flags & AT86RF2XX_OPT_TELL_RX_END) )
+//								{
+//									break;
+//								}
+//								static_dev->event_callback(static_dev, NETDEV_EVENT_RX_COMPLETE);
+//							}
+//							else if ( state == AT86RF2XX_STATE_TX_ARET_ON ||
+//									  state == AT86RF2XX_STATE_BUSY_TX_ARET )
+//							{
+//								/* check for more pending TX calls and return to idle state if
+//								 * there are none */
+//								assert( dev->pending_tx != 0);
+//								if ((--dev->pending_tx) == 0)
+//								{
+//									at86rf2xx_set_state(dev, dev->idle_state);
+//									DEBUG("[at86rf2xx] return to state 0x%x\n", dev->idle_state);
+//								}
+//							}
+//							DEBUG("[at86rf2xx] EVT - TX_END\n");
+//						break;
+//					case TRX24_TX_END_vect_num:
+//							/*
+//							 * If interrupt is triggered check if upper layer wants to be informed.
+//							 * If not give error then the interrupt could be disabled.
+//							 */
+//							if ( dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END)
+//							{
+//								uint8_t trac_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATE) &
+//											  AT86RF2XX_TRX_STATE_MASK__TRAC;
+//
+//								switch (trac_status)
+//								{
+//									case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
+//									case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
+//										static_dev->event_callback(static_dev, NETDEV_EVENT_TX_COMPLETE);
+//										DEBUG("[at86rf2xx] TX SUCCESS\n");
+//										break;
+//									case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
+//										static_dev->event_callback(static_dev, NETDEV_EVENT_TX_NOACK);
+//										DEBUG("[at86rf2xx] TX NO_ACK\n");
+//										break;
+//									case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
+//										static_dev->event_callback(static_dev, NETDEV_EVENT_TX_MEDIUM_BUSY);
+//										DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
+//										break;
+//									default:
+//										DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",trac_status >> 5);
+//								}
+//							}
+//							/* set transceiver back to receiving state*/
+//							// do it after the packet was read in _rec() function
+//							//at86rf2xx_set_state((at86rf2xx_t*)static_dev, AT86RF2XX_TRX_STATE__RX_AACK_ON);
+//						break;
+//					default:
+//							printf("[at86rf2xx] Error: Unhandled Interrupt %u\n",  m.content.value );
+//						break;
+//				}
+//			}
+//		}
+//	}
 
 	/**
-	 * \brief ISR for transceiver's transmit end interrupt
+	 * \brief ISR for transceiver's PLL Lock interrupt
 	 */
 	ISR(TRX24_PLL_LOCK_vect, ISR_BLOCK)
 	{
 		__enter_isr();
-		DEBUG("TRX24_PLL_LOCK_vect\n");
 		LED_PORT &= ~GREEN;
+		((at86rf2xx_t*)static_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN;
+		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
 		__exit_isr();
 	}
 
 	/**
-	 * \brief ISR for transceiver's transmit end interrupt
+	 * \brief ISR for transceiver's PLL unlock interrupt
 	 */
 	ISR(TRX24_PLL_UNLOCK_vect, ISR_BLOCK)
 	{
 		__enter_isr();
-		DEBUG("TRX24_PLL_UNLOCK_vect\n");
+		((at86rf2xx_t*)static_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK_EN;
+		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
 		LED_PORT |= GREEN;
 		__exit_isr();
 	}
@@ -77,8 +228,8 @@
 	{
 		__enter_isr();
 		LED_PORT &= ~GREEN;
-		((at86rf2xx_t*)static_dev)->irq_status |=  AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN;
-		static_dev->event_callback(static_dev,NETDEV_EVENT_ISR);
+		((at86rf2xx_t*)static_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN;
+		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
 		__exit_isr();
 	}
 
@@ -88,28 +239,34 @@
 	ISR(TRX24_RX_END_vect, ISR_BLOCK)
 	{
 		__enter_isr();
-		//DEBUG("TRX24_RX_END \n");
-		((at86rf2xx_t*)static_dev)->irq_status |=  AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN;
-		static_dev->event_callback(static_dev,NETDEV_EVENT_ISR);
-	    LED_PORT |= GREEN;
+		((at86rf2xx_t*)static_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN;
+		/*
+		 * p. 99, 9.8.7 Dynamic Frame Buffer Protection
+		 * Enabled in reset function to Protect content in
+		 * frame from beeing overwritten by  new frames which are received
+		 * */
+
+		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
 		__exit_isr();
 	}
 
-	ISR(TRX24_CCA_ED_DONE_vect, ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("TRX24_CCA_ED_DONE \n");
-		__exit_isr();
-	}
+//	ISR(TRX24_CCA_ED_DONE_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		msg_t m;
+//		m.content.value = TRX24_CCA_ED_DONE_vect_num;
+//		msg_send_int(&m, at86rfr2_interrupt_thread_pid);
+//		__exit_isr();
+//	}
 	/* Transceiver Frame Address Match
 	 * Indicates address matching
 	 *
 	 * */
 	ISR(TRX24_XAH_AMI_vect , ISR_BLOCK)
 	{
-
 		__enter_isr();
-		DEBUG("TRX24_XAH_AMI \n");
+		((at86rf2xx_t*)static_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__AMI_EN;
+		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
 		__exit_isr();
 	}
 
@@ -119,63 +276,74 @@
 	ISR(TRX24_TX_END_vect, ISR_BLOCK)
 	{
 		__enter_isr();
-		DEBUG("TRX24_TX_END_vect\n");
-		((at86rf2xx_t*)static_dev)->irq_status |=  AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN;
-		static_dev->event_callback(static_dev,NETDEV_EVENT_ISR);
-		LED_PORT |= RED;
-		__exit_isr();
-
+		((at86rf2xx_t*)static_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN;
+		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
 		/* set transceiver back to receiving state*/
-		at86rf2xx_set_state((at86rf2xx_t*)static_dev, AT86RF2XX_TRX_STATE__RX_AACK_ON);
-	}
-
-	/**
-	 * \brief ISR for transceiver's transmit end interrupt
-	 */
-	ISR(TRX24_AWAKE_vect, ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("TRX24_AWAKE_vect\n");
-		LED_PORT |= RED;
+		//at86rf2xx_set_state((at86rf2xx_t*)static_dev, AT86RF2XX_TRX_STATE__RX_AACK_ON);
 		__exit_isr();
 	}
 
-	ISR(SCNT_CMP1_vect, ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("SCNT_CMP1   \n");
-		__exit_isr();
-	}
-	ISR(SCNT_CMP2_vect, ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("SCNT_CMP 2 \n");
-		__exit_isr();
-	}
-	ISR(SCNT_CMP3_vect , ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("SCNT_CMP3   \n");
-		__exit_isr();
-	}
-	ISR(SCNT_OVFL_vect , ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("SCNT_OVFL \n");
-		__exit_isr();
-	}
-	ISR(SCNT_BACKOFF_vect , ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("SCNT_BACKOFF\n");
-		__exit_isr();
-	}
-	ISR(AES_READY_vect , ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("AES_READY \n");
-		__exit_isr();
-	}
+//	/**
+//	 * \brief ISR for transceiver's transmit end interrupt
+//	 */
+//	ISR(TRX24_AWAKE_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		msg_t m;
+//		m.content.value = TRX24_AWAKE_vect_num;
+//		msg_send_int(&m, at86rfr2_interrupt_thread_pid);
+//		LED_PORT |= RED;
+//		__exit_isr();
+//	}
+
+//	ISR(SCNT_CMP1_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		msg_t m;
+//		m.content.value = SCNT_CMP1_vect_num;
+//		msg_send_int(&m, at86rfr2_interrupt_thread_pid);
+//		__exit_isr();
+//	}
+//	ISR(SCNT_CMP2_vect, ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		msg_t m;
+//		m.content.value = SCNT_CMP2_vect_num;
+//		msg_send_int(&m, at86rfr2_interrupt_thread_pid);
+//		__exit_isr();
+//	}
+//	ISR(SCNT_CMP3_vect , ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		msg_t m;
+//		m.content.value = SCNT_CMP3_vect_num;
+//		msg_send_int(&m, at86rfr2_interrupt_thread_pid);
+//		__exit_isr();
+//	}
+//	ISR(SCNT_OVFL_vect , ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		msg_t m;
+//		m.content.value = SCNT_OVFL_vect_num;
+//		msg_send_int(&m, at86rfr2_interrupt_thread_pid);
+//		__exit_isr();
+//	}
+//	ISR(SCNT_BACKOFF_vect , ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		msg_t m;
+//		m.content.value = SCNT_BACKOFF_vect_num;
+//		msg_send_int(&m, at86rfr2_interrupt_thread_pid);
+//		__exit_isr();
+//	}
+//	ISR(AES_READY_vect , ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		msg_t m;
+//		m.content.value = AES_READY_vect_num;
+//		msg_send_int(&m, at86rfr2_interrupt_thread_pid);
+//		__exit_isr();
+//	}
 
 	/**
 	 * \brief ISR for transceiver's TX_START interrupt
@@ -183,41 +351,48 @@
 	ISR(TRX24_TX_START_vect)
 	{
 		__enter_isr();
-		 DEBUG("TRX24_TX_START_vect\n");
-		LED_PORT &= ~RED;
 		((at86rf2xx_t*)static_dev)->irq_status1 |= AT86RF2XX_IRQ_STATUS_MASK1__TX_START_EN;
-		static_dev->event_callback(static_dev,NETDEV_EVENT_ISR);
+		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
+		LED_PORT &= ~RED;
 		__exit_isr();
 	}
-
-	/* address match interrupt from address filter #0,
-	 * enabled bit AMI0 in register IRQ_MASK1 is set.
-	 *
-	 */
-	ISR(TRX24_AMI0_vect , ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("TRX24_AMI0 \n");
-		__exit_isr();
-	}
-	ISR(TRX24_AMI1_vect , ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("TRX24_AMI1 \n");
-		__exit_isr();
-	}
-	ISR(TRX24_AMI2_vect , ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("TRX24_AMI2 \n");
-		__exit_isr();
-	}
-	ISR(TRX24_AMI3_vect , ISR_BLOCK)
-	{
-		__enter_isr();
-		DEBUG("TRX24_AMI3 \n");
-		__exit_isr();
-	}
+//
+//	/* address match interrupt from address filter #0,
+//	 * enabled bit AMI0 in register IRQ_MASK1 is set.
+//	 *
+//	 */
+//	ISR(TRX24_AMI0_vect , ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		msg_t m;
+//		m.content.value = TRX24_AMI0_vect_num;
+//		msg_send_int(&m, at86rfr2_interrupt_thread_pid);
+//		__exit_isr();
+//	}
+//	ISR(TRX24_AMI1_vect , ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		msg_t m;
+//		m.content.value = TRX24_AMI1_vect_num;
+//		msg_send_int(&m, at86rfr2_interrupt_thread_pid);
+//		__exit_isr();
+//	}
+//	ISR(TRX24_AMI2_vect , ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		msg_t m;
+//		m.content.value = TRX24_AMI2_vect_num;
+//		msg_send_int(&m, at86rfr2_interrupt_thread_pid);
+//		__exit_isr();
+//	}
+//	ISR(TRX24_AMI3_vect , ISR_BLOCK)
+//	{
+//		__enter_isr();
+//		msg_t m;
+//		m.content.value = TRX24_AMI3_vect_num;
+//		msg_send_int(&m, at86rfr2_interrupt_thread_pid);
+//		__exit_isr();
+//	}
 
 #endif
 
@@ -235,6 +410,16 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
 #ifdef MODULE_AT86RFR2
     // save device pointer for interrupts
     static_dev= (netdev_t *)dev;
+
+//    /* add thread to handle interrupt massages */
+//    at86rfr2_interrupt_thread_pid = thread_create(at86rfr2_interrupt_thread_stack, sizeof(at86rfr2_interrupt_thread_stack),
+//                                2, THREAD_CREATE_STACKTEST,
+//								at86rfr2_interrupt_thread, NULL, "at86rfr2_int");
+
+    /* set all interrupts off */
+
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, 0x00);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1,0x00);
 
 #endif
 }
@@ -291,7 +476,8 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 #endif
 
 #ifdef MODULE_AT86RFR2
-    /* no spi,
+    /* no spi,s
+     *
      * no clock out pin
      *  TODO replace for functionality for RFR2? */
 
@@ -309,20 +495,24 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 			| AT86RF2XX_IRQ_STATUS_MASK__AMI_EN
 			//| AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE_EN
 			| AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN
-			| AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN
+			//| AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN
 			//| AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK_EN
-			//| AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN
+			| AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN
 						);
 
 	/* enable interrupts IRQ_MASK1*/
-	   at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1,
-			   AT86RF2XX_IRQ_STATUS_MASK1__TX_START_EN
+	 at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1, 0x00);
+//			    AT86RF2XX_IRQ_STATUS_MASK1__TX_START_EN
 //			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_0_AMI_EN
 //			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_1_AMI_EN
 //			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_2_AMI_EN
 //			   | AT86RF2XX_IRQ_STATUS_MASK1__MAF_3_AMI_EN
-						);
-   /* set PLL on */
+//						);
+
+	/* clear frame buffer protection */
+	*AT86RF2XX_REG__TRX_CTRL_2 &= ~(1<<RX_SAFE_MODE);
+
+	/* set PLL on */
 	   at86rf2xx_set_state(dev, AT86RF2XX_STATE_PLL_ON);
 #else
     /* don't populate masked interrupt flags to IRQ_STATUS register */

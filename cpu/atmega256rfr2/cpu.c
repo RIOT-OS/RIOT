@@ -19,6 +19,7 @@
  */
 
 #include "cpu.h"
+#include <avr/io.h>
 
 #include "avr/wdt.h"
 #include "avr/pgmspace.h"
@@ -32,19 +33,25 @@
  */
 void cpu_init(void)
 {
-	if( MCUSR&(1<<PORF)  ){printf_P(PSTR("Power-on reset.\n"));}
-	if( MCUSR&(1<<EXTRF) ){printf_P(PSTR("External reset!\n"));}
-	if( MCUSR&(1<<BORF)  ){printf_P(PSTR("Brownout reset!\n"));}
-	if( MCUSR&(1<<WDRF)  ){printf_P(PSTR("Watchdog reset!\n"));}
-	if( MCUSR&(1<<JTRF)  ){printf_P(PSTR("JTAG reset!\n"));}
+	if( MCUSR&(1<<PORF)  ){printf( ("Power-on reset.\n"));}
+	if( MCUSR&(1<<EXTRF) ){printf( ("External reset!\n"));}
+	if( MCUSR&(1<<BORF)  ){printf( ("Brownout reset!\n"));}
+	if( MCUSR&(1<<WDRF)  ){printf( ("Watchdog reset!\n"));}
+	if( MCUSR&(1<<JTRF)  ){printf( ("JTAG reset!\n"));}
 	MCUSR = 0;
 
 
 	wdt_reset();
 	wdt_disable();
 
+	/*
+	 * Set system clock Prescaler
+	 */
+	CLKPR = (1 << CLKPCE); // enable a change to CLKPR
+	CLKPR = 0; // set the Division factor to 1, internal system clock speed to 16MHz
+
 	/* Right now we need to do nothing here */
-    ;
+    //;
 }
 
 /* This is a vector which is aliased to __vector_default,
@@ -62,11 +69,11 @@ void cpu_init(void)
 ISR(BADISR_vect)
 {
 
-	if( MCUSR&(1<<PORF)  ){printf_P(PSTR("Power-on reset.\n"));}
-	if( MCUSR&(1<<EXTRF) ){printf_P(PSTR("External reset!\n"));}
-	if( MCUSR&(1<<BORF)  ){printf_P(PSTR("Brownout reset!\n"));}
-	if( MCUSR&(1<<WDRF)  ){printf_P(PSTR("Watchdog reset!\n"));}
-	if( MCUSR&(1<<JTRF)  ){printf_P(PSTR("JTAG reset!\n"));}
+	if( MCUSR&(1<<PORF)  ){printf( ("Power-on reset.\n")); }
+	if( MCUSR&(1<<EXTRF) ){printf( ("External reset!\n")); }
+	if( MCUSR&(1<<BORF)  ){printf( ("Brownout reset!\n")); }
+	if( MCUSR&(1<<WDRF)  ){printf( ("Watchdog reset!\n")); }
+	if( MCUSR&(1<<JTRF)  ){printf( ("JTAG reset!\n")); }
 
 	printf_P(PSTR("FATAL ERROR: BADISR_vect called, unprocessed Interrupt.\nSTOP Execution.\n"));
 
@@ -138,7 +145,7 @@ ISR(BADISR_vect)
 //	}
 
 
-
+// context save interrupt
 //	ISR(PCINT0_vect, ISR_BLOCK)
 //	{
 //		__enter_isr();
@@ -146,6 +153,8 @@ ISR(BADISR_vect)
 //		LED_PORT |= RED;
 //		__exit_isr();
 //	}
+
+
 	ISR(PCINT1_vect, ISR_BLOCK)
 	{
 		__enter_isr();
@@ -194,7 +203,6 @@ ISR(BADISR_vect)
 	{
 		__enter_isr();
 		DEBUG("TIMER1_COMPA_vect \n");
-		LED_PORT |= RED;
 		__exit_isr();
 	}
 	ISR(TIMER1_COMPB_vect, ISR_BLOCK)
@@ -242,12 +250,14 @@ ISR(BADISR_vect)
 		DEBUG("SPI_STC_vect \n");
 		__exit_isr();
 	}
+// Defined in atmega_common/periph/uart.c
 //	ISR(USART0_RX_vect, ISR_BLOCK)
 //	{
 //		__enter_isr();
 //		DEBUG("USART0_RX_vect \n");
 //		__exit_isr();
 //	}
+
 	ISR(USART0_UDRE_vect, ISR_BLOCK)
 	{
 		__enter_isr();
@@ -312,12 +322,14 @@ ISR(BADISR_vect)
 		__exit_isr();
 	}
 
+// Defined in atmega_common/periph/uart.c
 //	ISR(USART1_RX_vect , ISR_BLOCK)
 //	{
 //		__enter_isr();
 //		DEBUG("USART1_RX_vect \n");
 //		__exit_isr();
 //	}
+
 	ISR(USART1_UDRE_vect, ISR_BLOCK)
 	{
 		__enter_isr();
@@ -350,6 +362,8 @@ ISR(BADISR_vect)
 		DEBUG("TIMER4_CAPT_vect \n");
 		__exit_isr();
 	}
+// configured in /[BOARD]/include/periph_conf.h
+// Defined in atmega_common/periph/timer.c
 //	ISR(TIMER4_COMPA_vect, ISR_BLOCK)
 //	{
 //		__enter_isr();
@@ -368,6 +382,7 @@ ISR(BADISR_vect)
 //		DEBUG("TIMER4_COMPC_vect \n");
 //		__exit_isr();
 //	}
+
 	ISR(TIMER4_OVF_vect, ISR_BLOCK)
 	{
 		__enter_isr();
@@ -381,6 +396,9 @@ ISR(BADISR_vect)
 		DEBUG("TIMER5_CAPT_vect \n");
 		__exit_isr();
 	}
+
+// configured in /[BOARD]/include/periph_conf.h
+// Defined in atmega_common/periph/timer.c
 //	ISR(TIMER5_COMPA_vect, ISR_BLOCK)
 //	{
 //		__enter_isr();
@@ -399,6 +417,7 @@ ISR(BADISR_vect)
 //		DEBUG("TIMER5_COMPC_vect \n");
 //		__exit_isr();
 //	}
+
 	ISR(TIMER5_OVF_vect, ISR_BLOCK)
 	{
 		__enter_isr();

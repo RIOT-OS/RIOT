@@ -39,14 +39,43 @@ static FILE uart_stdin = FDEV_SETUP_STREAM(NULL, uart_getchar, _FDEV_SETUP_READ)
 
 void board_init(void)
 {
-    /* disable unwanted Interrupts */
+    /* PD4 BKPKVCC-EN to low  */
+	DDRD |= 1<<DDRD4; 			// set port D4 as output
+	PORTD &= ~(1<<PORTD4);    	// set D4 low
+
+	/* PD7 CHGSTATUS to input */
+	DDRD &= ~(1<<DDRD7); 		// set port D7 as input
+
+	/* PE7 BATTALRT to input  */
+	DDRE &= ~(1<<DDRE7); 		// set port D7 as input
+
+	/* enable all power saving */
+	/* Turn off all peripheral clocks that can be turned off.
+	 * The debugWIRE system of some devices that shares system clock with the SPI module.
+	 * Thus the PRSPI bit in the PRR register must not be set when debugging.
+	 */
+	/* keep
+	 * uart 					PRUSART0
+	 * xtimer clock 			PRTIM4
+	 * transceiver, XTAL		PRTRX24
+	 */
+	// PRR0 |= (1<<PRTWI)|(1<<PRTIM2)|(1<<PRTIM0)|(1<<PRPGA)|(1<<PRTIM1)|(1<<PRSPI)|(1<<PRADC);
+	// PRR1 |= (1<<PRTIM5)|(1<<PRTIM3)|(1<<PRUSART1);
+	// PRR0 = 0xFD; // keep PRUSART0
+	// PRR1 = 0x29; // keep PRTRX24 and PRTIM4
+	// PRR2 = 0x0F; // keep SRAM
+
+	/* disable unwanted Interrupts */
 	/* External Interrupt INT0 is somehow triggered, stop that */
-	DDRD = 1<<DDRD0; // set port D0 as output
-	PORTD &= 1<<DDRD0;    // set D0 low
+	// DDRD = 1<<DDRD0; // set port D0 as output
+	// PORTD &= 1<<DDRD0;    // set D0 low
 
 
 	/* initialize stdio via USART_0 */
 	system_stdio_init();
+
+    /* Disable power saving for TIMER4 which is used as xtimer, PRTIM4*/
+	PRR1 &= ~(1<<PRTIM4);
 
     /* initialize the CPU */
     cpu_init();
@@ -69,7 +98,10 @@ void board_init(void)
  */
 void system_stdio_init(void)
 {
-    /* initialize UART_0 for use as stdout */
+    /* Disable power saving for UART0 PRUSART0*/
+	PRR0 &= ~(1<<PRUSART0);
+
+	/* initialize UART_0 for use as stdout */
     uart_stdio_init();
 
     stdout = &uart_stdout;

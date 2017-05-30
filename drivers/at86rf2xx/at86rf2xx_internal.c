@@ -33,6 +33,9 @@
 	// SOC uses no SPI
 	// but needs memcpy
 	#include <string.h>
+
+	#define ENABLE_DEBUG (1)
+	#include "debug.h"
 #else
 	#define SPIDEV          (dev->params.spi)
 	#define CSPIN           (dev->params.cs_pin)
@@ -113,6 +116,13 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev,
                           const size_t len)
 {
 #ifdef MODULE_AT86RFR2
+
+	/* check if frame buffer protection is active, rx frame was not read */
+	if( ( *(AT86RF2XX_REG__TRX_CTRL_2) &(1<<RX_SAFE_MODE)) != 0)
+	{
+		DEBUG("[at86rf2cc_internal] at86rf2xx_sram_write: frame buffer protected\n");
+		return;
+	}
 	memcpy( (void *)(AT86RF2XX_REG__TRXFBST+offset), data, len);
 #else
     uint8_t reg = (AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_WRITE);
@@ -143,6 +153,8 @@ void at86rf2xx_fb_read(const at86rf2xx_t *dev,
 {
 #ifdef MODULE_AT86RFR2
 	memcpy( data, (void *)(AT86RF2XX_REG__TRXFBST), len);
+	/* clear frame buffer protection */
+	*AT86RF2XX_REG__TRX_CTRL_2 &= ~(1<<RX_SAFE_MODE);
 #else
     spi_transfer_bytes(SPIDEV, CSPIN, true, NULL, data, len);
 #endif

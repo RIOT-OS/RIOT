@@ -27,9 +27,17 @@
 
 #include "board.h"
 
+#include "xtimer.h"
+
 void pm_off(void)
 {
 	// TODO
+	/* White LED ON. */
+	LED_PORT &= ~(BLUE|GREEN|RED);
+
+	/* White LED OFF. */
+	// All LED OFF
+	LED_PORT |= BLUE|GREEN|RED;
 }
 
 void pm_reboot(void)
@@ -38,20 +46,18 @@ void pm_reboot(void)
      * Since the AVR doesn't support a real software reset, we set the Watchdog
      * Timer on a 250ms timeout. Consider this a kludge.
      */
-//    irq_disable();
-//    wdt_enable(WDTO_250MS);
-//    while(1);
+    irq_disable();
+    wdt_enable(WDTO_250MS);
+    while(1);
 }
 
 void pm_set_lowest(void) {
 
 	/* White LED ON. */
-	LED_PORT &= ~(BLUE|GREEN|RED);
+	//LED_PORT &= ~(BLUE|GREEN|RED);
 
 	/* White LED OFF. */
+	// All LED OFF
 	LED_PORT |= BLUE|GREEN|RED;
-
 	/*TODO implement power save Modes*/
-
-
 }
