@@ -626,6 +626,14 @@ ifneq (,$(filter spiffs,$(USEMODULE)))
     USEMODULE += mtd
 endif
 
+ifneq (,$(filter shell_sec_%,$(USEMODULE)))
+    USEMODULE += shell_sec
+endif
+
+ifneq (,$(filter shell_sec_default,$(USEMODULE)))
+    USEMODULE += hashes
+endif
+
 ifneq (,$(filter shell_sec,$(USEMODULE)))
     USEMODULE += shell
     USEMODULE += shell_commands

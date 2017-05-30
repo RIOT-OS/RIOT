@@ -3,7 +3,6 @@
 #include <stdio.h>
 
 #include "shell_sec.h"
-#include "shell_sec_params.h"
 #include "shell_commands.h"
 
 static int _level;
@@ -11,8 +10,12 @@ static shell_command_handler_t _login_cb = NULL;
 static shell_command_handler_t _passwd_cb = NULL;
 static shell_command_handler_t _logout_cb = NULL;
 
-#if SHELL_SEC_USE_DEFAULT
-static int user_ok;
+#ifdef MODULE_SHELL_SEC_DEFAULT
+#include "shell_sec_params.h"
+#include "hashes/md5.h"
+
+static int logged_user = -1;
+static int logging_user = -1;
 #endif
 
 int _login_handler(int argc, char **argv)
@@ -20,13 +23,17 @@ int _login_handler(int argc, char **argv)
     if (_login_cb != NULL) {
         return _login_cb(argc - 1, &argv[1]);
     }
-#if SHELL_SEC_USE_DEFAULT
+#ifdef MODULE_SHELL_SEC_DEFAULT
     else {
-        if (argc >= 2 && strcmp(argv[1], SHELL_SEC_DEFAULT_USER) == 0) {
-            user_ok = 1;
-            return 0;
+        if (argc >= 2) {
+            for (int i = 0; i < (int) SHELL_SEC_USERS_NUMOF; i++) {
+                if (strcmp(argv[1], shell_sec_users[i]) == 0) {
+                    logging_user = i;
+                    return 0;
+                }
+            }
         }
-        user_ok = 0;
+        logging_user = -1;
         return 1;
     }
 #endif
@@ -39,18 +46,28 @@ int _passwd_handler(int argc, char **argv)
     if (_passwd_cb != NULL) {
         return _passwd_cb(argc - 1, &argv[1]);
     }
-#if SHELL_SEC_USE_DEFAULT
+#ifdef MODULE_SHELL_SEC_DEFAULT
     else {
-        if (!user_ok) {
-            puts("Please enter a username");
+        if (logging_user < 0) {
+            puts("Incorrect user or password");
             return 1;
         }
-        if (argc >= 2 && strcmp(argv[1], SHELL_SEC_DEFAULT_PASSWD) == 0) {
-            _level = 1;
-            printf("Welcome %s\n", SHELL_SEC_DEFAULT_USER);
-            return 0;
+        if (argc >= 2) {
+            uint8_t digest[16];
+            md5(digest, argv[1], strlen(argv[1]));
+            if (memcmp(digest, shell_sec_passwds[logging_user], 16) == 0) {
+                if (logged_user != -1) {
+                    printf("Goodbye %s\n", shell_sec_users[logged_user]);
+                }
+                _level = shell_sec_levels[logging_user];
+                logged_user = logging_user;
+                logging_user = -1;
+                printf("Welcome %s\n", shell_sec_users[logged_user]);
+                return 0;
+            }
         }
     }
+    logging_user = -1;
 #endif
 
     puts("Incorrect user or password");
@@ -62,11 +79,11 @@ int _logout_handler(int argc, char **argv)
     if (_logout_cb != NULL) {
         return _logout_cb(argc - 1, &argv[1]);
     }
-#if SHELL_SEC_USE_DEFAULT
+#ifdef MODULE_SHELL_SEC_DEFAULT
     else {
-        user_ok = 0;
+        printf("Goodbye %s\n", shell_sec_users[logged_user]);
+        logged_user = -1;
         _level = 0;
-        printf("Goodbye %s\n", SHELL_SEC_DEFAULT_USER);
     }
 #endif
     return 0;
