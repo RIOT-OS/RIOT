@@ -21,6 +21,7 @@
 #include "shell_sec.h"
 #include "shell.h"
 
+#ifndef MODULE_SHELL_SEC_DEFAULT
 #define NB_USER     2
 #define USER_LENGTH 10
 
@@ -94,6 +95,7 @@ static int logout(int argc, char **argv)
 
     return 0;
 }
+#endif
 
 static int unsecure_command(int argc, char **argv)
 {
@@ -134,7 +136,9 @@ int main(void)
 
     printf("test_shell_sec.\n");
 
+#ifndef MODULE_SHELL_SEC_DEFAULT
     shell_sec_set_cb(login, passwd, logout);
+#endif
     /* define buffer to be used by the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
