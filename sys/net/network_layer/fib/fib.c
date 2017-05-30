@@ -379,7 +379,6 @@ static int fib_signal_rp(fib_table_t *table, uint16_t type, uint8_t *dat,
             }
         }
     }
-
     return ret;
 }
 
@@ -534,7 +533,11 @@ int fib_get_next_hop(fib_table_t *table, kernel_pid_t *iface_id,
 
     *iface_id = entry[0]->iface_id;
     *next_hop_flags = entry[0]->next_hop_flags;
-    mutex_unlock(&(table->mtx_access));
+
+    /* notify all RPs that a route has been used */
+    fib_signal_rp(table, FIB_MSG_RP_SIGNAL_DESTINATION_USED, dst, dst_size, dst_flags);
+
+    mutex_unlock(&table->mtx_access);
     return 0;
 }
 
