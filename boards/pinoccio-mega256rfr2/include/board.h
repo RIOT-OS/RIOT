@@ -141,15 +141,36 @@ extern "C" {
 // Set Port as output
 // Enable Pin Change Interrupt 0
 // Enable Pin change Interrupt 7 in Mask
+
+//#define AVR_CONTEXT_SWAP_INIT do {
+//    DDRB |= (1 << PB0);
+//    PCICR |= (1 << PCIE0);
+//    PCMSK0 |= (1 << PCINT0);
+//} while (0)
+//#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT0_vect
+//#define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB0)
+
+
+/*
+* Context Swap Interrupt with Port E7
+*
+* clear global interrupt flag
+* Configure PE7 as output
+* Disable INT7 in External Interrupt Mask Register to avoid triggering when setting options
+* Set External Interrupt Control Register B to trigger INT7 at any edge
+* Enable INT7 in External Interrupt Mask Register
+*/
 #define AVR_CONTEXT_SWAP_INIT do { \
-    DDRB |= (1 << PB0); \
-    PCICR |= (1 << PCIE0); \
-    PCMSK0 |= (1 << PCINT0); \
+	cli(); \
+	DDRE  |= (1 << PE6);  \
+	EIMSK &= ~(1<<INT6);  \
+	EICRB |= (1<<ISC60);  \
+	EICRB &= ~(1<<ISC61); \
+	EIMSK |= (1<<INT6);   \
 } while (0)
-#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT0_vect
-#define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB0)
 
-
+#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  INT6_vect
+#define AVR_CONTEXT_SWAP_TRIGGER   PORTE ^= (1 << PE6)
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

@@ -38,6 +38,8 @@ void pm_off(void)
 	/* White LED OFF. */
 	// All LED OFF
 	LED_PORT |= BLUE|GREEN|RED;
+
+	printf("pm_off\n");
 }
 
 void pm_reboot(void)
@@ -53,11 +55,12 @@ void pm_reboot(void)
 
 void pm_set_lowest(void) {
 
+	// printf("pm_set_lowest\n");
 	/* White LED ON. */
 	//LED_PORT &= ~(BLUE|GREEN|RED);
 
 	/* White LED OFF. */
 	// All LED OFF
-	LED_PORT |= BLUE|GREEN|RED;
+	// LED_PORT |= BLUE|GREEN|RED;
 	/*TODO implement power save Modes*/
 }
