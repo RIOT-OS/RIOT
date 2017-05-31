@@ -287,6 +287,10 @@ void auto_init(void)
     extern void auto_init_mma8x5x(void);
     auto_init_mma8x5x();
 #endif
+#ifdef MODULE_MPL3115A2
+    extern void auto_init_mpl3115a2(void);
+    auto_init_mpl3115a2();
+#endif
 #ifdef MODULE_SI70XX
     extern void auto_init_si70xx(void);
     auto_init_si70xx();

@@ -69,9 +69,7 @@ static const mpl3115a2_params_t mpl3115a2_params[] =
  */
 static const saul_reg_info_t mpl3115a2_saul_info[] =
 {
-    {
-        .name = "mpl3115a2"
-    }
+    { .name = "mpl3115a2" },
 };
 
 #ifdef __cplusplus
