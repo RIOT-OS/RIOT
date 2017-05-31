@@ -1,10 +1,8 @@
-# Test if the input language was specified externally.
-# Otherwise test if the compiler unterstands the "-std=c99" flag, and use it if so.
-ifeq ($(filter -std=%,$(CFLAGS)),)
-  ifeq ($(shell $(CC) -std=c99 -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
-    CFLAGS += -std=c99
-  endif
-endif
+CSTD ?= c99
+CXXSTD ?= c++11
+
+CFLAGS += -std=$(CSTD)
+CXXEXFLAGS += -std=$(CXXSTD)
 
 # Add `-fno-delete-null-pointer-checks` flag iff the compiler supports it.
 # GCC removes moves tests whether `x == NULL`, if previously `x` or even `x->y` was accessed.

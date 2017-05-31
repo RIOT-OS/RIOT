@@ -13,8 +13,11 @@ ifneq ($(BUILD_IN_DOCKER),1) #Don't error when BUILD_IN_DOCKER=1 as MIPS_ELF_ROO
 include $(MIPS_ELF_ROOT)/share/mips/rules/mipshal.mk
 endif
 
+# c standard
+export CSTD ?= gnu99
+
 # define build specific options
-export CFLAGS_CPU   = -EL -std=gnu99
+export CFLAGS_CPU   = -EL
 export CFLAGS_LINK  = -ffunction-sections -fno-builtin -fshort-enums #-fdata-sections
 export CFLAGS_DBG = -O0 -g2
 export CFLAGS_OPT = -Os -g2

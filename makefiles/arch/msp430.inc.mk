@@ -2,10 +2,12 @@
 export TARGET_ARCH ?= msp430
 
 # define build specific options
-CFLAGS_CPU   = -mmcu=$(CPU_MODEL) -std=gnu99
+CFLAGS_CPU   = -mmcu=$(CPU_MODEL)
 CFLAGS_LINK  = -ffunction-sections -fdata-sections
 CFLAGS_DBG  ?= -gdwarf-2
 CFLAGS_OPT  ?= -Os
+# export c standard
+export CSTD = gnu99
 # export compiler flags
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 # export assmebly flags

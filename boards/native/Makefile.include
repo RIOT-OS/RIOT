@@ -45,8 +45,11 @@ export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
+# c standard
+export CSTD ?= gnu99
+
 # basic cflags:
-export CFLAGS += -Wall -Wextra -pedantic -std=gnu99
+export CFLAGS += -Wall -Wextra -pedantic
 ifeq ($(shell uname -m),x86_64)
 export CFLAGS += -m32
 endif
