@@ -12,8 +12,7 @@
 /**
  * @defgroup    drivers_netdev_api Network Device Driver API
  * @ingroup     drivers_netdev
- * @brief       This is the second version of a generic low-level network
- *              driver interface
+ * @brief       This is a generic low-level network driver interface
  * @{
  *
  * This interface is supposed to be a low-level interface for network drivers.
