@@ -34,7 +34,7 @@
 
 char ledblink_thread_stack[200];
 /* set interval to 4 second */
-#define INTERVAL (60U * US_PER_SEC)
+#define INTERVAL (5U * US_PER_SEC)
 
 void *ledblink_thread(void *arg)
 {
@@ -78,7 +78,8 @@ int main(void)
 	LED_PORT ^= RED;
 
 	thread_create(ledblink_thread_stack, sizeof(ledblink_thread_stack),
-				THREAD_PRIORITY_MAIN -2, 0,
+				THREAD_PRIORITY_MAIN +1,
+				THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
 				ledblink_thread, NULL, "ledblink_thread");
 
     /* we need a message queue for the thread running the shell in order to

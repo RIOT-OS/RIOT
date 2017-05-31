@@ -243,7 +243,7 @@
 		/*
 		 * p. 99, 9.8.7 Dynamic Frame Buffer Protection
 		 * Enabled in reset function to Protect content in
-		 * frame from beeing overwritten by  new frames which are received
+		 * frame from being overwritten by  new frames which are received
 		 * */
 
 		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
@@ -278,8 +278,9 @@
 		__enter_isr();
 		((at86rf2xx_t*)static_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN;
 		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
-		/* set transceiver back to receiving state*/
-		//at86rf2xx_set_state((at86rf2xx_t*)static_dev, AT86RF2XX_TRX_STATE__RX_AACK_ON);
+		/* don't set transceiver back to receiving state
+		* it will be in TX_ARET_ON
+		*/
 		__exit_isr();
 	}
 

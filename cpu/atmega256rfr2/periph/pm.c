@@ -61,6 +61,6 @@ void pm_set_lowest(void) {
 
 	/* White LED OFF. */
 	// All LED OFF
-	// LED_PORT |= BLUE|GREEN|RED;
+	LED_PORT |= BLUE|GREEN|RED;
 	/*TODO implement power save Modes*/
 }

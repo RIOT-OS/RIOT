@@ -153,8 +153,6 @@ void at86rf2xx_fb_read(const at86rf2xx_t *dev,
 {
 #ifdef MODULE_AT86RFR2
 	memcpy( data, (void *)(AT86RF2XX_REG__TRXFBST), len);
-	/* clear frame buffer protection */
-	*AT86RF2XX_REG__TRX_CTRL_2 &= ~(1<<RX_SAFE_MODE);
 #else
     spi_transfer_bytes(SPIDEV, CSPIN, true, NULL, data, len);
 #endif
@@ -163,7 +161,8 @@ void at86rf2xx_fb_read(const at86rf2xx_t *dev,
 void at86rf2xx_fb_stop(const at86rf2xx_t *dev)
 {
 #ifdef MODULE_AT86RFR2
-	// nothing to do here
+	/* clear frame buffer protection */
+	*AT86RF2XX_REG__TRX_CTRL_2 &= ~(1<<RX_SAFE_MODE);
 #else
 	/* transfer one byte (which we ignore) to release the chip select */
     spi_transfer_byte(SPIDEV, CSPIN, false, 1);
