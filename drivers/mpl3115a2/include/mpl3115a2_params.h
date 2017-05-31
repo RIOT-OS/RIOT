@@ -56,11 +56,22 @@ extern "C" {
  */
 static const mpl3115a2_params_t mpl3115a2_params[] =
 {
+
 #ifdef MPL3115A2_PARAMS_CUSTOM
     MPL3115A2_PARAMS_CUSTOM
 #else
     MPL3115A2_PARAMS_DEFAULT
 #endif
+};
+
+/**
+ * @brief   Additional meta information to keep in the SAUL registry
+ */
+static const saul_reg_info_t mpl3115a2_saul_info[] =
+{
+    {
+        .name = "mpl3115a2"
+    }
 };
 
 #ifdef __cplusplus
