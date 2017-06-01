@@ -1,0 +1,10 @@
+export CPU_ARCH = cortex-a9
+export CPU_FAM  = s5p4418
+
+# this CPU implementation is using s5p4418 common startup
+export COMMON_STARTUP = $(S5P4418_COMMON)
+
+include $(RIOTCPU)/armv7a_common/Makefile.include
+include $(RIOTMAKE)/arch/armv7a.inc.mk
+
+INCLUDES += -I$(RIOTBASE)/cpu/s5p4418/include/
