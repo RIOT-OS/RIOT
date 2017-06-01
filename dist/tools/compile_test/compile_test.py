@@ -43,6 +43,11 @@ class Termcolor:
     purple = '\033[1;35m'
     end = '\033[0m'
 
+blacklist = {
+        'examples'  : [ 'default', 'gnrc_minimal', 'hello-world' ],
+        'tests'     : [ 'minimal', 'posix', 'shell', 'sizeof_tcb', 'thread_basic' ]
+        }
+
 def is_tracked(application_folder):
     if not isfile(join(application_folder, 'Makefile')):
         return False
@@ -86,10 +91,11 @@ def get_results_and_output_from(fd):
 def build_all():
     riotbase = environ.get('RIOTBASE') or abspath(join(dirname(abspath(__file__)), '../' * 3))
     for folder in ('examples', 'tests'):
-        print('Building all applications in: {}'.format(colorize_str(folder, Termcolor.blue)))
+        print('Building applications in: {}'.format(colorize_str(folder, Termcolor.blue)))
 
         applications = listdir(join(riotbase, folder))
         applications = filter(lambda app: is_tracked(join(riotbase, folder, app)), applications)
+        applications = [app for app in applications if app not in blacklist[folder]]
         applications = sorted(applications)
 
         subprocess_env = environ.copy()
