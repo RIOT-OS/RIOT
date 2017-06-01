@@ -1,0 +1,1 @@
+UNDEF += $(BINDIR)/newlib_syscalls_default/syscalls.o
