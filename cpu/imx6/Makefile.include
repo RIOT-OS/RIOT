@@ -1,0 +1,87 @@
+export PREFIX = arm-none-eabi-
+export CC = $(PREFIX)gcc
+export CXX = $(PREFIX)g++
+export AR = $(PREFIX)ar
+export AS = $(PREFIX)as
+export LINK = $(PREFIX)ld
+LINKFLAGPREFIX :=
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+
+
+# Don't use common symbols.  This is usually done in kernels.  Makes
+# code size slightly larger and increases performance.
+CFLAGS += -fno-common
+
+# Use a freestanding build environment.  Standard for kernels, implies
+# std library may not exist.
+CFLAGS += -ffreestanding -fno-builtin
+
+# Don't ever link anything against shared libs.
+CFLAGS += -static
+
+# Don't link against the system std library or compiler libraries.
+# Everything we link against MUST be specified with -I/-L explicitly.
+# COMMON_FLAGS += -nostdinc -nostdlib
+
+# Set the C standard to C99 with GNU extensions.
+# Use traditional GNU inline function semantics.
+CFLAGS += -std=gnu99 -fgnu89-inline
+
+# Generate code specifically for ARMv7-A, cortex-ax CPU.
+# Use the ARM Procedure Call Standard.
+ARM_FLAGS = -march=armv7-a -mcpu=cortex-a9 -mtune=cortex-a9 -mapcs
+
+USETHUMB = "1"
+ifeq "$(USE_THUMB)" "1"
+    # Generate thumb2 instructions (mixed 16/32-bit).
+    ARM_FLAGS += -mthumb
+    # Allow mixed ARM and thumb code.  All C code will generate thumb instructions
+    # but there is hand-written asm that requires ARM.
+    ARM_FLAGS += -mthumb-interwork
+    # Indicate that we're using thumb.
+    ARM_FLAGS += -DUSE_THUMB
+    CC_LIB_POST = thumb2
+else
+    # Generate ARM-only code.
+    ARM_FLAGS += -marm -mno-thumb-interwork
+    CC_LIB_POST =
+endif
+
+FPU_FLAGS = -mfpu=neon -ftree-vectorize -fno-math-errno -funsafe-math-optimizations -fno-signed-zeros -mfloat-abi=softfp
+
+# Get the compiler directory. We have to go through this sillyness in order to support
+# paths with spaces in their names, such as under Cygwin where the CodeSourcery compiler
+# is normally installed under C:\Program Files\.
+CC_PREFIX := $(shell dirname "`which $(CC)`")/..
+
+# Set compiler version defaults.
+CROSS_COMPILE = $(PREFIX)
+
+# Strip off the trailing '-', resulting in arm-none-eabi
+CROSS_COMPILE_STRIP := $(CROSS_COMPILE:%-=%)
+
+# Ask the compiler for its version
+CC_VERSION := $(shell $(CC) -dumpversion)
+
+LIBGCC_LDPATH = $(CC_PREFIX)/lib/gcc/$(CROSS_COMPILE_STRIP)/$(CC_VERSION)/$(CC_LIB_POST)
+LIBC_LDPATH = $(CC_PREFIX)/$(CROSS_COMPILE_STRIP)/lib/$(CC_LIB_POST)
+
+export LDFLAGS = --no-gc-sections --cref -T$(RIOTCPU)/$(CPU)/link.lds -Bstatic -nostdlib -lstdc++ -lc -lgcc -L '$(LIBGCC_LDPATH)' -L '$(LIBC_LDPATH)'
+export LINKFLAGS = $(LDFLAGS)
+
+export CFLAGS += -g $(ARM_FLAGS) $(FPU_FLAGS) -mno-unaligned-access -fno-strict-aliasing -ffixed-r8 -msoft-float -isystem $(shell $(CC) -print-file-name=include) -pipe -Wall -mlittle-endian # -nostartfiles
+export CFLAGS += -Wall
+
+ifeq ($(strip $(PORT)),)
+  export PORT = /dev/ttyUSB0
+endif
+
+export INCLUDES +=  -I$(RIOTCPU)/$(CPU)/include -I$(RIOTCPU)/$(CPU)/variant/include -I$(RIOTCPU)/$(CPU)/core/include
+export OFLAGS += --gap-fill 0x00 -I elf32-little -O binary
+
+export UNDEF += $(BINDIR)cpu/syscalls.o $(BINDIR)IMX6_CORE/ivt.o
+
+export USEPKG += imx6_SDK
+
+include $(RIOTCPU)/$(CPU)/Makefile.dep

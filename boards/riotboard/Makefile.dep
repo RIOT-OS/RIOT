@@ -1,0 +1,3 @@
+ifeq (,$(filter riotboard_muxer_config,$(USEMODULE)))
+	USEMODULE += riotboard_muxer_config
+endif

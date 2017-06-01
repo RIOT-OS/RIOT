@@ -1,0 +1,1 @@
+export RIOTBOARD_SDK_PATH="$(RIOTBASE)/pkg/riotboard_SDK"

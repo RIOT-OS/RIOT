@@ -1,0 +1,16 @@
+export CPU = imx6
+
+#MODULE = riotboard_base
+
+export IMX6_VARIANT = MX6SDL
+
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBOARD)/$(BOARD)/muxer_config/include
+export CFLAGS += -DCHIP_MX6SDL
+
+export UNDEF += $(BINDIR)riotboard_base/dcd.o
+
+export USEPKG += riotboard_SDK
+
+export INCLUDES += -I$(RIOTBOARD_SDK_PATH)/muxer_config/include
+
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
