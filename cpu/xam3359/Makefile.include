@@ -1,0 +1,30 @@
+# this CPU implementation is using the new core/CPU interface
+#export CFLAGS += -DCOREIF_NG=1 didn work so now i put it below:
+
+# this CPU implementation is using the new core/CPU interface
+export CFLAGS=-mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp -mtune=cortex-a8 -march=armv7-a -DCOREIF_NG=1
+#	CFLAGS+=-c ${${TARGET_MODE}_FLAG} -mlong-calls -fdata-sections -funsigned-char \
+#            -ffunction-sections -Wall ${IPATH} -Dgcc ${DEVICE_D} ${EVM_D} \
+#            -D SUPPORT_UNALIGNED -D ${BOOT} -D${CONSOLE}
+
+# ifeq ($(CONSOLE), SEMIHOSTING) brauchen wir das?
+# CFLAGS+=--specs=rdimon.specs
+# RUNTIMELIB = -lrdimon -lc -lgcc
+# endif
+
+# define the linker script to use for this CPU
+export LINKERSCRIPT = $(RIOTCPU)/$(CPU)/starterware/xam3359_linkerscript.lds
+
+# include CPU specific includes
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+
+# explicitly tell the linker to link the syscalls and startup code.
+#   Without this the interrupt vectors will not be linked correctly! brauchen wir das?
+export UNDEF += $(BINDIR)cpu/syscalls.o
+export UNDEF += $(BINDIR)cpu/startup.o
+export UNDEF += $(BINDIR)cpu/exceptionhandler.o
+
+# export the peripheral drivers to be linked into the final binary
+export USEMODULE += periph
+
+
