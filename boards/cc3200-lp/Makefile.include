@@ -1,0 +1,15 @@
+# define the cpu used by the ek-lm4f120xl board
+export CPU = cc3200
+export CPU_MODEL = CC3200R1M2
+
+#define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyUSB1
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# this board uses openocd
+# include $(RIOTBOARD)/Makefile.include.openocd
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common
