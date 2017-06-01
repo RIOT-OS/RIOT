@@ -52,7 +52,7 @@ extern "C" {
  * @brief   Type of the interface
  */
 typedef enum {
-    NETIF_TYPE_INVALID = 0;     /**< Interface is of no specific type (should not be used) */
+    NETIF_TYPE_INVALID = 0,     /**< Interface is of no specific type (should not be used) */
 #if defined(MODULE_GNRC) || DOXYGEN
     /**
      * @brief   Default GNRC network interface (without software MAC)
@@ -133,8 +133,8 @@ netif_params_t *netif_params_get_by_dev(netif_params_t *netif_params,
  * @return  The interface enumerator on success
  * @return  @ref NETIF_INVALID on error.
  */
-netif_t netif_init(const netif_params_t *params, unsigned subtype,
-                   netdev_t *netdev, void *priv_data);
+netif_t netif_setup(const netif_params_t *params, unsigned subtype,
+                    netdev_t *netdev, void *priv_data);
 
 /**
  * @brief   Iterator for the interfaces
