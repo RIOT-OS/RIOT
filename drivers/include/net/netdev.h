@@ -220,15 +220,16 @@ enum {
  *          upper layer
  */
 typedef enum {
-    NETDEV_EVENT_ISR,               /**< driver needs it's ISR handled */
-    NETDEV_EVENT_RX_STARTED,        /**< started to receive a packet */
-    NETDEV_EVENT_RX_COMPLETE,       /**< finished receiving a packet */
-    NETDEV_EVENT_TX_STARTED,        /**< started to transfer a packet */
-    NETDEV_EVENT_TX_COMPLETE,       /**< finished transferring packet */
-    NETDEV_EVENT_TX_NOACK,          /**< ACK requested but not received */
-    NETDEV_EVENT_TX_MEDIUM_BUSY,    /**< couldn't transfer packet */
-    NETDEV_EVENT_LINK_UP,           /**< link established */
-    NETDEV_EVENT_LINK_DOWN,         /**< link gone */
+    NETDEV_EVENT_ISR,                       /**< driver needs it's ISR handled */
+    NETDEV_EVENT_RX_STARTED,                /**< started to receive a packet */
+    NETDEV_EVENT_RX_COMPLETE,               /**< finished receiving a packet */
+    NETDEV_EVENT_TX_STARTED,                /**< started to transfer a packet */
+    NETDEV_EVENT_TX_COMPLETE,               /**< transfer packet complete */
+    NETDEV_EVENT_TX_COMPLETE_DATA_PENDING,  /**< transfer packet complete and data pending flag */
+    NETDEV_EVENT_TX_NOACK,                  /**< ACK requested but not received */
+    NETDEV_EVENT_TX_MEDIUM_BUSY,            /**< couldn't transfer packet */
+    NETDEV_EVENT_LINK_UP,                   /**< link established */
+    NETDEV_EVENT_LINK_DOWN,                 /**< link gone */
     /* expand this list if needed */
 } netdev_event_t;
 
