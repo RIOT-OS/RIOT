@@ -11,18 +11,6 @@ Build with the standard `Makefile`. Follow the setup [instructions][2] for the g
 
 Build with `Makefile.slip`. Follow the setup instructions in README-slip.md, which are based on the [SLIP instructions][3] for the gnrc_border_router example. We also plan to provide or reference the ethos/UHCP instructions, but we don't have it working yet.
 
-## Current Status
-gcoap includes server and client capability. Available features include:
-
-* Message Type: Supports non-confirmable (NON) messaging. Additionally provides a callback on timeout.
-* Observe extension: Provides server-side registration and notifications.
-* Server and Client provide helper functions for writing the response/request. See the CoAP topic in the source documentation for details. See the gcoap example for sample implementations.
-* Server allows an application to register a 'listener', which includes an array of endpoint paths and function callbacks used to write a response.
-* Server listens on a port at startup; defaults to 5683.
-* Client operates asynchronously; sends request and then handles response in a user provided callback.
-* Client generates token; length defined at compile time.
-* Options: Supports Content-Format for payload.
-
 
 ## Example Use
 This example uses gcoap as a server on RIOT native. Then we send a request from a libcoap example client on the Linux host.
