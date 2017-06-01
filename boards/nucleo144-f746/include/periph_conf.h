@@ -139,6 +139,11 @@ static const uart_conf_t uart_config[] = {
 #define DAC_NUMOF           (0)
 /** @} */
 
+/**
+ * @brief   Enable the RTC
+ */
+#define RTC_NUMOF           (1)
+
 #ifdef __cplusplus
 }
 #endif

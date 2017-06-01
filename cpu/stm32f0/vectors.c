@@ -37,7 +37,7 @@ WEAK_DEFAULT void isr_systick(void);
 /* STM32F0 specific interrupt vectors */
 WEAK_DEFAULT void isr_wwdg(void);
 WEAK_DEFAULT void isr_pvd(void);
-WEAK_DEFAULT void isr_rtc(void);
+WEAK_DEFAULT void isr_rtc_alarm(void);
 WEAK_DEFAULT void isr_flash(void);
 WEAK_DEFAULT void isr_rcc(void);
 WEAK_DEFAULT void isr_exti(void);
@@ -90,7 +90,7 @@ ISR_VECTORS const void *interrupt_vector[] = {
     /* STM specific peripheral handlers */
     (void*) isr_wwdg,               /* windowed watchdog */
     (void*) isr_pvd,                /* power control */
-    (void*) isr_rtc,                /* real time clock */
+    (void*) isr_rtc_alarm,          /* real time clock */
     (void*) isr_flash,              /* flash memory controller */
     (void*) isr_rcc,                /* reset and clock control */
     (void*) isr_exti,               /* external interrupt lines 0 and 1 */

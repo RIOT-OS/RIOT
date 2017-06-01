@@ -2,6 +2,7 @@
  * Copyright (C) 2015 Lari Lehtomäki
  *               2016 Laksh Bhatia
  *               2016-2017 OTA keys S.A.
+ *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,11 +18,13 @@
  * @author      Lari Lehtomäki <lari@lehtomaki.fi>
  * @author      Laksh Bhatia <bhatialaksh3@gmail.com>
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @}
  */
 
 #include <time.h>
 #include "cpu.h"
+#include "stmclk.h"
 #include "periph/rtc.h"
 #include "periph_conf.h"
 
@@ -32,14 +35,51 @@
 /* guard file in case no RTC device was specified */
 #if RTC_NUMOF
 
-#define RTC_WRITE_PROTECTION_KEY1   (0xCA)
-#define RTC_WRITE_PROTECTION_KEY2   (0x53)
-#define RTC_SYNC_PRESCALER          (0xff)  /**< prescaler for 32.768 kHz oscillator */
-#define RTC_ASYNC_PRESCALER         (0x7f)  /**< prescaler for 32.768 kHz oscillator */
+/* map some CPU specific register names */
+#ifdef CPU_FAM_STM32L1
+#define EN_REG              (RCC->CSR)
+#define EN_BIT              (RCC_CSR_RTCEN)
+#define CLKSEL_MASK         (RCC_CSR_RTCSEL)
+#define CLKSEL_LSE          (RCC_CSR_RTCSEL_LSE)
+#define CLKSEL_LSI          (RCC_CSR_RTCSEL_LSI)
+#else
+#define EN_REG              (RCC->BDCR)
+#define EN_BIT              (RCC_BDCR_RTCEN)
+#define CLKSEL_MASK         (RCC_BDCR_RTCSEL_Msk)
+#define CLKSEL_LSE          (RCC_BDCR_RTCSEL_0)
+#define CLKSEL_LSI          (RCC_BDCR_RTCSEL_1)
+#endif
 
-#define MCU_YEAR_OFFSET              (100)  /**< struct tm counts years since 1900
-                                                but RTC has only two-digit year
-                                                hence the offset of 100 years. */
+#ifdef CPU_FAM_STM32F1
+#define IRQN                (RTC_IRQn)
+#else
+#define IRQN                (RTC_Alarm_IRQn)
+#endif
+
+/* write protection values */
+#define WPK1                (0xCA)
+#define WPK2                (0x53)
+
+/* figure out sync and async prescaler */
+#if CLOCK_LSE
+#define PRE_SYNC            (255)
+#define PRE_ASYNC           (127)
+#elif (CLOCK_LSI == 40000)
+#define PRE_SYNC            (319)
+#define PRE_ASYNC           (124)
+#elif (CLOCK_LSI == 37000)
+#define PRE_SYNC            (295)
+#define PRE_ASYNC           (124)
+#elif (CLOCK_LSI == 32000)
+#define PRE_SYNC            (249)
+#define PRE_ASYNC           (127)
+#else
+#error "rtc: unable to determine RTC SYNC and ASYNC prescalers from LSI value"
+#endif
+
+#define MCU_YEAR_OFFSET     (100)  /**< struct tm counts years since 1900
+                                        but RTC has only two-digit year
+                                        hence the offset of 100 years. */
 
 typedef struct {
     rtc_alarm_cb_t cb;          /**< callback called from RTC interrupt */
@@ -50,6 +90,28 @@ static rtc_state_t rtc_callback;
 
 static uint8_t byte2bcd(uint8_t value);
 
+static inline void rtc_unlock(void)
+{
+    /* enable backup clock domain */
+    stmclk_bdp_unlock();
+    /* unlock RTC */
+    RTC->WPR = WPK1;
+    RTC->WPR = WPK2;
+    /* enter RTC init mode */
+    RTC->ISR |= RTC_ISR_INIT;
+    while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
+}
+
+static inline void rtc_lock(void)
+{
+    /* exit RTC init mode */
+    RTC->ISR &= ~RTC_ISR_INIT;
+    /* lock RTC device */
+    RTC->WPR = 0xff;
+    /* disable backup clock domain */
+    stmclk_bdp_lock();
+}
+
 /**
  * @brief Initializes the RTC to use LSE (external 32.768 kHz oscillator) as a
  * clocl source. Verify that your board has this oscillator. If other clock
@@ -57,30 +119,20 @@ static uint8_t byte2bcd(uint8_t value);
  */
 void rtc_init(void)
 {
-    /* Enable write access to RTC registers */
-    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
-#if defined(CPU_FAM_STM32F7)
-    PWR->CR1 |= PWR_CR1_DBP;
+    /* enable low frequency clock */
+    stmclk_enable_lfclk();
+
+    /* select input clock and enable the RTC */
+    stmclk_bdp_unlock();
+    EN_REG &= ~(CLKSEL_MASK);
+#if CLOCK_LSE
+    EN_REG |= (CLKSEL_LSE | EN_BIT);
 #else
-    PWR->CR |= PWR_CR_DBP;
+    EN_REG |= (CLKSEL_LSI | EN_BIT);
 #endif
 
-#if defined(CPU_FAM_STM32L1)
-    if (!(RCC->CSR & RCC_CSR_RTCEN)) {
-#else
-    if (!(RCC->BDCR & RCC_BDCR_RTCEN)) {
-#endif
-        rtc_poweron();
-    }
-
-    /* Unlock RTC write protection */
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY1;
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY2;
-
-    /* Enter RTC Init mode */
-    RTC->ISR = 0;
-    RTC->ISR |= RTC_ISR_INIT;
-    while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
+    /* unlock the RTC */
+    rtc_unlock();
 
     /* Set 24-h clock */
     RTC->CR &= ~RTC_CR_FMT;
@@ -88,33 +140,19 @@ void rtc_init(void)
     RTC->CR |= RTC_CR_TSE;
 
     /* Configure the RTC PRER */
-    RTC->PRER = RTC_SYNC_PRESCALER;
-    RTC->PRER |= (RTC_ASYNC_PRESCALER << 16);
+    RTC->PRER = PRE_SYNC;
+    RTC->PRER |= (PRE_ASYNC << 16);
 
-    /* Exit RTC init mode */
-    RTC->ISR &= (uint32_t) ~RTC_ISR_INIT;
+    /* enable global RTC interrupt */
+    NVIC_EnableIRQ(IRQN);
+    /* @todo any need for adaption the default IRQ priority for the RTC? */
 
-    /* Enable RTC write protection */
-    RTC->WPR = 0xff;
+    rtc_lock();
 }
 
 int rtc_set_time(struct tm *time)
 {
-    /* Enable write access to RTC registers */
-    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
-#if defined(CPU_FAM_STM32F7)
-    PWR->CR1 |= PWR_CR1_DBP;
-#else
-    PWR->CR |= PWR_CR_DBP;
-#endif
-
-    /* Unlock RTC write protection */
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY1;
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY2;
-
-    /* Enter RTC Init mode */
-    RTC->ISR |= RTC_ISR_INIT;
-    while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
+    rtc_unlock();
 
     /* Set 24-h clock */
     RTC->CR &= ~RTC_CR_FMT;
@@ -127,10 +165,8 @@ int rtc_set_time(struct tm *time)
                (((uint32_t)byte2bcd(time->tm_min) <<  8) & (RTC_TR_MNT | RTC_TR_MNU)) |
                (((uint32_t)byte2bcd(time->tm_sec) <<  0) & (RTC_TR_ST | RTC_TR_SU)));
 
-    /* Exit RTC init mode */
-    RTC->ISR &= (uint32_t) ~RTC_ISR_INIT;
-    /* Enable RTC write protection */
-    RTC->WPR = 0xFF;
+    rtc_lock();
+
     return 0;
 }
 
@@ -158,21 +194,10 @@ int rtc_get_time(struct tm *time)
 
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
-    /* Enable write access to RTC registers */
-    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
-#if defined(CPU_FAM_STM32F7)
-    PWR->CR1 |= PWR_CR1_DBP;
-#else
-    PWR->CR |= PWR_CR_DBP;
-#endif
+    rtc_unlock();
 
-    /* Unlock RTC write protection */
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY1;
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY2;
-
-    /* Enter RTC Init mode */
-    RTC->ISR |= RTC_ISR_INIT;
-    while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
+    rtc_callback.cb = cb;
+    rtc_callback.arg = arg;
 
     RTC->CR &= ~(RTC_CR_ALRAE);
     while ((RTC->ISR & RTC_ISR_ALRAWF) == 0) {}
@@ -187,23 +212,10 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     RTC->CR |= RTC_CR_ALRAIE;
     RTC->ISR &= ~(RTC_ISR_ALRAF);
 
-    /* Exit RTC init mode */
-    RTC->ISR &= (uint32_t) ~RTC_ISR_INIT;
-    /* Enable RTC write protection */
-    RTC->WPR = 0xFF;
-
     EXTI->IMR  |= EXTI_IMR_MR17;
     EXTI->RTSR |= EXTI_RTSR_TR17;
-#if defined(CPU_FAM_STM32F0)
-    NVIC_SetPriority(RTC_IRQn, 10);
-    NVIC_EnableIRQ(RTC_IRQn);
-#else
-    NVIC_SetPriority(RTC_Alarm_IRQn, 10);
-    NVIC_EnableIRQ(RTC_Alarm_IRQn);
-#endif
 
-    rtc_callback.cb = cb;
-    rtc_callback.arg = arg;
+    rtc_lock();
 
     return 0;
 }
@@ -233,72 +245,26 @@ void rtc_clear_alarm(void)
     rtc_callback.arg = NULL;
 }
 
+
 void rtc_poweron(void)
 {
-#if defined(CPU_FAM_STM32L1)
-    /* Reset RTC domain */
-    RCC->CSR |= RCC_CSR_RTCRST;
-    RCC->CSR &= ~(RCC_CSR_RTCRST);
-
-    /* Enable the LSE clock (external 32.768 kHz oscillator) */
-    RCC->CSR &= ~(RCC_CSR_LSEON);
-    RCC->CSR &= ~(RCC_CSR_LSEBYP);
-    RCC->CSR |= RCC_CSR_LSEON;
-    while ( (RCC->CSR & RCC_CSR_LSERDY) == 0 ) {}
-
-    /* Switch RTC to LSE clock source */
-    RCC->CSR &= ~(RCC_CSR_RTCSEL);
-    RCC->CSR |= RCC_CSR_RTCSEL_LSE;
-
-    /* Enable the RTC */
-    RCC->CSR |= RCC_CSR_RTCEN;
-#else
-    /* Reset RTC domain */
-    RCC->BDCR |= RCC_BDCR_BDRST;
-    RCC->BDCR &= ~(RCC_BDCR_BDRST);
-
-    /* Enable the LSE clock (external 32.768 kHz oscillator) */
-    RCC->BDCR &= ~(RCC_BDCR_LSEON);
-    RCC->BDCR &= ~(RCC_BDCR_LSEBYP);
-    RCC->BDCR |= RCC_BDCR_LSEON;
-    while ((RCC->BDCR & RCC_BDCR_LSERDY) == 0) {}
-
-    /* Switch RTC to LSE clock source */
-    RCC->BDCR &= ~(RCC_BDCR_RTCSEL);
-    RCC->BDCR |= RCC_BDCR_RTCSEL_0;
-
-    /* Enable the RTC */
-    RCC->BDCR |= RCC_BDCR_RTCEN;
-#endif
+    /* enable write access to RTC registers -> unlock backup power domain */
+    stmclk_bdp_unlock();
+    /* enable RTC */
+    EN_REG |= EN_BIT;
+    stmclk_bdp_lock();
 }
 
 void rtc_poweroff(void)
 {
-#if defined(CPU_FAM_STM32L1)
-    /* Reset RTC domain */
-    RCC->CSR |= RCC_CSR_RTCRST;
-    RCC->CSR &= ~(RCC_CSR_RTCRST);
-    /* Disable the RTC */
-    RCC->CSR &= ~RCC_CSR_RTCEN;
-    /* Disable LSE clock */
-    RCC->CSR &= ~(RCC_CSR_LSEON);
-#else
-    /* Reset RTC domain */
-    RCC->BDCR |= RCC_BDCR_BDRST;
-    RCC->BDCR &= ~(RCC_BDCR_BDRST);
-    /* Disable the RTC */
-    RCC->BDCR &= ~RCC_BDCR_RTCEN;
-    /* Disable LSE clock */
-    RCC->BDCR &= ~(RCC_BDCR_LSEON);
-#endif
+    stmclk_bdp_unlock();
+    EN_REG &= ~EN_BIT;
+    stmclk_bdp_lock();
 }
 
-#if defined(CPU_FAM_STM32F0)
-void isr_rtc(void)
-#else
 void isr_rtc_alarm(void)
-#endif
 {
+    /* @todo do we need access to the backup clock domain when playing around here? */
     if (RTC->ISR & RTC_ISR_ALRAF) {
         if (rtc_callback.cb != NULL) {
             rtc_callback.cb(rtc_callback.arg);

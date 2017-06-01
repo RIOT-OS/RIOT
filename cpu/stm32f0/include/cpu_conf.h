@@ -83,6 +83,11 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @brief   LSI clock speed [in Hz]
+ */
+#define CLOCK_LSI                       (40000U)
+
 #ifdef __cplusplus
 }
 #endif
