@@ -182,6 +182,8 @@ netif_t netif_get_by_name(const char *name);
 /**
  * @brief   Gets option from an interface
  *
+ * @note    Supposed to be implemented by the networking module
+ *
  * @param[in]   netif   A network interface.
  * @param[in]   opt     Option type.
  * @param[out]  value   Pointer to store the option's value in.
@@ -194,6 +196,8 @@ int netif_get_opt(netif_t netif, netopt_t opt, void *value, size_t max_len);
 
 /**
  * @brief   Sets option to an interface
+ *
+ * @note    Supposed to be implemented by the networking module
  *
  * @param[in] netif     A network interface.
  * @param[in] opt       Option type.
