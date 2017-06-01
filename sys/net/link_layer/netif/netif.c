@@ -18,6 +18,8 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+netif_params_t *netif_params_default = NULL;
+
 netif_params_t *netif_params_get_by_dev(netif_params_t *netif_params,
                                         const void *dev_params)
 {
@@ -30,13 +32,14 @@ netif_params_t *netif_params_get_by_dev(netif_params_t *netif_params,
 }
 
 netif_t netif_setup(const netif_params_t *params, unsigned subtype,
-                    netdev_t *netdev)
+                    netdev_t *netdev, void *priv_data)
 {
     switch (params->type) {
         /* TODO: type specific calls */
         default:
             (void)subtype;
             (void)netdev;
+            (void)priv_data;
             return NETIF_INVALID;
     }
 }

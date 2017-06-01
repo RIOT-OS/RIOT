@@ -23,6 +23,7 @@
 #define NETIF_H_
 
 #include "net/netdev.h"
+#include "net/netopt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,11 +101,16 @@ typedef struct {
 typedef intptr_t netif_t;
 
 /**
+ * @brief   Parameters for the default network device of the @ref boards
+ */
+extern void *netdev_params_default;
+
+/**
  * @brief   Gets a network interface parameter struct from an array of parameter
  *          structs by network device parameters
  *
  * @param[in] netif_params  Array of network interface parameters.
- * @param[in] dev_pararms   A struct of network device parameters.
+ * @param[in] dev_params    A struct of network device parameters.
  *
  * @return  The parameters with netif_params_t::dev_params == @p dev_params
  * @return  NULL, if there are no such parameters in @p netif_params
@@ -122,12 +128,13 @@ netif_params_t *netif_params_get_by_dev(netif_params_t *netif_params,
  *                      if not required by network stack.
  * @param[in] netdev    The set-up'd (but not initialized) network device, based
  *                      on device specific parameters netif_params_t::dev_params
+ * @param[in] priv_data Private, stack-dependent data.
  *
  * @return  The interface enumerator on success
  * @return  @ref NETIF_INVALID on error.
  */
 netif_t netif_init(const netif_params_t *params, unsigned subtype,
-                   netdev_t *netdev);
+                   netdev_t *netdev, void *priv_data);
 
 /**
  * @brief   Iterator for the interfaces
@@ -171,6 +178,32 @@ int netif_get_name(netif_t netif, char *name);
  * @return  @ref NETIF_INVALID if no interface is named @p name.
  */
 netif_t netif_get_by_name(const char *name);
+
+/**
+ * @brief   Gets option from an interface
+ *
+ * @param[in]   netif   A network interface.
+ * @param[in]   opt     Option type.
+ * @param[out]  value   Pointer to store the option's value in.
+ * @param[in]   max_len Maximal amount of byte that fit into @p value.
+ *
+ * @return  Number of bytes written to @p value.
+ * @return  `< 0` on error, 0 on success.
+ */
+int netif_get_opt(netif_t netif, netopt_t opt, void *value, size_t max_len);
+
+/**
+ * @brief   Sets option to an interface
+ *
+ * @param[in] netif     A network interface.
+ * @param[in] opt       Option type.
+ * @param[in] value     Pointer to store the option's value in.
+ * @param[in] value_len The length of @p value.
+ *
+ * @return Number of bytes used from @p value.
+ * @return `< 0` on error, 0 on success.
+ */
+int netif_set_opt(netif_t netif, netopt_t opt, void *value, size_t value_len);
 
 #ifdef __cplusplus
 }
