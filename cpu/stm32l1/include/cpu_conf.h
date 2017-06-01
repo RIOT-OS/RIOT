@@ -38,6 +38,11 @@ extern "C" {
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
+/**
+ * @brief   LSI clock speed [in Hz]
+ */
+#define CLOCK_LSI                       (37000U)
+
 #ifdef __cplusplus
 }
 #endif

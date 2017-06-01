@@ -60,6 +60,11 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   LSI clock speed [in Hz]
+ */
+#define CLOCK_LSI                       (32000U)
+
+/**
  * @brief Configure the CPU's clock system
  *
  * @param[in] source    source clock frequency
