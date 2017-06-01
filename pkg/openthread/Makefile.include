@@ -1,0 +1,18 @@
+OPENTHREAD_DIR = $(RIOTBASE)/pkg/openthread
+
+INCLUDES += -I$(OPENTHREAD_DIR)/include \
+            -I$(OPENTHREAD_DIR)/include/openthread \
+            -I$(BINDIRBASE)/pkg/$(BOARD)/openthread/output/include \
+            -I$(BINDIRBASE)/pkg/$(BOARD)/openthread/include/openthread \
+
+ifneq (,$(filter openthread_contrib,$(USEMODULE)))
+  DIRS += $(OPENTHREAD_DIR)/contrib
+  DIRS += $(OPENTHREAD_DIR)/contrib/netdev
+endif
+ifneq (,$(filter openthread_sock,$(USEMODULE)))
+  DIRS += $(OPENTHREAD_DIR)/contrib/sock
+  CFLAGS += -DSOCK_HAS_IPV6
+endif
+ifneq (,$(filter openthread_sock_udp,$(USEMODULE)))
+  DIRS += $(OPENTHREAD_DIR)/contrib/sock/udp
+endif
