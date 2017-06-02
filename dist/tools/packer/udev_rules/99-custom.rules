@@ -1,0 +1,10 @@
+ACTION!="add|change", GOTO="custom_rules_end"
+SUBSYSTEM!="usb|tty|hidraw", GOTO="custom_rules_end"
+
+# cp210x UART
+ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", MODE="660", GROUP="plugdev", TAG+="uaccess"
+
+# Arduino Due
+ATTRS{idVendor}=="2341", ATTRS{idProduct}=="003d", MODE="660", GROUP="plugdev", TAG+="uaccess"
+
+LABEL="custom_rules_end"
