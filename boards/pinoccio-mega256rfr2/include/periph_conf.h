@@ -178,6 +178,12 @@ static const i2c_conf_t i2c_config[] = {
 };
 
 /**
+ * @brief RTC configuartion
+ */
+#define RTC_NUMOF	(1U)
+
+
+/**
  * @brief SPI configuration
  *
  * The atmega256rfr has only one hardware SPI with fixed pin configuration, so all
