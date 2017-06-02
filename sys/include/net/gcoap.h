@@ -30,6 +30,14 @@
  * provides functions to generate and send an observe notification that are
  * similar to the functions to send a client request.
  *
+ * *Contents*
+ *
+ * - Server Operation
+ * - Client Operation
+ * - Observe Server Operation
+ * - Implementation Notes
+ * - Implementation Status
+ *
  * ## Server Operation ##
  *
  * gcoap listens for requests on GCOAP_PORT, 5683 by default. You can redefine
