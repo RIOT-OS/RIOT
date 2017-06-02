@@ -46,7 +46,7 @@ void microcoap_server_loop(void)
         rc = sock_udp_recv(&sock, (char *)_udp_buf, sizeof(_udp_buf),
                            SOCK_NO_TIMEOUT, &remote);
         if (rc < 0) {
-            DEBUG("Error in conn_udp_recvfrom(). rc=%u\n", rc);
+            DEBUG("Error in sock_udp_recv(). rc=%u\n", rc);
             continue;
         }
 

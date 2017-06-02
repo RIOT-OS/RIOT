@@ -35,7 +35,7 @@ extern "C" {
 #define HD44780_FUNCTIONSET             (0x20)
 #define HD44780_SETCGRAMADDR            (0x40)
 #define HD44780_SETDDRAMADDR            (0x80)
-/**@}*/
+/** @} */
 
 /**
  * @brief   HD44780 LCD entry modes flags
@@ -45,7 +45,7 @@ extern "C" {
 #define HD44780_ENTRYLEFT               (0x02)
 #define HD44780_ENTRYSHIFTINCREMENT     (0x01)
 #define HD44780_ENTRYSHIFTDECREMENT     (0x00)
-/**@}*/
+/** @} */
 
 /**
  * @brief   HD44780 LCD control flags
@@ -57,7 +57,7 @@ extern "C" {
 #define HD44780_CURSOROFF               (0x00)
 #define HD44780_BLINKON                 (0x01)
 #define HD44780_BLINKOFF                (0x00)
-/**@}*/
+/** @} */
 
 /**
  * @brief   HD44780 display and cursor shift flags
@@ -79,7 +79,7 @@ extern "C" {
 #define HD44780_1LINE                   (0x00)
 #define HD44780_5x10DOTS                (0x04)
 #define HD44780_5x8DOTS                 (0x00)
-/**@}*/
+/** @} */
 
 /**
  * @brief   HD44780 LCD timings
@@ -98,3 +98,4 @@ extern "C" {
 #endif
 
 #endif /* HD44780_INTERNAL_H */
+/** @} */

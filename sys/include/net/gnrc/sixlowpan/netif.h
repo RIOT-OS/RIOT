@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_SIXLOWPAN_NETIF_H
-#define GNRC_SIXLOWPAN_NETIF_H
+#ifndef NET_GNRC_SIXLOWPAN_NETIF_H
+#define NET_GNRC_SIXLOWPAN_NETIF_H
 
 #include <stdbool.h>
 
@@ -73,5 +73,5 @@ gnrc_sixlowpan_netif_t *gnrc_sixlowpan_netif_get(kernel_pid_t pid);
 }
 #endif
 
-#endif /* GNRC_SIXLOWPAN_NETIF_H */
+#endif /* NET_GNRC_SIXLOWPAN_NETIF_H */
 /** @} */

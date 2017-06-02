@@ -1,6 +1,6 @@
 PKG_NAME=jerryscript
 PKG_URL=https://github.com/jerryscript-project/jerryscript.git
-PKG_VERSION=b140158104064ef082ddb58052f8c7c7cee9675c
+PKG_VERSION=56802c22a10b0d684ac93921ac28df891e320b4a
 PKG_LICENSE=Apache-2.0
 
 .PHONY: all
@@ -8,6 +8,5 @@ PKG_LICENSE=Apache-2.0
 all: git-download
 	@cp Makefile.jerryscript $(PKG_BUILDDIR)/Makefile
 	$(MAKE) -C $(PKG_BUILDDIR)
-	cp $(PKG_BUILDDIR)/riot/lib/libjerry-core.a ${BINDIR}/libjerrycore.a
 
 include $(RIOTBASE)/pkg/pkg.mk

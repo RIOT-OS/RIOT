@@ -21,8 +21,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef IPV6_H
-#define IPV6_H
+#ifndef NET_IPV6_H
+#define NET_IPV6_H
 
 #include "net/ipv6/addr.h"
 #include "net/ipv6/ext.h"
@@ -46,5 +46,5 @@ extern "C" {
 #endif
 
 
-#endif /* IPV6_H */
+#endif /* NET_IPV6_H */
 /** @} */

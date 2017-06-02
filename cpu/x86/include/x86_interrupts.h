@@ -26,8 +26,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU__X86__INTERRUPTS__H__
-#define CPU__X86__INTERRUPTS__H__
+#ifndef X86_INTERRUPTS_H
+#define X86_INTERRUPTS_H
 
 #include "ucontext.h"
 
@@ -160,6 +160,6 @@ void x86_print_registers(struct x86_pushad *orig_ctx, unsigned long error_code);
 }
 #endif
 
-#endif
+#endif /* X86_INTERRUPTS_H */
 
 /** @} */

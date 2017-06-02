@@ -16,8 +16,8 @@
  * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
-#ifndef _NATIVE_INTERNAL_H
-#define _NATIVE_INTERNAL_H
+#ifndef NATIVE_INTERNAL_H
+#define NATIVE_INTERNAL_H
 
 #include <signal.h>
 #include <stdio.h>
@@ -188,4 +188,4 @@ int unregister_interrupt(int sig);
 #include "sched.h"
 
 /** @} */
-#endif /* _NATIVE_INTERNAL_H */
+#endif /* NATIVE_INTERNAL_H */

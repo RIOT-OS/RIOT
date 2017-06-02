@@ -57,7 +57,8 @@ extern uint32_t _cpuid_address;
 /**
  * @brief   Number of usable low power modes
  */
-#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || defined(DOXYGEN)
+#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) \
+    || defined(CPU_FAM_STM32F4) || defined(DOXYGEN)
 #define PM_NUM_MODES    (2U)
 #endif
 
@@ -74,7 +75,7 @@ typedef enum {
     || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
     AHB,            /**< AHB bus */
 #elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) \
-    || defined(CPU_FAM_STM32L4)
+    || defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7)
     AHB1,           /**< AHB1 bus */
     AHB2,           /**< AHB2 bus */
     AHB3            /**< AHB3 bus */

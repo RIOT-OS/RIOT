@@ -82,8 +82,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef MQTTSN_H
-#define MQTTSN_H
+#ifndef NET_EMCUTE_H
+#define NET_EMCUTE_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -377,5 +377,5 @@ const char *emcute_type_str(uint8_t type);
 }
 #endif
 
-#endif /* MQTTSN_H */
+#endif /* NET_EMCUTE_H */
 /** @} */

@@ -77,8 +77,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef SCHEDULER_H
-#define SCHEDULER_H
+#ifndef SCHED_H
+#define SCHED_H
 
 #include <stddef.h>
 #include "kernel_defines.h"
@@ -179,10 +179,10 @@ NORETURN void sched_task_exit(void);
  *  Scheduler statistics
  */
 typedef struct {
-    unsigned int laststart;         /**< Time stamp of the last time this thread was
-                                         scheduled to run */
-    unsigned int schedules;         /**< How often the thread was scheduled to run */
-    unsigned long runtime_ticks;    /**< The total runtime of this thread in ticks */
+    uint64_t laststart;      /**< Time stamp of the last time this thread was
+                                  scheduled to run */
+    unsigned int schedules;  /**< How often the thread was scheduled to run */
+    uint64_t runtime_ticks;  /**< The total runtime of this thread in ticks */
 } schedstat;
 
 /**
@@ -202,5 +202,5 @@ void sched_register_cb(void (*callback)(uint32_t, uint32_t));
 }
 #endif
 
-#endif /* SCHEDULER_H */
+#endif /* SCHED_H */
 /** @} */

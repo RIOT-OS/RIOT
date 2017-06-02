@@ -22,10 +22,6 @@
 #include <assert.h>
 #include <errno.h>
 
-#ifdef MODULE_NETSTATS_L2
-#include <string.h>
-#endif
-
 #include "mutex.h"
 #include "encx24j600.h"
 #include "encx24j600_internal.h"
@@ -36,7 +32,11 @@
 #include "net/netdev/eth.h"
 #include "net/eui64.h"
 #include "net/ethernet.h"
+
+#ifdef MODULE_NETSTATS_L2
+#include <string.h>
 #include "net/netstats.h"
+#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"

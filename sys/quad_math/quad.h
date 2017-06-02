@@ -49,6 +49,9 @@
  * with 48-bit ints.
  */
 
+#ifndef QUAD_H
+#define QUAD_H
+
 #include <sys/types.h>
 #include <limits.h>
 
@@ -147,3 +150,5 @@ quad_t __xordi3(quad_t, quad_t);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* QUAD_H */

@@ -20,8 +20,8 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef SOCK_UTIL_H
-#define SOCK_UTIL_H
+#ifndef NET_SOCK_UTIL_H
+#define NET_SOCK_UTIL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -87,5 +87,5 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str);
 }
 #endif
 
-#endif /* SOCK_UTIL_H */
+#endif /* NET_SOCK_UTIL_H */
 /** @} */

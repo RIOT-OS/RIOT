@@ -976,7 +976,7 @@ void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, ipv6
     (void)iface;
     (void)src;
     (void)dst;
-    (void) len;
+    (void)len;
 
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
@@ -986,7 +986,7 @@ void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, ipv6
 #endif
 
 #ifndef GNRC_RPL_WITHOUT_VALIDATION
-    if (!gnrc_rpl_validation_DAO_ACK(dao_ack, len)) {
+    if (!gnrc_rpl_validation_DAO_ACK(dao_ack, len, dst)) {
         return;
     }
 #endif

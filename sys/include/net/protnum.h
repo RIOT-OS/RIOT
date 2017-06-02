@@ -23,8 +23,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef PROTNUM_H
-#define PROTNUM_H
+#ifndef NET_PROTNUM_H
+#define NET_PROTNUM_H
 
 
 #ifdef __cplusplus
@@ -182,5 +182,5 @@ extern "C" {
 }
 #endif
 
-#endif /* PROTNUM_H */
+#endif /* NET_PROTNUM_H */
 /** @} */

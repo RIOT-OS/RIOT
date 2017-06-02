@@ -9,15 +9,6 @@ RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo32-f031
 
-## Uncomment to support the XBee module
-#USEMODULE += xbee
-
-## set default UART to use in case none was defined
-#XBEE_UART ?= "1"
-
-## export UART to params file
-#CFLAGS += -DXBEE_UART=$(XBEE_UART)
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:

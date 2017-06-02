@@ -98,7 +98,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     /* disable transmitter and receiver */
     dev->C2 &= ~(UART_C2_TE_MASK | UART_C2_RE_MASK);
     /* set defaults, 8-bit mode, no parity */
-    dev->C1 = 0;
+    dev->C1 = uart_config[uart].mode;
 
     /* calculate baudrate */
     ubd = (uint16_t)(clk / (baudrate * 16));
@@ -178,27 +178,37 @@ static inline void irq_handler(uart_t uart)
     cortexm_isr_end();
 }
 
-void isr_uart0_rx_tx(void)
+#ifdef UART_0_ISR
+void UART_0_ISR(void)
 {
     irq_handler(UART_DEV(0));
 }
+#endif
 
-void isr_uart1_rx_tx(void)
+#ifdef UART_1_ISR
+void UART_1_ISR(void)
 {
     irq_handler(UART_DEV(1));
 }
+#endif
 
-void isr_uart2_rx_tx(void)
+#ifdef UART_2_ISR
+void UART_2_ISR(void)
 {
     irq_handler(UART_DEV(2));
 }
+#endif
 
-void isr_uart3_rx_tx(void)
+#ifdef UART_3_ISR
+void UART_3_ISR(void)
 {
     irq_handler(UART_DEV(3));
 }
+#endif
 
-void isr_uart4_rx_tx(void)
+#ifdef UART_4_ISR
+void UART_4_ISR(void)
 {
     irq_handler(UART_DEV(4));
 }
+#endif

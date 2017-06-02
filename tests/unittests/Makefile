@@ -4,6 +4,7 @@ include ../Makefile.tests_common
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-duemilanove \
                              arduino-mega2560 \
+                             arduino-mkr1000 \
                              arduino-uno \
                              arduino-zero \
                              calliope-mini \
@@ -73,6 +74,7 @@ DISABLE_TEST_FOR_ARM7 := tests-relic tests-cpp_%
 
 ARM_CORTEX_M_BOARDS := airfy-beacon \
                        arduino-due \
+                       arduino-mkr1000 \
                        arduino-zero \
                        cc2538dk \
                        ek-lm4f120xl \

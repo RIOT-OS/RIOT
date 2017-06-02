@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef IPV6_EXT_RH_H
-#define IPV6_EXT_RH_H
+#ifndef NET_IPV6_EXT_RH_H
+#define NET_IPV6_EXT_RH_H
 
 #include <stdint.h>
 
@@ -73,5 +73,5 @@ int ipv6_ext_rh_process(ipv6_hdr_t *ipv6, ipv6_ext_rh_t *ext);
 }
 #endif
 
-#endif /* IPV6_EXT_RH_H */
+#endif /* NET_IPV6_EXT_RH_H */
 /** @} */

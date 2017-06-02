@@ -1,48 +1,29 @@
 APPLICATION = lwip
-# overwrite board, do not set native as default
-BOARD ?= iotlab-m3
 include ../Makefile.tests_common
 
-BOARD_BLACKLIST := arduino-mega2560 msb-430h telosb waspmote-pro z1 arduino-uno \
-                   arduino-duemilanove msb-430 wsn430-v1_4 wsn430-v1_3b
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-mega2560 msb-430h nrf6310 \
-                             nucleo32-f031 nucleo32-f031 nucleo32-f042 nucleo32-f303 \
-                             nucleo32-l031 nucleo-f030 nucleo-f072 \
-                             nucleo-f302 nucleo-f334 nucleo-l053 pca10005 stm32f0discovery \
-                             telosb weio yunjia-nrf51822 z1
+# lwIP's memory management doesn't seem to work on non 32-bit platforms at the
+# moment.
+BOARD_BLACKLIST := arduino-uno arduino-duemilanove arduino-mega2560 chronos \
+                   msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b \
+                   wsn430-v1_4 z1
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon nrf6310 nucleo32-f031 nucleo32-f042 \
+                             nucleo32-l031 nucleo-f030 nucleo-f334 nucleo-l053 \
+                             pca10005 stm32f0discovery weio yunjia-nrf51822
 
 # including lwip_ipv6_mld would currently break this test on at86rf2xx radios
-USEMODULE += lwip lwip_ipv6_autoconfig lwip_conn_ip lwip_netdev
-USEMODULE += lwip_udp lwip_conn_udp
+USEMODULE += lwip lwip_ipv6_autoconfig lwip_sock_ip lwip_netdev
+USEMODULE += lwip_udp lwip_sock_udp
+USEMODULE += lwip_tcp lwip_sock_tcp
 USEMODULE += ipv6_addr
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += od
+USEMODULE += netdev_default
 
-# use the at86rf231 as fallback device
-DRIVER := at86rf231
-
-# define the driver to be used for selected boards
-ifneq (,$(filter samr21-xpro,$(BOARD)))
-  DRIVER := at86rf233
-endif
-ifneq (,$(filter iotlab-m3 fox,$(BOARD)))
-  DRIVER := at86rf231
-endif
-ifneq (,$(filter mulle,$(BOARD)))
-  DRIVER := at86rf212b
-endif
-ifneq (,$(filter native,$(BOARD)))
-  DRIVER := netdev_tap
+ifeq ($(BOARD),native)
   USEMODULE += lwip_ethernet
 endif
-
-ifneq (,$(filter at86rf2%,$(DRIVER)))
-  FEATURES_REQUIRED = periph_spi periph_gpio
-endif
-
-USEMODULE += $(DRIVER)
 
 include $(RIOTBASE)/Makefile.include
 

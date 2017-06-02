@@ -61,4 +61,4 @@ extern const TestImplement RepeatedTestImplement;
 }
 #endif
 
-#endif/* EMBUNIT_REPEATEDTEST_H */
+#endif /* EMBUNIT_REPEATEDTEST_H */

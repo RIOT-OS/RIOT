@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_IPV6_WHITELIST_H
-#define GNRC_IPV6_WHITELIST_H
+#ifndef NET_GNRC_IPV6_WHITELIST_H
+#define NET_GNRC_IPV6_WHITELIST_H
 
 #include <stdbool.h>
 
@@ -73,5 +73,5 @@ void gnrc_ipv6_whitelist_print(void);
 }
 #endif
 
-#endif /* GNRC_IPV6_WHITELIST_H */
+#endif /* NET_GNRC_IPV6_WHITELIST_H */
 /** @} */

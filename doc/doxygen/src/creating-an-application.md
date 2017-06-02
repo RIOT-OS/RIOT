@@ -78,11 +78,11 @@ Including modules                                          {#including-modules}
 -----------------
 By default a RIOT application comprises only of the applications' code itself,
 the kernel, and platform specific code. In order to use additional modules,
-such as a particular @ref drivers "device driver" or @ref sys "a system
-library" (including @ref net "networking capabilities"), you have to append the
-modules' names to the USEMODULE variable. For example, to build an application
-using the SHT11 temperature sensor and UDP/IPv6 functionalities of the GNRC
-network stack, your Makefile needs to contain these lines:
+such as a particular [device driver](@ref drivers) or [a system library](@ref sys)
+(including [networking capabilities](@ref net)), you have to append the modules'
+names to the USEMODULE variable. For example, to build an application using the
+SHT11 temperature sensor and UDP/IPv6 functionalities of the GNRC network stack,
+your Makefile needs to contain these lines:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
 USEMODULE += sht11

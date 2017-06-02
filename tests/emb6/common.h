@@ -11,12 +11,12 @@
  * @{
  *
  * @file
- * @brief   Definitions for tests/lwip/
+ * @brief   Definitions for tests/emb6/
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef COMMON_H
+#define COMMON_H
 
 #include <stdint.h>
 #include <sys/types.h>
@@ -29,7 +29,7 @@ extern "C" {
  * @brief   Application configuration
  * @{
  */
-#define CONN_INBUF_SIZE         (256)
+#define SOCK_INBUF_SIZE         (256)
 #define SERVER_MSG_QUEUE_SIZE   (8)
 #define SERVER_BUFFER_SIZE      (64)
 /**
@@ -58,7 +58,7 @@ size_t hex2ints(uint8_t *out, const char *in);
  */
 int ping_cmd(int argc, char **argv);
 
-#ifdef MODULE_CONN_UDP
+#ifdef MODULE_EMB6_SOCK_UDP
 /**
  * @brief   UDP IP shell command
  *
@@ -75,5 +75,5 @@ int udp_cmd(int argc, char **argv);
 }
 #endif
 
-#endif /* MAIN_H */
+#endif /* COMMON_H */
 /** @} */

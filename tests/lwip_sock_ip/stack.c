@@ -27,6 +27,7 @@
 #include "lwip/ip4.h"
 #include "lwip/inet_chksum.h"
 #include "lwip/nd6.h"
+#include "lwip/priv/nd6_priv.h"
 #include "lwip/netif.h"
 #include "lwip/netif/netdev.h"
 #include "lwip/tcpip.h"
@@ -35,7 +36,7 @@
 #include "constants.h"
 #include "stack.h"
 
-#define _MSG_QUEUE_SIZE     (1)
+#define _MSG_QUEUE_SIZE     (4)
 #define _SEND_DONE  (0x92d7)
 #define _NETDEV_BUFFER_SIZE     (128)
 
@@ -197,7 +198,9 @@ void _net_init(void)
     static const uint8_t local6[] = _TEST_ADDR6_LOCAL;
     s8_t idx;
     netif_add_ip6_address(&netif, (ip6_addr_t *)&local6, &idx);
-    netif_ip6_addr_set_state(&netif, idx, IP6_ADDR_VALID);
+    for (int i = 0; i <= idx; i++) {
+        netif.ip6_addr_state[i] |= IP6_ADDR_VALID;
+    }
 #endif
     netif_set_default(&netif);
     lwip_bootstrap();

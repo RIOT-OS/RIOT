@@ -97,7 +97,7 @@ quad_t __muldi3(quad_t a, quad_t b)
 {
     union uu u, v, low, prod;
     u_int high, mid, udiff, vdiff;
-    int negall, negmid;
+    int negall;
 #define u1  u.ul[H]
 #define u0  u.ul[L]
 #define v1  v.ul[H]
@@ -131,6 +131,7 @@ quad_t __muldi3(quad_t a, quad_t b)
         prod.q = __lmulq(u0, v0);
     }
     else {
+        int negmid;
         /*
          * Compute the three intermediate products, remembering
          * whether the middle term is negative.  We can discard

@@ -14,8 +14,8 @@
  * @brief           CC26x0 WDT register definitions
  */
 
-#ifndef CC26x0_WDT_H
-#define CC26x0_WDT_H
+#ifndef CC26X0_WDT_H
+#define CC26X0_WDT_H
 
 #include <cc26x0.h>
 
@@ -51,6 +51,6 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26x0_WDT_H */
+#endif /* CC26X0_WDT_H */
 
 /*@}*/

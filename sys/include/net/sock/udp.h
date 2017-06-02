@@ -63,7 +63,7 @@
  * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc GNRC) and at least
  * one network device.
  *
- * After including the header file for @ref net_sock_udp "UDP sock", we create some 
+ * After including the header file for @ref net_sock_udp "UDP sock", we create some
  * buffer space `buf` to store the data received by the server:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
@@ -313,7 +313,7 @@ typedef struct sock_udp sock_udp_t;
  *                      @ref SOCK_ADDR_ANY_NETIF or equal to sock_udp_ep_t::netif
  *                      of @p local if `local != NULL`.
  * @param[in] flags     Flags for the sock object. See also
- *                      [sock flags](net_sock_flags).
+ *                      [sock flags](@ref net_sock_flags).
  *                      May be 0.
  *
  * @return  0 on success.

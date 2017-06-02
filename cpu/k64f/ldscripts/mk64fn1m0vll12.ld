@@ -1,1 +1,0 @@
-../../kinetis_common/ldscripts/kinetis_f1024l64u192.ld

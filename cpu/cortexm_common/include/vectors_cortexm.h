@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef VECTORS_DEFAULT_H
-#define VECTORS_DEFAULT_H
+#ifndef VECTORS_CORTEXM_H
+#define VECTORS_CORTEXM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,7 +74,7 @@ void hard_fault_default(void);
 
 /* The following four exceptions are only present for Cortex-M3 and -M4 CPUs */
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
-    defined(CPU_ARCH_CORTEX_M4F)
+    defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
 /**
  * @brief   Memory management exception handler
  *
@@ -122,5 +122,5 @@ void dummy_handler_default(void);
 }
 #endif
 
-#endif /* VECTORS_DEFAULT_H */
+#endif /* VECTORS_CORTEXM_H */
 /** @} */

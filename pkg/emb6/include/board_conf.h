@@ -18,8 +18,8 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef EMB6_BOARD_CONF_H
-#define EMB6_BOARD_CONF_H
+#ifndef BOARD_CONF_H
+#define BOARD_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,6 +41,6 @@ uint8_t board_conf(s_ns_t *ps_nStack);
 }
 #endif
 
-#endif /* EMB6_BOARD_CONF_H */
+#endif /* BOARD_CONF_H */
 /** @} */
 /** @} */

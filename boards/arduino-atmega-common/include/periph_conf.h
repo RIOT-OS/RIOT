@@ -12,8 +12,7 @@
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the arduino Uno and
- * @brief       Dumilanove boards.
+ * @brief       Common configuration of MCU periphery for Arduino Atmega boards
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Laurent Navet <laurent.navet@gmail.com>

@@ -17,8 +17,8 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se
  */
 
-#ifndef RIOT_MSP430_STDIO_H
-#define RIOT_MSP430_STDIO_H
+#ifndef STDIO_H
+#define STDIO_H
 
 /*
  * The MSP430 toolchain does not provide getchar in stdio.h.
@@ -41,4 +41,4 @@ int getchar(void);
 }
 #endif
 
-#endif /* RIOT_MSP430_STDIO_H */
+#endif /* STDIO_H */

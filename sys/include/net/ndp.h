@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NDP_H
-#define NDP_H
+#ifndef NET_NDP_H
+#define NET_NDP_H
 
 #include <stdint.h>
 
@@ -66,7 +66,7 @@ extern "C" {
 
 /**
  * @name    Neighbor advertisement flags
- * @see     [RFC 4861, section 4.2](https://tools.ietf.org/html/rfc4861#section-4.2)
+ * @see     [RFC 4861, section 4.4](https://tools.ietf.org/html/rfc4861#section-4.4)
  * @{
  */
 #define NDP_NBR_ADV_FLAGS_MASK      (0xe0)
@@ -291,5 +291,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
-#endif /* NDP_H */
+#endif /* NET_NDP_H */
 /** @} */

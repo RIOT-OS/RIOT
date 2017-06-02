@@ -19,8 +19,10 @@
  *
  * @author       Neil Jones <Neil.Jones@imgtec.com>
  */
-#ifndef _PERIPH_CONF_H_
-#define _PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
+
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,5 +60,5 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* PERIPH_CONF_H */
 /** @} */

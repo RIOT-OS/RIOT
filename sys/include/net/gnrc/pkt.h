@@ -19,8 +19,8 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-#ifndef GNRC_PKT_H
-#define GNRC_PKT_H
+#ifndef NET_GNRC_PKT_H
+#define NET_GNRC_PKT_H
 
 #include <inttypes.h>
 #include <stdlib.h>
@@ -128,7 +128,7 @@ static inline size_t gnrc_pkt_len(gnrc_pktsnip_t *pkt)
 {
     size_t len = 0;
 
-    while (pkt) {
+    while (pkt != NULL) {
         len += pkt->size;
         pkt = pkt->next;
     }
@@ -148,7 +148,7 @@ static inline size_t gnrc_pkt_len_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type)
 {
     size_t len = 0;
 
-    while (pkt) {
+    while (pkt != NULL) {
         len += pkt->size;
 
         if (pkt->type == type) {
@@ -172,7 +172,7 @@ static inline size_t gnrc_pkt_count(const gnrc_pktsnip_t *pkt)
 {
     size_t count = 0;
 
-    while (pkt) {
+    while (pkt != NULL) {
         ++count;
         pkt = pkt->next;
     }
@@ -196,5 +196,5 @@ gnrc_pktsnip_t *gnrc_pktsnip_search_type(gnrc_pktsnip_t *pkt,
 }
 #endif
 
-#endif /* GNRC_PKT_H */
+#endif /* NET_GNRC_PKT_H */
 /** @} */

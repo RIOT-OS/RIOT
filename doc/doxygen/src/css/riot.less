@@ -1,0 +1,453 @@
+/*
+ * riot.css
+ * Copyright (C) 2017 Freie Universität Berlin
+ *
+ * Distributed under terms of the LGPLv2.1 license (see LICENSE file).
+ */
+@import "variables.less";
+
+table, div, p, dl {
+  font-family: @font-family-base;
+}
+#brand-logo {
+  padding: 5px 0px 5px 0px;
+}
+.navbar {
+  margin-bottom: 0px;
+}
+.navbar-inverse {
+  border-radius: 0px;
+  border-bottom: 3px @navbar-inverse-border solid;
+}
+.nav-tabs-regs {
+  margin-top: 1px;
+  border-bottom: 1px solid @navbar-inverse-border;
+}
+.nav-tabs-regs > li.active > a {
+  border: 1px solid @navbar-inverse-border;
+  border-bottom-color: transparent;
+}
+#MSearchBox {
+  background-color: inherit;
+  float: none;
+  margin-top: 0;
+  right: auto;
+  width: auto;
+  position: static;
+  white-space: nowrap;
+}
+#MSearchClose {
+  position: absolute;
+  color: @navbar-inverse-link-color;
+  right: 10px;
+  top: 6px;
+  bottom: auto;
+  height: 14px;
+  margin: auto;
+  font-size: 14px;
+  z-index: 3;
+}
+#FSearchBox #MSearchField {
+  margin-left: auto;
+}
+#MSearchField {
+  background: @navbar-inverse-bg;
+  border: @input-border solid 1px;
+  color: @navbar-inverse-color;
+  display: inline;
+  font: 14px @font-family-base;
+  height: 34px;
+  width: 150px;
+  padding: 6px 12px;
+  position: static;
+  outline: inherit;
+  margin: auto;
+  font-size: 14px;
+  z-index: 1;
+}
+#MSearchSelect {
+  position: relative;
+  display: inline;
+  height: auto;
+  width: auto;
+}
+.MSearchBoxActive #MSearchField {
+  color: @navbar-inverse-color;
+}
+.MSearchBoxInactive #MSearchField {
+  color: @input-color-placeholder;
+}
+#MSearchSelectWindow {
+  background-color: @tooltip-bg;
+}
+a.SelectItem,
+a.SelectItem:focus,
+a.SelectItem:active {
+  color: @link-color;
+}
+#nav-sync {
+  display: none;
+}
+#nav-tree {
+  background: @well-bg;
+}
+#nav-tree img, #nav-tree span {
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+}
+#side-nav {
+  padding-right: 3px;
+}
+.ui-resizable-e {
+  background: @well-border;
+  width: 3px;
+}
+#nav-sync img {
+  opacity: 0.5;
+}
+div.toc, div.toc-sm {
+  min-height: 20px;
+  margin-bottom: 20px;
+  background-color: @well-bg;
+  border: 1px solid @well-border;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+div.toc {
+  padding: 19px;
+}
+div.toc-sm {
+  padding: 8px;
+}
+div.toc h3, div.toc-sm h3 {
+  font-family: @font-family-base;
+}
+div.toc-sm h3 {
+  margin-top: 0px;
+}
+div.toc-sm ul {
+  list-style: none;
+  margin: 0;
+  padding-left: 10px;
+}
+div.toc li, div.toc-sm li {
+  background: none;
+  font-family: @font-family-base;
+  margin-left: 0;
+}
+div.ingroups {
+  font-size: 10pt;
+}
+div.header {
+  background: none;
+  border-bottom: 1px solid @page-header-border-color;
+}
+h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {
+ text-shadow: 0 0 15px @state-success-border;
+}
+h2.groupheader {
+  border-color: @page-header-border-color;
+  color: @headings-color;
+}
+tr.heading h2 {
+  margin-bottom: 0px;
+}
+.memSeparator {
+  border-bottom: 1px solid @table-border-color;
+}
+.title {
+  color: @headings-color;
+  font-family: @headings-font-family;
+  font-size: floor((@font-size-h1 * 1.25));
+  line-height: floor((@font-size-h1 * 1.25 * @line-height-base));
+  font-weight: normal;
+}
+#projectname, #projectbrief, #projectnumber {
+  font-family: @font-family-base
+}
+#projectbrief {
+  font-size: floor((@font-size-base * 0.75));
+}
+pre.fragment {
+  font-family: @font-family-monospace;
+}
+div.fragment {
+  border: 1px solid @well-border;
+  border-radius: 4px;
+  background-color: @well-bg;
+  color: inherit;
+  display: block;
+  font-family: @font-family-monospace;
+  font-size: @font-size-base;
+  line-height: @line-height-base;
+  margin: 0 0 10px;
+  overflow: visible;
+  page-break-inside: avoid;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+div.line.glow {
+  background-color: @state-success-bg;
+  box-shadow: 0 0 10px @state-success-border;
+  -webkit-box-shadow: 0 0 15px @state-success-border;
+}
+span.lineno {
+  background-color: transparent;
+  border-right: 2px solid @well-border;
+}
+span.lineno a {
+  background-color: transparent;
+}
+span.lineno a:hover {
+  background-color: transparent;
+}
+div.directory {
+  border: 0px;
+}
+table.directory {
+  font-family: @font-family-base
+}
+.directory .arrow {
+  height: auto;
+}
+.directory .levels span {
+  color: @link-color;
+}
+.contents a:visited {
+  color: @link-color;
+}
+.contents a:hover {
+  color: @link-hover-color;
+}
+.directory td.entry {
+  padding-bottom: 8px;
+  padding-top: 8px;
+}
+.directory td.desc {
+  padding-bottom: 8px;
+  padding-top: 8px;
+  border-left: 0px;
+}
+.directory tr {
+  height: 32px;
+  padding-left: 0px;
+}
+.directory tr.even {
+  padding-left: 0px;
+  background-color: @table-bg-accent;
+}
+.memberdecls td.glow, .fieldtable tr.glow {
+  background-color: @state-success-bg;
+  box-shadow: 0 0 15px @state-success-border;
+  -webkit-box-shadow: 0 0 15px @state-success-border;
+}
+.mdescLeft,
+.mdescRight,
+.memItemLeft,
+.memItemRight,
+.memTemplItemLeft,
+.memTemplItemRight,
+.memTemplParams {
+  background-color: transparent;
+  color: @text-color;
+  border: none;
+  margin: 4px;
+  padding: 1px 0 0 8px;
+}
+.navpath ul {
+  color: @navbar-inverse-color;
+  background: @navbar-inverse-bg;
+  border: 0px;
+}
+.navpath li.footer {
+  color: @navbar-inverse-color;
+}
+.navpath li.navelem a {
+  font-family: @font-family-base;
+}
+.memitem {
+  margin-bottom: 20px;
+  background-color: @panel-bg;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.memitem.glow {
+  box-shadow: 0 0 15px @state-success-border;
+  -webkit-box-shadow: 0 0 15px @state-success-border;
+}
+.memdoc, dl.reflist > dd {
+  border: none;
+  background: @panel-bg;
+  padding: @panel-body-padding;
+  border-bottom: 1px solid @panel-default-border;
+  border-left: 1px solid @panel-default-border;
+  border-right: 1px solid @panel-default-border;
+}
+.memname {
+  font-weight: normal;
+  margin-left: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 16px;
+  color: inherit;
+}
+.memproto, dl.reflist > dt {
+  padding: @panel-heading-padding;
+  border-bottom: 1px solid transparent;
+  border-top: 1px solid @panel-default-border;
+  border-left: 1px solid @panel-default-border;
+  border-right: 1px solid @panel-default-border;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  color: @panel-default-text;
+  background: @panel-default-heading-bg;
+  text-shadow: none;
+}
+/* @group Code Colorization */
+a.code {
+  color: @link-color;
+}
+span.keyword, span.keywordtype, span.keywordflow, span.vhdlkeyword {
+  color: darken(@text-color, 10%);
+}
+span.keywordflow {
+  font-weight: bold;
+}
+span.comment {
+  color: @state-info-text;
+}
+span.preprocessor {
+  color: @state-success-text;
+}
+span.stringliteral {
+  color: @state-warning-text;
+}
+span.charliteral, span.vhdldigit, span.vhdlchar, span.vhdllogic {
+  color: @state-danger-text;
+}
+dl.attention, dl.bug, dl.deprecated, dl.invariant, dl.post, dl.pre, dl.note,
+dl.see, dl.test, dl.todo, dl.warning {
+  margin-left: 3px;
+  margin-bottom: 20px;
+  padding-left: 0px;
+  background-color: @panel-bg;
+  border-left: 0px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+dl.attention > dd, dl.deprecated > dd, dl.bug > dd, dl.invariant > dd,
+dl.post > dd, dl.pre > dd, dl.note > dd, dl.see > dd, dl.test > dd,
+dl.todo > dd, dl.warning > dd {
+  padding: @panel-body-padding;
+  margin-bottom: 0px
+}
+dl.attention > dt, dl.deprecated > dt, dl.bug > dt, dl.invariant > dt,
+dl.post > dt, dl.pre > dt, dl.note > dt, dl.see > dt, dl.test > dt,
+dl.todo > dt, dl.warning > dt {
+  padding: @panel-heading-padding;
+}
+dl.attention, dl.warning {
+  border-color: @panel-danger-border;
+}
+dl.attention > dt, dl.warning > dt {
+  color: @panel-danger-text;
+  background-color: @panel-danger-heading-bg;
+  border-color: @panel-danger-text;
+}
+dl.bug {
+  border-color: @panel-warning-border;
+}
+dl.bug a, dl.bug a:visited {
+  color: @panel-warning-text;
+}
+dl.bug a:hover {
+  color: darken(@panel-warning-text, 15%);
+}
+dl.bug > dt {
+  color: @panel-warning-text;
+  background-color: @panel-warning-heading-bg;
+  border-color: @panel-warning-text;
+}
+dl.deprecated {
+  border-color: darken(spin(@gray-light, -10), 5%)
+}
+dl.deprecated a, dl.deprecated a:visited {
+  color: @gray-darker;
+}
+dl.deprecated a:hover {
+  color: darken(@gray-darker, 15%);
+}
+dl.deprecated > dt {
+  color: @gray-darker;
+  background-color: @gray-light;
+  border-color: darken(spin(@gray-light, -10), 5%);
+}
+dl.note, dl.see {
+  border-color: @panel-primary-border;
+}
+dl.note > dt, dl.see > dt {
+  color: @panel-primary-text;
+  background-color: @panel-primary-heading-bg;
+  border-color: @panel-primary-border;
+}
+dl.post, dl.pre, dl.invariant {
+  border-color: @panel-success-border;
+}
+dl.post > dt, dl.pre > dt, dl.invariant > dt {
+  color: @panel-success-text;
+  background-color: @panel-success-heading-bg;
+  border-color: @panel-success-border;
+}
+dl.test {
+  border-color: spin(@panel-info-border, 30);
+}
+dl.test a, dl.test a:visited {
+  color: spin(@panel-info-text, 30);
+}
+dl.test a:hover {
+  color: darken(spin(@panel-info-text, 30), 15%);
+}
+dl.test > dt {
+  color: spin(@panel-info-text, 30);
+  background-color: spin(@panel-info-heading-bg, 30);
+  border-color: spin(@panel-info-border, 30);
+}
+dl.todo {
+  border-color: @panel-info-border;
+}
+dl.todo a, dl.todo a:visited {
+  color: @panel-info-text;
+}
+dl.todo a:hover {
+  color: darken(@panel-info-text, 15%);
+}
+dl.todo > dt {
+  color: @panel-info-text;
+  background-color: @panel-info-heading-bg;
+  border-color: @panel-info-border;
+}
+#powerTip div {
+  font-family: @font-family-base;
+}
+.params .paramdir {
+  font-family: @font-family-monospace;
+  padding-right: 0.5em;
+}
+.params .paramname {
+  padding-right: 2em;
+}
+.icon {
+  font-family: @font-family-base;
+}
+.img-responsive {
+  margin: 0 auto;
+}
+.image > img {
+  border: 1px solid @well-border;
+  border-radius: 4px;
+  background-color: @well-bg;
+  padding: 4px 6px;
+}

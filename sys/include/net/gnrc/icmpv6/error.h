@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_ICMPV6_ERROR_H
-#define GNRC_ICMPV6_ERROR_H
+#ifndef NET_GNRC_ICMPV6_ERROR_H
+#define NET_GNRC_ICMPV6_ERROR_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -165,5 +165,5 @@ static inline void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,
 }
 #endif
 
-#endif /* GNRC_ICMPV6_ERROR_H */
+#endif /* NET_GNRC_ICMPV6_ERROR_H */
 /** @} */

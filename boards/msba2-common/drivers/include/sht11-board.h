@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef SHT11BOARD_H
-#define SHT11BOARD_H
+#ifndef SHT11_BOARD_H
+#define SHT11_BOARD_H
 
 /**
  * @ingroup     lpc2387
@@ -53,4 +53,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* SHT11BOARD_H */
+#endif /* SHT11_BOARD_H */

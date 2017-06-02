@@ -20,8 +20,8 @@
  * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
  */
 
-#ifndef GNRC_RPL_STRUCTS_H
-#define GNRC_RPL_STRUCTS_H
+#ifndef NET_GNRC_RPL_STRUCTS_H
+#define NET_GNRC_RPL_STRUCTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -293,7 +293,7 @@ struct gnrc_rpl_instance {
 }
 #endif
 
-#endif /* GNRC_RPL_STRUCTS_H */
+#endif /* NET_GNRC_RPL_STRUCTS_H */
 /**
  * @}
  */

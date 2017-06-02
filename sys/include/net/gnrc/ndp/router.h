@@ -18,8 +18,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_NDP_ROUTER_H
-#define GNRC_NDP_ROUTER_H
+#ifndef NET_GNRC_NDP_ROUTER_H
+#define NET_GNRC_NDP_ROUTER_H
 
 #include <stdbool.h>
 
@@ -84,5 +84,5 @@ void gnrc_ndp_router_send_rtr_adv(gnrc_ipv6_nc_t *neighbor);
 }
 #endif
 
-#endif /* GNRC_NDP_ROUTER_H */
+#endif /* NET_GNRC_NDP_ROUTER_H */
 /** @} */

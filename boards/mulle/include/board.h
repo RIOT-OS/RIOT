@@ -81,17 +81,17 @@
 #define LED1_PIN            GPIO_PIN(PORT_C, LED1_BIT)
 #define LED2_PIN            GPIO_PIN(PORT_C, LED2_BIT)
 
-#define LED0_ON             (BITBAND_REG32(LED_PORT->PSOR, LED0_BIT) = 1)
-#define LED0_OFF            (BITBAND_REG32(LED_PORT->PCOR, LED0_BIT) = 1)
-#define LED0_TOGGLE         (BITBAND_REG32(LED_PORT->PTOR, LED0_BIT) = 1)
+#define LED0_ON             (LED_PORT->PSOR = (1 << LED0_BIT))
+#define LED0_OFF            (LED_PORT->PCOR = (1 << LED0_BIT))
+#define LED0_TOGGLE         (LED_PORT->PTOR = (1 << LED0_BIT))
 
-#define LED1_ON             (BITBAND_REG32(LED_PORT->PSOR, LED1_BIT) = 1)
-#define LED1_OFF            (BITBAND_REG32(LED_PORT->PCOR, LED1_BIT) = 1)
-#define LED1_TOGGLE         (BITBAND_REG32(LED_PORT->PTOR, LED1_BIT) = 1)
+#define LED1_ON             (LED_PORT->PSOR = (1 << LED1_BIT))
+#define LED1_OFF            (LED_PORT->PCOR = (1 << LED1_BIT))
+#define LED1_TOGGLE         (LED_PORT->PTOR = (1 << LED1_BIT))
 
-#define LED2_ON             (BITBAND_REG32(LED_PORT->PSOR, LED2_BIT) = 1)
-#define LED2_OFF            (BITBAND_REG32(LED_PORT->PCOR, LED2_BIT) = 1)
-#define LED2_TOGGLE         (BITBAND_REG32(LED_PORT->PTOR, LED2_BIT) = 1)
+#define LED2_ON             (LED_PORT->PSOR = (1 << LED2_BIT))
+#define LED2_OFF            (LED_PORT->PCOR = (1 << LED2_BIT))
+#define LED2_TOGGLE         (LED_PORT->PTOR = (1 << LED2_BIT))
 /** @} */
 
 #ifdef __cplusplus

@@ -63,7 +63,7 @@ extern void free (void *ptr);
 }
 #endif
 
-#endif /* malloc.h */
+#endif /* MALLOC_H */
 
 /**
  * @}

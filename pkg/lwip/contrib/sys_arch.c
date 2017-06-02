@@ -36,6 +36,11 @@ void sys_init(void)
     return;
 }
 
+u32_t sys_now(void)
+{
+    return (uint32_t)(xtimer_now_usec64() / US_PER_MS);
+}
+
 err_t sys_mutex_new(sys_mutex_t *mutex)
 {
     mutex_init((mutex_t *)mutex);

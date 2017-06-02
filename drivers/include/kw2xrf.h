@@ -20,8 +20,8 @@
  * @author      Sebastian Meiling <s@mlng.net>
  */
 
-#ifndef KW2XDRF_H
-#define KW2XDRF_H
+#ifndef KW2XRF_H
+#define KW2XRF_H
 
 #include <stdint.h>
 
@@ -170,5 +170,5 @@ void kw2xrf_reset_phy(kw2xrf_t *dev);
 }
 #endif
 
-#endif /* KW2XDRF_H */
+#endif /* KW2XRF_H */
 /** @} */

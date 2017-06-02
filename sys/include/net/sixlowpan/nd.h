@@ -19,8 +19,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef SIXLOWPAN_ND_H
-#define SIXLOWPAN_ND_H
+#ifndef NET_SIXLOWPAN_ND_H
+#define NET_SIXLOWPAN_ND_H
 
 #include <stdint.h>
 
@@ -227,5 +227,5 @@ static inline void sixlowpan_nd_opt_6ctx_set_cid(sixlowpan_nd_opt_6ctx_t *ctx_op
 }
 #endif
 
-#endif /* SIXLOWPAN_ND_H */
+#endif /* NET_SIXLOWPAN_ND_H */
 /** @} */

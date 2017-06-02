@@ -26,6 +26,9 @@
 #include "od.h"
 #include "fmt.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 static void _resp_handler(unsigned req_state, coap_pkt_t* pdu);
 static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
 
@@ -110,7 +113,7 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
     memcpy(&remote.addr.ipv6[0], &addr.u8[0], sizeof(addr.u8));
 
     /* parse port */
-    remote.port = (uint16_t)atoi(port_str);
+    remote.port = atoi(port_str);
     if (remote.port == 0) {
         puts("gcoap_cli: unable to parse destination port");
         return 0;
@@ -149,15 +152,33 @@ int gcoap_cli_cmd(int argc, char **argv)
                                                                            argv[4]);
                 }
                 printf("gcoap_cli: sending msg ID %u, %u bytes\n", coap_get_id(&pdu),
-                                                                   (unsigned) len);
+                       (unsigned) len);
                 if (!_send(&buf[0], len, argv[2], argv[3])) {
                     puts("gcoap_cli: msg send failed");
+                }
+                else {
+                    /* send Observe notification for /cli/stats */
+                    switch (gcoap_obs_init(&pdu, &buf[0], GCOAP_PDU_BUF_SIZE,
+                            &_resources[0])) {
+                    case GCOAP_OBS_INIT_OK:
+                        DEBUG("gcoap_cli: creating /cli/stats notification\n");
+                        size_t payload_len = fmt_u16_dec((char *)pdu.payload, req_count);
+                        len = gcoap_finish(&pdu, payload_len, COAP_FORMAT_TEXT);
+                        gcoap_obs_send(&buf[0], len, &_resources[0]);
+                        break;
+                    case GCOAP_OBS_INIT_UNUSED:
+                        DEBUG("gcoap_cli: no observer for /cli/stats\n");
+                        break;
+                    case GCOAP_OBS_INIT_ERR:
+                        DEBUG("gcoap_cli: error initializing /cli/stats notification\n");
+                        break;
+                    }
                 }
                 return 0;
             }
             else {
                 printf("usage: %s <get|post|put> <addr> <port> <path> [data]\n",
-                                                                       argv[0]);
+                       argv[0]);
                 return 1;
             }
         }
@@ -165,8 +186,7 @@ int gcoap_cli_cmd(int argc, char **argv)
 
     if (strcmp(argv[1], "info") == 0) {
         if (argc == 2) {
-            uint8_t open_reqs;
-            gcoap_op_state(&open_reqs);
+            uint8_t open_reqs = gcoap_op_state();
 
             printf("CoAP server is listening on port %u\n", GCOAP_PORT);
             printf(" CLI requests sent: %u\n", req_count);

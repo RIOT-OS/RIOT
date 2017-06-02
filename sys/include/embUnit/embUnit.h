@@ -55,4 +55,4 @@ extern "C" {
 }
 #endif
 
-#endif/* EMBUNIT_EMBUNIT_H */
+#endif /* EMBUNIT_EMBUNIT_H */

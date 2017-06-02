@@ -1,4 +1,4 @@
-APPLICATION = xtimer_sleep_until
+APPLICATION = xtimer_periodic_wakeup
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := chronos

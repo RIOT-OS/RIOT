@@ -65,4 +65,4 @@ extern const TestImplement TestCaseImplement;
 }
 #endif
 
-#endif/* EMBUNIT_TESTCASE_H */
+#endif /* EMBUNIT_TESTCASE_H */

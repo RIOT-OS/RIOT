@@ -62,7 +62,7 @@ static void _set_test_mode(int argc, char **argv, uint8_t mode)
 {
     (void) argc;
     if (_is_number(argv[1])) {
-        kernel_pid_t dev = (kernel_pid_t)atoi(argv[1]);
+        kernel_pid_t dev = atoi(argv[1]);
 
         if (_is_iface(dev)) {
             gnrc_netapi_set(dev, NETOPT_RF_TESTMODE, 0, (void *)&mode, sizeof(mode));

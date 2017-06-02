@@ -72,5 +72,5 @@ void pm_set(unsigned mode);
 }
 #endif
 
-#endif /* __PM_LAYERED_H */
+#endif /* PM_LAYERED_H */
 /** @} */
