@@ -73,8 +73,8 @@ endif
 ifneq (,$(filter jc42,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/jc42/include
 endif
-ifneq (,$(filter bme280,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/bme280/include
+ifneq (,$(filter bm%280,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/bmx280/include
 endif
 ifneq (,$(filter tsl2561,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/tsl2561/include
