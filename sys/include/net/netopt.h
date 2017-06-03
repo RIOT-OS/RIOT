@@ -260,6 +260,15 @@ typedef enum {
      */
     NETOPT_L2FILTER_RM,
 
+    /**
+     * @brief   Energy level during the last performed CCA or RX frame
+     *
+     * Get the last ED level available as an int8_t. The source of the
+     * measurement is unspecified and may come from the latest CCA
+     * measurement (CCA mode 1), or from the last received frame.
+     */
+    NETOPT_LAST_ED_LEVEL,
+
     /* add more options if needed */
 
     /**

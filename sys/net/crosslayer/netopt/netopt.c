@@ -60,6 +60,7 @@ static const char *_netopt_strmap[] = {
     [NETOPT_RF_TESTMODE]     = "NETOPT_RF_TESTMODE",
     [NETOPT_L2FILTER]        = "NETOPT_L2FILTER",
     [NETOPT_L2FILTER_RM]     = "NETOPT_L2FILTER_RM",
+    [NETOPT_LAST_ED_LEVEL]   = "NETOPT_LAST_ED_LEVEL",
     [NETOPT_NUMOF]           = "NETOPT_NUMOF",
 };
 
