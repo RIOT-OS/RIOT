@@ -50,7 +50,7 @@ void dump_pkt(gnrc_pktsnip_t *pkt)
     gnrc_pktsnip_t *snip = pkt;
 
     printf("rftest-rx --- len 0x%02x lqi 0x%02x rx_time 0x%08" PRIx64 "\n\n",
-           gnrc_pkt_len(pkt), 0, xtimer_now64());
+           gnrc_pkt_len(pkt), 0, xtimer_usec_from_ticks64(xtimer_now64()));
 
     while (snip) {
         for (size_t i = 0; i < snip->size; i++) {
