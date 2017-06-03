@@ -36,9 +36,13 @@ export UNDEF += $(BINDIR)/cpu/fcfield.o
 # include common periph drivers
 USEMODULE += periph_common
 
-# select kinetis periph drivers
+# select Kinetis periph drivers
+USEMODULE += periph_llwu
 USEMODULE += periph_mcg
 USEMODULE += periph_wdog
+
+# Enable power management by default
+USEMODULE += pm_layered
 
 # Define a recipe to build the watchdog disable binary, used when flashing
 $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin: $(RIOTCPU)/$(CPU)/dist/wdog-disable.s

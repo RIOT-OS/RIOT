@@ -2,6 +2,7 @@ FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_gpio_irq
+FEATURES_PROVIDED += periph_llwu
 FEATURES_PROVIDED += periph_mcg
 
 include $(RIOTCPU)/cortexm_common/Makefile.features

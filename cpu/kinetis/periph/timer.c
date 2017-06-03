@@ -30,7 +30,20 @@
 #include "bit.h"
 #include "board.h"
 #include "periph_conf.h"
+#if MODULE_PERIPH_LLWU
+#include "llwu.h"
+#endif
 #include "periph/timer.h"
+#if MODULE_PM_LAYERED
+#include "pm_layered.h"
+#define PM_BLOCK(x) pm_block(x)
+#define PM_UNBLOCK(x) pm_unblock(x)
+#else
+#define PM_BLOCK(x)
+#define PM_UNBLOCK(x)
+#endif
+
+
 
 #ifdef PIT_LTMR64H_LTH_MASK
 /* The KW41Z PIT module provides only one IRQ for all PIT channels combined. */
@@ -176,6 +189,8 @@ static inline int pit_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     /* Start the prescaler counter */
     PIT->CHANNEL[pit_config[dev].prescaler_ch].TCTRL = (PIT_TCTRL_TEN_MASK);
     PIT->CHANNEL[count_ch].TCTRL = PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
+    /* PIT is halted in STOP mode, we need to block it */
+    PM_BLOCK(KINETIS_PM_STOP);
 
     irq_restore(mask);
     return 0;
@@ -253,12 +268,22 @@ static inline uint32_t pit_read(uint8_t dev)
 static inline void pit_start(uint8_t dev)
 {
     uint8_t ch = pit_config[dev].prescaler_ch;
+    if (PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) {
+        /* Already running */
+        return;
+    }
+    PM_BLOCK(KINETIS_PM_STOP);
     PIT->CHANNEL[ch].TCTRL = PIT_TCTRL_TEN_MASK;
 }
 
 static inline void pit_stop(uint8_t dev)
 {
     uint8_t ch = pit_config[dev].prescaler_ch;
+    if (!(PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK)) {
+        /* Already stopped */
+        return;
+    }
+    PM_UNBLOCK(KINETIS_PM_STOP);
     PIT->CHANNEL[ch].TCTRL = 0;
 }
 
@@ -355,6 +380,9 @@ static inline int lptmr_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *ar
     /* Enable IRQs on the counting channel */
     NVIC_ClearPendingIRQ(lptmr_config[dev].irqn);
     NVIC_EnableIRQ(lptmr_config[dev].irqn);
+#if MODULE_PERIPH_LLWU
+    llwu_wakeup_module_enable(lptmr_config[dev].llwu);
+#endif
 
     _lptmr_set_cb_config(dev, cb, arg);
 
