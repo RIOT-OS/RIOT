@@ -10,6 +10,7 @@ ifneq (,$(filter-out $(_KINETIS_CPU_MODELS_WITHOUT_HWRNG),$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_hwrng
 endif
 
+FEATURES_PROVIDED += periph_llwu
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_gpio_irq
 
