@@ -17,6 +17,7 @@ else ifneq (,$(filter periph_mcg,$(FEATURES_USED)))
   USEMODULE += periph_mcg
 endif
 
+USEMODULE += periph_llwu
 USEMODULE += periph_wdog
 USEMODULE += pm_layered
 
