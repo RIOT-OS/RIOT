@@ -369,7 +369,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         }
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += len;
+        netdev->stats.rx_bytes += payload_len;
 #endif
         /* read packet (without 4 bytes checksum) */
         sram_op(dev, ENC_RRXDATA, 0xFFFF, buf, payload_len);
