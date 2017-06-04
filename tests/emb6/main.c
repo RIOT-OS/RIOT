@@ -72,6 +72,8 @@ static int ifconfig(int argc, char **argv)
 
 static void *_emb6_thread(void *args)
 {
+    (void)args;
+
     emb6_process(500);  /* never stops */
     return NULL;
 }
