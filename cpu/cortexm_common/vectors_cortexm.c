@@ -90,6 +90,9 @@ void reset_handler_default(void)
     }
 #endif
 
+    /* Workaround for compiling without optimization: -O0 */
+    src = &_etext;
+
     /* load data section from flash to ram */
     for (dst = &_srelocate; dst < &_erelocate; ) {
         *(dst++) = *(src++);
