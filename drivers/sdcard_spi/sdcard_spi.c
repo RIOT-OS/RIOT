@@ -94,7 +94,6 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
                   (gpio_init(card->params.power, GPIO_OUT) == 0)) ) {
 
                 DEBUG("gpio_init(): [OK]\n");
-                xtimer_init();
                 return SD_INIT_SPI_POWER_SEQ;
             }
 
