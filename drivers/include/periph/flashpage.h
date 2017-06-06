@@ -11,10 +11,6 @@
  * @ingroup     drivers_periph
  * @brief       Low-level flash page interface
  *
- * @{
- * @file
- * @brief       Low-level flash page peripheral driver interface
- *
  * This interface provides a very simple and straight forward way for writing
  * a MCU's internal flash. This interface is only capable of reading, verifying,
  * and writing complete flash pages, it has no support for partial flash access.
@@ -26,6 +22,10 @@
  * @note        Flash memory has only a limited amount of erase cycles (mostly
  *              around 10K times), so using this interface in some kind of loops
  *              can damage you MCU!
+ *
+ * @{
+ * @file
+ * @brief       Low-level flash page peripheral driver interface
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
