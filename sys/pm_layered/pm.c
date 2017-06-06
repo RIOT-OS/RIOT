@@ -21,6 +21,7 @@
 #include "irq.h"
 #include "periph/pm.h"
 #include "pm_layered.h"
+#include "board.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
