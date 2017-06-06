@@ -11,12 +11,20 @@
  * @ingroup     drivers_periph
  * @brief       Low-level I2C peripheral driver
  *
- * @{
- * @file
- * @brief       Low-level I2C peripheral driver interface definition
+ * This is a simple I2C interface to allow platform independent access to a
+ * MCU's I2C bus and peripherals. This interface is intentionally designed as
+ * simple as possible, to allow for easy implementation and maximal portability.
+ *
+ * @note        The current version of this interface only supports the
+ *              7-bit addressing mode.
+ *
+ * @note        This interface is due for remodeling, hence API changes are to
+ *              be expected for upcoming releases.
+ *
+ * ## A note on pull-up resistors for SDA/SCL
  *
  * The I2C signal lines SDA/SCL need external pull-up resistors which connect
- * the lines to the positive voltage supply Vcc. The I2C driver implementation
+ * the lines to the positive voltage supply VCC. The I2C driver implementation
  * should enable the pin's internal pull-up resistors. There are however some
  * use cases for which the internal pull resistors are not strong enough and the
  * I2C bus will show faulty behavior. This can for example happen when
@@ -44,8 +52,9 @@
  * For more details refer to section 7.1 in:<br>
  * http://www.nxp.com/documents/user_manual/UM10204.pdf
  *
- * @note        The current version of this interface only supports the
-                7-bit addressing mode.
+ * @{
+ * @file
+ * @brief       Low-level I2C peripheral driver interface definition
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
