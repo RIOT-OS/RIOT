@@ -510,6 +510,10 @@ ifneq (,$(filter gnrc_netdev,$(USEMODULE)))
   USEMODULE += netopt
 endif
 
+ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+  USEMODULE += netif
+endif
+
 ifneq (,$(filter netstats_%, $(USEMODULE)))
   USEMODULE += netstats
 endif

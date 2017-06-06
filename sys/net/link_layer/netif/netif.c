@@ -40,7 +40,17 @@ netif_t netif_setup(const netif_params_t *params, unsigned subtype,
                     netdev_t *netdev, void *priv_data)
 {
     switch (params->type) {
-        /* TODO: type specific calls */
+#ifdef MODULE_GNRC
+        case NETIF_TYPE_GNRC_DEFAULT: {
+            kernel_pid_t res;
+            DEBUG("netif: Initialize %s as GNRC interface\n", params->name);
+            if ((res = gnrc_netdev_setup(params, subtype, netdev,
+                                         priv_data)) == KERNEL_PID_UNDEF) {
+                return NETIF_INVALID;
+            }
+            return (netif_t)res;
+        }
+#endif
         default:
             (void)subtype;
             (void)netdev;

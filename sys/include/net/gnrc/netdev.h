@@ -38,6 +38,7 @@
 #include "net/gnrc/mac/types.h"
 #include "net/ieee802154.h"
 #include "net/gnrc/mac/mac.h"
+#include "net/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,6 +66,21 @@ extern "C" {
  *          packet
  */
 #define GNRC_NETDEV_MAC_INFO_RX_STARTED         (0x0004U)
+
+/**
+ * @brief   Sub-types for interface initialization
+ * @anchor  net_gnrc_netif_type
+ */
+enum {
+    GNRC_NETDEV_TYPE_NONE = 0,      /**< No specified type */
+    GNRC_NETDEV_TYPE_ETH,           /**< Use Ethernet adaptation layer
+                                     *   (see net/gnrc/netdev/eth.h) */
+    GNRC_NETDEV_TYPE_IEEE802154,    /**< Use IEEE 802.15.4 adaptation layer
+                                     *   (see net/gnrc/netdev/ieee802154.h) */
+    GNRC_NETDEV_TYPE_CC110X,        /**< Use CC110X adaptation layer (see gnrc_netdev_cc110x.h) */
+    GNRC_NETDEV_TYPE_XBEE,          /**< Use XBEE adaptation layer (see xbee_adpt.h) */
+    /* extend if needed */
+};
 
 /**
  * @brief Structure holding GNRC netdev adapter state
@@ -204,19 +220,21 @@ static inline void gnrc_netdev_set_tx_feedback(gnrc_netdev_t *dev,
 #endif
 
 /**
- * @brief Initialize GNRC netdev handler thread
+ * @brief   Setup GNRC network interface (== GNRC netdev handler thread) from
+ *          network interface parameters
  *
- * @param[in] stack         ptr to preallocated stack buffer
- * @param[in] stacksize     size of stack buffer
- * @param[in] priority      priority of thread
- * @param[in] name          name of thread
- * @param[in] gnrc_netdev  ptr to netdev device to handle in created thread
+ * @param[in] params    Initialization parameters of the interface
+ * @param[in] subtype   See @ref net_gnrc_netif_type "GNRC netif subtypes"
+ * @param[in] netdev    The set-up'd (but not initialized) network device, based
+ *                      on device specific parameters netif_params_t::dev_params
+ *
+ * @note    Called by @ref netif_setup() with `auto_init`.
  *
  * @return pid of created thread
  * @return KERNEL_PID_UNDEF on error
  */
-kernel_pid_t gnrc_netdev_init(char *stack, int stacksize, char priority,
-                               const char *name, gnrc_netdev_t *gnrc_netdev);
+kernel_pid_t gnrc_netdev_setup(const netif_params_t *params, unsigned subtype,
+                               netdev_t *netdev, gnrc_netdev_t *iface);
 
 #ifdef __cplusplus
 }

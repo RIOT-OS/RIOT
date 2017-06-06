@@ -23,7 +23,16 @@
 #include "msg.h"
 #include "thread.h"
 
+#include "log.h"
+#ifdef MODULE_CC110X
+#include "gnrc_netdev_cc110x.h"
+#endif
 #include "net/gnrc.h"
+#include "net/gnrc/netdev/eth.h"
+#include "net/gnrc/netdev/ieee802154.h"
+#ifdef MODULE_XBEE
+#include "net/gnrc/netdev/xbee_adpt.h"
+#endif
 #include "net/gnrc/nettype.h"
 #include "net/netdev.h"
 
@@ -57,7 +66,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         msg.content.ptr = gnrc_netdev;
 
         if (msg_send(&msg, gnrc_netdev->pid) <= 0) {
-            puts("gnrc_netdev: possibly lost interrupt.");
+            LOG_ERROR("gnrc_netdev: possibly lost interrupt.");
         }
     }
     else {
@@ -180,8 +189,8 @@ static void *_gnrc_netdev_thread(void *args)
     return NULL;
 }
 
-kernel_pid_t gnrc_netdev_init(char *stack, int stacksize, char priority,
-                        const char *name, gnrc_netdev_t *gnrc_netdev)
+static kernel_pid_t gnrc_netdev_init(char *stack, int stacksize, char priority,
+                                     const char *name, gnrc_netdev_t *gnrc_netdev)
 {
     kernel_pid_t res;
 
@@ -197,5 +206,55 @@ kernel_pid_t gnrc_netdev_init(char *stack, int stacksize, char priority,
         return -EINVAL;
     }
 
+    return res;
+}
+
+kernel_pid_t gnrc_netdev_setup(const netif_params_t *params, unsigned subtype,
+                               netdev_t *netdev, gnrc_netdev_t *iface)
+{
+    /* XXX: hacky way to get the stack in here */
+    char *stack = (char *)iface->dev;
+    int stacksize = (int)iface->pid;
+    int res = KERNEL_PID_UNDEF;
+
+    iface->dev = NULL;
+    switch (subtype) {
+#ifdef MODULE_NETDEV_ETH
+        case GNRC_NETDEV_TYPE_ETH:
+            gnrc_netdev_eth_init(iface, netdev);
+            break;
+#endif
+#ifdef MODULE_NETDEV_IEEE802154
+        case GNRC_NETDEV_TYPE_IEEE802154:
+            gnrc_netdev_ieee802154_init(iface, (netdev_ieee802154_t *)netdev);
+            break;
+#endif
+#ifdef MODULE_CC110X
+        case GNRC_NETDEV_TYPE_CC110X:
+            gnrc_netdev_cc110x_init(iface, (netdev_cc110x_t *)netdev);
+            break;
+#endif
+#ifdef MODULE_XBEE
+        case GNRC_NETDEV_TYPE_XBEE:
+            gnrc_netdev_xbee_init(iface, (xbee_t *)netdev);
+            break;
+#endif
+        default:
+            break;
+    }
+    if (iface->dev != netdev) {
+        LOG_ERROR("[gnrc_netdev_setup] error initializing interface '%s'\n",
+                  params->name);
+    }
+    else {
+        switch (params->type) {
+            case NETIF_TYPE_GNRC_DEFAULT:
+                res = gnrc_netdev_init(stack, stacksize, GNRC_NETDEV_MAC_PRIO,
+                                       params->name, iface);
+                break;
+            default:
+                break;
+        }
+    }
     return res;
 }
