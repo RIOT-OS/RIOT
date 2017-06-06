@@ -13,21 +13,26 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#ifdef MODULE_GNRC
+#include "net/gnrc/netdev.h"
+#endif
+
 #include "net/netif.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-netif_params_t *netif_params_default = NULL;
-
-netif_params_t *netif_params_get_by_dev(netif_params_t *netif_params,
-                                        const void *dev_params)
+/* XXX: rename parameters locally to not conflict with global names in
+ * NETIF_NUMOF macro*/
+const netif_params_t *netif_params_get_by_dev(const netif_params_t *nparams,
+                                              const void *dparams)
 {
-    for (int i = 0; i < NETIF_NUMOF; i++) {
-        if (netif_params[i].dev_params == dev_params) {
-            return &netif_params[i];
+    for (unsigned i = 0; i < NETIF_NUMOF; i++) {
+        if (nparams[i].dev_params == dparams) {
+            return &nparams[i];
         }
     }
+    DEBUG("netif: found no fitting netif parameters for dev %p\n", dparams);
     return NULL;
 }
 

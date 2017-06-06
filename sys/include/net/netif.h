@@ -42,13 +42,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Maximum number of network interfaces
- */
-#ifndef NETIF_NUMOF
-#define NETIF_NUMOF         (1U)
-#endif
-
-/**
  * @brief   Type of the interface
  */
 typedef enum {
@@ -95,15 +88,19 @@ typedef struct {
     const char *name;       /**< name of the interface */
 } netif_params_t;
 
+#include "netif_params.h"
+
+/**
+ * @brief   Maximum number of network interfaces
+ */
+#ifndef NETIF_NUMOF
+#define NETIF_NUMOF         (sizeof(netif_params) / sizeof(netif_params[0]))
+#endif
+
 /**
  * @brief   Network interface enumeration type
  */
 typedef intptr_t netif_t;
-
-/**
- * @brief   Parameters for the default network device of the @ref boards
- */
-extern void *netdev_params_default;
 
 /**
  * @brief   Gets a network interface parameter struct from an array of parameter
@@ -115,14 +112,14 @@ extern void *netdev_params_default;
  * @return  The parameters with netif_params_t::dev_params == @p dev_params
  * @return  NULL, if there are no such parameters in @p netif_params
  */
-netif_params_t *netif_params_get_by_dev(netif_params_t *netif_params,
-                                        const void *dev_params);
+const netif_params_t *netif_params_get_by_dev(const netif_params_t *netif_params,
+                                              const void *dev_params);
 
 /**
  * @brief   Set-up interface
  *
  * @param[in] params    Initialization parameters of the interface
- * @param[in] subtype   netif_params_t:: specific sub-type based on the nature
+ * @param[in] subtype   netif_params_t::type specific sub-type based on the nature
  *                      of @p netdev (e.g. specifies that the device is an
  *                      Ethernet or IEEE 802.15.4 device). May be 0 and ignored
  *                      if not required by network stack.
