@@ -26,9 +26,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/** @brief Stack size for module thread */
-#define GCOAP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
-
 /* Internal functions */
 static void *_event_loop(void *arg);
 static void _listen(sock_udp_t *sock);
