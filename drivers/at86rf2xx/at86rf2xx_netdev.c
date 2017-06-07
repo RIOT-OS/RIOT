@@ -208,22 +208,27 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     (void)tmp;
 #endif
 
-    if (info != NULL) {
+    if (info != NULL)
+    {
         netdev_ieee802154_rx_info_t *radio_info = info;
-        at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
+
 #if defined(MODULE_AT86RFR2)
 		at86rf2xx_sram_read(dev, pkt_len+2, &(radio_info->lqi),1); // skip Payload + FCS
+		at86rf2xx_fb_stop(dev); // /* clear frame buffer protection */
 		radio_info->rssi = (PHY_RSSI & 0x1f); // MASK highest 3 bits
 		DEBUG("[at86rf2xx] LQI:%d high value is good, RSSI:%d high value can be good or interferer.\n", radio_info->lqi, radio_info->rssi);
-#elif !defined(MODULE_AT86RF231)
-        at86rf2xx_fb_read(dev, &(radio_info->rssi), 1);
-        at86rf2xx_fb_stop(dev);
-#else
+#elif defined(MODULE_AT86RF231)
+        at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
         at86rf2xx_fb_stop(dev);
         radio_info->rssi = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
+#else // for all other Modules
+		at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
+		at86rf2xx_fb_read(dev, &(radio_info->rssi), 1);
+        at86rf2xx_fb_stop(dev);
 #endif
     }
-    else {
+    else
+    {
         at86rf2xx_fb_stop(dev);
     }
     return pkt_len;
@@ -594,7 +599,9 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
 //    }
 //
 //    if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN) {
-//        if (state == AT86RF2XX_STATE_RX_AACK_ON ||
+//    	DEBUG("[at86rf2xx] EVT - END\n");
+//
+//    	if (state == AT86RF2XX_STATE_RX_AACK_ON ||
 //            state == AT86RF2XX_STATE_BUSY_RX_AACK) {
 //            DEBUG("[at86rf2xx] EVT - RX_END\n");
 //            if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)) {
@@ -649,7 +656,7 @@ static void _isr(netdev_t *netdev){
 
 	uint8_t state = at86rf2xx_get_status(dev);
 
-	DEBUG("[at86rf2xx] irq_status= 0x%2x, irq_status1= 0x%2x .\n", dev->irq_status, dev->irq_status1 );
+	// DEBUG("[at86rf2xx] irq_status=0x%2x, irq_status1=0x%02x .\n", dev->irq_status, dev->irq_status1 );
 
     /*
 	 * If transceiver is sleeping there should be no interrupts triggered.
@@ -657,9 +664,10 @@ static void _isr(netdev_t *netdev){
 	if (state == AT86RF2XX_STATE_SLEEP)
 	{
 		printf("[at86rf2xx] Error at86rfr2_interrupt_thread: Interrupt triggered while transceiver is in sleep.\n");
-		printf("[at86rf2xx] irq_status= %u, irq_status1= %u .\n", dev->irq_status, dev->irq_status1 );
+		printf("[at86rf2xx] irq_status=0x%2x, irq_status1=0x%2x .\n", dev->irq_status, dev->irq_status1 );
 		dev->irq_status=0;
 		dev->irq_status1=0;
+		return;
 
 	}else
 	{
@@ -676,72 +684,151 @@ static void _isr(netdev_t *netdev){
 					  AT86RF2XX_TRX_STATE_MASK__TRAC;
 
 
-//	    if (irq_status & AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN)
-//	    {
-//	    	dev->irq_status &= ~AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN;
-//
-//	    	if (state == AT86RF2XX_STATE_RX_AACK_ON ||
-//	            state == AT86RF2XX_STATE_BUSY_RX_AACK)
-//	        {
-//	            /*
-//	             * if state is auto ack or busy the transceiver got some data
-//	             */
-//	            if (dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)
-//	            {
-//		            netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
-//	            }
-//	            DEBUG("[at86rf2xx] EVT - RX_END\n");
-//
-//		    	/* set transceiver back to receiving state*/
-//	            /*
-//	             * Packet is read in the event_callback so new data will not override the old.
-//	             */
-//		    	at86rf2xx_set_state(dev, AT86RF2XX_TRX_STATE__RX_AACK_ON);
-//
-//	        }
-//	    	else if (state == AT86RF2XX_STATE_TX_ARET_ON ||
-//	                 state == AT86RF2XX_STATE_BUSY_TX_ARET)
-//	        {
-//	            /* check for more pending TX calls and return to idle state if
-//	             * there are none */
-//	            assert(dev->pending_tx != 0);
-//	            if ((--dev->pending_tx) == 0) {
-//	                at86rf2xx_set_state(dev, dev->idle_state);
-//	                DEBUG("[at86rf2xx] return to state 0x%x\n", dev->idle_state);
-//	            }
-//
-//	            DEBUG("[at86rf2xx] EVT - TX_END\n");
-//
-//	            if (netdev->event_callback && (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END))
-//	            {
-//	                switch (trac_status)
-//	                {
-//	                    case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
-//	                    case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
-//	                        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-//	                        DEBUG("[at86rf2xx] TX SUCCESS\n");
-//	                        break;
-//	                    case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
-//	                        netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
-//	                        DEBUG("[at86rf2xx] TX NO_ACK\n");
-//	                        break;
-//	                    case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
-//	                        netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
-//	                        DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
-//	                        break;
-//	                    default:
-//	                        DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",
-//	                              trac_status >> 5);
-//	                }
-//	            }
-//	        }
-//	    	return;
-//	    }
 
 	    /*
 	     * IRQ Status
+	     *
+	     * Ordered in sequence of appearence or priority
+	     * AMI
+	     * RX_END
+	     * TX_END
+	     * ...
 	     */
-	    if (irq_status & AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN)
+
+		if (irq_status & AT86RF2XX_IRQ_STATUS_MASK__AMI_EN)
+		{
+			dev->irq_status &= ~AT86RF2XX_IRQ_STATUS_MASK__AMI_EN;
+			DEBUG("[at86rf2xx] AMI\n");
+			return;
+		}
+
+		/*
+		 * See ATmega256/128/64RFR2 p. 52 and 63 Flow Diagram
+		 * and p. 66 Interrupt Handling in Extended Operating Mode
+		 *
+		 *  TRX24_TX_END is generated after
+		 *  	A received frame must pass the address filter
+		 *  	The FCS is valid
+		 *
+		 * Returns back to RX_AACK_ON state
+		 * till the Packet is read in the event_callback
+		 * and the frame buffer protection is cleared
+		 * no new data will be written to frame buffer.
+		 */
+		if (irq_status & AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN)
+		{
+			dev->irq_status &= ~AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN;
+
+			// test to find Ping Reception problem
+			return;
+
+			if (dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)
+			{
+				netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+			}
+			DEBUG("[at86rf2xx] EVT - RX_END\n");
+
+			/* Transceiver will be in RX_AACK_ON or BUSY_RX_AACK state
+			 *
+			 * Packet is read in the event_callback and frame buffer protection will be released then.
+			 * New data will not override the old in frame buffer.
+			 */
+			/* should not be necessary*/
+			// at86rf2xx_set_state(dev, AT86RF2XX_TRX_STATE__RX_AACK_ON);
+			return;
+		}
+
+		/*
+		 * See ATmega256/128/64RFR2 p. 52 and 63 Flow Diagram
+		 *
+		 *  TRX24_TX_END is generated after
+		 *  	auto "Transmit ACK" 	returns to TRX_STATE = RX_AACK_ON
+		 *  	Transmit Frame 			returns to TRX_STATE = TX_ARET_ON
+		 *
+		 *  No event to upper layer if in RX_AACK_ON state
+		 *  event is only generated for explicit transmit states
+		 */
+		if (irq_status & AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN)
+		{
+			dev->irq_status &= ~AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN;
+
+			DEBUG("[at86rf2xx] INT - TX_END\n");
+
+			/* Acknowledging of Received data done */
+			state = at86rf2xx_get_status(dev);
+			if( state == AT86RF2XX_STATE_RX_AACK_ON ||
+				state == AT86RF2XX_STATE_BUSY_RX_AACK )
+			{
+				if (dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)
+				{
+					netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+				}
+				DEBUG("[at86rf2xx] EVT - ACK SEND\n");
+				return;
+			}
+
+			/* check for more pending TX calls
+			 * set if there are none go to RX_AACK_ON
+			 * else stay in TX_ARET_ON.
+			 */
+			///TODO check if this works as described above, now the old implementation is used.
+			if ((--dev->pending_tx) == 0) {
+//				at86rf2xx_set_state(dev, dev->idle_state);// idle state is AT86RF2XX_STATE_TRX_OFF
+//				DEBUG("[at86rf2xx] return to state 0x%x\n", dev->idle_state);
+				/* return to receive state
+				 * but this should not be necessary
+				 * */
+				at86rf2xx_set_state(dev, AT86RF2XX_TRX_STATE__RX_AACK_ON);
+				DEBUG("[at86rf2xx] return to state RX_AACK_ON \n");
+			}
+			else
+			{
+				/* return to transmit state
+				 * but this should not be necessary
+				 * */
+				at86rf2xx_set_state(dev, AT86RF2XX_TRX_STATE__TX_ARET_ON);
+				DEBUG("[at86rf2xx] return to state TX_ARET_ON\n");
+			}
+
+			DEBUG("[at86rf2xx] EVT - TX_END\n");
+
+			if (state == AT86RF2XX_STATE_TX_ARET_ON ||
+			                 state == AT86RF2XX_STATE_BUSY_TX_ARET) {
+
+
+				if (netdev->event_callback && (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END))
+				{
+					switch (trac_status)
+					{
+						case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
+						case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
+							netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+							DEBUG("[at86rf2xx] TX SUCCESS\n");
+							break;
+						case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
+							netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
+							DEBUG("[at86rf2xx] TX NO_ACK\n");
+							break;
+						case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
+							netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
+							DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
+							break;
+						default:
+							DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",
+								  trac_status >> 5);
+							break;
+					}
+
+				}
+				return;
+			}else
+			{
+				DEBUG("[at86rf2xx] Unhandled state: 0x%2x\n",state);
+			}
+		}
+
+
+		if (irq_status & AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN)
 	    {
 	    	dev->irq_status &= ~AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN;
 
@@ -749,117 +836,28 @@ static void _isr(netdev_t *netdev){
 	    	at86rf2xx_set_state(dev, AT86RF2XX_TRX_STATE__RX_AACK_ON);
 
 	    	DEBUG("[at86rf2xx] PLL Lock\n");
-	    	return;
+	        return;
 	    }
 
 	    if (irq_status & AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK_EN)
 	    {
 	    	dev->irq_status &= ~AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK_EN;
 	    	DEBUG("[at86rf2xx] PLL unlock\n");
-	    	return;
+	        return;
 	    }
 
 	    if (irq_status & AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN) {
 
 	    	dev->irq_status &= ~AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN;
 
-	    	if ((dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_START))
-            {
+//	    	if ((dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_START))
+//            {
 	    		netdev->event_callback(netdev, NETDEV_EVENT_RX_STARTED);
-            }
+//            }
 	        DEBUG("[at86rf2xx] EVT - RX_START\n");
 	        return;
 	    }
 
-	    /*
-	     * See ATmega256/128/64RFR2 p. 52 and 63 Flow Diagram
-	     * and p. 66 Interrupt Handling in Extended Operating Mode
-	     *
-	     *  TRX24_TX_END is generated after
-	     *  	A received frame must pass the address filter
-	     *  	The FCS is valid
-	     *
-	     * Returns back to RX_AACK_ON state
-	     * till the Packet is read in the event_callback
-		 * and the frame buffer protection is cleared no new
-		 * data will be written to frame buffer and override the old.
-	     */
-	    if (irq_status & AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN)
-	    {
-//	    	dev->irq_status &= ~AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN;
-//	    	DEBUG("[at86rf2xx] RX end\n");
-//	    	return;
-
-			if (dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)
-			{
-				netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
-			}
-			DEBUG("[at86rf2xx] EVT - RX_END\n");
-			return;
-	    }
-
-	    if (irq_status & AT86RF2XX_IRQ_STATUS_MASK__AMI_EN)
-	    {
-	    	dev->irq_status &= ~AT86RF2XX_IRQ_STATUS_MASK__AMI_EN;
-	    	DEBUG("[at86rf2xx] AMI\n");
-	    	return;
-	    }
-
-
-	    /*
-	     * See ATmega256/128/64RFR2 p. 52 and 63 Flow Diagram
-	     *
-	     *  TRX24_TX_END is generated after
-	     *  	auto "Transmit ACK" 	returns to TRX_STATE = RX_AACK_ON
-	     *  	Transmit Frame 			returns to TRX_STATE = TX_ARET_ON
-	     *
-	     *  No event to upper layer if in RX_AACK_ON state
-	     *  event is only generated for explicit transmit states
-	     */
-	    if (irq_status & AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN)
-	    {
-//	    	dev->irq_status &= ~AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN;
-//
-//	    	/* set transceiver back to receiving state*/
-//	    	at86rf2xx_set_state(dev, AT86RF2XX_TRX_STATE__RX_AACK_ON);
-//	    	DEBUG("[at86rf2xx] TX end\n");
-//	    	return;
-
-	    	dev->irq_status &= ~AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN;
-			/* check for more pending TX calls and return to idle state if
-			 * there are none */
-			// assert(dev->pending_tx != 0);
-			if ((--dev->pending_tx) == 0) {
-				at86rf2xx_set_state(dev, dev->idle_state);
-				DEBUG("[at86rf2xx] return to state 0x%x\n", dev->idle_state);
-			}
-
-			DEBUG("[at86rf2xx] EVT - TX_END\n");
-
-			if (netdev->event_callback && (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END))
-			{
-				switch (trac_status)
-				{
-					case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
-					case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
-						netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-						DEBUG("[at86rf2xx] TX SUCCESS\n");
-						break;
-					case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
-						netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
-						DEBUG("[at86rf2xx] TX NO_ACK\n");
-						break;
-					case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
-						netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
-						DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
-						break;
-					default:
-						DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",
-							  trac_status >> 5);
-						break;
-				}
-			}
-		}
 
 
 	    /*

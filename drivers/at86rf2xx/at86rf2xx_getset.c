@@ -394,8 +394,16 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
                 tmp |= AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN;
                 at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
 #endif
-
                 break;
+            case AT86RF2XX_OPT_TELL_TX_END:
+#ifdef MODULE_AT86RFR2
+            	DEBUG("[at86rf2xx] opt: enabling TX end Interrupt\n");
+				tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
+				tmp |= AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN;
+				at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
+#endif
+				break;
+
             default:
                 /* do nothing */
                 break;
@@ -437,6 +445,14 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
                 tmp &= ~AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN;
                 at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
                 break;
+            case AT86RF2XX_OPT_TELL_TX_END:
+#ifdef MODULE_AT86RFR2
+            	DEBUG("[at86rf2xx] opt: disabling TX end Interrupt\n");
+				tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
+				tmp &= ~AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN;
+				at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
+#endif
+				break;
             default:
                 /* do nothing */
                 break;

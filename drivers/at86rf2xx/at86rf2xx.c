@@ -194,6 +194,12 @@
 //		}
 //	}
 
+
+//	if (((at86rf2xx_t*)static_dev)->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)
+//	{
+//
+//	}
+
 	/**
 	 * \brief ISR for transceiver's PLL Lock interrupt
 	 */
@@ -203,6 +209,7 @@
 		LED_PORT &= ~GREEN;
 		((at86rf2xx_t*)static_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN;
 		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
+		DEBUG("TRX24_PLL_LOCK\n");
 		__exit_isr();
 	}
 
@@ -215,6 +222,7 @@
 		((at86rf2xx_t*)static_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK_EN;
 		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
 		LED_PORT |= GREEN;
+		DEBUG("TRX24_PLL_UNLOCK\n");
 		__exit_isr();
 	}
 
@@ -230,6 +238,7 @@
 		LED_PORT &= ~GREEN;
 		((at86rf2xx_t*)static_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN;
 		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
+		DEBUG("TRX24_RX_START\n");
 		__exit_isr();
 	}
 
@@ -247,7 +256,24 @@
 		 * */
 
 		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
+		DEBUG("TRX24_RX_END\n");
 		__exit_isr();
+
+//		__ENTER_ISR();
+//		IF ( ((AT86RF2XX_T*)STATIC_DEV)->NETDEV.FLAGS & AT86RF2XX_OPT_TELL_RX_END)
+//		{
+//			STATIC_DEV->EVENT_CALLBACK(STATIC_DEV, NETDEV_EVENT_RX_COMPLETE);
+//		}
+//		DEBUG("[AT86RF2XX] EVT - RX_END\N");
+//
+//		/* TRANSCEIVER WILL BE IN RX_AACK_ON OR BUSY_RX_AACK STATE
+//		 *
+//		 * PACKET IS READ IN THE EVENT_CALLBACK AND FRAME BUFFER PROTECTION WILL BE RELEASED THEN.
+//		 * NEW DATA WILL NOT OVERRIDE THE OLD IN FRAME BUFFER.
+//		 */
+//		/* SHOULD NOT BE NECESSARY*/
+//		// AT86RF2XX_SET_STATE(DEV, AT86RF2XX_TRX_STATE__RX_AACK_ON);
+//		__EXIT_ISR();
 	}
 
 //	ISR(TRX24_CCA_ED_DONE_vect, ISR_BLOCK)
@@ -267,6 +293,7 @@
 		__enter_isr();
 		((at86rf2xx_t*)static_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__AMI_EN;
 		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
+		DEBUG("TRX24_XAH_AMI\n");
 		__exit_isr();
 	}
 
@@ -281,6 +308,7 @@
 		/* don't set transceiver back to receiving state
 		* it will be in TX_ARET_ON
 		*/
+		DEBUG("TRX24_TX_END\n");
 		__exit_isr();
 	}
 
@@ -355,6 +383,7 @@
 		((at86rf2xx_t*)static_dev)->irq_status1 |= AT86RF2XX_IRQ_STATUS_MASK1__TX_START_EN;
 		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
 		LED_PORT &= ~RED;
+		DEBUG("TRX24_TX_START\n");
 		__exit_isr();
 	}
 //
@@ -459,6 +488,10 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_START, false);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_END, true);
 
+#ifdef MODULE_AT86RFR2
+    at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_TX_END, true);
+#endif
+
 #ifdef MODULE_NETSTATS_L2
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_TX_END, true);
 #endif
@@ -493,12 +526,12 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 	at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
 			// AT86RF2XX_IRQ_STATUS_MASK__AWAKE
 			 AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN
-			| AT86RF2XX_IRQ_STATUS_MASK__AMI_EN
+			// | AT86RF2XX_IRQ_STATUS_MASK__AMI_EN
 			//| AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE_EN
 			| AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN
 			//| AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN
 			//| AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK_EN
-			| AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN
+			// | AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN
 						);
 
 	/* enable interrupts IRQ_MASK1*/

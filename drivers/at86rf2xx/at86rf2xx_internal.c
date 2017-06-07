@@ -34,7 +34,7 @@
 	// but needs memcpy
 	#include <string.h>
 
-	#define ENABLE_DEBUG (1)
+	#define ENABLE_DEBUG (0)
 	#include "debug.h"
 #else
 	#define SPIDEV          (dev->params.spi)
@@ -117,7 +117,7 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev,
 {
 #ifdef MODULE_AT86RFR2
 
-	/* check if frame buffer protection is active, rx frame was not read */
+	/* check if frame buffer protection is active, rx frame was not read jet*/
 	if( ( *(AT86RF2XX_REG__TRX_CTRL_2) &(1<<RX_SAFE_MODE)) != 0)
 	{
 		DEBUG("[at86rf2cc_internal] at86rf2xx_sram_write: frame buffer protected\n");

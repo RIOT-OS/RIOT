@@ -36,19 +36,20 @@ extern "C" {
  */
 // core/include/debug.h prints if(sched_active_thread->stack_size > THREAD_EXTRA_STACKSIZE_PRINTF)
 // so small THREAD_EXTRA_STACKSIZE_PRINTF prints more than a big one
-#define THREAD_EXTRA_STACKSIZE_PRINTF    (256) //128
+
+#define THREAD_EXTRA_STACKSIZE_PRINTF    (32) //128
 
 #ifndef THREAD_STACKSIZE_DEFAULT
 #define THREAD_STACKSIZE_DEFAULT   (512)
 #endif
 /** @} */
 
-#define THREAD_STACKSIZE_IDLE      (256)
+#define THREAD_STACKSIZE_IDLE      (128)
 /**
  * @brief   Stack size used for the exception (ISR) stack
  * @{
  */
-#define ISR_STACKSIZE              (128)
+#define ISR_STACKSIZE              (0)
 /** @} */
 
 #ifdef __cplusplus

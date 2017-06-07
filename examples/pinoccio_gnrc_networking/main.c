@@ -32,9 +32,9 @@
 
 #include "ps.h"
 
-char ledblink_thread_stack[200];
+char ledblink_thread_stack[160];
 /* set interval to 4 second */
-#define INTERVAL (5U * US_PER_SEC)
+#define INTERVAL (10U * US_PER_SEC)
 
 void *ledblink_thread(void *arg)
 {
