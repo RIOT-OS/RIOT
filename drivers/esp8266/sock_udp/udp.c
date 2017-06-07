@@ -43,7 +43,11 @@
 
 /* private varibaled fo the driver */
 static ESP8266_t esp8266;
-static char threadstack[THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE];
+static char threadstack[THREAD_STACKSIZE_DEFAULT
+  #if(ENABLE_DEBUG == 1)
+    + DEBUG_EXTRA_STACKSIZE
+  #endif
+  ];
 static mutex_t esp_sock_mutex;
 static mutex_t esp_callback_mutex;
 // static kernel_pid_t api_pid;
@@ -71,7 +75,7 @@ typedef struct transmission {
 /* callback functions required by the esp8266 parser drivers/esp8266/esp8266.h */
 void ESP8266_Callback_ClientConnectionConnected(ESP8266_t *ESP8266, ESP8266_Connection_t *Connection)
 {
-    DEBUG("start %s\r\n", __FUNCTION__);
+    DEBUG("start %s\r\n", DEBUG_FUNC);
     DEBUG("Connection name: %s\r\n", Connection->Name);
     if (0 == strcmp(Connection->Name, TEMP_ID_STR)) {
         temp_conn = Connection;
@@ -82,46 +86,47 @@ void ESP8266_Callback_ClientConnectionConnected(ESP8266_t *ESP8266, ESP8266_Conn
     if (0 == strcmp(Connection->Name, REMOTE_ID_STR)) {
         remote_conn = Connection;
     }
-    DEBUG("end %s\r\n", __FUNCTION__);
+    DEBUG("end %s\r\n", DEBUG_FUNC);
 }
 void ESP8266_Callback_ClientConnectionError(ESP8266_t *ESP8266, ESP8266_Connection_t *Connection)
 {
-    DEBUG("start %s\r\n", __FUNCTION__);
-    DEBUG("end %s\r\n", __FUNCTION__);
+    DEBUG("start %s\r\n", DEBUG_FUNC);
+    DEBUG("end %s\r\n", DEBUG_FUNC);
 }
 void ESP8266_Callback_ClientConnectionTimeout(ESP8266_t *ESP8266, ESP8266_Connection_t *Connection)
 {
-    DEBUG("start %s\r\n", __FUNCTION__);
-    DEBUG("end %s\r\n", __FUNCTION__);
+    DEBUG("start %s\r\n", DEBUG_FUNC);
+    DEBUG("end %s\r\n", DEBUG_FUNC);
 }
 void ESP8266_Callback_ClientConnectionClosed(ESP8266_t *ESP8266, ESP8266_Connection_t *Connection)
 {
-    DEBUG("start %s\r\n", __FUNCTION__);
-    DEBUG("end %s\r\n", __FUNCTION__);
+    DEBUG("start %s\r\n", DEBUG_FUNC);
+    DEBUG("end %s\r\n", DEBUG_FUNC);
 }
 uint16_t ESP8266_Callback_ClientConnectionSendData(ESP8266_t *ESP8266, ESP8266_Connection_t *Connection, char *Buffer, uint16_t max_buffer_size)
 {
-    DEBUG("start %s\r\n", __FUNCTION__);
+    DEBUG("start %s\r\n", DEBUG_FUNC);
     /* restrain size to avoid memory corruption */
     if (send_len > max_buffer_size) {
         send_len = max_buffer_size;
     }
     memcpy(Buffer, send_data, send_len);
     return send_len;
-    DEBUG("end %s\r\n", __FUNCTION__);
+    DEBUG("end %s\r\n", DEBUG_FUNC);
 }
 void ESP8266_Callback_ClientConnectionDataSent(ESP8266_t *ESP8266, ESP8266_Connection_t *Connection)
 {
-    // msg_send(NULL, api_pid);
+    DEBUG("start %s\r\n", DEBUG_FUNC);
+    DEBUG("end %s\r\n", DEBUG_FUNC);
 }
 void ESP8266_Callback_ClientConnectionDataSentError(ESP8266_t *ESP8266, ESP8266_Connection_t *Connection)
 {
-    DEBUG("start %s\r\n", __FUNCTION__);
-    DEBUG("end %s\r\n", __FUNCTION__);
+    DEBUG("start %s\r\n", DEBUG_FUNC);
+    DEBUG("end %s\r\n", DEBUG_FUNC);
 }
 void ESP8266_Callback_ClientConnectionDataReceived(ESP8266_t *ESP8266, ESP8266_Connection_t *Connection, char *Buffer)
 {
-    DEBUG("start %s\r\n", __FUNCTION__);
+    DEBUG("start %s\r\n", DEBUG_FUNC);
     /* listening endpoint received something */
     DEBUG("Conection name:  %s\r\n", Connection->Name);
     if (0 == strcmp(Connection->Name, LOCAL_ID_STR)) {
@@ -147,12 +152,12 @@ void ESP8266_Callback_ClientConnectionDataReceived(ESP8266_t *ESP8266, ESP8266_C
     else if (Connection == remote_conn) {
         DEBUG("remote endpoint\r\n");
     }
-    DEBUG("end %s\r\n", __FUNCTION__);
+    DEBUG("end %s\r\n", DEBUG_FUNC);
 }
 void ESP8266_Callback_ConnectedStationsDetected(ESP8266_t *ESP8266, ESP8266_ConnectedStations_t *Stations)
 {
-    DEBUG("start %s\r\n", __FUNCTION__);
-    DEBUG("end %s\r\n", __FUNCTION__);
+    DEBUG("start %s\r\n", DEBUG_FUNC);
+    DEBUG("end %s\r\n", DEBUG_FUNC);
 }
 
 /* static functions */
@@ -189,7 +194,7 @@ int auto_init_esp8266(void)
     ESP8266_WaitReady(&esp8266);
     ESP8266_GetSTAIPBlocking(&esp8266);
     DEBUG("The device's IP address is %d.%d.%d.%d\r\n", esp8266.STAIP[0], esp8266.STAIP[1], esp8266.STAIP[2], esp8266.STAIP[3]);
-    DEBUG("end %s\r\n", __FUNCTION__);
+    DEBUG("end %s\r\n", DEBUG_FUNC);
     mutex_unlock(&esp_sock_mutex);
     return 0;
 }
@@ -204,24 +209,24 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
     assert(sock);
     assert(local == NULL || local->port != 0);
     assert(remote == NULL || remote->port != 0);
-    DEBUG("%s assertion check succeded\n", __FUNCTION__);
+    DEBUG("%s assertion check succeded\n", DEBUG_FUNC);
     if ((local != NULL) && (remote != NULL) &&
         (local->netif != SOCK_ADDR_ANY_NETIF) &&
         (remote->netif != SOCK_ADDR_ANY_NETIF) &&
         (local->netif != remote->netif)) {
         return -EINVAL;
     }
-    DEBUG("%s value check succeded\n", __FUNCTION__);
+    DEBUG("%s value check succeded\n", DEBUG_FUNC);
     /* esp8266 suports IPv4 only 😞 */
     if (((local != NULL) && (local->family != AF_INET)) ||
         ((remote != NULL) && (remote->family != AF_INET))) {
         return -EAFNOSUPPORT;
     }
-    DEBUG("%s IPv4 check succeded\n", __FUNCTION__);
+    DEBUG("%s IPv4 check succeded\n", DEBUG_FUNC);
     memset(&sock->local, 0, sizeof(sock_udp_ep_t));
     if (local != NULL) {
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
-        DEBUG("%s checking for reuse\n", __FUNCTION__);
+        DEBUG("%s checking for reuse\n", DEBUG_FUNC);
         if (!(flags & SOCK_FLAGS_REUSE_EP)) {
             for (sock_udp_t *ptr = _udp_socks; ptr != NULL;
                  ptr = (sock_udp_t *)ptr->reg.next) {
@@ -230,16 +235,16 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
                 }
             }
         }
-        DEBUG("%s reuse check succeded\n", __FUNCTION__);
+        DEBUG("%s reuse check succeded\n", DEBUG_FUNC);
         /* prepend to current socks */
         sock->reg.next = (gnrc_sock_reg_t *)_udp_socks;
         _udp_socks = sock;
 #endif
-        DEBUG("%s checking for support\n", __FUNCTION__);
+        DEBUG("%s checking for support\n", DEBUG_FUNC);
         if (local->family != AF_INET) {
             return -EAFNOSUPPORT;
         }
-        DEBUG("%s support check succeded\n", __FUNCTION__);
+        DEBUG("%s support check succeded\n", DEBUG_FUNC);
         ipv4_addr_to_str(addr_str, (ipv4_addr_t *) &(local->addr), IPV4_ADDR_MAX_STR_LEN);
         ESP8266_WaitReady(&esp8266);
         res = ESP8266_StartClientConnectionUDP(&esp8266, LOCAL_ID_STR, addr_str, 0, local->port, NULL);
@@ -256,7 +261,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         if (remote->family  != AF_INET) {
             return -EAFNOSUPPORT;
         }
-        DEBUG("%s support check succeded\n", __FUNCTION__);
+        DEBUG("%s support check succeded\n", DEBUG_FUNC);
         if (gnrc_ep_addr_any((const sock_ip_ep_t *)remote)) {
             return -EINVAL;
         }
@@ -278,7 +283,7 @@ void sock_udp_close(sock_udp_t *sock)
     // api_pid = thread_getpid();
     ESP8266_WaitReady(&esp8266);
     ESP8266_CloseAllConnections(&esp8266);
-    DEBUG("%s\r\n", __FUNCTION__);
+    DEBUG("%s\r\n", DEBUG_FUNC);
     mutex_unlock(&esp_sock_mutex);
 }
 
@@ -307,16 +312,16 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *remote)
 ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
                       uint32_t timeout, sock_udp_ep_t *remote)
 {
-    DEBUG("start %s\r\n", __FUNCTION__);
+    DEBUG("start %s\r\n", DEBUG_FUNC);
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    DEBUG("%s: assertion check succeded\r\n", __FUNCTION__);
+    DEBUG("%s: assertion check succeded\r\n", DEBUG_FUNC);
     if (sock->local.family == AF_UNSPEC) {
         return -EADDRNOTAVAIL;
     }
-    DEBUG("%s: family check succeded\r\n", __FUNCTION__);
+    DEBUG("%s: family check succeded\r\n", DEBUG_FUNC);
 
     mutex_lock(&esp_sock_mutex);
-    DEBUG("%s: mutex locked\r\n", __FUNCTION__);
+    DEBUG("%s: mutex locked\r\n", DEBUG_FUNC);
     int res;
     if ((res = sema_wait_timed(&sem_loc_rece_count, timeout)) < 0) {
         if (res == -ETIMEDOUT) {
@@ -355,10 +360,10 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     ESP8266_WaitReady(&esp8266);
     /* if another remote endpoint is given, connect to it */
     if (remote != NULL) {
-        DEBUG("%s: Using remote given parameter for temporary connection\r\n", __FUNCTION__);
+        DEBUG("%s: Using remote given parameter for temporary connection\r\n", DEBUG_FUNC);
         char addr_str[IPV4_ADDR_MAX_STR_LEN] = { 0 };
         ipv4_addr_to_str(addr_str, (ipv4_addr_t *) &(remote->addr), IPV4_ADDR_MAX_STR_LEN);
-        DEBUG("%s: remote address: %s\r\n", __FUNCTION__, addr_str);
+        DEBUG("%s: remote address: %s\r\n", DEBUG_FUNC, addr_str);
         /* issue esp to establish a client connection */
         ESP8266_WaitReady(&esp8266);
         ESP8266_StartClientConnectionUDP(&esp8266, TEMP_ID_STR, addr_str, remote->port, 0, NULL);
@@ -366,7 +371,7 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     }
     /* else use current remote endpoint */
     else {
-        DEBUG("%s: Using remote_conn as connection\r\n", __FUNCTION__);
+        DEBUG("%s: Using remote_conn as connection\r\n", DEBUG_FUNC);
         temp_conn = remote_conn;
     }
 
@@ -374,17 +379,17 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     send_data = (void *)data;
     send_len = len;
     /* request to send them */
-    DEBUG("%s: sending data\n", __FUNCTION__);
+    DEBUG("%s: sending data\n", DEBUG_FUNC);
     ESP8266_RequestSendData(&esp8266, temp_conn);
     ESP8266_WaitReady(&esp8266);
     /* close temporaty remote connection if necessary */
     if (remote != NULL) {
-        DEBUG("%s: closing temporary connection\r\n", __FUNCTION__);
+        DEBUG("%s: closing temporary connection\r\n", DEBUG_FUNC);
         ESP8266_WaitReady(&esp8266);
         ESP8266_CloseConnection(&esp8266, temp_conn);
         ESP8266_WaitReady(&esp8266);
     }
-    DEBUG("end %s\r\n", __FUNCTION__);
+    DEBUG("end %s\r\n", DEBUG_FUNC);
     mutex_unlock(&esp_sock_mutex);
     /* return number of acutally sent bytes */
     return send_len;
