@@ -10,7 +10,7 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 #   Usage: SERIAL="ATML..." BOARD=<board> make flash
 ifneq (,$(SERIAL))
     export OPENOCD_EXTRA_INIT += "-c cmsis_dap_serial $(SERIAL)"
-    EDBG_ARGS += "--serial $(SERIAL)"
+    EDBG_ARGS += --serial $(SERIAL)
     SERIAL_TTY = $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL)))
     ifeq (,$(SERIAL_TTY))
         $(error Did not find a device with serial $(SERIAL))
