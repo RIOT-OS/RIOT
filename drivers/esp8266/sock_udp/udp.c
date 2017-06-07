@@ -287,7 +287,6 @@ void sock_udp_close(sock_udp_t *sock)
     mutex_unlock(&esp_sock_mutex);
 }
 
-/* FINISHED */
 int sock_udp_get_local(sock_udp_t *sock, sock_udp_ep_t *local)
 {
     assert(sock && local);
@@ -298,7 +297,6 @@ int sock_udp_get_local(sock_udp_t *sock, sock_udp_ep_t *local)
     return 0;
 }
 
-/* FINISHED */
 int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *remote)
 {
     assert(sock && remote);
