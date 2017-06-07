@@ -677,6 +677,11 @@ ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += gnrc_sock_udp
 endif
 
+ifneq (,$(filter openthread,$(USEPKG)))
+  USEMODULE += openthread_contrib
+  USEMODULE += mbedcrypto
+endif
+
 ifneq (,$(filter luid,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_cpuid
 endif

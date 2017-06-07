@@ -13,85 +13,33 @@
  * @brief       Implementation of OpenThread logging platform abstraction
  *
  * @author      Jose Ignacio Alamos <jialamos@uc.cl>
+ * @author      Baptiste Clenet <bapclenet@gmail.com>
  * @}
  */
 
+#include "openthread/config.h"
+#include "openthread/platform/logging.h"
+#if OPENTHREAD_ENABLE_CLI_LOGGING
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <string.h>
-#include <time.h>
 
-#include "openthread/platform/logging.h"
+#include "utils/code_utils.h"
+#include "cli/cli-uart.h"
+#endif
 
-/* adapted from OpenThread posix example:
- * See: https://github.com/openthread/openthread/blob/master/examples/platforms/posix/logging.c */
 void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
 {
+#if OPENTHREAD_ENABLE_CLI_LOGGING
     va_list args;
-
-    switch (aLogLevel) {
-        case kLogLevelNone:
-            fprintf(stderr, "NONE ");
-            break;
-
-        case kLogLevelCrit:
-            fprintf(stderr, "CRIT ");
-            break;
-
-        case kLogLevelWarn:
-            fprintf(stderr, "WARN ");
-            break;
-
-        case kLogLevelInfo:
-            fprintf(stderr, "INFO ");
-            break;
-
-        case kLogLevelDebg:
-            fprintf(stderr, "DEBG ");
-            break;
-    }
-
-    switch (aLogRegion) {
-        case kLogRegionApi:
-            fprintf(stderr, "API  ");
-            break;
-
-        case kLogRegionMle:
-            fprintf(stderr, "MLE  ");
-            break;
-
-        case kLogRegionArp:
-            fprintf(stderr, "ARP  ");
-            break;
-
-        case kLogRegionNetData:
-            fprintf(stderr, "NETD ");
-            break;
-
-        case kLogRegionIp6:
-            fprintf(stderr, "IPV6 ");
-            break;
-
-        case kLogRegionIcmp:
-            fprintf(stderr, "ICMP ");
-            break;
-
-        case kLogRegionMac:
-            fprintf(stderr, "MAC  ");
-            break;
-
-        case kLogRegionMem:
-            fprintf(stderr, "MEM  ");
-            break;
-        default:
-            break;
-    }
-
     va_start(args, aFormat);
-    vfprintf(stderr, aFormat, args);
-    fprintf(stderr, "\r");
+    otCliLog(aLogLevel, aLogRegion, aFormat, args);
     va_end(args);
+#else
+    (void)aLogLevel;
+    (void)aLogRegion;
+    (void)aFormat;
+#endif /* OPENTHREAD_ENABLE_CLI_LOGGING */
 }

@@ -49,3 +49,13 @@ uint32_t otPlatRandomGet(void)
     DEBUG("otPlatRandomGet: %i\n", (int) rand_val);
     return rand_val;
 }
+
+otError otPlatRandomGetTrue(uint8_t *aOutput, uint16_t aOutputLength)
+{
+    for (uint16_t index = 0; index < aOutputLength; index++) {
+        aOutput[index] = 0;
+        uint32_t rand_val = random_uint32();
+        aOutput[index] = (uint8_t) rand_val;
+    }
+    return OT_ERROR_NONE;
+}

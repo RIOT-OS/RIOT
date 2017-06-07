@@ -17,7 +17,8 @@
  *
  * @file
  *
- * @author  José Ignacio Alamos <jialamos@uc.cl>
+ * @author      Jose Ignacio Alamos <jialamos@uc.cl>
+ * @author      Baptiste Clenet <bapclenet@gmail.com>
  */
 
 #ifndef OT_H
@@ -34,18 +35,46 @@ extern "C" {
 #include "thread.h"
 #include "openthread/types.h"
 
-#define OPENTHREAD_XTIMER_MSG_TYPE_EVENT (0x2235)        /**< xtimer message receiver event*/
-#define OPENTHREAD_NETDEV_MSG_TYPE_EVENT (0x2236)        /**< message received from driver */
-#define OPENTHREAD_SERIAL_MSG_TYPE_EVENT (0x2237)        /**< event indicating a serial (UART) message was sent to OpenThread */
-#define OPENTHREAD_MSG_TYPE_RECV         (0x2238)        /**< event for frame reception */
-#define OPENTHREAD_JOB_MSG_TYPE_EVENT    (0x2240)        /**< event indicating an OT_JOB message */
+/**< xtimer message receiver event*/
+#define OPENTHREAD_XTIMER_MSG_TYPE_EVENT                    (0x2235)
+/**< message received from driver */
+#define OPENTHREAD_NETDEV_MSG_TYPE_EVENT                    (0x2236)
+/**< event indicating a serial (UART) message was sent to OpenThread */
+#define OPENTHREAD_SERIAL_MSG_TYPE_EVENT                    (0x2237)
+/**< event for frame reception */
+#define OPENTHREAD_MSG_TYPE_RECV                            (0x2238)
+/**< event indicating an OT_JOB message */
+#define OPENTHREAD_JOB_MSG_TYPE_EVENT                       (0x2240)
+/**< number of serial reception buffer*/
+#define OPENTHREAD_NUMBER_OF_SERIAL_BUFFER                   (1U)
+/**< sizeof in bytes the two first members of she serial structure*/
+#define OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF                (4U)
+#ifdef MODULE_OPENTHREAD_NCP_FTD
+/**< sizeof the serial buffer*/
+#define OPENTHREAD_SERIAL_BUFFER_SIZE                        OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF + 200
+#else
+/**< sizeof the serial buffer*/
+#define OPENTHREAD_SERIAL_BUFFER_SIZE                        OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF + 1
+#endif
+/**< sizeof the spinel payload data*/
+#define OPENTHREAD_SERIAL_BUFFER__PAYLOAD_SIZE               OPENTHREAD_SERIAL_BUFFER_SIZE - OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF
+/**< error when no more buffer available*/
+#define OPENTHREAD_ERROR_NO_EMPTY_SERIAL_BUFFER              -1
+/**< serial buffer ready to use*/
+#define OPENTHREAD_SERIAL_BUFFER_STATUS_FREE                 (0x0001)
+/**< serial buffer ready for processsing*/
+#define OPENTHREAD_SERIAL_BUFFER_STATUS_READY_TO_PROCESS     (0x0002)
+/**< serial buffer payload full*/
+#define OPENTHREAD_SERIAL_BUFFER_STATUS_FULL                 (0x0004)
+
 
 /**
  * @brief   Struct containing a serial message
  */
 typedef struct {
-    void *buf;  /**< buffer containing the message */
-    size_t len; /**< length of the message */
+    uint16_t length;                                        /**< length of the message */
+    uint16_t serial_buffer_status;                          /**< status of the buffer */
+    uint8_t buf[OPENTHREAD_SERIAL_BUFFER__PAYLOAD_SIZE];    /**< buffer containing the message */
 } serial_msg_t;
 
 /**
@@ -114,11 +143,6 @@ kernel_pid_t openthread_get_pid(void);
  * @brief   Init OpenThread random
  */
 void ot_random_init(void);
-
-/**
- * @brief   Run OpenThread UART simulator (stdio)
- */
-void openthread_uart_run(void);
 
 /**
  * @brief   Execute OpenThread command. Call this function only in OpenThread thread

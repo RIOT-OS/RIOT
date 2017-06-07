@@ -13,6 +13,7 @@
  * @brief       Netdev adoption for OpenThread
  *
  * @author      Jose Ignacio Alamos <jialamos@uc.cl>
+ * @author      Baptiste Clenet <bapclenet@gmail.com>
  * @}
  */
 
@@ -30,6 +31,10 @@
 #include "random.h"
 #include "ot.h"
 
+#ifdef MODULE_OPENTHREAD_NCP_FTD
+#include "openthread/ncp.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -38,18 +43,6 @@ static msg_t _queue[OPENTHREAD_QUEUE_LEN];
 
 static kernel_pid_t _pid;
 static otInstance *sInstance;
-
-/**
- * @name    Default configuration for OpenThread network
- * @{
- */
-#ifndef OPENTHREAD_PANID
-#define OPENTHREAD_PANID            0x1234
-#endif
-#ifndef OPENTHREAD_CHANNEL
-#define OPENTHREAD_CHANNEL          (26U)
-#endif
-/** @} */
 
 uint8_t ot_call_command(char* command, void *arg, void* answer) {
     ot_job_t job;
@@ -67,7 +60,7 @@ uint8_t ot_call_command(char* command, void *arg, void* answer) {
 
 /* OpenThread will call this when switching state from empty tasklet to non-empty tasklet. */
 void otTaskletsSignalPending(otInstance *aInstance) {
-    otTaskletsProcess(aInstance);
+    (void) aInstance;
 }
 
 static void *_openthread_event_loop(void *arg) {
@@ -84,12 +77,8 @@ static void *_openthread_event_loop(void *arg) {
     netdev_t *dev;
     msg_t msg, reply;
 
+#if defined(MODULE_OPENTHREAD_CLI_FTD) || defined(MODULE_OPENTHREAD_CLI_MTD)
     otCliUartInit(sInstance);
-
-#if OPENTHREAD_ENABLE_DIAG
-    diagInit(sInstance);
-#endif
-
     /* Init default parameters */
     otPanId panid = OPENTHREAD_PANID;
     uint8_t channel = OPENTHREAD_CHANNEL;
@@ -99,31 +88,44 @@ static void *_openthread_event_loop(void *arg) {
     otIp6SetEnabled(sInstance, true);
     /* Start Thread protocol operation */
     otThreadSetEnabled(sInstance, true);
+#endif
 
-    uint8_t *buf;
+#ifdef MODULE_OPENTHREAD_NCP_FTD
+    otNcpInit(sInstance);
+#endif
+
+#if OPENTHREAD_ENABLE_DIAG
+    diagInit(sInstance);
+#endif
+
     ot_job_t *job;
+    serial_msg_t* serialBuffer;
     while (1) {
-        msg_receive(&msg);
-        switch (msg.type) {
-            case OPENTHREAD_XTIMER_MSG_TYPE_EVENT:
-                /* Tell OpenThread a time event was received */
-                otPlatAlarmFired(sInstance);
-                break;
-            case OPENTHREAD_NETDEV_MSG_TYPE_EVENT:
-                /* Received an event from driver */
-                dev = msg.content.ptr;
-                dev->driver->isr(dev);
-                break;
-            case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
-                /* Tell OpenThread about the reception of a CLI command */
-                buf = msg.content.ptr;
-                otPlatUartReceived(buf, strlen((char *) buf));
-                break;
-            case OPENTHREAD_JOB_MSG_TYPE_EVENT:
-                job = msg.content.ptr;
-                reply.content.value = ot_exec_command(sInstance, job->command, job->arg, job->answer);
-                msg_reply(&msg, &reply);
-                break;
+        otTaskletsProcess(sInstance);
+        if (otTaskletsArePending(sInstance) == false) {
+            msg_receive(&msg);
+            switch (msg.type) {
+                case OPENTHREAD_XTIMER_MSG_TYPE_EVENT:
+                    /* Tell OpenThread a time event was received */
+                    otPlatAlarmFired(sInstance);
+                    break;
+                case OPENTHREAD_NETDEV_MSG_TYPE_EVENT:
+                    /* Received an event from driver */
+                    dev = msg.content.ptr;
+                    dev->driver->isr(dev);
+                    break;
+                case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
+                    /* Tell OpenThread about the reception of a CLI command */
+                    serialBuffer = (serial_msg_t*)msg.content.ptr;
+                    otPlatUartReceived((uint8_t*) serialBuffer->buf,serialBuffer->length);
+                    serialBuffer->serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
+                    break;
+                case OPENTHREAD_JOB_MSG_TYPE_EVENT:
+                    job = msg.content.ptr;
+                    reply.content.value = ot_exec_command(sInstance, job->command, job->arg, job->answer);
+                    msg_reply(&msg, &reply);
+                    break;
+            }
         }
     }
 
