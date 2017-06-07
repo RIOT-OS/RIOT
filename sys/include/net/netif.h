@@ -45,31 +45,18 @@ extern "C" {
  * @brief   Type of the interface
  */
 typedef enum {
-    NETIF_TYPE_INVALID = 0,     /**< Interface is of no specific type (should not be used) */
-#if defined(MODULE_GNRC) || DOXYGEN
     /**
      * @brief   Default GNRC network interface (without software MAC)
-     *
-     * @note only available with @ref net_gnrc "GNRC" module.
      */
     NETIF_TYPE_GNRC_DEFAULT,
-#endif
-#if defined(MODULE_LWIP_ETHERNET) || DOXYGEN
     /**
      * @brief   lwIP network interface
-     *
-     * @note only available with @ref pkg_lwip.
      */
     NETIF_TYPE_LWIP,
-#endif /* MODULE_LWIP */
-#if defined(MODULE_EMB6) || DOXYGEN
     /**
      * @brief   emb6 interface
-     *
-     * @note only available with @ref pkg_emb6
      */
     NETIF_TYPE_EMB6,
-#endif
     /* extend list if needed */
 } netif_type_t;
 
