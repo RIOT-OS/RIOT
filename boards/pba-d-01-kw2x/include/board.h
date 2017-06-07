@@ -65,6 +65,15 @@ extern "C"
 /** @} */
 
 /**
+ * @name Macro for capacitive sensor button.
+ * @{
+ */
+#define CS_BUTTON_PORT         PORTC
+#define CS_BUTTON_PIN          6
+#define CS_BUTTON_GPIO         GPIO_PIN(PORT_C, CS_BUTTON_PIN)
+/** @} */
+
+/**
  * @name KW2XRF configuration
  *
  * {spi bus, cs pin, int pin, spi speed,}
