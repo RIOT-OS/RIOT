@@ -24,11 +24,9 @@
 #include "phydat.h"
 #include "periph/gpio.h"
 
-
 static int read(void *dev, phydat_t *res)
 {
-    gpio_t pin = *((gpio_t *)dev);
-    res->val[0] = (gpio_read(pin)) ? 1 : 0;
+    res->val[0] = (gpio_read(*((gpio_t *)dev))) ? 1 : 0;
     memset(&(res->val[1]), 0, 2 * sizeof(int16_t));
     res->unit = UNIT_BOOL;
     res->scale = 0;
@@ -37,19 +35,43 @@ static int read(void *dev, phydat_t *res)
 
 static int write(void *dev, phydat_t *state)
 {
-    gpio_t pin = *((gpio_t *)dev);
-    gpio_write(pin, state->val[0]);
+    gpio_write(*((gpio_t *)dev), state->val[0]);
     return 1;
 }
 
-const saul_driver_t gpio_out_saul_driver = {
-    .read = read,
-    .write = write,
-    .type = SAUL_ACT_SWITCH
-};
+static int read_inv(void *dev, phydat_t *res)
+{
+    read(dev, res);
+    res->val[0] = (res->val[0] ^ 1);
+    return 1;
+}
+
+static int write_inv(void *dev, phydat_t *state)
+{
+    gpio_write(*((gpio_t *)dev), !state->val[0]);
+    return 1;
+}
 
 const saul_driver_t gpio_in_saul_driver = {
-    .read = read,
+    .read  = read,
     .write = saul_notsup,
-    .type = SAUL_SENSE_BTN
+    .type  = SAUL_SENSE_BTN
+};
+
+const saul_driver_t gpio_in_inv_saul_driver = {
+    .read  = read_inv,
+    .write = saul_notsup,
+    .type  = SAUL_SENSE_BTN
+};
+
+const saul_driver_t gpio_out_saul_driver = {
+    .read  = read,
+    .write = write,
+    .type  = SAUL_ACT_SWITCH
+};
+
+const saul_driver_t gpio_out_inv_saul_driver = {
+    .read  = read_inv,
+    .write = write_inv,
+    .type  = SAUL_ACT_SWITCH
 };

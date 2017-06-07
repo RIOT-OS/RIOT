@@ -33,13 +33,54 @@ extern "C" {
 
 #ifdef MODULE_SAUL_GPIO
 /**
+ * @brief   Available SAUL GPIO modes
+ */
+typedef enum {
+    SAUL_GPIO_IN,           /**< pin is used as input */
+    SAUL_GPIO_IN_INV,       /**< pin is used as inverted input */
+    SAUL_GPIO_OUT,          /**< pin is used as output */
+    SAUL_GPIO_OUT_INV,      /**< pin is used as inverted output */
+} saul_gpio_type_t;
+
+/**
+ * @brief   Initial pin state after initialization
+ */
+typedef enum {
+    SAUL_GPIO_CLEAR = 0,    /**< set pin inactive after initialization */
+    SAUL_GPIO_SET   = 1,    /**< set pin active after initialization */
+    SAUL_GPIO_SKIP  = 2     /**< do not touch the pin state */
+} saul_gpio_state_t;
+
+/**
  * @brief   Direct mapped GPIO configuration values
  */
 typedef struct {
     const char *name;       /**< name of the device connected to this pin */
     gpio_t pin;             /**< GPIO pin to initialize and expose */
-    gpio_mode_t mode;       /**< pin mode to use */
+    gpio_mode_t mode;       /**< GPIO mode to use */
+    saul_gpio_type_t type;  /**< usage type for the pin */
+    saul_gpio_state_t state;/**< initial pin state */
 } saul_gpio_params_t;
+
+/**
+ * @brief   SAUL GPIO input driver
+ */
+extern const saul_driver_t gpio_in_saul_driver;
+
+/**
+ * @brief   SAUL GPIO inverted input driver
+ */
+extern const saul_driver_t gpio_in_inv_saul_driver;
+
+/**
+ * @brief   SAUL GPIO output driver
+ */
+extern const saul_driver_t gpio_out_saul_driver;
+
+/**
+ * @brief   SAUL GPIO inverted output driver
+ */
+extern const saul_driver_t gpio_out_inv_saul_driver;
 #endif /* MODULE_SAUL_GPIO */
 
 #ifdef MODULE_SAUL_ADC
