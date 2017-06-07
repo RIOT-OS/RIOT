@@ -121,6 +121,9 @@ endif
 ifneq (,$(filter l2filter,$(USEMODULE)))
     DIRS += net/link_layer/l2filter
 endif
+ifneq (,$(filter gnrc_dtls,$(USEMODULE)))
+    DIRS += net/application_layer/dtls
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
