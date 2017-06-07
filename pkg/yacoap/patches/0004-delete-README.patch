@@ -1,0 +1,51 @@
+From 5b0e9b99265284ec0c80c9a10041b2ca9fdd28b7 Mon Sep 17 00:00:00 2001
+From: smlng <s@mlng.net>
+Date: Wed, 31 Aug 2016 09:50:33 +0200
+Subject: [PATCH 4/4] delete README
+
+---
+ README.md | 32 --------------------------------
+ 1 file changed, 32 deletions(-)
+ delete mode 100644 README.md
+
+diff --git a/README.md b/README.md
+deleted file mode 100644
+index 539a501..0000000
+--- a/README.md
++++ /dev/null
+@@ -1,32 +0,0 @@
+-# YaCoAP - Yet another CoAP library
+-
+-## example
+-
+-## tests
+-
+-Build all tests by simply running `make` within subdirectory `/tests`.
+-This will create the following test applications, + use Firefox+Copper.
+-
+-### piggyback
+-
+-This tests is a CoAP server application which provides distinct resources:
+-
+-- `/.well-known/core`: as per standard you receive resources in link-format
+-- `/piggyback`: the response is combined with the ACK
+-- `/separate`: if request is `CON` it sends separate acknowledgement and response messages, if request is `NONCON` you get a response message only (no ACK)
+-
+-### request_get
+-
+-This test application sends a GET request to a chosen server, it retrieves and prints `/.well-known/core`.
+-
+-```
+-./request_get host|ip
+-```
+-
+-### request_put
+-
+-This test application sends a PUT request to a chosen server for any path with any content.
+-
+-```
+-./request_put host|ip "path" "content"
+-```
+-- 
+2.9.3
+
