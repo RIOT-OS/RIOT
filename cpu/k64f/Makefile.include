@@ -1,8 +1,13 @@
 # define the CPU architecture for the k64f
 export CPU_ARCH = cortex-m4
 
-# map CPU models to generic Kinetis linkerscript
+# map CPU models to generic Kinetis linkerscript, replace it by mcuboot specific
+# when MCUBOOT flag is set
+ifdef MCUBOOT
+LD_MK64FN1M0VLL12 = kinetis_f1024l64u192-mcuboot.ld
+else
 LD_MK64FN1M0VLL12 = kinetis_f1024l64u192.ld
+endif
 
 # tell the build system that the CPU depends on the Kinetis common files
 export USEMODULE += kinetis_common
