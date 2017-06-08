@@ -529,6 +529,10 @@ ifneq (,$(filter arduino,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter extimer,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter xtimer,$(USEMODULE)))
   FEATURES_REQUIRED += periph_timer
   USEMODULE += div
