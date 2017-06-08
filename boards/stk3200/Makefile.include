@@ -1,0 +1,17 @@
+# define the cpu used by STK3200
+export CPU = efm32zg
+export CPU_MODEL = efm32zg222f32
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbmodem* | head -n 1)
+
+# setup JLink for flashing
+export JLINK_DEVICE := $(CPU_MODEL)
+include $(RIOTBOARD)/Makefile.include.jlink
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common

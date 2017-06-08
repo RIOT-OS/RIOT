@@ -1,0 +1,17 @@
+# define the cpu used by SLSTK3401A
+export CPU = efm32pg1b
+export CPU_MODEL = efm32pg1b200f256gm48
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbmodem* | head -n 1)
+
+# setup JLink for flashing
+export JLINK_DEVICE := EFM32PG1BxxxF256
+include $(RIOTBOARD)/Makefile.include.jlink
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common

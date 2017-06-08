@@ -1,0 +1,7 @@
+export CPU_ARCH = cortex-m0plus
+
+# CMSIS-DSP is needed for arm_math.h
+USEPKG += cmsis-dsp
+
+# include efm32_common
+include $(RIOTCPU)/efm32_common/Makefile.include
