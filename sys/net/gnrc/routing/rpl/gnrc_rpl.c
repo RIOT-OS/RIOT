@@ -120,9 +120,9 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
     dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO;
 #endif
 
-    trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL,
-                  GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << dodag->dio_min),
-                  dodag->dio_interval_doubl, dodag->dio_redun);
+    trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_MSG,
+                  (1 << dodag->dio_min), dodag->dio_interval_doubl,
+                  dodag->dio_redun);
 
     return inst;
 }
@@ -216,15 +216,8 @@ static void *_event_loop(void *args)
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE received\n");
                 _update_lifetime();
                 break;
-            case GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL:
-                DEBUG("RPL: GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL received\n");
-                trickle = msg.content.ptr;
-                if (trickle && (trickle->callback.func != NULL)) {
-                    trickle_interval(trickle);
-                }
-                break;
-            case GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK:
-                DEBUG("RPL: GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK received\n");
+            case GNRC_RPL_MSG_TYPE_TRICKLE_MSG:
+                DEBUG("RPL: GNRC_RPL_MSG_TYPE_TRICKLE_MSG received\n");
                 trickle = msg.content.ptr;
                 if (trickle && (trickle->callback.func != NULL)) {
                     trickle_callback(trickle);
