@@ -167,6 +167,17 @@ do_flash_elf() {
             exit $RETVAL
         fi
     fi
+    if [ -n "${MCUBOOT}" ]; then
+        FLASH_CMD="-c 'program \"${SIGN_BINFILE}\" \"${BOOTLOADER_OFFSET}\"' \
+                   -c 'reset halt' \
+                   ${OPENOCD_PRE_VERIFY_CMDS} \
+                   -c 'verify_image \"${SIGN_BINFILE}\" \"${BOOTLOADER_OFFSET}\" bin'"
+    else
+        FLASH_CMD="-c 'flash write_image erase \"${ELFFILE}\"' \
+                   -c 'reset halt' \
+                   ${OPENOCD_PRE_VERIFY_CMDS} \
+                   -c 'verify_image \"${ELFFILE}\"'"
+    fi
     # flash device
     sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
@@ -177,10 +188,7 @@ do_flash_elf() {
             -c 'targets' \
             -c 'reset halt' \
             ${OPENOCD_PRE_FLASH_CMDS} \
-            -c 'flash write_image erase \"${ELFFILE}\"' \
-            -c 'reset halt' \
-            ${OPENOCD_PRE_VERIFY_CMDS} \
-            -c 'verify_image \"${ELFFILE}\"' \
+            ${FLASH_CMD} \
             -c 'reset run' \
             -c 'shutdown'" &&
     echo 'Done flashing'
