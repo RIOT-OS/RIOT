@@ -315,6 +315,10 @@ void auto_init(void)
     extern void auto_init_dht(void);
     auto_init_dht();
 #endif
+#ifdef MODULE_TMP006
+    extern void auto_init_tmp006(void);
+    auto_init_tmp006();
+#endif
 #ifdef MODULE_TCS37727
     extern void auto_init_tcs37727(void);
     auto_init_tcs37727();

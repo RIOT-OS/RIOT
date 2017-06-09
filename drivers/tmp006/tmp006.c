@@ -223,3 +223,20 @@ void tmp006_convert(int16_t rawv, int16_t rawt,  float *tamb, float *tobj)
     /* calculate object temperature in Celsius */
     *tobj = (t - 273.15);
 }
+
+int tmp006_read_temperature(tmp006_t *dev, int16_t *ta, int16_t *to)
+{
+    int16_t rawtemp, rawvolt;
+    float tamb, tobj;
+    uint8_t drdy;
+    tmp006_read(dev, &rawvolt, &rawtemp, &drdy);
+
+    if (!drdy) {
+        return TMP006_ERROR;
+    }
+    tmp006_convert(rawvolt, rawtemp,  &tamb, &tobj);
+    *ta = (int16_t)(tamb*100);
+    *to = (int16_t)(tobj*100);
+
+    return TMP006_OK;
+}

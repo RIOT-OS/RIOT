@@ -21,6 +21,7 @@
 
 #include "board.h"
 #include "tmp006.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,6 +56,14 @@ static const tmp006_params_t tmp006_params[] =
 #else
     TMP006_PARAMS_DEFAULT,
 #endif
+};
+
+/**
+ * @brief   Additional meta information to keep in the SAUL registry
+ */
+static const saul_reg_info_t tmp006_saul_info[] =
+{
+    { .name = "tmp006" }
 };
 
 #ifdef __cplusplus
