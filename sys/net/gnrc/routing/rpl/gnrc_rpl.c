@@ -259,7 +259,7 @@ void _update_lifetime(void)
         parent = &gnrc_rpl_parents[i];
         if (parent->state != 0) {
             if (parent->lifetime > GNRC_RPL_LIFETIME_UPDATE_STEP) {
-                if (parent->lifetime > (2 * GNRC_RPL_LIFETIME_UPDATE_STEP)) {
+                if (parent->lifetime <= (2 * GNRC_RPL_LIFETIME_UPDATE_STEP)) {
                     gnrc_rpl_send_DIS(parent->dodag->instance, &parent->addr);
                 }
                 parent->lifetime -= GNRC_RPL_LIFETIME_UPDATE_STEP;
