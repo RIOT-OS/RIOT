@@ -41,6 +41,7 @@ void trickle_interval(trickle_t *trickle)
 
     if ((trickle->I == 0) || (trickle->I > max_interval)) {
         trickle->I = max_interval;
+        old_interval = max_interval / 2;
     }
 
     DEBUG("trickle: I == %" PRIu32 ", diff == %" PRIu32 "\n", trickle->I, diff);
