@@ -156,14 +156,9 @@ extern "C" {
 #define GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE     (0x0900)
 
 /**
- * @brief   Message type for trickle intervals
+ * @brief   Message type for trickle
  */
-#define GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL    (0x0901)
-
-/**
- * @brief   Message type for trickle callbacks
- */
-#define GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK    (0x0902)
+#define GNRC_RPL_MSG_TYPE_TRICKLE_MSG         (0x0901)
 
 /**
  * @brief   Message type for handling DAO sending

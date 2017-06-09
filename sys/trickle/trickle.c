@@ -2,6 +2,7 @@
  * Trickle implementation
  *
  * Copyright (C) 2013, 2014  INRIA.
+ *               2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,12 +11,8 @@
 
 /**
  * @author  Eric Engel <eric.engel@fu-berlin.de>
- * @author  Cenk Gündoğan <cnkgndgn@gmail.com>
+ * @author  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "inttypes.h"
 #include "random.h"
@@ -30,42 +27,42 @@ void trickle_callback(trickle_t *trickle)
     if ((trickle->c < trickle->k) || (trickle->k == 0)) {
         (*trickle->callback.func)(trickle->callback.args);
     }
+
+    trickle_interval(trickle);
 }
 
 void trickle_interval(trickle_t *trickle)
 {
-    uint32_t max_interval;
+    uint32_t old_interval = trickle->I;
+    uint32_t max_interval = trickle->Imin << trickle->Imax;
+    uint32_t diff = old_interval - trickle->t;
 
-    trickle->I = trickle->I * 2;
-    max_interval = trickle->Imin << trickle->Imax;
+    trickle->I *= 2;
 
     if ((trickle->I == 0) || (trickle->I > max_interval)) {
         trickle->I = max_interval;
     }
 
-    DEBUG("trickle: I == %" PRIu32 "\n", trickle->I);
+    DEBUG("trickle: I == %" PRIu32 ", diff == %" PRIu32 "\n", trickle->I, diff);
 
     trickle->c = 0;
-    trickle->t = (trickle->I / 2) + random_uint32_range(0, (trickle->I / 2) + 1);
+    trickle->t = random_uint32_range(old_interval, trickle->I);
 
-    trickle->msg_callback_time = trickle->t * MS_PER_SEC;
-    xtimer_set_msg64(&trickle->msg_callback_timer, trickle->msg_callback_time,
-                     &trickle->msg_callback, trickle->pid);
+    trickle->msg_time = (trickle->t + diff) * MS_PER_SEC;
+    xtimer_set_msg64(&trickle->msg_timer, trickle->msg_time, &trickle->msg,
+                     trickle->pid);
 
-    trickle->msg_interval_time = trickle->I * MS_PER_SEC;
-    xtimer_set_msg64(&trickle->msg_interval_timer, trickle->msg_interval_time,
-                     &trickle->msg_interval, trickle->pid);
 }
 
 void trickle_reset_timer(trickle_t *trickle)
 {
     trickle_stop(trickle);
-    trickle_start(trickle->pid, trickle, trickle->msg_interval.type, trickle->msg_callback.type,
-                  trickle->Imin, trickle->Imax, trickle->k);
+    trickle_start(trickle->pid, trickle, trickle->msg.type, trickle->Imin,
+                  trickle->Imax, trickle->k);
 }
 
-void trickle_start(kernel_pid_t pid, trickle_t *trickle, uint16_t interval_msg_type,
-                   uint16_t callback_msg_type, uint32_t Imin, uint8_t Imax, uint8_t k)
+void trickle_start(kernel_pid_t pid, trickle_t *trickle, uint16_t msg_type,
+                   uint32_t Imin, uint8_t Imax, uint8_t k)
 {
     trickle->pid = pid;
 
@@ -73,20 +70,18 @@ void trickle_start(kernel_pid_t pid, trickle_t *trickle, uint16_t interval_msg_t
     trickle->k = k;
     trickle->Imin = Imin;
     trickle->Imax = Imax;
-    trickle->I = trickle->Imin + random_uint32_range(0, 4 * trickle->Imin);
+    trickle->I = trickle->t = random_uint32_range(trickle->Imin,
+                                                  4 * trickle->Imin);
     trickle->pid = pid;
-    trickle->msg_interval.content.ptr = trickle;
-    trickle->msg_interval.type = interval_msg_type;
-    trickle->msg_callback.content.ptr = trickle;
-    trickle->msg_callback.type = callback_msg_type;
+    trickle->msg.content.ptr = trickle;
+    trickle->msg.type = msg_type;
 
     trickle_interval(trickle);
 }
 
 void trickle_stop(trickle_t *trickle)
 {
-    xtimer_remove(&trickle->msg_interval_timer);
-    xtimer_remove(&trickle->msg_callback_timer);
+    xtimer_remove(&trickle->msg_timer);
 }
 
 void trickle_increment_counter(trickle_t *trickle)
