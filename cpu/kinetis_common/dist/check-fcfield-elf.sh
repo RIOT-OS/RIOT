@@ -7,10 +7,20 @@
 #
 # @author       Jonas Remmert <j.remmert@phytec.de>
 # @author       Johann Fischer <j.fischer@phytec.de>
+# @author       Francisco Acosta <francisco.acosta@inria.fr>
 
 ELFFILE=$1
 
-RETVAL=$(arm-none-eabi-readelf -x .fcfield $ELFFILE  | awk '/0x00000400/ {print $2 $3 $4 $5}')
+# Check if MCUBoot is enabled. If so, increase the memory addresses by the
+# BOOTLAODER_OFFSET + VTOR_OFFSET + MCUBOOT_HDR
+if [ -n "${MCUBOOT}" ]; then
+	let "FCFIELD = $BOOTLOADER_OFFSET+$MCUBOOT_HDR+$VTOR_OFFSET"
+	FCFIELD_ADDR=`printf "0x%08x\n" $FCFIELD`
+else
+	FCFIELD_ADDR=`printf "0x%08x\n" $VTOR_OFFSET`
+fi
+
+RETVAL=$(arm-none-eabi-readelf -x .fcfield $ELFFILE  | awk "/${FCFIELD_ADDR}/ {print \$2 \$3 \$4 \$5}")
 UNLOCKED_FCFIELD="fffffffffffffffffffffffffeffffff"
 
 if [ "$RETVAL" != "$UNLOCKED_FCFIELD" ]; then
