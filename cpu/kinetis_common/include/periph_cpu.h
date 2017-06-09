@@ -205,9 +205,9 @@ typedef enum {
 /** @brief 8 data bits, no parity, 1 stop bit */
 #define UART_MODE_8N1       (0)
 /** @brief 8 data bits, even parity, 1 stop bit */
-#define UART_MODE_8E1       (UART_C1_PE_MASK)
+#define UART_MODE_8E1       (UART_C1_PE_MASK | UART_C1_M_MASK)
 /** @brief 8 data bits, odd parity, 1 stop bit */
-#define UART_MODE_8O1       (UART_C1_PE_MASK | UART_C1_PT_MASK)
+#define UART_MODE_8O1       (UART_C1_PE_MASK | UART_C1_M_MASK | UART_C1_PT_MASK)
 /** @} */
 
 #ifndef DOXYGEN
