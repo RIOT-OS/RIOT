@@ -36,7 +36,6 @@ PSEUDOMODULES += lwip_udp
 PSEUDOMODULES += lwip_udplite
 PSEUDOMODULES += mpu_stack_guard
 PSEUDOMODULES += netdev_default
-PSEUDOMODULES += netif
 PSEUDOMODULES += netstats
 PSEUDOMODULES += netstats_l2
 PSEUDOMODULES += netstats_ipv6
