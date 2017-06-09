@@ -12,6 +12,7 @@ RIOTMAKE       ?= $(RIOTBASE)/makefiles
 RIOTPKG        ?= $(RIOTBASE)/pkg
 RIOTPROJECT    ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 GITCACHE       ?= $(RIOTBASE)/dist/tools/git/git-cache
+IMGTOOL        ?= $(RIOTBASE)/dist/tools/mcuboot/imgtool.py
 APPDIR         ?= $(CURDIR)
 BINDIRBASE     ?= $(APPDIR)/bin
 BINDIR         ?= $(BINDIRBASE)/$(BOARD)
@@ -29,6 +30,7 @@ __DIRECTORY_VARIABLES := \
   BINDIR \
   CCACHE_BASEDIR \
   GITCACHE \
+  IMGTOOL \
   PKGDIRBASE \
   #
 
@@ -41,6 +43,7 @@ override RIOTMAKE       := $(abspath $(RIOTMAKE))
 override RIOTPKG        := $(abspath $(RIOTPKG))
 override RIOTPROJECT    := $(abspath $(RIOTPROJECT))
 override GITCACHE       := $(abspath $(GITCACHE))
+override IMGTOOL        := $(abspath $(IMGTOOL))
 override APPDIR         := $(abspath $(APPDIR))
 override BINDIRBASE     := $(abspath $(BINDIRBASE))
 override BINDIR         := $(abspath $(BINDIR))
@@ -280,6 +283,10 @@ BASELIBS += $(APPDEPS)
 
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
+ifdef MCUBOOT
+export BINFILE ?= $(BINDIR)/$(APPLICATION).bin
+export SIGN_BINFILE = $(BINDIR)/signed-$(APPLICATION).bin
+endif
 
 # variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)
@@ -303,6 +310,9 @@ else
 endif
 	$(Q)$(SIZE) $(ELFFILE)
 	$(Q)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
+ifeq ($(MCUBOOT), 1)
+	$(Q)$(OBJCOPY) -O binary $(ELFFILE) $(BINFILE)
+endif
 endif
 endif # BUILD_IN_DOCKER
 
@@ -315,6 +325,10 @@ endif # BUILD_IN_DOCKER
 ..build-message:
 	@$(COLOR_ECHO) '${COLOR_GREEN}Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".${COLOR_RESET}'
 	@$(COLOR_ECHO)
+ifdef MCUBOOT
+	@$(COLOR_ECHO) '${COLOR_PURPLE}This is a build for MCUBoot linked at $(BOOTLOADER_OFFSET).${COLOR_RESET}'
+	@$(COLOR_ECHO)
+endif
 
 # add extra include paths for packages in $(USEMODULE)
 export USEMODULE_INCLUDES =
@@ -366,6 +380,15 @@ flash: all $(FLASHDEPS)
 		'${COLOR_RED}Flash program $(FLASHER) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(FLASHER) $(FFLAGS)
+
+create-sign: key.pem
+
+key.pem:
+	$(Q)$(IMGTOOL) keygen -k key.pem -t rsa-2048
+
+mcuboot: create-sign all
+	$(Q)$(IMGTOOL) sign --key key.pem --version $(MCUBOOT_VERSION) --align $(MCUBOOT_ALIGN) \
+	-H $(MCUBOOT_HDR) $(BINFILE) $(SIGN_BINFILE)
 
 preflash: all
 	$(PREFLASHER) $(PREFFLAGS)
