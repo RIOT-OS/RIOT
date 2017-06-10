@@ -24,6 +24,47 @@
 extern "C" {
 #endif
 
+/* some pseudo-module based configuration, doc: see below */
+#ifdef MODULE_GNRC_IPV6_NIB_6LBR
+#ifndef GNRC_IPV6_NIB_CONF_6LBR
+#define GNRC_IPV6_NIB_CONF_6LBR         (1)
+#endif
+#endif
+
+#ifdef MODULE_GNRC_IPV6_NIB_6LR
+#ifndef GNRC_IPV6_NIB_CONF_6LR
+#define GNRC_IPV6_NIB_CONF_6LR          (1)
+#endif
+#ifndef GNRC_IPV6_NIB_CONF_SLAAC
+#define GNRC_IPV6_NIB_CONF_SLAAC        (0)
+#endif
+#endif
+
+#ifdef MODULE_GNRC_IPV6_NIB_6LN
+#ifndef GNRC_IPV6_NIB_CONF_6LN
+#define GNRC_IPV6_NIB_CONF_6LN          (1)
+#endif
+#ifndef GNRC_IPV6_NIB_CONF_SLAAC
+#define GNRC_IPV6_NIB_CONF_SLAAC        (0)
+#endif
+#ifndef GNRC_IPV6_NIB_CONF_QUEUE_PKT
+#define GNRC_IPV6_NIB_CONF_QUEUE_PKT    (0)
+#endif
+#if !GNRC_IPV6_NIB_CONF_6LR
+# ifndef GNRC_IPV6_NIB_CONF_ARSM
+# define GNRC_IPV6_NIB_CONF_ARSM        (0)
+# endif
+# ifndef GNRC_IPV6_NIB_NUMOF
+/* only needs to store default router */
+# define GNRC_IPV6_NIB_NUMOF            (1)
+# endif
+#endif
+#endif
+
+#ifdef MODULE_GNRC_IPV6_NIB_ROUTER
+#define GNRC_IPV6_NIB_CONF_ROUTER       (1)
+#endif
+
 /**
  * @name    Compile flags
  * @brief   Compile flags to (de-)activate certain features for NIB
