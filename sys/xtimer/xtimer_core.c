@@ -452,7 +452,7 @@ static void _timer_callback(void)
 
         /* make sure the timer counter also arrived
          * in the next timer period */
-        while (_xtimer_lltimer_now() == _xtimer_lltimer_mask(0xFFFFFFFF));
+        while (_xtimer_lltimer_now() == _xtimer_lltimer_mask(0xFFFFFFFF)) {}
     }
     else {
         /* we ended up in _timer_callback and there is
@@ -466,7 +466,7 @@ overflow:
     /* check if next timers are close to expiring */
     while (timer_list_head && (_time_left(_xtimer_lltimer_mask(timer_list_head->target), reference) < XTIMER_ISR_BACKOFF)) {
         /* make sure we don't fire too early */
-        while (_time_left(_xtimer_lltimer_mask(timer_list_head->target), reference));
+        while (_time_left(_xtimer_lltimer_mask(timer_list_head->target), reference)) {}
 
         /* pick first timer in list */
         xtimer_t *timer = timer_list_head;
@@ -519,7 +519,7 @@ overflow:
             /* check if the end of this period is very soon */
             if (_xtimer_lltimer_mask(now + XTIMER_ISR_BACKOFF) < now) {
                 /* spin until next period, then advance */
-                while (_xtimer_lltimer_now() >= now);
+                while (_xtimer_lltimer_now() >= now) {}
                 _next_period();
                 reference = 0;
                 goto overflow;
