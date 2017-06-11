@@ -88,6 +88,15 @@ int netdev_eth_get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
                 break;
             }
 #endif
+#ifdef MODULE_L2FILTER
+        case NETOPT_L2FILTER:
+            {
+                assert(max_len >= sizeof(l2filter_t **));
+                *((l2filter_t **)value) = dev->filter;
+                res = sizeof(l2filter_t **);
+                break;
+            }
+#endif
         default:
             {
                 res = -ENOTSUP;
@@ -100,15 +109,27 @@ int netdev_eth_get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
 
 int netdev_eth_set(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
 {
+#ifndef MODULE_L2FILTER
     (void)dev;
+#endif
     (void)value;
     (void)value_len;
 
     int res = 0;
 
     switch (opt) {
+
+#ifdef MODULE_L2FILTER
+        case NETOPT_L2FILTER:
+            res = l2filter_add(dev->filter, value, value_len);
+            break;
+        case NETOPT_L2FILTER_RM:
+            res = l2filter_rm(dev->filter, value, value_len);
+            break;
+#endif
         default:
-            return -ENOTSUP;
+            res = -ENOTSUP;
+            break;
     }
 
     return res;

@@ -27,8 +27,8 @@
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
-#ifndef CRC16_CCITT_H
-#define CRC16_CCITT_H
+#ifndef CHECKSUM_CRC16_CCITT_H
+#define CHECKSUM_CRC16_CCITT_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -66,6 +66,6 @@ uint16_t crc16_ccitt_calc(const unsigned char *buf, size_t len);
 }
 #endif
 
-#endif /* CRC16_CCITT_H */
+#endif /* CHECKSUM_CRC16_CCITT_H */
 
 /** @} */

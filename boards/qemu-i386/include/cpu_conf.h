@@ -16,8 +16,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef QEMU_I386_CPU_CONF_H
-#define QEMU_I386_CPU_CONF_H
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,12 +30,11 @@ extern "C" {
 #define THREAD_EXTRA_STACKSIZE_PRINTF            (8192)
 #define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT      (8192)
 #define THREAD_STACKSIZE_MINIMUM                 (8192)
-#define ISR_STACKSIZE                            (0)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* QEMU_I386_CPU_CONF_H */
+#endif /* CPU_CONF_H */
 
 /** @} */

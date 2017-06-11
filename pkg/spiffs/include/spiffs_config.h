@@ -28,8 +28,8 @@
  *      Author: petera
  */
 
-#ifndef SPIFFS_CONFIG_H_
-#define SPIFFS_CONFIG_H_
+#ifndef SPIFFS_CONFIG_H
+#define SPIFFS_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -208,7 +208,7 @@ void spiffs_unlock(struct spiffs_t *fs);
 
 // Enable this if your target needs aligned data for index tables
 #ifndef SPIFFS_ALIGNED_OBJECT_INDEX_TABLES
-#define SPIFFS_ALIGNED_OBJECT_INDEX_TABLES       0
+#define SPIFFS_ALIGNED_OBJECT_INDEX_TABLES       1
 #endif
 
 // Enable this if you want the HAL callbacks to be called with the spiffs struct
@@ -298,4 +298,4 @@ typedef int16_t s16_t;
 }
 #endif
 
-#endif /* SPIFFS_CONFIG_H_ */
+#endif /* SPIFFS_CONFIG_H */

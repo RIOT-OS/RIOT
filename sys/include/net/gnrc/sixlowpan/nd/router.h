@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_SIXLOWPAN_ND_ROUTER_H
-#define GNRC_SIXLOWPAN_ND_ROUTER_H
+#ifndef NET_GNRC_SIXLOWPAN_ND_ROUTER_H
+#define NET_GNRC_SIXLOWPAN_ND_ROUTER_H
 
 #include <stdbool.h>
 
@@ -222,5 +222,5 @@ void gnrc_sixlowpan_nd_router_abr_rem_ctx(gnrc_sixlowpan_nd_router_abr_t *abr, u
 }
 #endif
 
-#endif /* GNRC_SIXLOWPAN_ND_ROUTER_H */
+#endif /* NET_GNRC_SIXLOWPAN_ND_ROUTER_H */
 /** @} */

@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# Copyright 2017 Kaspar Schleiser <kaspar@schleiser.de>
 # Copyright 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
 # Copyright 2014 DangNhat Pham-Huu <51002279@hcmut.edu.vn>
 #
@@ -7,28 +8,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-# customizable
-CHECKROOT=$(dirname "${0}")
+. ${RIOTBASE:+${RIOTBASE}/}dist/tools/ci/changed_files.sh
 
 # prepare
 ROOT=$(git rev-parse --show-toplevel)
 EXIT_CODE=0
-BRANCH="${1}"
-DIFFFILTER="${2}"
 
-# set default diff-filter
-if [ -z "${DIFFFILTER}" ]; then
-    DIFFFILTER="ACMR"
-fi
-
-# select files to check
-if [ -z "${BRANCH}" ]; then
-    FILES="$(git ls-tree -r --full-tree --name-only HEAD | grep -E '\.h$')"
-else
-    FILES="$(git diff --diff-filter=${DIFFFILTER} --name-only ${BRANCH} | grep -E '\.h$')"
-fi
-
-FILES=$(echo "${FILES}" | grep -v -E '^(dist/tools|boards/msba2-common/tools/|.+/include/vendor/)')
+FILES=$(FILEREGEX='\.h$' changed_files)
 
 # check files
 for FILE in ${FILES}; do

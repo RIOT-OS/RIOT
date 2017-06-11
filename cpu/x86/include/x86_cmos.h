@@ -25,8 +25,8 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU__X86__CMOS__H__
-#define CPU__X86__CMOS__H__
+#ifndef X86_CMOS_H
+#define X86_CMOS_H
 
 #include "x86_ports.h"
 
@@ -66,6 +66,6 @@ void x86_cmos_serial(uint8_t (*serial)[CMOS_SERIAL_LEN]);
 }
 #endif
 
-#endif
+#endif /* X86_CMOS_H */
 
 /** @} */

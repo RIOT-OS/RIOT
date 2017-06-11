@@ -1,6 +1,11 @@
 # define the CPU architecture for the kw2xd
 export CPU_ARCH = cortex-m4
 
+# map CPU models to generic Kinetis linkerscript
+LD_KW21D256 = kinetis_f256l16u16.ld
+LD_KW21D512 = kinetis_f512l32u32.ld
+LD_KW22D512 = kinetis_f512l32u32.ld
+
 # tell the build system that the CPU depends on the Kinetis common files
 export USEMODULE += kinetis_common
 

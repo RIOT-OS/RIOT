@@ -32,8 +32,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef PIPE__H
-#define PIPE__H
+#ifndef PIPE_H
+#define PIPE_H
 
 #include <sys/types.h>
 
@@ -121,7 +121,7 @@ void pipe_free(pipe_t *rp);
 }
 #endif
 
-#endif /* PIPE__H */
+#endif /* PIPE_H */
 /**
  * @}
  */

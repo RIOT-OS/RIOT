@@ -16,8 +16,8 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef PANIC_ARCH_H
-#define PANIC_ARCH_H
+#ifndef ARCH_PANIC_ARCH_H
+#define ARCH_PANIC_ARCH_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -35,5 +35,5 @@ void panic_arch(void);
 }
 #endif
 
-#endif /* REBOOT_ARCH_H */
+#endif /* ARCH_PANIC_ARCH_H */
 /** @} */

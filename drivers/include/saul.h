@@ -45,6 +45,7 @@
 #define SAUL_H
 
 #include <stdint.h>
+#include <errno.h>
 
 #include "phydat.h"
 

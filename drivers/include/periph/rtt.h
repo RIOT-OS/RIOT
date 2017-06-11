@@ -20,8 +20,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef RTT_H
-#define RTT_H
+#ifndef PERIPH_RTT_H
+#define PERIPH_RTT_H
 
 #include "periph_conf.h"
 
@@ -172,5 +172,5 @@ void rtt_poweroff(void);
 }
 #endif
 
-#endif /* RTT_H */
+#endif /* PERIPH_RTT_H */
 /** @} */

@@ -56,15 +56,25 @@ extern "C" {
  */
 static const pwm_conf_t pwm_config[] = {
     {
-        .dev      = TIM3,
-        .rcc_mask = RCC_APB1ENR_TIM3EN,
-        .chan     = { { .pin = GPIO_PIN(PORT_C, 6), .cc_chan = 0 },
-                      { .pin = GPIO_PIN(PORT_C, 7), .cc_chan = 1 },
-                      { .pin = GPIO_PIN(PORT_C, 8), .cc_chan = 2 },
-                      { .pin = GPIO_PIN(PORT_C, 9), .cc_chan = 3 } },
+        .dev      = TIM1,
+        .rcc_mask = RCC_APB2ENR_TIM1EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_E,  9) /* D6 */, .cc_chan = 0},
+                      { .pin = GPIO_PIN(PORT_E, 11) /* D5 */, .cc_chan = 1},
+                      { .pin = GPIO_PIN(PORT_E, 13) /* D3 */, .cc_chan = 2},
+                      { .pin = GPIO_UNDEF,                    .cc_chan = 0} },
+        .af       = GPIO_AF1,
+        .bus      = APB2
+    },
+    {
+        .dev      = TIM4,
+        .rcc_mask = RCC_APB1ENR_TIM4EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_D, 15) /* D9 */, .cc_chan = 3},
+                      { .pin = GPIO_UNDEF,                    .cc_chan = 0},
+                      { .pin = GPIO_UNDEF,                    .cc_chan = 0},
+                      { .pin = GPIO_UNDEF,                    .cc_chan = 0} },
         .af       = GPIO_AF2,
         .bus      = APB1
-    }
+    },
 };
 
 #define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
@@ -88,20 +98,11 @@ static const timer_conf_t timer_config[] = {
         .rcc_mask = RCC_APB1ENR_TIM5EN,
         .bus      = APB1,
         .irqn     = TIM5_IRQn
-    },
-    {
-        .dev      = TIM4,
-        .max      = 0xffffffff,
-        .rcc_mask = RCC_APB1ENR_TIM4EN,
-        .bus      = APB1,
-        .irqn     = TIM4_IRQn
     }
 };
 
 #define TIMER_0_ISR         isr_tim2
 #define TIMER_1_ISR         isr_tim5
-#define TIMER_2_ISR         isr_tim3
-#define TIMER_3_ISR         isr_tim4
 
 #define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
@@ -126,6 +127,20 @@ static const uart_conf_t uart_config[] = {
 #endif
     },
     {
+        .dev        = USART6,
+        .rcc_mask   = RCC_APB2ENR_USART6EN,
+        .rx_pin     = GPIO_PIN(PORT_G, 9),
+        .tx_pin     = GPIO_PIN(PORT_G, 14),
+        .rx_af      = GPIO_AF8,
+        .tx_af      = GPIO_AF8,
+        .bus        = APB2,
+        .irqn       = USART6_IRQn,
+#ifdef UART_USE_DMA
+        .dma_stream = 6,
+        .dma_chan   = 4
+#endif
+    },
+    {
         .dev        = USART2,
         .rcc_mask   = RCC_APB1ENR_USART2EN,
         .rx_pin     = GPIO_PIN(PORT_D, 6),
@@ -135,33 +150,19 @@ static const uart_conf_t uart_config[] = {
         .bus        = APB1,
         .irqn       = USART2_IRQn,
 #ifdef UART_USE_DMA
-        .dma_stream = 6,
-        .dma_chan   = 4
-#endif
-    },
-    {
-        .dev        = USART1,
-        .rcc_mask   = RCC_APB2ENR_USART1EN,
-        .rx_pin     = GPIO_PIN(PORT_A, 10),
-        .tx_pin     = GPIO_PIN(PORT_A,  9),
-        .rx_af      = GPIO_AF7,
-        .tx_af      = GPIO_AF7,
-        .bus        = APB2,
-        .irqn       = USART1_IRQn,
-#ifdef UART_USE_DMA
         .dma_stream = 7,
         .dma_chan   = 4
 #endif
-    }
+    },
 };
 
 #define UART_0_ISR          (isr_usart3)
 #define UART_0_DMA_ISR      (isr_dma1_stream3)
 
-#define UART_1_ISR          (isr_usart2)
+#define UART_1_ISR          (isr_usart6)
 #define UART_1_DMA_ISR      (isr_dma1_stream6)
 
-#define UART_2_ISR          (isr_usart1)
+#define UART_2_ISR          (isr_usart2)
 #define UART_2_DMA_ISR      (isr_dma1_stream7)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))

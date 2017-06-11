@@ -16,8 +16,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_H
-#define GNRC_SIXLOWPAN_FRAG_RBUF_H
+#ifndef RBUF_H
+#define RBUF_H
 
 #include <inttypes.h>
 
@@ -104,5 +104,5 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *frag,
 }
 #endif
 
-#endif /* GNRC_SIXLOWPAN_FRAG_RBUF_H */
+#endif /* RBUF_H */
 /** @} */

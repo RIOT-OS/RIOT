@@ -10,7 +10,6 @@
  * @defgroup    drivers_periph_uart UART
  * @ingroup     drivers_periph
  * @brief       Low-level UART peripheral driver
- * @{
  *
  * This is a basic UART (Universal Asynchronous Receiver Transmitter) interface
  * to allow platform independent access to the MCU's serial communication abilities.
@@ -34,6 +33,8 @@
  * By default the @p UART_DEV(0) device of each board is initialized and mapped to STDIO
  * in RIOT which is used for standard input/output functions like `printf()` or
  * `puts()`.
+ *
+ * @{
  *
  * @file
  * @brief       Low-level UART peripheral driver interface definition

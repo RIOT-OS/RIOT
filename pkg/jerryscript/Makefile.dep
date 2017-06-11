@@ -1,0 +1,3 @@
+ifneq (,$(filter jerryscript,$(USEPKG)))
+    USEMODULE += jerryport-minimal
+endif

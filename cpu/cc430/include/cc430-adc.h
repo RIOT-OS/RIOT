@@ -49,4 +49,4 @@ extern uint8_t  adc12_data_ready;
 }
 #endif
 
-#endif
+#endif /* CC430_ADC_H */

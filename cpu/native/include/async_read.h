@@ -71,5 +71,5 @@ void native_async_read_add_handler(int fd, void *arg, native_async_read_callback
 }
 #endif
 
-#endif
+#endif /* ASYNC_READ_H */
 /** @} */

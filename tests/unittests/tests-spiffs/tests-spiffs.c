@@ -29,10 +29,10 @@
 #else
 /* Test mock object implementing a simple RAM-based mtd */
 #ifndef SECTOR_COUNT
-#define SECTOR_COUNT 8
+#define SECTOR_COUNT 4
 #endif
 #ifndef PAGE_PER_SECTOR
-#define PAGE_PER_SECTOR 4
+#define PAGE_PER_SECTOR 8
 #endif
 #ifndef PAGE_SIZE
 #define PAGE_SIZE 128

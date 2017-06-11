@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MMA8X5X_REG_H
-#define MMA8X5X_REG_H
+#ifndef MMA8X5X_REGS_H
+#define MMA8X5X_REGS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -258,5 +258,5 @@ extern "C"
 }
 #endif
 
-#endif
+#endif /* MMA8X5X_REGS_H */
 /** @} */

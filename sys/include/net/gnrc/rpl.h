@@ -95,8 +95,8 @@
  * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
  */
 
-#ifndef GNRC_RPL_H
-#define GNRC_RPL_H
+#ifndef NET_GNRC_RPL_H
+#define NET_GNRC_RPL_H
 
 #include <string.h>
 #include <stdint.h>
@@ -156,14 +156,9 @@ extern "C" {
 #define GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE     (0x0900)
 
 /**
- * @brief   Message type for trickle intervals
+ * @brief   Message type for trickle
  */
-#define GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL    (0x0901)
-
-/**
- * @brief   Message type for trickle callbacks
- */
-#define GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK    (0x0902)
+#define GNRC_RPL_MSG_TYPE_TRICKLE_MSG         (0x0901)
 
 /**
  * @brief   Message type for handling DAO sending
@@ -634,5 +629,5 @@ static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
 }
 #endif
 
-#endif /* GNRC_RPL_H */
+#endif /* NET_GNRC_RPL_H */
 /** @} */

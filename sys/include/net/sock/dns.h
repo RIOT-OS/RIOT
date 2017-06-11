@@ -20,8 +20,8 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef SOCK_DNS_H
-#define SOCK_DNS_H
+#ifndef NET_SOCK_DNS_H
+#define NET_SOCK_DNS_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -94,5 +94,5 @@ extern sock_udp_ep_t sock_dns_server;
 }
 #endif
 
-#endif /* SOCK_DNS_H */
+#endif /* NET_SOCK_DNS_H */
 /** @} */

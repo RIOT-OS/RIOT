@@ -21,7 +21,7 @@ A module's Makefile just needs to include `Makefile.base` in the RIOT
 repository:
 
 ~~~~~~~~~~~~~~~~~~~ {.mk}
-include $(RIOTBASE)/Makefile
+include $(RIOTBASE)/Makefile.base
 ~~~~~~~~~~~~~~~~~~~
 
 If your module's name differs from the name of the directory it resides in you

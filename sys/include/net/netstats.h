@@ -20,8 +20,8 @@
 
 #include <stdint.h>
 
-#ifndef NETSTATS_H
-#define NETSTATS_H
+#ifndef NET_NETSTATS_H
+#define NET_NETSTATS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,5 +57,5 @@ typedef struct {
 }
 #endif
 
-#endif /* NETSTATS_H */
+#endif /* NET_NETSTATS_H */
 /** @} */

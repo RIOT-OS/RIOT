@@ -219,6 +219,9 @@ int cmd_transfer(int argc, char **argv)
 
 int cmd_bench(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+
     uint32_t start, stop;
     uint32_t sum = 0;
     uint8_t in;

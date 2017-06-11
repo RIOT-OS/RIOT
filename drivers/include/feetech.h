@@ -166,5 +166,5 @@ int feetech_read(feetech_t *device, feetech_addr_t addr, uint8_t *data, size_t l
 }
 #endif
 
-#endif
+#endif /* FEETECH_H */
 /** @} */

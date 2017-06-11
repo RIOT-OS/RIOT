@@ -551,9 +551,9 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
         }
 
         gnrc_rpl_delay_dao(dodag);
-        trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL,
-                      GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << dodag->dio_min),
-                      dodag->dio_interval_doubl, dodag->dio_redun);
+        trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_MSG,
+                      (1 << dodag->dio_min), dodag->dio_interval_doubl,
+                      dodag->dio_redun);
 
         gnrc_rpl_parent_update(dodag, parent);
         return;
@@ -976,7 +976,7 @@ void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, ipv6
     (void)iface;
     (void)src;
     (void)dst;
-    (void) len;
+    (void)len;
 
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
@@ -986,7 +986,7 @@ void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, ipv6
 #endif
 
 #ifndef GNRC_RPL_WITHOUT_VALIDATION
-    if (!gnrc_rpl_validation_DAO_ACK(dao_ack, len)) {
+    if (!gnrc_rpl_validation_DAO_ACK(dao_ack, len, dst)) {
         return;
     }
 #endif

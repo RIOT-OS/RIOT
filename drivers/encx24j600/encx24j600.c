@@ -22,10 +22,6 @@
 #include <assert.h>
 #include <errno.h>
 
-#ifdef MODULE_NETSTATS_L2
-#include <string.h>
-#endif
-
 #include "mutex.h"
 #include "encx24j600.h"
 #include "encx24j600_internal.h"
@@ -36,7 +32,11 @@
 #include "net/netdev/eth.h"
 #include "net/eui64.h"
 #include "net/ethernet.h"
+
+#ifdef MODULE_NETSTATS_L2
+#include <string.h>
 #include "net/netstats.h"
+#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -360,10 +360,16 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     /* hdr.frame_len given by device contains 4 bytes checksum */
     size_t payload_len = hdr.frame_len - 4;
 
+
     if (buf) {
+        if (payload_len > len) {
+            /* payload exceeds buffer size */
+            unlock(dev);
+            return -ENOBUFS;
+        }
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += len;
+        netdev->stats.rx_bytes += payload_len;
 #endif
         /* read packet (without 4 bytes checksum) */
         sram_op(dev, ENC_RRXDATA, 0xFFFF, buf, payload_len);

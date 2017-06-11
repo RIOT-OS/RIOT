@@ -25,8 +25,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef WSN_BOARD_H
-#define WSN_BOARD_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "board_common.h"
 
@@ -60,4 +60,4 @@ extern "C" {
 #include <msp430x16x.h>
 
 /** @} */
-#endif /* WSN_BOARD_H */
+#endif /* BOARD_H */

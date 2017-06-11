@@ -23,8 +23,8 @@
 /* This code is public-domain - it is based on libcrypt
  * placed in the public domain by Wei Dai and other contributors. */
 
-#ifndef _SHA1_H
-#define _SHA1_H
+#ifndef HASHES_SHA1_H
+#define HASHES_SHA1_H
 
 #include <stdint.h>
 
@@ -118,5 +118,5 @@ void sha1_final_hmac(sha1_context *ctx, void *digest);
 }
 #endif
 
-#endif /* _SHA1_H */
+#endif /* HASHES_SHA1_H */
 /** @} */

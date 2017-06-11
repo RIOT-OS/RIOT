@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef RMUTEX_H_
-#define RMUTEX_H_
+#ifndef RMUTEX_H
+#define RMUTEX_H
 
 #include <stdatomic.h>
 
@@ -106,5 +106,5 @@ void rmutex_unlock(rmutex_t *rmutex);
 }
 #endif
 
-#endif /* RMUTEX_H_ */
+#endif /* RMUTEX_H */
 /** @} */

@@ -89,7 +89,7 @@ static int cmd_con(int argc, char **argv)
     }
 
     if (argc >= 3) {
-        gw.port = (uint16_t)atoi(argv[2]);
+        gw.port = atoi(argv[2]);
     }
     if (argc >= 5) {
         topic = argv[3];

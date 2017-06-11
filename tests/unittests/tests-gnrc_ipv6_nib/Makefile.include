@@ -1,0 +1,6 @@
+USEMODULE += gnrc_ipv6_nib
+
+CFLAGS += -DGNRC_IPV6_NIB_NUMOF=16
+CFLAGS += -DGNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF=4
+
+INCLUDES += -I$(RIOTBASE)/sys/net/gnrc/network_layer/ipv6/nib

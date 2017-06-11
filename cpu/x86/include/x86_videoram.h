@@ -25,8 +25,8 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU__X86__VIDEORAM_H__
-#define CPU__X86__VIDEORAM_H__
+#ifndef X86_VIDEORAM_H
+#define X86_VIDEORAM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,6 +65,6 @@ void videoram_put_hex(unsigned long v);
 }
 #endif
 
-#endif
+#endif /* X86_VIDEORAM_H */
 
 /** @} */

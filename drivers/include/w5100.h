@@ -81,5 +81,5 @@ void w5100_setup(w5100_t *dev, const w5100_params_t *params);
 }
 #endif
 
-#endif /* W5100_h */
+#endif /* W5100_H */
 /* @} */

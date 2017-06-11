@@ -135,4 +135,4 @@ inline static uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
 }
 #endif
 
-#endif
+#endif /* XTIMER_TICK_CONVERSION_H */

@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef IEEE802154_H
-#define IEEE802154_H
+#ifndef NET_IEEE802154_H
+#define NET_IEEE802154_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -295,5 +295,5 @@ static inline eui64_t *ieee802154_get_iid(eui64_t *eui64, const uint8_t *addr,
 }
 #endif
 
-#endif /* IEEE802154_H */
+#endif /* NET_IEEE802154_H */
 /** @} */

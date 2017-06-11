@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef UBJSON__INTERNAL_H__
-#define UBJSON__INTERNAL_H__
+#ifndef UBJSON_INTERNAL_H
+#define UBJSON_INTERNAL_H
 
 /* compare http://ubjson.org/type-reference/ */
 
@@ -59,4 +59,4 @@ typedef enum {
 }
 #endif
 
-#endif /* ifndef UBJSON__INTERNAL_H__ */
+#endif /* UBJSON_INTERNAL_H */
