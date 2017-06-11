@@ -224,8 +224,7 @@ void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, const size_t len)
 
 void at86rf2xx_force_trx_off(const at86rf2xx_t *dev)
 {
-    at86rf2xx_reg_write(dev,
-                        AT86RF2XX_REG__TRX_STATE,
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE,
                         AT86RF2XX_TRX_STATE__FORCE_TRX_OFF);
-    while (at86rf2xx_get_status(dev) != AT86RF2XX_STATE_TRX_OFF);
+    while (at86rf2xx_get_status(dev) != AT86RF2XX_STATE_TRX_OFF) {}
 }
