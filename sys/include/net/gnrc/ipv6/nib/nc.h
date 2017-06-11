@@ -9,7 +9,7 @@
 /**
  * @defgroup    net_gnrc_ipv6_nib_nc   Neighbor Cache
  * @ingroup     net_gnrc_ipv6_nib
- * @brief       Neighbor cache component of network information base
+ * @brief       Neighbor cache component of neighbor information base
  * @{
  *
  * @file
