@@ -1,6 +1,7 @@
 /*
  * Copyright (C)  2016 Freie Universität Berlin
  *                2016 Inria
+ *                2017 Tom Keddie
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,16 +9,17 @@
  */
 
 /**
- * @ingroup     boards_arduino-zero
+ * @ingroup     boards_sparkfun-samd-mini
  * @{
  *
  * @file
- * @brief       Configuration of CPU peripherals for Arduino Zero board
+ * @brief       Configuration of CPU peripherals for SparkFun SAMD21 Mini Breakout board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Tom Keddie <github@bronwenandtom.com>
  */
 
 #ifndef PERIPH_CONF_H

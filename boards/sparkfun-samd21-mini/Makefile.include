@@ -1,4 +1,4 @@
-# define the cpu used by Arduino/Genuino Zero board
+# define the cpu used by SparkFun SAMD21 Mini Breakout board
 export CPU = samd21
 export CPU_MODEL = samd21g18a
 

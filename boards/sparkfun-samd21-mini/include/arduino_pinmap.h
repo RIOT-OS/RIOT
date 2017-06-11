@@ -1,5 +1,6 @@
 /*
  * Copyright (C)  2016 Inria
+ *                2017 Tom Keddie
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,7 +8,7 @@
  */
 
 /**
- * @ingroup     boards_arduino-zero
+ * @ingroup     boards_sparkfun-samd-mini
  * @{
  *
  * @file
@@ -17,6 +18,7 @@
  * Arduino specific pin numbers.
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Tom Keddie <github@bronwenandtom.com>
  */
 
 #ifndef ARDUINO_PINMAP_H

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Inria
+ *               2017 Tom Keddie
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,16 +8,17 @@
  */
 
 /**
- * @defgroup    boards_arduino-zero Arduino Zero
+ * @defgroup    boards_sparkfun-samd-mini
  * @ingroup     boards
- * @brief       Support for the Arduino Zero board.
+ * @brief       Support for the SparkFun SAMD21 Mini Breakout board.
  * @{
  *
  * @file
- * @brief       Board specific definitions for the Arduino Zero
- *              board
+ * @brief       Board specific definitions for the SparkFun SAMD21 Mini
+ *              Breakout board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Tom Keddie <github@bronwenandtom.com>
  */
 
 #ifndef BOARD_H
