@@ -168,6 +168,10 @@ ifneq (,$(filter mtd_sdcard,$(USEMODULE)))
     USEMODULE += sdcard_spi
 endif
 
+ifneq (,$(filter grove_ledbar,$(USEMODULE)))
+    USEMODULE += my9221
+endif
+
 ifneq (,$(filter my9221,$(USEMODULE)))
     FEATURES_REQUIRED += periph_gpio
     USEMODULE += xtimer
