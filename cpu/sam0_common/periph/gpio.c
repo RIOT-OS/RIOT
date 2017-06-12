@@ -97,9 +97,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
         port->DIRSET.reg = pin_mask;
     }
 
-    /* configure the pin cfg and clear output register */
+    /* configure the pin cfg */
     port->PINCFG[pin_pos].reg = (mode & MODE_PINCFG_MASK);
-    port->OUTCLR.reg = pin_mask;
 
     /* and set pull-up/pull-down if applicable */
     if (mode == 0x7) {
