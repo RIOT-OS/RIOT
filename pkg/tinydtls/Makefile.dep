@@ -6,4 +6,13 @@ ifneq (,$(filter tinydtls,$(USEMODULE)))
   USEMODULE += tinydtls_aes
   USEMODULE += tinydtls_ecc
   USEMODULE += tinydtls_sha2
+
+  #TinyDTLs (crypto.c) made use of pthread
+  ifneq ($(BOARD),native)
+    USEMODULE += pthread
+  endif
+
+  # NOTE: Those are taken from TinyDTLS. As the original Makefiles are
+  #       overwitten is a good idea to preserve them here.
+  CFLAGS += -DDTLSv12 -DWITH_SHA256
 endif
