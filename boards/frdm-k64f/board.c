@@ -29,6 +29,11 @@
                                 SIM_CLKDIV1_OUTDIV3(1) | \
                                 SIM_CLKDIV1_OUTDIV4(2))
 
+#define SIM_CLKDIV1_SAFE       (SIM_CLKDIV1_OUTDIV1(0) | \
+                                SIM_CLKDIV1_OUTDIV2(1) | \
+                                SIM_CLKDIV1_OUTDIV3(1) | \
+                                SIM_CLKDIV1_OUTDIV4(3))
+
 static void cpu_clock_init(void);
 
 void board_init(void)
@@ -61,7 +66,11 @@ void board_init(void)
 static void cpu_clock_init(void)
 {
     /* setup system prescalers */
+#ifdef MCUBOOT
+    SIM->CLKDIV1 = (uint32_t)SIM_CLKDIV1_SAFE;
+#else
     SIM->CLKDIV1 = (uint32_t)SIM_CLKDIV1_60MHZ;
+#endif
 
     /* RMII RXCLK */
     SIM->SCGC5 |= SIM_SCGC5_PORTA_MASK;
