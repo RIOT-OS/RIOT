@@ -49,6 +49,11 @@ USEMODULE += ps
 # development process:
 CFLAGS += -DDEVELHELP
 
+# Enable this line for making use of (tiny)DTLS.
+# NOTE: This also changes the default port to 20220 (DTLS default port)
+# WARNING: The BOARD_BLACKLIST of examples/dtls-echo must be considered.
+# USEMODULE += gnrc_dtls
+
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 

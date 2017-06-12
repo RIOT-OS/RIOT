@@ -126,6 +126,30 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
     return bytes_sent;
 }
 
+#ifdef MODULE_GNRC_DTLS
+int dtlsc_cli_cmd(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    /* TODO: Adding renegotiate [and start?] */
+    if (argc < 2) {
+        printf("usage: %s dtlsc [stop]\n", argv[0]);
+        return 0;
+    }
+
+    if (strcmp(argv[1], "stop") == 0) {
+        gcoap_end_dtls_session();
+    }
+    else {
+        printf("usage: %s dtlsc [stop]\n", argv[0]);
+        return 0;
+    }
+
+    return 1;
+}
+#endif
+
 int gcoap_cli_cmd(int argc, char **argv)
 {
     /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
