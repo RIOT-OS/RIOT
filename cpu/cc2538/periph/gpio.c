@@ -55,8 +55,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     else {
         gpio(pin)->DIR &= ~gpio_pin_mask(pin);
     }
-    /* clear pin */
-    gpio(pin)->DATA &= ~gpio_pin_mask(pin);
 
     return 0;
 }
