@@ -138,6 +138,10 @@ typedef struct {
 /**
  * @brief   Initialize the given pin as general purpose input or output
  *
+ * When configured as output, the pin state after initialization is undefined.
+ * The output pin's state **should** be untouched during the initialization.
+ * This behavior can however **not be guaranteed** by every platform.
+ *
  * @param[in] pin       pin to initialize
  * @param[in] mode      mode of the pin, see @c gpio_mode_t
  *
