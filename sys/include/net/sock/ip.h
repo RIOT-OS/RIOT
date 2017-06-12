@@ -404,7 +404,8 @@ int sock_ip_get_remote(sock_ip_t *sock, sock_ip_ep_t *ep);
  * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
  * @return  -EAGAIN, if @p timeout is `0` and no data is available.
  * @return  -EINTR, receive was interrupted by an illegal networking state
- *          (most likely due to wrong initialization of a parameter)
+ *          (most likely due to wrong initialization of a parameter or @p sock
+ *          being closed before this function was called)
  * @return  -ENOBUFS, if buffer space is not large enough to store received
  *          data.
  * @return  -ENOMEM, if no memory was available to receive @p data.
