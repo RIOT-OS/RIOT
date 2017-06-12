@@ -20,6 +20,7 @@
 
 #include "board.h"
 #include "periph/gpio.h"
+#include "saul_reg.h"
 
 #include "grove_ledbar.h"
 #include "my9221.h"
@@ -70,6 +71,16 @@ static const grove_ledbar_params_t grove_ledbar_params[] =
 #else
     GROVE_LEDBAR_PARAMS,
 #endif
+};
+
+/**
+ * @brief   Additional meta information to keep in the SAUL registry
+ */
+static const saul_reg_info_t grove_ledbar_saul_info[] =
+{
+    {
+        .name = "Grove LED bar"
+    }
 };
 
 #ifdef __cplusplus
