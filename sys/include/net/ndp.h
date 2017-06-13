@@ -153,6 +153,12 @@ extern "C" {
 #define NDP_MAX_NA_NUMOF            (3U)        /**< MAX_NEIGHBOR_ADVERTISEMENT */
 #define NDP_REACH_MS                (30000U)    /**< REACHABLE_TIME (in ms) */
 #define NDP_RETRANS_TIMER_MS        (1000U)     /**< RETRANS_TIMER (in ms) */
+/**
+ * @brief   MAX_RETRANS_TIMER (in ms)
+ *
+ * @see     [RFC 7048](https://tools.ietf.org/html/rfc7048)
+ */
+#define NDP_MAX_RETRANS_TIMER_MS    (60000U)
 #define NDP_DELAY_FIRST_PROBE_MS    (5000U)     /**< DELAY_FIRST_PROBE_TIME (in ms) */
 #define NDP_MIN_RANDOM_FACTOR       (500U)      /**< MIN_RANDOM_FACTOR (x 1000) */
 #define NDP_MAX_RANDOM_FACTOR       (1500U)     /**< MAX_RANDOM_FACTOR (x 1000) */
