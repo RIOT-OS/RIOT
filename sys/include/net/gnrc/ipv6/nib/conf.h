@@ -9,11 +9,11 @@
 /**
  * @defgroup    net_gnrc_ipv6_nib_conf  Configuration macros
  * @ingroup     net_gnrc_ipv6_nib
- * @brief       Configuration macros for network information base
+ * @brief       Configuration macros for neighbor information base
  * @{
  *
  * @file
- * @brief       Configuration macro definitions for network information base
+ * @brief       Configuration macro definitions for neighbor information base
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */

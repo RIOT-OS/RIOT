@@ -25,7 +25,12 @@
 #   include "msp430_types.h"
 #endif
 
-#if defined(__MACH__) || defined(__WITH_AVRLIBC__)
+#ifdef __MACH__
+/* needed for AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER */
+#include <AvailabilityMacros.h>
+#endif
+
+#if defined(__WITH_AVRLIBC__) || (defined(__MACH__) && !defined(AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER))
 typedef int clockid_t;
 #endif
 
