@@ -15,7 +15,7 @@ ifneq (,$(filter tinydtls,$(USEPKG)))
 
 # NOTE: PSK should be enabled by default BUT if the user define any other cipher
 #       suite(s) it should not be enabled.
-#IDEA: Create the flag DTLS_CIPHERS with keywords PSK, ECC (and future)
+#TODO: Create the flag DTLS_CIPHERS with keywords PSK, ECC (and future)
   ifeq (,$(filter -DDTLS_PSK,$(CFLAGS)))
       ifeq (,$(filter -DDTLS_ECC,$(CFLAGS)))
         CFLAGS += -DDTLS_PSK
