@@ -48,6 +48,19 @@ typedef enum {
     NETOPT_ADDR_LEN,            /**< get the default address length a
                                  *   network device expects as uint16_t in
                                  *   host byte order */
+    /**
+     * @brief   get the currently configured source address as an array in host
+     *          byte order
+     *
+     * Expects the return parameter array to at least be as long as the length
+     * of the address returned by getting NETOPT_ADDRESS_LONG. Returns the
+     * actual length of the address on success.
+     *
+     * @note Setting this option should always return -ENOTSUP.
+     *       @ref NETOPT_ADDRESS and @ref NETOPT_ADDRESS_LONG shall be used for
+     *       setting the specific address.
+     */
+    NETOPT_SRC_ADDR,
     NETOPT_SRC_LEN,             /**< get/set the address length to choose
                                  *   for the network device's source address
                                  *   as uint16_t in host byte order */
