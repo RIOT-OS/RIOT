@@ -1122,7 +1122,6 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
 
     /*First, DTLS session must be established */
     msg_t mbox_msg, msg_answ; /* Universal, used for the mailboxes and IPC-s msgs */
-    int res;
 
     /*Retrieve the DTLS channel (or create it) */
     mbox_msg.type = DTLS_MSG_CLIENT_START_CHANNEL;
@@ -1173,11 +1172,6 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
                 return 0;
             }
         }/* IF GCOAP_NON_TIMEOUT */
-        else if (!res) {
-            memo->state = GCOAP_MEMO_UNUSED;
-            DEBUG("gcoap: sock send failed: %d\n", res);
-            return 0;
-        }
     }/* IF - memo */
 
     return 1;
