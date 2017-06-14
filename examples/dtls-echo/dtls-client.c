@@ -436,7 +436,7 @@ static void client_send(char *addr_str, char *data UNUSED_PARAM,
     }
 
 #ifndef COAP_MSG_SPOOF
-    static char *client_payload;
+     char *client_payload;
     if (strlen(data) > DTLS_MAX_BUF) {
         puts("ERROR: Exceeded max size of DTLS buffer.");
         return;
@@ -446,7 +446,7 @@ static void client_send(char *addr_str, char *data UNUSED_PARAM,
 #else /* COAP_MSG_SPOOF */
     (void) data;
     /* CoAP Message: NON, MID:59394, GET, TKN:0d 9f, /riot/value */
-    static unsigned char client_payload[] = {
+     unsigned char client_payload[] = {
         0x52, 0x01, 0xe8, 0x02, 0x0d, 0x9f, 0xb4, 0x72,
         0x69, 0x6f, 0x74, 0x05, 0x76, 0x61, 0x6c, 0x75,
         0x65
