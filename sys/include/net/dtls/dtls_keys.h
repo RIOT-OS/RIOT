@@ -17,7 +17,6 @@
 #ifndef NET_DTLS_DTLS_KEYS_H
 #define NET_DTLS_DTLS_KEYS_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
