@@ -54,8 +54,7 @@ void auto_init_bmp180(void)
         LOG_DEBUG("[auto_init_saul] initializing bmp180 #%u\n", i);
 
         if (bmp180_init(&bmp180_devs[i],
-                        bmp180_params[i].i2c_dev,
-                        bmp180_params[i].mode) < 0) {
+                        &bmp180_params[i]) != BMP180_OK) {
             LOG_ERROR("[auto_init_saul] error initializing bmp180 #%u\n", i);
             continue;
         }

@@ -30,6 +30,10 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
+#define DEV_I2C      (dev->params.i2c_dev)
+#define DEV_ADDR     (dev->params.i2c_addr)
+#define OVERSAMPLING (dev->params.oversampling)
+
 /* Internal function prototypes */
 static int _read_ut(bmp180_t *dev, int32_t *ut);
 static int _read_up(bmp180_t *dev, int32_t *up);
@@ -39,34 +43,31 @@ static int _compute_b5(bmp180_t *dev, int32_t ut, int32_t *b5);
  *                          BMP180 Core API                                 *
  *---------------------------------------------------------------------------*/
 
-int bmp180_init(bmp180_t *dev, i2c_t i2c, uint8_t mode)
+int bmp180_init(bmp180_t *dev, const bmp180_params_t *params)
 {
-    dev->i2c_dev = i2c;
+    dev->params = *params;
 
     /* Clamp oversampling mode */
-    if (mode > BMP180_ULTRAHIGHRES) {
-        mode = BMP180_ULTRAHIGHRES;
+    if (OVERSAMPLING > BMP180_ULTRAHIGHRES) {
+        OVERSAMPLING = BMP180_ULTRAHIGHRES;
     }
 
-    /* Setting oversampling mode */
-    dev->oversampling = mode;
-
     /* Initialize I2C interface */
-    if (i2c_init_master(dev->i2c_dev, I2C_SPEED_NORMAL)) {
+    if (i2c_init_master(DEV_I2C, I2C_SPEED_NORMAL)) {
         DEBUG("[Error] I2C device not enabled\n");
-        return -1;
+        return -BMP180_ERR_NOI2C;
     }
 
     /* Acquire exclusive access */
-    i2c_acquire(dev->i2c_dev);
+    i2c_acquire(DEV_I2C);
 
     /* Check sensor ID */
     uint8_t checkid;
-    i2c_read_reg(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_ID, &checkid);
+    i2c_read_reg(DEV_I2C, DEV_ADDR, BMP180_REGISTER_ID, &checkid);
     if (checkid != 0x55) {
         DEBUG("[Error] Wrong device ID\n");
-        i2c_release(dev->i2c_dev);
-        return -1;
+        i2c_release(DEV_I2C);
+        return -BMP180_ERR_NODEV;
     }
 
     /* adding delay before reading calibration values to avoid timing issues */
@@ -74,10 +75,10 @@ int bmp180_init(bmp180_t *dev, i2c_t i2c, uint8_t mode)
 
     uint8_t buffer[22] = {0};
     /* Read calibration values, using contiguous register addresses */
-    if (i2c_read_regs(dev->i2c_dev, BMP180_ADDR, BMP180_CALIBRATION_AC1, buffer, 22) < 0) {
+    if (i2c_read_regs(DEV_I2C, DEV_ADDR, BMP180_CALIBRATION_AC1, buffer, 22) < 0) {
         DEBUG("[Error] Cannot read calibration registers.\n");
-        i2c_release(dev->i2c_dev);
-        return -1;
+        i2c_release(DEV_I2C);
+        return -BMP180_ERR_NOCAL;
     }
     dev->calibration.ac1 = (int16_t)(buffer[0] << 8)   | buffer[1];
     dev->calibration.ac2 = (int16_t)(buffer[2] << 8)   | buffer[3];
@@ -92,7 +93,7 @@ int bmp180_init(bmp180_t *dev, i2c_t i2c, uint8_t mode)
     dev->calibration.md  = (int16_t)(buffer[20] << 8)  | buffer[21];
 
     /* Release I2C device */
-    i2c_release(dev->i2c_dev);
+    i2c_release(DEV_I2C);
 
     DEBUG("AC1: %i\n", (int)dev->calibration.ac1);
     DEBUG("AC2: %i\n", (int)dev->calibration.ac2);
@@ -108,36 +109,38 @@ int bmp180_init(bmp180_t *dev, i2c_t i2c, uint8_t mode)
     return 0;
 }
 
-int bmp180_read_temperature(bmp180_t *dev, int32_t *temperature)
+int16_t bmp180_read_temperature(bmp180_t *dev)
 {
     int32_t ut, b5;
     /* Acquire exclusive access */
-    i2c_acquire(dev->i2c_dev);
+    i2c_acquire(DEV_I2C);
 
     /* Read uncompensated value */
     _read_ut(dev, &ut);
 
+    /* Release I2C device */
+    i2c_release(DEV_I2C);
+
     /* Compute true temperature value following datasheet formulas */
     _compute_b5(dev, ut, &b5);
-    *temperature = (b5 + 8) >> 4;
 
-    /* Release I2C device */
-    i2c_release(dev->i2c_dev);
-
-    return 0;
+    return (int16_t)((b5 + 8) >> 4);
 }
 
-int bmp180_read_pressure(bmp180_t *dev, int32_t *pressure)
+uint32_t bmp180_read_pressure(bmp180_t *dev)
 {
     int32_t ut = 0, up = 0, x1, x2, x3, b3, b5, b6, p;
     uint32_t b4, b7;
 
     /* Acquire exclusive access */
-    i2c_acquire(dev->i2c_dev);
+    i2c_acquire(DEV_I2C);
 
     /* Read uncompensated values: first temperature, second pressure */
     _read_ut(dev, &ut);
     _read_up(dev, &up);
+
+    /* release I2C device */
+    i2c_release(DEV_I2C);
 
     /* Compute true pressure value following datasheet formulas */
     _compute_b5(dev, ut, &b5);
@@ -145,12 +148,12 @@ int bmp180_read_pressure(bmp180_t *dev, int32_t *pressure)
     x1 = ((int32_t)dev->calibration.b2 * ((b6 * b6) >> 12)) >> 11;
     x2 = ((int32_t)dev->calibration.ac2 * b6) >> 11;
     x3 = x1 + x2;
-    b3 = ((((int32_t)dev->calibration.ac1*4 + x3) << dev->oversampling) + 2) >> 2;
+    b3 = ((((int32_t)dev->calibration.ac1*4 + x3) << OVERSAMPLING) + 2) >> 2;
     x1 = ((int32_t)dev->calibration.ac3 * b6) >> 13;
     x2 = ((int32_t)dev->calibration.b1 * (b6 * b6) >> 12) >> 16;
     x3 = ((x1 + x2) + 2) >> 2;
     b4 = (int32_t)dev->calibration.ac4 * (uint32_t)(x3+32768) >> 15;
-    b7 = ((uint32_t)up - b3) * (uint32_t)(50000UL >> dev->oversampling);
+    b7 = ((uint32_t)up - b3) * (uint32_t)(50000UL >> OVERSAMPLING);
     if (b7 < 0x80000000) {
         p = (b7 * 2) / b4;
     }
@@ -161,32 +164,22 @@ int bmp180_read_pressure(bmp180_t *dev, int32_t *pressure)
     x1 = (p >> 8) * (p >> 8);
     x1 = (x1 * 3038) >> 16;
     x2 = (-7357 * p) >> 16;
-    *pressure = p + ((x1 + x2 + 3791) >> 4);
 
-    /* release I2C device */
-    i2c_release(dev->i2c_dev);
-
-    return 0;
+    return (uint32_t)(p + ((x1 + x2 + 3791) >> 4));
 }
 
-int bmp180_altitude(bmp180_t *dev, int32_t pressure_0, int32_t *altitude)
+int16_t bmp180_altitude(bmp180_t *dev, uint32_t pressure_0)
 {
-    int32_t p;
-    bmp180_read_pressure(dev, &p);
+    uint32_t p = bmp180_read_pressure(dev);
 
-    *altitude = (int32_t)(44330.0 * (1.0 - pow((double)p / pressure_0, 0.1903)));
-
-    return 0;
+    return (int16_t)(44330.0 * (1.0 - pow((double)p / pressure_0, 0.1903)));;
 }
 
-int bmp180_sealevel_pressure(bmp180_t *dev, int32_t altitude, int32_t *pressure_0)
+uint32_t bmp180_sealevel_pressure(bmp180_t *dev, int16_t altitude)
 {
-    int32_t p;
-    bmp180_read_pressure(dev, &p);
+    uint32_t p = bmp180_read_pressure(dev);
 
-    *pressure_0 = (int32_t)((double)p / pow(1.0 - (altitude / 44330.0), 5.255));
-
-    return 0;
+    return (uint32_t)((double)p / pow(1.0 - (altitude / 44330.0), 5.255));;
 }
 
 /*------------------------------------------------------------------------------------*/
@@ -198,11 +191,11 @@ static int _read_ut(bmp180_t *dev, int32_t *output)
     /* Read UT (Uncompsensated Temperature value) */
     uint8_t ut[2] = {0};
     uint8_t control[2] = { BMP180_REGISTER_CONTROL, BMP180_TEMPERATURE_COMMAND };
-    i2c_write_bytes(dev->i2c_dev, BMP180_ADDR, control, 2);
+    i2c_write_bytes(DEV_I2C, DEV_ADDR, control, 2);
     xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
-    if (i2c_read_regs(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_DATA, ut, 2) < 0) {
+    if (i2c_read_regs(DEV_I2C, DEV_ADDR, BMP180_REGISTER_DATA, ut, 2) < 0) {
         DEBUG("[Error] Cannot read uncompensated temperature.\n");
-        i2c_release(dev->i2c_dev);
+        i2c_release(DEV_I2C);
         return -1;
     }
     *output = ( ut[0] << 8 ) | ut[1];
@@ -216,9 +209,9 @@ static int _read_up(bmp180_t *dev, int32_t *output)
 {
     /* Read UP (Uncompsensated Pressure value) */
     uint8_t up[3] = {0};
-    uint8_t control[2] = { BMP180_REGISTER_CONTROL, BMP180_PRESSURE_COMMAND | (dev->oversampling & 0x3) << 6 };
-    i2c_write_bytes(dev->i2c_dev, BMP180_ADDR, control, 2);
-    switch (dev->oversampling) {
+    uint8_t control[2] = { BMP180_REGISTER_CONTROL, BMP180_PRESSURE_COMMAND | (OVERSAMPLING & 0x3) << 6 };
+    i2c_write_bytes(DEV_I2C, DEV_ADDR, control, 2);
+    switch (OVERSAMPLING) {
     case BMP180_ULTRALOWPOWER:
         xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
         break;
@@ -235,13 +228,13 @@ static int _read_up(bmp180_t *dev, int32_t *output)
         xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
         break;
     }
-    if (i2c_read_regs(dev->i2c_dev, BMP180_ADDR, BMP180_REGISTER_DATA, up, 3) < 0) {
+    if (i2c_read_regs(DEV_I2C, DEV_ADDR, BMP180_REGISTER_DATA, up, 3) < 0) {
         DEBUG("[Error] Cannot read uncompensated pressure.\n");
-        i2c_release(dev->i2c_dev);
+        i2c_release(DEV_I2C);
         return -1;
     }
 
-    *output = ((up[0] << 16) | (up[1] << 8) | up[2]) >> (8 - dev->oversampling);
+    *output = ((up[0] << 16) | (up[1] << 8) | up[2]) >> (8 - OVERSAMPLING);
 
     DEBUG("UP: %i\n", (int)*output);
 
