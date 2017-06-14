@@ -26,8 +26,8 @@
  *
  */
 
-#ifndef NET_DTLS_H
-#define NET_DTLS_H
+#ifndef NET_DTLS_GDTLS_H
+#define NET_DTLS_GDTLS_H
 
 #include "net/dtls/dtls_keys.h"
 
@@ -191,7 +191,7 @@ int _server_peer_get_psk_info(struct dtls_context_t *ctx,
                               dtls_credentials_type_t type,
                               const unsigned char *id, size_t id_len,
                               unsigned char *result, size_t result_length);
-#endif /* DTLS_PSK */
+#endif
 
 /**
  * @brief Handles the DTLS communication with the other peer.
@@ -262,7 +262,7 @@ int _peer_verify_ecdsa_key(struct dtls_context_t *ctx,
  *
  * @param[in] ctx     The current dtls context.
  * @param[in] session The current session.
- * @param[in] buf     The packet received.
+ * @param[in] data     The packet received.
  * @param[in] len     The lenght of the packet received.
  * @return   >= 0 on success
  * @return   < 0 on error
@@ -293,4 +293,5 @@ int _client_events(struct dtls_context_t *ctx,
 }
 #endif
 
-#endif /* NET_DTLS_H */
+#endif /* NET_DTLS_GDTLS_H */
+/** @} */

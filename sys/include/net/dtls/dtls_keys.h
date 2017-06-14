@@ -14,8 +14,8 @@
  */
 
 
-#ifndef NET_DTLS_KEYS_PARAMS_H
-#define NET_DTLS_KEYS_PARAMS_H
+#ifndef NET_DTLS_DTLS_KEYS_H
+#define NET_DTLS_DTLS_KEYS_H
 
 
 #ifdef __cplusplus
@@ -28,16 +28,16 @@ extern "C" {
  */
 
 /* Used by the PSK client side */
-# ifdef DTLS_PSK
-#   define PSK_DEFAULT_IDENTITY "Client_identity"
-#   define PSK_DEFAULT_KEY      "secretPSK"
-#   define PSK_OPTIONS          "i:k:"
+#ifdef DTLS_PSK
+#define PSK_DEFAULT_IDENTITY "Client_identity"
+#define PSK_DEFAULT_KEY      "secretPSK"
+#define PSK_OPTIONS          "i:k:"
     /* Max size for PSK lowered for embedded devices */
-#   define PSK_ID_MAXLEN 32
-#   define PSK_MAXLEN 32
-#endif /* DTLS_PSK */
+#define PSK_ID_MAXLEN 32
+#define PSK_MAXLEN 32
+#endif
 
-# ifdef DTLS_ECC
+#ifdef DTLS_ECC
   static const unsigned char ecdsa_priv_key[] = {
       0xD9, 0xE2, 0x70, 0x7A, 0x72, 0xDA, 0x6A, 0x05,
       0x04, 0x99, 0x5C, 0x86, 0xED, 0xDB, 0xE3, 0xEF,
@@ -56,10 +56,10 @@ extern "C" {
       0xD0, 0x43, 0xB1, 0xFB, 0x03, 0xE2, 0x2F, 0x4D,
       0x17, 0xDE, 0x43, 0xF9, 0xF9, 0xAD, 0xEE, 0x70
   };
-# endif /* DTLS_ECC */
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /*NET_DTLS_KEYS_PARAMS_H */
+#endif /* NET_DTLS_DTLS_KEYS_H */
