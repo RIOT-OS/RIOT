@@ -753,6 +753,19 @@ ifneq (,$(filter uuid,$(USEMODULE)))
   USEMODULE += random
 endif
 
+ifneq (,$(RIOTBOOT_SLOT0_SIZE))
+  FEATURES_PROVIDED += riotboot
+endif
+
+ifneq (,$(filter ota_%,$(USEMODULE)))
+  USEMODULE += ota
+endif
+
+ifneq (,$(filter ota_coap,$(USEMODULE)))
+  USEMODULE += firmware
+  USEMODULE += nanocoap
+endif
+
 # always select gpio (until explicit dependencies are sorted out)
 FEATURES_OPTIONAL += periph_gpio
 
