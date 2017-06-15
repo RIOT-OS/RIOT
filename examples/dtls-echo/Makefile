@@ -37,14 +37,13 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
-
 # Uncomment to redefine port. Default: DTLS port (20220). Useful for FEBx range
 #DTLS_PORT = 20220
 #CFLAGS += -DDTLS_DEFAULT_PORT=$(DTLS_PORT)
 
-# If enabled, DTLS client will spoofed a CoAP message (GET /riot/value)
+# DTLS-client will generate a "CoAP get /riot/value" message instead of
+# sending the user input
 #CFLAGS += -DCOAP_MSG_SPOOF
-
 
 # NOTE: The following lines are custom configuration for TinyDTLS
 
@@ -65,7 +64,6 @@ CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(3*THREAD_STACKSIZE_DEFAULT\)
 
 # NOTE: The configuration for socket or non-socket  communication in TinyDTLS.
 CFLAGS += -DWITH_RIOT_GNRC
-
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
