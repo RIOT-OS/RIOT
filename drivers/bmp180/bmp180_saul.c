@@ -39,9 +39,9 @@ static int read_pressure(void *dev, phydat_t *res)
 {
     bmp180_t *d = (bmp180_t *)dev;
 
-    res->val[0] = bmp180_read_pressure(d) / 10;
+    res->val[0] = bmp180_read_pressure(d) / 100;
     res->unit = UNIT_PA;
-    res->scale = 1;
+    res->scale = 2;
     return 1;
 }
 
