@@ -14,6 +14,10 @@ FEATURES_PROVIDED += periph_uart
 # Various other features (if any)
 FEATURES_PROVIDED += cpp
 
+#ifdef APP_ID
+FEATURES_PROVIDED += multislot
+#endif
+
 # The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = cortex_m0_2
 
