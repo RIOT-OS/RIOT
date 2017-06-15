@@ -18,10 +18,14 @@
  * @}
  */
 
+rom_length = 256K;
+
+INCLUDE multislot.ld
+
 MEMORY
 {
-    rom (rx)    : ORIGIN = 0x00000000, LENGTH = 256K
-    ram (rwx)   : ORIGIN = 0x20000000, LENGTH = 32K
+    rom (rx)    : ORIGIN = 0x00000000 + boot_offset, LENGTH = rom_length
+    ram (rwx)   : ORIGIN = 0x20000000,               LENGTH = 32K
 }
 
 INCLUDE cortexm_base.ld
