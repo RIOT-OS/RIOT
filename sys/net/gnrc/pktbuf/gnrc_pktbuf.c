@@ -13,6 +13,8 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <sys/uio.h>
+
 #include "net/gnrc/pktbuf.h"
 
 gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len)

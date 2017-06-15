@@ -22,7 +22,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/types.h>
-#include <sys/uio.h>
 
 #include "mutex.h"
 #include "od.h"
