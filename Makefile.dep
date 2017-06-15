@@ -656,6 +656,12 @@ USEPKG += nanocoap
 USEMODULE += gnrc_sock_udp
 endif
 
+ifneq (,$(filter firmware,$(USEMODULE)))
+  USEMODULE += checksum
+  USEPKG += tweetnacl
+  FEATURES_REQUIRED += multislot
+endif
+
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
