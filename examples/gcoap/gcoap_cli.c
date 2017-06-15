@@ -129,9 +129,6 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
 #ifdef MODULE_GNRC_DTLS
 int dtlsc_cli_cmd(int argc, char **argv)
 {
-    (void) argc;
-    (void) argv;
-
     /* TODO: Adding renegotiate [and start?] */
     if (argc < 2) {
         printf("usage: %s dtlsc [stop]\n", argv[0]);
