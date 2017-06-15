@@ -39,6 +39,7 @@ static FILE uart_stdin = FDEV_SETUP_STREAM(NULL, uart_getchar, _FDEV_SETUP_READ)
 
 void board_init(void)
 {
+	OSCCAL = 0xa3;
     /* initialize stdio via USART_0 */
     SystemInit();
 
