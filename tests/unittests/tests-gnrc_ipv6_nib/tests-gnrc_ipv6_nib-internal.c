@@ -464,23 +464,15 @@ static void test_nib_nc_add__success_full_but_garbage_collectible(void)
     ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                   { .u64 = TEST_UINT64 } } };
 
-    for (int i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
+    for (int i = 0; i < (3 * GNRC_IPV6_NIB_NUMOF); i++) {
         TEST_ASSERT_NOT_NULL((node = _nib_nc_add(&addr, IFACE,
                                                  GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE)));
         TEST_ASSERT(last != node);
+        TEST_ASSERT(ipv6_addr_equal(&addr, &node->ipv6));
+        TEST_ASSERT_EQUAL_INT(IFACE, _nib_onl_get_if(node));
         addr.u64[1].u64++;
         last = node;
     }
-    TEST_ASSERT_NOT_NULL((last = _nib_nc_add(&addr, IFACE,
-                                             GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNMANAGED)));
-    addr.u64[1].u64++;
-    TEST_ASSERT_NOT_NULL((node = _nib_nc_add(&addr, IFACE,
-                                             GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE)));
-    TEST_ASSERT(last != node);
-    addr.u64[1].u64++;
-    TEST_ASSERT_NOT_NULL((node = _nib_nc_add(&addr, IFACE,
-                                            GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE)));
-    TEST_ASSERT(last != node);
 }
 
 /*
