@@ -562,6 +562,10 @@ ifneq (,$(filter phydat,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter evtimer,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter random,$(USEMODULE)))
   # select default prng
   ifeq (,$(filter prng_%,$(USEMODULE)))
