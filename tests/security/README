@@ -1,0 +1,67 @@
+THIS IS AN ALPHA RELEASE
+
+If you find bugs please contact support@wolfssl.com
+
+These are the steps to properly setup a test of wolfssl in RIOT OS:
+
+clone wolfssl in the RIOT examples directory.
+You should end up with RIOT/tests/security/wolfssl
+
+git clone https://github.com/wolfssl/wolfssl
+
+Change to the directory of the desired test case:
+cd <path-to>/RIOT/tests/security/crypto-benchmark
+cd <path-to>/RIOT/tests/security/crypt-test
+cd <path-to>/RIOT/tests/security/tls-client-server-crypto-test
+
+run the script ./wolf-build-and-run-test.sh
+
+That script will perform the following steps:
+1. copy the source files from:
+    <wolfssl-root>/src
+    <wolfssl-root>/wolfcrypt/src
+    <wolfssl-root>/wolfcrypt/benchmark
+    <wolfssl-root>/*<relevant test.c>
+
+2. The script will use the provided Makefile to build the example application:
+    "wolfbenchmark.elf"
+    This application will be located here:
+    <path-to>/RIOT/tests/security/<test-name>/bin/native/<app name>.elf
+
+3. The script will execute that application. You should see a pass or fail.
+
+4. Lastly that script will cleanup the source files it copied in for building.
+   To disable this step run the script with --no-cleanup flag IE:
+
+    ./wolf-build-and-run-test.sh --no-cleanup
+
+    NOTE: the cleanup is HIGHLY RECOMMENDED when doing development to prevent
+            making changes on temporary files.
+            All development changes should be made to the actual source
+            files located in their respective directories:
+            <wolfssl-root>/src
+            <wolfssl-root>/wolfcrypt/src
+            <wolfssl-root>/wolfcrypt/benchmark
+            Then the script "wolf-build-and-run-test.sh" should be run again to
+            test those changes
+            If you do make changes in this directory, they will not be tracked
+            by GIT
+
+
+NOTE: This test is only for the "native" test. To build for a specific platform
+        cd to RIOT directory and run "make doc" to generate doxygen docs.
+        (You will need to install doxygen if you don't have it already)
+        Then open the file: RIOT/doc/doxygen/html/index.html
+
+        This will provide you with the necessary help to setup and build for a
+        specific platform
+
+KNOWN BUGS:
+
+1. To buid with gcc instead of clang, you have to edit RIOT/Makefile.cflags and
+   comment out the -Wold-style-definitions section that starts with:
+   "Fast-out on old style function definitions"
+
+2. With gcc the benchmark test currently fails when HAVE_ECC is defined. If
+   using clang it works fine.
+
