@@ -11,6 +11,13 @@ RIOTBOOT_PUBKEY ?= $(RIOTBASE)/dist/tools/firmware/pub.key
 
 FIRMWARE_TOOL ?= $(RIOTBASE)/dist/tools/firmware/bin/firmware
 RIOTBOOT_HDR_LEN ?= 0x100
+# TODO 'firmware' should be rebuilt here at the same time with the same
+# compilation options
+CFLAGS += -DFIRMWARE_METATADA_SIZE=$(RIOTBOOT_HDR_LEN)
+
+# export variables for 'firmware'
+export RIOTBOOT_SLOT0_SIZE
+export RIOTBOOT_FW_SLOT_SIZE
 
 APP_ID  ?= 0
 APP_VER ?= 0
