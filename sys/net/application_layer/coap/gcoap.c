@@ -23,12 +23,21 @@
 #include "random.h"
 #include "thread.h"
 
+#ifdef MODULE_GNRC_DTLS
+#include "net/dtls/gdtls.h"
+#include "mutex.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /* Internal functions */
 static void *_event_loop(void *arg);
+#ifndef MODULE_GNRC_DTLS
 static void _listen(sock_udp_t *sock);
+#else
+static void _listen(sock_udp_t *sock, dtls_context_t *dtls_context, sock_udp_ep_t *client_peer);
+#endif
 static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
 static ssize_t _write_options(coap_pkt_t *pdu, uint8_t *buf, size_t len);
 static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
@@ -39,11 +48,23 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *pdu,
                                                             uint8_t *buf, size_t len);
 static void _find_resource(coap_pkt_t *pdu, coap_resource_t **resource_ptr,
                                             gcoap_listener_t **listener_ptr);
+static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
+                                            const coap_resource_t *resource);
 static int _find_observer(sock_udp_ep_t **observer, sock_udp_ep_t *remote);
 static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
-                                                       coap_pkt_t *pdu);
-static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
-                                   const coap_resource_t *resource);
+                                            coap_pkt_t *pdu);
+#ifdef MODULE_GNRC_DTLS
+static int _dtlsc_data_try_send(dtls_data_app_t *data,
+                                dtls_context_t *dtls_context, session_t *dst);
+int _read_from_peer(struct dtls_context_t *ctx,
+                    session_t *session, uint8 *data, size_t len);
+dtls_context_t *_dtlsc_create_channel(dtls_remote_peer_t *remote_peer,
+                                      dtls_context_t *dtls_context,
+                                      dtls_handler_t *dtls_cb_clnt,
+                                      session_t *dst );
+static void *_dtlsc_loop(void *arg);
+int8_t  gcoap_end_dtls_session(void);
+#endif
 
 /* Internal variables */
 const coap_resource_t _default_resources[] = {
@@ -64,6 +85,279 @@ static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static char _msg_stack[GCOAP_STACK_SIZE];
 static sock_udp_t _sock;
 
+#ifdef MODULE_GNRC_DTLS
+
+extern int8_t dtls_connected;
+
+mutex_t gcoap_mutex = MUTEX_INIT ;
+
+static kernel_pid_t _pid_dtlsc = KERNEL_PID_UNDEF;
+static char _msg_stack_dtlsc[DTLS_STACKSIZE];
+
+
+static int _dtlsc_data_try_send(dtls_data_app_t *data,
+                                dtls_context_t *dtls_context,  session_t *dst)
+{
+    int app_data_buf = *data->buffer_size;
+
+    mutex_lock(&gcoap_mutex); /* Racing condition? (With udp_sock_rcvd ) */
+    while (app_data_buf > 0) {
+        DEBUG("gcoap: send2 sending CoAP packet as DTLS App data record\n");
+        app_data_buf = try_send(dtls_context, dst,
+                                data->buffer, app_data_buf);
+        if (app_data_buf == -1) {
+            break;
+        }
+    }
+    mutex_unlock(&gcoap_mutex);
+
+    return app_data_buf;
+}
+
+/**
+ * @brief Reception of a DTLS Applicaiton data record for GCOAP module.
+ */
+int _read_from_peer(struct dtls_context_t *ctx, session_t *session,
+                    uint8 *data, size_t len)
+{
+    (void) ctx;
+    (void) session;
+
+    coap_pkt_t pdu;
+    gcoap_request_memo_t *memo = NULL;
+
+    dtls_remote_peer_t *remote_peer;
+    remote_peer =  (dtls_remote_peer_t *) dtls_get_app_data(ctx);
+
+    ssize_t res = coap_parse(&pdu, data, len);
+    if (res < 0) {
+        DEBUG("gcoap: parse failure: %d\n", res);
+        /* If a response, can't clear memo, but it will timeout later. */
+        return res;
+    }
+
+    /* incoming request */
+    if (coap_get_code_class(&pdu) == COAP_CLASS_REQ) {
+        size_t pdu_len = _handle_req(&pdu, data, len, remote_peer->remote);
+        if (pdu_len > 0) {
+
+            return dtls_write(ctx, session, data, len);
+        }
+    }
+    /* incoming response */
+    else {
+        _find_req_memo(&memo, &pdu, data, len);
+        if (memo) {
+            xtimer_remove(&memo->response_timer);
+            memo->resp_handler(memo->state, &pdu);
+            memo->state = GCOAP_MEMO_UNUSED;
+        }
+    }
+    return 0;
+
+}
+
+dtls_context_t *_dtlsc_create_channel(dtls_remote_peer_t *remote_peer,
+                                      dtls_context_t *dtls_context,
+                                      dtls_handler_t *dtls_cb_clnt,
+                                      session_t *dst )
+{
+
+    msg_t mbox_msg;
+
+    /* NOTE: This avoid conflicts between both sides of (the internal) DTLS  */
+    remote_peer->local->port = (unsigned short)  remote_peer->remote->port + 1;
+
+    ssize_t res = sock_udp_create(remote_peer->sock, remote_peer->local, NULL, 0);
+    if (res != 0) {
+        DEBUG("dtlsc: Cannot create DTLS client sock: %d\n", res);
+        return NULL;
+    }
+
+    dst->size = sizeof(uint8_t) * 16 + sizeof(unsigned short);
+    dst->port = remote_peer->remote->port;
+    if (memcpy(dst->addr.u8, remote_peer->remote->addr.ipv6, 16) == NULL) {
+        DEBUG("dtlsc: Unable to prepare context\n");
+        return NULL;
+    }
+
+    /* Stopping (temporary) the DTLS server side */
+    mbox_msg.type = DTLS_MSG_SERVER_STOP;
+    mbox_msg.content.ptr = NULL;
+    msg_send_receive(&mbox_msg, &mbox_msg, _pid );
+
+    dtls_context = dtls_new_context(remote_peer);
+    if (!dtls_context) {
+        dtls_crit("dtlsc: Unable to create DTLS context!\n");
+        return NULL;
+    }
+
+    dtls_set_handler(dtls_context, dtls_cb_clnt);
+
+    mbox_msg.type = DTLS_MSG_CLIENT_START;
+    mbox_msg.content.ptr = dtls_context;
+    msg_send_receive(&mbox_msg, &mbox_msg, _pid );
+
+    /* We start the DTLS connection */
+    if (dtls_connect(dtls_context, dst) < 0) { /* The first dtls flight */
+        dtls_crit("dtlsc: Unable to start a DTLS channel!\n");
+        return NULL;
+    }
+
+    mbox_msg.type = DTLS_MSG_CLIENT_HNDSHK;
+    mbox_msg.content.ptr = NULL;
+
+    /* We listen the medium for other DTLS flights */
+    int8_t watchdog = GDTLS_MAX_RETRANSMISIONS;
+    while (!dtls_connected && (watchdog > 0)) { /* Preparing DTLS channel */
+
+        DEBUG("dtlsc: handshake stage (watchdog %i)\n", watchdog);
+        msg_send_receive(&mbox_msg, &mbox_msg, _pid);
+        watchdog--;
+
+        /* TODO Try to restart the connection? */
+        //dtls_connect(dtls_context, dst); /*Try to re-connect? */
+
+    }  /* WHILE */
+
+    if (!dtls_connected) {
+        return NULL;
+    }
+
+    return dtls_context;
+}
+
+/* Create, preserve and close the DTLS session for the client side */
+static void *_dtlsc_loop(void *arg)
+{
+
+    /* FIXME Make this more dynamic (more than one client instance) */
+    static dtls_context_t *dtls_context = NULL;
+    dtls_data_app_t *data;
+
+    msg_t msg_rcvd, msg_snd, msg_queue[GCOAP_MSG_QUEUE_SIZE];
+
+    /*The server and client side uses different remotes_peer */
+    /*FIXME Probably not the best solution in terms of resources */
+    static dtls_remote_peer_t remote_peer = DTLS_REMOTE_PEER_NULL;
+    static sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
+    sock_udp_t sock;
+    static session_t dtlsc_session;  /* TODO: One by request? */
+
+    static dtls_handler_t dtls_cb_clnt = {
+        .write = _send_to_peer,
+        .read = _read_from_peer,
+        .event = _client_events,
+        #ifdef DTLS_PSK
+        .get_psk_info = _client_peer_get_psk_info,
+        #endif  /* DTLS_PSK */
+        #ifdef DTLS_ECC
+        .get_ecdsa_key = _peer_get_ecdsa_key,
+        .verify_ecdsa_key = _peer_verify_ecdsa_key
+        #endif  /* DTLS_ECC */
+    };
+
+    msg_init_queue(msg_queue, GCOAP_MSG_QUEUE_SIZE);
+
+    (void) arg;
+
+    while (1) {
+        int res = msg_receive(&msg_rcvd);
+        (void) res;
+        switch (msg_rcvd.type) {
+            case DTLS_MSG_CLIENT_START_CHANNEL:
+                remote_peer.remote = (sock_udp_ep_t *) msg_rcvd.content.ptr;
+                remote_peer.sock = &sock;
+                remote_peer.local = &local;
+                msg_snd.type = DTLS_MSG_CLIENT_ANSWER; /* USELESS? */
+
+                /* NOTE: Risk of race condition here? */
+                mutex_lock(&gcoap_mutex);
+                if (dtls_connected == 0) {
+                    dtls_context = _dtlsc_create_channel(&remote_peer, dtls_context,
+                                                         &dtls_cb_clnt, &dtlsc_session);
+                    msg_snd.content.ptr = dtls_context;
+                }
+                else {   /*There is a context ready! */
+                    msg_snd.content.ptr = dtls_context;
+                }
+                mutex_unlock(&gcoap_mutex);
+                msg_reply(&msg_rcvd, &msg_snd); /* TODO Damage control? */
+                break;
+
+            case DTLS_MSG_CLIENT_STOP_CHANNEL:
+                msg_snd.content.value = !dtls_connected;
+                if (dtls_connected == 1) {
+                    DEBUG("Releaseing DTLS context..\n");
+
+                    sock_udp_ep_t remote = SOCK_IPV6_EP_ANY;
+                    remote_peer.remote = &remote;
+
+                    memcpy(remote_peer.remote->addr.ipv6, &dtlsc_session.addr, 16);
+                    remote_peer.remote->port = dtlsc_session.port;
+
+                    dtls_free_context(dtls_context);
+
+                    msg_snd.type = DTLS_MSG_SERVER_RESTART;
+                    msg_send_receive(&msg_snd, &msg_snd, _pid );
+
+                    sock_udp_close(remote_peer.sock);
+
+                    dtls_connected = 0;
+                }
+                msg_reply(&msg_rcvd, &msg_rcvd);
+                break;
+
+            case DTLS_MSG_CLIENT_SEND_DATA:
+                data = (dtls_data_app_t *) msg_rcvd.content.ptr;
+
+                sock_udp_ep_t remote = SOCK_IPV6_EP_ANY;
+                remote_peer.remote = &remote;
+
+                memcpy(remote_peer.remote->addr.ipv6, &dtlsc_session.addr, 16);
+                remote_peer.remote->port = dtlsc_session.port;
+
+                _dtlsc_data_try_send(data, dtls_context, &dtlsc_session);
+
+                msg_reply(&msg_rcvd, &msg_rcvd);
+                break;
+
+            /* TODO renegotiation case */
+
+            default:
+                DEBUG("dtlsc: Request not supported: %i", res);
+                break;
+        }   /* END switch*/
+    }       /*END while */
+
+
+    return 0;
+}
+
+int8_t gcoap_end_dtls_session(void)
+{
+
+    /* Actually, this should not happen*/
+    if (_pid_dtlsc == KERNEL_PID_UNDEF) {
+        DEBUG("DTLS client thread not running!\n");
+        return -1;
+    }
+
+    msg_t mbox_msg, msg_answ;
+    mbox_msg.type = DTLS_MSG_CLIENT_STOP_CHANNEL;
+    msg_send_receive(&mbox_msg, &msg_answ, _pid_dtlsc);
+
+    if (msg_answ.content.value) {
+        DEBUG("DTLSC stoppded!\n");
+    }
+    else {
+        DEBUG("A DTLS client side is not started yet!\n");
+    }
+    return 0;
+}
+
+#endif
+
 
 /* Event/Message loop for gcoap _pid thread. */
 static void *_event_loop(void *arg)
@@ -79,7 +373,47 @@ static void *_event_loop(void *arg)
     local.netif  = SOCK_ADDR_ANY_NETIF;
     local.port   = GCOAP_PORT;
 
-    int res = sock_udp_create(&_sock, &local, NULL, 0);
+#ifdef MODULE_GNRC_DTLS
+
+    dtls_remote_peer_t *remote_aux;
+    dtls_remote_peer_t remote_peer = DTLS_REMOTE_PEER_NULL;
+    dtls_context_t *dtls_context_srvr = NULL;
+    dtls_context_t *dtls_context_clnt = NULL;
+
+    remote_peer.sock = &_sock;
+    remote_peer.local = &local;
+    uint8_t flag =  DTLS_FLAGS_SERVER_LISTEN;
+
+    static dtls_handler_t dtls_cb_srvr = {
+        .write = _send_to_peer,
+        .read = _read_from_peer,
+        .event = NULL,
+      #ifdef DTLS_PSK
+        .get_psk_info = _server_peer_get_psk_info, /*DANGER WE have a big problem here! */
+      #endif  /* DTLS_PSK */
+      #ifdef DTLS_ECC
+        .get_ecdsa_key = _peer_get_ecdsa_key,
+        .verify_ecdsa_key = _peer_verify_ecdsa_key
+      #endif  /* DTLS_ECC */
+    };
+
+    dtls_context_srvr = dtls_new_context(&remote_peer);
+    if (dtls_context_srvr) {
+        dtls_set_handler(dtls_context_srvr, &dtls_cb_srvr);
+    }
+    else {
+        DEBUG("gcoap: DTLS context not loaded\n");
+        return 0;
+    }
+
+#endif /* MODULE_GNRC_DTLS  */
+
+#ifndef MODULE_GNRC_DTLS
+    int8_t res = sock_udp_create(&_sock, &local, NULL, 0);
+#else
+    int8_t res = sock_udp_create(remote_peer.sock, remote_peer.local, NULL, 0);
+#endif
+
     if (res < 0) {
         DEBUG("gcoap: cannot create sock: %d\n", res);
         return 0;
@@ -96,29 +430,98 @@ static void *_event_loop(void *arg)
                 case GCOAP_MSG_TYPE_INTR:
                     /* next _listen() timeout will account for open requests */
                     break;
+#ifdef MODULE_GNRC_DTLS
+                case DTLS_MSG_CLIENT_START:
+                    dtls_context_clnt = (dtls_context_t *) msg_rcvd.content.ptr;
+#if ENABLE_DEBUG == 1
+                    if (!dtls_context_clnt) {
+                        DEBUG("Client context not passed!\n");
+                    }
+                    else {
+                        DEBUG("DTLS now listen to client side only!\n");
+                    }
+#endif
+                    remote_aux =  (dtls_remote_peer_t *) dtls_get_app_data(dtls_context_clnt);
+                    msg_reply(&msg_rcvd, &msg_rcvd);
+                    break;
+
+                case DTLS_MSG_SERVER_STOP:
+                    // dtls_free_context(dtls_context_srvr);
+                    // dtls_context_srvr = NULL;
+                    flag = DTLS_FLAGS_CLIENT_LISTEN_ONLY;
+                    DEBUG("DTLS Server temporary disabled!\n");
+                    msg_reply(&msg_rcvd, &msg_rcvd);
+                    break;
+
+                case DTLS_MSG_SERVER_RESTART:
+                    flag = DTLS_FLAGS_SERVER_LISTEN;
+                    dtls_context_clnt = NULL;
+                    DEBUG("DTLS Server listening!\n");
+                    msg_reply(&msg_rcvd, &msg_rcvd);
+                    xtimer_usleep(500U);
+                    break;
+
+                case DTLS_MSG_CLIENT_HNDSHK: /* Nothing to do */
+#endif
                 default:
                     break;
             }
         }
 
+#ifndef MODULE_GNRC_DTLS
         _listen(&_sock);
+#else
+
+        if ((flag == DTLS_FLAGS_SERVER_LISTEN) && !dtls_context_clnt) {
+            remote_aux =  &remote_peer;
+            _listen(remote_aux->sock, dtls_context_srvr, NULL);
+        }
+        else if ((flag == DTLS_FLAGS_CLIENT_LISTEN_ONLY) &&  dtls_context_clnt) {
+
+            remote_aux =  (dtls_remote_peer_t *) dtls_get_app_data(dtls_context_clnt);
+            _listen(remote_aux->sock, dtls_context_clnt, remote_aux->remote );
+
+            if (msg_rcvd.type == DTLS_MSG_CLIENT_HNDSHK) {
+                msg_reply(&msg_rcvd, &msg_rcvd);
+            }
+        }
+        else {
+            /* This is a safety check, should only happens once time */
+            xtimer_usleep(500U);
+        }
+
+#endif
     }
 
     return 0;
 }
 
 /* Listen for an incoming CoAP message. */
+#ifndef MODULE_GNRC_DTLS
 static void _listen(sock_udp_t *sock)
+#else
+static void _listen(sock_udp_t *sock, dtls_context_t *dtls_context, sock_udp_ep_t *client_peer)
+#endif
 {
-    coap_pkt_t pdu;
+
     uint8_t buf[GCOAP_PDU_BUF_SIZE];
     sock_udp_ep_t remote;
+
+
+
+#ifndef MODULE_GNRC_DTLS
+    coap_pkt_t pdu;
     gcoap_request_memo_t *memo = NULL;
     uint8_t open_reqs = gcoap_op_state();
-
     ssize_t res = sock_udp_recv(sock, buf, sizeof(buf),
                                 open_reqs > 0 ? GCOAP_RECV_TIMEOUT : SOCK_NO_TIMEOUT,
                                 &remote);
+#else
+    assert(dtls_context != NULL);
+    ssize_t res = sock_udp_recv(sock, buf, sizeof(buf),
+                                3000000U, /* */
+                                &remote);
+#endif
     if (res <= 0) {
 #if ENABLE_DEBUG
         if (res < 0 && res != -ETIMEDOUT) {
@@ -128,6 +531,7 @@ static void _listen(sock_udp_t *sock)
         return;
     }
 
+#ifndef MODULE_GNRC_DTLS
     res = coap_parse(&pdu, buf, res);
     if (res < 0) {
         DEBUG("gcoap: parse failure: %d\n", res);
@@ -151,6 +555,19 @@ static void _listen(sock_udp_t *sock)
             memo->state = GCOAP_MEMO_UNUSED;
         }
     }
+#else /* MODULE_GNRC_DTLS */
+
+    /* The request is handled now by DTLS */
+    dtls_remote_peer_t *remote_peer =  (dtls_remote_peer_t *) dtls_get_app_data(dtls_context);
+
+    if (!client_peer) {
+        remote_peer->remote = &remote;
+    }
+    /* NOTE: DTLS records are of dynamic sizes */
+    dtls_handle_read_sock(dtls_context, buf, res );
+
+#endif
+
 }
 
 /*
@@ -161,7 +578,7 @@ static void _listen(sock_udp_t *sock)
  * return length of response pdu, or < 0 if can't handle
  */
 static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
-                                                         sock_udp_ep_t *remote)
+                          sock_udp_ep_t *remote)
 {
     coap_resource_t *resource;
     gcoap_listener_t *listener;
@@ -583,7 +1000,7 @@ kernel_pid_t gcoap_init(void)
         return -EEXIST;
     }
     _pid = thread_create(_msg_stack, sizeof(_msg_stack), THREAD_PRIORITY_MAIN - 1,
-                            THREAD_CREATE_STACKTEST, _event_loop, NULL, "coap");
+                         THREAD_CREATE_STACKTEST, _event_loop, NULL, "coap");
 
     /* Blank lists so we know if an entry is available. */
     memset(&_coap_state.open_reqs[0], 0, sizeof(_coap_state.open_reqs));
@@ -591,6 +1008,17 @@ kernel_pid_t gcoap_init(void)
     memset(&_coap_state.observe_memos[0], 0, sizeof(_coap_state.observe_memos));
     /* randomize initial value */
     _coap_state.last_message_id = random_uint32() & 0xFFFF;
+
+#ifdef MODULE_GNRC_DTLS
+    if (_pid_dtlsc != KERNEL_PID_UNDEF) {
+        /*TODO: What to do here? (Should not happen) */
+        return -EEXIST;
+    }
+
+    _pid_dtlsc = thread_create(_msg_stack_dtlsc, sizeof(_msg_stack_dtlsc), THREAD_PRIORITY_MAIN - 1,
+                               THREAD_CREATE_STACKTEST, _dtlsc_loop, NULL, "dtlsc");
+    dtls_connected = 0;
+#endif
 
     return _pid;
 }
@@ -689,6 +1117,66 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
             break;
         }
     }
+
+#ifdef MODULE_GNRC_DTLS
+
+    /*First, DTLS session must be established */
+    msg_t mbox_msg, msg_answ; /* Universal, used for the mailboxes and IPC-s msgs */
+
+    /*Retrieve the DTLS channel (or create it) */
+    mbox_msg.type = DTLS_MSG_CLIENT_START_CHANNEL;
+    mbox_msg.content.ptr = (sock_udp_ep_t *) remote;
+    msg_send_receive(&mbox_msg, &msg_answ, _pid_dtlsc);
+
+    if (msg_answ.content.ptr == NULL) {
+        DEBUG("send2: Unable to process without DTLS\n");
+        return 0;
+    }
+
+    if (memo) {
+
+        memcpy(&memo->hdr_buf[0], buf, GCOAP_HEADER_MAXLEN);
+        memo->resp_handler = resp_handler;
+
+
+        if (len > DTLS_MAX_BUF) {
+            DEBUG("Payload to send Exceeded maximum size!\n");
+            return 0;
+        }
+
+        /*We send the CoAP message by means of DTLS */
+        dtls_data_app_t data_app = DTLS_DATA_APP_NULL;
+        data_app.buffer = (uint8_t *) buf;
+        data_app.buffer_size = &len;
+
+        mbox_msg.type = DTLS_MSG_CLIENT_SEND_DATA;
+        mbox_msg.content.ptr = &data_app;
+        msg_send_receive(&mbox_msg, &mbox_msg, _pid_dtlsc);
+
+
+        if (/*(app_data_buf >= 0) &&*/ (GCOAP_NON_TIMEOUT > 0)) {
+            /* interrupt sock listening (to set a listen timeout) */
+            msg_t mbox_msg;
+            mbox_msg.type = GCOAP_MSG_TYPE_INTR;
+            mbox_msg.content.value = 0;
+            if (mbox_try_put(&_sock.reg.mbox, &mbox_msg)) {
+                /* start response wait timer */
+                memo->timeout_msg.type = GCOAP_MSG_TYPE_TIMEOUT;
+                memo->timeout_msg.content.ptr = (char *)memo;
+                xtimer_set_msg(&memo->response_timer, GCOAP_NON_TIMEOUT,
+                               &memo->timeout_msg, _pid);
+            }
+            else {
+                memo->state = GCOAP_MEMO_UNUSED;
+                DEBUG("gcoap: can't wake up mbox; no timeout for msg\n");
+                return 0;
+            }
+        }/* IF GCOAP_NON_TIMEOUT */
+    }/* IF - memo */
+
+    return 1;
+
+#else
     if (memo) {
         memcpy(&memo->hdr_buf[0], buf, GCOAP_HEADER_MAXLEN);
         memo->resp_handler = resp_handler;
@@ -721,6 +1209,9 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
         DEBUG("gcoap: dropping request; no space for response tracking\n");
         return 0;
     }
+
+
+#endif /* MODULE_GNRC_DTLS */
 }
 
 int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)

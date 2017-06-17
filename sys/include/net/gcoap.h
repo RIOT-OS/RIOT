@@ -213,6 +213,10 @@
 #include "nanocoap.h"
 #include "xtimer.h"
 
+#ifdef MODULE_GNRC_DTLS
+# include "net/dtls/gdtls.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -220,13 +224,21 @@ extern "C" {
 /**
  * @brief  Size for module message queue
  */
-#define GCOAP_MSG_QUEUE_SIZE    (4)
+#ifndef MODULE_GNRC_DTLS
+#define GCOAP_MSG_QUEUE_SIZE (4)
+#else
+#define GCOAP_MSG_QUEUE_SIZE DTLS_READER_QUEUE_SIZE
+#endif
 
 /**
  * @brief   Server port; use RFC 7252 default if not defined
  */
 #ifndef GCOAP_PORT
-#define GCOAP_PORT              (5683)
+#ifndef MODULE_GNRC_DTLS
+#define GCOAP_PORT  (5683)
+#else
+#define GCOAP_PORT  DTLS_DEFAULT_PORT
+#endif
 #endif
 
 /**
@@ -304,7 +316,11 @@ extern "C" {
  *
  * Set to 0 to disable timeout.
  */
-#define GCOAP_NON_TIMEOUT       (5000000U)
+#ifndef MODULE_GNRC_DTLS
+#define GCOAP_NON_TIMEOUT    (5000000U)
+#else
+#define GCOAP_NON_TIMEOUT    (5000000U) * 2
+#endif
 
 /**
  * @brief   Identifies waiting timed out for a response to a sent message
@@ -385,6 +401,16 @@ extern "C" {
 #define GCOAP_OBS_INIT_ERR      (-1)
 #define GCOAP_OBS_INIT_UNUSED   (-2)
 /** @} */
+
+/** @brief Stack size for module thread */
+#ifndef GCOAP_STACK_SIZE
+#define GCOAP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
+#endif
+
+#ifdef MODULE_GNRC_DTLS
+#undef GCOAP_STACK_SIZE
+#define GCOAP_STACK_SIZE DTLS_STACKSIZE
+#endif
 
 /**
  * @brief Stack size for module thread
@@ -627,6 +653,18 @@ size_t gcoap_obs_send(const uint8_t *buf, size_t len,
  * @return  count of unanswered requests
  */
 uint8_t gcoap_op_state(void);
+
+#ifdef MODULE_GNRC_DTLS
+/**
+ * @brief A fast command to close the DTLS session(s)
+ *
+ * This will terminate any client DTLS session.
+ *
+ *  @return < 0 on error
+ */
+int8_t gcoap_end_dtls_session(void);
+
+#endif
 
 #ifdef __cplusplus
 }

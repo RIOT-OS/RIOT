@@ -31,8 +31,15 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 extern int gcoap_cli_cmd(int argc, char **argv);
 extern void gcoap_cli_init(void);
 
+#ifdef MODULE_GNRC_DTLS
+extern int dtlsc_cli_cmd(int argc, char **argv);
+#endif
+
 static const shell_command_t shell_commands[] = {
     { "coap", "CoAP example", gcoap_cli_cmd },
+#ifdef MODULE_GNRC_DTLS
+    { "dtlsc", "DTLS Client operators", dtlsc_cli_cmd },
+#endif
     { NULL, NULL, NULL }
 };
 
