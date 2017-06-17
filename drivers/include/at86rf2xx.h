@@ -49,6 +49,14 @@ extern "C" {
 #define AT86RF2XX_MAX_PKT_LENGTH        (IEEE802154_FRAME_LEN_MAX)
 
 /**
+ * @brief   Default addresses used if the CPUID module is not present
+ * @{
+ */
+#define AT86RF2XX_DEFAULT_ADDR_SHORT    (0x0230)
+#define AT86RF2XX_DEFAULT_ADDR_LONG     (0x1222334455667788)
+/** @} */
+
+/**
  * @brief   Channel configuration
  * @{
  */
@@ -95,7 +103,12 @@ extern "C" {
  * @brief   Flags for device internal states (see datasheet)
  * @{
  */
+#define AT86RF2XX_STATE_NOP    			(0x00)     /**< NOP */
+#define AT86RF2XX_STATE_BUSY_RX   		(0x01)     /**< BUSY_RX */
+#define AT86RF2XX_STATE_BUSY_TX     	(0x02)     /**< TX_START  */
+#define AT86RF2XX_STATE_FORCE_PLL_ON   (0x03)     /*<< FORCE_PLL_ON */
 #define AT86RF2XX_STATE_FORCE_TRX_OFF  (0x03)     /**< force transition to idle */
+#define AT86RF2XX_STATE_RX_ON			(0x06)     /**< idle */
 #define AT86RF2XX_STATE_TRX_OFF        (0x08)     /**< idle */
 #define AT86RF2XX_STATE_PLL_ON         (0x09)     /**< ready to transmit */
 #define AT86RF2XX_STATE_SLEEP          (0x0f)     /**< sleep mode */
@@ -183,6 +196,16 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params);
  * @param[in] dev           device to reset
  */
 void at86rf2xx_reset(at86rf2xx_t *dev);
+
+/**
+ * @brief   Trigger a clear channel assessment
+ *
+ * @param[in] dev           device to use
+ *
+ * @return                  true if channel is clear
+ * @return                  false if channel is busy
+ */
+bool at86rf2xx_cca(at86rf2xx_t *dev);
 
 /**
  * @brief   Get the short address of the given device

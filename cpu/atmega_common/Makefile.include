@@ -8,7 +8,7 @@ export CFLAGS_OPT  ?= -Os
 
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
-export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -e reset_handler -Wl,--gc-sections
+export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -Wl,-u,vfprintf -lprintf_flt -lm -static -lgcc -e reset_handler -Wl,--gc-sections
 
 # export the peripheral drivers to be linked into the final binary
 export USEMODULE += periph
@@ -19,6 +19,7 @@ export USEMODULE += uart_stdio
 
 # include module specific includes
 export INCLUDES += -I$(RIOTCPU)/atmega_common/include -isystem$(RIOTCPU)/atmega_common/avr-libc-extra
+export INCLUDES += -I /usr/avr/include
 
 ifeq ($(LTO),1)
   # avr-gcc <4.8.3 has a bug when using LTO which causes a warning to be printed always:

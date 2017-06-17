@@ -285,6 +285,7 @@ void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
     print_prompt();
 
     while (1) {
+
         int res = readline(line_buf, len);
 
         if (!res) {

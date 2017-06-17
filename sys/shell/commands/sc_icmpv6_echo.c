@@ -226,6 +226,7 @@ int _icmpv6_ping(int argc, char **argv)
         }
     }
 
+    puts("_icmpv6_ping 1");
     if (gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &my_entry) < 0) {
         puts("error: network registry is full");
         return 1;
@@ -233,6 +234,7 @@ int _icmpv6_ping(int argc, char **argv)
 
     remaining = count;
 
+	puts("_icmpv6_ping 2");
     ping_start = xtimer_now_usec64();
 
     while ((remaining--) > 0) {

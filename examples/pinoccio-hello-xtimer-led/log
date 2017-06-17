@@ -1,0 +1,561 @@
+Building application "pinoccio-hello-world" for "pinoccio-mega256rfr2" with MCU "atmega256rfr2".
+
+'/home/steffen/workspace/RIOT/dist/tools/genconfigheader/genconfigheader.sh' '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h' -DDEVELHELP -Werror -mmcu=atmega256rfr2   -ffunction-sections -fdata-sections -ggdb -g3 -Os -DCOREIF_NG=1 -ffunction-sections -fdata-sections -DBOARD_PINOCCIO_MEGA256RFR2=\"pinoccio-mega256rfr2\" -DRIOT_BOARD=BOARD_PINOCCIO_MEGA256RFR2 -DCPU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_CPU=CPU_ATMEGA256RFR2 -DMCU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_MCU=MCU_ATMEGA256RFR2 -std=gnu99 -fno-delete-null-pointer-checks -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -fno-common -Wall -DFEATURE_PERIPH_TIMER -DMODULE_ATMEGA_COMMON -DMODULE_AUTO_INIT -DMODULE_BOARD -DMODULE_CORE -DMODULE_CORE_MSG -DMODULE_CPU -DMODULE_PERIPH -DMODULE_SYS -DMODULE_TSRB -DMODULE_UART_STDIO -DMODULE_XTIMER -DRIOT_VERSION=\"2017.01-devel-116-g5e63c-Steffens-HP-pinoccio-atmegarfr2\"
+Keeping old /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h
+DIRS=" " "make" -C /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led -f /home/steffen/workspace/RIOT/Makefile.application
+make[1]: Entering directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+"make" -C /home/steffen/workspace/RIOT/boards/pinoccio-mega256rfr2
+"make" -C /home/steffen/workspace/RIOT/core
+make[2]: Entering directory '/home/steffen/workspace/RIOT/core'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/core'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega256rfr2
+make[2]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common
+make[3]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common/periph
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/drivers
+make[2]: Entering directory '/home/steffen/workspace/RIOT/drivers'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/drivers'
+"make" -C /home/steffen/workspace/RIOT/sys
+make[2]: Entering directory '/home/steffen/workspace/RIOT/sys'
+"make" -C /home/steffen/workspace/RIOT/sys/auto_init
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/auto_init'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/auto_init'
+"make" -C /home/steffen/workspace/RIOT/sys/tsrb
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/tsrb'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/tsrb'
+"make" -C /home/steffen/workspace/RIOT/sys/uart_stdio
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+"make" -C /home/steffen/workspace/RIOT/sys/xtimer
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/sys'
+make[1]: Leaving directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+avr-gcc /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu/startup.o -o /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf -Wl,--start-group /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.a  /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/atmega_common.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/auto_init.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/board.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/core.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/periph.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/sys.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/tsrb.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/uart_stdio.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/xtimer.a -lm -Wl,--end-group  -Wl,-Map=/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.map -Wl,--cref -mmcu=atmega256rfr2   -ggdb -g3 -Os -e reset_handler -Wl,--gc-sections -static -lgcc
+avr-size --format avr --mcu=atmega256rfr2 --radix=10 /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf
+AVR Memory Usage
+----------------
+Device: Unknown
+
+Program:    9172 bytes
+(.text + .data + .bootloader)
+
+Data:       1277 bytes
+(.data + .bss + .noinit)
+
+
+/usr/bin/avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex
+avrdude -p atmega256rfr2 -c wiring -P /dev/ttyACM0 -b 115200 -D -U flash:w:bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex:i -C "/etc/avrdude.conf" 
+Building application "pinoccio-hello-world" for "pinoccio-mega256rfr2" with MCU "atmega256rfr2".
+
+'/home/steffen/workspace/RIOT/dist/tools/genconfigheader/genconfigheader.sh' '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h' -DDEVELHELP -Werror -mmcu=atmega256rfr2   -ffunction-sections -fdata-sections -ggdb -g3 -Os -DCOREIF_NG=1 -ffunction-sections -fdata-sections -DBOARD_PINOCCIO_MEGA256RFR2=\"pinoccio-mega256rfr2\" -DRIOT_BOARD=BOARD_PINOCCIO_MEGA256RFR2 -DCPU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_CPU=CPU_ATMEGA256RFR2 -DMCU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_MCU=MCU_ATMEGA256RFR2 -std=gnu99 -fno-delete-null-pointer-checks -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -fno-common -Wall -DFEATURE_PERIPH_TIMER -DMODULE_ATMEGA_COMMON -DMODULE_AUTO_INIT -DMODULE_BOARD -DMODULE_CORE -DMODULE_CORE_MSG -DMODULE_CPU -DMODULE_PERIPH -DMODULE_SYS -DMODULE_TSRB -DMODULE_UART_STDIO -DMODULE_XTIMER -DRIOT_VERSION=\"2017.01-devel-116-g5e63c-Steffens-HP-pinoccio-atmegarfr2\"
+Keeping old /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h
+DIRS=" " "make" -C /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led -f /home/steffen/workspace/RIOT/Makefile.application
+make[1]: Entering directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+"make" -C /home/steffen/workspace/RIOT/boards/pinoccio-mega256rfr2
+"make" -C /home/steffen/workspace/RIOT/core
+make[2]: Entering directory '/home/steffen/workspace/RIOT/core'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/core'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega256rfr2
+make[2]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common
+make[3]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common/periph
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/drivers
+make[2]: Entering directory '/home/steffen/workspace/RIOT/drivers'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/drivers'
+"make" -C /home/steffen/workspace/RIOT/sys
+make[2]: Entering directory '/home/steffen/workspace/RIOT/sys'
+"make" -C /home/steffen/workspace/RIOT/sys/auto_init
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/auto_init'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/auto_init'
+"make" -C /home/steffen/workspace/RIOT/sys/tsrb
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/tsrb'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/tsrb'
+"make" -C /home/steffen/workspace/RIOT/sys/uart_stdio
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+"make" -C /home/steffen/workspace/RIOT/sys/xtimer
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/sys'
+make[1]: Leaving directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+avr-gcc /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu/startup.o -o /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf -Wl,--start-group /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.a  /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/atmega_common.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/auto_init.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/board.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/core.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/periph.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/sys.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/tsrb.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/uart_stdio.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/xtimer.a -lm -Wl,--end-group  -Wl,-Map=/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.map -Wl,--cref -mmcu=atmega256rfr2   -ggdb -g3 -Os -e reset_handler -Wl,--gc-sections -static -lgcc
+avr-size --format avr --mcu=atmega256rfr2 --radix=10 /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf
+AVR Memory Usage
+----------------
+Device: Unknown
+
+Program:    9172 bytes
+(.text + .data + .bootloader)
+
+Data:       1277 bytes
+(.data + .bss + .noinit)
+
+
+/usr/bin/avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex
+avrdude -p atmega256rfr2 -c wiring -P /dev/ttyACM0 -b 115200 -D -U flash:w:bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex:i -C "/etc/avrdude.conf" 
+Building application "pinoccio-hello-world" for "pinoccio-mega256rfr2" with MCU "atmega256rfr2".
+
+'/home/steffen/workspace/RIOT/dist/tools/genconfigheader/genconfigheader.sh' '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h' -DDEVELHELP -Werror -mmcu=atmega256rfr2   -ffunction-sections -fdata-sections -ggdb -g3 -Os -DCOREIF_NG=1 -ffunction-sections -fdata-sections -DBOARD_PINOCCIO_MEGA256RFR2=\"pinoccio-mega256rfr2\" -DRIOT_BOARD=BOARD_PINOCCIO_MEGA256RFR2 -DCPU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_CPU=CPU_ATMEGA256RFR2 -DMCU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_MCU=MCU_ATMEGA256RFR2 -std=gnu99 -fno-delete-null-pointer-checks -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -fno-common -Wall -DFEATURE_PERIPH_TIMER -DMODULE_ATMEGA_COMMON -DMODULE_AUTO_INIT -DMODULE_BOARD -DMODULE_CORE -DMODULE_CORE_MSG -DMODULE_CPU -DMODULE_PERIPH -DMODULE_SYS -DMODULE_TSRB -DMODULE_UART_STDIO -DMODULE_XTIMER -DRIOT_VERSION=\"2017.01-devel-116-g5e63c-Steffens-HP-pinoccio-atmegarfr2\"
+Keeping old /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h
+DIRS=" " "make" -C /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led -f /home/steffen/workspace/RIOT/Makefile.application
+make[1]: Entering directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+"make" -C /home/steffen/workspace/RIOT/boards/pinoccio-mega256rfr2
+"make" -C /home/steffen/workspace/RIOT/core
+make[2]: Entering directory '/home/steffen/workspace/RIOT/core'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/core'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega256rfr2
+make[2]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common
+make[3]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common/periph
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/drivers
+make[2]: Entering directory '/home/steffen/workspace/RIOT/drivers'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/drivers'
+"make" -C /home/steffen/workspace/RIOT/sys
+make[2]: Entering directory '/home/steffen/workspace/RIOT/sys'
+"make" -C /home/steffen/workspace/RIOT/sys/auto_init
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/auto_init'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/auto_init'
+"make" -C /home/steffen/workspace/RIOT/sys/tsrb
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/tsrb'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/tsrb'
+"make" -C /home/steffen/workspace/RIOT/sys/uart_stdio
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+"make" -C /home/steffen/workspace/RIOT/sys/xtimer
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/sys'
+make[1]: Leaving directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+avr-gcc /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu/startup.o -o /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf -Wl,--start-group /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.a  /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/atmega_common.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/auto_init.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/board.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/core.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/periph.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/sys.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/tsrb.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/uart_stdio.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/xtimer.a -lm -Wl,--end-group  -Wl,-Map=/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.map -Wl,--cref -mmcu=atmega256rfr2   -ggdb -g3 -Os -e reset_handler -Wl,--gc-sections -static -lgcc
+avr-size --format avr --mcu=atmega256rfr2 --radix=10 /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf
+AVR Memory Usage
+----------------
+Device: Unknown
+
+Program:    9172 bytes
+(.text + .data + .bootloader)
+
+Data:       1277 bytes
+(.data + .bss + .noinit)
+
+
+/usr/bin/avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex
+avrdude -p atmega256rfr2 -c wiring -P /dev/ttyACM0 -b 115200 -D -U flash:w:bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex:i -C "/etc/avrdude.conf" 
+Building application "pinoccio-hello-world" for "pinoccio-mega256rfr2" with MCU "atmega256rfr2".
+
+'/home/steffen/workspace/RIOT/dist/tools/genconfigheader/genconfigheader.sh' '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h' -DDEVELHELP -Werror -mmcu=atmega256rfr2   -ffunction-sections -fdata-sections -ggdb -g3 -Os -DCOREIF_NG=1 -ffunction-sections -fdata-sections -DBOARD_PINOCCIO_MEGA256RFR2=\"pinoccio-mega256rfr2\" -DRIOT_BOARD=BOARD_PINOCCIO_MEGA256RFR2 -DCPU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_CPU=CPU_ATMEGA256RFR2 -DMCU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_MCU=MCU_ATMEGA256RFR2 -std=gnu99 -fno-delete-null-pointer-checks -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -fno-common -Wall -DFEATURE_PERIPH_TIMER -DMODULE_ATMEGA_COMMON -DMODULE_AUTO_INIT -DMODULE_BOARD -DMODULE_CORE -DMODULE_CORE_MSG -DMODULE_CPU -DMODULE_PERIPH -DMODULE_SYS -DMODULE_TSRB -DMODULE_UART_STDIO -DMODULE_XTIMER -DRIOT_VERSION=\"2017.01-devel-116-g5e63c-Steffens-HP-pinoccio-atmegarfr2\"
+Keeping old /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h
+DIRS=" " "make" -C /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led -f /home/steffen/workspace/RIOT/Makefile.application
+make[1]: Entering directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+"make" -C /home/steffen/workspace/RIOT/boards/pinoccio-mega256rfr2
+"make" -C /home/steffen/workspace/RIOT/core
+make[2]: Entering directory '/home/steffen/workspace/RIOT/core'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/core'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega256rfr2
+make[2]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common
+make[3]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common/periph
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/drivers
+make[2]: Entering directory '/home/steffen/workspace/RIOT/drivers'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/drivers'
+"make" -C /home/steffen/workspace/RIOT/sys
+make[2]: Entering directory '/home/steffen/workspace/RIOT/sys'
+"make" -C /home/steffen/workspace/RIOT/sys/auto_init
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/auto_init'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/auto_init'
+"make" -C /home/steffen/workspace/RIOT/sys/tsrb
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/tsrb'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/tsrb'
+"make" -C /home/steffen/workspace/RIOT/sys/uart_stdio
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+"make" -C /home/steffen/workspace/RIOT/sys/xtimer
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/sys'
+make[1]: Leaving directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+avr-gcc /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu/startup.o -o /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf -Wl,--start-group /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.a  /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/atmega_common.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/auto_init.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/board.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/core.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/periph.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/sys.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/tsrb.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/uart_stdio.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/xtimer.a -lm -Wl,--end-group  -Wl,-Map=/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.map -Wl,--cref -mmcu=atmega256rfr2   -ggdb -g3 -Os -e reset_handler -Wl,--gc-sections -static -lgcc
+avr-size --format avr --mcu=atmega256rfr2 --radix=10 /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf
+AVR Memory Usage
+----------------
+Device: Unknown
+
+Program:    9172 bytes
+(.text + .data + .bootloader)
+
+Data:       1277 bytes
+(.data + .bss + .noinit)
+
+
+/usr/bin/avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex
+avrdude -p atmega256rfr2 -c wiring -P /dev/ttyACM0 -b 115200 -D -U flash:w:bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex:i -C "/etc/avrdude.conf" 
+Building application "pinoccio-hello-world" for "pinoccio-mega256rfr2" with MCU "atmega256rfr2".
+
+'/home/steffen/workspace/RIOT/dist/tools/genconfigheader/genconfigheader.sh' '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h' -DDEVELHELP -Werror -mmcu=atmega256rfr2   -ffunction-sections -fdata-sections -ggdb -g3 -Os -DCOREIF_NG=1 -ffunction-sections -fdata-sections -DBOARD_PINOCCIO_MEGA256RFR2=\"pinoccio-mega256rfr2\" -DRIOT_BOARD=BOARD_PINOCCIO_MEGA256RFR2 -DCPU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_CPU=CPU_ATMEGA256RFR2 -DMCU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_MCU=MCU_ATMEGA256RFR2 -std=gnu99 -fno-delete-null-pointer-checks -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -fno-common -Wall -DFEATURE_PERIPH_TIMER -DMODULE_ATMEGA_COMMON -DMODULE_AUTO_INIT -DMODULE_BOARD -DMODULE_CORE -DMODULE_CORE_MSG -DMODULE_CPU -DMODULE_PERIPH -DMODULE_SYS -DMODULE_TSRB -DMODULE_UART_STDIO -DMODULE_XTIMER -DRIOT_VERSION=\"2017.01-devel-116-g5e63c-Steffens-HP-pinoccio-atmegarfr2\"
+Keeping old /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h
+DIRS=" " "make" -C /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led -f /home/steffen/workspace/RIOT/Makefile.application
+make[1]: Entering directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+"make" -C /home/steffen/workspace/RIOT/boards/pinoccio-mega256rfr2
+"make" -C /home/steffen/workspace/RIOT/core
+make[2]: Entering directory '/home/steffen/workspace/RIOT/core'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/core'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega256rfr2
+make[2]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common
+make[3]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common/periph
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/drivers
+make[2]: Entering directory '/home/steffen/workspace/RIOT/drivers'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/drivers'
+"make" -C /home/steffen/workspace/RIOT/sys
+make[2]: Entering directory '/home/steffen/workspace/RIOT/sys'
+"make" -C /home/steffen/workspace/RIOT/sys/auto_init
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/auto_init'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/auto_init'
+"make" -C /home/steffen/workspace/RIOT/sys/tsrb
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/tsrb'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/tsrb'
+"make" -C /home/steffen/workspace/RIOT/sys/uart_stdio
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+"make" -C /home/steffen/workspace/RIOT/sys/xtimer
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/sys'
+make[1]: Leaving directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+avr-gcc /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu/startup.o -o /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf -Wl,--start-group /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.a  /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/atmega_common.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/auto_init.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/board.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/core.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/periph.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/sys.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/tsrb.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/uart_stdio.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/xtimer.a -lm -Wl,--end-group  -Wl,-Map=/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.map -Wl,--cref -mmcu=atmega256rfr2   -ggdb -g3 -Os -e reset_handler -Wl,--gc-sections -static -lgcc
+avr-size --format avr --mcu=atmega256rfr2 --radix=10 /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf
+AVR Memory Usage
+----------------
+Device: Unknown
+
+Program:    9172 bytes
+(.text + .data + .bootloader)
+
+Data:       1277 bytes
+(.data + .bss + .noinit)
+
+
+/usr/bin/avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex
+avrdude -p atmega256rfr2 -c wiring -P /dev/ttyACM0 -b 115200 -D -U flash:w:bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex:i -C "/etc/avrdude.conf" 
+Building application "pinoccio-hello-world" for "pinoccio-mega256rfr2" with MCU "atmega256rfr2".
+
+'/home/steffen/workspace/RIOT/dist/tools/genconfigheader/genconfigheader.sh' '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h' -DDEVELHELP -Werror -mmcu=atmega256rfr2   -ffunction-sections -fdata-sections -ggdb -g3 -Os -DCOREIF_NG=1 -ffunction-sections -fdata-sections -DBOARD_PINOCCIO_MEGA256RFR2=\"pinoccio-mega256rfr2\" -DRIOT_BOARD=BOARD_PINOCCIO_MEGA256RFR2 -DCPU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_CPU=CPU_ATMEGA256RFR2 -DMCU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_MCU=MCU_ATMEGA256RFR2 -std=gnu99 -fno-delete-null-pointer-checks -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -fno-common -Wall -DFEATURE_PERIPH_TIMER -DMODULE_ATMEGA_COMMON -DMODULE_AUTO_INIT -DMODULE_BOARD -DMODULE_CORE -DMODULE_CORE_MSG -DMODULE_CPU -DMODULE_PERIPH -DMODULE_SYS -DMODULE_TSRB -DMODULE_UART_STDIO -DMODULE_XTIMER -DRIOT_VERSION=\"2017.01-devel-116-g5e63c-Steffens-HP-pinoccio-atmegarfr2\"
+Keeping old /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h
+DIRS=" " "make" -C /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led -f /home/steffen/workspace/RIOT/Makefile.application
+make[1]: Entering directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+"make" -C /home/steffen/workspace/RIOT/boards/pinoccio-mega256rfr2
+"make" -C /home/steffen/workspace/RIOT/core
+make[2]: Entering directory '/home/steffen/workspace/RIOT/core'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/core'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega256rfr2
+make[2]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common
+make[3]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common/periph
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/drivers
+make[2]: Entering directory '/home/steffen/workspace/RIOT/drivers'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/drivers'
+"make" -C /home/steffen/workspace/RIOT/sys
+make[2]: Entering directory '/home/steffen/workspace/RIOT/sys'
+"make" -C /home/steffen/workspace/RIOT/sys/auto_init
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/auto_init'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/auto_init'
+"make" -C /home/steffen/workspace/RIOT/sys/tsrb
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/tsrb'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/tsrb'
+"make" -C /home/steffen/workspace/RIOT/sys/uart_stdio
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+"make" -C /home/steffen/workspace/RIOT/sys/xtimer
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/sys'
+make[1]: Leaving directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+avr-gcc /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu/startup.o -o /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf -Wl,--start-group /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.a  /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/atmega_common.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/auto_init.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/board.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/core.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/periph.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/sys.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/tsrb.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/uart_stdio.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/xtimer.a -lm -Wl,--end-group  -Wl,-Map=/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.map -Wl,--cref -mmcu=atmega256rfr2   -ggdb -g3 -Os -e reset_handler -Wl,--gc-sections -static -lgcc
+avr-size --format avr --mcu=atmega256rfr2 --radix=10 /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf
+AVR Memory Usage
+----------------
+Device: Unknown
+
+Program:    9172 bytes
+(.text + .data + .bootloader)
+
+Data:       1277 bytes
+(.data + .bss + .noinit)
+
+
+/usr/bin/avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex
+avrdude -p atmega256rfr2 -c wiring -P /dev/ttyACM0 -b 115200 -D -U flash:w:bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex:i -C "/etc/avrdude.conf" 
+[1;32mBuilding application "pinoccio-hello-world" for "pinoccio-mega256rfr2" with MCU "atmega256rfr2".[0m
+
+'/home/steffen/workspace/RIOT/dist/tools/genconfigheader/genconfigheader.sh' '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h' -DDEVELHELP -Werror -mmcu=atmega256rfr2   -ffunction-sections -fdata-sections -ggdb -g3 -Os -DCOREIF_NG=1 -ffunction-sections -fdata-sections -DBOARD_PINOCCIO_MEGA256RFR2=\"pinoccio-mega256rfr2\" -DRIOT_BOARD=BOARD_PINOCCIO_MEGA256RFR2 -DCPU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_CPU=CPU_ATMEGA256RFR2 -DMCU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_MCU=MCU_ATMEGA256RFR2 -std=gnu99 -fno-delete-null-pointer-checks -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -fno-common -Wall -DFEATURE_PERIPH_TIMER -DMODULE_ATMEGA_COMMON -DMODULE_AUTO_INIT -DMODULE_BOARD -DMODULE_CORE -DMODULE_CORE_MSG -DMODULE_CPU -DMODULE_PERIPH -DMODULE_SYS -DMODULE_TSRB -DMODULE_UART_STDIO -DMODULE_XTIMER -DRIOT_VERSION=\"2017.01-devel-116-g5e63c-Steffens-HP-pinoccio-atmegarfr2\"
+Keeping old /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h
+DIRS=" " "make" -C /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led -f /home/steffen/workspace/RIOT/Makefile.application
+make[1]: Entering directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+"make" -C /home/steffen/workspace/RIOT/boards/pinoccio-mega256rfr2
+"make" -C /home/steffen/workspace/RIOT/core
+make[2]: Entering directory '/home/steffen/workspace/RIOT/core'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/core'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega256rfr2
+make[2]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common
+make[3]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common/periph
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/drivers
+make[2]: Entering directory '/home/steffen/workspace/RIOT/drivers'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/drivers'
+"make" -C /home/steffen/workspace/RIOT/sys
+make[2]: Entering directory '/home/steffen/workspace/RIOT/sys'
+"make" -C /home/steffen/workspace/RIOT/sys/auto_init
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/auto_init'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/auto_init'
+"make" -C /home/steffen/workspace/RIOT/sys/tsrb
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/tsrb'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/tsrb'
+"make" -C /home/steffen/workspace/RIOT/sys/uart_stdio
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+"make" -C /home/steffen/workspace/RIOT/sys/xtimer
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/sys'
+make[1]: Leaving directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+avr-gcc /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu/startup.o -o /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf -Wl,--start-group /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.a  /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/atmega_common.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/auto_init.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/board.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/core.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/periph.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/sys.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/tsrb.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/uart_stdio.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/xtimer.a -lm -Wl,--end-group  -Wl,-Map=/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.map -Wl,--cref -mmcu=atmega256rfr2   -ggdb -g3 -Os -e reset_handler -Wl,--gc-sections -static -lgcc
+avr-size --format avr --mcu=atmega256rfr2 --radix=10 /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf
+AVR Memory Usage
+----------------
+Device: Unknown
+
+Program:    9172 bytes
+(.text + .data + .bootloader)
+
+Data:       1277 bytes
+(.data + .bss + .noinit)
+
+
+/usr/sbin/avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex
+avrdude -p atmega256rfr2 -c wiring -P /dev/ttyACM0 -b 115200 -D -U flash:w:bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex:i -C "/etc/avrdude.conf" 
+[1;32mBuilding application "pinoccio-hello-world" for "pinoccio-mega256rfr2" with MCU "atmega256rfr2".[0m
+
+'/home/steffen/workspace/RIOT/dist/tools/genconfigheader/genconfigheader.sh' '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h' -DDEVELHELP -Werror -mmcu=atmega256rfr2   -ffunction-sections -fdata-sections -ggdb -g3 -Os -DCOREIF_NG=1 -ffunction-sections -fdata-sections -DBOARD_PINOCCIO_MEGA256RFR2=\"pinoccio-mega256rfr2\" -DRIOT_BOARD=BOARD_PINOCCIO_MEGA256RFR2 -DCPU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_CPU=CPU_ATMEGA256RFR2 -DMCU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_MCU=MCU_ATMEGA256RFR2 -std=gnu99 -fno-delete-null-pointer-checks -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -fno-common -Wall -DFEATURE_PERIPH_TIMER -DMODULE_ATMEGA_COMMON -DMODULE_AUTO_INIT -DMODULE_BOARD -DMODULE_CORE -DMODULE_CORE_MSG -DMODULE_CPU -DMODULE_PERIPH -DMODULE_SYS -DMODULE_TSRB -DMODULE_UART_STDIO -DMODULE_XTIMER -DRIOT_VERSION=\"2017.01-devel-116-g5e63c-Steffens-HP-pinoccio-atmegarfr2\"
+Keeping old /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h
+DIRS=" " "make" -C /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led -f /home/steffen/workspace/RIOT/Makefile.application
+make[1]: Entering directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+"make" -C /home/steffen/workspace/RIOT/boards/pinoccio-mega256rfr2
+"make" -C /home/steffen/workspace/RIOT/core
+make[2]: Entering directory '/home/steffen/workspace/RIOT/core'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/core'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega256rfr2
+make[2]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common
+make[3]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common/periph
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/drivers
+make[2]: Entering directory '/home/steffen/workspace/RIOT/drivers'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/drivers'
+"make" -C /home/steffen/workspace/RIOT/sys
+make[2]: Entering directory '/home/steffen/workspace/RIOT/sys'
+"make" -C /home/steffen/workspace/RIOT/sys/auto_init
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/auto_init'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/auto_init'
+"make" -C /home/steffen/workspace/RIOT/sys/tsrb
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/tsrb'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/tsrb'
+"make" -C /home/steffen/workspace/RIOT/sys/uart_stdio
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+"make" -C /home/steffen/workspace/RIOT/sys/xtimer
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/sys'
+make[1]: Leaving directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+avr-gcc /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu/startup.o -o /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf -Wl,--start-group /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.a  /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/atmega_common.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/auto_init.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/board.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/core.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/periph.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/sys.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/tsrb.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/uart_stdio.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/xtimer.a -lm -Wl,--end-group  -Wl,-Map=/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.map -Wl,--cref -mmcu=atmega256rfr2   -ggdb -g3 -Os -e reset_handler -Wl,--gc-sections -static -lgcc
+avr-size --format avr --mcu=atmega256rfr2 --radix=10 /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf
+AVR Memory Usage
+----------------
+Device: Unknown
+
+Program:    9172 bytes
+(.text + .data + .bootloader)
+
+Data:       1277 bytes
+(.data + .bss + .noinit)
+
+
+/usr/sbin/avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex
+avrdude -p atmega256rfr2 -c wiring -P /dev/ttyACM0 -b 115200 -D -U flash:w:bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex:i -C "/etc/avrdude.conf" 
+[1;32mBuilding application "pinoccio-hello-world" for "pinoccio-mega256rfr2" with MCU "atmega256rfr2".[0m
+
+'/home/steffen/workspace/RIOT/dist/tools/genconfigheader/genconfigheader.sh' '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h' -DDEVELHELP -Werror -mmcu=atmega256rfr2   -ffunction-sections -fdata-sections -ggdb -g3 -Os -DCOREIF_NG=1 -ffunction-sections -fdata-sections -DBOARD_PINOCCIO_MEGA256RFR2=\"pinoccio-mega256rfr2\" -DRIOT_BOARD=BOARD_PINOCCIO_MEGA256RFR2 -DCPU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_CPU=CPU_ATMEGA256RFR2 -DMCU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_MCU=MCU_ATMEGA256RFR2 -std=gnu99 -fno-delete-null-pointer-checks -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -fno-common -Wall -DFEATURE_PERIPH_TIMER -DMODULE_ATMEGA_COMMON -DMODULE_AUTO_INIT -DMODULE_BOARD -DMODULE_CORE -DMODULE_CORE_MSG -DMODULE_CPU -DMODULE_PERIPH -DMODULE_SYS -DMODULE_TSRB -DMODULE_UART_STDIO -DMODULE_XTIMER -DRIOT_VERSION=\"2017.01-devel-116-g5e63c-Steffens-HP-pinoccio-atmegarfr2\"
+Keeping old /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h
+DIRS=" " "make" -C /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led -f /home/steffen/workspace/RIOT/Makefile.application
+make[1]: Entering directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+"make" -C /home/steffen/workspace/RIOT/boards/pinoccio-mega256rfr2
+"make" -C /home/steffen/workspace/RIOT/core
+make[2]: Entering directory '/home/steffen/workspace/RIOT/core'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/core'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega256rfr2
+make[2]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common
+make[3]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common/periph
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/drivers
+make[2]: Entering directory '/home/steffen/workspace/RIOT/drivers'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/drivers'
+"make" -C /home/steffen/workspace/RIOT/sys
+make[2]: Entering directory '/home/steffen/workspace/RIOT/sys'
+"make" -C /home/steffen/workspace/RIOT/sys/auto_init
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/auto_init'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/auto_init'
+"make" -C /home/steffen/workspace/RIOT/sys/tsrb
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/tsrb'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/tsrb'
+"make" -C /home/steffen/workspace/RIOT/sys/uart_stdio
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+"make" -C /home/steffen/workspace/RIOT/sys/xtimer
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/sys'
+make[1]: Leaving directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+avr-gcc /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu/startup.o -o /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf -Wl,--start-group /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.a  /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/atmega_common.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/auto_init.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/board.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/core.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/periph.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/sys.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/tsrb.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/uart_stdio.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/xtimer.a -lm -Wl,--end-group  -Wl,-Map=/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.map -Wl,--cref -mmcu=atmega256rfr2   -ggdb -g3 -Os -e reset_handler -Wl,--gc-sections -static -lgcc
+avr-size --format avr --mcu=atmega256rfr2 --radix=10 /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf
+AVR Memory Usage
+----------------
+Device: Unknown
+
+Program:    9172 bytes
+(.text + .data + .bootloader)
+
+Data:       1277 bytes
+(.data + .bss + .noinit)
+
+
+/usr/sbin/avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex
+avrdude -p atmega256rfr2 -c wiring -P /dev/ttyACM0 -b 115200 -D -U flash:w:bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex:i -C "/etc/avrdude.conf" 
+[1;32mBuilding application "pinoccio-hello-world" for "pinoccio-mega256rfr2" with MCU "atmega256rfr2".[0m
+
+'/home/steffen/workspace/RIOT/dist/tools/genconfigheader/genconfigheader.sh' '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h' -DDEVELHELP -Werror -mmcu=atmega256rfr2   -ffunction-sections -fdata-sections -ggdb -g3 -Os -DCOREIF_NG=1 -ffunction-sections -fdata-sections -DBOARD_PINOCCIO_MEGA256RFR2=\"pinoccio-mega256rfr2\" -DRIOT_BOARD=BOARD_PINOCCIO_MEGA256RFR2 -DCPU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_CPU=CPU_ATMEGA256RFR2 -DMCU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_MCU=MCU_ATMEGA256RFR2 -std=gnu99 -fno-delete-null-pointer-checks -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -fno-common -Wall -DFEATURE_PERIPH_TIMER -DMODULE_ATMEGA_COMMON -DMODULE_AUTO_INIT -DMODULE_BOARD -DMODULE_CORE -DMODULE_CORE_MSG -DMODULE_CPU -DMODULE_PERIPH -DMODULE_SYS -DMODULE_TSRB -DMODULE_UART_STDIO -DMODULE_XTIMER -DRIOT_VERSION=\"2017.01-devel-116-g5e63c-Steffens-HP-pinoccio-atmegarfr2\"
+Keeping old /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h
+DIRS=" " "make" -C /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led -f /home/steffen/workspace/RIOT/Makefile.application
+make[1]: Entering directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+"make" -C /home/steffen/workspace/RIOT/boards/pinoccio-mega256rfr2
+"make" -C /home/steffen/workspace/RIOT/core
+make[2]: Entering directory '/home/steffen/workspace/RIOT/core'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/core'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega256rfr2
+make[2]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common
+make[3]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common/periph
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/drivers
+make[2]: Entering directory '/home/steffen/workspace/RIOT/drivers'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/drivers'
+"make" -C /home/steffen/workspace/RIOT/sys
+make[2]: Entering directory '/home/steffen/workspace/RIOT/sys'
+"make" -C /home/steffen/workspace/RIOT/sys/auto_init
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/auto_init'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/auto_init'
+"make" -C /home/steffen/workspace/RIOT/sys/tsrb
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/tsrb'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/tsrb'
+"make" -C /home/steffen/workspace/RIOT/sys/uart_stdio
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+"make" -C /home/steffen/workspace/RIOT/sys/xtimer
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/sys'
+make[1]: Leaving directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+avr-gcc /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu/startup.o -o /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf -Wl,--start-group /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.a  /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/atmega_common.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/auto_init.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/board.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/core.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/periph.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/sys.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/tsrb.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/uart_stdio.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/xtimer.a -lm -Wl,--end-group  -Wl,-Map=/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.map -Wl,--cref -mmcu=atmega256rfr2   -ggdb -g3 -Os -e reset_handler -Wl,--gc-sections -static -lgcc
+avr-size --format avr --mcu=atmega256rfr2 --radix=10 /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf
+AVR Memory Usage
+----------------
+Device: Unknown
+
+Program:    9172 bytes
+(.text + .data + .bootloader)
+
+Data:       1277 bytes
+(.data + .bss + .noinit)
+
+
+/usr/sbin/avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex
+avrdude -p atmega256rfr2 -c wiring -P /dev/ttyACM0 -b 115200 -D -U flash:w:bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex:i -C "/etc/avrdude.conf" 
+Building application "pinoccio-hello-world" for "pinoccio-mega256rfr2" with MCU "atmega256rfr2".
+
+'/home/steffen/workspace/RIOT/dist/tools/genconfigheader/genconfigheader.sh' '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h' -DDEVELHELP -Werror -mmcu=atmega256rfr2   -ffunction-sections -fdata-sections -ggdb -g3 -Os -DCOREIF_NG=1 -ffunction-sections -fdata-sections -DBOARD_PINOCCIO_MEGA256RFR2=\"pinoccio-mega256rfr2\" -DRIOT_BOARD=BOARD_PINOCCIO_MEGA256RFR2 -DCPU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_CPU=CPU_ATMEGA256RFR2 -DMCU_ATMEGA256RFR2=\"atmega256rfr2\" -DRIOT_MCU=MCU_ATMEGA256RFR2 -std=gnu99 -fno-delete-null-pointer-checks -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -fno-common -Wall -DFEATURE_PERIPH_TIMER -DMODULE_ATMEGA_COMMON -DMODULE_AUTO_INIT -DMODULE_BOARD -DMODULE_CORE -DMODULE_CORE_MSG -DMODULE_CPU -DMODULE_PERIPH -DMODULE_SYS -DMODULE_TSRB -DMODULE_UART_STDIO -DMODULE_XTIMER -DRIOT_VERSION=\"2017.01-devel-116-g5e63c-Steffens-HP-pinoccio-atmegarfr2\"
+Keeping old /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/riotbuild/riotbuild.h
+DIRS=" " "make" -C /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led -f /home/steffen/workspace/RIOT/Makefile.application
+make[1]: Entering directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+"make" -C /home/steffen/workspace/RIOT/boards/pinoccio-mega256rfr2
+"make" -C /home/steffen/workspace/RIOT/core
+make[2]: Entering directory '/home/steffen/workspace/RIOT/core'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/core'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega256rfr2
+make[2]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common
+make[3]: Entering directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+"make" -C /home/steffen/workspace/RIOT/cpu/atmega_common/periph
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega_common'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/cpu/atmega256rfr2'
+"make" -C /home/steffen/workspace/RIOT/drivers
+make[2]: Entering directory '/home/steffen/workspace/RIOT/drivers'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/drivers'
+"make" -C /home/steffen/workspace/RIOT/sys
+make[2]: Entering directory '/home/steffen/workspace/RIOT/sys'
+"make" -C /home/steffen/workspace/RIOT/sys/auto_init
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/auto_init'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/auto_init'
+"make" -C /home/steffen/workspace/RIOT/sys/tsrb
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/tsrb'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/tsrb'
+"make" -C /home/steffen/workspace/RIOT/sys/uart_stdio
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/uart_stdio'
+"make" -C /home/steffen/workspace/RIOT/sys/xtimer
+make[3]: Entering directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[3]: Leaving directory '/home/steffen/workspace/RIOT/sys/xtimer'
+make[2]: Leaving directory '/home/steffen/workspace/RIOT/sys'
+make[1]: Leaving directory '/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led'
+avr-gcc /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu/startup.o -o /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf -Wl,--start-group /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.a  /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/atmega_common.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/auto_init.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/board.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/core.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/cpu.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/periph.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/sys.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/tsrb.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/uart_stdio.a /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/xtimer.a -lm -Wl,--end-group  -Wl,-Map=/home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.map -Wl,--cref -mmcu=atmega256rfr2   -ggdb -g3 -Os -e reset_handler -Wl,--gc-sections -static -lgcc
+avr-size --format avr --mcu=atmega256rfr2 --radix=10 /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf
+AVR Memory Usage
+----------------
+Device: Unknown
+
+Program:    9172 bytes
+(.text + .data + .bootloader)
+
+Data:       1277 bytes
+(.data + .bss + .noinit)
+
+
+/usr/bin/avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.elf /home/steffen/workspace/RIOT/examples/pinoccio-hello-xtimer-led/bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex
+avrdude -p atmega256rfr2 -c wiring -P /dev/ttyACM0 -b 115200 -D -U flash:w:bin/pinoccio-mega256rfr2/pinoccio-hello-world.hex:i -C "/etc/avrdude.conf" 

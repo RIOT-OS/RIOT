@@ -22,7 +22,10 @@
 
 #include "net/gnrc/netdev/ieee802154.h"
 
-#define ENABLE_DEBUG    (0)
+
+#include "net/gnrc/netdev2/ieee802154.h"
+
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 static gnrc_pktsnip_t *_recv(gnrc_netdev_t *gnrc_netdev);
@@ -102,14 +105,16 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev_t *gnrc_netdev)
             nread -= mhr_len;
             /* mark IEEE 802.15.4 header */
             ieee802154_hdr = gnrc_pktbuf_mark(pkt, mhr_len, GNRC_NETTYPE_UNDEF);
+
             if (ieee802154_hdr == NULL) {
-                DEBUG("_recv_ieee802154: no space left in packet buffer\n");
+                DEBUG("_recv_ieee802154: gnrc_pktbuf_mark no space left in packet buffer\n");
                 gnrc_pktbuf_release(pkt);
                 return NULL;
             }
+
             netif_hdr = _make_netif_hdr(ieee802154_hdr->data);
             if (netif_hdr == NULL) {
-                DEBUG("_recv_ieee802154: no space left in packet buffer\n");
+                DEBUG("_recv_ieee802154: _make_netif_hdr no space left in packet buffer\n");
                 gnrc_pktbuf_release(pkt);
                 return NULL;
             }

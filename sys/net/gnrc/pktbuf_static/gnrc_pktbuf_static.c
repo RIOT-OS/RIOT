@@ -87,6 +87,7 @@ void gnrc_pktbuf_init(void)
     _first_unused->next = NULL;
     _first_unused->size = sizeof(_pktbuf);
     mutex_unlock(&_mutex);
+    DEBUG("pktbuf: initialized.\n");
 }
 
 gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, void *data, size_t size,
@@ -125,7 +126,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
     /* create new snip descriptor for marked data */
     marked_snip = _pktbuf_alloc(sizeof(gnrc_pktsnip_t));
     if (marked_snip == NULL) {
-        DEBUG("pktbuf: could not reallocate marked section.\n");
+        DEBUG("pktbuf: could not reallocate marked section 1.\n");
         mutex_unlock(&_mutex);
         return NULL;
     }
@@ -136,7 +137,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
         void *new_data_rest;
         new_data_marked = _pktbuf_alloc(size);
         if (new_data_marked == NULL) {
-            DEBUG("pktbuf: could not reallocate marked section.\n");
+            DEBUG("pktbuf: could not reallocate marked section 2.\n");
             _pktbuf_free(marked_snip, sizeof(gnrc_pktsnip_t));
             mutex_unlock(&_mutex);
             return NULL;

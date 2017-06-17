@@ -109,5 +109,8 @@ int main(void)
                                                     time.tm_sec);
 
     puts("The alarm should trigger every 10 seconds for 4 times.");
+
+    while(1);
+
     return 0;
 }

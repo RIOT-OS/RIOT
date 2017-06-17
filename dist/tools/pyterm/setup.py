@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#/usr/bin/python python
 
 try:
     from setuptools import setup
