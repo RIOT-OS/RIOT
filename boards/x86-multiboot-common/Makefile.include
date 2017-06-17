@@ -5,11 +5,12 @@ endif
 ifneq (0, $(shell test -e "$(NEWLIB_BASE)/lib/libc.a" && echo $$?))
   NEWLIB_PRECOMPILED_NAME := i586-newlib_2.2.0.20150623_tlsf-3337.tar.bz2
   NEWLIB_PRECOMPILED := http://download.riot-os.org/$(NEWLIB_PRECOMPILED_NAME)
+  NEWLIB_PRECOMPILED_MD5 := 8090a768cf0294b259fe7ad904d085c7
 
   $(warning Precompiled newlib is missing in $(NEWLIB_BASE))
   $(warning Downloading from $(NEWLIB_PRECOMPILED))
 
-  $(shell cd $(RIOTBASE) && $(DOWNLOAD_TO_STDOUT) "$(NEWLIB_PRECOMPILED)" | tar xj)
+  $(shell cd $(RIOTBASE) && $(DLCACHE) "$(NEWLIB_PRECOMPILED)" 8090a768cf0294b259fe7ad904d085c7 - | tar xj)
 endif
 
 ifeq (,$(BUILD_INCLUDE_BASE))
