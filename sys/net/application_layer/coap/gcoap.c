@@ -585,6 +585,7 @@ kernel_pid_t gcoap_init(void)
     _pid = thread_create(_msg_stack, sizeof(_msg_stack), THREAD_PRIORITY_MAIN - 1,
                             THREAD_CREATE_STACKTEST, _event_loop, NULL, "coap");
 
+    mutex_init(&_coap_state.lock);
     /* Blank lists so we know if an entry is available. */
     memset(&_coap_state.open_reqs[0], 0, sizeof(_coap_state.open_reqs));
     memset(&_coap_state.observers[0], 0, sizeof(_coap_state.observers));
@@ -683,6 +684,7 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
     assert(resp_handler != NULL);
 
     /* Find empty slot in list of open requests. */
+    mutex_lock(&_coap_state.lock);
     for (int i = 0; i < GCOAP_REQ_WAITING_MAX; i++) {
         if (_coap_state.open_reqs[i].state == GCOAP_MEMO_UNUSED) {
             memo = &_coap_state.open_reqs[i];
@@ -690,6 +692,8 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
             break;
         }
     }
+    mutex_unlock(&_coap_state.lock);
+
     if (memo) {
         memcpy(&memo->hdr_buf[0], buf, GCOAP_HEADER_MAXLEN);
         memo->resp_handler = resp_handler;
