@@ -86,6 +86,7 @@ char phydat_scale_to_str(int8_t scale)
         case -9:    return 'n';
         case -12:   return 'p';
         case -15:   return 'f';
+        case 2:     return 'h';
         case 3:     return 'k';
         case 6:     return 'M';
         case 9:     return 'G';
