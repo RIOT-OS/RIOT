@@ -11,7 +11,7 @@
  * @{
  * @file
  * @brief       Low-level I2C driver implementation
- * @author      Baptiste Clenet <baptiste.clenet@xsoen.com>
+ * @author      Baptiste Clenet <bapclenet@gmail.com>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @}
  */
