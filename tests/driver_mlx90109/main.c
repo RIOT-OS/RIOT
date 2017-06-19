@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <string.h>
+#include <xtimer.h>
+#include <math.h>
+
+/*RFID*/
+#include "mlx90109.h"
+#include "mlx90109_params.h"
+
+
+
+int sleepTime = 2;
+
+	/*RFID */
+	mlx90109_t mlx90109_dev;
+	tagdata neuerTag;
+	
+//INTERRUPT ZUM AUSLESEN	
+void interrupt_mlx90109(void *args)
+{
+	if (args){}
+	int16_t temp = 0;
+//	printf("Dies ist ein Interrupt\n");
+	temp = mlx90109_read(&mlx90109_dev);
+	if (temp == MLX90109_DATA_OK)
+	{
+		//printf("data ok\n");
+		temp = mlx90109_format(&mlx90109_dev, &neuerTag);
+		if (temp == MLX90109_OK){
+			neuerTag.newTag = 1;
+		}
+	}
+	return;
+}
+
+int main(void)
+{
+	puts("MLX90901 AnimalTag driver test application\n");
+ 
+	mlx90109_init(&mlx90109_dev, &mlx90109_params[0], interrupt_mlx90109);
+	//printf ("error: %d \n", error);
+	puts("ISR Konfiguriert\n");
+
+ 
+ 
+    while (1) {
+		if (neuerTag.newTag == 1){
+			neuerTag.newTag = 0;
+			printf("TagId: 0x%x%x \n" , (unsigned int)(neuerTag.tagId>>32),(unsigned int)neuerTag.tagId);
+			neuerTag.tagId = 0;
+		}
+		xtimer_sleep(sleepTime);
+    }
+}
