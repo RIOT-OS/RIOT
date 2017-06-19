@@ -64,6 +64,8 @@ const char *phydat_unit_to_str(uint8_t unit)
         case UNIT_TEMP_K:   return "K";
         case UNIT_LUX:      return "lx";
         case UNIT_M:        return "m";
+        case UNIT_M2:       return "m^2";
+        case UNIT_M3:       return "m^3";
         case UNIT_G:        return "g";
         case UNIT_DPS:      return "dps";
         case UNIT_GR:       return "G";
