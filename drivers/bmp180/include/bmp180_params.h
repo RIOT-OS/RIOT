@@ -64,12 +64,9 @@ static const bmp180_params_t bmp180_params[] =
 /**
  * @brief   Configure SAUL registry entries
  */
-static const saul_reg_info_t bmp180_saul_reg_info[][2] =
+static const saul_reg_info_t bmp180_saul_reg_info[] =
 {
-    {
-        { .name = "bmp180-temp" },
-        { .name = "bmp180-press" }
-    }
+    { .name = "bmp180" }
 };
 
 #ifdef __cplusplus
