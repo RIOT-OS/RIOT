@@ -116,7 +116,7 @@ int lsm6dsl_init(lsm6dsl_t *dev, const lsm6dsl_params_t *params);
  * @return 0 on success
  * @return < 0 on error
  */
-int lsm6dsl_read_acc(lsm6dsl_t *dev, lsm6dsl_3d_data_t *data);
+int lsm6dsl_read_acc(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data);
 
 /**
  * @brief Read gyroscope data
@@ -127,7 +127,7 @@ int lsm6dsl_read_acc(lsm6dsl_t *dev, lsm6dsl_3d_data_t *data);
  * @return 0 on success
  * @return < 0 on error
  */
-int lsm6dsl_read_gyro(lsm6dsl_t *dev, lsm6dsl_3d_data_t *data);
+int lsm6dsl_read_gyro(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data);
 
 /**
  * @brief Read temperature data
@@ -138,7 +138,7 @@ int lsm6dsl_read_gyro(lsm6dsl_t *dev, lsm6dsl_3d_data_t *data);
  * @return 0 on success
  * @return < 0 on error
  */
-int lsm6dsl_read_temp(lsm6dsl_t *dev, int16_t *data);
+int lsm6dsl_read_temp(const lsm6dsl_t *dev, int16_t *data);
 
 #ifdef __cplusplus
 }

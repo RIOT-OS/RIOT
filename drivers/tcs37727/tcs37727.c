@@ -77,7 +77,7 @@ int tcs37727_init(tcs37727_t *dev, const tcs37727_params_t *params)
     return TCS37727_OK;
 }
 
-void tcs37727_set_rgbc_active(tcs37727_t *dev)
+void tcs37727_set_rgbc_active(const tcs37727_t *dev)
 {
     uint8_t reg;
 
@@ -90,7 +90,7 @@ void tcs37727_set_rgbc_active(tcs37727_t *dev)
     i2c_release(BUS);
 }
 
-void tcs37727_set_rgbc_standby(tcs37727_t *dev)
+void tcs37727_set_rgbc_standby(const tcs37727_t *dev)
 {
     uint8_t reg;
 
@@ -177,7 +177,7 @@ static uint8_t tcs37727_trim_gain(tcs37727_t *dev, int rawc)
     return 0;
 }
 
-void tcs37727_read(tcs37727_t *dev, tcs37727_data_t *data)
+void tcs37727_read(const tcs37727_t *dev, tcs37727_data_t *data)
 {
     uint8_t buf[8];
 
@@ -210,7 +210,7 @@ void tcs37727_read(tcs37727_t *dev, tcs37727_data_t *data)
     int32_t lux = gi / cpl;
 
     /* Autogain */
-    tcs37727_trim_gain(dev, tmpc);
+    tcs37727_trim_gain((tcs37727_t *)dev, tmpc);
 
     data->red = (tmpr < 0) ? 0 : (tmpr * 1000) / cpl;
     data->green = (tmpg < 0) ? 0 : (tmpg * 1000) / cpl;

@@ -88,7 +88,7 @@ void feetech_init(feetech_t *device, uart_half_duplex_t *stream, feetech_id_t id
  * @return             FEETECH_BUFFER_TOO_SMALL if buffer is too small for the message
  * @return             FEETECH_INVALID_MESSAGE if an invalid message was received
  */
-int feetech_write8(feetech_t *device, feetech_addr_t addr, uint8_t value);
+int feetech_write8(const feetech_t *device, feetech_addr_t addr, uint8_t value);
 
 /**
  * @brief Write to a device 16bits address
@@ -102,7 +102,7 @@ int feetech_write8(feetech_t *device, feetech_addr_t addr, uint8_t value);
  * @return             FEETECH_BUFFER_TOO_SMALL if buffer is too small for the message
  * @return             FEETECH_INVALID_MESSAGE if an invalid message was received
  */
-int feetech_write16(feetech_t *device, feetech_addr_t addr, uint16_t value);
+int feetech_write16(const feetech_t *device, feetech_addr_t addr, uint16_t value);
 
 /**
  * @brief Write to a device address
@@ -117,7 +117,7 @@ int feetech_write16(feetech_t *device, feetech_addr_t addr, uint16_t value);
  * @return             FEETECH_BUFFER_TOO_SMALL if buffer is too small for the message
  * @return             FEETECH_INVALID_MESSAGE if an invalid message was received
  */
-int feetech_write(feetech_t *device, feetech_addr_t addr, const uint8_t *data, size_t length);
+int feetech_write(const feetech_t *device, feetech_addr_t addr, const uint8_t *data, size_t length);
 
 /**
  * @brief Read from a device 8bits address
@@ -131,7 +131,7 @@ int feetech_write(feetech_t *device, feetech_addr_t addr, const uint8_t *data, s
  * @return             FEETECH_BUFFER_TOO_SMALL if buffer is too small for the message
  * @return             FEETECH_INVALID_MESSAGE if an invalid message was received
  */
-int feetech_read8(feetech_t *device, feetech_addr_t addr, uint8_t *value);
+int feetech_read8(const feetech_t *device, feetech_addr_t addr, uint8_t *value);
 
 /**
  * @brief Read from a device 16bits address
@@ -145,7 +145,7 @@ int feetech_read8(feetech_t *device, feetech_addr_t addr, uint8_t *value);
  * @return             FEETECH_BUFFER_TOO_SMALL if buffer is too small for the message
  * @return             FEETECH_INVALID_MESSAGE if an invalid message was received
  */
-int feetech_read16(feetech_t *device, feetech_addr_t addr, uint16_t *value);
+int feetech_read16(const feetech_t *device, feetech_addr_t addr, uint16_t *value);
 
 /**
  * @brief Read from a device address
@@ -160,7 +160,7 @@ int feetech_read16(feetech_t *device, feetech_addr_t addr, uint16_t *value);
  * @return             FEETECH_BUFFER_TOO_SMALL if buffer is too small for the message
  * @return             FEETECH_INVALID_MESSAGE if an invalid message was received
  */
-int feetech_read(feetech_t *device, feetech_addr_t addr, uint8_t *data, size_t length);
+int feetech_read(const feetech_t *device, feetech_addr_t addr, uint8_t *data, size_t length);
 
 #ifdef __cplusplus
 }

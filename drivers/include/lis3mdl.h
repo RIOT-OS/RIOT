@@ -124,7 +124,7 @@ int lis3mdl_init(lis3mdl_t *dev, i2c_t i2c, uint8_t address,
  * @param[in] dev          device descriptor of LIS3MDL
  * @param[in] data         measured magnetometer data
  */
-void lis3mdl_read_mag(lis3mdl_t *dev, lis3mdl_3d_data_t *data);
+void lis3mdl_read_mag(const lis3mdl_t *dev, lis3mdl_3d_data_t *data);
 
 /**
  * @brief Reads the temperature value of LIS3MDL.
@@ -132,21 +132,21 @@ void lis3mdl_read_mag(lis3mdl_t *dev, lis3mdl_3d_data_t *data);
  * @param[in] dev          device descriptor of LIS3MDL
  * @param[in] value        measured temperature in degree celsius
  */
-void lis3mdl_read_temp(lis3mdl_t *dev, int16_t *value);
+void lis3mdl_read_temp(const lis3mdl_t *dev, int16_t *value);
 
 /**
  * @brief Enable the LIS3MDL device.
  *
  * @param[in] dev          device descriptor of LIS3MDL
  */
-void lis3mdl_enable(lis3mdl_t *dev);
+void lis3mdl_enable(const lis3mdl_t *dev);
 
 /**
  * @brief Disable the LIS3MDL device.
  *
  * @param[in] dev          device descriptor of LIS3MDL
  */
-void lis3mdl_disable(lis3mdl_t *dev);
+void lis3mdl_disable(const lis3mdl_t *dev);
 
 #ifdef __cplusplus
 }

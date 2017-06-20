@@ -49,7 +49,7 @@ int dynamixel_ping(uart_half_duplex_t *stream, dynamixel_id_t id)
     return DYNAMIXEL_OK;
 }
 
-int dynamixel_write(dynamixel_t *device, dynamixel_addr_t reg, const uint8_t *data, size_t length)
+int dynamixel_write(const dynamixel_t *device, dynamixel_addr_t reg, const uint8_t *data, size_t length)
 {
     uart_half_duplex_set_tx(device->stream);
     if (device->stream->size < length) {
@@ -70,17 +70,17 @@ int dynamixel_write(dynamixel_t *device, dynamixel_addr_t reg, const uint8_t *da
     return DYNAMIXEL_OK;
 }
 
-int dynamixel_write8(dynamixel_t *device, dynamixel_addr_t reg, uint8_t value)
+int dynamixel_write8(const dynamixel_t *device, dynamixel_addr_t reg, uint8_t value)
 {
     return dynamixel_write(device, reg, &value, 1);
 }
 
-int dynamixel_write16(dynamixel_t *device, dynamixel_addr_t reg, uint16_t value)
+int dynamixel_write16(const dynamixel_t *device, dynamixel_addr_t reg, uint16_t value)
 {
     return dynamixel_write(device, reg, (uint8_t*)&value, 2);
 }
 
-int dynamixel_read(dynamixel_t *device, dynamixel_addr_t reg, uint8_t *data, size_t length)
+int dynamixel_read(const dynamixel_t *device, dynamixel_addr_t reg, uint8_t *data, size_t length)
 {
     uart_half_duplex_set_tx(device->stream);
     if (device->stream->size < length) {
@@ -113,12 +113,12 @@ int dynamixel_read(dynamixel_t *device, dynamixel_addr_t reg, uint8_t *data, siz
     return DYNAMIXEL_OK;
 }
 
-int dynamixel_read8(dynamixel_t *device, dynamixel_addr_t reg, uint8_t *value)
+int dynamixel_read8(const dynamixel_t *device, dynamixel_addr_t reg, uint8_t *value)
 {
     return dynamixel_read(device, reg, value, 1);
 }
 
-int dynamixel_read16(dynamixel_t *device, dynamixel_addr_t reg, uint16_t *value)
+int dynamixel_read16(const dynamixel_t *device, dynamixel_addr_t reg, uint16_t *value)
 {
     return dynamixel_read(device, reg, (uint8_t*)value, 2);
 }

@@ -157,7 +157,7 @@ int ina220_init(ina220_t *dev, i2c_t i2c, uint8_t address);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina220_set_calibration(ina220_t *dev, uint16_t calibration);
+int ina220_set_calibration(const ina220_t *dev, uint16_t calibration);
 
 /**
  * @brief Write to configuration register
@@ -168,7 +168,7 @@ int ina220_set_calibration(ina220_t *dev, uint16_t calibration);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina220_set_config(ina220_t *dev, uint16_t config);
+int ina220_set_config(const ina220_t *dev, uint16_t config);
 
 /**
  * @brief Read shunt voltage
@@ -179,7 +179,7 @@ int ina220_set_config(ina220_t *dev, uint16_t config);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina220_read_shunt(ina220_t *dev, int16_t *voltage);
+int ina220_read_shunt(const ina220_t *dev, int16_t *voltage);
 
 /**
  * @brief Read bus voltage register
@@ -195,7 +195,7 @@ int ina220_read_shunt(ina220_t *dev, int16_t *voltage);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina220_read_bus(ina220_t *dev, int16_t *voltage);
+int ina220_read_bus(const ina220_t *dev, int16_t *voltage);
 
 /**
  * @brief Read shunt current
@@ -206,7 +206,7 @@ int ina220_read_bus(ina220_t *dev, int16_t *voltage);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina220_read_current(ina220_t *dev, int16_t *current);
+int ina220_read_current(const ina220_t *dev, int16_t *current);
 
 /**
  * @brief Read power consumption
@@ -217,7 +217,7 @@ int ina220_read_current(ina220_t *dev, int16_t *current);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int ina220_read_power(ina220_t *dev, int16_t *power);
+int ina220_read_power(const ina220_t *dev, int16_t *power);
 
 #ifdef __cplusplus
 }

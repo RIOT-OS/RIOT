@@ -76,7 +76,7 @@ int pir_init(pir_t *dev, gpio_t gpio);
  *
  * @return              1 if motion is detected, 0 otherwise
  */
-pir_event_t pir_get_status(pir_t *dev);
+pir_event_t pir_get_status(const pir_t *dev);
 
 /**
  * @brief   Register a thread for notification whan state changes on the

@@ -33,11 +33,11 @@
 #include "debug.h"
 
 static int read_calibration_data(bmx280_t* dev);
-static int do_measurement(bmx280_t* dev);
-static uint8_t get_ctrl_meas(bmx280_t* dev);
-static uint8_t get_status(bmx280_t* dev);
-static uint8_t read_u8_reg(bmx280_t* dev, uint8_t reg);
-static void write_u8_reg(bmx280_t* dev, uint8_t reg, uint8_t b);
+static int do_measurement(const bmx280_t* dev);
+static uint8_t get_ctrl_meas(const bmx280_t* dev);
+static uint8_t get_status(const bmx280_t* dev);
+static uint8_t read_u8_reg(const bmx280_t* dev, uint8_t reg);
+static void write_u8_reg(const bmx280_t* dev, uint8_t reg, uint8_t b);
 static uint16_t get_uint16_le(const uint8_t *buffer, size_t offset);
 static int16_t get_int16_le(const uint8_t *buffer, size_t offset);
 
@@ -98,13 +98,13 @@ int bmx280_init(bmx280_t* dev, const bmx280_params_t* params)
  * Returns temperature in DegC, resolution is 0.01 DegC.
  * t_fine carries fine temperature as global value
  */
-int16_t bmx280_read_temperature(bmx280_t* dev)
+int16_t bmx280_read_temperature(const bmx280_t* dev)
 {
     if (do_measurement(dev) < 0) {
         return INT16_MIN;
     }
 
-    bmx280_calibration_t *cal = &dev->calibration;      /* helper variable */
+    const bmx280_calibration_t *cal = &dev->calibration; /* helper variable */
 
     /* Read the uncompensated temperature */
     int32_t adc_T = (((uint32_t)measurement_regs[3 + 0]) << 12) |
@@ -133,9 +133,9 @@ int16_t bmx280_read_temperature(bmx280_t* dev)
 /*
  * Returns pressure in Pa
  */
-uint32_t bmx280_read_pressure(bmx280_t *dev)
+uint32_t bmx280_read_pressure(const bmx280_t *dev)
 {
-    bmx280_calibration_t *cal = &dev->calibration;      /* helper variable */
+    const bmx280_calibration_t *cal = &dev->calibration; /* helper variable */
 
     /* Read the uncompensated pressure */
     int32_t adc_P = (((uint32_t)measurement_regs[0 + 0]) << 12) |
@@ -173,9 +173,9 @@ uint32_t bmx280_read_pressure(bmx280_t *dev)
 }
 
 #if defined(MODULE_BME280)
-uint16_t bme280_read_humidity(bmx280_t *dev)
+uint16_t bme280_read_humidity(const bmx280_t *dev)
 {
-    bmx280_calibration_t *cal = &dev->calibration;      /* helper variable */
+    const bmx280_calibration_t *cal = &dev->calibration; /* helper variable */
 
     /* Read the uncompensated pressure */
     int32_t adc_H = (((uint32_t)measurement_regs[6 + 0]) << 8) |
@@ -293,7 +293,7 @@ static int read_calibration_data(bmx280_t* dev)
 /**
  * @brief Start a measurement and read the registers
  */
-static int do_measurement(bmx280_t* dev)
+static int do_measurement(const bmx280_t* dev)
 {
     /*
      * If settings has FORCED mode, then the device go to sleep after
@@ -330,17 +330,17 @@ static int do_measurement(bmx280_t* dev)
     return 0;
 }
 
-static uint8_t get_ctrl_meas(bmx280_t* dev)
+static uint8_t get_ctrl_meas(const bmx280_t* dev)
 {
     return read_u8_reg(dev, BMX280_CTRL_MEAS_REG);
 }
 
-static uint8_t get_status(bmx280_t* dev)
+static uint8_t get_status(const bmx280_t* dev)
 {
     return read_u8_reg(dev, BMX280_STAT_REG);
 }
 
-static uint8_t read_u8_reg(bmx280_t* dev, uint8_t reg)
+static uint8_t read_u8_reg(const bmx280_t* dev, uint8_t reg)
 {
     uint8_t b;
     /* Assuming device is correct, it should return 1 (nr bytes) */
@@ -348,7 +348,7 @@ static uint8_t read_u8_reg(bmx280_t* dev, uint8_t reg)
     return b;
 }
 
-static void write_u8_reg(bmx280_t* dev, uint8_t reg, uint8_t b)
+static void write_u8_reg(const bmx280_t* dev, uint8_t reg, uint8_t b)
 {
     /* Assuming device is correct, it should return 1 (nr bytes) */
     (void)i2c_write_reg(dev->params.i2c_dev, dev->params.i2c_addr, reg, b);

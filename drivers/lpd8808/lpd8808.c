@@ -28,7 +28,7 @@
  * @param[in] dev   device to use
  * @param[in] d     byte to shift out
  */
-static void put_byte(lpd8808_t *dev, uint8_t d)
+static void put_byte(const lpd8808_t *dev, uint8_t d)
 {
     for (int i = 0; i < 8; i++) {
         gpio_write(dev->pin_dat, d & 0x80);
@@ -47,7 +47,7 @@ static void put_byte(lpd8808_t *dev, uint8_t d)
  *
  * @param[in] dev   device to flush
  */
-static void flush(lpd8808_t *dev)
+static void flush(const lpd8808_t *dev)
 {
     for (int i = 0; i < ((dev->led_cnt + 31) / 32); i++) {
         put_byte(dev, 0);
@@ -66,7 +66,7 @@ int lpd8808_init(lpd8808_t *dev, const lpd8808_params_t *params)
     return 0;
 }
 
-void lpd8808_load_rgb(lpd8808_t *dev, color_rgb_t vals[])
+void lpd8808_load_rgb(const lpd8808_t *dev, color_rgb_t vals[])
 {
     for (int i = 0; i < dev->led_cnt; i++) {
         put_byte(dev, ((vals[i].g >> 1) | 0x80));

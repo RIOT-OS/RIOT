@@ -79,7 +79,7 @@ int io1_xplained_init(io1_xplained_t *dev, const io1_xplained_params_t *params);
  * @return                  IO1_XPLAINED_READ_OK on success
  * @return                  -IO1_XPLAINED_READ_ERR if temperature sensor read failed
  */
-int io1_xplained_read_temperature(io1_xplained_t *dev, float *temperature);
+int io1_xplained_read_temperature(const io1_xplained_t *dev, float *temperature);
 
 /**
  * @brief Set the on-board led of the IO1 Xplained extension

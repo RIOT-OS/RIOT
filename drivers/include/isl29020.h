@@ -93,7 +93,7 @@ int isl29020_init(isl29020_t *dev, i2c_t i2c, uint8_t address,
  * @return              the measured brightness in lux
  * @return              -1 on error
  */
-int isl29020_read(isl29020_t *dev);
+int isl29020_read(const isl29020_t *dev);
 
 /**
  * @brief Enable the given sensor
@@ -103,7 +103,7 @@ int isl29020_read(isl29020_t *dev);
  * @return              0 on success
  * @return              -1 on error
  */
-int isl29020_enable(isl29020_t *dev);
+int isl29020_enable(const isl29020_t *dev);
 
 /**
  * @brief Disable the given sensor
@@ -113,7 +113,7 @@ int isl29020_enable(isl29020_t *dev);
  * @return              0 on success
  * @return              -1 on error
  */
-int isl29020_disable(isl29020_t *dev);
+int isl29020_disable(const isl29020_t *dev);
 
 #ifdef __cplusplus
 }

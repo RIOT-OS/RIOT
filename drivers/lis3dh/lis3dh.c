@@ -125,7 +125,7 @@ int lis3dh_read_aux_adc3(const lis3dh_t *dev, int16_t *out)
                             LIS3DH_ADC_DATA_SIZE, (uint8_t *)out);
 }
 
-int lis3dh_set_aux_adc(lis3dh_t *dev, const uint8_t enable,
+int lis3dh_set_aux_adc(const lis3dh_t *dev, const uint8_t enable,
                        const uint8_t temperature)
 {
     return lis3dh_write_bits(dev, LIS3DH_REG_TEMP_CFG_REG,
@@ -134,13 +134,13 @@ int lis3dh_set_aux_adc(lis3dh_t *dev, const uint8_t enable,
                              (temperature ? LIS3DH_TEMP_CFG_REG_TEMP_EN_MASK : 0));
 }
 
-int lis3dh_set_axes(lis3dh_t *dev, const uint8_t axes)
+int lis3dh_set_axes(const lis3dh_t *dev, const uint8_t axes)
 {
     return lis3dh_write_bits(dev, LIS3DH_REG_CTRL_REG1,
                              LIS3DH_CTRL_REG1_XYZEN_MASK, axes);
 }
 
-int lis3dh_set_fifo(lis3dh_t *dev, const uint8_t mode, const uint8_t watermark)
+int lis3dh_set_fifo(const lis3dh_t *dev, const uint8_t mode, const uint8_t watermark)
 {
     int status;
     uint8_t reg;
@@ -162,7 +162,7 @@ int lis3dh_set_fifo(lis3dh_t *dev, const uint8_t mode, const uint8_t watermark)
     return status;
 }
 
-int lis3dh_set_odr(lis3dh_t *dev, const uint8_t odr)
+int lis3dh_set_odr(const lis3dh_t *dev, const uint8_t odr)
 {
     return lis3dh_write_bits(dev, LIS3DH_REG_CTRL_REG1,
         LIS3DH_CTRL_REG1_ODR_MASK, odr);
@@ -198,12 +198,12 @@ int lis3dh_set_scale(lis3dh_t *dev, const uint8_t scale)
                              LIS3DH_CTRL_REG4_FS_MASK, scale_reg);
 }
 
-int lis3dh_set_int1(lis3dh_t *dev, const uint8_t mode)
+int lis3dh_set_int1(const lis3dh_t *dev, const uint8_t mode)
 {
     return lis3dh_write_reg(dev, LIS3DH_REG_CTRL_REG3, mode);
 }
 
-int lis3dh_get_fifo_level(lis3dh_t *dev)
+int lis3dh_get_fifo_level(const lis3dh_t *dev)
 {
     uint8_t reg;
     int level;

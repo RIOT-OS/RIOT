@@ -146,7 +146,7 @@ static const uint8_t dsp0401_charmap[][2] = {
     { 0x00, 0x00 },  /* 127:      */
 };
 
-static void _shift_char(dsp0401_t *dev, uint8_t c)
+static void _shift_char(const dsp0401_t *dev, uint8_t c)
 {
     /* Unsupported chars not displayed */
     if ((c < CHAR_MAP_MIN) || (c > CHAR_MAP_MAX)) {
@@ -162,7 +162,7 @@ static void _shift_char(dsp0401_t *dev, uint8_t c)
     }
 }
 
-static void _latch(dsp0401_t *dev)
+static void _latch(const dsp0401_t *dev)
 {
     xtimer_usleep(LATCH_DELAY);
     gpio_set(LAT);
@@ -208,7 +208,7 @@ int dsp0401_init(dsp0401_t *dev, const dsp0401_params_t *params)
     return DSP0401_OK;
 }
 
-void dsp0401_display_text(dsp0401_t *dev, char *text)
+void dsp0401_display_text(const dsp0401_t *dev, char *text)
 {
     unsigned text_len = strlen(text);
     for (unsigned i = 0 ; i < MOD_COUNT * 4; ++i) {
@@ -222,7 +222,7 @@ void dsp0401_display_text(dsp0401_t *dev, char *text)
     _latch(dev);
 }
 
-void dsp0401_clear_text(dsp0401_t *dev)
+void dsp0401_clear_text(const dsp0401_t *dev)
 {
     /* each module has 4 alphanumeric displays */
     for (unsigned i = 0; i < MOD_COUNT * 4; ++i) {
@@ -231,7 +231,7 @@ void dsp0401_clear_text(dsp0401_t *dev)
     _latch(dev);
 }
 
-void dsp0401_scroll_text(dsp0401_t *dev, char *text, uint16_t delay)
+void dsp0401_scroll_text(const dsp0401_t *dev, char *text, uint16_t delay)
 {
     dsp0401_clear_text(dev);
 

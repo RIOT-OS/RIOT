@@ -34,7 +34,7 @@
 #define SPI_MODE            SPI_MODE_0
 #define SPI_CLK             SPI_CLK_400KHZ
 
-int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer)
+int nrf24l01p_read_reg(const nrf24l01p_t *dev, char reg, char *answer)
 {
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
@@ -48,7 +48,7 @@ int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer)
     return 0;
 }
 
-int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write)
+int nrf24l01p_write_reg(const nrf24l01p_t *dev, char reg, char write)
 {
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
@@ -186,7 +186,7 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
     return nrf24l01p_on(dev);
 }
 
-int nrf24l01p_on(nrf24l01p_t *dev)
+int nrf24l01p_on(const nrf24l01p_t *dev)
 {
     char read;
     int status;
@@ -199,7 +199,7 @@ int nrf24l01p_on(nrf24l01p_t *dev)
     return status;
 }
 
-int nrf24l01p_off(nrf24l01p_t *dev)
+int nrf24l01p_off(const nrf24l01p_t *dev)
 {
     char read;
     int status;
@@ -212,7 +212,7 @@ int nrf24l01p_off(nrf24l01p_t *dev)
     return status;
 }
 
-void nrf24l01p_transmit(nrf24l01p_t *dev)
+void nrf24l01p_transmit(const nrf24l01p_t *dev)
 {
     gpio_set(dev->ce);
     xtimer_usleep(DELAY_CE_HIGH_US); /* at least 10 us high */
@@ -221,7 +221,7 @@ void nrf24l01p_transmit(nrf24l01p_t *dev)
     xtimer_spin(DELAY_CHANGE_TXRX_TICKS);
 }
 
-int nrf24l01p_read_payload(nrf24l01p_t *dev, char *answer, unsigned int size)
+int nrf24l01p_read_payload(const nrf24l01p_t *dev, char *answer, unsigned int size)
 {
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
@@ -249,24 +249,24 @@ int nrf24l01p_unregister(nrf24l01p_t *dev, unsigned int pid)
     }
 }
 
-void nrf24l01p_get_id(nrf24l01p_t *dev, unsigned int *pid)
+void nrf24l01p_get_id(const nrf24l01p_t *dev, unsigned int *pid)
 {
     *((int *)pid) = dev->listener;
 }
 
-void nrf24l01p_start(nrf24l01p_t *dev)
+void nrf24l01p_start(const nrf24l01p_t *dev)
 {
     gpio_set(dev->ce);
     xtimer_usleep(DELAY_CE_START_US);
 }
 
-void nrf24l01p_stop(nrf24l01p_t *dev)
+void nrf24l01p_stop(const nrf24l01p_t *dev)
 {
     xtimer_spin(DELAY_CS_TOGGLE_TICKS);
     gpio_clear(dev->ce);
 }
 
-int nrf24l01p_preload(nrf24l01p_t *dev, char *data, unsigned int size)
+int nrf24l01p_preload(const nrf24l01p_t *dev, char *data, unsigned int size)
 {
     size = (size <= 32) ? size : 32;
 
@@ -281,7 +281,7 @@ int nrf24l01p_preload(nrf24l01p_t *dev, char *data, unsigned int size)
 }
 
 
-int nrf24l01p_set_channel(nrf24l01p_t *dev, uint8_t chan)
+int nrf24l01p_set_channel(const nrf24l01p_t *dev, uint8_t chan)
 {
     if (chan > 125) {
         chan = 125;
@@ -290,7 +290,7 @@ int nrf24l01p_set_channel(nrf24l01p_t *dev, uint8_t chan)
     return nrf24l01p_write_reg(dev, REG_RF_CH, chan);
 }
 
-int nrf24l01p_set_address_width(nrf24l01p_t *dev, nrf24l01p_aw_t aw)
+int nrf24l01p_set_address_width(const nrf24l01p_t *dev, nrf24l01p_aw_t aw)
 {
     char aw_setup;
     nrf24l01p_read_reg(dev, REG_SETUP_AW, &aw_setup);
@@ -320,7 +320,7 @@ int nrf24l01p_set_address_width(nrf24l01p_t *dev, nrf24l01p_aw_t aw)
     return nrf24l01p_write_reg(dev, REG_SETUP_AW, aw_setup);
 }
 
-int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char width)
+int nrf24l01p_set_payload_width(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char width)
 {
     char pipe_pw_address;
 
@@ -366,7 +366,7 @@ int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char
 
 
 
-int nrf24l01p_set_tx_address(nrf24l01p_t *dev, char *saddr, unsigned int length)
+int nrf24l01p_set_tx_address(const nrf24l01p_t *dev, char *saddr, unsigned int length)
 {
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
@@ -381,7 +381,7 @@ int nrf24l01p_set_tx_address(nrf24l01p_t *dev, char *saddr, unsigned int length)
     return (int)length;
 }
 
-int nrf24l01p_set_tx_address_long(nrf24l01p_t *dev, uint64_t saddr, unsigned int length)
+int nrf24l01p_set_tx_address_long(const nrf24l01p_t *dev, uint64_t saddr, unsigned int length)
 {
     char buf[length];
 
@@ -407,7 +407,7 @@ int nrf24l01p_set_tx_address_long(nrf24l01p_t *dev, uint64_t saddr, unsigned int
     return (int)length;
 }
 
-uint64_t nrf24l01p_get_tx_address_long(nrf24l01p_t *dev)
+uint64_t nrf24l01p_get_tx_address_long(const nrf24l01p_t *dev)
 {
     uint64_t saddr_64 = 0;
     char addr_array[INITIAL_ADDRESS_WIDTH];
@@ -430,7 +430,7 @@ uint64_t nrf24l01p_get_tx_address_long(nrf24l01p_t *dev)
 }
 
 
-int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *saddr, unsigned int length)
+int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *saddr, unsigned int length)
 {
     char pipe_addr;
 
@@ -478,7 +478,7 @@ int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *s
     return (int)length;
 }
 
-int nrf24l01p_set_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint64_t saddr, unsigned int length)
+int nrf24l01p_set_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint64_t saddr, unsigned int length)
 {
     char buf[length];
 
@@ -496,7 +496,7 @@ int nrf24l01p_set_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, ui
 }
 
 
-uint64_t nrf24l01p_get_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
+uint64_t nrf24l01p_get_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 {
     char pipe_addr;
     uint64_t saddr_64 = 0;
@@ -550,7 +550,7 @@ uint64_t nrf24l01p_get_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pip
 }
 
 
-int nrf24l01p_set_datarate(nrf24l01p_t *dev, nrf24l01p_dr_t dr)
+int nrf24l01p_set_datarate(const nrf24l01p_t *dev, nrf24l01p_dr_t dr)
 {
     char rf_setup;
 
@@ -578,7 +578,7 @@ int nrf24l01p_set_datarate(nrf24l01p_t *dev, nrf24l01p_dr_t dr)
     return nrf24l01p_write_reg(dev, REG_RF_SETUP, rf_setup);
 }
 
-int nrf24l01p_get_status(nrf24l01p_t *dev)
+int nrf24l01p_get_status(const nrf24l01p_t *dev)
 {
     uint8_t status;
 
@@ -593,7 +593,7 @@ int nrf24l01p_get_status(nrf24l01p_t *dev)
     return (int)status;
 }
 
-int nrf24l01p_set_power(nrf24l01p_t *dev, int pwr)
+int nrf24l01p_set_power(const nrf24l01p_t *dev, int pwr)
 {
     char rf_setup;
 
@@ -621,7 +621,7 @@ int nrf24l01p_set_power(nrf24l01p_t *dev, int pwr)
     return nrf24l01p_write_reg(dev, REG_RF_SETUP, rf_setup);
 }
 
-int nrf24l01p_get_power(nrf24l01p_t *dev)
+int nrf24l01p_get_power(const nrf24l01p_t *dev)
 {
     char rf_setup;
     int pwr;
@@ -648,7 +648,7 @@ int nrf24l01p_get_power(nrf24l01p_t *dev)
 }
 
 
-int nrf24l01p_set_txmode(nrf24l01p_t *dev)
+int nrf24l01p_set_txmode(const nrf24l01p_t *dev)
 {
     char conf;
     int status;
@@ -668,7 +668,7 @@ int nrf24l01p_set_txmode(nrf24l01p_t *dev)
     return status;
 }
 
-int nrf24l01p_set_rxmode(nrf24l01p_t *dev)
+int nrf24l01p_set_rxmode(const nrf24l01p_t *dev)
 {
     char conf;
     int status;
@@ -690,17 +690,17 @@ int nrf24l01p_set_rxmode(nrf24l01p_t *dev)
 }
 
 
-int nrf24l01p_reset_interrupts(nrf24l01p_t *dev, char intrs)
+int nrf24l01p_reset_interrupts(const nrf24l01p_t *dev, char intrs)
 {
     return nrf24l01p_write_reg(dev, REG_STATUS, intrs);
 }
 
-int nrf24l01p_reset_all_interrupts(nrf24l01p_t *dev)
+int nrf24l01p_reset_all_interrupts(const nrf24l01p_t *dev)
 {
     return nrf24l01p_write_reg(dev, REG_STATUS, ALL_INT_MASK);
 }
 
-int nrf24l01p_mask_interrupt(nrf24l01p_t *dev, char intr)
+int nrf24l01p_mask_interrupt(const nrf24l01p_t *dev, char intr)
 {
     char conf;
 
@@ -710,7 +710,7 @@ int nrf24l01p_mask_interrupt(nrf24l01p_t *dev, char intr)
     return nrf24l01p_write_reg(dev, REG_CONFIG, conf);
 }
 
-int nrf24l01p_unmask_interrupt(nrf24l01p_t *dev, char intr)
+int nrf24l01p_unmask_interrupt(const nrf24l01p_t *dev, char intr)
 {
     char conf;
 
@@ -720,7 +720,7 @@ int nrf24l01p_unmask_interrupt(nrf24l01p_t *dev, char intr)
     return nrf24l01p_write_reg(dev, REG_CONFIG, conf);
 }
 
-int nrf24l01p_enable_dynamic_payload(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
+int nrf24l01p_enable_dynamic_payload(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 {
     char feature_val;
     char en_aa_val;
@@ -795,7 +795,7 @@ int nrf24l01p_enable_dynamic_payload(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
     return 0;
 }
 
-int nrf24l01p_enable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
+int nrf24l01p_enable_pipe(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 {
     char pipe_conf;
 
@@ -805,7 +805,7 @@ int nrf24l01p_enable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
     return nrf24l01p_write_reg(dev, REG_EN_RXADDR, pipe_conf);
 }
 
-int nrf24l01p_disable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
+int nrf24l01p_disable_pipe(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 {
     char pipe_conf;
 
@@ -815,7 +815,7 @@ int nrf24l01p_disable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
     return nrf24l01p_write_reg(dev, REG_EN_RXADDR, pipe_conf);
 }
 
-int nrf24l01p_disable_crc(nrf24l01p_t *dev)
+int nrf24l01p_disable_crc(const nrf24l01p_t *dev)
 {
     char conf;
 
@@ -823,7 +823,7 @@ int nrf24l01p_disable_crc(nrf24l01p_t *dev)
     return nrf24l01p_write_reg(dev, REG_CONFIG, (conf & ~(EN_CRC)));
 }
 
-int nrf24l01p_enable_crc(nrf24l01p_t *dev, nrf24l01p_crc_t crc)
+int nrf24l01p_enable_crc(const nrf24l01p_t *dev, nrf24l01p_crc_t crc)
 {
     char conf;
 
@@ -845,7 +845,7 @@ int nrf24l01p_enable_crc(nrf24l01p_t *dev, nrf24l01p_crc_t crc)
     return nrf24l01p_write_reg(dev, REG_CONFIG, (conf | EN_CRC));
 }
 
-int nrf24l01p_setup_auto_ack(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l01p_retransmit_delay_t delay_retrans, char count_retrans)
+int nrf24l01p_setup_auto_ack(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l01p_retransmit_delay_t delay_retrans, char count_retrans)
 {
     char en_aa;
     int status;
@@ -893,7 +893,7 @@ int nrf24l01p_setup_auto_ack(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l0
     return nrf24l01p_write_reg(dev, REG_SETUP_RETR, ((delay_retrans << 4) | count_retrans));
 }
 
-int nrf24l01p_enable_dynamic_ack(nrf24l01p_t *dev)
+int nrf24l01p_enable_dynamic_ack(const nrf24l01p_t *dev)
 {
     char feature;
 
@@ -911,13 +911,13 @@ int nrf24l01p_enable_dynamic_ack(nrf24l01p_t *dev)
     return 0;
 }
 
-int nrf24l01p_disable_all_auto_ack(nrf24l01p_t *dev)
+int nrf24l01p_disable_all_auto_ack(const nrf24l01p_t *dev)
 {
     return nrf24l01p_write_reg(dev, REG_EN_AA, 0x00);
 }
 
 
-int nrf24l01p_flush_tx_fifo(nrf24l01p_t *dev)
+int nrf24l01p_flush_tx_fifo(const nrf24l01p_t *dev)
 {
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
@@ -930,7 +930,7 @@ int nrf24l01p_flush_tx_fifo(nrf24l01p_t *dev)
     return 0;
 }
 
-int nrf24l01p_flush_rx_fifo(nrf24l01p_t *dev)
+int nrf24l01p_flush_rx_fifo(const nrf24l01p_t *dev)
 {
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);

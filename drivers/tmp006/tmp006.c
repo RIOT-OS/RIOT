@@ -106,7 +106,7 @@ int tmp006_init(tmp006_t *dev, const tmp006_params_t *params)
     return TMP006_OK;
 }
 
-int tmp006_reset(tmp006_t *dev)
+int tmp006_reset(const tmp006_t *dev)
 {
     uint8_t reg[2];
     uint16_t tmp = TMP006_CONFIG_RST;
@@ -123,7 +123,7 @@ int tmp006_reset(tmp006_t *dev)
     return TMP006_OK;
 }
 
-int tmp006_set_active(tmp006_t *dev)
+int tmp006_set_active(const tmp006_t *dev)
 {
     uint8_t reg[2];
 
@@ -142,7 +142,7 @@ int tmp006_set_active(tmp006_t *dev)
     return TMP006_OK;
 }
 
-int tmp006_set_standby(tmp006_t *dev)
+int tmp006_set_standby(const tmp006_t *dev)
 {
     uint8_t reg[2];
 
@@ -161,7 +161,7 @@ int tmp006_set_standby(tmp006_t *dev)
     return TMP006_OK;
 }
 
-int tmp006_read(tmp006_t *dev, int16_t *rawv, int16_t *rawt, uint8_t *drdy)
+int tmp006_read(const tmp006_t *dev, int16_t *rawv, int16_t *rawt, uint8_t *drdy)
 {
     uint8_t reg[2];
 
@@ -224,7 +224,7 @@ void tmp006_convert(int16_t rawv, int16_t rawt,  float *tamb, float *tobj)
     *tobj = (t - 273.15);
 }
 
-int tmp006_read_temperature(tmp006_t *dev, int16_t *ta, int16_t *to)
+int tmp006_read_temperature(const tmp006_t *dev, int16_t *ta, int16_t *to)
 {
     int16_t rawtemp, rawvolt;
     float tamb, tobj;

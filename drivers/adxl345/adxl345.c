@@ -80,7 +80,7 @@ int adxl345_init(adxl345_t *dev, adxl345_params_t* params)
     return ADXL345_OK;
 }
 
-void adxl345_read(adxl345_t *dev, adxl345_data_t *data)
+void adxl345_read(const adxl345_t *dev, adxl345_data_t *data)
 {
     int8_t result[6];
 
@@ -95,7 +95,7 @@ void adxl345_read(adxl345_t *dev, adxl345_data_t *data)
     data->z = (((result[5] << 8)+result[4]) * dev->scale_factor);
 }
 
-void adxl345_set_interrupt(adxl345_t *dev)
+void adxl345_set_interrupt(const adxl345_t *dev)
 {
     assert(dev);
 
@@ -135,7 +135,7 @@ void adxl345_set_interrupt(adxl345_t *dev)
     i2c_release(BUS);
 }
 
-void adxl345_set_measure(adxl345_t *dev)
+void adxl345_set_measure(const adxl345_t *dev)
 {
     uint8_t reg;
 
@@ -150,7 +150,7 @@ void adxl345_set_measure(adxl345_t *dev)
     i2c_release(BUS);
 }
 
-void adxl345_set_standby(adxl345_t *dev)
+void adxl345_set_standby(const adxl345_t *dev)
 {
     uint8_t reg;
 
@@ -165,7 +165,7 @@ void adxl345_set_standby(adxl345_t *dev)
     i2c_release(BUS);
 }
 
-void adxl345_set_sleep(adxl345_t *dev)
+void adxl345_set_sleep(const adxl345_t *dev)
 {
     uint8_t reg;
 
@@ -180,7 +180,7 @@ void adxl345_set_sleep(adxl345_t *dev)
     i2c_release(BUS);
 }
 
-void adxl345_set_autosleep(adxl345_t *dev)
+void adxl345_set_autosleep(const adxl345_t *dev)
 {
     uint8_t reg;
 
@@ -195,7 +195,7 @@ void adxl345_set_autosleep(adxl345_t *dev)
     i2c_release(BUS);
 }
 
-void adxl345_set_bandwidth_rate(adxl345_t *dev, uint8_t bw_rate)
+void adxl345_set_bandwidth_rate(const adxl345_t *dev, uint8_t bw_rate)
 {
     uint8_t reg;
 
@@ -210,7 +210,7 @@ void adxl345_set_bandwidth_rate(adxl345_t *dev, uint8_t bw_rate)
     i2c_release(BUS);
 }
 
-void adxl345_set_fifo_mode(adxl345_t *dev, uint8_t mode,
+void adxl345_set_fifo_mode(const adxl345_t *dev, uint8_t mode,
                            uint8_t output, uint8_t value)
 {
     uint8_t reg;

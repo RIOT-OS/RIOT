@@ -73,7 +73,7 @@ int lpd8808_init(lpd8808_t *dev, const lpd8808_params_t *params);
  * @param[in] vals      array of color values, MUST be of same length as LEDs on
  *                      the strip
  */
-void lpd8808_load_rgb(lpd8808_t *dev, color_rgb_t vals[]);
+void lpd8808_load_rgb(const lpd8808_t *dev, color_rgb_t vals[]);
 
 #ifdef __cplusplus
 }

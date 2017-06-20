@@ -35,9 +35,9 @@
 #define OVERSAMPLING (dev->params.oversampling)
 
 /* Internal function prototypes */
-static int _read_ut(bmp180_t *dev, int32_t *ut);
-static int _read_up(bmp180_t *dev, int32_t *up);
-static int _compute_b5(bmp180_t *dev, int32_t ut, int32_t *b5);
+static int _read_ut(const bmp180_t *dev, int32_t *ut);
+static int _read_up(const bmp180_t *dev, int32_t *up);
+static int _compute_b5(const bmp180_t *dev, int32_t ut, int32_t *b5);
 
 /*---------------------------------------------------------------------------*
  *                          BMP180 Core API                                 *
@@ -109,7 +109,7 @@ int bmp180_init(bmp180_t *dev, const bmp180_params_t *params)
     return 0;
 }
 
-int16_t bmp180_read_temperature(bmp180_t *dev)
+int16_t bmp180_read_temperature(const bmp180_t *dev)
 {
     int32_t ut, b5;
     /* Acquire exclusive access */
@@ -127,7 +127,7 @@ int16_t bmp180_read_temperature(bmp180_t *dev)
     return (int16_t)((b5 + 8) >> 4);
 }
 
-uint32_t bmp180_read_pressure(bmp180_t *dev)
+uint32_t bmp180_read_pressure(const bmp180_t *dev)
 {
     int32_t ut = 0, up = 0, x1, x2, x3, b3, b5, b6, p;
     uint32_t b4, b7;
@@ -168,14 +168,14 @@ uint32_t bmp180_read_pressure(bmp180_t *dev)
     return (uint32_t)(p + ((x1 + x2 + 3791) >> 4));
 }
 
-int16_t bmp180_altitude(bmp180_t *dev, uint32_t pressure_0)
+int16_t bmp180_altitude(const bmp180_t *dev, uint32_t pressure_0)
 {
     uint32_t p = bmp180_read_pressure(dev);
 
     return (int16_t)(44330.0 * (1.0 - pow((double)p / pressure_0, 0.1903)));;
 }
 
-uint32_t bmp180_sealevel_pressure(bmp180_t *dev, int16_t altitude)
+uint32_t bmp180_sealevel_pressure(const bmp180_t *dev, int16_t altitude)
 {
     uint32_t p = bmp180_read_pressure(dev);
 
@@ -186,7 +186,7 @@ uint32_t bmp180_sealevel_pressure(bmp180_t *dev, int16_t altitude)
 /*                                Internal functions                                  */
 /*------------------------------------------------------------------------------------*/
 
-static int _read_ut(bmp180_t *dev, int32_t *output)
+static int _read_ut(const bmp180_t *dev, int32_t *output)
 {
     /* Read UT (Uncompsensated Temperature value) */
     uint8_t ut[2] = {0};
@@ -205,7 +205,7 @@ static int _read_ut(bmp180_t *dev, int32_t *output)
     return 0;
 }
 
-static int _read_up(bmp180_t *dev, int32_t *output)
+static int _read_up(const bmp180_t *dev, int32_t *output)
 {
     /* Read UP (Uncompsensated Pressure value) */
     uint8_t up[3] = {0};
@@ -241,7 +241,7 @@ static int _read_up(bmp180_t *dev, int32_t *output)
     return 0;
 }
 
-static int _compute_b5(bmp180_t *dev, int32_t ut, int32_t *output)
+static int _compute_b5(const bmp180_t *dev, int32_t ut, int32_t *output)
 {
     int32_t x1, x2;
     x1 = (ut - dev->calibration.ac6) * dev->calibration.ac5 >> 15;

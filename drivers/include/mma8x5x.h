@@ -136,21 +136,21 @@ int mma8x5x_init(mma8x5x_t *dev, const mma8x5x_params_t *params);
  * @param[in]  y            offset correction value for y-axis
  * @param[in]  z            offset correction value for z-axis
  */
-void mma8x5x_set_user_offset(mma8x5x_t *dev, int8_t x, int8_t y, int8_t z);
+void mma8x5x_set_user_offset(const mma8x5x_t *dev, int8_t x, int8_t y, int8_t z);
 
 /**
  * @brief   Set active mode, this enables periodic measurements
  *
  * @param[out] dev          device descriptor of accelerometer to reset
  */
-void mma8x5x_set_active(mma8x5x_t *dev);
+void mma8x5x_set_active(const mma8x5x_t *dev);
 
 /**
  * @brief   Set standby mode.
  *
  * @param[in]  dev          device descriptor of accelerometer
  */
-void mma8x5x_set_standby(mma8x5x_t *dev);
+void mma8x5x_set_standby(const mma8x5x_t *dev);
 
 /**
  * @brief   Check for new set of measurement data
@@ -160,7 +160,7 @@ void mma8x5x_set_standby(mma8x5x_t *dev);
  * @return                  MMA8X5X_DATA_READY if new sample is ready
  * @return                  MMA8X5X_NODATA if nothing is available
  */
-int mma8x5x_is_ready(mma8x5x_t *dev);
+int mma8x5x_is_ready(const mma8x5x_t *dev);
 
 /**
  * @brief   Read accelerometer's data
@@ -176,7 +176,7 @@ int mma8x5x_is_ready(mma8x5x_t *dev);
  * @param[in]  dev          device descriptor of accelerometer
  * @param[out] data         the current acceleration data [in mg]
  */
-void mma8x5x_read(mma8x5x_t *dev, mma8x5x_data_t *data);
+void mma8x5x_read(const mma8x5x_t *dev, mma8x5x_data_t *data);
 
 /**
  * @brief   Configure motion detection interrupt
@@ -189,7 +189,7 @@ void mma8x5x_read(mma8x5x_t *dev, mma8x5x_data_t *data);
  * @param[in]   int_pin     select mma8x5x int pin (1 or 2)
  * @param[in]   threshold   motion detection threshold (see datasheet)
  */
-void mma8x5x_set_motiondetect(mma8x5x_t *dev, uint8_t int_pin, uint8_t threshold);
+void mma8x5x_set_motiondetect(const mma8x5x_t *dev, uint8_t int_pin, uint8_t threshold);
 
 /**
  * @brief   Acknowledge motion detection interrupt
@@ -202,7 +202,7 @@ void mma8x5x_set_motiondetect(mma8x5x_t *dev, uint8_t int_pin, uint8_t threshold
  *
  * @param[in]   dev         device descriptor of accelerometer
  */
-void mma8x5x_ack_int(mma8x5x_t *dev);
+void mma8x5x_ack_int(const mma8x5x_t *dev);
 
 #ifdef __cplusplus
 }

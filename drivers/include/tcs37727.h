@@ -112,7 +112,7 @@ int tcs37727_init(tcs37727_t *dev, const tcs37727_params_t *params);
  *
  * @param[out] dev          device descriptor of sensor
  */
-void tcs37727_set_rgbc_active(tcs37727_t *dev);
+void tcs37727_set_rgbc_active(const tcs37727_t *dev);
 
 /**
  * @brief Set RGBC disable, this deactivates periodic RGBC measurements
@@ -121,7 +121,7 @@ void tcs37727_set_rgbc_active(tcs37727_t *dev);
  *
  * @param[in]  dev          device descriptor of sensor
  */
-void tcs37727_set_rgbc_standby(tcs37727_t *dev);
+void tcs37727_set_rgbc_standby(const tcs37727_t *dev);
 
 /**
  * @brief Read sensor's data
@@ -133,7 +133,7 @@ void tcs37727_set_rgbc_standby(tcs37727_t *dev);
  * @param[in]  dev         device descriptor of sensor
  * @param[out] data        device sensor data, MUST not be NULL
  */
-void tcs37727_read(tcs37727_t *dev, tcs37727_data_t *data);
+void tcs37727_read(const tcs37727_t *dev, tcs37727_data_t *data);
 
 #ifdef __cplusplus
 }

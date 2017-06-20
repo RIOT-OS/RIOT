@@ -116,7 +116,7 @@ int dht_init(dht_t *dev, const dht_params_t *params);
  * @return              -1 on checksum error
  * @return              -2 on parsing error
  */
-int dht_read(dht_t *dev, int16_t *temp, int16_t *hum);
+int dht_read(const dht_t *dev, int16_t *temp, int16_t *hum);
 
 #ifdef __cplusplus
 }

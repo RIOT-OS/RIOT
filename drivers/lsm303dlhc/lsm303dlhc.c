@@ -92,7 +92,7 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, i2c_t i2c, gpio_t acc_pin, gpio_t mag_pin
     return (res < 7) ? -1 : 0;
 }
 
-int lsm303dlhc_read_acc(lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data)
+int lsm303dlhc_read_acc(const lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data)
 {
     int res;
     uint8_t tmp;
@@ -136,7 +136,7 @@ int lsm303dlhc_read_acc(lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data)
     return 0;
 }
 
-int lsm303dlhc_read_mag(lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data)
+int lsm303dlhc_read_mag(const lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data)
 {
     int res;
 
@@ -169,7 +169,7 @@ int lsm303dlhc_read_mag(lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data)
     return 0;
 }
 
-int lsm303dlhc_read_temp(lsm303dlhc_t *dev, int16_t *value)
+int lsm303dlhc_read_temp(const lsm303dlhc_t *dev, int16_t *value)
 {
     int res;
 
@@ -188,7 +188,7 @@ int lsm303dlhc_read_temp(lsm303dlhc_t *dev, int16_t *value)
     return 0;
 }
 
-int lsm303dlhc_disable(lsm303dlhc_t *dev)
+int lsm303dlhc_disable(const lsm303dlhc_t *dev)
 {
     int res;
 
@@ -204,7 +204,7 @@ int lsm303dlhc_disable(lsm303dlhc_t *dev)
     return (res < 3) ? -1 : 0;
 }
 
-int lsm303dlhc_enable(lsm303dlhc_t *dev)
+int lsm303dlhc_enable(const lsm303dlhc_t *dev)
 {
     int res;
     uint8_t tmp = (LSM303DLHC_CTRL1_A_XEN
