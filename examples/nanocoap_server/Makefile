@@ -27,8 +27,12 @@ USEMODULE += gnrc_icmpv6_echo
 USEMODULE += gnrc_sock_udp
 
 USEPKG += nanocoap
+# posix is Required by nanocoap, but only due to issue #5959.
+# Example crashes if not included.
+USEMODULE += posix
+
 # optionally enable nanocoap's debug output
-#CFLAGS += -DNANOCOAP_DEBUG
+CFLAGS += -DNANOCOAP_DEBUG
 
 # include this for nicely formatting the returned internal value
 USEMODULE += fmt
@@ -39,7 +43,7 @@ USEMODULE += shell_commands
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-#CFLAGS += -DDEVELHELP
+CFLAGS += -DDEVELHELP
 
 # Use different settings when compiling for one of the following (low-memory)
 # boards

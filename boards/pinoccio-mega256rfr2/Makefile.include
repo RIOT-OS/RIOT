@@ -30,6 +30,11 @@ ifeq ($(OS),Linux)
   
   FLASHER = avrdude
   export FLASHER_PATH ="/etc/avrdude.conf"
+
+  export PROGRAMMER ?= wiring
+  #export PROGRAMMER ?= stk500v2
+  #export PROGRAMMER ?= avrispv2
+  export PROGRAMMER_FLAGS =-P $(PORT) -b 115200 -vvvvv
   export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex:i -C $(FLASHER_PATH) 
 
 else ifeq ($(OS),Darwin)
@@ -57,11 +62,11 @@ export DEBUGGER = $(DIST_PATH)/debug.sh $(DEBUGSERVER_FLAGS) $(DIST_PATH) $(DEBU
 
 # PROGRAMMER defaults to wiring which is the internal flasher via USB. Can be
 # overridden for debugging (which requires changes that require to use an ISP)
-export PROGRAMMER ?= wiring
+#export PROGRAMMER ?= wiring
 
-ifeq ($(PROGRAMMER),wiring)
-    export PROGRAMMER_FLAGS =-P $(PORT) -b 115200
-endif
+#ifeq ($(PROGRAMMER),wiring)
+#    export PROGRAMMER_FLAGS =-P $(PORT) -b 115200
+#endif
 
 # define build specific options
 export CFLAGS_CPU   = -mmcu=atmega256rfr2  $(CFLAGS_FPU)

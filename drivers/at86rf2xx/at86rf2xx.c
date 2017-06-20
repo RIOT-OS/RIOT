@@ -34,7 +34,11 @@
 
 #include "net/gnrc/netdev.h"
 
+#ifdef DEBUG_AT86RF2XX
+#define ENABLE_DEBUG (1)
+#else
 #define ENABLE_DEBUG (0)
+#endif
 #include "debug.h"
 
 #ifdef MODULE_AT86RFR2
@@ -248,6 +252,19 @@
 	ISR(TRX24_RX_END_vect, ISR_BLOCK)
 	{
 		__enter_isr();
+		/* Set receiver in idle state so no Packages are received and Acknowledged
+		 *  AT86RF2XX_TRX_STATE__FORCE_TRX_OFF
+		 *
+		 *  Choose AT86RF2XX_TRX_STATE__FORCE_PLL_ON for faster change to RX_AACK_ON/TX_ARET_ON
+		 *
+		 * ATmega256/128/64RFR2 p. 49
+		 * The RX_AACK state is left by writing command TRX_OFF or PLL_ON to the register
+		 * bits TRX_CMD. If the radio transceiver is within a frame receive or acknowledgment
+		 * procedure (BUSY_RX_AACK) the state change is executed after finish.
+		 */
+		*AT86RF2XX_REG__TRX_STATE =  AT86RF2XX_TRX_STATE__FORCE_PLL_ON;
+
+		LED_PORT &= ~GREEN;
 		((at86rf2xx_t*)static_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN;
 		/*
 		 * p. 99, 9.8.7 Dynamic Frame Buffer Protection
@@ -303,6 +320,7 @@
 	ISR(TRX24_TX_END_vect, ISR_BLOCK)
 	{
 		__enter_isr();
+		LED_PORT &= ~BLUE;
 		((at86rf2xx_t*)static_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN;
 		static_dev->event_callback(static_dev, NETDEV_EVENT_ISR);
 		/* don't set transceiver back to receiving state
@@ -482,6 +500,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_set_chan(dev, AT86RF2XX_DEFAULT_CHANNEL);
     /* set default TX power */
     at86rf2xx_set_txpower(dev, AT86RF2XX_DEFAULT_TXPOWER);
+
     /* set default options */
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
@@ -490,6 +509,10 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 
 #ifdef MODULE_AT86RFR2
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_TX_END, true);
+
+    /*  Automatic FCS Generation */
+//    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_1,
+//    		AT86RF2XX_TRX_CTRL_1_MASK__TX_AUTO_CRC_ON );
 #endif
 
 #ifdef MODULE_NETSTATS_L2
