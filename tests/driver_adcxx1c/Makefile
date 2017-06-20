@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_i2c
 
-USEMODULE += adcxx1c
+USEMODULE += adc081c
 USEMODULE += xtimer
 
 # set alert parameters in case they are undefined

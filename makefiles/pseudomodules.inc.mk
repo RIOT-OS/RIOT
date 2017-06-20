@@ -64,5 +64,10 @@ PSEUDOMODULES += at86rf21%
 PSEUDOMODULES += bmp280
 PSEUDOMODULES += bme280
 
+# variants of TI ADCXX1C
+PSEUDOMODULES += adc081c
+PSEUDOMODULES += adc101c
+PSEUDOMODULES += adc121c
+
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%
