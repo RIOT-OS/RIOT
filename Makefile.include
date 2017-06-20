@@ -343,7 +343,7 @@ USEMODULE_INCLUDES_ = $(shell echo $(USEMODULE_INCLUDES) | tr ' ' '\n' | awk '!a
 INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 
 .PHONY: $(USEPKG:%=${BINDIR}/%.a)
-$(USEPKG:%=${BINDIR}/%.a): $(RIOTBUILD_CONFIG_HEADER_C)
+$(USEPKG:%=${BINDIR}/%.a): $(RIOTBUILD_CONFIG_HEADER_C) $(USEPKG_BUILDFIRST:%=${BINDIR}/%.a)
 	@mkdir -p ${BINDIR}
 	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(patsubst ${BINDIR}/%.a,%,$@)
 
