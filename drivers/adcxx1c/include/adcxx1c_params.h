@@ -85,7 +85,7 @@ static const adcxx1c_params_t adcxx1c_params[] =
 static const saul_reg_info_t adcxx1c_saul_info[] =
 {
     {
-        .name = "adc081c",
+        .name = "adcxx1c",
     },
 };
 
