@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     board_remote
+ * @ingroup     board_remote-pa
  * @{
  *
  * @file

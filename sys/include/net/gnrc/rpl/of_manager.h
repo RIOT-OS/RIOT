@@ -16,8 +16,8 @@
  * @author  Fabian Brandt <fabianbr@zedat.fu-berlin.de>
  */
 
-#ifndef RPL_OFM_H
-#define RPL_OFM_H
+#ifndef NET_GNRC_RPL_OF_MANAGER_H
+#define NET_GNRC_RPL_OF_MANAGER_H
 
 #include "structs.h"
 
@@ -41,5 +41,5 @@ gnrc_rpl_of_t *gnrc_rpl_get_of_for_ocp(uint16_t ocp);
 }
 #endif
 
-#endif /* RPL_OFM_H */
+#endif /* NET_GNRC_RPL_OF_MANAGER_H */
 /** @} */

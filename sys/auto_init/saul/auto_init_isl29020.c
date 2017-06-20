@@ -58,13 +58,13 @@ void auto_init_isl29020(void)
                                 p->range, p->mode);
         if (res < 0) {
             LOG_ERROR("[auto_init_saul] error initializing isl29020 #%u\n", i);
+            continue;
         }
-        else {
-            saul_entries[i].dev = &(isl29020_devs[i]);
-            saul_entries[i].name = isl29020_saul_info[i].name;
-            saul_entries[i].driver = &isl29020_saul_driver;
-            saul_reg_add(&(saul_entries[i]));
-        }
+
+        saul_entries[i].dev = &(isl29020_devs[i]);
+        saul_entries[i].name = isl29020_saul_info[i].name;
+        saul_entries[i].driver = &isl29020_saul_driver;
+        saul_reg_add(&(saul_entries[i]));
     }
 }
 

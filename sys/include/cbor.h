@@ -9,26 +9,19 @@
  */
 
 /**
- * @ingroup     cbor
- * @{
- */
-
-/**
- * @file
- * @brief       Implementation of a CBOR serializer/deserializer in C
+ * @defgroup    sys_cbor    CBOR
+ * @ingroup     sys
  *
- * @author      Kevin Funk <kfunk@kde.org>
- * @author      Jana Cavojska <jana.cavojska9@gmail.com>
- * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @brief CBOR serializer/deserializer
  *
  * This is an implementation suited for constrained devices
  * Characteristics:
- * - No dynamic memory allocation (i.e. no calls to @e malloc, @e free) used
+ * - No dynamic memory allocation (i.e. no calls to `malloc()`, `free()`) used
  *   throughout the implementation
  * - User may allocate static buffers, this implementation uses the space
  *   provided by them (cf. @ref cbor_stream_t)
  *
- * @par Supported types (categorized by major type (MT)):
+ * # Supported types (categorized by major type (MT))
  *
  * - Major type 0 (unsigned integer): Full support. Relevant functions:
  *   - cbor_serialize_int(), cbor_deserialize_int()
@@ -46,12 +39,12 @@
  *
  * - Major type 4 (array of data items): Full support. Relevant functions:
  *   - cbor_serialize_array(), cbor_deserialize_array()
- *   - cbor_serialize_indefinite_array(), cbor_deserialize_indefinite_array(),
+ *   - cbor_serialize_array_indefinite(), cbor_deserialize_array_indefinite(),
  *     cbor_at_break()
  *
  * - Major type 5 (map of pairs of data items): Full support. Relevant functions:
  *   - cbor_serialize_map(), cbor_deserialize_map()
- *   - cbor_serialize_indefinite_map(), cbor_deserialize_indefinite_map(),
+ *   - cbor_serialize_map_indefinite(), cbor_deserialize_map_indefinite(),
  *     cbor_at_break()
  *
  * - Major type 6 (optional semantic tagging of other major types): Basic
@@ -67,35 +60,57 @@
  *   - cbor_serialize_double(), cbor_deserialize_double()
  *   - cbor_serialize_bool(), cbor_deserialize_bool()
  *
- * @par Notes about major type 3:
+ * ## Notes about major type 3
  * Since we do not have a standardised C type for representing Unicode code
- * points, we just provide API to serialize/deserialize @e char* arrays. The
+ * points, we just provide API to serialize/deserialize `char` arrays. The
  * user then has to transform that into a meaningful representation
  *
- * @par Notes about major type 6 (cf. https://tools.ietf.org/html/rfc7049#section-2.4):
+ * ## Notes about major type 6
  * Encoding date and time: date/time strings that follow the standard format
- * described in Section 3.3 of [RFC3339]:
- *   2003-12-13T18:30:02Z          - supported
- *   2003-12-13T18:30:02.25Z       - not supported
- *   2003-12-13T18:30:02+01:00     - not supported
- *   2003-12-13T18:30:02.25+01:00  - not supported
- * Since we do not have C types for representing bignums/bigfloats/decimal-fraction
- * we do not provide API to serialize/deserialize them at all.
- * You can still read out the actual data item behind the tag (via
- * cbor_deserialize_byte_string()) and interpret it yourself.
+ * described in
+ * [RFC3339, section 5.6](https://tools.ietf.org/html/rfc3339#section-5.6):
  *
- * @par Notes about major type 7 and simple values
- *      (cf. https://tools.ietf.org/html/rfc7049#section-2.3)
+ * |             Date/Time string | Support       |
+ * | ---------------------------: | :------------ |
+ * |         2003-12-13T18:30:02Z | supported     |
+ * |      2003-12-13T18:30:02.25Z | not supported |
+ * |    2003-12-13T18:30:02+01:00 | not supported |
+ * | 2003-12-13T18:30:02.25+01:00 | not supported |
+ *
+ * Since we do not have C types for representing
+ * bignums/bigfloats/decimal-fraction we do not provide API to
+ * serialize/deserialize them at all. You can still read out the actual data
+ * item behind the tag (via cbor_deserialize_byte_string()) and interpret it
+ * yourself.
+ *
+ * @see [RFC7049, section 2.4](https://tools.ietf.org/html/rfc7049#section-2.4)
+ *
+ * # Notes about major type 7 and simple values
  * Simple values:
- * -   0-19: (Unassigned)    - No support
- * -  20,21: True, False     - Supported (see cbor_serialize_bool(),
- *                                        cbor_deserialize_bool())
- * -  22,23: Null, Undefined - No support (what's the use-case?)
- * -  24-31: (Reserved)      - No support
- * - 32-255: (Unassigned)    - No support
+ *
+ * | Simple value types      | Support                                                        |
+ * | :---------------------- | :------------------------------------------------------------- |
+ * |   0-19: (Unassigned)    | not supported                                                  |
+ * |  20,21: True, False     | supported (see cbor_serialize_bool(), cbor_deserialize_bool()) |
+ * |  22,23: Null, Undefined | not supported (what's the use-case?)                           |
+ * |  24-31: (Reserved)      | not supported                                                  |
+ * | 32-255: (Unassigned)    | not supported                                                  |
+ *
+ * @see [RFC7049, section 2.4](https://tools.ietf.org/html/rfc7049#section-2.3)
  *
  * @todo API for Indefinite-Length Byte Strings and Text Strings
  *       (see https://tools.ietf.org/html/rfc7049#section-2.2.2)
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       CBOR definitions
+ *
+ * @author      Kevin Funk <kfunk@kde.org>
+ * @author      Jana Cavojska <jana.cavojska9@gmail.com>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
  */
 
 #ifndef CBOR_H
@@ -117,29 +132,27 @@ extern "C" {
  * @brief Struct containing CBOR-encoded data
  *
  * A typical usage of CBOR looks like:
- * @code
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * unsigned char data[1024];
  * cbor_stream_t stream;
  * cbor_init(&stream, data, sizeof(data));
  *
  * cbor_serialize_int(&stream, 5);
- * (...)
- * <data contains CBOR encoded items now>
+ * // (...)
+ * // <data contains CBOR encoded items now>
  *
  * cbor_destroy(&stream);
- * @endcode
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * @sa cbor_init
- * @sa cbor_clear
- * @sa cbor_destroy
+ * @see cbor_init
+ * @see cbor_clear
+ * @see cbor_destroy
  */
 typedef struct {
-    /** Array containing CBOR encoded data */
-    unsigned char *data;
-    /** Size of the array */
-    size_t size;
-    /** Index to the next free byte */
-    size_t pos;
+    unsigned char *data;    /**< Array containing CBOR encoded data */
+    size_t size;            /**< Size of the array */
+    size_t pos;             /**< Index to the next free byte */
 } cbor_stream_t;
 
 /**
@@ -185,14 +198,14 @@ void cbor_stream_print(const cbor_stream_t *stream);
  * representation
  *
  * Example output:
- * @code
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * Data:
  * (int, 1)
  * (bool, 1)
  * (float, 1.099609)
  * (tag: 0, date/time string: "Mon Jul 14 19:07:40 2014")
  * (tag: 1, date/time epoch: 1405357660)
- * @endcode
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @param[in] stream Pointer to the cbor struct
  */
@@ -389,10 +402,19 @@ size_t cbor_serialize_byte_stringl(cbor_stream_t *stream, const char *val, size_
 size_t cbor_deserialize_byte_string(const cbor_stream_t *stream, size_t offset,
                                     char *val, size_t length);
 
+/**
+ * @brief Serializes a unicode string.
+ *
+ * @param[out] stream   The destination stream for serializing the unicode
+ *                      string
+ * @param[out] val      The zero-terminated unicode string to serialize.
+ *
+ * @return Number of bytes written to stream @p stream
+ */
 size_t cbor_serialize_unicode_string(cbor_stream_t *stream, const char *val);
 
 /**
- * @brief Deserialize bytes/unicode from @p stream to @p val (without copy)
+ * @brief Deserialize bytes from @p stream to @p val (without copy)
  *
  * @param[in] stream The stream to deserialize
  * @param[in] offset The offset within the stream where to start deserializing
@@ -402,10 +424,20 @@ size_t cbor_serialize_unicode_string(cbor_stream_t *stream, const char *val);
  * @return Number of bytes written into @p val
  */
 size_t cbor_deserialize_byte_string_no_copy(const cbor_stream_t *stream, size_t offset,
-                                    unsigned char **val, size_t *length);
+                                            unsigned char **val, size_t *length);
 
+/**
+ * @brief Deserialize unicode string from @p stream to @p val (without copy)
+ *
+ * @param[in] stream The stream to deserialize
+ * @param[in] offset The offset within the stream where to start deserializing
+ * @param[out] val   Pointer to a char *
+ * @param[out] length Pointer to a size_t to store the size of the string
+ *
+ * @return Number of bytes written into @p val
+ */
 size_t cbor_deserialize_unicode_string_no_copy(const cbor_stream_t *stream, size_t offset,
-                                    unsigned char **val, size_t *length);
+                                               unsigned char **val, size_t *length);
 
 /**
  * @brief Deserialize unicode string from @p stream to @p val
@@ -424,11 +456,11 @@ size_t cbor_deserialize_unicode_string(const cbor_stream_t *stream,
  * @brief Serialize array of length @p array_length
  *
  * Basic usage:
- * @code
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * cbor_serialize_array(&stream, 2); // array of length 2 follows
  * cbor_serialize_int(&stream, 1)); // write item 1
  * cbor_serialize_int(&stream, 2)); // write item 2
- * @endcode
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @note You have to make sure to serialize the correct amount of items.
  * If you exceed the length @p array_length, items will just be appened as normal
@@ -444,14 +476,14 @@ size_t cbor_serialize_array(cbor_stream_t *stream, size_t array_length);
  * @brief Deserialize array of items
  *
  * Basic usage:
- * @code
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * size_t array_length;
  * // read out length of the array
  * size_t offset = cbor_deserialize_array(&stream, 0, &array_length);
  * int i1, i2;
  * offset += cbor_deserialize_int(&stream, offset, &i1); // read item 1
  * offset += cbor_deserialize_int(&stream, offset, &i2); // read item 2
- * @endcode
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @param[in] stream       The stream to deserialize
  * @param[in] offset       The offset within the stream
@@ -485,13 +517,13 @@ size_t cbor_deserialize_array_indefinite(const cbor_stream_t *stream, size_t off
  * @brief Serialize map of length @p map_length
  *
  * Basic usage:
- * @code
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * cbor_serialize_map(&stream, 2); // map of length 2 follows
  * cbor_serialize_int(&stream, 1)); // write key 1
  * cbor_serialize_byte_string(&stream, "1")); // write value 1
  * cbor_serialize_int(&stream, 2)); // write key 2
  * cbor_serialize_byte_string(&stream, "2")); // write value 2
- * @endcode
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @param[out] stream  The destination stream for serializing the map
  * @param map_length Length of the map of items which follows
@@ -504,7 +536,7 @@ size_t cbor_serialize_map(cbor_stream_t *stream, size_t map_length);
  * @brief Deserialize map of items
  *
  * Basic usage:
- * @code
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * size_t map_length;
  * // read out length of the map
  * size_t offset = cbor_deserialize_map(&stream, 0, &map_length);
@@ -518,7 +550,7 @@ size_t cbor_serialize_map(cbor_stream_t *stream, size_t map_length);
  * offset += cbor_deserialize_int(&stream, offset, &key2);
  * // read value 2
  * offset += cbor_deserialize_byte_string(&stream, offset, value2, sizeof(value));
- * @endcode
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @param[in] stream     The stream to deserialize
  * @param[in] offset     The offset within the stream where to start deserializing
@@ -554,7 +586,7 @@ size_t cbor_deserialize_map_indefinite(const cbor_stream_t *stream, size_t offse
  * @brief Serialize date and time
  *
  * Basic usage:
- * @code
+ * ~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * struct tm val;
  * val.tm_year = 114;
  * val.tm_mon = 6;
@@ -564,7 +596,7 @@ size_t cbor_deserialize_map_indefinite(const cbor_stream_t *stream, size_t offse
  * val.tm_sec = 0;
  * mktime(&val);
  * cbor_serialize_date_time(&stream, &val);
- * @endcode
+ * ~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @param[out] stream  The destination stream for serializing the date_time
  * @param[in] val      tm struct containing the date/time info to be encoded
@@ -577,10 +609,10 @@ size_t cbor_serialize_date_time(cbor_stream_t *stream, struct tm *val);
  * @brief Deserialize date and time
  *
  * Basic usage:
- * @code
+ * ~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * struct tm val;
  * cbor_deserialize_date_time(&stream, 0, &val);
- * @endcode
+ * ~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @param[in] stream The stream to deserialize
  * @param[in] offset The offset within the stream where to start deserializing
@@ -590,8 +622,25 @@ size_t cbor_serialize_date_time(cbor_stream_t *stream, struct tm *val);
  */
 size_t cbor_deserialize_date_time(const cbor_stream_t *stream, size_t offset, struct tm *val);
 
+/**
+ * @brief Serialize seconds since UNIX epoch
+ *
+ * @param[out] stream  The destination stream for serializing the date_time
+ * @param[in] val      Time in seconds since UNIX epoch
+ *
+ * @return Number of bytes written to stream @p stream
+ */
 size_t cbor_serialize_date_time_epoch(cbor_stream_t *stream, time_t val);
 
+/**
+ * @brief Deserialize seconds since UNIX epoch
+ *
+ * @param[in] stream The stream to deserialize
+ * @param[in] offset The offset within the stream where to start deserializing
+ * @param[out] val   `time_t` variable where the decoded date/time will be stored
+ *
+ * @return The number of deserialized bytes
+ */
 size_t cbor_deserialize_date_time_epoch(const cbor_stream_t *stream, size_t offset, time_t *val);
 
 #endif /* CBOR_NO_CTIME */
@@ -657,6 +706,6 @@ bool cbor_at_end(const cbor_stream_t *stream, size_t offset);
 }
 #endif
 
-#endif
+#endif /* CBOR_H */
 
 /** @} */

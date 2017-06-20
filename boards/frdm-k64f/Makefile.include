@@ -4,6 +4,7 @@ export CPU_MODEL = mk64fn1m0vll12
 
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
 .PHONY: flash
 flash: $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin
@@ -24,7 +25,7 @@ export OPENOCD_EXTRA_INIT
 export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/kinetis_common/dist/check-fcfield-elf.sh
 
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.inc.mk
 
 # this board uses openocd
-include $(RIOTBOARD)/Makefile.include.openocd
+include $(RIOTMAKE)/tools/openocd.inc.mk

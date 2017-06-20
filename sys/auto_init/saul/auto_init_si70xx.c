@@ -22,9 +22,8 @@
 
 #include "log.h"
 #include "saul_reg.h"
-
-#include "si70xx_params.h"
 #include "si70xx.h"
+#include "si70xx_params.h"
 
 /**
  * @brief   Define the number of configured sensors
@@ -59,7 +58,7 @@ void auto_init_si70xx(void)
                               si70xx_params[i].address);
         if (res < 0) {
             LOG_ERROR("[auto_init_saul] error initializing SI70xx #%i\n", i);
-            return;
+            continue;
         }
 
         /* temperature */

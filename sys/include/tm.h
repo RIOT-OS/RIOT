@@ -14,8 +14,8 @@
  * @brief       Utility library for `struct tm`.
  */
 
-#ifndef SYS__TIMEX__TM__H
-#define SYS__TIMEX__TM__H
+#ifndef TM_H
+#define TM_H
 
 #include <time.h>
 #include <sys/time.h>
@@ -119,5 +119,5 @@ int tm_is_valid_time(int hour, int min, int sec) CONST;
 }
 #endif
 
-#endif /* SYS__TIMEX__TM__H */
+#endif /* TM_H */
 /** @} */

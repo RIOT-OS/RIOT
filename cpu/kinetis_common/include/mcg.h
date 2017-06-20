@@ -10,7 +10,8 @@
  * @defgroup    cpu_kinetis_common_mcg Kinetis MCG
  * @ingroup     cpu_kinetis_common
  * @brief       Implementation of the Kinetis Multipurpose Clock Generator
- *              (MCG) driver.
+ *              (MCG) driver
+ *
  *              Please add mcg.h in cpu conf.h
  *              and MCG configuration to periph_conf.h
  *
@@ -36,6 +37,30 @@
  *              -  FEE -> BLPI
  *              -  BLPE -> FEE
  *              -  BLPI -> FEE
+ *
+ *              \dot
+ *              digraph states {
+ *                layout=dot
+ *                nodesep=0.5
+ *                {rank=same Reset [shape=none] FEI FEE}
+ *                {rank=same FBI FBE}
+ *                {rank=same BLPI BLPE}
+ *                Reset -> FEI
+ *                FEI -> FEE [dir="both"]
+ *                FEI -> FBE [dir="both"]
+ *                FEI -> FBI [dir="both"]
+ *                FEE -> FBI [dir="both"]
+ *                FEE -> FBE [dir="both"]
+ *                FBI -> FBE [dir="both"]
+ *                FBI -> BLPI [dir="both"]
+ *                FBE -> BLPE [dir="both"]
+ *                PBE
+ *                PEE
+ *                FBE -> PBE [dir="both"]
+ *                BLPE -> PBE [dir="both"]
+ *                PBE -> PEE [dir="both"]
+ *              }
+ *              \enddot
  *
  *              ### MCG Configuration Examples (for periph_conf.h) ###
  *
@@ -97,8 +122,8 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
 
-#ifndef MCG_CPU_H
-#define MCG_CPU_H
+#ifndef MCG_H
+#define MCG_H
 
 #include "periph_conf.h"
 
@@ -133,4 +158,4 @@ int kinetis_mcg_set_mode(kinetis_mcg_mode_t mode);
 #endif /* KINETIS_CPU_USE_MCG */
 /** @} */
 
-#endif /* MCG_CPU_H */
+#endif /* MCG_H */

@@ -27,6 +27,7 @@
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F2) || \
     defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F4) || \
+    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32L1)
 
 /* guard file in case no RTC device was specified */
@@ -59,9 +60,13 @@ void rtc_init(void)
 {
     /* Enable write access to RTC registers */
     periph_clk_en(APB1, RCC_APB1ENR_PWREN);
+#if defined(CPU_FAM_STM32F7)
+    PWR->CR1 |= PWR_CR1_DBP;
+#else
     PWR->CR |= PWR_CR_DBP;
+#endif
 
-#if defined(CPU_FAM_STM32L1)
+#if defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32L0)
     if (!(RCC->CSR & RCC_CSR_RTCEN)) {
 #else
     if (!(RCC->BDCR & RCC_BDCR_RTCEN)) {
@@ -98,7 +103,11 @@ int rtc_set_time(struct tm *time)
 {
     /* Enable write access to RTC registers */
     periph_clk_en(APB1, RCC_APB1ENR_PWREN);
+#if defined(CPU_FAM_STM32F7)
+    PWR->CR1 |= PWR_CR1_DBP;
+#else
     PWR->CR |= PWR_CR_DBP;
+#endif
 
     /* Unlock RTC write protection */
     RTC->WPR = RTC_WRITE_PROTECTION_KEY1;
@@ -152,7 +161,11 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
     /* Enable write access to RTC registers */
     periph_clk_en(APB1, RCC_APB1ENR_PWREN);
+#if defined(CPU_FAM_STM32F7)
+    PWR->CR1 |= PWR_CR1_DBP;
+#else
     PWR->CR |= PWR_CR_DBP;
+#endif
 
     /* Unlock RTC write protection */
     RTC->WPR = RTC_WRITE_PROTECTION_KEY1;
@@ -180,9 +193,15 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     /* Enable RTC write protection */
     RTC->WPR = 0xFF;
 
+#if defined(CPU_FAM_STM32L0)
+    EXTI->IMR  |= EXTI_IMR_IM17;
+#else
     EXTI->IMR  |= EXTI_IMR_MR17;
+#endif
+
     EXTI->RTSR |= EXTI_RTSR_TR17;
-#if defined(CPU_FAM_STM32F0)
+
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)
     NVIC_SetPriority(RTC_IRQn, 10);
     NVIC_EnableIRQ(RTC_IRQn);
 #else
@@ -223,7 +242,7 @@ void rtc_clear_alarm(void)
 
 void rtc_poweron(void)
 {
-#if defined(CPU_FAM_STM32L1)
+#if defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32L0)
     /* Reset RTC domain */
     RCC->CSR |= RCC_CSR_RTCRST;
     RCC->CSR &= ~(RCC_CSR_RTCRST);
@@ -262,7 +281,7 @@ void rtc_poweron(void)
 
 void rtc_poweroff(void)
 {
-#if defined(CPU_FAM_STM32L1)
+#if defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32L0)
     /* Reset RTC domain */
     RCC->CSR |= RCC_CSR_RTCRST;
     RCC->CSR &= ~(RCC_CSR_RTCRST);
@@ -281,7 +300,7 @@ void rtc_poweroff(void)
 #endif
 }
 
-#if defined(CPU_FAM_STM32F0)
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)
 void isr_rtc(void)
 #else
 void isr_rtc_alarm(void)
@@ -319,4 +338,5 @@ static uint8_t byte2bcd(uint8_t value)
 
 #endif /* defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F2) || \
           defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F4) || \
+          defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
           defined(CPU_FAM_STM32L1) */

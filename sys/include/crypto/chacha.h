@@ -137,7 +137,7 @@ uint32_t chacha_prng_next(void);
 }
 #endif
 
-#endif /* ifndef CRYPTO_CHACHA_H */
+#endif /* CRYPTO_CHACHA_H */
 
 /**
  * @}

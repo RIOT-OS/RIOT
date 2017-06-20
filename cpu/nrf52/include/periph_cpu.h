@@ -16,8 +16,8 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_CPU_
-#define PERIPH_CPU_
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include "periph_cpu_common.h"
 
@@ -29,7 +29,6 @@ extern "C" {
  * @brief   Redefine some peripheral names to unify them between nRF51 and 52
  * @{
  */
-#define GPIO_BASE           (NRF_P0)
 #define UART_IRQN           (UARTE0_UART0_IRQn)
 #define SPI_SCKSEL          (dev(bus)->PSEL.SCK)
 #define SPI_MOSISEL         (dev(bus)->PSEL.MOSI)
@@ -40,5 +39,5 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CPU_ */
+#endif /* PERIPH_CPU_H */
 /** @} */

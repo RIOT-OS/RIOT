@@ -32,8 +32,8 @@
  * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  */
 
-#ifndef GNRC_TFTP_H
-#define GNRC_TFTP_H
+#ifndef NET_GNRC_TFTP_H
+#define NET_GNRC_TFTP_H
 
 #include <inttypes.h>
 
@@ -199,7 +199,7 @@ int gnrc_tftp_client_write(ipv6_addr_t *addr, const char *file_name, tftp_mode_t
 }
 #endif
 
-#endif /* GNRC_TFTP_H */
+#endif /* NET_GNRC_TFTP_H */
 
 /**
  * @}

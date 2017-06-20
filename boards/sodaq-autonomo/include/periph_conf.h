@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   External oscillator and clock configuration
+ * @name    External oscillator and clock configuration
  *
  * For selection of the used CORECLOCK, we have implemented two choices:
  *
@@ -76,7 +76,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name Timer peripheral configuration
+ * @name    Timer peripheral configuration
  * @{
  */
 #define TIMER_NUMOF         (2U)
@@ -97,7 +97,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name UART configuration
+ * @name    UART configuration
  * @{
  * See Table 6.1 of the SAM D21 Datasheet
  */
@@ -146,7 +146,7 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name PWM configuration
+ * @name    PWM configuration
  * @{
  */
 #define PWM_0_EN            1
@@ -181,7 +181,7 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
- * @name SPI configuration
+ * @name    SPI configuration
  * @{
  */
 static const spi_conf_t spi_config[] = {
@@ -202,7 +202,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name I2C configuration
+ * @name    I2C configuration
  * @{
  */
 #define I2C_NUMOF           (1U)
@@ -224,7 +224,7 @@ static const spi_conf_t spi_config[] = {
 #define I2C_0_MUX           GPIO_MUX_C
 
 /**
- * @name RTC configuration
+ * @name    RTC configuration
  * @{
  */
 #define RTC_NUMOF          (1U)
@@ -232,7 +232,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name RTT configuration
+ * @name    RTT configuration
  * @{
  */
 #define RTT_NUMOF          (1U)

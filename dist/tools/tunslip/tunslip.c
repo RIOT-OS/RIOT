@@ -307,7 +307,7 @@ done:
 
     if (op == DHCP_OPTION_END) {
         *t++ = op;
-        *p++;
+        (*p)++;
     }
 
     optlen = t - pkt.m.options;
@@ -535,7 +535,6 @@ after_fread:
 
     if (ret == 0) {
         clearerr(inslip);
-        return;
         fprintf(stderr, "serial_to_tun: EOF\n");
         exit(1);
     }

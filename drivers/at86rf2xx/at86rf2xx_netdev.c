@@ -304,7 +304,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     }
 
     uint8_t old_state = at86rf2xx_get_status(dev);
-    res = 0;
 
     /* temporarily wake up if sleeping */
     if (old_state == AT86RF2XX_STATE_SLEEP) {
@@ -339,6 +338,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         default:
             res = -ENOTSUP;
+            break;
     }
 
     /* go back to sleep if were sleeping */
@@ -565,11 +565,22 @@ static void _isr(netdev_t *netdev)
 
             if (netdev->event_callback && (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END)) {
                 switch (trac_status) {
+#ifdef MODULE_OPENTHREAD
+                    case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
+                        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+                        DEBUG("[at86rf2xx] TX SUCCESS\n");
+                        break;
+                    case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
+                        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE_DATA_PENDING);
+                        DEBUG("[at86rf2xx] TX SUCCESS DATA PENDING\n");
+                        break;
+#else
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
                         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
                         DEBUG("[at86rf2xx] TX SUCCESS\n");
                         break;
+#endif
                     case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
                         netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
                         DEBUG("[at86rf2xx] TX NO_ACK\n");

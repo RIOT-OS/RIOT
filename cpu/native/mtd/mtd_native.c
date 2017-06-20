@@ -7,7 +7,6 @@
  */
 
 /**
- * @ingroup     mtd_native
  * @{
  * @brief       mtd flash emulation for native
  *

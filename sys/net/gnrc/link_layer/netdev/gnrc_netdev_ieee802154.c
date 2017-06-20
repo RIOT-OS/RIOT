@@ -16,6 +16,7 @@
 #include <stddef.h>
 
 #include "od.h"
+#include "net/l2filter.h"
 #include "net/gnrc.h"
 #include "net/ieee802154.h"
 
@@ -112,7 +113,19 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev_t *gnrc_netdev)
                 gnrc_pktbuf_release(pkt);
                 return NULL;
             }
+
             hdr = netif_hdr->data;
+
+#ifdef MODULE_L2FILTER
+            if (!l2filter_pass(netdev->filter, gnrc_netif_hdr_get_src_addr(hdr),
+                               hdr->src_l2addr_len)) {
+                gnrc_pktbuf_release(pkt);
+                gnrc_pktbuf_release(netif_hdr);
+                DEBUG("_recv_ieee802154: packet dropped by l2filter\n");
+                return NULL;
+            }
+#endif
+
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
             hdr->if_pid = thread_getpid();
@@ -208,7 +221,16 @@ static int _send(gnrc_netdev_t *gnrc_netdev, gnrc_pktsnip_t *pkt)
             gnrc_netdev->dev->stats.tx_unicast_count++;
         }
 #endif
+#ifdef MODULE_GNRC_MAC
+        if (gnrc_netdev->mac_info & GNRC_NETDEV_MAC_INFO_CSMA_ENABLED) {
+            res = csma_sender_csma_ca_send(netdev, vector, n, &gnrc_netdev->csma_conf);
+        }
+        else {
+            res = netdev->driver->send(netdev, vector, n);
+        }
+#else
         res = netdev->driver->send(netdev, vector, n);
+#endif
     }
     else {
         return -ENOBUFS;

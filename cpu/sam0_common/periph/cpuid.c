@@ -33,5 +33,5 @@
 void cpuid_get(void *id)
 {
     uint32_t addr[] = { WORD0, WORD1, WORD2, WORD3 };
-    memcpy(id, (void *)addr, CPUID_LEN);
+    memcpy(id, &addr[0], CPUID_LEN);
 }

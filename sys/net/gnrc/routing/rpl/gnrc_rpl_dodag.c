@@ -37,7 +37,6 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
 static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *dodag);
-static void _rpl_trickle_send_dio(void *args);
 
 static void _rpl_trickle_send_dio(void *args)
 {
@@ -266,8 +265,7 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
 {
     /* update Parent lifetime */
     if (parent != NULL) {
-        uint32_t now = xtimer_now_usec();
-        parent->lifetime = (now / US_PER_SEC) + (dodag->default_lifetime * dodag->lifetime_unit);
+        parent->lifetime = dodag->default_lifetime * dodag->lifetime_unit;
 #ifdef MODULE_GNRC_RPL_P2P
         if (dodag->instance->mop != GNRC_RPL_P2P_MOP) {
 #endif

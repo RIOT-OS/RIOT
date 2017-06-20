@@ -6,9 +6,9 @@ export CPU_MODEL = sam3x8e
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
-# define board specific flasher options
-export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-export OFLAGS = -O binary
-
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# setup flasher (using BOSSA)
+export BOSSA_ARDUINO_PREFLASH = yes
+include $(RIOTMAKE)/tools/bossa.inc.mk

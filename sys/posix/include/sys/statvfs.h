@@ -18,13 +18,13 @@
 /* without the GCC pragma above #include_next will trigger a pedantic error */
 #include_next <sys/statvfs.h>
 #else
-#ifndef SYS_STATVFS_H_
-#define SYS_STATVFS_H_
+#ifndef SYS_STATVFS_H
+#define SYS_STATVFS_H
 
 #include <sys/types.h> /* for fsblkcnt_t, fsfilcnt_t */
-/** @todo Remove ifdef BOARD_MIPS_MALTA special case after
+/** @todo Remove ifdef __mips__ special case after
  * [#6639](https://github.com/RIOT-OS/RIOT/pull/6639) is merged */
-#if MODULE_NEWLIB || defined(BOARD_MIPS_MALTA)
+#if MODULE_NEWLIB || defined(__mips__)
 /* newlib support for fsblkcnt_t was only recently added to the newlib git
  * repository, commit f3e587d30a9f65d0c6551ad14095300f6e81672e, 15 apr 2016.
  * Will be included in release 2.5.0, around new year 2016/2017.
@@ -71,7 +71,7 @@ enum {
 }
 #endif
 
-#endif /* SYS_STATVFS_H_ */
+#endif /* SYS_STATVFS_H */
 
 #endif /* CPU_NATIVE */
 

@@ -14,10 +14,9 @@ export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 
 export OFLAGS = -O binary
 export HEXFILE = $(ELFFILE:.elf=.bin)
-export TERMFLAGS += -p "$(PORT)"
 export FFLAGS = $(BINDIR) $(HEXFILE)
 export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 export RESET_FLAGS = $(BINDIR)
 
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.inc.mk

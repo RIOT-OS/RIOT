@@ -7,8 +7,8 @@
  * directory for more details.
  */
 
-#ifndef Z1_BOARD_H
-#define Z1_BOARD_H
+#ifndef BOARD_H
+#define BOARD_H
 
 /**
  * @defgroup    boards_z1 Zolertia Z1
@@ -45,7 +45,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Xtimer configuration
+ * @name    Xtimer configuration
  * @{
  */
 #define XTIMER_DEV                  (0)
@@ -55,11 +55,10 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   CPU core configuration
- *
- * @todo    Move this to the periph_conf.h
+ * @name    CPU core configuration
  * @{
  */
+/** @todo   Move this to the periph_conf.h */
 #define MSP430_INITIAL_CPU_SPEED    8000000uL
 #ifndef F_CPU
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
@@ -70,7 +69,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED0_PIN                    GPIO_PIN(4, 0)
@@ -95,9 +94,8 @@ extern "C" {
 #define LED2_TOGGLE                 (LED_OUT_REG ^= LED2_MASK)
 /** @} */
 
-
 /**
- * @brief   User button configuration
+ * @name    User button configuration
  * @{
  */
 #define USER_BTN_PxIN      P2IN
@@ -125,4 +123,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /*  Z1_BOARD_H */
+#endif /* BOARD_H */

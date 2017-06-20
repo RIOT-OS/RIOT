@@ -120,8 +120,8 @@
  * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 
-#ifndef _BLOOM_FILTER_H
-#define _BLOOM_FILTER_H
+#ifndef BLOOM_H
+#define BLOOM_H
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -233,4 +233,4 @@ bool bloom_check(bloom_t *bloom, const uint8_t *buf, size_t len);
 #endif
 
 /** @} */
-#endif /* _BLOOM_FILTER_H */
+#endif /* BLOOM_H */

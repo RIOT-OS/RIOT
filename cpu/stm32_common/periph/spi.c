@@ -172,6 +172,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
             *DR = outbuf[i];
         }
         /* wait until everything is finished and empty the receive buffer */
+        while (!(dev(bus)->SR & SPI_SR_TXE)) {}
         while (dev(bus)->SR & SPI_SR_BSY) {}
         while (dev(bus)->SR & SPI_SR_RXNE) {
             dev(bus)->DR;       /* we might just read 2 bytes at once here */

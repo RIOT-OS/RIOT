@@ -30,12 +30,12 @@ extern "C" {
 #endif
 
 /**
- * @brief GCLK reference speed
+ * @brief   GCLK reference speed
  */
 #define CLOCK_CORECLOCK     (16000000U)
 
 /**
- * @name Timer peripheral configuration
+ * @name    Timer peripheral configuration
  * @{
  */
 #define TIMER_NUMOF        (1U)
@@ -49,7 +49,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name UART configuration
+ * @name    UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)
@@ -71,7 +71,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name SPI configuration
+ * @name    SPI configuration
  * @{
  */
 static const spi_conf_t spi_config[] = {
@@ -93,14 +93,14 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name I2C configuration
+ * @name    I2C configuration
  * @{
  */
 #define I2C_NUMOF          (0)
 /** @} */
 
 /**
- * @name RTC configuration
+ * @name    RTC configuration
  * @{
  */
 #define RTC_NUMOF           (1)
@@ -110,12 +110,33 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name RTT configuration
+ * @name    RTT configuration
  * @{
  */
 #define RTT_FREQUENCY       (32768U)
 #define RTT_MAX_VALUE       (0xffffffffU)
 #define RTT_NUMOF           (1)
+/** @} */
+
+/**
+ * @name ADC Configuration
+ * @{
+ */
+#define ADC_NUMOF                          (3U)
+
+/* ADC 0 Default values */
+#define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
+#define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV256
+
+static const adc_conf_chan_t adc_channels[] = {
+    /* port, pin, muxpos */
+    {GPIO_PIN(PA, 10), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN18)},
+    {GPIO_PIN(PA, 11), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN19)},
+    {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN0)}
+};
+
+#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG(0x18u)
+#define ADC_0_REF_DEFAULT                  ADC_REFCTRL_REFSEL_INTVCC2
 /** @} */
 
 #ifdef __cplusplus

@@ -177,7 +177,7 @@ static uint16_t cmd_r_phy(enc28j60_t *dev, uint8_t reg)
     /* trigger register read and wait for results */
     cmd_wcr(dev, REG_B2_MICMD, 2, MICMD_MIIRD);
     cmd_wcr(dev, REG_B2_MICMD, 2, 0x00);
-    while (cmd_rcr_miimac(dev, REG_B3_MISTAT, 3) & MISTAT_BUSY);
+    while (cmd_rcr_miimac(dev, REG_B3_MISTAT, 3) & MISTAT_BUSY) {}
     /* results */
     uint8_t low = cmd_rcr_miimac(dev, REG_B2_MIRDL, 2);
     uint8_t high = cmd_rcr_miimac(dev, REG_B2_MIRDH, 2);
@@ -191,7 +191,7 @@ static void cmd_w_phy(enc28j60_t *dev, uint8_t reg, uint16_t val)
     cmd_wcr(dev, REG_B2_MIWRL, 2, (val & 0xff));
     cmd_wcr(dev, REG_B2_MIWRH, 2, (val >> 8));
     /* wait until the transaction is finished */
-    while (cmd_rcr_miimac(dev, REG_B3_MISTAT, 3) & MISTAT_BUSY);
+    while (cmd_rcr_miimac(dev, REG_B3_MISTAT, 3) & MISTAT_BUSY) {}
 }
 
 static void cmd_rbm(enc28j60_t *dev, uint8_t *data, size_t len)

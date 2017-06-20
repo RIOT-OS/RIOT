@@ -149,7 +149,7 @@ char *thread_arch_stack_init(thread_task_func_t task_func,
         *stk = ~((uint32_t)STACK_MARKER);
     }
 
-#ifdef CPU_ARCH_CORTEX_M4F
+#if defined(CPU_ARCH_CORTEX_M4F) || (CPU_ARCH_CORTEX_M7)
     /* TODO: fix FPU handling for Cortex-M4f */
     /*
     stk--;
@@ -320,7 +320,7 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
 #else
     "stmdb  r0!,{r4-r11}              \n" /* save regs */
     "stmdb  r0!,{lr}                  \n" /* exception return value */
-#ifdef CPU_ARCH_CORTEX_M4F
+#if defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
 /*  "vstmdb sp!, {s16-s31}            \n" */ /* TODO save FPU registers */
 #endif
 #endif
@@ -365,7 +365,7 @@ void __attribute__((naked)) __attribute__((used)) isr_svc(void) {
     "ldr    r0, [r0]                  \n" /* dereference TCB */
     "ldr    r1, [r0]                  \n" /* load tcb->sp to register 1 */
     "ldmia  r1!, {r0}                 \n" /* restore exception return value */
-#ifdef CPU_ARCH_CORTEX_M4F
+#if defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
 /*  "pop    {s16-s31}                 \n" */ /* TODO load FPU registers */
 #endif
     "ldmia  r1!, {r4-r11}             \n" /* restore other registers */

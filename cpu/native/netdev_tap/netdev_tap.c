@@ -28,6 +28,9 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+/* needs to be included before native's declarations of ntohl etc. */
+#include "byteorder.h"
+
 #ifdef __MACH__
 #include <net/if.h>
 #include <sys/types.h>
@@ -55,7 +58,6 @@
 #include "net/ethernet/hdr.h"
 #include "netdev_tap.h"
 #include "net/netopt.h"
-#include "net/eui64.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -142,7 +144,8 @@ static int _set(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
             _set_promiscous(dev, ((bool *)value)[0]);
             break;
         default:
-            return -ENOTSUP;
+            res = netdev_eth_set(dev, opt, value, value_len);
+            break;
     }
 
     return res;

@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef MSB_BOARD_H
-#define MSB_BOARD_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "board_common.h"
 
@@ -36,11 +36,10 @@ extern "C" {
 #endif
 
 /**
- * @brief   CPU core configuration
- *
- * @todo    Move this to the periph_conf.h
+ * @name    CPU core configuration
  * @{
  */
+/** @todo   Move this to the periph_conf.h */
 #define MSP430_INITIAL_CPU_SPEED    7372800uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
 #define F_RC_OSCILLATOR             32768
@@ -53,4 +52,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* MSB_BOARD_H */
+#endif /* BOARD_H */

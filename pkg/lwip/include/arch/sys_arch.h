@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef LWIP_ARCH_SYS_ARCH_H
-#define LWIP_ARCH_SYS_ARCH_H
+#ifndef ARCH_SYS_ARCH_H
+#define ARCH_SYS_ARCH_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -84,5 +84,5 @@ static inline void sys_mbox_set_invalid(sys_mbox_t *mbox)
 }
 #endif
 
-#endif /* LWIP_ARCH_SYS_ARCH_H */
+#endif /* ARCH_SYS_ARCH_H */
 /** @} */

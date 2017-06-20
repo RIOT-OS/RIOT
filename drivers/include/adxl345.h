@@ -26,45 +26,56 @@ extern "C" {
 #endif
 
 #include "periph/i2c.h"
+#include "periph/gpio.h"
 
 /**
  * @brief Possible ADXL345 hardware addresses (wiring specific)
  */
 enum {
-    ADXL345_ADDR_1D = 0x1D, /**< I2C device address if SDO / Alt address pin is high */
-    ADXL345_ADDR_53 = 0x53, /**< I2C device address if SDO / Alt address pin is low */
+    ADXL345_ADDR_1D = 0x1D, /**< I2C device address if Alt addr pin is high */
+    ADXL345_ADDR_53 = 0x53, /**< I2C device address if Alt addr pin is low */
+};
+
+/**
+ * @brief List ADXL345 power mode
+ */
+enum {
+    ADXL345_MEASURE_MODE,
+    ADXL345_STANDBY_MODE,
+    ADXL345_SLEEP_MODE,
+    ADXL345_AUTOSLEEP_MODE,
 };
 
 /**
  * @brief Define ADXL345 sensitivity
  */
 enum {
-    ADXL345_RANGE_2G,      /**< +/- 2 g Full Scale Rang */
-    ADXL345_RANGE_4G,      /**< +/- 4 g Full Scale Rang */
-    ADXL345_RANGE_8G,      /**< +/- 8 g Full Scale Rang */
-    ADXL345_RANGE_16G      /**< +/- 16 g Full Scale Rang */
+    ADXL345_RANGE_2G    = 1,     /**< +/- 2 g Full Scale Rang */
+    ADXL345_RANGE_4G    = 2,     /**< +/- 4 g Full Scale Rang */
+    ADXL345_RANGE_8G    = 4,     /**< +/- 8 g Full Scale Rang */
+    ADXL345_RANGE_16G   = 8      /**< +/- 16 g Full Scale Rang */
 };
 
 /**
  * @brief List bandwidth rate
  */
 enum {
-    ADXL345_RATE_0HZ1 = 0,    /**< 0.1 Hz Output Data Rate */
-    ADXL345_RATE_0HZ2 = 1,    /**< 0.2 Hz Output Data Rate */
-    ADXL345_RATE_0HZ39 = 2,   /**< 0.39 Hz Output Data Rate */
-    ADXL345_RATE_0HZ78 = 3,   /**< 0.78 Hz Output Data Rate */
-    ADXL345_RATE_1HZ56 = 4,   /**< 1.56 Hz Output Data Rate */
-    ADXL345_RATE_3HZ13 = 5,   /**< 3.13 Hz Output Data Rate */
-    ADXL345_RATE_6HZ25 = 6,   /**< 6.25 Hz Output Data Rate */
-    ADXL345_RATE_12HZ50 = 7,  /**< 12.5 Hz Output Data Rate */
-    ADXL345_RATE_25HZ = 8,    /**< 25 Hz Output Data Rate */
-    ADXL345_RATE_50HZ = 9,    /**< 50 Hz Output Data Rate */
-    ADXL345_RATE_100HZ = 10,  /**< 100 Hz Output Data Rate */
-    ADXL345_RATE_200HZ = 11,  /**< 200 Hz Output Data Rate */
-    ADXL345_RATE_400HZ = 12,  /**< 400 Hz Output Data Rate */
-    ADXL345_RATE_800HZ = 13,  /**< 800 Hz Output Data Rate */
-    ADXL345_RATE_1600HZ = 14, /**< 1600 Hz Output Data Rate */
-    ADXL345_RATE_3200HZ = 15  /**< 3200 Hz Output Data Rate */
+    ADXL345_RATE_0HZ1   = 0,   /**< 0.1 Hz Output Data Rate */
+    ADXL345_RATE_0HZ2   = 1,   /**< 0.2 Hz Output Data Rate */
+    ADXL345_RATE_0HZ39  = 2,   /**< 0.39 Hz Output Data Rate */
+    ADXL345_RATE_0HZ78  = 3,   /**< 0.78 Hz Output Data Rate */
+    ADXL345_RATE_1HZ56  = 4,   /**< 1.56 Hz Output Data Rate */
+    ADXL345_RATE_3HZ13  = 5,   /**< 3.13 Hz Output Data Rate */
+    ADXL345_RATE_6HZ25  = 6,   /**< 6.25 Hz Output Data Rate */
+    ADXL345_RATE_12HZ50 = 7,   /**< 12.5 Hz Output Data Rate */
+    ADXL345_RATE_25HZ   = 8,   /**< 25 Hz Output Data Rate */
+    ADXL345_RATE_50HZ   = 9,   /**< 50 Hz Output Data Rate */
+    ADXL345_RATE_100HZ  = 10,  /**< 100 Hz Output Data Rate */
+    ADXL345_RATE_200HZ  = 11,  /**< 200 Hz Output Data Rate */
+    ADXL345_RATE_400HZ  = 12,  /**< 400 Hz Output Data Rate */
+    ADXL345_RATE_800HZ  = 13,  /**< 800 Hz Output Data Rate */
+    ADXL345_RATE_1600HZ = 14,  /**< 1600 Hz Output Data Rate */
+    ADXL345_RATE_3200HZ = 15   /**< 3200 Hz Output Data Rate */
 };
 
 /**
@@ -120,7 +131,7 @@ typedef struct {
     uint8_t time_inact;   /**< Inactivity time */
     uint8_t thres_ff;     /**< Free-fall threshold */
     uint8_t time_ff;      /**< Time threshold */
-    uint8_t act_inact;    /**< Axis enable control for activity and inactivity detection */
+    uint8_t act_inact;    /**< Enable ctrl for activity/inactivity detection */
     uint8_t tap_axes;     /**< Axis control for single tap/double tap */
 } adxl345_interrupt_t;
 
@@ -128,21 +139,23 @@ typedef struct {
  * @brief Configuration struct for the ADXL345 sensor
  */
 typedef struct {
-    i2c_t i2c;                     /**< I2C device which is used */
-    uint8_t addr;                  /**< I2C address */
-    adxl345_interrupt_t interrupt; /**< Interrupts configuration  */
-    uint8_t offset[3];             /**< offset axis */
-    uint8_t range;                 /**< Sensitivity configuration */
-    uint8_t rate;                  /**< Configured sample rate for accel  */
-    uint8_t full_res;              /**< Resolution bit */
-    uint8_t scale_factor;          /**< Scale factor for converting value to mg */
+    gpio_t int1;              /**< accelerometer int1 pin */
+    gpio_t int2;              /**< accelerometer int2 pin */
+    uint8_t offset[3];        /**< offset axis */
+    uint8_t range;            /**< Sensitivity configuration */
+    uint8_t rate;             /**< Configured sample rate for accel  */
+    uint8_t full_res;         /**< Resolution bit */
 } adxl345_params_t;
 
 /**
  * @brief Device descriptor for the ADXL345 sensor
  */
 typedef struct {
-    adxl345_params_t params;      /**< Device configuration */
+    i2c_t i2c;                      /**< I2C device which is used */
+    uint8_t addr;                   /**< I2C address */
+    adxl345_params_t *params;       /**< Device configuration */
+    adxl345_interrupt_t interrupt;  /**< Interrupts configuration  */
+    float scale_factor;             /**< Scale factor for converting value to mg */
 } adxl345_t;
 
 /**
@@ -155,8 +168,7 @@ typedef struct {
  * @return                  ADXL345_NOI2C if initialization of I2C bus failed
  * @return                  ADXL345_NODEV if accelerometer test failed
  */
-int adxl345_init(adxl345_t *dev, const adxl345_params_t* params);
-
+int adxl345_init(adxl345_t *dev, adxl345_params_t* params);
 /**
  * @brief   Read accelerometer's data
  *

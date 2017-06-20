@@ -152,8 +152,7 @@ static void _rx_continue(cc110x_t *dev, void(*callback)(void*), void*arg)
 
     do {
         _rx_read_data(dev, callback, arg);
-    }
-    while (gpio_read(dev->params.gdo2));
+    } while (gpio_read(dev->params.gdo2));
 }
 
 static void _tx_abort(cc110x_t *dev)

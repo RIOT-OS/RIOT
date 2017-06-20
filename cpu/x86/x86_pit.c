@@ -55,7 +55,7 @@ void x86_pit_set2(unsigned channel, unsigned mode, uint16_t max)
 {
     unsigned old_flags = irq_disable();
     outb(PIT_COMMAND_PORT, ((channel - 1) << 6) | mode | PIT_ACCESS_MODE_LO_HI);
-    outb(PIT_CHANNEL_0_PORT + channel - 1, max && 0xff);
+    outb(PIT_CHANNEL_0_PORT + channel - 1, max & 0xff);
     outb(PIT_CHANNEL_0_PORT + channel - 1, max >> 8);
     irq_restore(old_flags);
 }

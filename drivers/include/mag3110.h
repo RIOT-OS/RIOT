@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
+ *               2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -25,6 +26,7 @@
  * @brief       Interface definition for the MAG3110 magnetometer driver.
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef MAG3110_H
@@ -38,6 +40,16 @@
 extern "C"
 {
 #endif
+
+/**
+ * @brief   Named return values
+ */
+enum {
+    MAG3110_OK,                 /**< all good */
+    MAG3110_ERROR_I2C,          /**< I2C communication failed */
+    MAG3110_ERROR_DEV,          /**< Device MAG3110 not found */
+    MAG3110_ERROR_CNF,          /**< Device configuration failed */
+};
 
 #ifndef MAG3110_I2C_ADDRESS
 #define MAG3110_I2C_ADDRESS             0x0E /**< Magnetometer Default Address */
@@ -78,40 +90,44 @@ extern "C"
 #define MAG3110_DROS_DEFAULT    MAG3110_DROS_0125_128 /**< Default Setting for testing */
 
 /**
+ * @brief   Configuration parameters
+ */
+typedef struct {
+    i2c_t i2c;                  /**< I2C bus the device is connected to */
+    uint8_t addr;               /**< I2C bus address of the device */
+    uint8_t type;               /**< device type */
+    uint8_t dros;               /**< sampling rate to use */
+    int16_t offset[3];          /**< data offset in X, Y, and Z direction */
+} mag3110_params_t;
+
+/**
  * @brief Device descriptor for MAG3110 magnetometer.
  */
 typedef struct {
-    i2c_t i2c;              /**< I2C device, the magnetometer is connected to */
-    uint8_t addr;           /**< the magnetometer's slave address on the I2C bus */
-    bool initialized;       /**< magnetometer status, true if magnetometer is initialized */
+    mag3110_params_t params;    /**< device configuration parameters */
 } mag3110_t;
 
 /**
- * @brief MAG3110 magnetometer test.
- * This function looks for Device ID of the MAG3110 magnetometer.
- *
- * @param[in]  dev          device descriptor of magnetometer
- *
- * @return                  0 on success
- * @return                  -1 on error
+ * @brief   Data type for the result data
  */
-int mag3110_test(mag3110_t *dev);
+typedef struct {
+    int16_t x;                  /**< acceleration in X direction */
+    int16_t y;                  /**< acceleration in Y direction */
+    int16_t z;                  /**< acceleration in Z direction */
+} mag3110_data_t;
 
 /**
  * @brief Initialise the MAG3110 magnetometer driver.
  *
  * @param[out] dev          device descriptor of magnetometer to initialize
- * @param[in]  i2c          I2C bus the magnetometer is connected to
- * @param[in]  address      magnetometer's I2C slave address
- * @param[in]  dros         data rate and over sampling selection
+ * @param[in]  params       configuration parameters
  *
  * @return                  0 on success
- * @return                  -1 if dros parameter is wrong
- * @return                  -2 if initialization of I2C bus failed
- * @return                  -3 if magnetometer test failed
- * @return                  -4 if magnetometer configuration failed
+ * @return                  -1 if I2C communication failed
+ * @return                  -2 if magnetometer test failed
+ * @return                  -3 if magnetometer configuration failed
  */
-int mag3110_init(mag3110_t *dev, i2c_t i2c, uint8_t address, uint8_t dros);
+int mag3110_init(mag3110_t *dev, const mag3110_params_t *params);
 
 /**
  * @brief Set user offset correction.
@@ -163,16 +179,13 @@ int mag3110_is_ready(mag3110_t *dev);
  * To get the actual values for the magnetic field in \f$\mu T\f$,
  * one have to divide the returned values from the magnetometer by 10.
  *
- * @param[in]  dev          device descriptor of magnetometer
- * @param[out] x            x-axis magnetic field strength
- * @param[out] y            y-axis magnetic field strength
- * @param[out] z            z-axis magnetic field strength
- * @param[out] status       magnetometer status register
+ * @param[in]  dev          device descriptor of accelerometer
+ * @param[out] data         the current magnetic field strength
  *
  * @return                  0 on success
  * @return                  -1 on error
  */
-int mag3110_read(mag3110_t *dev, int16_t *x, int16_t *y, int16_t *z, uint8_t *status);
+int mag3110_read(mag3110_t *dev, mag3110_data_t *data);
 
 /**
  * @brief Read die temperature.
@@ -189,5 +202,5 @@ int mag3110_read_dtemp(mag3110_t *dev, int8_t *dtemp);
 }
 #endif
 
-#endif
+#endif /* MAG3110_H */
 /** @} */

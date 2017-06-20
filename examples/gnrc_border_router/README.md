@@ -181,7 +181,7 @@ example on any RIOT supported platform that offers either more than one UART or
 be equipped with an IPv6 capable network device. In this case only the Makefile
 of this application has to be slightly modified, e.g. by replacing the line
 ```
-USEMODULE += gnrc_slip
+USEMODULE += ethos gnrc_netdev
 ```
 with something like
 ```
@@ -217,7 +217,7 @@ USEMODULE += gnrc_slip
 ## Configuration
 
 In order to connect a RIOT 6LoWPAN border router over SLIP you run a small
-program called tunslip (imported from Contiki) [2] on the Linux host. The
+program called tunslip6 (imported from Contiki) [2] on the Linux host. The
 program can be found in the `dist/tools/tunslip` folder and has to be compiled
 before first use (simple calling `make` should be enough). Now, one can start
 the program by calling something like:

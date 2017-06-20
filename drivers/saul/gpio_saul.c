@@ -42,8 +42,14 @@ static int write(void *dev, phydat_t *state)
     return 1;
 }
 
-const saul_driver_t gpio_saul_driver = {
+const saul_driver_t gpio_out_saul_driver = {
     .read = read,
     .write = write,
-    .type = SAUL_ACT_SWITCH,
+    .type = SAUL_ACT_SWITCH
+};
+
+const saul_driver_t gpio_in_saul_driver = {
+    .read = read,
+    .write = saul_notsup,
+    .type = SAUL_SENSE_BTN
 };

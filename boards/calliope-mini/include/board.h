@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    boards_mini Calliope mini
+ * @defgroup    boards_calliope-mini Calliope mini
  * @ingroup     boards
  * @brief       Board specific files for the Calliope mini
  * @{
@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Xtimer configuration
+ * @name    Xtimer configuration
  * @{
  */
 #define XTIMER_DEV                  (0)
@@ -39,7 +39,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   LED matrix pin configuration
+ * @name    LED matrix pin configuration
  * @{
  */
 #define MINI_LED_COL1               GPIO_PIN(0,  4)
@@ -57,7 +57,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Button configuration
+ * @name    Button configuration
  * @{
  */
 #define BTN0_PIN                    GPIO_PIN(0, 17)
@@ -73,5 +73,5 @@ void board_init(void);
 }
 #endif
 
-#endif /** BOARD_H */
+#endif /* BOARD_H */
 /** @} */

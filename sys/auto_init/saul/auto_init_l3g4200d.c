@@ -58,13 +58,13 @@ void auto_init_l3g4200d(void)
                                 p->int1_pin, p->int2_pin, p->mode, p->scale);
         if (res < 0) {
             LOG_ERROR("[auto_init_saul] error initializing l3g4200d #%u\n", i);
+            continue;
         }
-        else {
-            saul_entries[i].dev = &(l3g4200d_devs[i]);
-            saul_entries[i].name = l3g4200d_saul_info[i].name;
-            saul_entries[i].driver = &l3g4200d_saul_driver;
-            saul_reg_add(&(saul_entries[i]));
-        }
+
+        saul_entries[i].dev = &(l3g4200d_devs[i]);
+        saul_entries[i].name = l3g4200d_saul_info[i].name;
+        saul_entries[i].driver = &l3g4200d_saul_driver;
+        saul_reg_add(&(saul_entries[i]));
     }
 }
 

@@ -128,7 +128,7 @@ int saul_reg_read(saul_reg_t *dev, phydat_t *res);
  * @param[in] dev       device to write to
  * @param[in] data      data to write to the device
  *
- * @return      the number of data elements read to @p res [1-3]
+ * @return      the number of data elements processed by the device
  * @return      -ENODEV if given device is invalid
  * @return      -ENOTSUP if read operation is not supported by the device
  * @return      -ECANCELED on device errors

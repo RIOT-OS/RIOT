@@ -48,7 +48,7 @@ static int _contrast(int argc, char **argv)
         printf("usage: %s VAL [0-127]\n", argv[0]);
         return 1;
     }
-    val = (uint8_t)atoi(argv[1]);
+    val = atoi(argv[1]);
     pcd8544_set_contrast(&dev, val);
     return 0;
 }
@@ -61,7 +61,7 @@ static int _temp(int argc, char **argv)
         printf("usage: %s VAL [0-3]\n", argv[0]);
         return 1;
     }
-    val = (uint8_t)atoi(argv[1]);
+    val = atoi(argv[1]);
     pcd8544_set_tempcoef(&dev, val);
     return 0;
 }
@@ -74,7 +74,7 @@ static int _bias(int argc, char **argv)
         printf("usage: %s VAL [0-7]\n", argv[0]);
         return 1;
     }
-    val = (uint8_t)atoi(argv[1]);
+    val = atoi(argv[1]);
     pcd8544_set_bias(&dev, val);
     return 0;
 }
@@ -132,8 +132,8 @@ static int _write(int argc, char **argv)
         return -1;
     }
 
-    x = (uint8_t)atoi(argv[1]);
-    y = (uint8_t)atoi(argv[2]);
+    x = atoi(argv[1]);
+    y = atoi(argv[2]);
 
     pcd8544_write_s(&dev, x, y, argv[3]);
     return 0;

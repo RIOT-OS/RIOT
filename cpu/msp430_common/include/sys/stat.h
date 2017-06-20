@@ -18,8 +18,8 @@
 /* without the GCC pragma above #include_next will trigger a pedantic error */
 #include_next <sys/stat.h>
 #else
-#ifndef SYS_STAT_H_
-#define SYS_STAT_H_
+#ifndef SYS_STAT_H
+#define SYS_STAT_H
 
 #include <time.h> /* for struct timespec */
 #include <sys/types.h> /* for fsblkcnt_t, fsfilcnt_t */
@@ -121,7 +121,7 @@ int    utimensat(int, const char *, const struct timespec [2], int);
 }
 #endif
 
-#endif /* SYS_STAT_H_ */
+#endif /* SYS_STAT_H */
 
 #endif /* CPU_NATIVE */
 

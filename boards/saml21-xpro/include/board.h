@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED0_PIN            GPIO_PIN(1, 10)
@@ -42,12 +42,12 @@ extern "C" {
 /** @} */
 
 /**
- * @brief User button pin
+ * @brief   User button pin
  */
 #define SW0_PIN             GPIO_PIN(PA, 2)
 
 /**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
 
@@ -55,5 +55,5 @@ void board_init(void);
 }
 #endif
 
-#endif /** BOARD_H */
+#endif /* BOARD_H */
 /** @} */

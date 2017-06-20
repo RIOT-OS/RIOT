@@ -79,4 +79,4 @@ struct __Outputter {
 }
 #endif
 
-#endif/* EMBUNIT_OUTPUTTER_H */
+#endif /* EMBUNIT_OUTPUTTER_H */

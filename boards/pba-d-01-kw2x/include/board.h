@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    board_phywave_eval phyWAVE-KW22 Board
+ * @defgroup    boards_pba-d-01-kw2x phyWAVE-KW22 Board
  * @ingroup     boards
  * @brief       Board specific implementations for the phyWAVE evaluation board
  * @{
@@ -62,6 +62,15 @@ extern "C"
 #define BUTTON_PORT         PORTD
 #define BUTTON_PIN          1
 #define BUTTON_GPIO         GPIO_PIN(PORT_D, BUTTON_PIN)
+/** @} */
+
+/**
+ * @name Macro for capacitive sensor button.
+ * @{
+ */
+#define CS_BUTTON_PORT         PORTC
+#define CS_BUTTON_PIN          6
+#define CS_BUTTON_GPIO         GPIO_PIN(PORT_C, CS_BUTTON_PIN)
 /** @} */
 
 /**

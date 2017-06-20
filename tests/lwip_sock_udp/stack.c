@@ -28,6 +28,7 @@
 #include "lwip/ip4.h"
 #include "lwip/inet_chksum.h"
 #include "lwip/nd6.h"
+#include "lwip/priv/nd6_priv.h"
 #include "lwip/netif.h"
 #include "lwip/netif/netdev.h"
 #include "lwip/opt.h"
@@ -189,9 +190,9 @@ void _net_init(void)
     assert(netdev.netdev.driver);
 #if LWIP_IPV4
     ip4_addr_t local4, mask4, gw4;
-    local4.addr = HTONL(_TEST_ADDR4_LOCAL);
-    mask4.addr = HTONL(_TEST_ADDR4_MASK);
-    gw4.addr = HTONL(_TEST_ADDR4_GW);
+    local4.addr = htonl(_TEST_ADDR4_LOCAL);
+    mask4.addr = htonl(_TEST_ADDR4_MASK);
+    gw4.addr = htonl(_TEST_ADDR4_GW);
     netif_add(&netif, &local4, &mask4, &gw4, &netdev, lwip_netdev_init, tcpip_input);
 #else
     netif_add(&netif, &netdev, lwip_netdev_init, tcpip_input);
@@ -200,7 +201,9 @@ void _net_init(void)
     static const uint8_t local6[] = _TEST_ADDR6_LOCAL;
     s8_t idx;
     netif_add_ip6_address(&netif, (ip6_addr_t *)&local6, &idx);
-    netif_ip6_addr_set_state(&netif, idx, IP6_ADDR_VALID);
+    for (int i = 0; i <= idx; i++) {
+        netif.ip6_addr_state[i] |= IP6_ADDR_VALID;
+    }
 #endif
     netif_set_default(&netif);
     lwip_bootstrap();
@@ -220,7 +223,7 @@ void _prepare_send_checks(void)
 
     netdev_test_set_send_cb(&netdev, _netdev_send);
 #if LWIP_ARP
-    const ip4_addr_t remote4 = { .addr = HTONL(_TEST_ADDR4_REMOTE) };
+    const ip4_addr_t remote4 = { .addr = htonl(_TEST_ADDR4_REMOTE) };
     assert(ERR_OK == etharp_add_static_entry(&remote4, (struct eth_addr *)mac));
 #endif
 #if LWIP_IPV6
@@ -259,11 +262,11 @@ bool _inject_4packet(uint32_t src, uint32_t dst, uint16_t src_port,
     eth_hdr->type = byteorder_htons(ETHERTYPE_IPV4);
     IPH_VHL_SET(ip_hdr, 4, 5);
     IPH_TOS_SET(ip_hdr, 0);
-    IPH_LEN_SET(ip_hdr, HTONS(sizeof(struct ip_hdr) + udp_len));
+    IPH_LEN_SET(ip_hdr, htons(sizeof(struct ip_hdr) + udp_len));
     IPH_TTL_SET(ip_hdr, 64);
     IPH_PROTO_SET(ip_hdr, PROTNUM_UDP);
-    ip_hdr->src.addr = HTONL(src);
-    ip_hdr->dest.addr = HTONL(dst);
+    ip_hdr->src.addr = htonl(src);
+    ip_hdr->dest.addr = htonl(dst);
     IPH_CHKSUM_SET(ip_hdr, 0);
     IPH_CHKSUM_SET(ip_hdr, inet_chksum(ip_hdr, sizeof(struct ip_hdr)));
 

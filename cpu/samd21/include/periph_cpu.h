@@ -16,8 +16,8 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef CPU_PERIPH_H
-#define CPU_PERIPH_H
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include <limits.h>
 
@@ -111,11 +111,23 @@ static inline int _sercom_id(SercomUsart *sercom)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
 }
 
-#define PM_NUM_MODES    (3)
-
+/**
+ * @brief   Override the ADC resolution configuration
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0xff,                       /**< not supported */
+    ADC_RES_8BIT  = ADC_CTRLB_RESSEL_8BIT,      /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = ADC_CTRLB_RESSEL_10BIT,     /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = ADC_CTRLB_RESSEL_12BIT,     /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 0xfe,                       /**< not supported */
+    ADC_RES_16BIT = 0xfd                        /**< not supported */
+} adc_res_t;
+/** @} */
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* CPU_PERIPH_H */
+#endif /* PERIPH_CPU_H */
 /** @} */

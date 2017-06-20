@@ -26,7 +26,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#ifdef MODULE_CORE_THREAD_FLAGS
 static thread_flags_t _thread_flags_clear_atomic(thread_t *thread, thread_flags_t mask)
 {
     unsigned state = irq_disable();
@@ -133,4 +132,3 @@ void thread_flags_set(thread_t *thread, thread_flags_t mask)
         irq_restore(state);
     }
 }
-#endif /* MODULE_CORE_THREAD_FLAGS */

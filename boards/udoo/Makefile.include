@@ -2,23 +2,13 @@
 export CPU = sam3
 export CPU_MODEL = sam3x8e
 
-#define the flash-tool and default port depending on the host operating system
-OS := $(shell uname)
-ifeq ($(OS),Linux)
-  PORT ?= /dev/ttyUSB0
-  FLASHER = $(RIOTBOARD)/$(BOARD)/dist/bossac_udoo
-else ifeq ($(OS),Darwin)
-  PORT = /dev/tty.SLAB_USBtoUART
-  FLASHER = $(RIOTBOARD)/$(BOARD)/dist/bossac_udoo_osx
-else
-  $(info CAUTION: No flash tool for your host system found!)
-  # TODO: add support for windows as host platform
-endif
-export FLASHER
-export PORT
-
-export OFLAGS = -O binary
-export FFLAGS = -R -e -w -v -b bin/$(BOARD)/$(APPLICATION).hex
+# define the default port depending on host OS
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# setup the flash tool (BOSSA)
+export BOSSA_ARDUINO_PREFLASH = yes
+include $(RIOTMAKE)/tools/bossa.inc.mk

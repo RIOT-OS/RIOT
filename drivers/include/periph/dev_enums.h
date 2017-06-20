@@ -20,8 +20,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_COMPAT_H
-#define PERIPH_COMPAT_H
+#ifndef PERIPH_DEV_ENUMS_H
+#define PERIPH_DEV_ENUMS_H
 
 #include "periph_conf.h"
 
@@ -99,5 +99,5 @@ enum {
 }
 #endif
 
-#endif /* PERIPH_COMPAT_H */
+#endif /* PERIPH_DEV_ENUMS_H */
 /** @} */

@@ -10,6 +10,7 @@ endif
 USEMODULE += nvram_spi
 USEMODULE += nvram
 USEMODULE += devfs
+USEMODULE += mtd_spi_nor
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio

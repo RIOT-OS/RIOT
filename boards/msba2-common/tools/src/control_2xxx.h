@@ -22,4 +22,4 @@
 void hard_reset_to_bootloader(void);
 void hard_reset_to_user_code(void);
 
-#endif /*  CONTROL_2XXX_H */
+#endif /* CONTROL_2XXX_H */

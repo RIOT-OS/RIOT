@@ -30,31 +30,17 @@
 #define IS_PIN(dir)    (dir >= UART_HALF_DUPLEX_DIR_PIN_SET(0))
 #define GET_PIN(dir)   ((dir >> 1) - 1)
 
-static inline void _enable_tx(uart_half_duplex_dir_t dir)
+static inline void _enable_tx(uart_half_duplex_t *dev)
 {
-    if (IS_PIN(dir)) {
-        if (IS_SET(dir)) {
-            gpio_set(GET_PIN(dir));
-            return;
-        }
-        if (IS_CLEAR(dir)) {
-            gpio_clear(GET_PIN(dir));
-            return;
-        }
+    if (dev->params.dir.enable_tx) {
+        dev->params.dir.enable_tx(dev->params.uart);
     }
 }
 
-static inline void _disable_tx(uart_half_duplex_dir_t dir)
+static inline void _disable_tx(uart_half_duplex_t *dev)
 {
-    if (IS_PIN(dir)) {
-        if (IS_SET(dir)) {
-            gpio_clear(GET_PIN(dir));
-            return;
-        }
-        if (IS_CLEAR(dir)) {
-            gpio_set(GET_PIN(dir));
-            return;
-        }
+    if (dev->params.dir.disable_tx) {
+        dev->params.dir.disable_tx(dev->params.uart);
     }
 }
 
@@ -77,13 +63,13 @@ int uart_half_duplex_init(uart_half_duplex_t *dev, uint8_t *buffer, size_t buffe
     dev->params = *params;
     dev->timeout_us = UART_HALF_DUPLEX_DEFAULT_TIMEOUT_US;
 
-    if (IS_PIN(dev->params.dir)) {
-        gpio_init(GET_PIN(dev->params.dir), GPIO_OUT);
+    if (dev->params.dir.init) {
+        dev->params.dir.init(dev->params.uart);
     }
 
     int ret = uart_init(dev->params.uart, dev->params.baudrate, _rx_cb, dev);
 
-    _disable_tx(dev->params.dir);
+    _disable_tx(dev);
     uart_half_duplex_set_rx(dev);
 
     return ret;
@@ -91,9 +77,9 @@ int uart_half_duplex_init(uart_half_duplex_t *dev, uint8_t *buffer, size_t buffe
 
 size_t uart_half_duplex_send(uart_half_duplex_t *dev, size_t size)
 {
-    _enable_tx(dev->params.dir);
+    _enable_tx(dev);
     uart_write(dev->params.uart, dev->buffer, size);
-    _disable_tx(dev->params.dir);
+    _disable_tx(dev);
     return size;
 }
 

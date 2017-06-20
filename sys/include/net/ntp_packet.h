@@ -19,8 +19,8 @@
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
 
-#ifndef NTP_PACKET_H
-#define NTP_PACKET_H
+#ifndef NET_NTP_PACKET_H
+#define NET_NTP_PACKET_H
 
 #include <stdint.h>
 #include "byteorder.h"
@@ -45,6 +45,12 @@ extern "C" {
 
 #define NTP_VERSION          (4U)       /**< NTP version */
 #define NTP_PORT             (123U)     /**< NTP port number */
+
+/**
+ * @brief   Offset in seconds of NTP timestamp (seconds from 1990-01-01 00:00:00 UTC)
+ *          to UNIX timestamp (seconds from 1970-01-01 00:00:00 UTC).
+ */
+#define NTP_UNIX_OFFSET      (2208988800)
 
 /**
  * @brief NTP modes
@@ -163,5 +169,5 @@ static inline ntp_mode_t ntp_packet_get_mode(ntp_packet_t *packet)
 }
 #endif
 
-#endif /* NTP_PACKET_H */
+#endif /* NET_NTP_PACKET_H */
 /** @} */

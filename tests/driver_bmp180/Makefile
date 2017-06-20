@@ -5,14 +5,10 @@ USEMODULE += bmp180
 USEMODULE += xtimer
 USEMODULE += printf_float
 
-# set default device parameters in case they are undefined
-TEST_I2C                  ?= I2C_DEV\(0\)
-TEST_MEASURE_OVERSAMPLING ?= BMP180_ULTRALOWPOWER
-TEST_ALTITUDE             ?= 158 # altitude in Polytechnique School campus
+# set default altitude
+TEST_ALTITUDE ?= 158 # altitude in Polytechnique School campus
 
-# export parameters
-CFLAGS += -DTEST_I2C=$(TEST_I2C)
-CFLAGS += -DTEST_MEASURE_OVERSAMPLING=$(TEST_MEASURE_OVERSAMPLING)
+# export altitude parameter
 CFLAGS += -DTEST_ALTITUDE=$(TEST_ALTITUDE)
 
 include $(RIOTBASE)/Makefile.include

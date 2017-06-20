@@ -50,8 +50,8 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef VFS_H_
-#define VFS_H_
+#ifndef VFS_H
+#define VFS_H
 
 #include <stdint.h>
 /* The stdatomic.h in GCC gives compilation errors with C++
@@ -652,7 +652,8 @@ int vfs_opendir(vfs_DIR *dirp, const char *dirname);
  * @param[in]  dirp     pointer to open directory
  * @param[out] entry    directory entry information
  *
- * @return 0 on success
+ * @return 1 if @p entry was updated
+ * @return 0 if @p dirp has reached the end of the directory index
  * @return <0 on error
  */
 int vfs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry);
@@ -829,6 +830,6 @@ const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur);
 }
 #endif
 
-#endif
+#endif /* VFS_H */
 
 /** @} */

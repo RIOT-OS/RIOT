@@ -25,8 +25,8 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef KERNEL_MEMORY_H__
-#define KERNEL_MEMORY_H__
+#ifndef X86_KERNEL_MEMORY_H
+#define X86_KERNEL_MEMORY_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -119,6 +119,6 @@ extern char _heap_start;
 }
 #endif
 
-#endif
+#endif /* X86_KERNEL_MEMORY_H */
 
 /** @} */

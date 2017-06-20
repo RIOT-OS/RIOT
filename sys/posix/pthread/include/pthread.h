@@ -17,8 +17,8 @@
  * @see     [The Open Group Base Specifications Issue 7: pthread.h - threads](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
  */
 
-#ifndef SYS__POSIX__PTHREAD__H
-#define SYS__POSIX__PTHREAD__H
+#ifndef PTHREAD_H
+#define PTHREAD_H
 
 #include <time.h>
 
@@ -58,7 +58,7 @@ extern "C" {
 }
 #endif
 
-#endif /* SYS__POSIX__PTHREAD__H */
+#endif /* PTHREAD_H */
 
 /**
  * @}

@@ -5,10 +5,11 @@ export CPU_MODEL = stm32f103cb
 # the spark-core uses its own custom linkerscript...
 export LINKER_SCRIPT = stm32f103cb_sparkcore.ld
 
-# set the default port
-export PORT ?= /dev/ttyUSB0
+# configure the serial interface
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+include $(RIOTMAKE)/tools/serial.inc.mk
 
-#
 export BINFILE = $(patsubst %.elf,%.bin,$(ELFFILE))
 
 export FLASHER = dfu-util
@@ -17,12 +18,8 @@ export RESET = # dfu-util has no support for resetting the device
 
 export OFLAGS = -O binary
 export FFLAGS = -d 1d50:607f -a 0 -s 0x08005000:leave -D "$(HEXFILE)"
-export TERMFLAGS = -p $(PORT)
 
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
 
-# setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
-
 # this board uses openocd
-include $(RIOTBOARD)/Makefile.include.openocd
+include $(RIOTMAKE)/tools/openocd.inc.mk

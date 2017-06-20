@@ -117,26 +117,6 @@ void thread_arch_stack_print(void)
     }
 }
 
-
-/* This function calculates the ISR_usage */
-int thread_arch_isr_stack_usage(void)
-{
-    /* TODO */
-    return -1;
-}
-
-void *thread_arch_isr_stack_pointer(void)
-{
-    /* TODO */
-    return (void *)-1;
-}
-
-void *thread_arch_isr_stack_start(void)
-{
-    /* TODO */
-    return (void *)-1;
-}
-
 extern void __exception_restore(void);
 void thread_arch_start_threading(void)
 {

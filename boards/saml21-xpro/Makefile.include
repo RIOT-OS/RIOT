@@ -3,9 +3,4 @@ export CPU = saml21
 export CPU_MODEL = saml21j18a
 export CFLAGS += -D__SAML21J18A__
 
-# setup serial terminal
-PORT_LINUX ?= /dev/ttyACM0
-include $(RIOTBOARD)/Makefile.include.serial
-
-# this board uses openocd
-include $(RIOTBOARD)/Makefile.include.openocd
+include $(RIOTMAKE)/boards/sam0.inc.mk

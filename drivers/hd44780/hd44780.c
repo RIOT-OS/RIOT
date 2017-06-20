@@ -16,6 +16,8 @@
  * @note        The display is also known as LCM1602C from Arduino kits
  *
  * @author      Sebastian Meiling <s@mlng.net>
+ *
+ * @}
  */
 
 #include <assert.h>

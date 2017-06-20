@@ -43,8 +43,8 @@
  * @author      Hermann Lelong
  */
 
-#ifndef _SHA256_H
-#define _SHA256_H
+#ifndef HASHES_SHA256_H
+#define HASHES_SHA256_H
 
 #include <inttypes.h>
 
@@ -240,4 +240,4 @@ int sha256_chain_verify_element(void *element,
 #endif
 
 /** @} */
-#endif /* _SHA256_H */
+#endif /* HASHES_SHA256_H */

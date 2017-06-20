@@ -49,13 +49,13 @@ void auto_init_tcs37727(void)
         int res = tcs37727_init(&tcs37727_devs[i], &tcs37727_params[i]);
         if (res != TCS37727_OK) {
             LOG_ERROR("[auto_init_saul] error initializing tcs37727 #%u\n", i);
+            continue;
         }
-        else {
-            saul_entries[i].dev = &(tcs37727_devs[i]);
-            saul_entries[i].name = tcs37727_saul_info[i].name;
-            saul_entries[i].driver = &tcs37727_saul_driver;
-            saul_reg_add(&(saul_entries[i]));
-        }
+
+        saul_entries[i].dev = &(tcs37727_devs[i]);
+        saul_entries[i].name = tcs37727_saul_info[i].name;
+        saul_entries[i].driver = &tcs37727_saul_driver;
+        saul_reg_add(&(saul_entries[i]));
     }
 }
 

@@ -1,8 +1,6 @@
 APPLICATION = gnrc_sock_udp
 include ../Makefile.tests_common
 
-RIOTBASE ?= $(CURDIR)/../..
-
 BOARD_INSUFFICIENT_MEMORY := nucleo32-f031 nucleo32-f042
 
 USEMODULE += gnrc_sock_check_reuse

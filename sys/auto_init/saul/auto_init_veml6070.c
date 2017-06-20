@@ -22,7 +22,7 @@
 
 #include "log.h"
 #include "saul_reg.h"
-
+#include "veml6070.h"
 #include "veml6070_params.h"
 
 /**
@@ -55,7 +55,7 @@ void auto_init_veml6070(void)
         if (veml6070_init(&veml6070_devs[i],
                           &veml6070_params[i]) != VEML6070_OK) {
             LOG_ERROR("[auto_init_saul] error initializing veml6070 #%u\n", i);
-            return;
+            continue;
         }
 
         saul_entries[(i)].dev = &(veml6070_devs[i]);

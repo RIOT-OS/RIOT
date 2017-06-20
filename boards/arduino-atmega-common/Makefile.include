@@ -1,21 +1,13 @@
 # include optional dependencies
 include $(RIOTBOARD)/arduino-atmega-common/Makefile.dep
 
-# define port used to flash the board
-OS = $(shell uname)
-ifeq ($(OS),Linux)
-  PORT = $(PORT_LINUX)
-else ifeq ($(OS),Darwin)
-  PORT ?= $(PORT_DARWIN)
-else
-  $(info CAUTION: No flash tool for your host system found!)
-  # TODO: fix for building under windows
-endif
+INCLUDES += -I$(RIOTBOARD)/arduino-atmega-common/include
 
-export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
-export TERMFLAGS ?= -b 9600 -p $(PORT)
+# refine serial port information
+export BAUD ?= 9600
+include $(RIOTMAKE)/tools/serial.inc.mk
+
 export FLASHER = avrdude
-export PORT
 export DIST_PATH = $(RIOTBOARD)/$(BOARD)/dist
 export DEBUGSERVER_PORT = 4242
 export DEBUGSERVER = $(DIST_PATH)/debug_srv.sh

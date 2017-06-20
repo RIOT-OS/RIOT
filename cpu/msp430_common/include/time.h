@@ -17,8 +17,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef MSPGCC_TIME_H
-#define MSPGCC_TIME_H
+#ifndef TIME_H
+#define TIME_H
 
 #include <sys/types.h>
 #include "msp430_types.h"
@@ -47,5 +47,5 @@ struct tm {
 }
 #endif
 
-#endif
+#endif /* TIME_H */
 /** @} */

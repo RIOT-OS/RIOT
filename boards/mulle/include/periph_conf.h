@@ -9,7 +9,7 @@
 
 
 /**
- * @ingroup     board_mulle
+ * @ingroup     boards_mulle
  * @{
  *
  * @file
@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef MULLE_PERIPH_CONF_H
-#define MULLE_PERIPH_CONF_H
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -43,7 +43,6 @@ extern "C"
 #define KINETIS_MCG_ERC_RANGE             0
 #define KINETIS_MCG_ERC_FREQ              (32768U)
 
-/* Base clocks, used by SystemCoreClockUpdate */
 /** Value of the external crystal or oscillator clock frequency in Hz */
 #define CPU_XTAL_CLK_HZ                 8000000u
 /** Value of the external 32k crystal or oscillator clock frequency in Hz */
@@ -56,7 +55,8 @@ extern "C"
 #define DEFAULT_SYSTEM_CLOCK            (CPU_XTAL32k_CLK_HZ * 2929u)
 
 /* bus clock for the peripherals */
-#define CLOCK_BUSCLOCK                  (DEFAULT_SYSTEM_CLOCK / 2)
+#define CLOCK_CORECLOCK                 (DEFAULT_SYSTEM_CLOCK)
+#define CLOCK_BUSCLOCK                  (CLOCK_CORECLOCK / 2)
 /** @} */
 
 /**
@@ -96,50 +96,35 @@ extern "C"
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (2U)
-#define UART_0_EN           1
-#define UART_1_EN           1
-#define UART_2_EN           0
-#define UART_3_EN           0
-#define UART_4_EN           0
-#define UART_IRQ_PRIO       CPU_DEFAULT_IRQ_PRIO
+static const uart_conf_t uart_config[] = {
+    {
+        .dev    = UART0,
+        .clken  = (volatile uint32_t*)(BITBAND_REGADDR(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT)),
+        .freq   = CLOCK_CORECLOCK,
+        .pin_rx = GPIO_PIN(PORT_A, 14),
+        .pin_tx = GPIO_PIN(PORT_A, 15),
+        .pcr_rx = PORT_PCR_MUX(3),
+        .pcr_tx = PORT_PCR_MUX(3),
+        .irqn   = UART0_RX_TX_IRQn,
+        .mode   = UART_MODE_8N1
+    },
+    {
+        .dev    = UART1,
+        .clken  = (volatile uint32_t*)(BITBAND_REGADDR(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT)),
+        .freq   = CLOCK_CORECLOCK,
+        .pin_rx = GPIO_PIN(PORT_C, 3),
+        .pin_tx = GPIO_PIN(PORT_C, 4),
+        .pcr_rx = PORT_PCR_MUX(3),
+        .pcr_tx = PORT_PCR_MUX(3),
+        .irqn   = UART1_RX_TX_IRQn,
+        .mode   = UART_MODE_8N1
+    },
+};
 
-/* UART 0 device configuration */
-#define UART_0_DEV          UART1
-#define UART_0_CLKEN()      (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT) = 1)
-#define UART_0_CLKDIS()     (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT) = 0)
-#define UART_0_CLK          (SystemSysClock)
-#define UART_0_IRQ_CHAN     UART1_RX_TX_IRQn
-#define UART_0_ISR          isr_uart1_status
-/* UART 0 pin configuration */
-#define UART_0_PORT_CLKEN() (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTC_SHIFT) = 1)
-#define UART_0_PORT         PORTC
-#define UART_0_TX_PIN       4
-#define UART_0_RX_PIN       3
-/* Function number in pin multiplex, see K60 Sub-Family Reference Manual,
- * section 10.3.1 K60 Signal Multiplexing and Pin Assignments */
-#define UART_0_AF           3
-#define UART_0_TX_PCR_MUX   3
-#define UART_0_RX_PCR_MUX   3
+#define UART_0_ISR          (isr_uart0_rx_tx)
+#define UART_1_ISR          (isr_uart1_rx_tx)
 
-/* UART 1 device configuration */
-#define UART_1_DEV          UART0
-#define UART_1_CLKEN()      (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT) = 1)
-#define UART_1_CLKDIS()     (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT) = 0)
-#define UART_1_CLK          (SystemSysClock)
-#define UART_1_IRQ_CHAN     UART0_RX_TX_IRQn
-#define UART_1_ISR          isr_uart0_status
-/* UART 1 pin configuration */
-#define UART_1_PORT_CLKEN() (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTA_SHIFT) = 1)
-#define UART_1_PORT         PORTA
-#define UART_1_TX_PIN       14
-#define UART_1_RX_PIN       15
-/* Function number in pin multiplex, see K60 Sub-Family Reference Manual,
- * section 10.3.1 K60 Signal Multiplexing and Pin Assignments */
-#define UART_1_AF           3
-#define UART_1_TX_PCR_MUX   3
-#define UART_1_RX_PCR_MUX   3
-
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**
@@ -265,9 +250,9 @@ static const spi_conf_t spi_config[] = {
         .pin_clk  = GPIO_PIN(PORT_D, 1),
         .pin_cs   = {
             GPIO_PIN(PORT_D, 0),
-            GPIO_UNDEF,
-            GPIO_UNDEF,
-            GPIO_UNDEF,
+            GPIO_PIN(PORT_D, 4),
+            GPIO_PIN(PORT_D, 5),
+            GPIO_PIN(PORT_D, 6),
             GPIO_UNDEF
         },
         .pcr      = GPIO_AF_2,
@@ -293,22 +278,6 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
-/**
- * @name I2C baud rate configuration
- * @{
- */
-/* Low (10 kHz): MUL = 4, SCL divider = 2560, total: 10240 */
-#define KINETIS_I2C_F_ICR_LOW        (0x3D)
-#define KINETIS_I2C_F_MULT_LOW       (2)
-/* Normal (100 kHz): MUL = 2, SCL divider = 240, total: 480 */
-#define KINETIS_I2C_F_ICR_NORMAL     (0x1F)
-#define KINETIS_I2C_F_MULT_NORMAL    (1)
-/* Fast (400 kHz): MUL = 1, SCL divider = 128, total: 128 */
-#define KINETIS_I2C_F_ICR_FAST       (0x17)
-#define KINETIS_I2C_F_MULT_FAST      (0)
-/* Fast plus (1000 kHz): MUL = 1, SCL divider = 48, total: 48 */
-#define KINETIS_I2C_F_ICR_FAST_PLUS  (0x10)
-#define KINETIS_I2C_F_MULT_FAST_PLUS (0)
 /** @} */
 
 /**
@@ -316,7 +285,7 @@ static const spi_conf_t spi_config[] = {
  * @{
  */
 #define I2C_NUMOF               (1U)
-#define I2C_CLK                 SystemBusClock
+#define I2C_CLK                 CLOCK_BUSCLOCK
 #define I2C_0_EN                1
 #define I2C_1_EN                0
 #define I2C_IRQ_PRIO            CPU_DEFAULT_IRQ_PRIO
@@ -334,6 +303,24 @@ static const spi_conf_t spi_config[] = {
 #define I2C_0_SDA_PIN           1
 #define I2C_0_SCL_PIN           2
 #define I2C_0_PORT_CFG          (PORT_PCR_MUX(I2C_0_PIN_AF) | PORT_PCR_ODE_MASK)
+/** @} */
+
+/**
+ * @name I2C baud rate configuration
+ * @{
+ */
+/* Low (10 kHz): MUL = 4, SCL divider = 2560, total: 10240 */
+#define KINETIS_I2C_F_ICR_LOW        (0x3D)
+#define KINETIS_I2C_F_MULT_LOW       (2)
+/* Normal (100 kHz): MUL = 2, SCL divider = 240, total: 480 */
+#define KINETIS_I2C_F_ICR_NORMAL     (0x1F)
+#define KINETIS_I2C_F_MULT_NORMAL    (1)
+/* Fast (400 kHz): MUL = 1, SCL divider = 128, total: 128 */
+#define KINETIS_I2C_F_ICR_FAST       (0x17)
+#define KINETIS_I2C_F_MULT_FAST      (0)
+/* Fast plus (1000 kHz): MUL = 1, SCL divider = 48, total: 48 */
+#define KINETIS_I2C_F_ICR_FAST_PLUS  (0x10)
+#define KINETIS_I2C_F_MULT_FAST_PLUS (0)
 /** @} */
 
 /**
@@ -389,5 +376,5 @@ static const spi_conf_t spi_config[] = {
 }
 #endif
 
-#endif /* MULLE_PERIPH_CONF_H */
+#endif /* PERIPH_CONF_H */
 /** @} */

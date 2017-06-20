@@ -353,6 +353,7 @@ int _ls_handler(int argc, char **argv)
     char *path = argv[1];
     uint8_t buf[16];
     int res;
+    int ret = 0;
     res = vfs_normalize_path(path, path, strlen(path) + 1);
     if (res < 0) {
         _errno_string(res, (char *)buf, sizeof(buf));
@@ -373,12 +374,13 @@ int _ls_handler(int argc, char **argv)
         res = vfs_readdir(&dir, &entry);
         if (res < 0) {
             _errno_string(res, (char *)buf, sizeof(buf));
-            printf("vfs_opendir error: %s\n", buf);
+            printf("vfs_readdir error: %s\n", buf);
             if (res == -EAGAIN) {
                 /* try again */
                 continue;
             }
-            return 2;
+            ret = 2;
+            break;
         }
         if (res == 0) {
             /* end of stream */
@@ -387,8 +389,17 @@ int _ls_handler(int argc, char **argv)
         printf("%s\n", entry.d_name);
         ++nfiles;
     }
-    printf("total %u files\n", nfiles);
-    return 0;
+    if (ret == 0) {
+        printf("total %u files\n", nfiles);
+    }
+
+    res = vfs_closedir(&dir);
+    if (res < 0) {
+        _errno_string(res, (char *)buf, sizeof(buf));
+        printf("vfs_closedir error: %s\n", buf);
+        return 2;
+    }
+    return ret;
 }
 
 int _vfs_handler(int argc, char **argv)

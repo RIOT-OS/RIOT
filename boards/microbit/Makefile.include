@@ -7,11 +7,11 @@ PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.inc.mk
 
 # we support flashing through plain fscopy or using JLink
-FLASHTOOL ?= fscopy
-ifeq (fscopy,$(FLASHTOOL))
+PROGRAMMER ?= fscopy
+ifeq (fscopy,$(PROGRAMMER))
   export OFLAGS = -O ihex
   export HEXFILE = $(ELFFILE:.elf=.hex)
   export FFLAGS =
@@ -20,9 +20,9 @@ ifeq (fscopy,$(FLASHTOOL))
   export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
   export DEBUGGER =
   export DEBUGSERVER =
-else ifeq (jlink,$(FLASHTOOL))
+else ifeq (jlink,$(PROGRAMMER))
   export JLINK_DEVICE := nrf51822
-  include $(RIOTBOARD)/Makefile.include.jlink
+  include $(RIOTMAKE)/tools/jlink.inc.mk
 else
   $(info ERROR: invalid flash tool specified)
 endif

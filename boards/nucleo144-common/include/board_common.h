@@ -25,13 +25,14 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "arduino_pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED0_PIN            GPIO_PIN(PORT_B, 0)

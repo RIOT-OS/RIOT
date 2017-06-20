@@ -26,16 +26,24 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Starting offset of CPU_ID
+ */
+#define CPUID_ADDR          (&NRF_FICR->DEVICEID[0])
+/**
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (8U)
 
 /**
- * @brief   Override macro for defining GPIO pins
+ * @name    Override macro for defining GPIO pins
  *
  * The port definition is used (and zeroed) to suppress compiler warnings
  */
+#ifdef CPU_MODEL_NRF52840XXAA
+#define GPIO_PIN(x,y)       ((x << 5) | y)
+#else
 #define GPIO_PIN(x,y)       ((x & 0) | y)
+#endif
 
 /**
  * @brief   Generate GPIO mode bitfields

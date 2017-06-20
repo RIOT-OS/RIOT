@@ -28,25 +28,24 @@ extern "C" {
 #endif
 
 /**
- * @name Clock system configuration
+ * @name    Clock system configuration
  * @{
  */
-#define CLOCK_HSE           (8000000U)          /* external oscillator */
-#define CLOCK_CORECLOCK     (120000000U)        /* desired core clock frequency */
-
-/* the actual PLL values are automatically generated */
-#define CLOCK_PLL_M         (CLOCK_HSE / 1000000)
-#define CLOCK_PLL_N         ((CLOCK_CORECLOCK / 1000000) * 2)
-#define CLOCK_PLL_P         (2U)
-#define CLOCK_PLL_Q         (CLOCK_PLL_N / 48)
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2
-#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_5WS
-
-/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
+/* 0: no external high speed crystal available
+ * else: actual crystal frequency [in Hz] */
+#define CLOCK_HSE           (8000000U)
+/* 0: no external low speed crystal available,
+ * 1: external crystal available (always 32.768kHz) */
+#define CLOCK_LSE           (1)
+/* give the target core clock (HCLK) frequency [in Hz],
+ * maximum: 120MHz */
+#define CLOCK_CORECLOCK     (120000000U)
+/* peripheral clock setup */
+#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1      /* min 25MHz */
 #define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4     /* max 30MHz */
 #define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
+#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2     /* max 60MHz */
 #define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
 /** @} */
 
@@ -56,22 +55,32 @@ extern "C" {
  */
 static const pwm_conf_t pwm_config[] = {
     {
-        .dev      = TIM3,
-        .rcc_mask = RCC_APB1ENR_TIM3EN,
-        .chan     = { { .pin = GPIO_PIN(PORT_C, 6), .cc_chan = 0 },
-                      { .pin = GPIO_PIN(PORT_C, 7), .cc_chan = 1 },
-                      { .pin = GPIO_PIN(PORT_C, 8), .cc_chan = 2 },
-                      { .pin = GPIO_PIN(PORT_C, 9), .cc_chan = 3 } },
+        .dev      = TIM1,
+        .rcc_mask = RCC_APB2ENR_TIM1EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_E,  9) /* D6 */, .cc_chan = 0},
+                      { .pin = GPIO_PIN(PORT_E, 11) /* D5 */, .cc_chan = 1},
+                      { .pin = GPIO_PIN(PORT_E, 13) /* D3 */, .cc_chan = 2},
+                      { .pin = GPIO_UNDEF,                    .cc_chan = 0} },
+        .af       = GPIO_AF1,
+        .bus      = APB2
+    },
+    {
+        .dev      = TIM4,
+        .rcc_mask = RCC_APB1ENR_TIM4EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_D, 15) /* D9 */, .cc_chan = 3},
+                      { .pin = GPIO_UNDEF,                    .cc_chan = 0},
+                      { .pin = GPIO_UNDEF,                    .cc_chan = 0},
+                      { .pin = GPIO_UNDEF,                    .cc_chan = 0} },
         .af       = GPIO_AF2,
         .bus      = APB1
-    }
+    },
 };
 
 #define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
 /** @} */
 
 /**
- * @name   Timer configuration
+ * @name    Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -88,25 +97,17 @@ static const timer_conf_t timer_config[] = {
         .rcc_mask = RCC_APB1ENR_TIM5EN,
         .bus      = APB1,
         .irqn     = TIM5_IRQn
-    },
-    {
-        .dev      = TIM4,
-        .max      = 0xffffffff,
-        .rcc_mask = RCC_APB1ENR_TIM4EN,
-        .bus      = APB1,
-        .irqn     = TIM4_IRQn
     }
 };
 
 #define TIMER_0_ISR         isr_tim2
 #define TIMER_1_ISR         isr_tim5
-#define TIMER_2_ISR         isr_tim3
-#define TIMER_3_ISR         isr_tim4
 
 #define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
+
 /**
- * @name   UART configuration
+ * @name    UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -125,6 +126,20 @@ static const uart_conf_t uart_config[] = {
 #endif
     },
     {
+        .dev        = USART6,
+        .rcc_mask   = RCC_APB2ENR_USART6EN,
+        .rx_pin     = GPIO_PIN(PORT_G, 9),
+        .tx_pin     = GPIO_PIN(PORT_G, 14),
+        .rx_af      = GPIO_AF8,
+        .tx_af      = GPIO_AF8,
+        .bus        = APB2,
+        .irqn       = USART6_IRQn,
+#ifdef UART_USE_DMA
+        .dma_stream = 6,
+        .dma_chan   = 4
+#endif
+    },
+    {
         .dev        = USART2,
         .rcc_mask   = RCC_APB1ENR_USART2EN,
         .rx_pin     = GPIO_PIN(PORT_D, 6),
@@ -134,40 +149,26 @@ static const uart_conf_t uart_config[] = {
         .bus        = APB1,
         .irqn       = USART2_IRQn,
 #ifdef UART_USE_DMA
-        .dma_stream = 6,
-        .dma_chan   = 4
-#endif
-    },
-    {
-        .dev        = USART1,
-        .rcc_mask   = RCC_APB2ENR_USART1EN,
-        .rx_pin     = GPIO_PIN(PORT_A, 10),
-        .tx_pin     = GPIO_PIN(PORT_A,  9),
-        .rx_af      = GPIO_AF7,
-        .tx_af      = GPIO_AF7,
-        .bus        = APB2,
-        .irqn       = USART1_IRQn,
-#ifdef UART_USE_DMA
         .dma_stream = 7,
         .dma_chan   = 4
 #endif
-    }
+    },
 };
 
 #define UART_0_ISR          (isr_usart3)
 #define UART_0_DMA_ISR      (isr_dma1_stream3)
 
-#define UART_1_ISR          (isr_usart2)
+#define UART_1_ISR          (isr_usart6)
 #define UART_1_DMA_ISR      (isr_dma1_stream6)
 
-#define UART_2_ISR          (isr_usart1)
+#define UART_2_ISR          (isr_usart2)
 #define UART_2_DMA_ISR      (isr_dma1_stream7)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**
- * @name   SPI configuration
+ * @name    SPI configuration
  *
  * @note    The spi_divtable is auto-generated from
  *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
@@ -217,7 +218,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name I2C configuration
+ * @name    I2C configuration
  * @{
  */
 #define I2C_NUMOF           (1U)
@@ -247,7 +248,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name   ADC configuration
+ * @name    ADC configuration
  *
  * We need to define the following fields:
  * PIN, device (ADCx), channel
@@ -262,14 +263,14 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name   DAC configuration
+ * @name    DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)
 /** @} */
 
 /**
- * @brief   RTC configuration
+ * @name    RTC configuration
  * @{
  */
 #define RTC_NUMOF           (1)

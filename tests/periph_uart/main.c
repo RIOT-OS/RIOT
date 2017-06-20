@@ -52,7 +52,7 @@ static char printer_stack[THREAD_STACKSIZE_MAIN];
 
 static int parse_dev(char *arg)
 {
-    unsigned dev = (unsigned)atoi(arg);
+    unsigned dev = atoi(arg);
     if (dev >= UART_NUMOF) {
         printf("Error: Invalid UART_DEV device specified (%u).\n", dev);
         return -1;
@@ -121,7 +121,7 @@ static int cmd_init(int argc, char **argv)
     if (dev < 0) {
         return 1;
     }
-    baud = (uint32_t)atoi(argv[2]);
+    baud = atoi(argv[2]);
 
     /* initialize UART */
     res = uart_init(UART_DEV(dev), baud, rx_cb, (void *)dev);

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_mulle Eistec Mulle
+ * @defgroup    boards_mulle Eistec Mulle
  * @ingroup     boards
  * @brief       Board specific files for Eistec Mulle IoT boards
  * @{
@@ -24,6 +24,7 @@
 #include "cpu.h"
 #include "periph_conf.h"
 #include "mulle-nvram.h"
+#include "mtd.h"
 
 /* Use the on board RTC 32kHz clock for LPTMR clocking. */
 #undef LPTIMER_CLKSRC
@@ -32,6 +33,11 @@
 
 /** Disable hardware watchdog, for debugging purposes, don't use this on production builds. */
 #define DISABLE_WDOG    1
+
+/**
+ * @brief Use the UART1 for STDIO on this board
+ */
+#define UART_STDIO_DEV      UART_DEV(1)
 
 /**
  * @brief   xtimer configuration
@@ -75,17 +81,17 @@
 #define LED1_PIN            GPIO_PIN(PORT_C, LED1_BIT)
 #define LED2_PIN            GPIO_PIN(PORT_C, LED2_BIT)
 
-#define LED0_ON             (BITBAND_REG32(LED_PORT->PSOR, LED0_BIT) = 1)
-#define LED0_OFF            (BITBAND_REG32(LED_PORT->PCOR, LED0_BIT) = 1)
-#define LED0_TOGGLE         (BITBAND_REG32(LED_PORT->PTOR, LED0_BIT) = 1)
+#define LED0_ON             (LED_PORT->PSOR = (1 << LED0_BIT))
+#define LED0_OFF            (LED_PORT->PCOR = (1 << LED0_BIT))
+#define LED0_TOGGLE         (LED_PORT->PTOR = (1 << LED0_BIT))
 
-#define LED1_ON             (BITBAND_REG32(LED_PORT->PSOR, LED1_BIT) = 1)
-#define LED1_OFF            (BITBAND_REG32(LED_PORT->PCOR, LED1_BIT) = 1)
-#define LED1_TOGGLE         (BITBAND_REG32(LED_PORT->PTOR, LED1_BIT) = 1)
+#define LED1_ON             (LED_PORT->PSOR = (1 << LED1_BIT))
+#define LED1_OFF            (LED_PORT->PCOR = (1 << LED1_BIT))
+#define LED1_TOGGLE         (LED_PORT->PTOR = (1 << LED1_BIT))
 
-#define LED2_ON             (BITBAND_REG32(LED_PORT->PSOR, LED2_BIT) = 1)
-#define LED2_OFF            (BITBAND_REG32(LED_PORT->PCOR, LED2_BIT) = 1)
-#define LED2_TOGGLE         (BITBAND_REG32(LED_PORT->PTOR, LED2_BIT) = 1)
+#define LED2_ON             (LED_PORT->PSOR = (1 << LED2_BIT))
+#define LED2_OFF            (LED_PORT->PCOR = (1 << LED2_BIT))
+#define LED2_TOGGLE         (LED_PORT->PTOR = (1 << LED2_BIT))
 /** @} */
 
 #ifdef __cplusplus
@@ -110,7 +116,7 @@ void board_init(void);
  */
 #define AT86RF2XX_PARAMS_BOARD      {.spi = SPI_DEV(0), \
                                      .spi_clk = SPI_CLK_5MHZ, \
-                                     .cs_pin = GPIO_PIN(PORT_D, 4), \
+                                     .cs_pin = SPI_HWCS(1), \
                                      .int_pin = GPIO_PIN(PORT_B, 9), \
                                      .sleep_pin = GPIO_PIN(PORT_E, 6), \
                                      .reset_pin = GPIO_PIN(PORT_C, 12)}
@@ -142,9 +148,25 @@ void board_init(void);
 /** @{ */
 #define MULLE_NVRAM_SPI_DEV             SPI_DEV(0)
 #define MULLE_NVRAM_SPI_CLK             SPI_CLK_5MHZ
-#define MULLE_NVRAM_SPI_CS              GPIO_PIN(PORT_D, 6) /**< FRAM CS pin */
+#define MULLE_NVRAM_SPI_CS              SPI_HWCS(3) /**< FRAM CS pin */
 #define MULLE_NVRAM_CAPACITY            512     /**< FRAM size, in bytes */
 #define MULLE_NVRAM_SPI_ADDRESS_COUNT   1       /**< FRAM addressing size, in bytes */
+/** @} */
+
+/**
+ * @name Mulle NOR flash hardware configuration
+ */
+/** @{ */
+#define MULLE_NOR_SPI_DEV               SPI_DEV(0)
+#define MULLE_NOR_SPI_CLK               SPI_CLK_5MHZ
+#define MULLE_NOR_SPI_CS                SPI_HWCS(2) /**< Flash CS pin */
+/** @} */
+/**
+ * @name MTD configuration
+ */
+/** @{ */
+extern mtd_dev_t *mtd0;
+#define MTD_0 mtd0
 /** @} */
 
 /**

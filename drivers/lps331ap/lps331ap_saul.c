@@ -33,13 +33,8 @@ static int read(void *dev, phydat_t *res)
     return 1;
 }
 
-static int write(void *dev, phydat_t *state)
-{
-    return -ENOTSUP;
-}
-
 const saul_driver_t lps331ap_saul_driver = {
     .read = read,
-    .write = write,
+    .write = saul_notsup,
     .type = SAUL_SENSE_PRESS,
 };

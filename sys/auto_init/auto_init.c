@@ -20,10 +20,6 @@
 
 #include "auto_init.h"
 
-#ifdef MODULE_IO1_XPLAINED
-#include "io1_xplained.h"
-#endif
-
 #ifdef MODULE_SHT11
 #include "sht11.h"
 #endif
@@ -76,6 +72,10 @@
 #include "lwip.h"
 #endif
 
+#ifdef MODULE_OPENTHREAD
+#include "ot.h"
+#endif
+
 #ifdef MODULE_FIB
 #include "net/fib.h"
 #endif
@@ -103,10 +103,6 @@ void auto_init(void)
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");
     rtc_init();
-#endif
-#ifdef MODULE_IO1_XPLAINED
-    DEBUG("Auto init IO1 Xplained extension module.\n");
-    io1_xplained_auto_init();
 #endif
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");
@@ -147,6 +143,10 @@ void auto_init(void)
 #ifdef MODULE_LWIP
     DEBUG("Bootstraping lwIP.\n");
     lwip_bootstrap();
+#endif
+#ifdef MODULE_OPENTHREAD
+    extern void openthread_bootstrap(void);
+    openthread_bootstrap();
 #endif
 #ifdef MODULE_GCOAP
     DEBUG("Auto init gcoap module.\n");
@@ -279,6 +279,10 @@ void auto_init(void)
     extern void auto_init_lis3dh(void);
     auto_init_lis3dh();
 #endif
+#ifdef MODULE_MAG3110
+    extern void auto_init_mag3110(void);
+    auto_init_mag3110();
+#endif
 #ifdef MODULE_MMA8X5X
     extern void auto_init_mma8x5x(void);
     auto_init_mma8x5x();
@@ -291,9 +295,9 @@ void auto_init(void)
     extern void auto_init_bmp180(void);
     auto_init_bmp180();
 #endif
-#ifdef MODULE_BME280
-    extern void auto_init_bme280(void);
-    auto_init_bme280();
+#if defined(MODULE_BME280) || defined(MODULE_BMP280)
+    extern void auto_init_bmx280(void);
+    auto_init_bmx280();
 #endif
 #ifdef MODULE_JC42
     extern void auto_init_jc42(void);
@@ -311,6 +315,10 @@ void auto_init(void)
     extern void auto_init_dht(void);
     auto_init_dht();
 #endif
+#ifdef MODULE_TMP006
+    extern void auto_init_tmp006(void);
+    auto_init_tmp006();
+#endif
 #ifdef MODULE_TCS37727
     extern void auto_init_tcs37727(void);
     auto_init_tcs37727();
@@ -319,9 +327,17 @@ void auto_init(void)
     extern void auto_init_veml6070(void);
     auto_init_veml6070();
 #endif
+#ifdef MODULE_IO1_XPLAINED
+    extern void auto_init_io1_xplained(void);
+    auto_init_io1_xplained();
+#endif
 #ifdef MODULE_ADXL345
     extern void auto_init_adxl345(void);
     auto_init_adxl345();
+#endif
+#ifdef MODULE_LSM6DSL
+    extern void auto_init_lsm6dsl(void);
+    auto_init_lsm6dsl();
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */

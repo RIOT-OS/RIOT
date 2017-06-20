@@ -32,39 +32,35 @@ extern "C" {
  * @{
  */
 #ifndef ADXL345_PARAM_I2C
-#define ADXL345_PARAM_I2C       (I2C_DEV(0))
+#define ADXL345_PARAM_I2C           (I2C_DEV(0))
 #endif
 #ifndef ADXL345_PARAM_ADDR
-#define ADXL345_PARAM_ADDR      (ADXL345_ADDR_53)
+#define ADXL345_PARAM_ADDR          (ADXL345_ADDR_53)
 #endif
 #ifndef ADXL345_PARAM_RATE
-#define ADXL345_PARAM_RATE      (ADXL345_RATE_200HZ)
+#define ADXL345_PARAM_RATE          (ADXL345_RATE_200HZ)
 #endif
 #ifndef ADXL345_PARAM_RANGE
-#define ADXL345_PARAM_RANGE     (ADXL345_RANGE_16G)
-#endif
-#ifndef ADXL345_PARAM_OFFSET
-#define ADXL345_PARAM_OFFSET    { 0, 0, 0 }
+#define ADXL345_PARAM_RANGE         (ADXL345_RANGE_16G)
 #endif
 #ifndef ADXL345_PARAM_INTERRUPT
-#define ADXL345_PARAM_INTERRUPT {0x0F, 0xBF, 0x40, 0xF0, 0xFF, 0x00, 0x00, \
-                                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0F}
+#define ADXL345_PARAM_INTERRUPT     {0x0F, 0xBF, 0x40, 0xF0, 0xFF, 0x00, 0x00, \
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0F}
 #endif
 #ifndef ADXL345_PARAM_FULL_RES
-#define ADXL345_PARAM_FULL_RES     (1)
+#define ADXL345_PARAM_FULL_RES      (1)
+#endif
+#ifndef ADXL345_PARAM_OFFSET
+#define ADXL345_PARAM_OFFSET        { 0, 0, 0 }
 #endif
 #ifndef ADXL345_PARAM_SCALE_FACTOR
-#define ADXL345_PARAM_SCALE_FACTOR (3.9)
+#define ADXL345_PARAM_SCALE_FACTOR  (3.9)
 #endif
 #ifndef ADXL345_PARAMS
-#define ADXL345_PARAMS          { .i2c    = ADXL345_PARAM_I2C, \
-                                  .addr   = ADXL345_PARAM_ADDR, \
-                                  .rate   = ADXL345_PARAM_RATE, \
-                                  .range  = ADXL345_PARAM_RANGE, \
-                                  .offset = ADXL345_PARAM_OFFSET, \
-                                  .interrupt = ADXL345_PARAM_INTERRUPT, \
-                                  .full_res = ADXL345_PARAM_FULL_RES, \
-                                  .scale_factor = ADXL345_PARAM_SCALE_FACTOR}
+#define ADXL345_PARAMS              { .offset = ADXL345_PARAM_OFFSET,    \
+                                      .range  = ADXL345_PARAM_RANGE,     \
+                                      .rate   = ADXL345_PARAM_RATE,      \
+                                      .full_res = ADXL345_PARAM_FULL_RES }
 #endif
 /**@}*/
 

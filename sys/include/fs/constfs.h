@@ -21,8 +21,8 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef CONSTFS_H_
-#define CONSTFS_H_
+#ifndef FS_CONSTFS_H
+#define FS_CONSTFS_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -61,6 +61,6 @@ extern const vfs_file_system_t constfs_file_system;
 }
 #endif
 
-#endif
+#endif /* FS_CONSTFS_H */
 
 /** @} */

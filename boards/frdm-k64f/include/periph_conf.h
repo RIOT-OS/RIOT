@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     board_frdm-k64f
+ * @ingroup     boards_frdm-k64f
  * @{
  *
  * @file
@@ -79,24 +79,23 @@ extern "C"
 * @name UART configuration
 * @{
 */
-#define UART_NUMOF                   (1U)
-#define UART_0_EN                    1
-#define UART_IRQ_PRIO                1
-#define UART_CLK                     CLOCK_CORECLOCK
+static const uart_conf_t uart_config[] = {
+    {
+        .dev    = UART0,
+        .clken  = (volatile uint32_t*)(BITBAND_REGADDR(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT)),
+        .freq   = CLOCK_CORECLOCK,
+        .pin_rx = GPIO_PIN(PORT_B, 16),
+        .pin_tx = GPIO_PIN(PORT_B, 17),
+        .pcr_rx = PORT_PCR_MUX(3),
+        .pcr_tx = PORT_PCR_MUX(3),
+        .irqn   = UART0_RX_TX_IRQn,
+        .mode   = UART_MODE_8N1
+    },
+};
 
-/* UART 0 device configuration */
-#define KINETIS_UART                 UART_Type
-#define UART_0_DEV                   UART0
-#define UART_0_CLKEN()               (SIM->SCGC4 |= (SIM_SCGC4_UART0_MASK))
-#define UART_0_CLK                   UART_CLK
-#define UART_0_IRQ_CHAN              UART0_RX_TX_IRQn
-#define UART_0_ISR                   isr_uart0_rx_tx
-/* UART 0 pin configuration */
-#define UART_0_PORT_CLKEN()          (SIM->SCGC5 |= (SIM_SCGC5_PORTB_MASK))
-#define UART_0_PORT                  PORTB
-#define UART_0_RX_PIN                16
-#define UART_0_TX_PIN                17
-#define UART_0_AF                    3
+#define UART_0_ISR          (isr_uart0_rx_tx)
+
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**

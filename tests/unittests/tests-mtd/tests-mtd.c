@@ -27,7 +27,7 @@
 
 /* Define MTD_0 in board.h to use the board mtd if any */
 #ifdef MTD_0
-#define _dev MTD_0
+#define dev (MTD_0)
 #else
 /* Test mock object implementing a simple RAM-based mtd */
 #ifndef SECTOR_COUNT
@@ -116,27 +116,24 @@ static mtd_dev_t _dev = {
     .pages_per_sector = PAGE_PER_SECTOR,
     .page_size = PAGE_SIZE,
 };
+
+static mtd_dev_t *dev = (mtd_dev_t*) &_dev;
+
 #endif /* MTD_0 */
 
 static void setup_teardown(void)
 {
-    mtd_dev_t *dev = (mtd_dev_t*) &_dev;
-
     mtd_erase(dev, 0, dev->pages_per_sector * dev->page_size);
 }
 
 static void test_mtd_init(void)
 {
-    mtd_dev_t *dev = (mtd_dev_t*) &_dev;
-
     int ret = mtd_init(dev);
     TEST_ASSERT_EQUAL_INT(0, ret);
 }
 
 static void test_mtd_erase(void)
 {
-    mtd_dev_t *dev = (mtd_dev_t*) &_dev;
-
     /* Erase first sector */
     int ret = mtd_erase(dev, 0, dev->pages_per_sector * dev->page_size);
     TEST_ASSERT_EQUAL_INT(0, ret);
@@ -162,7 +159,6 @@ static void test_mtd_erase(void)
 
 static void test_mtd_write_erase(void)
 {
-    mtd_dev_t *dev = (mtd_dev_t*) &_dev;
     const char buf[] = "ABCDEFGHIJK";
     uint8_t buf_empty[] = {0xff, 0xff, 0xff};
     char buf_read[sizeof(buf) + sizeof(buf_empty)];
@@ -184,7 +180,6 @@ static void test_mtd_write_erase(void)
 
 static void test_mtd_write_read(void)
 {
-    mtd_dev_t *dev = (mtd_dev_t*) &_dev;
     const char buf[] = "ABCDEFGH";
     uint8_t buf_empty[] = {0xff, 0xff, 0xff};
     char buf_read[sizeof(buf) + sizeof(buf_empty)];
@@ -219,9 +214,9 @@ static void test_mtd_write_read(void)
     TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
 }
 
+#ifdef MTD_0
 static void test_mtd_write_read_flash(void)
 {
-    mtd_dev_t *dev = (mtd_dev_t*) &_dev;
     const uint8_t buf1[] = {0xee, 0xdd, 0xcc};
     const uint8_t buf2[] = {0x33, 0x33, 0x33};
     const uint8_t buf_expected[] = {0x22, 0x11, 0x0};
@@ -242,12 +237,13 @@ static void test_mtd_write_read_flash(void)
     TEST_ASSERT_EQUAL_INT(0, memcmp(buf_expected, buf_read, sizeof(buf_expected)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(buf_empty, buf_read + sizeof(buf_expected), sizeof(buf_empty)));
 }
+#endif
 
 #if MODULE_VFS
 static void test_mtd_vfs(void)
 {
     int fd;
-    fd = vfs_bind(VFS_ANY_FD, O_RDWR, &mtd_vfs_ops, &_dev);
+    fd = vfs_bind(VFS_ANY_FD, O_RDWR, &mtd_vfs_ops, dev);
     const char buf[] = "mnopqrst";
     uint8_t buf_empty[] = {0xff, 0xff, 0xff};
     char buf_read[sizeof(buf) + sizeof(buf_empty)];
@@ -279,7 +275,9 @@ Test *tests_mtd_tests(void)
         new_TestFixture(test_mtd_erase),
         new_TestFixture(test_mtd_write_erase),
         new_TestFixture(test_mtd_write_read),
+#ifdef MTD_0
         new_TestFixture(test_mtd_write_read_flash),
+#endif
 #if MODULE_VFS
         new_TestFixture(test_mtd_vfs),
 #endif

@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     board_remote
+ * @ingroup     boards_remote-revb
  * @{
  *
  * @file

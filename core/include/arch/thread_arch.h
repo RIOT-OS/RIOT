@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef THREAD_ARCH_H
-#define THREAD_ARCH_H
+#ifndef ARCH_THREAD_ARCH_H
+#define ARCH_THREAD_ARCH_H
 
 #include "kernel_defines.h"
 
@@ -92,5 +92,5 @@ void thread_arch_yield(void);
 }
 #endif
 
-#endif /* THREAD_ARCH_H */
+#endif /* ARCH_THREAD_ARCH_H */
 /** @} */

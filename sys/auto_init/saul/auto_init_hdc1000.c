@@ -23,7 +23,6 @@
 
 #include "log.h"
 #include "saul_reg.h"
-
 #include "hdc1000.h"
 #include "hdc1000_params.h"
 
@@ -59,17 +58,17 @@ void auto_init_hdc1000(void)
         int res = hdc1000_init(&hdc1000_devs[i], &hdc1000_params[i]);
         if (res < 0) {
             LOG_ERROR("[auto_init_saul] error initializing hdc1000 #%u\n", i);
+            continue;
         }
-        else {
-            saul_entries[(i * 2)].dev = &(hdc1000_devs[i]);
-            saul_entries[(i * 2)].name = hdc1000_saul_info[i].name;
-            saul_entries[(i * 2)].driver = &hdc1000_saul_temp_driver;
-            saul_entries[(i * 2) + 1].dev = &(hdc1000_devs[i]);
-            saul_entries[(i * 2) + 1].name = hdc1000_saul_info[i].name;
-            saul_entries[(i * 2) + 1].driver = &hdc1000_saul_hum_driver;
-            saul_reg_add(&(saul_entries[(i * 2)]));
-            saul_reg_add(&(saul_entries[(i * 2) + 1]));
-        }
+
+        saul_entries[(i * 2)].dev = &(hdc1000_devs[i]);
+        saul_entries[(i * 2)].name = hdc1000_saul_info[i].name;
+        saul_entries[(i * 2)].driver = &hdc1000_saul_temp_driver;
+        saul_entries[(i * 2) + 1].dev = &(hdc1000_devs[i]);
+        saul_entries[(i * 2) + 1].name = hdc1000_saul_info[i].name;
+        saul_entries[(i * 2) + 1].driver = &hdc1000_saul_hum_driver;
+        saul_reg_add(&(saul_entries[(i * 2)]));
+        saul_reg_add(&(saul_entries[(i * 2) + 1]));
     }
 }
 

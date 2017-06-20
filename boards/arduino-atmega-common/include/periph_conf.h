@@ -12,8 +12,7 @@
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the arduino Uno and
- * @brief       Dumilanove boards.
+ * @brief       Common configuration of MCU periphery for Arduino Atmega boards
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Laurent Navet <laurent.navet@gmail.com>
@@ -28,14 +27,14 @@ extern "C" {
 #endif
 
 /**
- * @brief   Clock configuration
+ * @name    Clock configuration
  * @{
  */
 #define CLOCK_CORECLOCK     (16000000L)
 /** @} */
 
 /**
- * @name   Timer configuration
+ * @name    Timer configuration
  *
  * arduino uno and arduino duemilanove:
  * The timer driver only supports the 16-bit timer (Timer1)
@@ -74,12 +73,10 @@ extern "C" {
 #define TIMER_1_ISRB        TIMER4_COMPB_vect
 #define TIMER_1_ISRC        TIMER4_COMPC_vect
 #endif
-
-
 /** @} */
 
 /**
- * @name   UART configuration
+ * @name    UART configuration
  *
  * The UART devices have fixed pin mappings, so all we need to do, is to specify
  * which devices we would like to use and their corresponding RX interrupts. See
@@ -112,7 +109,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name   SPI configuration
+ * @name    SPI configuration
  *
  * The atmega2560 has only one hardware SPI with fixed pin configuration, so all
  * we can do here, is to enable or disable it...

@@ -72,7 +72,7 @@ int jc42_get_temperature(jc42_t* dev, int16_t* temperature)
     if (jc42_get_register(dev, JC42_REG_TEMP, &tmp) != 0) {
         return JC42_NODEV;
     }
-    tmp = NTOHS(tmp);
+    tmp = ntohs(tmp);
     /* Convert fixed point to uint16_t */
     *temperature = ((s.x = tmp)*100)>>4;
     return JC42_OK;

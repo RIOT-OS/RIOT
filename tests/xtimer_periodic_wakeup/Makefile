@@ -1,7 +1,5 @@
-APPLICATION = xtimer_sleep_until
+APPLICATION = xtimer_periodic_wakeup
 include ../Makefile.tests_common
-
-RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := chronos
 

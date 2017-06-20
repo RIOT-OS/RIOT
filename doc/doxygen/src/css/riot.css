@@ -1,0 +1,511 @@
+/*
+ * riot.css
+ * Copyright (C) 2017 Freie Universität Berlin
+ *
+ * Distributed under terms of the LGPLv2.1 license (see LICENSE file).
+ */
+table,
+div,
+p,
+dl {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#brand-logo {
+  padding: 5px 0px 5px 0px;
+}
+.navbar {
+  margin-bottom: 0px;
+}
+.navbar-inverse {
+  border-radius: 0px;
+  border-bottom: 3px #1a1a1a solid;
+}
+.nav-tabs-regs {
+  margin-top: 1px;
+  border-bottom: 1px solid #1a1a1a;
+}
+.nav-tabs-regs > li.active > a {
+  border: 1px solid #1a1a1a;
+  border-bottom-color: transparent;
+}
+#MSearchBox {
+  background-color: inherit;
+  float: none;
+  margin-top: 0;
+  right: auto;
+  width: auto;
+  position: static;
+  white-space: nowrap;
+}
+#MSearchClose {
+  position: absolute;
+  color: #515151;
+  right: 10px;
+  top: 6px;
+  bottom: auto;
+  height: 14px;
+  margin: auto;
+  font-size: 14px;
+  z-index: 3;
+}
+#FSearchBox #MSearchField {
+  margin-left: auto;
+}
+#MSearchField {
+  background: #000000;
+  border: #eeeeee solid 1px;
+  color: #ffffff;
+  display: inline;
+  font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  height: 34px;
+  width: 150px;
+  padding: 6px 12px;
+  position: static;
+  outline: inherit;
+  margin: auto;
+  font-size: 14px;
+  z-index: 1;
+}
+#MSearchSelect {
+  position: relative;
+  display: inline;
+  height: auto;
+  width: auto;
+}
+.MSearchBoxActive #MSearchField {
+  color: #ffffff;
+}
+.MSearchBoxInactive #MSearchField {
+  color: #555555;
+}
+#MSearchSelectWindow {
+  background-color: #000000;
+}
+a.SelectItem,
+a.SelectItem:focus,
+a.SelectItem:active {
+  color: #3fa687;
+}
+#nav-sync {
+  display: none;
+}
+#nav-tree {
+  background: #f5f5f5;
+}
+#nav-tree img,
+#nav-tree span {
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+}
+#side-nav {
+  padding-right: 3px;
+}
+.ui-resizable-e {
+  background: #e3e3e3;
+  width: 3px;
+}
+#nav-sync img {
+  opacity: 0.5;
+}
+div.toc,
+div.toc-sm {
+  min-height: 20px;
+  margin-bottom: 20px;
+  background-color: #f5f5f5;
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+div.toc {
+  padding: 19px;
+}
+div.toc-sm {
+  padding: 8px;
+}
+div.toc h3,
+div.toc-sm h3 {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+div.toc-sm h3 {
+  margin-top: 0px;
+}
+div.toc-sm ul {
+  list-style: none;
+  margin: 0;
+  padding-left: 10px;
+}
+div.toc li,
+div.toc-sm li {
+  background: none;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin-left: 0;
+}
+div.ingroups {
+  font-size: 10pt;
+}
+div.header {
+  background: none;
+  border-bottom: 1px solid #eeeeee;
+}
+h1.glow,
+h2.glow,
+h3.glow,
+h4.glow,
+h5.glow,
+h6.glow {
+  text-shadow: 0 0 15px #cce6c7;
+}
+h2.groupheader {
+  border-color: #eeeeee;
+  color: inherit;
+}
+tr.heading h2 {
+  margin-bottom: 0px;
+}
+.memSeparator {
+  border-bottom: 1px solid #eeeeee;
+}
+.title {
+  color: inherit;
+  font-family: "Miso", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 45px;
+  line-height: 64px;
+  font-weight: normal;
+}
+#projectname,
+#projectbrief,
+#projectnumber {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#projectbrief {
+  font-size: 10px;
+}
+pre.fragment {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+div.fragment {
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  color: inherit;
+  display: block;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.42857143;
+  margin: 0 0 10px;
+  overflow: visible;
+  page-break-inside: avoid;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+div.line.glow {
+  background-color: #d8eed8;
+  box-shadow: 0 0 10px #cce6c7;
+  -webkit-box-shadow: 0 0 15px #cce6c7;
+}
+span.lineno {
+  background-color: transparent;
+  border-right: 2px solid #e3e3e3;
+}
+span.lineno a {
+  background-color: transparent;
+}
+span.lineno a:hover {
+  background-color: transparent;
+}
+div.directory {
+  border: 0px;
+}
+table.directory {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.directory .arrow {
+  height: auto;
+}
+.directory .levels span {
+  color: #3fa687;
+}
+.contents a:visited {
+  color: #3fa687;
+}
+.contents a:hover {
+  color: #2a6f5a;
+}
+.directory td.entry {
+  padding-bottom: 8px;
+  padding-top: 8px;
+}
+.directory td.desc {
+  padding-bottom: 8px;
+  padding-top: 8px;
+  border-left: 0px;
+}
+.directory tr {
+  height: 32px;
+  padding-left: 0px;
+}
+.directory tr.even {
+  padding-left: 0px;
+  background-color: #eeeeee;
+}
+.memberdecls td.glow,
+.fieldtable tr.glow {
+  background-color: #d8eed8;
+  box-shadow: 0 0 15px #cce6c7;
+  -webkit-box-shadow: 0 0 15px #cce6c7;
+}
+.mdescLeft,
+.mdescRight,
+.memItemLeft,
+.memItemRight,
+.memTemplItemLeft,
+.memTemplItemRight,
+.memTemplParams {
+  background-color: transparent;
+  color: #333333;
+  border: none;
+  margin: 4px;
+  padding: 1px 0 0 8px;
+}
+.navpath ul {
+  color: #ffffff;
+  background: #000000;
+  border: 0px;
+}
+.navpath li.footer {
+  color: #ffffff;
+}
+.navpath li.navelem a {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.memitem {
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.memitem.glow {
+  box-shadow: 0 0 15px #cce6c7;
+  -webkit-box-shadow: 0 0 15px #cce6c7;
+}
+.memdoc,
+dl.reflist > dd {
+  border: none;
+  background: #ffffff;
+  padding: 15px;
+  border-bottom: 1px solid #dddddd;
+  border-left: 1px solid #dddddd;
+  border-right: 1px solid #dddddd;
+}
+.memname {
+  font-weight: normal;
+  margin-left: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 16px;
+  color: inherit;
+}
+.memproto,
+dl.reflist > dt {
+  padding: 10px 15px;
+  border-bottom: 1px solid transparent;
+  border-top: 1px solid #dddddd;
+  border-left: 1px solid #dddddd;
+  border-right: 1px solid #dddddd;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  color: #333333;
+  background: #f5f5f5;
+  text-shadow: none;
+}
+/* @group Code Colorization */
+a.code {
+  color: #3fa687;
+}
+span.keyword,
+span.keywordtype,
+span.keywordflow,
+span.vhdlkeyword {
+  color: #1a1a1a;
+}
+span.keywordflow {
+  font-weight: bold;
+}
+span.comment {
+  color: #5bc0de;
+}
+span.preprocessor {
+  color: #5cb85c;
+}
+span.stringliteral {
+  color: #f0ad4e;
+}
+span.charliteral,
+span.vhdldigit,
+span.vhdlchar,
+span.vhdllogic {
+  color: #bd202c;
+}
+dl.attention,
+dl.bug,
+dl.deprecated,
+dl.invariant,
+dl.post,
+dl.pre,
+dl.note,
+dl.see,
+dl.test,
+dl.todo,
+dl.warning {
+  margin-left: 3px;
+  margin-bottom: 20px;
+  padding-left: 0px;
+  background-color: #ffffff;
+  border-left: 0px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+dl.attention > dd,
+dl.deprecated > dd,
+dl.bug > dd,
+dl.invariant > dd,
+dl.post > dd,
+dl.pre > dd,
+dl.note > dd,
+dl.see > dd,
+dl.test > dd,
+dl.todo > dd,
+dl.warning > dd {
+  padding: 15px;
+  margin-bottom: 0px;
+}
+dl.attention > dt,
+dl.deprecated > dt,
+dl.bug > dt,
+dl.invariant > dt,
+dl.post > dt,
+dl.pre > dt,
+dl.note > dt,
+dl.see > dt,
+dl.test > dt,
+dl.todo > dt,
+dl.warning > dt {
+  padding: 10px 15px;
+}
+dl.attention,
+dl.warning {
+  border-color: #f6ccd6;
+}
+dl.attention > dt,
+dl.warning > dt {
+  color: #bd202c;
+  background-color: #fae2e4;
+  border-color: #bd202c;
+}
+dl.bug {
+  border-color: #fce9db;
+}
+dl.bug a,
+dl.bug a:visited {
+  color: #f0ad4e;
+}
+dl.bug a:hover {
+  color: #df8a13;
+}
+dl.bug > dt {
+  color: #f0ad4e;
+  background-color: #fef9f3;
+  border-color: #f0ad4e;
+}
+dl.deprecated {
+  border-color: #6a6a6a;
+}
+dl.deprecated a,
+dl.deprecated a:visited {
+  color: #222222;
+}
+dl.deprecated a:hover {
+  color: #000000;
+}
+dl.deprecated > dt {
+  color: #222222;
+  background-color: #777777;
+  border-color: #6a6a6a;
+}
+dl.note,
+dl.see {
+  border-color: #3fa687;
+}
+dl.note > dt,
+dl.see > dt {
+  color: #ffffff;
+  background-color: #3fa687;
+  border-color: #3fa687;
+}
+dl.post,
+dl.pre,
+dl.invariant {
+  border-color: #cce6c7;
+}
+dl.post > dt,
+dl.pre > dt,
+dl.invariant > dt {
+  color: #5cb85c;
+  background-color: #d8eed8;
+  border-color: #cce6c7;
+}
+dl.test {
+  border-color: #d2e2f6;
+}
+dl.test a,
+dl.test a:visited {
+  color: #5b7ede;
+}
+dl.test a:hover {
+  color: #2852c5;
+}
+dl.test > dt {
+  color: #5b7ede;
+  background-color: #f0f3fc;
+  border-color: #d2e2f6;
+}
+dl.todo {
+  border-color: #d2f4f6;
+}
+dl.todo a,
+dl.todo a:visited {
+  color: #5bc0de;
+}
+dl.todo a:hover {
+  color: #28a1c5;
+}
+dl.todo > dt {
+  color: #5bc0de;
+  background-color: #f0f9fc;
+  border-color: #d2f4f6;
+}
+#powerTip div {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.params .paramdir {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  padding-right: 0.5em;
+}
+.params .paramname {
+  padding-right: 2em;
+}
+.icon {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.img-responsive {
+  margin: 0 auto;
+}
+.image > img {
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  padding: 4px 6px;
+}

@@ -25,6 +25,7 @@ BOARD_WHITELIST := \
   pba-d-01-kw2x \
   pca10000 \
   pca10005 \
+  samd21-xpro \
   saml21-xpro \
   samr21-xpro \
   spark-core \

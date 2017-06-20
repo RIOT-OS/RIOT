@@ -48,4 +48,4 @@ void rtc_remove_alarm(void);
 }
 #endif
 
-#endif
+#endif /* CC430_RTC_H */

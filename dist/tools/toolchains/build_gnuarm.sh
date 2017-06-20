@@ -25,6 +25,16 @@ MAKE_THREADS=-j4
 DOWNLOADER=wget
 DOWNLOADER_OPTS="-nv -c"
 
+if [ `uname` = "Linux" ]; then
+  MD5=md5sum
+  MD5_OPTS="-c -"
+elif [ `uname` = "Darwin" ]; then
+  MD5=md5
+  MD5_OPTS=""
+else
+    echo "CAUTION: No 'md5' tool for your host system found!"
+fi
+
 #
 # Build targets
 #
@@ -139,7 +149,7 @@ download_file() {
     ${DOWNLOADER} ${DOWNLOADER_OPTS} $1/$2
 
     echo -n "Checking MD5 of "
-    echo "${3}  ${2}" | md5sum -c -
+    echo "${3}  ${2}" | ${MD5} ${MD5_OPTS}
 }
 
 check_space() {

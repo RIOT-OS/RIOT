@@ -14,8 +14,8 @@
  * @brief           CC26x0 VIMS register definitions
  */
 
-#ifndef CC26x0_VIMS_H
-#define CC26x0_VIMS_H
+#ifndef CC26X0_VIMS_H
+#define CC26X0_VIMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -232,6 +232,6 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26x0_VIMS_H */
+#endif /* CC26X0_VIMS_H */
 
 /*@}*/

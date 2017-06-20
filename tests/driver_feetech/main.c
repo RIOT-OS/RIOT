@@ -81,7 +81,7 @@ static uart_half_duplex_t stream;
 
 static int parse_uart(char *arg)
 {
-    unsigned uart = (unsigned)atoi(arg);
+    unsigned uart = atoi(arg);
     if (uart >= UART_NUMOF) {
         printf("Error: Invalid UART_DEV device specified (%u).\n", uart);
         return -1;
@@ -95,10 +95,10 @@ static int parse_uart(char *arg)
 
 static int32_t parse_baud(char *arg)
 {
-    int32_t baud = (int32_t)atoi(arg);
+    int32_t baud = atoi(arg);
 
     for (size_t i = 0 ; i < ARRAY_LEN(baudrates) ; i++) {
-        if(baud == baudrates[i]) {
+        if (baud == baudrates[i]) {
             return baud;
         }
     }
@@ -109,7 +109,7 @@ static int32_t parse_baud(char *arg)
 
 static int parse_dev(char *arg)
 {
-    int dev = (int)atoi(arg);
+    int dev = atoi(arg);
     if (dev < 0 || 254 < dev) {
         printf("Error: Invalid device id (%s)\n", arg);
         return -1;
@@ -123,14 +123,14 @@ static void parse_reg(char *arg, int *reg8, int *reg16)
     *reg16 = -1;
 
     for (size_t i = 0 ; i < ARRAY_LEN(regs8) ; i++) {
-        if(strcmp(arg, regs8[i].name) == 0) {
+        if (strcmp(arg, regs8[i].name) == 0) {
             *reg8 = regs8[i].addr;
             return;
         }
     }
 
     for (size_t i = 0 ; i < ARRAY_LEN(regs16) ; i++) {
-        if(strcmp(arg, regs16[i].name) == 0) {
+        if (strcmp(arg, regs16[i].name) == 0) {
             *reg16 = regs16[i].addr;
             return;
         }

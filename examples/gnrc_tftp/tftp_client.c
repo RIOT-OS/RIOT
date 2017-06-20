@@ -118,7 +118,12 @@ static void _tftp_client_stop_cb(tftp_event_t event, const char *msg)
     }
 
     /* print the transfer result to the console */
-    printf("tftp_client: %s: %s\n", cause, msg);
+    if (msg != NULL) {
+        printf("tftp_client: %s: %s\n", cause, msg);
+    }
+    else {
+        printf("tftp_client: %s\n", cause);
+    }
 }
 
 static int _tftp_client_cmd(int argc, char * *argv)

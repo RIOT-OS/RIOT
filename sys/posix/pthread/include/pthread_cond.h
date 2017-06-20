@@ -14,8 +14,8 @@
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
 
-#ifndef SYS__POSIX__PTHREAD_COND__H
-#define SYS__POSIX__PTHREAD_COND__H
+#ifndef PTHREAD_COND_H
+#define PTHREAD_COND_H
 
 #include <time.h>
 #include "mutex.h"
@@ -25,7 +25,12 @@
 #   include "msp430_types.h"
 #endif
 
-#if defined(__MACH__) || defined(__WITH_AVRLIBC__)
+#ifdef __MACH__
+/* needed for AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER */
+#include <AvailabilityMacros.h>
+#endif
+
+#if defined(__WITH_AVRLIBC__) || (defined(__MACH__) && !defined(AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER))
 typedef int clockid_t;
 #endif
 
@@ -150,7 +155,7 @@ int pthread_cond_broadcast(pthread_cond_t *cond);
 }
 #endif
 
-#endif /* SYS__POSIX__PTHREAD_COND__H */
+#endif /* PTHREAD_COND_H */
 
 /**
  * @}

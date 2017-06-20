@@ -26,7 +26,6 @@
 #include <inttypes.h>
 
 #include "thread.h"
-#include "net/netstats.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/netif.h"
@@ -36,6 +35,13 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/sixlowpan/netif.h"
+
+#ifdef MODULE_NETSTATS
+#include "net/netstats.h"
+#endif
+#ifdef MODULE_L2FILTER
+#include "net/l2filter.h"
+#endif
 
 /**
  * @brief   The maximal expected link layer address length in byte
@@ -499,6 +505,30 @@ static void _netif_list(kernel_pid_t dev)
     }
 #endif
 
+#ifdef MODULE_L2FILTER
+    l2filter_t *filter = NULL;
+    res = gnrc_netapi_get(dev, NETOPT_L2FILTER, 0, &filter, sizeof(filter));
+    if (res > 0) {
+#ifdef MODULE_L2FILTER_WHITELIST
+        puts("\n           White-listed link layer addresses:");
+#else
+        puts("\n           Black-listed link layer addresses:");
+#endif
+        int count = 0;
+        for (unsigned i = 0; i < L2FILTER_LISTSIZE; i++) {
+            if (filter[i].addr_len > 0) {
+                char hwaddr_str[filter[i].addr_len * 3];
+                gnrc_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
+                                    filter[i].addr, filter[i].addr_len);
+                printf("            %2i: %s\n", count++, hwaddr_str);
+            }
+        }
+        if (count == 0) {
+            puts("            --- none ---");
+        }
+    }
+#endif
+
 #ifdef MODULE_NETSTATS_L2
     puts("");
     _netif_stats(dev, NETSTATS_LAYER2, false);
@@ -560,7 +590,7 @@ static int _netif_set_u16(kernel_pid_t dev, netopt_t opt, char *u16_str)
 
 static int _netif_set_i16(kernel_pid_t dev, netopt_t opt, char *i16_str)
 {
-    int16_t val = (int16_t)atoi(i16_str);
+    int16_t val = atoi(i16_str);
 
     if (gnrc_netapi_set(dev, opt, 0, (int16_t *)&val, sizeof(int16_t)) < 0) {
         printf("error: unable to set ");
@@ -578,7 +608,7 @@ static int _netif_set_i16(kernel_pid_t dev, netopt_t opt, char *i16_str)
 
 static int _netif_set_u8(kernel_pid_t dev, netopt_t opt, char *u8_str)
 {
-    uint8_t val = (uint8_t)atoi(u8_str);
+    uint8_t val = atoi(u8_str);
 
     if (gnrc_netapi_set(dev, opt, 0, (uint8_t *)&val, sizeof(uint8_t)) < 0) {
         printf("error: unable to set ");
@@ -770,6 +800,40 @@ static int _netif_set_encrypt_key(kernel_pid_t dev, netopt_t opt, char *key_str)
     puts("");
     return 0;
 }
+
+#ifdef MODULE_L2FILTER
+static int _netif_addrm_l2filter(kernel_pid_t dev, char *val, bool add)
+{
+    uint8_t addr[MAX_ADDR_LEN];
+    size_t addr_len = gnrc_netif_addr_from_str(addr, sizeof(addr), val);
+
+    if ((addr_len == 0) || (addr_len > L2FILTER_ADDR_MAXLEN)) {
+        puts("error: given address is invalid");
+        return 1;
+    }
+
+    if (add) {
+        if (gnrc_netapi_set(dev, NETOPT_L2FILTER, 0, addr, addr_len) < 0) {
+            puts("unable to add link layer address to filter");
+            return 1;
+        }
+        puts("successfully added address to filter");
+    }
+    else {
+        if (gnrc_netapi_set(dev, NETOPT_L2FILTER_RM, 0, addr, addr_len) < 0) {
+            puts("unable to remove link layer address from filter");
+            return 1;
+        }
+        puts("successfully removed address to filter");
+    }
+    return 0;
+}
+
+static void _l2filter_usage(const char *cmd)
+{
+    printf("usage: %s <if_id> l2filter {add|del} <addr>\n", cmd);
+}
+#endif
 
 static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
 {
@@ -1056,7 +1120,7 @@ int _netif_send(int argc, char **argv)
     }
 
     /* parse interface */
-    dev = (kernel_pid_t)atoi(argv[1]);
+    dev = atoi(argv[1]);
 
     if (!_is_iface(dev)) {
         puts("error: invalid interface given");
@@ -1114,7 +1178,7 @@ int _netif_config(int argc, char **argv)
         return 0;
     }
     else if (_is_number(argv[1])) {
-        kernel_pid_t dev = (kernel_pid_t)atoi(argv[1]);
+        kernel_pid_t dev = atoi(argv[1]);
 
         if (_is_iface(dev)) {
             if (argc < 3) {
@@ -1153,6 +1217,23 @@ int _netif_config(int argc, char **argv)
 
                 return _netif_mtu((kernel_pid_t)dev, argv[3]);
             }
+#ifdef MODULE_L2FILTER
+            else if (strcmp(argv[2], "l2filter") == 0) {
+                if (argc < 5) {
+                    _l2filter_usage(argv[2]);
+                }
+                else if (strcmp(argv[3], "add") == 0) {
+                    return _netif_addrm_l2filter(dev, argv[4], true);
+                }
+                else if (strcmp(argv[3], "del") == 0) {
+                    return _netif_addrm_l2filter(dev, argv[4], false);
+                }
+                else {
+                    _l2filter_usage(argv[2]);
+                }
+                return 1;
+            }
+#endif
 #ifdef MODULE_NETSTATS
             else if (strcmp(argv[2], "stats") == 0) {
                 uint8_t module;
@@ -1230,6 +1311,9 @@ int _netif_config(int argc, char **argv)
     _flag_usage(argv[0]);
     _add_usage(argv[0]);
     _del_usage(argv[0]);
+#ifdef MODULE_L2FILTER
+    _l2filter_usage(argv[0]);
+#endif
 #ifdef MODULE_NETSTATS
     _stats_usage(argv[0]);
 #endif

@@ -2,26 +2,4 @@
 export CPU = samd21
 export CPU_MODEL = samd21j18a
 
-# set default port depending on operating system
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-
-export OFLAGS = -O binary
-
-# setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
-
-# Add board selector (USB serial) to OpenOCD options if specified.
-# Use /dist/tools/usb-serial/list-ttys.sh to find out serial number.
-#   Usage: SERIAL="AAA..." BOARD="sodaq-autonomo" make flash
-ifneq (,$(SERIAL))
-    export OPENOCD_EXTRA_INIT += "-c cmsis_dap_serial $(SERIAL)"
-    SERIAL_TTY = $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL))
-    ifeq (,$(SERIAL_TTY))
-        $(error Did not find a device with serial $(SERIAL))
-    endif
-    PORT_LINUX := $(SERIAL_TTY)
-endif
-
-# this board uses openocd
-include $(RIOTBOARD)/Makefile.include.openocd
+include $(RIOTMAKE)/boards/sam0.inc.mk

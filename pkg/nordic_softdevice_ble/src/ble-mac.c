@@ -73,6 +73,9 @@ static ble_mac_callback_t _callback;
  */
 static ble_mac_interface_t *ble_mac_interface_lookup(ble_ipsp_handle_t *handle)
 {
+    if (handle == NULL) {
+        return NULL;
+    }
     for (int i = 0; i < BLE_MAC_MAX_INTERFACE_NUM; i++) {
         if (interfaces[i].handle.conn_handle == handle->conn_handle &&
             interfaces[i].handle.cid == handle->cid) {
@@ -172,13 +175,12 @@ int ble_mac_send(uint8_t dest[8], void *data, size_t len)
     od_hex_dump(data, len, OD_WIDTH_DEFAULT);
 #endif
 
-    int i;
     ble_ipsp_handle_t *handle;
     int ret = -1;
 
     if ((!dest) || _is_broadcast(dest)) {
         DEBUG("broadcast\n");
-        for (i = 0; i < BLE_MAC_MAX_INTERFACE_NUM; i++) {
+        for (int i = 0; i < BLE_MAC_MAX_INTERFACE_NUM; i++) {
             if (interfaces[i].handle.cid != 0 && interfaces[i].handle.conn_handle != 0) {
                 ret = _send_to_peer(&interfaces[i].handle, data, len);
                 DEBUG("ret=%i\n", ret);
@@ -207,9 +209,7 @@ static uint32_t ble_mac_ipsp_evt_handler_irq(ble_ipsp_handle_t *p_handle, ble_ip
 {
     uint32_t retval = NRF_SUCCESS;
 
-    ble_mac_interface_t *p_instance = NULL;
-
-    p_instance = ble_mac_interface_lookup(p_handle);
+    ble_mac_interface_t *p_instance = ble_mac_interface_lookup(p_handle);
 
     if (p_handle) {
         DEBUG("ble-mac: IPSP event [handle:%d CID 0x%04X]\n", p_handle->conn_handle, p_handle->cid);

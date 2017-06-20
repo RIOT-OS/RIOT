@@ -38,7 +38,7 @@
  * pwm_set() function to change the duty cycle for a given channel. If you
  * want to disable the PWM generation again, simply call pwm_poweroff().
  *
- * @section     sec_pm (Low-) power implications
+ * ## (Low-)Power implications
  *
  * After initialization, the a PWM peripheral **should** be powered on and
  * active. When manually stopped using the pwm_poweroff() function, the PWM

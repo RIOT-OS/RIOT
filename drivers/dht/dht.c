@@ -49,9 +49,9 @@ static uint16_t read(gpio_t pin, int bits)
         res <<= 1;
         /* measure the length between the next rising and falling flanks (the
          * time the pin is high - smoke up :-) */
-        while (!gpio_read(pin));
+        while (!gpio_read(pin)) {}
         start = xtimer_now_usec();
-        while (gpio_read(pin));
+        while (gpio_read(pin)) {}
         end = xtimer_now_usec();
         /* if the high phase was more than 40us, we got a 1 */
         if ((end - start) > PULSE_WIDTH_THRESHOLD) {
@@ -95,8 +95,8 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
 
     /* sync on device */
     gpio_init(dev->pin, dev->in_mode);
-    while (!gpio_read(dev->pin)) ;
-    while (gpio_read(dev->pin)) ;
+    while (!gpio_read(dev->pin)) {}
+    while (gpio_read(dev->pin)) {}
 
     /*
      * data is read in sequentially, highest bit first:

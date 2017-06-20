@@ -17,8 +17,8 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -124,6 +124,46 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
+ * @name   SPI configuration
+ *
+ * @note    The spi_divtable is auto-generated from
+ *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
+ * @{
+ */
+static const uint8_t spi_divtable[2][5] = {
+    {       /* for APB1 @ 48000000Hz */
+        7,  /* -> 187500Hz */
+        6,  /* -> 375000Hz */
+        5,  /* -> 750000Hz */
+        2,  /* -> 6000000Hz */
+        1   /* -> 12000000Hz */
+    },
+    {       /* for APB2 @ 48000000Hz */
+        7,  /* -> 187500Hz */
+        6,  /* -> 375000Hz */
+        5,  /* -> 750000Hz */
+        2,  /* -> 6000000Hz */
+        1   /* -> 12000000Hz */
+    }
+};
+
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_B, 5),
+        .miso_pin = GPIO_PIN(PORT_B, 4),
+        .sclk_pin = GPIO_PIN(PORT_B, 3),
+        .cs_pin   = GPIO_UNDEF,
+        .af       = GPIO_AF0,
+        .rccmask  = RCC_APB2ENR_SPI1EN,
+        .apbbus   = APB2
+    }
+};
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+/** @} */
+
+/**
  * @name RTC configuration
  * @{
  */
@@ -160,5 +200,5 @@ static const pwm_conf_t pwm_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */

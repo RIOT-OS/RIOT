@@ -310,8 +310,7 @@ static inline void _print_chunk(void *chunk, size_t size, int num)
 {
     printf("=========== chunk %3d (%-10p size: %4u) ===========\n", num, chunk,
            (unsigned int)size);
-    od(chunk, size, OD_WIDTH_DEFAULT,
-       OD_FLAGS_ADDRESS_HEX | OD_FLAGS_BYTES_HEX | OD_FLAGS_LENGTH_1);
+    od_hex_dump(chunk, size, OD_WIDTH_DEFAULT);
 }
 
 static inline void _print_unused(_unused_t *ptr)

@@ -27,7 +27,7 @@
 #include "net/gnrc/ipv6.h"
 #include "random.h"
 
-#define ENABLE_DEBUG                (1)
+#define ENABLE_DEBUG                (0)
 #include "debug.h"
 
 #if ENABLE_DEBUG
@@ -39,13 +39,13 @@ static kernel_pid_t _tftp_kernel_pid;
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define CT_HTONS(x)                 ((uint16_t)((          \
-                                                    (((uint16_t)(x)) >> 8) & 0x00FF) |  \
-                                                ((((uint16_t)(x)) << 8) & 0xFF00)))
+                                    (((uint16_t)(x)) >> 8) & 0x00FF) |  \
+                                    ((((uint16_t)(x)) << 8) & 0xFF00)))
 #else
 #define CT_HTONS(x)                 ((uint16_t)x)
 #endif
 
-#define MIN(a, b)                    ((a) > (b) ? (b) : (a))
+#define MIN(a, b)                   ((a) > (b) ? (b) : (a))
 #define ARRAY_LEN(x)                (sizeof(x) / sizeof(x[0]))
 
 #define TFTP_TIMEOUT_MSG            0x4000
@@ -124,6 +124,8 @@ tftp_opt_t _tftp_options[] = {
  * @brief The TFTP state
  */
 typedef enum {
+    TS_APP_FAILED  = -3,
+    TS_DUP         = -2,
     TS_FAILED      = -1,
     TS_BUSY        = 0,
     TS_FINISHED    = 1
@@ -559,7 +561,6 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
 {
     gnrc_pktsnip_t *outbuf = gnrc_pktbuf_add(NULL, NULL, TFTP_DEFAULT_DATA_SIZE,
                                              GNRC_NETTYPE_UNDEF);
-
     /* check if this is an client start */
     if (!m) {
         DEBUG("tftp: starting transaction as client\n");
@@ -688,10 +689,18 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
         case TO_DATA: {
             /* try to process the data */
             int proc = _tftp_process_data(ctxt, pkt);
-            if (proc < 0) {
+
+            if (proc == TS_APP_FAILED || proc == TS_FAILED) {
                 DEBUG("tftp: data not accepted\n");
                 /* the data is not accepted return */
+                /* we are maybe releasing twice XXX*/
                 gnrc_pktbuf_release(outbuf);
+                return proc;
+            }
+
+            if (proc == TS_DUP) {
+                DEBUG("tftp: duplicated data received, acking...\n");
+                _tftp_send_dack(ctxt, outbuf, TO_ACK);
                 return TS_BUSY;
             }
 
@@ -724,7 +733,8 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
             }
 
             return TS_BUSY;
-        } break;
+        }
+        break;
 
         case TO_ACK: {
             /* validate if this is the ACK we are waiting for */
@@ -902,9 +912,7 @@ tftp_state _tftp_send_dack(tftp_context_t *ctxt, gnrc_pktsnip_t *buf, tftp_opcod
 
 tftp_state _tftp_send_error(tftp_context_t *ctxt, gnrc_pktsnip_t *buf, tftp_err_codes_t err, const char *err_msg)
 {
-    int strl = err_msg
-               ? strlen(err_msg) + 1
-               : 0;
+    int strl = err_msg ? strlen(err_msg) + 1 : 0;
 
     (void) ctxt;
 
@@ -1107,15 +1115,22 @@ int _tftp_process_data(tftp_context_t *ctxt, gnrc_pktsnip_t *buf)
     uint16_t block_nr = byteorder_ntohs(pkt->block_nr);
 
     /* check if this is the packet we are waiting for */
-    if (block_nr != (ctxt->block_nr + 1)) {
-        DEBUG("tftp: not the packet we were wating for\n");
-        return TS_BUSY;
+    if (block_nr > (ctxt->block_nr + 1)) {
+        DEBUG("tftp: incorrect block_nr %d received from server, expected %d\n",
+               block_nr, (ctxt->block_nr + 1));
+        return TS_FAILED;
+    }
+    if (block_nr < (ctxt->block_nr + 1)) {
+        DEBUG("tftp: not the packet we were waiting for, expected %d, received %d\n",
+              (uint16_t)(ctxt->block_nr + 1), block_nr);
+        return TS_DUP;
     }
 
     /* send the user data trough to the user application */
-    if (ctxt->data_cb(ctxt->block_nr * ctxt->block_size, pkt->data, buf->size - sizeof(tftp_packet_data_t)) < 0) {
+    if (ctxt->data_cb(ctxt->block_nr * ctxt->block_size, pkt->data,
+                      buf->size - sizeof(tftp_packet_data_t)) < 0) {
         DEBUG("tftp: error in data callback\n");
-        return TS_BUSY;
+        return TS_APP_FAILED;
     }
 
     /* return the number of data bytes received */

@@ -46,5 +46,5 @@ typedef enum ina220_reg {
 }
 #endif
 
-#endif /* __L3G4200D_REGS_H */
+#endif /* INA220_REGS_H */
 /** @} */

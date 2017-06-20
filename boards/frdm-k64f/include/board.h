@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    board_frdm-k64f Freescale FRDM-K64F Board
+ * @defgroup    boards_frdm-k64f Freescale FRDM-K64F Board
  * @ingroup     boards
  * @brief       Board specific implementations for the FRDM-K64F
  * @{
@@ -31,7 +31,7 @@ extern "C"
 #endif
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED0_PIN            GPIO_PIN(PORT_B, 22)
@@ -56,7 +56,7 @@ extern "C"
 /** @} */
 
 /**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
 
@@ -64,5 +64,5 @@ void board_init(void);
 }
 #endif
 
-#endif /** BOARD_H */
+#endif /* BOARD_H */
 /** @} */

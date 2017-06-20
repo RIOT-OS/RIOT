@@ -36,6 +36,11 @@ void sys_init(void)
     return;
 }
 
+u32_t sys_now(void)
+{
+    return (uint32_t)(xtimer_now_usec64() / US_PER_MS);
+}
+
 err_t sys_mutex_new(sys_mutex_t *mutex)
 {
     mutex_init((mutex_t *)mutex);
@@ -88,7 +93,7 @@ u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t count)
         return (u32_t)(stop / US_PER_MS);
     }
     else {
-        sema_wait_timed((sema_t *)sem, 0);
+        sema_wait((sema_t *)sem);
         return 0;
     }
 }

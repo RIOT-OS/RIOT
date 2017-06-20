@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the sdcard_spi driver
+ * @name    Default configuration for the sdcard_spi driver
  * @{
  */
 #ifndef SDCARD_SPI_PARAM_SPI
@@ -69,7 +69,6 @@ static const  sdcard_spi_params_t sdcard_spi_params[] = {
         .power_act_high = SDCARD_SPI_PARAM_POWER_AH
     },
 };
-/** @} */
 
 #ifdef __cplusplus
 }

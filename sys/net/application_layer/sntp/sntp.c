@@ -38,13 +38,11 @@ int sntp_sync(sock_udp_ep_t *server, uint32_t timeout)
 {
     int result;
 
-    mutex_lock(&_sntp_mutex);
     if ((result = sock_udp_create(&_sntp_sock,
                                   NULL,
                                   server,
                                   0)) < 0) {
         DEBUG("Error creating UDP sock\n");
-        mutex_unlock(&_sntp_mutex);
         return result;
     }
     memset(&_sntp_packet, 0, sizeof(_sntp_packet));
@@ -57,7 +55,6 @@ int sntp_sync(sock_udp_ep_t *server, uint32_t timeout)
                                      NULL)) < 0) {
         DEBUG("Error sending message\n");
         sock_udp_close(&_sntp_sock);
-        mutex_unlock(&_sntp_mutex);
         return result;
     }
     if ((result = (int)sock_udp_recv(&_sntp_sock,
@@ -67,13 +64,13 @@ int sntp_sync(sock_udp_ep_t *server, uint32_t timeout)
                                      NULL)) < 0) {
         DEBUG("Error receiving message\n");
         sock_udp_close(&_sntp_sock);
-        mutex_unlock(&_sntp_mutex);
         return result;
     }
     sock_udp_close(&_sntp_sock);
-    _sntp_offset = (byteorder_ntohl(_sntp_packet.transmit.seconds) * US_PER_SEC) +
-                   ((byteorder_ntohl(_sntp_packet.transmit.fraction) * 232)
-                   / 1000000) - xtimer_now64();
+    mutex_lock(&_sntp_mutex);
+    _sntp_offset = (((int64_t)byteorder_ntohl(_sntp_packet.transmit.seconds)) * US_PER_SEC) +
+                   ((((int64_t)byteorder_ntohl(_sntp_packet.transmit.fraction)) * 232)
+                   / 1000000) - xtimer_now_usec64();
     mutex_unlock(&_sntp_mutex);
     return 0;
 }

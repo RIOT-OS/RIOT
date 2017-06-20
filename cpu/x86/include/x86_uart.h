@@ -25,8 +25,8 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU__X86__UART__H__
-#define CPU__X86__UART__H__
+#ifndef X86_UART_H
+#define X86_UART_H
 
 #include "x86_pic.h"
 
@@ -179,6 +179,6 @@ enum iir_t {
 }
 #endif
 
-#endif
+#endif /* X86_UART_H */
 
 /** @} */

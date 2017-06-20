@@ -18,8 +18,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "board_common.h"
 
@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @name xtimer configuration
+ * @name    xtimer configuration
  * @{
  */
 #define XTIMER_DEV          TIMER_DEV(0)
@@ -41,5 +41,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

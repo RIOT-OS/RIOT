@@ -22,7 +22,7 @@
 #else
 #include <dlfcn.h>
 #endif
-
+#include "byteorder.h"
 #include <assert.h>
 #include <getopt.h>
 #include <stdbool.h>
@@ -42,6 +42,9 @@
 #include "board_internal.h"
 #include "native_internal.h"
 #include "tty_uart.h"
+
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
 typedef enum {
     _STDIOTYPE_STDIO = 0,   /**< leave intact */
@@ -250,7 +253,22 @@ void usage_exit(int status)
     real_exit(status);
 }
 
-__attribute__((constructor)) static void startup(int argc, char **argv)
+/** @brief Initialization function pointer type */
+typedef void (*init_func_t)(int argc, char **argv, char **envp);
+#ifdef __APPLE__
+/* Taken from the sources of Apple's dyld launcher
+ * https://github.com/opensource-apple/dyld/blob/3f928f32597888c5eac6003b9199d972d49857b5/src/dyldInitialization.cpp#L85-L104
+ */
+/* Find the extents of the __DATA __mod_init_func section */
+extern init_func_t __init_array_start __asm("section$start$__DATA$__mod_init_func");
+extern init_func_t __init_array_end   __asm("section$end$__DATA$__mod_init_func");
+#else
+/* Linker script provides pointers to the beginning and end of the init array */
+extern init_func_t __init_array_start;
+extern init_func_t __init_array_end;
+#endif
+
+__attribute__((constructor)) static void startup(int argc, char **argv, char **envp)
 {
     _native_init_syscalls();
 
@@ -272,6 +290,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
             case 0:
             case 'h':
                 usage_exit(EXIT_SUCCESS);
+                break;
             case 'i':
                 _native_id = atol(optarg);
                 break;
@@ -304,7 +323,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
                 break;
 #ifdef MODULE_MTD_NATIVE
             case 'm':
-                mtd0.fname = strndup(optarg, PATH_MAX - 1);
+                ((mtd_native_dev_t *)mtd0)->fname = strndup(optarg, PATH_MAX - 1);
                 break;
 #endif
             default:
@@ -340,6 +359,39 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     _native_log_output(stderrtype, STDERR_FILENO);
     _native_null_out_file = _native_log_output(stdouttype, STDOUT_FILENO);
     _native_input(stdintype);
+
+    /* startup is a constructor which is being called from the init_array during
+     * C runtime initialization, this is normally used for code which must run
+     * before launching main(), such as C++ global object constructors etc.
+     * However, this function (startup) misbehaves a bit when we call
+     * kernel_init below, which does not return until there is an abort or a
+     * power off command.
+     * We need all C++ global constructors and other initializers to run before
+     * we enter the normal application code, which may depend on global objects
+     * having been initalized properly. Therefore, we iterate through the
+     * remainder of the init_array and call any constructors which have been
+     * placed after startup in the initialization order.
+     */
+    init_func_t *init_array_ptr = &__init_array_start;
+    DEBUG("__init_array_start: %p\n", (void *)init_array_ptr);
+    while (init_array_ptr != &__init_array_end) {
+        /* Skip everything which has already been run */
+        if ((*init_array_ptr) == startup) {
+            /* Found ourselves, move on to calling the rest of the constructors */
+            DEBUG("%18p - myself\n", (void *)init_array_ptr);
+            ++init_array_ptr;
+            break;
+        }
+        DEBUG("%18p - skip\n", (void *)init_array_ptr);
+        ++init_array_ptr;
+    }
+    while (init_array_ptr != &__init_array_end) {
+        /* call all remaining constructors */
+        DEBUG("%18p - call\n", (void *)init_array_ptr);
+        (*init_array_ptr)(argc, argv, envp);
+        ++init_array_ptr;
+    }
+    DEBUG("done, __init_array_end: %p\n", (void *)init_array_ptr);
 
     native_cpu_init();
     native_interrupt_init();

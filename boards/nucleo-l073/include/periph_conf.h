@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @name Clock system configuration
+ * @name    Clock system configuration
  * @{
  */
 #define CLOCK_HSI           (16000000U)         /* internal oscillator */
@@ -52,7 +52,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timer configuration
+ * @name    Timer configuration
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -71,7 +71,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @brief   UART configuration
+ * @name    UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
@@ -86,6 +86,16 @@ static const uart_conf_t uart_config[] = {
         .irqn       = USART2_IRQn
     },
     {
+        .dev        = USART1,
+        .rcc_mask   = RCC_APB2ENR_USART1EN,
+        .rx_pin     = GPIO_PIN(PORT_A, 10),
+        .tx_pin     = GPIO_PIN(PORT_A, 9),
+        .rx_af      = GPIO_AF4,
+        .tx_af      = GPIO_AF4,
+        .bus        = APB2,
+        .irqn       = USART1_IRQn
+    },
+    {
         .dev        = USART4,
         .rcc_mask   = RCC_APB1ENR_USART4EN,
         .rx_pin     = GPIO_PIN(PORT_C, 11),
@@ -98,13 +108,14 @@ static const uart_conf_t uart_config[] = {
 };
 
 #define UART_0_ISR          (isr_usart2)
-#define UART_1_ISR          (isr_usart4_5)
+#define UART_1_ISR          (isr_usart1)
+#define UART_2_ISR          (isr_usart4_5)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**
- * @brief   PWM configuration
+ * @name    PWM configuration
  * @{
  */
 static const pwm_conf_t pwm_config[] = {
@@ -124,7 +135,7 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
- * @name   SPI configuration
+ * @name    SPI configuration
  *
  * @note    The spi_divtable is auto-generated from
  *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
@@ -164,7 +175,7 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @brief   ADC configuration
+ * @name    ADC configuration
  * @{
  */
 #define ADC_NUMOF           (0)
@@ -172,17 +183,62 @@ static const spi_conf_t spi_config[] = {
 
 
 /**
- * @brief   DAC configuration
+ * @name    DAC configuration
  * @{
  */
 #define DAC_NUMOF           (0)
 /** @} */
 
 /**
- * @name RTC configuration
+ * @name I2C configuration
  * @{
  */
-#define RTC_NUMOF           (0U)
+#define I2C_0_EN            1
+#define I2C_1_EN            1
+#define I2C_NUMOF           (I2C_0_EN + I2C_1_EN)
+#define I2C_IRQ_PRIO        1
+#define I2C_APBCLK          (CLOCK_APB1)
+
+/* I2C 0 device configuration */
+#define I2C_0_DEV           I2C1
+#define I2C_0_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_I2C1EN))
+#define I2C_0_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_I2C1EN))
+#define I2C_0_EVT_IRQ       I2C1_IRQn
+#define I2C_0_EVT_ISR       isr_i2c1
+/* I2C 0 pin configuration */
+#define I2C_0_SCL_PORT      PORT_B
+#define I2C_0_SCL_PIN       8
+#define I2C_0_SCL_AF        4
+#define I2C_0_SCL_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOBEN))
+#define I2C_0_SDA_PORT      PORT_B
+#define I2C_0_SDA_PIN       9
+#define I2C_0_SDA_AF        4
+#define I2C_0_SDA_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOBEN))
+
+/* I2C 1 device configuration */
+#define I2C_1_DEV           I2C3
+#define I2C_1_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_I2C3EN))
+#define I2C_1_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_I2C3EN))
+#define I2C_1_EVT_IRQ       I2C3_IRQn
+#define I2C_1_EVT_ISR       isr_i2c3
+/* I2C 1 pin configuration */
+#define I2C_1_SCL_PORT      PORT_A
+#define I2C_1_SCL_PIN       8
+#define I2C_1_SCL_AF        3
+#define I2C_1_SCL_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOAEN))
+#define I2C_1_SDA_PORT      PORT_B
+#define I2C_1_SDA_PIN       5
+#define I2C_1_SDA_AF        8
+#define I2C_1_SDA_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOBEN))
+/** @} */
+
+/** @} */
+
+/**
+ * @name    RTC configuration
+ * @{
+ */
+#define RTC_NUMOF           (1U)
 /** @} */
 
 #ifdef __cplusplus
