@@ -184,7 +184,8 @@
  * gcoap includes server and client capability. Available features include:
  *
  * - Message Type: Supports non-confirmable (NON) messaging. Additionally
- *   provides a callback on timeout.
+ *   provides a callback on timeout. Provides piggybacked ACK response to a
+ *   confirmable (CON) request.
  * - Observe extension: Provides server-side registration and notifications.
  * - Server and Client provide helper functions for writing the
  *   response/request. See the CoAP topic in the source documentation for
