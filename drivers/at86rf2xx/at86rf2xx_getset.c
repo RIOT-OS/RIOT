@@ -452,10 +452,6 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
         return;
     }
 
-    if (state == AT86RF2XX_STATE_FORCE_TRX_OFF) {
-        _set_state(dev, AT86RF2XX_STATE_TRX_OFF, state);
-        return;
-    }
 
     /* make sure there is no ongoing transmission, or state transition already
      * in progress */
@@ -463,6 +459,11 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
            old_state == AT86RF2XX_STATE_BUSY_TX_ARET ||
            old_state == AT86RF2XX_STATE_IN_PROGRESS) {
         old_state = at86rf2xx_get_status(dev);
+    }
+
+    if (state == AT86RF2XX_STATE_FORCE_TRX_OFF) {
+        _set_state(dev, AT86RF2XX_STATE_TRX_OFF, state);
+        return;
     }
 
     if (state == old_state) {
