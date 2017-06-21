@@ -28,10 +28,12 @@ extern "C" {
  *
  * The number of message buffers in buffer pool
  */
-#ifdef OPENTHREAD_ENABLE_NCP_UART
+#if OPENTHREAD_ENABLE_NCP_UART
 #define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       5
-#elif defined(OPENTHREAD_FTD) || defined(OPENTHREAD_MTD)
-#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       5
+#elif OPENTHREAD_MTD
+#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       20
+#elif OPENTHREAD_FTD
+#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       10
 #endif
 
 /**
