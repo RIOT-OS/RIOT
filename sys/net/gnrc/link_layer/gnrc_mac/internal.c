@@ -20,14 +20,16 @@
  */
 
 #include <stdbool.h>
-#include <net/gnrc.h>
-#include <net/gnrc/mac/internal.h>
+
+#include "net/gnrc.h"
+#include "net/gnrc/mac/internal.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #if ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (GNRC_MAC_RX_QUEUE_SIZE != 0))
-gnrc_priority_pktqueue_node_t* _alloc_pktqueue_node(gnrc_priority_pktqueue_node_t* nodes, uint32_t size)
+gnrc_priority_pktqueue_node_t *_alloc_pktqueue_node(gnrc_priority_pktqueue_node_t *nodes,
+                                                    uint32_t size)
 {
     assert(nodes != NULL);
     assert(size > 0);
@@ -47,13 +49,13 @@ gnrc_priority_pktqueue_node_t* _alloc_pktqueue_node(gnrc_priority_pktqueue_node_
 #if GNRC_MAC_TX_QUEUE_SIZE != 0
 #if GNRC_MAC_NEIGHBOR_COUNT != 0
 /* Find the neighbor's id based on the given address */
-int _gnrc_mac_find_neighbor(gnrc_mac_tx_t* tx, const uint8_t* dst_addr, int addr_len)
+int _gnrc_mac_find_neighbor(gnrc_mac_tx_t *tx, const uint8_t *dst_addr, int addr_len)
 {
     assert(tx != NULL);
     assert(dst_addr != NULL);
     assert(addr_len > 0);
 
-    gnrc_mac_tx_neighbor_t* neighbors;
+    gnrc_mac_tx_neighbor_t *neighbors;
     neighbors = tx->neighbors;
 
     /* Don't attempt to find broadcast neighbor, so start at index 1 */
@@ -68,11 +70,11 @@ int _gnrc_mac_find_neighbor(gnrc_mac_tx_t* tx, const uint8_t* dst_addr, int addr
 }
 
 /* Free first empty queue (neighbor) that is not active */
-int _gnrc_mac_free_neighbor(gnrc_mac_tx_t* tx)
+int _gnrc_mac_free_neighbor(gnrc_mac_tx_t *tx)
 {
     assert(tx != NULL);
 
-    gnrc_mac_tx_neighbor_t* neighbors;
+    gnrc_mac_tx_neighbor_t *neighbors;
     neighbors = tx->neighbors;
 
     /* Don't attempt to free broadcast neighbor, so start at index 1 */
@@ -88,11 +90,11 @@ int _gnrc_mac_free_neighbor(gnrc_mac_tx_t* tx)
 }
 
 /* Allocate first unused queue (neighbor) */
-int _gnrc_mac_alloc_neighbor(gnrc_mac_tx_t* tx)
+int _gnrc_mac_alloc_neighbor(gnrc_mac_tx_t *tx)
 {
     assert(tx != NULL);
 
-    gnrc_mac_tx_neighbor_t* neighbors;
+    gnrc_mac_tx_neighbor_t *neighbors;
     neighbors = tx->neighbors;
 
     /* Don't attempt to allocate broadcast neighbor, so start at index 1 */
@@ -106,7 +108,7 @@ int _gnrc_mac_alloc_neighbor(gnrc_mac_tx_t* tx)
 }
 
 /* Initialize the neighbor */
-void _gnrc_mac_init_neighbor(gnrc_mac_tx_neighbor_t* neighbor, const uint8_t* addr, int len)
+void _gnrc_mac_init_neighbor(gnrc_mac_tx_neighbor_t *neighbor, const uint8_t *addr, int len)
 {
     assert(neighbor != NULL);
     assert(addr != NULL);
@@ -118,14 +120,14 @@ void _gnrc_mac_init_neighbor(gnrc_mac_tx_neighbor_t* neighbor, const uint8_t* ad
 }
 #endif /* GNRC_MAC_NEIGHBOR_COUNT != 0 */
 
-bool gnrc_mac_queue_tx_packet(gnrc_mac_tx_t* tx, uint32_t priority, gnrc_pktsnip_t* pkt)
+bool gnrc_mac_queue_tx_packet(gnrc_mac_tx_t *tx, uint32_t priority, gnrc_pktsnip_t *pkt)
 {
     assert(tx != NULL);
     assert(pkt != NULL);
 
 #if GNRC_MAC_NEIGHBOR_COUNT == 0
 
-    gnrc_priority_pktqueue_node_t* node;
+    gnrc_priority_pktqueue_node_t *node;
     node = _alloc_pktqueue_node(tx->_queue_nodes, GNRC_MAC_TX_QUEUE_SIZE);
 
     if (node) {
@@ -139,17 +141,19 @@ bool gnrc_mac_queue_tx_packet(gnrc_mac_tx_t* tx, uint32_t priority, gnrc_pktsnip
 
 #else
 
-    gnrc_mac_tx_neighbor_t* neighbor;
+    gnrc_mac_tx_neighbor_t *neighbor;
     int neighbor_id;
 
     /* Check whether the packet it for broadcast or multicast */
-    if (gnrc_netif_hdr_get_flag(pkt) & (GNRC_NETIF_HDR_FLAGS_MULTICAST | GNRC_NETIF_HDR_FLAGS_BROADCAST)) {
+    if (gnrc_netif_hdr_get_flag(pkt) &
+        (GNRC_NETIF_HDR_FLAGS_MULTICAST | GNRC_NETIF_HDR_FLAGS_BROADCAST)) {
         /* Broadcast/multicast queue is neighbor 0 by definition */
         neighbor_id = 0;
         neighbor = &tx->neighbors[neighbor_id];
 
-    } else {
-        uint8_t* addr;
+    }
+    else {
+        uint8_t *addr;
         int addr_len;
         bool neighbor_known = true;
 
@@ -193,7 +197,7 @@ bool gnrc_mac_queue_tx_packet(gnrc_mac_tx_t* tx, uint32_t priority, gnrc_pktsnip
         }
     }
 
-    gnrc_priority_pktqueue_node_t* node;
+    gnrc_priority_pktqueue_node_t *node;
     node = _alloc_pktqueue_node(tx->_queue_nodes, GNRC_MAC_TX_QUEUE_SIZE);
     if (node) {
         gnrc_priority_pktqueue_node_init(node, priority, pkt);
@@ -203,20 +207,20 @@ bool gnrc_mac_queue_tx_packet(gnrc_mac_tx_t* tx, uint32_t priority, gnrc_pktsnip
     }
 
     DEBUG("[gnrc_mac-int] Can't push to neighbor #%d's queue, no entries left\n",
-            neighbor_id);
+          neighbor_id);
     return false;
 
-#endif /* GNRC_MAC_NEIGHBOR_COUNT == 0 */
+#endif  /* GNRC_MAC_NEIGHBOR_COUNT == 0 */
 }
-#endif /* GNRC_MAC_TX_QUEUE_SIZE != 0 */
+#endif  /* GNRC_MAC_TX_QUEUE_SIZE != 0 */
 
 #if GNRC_MAC_RX_QUEUE_SIZE != 0
-bool gnrc_mac_queue_rx_packet(gnrc_mac_rx_t* rx, uint32_t priority, gnrc_pktsnip_t* pkt)
+bool gnrc_mac_queue_rx_packet(gnrc_mac_rx_t *rx, uint32_t priority, gnrc_pktsnip_t *pkt)
 {
     assert(rx != NULL);
     assert(pkt != NULL);
 
-    gnrc_priority_pktqueue_node_t* node;
+    gnrc_priority_pktqueue_node_t *node;
     node = _alloc_pktqueue_node(rx->_queue_nodes, GNRC_MAC_RX_QUEUE_SIZE);
 
     if (node) {
@@ -231,13 +235,15 @@ bool gnrc_mac_queue_rx_packet(gnrc_mac_rx_t* rx, uint32_t priority, gnrc_pktsnip
 #endif /* GNRC_MAC_RX_QUEUE_SIZE != 0 */
 
 #if GNRC_MAC_DISPATCH_BUFFER_SIZE != 0
-void gnrc_mac_dispatch(gnrc_mac_rx_t* rx)
+void gnrc_mac_dispatch(gnrc_mac_rx_t *rx)
 {
     assert(rx != NULL);
 
     for (unsigned i = 0; i < GNRC_MAC_DISPATCH_BUFFER_SIZE; i++) {
         if (rx->dispatch_buffer[i]) {
-            if (!gnrc_netapi_dispatch_receive(rx->dispatch_buffer[i]->type, GNRC_NETREG_DEMUX_CTX_ALL, rx->dispatch_buffer[i])) {
+            if (!gnrc_netapi_dispatch_receive(rx->dispatch_buffer[i]->type,
+                                              GNRC_NETREG_DEMUX_CTX_ALL,
+                                              rx->dispatch_buffer[i])) {
                 DEBUG("Unable to forward packet of type %i\n", buffer[i]->type);
                 gnrc_pktbuf_release(rx->dispatch_buffer[i]);
             }
