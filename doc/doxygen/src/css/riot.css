@@ -279,6 +279,9 @@ table.directory {
 .navpath li.navelem a {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
+.memtitle {
+  display: none;
+}
 .memitem {
   margin-bottom: 20px;
   background-color: #ffffff;
