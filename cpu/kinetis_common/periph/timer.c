@@ -26,6 +26,7 @@
 #include <stdlib.h>
 
 #include "cpu.h"
+#include "bit.h"
 #include "board.h"
 #include "periph_conf.h"
 #include "periph/timer.h"
@@ -86,11 +87,6 @@ static const lptmr_conf_t lptmr_config[LPTMR_NUMOF] = LPTMR_CONFIG;
 
 static pit_t pit[PIT_NUMOF];
 static lptmr_t lptmr[LPTMR_NUMOF];
-
-/**
- * @brief  lvalue accessor for PIT channel enable bit in the bitband region
- */
-#define PIT_BITBAND_TEN(ch) (BITBAND_REG32(PIT->CHANNEL[ch].TCTRL, PIT_TCTRL_TEN_SHIFT))
 
 /**
  * @brief  Find out whether a given timer is a LPTMR or a PIT timer
@@ -174,7 +170,8 @@ inline static void _pit_set_counter(uint8_t dev)
 
 inline static int pit_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
-    PIT_CLOCKGATE = 1;
+    /* Turn on module clock gate */
+    PIT_CLKEN();
     /* Completely disable the module before messing with the settings */
     PIT->MCR = PIT_MCR_MDIS_MASK;
 
@@ -215,7 +212,7 @@ inline static int pit_set(uint8_t dev, uint32_t timeout)
     pit[dev].tctrl = PIT_TCTRL_TIE_MASK | PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
     /* Add the new timeout offset to the up-counter */
     pit[dev].count += timeout;
-    if (PIT_BITBAND_TEN(ch) != 0) {
+    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
         /* Timer is currently running */
         uint32_t cval = PIT->CHANNEL[ch].CVAL;
         /* Subtract if there was anything left on the counter */
@@ -237,7 +234,7 @@ inline static int pit_set_absolute(uint8_t dev, uint32_t target)
     pit[dev].tctrl = PIT_TCTRL_TIE_MASK | PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
     /* Set the new target time in the up-counter */
     pit[dev].count = target;
-    if (PIT_BITBAND_TEN(ch) != 0) {
+    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
         _pit_set_counter(dev);
     }
 
@@ -255,7 +252,7 @@ inline static int pit_clear(uint8_t dev)
     pit[dev].tctrl = PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
     /* pit[dev].count += PIT_MAX_VALUE + 1; */ /* == 0 (mod 2**32) */
 
-    if (PIT_BITBAND_TEN(ch) != 0) {
+    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
         /* Timer is currently running */
         uint32_t cval = PIT->CHANNEL[ch].CVAL;
         /* Subtract if there was anything left on the counter */
@@ -271,7 +268,7 @@ inline static int pit_clear(uint8_t dev)
 inline static uint32_t pit_read(uint8_t dev)
 {
     uint8_t ch = pit_config[dev].count_ch;
-    if (PIT_BITBAND_TEN(ch) != 0) {
+    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
         /* Timer running */
         return pit[dev].count - PIT->CHANNEL[ch].CVAL;
     }
@@ -284,7 +281,7 @@ inline static uint32_t pit_read(uint8_t dev)
 inline static void pit_start(uint8_t dev)
 {
     uint8_t ch = pit_config[dev].count_ch;
-    if (PIT_BITBAND_TEN(ch) != 0) {
+    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
         /* Already running */
         return;
     }
@@ -296,7 +293,7 @@ inline static void pit_start(uint8_t dev)
 inline static void pit_stop(uint8_t dev)
 {
     uint8_t ch = pit_config[dev].count_ch;
-    if (PIT_BITBAND_TEN(ch) == 0) {
+    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) == 0) {
         /* Already stopped */
         return;
     }
@@ -438,7 +435,7 @@ inline static int lptmr_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *ar
     unsigned int mask = irq_disable();
 
     /* Turn on module clock */
-    *lptmr_config[dev].clk_gate = 1;
+    LPTMR_CLKEN();
     /* Completely disable the module before messing with the settings */
     hw->CSR = 0;
     /* select ERCLK32K as clock source for LPTMR */
@@ -447,9 +444,8 @@ inline static int lptmr_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *ar
     /* Clear IRQ flag in case it was already set */
     hw->CSR = LPTMR_CSR_TCF_MASK;
     /* Enable IRQs on the counting channel */
-    /* Refactor the below lines if there are any CPUs where the LPTMR IRQs are not sequential */
-    NVIC_ClearPendingIRQ(LPTMR0_IRQn + lptmr_config[dev].index);
-    NVIC_EnableIRQ(LPTMR0_IRQn + lptmr_config[dev].index);
+    NVIC_ClearPendingIRQ(lptmr_config[dev].irqn);
+    NVIC_EnableIRQ(lptmr_config[dev].irqn);
 
     _lptmr_set_cb_config(dev, cb, arg);
 
@@ -549,7 +545,7 @@ inline static void lptmr_stop(uint8_t dev)
     /* Disable counter and clear interrupt flag */
     hw->CSR = LPTMR_CSR_TCF_MASK;
     /* Clear any pending IRQ */
-    NVIC_ClearPendingIRQ(LPTMR0_IRQn + lptmr_config[dev].index);
+    NVIC_ClearPendingIRQ(lptmr_config[dev].irqn);
     irq_restore(mask);
 }
 
@@ -566,7 +562,7 @@ inline static void lptmr_irq_handler(tim_t tim)
     }
 
     /* Clear interrupt flag */
-    BITBAND_REG32(hw->CSR, LPTMR_CSR_TCF_SHIFT) = 1;
+    bit_set32(&hw->CSR, LPTMR_CSR_TCF_SHIFT);
 
     cortexm_isr_end();
 }

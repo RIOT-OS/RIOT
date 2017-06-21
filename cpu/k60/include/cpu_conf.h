@@ -68,50 +68,12 @@ extern "C"
 #define PIN_INTERRUPT_EDGE 0b1011
 /** @} */
 
-/** @name PORT module clock gates */
-/** @{ */
-#define PORTA_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTA_SHIFT))
-#define PORTB_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTB_SHIFT))
-#define PORTC_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTC_SHIFT))
-#define PORTD_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTD_SHIFT))
-#define PORTE_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTE_SHIFT))
-/** @} */
-
 /**
- * @name Clock settings for the LPTMR0 timer
- * @{
+ * @name Timer hardware information
  */
-#define LPTIMER_DEV                      (LPTMR0) /**< LPTIMER hardware module */
-#define LPTIMER_CLKEN()                  (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_LPTIMER_SHIFT) = 1)    /**< Enable LPTMR0 clock gate */
-#define LPTIMER_CLKDIS()                 (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_LPTIMER_SHIFT) = 0)    /**< Disable LPTMR0 clock gate */
-#define LPTIMER_CLKSRC_MCGIRCLK          0    /**< internal reference clock (4MHz) */
-#define LPTIMER_CLKSRC_LPO               1    /**< PMC 1kHz output */
-#define LPTIMER_CLKSRC_ERCLK32K          2    /**< RTC clock 32768Hz */
-#define LPTIMER_CLKSRC_OSCERCLK          3    /**< system oscillator output, clock from RF-Part */
-
-#ifndef LPTIMER_CLKSRC
-#define LPTIMER_CLKSRC                   LPTIMER_CLKSRC_ERCLK32K    /**< default clock source */
-#endif
-
-#if (LPTIMER_CLKSRC == LPTIMER_CLKSRC_MCGIRCLK)
-#define LPTIMER_CLK_PRESCALE    1
-#define LPTIMER_SPEED           1000000
-#elif (LPTIMER_CLKSRC == LPTIMER_CLKSRC_OSCERCLK)
-#define LPTIMER_CLK_PRESCALE    1
-#define LPTIMER_SPEED           1000000
-#elif (LPTIMER_CLKSRC == LPTIMER_CLKSRC_ERCLK32K)
-#define LPTIMER_CLK_PRESCALE    0
-#define LPTIMER_SPEED           32768
-#else
-#define LPTIMER_CLK_PRESCALE    0
-#define LPTIMER_SPEED           1000
-#endif
-
-/** IRQ priority for hwtimer interrupts */
-#define LPTIMER_IRQ_PRIO          1
-/** IRQ channel for hwtimer interrupts */
-#define LPTIMER_IRQ_CHAN          LPTMR0_IRQn
-
+/** @{ */
+#define LPTMR_CLKEN()  (bit_set32(&SIM->SCGC5, SIM_SCGC5_LPTMR_SHIFT)) /**< Enable LPTMR0 clock gate */
+#define PIT_CLKEN()    (bit_set32(&SIM->SCGC6, SIM_SCGC6_PIT_SHIFT)) /**< Enable PIT clock gate */
 /** @} */
 
 /**
@@ -199,45 +161,6 @@ typedef enum llwu_wakeup_pin {
 
 /** @} */
 
-/**
- * @name Bit band macros
- * @{
- */
-/* Generic bitband conversion routine */
-/** @brief Convert bit-band region address and bit number to bit-band alias address
- *
- * @param[in] addr base address in non-bit-banded memory
- * @param[in] bit  bit number within the word
- *
- * @return Address of the bit within the bit-band memory region
- */
-#define BITBAND_ADDR(addr, bit) ((((uint32_t) (addr)) & 0xF0000000u) + 0x2000000 + ((((uint32_t) (addr)) & 0xFFFFF) << 5) + ((bit) << 2))
-
-/**
- * @brief Bitband 32 bit access to variable stored in SRAM_U
- *
- * @note SRAM_L is not bit band aliased on the K60, only SRAM_U (0x20000000 and up)
- * @note var must be declared 'volatile'
- */
-#define BITBAND_VAR32(var, bit) (*((uint32_t volatile*) BITBAND_ADDR(&(var), (bit))))
-
-/**
- * @brief Bitband 16 bit access to variable stored in SRAM_U
- *
- * @note SRAM_L is not bit band aliased on the K60, only SRAM_U (0x20000000 and up)
- * @note var must be declared 'volatile'
- */
-#define BITBAND_VAR16(var, bit) (*((uint16_t volatile*) BITBAND_ADDR(&(var), (bit))))
-
-/**
- * @brief Bitband 8 bit access to variable stored in SRAM_U
- *
- * @note SRAM_L is not bit band aliased on the K60, only SRAM_U (0x20000000 and up)
- * @note var must be declared 'volatile'
- */
-#define BITBAND_VAR8(var, bit) (*((uint8_t volatile*) BITBAND_ADDR(&(var), (bit))))
-
-/** @} */
 #ifdef __cplusplus
 }
 #endif
