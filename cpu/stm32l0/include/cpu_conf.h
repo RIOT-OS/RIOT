@@ -28,6 +28,9 @@
 #ifdef CPU_MODEL_STM32L073RZ
 #include "vendor/stm32l073xx.h"
 #endif
+#ifdef CPU_MODEL_STM32L072CZ
+#include "vendor/stm32l072xx.h"
+#endif
 #ifdef CPU_MODEL_STM32L053R8
 #include "vendor/stm32l053xx.h"
 #endif

@@ -13,7 +13,8 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
                    z1 \
                    nrf52dk # see #6022
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon calliope-mini cc2650stk maple-mini \
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 \
+                             calliope-mini cc2650stk maple-mini \
                              microbit nrf51dongle nrf6310 nucleo32-f031 \
                              nucleo32-f042 nucleo32-f303 nucleo32-l031 nucleo-f030 \
                              nucleo-f070 nucleo-f072 nucleo-f103 nucleo-f302 nucleo-f334 \
