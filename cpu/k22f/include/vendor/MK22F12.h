@@ -15002,6 +15002,21 @@ typedef struct {
 #define LLW_IRQn                     LLWU_IRQn
 #define LLW_IRQHandler               LLWU_IRQHandler
 
+#define GPIOA_BASE PTA_BASE
+#define GPIOB_BASE PTB_BASE
+#define GPIOC_BASE PTC_BASE
+#define GPIOD_BASE PTD_BASE
+#define GPIOE_BASE PTE_BASE
+#define GPIOF_BASE PTF_BASE
+#define GPIOG_BASE PTG_BASE
+#define GPIOA PTA
+#define GPIOB PTB
+#define GPIOC PTC
+#define GPIOD PTD
+#define GPIOE PTE
+#define GPIOF PTF
+#define GPIOG PTG
+#define OSC0 OSC
 /*!
  * @}
  */ /* end of group Backward_Compatibility_Symbols */

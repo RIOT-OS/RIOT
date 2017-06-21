@@ -16488,6 +16488,7 @@ typedef struct {
 #define LLW_IRQn                     LLWU_IRQn
 #define LLW_IRQHandler               LLWU_IRQHandler
 
+#define OSC0 OSC
 /*!
  * @}
  */ /* end of group Backward_Compatibility_Symbols */
