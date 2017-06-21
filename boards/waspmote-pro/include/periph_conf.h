@@ -104,6 +104,14 @@ extern "C" {
 #define MEGA_PRR            PRR0        /* Power Reduction Register */
 /** @} */
 
+/**
+ * @name    I2C configuration
+  * @{
+ */
+#define I2C_NUMOF           1
+#define I2C_0_EN            1
+#define I2C_IRQ_PRIO        1
+
 #ifdef __cplusplus
 }
 #endif
