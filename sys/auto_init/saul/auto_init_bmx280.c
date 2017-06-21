@@ -67,14 +67,14 @@ void auto_init_bmx280(void)
 
         /* temperature */
         saul_entries[se_ix].dev = &bmx280_devs[i];
-        saul_entries[se_ix].name = bmx280_saul_reg_info[i][0].name;
+        saul_entries[se_ix].name = bmx280_saul_reg_info[i].name;
         saul_entries[se_ix].driver = &bmx280_temperature_saul_driver;
         saul_reg_add(&saul_entries[se_ix]);
         se_ix++;
 
         /* pressure */
         saul_entries[se_ix].dev = &bmx280_devs[i];
-        saul_entries[se_ix].name = bmx280_saul_reg_info[i][1].name;
+        saul_entries[se_ix].name = bmx280_saul_reg_info[i].name;
         saul_entries[se_ix].driver = &bmx280_pressure_saul_driver;
         saul_reg_add(&saul_entries[se_ix]);
         se_ix++;
@@ -82,7 +82,7 @@ void auto_init_bmx280(void)
 #if defined(MODULE_BME280)
         /* relative humidity */
         saul_entries[se_ix].dev = &bmx280_devs[i];
-        saul_entries[se_ix].name = bmx280_saul_reg_info[i][2].name;
+        saul_entries[se_ix].name = bmx280_saul_reg_info[i].name;
         saul_entries[se_ix].driver = &bme280_relative_humidity_saul_driver;
         saul_reg_add(&saul_entries[se_ix]);
         se_ix++;

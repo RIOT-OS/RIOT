@@ -59,12 +59,9 @@ static const si70xx_params_t si70xx_params[] =
 /**
  * @brief   Configure SAUL registry entries
  */
-static const saul_reg_info_t si70xx_saul_reg_info[][2] =
+static const saul_reg_info_t si70xx_saul_reg_info[] =
 {
-    {
-        { .name = "si70xx-temp" },
-        { .name = "si70xx-hum" }
-    }
+    { .name = "si70xx" }
 };
 
 #ifdef __cplusplus
