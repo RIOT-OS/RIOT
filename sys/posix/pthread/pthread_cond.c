@@ -120,15 +120,12 @@ int pthread_cond_wait(pthread_cond_t *cond, mutex_t *mutex)
 
 int pthread_cond_timedwait(pthread_cond_t *cond, mutex_t *mutex, const struct timespec *abstime)
 {
-    timex_t now, then, reltime;
-
-    xtimer_now_timex(&now);
-    then.seconds = abstime->tv_sec;
-    then.microseconds = abstime->tv_nsec / 1000u;
-    reltime = timex_sub(then, now);
+    uint64_t now = xtimer_now_usec64();
+    uint64_t then = ((uint64_t)abstime->tv_sec * US_PER_SEC) +
+                    (abstime->tv_nsec / NS_PER_US);
 
     xtimer_t timer;
-    xtimer_set_wakeup64(&timer, timex_uint64(reltime) , sched_active_pid);
+    xtimer_set_wakeup64(&timer, (then - now) , sched_active_pid);
     int result = pthread_cond_wait(cond, mutex);
     xtimer_remove(&timer);
 
