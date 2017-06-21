@@ -173,8 +173,8 @@ size_t fmt_u32_dec(char *out, uint32_t val)
     size_t len = 1;
 
     /* count needed characters */
-    for (uint32_t tmp = val; (tmp > 9); len++) {
-        tmp /= 10;
+    for (uint32_t tmp = 10; tmp <= val; len++) {
+        tmp *= 10;
     }
 
     if (out) {
@@ -194,12 +194,12 @@ size_t fmt_u16_dec(char *out, uint16_t val)
 
 size_t fmt_s32_dec(char *out, int32_t val)
 {
-    int negative = (val < 0);
+    unsigned negative = (val < 0);
     if (negative) {
         if (out) {
             *out++ = '-';
         }
-        val *= -1;
+        val = -val;
     }
     return fmt_u32_dec(out, val) + negative;
 }
@@ -227,10 +227,10 @@ size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits)
         if (out) {
             out[pos++] = '-';
         }
-        val *= -1;
+        val = -val;
     }
 
-    e = pwr(10, fp_digits);
+    e = _tenmap[fp_digits];
     absolute = (val / (int)e);
     divider = val - (absolute * e);
 
@@ -309,7 +309,7 @@ size_t fmt_float(char *out, float f, unsigned precision)
     uint32_t integer;
 
     if (negative) {
-        f *= -1;
+        f = -f;
     }
 
     integer = (uint32_t) f;
