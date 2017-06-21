@@ -178,6 +178,32 @@ int mma8x5x_is_ready(mma8x5x_t *dev);
  */
 void mma8x5x_read(mma8x5x_t *dev, mma8x5x_data_t *data);
 
+/**
+ * @brief   Configure motion detection interrupt
+ *
+ * User needs to configure MCU side of the selected int pin.  mma8x5x will set
+ * the pin to low on interrupt.  Before another interrupt can occur, the
+ * current interrupt must be acknowledged using @p mma8x5x_ack_int().
+ *
+ * @param[in]   dev         device descriptor of accelerometer
+ * @param[in]   int_pin     select mma8x5x int pin (1 or 2)
+ * @param[in]   threshold   motion detection threshold (see datasheet)
+ */
+void mma8x5x_set_motiondetect(mma8x5x_t *dev, uint8_t int_pin, uint8_t threshold);
+
+/**
+ * @brief   Acknowledge motion detection interrupt
+ *
+ * Acknowledges (clears) a motion detection interrupt.
+ * See @ref mma8x5x_set_motiondetect().
+ *
+ * @warning: this does incur an I2C write, thus should not be done from within
+ *           the ISR.
+ *
+ * @param[in]   dev         device descriptor of accelerometer
+ */
+void mma8x5x_ack_int(mma8x5x_t *dev);
+
 #ifdef __cplusplus
 }
 #endif
