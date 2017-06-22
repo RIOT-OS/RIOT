@@ -165,21 +165,24 @@ static void on_ack(uint8_t type, int id_pos, int ret_pos, int res_pos)
     }
 }
 
-static void on_publish(void)
+static void on_publish(uint16_t len, int pos)
 {
+    /* make sure packet length is valid - if not, drop packet silently */
+    if ((int)len < (pos + 6)) {
+        return;
+    }
+
     emcute_sub_t *sub;
-    uint16_t len;
-    int pos = get_len(rbuf, &len);
     uint16_t tid = get_u16(&rbuf[pos + 2]);
 
     /* allocate a response packet */
     uint8_t buf[7] = { 7, PUBACK, 0, 0, 0, 0, ACCEPT };
     /* and populate message ID and topic ID fields */
-    memcpy(&buf[2], &rbuf[3], 4);
+    memcpy(&buf[2], &rbuf[pos + 2], 4);
 
     /* return error code in case we don't support/understand active flags. So
      * far we only understand QoS 1... */
-    if (rbuf[2] & ~(EMCUTE_QOS_1 | EMCUTE_TIT_SHORT)) {
+    if (rbuf[pos + 1] & ~(EMCUTE_QOS_1 | EMCUTE_TIT_SHORT)) {
         buf[6] = REJ_NOTSUP;
         sock_udp_send(&sock, &buf, 7, &gateway);
         return;
@@ -193,11 +196,13 @@ static void on_publish(void)
         DEBUG("[emcute] on pub: no subscription found\n");
     }
     else {
-        if (rbuf[2] & EMCUTE_QOS_1) {
+        if (rbuf[pos + 1] & EMCUTE_QOS_1) {
             sock_udp_send(&sock, &buf, 7, &gateway);
         }
         DEBUG("[emcute] on pub: got %i bytes of data\n", (int)(len - pos - 6));
-        sub->cb(&sub->topic, &rbuf[pos + 6], (size_t)(len - pos - 6));
+        size_t dat_len = (len - pos - 6);
+        void *dat = (dat_len > 0) ? &rbuf[pos + 6] : NULL;
+        sub->cb(&sub->topic, dat, dat_len);
     }
 }
 
@@ -532,7 +537,17 @@ void emcute_run(uint16_t port, const char *id)
         if (len >= 2) {
             /* handle the packet */
             uint16_t pkt_len;
+            /* catch invalid length field */
+            if ((len == 2) && (rbuf[0] == 0x01)) {
+                continue;
+            }
+            /* parse length field */
             int pos = get_len(rbuf, &pkt_len);
+            /* verify length to prevent overflows */
+            if (((ssize_t)pkt_len > len) || ((ssize_t)pos >= len)) {
+                continue;
+            }
+            /* get packet type */
             uint8_t type = rbuf[pos];
 
             switch (type) {
@@ -540,7 +555,7 @@ void emcute_run(uint16_t port, const char *id)
                 case WILLTOPICREQ:  on_ack(type, 0, 0, 0);  break;
                 case WILLMSGREQ:    on_ack(type, 0, 0, 0);  break;
                 case REGACK:        on_ack(type, 4, 6, 2);  break;
-                case PUBLISH:       on_publish();           break;
+                case PUBLISH:       on_publish(len, pos);   break;
                 case PUBACK:        on_ack(type, 4, 6, 0);  break;
                 case SUBACK:        on_ack(type, 5, 7, 3);  break;
                 case UNSUBACK:      on_ack(type, 2, 0, 0);  break;

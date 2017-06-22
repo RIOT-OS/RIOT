@@ -210,7 +210,7 @@ typedef struct {
  * @brief   Signature for callbacks fired when publish messages are received
  *
  * @param[in] topic     topic the received data was published on
- * @param[in] data      published data
+ * @param[in] data      published data, can be NULL
  * @param[in] len       length of @p data in bytes
  */
 typedef void(*emcute_cb_t)(const emcute_topic_t *topic, void *data, size_t len);
