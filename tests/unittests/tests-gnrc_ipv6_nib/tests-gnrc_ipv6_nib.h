@@ -43,6 +43,13 @@ Test *tests_gnrc_ipv6_nib_internal_tests(void);
  */
 Test *tests_gnrc_ipv6_nib_nc_tests(void);
 
+/**
+ * @brief   Generates tests for prefix list view
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_gnrc_ipv6_nib_pl_tests(void);
+
 #ifdef __cplusplus
 }
 #endif
