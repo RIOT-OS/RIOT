@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     cpu_arm7_common
+ * @ingroup     drivers_periph_pm
  * @{
  *
  * @file

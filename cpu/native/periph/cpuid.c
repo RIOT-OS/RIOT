@@ -7,7 +7,8 @@
  */
 
 /**
- * @addtogroup  cpu_native
+ * @ingroup     cpu_native
+ * @ingroup     drivers_periph_cpuid
  * @{
  *
  * @file

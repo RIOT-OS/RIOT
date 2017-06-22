@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     cpu_ezr32wg
+ * @ingroup     drivers_periph_timer
  * @{
  *
  * @file

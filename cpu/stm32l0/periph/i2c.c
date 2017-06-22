@@ -7,14 +7,15 @@
  */
 
 /**
- * @addtogroup  driver_periph
+ * @ingroup     cpu_stm32l0
+ * @ingroup     drivers_periph_i2c
  * @{
  *
  * @file
  * @brief       Low-level I2C driver implementation
  *
- * @note This implementation only implements the 7-bit addressing polling mode (for now
- * interrupt mode is not available)
+ * @note This implementation only implements the 7-bit addressing polling mode
+ * (for now interrupt mode is not available)
  *
  * @author      Aurélien Fillau <aurelien.fillau@we-sens.com>
  *

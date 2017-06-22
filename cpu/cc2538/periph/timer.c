@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     cpu_cc2538
+ * @ingroup     drivers_periph_timer
  * @{
  *
  * @file

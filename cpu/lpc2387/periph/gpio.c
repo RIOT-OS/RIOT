@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup     lpc2387
+ * @ingroup     cpu_lpc2387
+ * @ingroup     drivers_periph_gpio
  * @{
  *
  * @file

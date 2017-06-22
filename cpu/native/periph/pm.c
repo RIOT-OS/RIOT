@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     native_cpu
+ * @ingroup     drivers_periph_pm
  * @{
  *
  * @file

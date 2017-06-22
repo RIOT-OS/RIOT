@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     cpu_msp430fxyz
+ * @ingroup     drivers_periph_spi
  * @{
  *
  * @file

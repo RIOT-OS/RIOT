@@ -9,6 +9,7 @@
 
 /**
  * @ingroup     cpu_samd21
+ * @ingroup     drivers_periph_pwm
  * @{
  *
  * @file

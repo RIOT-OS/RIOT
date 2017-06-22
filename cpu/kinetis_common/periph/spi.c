@@ -10,7 +10,8 @@
  */
 
 /**
- * @ingroup     cpu_kinetis_common_spi
+ * @ingroup     cpu_kinetis_common
+ * @ingroup     drivers_periph_spi
  *
  * @{
  *

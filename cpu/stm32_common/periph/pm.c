@@ -9,7 +9,8 @@
  */
 
 /**
- * @ingroup     cpu_stm32
+ * @ingroup     cpu_cortexm_common
+ * @ingroup     drivers_periph_pm
  * @{
  *
  * @file

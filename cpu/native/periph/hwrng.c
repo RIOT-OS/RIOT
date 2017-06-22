@@ -9,7 +9,7 @@
 
 /**
  * @ingroup     native_cpu
- * @defgroup    native_rng
+ * @ingroup     drivers_periph_hwrng
  * @{
  *
  * @file

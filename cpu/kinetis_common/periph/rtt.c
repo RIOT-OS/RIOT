@@ -8,7 +8,8 @@
  */
 
 /**
- * @ingroup     cpu_kinetis_common_rtt
+ * @ingroup     cpu_kinetis_common
+ * @ingroup     drivers_periph_rtt
  *
  * @{
  *

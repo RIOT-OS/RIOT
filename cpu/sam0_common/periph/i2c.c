@@ -7,12 +7,16 @@
  */
 
 /**
- * @ingroup  cpu_samd21
+ * @ingroup     cpu_sam0_common
+ * @ingroup     drivers_periph_i2c
  * @{
+ *
  * @file
  * @brief       Low-level I2C driver implementation
+ *
  * @author      Baptiste Clenet <bapclenet@gmail.com>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ *
  * @}
  */
 

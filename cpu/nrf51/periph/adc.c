@@ -8,14 +8,12 @@
  */
 
 /**
- * @ingroup     cpu_nrf51822
+ * @ingroup     cpu_nrf51
+ * @ingroup     drivers_periph_adc
  * @{
  *
  * @file
  * @brief       Low-level ADC driver implementation
- *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * @}
  */
