@@ -16,6 +16,7 @@
  * @brief       Board specific definitions for the Atmel SAM L21 Xplained Pro board.
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef BOARD_H
@@ -42,9 +43,14 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   User button pin
+ * @name SW0 (Button) pin definitions
+ * @{
  */
-#define SW0_PIN             GPIO_PIN(PA, 2)
+#define BTN0_PORT           PORT->Group[PA]
+#define BTN0_PIN            GPIO_PIN(PA, 2)
+#define BTN0_MODE           GPIO_IN_PU
+/** @} */
+
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO

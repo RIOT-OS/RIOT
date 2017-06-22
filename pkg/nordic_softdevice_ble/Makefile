@@ -2,6 +2,7 @@ PKG_NAME = nordic_softdevice_ble
 PKG_VERSION = 3288530
 PKG_FILE = nrf5_iot_sdk_$(PKG_VERSION).zip
 PKG_URL = https://developer.nordicsemi.com/nRF5_IoT_SDK/nRF5_IoT_SDK_v0.9.x/$(PKG_FILE)
+PKG_MD5 = 291c875df69c51e22491e6112128bd9c
 PKG_LICENSE = nordic-bsd
 PKG_DIR=$(CURDIR)
 PKG_BUILDDIR=$(PKGDIRBASE)/$(PKG_NAME)
@@ -41,7 +42,7 @@ $(PKG_SRCDIR)/.extracted: $(PKG_BUILDDIR)/$(PKG_FILE)
 
 $(PKG_BUILDDIR)/$(PKG_FILE):
 	@mkdir -p $(@D)
-	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)
+	$(Q)$(DLCACHE) $(PKG_URL) $(PKG_MD5) $@
 
 clean::
 	rm -rf $(PKG_SRCDIR)/

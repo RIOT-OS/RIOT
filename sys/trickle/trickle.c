@@ -18,7 +18,7 @@
 #include "random.h"
 #include "trickle.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG        (0)
 #include "debug.h"
 
 void trickle_callback(trickle_t *trickle)
@@ -33,13 +33,14 @@ void trickle_callback(trickle_t *trickle)
 
 void trickle_interval(trickle_t *trickle)
 {
+    assert(trickle->I > 0);
+
     uint32_t old_interval = trickle->I;
     uint32_t max_interval = trickle->Imin << trickle->Imax;
     uint32_t diff = old_interval - trickle->t;
 
     trickle->I *= 2;
-
-    if ((trickle->I == 0) || (trickle->I > max_interval)) {
+    if (trickle->I > max_interval) {
         trickle->I = max_interval;
         old_interval = max_interval / 2;
     }
@@ -47,24 +48,29 @@ void trickle_interval(trickle_t *trickle)
     DEBUG("trickle: I == %" PRIu32 ", diff == %" PRIu32 "\n", trickle->I, diff);
 
     trickle->c = 0;
+    /* old_interval == trickle->I / 2 */
     trickle->t = random_uint32_range(old_interval, trickle->I);
 
     trickle->msg_time = (trickle->t + diff) * MS_PER_SEC;
     xtimer_set_msg64(&trickle->msg_timer, trickle->msg_time, &trickle->msg,
                      trickle->pid);
-
 }
 
 void trickle_reset_timer(trickle_t *trickle)
 {
+    assert(trickle->I > trickle->Imin);
+
     trickle_stop(trickle);
-    trickle_start(trickle->pid, trickle, trickle->msg.type, trickle->Imin,
-                  trickle->Imax, trickle->k);
+    trickle->I = trickle->Imin;
+    trickle_interval(trickle);
 }
 
 void trickle_start(kernel_pid_t pid, trickle_t *trickle, uint16_t msg_type,
                    uint32_t Imin, uint8_t Imax, uint8_t k)
 {
+    assert(Imin > 0);
+    assert((Imin << Imax) < (UINT32_MAX / 2));
+
     trickle->pid = pid;
 
     trickle->c = 0;

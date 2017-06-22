@@ -133,7 +133,7 @@ typedef enum {
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer);
+int nrf24l01p_read_reg(const nrf24l01p_t *dev, char reg, char *answer);
 
 /**
 * @brief Write one register to the nrf24l01+ transceiver.
@@ -145,7 +145,7 @@ int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write);
+int nrf24l01p_write_reg(const nrf24l01p_t *dev, char reg, char write);
 
 /**
 * @brief Initialize the nrf24l01+ transceiver.
@@ -172,7 +172,7 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t csn, gpio_t ir
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_on(nrf24l01p_t *dev);
+int nrf24l01p_on(const nrf24l01p_t *dev);
 
 /**
 * @brief Power off the nrf24l01+ transceiver.
@@ -182,7 +182,7 @@ int nrf24l01p_on(nrf24l01p_t *dev);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_off(nrf24l01p_t *dev);
+int nrf24l01p_off(const nrf24l01p_t *dev);
 
 /**
 * @brief Transmit payload laying in TX FIFO of the nrf24l01+ transceiver.
@@ -190,7 +190,7 @@ int nrf24l01p_off(nrf24l01p_t *dev);
 * @param[in] dev    Transceiver device to use.
 *
 */
-void nrf24l01p_transmit(nrf24l01p_t *dev);
+void nrf24l01p_transmit(const nrf24l01p_t *dev);
 
 /**
 * @brief Read payload from RX FIFO of the nrf24l01+ transceiver.
@@ -202,7 +202,7 @@ void nrf24l01p_transmit(nrf24l01p_t *dev);
 * @return           Number of bytes that were transfered.
 * @return           -1 on error.
 */
-int nrf24l01p_read_payload(nrf24l01p_t *dev, char *answer, unsigned int size);
+int nrf24l01p_read_payload(const nrf24l01p_t *dev, char *answer, unsigned int size);
 
 /**
 * @brief Register a given ID to the nrf24l01+ transceiver.
@@ -222,7 +222,7 @@ void nrf24l01p_register(nrf24l01p_t *dev, unsigned int *pid);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_enable_dynamic_payload(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
+int nrf24l01p_enable_dynamic_payload(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
 
 /**
 * @brief Enable dynamic ack for the nrf24l01+ transceiver.
@@ -232,7 +232,7 @@ int nrf24l01p_enable_dynamic_payload(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_enable_dynamic_ack(nrf24l01p_t *dev);
+int nrf24l01p_enable_dynamic_ack(const nrf24l01p_t *dev);
 
 /**
 * @brief Unregister the nrf24l01+ transceiver from his ID.
@@ -252,7 +252,7 @@ int nrf24l01p_unregister(nrf24l01p_t *dev, unsigned int pid);
 * @param[in] pid    Transceiver ID.
 *
 */
-void nrf24l01p_get_id(nrf24l01p_t *dev, unsigned int *pid);
+void nrf24l01p_get_id(const nrf24l01p_t *dev, unsigned int *pid);
 
 /**
 * @brief Start searching packets while in RX mode.
@@ -260,7 +260,7 @@ void nrf24l01p_get_id(nrf24l01p_t *dev, unsigned int *pid);
 * @param[in] dev    Transceiver device to use.
 *
 */
-void nrf24l01p_start(nrf24l01p_t *dev);
+void nrf24l01p_start(const nrf24l01p_t *dev);
 
 /**
 * @brief Stop searching packets while in RX mode.
@@ -268,7 +268,7 @@ void nrf24l01p_start(nrf24l01p_t *dev);
 * @param[in] dev    Transceiver device to use.
 *
 */
-void nrf24l01p_stop(nrf24l01p_t *dev);
+void nrf24l01p_stop(const nrf24l01p_t *dev);
 
 /**
 * @brief Preload TX FIFO with payload to transmit.
@@ -280,7 +280,7 @@ void nrf24l01p_stop(nrf24l01p_t *dev);
 * @return           Number of bytes that were transfered.
 * @return           -1 on error.
 */
-int nrf24l01p_preload(nrf24l01p_t *dev, char *data, unsigned int size);
+int nrf24l01p_preload(const nrf24l01p_t *dev, char *data, unsigned int size);
 
 /**
 * @brief Set the RF channel for the nrf24l01+ transceiver.
@@ -295,7 +295,7 @@ int nrf24l01p_preload(nrf24l01p_t *dev, char *data, unsigned int size);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_channel(nrf24l01p_t *dev, uint8_t chan);
+int nrf24l01p_set_channel(const nrf24l01p_t *dev, uint8_t chan);
 
 /**
 * @brief Set the address width for the nrf24l01+ transceiver.
@@ -306,7 +306,7 @@ int nrf24l01p_set_channel(nrf24l01p_t *dev, uint8_t chan);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_address_width(nrf24l01p_t *dev, nrf24l01p_aw_t aw);
+int nrf24l01p_set_address_width(const nrf24l01p_t *dev, nrf24l01p_aw_t aw);
 
 /**
 * @brief Set the RX payload width for the nrf24l01+ transceiver
@@ -322,7 +322,7 @@ int nrf24l01p_set_address_width(nrf24l01p_t *dev, nrf24l01p_aw_t aw);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char width);
+int nrf24l01p_set_payload_width(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char width);
 
 /**
 * @brief Set the TX address for the nrf24l01+ transceiver (byte array).
@@ -339,7 +339,7 @@ int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char
 * @return           Address length on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_tx_address(nrf24l01p_t *dev, char *saddr, unsigned int length);
+int nrf24l01p_set_tx_address(const nrf24l01p_t *dev, char *saddr, unsigned int length);
 
 /**
 * @brief Set the TX address for the nrf24l01+ transceiver (long int).
@@ -351,7 +351,7 @@ int nrf24l01p_set_tx_address(nrf24l01p_t *dev, char *saddr, unsigned int length)
 * @return           Address length on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_tx_address_long(nrf24l01p_t *dev, uint64_t saddr, unsigned int length);
+int nrf24l01p_set_tx_address_long(const nrf24l01p_t *dev, uint64_t saddr, unsigned int length);
 
 /**
 * @brief Set the RX address for the nrf24l01+ transceiver (byte array).
@@ -369,7 +369,7 @@ int nrf24l01p_set_tx_address_long(nrf24l01p_t *dev, uint64_t saddr, unsigned int
 * @return           Address length on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *saddr, unsigned int length);
+int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *saddr, unsigned int length);
 
 /**
 * @brief Set the RX address for the nrf24l01+ transceiver (long int).
@@ -382,7 +382,7 @@ int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *s
 * @return           Address length on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint64_t saddr, unsigned int length);
+int nrf24l01p_set_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint64_t saddr, unsigned int length);
 
 /**
 * @brief Get the TX address for the nrf24l01+ transceiver (long int).
@@ -392,7 +392,7 @@ int nrf24l01p_set_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, ui
 * @return           TX address of the nrf24l01+ transceiver.
 * @return           -1 on error.
 */
-uint64_t nrf24l01p_get_tx_address_long(nrf24l01p_t *dev);
+uint64_t nrf24l01p_get_tx_address_long(const nrf24l01p_t *dev);
 
 /**
 * @brief Get the RX address for the nrf24l01+ transceiver (long int).
@@ -403,7 +403,7 @@ uint64_t nrf24l01p_get_tx_address_long(nrf24l01p_t *dev);
 * @return           RX address of the nrf24l01+ transceiver.
 * @return           -1 on error.
 */
-uint64_t nrf24l01p_get_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
+uint64_t nrf24l01p_get_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
 
 /**
 * @brief Get the TX address for the nrf24l01+ transceiver (long int).
@@ -417,7 +417,7 @@ uint64_t nrf24l01p_get_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pip
 * @return           1 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_datarate(nrf24l01p_t *dev, nrf24l01p_dr_t dr);
+int nrf24l01p_set_datarate(const nrf24l01p_t *dev, nrf24l01p_dr_t dr);
 
 /**
 * @brief Get the status (register) of the nrf24l01+ transceiver device.
@@ -426,7 +426,7 @@ int nrf24l01p_set_datarate(nrf24l01p_t *dev, nrf24l01p_dr_t dr);
 *
 * @return           Value of the status register.
 */
-int nrf24l01p_get_status(nrf24l01p_t *dev);
+int nrf24l01p_get_status(const nrf24l01p_t *dev);
 
 /**
 * @brief Set the transmit power for the nrf24l01+ transceiver device.
@@ -440,7 +440,7 @@ int nrf24l01p_get_status(nrf24l01p_t *dev);
 * @return           1 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_power(nrf24l01p_t *dev, int pwr);
+int nrf24l01p_set_power(const nrf24l01p_t *dev, int pwr);
 
 /**
 * @brief Get the transmit power for the nrf24l01+ transceiver device.
@@ -449,7 +449,7 @@ int nrf24l01p_set_power(nrf24l01p_t *dev, int pwr);
 *
 * @return           TX power value of the nrf24l01+ transceiver.
 */
-int nrf24l01p_get_power(nrf24l01p_t *dev);
+int nrf24l01p_get_power(const nrf24l01p_t *dev);
 
 /**
 * @brief Set the nrf24l01+ into TX mode.
@@ -459,7 +459,7 @@ int nrf24l01p_get_power(nrf24l01p_t *dev);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_txmode(nrf24l01p_t *dev);
+int nrf24l01p_set_txmode(const nrf24l01p_t *dev);
 
 /**
 * @brief Set the nrf24l01+ into RX mode.
@@ -469,7 +469,7 @@ int nrf24l01p_set_txmode(nrf24l01p_t *dev);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_rxmode(nrf24l01p_t *dev);
+int nrf24l01p_set_rxmode(const nrf24l01p_t *dev);
 
 /**
 * @brief Reset all interrupts on the nrf24l01+ transceiver.
@@ -479,7 +479,7 @@ int nrf24l01p_set_rxmode(nrf24l01p_t *dev);
 * @return           1 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_reset_all_interrupts(nrf24l01p_t *dev);
+int nrf24l01p_reset_all_interrupts(const nrf24l01p_t *dev);
 
 /**
 * @brief Reset interrupts on the nrf24l01+ transceiver.
@@ -490,7 +490,7 @@ int nrf24l01p_reset_all_interrupts(nrf24l01p_t *dev);
 * @return           1 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_reset_interrupts(nrf24l01p_t *dev, char intrs);
+int nrf24l01p_reset_interrupts(const nrf24l01p_t *dev, char intrs);
 
 /**
 * @brief Mask one interrupt on the nrf24l01+ transceiver.
@@ -506,7 +506,7 @@ int nrf24l01p_reset_interrupts(nrf24l01p_t *dev, char intrs);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_mask_interrupt(nrf24l01p_t *dev, char intr);
+int nrf24l01p_mask_interrupt(const nrf24l01p_t *dev, char intr);
 
 /**
 * @brief Unmask one interrupt on the nrf24l01+ transceiver.
@@ -522,7 +522,7 @@ int nrf24l01p_mask_interrupt(nrf24l01p_t *dev, char intr);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_unmask_interrupt(nrf24l01p_t *dev, char intr);
+int nrf24l01p_unmask_interrupt(const nrf24l01p_t *dev, char intr);
 
 /**
 * @brief Enable RX datapipe on the nrf24l01+ transceiver.
@@ -533,7 +533,7 @@ int nrf24l01p_unmask_interrupt(nrf24l01p_t *dev, char intr);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_enable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
+int nrf24l01p_enable_pipe(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
 
 /**
 * @brief Disable RX datapipe on the nrf24l01+ transceiver.
@@ -544,7 +544,7 @@ int nrf24l01p_enable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_disable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
+int nrf24l01p_disable_pipe(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
 
 /**
 * @brief Disable CRC error detection on the nrf24l01+ transceiver.
@@ -553,7 +553,7 @@ int nrf24l01p_disable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
 *
 * @return           0.
 */
-int nrf24l01p_disable_crc(nrf24l01p_t *dev);
+int nrf24l01p_disable_crc(const nrf24l01p_t *dev);
 
 /**
 * @brief Enable CRC error detection on the nrf24l01+ transceiver.
@@ -564,7 +564,7 @@ int nrf24l01p_disable_crc(nrf24l01p_t *dev);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_enable_crc(nrf24l01p_t *dev, nrf24l01p_crc_t crc);
+int nrf24l01p_enable_crc(const nrf24l01p_t *dev, nrf24l01p_crc_t crc);
 
 /**
 * @brief Setup and enable automatic ACK and retransmission on the nrf24l01+ transceiver.
@@ -582,7 +582,7 @@ int nrf24l01p_enable_crc(nrf24l01p_t *dev, nrf24l01p_crc_t crc);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_setup_auto_ack(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l01p_retransmit_delay_t delay_retrans, char count_retrans);
+int nrf24l01p_setup_auto_ack(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l01p_retransmit_delay_t delay_retrans, char count_retrans);
 
 /**
 * @brief Disable automatic ACK on the nrf24l01+ transceiver.
@@ -592,7 +592,7 @@ int nrf24l01p_setup_auto_ack(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l0
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_disable_all_auto_ack(nrf24l01p_t *dev);
+int nrf24l01p_disable_all_auto_ack(const nrf24l01p_t *dev);
 
 /**
 * @brief Flush TX FIFO on the nrf24l01+ transceiver.
@@ -602,7 +602,7 @@ int nrf24l01p_disable_all_auto_ack(nrf24l01p_t *dev);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_flush_tx_fifo(nrf24l01p_t *dev);
+int nrf24l01p_flush_tx_fifo(const nrf24l01p_t *dev);
 
 /**
 * @brief Flush RX FIFO on the nrf24l01+ transceiver.
@@ -612,7 +612,7 @@ int nrf24l01p_flush_tx_fifo(nrf24l01p_t *dev);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_flush_rx_fifo(nrf24l01p_t *dev);
+int nrf24l01p_flush_rx_fifo(const nrf24l01p_t *dev);
 
 /**
 * @brief Callback that is called when interrupt occurs on interrupt

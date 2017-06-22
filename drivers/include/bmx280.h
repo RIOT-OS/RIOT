@@ -183,7 +183,7 @@ int bmx280_init(bmx280_t* dev, const bmx280_params_t* params);
  * @returns                 The temperature in centi Celsius. In case of an error
  *                          it returns INT16_MIN.
  */
-int16_t bmx280_read_temperature(bmx280_t* dev);
+int16_t bmx280_read_temperature(const bmx280_t* dev);
 
 /**
  * @brief Read air pressure value from the given BMX280 device, returned in PA
@@ -195,7 +195,7 @@ int16_t bmx280_read_temperature(bmx280_t* dev);
  *
  * @returns                 The air pressure in Pa
  */
-uint32_t bmx280_read_pressure(bmx280_t *dev);
+uint32_t bmx280_read_pressure(const bmx280_t *dev);
 
 #if defined(MODULE_BME280)
 /**
@@ -208,7 +208,7 @@ uint32_t bmx280_read_pressure(bmx280_t *dev);
  *
  * @returns                 Humidity in centi %RH (i.e. the percentage times 100)
  */
-uint16_t bme280_read_humidity(bmx280_t *dev);
+uint16_t bme280_read_humidity(const bmx280_t *dev);
 #endif
 
 #ifdef __cplusplus

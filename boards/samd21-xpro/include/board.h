@@ -19,6 +19,7 @@
  *
  * @author      Travis Griggs <travisgriggs@gmail.com>
  * @author      Dan Evans <photonthunder@gmail.com>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef BOARD_H
@@ -58,9 +59,9 @@ extern "C" {
  * @name SW0 (Button) pin definitions
  * @{
  */
-#define BUTTON_PORT         PORT->Group[PA]
-#define BUTTON_PIN          (15)
-#define BUTTON_GPIO         GPIO_PIN(PA, BUTTON_PIN)
+#define BTN0_PORT           PORT->Group[PA]
+#define BTN0_PIN            GPIO_PIN(PA, 15)
+#define BTN0_MODE           GPIO_IN_PU
 /** @} */
 
 /**

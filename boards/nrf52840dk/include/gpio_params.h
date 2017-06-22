@@ -14,7 +14,7 @@
  * @brief       Configuration of SAUL mapped GPIO pins
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- *
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef GPIO_PARAMS_H
@@ -54,23 +54,23 @@ static const  saul_gpio_params_t saul_gpio_params[] =
     },
     {
         .name = "Button 1",
-        .pin = BUTTON1_PIN,
-        .mode = GPIO_IN_PU
+        .pin  = BTN0_PIN,
+        .mode = BTN0_MODE
     },
     {
         .name = "Button 2",
-        .pin = BUTTON2_PIN,
-        .mode = GPIO_IN_PU
+        .pin  = BTN1_PIN,
+        .mode = BTN1_MODE
     },
     {
         .name = "Button 3",
-        .pin = BUTTON3_PIN,
-        .mode = GPIO_IN_PU
+        .pin  = BTN2_PIN,
+        .mode = BTN2_MODE
     },
     {
         .name = "Button 4",
-        .pin = BUTTON4_PIN,
-        .mode = GPIO_IN_PU
+        .pin  = BTN3_PIN,
+        .mode = BTN3_MODE
     }
 };
 

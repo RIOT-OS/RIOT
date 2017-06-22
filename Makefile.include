@@ -16,6 +16,8 @@ APPDIR         ?= $(CURDIR)
 BINDIRBASE     ?= $(APPDIR)/bin
 BINDIR         ?= $(BINDIRBASE)/$(BOARD)
 PKGDIRBASE     ?= $(BINDIRBASE)/pkg/$(BOARD)
+DLCACHE        ?= $(RIOTBASE)/dist/tools/dlcache/dlcache.sh
+DLCACHE_DIR    ?= $(RIOTBASE)/.dlcache
 
 __DIRECTORY_VARIABLES := \
   RIOTBASE \
@@ -30,6 +32,7 @@ __DIRECTORY_VARIABLES := \
   CCACHE_BASEDIR \
   GITCACHE \
   PKGDIRBASE \
+  DLCACHE_DIR \
   #
 
 # Make all paths absolute.
@@ -45,6 +48,7 @@ override APPDIR         := $(abspath $(APPDIR))
 override BINDIRBASE     := $(abspath $(BINDIRBASE))
 override BINDIR         := $(abspath $(BINDIR))
 override PKGDIRBASE     := $(abspath $(PKGDIRBASE))
+override DLCACHE_DIR    := $(abspath $(DLCACHE_DIR))
 
 # Ensure that all directories are set and don't contain spaces.
 ifneq (, $(filter-out 1, $(foreach v,${__DIRECTORY_VARIABLES},$(words ${${v}}))))

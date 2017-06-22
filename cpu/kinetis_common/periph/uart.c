@@ -26,6 +26,7 @@
 #include <math.h>
 
 #include "cpu.h"
+#include "bit.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
 
@@ -93,7 +94,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     }
 
     /* Turn on module clock gate */
-    *(uart_config[uart].clken) = 1;
+    bit_set32(uart_config[uart].scgc_addr, uart_config[uart].scgc_bit);
 
     /* disable transmitter and receiver */
     dev->C2 &= ~(UART_C2_TE_MASK | UART_C2_RE_MASK);

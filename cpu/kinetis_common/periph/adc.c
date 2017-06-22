@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include "cpu.h"
+#include "bit.h"
 #include "mutex.h"
 #include "periph/adc.h"
 
@@ -65,11 +66,11 @@ static inline int dev_num(adc_t line)
 static inline void prep(adc_t line)
 {
     if (dev(line) == ADC0) {
-        BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_ADC0_SHIFT) = 1;
+        bit_set32(&SIM->SCGC6, SIM_SCGC6_ADC0_SHIFT);
     }
 #ifdef ADC1
     else {
-        BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_ADC1_SHIFT) = 1;
+        bit_set32(&SIM->SCGC3, SIM_SCGC3_ADC1_SHIFT);
     }
 #endif
     mutex_lock(&locks[dev_num(line)]);
@@ -78,11 +79,11 @@ static inline void prep(adc_t line)
 static inline void done(adc_t line)
 {
     if (dev(line) == ADC0) {
-        BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_ADC0_SHIFT) = 0;
+        bit_clear32(&SIM->SCGC6, SIM_SCGC6_ADC0_SHIFT);
     }
 #ifdef ADC1
     else {
-        BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_ADC1_SHIFT) = 0;
+        bit_clear32(&SIM->SCGC3, SIM_SCGC3_ADC1_SHIFT);
     }
 #endif
     mutex_unlock(&locks[dev_num(line)]);

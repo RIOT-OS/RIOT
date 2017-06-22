@@ -75,7 +75,7 @@ int lps331ap_init(lps331ap_t *dev, i2c_t i2c, uint8_t address, lps331ap_rate_t r
     return 0;
 }
 
-int lps331ap_read_temp(lps331ap_t *dev)
+int lps331ap_read_temp(const lps331ap_t *dev)
 {
     uint8_t tmp;
     int16_t val = 0;
@@ -95,7 +95,7 @@ int lps331ap_read_temp(lps331ap_t *dev)
     return (int)(res * 1000);
 }
 
-int lps331ap_read_pres(lps331ap_t *dev)
+int lps331ap_read_pres(const lps331ap_t *dev)
 {
     uint8_t tmp;
     int32_t val = 0;
@@ -121,7 +121,7 @@ int lps331ap_read_pres(lps331ap_t *dev)
 }
 
 
-int lps331ap_enable(lps331ap_t *dev)
+int lps331ap_enable(const lps331ap_t *dev)
 {
     uint8_t tmp;
     int status;
@@ -138,7 +138,7 @@ int lps331ap_enable(lps331ap_t *dev)
     return status;
 }
 
-int lps331ap_disable(lps331ap_t *dev)
+int lps331ap_disable(const lps331ap_t *dev)
 {
     uint8_t tmp;
     int status;

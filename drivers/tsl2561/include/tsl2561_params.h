@@ -66,9 +66,7 @@ static const tsl2561_params_t tsl2561_params[] =
  */
 saul_reg_info_t tsl2561_saul_reg_info[] =
 {
-    {
-        .name= "tsl2561-illuminance"
-    }
+    { .name= "tsl2561" }
 };
 
 #ifdef __cplusplus

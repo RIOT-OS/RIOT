@@ -96,7 +96,7 @@ int mag3110_init(mag3110_t *dev, const mag3110_params_t *params)
                                    dev->params.offset[1], dev->params.offset[2]);
 }
 
-int mag3110_set_user_offset(mag3110_t *dev, int16_t x, int16_t y, int16_t z)
+int mag3110_set_user_offset(const mag3110_t *dev, int16_t x, int16_t y, int16_t z)
 {
     uint8_t buf[6];
 
@@ -123,7 +123,7 @@ int mag3110_set_user_offset(mag3110_t *dev, int16_t x, int16_t y, int16_t z)
     return MAG3110_OK;
 }
 
-int mag3110_set_active(mag3110_t *dev)
+int mag3110_set_active(const mag3110_t *dev)
 {
     uint8_t reg;
 
@@ -146,7 +146,7 @@ int mag3110_set_active(mag3110_t *dev)
     return MAG3110_OK;
 }
 
-int mag3110_set_standby(mag3110_t *dev)
+int mag3110_set_standby(const mag3110_t *dev)
 {
     uint8_t reg;
 
@@ -169,7 +169,7 @@ int mag3110_set_standby(mag3110_t *dev)
     return MAG3110_OK;
 }
 
-int mag3110_is_ready(mag3110_t *dev)
+int mag3110_is_ready(const mag3110_t *dev)
 {
     uint8_t reg;
 
@@ -185,7 +185,7 @@ int mag3110_is_ready(mag3110_t *dev)
     return (int)(reg & MAG3110_DR_STATUS_ZYXDR);
 }
 
-int mag3110_read(mag3110_t *dev, mag3110_data_t *data)
+int mag3110_read(const mag3110_t *dev, mag3110_data_t *data)
 {
     uint8_t buf[7];
 
@@ -207,7 +207,7 @@ int mag3110_read(mag3110_t *dev, mag3110_data_t *data)
     return MAG3110_OK;
 }
 
-int mag3110_read_dtemp(mag3110_t *dev, int8_t *dtemp)
+int mag3110_read_dtemp(const mag3110_t *dev, int8_t *dtemp)
 {
     assert(dev);
 

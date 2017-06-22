@@ -14,6 +14,7 @@
  * @brief     Board specific configuration of direct mapped GPIOs
  *
  * @author    Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author    Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef GPIO_PARAMS_H
@@ -48,8 +49,8 @@ static const  saul_gpio_params_t saul_gpio_params[] =
     },
     {
         .name = "B1(User button)",
-        .pin = BTN_B1_PIN,
-        .mode = GPIO_IN_PD
+        .pin  = BTN0_PIN,
+        .mode = BTN0_MODE
     }
 };
 

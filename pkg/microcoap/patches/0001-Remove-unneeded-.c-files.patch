@@ -1,13 +1,13 @@
-From 8976fda8df092ce24e1c6bbf718f94cb98009231 Mon Sep 17 00:00:00 2001
-From: Martine Lenders <mail@martine-lenders.eu>
-Date: Sun, 1 Feb 2015 16:35:56 +0100
-Subject: [PATCH 1/2] Remove unneeded *.c files
+From 335f83548f4a4a13b556800bcc354d77db8c3434 Mon Sep 17 00:00:00 2001
+From: Patrick Grosse <patrick.grosse@uni-muenster.de>
+Date: Sat, 25 Mar 2017 10:32:27 +0100
+Subject: [PATCH 1/6] Remove unneeded *.c files
 
 ---
  endpoints.c   | 113 ----------------------------------------------------------
- main-posix.c  |  71 ------------------------------------
+ main-posix.c  |  85 -------------------------------------------
  microcoap.ino |  99 --------------------------------------------------
- 3 files changed, 283 deletions(-)
+ 3 files changed, 297 deletions(-)
  delete mode 100644 endpoints.c
  delete mode 100644 main-posix.c
  delete mode 100644 microcoap.ino
@@ -133,10 +133,10 @@ index ccc961b..0000000
 -
 diff --git a/main-posix.c b/main-posix.c
 deleted file mode 100644
-index dd73cf9..0000000
+index 3711b02..0000000
 --- a/main-posix.c
 +++ /dev/null
-@@ -1,71 +0,0 @@
+@@ -1,85 +0,0 @@
 -#include <sys/socket.h>
 -#include <netinet/in.h>
 -#include <stdio.h>
@@ -150,17 +150,31 @@ index dd73cf9..0000000
 -int main(int argc, char **argv)
 -{
 -    int fd;
+-#ifdef IPV6
+-    struct sockaddr_in6 servaddr, cliaddr;
+-#else /* IPV6 */
 -    struct sockaddr_in servaddr, cliaddr;
+-#endif /* IPV6 */
 -    uint8_t buf[4096];
 -    uint8_t scratch_raw[4096];
 -    coap_rw_buffer_t scratch_buf = {scratch_raw, sizeof(scratch_raw)};
 -
+-#ifdef IPV6
+-    fd = socket(AF_INET6,SOCK_DGRAM,0);
+-#else /* IPV6 */
 -    fd = socket(AF_INET,SOCK_DGRAM,0);
+-#endif /* IPV6 */
 -
 -    bzero(&servaddr,sizeof(servaddr));
+-#ifdef IPV6
+-    servaddr.sin6_family = AF_INET6;
+-    servaddr.sin6_addr = in6addr_any;
+-    servaddr.sin6_port = htons(PORT);
+-#else /* IPV6 */
 -    servaddr.sin_family = AF_INET;
 -    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 -    servaddr.sin_port = htons(PORT);
+-#endif /* IPV6 */
 -    bind(fd,(struct sockaddr *)&servaddr, sizeof(servaddr));
 -
 -    endpoint_setup();
@@ -314,5 +328,5 @@ index 148b6ce..0000000
 -}
 -
 -- 
-1.9.1
+2.7.4
 

@@ -160,7 +160,7 @@ typedef enum {
  * @param[in]  dev          target device
  *
  */
-void pn532_reset(pn532_t *dev);
+void pn532_reset(const pn532_t *dev);
 
 /**
  * @brief Initialize the module and peripherals

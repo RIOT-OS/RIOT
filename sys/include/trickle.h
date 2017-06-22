@@ -59,12 +59,18 @@ typedef struct {
 /**
  * @brief resets the trickle timer
  *
+ * @pre `trickle->I > trickle->Imin`
+ * @see https://tools.ietf.org/html/rfc6206#section-4.2, number 6
+ *
  * @param[in] trickle   the trickle timer
  */
 void trickle_reset_timer(trickle_t *trickle);
 
 /**
  * @brief start the trickle timer
+ *
+ * @pre `Imin > 0`
+ * @pre `(Imin << Imax) < (UINT32_MAX / 2)` to avoid overflow of uint32_t
  *
  * @param[in] pid                   target thread
  * @param[in] trickle               trickle timer
@@ -92,6 +98,8 @@ void trickle_increment_counter(trickle_t *trickle);
 
 /**
  * @brief is called after the interval is over and calculates the next interval
+ *
+ * @pre `(trickle->I > 0)` required for trickle algorithm to work
  *
  * @param[in] trickle   trickle timer
  */

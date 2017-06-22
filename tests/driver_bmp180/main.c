@@ -18,47 +18,37 @@
  * @}
  */
 
-#ifndef TEST_I2C
-#error "TEST_I2C not defined"
-#endif
-
-#ifndef TEST_MEASURE_OVERSAMPLING
-#error "TEST_MEASURE_OVERSAMPLING not defined"
-#endif
-
-#ifndef TEST_ALTITUDE
-#error "TEST_ALTITUDE not defined"
-#endif
-
 #include <stdio.h>
 #include <inttypes.h>
 
 #include "bmp180.h"
+#include "bmp180_params.h"
 #include "xtimer.h"
 #include "board.h"
-
-#define SLEEP_2S   (2 * 1000 * 1000u) /* 2 seconds delay between printf */
 
 int main(void)
 {
     bmp180_t dev;
-    int32_t temperature, pressure, altitude, pressure_0;
     int result;
 
     puts("BMP180 test application\n");
 
     printf("+------------Initializing------------+\n");
-    result = bmp180_init(&dev, TEST_I2C, TEST_MEASURE_OVERSAMPLING);
-    if (result == -1) {
+    result = bmp180_init(&dev, &bmp180_params[0]);
+    if (result == -BMP180_ERR_NOI2C) {
         puts("[Error] The given i2c is not enabled");
         return 1;
     }
-    else if (result == -2) {
+    else if (result == -BMP180_ERR_NODEV) {
         puts("[Error] The sensor did not answer correctly on the given address");
         return 1;
     }
+    else if (result == -BMP180_ERR_NOCAL) {
+        puts("[Error] Cannot read the sensor calibration values");
+        return 1;
+    }
     else {
-        printf("Initialization successful\n\n");
+        puts("Initialization successful\n");
     }
 
     printf("+------------Calibration------------+\n");
@@ -76,26 +66,28 @@ int main(void)
     printf("\n+--------Starting Measurements--------+\n");
     while (1) {
         /* Get temperature in deci degrees celsius */
-        bmp180_read_temperature(&dev, &temperature);
+        int16_t temperature = bmp180_read_temperature(&dev);
 
         /* Get pressure in Pa */
-        bmp180_read_pressure(&dev, &pressure);
+        uint32_t pressure = bmp180_read_pressure(&dev);
 
         /* Get pressure at sealevel in Pa */
-        bmp180_sealevel_pressure(&dev, (int32_t)TEST_ALTITUDE, &pressure_0);
+        uint32_t pressure_0 = bmp180_sealevel_pressure(&dev, (int16_t)TEST_ALTITUDE);
 
         /* Get altitude in meters */
-        bmp180_altitude(&dev, pressure_0, &altitude);
+        int16_t altitude = bmp180_altitude(&dev, pressure_0);
 
-        printf("Temperature [°C]: %.1f\n"
-               "Pressure [hPa]: %.2f\n"
-               "Pressure at see level [hPa]: %.2f\n"
-               "Altitude [m]: %i\n"
+        printf("Temperature [°C]: %d.%d\n"
+               "Pressure [hPa]: %lu.%d\n"
+               "Pressure at see level [hPa]: %lu.%d\n"
+              "Altitude [m]: %i\n"
                "\n+-------------------------------------+\n",
-               (double)temperature / 10.0, (double)pressure / 100.0,
-               (double)pressure_0 / 100.0, (int)altitude);
+               (int)(temperature / 10), (int)(temperature % 10),
+               (unsigned long)pressure / 100, (int)(pressure % 100),
+               (unsigned long)pressure_0 / 100, (int)(pressure_0 % 100),
+               (int)altitude);
 
-        xtimer_usleep(SLEEP_2S);
+        xtimer_sleep(2);
     }
 
     return 0;

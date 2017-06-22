@@ -1,7 +1,7 @@
-From a90622ce42cd1a816fab4d8f6829426bfc8683b2 Mon Sep 17 00:00:00 2001
-From: Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>
-Date: Sun, 8 Feb 2015 15:00:01 -0800
-Subject: [PATCH] change flag from DEBUG to MICROCOAP_DEBUG
+From 265f4bb3d661b32fb3ec58712c48982bab433a52 Mon Sep 17 00:00:00 2001
+From: Patrick Grosse <patrick.grosse@uni-muenster.de>
+Date: Sat, 25 Mar 2017 10:35:03 +0100
+Subject: [PATCH 3/6] change flag from DEBUG to MICROCOAP_DEBUG
 
 ---
  coap.c |  8 ++++----
@@ -9,7 +9,7 @@ Subject: [PATCH] change flag from DEBUG to MICROCOAP_DEBUG
  2 files changed, 15 insertions(+), 5 deletions(-)
 
 diff --git a/coap.c b/coap.c
-index 4f30e3a..ada66c2 100644
+index 4d036f5..407d1d2 100644
 --- a/coap.c
 +++ b/coap.c
 @@ -9,7 +9,7 @@
@@ -49,10 +49,10 @@ index 4f30e3a..ada66c2 100644
  {
      coap_dumpHeader(&pkt->hdr);
 diff --git a/coap.h b/coap.h
-index c132334..4a7adc5 100644
+index c67c7ce..8c91369 100644
 --- a/coap.h
 +++ b/coap.h
-@@ -145,12 +145,22 @@ typedef struct
+@@ -158,12 +158,22 @@ typedef struct
  
  
  ///////////////////////
@@ -77,5 +77,5 @@ index c132334..4a7adc5 100644
  int coap_handle_req(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt);
  void coap_option_nibble(uint32_t value, uint8_t *nibble);
 -- 
-1.8.3.2
+2.7.4
 

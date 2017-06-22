@@ -82,7 +82,7 @@ int lps331ap_init(lps331ap_t *dev, i2c_t i2c, uint8_t address, lps331ap_rate_t r
  *
  * @return              temperature value in m°C
  */
-int lps331ap_read_temp(lps331ap_t *dev);
+int lps331ap_read_temp(const lps331ap_t *dev);
 
 /**
  * @brief Read a pressure value from the given sensor, returned in mbar
@@ -91,7 +91,7 @@ int lps331ap_read_temp(lps331ap_t *dev);
  *
  * @return              pressure value in mbar
  */
-int lps331ap_read_pres(lps331ap_t *dev);
+int lps331ap_read_pres(const lps331ap_t *dev);
 
 /**
  * @brief Enable the given sensor
@@ -101,7 +101,7 @@ int lps331ap_read_pres(lps331ap_t *dev);
  * @return              0 on success
  * @return              -1 on error
  */
-int lps331ap_enable(lps331ap_t *dev);
+int lps331ap_enable(const lps331ap_t *dev);
 
 /**
  * @brief Disable the given sensor
@@ -111,7 +111,7 @@ int lps331ap_enable(lps331ap_t *dev);
  * @return              0 on success
  * @return              -1 on error
  */
-int lps331ap_disable(lps331ap_t *dev);
+int lps331ap_disable(const lps331ap_t *dev);
 
 #ifdef __cplusplus
 }

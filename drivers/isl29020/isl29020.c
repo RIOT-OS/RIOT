@@ -53,7 +53,7 @@ int isl29020_init(isl29020_t *dev, i2c_t i2c, uint8_t address,
     return 0;
 }
 
-int isl29020_read(isl29020_t *dev)
+int isl29020_read(const isl29020_t *dev)
 {
     uint8_t low, high;
     uint16_t res;
@@ -73,7 +73,7 @@ int isl29020_read(isl29020_t *dev)
     return (int)(dev->lux_fac * res);
 }
 
-int isl29020_enable(isl29020_t *dev)
+int isl29020_enable(const isl29020_t *dev)
 {
     int res;
     uint8_t tmp;
@@ -94,7 +94,7 @@ int isl29020_enable(isl29020_t *dev)
     return 0;
 }
 
-int isl29020_disable(isl29020_t *dev)
+int isl29020_disable(const isl29020_t *dev)
 {
     int res;
     uint8_t tmp;

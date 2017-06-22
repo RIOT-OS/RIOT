@@ -105,14 +105,14 @@ int hd44780_init(hd44780_t *dev, const hd44780_params_t *params);
  *
  * @param[in]  dev          device descriptor of LCD
  */
-void hd44780_clear(hd44780_t *dev);
+void hd44780_clear(const hd44780_t *dev);
 
 /**
  * @brief Reset cursor to row 0 and column 0
  *
  * @param[in]  dev          device descriptor of LCD
  */
-void hd44780_home(hd44780_t *dev);
+void hd44780_home(const hd44780_t *dev);
 
 /**
  * @brief Set cursor to specific position in column and row
@@ -121,7 +121,7 @@ void hd44780_home(hd44780_t *dev);
  * @param[in]  col          column position
  * @param[in]  row          row position
  */
-void hd44780_set_cursor(hd44780_t *dev, uint8_t col, uint8_t row);
+void hd44780_set_cursor(const hd44780_t *dev, uint8_t col, uint8_t row);
 
 /**
  * @brief Turn display on or off
@@ -152,14 +152,14 @@ void hd44780_blink(hd44780_t *dev, hd44780_state_t state);
  *
  * @param[in]  dev          device descriptor of LCD
  */
-void hd44780_scroll_left(hd44780_t *dev);
+void hd44780_scroll_left(const hd44780_t *dev);
 
 /**
  * @brief Enable right scrolling
  *
  * @param[in]  dev          device descriptor of LCD
  */
-void hd44780_scroll_right(hd44780_t *dev);
+void hd44780_scroll_right(const hd44780_t *dev);
 
 /**
  * @brief set display direction left to right
@@ -192,7 +192,7 @@ void hd44780_autoscroll(hd44780_t *dev, hd44780_state_t state);
  *
  * @pre charmap has to be of size HD44780_CGRAM_SIZE, which is 8 by default
  */
-void hd44780_create_char(hd44780_t *dev, uint8_t location, uint8_t charmap[]);
+void hd44780_create_char(const hd44780_t *dev, uint8_t location, uint8_t charmap[]);
 
 /**
  * @brief Write a single character on the LCD
@@ -200,7 +200,7 @@ void hd44780_create_char(hd44780_t *dev, uint8_t location, uint8_t charmap[]);
  * @param[in]  dev          device descriptor of LCD
  * @param[in]  value        the character to print, i.e., memory location
  */
-void hd44780_write(hd44780_t *dev, uint8_t value);
+void hd44780_write(const hd44780_t *dev, uint8_t value);
 
 /**
  * @brief Write a string on the LCD
@@ -208,7 +208,7 @@ void hd44780_write(hd44780_t *dev, uint8_t value);
  * @param[in]  dev          device descriptor of LCD
  * @param[in]  data         the string to print
  */
-void hd44780_print(hd44780_t *dev, const char *data);
+void hd44780_print(const hd44780_t *dev, const char *data);
 
 #ifdef __cplusplus
 }

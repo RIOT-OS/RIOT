@@ -92,7 +92,7 @@ int jc42_init(jc42_t* dev, jc42_params_t* params);
  * @return                   0 on success
  * @return                  -1 on error
  */
-int jc42_get_config(jc42_t* dev, uint16_t* data);
+int jc42_get_config(const jc42_t* dev, uint16_t* data);
 
 /**
  * @brief   Set content of configuration register
@@ -103,7 +103,7 @@ int jc42_get_config(jc42_t* dev, uint16_t* data);
  * @return                   0 on success
  * @return                  -1 on error
  */
-int jc42_set_config(jc42_t* dev, uint16_t data);
+int jc42_set_config(const jc42_t* dev, uint16_t data);
 
 
 /**
@@ -115,7 +115,7 @@ int jc42_set_config(jc42_t* dev, uint16_t data);
  * @return                   0 on success
  * @return                  -1 on error
  */
-int jc42_get_temperature(jc42_t* dev, int16_t* temperature);
+int jc42_get_temperature(const jc42_t* dev, int16_t* temperature);
 
 #ifdef __cplusplus
 }

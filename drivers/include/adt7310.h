@@ -139,7 +139,7 @@ int adt7310_init(adt7310_t *dev, spi_t spi, spi_clk_t clk, gpio_t cs);
  * @return                  raw sensor value on success
  * @return                  INT16_MIN on error
  */
-int16_t adt7310_read_raw(adt7310_t *dev);
+int16_t adt7310_read_raw(const adt7310_t *dev);
 
 /**
  * @brief Read temperature value from sensor and convert to milli-degrees Celsius.
@@ -151,7 +151,7 @@ int16_t adt7310_read_raw(adt7310_t *dev);
  * @return                  temperature in milli-degrees Celsius
  * @return                  INT32_MIN on errors
  */
-int32_t adt7310_read(adt7310_t *dev);
+int32_t adt7310_read(const adt7310_t *dev);
 
 /**
  * @brief Read temperature value from sensor and convert to degrees Celsius.
@@ -161,7 +161,7 @@ int32_t adt7310_read(adt7310_t *dev);
  * @return                  floating point representation of temperature in degrees Celsius
  * @return                  NaN on errors
  */
-float adt7310_read_float(adt7310_t *dev);
+float adt7310_read_float(const adt7310_t *dev);
 
 #ifdef __cplusplus
 }

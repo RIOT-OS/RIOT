@@ -274,12 +274,11 @@ size_t fmt_float(char *out, float f, unsigned precision)
 
     uint32_t fraction = f * _tenmap[precision];
 
-    size_t res = negative;
     if (negative && out) {
         *out++ = '-';
     }
 
-    res += fmt_u32_dec(out, integer);
+    size_t res = fmt_u32_dec(out, integer);
     if (precision && fraction) {
         if (out) {
             out += res;
@@ -289,6 +288,7 @@ size_t fmt_float(char *out, float f, unsigned precision)
         }
         res += (1 + precision);
     }
+    res += negative;
 
     return res;
 }

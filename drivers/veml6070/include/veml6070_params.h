@@ -59,9 +59,7 @@ static const veml6070_params_t veml6070_params[] =
  */
 static const saul_reg_info_t veml6070_saul_reg_info[] =
 {
-    {
-        .name = "veml6070-uv"
-    }
+    { .name = "veml6070" }
 };
 
 #ifdef __cplusplus

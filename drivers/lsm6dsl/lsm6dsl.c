@@ -76,7 +76,7 @@ int lsm6dsl_init(lsm6dsl_t *dev, const lsm6dsl_params_t *params)
     return 0;
 }
 
-int lsm6dsl_read_acc(lsm6dsl_t *dev, lsm6dsl_3d_data_t *data)
+int lsm6dsl_read_acc(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data)
 {
     int res;
     uint8_t tmp;
@@ -136,7 +136,7 @@ int lsm6dsl_read_acc(lsm6dsl_t *dev, lsm6dsl_3d_data_t *data)
     return 0;
 }
 
-int lsm6dsl_read_gyro(lsm6dsl_t *dev, lsm6dsl_3d_data_t *data)
+int lsm6dsl_read_gyro(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data)
 {
     int res;
     uint8_t tmp;
@@ -196,7 +196,7 @@ int lsm6dsl_read_gyro(lsm6dsl_t *dev, lsm6dsl_3d_data_t *data)
     return 0;
 }
 
-int lsm6dsl_read_temp(lsm6dsl_t *dev, int16_t *data)
+int lsm6dsl_read_temp(const lsm6dsl_t *dev, int16_t *data)
 {
     int res;
     uint8_t tmp;

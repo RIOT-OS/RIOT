@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-mkr1000 \
                              arduino-uno \
                              arduino-zero \
+                             b-l072z-lrwan1 \
                              calliope-mini \
                              cc2538dk \
                              cc2650stk \
@@ -76,6 +77,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        arduino-due \
                        arduino-mkr1000 \
                        arduino-zero \
+                       b-l072z-lrwan1 \
                        cc2538dk \
                        ek-lm4f120xl \
                        f4vi1 \

@@ -16,6 +16,7 @@
  * @brief       Board specific definitions for the stm32f769 Discovery board
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef BOARD_H
@@ -65,8 +66,12 @@ extern "C" {
 
 /**
  * @brief User button
+ * @{
  */
-#define BTN_B1_PIN          GPIO_PIN(PORT_A, 0)
+#define BTN0_PIN            GPIO_PIN(PORT_A, 0)
+#define BTN0_MODE           GPIO_IN
+/** @} */
+
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

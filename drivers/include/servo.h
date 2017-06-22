@@ -86,7 +86,7 @@ int servo_init(servo_t *dev, pwm_t pwm, int pwm_channel, unsigned int min, unsig
  * @param[in] dev           the servo to set
  * @param[in] pos           the position to set the servo (in the resolution range)
  */
-void servo_set(servo_t *dev, unsigned int pos);
+void servo_set(const servo_t *dev, unsigned int pos);
 
 #ifdef __cplusplus
 }

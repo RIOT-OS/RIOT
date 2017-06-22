@@ -31,10 +31,10 @@
 #include "debug.h"
 
 /* internal helpers */
-static void _enable(tsl2561_t *dev);
-static void _disable(tsl2561_t *dev);
-static void _read_data(tsl2561_t *dev, uint16_t *full, uint16_t *ir);
-static void _print_init_info(tsl2561_t *dev);
+static void _enable(const tsl2561_t *dev);
+static void _disable(const tsl2561_t *dev);
+static void _read_data(const tsl2561_t *dev, uint16_t *full, uint16_t *ir);
+static void _print_init_info(const tsl2561_t *dev);
 
 /*---------------------------------------------------------------------------*
  *                          TSL2561 Core API                                 *
@@ -92,7 +92,7 @@ int tsl2561_init(tsl2561_t *dev,
     return TSL2561_OK;
 }
 
-uint16_t tsl2561_read_illuminance(tsl2561_t *dev)
+uint16_t tsl2561_read_illuminance(const tsl2561_t *dev)
 {
     /* Read IR and full spectrum values */
     uint16_t ir = 0;
@@ -184,7 +184,7 @@ uint16_t tsl2561_read_illuminance(tsl2561_t *dev)
 }
 
 
-static void _enable(tsl2561_t *dev)
+static void _enable(const tsl2561_t *dev)
 {
     /* enabling device */
     i2c_write_reg(dev->i2c_dev, dev->addr,
@@ -199,7 +199,7 @@ static void _enable(tsl2561_t *dev)
 }
 
 
-static void _disable(tsl2561_t *dev)
+static void _disable(const tsl2561_t *dev)
 {
     /* disabling device */
     i2c_write_reg(dev->i2c_dev, dev->addr,
@@ -214,7 +214,7 @@ static void _disable(tsl2561_t *dev)
 #endif
 }
 
-static void _read_data(tsl2561_t *dev, uint16_t *full, uint16_t *ir)
+static void _read_data(const tsl2561_t *dev, uint16_t *full, uint16_t *ir)
 {
     /* Enable the device */
     _enable(dev);
@@ -253,7 +253,7 @@ static void _read_data(tsl2561_t *dev, uint16_t *full, uint16_t *ir)
     _disable(dev);
 }
 
-static void _print_init_info(tsl2561_t *dev)
+static void _print_init_info(const tsl2561_t *dev)
 {
     DEBUG("[Info] I2C device: %d\n", dev->i2c_dev);
     DEBUG("[Info] Address: %d\n", dev->addr);

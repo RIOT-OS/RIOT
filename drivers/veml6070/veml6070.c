@@ -58,7 +58,7 @@ int veml6070_init(veml6070_t *dev, const veml6070_params_t * params)
     return VEML6070_OK;
 }
 
-uint16_t veml6070_read_uv(veml6070_t *dev)
+uint16_t veml6070_read_uv(const veml6070_t *dev)
 {
     /* Acquire exclusive access */
     i2c_acquire(dev->params.i2c_dev);

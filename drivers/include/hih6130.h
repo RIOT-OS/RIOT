@@ -59,7 +59,7 @@ void hih6130_init(hih6130_t *dev, i2c_t i2c, uint8_t address);
  * @return -1 on error
  * @return 1 if data is stale
  */
-int hih6130_get_humidity_temperature_float(hih6130_t *dev,
+int hih6130_get_humidity_temperature_float(const hih6130_t *dev,
     float *relative_humidity_percent, float *temperature_celsius);
 
 #ifdef __cplusplus

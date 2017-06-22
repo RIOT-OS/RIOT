@@ -44,7 +44,7 @@ int pir_init(pir_t *dev, gpio_t gpio)
     return gpio_init(dev->gpio_dev, GPIO_IN);
 }
 
-pir_event_t pir_get_status(pir_t *dev)
+pir_event_t pir_get_status(const pir_t *dev)
 {
     return ((gpio_read(dev->gpio_dev) == 0) ? PIR_STATUS_LO : PIR_STATUS_HI);
 }

@@ -4,7 +4,8 @@ APPLICATION = riot_javascript
 # default BOARD environment
 BOARD ?= native
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon calliope-mini cc2650stk maple-mini \
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 \
+                             calliope-mini cc2650stk maple-mini \
                              microbit nrf51dongle nrf6310 nucleo-f030 nucleo-f070 \
                              nucleo-f072 nucleo-f103 nucleo-f302 nucleo-f334 nucleo-f410 \
                              nucleo-l053 nucleo-l073 nucleo32-f031 nucleo32-f042 \

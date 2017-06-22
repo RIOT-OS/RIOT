@@ -171,7 +171,7 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, i2c_t i2c, gpio_t acc_pin, gpio_t mag_pin
  * @return              0 on success
  * @return              -1 on error
  */
-int lsm303dlhc_read_acc(lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data);
+int lsm303dlhc_read_acc(const lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data);
 
 /**
  * @brief Read a magnetometer value from the sensor.
@@ -195,7 +195,7 @@ int lsm303dlhc_read_acc(lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data);
  * @return              0 on success
  * @return              -1 on error
  */
-int lsm303dlhc_read_mag(lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data);
+int lsm303dlhc_read_mag(const lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data);
 
 /**
  * @brief Read a temperature value from the sensor.
@@ -206,7 +206,7 @@ int lsm303dlhc_read_mag(lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data);
  * @return              0 on success
  * @return              -1 on error
  */
-int lsm303dlhc_read_temp(lsm303dlhc_t *dev, int16_t *value);
+int lsm303dlhc_read_temp(const lsm303dlhc_t *dev, int16_t *value);
 
 /**
  * @brief Enable the given sensor
@@ -216,7 +216,7 @@ int lsm303dlhc_read_temp(lsm303dlhc_t *dev, int16_t *value);
  * @return              0 on success
  * @return              -1 on error
  */
-int lsm303dlhc_enable(lsm303dlhc_t *dev);
+int lsm303dlhc_enable(const lsm303dlhc_t *dev);
 
 /**
  * @brief Disable the given sensor
@@ -226,7 +226,7 @@ int lsm303dlhc_enable(lsm303dlhc_t *dev);
  * @return              0 on success
  * @return              -1 on error
  */
-int lsm303dlhc_disable(lsm303dlhc_t *dev);
+int lsm303dlhc_disable(const lsm303dlhc_t *dev);
 
 #ifdef __cplusplus
 }

@@ -30,10 +30,10 @@
 #include "hd44780.h"
 #include "hd44780_internal.h"
 
-static inline void _command(hd44780_t *dev, uint8_t value);
-static void _pulse(hd44780_t *dev);
-static void _send(hd44780_t *dev, uint8_t value, uint8_t mode);
-static void _write_bits(hd44780_t *dev, uint8_t bits, uint8_t value);
+static inline void _command(const hd44780_t *dev, uint8_t value);
+static void _pulse(const hd44780_t *dev);
+static void _send(const hd44780_t *dev, uint8_t value, uint8_t mode);
+static void _write_bits(const hd44780_t *dev, uint8_t bits, uint8_t value);
 
 /**
  * @brief   Send a command to the display
@@ -41,7 +41,7 @@ static void _write_bits(hd44780_t *dev, uint8_t bits, uint8_t value);
  * @param[in]  dev          device descriptor of display to initialize
  * @param[in]  value        the command
  */
-static inline void _command(hd44780_t *dev, uint8_t value)
+static inline void _command(const hd44780_t *dev, uint8_t value)
 {
     _send(dev, value, HD44780_OFF);
 }
@@ -51,7 +51,7 @@ static inline void _command(hd44780_t *dev, uint8_t value)
  *
  * @param[in]  dev          device descriptor of display to initialize
  */
-static void _pulse(hd44780_t *dev)
+static void _pulse(const hd44780_t *dev)
 {
     gpio_clear(dev->p.enable);
     xtimer_usleep(HD44780_PULSE_WAIT_SHORT);
@@ -68,7 +68,7 @@ static void _pulse(hd44780_t *dev)
  * @param[in]  value        the data value, either char or command
  * @param[in]  state        send state, to distinguish chars and commands
  */
-static void _send(hd44780_t *dev, uint8_t value, hd44780_state_t state)
+static void _send(const hd44780_t *dev, uint8_t value, hd44780_state_t state)
 {
     (state == HD44780_ON) ? gpio_set(dev->p.rs) : gpio_clear(dev->p.rs);
     /* if RW pin is available, set it to LOW */
@@ -85,7 +85,7 @@ static void _send(hd44780_t *dev, uint8_t value, hd44780_state_t state)
     }
 }
 
-static void _write_bits(hd44780_t *dev, uint8_t bits, uint8_t value)
+static void _write_bits(const hd44780_t *dev, uint8_t bits, uint8_t value)
 {
     for (unsigned i = 0; i < bits; ++i) {
         if ((value >> i) & 0x01) {
@@ -190,19 +190,19 @@ int hd44780_init(hd44780_t *dev, const hd44780_params_t *params)
     return 0;
 }
 
-void hd44780_clear(hd44780_t *dev)
+void hd44780_clear(const hd44780_t *dev)
 {
     _command(dev, HD44780_CLEARDISPLAY);
     xtimer_usleep(HD44780_CMD_WAIT);
 }
 
-void hd44780_home(hd44780_t *dev)
+void hd44780_home(const hd44780_t *dev)
 {
     _command(dev, HD44780_RETURNHOME);
     xtimer_usleep(HD44780_CMD_WAIT);
 }
 
-void hd44780_set_cursor(hd44780_t *dev, uint8_t col, uint8_t row)
+void hd44780_set_cursor(const hd44780_t *dev, uint8_t col, uint8_t row)
 {
     if (row >= dev->p.rows) {
         row = dev->p.rows - 1;
@@ -243,12 +243,12 @@ void hd44780_blink(hd44780_t *dev, hd44780_state_t state)
     _command(dev, HD44780_DISPLAYCONTROL | dev->ctrl);
 }
 
-void hd44780_scroll_left(hd44780_t *dev)
+void hd44780_scroll_left(const hd44780_t *dev)
 {
     _command(dev, HD44780_CURSORSHIFT | HD44780_DISPLAYMOVE | HD44780_MOVELEFT);
 }
 
-void hd44780_scroll_right(hd44780_t *dev) {
+void hd44780_scroll_right(const hd44780_t *dev) {
     _command(dev, HD44780_CURSORSHIFT | HD44780_DISPLAYMOVE | HD44780_MOVERIGHT);
 }
 
@@ -275,7 +275,7 @@ void hd44780_autoscroll(hd44780_t *dev, hd44780_state_t state)
     _command(dev, HD44780_ENTRYMODESET | dev->mode);
 }
 
-void hd44780_create_char(hd44780_t *dev, uint8_t location, uint8_t charmap[])
+void hd44780_create_char(const hd44780_t *dev, uint8_t location, uint8_t charmap[])
 {
     location &= 0x7; /* 8 locations (0-7) possible */
     _command(dev, HD44780_SETCGRAMADDR | (location << 3));
@@ -284,12 +284,12 @@ void hd44780_create_char(hd44780_t *dev, uint8_t location, uint8_t charmap[])
     }
 }
 
-void hd44780_write(hd44780_t *dev, uint8_t value)
+void hd44780_write(const hd44780_t *dev, uint8_t value)
 {
     _send(dev, value, HD44780_ON);
 }
 
-void hd44780_print(hd44780_t *dev, const char *data )
+void hd44780_print(const hd44780_t *dev, const char *data )
 {
     while (*data != '\0') {
         hd44780_write(dev, *data++);

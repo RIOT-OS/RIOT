@@ -23,6 +23,7 @@
 
 #include "board.h"
 #include "bmp180.h"
+#include "bmp180_internals.h"
 #include "saul_reg.h"
 
 #ifdef __cplusplus
@@ -36,12 +37,16 @@ extern "C" {
 #ifndef BMP180_PARAM_I2C_DEV
 #define BMP180_PARAM_I2C_DEV         I2C_DEV(0)
 #endif
-#ifndef BMP180_PARAM_MODE
-#define BMP180_PARAM_MODE            BMP180_ULTRALOWPOWER
+#ifndef BMP180_PARAM_I2C_ADDR
+#define BMP180_PARAM_I2C_ADDR        BMP180_ADDR
+#endif
+#ifndef BMP180_PARAM_OVERSAMPLING
+#define BMP180_PARAM_OVERSAMPLING    BMP180_ULTRALOWPOWER
 #endif
 
-#define BMP180_PARAMS_DEFAULT        { .i2c_dev = BMP180_PARAM_I2C_DEV,  \
-                                       .mode    = BMP180_PARAM_MODE }
+#define BMP180_PARAMS_DEFAULT        { .i2c_dev      = BMP180_PARAM_I2C_DEV,  \
+                                       .i2c_addr     = BMP180_PARAM_I2C_ADDR, \
+                                       .oversampling = BMP180_PARAM_OVERSAMPLING }
 /**@}*/
 
 /**
@@ -59,12 +64,9 @@ static const bmp180_params_t bmp180_params[] =
 /**
  * @brief   Configure SAUL registry entries
  */
-static const saul_reg_info_t bmp180_saul_reg_info[][2] =
+static const saul_reg_info_t bmp180_saul_reg_info[] =
 {
-    {
-        { .name = "bmp180-temp" },
-        { .name = "bmp180-press" }
-    }
+    { .name = "bmp180" }
 };
 
 #ifdef __cplusplus

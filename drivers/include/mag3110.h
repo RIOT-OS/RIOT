@@ -141,7 +141,7 @@ int mag3110_init(mag3110_t *dev, const mag3110_params_t *params);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int mag3110_set_user_offset(mag3110_t *dev, int16_t x, int16_t y, int16_t z);
+int mag3110_set_user_offset(const mag3110_t *dev, int16_t x, int16_t y, int16_t z);
 
 /**
  * @brief Set active mode, this enables periodic measurements.
@@ -151,7 +151,7 @@ int mag3110_set_user_offset(mag3110_t *dev, int16_t x, int16_t y, int16_t z);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int mag3110_set_active(mag3110_t *dev);
+int mag3110_set_active(const mag3110_t *dev);
 
 /**
  * @brief Set standby mode.
@@ -161,7 +161,7 @@ int mag3110_set_active(mag3110_t *dev);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int mag3110_set_standby(mag3110_t *dev);
+int mag3110_set_standby(const mag3110_t *dev);
 
 /**
  * @brief Check for new set of measurement data.
@@ -172,7 +172,7 @@ int mag3110_set_standby(mag3110_t *dev);
  * @return                  0 if measurement is in progress
  * @return                  -1 on error
  */
-int mag3110_is_ready(mag3110_t *dev);
+int mag3110_is_ready(const mag3110_t *dev);
 
 /**
  * @brief Read magnetometer's data.
@@ -185,7 +185,7 @@ int mag3110_is_ready(mag3110_t *dev);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int mag3110_read(mag3110_t *dev, mag3110_data_t *data);
+int mag3110_read(const mag3110_t *dev, mag3110_data_t *data);
 
 /**
  * @brief Read die temperature.
@@ -196,7 +196,7 @@ int mag3110_read(mag3110_t *dev, mag3110_data_t *data);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int mag3110_read_dtemp(mag3110_t *dev, int8_t *dtemp);
+int mag3110_read_dtemp(const mag3110_t *dev, int8_t *dtemp);
 
 #ifdef __cplusplus
 }
