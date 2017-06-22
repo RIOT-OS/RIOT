@@ -181,42 +181,42 @@ int adxl345_init(adxl345_t *dev, adxl345_params_t* params);
  * @param[in]  dev          device descriptor of accelerometer
  * @param[out] data         the current acceleration data [in mg]
  */
-void adxl345_read(adxl345_t *dev, adxl345_data_t *data);
+void adxl345_read(const adxl345_t *dev, adxl345_data_t *data);
 
 /**
  * @brief   set ADXL345's interrupts configuration
  *
  * @param[in]  dev          device descriptor of accelerometer
  */
-void adxl345_set_interrupt(adxl345_t *dev);
+void adxl345_set_interrupt(const adxl345_t *dev);
 
 /**
  * @brief   set ADXL345's measure mode
  *
  * @param[in]  dev          device descriptor of accelerometer
  */
-void adxl345_set_measure(adxl345_t *dev);
+void adxl345_set_measure(const adxl345_t *dev);
 
 /**
  * @brief   Set standby mode
  *
  * @param[in]  dev          device descriptor of accelerometer
  */
-void adxl345_set_standby(adxl345_t *dev);
+void adxl345_set_standby(const adxl345_t *dev);
 
 /**
  * @brief   Set sleep mode
  *
  * @param[in]  dev          device descriptor of accelerometer
  */
-void adxl345_set_sleep(adxl345_t *dev);
+void adxl345_set_sleep(const adxl345_t *dev);
 
 /**
  * @brief   Set autosleep mode
  *
  * @param[in]  dev          device descriptor of accelerometer
  */
-void adxl345_set_autosleep(adxl345_t *dev);
+void adxl345_set_autosleep(const adxl345_t *dev);
 
 /**
  * @brief   Set bandwidth rate
@@ -224,7 +224,7 @@ void adxl345_set_autosleep(adxl345_t *dev);
  * @param[in]  dev          device descriptor of accelerometer
  * @param[in]  bw_rate      new datarate
  */
-void adxl345_set_bandwidth_rate(adxl345_t *dev, uint8_t bw_rate);
+void adxl345_set_bandwidth_rate(const adxl345_t *dev, uint8_t bw_rate);
 
 /**
  * @brief   Set fifo mode with its configuration.
@@ -234,7 +234,7 @@ void adxl345_set_bandwidth_rate(adxl345_t *dev, uint8_t bw_rate);
  * @param[in]  output       set trigger output
  * @param[in]  value        set trigger's value
  */
-void adxl345_set_fifo_mode(adxl345_t *dev, uint8_t mode,
+void adxl345_set_fifo_mode(const adxl345_t *dev, uint8_t mode,
                            uint8_t output, uint8_t value);
 
 #ifdef __cplusplus

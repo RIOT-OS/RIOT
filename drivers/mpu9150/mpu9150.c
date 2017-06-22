@@ -45,8 +45,8 @@ static const mpu9150_status_t DEFAULT_STATUS = {
 
 /* Internal function prototypes */
 static int compass_init(mpu9150_t *dev);
-static void conf_bypass(mpu9150_t *dev, uint8_t bypass_enable);
-static void conf_lpf(mpu9150_t *dev, uint16_t rate);
+static void conf_bypass(const mpu9150_t *dev, uint8_t bypass_enable);
+static void conf_lpf(const mpu9150_t *dev, uint16_t rate);
 
 /*---------------------------------------------------------------------------*
  *                          MPU9150 Core API                                 *
@@ -242,7 +242,7 @@ int mpu9150_set_compass_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf)
     return 0;
 }
 
-int mpu9150_read_gyro(mpu9150_t *dev, mpu9150_results_t *output)
+int mpu9150_read_gyro(const mpu9150_t *dev, mpu9150_results_t *output)
 {
     uint8_t data[6];
     int16_t temp;
@@ -285,7 +285,7 @@ int mpu9150_read_gyro(mpu9150_t *dev, mpu9150_results_t *output)
     return 0;
 }
 
-int mpu9150_read_accel(mpu9150_t *dev, mpu9150_results_t *output)
+int mpu9150_read_accel(const mpu9150_t *dev, mpu9150_results_t *output)
 {
     uint8_t data[6];
     int16_t temp;
@@ -328,7 +328,7 @@ int mpu9150_read_accel(mpu9150_t *dev, mpu9150_results_t *output)
     return 0;
 }
 
-int mpu9150_read_compass(mpu9150_t *dev, mpu9150_results_t *output)
+int mpu9150_read_compass(const mpu9150_t *dev, mpu9150_results_t *output)
 {
     uint8_t data[6];
 
@@ -361,7 +361,7 @@ int mpu9150_read_compass(mpu9150_t *dev, mpu9150_results_t *output)
     return 0;
 }
 
-int mpu9150_read_temperature(mpu9150_t *dev, int32_t *output)
+int mpu9150_read_temperature(const mpu9150_t *dev, int32_t *output)
 {
     uint8_t data[2];
     int16_t temp;
@@ -567,7 +567,7 @@ static int compass_init(mpu9150_t *dev)
  * Caution: This internal function does not acquire exclusive access to the I2C bus.
  *          Acquisation and release is supposed to be handled by the calling function.
  */
-static void conf_bypass(mpu9150_t *dev, uint8_t bypass_enable)
+static void conf_bypass(const mpu9150_t *dev, uint8_t bypass_enable)
 {
    uint8_t data;
    i2c_read_reg(dev->i2c_dev, dev->hw_addr, MPU9150_USER_CTRL_REG, &data);
@@ -591,7 +591,7 @@ static void conf_bypass(mpu9150_t *dev, uint8_t bypass_enable)
  * Caution: This internal function does not acquire exclusive access to the I2C bus.
  *          Acquisation and release is supposed to be handled by the calling function.
  */
-static void conf_lpf(mpu9150_t *dev, uint16_t half_rate)
+static void conf_lpf(const mpu9150_t *dev, uint16_t half_rate)
 {
     mpu9150_lpf_t lpf_setting;
 

@@ -125,7 +125,7 @@ int l3g4200d_init(l3g4200d_t *dev, i2c_t i2c, uint8_t address,
  * @return                  0 on success
  * @return                  -1 on error
  */
-int l3g4200d_read(l3g4200d_t *dev, l3g4200d_data_t *acc_data);
+int l3g4200d_read(const l3g4200d_t *dev, l3g4200d_data_t *acc_data);
 
 /**
  * @brief Power-up the given device
@@ -135,7 +135,7 @@ int l3g4200d_read(l3g4200d_t *dev, l3g4200d_data_t *acc_data);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int l3g4200d_enable(l3g4200d_t *dev);
+int l3g4200d_enable(const l3g4200d_t *dev);
 
 /**
  * @brief Power-down the given device
@@ -145,7 +145,7 @@ int l3g4200d_enable(l3g4200d_t *dev);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int l3g4200d_disable(l3g4200d_t *dev);
+int l3g4200d_disable(const l3g4200d_t *dev);
 
 #ifdef __cplusplus
 }

@@ -148,7 +148,7 @@ int isl29125_init_int(isl29125_t *dev, isl29125_interrupt_status_t interrupt_sta
     return 0;
 }
 
-void isl29125_read_rgb_lux(isl29125_t *dev, isl29125_rgb_t *dest)
+void isl29125_read_rgb_lux(const isl29125_t *dev, isl29125_rgb_t *dest)
 {
     /* acquire exclusive access to the bus */
     (void) i2c_acquire(dev->i2c);
@@ -176,7 +176,7 @@ void isl29125_read_rgb_lux(isl29125_t *dev, isl29125_rgb_t *dest)
     dest->blue = blue * luxfactor;
 }
 
-void isl29125_read_rgb_color(isl29125_t *dev, color_rgb_t *dest)
+void isl29125_read_rgb_color(const isl29125_t *dev, color_rgb_t *dest)
 {
     /* acquire exclusive access to the bus */
     (void) i2c_acquire(dev->i2c);
@@ -196,7 +196,7 @@ void isl29125_read_rgb_color(isl29125_t *dev, color_rgb_t *dest)
     dest->b = (bytes[4] | (bytes[5] << 8)) >> normfactor;
 }
 
-void isl29125_set_mode(isl29125_t *dev, isl29125_mode_t mode)
+void isl29125_set_mode(const isl29125_t *dev, isl29125_mode_t mode)
 {
     uint8_t conf1;
 
@@ -210,7 +210,7 @@ void isl29125_set_mode(isl29125_t *dev, isl29125_mode_t mode)
     (void) i2c_release(dev->i2c);
 }
 
-int isl29125_read_irq_status(isl29125_t *dev)
+int isl29125_read_irq_status(const isl29125_t *dev)
 {
     /* acquire exclusive access to the bus */
     (void) i2c_acquire(dev->i2c);

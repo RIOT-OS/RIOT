@@ -782,7 +782,7 @@ int lis3dh_read_aux_adc3(const lis3dh_t *dev, int16_t *out);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int lis3dh_set_aux_adc(lis3dh_t *dev, const uint8_t enable, const uint8_t temperature);
+int lis3dh_set_aux_adc(const lis3dh_t *dev, const uint8_t enable, const uint8_t temperature);
 
 /**
  * @brief Enable/disable accelerometer axes.
@@ -796,7 +796,7 @@ int lis3dh_set_aux_adc(lis3dh_t *dev, const uint8_t enable, const uint8_t temper
  * @return                  0 on success
  * @return                  -1 on error
  */
-int lis3dh_set_axes(lis3dh_t *dev, const uint8_t axes);
+int lis3dh_set_axes(const lis3dh_t *dev, const uint8_t axes);
 
 /**
  * @brief Enable/disable the FIFO.
@@ -808,7 +808,7 @@ int lis3dh_set_axes(lis3dh_t *dev, const uint8_t axes);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int lis3dh_set_fifo(lis3dh_t *dev, const uint8_t mode, const uint8_t watermark);
+int lis3dh_set_fifo(const lis3dh_t *dev, const uint8_t mode, const uint8_t watermark);
 
 /**
  * Set the output data rate of the sensor.
@@ -819,7 +819,7 @@ int lis3dh_set_fifo(lis3dh_t *dev, const uint8_t mode, const uint8_t watermark);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int lis3dh_set_odr(lis3dh_t *dev, const uint8_t odr);
+int lis3dh_set_odr(const lis3dh_t *dev, const uint8_t odr);
 
 /**
  * @brief Set the full scale range of the sensor.
@@ -846,7 +846,7 @@ int lis3dh_set_scale(lis3dh_t *dev, const uint8_t scale);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int lis3dh_set_int1(lis3dh_t *dev, const uint8_t mode);
+int lis3dh_set_int1(const lis3dh_t *dev, const uint8_t mode);
 
 /**
  * @brief Get the current number of elements in the FIFO
@@ -856,7 +856,7 @@ int lis3dh_set_int1(lis3dh_t *dev, const uint8_t mode);
  * @return                  number of elements in device FIFO on success
  * @return                  -1 on error
  */
-int lis3dh_get_fifo_level(lis3dh_t *dev);
+int lis3dh_get_fifo_level(const lis3dh_t *dev);
 
 #ifdef __cplusplus
 }

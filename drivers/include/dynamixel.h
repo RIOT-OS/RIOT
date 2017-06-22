@@ -89,7 +89,7 @@ void dynamixel_init(dynamixel_t *device, uart_half_duplex_t *stream, dynamixel_i
  * @return             DYNAMIXEL_BUFFER_TOO_SMALL if buffer is too small for the message
  * @return             DYNAMIXEL_INVALID_MESSAGE if an invalid message was received
  */
-int dynamixel_write8(dynamixel_t *device, dynamixel_addr_t reg, uint8_t value);
+int dynamixel_write8(const dynamixel_t *device, dynamixel_addr_t reg, uint8_t value);
 
 /**
  * @brief Write to a device 16bits register
@@ -103,7 +103,7 @@ int dynamixel_write8(dynamixel_t *device, dynamixel_addr_t reg, uint8_t value);
  * @return             DYNAMIXEL_BUFFER_TOO_SMALL if buffer is too small for the message
  * @return             DYNAMIXEL_INVALID_MESSAGE if an invalid message was received
  */
-int dynamixel_write16(dynamixel_t *device, dynamixel_addr_t reg, uint16_t value);
+int dynamixel_write16(const dynamixel_t *device, dynamixel_addr_t reg, uint16_t value);
 
 /**
  * @brief Write to a device address
@@ -118,7 +118,7 @@ int dynamixel_write16(dynamixel_t *device, dynamixel_addr_t reg, uint16_t value)
  * @return             DYNAMIXEL_BUFFER_TOO_SMALL if buffer is too small for the message
  * @return             DYNAMIXEL_INVALID_MESSAGE if an invalid message was received
  */
-int dynamixel_write(dynamixel_t *device, dynamixel_addr_t reg, const uint8_t *data, size_t length);
+int dynamixel_write(const dynamixel_t *device, dynamixel_addr_t reg, const uint8_t *data, size_t length);
 
 /**
  * @brief Read from a device 8bits register
@@ -132,7 +132,7 @@ int dynamixel_write(dynamixel_t *device, dynamixel_addr_t reg, const uint8_t *da
  * @return             DYNAMIXEL_BUFFER_TOO_SMALL if buffer is too small for the message
  * @return             DYNAMIXEL_INVALID_MESSAGE if an invalid message was received
  */
-int dynamixel_read8(dynamixel_t *device, dynamixel_addr_t reg, uint8_t *value);
+int dynamixel_read8(const dynamixel_t *device, dynamixel_addr_t reg, uint8_t *value);
 
 /**
  * @brief Read from a device 16bits register
@@ -146,7 +146,7 @@ int dynamixel_read8(dynamixel_t *device, dynamixel_addr_t reg, uint8_t *value);
  * @return             DYNAMIXEL_BUFFER_TOO_SMALL if buffer is too small for the message
  * @return             DYNAMIXEL_INVALID_MESSAGE if an invalid message was received
  */
-int dynamixel_read16(dynamixel_t *device, dynamixel_addr_t reg, uint16_t *value);
+int dynamixel_read16(const dynamixel_t *device, dynamixel_addr_t reg, uint16_t *value);
 
 /**
  * @brief Read from a device address
@@ -161,7 +161,7 @@ int dynamixel_read16(dynamixel_t *device, dynamixel_addr_t reg, uint16_t *value)
  * @return             DYNAMIXEL_BUFFER_TOO_SMALL if buffer is too small for the message
  * @return             DYNAMIXEL_INVALID_MESSAGE if an invalid message was received
  */
-int dynamixel_read(dynamixel_t *device, dynamixel_addr_t reg, uint8_t *data, size_t length);
+int dynamixel_read(const dynamixel_t *device, dynamixel_addr_t reg, uint8_t *data, size_t length);
 
 #ifdef __cplusplus
 }

@@ -76,7 +76,7 @@ int hdc1000_init(hdc1000_t *dev, const hdc1000_params_t *params)
     return HDC1000_OK;
 }
 
-int hdc1000_trigger_conversion(hdc1000_t *dev)
+int hdc1000_trigger_conversion(const hdc1000_t *dev)
 {
     int status = HDC1000_OK;
     assert(dev);
@@ -95,7 +95,7 @@ int hdc1000_trigger_conversion(hdc1000_t *dev)
     return status;
 }
 
-int hdc1000_get_results(hdc1000_t *dev, int16_t *temp, int16_t *hum)
+int hdc1000_get_results(const hdc1000_t *dev, int16_t *temp, int16_t *hum)
 {
     int status = HDC1000_OK;
     assert(dev);
@@ -124,7 +124,7 @@ int hdc1000_get_results(hdc1000_t *dev, int16_t *temp, int16_t *hum)
     return status;
 }
 
-int hdc1000_read(hdc1000_t *dev, int16_t *temp, int16_t *hum)
+int hdc1000_read(const hdc1000_t *dev, int16_t *temp, int16_t *hum)
 {
     if (hdc1000_trigger_conversion(dev) != HDC1000_OK) {
         return HDC1000_BUSERR;

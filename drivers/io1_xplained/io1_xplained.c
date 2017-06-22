@@ -64,7 +64,7 @@ int io1_xplained_init(io1_xplained_t *dev, const io1_xplained_params_t *params)
     return IO1_XPLAINED_OK;
 }
 
-int io1_xplained_read_temperature(io1_xplained_t *dev, float *temperature)
+int io1_xplained_read_temperature(const io1_xplained_t *dev, float *temperature)
 {
     if (at30tse75x_get_temperature(&dev->temp, temperature) < 0) {
         LOG_ERROR("Cannot read temperature sensor.\n");

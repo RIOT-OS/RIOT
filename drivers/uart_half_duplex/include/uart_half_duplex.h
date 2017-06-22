@@ -124,7 +124,7 @@ static inline void uart_half_duplex_set_rx(uart_half_duplex_t *dev)
  *
  * @return               the number of characters actually sent
  */
-size_t uart_half_duplex_send(uart_half_duplex_t *dev, size_t size);
+size_t uart_half_duplex_send(const uart_half_duplex_t *dev, size_t size);
 
 /**
  * @brief Recv data an fill the driver's buffer
@@ -134,7 +134,7 @@ size_t uart_half_duplex_send(uart_half_duplex_t *dev, size_t size);
  *
  * @return               the number of characters actually received
  */
-size_t uart_half_duplex_recv(uart_half_duplex_t *dev, size_t size);
+size_t uart_half_duplex_recv(const uart_half_duplex_t *dev, size_t size);
 
 #ifdef __cplusplus
 }

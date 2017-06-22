@@ -83,14 +83,14 @@ int dsp0401_init(dsp0401_t *dev, const dsp0401_params_t *params);
  * @param[in] dev           Device descriptor of the DSP0401 device
  * @param[in] text          The text to display
  */
-void dsp0401_display_text(dsp0401_t *dev, char *text);
+void dsp0401_display_text(const dsp0401_t *dev, char *text);
 
 /**
  * @brief Clear the text displayed on the DSP0401
  *
  * @param[in] dev           Device descriptor of the DSP0401 device
  */
-void dsp0401_clear_text(dsp0401_t *dev);
+void dsp0401_clear_text(const dsp0401_t *dev);
 
 /**
  * @brief Scroll the given text on the DSP0401
@@ -99,7 +99,7 @@ void dsp0401_clear_text(dsp0401_t *dev);
  * @param[in] text          The text to scroll on the display
  * @param[in] delay         Delay in ms between each horizontal move
  */
-void dsp0401_scroll_text(dsp0401_t *dev, char *text, uint16_t delay);
+void dsp0401_scroll_text(const dsp0401_t *dev, char *text, uint16_t delay);
 
 #ifdef __cplusplus
 }

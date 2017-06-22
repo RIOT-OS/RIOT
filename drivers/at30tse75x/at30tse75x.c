@@ -35,7 +35,7 @@ static inline float temperature_to_float(uint16_t temp)
     return temp_int + (frac_multiplier * AT30TSE75X_FRACTIONAL_BASE);
 }
 
-static int at30tse75x_get_register(at30tse75x_t* dev, uint8_t reg, uint16_t* data)
+static int at30tse75x_get_register(const at30tse75x_t *dev, uint8_t reg, uint16_t* data)
 {
     i2c_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
@@ -49,7 +49,7 @@ static int at30tse75x_get_register(at30tse75x_t* dev, uint8_t reg, uint16_t* dat
     return 0;
 }
 
-static int at30tse75x_set_register(at30tse75x_t* dev, uint8_t reg, uint16_t* data)
+static int at30tse75x_set_register(const at30tse75x_t *dev, uint8_t reg, uint16_t *data)
 {
     i2c_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
@@ -63,7 +63,7 @@ static int at30tse75x_set_register(at30tse75x_t* dev, uint8_t reg, uint16_t* dat
     return 0;
 }
 
-static int at30tse75x_reset(at30tse75x_t* dev)
+static int at30tse75x_reset(const at30tse75x_t *dev)
 {
     i2c_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
@@ -77,7 +77,7 @@ static int at30tse75x_reset(at30tse75x_t* dev)
     return 0;
 }
 
-int at30tse75x_get_config(at30tse75x_t* dev, uint8_t* data)
+int at30tse75x_get_config(const at30tse75x_t *dev, uint8_t *data)
 {
     i2c_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
@@ -91,7 +91,7 @@ int at30tse75x_get_config(at30tse75x_t* dev, uint8_t* data)
     return 0;
 }
 
-int at30tse75x_set_config(at30tse75x_t* dev, uint8_t data)
+int at30tse75x_set_config(const at30tse75x_t *dev, uint8_t data)
 {
     i2c_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
@@ -105,7 +105,7 @@ int at30tse75x_set_config(at30tse75x_t* dev, uint8_t data)
     return 0;
 }
 
-int at30tse75x_set_resolution(at30tse75x_t* dev, at30tse75x_resolution_t resolution)
+int at30tse75x_set_resolution(const at30tse75x_t *dev, at30tse75x_resolution_t resolution)
 {
     uint8_t config;
 
@@ -128,7 +128,7 @@ int at30tse75x_set_resolution(at30tse75x_t* dev, at30tse75x_resolution_t resolut
     return 0;
 }
 
-int at30tse75x_set_mode(at30tse75x_t* dev, at30tse75x_mode_t mode)
+int at30tse75x_set_mode(const at30tse75x_t *dev, at30tse75x_mode_t mode)
 {
     uint8_t config;
     if(at30tse75x_get_config(dev, &config) != 0) {
@@ -159,7 +159,7 @@ int at30tse75x_set_mode(at30tse75x_t* dev, at30tse75x_mode_t mode)
     return 0;
 }
 
-int at30tse75x_set_alarm_polarity(at30tse75x_t* dev, at30tse75x_alarm_polatity_t polarity)
+int at30tse75x_set_alarm_polarity(const at30tse75x_t *dev, at30tse75x_alarm_polatity_t polarity)
 {
     uint8_t config;
     if(at30tse75x_get_config(dev, &config) != 0) {
@@ -184,7 +184,7 @@ int at30tse75x_set_alarm_polarity(at30tse75x_t* dev, at30tse75x_alarm_polatity_t
     return 0;
 }
 
-int at30tse75x_set_fault_tolerance(at30tse75x_t* dev, at30tse75x_fault_tolerance_t tolerance)
+int at30tse75x_set_fault_tolerance(const at30tse75x_t *dev, at30tse75x_fault_tolerance_t tolerance)
 {
     if(tolerance < AT30TSE75X_ALARM_AFTER_1 ||
        tolerance > AT30TSE75X_ALARM_AFTER_6) {
@@ -206,19 +206,19 @@ int at30tse75x_set_fault_tolerance(at30tse75x_t* dev, at30tse75x_fault_tolerance
     return 0;
 }
 
-int at30tse75x_set_limit_low(at30tse75x_t* dev, int8_t t_low)
+int at30tse75x_set_limit_low(const at30tse75x_t *dev, int8_t t_low)
 {
     uint16_t tmp = (t_low << 8) | (0x00);
     return at30tse75x_set_register(dev, AT30TSE75X_REG__LIMIT_LOW, &tmp);
 }
 
-int at30tse75x_set_limit_high(at30tse75x_t* dev, int8_t t_high)
+int at30tse75x_set_limit_high(const at30tse75x_t *dev, int8_t t_high)
 {
     uint16_t tmp = (t_high << 8) | (0x00);
     return at30tse75x_set_register(dev, AT30TSE75X_REG__LIMIT_HIGH, &tmp);
 }
 
-int at30tse75x_save_config(at30tse75x_t* dev)
+int at30tse75x_save_config(const at30tse75x_t *dev)
 {
     i2c_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
@@ -232,7 +232,7 @@ int at30tse75x_save_config(at30tse75x_t* dev)
     return 0;
 }
 
-int at30tse75x_restore_config(at30tse75x_t* dev)
+int at30tse75x_restore_config(const at30tse75x_t *dev)
 {
     i2c_acquire(dev->i2c);
     xtimer_spin(AT30TSE75X_BUS_FREE_TIME_TICKS);
@@ -246,7 +246,7 @@ int at30tse75x_restore_config(at30tse75x_t* dev)
     return 0;
 }
 
-int at30tse75x_get_temperature(at30tse75x_t* dev, float* temperature)
+int at30tse75x_get_temperature(const at30tse75x_t *dev, float *temperature)
 {
     uint16_t tmp;
     uint8_t config;
@@ -282,7 +282,7 @@ int at30tse75x_get_temperature(at30tse75x_t* dev, float* temperature)
     return 0;
 }
 
-int at30tse75x_init(at30tse75x_t* dev, i2c_t i2c, i2c_speed_t speed, uint8_t addr)
+int at30tse75x_init(at30tse75x_t *dev, i2c_t i2c, i2c_speed_t speed, uint8_t addr)
 {
     uint8_t config;
 

@@ -94,7 +94,7 @@ typedef struct {
  * @return                  zero on succesful test
  * @return                  non-zero on unsuccesfull test.
  */
-int si70xx_test(si70xx_t *dev);
+int si70xx_test(const si70xx_t *dev);
 
 /**
  * @brief   Initialize and reset the sensor.
@@ -113,7 +113,7 @@ int si70xx_init(si70xx_t *dev, i2c_t i2c_dev, uint8_t address);
  * @param[in] dev           device descriptor
  * @return                  relative humidity in centi-percent (times 100)
  */
-uint16_t si70xx_get_relative_humidity(si70xx_t *dev);
+uint16_t si70xx_get_relative_humidity(const si70xx_t *dev);
 
 /**
  * @brief   Read the current temperature from the sensor. Uses clock streching.
@@ -122,7 +122,7 @@ uint16_t si70xx_get_relative_humidity(si70xx_t *dev);
  * @return                  current temperature in centi-degrees Celsius
  *                          (times 100)
  */
-int16_t si70xx_get_temperature(si70xx_t *dev);
+int16_t si70xx_get_temperature(const si70xx_t *dev);
 
 /**
  * @brief   Read the relative humidity and temperature from the sensor. Uses
@@ -132,7 +132,7 @@ int16_t si70xx_get_temperature(si70xx_t *dev);
  * @param[out] humidity     pointer to relative humidity (in centi-percent)
  * @param[out] temperature  pointer to temperature (in centi-degrees Celsius)
  */
-void si70xx_get_both(si70xx_t *dev, uint16_t *humidity, int16_t *temperature);
+void si70xx_get_both(const si70xx_t *dev, uint16_t *humidity, int16_t *temperature);
 
 /**
  * @brief   Read the sensor serial number.
@@ -140,7 +140,7 @@ void si70xx_get_both(si70xx_t *dev, uint16_t *humidity, int16_t *temperature);
  * @param[in] dev           device descriptor
  * @return                  sensor serial number
  */
-uint64_t si70xx_get_serial(si70xx_t *dev);
+uint64_t si70xx_get_serial(const si70xx_t *dev);
 
 /**
  * @brief   Read the sensor id, to identifier the sensor variant.
@@ -148,7 +148,7 @@ uint64_t si70xx_get_serial(si70xx_t *dev);
  * @param[in] dev           device descriptor
  * @return                  device id
  */
-uint8_t si70xx_get_id(si70xx_t *dev);
+uint8_t si70xx_get_id(const si70xx_t *dev);
 
 /**
  * @brief   Read the firmware revision of the sensor.
@@ -156,7 +156,7 @@ uint8_t si70xx_get_id(si70xx_t *dev);
  * @param[in] dev           device descriptor
  * @return                  sensor firmware revision number
  */
-uint8_t si70xx_get_revision(si70xx_t *dev);
+uint8_t si70xx_get_revision(const si70xx_t *dev);
 
 #ifdef __cplusplus
 }

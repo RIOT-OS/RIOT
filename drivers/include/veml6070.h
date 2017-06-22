@@ -79,7 +79,7 @@ int veml6070_init(veml6070_t *dev, const veml6070_params_t * params);
  *
  * @return                  UV index
  */
-uint16_t veml6070_read_uv(veml6070_t *dev);
+uint16_t veml6070_read_uv(const veml6070_t *dev);
 
 #ifdef __cplusplus
 }

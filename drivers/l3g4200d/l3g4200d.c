@@ -84,7 +84,7 @@ int l3g4200d_init(l3g4200d_t *dev, i2c_t i2c, uint8_t address,
     return 0;
 }
 
-int l3g4200d_read(l3g4200d_t *dev, l3g4200d_data_t *data)
+int l3g4200d_read(const l3g4200d_t *dev, l3g4200d_data_t *data)
 {
     uint8_t tmp[6];
     int16_t res;
@@ -104,7 +104,7 @@ int l3g4200d_read(l3g4200d_t *dev, l3g4200d_data_t *data)
     return 0;
 }
 
-int l3g4200d_enable(l3g4200d_t *dev)
+int l3g4200d_enable(const l3g4200d_t *dev)
 {
     uint8_t tmp;
     int res;
@@ -124,7 +124,7 @@ int l3g4200d_enable(l3g4200d_t *dev)
     return 0;
 }
 
-int l3g4200d_disable(l3g4200d_t *dev)
+int l3g4200d_disable(const l3g4200d_t *dev)
 {
     uint8_t tmp;
     int res;

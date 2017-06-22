@@ -177,7 +177,7 @@ int tmp006_init(tmp006_t *dev, const tmp006_params_t *params);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int tmp006_reset(tmp006_t *dev);
+int tmp006_reset(const tmp006_t *dev);
 
 /**
  * @brief   Set active mode, this enables periodic measurements.
@@ -187,7 +187,7 @@ int tmp006_reset(tmp006_t *dev);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int tmp006_set_active(tmp006_t *dev);
+int tmp006_set_active(const tmp006_t *dev);
 
 /**
  * @brief   Set standby mode.
@@ -197,7 +197,7 @@ int tmp006_set_active(tmp006_t *dev);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int tmp006_set_standby(tmp006_t *dev);
+int tmp006_set_standby(const tmp006_t *dev);
 
 /**
  * @brief   Read sensor's data.
@@ -210,7 +210,7 @@ int tmp006_set_standby(tmp006_t *dev);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int tmp006_read(tmp006_t *dev, int16_t *rawv, int16_t *rawt, uint8_t *drdy);
+int tmp006_read(const tmp006_t *dev, int16_t *rawv, int16_t *rawt, uint8_t *drdy);
 
 /**
  * @brief   Convert raw sensor values to temperature.
@@ -231,7 +231,7 @@ void tmp006_convert(int16_t rawv, int16_t rawt,  float *tamb, float *tobj);
  * @param[out] ta           converted ambient temperature
  * @param[out] to           converted object temperature
  */
-int tmp006_read_temperature(tmp006_t *dev, int16_t *ta, int16_t *to);
+int tmp006_read_temperature(const tmp006_t *dev, int16_t *ta, int16_t *to);
 
 #ifdef __cplusplus
 }
