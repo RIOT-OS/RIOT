@@ -135,8 +135,12 @@ static void _listen(sock_udp_t *sock)
         return;
     }
 
+    if (coap_get_code(&pdu) == COAP_CODE_EMPTY) {
+        DEBUG("gcoap: empty messages not handled yet\n");
+        return;
+
     /* incoming request */
-    if (coap_get_code_class(&pdu) == COAP_CLASS_REQ) {
+    } else if (coap_get_code_class(&pdu) == COAP_CLASS_REQ) {
         if (coap_get_type(&pdu) == COAP_TYPE_NON
                 || coap_get_type(&pdu) == COAP_TYPE_CON) {
             size_t pdu_len = _handle_req(&pdu, buf, sizeof(buf), &remote);
@@ -149,6 +153,7 @@ static void _listen(sock_udp_t *sock)
             return;
         }
     }
+
     /* incoming response */
     else {
         _find_req_memo(&memo, &pdu, buf, sizeof(buf));
