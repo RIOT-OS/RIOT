@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *               2017 Inria
+ * Copyright (C) 2017   HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,15 +7,13 @@
  */
 
 /**
- * @ingroup   boards_stm32f0discovery
+ * @ingroup boards_cc2650stk
  * @{
  *
  * @file
- * @brief     Board specific configuration of direct mapped GPIOs
+ * @brief   Board specific configuration of direct mapped GPIOs
  *
- * @author    Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author    Alexandre Abadie <alexandre.abadie@inria.fr>
- * @author    Sebastian Meiling <s@mlng.net>
+ * @author  Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef GPIO_PARAMS_H
@@ -30,24 +27,29 @@ extern "C" {
 #endif
 
 /**
- * @brief    GPIO pin configuration
+ * @brief   GPIO pin configuration
  */
-static const  saul_gpio_params_t saul_gpio_params[] =
+static const saul_gpio_params_t saul_gpio_params[] =
 {
     {
-        .name = "LD3",
-        .pin = LED0_PIN,
+        .name = "LED(red)",
+        .pin  = LED0_PIN,
         .mode = GPIO_OUT
     },
     {
-        .name = "LD4",
-        .pin = LED1_PIN,
+        .name = "LED(green)",
+        .pin  = LED1_PIN,
         .mode = GPIO_OUT
     },
     {
-        .name = "BTN USER",
+        .name = "Button A",
         .pin  = BTN0_PIN,
         .mode = BTN0_MODE
+    },
+    {
+        .name = "Button B",
+        .pin  = BTN1_PIN,
+        .mode = BTN1_MODE
     },
 };
 

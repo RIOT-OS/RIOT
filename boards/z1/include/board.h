@@ -98,11 +98,12 @@ extern "C" {
  * @name    User button configuration
  * @{
  */
-#define USER_BTN_PxIN      P2IN
-#define USER_BTN_MASK      0x20
+#define BTN0_PIN            P2IN
+#define BTN0_MASK           (0x20)
+#define BTN0_MODE           GPIO_IN
 
-#define USER_BTN_PRESSED   ((USER_BTN_PxIN & USER_BTN_MASK) == 0)
-#define USER_BTN_RELEASED  ((USER_BTN_PxIN & USER_BTN_MASK) != 0)
+#define BTN0_PRESSED        ((BTN0_PIN & BTN0_MASK) == 0)
+#define BTN0_RELEASED       ((BTN0_PIN & BTN0_MASK) != 0)
 /** @} */
 
 /**

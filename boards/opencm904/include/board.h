@@ -16,6 +16,7 @@
  * @brief       Board specific definitions for the OpenCM9.04 board
  *
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef BOARD_H
@@ -49,8 +50,11 @@ extern "C" {
 
 /**
  * @brief User button
+ * @{
  */
-#define BTN_B1_PIN          GPIO_PIN(PORT_C, 15)
+#define BTN0_PIN            GPIO_PIN(PORT_C, 15)
+#define BTN0_MODE           GPIO_IN
+/** @} */
 
 /**
  * @brief Pin used to switch RX and TX mode for the Dynamixel TTL bus

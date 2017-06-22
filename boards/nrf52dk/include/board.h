@@ -15,7 +15,7 @@
  * @brief       Board specific configuaration for the nRF52 DK
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- *
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef BOARD_H
@@ -62,10 +62,14 @@ extern "C" {
  * @name    Button pin configuration
  * @{
  */
-#define BUTTON1_PIN         (GPIO_PIN(0, 13))
-#define BUTTON2_PIN         (GPIO_PIN(0, 14))
-#define BUTTON3_PIN         (GPIO_PIN(0, 15))
-#define BUTTON4_PIN         (GPIO_PIN(0, 16))
+#define BTN0_PIN            GPIO_PIN(0, 13)
+#define BTN0_MODE           GPIO_IN_PU
+#define BTN1_PIN            GPIO_PIN(0, 14)
+#define BTN1_MODE           GPIO_IN_PU
+#define BTN2_PIN            GPIO_PIN(0, 15)
+#define BTN2_MODE           GPIO_IN_PU
+#define BTN3_PIN            GPIO_PIN(0, 16)
+#define BTN3_MODE           GPIO_IN_PU
 /** @} */
 
 /**

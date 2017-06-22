@@ -16,6 +16,7 @@
  * @brief       Common pin definitions and board configuration options
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef BOARD_COMMON_H
@@ -48,8 +49,11 @@ extern "C" {
 
 /**
  * @brief   User button
+ * @{
  */
-#define BTN_B1_PIN          GPIO_PIN(PORT_C, 13)
+#define BTN0_PIN            GPIO_PIN(PORT_C, 13)
+#define BTN0_MODE           GPIO_IN_PU
+/** @} */
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
