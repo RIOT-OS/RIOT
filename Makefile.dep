@@ -130,6 +130,11 @@ ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
   USEMODULE += gnrc_rpl
 endif
 
+ifneq (,$(filter gnrc_rpl_hop,$(USEMODULE)))
+  USEMODULE += gnrc_rpl
+  USEMODULE += gnrc_ipv6_ext
+endif
+
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
   USEMODULE += gnrc_ipv6_nib

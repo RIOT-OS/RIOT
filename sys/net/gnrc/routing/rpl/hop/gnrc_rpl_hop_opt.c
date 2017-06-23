@@ -13,7 +13,6 @@
  */
 
 #include <string.h>
-#include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/rpl/dodag.h"
 #include "net/gnrc/rpl/hop.h"
 

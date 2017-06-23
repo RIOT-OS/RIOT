@@ -58,11 +58,13 @@ extern "C" {
  * @param[in] current   A snip to process.
  * @param[in] pkt       A packet.
  * @param[in] nh        A protocol number (see @ref net_protnum) of the current snip.
+ * @param[in] is_for_me  Indicates if We are the destination of the packet.
  */
 void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
                          gnrc_pktsnip_t *current,
                          gnrc_pktsnip_t *pkt,
-                         uint8_t nh);
+                         uint8_t nh,
+                         bool is_for_me);
 
 /**
  * @brief   Builds an extension header for sending.

@@ -553,6 +553,18 @@ typedef enum {
      * incoming frames until unset.
      */
     NETOPT_PHY_BUSY,
+    /**
+     * @brief   Type for sequiential processing of IPv6 extension headers
+     *
+     * On GET it requests a thread to provide an extension header
+     *        and prepends it to the given payload of the given (IPv6) packet.
+     * On SET it always returns -ENOTSUP.
+     *
+     * When the header is done the thread replies to the call.
+     * The result is the pktsnip_t with the extension header
+     * The result is NULL if no extension header is passed.
+     */
+    NETOPT_IPV6_EXT_HDR,
 
     /* add more options if needed */
 

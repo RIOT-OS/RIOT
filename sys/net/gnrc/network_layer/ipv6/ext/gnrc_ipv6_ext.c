@@ -168,7 +168,8 @@ static inline bool _has_valid_size(gnrc_pktsnip_t *pkt, uint8_t nh)
 void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
                          gnrc_pktsnip_t *current,
                          gnrc_pktsnip_t *pkt,
-                         uint8_t nh)
+                         uint8_t nh,
+                         bool is_for_me)
 {
     ipv6_ext_t *ext;
 
@@ -195,7 +196,7 @@ void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
                             return;
                         }
 
-                        gnrc_ipv6_demux(netif, current, pkt, nh); /* demultiplex next header */
+                        gnrc_ipv6_demux(netif, current, pkt, nh, is_for_me); /* demultiplex next header */
 
                         return;
 
@@ -261,7 +262,7 @@ void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
                 break;
 
             default:
-                gnrc_ipv6_demux(netif, current, pkt, nh); /* demultiplex next header */
+                gnrc_ipv6_demux(netif, current, pkt, nh, is_for_me); /* demultiplex next header */
                 return;
         }
     }

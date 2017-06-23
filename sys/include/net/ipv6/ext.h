@@ -23,6 +23,7 @@
 #include <stdint.h>
 
 #include "net/ipv6/ext/rh.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/pkt.h"
 
 #ifdef __cplusplus
@@ -39,7 +40,7 @@ extern "C" {
  * @brief   Message content container to process extension headers sequentially.
  */
 typedef struct {
-    kernel_pid_t    iface;      /**< The interface we received the packet */
+    gnrc_netif_t    *netif;     /**< The interface we received the packet */
     gnrc_pktsnip_t  *current;   /**< The snip of the IP6 header */
     gnrc_pktsnip_t  *next_hdr;  /**< The next header to be processed */
     uint8_t         nh_type;    /**< The type of the next header */

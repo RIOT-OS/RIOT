@@ -20,8 +20,8 @@
  *
  * @author  Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
-#ifndef GNRC_RPL_HOP_H
-#define GNRC_RPL_HOP_H
+#ifndef NET_GNRC_RPL_HOP_H
+#define NET_GNRC_RPL_HOP_H
 
 #include "net/ipv6/hdr.h"
 #include "net/ipv6/addr.h"
@@ -72,7 +72,9 @@ extern "C" {
  *      </a>
  */
 typedef struct __attribute__((packed)) {
-    uint8_t nh;           /**< next header identifier (0x63) */
+    uint8_t nh;           /**< the option type of the next extension */
+    uint8_t hbh_len;      /**< the hbh length without the first octet */
+    uint8_t type;         /**< option identifier (0x63) */
     uint8_t len;          /**< length in 8 octets without first octet */
     uint8_t ORF_flags;    /**< O|R|F flags followed by 5 unused bits */
     uint8_t instance_id;  /**< id of the instance */
@@ -99,5 +101,5 @@ int gnrc_rpl_hop_opt_process(gnrc_rpl_hop_opt_t *hop);
 }
 #endif
 
-#endif /* GNRC_RPL_HOP_H */
+#endif /* NET_GNRC_RPL_HOP_H */
 /** @} */

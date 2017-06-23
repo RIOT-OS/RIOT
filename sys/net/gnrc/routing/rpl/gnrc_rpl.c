@@ -153,56 +153,94 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
     return inst;
 }
 
-static void _handle_ext_hdr_insert(gnrc_pktsnip_t *pkt)
+static bool _get_pl_entry(unsigned iface, ipv6_addr_t *pfx,
+                          unsigned pfx_len, gnrc_ipv6_nib_pl_t *ple)
+{
+    void *state = NULL;
+
+    while (gnrc_ipv6_nib_pl_iter(iface, &state, ple)) {
+        if (ipv6_addr_match_prefix(&ple->pfx, pfx) >= pfx_len) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static gnrc_pktsnip_t * _handle_ext_hdr_insert(gnrc_pktsnip_t *pkt)
 {
     ipv6_hdr_t* hdr = gnrc_ipv6_get_header(pkt);
     /* get the ipv6 header to append the extensions */
     if (hdr == NULL) {
-        return;
+        return NULL;
+    }
+
+    /* determine if we know a next-hop */
+    gnrc_ipv6_nib_ft_t ftentry;
+
+    int ret = gnrc_ipv6_nib_ft_get(&hdr->dst, pkt, &ftentry);
+
+    if (ret != 0) {
+        /* we don't know a next-hop, and we have no default route set */
+        DEBUG("rpl: Error no next-hop available to forward the packet!\n");
+        return NULL;
     }
 
     for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
+        gnrc_ipv6_nib_pl_t ple;
         /* check if the destination is in one of our DODAGs */
-        gnrc_ipv6_netif_addr_t* prefix = gnrc_rpl_instances[i].dodag.netif_addr;
+        if ( _get_pl_entry(gnrc_rpl_instances[i].dodag.iface,
+                           &gnrc_rpl_instances[i].dodag.dodag_id, 64, &ple)) {
+            /* This MUST only apply to a single DODAG.
+             * Otherwise we cannot rely on the routing. */
+            gnrc_rpl_hop_opt_t ext_hdr;
 
-        if (ipv6_addr_match_prefix(&(prefix->addr), &(hdr->dst)) == prefix->prefix_len) {
-            /* determine the forwarding direction towards the destination */
-            kernel_pid_t fib_iface;
-            ipv6_addr_t next_hop;
-            size_t next_hop_size = sizeof(ipv6_addr_t);
-            uint32_t next_hop_flags;
+            ext_hdr.nh = gnrc_nettype_to_protnum(pkt->next->type);
 
-            int ret = fib_get_next_hop(&gnrc_ipv6_fib_table, &fib_iface,
-                                       next_hop.u8, &next_hop_size,
-                                       &next_hop_flags, hdr->dst.u8, next_hop_size,
-                                       0);
-            if ( (ret == 0) && (next_hop_flags & FIB_FLAG_RPL_ROUTE) ) {
-                /* we know a next hop and it has been set by RPL */
-                gnrc_rpl_hop_opt_t ext_hdr;
+            /*
+             * https://tools.ietf.org/html/rfc2460#section-4.3
+             * 8-bit unsigned integer.  Length of the Hop-by-
+             * Hop Options header in 8-octet **units**, not
+             * including the first 8 octets.
+             */
+            ext_hdr.hbh_len = 0;
 
-                ext_hdr.nh = 0x63;
-                ext_hdr.len = (sizeof(gnrc_rpl_hop_opt_t) - 2);
-                /* set default propagation direction to upward */
-                ext_hdr.ORF_flags = GNRC_RPL_HOP_OPT_FLAG_O;
+            ext_hdr.type = GNRC_RPL_HOP_OPT_TYPE;
+            ext_hdr.len = (sizeof(gnrc_rpl_hop_opt_t) - 4);
+            /* set default propagation direction to upward */
+            ext_hdr.ORF_flags = GNRC_RPL_HOP_OPT_FLAG_O;
 
-                ext_hdr.instance_id = gnrc_rpl_instances[i].id;
-                ext_hdr.sender_rank = gnrc_rpl_instances[i].dodag.my_rank;
+            ext_hdr.instance_id = gnrc_rpl_instances[i].id;
+            ext_hdr.sender_rank = gnrc_rpl_instances[i].dodag.my_rank;
 
-                if ( !ipv6_addr_is_unspecified(&next_hop) ) {
-                    /* its a downward route entry so we clear the bit */
-                    ext_hdr.ORF_flags &= ~GNRC_RPL_HOP_OPT_FLAG_O;
+            if ( !ipv6_addr_is_unspecified(&ftentry.next_hop) ) {
+                /* its a downward route entry so we clear the bit */
+                ext_hdr.ORF_flags &= ~GNRC_RPL_HOP_OPT_FLAG_O;
+            }
+            /* append the extension below the IPv6 Header */
+            gnrc_pktsnip_t* ext = gnrc_pktbuf_add(pkt->next, &ext_hdr,
+                                                  sizeof(gnrc_rpl_hop_opt_t),
+                                                  GNRC_NETTYPE_IPV6_EXT);
+
+            hdr->nh = PROTNUM_IPV6_EXT_HOPOPT;
+            return ext;
+        }
+        else {
+            /* Workaround till we can determine correctly the origin of the entry */
+            /* The packet will be forwarded to a ~Raf.
+             * We need to encapsulate the extension since IPv6 isn't aware
+             * how to handle it. */
+            ipv6_hdr_t* hdr = gnrc_ipv6_get_header(pkt);
+            if (hdr) {
+                pkt = gnrc_ipv6_hdr_build(pkt, &hdr->src, &hdr->dst);
+                if (pkt == NULL) {
+                    DEBUG("rpl: ~Raf encapsulation Error!\n");
+                    return NULL;
                 }
-                /* append the extension below the IPv6 Header */
-                gnrc_pktsnip_t* ext = gnrc_pktbuf_add(pkt->next, &ext_hdr,
-                                                      sizeof(gnrc_ipv6_ext_hdr_handle_t),
-                                                      GNRC_NETTYPE_UNDEF);
-                if (ext) {
-                    /* bend the pointers */
-                    pkt->next = ext;
-                }
+                return pkt;
             }
         }
     }
+    return NULL;
 }
 
 static void _handle_ext_hdr_process(gnrc_pktsnip_t *ext, msg_t *msg)
@@ -210,73 +248,34 @@ static void _handle_ext_hdr_process(gnrc_pktsnip_t *ext, msg_t *msg)
         ipv6_ext_t *ext_header = ext->data;
         gnrc_ipv6_ext_hdr_handle_t* content = (gnrc_ipv6_ext_hdr_handle_t*)msg->content.ptr;
         content->next_hdr = NULL;
-        content->nh_type = 0;
-        content->iface = KERNEL_PID_UNDEF;
+        content->nh_type = PROTNUM_RESERVED;
+
+        gnrc_pktsnip_t *netif = gnrc_pktsnip_search_type(content->current, GNRC_NETTYPE_NETIF);
+        content->netif = gnrc_netif_get_by_pid(((gnrc_netif_hdr_t *)netif->data)->if_pid);
 
         if (ext_header->nh == GNRC_RPL_HOP_OPT_TYPE) {
             gnrc_rpl_hop_opt_t *hop = (gnrc_rpl_hop_opt_t *)ext_header;
             int ret = gnrc_rpl_hop_opt_process(hop);
             switch (ret) {
-                case HOP_OPT_SUCCESS:
+                case HOP_OPT_ERR_NOT_FOR_ME:
+                /* we found the header is just not for us */
+                /* fallthrough intentionally */
+                case HOP_OPT_ERR_HEADER_LENGTH:
+                /* something is broken with the extension -> ignore header, probably just not for us */
                 /* fallthrough intentionally */
                 case HOP_OPT_ERR_FLAG_R_SET:
-                    /* we determined the first forwarding error and have set the R Flag */
+                /* we determined the first forwarding error and have set the R Flag */
+                /* fallthrough intentionally */
+                case HOP_OPT_SUCCESS: {
                     /* we check for more headers and let IPv6 demux them */
                     if ((ext->next) && ext->next->type == GNRC_NETTYPE_IPV6_EXT) {
-
                         content->next_hdr = ext->next;
                         content->nh_type = ((ipv6_ext_t*)ext->next->data)->nh;
-
-                        gnrc_pktsnip_t *netif = gnrc_pktsnip_search_type(content->current, GNRC_NETTYPE_NETIF);
-                        content->iface = ((gnrc_netif_hdr_t *)netif->data)->if_pid;
                     }
-                    else {
-                        /* done. no more headers to handle so we just forward the packet */
-                        gnrc_pktsnip_t *reversed_pkt = NULL, *ptr = content->current, *ipv6 = NULL;
 
-                        for (ipv6 = content->current; ipv6 != NULL; ipv6 = ipv6->next) { /* find IPv6 header if already marked */
-                                if ((ipv6->type == GNRC_NETTYPE_IPV6) && (ipv6->size == sizeof(ipv6_hdr_t)) &&
-                                    (ipv6_hdr_is(ipv6->data))) {
-                                    break;
-                                }
-                        }
-                        DEBUG("RPL: prepare to forward extended packet to next hop\n");
-
-                        /* pkt might not be writable yet, if header was given above */
-                        ipv6 = gnrc_pktbuf_start_write(ipv6);
-                        if (ipv6 == NULL) {
-                            DEBUG("RPL: unable to get write access to packet: dropping it\n");
-                            gnrc_pktbuf_release(content->current);
-                            return;
-                        }
-
-                        /* remove L2 headers around IPV6 */
-                        gnrc_pktsnip_t *netif = gnrc_pktsnip_search_type(content->current, GNRC_NETTYPE_NETIF);
-                        if (netif != NULL) {
-                            gnrc_pktbuf_remove_snip(content->current, netif);
-                        }
-
-                        /* reverse packet snip list order */
-                        while (ptr != NULL) {
-                            gnrc_pktsnip_t *next;
-                            ptr = gnrc_pktbuf_start_write(ptr);     /* duplicate if not already done */
-                            if (ptr == NULL) {
-                                DEBUG("RPL: unable to get write access to packet: dropping it\n");
-                                gnrc_pktbuf_release(reversed_pkt);
-                                gnrc_pktbuf_release(content->current);
-                                reversed_pkt = NULL;
-                                break;
-                            }
-                            next = ptr->next;
-                            ptr->next = reversed_pkt;
-                            reversed_pkt = ptr;
-                            ptr = next;
-                        }
-                        content->current = reversed_pkt;
-                    }
                     msg_send(msg, msg->sender_pid);
-
                     break;
+                }
                 case HOP_OPT_ERR_INCONSISTENCY:
                     // we received a F Flag, process dependant on MOP
                     // drop on non-storing
@@ -287,19 +286,7 @@ static void _handle_ext_hdr_process(gnrc_pktsnip_t *ext, msg_t *msg)
                     // drop on non-storing
                     // TODO: keep track of original sender and count F errors
                     break;
-                case HOP_OPT_ERR_NOT_FOR_ME:
-                    /* we found the header is just not for us */
-                case HOP_OPT_ERR_HEADER_LENGTH:
-                    /* something is broken with the extension -> ignore header, probably just not for us */
-                    if ((ext->next) && ext->next->type == GNRC_NETTYPE_IPV6_EXT) {
-                        content->next_hdr = ext->next;
-                        content->nh_type = ((ipv6_ext_t*)ext->next->data)->nh;
 
-                        gnrc_pktsnip_t *netif = gnrc_pktsnip_search_type(content->current, GNRC_NETTYPE_NETIF);
-                        content->iface = ((gnrc_netif_hdr_t *)netif->data)->if_pid;
-                        msg_send(msg, msg->sender_pid);
-                    }
-                    break;
                 default:
                     break;
             }
@@ -428,20 +415,12 @@ static void *_event_loop(void *args)
         msg_receive(&msg);
 
         switch (msg.type) {
-            case PROTNUM_IPV6_EXT_HOPOPT:
-                DEBUG("RPL: call to add extension header received\n");
-                /* add our Hop-by-Hop extension header */
-                if (gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_ICMPV6) == NULL) {
-                    /* but only if we send a dataplane packet */
-                    _handle_ext_hdr_insert(msg.content.ptr);
-                }
-                /* reply to allow others adding their extension headers */
-                msg_reply(&msg, &reply);
-                break;
+#ifdef MODULE_GNRC_RPL_P2P
             case GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE:
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE received\n");
                 _update_lifetime();
                 break;
+#endif
             case GNRC_RPL_MSG_TYPE_PARENT_TIMEOUT:
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_PARENT_TIMEOUT received\n");
                 parent = msg.content.ptr;
@@ -482,12 +461,35 @@ static void *_event_loop(void *args)
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 break;
-            case GNRC_NETAPI_MSG_TYPE_GET:
             case GNRC_NETAPI_MSG_TYPE_SET:
-                DEBUG("RPL: reply to unsupported get/set\n");
+                DEBUG("RPL: reply to unsupported set\n");
                 reply.content.value = -ENOTSUP;
                 msg_reply(&msg, &reply);
                 break;
+            case GNRC_NETAPI_MSG_TYPE_GET: {
+                gnrc_netapi_opt_t *o = (gnrc_netapi_opt_t*)msg.content.ptr;
+                if (o->opt == NETOPT_IPV6_EXT_HDR) {
+                    DEBUG("RPL: call to add extension header received\n");
+                    switch (o->context) {
+                        case PROTNUM_IPV6_EXT_HOPOPT:
+                            reply.content.ptr = NULL;
+                            if (gnrc_pktsnip_search_type(o->data,
+                                                         GNRC_NETTYPE_ICMPV6) == NULL) {
+                                reply.content.ptr = _handle_ext_hdr_insert(o->data);
+                            }
+                            msg_reply(&msg, &reply);
+                            break;
+                        case PROTNUM_IPV6_EXT_RH:
+                            break;
+                        default:
+                            DEBUG("RPL: reply to unsupported context\n");
+                            reply.content.value = -ENOTSUP;
+                            msg_reply(&msg, &reply);
+                            break;
+                    }
+                }
+                break;
+            }
             default:
                 break;
         }
