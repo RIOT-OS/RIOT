@@ -22,6 +22,7 @@
 static void _usage(char **argv);
 static int _nib_neigh(int argc, char **argv);
 static int _nib_prefix(int argc, char **argv);
+static int _nib_route(int argc, char **argv);
 
 int _gnrc_ipv6_nib(int argc, char **argv)
 {
@@ -37,6 +38,9 @@ int _gnrc_ipv6_nib(int argc, char **argv)
     else if (strcmp(argv[1], "prefix") == 0) {
         res = _nib_prefix(argc, argv);
     }
+    else if (strcmp(argv[1], "route") == 0) {
+        res = _nib_route(argc, argv);
+    }
     else {
         _usage(argv);
     }
@@ -45,7 +49,7 @@ int _gnrc_ipv6_nib(int argc, char **argv)
 
 static void _usage(char **argv)
 {
-    printf("usage: %s {neigh|prefix|help} ...\n", argv[0]);
+    printf("usage: %s {neigh|prefix|route|help} ...\n", argv[0]);
 }
 
 static void _usage_nib_neigh(char **argv)
@@ -60,6 +64,15 @@ static void _usage_nib_prefix(char **argv)
 {
     printf("usage: %s %s [show|add|del|help]\n", argv[0], argv[1]);
     printf("       %s %s add <iface> <prefix>[/<prefix_len>] [<valid in ms>] [<pref in ms>]\n",
+           argv[0], argv[1]);
+    printf("       %s %s del <iface> <prefix>[/<prefix_len>]\n", argv[0], argv[1]);
+    printf("       %s %s show <iface>\n", argv[0], argv[1]);
+}
+
+static void _usage_nib_route(char **argv)
+{
+    printf("usage: %s %s [show|add|del|help]\n", argv[0], argv[1]);
+    printf("       %s %s add <iface> <prefix>[/<prefix_len>] <next_hop>\n",
            argv[0], argv[1]);
     printf("       %s %s del <iface> <prefix>[/<prefix_len>]\n", argv[0], argv[1]);
     printf("       %s %s show <iface>\n", argv[0], argv[1]);
@@ -164,6 +177,59 @@ static int _nib_prefix(int argc, char **argv)
     }
     else {
         _usage_nib_prefix(argv);
+        return 1;
+    }
+    return 0;
+}
+
+static int _nib_route(int argc, char **argv)
+{
+    if ((argc == 2) || (strcmp(argv[2], "show") == 0)) {
+        gnrc_ipv6_nib_ft_t entry;
+        void *state = NULL;
+        unsigned iface = 0U;
+
+        if (argc > 3) {
+            iface = atoi(argv[3]);
+        }
+        while (gnrc_ipv6_nib_ft_iter(NULL, iface, &state, &entry)) {
+            gnrc_ipv6_nib_ft_print(&entry);
+        }
+    }
+    else if ((argc > 2) && (strcmp(argv[2], "help") == 0)) {
+        _usage_nib_route(argv);
+    }
+    else if ((argc > 5) && (strcmp(argv[2], "add") == 0)) {
+        ipv6_addr_t pfx = IPV6_ADDR_UNSPECIFIED, next_hop;
+        unsigned iface = atoi(argv[3]);
+        unsigned pfx_len = ipv6_addr_split_prefix(argv[4]);
+
+        if (ipv6_addr_from_str(&pfx, argv[4]) == NULL) {
+            /* check if string equals "default"
+             * => keep pfx as unspecified address == default route */
+            if (strcmp(argv[4], "default") != 0) {
+                _usage_nib_route(argv);
+                return 1;
+            }
+        }
+        if (ipv6_addr_from_str(&next_hop, argv[5]) == NULL) {
+            _usage_nib_route(argv);
+            return 1;
+        }
+        gnrc_ipv6_nib_ft_add(&pfx, pfx_len, &next_hop, iface);
+    }
+    else if ((argc > 4) && (strcmp(argv[2], "del") == 0)) {
+        ipv6_addr_t pfx;
+        unsigned pfx_len = ipv6_addr_split_prefix(argv[4]);
+
+        if (ipv6_addr_from_str(&pfx, argv[4]) == NULL) {
+            _usage_nib_route(argv);
+            return 1;
+        }
+        gnrc_ipv6_nib_ft_del(&pfx, pfx_len);
+    }
+    else {
+        _usage_nib_route(argv);
         return 1;
     }
     return 0;
