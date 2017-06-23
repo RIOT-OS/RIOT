@@ -27,6 +27,8 @@ USEMODULE += shell_commands
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
+# This application dumps received packets to STDIO using the pktdump module
+USEMODULE += gnrc_pktdump
 USEMODULE += timex
 USEMODULE += xtimer
 USEMODULE += random
