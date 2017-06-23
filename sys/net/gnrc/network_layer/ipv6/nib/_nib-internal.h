@@ -32,6 +32,7 @@
 #ifdef MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
 #endif
+#include "net/gnrc/ipv6/nib/ft.h"
 #include "net/gnrc/ipv6/nib/nc.h"
 #include "net/gnrc/ipv6/nib/conf.h"
 #include "net/gnrc/pktqueue.h"
@@ -464,6 +465,17 @@ _nib_dr_entry_t *_nib_drl_iter(const _nib_dr_entry_t *last);
 _nib_dr_entry_t *_nib_drl_get(const ipv6_addr_t *router_addr, unsigned iface);
 
 /**
+ * @brief   Gets external forwarding table entry representation from default
+ *          router entry
+ *
+ * @pre `(drl != NULL) && (drl->next_hop != NULL) && (fte != NULL)`
+ *
+ * @param[in] drl   Default router entry.
+ * @param[out] fte  External representation of the forwarding table entry.
+ */
+void _nib_drl_ft_get(const _nib_dr_entry_t *drl, gnrc_ipv6_nib_ft_t *fte);
+
+/**
  * @brief   Gets *the* default router
  *
  * @see [RFC 4861, section 6.3.6](https://tools.ietf.org/html/rfc4861#section-6.3.6)
@@ -508,6 +520,16 @@ void _nib_offl_clear(_nib_offl_entry_t *dst);
  * @return  entry after @p last.
  */
 _nib_offl_entry_t *_nib_offl_iter(const _nib_offl_entry_t *last);
+
+/**
+ * @brief   Checks if @p entry was allocated using _nib_offl_alloc()
+ *
+ * @param[in] entry An entry.
+ *
+ * @return  true, if @p entry was allocated using @ref _nib_offl_alloc()
+ * @return  false, if @p entry was not allocated using @ref _nib_offl_alloc()
+ */
+bool _nib_offl_is_entry(const _nib_offl_entry_t *entry);
 
 /**
  * @brief   Helper function for view-level add-functions below
@@ -725,6 +747,34 @@ _nib_offl_entry_t *_nib_abr_iter_pfx(const _nib_abr_entry_t *abr,
  */
 _nib_abr_entry_t *_nib_abr_iter(const _nib_abr_entry_t *last);
 #endif
+
+/**
+ * @brief   Gets external forwarding table entry representation from off-link
+ *          entry
+ *
+ * @pre `(dst != NULL) && (dst->next_hop != NULL) && (fte != NULL)`
+ *
+ * @param[in] dst   Off-link entry.
+ * @param[out] fte  External representation of the forwarding table entry.
+ */
+void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte);
+
+/**
+ * @brief   Gets best match to @p dst from all off-link entries and default
+ *          route.
+ *
+ * @pre `(dst != NULL) && (fte != NULL)`
+ *
+ * @param[in] dst   Destination address to get the off-link entry for.
+ * @param[in] pkt   Packet causing the route look-up (provided to allow reactive
+ *                  routing protocols to queue it if needed). May be NULL.
+ * @param[out] fte  Resulting forwarding table entry.
+ *
+ * @return  0, on success.
+ * @return  -ENETUNREACH, when no route was found.
+ */
+int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *ctx,
+                   gnrc_ipv6_nib_ft_t *entry);
 
 /**
  * @brief   Gets (or creates if it not exists) interface information for

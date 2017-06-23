@@ -401,6 +401,18 @@ _nib_dr_entry_t *_nib_drl_get_dr(void)
     return _prime_def_router;
 }
 
+void _nib_drl_ft_get(const _nib_dr_entry_t *drl, gnrc_ipv6_nib_ft_t *fte)
+{
+    assert((drl != NULL) && (drl->next_hop != NULL) && (fte != NULL));
+    ipv6_addr_set_unspecified(&fte->dst);
+    fte->dst_len = 0;
+    fte->primary = ((drl == _prime_def_router) &&
+                    !((_prime_def_router == NULL) ||
+                      (_node_unreachable(_prime_def_router->next_hop))));
+    memcpy(&fte->next_hop, &drl->next_hop->ipv6, sizeof(fte->next_hop));
+    fte->iface = _nib_onl_get_if(drl->next_hop);
+}
+
 _nib_offl_entry_t *_nib_offl_alloc(const ipv6_addr_t *next_hop, unsigned iface,
                                    const ipv6_addr_t *pfx, unsigned pfx_len)
 {
@@ -495,6 +507,87 @@ _nib_offl_entry_t *_nib_offl_iter(const _nib_offl_entry_t *last)
         }
     }
     return NULL;
+}
+
+bool _nib_offl_is_entry(const _nib_offl_entry_t *entry)
+{
+    return (entry >= _dsts) && _in_dsts(entry);
+}
+
+static _nib_offl_entry_t *_nib_offl_get_match(const ipv6_addr_t *dst)
+{
+    _nib_offl_entry_t *res = NULL;
+    uint8_t best_match = 0;
+
+    DEBUG("nib: get match for destination %s from NIB\n",
+          ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
+    for (_nib_offl_entry_t *entry = _dsts; _in_dsts(entry); entry++) {
+        if (entry->mode != _EMPTY) {
+            uint8_t match = ipv6_addr_match_prefix(&entry->pfx, dst);
+
+            DEBUG("nib: %s/%u => ",
+                  ipv6_addr_to_str(addr_str, &entry->pfx, sizeof(addr_str)),
+                  entry->pfx_len);
+            DEBUG("%s%%%u matches with %u bits\n",
+                  (entry->mode == _PL) ? "(nil)" :
+                  ipv6_addr_to_str(addr_str, &entry->next_hop->ipv6,
+                                   sizeof(addr_str)),
+                  _nib_onl_get_if(entry->next_hop), match);
+            if ((match > best_match) && (match >= entry->pfx_len)) {
+                DEBUG("nib: best match (%u bits)\n", match);
+                res = entry;
+                best_match = match;
+            }
+        }
+    }
+    return res;
+}
+
+void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte)
+{
+    assert((dst != NULL) && (dst->next_hop != NULL) && (fte != NULL));
+    memcpy(&fte->dst, &dst->pfx, sizeof(dst->pfx));
+    fte->dst_len = dst->pfx_len;
+    fte->primary = 0;
+    fte->iface = _nib_onl_get_if(dst->next_hop);
+    if (dst->mode == _PL) { /* entry is only in prefix list */
+        ipv6_addr_set_unspecified(&fte->next_hop);
+    }
+    else {
+        memcpy(&fte->next_hop, &dst->next_hop->ipv6, sizeof(dst->next_hop->ipv6));
+    }
+}
+
+int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
+                   gnrc_ipv6_nib_ft_t *fte)
+{
+    assert((dst != NULL) && (fte != NULL));
+    DEBUG("nib: get route %s for packet %p\n",
+          ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)),
+          (void *)pkt);
+    _nib_offl_entry_t *offl = _nib_offl_get_match(dst);
+
+    assert((dst != NULL) && (fte != NULL));
+    if ((offl == NULL) || (offl->mode == _PL)) {
+        /* give default router precedence over PLE */
+        _nib_dr_entry_t *router = _nib_drl_get_dr();
+
+        if ((router == NULL) && (offl == NULL)) {
+            (void)pkt;
+            /* TODO: ask RRP to search for route (using pkt) */
+            return -ENETUNREACH;
+        }
+        else if (router != NULL) {
+            DEBUG("nib: prefer default router %s%%%u over prefix list entry\n",
+                  ipv6_addr_to_str(addr_str, &router->next_hop->ipv6,
+                                   sizeof(addr_str)),
+                  _nib_onl_get_if(router->next_hop));
+            _nib_drl_ft_get(router, fte);
+            return 0;
+        }
+    }
+    _nib_ft_get(offl, fte);
+    return 0;
 }
 
 void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
