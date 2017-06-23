@@ -212,6 +212,26 @@ void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
 #endif  /* MODULE_GNRC_IPV6_EXT_RH */
 
             case PROTNUM_IPV6_EXT_HOPOPT:
+                /* if current != pkt, size is already checked */
+                if (current == pkt && !_has_valid_size(pkt, nh)) {
+                    DEBUG("ipv6_ext: invalid size\n");
+                    gnrc_pktbuf_release(pkt);
+                    return;
+                }
+
+                nh = ext->nh;
+                DEBUG("ipv6_ext: next header = %" PRIu8 "\n", nh);
+
+                if ((current = _mark_extension_header(current, &pkt)) == NULL) {
+                    return;
+                }
+
+                gnrc_pktbuf_hold(pkt, 1);   /* don't release on next dispatch */
+                if (gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, nh, pkt) == 0) {
+                    gnrc_pktbuf_release(pkt);
+                }
+
+                break;
             case PROTNUM_IPV6_EXT_DST:
             case PROTNUM_IPV6_EXT_FRAG:
             case PROTNUM_IPV6_EXT_AH:

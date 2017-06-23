@@ -23,6 +23,7 @@
 #include <stdint.h>
 
 #include "net/ipv6/ext/rh.h"
+#include "net/gnrc/pkt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,6 +31,19 @@ extern "C" {
 
 #define IPV6_EXT_LEN_UNIT   (8U)    /**< Unit in byte for the extension header's
                                      *   length field */
+
+/** @brief Message type to reply IPv6 that a next header has been processed */
+#define GNRC_IPV6_EXT_HANDLE_NEXT_HDR   (0x0399)
+
+/**
+ * @brief   Message content container to process extension headers sequentially.
+ */
+typedef struct {
+    kernel_pid_t    iface;      /**< The interface we received the packet */
+    gnrc_pktsnip_t  *current;   /**< The snip of the IP6 header */
+    gnrc_pktsnip_t  *next_hdr;  /**< The next header to be processed */
+    uint8_t         nh_type;    /**< The type of the next header */
+} gnrc_ipv6_ext_hdr_handle_t;
 
 /**
  * @brief   IPv6 extension headers.

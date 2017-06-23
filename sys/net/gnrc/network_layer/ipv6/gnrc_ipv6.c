@@ -93,6 +93,49 @@ kernel_pid_t gnrc_ipv6_init(void)
     return gnrc_ipv6_pid;
 }
 
+static void _dispatch_insert_ext_headers(gnrc_pktsnip_t *pkt)
+{
+    DEBUG("ipv6: dispatch insertion of extension headers\n");
+    uint8_t ext_demux[] = { PROTNUM_IPV6_EXT_HOPOPT
+                          , PROTNUM_IPV6_EXT_RH
+                          , PROTNUM_IPV6_EXT_FRAG
+                          , PROTNUM_IPV6_EXT_ESP
+                          , PROTNUM_IPV6_EXT_AH
+                          , PROTNUM_IPV6_EXT_DST
+                          , PROTNUM_IPV6_EXT_MOB
+                          };
+    bool encapsulate = false;
+
+    for ( size_t i = 0; i < sizeof(ext_demux); ++i ) {
+        gnrc_netreg_entry_t *call = gnrc_netreg_lookup(GNRC_NETAPI_MSG_TYPE_SND, ext_demux[i]);
+        msg_t msg, rcv;
+        msg.type = ext_demux[i];
+
+        while (call) {
+            if (   ext_demux[i] == PROTNUM_IPV6_EXT_HOPOPT
+                || ext_demux[i] == PROTNUM_IPV6_EXT_RH ) {
+                encapsulate = true;
+            }
+            msg.content.ptr = pkt;
+            msg_send_receive(&msg, &rcv, call->target.pid);
+            call = gnrc_netreg_getnext(call);
+        }
+    }
+
+    if (encapsulate) {
+        ipv6_hdr_t* hdr = gnrc_ipv6_get_header(pkt);
+        if (hdr) {
+            gnrc_pktsnip_t* tmp = pkt;
+            pkt = gnrc_ipv6_hdr_build(pkt, &hdr->src, &hdr->dst);
+            if (pkt == NULL) {
+                /* revert but what do we now */
+                DEBUG("ipv6: dispatch insertion of extension headers, encapsulation Error!\n");
+                pkt = tmp;
+            }
+        }
+    }
+}
+
 static void _dispatch_next_header(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt,
                                   uint8_t nh, bool interested);
 
@@ -278,6 +321,7 @@ static void *_event_loop(void *args)
 
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("ipv6: GNRC_NETAPI_MSG_TYPE_SND received\n");
+                _dispatch_insert_ext_headers(msg.content.ptr);
                 _send(msg.content.ptr, true);
                 break;
 
@@ -286,6 +330,19 @@ static void *_event_loop(void *args)
                 DEBUG("ipv6: reply to unsupported get/set\n");
                 reply.content.value = -ENOTSUP;
                 msg_reply(&msg, &reply);
+                break;
+
+            case GNRC_IPV6_EXT_HANDLE_NEXT_HDR:
+                DEBUG("ipv6: GNRC_IPV6_EXT_HANDLE_NEXT_HDR received\n");
+                gnrc_ipv6_ext_hdr_handle_t *handle = (gnrc_ipv6_ext_hdr_handle_t*)msg.content.ptr;
+                assert(handle->current);
+
+                if (handle->next_hdr) {
+                    gnrc_ipv6_demux(handle->iface, handle->current, handle->next_hdr, handle->nh_type);
+                } else {
+                    /* no more headers passed send the packet further */
+                    _send(handle->current, false);
+                }
                 break;
 
             case GNRC_IPV6_NIB_SND_UC_NS:
@@ -866,40 +923,12 @@ static void _receive(gnrc_pktsnip_t *pkt)
             gnrc_pktbuf_release(pkt);
             return;
         }
-        /* TODO: check if receiving interface is router */
-        else if (--(hdr->hl) > 0) {  /* drop packets that *reach* Hop Limit 0 */
-            DEBUG("ipv6: forward packet to next hop\n");
-
-            /* pkt might not be writable yet, if header was given above */
-            ipv6 = gnrc_pktbuf_start_write(ipv6);
-            if (ipv6 == NULL) {
-                DEBUG("ipv6: unable to get write access to packet: dropping it\n");
-                gnrc_pktbuf_release(pkt);
-                return;
-            }
-
-            /* remove L2 headers around IPV6 */
-            netif_hdr = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
-            if (netif_hdr != NULL) {
-                gnrc_pktbuf_remove_snip(pkt, netif_hdr);
-            }
-            pkt = gnrc_pktbuf_reverse_snips(pkt);
-            if (pkt != NULL) {
-                _send(pkt, false);
-            }
-            else {
-                DEBUG("ipv6: unable to reverse pkt from receive order to send "
-                      "order; dropping it\n");
-            }
-            return;
-        }
-        else {
+        else if (--(hdr->hl) <= 0) {
             DEBUG("ipv6: hop limit reached 0: drop packet\n");
             gnrc_icmpv6_error_time_exc_send(ICMPV6_ERROR_TIME_EXC_HL, pkt);
             gnrc_pktbuf_release_error(pkt, ETIMEDOUT);
             return;
         }
-
 #else  /* MODULE_GNRC_IPV6_ROUTER */
         DEBUG("ipv6: dropping packet\n");
         /* non rounting hosts just drop the packet */
