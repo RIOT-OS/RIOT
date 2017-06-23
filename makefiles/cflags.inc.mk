@@ -30,8 +30,11 @@ endif
 # Worse yet they hide errors by accepting wildcard argument types.
 ifeq ($(shell $(CC) -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
   # duplicated parameters don't hurt
-  CFLAGS += -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition
+  CFLAGS += -Wstrict-prototypes -Wold-style-definition
   CXXUWFLAGS += -Wstrict-prototypes -Wold-style-definition
+  ifeq ($(WERROR),1)
+    CFLAGS += -Werror=strict-prototypes -Werror=old-style-definition
+  endif
 endif
 
 # Unwanted flags for c++
