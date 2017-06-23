@@ -185,22 +185,16 @@ static int pthread_rwlock_timedlock(pthread_rwlock_t *rwlock,
                                     int incr_when_held,
                                     const struct timespec *abstime)
 {
-    timex_t now, then;
+    uint64_t now = xtimer_now_usec64();
+    uint64_t then = ((uint64_t)abstime->tv_sec * US_PER_SEC) +
+                    (abstime->tv_nsec / NS_PER_US);
 
-    then.seconds = abstime->tv_sec;
-    then.microseconds = abstime->tv_nsec / 1000u;
-    timex_normalize(&then);
-
-    xtimer_now_timex(&now);
-
-    if (timex_cmp(then, now) <= 0) {
+    if ((then - now) <= 0) {
         return ETIMEDOUT;
     }
     else {
-        timex_t reltime = timex_sub(then, now);
-
         xtimer_t timer;
-        xtimer_set_wakeup64(&timer, timex_uint64(reltime) , sched_active_pid);
+        xtimer_set_wakeup64(&timer, (then - now), sched_active_pid);
         int result = pthread_rwlock_lock(rwlock, is_blocked, is_writer, incr_when_held, true);
         if (result != ETIMEDOUT) {
             xtimer_remove(&timer);
