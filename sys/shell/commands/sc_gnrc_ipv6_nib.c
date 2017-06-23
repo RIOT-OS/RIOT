@@ -21,6 +21,7 @@
 
 static void _usage(char **argv);
 static int _nib_neigh(int argc, char **argv);
+static int _nib_prefix(int argc, char **argv);
 
 int _gnrc_ipv6_nib(int argc, char **argv)
 {
@@ -33,6 +34,9 @@ int _gnrc_ipv6_nib(int argc, char **argv)
     else if (strcmp(argv[1], "neigh") == 0) {
         res = _nib_neigh(argc, argv);
     }
+    else if (strcmp(argv[1], "prefix") == 0) {
+        res = _nib_prefix(argc, argv);
+    }
     else {
         _usage(argv);
     }
@@ -41,7 +45,7 @@ int _gnrc_ipv6_nib(int argc, char **argv)
 
 static void _usage(char **argv)
 {
-    printf("usage: %s {neigh|help} ...\n", argv[0]);
+    printf("usage: %s {neigh|prefix|help} ...\n", argv[0]);
 }
 
 static void _usage_nib_neigh(char **argv)
@@ -50,6 +54,15 @@ static void _usage_nib_neigh(char **argv)
     printf("       %s %s add <iface> <ipv6 addr> [<l2 addr>]\n", argv[0], argv[1]);
     printf("       %s %s del <ipv6 addr>\n", argv[0], argv[1]);
     printf("       %s %s show <ipv6 addr>\n", argv[0], argv[1]);
+}
+
+static void _usage_nib_prefix(char **argv)
+{
+    printf("usage: %s %s [show|add|del|help]\n", argv[0], argv[1]);
+    printf("       %s %s add <iface> <prefix>[/<prefix_len>] [<valid in ms>] [<pref in ms>]\n",
+           argv[0], argv[1]);
+    printf("       %s %s del <iface> <prefix>[/<prefix_len>]\n", argv[0], argv[1]);
+    printf("       %s %s show <iface>\n", argv[0], argv[1]);
 }
 
 static int _nib_neigh(int argc, char **argv)
@@ -98,6 +111,59 @@ static int _nib_neigh(int argc, char **argv)
     }
     else {
         _usage_nib_neigh(argv);
+        return 1;
+    }
+    return 0;
+}
+
+static int _nib_prefix(int argc, char **argv)
+{
+    if ((argc == 2) || (strcmp(argv[2], "show") == 0)) {
+        gnrc_ipv6_nib_pl_t entry;
+        void *state = NULL;
+        unsigned iface = 0U;
+
+        if (argc > 3) {
+            iface = atoi(argv[3]);
+        }
+        while (gnrc_ipv6_nib_pl_iter(iface, &state, &entry)) {
+            gnrc_ipv6_nib_pl_print(&entry);
+        }
+    }
+    else if ((argc > 2) && (strcmp(argv[2], "help") == 0)) {
+        _usage_nib_prefix(argv);
+    }
+    else if ((argc > 4) && (strcmp(argv[2], "add") == 0)) {
+        ipv6_addr_t pfx;
+        unsigned iface = atoi(argv[3]);
+        unsigned pfx_len = ipv6_addr_split_prefix(argv[4]);
+        unsigned valid_ltime = UINT32_MAX, pref_ltime = UINT32_MAX;
+
+        if (ipv6_addr_from_str(&pfx, argv[4]) == NULL) {
+            _usage_nib_prefix(argv);
+            return 1;
+        }
+        if (argc > 5) {
+            valid_ltime = atoi(argv[5]);
+        }
+        if (argc > 6) {
+            pref_ltime = atoi(argv[6]);
+        }
+        gnrc_ipv6_nib_pl_set(iface, &pfx, pfx_len, valid_ltime, pref_ltime);
+    }
+    else if ((argc > 4) && (strcmp(argv[2], "del") == 0)) {
+        ipv6_addr_t pfx;
+        unsigned iface = atoi(argv[3]);
+        unsigned pfx_len = ipv6_addr_split_prefix(argv[4]);
+
+        if (ipv6_addr_from_str(&pfx, argv[4]) == NULL) {
+            _usage_nib_prefix(argv);
+            return 1;
+        }
+        gnrc_ipv6_nib_pl_del(iface, &pfx, pfx_len);
+    }
+    else {
+        _usage_nib_prefix(argv);
         return 1;
     }
     return 0;
