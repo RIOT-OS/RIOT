@@ -31,6 +31,8 @@
 #include "vendor/stm32f410rx.h"
 #elif defined(CPU_MODEL_STM32F411RE)
 #include "vendor/stm32f411xe.h"
+#elif defined(CPU_MODEL_STM32F412ZG)
+#include "vendor/stm32f412zx.h"
 #elif defined(CPU_MODEL_STM32F413ZH)
 #include "vendor/stm32f413xx.h"
 #elif defined(CPU_MODEL_STM32F415RG)
