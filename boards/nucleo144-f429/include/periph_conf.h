@@ -224,10 +224,24 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name    ADC configuration
+ * @name   ADC configuration
+ *
+ * Note that we do not configure all ADC channels,
+ * and not in the STM32F429zi order. Instead, we
+ * just define 6 ADC channels, for the Nucleo
+ * Arduino header pins A0-A5
+ *
  * @{
  */
-#define ADC_NUMOF          (0)
+#define ADC_NUMOF          (6U)
+#define ADC_CONFIG {              \
+    {GPIO_PIN(PORT_A, 3), 2, 3},  \
+    {GPIO_PIN(PORT_C, 0), 2, 10}, \
+    {GPIO_PIN(PORT_C, 3), 2, 13}, \
+    {GPIO_PIN(PORT_F, 3), 2, 9},  \
+    {GPIO_PIN(PORT_F, 5), 2, 15}, \
+    {GPIO_PIN(PORT_F, 10), 2, 8}, \
+}
 /** @} */
 
 /**
