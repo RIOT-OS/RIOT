@@ -135,13 +135,25 @@ static void _listen(sock_udp_t *sock)
         return;
     }
 
+    if (coap_get_code(&pdu) == COAP_CODE_EMPTY) {
+        DEBUG("gcoap: empty messages not handled yet\n");
+        return;
+
     /* incoming request */
-    if (coap_get_code_class(&pdu) == COAP_CLASS_REQ) {
-        size_t pdu_len = _handle_req(&pdu, buf, sizeof(buf), &remote);
-        if (pdu_len > 0) {
-            sock_udp_send(sock, buf, pdu_len, &remote);
+    } else if (coap_get_code_class(&pdu) == COAP_CLASS_REQ) {
+        if (coap_get_type(&pdu) == COAP_TYPE_NON
+                || coap_get_type(&pdu) == COAP_TYPE_CON) {
+            size_t pdu_len = _handle_req(&pdu, buf, sizeof(buf), &remote);
+            if (pdu_len > 0) {
+                sock_udp_send(sock, buf, pdu_len, &remote);
+            }
+        }
+        else {
+            DEBUG("gcoap: illegal request type: %u\n", coap_get_type(&pdu));
+            return;
         }
     }
+
     /* incoming response */
     else {
         _find_req_memo(&memo, &pdu, buf, sizeof(buf));
@@ -730,9 +742,10 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
 
 int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
 {
-    /* Assume NON type request, so response type is the same. */
+    if (coap_get_type(pdu) == COAP_TYPE_CON) {
+        coap_hdr_set_type(pdu->hdr, COAP_TYPE_ACK);
+    }
     coap_hdr_set_code(pdu->hdr, code);
-    /* Create message ID since NON? */
 
     /* Reserve some space between the header and payload to write options later */
     pdu->payload      = buf + coap_get_total_hdr_len(pdu) + GCOAP_RESP_OPTIONS_BUF;

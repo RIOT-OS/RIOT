@@ -18,6 +18,7 @@
  *
  * @}
  */
+#include <errno.h>
 
 #include "pthread_cond.h"
 #include "thread.h"
@@ -92,47 +93,69 @@ int pthread_cond_destroy(pthread_cond_t *cond)
     return 0;
 }
 
-int pthread_cond_wait(pthread_cond_t *cond, mutex_t *mutex)
+void _init_cond_wait(pthread_cond_t *cond, priority_queue_node_t *n)
 {
-    priority_queue_node_t n;
-    n.priority = sched_active_thread->priority;
-    n.data = sched_active_pid;
-    n.next = NULL;
+    n->priority = sched_active_thread->priority;
+    n->data = sched_active_pid;
+    n->next = NULL;
 
     /* the signaling thread may not hold the mutex, the queue is not thread safe */
     unsigned old_state = irq_disable();
-    priority_queue_add(&(cond->queue), &n);
+    priority_queue_add(&(cond->queue), n);
     irq_restore(old_state);
+}
+
+int pthread_cond_wait(pthread_cond_t *cond, mutex_t *mutex)
+{
+    if (cond == NULL) {
+        return EINVAL;
+    }
+    priority_queue_node_t n;
+    _init_cond_wait(cond, &n);
 
     mutex_unlock_and_sleep(mutex);
 
-    if (n.data != -1u) {
-        /* on signaling n.data is set to -1u */
-        /* if it isn't set, then the wakeup is either spurious or a timer wakeup */
-        old_state = irq_disable();
-        priority_queue_remove(&(cond->queue), &n);
-        irq_restore(old_state);
-    }
-
     mutex_lock(mutex);
+
     return 0;
 }
 
 int pthread_cond_timedwait(pthread_cond_t *cond, mutex_t *mutex, const struct timespec *abstime)
 {
-    timex_t now, then, reltime;
+    if ((cond == NULL) || (abstime->tv_sec < 0)) {
+        return EINVAL;
+    }
 
-    xtimer_now_timex(&now);
-    then.seconds = abstime->tv_sec;
-    then.microseconds = abstime->tv_nsec / 1000u;
-    reltime = timex_sub(then, now);
+    uint64_t now = xtimer_now_usec64();
+    uint64_t then = ((uint64_t)abstime->tv_sec * US_PER_SEC) +
+                    (abstime->tv_nsec / NS_PER_US);
 
-    xtimer_t timer;
-    xtimer_set_wakeup64(&timer, timex_uint64(reltime) , sched_active_pid);
-    int result = pthread_cond_wait(cond, mutex);
-    xtimer_remove(&timer);
+    int ret = 0;
+    if (then > now) {
+        xtimer_t timer;
+        priority_queue_node_t n;
 
-    return result;
+        _init_cond_wait(cond, &n);
+        xtimer_set_wakeup64(&timer, (then - now), sched_active_pid);
+
+        mutex_unlock_and_sleep(mutex);
+
+        if (n.data != -1u) {
+            /* on signaling n.data is set to -1u */
+            /* if it isn't set, then the wakeup is either spurious or a timer wakeup */
+            unsigned old_state = irq_disable();
+            priority_queue_remove(&(cond->queue), &n);
+            irq_restore(old_state);
+            ret = ETIMEDOUT;
+        }
+        xtimer_remove(&timer);
+    }
+    else {
+        mutex_unlock(mutex);
+        ret = ETIMEDOUT;
+    }
+    mutex_lock(mutex);
+    return ret;
 }
 
 int pthread_cond_signal(pthread_cond_t *cond)
