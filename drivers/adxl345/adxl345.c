@@ -34,7 +34,7 @@
 #define BUS                 (dev->i2c)
 #define ADDR                (dev->addr)
 
-int adxl345_init(adxl345_t *dev, adxl345_params_t* params)
+int adxl345_init(adxl345_t *dev, const adxl345_params_t* params)
 {
     uint8_t reg;
 
