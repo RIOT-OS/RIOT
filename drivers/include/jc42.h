@@ -81,7 +81,7 @@ extern const saul_driver_t jc42_temperature_saul_driver;
  * @return                   0 on success
  * @return                  -1 on error
  */
-int jc42_init(jc42_t* dev, jc42_params_t* params);
+int jc42_init(jc42_t* dev, const jc42_params_t* params);
 
 /**
  * @brief   Get content of configuration register
