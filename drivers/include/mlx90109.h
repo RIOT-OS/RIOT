@@ -10,6 +10,8 @@
  * @defgroup    drivers_MLX90109 Read RFID Animal Tags
  * @ingroup     drivers
  * @brief       Driver for reading ISO 11784 & 11785 FDX-B Animal Tags
+ * 				Example: http://www.radtke.dk/mlx90109_schematic.pdf
+ *				The driver reads FDX-B RFID Animal Tags. (ISO 11784 & 11785)
  * @{
  *
  * @file
@@ -34,9 +36,9 @@ extern "C" {
  */
 enum {
     MLX90109_OK    = 0,			/**< all went as expected */
+	MLX90109_DATA_OK = 1,		/**< Data read complete */
     MLX90109_GPIO_FAULT = -1,	/**< error GPIO configuation */
-    MLX90109_CRC_NOT_OK = -2,	/**< crc is wrong */
-	MLX90109_DATA_OK = -3		/**< Data read complete */
+    MLX90109_CRC_NOT_OK = -2	/**< crc is wrong */
 };
 
 /**
@@ -94,9 +96,9 @@ int16_t mlx90109_init(mlx90109_t *dev, const mlx90109_params_t *params,	gpio_cb_
  * @param[out] dev     the device descriptor
  *
  * @return             0 if a bit could read successfully
- * @return             -3 if the raw data is complete
+ * @return             1 if the raw data is complete
  */
-int16_t mlx90109_read(mlx90109_t *dev);
+int16_t mlx90109_read_fdxb(mlx90109_t *dev);
 
 /**
  * @brief              Extract the Data from the Raw data and performs a CRC.
@@ -107,7 +109,7 @@ int16_t mlx90109_read(mlx90109_t *dev);
  * @return             0 if CRC is ok
  * @return             -2 if CRC is not ok
  */
-int16_t mlx90109_format(mlx90109_t *dev, tagdata *tag);
+int16_t mlx90109_format_fdxb(mlx90109_t *dev, tagdata *tag);
 
 
 #endif /* MLX90109_H_ */

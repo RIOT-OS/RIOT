@@ -31,10 +31,10 @@ extern "C" {
  * @{
  */
 #ifndef MLX90109_PARAM_CLOCK_PIN
-#define MLX90109_PARAM_CLOCK_PIN       (GPIO_PIN(0, 1)) // (GPIO_PIN(PORT_A, 15))
+#define MLX90109_PARAM_CLOCK_PIN       (GPIO_PIN(0, 1))
 #endif
 #ifndef MLX90109_PARAM_DATA_PIN
-#define MLX90109_PARAM_DATA_PIN   	   (GPIO_PIN(0, 4))//(GPIO_PIN(PORT_C, 14))
+#define MLX90109_PARAM_DATA_PIN   	   (GPIO_PIN(0, 4))
 #endif
 #ifndef MLX90109_PARAM_MODE_PIN
 #define MLX90109_PARAM_MODE_PIN		  (0)
@@ -46,10 +46,10 @@ extern "C" {
 #define MLX90109_PARAM_MODU_PIN   (0)
 #endif
 #ifndef MLX90109_PARAM_SPEED
-#define MLX90109_PARAM_SPEED      (4000)//2000 baud or 4000 baud
+#define MLX90109_PARAM_SPEED      (4000)	//2000 baud or 4000 baud
 #endif
 #ifndef MLX90109_PARAM_CODE
-#define MLX90109_PARAM_CODE       (2)//  1 = Manchester, 2 = Biphase
+#define MLX90109_PARAM_CODE       (2)	//  1 = Manchester, 2 = Biphase
 #endif
 /** @} */
 

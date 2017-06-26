@@ -18,25 +18,7 @@
  *
  * @}
  */
- 
-/*
-* 
-*  10000000000 	  11bit Header
-*  1 11110000 	
-*  1 ->00000011 	  38 bit, 12 digits, ID.
-*  1 00000000 	  eg. 000000001008 (decimal).
-*  1 00000000 	
-*  1 11->000000   10 bit (3 digit) Country code.
-*  1 11111001 	  eg. 999 (decimal).
-*  1 -------1 	  1 bit data block status flag.
-*  1 1------- 	  1 bit animal application indicator.
-*  1 11010110 	  16 bit checksum.
-*  1 01011101 	
-*  1 01010110 	  24 bits of extra data if present.
-*  1 00110100 	 
-*  1 00010010 	
-*
-*/
+
  
 #include "mlx90109.h"
 #include "include/mlx90109_params.h"
@@ -88,7 +70,7 @@ int16_t mlx90109_init(mlx90109_t *dev, const mlx90109_params_t *params, gpio_cb_
 	
 }
 
-int16_t mlx90109_format(mlx90109_t *dev, tagdata *tag)
+int16_t mlx90109_format_fdxb(mlx90109_t *dev, tagdata *tag)
 {
 	uint8_t i=0;
 	uint8_t k=0;
@@ -164,7 +146,7 @@ int16_t mlx90109_format(mlx90109_t *dev, tagdata *tag)
 }
 
 
-int16_t mlx90109_read(mlx90109_t *dev)
+int16_t mlx90109_read_fdxb(mlx90109_t *dev)
 {
 	// Detect "1"
 	if((gpio_read(dev->p.data) > 0)&&(dev->counter_header==11))
