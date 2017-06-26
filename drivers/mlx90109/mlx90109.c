@@ -70,7 +70,7 @@ int16_t mlx90109_init(mlx90109_t *dev, const mlx90109_params_t *params, gpio_cb_
 	
 }
 
-int16_t mlx90109_format_fdxb(mlx90109_t *dev, tagdata *tag)
+int16_t mlx90109_format_fdxb(mlx90109_t *dev, mlx90109_fdxb_tagdata *tag)
 {
 	uint8_t i=0;
 	uint8_t k=0;

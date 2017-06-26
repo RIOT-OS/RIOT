@@ -75,7 +75,7 @@ typedef struct {
 	uint16_t checksum16;		/**< 16bit checksum, calcuated */
 	uint8_t dataB[3];			/**< for Data on Tag, if DataBlock is 1 */
 	uint8_t newTag;
-} tagdata;
+} mlx90109_fdxb_tagdata;
 
 /**
  * @brief              Initializes the MLX90109 with the given parameters in mlx90109_t structure.
@@ -109,7 +109,7 @@ int16_t mlx90109_read_fdxb(mlx90109_t *dev);
  * @return             0 if CRC is ok
  * @return             -2 if CRC is not ok
  */
-int16_t mlx90109_format_fdxb(mlx90109_t *dev, tagdata *tag);
+int16_t mlx90109_format_fdxb(mlx90109_t *dev, mlx90109_fdxb_tagdata *tag);
 
 
 #endif /* MLX90109_H_ */

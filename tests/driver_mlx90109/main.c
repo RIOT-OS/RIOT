@@ -13,7 +13,7 @@ int sleepTime = 2;
 
 	/*RFID */
 	mlx90109_t mlx90109_dev;
-	tagdata neuerTag;
+	mlx90109_fdxb_tagdata neuerTag;
 	
 //Read Data
 void interrupt_mlx90109(void *args)
@@ -23,7 +23,7 @@ void interrupt_mlx90109(void *args)
 	temp = mlx90109_read_fdxb(&mlx90109_dev);
 	if (temp == MLX90109_DATA_OK)
 	{
-		//printf("data ok\n");
+		//Raw Data to Tag Data and CRC
 		temp = mlx90109_format_fdxb(&mlx90109_dev, &neuerTag);
 		if (temp == MLX90109_OK){
 			neuerTag.newTag = 1;
