@@ -8,7 +8,8 @@
  */
 
 /**
- * @addtogroup  cpu_cc2538
+ * @ingroup     cpu_cc2538
+ * @ingroup     drivers_periph_spi
  * @{
  *
  * @file

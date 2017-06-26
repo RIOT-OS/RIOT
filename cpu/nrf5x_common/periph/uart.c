@@ -10,6 +10,7 @@
 
 /**
  * @ingroup     cpu_nrf5x_common
+ * @ingroup     drivers_periph_uart
  * @{
  *
  * @file

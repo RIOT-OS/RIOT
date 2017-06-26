@@ -8,6 +8,16 @@
  * directory for more details.
  */
 
+/**
+ * @ingroup     cpu_sam0_common
+ * @ingroup     drivers_periph_adc
+ * @{
+ *
+ * @file
+ * @brief       Low-level ADC driver implementation
+ *
+ * @}
+ */
 #include <stdint.h>
 #include "cpu.h"
 #include "periph/gpio.h"

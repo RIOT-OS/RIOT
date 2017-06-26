@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     cpu_lm4f120
+ * @ingroup     drivers_periph_uart
  * @{
  *
  * @file        uart.c

@@ -7,7 +7,8 @@
  */
 
 /**
- * @addtogroup  driver_periph
+ * @ingroup     cpu_stm32f3
+ * @ingroup     drivers_periph_i2c
  * @{
  *
  * @file

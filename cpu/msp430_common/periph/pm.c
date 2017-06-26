@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     cpu_msp430_common
+ * @ingroup     drivers_periph_pm
  * @{
  *
  * @file

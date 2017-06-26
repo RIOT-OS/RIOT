@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup      cpu_mips32r2_common
+ * @ingroup     cpu_mips32r2_common
+ * @ingroup     drivers_periph_pm
  * @{
  *
  * @file

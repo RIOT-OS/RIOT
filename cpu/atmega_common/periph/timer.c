@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     cpu_atmega_common
+ * @ingroup     drivers_periph_timer
  * @{
  *
  * @file

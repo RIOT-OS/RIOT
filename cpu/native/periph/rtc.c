@@ -7,16 +7,19 @@
  */
 
 /**
- * Native CPU periph/rtc.h implementation
+ * @ingroup     cpu_native
+ * @ingroup     drivers_periph_rtc
+ * @{
+ *
+ * @file
+ * @brief Native CPU periph/rtc.h implementation
  *
  * The implementation uses POSIX system calls to emulate a real-time
  * clock based on the system clock.
  *
  * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
- * @ingroup _native_cpu
- * @defgroup _native_rtc
- * @file
+ * @}
  */
 
 #include <time.h>

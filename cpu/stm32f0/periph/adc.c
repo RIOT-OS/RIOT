@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     cpu_stm32f0
+ * @ingroup     drivers_periph_adc
  * @{
  *
  * @file

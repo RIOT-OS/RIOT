@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     cpu_lpc1768
+ * @ingroup     drivers_periph_timer
  * @{
  *
  * @file

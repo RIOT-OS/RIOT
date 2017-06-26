@@ -9,7 +9,8 @@
  */
 
 /**
- * @ingroup     cpu_kinetis_common_i2c
+ * @ingroup     cpu_kinetis_commo
+ * @ingroup     drivers_periph_i2c
  *
  * @note        This driver only implements the 7-bit addressing master mode.
  *

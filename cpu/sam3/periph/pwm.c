@@ -8,7 +8,8 @@
  */
 
 /**
- * @ingroup     cpu_sam3x8e
+ * @ingroup     cpu_sam3
+ * @ingroup     drivers_periph_pwm
  * @{
  *
  * @file

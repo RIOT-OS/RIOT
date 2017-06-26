@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     cpu_samd21
+ * @ingroup     drivers_periph_gpio
  * @{
  *
  * @file

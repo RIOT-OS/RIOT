@@ -7,6 +7,19 @@
  * directory for more details.
  */
 
+ /**
+  * @ingroup     cpu_lpc2387
+  * @ingroup     drivers_periph_rtc
+  * @{
+  *
+  * @file
+  * @brief       Peripheral UART driver implementation
+  *
+  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+  *
+  * @}
+  */
+
 #include <sys/time.h>
 #include <stdint.h>
 #include <string.h>

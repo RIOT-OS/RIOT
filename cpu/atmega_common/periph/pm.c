@@ -9,6 +9,7 @@
 
 /**
  * @ingroup     cpu_atmega_common
+ * @ingroup     drivers_periph_pm
  * @{
  *
  * @file

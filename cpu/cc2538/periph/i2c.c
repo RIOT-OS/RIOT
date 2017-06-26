@@ -7,7 +7,8 @@
  */
 
 /**
- * @addtogroup  driver_periph
+ * @ingroup     cpu_cc2538
+ * @ingroup     drivers_periph
  * @{
  *
  * @file
@@ -160,7 +161,7 @@ static void recover_i2c_bus(void) {
 }
 
 #ifdef MODULE_XTIMER
-static void callback(void *arg)
+static void _timer_cb(void *arg)
 {
     mutex_unlock(&i2c_wait_mutex);
 }
@@ -179,7 +180,7 @@ static uint_fast8_t i2c_ctrl_blocking(uint_fast8_t flags)
 
 #ifdef MODULE_XTIMER
     /* Set a timeout at double the expected time to transmit a byte: */
-    xtimer_t xtimer = {.callback = callback};
+    xtimer_t xtimer = { .callback = _timer_cb, .arg = NULL };
     xtimer_set(&xtimer, xtimer_timeout);
 #endif
 

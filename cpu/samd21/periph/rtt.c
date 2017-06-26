@@ -8,10 +8,14 @@
 
 /**
  * @ingroup     cpu_samd21
+ * @ingroup     drivers_periph_rtt
  * @{
+ *
  * @file
  * @brief       Low-level RTT driver implementation
+ *
  * @author      Daniel Krebs <github@daniel-krebs.net>
+ *
  * @}
  */
 

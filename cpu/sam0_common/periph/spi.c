@@ -9,7 +9,8 @@
  */
 
 /**
- * @ingroup     cpu_samd21
+ * @ingroup     cpu_sam0_common
+ * @ingroup     drivers_periph_spi
  * @{
  *
  * @file
