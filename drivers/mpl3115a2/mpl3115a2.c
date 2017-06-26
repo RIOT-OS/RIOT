@@ -31,7 +31,7 @@
 
 #define I2C_SPEED                  I2C_SPEED_FAST
 
-int mpl3115a2_test(mpl3115a2_t *dev)
+int mpl3115a2_test(const mpl3115a2_t *dev)
 {
     uint8_t reg;
 
@@ -118,7 +118,7 @@ int mpl3115a2_reset(mpl3115a2_t *dev)
     return 0;
 }
 
-int mpl3115a2_set_active(mpl3115a2_t *dev)
+int mpl3115a2_set_active(const mpl3115a2_t *dev)
 {
     uint8_t reg;
 
@@ -143,7 +143,7 @@ int mpl3115a2_set_active(mpl3115a2_t *dev)
     return 0;
 }
 
-int mpl3115a2_set_standby(mpl3115a2_t *dev)
+int mpl3115a2_set_standby(const mpl3115a2_t *dev)
 {
     uint8_t reg;
 
@@ -164,7 +164,7 @@ int mpl3115a2_set_standby(mpl3115a2_t *dev)
     return 0;
 }
 
-int mpl3115a2_is_ready(mpl3115a2_t *dev)
+int mpl3115a2_is_ready(const mpl3115a2_t *dev)
 {
     uint8_t reg;
 
@@ -182,7 +182,7 @@ int mpl3115a2_is_ready(mpl3115a2_t *dev)
     return reg & MPL3115A2_STATUS_PTDR;
 }
 
-int mpl3115a2_read_pressure(mpl3115a2_t *dev, uint32_t *pres, uint8_t *status)
+int mpl3115a2_read_pressure(const mpl3115a2_t *dev, uint32_t *pres, uint8_t *status)
 {
     uint8_t buf[4];
 
@@ -205,7 +205,7 @@ int mpl3115a2_read_pressure(mpl3115a2_t *dev, uint32_t *pres, uint8_t *status)
     return 0;
 }
 
-int mpl3115a2_read_temp(mpl3115a2_t *dev, int16_t *temp)
+int mpl3115a2_read_temp(const mpl3115a2_t *dev, int16_t *temp)
 {
     uint8_t buf[2];
 

@@ -30,12 +30,12 @@ int mq3_init(mq3_t *dev, adc_t adc_line)
     return adc_init(dev->adc_line);
 }
 
-int mq3_read_raw(mq3_t *dev)
+int mq3_read_raw(const mq3_t *dev)
 {
     return adc_sample(dev->adc_line, PRECISION);
 }
 
-int mq3_read(mq3_t *dev)
+int mq3_read(const mq3_t *dev)
 {
     float res = mq3_read_raw(dev);
     res = (res > MIN) ? res - MIN : 0;

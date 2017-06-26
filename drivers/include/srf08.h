@@ -113,7 +113,7 @@ int srf08_init(srf08_t *dev, i2c_t i2c, uint8_t addr, i2c_speed_t speed);
  * @return                  -1 on undefined device given
  *
  */
-int srf08_set_max_range(srf08_t *dev, uint8_t max_range);
+int srf08_set_max_range(const srf08_t *dev, uint8_t max_range);
 
 /**
  * @brief       Set the maximum of the analog stages.
@@ -130,7 +130,7 @@ int srf08_set_max_range(srf08_t *dev, uint8_t max_range);
  * @return                  -1 on undefined device given
  *
  */
-int srf08_set_max_gain(srf08_t *dev, uint8_t max_gain);
+int srf08_set_max_gain(const srf08_t *dev, uint8_t max_gain);
 
 /**
  * @brief       Get all distances measured from the SRF08 ultrasonic sensor.
@@ -154,7 +154,10 @@ int srf08_set_max_gain(srf08_t *dev, uint8_t max_gain);
  * @return                  -4 if i2c read low byte failed
  *
  */
-int srf08_get_distances(srf08_t *dev, uint16_t *range_array, int num_echos, srf08_mode_t ranging_mode);
+int srf08_get_distances(const srf08_t *dev,
+                        uint16_t *range_array,
+                        int num_echos,
+                        srf08_mode_t ranging_mode);
 
 #ifdef __cplusplus
 }

@@ -86,7 +86,7 @@ int srf02_init(srf02_t *dev, i2c_t i2c, uint8_t addr)
     return 0;
 }
 
-void srf02_trigger(srf02_t *dev, srf02_mode_t mode)
+void srf02_trigger(const srf02_t *dev, srf02_mode_t mode)
 {
     /* trigger a new measurement by writing the mode to the CMD register */
     DEBUG("[srf02] trigger new reading\n");
@@ -95,7 +95,7 @@ void srf02_trigger(srf02_t *dev, srf02_mode_t mode)
     i2c_release(dev->i2c);
 }
 
-uint16_t srf02_read(srf02_t *dev)
+uint16_t srf02_read(const srf02_t *dev)
 {
     uint8_t res[2];
 
@@ -109,7 +109,7 @@ uint16_t srf02_read(srf02_t *dev)
     return ((((uint16_t)res[0]) << 8) | (res[1] & 0xff));
 }
 
-uint16_t srf02_get_distance(srf02_t *dev, srf02_mode_t mode)
+uint16_t srf02_get_distance(const srf02_t *dev, srf02_mode_t mode)
 {
     /* trigger a new reading */
     srf02_trigger(dev, mode);

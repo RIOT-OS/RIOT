@@ -22,8 +22,9 @@
 #define NET_GNRC_MAC_INTERNAL_H
 
 #include <stdint.h>
-#include <net/ieee802154.h>
-#include <net/gnrc/mac/types.h>
+
+#include "net/ieee802154.h"
+#include "net/gnrc/mac/types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,7 +48,7 @@ extern "C" {
  *
  * @return                  true if queued successfully, otherwise false.
  */
-bool gnrc_mac_queue_tx_packet(gnrc_mac_tx_t* tx, uint32_t priority, gnrc_pktsnip_t* pkt);
+bool gnrc_mac_queue_tx_packet(gnrc_mac_tx_t *tx, uint32_t priority, gnrc_pktsnip_t *pkt);
 #endif /* (GNRC_MAC_TX_QUEUE_SIZE != 0) || defined(DOXYGEN) */
 
 #if (GNRC_MAC_RX_QUEUE_SIZE != 0) || defined(DOXYGEN)
@@ -60,7 +61,7 @@ bool gnrc_mac_queue_tx_packet(gnrc_mac_tx_t* tx, uint32_t priority, gnrc_pktsnip
  *
  * @return                  true if queued successfully, otherwise false.
  */
-bool gnrc_mac_queue_rx_packet(gnrc_mac_rx_t* rx, uint32_t priority, gnrc_pktsnip_t* pkt);
+bool gnrc_mac_queue_rx_packet(gnrc_mac_rx_t *rx, uint32_t priority, gnrc_pktsnip_t *pkt);
 #endif /* (GNRC_MAC_RX_QUEUE_SIZE != 0) || defined(DOXYGEN) */
 
 #if (GNRC_MAC_DISPATCH_BUFFER_SIZE != 0) || defined(DOXYGEN)
@@ -69,7 +70,7 @@ bool gnrc_mac_queue_rx_packet(gnrc_mac_rx_t* rx, uint32_t priority, gnrc_pktsnip
  *
  * @param[in,out]  rx       gnrc_mac reception management object
  */
-void gnrc_mac_dispatch(gnrc_mac_rx_t* rx);
+void gnrc_mac_dispatch(gnrc_mac_rx_t *rx);
 #endif /* (GNRC_MAC_DISPATCH_BUFFER_SIZE != 0) || defined(DOXYGEN) */
 
 #ifdef __cplusplus

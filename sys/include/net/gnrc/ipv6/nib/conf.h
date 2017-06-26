@@ -167,8 +167,8 @@ extern "C" {
 /**
  * @brief   Number of default routers in the default router list.
  *
- * @note    **This number has direct influence on the maximum number of
- *          default routers**
+ * @attention   This number has direct influence on the maximum number of
+ *              default routers
  */
 #ifndef GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF
 #define GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF  (1)
@@ -177,8 +177,8 @@ extern "C" {
 /**
  * @brief   Number of entries in NIB
  *
- * @note    **This number has direct influence on the maximum number of
- *          neighbors and duplicate address detection table entries**
+ * @attention   This number has direct influence on the maximum number of
+ *              neighbors and duplicate address detection table entries
  */
 #ifndef GNRC_IPV6_NIB_NUMOF
 #define GNRC_IPV6_NIB_NUMOF                 (4)

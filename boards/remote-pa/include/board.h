@@ -17,7 +17,8 @@
  * @brief       Board specific definitions for the Re-Mote board prototype A
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- *              Antonio Lignan <alinan@zolertia.com>
+ * @author      Antonio Lignan <alinan@zolertia.com>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef BOARD_H
@@ -60,6 +61,7 @@
  * @{
  */
 #define BTN0_PIN            GPIO_PIN(0, 3)
+#define BTN0_MODE           GPIO_IN_PU
 /** @} */
 
 /**

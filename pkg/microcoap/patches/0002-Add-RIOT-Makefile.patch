@@ -1,18 +1,19 @@
-From 007576627163a35881ebdf50701f94b73aa7aae7 Mon Sep 17 00:00:00 2001
-From: Martine Lenders <mail@martine-lenders.eu>
-Date: Sun, 1 Feb 2015 16:40:35 +0100
-Subject: [PATCH 2/2] Add RIOT Makefile
+From 021e6371d6915126cf0e9cf7556b9b4a6f3ae14f Mon Sep 17 00:00:00 2001
+From: Patrick Grosse <patrick.grosse@uni-muenster.de>
+Date: Sat, 25 Mar 2017 10:33:22 +0100
+Subject: [PATCH 2/6] Add RIOT Makefile
 
 ---
- Makefile | 22 +---------------------
- 1 file changed, 1 insertion(+), 21 deletions(-)
+ Makefile | 23 +----------------------
+ 1 file changed, 1 insertion(+), 22 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index bb3c5fc..48422e9 100644
+index 19175d2..48422e9 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1,21 +1 @@
+@@ -1,22 +1 @@
 -CFLAGS += -Wall -DDEBUG
+-# -DIPV6
 -SRC = $(wildcard *.c)
 -OBJ = $(SRC:%.c=%.o)
 -DEPS = $(SRC:%.c=%.d)
@@ -35,5 +36,5 @@ index bb3c5fc..48422e9 100644
 -	@$(RM) $(EXEC) $(OBJ) $(DEPS)
 +include $(RIOTBASE)/Makefile.base
 -- 
-1.9.1
+2.7.4
 

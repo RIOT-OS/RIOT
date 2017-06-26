@@ -229,7 +229,7 @@ int mpu9150_set_compass_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf);
  * @return                  -1 if device's I2C is not enabled in board config
  * @return                  -2 if gyro full-scale range is configured wrong
  */
-int mpu9150_read_gyro(mpu9150_t *dev, mpu9150_results_t *output);
+int mpu9150_read_gyro(const mpu9150_t *dev, mpu9150_results_t *output);
 
 /**
  * @brief Read acceleration values from the given MPU9150 device, returned in mG
@@ -244,7 +244,7 @@ int mpu9150_read_gyro(mpu9150_t *dev, mpu9150_results_t *output);
  * @return                  -1 if device's I2C is not enabled in board config
  * @return                  -2 if accel full-scale range is configured wrong
  */
-int mpu9150_read_accel(mpu9150_t *dev, mpu9150_results_t *output);
+int mpu9150_read_accel(const mpu9150_t *dev, mpu9150_results_t *output);
 
 /**
  * @brief Read magnetic field values from the given MPU9150 device, returned in mikroT
@@ -258,7 +258,7 @@ int mpu9150_read_accel(mpu9150_t *dev, mpu9150_results_t *output);
  * @return                  0 on success
  * @return                  -1 if device's I2C is not enabled in board config
  */
-int mpu9150_read_compass(mpu9150_t *dev, mpu9150_results_t *output);
+int mpu9150_read_compass(const mpu9150_t *dev, mpu9150_results_t *output);
 
 /**
  * @brief Read temperature value from the given MPU9150 device, returned in m°C
@@ -273,7 +273,7 @@ int mpu9150_read_compass(mpu9150_t *dev, mpu9150_results_t *output);
  * @return                  0 on success
  * @return                  -1 if device's I2C is not enabled in board config
  */
-int mpu9150_read_temperature(mpu9150_t *dev, int32_t *output);
+int mpu9150_read_temperature(const mpu9150_t *dev, int32_t *output);
 
 /**
  * @brief Set the full-scale range for raw gyroscope data

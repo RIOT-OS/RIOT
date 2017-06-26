@@ -84,7 +84,7 @@ int pcd8544_init(pcd8544_t *dev, spi_t spi, gpio_t cs,
  * @param[in] dev           display device descriptor
  * @param[in] contrast      targeted contrast value [0 - 127]
  */
-void pcd8544_set_contrast(pcd8544_t *dev, uint8_t contrast);
+void pcd8544_set_contrast(const pcd8544_t *dev, uint8_t contrast);
 
 /**
  * @brief   Set the temperature coefficient for the given display
@@ -94,7 +94,7 @@ void pcd8544_set_contrast(pcd8544_t *dev, uint8_t contrast);
  * @param[in] dev           device descriptor of display to use
  * @param[in] coef          temperature coefficient to use [0 - 3]
  */
-void pcd8544_set_tempcoef(pcd8544_t *dev, uint8_t coef);
+void pcd8544_set_tempcoef(const pcd8544_t *dev, uint8_t coef);
 
 /**
  * @brief   Set the internal BIAS for the given display
@@ -105,7 +105,7 @@ void pcd8544_set_tempcoef(pcd8544_t *dev, uint8_t coef);
  * @param[in] bias          the BIAS to use [0 - 7]
  *
  */
-void pcd8544_set_bias(pcd8544_t *dev, uint8_t bias);
+void pcd8544_set_bias(const pcd8544_t *dev, uint8_t bias);
 
 /**
  * @brief   Write an image to memory of the given display
@@ -120,7 +120,7 @@ void pcd8544_set_bias(pcd8544_t *dev, uint8_t bias);
  * @param[in] dev           device descriptor of display to use
  * @param[in] img           char array with image data (must be of size := 504)
  */
-void pcd8544_write_img(pcd8544_t *dev, const char img[]);
+void pcd8544_write_img(const pcd8544_t *dev, const char img[]);
 
 /**
  * @brief   Write a single ASCII character to the display
@@ -132,7 +132,7 @@ void pcd8544_write_img(pcd8544_t *dev, const char img[]);
  * @param[in] y             row to put the character [0 - 5]
  * @param[in] c             ASCII code for the character to write
  */
-void pcd8544_write_c(pcd8544_t *dev, uint8_t x, uint8_t y, const char c);
+void pcd8544_write_c(const pcd8544_t *dev, uint8_t x, uint8_t y, const char c);
 
 /**
  * @brief   Write a string to a given position on the display
@@ -147,14 +147,14 @@ void pcd8544_write_c(pcd8544_t *dev, uint8_t x, uint8_t y, const char c);
  * @param[in] y             row to write the string to [0 - 5]
  * @param[in] str           string to write to the display
  */
-void pcd8544_write_s(pcd8544_t *dev, uint8_t x, uint8_t y, const char* str);
+void pcd8544_write_s(const pcd8544_t *dev, uint8_t x, uint8_t y, const char* str);
 
 /**
  * @brief   Clear the current display (clear the display memory)
  *
  * @param[in] dev           device descriptor of display to use
  */
-void pcd8544_clear(pcd8544_t *dev);
+void pcd8544_clear(const pcd8544_t *dev);
 
 /**
  * @brief   Invert the display (toggles dark and bright pixels)
@@ -171,28 +171,28 @@ void pcd8544_invert(pcd8544_t *dev);
  * @return      0 -> display is not inverted
  * @return      1 -> display is inverted
  */
-int pcd8544_is_inverted(pcd8544_t *dev);
+int pcd8544_is_inverted(const pcd8544_t *dev);
 
 /**
  * @brief   Power on the display
  *
  * @param[in] dev           device descriptor of display to use
  */
-void pcd8544_poweron(pcd8544_t *dev);
+void pcd8544_poweron(const pcd8544_t *dev);
 
 /**
  * @brief   Poser off the display
  *
  * @param[in] dev           device descriptor of display to use
  */
-void pcd8544_poweroff(pcd8544_t *dev);
+void pcd8544_poweroff(const pcd8544_t *dev);
 
 /**
  * @brief   I wonder what this does -> find out!
  *
  * @param[in] dev           device descriptor of display to use
  */
-void pcd8544_riot(pcd8544_t *dev);
+void pcd8544_riot(const pcd8544_t *dev);
 
 #ifdef __cplusplus
 }

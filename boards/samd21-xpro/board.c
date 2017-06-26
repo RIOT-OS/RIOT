@@ -17,7 +17,7 @@
  *
  * @author      Travis Griggs <travisgriggs@gmail.com>
  * @author      Dan Evans <photonthunder@gmail.com>
- *
+ * @author      Sebastian Meiling <s@mlng.net>
  * @}
  */
 
@@ -30,7 +30,7 @@ void board_init(void)
     gpio_init(LED0_PIN, GPIO_OUT);
 
     /* initialize the on-board button */
-    gpio_init(BUTTON_GPIO, GPIO_IN_PU);
+    gpio_init(BTN0_PIN, BTN0_MODE);
 
     /* initialize the CPU */
     cpu_init();

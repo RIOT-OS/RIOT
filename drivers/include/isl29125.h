@@ -181,7 +181,7 @@ int isl29125_init_int(isl29125_t *dev, isl29125_interrupt_status_t interrupt_sta
  * @param[in] dev       device descriptor of an ISL29125 device
  * @param[in] dest      pointer to lux RGB color object data is written to
  */
-void isl29125_read_rgb_lux(isl29125_t *dev, isl29125_rgb_t *dest);
+void isl29125_read_rgb_lux(const isl29125_t *dev, isl29125_rgb_t *dest);
 
  /**
  * @brief read color values from device
@@ -189,7 +189,7 @@ void isl29125_read_rgb_lux(isl29125_t *dev, isl29125_rgb_t *dest);
  * @param[in] dev       device descriptor of an ISL29125 device
  * @param[in] dest      pointer to RGB color object data is written to
  */
-void isl29125_read_rgb_color(isl29125_t *dev, color_rgb_t *dest);
+void isl29125_read_rgb_color(const isl29125_t *dev, color_rgb_t *dest);
 
 /**
  * @brief set the device's operation mode
@@ -197,7 +197,7 @@ void isl29125_read_rgb_color(isl29125_t *dev, color_rgb_t *dest);
  * @param[in] dev       device descriptor of an ISL29125 device
  * @param[in] mode      operation mode
  */
-void isl29125_set_mode(isl29125_t *dev, isl29125_mode_t mode);
+void isl29125_set_mode(const isl29125_t *dev, isl29125_mode_t mode);
 
 /**
  * @brief read isl29125 interrupt status
@@ -206,7 +206,7 @@ void isl29125_set_mode(isl29125_t *dev, isl29125_mode_t mode);
  *
  * @return              interrupt status
  */
-int isl29125_read_irq_status(isl29125_t *dev);
+int isl29125_read_irq_status(const isl29125_t *dev);
 
 #ifdef __cplusplus
 }

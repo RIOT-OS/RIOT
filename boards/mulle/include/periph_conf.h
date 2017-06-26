@@ -78,14 +78,12 @@ extern "C"
 #define LPTMR_CONFIG { \
         { \
             .dev = LPTMR0, \
-            .clk_gate = (uint32_t volatile *)BITBAND_REGADDR(SIM->SCGC5, SIM_SCGC5_LPTIMER_SHIFT), \
-            .index = 0, \
+            .irqn = LPTMR0_IRQn, \
         } \
     }
 #define TIMER_NUMOF             ((PIT_NUMOF) + (LPTMR_NUMOF))
 
 #define PIT_BASECLOCK           (CLOCK_BUSCLOCK)
-#define PIT_CLOCKGATE           (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_PIT_SHIFT))
 #define PIT_ISR_0               isr_pit1
 #define PIT_ISR_1               isr_pit3
 #define LPTMR_ISR_0             isr_lptmr0
@@ -99,24 +97,26 @@ extern "C"
 static const uart_conf_t uart_config[] = {
     {
         .dev    = UART0,
-        .clken  = (volatile uint32_t*)(BITBAND_REGADDR(SIM->SCGC4, SIM_SCGC4_UART0_SHIFT)),
         .freq   = CLOCK_CORECLOCK,
         .pin_rx = GPIO_PIN(PORT_A, 14),
         .pin_tx = GPIO_PIN(PORT_A, 15),
         .pcr_rx = PORT_PCR_MUX(3),
         .pcr_tx = PORT_PCR_MUX(3),
         .irqn   = UART0_RX_TX_IRQn,
+        .scgc_addr = &SIM->SCGC4,
+        .scgc_bit = SIM_SCGC4_UART0_SHIFT,
         .mode   = UART_MODE_8N1
     },
     {
         .dev    = UART1,
-        .clken  = (volatile uint32_t*)(BITBAND_REGADDR(SIM->SCGC4, SIM_SCGC4_UART1_SHIFT)),
         .freq   = CLOCK_CORECLOCK,
         .pin_rx = GPIO_PIN(PORT_C, 3),
         .pin_tx = GPIO_PIN(PORT_C, 4),
         .pcr_rx = PORT_PCR_MUX(3),
         .pcr_tx = PORT_PCR_MUX(3),
         .irqn   = UART1_RX_TX_IRQn,
+        .scgc_addr = &SIM->SCGC4,
+        .scgc_bit = SIM_SCGC4_UART1_SHIFT,
         .mode   = UART_MODE_8N1
     },
 };

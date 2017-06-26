@@ -77,12 +77,12 @@ extern "C"
 /** @} */
 
 /**
- * @brief MCU specific Low Power Timer settings.
+ * @name Timer hardware information
  */
-#define LPTIMER_CLKSRC                   LPTIMER_CLKSRC_LPO
-#define LPTIMER_DEV                      (LPTMR0) /**< LPTIMER hardware module */
-#define LPTIMER_CLKEN()                  (SIM->SCGC5 |= SIM_SCGC5_LPTMR_MASK) /**< Enable LPTMR0 clock gate */
-#define LPTIMER_CLKDIS()                 (SIM->SCGC5 &= ~SIM_SCGC5_PTMR_MASK) /**< Disable LPTMR0 clock gate */
+/** @{ */
+#define LPTMR_CLKEN()  (bit_set32(&SIM->SCGC5, SIM_SCGC5_LPTMR_SHIFT)) /**< Enable LPTMR0 clock gate */
+#define PIT_CLKEN()    (bit_set32(&SIM->SCGC6, SIM_SCGC6_PIT_SHIFT)) /**< Enable PIT clock gate */
+/** @} */
 
 /**
  * @name KW2XD SiP internal interconnects between MCU and Modem.

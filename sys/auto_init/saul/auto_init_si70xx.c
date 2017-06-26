@@ -63,12 +63,12 @@ void auto_init_si70xx(void)
 
         /* temperature */
         saul_entries[i * 2].dev = &si70xx_devs[i];
-        saul_entries[i * 2].name = si70xx_saul_reg_info[i][0].name;
+        saul_entries[i * 2].name = si70xx_saul_reg_info[i].name;
         saul_entries[i * 2].driver = &si70xx_temperature_saul_driver;
 
         /* relative humidity */
         saul_entries[(i * 2) + 1].dev = &si70xx_devs[i];
-        saul_entries[(i * 2) + 1].name = si70xx_saul_reg_info[i][1].name;
+        saul_entries[(i * 2) + 1].name = si70xx_saul_reg_info[i].name;
         saul_entries[(i * 2) + 1].driver = \
                 &si70xx_relative_humidity_saul_driver;
 

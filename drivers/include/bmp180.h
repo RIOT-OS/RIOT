@@ -104,7 +104,7 @@ int bmp180_init(bmp180_t *dev, const bmp180_params_t *params);
  *
  * @return                  Temperature in d°C
  */
-int16_t bmp180_read_temperature(bmp180_t *dev);
+int16_t bmp180_read_temperature(const bmp180_t *dev);
 
 /**
  * @brief Read pressure value from the given BMP180 device, returned in Pa
@@ -113,7 +113,7 @@ int16_t bmp180_read_temperature(bmp180_t *dev);
  *
  * @return                  Pressure in Pa
  */
-uint32_t bmp180_read_pressure(bmp180_t *dev);
+uint32_t bmp180_read_pressure(const bmp180_t *dev);
 
 /**
  * @brief Compute altitude, returned in m.
@@ -123,7 +123,7 @@ uint32_t bmp180_read_pressure(bmp180_t *dev);
  *
  * @return                  Altitude in m
  */
-int16_t bmp180_altitude(bmp180_t *dev, uint32_t pressure_0);
+int16_t bmp180_altitude(const bmp180_t *dev, uint32_t pressure_0);
 
 /**
  * @brief Compute pressure at sea level, returned in Pa.
@@ -133,7 +133,7 @@ int16_t bmp180_altitude(bmp180_t *dev, uint32_t pressure_0);
  *
  * @return                  Pressure at sea level in Pa
  */
-uint32_t bmp180_sealevel_pressure(bmp180_t *dev, int16_t altitude);
+uint32_t bmp180_sealevel_pressure(const bmp180_t *dev, int16_t altitude);
 
 #ifdef __cplusplus
 }

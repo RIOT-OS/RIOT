@@ -55,7 +55,7 @@ enum {
 #define MEASUREMENT_DELAY   (50*1000)
 
 /** @brief Trigger a new measurement on the sensor */
-static inline int hih6130_measurement_request(hih6130_t *dev)
+static inline int hih6130_measurement_request(const hih6130_t *dev)
 {
     i2c_acquire(dev->i2c);
 
@@ -77,7 +77,7 @@ void hih6130_init(hih6130_t *dev, i2c_t i2c, uint8_t address)
     dev->addr = address;
 }
 
-static inline int hih6130_get_humidity_temperature_raw(hih6130_t *dev, uint16_t *humidity_raw, uint16_t *temperature_raw)
+static inline int hih6130_get_humidity_temperature_raw(const hih6130_t *dev, uint16_t *humidity_raw, uint16_t *temperature_raw)
 {
     int status;
     uint8_t buf[HIH6130_FULL_DATA_LENGTH];
@@ -109,7 +109,7 @@ static inline int hih6130_get_humidity_temperature_raw(hih6130_t *dev, uint16_t 
     return status;
 }
 
-int hih6130_get_humidity_temperature_float(hih6130_t *dev,
+int hih6130_get_humidity_temperature_float(const hih6130_t *dev,
     float *relative_humidity_percent, float *temperature_celsius)
 {
     uint16_t hum_raw, temp_raw;

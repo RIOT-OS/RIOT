@@ -103,7 +103,7 @@ int tsl2561_init(tsl2561_t *dev, i2c_t i2c, uint8_t addr,
  *
  * @return                  Illuminance in Lux (lx)
  */
-uint16_t tsl2561_read_illuminance(tsl2561_t *dev);
+uint16_t tsl2561_read_illuminance(const tsl2561_t *dev);
 
 #ifdef __cplusplus
 }

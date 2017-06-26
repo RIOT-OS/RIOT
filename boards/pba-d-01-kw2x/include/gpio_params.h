@@ -48,13 +48,13 @@ static const saul_gpio_params_t saul_gpio_params[] =
     },
     {
         .name = "Button(SW0)",
-        .pin = BUTTON_GPIO,
-        .mode = GPIO_IN_PU
+        .pin  = BTN0_PIN,
+        .mode = BTN0_MODE
     },
     {
         .name = "Button(CS0)",
-        .pin = CS_BUTTON_GPIO,
-        .mode = GPIO_IN
+        .pin  = BTN1_PIN,
+        .mode = BTN1_MODE
     },
 };
 

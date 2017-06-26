@@ -30,14 +30,14 @@
 #define IS_PIN(dir)    (dir >= UART_HALF_DUPLEX_DIR_PIN_SET(0))
 #define GET_PIN(dir)   ((dir >> 1) - 1)
 
-static inline void _enable_tx(uart_half_duplex_t *dev)
+static inline void _enable_tx(const uart_half_duplex_t *dev)
 {
     if (dev->params.dir.enable_tx) {
         dev->params.dir.enable_tx(dev->params.uart);
     }
 }
 
-static inline void _disable_tx(uart_half_duplex_t *dev)
+static inline void _disable_tx(const uart_half_duplex_t *dev)
 {
     if (dev->params.dir.disable_tx) {
         dev->params.dir.disable_tx(dev->params.uart);
@@ -75,7 +75,7 @@ int uart_half_duplex_init(uart_half_duplex_t *dev, uint8_t *buffer, size_t buffe
     return ret;
 }
 
-size_t uart_half_duplex_send(uart_half_duplex_t *dev, size_t size)
+size_t uart_half_duplex_send(const uart_half_duplex_t *dev, size_t size)
 {
     _enable_tx(dev);
     uart_write(dev->params.uart, dev->buffer, size);
@@ -83,7 +83,7 @@ size_t uart_half_duplex_send(uart_half_duplex_t *dev, size_t size)
     return size;
 }
 
-size_t uart_half_duplex_recv(uart_half_duplex_t *dev, size_t size)
+size_t uart_half_duplex_recv(const uart_half_duplex_t *dev, size_t size)
 {
     const uint32_t begin = xtimer_now_usec();
     while (xtimer_now_usec() - begin < dev->timeout_us) {

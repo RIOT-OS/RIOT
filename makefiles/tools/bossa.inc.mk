@@ -1,5 +1,5 @@
 export FLASHER ?= $(RIOTBASE)/dist/tools/bossa/bossac
-export FFLAGS  ?= -p $(PORT) -i -i -w -v -b -R $(HEXFILE)
+export FFLAGS  ?= -p $(PORT) -e -i -w -v -b -R $(HEXFILE)
 
 export OFLAGS  = -O binary
 export HEXFILE = $(ELFFILE:.elf=.bin)

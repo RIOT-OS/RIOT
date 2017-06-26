@@ -56,7 +56,7 @@ void rgbled_init(rgbled_t *led, pwm_t pwm, int channel_r, int channel_g, int cha
  * @param[in] led           Struct identifying the LED to set
  * @param[in] color         Color to set the led to
  */
-void rgbled_set(rgbled_t *led, color_rgb_t *color);
+void rgbled_set(const rgbled_t *led, color_rgb_t *color);
 
 #ifdef __cplusplus
 }

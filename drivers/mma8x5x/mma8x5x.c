@@ -87,7 +87,7 @@ int mma8x5x_init(mma8x5x_t *dev, const mma8x5x_params_t *params)
     return MMA8X5X_OK;
 }
 
-void mma8x5x_set_user_offset(mma8x5x_t *dev, int8_t x, int8_t y, int8_t z)
+void mma8x5x_set_user_offset(const mma8x5x_t *dev, int8_t x, int8_t y, int8_t z)
 {
     uint8_t buf[3];
 
@@ -105,47 +105,106 @@ void mma8x5x_set_user_offset(mma8x5x_t *dev, int8_t x, int8_t y, int8_t z)
     i2c_release(BUS);
 }
 
-void mma8x5x_set_active(mma8x5x_t *dev)
+static int _get_reg(const mma8x5x_t *dev, uint8_t addr)
 {
     uint8_t reg;
 
     assert(dev);
 
+    DEBUG("[mma8x5x] getting reg 0x%02x\n", (unsigned)addr);
+
+    i2c_acquire(BUS);
+    i2c_read_reg(BUS, ADDR, addr, &reg);
+    i2c_release(BUS);
+
+    DEBUG("[mma8x5x] reg 0x%02x=0x%02x\n", (unsigned)addr, (unsigned)reg);
+    return reg;
+}
+
+static void _reg_setbits(const mma8x5x_t *dev, uint8_t reg, uint8_t val)
+{
+    uint8_t tmp;
+
+    assert(dev);
+
+    i2c_acquire(BUS);
+    i2c_read_reg(BUS, ADDR, reg, &tmp);
+    DEBUG("[mma8x5x] 0x%02x: 0x%02x | 0x%02x = 0x%02x\n",
+            (unsigned)reg, (unsigned)tmp, (unsigned)val, (unsigned) tmp | val);
+    tmp |= val;
+    i2c_write_reg(BUS, ADDR, reg, tmp);
+    i2c_release(BUS);
+}
+
+static void _reg_clearbits(const mma8x5x_t *dev, uint8_t reg, uint8_t val)
+{
+    uint8_t tmp;
+
+    assert(dev);
+
+    i2c_acquire(BUS);
+    i2c_read_reg(BUS, ADDR, reg, &tmp);
+    DEBUG("[mma8x5x] 0x%02x: 0x%02x &= ~0x%02x = 0x%02x\n",
+            (unsigned)reg, (unsigned)tmp, (unsigned)val, (unsigned) tmp & ~val);
+    tmp &= ~val;
+    i2c_write_reg(BUS, ADDR, reg, tmp);
+    i2c_release(BUS);
+}
+
+void mma8x5x_set_active(const mma8x5x_t *dev)
+{
     DEBUG("[mma8x5x] put device to active mode\n");
-
-    i2c_acquire(BUS);
-    i2c_read_reg(BUS, ADDR, MMA8X5X_CTRL_REG1, &reg);
-    reg |= MMA8X5X_CTRL_REG1_ACTIVE;
-    i2c_write_reg(BUS, ADDR, MMA8X5X_CTRL_REG1, reg);
-    i2c_release(BUS);
+    _reg_setbits(dev, MMA8X5X_CTRL_REG1, MMA8X5X_CTRL_REG1_ACTIVE);
 }
 
-void mma8x5x_set_standby(mma8x5x_t *dev)
+void mma8x5x_set_standby(const mma8x5x_t *dev)
 {
-    uint8_t reg;
-
-    assert(dev);
-
     DEBUG("[mma8x5x] put device to standby mode\n");
-
-    i2c_acquire(BUS);
-    i2c_read_reg(BUS, ADDR, MMA8X5X_CTRL_REG1, &reg);
-    reg &= ~MMA8X5X_CTRL_REG1_ACTIVE;
-    i2c_write_reg(BUS, ADDR, MMA8X5X_CTRL_REG1, reg);
-    i2c_release(BUS);
+    _reg_clearbits(dev, MMA8X5X_CTRL_REG1, MMA8X5X_CTRL_REG1_ACTIVE);
 }
 
-int mma8x5x_is_ready(mma8x5x_t *dev)
+void mma8x5x_set_motiondetect(const mma8x5x_t *dev, uint8_t int_pin, uint8_t threshold)
 {
-    uint8_t reg;
+    DEBUG("[mma8x5x] put device to motion detect mode (ELE=1, OAE=1)\n");
+    assert(int_pin < 3);
 
-    assert(dev);
+    mma8x5x_set_standby(dev);
 
+    _reg_setbits(dev, MMA8X5X_FF_MT_CFG, \
+            MMA8X5X_FF_MT_CFG_XEFE | \
+            MMA8X5X_FF_MT_CFG_YEFE | \
+            MMA8X5X_FF_MT_CFG_ZEFE | \
+            MMA8X5X_FF_MT_CFG_OAE | MMA8X5X_FF_MT_CFG_ELE);
+
+    switch(int_pin) {
+        case 0:
+            _reg_clearbits(dev, MMA8X5X_CTRL_REG4, MMA8X5X_CTRL_REG4_INT_EN_FF_MT);
+            goto out;
+        case 1:
+            _reg_setbits(dev, MMA8X5X_CTRL_REG5, MMA8X5X_CTRL_REG5_INT_CFG_FF_MT);
+            break;
+        case 2:
+            _reg_clearbits(dev, MMA8X5X_CTRL_REG5, MMA8X5X_CTRL_REG5_INT_CFG_FF_MT);
+            break;
+    }
+
+    _reg_setbits(dev, MMA8X5X_FF_MT_THS, threshold & 0x7f);
+    _reg_setbits(dev, MMA8X5X_CTRL_REG4, MMA8X5X_CTRL_REG4_INT_EN_FF_MT);
+
+out:
+    mma8x5x_set_active(dev);
+}
+
+void mma8x5x_ack_int(const mma8x5x_t *dev)
+{
+    _get_reg(dev, MMA8X5X_FF_MT_SRC);
+}
+
+int mma8x5x_is_ready(const mma8x5x_t *dev)
+{
     DEBUG("[mma8x5x] checking for new available data\n");
 
-    i2c_acquire(BUS);
-    i2c_read_reg(BUS, ADDR, MMA8X5X_STATUS, &reg);
-    i2c_release(BUS);
+    uint8_t reg = _get_reg(dev, MMA8X5X_STATUS);
 
     if (reg & MMA8X5X_STATUS_ZYXDR) {
         return MMA8X5X_DATA_READY;
@@ -155,7 +214,7 @@ int mma8x5x_is_ready(mma8x5x_t *dev)
     }
 }
 
-void mma8x5x_read(mma8x5x_t *dev, mma8x5x_data_t *data)
+void mma8x5x_read(const mma8x5x_t *dev, mma8x5x_data_t *data)
 {
     uint8_t buf[7];
 

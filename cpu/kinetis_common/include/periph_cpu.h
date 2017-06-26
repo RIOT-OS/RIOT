@@ -261,10 +261,8 @@ typedef struct {
 typedef struct {
     /** LPTMR device base pointer */
     LPTMR_Type *dev;
-    /** Pointer to module clock gate bit in bitband region, use BITBAND_REGADDR() */
-    uint32_t volatile *clk_gate;
-    /** LPTMR device index */
-    uint8_t index;
+    /** IRQn interrupt number */
+    uint8_t irqn;
 } lptmr_conf_t;
 
 /**
@@ -314,15 +312,16 @@ enum {
  * @brief UART module configuration options
  */
 typedef struct {
-    UART_Type *dev;             /**< Pointer to module hardware registers */
-    volatile uint32_t *clken;   /**< Clock enable bitband register address */
-    uint32_t freq;              /**< Module clock frequency, usually CLOCK_CORECLOCK or CLOCK_BUSCLOCK */
-    gpio_t pin_rx;              /**< RX pin, GPIO_UNDEF disables RX */
-    gpio_t pin_tx;              /**< TX pin */
-    uint32_t pcr_rx;            /**< Pin configuration register bits for RX */
-    uint32_t pcr_tx;            /**< Pin configuration register bits for TX */
-    IRQn_Type irqn;             /**< IRQ number for this module */
-    uint8_t mode;               /**< UART mode: data bits, parity, stop bits */
+    UART_Type *dev;               /**< Pointer to module hardware registers */
+    uint32_t freq;                /**< Module clock frequency, usually CLOCK_CORECLOCK or CLOCK_BUSCLOCK */
+    gpio_t pin_rx;                /**< RX pin, GPIO_UNDEF disables RX */
+    gpio_t pin_tx;                /**< TX pin */
+    uint32_t pcr_rx;              /**< Pin configuration register bits for RX */
+    uint32_t pcr_tx;              /**< Pin configuration register bits for TX */
+    IRQn_Type irqn;               /**< IRQ number for this module */
+    volatile uint32_t *scgc_addr; /**< Clock enable register, in SIM module */
+    uint8_t scgc_bit;             /**< Clock enable bit, within the register */
+    uint8_t mode;                 /**< UART mode: data bits, parity, stop bits */
 } uart_conf_t;
 
 /**

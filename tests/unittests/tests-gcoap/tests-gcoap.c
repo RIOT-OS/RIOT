@@ -169,6 +169,63 @@ static void test_gcoap__server_get_resp(void)
     }
 }
 
+/*
+ * Helper for server_con_* tests below.
+ * Confirmable request from libcoap example for gcoap_cli /cli/stats resource.
+ * Include 2-byte token.
+ */
+static int _read_cli_stats_req_con(coap_pkt_t *pdu, uint8_t *buf)
+{
+    uint8_t pdu_data[] = {
+        0x42, 0x01, 0x8e, 0x03, 0x35, 0x61, 0xb3, 0x63,
+        0x6c, 0x69, 0x05, 0x73, 0x74, 0x61, 0x74, 0x73
+    };
+    memcpy(buf, pdu_data, sizeof(pdu_data));
+
+    return coap_parse(pdu, buf, sizeof(pdu_data));
+}
+
+/* Server CON GET request success case. Validate request is confirmable. */
+static void test_gcoap__server_con_req(void)
+{
+    uint8_t buf[GCOAP_PDU_BUF_SIZE];
+    coap_pkt_t pdu;
+
+    int res = _read_cli_stats_req_con(&pdu, &buf[0]);
+
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code(&pdu));
+    TEST_ASSERT_EQUAL_INT(COAP_TYPE_CON, coap_get_type(&pdu));
+}
+
+/*
+ * Server CON GET response success case. Test response is ACK.
+ * Response for libcoap example for gcoap_cli /cli/stats resource
+ */
+static void test_gcoap__server_con_resp(void)
+{
+    uint8_t buf[GCOAP_PDU_BUF_SIZE];
+    coap_pkt_t pdu;
+
+    /* read request */
+    _read_cli_stats_req_con(&pdu, &buf[0]);
+
+    /* generate response */
+    gcoap_resp_init(&pdu, &buf[0], sizeof(buf), COAP_CODE_CONTENT);
+    char resp_payload[]  = "2";
+    memcpy(&pdu.payload[0], &resp_payload[0], strlen(resp_payload));
+    ssize_t res = gcoap_finish(&pdu, strlen(resp_payload), COAP_FORMAT_TEXT);
+
+    uint8_t resp_data[] = {
+        0x62, 0x45, 0x8e, 0x03, 0x35, 0x61, 0xc0, 0xff,
+        0x30
+    };
+
+    TEST_ASSERT_EQUAL_INT(COAP_CLASS_SUCCESS, coap_get_code_class(&pdu));
+    TEST_ASSERT_EQUAL_INT(COAP_TYPE_ACK, coap_get_type(&pdu));
+    TEST_ASSERT_EQUAL_INT(sizeof(resp_data), res);
+}
+
 Test *tests_gcoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -176,6 +233,8 @@ Test *tests_gcoap_tests(void)
         new_TestFixture(test_gcoap__client_get_resp),
         new_TestFixture(test_gcoap__server_get_req),
         new_TestFixture(test_gcoap__server_get_resp),
+        new_TestFixture(test_gcoap__server_con_req),
+        new_TestFixture(test_gcoap__server_con_resp),
     };
 
     EMB_UNIT_TESTCALLER(gcoap_tests, NULL, NULL, fixtures);

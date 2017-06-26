@@ -28,7 +28,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-static int jc42_get_register(jc42_t* dev, uint8_t reg, uint16_t* data)
+static int jc42_get_register(const jc42_t* dev, uint8_t reg, uint16_t* data)
 {
     i2c_acquire(dev->i2c);
     if (i2c_read_regs(dev->i2c, dev->addr, reg, data, 2) <= 0) {
@@ -40,7 +40,7 @@ static int jc42_get_register(jc42_t* dev, uint8_t reg, uint16_t* data)
     return JC42_OK;
 }
 
-static int jc42_set_register(jc42_t* dev, uint8_t reg, uint16_t* data)
+static int jc42_set_register(const jc42_t* dev, uint8_t reg, uint16_t* data)
 {
     i2c_acquire(dev->i2c);
     if (i2c_write_regs(dev->i2c, dev->addr, reg, data, 2) <= 0) {
@@ -53,17 +53,17 @@ static int jc42_set_register(jc42_t* dev, uint8_t reg, uint16_t* data)
     return JC42_OK;
 }
 
-int jc42_get_config(jc42_t* dev, uint16_t* data)
+int jc42_get_config(const jc42_t* dev, uint16_t* data)
 {
     return jc42_get_register(dev, JC42_REG_CONFIG, data);
 }
 
-int jc42_set_config(jc42_t* dev, uint16_t data)
+int jc42_set_config(const jc42_t* dev, uint16_t data)
 {
     return jc42_set_register(dev, JC42_REG_CONFIG, &data);
 }
 
-int jc42_get_temperature(jc42_t* dev, int16_t* temperature)
+int jc42_get_temperature(const jc42_t* dev, int16_t* temperature)
 {
     struct { signed int x:12;} s;
     uint16_t tmp;

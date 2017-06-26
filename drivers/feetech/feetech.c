@@ -53,7 +53,7 @@ int feetech_ping(uart_half_duplex_t *stream, feetech_id_t id)
     return FEETECH_OK;
 }
 
-int feetech_write(feetech_t *device, feetech_addr_t reg, const uint8_t *data, size_t length)
+int feetech_write(const feetech_t *device, feetech_addr_t reg, const uint8_t *data, size_t length)
 {
     uart_half_duplex_set_tx(device->stream);
     if (device->stream->size < length) {
@@ -74,18 +74,18 @@ int feetech_write(feetech_t *device, feetech_addr_t reg, const uint8_t *data, si
     return FEETECH_OK;
 }
 
-int feetech_write8(feetech_t *device, feetech_addr_t reg, uint8_t value)
+int feetech_write8(const feetech_t *device, feetech_addr_t reg, uint8_t value)
 {
     return feetech_write(device, reg, &value, 1);
 }
 
-int feetech_write16(feetech_t *device, feetech_addr_t reg, uint16_t value)
+int feetech_write16(const feetech_t *device, feetech_addr_t reg, uint16_t value)
 {
     value = htons(value);
     return feetech_write(device, reg, (uint8_t*)&value, 2);
 }
 
-int feetech_read(feetech_t *device, feetech_addr_t reg, uint8_t *data, size_t length)
+int feetech_read(const feetech_t *device, feetech_addr_t reg, uint8_t *data, size_t length)
 {
     uart_half_duplex_set_tx(device->stream);
     if (device->stream->size < length) {
@@ -118,12 +118,12 @@ int feetech_read(feetech_t *device, feetech_addr_t reg, uint8_t *data, size_t le
     return FEETECH_OK;
 }
 
-int feetech_read8(feetech_t *device, feetech_addr_t reg, uint8_t *value)
+int feetech_read8(const feetech_t *device, feetech_addr_t reg, uint8_t *value)
 {
     return feetech_read(device, reg, value, 1);
 }
 
-int feetech_read16(feetech_t *device, feetech_addr_t reg, uint16_t *value)
+int feetech_read16(const feetech_t *device, feetech_addr_t reg, uint16_t *value)
 {
     const int ret = feetech_read(device, reg, (uint8_t*)value, 2);
     if (ret == FEETECH_OK) {

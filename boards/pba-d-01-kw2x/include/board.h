@@ -17,6 +17,7 @@
  * @brief       Board specific definitions for the phyWAVE evaluation board
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef BOARD_H
@@ -59,18 +60,18 @@ extern "C"
  * @name Macro for button S1/S2.
  * @{
  */
-#define BUTTON_PORT         PORTD
-#define BUTTON_PIN          1
-#define BUTTON_GPIO         GPIO_PIN(PORT_D, BUTTON_PIN)
+#define BTN0_PORT           PORTD
+#define BTN0_PIN            GPIO_PIN(PORT_D, 1)
+#define BTN0_MODE           GPIO_IN_PU
 /** @} */
 
 /**
  * @name Macro for capacitive sensor button.
  * @{
  */
-#define CS_BUTTON_PORT         PORTC
-#define CS_BUTTON_PIN          6
-#define CS_BUTTON_GPIO         GPIO_PIN(PORT_C, CS_BUTTON_PIN)
+#define BTN1_PORT           PORTC
+#define BTN1_PIN            GPIO_PIN(PORT_C, 6)
+#define BTN1_MODE           GPIO_IN
 /** @} */
 
 /**

@@ -80,7 +80,7 @@ int dht_init(dht_t *dev, const dht_params_t *params)
     return DHT_OK;
 }
 
-int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
+int dht_read(const dht_t *dev, int16_t *temp, int16_t *hum)
 {
     uint8_t csum, sum;
     uint16_t raw_hum, raw_temp;

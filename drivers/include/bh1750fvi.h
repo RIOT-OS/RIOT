@@ -95,7 +95,7 @@ int bh1750fvi_init(bh1750fvi_t *dev, bh1750fvi_params_t *params);
  *
  * @return      ambient light intensity in LUX
  */
-uint16_t bh1750fvi_sample(bh1750fvi_t *dev);
+uint16_t bh1750fvi_sample(const bh1750fvi_t *dev);
 
 #ifdef __cplusplus
 }
