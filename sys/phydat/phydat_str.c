@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Generic sensor/actuator data handling
+ * @brief       String helper functions for formatting and dumping phydat data
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
