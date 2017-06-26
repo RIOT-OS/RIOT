@@ -35,6 +35,7 @@
 #ifndef PHYDAT_H
 #define PHYDAT_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include "kernel_defines.h"
 
@@ -178,6 +179,23 @@ void phydat_dump(phydat_t *data, uint8_t dim);
  * @return  NULL if unit was not recognized
  */
 const char *phydat_unit_to_str(uint8_t unit);
+
+/**
+ * @brief   Return a string representation for every unit, including
+ *          non-physical units like 'none' or 'time'
+ *
+ * This function is useful when converting phydat_t structures to non-binary
+ * representations like JSON or XML.
+ *
+ * In practice, this function extends phydat_unit_to_str() with additional
+ * identifiers for non physical units.
+ *
+ * @param[in] unit      unit to convert
+ *
+ * @return  string representation of given unit
+ * @return  empty string ("") if unit was not recognized
+ */
+const char *phydat_unit_to_str_verbose(uint8_t unit);
 
 /**
  * @brief   Convert the given scale factor to an SI prefix
