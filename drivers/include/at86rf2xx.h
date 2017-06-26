@@ -385,8 +385,10 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state);
  *
  * @param[in] dev           device to change state of
  * @param[in] state         the targeted new state
+ *
+ * @return                  the previous state before the new state was set
  */
-void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state);
+uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state);
 
 /**
  * @brief   Reset the internal state machine to TRX_OFF mode.
