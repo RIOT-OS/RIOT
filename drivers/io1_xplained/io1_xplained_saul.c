@@ -25,10 +25,9 @@
 
 static float temperature;
 
-static int read_temperature(void *dev, phydat_t *res)
+static int read_temperature(const void *dev, phydat_t *res)
 {
-    io1_xplained_t *d = (io1_xplained_t *)dev;
-    io1_xplained_read_temperature(d, &temperature);
+    io1_xplained_read_temperature((const io1_xplained_t *)dev, &temperature);
     res->val[0] = (int)(temperature * 100.0);
     res->unit = UNIT_TEMP_C;
     res->scale = -2;

@@ -24,22 +24,18 @@
 
 #include "bmx280.h"
 
-static int read_temperature(void *dev, phydat_t *res)
+static int read_temperature(const void *dev, phydat_t *res)
 {
-    bmx280_t *d = (bmx280_t *)dev;
-
-    res->val[0] = bmx280_read_temperature(d);
+    res->val[0] = bmx280_read_temperature((const bmx280_t *)dev);
     res->unit = UNIT_TEMP_C;
     res->scale = -2;
 
     return 1;
 }
 
-static int read_pressure(void *dev, phydat_t *res)
+static int read_pressure(const void *dev, phydat_t *res)
 {
-    bmx280_t *d = (bmx280_t *)dev;
-
-    res->val[0] = bmx280_read_pressure(d) / 100;
+    res->val[0] = bmx280_read_pressure((const bmx280_t *)dev) / 100;
     res->unit = UNIT_PA;
     res->scale = 2;
 
@@ -47,11 +43,9 @@ static int read_pressure(void *dev, phydat_t *res)
 }
 
 #ifdef MODULE_BME280
-static int read_relative_humidity(void *dev, phydat_t *res)
+static int read_relative_humidity(const void *dev, phydat_t *res)
 {
-    bmx280_t *d = (bmx280_t *)dev;
-
-    res->val[0] = bme280_read_humidity(d);
+    res->val[0] = bme280_read_humidity((const bmx280_t *)dev);
     res->unit = UNIT_PERCENT;
     res->scale = -2;
 

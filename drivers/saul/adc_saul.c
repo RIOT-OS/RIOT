@@ -26,7 +26,7 @@
 #include "periph/adc.h"
 
 
-static int read_adc(void *dev, phydat_t *res)
+static int read_adc(const void *dev, phydat_t *res)
 {
     const saul_adc_params_t *params = *((const saul_adc_params_t **)dev);
     res->val[0] = adc_sample(params->line, params->res);
