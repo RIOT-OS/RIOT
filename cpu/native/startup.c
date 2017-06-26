@@ -67,17 +67,23 @@ const char *_native_unix_socket_path = NULL;
 
 netdev_tap_params_t netdev_tap_params[NETDEV_TAP_MAX];
 #endif
-
 #ifdef MODULE_MTD_NATIVE
 #include "board.h"
 #include "mtd_native.h"
+#endif
+#ifdef MODULE_CAN_LINUX
+#include "candev_linux.h"
 #endif
 
 static const char short_opts[] = ":hi:s:deEoc:"
 #ifdef MODULE_MTD_NATIVE
     "m:"
 #endif
+#ifdef MODULE_CAN_LINUX
+    "n:"
+#endif
     "";
+
 static const struct option long_opts[] = {
     { "help", no_argument, NULL, 'h' },
     { "id", required_argument, NULL, 'i' },
@@ -89,6 +95,9 @@ static const struct option long_opts[] = {
     { "uart-tty", required_argument, NULL, 'c' },
 #ifdef MODULE_MTD_NATIVE
     { "mtd", required_argument, NULL, 'm' },
+#endif
+#ifdef MODULE_CAN_LINUX
+    { "can", required_argument, NULL, 'n' },
 #endif
     { NULL, 0, NULL, '\0' },
 };
@@ -250,6 +259,12 @@ void usage_exit(int status)
 "    -m <mtd>, --mtd=<mtd>\n"
 "       specify the file name of mtd emulated device\n");
 #endif
+#if defined(MODULE_CAN_LINUX)
+    real_printf(
+"    -n <ifnum>:<ifname>, --can <ifnum>:<ifname>\n"
+"        specify CAN interface <ifname> to use for CAN device #<ifnum>\n"
+"        max number of CAN device: %d\n", CAN_DLL_NUMOF);
+#endif
     real_exit(status);
 }
 
@@ -324,6 +339,25 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 #ifdef MODULE_MTD_NATIVE
             case 'm':
                 ((mtd_native_dev_t *)mtd0)->fname = strndup(optarg, PATH_MAX - 1);
+                break;
+#endif
+#if defined(MODULE_CAN_LINUX)
+            case 'n':{
+                int i;
+                i = atol(optarg);
+                if (i >= (int)CAN_DLL_NUMOF) {
+                    usage_exit(EXIT_FAILURE);
+                }
+                while ((*optarg != ':') && (*optarg != '\0')) {
+                    optarg++;
+                }
+                if (*optarg == '\0') {
+                    usage_exit(EXIT_FAILURE);
+                }
+                optarg++;
+                strncpy(candev_linux_conf[i].interface_name, optarg,
+                        CAN_MAX_SIZE_INTERFACE_NAME);
+                }
                 break;
 #endif
             default:

@@ -365,4 +365,12 @@ void auto_init(void)
 #endif
 
 #endif /* MODULE_AUTO_INIT_STORAGE */
+
+#ifdef MODULE_AUTO_INIT_CAN
+    DEBUG("auto_init CAN\n");
+
+    extern void auto_init_candev(void);
+    auto_init_candev();
+
+#endif /* MODULE_AUTO_INIT_CAN */
 }
