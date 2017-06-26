@@ -152,6 +152,14 @@ typedef struct gnrc_netdev {
      */
     gnrc_mac_tx_t tx;
 #endif /* ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (GNRC_MAC_NEIGHBOR_COUNT == 0)) || defined(DOXYGEN) */
+
+#ifdef MODULE_GNRC_LWMAC
+    /**
+     * @brief LWMAC specific structure object for storing LWMAC internal states.
+     */
+    gnrc_lwmac_t lwmac;
+#endif
+
 #endif /* MODULE_GNRC_MAC */
 } gnrc_netdev_t;
 

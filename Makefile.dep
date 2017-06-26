@@ -524,6 +524,12 @@ ifneq (,$(filter netstats_%, $(USEMODULE)))
   USEMODULE += netstats
 endif
 
+ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
+  USEMODULE += gnrc_mac
+  USEMODULE += gnrc_netdev
+  FEATURES_REQUIRED += periph_rtt
+endif
+
 ifneq (,$(filter pthread,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += timex
