@@ -78,7 +78,7 @@ int jc42_get_temperature(const jc42_t* dev, int16_t* temperature)
     return JC42_OK;
 }
 
-int jc42_init(jc42_t* dev, jc42_params_t* params)
+int jc42_init(jc42_t* dev, const jc42_params_t* params)
 {
     uint16_t config;
     dev->i2c = params->i2c;
