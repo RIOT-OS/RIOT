@@ -118,7 +118,7 @@ get_test_jobs() {
         --murdock \
         --all \
         --tests dist/testsuite/tests/02-tests \
-        --nodes /home/kaspar/src/riot/dist/testsuite/nodes
+        --nodes dist/testsuite/nodes
 }
 
 run_test() {
