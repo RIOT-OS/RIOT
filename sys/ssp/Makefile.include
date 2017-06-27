@@ -1,0 +1,3 @@
+ifneq (,$(filter ssp,$(USEMODULE)))
+    CFLAGS += -fstack-protector
+endif

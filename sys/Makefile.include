@@ -83,4 +83,8 @@ ifneq (,$(filter printf_float,$(USEMODULE)))
     endif
 endif
 
+ifneq (,$(filter ssp,$(USEMODULE)))
+    include $(RIOTBASE)/sys/ssp/Makefile.include
+endif
+
 INCLUDES += -I$(RIOTBASE)/sys/libc/include
