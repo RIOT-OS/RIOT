@@ -37,7 +37,7 @@ extern "C" {
  * @param output     pointer to allocated memory for encrypted data. It has to
  *                   be of size data_len + BLOCK_SIZE - data_len % BLOCK_SIZE.
  */
-int cipher_encrypt_cbc(cipher_t* cipher, uint8_t iv[16], uint8_t* input,
+int cipher_encrypt_cbc(cipher_t* cipher, uint8_t iv[16], const uint8_t* input,
                        size_t input_len, uint8_t* output);
 
 
@@ -51,7 +51,7 @@ int cipher_encrypt_cbc(cipher_t* cipher, uint8_t iv[16], uint8_t* input,
  * @param output     pointer to allocated memory for plaintext data. It has to
  *                   be of size input_len.
  */
-int cipher_decrypt_cbc(cipher_t* cipher, uint8_t iv[16], uint8_t* input,
+int cipher_decrypt_cbc(cipher_t* cipher, uint8_t iv[16], const uint8_t* input,
                        size_t input_len, uint8_t* output);
 
 #ifdef __cplusplus
