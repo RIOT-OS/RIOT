@@ -36,7 +36,7 @@ int8_t dac_init(dac_t line)
 {
     DAC_Type *dac;
     if ((unsigned int)line >= DAC_NUMOF) {
-        return -1;
+        return DAC_NOLINE;
     }
 
     dac = dac_config[line].dev;
@@ -56,7 +56,7 @@ int8_t dac_init(dac_t line)
 
     /* Set output value to zero */
     dac_set(line, 0);
-    return 0;
+    return DAC_OK;
 }
 
 void dac_set(dac_t line, uint16_t value)
