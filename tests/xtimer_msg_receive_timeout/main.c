@@ -40,6 +40,7 @@ int main(void)
         xtimer_set_msg(&t, TEST_PERIOD + offset, &tmsg, sched_active_pid);
         if (xtimer_msg_receive_timeout(&m, TEST_PERIOD) < 0) {
             puts("Timeout!");
+            msg_receive(&m);
         }
         else {
             printf("Message: %" PRIu16 "\n", m.type);
