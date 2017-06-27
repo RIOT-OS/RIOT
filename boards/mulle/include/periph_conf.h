@@ -172,15 +172,18 @@ static const adc_conf_t adc_config[] = {
 /** @} */
 
 /**
- * @name DAC configuration
+ * @name    DAC configuration
  * @{
  */
+static const dac_conf_t dac_config[] = {
+    {
+        .dev       = DAC0,
+        .scgc_addr = &SIM->SCGC2,
+        .scgc_bit  = SIM_SCGC2_DAC0_SHIFT
+    }
+};
 
-#define DAC_CONFIG { \
-    { DAC0, (uint32_t volatile *)BITBAND_REGADDR(SIM->SCGC2, SIM_SCGC2_DAC0_SHIFT) }, \
-  }
-#define DAC_NUMOF 1
-
+#define DAC_NUMOF           (sizeof(dac_config) / sizeof(dac_config[0]))
 /** @} */
 
 /**
