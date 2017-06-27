@@ -118,6 +118,20 @@ typedef enum {
 } uart_txpad_t;
 
 /**
+ * @brief   UART device configuration
+ */
+typedef struct {
+    SercomUsart *dev;       /**< pointer to the used UART device */
+    gpio_t rx_pin;          /**< pin used for RX */
+    gpio_t tx_pin;          /**< pin used for TX */
+    gpio_mux_t mux;         /**< alternative function for pins */
+    uart_rxpad_t rx_pad;    /**< pad selection for RX line */
+    uart_txpad_t tx_pad;    /**< pad selection for TX line */
+    uint8_t runstdby;       /**< allow SERCOM to run in standby mode */
+    uint8_t gclk_src;       /**< GCLK source which supplys SERCOM */
+} uart_conf_t;
+
+/**
  * @brief   Available values for SERCOM SPI MISO pad selection
  */
 typedef enum {
