@@ -748,67 +748,6 @@ static void test_double_invalid(void)
 }
 #endif /* MODULE_CBOR_FLOAT */
 
-#ifdef MODULE_CBOR_PRINT
-/**
- * Manual test for testing the cbor_stream_decode function
- */
-void test_stream_decode(void)
-{
-    cbor_clear(&stream);
-
-    cbor_serialize_int(&stream, 1);
-    cbor_serialize_uint64_t(&stream, 2llu);
-    cbor_serialize_int64_t(&stream, 3);
-    cbor_serialize_int64_t(&stream, -5);
-    cbor_serialize_bool(&stream, true);
-#ifdef MODULE_CBOR_FLOAT
-    cbor_serialize_float_half(&stream, 1.1f);
-    cbor_serialize_float(&stream, 1.5f);
-    cbor_serialize_double(&stream, 2.0);
-#endif /* MODULE_CBOR_FLOAT */
-    cbor_serialize_byte_string(&stream, "abc");
-    cbor_serialize_unicode_string(&stream, "def");
-
-    cbor_serialize_array(&stream, 2);
-    cbor_serialize_int(&stream, 0);
-    cbor_serialize_int(&stream, 1);
-
-    cbor_serialize_array_indefinite(&stream);
-    cbor_serialize_int(&stream, 10);
-    cbor_serialize_int(&stream, 11);
-    cbor_write_break(&stream);
-
-    cbor_serialize_map(&stream, 2);
-    cbor_serialize_int(&stream, 1);
-    cbor_serialize_byte_string(&stream, "1");
-    cbor_serialize_int(&stream, 2);
-    cbor_serialize_byte_string(&stream, "2");
-
-    cbor_serialize_map_indefinite(&stream);
-    cbor_serialize_int(&stream, 10);
-    cbor_serialize_byte_string(&stream, "10");
-    cbor_serialize_int(&stream, 11);
-    cbor_serialize_byte_string(&stream, "11");
-    cbor_write_break(&stream);
-
-#ifdef MODULE_CBOR_SEMANTIC_TAGGING
-#ifdef MODULE_CBOR_CTIME
-    time_t rawtime;
-    time(&rawtime);
-    struct tm *timeinfo = localtime(&rawtime);
-    cbor_serialize_date_time(&stream, timeinfo);
-    cbor_serialize_date_time_epoch(&stream, rawtime);
-#endif /* MODULE_CBOR_CTIME */
-
-    /* decoder should skip the tag and print 'unsupported' here */
-    cbor_write_tag(&stream, 2);
-    cbor_serialize_byte_string(&stream, "1");
-#endif /* MODULE_CBOR_SEMANTIC_TAGGING */
-
-    //cbor_stream_decode(&stream);
-}
-#endif /* MODULE_CBOR_PRINT */
-
 /**
  * See examples from CBOR RFC (cf. Appendix A. Examples)
  */
@@ -858,9 +797,5 @@ TestRef tests_cbor_all(void)
 
 void tests_cbor(void)
 {
-#ifdef MODULE_CBOR_PRINT
-    test_stream_decode();
-#endif /* MODULE_CBOR_PRINT */
-
     TESTS_RUN(tests_cbor_all());
 }
