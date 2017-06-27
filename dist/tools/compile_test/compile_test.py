@@ -21,7 +21,7 @@
 
 from __future__ import print_function
 
-import re
+import os.path
 from itertools import groupby
 from os import devnull, environ, listdir
 from os.path import abspath, dirname, isfile, join
@@ -83,7 +83,9 @@ def get_results_and_output_from(fd):
         elif read_more_output:
             output.write(line)
 
+
 def build_all():
+    """Build all applications in examples and tests folder."""
     riotbase = environ.get('RIOTBASE') or abspath(join(dirname(abspath(__file__)), '../' * 3))
     for folder in ('examples', 'tests'):
         print('Building all applications in: {}'.format(colorize_str(folder, Termcolor.blue)))
@@ -97,40 +99,64 @@ def build_all():
         subprocess_env['BUILDTEST_VERBOSE'] = '1'
 
         for nth, application in enumerate(applications, 1):
-            stdout.write('\tBuilding application: {} ({}/{}) '.format(colorize_str(application, Termcolor.blue), nth, len(applications)))
+            stdout.write('\tBuilding application: {} ({}/{}) '
+                         .format(colorize_str(application, Termcolor.blue),
+                                 nth, len(applications)))
             stdout.flush()
-            try:
-                subprocess = Popen(('make', 'buildtest'),
-                                   bufsize=1, stdin=null, stdout=PIPE, stderr=null,
-                                   cwd=join(riotbase, folder, application),
-                                   env=subprocess_env)
+            if folder == 'tests' and application == 'saul':
+                # For tests/saul, we loop other all drivers having saul
+                # capabilities
+                saul_drivers_dir = join(riotbase, 'sys', 'auto_init', 'saul')
+                raw_saul_drivers = listdir(saul_drivers_dir)
+                exclude_files = ('Makfile', 'auto_init_adc.c', 'auto_init_gpio.c')
+                drivers = [os.path.splitext(i)[0].split('_')[-1]
+                           for i in raw_saul_drivers if i not in exclude_files]
+                for driver in drivers:
+                    subprocess_env.update({'USEMODULE', driver})
+                    build_application(application, folder, riotbase,
+                                      subprocess_env)
+                    subprocess_env.pop('USEMODULE')
+            else:
+                build_application(application, folder, riotbase,
+                                  subprocess_env)
 
-                results, results_with_output = tee(get_results_and_output_from(subprocess.stdout))
-                results = groupby(sorted(results), lambda res: res[0])
-                results_with_output = list(filter(lambda res: res[2].getvalue(), results_with_output))
-                failed_with_output = list(filter(lambda res: 'failed' in res[0], results_with_output))
-                success_with_output = list(filter(lambda res: 'success' in res[0], results_with_output))
-                print()
-                for group, result in results:
-                    print('\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board, output in result))))
-                returncode = subprocess.wait()
-                if success_with_output:
-                    warnings.append((application, success_with_output))
-                if returncode == 0:
-                    success.append(application)
-                else:
-                    if not failed_with_output:
-                        print(colorize_str('\t\tmake buildtest error!', Termcolor.red))
-                    failed.append(application)
-                    errors.append((application, failed_with_output))
-            except Exception as e:
-                print('\n\t\tException: {}'.format(e))
-                exceptions.append(application)
-            finally:
-                try:
-                    subprocess.kill()
-                except:
-                    pass
+
+def build_application(application, folder, riotbase, env):
+    """Build a single application in one try."""
+    try:
+        subprocess = Popen(('make', 'buildtest'),
+                           bufsize=1, stdin=null, stdout=PIPE, stderr=null,
+                           cwd=join(riotbase, folder, application),
+                           env=env)
+
+        results, results_with_output = tee(get_results_and_output_from(subprocess.stdout))
+        results = groupby(sorted(results), lambda res: res[0])
+        results_with_output = list(filter(lambda res: res[2].getvalue(), results_with_output))
+        failed_with_output = list(filter(lambda res: 'failed' in res[0], results_with_output))
+        success_with_output = list(filter(lambda res: 'success' in res[0], results_with_output))
+        print()
+        for group, result in results:
+            print('\t\t{}: {}'
+                  .format(group, ', '.join(sorted(board for outcome, board, output in result))))
+        returncode = subprocess.wait()
+        if success_with_output:
+            warnings.append((application, success_with_output))
+        if returncode == 0:
+            success.append(application)
+        else:
+            if not failed_with_output:
+                print(colorize_str('\t\tmake buildtest error!', Termcolor.red))
+            failed.append(application)
+            errors.append((application, failed_with_output))
+    except Exception as exc:
+        print('\n\t\tException: {}'.format(exc))
+        exceptions.append(application)
+    finally:
+        try:
+            subprocess.kill()
+        except:
+            pass
+
 
 def colorize_str(string, color):
     return '%s%s%s' % (color, string, Termcolor.end)
