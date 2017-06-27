@@ -110,10 +110,28 @@ static_tests() {
     BUILDTEST_MCU_GROUP=static-tests ./dist/tools/ci/build_and_test.sh
 }
 
+get_test_jobs() {
+    RIOTBASE=$(pwd) dist/tools/testrunner/testrunner.py \
+        --murdock \
+        --all \
+        --tests dist/testsuite/tests/02-tests \
+        --nodes /home/kaspar/src/riot/dist/testsuite/nodes
+}
+
+run_test() {
+    [ -z "$TESTRUNNER_NODES" ] && {
+        echo "$0: TESTRUNNER_NODES not set!"
+        exit 1
+    }
+
+    RIOTBASE=$(pwd) dist/tools/testrunner/testrunner.py --tests $1 ${2:+--instance $2}
+}
+
 get_jobs() {
     [ "$STATIC_TESTS" = "1" ] && \
         echo "$0 static_tests###{ \"jobdir\" : \"exclusive\" }"
     get_compile_jobs
+    get_test_jobs
 }
 
 $*
