@@ -230,13 +230,6 @@ static const spi_conf_t spi_config[] = {
 #define ADC_NUMOF          (0)
 /** @} */
 
-/**
- * @name    DAC configuration
- * @{
- */
-#define DAC_NUMOF          (0)
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif

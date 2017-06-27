@@ -59,13 +59,6 @@
 #define CLOCK_APB1          (CLOCK_CORECLOCK / 2)
 /** @} */
 
- /**
-  * @name   DAC configuration
-  * @{
-  */
- #define DAC_NUMOF           (0)
- /** @} */
-
 /**
  * @name ADC configuration
  * @{

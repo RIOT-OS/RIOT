@@ -49,11 +49,11 @@ extern "C" {
  * @name   DAC configuration
  * @{
  */
-#define DAC_CONFIG {                \
-    { GPIO_PIN(PORT_A, 4), 0, 0 },  \
-}
+static const dac_conf_t dac_config[] = {
+    { .pin = GPIO_PIN(PORT_A,  4), .chan = 0 }
+};
 
-#define DAC_NUMOF           (1)
+#define DAC_NUMOF           (sizeof(dac_config) / sizeof(dac_config[0]))
 /** @} */
 
 /**

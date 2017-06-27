@@ -113,13 +113,6 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name   DAC configuration
- * @{
- */
-#define DAC_NUMOF           (0)
-/** @} */
-
-/**
  * @name SPI configuration
  * @{
  */

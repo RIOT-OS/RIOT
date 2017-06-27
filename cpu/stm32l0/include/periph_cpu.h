@@ -66,14 +66,6 @@ typedef struct {
 } adc_conf_t;
 
 /**
- * @brief   DAC line configuration data
- */
-typedef struct {
-    gpio_t pin;             /**< pin connected to the line */
-    uint8_t chan;           /**< DAC device used for this line */
-} dac_conf_t;
-
-/**
  * @brief   I2C configuration data structure
  */
 typedef struct {
