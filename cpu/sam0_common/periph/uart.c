@@ -51,44 +51,17 @@ static inline SercomUsart *_uart(uart_t dev)
 
 static uint64_t _long_division(uint64_t n, uint64_t d);
 
-/**
- * @brief   Get the sercom gclk id of the given UART device
- *
- * @param[in] dev       UART device identifier
- *
- * @return              sercom gclk id
- */
+static uint8_t sercom_gclk_id[] =
+        {
+            SERCOM0_GCLK_ID_CORE,
+            SERCOM1_GCLK_ID_CORE,
+            SERCOM2_GCLK_ID_CORE,
+            SERCOM3_GCLK_ID_CORE,
+            SERCOM4_GCLK_ID_CORE,
+            SERCOM5_GCLK_ID_CORE
+        };
 
-static int _get_sercom_gclk_id(SercomUsart *dev)
-{
-    int id;
 
-    switch(sercom_id(dev)) {
-        case 0:
-            id = SERCOM0_GCLK_ID_CORE;
-            break;
-        case 1:
-            id = SERCOM1_GCLK_ID_CORE;
-            break;
-        case 2:
-            id = SERCOM2_GCLK_ID_CORE;
-            break;
-        case 3:
-            id = SERCOM3_GCLK_ID_CORE;
-            break;
-        case 4:
-            id = SERCOM4_GCLK_ID_CORE;
-            break;
-        case 5:
-            id = SERCOM5_GCLK_ID_CORE;
-            break;
-        default:
-            id = -1;
-            DEBUG("[UART]: wrong SERCOM ID\n");
-            break;
-    }
-    return id;
-}
 #endif
 
 static int init_base(uart_t uart, uint32_t baudrate);
@@ -130,7 +103,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
 
 #ifdef CPU_FAM_SAMD21
     /* calculate baudrate */
-    uint32_t  baud =  ((((uint32_t)CLOCK_CORECLOCK * 10) / baudrate) / 16);
+    uint32_t baud = ((((uint32_t)CLOCK_CORECLOCK * 10) / baudrate) / 16);
     /* enable sync and async clocks */
     uart_poweron(uart);
     /* reset the UART device */
@@ -210,11 +183,12 @@ void uart_poweron(uart_t uart)
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 #elif CPU_FAM_SAML21
     /* Enable the peripheral channel */
-    GCLK->PCHCTRL[_get_sercom_gclk_id(dev)].reg |= GCLK_PCHCTRL_CHEN |
-                                                   GCLK_PCHCTRL_GEN(uart_config[uart].gclk_src);
+    GCLK->PCHCTRL[sercom_gclk_id[sercom_id(dev)]].reg |=
+            GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(uart_config[uart].gclk_src);
 
-    while (!(GCLK->PCHCTRL[_get_sercom_gclk_id(dev)].reg & GCLK_PCHCTRL_CHEN)) {}
-    if(_get_sercom_gclk_id(dev) < 5) {
+    while (!(GCLK->PCHCTRL[sercom_gclk_id[sercom_id(dev)]].reg &
+           GCLK_PCHCTRL_CHEN)) {}
+    if(sercom_gclk_id[sercom_id(dev)] < 5) {
         MCLK->APBCMASK.reg |= MCLK_APBCMASK_SERCOM0 << sercom_id(dev);
     }
     else {
@@ -240,9 +214,9 @@ void uart_poweroff(uart_t uart)
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 #elif CPU_FAM_SAML21
     /* Enable the peripheral channel */
-    GCLK->PCHCTRL[_get_sercom_gclk_id(dev)].reg &= ~GCLK_PCHCTRL_CHEN;
+    GCLK->PCHCTRL[sercom_gclk_id[sercom_id(dev)]].reg &= ~GCLK_PCHCTRL_CHEN;
 
-    if(_get_sercom_gclk_id(dev) < 5) {
+    if(sercom_gclk_id[sercom_id(dev)] < 5) {
         MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << sercom_id(dev));
     }
     else {
@@ -259,7 +233,8 @@ static inline void irq_handler(uint8_t uartnum)
 #ifdef CPU_FAM_SAMD21
     if (uart->INTFLAG.reg & SERCOM_USART_INTFLAG_RXC) {
         /* interrupt flag is cleared by reading the data register */
-        uart_ctx[uartnum].rx_cb(uart_ctx[uartnum].arg, (uint8_t)(uart->DATA.reg));
+        uart_ctx[uartnum].rx_cb(uart_ctx[uartnum].arg,
+                                (uint8_t)(uart->DATA.reg));
     }
     else if (uart->INTFLAG.reg & SERCOM_USART_INTFLAG_ERROR) {
         /* clear error flag */
