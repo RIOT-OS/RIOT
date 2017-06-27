@@ -62,6 +62,10 @@ int netdev_eth_get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
                 res = sizeof(uint16_t);
                 break;
             }
+        case NETOPT_SRC_ADDR:
+            res = netdev->driver->get(netdev, NETOPT_ADDRESS, addr,
+                                      ETHERNET_ADDR_LEN);
+            break;
         case NETOPT_MAX_PACKET_SIZE:
             {
                 assert(max_len >= 2);
