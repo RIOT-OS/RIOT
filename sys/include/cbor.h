@@ -120,9 +120,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#ifndef CBOR_NO_CTIME
+#ifdef MODULE_CBOR_CTIME
 #include <time.h>
-#endif /* CBOR_NO_CTIME */
+#endif /* MODULE_CBOR_CTIME */
 
 #ifdef __cplusplus
 extern "C" {
@@ -183,7 +183,6 @@ void cbor_clear(cbor_stream_t *stream);
  */
 void cbor_destroy(cbor_stream_t *stream);
 
-#ifndef CBOR_NO_PRINT
 /**
  * @brief Print @p stream in hex representation
  *
@@ -210,7 +209,6 @@ void cbor_stream_print(const cbor_stream_t *stream);
  * @param[in] stream Pointer to the cbor struct
  */
 void cbor_stream_decode(cbor_stream_t *stream);
-#endif /* CBOR_NO_PRINT */
 
 /**
  * @brief Serializes an integer
@@ -300,7 +298,7 @@ size_t cbor_serialize_bool(cbor_stream_t *stream, bool val);
 size_t cbor_deserialize_bool(const cbor_stream_t *stream, size_t offset,
                              bool *val);
 
-#ifndef CBOR_NO_FLOAT
+#ifdef MODULE_CBOR_FLOAT
 /**
  * @brief Serializes a half-width floating point value
  *
@@ -366,7 +364,7 @@ size_t cbor_serialize_double(cbor_stream_t *stream, double val);
  */
 size_t cbor_deserialize_double(const cbor_stream_t *stream, size_t offset,
                                double *val);
-#endif /* CBOR_NO_FLOAT */
+#endif /* MODULE_CBOR_FLOAT */
 
 /**
  * @brief Serializes a signed 64 bit value
@@ -580,8 +578,8 @@ size_t cbor_serialize_map_indefinite(cbor_stream_t *stream);
  */
 size_t cbor_deserialize_map_indefinite(const cbor_stream_t *stream, size_t offset);
 
-#ifndef CBOR_NO_SEMANTIC_TAGGING
-#ifndef CBOR_NO_CTIME
+#ifdef MODULE_CBOR_SEMANTIC_TAGGING
+#ifdef MODULE_CBOR_CTIME
 /**
  * @brief Serialize date and time
  *
@@ -643,7 +641,7 @@ size_t cbor_serialize_date_time_epoch(cbor_stream_t *stream, time_t val);
  */
 size_t cbor_deserialize_date_time_epoch(const cbor_stream_t *stream, size_t offset, time_t *val);
 
-#endif /* CBOR_NO_CTIME */
+#endif /* MODULE_CBOR_CTIME */
 
 /**
  * @brief Write a tag to give the next CBOR item additional semantics
@@ -667,7 +665,7 @@ size_t cbor_write_tag(cbor_stream_t *stream, unsigned char tag);
  */
 bool cbor_at_tag(const cbor_stream_t *stream, size_t offset);
 
-#endif /* CBOR_NO_SEMANTIC_TAGGING */
+#endif /* MODULE_CBOR_SEMANTIC_TAGGING */
 
 /**
  * @brief Write a break symbol at the current offset in stream @p stream
