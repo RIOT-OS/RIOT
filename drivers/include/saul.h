@@ -112,7 +112,7 @@ enum {
  * @return  -ENOTSUP if the device does not support this operation
  * @return  -ECANCELED on other errors
  */
-typedef int(*saul_read_t)(void *dev, phydat_t *res);
+typedef int(*saul_read_t)(const void *dev, phydat_t *res);
 
 /**
  * @brief   Write a value (a set of values) to a device
@@ -132,7 +132,7 @@ typedef int(*saul_read_t)(void *dev, phydat_t *res);
  * @return  -ENOTSUP if the device does not support this operation
  * @return  -ECANCELED on other errors
  */
-typedef int(*saul_write_t)(void *dev, phydat_t *data);
+typedef int(*saul_write_t)(const void *dev, phydat_t *data);
 
 /**
  * @brief   Definition of the RIOT actuator/sensor interface
@@ -146,7 +146,7 @@ typedef struct {
 /**
  * @brief   Default not supported function
  */
-int saul_notsup(void *dev, phydat_t *dat);
+int saul_notsup(const void *dev, phydat_t *dat);
 
 /**
  * @brief   Helper function converts a class ID to a string
@@ -156,7 +156,7 @@ int saul_notsup(void *dev, phydat_t *dat);
  * @return      string representation of the device class
  * @return      NULL if class ID is not known
  */
-const char *saul_class_to_str(uint8_t class_id);
+const char *saul_class_to_str(const uint8_t class_id);
 
 #ifdef __cplusplus
 }

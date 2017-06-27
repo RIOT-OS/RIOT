@@ -22,7 +22,7 @@
 
 #include "saul.h"
 
-int saul_notsup(void *dev, phydat_t *dat)
+int saul_notsup(const void *dev, phydat_t *dat)
 {
     (void)dev;
     (void)dat;

@@ -17,9 +17,9 @@
 #include "lsm6dsl.h"
 #include "saul.h"
 
-static int read_acc(void *dev, phydat_t *res)
+static int read_acc(const void *dev, phydat_t *res)
 {
-    int ret = lsm6dsl_read_acc(dev, (lsm6dsl_3d_data_t *)res);
+    int ret = lsm6dsl_read_acc((const lsm6dsl_t *)dev, (lsm6dsl_3d_data_t *)res);
     if (ret < 0) {
         return -ECANCELED;
     }
@@ -30,9 +30,9 @@ static int read_acc(void *dev, phydat_t *res)
     return 3;
 }
 
-static int read_gyro(void *dev, phydat_t *res)
+static int read_gyro(const void *dev, phydat_t *res)
 {
-    int ret = lsm6dsl_read_gyro(dev, (lsm6dsl_3d_data_t *)res);
+    int ret = lsm6dsl_read_gyro((const lsm6dsl_t *)dev, (lsm6dsl_3d_data_t *)res);
     if (ret < 0) {
         return -ECANCELED;
     }
@@ -48,7 +48,6 @@ const saul_driver_t lsm6dsl_saul_acc_driver = {
     .write = saul_notsup,
     .type = SAUL_SENSE_ACCEL,
 };
-
 
 const saul_driver_t lsm6dsl_saul_gyro_driver = {
     .read = read_gyro,
