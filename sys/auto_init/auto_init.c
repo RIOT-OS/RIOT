@@ -343,6 +343,10 @@ void auto_init(void)
     extern void auto_init_adcxx1c(void);
     auto_init_adcxx1c();
 #endif
+#ifdef MODULE_LPS25H
+    extern void auto_init_lps25h(void);
+    auto_init_lps25h();
+#endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 
