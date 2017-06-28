@@ -27,8 +27,6 @@
 int main(void)
 {
     lps25h_t dev;
-    int16_t temp;
-    uint16_t pres;
 
     puts("LPS25H pressure sensor test application");
 
@@ -42,10 +40,8 @@ int main(void)
     }
 
     while (1) {
-        temp = lps25h_read_temperature(&dev);
-        pres = lps25h_read_pressure(&dev);
-
-        printf("Pressure: %3i hPa - Temperature: %3i °C\n", pres, temp);
+        printf("Pressure: %3i hPa - Temperature: %3i °C\n",
+               lps25h_read_pressure(&dev), lps25h_read_temperature(&dev));
 
         xtimer_sleep(1);
     }
