@@ -79,7 +79,7 @@ static inline void set_u16(uint8_t *buf, uint16_t val)
 #endif
 }
 
-static int set_len(uint8_t *buf, size_t len)
+static size_t set_len(uint8_t *buf, size_t len)
 {
     if (len < (0xff - 7)) {
         buf[0] = len + 1;
@@ -92,7 +92,7 @@ static int set_len(uint8_t *buf, size_t len)
     }
 }
 
-static int get_len(uint8_t *buf, uint16_t *len)
+static size_t get_len(uint8_t *buf, uint16_t *len)
 {
     if (buf[0] != 0x01) {
         *len = (uint16_t)buf[0];
@@ -165,21 +165,24 @@ static void on_ack(uint8_t type, int id_pos, int ret_pos, int res_pos)
     }
 }
 
-static void on_publish(void)
+static void on_publish(size_t len, size_t pos)
 {
+    /* make sure packet length is valid - if not, drop packet silently */
+    if (len < (pos + 6)) {
+        return;
+    }
+
     emcute_sub_t *sub;
-    uint16_t len;
-    int pos = get_len(rbuf, &len);
     uint16_t tid = get_u16(&rbuf[pos + 2]);
 
     /* allocate a response packet */
     uint8_t buf[7] = { 7, PUBACK, 0, 0, 0, 0, ACCEPT };
     /* and populate message ID and topic ID fields */
-    memcpy(&buf[2], &rbuf[3], 4);
+    memcpy(&buf[2], &rbuf[pos + 2], 4);
 
     /* return error code in case we don't support/understand active flags. So
      * far we only understand QoS 1... */
-    if (rbuf[2] & ~(EMCUTE_QOS_1 | EMCUTE_TIT_SHORT)) {
+    if (rbuf[pos + 1] & ~(EMCUTE_QOS_1 | EMCUTE_TIT_SHORT)) {
         buf[6] = REJ_NOTSUP;
         sock_udp_send(&sock, &buf, 7, &gateway);
         return;
@@ -193,11 +196,13 @@ static void on_publish(void)
         DEBUG("[emcute] on pub: no subscription found\n");
     }
     else {
-        if (rbuf[2] & EMCUTE_QOS_1) {
+        if (rbuf[pos + 1] & EMCUTE_QOS_1) {
             sock_udp_send(&sock, &buf, 7, &gateway);
         }
         DEBUG("[emcute] on pub: got %i bytes of data\n", (int)(len - pos - 6));
-        sub->cb(&sub->topic, &rbuf[pos + 6], (size_t)(len - pos - 6));
+        size_t dat_len = (len - pos - 6);
+        void *dat = (dat_len > 0) ? &rbuf[pos + 6] : NULL;
+        sub->cb(&sub->topic, dat, dat_len);
     }
 }
 
@@ -269,7 +274,7 @@ int emcute_con(sock_udp_ep_t *remote, bool clean, const char *will_topic,
         }
 
         /* now send WILLTOPIC */
-        int pos = set_len(tbuf, (topic_len + 2));
+        size_t pos = set_len(tbuf, (topic_len + 2));
         len = (pos + topic_len + 2);
         tbuf[pos++] = WILLTOPIC;
         tbuf[pos++] = will_flags;
@@ -356,7 +361,7 @@ int emcute_pub(emcute_topic_t *topic, const void *data, size_t len,
 
     mutex_lock(&txlock);
 
-    int pos = set_len(tbuf, (len + 6));
+    size_t pos = set_len(tbuf, (len + 6));
     len += (pos + 6);
     tbuf[pos++] = PUBLISH;
     tbuf[pos++] = flags;
@@ -493,7 +498,7 @@ int emcute_willupd_msg(const void *data, size_t len)
 
     mutex_lock(&txlock);
 
-    int pos = set_len(tbuf, (len + 1));
+    size_t pos = set_len(tbuf, (len + 1));
     len += (pos + 1);
     tbuf[pos++] = WILLMSGUPD;
     memcpy(&tbuf[pos], data, len);
@@ -532,23 +537,33 @@ void emcute_run(uint16_t port, const char *id)
         if (len >= 2) {
             /* handle the packet */
             uint16_t pkt_len;
-            int pos = get_len(rbuf, &pkt_len);
+            /* catch invalid length field */
+            if ((len == 2) && (rbuf[0] == 0x01)) {
+                continue;
+            }
+            /* parse length field */
+            size_t pos = get_len(rbuf, &pkt_len);
+            /* verify length to prevent overflows */
+            if (((size_t)pkt_len > (size_t)len) || (pos >= (size_t)len)) {
+                continue;
+            }
+            /* get packet type */
             uint8_t type = rbuf[pos];
 
             switch (type) {
-                case CONNACK:       on_ack(type, 0, 2, 0);  break;
-                case WILLTOPICREQ:  on_ack(type, 0, 0, 0);  break;
-                case WILLMSGREQ:    on_ack(type, 0, 0, 0);  break;
-                case REGACK:        on_ack(type, 4, 6, 2);  break;
-                case PUBLISH:       on_publish();           break;
-                case PUBACK:        on_ack(type, 4, 6, 0);  break;
-                case SUBACK:        on_ack(type, 5, 7, 3);  break;
-                case UNSUBACK:      on_ack(type, 2, 0, 0);  break;
-                case PINGREQ:       on_pingreq(&remote);    break;
-                case PINGRESP:      on_pingresp();          break;
-                case DISCONNECT:    on_disconnect();        break;
-                case WILLTOPICRESP: on_ack(type, 0, 0, 0);  break;
-                case WILLMSGRESP:   on_ack(type, 0, 0, 0);  break;
+                case CONNACK:       on_ack(type, 0, 2, 0);              break;
+                case WILLTOPICREQ:  on_ack(type, 0, 0, 0);              break;
+                case WILLMSGREQ:    on_ack(type, 0, 0, 0);              break;
+                case REGACK:        on_ack(type, 4, 6, 2);              break;
+                case PUBLISH:       on_publish((size_t)pkt_len, pos);   break;
+                case PUBACK:        on_ack(type, 4, 6, 0);              break;
+                case SUBACK:        on_ack(type, 5, 7, 3);              break;
+                case UNSUBACK:      on_ack(type, 2, 0, 0);              break;
+                case PINGREQ:       on_pingreq(&remote);                break;
+                case PINGRESP:      on_pingresp();                      break;
+                case DISCONNECT:    on_disconnect();                    break;
+                case WILLTOPICRESP: on_ack(type, 0, 0, 0);              break;
+                case WILLMSGRESP:   on_ack(type, 0, 0, 0);              break;
                 default:
                     LOG_DEBUG("[emcute] received unexpected type [%s]\n",
                               emcute_type_str(type));
