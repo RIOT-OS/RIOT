@@ -10,8 +10,7 @@ RIOTBASE ?= $(CURDIR)/../..
 # TinyDTLS only has support for 32-bit architectures ATM
 BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
                    msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b wsn430-v1_4 \
-                   z1 \
-                   nrf52dk # see #6022
+                   z1
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 \
                              calliope-mini cc2650stk maple-mini \
